@@ -21,7 +21,7 @@ namespace Belle2 {
     * @param name Name of the branch to be read/saved
     * @param durability 0: event, 1: run, 2: persistent
     */
-    PyStoreArray(const std::string& name = "", int durability = 0):
+    explicit PyStoreArray(const std::string& name = "", int durability = 0):
       TObject(),
       m_storearray(name, DataStore::EDurability(durability)) { }
 

@@ -38,7 +38,7 @@ namespace Belle2 {
      *  @param name        Name under which the TClonesArray is stored.
      *  @param durability  Specifies lifetime of array in question.
      */
-    StoreArray(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
+    explicit StoreArray(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
       assignArray(name, durability);
     }
 
@@ -62,7 +62,7 @@ namespace Belle2 {
       DataStore::Instance().handleArray<T>(m_name, durability, m_storeArray);
     }
 
-    /** Switch the array, the StoreArray points to.
+    /** Switch the array the StoreArray points to.
      *
      *  @param name       Key with which the TClonesArray is saved. An empty string is treated as equal to class name.
      *  @param durability Specifies lifetime of array in question.
@@ -77,7 +77,7 @@ namespace Belle2 {
       return (b.m_name == m_name) && (b.m_durability == m_durability);
     }
     bool operator!=(const StoreArray<T> &b) const {                /**< ...or to different ones. */
-      return (b.m_name != m_name) || (b.m_durability != m_durability);
+      return *this != b;
     }
     operator bool() const {return m_storeArray;}  /**< Imitate array functionality. */
 

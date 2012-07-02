@@ -13,6 +13,8 @@
 #include <framework/core/Environment.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/utilities.h>
+#include <framework/core/EventProcessor.h>
+#include <framework/pcore/pEventProcessor.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConnectionIOStream.h>
@@ -68,13 +70,13 @@ void Framework::setExternalsPath(const std::string& path)
 }
 
 
-ModulePtr Framework::registerModule(const string moduleName) throw(ModuleManager::ModuleNotCreatedError)
+ModulePtr Framework::registerModule(const string& moduleName) throw(ModuleManager::ModuleNotCreatedError)
 {
   return ModuleManager::Instance().registerModule(moduleName);
 }
 
 
-ModulePtr Framework::registerModule(const string moduleName, const string sharedLibPath) throw(ModuleManager::ModuleNotCreatedError)
+ModulePtr Framework::registerModule(const string& moduleName, const string& sharedLibPath) throw(ModuleManager::ModuleNotCreatedError)
 {
   return ModuleManager::Instance().registerModule(moduleName, sharedLibPath);
 }
@@ -170,8 +172,8 @@ boost::python::list Framework::getRegisteredModulesPython() const
 void Framework::exposePythonAPI()
 {
   //Overloaded methods
-  ModulePtr(Framework::*registerModule1)(string) = &Framework::registerModule;
-  ModulePtr(Framework::*registerModule2)(string, string) = &Framework::registerModule;
+  ModulePtr(Framework::*registerModule1)(const string&) = &Framework::registerModule;
+  ModulePtr(Framework::*registerModule2)(const string&, const string&) = &Framework::registerModule;
   void(Framework::*process1)(PathPtr) = &Framework::process;
   void(Framework::*process2)(PathPtr, long) = &Framework::process;
 

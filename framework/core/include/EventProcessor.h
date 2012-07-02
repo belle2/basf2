@@ -13,10 +13,10 @@
 
 #include <framework/core/Module.h>
 #include <framework/core/Path.h>
-#include <framework/core/PathManager.h>
 
 namespace Belle2 {
 
+  class PathManager;
   /**
    * The EventProcessor Class.
    *

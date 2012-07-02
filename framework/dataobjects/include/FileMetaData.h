@@ -34,81 +34,81 @@ namespace Belle2 {
 
     /** Unique identifier getter.
      */
-    int getId() {return m_id;}
+    int getId() const {return m_id;}
 
     /** Grid unique identifier getter.
      */
-    std::string getGuid() {return m_guid;}
+    std::string getGuid() const {return m_guid;}
 
     /** Logical file name getter.
      */
-    std::string getLfn() {return m_lfn;}
+    std::string getLfn() const {return m_lfn;}
 
     /** Number of events getter.
      */
-    unsigned long getEvents() {return m_events;}
+    unsigned long getEvents() const {return m_events;}
 
     /** Experiment number getter.
      */
-    unsigned long getExperiment() {return m_experiment;}
+    unsigned long getExperiment() const {return m_experiment;}
 
     /** Lowest run number getter.
      */
-    unsigned long getRunLow() {return m_runLow;}
+    unsigned long getRunLow() const {return m_runLow;}
 
     /** Lowest event number in lowest run getter.
      */
-    unsigned long getEventLow() {return m_eventLow;}
+    unsigned long getEventLow() const {return m_eventLow;}
 
     /** Highest run number getter.
      */
-    unsigned long getRunHigh() {return m_runHigh;}
+    unsigned long getRunHigh() const {return m_runHigh;}
 
     /** Highest event number in highest run getter.
      */
-    unsigned long getEventHigh() {return m_eventHigh;}
+    unsigned long getEventHigh() const {return m_eventHigh;}
 
     /** Get number of parent files.
      */
-    int getNParents() {return m_parents.size();}
+    int getNParents() const {return m_parents.size();}
 
     /** Get unique identifier of parent file.
      *
      *  @param iParent The number of the parent file.
      */
-    int getParent(int iParent) {return m_parents[iParent];}
+    int getParent(int iParent) const {return m_parents[iParent];}
 
     /** Software release version getter.
      */
-    std::string getRelease() {return m_release;}
+    std::string getRelease() const {return m_release;}
 
     /** File creation date and time getter.
      */
-    time_t getTimeStamp() {return m_timeStamp;}
+    time_t getTimeStamp() const {return m_timeStamp;}
 
     /** Site where the file was created getter.
      */
-    std::string getSite() {return m_site;}
+    std::string getSite() const {return m_site;}
 
     /** User who created the file getter.
      */
-    std::string getUser() {return m_user;}
+    std::string getUser() const {return m_user;}
 
     /** Unique identifier of log file getter.
      */
-    int getLogFile() {return m_logFile;}
+    int getLogFile() const {return m_logFile;}
 
     /** Random seed getter.
      */
-    unsigned int getRandomSeed() {return m_randomSeed;}
+    unsigned int getRandomSeed() const {return m_randomSeed;}
 
     /** Initital random number generator object getter.
      */
-    const TRandom3 getRandom() {return m_random;}
+    const TRandom3 getRandom() const {return m_random;}
 
     /** Steering file content getter.
      */
-    std::string getSteering() {return m_steering;}
+    std::string getSteering() const {return m_steering;}
 
     /** Number of events setter.
      *

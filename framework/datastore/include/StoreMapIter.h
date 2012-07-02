@@ -25,6 +25,7 @@ namespace Belle2 {
    *  to create this class internally.
    *
    *  @author <a href="mailto:martin.heck@kit.edu?subject=StoreMapIter">Martin Heck</a>
+   *  @deprecated DataStore::getArray/ObjectIterator() and the StoreIter class are deprecated! Please use getObjMap() and std:map<>::iterators instead.
    */
   template <class T>
   class StoreMapIter : public StoreIter {

@@ -12,6 +12,8 @@
 
 #include <TObject.h>
 
+#include <vector>
+
 namespace Belle2 {
 
   /** Possibility to store primitive types like ints into the DataStore; not recommended for use in official modules.
@@ -31,7 +33,7 @@ namespace Belle2 {
      *
      *  @par AVector, that will be saved internally.
      */
-    SimpleVec(std::vector<T> AVector) {
+    SimpleVec(const std::vector<T>& AVector) {
       m_vector = AVector;
     }
 
@@ -52,7 +54,7 @@ namespace Belle2 {
      *
      *  @par AVector Vector to be saved. Keep in mind the initial template instantiation.
      */
-    void setVector(std::vector<T> AVector) {
+    void setVector(const std::vector<T>& AVector) {
       m_vector = AVector;
     }
 
@@ -60,7 +62,7 @@ namespace Belle2 {
      *
      *  @return Vector, that was internally saved.
      */
-    std::vector<T> getVector() {
+    const std::vector<T>& getVector() const {
       return m_vector;
     }
 

@@ -139,7 +139,7 @@ void RxModule::event()
   // Restore arrays in DataStore
   for (int i = 0; i < narrays; i++) {
     //    printf ( "Rx : restoring index=%d\n", i+nobjs );
-    TClonesArray* adrs = (TClonesArray*) objlist.at(i + nobjs);
+    //TClonesArray* adrs = (TClonesArray*) objlist.at(i + nobjs);
     //    printf ( "Rx: Address of %s = %8.8x (pid=%d)\n", (namelist.at(i+nobjs)).c_str(), adrs, (int)getpid() );
     //    printf ( "Rx: Restoring [Array] %s\n", namelist.at(i+nobjs).c_str() );
 

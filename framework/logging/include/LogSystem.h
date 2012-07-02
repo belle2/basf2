@@ -54,7 +54,8 @@ namespace Belle2 {
     /**
      * Adds a log connection object which is used to the send the logging messages.
      *
-     * Please note: The LogSystem class takes ownership of the log connection object.
+     * \note
+     * The LogSystem class takes ownership of the log connection object.
      *
      * @param logConnection Pointer to the logging connection object. The LogSystem takes ownership of this object.
      */

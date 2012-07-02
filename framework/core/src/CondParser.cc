@@ -55,7 +55,7 @@ bool CondParser::parseCondition(string expression, EConditionOperators& condOper
   //Try to translate the remaining text to a number
   try {
     condValue = boost::lexical_cast<int>(expression.substr(iOperator, expression.length() - 1));
-  } catch (boost::bad_lexical_cast& b) {
+  } catch (boost::bad_lexical_cast&) {
     return false;
   }
   return true;

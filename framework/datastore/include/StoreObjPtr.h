@@ -32,7 +32,7 @@ namespace Belle2 {
      *  @param generate   Shall an object in the DataStore be created, if none exists with given name and durability?
      *  @sa assignObject
      */
-    StoreObjPtr(const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event, bool generate = true) {
+    explicit StoreObjPtr(const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event, bool generate = true) {
       assignObject(name, durability,  generate);
     }
 
@@ -58,7 +58,7 @@ namespace Belle2 {
      *  The argument is ignored but required to distuingish
      *  between the default constructor and this one
      */
-    StoreObjPtr(int /*dummy*/)
+    explicit StoreObjPtr(int /*dummy*/)
       : m_storeObjPtr(0), m_name(""), m_durability(DataStore::c_Event) {}
 
     /** Virtual destructor for inherited classes */
@@ -91,9 +91,9 @@ namespace Belle2 {
     bool storeObject(T* const AObject, const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event);
 
     //------------------------ Imitate pointer functionality -----------------------------------------------
-    T& operator *()  const {return *m_storeObjPtr;};  /**< Imitate pointer functionality. */
-    T* operator ->() const {return m_storeObjPtr;};   /**< Imitate pointer functionality. */
-    operator bool()  const {return m_storeObjPtr;};   /**< Imitate pointer functionality. */
+    T& operator *()  const {return *m_storeObjPtr;}  /**< Imitate pointer functionality. */
+    T* operator ->() const {return m_storeObjPtr;}   /**< Imitate pointer functionality. */
+    operator bool()  const {return m_storeObjPtr;}   /**< Imitate pointer functionality. */
 
     //------------------------ Getters for AccessorParams --------------------------------------------------
     AccessorParams getAccessorParams() const {     /**< Returns name and durability under which the object is saved in the DataStore. */

@@ -12,6 +12,7 @@
 
 #include <framework/core/ModuleManager.h>
 #include <framework/core/ModuleStatistics.h>
+#include <framework/core/PathManager.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>

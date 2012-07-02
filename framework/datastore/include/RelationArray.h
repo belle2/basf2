@@ -134,7 +134,7 @@ namespace Belle2 {
      *  @param name       Name of the (existing) Relation
      *  @param durability Durability of the (existing) Relation
      */
-    RelationArray(std::string name, const DataStore::EDurability& durability = DataStore::c_Event): StoreObjPtr<RelationContainer>(0) {
+    explicit RelationArray(const std::string& name, DataStore::EDurability durability = DataStore::c_Event): StoreObjPtr<RelationContainer>(0) {
       if (name == "") {
         B2FATAL("Cannot guess relation name, please supply correct name");
         return;
@@ -174,7 +174,7 @@ namespace Belle2 {
     const AccessorParams getToAccessorParams()   const { check(); return AccessorParams(m_storeObjPtr->getToName(), (DataStore::EDurability) m_storeObjPtr->getToDurability()); }
 
     /** Get modified flag of underlying container. */
-    bool getModified() { check(); return m_storeObjPtr->getModified(); }
+    bool getModified() const { check(); return m_storeObjPtr->getModified(); }
 
     /** Set modified flag of underlying container. */
     void setModified(bool modified) { check(); m_storeObjPtr->setModified(modified); }
@@ -244,7 +244,7 @@ namespace Belle2 {
      *  This function will loop over the relation and "compress" it by
      *  merging all elements with the same fromIndex.
      *
-     *  The optional arguments can be used to replace indicies in the
+     *  The optional arguments can be used to replace indices in the
      *  relation, mainly useful in the simulation to replace the Geant4
      *  TrackID with the index of the MCParticle at the end of the event
      *

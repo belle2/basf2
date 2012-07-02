@@ -85,6 +85,7 @@ namespace Belle2 {
     >
     > ElementIndex;
 
+    /** Returns true if relation is valid */
     operator bool() const { return m_valid; }
 
     /** Get the index. */

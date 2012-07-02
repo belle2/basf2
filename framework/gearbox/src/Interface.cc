@@ -136,7 +136,7 @@ namespace Belle2 {
       BOOST_FOREACH(const string & tok, tokens) {
         try {
           numValue = boost::lexical_cast<double>(tok);
-        } catch (boost::bad_lexical_cast& e) {
+        } catch (boost::bad_lexical_cast&) {
           throw(ConversionError() << path << value.first);
         }
         if (!value.second.empty()) {

@@ -62,14 +62,14 @@ namespace Belle2 {
      *
      * @return The path in which the data files for the framework are located.
      */
-    const std::string getDataSearchPath() { return m_dataSearchPath; };
+    const std::string getDataSearchPath() const { return m_dataSearchPath; };
 
     /**
      * Returns the path which points to the externals directory of the framework.
      *
      * @return The path in which the externals of the framework are located.
      */
-    const std::string getExternalsPath() { return m_externalsPath; };
+    const std::string getExternalsPath() const { return m_externalsPath; };
 
     /**
      * Sets the number of processes which should be used for the parallel processing.
@@ -84,7 +84,7 @@ namespace Belle2 {
      *
      * @return  The number of processors used for the parallel processing.
      */
-    int getNumberProcesses() { return m_numberProcesses; }
+    int getNumberProcesses() const { return m_numberProcesses; }
 
     /**
      * Sets the steering file content.

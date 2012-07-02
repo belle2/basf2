@@ -26,6 +26,8 @@
 
 namespace Belle2 {
 
+  class PathManager;
+
   /*! The pEventProcessor Class */
   /*!
     This class provides the core event processing loop for parallel processing.

@@ -15,6 +15,9 @@ namespace Belle2 {
    * reimplemented virtual functions (e.g. event()) actually get called.
    * The C++ part of the framework will only see a PyModule, which will call
    * the corresponding methods of the python module (m_self)
+   *
+   * See framework/examples/cdcplotmodule.py for an example module. Note that
+   * the CDCPlotModule class inherits from Module, not PyModule.
    */
   class PyModule : public Module {
   public:
@@ -36,7 +39,7 @@ namespace Belle2 {
 
 
     /* reimplement all virtual functions of base class and call the corresponding method in the python class
-    * note that all methods must be registered in Module::exposePythonAPI()
+    *  note that all methods must be registered in Module::exposePythonAPI()
     */
 
     void initialize() { boost::python::call_method<void>(m_self, "initialize"); };

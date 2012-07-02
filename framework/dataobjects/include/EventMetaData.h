@@ -37,7 +37,7 @@ namespace Belle2 {
      *
      *  @param event The current event number.
      */
-    void setEvent(const unsigned long& event) {
+    void setEvent(unsigned long event) {
       m_event = event;
     }
 
@@ -45,7 +45,7 @@ namespace Belle2 {
      *
      *  @param run The number of the current run.
      */
-    void setRun(const unsigned long& run) {
+    void setRun(unsigned long run) {
       m_run = run;
     }
 
@@ -53,7 +53,7 @@ namespace Belle2 {
      *
      *  @param experiment The number of the current experiment.
      */
-    void setExperiment(const unsigned long& experiment) {
+    void setExperiment(unsigned long experiment) {
       m_experiment = experiment;
     }
 
@@ -79,7 +79,7 @@ namespace Belle2 {
      *
      *  @param weight The weight produced by the event generator
      */
-    void setGeneratedWeight(const double& weight) {
+    void setGeneratedWeight(double weight) {
       m_generated_weight = weight;
     }
 

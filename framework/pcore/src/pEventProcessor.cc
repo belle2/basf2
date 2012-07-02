@@ -9,6 +9,7 @@
 #include <signal.h>
 
 #include <framework/pcore/pEventProcessor.h>
+#include <framework/core/PathManager.h>
 #include <framework/core/ModuleManager.h>
 
 using namespace std;

@@ -366,7 +366,10 @@ namespace Belle2 {
 
     /**
      * Set the name of the module just for internal use.
-     * Note : the name should be set through ModuleProxy in the normal usage.
+     *
+     * \note
+     * The module name is set when using the REG_MODULE macro,
+     * there is usually no need to call this function directly.
      *
      * @param name The name of the module
      */

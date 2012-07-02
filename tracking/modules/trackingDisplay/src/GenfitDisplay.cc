@@ -155,12 +155,10 @@ void GenfitDisplay::open()
     TGeoNode* top_node = gGeoManager->GetTopNode();
     assert(top_node != NULL);
 
-    //Set transparency & color of geometry
+    //Set transparency of geometry
     TObjArray* volumes = gGeoManager->GetListOfVolumes();
-    for (int i = 0; i < volumes->GetEntries(); i++) {
-      TGeoVolume* volume = dynamic_cast<TGeoVolume*>(volumes->At(i));
-      assert(volume != NULL);
-      //volume->SetLineColor(12);
+    for (int i = 0; i < volumes->GetEntriesFast(); i++) {
+      TGeoVolume* volume = static_cast<TGeoVolume*>(volumes->At(i));
       volume->SetTransparency(50);
     }
 

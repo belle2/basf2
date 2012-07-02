@@ -17,7 +17,7 @@ using namespace Belle2;
 REG_MODULE(Progress)
 
 ProgressModule::ProgressModule() : Module(), m_maxOrder(3), m_evtNr(0), m_runNr(0),
-    m_output("Processed: %3d runs, %6d events")
+  m_output("Processed: %3d runs, %6d events")
 {
   setDescription("Output number of processed events. "
                  "Output cannot be suppressed using set_log_level. "

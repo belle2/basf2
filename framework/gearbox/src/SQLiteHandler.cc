@@ -27,7 +27,7 @@ namespace Belle2 {
     {
       m_statement = statement;
       const size_t size = sqlite3_column_bytes(m_statement, 0);
-      const char *data = (const char*) sqlite3_column_text(m_statement, 0);
+      const char* data = (const char*) sqlite3_column_text(m_statement, 0);
       const int compressed = sqlite3_column_int(m_statement, 1);
       if (compressed) m_stream.push(io::gzip_decompressor());
       m_stream.push(io::array_source(data, size));

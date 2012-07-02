@@ -81,7 +81,7 @@ class CDCPlotModule(Module):
         B2INFO('terminating CDCPlotModule')
         # plot the (x,y) list on a matplotlib figure
         fig = plot(self.trackhits_x, self.trackhits_y)
-        if(os.path.lexists('hits_all.png')):
+        if os.path.lexists('hits_all.png'):
             B2WARNING('hits_all.png exists, overwriting ...')
         else:
             B2INFO('creating hits_all.png ...')
@@ -108,7 +108,7 @@ geo = register_module('Geometry')
 # Outer detectors are disabled for performance reasons.
 # Note that this may produce a larger number of particles reentering
 # the detector from the outside.
-geo.param("ExcludedComponents", ["TOP", "ECL", "BKLM", "EKLM"])
+geo.param('ExcludedComponents', ['TOP', 'ECL', 'BKLM', 'EKLM'])
 
 # particle gun to shoot particles in the detector
 pGun = register_module('ParticleGun')

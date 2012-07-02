@@ -20,7 +20,7 @@ namespace Belle2 {
     //LogSystem::Instance().getLogConfig()->setLogLevel(LogConfig::c_Debug);
     //LogSystem::Instance().getLogConfig()->setDebugLevel(1000);
 
-    Gearbox &gb = Gearbox::getInstance();
+    Gearbox& gb = Gearbox::getInstance();
     vector<string> backends;
     //Environment::getDataSearchPath useless here since it gets set only in basf2
     string local_dir(getenv("BELLE2_LOCAL_DIR"));
@@ -32,7 +32,7 @@ namespace Belle2 {
     while (!nodes.empty()) {
       GearDir node = nodes.front();
       nodes.pop();
-      BOOST_FOREACH(const GearDir &child, node.getNodes("*")) {
+      BOOST_FOREACH(const GearDir & child, node.getNodes("*")) {
         nodes.push(child);
       }
     }
@@ -46,7 +46,7 @@ namespace Belle2 {
     eventMetaDataPtr->setExperiment(1);
     eventMetaDataPtr->setRun(1);
 
-    Gearbox &gb = Gearbox::getInstance();
+    Gearbox& gb = Gearbox::getInstance();
     vector<string> backends;
     string local_dir(getenv("BELLE2_LOCAL_DIR"));
     backends.push_back("sqlite:" + local_dir + "/framework/tests/gearbox.sqlite");

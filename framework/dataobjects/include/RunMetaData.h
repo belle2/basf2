@@ -41,7 +41,7 @@ namespace Belle2 {
     RunMetaData(const float& energyLER = 4.0, const float& energyHER = 7.0,
                 const float& crossingAngle = 83   * Unit::mrad,
                 const float& angleLER      = 41.5 * Unit::mrad)
-        : m_energyLER(energyLER), m_energyHER(energyHER), m_crossingAngle(crossingAngle), m_angleLER(angleLER) {}
+      : m_energyLER(energyLER), m_energyHER(energyHER), m_crossingAngle(crossingAngle), m_angleLER(angleLER) {}
 
     /** Destructor. */
     ~RunMetaData() {}

@@ -115,7 +115,7 @@ namespace Belle2 {
     typedef const RelationIndex<EventMetaData, RunMetaData>::Element el_t;
     {
       int size(0);
-      BOOST_FOREACH(el_t &e, relIndex.getFrom(evtData[0])) {
+      BOOST_FOREACH(el_t & e, relIndex.getFrom(evtData[0])) {
         ++size;
         dummy += e.weight;
       }
@@ -123,7 +123,7 @@ namespace Belle2 {
     }
     {
       int size(0);
-      BOOST_FOREACH(el_t &e, relIndex.getTo(runData[0])) {
+      BOOST_FOREACH(el_t & e, relIndex.getTo(runData[0])) {
         ++size;
         dummy += e.weight;
       }

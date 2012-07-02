@@ -29,7 +29,7 @@ namespace Belle2 {
       /** Reset the statement to be ready for execution again */
       virtual ~SQLiteContext();
       /** Read a block of data */
-      virtual int readXmlData(char *buffer, int buffsize) {
+      virtual int readXmlData(char* buffer, int buffsize) {
         m_stream.read(buffer, buffsize);
         return m_stream.gcount();
       }
@@ -57,7 +57,7 @@ namespace Belle2 {
        * Return InputContext corresponding to a requested XML resource
        * @return SQLiteContext pointer on success, 0 on failure
        */
-      virtual InputContext* open(const std::string &path);
+      virtual InputContext* open(const std::string& path);
 
     protected:
       /** string containing the query to be executed */

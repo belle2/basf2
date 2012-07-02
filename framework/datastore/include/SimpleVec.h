@@ -40,7 +40,7 @@ namespace Belle2 {
      *  This constructor is needed for I/O purposes.
      */
     SimpleVec()
-        : m_vector(0) {}
+      : m_vector(0) {}
 
     /** Destructor.
      *

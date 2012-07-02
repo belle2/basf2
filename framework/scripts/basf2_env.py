@@ -79,7 +79,6 @@ fw.set_data_search_path(basf2datadir)
 # Sets the path in which the externals of the framework are located
 fw.set_externals_path(envarExtDir)
 
-
 # -----------------------------------------------
 #         Load evtgen particle tables
 # -----------------------------------------------

@@ -100,8 +100,8 @@ namespace Belle2 {
      *                   error is raised
      */
     template <class FROM, class TO> RelationArray(const StoreArray<FROM>& from, const StoreArray<TO>& to, std::string name = "",
-                                                  const DataStore::EDurability &durability = DataStore::c_Event, bool generate = true):
-        StoreObjPtr<RelationContainer>(0) {
+                                                  const DataStore::EDurability& durability = DataStore::c_Event, bool generate = true):
+      StoreObjPtr<RelationContainer>(0) {
 
       const AccessorParams accessorFrom = from.getAccessorParams();
       const AccessorParams accessorTo   = to.getAccessorParams();
@@ -134,7 +134,7 @@ namespace Belle2 {
      *  @param name       Name of the (existing) Relation
      *  @param durability Durability of the (existing) Relation
      */
-    RelationArray(std::string name, const DataStore::EDurability &durability = DataStore::c_Event): StoreObjPtr<RelationContainer>(0) {
+    RelationArray(std::string name, const DataStore::EDurability& durability = DataStore::c_Event): StoreObjPtr<RelationContainer>(0) {
       if (name == "") {
         B2FATAL("Cannot guess relation name, please supply correct name");
         return;
@@ -149,8 +149,8 @@ namespace Belle2 {
      *
      *  @param params     AccessorParams for the (existing) Relation
      */
-    RelationArray(const AccessorParams &params):
-        StoreObjPtr<RelationContainer>(0) {
+    RelationArray(const AccessorParams& params):
+      StoreObjPtr<RelationContainer>(0) {
       if (params.first == "") {
         B2FATAL("Cannot guess relation name, please supply correct name");
         return;
@@ -302,10 +302,10 @@ namespace Belle2 {
     //duplicate elements
     index_type lastFromIndex(-1);
     buffer_t::iterator lastFromIter = buffer.end();
-    TClonesArray &elements = m_storeObjPtr->elements();
+    TClonesArray& elements = m_storeObjPtr->elements();
     unsigned int nElements = elements.GetEntries();
     for (unsigned int i = 0; i < nElements; ++i) {
-      RelationElement &element = *static_cast<RelationElement*>(elements[i]);
+      RelationElement& element = *static_cast<RelationElement*>(elements[i]);
       //Replace from index
       index_type from = replaceFrom(element.getFromIndex());
 

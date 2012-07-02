@@ -31,7 +31,7 @@ namespace Belle2 {
        *                 be less if XML is shorter
        * @return number of bytes actually written
        */
-      virtual int readXmlData(char *buffer, int buffsize) = 0;
+      virtual int readXmlData(char* buffer, int buffsize) = 0;
       /** Close the context */
       virtual ~InputContext() {}
     protected:
@@ -49,7 +49,7 @@ namespace Belle2 {
        * Factory function which takes a backend uri and returns
        * an InputHandler instance
        * */
-      typedef InputHandler *Factory(const std::string& uri);
+      typedef InputHandler* Factory(const std::string& uri);
 
       /**
        * Constructor accepting the uri for the InputHandler.
@@ -72,7 +72,7 @@ namespace Belle2 {
        * @param path name of the XML resource
        * @return pointer to an InputContext instance on success, 0 otherwise
        */
-      virtual InputContext* open(const std::string &path) = 0;
+      virtual InputContext* open(const std::string& path) = 0;
     protected:
       /** URI for the InputHandler */
       std::string m_uri;

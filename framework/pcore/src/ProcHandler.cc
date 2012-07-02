@@ -31,7 +31,7 @@ int ProcHandler::m_fEvtProcID = -1;
 /// @param nOutputSrv The number of output servers
 
 ProcHandler::ProcHandler(void)
-    : m_nEvtSrv(0), m_nEvtProc(0), m_nOutputSrv(0),
+  : m_nEvtSrv(0), m_nEvtProc(0), m_nOutputSrv(0),
     m_fEvtServer(0), m_fEvtProc(0), m_fOutputSrv(0)
 {
 
@@ -175,7 +175,7 @@ int ProcHandler::isproc(int pid, char* exe)
   char procfile[80];
   char null[40];
   char exename[80];
-  FILE *fp;
+  FILE* fp;
   sprintf(procfile, "/proc/%d/stat", pid);
 
   if (access(procfile, F_OK) != 0) {

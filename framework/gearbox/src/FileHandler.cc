@@ -36,7 +36,7 @@ namespace Belle2 {
       B2DEBUG(300, "Created FileHandler for directory " << m_path);
     }
 
-    InputContext* FileHandler::open(const std::string &path)
+    InputContext* FileHandler::open(const std::string& path)
     {
       fs::path basedir(m_path);
       fs::path filename = basedir / path;

@@ -16,7 +16,7 @@ namespace Belle2 {
 
   namespace gearbox {
     /** Callback function to let libxml2 know that we handle all input files */
-    static int matchXmlUri(const char *uri)
+    static int matchXmlUri(const char* uri)
     {
       //Ignore uris including file protocol. They are only used if loading of a
       //resource failed, then libxml will try to look in /etc/xml/catalog if it
@@ -65,10 +65,10 @@ namespace Belle2 {
     return *instance;
   }
 
-  gearbox::InputContext* Gearbox::openXmlUri(const string &uri) const
+  gearbox::InputContext* Gearbox::openXmlUri(const string& uri) const
   {
     //Check input handlers one by one
-    BOOST_FOREACH(gearbox::InputHandler* handler, m_handlers) {
+    BOOST_FOREACH(gearbox::InputHandler * handler, m_handlers) {
       //try to create context for uri, return if success
       gearbox::InputContext* context = handler->open(uri);
       if (context) return context;
@@ -80,7 +80,7 @@ namespace Belle2 {
   void Gearbox::setBackends(const vector<string>& backends)
   {
     clearBackends();
-    BOOST_FOREACH(const string& backend, backends) {
+    BOOST_FOREACH(const string & backend, backends) {
       B2DEBUG(300, "Adding InputHandler for '" << backend << "'");
       //Find correct InputHandler, assuming file backend by default if there is no colon in the
       //uri
@@ -107,7 +107,7 @@ namespace Belle2 {
 
   void Gearbox::clearBackends()
   {
-    BOOST_FOREACH(gearbox::InputHandler* handler, m_handlers) delete handler;
+    BOOST_FOREACH(gearbox::InputHandler * handler, m_handlers) delete handler;
     m_handlers.clear();
   }
 
@@ -142,7 +142,7 @@ namespace Belle2 {
     m_parameterCache.clear();
   }
 
-  Gearbox::PathValue Gearbox::getPathValue(const std::string &path) const
+  Gearbox::PathValue Gearbox::getPathValue(const std::string& path) const
   {
     PathValue value;
     if (m_xpathContext == NULL) B2FATAL("Gearbox is not connected");

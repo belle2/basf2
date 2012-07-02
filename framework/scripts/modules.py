@@ -10,6 +10,7 @@ def printAllModules(moduleList):
     Loop over the list of available modules,
     register them and print their information
     """
+
     for (moduleName, sharedLib) in sorted(moduleList.iteritems()):
         current_module = register_module(moduleName)
         print_params(current_module, False, sharedLib)
@@ -25,7 +26,7 @@ if len(sys.argv) == 2:
         current_module = register_module(sys.argv[1])
         print_params(current_module, False, avModList[sys.argv[1]])
     else:
-        B2ERROR('Print module information: A module with the name \"' +\
-                 sys.argv[1] + '\" does not exist !')
+        B2ERROR('Print module information: A module with the name "'
+                + sys.argv[1] + '" does not exist !')
 else:
     printAllModules(avModList)

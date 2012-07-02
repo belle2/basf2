@@ -28,7 +28,7 @@ namespace Belle2 {
      *  Initilises meta data of event with Nulls.
      */
     EventMetaData(unsigned long event = 0, unsigned long run = 0, unsigned long experiment = 0)
-        : m_event(event), m_run(run), m_experiment(experiment), m_parent_index(-1), m_generated_weight(1) {}
+      : m_event(event), m_run(run), m_experiment(experiment), m_parent_index(-1), m_generated_weight(1) {}
 
     /** Destructor. */
     ~EventMetaData() {}

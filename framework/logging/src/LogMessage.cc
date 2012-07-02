@@ -17,14 +17,14 @@ using namespace Belle2;
 
 LogMessage::LogMessage(LogConfig::ELogLevel logLevel, const std::string& message, const std::string& package,
                        const std::string& function, const std::string& file, unsigned int line) :
-    m_logLevel(logLevel),
-    m_message(message),
-    m_module("-global-"),
-    m_package(package),
-    m_function(function),
-    m_file(file),
-    m_line(line),
-    m_logInfo(0)
+  m_logLevel(logLevel),
+  m_message(message),
+  m_module("-global-"),
+  m_package(package),
+  m_function(function),
+  m_file(file),
+  m_line(line),
+  m_logInfo(0)
 {
 }
 

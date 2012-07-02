@@ -39,14 +39,14 @@ GearboxModule::GearboxModule() : Module()
 
 void GearboxModule::initialize()
 {
-  Gearbox &gearbox = Gearbox::getInstance();
+  Gearbox& gearbox = Gearbox::getInstance();
   gearbox.setBackends(m_backends);
   gearbox.open(m_filename);
 }
 
 void GearboxModule::beginRun()
 {
-  Gearbox &gearbox = Gearbox::getInstance();
+  Gearbox& gearbox = Gearbox::getInstance();
   gearbox.close();
   gearbox.open(m_filename);
 }

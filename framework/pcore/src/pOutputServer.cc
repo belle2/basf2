@@ -12,7 +12,7 @@ using namespace std;
 using namespace Belle2;
 
 pOutputServer::pOutputServer() :
-    Module()
+  Module()
 {
   cout << "constructor called" << endl;
 }

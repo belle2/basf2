@@ -41,7 +41,7 @@ EvtMessage::EvtMessage(char* data)
 /// @param size Length of the data (TMessage)
 EvtMessage::EvtMessage(char* sobjs, int size, RECORD_TYPE type = MSG_EVENT)
 {
-  m_data = new char[size+sizeof(EvtHeader)]; // Allocate new buffer
+  m_data = new char[size + sizeof(EvtHeader)]; // Allocate new buffer
   msg(sobjs, size, type);
   m_buftype = 1;
 }
@@ -64,7 +64,7 @@ EvtMessage::~EvtMessage(void)
 /// @brief Overridden assign operator
 /// @param obj Source object
 /// @param Pointer to assigned object
-EvtMessage& EvtMessage::operator=(EvtMessage & obj)
+EvtMessage& EvtMessage::operator=(EvtMessage& obj)
 {
   if (this != &obj) {
     this->buffer(obj.buffer());

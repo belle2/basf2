@@ -35,10 +35,10 @@ namespace Belle2 {
      *  @param relation Relation to build an index for
      *  @returns A RelationIndexContainer
      */
-    template<class FROM, class TO> static const RelationIndexContainer<FROM, TO> &get(const RelationArray &relation) {
+    template<class FROM, class TO> static const RelationIndexContainer<FROM, TO> &get(const RelationArray& relation) {
       std::string name = relation.getName();
       DataStore::EDurability durability = relation.getDurability();
-      RelationMap &relations =  m_cache[durability];
+      RelationMap& relations =  m_cache[durability];
       RelationIndexContainer<FROM, TO> *indexContainer(0);
       RelationMap::iterator it = relations.find(name);
       if (it != relations.end()) {
@@ -62,7 +62,7 @@ namespace Belle2 {
      *  @param durability Which cache to clear
      */
     static void clear(DataStore::EDurability durability = DataStore::c_Event) {
-      RelationMap &relations =  m_cache[durability];
+      RelationMap& relations =  m_cache[durability];
       RelationMap::iterator it = relations.begin();
       while (it != relations.end()) {
         if (it->second) delete it->second;

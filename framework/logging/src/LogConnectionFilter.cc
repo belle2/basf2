@@ -16,9 +16,9 @@ using namespace Belle2;
 using namespace std;
 
 LogConnectionFilter::LogConnectionFilter(LogConnectionBase* logConnection) :
-    m_logConnection(logConnection),
-    m_previousMessage(LogConfig::c_Default, "", "", "", "", 0),
-    m_repeatCounter(0)
+  m_logConnection(logConnection),
+  m_previousMessage(LogConfig::c_Default, "", "", "", "", 0),
+  m_repeatCounter(0)
 {
 }
 

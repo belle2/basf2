@@ -52,8 +52,8 @@ void RbTupleManager::init(int nprocess, const char* filename)
 
   // Open current directory
   std::string dir = ".";
-  DIR *dp;
-  struct dirent *dirp;
+  DIR* dp;
+  struct dirent* dirp;
   if ((dp = opendir(dir.c_str())) == NULL) {
     B2ERROR("Error to open directory" << dir);
     return;
@@ -140,8 +140,8 @@ int RbTupleManager::hadd(void)
 
   // Open current directory
   std::string dir = ".";
-  DIR *dp;
-  struct dirent *dirp;
+  DIR* dp;
+  struct dirent* dirp;
   if ((dp = opendir(dir.c_str())) == NULL) {
     B2ERROR("Error to open directory" << dir);
     return errno;
@@ -192,24 +192,24 @@ int RbTupleManager::hadd(void)
 
 // Body of root file merger grabbed from "hadd"
 
-void RbTupleManager::MergeRootfile(TDirectory *target, TList *sourcelist)
+void RbTupleManager::MergeRootfile(TDirectory* target, TList* sourcelist)
 {
 
   //  cout << "Target path: " << target->GetPath() << endl;
   TString path((char*)strstr(target->GetPath(), ":"));
   path.Remove(0, 2);
 
-  TFile *first_source = (TFile*)sourcelist->First();
+  TFile* first_source = (TFile*)sourcelist->First();
   first_source->cd(path);
-  TDirectory *current_sourcedir = gDirectory;
+  TDirectory* current_sourcedir = gDirectory;
   //gain time, do not add the objects in the list in memory
   Bool_t status = TH1::AddDirectoryStatus();
   TH1::AddDirectory(kFALSE);
 
   // loop over all keys in this directory
-  TChain *globChain = 0;
+  TChain* globChain = 0;
   TIter nextkey(current_sourcedir->GetListOfKeys());
-  TKey *key, *oldkey = 0;
+  TKey* key, *oldkey = 0;
   while ((key = (TKey*)nextkey())) {
 
     //keep only the highest cycle number for each key
@@ -217,24 +217,24 @@ void RbTupleManager::MergeRootfile(TDirectory *target, TList *sourcelist)
 
     // read object from first source file
     first_source->cd(path);
-    TObject *obj = key->ReadObj();
+    TObject* obj = key->ReadObj();
 
     if (obj->IsA()->InheritsFrom("TH1")) {
       // descendant of TH1 -> merge it
 
       //      cout << "Merging histogram " << obj->GetName() << endl;
-      TH1 *h1 = (TH1*)obj;
+      TH1* h1 = (TH1*)obj;
 
       // loop over all source files and add the content of the
       // correspondant histogram to the one pointed to by "h1"
-      TFile *nextsource = (TFile*)sourcelist->After(first_source);
+      TFile* nextsource = (TFile*)sourcelist->After(first_source);
       while (nextsource) {
 
         // make sure we are at the correct directory level by cd'ing to path
         nextsource->cd(path);
-        TKey *key2 = (TKey*)gDirectory->GetListOfKeys()->FindObject(h1->GetName());
+        TKey* key2 = (TKey*)gDirectory->GetListOfKeys()->FindObject(h1->GetName());
         if (key2) {
-          TH1 *h2 = (TH1*)key2->ReadObj();
+          TH1* h2 = (TH1*)key2->ReadObj();
           h1->Add(h2);
           delete h2;
         }
@@ -248,7 +248,7 @@ void RbTupleManager::MergeRootfile(TDirectory *target, TList *sourcelist)
 
       globChain = new TChain(obj_name);
       globChain->Add(first_source->GetName());
-      TFile *nextsource = (TFile*)sourcelist->After(first_source);
+      TFile* nextsource = (TFile*)sourcelist->After(first_source);
       //      const char* file_name = nextsource->GetName();
       // cout << "file name  " << file_name << endl;
       while (nextsource) {
@@ -264,7 +264,7 @@ void RbTupleManager::MergeRootfile(TDirectory *target, TList *sourcelist)
 
       // create a new subdir of same name and title in the target file
       target->cd();
-      TDirectory *newdir = target->mkdir(obj->GetName(), obj->GetTitle());
+      TDirectory* newdir = target->mkdir(obj->GetName(), obj->GetTitle());
 
       // newdir is now the starting point of another round of merging
       // newdir still knows its depth within the target file via

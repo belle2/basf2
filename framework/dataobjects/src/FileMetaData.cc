@@ -19,9 +19,9 @@ using namespace boost::python;
 ClassImp(FileMetaData)
 
 FileMetaData::FileMetaData() :
-    m_id(0), m_guid(""), m_lfn(""), m_events(0), m_experiment(0), m_runLow(0), m_eventLow(0),
-    m_runHigh(0), m_eventHigh(0), m_release(""), m_timeStamp(0), m_site(""), m_user(""), m_logFile(0),
-    m_randomSeed(0), m_random(0), m_steering("")
+  m_id(0), m_guid(""), m_lfn(""), m_events(0), m_experiment(0), m_runLow(0), m_eventLow(0),
+  m_runHigh(0), m_eventHigh(0), m_release(""), m_timeStamp(0), m_site(""), m_user(""), m_logFile(0),
+  m_randomSeed(0), m_random(0), m_steering("")
 {
 }
 

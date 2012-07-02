@@ -12,7 +12,7 @@ using namespace std;
 using namespace Belle2;
 
 pEventServer::pEventServer() :
-    Module()
+  Module()
 {
   cout << "constructor called" << endl;
 }

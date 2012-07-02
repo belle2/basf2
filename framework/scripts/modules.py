@@ -12,8 +12,12 @@ def printAllModules(moduleList):
     """
 
     for (moduleName, sharedLib) in sorted(moduleList.iteritems()):
-        current_module = register_module(moduleName)
-        print_params(current_module, False, sharedLib)
+        try:
+            current_module = register_module(moduleName)
+            print_params(current_module, False, sharedLib)
+        except:
+            B2ERROR('The module could not be loaded. This is most likely '
+                    + 'caused by a library with missing links.')
 
 
 # Get the list of available modules
@@ -27,6 +31,6 @@ if len(sys.argv) == 2:
         print_params(current_module, False, avModList[sys.argv[1]])
     else:
         B2ERROR('Print module information: A module with the name "'
-                + sys.argv[1] + '" does not exist !')
+                + sys.argv[1] + '" does not exist!')
 else:
     printAllModules(avModList)

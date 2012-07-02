@@ -10,7 +10,7 @@ from pybasf2 import *
 # -----------------------------------------------
 basf2label = 'BASF2 (Belle Analysis Framework 2)'
 basf2version = os.environ.get('BELLE2_RELEASE', 'unknown')
-basf2copyright = 'Copyright(C) 2010-2011  Belle II Collaboration'
+basf2copyright = 'Copyright(C) 2010-2012  Belle II Collaboration'
 basf2authors = [
     'Andreas Moll',
     'Martin Heck',
@@ -83,7 +83,7 @@ fw.set_externals_path(envarExtDir)
 #         Load evtgen particle tables
 # -----------------------------------------------
 if not fw.read_evtgen_table(os.path.join(envarExtDir, 'share/evtgen/evt.pdl')):
-    print """ERROR: Could not load the evtgen table file !"""
+    print """ERROR: Could not load the evtgen table file!"""
 
 # -----------------------------------------------
 #             Print output

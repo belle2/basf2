@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
     generic.add_options()
     ("help,h", "print all available options")
     ("version,v", "print version string")
-    ("info,i", "print information about basf2")
+    ("info", "print information about basf2")
     ("modules,m", prog::value<string>()->implicit_value(""), "print a list of all available modules or optionally the module specified as an argument")
     ;
 

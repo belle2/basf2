@@ -62,4 +62,3 @@ print ''
 print 'basf2 modules directory:', ':'.join(basf2moddir)
 print 'basf2 data    directory:', basf2datadir
 print '-------------------------------------------------'
-

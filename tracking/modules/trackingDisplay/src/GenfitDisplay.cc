@@ -94,7 +94,6 @@ void GenfitDisplay::reset()
 void GenfitDisplay::addEvent(const std::vector<GFTrack*>& evts)
 {
   std::vector<GFTrack*>* vec = new std::vector<GFTrack*>;
-
   for (unsigned int i = 0; i < evts.size(); i++) {
     vec->push_back(new GFTrack(*(evts.at(i))));
   }
@@ -122,15 +121,19 @@ void GenfitDisplay::gotoEvent(unsigned int id)
 {
   if (fEvents.size() == 0) return;
   if (id >= fEvents.size()) id = fEvents.size() - 1;
+  if (fEventId == id) return;
 
   fEventId = id;
 
   B2INFO("Switching to event " << id);
-  gEve->GetCurrentEvent()->DestroyElements();
+
+  if (gEve->GetCurrentEvent())
+    gEve->GetCurrentEvent()->DestroyElements();
   double old_error_scale = fErrorScale;
   drawEvent(fEventId);
   if (old_error_scale != fErrorScale) {
-    gEve->GetCurrentEvent()->DestroyElements();
+    if (gEve->GetCurrentEvent())
+      gEve->GetCurrentEvent()->DestroyElements();
     drawEvent(fEventId); // if autoscaling changed the error, draw again.
   }
   fErrorScale = old_error_scale;

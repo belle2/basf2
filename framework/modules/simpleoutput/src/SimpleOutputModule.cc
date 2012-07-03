@@ -71,22 +71,10 @@ SimpleOutputModule::SimpleOutputModule() : Module(), m_file(0), m_experiment(0),
   addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0], "Names of branches NOT to be written from event map. Branches also in branchNames are not written.", branchNames);
   addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of branches NOT to be written from run map. Branches also in branchNamesRun are not written.", branchNames);
   addParam(c_SteerExcludeBranchNames[2], m_excludeBranchNames[2], "Names of branches NOT to be written from persistent map. Branches also in branchNamesPersistent are not written.", branchNames);
-
-  addParam("switchBranchNameMeaning", m_switchBranchNameMeaning, "DEPRECATED: switches branchNames and excludeBranchNames parameters.", false);
 }
 
 
-SimpleOutputModule::~SimpleOutputModule()
-{
-  //  printf ( "SimpleOutput : destructor called\n" );
-  /* Moved to terminate()
-  delete m_file;
-
-  for (size_t jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
-    delete[] m_objects[jj];
-  }
-  */
-}
+SimpleOutputModule::~SimpleOutputModule() { }
 
 void SimpleOutputModule::initialize()
 {
@@ -306,10 +294,6 @@ void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
 
 void SimpleOutputModule::setupBranches(DataStore::EDurability durability)
 {
-  if (m_switchBranchNameMeaning) {
-    switchBranchNameMeaning(durability);
-  }
-
   std::vector<std::string> branchesToBeSaved;
   for (int iMap = 0; iMap < 2; iMap++) {
     //first objects, then arrays
@@ -368,10 +352,4 @@ void SimpleOutputModule::setupBranches(DataStore::EDurability durability)
   if (sizeCounter != m_branchNames[durability].size()) {
     B2FATAL("Number of initialized branches is different from constructed branch name list!");
   }
-}
-
-
-void SimpleOutputModule::switchBranchNameMeaning(const DataStore::EDurability& durability)
-{
-  m_branchNames[durability].swap(m_excludeBranchNames[durability]);
 }

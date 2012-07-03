@@ -98,14 +98,6 @@ namespace Belle2 {
      */
     void fillTree(const DataStore::EDurability& durability);
 
-    /** Switch branch name meaning function.
-     *
-     *  Swaps branchNames and excludeBranchNames. Provided for compatibility only.
-     *
-     *  @param durability Specifies branchNames to be taken.
-     */
-    void switchBranchNameMeaning(const DataStore::EDurability& durability);
-
     /** Sorts stringlist alphabetically and removes any duplicates.
      *
      *  @return true, if duplicates are found
@@ -141,12 +133,6 @@ namespace Belle2 {
      *  m_branchNames[d] and m_excludeBranchNames[d], it is not saved.
      */
     std::vector<std::string> m_excludeBranchNames[DataStore::c_NDurabilityTypes];
-
-    /** Switch branchNames from inclusion to exclusion lists.
-     *
-     * Switching happens, if the variable is true.
-     */
-    bool m_switchBranchNameMeaning;
 
     /** TFile compression level.
      *

@@ -17,6 +17,7 @@
 #include <pxd/geometry/SensorInfo.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
+// // #include <vxd/simulation/SensitiveDetector.h>
 
 #include <generators/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationArray.h>
@@ -27,9 +28,13 @@
 
 //C++ std lib
 #include <vector>
+#include <map>
+#include <utility>
 using std::vector;
+using std::map;
+using std::pair;
 #include <fstream>
-using std::ofstream;
+// // using std::ofstream;
 #include <cmath>
 using std::sin;
 using std::cos;
@@ -42,6 +47,8 @@ using std::endl;
 
 //root stuff
 #include <TRandom.h>
+//Boost-packages:
+#include <boost/foreach.hpp>
 
 
 using namespace Belle2;
@@ -59,8 +66,6 @@ VXDSimpleClusterizerModule::VXDSimpleClusterizerModule() : Module()
   addParam("onlyPrimaries", m_onlyPrimaries, "if true use only primary particles from the generator no particles created by Geant4", false);
   addParam("setMeasSigma", m_setMeasSigma, "if positive value (in cm) is given it will be used as the sigma to smear the Clusters otherwise pitch/sqrt(12) will be used", -1.0);
 
-  //addParam("writeTruthToFile", m_writeTruthToFile, "write the u and v coordinate of the trueHits of one track to a text file", false);
-
 }
 
 VXDSimpleClusterizerModule::~VXDSimpleClusterizerModule()
@@ -69,17 +74,17 @@ VXDSimpleClusterizerModule::~VXDSimpleClusterizerModule()
 
 void VXDSimpleClusterizerModule::initialize()
 {
-  //output containers, will be created when initialized here
+  //output containers, will be created when registered here
   StoreArray<PXDCluster> pxdClusters("");
   StoreArray<SVDCluster> svdClusters("");
   StoreArray<MCParticle> mcParticles("");
   StoreArray<PXDTrueHit> pxdTrueHits("");
   StoreArray<SVDTrueHit> svdTrueHits("");
 
-  RelationArray relPXDClusterMCParticle(pxdClusters, mcParticles, "");
-  RelationArray relPXDClusterTrueHit(pxdClusters, pxdTrueHits, "");
-  RelationArray relSVDClusterMCParticle(svdClusters, mcParticles, "");
-  RelationArray relSVDClusterTrueHit(svdClusters, svdTrueHits, "");
+  RelationArray relPXDClusterMCParticle(pxdClusters, mcParticles);
+  RelationArray relPXDClusterTrueHit(pxdClusters, pxdTrueHits);
+  RelationArray relSVDClusterMCParticle(svdClusters, mcParticles);
+  RelationArray relSVDClusterTrueHit(svdClusters, svdTrueHits);
 }
 
 void VXDSimpleClusterizerModule::beginRun()
@@ -89,8 +94,7 @@ void VXDSimpleClusterizerModule::beginRun()
 
 void VXDSimpleClusterizerModule::event()
 {
-//  ofstream dataOut;
-//  if (m_writeTruthToFile == true) dataOut.open("data.txt");
+
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   int eventCounter = eventMetaDataPtr->getEvent();
 
@@ -106,7 +110,7 @@ void VXDSimpleClusterizerModule::event()
   B2DEBUG(10, "VXDSimpleClusterizerModule: Number of PXDHits: " << nPxdTrueHits);
   if (nPxdTrueHits == 0) {B2DEBUG(100, "MCTrackFinder: PXDHitsCollection is empty!");}
 
-  RelationIndex<MCParticle, PXDTrueHit> relMcPxdTrueHit;
+  RelationIndex<MCParticle, PXDTrueHit> relIndexPxdTH2McP(mcParticles, pxdTrueHits, "");
 
   //SVD
   StoreArray<SVDTrueHit> svdTrueHits("");
@@ -114,46 +118,49 @@ void VXDSimpleClusterizerModule::event()
   B2DEBUG(10, "VXDSimpleClusterizerModule: Number of SVDDHits: " << nSvdTrueHits);
   if (nSvdTrueHits == 0) {B2DEBUG(100, "MCTrackFinder: SVDHitsCollection is empty!");}
 
-  RelationIndex<MCParticle, SVDTrueHit> relMcSvdTrueHit;
-
+  RelationIndex<MCParticle, SVDTrueHit> relIndexSvdTH2McP(mcParticles, svdTrueHits, "");
 
 
   //output containers
   StoreArray<PXDCluster> pxdClusters("");
   StoreArray<SVDCluster> svdClusters("");
-  MCParticle* aMcParticle = mcParticles[0];
 
-  RelationArray relPXDClusterMCParticle(pxdClusters, mcParticles, "relPXDClusterMCParticle");
-  RelationArray relPXDClusterTrueHit(pxdClusters, pxdTrueHits, "relPXDClusterTrueHit");
-  RelationArray relSVDClusterMCParticle(svdClusters, mcParticles, "relSVDClusterMCParticle");
-  RelationArray relSVDClusterTrueHit(svdClusters, svdTrueHits, "relSVDClusterTrueHit");
+  RelationArray relPXDClusterMCParticle(pxdClusters, mcParticles, "");
+  RelationArray relPXDClusterTrueHit(pxdClusters, pxdTrueHits, "");
+  RelationArray relSVDClusterMCParticle(svdClusters, mcParticles, "");
+  RelationArray relSVDClusterTrueHit(svdClusters, svdTrueHits, "");
+
+  // since there are many clusters produced by the same particle, we have to collect them before creating the relations. This feature is needed for the MCtrackFinder
+  typedef map<const int, vector<unsigned int> > relationMap; // needed for the storing loops at the end of the event
+  typedef pair<const int, vector<unsigned int> > mapEntry;
+  relationMap relationMapMcP2PxdCls;
+  relationMap relationMapMcP2SvdCls;
+
 
   double sigmaU = m_setMeasSigma;
   double sigmaV = m_setMeasSigma;
 
-  //smear the pxd true Hits and store them in pxdSimpleDigiHits
-  int aClusterHit = 0;
-  for (int i = 0; i not_eq nPxdTrueHits; ++i) {
-    const PXDTrueHit* aPxdTrueHit = pxdTrueHits[i];
+///////////////////////////////////////////////////// NOW THE PXD
+  for (int currentTrueHit = 0; currentTrueHit not_eq nPxdTrueHits; ++currentTrueHit) {
+
+    const PXDTrueHit* aPxdTrueHit = pxdTrueHits[currentTrueHit];
+    relIndexPxdTH2McP.getFirstFrom(aPxdTrueHit)->from->fixParticleList();
+    const int particleID = relIndexPxdTH2McP.getFirstFrom(aPxdTrueHit)->from->getArrayIndex(); // WARNING:possible trap, might change in future revisions
     float energy = aPxdTrueHit->getEnergyDep();
+
+    B2DEBUG(20, "particleID: " << particleID);
+
     if (energy < m_energyThreshold) { //ignore hit if energy deposit is too small
       continue;
     }
 
     if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
-      RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relMcPxdTrueHit.getFrom(aMcParticle);
-      while (iterPairMcPxd.first not_eq iterPairMcPxd.second) {
-        if (iterPairMcPxd.first->to == aPxdTrueHit) {
-          break;
-        }
-        ++iterPairMcPxd.first;
-      }
-      if (iterPairMcPxd.first == iterPairMcPxd.second) { // if the beak statement never was invoced the current pxdHit does not come from a primary particle and will not be added to the track cand
-        continue;
+      if (relIndexPxdTH2McP.getFirstFrom(aPxdTrueHit)->from->hasStatus(MCParticle::c_PrimaryParticle) == false) {
+        continue; // jump to next pxdTrueHit
       }
     }
 
-
+    //smear the pxdTrueHit and get needed variables for storing
     VxdID aVXDId = aPxdTrueHit->getSensorID();
     float uTrue = aPxdTrueHit->getU();
     float vTrue = aPxdTrueHit->getV();
@@ -163,45 +170,45 @@ void VXDSimpleClusterizerModule::event()
       const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(aVXDId));
       sigmaU = geometry.getUPitch(uTrue) / sqrt(12.);
       sigmaV = geometry.getVPitch(vTrue) / sqrt(12.);
-
     }
     B2DEBUG(1000, "sigU sigV: " << sigmaU << " " << sigmaV);
 
-    //make a normal measurment
     u = gRandom->Gaus(uTrue, sigmaU);
     v = gRandom->Gaus(vTrue, sigmaV);
 
-    //if (m_writeTruthToFile == true) dataOut << uTrue << "\t" << vTrue << "\n";
 
+    // Save as new 2D-PXD-cluster
+    unsigned int clusterIndex = pxdClusters->GetLast() + 1;
+    new(pxdClusters->AddrAt(clusterIndex)) PXDCluster(aVXDId, u, v, 0, 0, 1, 1, 1, 1, 1);
 
-    new(pxdClusters->AddrAt(aClusterHit)) PXDCluster(aVXDId, u, v, 0, 0, 1, 1, 1, 1, 1);
+    relPXDClusterTrueHit.add((unsigned int) currentTrueHit, clusterIndex);
 
-    ++aClusterHit;
-
+    relationMapMcP2PxdCls[particleID].push_back(clusterIndex);
   }
+
+
 ////////////////////////////////////////////////  NOW THE SVD
-  //smear the svd true Hits and store them in svdSimpleDigiHits
-  aClusterHit = 0;
-  for (int i = 0; i not_eq nSvdTrueHits; ++i) {
-    const SVDTrueHit* aSvdTrueHit = svdTrueHits[i];
+  for (int currentTrueHit = 0; currentTrueHit not_eq nSvdTrueHits; ++currentTrueHit) {
+
+    const SVDTrueHit* aSvdTrueHit = svdTrueHits[currentTrueHit];
+    relIndexSvdTH2McP.getFirstFrom(aSvdTrueHit)->from->fixParticleList();
+    const int particleID = relIndexSvdTH2McP.getFirstFrom(aSvdTrueHit)->from->getArrayIndex(); // WARNING:possible trap, might change in future revisions
     float energy = aSvdTrueHit->getEnergyDep();
+
     if (energy < m_energyThresholdU + m_energyThresholdV) { //ignore hit if energy deposity is too snall
       continue;
     }
 
-    if (m_onlyPrimaries == true) {
-      RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getFrom(aMcParticle);
-      while (iterPairMcSvd.first not_eq iterPairMcSvd.second) {
-        if (iterPairMcSvd.first->to == aSvdTrueHit) {
-          break;
-        }
-        ++iterPairMcSvd.first;
-      }
-      if (iterPairMcSvd.first == iterPairMcSvd.second) { // if the beak statement never was invoced the current svdHit does not come from a primary particle and will not be added to the track cand
-        continue;
+    B2DEBUG(20, "particleID: " << particleID);
+
+    if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
+      if (relIndexSvdTH2McP.getFirstFrom(aSvdTrueHit)->from->hasStatus(MCParticle::c_PrimaryParticle) == false) {
+        continue; // jump to next svdTrueHit
       }
     }
 
+
+    // smear the SvdTrueHit and get needed variables for storing
     VxdID aVXDId = aSvdTrueHit->getSensorID();
     float uTrue = aSvdTrueHit->getU();
     float vTrue = aSvdTrueHit->getV();
@@ -214,26 +221,43 @@ void VXDSimpleClusterizerModule::event()
     }
     B2DEBUG(1000, "sigU sigV: " << sigmaU << " " << sigmaV);
 
-    //make a normal measurment
     u = gRandom->Gaus(uTrue, sigmaU);
     v = gRandom->Gaus(vTrue, sigmaV);
 
-    //if (m_writeTruthToFile == true) dataOut << uTrue << "\t" << vTrue << "\n";
 
-    new(svdClusters->AddrAt(aClusterHit)) SVDCluster(aVXDId, true, u, svdTrueHits[i]->getGlobalTime(), 0, 1, 1, 1);
+    // Save as two new 1D-SVD-clusters
+    unsigned int clusterIndex = svdClusters->GetLast() + 1;
+    float timeStamp = svdTrueHits[currentTrueHit]->getGlobalTime();
+    new(svdClusters->AddrAt(clusterIndex)) SVDCluster(aVXDId, true, u, timeStamp, 0, 1, 1, 1);
+    new(svdClusters->AddrAt(clusterIndex + 1)) SVDCluster(aVXDId, false, v, timeStamp, 0, 1, 1, 1);
 
-    ++aClusterHit;
+    vector<unsigned int> clusterVector;
+    clusterVector.push_back(clusterIndex);
+    clusterVector.push_back(clusterIndex + 1);
+    relSVDClusterTrueHit.add((unsigned int) currentTrueHit, clusterVector);
 
-    new(svdClusters->AddrAt(aClusterHit)) SVDCluster(aVXDId, false, v, svdTrueHits[i]->getGlobalTime(), 0, 1, 1, 1);
-
-    ++aClusterHit;
+    relationMapMcP2SvdCls[particleID].push_back(clusterIndex);
   }
 
-  //if (m_writeTruthToFile == true) dataOut.close();
+  // exporting RelationMaps to relationArrays...
+  BOOST_FOREACH(mapEntry aRelation, relationMapMcP2PxdCls) {
+    relPXDClusterMCParticle.add(aRelation.first, aRelation.second);
+  }
+  BOOST_FOREACH(mapEntry aRelation, relationMapMcP2SvdCls) {
+    relSVDClusterMCParticle.add(aRelation.first, aRelation.second);
+  }
 
+
+  B2DEBUG(10, "------------------------------------------------------");
   B2DEBUG(10, "pxdClusters.getEntries()" << pxdClusters.getEntries());
   B2DEBUG(10, "svdClusters.getEntries()" << svdClusters.getEntries());
-
+  B2DEBUG(10, "relPXDClusterMCParticle.getEntries()" << relPXDClusterMCParticle.getEntries());
+  B2DEBUG(10, "relPXDClusterTrueHit.getEntries())" << relPXDClusterTrueHit.getEntries());
+  B2DEBUG(10, "relSVDClusterMCParticle.getEntries()" << relSVDClusterMCParticle.getEntries());
+  B2DEBUG(10, "relSVDClusterTrueHit.getEntries()" << relSVDClusterTrueHit.getEntries());
+  B2DEBUG(10, "relationMapMcP2PxdCls.size()" << relationMapMcP2PxdCls.size());
+  B2DEBUG(10, "relationMapMcP2SvdCls.size()" << relationMapMcP2SvdCls.size());
+  B2DEBUG(10, "------------------------------------------------------");
 
 }
 

@@ -75,16 +75,20 @@ VXDSimpleClusterizerModule::~VXDSimpleClusterizerModule()
 void VXDSimpleClusterizerModule::initialize()
 {
   //output containers, will be created when registered here
+  // since clusterArrays are inconsistently defined, both versions are implemented
   StoreArray<PXDCluster> pxdClusters("");
   StoreArray<SVDCluster> svdClusters("");
   StoreArray<MCParticle> mcParticles("");
   StoreArray<PXDTrueHit> pxdTrueHits("");
   StoreArray<SVDTrueHit> svdTrueHits("");
-
   RelationArray relPXDClusterMCParticle(pxdClusters, mcParticles);
   RelationArray relPXDClusterTrueHit(pxdClusters, pxdTrueHits);
   RelationArray relSVDClusterMCParticle(svdClusters, mcParticles);
   RelationArray relSVDClusterTrueHit(svdClusters, svdTrueHits);
+  RelationArray relMCParticlePXDCluster(mcParticles, pxdClusters);
+  RelationArray relTrueHitPXDCluster(pxdTrueHits, pxdClusters);
+  RelationArray relMCParticleSVDCluster(mcParticles, svdClusters);
+  RelationArray relTrueHitSVDCluster(svdTrueHits, svdClusters);
 }
 
 void VXDSimpleClusterizerModule::beginRun()
@@ -102,12 +106,10 @@ void VXDSimpleClusterizerModule::event()
   //all the input containers. First: MCParticles
   StoreArray<MCParticle> mcParticles("");
   int nMcParticles = mcParticles.getEntries();
-  B2DEBUG(10, "VXDSimpleClusterizerModule: total Number of MCParticles: " << nMcParticles);
   if (nMcParticles == 0) {B2DEBUG(100, "MCTrackFinder: MCParticlesCollection is empty!");}
   //PXD
   StoreArray<PXDTrueHit> pxdTrueHits("");
   int nPxdTrueHits = pxdTrueHits.getEntries();
-  B2DEBUG(10, "VXDSimpleClusterizerModule: Number of PXDHits: " << nPxdTrueHits);
   if (nPxdTrueHits == 0) {B2DEBUG(100, "MCTrackFinder: PXDHitsCollection is empty!");}
 
   RelationIndex<MCParticle, PXDTrueHit> relIndexPxdTH2McP(mcParticles, pxdTrueHits, "");
@@ -115,7 +117,6 @@ void VXDSimpleClusterizerModule::event()
   //SVD
   StoreArray<SVDTrueHit> svdTrueHits("");
   int nSvdTrueHits = svdTrueHits.getEntries();
-  B2DEBUG(10, "VXDSimpleClusterizerModule: Number of SVDDHits: " << nSvdTrueHits);
   if (nSvdTrueHits == 0) {B2DEBUG(100, "MCTrackFinder: SVDHitsCollection is empty!");}
 
   RelationIndex<MCParticle, SVDTrueHit> relIndexSvdTH2McP(mcParticles, svdTrueHits, "");
@@ -125,14 +126,18 @@ void VXDSimpleClusterizerModule::event()
   StoreArray<PXDCluster> pxdClusters("");
   StoreArray<SVDCluster> svdClusters("");
 
-  RelationArray relPXDClusterMCParticle(pxdClusters, mcParticles, "");
-  RelationArray relPXDClusterTrueHit(pxdClusters, pxdTrueHits, "");
-  RelationArray relSVDClusterMCParticle(svdClusters, mcParticles, "");
-  RelationArray relSVDClusterTrueHit(svdClusters, svdTrueHits, "");
+  RelationArray relPXDClusterMCParticle(pxdClusters, mcParticles);
+  RelationArray relPXDClusterTrueHit(pxdClusters, pxdTrueHits);
+  RelationArray relSVDClusterMCParticle(svdClusters, mcParticles);
+  RelationArray relSVDClusterTrueHit(svdClusters, svdTrueHits);
+  RelationArray relMCParticlePXDCluster(mcParticles, pxdClusters);
+  RelationArray relTrueHitPXDCluster(pxdTrueHits, pxdClusters);
+  RelationArray relMCParticleSVDCluster(mcParticles, svdClusters);
+  RelationArray relTrueHitSVDCluster(svdTrueHits, svdClusters);
 
   // since there are many clusters produced by the same particle, we have to collect them before creating the relations. This feature is needed for the MCtrackFinder
-  typedef map<const int, vector<unsigned int> > relationMap; // needed for the storing loops at the end of the event
-  typedef pair<const int, vector<unsigned int> > mapEntry;
+  typedef map<unsigned int, vector<unsigned int> > relationMap; // needed for the storing loops at the end of the event
+  typedef pair<unsigned int, vector<unsigned int> > mapEntry;
   relationMap relationMapMcP2PxdCls;
   relationMap relationMapMcP2SvdCls;
 
@@ -141,14 +146,12 @@ void VXDSimpleClusterizerModule::event()
   double sigmaV = m_setMeasSigma;
 
 ///////////////////////////////////////////////////// NOW THE PXD
-  for (int currentTrueHit = 0; currentTrueHit not_eq nPxdTrueHits; ++currentTrueHit) {
+  for (unsigned int currentTrueHit = 0; currentTrueHit not_eq nPxdTrueHits; ++currentTrueHit) {
 
     const PXDTrueHit* aPxdTrueHit = pxdTrueHits[currentTrueHit];
     relIndexPxdTH2McP.getFirstFrom(aPxdTrueHit)->from->fixParticleList();
-    const int particleID = relIndexPxdTH2McP.getFirstFrom(aPxdTrueHit)->from->getArrayIndex(); // WARNING:possible trap, might change in future revisions
+    unsigned int particleID = relIndexPxdTH2McP.getFirstFrom(aPxdTrueHit)->from->getArrayIndex(); // WARNING:possible trap, might change in future revisions
     float energy = aPxdTrueHit->getEnergyDep();
-
-    B2DEBUG(20, "particleID: " << particleID);
 
     if (energy < m_energyThreshold) { //ignore hit if energy deposit is too small
       continue;
@@ -181,25 +184,26 @@ void VXDSimpleClusterizerModule::event()
     unsigned int clusterIndex = pxdClusters->GetLast() + 1;
     new(pxdClusters->AddrAt(clusterIndex)) PXDCluster(aVXDId, u, v, 0, 0, 1, 1, 1, 1, 1);
 
-    relPXDClusterTrueHit.add((unsigned int) currentTrueHit, clusterIndex);
-
+    //add relations:
+    relPXDClusterTrueHit.add(clusterIndex, currentTrueHit);
+    relTrueHitPXDCluster.add(currentTrueHit, clusterIndex);
+    relPXDClusterMCParticle.add(clusterIndex, particleID);
     relationMapMcP2PxdCls[particleID].push_back(clusterIndex);
+
   }
 
 
 ////////////////////////////////////////////////  NOW THE SVD
-  for (int currentTrueHit = 0; currentTrueHit not_eq nSvdTrueHits; ++currentTrueHit) {
+  for (unsigned int currentTrueHit = 0; currentTrueHit not_eq nSvdTrueHits; ++currentTrueHit) {
 
     const SVDTrueHit* aSvdTrueHit = svdTrueHits[currentTrueHit];
     relIndexSvdTH2McP.getFirstFrom(aSvdTrueHit)->from->fixParticleList();
-    const int particleID = relIndexSvdTH2McP.getFirstFrom(aSvdTrueHit)->from->getArrayIndex(); // WARNING:possible trap, might change in future revisions
+    unsigned int particleID = relIndexSvdTH2McP.getFirstFrom(aSvdTrueHit)->from->getArrayIndex(); // WARNING:possible trap, might change in future revisions
     float energy = aSvdTrueHit->getEnergyDep();
 
     if (energy < m_energyThresholdU + m_energyThresholdV) { //ignore hit if energy deposity is too snall
       continue;
     }
-
-    B2DEBUG(20, "particleID: " << particleID);
 
     if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
       if (relIndexSvdTH2McP.getFirstFrom(aSvdTrueHit)->from->hasStatus(MCParticle::c_PrimaryParticle) == false) {
@@ -231,24 +235,34 @@ void VXDSimpleClusterizerModule::event()
     new(svdClusters->AddrAt(clusterIndex)) SVDCluster(aVXDId, true, u, timeStamp, 0, 1, 1, 1);
     new(svdClusters->AddrAt(clusterIndex + 1)) SVDCluster(aVXDId, false, v, timeStamp, 0, 1, 1, 1);
 
+    // add relations
     vector<unsigned int> clusterVector;
     clusterVector.push_back(clusterIndex);
     clusterVector.push_back(clusterIndex + 1);
-    relSVDClusterTrueHit.add((unsigned int) currentTrueHit, clusterVector);
-
+    relTrueHitSVDCluster.add(currentTrueHit, clusterVector);
+    relSVDClusterTrueHit.add(clusterIndex, currentTrueHit);
+    relSVDClusterTrueHit.add(clusterIndex + 1, currentTrueHit);
+    relSVDClusterMCParticle.add(clusterIndex, particleID);
+    relSVDClusterMCParticle.add(clusterIndex + 1, particleID);
     relationMapMcP2SvdCls[particleID].push_back(clusterIndex);
+    relationMapMcP2SvdCls[particleID].push_back(clusterIndex + 1);
   }
 
+  B2DEBUG(10, "------------------------------------------------------");
   // exporting RelationMaps to relationArrays...
   BOOST_FOREACH(mapEntry aRelation, relationMapMcP2PxdCls) {
     relPXDClusterMCParticle.add(aRelation.first, aRelation.second);
+    B2DEBUG(20, "mcParticle " << aRelation.first << " has " << aRelation.second.size() << " relations to PXD clusters");
   }
   BOOST_FOREACH(mapEntry aRelation, relationMapMcP2SvdCls) {
     relSVDClusterMCParticle.add(aRelation.first, aRelation.second);
+    B2DEBUG(20, "mcParticle " << aRelation.first << " has " << aRelation.second.size() << " relations to SVD clusters");
   }
 
 
-  B2DEBUG(10, "------------------------------------------------------");
+  B2DEBUG(10, "VXDSimpleClusterizerModule: Number of PXDHits: " << nPxdTrueHits);
+  B2DEBUG(10, "VXDSimpleClusterizerModule: Number of SVDDHits: " << nSvdTrueHits);
+  B2DEBUG(10, "VXDSimpleClusterizerModule: total Number of MCParticles: " << nMcParticles);
   B2DEBUG(10, "pxdClusters.getEntries()" << pxdClusters.getEntries());
   B2DEBUG(10, "svdClusters.getEntries()" << svdClusters.getEntries());
   B2DEBUG(10, "relPXDClusterMCParticle.getEntries()" << relPXDClusterMCParticle.getEntries());

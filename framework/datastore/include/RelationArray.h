@@ -300,10 +300,10 @@ namespace Belle2 {
 
     //Fill all existing elements in a nested map, adding the weights of
     //duplicate elements
-    index_type lastFromIndex(-1);
+    index_type lastFromIndex(0);
     buffer_t::iterator lastFromIter = buffer.end();
+    unsigned int nElements = m_storeObjPtr->getEntries();
     TClonesArray& elements = m_storeObjPtr->elements();
-    unsigned int nElements = elements.GetEntries();
     for (unsigned int i = 0; i < nElements; ++i) {
       RelationElement& element = *static_cast<RelationElement*>(elements[i]);
       //Replace from index

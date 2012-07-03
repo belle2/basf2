@@ -18,6 +18,9 @@
 #include <string>
 #include <vector>
 #include "trg/trg/Clock.h"
+#include <TFile.h>
+#include <TTree.h>
+#include <TVectorD.h>
 
 #define TRGCDC_UNDEFINED 999999
 
@@ -438,6 +441,12 @@ class TRGCDC {
 
     /// LUT holder.
     std::vector<TRGCDCLUT *> _luts;
+
+    /// root file
+    TFile* m_file;
+    TTree* m_tree;
+    TClonesArray* m_fitParameters;
+    TClonesArray* m_mcParameters;
 
     friend class TRGCDCModule;
 };

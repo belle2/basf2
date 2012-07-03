@@ -173,11 +173,13 @@ TRGCDCModule::beginRun() {
       cout << "TRGCDCModule ... endRun called " << endl;
   }
 
-  void
-  TRGCDCModule::terminate()
-  {
+void
+TRGCDCModule::terminate() {
+
+    _cdc->terminate();
+
     if (TRGDebug::level())
-      cout << "TRGCDCModule ... terminate called " << endl;
-  }
+	cout << "TRGCDCModule ... terminate called " << endl;
+}
 
 } // namespace Belle2

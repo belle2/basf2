@@ -32,6 +32,7 @@
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/WireHitMC.h"
 #include "trg/cdc/TrackMC.h"
+#include "trg/cdc/Relation.h"
 #include "trg/cdc/Track.h"
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/SegmentHit.h"
@@ -409,11 +410,21 @@ TRGCDC::initialize(bool houghFinderPerfect,
     //...For module simulation (Front-end)...
     configure();
 
+    //...Initialize root file...
+    m_file = new TFile("TRGCDC.root","RECREATE");
+    m_tree = new TTree("m_tree","tree");
+    m_fitParameters = new TClonesArray("TVectorD");
+    m_mcParameters = new TClonesArray("TVectorD");
+    m_tree->Branch("fitParameters", &m_fitParameters);
+    m_tree->Branch("mcParameters", &m_mcParameters);
+
 }
 
 void
 TRGCDC::terminate(void){
     _fitter3D->terminate();
+    m_file->Write();
+    m_file->Close();
 }
 
 void
@@ -1302,6 +1313,47 @@ TRGCDC::simulate(void) {
 //         D->run();
 //     }
 #endif
+    
+    //...Fill root file...
+    TClonesArray &fitParameters = *m_fitParameters;
+    TClonesArray &mcParameters = *m_mcParameters;
+    fitParameters.Clear();
+    for(unsigned i=0; i<trackList3D.size(); i++){
+      const TCTrack &aTrack = *trackList3D[i];
+      double fitPt = aTrack.pt();
+      double fitPhi0; //= aTrack.helix().phi0();
+      if(aTrack.charge()>0) fitPhi0=aTrack.p().phi()-M_PI/2;
+      if(aTrack.charge()<0) fitPhi0=aTrack.p().phi()+M_PI/2;
+      double fitZ0 = aTrack.helix().dz();
+      double fitCot = aTrack.helix().tanl();
+      // pT, phi0, z0, cot
+      TVectorD tempFitParameters(4);
+      tempFitParameters[0] = fitPt;
+      tempFitParameters[1] = fitPhi0;
+      tempFitParameters[2] = fitZ0;
+      tempFitParameters[3] = fitCot;
+      new(fitParameters[i]) TVectorD(tempFitParameters);
+
+      const TCRelation &trackRelation = aTrack.relation();
+      const MCParticle &trackMCParticle = trackRelation.mcParticle(0);
+      double mcPt = trackMCParticle.getMomentum().Pt();
+      double mcPhi0;
+      if(trackMCParticle.getCharge()>0) mcPhi0=trackMCParticle.getMomentum().Phi()-M_PI/2;
+      if(trackMCParticle.getCharge()<0) mcPhi0=trackMCParticle.getMomentum().Phi()+M_PI/2;
+      // Change range to [0,2pi]
+      if(mcPhi0<0) mcPhi0+=2*M_PI;
+      double mcZ0 = trackMCParticle.getVertex().Z();
+      double mcCot=trackMCParticle.getMomentum().Pz()/trackMCParticle.getMomentum().Pt();
+
+      tempFitParameters[0] = mcPt;
+      tempFitParameters[1] = mcPhi0;
+      tempFitParameters[2] = mcZ0;
+      tempFitParameters[3] = mcCot;
+      new(mcParameters[i]) TVectorD(tempFitParameters);
+    }
+    m_tree->Fill();
+
+
     
     TRGDebug::leaveStage("TRGCDC simulation");
     return;

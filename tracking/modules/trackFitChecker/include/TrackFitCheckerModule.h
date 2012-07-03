@@ -35,7 +35,8 @@
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/count.hpp>
-
+#include <boost/accumulators/statistics/tail.hpp>
+#include <boost/accumulators/statistics/median.hpp>
 //genfit stuff
 #include <GFTrack.h>
 
@@ -48,14 +49,19 @@
 namespace Belle2 {
 
   /*!
-      This module calculates the resudals, pulls and chi^2 for a sample of tracks both track wise and layer wise tests are used. If availiable truth info from simulation in form of "TrueHits" is used.
+      This module calculates the residuals, pulls and chi^2 for a sample of tracks both track wise and layer wise tests are used. If available truth info from simulation in form of "TrueHits" is used.
   */
 
   class TrackFitCheckerModule : public Module {
 
 
-    typedef boost::accumulators::accumulator_set < double, boost::accumulators::stats < boost::accumulators::tag::mean, boost::accumulators::tag::variance(boost::accumulators::lazy) > > StatisticsAccuWithMeanAndVar;
-    typedef StatisticsAccuWithMeanAndVar StatisticsContainer;
+//    typedef boost::accumulators::accumulator_set < double, boost::accumulators::stats < boost::accumulators::tag::mean, boost::accumulators::tag::variance(boost::accumulators::lazy) > > StatisticsAccuWithMeanAndVar;
+//    typedef StatisticsAccuWithMeanAndVar StatisticsContainer;
+//    typedef boost::accumulators::accumulator_set < double, boost::accumulators::stats < boost::accumulators::tag::mean, boost::accumulators::tag::tail<boost::accumulators::right>, boost::accumulators::tag::variance(boost::accumulators::lazy) > > StatisticsAccuWithMeanVarAndTail;
+//    typedef StatisticsAccuWithMeanVarAndTail StatisticsContainer;
+    typedef boost::accumulators::accumulator_set < double, boost::accumulators::stats < boost::accumulators::tag::mean, boost::accumulators::tag::median, boost::accumulators::tag::variance(boost::accumulators::lazy) > > StatisticsAccuWithMeanMedianAndVar;
+    typedef StatisticsAccuWithMeanMedianAndVar StatisticsContainer;
+
   public:
 
     //! Constructor
@@ -148,6 +154,21 @@ namespace Belle2 {
     std::map<std::string, std::vector<float>* > m_trackWiseVecDataForRoot;
     std::map<std::string, std::vector< std::vector <float> >* > m_layerWiseDataForRoot;
 
+//    // now the data itself also in c++ vectors so this module can use custom implemented estimator instead just the one provided by root and
+    bool m_robust;
+    std::map<std::string, std::vector<double > > m_trackWiseData;
+    std::map<std::string, std::vector<std::vector<double> > > m_trackWiseVecData;
+    std::map<std::string, std::vector<std::vector< std::vector <double> > > > m_layerWiseData;
+
+
+    /** function to calculated the MAD or Median absolute deviation for given data sample. One has also provide the median of the sample (because boost has already median calculation implemented so I did not implement it myself) */
+    double calcMad(const std::vector<double>& data, const double& median);
+    std::map<std::string, double > m_madScalingFactors; //scaling factor the mad to make it compariable to the standard deviation
+    double calcMedian(std::vector<double> data);
+    //void calcMedianAndMad(std::vector<double> data, double& median, double& mad);
+    //void trunctatedMeanAndStd(std::vector<double> data, bool symmetric, double& mean, double& std);
+    int countOutliers(const std::vector<double>& dataSample, const double mean, const double sigma, const double widthScaling);
+
     // this maps will hold the names of the test data variables that have more then one component like the residuals of the origin position and momentum
     std::map<std::string, std::vector<std::string>* > namesOfTestVars;
 
@@ -168,7 +189,7 @@ namespace Belle2 {
     bool m_testPrediction;
     bool m_testDaf;
     bool m_truthAvailable;
-    bool m_inspectTracks;
+    int m_inspectTracks;
     std::string m_dataOutFileName; //common part of all names of output files
 
 
@@ -195,7 +216,6 @@ namespace Belle2 {
 
       std::vector<int> accuVecIndices;
       std::vector<int> detIds;
-      std::vector<int> hitDims;
 
       std::vector<TMatrixD> ms;
       std::vector<TMatrixD> Hs;

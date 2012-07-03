@@ -776,7 +776,7 @@ void TrackFitCheckerModule::printTrackWiseStatistics(const string& nameOfDataSam
       double aMedian = median(dataSample);
       double scaledMad = madScalingFactor * calcMad(m_trackWiseData[nameOfDataSample], aMedian);
       int nOutliers = countOutliers(m_trackWiseData[nameOfDataSample], aMedian, scaledMad, 4);
-      m_textOutput << "\t" << aMedian << "\t" << scaledMad << "\t" << nOutliers << "\t" << calcMedian(m_trackWiseData[nameOfDataSample]);
+      m_textOutput << "\t" << aMedian << "\t" << scaledMad << "\t" << nOutliers; // << "\t" << calcMedian(m_trackWiseData[nameOfDataSample]);
     } else {
       m_textOutput << "\tcannot compute MAD std";
     }

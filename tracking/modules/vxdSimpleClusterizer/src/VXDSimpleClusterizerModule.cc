@@ -251,11 +251,11 @@ void VXDSimpleClusterizerModule::event()
   B2DEBUG(10, "------------------------------------------------------");
   // exporting RelationMaps to relationArrays...
   BOOST_FOREACH(mapEntry aRelation, relationMapMcP2PxdCls) {
-    relPXDClusterMCParticle.add(aRelation.first, aRelation.second);
+    relMCParticlePXDCluster.add(aRelation.first, aRelation.second);
     B2DEBUG(20, "mcParticle " << aRelation.first << " has " << aRelation.second.size() << " relations to PXD clusters");
   }
   BOOST_FOREACH(mapEntry aRelation, relationMapMcP2SvdCls) {
-    relSVDClusterMCParticle.add(aRelation.first, aRelation.second);
+    relMCParticleSVDCluster.add(aRelation.first, aRelation.second);
     B2DEBUG(20, "mcParticle " << aRelation.first << " has " << aRelation.second.size() << " relations to SVD clusters");
   }
 

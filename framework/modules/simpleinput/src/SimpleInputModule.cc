@@ -10,6 +10,8 @@
 
 #include <framework/modules/simpleinput/SimpleInputModule.h>
 
+#include <framework/core/Environment.h>
+
 
 using namespace std;
 using namespace Belle2;
@@ -69,6 +71,10 @@ SimpleInputModule::~SimpleInputModule()
 
 void SimpleInputModule::initialize()
 {
+  const std::string& inputFileArgument = Environment::Instance().getInputFileOverride();
+  if (!inputFileArgument.empty())
+    m_inputFileName = inputFileArgument;
+
   //Open TFile
   m_file = new TFile(m_inputFileName.c_str(), "READ");
   if (!m_file or !m_file->IsOpen()) {

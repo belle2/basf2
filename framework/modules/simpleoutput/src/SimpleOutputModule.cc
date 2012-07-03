@@ -81,6 +81,10 @@ void SimpleOutputModule::initialize()
   //create a file level metadata object in the data store
   StoreObjPtr<FileMetaData> fileMetaDataPtr("", DataStore::c_Persistent);
 
+  const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
+  if (!outputFileArgument.empty())
+    m_outputFileName = outputFileArgument;
+
   m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
   if (m_file->IsZombie()) {
     B2FATAL("Couldn't open file '" << m_outputFileName << "' for writing!");

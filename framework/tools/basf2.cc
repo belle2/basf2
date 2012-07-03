@@ -138,7 +138,10 @@ int main(int argc, char* argv[])
     prog::options_description config("Configuration");
     config.add_options()
     ("steering", prog::value<string>(), "the python steering file")
-    ("arg", prog::value<vector<string> >(&arguments), "Additional arguments to be passed to the steering file")
+    ("arg", prog::value<vector<string> >(&arguments), "additional arguments to be passed to the steering file")
+    ("events,n", prog::value<int>(), "override number of events in run 1 for EvtMetaGen")
+    ("input,i", prog::value<string>(), "override name of input file for SimpleInput")
+    ("output,o", prog::value<string>(), "override name of output file for SimpleOutput")
     ;
 
     prog::options_description cmdlineOptions;
@@ -176,6 +179,26 @@ int main(int argc, char* argv[])
       if (!modArgs.empty()) arguments.push_back(modArgs);
       pythonFile = "modules.py";
     }
+
+    if (varMap.count("events")) {
+      int nevents = varMap["events"].as<int>();
+      if (nevents <= 0) {
+        B2FATAL("Invalid number of events!");
+        return 1;
+      }
+      Environment::Instance().setNumberEventsOverride(nevents);
+    }
+
+    if (varMap.count("input")) {
+      std::string name = varMap["input"].as<string>();
+      Environment::Instance().setInputFileOverride(name);
+    }
+
+    if (varMap.count("output")) {
+      std::string name = varMap["output"].as<string>();
+      Environment::Instance().setOutputFileOverride(name);
+    }
+
 
     //Check for info option
     if (varMap.count("info")) {

@@ -34,7 +34,13 @@ const list<string>& Environment::getModuleSearchPaths() const
 //                              Private methods
 //============================================================================
 
-Environment::Environment() : m_dataSearchPath(""), m_numberProcesses(0), m_steering("")
+Environment::Environment() :
+  m_dataSearchPath(""),
+  m_numberProcesses(0),
+  m_steering(""),
+  m_numberEventsOverride(0),
+  m_inputFileOverride(""),
+  m_outputFileOverride("")
 {
 
 }

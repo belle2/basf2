@@ -71,6 +71,24 @@ namespace Belle2 {
      */
     const std::string getExternalsPath() const { return m_externalsPath; };
 
+    /** Override the number of events in run 1 for EvtMetaGen module. */
+    void setNumberEventsOverride(int nevents) { m_numberEventsOverride = nevents; }
+
+    /** Returns number of events in run 1 for EvtMetaGen module, or 0 for no override. */
+    int getNumberEventsOverride() const { return m_numberEventsOverride; }
+
+    /** Override input file name for modules */
+    void setInputFileOverride(const std::string& name) { m_inputFileOverride = name; }
+
+    /** Return overriden input file name, or "" if none was set */
+    const std::string& getInputFileOverride() const { return m_inputFileOverride; }
+
+    /** Override output file name for modules */
+    void setOutputFileOverride(const std::string& name) { m_outputFileOverride = name; }
+
+    /** Return overriden output file name, or "" if none was set */
+    const std::string& getOutputFileOverride() const { return m_outputFileOverride; }
+
     /**
      * Sets the number of processes which should be used for the parallel processing.
      * If the value is set to 0, no parallel processing will be used in the event loop.
@@ -106,6 +124,9 @@ namespace Belle2 {
     std::string m_externalsPath;  /**< The path in which the externals are located. */
     int m_numberProcesses;        /**< The number of processes that should be used for the parallel processing. */
     std::string m_steering;       /**< The content of the steering file. */
+    int m_numberEventsOverride; /**< Override number of events in the first run. */
+    std::string m_inputFileOverride; /** Override name of input file for input module */
+    std::string m_outputFileOverride; /** Override name of output file for output module */
 
     /**
      * The constructor is hidden to avoid that someone creates an instance of this class.
@@ -135,7 +156,7 @@ namespace Belle2 {
      */
     class SingletonDestroyer {
     public: ~SingletonDestroyer() {
-        if (Environment::m_instance != NULL) delete Environment::m_instance;
+        delete Environment::m_instance;
       }
     };
     friend class SingletonDestroyer;

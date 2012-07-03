@@ -34,7 +34,7 @@ RxModule::RxModule() : Module()
   m_compressionLevel = 0;
 
   //Parameter definition
-  B2INFO("Rx: Constructor done.");
+  B2DEBUG(1, "Rx: Constructor done.");
 }
 
 RxModule::RxModule(RingBuffer* rbuf) : Module()

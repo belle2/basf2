@@ -38,7 +38,7 @@ SeqRootOutputModule::SeqRootOutputModule() : Module()
   addParam("outputFileName"  , m_outputFileName, "SeqRoot file name.", string("SeqRootOutput.root"));
   addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression.", 0);
 
-  B2INFO("SeqRootOutput: Constructor done.");
+  B2DEBUG(1, "SeqRootOutput: Constructor done.");
 }
 
 

@@ -40,7 +40,7 @@ SeqRootInputModule::SeqRootInputModule() : Module()
   addParam("inputFileName"  , m_inputFileName, "SeqRoot file name.", string("SeqRootInput.root"));
   addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression.", 0);
 
-  B2INFO("SeqRootInput: Constructor done.");
+  B2DEBUG(1, "SeqRootInput: Constructor done.");
 }
 
 

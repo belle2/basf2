@@ -32,7 +32,7 @@ TxModule::TxModule() : Module()
   m_compressionLevel = 0;
 
   //Parameter definition
-  B2INFO("Tx: Constructor done.");
+  B2DEBUG(1, "Tx: Constructor done.");
 }
 
 TxModule::TxModule(RingBuffer* rbuf) : Module()

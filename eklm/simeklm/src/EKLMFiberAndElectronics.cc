@@ -44,7 +44,6 @@ namespace Belle2 {
     m_scintillatorDeExcitationTime = Digitizer.getDouble("ScintillatorDeExcitationTime");
     m_fiberDeExcitationTime = Digitizer.getDouble("FiberDeExcitationTime");
     m_outputFilename = Digitizer.getString("OutputFile");
-    //    m_lightSpeed = Digitizer.getDouble("LightSpeedInFiber");
     m_firstPhotonlightSpeed = Digitizer.getDouble("FirstPhotonSpeed");
     m_attenuationLength = Digitizer.getLength("AttenuationLength");
     m_expCoefficient = Digitizer.getDouble("SignalShapeExpCoefficient");
@@ -107,18 +106,21 @@ namespace Belle2 {
 
 
       // fill histograms
-      timesToShape(hitTimes(gRandom->Poisson(nPEmean), (*iHit)->getTime(), true), m_digitizedAmplitudeDirect);
-      timesToShape(hitTimes(gRandom->Poisson(nPEmean), (*iHit)->getTime(), false), m_digitizedAmplitudeReflected);
+      timesToShape(hitTimes(gRandom->Poisson(nPEmean), (*iHit)->getTime(), false), m_digitizedAmplitudeDirect);
+      if (m_mirrorReflectiveIndex > 0)
+        timesToShape(hitTimes(gRandom->Poisson(nPEmean), (*iHit)->getTime(), true), m_digitizedAmplitudeReflected);
 
     }
 
     // sum up histograms
-    m_digitizedAmplitude->Add(m_digitizedAmplitudeReflected, 1);
     m_digitizedAmplitude->Add(m_digitizedAmplitudeDirect, 1);
+    if (m_mirrorReflectiveIndex > 0)
+      m_digitizedAmplitude->Add(m_digitizedAmplitudeReflected, 1);
 
 
     // add random SiPM noise to the histogram
-    addRandomSiPMNoise();
+    if (m_meanSiPMNoise > 0)
+      addRandomSiPMNoise();
 
     // set up fit parameters
     m_fitFunction->SetParameters(10, 2., 0.04, 50, m_enableConstBkg);
@@ -158,7 +160,7 @@ namespace Belle2 {
     G4Box* box = (G4Box*)(sh->getVolume()->GetLogicalVolume()->GetSolid()->GetConstituentSolid(0));
     // Native Geant4 units are mm, here we account for that
     double half_len = box->GetXHalfLength() * Unit::mm;
-    double local_pos = sh->getLocalPosition()->x() * Unit::mm;
+    double local_pos = sh->getLocalPosition()->x() ; // already in cm!!!
     m_hitDist = make_pair(half_len - local_pos, 3.0 * half_len + local_pos);
   }
 
@@ -184,10 +186,11 @@ namespace Belle2 {
   {
     vector <double> hitTimesVector;
     // start selection procedure
+    m_min_time = 100000000.;
     for (int i = 0; i < nPE; i++) {
       double cosTheta = gRandom->Uniform(m_minCosTheta, 1);
       double hitDist;
-      if (isReflected)
+      if (!isReflected)
         hitDist = m_hitDist.first / cosTheta;
       else
         hitDist = m_hitDist.second / cosTheta;
@@ -206,8 +209,12 @@ namespace Belle2 {
       double deExcitationTime = gRandom->Exp(m_scintillatorDeExcitationTime)
                                 + gRandom->Exp(m_fiberDeExcitationTime);
       double hitTime = lightPropagationTime(hitDist) + deExcitationTime + timeShift;
+      // std::cout<<"TRMPORARY BUG IN EKLMFiberAndElectronics.cc"<<std::endl;
+//       double hitTime = lightPropagationTime(hitDist) + timeShift;
 
       hitTimesVector.push_back(hitTime);
+      if (hitTime < m_min_time)
+        m_min_time = hitTime;
     }
     return hitTimesVector;
   }
@@ -215,11 +222,13 @@ namespace Belle2 {
   void EKLMFiberAndElectronics::timesToShape(const vector <double> & times,
                                              TH1D* shape)
   {
-    for (unsigned  i = 0; i < times.size(); i++)
+    //    for (unsigned  i = 0; i < times.size(); i++)
+    for (std::vector<double>::const_iterator i = times.begin(); i != times.end(); i++)
       for (int iTimeStep = 0; iTimeStep < m_nTimeDigitizationSteps; iTimeStep++)
         shape->AddBinContent(iTimeStep + 1,
                              signalShape(iTimeStep * m_timeDigitizationStep -
-                                         times[i]));
+                                         //                                         times[i]));
+                                         *i));
   }
 
   double EKLMFiberAndElectronics::lightPropagationTime(double L)
@@ -235,6 +244,8 @@ namespace Belle2 {
 
   double EKLMFiberAndElectronics::getFitResults(int i) const
   {
+    if (i == -1)
+      return m_min_time;
     return m_fitResultsPtr->Value(i);
   }
 
@@ -242,7 +253,6 @@ namespace Belle2 {
   {
     return (int)m_fitResultsPtr;
   }
-
 
 
 

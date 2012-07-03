@@ -245,6 +245,9 @@ namespace Belle2 {
      */
     double distanceAttenuation(double);
 
+
+    double m_min_time;
+
   };
 
   double  EKLMSignalShapeFitFunction(double*, double*);

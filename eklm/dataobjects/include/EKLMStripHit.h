@@ -117,6 +117,8 @@ namespace Belle2 {
     void setFitResults(TFitResultPtr resPtr);
 
 
+    void setMCTS(double ts);
+    double getMCTS() const;
 
 
   private:
@@ -146,6 +148,8 @@ namespace Belle2 {
     int m_fitStatus;
 
 
+    double m_MCtime;
+    double m_timeshift;
 
 
     //! Physical volume (for simulation)

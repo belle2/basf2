@@ -136,24 +136,23 @@ namespace Belle2 {
     // see similar problem in EKLMFiberAndElectronics::lightPropagationDistance function
     G4Box* box1 = (G4Box*)(hit1->getVolume()->GetLogicalVolume()->GetSolid()->GetConstituentSolid(0));
     double max1 = 2.0 * box1->GetXHalfLength();
-    HepGeom::Point3D<double> p1(0.5 * max1, 0., 0.);
-    HepGeom::Point3D<double> sipm1(0., 0., 0.);
-    // strip centre coordinates in a global frame
-    HepGeom::Point3D<double> pt1 = ((G4PVPlacementGT*)(hit1->getVolume()))-> getTransform() * p1;
+    HepGeom::Point3D<double> p1(box1->GetXHalfLength(), 0., 0.);
+    HepGeom::Point3D<double> q1(-(box1->GetXHalfLength()), 0., 0.);
     // sipm coordinates in a global frame
-    HepGeom::Point3D<double> sipmt1 = ((G4PVPlacementGT*)(hit1->getVolume()))-> getTransform() *  sipm1;
+    HepGeom::Point3D<double> pt1 = ((G4PVPlacementGT*)(hit1->getVolume()))-> getTransform() * p1;
+    HepGeom::Point3D<double> qt1 = ((G4PVPlacementGT*)(hit1->getVolume()))-> getTransform() * q1;
 
     // actually, it is not too safe to use GetConstituentSolid(0).
     // here we rely on the fact that the first child is a real strip G4box
     // similar problem is in EKLMFiberAndElectronics::lightPropagationDistance function
     G4Box* box2 = (G4Box*)(hit2->getVolume()->GetLogicalVolume()->GetSolid()->GetConstituentSolid(0));
     double max2 = 2.0 * box2->GetXHalfLength();
-    HepGeom::Point3D<double> p2(0.5 * max2, 0., 0.);
-    HepGeom::Point3D<double> sipm2(0., 0., 0.);
-    // strip centre coordinates in a global frame
-    HepGeom::Point3D<double> pt2 = ((G4PVPlacementGT*)(hit2->getVolume()))->getTransform() * p2;
+    HepGeom::Point3D<double> p2(box2->GetXHalfLength(), 0., 0.);
+    HepGeom::Point3D<double> q2(-(box2->GetXHalfLength()), 0., 0.);
     // sipm coordinates in a global frame
-    HepGeom::Point3D<double> sipmt2 = ((G4PVPlacementGT*)(hit2->getVolume()))-> getTransform() *  sipm2;
+    HepGeom::Point3D<double> pt2 = ((G4PVPlacementGT*)(hit2->getVolume()))->getTransform() * p2;
+    HepGeom::Point3D<double> qt2 = ((G4PVPlacementGT*)(hit2->getVolume()))->getTransform() * q2;
+
 
     crossPoint.SetZ((pt1.z() + pt2.z()) / 2 * Unit::mm);
 
@@ -164,8 +163,16 @@ namespace Belle2 {
       {
         if (fabs(pt1.x() - pt2.x()) <= max1 && fabs(pt1.y() - pt2.y()) <= max2 &&
             fabs(pt2.x()) <= fabs(pt1.x()) && fabs(pt1.y()) <= fabs(pt2.y())) {   // there is a crossing
-          t1 = hit1->getTime() - fabs(sipmt1.x() - pt2.x()) * Unit::mm / m_firstPhotonlightSpeed;
-          t2 = hit2->getTime() - fabs(sipmt2.y() - pt1.y()) * Unit::mm / m_firstPhotonlightSpeed;
+          t1 = hit1->getTime() - fabs(pt1.x() - pt2.x()) * Unit::mm / m_firstPhotonlightSpeed;
+          t2 = hit2->getTime() - fabs(pt2.y() - pt1.y()) * Unit::mm / m_firstPhotonlightSpeed;
+//    std::cout<<"TIME 1 "<<hit1->getTime()<<" "<<hit1->getMCTS()<<" "<<fabs(pt1.x() - pt2.x()) <<std::endl;
+//    std::cout<<"TIME 2 "<<hit2->getTime()<<" "<<hit2->getMCTS()<<" "<<fabs(pt1.y() - pt2.y()) <<std::endl;
+
+//    std::cout<<"COORDINATES 1 P:( "<<pt1.x()<<" , "<<pt1.y()<<" )  Q:( "<<qt1.x()<<" , "<<qt1.y()<<" );    ";
+//    std::cout<<"2 P:( "<<pt2.x()<<" , "<<pt2.y()<<" ) Q:( "<<qt2.x()<<" , "<<qt2.y()<<" )"<<std::endl;
+
+
+
           crossPoint.SetX(pt2.x()*Unit::mm);
           crossPoint.SetY(pt1.y()*Unit::mm);
           time = (t1 + t2) / 2;
@@ -177,10 +184,17 @@ namespace Belle2 {
       {
         if (fabs(pt1.x() - pt2.x()) <= max2 && fabs(pt1.y() - pt2.y()) <= max1 &&
             fabs(pt1.x()) <= fabs(pt2.x()) && fabs(pt2.y()) <= fabs(pt1.y())) { // there is a crossing
-          t1 = hit1->getTime() - fabs(sipmt1.y() - pt2.y()) * Unit::mm / m_firstPhotonlightSpeed;
-          t2 = hit2->getTime() - fabs(sipmt2.x() - pt1.x()) * Unit::mm / m_firstPhotonlightSpeed;
+          t1 = hit1->getTime() - fabs(pt1.y() - pt2.y()) * Unit::mm / m_firstPhotonlightSpeed;
+          t2 = hit2->getTime() - fabs(pt1.x() - pt2.x()) * Unit::mm / m_firstPhotonlightSpeed;
+//    std::cout<<"TIME 1 "<<hit1->getTime()<<" "<<hit1->getMCTS()<<" "<<fabs(pt1.y() - pt2.y())<<std::endl;
+//    std::cout<<"TIME 2 "<<hit2->getTime()<<" "<<hit2->getMCTS()<<" "<<fabs(pt1.x() - pt2.x())<<std::endl;
           crossPoint.SetX(pt1.x()*Unit::mm);
           crossPoint.SetY(pt2.y()*Unit::mm);
+
+
+//    std::cout<<"COORDINATES 1 P:( "<<pt1.x()<<" , "<<pt1.y()<<" )  Q:( "<<qt1.x()<<" , "<<qt1.y()<<" );    ";
+//    std::cout<<"2 P:( "<<pt2.x()<<" , "<<pt2.y()<<" ) Q:( "<<qt2.x()<<" , "<<qt2.y()<<" )"<<std::endl;
+
 
           time = (t1 + t2) / 2;
           chisq = (t1 - t2) * (t1 - t2) / m_sigmaT / m_sigmaT;

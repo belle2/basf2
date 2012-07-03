@@ -29,15 +29,21 @@ set_log_level(LogLevel.INFO)
 
 # EvtMetaGen - generate event meta data
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [20])
+evtmetagen.param('EvtNumList', [200])
 evtmetagen.param('RunList', [1])
 
 # Particle gun
 particlegun = register_module('PGunInput')
 particlegun.param('nTracks', 1)
 particlegun.param('PIDcodes', [13, -13])
-particlegun.param('pPar1', 2)
-particlegun.param('pPar2', 3)
+particlegun.param('pPar1', 20)
+particlegun.param('pPar2', 20.01)
+
+particlegun.param('thetaPar1', 25)
+particlegun.param('thetaPar2', 25.01)
+
+particlegun.param('phiPar1', 20)
+particlegun.param('phiPar2', 20.01)
 
 # Geometry parameter loader
 paramloader = register_module('Gearbox')

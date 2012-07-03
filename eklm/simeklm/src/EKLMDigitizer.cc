@@ -14,9 +14,14 @@
 #include <framework/logging/Logger.h>
 
 #include "G4VPhysicalVolume.hh"
+#include <eklm/geoeklm/G4PVPlacementGT.h>
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
+
+
+#include "G4Box.hh"
+#include <framework/gearbox/Unit.h>
 
 
 using namespace CLHEP;
@@ -218,21 +223,27 @@ namespace Belle2 {
       // create new stripHit
       EKLMStripHit* stripHit = new(m_stripHitsArray->AddrAt(m_stripHitsArray.getEntries()))EKLMStripHit(simHit);
 
+      //***
+      //      G4Box* box1 = (G4Box*)(simHit->getVolume()->GetLogicalVolume()->GetSolid()->GetConstituentSolid(0));
+      stripHit->setMCTS(simHit->getTime());
+
+
+      //***
 
       if (!fiberAndElectronicsSimulator->getFitStatus()) {
         stripHit->setTime(fiberAndElectronicsSimulator->getFitResults(0));
         stripHit->setNumberPhotoElectrons(fiberAndElectronicsSimulator->
                                           getFitResults(3));
       } else {
-        stripHit->setTime(0);
+        stripHit->setTime(0.);
         stripHit->setNumberPhotoElectrons(0);
       }
       stripHit->setFitStatus(fiberAndElectronicsSimulator->getFitStatus());
 
-      if (stripHit->getNumberPhotoElectrons() < threshold)
-        stripHit->isGood(false);
-      else
+      if (stripHit->getNumberPhotoElectrons() > threshold)
         stripHit->isGood(true);
+      else
+        stripHit->isGood(false);
 
 
       delete fiberAndElectronicsSimulator;

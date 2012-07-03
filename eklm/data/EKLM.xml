@@ -13,18 +13,18 @@
      <TimeDigitizationStep desc="Time setp of FPGA TDC">1</TimeDigitizationStep>
      <NTimeDigitizationSteps desc="Number of steps to to in digitization">200</NTimeDigitizationSteps>
      <NPEperMeV desc="Number of Photoelectons per 1 MeV energy deposition">20</NPEperMeV>
-     <MaxTheta desc="Angle at which WLS fiber captures the light" unit="deg">26.7</MaxTheta>
-     <MirrorReflectiveIndex desc="Reflective index of the mirror at the end of the fiber">0.95</MirrorReflectiveIndex>
-     <ScintillatorDeExcitationTime desc="Scintillator deexcitation time" unit="ns">3</ScintillatorDeExcitationTime>
-     <FiberDeExcitationTime desc="Fiber deexcitation time" unit="ns">10</FiberDeExcitationTime>
-     <LightSpeedInFiber desc="Light speed in fiber, does not depend on angle, cm/ns">17.0</LightSpeedInFiber>
+     <MaxTheta desc="Angle at which WLS fiber captures the light" unit="deg">26.7</MaxTheta> 
+     <!--- <MaxTheta desc="Angle at which WLS fiber captures the light" unit="deg">0.7</MaxTheta> -->
+     <MirrorReflectiveIndex desc="Reflective index of the mirror at the end of the fiber">0.</MirrorReflectiveIndex>
+     <ScintillatorDeExcitationTime desc="Scintillator deexcitation time" unit="ns">0.0003</ScintillatorDeExcitationTime>
+     <FiberDeExcitationTime desc="Fiber deexcitation time" unit="ns">.000000010</FiberDeExcitationTime>
      <FirstPhotonSpeed desc="Speed for a fastest photon. Should be measured, cm/ns">17.0</FirstPhotonSpeed>
      <TimeResolution desc="Time resolution used in 2D hit reconstruction">3.0</TimeResolution>
      <SignalShapeExpCoefficient desc="exponent coefficient for a single-photoelectron shape">0.04</SignalShapeExpCoefficient>
      <AttenuationLength desc="attenuation length in the fiber" unit="cm">300</AttenuationLength>
-     <BackgroundPoissonMean desc="Mean for SiPM backgrouns. If zero or negative no backgrounds are added">1</BackgroundPoissonMean>
-     <EnableConstantBackgroundInTheFit desc="Enables (non-zero) or disables (0) constant background fraction in the fit. If value!=0,  value  will be used as seed  fit value">1.</EnableConstantBackgroundInTheFit>
-     <OutputFile desc="Prefix for name of file with histograms (can include directory name). If void no histos would be saved">/tmp/hist/</OutputFile>
+     <BackgroundPoissonMean desc="Mean for SiPM backgrouns. If zero or negative no backgrounds are added">-1.</BackgroundPoissonMean>
+     <EnableConstantBackgroundInTheFit desc="Enables (non-zero) or disables (0) constant background fraction in the fit. If value!=0,  value  will be used as seed  fit value">0.</EnableConstantBackgroundInTheFit>
+     <OutputFile desc="Prefix for name of file with histograms (can include directory name). If void no histos would be saved"></OutputFile>
     </Digitizer>
     <Rotation desc="Rotation of the EKLM with respect to the Detector"
       unit="mrad">0.0</Rotation>

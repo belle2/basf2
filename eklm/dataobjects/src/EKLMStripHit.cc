@@ -30,7 +30,8 @@ EKLMStripHit::EKLMStripHit(const EKLMSimHit* hit)
     m_Plane(hit->getPlane()),
     m_Strip(hit->getStrip()),
     m_NumberPhotoElectrons(-1),
-    m_pv(hit->getVolume())
+    m_pv(hit->getVolume()),
+    m_MCtime(hit->getTime())
 {}
 
 
@@ -113,7 +114,11 @@ void EKLMStripHit::setVolume(const G4VPhysicalVolume* pv)
 
 
 
+void EKLMStripHit::setMCTS(double ts)
+{m_timeshift = ts;}
 
+double EKLMStripHit::getMCTS() const
+{return m_timeshift;}
 
 void EKLMStripHit::Print() const
 {

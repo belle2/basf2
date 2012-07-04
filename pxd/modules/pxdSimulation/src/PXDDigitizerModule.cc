@@ -25,7 +25,7 @@
 #include <boost/foreach.hpp>
 #include <cmath>
 
-#include <TRandom3.h>
+#include <TRandom.h>
 #include <TMath.h>
 
 using namespace std;
@@ -41,7 +41,7 @@ REG_MODULE(PXDDigitizer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDDigitizerModule::PXDDigitizerModule() : Module(), m_random(0), m_rootFile(0), m_histSteps(0), m_histDiffusion(0),
+PXDDigitizerModule::PXDDigitizerModule() : Module(), m_rootFile(0), m_histSteps(0), m_histDiffusion(0),
   m_histLorentz_u(0), m_histLorentz_v(0)
 {
   //Set module properties
@@ -176,7 +176,6 @@ void PXDDigitizerModule::initialize()
     m_histLorentz_v->GetXaxis()->SetTitle("Lorentz angle");
   }
 
-  m_random = new TRandom3(0);
 }
 
 void PXDDigitizerModule::beginRun()
@@ -440,7 +439,7 @@ void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
   B2DEBUG(40, "Splitting charge in " << nGroups << " groups of " << groupCharge << " electrons");
   for (int group = 0; group < nGroups; ++group) {
     //Distribute according to sigmaDrift in u and v
-    TVector3 step3(m_random->Gaus(0.0, sigmaDrift_u), m_random->Gaus(0.0, sigmaDrift_v), 0);
+    TVector3 step3(gRandom->Gaus(0.0, sigmaDrift_u), gRandom->Gaus(0.0, sigmaDrift_v), 0);
     double uPos = positionInPlane.X() + step3.X();
     double vPos = positionInPlane.Y() + step3.Y();
     int uID(0), vID(0);
@@ -473,7 +472,7 @@ void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
       }
       //Random walk with drift
       //collectionTime += m_elStepTime;
-      step3.SetXYZ(m_random->Gaus(0.0, sigmaDiffus), m_random->Gaus(0.0, sigmaDiffus), 0);
+      step3.SetXYZ(gRandom->Gaus(0.0, sigmaDiffus), gRandom->Gaus(0.0, sigmaDiffus), 0);
       step3 += m_hallFactor * Unit::eMobilitySi * step3.Cross(m_currentBField);
       uPos += step3.X();
       vPos += step3.Y();
@@ -562,18 +561,18 @@ double PXDDigitizerModule::addNoise(double charge)
 {
   if (charge <= 0) {
     //Noise Pixel, add noise to exceed Noise Threshold;
-    double p = m_random->Uniform(m_noiseFraction, 1.0);
+    double p = gRandom->Uniform(m_noiseFraction, 1.0);
     charge = TMath::NormQuantile(p) * m_elNoise;
   } else {
     if (m_applyPoisson) {
       // For big charge assume Gaussian distr.
       if (charge > (1000. * Unit::e))
-        charge = m_random->Gaus(charge, sqrt(charge));
+        charge = gRandom->Gaus(charge, sqrt(charge));
       else  // Otherwise Poisson distr.
-        charge = m_random->Poisson(charge);
+        charge = gRandom->Poisson(charge);
     }
     if (m_applyNoise) {
-      charge += m_random->Gaus(0., m_elNoise);
+      charge += gRandom->Gaus(0., m_elNoise);
     }
   }
   return charge;
@@ -593,13 +592,13 @@ void PXDDigitizerModule::addNoiseDigits()
     const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensor.first));
     int nU = info.getUCells();
     int nV = info.getVCells();
-    int nPixels = m_random->Poisson(fraction * nU * nV);
+    int nPixels = gRandom->Poisson(fraction * nU * nV);
 
     //With an empty Sensor, nPixels would exceed the noise cut. If pixels are lit, these will have their own
     //noise fluctuation in addNoise. So if we find that a pixel we chose randomly to be lit already carry charge,
     //we ignore it.
     for (int i = 0; i < nPixels; ++i) {
-      Digit d(m_random->Integer(nU), m_random->Integer(nV));
+      Digit d(gRandom->Integer(nU), gRandom->Integer(nV));
       //Add 0 electrons, will not modify existing digits but will add empty ones which
       //will be filled with noise in PXDDigitizer::addNoise
       s[d].add(0.0);
@@ -666,5 +665,4 @@ void PXDDigitizerModule::terminate()
     m_rootFile->Write();
     m_rootFile->Close();
   }
-  if (m_random) delete m_random;
 }

@@ -239,8 +239,6 @@ namespace Belle2 {
 
       /** Structure containing all existing sensors */
       Sensors m_sensors;
-      /** Pointer to random number generator, FIXME: should be provided by framework */
-      TRandom* m_random;
 
       /** Pointer to the PXDSimhit currently digitized */
       const PXDSimHit*   m_currentHit;

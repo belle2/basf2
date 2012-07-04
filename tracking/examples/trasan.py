@@ -5,7 +5,6 @@ from basf2 import *
 
 # ...Particle Gun...
 particlegun = register_module('ParticleGun')
-particlegun.param('randomSeed', 346)
 particlegun.param('pdgCodes', [13])
 particlegun.param('nTracks', 10)
 particlegun.param('momentumGeneration', 'uniformPt')

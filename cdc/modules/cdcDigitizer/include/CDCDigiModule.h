@@ -24,8 +24,7 @@
 #include <queue>
 #include <map>
 
-//ROOT
-#include <TRandom3.h>
+
 
 
 
@@ -173,9 +172,6 @@ namespace Belle2 {
     int   m_electronicEffects;       /*!< Add noise? */
     double m_elNoise;                 /*!< Noise added to the signal */
 
-    int   m_randomSeed;   /*!< Random number seed */
-
-    TRandom3* m_random;    /*!< Random number generator - Gaussian distribution */
 
   private:
 

@@ -26,7 +26,7 @@
 
 //root
 #include <TVector3.h>
-
+#include <TRandom.h>
 //C++ STL
 #include <cstdlib>
 #include <iomanip>
@@ -60,7 +60,6 @@ CDCDigiModule::CDCDigiModule() : Module()
   //  addParam("OutputColName",               m_outColName, "Output collection name", string("HitCDCArray"));
   addParam("CDCHitOutColName",            m_cdcHitOutColName, "Output collection name", string("CDCHits"));
   //Parameters for Digitization
-  addParam("RandomSeed",                  m_randomSeed, "Random seed", 12345);
   addParam("Fraction",                    m_fraction, "The fraction of the first Gaussian used to smear drift length, set in cm", 0.571);
   addParam("Mean1",                       m_mean1, "The mean value of the first Gaussian used to smear drift length, set in cm", 0.0);
   addParam("Resolution1",                 m_resolution1, "Resolution of the first Gaussian used to smear drift length, set in cm", 0.0089);
@@ -94,9 +93,6 @@ void CDCDigiModule::initialize()
   m_mean2  *= Unit::cm;
   m_resolution1  *= Unit::cm;
   m_resolution2  *= Unit::cm;
-
-  // Initialize random generator (engine, mean, sigma)
-  m_random = new TRandom3((UInt_t)m_randomSeed);
 
   // Print set parameters
   printModuleParams();
@@ -280,7 +276,7 @@ double CDCDigiModule::smearDriftLength(double driftLength, double fraction, doub
 {
   // Smear drift length using double Gaussian function
   double mean, resolution;
-  if (m_random->Uniform() <= fraction) {
+  if (gRandom->Uniform() <= fraction) {
     mean = mean1;
     resolution = resolution1;
   } else {
@@ -289,8 +285,8 @@ double CDCDigiModule::smearDriftLength(double driftLength, double fraction, doub
   }
 
   // Smear drift length
-  double newDL = m_random->Gaus(driftLength / Unit::cm + mean / Unit::cm, resolution / Unit::cm);
-  while (newDL <= 0.) newDL = m_random->Gaus(driftLength / Unit::cm + mean / Unit::cm, resolution / Unit::cm);
+  double newDL = gRandom->Gaus(driftLength / Unit::cm + mean / Unit::cm, resolution / Unit::cm);
+  while (newDL <= 0.) newDL = gRandom->Gaus(driftLength / Unit::cm + mean / Unit::cm, resolution / Unit::cm);
   return newDL * Unit::cm;
 }
 
@@ -303,7 +299,7 @@ void CDCDigiModule::terminate()
   // CPU time end
   m_timeCPU = clock() * Unit::us - m_timeCPU;
 
-  if (m_random)  delete m_random;
+
   // Print message
   //B2INFO(   " "
   //     << "Time per event: "

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/datastore/SimpleVec.h>
+#include <framework/dataobjects/SimpleVec.h>
 
 using namespace std;
 using namespace Belle2;

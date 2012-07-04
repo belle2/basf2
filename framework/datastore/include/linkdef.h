@@ -5,12 +5,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-
-#pragma link C++ class Belle2::SimpleVec<int>;
-#pragma link C++ class Belle2::SimpleVec<double>;
-#pragma link C++ class Belle2::SimpleVec<float>;
-#pragma link C++ class Belle2::SimpleVec<char>;
-
 #pragma link C++ class Belle2::PyStoreArray;
 #pragma link C++ class Belle2::PyRelationArray;
 

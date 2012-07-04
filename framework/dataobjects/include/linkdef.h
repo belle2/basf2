@@ -12,4 +12,9 @@
 #pragma link C++ class Belle2::FileMetaData;
 #pragma link C++ class Belle2::ProfileInfo;
 
+#pragma link C++ class Belle2::SimpleVec<int>;
+#pragma link C++ class Belle2::SimpleVec<double>;
+#pragma link C++ class Belle2::SimpleVec<float>;
+#pragma link C++ class Belle2::SimpleVec<char>;
+
 #endif

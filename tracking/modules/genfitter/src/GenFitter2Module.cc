@@ -73,7 +73,7 @@ GenFitter2Module::GenFitter2Module() :
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("useDaf", m_useDaf, "use the DAF instead of the std. Kalman filter", false);
   addParam("blowUpFactor", m_blowUpFactor, "factor multiplied with the cov of the Kalman filter when backward filter starts", 500.0);
-  addParam("filter", m_filter, "throw away tracks with do not have exactly 1 hit in every Si layer", false);
+  addParam("only6", m_filter, "throw away tracks with do not have exactly 1 hit in every Si layer (so 6 hits altogether)", false);
   addParam("filterIterations", m_nGFIter, "number of Genfit iterations", 1);
   addParam("probCut", m_probCut, "Probability cut for the DAF (0.001, 0.005, 0.01)", 0.001);
   addParam("energyLossBetheBloch", m_energyLossBetheBloch, "activate the material effect: EnergyLossBetheBloch", true);
@@ -156,11 +156,12 @@ void GenFitter2Module::event()
   B2DEBUG(100, "**********   GenFitter2Module  processing event number: " << eventCounter << " ************");
   StoreArray<GFTrackCand> trackCandidates("");
   int nTrackCandidates = trackCandidates.getEntries();
-  if (nTrackCandidates not_eq 0) {  // only try to access a track candidate if there is one
+  if (nTrackCandidates == 0) {
+    B2DEBUG(100, "GenFitter2: StoreArray<GFTrackCand> is empty!");
+  }
+  for (int iTrackCand = 0; iTrackCand not_eq nTrackCandidates; ++iTrackCand) {
 
-    if (nTrackCandidates == 0) {
-      B2DEBUG(100, "GenFitter2: StoreArray<GFTrackCand> is empty!");
-    }
+
     StoreArray<SVDTrueHit> svdTrueHits("");
     int nSvdTrueHits = svdTrueHits.getEntries();
     if (nSvdTrueHits == 0) {
@@ -195,14 +196,14 @@ void GenFitter2Module::event()
     if (nSVDClusters == 0) {B2DEBUG(100, "GenFitter2: SVDClustersCollection is empty!");}
 
 
-    GFTrackCand* aTrackCandPointer = trackCandidates[0];
+    GFTrackCand* aTrackCandPointer = trackCandidates[iTrackCand];
     int nTrackCandHits = aTrackCandPointer->getNHits();
     B2DEBUG(100, "nTrackCandHits " << nTrackCandHits);
     // if option is set ignore every track that does not have exactly 1 hit in every Si layer
-    bool filterEvent = false;
+    bool filterTrack = false;
     if (m_filter == true) {
       if (nTrackCandHits not_eq 6) {
-        filterEvent = true;
+        filterTrack = true;
         B2DEBUG(100, "Not exactly one hit in very Si layer. Track "  << eventCounter << " will not be reconstructed");
         ++m_notPerfectCounter;
       } else {
@@ -231,7 +232,7 @@ void GenFitter2Module::event()
         sort(layerIds.begin(), layerIds.end());
         for (int l = 0; l not_eq nTrackCandHits; ++l) {
           if (l + 1 not_eq layerIds[l]) {
-            filterEvent = true;
+            filterTrack = true;
             B2DEBUG(100, "Not exactly one hit in very Si layer. Track "  << eventCounter << " will not be reconstructed");
             ++m_notPerfectCounter;
             break;
@@ -241,7 +242,7 @@ void GenFitter2Module::event()
       }
     }
     //find out if a track has a too large scattering angel and if yes ignore it ( only check if event was not filter out by the six hit only filter)
-    if (m_angleCut > 0.0 and filterEvent == false) {
+    if (m_angleCut > 0.0 and filterTrack == false) {
       // class to convert global and local coordinates into each other
       //VXD::GeoCache& aGeoCach = VXD::GeoCache::getInstance();
       for (int i = 0; i not_eq nTrackCandHits; ++i) {
@@ -261,7 +262,7 @@ void GenFitter2Module::event()
         //        TVector3 pTrueInGlobal = aCoordTrans.vectorToGlobal(pTrueIn);
         //        TVector3 pTrueOutGlobal = aCoordTrans.vectorToGlobal(pTrueOut);
         if (abs(pTrueIn.Angle(pTrueOut)) > m_angleCut) {
-          filterEvent = true;
+          filterTrack = true;
           ++m_largeAngleCounter;
           B2INFO("Scattering angle larger than "  << m_angleCut << ". Track " << eventCounter << " will not be reconstructed");
           break;
@@ -272,7 +273,7 @@ void GenFitter2Module::event()
     }
 
 
-    if (filterEvent == false) { // fit the track
+    if (filterTrack == false) { // fit the track
 
       StoreArray<GFTrack> fittedTracks(""); //holds the output of this module in the form of Genfit track objects
 
@@ -389,7 +390,7 @@ void GenFitter2Module::event()
       //          }
 
       if (genfitStatusFlag == 0) {
-        new(fittedTracks->AddrAt(0)) GFTrack(track);
+        new(fittedTracks->AddrAt(iTrackCand)) GFTrack(track);
         ++m_fitCounter;
       } else {
         B2WARNING("Genfit returned an error (with status flag " << genfitStatusFlag << ") during the fit of one track in event " << eventCounter);
@@ -398,6 +399,8 @@ void GenFitter2Module::event()
 
     }
   }
+
+
 }
 
 void GenFitter2Module::endRun()

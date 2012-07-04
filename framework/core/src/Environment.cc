@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2012  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Thomas Kuhr                                             *
+ * Contributors: Andreas Moll, Thomas Kuhr                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -40,7 +40,8 @@ Environment::Environment() :
   m_steering(""),
   m_numberEventsOverride(0),
   m_inputFileOverride(""),
-  m_outputFileOverride("")
+  m_outputFileOverride(""),
+  m_numberProcessesOverride(-1)
 {
 
 }

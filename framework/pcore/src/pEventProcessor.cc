@@ -9,16 +9,23 @@
 #include <signal.h>
 
 #include <framework/pcore/pEventProcessor.h>
+#include <framework/core/Environment.h>
 #include <framework/core/PathManager.h>
 #include <framework/core/ModuleManager.h>
+#include <framework/core/ModuleStatistics.h>
+#include <framework/pcore/pEventServer.h>
+#include <framework/pcore/pOutputServer.h>
+#include <framework/pcore/ProcHandler.h>
+#include <framework/pcore/RingBuffer.h>
+#include <framework/pcore/RxModule.h>
+#include <framework/pcore/TxModule.h>
 
 using namespace std;
 using namespace Belle2;
 
-pEventProcessor::pEventProcessor(PathManager& pathManager) : EventProcessor(pathManager)
-{
-  procHandler = new ProcHandler();
-}
+pEventProcessor::pEventProcessor(PathManager& pathManager) : EventProcessor(pathManager),
+  procHandler(new ProcHandler())
+{ }
 
 
 pEventProcessor::~pEventProcessor()
@@ -31,9 +38,10 @@ void pEventProcessor::process_old(PathPtr spath)
 {
   if (spath->getModules().size() == 0) return;
 
+  const int numProcesses = Environment::Instance().getNumberProcesses();
   // 0. If nprocess is 0, pass control to kbasf2::process()
 
-  if (m_nproc == 0) {   // Single process -> fall back to kbasf2
+  if (numProcesses == 0) {   // Single process -> fall back to kbasf2
     //    process ( spath, maxev );
     process(spath);
     return;
@@ -77,7 +85,7 @@ void pEventProcessor::process_old(PathPtr spath)
   }
 
   // 4. fork event processes
-  procHandler->init_EvtProc(m_nproc);
+  procHandler->init_EvtProc(numProcesses);
   if (procHandler->isEvtProc()) {
     processCore(spath, modulelist);
     //    processTerminate(modulelist);
@@ -96,9 +104,10 @@ void pEventProcessor::process(PathPtr spath)
 
   signal(SIGSEGV, SIG_DFL);
 
+  const int numProcesses = Environment::Instance().getNumberProcesses();
   // 0. If nprocess is 0, pass control to kbasf2::process()
 
-  if (m_nproc == 0) {   // Single process -> fall back to kbasf2
+  if (numProcesses == 0) {   // Single process -> fall back to kbasf2
     //    process ( spath, maxev );
     process(spath);
     return;
@@ -168,7 +177,7 @@ void pEventProcessor::process(PathPtr spath)
 
   // 5. Fork out main path
   fflush(stdout);
-  procHandler->init_EvtProc(m_nproc);
+  procHandler->init_EvtProc(numProcesses);
   if (procHandler->isEvtProc()) {
     PathPtr& mainpath = m_bodypathlist[m_bodypathlist.size() - 1];
     ModulePtrList main_modules = m_pathManager.buildModulePathList(mainpath);
@@ -188,7 +197,7 @@ void pEventProcessor::process(PathPtr spath)
     // 6.1 Wait for input path to terminate
     procHandler->wait_event_server();
     // 6.2 Send termination to event processes
-    for (int i = 0; i < m_nproc; i++) {
+    for (int i = 0; i < numProcesses; i++) {
       for (std::vector<RingBuffer*>::iterator it = m_rbinlist.begin();
            it != m_rbinlist.end(); ++it) {
         RingBuffer* rbuf = *it;
@@ -224,16 +233,6 @@ void pEventProcessor::process(PathPtr spath)
   }
 }
 
-
-void pEventProcessor::nprocess(int nproc)
-{
-  m_nproc = nproc;
-}
-
-int pEventProcessor::nprocess(void)
-{
-  return m_nproc;
-}
 
 void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
 {

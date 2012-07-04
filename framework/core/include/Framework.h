@@ -140,7 +140,7 @@ namespace Belle2 {
      *
      * @return Number of processes for parallel processing
     */
-    int getNumberProcesses();
+    int getNumberProcesses() const;
 
     /**
      * Reads the particle information from the evtgen table file specified by its filename.

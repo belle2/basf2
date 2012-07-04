@@ -142,6 +142,7 @@ int main(int argc, char* argv[])
     ("events,n", prog::value<int>(), "override number of events in run 1 for EvtMetaGen")
     ("input,i", prog::value<string>(), "override name of input file for SimpleInput")
     ("output,o", prog::value<string>(), "override name of output file for SimpleOutput")
+    ("processes,p", prog::value<int>(), "override number of parallel processes (0 to disable parallel processing)")
     ;
 
     prog::options_description cmdlineOptions;
@@ -197,6 +198,15 @@ int main(int argc, char* argv[])
     if (varMap.count("output")) {
       std::string name = varMap["output"].as<string>();
       Environment::Instance().setOutputFileOverride(name);
+    }
+
+    if (varMap.count("processes")) {
+      int nprocesses = varMap["processes"].as<int>();
+      if (nprocesses < 0) {
+        B2FATAL("Invalid number of processes!");
+        return 1;
+      }
+      Environment::Instance().setNumberProcessesOverride(nprocesses);
     }
 
 

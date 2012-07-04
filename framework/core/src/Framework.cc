@@ -94,7 +94,6 @@ void Framework::process(PathPtr startPath)
     m_eventProcessor->process(startPath);
   else
     m_peventProcessor->process(startPath);
-
 }
 
 
@@ -107,11 +106,10 @@ void Framework::process(PathPtr startPath, long maxEvent)
 void Framework::setNumberProcesses(int number)
 {
   Environment::Instance().setNumberProcesses(number);
-  m_peventProcessor->nprocess(number);
 }
 
 
-int Framework::getNumberProcesses()
+int Framework::getNumberProcesses() const
 {
   return Environment::Instance().getNumberProcesses();
 }

@@ -12,21 +12,17 @@
 #define PEVENTPROCESSOR_H_
 
 #include <framework/core/EventProcessor.h>
-#include <framework/core/ModuleStatistics.h>
 
-#include <framework/pcore/pEventServer.h>
-#include <framework/pcore/pOutputServer.h>
-#include <framework/pcore/ProcHandler.h>
-#include <framework/pcore/RingBuffer.h>
 #include <framework/core/Module.h>
-#include <framework/pcore/RxModule.h>
-#include <framework/pcore/TxModule.h>
+#include <framework/core/Path.h>
 
 #define RBUFSIZE 100000000
 
 namespace Belle2 {
 
   class PathManager;
+  class ProcHandler;
+  class RingBuffer;
 
   /*! The pEventProcessor Class */
   /*!
@@ -54,15 +50,6 @@ namespace Belle2 {
     */
     void process_old(PathPtr spath);
 
-    /*! Set number of processes for parallel processing */
-    /*!
-        Number of processes. 0 means normal single event processing
-    \param nproc Number of processes
-    */
-    void nprocess(int nproc);
-
-    /*! Get number of processes from outside */
-    int nprocess(void);
 
   private:
     /*! Analyze given path */
@@ -92,7 +79,6 @@ namespace Belle2 {
 
   private:
 
-    int m_nproc;
     ModulePtrList m_input_list;
     ModulePtrList m_output_list;
     ProcHandler* procHandler;

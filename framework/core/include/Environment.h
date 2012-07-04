@@ -89,6 +89,12 @@ namespace Belle2 {
     /** Return overriden output file name, or "" if none was set */
     const std::string& getOutputFileOverride() const { return m_outputFileOverride; }
 
+    /** Override number of processes to run in parallel.
+     *
+     * Only values >= 0 will change the result of getNumberProcesses().
+     */
+    void setNumberProcessesOverride(int nproc) { m_numberProcessesOverride = nproc; }
+
     /**
      * Sets the number of processes which should be used for the parallel processing.
      * If the value is set to 0, no parallel processing will be used in the event loop.
@@ -102,7 +108,12 @@ namespace Belle2 {
      *
      * @return  The number of processors used for the parallel processing.
      */
-    int getNumberProcesses() const { return m_numberProcesses; }
+    int getNumberProcesses() const {
+      if (m_numberProcessesOverride >= 0)
+        return m_numberProcessesOverride;
+      else
+        return m_numberProcesses;
+    }
 
     /**
      * Sets the steering file content.
@@ -116,7 +127,7 @@ namespace Belle2 {
      *
      * @return The steering file content.
      */
-    const std::string& getSteering() { return m_steering; };
+    const std::string& getSteering() const { return m_steering; };
 
   private:
 
@@ -124,9 +135,10 @@ namespace Belle2 {
     std::string m_externalsPath;  /**< The path in which the externals are located. */
     int m_numberProcesses;        /**< The number of processes that should be used for the parallel processing. */
     std::string m_steering;       /**< The content of the steering file. */
-    int m_numberEventsOverride; /**< Override number of events in the first run. */
+    int m_numberEventsOverride;   /**< Override number of events in the first run. */
     std::string m_inputFileOverride; /** Override name of input file for input module */
     std::string m_outputFileOverride; /** Override name of output file for output module */
+    int m_numberProcessesOverride; /**< Override m_numberProcesses if >= 0 */
 
     /**
      * The constructor is hidden to avoid that someone creates an instance of this class.
@@ -145,7 +157,6 @@ namespace Belle2 {
 
     /**
      * The Environment destructor.
-     * Deletes the Environment.
      */
     ~Environment();
 

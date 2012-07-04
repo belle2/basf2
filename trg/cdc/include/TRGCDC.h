@@ -48,6 +48,7 @@ class TRGCDCMerger;
 class TRGCDCHoughFinder;
 class TRGCDCFitter3D;
 class TRGCDCLUT;
+class TRGCDCTrack;
 
 ///  The instance of TRGCDC is a singleton. 'TRGCDC::getTRGCDC()'
 ///  gives you a pointer to access the TRGCDC. Geometrical information
@@ -290,6 +291,9 @@ class TRGCDC {
 
     /// returns true if w0 and w1 are neighbor.
     bool neighbor(const TRGCDCWire & w0, const TRGCDCWire & w1) const;
+
+    /// fills stereo TSs to tracks using MC info.
+    void perfect3DFinder(std::vector<TRGCDCTrack *> trackList) const;
 
     /// calculates corrected drift time. correctionFlag(bit 0:tof,
     /// 1:T0 offset, 2:propagation delay, 3:tan(lambda) correction)

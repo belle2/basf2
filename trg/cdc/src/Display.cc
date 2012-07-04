@@ -13,6 +13,7 @@
 
 #ifdef TRGCDC_DISPLAY
 
+#include <unistd.h>
 #include <iostream>
 #include "trg/cdc/Display.h"
 #include "trg/cdc/DisplayDrawingArea.h"
@@ -25,6 +26,7 @@ Gtk::Main * GtkMain = 0;
 bool TRGCDCDisplay::_skipEvent = false;
 bool TRGCDCDisplay::_endOfEvent = false;
 bool TRGCDCDisplay::_endOfEventFlag = false;
+bool TRGCDCDisplay::_nonStop = false;
 
 TRGCDCDisplay::TRGCDCDisplay(const string & name,
                              int ,
@@ -37,6 +39,7 @@ TRGCDCDisplay::TRGCDCDisplay(const string & name,
       _buttonNext("Next Step"),
       _buttonEndOfEvent("End of Event"),
       _buttonNextEvent("Next Event"),
+      _buttonNonStop("Non Stop"),
       _label("Stage : TRGing not started\nInformation :",
              Gtk::ALIGN_LEFT,
              Gtk::ALIGN_TOP),
@@ -61,6 +64,11 @@ TRGCDCDisplay::TRGCDCDisplay(const string & name,
         .signal_clicked()
         .connect(sigc::mem_fun(* this, & TRGCDCDisplay::on_nextEvent));
     _menuButtons.pack_start(_buttonNextEvent, Gtk::PACK_EXPAND_WIDGET, 2);
+
+    _buttonNonStop
+        .signal_clicked()
+        .connect(sigc::mem_fun(* this, & TRGCDCDisplay::on_nonStop));
+    _menuButtons.pack_start(_buttonNonStop, Gtk::PACK_EXPAND_WIDGET, 2);
 
     _buttonPositionReset
         .signal_clicked()
@@ -98,6 +106,12 @@ TRGCDCDisplay::on_nextEvent(void) {
 }
 
 void
+TRGCDCDisplay::on_nonStop(void) {
+    _nonStop = true;
+    Gtk::Main::quit();
+}
+
+void
 TRGCDCDisplay::on_wireName(void) {
     _wireName = _buttonWireName.get_active();
     area().wireName(_wireName);
@@ -110,8 +124,9 @@ TRGCDCDisplay::run(void) {
     char ** argv = 0;
     Gtk::Main main_instance(argc, argv);
     show();
-    if (((! _skip) && (! _skipEvent)) ||
-        (_endOfEventFlag && _endOfEvent))
+    if (_nonStop)
+	sleep(1);
+    else if (((! _skip) && (! _skipEvent)) || (_endOfEventFlag && _endOfEvent))
         Gtk::Main::run();
 }
 

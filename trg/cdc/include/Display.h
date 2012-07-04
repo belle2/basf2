@@ -34,6 +34,7 @@ namespace Belle2 {
 class TRGCDCDisplay : public Gtk::Window {
     
   public:
+
     /// Default constructor
     TRGCDCDisplay(const std::string & name,
                   int sizeWindow = 600,
@@ -85,34 +86,90 @@ class TRGCDCDisplay : public Gtk::Window {
     TRGCDCDisplayRphi * rphi(void);
 
   private: // Actions
+
+    /// For next button
     virtual void on_next(void);
+
+    /// For End of Event button
     virtual void on_endOfEvent(void);
+
+    /// For Next Event button
     virtual void on_nextEvent(void);
+
+    /// For Non Stop button
+    virtual void on_nonStop(void);
+
+    /// For Position Reset button
     virtual void on_positionReset(void);
+
+    /// For Wire Name button
     virtual void on_wireName(void);
 
   private: // Objects to display and control
+
+    /// Stage
     std::string _stage;
+
+    /// Information
     std::string _info;
+
+    /// Skip
     bool _skip;
+
+    /// End of event
     static bool _endOfEvent;
+
+    /// End of event flag
     static bool _endOfEventFlag;
+
+    /// Skip event
     static bool _skipEvent;
 
+    /// Non stop mode
+    static bool _nonStop;
+
   private: // GTK stuff
+
+    /// Wire name
     bool _wireName;
+
+    /// Old CDC display
     bool _oldCDC;
+
+    /// Box 0
     Gtk::VBox _box0;
+
+    /// Menu buttons
     Gtk::HBox _menuButtons;
+
+    /// Button
     Gtk::Button _buttonNext;
+
+    /// Button
     Gtk::Button _buttonEndOfEvent;
+
+    /// Button
     Gtk::Button _buttonNextEvent;
+
+    /// Button
+    Gtk::Button _buttonNonStop;
+
+    /// Label
     Gtk::Label _label;
+
+    /// Bottom box
     Gtk::HBox _bottom;
+
+    /// Button
     Gtk::Button _buttonPositionReset;
+
+    /// Button
     Gtk::CheckButton _buttonWireName;
 
+    /// Friends
     friend class TRGCDCDisplayRphi;
+
+    /// Friends
     friend class TRGCDCDisplayHough;
 
     /// Rphi display.

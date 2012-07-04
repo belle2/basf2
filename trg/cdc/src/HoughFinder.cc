@@ -374,6 +374,7 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
     for (unsigned i = 0; i < hits.size(); i++) {
 	const TCSHit & ts = * hits[i];
 	if (! ts.timing().active()) continue;
+	if (ts.segment().stereo()) continue;
 	const TCWHit * wh = ts.segment().center().hit();
 	if (! wh) continue;
 	const CDCSimHit & sh = * wh->simHit();

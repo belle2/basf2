@@ -272,7 +272,8 @@ TRGCDC::initialize(bool houghFinderPerfect,
     }
 
     //...LUT for LR decision : common to all TS...
-    _luts.push_back(new TCLUT("LR LUT", * this));
+    _luts.push_back(new TCLUT("LR LUT inner", * this));
+    _luts.back()->initialize(_innerTSLUTDataFilename);
     _luts.back()->initialize(_outerTSLUTDataFilename);
     
 //  for (unsigned i = 0; _luts.size(); i++)
@@ -1267,6 +1268,8 @@ TRGCDC::simulate(void) {
 	}
     }
 
+    //...Stereo finder...
+    perfect3DFinder(trackList);
 
     //...Check relations...
     if (TRGDebug::level()) {
@@ -1274,8 +1277,6 @@ TRGCDC::simulate(void) {
 	    trackList[i]->relation().dump();
 	}
     }
-
-    //...Stereo finder...
 
     //...3D tracker...
     vector<TCTrack *> trackList3D;
@@ -1483,6 +1484,61 @@ TRGCDC::configure(void) {
 const TRGCDCSegment &
 TRGCDC::segment(unsigned lid, unsigned id) const {
     return * (const TRGCDCSegment *) (* _tsLayers[lid])[id];
+}
+
+void
+TRGCDC::perfect3DFinder(vector<TCTrack *> trackList) const {
+
+    //...Track loop....
+    for (unsigned j = 0; j < trackList.size(); j++) {
+
+	//...G4 trackID...
+	TCTrack * trk = trackList[j];
+	unsigned id = trackList[j]->relation().contributor(0);
+	vector<const TCSHit *> tsList[9];
+
+	//...Segment loop...
+	const vector<const TCSHit *> hits = segmentHits();
+	for (unsigned i = 0; i < hits.size(); i++) {
+	    const TCSHit & ts = * hits[i];
+	    if (ts.segment().axial()) continue;
+	    if (! ts.timing().active()) continue;
+	    const TCWHit * wh = ts.segment().center().hit();
+	    if (! wh) continue;
+	    const CDCSimHit & sh = * wh->simHit();
+	    const unsigned trackId = sh.m_trackId;
+
+	    if (id == trackId)
+		tsList[wh->wire().superLayerId()].push_back(& ts);
+	}
+
+	//...Select best one in each super layer...
+	for (unsigned i = 0; i < 9; i++) {
+	    if (tsList[i].size() == 0) {
+		continue;
+	    }
+	    else if (tsList[i].size() == 1) {
+		trk->append(new TCLink(0,
+				       tsList[i][0],
+				       tsList[i][0]->cell().xyPosition()));
+	    }
+	    else {
+		int timeMin = 99999;
+		const TCSHit * best = 0;
+		for (unsigned k = 0; k < tsList[i].size(); k++) {
+		    const TRGSignal & timing = tsList[i][k]->timing();
+		    const TRGTime & t = * timing[0];
+		    if (t.time() < timeMin) {
+			timeMin = t.time();
+			best = tsList[i][k];
+		    }
+		}
+		trk->append(new TCLink(0,
+				       best,
+				       best->cell().xyPosition()));
+	    }
+	}
+    }
 }
 
 } // namespace Belle2

@@ -41,20 +41,21 @@ for (name, value) in LogLevel.names.items():
     if name != 'default':
         print 'LogInfo for level %8s: %3d' % (name, logging.get_info(value))
 
-# reset logging connections (-> the default log connection to the console is deleted)
+# reset logging connections (default log connection to the console is deleted)
 logging.reset()
 # add logfile for output
 logging.add_file('test.log')
 # add colored console output
 logging.add_console(True)
 
-# It is now possible to send log messages from python to have consistend messages
+# It is possible to send log messages from python to have consistent messages
 # print some log messages
 B2DEBUG(100, 'Debug Message')
 B2INFO('Info Message')
 B2WARNING('Warning Message')
 B2ERROR('Error Message')
-# next line will bail since the default abort-level is FATAL, so leaving it commented
+# next line will bail since the default abort-level is FATAL,
+# so leaving it commented.
 # B2FATAL('Fatal Message')
 
 # show number of log_messages per level

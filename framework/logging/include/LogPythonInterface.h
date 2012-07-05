@@ -36,7 +36,7 @@ namespace Belle2 {
    *
    * >>> B2WARNING("This is a warning message")
    *
-   * For all features, see the logging.py in the framework/examples folder
+   * For all features, see b2logging.py in the framework/examples folder
    */
   class LogPythonInterface {
   public:

@@ -66,7 +66,7 @@ namespace Belle2 {
     /** maps from-index to to-indices */
     std::map<unsigned int, std::vector<unsigned int> > m_toindicesMap;
 
-    ClassDef(PyRelationArray, 0);
+    ClassDef(PyRelationArray, 0); /**< Build ROOT dictionary */
   };
 }
 #endif

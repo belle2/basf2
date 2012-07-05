@@ -4,8 +4,18 @@
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 
+from basf2 import *
+from ROOT import Belle2
+
+import os
+
 
 def plot(x, y, show=0):
+    """
+    Plot a list of x/y values, plus CDC superlayer boundaries.
+
+    Returns a pyplot.figure that can be saved.
+    """
     fig = plt.figure(figsize=(8, 8))
     fig.subplots_adjust(bottom=0.1, left=0.1, right=0.95, top=0.95)
     ax = fig.add_subplot(111)
@@ -51,24 +61,31 @@ def plot(x, y, show=0):
     return fig
 
 
-from basf2 import *
-
-from ROOT import Belle2
-
-import os
-
-
 class CDCPlotModule(Module):
+    """An example python module.
+
+    It gathers the x/y position off all CDCSimHits and draws them using
+    matplotlib. The result is saved as a PNG.
+
+    CDCPlotModule.num_events: event counter
+    CDCPlotModule.trackhits_x: list of x positions
+    CDCPlotModule.trackhits_y: corresponding list of y positions
+    """
 
     num_events = 0
     trackhits_x = []
     trackhits_y = []
 
     def __init__(self):
+        """constructor."""
         super(CDCPlotModule, self).__init__()
         self.setName('CDCPlotModule')
 
     def event(self):
+        """reimplementation of Module::event().
+
+        loops over the CDCSimHits in the current event.
+        """
         store = Belle2.PyStoreArray('CDCSimHits')
         entries = store.getEntries()
         for i in range(entries):
@@ -78,6 +95,7 @@ class CDCPlotModule(Module):
         self.num_events += 1
 
     def terminate(self):
+        """reimplementation of Module::terminate()."""
         B2INFO('terminating CDCPlotModule')
         # plot the (x,y) list on a matplotlib figure
         fig = plot(self.trackhits_x, self.trackhits_y)
@@ -89,8 +107,6 @@ class CDCPlotModule(Module):
 
 
 # Normal steering file part begins here
-
-import random
 
 # Create main path
 main = create_path()

@@ -14,11 +14,13 @@
 #include <framework/logging/Logger.h>
 
 #include <vector>
-#include <string>
 
 namespace Belle2 {
 
-  /** Class to store a single Element of a Relation. */
+  /** Class to store a single element of a Relation.
+   *
+   *  Supports 1:n relations with individual weights.
+   */
   class RelationElement: public TObject {
   public:
 
@@ -47,7 +49,7 @@ namespace Belle2 {
      *  @param to      indices to point to
      *  @param weights weights of the relation
      */
-    RelationElement(index_type from, std::vector<index_type> to, std::vector<weight_type> weights):
+    RelationElement(index_type from, const std::vector<index_type>& to, const std::vector<weight_type>& weights):
       TObject(), m_from(from), m_to(to.begin(), to.end()), m_weights(weights.begin(), weights.end()) {
       if (to.size() != weights.size()) {
         B2FATAL("Size of weights is different to size of indices");
@@ -122,10 +124,9 @@ namespace Belle2 {
     /** weights for to indices. */
     std::vector<weight_type> m_weights;
 
-    ClassDef(RelationElement, 1);
+    ClassDef(RelationElement, 1); /**< Build ROOT dictionary */
   };
 
 }
 
 #endif
-

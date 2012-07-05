@@ -13,10 +13,7 @@
 
 #include <string>
 #include <boost/python.hpp>
-#include <framework/logging/Logger.h>
-#include <framework/logging/LogConnectionFilter.h>
-#include <framework/logging/LogConnectionTxtFile.h>
-#include <framework/logging/LogConnectionIOStream.h>
+#include <framework/logging/LogConfig.h>
 
 namespace Belle2 {
 

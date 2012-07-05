@@ -68,7 +68,7 @@ namespace Belle2 {
      *
      * @return Returns the configured log level.
      */
-    ELogLevel getLogLevel() {return m_logLevel; };
+    ELogLevel getLogLevel() const {return m_logLevel; };
 
     /**
      * Configure the debug messaging level.
@@ -82,7 +82,7 @@ namespace Belle2 {
      *
      * @return Returns the configured debug messaging level.
      */
-    int getDebugLevel() {return m_debugLevel; };
+    int getDebugLevel() const {return m_debugLevel; };
 
     /**
      * Configure the abort level.
@@ -96,7 +96,7 @@ namespace Belle2 {
      *
      * @return Returns the configured abort level.
      */
-    ELogLevel getAbortLevel() {return m_abortLevel; };
+    ELogLevel getAbortLevel() const {return m_abortLevel; };
 
     /**
      * Configure the printed log information for the given level.
@@ -111,7 +111,7 @@ namespace Belle2 {
      *
      * @return Returns the configured log information.
      */
-    unsigned int getLogInfo(ELogLevel logLevel) {return m_logInfo[logLevel]; };
+    unsigned int getLogInfo(ELogLevel logLevel) const {return m_logInfo[logLevel]; };
 
 
   private:

@@ -67,7 +67,7 @@ void EvtMetaGenModule::initialize()
     B2ERROR("Parameters are inconsistent. The lists must have the same number of entries.")
   } else {
 
-    if (m_expList.size() == 0) B2ERROR("There are no events to be processed !")
+    if (m_expList.size() == 0) B2ERROR("There are no events to be processed!")
     }
 
   m_evtNumber = 0;

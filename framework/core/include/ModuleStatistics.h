@@ -153,7 +153,6 @@ namespace Belle2 {
 
     /**
      * Start to measure global time
-     * @param mode    Which counter to increase
      */
     void startGlobal() {
       m_globalStart = Utils::getClock();
@@ -170,9 +169,9 @@ namespace Belle2 {
     }
 
     /**
-     * Start to measure time
-     * @param module Module the time will be attributed to
-     * @param mode   Which counter to increase
+     * Start to measure time.
+     *
+     * Which module is being timed is determined by stopModule()
      */
     void startModule() {
       m_moduleStart = Utils::getClock();
@@ -247,7 +246,9 @@ namespace Belle2 {
     /** Singleton, hide assignment operator*/
     ModuleStatistics& operator=(ModuleStatistics& b);
 
+    /** Start time of the current module */
     double m_moduleStart;
+    /** Global start time */
     double m_globalStart;
     /** Statistics for whole framework */
     Statistics m_global;

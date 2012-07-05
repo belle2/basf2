@@ -22,6 +22,10 @@ namespace Belle2 {
     void* openXmlUri(const char*);
   }
 
+  /** Singleton class responsible for loading detector parameters from an XML file.
+   *
+   * \sa GearboxModule
+   */
   class Gearbox: public gearbox::Interface {
   public:
     /** Default cache size for the Gearbox */

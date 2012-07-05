@@ -27,6 +27,7 @@ namespace Belle2 {
         return m_stream.gcount();
       }
     protected:
+      /** Assigned data string */
       std::istringstream m_stream;
     };
 

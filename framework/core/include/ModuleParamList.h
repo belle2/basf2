@@ -75,9 +75,9 @@ namespace Belle2 {
 
     //Define exceptions
     /** Exception is thrown if the requested parameter could not be found. */
-    BELLE2_DEFINE_EXCEPTION(ModuleParameterNotFoundError, "Could not find the parameter with the name '%1%' ! The value of the parameter could NOT be set.");
+    BELLE2_DEFINE_EXCEPTION(ModuleParameterNotFoundError, "Could not find the parameter with the name '%1%'! The value of the parameter could NOT be set.");
     /** Exception is thrown if the type of the requested parameter is different from the expected type. */
-    BELLE2_DEFINE_EXCEPTION(ModuleParameterTypeError, "The type of the module parameter '%1%' (%2%) is different from the type of the value it should be set to (%3%) !");
+    BELLE2_DEFINE_EXCEPTION(ModuleParameterTypeError, "The type of the module parameter '%1%' (%2%) is different from the type of the value it should be set to (%3%)!");
 
     /**
      * Constructor.
@@ -301,7 +301,7 @@ namespace Belle2 {
       ModuleParam<T>* explModParam = static_cast< ModuleParam<T>* >(newParam.get());
       explModParam->setDefaultValue(defaultValue);
     } else {
-      B2ERROR("A parameter with the name '" + name + "' already exists ! The name of a module parameter must be unique within a module.")
+      B2ERROR("A parameter with the name '" + name + "' already exists! The name of a module parameter must be unique within a module.")
     }
   }
 
@@ -318,7 +318,7 @@ namespace Belle2 {
     if (mapIter == m_paramMap.end()) {
       m_paramMap.insert(std::make_pair(name, newParam));
     } else {
-      B2ERROR("A parameter with the name '" + name + "' already exists ! The name of a module parameter must be unique within a module.")
+      B2ERROR("A parameter with the name '" + name + "' already exists! The name of a module parameter must be unique within a module.")
     }
   }
 
@@ -364,7 +364,7 @@ namespace Belle2 {
       T tmpValue = static_cast<T>(valueProxy);
       setParameter(name, tmpValue);
     } else {
-      B2ERROR("Could not set a module parameter: The python object defined by '" + name + "' could not be converted !")
+      B2ERROR("Could not set a module parameter: The python object defined by '" + name + "' could not be converted!")
     }
   }
 
@@ -380,7 +380,7 @@ namespace Belle2 {
       if (checkValue.check()) {
         tmpList.push_back(checkValue);
       } else {
-        B2ERROR("Could not set a module parameter: A python object defined in the list '" + name + "' could not be converted !")
+        B2ERROR("Could not set a module parameter: A python object defined in the list '" + name + "' could not be converted!")
       }
     }
     setParameter(name, tmpList);
@@ -395,7 +395,7 @@ namespace Belle2 {
       ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
       if (paramInfo.m_paramBasicType != ParamTypeInfo::c_SingleParam) {
-        B2ERROR("The parameter type of parameter '" + name + "' is not a single parameter value !")
+        B2ERROR("The parameter type of parameter '" + name + "' is not a single parameter value!")
         return;
       }
 
@@ -420,7 +420,7 @@ namespace Belle2 {
       ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
       if (paramInfo.m_paramBasicType != ParamTypeInfo::c_ListParam) {
-        B2ERROR("The parameter type of parameter '" + name + "' is not a list parameter value !")
+        B2ERROR("The parameter type of parameter '" + name + "' is not a list parameter value!")
         return;
       }
 

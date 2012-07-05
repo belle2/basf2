@@ -9,6 +9,10 @@
  **************************************************************************/
 
 #include <framework/logging/LogPythonInterface.h>
+#include <framework/logging/Logger.h>
+#include <framework/logging/LogConnectionFilter.h>
+#include <framework/logging/LogConnectionTxtFile.h>
+#include <framework/logging/LogConnectionIOStream.h>
 
 using namespace std;
 using namespace Belle2;

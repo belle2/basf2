@@ -48,9 +48,8 @@ void LogSystem::resetLogConnections()
 }
 
 
-bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, std::string package)
+bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, const std::string& package)
 {
-
   LogConfig::ELogLevel logLevelLimit = LogConfig::c_Default;
   int debugLevelLimit = 0;
 

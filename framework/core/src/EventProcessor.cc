@@ -57,7 +57,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
     processCore(startPath, moduleList, maxEvent); //Do the event processing
 
   } else {
-    B2ERROR(numLogError << " ERROR(S) occurred ! The processing of events will not be started.");
+    B2ERROR(numLogError << " ERROR(S) occurred! The processing of events will not be started.");
   }
 
   //Terminate modules
@@ -88,11 +88,11 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
   stats.startGlobal();
   DataStore::Instance().setInitializeActive(true);
 
-  for (listIter = modulePathList.begin(); listIter != modulePathList.end(); listIter++) {
+  for (listIter = modulePathList.begin(); listIter != modulePathList.end(); ++listIter) {
     Module* module = listIter->get();
 
     if (module->hasUnsetForcedParams()) {
-      B2ERROR("The module " << module->getName() << " has unset parameters which have to be set by the user !")
+      B2ERROR("The module " << module->getName() << " has unset parameters which have to be set by the user!")
       continue;
     }
 
@@ -224,7 +224,9 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
         if (module->evalCondition()) {
           currPath = module->getConditionPath();
           moduleIter = currPath->getModules().begin();
-        } else moduleIter++;
+        } else {
+          ++moduleIter;
+        }
       }
     }
 
@@ -265,7 +267,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
   ModuleStatistics& stats = ModuleStatistics::getInstance();
   stats.startGlobal();
 
-  for (listIter = modulePathList.rbegin(); listIter != modulePathList.rend(); listIter++) {
+  for (listIter = modulePathList.rbegin(); listIter != modulePathList.rend(); ++listIter) {
     Module* module = listIter->get();
 
     //Set the module dependent log level
@@ -299,7 +301,7 @@ void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
   ModuleStatistics& stats = ModuleStatistics::getInstance();
   stats.startGlobal();
 
-  for (listIter = modulePathList.begin(); listIter != modulePathList.end(); listIter++) {
+  for (listIter = modulePathList.begin(); listIter != modulePathList.end(); ++listIter) {
     Module* module = listIter->get();
 
     //Set the module dependent log level
@@ -331,7 +333,7 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
   ModuleStatistics& stats = ModuleStatistics::getInstance();
   stats.startGlobal();
 
-  for (listIter = modulePathList.begin(); listIter != modulePathList.end(); listIter++) {
+  for (listIter = modulePathList.begin(); listIter != modulePathList.end(); ++listIter) {
     Module* module = listIter->get();
 
     //Set the module dependent log level

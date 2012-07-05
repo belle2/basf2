@@ -17,9 +17,11 @@ namespace Belle2 {
 
   /** Class to ease use of relations.
    *
-   *  This class provides a bidirectional access to a given Relation to ease use
+   *  This class provides bidirectional access to a given Relation to ease use
    *  of Relations for the normal user. There is no support for changing or adding
-   *  Elements of the relation, this should be done directly using RelationArray
+   *  Elements of the relation, this should be done directly using RelationArray.
+   *
+   *  \sa RelationArray
    */
   template<class FROM, class TO> class RelationIndex {
   public:
@@ -98,7 +100,7 @@ namespace Belle2 {
 
     /** Return a range of all elements pointing to the given object
      *
-     *  @param from Pointer for which to get the relation
+     *  @param to Pointer for which to get the relation
      *  @returns Pair of iterators specifing the range [first,second) of
      *           elements which point to this object
      */
@@ -106,7 +108,7 @@ namespace Belle2 {
 
     /** Return a range of all elements pointing to the given object
      *
-     *  @param from Reference for which to get the relation
+     *  @param to Reference for which to get the relation
      *  @returns Pair of iterators specifing the range [first,second) of
      *           elements which point to this object
      */
@@ -137,7 +139,7 @@ namespace Belle2 {
     /** Return a pointer to the first Relation Element of the given object.
      *
      *  Useful if there is at most one relation
-     *  @param from Reference for which to get the Relation
+     *  @param to Reference for which to get the Relation
      *  @returns Pointer to the RelationIndex<FROM,TO>::Element, can be
      *           NULL if no relation exists
      */
@@ -146,7 +148,7 @@ namespace Belle2 {
     /** Return a pointer to the first Relation Element of the given object.
      *
      *  Useful if there is at most one relation
-     *  @param from Pointer for which to get the Relation
+     *  @param to Pointer for which to get the Relation
      *  @returns Pointer to the RelationIndex<FROM,TO>::Element, can be
      *           NULL if no relation exists
      */

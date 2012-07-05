@@ -99,7 +99,7 @@ namespace Belle2 {
      * @param package The name of the package whose log configuration should be returned
      * @return The log configuration of the given package
      */
-    LogConfig& getPackageLogConfig(std::string package) {return m_packageLogConfigs[package]; };
+    LogConfig& getPackageLogConfig(const std::string& package) {return m_packageLogConfigs[package]; };
 
     /**
      * Returns true if the log level of the log system is greater or equal the given level.
@@ -108,7 +108,7 @@ namespace Belle2 {
      * @param debugLevel The level for debug messages. Only used for the debug level.
      * @return True if the log level of the log system is greater or equal the given level.
      */
-    bool isLevelEnabled(LogConfig::ELogLevel level, int debugLevel = 0, std::string package = "");
+    bool isLevelEnabled(LogConfig::ELogLevel level, int debugLevel = 0, const std::string& package = "");
 
     /**
      * Sends a log message using the log connection object.

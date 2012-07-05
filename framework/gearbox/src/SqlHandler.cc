@@ -20,11 +20,12 @@
 #endif
 
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <framework/gearbox/SqlHandler.h>
 #include <framework/gearbox/Gearbox.h>
+
+#include <TObjString.h>
+#include <TObjArray.h>
 
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -65,7 +66,7 @@ namespace Belle2 {
 
       TString urloptions = url->GetOptions();
       TObjArray* objOptions = urloptions.Tokenize("&");
-      for (Int_t n = 0; n < objOptions->GetEntries(); n++) {
+      for (Int_t n = 0; n < objOptions->GetEntriesFast(); n++) {
         TString loption = ((TObjString*) objOptions->At(n))->GetName();
 
 
@@ -74,7 +75,7 @@ namespace Belle2 {
         for (int i = 0; i < 6; i++) if (loption.Contains(optoperator[i])) Operator = optoperator[i];
 
         TObjArray* objTags = loption.Tokenize(Operator);
-        if (objTags->GetEntries() == 2) {
+        if (objTags->GetEntriesFast() == 2) {
           TString key = ((TObjString*) objTags->At(0))->GetName();
           TString value = ((TObjString*) objTags->At(1))->GetName();
 

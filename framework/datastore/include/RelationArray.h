@@ -19,7 +19,14 @@
 
 namespace Belle2 {
 
-  /** Class to access Relation from Datastore. */
+  /** Class to create/modify relations between StoreArrays.
+   *
+   *  RelationArray is suitable for adding and modifying relations, see the
+   *  documentation of RelationIndex for a more convenient way of finding and
+   *  accessing relations.
+   *
+   *  \sa RelationIndex
+   */
   class RelationArray: public StoreObjPtr<RelationContainer> {
   public:
 
@@ -107,7 +114,7 @@ namespace Belle2 {
       const AccessorParams accessorTo   = to.getAccessorParams();
       if (accessorFrom.second > durability || accessorTo.second > durability) {
         B2FATAL("Tried to create Relation '" << name
-                << "' with a durability larger than the Arrays it relates");
+                << "' with a durability larger than the StoreArrays it relates");
       }
 
       if (name == "") name = DataStore::defaultRelationName<FROM, TO>();
@@ -239,7 +246,7 @@ namespace Belle2 {
      */
     void consolidate() { consolidate<Identity, Identity>(); }
 
-    /** Consolidate Relation Elements
+    /** Consolidate RelationElements
      *
      *  This function will loop over the relation and "compress" it by
      *  merging all elements with the same fromIndex.
@@ -291,7 +298,7 @@ namespace Belle2 {
   void RelationArray::consolidate(const FunctionFrom& replaceFrom, const FunctionTo& replaceTo)
   {
     if (!m_storeObjPtr) {
-      B2ERROR("Cannot consilidate relation if pointer to container is NULL");
+      B2ERROR("Cannot consolidate relation if pointer to container is NULL");
       return;
     }
     typedef std::map<index_type, weight_type> element_t;

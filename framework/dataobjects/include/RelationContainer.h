@@ -19,7 +19,12 @@
 
 namespace Belle2 {
 
-  /** Class to store Relations between StoreArrays in the DataStore. */
+  /** Class to store relations between StoreArrays in the DataStore.
+   *
+   *  This class is only used internally, users should use RelationIndex/RelationArray to access/modify relations.
+   *
+   *  \sa RelationElement
+   */
   class RelationContainer: public TObject {
   public:
 
@@ -91,7 +96,7 @@ namespace Belle2 {
     int m_fromDurability;
 
     /** name of the StoreArray we relate to. */
-    std::string  m_toName;
+    std::string m_toName;
 
     /** durability of the StoreArray we relate to. */
     int m_toDurability;
@@ -101,7 +106,7 @@ namespace Belle2 {
 
     friend class RelationArray;
 
-    ClassDef(RelationContainer, 1);
+    ClassDef(RelationContainer, 1); /**< Build ROOT dictionary */
   };
 }
 

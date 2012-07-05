@@ -136,8 +136,8 @@ namespace Belle2 {
     int m_numberProcesses;        /**< The number of processes that should be used for the parallel processing. */
     std::string m_steering;       /**< The content of the steering file. */
     int m_numberEventsOverride;   /**< Override number of events in the first run. */
-    std::string m_inputFileOverride; /** Override name of input file for input module */
-    std::string m_outputFileOverride; /** Override name of output file for output module */
+    std::string m_inputFileOverride; /**< Override name of input file for input module */
+    std::string m_outputFileOverride; /**< Override name of output file for output module */
     int m_numberProcessesOverride; /**< Override m_numberProcesses if >= 0 */
 
     /**

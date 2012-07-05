@@ -13,9 +13,9 @@ def printAllModules(moduleList):
     register them and print their information
     """
 
-    #how many characters of description to print per line?
+    # how many characters of description to print per line?
     try:
-        #get terminal width
+        # get terminal width
         columns = int(os.popen('stty size', 'r').read().split()[1])
         if columns < 50:
             columns = 50
@@ -29,21 +29,22 @@ def printAllModules(moduleList):
             B2ERROR('The module could not be loaded. This is most likely '
                     + 'caused by a library with missing links.')
 
-        #use automatic word wrapping on module description
+        # use automatic word wrapping on module description
         description = textwrap.wrap(current_module.description(), columns - 22)
         first = True
         for text in description:
             if not first:
-                moduleName = ""
+                moduleName = ''
             first = False
-            print "%-20s  %-s" % (moduleName, text)
+            print '%-20s  %-s' % (moduleName, text)
 
     print ''
-    print ('------------------------------------------------------'
-          + '-----------------------')
+    print '------------------------------------------------------' \
+        + '-----------------------'
     print ''
     print 'To show detailed information on a module, including its parameters,'
     print 'type \'basf2 -m ModuleName\'.'
+
 
 # Get the list of available modules
 avModList = fw.list_available_modules()

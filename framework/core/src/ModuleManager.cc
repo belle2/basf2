@@ -65,7 +65,7 @@ void ModuleManager::addModuleSearchPath(const string& path)
     }
 
   } else {
-    B2WARNING("Could not add module search filepath ! Directory does not exist: " + path);
+    B2WARNING("Could not add module search filepath! Directory does not exist: " + path);
   }
 }
 
@@ -94,11 +94,11 @@ ModulePtr ModuleManager::registerModule(const string& moduleName, const std::str
       if (FileSystem::isFile(sharedLibPath)) {
         FileSystem::loadLibrary(sharedLibPath);
         moduleIter =  m_registeredProxyMap.find(moduleName);
-      } else B2WARNING("Could not load shared library " + sharedLibPath + ". File does not exist !");
+      } else B2WARNING("Could not load shared library " + sharedLibPath + ". File does not exist!");
 
       //Check if the loaded shared library file contained the module
       if (moduleIter == m_registeredProxyMap.end()) {
-        B2ERROR("The shared library " + sharedLibPath + " does not contain the module " + moduleName + " !");
+        B2ERROR("The shared library " + sharedLibPath + " does not contain the module " + moduleName + "!");
       }
     } else {
       //If no library path is given, check if the module name is known to the manager and load
@@ -111,10 +111,10 @@ ModulePtr ModuleManager::registerModule(const string& moduleName, const std::str
 
         //Check if the loaded shared library file contained the module
         if (moduleIter == m_registeredProxyMap.end()) {
-          B2ERROR("The shared library " + libIter->second + " does not contain the module " + moduleName + " !");
+          B2ERROR("The shared library " + libIter->second + " does not contain the module " + moduleName + "!");
         }
       } else {
-        B2ERROR("The module " + moduleName + " is not known to the framework !")
+        B2ERROR("The module " + moduleName + " is not known to the framework!")
       }
     }
   }
@@ -140,7 +140,7 @@ ModulePtrList ModuleManager::getModulesByProperties(const ModulePtrList& moduleP
   ModulePtrList tmpModuleList;
   ModulePtrList::const_iterator listIter;
 
-  for (listIter = modulePathList.begin(); listIter != modulePathList.end(); listIter++) {
+  for (listIter = modulePathList.begin(); listIter != modulePathList.end(); ++listIter) {
     Module* module = listIter->get();
     if (module->hasProperties(propertyFlags)) tmpModuleList.push_back(*listIter);
   }

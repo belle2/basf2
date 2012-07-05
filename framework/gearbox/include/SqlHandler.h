@@ -65,7 +65,6 @@ namespace Belle2 {
     protected:
       /** string containing the query to be executed */
       std::string GetQuery(TSQLServer*, TUrl*);
-      static std::string m_data;
       /** database object representing the TSQLServer database */
       TSQLServer* m_database;
       /** prepared statement object used for querying the database */

@@ -81,8 +81,8 @@ namespace Belle2 {
   DEFINE_UNIT(V   , Unit::eV / Unit::e); /**< Standard of [voltage] */
 
 // charge units
-  DEFINE_UNIT(C  , 1.0 / TMath::Qe() * Unit::e);
-  DEFINE_UNIT(fC , Unit::C / 1.0e15);
+  DEFINE_UNIT(C  , 1.0 / TMath::Qe() * Unit::e); /**< [Coulomb] */
+  DEFINE_UNIT(fC , Unit::C / 1.0e15);            /**< [femtoCoulomb] */
 
 // density units
   DEFINE_UNIT_NAME(mg_cm3  , Unit::g_cm3 * 1e-3, "mg/cm3"); /**< [mg/cm^3] */

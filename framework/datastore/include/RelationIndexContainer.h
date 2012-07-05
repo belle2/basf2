@@ -25,6 +25,8 @@ namespace Belle2 {
    *
    *  This is an empty baseclass to allow storage of all template
    *  specializations to be stored in the same map
+   *
+   *  This class is only used internally, users should use RelationIndex/RelationArray to access/modify relations.
    */
   class RelationIndexBase {
   public:
@@ -38,7 +40,9 @@ namespace Belle2 {
    *  This class provides a bidirectional access to a given Relation to ease
    *  use of Relations for the normal user. There is no support for changing
    *  or adding Relations. All instances of this class will be managed and
-   *  created by the RelationIndexManager
+   *  created by the RelationIndexManager.
+   *
+   *  This class is only used internally, users should use RelationIndex/RelationArray to access/modify relations.
    */
   template<class FROM, class TO> class RelationIndexContainer: public RelationIndexBase {
   public:

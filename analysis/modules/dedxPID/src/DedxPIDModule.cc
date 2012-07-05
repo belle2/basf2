@@ -5,6 +5,7 @@
 #include <analysis/dataobjects/TrackDedx.h>
 #include <analysis/dataobjects/DedxLikelihood.h>
 
+#include <framework/core/Environment.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
@@ -70,7 +71,7 @@ DedxPIDModule::DedxPIDModule() : Module()
   addParam("TrackDistanceThreshold", m_trackDistanceThreshhold, "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
   addParam("EnableDebugOutput", m_enableDebugOutput, "Wether to save information on tracks and associated hits and dE/dx values in TrackDedx objects.", false);
 
-  addParam("PDFFile", m_pdfFilename, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", std::string("pdfs.root"));
+  addParam("PDFFile", m_pdfFilename, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", Environment::Instance().getDataSearchPath() + std::string("/analysis/dedxPID_PDFs_r3178.root"));
   addParam("IgnoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 }
 
@@ -83,8 +84,8 @@ void DedxPIDModule::initialize()
   m_trackID = m_eventID = 0;
   m_numExtrapolations = 0;
 
-  if (!m_enableDebugOutput and !m_pdfFilename.empty()) {
-    B2WARNING("No PDFFile given and debug output disabled. DedxPID module will produce no output!");
+  if (!m_enableDebugOutput and m_pdfFilename.empty()) {
+    B2ERROR("No PDFFile given and debug output disabled. DedxPID module will produce no output!");
   }
 
   //register outputs (if needed)

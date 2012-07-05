@@ -7,7 +7,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/PyRelationArray.h>
+#include <framework/datastore/RelationIndex.h>
 
 #include <tracking/dataobjects/Track.h>
 #include <generators/dataobjects/MCParticle.h>
@@ -127,14 +127,12 @@ void DedxPIDModule::initialize()
           xMax = m_pdfs[detector][particle]->GetXaxis()->GetXmax();
           yMin = m_pdfs[detector][particle]->GetYaxis()->GetXmin();
           yMax = m_pdfs[detector][particle]->GetYaxis()->GetXmax();
-          B2INFO(nBinsX << nBinsY << xMin << xMax << yMin << yMax);
         } else if (nBinsX != m_pdfs[detector][particle]->GetNbinsX()
                    or nBinsY != m_pdfs[detector][particle]->GetNbinsY()
                    or fabs(xMin - m_pdfs[detector][particle]->GetXaxis()->GetXmin()) > eps_factor * xMax
                    or fabs(xMax - m_pdfs[detector][particle]->GetXaxis()->GetXmax()) > eps_factor * xMax
                    or fabs(yMin - m_pdfs[detector][particle]->GetYaxis()->GetXmin()) > eps_factor * yMax
                    or fabs(yMax - m_pdfs[detector][particle]->GetYaxis()->GetXmax()) > eps_factor * yMax) {
-          B2INFO(nBinsX << nBinsY << xMin << xMax << yMin << yMax);
           B2FATAL("PDF for PDG " << pdg_code << ", detector " << detector << suffix << " has binning/dimensions differing from previous PDF.")
         }
       }
@@ -180,23 +178,11 @@ void DedxPIDModule::event()
   const int num_mcparticles = mcparticles.getEntries();
 
   StoreArray<CDCHit> cdcHits;
-  StoreArray<SVDTrueHit> svdHits;
-  StoreArray<PXDTrueHit> pxdHits;
+  StoreArray<SVDTrueHit> svdTrueHits;
+  StoreArray<PXDTrueHit> pxdTrueHits;
   StoreArray<PXDCluster> pxdClusters; //no 1:1 correspondence with PXDTrueHits & PXDRecoHits!
 
-  std::vector<unsigned int> pxd_reco_hits_to_clusters[pxdHits.getEntries()];
-  if (m_usePXD) {
-    PyRelationArray pxdClustersToHits("PXDClustersToPXDTrueHits");
-    for (int i = 0; i < pxdClustersToHits.getEntries(); i++) {
-      const unsigned int cluster_idx = pxdClustersToHits[i].getFromIndex();
-      const std::vector<unsigned int> &hit_indices = pxdClustersToHits[i].getToIndices();
-
-      for (unsigned int j = 0; j < hit_indices.size(); j++) {
-        const unsigned int hit_index = hit_indices.at(j);
-        pxd_reco_hits_to_clusters[hit_index].push_back(cluster_idx);
-      }
-    }
-  }
+  RelationIndex<PXDCluster, PXDTrueHit> pxdClustersToTrueHitsIndex(pxdClusters, pxdTrueHits);
 
   //output
   StoreArray<DedxLikelihood> *likelihood_array = 0;
@@ -430,24 +416,27 @@ void DedxPIDModule::event()
     }
 
     if (m_usePXD) {
-      //there may be multiple clusters per hit, so we get them from relations...
-      std::vector<unsigned int> pxd_cluster_ids;
-      const std::vector<unsigned int>& pxd_hit_ids = gftrackcand.GetHitIDs(c_PXD);
-      for (unsigned int i = 0; i < pxd_hit_ids.size(); i++) {
-        const std::vector<unsigned int>& cluster_ids = pxd_reco_hits_to_clusters[pxd_hit_ids.at(i)];
-        for (unsigned int j = 0; j < cluster_ids.size(); j++) {
-          pxd_cluster_ids.push_back(cluster_ids.at(j));
+      //get indices of PXDTrueHits
+      const std::vector<unsigned int>& pxdHitIDs = gftrackcand.GetHitIDs(c_PXD);
+
+      //and construct a list of associated PXDCluster indices
+      std::vector<unsigned int> pxdClusterIDs;
+      for (unsigned int iHit = 0; iHit < pxdHitIDs.size(); iHit++) {
+        typedef RelationIndex<PXDCluster, PXDTrueHit>::Element relElement_t;
+        unsigned int hitID = pxdHitIDs[iHit];
+        //get all relations that point to hitID
+        BOOST_FOREACH(const relElement_t & rel, pxdClustersToTrueHitsIndex.getTo(pxdTrueHits[hitID])) {
+          pxdClusterIDs.push_back(rel.indexFrom);
         }
       }
-      //...and sort by their index to get them in sequence along the flight path
-      sort(pxd_cluster_ids.begin(), pxd_cluster_ids.end());
-      saveSiHits(&track, helix_at_origin, pxdClusters, pxd_cluster_ids);
+      sort(pxdClusterIDs.begin(), pxdClusterIDs.end());
+      saveSiHits(&track, helix_at_origin, pxdClusters, pxdClusterIDs);
     }
 
     if (m_useSVD) {
       //no way to access digitized SVD hits, so we'll just use the SVDTrueHits directly
       const std::vector<unsigned int>& svd_hit_ids = gftrackcand.GetHitIDs(c_SVD);
-      saveSiHits(&track, helix_at_origin, svdHits, svd_hit_ids);
+      saveSiHits(&track, helix_at_origin, svdTrueHits, svd_hit_ids);
     }
 
 

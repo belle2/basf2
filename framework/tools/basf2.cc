@@ -34,10 +34,13 @@
 #include <framework/core/Framework.h>
 #include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
+#include <framework/logging/LogConfig.h>
+#include <framework/logging/LogSystem.h>
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 #include <signal.h>
 #include <cstdlib>
@@ -139,6 +142,7 @@ int main(int argc, char* argv[])
     config.add_options()
     ("steering", prog::value<string>(), "the python steering file")
     ("arg", prog::value<vector<string> >(&arguments), "additional arguments to be passed to the steering file")
+    ("log_level,l", prog::value<string>(), "set log level (one of DEBUG, INFO, WARNING, or ERROR)")
     ("events,n", prog::value<int>(), "override number of events in run 1 for EvtMetaGen")
     ("input,i", prog::value<string>(), "override name of input file for SimpleInput")
     ("output,o", prog::value<string>(), "override name of output file for SimpleOutput")
@@ -207,6 +211,24 @@ int main(int argc, char* argv[])
         return 1;
       }
       Environment::Instance().setNumberProcessesOverride(nprocesses);
+    }
+
+    if (varMap.count("log_level")) {
+      std::string levelParam = varMap["log_level"].as<string>();
+      int level = -1;
+      for (int i = LogConfig::c_Debug; i < LogConfig::c_Fatal; i++) {
+        std::string thisLevel = LogConfig::logLevelToString((LogConfig::ELogLevel)i);
+        if (boost::iequals(levelParam, thisLevel)) { //case-insensitive
+          level = i;
+          break;
+        }
+      }
+      if (level < 0) {
+        B2FATAL("Invalid log level! Needs to be one of DEBUG, INFO, WARNING, or ERROR.");
+        return 1;
+      }
+
+      LogSystem::Instance().getLogConfig()->setLogLevel((LogConfig::ELogLevel)level);
     }
 
 

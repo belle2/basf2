@@ -82,6 +82,9 @@ class TRGCDCTrackBase {
     /// returns true if fitted.
     bool fitted(void) const;
 
+    /// set fit status
+    void setFitted(bool fitted);
+
     /// returns object type.
     virtual unsigned objectType(void) const;
 
@@ -198,6 +201,12 @@ inline
 bool
 TRGCDCTrackBase::fitted(void) const {
     return _fitted;
+}
+
+inline
+void
+TRGCDCTrackBase::setFitted(bool fitted){
+  _fitted = fitted;
 }
 
 inline

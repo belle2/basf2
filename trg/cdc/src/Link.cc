@@ -33,9 +33,9 @@ namespace Belle2 {
 
 bool TRGCDCLink::ms_smallcell(false);
 bool TRGCDCLink::ms_superb(false);
-unsigned TRGCDCLink::_nL = 0;
-unsigned TRGCDCLink::_nSL = 0;
-unsigned TRGCDCLink::_nSLA = 0;
+unsigned TRGCDCLink::_nL = 56;
+unsigned TRGCDCLink::_nSL = 9;
+unsigned TRGCDCLink::_nSLA = 5;
 unsigned * TRGCDCLink::_nHitsSL = 0;
 vector<TCLink *> TRGCDCLink::_all;
 

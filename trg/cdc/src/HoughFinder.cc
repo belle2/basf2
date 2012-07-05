@@ -385,7 +385,7 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
     }
 
     if (TRGDebug::level()) {
-	cout << TRGDebug::tab() << "#tracks=" << trackMap.size() << endl;
+	cout << TRGDebug::tab() << "#tracksInMC=" << trackMap.size() << endl;
 	map<int, vector<const TCSegment *> *>::iterator it = trackMap.begin();
 	while (it != trackMap.end()) {
 	    cout << TRGDebug::tab(4) << it->first << ":";
@@ -410,6 +410,13 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
 				       l[i]->hit(),
 				       l[i]->hit()->cell().xyPosition());
 	    links.push_back(link);
+	}
+
+	//...Requires all axial super layer hits...
+	const unsigned nSuperLayers = TCLink::nSuperLayers(links);
+	if (nSuperLayers < 5) {
+	    ++it;
+	    continue;
 	}
 
 	//...Check uniquness...
@@ -476,6 +483,10 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
 	D->run();
 #endif
 
+    }
+
+    if (TRGDebug::level()) {
+	cout << TRGDebug::tab() << "#tracksMade=" << trackList.size() << endl;
     }
 
     TRGDebug::leaveStage("Perfect Finder");

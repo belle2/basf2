@@ -52,6 +52,9 @@ class TRGCDCTrack : public TRGCDCTrackBase {
     /// returns helix parameter.
     const TRGCDCHelix & helix(void) const;
 
+    /// Set helix parameter
+    void setHelix(TRGCDCHelix &helix);
+
     /// calculates the closest approach to a wire in real space. Results are stored in TLink. Return value is negative if error happened.
     int approach(TRGCDCLink &, bool sagCorrection = false) const;
     
@@ -103,6 +106,12 @@ inline
 const TRGCDCHelix &
 TRGCDCTrack::helix(void) const {
     return _helix;
+}
+
+inline
+void
+TRGCDCTrack::setHelix(TRGCDCHelix &helix){
+  _helix=helix;
 }
 
 inline

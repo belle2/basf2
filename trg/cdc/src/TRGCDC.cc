@@ -1274,7 +1274,8 @@ TRGCDC::simulate(void) {
     //...Check relations...
     if (TRGDebug::level()) {
 	for (unsigned i = 0; i < trackList.size(); i++) {
-	    trackList[i]->relation().dump();
+//	    trackList[i]->relation().dump();
+	    trackList[i]->dump();
 	}
     }
 
@@ -1321,36 +1322,38 @@ TRGCDC::simulate(void) {
     fitParameters.Clear();
     for(unsigned i=0; i<trackList3D.size(); i++){
       const TCTrack &aTrack = *trackList3D[i];
-      double fitPt = aTrack.pt();
-      double fitPhi0; //= aTrack.helix().phi0();
-      if(aTrack.charge()>0) fitPhi0=aTrack.p().phi()-M_PI/2;
-      if(aTrack.charge()<0) fitPhi0=aTrack.p().phi()+M_PI/2;
-      double fitZ0 = aTrack.helix().dz();
-      double fitCot = aTrack.helix().tanl();
-      // pT, phi0, z0, cot
-      TVectorD tempFitParameters(4);
-      tempFitParameters[0] = fitPt;
-      tempFitParameters[1] = fitPhi0;
-      tempFitParameters[2] = fitZ0;
-      tempFitParameters[3] = fitCot;
-      new(fitParameters[i]) TVectorD(tempFitParameters);
+      if (aTrack.fitted()) {
+        double fitPt = aTrack.pt();
+        double fitPhi0; //= aTrack.helix().phi0();
+        if(aTrack.charge()>0) fitPhi0=aTrack.p().phi()-M_PI/2;
+        if(aTrack.charge()<0) fitPhi0=aTrack.p().phi()+M_PI/2;
+        double fitZ0 = aTrack.helix().dz();
+        double fitCot = aTrack.helix().tanl();
+        // pT, phi0, z0, cot
+        TVectorD tempFitParameters(4);
+        tempFitParameters[0] = fitPt;
+        tempFitParameters[1] = fitPhi0;
+        tempFitParameters[2] = fitZ0;
+        tempFitParameters[3] = fitCot;
+        new(fitParameters[i]) TVectorD(tempFitParameters);
 
-      const TCRelation &trackRelation = aTrack.relation();
-      const MCParticle &trackMCParticle = trackRelation.mcParticle(0);
-      double mcPt = trackMCParticle.getMomentum().Pt();
-      double mcPhi0;
-      if(trackMCParticle.getCharge()>0) mcPhi0=trackMCParticle.getMomentum().Phi()-M_PI/2;
-      if(trackMCParticle.getCharge()<0) mcPhi0=trackMCParticle.getMomentum().Phi()+M_PI/2;
-      // Change range to [0,2pi]
-      if(mcPhi0<0) mcPhi0+=2*M_PI;
-      double mcZ0 = trackMCParticle.getVertex().Z();
-      double mcCot=trackMCParticle.getMomentum().Pz()/trackMCParticle.getMomentum().Pt();
+        const TCRelation &trackRelation = aTrack.relation();
+        const MCParticle &trackMCParticle = trackRelation.mcParticle(0);
+        double mcPt = trackMCParticle.getMomentum().Pt();
+        double mcPhi0;
+        if(trackMCParticle.getCharge()>0) mcPhi0=trackMCParticle.getMomentum().Phi()-M_PI/2;
+        if(trackMCParticle.getCharge()<0) mcPhi0=trackMCParticle.getMomentum().Phi()+M_PI/2;
+        // Change range to [0,2pi]
+        if(mcPhi0<0) mcPhi0+=2*M_PI;
+        double mcZ0 = trackMCParticle.getVertex().Z();
+        double mcCot=trackMCParticle.getMomentum().Pz()/trackMCParticle.getMomentum().Pt();
 
-      tempFitParameters[0] = mcPt;
-      tempFitParameters[1] = mcPhi0;
-      tempFitParameters[2] = mcZ0;
-      tempFitParameters[3] = mcCot;
-      new(mcParameters[i]) TVectorD(tempFitParameters);
+        tempFitParameters[0] = mcPt;
+        tempFitParameters[1] = mcPhi0;
+        tempFitParameters[2] = mcZ0;
+        tempFitParameters[3] = mcCot;
+        new(mcParameters[i]) TVectorD(tempFitParameters);
+      }
     }
     m_tree->Fill();
 
@@ -1489,6 +1492,10 @@ TRGCDC::segment(unsigned lid, unsigned id) const {
 void
 TRGCDC::perfect3DFinder(vector<TCTrack *> trackList) const {
 
+    TRGDebug::enterStage("Perfect 3D Finder");
+    if (TRGDebug::level())
+	cout << TRGDebug::tab() << "givenTrk#=" << trackList.size() << endl;
+
     //...Track loop....
     for (unsigned j = 0; j < trackList.size(); j++) {
 
@@ -1512,19 +1519,32 @@ TRGCDC::perfect3DFinder(vector<TCTrack *> trackList) const {
 		tsList[wh->wire().superLayerId()].push_back(& ts);
 	}
 
+	if (TRGDebug::level()) {
+	    cout << TRGDebug::tab() << "trk#" << j << endl;
+	    for (unsigned k = 0; k < 9; k++) {
+		if (k % 2) {
+		    cout << TRGDebug::tab(4) << "superlayer " << k << ":";
+		    for (unsigned l = 0; l < tsList[k].size(); l++) {
+			if (l)
+			    cout << ",";
+			cout << tsList[k][l]->cell().name();
+		    }
+		    cout << endl;
+		}
+	    }
+	}
+
 	//...Select best one in each super layer...
 	for (unsigned i = 0; i < 9; i++) {
+	    const TCSHit * best = 0;
 	    if (tsList[i].size() == 0) {
 		continue;
 	    }
 	    else if (tsList[i].size() == 1) {
-		trk->append(new TCLink(0,
-				       tsList[i][0],
-				       tsList[i][0]->cell().xyPosition()));
+		best = tsList[i][0];
 	    }
 	    else {
 		int timeMin = 99999;
-		const TCSHit * best = 0;
 		for (unsigned k = 0; k < tsList[i].size(); k++) {
 		    const TRGSignal & timing = tsList[i][k]->timing();
 		    const TRGTime & t = * timing[0];
@@ -1533,12 +1553,18 @@ TRGCDC::perfect3DFinder(vector<TCTrack *> trackList) const {
 			best = tsList[i][k];
 		    }
 		}
-		trk->append(new TCLink(0,
-				       best,
-				       best->cell().xyPosition()));
 	    }
+	    trk->append(new TCLink(0,
+				   best,
+				   best->cell().xyPosition()));
 	}
+
+	if (TRGDebug::level())
+	    trk->dump("", "> ");
+
     }
+
+    TRGDebug::leaveStage("Perfect 3D Finder");
 }
 
 } // namespace Belle2

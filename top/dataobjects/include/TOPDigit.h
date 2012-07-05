@@ -14,7 +14,9 @@
 #include <TObject.h>
 
 namespace Belle2 {
-
+  /** \addtogroup dataobjects
+   * @{
+   */
 
   /*! Class to store TOP digitized hits (output of TOPDigi)
    * relation to TOPSimHit
@@ -67,6 +69,8 @@ namespace Belle2 {
     ClassDef(TOPDigit, 1); /**< ClassDef */
 
   };
+
+  /** @}*/
 
 } // end namespace Belle2
 

@@ -15,6 +15,9 @@
 #include <TVector3.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
   /*! Class to store MC particle track parameters at impact to TOP (at bar surface)
    * relation to MCParticle
@@ -151,6 +154,8 @@ namespace Belle2 {
     ClassDef(TOPTrack, 1);     /**< ClassDef */
 
   };
+
+  /** @}*/
 
 } // end namespace Belle2
 

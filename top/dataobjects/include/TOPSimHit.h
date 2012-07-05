@@ -15,6 +15,9 @@
 #include <TVector3.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
   /*! Class to store G4 Cerenkov photons entering PMT's
    * input for digitization module (TOPDigi).
@@ -175,6 +178,8 @@ namespace Belle2 {
     ClassDef(TOPSimHit, 1); /**< ClassDef */
 
   };
+
+  /** @}*/
 
 } // end namespace Belle2
 

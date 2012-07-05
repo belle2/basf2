@@ -14,7 +14,9 @@
 #include <TObject.h>
 
 namespace Belle2 {
-
+  /** \addtogroup dataobjects
+   * @{
+   */
 
   /*! Class to store TOP likelihoods (output of TOPReco)
    * relation to TOPTrack
@@ -172,6 +174,8 @@ namespace Belle2 {
     ClassDef(TOPLikelihoods, 1); /**< ClassDef */
 
   };
+
+  /** @}*/
 
 } // end namespace Belle2
 

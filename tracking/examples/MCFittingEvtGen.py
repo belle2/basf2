@@ -1,25 +1,31 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-###########################################################################################################################
+##############################################################################
 #
 # This steering file creates the Belle II detector geometry,
-# and perfoms the simulation with EVTGen as generator and MC based track finding and fitting.
+# and perfoms the simulation with EVTGen as generator and MC based
+# track finding and fitting.
 #
-# EvtMetaGen and EvtMetaInfo generates and shows event meta data (see example in the framework package).
+# EvtMetaGen and EvtMetaInfo generates and shows event meta data (see example
+# in the framework package).
 # Gearbox and Geometry are used to create the Belle2 detector geometry.
-# The generator used in this example is geant4 particle gun (see example in the simulation or generator package).
+# The generator used in this example is geant4 particle gun (see example in the
+# simulation or generator package).
 # FullSim performs the full simulation.
 
 # CDCDigi creates the detector response in the CDC for the simulated Hits.
-# For the PXD and SVD currently the TrueHits are used (created directly by the sensitive detector), will be replaced by realistic clusters later on.
+# For the PXD and SVD currently the TrueHits are used (created directly by the
+# sensitive detector), will be replaced by realistic clusters later on.
 
-# MCTrackFinder creates relations between MCParticles and CDCHits/PXDTrueHits/SVDTrueHits produced by it.
-# GenFitter fits the found MCTracks and created two track collections: GFTracks (Genfit class) and Tracks (class with helix parametrization)
+# MCTrackFinder creates relations between MCParticles and CDCHits/PXDTrueHits/
+# SVDTrueHits produced by it.
+# GenFitter fits the found MCTracks and created two track collections:
+# GFTracks (Genfit class) and Tracks (class with helix parametrization)
 #
 # For details about module parameters just type > basf2 -m .
 #
-############################################################################################################################
+##############################################################################
 
 import os
 from basf2 import *
@@ -39,17 +45,14 @@ gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 
 # simulate only tracking detectors
-# to simulate the whole detector included in BelleII.xml, comment the next line out
+# to simulate the whole detector included in BelleII.xml, comment the next line
 geometry.param('Components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'
                ])
 # EvtGen to provide generic BB events
 evtgeninput = register_module('EvtGenInput')
 
-# if the files are not in your data/generators folder, copy them there from externals/v...../evtgen
-evtgeninput.param('DECFile', os.path.join(basf2datadir, 'generators/DECAY.DEC'
-                  ))
-evtgeninput.param('pdlFile', os.path.join(basf2datadir, 'generators/evt.pdl'))
 evtgeninput.param('boost2LAB', True)
+#DECFile and pdlFile have sane defaults
 
 # simulation
 g4sim = register_module('FullSim')
@@ -59,7 +62,8 @@ g4sim.logging.log_level = LogLevel.ERROR
 # digitizer
 cdcDigitizer = register_module('CDCDigi')
 
-# use one gaussian with resolution of 0.01 in the digitizer (to simplify the fitting)
+# use one gaussian with resolution of 0.01 in the digitizer
+# (to simplify the fitting)
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
 cdcDigitizer.param(param_cdcdigi)
 
@@ -69,7 +73,8 @@ mctrackfinder = register_module('MCTrackFinder')
 # select which detectors you would like to use
 param_mctrackfinder = {'UseCDCHits': 1, 'UseSVDHits': 1, 'UsePXDHits': 1}
 
-# select which particles to use, here as example: use only particles which had created hits in the CDC, have an energy > 0.1 and are charged
+# select which particles to use, here as example: use only particles which had
+# created hits in the CDC, have an energy > 0.1 and are charged
 param_mctrackfinder = {'WhichParticles': 3, 'EnergyCut': 0.1, 'Neutrals': 0}
 mctrackfinder.param(param_mctrackfinder)
 

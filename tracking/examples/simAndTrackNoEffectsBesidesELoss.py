@@ -186,7 +186,7 @@ param_mctrackfinder = {
     'Smearing': 0,
     }
 mctrackfinder.param(param_mctrackfinder)
-mctrackfinder.logging.log_level = LogLevel.DEBUG
+# mctrackfinder.logging.log_level = LogLevel.WARNING
 
 trackfitter = register_module('GenFitter2')
 trackfitter.logging.log_level = LogLevel.WARNING

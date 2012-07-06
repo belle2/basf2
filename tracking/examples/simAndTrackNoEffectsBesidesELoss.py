@@ -38,8 +38,6 @@ pGun.param(param_pGun)
 
 g4sim = register_module('FullSim')
 
-g4sim.param('EnableVisualization', True)
-
 # in this example I am swiching off the effects only for Muons because engery loss for muons is still acitve which means the still produce seoncondary particles
 # in the detector if these particles also do not have any effects like decay the will curle in the detector for every and the simulation needs ages to compleate
 g4sim.param('UICommands', [  # "/process/inactivate     Transportation mu+",

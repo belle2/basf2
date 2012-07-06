@@ -38,8 +38,8 @@ pGun.param(param_pGun)
 
 g4sim = register_module('FullSim')
 
-# in this example I am swiching off the effects only for Muons because engery loss for muons is still acitve which means the still produce seoncondary particles
-# in the detector if these particles also do not have any effects like decay the will curle in the detector for every and the simulation needs ages to compleate
+# in this example I am switching off the effects only for Muons because energy loss for Muons is still active which means they still produce secondary particles
+# in the detector. If these particles also do not have any effects like decay the will curl in the detector for ever and the simulation needs ages to complete
 g4sim.param('UICommands', [  # "/process/inactivate     Transportation mu+",
                              # "/process/inactivate             muIoni mu+",
                              # "/process/inactivate            nKiller mu+",
@@ -189,11 +189,11 @@ mctrackfinder.param(param_mctrackfinder)
 trackfitter = register_module('GenFitter2')
 trackfitter.logging.log_level = LogLevel.WARNING
 trackfitter.param('noiseCoulomb', False)
-# you do not have to switch off bremsstrahlung in Genfit becuse it is only active for electrons (in Genfit!) anyway and this steering file uses only Pions
+# you do not have to switch off bremsstrahlung in Genfit because it is only active for electrons (in Genfit!) anyway and this steering file uses only Muons
 trackfitter.param('filterIterations', 3)
 
 trackfitchecker = register_module('TrackFitChecker')
-trackfitchecker.logging.log_level = LogLevel.INFO  # the reults of the statistical tests will only show up at info or debug level
+trackfitchecker.logging.log_level = LogLevel.INFO  # the results of the statistical tests will only show up at info or debug level
 trackfitchecker.param('testSi', False)
 trackfitchecker.param('writeToTextFile', True)
 trackfitchecker.param('writeToRootFile', True)

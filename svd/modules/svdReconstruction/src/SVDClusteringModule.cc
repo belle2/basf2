@@ -316,7 +316,7 @@ void SVDClusteringModule::writeClusters(VxdID sensorID, int side)
       minStripCharge = (minStripCharge < centreCharge) ? minStripCharge : centreCharge;
       maxStripCharge = (maxStripCharge < centreCharge) ? maxStripCharge : centreCharge;
       double minPos = isU ? info.getUCellPosition(minStrip) : info.getVCellPosition(minStrip);
-      double maxPos = isU ? info.getUCellPosition(maxStrip) : info.getUCellPosition(maxStrip);
+      double maxPos = isU ? info.getUCellPosition(maxStrip) : info.getVCellPosition(maxStrip);
       pos = 0.5 * (minPos + maxPos + (maxStripCharge - minStripCharge) / centreCharge * pitch);
     }
 

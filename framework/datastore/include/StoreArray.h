@@ -123,12 +123,14 @@ namespace Belle2 {
       DataStore::Instance().handleArray<T>(m_name, durability, m_storeArray);
     }
 
-
-    bool operator==(const StoreArray<T> &b) const {                /**< Check if two StoreArrays point to the same array. */
+    /** Check if two StoreArrays point to the same array. */
+    bool operator==(const StoreArray<T> &b) const {
       return (b.m_name == m_name) && (b.m_durability == m_durability);
     }
-    bool operator!=(const StoreArray<T> &b) const {                /**< ...or to different ones. */
-      return *this != b;
+
+    /** Check if two StoreArrays point to the different arrays. */
+    bool operator!=(const StoreArray<T> &b) const {
+      return !(*this == b);
     }
 
     /** Is this StoreArray's data safe to access? */

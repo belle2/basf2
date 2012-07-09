@@ -26,7 +26,7 @@ REG_MODULE(Rx)
 RxModule::RxModule() : Module()
 {
   //Set module properties
-  setDescription("Encode DataStore into RingBuffer");
+  setDescription("Decode DataStore from RingBuffer");
   //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
 
   m_rbuf = NULL;

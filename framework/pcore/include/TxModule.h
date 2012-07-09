@@ -62,10 +62,6 @@ namespace Belle2 {
     std::vector<std::string> m_arraynames[DataStore::c_NDurabilityTypes];
     std::vector<TClonesArray*> m_arrays[DataStore::c_NDurabilityTypes];
 
-    //! DataStore iterators
-    StoreIter* m_obj_iter[DataStore::c_NDurabilityTypes];
-    StoreIter* m_array_iter[DataStore::c_NDurabilityTypes];
-
     //!Compression parameter
     int m_compressionLevel;
 

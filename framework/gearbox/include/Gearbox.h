@@ -171,9 +171,11 @@ namespace Belle2 {
 
   /** Helper class to easily register new input handlers */
   template<class T> struct InputHandlerFactory {
+    /** constructor, used by B2_GEARBOX_REGISTER_INPUTHANDLER macro.*/
     InputHandlerFactory(const std::string& prefix) {
       Gearbox::registerInputHandler(prefix, factory);
     }
+    /** create a new InputHandler of type T for given URI. */
     static gearbox::InputHandler* factory(const std::string& uri) {
       return new T(uri);
     }

@@ -59,10 +59,6 @@ namespace Belle2 {
     //! Compression level
     int m_compressionLevel;
 
-    //! DataStore iterators
-    StoreIter* m_obj_iter[DataStore::c_NDurabilityTypes];
-    StoreIter* m_array_iter[DataStore::c_NDurabilityTypes];
-
 
     //! Blocked file handler
     SeqFile* m_file;

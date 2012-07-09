@@ -64,11 +64,10 @@ void EvtMetaGenModule::initialize()
   //Make sure all lists have the same size
   unsigned int defListSize = m_expList.size();
   if ((m_runList.size() != defListSize) || (m_evtNumList.size() != defListSize)) {
-    B2ERROR("Parameters are inconsistent. The lists must have the same number of entries.")
-  } else {
-
-    if (m_expList.size() == 0) B2ERROR("There are no events to be processed!")
-    }
+    B2ERROR("Parameters are inconsistent. The exp, run and evt lists must have the same number of entries.")
+  } else if (defListSize == 0) {
+    B2ERROR("There are no events to be processed!")
+  }
 
   m_evtNumber = 0;
   m_colIndex = 0;

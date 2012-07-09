@@ -25,6 +25,7 @@ namespace Belle2 {
     /** Exception to be thrown in case of an conversion error */
     BELLE2_DEFINE_EXCEPTION(ConversionError, "Path '%1%': Could not convert '%2%' to numerical value");
 
+    /** common interface for Gearbox and GearDir. */
     class Interface {
     public:
 

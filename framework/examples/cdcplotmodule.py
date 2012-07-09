@@ -67,9 +67,9 @@ class CDCPlotModule(Module):
     It gathers the x/y position off all CDCSimHits and draws them using
     matplotlib. The result is saved as a PNG.
 
-    CDCPlotModule.num_events: event counter
-    CDCPlotModule.trackhits_x: list of x positions
-    CDCPlotModule.trackhits_y: corresponding list of y positions
+    \var num_events  event counter
+    \var trackhits_x list of x positions
+    \var trackhits_y corresponding list of y positions
     """
 
     num_events = 0

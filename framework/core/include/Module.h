@@ -29,7 +29,7 @@ namespace Belle2 {
   class Path;
 
   /**
-   * Base Class for Modules.
+   * Base class for Modules.
    *
    * A module is the smallest building block of the framework.
    * A typical event processing chain consists of a linear arrangement
@@ -532,7 +532,7 @@ namespace Belle2 {
 
   protected:
 
-    std::string m_moduleName; /**< The type name of the module. */
+    std::string m_moduleName; /**< The type name of the module. (without trailing "Module") */
   };
 
 

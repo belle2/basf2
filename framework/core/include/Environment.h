@@ -60,16 +60,16 @@ namespace Belle2 {
     /**
      * Returns the path which points to the data directory of the framework.
      *
-     * @return The path in which the data files for the framework are located.
+     * @return data search path, without trailing slash
      */
-    const std::string getDataSearchPath() const { return m_dataSearchPath; };
+    const std::string& getDataSearchPath() const { return m_dataSearchPath; };
 
     /**
      * Returns the path which points to the externals directory of the framework.
      *
-     * @return The path in which the externals of the framework are located.
+     * @return externals path, without trailing slash
      */
-    const std::string getExternalsPath() const { return m_externalsPath; };
+    const std::string& getExternalsPath() const { return m_externalsPath; };
 
     /** Override the number of events in run 1 for EvtMetaGen module. */
     void setNumberEventsOverride(int nevents) { m_numberEventsOverride = nevents; }

@@ -191,7 +191,10 @@ namespace Belle2 {
     }
 
     /**
-     * Return string with statistics for all modules
+     * Return string with statistics for all modules.
+     *
+     * Can be used in steering file with 'print statistics'.
+     *
      * @param type    counter type to use for statistics
      * @param modules map of modules to use. If NULL, default map will be used
      */

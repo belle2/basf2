@@ -21,7 +21,6 @@ using namespace boost::python;
 
 namespace Belle2 {
 
-  /** return reference to Instance */
   ModuleStatistics& ModuleStatistics::getInstance()
   {
     static ModuleStatistics instance;
@@ -54,7 +53,6 @@ namespace Belle2 {
     return out.str();
   }
 
-  /** print event statistics for given modules to stream */
   string ModuleStatistics::getModuleStatistics(const boost::python::list& pyList, ECounters mode)
   {
     StatisticsMap modules;
@@ -72,7 +70,6 @@ namespace Belle2 {
     return getStatistics(mode, &modules);
   }
 
-  /** get list of all statistic objects */
   boost::python::list ModuleStatistics::getAll()
   {
     boost::python::list result;
@@ -82,7 +79,6 @@ namespace Belle2 {
     return result;
   }
 
-  /** clear counters, keep names */
   void ModuleStatistics::clear()
   {
     BOOST_FOREACH(StatisticsMap::value_type & module, m_modules) {
@@ -91,12 +87,12 @@ namespace Belle2 {
     m_global.clear();
   }
 
-  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(stats_time_overloads, getTime, 0, 1);
-  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(stats_calls_overloads, getCalls, 0, 1);
-  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getStatistics_overloads, getStatistics, 0, 1);
-  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getModuleStatistics_overloads, getModuleStatistics, 1, 2);
+  //used to make python aware of default arguments
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(stats_time_overloads, getTime, 0, 1)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(stats_calls_overloads, getCalls, 0, 1)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getStatistics_overloads, getStatistics, 0, 1)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getModuleStatistics_overloads, getModuleStatistics, 1, 2)
 
-  /** Expose python API */
   void ModuleStatistics::exposePythonAPI()
   {
     //Reference to global scope

@@ -39,13 +39,17 @@ namespace Belle2 {
     enum { kSQLHANDLER_TMessage = 1, kSQLHANDLER_String = 0 };
     enum { kMySQL, kPgSQL, kOracle };
 
+    /** serialised SQL message */
     class SqlMessage : public TMessage {
     private:
-      Int_t kHdrlen;
+      Int_t kHdrlen; /**< size of message header */
     public:
+      /** constructor. */
       SqlMessage(void* buf, Int_t bufsize): TMessage(buf, bufsize) { kHdrlen = 2 * sizeof(UInt_t); };
+      /** returns data of size DataSize(), without header. */
       char* Data() { return Buffer() + kHdrlen; }
-      Int_t  DataSize() { return BufferSize() - kHdrlen; }
+      /** size of data returned by Data(). */
+      Int_t DataSize() { return BufferSize() - kHdrlen; }
     };
 
     std::string SqlHandler::GetQuery(TSQLServer* sql,  TUrl* url)

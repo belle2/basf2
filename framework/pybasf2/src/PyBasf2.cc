@@ -42,7 +42,7 @@ FileMetaData updateFileMetaData(const std::string& fileName, int id, const std::
   TTree* tree = (TTree*) file->Get("persistent");
   TTree* newTree = 0;
   if (!tree) {
-    fileMetaData = (FileMetaData*) file->Get("FileMetaData");
+    fileMetaData = dynamic_cast<FileMetaData*>(file->Get("FileMetaData"));
     if (!fileMetaData) {
       B2WARNING("Failed to get persistent tree in the file " << fileName);
       tree = new TTree("persistent", "persistent");

@@ -56,7 +56,7 @@ namespace Belle2 {
        *
        * The uri is used to specify any parameters for the backend. The content is
        * dependent on the actual InputHandler implementation but could be a
-       * base directory, a database host, a archive filename or any combination.
+       * base directory, a database host, an archive filename or any combination.
        * Parsing of this string is left to the actual implementation
        */
       InputHandler(const std::string& uri): m_uri(uri) {};

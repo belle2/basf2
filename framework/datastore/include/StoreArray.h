@@ -22,11 +22,72 @@ namespace Belle2 {
 
   /** Accessor to arrays stored in the data store.
    *
-   *  This is an accessor class for the TClonesArrays saved in the DataStore.
-   *  To add new objects, please use the TClonesArray function
-   *  <a href="http://root.cern.ch/root/htmldoc/TClonesArray.html#TClonesArray:New">new</a>.
-   *  The TClonesArrays are never deleted, but their content is deleted according to the EDurability type
-   *  that is given to them.
+   *  StoreArrays (like StoreObjPtrs) are uniquely identified by their name
+   *  and durability. In most cases, arrays are created with durability
+   *  DataStore::c_Event and the default name corresponding to their type.
+   *  (i.e. typename + 's')
+   *  Thus, calling the constructor StoreArray<MyType>() will connect this
+   *  StoreArray with the array called 'MyTypes' in the data store, with a
+   *  lifetime of one event.
+   *
+   *
+   *  Accessing elements of an existing array
+   *  =======================================
+   *
+   *  Stored objects can be accessed directly using their array index and
+   *  operator[]. For example, the following code snippet loops over all
+   *  entries in an array of CDCSimHits:
+   *
+   *      StoreArray<CDCSimHit> cdcsimhits;
+   *      //loop over all CDC simhits
+   *      for(int iCDC = 0; iCDC < cdcsimhits.getEntries(); iCDC++) {
+   *        const CDCSimHit* hit = cdcsimhits[iCDC]; //get iCDC'th entry in StoreArray
+   *        // Use hit's data here...
+   *      }
+   *
+   *  Objects linked together using relations can also be obtained through
+   *  the RelationIndex class. (See class documentation for usage examples.)
+   *
+   *
+   *  Adding elements
+   *  ===============
+   *
+   *  Elements can be added to the array in a few ways. The easiest is to use
+   *  something like:
+   *
+   *      StoreArray<CDCSimHit> cdcsimhits;
+   *      //...
+   *      CDCSimHit* newhit = cdcsimhits.appendNew();
+   *      //fill newhit with data here...
+   *
+   *  alternatively, you can copy an existing object into the array using
+   *  appendNew(const T& obj) instead.
+   *  If performance is especially important, you can also create a new object
+   *  using 'placement-new':
+   *
+   *      new (cdcsimhits[cdcsimhits.getEntries()]) CDCSimHit(some ctor arguments);
+   *
+   *  This creates a new CDCSimHit at the end of the array and allows
+   *  you to fill its data members using a custom constructor.
+   *
+   *
+   *  Note that if you want to create a new array in a module, you should
+   *  create an object of type StoreArray<T> in your implementation of
+   *  Module::initialize(). This registers the array in the data store and
+   *  lets other modules know you intend to fill it.
+   *
+   *
+   *  Internals
+   *  =========
+   *
+   *  Internally, the arrays are stored as TClonesArrays, see the
+   *  [ROOT documentation on TClonesArray](http://root.cern.ch/root/html/TClonesArray.html)
+   *  for technical details.
+   *
+   *  @sa objects in different arrays can be linked using relations, see
+   *      RelationArray or RelationIndex.
+   *  @sa see StoreObjPtr for a way store single objects
+   *
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreArray">The basf2 developers</a>
    */
   template <class T>
@@ -46,16 +107,16 @@ namespace Belle2 {
      *
      *  @param accessorParams   A pair with name and durability.
      */
-    StoreArray(AccessorParams accessorParams) {
+    explicit StoreArray(AccessorParams accessorParams) {
       assignArray(accessorParams.first, accessorParams.second);
     }
 
     /** Constructor for storage of TClonesArrays.
      *
      *  This is most likely needed for the multiprocessing implementation.
+     *  @param array       TClonesArray for storage.
      *  @param name        Key under which TClonesArray is stored.
      *  @param durability  Lifetime of stored TClonesArray.
-     *  @param array       TClonesArray for storage.
      */
     StoreArray(TClonesArray* const array, const std::string& name, DataStore::EDurability durability = DataStore::c_Event)
       : m_name(name), m_durability(durability), m_storeArray(array) {
@@ -70,16 +131,18 @@ namespace Belle2 {
       return *this != b;
     }
 
-    /** Get the number of occupied slots in the array. */
-    int getEntries() const {return m_storeArray->GetEntriesFast();}
-
     /** Is this StoreArray's data safe to access? */
     operator bool() const {return m_storeArray;}
+
+    /** Get the number of occupied slots in the array. */
+    inline int getEntries() const {return m_storeArray->GetEntriesFast();}
 
     /** Access to the stored objects.
      *
      *  To add an element to the array, use:
-     *   new (myStoreArray[myStoreArray.getEntries()]) T(some ctor arguments);
+     *
+     *      new (myStoreArray[myStoreArray.getEntries()]) T(some ctor arguments);
+     *
      *  which constructs a new T object at the end of myStoreArray.
      *
      *  If you only want to use T's default or copy constructor, use the safer

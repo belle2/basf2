@@ -80,14 +80,10 @@ TRGCDCCellHit::dump(const std::string & msg,
     }
     if (msg.find("mc") != std::string::npos ||
         msg.find("detail") != std::string::npos) {
-        std::cout << ",hep ";
-//         if (mc()) {
-//             if (mc()->hep()) std::cout << mc()->hep()->id();
-//             else std::cout << "0";
-//         }
-//         else {
-//             std::cout << "0";
-//         }
+        cout << ",mcpart=" << iMCParticle();
+	cout << ",flightTime=" << simHit()->getFlightTime();
+	cout << ",driftLength=" << simHit()->getDriftLength() << endl;
+	_cell.timing().dump("detail", pre + "    ");
     }
     std::cout << std::endl;
 }

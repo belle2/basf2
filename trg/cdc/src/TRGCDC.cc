@@ -725,7 +725,8 @@ TRGCDC::update(bool ) {
         //...Drift legnth(micron) to drift time(ns)...
         //   coefficient used here must be re-calculated.
         const float driftTimeMC =
-	    SimHits[iSimHit]->getDriftLength() * 10 * 1000 / 40;
+	    SimHits[iSimHit]->getDriftLength() * 10 * 1000 / 40 +
+	    SimHits[iSimHit]->getFlightTime();
 
 	//cout << " -2 driftTimeMC=" << driftTimeMC << endl;
 
@@ -771,6 +772,17 @@ TRGCDC::update(bool ) {
 	StoreArray<CDCSimHit> simHits("CDCSimHits");
         cout << TRGDebug::tab() << "#CDCSimHit=" << n << ",#CDCHit=" << nHits
 	     << endl;
+
+	_clock.dump("detail", TRGDebug::tab());
+	_clockFE.dump("detail", TRGDebug::tab());
+
+	const unsigned n = 10;
+        cout << TRGDebug::tab() << "Dump of the first " << n
+	     << " hits of a wire" << endl;
+	for (unsigned i = 0; i < n; i++) {
+	    const TCWHit & h = * _hits[i];
+	    h.dump("detail", TRGDebug::tab(4));
+	}
     }
 
     TRGDebug::leaveStage("TRGCDC update");
@@ -1196,7 +1208,7 @@ TRGCDC::simulate(void) {
         s.simulate();
         if (s.timing().active()) {
 
-	     //...Create TCShit...
+	     //...Create TCSHit...
 	     unsigned j = 0;
 	     const TCWire * w = s[j];
 	     TCSHit * th = 0;

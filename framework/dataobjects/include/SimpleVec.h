@@ -15,12 +15,15 @@
 #include <vector>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
   /** Possibility to store primitive types like ints into the DataStore; not recommended for use in official modules.
    *
-   *  Use this class to store primitive types like integers the DataStore in a simple way.
-   *  However, objects in official modules should be properly created in their own objects, so this object is meant
-   *  for private modules/analysis and so on. <br>
+   *  Use this class to store primitive types like integers in the DataStore in a simple way.
+   *  However, official modules should properly encapsulate data in their own objects, so this
+   *  object is meant for private modules/analysis and so on. <br>
    *  This object is still quite preliminary. Please improve by making it more convenient.
    *
    *  @author <a href="mailto:martin.heck@kit.edu?subject=SimpleVec">Martin Heck</a>
@@ -76,5 +79,6 @@ namespace Belle2 {
     /** Needed for ROOT purposes. This Macro makes a ROOT object from SimpleVec. */
     ClassDef(SimpleVec, 1);
   }; //class
+  /*! @} */
 } // namespace Belle2
 #endif // SIMPLEVEC

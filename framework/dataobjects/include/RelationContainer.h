@@ -18,6 +18,9 @@
 #include <string>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
   /** Class to store relations between StoreArrays in the DataStore.
    *
@@ -108,6 +111,7 @@ namespace Belle2 {
 
     ClassDef(RelationContainer, 1); /**< Build ROOT dictionary */
   };
+  /*! @} */
 }
 
 #endif

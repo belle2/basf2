@@ -14,6 +14,10 @@
 #include <string>
 
 namespace Belle2 {
+  /**
+   * \addtogroup modules
+   * @{
+   */
 
   /*! Class definition of HistoManager module */
   class HistoManagerModule : public Module {
@@ -36,9 +40,7 @@ namespace Belle2 {
     bool        m_initialized;
   };
 
+  /*! @} */
 } // Namaspace Belle2
 
 #endif /* HISTO_MANAGER_H */
-
-
-

@@ -13,6 +13,9 @@
 #include <TObject.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
   /** Store execution time and memory usage.
    *
@@ -63,5 +66,6 @@ namespace Belle2 {
     ClassDef(ProfileInfo, 1);
 
   }; //class
+  /*! @} */
 } // namespace Belle2
 #endif // EVENTMETADATA

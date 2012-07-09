@@ -16,6 +16,9 @@
 #include <vector>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
   /** Class to store a single element of a Relation.
    *
@@ -127,6 +130,7 @@ namespace Belle2 {
     ClassDef(RelationElement, 1); /**< Build ROOT dictionary */
   };
 
+  /*! @} */
 }
 
 #endif

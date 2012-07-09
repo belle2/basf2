@@ -13,6 +13,9 @@
 #include <TObject.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
   /** Store event number, run number, and experiment number.
    *
@@ -164,5 +167,6 @@ namespace Belle2 {
     ClassDef(EventMetaData, 1);
 
   }; //class
+  /*! @} */
 } // namespace Belle2
 #endif // EVENTMETADATA

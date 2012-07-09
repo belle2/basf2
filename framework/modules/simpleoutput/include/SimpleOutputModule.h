@@ -24,6 +24,11 @@
 
 
 namespace Belle2 {
+  /**
+   * \addtogroup modules
+   * @{
+   */
+
   /** Write objects from DataStore into a ROOT file.
    *
    *  Please make sure, that you create the same objects in each call of event,
@@ -204,6 +209,7 @@ namespace Belle2 {
     unsigned long m_eventHigh;
   };
 
+  /*! @} */
 } // end namespace Belle2
 
 #endif // SIMPLEOUTPUTMODULE_H

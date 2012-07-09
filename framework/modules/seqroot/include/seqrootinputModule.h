@@ -26,6 +26,10 @@
 #define MAXEVTSIZE 400000000*4
 
 namespace Belle2 {
+  /**
+   * \addtogroup modules
+   * @{
+   */
 
   /*! A class definition of an input module for Sequential ROOT I/O */
 
@@ -80,6 +84,7 @@ namespace Belle2 {
 
   };
 
+  /*! @} */
 } // end namespace Belle2
 
 #endif // MODULEHELLO_H

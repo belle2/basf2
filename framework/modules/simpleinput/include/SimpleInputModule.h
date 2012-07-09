@@ -22,6 +22,10 @@
 
 
 namespace Belle2 {
+  /**
+   * \addtogroup modules
+   * @{
+   */
 
   /** Module Simple Input.
    *
@@ -127,6 +131,7 @@ namespace Belle2 {
     const static std::string c_SteerExcludeBranchNames[DataStore::c_NDurabilityTypes];
 
   };
+  /*! @} */
 
 } // end namespace Belle2
 

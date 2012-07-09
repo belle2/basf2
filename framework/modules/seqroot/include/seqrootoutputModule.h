@@ -22,6 +22,10 @@
 #include <framework/datastore/DataStore.h>
 
 namespace Belle2 {
+  /**
+   * \addtogroup modules
+   * @{
+   */
 
   /*! Class definition for the output module of Sequential ROOT I/O */
 
@@ -82,6 +86,7 @@ namespace Belle2 {
 
   };
 
+  /*! @} */
 } // end namespace Belle2
 
 #endif // MODULEHELLO_H

@@ -15,6 +15,10 @@
 #include <boost/format.hpp>
 
 namespace Belle2 {
+  /**
+   * \addtogroup modules
+   * @{
+   */
 
   /**
    * The Progress module.
@@ -56,6 +60,7 @@ namespace Belle2 {
     /** compiled output format */
     boost::format m_output;
   };
+  /*! @} */
 } // end namespace Belle2
 
 #endif // ProgressModule_H

@@ -15,6 +15,9 @@
 
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
   /** Store information, that is constant during a run, and is needed during the event loop.
    *
@@ -96,5 +99,6 @@ namespace Belle2 {
     ClassDef(RunMetaData, 1);
 
   }; //class
+  /*! @} */
 } // namespace Belle2
 #endif // EVENTMETADATA

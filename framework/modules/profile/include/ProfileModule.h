@@ -16,6 +16,10 @@
 
 
 namespace Belle2 {
+  /**
+   * \addtogroup modules
+   * @{
+   */
 
   /**
    * A module that measures the execution time and memory usage per event.
@@ -84,6 +88,7 @@ namespace Belle2 {
     MemTime m_endInfo;        /**< memory usage and time at end of event loop */
 
   };
+  /*! @} */
 }
 
 #endif /* PROFILEMODULE_H_ */

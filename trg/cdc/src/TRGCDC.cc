@@ -1271,6 +1271,15 @@ TRGCDC::simulate(void) {
     //...Stereo finder...
     perfect3DFinder(trackList);
 
+    //...Check tracks...
+    if (TRGDebug::level()) {
+	for (unsigned i = 0; i < trackList.size(); i++) {
+	    const TCTrack & t = * trackList[i];
+	    cout << ">   links=" << t.links().size() << endl;
+	    t.dump();
+	}
+    }
+
     //...Check relations...
     if (TRGDebug::level()) {
 	for (unsigned i = 0; i < trackList.size(); i++) {
@@ -1512,8 +1521,7 @@ TRGCDC::perfect3DFinder(vector<TCTrack *> trackList) const {
 	    if (! ts.timing().active()) continue;
 	    const TCWHit * wh = ts.segment().center().hit();
 	    if (! wh) continue;
-	    const CDCSimHit & sh = * wh->simHit();
-	    const unsigned trackId = sh.m_trackId;
+	    const unsigned trackId = wh->iMCParticle();
 
 	    if (id == trackId)
 		tsList[wh->wire().superLayerId()].push_back(& ts);

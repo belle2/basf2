@@ -144,8 +144,8 @@ TRGCDCTrackBase::relation(void) const {
 	    relations[iMCParticle] = 1;
 
 	if (TRGDebug::level()) {
-	    cout << TRGDebug::tab() << cell.name() << ","
-		 << ",MCParticle=" << iMCParticle << endl;
+	    cout << TRGDebug::tab() << cell.name() << ",MCParticle="
+		 << iMCParticle << endl;
 	}
     }
 

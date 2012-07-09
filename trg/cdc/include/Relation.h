@@ -46,7 +46,7 @@ class TRGCDCRelation {
     /// returns /# of contributors.
     unsigned nContributors(void) const;
 
-    /// returns i'th contributor.
+    /// returns i'th contributor of MCParticle.
 //  G4Track contributor(unsigned i = 0) const;
     unsigned contributor(unsigned i = 0) const;
 

@@ -62,16 +62,6 @@ namespace Belle2 {
       DataStore::Instance().handleArray<T>(m_name, durability, m_storeArray);
     }
 
-    /** Switch the array the StoreArray points to.
-     *
-     *  @param name       Key with which the TClonesArray is saved. An empty string is treated as equal to class name.
-     *  @param durability Specifies lifetime of array in question.
-     */
-    bool assignArray(const std::string& name, DataStore::EDurability durability = DataStore::c_Event);
-
-    //------------------------ Imitate array functionality -----------------------------------------------------
-    TClonesArray& operator *() const {return *m_storeArray;} /**< Imitate array functionality. */
-    TClonesArray* operator ->() const {return m_storeArray;} /**< Imitate array functionality. */
 
     bool operator==(const StoreArray<T> &b) const {                /**< Check if two StoreArrays point to the same array. */
       return (b.m_name == m_name) && (b.m_durability == m_durability);
@@ -79,31 +69,90 @@ namespace Belle2 {
     bool operator!=(const StoreArray<T> &b) const {                /**< ...or to different ones. */
       return *this != b;
     }
-    operator bool() const {return m_storeArray;}  /**< Imitate array functionality. */
 
-    /** Access to the stored objects.
-     *
-     *  By default the TClonesArray would return TObjects, so a cast is necessary.
-     *  The static cast is safe here, because at a previous stage, it is already checked
-     *  that the TClonesArray contains type T.
-     */
-    T* operator [](int i) const {return static_cast<T*>(m_storeArray->At(i));}
-
-    TClonesArray* getPtr() {return m_storeArray;} /**< Return stored object. */
-
-    //------------------------ Getters for AccessorParams -----------------------------------------------------
-    /** Returns name under which the object is saved in the DataStore. */
-    AccessorParams getAccessorParams() const {return make_pair(m_name, m_durability);};
-    /** Return  name under which the object is saved in the DataStore. */
-    const std::string& getName() const { return m_name; }
-    /** Return  durability with which the object is saved in the DataStore. */
-    DataStore::EDurability getDurability() const { return m_durability; }
-
-    //------------------------ Parsing for easier handling of TClonesArrays -----------------------------------
     /** Get the number of occupied slots in the array. */
     int getEntries() const {return m_storeArray->GetEntriesFast();}
 
+    /** Is this StoreArray's data safe to access? */
+    operator bool() const {return m_storeArray;}
+
+    /** Access to the stored objects.
+     *
+     *  To add an element to the array, use:
+     *   new (myStoreArray[myStoreArray.getEntries()]) T(some ctor arguments);
+     *  which constructs a new T object at the end of myStoreArray.
+     *
+     *  If you only want to use T's default or copy constructor, use the safer
+     *  appendNew() instead.
+     *
+     *
+     *  \param i Array index, should be in 0..getEntries()-1 (no range check).
+     *           Using i = getEntries() is O.K. when used with new (...) T, the
+     *           array is expanded as necessary.
+     *  \return const pointer to T (no left-hand side assignments)
+     */
+    inline T* const operator [](int i) const {
+      //type was checked by DataStore, so this is safe
+      return static_cast<T*>(m_storeArray->AddrAt(i));
+    }
+
+    /** Construct a new T object at the end of the array.
+     *
+     *  Appends a new object to the array, and returns a pointer so
+     *  it can be filled with data. The default constructor is used
+     *  for the object's creation.
+     *
+     *  \return const pointer to the created object (no left-hand side assignments)
+     */
+    inline T* const appendNew() { return new((*this)[getEntries()]) T(); }
+
+    /** Copy-construct a new T object at the end of the array.
+     *
+     *  Appends a new object to the array, and returns a pointer so
+     *  it can be filled with data. The copy-constructor of T is
+     *  used to create the object.
+     *
+     *  \note For code that needs to store large numbers of objects in an
+     *        array, you may want to avoid creating a temporary object for
+     *        each of them. In this case, the default-constructing variant
+     *        of appendNew() or placement-new with a custom constructor (see
+     *        documentation of operator[]) may be better.
+     *
+     *  \return const pointer to the created object (no left-hand side assignments)
+     */
+    inline T* const appendNew(const T& obj) { return new((*this)[getEntries()]) T(obj); }
+
+    //@{
+    /** Raw access to the underlying TClonesArray.
+     *
+     *  In most cases, you'll want to avoid direct interaction with
+     *  TClonesArrays and use StoreArray functions like operator[],
+     *  getEntries() or appendNew() instead.
+     *  If you must access the TClonesArray, using the getPtr()
+     *  function is recommended, as the difference between . and ->
+     *  may be lost on casual readers of the source code.
+     */
+    TClonesArray& operator *() const {return *m_storeArray;}
+    TClonesArray* operator ->() const {return m_storeArray;}
+    TClonesArray* getPtr() const {return m_storeArray;}
+    //@}
+
+    //------------------------ Getters for AccessorParams -----------------------------------------------------
+    /** Returns name/durability under which the object is saved in the DataStore. */
+    AccessorParams getAccessorParams() const {return make_pair(m_name, m_durability);};
+    /** Return name under which the object is saved in the DataStore. */
+    const std::string& getName() const { return m_name; }
+    /** Return durability with which the object is saved in the DataStore. */
+    DataStore::EDurability getDurability() const { return m_durability; }
+
   protected:
+    /** Switch the array the StoreArray points to.
+     *
+     *  @param name       Key with which the TClonesArray is saved. An empty string is treated as equal to class name.
+     *  @param durability Specifies lifetime of array in question.
+     */
+    bool assignArray(const std::string& name, DataStore::EDurability durability = DataStore::c_Event);
+
     /** Pointer that actually holds the TClonesArray. */
     TClonesArray* m_storeArray;
 

@@ -17,7 +17,7 @@
 
 namespace Belle2 {
 
-  /** Type save access pointer.
+  /** Type safe access pointer.
    *
    *  Use this, if you want to access or create a single object in the store.
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreObjPtr">The basf2 developers</a>
@@ -33,7 +33,7 @@ namespace Belle2 {
      *  @sa assignObject
      */
     explicit StoreObjPtr(const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event, bool generate = true) {
-      assignObject(name, durability,  generate);
+      assignObject(name, durability, generate);
     }
 
     /** Constructor for usage with Relations etc.
@@ -64,6 +64,22 @@ namespace Belle2 {
     /** Virtual destructor for inherited classes */
     virtual ~StoreObjPtr() {}
 
+    //------------------------ Imitate pointer functionality -----------------------------------------------
+    T& operator *()  const {return *m_storeObjPtr;}  /**< Imitate pointer functionality. */
+    T* operator ->() const {return m_storeObjPtr;}   /**< Imitate pointer functionality. */
+    operator bool()  const {return m_storeObjPtr;}   /**< Imitate pointer functionality. */
+
+    //------------------------ Getters for AccessorParams --------------------------------------------------
+    AccessorParams getAccessorParams() const {     /**< Returns name and durability under which the object is saved in the DataStore. */
+      return AccessorParams(m_name, m_durability);
+    }
+    const std::string& getName() const { return m_name; } /**< Return  name under which the object is saved in the DataStore. */
+    DataStore::EDurability getDurability() const { /**< Return durability with which the object is saved in the DataStore. */
+      return m_durability;
+    }
+
+  protected:
+
     /** Assigning an object to the pointer.
      *
      *  This function actually calls the DataStore. If the DataStore is called for the first time during an execution of basf2,
@@ -90,21 +106,6 @@ namespace Belle2 {
      */
     bool storeObject(T* const AObject, const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event);
 
-    //------------------------ Imitate pointer functionality -----------------------------------------------
-    T& operator *()  const {return *m_storeObjPtr;}  /**< Imitate pointer functionality. */
-    T* operator ->() const {return m_storeObjPtr;}   /**< Imitate pointer functionality. */
-    operator bool()  const {return m_storeObjPtr;}   /**< Imitate pointer functionality. */
-
-    //------------------------ Getters for AccessorParams --------------------------------------------------
-    AccessorParams getAccessorParams() const {     /**< Returns name and durability under which the object is saved in the DataStore. */
-      return AccessorParams(m_name, m_durability);
-    }
-    const std::string& getName() const { return m_name; } /**< Return  name under which the object is saved in the DataStore. */
-    DataStore::EDurability getDurability() const { /**< Return  durability with which the object is saved in the DataStore. */
-      return m_durability;
-    }
-
-  protected:
     /** Store of actual pointer. */
     T* m_storeObjPtr;
 

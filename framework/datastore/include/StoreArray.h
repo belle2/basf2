@@ -20,7 +20,7 @@
 
 namespace Belle2 {
 
-  /** Accessor to stored TClonesArrays.
+  /** Accessor to arrays stored in the data store.
    *
    *  This is an accessor class for the TClonesArrays saved in the DataStore.
    *  To add new objects, please use the TClonesArray function
@@ -89,9 +89,9 @@ namespace Belle2 {
      *  \param i Array index, should be in 0..getEntries()-1 (no range check).
      *           Using i = getEntries() is O.K. when used with new (...) T, the
      *           array is expanded as necessary.
-     *  \return const pointer to T (no left-hand side assignments)
+     *  \return pointer to the created object
      */
-    inline T* const operator [](int i) const {
+    inline T* operator [](int i) const {
       //type was checked by DataStore, so this is safe
       return static_cast<T*>(m_storeArray->AddrAt(i));
     }
@@ -102,9 +102,9 @@ namespace Belle2 {
      *  it can be filled with data. The default constructor is used
      *  for the object's creation.
      *
-     *  \return const pointer to the created object (no left-hand side assignments)
+     *  \return pointer to the created object
      */
-    inline T* const appendNew() { return new((*this)[getEntries()]) T(); }
+    inline T* appendNew() { return new((*this)[getEntries()]) T(); }
 
     /** Copy-construct a new T object at the end of the array.
      *
@@ -118,9 +118,9 @@ namespace Belle2 {
      *        of appendNew() or placement-new with a custom constructor (see
      *        documentation of operator[]) may be better.
      *
-     *  \return const pointer to the created object (no left-hand side assignments)
+     *  \return pointer to the created object
      */
-    inline T* const appendNew(const T& obj) { return new((*this)[getEntries()]) T(obj); }
+    inline T* appendNew(const T& obj) { return new((*this)[getEntries()]) T(obj); }
 
     //@{
     /** Raw access to the underlying TClonesArray.

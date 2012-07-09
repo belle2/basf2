@@ -21,11 +21,43 @@ namespace Belle2 {
 
   /** Class to create/modify relations between StoreArrays.
    *
+   *  Relations connect objects stored in two StoreArrays with each other,
+   *  with the possibility of n:n connections and individual weights.
+   *
    *  RelationArray is suitable for adding and modifying relations, see the
    *  documentation of RelationIndex for a more convenient way of finding and
    *  accessing relations.
    *
-   *  \sa RelationIndex
+   *  Creating new relations
+   *  ======================
+   *
+   *  Assuming you have two StoreArrays called 'particles' and 'cdcsimhits',
+   *  you can use RelationArray to create relations between entries:
+   *
+   *      RelationArray particlesToCdchits(particles, cdcsimhits);
+   *      for(int iPart = 0; iPart < particles.getEntries(); iPart++) {
+   *        //... create new hit 'myhit'
+   *        cdcsimhits.appendNew(myhit);
+   *        int cdcsimhitIdx = getEntries()-1; //index of last object stored
+   *
+   *        //connect objects at indices iPart and cdcsimhitIdx
+   *        particlesToCdchits.add(iPart, cdcsimhitIdx);
+   *      }
+   *
+   *  This example loops over the 'particles' array and might for example
+   *  simulate the particles' interaction with the detector. New hits are
+   *  added and also connected with the particles that created them.
+   *
+   *  As with other data store objects, you should register relations you want
+   *  to store in your implementation of Module::initialize().
+   *  Just create a RelationArray of the appropriate type (as in the first line
+   *  of the example above).
+   *
+   *
+   *  \sa RelationIndex provides a convenient interface to finding objects
+   *      related to a given FROM/TO side object.
+   *  \sa The on-disk data structure is provided by RelationElement objects
+   *      in a RelationContainer.
    */
   class RelationArray: public StoreObjPtr<RelationContainer> {
   public:

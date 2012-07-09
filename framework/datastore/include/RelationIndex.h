@@ -17,11 +17,56 @@ namespace Belle2 {
 
   /** Class to ease use of relations.
    *
+   *  Relations connect objects stored in two StoreArrays with each other,
+   *  with the possibility of n:n connections and individual weights.
+   *
    *  This class provides bidirectional access to a given Relation to ease use
    *  of Relations for the normal user. There is no support for changing or adding
    *  Elements of the relation, this should be done directly using RelationArray.
    *
-   *  \sa RelationArray
+   *
+   *  Finding related objects
+   *  =======================
+   *
+   *  Given an object of type FROM or TO, RelationIndex can easily find objects
+   *  on the other side connected to it. If there can be at most one relation
+   *  from/to the given objects, this is especially simple:
+   *
+   *      RelationIndex<MCParticle, CDCSimHit> mcparticlesToCdcsimhits;
+   *      typedef RelationIndex<MCParticle, CDCSimHit>::Element relElement_t;
+   *
+   *      for(int iCDC = 0; iCDC < cdcsimhits.getEntries(); iCDC++) {
+   *        const CDCSimHit* hit = cdcsimhits[iCDC];
+   *
+   *        //assuming 'hit' was only created by a single particle
+   *        const relElement_t* rel = mcparticlesToCdcsimhits.getFirstFrom(hit);
+   *        if(!rel) {
+   *          B2WARNING("no MCParticle found for CDCSimHit " << iCDC);
+   *          continue;
+   *        }
+   *        B2INFO("this CDCHit came from a particle with PDG code " << rel->from->getPDG());
+   *      }
+   *
+   *  If more than one associated object exists, one can loop over them using
+   *  BOOST_FOREACH. For example, when one instead wants to find the CDCSimHits
+   *  belonging to a particle, one can use:
+   *
+   *      const MCParticle* particle = ...;
+   *      BOOST_FOREACH(const relElement_t & rel, mcparticlesToCdcsimhits.getFrom(particle)) {
+   *        const CDCSimHit* hit = rel.to;
+   *        //...
+   *      }
+   *
+   *  The documentation of the relation element type used by getFirstFrom()/
+   *  getFirstTo() or during the BOOST_FOREACH loop can be found in
+   *  RelationIndexContainer<FROM, TO>::Element.
+   *
+   *  Note that the BOOST_FOREACH macro must always be used with a typedef similar
+   *  to relElement_t (because of the comma between the template arguments).
+   *
+   *
+   *  \sa See RelationArray for examples on how to create new relations
+   *      between objects.
    */
   template<class FROM, class TO> class RelationIndex {
   public:
@@ -84,6 +129,9 @@ namespace Belle2 {
 
     /** Return a range of all elements pointing from the given object.
      *
+     *  Can be used with BOOST_FOREACH macro, see RelationIndex class
+     *  documentation for an example.
+     *
      *  @param   from Pointer for which to get the relation.
      *  @returns pair of iterators specifing the range [first,second) of
      *           elements which point from this object.
@@ -92,13 +140,19 @@ namespace Belle2 {
 
     /** Return a range of all elements pointing from the given object.
      *
+     *  Can be used with BOOST_FOREACH macro, see RelationIndex class
+     *  documentation for an example.
+     *
      *  @param from Reference for which to get the relation
      *  @returns Pair of iterators specifing the range [first,second) of
      *           elements which point from this object
      */
     range_from getFrom(const FROM& from) const { return m_from.equal_range(&from); }
 
-    /** Return a range of all elements pointing to the given object
+    /** Return a range of all elements pointing to the given object.
+     *
+     *  Can be used with BOOST_FOREACH macro, see RelationIndex class
+     *  documentation for an example.
      *
      *  @param to Pointer for which to get the relation
      *  @returns Pair of iterators specifing the range [first,second) of
@@ -106,7 +160,10 @@ namespace Belle2 {
      */
     range_to   getTo(const TO* to)       const { return m_to.equal_range(to);      }
 
-    /** Return a range of all elements pointing to the given object
+    /** Return a range of all elements pointing to the given object.
+     *
+     *  Can be used with BOOST_FOREACH macro, see RelationIndex class
+     *  documentation for an example.
      *
      *  @param to Reference for which to get the relation
      *  @returns Pair of iterators specifing the range [first,second) of
@@ -114,7 +171,7 @@ namespace Belle2 {
      */
     range_to   getTo(const TO& to)       const { return m_to.equal_range(&to);     }
 
-    /** Return a pointer to the first Relation Element of the given object.
+    /** Return a pointer to the first relation Element of the given object.
      *
      *  Useful if there is at most one relation
      *  @param from Reference for which to get the Relation
@@ -123,7 +180,7 @@ namespace Belle2 {
      */
     const Element* getFirstTo(const FROM& from) const { return getFirst(&from); }
 
-    /** Return a pointer to the first Relation Element of the given object.
+    /** Return a pointer to the first relation Element of the given object.
      *
      *  Useful if there is at most one relation
      *  @param from Pointer for which to get the Relation
@@ -136,7 +193,7 @@ namespace Belle2 {
       return &(*it);
     }
 
-    /** Return a pointer to the first Relation Element of the given object.
+    /** Return a pointer to the first relation Element of the given object.
      *
      *  Useful if there is at most one relation
      *  @param to Reference for which to get the Relation
@@ -145,7 +202,7 @@ namespace Belle2 {
      */
     const Element* getFirstFrom(const TO& to)   const { return getFirst(&to);   }
 
-    /** Return a pointer to the first Relation Element of the given object.
+    /** Return a pointer to the first relation Element of the given object.
      *
      *  Useful if there is at most one relation
      *  @param to Pointer for which to get the Relation

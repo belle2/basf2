@@ -35,14 +35,23 @@ namespace Belle2 {
     boost::format output("%s %|32t|| %10d | %14.3f | %14.3f\n");
     out << output % "Name" % "Calls" % "Time(s)" % "Time(ms)/Call";
     out << boost::format("%|79T-|\n");
-    for (StatisticsMap::const_iterator it = modules->begin(); it != modules->end(); ++it) {
-      const Statistics& stats = it->second;
-      out << output
-          % stats.getName()
-          % stats.getCalls(mode)
-          % stats.getTime(mode)
-          % (stats.getCalls(mode) > 0 ? (1e3 * stats.getTime(mode) / stats.getCalls(mode)) : 0);
+
+    const unsigned int numModules = modules->size();
+    for (unsigned int iModule = 0; iModule < numModules; iModule++) {
+      //find Module with ID = iModule, to list them by initialisation
+      for (StatisticsMap::const_iterator it = modules->begin(); it != modules->end(); ++it) {
+        const Statistics& stats = it->second;
+        if (stats.m_id != iModule)
+          continue;
+
+        out << output
+            % stats.getName()
+            % stats.getCalls(mode)
+            % stats.getTime(mode)
+            % (stats.getCalls(mode) > 0 ? (1e3 * stats.getTime(mode) / stats.getCalls(mode)) : 0);
+      }
     }
+
     out << boost::format("%|79T-|\n");
     out << output
         % "Total"

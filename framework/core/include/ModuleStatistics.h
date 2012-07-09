@@ -142,6 +142,9 @@ namespace Belle2 {
       /** Number of calls to functions */
       boost::array<unsigned int, c_Total> m_calls;
 
+      /** A unique ID, ordered by initialisation. */
+      unsigned int m_id;
+
       friend class ModuleStatistics;
     };
 
@@ -185,7 +188,10 @@ namespace Belle2 {
     inline void stopModule(const Module& module, ECounters mode = c_Event, bool suspend = false) {
       Statistics& stats = m_modules[&module];
       double elapsed = (Utils::getClock() - m_moduleStart) / Unit::s;
-      if (mode == c_Init && stats.m_name.empty()) { stats.m_name = module.getName();}
+      if (mode == c_Init && stats.m_name.empty()) {
+        stats.m_name = module.getName();
+        stats.m_id = m_modules.size() - 1;
+      }
       stats.m_times[mode] += elapsed;
       if (!suspend) ++stats.m_calls[mode];
     }

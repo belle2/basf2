@@ -162,7 +162,7 @@ def main():
 
     print str(totalevents) + ' events to process!'
   # FIXME - retrieve this URL automatically from DIRAC
-    print 'Now visit https://besdirac01.ihep.ac.cn/DIRAC/BELLE_Production/belle/systems/projects/overview  and select Project ' \
+    print 'Now visit https://dirac.ifj.edu.pl/DIRAC/Belle-Development/belle/systems/projects/overview  and select Project ' \
         + cliParams.getProject()
     DIRAC.exit(exitCode)
 

@@ -77,7 +77,9 @@ namespace Belle2 {
     std::vector<float> edep; /**< uncorrected energy deposition (or charge for CDC hits) */
     std::vector<int> flayer; /**< full layer id, -1..-2 for PXD -2..-6 for SVD */
     std::vector<float> phiWireTrack; /**< for PXD/SVD: angle between sensor normal and track; for CDC angle of track in x/y plane */
-    std::vector<float> wx, wy, wz; /**< hit position */
+    std::vector<float> wx; /**< hit position */
+    std::vector<float> wy; /**< hit position */
+    std::vector<float> wz; /**< hit position */
     std::vector<int> sensorUID; /**< unique sensor ID (wire ID in CDC) */
     std::vector<float> driftLength; /**< drift length in CDC (0 for other hits) */
 
@@ -93,7 +95,7 @@ namespace Belle2 {
     //these are only filled in by DedxLikelihoodModule
     float m_logl[c_Dedx_num_particles]; /**< log likelihood for each particle, not including momentum prior */
 
-    ClassDef(TrackDedx, 1);
+    ClassDef(TrackDedx, 1); /**< Build ROOT dictionary */
   };
 }
 #endif

@@ -198,7 +198,6 @@ void DedxPIDModule::event()
 
 
   //loop over all tracks
-  int track_id_for_current_event = 0;
   for (int iTrack = 0; iTrack < tracks.getEntries(); iTrack++) {
     TrackDedx track; //temporary storage for track data
 
@@ -461,15 +460,15 @@ void DedxPIDModule::event()
       track.m_event_id = m_eventID - 1;
       track.m_track_id = m_trackID - 1;
 
-      new((*dedx_array)->AddrAt(track_id_for_current_event)) TrackDedx(track);
+      dedx_array->appendNew(track);
     }
     if (likelihood_array) {
       //save likelihoods
-      new((*likelihood_array)->AddrAt(track_id_for_current_event)) DedxLikelihood(track.m_logl, track.m_p);
-      tracks_to_likelihoods->add(iTrack, track_id_for_current_event);
+      const int dedxLikelihoodIdx = likelihood_array->getEntries();
+      new((*likelihood_array)[dedxLikelihoodIdx]) DedxLikelihood(track.m_logl, track.m_p);
+      tracks_to_likelihoods->add(iTrack, dedxLikelihoodIdx);
       //TODO: add one for mcparticles?
     }
-    track_id_for_current_event++;
   } //end loop over tracks
 
   delete dedx_array;

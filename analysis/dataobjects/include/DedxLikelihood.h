@@ -110,7 +110,7 @@ namespace Belle2 {
 
     static TH1F** s_momentumPrior; /**< prior distributions for the momentum, an array with c_Dedx_num_particles elements */
 
-    ClassDef(DedxLikelihood, 1);
+    ClassDef(DedxLikelihood, 1); /**< Build ROOT dictionary */
   };
   /*! @} */
 }

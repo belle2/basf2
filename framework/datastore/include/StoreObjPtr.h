@@ -17,20 +17,65 @@
 
 namespace Belle2 {
 
-  /** Type safe access pointer.
+  /** Type safe access to single objects in the data store.
    *
-   *  Use this, if you want to access or create a single object in the store.
+   *  This class provides access to single (i.e. non-array) objects
+   *  in the data store, identified by their name and durability.
+   *
+   *  <h1>Accessing existing objects</h1>
+   *  This example creates a new StoreObjPtr for the EventMetaData object,
+   *  using the default name (EventMetaData) and default durability (event).
+   *  \code
+  StoreObjPtr<EventMetaData> eventmetadata;
+  B2INFO("we're currently in event " << eventmetadata->getEvent() << "!");
+      \endcode
+   *  If no object 'EventMetaData' is found in the data store, a new one
+   *  will be created. This can be avoided by setting the generate parameter
+   *  of the constructor to false:
+   *  \code
+  StoreObjPtr<EventMetaData> checkObj("", DataStore::c_Event, false);
+  if(!checkObj) {
+    B2INFO("an object called '" << checkObj.getName() << "' does not exist in the data store.");
+  } else {
+    //object exists, you can now access its data
+  }
+      \endcode
+   *
+   *  <h1>Storing objects</h1>
+   *  Storing objects works in the same way as the first example:
+   *  \code
+  //store a single cdchit
+  StoreObjPtr<CDCHit> cdchit;
+  cdchit->setCharge(5.0);
+      \endcode
+   *  As in the very first example above, StoreObjPtr will create a new object
+   *  and add it to the data store (unless an object was found already).
+   *
+   *  Note that if you want to create a new object in a module, you should
+   *  create an object of type StoreObjPtr<T> in your implementation of
+   *  Module::initialize(). This registers the array in the data store and
+   *  lets other modules know you intend to fill it.
+   *
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreObjPtr">The basf2 developers</a>
+   *  @sa If you want to store more than a single object of one type, use the StoreArray class.
    */
   template <class T> class StoreObjPtr : StoreAccessorBase {
   public:
     /** Constructor with assignment.
      *
-     *  This constructor calls the assignObject function.
+     *  Note that if generate is set to false, the created StoreObjPtr may be
+     *  invalid if no object was found in the data store. Use operator bool()
+     *  before trying to access the object's data.
+     *
+     *  In case the object in the data store is incompatible with the type T,
+     *  the program will abort. Accessing a stored object through a StoreObjPtr
+     *  of a base class T will work. (Don't try to store them like that, though.)
+     *
      *  @param name       Name under which the object to be hold by this pointer is stored.
+     *                    If an empty string is supplied, the type name will be used.
      *  @param durability Decides durability map used for getting or creating the accessed object.
      *  @param generate   Shall an object in the DataStore be created, if none exists with given name and durability?
-     *  @sa assignObject
+     *  @sa assignObject()
      */
     explicit StoreObjPtr(const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event, bool generate = true) {
       assignObject(name, durability, generate);
@@ -41,25 +86,9 @@ namespace Belle2 {
      *  No new objects are created when using this constructor.
      *  @param accessorParams   A pair with name and durability.
      */
-    StoreObjPtr(AccessorParams accessorParams) {
+    explicit StoreObjPtr(AccessorParams accessorParams) {
       assignObject(accessorParams.first, accessorParams.second, false);
     }
-
-    /** Constructor, no assignment.
-     *
-     *  The default constructor already assigns the TObject pointer. Since the
-     *  RelationArray needs to determine the name first and do some logic, we
-     *  need a constructor which does not do anything. Therefore this
-     *  constructor takes an int as argument to distuingish it from the default
-     *  constructor. DO NOT DELETE AGAIN.
-     *
-     *  This contructor doesn't request a name. You can later assign an object to it, if you like.
-     *
-     *  The argument is ignored but required to distuingish
-     *  between the default constructor and this one
-     */
-    explicit StoreObjPtr(int /*dummy*/)
-      : m_storeObjPtr(0), m_name(""), m_durability(DataStore::c_Event) {}
 
     /** Virtual destructor for inherited classes */
     virtual ~StoreObjPtr() {}
@@ -79,6 +108,22 @@ namespace Belle2 {
     }
 
   protected:
+    /** Constructor, no assignment.
+     *
+     *  The default constructor already assigns the TObject pointer. Since the
+     *  RelationArray needs to determine the name first and do some logic, we
+     *  need a constructor which does not do anything. Therefore this
+     *  constructor takes an int as argument to distuingish it from the default
+     *  constructor. DO NOT DELETE AGAIN.
+     *
+     *  This contructor doesn't request a name. You can later assign an object to it, if you like.
+     *
+     *  The argument is ignored but required to distuingish
+     *  between the default constructor and this one
+     */
+    explicit StoreObjPtr(int /*dummy*/)
+      : m_storeObjPtr(0), m_name(""), m_durability(DataStore::c_Event) {}
+
 
     /** Assigning an object to the pointer.
      *
@@ -88,6 +133,7 @@ namespace Belle2 {
      *  If there is already a slot registered in the DataStore under the given name and durability, this slot is used. If the slot is
      *  occupied by an object of different type than the template class of StoreObjPtr, a B2FATAL error message is produced.
      *  If the slot isn't occupied so far by an object, you can create a new one.
+     *
      *  @return           Was a new object generated?
      *  @param name       Name under which the object to be assigned is stored. An empty string is treated as name equal to the template class name.
      *  @param durability Decides durability map used for getting or creating the accessed object.
@@ -95,31 +141,32 @@ namespace Belle2 {
      *                    For this purpose the default constructor of the template class is used and the created object assigned
      *                    to the StoreObjPtr.
      */
-    bool assignObject(const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event, bool generate = false);
+    bool assignObject(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event, bool generate = false);
 
     /** Store existing object.
      *
-     *  Instead of creating a new object, you can store an object, that already exists.
+     *  Instead of creating a new object, you can store an object that already exists.
      *  @return           True, if object was stored successfully. This might not be the case, if the requested slot is already occupied.
+     *  @param AObject    Object to add to the data store.
      *  @param name       Name under which the object shall be stored.
      *  @param durability Decides durability map used to store the object.
      */
-    bool storeObject(T* const AObject, const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event);
+    bool storeObject(T* const AObject, const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event);
 
     /** Store of actual pointer. */
     T* m_storeObjPtr;
 
-    /** Store name under which object is saved. */
+    /** name under which object is saved. */
     std::string m_name;
 
-    /**Store durability under which the TClonesArray is saved. */
+    /**durability under which the object is saved. */
     DataStore::EDurability m_durability;
   };
 } // end namespace Belle2
 
 
 // ------------ Implementation of template class -----------------------------------------------------------
-template <class T> bool Belle2::StoreObjPtr<T>::assignObject(const std::string& name, const Belle2::DataStore::EDurability& durability, bool generate)
+template <class T> bool Belle2::StoreObjPtr<T>::assignObject(const std::string& name, Belle2::DataStore::EDurability durability, bool generate)
 {
   if (name == "") {
     m_name = DataStore::defaultObjectName<T>();
@@ -133,7 +180,7 @@ template <class T> bool Belle2::StoreObjPtr<T>::assignObject(const std::string& 
   return DataStore::Instance().handleObject<T>(m_name, durability, generate, m_storeObjPtr);
 }
 
-template <class T> bool Belle2::StoreObjPtr<T>::storeObject(T* const AObject, const std::string& name, const DataStore::EDurability& durability)
+template <class T> bool Belle2::StoreObjPtr<T>::storeObject(T* const AObject, const std::string& name, DataStore::EDurability durability)
 {
   if (name == "") {
     m_name = DataStore::defaultObjectName<T>();

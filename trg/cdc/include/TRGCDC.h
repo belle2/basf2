@@ -451,6 +451,7 @@ class TRGCDC {
     TTree* m_tree;
     TClonesArray* m_fitParameters;
     TClonesArray* m_mcParameters;
+    TVectorD* m_multiplicity;
 
     friend class TRGCDCModule;
 };

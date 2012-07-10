@@ -406,6 +406,8 @@ namespace Belle2 {
 
       //...Loop over track list...
       const unsigned nInput = trackListIn.size();
+      // Index for number of successful fits
+      int iFit=0;
       
       for (unsigned iInput = 0; iInput < nInput; iInput++) {
         double phi[9]={0,0,0,0,0,0,0,0,0};
@@ -515,11 +517,11 @@ namespace Belle2 {
             }
           }
           // Save the candidates
-          new(stTSsTrackFitter3D[iInput]) TVectorD(stTSs);
+          new(stTSsTrackFitter3D[iFit]) TVectorD(stTSs);
 
           // Save track segment information
           TVectorD tempPhi(9,phi2);
-          new(tSTrackFitter3D[iInput]) TVectorD(tempPhi);
+          new(tSTrackFitter3D[iFit]) TVectorD(tempPhi);
 
           // Sign Finder
           int mysign = findSign(phi2);
@@ -631,7 +633,7 @@ namespace Belle2 {
             tempSz[i] = arcS[i];
             tempSz[i+4] = zz[i];
           }
-          new(szTrackFitter3D[iInput]) TVectorD(tempSz);
+          new(szTrackFitter3D[iFit]) TVectorD(tempSz);
 
           // RZ Fit
           if(m_flagRealInt == 1){
@@ -706,7 +708,7 @@ namespace Belle2 {
           tempFit[2]=z0*100;
           tempFit[3]=cot;
           tempFit[4]=mysign;
-          new(fitTrackFitter3D[iInput]) TVectorD(tempFit);
+          new(fitTrackFitter3D[iFit]) TVectorD(tempFit);
 
           TVectorD tempMC(5);
           tempMC[0] = mcPt;
@@ -714,14 +716,16 @@ namespace Belle2 {
           tempMC[2] = mcZ0*100;
           tempMC[3] = mcCot;
           tempMC[4] = mcCharge;
-          new(mcTrackFitter3D[iInput]) TVectorD(tempMC);
+          new(mcTrackFitter3D[iFit]) TVectorD(tempMC);
 
           //          cout << "tsimz0/"  << z0*100 <<"]"<<endl;
           //          cout << "tsimpt/"  << pt <<"]"<<endl;
           //          cout << "tsimth/"  << ztheta <<"]"<<endl;
           //          cout << "tsimpi/" << myphi0*180/m_Trg_PI*3.2/intnum3 << "]" << endl;
 
-      }
+          iFit += 1;
+
+      } // end of chk
 
       // Set Helix parameters
       TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0));
@@ -739,20 +743,14 @@ namespace Belle2 {
       helix.a(a);
       t.setHelix(helix);
 
+      // Fill track list
+      trackListOut.push_back(&t);
+
+      } // End trackList loop 
 
       m_treeTrackFitter3D->Fill();
 
-      trackListOut.push_back(&t);
-
-      // Fill track list
-      
-
-      //trackListOut.push_back(&aTrack);
-      
       //...Termination...
-
-        }  
-
       TRGDebug::leaveStage("Fitter 3D");
       return 0;
     }

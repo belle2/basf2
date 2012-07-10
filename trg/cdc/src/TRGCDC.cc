@@ -416,8 +416,10 @@ TRGCDC::initialize(bool houghFinderPerfect,
     m_tree = new TTree("m_tree","tree");
     m_fitParameters = new TClonesArray("TVectorD");
     m_mcParameters = new TClonesArray("TVectorD");
+    m_multiplicity = new TVectorD(2);
     m_tree->Branch("fitParameters", &m_fitParameters);
     m_tree->Branch("mcParameters", &m_mcParameters);
+    m_tree->Branch("multiplicity", &m_multiplicity);
 
 }
 
@@ -725,8 +727,7 @@ TRGCDC::update(bool ) {
         //...Drift legnth(micron) to drift time(ns)...
         //   coefficient used here must be re-calculated.
         const float driftTimeMC =
-	    SimHits[iSimHit]->getDriftLength() * 10 * 1000 / 40 +
-	    SimHits[iSimHit]->getFlightTime();
+	    SimHits[iSimHit]->getDriftLength() * 10 * 1000 / 40;
 
 	//cout << " -2 driftTimeMC=" << driftTimeMC << endl;
 
@@ -772,17 +773,6 @@ TRGCDC::update(bool ) {
 	StoreArray<CDCSimHit> simHits("CDCSimHits");
         cout << TRGDebug::tab() << "#CDCSimHit=" << n << ",#CDCHit=" << nHits
 	     << endl;
-
-	_clock.dump("detail", TRGDebug::tab());
-	_clockFE.dump("detail", TRGDebug::tab());
-
-	const unsigned n = 10;
-        cout << TRGDebug::tab() << "Dump of the first " << n
-	     << " hits of a wire" << endl;
-	for (unsigned i = 0; i < n; i++) {
-	    const TCWHit & h = * _hits[i];
-	    h.dump("detail", TRGDebug::tab(4));
-	}
     }
 
     TRGDebug::leaveStage("TRGCDC update");
@@ -1208,7 +1198,7 @@ TRGCDC::simulate(void) {
         s.simulate();
         if (s.timing().active()) {
 
-	     //...Create TCSHit...
+	     //...Create TCShit...
 	     unsigned j = 0;
 	     const TCWire * w = s[j];
 	     TCSHit * th = 0;
@@ -1336,11 +1326,20 @@ TRGCDC::simulate(void) {
 //         D->run();
 //     }
 #endif
-    
+
     //...Fill root file...
+    //...MCParticle...
+    StoreArray<MCParticle> mcParticles;
+    if (! mcParticles) {
+        cout << "TRGCDC !!! can not access to MCParticles" << endl;
+        TRGDebug::leaveStage("TRGCDC update");
+        return;
+    }
     TClonesArray &fitParameters = *m_fitParameters;
     TClonesArray &mcParameters = *m_mcParameters;
+    TVectorD &multiplicity = *m_multiplicity;
     fitParameters.Clear();
+    int iFit=0;
     for(unsigned i=0; i<trackList3D.size(); i++){
       const TCTrack &aTrack = *trackList3D[i];
       if (aTrack.fitted()) {
@@ -1356,7 +1355,7 @@ TRGCDC::simulate(void) {
         tempFitParameters[1] = fitPhi0;
         tempFitParameters[2] = fitZ0;
         tempFitParameters[3] = fitCot;
-        new(fitParameters[i]) TVectorD(tempFitParameters);
+        new(fitParameters[iFit]) TVectorD(tempFitParameters);
 
         const TCRelation &trackRelation = aTrack.relation();
         const MCParticle &trackMCParticle = trackRelation.mcParticle(0);
@@ -1373,12 +1372,27 @@ TRGCDC::simulate(void) {
         tempFitParameters[1] = mcPhi0;
         tempFitParameters[2] = mcZ0;
         tempFitParameters[3] = mcCot;
-        new(mcParameters[i]) TVectorD(tempFitParameters);
+        new(mcParameters[iFit]) TVectorD(tempFitParameters);
+        iFit += 1;
+      } // if fitted
+    } // trackList loop
+
+    // Find MC multiplicity
+    int nFinalParticles=0;
+    for(signed i=0; i<mcParticles.getEntries(); i++) {
+      if(mcParticles[i]->getDaughters().size() == 0) {
+        if(mcParticles[i]->getCharge() != 0) {
+          nFinalParticles += 1;
+          //cout<<"Final Part PDG: "<<mcParticles[i]->getPDG()<<endl;
+        }
       }
     }
+    multiplicity[0] = nFinalParticles;
+    multiplicity[1] = iFit;
+    multiplicity[1] = trackList3D.size();
+
+
     m_tree->Fill();
-
-
     
     TRGDebug::leaveStage("TRGCDC simulation");
     return;

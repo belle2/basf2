@@ -49,6 +49,7 @@ class TRGCDCHoughFinder;
 class TRGCDCFitter3D;
 class TRGCDCLUT;
 class TRGCDCTrack;
+class TRGCDCEventTime;
 
 ///  The instance of TRGCDC is a singleton. 'TRGCDC::getTRGCDC()'
 ///  gives you a pointer to access the TRGCDC. Geometrical information
@@ -443,6 +444,9 @@ class TRGCDC {
     /// 3D fitter.
     TRGCDCFitter3D * _fitter3D;
 
+    /// EventTime
+    TRGCDCEventTime * _eventTime;
+
     /// LUT holder.
     std::vector<TRGCDCLUT *> _luts;
 
@@ -452,6 +456,7 @@ class TRGCDC {
     TClonesArray* m_fitParameters;
     TClonesArray* m_mcParameters;
     TVectorD* m_multiplicity;
+    TClonesArray* m_evtTime;
 
     friend class TRGCDCModule;
 };

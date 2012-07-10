@@ -17,15 +17,15 @@ namespace Belle2 {
    * name and event.
    *
    * Example (Loop over MCParticles and find corresponding PXDSimHits):
-   * \verbatim
-   *   mcpart_to_pxdhits = Belle2.PyRelationArray('MCParticlesToPXDSimHits')
-   *   #...
-   *   for mcpart_index in range(num_mcparticles):
-   *     pxdhits_for_current_particle = mcpart_to_pxdhits.getToIndices(mcpart_index)
-   *     for hit_index in pxdhits_for_current_particle:
-   *       hit = pxdhits[hit_index]
-   *       #do something with hit
-   * \endverbatim
+     \code{.py}
+  mcpart_to_pxdhits = Belle2.PyRelationArray('MCParticlesToPXDSimHits')
+  #...
+  for mcpart_index in range(num_mcparticles):
+  pxdhits_for_current_particle = mcpart_to_pxdhits.getToIndices(mcpart_index)
+  for hit_index in pxdhits_for_current_particle:
+    hit = pxdhits[hit_index]
+    #do something with hit
+     \endcode
    */
   class PyRelationArray : public TObject {
   public:

@@ -90,7 +90,7 @@ namespace Belle2 {
        * if the parameter is empty or does not exist, the defaultvalue will be
        * returned.
        * @param path path of the parameter to get
-       * @param defaultvalue value to return if the path es empty or does not exist
+       * @param defaultValue value to return if the path es empty or does not exist
        * @return value of the parameter
        */
       std::string getString(const std::string& path, const std::string& defaultValue) const;
@@ -164,7 +164,6 @@ namespace Belle2 {
        * @exception gearbox::PathEmptyError if path is empty or does not exist
        * @exception gearbox::ConversionError if the value could not converted to a numerical type
        * @param path Path of the parameter to get
-       * @param unittype type of the unit, eg. length, angle or energy
        * @return value of the parameter
        */
       double getWithUnit(const std::string& path) const throw(PathEmptyError, ConversionError);
@@ -182,7 +181,6 @@ namespace Belle2 {
        *
        * @exception gearbox::ConversionError if the value could not converted to a numerical type
        * @param path Path of the parameter to get
-       * @param unittype type of the unit, eg. length, angle or energy
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
@@ -202,7 +200,6 @@ namespace Belle2 {
        * @exception gearbox::PathEmptyError if path is empty or does not exist
        * @exception gearbox::ConversionError if the value could not converted to a numerical type
        * @param path Path of the parameter to get
-       * @param unittype type of the unit, eg. length, angle or energy
        * @return value of the parameter
        */
 
@@ -224,7 +221,6 @@ namespace Belle2 {
        *
        * @exception gearbox::ConversionError if the value could not converted to a numerical type
        * @param path Path of the parameter to get
-       * @param unittype type of the unit, eg. length, angle or energy
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */

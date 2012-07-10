@@ -58,7 +58,7 @@ namespace Belle2 {
     /**
      * Set the debug messaging level.
      *
-     * @param debugLevel The debug level
+     * @param level The debug level
      */
     void setDebugLevel(int level);
 
@@ -66,7 +66,7 @@ namespace Belle2 {
      * Set the printed log information for the given level.
      *
      * @param level The log level
-     * @param lnfo The log information that should be printed
+     * @param info The log information that should be printed
      */
     void setLogInfo(LogConfig::ELogLevel level, int info);
 

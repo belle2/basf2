@@ -43,10 +43,10 @@ namespace Belle2 {
    * if the user requests it.
    *
    * The creation of a new module instance works as following:
-   * 1) The user requests a new module by calling the method registerModule() with the module name given as a parameter.</br>
+   * 1) The user requests a new module by calling the method registerModule() with the module name given as a parameter.<br>
    * 2) The ModuleManager checks if a proxy class was already registered for the given module name. If yes, the proxy creates
    * a new module instance. Otherwise the modules known to the manager are searched for the given module name. If the
-   * module is known to the module manager the associated shared library is dynamically loaded.</br>
+   * module is known to the module manager the associated shared library is dynamically loaded.
    *
    * This class is designed as a singleton.
    */
@@ -108,13 +108,13 @@ namespace Belle2 {
      * library file. The found shared library is dynamically loaded and the module proxy registered.
      * Using the proxy an instance of the module is created and returned.
      *
-     * The search order is as following:</br>
-     * 1) First the method checks if a proxy associated with the module name was already registered</br>
-     * 2) If not, the method checks if a shared library path was given and tries to load the module from that shared library</br>
-     * 3) If not, the method searches for the module name in the map of known modules due to the given search paths</br>
+     * The search order is as following:<br>
+     * 1) First the method checks if a proxy associated with the module name was already registered<br>
+     * 2) If not, the method checks if a shared library path was given and tries to load the module from that shared library<br>
+     * 3) If not, the method searches for the module name in the map of known modules due to the given search paths<br>
      *
      * @param moduleName The unique name of the Module which should be created.
-     * @param sharedLibPath Optional: The shared library from which the module should be registered (not a map file !).
+     * @param sharedLibPath Optional: The shared library from which the module should be registered (not a map file!).
      * @return A shared pointer to the created module instance.
      */
     boost::shared_ptr<Module> registerModule(const std::string& moduleName, const std::string& sharedLibPath = "") throw(ModuleNotCreatedError);

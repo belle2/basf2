@@ -28,21 +28,21 @@ namespace Belle2 {
    *  documentation of RelationIndex for a more convenient way of finding and
    *  accessing relations.
    *
-   *  Creating new relations
-   *  ======================
-   *
+   *  <h1>Creating new relations</h1>
    *  Assuming you have two StoreArrays called 'particles' and 'cdcsimhits',
    *  you can use RelationArray to create relations between entries:
    *
-   *      RelationArray particlesToCdchits(particles, cdcsimhits);
-   *      for(int iPart = 0; iPart < particles.getEntries(); iPart++) {
-   *        //... create new hit 'myhit'
-   *        cdcsimhits.appendNew(myhit);
-   *        int cdcsimhitIdx = getEntries()-1; //index of last object stored
-   *
-   *        //connect objects at indices iPart and cdcsimhitIdx
-   *        particlesToCdchits.add(iPart, cdcsimhitIdx);
-   *      }
+   *  \code
+  RelationArray particlesToCdchits(particles, cdcsimhits);
+  for(int iPart = 0; iPart < particles.getEntries(); iPart++) {
+    //... create new hit 'myhit'
+    cdcsimhits.appendNew(myhit);
+    int cdcsimhitIdx = getEntries()-1; //index of last object stored
+
+    //connect objects at indices iPart and cdcsimhitIdx
+    particlesToCdchits.add(iPart, cdcsimhitIdx);
+  }
+      \endcode
    *
    *  This example loops over the 'particles' array and might for example
    *  simulate the particles' interaction with the detector. New hits are

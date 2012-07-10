@@ -32,6 +32,8 @@ namespace Belle2 {
      * The constructor.
      *
      * @param outputStream The output stream.
+     * @param color Wether to print messages of different log levels
+     *              in different colors.
      */
     LogConnectionIOStream(std::ostream& outputStream, bool color = false);
 

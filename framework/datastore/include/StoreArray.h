@@ -31,42 +31,43 @@ namespace Belle2 {
    *  lifetime of one event.
    *
    *
-   *  Accessing elements of an existing array
-   *  =======================================
-   *
+   *  <h1>Accessing elements of an existing array</h1>
    *  Stored objects can be accessed directly using their array index and
    *  operator[]. For example, the following code snippet loops over all
    *  entries in an array of CDCSimHits:
    *
-   *      StoreArray<CDCSimHit> cdcsimhits;
-   *      //loop over all CDC simhits
-   *      for(int iCDC = 0; iCDC < cdcsimhits.getEntries(); iCDC++) {
-   *        const CDCSimHit* hit = cdcsimhits[iCDC]; //get iCDC'th entry in StoreArray
-   *        // Use hit's data here...
-   *      }
+      \code
+  StoreArray<CDCSimHit> cdcsimhits;
+  //loop over all CDC simhits
+  for(int iCDC = 0; iCDC < cdcsimhits.getEntries(); iCDC++) {
+    const CDCSimHit* hit = cdcsimhits[iCDC]; //get iCDC'th entry in StoreArray
+    // Use hit's data here...
+  }
+      \endcode
    *
    *  Objects linked together using relations can also be obtained through
    *  the RelationIndex class. (See class documentation for usage examples.)
    *
    *
-   *  Adding elements
-   *  ===============
-   *
+   *  <h1>Adding elements</h1>
    *  Elements can be added to the array in a few ways. The easiest is to use
    *  something like:
    *
-   *      StoreArray<CDCSimHit> cdcsimhits;
-   *      //...
-   *      CDCSimHit* newhit = cdcsimhits.appendNew();
-   *      //fill newhit with data here...
+      \code
+  StoreArray<CDCSimHit> cdcsimhits;
+  //...
+  CDCSimHit* newhit = cdcsimhits.appendNew();
+  //fill newhit with data here...
+      \endcode
    *
    *  alternatively, you can copy an existing object into the array using
    *  appendNew(const T& obj) instead.
    *  If performance is especially important, you can also create a new object
    *  using 'placement-new':
-   *
-   *      new (cdcsimhits[cdcsimhits.getEntries()]) CDCSimHit(some ctor arguments);
-   *
+   *  \code
+  new (cdcsimhits[cdcsimhits.getEntries()]) CDCSimHit(some ctor arguments);
+      \endcode
+
    *  This creates a new CDCSimHit at the end of the array and allows
    *  you to fill its data members using a custom constructor.
    *
@@ -77,12 +78,9 @@ namespace Belle2 {
    *  lets other modules know you intend to fill it.
    *
    *
-   *  Internals
-   *  =========
-   *
-   *  Internally, the arrays are stored as TClonesArrays, see the
-   *  [ROOT documentation on TClonesArray](http://root.cern.ch/root/html/TClonesArray.html)
-   *  for technical details.
+   *  <h1>Internals</h1>
+   *  Internally, the arrays are stored as TClonesArrays, see
+   *  http://root.cern.ch/root/html/TClonesArray.html for technical details.
    *
    *  @sa objects in different arrays can be linked using relations, see
    *      RelationArray or RelationIndex.
@@ -142,9 +140,9 @@ namespace Belle2 {
     /** Access to the stored objects.
      *
      *  To add an element to the array, use:
-     *
-     *      new (myStoreArray[myStoreArray.getEntries()]) T(some ctor arguments);
-     *
+     *  \code
+    new (myStoreArray[myStoreArray.getEntries()]) T(some ctor arguments);
+        \endcode
      *  which constructs a new T object at the end of myStoreArray.
      *
      *  If you only want to use T's default or copy constructor, use the safer

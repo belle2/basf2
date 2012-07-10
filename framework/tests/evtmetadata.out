@@ -1,0 +1,12 @@
+[INFO] Steering file: evtmetadata.py
+>>> basf2 Python environment set
+>>> Framework object created: fw
+[INFO] event	run	exp
+[INFO] 0	1	0
+[INFO] 1	1	0
+[INFO] 0	3	2
+[INFO] 1	3	2
+[INFO] 2	3	2
+[INFO] 3	3	2
+[WARNING] Event processing stopped by non-master module EvtMetaDataTest
+[INFO] terminating EvtMetaDataTest

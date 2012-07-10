@@ -28,7 +28,7 @@ namespace Belle2 {
 
     /** Constructor.
      *
-     *  Initilises meta data of event with Nulls.
+     *  Initialises meta data of event with Nulls.
      */
     EventMetaData(unsigned long event = 0, unsigned long run = 0, unsigned long experiment = 0)
       : m_event(event), m_run(run), m_experiment(experiment), m_parent_index(-1), m_generated_weight(1) {}
@@ -61,6 +61,9 @@ namespace Belle2 {
     }
 
     /** Marks the end of the data processing.
+     *
+     * Can be used by non-master modules to halt event processing.
+     *
      * Sets the values for the experiment, run and event to
      * values indicating the end of data.
      */

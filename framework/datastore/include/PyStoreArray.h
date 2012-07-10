@@ -14,6 +14,9 @@ namespace Belle2 {
   *
   * You can check the runtime type information of the returned objects by
   * using Python's built-in type() function.
+  *
+  * \note While it is not possible to add objects/arrays to the data store, you
+  *       can modify the contents of existing ones.
   */
   class PyStoreArray : public TObject {
   public:
@@ -21,7 +24,7 @@ namespace Belle2 {
     * @param name Name of the branch to be read/saved
     * @param durability 0: event, 1: run, 2: persistent
     */
-    explicit PyStoreArray(const std::string& name = "", int durability = 0):
+    explicit PyStoreArray(const std::string& name, int durability = 0):
       TObject(),
       m_storearray(name, DataStore::EDurability(durability)) { }
 

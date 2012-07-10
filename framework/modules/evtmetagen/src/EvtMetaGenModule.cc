@@ -86,7 +86,7 @@ void EvtMetaGenModule::event()
 
     if (m_colIndex < static_cast<int>(m_expList.size())) {
       m_evtNumber = 0;
-    } else {
+    } else { //no experiment/run with non-zero number of events found
       return;
     }
   }

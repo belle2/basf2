@@ -53,10 +53,9 @@ namespace Belle2 {
      *
      * Based on the parameters set by the user the current event meta data
      * is calculated (event number, run number, experiment number) and stored
-     * into the event part of the DataStore. If a new run is started the
-     * endRun process type followed by the beginRun process type is returned.
-     * Once the end of the processing is reached, the end of data process type
-     * is returned.
+     * into the event part of the DataStore.
+     *
+     * No object is created when the end of of processing is reached.
      */
     virtual void event();
 

@@ -81,6 +81,18 @@ namespace Belle2 {
       assignObject(name, durability, generate);
     }
 
+    /** Constructor for storing an existing object.
+     *
+     *  @param AObject    Object that is to be saved in the data store.
+     *  @param name       Name under which the object to be hold by this pointer is stored.
+     *                    If an empty string is supplied, the type name will be used.
+     *  @param durability Decides durability map used for getting or creating the accessed object.
+     *  @sa assignObject()
+     */
+    explicit StoreObjPtr(T* const AObject, const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event) {
+      assignObject(name, durability, true, AObject);
+    }
+
     /** Constructor for usage with Relations etc.
      *
      *  No new objects are created when using this constructor.
@@ -134,24 +146,16 @@ namespace Belle2 {
      *  occupied by an object of different type than the template class of StoreObjPtr, a B2FATAL error message is produced.
      *  If the slot isn't occupied so far by an object, you can create a new one.
      *
-     *  @return           Was a new object generated?
      *  @param name       Name under which the object to be assigned is stored. An empty string is treated as name equal to the template class name.
      *  @param durability Decides durability map used for getting or creating the accessed object.
      *  @param generate   Shall an object in the DataStore be created, if none occupies the slot with given name and durability?
      *                    For this purpose the default constructor of the template class is used and the created object assigned
      *                    to the StoreObjPtr.
+     *  @param AObject    Object to add to the data store, NULL to connect to object
+     *                    existing in the data store or for creation of new object.
+     *  @return           Was a new object generated?
      */
-    bool assignObject(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event, bool generate = false);
-
-    /** Store existing object.
-     *
-     *  Instead of creating a new object, you can store an object that already exists.
-     *  @return           True, if object was stored successfully. This might not be the case, if the requested slot is already occupied.
-     *  @param AObject    Object to add to the data store.
-     *  @param name       Name under which the object shall be stored.
-     *  @param durability Decides durability map used to store the object.
-     */
-    bool storeObject(T* const AObject, const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event);
+    bool assignObject(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event, bool generate = false, T* const AObject = 0);
 
     /** Store of actual pointer. */
     T* m_storeObjPtr;
@@ -166,21 +170,7 @@ namespace Belle2 {
 
 
 // ------------ Implementation of template class -----------------------------------------------------------
-template <class T> bool Belle2::StoreObjPtr<T>::assignObject(const std::string& name, Belle2::DataStore::EDurability durability, bool generate)
-{
-  if (name == "") {
-    m_name = DataStore::defaultObjectName<T>();
-  } else {
-    m_name = name;
-  }
-  m_durability = durability;
-  m_storeObjPtr = 0;
-
-  B2DEBUG(250, "Calling DataStore from StoreObjPtr." << name);
-  return DataStore::Instance().handleObject<T>(m_name, durability, generate, m_storeObjPtr);
-}
-
-template <class T> bool Belle2::StoreObjPtr<T>::storeObject(T* const AObject, const std::string& name, DataStore::EDurability durability)
+template <class T> bool Belle2::StoreObjPtr<T>::assignObject(const std::string& name, Belle2::DataStore::EDurability durability, bool generate, T* const AObject)
 {
   if (name == "") {
     m_name = DataStore::defaultObjectName<T>();
@@ -190,8 +180,8 @@ template <class T> bool Belle2::StoreObjPtr<T>::storeObject(T* const AObject, co
   m_durability = durability;
   m_storeObjPtr = AObject;
 
-  B2DEBUG(250, "Calling DataStore from StoreObjPtr.");
-  return DataStore::Instance().handleObject<T>(m_name, durability, true, m_storeObjPtr);
+  B2DEBUG(250, "Calling DataStore from StoreObjPtr." << name);
+  return DataStore::Instance().handleObject<T>(m_name, durability, generate, m_storeObjPtr);
 }
 
 #endif

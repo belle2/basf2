@@ -143,6 +143,7 @@ void TrackFitCheckerModule::initialize()
     registerTrackWiseData("absMomVertex");
     registerTrackWiseData("res_curvVertex");
     registerTrackWiseData("relRes_curvVertex");
+    registerTrackWiseData("relRes_p_T");
 
   } else {
     m_rootFilePtr = NULL;
@@ -172,40 +173,41 @@ void TrackFitCheckerModule::initialize()
   //int measDim = 2;
 
   // pulls (z) of cartesian coordinates at vertex
-  registerTrackWiseVecData("zs_vertexPosMom", vecDataSize);
+  registerTrackWiseVecData("pulls_vertexPosMom", vecDataSize);
   // residuals of Cartesian coordinates at vertex
   registerTrackWiseVecData("res_vertexPosMom", vecDataSize);
 
   // pulls (z) of cartesian 7D coordinates at vertex
-  registerTrackWiseVecData("zs_vertexState", 7);
+  //registerTrackWiseVecData("pulls_vertexState", 7);
   // residuals of cartesian 7D coordinates at vertex
-  registerTrackWiseVecData("res_vertexState", 7);
+//  registerTrackWiseVecData("res_vertexState", 7);
 
   // pulls (z) and chi2s for the 5 track parameters in every layer using truth info
-  registerLayerWiseData("zs_and_chi2_fp_t", vecSizeTruthTest);
-  registerLayerWiseData("zs_and_chi2_fu_t", vecSizeTruthTest);
-  registerLayerWiseData("zs_and_chi2_bp_t", vecSizeTruthTest);
-  registerLayerWiseData("zs_and_chi2_bu_t", vecSizeTruthTest);
-  registerLayerWiseData("zs_and_chi2_sm_t", vecSizeTruthTest);
+  registerLayerWiseData("pulls_and_chi2_fp_t", vecSizeTruthTest);
+  registerLayerWiseData("pulls_and_chi2_fu_t", vecSizeTruthTest);
+  registerLayerWiseData("pulls_and_chi2_bp_t", vecSizeTruthTest);
+  registerLayerWiseData("pulls_and_chi2_bu_t", vecSizeTruthTest);
+  registerLayerWiseData("pulls_and_chi2_sm_t", vecSizeTruthTest);
   // pulls (z) and chi2s for the 5 track parameters in every layer using the projection onto the measurement m-Hx
-  registerLayerWiseData("zs_and_chi2_fp", vecSizeMeasTest);
-  registerLayerWiseData("zs_and_chi2_fu", vecSizeMeasTest);
-  registerLayerWiseData("zs_and_chi2_bp", vecSizeMeasTest);
-  registerLayerWiseData("zs_and_chi2_bu", vecSizeMeasTest);
-  registerLayerWiseData("zs_and_chi2_sm", vecSizeMeasTest);
+  registerLayerWiseData("pulls_and_chi2_fp", vecSizeMeasTest);
+  registerLayerWiseData("pulls_and_chi2_fu", vecSizeMeasTest);
+  registerLayerWiseData("pulls_and_chi2_bp", vecSizeMeasTest);
+  registerLayerWiseData("pulls_and_chi2_bu", vecSizeMeasTest);
+  registerLayerWiseData("pulls_and_chi2_sm", vecSizeMeasTest);
 
   // pulls and chi2 to test consistency of normal distribution model of measurements and the sigma of the digitizer with the sigma of the recoHits
-  registerLayerWiseData("zs_and_chi2_meas_t", vecSizeMeasTest);
+  registerLayerWiseData("pulls_and_chi2_meas_t", vecSizeMeasTest);
+  registerLayerWiseData("res_meas_t", 2);
 
   registerLayerWiseData("DAF_weights", 5); // at the moment only tracks with no noise
   registerLayerWiseData("DAF_chi2s", 5);
   //registerLayerWiseData("DAF_weights_BG", 3);
 
   if (m_robust == true) { //set the scaling factors for the MAD. No MAD will be caclulated when
-    m_madScalingFactors["zs_vertexPosMom"] = 1.4826; //scaling factor for normal distribute variables
+    m_madScalingFactors["pulls_vertexPosMom"] = 1.4826; //scaling factor for normal distribute variables
     m_madScalingFactors["absMomVertex"] = 1.4826;
     m_madScalingFactors["res_vertexPosMom"] = 1.4826;
-    m_madScalingFactors["zs_vertexPosMom"] = 1.4826;
+    m_madScalingFactors["pulls_vertexPosMom"] = 1.4826;
     m_madScalingFactors["res_curvVertex"] = 1.4826;
     m_madScalingFactors["relRes_curvVertex"] = 1.4826;
   }
@@ -362,7 +364,7 @@ void TrackFitCheckerModule::event()
     zVertex7D[4] = resVertex7D[4] / sqrt(cov7D[4][4]);
     zVertex7D[5] = resVertex7D[5] / sqrt(cov7D[5][5]);
     zVertex7D[6] = resVertex7D[6] / sqrt(cov7D[6][6]);
-    fillTrackWiseVecData("zs_vertexState", zVertex7D);*/
+    fillTrackWiseVecData("pulls_vertexState", zVertex7D);*/
     //vertexMom = aTrackPtr->getMom(planeThroughVertex);
     //get fitted momentum at fitted vertex
 
@@ -373,7 +375,9 @@ void TrackFitCheckerModule::event()
     fillTrackWiseData("res_curvVertex", res_curvatureAtVertex);
     double relRes_curvatureAtVertex = res_curvatureAtVertex * trueVertexMom.Pt();
     fillTrackWiseData("relRes_curvVertex", relRes_curvatureAtVertex);
+    double relRes_p_T = (vertexMom.Pt() - trueVertexMom.Pt()) / trueVertexMom.Pt();
 
+    fillTrackWiseData("relRes_p_T", relRes_p_T);
     resVertexPosMom[0] = (vertexPos[0] - trueVertexPos[0]);
     resVertexPosMom[1] = (vertexPos[1] - trueVertexPos[1]);
     resVertexPosMom[2] = (vertexPos[2] - trueVertexPos[2]);
@@ -387,7 +391,7 @@ void TrackFitCheckerModule::event()
     zVertexPosMom[3] = resVertexPosMom[3] / sqrt(vertexCov[3][3]);
     zVertexPosMom[4] = resVertexPosMom[4] / sqrt(vertexCov[4][4]);
     zVertexPosMom[5] = resVertexPosMom[5] / sqrt(vertexCov[5][5]);
-    fillTrackWiseVecData("zs_vertexPosMom", zVertexPosMom);
+    fillTrackWiseVecData("pulls_vertexPosMom", zVertexPosMom);
     B2DEBUG(100, "filled all track wise tests");
     if (m_nLayers not_eq 0) { // now the layer wise tests
 
@@ -461,7 +465,7 @@ void TrackFitCheckerModule::endRun()
       measVarNames[1] = "v/χ²";
     }
     printTrackWiseVecStatistics("res_vertexPosMom", m_vertexTestsVarNames);
-    printTrackWiseVecStatistics("zs_vertexPosMom", m_vertexTestsVarNames);
+    printTrackWiseVecStatistics("pulls_vertexPosMom", m_vertexTestsVarNames);
     /*vector<string> vertexTests7DVarNames;
     vertexTests7DVarNames.push_back("x");
     vertexTests7DVarNames.push_back("y");
@@ -471,7 +475,7 @@ void TrackFitCheckerModule::endRun()
     vertexTests7DVarNames.push_back("a_z");
     vertexTests7DVarNames.push_back("q/p");
         printTrackWiseVecStatistics("res_vertexState", vertexTests7DVarNames);
-        printTrackWiseVecStatistics("zs_vertexState", vertexTests7DVarNames);*/
+        printTrackWiseVecStatistics("pulls_vertexState", vertexTests7DVarNames);*/
     //looks a bit clumsy with all the if (m_testSi == true) but the hope is there will easy accessible truth info for CDCHits so a better solution is not needed because the if (m_testSi == true) are temporary anyway
     if (m_testDaf == true) {
       vector<string> dafVarNames;
@@ -490,32 +494,33 @@ void TrackFitCheckerModule::endRun()
     } else {
       if (m_nLayers > 0) {
         if (m_truthAvailable == true) {
-          printLayerWiseStatistics("zs_and_chi2_meas_t", measVarNames);
+          printLayerWiseStatistics("pulls_and_chi2_meas_t", measVarNames);
+          printLayerWiseStatistics("res_meas_t", measVarNames);
         }
         if (m_testPrediction == true) {
           if (m_truthAvailable == true) {
-            printLayerWiseStatistics("zs_and_chi2_fp_t", m_layerWiseTruthTestsVarNames);
+            printLayerWiseStatistics("pulls_and_chi2_fp_t", m_layerWiseTruthTestsVarNames);
           }
-          printLayerWiseStatistics("zs_and_chi2_fp", measVarNames);
+          printLayerWiseStatistics("pulls_and_chi2_fp", measVarNames);
         }
         if (m_truthAvailable == true) {
-          printLayerWiseStatistics("zs_and_chi2_fu_t", m_layerWiseTruthTestsVarNames);
+          printLayerWiseStatistics("pulls_and_chi2_fu_t", m_layerWiseTruthTestsVarNames);
         }
-        printLayerWiseStatistics("zs_and_chi2_fu", measVarNames);
+        printLayerWiseStatistics("pulls_and_chi2_fu", measVarNames);
         if (m_testPrediction == true) {
           if (m_truthAvailable == true) {
-            printLayerWiseStatistics("zs_and_chi2_bp_t", m_layerWiseTruthTestsVarNames);
+            printLayerWiseStatistics("pulls_and_chi2_bp_t", m_layerWiseTruthTestsVarNames);
           }
-          printLayerWiseStatistics("zs_and_chi2_bp", measVarNames);
+          printLayerWiseStatistics("pulls_and_chi2_bp", measVarNames);
         }
         if (m_truthAvailable == true) {
-          printLayerWiseStatistics("zs_and_chi2_bu_t", m_layerWiseTruthTestsVarNames);
+          printLayerWiseStatistics("pulls_and_chi2_bu_t", m_layerWiseTruthTestsVarNames);
         }
-        printLayerWiseStatistics("zs_and_chi2_bu", measVarNames);
+        printLayerWiseStatistics("pulls_and_chi2_bu", measVarNames);
         if (m_truthAvailable == true) {
-          printLayerWiseStatistics("zs_and_chi2_sm_t", m_layerWiseTruthTestsVarNames);
+          printLayerWiseStatistics("pulls_and_chi2_sm_t", m_layerWiseTruthTestsVarNames);
         }
-        printLayerWiseStatistics("zs_and_chi2_sm", measVarNames);
+        printLayerWiseStatistics("pulls_and_chi2_sm", measVarNames);
       }
     }
     //write out the test results
@@ -1069,23 +1074,33 @@ void TrackFitCheckerModule::truthTests()  //
       //m_trackData.ms[iGFHit].Print();
       //m_trackData.Hs[iGFHit].Print();
       //trueState.Print();
+
+      //vector<double> measTrueTests(2);
       TMatrixT<double> res = m_trackData.ms[iGFHit] - m_trackData.Hs[iGFHit] * trueState;
+//      if (res.GetNrows() == 1 ){ cannot work as long as every hit is filled seperatly
+//        if ( m_trackData.Hs[iGFHit][3][0] > 0.1 ){ // u coordinate
+//          measTrueTests[0] = res[0][0];
+//        } else { // v coordinate
+//          measTrueTests[1] = res[0][0];
+//        }
+//      }
+      fillLayerWiseData("res_meas_t", accuVecIndex, rootMatrixToStdVec(res));
       //res.Print();
       TMatrixT<double> V = m_trackData.Vs[iGFHit];
       //V.Print();
       //V.Sqrt().Print();
-      vector<double> truthTests = calcZs(res, V);
+      vector<double> measTrueTests = calcZs(res, V);
       //cerr << "blub";
-      truthTests.push_back(calcChi2(res, V));
+      measTrueTests.push_back(calcChi2(res, V));
       //cerr << "bla\n";
-      fillLayerWiseData("zs_and_chi2_meas_t", accuVecIndex, truthTests);
+      fillLayerWiseData("pulls_and_chi2_meas_t", accuVecIndex, measTrueTests);
 
-      fillLayerWiseData("zs_and_chi2_sm_t", accuVecIndex, calcTestsWithTruthInfo(m_trackData.states_sm[iGFHit], m_trackData.covs_sm[iGFHit], trueState));
-      fillLayerWiseData("zs_and_chi2_fu_t", accuVecIndex, calcTestsWithTruthInfo(m_trackData.states_fu[iGFHit], m_trackData.covs_fu[iGFHit], trueState));
-      fillLayerWiseData("zs_and_chi2_bu_t", accuVecIndex, calcTestsWithTruthInfo(m_trackData.states_bu[iGFHit], m_trackData.covs_bu[iGFHit], trueState));
+      fillLayerWiseData("pulls_and_chi2_sm_t", accuVecIndex, calcTestsWithTruthInfo(m_trackData.states_sm[iGFHit], m_trackData.covs_sm[iGFHit], trueState));
+      fillLayerWiseData("pulls_and_chi2_fu_t", accuVecIndex, calcTestsWithTruthInfo(m_trackData.states_fu[iGFHit], m_trackData.covs_fu[iGFHit], trueState));
+      fillLayerWiseData("pulls_and_chi2_bu_t", accuVecIndex, calcTestsWithTruthInfo(m_trackData.states_bu[iGFHit], m_trackData.covs_bu[iGFHit], trueState));
       if (m_testPrediction == true) {
-        fillLayerWiseData("zs_and_chi2_fp_t", accuVecIndex, calcTestsWithTruthInfo(m_trackData.states_fp[iGFHit], m_trackData.covs_fp[iGFHit], trueState));
-        fillLayerWiseData("zs_and_chi2_bp_t", accuVecIndex, calcTestsWithTruthInfo(m_trackData.states_bp[iGFHit], m_trackData.covs_bp[iGFHit], trueState));
+        fillLayerWiseData("pulls_and_chi2_fp_t", accuVecIndex, calcTestsWithTruthInfo(m_trackData.states_fp[iGFHit], m_trackData.covs_fp[iGFHit], trueState));
+        fillLayerWiseData("pulls_and_chi2_bp_t", accuVecIndex, calcTestsWithTruthInfo(m_trackData.states_bp[iGFHit], m_trackData.covs_bp[iGFHit], trueState));
       }
     }
   }
@@ -1127,7 +1142,7 @@ void TrackFitCheckerModule::normalTests()
     } else {
       vector<double> testResutlsWithoutTruth = calcZs(res, R);
       testResutlsWithoutTruth.push_back(calcChi2(res, R));
-      fillLayerWiseData("zs_and_chi2_sm", accuVecIndex, testResutlsWithoutTruth);
+      fillLayerWiseData("pulls_and_chi2_sm", accuVecIndex, testResutlsWithoutTruth);
     }
 
     res = m - H * m_trackData.states_fu[iGFHit];
@@ -1137,7 +1152,7 @@ void TrackFitCheckerModule::normalTests()
     } else {
       vector<double> testResutlsWithoutTruth = calcZs(res, R);
       testResutlsWithoutTruth.push_back(calcChi2(res, R));
-      fillLayerWiseData("zs_and_chi2_fu", accuVecIndex, testResutlsWithoutTruth);
+      fillLayerWiseData("pulls_and_chi2_fu", accuVecIndex, testResutlsWithoutTruth);
     }
 
     res = m - H * m_trackData.states_bu[iGFHit];
@@ -1147,7 +1162,7 @@ void TrackFitCheckerModule::normalTests()
     } else {
       vector<double> testResutlsWithoutTruth = calcZs(res, R);
       testResutlsWithoutTruth.push_back(calcChi2(res, R));
-      fillLayerWiseData("zs_and_chi2_bu", accuVecIndex, testResutlsWithoutTruth);
+      fillLayerWiseData("pulls_and_chi2_bu", accuVecIndex, testResutlsWithoutTruth);
     }
 
     if (m_testPrediction == true) {
@@ -1155,13 +1170,13 @@ void TrackFitCheckerModule::normalTests()
       R = V + H * m_trackData.covs_fp[iGFHit] * HT;
       vector<double> testResutlsWithoutTruth = calcZs(res, R);
       testResutlsWithoutTruth.push_back(calcChi2(res, R));
-      fillLayerWiseData("zs_and_chi2_fp", accuVecIndex, testResutlsWithoutTruth);
+      fillLayerWiseData("pulls_and_chi2_fp", accuVecIndex, testResutlsWithoutTruth);
 
       res = m - H * m_trackData.states_bp[iGFHit];
       R = V + H * m_trackData.covs_bp[iGFHit] * HT;
       testResutlsWithoutTruth = calcZs(res, R);
       testResutlsWithoutTruth.push_back(calcChi2(res, R));
-      fillLayerWiseData("zs_and_chi2_bp", accuVecIndex, testResutlsWithoutTruth);
+      fillLayerWiseData("pulls_and_chi2_bp", accuVecIndex, testResutlsWithoutTruth);
 
     }
 
@@ -1405,4 +1420,15 @@ int TrackFitCheckerModule::countOutliers(const vector<double>& dataSample, const
     }
   }
   return nOutliers;
+}
+
+
+vector<double> TrackFitCheckerModule::rootMatrixToStdVec(const TMatrixT<double>&  rootMatrix) const
+{
+  int n = rootMatrix.GetNrows();
+  vector<double> stdVec(n);
+  for (int i = 0; i not_eq n; ++i) {
+    stdVec[i] = rootMatrix[i][0];
+  }
+  return stdVec;
 }

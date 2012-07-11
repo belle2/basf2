@@ -119,7 +119,7 @@ namespace Belle2 {
     void isMatrixCov(const TMatrixT<double>& cov);
     bool isSymmetric(const TMatrixT<double>& aMatrix) const;
     bool hasMatrixNegDiagElement(const TMatrixT<double>& aMatrix) const;
-
+    std::vector<double> rootMatrixToStdVec(const TMatrixT<double>&  rootMatrix) const;
     // functions for dataflow inside module
     void registerTrackWiseData(const std::string& nameOfDataSample);
     void registerTrackWiseVecData(const std::string& nameOfDataSample, const int nVarsToTest);

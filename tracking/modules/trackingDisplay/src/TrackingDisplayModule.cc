@@ -12,6 +12,7 @@
 #include <GFTrack.h>
 #include <GFFieldManager.h>
 #include "TGeoManager.h"
+#include "TSystem.h"
 
 
 using namespace Belle2;
@@ -26,6 +27,12 @@ TrackingDisplayModule::TrackingDisplayModule() : Module(), m_display(0)
   addParam("AddPXDHits", m_addPXDHits, "Add PXDSimHits to display? Use with 'R' option.", true);
   addParam("AddSVDHits", m_addSVDHits, "Add SVDSimHits to display? Use with 'R' option.", true);
   addParam("AddCDCHits", m_addCDCHits, "Add CDCSimHits to display? Use with 'R' option.", true);
+
+  //make sure dictionaries for PXD/SVD hits are loaded
+  //needs to be done here to have dictionaries available during SimpleInput::initialize()
+  gSystem->Load("libpxd");
+  gSystem->Load("libsvd");
+  gSystem->Load("libRKTrackRep");
 }
 
 

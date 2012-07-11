@@ -43,7 +43,6 @@
 #include "trg/cdc/Fitter3D.h"
 #include "trg/cdc/Link.h"
 #include "trg/cdc/Relation.h"
-#include "trg/cdc/EventTime.h"
 
 #ifdef TRGCDC_DISPLAY
 #include "trg/cdc/DisplayRphi.h"
@@ -135,9 +134,7 @@ TRGCDC::TRGCDC(const string & configFile,
       _clockFE("CDCFETrigge system clock", Belle2_GDL::GDLSystemClock, 8),
       _offset(5.3),
       _hFinder(0),
-      _fitter3D(0),
-      _eventTime(0)
- {
+      _fitter3D(0) {
 
 #ifdef TRGCDC_DISPLAY
     int argc = 0;
@@ -277,7 +274,6 @@ TRGCDC::initialize(bool houghFinderPerfect,
     //...LUT for LR decision : common to all TS...
     _luts.push_back(new TCLUT("LR LUT inner", * this));
     _luts.back()->initialize(_innerTSLUTDataFilename);
-    _luts.back()->initialize(_innerTSLUTDataFilename);
     _luts.back()->initialize(_outerTSLUTDataFilename);
     
 //  for (unsigned i = 0; _luts.size(); i++)
@@ -401,17 +397,12 @@ TRGCDC::initialize(bool houghFinderPerfect,
         }
     }
 
-	
     //...Hough Finder...
     _hFinder = new TCHFinder("HoughFinder",
                              * this,
                              houghFinderMeshX,
                              houghFinderMeshY);
     _hFinder->perfect(houghFinderPerfect);
-
-   _eventTime = new TCEventTime(* this);
-   _eventTime->initialize();
-
 
     //...3D fitter...
     _fitter3D = new TCFitter3D("Fitter3D", * this);
@@ -429,8 +420,6 @@ TRGCDC::initialize(bool houghFinderPerfect,
     m_tree->Branch("fitParameters", &m_fitParameters);
     m_tree->Branch("mcParameters", &m_mcParameters);
     m_tree->Branch("multiplicity", &m_multiplicity);
-    m_evtTime= new TClonesArray("TVectorD");
-    m_tree->Branch("evtTime",&m_evtTime);
 
 }
 
@@ -1282,7 +1271,7 @@ TRGCDC::simulate(void) {
     }
 
     //...Stereo finder...
-//    perfect3DFinder(trackList);
+    perfect3DFinder(trackList);
 
     //...Check tracks...
     if (TRGDebug::level()) {
@@ -1301,7 +1290,6 @@ TRGCDC::simulate(void) {
 	}
     }
 
-//    _eventTime->getT0();
     //...3D tracker...
     vector<TCTrack *> trackList3D;
     _fitter3D->doit(trackList, trackList3D);
@@ -1340,12 +1328,6 @@ TRGCDC::simulate(void) {
 #endif
 
     //...Fill root file...
-    //...Event Time
-    TClonesArray & evtTime=*m_evtTime;
-    evtTime.Clear();
-    TVectorD tempEvtTime(1);
-    tempEvtTime[0]=_eventTime->getT0();
-    new(evtTime[0]) TVectorD(tempEvtTime);
     //...MCParticle...
     StoreArray<MCParticle> mcParticles;
     if (! mcParticles) {
@@ -1383,7 +1365,7 @@ TRGCDC::simulate(void) {
         if(trackMCParticle.getCharge()<0) mcPhi0=trackMCParticle.getMomentum().Phi()+M_PI/2;
         // Change range to [0,2pi]
         if(mcPhi0<0) mcPhi0+=2*M_PI;
-        double mcZ0 = trackMCParticle.getVertex().Z();
+        double mcZ0 = trackMCParticle.getVertex().Z()/100;
         double mcCot=trackMCParticle.getMomentum().Pz()/trackMCParticle.getMomentum().Pt();
 
         tempFitParameters[0] = mcPt;
@@ -1398,13 +1380,11 @@ TRGCDC::simulate(void) {
     // Find MC multiplicity
     int nFinalParticles=0;
     for(signed i=0; i<mcParticles.getEntries(); i++) {
-      if(mcParticles[i]->getDaughters().size() == 0) {
-        if(mcParticles[i]->getCharge() != 0) {
+      if(mcParticles[i]->hasStatus(64)){
           nFinalParticles += 1;
-          //cout<<"Final Part PDG: "<<mcParticles[i]->getPDG()<<endl;
-        }
       }
     }
+
     multiplicity[0] = nFinalParticles;
     multiplicity[1] = iFit;
     multiplicity[1] = trackList3D.size();

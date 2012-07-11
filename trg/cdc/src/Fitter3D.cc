@@ -305,7 +305,7 @@ namespace Belle2 {
 
     // Flags
     m_flagRealInt = 0;
-    m_flagWireLRLUT = 0;
+    m_flagWireLRLUT = 1;
     m_flagNonTSStudy = 0;
 
     // Geometry
@@ -430,7 +430,7 @@ namespace Belle2 {
         if(trackMCParticle.getCharge()<0) mcPhi0=trackMCParticle.getMomentum().Phi()+m_Trg_PI/2;
         // Change range to [0,2pi]
         if(mcPhi0<0) mcPhi0+=2*m_Trg_PI;
-        double mcZ0 = trackMCParticle.getVertex().Z();
+        double mcZ0 = trackMCParticle.getVertex().Z()/100;
         double mcCot=trackMCParticle.getMomentum().Pz()/trackMCParticle.getMomentum().Pt();
         double mcCharge = trackMCParticle.getCharge();
 
@@ -705,7 +705,7 @@ namespace Belle2 {
           TVectorD tempFit(5);
           tempFit[0]=pt;
           tempFit[1]=myphi0;
-          tempFit[2]=z0*100;
+          tempFit[2]=z0;
           tempFit[3]=cot;
           tempFit[4]=mysign;
           new(fitTrackFitter3D[iFit]) TVectorD(tempFit);
@@ -713,7 +713,7 @@ namespace Belle2 {
           TVectorD tempMC(5);
           tempMC[0] = mcPt;
           tempMC[1] = mcPhi0;
-          tempMC[2] = mcZ0*100;
+          tempMC[2] = mcZ0;
           tempMC[3] = mcCot;
           tempMC[4] = mcCharge;
           new(mcTrackFitter3D[iFit]) TVectorD(tempMC);

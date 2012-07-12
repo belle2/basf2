@@ -114,6 +114,7 @@ TRGTime::clock(const TRGClock & c) {
     const double t = _clock->absoluteTime(_time);
     _clock = & c;
     _time = c.time(t);
+    return * _clock;
 }
 
 } // namespace Belle2

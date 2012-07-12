@@ -79,9 +79,12 @@ TRGCDC::getTRGCDC(const string & configFile,
 		  unsigned firmwareSimulationMode,
 		  const string & innerTSLUTDataFile,
 		  const string & outerTSLUTDataFile,
+      const string & rootTRGCDCFile,
+      const string & rootFitter3DFile,
                   bool houghFinderPerfect,
                   unsigned houghFinderMeshX,
-                  unsigned houghFinderMeshY) {
+                  unsigned houghFinderMeshY,
+                  bool fLRLUT) {
     if (_cdc){
         //delete _cdc;
         _cdc = 0;
@@ -93,9 +96,12 @@ TRGCDC::getTRGCDC(const string & configFile,
 			  firmwareSimulationMode,
 			  innerTSLUTDataFile,
 			  outerTSLUTDataFile,
+        rootTRGCDCFile,
+        rootFitter3DFile,
                           houghFinderPerfect,
                           houghFinderMeshX,
-                          houghFinderMeshY);
+                          houghFinderMeshY,
+                          fLRLUT);
     }
     else {
         cout << "TRGCDC::getTRGCDC ... good-bye" << endl;
@@ -118,15 +124,21 @@ TRGCDC::TRGCDC(const string & configFile,
 	       unsigned firmwareSimulationMode,
 	       const string & innerTSLUTDataFile,
 	       const string & outerTSLUTDataFile,
+         const string & rootTRGCDCFile,
+         const string & rootFitter3DFile,
 	       bool houghFinderPerfect,
 	       unsigned houghFinderMeshX,
-	       unsigned houghFinderMeshY) 
+	       unsigned houghFinderMeshY,
+         bool fLRLUT) 
     : _debugLevel(0),
       _configFilename(configFile),
       _simulationMode(simulationMode),
       _firmwareSimulationMode(firmwareSimulationMode),
       _innerTSLUTDataFilename(innerTSLUTDataFile),
       _outerTSLUTDataFilename(outerTSLUTDataFile),
+      _rootTRGCDCFilename(rootTRGCDCFile),
+      _rootFitter3DFilename(rootFitter3DFile),
+      _fLRLUT(fLRLUT),
       _fudgeFactor(1.),
       _width(0),
       _r(0),
@@ -411,23 +423,31 @@ TRGCDC::initialize(bool houghFinderPerfect,
     _eventTime->initialize();
 
     //...3D fitter...
-    _fitter3D = new TCFitter3D("Fitter3D", * this);
+    _fitter3D = new TCFitter3D("Fitter3D", 
+                              _rootFitter3DFilename,
+                              * this,
+                              _fLRLUT);
     _fitter3D->initialize();
 
     //...For module simulation (Front-end)...
     configure();
 
     //...Initialize root file...
-    m_file = new TFile("TRGCDC.root","RECREATE");
+    m_file = new TFile((char*)_rootTRGCDCFilename.c_str(),"RECREATE");
     m_tree = new TTree("m_tree","tree");
+    m_treeAllTracks = new TTree("m_treeAllTracks","treeAllTracks");
     m_fitParameters = new TClonesArray("TVectorD");
     m_mcParameters = new TClonesArray("TVectorD");
-    m_multiplicity = new TVectorD(2);
+    m_mcTrack4Vector = new TClonesArray("TLorentzVector");
+    m_mcTrackVertexVector = new TClonesArray("TVector3");
+    m_mcTrackStatus = new TClonesArray("TVectorD");
     m_tree->Branch("fitParameters", &m_fitParameters);
     m_tree->Branch("mcParameters", &m_mcParameters);
-    m_tree->Branch("multiplicity", &m_multiplicity);
+    m_treeAllTracks->Branch("mcTrack4Vector", &m_mcTrack4Vector);
+    m_treeAllTracks->Branch("mcTrackVertexVector", &m_mcTrackVertexVector);
+    m_treeAllTracks->Branch("mcTrackStatus", &m_mcTrackStatus);
     m_evtTime=new TClonesArray("TVectorD");
-    m_tree->Branch("evtTime",&m_evtTime);
+    m_treeAllTracks->Branch("evtTime",&m_evtTime);
 
 }
 
@@ -1354,8 +1374,14 @@ TRGCDC::simulate(void) {
     }
     TClonesArray &fitParameters = *m_fitParameters;
     TClonesArray &mcParameters = *m_mcParameters;
-    TVectorD &multiplicity = *m_multiplicity;
+    TClonesArray &mcTrack4Vector = *m_mcTrack4Vector;
+    TClonesArray &mcTrackVertexVector = *m_mcTrackVertexVector;
+    TClonesArray &mcTrackStatus = *m_mcTrackStatus;
     fitParameters.Clear();
+    mcParameters.Clear();
+    mcTrack4Vector.Clear();
+    mcTrackVertexVector.Clear();
+    mcTrackStatus.Clear();
     int iFit=0;
     for(unsigned i=0; i<trackList3D.size(); i++){
       const TCTrack &aTrack = *trackList3D[i];
@@ -1394,20 +1420,28 @@ TRGCDC::simulate(void) {
       } // if fitted
     } // trackList loop
 
-    // Find MC multiplicity
-    int nFinalParticles=0;
+    // Save MC tracks for multiplicity study
+    // mcStatus[0]: statusbit, mcStatus[1]: pdg, mcStatus[2]: charge
+    TVectorD mcStatus(3);
+    int iStoredPart=0;
     for(signed i=0; i<mcParticles.getEntries(); i++) {
-      if(mcParticles[i]->hasStatus(64)){
-          nFinalParticles += 1;
+      if((mcParticles[i]->hasStatus(2) || mcParticles[i]->hasStatus(64)) && mcParticles[i]->getCharge() != 0){
+        mcStatus[0] = mcParticles[i]->getStatus();
+        mcStatus[1] = mcParticles[i]->getPDG();
+        mcStatus[2] = mcParticles[i]->getCharge();
+        new(mcTrackStatus[iStoredPart]) TVectorD(mcStatus);
+        new(mcTrack4Vector[iStoredPart]) TLorentzVector(mcParticles[i]->get4Vector());
+        new(mcTrackVertexVector[iStoredPart]) TVector3(mcParticles[i]->getVertex());
+        //cout<<"Status: "<<mcParticles[i]->getStatus()<<" PDG: "<<mcParticles[i]->getPDG()<<" Charge: "<<mcParticles[i]->getCharge()<<" pT: "<<mcParticles[i]->get4Vector().Pt()<<endl;
+        iStoredPart += 1;
       }
     }
+    //cout<<"Num Tracks: "<<iStoredPart<<endl;
 
-    multiplicity[0] = nFinalParticles;
-    multiplicity[1] = iFit;
-    multiplicity[1] = trackList3D.size();
-
-
-    m_tree->Fill();
+    if(iFit!=0){
+      m_tree->Fill();
+    }
+    m_treeAllTracks->Fill();
     
     TRGDebug::leaveStage("TRGCDC simulation");
     return;

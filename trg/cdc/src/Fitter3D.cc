@@ -105,10 +105,14 @@ namespace Belle2 {
       return string("TRGCDCFitter3D 5.1");
     }
 
-  TRGCDCFitter3D::TRGCDCFitter3D(const string & name,
-      const TRGCDC & TRGCDC)
+  TRGCDCFitter3D::TRGCDCFitter3D(const string & name, 
+                                 const string & rootFitter3DFile,
+                                 const TRGCDC & TRGCDC,
+                                 bool fLRLUT)
     : _name(name),
-    _cdc(TRGCDC) {
+    _cdc(TRGCDC),
+    m_rootFitter3DFilename(rootFitter3DFile),
+    m_flagWireLRLUT(fLRLUT){
 
       //...Initialization...
     }
@@ -281,19 +285,21 @@ namespace Belle2 {
     m_zerror[0] = 0.0319263; m_zerror[1] = 0.028765; m_zerror[2] = 0.0290057; m_zerror[3]=0.0396206;
     m_phierror[0] = 0.0085106; m_phierror[1] = 0.0039841; m_phierror[2] = 0.0025806; m_phierror[3] = 0.0019084; m_phierror[4] = 0.001514;
 
-    m_fileFitter3D = new TFile("Fitter3D.root","RECREATE");
+    m_fileFitter3D = new TFile((char*)m_rootFitter3DFilename.c_str(),"RECREATE");
     m_treeTrackFitter3D = new TTree("m_treeTrackFitter3D","track");
 
     m_tSTrackFitter3D = new TClonesArray("TVectorD");
     m_fitTrackFitter3D = new TClonesArray("TVectorD");
     m_szTrackFitter3D = new TClonesArray("TVectorD");
     m_mcTrackFitter3D = new TClonesArray("TVectorD");
+    m_mcStatusTrackFitter3D = new TClonesArray("TVectorD");
     m_stTSsTrackFitter3D = new TClonesArray("TVectorD");
 
     m_treeTrackFitter3D->Branch("tSTrackFitter3D", &m_tSTrackFitter3D);
     m_treeTrackFitter3D->Branch("fitTrackFitter3D", &m_fitTrackFitter3D);
     m_treeTrackFitter3D->Branch("szTrackFitter3D", &m_szTrackFitter3D);
     m_treeTrackFitter3D->Branch("mcTrackFitter3D", &m_mcTrackFitter3D);
+    m_treeTrackFitter3D->Branch("mcStatusTrackFitter3D", &m_mcStatusTrackFitter3D);
     m_treeTrackFitter3D->Branch("stTSsTrackFitter3D", &m_stTSsTrackFitter3D);
 
     m_treeConstantsFitter3D = new TTree("m_treeConstantsFitter3D","constants");
@@ -305,7 +311,6 @@ namespace Belle2 {
 
     // Flags
     m_flagRealInt = 0;
-    m_flagWireLRLUT = 1;
     m_flagNonTSStudy = 0;
 
     // Geometry
@@ -364,6 +369,7 @@ namespace Belle2 {
       TClonesArray &fitTrackFitter3D = *m_fitTrackFitter3D;
       TClonesArray &szTrackFitter3D = *m_szTrackFitter3D;
       TClonesArray &mcTrackFitter3D = *m_mcTrackFitter3D;
+      TClonesArray &mcStatusTrackFitter3D = *m_mcStatusTrackFitter3D;
       TClonesArray &stTSsTrackFitter3D = *m_stTSsTrackFitter3D;
 
       //...TS study (loop over all TS's)...
@@ -401,6 +407,7 @@ namespace Belle2 {
       fitTrackFitter3D.Clear();
       szTrackFitter3D.Clear();
       mcTrackFitter3D.Clear();
+      mcStatusTrackFitter3D.Clear();
       stTSsTrackFitter3D.Clear();
 
 
@@ -433,8 +440,11 @@ namespace Belle2 {
         double mcZ0 = trackMCParticle.getVertex().Z()/100;
         double mcCot=trackMCParticle.getMomentum().Pz()/trackMCParticle.getMomentum().Pt();
         double mcCharge = trackMCParticle.getCharge();
-
-
+        // mcStatus[0]: statusbit, mcStatus[1]: pdg, mcStatus[2]: charge
+        TVectorD mcStatus(3);
+        mcStatus[0] = trackMCParticle.getStatus();
+        mcStatus[1] = trackMCParticle.getPDG();
+        mcStatus[2] = trackMCParticle.getCharge();
 
         //       t.dump("detail");
 
@@ -701,7 +711,7 @@ namespace Belle2 {
           ztheta=m_Trg_PI/2.-atan(cot);
           ztheta*=180./m_Trg_PI;
 
-          //Save fit values
+          // Save fit values
           TVectorD tempFit(5);
           tempFit[0]=pt;
           tempFit[1]=myphi0;
@@ -718,6 +728,11 @@ namespace Belle2 {
           tempMC[4] = mcCharge;
           new(mcTrackFitter3D[iFit]) TVectorD(tempMC);
 
+          // Save mc status
+          new(mcStatusTrackFitter3D[iFit]) TVectorD(mcStatus);
+          
+
+          // For integer space
           //          cout << "tsimz0/"  << z0*100 <<"]"<<endl;
           //          cout << "tsimpt/"  << pt <<"]"<<endl;
           //          cout << "tsimth/"  << ztheta <<"]"<<endl;
@@ -737,8 +752,6 @@ namespace Belle2 {
         a[4] = cot;
       } else {
         t.setFitted(0);
-        a[3] = -999;
-        a[4] = -999;
       }
       helix.a(a);
       t.setHelix(helix);

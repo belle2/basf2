@@ -3,7 +3,8 @@
 from basf2 import *
 
 # suppress messages and warnings during processing:
-#set_log_level(LogLevel.ERROR)
+set_log_level(LogLevel.ERROR)
+set_random_seed(0)
 
 #...Particle Gun...
 particlegun = register_module('ParticleGun')
@@ -55,14 +56,17 @@ geobuilder.param('Components', ['MagneticField', 'CDC'])
 cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/TRGCDCConfig_0_20101111_1051.dat"))
 cdctrg.param('InnerTSLUTDataFile', os.path.join(basf2datadir,"trg/LRLUT.coe"))
 cdctrg.param('OuterTSLUTDataFile', os.path.join(basf2datadir,"trg/LRLUT.coe"))
-cdctrg.param('DebugLevel',2)
+#cdctrg.param('DebugLevel',2)
 cdctrg.param('CurlBackStop',1)
-#cdctrg.param('HoughFinderPerfect',1)
-cdctrg.param('HoughFinderPerfect',0)
-cdctrg.param('HoughFinderMeshX',180)
-cdctrg.param('HoughFinderMeshY',24)
-cdctrg.param('SimulationMode',11)
-cdctrg.param('SimulationMode',0x11)
+cdctrg.param('HoughFinderPerfect',1)
+#cdctrg.param('HoughFinderPerfect',0)
+#cdctrg.param('HoughFinderMeshX',180)
+#cdctrg.param('HoughFinderMeshY',24)
+#cdctrg.param('SimulationMode',11)
+#cdctrg.param('SimulationMode',0x11)
+#cdctrg.param('RootTRGCDCFile', 'TRGCDC.root')
+#cdctrg.param('RootFitter3DFile', 'Fitter3D.root')
+#cdctrg.param('Fitter3DLRLUT', 0)
 
 #set mcprinter
 mcparticleprinter = register_module('PrintMCParticles')
@@ -76,6 +80,12 @@ geobuilder.param('Components', ['MagneticField', 'CDC'
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.00, 'Resolution2': 0.0}
 cdcdigitizer.param(param_cdcdigi)
 
+# For B Bbar events.
+evtgeninput = register_module('EvtGenInput')
+#evtgeninput.param('userDECFile', 'USER.DEC')
+evtgeninput.param('boost2LAB', True)
+
+
 ##Create paths
 main = create_path()
 
@@ -84,7 +94,8 @@ main.add_module(evtmetagen)
 main.add_module(evtmetainfo)
 main.add_module(paramloader)
 main.add_module(geobuilder)
-main.add_module(particlegun)
+#main.add_module(particlegun)
+main.add_module(evtgeninput)
 main.add_module(mcparticleprinter)
 main.add_module(g4sim)
 main.add_module(cdcdigitizer)

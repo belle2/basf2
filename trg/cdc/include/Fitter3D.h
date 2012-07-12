@@ -36,7 +36,9 @@ class TRGCDCFitter3D {
 
     /// Contructor.
     TRGCDCFitter3D(const std::string & name,
-                   const TRGCDC &);
+                   const std::string & rootFitter3DFile,
+                   const TRGCDC &,
+                   const bool fLRLUT);
 
     /// Destructor
     virtual ~TRGCDCFitter3D();
@@ -100,6 +102,10 @@ class TRGCDCFitter3D {
     double m_zerror[4];
 
     protected:
+
+      // The filename of root file for Fitter3D
+      std::string m_rootFitter3DFilename;
+
       TFile* m_fileFitter3D;
       TTree* m_treeTrackFitter3D;
       TTree* m_treeConstantsFitter3D;
@@ -115,6 +121,8 @@ class TRGCDCFitter3D {
       // Stores MC values
       // MCpT, MCphi0, MCz0, MCtheta, MCcharge
       TClonesArray* m_mcTrackFitter3D;
+      // statusbit, pdg, charge
+      TClonesArray* m_mcStatusTrackFitter3D;
       // Stores geometry
       // r1, r2, r3, r4, r5, r6, r7, r8, r9, anglest1, anglest2, anglest3, anglest4, ztostraw1, ztostraw2, ztostraw3, ztostraw4
       TVectorD* m_geometryFitter3D;

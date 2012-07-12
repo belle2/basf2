@@ -37,6 +37,8 @@ TRGCDCModule::TRGCDCModule()
       _configFilename("TRGCDCConfig.dat"),
       _innerTSLUTDataFilename("undefined"),
       _outerTSLUTDataFilename("undefined"),
+      _rootTRGCDCFilename("undefined"),
+      _rootFitter3DFilename("undefined"),
       _curlBackStop(0),
       _simulationMode(0),
       _firmwareSimulationMode(0),
@@ -45,6 +47,7 @@ TRGCDCModule::TRGCDCModule()
       _hFinderMeshX(180),
 //    _hFinderMeshY(96),
       _hFinderMeshY(24),
+      _fLRLUT(1),
       _cdc(0),
       _sa(0) {
 
@@ -65,6 +68,14 @@ TRGCDCModule::TRGCDCModule()
              _outerTSLUTDataFilename,
              "The filename of LUT for outer track segments",
              _outerTSLUTDataFilename);
+    addParam("RootTRGCDCFile",
+              _rootTRGCDCFilename,
+              "The filename of root file for TRGCDC",
+              string("TRGCDC.root"));
+    addParam("RootFitter3DFile",
+              _rootFitter3DFilename,
+              "The filename of root file for Fitter3D",
+              string("Fitter3D.root"));
     addParam("CurlBackStop",
              _curlBackStop,
              "Curl back stop parameter",
@@ -86,6 +97,10 @@ TRGCDCModule::TRGCDCModule()
              _hFinderMeshY,
              "Hough finder # mesh in y",
              _hFinderMeshY);
+    addParam("Fitter3DLRLUT",
+             _fLRLUT,
+             "Using L/R LUT in fitter3D",
+             _fLRLUT);
 
     if (TRGDebug::level())
       cout << "TRGCDCModule ... created" << endl;
@@ -144,9 +159,12 @@ TRGCDCModule::beginRun() {
 				 _firmwareSimulationMode,
 				 _innerTSLUTDataFilename,
 				 _outerTSLUTDataFilename,
+         _rootTRGCDCFilename,
+         _rootFitter3DFilename,
 				 _hFinderPerfect,
 				 _hFinderMeshX,
-				 _hFinderMeshY);
+				 _hFinderMeshY,
+         _fLRLUT);
 
     if (TRGDebug::level())
 	cout << "TRGCDCModule ... beginRun called " << endl;

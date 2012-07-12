@@ -67,9 +67,12 @@ class TRGCDC {
 			      unsigned firmwareSimulationMode = 0,
 			      const std::string & innerTSLUTDataFile = "?",
 			      const std::string & outerTSLUTDataFile = "?",
+            const std::string & rootTRGCDCFile = "?",
+            const std::string & rootFitter3DFile = "?",
                               bool houghFinderPerfect = false,
                               unsigned houghFinderMeshX = 96,
-                              unsigned houghFinderMeshY = 96);
+                              unsigned houghFinderMeshY = 96,
+                              bool fLRLUT = 1);
     
     /// returns TRGCDC object. TRGCDC should be created with specific
     /// configuration before calling this function.
@@ -83,9 +86,12 @@ class TRGCDC {
 	   unsigned firmwareSimulationMode,
 	   const std::string & innerTSLUTDataFile,
 	   const std::string & outerTSLUTDataFile,
+     const std::string & rootTRGCDCFile,
+     const std::string & rootFitter3DFile,
            bool houghFinderPerfect,
            unsigned houghFinderMeshX,
-           unsigned houghFinderMeshY);
+           unsigned houghFinderMeshY,
+           bool fLRLUT);
 
     /// Destructor
     virtual ~TRGCDC();
@@ -342,10 +348,10 @@ class TRGCDC {
     /// CDC trigger configuration filename.
     std::string _configFilename;
 
-    /// Simulation mode
+    /// Simulation mode.
     unsigned _simulationMode;
 
-    /// Firmware simulation mode
+    /// Firmware simulation mode.
     unsigned _firmwareSimulationMode;
 
     /// The filename of LUT for the inner-most track segments.
@@ -353,6 +359,15 @@ class TRGCDC {
 
     /// The filename of LUT for outer track segments.
     std::string _outerTSLUTDataFilename;
+
+    /// The filename of root file for TRGCDC.
+    std::string _rootTRGCDCFilename;
+
+    /// The filename of root file for Fitter3D.
+    std::string _rootFitter3DFilename;
+
+    /// Switch for the LR LUT in Fitter3D.
+    bool _fLRLUT;
 
     /// Super layers.
     std::vector<std::vector<TRGCDCLayer *> *> _superLayers;
@@ -453,9 +468,12 @@ class TRGCDC {
     /// root file
     TFile* m_file;
     TTree* m_tree;
+    TTree* m_treeAllTracks;
     TClonesArray* m_fitParameters;
     TClonesArray* m_mcParameters;
-    TVectorD* m_multiplicity;
+    TClonesArray* m_mcTrack4Vector;
+    TClonesArray* m_mcTrackVertexVector;
+    TClonesArray* m_mcTrackStatus;
     TClonesArray * m_evtTime;
 
     friend class TRGCDCModule;

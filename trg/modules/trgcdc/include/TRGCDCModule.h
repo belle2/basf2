@@ -67,6 +67,12 @@ class TRGCDCModule : public Module {
     /// The filename of LUT for outer track segments.
     std::string _outerTSLUTDataFilename;
 
+    /// The filename of root file for TRGCDC
+    std::string _rootTRGCDCFilename;
+
+    /// The filename of root file for Fitter3D
+    std::string _rootFitter3DFilename;
+
     /// Curl back stop parameter. 0:do nothing, 1:stop curling. Default is 0.
     int _curlBackStop;
 
@@ -84,6 +90,9 @@ class TRGCDCModule : public Module {
 
     /// \# of Y mesh for the Hough finder.
     int _hFinderMeshY;
+
+    /// Switch for the LR LUT in Fitter3D.
+    bool _fLRLUT;
 
   private:
 

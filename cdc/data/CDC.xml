@@ -3885,11 +3885,11 @@
       -->
       <Cover id="2">
         <Name>BackwardCover</Name>
-        <InnerR1 desc="Inner radius near IP" unit="mm">280.5</InnerR1>
-        <InnerR2 desc="Inner radius far from IP" unit="mm">1130.0</InnerR2>
+        <InnerR1 desc="Inner radius near IP" unit="mm">281.0</InnerR1>
+        <InnerR2 desc="Inner radius far from IP" unit="mm">1128.0</InnerR2>
         <Thickness desc="The thickness of the cover" unit="mm">0.5</Thickness>
         <Angle desc="The angle between the cover and z axis" unit="rad">1.51</Angle>
-        <PosZ desc="Z position near IP" unit="mm">-950.0</PosZ>
+        <PosZ desc="Z position near IP" unit="mm">-1008.0</PosZ>
       </Cover> 	
       <Cover id="3">
         <Name>ForwardCover</Name>

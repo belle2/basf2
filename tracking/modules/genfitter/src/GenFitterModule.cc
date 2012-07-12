@@ -407,6 +407,11 @@ void GenFitterModule::event()
               TMatrixT<double> resultCovariance;
               gfTrack.getPosMomCov(plane, resultPosition, resultMomentum, resultCovariance);
 
+              // store position
+              tracks[trackCounter]->setPosition(resultPosition);
+              // store covariance matrix
+              tracks[trackCounter]->setErrorMatrix(resultCovariance);
+
               //store position errors
               double xErr = sqrt(resultCovariance[0][0]);
               double yErr = sqrt(resultCovariance[1][1]);

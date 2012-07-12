@@ -58,6 +58,49 @@ namespace Belle2 {
       m_dEdx = -999;
       m_dEdxSigma = -999;
       m_radiusOfInnermostHit = -999;
+
+      m_errorMatrix.ResizeTo(6, 6);
+      m_errorMatrix[0][0] = -999;
+      m_errorMatrix[0][1] = -999;
+      m_errorMatrix[0][2] = -999;
+      m_errorMatrix[0][3] = -999;
+      m_errorMatrix[0][4] = -999;
+      m_errorMatrix[0][5] = -999;
+
+      m_errorMatrix[1][0] = -999;
+      m_errorMatrix[1][1] = -999;
+      m_errorMatrix[1][2] = -999;
+      m_errorMatrix[1][3] = -999;
+      m_errorMatrix[1][4] = -999;
+      m_errorMatrix[1][5] = -999;
+
+      m_errorMatrix[2][0] = -999;
+      m_errorMatrix[2][1] = -999;
+      m_errorMatrix[2][2] = -999;
+      m_errorMatrix[2][3] = -999;
+      m_errorMatrix[2][4] = -999;
+      m_errorMatrix[2][5] = -999;
+
+      m_errorMatrix[3][0] = -999;
+      m_errorMatrix[3][1] = -999;
+      m_errorMatrix[3][2] = -999;
+      m_errorMatrix[3][3] = -999;
+      m_errorMatrix[3][4] = -999;
+      m_errorMatrix[3][5] = -999;
+
+      m_errorMatrix[4][0] = -999;
+      m_errorMatrix[4][1] = -999;
+      m_errorMatrix[4][2] = -999;
+      m_errorMatrix[4][3] = -999;
+      m_errorMatrix[4][4] = -999;
+      m_errorMatrix[4][5] = -999;
+
+      m_errorMatrix[5][0] = -999;
+      m_errorMatrix[5][1] = -999;
+      m_errorMatrix[5][2] = -999;
+      m_errorMatrix[5][3] = -999;
+      m_errorMatrix[5][4] = -999;
+      m_errorMatrix[5][5] = -999;
     }
 
     /** Destructor. */
@@ -154,6 +197,14 @@ namespace Belle2 {
      */
     TVector3 getMomentum() const;
 
+    /** Getter for the position (= POCA)
+     */
+    TVector3 getPosition() const { return m_position;}
+
+    /** Getter for the error matrix
+     */
+    TMatrixT<double> getErrorMatrix() const { return m_errorMatrix;}
+
     // Setters for all the parameters.
     //helix parameters: perigee
     /** Setter for impact parameter.
@@ -248,6 +299,10 @@ namespace Belle2 {
       m_vertexErrors.SetZ(z);
     }
 
+    /** Setter for the position
+     */
+    void setPosition(const TVector3& position) { m_position = position; }
+
     /** Setter for energy loss in the tracking detectors.
      */
     void setdEdx(const float& dEdx) { m_dEdx = dEdx;}
@@ -260,7 +315,15 @@ namespace Belle2 {
      */
     void setRadiusOfInnermostHit(const float& radiusOfInnermostHit) {m_radiusOfInnermostHit = radiusOfInnermostHit;}
 
-
+    /** Setter for the error matrix
+     */
+    void setErrorMatrix(const TMatrixT<double> &errorMatrix) {
+      for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 6; j++) {
+          m_errorMatrix[i][j] = errorMatrix[i][j];
+        }
+      }
+    }
 
   private:
 
@@ -359,6 +422,15 @@ namespace Belle2 {
      */
     TVector3 m_vertexErrors;
 
+    /** Position ( = point of closest approach wrt. to IP)
+     *
+     */
+    TVector3 m_position;
+
+    /** Covariance Matrix 6x6 (x,y,z,px,py,pz)
+     *
+     */
+    TMatrixT<double> m_errorMatrix;
 
     //these parameters are not used yet ...
 

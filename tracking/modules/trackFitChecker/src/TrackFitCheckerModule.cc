@@ -210,6 +210,7 @@ void TrackFitCheckerModule::initialize()
     m_madScalingFactors["pulls_vertexPosMom"] = 1.4826;
     m_madScalingFactors["res_curvVertex"] = 1.4826;
     m_madScalingFactors["relRes_curvVertex"] = 1.4826;
+    m_madScalingFactors["relRes_p_T"] = 1.4826;
   }
 
 

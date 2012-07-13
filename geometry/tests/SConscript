@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'G4materials', 'Geant4GM', 'BaseVGM', RootGM', 'ClhepVGM']
+env['LIBS'] = ['framework', 'G4materials', 'Geant4GM', 'BaseVGM', 'RootGM', 'ClhepVGM']
 
 Return('env')

@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'G4materials', 'Geant4GM', 'BaseVGM', 'RootGM', 'ClhepVGM']
+env['LIBS'] = ['$ROOT_LIBS', 'Geom', '$XML_LIBS', '$GEANT4_LIBS', 'framework', 'G4materials', 'Geant4GM', 'BaseVGM', 'RootGM', 'ClhepVGM', 'CLHEP']
 
 Return('env')

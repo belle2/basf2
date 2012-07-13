@@ -171,6 +171,7 @@ void DedxPIDModule::event()
 
   StoreArray<GFTrack> gftracks; //same indices as tracks!
   if (tracks.getEntries() != gftracks.getEntries()) {
+    //TODO replace with Tracks<->GFTracks relation when available
     B2FATAL("Tracks and GFTracks have different lengths?");
     return;
   }
@@ -183,7 +184,9 @@ void DedxPIDModule::event()
   StoreArray<PXDTrueHit> pxdTrueHits;
   StoreArray<PXDCluster> pxdClusters; //no 1:1 correspondence with PXDTrueHits & PXDRecoHits!
 
-  RelationIndex<PXDCluster, PXDTrueHit> pxdClustersToTrueHitsIndex(pxdClusters, pxdTrueHits);
+  RelationIndex<PXDCluster, PXDTrueHit> *pxdClustersToTrueHitsIndex = 0;
+  if (m_usePXD)
+    pxdClustersToTrueHitsIndex = new RelationIndex<PXDCluster, PXDTrueHit> (pxdClusters, pxdTrueHits);
 
   //output
   StoreArray<DedxLikelihood> *likelihood_array = 0;
@@ -425,7 +428,7 @@ void DedxPIDModule::event()
         typedef RelationIndex<PXDCluster, PXDTrueHit>::Element relElement_t;
         unsigned int hitID = pxdHitIDs[iHit];
         //get all relations that point to hitID
-        BOOST_FOREACH(const relElement_t & rel, pxdClustersToTrueHitsIndex.getTo(pxdTrueHits[hitID])) {
+        BOOST_FOREACH(const relElement_t & rel, pxdClustersToTrueHitsIndex->getTo(pxdTrueHits[hitID])) {
           pxdClusterIDs.push_back(rel.indexFrom);
         }
       }
@@ -474,6 +477,7 @@ void DedxPIDModule::event()
   delete dedx_array;
   delete tracks_to_likelihoods;
   delete likelihood_array;
+  delete pxdClustersToTrueHitsIndex;
 }
 
 

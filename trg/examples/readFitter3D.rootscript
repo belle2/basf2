@@ -5,6 +5,8 @@ readFitter3D(){
   // Control readFitter3D
   // graphFlag=-1: don't plot, 0: plot all, 1: plot fit, 2: plot pdg and mcParticle Status
   int graphFlag = 1;
+  // Choose if there is a condition in plotting fit results
+  int conditionFlag = 1;
 
   gROOT->Reset();
   gROOT->SetStyle("Plain");
@@ -26,14 +28,14 @@ readFitter3D(){
   inTree->SetBranchAddress("mcStatusTrackFitter3D", &mcStatusTrackFitter3D);
 
   //Make Histogram
-  TH1F* hpT    = new TH1F("histpT","Plot of pT",93,0,7.0);
+  TH1F* hpT    = new TH1F("histpT","Plot of pT",93,0.9,1.1);
   TH1F* hphi0   = new TH1F("hphi00","",87,0,360);
   TH1F* hz0     = new TH1F("histz0","Plot of z0",98,-25,25);
   TH1F* htheta = new TH1F("htheta","",130,20,150);
   hphi0->SetMinimum(0);
   hpT->SetMinimum(0);
   // MC Histograms
-  TH1F* hMCpT    = new TH1F("histMCpT","Plot of pT",93,0,7.0);
+  TH1F* hMCpT    = new TH1F("histMCpT","Plot of pT",93,0.9,1.1);
   TH1F* hMCphi0   = new TH1F("hMCphi00","Plot of phi0",87,0,360);
   TH1F* hMCz0     = new TH1F("histMCz0","Plot of z0",98,-25,25);
   TH1F* hMCtheta = new TH1F("hMCtheta","Plot of theta",130,20,150);
@@ -101,9 +103,21 @@ readFitter3D(){
       tempMCPar = *(TVectorD*)mcTrackFitter3D->At(track);
       mcStatus = *(TVectorD*)mcStatusTrackFitter3D->At(track);
 
-      // For choosing z0 range
-      //if(tempMCPar[2]*100>4 || tempMCPar[2]*100<-4) {
-      //if(tempMCPar[2]*100<0.001 && tempMCPar[2]*100>-0.001) {
+      // Transform parameters
+      if(tempPar[1]<0) tempPar[1] += 2*Trg_PI;
+      tempPar[1] = tempPar[1]*180/Trg_PI;
+      if(tempMCPar[1]<0) tempMCPar[1] += 2*Trg_PI;
+      tempMCPar[1] = tempMCPar[1]*180/Trg_PI;
+
+      theta = Trg_PI/2.-atan(tempPar[3]);
+      theta*=180./Trg_PI;
+      MCtheta=Trg_PI/2.-atan(tempMCPar[3]);
+      MCtheta*=180./Trg_PI;
+
+      // Pick condition
+      //if((tempMCPar[2]*100>1 || tempMCPar[2]*100<-1) && conditionFlag == 1) continue;
+      //if(!(tempMCPar[1]>100 && tempMCPar[1]<250) && conditionFlag == 1) continue;
+      if(!(tempPar[0]>1.004) && conditionFlag == 1) continue;
 
       hpT->Fill(tempPar[0]);
       //myPt[event] = (tempPar[0]-tempMCPar[0])/tempMCPar[0];
@@ -127,12 +141,8 @@ readFitter3D(){
       }
 
 
-      if(tempPar[1]<0) tempPar[1] += 2*Trg_PI;
-      tempPar[1] = tempPar[1]*180/Trg_PI;
       hphi0->Fill(tempPar[1]);
       myPhi0[event] = tempPar[1];
-      if(tempMCPar[1]<0) tempMCPar[1] += 2*Trg_PI;
-      tempMCPar[1] = tempMCPar[1]*180/Trg_PI;
       hMCphi0->Fill(tempMCPar[1]);
       mcPhi0[event] = tempMCPar[1];
       hResphi0->Fill(tempPar[1]-tempMCPar[1]);
@@ -143,12 +153,8 @@ readFitter3D(){
       mcZ0[event] = tempMCPar[2]*100;
       hResz0->Fill(tempPar[2]*100-tempMCPar[2]);
 
-      theta = Trg_PI/2.-atan(tempPar[3]);
-      theta*=180./Trg_PI;
       htheta->Fill(theta);
       myTheta[event]=theta;
-      MCtheta=Trg_PI/2.-atan(tempMCPar[3]);
-      MCtheta*=180./Trg_PI;
       hMCtheta->Fill(MCtheta);
       mcTheta[event]=MCtheta;
       hRestheta->Fill(theta-MCtheta);
@@ -167,18 +173,16 @@ readFitter3D(){
       //for(int n=10; n>=0; n--) cout<<mcStatusBit[n];
       //cout<<endl;
 
+      // statusbit, pdg, charge
       hPDG->Fill(mcStatus[1]);
       for(int n=0; n<10; n++){
         if(mcStatusBit[n] == 1){
           hStatus->Fill(n);
         }
       }
-      
+
       float range = 1;
       if(tempMCPar[2]*100>range || tempMCPar[2]<-range) countStrangeZ0 +=1;
-
-      //For choosing z0 range
-      //}
 
     } // track loop
   } // event loop

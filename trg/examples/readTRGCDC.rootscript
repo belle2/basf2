@@ -177,7 +177,7 @@ readTRGCDC(){
       //for(int n=10; n>=0; n--) cout<<mcStatusBit[n];
       //cout<<endl;
       // Count number of tracks and save z0 for all tracks
-      if(mcStatusBit[1] == 1 && mcStatus[2] != 0 && mc4Vector.Pt()>0.4) {
+      if(mcStatusBit[6] == 1 && mcStatus[2] != 0 && mc4Vector.Pt()>0.4) {
         mcMultiplicity += 1;
         //This is in cm scale
         hAllMCz0->Fill(mcVertexVector.Z());

@@ -20,7 +20,6 @@
 
 #include <string>
 
-//#include <boost/tuple/tuple.hpp>
 
 namespace Belle2 {
   /** In the store you can park objects, that have to be accessed by various modules.
@@ -29,7 +28,7 @@ namespace Belle2 {
    *  Normal users should try to access the store via StoreAccessor classes like the
    *  StoreObjPtr or the StoreArray. <br>
    *  Currently the store supports either the storage of single objects, that inherit from TObject,
-   *  and TClonesArrays, which are faster, if you have to store a large number of objects from the same type.
+   *  or TClonesArrays, which are faster, if you have to store a large number of objects from the same type.
    *  Besides that, you have to chose the durability of the things you want to store. <br>
    *  Currently you can chose between lifetimes of event, run, and persistent.
    *  basf2 deletes the objects from the store according to the durability map in which the objects are stored.
@@ -213,7 +212,7 @@ namespace Belle2 {
     /** Clearing Maps of a specified durability.
      *
      *  Called by the framework. Users should usually not use this function without a good reason.
-     *  Object Maps are just deleted. ArrayMaps don't delete the TClonesArrays, but just their content.
+     *  Object maps are just deleted. ArrayMaps don't delete the TClonesArrays, but just their content.
      *  The TClonesArray keeps the memory occupied and one can faster store objects into it.
      *  @param durability Decides which Map is cleared.
      */
@@ -232,7 +231,7 @@ namespace Belle2 {
     /** Map for TObjects.
      *
      *  The StoreObjMap maps std::strings to TObject pointers.
-     *  There is a separated Map for each durability type that exists.
+     *  There is a separate map for each durability type that exists.
      */
     StoreObjMap m_objectMap[c_NDurabilityTypes];
 
@@ -244,7 +243,10 @@ namespace Belle2 {
      */
     StoreObjMap m_arrayMap[c_NDurabilityTypes];
 
-    /** Creating new map slots is only allowed, if this boolean is true. */
+    /** True if modules are currently being initialized.
+     *
+     * Creating new map slots is only allowed in a Module's initialize() function.
+     */
     bool m_initializeActive;
   };
 } // namespace Belle2
@@ -262,7 +264,7 @@ template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
     if (!objectFound && generate && !m_initializeActive) {
       // should only happen in the initialize phase
       //shall soon be replaced with a B2ERROR message
-      B2WARNING("m_initializeActive is false while you try to create an object " << name << " under EDurability " << durability);
+      B2WARNING("Creating an object " << name << " and durability " << durability << " outside initialize(). Please register output objects/relations by also creating them in your Module's initialize() function!");
     }
     if (AObject == 0 && generate) {
       AObject = new T;
@@ -274,7 +276,7 @@ template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
   } else {
     //object found
     if (AObject != 0) { //and new one given...
-      B2INFO("Found existing object '" << name << "', overwriting.");
+      B2WARNING("Found existing object '" << name << "' and new one was provided. Replacing existing object.");
       delete m_objectMap[durability][name];
       m_objectMap[durability][name] = AObject;
       storeSuccessful = true;
@@ -298,7 +300,7 @@ template <class T> bool Belle2::DataStore::handleArray(const std::string& name,
   if (registerNewArray) { // new slot in map needs to be created
     if (!m_initializeActive) { // should only happen in the initialize phase
       //shall soon be replaced with an B2ERROR message
-      B2WARNING("m_initializeActive is false while you try to create an array " << name << " under EDurability " << durability);
+      B2WARNING("Creating an array " << name << " and durability " << durability << " outside initialize(). Please register output arrays also creating them in your Module's initialize() function!");
     }
     if (array == 0) {
       array = new TClonesArray(T::Class()); // use default constructor

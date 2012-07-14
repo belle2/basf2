@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/modules/extrapolateToPXD/ExtrapolateToPXDModule.h>
+#include <tracking/modules/extrapolateToVXD/ExtrapolateToPXDModule.h>
 
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>

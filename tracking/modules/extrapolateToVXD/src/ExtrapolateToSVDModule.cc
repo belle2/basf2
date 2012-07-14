@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/modules/extrapolateToSVD/ExtrapolateToSVDModule.h>
+#include <tracking/modules/extrapolateToVXD/ExtrapolateToSVDModule.h>
 
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>

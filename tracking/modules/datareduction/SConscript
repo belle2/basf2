@@ -1,7 +1,0 @@
-Import('env')
-
-env['CONTINUE'] = False
-env['LIBS'] = ['pxd', 'svd', 'framework', 'geometry', 'simulation',
-               '$ROOT_LIBS', 'Geom', 'EG', 'g4root', 'tracking']
-
-Return('env')

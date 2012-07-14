@@ -1,6 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['tracking', 'framework','cdc_dataobjects', 'genfit', 'RKTrackRep']
-
-Return('env')
-

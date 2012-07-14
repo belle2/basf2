@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/cdcLegendreTracking/CDCLegendreTrackingModule.h>
+#include <tracking/modules/cdcPatternReco/CDCLegendreTrackingModule.h>
 
 //#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>

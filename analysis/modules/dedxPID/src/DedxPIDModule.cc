@@ -468,7 +468,7 @@ void DedxPIDModule::event()
     if (likelihood_array) {
       //save likelihoods
       const int dedxLikelihoodIdx = likelihood_array->getEntries();
-      new((*likelihood_array)[dedxLikelihoodIdx]) DedxLikelihood(track.m_logl, track.m_p);
+      new(likelihood_array->nextFreeAddress()) DedxLikelihood(track.m_logl, track.m_p);
       tracks_to_likelihoods->add(iTrack, dedxLikelihoodIdx);
       //TODO: add one for mcparticles?
     }

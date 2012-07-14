@@ -107,8 +107,7 @@ namespace Belle2 {
   protected:
     /** Constructor to create a new IndexContainer.
      *
-     *  @param name Name of the underlying relation
-     *  @param durability Durability of the underlying relation
+     *  @param params pair of name and durability
      */
     RelationIndexContainer(const AccessorParams& params): m_storeRel(params), m_valid(false) {
       rebuild(true);

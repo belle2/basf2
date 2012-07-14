@@ -9,9 +9,10 @@ using namespace std;
 namespace Belle2 {
 #define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
 
-  // The fixture for testing class Foo.
+  /** The fixture for testing class Foo. */
   class RelationTest : public ::testing::Test {
   protected:
+    /** fill StoreArrays with entries from 0..9 */
     virtual void SetUp() {
       for (int i = 0; i < 10; ++i) {
         new(evtData->AddrAt(i)) EventMetaData();
@@ -19,25 +20,25 @@ namespace Belle2 {
       }
     }
 
+    /** clear datastore */
     virtual void TearDown() {
-      //Clear Datastore
       for (int i = 0; i < DataStore::c_NDurabilityTypes; ++i) {
         DataStore::Instance().clearMaps((DataStore::EDurability) i);
       }
     }
 
-    StoreArray<EventMetaData> evtData;
-    StoreArray<RunMetaData> runData;
+    StoreArray<EventMetaData> evtData; /**< event data array */
+    StoreArray<RunMetaData> runData; /**< run data array */
   };
 
-  // Tests the creation of a Relation.
+  /** Tests the creation of a Relation. */
   TEST_F(RelationTest, RelationCreate)
   {
     RelationArray relation(evtData, runData);
     EXPECT_TRUE(relation);
   }
 
-  // Check finding of relations
+  /** Check finding of relations. */
   TEST_F(RelationTest, RelationFind)
   {
     EXPECT_FALSE(RelationArray(evtData, runData, "", DataStore::c_Event, false));
@@ -47,7 +48,7 @@ namespace Belle2 {
     EXPECT_TRUE(RelationArray(name));
   }
 
-  //Test that adding to an invalid relation yields a FATAL
+  /** Test that adding to an invalid relation yields a FATAL */
   TEST_F(RelationTest, AddInvalidDeathTest)
   {
     RelationArray relation(evtData, runData, "", DataStore::c_Event, false);
@@ -59,14 +60,14 @@ namespace Belle2 {
     EXPECT_FATAL(relation.getModified());
   }
 
-  //Test that Relations wich points to the wrong arrays yields a FATAL
+  /** Test that Relations wich points to the wrong arrays yields a FATAL. */
   TEST_F(RelationTest, RelationWrongDeathTest)
   {
     RelationArray relation1(evtData, runData, "test");
     EXPECT_FATAL(RelationArray relation2(runData, evtData, "test"));
   }
 
-  //Check consolidation of Relation Elements
+  /** Check consolidation of RelationElements. */
   TEST_F(RelationTest, RelationConsolidate)
   {
     RelationArray relation(evtData, runData);
@@ -91,7 +92,7 @@ namespace Belle2 {
     EXPECT_EQ(relation[0].getToIndex(), 1u);
   }
 
-  //Check creation of an index
+  /** Check creation of an index. */
   TEST_F(RelationTest, BuildIndex)
   {
     RelationArray relation(evtData, runData);
@@ -132,6 +133,7 @@ namespace Belle2 {
 
   }
 
+  /** Check wether out-of-bound indices are caught by RelationIndex. */
   TEST_F(RelationTest, InconsitentIndexDeathTest)
   {
     RelationArray relation(evtData, runData);
@@ -143,6 +145,8 @@ namespace Belle2 {
     EXPECT_FATAL(rel_t relIndex);
   }
 
+
+  /** Check behaviour when attaching to non-existing(=empty) relation */
   TEST_F(RelationTest, EmptyIndex)
   {
     RelationIndex<EventMetaData, RunMetaData> index;
@@ -152,6 +156,7 @@ namespace Belle2 {
     EXPECT_EQ(index.getToAccessorParams().first, "");
   }
 
+  /** Attaching to relation with from and two swapped, and with different StoreArray of same type. */
   TEST_F(RelationTest, WrongRelationIndexDeathTest)
   {
     RelationArray relation(runData, evtData, "test");
@@ -163,7 +168,7 @@ namespace Belle2 {
     RelationArray relation2(evtData, runData, "test2");
     EXPECT_FATAL(rel_t(eventData, runData, "test2"));
     //This relation works and points to evtData, not eventData.
-    //no check is performend, user is responsible to check
+    //no check is performed, user is responsible to check
     //using getFromAccessorParams and getToAccessorParams
     EXPECT_TRUE(rel_t("test2"));
   }

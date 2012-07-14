@@ -15,6 +15,7 @@ using namespace std;
 
 namespace Belle2 {
 
+  /** Test opening Belle2.xml and accessing nodes from Gearbox */
   TEST(GearBox, Open)
   {
     //LogSystem::Instance().getLogConfig()->setLogLevel(LogConfig::c_Debug);
@@ -40,6 +41,7 @@ namespace Belle2 {
   }
 
 #ifdef HAS_SQLITE
+  /** Test opening SQLite db and accessing nodes from Gearbox */
   TEST(GearBox, SQLite)
   {
     StoreObjPtr<EventMetaData> eventMetaDataPtr;

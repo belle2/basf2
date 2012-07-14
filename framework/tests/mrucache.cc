@@ -7,6 +7,7 @@ using namespace std;
 
 namespace Belle2 {
 
+  /** check constructing and retrieving data from MRUCache */
   TEST(MRUCache, Constructor)
   {
     MRUCache<string, string> cache(100);
@@ -18,6 +19,7 @@ namespace Belle2 {
     EXPECT_EQ(result, "bar");
   }
 
+  /** more extensive retrieval tests */
   TEST(MRUCache, InsertRetrieve)
   {
     MRUCache<int, int> cache(5);
@@ -44,6 +46,7 @@ namespace Belle2 {
     EXPECT_EQ(var, -1);
   }
 
+  /** check update of existing entries */
   TEST(MRUCache, Update)
   {
     MRUCache<int, int> cache(5);
@@ -58,6 +61,7 @@ namespace Belle2 {
     EXPECT_EQ(var, 2);
   }
 
+  /** check retrieval statistics */
   TEST(MRUCache, Statistics)
   {
     MRUCache<int, int> cache(1);

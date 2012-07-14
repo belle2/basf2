@@ -65,7 +65,7 @@ namespace Belle2 {
    *  If performance is especially important, you can also create a new object
    *  using 'placement-new':
    *  \code
-  new (cdcsimhits[cdcsimhits.getEntries()]) CDCSimHit(some ctor arguments);
+  new (cdcsimhits.nextFreeAddress()) CDCSimHit(some ctor arguments);
       \endcode
 
    *  This creates a new CDCSimHit at the end of the array and allows
@@ -139,24 +139,31 @@ namespace Belle2 {
 
     /** Access to the stored objects.
      *
+     *  \param i Array index, should be in 0..getEntries()-1
+     *  \return pointer to the created object, or NULL if out of bounds
+     */
+    inline T* operator [](int i) const {
+      if (i >= getEntries() or i < 0)
+        return 0;
+      //type was checked by DataStore, so this is safe
+      return static_cast<T*>(m_storeArray->AddrAt(i));
+    }
+
+    /** Returns address of the next free position of the array.
+     *
      *  To add an element to the array, use:
      *  \code
-    new (myStoreArray[myStoreArray.getEntries()]) T(some ctor arguments);
+    new (myStoreArray.nextFreeAddress()) T(some ctor arguments);
         \endcode
      *  which constructs a new T object at the end of myStoreArray.
      *
      *  If you only want to use T's default or copy constructor, use the safer
      *  appendNew() instead.
      *
-     *
-     *  \param i Array index, should be in 0..getEntries()-1 (no range check).
-     *           Using i = getEntries() is O.K. when used with new (...) T, the
-     *           array is expanded as necessary.
-     *  \return pointer to the created object
+     *  \return pointer to address just past the last array element
      */
-    inline T* operator [](int i) const {
-      //type was checked by DataStore, so this is safe
-      return static_cast<T*>(m_storeArray->AddrAt(i));
+    inline T* nextFreeAddress() {
+      return static_cast<T*>(m_storeArray->AddrAt(getEntries()));
     }
 
     /** Construct a new T object at the end of the array.
@@ -179,7 +186,7 @@ namespace Belle2 {
      *        array, you may want to avoid creating a temporary object for
      *        each of them. In this case, the default-constructing variant
      *        of appendNew() or placement-new with a custom constructor (see
-     *        documentation of operator[]) may be better.
+     *        documentation of nextFreeAddress() ) may be better.
      *
      *  \return pointer to the created object
      */

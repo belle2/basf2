@@ -39,6 +39,8 @@ namespace Belle2 {
 
   class ExtNavigator;
 
+  /** It is the main interface for the user to define the setup and start the propagation.
+   *  Initializes GEANT4 for the propagation. **/
   class ExtManager {
 
   public:

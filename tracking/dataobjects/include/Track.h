@@ -15,15 +15,17 @@
 
 namespace Belle2 {
 
-  /** Track parameters. */
-  /** This Track class is based on the perigee track parametrisation.
-   *  It is still under discussion which parametrisation will be the one we want to use at the end.
-   *  It is also generally not fixed which variables this class should contain, so it is more or less a preliminary solution...
-   *
+  /**
    *  \addtogroup dataobjects
    *  @{
    *  \addtogroup tracking
    *  @{
+   */
+
+  /** Track parameters.
+   *  This Track class is based on the perigee track parametrisation.
+   *  It is still under discussion which parametrisation will be the one we want to use at the end.
+   *  It is also generally not fixed which variables this class should contain, so it is more or less a preliminary solution...
    */
   class Track : public TObject {
   public:

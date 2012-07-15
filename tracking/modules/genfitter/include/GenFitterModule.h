@@ -18,9 +18,11 @@ namespace Belle2 {
   /**
    *  \addtogroup modules
    *  @{
-   *  \addtogroup tracking
-   *  @{
+   *  \addtogroup tracking_modules
+   *  \ingroup modules
+   *  @{ GenFitterModule @} @}
    */
+
 
   /** This module use GFTrackCand objects (track candidates with hits and momentum seed) and fits them using GenFit.
    *
@@ -28,7 +30,6 @@ namespace Belle2 {
    *
    *  At the end GFTracks (native GenFit output with all the information) and Tracks (custom objects with only the important parameters we want to have at the end) are created.
    */
-
   class GenFitterModule : public Module {
 
   public:
@@ -105,3 +106,4 @@ namespace Belle2 {
 
 
 #endif /* GENFITTERMODULE_H */
+

@@ -18,6 +18,9 @@ namespace Belle2 {
   /**
    * \addtogroup modules
    * @{
+   * \addtogroup framework_modules
+   * \ingroup modules
+   * @{ ProgressModule @} @}
    */
 
   /**
@@ -60,7 +63,6 @@ namespace Belle2 {
     /** compiled output format */
     boost::format m_output;
   };
-  /*! @} */
 } // end namespace Belle2
 
 #endif // ProgressModule_H

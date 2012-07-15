@@ -17,13 +17,14 @@
 #include <boost/tuple/tuple.hpp>
 
 namespace Belle2 {
-
   /**
    *  \addtogroup modules
    *  @{
-   *  \addtogroup tracking
-   *  @{
+   *  \addtogroup tracking_modules
+   *  \ingroup modules
+   *  @{ CDCTrackingModule @} @}
    */
+
 
   /** Module to perform pattern recognition in the CDC through conformal transformation.
    *
@@ -33,7 +34,6 @@ namespace Belle2 {
    *  In the following step stereo segments are assigned to these candidates.
    *  As output GFTrackCands are created, which can be directly passed to GenFit.
    */
-
   class CDCTrackingModule : public Module {
 
   public:
@@ -41,45 +41,37 @@ namespace Belle2 {
     /** Constructor.
      *  Create and allocate memory for variables here. Add the module parameters in this method.
      */
-
     CDCTrackingModule();
 
     /** Destructor.
      * Use the destructor to release the memory you allocated in the constructor.
      */
-
-
     virtual ~CDCTrackingModule();
 
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.
      * Use this method to initialize variables, open files etc.
      */
-
     virtual void initialize();
 
     /** Called when entering a new run;
      * Called at the beginning of each run, the method gives you the chance to change run dependent constants like alignment parameters, etc.
      */
-
     virtual void beginRun();
 
     /** This method is the core of the module.
      * This method is called for each event. All processing of the event has to take place in this method.
      */
-
     virtual void event();
 
     /** This method is called if the current run ends.
      * Use this method to store information, which should be aggregated over one run.
      */
-
     virtual void endRun();
 
     /** This method is called at the end of the event processing.
      *  Use this method for cleaning up, closing files, etc.
      */
-
     virtual void terminate();
 
     /** This method sorts hit indices to bring them in a correct order, which is needed for the fitting
@@ -117,7 +109,8 @@ namespace Belle2 {
 
 
 
-  }; /** @} @} */
+  };
 } // end namespace Belle2
 #endif
+
 

@@ -18,8 +18,9 @@ namespace Belle2 {
   /**
    *  \addtogroup dataobjects
    *  @{
-   *  \addtogroup tracking
-   *  @{
+   *  \addtogroup tracking_dataobjects
+   *  \ingroup dataobjects
+   *  @{ Track @} @}
    */
 
   /** Track parameters.
@@ -460,6 +461,6 @@ namespace Belle2 {
     /** ROOT Macro to make Track a ROOT class.*/
     ClassDef(Track, 1);
 
-  }; //class /** @} @} */
+  }; //class
 } // namespace Belle2
 #endif // TRACK

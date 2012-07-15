@@ -18,18 +18,19 @@
 #include <vector>
 
 namespace Belle2 {
-
   /**
    *  \addtogroup modules
    *  @{
-   *  \addtogroup tracking
-   *  @{
+   *  \addtogroup tracking_modules
+   *  \ingroup modules
+   *  @{ CDCLegendreTrackingModule @} @}
    */
+
+
 
   /** CDC tracking module, using Legendre transformation of the drift time circles.
    * This is a module, performing tracking in the CDC. It is based on the paper "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers" by T. Alexopoulus, et al. NIM A592 456-462 (2008)
    */
-
   class CDCLegendreTrackingModule: public Module {
 
   public:
@@ -37,44 +38,37 @@ namespace Belle2 {
     /** Constructor.
      *  Create and allocate memory for variables here. Add the module parameters in this method.
      */
-
     CDCLegendreTrackingModule();
 
     /** Destructor.
      * Use the destructor to release the memory you allocated in the constructor.
      */
-
     virtual ~CDCLegendreTrackingModule();
 
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.
      * Use this method to initialize variables, open files etc.
      */
-
     virtual void initialize();
 
     /** Called when entering a new run;
      * Called at the beginning of each run, the method gives you the chance to change run dependent constants like alignment parameters, etc.
      */
-
     virtual void beginRun();
 
     /** This method is the core of the module.
      * This method is called for each event. All processing of the event has to take place in this method.
      */
-
     virtual void event();
 
     /** This method is called if the current run ends.
      * Use this method to store information, which should be aggregated over one run.
      */
-
     virtual void endRun();
 
     /** This method is called at the end of the event processing.
      *  Use this method for cleaning up, closing files, etc.
      */
-
     virtual void terminate();
 
 
@@ -147,8 +141,8 @@ namespace Belle2 {
     void createLegendreTrackCandidates(
       std::vector<std::pair<int, int> > tracks);
 
-    void createGFTrackCandidates();
     /** Creates GeantFit Track Candidates from CDCLegendreTrackCandidates */
+    void createGFTrackCandidates();
 
   };
 
@@ -156,8 +150,9 @@ namespace Belle2 {
   struct SortCandidatesByVotes {
     bool operator()(const std::pair<int, std::pair<int, int> > &lhs,
                     const std::pair<int, std::pair<int, int> > &rhs) const;
-  };/**@} @}*/
+  };
 
 } // end namespace Belle2
 #endif
+
 

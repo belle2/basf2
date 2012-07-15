@@ -16,13 +16,14 @@
 #include <string>
 
 namespace Belle2 {
-
   /**
    *  \addtogroup modules
    *  @{
-   *  \addtogroup tracking
-   *  @{
+   *  \addtogroup tracking_modules
+   *  \ingroup modules
+   *  @{ MCTrackFinderModule @} @}
    */
+
 
   /** This module use MC true Relations to define which hits belong to which particles and writes track candidates filled with necessary information into the DataStore.
    *
@@ -104,7 +105,9 @@ namespace Belle2 {
     int m_notEnoughtHitsCounter;                                /**< 0 if the track has enough hits to create a GFTrackCand*/
 
 
-  };/** @} @} */
+  };
 }
 
 #endif /* MCTRACKFINDERMODULE_H_ */
+
+

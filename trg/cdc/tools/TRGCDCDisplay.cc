@@ -11,6 +11,8 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
+#ifdef TRGCDC_DISPLAY
+
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
@@ -18,14 +20,12 @@
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/Segment.h"
-#ifdef TRGCDC_DISPLAY
 #include "framework/gearbox/Gearbox.h"
 #include "trg/cdc/DisplayRphi.h"
 #include "trg/cdc/DisplayHough.h"
 namespace Belle2_TRGCDC {
     Belle2::TRGCDCDisplayRphi * D = 0;
 }
-#endif
 
 using namespace std;
 using namespace Belle2;
@@ -136,3 +136,12 @@ main(int , char ** ) {
     //...Termination...
     cout << PROGRAM_NAME << " ... terminated" << endl;
 }
+
+#else
+#include <iostream>
+int
+main() {
+    std::cout << "Please turn on TRG*_DISPLAY flags in trg/SConscript to get "
+	      << "a display" << std::endl;
+}
+#endif

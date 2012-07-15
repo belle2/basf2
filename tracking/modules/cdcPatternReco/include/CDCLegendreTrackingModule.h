@@ -21,6 +21,10 @@ namespace Belle2 {
 
   /** CDC tracking module, using Legendre transformation of the drift time circles.
    * This is a module, performing tracking in the CDC. It is based on the paper "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers" by T. Alexopoulus, et al. NIM A592 456-462 (2008)
+   *  \addtogroup modules
+   *  @{
+   *  \addtogroup tracking
+   *  @{
    */
 
   class CDCLegendreTrackingModule: public Module {
@@ -149,7 +153,7 @@ namespace Belle2 {
   struct SortCandidatesByVotes {
     bool operator()(const std::pair<int, std::pair<int, int> > &lhs,
                     const std::pair<int, std::pair<int, int> > &rhs) const;
-  };
+  };/**@} @}*/
 
 } // end namespace Belle2
 #endif

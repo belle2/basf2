@@ -26,6 +26,10 @@ namespace Belle2 {
    *  The created GFTrackCandidates can be fitted with GenFitterModule.
    *
    *  @todo: check hit ordering and planeIds when adding hits to GFTrackCand, maybe create track candidates not only for primary particles
+   *  \addtogroup modules
+   *  @{
+   *  \addtogroup tracking
+   *  @{
    */
   class MCTrackFinderModule : public Module {
 
@@ -97,7 +101,7 @@ namespace Belle2 {
     int m_notEnoughtHitsCounter;                                /**< 0 if the track has enough hits to create a GFTrackCand*/
 
 
-  };
+  };/** @} @} */
 }
 
 #endif /* MCTRACKFINDERMODULE_H_ */

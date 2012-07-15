@@ -20,6 +20,10 @@ namespace Belle2 {
    *  This modules can be executed after MCTrackFinderModule or any pattern recognition module, as long as these modules provide valid GFTrackCand array.
    *
    *  At the end GFTracks (native GenFit output with all the information) and Tracks (custom objects with only the important parameters we want to have at the end) are created.
+   *  \addtogroup modules
+   *  @{
+   *  \addtogroup tracking
+   *  @{
    */
 
   class GenFitterModule : public Module {
@@ -93,7 +97,7 @@ namespace Belle2 {
     bool m_createTextFile;                           /**< Boolean to select if an output file with helix parameters should be created. */
 
 
-  };
+  }; /** @} @} */
 } // end namespace Belle2
 
 

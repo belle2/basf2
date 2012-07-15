@@ -19,6 +19,11 @@ namespace Belle2 {
   /** This Track class is based on the perigee track parametrisation.
    *  It is still under discussion which parametrisation will be the one we want to use at the end.
    *  It is also generally not fixed which variables this class should contain, so it is more or less a preliminary solution...
+   *
+   *  \addtogroup dataobjects
+   *  @{
+   *  \addtogroup tracking
+   *  @{
    */
   class Track : public TObject {
   public:
@@ -453,6 +458,6 @@ namespace Belle2 {
     /** ROOT Macro to make Track a ROOT class.*/
     ClassDef(Track, 1);
 
-  }; //class
+  }; //class /** @} @} */
 } // namespace Belle2
 #endif // TRACK

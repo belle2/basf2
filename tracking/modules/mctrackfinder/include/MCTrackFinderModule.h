@@ -17,6 +17,13 @@
 
 namespace Belle2 {
 
+  /**
+   *  \addtogroup modules
+   *  @{
+   *  \addtogroup tracking
+   *  @{
+   */
+
   /** This module use MC true Relations to define which hits belong to which particles and writes track candidates filled with necessary information into the DataStore.
    *
    *  The Relations MCParticles -> Hits for PXD, SVD and CDC are used.
@@ -26,10 +33,6 @@ namespace Belle2 {
    *  The created GFTrackCandidates can be fitted with GenFitterModule.
    *
    *  @todo: check hit ordering and planeIds when adding hits to GFTrackCand, maybe create track candidates not only for primary particles
-   *  \addtogroup modules
-   *  @{
-   *  \addtogroup tracking
-   *  @{
    */
   class MCTrackFinderModule : public Module {
 

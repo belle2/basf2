@@ -18,6 +18,13 @@
 
 namespace Belle2 {
 
+  /**
+   *  \addtogroup modules
+   *  @{
+   *  \addtogroup tracking
+   *  @{
+   */
+
   /** Module to perform pattern recognition in the CDC through conformal transformation.
    *
    *  The CDCTrackingModule performs pattern recognition in the CDC through conformal transformation of hit coordinates.
@@ -25,10 +32,6 @@ namespace Belle2 {
    *  Then segments from axial superlayers are combined to track candidates.
    *  In the following step stereo segments are assigned to these candidates.
    *  As output GFTrackCands are created, which can be directly passed to GenFit.
-   *  \addtogroup modules
-   *  @{
-   *  \addtogroup tracking
-   *  @{
    */
 
   class CDCTrackingModule : public Module {

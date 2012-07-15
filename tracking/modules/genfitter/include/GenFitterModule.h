@@ -15,15 +15,18 @@
 
 namespace Belle2 {
 
+  /**
+   *  \addtogroup modules
+   *  @{
+   *  \addtogroup tracking
+   *  @{
+   */
+
   /** This module use GFTrackCand objects (track candidates with hits and momentum seed) and fits them using GenFit.
    *
    *  This modules can be executed after MCTrackFinderModule or any pattern recognition module, as long as these modules provide valid GFTrackCand array.
    *
    *  At the end GFTracks (native GenFit output with all the information) and Tracks (custom objects with only the important parameters we want to have at the end) are created.
-   *  \addtogroup modules
-   *  @{
-   *  \addtogroup tracking
-   *  @{
    */
 
   class GenFitterModule : public Module {

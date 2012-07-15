@@ -47,7 +47,7 @@ namespace Belle2 {
 
     SensitiveDetector::SensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
       Simulation::SensitiveDetectorBase(name, ECL), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
-      m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0)
+      m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_trackID(-999)
     {
       StoreArray<MCParticle> mcParticles;
       StoreArray<ECLSimHit> eclSimHits;

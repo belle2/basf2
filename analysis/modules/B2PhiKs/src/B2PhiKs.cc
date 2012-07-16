@@ -100,7 +100,7 @@ void B2PhiKsModule::terminate()
 
 void B2PhiKsModule::event()
 {
-  B2INFO("[B2PhiKs Module]: Begin Event.");
+  //B2INFO("[B2PhiKs Module]: Begin Event.");
 
   // Array of MC particles
   StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
@@ -121,7 +121,7 @@ void B2PhiKsModule::event()
   // PXD/SVD/CDC (true generated) hits
   StoreArray<PXDTrueHit> pxdTrueHits;
   StoreArray<SVDTrueHit> svdTrueHits;
-  StoreArray<CDCSimHit> cdcTrueHits;
+  StoreArray<CDCSimHit>  cdcTrueHits;
 
   // relation MCParticle -> PXD/SVD/CDC true hit
   RelationArray mcPartToPXDTrueHits(mcParticles, pxdTrueHits);

@@ -1,5 +1,7 @@
 Import('env')
 
+env['CONTINUE'] = False
+
 env['LIBS'] = ['$ROOT_LIBS', 'Geom',
                'g4root', '$GEANT4_LIBS', 'CLHEP',
                'boost_serialization',

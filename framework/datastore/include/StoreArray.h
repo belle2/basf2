@@ -174,7 +174,7 @@ namespace Belle2 {
      *
      *  \return pointer to the created object
      */
-    inline T* appendNew() { return new((*this)[getEntries()]) T(); }
+    inline T* appendNew() { return new(nextFreeAddress()) T(); }
 
     /** Copy-construct a new T object at the end of the array.
      *
@@ -190,7 +190,7 @@ namespace Belle2 {
      *
      *  \return pointer to the created object
      */
-    inline T* appendNew(const T& obj) { return new((*this)[getEntries()]) T(obj); }
+    inline T* appendNew(const T& obj) { return new(nextFreeAddress()) T(obj); }
 
     //@{
     /** Raw access to the underlying TClonesArray.

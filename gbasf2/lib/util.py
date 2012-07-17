@@ -31,7 +31,7 @@ def CheckAndRemoveProjectIfForce(username=None, project=None):
         if user_input.upper() == 'G':
             print 'You have terminated the project'
             DIRAC.exit(1)
-        elif user_input.upper() != 'R' or user_input.upper() != 'A':
+        elif user_input.upper() != 'R' and user_input.upper() != 'A':
             print 'You must eneter G or R or A'
             DIRAC.exit(1)
         else:

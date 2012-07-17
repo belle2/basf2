@@ -20,10 +20,8 @@ namespace Belle2 {
 
   typedef std::pair<std::string, DataStore::EDurability> AccessorParams; /**< Pair of parameters needed to find an object in the DataStore. */
 
-  /** Abstract base class for the StoreObjPtr and the StoreArray for easier common treatment by the Relation class.
+  /** Abstract base class for the StoreObjPtr and the StoreArray for easier common treatment.
    *
-   *  This class is purely virtual. It is the recommended access to the DataStore in case you have
-   *  to loop over all objects in the DataStore.
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreAccessorBase">The basf2 developers</a>
    */
   class StoreAccessorBase {
@@ -38,6 +36,17 @@ namespace Belle2 {
 
     /** Returns name under which stored object is saved.  */
     virtual AccessorParams getAccessorParams() const = 0;
+
+    /** Check if two store accessors point to the same object/array. */
+    virtual bool operator==(const StoreAccessorBase& other) {
+      return getAccessorParams() == other.getAccessorParams();
+    }
+
+    /** Check if two store accessors point to a different object/array. */
+    virtual bool operator!=(const StoreAccessorBase& other) {
+      return !(*this == other);
+    }
+
   };
 }
 

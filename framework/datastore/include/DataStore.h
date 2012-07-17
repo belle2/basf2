@@ -58,8 +58,6 @@ namespace Belle2 {
     };
 
     // Convenient typedefs.
-//    For later:
-//    typedef std::map<std::string, boost::tuple<TObject*,      ECollectionPropFlags> > StoreObjMap;   /**< Map for TObjects. */
     typedef std::map<std::string, TObject*> StoreObjMap;   /**< Map for TObjects. */
     typedef StoreObjMap::iterator StoreObjIter;             /**< Iterator for a TObject map. */
     typedef StoreObjMap::const_iterator StoreObjConstIter; /**< const_iterator for a TObject map. */
@@ -300,7 +298,7 @@ template <class T> bool Belle2::DataStore::handleArray(const std::string& name,
   if (registerNewArray) { // new slot in map needs to be created
     if (!m_initializeActive) { // should only happen in the initialize phase
       //shall soon be replaced with an B2ERROR message
-      B2WARNING("Creating an array " << name << " and durability " << durability << " outside initialize(). Please register output arrays also creating them in your Module's initialize() function!");
+      B2WARNING("Creating an array " << name << " and durability " << durability << " outside initialize(). Please register output arrays by also creating them in your Module's initialize() function!");
     }
     if (array == 0) {
       array = new TClonesArray(T::Class()); // use default constructor

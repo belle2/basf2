@@ -141,15 +141,15 @@ namespace Belle2 {
     template <class FROM, class TO> RelationArray(const StoreArray<FROM>& from, const StoreArray<TO>& to, std::string name = "",
                                                   const DataStore::EDurability& durability = DataStore::c_Event, bool generate = true):
       StoreObjPtr<RelationContainer>(0) {
+      const AccessorParams& accessorFrom = from.getAccessorParams();
+      const AccessorParams& accessorTo   = to.getAccessorParams();
 
-      const AccessorParams accessorFrom = from.getAccessorParams();
-      const AccessorParams accessorTo   = to.getAccessorParams();
+      if (name == "") name = DataStore::defaultRelationName<FROM, TO>();
       if (accessorFrom.second > durability || accessorTo.second > durability) {
         B2FATAL("Tried to create Relation '" << name
                 << "' with a durability larger than the StoreArrays it relates");
       }
 
-      if (name == "") name = DataStore::defaultRelationName<FROM, TO>();
       if (assignObject(name, durability, generate)) {
         m_storeObjPtr->setFromName(accessorFrom.first);
         m_storeObjPtr->setFromDurability(accessorFrom.second);

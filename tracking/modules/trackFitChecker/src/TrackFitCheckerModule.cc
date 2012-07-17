@@ -21,7 +21,9 @@
 
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-
+#include <vxd/geometry/GeoCache.h>
+#include <svd/geometry/SensorInfo.h>
+#include <pxd/geometry/SensorInfo.h>
 #include <vxd/dataobjects/VXDTrueHit.h>
 
 #include <pxd/reconstruction/PXDRecoHit.h>
@@ -49,6 +51,7 @@
 #include <cmath>
 #include <limits>
 #include <numeric>
+#include <set>
 //for root output
 
 using namespace std;
@@ -150,14 +153,19 @@ void TrackFitCheckerModule::initialize()
     m_statDataTreePtr = NULL;
   }
 
+
+
+
+
   if (m_testCdc == true) {
     m_nCdcLayers = 56; //should come from the xml file
   } else {
     m_nCdcLayers = 0;
   }
   if (m_testSi == true) {
-    m_nPxdLayers = 2;//should come from the xml file
-    m_nSvdLayers = 4;
+    VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+    m_nPxdLayers = geo.getLayers(PXD::SensorInfo::PXD).size();
+    m_nSvdLayers = geo.getLayers(SVD::SensorInfo::SVD).size();
   } else {
     m_nPxdLayers = 0;
     m_nSvdLayers = 0;
@@ -199,7 +207,7 @@ void TrackFitCheckerModule::initialize()
   registerLayerWiseData("pulls_and_chi2_meas_t", vecSizeMeasTest);
   registerLayerWiseData("res_meas_t", 2);
 
-  registerLayerWiseData("DAF_weights", 5); // at the moment only tracks with no noise
+  registerLayerWiseData("DAF_weights", 5); // at the moment only tracks 1 or 2 BG hits
   registerLayerWiseData("DAF_chi2s", 5);
   //registerLayerWiseData("DAF_weights_BG", 3);
 
@@ -285,7 +293,7 @@ void TrackFitCheckerModule::event()
       //m_layerWiseTests.havePredicitons = false;
       m_testPrediction = false;
       if (m_inspectTracks > 0) {
-        m_dataOut << "#inspect tracks was disables because no predictions are available in the Genfit bookkeeping\n";
+        m_dataOut << "#inspect tracks was disabled because no predictions are available in the Genfit bookkeeping\n";
       }
     }
 
@@ -325,8 +333,13 @@ void TrackFitCheckerModule::event()
     RKTrackRep* aRKTrackRepPtr = static_cast<RKTrackRep*>(aTrackPtr->getCardinalRep());
 
     aRKTrackRepPtr->setPropDir(-1);
-
-    aRKTrackRepPtr->extrapolateToPoint(trueVertexPos, poca, dirInPoca); //goto vertex position
+    try {
+      aRKTrackRepPtr->extrapolateToPoint(trueVertexPos, poca, dirInPoca);
+    } catch (GFException& e) {
+      B2WARNING("Extrapolation of a track in Event " << eventCounter <<  " to his true vertex position failed. Track will be ignored in statistical tests");
+      ++m_extrapFailed;
+      continue;
+    }
 
 
     GFDetPlane planeThroughVertex(poca, dirInPoca); //get planeThroughVertex through fitted vertex position
@@ -431,6 +444,9 @@ void TrackFitCheckerModule::endRun()
 
   if (m_nCutawayTracks not_eq 0) {
     B2WARNING(m_nCutawayTracks << " tracks where cut out because of too large total χ²");
+  }
+  if (m_extrapFailed not_eq 0) {
+    B2WARNING(m_extrapFailed << " tracks could not be extrapolated to their true vertex position.");
   }
   if (m_badR_fCounter not_eq 0 or m_badR_bCounter not_eq 0 or m_badR_smCounter not_eq 0) {
     B2WARNING("There were tracks hits with negative diagonal elements in the covariance matrix of the residuals. Occurrence forward: " << m_badR_fCounter << " backward: " << m_badR_bCounter << " smoother: " << m_badR_smCounter);
@@ -913,6 +929,7 @@ void TrackFitCheckerModule::setTrackData(GFTrack* const aTrackPtr, const double 
 {
   RelationIndex<PXDCluster, PXDTrueHit> relPxdClusterTrueHit;
   RelationIndex<SVDCluster, SVDTrueHit> relSvdClusterTrueHit;
+
   //make sure anything from the last track is cleared;
   m_trackData.accuVecIndices.clear();
   m_trackData.detIds.clear();
@@ -941,8 +958,8 @@ void TrackFitCheckerModule::setTrackData(GFTrack* const aTrackPtr, const double 
 
     VXDTrueHit const* aVxdTrueHitPtr = NULL;
     PXDRecoHit const*  aPxdRecoHitPtr = dynamic_cast<PXDRecoHit const* >(aGFAbsRecoHitPtr);
-    SVDRecoHit2D const*  aSvdRecoHitPtr =  dynamic_cast<SVDRecoHit2D  const* >(aGFAbsRecoHitPtr);
-    SVDRecoHit const*  aSvdRecoHit1DPtr =  dynamic_cast<SVDRecoHit  const* >(aGFAbsRecoHitPtr);
+    SVDRecoHit2D const*  aSvdRecoHit2DPtr =  dynamic_cast<SVDRecoHit2D  const* >(aGFAbsRecoHitPtr);
+    SVDRecoHit const*  aSvdRecoHitPtr =  dynamic_cast<SVDRecoHit  const* >(aGFAbsRecoHitPtr);
     CDCRecoHit const*  aCdcRecoHitPtr = dynamic_cast<CDCRecoHit const* >(aGFAbsRecoHitPtr); // cannot use the additional const here because the getter fuctions inside the CDCRecoHit class are not decleared as const (although they could be const)
     if (aPxdRecoHitPtr not_eq NULL) {
       m_trackData.accuVecIndices.push_back(aPxdRecoHitPtr->getSensorID().getLayerNumber() - 1);
@@ -964,22 +981,22 @@ void TrackFitCheckerModule::setTrackData(GFTrack* const aTrackPtr, const double 
           //cout << "aVxdTrueHitPtr: " << aVxdTrueHitPtr << endl;
         }
       }
+    } else if (aSvdRecoHit2DPtr not_eq NULL) {
+      m_trackData.accuVecIndices.push_back(aSvdRecoHit2DPtr->getSensorID().getLayerNumber() - 1);
+      m_trackData.detIds.push_back(1);
+      if (m_truthAvailable == true) {
+        aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(aSvdRecoHit2DPtr->getTrueHit());
+        if (aVxdTrueHitPtr == NULL) {
+          if (aSvdRecoHit2DPtr->getSimpleDigiHit() not_eq NULL) {
+            aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(aSvdRecoHit2DPtr->getSimpleDigiHit()->getTrueHit());
+          }
+        }
+      }
     } else if (aSvdRecoHitPtr not_eq NULL) {
       m_trackData.accuVecIndices.push_back(aSvdRecoHitPtr->getSensorID().getLayerNumber() - 1);
       m_trackData.detIds.push_back(1);
       if (m_truthAvailable == true) {
-        aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(aSvdRecoHitPtr->getTrueHit());
-        if (aVxdTrueHitPtr == NULL) {
-          if (aSvdRecoHitPtr->getSimpleDigiHit() not_eq NULL) {
-            aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(aSvdRecoHitPtr->getSimpleDigiHit()->getTrueHit());
-          }
-        }
-      }
-    } else if (aSvdRecoHit1DPtr not_eq NULL) {
-      m_trackData.accuVecIndices.push_back(aSvdRecoHit1DPtr->getSensorID().getLayerNumber() - 1);
-      m_trackData.detIds.push_back(1);
-      if (m_truthAvailable == true) {
-        const SVDCluster* aSvdCluster = aSvdRecoHit1DPtr->getCluster();
+        const SVDCluster* aSvdCluster = aSvdRecoHitPtr->getCluster();
         RelationIndex<SVDCluster, SVDTrueHit>::range_from iterPair = relSvdClusterTrueHit.getFrom(aSvdCluster);
 
         aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(iterPair.first->to);
@@ -997,7 +1014,7 @@ void TrackFitCheckerModule::setTrackData(GFTrack* const aTrackPtr, const double 
       B2ERROR("An unknown type of recoHit was detected in TrackFitCheckerModule::event(). This hit will not be included in the statistical tests");
     }
 
-    if (m_testDaf == true or(aCdcRecoHitPtr not_eq NULL and m_testCdc == false) or(aPxdRecoHitPtr not_eq NULL and m_testSi == false)or(aSvdRecoHitPtr not_eq NULL and m_testSi == false)) {    // skip all other stuff when daf is tested because it is not used
+    if (m_testDaf == true or(aCdcRecoHitPtr not_eq NULL and m_testCdc == false) or(aPxdRecoHitPtr not_eq NULL and m_testSi == false)or(aSvdRecoHit2DPtr not_eq NULL and m_testSi == false)) {    // skip all other stuff when daf is tested because it is not used
       continue;
     }
     GFDetPlane detPlaneOfRecoHit = aGFAbsRecoHitPtr->getDetPlane(aTrackPtr->getTrackRep(trackRepId));
@@ -1269,7 +1286,7 @@ void TrackFitCheckerModule::testDaf(GFTrack* const aTrackPtr)
 
     GFAbsRecoHit* aGFAbsRecoHitPtr = aTrackPtr->getHit(iGFHit);
     PXDRecoHit const*  aPxdRecoHitPtr = dynamic_cast<PXDRecoHit const* >(aGFAbsRecoHitPtr);
-    SVDRecoHit2D const*  aSvdRecoHitPtr =  dynamic_cast<SVDRecoHit2D  const* >(aGFAbsRecoHitPtr);
+    SVDRecoHit2D const*  aSvdRecoHit2DPtr =  dynamic_cast<SVDRecoHit2D  const* >(aGFAbsRecoHitPtr);
     const VXDSimpleDigiHit* aVXDSimpleDigiHit = NULL;
     const VXDTrueHit* aVXDTrueHit = NULL;
 
@@ -1278,10 +1295,10 @@ void TrackFitCheckerModule::testDaf(GFTrack* const aTrackPtr)
       if (aVXDSimpleDigiHit == NULL) {
         aVXDTrueHit = static_cast<const VXDTrueHit*>(aPxdRecoHitPtr->getTrueHit());
       }
-    } else if (aSvdRecoHitPtr not_eq NULL) {
-      aVXDSimpleDigiHit = aSvdRecoHitPtr->getSimpleDigiHit();
+    } else if (aSvdRecoHit2DPtr not_eq NULL) {
+      aVXDSimpleDigiHit = aSvdRecoHit2DPtr->getSimpleDigiHit();
       if (aVXDSimpleDigiHit == NULL) {
-        aVXDTrueHit = static_cast<const VXDTrueHit*>(aSvdRecoHitPtr->getTrueHit());
+        aVXDTrueHit = static_cast<const VXDTrueHit*>(aSvdRecoHit2DPtr->getTrueHit());
       }
     } else { //Probably a CDC hit -- not supported yet
 

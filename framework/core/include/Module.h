@@ -406,6 +406,10 @@ namespace Belle2 {
     //                    Python API
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+    /** return the module name. */
+    virtual std::string getPathString() const { return getName(); }
+
     /**
      * Implements a method for setting boost::python objects.
      * The method supports the following types: int, double, string, bool

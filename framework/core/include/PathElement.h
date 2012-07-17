@@ -14,6 +14,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include <list>
+#include <string>
+
 
 namespace Belle2 {
 
@@ -30,6 +32,10 @@ namespace Belle2 {
 
     /** Destructor. */
     virtual ~PathElement() { }
+
+    /** Return a string representation of the Modules in this path */
+    virtual std::string getPathString() const = 0;
+
 
     /** Returns a sequential list of Modules in this path element. */
     virtual std::list<boost::shared_ptr<Module> > getModules() const = 0;

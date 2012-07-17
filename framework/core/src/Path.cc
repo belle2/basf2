@@ -56,10 +56,26 @@ std::list<ModulePtr> Path::getModules() const
   return modules;
 }
 
-
 //=====================================================================
 //                          Python API
 //=====================================================================
+
+std::string Path::getPathString() const
+{
+  std::string out("");
+  bool firstElem = true;
+  BOOST_FOREACH(const boost::shared_ptr<PathElement>& elem, m_elements) {
+    if (!firstElem) {
+      out += " -> ";
+    } else {
+      firstElem = false;
+    }
+
+    out += elem->getPathString();
+  }
+  return "[" + out + "]";
+}
+
 
 boost::python::list Path::getModulesPython() const
 {
@@ -76,6 +92,7 @@ boost::python::list Path::getModulesPython() const
 void Path::exposePythonAPI()
 {
   class_<Path>("Path")
+  .def("__str__", &Path::getPathString)
   .def("add_module", &Path::addModule)
   .def("add_path", &Path::addPath)
   .def("modules", &Path::getModulesPython)

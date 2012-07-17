@@ -84,6 +84,12 @@ namespace Belle2 {
     //                   Python API
     //--------------------------------------------------
 
+    /** return a string of the form [module a, module b, [another path]]
+     *
+     *  can be used to 'print' a path in a steering file.
+     */
+    virtual std::string getPathString() const;
+
     /**
      * Returns a list of the modules in this path (as python list).
      *

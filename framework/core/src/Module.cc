@@ -196,6 +196,7 @@ void Module::exposePythonAPI()
 
   //Python class definition
   class_<Module, PyModule>("Module")
+  .def("__str__", &Module::getPathString)
   .def("name", &Module::getName, return_value_policy<copy_const_reference>())
   .def("setName", &PyModule::setName)
   .def("description", &Module::getDescription, return_value_policy<copy_const_reference>())

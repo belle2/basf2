@@ -16,6 +16,7 @@
 #include <boost/python/list.hpp>
 #include <boost/python/dict.hpp>
 
+#include <framework/core/PathElement.h>
 #include <framework/core/CondParser.h>
 #include <framework/core/ModuleParamList.h>
 #include <framework/logging/LogConfig.h>
@@ -26,7 +27,12 @@
 
 namespace Belle2 {
 
+  class Module;
   class Path;
+
+  /** Defines a pointer to a module object as a boost shared pointer. */
+  typedef boost::shared_ptr<Module> ModulePtr;
+
 
   /**
    * Base class for Modules.
@@ -36,7 +42,7 @@ namespace Belle2 {
    * of modules. By inheriting from this base class, various types of
    * modules can be created. Each module is identified by its unique name.
    */
-  class Module {
+  class Module : public PathElement {
 
   public:
 
@@ -377,6 +383,8 @@ namespace Belle2 {
 
 
   private:
+    /** no submodules. */
+    std::list<ModulePtr> getModules() const { return std::list<ModulePtr>(); }
 
     std::string m_name;           /**< The name of the module, saved as a string. */
     std::string m_description;    /**< The description of the module. */
@@ -461,9 +469,6 @@ namespace Belle2 {
   //------------------------------------------------------
   //             Define convenient typdefs
   //------------------------------------------------------
-
-  /** Defines a pointer to a module object as a boost shared pointer. */
-  typedef boost::shared_ptr<Module> ModulePtr;
 
   /**
    * Class that defines the < comparison operator ModulePtrs. Used to declare a set of ModulePtrs.

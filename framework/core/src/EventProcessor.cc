@@ -126,7 +126,6 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
   long currEvent = 0;
   bool endProcess = false;
   PathPtr currPath;
-  ModulePtrList::const_iterator moduleIter;
   LogSystem& logSystem = LogSystem::Instance();
 
   //Remember the previous event meta data, and identify end of data meta data
@@ -146,8 +145,9 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
     //Loop over the modules in the current path
     currPath = startPath;
-    moduleIter = currPath->getModules().begin();
-    while ((!endProcess) && (moduleIter != currPath->getModules().end())) {
+    ModulePtrList modules = currPath->getModules();
+    ModulePtrList::const_iterator moduleIter = modules.begin();
+    while (!endProcess and moduleIter != modules.end()) {
       Module* module = moduleIter->get();
 
       //Set the module dependent log level
@@ -223,7 +223,8 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
         //Check for a module condition, evaluate it and if it is true switch to a new path
         if (module->evalCondition()) {
           currPath = module->getConditionPath();
-          moduleIter = currPath->getModules().begin();
+          modules = currPath->getModules();
+          moduleIter = modules.begin();
         } else {
           ++moduleIter;
         }

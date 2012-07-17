@@ -9,11 +9,11 @@
  **************************************************************************/
 
 #include <framework/core/Path.h>
-#include <framework/logging/Logger.h>
+#include <framework/core/Module.h>
 
+#include <boost/foreach.hpp>
 #include <boost/python/register_ptr_to_python.hpp>
 
-using namespace std;
 using namespace Belle2;
 using namespace boost::python;
 
@@ -32,7 +32,28 @@ Path::~Path()
 
 void Path::addModule(ModulePtr module)
 {
-  m_modules.push_back(module);
+  m_elements.push_back(module);
+}
+
+void Path::addPath(PathPtr path)
+{
+  m_elements.push_back(path);
+}
+
+std::list<ModulePtr> Path::getModules() const
+{
+  std::list<ModulePtr> modules;
+  BOOST_FOREACH(const boost::shared_ptr<PathElement>& elem, m_elements) {
+    if (dynamic_cast<Module*>(elem.get()) != 0) {
+      //this path element is a Module, create a ModulePtr that shares ownership with 'elem'
+      modules.push_back(boost::static_pointer_cast<Module>(elem));
+    } else {
+      //some PathElement with submodules
+      const std::list<ModulePtr>& modulesInElem = elem->getModules();
+      modules.insert(modules.end(), modulesInElem.begin(), modulesInElem.end());
+    }
+  }
+  return modules;
 }
 
 
@@ -43,8 +64,9 @@ void Path::addModule(ModulePtr module)
 boost::python::list Path::getModulesPython() const
 {
   boost::python::list returnList;
+  const std::list<ModulePtr>& modules = getModules();
 
-  for (std::list<ModulePtr>::const_iterator listIter = m_modules.begin(); listIter != m_modules.end(); listIter++)
+  for (std::list<ModulePtr>::const_iterator listIter = modules.begin(); listIter != modules.end(); ++listIter)
     returnList.append(boost::python::object(ModulePtr(*listIter)));
 
   return returnList;
@@ -55,6 +77,7 @@ void Path::exposePythonAPI()
 {
   class_<Path>("Path")
   .def("add_module", &Path::addModule)
+  .def("add_path", &Path::addPath)
   .def("modules", &Path::getModulesPython)
   ;
 

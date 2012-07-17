@@ -13,21 +13,29 @@
 
 #include <boost/python.hpp>
 
-#include <framework/core/Module.h>
+#include <framework/core/PathElement.h>
 
 #include <list>
-#include <string>
-#include <vector>
 #include <boost/shared_ptr.hpp>
 #include <boost/python/list.hpp>
 
 
 namespace Belle2 {
 
+  class Module;
+  class Path;
+
+  //------------------------------------------------------
+  //             Define convenient typdefs
+  //------------------------------------------------------
+
+  /** Defines a pointer to a path object as a boost shared pointer. */
+  typedef boost::shared_ptr<Path> PathPtr;
+
   /** The path class.
    * Implements a path consisting of modules. The modules are arranged in a linear order.
    */
-  class Path {
+  class Path : public PathElement {
 
   public:
 
@@ -49,19 +57,27 @@ namespace Belle2 {
      *
      * @param module Reference to the module that should be added to the path.
      */
-    void addModule(ModulePtr module);
+    void addModule(boost::shared_ptr<Module> module);
+
+
+    /** Connect another path with this one.
+     *
+     * Modules in the other path will be executed after all modules in the
+     * curren path.
+     */
+    void addPath(PathPtr path);
 
     /**
      * Returns a list of the modules in this path.
      *
      * @return A list of all modules of this path.
      */
-    const std::list<ModulePtr>& getModules() const {return m_modules; };
+    std::list<boost::shared_ptr<Module> > getModules() const;
 
     /**
-     * Replace module list
-     **/
-    void putModules(std::list<ModulePtr>& mlist) {  m_modules = mlist; };
+     * Replaces all Modules and sub-Paths with the specified Module list
+     */
+    void putModules(const std::list<boost::shared_ptr<Module> >& mlist) { m_elements.assign(mlist.begin(), mlist.end()); }
 
 
     //--------------------------------------------------
@@ -79,21 +95,9 @@ namespace Belle2 {
     static void exposePythonAPI();
 
 
-  protected:
-
-
   private:
-
-    std::list<ModulePtr> m_modules; /**< The list of modules (the module objects are owned by ModuleList). */
-
+    std::list<boost::shared_ptr<PathElement> > m_elements; /**< The list of path elements (Modules and sub-Paths) */
   };
-
-  //------------------------------------------------------
-  //             Define convenient typdefs
-  //------------------------------------------------------
-
-  /** Defines a pointer to a path object as a boost shared pointer. */
-  typedef boost::shared_ptr<Path> PathPtr;
 
 } // end namespace Belle2
 

@@ -59,7 +59,7 @@ void PathManager::fillModulePathList(PathPtr path, ModulePtrList& modList) const
   ModulePtrList::const_iterator moduleIter;
   const ModulePtrList& currModList = path->getModules();
 
-  for (moduleIter = currModList.begin(); moduleIter != currModList.end(); moduleIter++) {
+  for (moduleIter = currModList.begin(); moduleIter != currModList.end(); ++moduleIter) {
     Module* module = moduleIter->get();
 
     //If module was not already added to the list, add it.

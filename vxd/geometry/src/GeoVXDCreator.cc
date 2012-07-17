@@ -52,7 +52,7 @@ namespace Belle2 {
     GeoVXDCreator::~GeoVXDCreator()
     {
       //Lets assume that it cannot be that only one part of the vxd gets destroyed
-      VXD::GeoCache::getInstance().clear();
+      // FIXME: This causes problems: VXD::GeoCache::getInstance().clear();
       //Delete all sensitive detectors
       BOOST_FOREACH(Simulation::SensitiveDetectorBase * sensitive, m_sensitive) {
         delete sensitive;

@@ -269,8 +269,10 @@ template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
       B2DEBUG(100, "Object with name " << name << " and durability " << durability << " was created.");
       storeSuccessful = true;
     }
-    if (AObject != 0)
+    if (AObject != 0) {
       m_objectMap[durability][name] = AObject;
+      storeSuccessful = true;
+    }
   } else {
     //object found
     if (AObject != 0) { //and new one given...

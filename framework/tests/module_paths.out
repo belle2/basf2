@@ -1,11 +1,12 @@
 [INFO] Steering file: framework/tests/module_paths.py
 >>> basf2 Python environment set
 >>> Framework object created: fw
-[[] -> EvtMetaGen -> [EvtMetaInfo -> [Progress -> []]] -> PrintCollections]
+[[] -> EvtMetaGen -> [SelectOddEvents -> EvtMetaInfo -> [Progress -> []]] -> PrintCollections]
+[INFO] Begin of new run
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
-[INFO] Begin of new run
+[INFO] Setting return value to True
 [INFO] EXP NUMBER: 0
 [INFO] RUN NUMBER: 1
 [INFO] EVT NUMBER: 0
@@ -25,32 +26,16 @@
 [INFO] ----------------------------------------------------------------------------
 [INFO] 
 [INFO] ============================================================================
-[INFO] EXP NUMBER: 0
-[INFO] RUN NUMBER: 1
-[INFO] EVT NUMBER: 1
+[INFO] Setting return value to False
 [INFO] Processed:   1 runs,      2 events
-[INFO] ============================================================================
-[INFO] DataStore collections in event 1
-[INFO] ============================================================================
-[INFO] 
-[INFO] (Type)    Name                      Number entries                   <Event>
-[INFO] ----------------------------------------------------------------------------
-[INFO] (Object)  EventMetaData
-[INFO] 
-[INFO] (Type)    Name                      Number entries                     <Run>
-[INFO] ----------------------------------------------------------------------------
-[INFO] 
-[INFO] (Type)    Name                      Number entries              <Persistent>
-[INFO] ----------------------------------------------------------------------------
-[INFO] 
-[INFO] ============================================================================
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
+[INFO] Begin of new run
 [INFO] ========================================================================
 [INFO] >>> Start new run: 2
 [INFO] ------------------------------------------------------------------------
-[INFO] Begin of new run
+[INFO] Setting return value to True
 [INFO] EXP NUMBER: 1
 [INFO] RUN NUMBER: 2
 [INFO] EVT NUMBER: 0
@@ -73,4 +58,5 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 2
 [INFO] ========================================================================
-[[] -> EvtMetaGen -> [EvtMetaInfo -> [Progress -> []]] -> PrintCollections]
+[INFO] terminating SelectOddEvents
+[[] -> EvtMetaGen -> [SelectOddEvents -> EvtMetaInfo -> [Progress -> []]] -> PrintCollections]

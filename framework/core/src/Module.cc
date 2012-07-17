@@ -194,6 +194,9 @@ void Module::exposePythonAPI()
   void (Module::*setConditionString)(const std::string&, boost::shared_ptr<Path>) = &Module::setCondition;
   void (Module::*setConditionBool)(boost::shared_ptr<Path>) = &Module::setCondition;
 
+  void (Module::*setReturnValueInt)(int) = &Module::setReturnValue;
+  void (Module::*setReturnValueBool)(bool) = &Module::setReturnValue;
+
   //Python class definition
   class_<Module, PyModule>("Module")
   .def("__str__", &Module::getPathString)
@@ -209,6 +212,8 @@ void Module::exposePythonAPI()
   .add_property("logging",
                 make_function(&Module::getLogConfig, return_value_policy<reference_existing_object>()),
                 &Module::setLogConfig)
+  .def("return_value", setReturnValueInt)
+  .def("return_value", setReturnValueBool)
   .def("set_log_level", &Module::setLogLevel)
   .def("set_debug_level", &Module::setDebugLevel)
   .def("set_abort_level", &Module::setAbortLevel)

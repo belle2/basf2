@@ -12,6 +12,8 @@
 
 #include <framework/core/Environment.h>
 
+#include <TSystem.h>
+
 
 using namespace std;
 using namespace Belle2;
@@ -71,6 +73,7 @@ SimpleInputModule::~SimpleInputModule()
 
 void SimpleInputModule::initialize()
 {
+  gSystem->Load("libdataobjects");
   const std::string& inputFileArgument = Environment::Instance().getInputFileOverride();
   if (!inputFileArgument.empty())
     m_inputFileName = inputFileArgument;

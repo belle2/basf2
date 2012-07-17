@@ -8,6 +8,9 @@
 
 #include <framework/modules/seqroot/seqrootinputModule.h>
 #include <framework/core/Environment.h>
+
+#include <TSystem.h>
+
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -15,6 +18,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <arpa/inet.h>
+
 
 using namespace std;
 using namespace Belle2;
@@ -50,6 +54,7 @@ SeqRootInputModule::~SeqRootInputModule()
 
 void SeqRootInputModule::initialize()
 {
+  gSystem->Load("libdataobjects");
 
   // Open input file
   m_file = new SeqFile(m_inputFileName.c_str(), "r");

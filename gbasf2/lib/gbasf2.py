@@ -39,7 +39,6 @@ def main():
     if os.environ.has_key('BELLE2_RELEASE'):
         cliParams.setSwVer(os.environ['BELLE2_RELEASE'])
     cliParams.registerCLISwitches()
-    Script.disableCS()
     Script.parseCommandLine(ignoreErrors=True)
     cliParams.registerSteeringOptions()
 

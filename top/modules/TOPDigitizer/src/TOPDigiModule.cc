@@ -50,7 +50,7 @@ namespace Belle2 {
       m_topgp(TOPGeometryPar::Instance())
     {
       // Set description()
-      setDescription("TOPDigitizer");
+      setDescription("Digitize TOPSimHits");
       setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
       // Add parameters
@@ -108,7 +108,7 @@ namespace Belle2 {
       double TDCwidth = m_topgp->getTDCbitwidth();
       double Tmax = maxTDC * TDCwidth;
 
-      int nHits = topSimHits->GetEntries();
+      int nHits = topSimHits.getEntries();
       for (int i = 0; i < nHits; i++) {
         TOPSimHit* aSimHit = topSimHits[i];
 
@@ -134,7 +134,7 @@ namespace Belle2 {
         if (TDC > maxTDC) TDC = maxTDC;
 
         // store result
-        int nentr = topDigits->GetEntries();
+        int nentr = topDigits.getEntries();
         new(topDigits->AddrAt(nentr)) TOPDigit(aSimHit->getBarID(), channelID, TDC);
 
         // make relations

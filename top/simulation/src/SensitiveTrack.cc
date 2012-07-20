@@ -140,7 +140,7 @@ namespace Belle2 {
       StoreArray<TOPTrack> topTracks;
 
       //! get the number of already stored topTracks
-      int nentr = topTracks->GetEntries();
+      int nentr = topTracks.getEntries();
 
       //! convert to Basf units
       TPosition = TPosition * Unit::mm;

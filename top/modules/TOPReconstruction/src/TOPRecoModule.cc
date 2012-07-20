@@ -61,8 +61,10 @@ namespace Belle2 {
       m_debugLevel(0),
       m_topgp(TOPGeometryPar::Instance())
     {
-      // Set description()
-      setDescription("TOPReconstruction");
+      // Set description
+      setDescription("Reconstruction for TOP counter. Uses reconstructed tracks extrapolated to TOP and TOPDigits to calculate log likelihoods for e, mu, pi, K, p.");
+
+      // Set property flags
       setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
       // Add parameters
@@ -168,7 +170,7 @@ namespace Belle2 {
 
       // add photons
 
-      int nHits = topDigits->GetEntries();
+      int nHits = topDigits.getEntries();
       for (int i = 0; i < nHits; ++i) {
         TOPDigit* data = topDigits[i];
         reco.AddData(data->getBarID() - 1, data->getChannelID() - 1, data->getTDC());
@@ -189,7 +191,7 @@ namespace Belle2 {
         int nphot;
         reco.GetLogL(Nhyp, logl, expPhot, nphot);
         // store results
-        int nentr = toplogL->GetEntries();
+        int nentr = toplogL.getEntries();
         new(toplogL->AddrAt(nentr)) TOPLikelihoods(reco.Flag(), logl, nphot, expPhot);
         // make relations
         gfTrackLogL.add(tracks[i].Label(LgfTrack), nentr);

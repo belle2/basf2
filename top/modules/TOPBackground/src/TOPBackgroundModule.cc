@@ -126,7 +126,7 @@ namespace Belle2 {
       StoreArray<TOPDigit> topDigits;
       StoreArray<TOPTrack> topTracks;
 
-      int nHits = topDigits->GetEntries();
+      int nHits = topDigits.getEntries();
       for (int i = 0; i < nHits; i++) {
         TOPDigit* aDigit = topDigits[i];
         int barID = aDigit->getBarID();
@@ -154,7 +154,7 @@ namespace Belle2 {
 
 
       StoreArray<BeamBackHit> beamBackHits;
-      nHits = beamBackHits->GetEntries();
+      nHits = beamBackHits.getEntries();
 
       for (int iHit = 0; iHit < nHits; ++iHit) {
         BeamBackHit* tophit = beamBackHits[iHit];
@@ -182,7 +182,7 @@ namespace Belle2 {
         }
       }
 
-      nHits = topTracks->GetEntries();
+      nHits = topTracks.getEntries();
       for (int iHit = 0; iHit < nHits; ++iHit) {
 
         TOPTrack* simHit = topTracks[iHit];

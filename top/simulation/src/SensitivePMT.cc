@@ -127,7 +127,7 @@ namespace Belle2 {
       StoreArray<TOPSimHit> topSimHits;
 
       //! get the number of already stored TOPSimHits
-      G4int nentr = topSimHits->GetEntries();
+      G4int nentr = topSimHits.getEntries();
 
       //! convert to Basf units (photon energy in [eV]!)
       locpos = locpos * Unit::mm;

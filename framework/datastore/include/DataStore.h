@@ -319,8 +319,10 @@ template <class T> bool Belle2::DataStore::handleArray(const std::string& name,
     array = static_cast<TClonesArray*>(m_arrayMap[durability][name]);
     B2DEBUG(250, "Attaching to existing TClonesArray with name " << name << " and durability " << durability << ".");
 
-    //assuming array != 0 (valid unless someone stored a null pointer in the DataStore)
-    if (!array->GetClass()->InheritsFrom(T::Class())) { // TClonesArray in map slot is for different type than requested one
+    if (!array or !array->GetClass()) {
+      B2WARNING("Array '" << name << "' in the data store is not valid, returning NULL pointer. May be caused by missing ROOT dictionaries.");
+      array = 0;
+    } else if (!array->GetClass()->InheritsFrom(T::Class())) { // TClonesArray in map slot is for different type than requested one
       B2FATAL("Requested array type (" << T::Class()->GetName() << ") is not a base class of the existing array (" << array->GetClass()->GetName() << "). Name was: " <<  name << " EDurability was " << durability);
     }
   }

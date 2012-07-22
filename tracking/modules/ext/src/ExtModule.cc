@@ -13,6 +13,7 @@
 #include <tracking/modules/ext/ExtPhysicsList.h>
 #include <tracking/modules/ext/ExtCylSurfaceTarget.h>
 #include <tracking/dataobjects/ExtRecoHit.h>
+#include <simulation/kernel/DetectorConstruction.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
 #include <cmath>
@@ -45,6 +46,7 @@
 #include <G4UImanager.hh>
 #include <G4RunManager.hh>
 #include <G4ParticleTable.hh>
+#include <G4RegionStore.hh>
 #include <G4ErrorPropagatorData.hh>
 #include <G4ErrorPropagator.hh>
 #include <G4ErrorTrackLengthTarget.hh>
@@ -95,15 +97,19 @@ void ExtModule::initialize()
     m_runMgr = NULL;
     m_trk    = NULL;
     m_stp    = NULL;
+    m_extMgr->SetUserInitialization(new DetectorConstruction());
+    G4Region* region = (*(G4RegionStore::GetInstance()))[0];
+    region->SetProductionCuts(G4ProductionCutsTable::GetProductionCutsTable()->GetDefaultProductionCuts());
     m_extMgr->SetUserInitialization(new ExtPhysicsList);
+    m_extMgr->InitGeant4e();
   } else {
     // ext will coexist with simulation
     m_runMgr = G4RunManager::GetRunManager();
     m_trk    = const_cast<G4UserTrackingAction*>(m_runMgr->GetUserTrackingAction());
     m_stp    = const_cast<G4UserSteppingAction*>(m_runMgr->GetUserSteppingAction());
+    m_extMgr->InitGeant4e();
+    G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
   }
-  m_extMgr->InitGeant4e();
-  G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
 
   // Redefine step length (cm), magnetic field step limitation (Tesla per GeV/c), and
   // kinetic energy loss limitation (fractional energy loss) by communicating with
@@ -183,7 +189,6 @@ void ExtModule::event()
       G4ErrorFreeTrajState* state = new G4ErrorFreeTrajState(g4eName, position, momentum, covG4e);
       m_extMgr->InitTrackPropagation();
       while (true) {
-
         const G4int    errCode    = m_extMgr->PropagateOneStep(state, G4ErrorMode_PropForwards);
         G4Track*       track      = state->GetG4Track();
         const G4Step*  step       = track->GetStep();
@@ -208,6 +213,10 @@ void ExtModule::event()
         // Post-step momentum too low?
         if (errCode || (track->GetMomentum().mag() < minP)) {
           addPoint(state, STOP, cand, extRecoHits);
+          break;
+        }
+        if (G4ErrorPropagatorData::GetErrorPropagatorData()->GetState() == G4ErrorState(G4ErrorState_TargetCloserThanBoundary)) {
+          addPoint(state, ESCAPE, cand, extRecoHits);
           break;
         }
         if (m_extMgr->GetPropagator()->CheckIfLastStep(track)) {

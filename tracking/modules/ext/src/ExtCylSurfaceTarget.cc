@@ -41,8 +41,9 @@ G4double ExtCylSurfaceTarget::GetDistanceFromPoint(const G4ThreeVector& point,
     B2FATAL("Module ext: ExtCylSurfaceTarget::GetDistanceFromPoint() direction is not a unit vector: " << dir)
   }
 
-  // Get intersection point with the cylinder's curved surface
-  G4double dist = (point - IntersectLocal(point, dir)).mag();
+  // Get distance to intersection point with the cylinder's curved surface
+  // should be negative if outside!  G4double dist = (point - IntersectLocal(point, dir)).mag();
+  G4double dist = (IntersectLocal(point, dir) - point) * dir;
 
   // Get intersection point with the plane at either zmin or zmax
   G4double dirz = dir.z();

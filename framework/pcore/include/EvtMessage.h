@@ -25,7 +25,6 @@
       word 1 : size of obj
       word 2- : streamd object
 */
-#define MSG_HEADER_SIZE  16
 
 namespace Belle2 {
 

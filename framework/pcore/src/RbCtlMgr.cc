@@ -38,7 +38,8 @@ RbCtlMgr::RbCtlMgr(void)
   sem_unlock();
 }
 
-RbCtlMgr::RbCtlMgr(int shmid)
+RbCtlMgr::RbCtlMgr(int shmid):
+  m_shmid(shmid)
 {
   m_ctlshm = (RbCtlShm*) shmat(m_shmid, 0, 0);
 }

@@ -159,6 +159,7 @@ void GenFitter2Module::event()
   if (nTrackCandidates == 0) {
     B2DEBUG(100, "GenFitter2: StoreArray<GFTrackCand> is empty!");
   }
+  int dataStoreCounter = 0; //counts the sucessfully fitted tracks in one event. Is used as index for the output datastore
   for (int iTrackCand = 0; iTrackCand not_eq nTrackCandidates; ++iTrackCand) {
 
 
@@ -275,7 +276,7 @@ void GenFitter2Module::event()
 
     if (filterTrack == false) { // fit the track
 
-      StoreArray<GFTrack> fittedTracks(""); //holds the output of this module in the form of Genfit track objects
+      StoreArray<GFTrack> fittedTracks; //holds the output of this module in the form of Genfit track objects
 
 
       //get fit starting values from the MCParticle
@@ -390,8 +391,9 @@ void GenFitter2Module::event()
       //          }
 
       if (genfitStatusFlag == 0) {
-        new(fittedTracks->AddrAt(iTrackCand)) GFTrack(track);
+        new(fittedTracks->AddrAt(dataStoreCounter)) GFTrack(track);
         ++m_fitCounter;
+        ++dataStoreCounter;
       } else {
         B2WARNING("Genfit returned an error (with status flag " << genfitStatusFlag << ") during the fit of one track in event " << eventCounter);
         ++m_failedFitCounter;
@@ -399,8 +401,6 @@ void GenFitter2Module::event()
 
     }
   }
-
-
 }
 
 void GenFitter2Module::endRun()

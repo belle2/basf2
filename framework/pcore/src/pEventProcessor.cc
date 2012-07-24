@@ -229,6 +229,7 @@ void pEventProcessor::process(PathPtr spath)
          it != m_rboutlist.end(); ++it)
       delete *it;
 
+    delete term;
     printf("process : completed\n");
   }
 }

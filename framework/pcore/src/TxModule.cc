@@ -21,7 +21,7 @@ REG_MODULE(Tx)
 //                 Implementation
 //-----------------------------------------------------------------
 
-TxModule::TxModule() : Module()
+TxModule::TxModule() : Module(), m_msghandler(0)
 {
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
@@ -35,7 +35,7 @@ TxModule::TxModule() : Module()
   B2DEBUG(1, "Tx: Constructor done.");
 }
 
-TxModule::TxModule(RingBuffer* rbuf) : Module()
+TxModule::TxModule(RingBuffer* rbuf) : Module(), m_msghandler(0)
 {
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
@@ -55,11 +55,11 @@ TxModule::TxModule(RingBuffer* rbuf) : Module()
 
 TxModule::~TxModule()
 {
+  delete m_msghandler;
 }
 
 void TxModule::initialize()
 {
-
   m_msghandler = new MsgHandler(m_compressionLevel);
 
   B2INFO("Tx initialized.");

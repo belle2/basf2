@@ -10,8 +10,6 @@
 #define RXMODULE_H
 
 #include <framework/core/Module.h>
-//#include <framework/core/Framework.h>
-//#include <framework/pcore/pEventServer.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/RingBuffer.h>
@@ -26,8 +24,7 @@
 
 namespace Belle2 {
 
-  /*! A class definition of an input module for Sequential ROOT I/O */
-
+  /** Module to decode data store contents from RingBuffer. */
   class RxModule : public Module {
 
     // Public functions
@@ -35,6 +32,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     RxModule();
+    //! Use the given RingBuffer for data
     RxModule(RingBuffer*);
     virtual ~RxModule();
 
@@ -50,16 +48,19 @@ namespace Belle2 {
     // Data members
   private:
 
-    //! Namess of TTrees and Branches
+    //! Names of TTrees
     std::string m_treeNames[DataStore::c_NDurabilityTypes];
+    //! Names of all branches for given durability
     std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
 
-    //! List of objects in TTree
+    //! List of object names in TTree
     std::vector<std::string> m_objnames[DataStore::c_NDurabilityTypes];
+    //! List of objects in TTree
     std::vector<TObject*> m_objects[DataStore::c_NDurabilityTypes];
 
-    //! List of arrays in TTree
+    //! List of array names in TTree
     std::vector<std::string> m_arraynames[DataStore::c_NDurabilityTypes];
+    //! List of arrays in TTree
     std::vector<TClonesArray*> m_arrays[DataStore::c_NDurabilityTypes];
 
 
@@ -84,4 +85,4 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // MODULEHELLO_H
+#endif

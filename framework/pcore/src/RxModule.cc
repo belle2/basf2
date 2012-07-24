@@ -23,7 +23,7 @@ REG_MODULE(Rx)
 //                 Implementation
 //-----------------------------------------------------------------
 
-RxModule::RxModule() : Module()
+RxModule::RxModule() : Module(), m_msghandler(0)
 {
   //Set module properties
   setDescription("Decode DataStore from RingBuffer");
@@ -37,7 +37,7 @@ RxModule::RxModule() : Module()
   B2DEBUG(1, "Rx: Constructor done.");
 }
 
-RxModule::RxModule(RingBuffer* rbuf) : Module()
+RxModule::RxModule(RingBuffer* rbuf) : Module(), m_msghandler(0)
 {
   //Set module properties
   setDescription("Decode DataStore from RingBuffer");
@@ -57,11 +57,11 @@ RxModule::RxModule(RingBuffer* rbuf) : Module()
 
 RxModule::~RxModule()
 {
+  delete m_msghandler;
 }
 
 void RxModule::initialize()
 {
-
   m_msghandler = new MsgHandler(m_compressionLevel);
 
   B2INFO("Rx initialized.");
@@ -97,6 +97,8 @@ void RxModule::event()
   EvtMessage* msg = new EvtMessage(evtbuf);    // Have EvtMessage by ptr cpy
   if (msg->type() == MSG_TERMINATE) {
     B2INFO("Rx: got termination message. Exitting....");
+    delete[] evtbuf;
+    delete msg;
     return;
     // Flag End Of File !!!!!
     //    return msg->type(); // EOF
@@ -186,4 +188,3 @@ void RxModule::terminate()
 {
   B2INFO("terminate called")
 }
-

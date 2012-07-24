@@ -79,7 +79,9 @@ namespace Belle2 {
 
   private:
 
+    /** input modules with multi-process support */
     ModulePtrList m_input_list;
+    /** output modules with multi-process support */
     ModulePtrList m_output_list;
     ProcHandler* procHandler;
 
@@ -87,10 +89,14 @@ namespace Belle2 {
     std::vector<PathPtr> m_bodypathlist;
     std::vector<PathPtr> m_outpathlist;
 
+    /** input RingBuffers */
     std::vector<RingBuffer*> m_rbinlist;
+    /** output RingBuffers */
     std::vector<RingBuffer*> m_rboutlist;
 
+    /** HistoManagerModule found? */
     bool m_histoflag;
+    /** Pointer to HistoManagerModule, if m_histoflag is set */
     ModulePtr m_histoman;
 
   };

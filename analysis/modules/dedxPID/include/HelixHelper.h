@@ -111,8 +111,17 @@ namespace Belle2 {
     }
 
   private:
-    /** helix parameters, with same convention as those stored in Track objects */
-    float z0, d0, omega, cotTheta, phi;
+    // helix parameters, with same convention as those stored in Track objects
+    /** minimal z distance of point of closest approach to origin */
+    float z0;
+    /** minimal r distance of point of closest approach to origin */
+    float d0;
+    /** signed curvature */
+    float omega;
+    /** cotangens of polar angle */
+    float cotTheta;
+    /** Phi at the perigee [-pi, pi]. */
+    float phi;
 
     /** point of closest approach to origin */
     TVector3 poca;
@@ -131,8 +140,10 @@ namespace Belle2 {
 
     /** user supplied point we're trying to find the nearest helix point to */
     static TVector3 minimize_distance_to_point;
+    // @{
     /** user supplied line we're trying to find the nearest helix point to */
     static TVector3 minimize_distance_to_line_a, minimize_distance_to_line_b;
+    //@}
     /** keep a 'this' pointer around for minimization */
     static HelixHelper const* helix_object;
   };

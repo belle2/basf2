@@ -38,9 +38,24 @@ namespace Belle2 {
    * Base class for Modules.
    *
    * A module is the smallest building block of the framework.
-   * A typical event processing chain consists of a linear arrangement
-   * of modules. By inheriting from this base class, various types of
-   * modules can be created. Each module is identified by its unique name.
+   * A typical event processing chain consists of a Path containing
+   * modules. By inheriting from this base class, various types of
+   * modules can be created.
+   *
+   * Each module is identified by its unique name, and should end in ...Module.
+   * To make the module 'SomeRecoModule' known to the framework, use REG_MODULE(SomeReco).
+   * It will then show up in the module list as 'SomeReco'.
+   *
+   * Modules can also define a return value (int or bool) using setReturnValue(),
+   * which can be used in the steering file to split the Path based on the set value:
+   *  \code
+  module_with_condition.condition("<1", another_path)
+      \endcode
+   * In case the module condition for a given event is less than 1, the execution
+   * will be diverted into another_path for this event. You could for example set
+   * a special return value if an error occurs, and divert the execution into a
+   * path containing SimpleOutput if it is found; saving only the data producing/
+   * produced by the error.
    */
   class Module : public PathElement {
 
@@ -60,6 +75,10 @@ namespace Belle2 {
      * Constructor.
      *
      * Create and allocate memory for variables here. Add the module parameters in this method.
+     * You should also set a description using setDescription() here.
+     *
+     * Please avoid producing output in the constructor, as it would show up in
+     * the module list (basf2 -m).
      */
     Module();
 
@@ -226,9 +245,7 @@ namespace Belle2 {
     void setCondition(boost::shared_ptr<Path> path);
 
     /**
-     * Returns true if a condition and a return value was set for the module.
-     *
-     * @return True if a condition and a return value was set for the module.
+     * Returns true if a condition was set for the module.
      */
     bool hasCondition() const { return m_hasCondition; };
 
@@ -388,14 +405,14 @@ namespace Belle2 {
 
     std::string m_name;           /**< The name of the module, saved as a string. */
     std::string m_description;    /**< The description of the module. */
-    unsigned int m_propertyFlags; /**< The properties of the module (Master, multi processing etc.) saved as bitwise flags. */
+    unsigned int m_propertyFlags; /**< The properties of the module as bitwise or (with |) of EModulePropFlags. */
 
     LogConfig m_logConfig;        /**< The log system configuration of the module. */
 
     ModuleParamList m_moduleParamList; /**< List storing and managing all parameter of the module. */
 
-    bool m_hasReturnValue;     /**< True, if the default return value is set. */
-    int  m_returnValue;        /**< The default return value. */
+    bool m_hasReturnValue;     /**< True, if the return value is set. */
+    int  m_returnValue;        /**< The return value. */
 
     bool m_hasCondition;     /**< True, if a condition was set for the module. */
     boost::shared_ptr<Path> m_conditionPath; /**< The path which which will be executed if the condition is evaluated to true. */

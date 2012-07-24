@@ -61,7 +61,13 @@ namespace Belle2 {
      */
     SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU = -1, float sigmaV = -1);
 
-
+    /** Construct SVDRecoHit2D from a VXDSimpleDigiHit
+     * The VXDSimpleDigiHit is used by the VXDSimpleBackground module which
+     * in turn is used to created artificial background in the VXD to test the
+     * correctness and performance of tracking algorithms
+     *
+     * @param hit    VXDSimpleDigiHit to use as base
+     */
     SVDRecoHit2D(const VXDSimpleDigiHit* hit);
 
     /** Destructor. */
@@ -105,7 +111,7 @@ namespace Belle2 {
   private:
 
     enum { HIT_DIMENSIONS = 2 /**< sensitive Dimensions of the Hit */ };
-    const static double c_HMatrixContent[10]; /**< holds all elements of H Matrix. A C array is only possibility to set TMatrixD elements with its constuctor*/
+    const static double c_HMatrixContent[10]; /**< holds all elements of H Matrix. A C array is the only possibility to set TMatrixD elements with its constructor*/
     const static TMatrixD c_HMatrix; /**< H matrix needed for Genfit. getHMatrix will return this attribute*/
 
     unsigned short m_sensorID; /**< Unique sensor identifier.*/

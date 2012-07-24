@@ -54,8 +54,7 @@ void RbCtlMgr::terminate(void)
 {
   shmdt((const void*)m_ctlshm);
   shmctl(m_shmid, IPC_RMID, NULL);
-  struct sembuf arg;
-  semctl(m_semid, 1, IPC_RMID, arg);
+  semctl(m_semid, 1, IPC_RMID);
 
 }
 

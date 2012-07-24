@@ -195,8 +195,7 @@ void RingBuffer::cleanup(void)
   printf("RingBuffer: Cleaning up IPC\n");
   if (m_new) {
     shmctl(m_shmid, IPC_RMID, (struct shmid_ds*) 0);
-    struct sembuf arg;
-    semctl(m_semid, 1, IPC_RMID, arg);
+    semctl(m_semid, 1, IPC_RMID);
     if (m_file) {
       close(m_pathfd);
       unlink(m_pathname.c_str());

@@ -407,6 +407,9 @@ void CDCLegendreTrackingModule::terminate()
 
 inline int CDCLegendreTrackingModule::calcBin(double r)
 {
+  //MH: Better way: Make calculation, that can be done once just once, e.g. ModuleMemeber m_value = 1./((m_rMax - m_rMin)*m_nbinsR)
+  //return static_cast<int>((r - m_rMin)* m_value);
+  //Function allows as well smarter r binning.
   return (int((r - m_rMin) / (m_rMax - m_rMin) * m_nbinsR));
 }
 

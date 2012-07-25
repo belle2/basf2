@@ -240,7 +240,7 @@ namespace Belle2 {
     };
     TrackData m_trackData;
 
-    void setTrackData(GFTrack* const aTrackPtr, const double charge);
+    void extractTrackData(GFTrack* const aTrackPtr, const double charge);
 
     void testDaf(GFTrack* const aTrackPtr);
     //void testDafWithBG(GFTrack *const aTrackPtr);

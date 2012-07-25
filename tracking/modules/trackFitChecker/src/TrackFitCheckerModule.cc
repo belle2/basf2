@@ -409,8 +409,8 @@ void TrackFitCheckerModule::event()
     B2DEBUG(100, "filled all track wise tests");
     if (m_nLayers not_eq 0) { // now the layer wise tests
 
-      setTrackData(aTrackPtr, charge); // read all the data for the layer wise tests from GFTracks
-      B2DEBUG(100, "setTrackData finished successfully");
+      extractTrackData(aTrackPtr, charge); // read all the data for the layer wise tests from GFTracks
+      B2DEBUG(100, "extractTrackData finished successfully");
       // do the layer wise test uses only data from GFTrack object
       if (m_testDaf == true) {
         //testDaf(aTrackPtr);
@@ -449,7 +449,7 @@ void TrackFitCheckerModule::endRun()
     B2WARNING(m_extrapFailed << " tracks could not be extrapolated to their true vertex position.");
   }
   if (m_badR_fCounter not_eq 0 or m_badR_bCounter not_eq 0 or m_badR_smCounter not_eq 0) {
-    B2WARNING("There were tracks hits with negative diagonal elements in the covariance matrix of the residuals. Occurrence forward: " << m_badR_fCounter << " backward: " << m_badR_bCounter << " smoother: " << m_badR_smCounter);
+    B2WARNING("There were tracks that produce negative diagonal elements in the covariance matrix R of the residuals r = m-H*state. Occurrence forward: " << m_badR_fCounter << " backward: " << m_badR_bCounter << " smoother: " << m_badR_smCounter);
   }
   if (m_unSymmetricCounter not_eq 0) {
     B2WARNING(m_unSymmetricCounter << " covs where not symmetric ");
@@ -925,10 +925,9 @@ void TrackFitCheckerModule::fillTrackWiseData(const string& nameOfDataSample, co
 }
 
 
-void TrackFitCheckerModule::setTrackData(GFTrack* const aTrackPtr, const double charge)
+void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const double charge)
 {
-  RelationIndex<PXDCluster, PXDTrueHit> relPxdClusterTrueHit;
-  RelationIndex<SVDCluster, SVDTrueHit> relSvdClusterTrueHit;
+
 
   //make sure anything from the last track is cleared;
   m_trackData.accuVecIndices.clear();
@@ -972,12 +971,20 @@ void TrackFitCheckerModule::setTrackData(GFTrack* const aTrackPtr, const double 
           }
         }
         if (aVxdTrueHitPtr == NULL) { //then check if there is a cluster which has a relation to a trueHit
+          RelationIndex<PXDCluster, PXDTrueHit> relPxdClusterTrueHit;
+
           const PXDCluster* aPxdCluster = aPxdRecoHitPtr->getCluster();
           //now use the relations to get the trueHit
-          RelationIndex<PXDCluster, PXDTrueHit>::range_from iterPair = relPxdClusterTrueHit.getFrom(aPxdCluster);
+          // RelationIndex<PXDCluster, PXDTrueHit>::range_from iterPair = relPxdClusterTrueHit.getFrom(aPxdCluster);
 
-          aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(iterPair.first->to);
-          assert(aVxdTrueHitPtr not_eq NULL);
+          //aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(iterPair.first->to);
+          if (relPxdClusterTrueHit.getFirstTo(aPxdCluster) not_eq NULL) {
+            aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(relPxdClusterTrueHit.getFirstTo(aPxdCluster)->to);
+          }
+
+
+          B2DEBUG(100, "aVxdTrueHitPtr is " << aVxdTrueHitPtr << " after the relation from clusters to trueHits was searched");
+          //assert(aVxdTrueHitPtr not_eq NULL);
           //cout << "aVxdTrueHitPtr: " << aVxdTrueHitPtr << endl;
         }
       }
@@ -996,11 +1003,16 @@ void TrackFitCheckerModule::setTrackData(GFTrack* const aTrackPtr, const double 
       m_trackData.accuVecIndices.push_back(aSvdRecoHitPtr->getSensorID().getLayerNumber() - 1);
       m_trackData.detIds.push_back(1);
       if (m_truthAvailable == true) {
+        RelationIndex<SVDCluster, SVDTrueHit> relSvdClusterTrueHit;
         const SVDCluster* aSvdCluster = aSvdRecoHitPtr->getCluster();
-        RelationIndex<SVDCluster, SVDTrueHit>::range_from iterPair = relSvdClusterTrueHit.getFrom(aSvdCluster);
+        //RelationIndex<SVDCluster, SVDTrueHit>::range_from iterPair = relSvdClusterTrueHit.getFrom(aSvdCluster);
 
-        aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(iterPair.first->to);
-        assert(aVxdTrueHitPtr not_eq NULL);
+        //aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(iterPair.first->to);
+        if (relSvdClusterTrueHit.getFirstTo(aSvdCluster) not_eq NULL) {
+          aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(relSvdClusterTrueHit.getFirstTo(aSvdCluster)->to);
+        }
+
+        //assert(aVxdTrueHitPtr not_eq NULL);
         // cout << "aVxdTrueHitPtr3: " << aVxdTrueHitPtr << endl;
       }
 
@@ -1067,7 +1079,8 @@ void TrackFitCheckerModule::setTrackData(GFTrack* const aTrackPtr, const double 
       trueState[3][0] = aVxdTrueHitPtr->getU(); // u
       trueState[4][0] = aVxdTrueHitPtr->getV(); // v
       m_trackData.states_t.push_back(trueState);
-    } else {
+    } else if (m_truthAvailable == true) {
+      B2WARNING("Although truthAvailable is set to true the simulated truth for the current hit could not be found. This should not happen. Something is wrong");
       TMatrixT<double> trueState;
       m_trackData.states_t.push_back(trueState);
     }
@@ -1079,10 +1092,13 @@ void TrackFitCheckerModule::truthTests()  //
 
   for (int iGFHit = 0; iGFHit not_eq m_trackData.nHits; ++iGFHit) {
     int detId = m_trackData.detIds[iGFHit];
-    if (detId == 0 or detId == 1) {  //at the moment only truth info for PXD and SVD
+    if (detId == 0 or detId == 1) {  //at the moment there is only truth info for PXD and SVD hits
       int accuVecIndex = m_trackData.accuVecIndices[iGFHit];
 
       TMatrixT<double> trueState = m_trackData.states_t[iGFHit];
+      if (trueState.GetNrows() == 0) { // this should not happen!!! If it does something went wrong. As a workaround just skip the hit (better the crashing I guess)
+        continue;
+      }
       //      cout << "true, m, H, V" << endl;
       //      trueState.Print();
       //      m_trackData.ms[iGFHit].Print();

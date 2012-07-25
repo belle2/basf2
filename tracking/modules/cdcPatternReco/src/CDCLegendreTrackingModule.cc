@@ -127,6 +127,7 @@ void CDCLegendreTrackingModule::event()
     B2WARNING("CDCTracking: cdcHitsCollection is empty!");
 
   //StoreArray with CDCTrackHits: a class derived from the original CDCHit, but also additional member variables and methods needed for tracking
+  //MH: Assume you want to be able to write this stuff out, otherwise std::vector smarter, because you can later use iterators.
   StoreArray<CDCLegendreTrackHit> cdcLegendreTrackHits(
     "CDCLegendreTrackHits");
 
@@ -158,33 +159,37 @@ std::vector<std::pair<int, int> > CDCLegendreTrackingModule::DoTrackFinding()
     new std::vector<std::vector<int> >(m_nbinsTheta,
                                        std::vector<int>(m_nbinsR, 0)));
 
+  //create Radius variable once as the loops are very long
+  float r = 0;
+
   for (int iHit = 0; iHit < cdcLegendreTrackHits.getEntries(); ++iHit) {
     if (not cdcLegendreTrackHits[iHit]->getIsAxial())
       continue;
 
     //Do the transformation in legendre plane and voting (according to NIM A592 456 (2008))
     for (int theta_bin = 0; theta_bin < m_nbinsTheta; ++theta_bin) {
-      double r1 = cdcLegendreTrackHits[iHit]->getConformalX()
-                  * cos_theta[theta_bin]
-                  + cdcLegendreTrackHits[iHit]->getConformalY()
-                  * sin_theta[theta_bin]
-                  + cdcLegendreTrackHits[iHit]->getConformalDriftTime();
-      double r2 = cdcLegendreTrackHits[iHit]->getConformalX()
-                  * cos_theta[theta_bin]
-                  + cdcLegendreTrackHits[iHit]->getConformalY()
-                  * sin_theta[theta_bin]
-                  - cdcLegendreTrackHits[iHit]->getConformalDriftTime();
+      r = cdcLegendreTrackHits[iHit]->getConformalX()
+          * cos_theta[theta_bin]
+          + cdcLegendreTrackHits[iHit]->getConformalY()
+          * sin_theta[theta_bin];
 
-      ++(*m_legendrePlane)[theta_bin][calcBin(r1)];
-      ++(*m_legendrePlane)[theta_bin][calcBin(r2)];
+      if (++(*m_legendrePlane)[theta_bin][calcBin(r + cdcLegendreTrackHits[iHit]->getConformalDriftTime())] == m_threshold) {
+        //put something into the candidates.
+      }
+      if (++(*m_legendrePlane)[theta_bin][calcBin(r - cdcLegendreTrackHits[iHit]->getConformalDriftTime())]) {
+        //put something into the candidates.
+      }
     }
   }
 
   //Find maximum in legendre plane
+  //MH: this should be before the other loop
+  //MH: Are vector here really the right container? You don't strictly need random access, but you are later going to delete stuff in the middle.
   std::vector<std::pair<int, std::pair<int, int> > > candidates;
   std::vector<std::pair<int, int> > tracks;
 
   //Find all entries with number of votes greater threshold and fill in candidates list
+  //MH: This is very inefficient. Should be deleted and just picking up the number of hits after voting in the candidate list.
   for (int i = 0; i < m_nbinsTheta; ++i) {
     for (int j = 0; j < m_nbinsR; ++j) {
       if ((*m_legendrePlane)[i][j] > m_threshold) {
@@ -213,6 +218,7 @@ std::vector<std::pair<int, int> > CDCLegendreTrackingModule::DoTrackFinding()
 
       //check for distance
       if (fabs(Theta_pri - Theta) < m_distThetaInBins && fabs(R_pri - R) < m_distRInBins) {
+        //MH: Here you are erasing from in between in a vector. Can be replace with list, see above.
         i = candidates.erase(i); //erase added candidate and keep iterator valid
       } else {
         ++i;
@@ -221,6 +227,7 @@ std::vector<std::pair<int, int> > CDCLegendreTrackingModule::DoTrackFinding()
     }
 
     tracks.push_back(std::make_pair(Theta_pri, R_pri));
+    //MH: Again erasing from vector
     candidates.erase(candidates.begin());
   }
 

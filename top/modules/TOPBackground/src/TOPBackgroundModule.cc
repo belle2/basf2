@@ -70,17 +70,41 @@ namespace Belle2 {
       m_rootFile = new TFile(m_OutputFileName.c_str(), "RECREATE");
 
       peflux = new TH1F("Photoelectron flux", "Photoelectron flux", 33, -11.25, 360);
-      rdose = new TH1F("Radiation dose", "Radiation dose", 33, -11.25, 360);
       nflux = new TH1F("Neutron flux", "Neutron flux", 33, -11.25, 360);
+      rdose = new TH1F("Radiation dose", "Radiation dose", 33, -11.25, 360);
       zdist = new TH1F("Photoelectron origin", "Photoelectron origin", 200, -400, 400);
+      genergy = new TH1F("Energy distribution of photons", "Energy distribution of photons", 150, 0, 5);
+      genergy2 = new TH1F("Energy distribution of gammas", "Energy distribution of gammas", 150, 0, 30);
+
+      zdistg = new TH1F("Photoelectron flux z", "Photoelectron flux Z projection", 80, -400, 400);
+
+      nflux_bar = new TH2F("Neutron flux on bar", "Neutron flux on bar", 32, -114.8, 211.5, 16, -0, 360);
+      gflux_bar = new TH2F("Gamma flux on bar", "Gamma flux on bar MHz/cm^{2}", 32, -114.8, 211.5, 16, -0, 360);
+      cflux_bar = new TH2F("Charged flux on bar", "Charged flux on bar MHz/cm^{2}", 32, -114.8, 211.5, 16, -0, 360);
+
+      norigin = new TH1F("neutron(BAR) origin", "neutron(BAR) origin", 200, -400, 400);
+      gorigin = new TH1F("gamma(BAR) origin", "gamma(BAR) origin", 200, -400, 400);
+      corigin = new TH1F("charged(BAR) origin", "charged(BAR) origin", 200, -400, 400);
+
+      nprim = new TH1F("neutron(BAR) primary", "neutron(BAR) primary", 200, -400, 400);
+      gprim = new TH1F("gamma(BAR) primary", "gamma(BAR) primary", 200, -400, 400);
+      cprim = new TH1F("charged(BAR) primary", "charged(BAR) primary", 200, -400, 400);
+
       origin_zx = new TGraph();
       origin_zy = new TGraph();
+
+      prim_zx = new TGraph();
+      prim_zy = new TGraph();
+
+      origin_zy->SetName("originZY");
+      origin_zx->SetName("originZX");
 
       PCBmass = 0.417249;
       PCBarea = 496.725;
       yearns = 1.e13;
       evtoJ = 1.60217653 * 1e-10;
       mtoc = 1.97530864197531;
+      count = 0;
 
 
     }
@@ -126,7 +150,7 @@ namespace Belle2 {
       StoreArray<TOPDigit> topDigits;
       StoreArray<TOPTrack> topTracks;
 
-      int nHits = topDigits.getEntries();
+      int nHits = topDigits->GetEntries();
       for (int i = 0; i < nHits; i++) {
         TOPDigit* aDigit = topDigits[i];
         int barID = aDigit->getBarID();
@@ -134,17 +158,23 @@ namespace Belle2 {
 
         const TOPSimHit* simHit = getTOPSimHit(aDigit);
 
+        genergy->Fill(simHit->getEnergy());
+
         RelationIndex<MCParticle, TOPSimHit> relMCParticleToTOPSimHit(mcParticles, topSimhits);
 
         if (relMCParticleToTOPSimHit.getFirstFrom(simHit)) {
           const MCParticle* currParticle = relMCParticleToTOPSimHit.getFirstFrom(simHit)->from;
 
           const MCParticle* mother = currParticle->getMother();
+
           int mm = 0;
           while (mother) {
             const MCParticle* pommother = mother->getMother();
             if (!pommother) {
+
               zdist->Fill(mother->getVertex().Z());
+              zdistg->Fill(mother->getVertex().Z(), 1. / m_TimeOfSimulation / 32.0 / 16.0);
+
             }
             mother = pommother;
             mm++;
@@ -154,7 +184,7 @@ namespace Belle2 {
 
 
       StoreArray<BeamBackHit> beamBackHits;
-      nHits = beamBackHits.getEntries();
+      nHits = beamBackHits->GetEntries();
 
       for (int iHit = 0; iHit < nHits; ++iHit) {
         BeamBackHit* tophit = beamBackHits[iHit];
@@ -182,13 +212,40 @@ namespace Belle2 {
         }
       }
 
-      nHits = topTracks.getEntries();
+      nHits = topTracks->GetEntries();
       for (int iHit = 0; iHit < nHits; ++iHit) {
+        TOPTrack* toptrk = topTracks[iHit];
 
-        TOPTrack* simHit = topTracks[iHit];
-        origin_zx->SetPoint(iHit, simHit->getVPosition().Z(), simHit->getVPosition().X());
-        origin_zy->SetPoint(iHit, simHit->getVPosition().Z(), simHit->getVPosition().Y());
+        int PDG = toptrk->getParticleID();
+        int barID = toptrk->getBarID();
+
+        if (PDG == 2112) {
+          nflux_bar->Fill(toptrk->getPosition().Z(), (barID - 1) * 22.5, 1. / 917.65 / m_TimeOfSimulation * yearns * 2.);
+          norigin->Fill(toptrk->getVPosition().Z());
+        } else {
+          if (PDG == 22) {
+            gflux_bar->Fill(toptrk->getPosition().Z(), (barID - 1) * 22.5, 1. / 917.65 / m_TimeOfSimulation * 2.);
+            gorigin->Fill(toptrk->getVPosition().Z());
+
+            genergy2->Fill(toptrk->getMomentum().Mag() * 1000);
+
+            origin_zx->SetPoint(count, toptrk->getVPosition().Z(), toptrk->getVPosition().X());
+            origin_zy->SetPoint(count, toptrk->getVPosition().Z() / 0.999143, toptrk->getVPosition().Y());
+            count++;
+
+          } else {
+            cflux_bar->Fill(toptrk->getPosition().Z(), (barID - 1) * 22.5, 1. / 917.65 / m_TimeOfSimulation * 2.);
+            corigin->Fill(toptrk->getVPosition().Z());
+          }
+        }
+
+
+
+
       }
+
+
+
     }
 
 
@@ -276,16 +333,27 @@ namespace Belle2 {
 
     void TOPBackgroundModule::terminate()
     {
-      myprint(peflux, ("peflux_" + m_BkgType + ".pdf").c_str(), "#phi", "MHz / PMT", 1.);
-      myprint(zdist, ("zdist_" + m_BkgType + ".pdf").c_str(), "z[cm]", "", 0.0);
-      myprint(nflux, ("nflux_" + m_BkgType + ".pdf").c_str(), "#phi", "neutrons / cm^{2} / year", 0.0);
-      myprint(rdose, ("rdose_" + m_BkgType + ".pdf").c_str(), "#phi", "Gy/year", 0.0);
+      /*
+       myprint(peflux, ("peflux_" + m_BkgType + ".pdf").c_str(), "#phi", "MHz / PMT", 1.);
+       myprint(zdist, ("zdist_" + m_BkgType + ".pdf").c_str(), "z[cm]", "", 0.0);
+       myprint(nflux, ("nflux_" + m_BkgType + ".pdf").c_str(), "#phi", "neutrons / cm^{2} / year", 0.0);
+       myprint(rdose, ("rdose_" + m_BkgType + ".pdf").c_str(), "#phi", "Gy/year", 0.0);
+       */
 
       m_rootFile->cd();
       peflux->Write();
       zdist->Write();
       nflux->Write();
       rdose->Write();
+      genergy->Write();
+      genergy2->Write();
+      nflux_bar->Write();
+      gflux_bar->Write();
+      origin_zx->Write();
+      origin_zy->Write();
+      gorigin->Write();
+      norigin->Write();
+      zdistg->Write();
       m_rootFile->Close();
 
       // Announce

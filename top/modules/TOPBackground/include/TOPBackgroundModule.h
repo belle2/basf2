@@ -129,14 +129,36 @@ namespace Belle2 {
       TH1F* nflux;    /**< neutron flux */
       TH1F* rdose;   /**<  radiation dose*/
       TH1F* zdist;    /**<  z distribution of primaries*/
-      TGraph* origin_zx;    /**<  grapch zx*/
-      TGraph* origin_zy;     /**<  graph zy*/
+      TH1F* genergy; /** energy of gamma that hits the bar */
+      TH1F* genergy2; /** energy of gamma that hits the bar */
+
+      TH1F* zdistg; /** z distribution of the photoelectron flux */
+
+
+      TH2F* nflux_bar;  /** neutron flux on bar */
+      TH2F* gflux_bar;  /** gamma flux on bar */
+      TH2F* cflux_bar;  /** charged flux on bar */
+
+      TH1F* norigin; /** nutron origin */
+      TH1F* gorigin; /** gamma origin */
+      TH1F* corigin;  /** charged origin */
+
+      TH1F* nprim;  /** neutron primery */
+      TH1F* gprim;  /**gamma primery */
+      TH1F* cprim;  /** charged primary */
+
+      TGraph* origin_zx;    /**<  grapch zx */
+      TGraph* origin_zy;     /**<  graph zy */
+
+      TGraph* prim_zx;    /**<  grapch zx */
+      TGraph* prim_zy;     /**<  graph zy */
 
       double PCBmass;   /**<  constant */
       double PCBarea;   /**<  constant */
       double yearns;   /**<  constant */
       double evtoJ;   /**<  constant */
       double mtoc;   /**<  constant */
+      int count; /** counter */
 
 
 

@@ -560,6 +560,11 @@ namespace Belle2 {
      */
     EKLMSensitiveDetector* m_sensitive;
 
+    /**
+     * File to store transformation matrices
+     */
+    std::string m_outputFile;
+
   };
 
 

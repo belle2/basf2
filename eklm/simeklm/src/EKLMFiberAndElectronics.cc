@@ -145,7 +145,7 @@ namespace Belle2 {
       hfile->Append(m_fitFunction);
       hfile->Write();
     } else {
-      B2INFO("OutputFile parameter in EKLM.xml is void. No histogram will be saved");
+      B2DEBUG(100, "OutputFile parameter in EKLM.xml is void. No histogram will be saved");
     }
   }
 
@@ -172,13 +172,9 @@ namespace Belle2 {
 
   double EKLMFiberAndElectronics::signalShape(double t)
   {
-    if (t < 0)
-      return 0;
-    if (t < m_expCoefficient)
-      return (-abs(t - m_expCoefficient) / m_expCoefficient + 1) / m_expCoefficient;
-    else
-      return exp(-(t - m_expCoefficient) / 30) / m_expCoefficient;
-    return 0 ;
+    if (t > 0)
+      return exp(-m_expCoefficient * t);
+    return 0;
   }
 
   double  EKLMFiberAndElectronics::distanceAttenuation(double dist)

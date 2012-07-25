@@ -14,6 +14,7 @@
 #include <G4PVPlacement.hh>
 #include <G4LogicalVolume.hh>
 #include <G4Transform3D.hh>
+#include <vector>
 
 namespace Belle2 {
 
@@ -82,6 +83,12 @@ namespace Belle2 {
      */
     const std::string getName() const;
 
+    /**
+     * getIdHistory -- get id hierarchy
+     */
+    std::vector<int> getIdHistory() const;
+
+
   private:
 
     /**
@@ -124,6 +131,12 @@ namespace Belle2 {
      * Mother G4PVPlacementGT.
      */
     const G4PVPlacementGT* m_mother;
+
+    /**
+     * ID ierarchy
+     */
+    std::vector<int> m_idHistory;
+
 
   };
 

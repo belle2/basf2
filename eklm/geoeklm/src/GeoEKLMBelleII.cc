@@ -42,6 +42,9 @@
 #include <errno.h>
 
 
+#include <eklm/geoeklm/EKLMTransformationFactory.h>
+
+
 using namespace Belle2;
 
 /* Register the creator */
@@ -108,6 +111,7 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   int j;
   GearDir gd(content);
   m_mode = gd.getInt("Mode");
+  m_outputFile = gd.getString("StripLengthAndTransformationMatrixDBFile");
   GearDir EndCap(gd);
   EndCap.append("/EndCap");
   readPositionData(EndcapPosition, EndCap);
@@ -1326,8 +1330,9 @@ void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
     exit(ENOMEM);
   }
   createBaseBoard(physiSectionReadoutBoard);
-  for (i = 1; i <= nStripBoard; i++)
-    createStripBoard(i, physiSectionReadoutBoard);
+  if (m_mode != 0)
+    for (i = 1; i <= nStripBoard; i++)
+      createStripBoard(i, physiSectionReadoutBoard);
 }
 
 /**
@@ -1598,7 +1603,8 @@ void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT* mpvgt)
     exit(ENOMEM);
   }
   createStrip(iStrip, physiStripVolume);
-  if (m_mode == 1 || m_mode == 2)
+
+  if (m_mode != 0)
     createSiPM(iStrip, physiStripVolume);
 }
 
@@ -1636,6 +1642,19 @@ void GeoEKLMBelleII::createStrip(int iStrip, G4PVPlacementGT* mpvgt)
   }
   createStripGroove(iStrip, physiStrip);
   createStripSensitive(iStrip, physiStrip);
+
+  //*** saving information to EKLMTransformationFactory
+  std::vector<int> history = physiStrip->getIdHistory();
+
+  (EKLMTransformationFactory::getInstance())->addMatrixEntry(history[0], // endcap
+                                                             history[1], // sector
+                                                             history[2], // layer
+                                                             history[3], // plane
+                                                             history[4], //strip
+                                                             physiStrip->getTransform());
+  (EKLMTransformationFactory::getInstance())->addLengthEntry(history[4], StripPosition[iStrip - 1].length);
+  //** done
+
   printVolumeMass(logicStrip);
 }
 
@@ -1813,5 +1832,11 @@ void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
     printf("EKLM started in mode 2. Exiting now.\n");
     exit(0);
   }
+
+  // save infrormation to file
+  std::cout << "A " << m_outputFile << std::endl;
+  if (m_outputFile.size() != 0)
+    (EKLMTransformationFactory::getInstance())->writeToFile(m_outputFile.c_str());
+  std::cout << "B" << std::endl;
 }
 

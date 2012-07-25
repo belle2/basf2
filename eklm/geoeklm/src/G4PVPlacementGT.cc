@@ -30,6 +30,7 @@ namespace Belle2 {
     m_mode = mode;
     m_mother = NULL;
     m_type = -1; ///default value
+    m_idHistory.push_back(id);
   }
 
   G4PVPlacementGT::G4PVPlacementGT(G4PVPlacementGT* motherPVPlacementGT,
@@ -46,6 +47,8 @@ namespace Belle2 {
     m_mode = mode;
     m_mother = motherPVPlacementGT;
     m_type = -1; ///default value
+    m_idHistory = motherPVPlacementGT->getIdHistory();
+    m_idHistory.push_back(id);
   }
 
   G4Transform3D G4PVPlacementGT::getTransform()
@@ -58,6 +61,10 @@ namespace Belle2 {
     return m_id;
   }
 
+  std::vector<int> G4PVPlacementGT::getIdHistory() const
+  {
+    return m_idHistory;
+  }
   int G4PVPlacementGT::getMode() const
   {
     return m_mode;

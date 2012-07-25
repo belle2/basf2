@@ -1,6 +1,8 @@
 
 #include <framework/core/ModuleManager.h>
 
+#include <eklm/geoeklm/EKLMTransformationFactory.h>
+
 #include <eklm/modules/eklmReconstruction/EKLMReconstructionModule.h>
 #include <eklm/receklm/EKLMRecon.h>
 #include <eklm/geoeklm/GeoEKLMBelleII.h>
@@ -24,6 +26,7 @@ EKLMReconstructionModule::EKLMReconstructionModule() : Module()
 
   setDescription("EKLM reconstruction simple module for tests");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  addParam("StripInformationDB", m_stripInfromationDBFile, "File to read strip information", std::string("/tmp/out.dat"));
 }
 
 EKLMReconstructionModule::~EKLMReconstructionModule()
@@ -33,6 +36,7 @@ EKLMReconstructionModule::~EKLMReconstructionModule()
 void EKLMReconstructionModule::initialize()
 {
   B2INFO("EKLMReconstructionModule initialized");
+  (EKLMTransformationFactory::getInstance())->readFromFile(m_stripInfromationDBFile.c_str());
 }
 
 void EKLMReconstructionModule::beginRun()

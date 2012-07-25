@@ -69,6 +69,11 @@ namespace Belle2 {
 
   protected:
   private:
+    /**
+     * Strip transformation file
+     */
+    std::string m_stripInfromationDBFile;
+
 
     double m_firstPhotonlightSpeed;
     double m_sigmaT;

@@ -74,6 +74,11 @@ namespace Belle2 {
      */
     double m_discriminatorThreshold;
 
+    /**
+     * Strip transformation file
+     */
+    std::string m_stripInfromationDBFile;
+
   };
 } // end namespace Belle2
 #endif

@@ -3,8 +3,8 @@
 
 #include <eklm/modules/eklmDigitization/EKLMDigitizationModule.h>
 #include <eklm/simeklm/EKLMDigitizer.h>
+#include <eklm/geoeklm/EKLMTransformationFactory.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -21,6 +21,7 @@ EKLMDigitizationModule::EKLMDigitizationModule() : Module()
   setDescription("EKLM digitization module");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("DiscriminatorThreshold", m_discriminatorThreshold, "Strip hits with npe lower this value will be marked as bad", double(7.));
+  addParam("StripInformationDB", m_stripInfromationDBFile, "File to read strip information", std::string("/tmp/out.dat"));
 }
 
 EKLMDigitizationModule::~EKLMDigitizationModule()
@@ -30,6 +31,7 @@ EKLMDigitizationModule::~EKLMDigitizationModule()
 void EKLMDigitizationModule::initialize()
 {
   B2INFO("EKLMDigitizationModule initialized");
+  (EKLMTransformationFactory::getInstance())->readFromFile(m_stripInfromationDBFile.c_str());
 }
 
 void EKLMDigitizationModule::beginRun()

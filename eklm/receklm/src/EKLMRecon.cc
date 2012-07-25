@@ -16,6 +16,10 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 
+#include <eklm/geoeklm/EKLMTransformationFactory.h>
+
+
+
 using namespace std;
 namespace Belle2 {
 
@@ -131,27 +135,36 @@ namespace Belle2 {
     // output values
 
 
-    // actually, it is not too safe to use GetConstituentSolid(0).
-    // here we rely on the fact that the first child is a real strip G4box
-    // see similar problem in EKLMFiberAndElectronics::lightPropagationDistance function
-    G4Box* box1 = (G4Box*)(hit1->getVolume()->GetLogicalVolume()->GetSolid()->GetConstituentSolid(0));
-    double max1 = 2.0 * box1->GetXHalfLength();
-    HepGeom::Point3D<double> p1(box1->GetXHalfLength(), 0., 0.);
-    HepGeom::Point3D<double> q1(-(box1->GetXHalfLength()), 0., 0.);
-    // sipm coordinates in a global frame
-    HepGeom::Point3D<double> pt1 = ((G4PVPlacementGT*)(hit1->getVolume()))-> getTransform() * p1;
-    HepGeom::Point3D<double> qt1 = ((G4PVPlacementGT*)(hit1->getVolume()))-> getTransform() * q1;
 
-    // actually, it is not too safe to use GetConstituentSolid(0).
-    // here we rely on the fact that the first child is a real strip G4box
-    // similar problem is in EKLMFiberAndElectronics::lightPropagationDistance function
-    G4Box* box2 = (G4Box*)(hit2->getVolume()->GetLogicalVolume()->GetSolid()->GetConstituentSolid(0));
-    double max2 = 2.0 * box2->GetXHalfLength();
-    HepGeom::Point3D<double> p2(box2->GetXHalfLength(), 0., 0.);
-    HepGeom::Point3D<double> q2(-(box2->GetXHalfLength()), 0., 0.);
+    double max1 = (EKLMTransformationFactory::getInstance())->getStripLength(hit1->getStrip());
+    HepGeom::Point3D<double> p1(max1 / 2, 0., 0.);
+    HepGeom::Point3D<double> q1(-max1 / 2, 0., 0.);
     // sipm coordinates in a global frame
-    HepGeom::Point3D<double> pt2 = ((G4PVPlacementGT*)(hit2->getVolume()))->getTransform() * p2;
-    HepGeom::Point3D<double> qt2 = ((G4PVPlacementGT*)(hit2->getVolume()))->getTransform() * q2;
+    G4Transform3D tr1 = (EKLMTransformationFactory::getInstance())->getTransformation(
+                          hit1->getEndcap(),
+                          hit1->getLayer(),
+                          hit1->getSector(),
+                          hit1->getPlane(),
+                          hit1->getStrip()
+                        );
+    HepGeom::Point3D<double> pt1 = tr1 * p1;
+    HepGeom::Point3D<double> qt1 = tr1 * q1;
+
+
+    double max2 = (EKLMTransformationFactory::getInstance())->getStripLength(hit2->getStrip());
+    HepGeom::Point3D<double> p2(max1 / 2, 0., 0.);
+    HepGeom::Point3D<double> q2(-max1 / 2, 0., 0.);
+    G4Transform3D tr2 = (EKLMTransformationFactory::getInstance())->getTransformation(
+                          hit2->getEndcap(),
+                          hit2->getLayer(),
+                          hit2->getSector(),
+                          hit2->getPlane(),
+                          hit2->getStrip()
+                        );
+
+    // sipm coordinates in a global frame
+    HepGeom::Point3D<double> pt2 = tr2 * p2;
+    HepGeom::Point3D<double> qt2 = tr2 * q2;
 
 
     crossPoint.SetZ((pt1.z() + pt2.z()) / 2 * Unit::mm);

@@ -1,15 +1,10 @@
 #ifndef EKLMRECONSTRUCTIONMODULE_H
 #define EKLMRECONSTRUCTIONMODULE_H
 
-#include <framework/datastore/StoreObjPtr.h>
-//#include <framework/datastore/StoreDefs.h>
-#include <framework/datastore/StoreArray.h>
 
 #include <framework/core/Module.h>
 #include <string>
 
-
-#include <eklm/receklm/EKLMRecon.h>
 
 namespace Belle2 {
 

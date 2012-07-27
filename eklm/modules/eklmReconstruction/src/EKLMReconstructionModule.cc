@@ -5,11 +5,7 @@
 
 #include <eklm/modules/eklmReconstruction/EKLMReconstructionModule.h>
 #include <eklm/receklm/EKLMRecon.h>
-#include <eklm/geoeklm/GeoEKLMBelleII.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------

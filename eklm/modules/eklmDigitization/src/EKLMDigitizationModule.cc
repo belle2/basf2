@@ -1,3 +1,14 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors:  Timofey Uglov                                           *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+
 
 #include <framework/core/ModuleManager.h>
 
@@ -43,13 +54,11 @@ void EKLMDigitizationModule::event()
 {
   B2DEBUG(1, "EKLMDigitizationModule : event");
   B2DEBUG(1, " START DIGITIZATION");
-  EKLMDigitizer* digi = new EKLMDigitizer();
-  digi->readAndSortStepHits();
-  digi->makeSimHits();
-  digi->readAndSortSimHits();
-  digi->mergeSimHitsToStripHits(m_discriminatorThreshold);
-  delete digi;
-  B2DEBUG(1, " DELETE DIGITIZER OBJECT");
+  EKLMDigitizer digi;
+  digi.readAndSortStepHits();
+  digi.makeSimHits();
+  digi.readAndSortSimHits();
+  digi.mergeSimHitsToStripHits(m_discriminatorThreshold);
 }
 
 

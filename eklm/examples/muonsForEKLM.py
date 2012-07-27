@@ -86,6 +86,8 @@ main.add_module(g4sim)
 main.add_module(eklmdigi)
 main.add_module(eklmreco)
 
+main.add_module(simpleoutput)
+
 # Process 100 events
 process(main)
 

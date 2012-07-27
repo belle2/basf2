@@ -24,9 +24,13 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 
+#include <svd/dataobjects/SVDCluster.h>
+#include <pxd/dataobjects/PXDCluster.h>
+
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit.h>
 
 #include <tracking/dataobjects/Track.h>
 
@@ -88,7 +92,7 @@ GenFitterModule::GenFitterModule() :
   addParam("StoreFailedTracks", m_storeFailed, "Set true if the tracks where the fit failed should also be stored in the output", bool(false));
   addParam("pdg", m_pdg, "Set the pdg hypothesis (positive charge) for the track (if set to -999, MC/default pdg will be used)", int(-999));
   addParam("allPDG", m_allPDG, "Set true if you want each track fitted 4 times with different pdg hypothesises (-11,-13, 211, 321), active only for pattern recognition tracks", bool(false));
-
+  addParam("UseClusters", m_useClusters, "if set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used", false);
   //output
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the final GFTracks (will be created by this module)", string(""));
   addParam("GFTracksToMCParticlesColName", m_gfTracksToMCParticlesColName, "Name of collection holding the relations between the final GFTracks and the original MCParticle (will be created by this module)", string(""));
@@ -144,27 +148,39 @@ void GenFitterModule::event()
 
   StoreArray < MCParticle > mcParticles(m_mcParticlesColName);
   B2DEBUG(149, "GenFitter: total Number of MCParticles: " << mcParticles.getEntries());
-  if (mcParticles.getEntries() == 0) B2WARNING("GenFitter: MCParticlesCollection is empty!");
+  if (mcParticles.getEntries() == 0) { B2DEBUG(100, "GenFitter: MCParticlesCollection is empty!"); }
 
   StoreArray < GFTrackCand > trackCandidates(m_gfTrackCandsColName);
   B2DEBUG(99, "GenFitter: Number of GFTrackCandidates: " << trackCandidates.getEntries());
   if (trackCandidates.getEntries() == 0)
-    B2WARNING("GenFitter: GFTrackCandidatesCollection is empty!");
+    B2DEBUG(100, "GenFitter: GFTrackCandidatesCollection is empty!");
 
   StoreArray < CDCHit > cdcHits(m_cdcHitsColName);
   B2DEBUG(149, "GenFitter: Number of CDCHits: " << cdcHits.getEntries());
   if (cdcHits.getEntries() == 0)
-    B2WARNING("GenFitter: CDCHitsCollection is empty!");
+    B2DEBUG(100, "GenFitter: CDCHitsCollection is empty!");
 
-  StoreArray < SVDTrueHit > svdHits(m_svdHitsColName);
-  B2DEBUG(149, "GenFitter: Number of SVDHits: " << svdHits.getEntries());
-  if (svdHits.getEntries() == 0)
-    B2WARNING("GenFitter: SVDHitsCollection is empty!");
+  StoreArray < SVDTrueHit > svdTrueHits(m_svdHitsColName);
+  B2DEBUG(149, "GenFitter: Number of SVDHits: " << svdTrueHits.getEntries());
+  if (svdTrueHits.getEntries() == 0)
+    B2DEBUG(100, "GenFitter: SVDHitsCollection is empty!");
 
-  StoreArray < PXDTrueHit > pxdHits(m_pxdHitsColName);
-  B2DEBUG(149, "GenFitter: Number of PXDHits: " << pxdHits.getEntries());
-  if (pxdHits.getEntries() == 0)
-    B2WARNING("GenFitter: PXDHitsCollection is empty!");
+  StoreArray < PXDTrueHit > pxdTrueHits(m_pxdHitsColName);
+  B2DEBUG(149, "GenFitter: Number of PXDHits: " << pxdTrueHits.getEntries());
+  if (pxdTrueHits.getEntries() == 0)
+    B2DEBUG(100, "GenFitter: PXDHitsCollection is empty!");
+
+  //PXD clusters
+  StoreArray<PXDCluster> pxdClusters("");
+  int nPXDClusters = pxdClusters.getEntries();
+  B2DEBUG(149, "GenFitter2: Number of PXDClusters: " << nPXDClusters);
+  if (nPXDClusters == 0) {B2DEBUG(100, "GenFitter2: PXDClustersCollection is empty!");}
+
+  //SVD clusters
+  StoreArray<SVDCluster> svdClusters("");
+  int nSVDClusters = svdClusters.getEntries();
+  B2DEBUG(149, "GenFitter2: Number of SVDClusters: " << nSVDClusters);
+  if (nSVDClusters == 0) {B2DEBUG(100, "GenFitter2: SVDClustersCollection is empty!");}
 
   if (m_filterId == 0) {
     B2DEBUG(99, "Kalman filter with " << m_nIter << " iterations will be used ");
@@ -244,18 +260,36 @@ void GenFitterModule::event()
 
       //create RecoHitProducers for PXD, SVD and CDC
       GFRecoHitProducer <PXDTrueHit, PXDRecoHit> * PXDProducer;
-      PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (&*pxdHits);
-
       GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> * SVDProducer;
-      SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> (&*svdHits);
+
+
 
       GFRecoHitProducer <CDCHit, CDCRecoHit> * CDCProducer;
-      CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
 
-      //add producers to the factory with correct detector Id
-      factory.addProducer(0, PXDProducer);
-      factory.addProducer(1, SVDProducer);
-      factory.addProducer(2, CDCProducer);
+
+      GFRecoHitProducer <PXDCluster, PXDRecoHit> * pxdClusterProducer;
+      GFRecoHitProducer <SVDCluster, SVDRecoHit> * svdClusterProducer;
+
+      //create RecoHitProducers for PXD, SVD and CDC
+      if (m_useClusters == false) { // use the trueHits
+        PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (&*pxdTrueHits);
+        SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> (&*svdTrueHits);
+        CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
+      } else {
+        pxdClusterProducer =  new GFRecoHitProducer <PXDCluster, PXDRecoHit> (&*pxdClusters);
+        svdClusterProducer =  new GFRecoHitProducer <SVDCluster, SVDRecoHit> (&*svdClusters);
+        CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
+      }
+
+      if (m_useClusters == false) { // use the trueHits
+        factory.addProducer(0, PXDProducer);
+        factory.addProducer(1, SVDProducer);
+        factory.addProducer(2, CDCProducer);
+      } else { // use the cluster hits
+        factory.addProducer(0, pxdClusterProducer);
+        factory.addProducer(1, svdClusterProducer);
+        factory.addProducer(2, CDCProducer);
+      }
 
       vector <GFAbsRecoHit*> factoryHits;
       //use the factory to create RecoHits for all Hits stored in the track candidate

@@ -96,6 +96,7 @@ namespace Belle2 {
     bool m_storeFailed;                              /**< Boolean to mark if failed track fits should also be stored as Tracks. */
     int m_pdg;                                       /**< PDG hypothesis for the track fit. If -999: MC/default values will be used. */
     bool m_allPDG;                                   /**< Boolean to mark if the track should be fitted with all implemented pdg hypothesises.*/
+    bool m_useClusters;                              /**< Boolean to mark if PXD/SVD cluster hits should be used instead of true hits in the.*/
 
     std::ofstream HelixParam;                        /**< Text output file name */
     bool m_createTextFile;                           /**< Boolean to select if an output file with helix parameters should be created. */

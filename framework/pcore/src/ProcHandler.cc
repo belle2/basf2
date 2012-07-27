@@ -4,6 +4,7 @@
 /// @date Jul 14 2008
 
 #include <framework/pcore/ProcHandler.h>
+#include <framework/logging/Logger.h>
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -15,7 +16,6 @@
 #include <errno.h>
 #include <string.h>
 
-//#include "inc/evtprocess.h" // DEPRECATED
 //#include "shm.h"
 
 using namespace std;
@@ -56,9 +56,9 @@ int ProcHandler::init_EvtServer(void)
     m_lEvtSrv.push_back(pid);
     m_fEvtServer = 0;
     m_nEvtSrv++;
-    printf("ProcHandler: event server forked. pid = %d\n", pid);
+    B2INFO("ProcHandler: event server forked. pid = " << pid);
   } else if (pid < 0) {
-    perror("init_EvtServer");
+    B2ERROR("init_EvtServer");
     exit(-99);
   } else {
     m_fEvtServer = 1; // I'm event server
@@ -80,10 +80,10 @@ int ProcHandler::init_EvtProc(int nproc)
         m_lEvtProc.push_back(pid);
         m_fEvtProc = 0;
         m_nEvtProc++;
-        printf("ProcHandler: event process %d forked. pid = %d\n", i, pid);
+        B2INFO("ProcHandler: event process " << i << " forked. pid = " << pid);
         fflush(stdout);
       } else if (pid < 0) {
-        perror("init_EvtProc");
+        B2ERROR("init_EvtProc");
         exit(-99);
       } else { // Event Process
         m_fEvtProc = 1;    // I'm event process
@@ -103,9 +103,9 @@ int ProcHandler::init_OutServer(int id)
     m_lOutputSrv.push_back(pid);
     m_fOutputSrv = 0;
     m_nOutputSrv++;
-    printf("ProcHandler: output server forked. pid = %d\n", pid);
+    B2INFO("ProcHandler: output server forked. pid = " << pid);
   } else if (pid < 0) {
-    perror("init_EvtServer");
+    B2ERROR("init_EvtServer");
     exit(-99);
   } else {
     m_fOutputSrv = 1; // I'm output server
@@ -260,7 +260,7 @@ int ProcHandler::wait_processes(void)
         if (errno == EINTR)
           continue;
         else {
-          perror("wait_processes : waitpid");
+          B2ERROR("wait_processes : waitpid");
           return -1;
         }
       } else {
@@ -283,7 +283,7 @@ int ProcHandler::remove_pid(pid_t pid)
   for (std::vector<pid_t>::iterator it = m_lEvtSrv.begin(); it != m_lEvtSrv.end(); ++it) {
     if (pid == *it) {
       m_lEvtSrv.erase(it);
-      printf("ProcHandler : event server %d completed and removed\n", pid);
+      B2INFO("ProcHandler : event server " << pid << " completed and removed");
       return 0;
     }
   }
@@ -291,7 +291,7 @@ int ProcHandler::remove_pid(pid_t pid)
   for (std::vector<pid_t>::iterator it = m_lOutputSrv.begin(); it != m_lOutputSrv.end(); ++it) {
     if (pid == *it) {
       m_lOutputSrv.erase(it);
-      printf("ProcHandler : output server %d completed and removed\n", pid);
+      B2INFO("ProcHandler : output server " << pid << " completed and removed");
       return 0;
     }
   }
@@ -299,7 +299,7 @@ int ProcHandler::remove_pid(pid_t pid)
   for (std::vector<pid_t>::iterator it = m_lEvtProc.begin(); it != m_lEvtProc.end(); ++it) {
     if (pid == *it) {
       m_lEvtProc.erase(it);
-      printf("ProcHandler : event process %d completed and removed\n", pid);
+      B2INFO("ProcHandler : event process " << pid << " completed and removed");
       return 0;
     }
   }
@@ -317,7 +317,7 @@ int ProcHandler::wait_event_server(void)
         if (errno == EINTR)
           continue;
         else {
-          perror("wait_processes : waitpid");
+          B2ERROR("wait_processes : waitpid");
           return -1;
         }
       } else {
@@ -341,7 +341,7 @@ int ProcHandler::wait_event_processes(void)
         if (errno == EINTR)
           continue;
         else {
-          perror("wait_processes : waitpid");
+          B2ERROR("wait_processes : waitpid");
           return -1;
         }
       } else {
@@ -368,7 +368,7 @@ int ProcHandler::wait_output_server(void)
         if (errno == EINTR)
           continue;
         else {
-          perror("wait_processes : waitpid");
+          B2ERROR("wait_processes : waitpid");
           return -1;
         }
       } else {
@@ -384,4 +384,3 @@ int ProcHandler::wait_output_server(void)
   m_lOutputSrv.erase(m_lOutputSrv.begin(), m_lOutputSrv.end());
   return 0;
 }
-

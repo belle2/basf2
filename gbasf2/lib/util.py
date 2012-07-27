@@ -70,6 +70,7 @@ def CheckAndRemoveProjectIfForce(username=None, project=None):
 
 def make_jdl(
     steering_file,
+    repetitionOfJob,
     project,
     CPUTime,
     priority,
@@ -99,6 +100,11 @@ def make_jdl(
     f.write('    Arguments = "' + steering_file + ' ' + swver + '";\n')
     f.write('    JobGroup = ' + project + ';\n')
     f.write('    JobName = ' + os.path.basename(lfn) + ';\n')
+    # parametric jobs that run multiple times (option -r)
+    if repetitionOfJob > 1:
+        f.write('   Parameters = %d;\n' % repetitionOfJob)
+        f.write('   ParameterStart = 1;\n')
+        f.write('   ParameterStep = 1;\n')
     f.write('    PilotType = "private";\n')
     f.write('    SystemConfig = ' + sysconfig + ';\n')
     if site != '':

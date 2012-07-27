@@ -29,6 +29,7 @@ class CLIParams:
     sysconfig = 'Belle-v2r2'
     datatype = None
     experiments = None
+    repetitionOfJob = 1
     inputsandboxfiles = []
     maxevents = None
     numberOfFiles = 1
@@ -43,6 +44,15 @@ class CLIParams:
     def setSteeringFile(self, arg):
         self.steering_file = arg
         return DIRAC.S_OK()
+
+    def setRepetitionOfJob(self, arg):
+        if arg > 0:
+            self.repetitionOfJob = int(arg)
+    # need to also set maxevents, otherwise it only submits 1 time
+            self.maxevents = int(arg)
+            return DIRAC.S_OK()
+        else:
+            return DIRAC.S_ERROR('repetitionOfJob is <=0')
 
     def setProject(self, arg):
     # FIXME: check for printable characters
@@ -131,6 +141,9 @@ class CLIParams:
     def getSteeringFile(self):
         return self.steering_file
 
+    def getRepetitionOfJob(self):
+        return self.repetitionOfJob
+
     def getProject(self):
         return self.project
 
@@ -203,6 +216,8 @@ class CLIParams:
         Script.registerSwitch('h', 'help', 'show the usage', self.showHelp)
         Script.registerSwitch('s:', 'steering=', 'basf2 steering file',
                               self.setSteeringFile)
+        Script.registerSwitch('r:', 'repetition=', 'Repetition of a Job submit'
+                              , self.setRepetitionOfJob)
         Script.registerSwitch('p:', 'project=', 'Name for project',
                               self.setProject)
         Script.registerSwitch('c:', 'evtpermin=',
@@ -232,7 +247,7 @@ class CLIParams:
                               '(optional) Number of data files per job',
                               self.setNumberOfFiles)
         Script.registerSwitch('u:', 'userdata=',
-                              '(optional) The project naem of user data',
+                              '(optional) The project name of user data',
                               self.setUserData)
         Script.registerSwitch('', 'site=',
                               '(optional) The site name to which you want to submit'
@@ -252,6 +267,7 @@ class CLIParams:
             options = {
                 'project': 'setProject',
                 'evtpermin': 'setEvtPerMin',
+                'repetition': 'setRepetitionOfJob',
                 'priority': 'setJobPriority',
                 'query': 'setQuery',
                 'type': 'setDataType',

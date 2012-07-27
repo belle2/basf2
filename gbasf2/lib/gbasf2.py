@@ -121,6 +121,7 @@ def main():
                          # XXX
                          # results[result]['lfn'].replace('belle2', 'belle'),
             cliParams.makeSteeringFile(lfns, numberOfJobs),
+            cliParams.getRepetitionOfJob(),
             cliParams.getProject(),
             int(float(results[result]['events']) / (cliParams.getEvtPerMin()
                 / 60.0)),

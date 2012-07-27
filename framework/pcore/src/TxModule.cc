@@ -81,10 +81,12 @@ void TxModule::event()
   DataStore::EDurability durability = DataStore::c_Event;
 
   // Stream objects in msg_handler
-  const DataStore::StoreObjMap& objmap = DataStore::Instance().getObjectMap(durability);
+  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
   int nobjs = 0;
-  for (DataStore::StoreObjConstIter it = objmap.begin(); it != objmap.end(); ++it) {
+  for (DataStore::StoreObjConstIter it = map.begin(); it != map.end(); ++it) {
     //    if ( it->second != NULL ) {
+    if (dynamic_cast<TClonesArray*>(it->second))
+      continue;
     if (m_msghandler->add(it->second, it->first)) {
       B2INFO("Tx: adding obj " << it->first);
       nobjs++;
@@ -92,10 +94,11 @@ void TxModule::event()
     //    }
   }
   // Stream arrays in msg_handler
-  const DataStore::StoreArrayMap& arymap = DataStore::Instance().getArrayMap(durability);
   int narrays = 0;
-  for (DataStore::StoreObjConstIter it = arymap.begin(); it != arymap.end(); ++it) {
+  for (DataStore::StoreObjConstIter it = map.begin(); it != map.end(); ++it) {
     //    if ( it->second != NULL ) {
+    if (dynamic_cast<TClonesArray*>(it->second) == 0)
+      continue;
     if (m_msghandler->add(it->second, it->first)) {
       B2INFO("Tx: adding array " << it->first);
       narrays++;

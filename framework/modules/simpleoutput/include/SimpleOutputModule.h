@@ -167,9 +167,6 @@ namespace Belle2 {
     /** Total number of branches. */
     size_t m_size[DataStore::c_NDurabilityTypes];
 
-    /** Number of branches for non-array objects. */
-    size_t m_sizeObj[DataStore::c_NDurabilityTypes];
-
     /** Pointer to pointer, that can be utilised by the TTree.*/
     TObject** m_objects[DataStore::c_NDurabilityTypes];
 

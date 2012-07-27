@@ -32,18 +32,15 @@ DataStore::DataStore() : m_initializeActive(false)
 void DataStore::clearMaps(const EDurability& durability)
 {
   B2DEBUG(100, "Start deletion process of durability " << durability);
-  for (StoreObjIter iter = m_objectMap[durability].begin(); iter != m_objectMap[durability].end(); ++iter) {
-    if (iter->second) {
-      B2DEBUG(250, iter->second->ClassName() << " is going to be deleted.");
+  for (StoreObjIter iter = m_storeObjMap[durability].begin(); iter != m_storeObjMap[durability].end(); ++iter) {
+    TClonesArray* array = dynamic_cast<TClonesArray*>(iter->second);
+    if (array) {
+      //clean TClonesArray
+      array->Delete();
+    } else {
+      //delete TObject
       delete iter->second; // delete object
       iter->second = 0;    // make sure pointer isn't dangling
-    }
-  }
-
-  for (StoreObjIter iter = m_arrayMap[durability].begin(); iter != m_arrayMap[durability].end(); ++iter) {
-    TClonesArray* array = static_cast<TClonesArray*>(iter->second);
-    if (array) {
-      array->Delete();
     }
   }
 }

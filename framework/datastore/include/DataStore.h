@@ -166,21 +166,9 @@ namespace Belle2 {
       return handleArray<TObject>(name, durability, array);
     }
 
-    /** Get a reference to the object map.
-     *
-     *  This should be used together with the map's STL iterators in preference
-     *  to the getObjectIterator() function.*/
-    const StoreObjMap& getObjectMap(EDurability durability) {
-      return m_objectMap[durability];
-    }
+    /** Get a reference to the object/array map. */
+    const StoreObjMap& getStoreObjectMap(EDurability durability) { return m_storeObjMap[durability]; }
 
-    /** Get a reference to the array map.
-     *
-     *  This should be used together with the map's STL iterators in preference
-     *  to the getArrayIterator() function.*/
-    const StoreObjMap& getArrayMap(EDurability durability) {
-      return m_arrayMap[durability];
-    }
 
     //------------------------------ Start and end procedures --------------------------------------------------
     /** Setter for m_initializeActive. */
@@ -207,20 +195,11 @@ namespace Belle2 {
 
     static DataStore* m_instance; /**< Pointer, that actually holds the store instance.*/
 
-    /** Map for TObjects.
+    /** Map for all objects/arrays in the data store.
      *
-     *  The StoreObjMap maps std::strings to TObject pointers.
-     *  There is a separate map for each durability type that exists.
+     * They map the name to a TObject pointer, separated by durability.
      */
-    StoreObjMap m_objectMap[c_NDurabilityTypes];
-
-
-    /** Map for TClonesArrays.
-     *
-     *  Separate map because of the special properties of the TClonesArray.
-     *  Otherwise same as map for the TObjects.
-     */
-    StoreObjMap m_arrayMap[c_NDurabilityTypes];
+    StoreObjMap m_storeObjMap[c_NDurabilityTypes];
 
     /** True if modules are currently being initialized.
      *
@@ -235,10 +214,10 @@ template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
                                                         const Belle2::DataStore::EDurability& durability,
                                                         bool generate, T*& AObject)
 {
-  const bool objectFound = (m_objectMap[durability].find(name) != m_objectMap[durability].end());
+  const bool objectFound = (m_storeObjMap[durability].find(name) != m_storeObjMap[durability].end());
   bool storeSuccessful = false; //true when new object created or given AObject was inserted
 
-  if (!objectFound || m_objectMap[durability][name] == 0) {
+  if (!objectFound || m_storeObjMap[durability][name] == 0) {
     // new slot in map needs to be created
     if (!objectFound && generate && !m_initializeActive) {
       // should only happen in the initialize phase
@@ -251,20 +230,20 @@ template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
       storeSuccessful = true;
     }
     if (AObject != 0) {
-      m_objectMap[durability][name] = AObject;
+      m_storeObjMap[durability][name] = AObject;
       storeSuccessful = true;
     }
   } else {
     //object found
     if (AObject != 0) { //and new one given...
       B2WARNING("Found existing object '" << name << "' and new one was provided. Replacing existing object.");
-      delete m_objectMap[durability][name];
-      m_objectMap[durability][name] = AObject;
+      delete m_storeObjMap[durability][name];
+      m_storeObjMap[durability][name] = AObject;
       storeSuccessful = true;
     }
-    AObject = dynamic_cast<T*>(m_objectMap[durability][name]);
+    AObject = dynamic_cast<T*>(m_storeObjMap[durability][name]);
     if (AObject == 0) {
-      B2FATAL("Existing object '" << name << "' of type " << m_objectMap[durability][name]->ClassName() << " doesn't match requested type " << T::Class()->GetName());
+      B2FATAL("Existing object '" << name << "' of type " << m_storeObjMap[durability][name]->ClassName() << " doesn't match requested type " << T::Class()->GetName());
     }
   }
 
@@ -276,7 +255,7 @@ template <class T> bool Belle2::DataStore::handleArray(const std::string& name,
                                                        const Belle2::DataStore::EDurability& durability,
                                                        TClonesArray*& array)
 {
-  const bool registerNewArray = (m_arrayMap[durability].find(name) == m_arrayMap[durability].end());
+  const bool registerNewArray = (m_storeObjMap[durability].find(name) == m_storeObjMap[durability].end());
 
   if (registerNewArray) { // new slot in map needs to be created
     if (!m_initializeActive) { // should only happen in the initialize phase
@@ -289,18 +268,20 @@ template <class T> bool Belle2::DataStore::handleArray(const std::string& name,
     }
 
     //actually insert new array
-    m_arrayMap[durability][name] = array;
+    m_storeObjMap[durability][name] = array;
   } else { //map already contains an array
     if (array != 0) { //we have both a new array and an existing one, merge them.
       B2INFO("Found existing array '" << name << "', merging.");
-      array->AbsorbObjects(static_cast<TClonesArray*>(m_arrayMap[durability][name]));
-      delete m_arrayMap[durability][name];
-      m_arrayMap[durability][name] = array;
+      array->AbsorbObjects(static_cast<TClonesArray*>(m_storeObjMap[durability][name]));
+      delete m_storeObjMap[durability][name];
+      m_storeObjMap[durability][name] = array;
     }
-    array = static_cast<TClonesArray*>(m_arrayMap[durability][name]);
+    array = dynamic_cast<TClonesArray*>(m_storeObjMap[durability][name]);
     B2DEBUG(250, "Attaching to existing TClonesArray with name " << name << " and durability " << durability << ".");
 
-    if (!array or !array->GetClass()) {
+    if (!array and m_storeObjMap[durability][name]) {
+      B2FATAL("Requested array from data store, but found object is not a TClonesArray. Name was: " <<  name << " EDurability was " << durability);
+    } else if (!array->GetClass()) {
       B2WARNING("Array '" << name << "' in the data store is not valid, returning NULL pointer. May be caused by missing ROOT dictionaries.");
       array = 0;
     } else if (!array->GetClass()->InheritsFrom(T::Class())) { // TClonesArray in map slot is for different type than requested one

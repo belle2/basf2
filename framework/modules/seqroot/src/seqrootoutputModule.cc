@@ -165,20 +165,18 @@ EvtMessage* SeqRootOutputModule::buildMessage(RECORD_TYPE rectype)
 
   // Collect objects and place them in msghandler
 
-  const DataStore::StoreObjMap& objmap = DataStore::Instance().getObjectMap(durability);
-  // 1. Stored Objects
-  int nobjs = 0;
-  for (DataStore::StoreObjConstIter it = objmap.begin(); it != objmap.end(); ++it) {
-
-    m_msghandler->add(it->second, it->first);
-    nobjs++;
-  }
-  // 2. Stored Arrays
-  const DataStore::StoreArrayMap& arymap = DataStore::Instance().getArrayMap(durability);
+  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
   int narrays = 0;
-  for (DataStore::StoreObjConstIter it = arymap.begin(); it != arymap.end(); ++it) {
-    m_msghandler->add(it->second, it->first);
-    narrays++;
+  int nobjs = 0;
+  for (DataStore::StoreObjConstIter it = map.begin(); it != map.end(); ++it) {
+    if (m_msghandler->add(it->second, it->first)) {
+      B2INFO("Tx: adding item " << it->first);
+
+      if (dynamic_cast<TClonesArray*>(it->second))
+        narrays++;
+      else
+        nobjs++;
+    }
   }
 
   // Encode EvtMessage

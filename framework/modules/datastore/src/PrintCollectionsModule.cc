@@ -74,8 +74,10 @@ void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
   //-----------------------------
   //Print the object information
   //-----------------------------
-  const DataStore::StoreObjMap& objMap = DataStore::Instance().getObjectMap(durability);
-  for (DataStore::StoreObjConstIter iter = objMap.begin(); iter != objMap.end(); ++iter) {
+  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
+  for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
+    if (dynamic_cast<TClonesArray*>(iter->second))
+      continue;
     const TObject* currCol = iter->second;
 
     if (currCol != NULL) {
@@ -87,8 +89,7 @@ void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
   //-----------------------------
   //Print the array information
   //-----------------------------
-  const DataStore::StoreObjMap& arrayMap = DataStore::Instance().getArrayMap(durability);
-  for (DataStore::StoreObjConstIter iter = arrayMap.begin(); iter != arrayMap.end(); ++iter) {
+  for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
     const TClonesArray* currCol = dynamic_cast<TClonesArray*>(iter->second);
 
     if (currCol != NULL) {

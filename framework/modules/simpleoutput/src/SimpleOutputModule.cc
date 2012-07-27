@@ -254,7 +254,7 @@ void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
   } else {
     // gather the object pointers for this entry
     size_t sizeCounter = 0;
-    const DataStore::StoreObjMap& map = DataStore::Instance().getObjectMap(durability);
+    const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
     for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
       if (binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), iter->first)) {
         if (iter->second != 0) {
@@ -268,28 +268,8 @@ void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
         sizeCounter++;
       }
     }
-    if (sizeCounter > m_sizeObj[durability]) {
-      B2FATAL("More object elements than in first event.");
-      return;
-    }
-    // gather the array pointers for this entry
-    const DataStore::StoreArrayMap& ary = DataStore::Instance().getArrayMap(durability);
-    for (DataStore::StoreObjConstIter iter = ary.begin(); iter != ary.end(); ++iter) {
-      if (binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), iter->first)) {
-        if (iter->second != 0) {
-          m_objects[durability][sizeCounter] = iter->second;
-          m_tree[durability]->SetBranchAddress(iter->first.c_str(), &(m_objects[durability][sizeCounter]));
-        } else {
-          //no object exists, this will create a temporary owned & deleted by the branch
-          m_tree[durability]->SetBranchAddress(iter->first.c_str(), 0);
-        }
-
-        sizeCounter++;
-      }
-    }
-    //    if (sizeCounter > m_sizeObj[durability]) {
     if (sizeCounter > m_size[durability]) {
-      B2FATAL("More array elements than in first event.");
+      B2FATAL("More data store items than in first event.");
       return;
     }
   }
@@ -299,22 +279,17 @@ void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
 void SimpleOutputModule::setupBranches(DataStore::EDurability durability)
 {
   std::vector<std::string> branchesToBeSaved;
-  for (int iMap = 0; iMap < 2; iMap++) {
-    //first objects, then arrays
-    const DataStore::StoreObjMap& map = (iMap == 0) ? DataStore::Instance().getObjectMap(durability) : DataStore::Instance().getArrayMap(durability);
-    for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
-      const std::string& branchName = iter->first;
-      //check if branchName is not excluded, and that it's in m_branchNames (which also may be empty for all branches)
-      if (!binary_search(m_excludeBranchNames[durability].begin(), m_excludeBranchNames[durability].end(), branchName)
-          && (m_branchNames[durability].empty() || binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName))) {
-        branchesToBeSaved.push_back(branchName);
-      }
-    }
-    if (iMap == 0) { //we just made a list of all object branches
-      m_sizeObj[durability] = branchesToBeSaved.size();
+  //first objects, then arrays
+  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
+  for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
+    const std::string& branchName = iter->first;
+    //check if branchName is not excluded, and that it's in m_branchNames (which also may be empty for all branches)
+    if (!binary_search(m_excludeBranchNames[durability].begin(), m_excludeBranchNames[durability].end(), branchName)
+        && (m_branchNames[durability].empty() || binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName))) {
+      branchesToBeSaved.push_back(branchName);
     }
   }
-  //as we also added arrays, this is now the total size
+  //save total size
   m_size[durability] = branchesToBeSaved.size();
   if (m_size[durability]) {
     m_objects[durability] = new TObject* [m_size[durability]];
@@ -335,22 +310,19 @@ void SimpleOutputModule::setupBranches(DataStore::EDurability durability)
 
   //loop over all objects/arrays in store and create branches if they're in m_branchNames (=enabled)
   size_t sizeCounter = 0;
-  for (int iMap = 0; iMap < 2; iMap++) {
-    //first objects, then arrays
-    const DataStore::StoreObjMap& map = (iMap == 0) ? DataStore::Instance().getObjectMap(durability) : DataStore::Instance().getArrayMap(durability);
-    for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
-      if (binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), iter->first)) {
-        //TODO: once setupBranches() is moved into initialize(), iter->second cannot actually be NULL
-        if (iter->second != 0) {
-          m_objects[durability][sizeCounter] = iter->second;
-          m_tree[durability]->Branch(iter->first.c_str(), &(m_objects[durability][sizeCounter]));
-        } else {
-          //no object exists, this will create a temporary owned & deleted by the branch
-          m_tree[durability]->Branch(iter->first.c_str(), 0);
-        }
-
-        sizeCounter++;
+  //first objects, then arrays
+  for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
+    if (binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), iter->first)) {
+      //TODO: once setupBranches() is moved into initialize(), iter->second cannot actually be NULL
+      if (iter->second != 0) {
+        m_objects[durability][sizeCounter] = iter->second;
+        m_tree[durability]->Branch(iter->first.c_str(), &(m_objects[durability][sizeCounter]));
+      } else {
+        //no object exists, this will create a temporary owned & deleted by the branch
+        m_tree[durability]->Branch(iter->first.c_str(), 0);
       }
+
+      sizeCounter++;
     }
   }
   if (sizeCounter != m_branchNames[durability].size()) {

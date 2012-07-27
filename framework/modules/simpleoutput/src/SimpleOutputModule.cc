@@ -18,6 +18,7 @@
 
 #include <TTreeIndex.h>
 #include <TProcessID.h>
+#include <TSystem.h>
 
 #include <time.h>
 #include <algorithm>
@@ -78,6 +79,7 @@ SimpleOutputModule::~SimpleOutputModule() { }
 
 void SimpleOutputModule::initialize()
 {
+  gSystem->Load("libdataobjects");
   //create a file level metadata object in the data store
   StoreObjPtr<FileMetaData> fileMetaDataPtr("", DataStore::c_Persistent);
 

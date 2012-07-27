@@ -210,8 +210,8 @@ void GenFitter2Module::event()
       } else {
         vector<int> layerIds(nTrackCandHits);
         for (int i = 0; i not_eq nTrackCandHits; ++i) {
-          unsigned int detId = -1;
-          unsigned int hitId = -1;
+          unsigned int detId = UINT_MAX;
+          unsigned int hitId = UINT_MAX;
           aTrackCandPointer->getHit(i, detId, hitId);
           int layerId = -1;
           if (detId == 0) {
@@ -247,8 +247,8 @@ void GenFitter2Module::event()
       // class to convert global and local coordinates into each other
       //VXD::GeoCache& aGeoCach = VXD::GeoCache::getInstance();
       for (int i = 0; i not_eq nTrackCandHits; ++i) {
-        unsigned int detId = -1;
-        unsigned int hitId = -1;
+        unsigned int detId = UINT_MAX;
+        unsigned int hitId = UINT_MAX;
         aTrackCandPointer->getHit(i, detId, hitId);
         VXDTrueHit const* aVxdTrueHitPtr = NULL;
         if (detId == 0) {

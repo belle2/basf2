@@ -47,18 +47,3 @@ void DataStore::clearMaps(const EDurability& durability)
     }
   }
 }
-
-
-StoreMapIter<DataStore::StoreObjMap>*  DataStore::getObjectIterator(const EDurability& durability)
-{
-  B2WARNING("DataStore::getObjectIterator() and the StoreIter class are deprecated! Please use getObjMap() and std:map<>::iterators instead.");
-  return new StoreMapIter <DataStore::StoreObjMap> (&m_objectMap[durability]);
-}
-
-
-StoreMapIter<DataStore::StoreObjMap>*  DataStore::getArrayIterator(const EDurability& durability)
-{
-  B2WARNING("DataStore::getArrayIterator() and the StoreIter class are deprecated! Please use getArrayMap() and std:map<>::iterators instead.");
-  return new StoreMapIter <DataStore::StoreObjMap> (&m_arrayMap[durability]);
-}
-

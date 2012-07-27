@@ -12,7 +12,6 @@
 #define DATASTORE_H
 
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreMapIter.h>
 
 #include <TObject.h>
 #include <TClonesArray.h>
@@ -166,24 +165,6 @@ namespace Belle2 {
       // use of TObject for template class is usually fine, because it is only checked, if there is already a corresponding slot.
       return handleArray<TObject>(name, durability, array);
     }
-
-    /** Get an iterator for one of the object maps.
-     *
-     *  @deprecated Use getObjectMap() and std::map iterators instead.
-     *
-     *  @return            Iterator for the specified map.
-     *  @param  durability EDurability type to specify map.
-     */
-    StoreMapIter<StoreObjMap>* getObjectIterator(const EDurability& durability);
-
-    /** Get an iterator for one of the TClonesArray maps.
-     *
-     *  @deprecated Use getArrayMap() and std::map iterators instead.
-     *
-     *  @return            Iterator for the specified map.
-     *  @param  durability EDurability type to specify map.
-     */
-    StoreMapIter<StoreObjMap>* getArrayIterator(const EDurability& durability);
 
     /** Get a reference to the object map.
      *

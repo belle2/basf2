@@ -118,6 +118,10 @@ namespace Belle2 {
      */
     void setStrip(int Strip);
 
+
+    virtual EKLMStripID getID() const;
+
+
   private:
 
     /**

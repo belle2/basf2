@@ -18,6 +18,16 @@
 
 namespace Belle2 {
 
+
+  struct EKLMStripID {
+    int endcap;
+    int layer;
+    int sector;
+    int plane;
+    int strip;
+  };
+
+
   /**
    * Base Hit reconstruction class. inherit HitBase class from TObject
    *  to make all hits storable
@@ -47,6 +57,12 @@ namespace Belle2 {
      * Destructor
      */
     ~EKLMHitBase() {};
+
+    /**
+     * Get ID
+     */
+    virtual EKLMStripID getID() const;
+
 
     /**
      * Get endcap number.
@@ -176,7 +192,7 @@ namespace Belle2 {
 
 
 
-  private:
+
 
 
     /**
@@ -194,6 +210,8 @@ namespace Belle2 {
      * Number of sector.
      */
     int m_Sector;
+
+  private:
 
     /**
      * Needed to make objects storable.

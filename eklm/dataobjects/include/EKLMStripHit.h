@@ -41,6 +41,7 @@ namespace Belle2 {
     //! Print stip name and some other useful info
     void Print() const;
 
+    virtual EKLMStripID getID() const;
 
 
     //! returns number of photo electrons

@@ -59,7 +59,7 @@ void EKLMTransformationFactory::addLengthEntry(int strip, double length)
     B2FATAL("Invalid strip number!");
     return ;
   }
-  std::cout << strip << " " << length << " " << stripLengthArray[strip - 1] << std::endl;
+  //  std::cout << strip << " " << length << " " << stripLengthArray[strip - 1] << std::endl;
   if (stripLengthArray[strip - 1] != 0 && (int)stripLengthArray[strip - 1] != (int)length) {
     B2FATAL("Strip length mismatch!");
     return ;
@@ -104,7 +104,7 @@ G4Transform3D EKLMTransformationFactory::getTransformation(int endcap, int layer
 
 void EKLMTransformationFactory::readFromFile(const char* filename)
 {
-  std::cout << " ------------ Q" << std::endl;
+  //  std::cout << " ------------ Q" << std::endl;
   std::ifstream in(filename);
   for (int endcap = 1; endcap <= 2; endcap++)
     for (int layer = 1; layer <= 14; layer++)
@@ -209,7 +209,7 @@ void EKLMTransformationFactory::writeToXMLFile(std::string filename)
 
 void EKLMTransformationFactory::writeToFile(const char* filename)const
 {
-  std::cout << " ------------ Q " << filename << std::endl;
+  //  std::cout << " ------------ Q " << filename << std::endl;
   std::ofstream out(filename, std::ios_base::trunc);
   for (int endcap = 1; endcap <= 2; endcap++)
     for (int layer = 1; layer <= 14; layer++)
@@ -304,3 +304,7 @@ void EKLMTransformationFactory::clear()
             stripMatrixArray[endcap - 1][layer - 1][sector - 1][plane - 1][strip - 1] = G4Transform3D();
   }
 }
+
+
+
+

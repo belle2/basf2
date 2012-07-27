@@ -1834,9 +1834,9 @@ void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
   }
 
   // save infrormation to file
-  std::cout << "A " << m_outputFile << std::endl;
+
   if (m_outputFile.size() != 0)
     (EKLMTransformationFactory::getInstance())->writeToFile(m_outputFile.c_str());
-  std::cout << "B" << std::endl;
+
 }
 

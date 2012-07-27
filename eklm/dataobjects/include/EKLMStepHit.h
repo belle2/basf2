@@ -67,6 +67,9 @@ namespace Belle2 {
     \param m_momentum the of the particle that produced the hit
     */
 
+
+
+
     EKLMStepHit(
       const int Endcap,
       const int Layer,
@@ -95,7 +98,7 @@ namespace Belle2 {
       m_pvName = pv->GetName();
     }
 
-
+    virtual EKLMStripID getID() const;
 
     /**
      * Get energy of the particle

@@ -75,6 +75,18 @@ void EKLMStepHit::setName(string& name)
   m_pvName = name;
 }
 
+EKLMStripID EKLMStepHit::getID() const
+{
+  EKLMStripID str;
+  str.endcap = m_Endcap;
+  str.layer = m_Layer;
+  str.sector = m_Sector;
+  str.plane = m_Plane;
+  str.strip = m_Strip;
+  return str;
+}
+
+
 
 const G4VPhysicalVolume* EKLMStepHit::getVolume()  const
 {

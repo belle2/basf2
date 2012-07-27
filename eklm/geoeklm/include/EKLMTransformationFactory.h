@@ -14,7 +14,7 @@
 #include <G4Transform3D.hh>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
-
+#include <eklm/dataobjects/EKLMHitBase.h>
 
 namespace Belle2 {
 
@@ -30,10 +30,31 @@ namespace Belle2 {
 
     //! returns transformation matrix for the strip
     //! [#endcap][#layer][#sector][#plane][#strip]
-    G4Transform3D getTransformation(int , int , int , int , int);
+    G4Transform3D getTransformation(int , int , int , int , int) ;
+
+    //! returns transformation matrix for the strip
+    //! with EKLMStripID structure
+    G4Transform3D getTransformation(EKLMStripID id)
+    {return getTransformation(id.endcap, id.layer, id.sector, id.plane, id.strip);}
+
+    //! returns transformation matrix for the strip
+    //! where strip ID is taken from the parent class via virtual function
+    G4Transform3D getTransformation(const EKLMHitBase* hit)
+    {return getTransformation(hit->getID());}
 
     //! returns length of the  the strip
-    double getStripLength(int);
+    double getStripLength(int) ;
+
+    //! returns length of the  the strip
+    //! where strip ID is taken from the parent class
+    double getStripLength(const EKLMHitBase* hit)
+    {return getStripLength(hit->getID());}
+
+    //! returns length of the  the strip
+    //! with EKLMStripID structure
+    double getStripLength(EKLMStripID id)
+    {return getStripLength(id.strip);}
+
 
     //! reads information from file to memory
     void readFromXMLFile(const GearDir&);

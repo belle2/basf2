@@ -100,6 +100,16 @@ int EKLMStripHit::getFitStatus()
   return m_fitStatus;
 }
 
+EKLMStripID EKLMStripHit::getID() const
+{
+  EKLMStripID str;
+  str.endcap = m_Endcap;
+  str.layer = m_Layer;
+  str.sector = m_Sector;
+  str.plane = m_Plane;
+  str.strip = m_Strip;
+  return str;
+}
 
 
 const G4VPhysicalVolume* EKLMStripHit::getVolume() const

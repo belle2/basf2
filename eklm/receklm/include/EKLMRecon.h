@@ -59,9 +59,15 @@ namespace Belle2 {
     std::vector <EKLMHit2d*> m_hit2dVector;
 
     /**
-     * returns true if strip is along X
+     * returns true if strip is along X (with pointer to hit)
      */
-    bool CheckStripOrientationX(const G4VPhysicalVolume*);
+    bool CheckStripOrientationX(const EKLMStripHit* h)
+    {return CheckStripOrientationX(h->getID());};
+
+    /**
+     * returns true if strip is along X (with StripID)
+     */
+    bool CheckStripOrientationX(EKLMStripID);
 
 
     /**

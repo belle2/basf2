@@ -16,8 +16,6 @@
 
 #include <string>
 
-#include <TRandom3.h>
-
 namespace Belle2 {
   namespace arich {
     //! ARICH digitizer module.
@@ -82,7 +80,6 @@ namespace Belle2 {
       std::string m_outColName;        /**< Output collection name */
 
       /* Other members.*/
-      TRandom3* m_random;              /**< Random number generator.*/
       double m_timeCPU;                /**< CPU time.     */
       int    m_nRun;                   /**< Run number.   */
       int    m_nEvent;                 /**< Event number. */

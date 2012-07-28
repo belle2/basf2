@@ -26,6 +26,7 @@
 
 // ROOT
 #include <TVector2.h>
+#include <TRandom3.h>
 
 using namespace std;
 using namespace boost;
@@ -44,7 +45,7 @@ namespace Belle2 {
     //-----------------------------------------------------------------
 
     ARICHDigiModule::ARICHDigiModule() : Module(),
-      m_random(new TRandom3(0)), m_arichgp(ARICHGeometryPar::Instance())
+      m_arichgp(ARICHGeometryPar::Instance())
     {
       // Set description()
       setDescription("ARICHDigitizer");
@@ -56,7 +57,6 @@ namespace Belle2 {
 
     ARICHDigiModule::~ARICHDigiModule()
     {
-      if (m_random) delete m_random;
       if (m_arichgp) delete m_arichgp;
     }
 
@@ -207,7 +207,7 @@ namespace Belle2 {
 
     int ARICHDigiModule::DetectorQE(double energy)
     {
-      return (m_random->Uniform(1) < QESuperBialkali(energy));
+      return (gRandom->Uniform(1) < QESuperBialkali(energy));
     }
 
   } // end arich namespace

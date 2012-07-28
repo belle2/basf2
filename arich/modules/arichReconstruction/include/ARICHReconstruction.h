@@ -14,7 +14,6 @@
 #include <arich/geometry/ARICHGeometryPar.h>
 
 #include <TVector3.h>
-#include <TRandom3.h>
 #include <cmath>
 #include <boost/format.hpp>
 
@@ -55,7 +54,6 @@ namespace Belle2 {
 
     private:
 
-      TRandom3* m_random; /**< random generator */
       ARICHGeometryPar* _arichgp; /**< holding the parameters of detector */
       double m_bkgLevel; /**< detector photon background level */
       double m_trackPosRes; /**< track position resolution (from tracking) */

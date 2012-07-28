@@ -39,7 +39,7 @@ namespace Belle2 {
 
 
     ARICHReconstruction::ARICHReconstruction():
-      m_random(new TRandom3()), _arichgp(ARICHGeometryPar::Instance()), m_bkgLevel(0), m_trackPosRes(0),
+      _arichgp(ARICHGeometryPar::Instance()), m_bkgLevel(0), m_trackPosRes(0),
       m_trackAngRes(0), m_singleRes(0), m_aeroMerit(0)
     {
 
@@ -71,11 +71,11 @@ namespace Belle2 {
 
       for (unsigned  int i = 0; i < tsize; i++) {
         ARICHTrack* track = arichTracks[i];
-        double thc = m_random->Gaus(0, m_trackAngRes);
-        double fic = m_random->Uniform(2 * M_PI);
+        double thc = gRandom->Gaus(0, m_trackAngRes);
+        double fic = gRandom->Uniform(2 * M_PI);
         TVector3 dirf = setThetaPhi(thc, fic);  // particle system
-        double dr = m_random->Gaus(0, m_trackPosRes);
-        double dfi = m_random->Uniform(2 * M_PI);
+        double dr = gRandom->Gaus(0, m_trackPosRes);
+        double dfi = gRandom->Uniform(2 * M_PI);
         double dx = dr * cos(dfi);
         double dy = dr * sin(dfi);
         TVector3 mod = TVector3(dx, dy, 0);

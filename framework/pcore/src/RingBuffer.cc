@@ -33,12 +33,12 @@ RingBuffer::RingBuffer(int size)
   // 1. Open shared memory
   m_shmid = shmget(IPC_PRIVATE, size * 4, IPC_CREAT | 0644);
   if (m_shmid < 0) {
-    B2ERROR("RingBuffer::shmget");
+    B2FATAL("RingBuffer::shmget");
     return;
   }
   m_shmadr = (int*) shmat(m_shmid, 0, 0);
   if (m_shmadr == (int*) - 1) {
-    B2ERROR("RingBuffer::shmat");
+    B2FATAL("RingBuffer::shmat");
     return;
   }
   //  cout << "Shared Memory created" << endl;
@@ -46,7 +46,7 @@ RingBuffer::RingBuffer(int size)
   // 2. Open Semaphore
   m_semid = semget(IPC_PRIVATE, 1, IPC_CREAT | 0644);
   if (m_semid < 0) {
-    B2ERROR("RingBuffer::semget");
+    B2FATAL("RingBuffer::semget");
     return;
   }
   //  cout << "Semaphore created" << endl;
@@ -98,7 +98,7 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
       m_semkey = ftok(m_pathname.c_str(), 2);
       m_new = false;
     } else {
-      B2ERROR("RingBuffer: error to open shm file");
+      B2FATAL("RingBuffer: error to open shm file");
       return;
     }
   } else { // Private
@@ -112,19 +112,19 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
   // 1. Open shared memory
   m_shmid = shmget(m_shmkey, size * 4, IPC_CREAT | 0644);
   if (m_shmid < 0) {
-    B2ERROR("RingBuffer::shmget");
+    B2FATAL("RingBuffer::shmget");
     return;
   }
   m_shmadr = (int*) shmat(m_shmid, 0, 0);
   if (m_shmadr == (int*) - 1) {
-    B2ERROR("RingBuffer::shmat");
+    B2FATAL("RingBuffer::shmat");
     return;
   }
 
   // 2. Open Semaphore
   m_semid = semget(m_semkey, 1, IPC_CREAT | 0644);
   if (m_semid < 0) {
-    B2ERROR("RingBuffer::semget");
+    B2FATAL("RingBuffer::semget");
     return;
   }
   //  cout << "Semaphore created" << endl;
@@ -192,7 +192,7 @@ RingBuffer::~RingBuffer(void)
 void RingBuffer::cleanup(void)
 {
   shmdt((char*)m_shmadr);
-  printf("RingBuffer: Cleaning up IPC\n");
+  B2INFO("RingBuffer: Cleaning up IPC");
   if (m_new) {
     shmctl(m_shmid, IPC_RMID, (struct shmid_ds*) 0);
     semctl(m_semid, 1, IPC_RMID);
@@ -444,7 +444,7 @@ int RingBuffer::sem_unlock(int sid)
   sb.sem_flg = 0;
   if (semop(sid, &sb, 1) == -1)
     if (semop(sid, &sb, 1) == -1)
-      fprintf(stderr, "Ringbuffer: error in sem_lock(semop) %d, %s\n",
+      fprintf(stderr, "Ringbuffer: error in sem_unlock(semop) %d, %s\n",
               sid, strerror(errno));
   //    perror ("semop");
   //  printf ( "semaphore unlocked.....\n" );

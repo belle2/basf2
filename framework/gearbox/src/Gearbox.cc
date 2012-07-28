@@ -37,7 +37,7 @@ namespace Belle2 {
     static int readXmlData(void* context, char* buffer, int buffsize)
     {
       //B2DEBUG(200,"Calling read to get " << buffsize << " bytes");
-      InputContext* gearContext = (InputContext*) context;
+      InputContext* gearContext = static_cast<InputContext*>(context);
       return gearContext->readXmlData(buffer, buffsize);
     }
 
@@ -45,7 +45,7 @@ namespace Belle2 {
     static int closeXmlContext(void* context)
     {
       B2DEBUG(200, "Closing context");
-      InputContext* gearContext = (InputContext*) context;
+      InputContext* gearContext = static_cast<InputContext*>(context);
       delete gearContext;
       return 0;
     }

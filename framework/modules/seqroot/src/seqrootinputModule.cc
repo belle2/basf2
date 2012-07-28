@@ -114,7 +114,7 @@ void SeqRootInputModule::event()
   vector<string> namelist;
   m_msghandler->decode_msg(evtmsg, objlist, namelist);
 
-  delete evtbuf;
+  delete[] evtbuf;
 
   //  printf("size of objlist = %d\n", objlist.size());
 

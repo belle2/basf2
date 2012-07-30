@@ -25,14 +25,10 @@ using namespace std;
 #define LIB_FILE_EXTENSION ".so"
 
 
-ModuleManager* ModuleManager::m_instance = NULL;
-
-
 ModuleManager& ModuleManager::Instance()
 {
-  static SingletonDestroyer siDestroyer;
-  if (!m_instance) m_instance = new ModuleManager();
-  return *m_instance;
+  static ModuleManager instance;
+  return instance;
 }
 
 

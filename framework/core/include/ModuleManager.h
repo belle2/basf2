@@ -56,7 +56,7 @@ namespace Belle2 {
 
     //Define exceptions
     /** Exception is thrown if the requested module could not be created by the ModuleManager. */
-    BELLE2_DEFINE_EXCEPTION(ModuleNotCreatedError, "Could not create module: %1%");
+    BELLE2_DEFINE_EXCEPTION(ModuleNotCreatedError, "Could not create module: %1%")
 
     /**
      * Static method to get a reference to the ModuleManager instance.
@@ -173,19 +173,6 @@ namespace Belle2 {
      * Deletes the ModuleManager.
      */
     ~ModuleManager();
-
-    static ModuleManager* m_instance; /**< Pointer that saves the instance of this class. */
-
-    /**
-     * Destroyer class to delete the instance of the ModuleManager class when the program terminates.
-     */
-    class SingletonDestroyer {
-    public: ~SingletonDestroyer() {
-        if (ModuleManager::m_instance != NULL) delete ModuleManager::m_instance;
-      }
-    };
-    friend class SingletonDestroyer;
-
   };
 
 } //end of namespace Belle2

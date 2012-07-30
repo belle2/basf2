@@ -368,7 +368,7 @@ namespace Belle2 {
     for (buffer_t::iterator iter = buffer.begin(); iter != buffer.end(); ++iter) {
       add(iter->first, iter->second.begin(), iter->second.end());
     }
-  };
+  }
 
 } // end namespace Belle2
 

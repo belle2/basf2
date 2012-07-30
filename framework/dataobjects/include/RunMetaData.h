@@ -19,12 +19,12 @@ namespace Belle2 {
    * @{
    */
 
-  /** Store information, that is constant during a run, and is needed during the event loop.
+  /** Store information that is constant during a run, and is needed during the event loop.
    *
    *  This object is supposed to be updated during the beginRun function.
    *  Currently stored information: <br>
    *  LER beam energy, HER beam energy, crossing angle of the beams, and angle between LER beam and solenoid axis. <br>
-   *  The latter two are probably constants during the lifetime of the experiment, but maybe changed for design studies. <br>
+   *  The latter two are probably constants during the lifetime of the experiment, but may be changed for design studies. <br>
    *  The Center of Mass energy and the \f$\gamma\f$ factor of the initial resonance in the lab frame can be calculated from the
    *  these variables.
    *
@@ -42,7 +42,7 @@ namespace Belle2 {
      *  @param angleLER       Angle between the LER beam and the solenoid axis, defining the axis of the Belle II detector.
      */
     RunMetaData(const float& energyLER = 4.0, const float& energyHER = 7.0,
-                const float& crossingAngle = 83   * Unit::mrad,
+                const float& crossingAngle = 83.0 * Unit::mrad,
                 const float& angleLER      = 41.5 * Unit::mrad)
       : m_energyLER(energyLER), m_energyHER(energyHER), m_crossingAngle(crossingAngle), m_angleLER(angleLER) {}
 

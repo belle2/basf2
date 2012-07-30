@@ -14,13 +14,11 @@
 using namespace Belle2;
 using namespace std;
 
-Environment* Environment::m_instance = NULL;
 
 Environment& Environment::Instance()
 {
-  static SingletonDestroyer siDestroyer;
-  if (!m_instance) m_instance = new Environment();
-  return *m_instance;
+  static Environment instance;
+  return instance;
 }
 
 

@@ -160,18 +160,6 @@ namespace Belle2 {
      */
     ~Environment();
 
-    static Environment* m_instance; /**< Pointer that saves the instance of this class. */
-
-    /**
-     * Destroyer class to delete the instance of the Environment class when the program terminates.
-     */
-    class SingletonDestroyer {
-    public: ~SingletonDestroyer() {
-        delete Environment::m_instance;
-      }
-    };
-    friend class SingletonDestroyer;
-
   };
 
 } //end of namespace Belle2

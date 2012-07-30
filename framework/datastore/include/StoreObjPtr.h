@@ -106,9 +106,9 @@ namespace Belle2 {
     virtual ~StoreObjPtr() {}
 
     //------------------------ Imitate pointer functionality -----------------------------------------------
-    T& operator *()  const {return *m_storeObjPtr;}  /**< Imitate pointer functionality. */
-    T* operator ->() const {return m_storeObjPtr;}   /**< Imitate pointer functionality. */
-    operator bool()  const {return m_storeObjPtr;}   /**< Imitate pointer functionality. */
+    inline T& operator *()  const {return *m_storeObjPtr;}  /**< Imitate pointer functionality. */
+    inline T* operator ->() const {return m_storeObjPtr;}   /**< Imitate pointer functionality. */
+    inline operator bool()  const {return m_storeObjPtr;}   /**< Imitate pointer functionality. */
 
     //------------------------ Getters for AccessorParams --------------------------------------------------
     AccessorParams getAccessorParams() const {     /**< Returns name and durability under which the object is saved in the DataStore. */

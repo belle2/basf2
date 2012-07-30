@@ -103,8 +103,8 @@ dict LogPythonInterface::getLogStatistics()
 }
 
 /** Create overloads since default arguments are lost in C++ */
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addLogFile_overloads, addLogFile, 1, 2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addLogConsole_overloads, addLogConsole, 0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addLogFile_overloads, addLogFile, 1, 2)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addLogConsole_overloads, addLogConsole, 0, 1)
 
 /** Expose python api */
 void LogPythonInterface::exposePythonAPI()

@@ -17,21 +17,15 @@
 #include <framework/pcore/pEventProcessor.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/logging/LogConnectionIOStream.h>
-#include <framework/logging/LogConnectionTxtFile.h>
-#include <framework/logging/LogConnectionFilter.h>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include "TDatabasePDG.h"
 
+#include <boost/python.hpp>
+
 
 using namespace std;
-using namespace Belle2;
-
 using namespace boost::python;
+using namespace Belle2;
 
 
 Framework::Framework()
@@ -88,19 +82,15 @@ PathPtr Framework::createPath() throw(PathManager::PathNotCreatedError)
 }
 
 
-void Framework::process(PathPtr startPath)
-{
-  if (Environment::Instance().getNumberProcesses() == 0)
-    m_eventProcessor->process(startPath);
-  else
-    m_peventProcessor->process(startPath);
-}
-
-
 void Framework::process(PathPtr startPath, long maxEvent)
 {
-  m_eventProcessor->process(startPath, maxEvent);
-}
+  if (Environment::Instance().getNumberProcesses() == 0)
+    m_eventProcessor->process(startPath, maxEvent);
+  else if (maxEvent <= 0)
+    m_peventProcessor->process(startPath);
+  else
+    B2FATAL("process(path, maxEvent) not supported when using parallel processing.")
+  }
 
 
 void Framework::setNumberProcesses(int number)
@@ -119,10 +109,9 @@ bool Framework::readEvtGenTableFromFile(const std::string& filename)
 {
   if (FileSystem::isFile(filename)) {
     TDatabasePDG::Instance()->ReadEvtGenTable(filename.c_str());
-  } else {
-    return false;
+    return true;
   }
-  return true;
+  return false;
 }
 
 
@@ -166,14 +155,13 @@ boost::python::list Framework::getRegisteredModulesPython() const
 }
 
 
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(process_overloads, process, 1, 2)
 
 void Framework::exposePythonAPI()
 {
   //Overloaded methods
   ModulePtr(Framework::*registerModule1)(const string&) = &Framework::registerModule;
   ModulePtr(Framework::*registerModule2)(const string&, const string&) = &Framework::registerModule;
-  void(Framework::*process1)(PathPtr) = &Framework::process;
-  void(Framework::*process2)(PathPtr, long) = &Framework::process;
 
   //Expose framework class
   class_<Framework>("Framework")
@@ -186,8 +174,7 @@ void Framework::exposePythonAPI()
   .def("register_module", registerModule2)
   .def("list_registered_modules", &Framework::getRegisteredModulesPython)
   .def("create_path", &Framework::createPath)
-  .def("process", process1)
-  .def("process", process2)
+  .def("process", &Framework::process, process_overloads())
   .def("set_nprocess", &Framework::setNumberProcesses)
   .def("read_evtgen_table", &Framework::readEvtGenTableFromFile)
   ;

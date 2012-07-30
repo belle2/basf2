@@ -12,7 +12,6 @@
 #ifndef FRAMEWORK_H_
 #define FRAMEWORK_H_
 
-#include <boost/python.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/dict.hpp>
 
@@ -20,7 +19,6 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/core/Path.h>
 #include <framework/core/PathManager.h>
-
 
 #include <string>
 #include <list>
@@ -111,22 +109,15 @@ namespace Belle2 {
     PathPtr createPath() throw(PathManager::PathNotCreatedError);
 
     /**
-     * Processes all events by starting with the first module in the specified path.
+     * Processes up to maxEvent events by starting with the first module in the specified path.
      *
      * This method starts processing events only if there is a module in the path
      * which is capable of specifying the end of the data flow.
      *
      * @param startPath The processing starts with the first module of this path.
+     * @param maxEvent The maximum number of events that will be processed. If the number is smaller than 1, all events will be processed (default).
      */
-    void process(PathPtr startPath);
-
-    /**
-     * Processes up to maxEvent events by starting with the first module in the specified path.
-     *
-     * @param startPath The processing starts with the first module of this path.
-     * @param maxEvent The maximum number of events that will be processed. If the number is smaller than 1, all events will be processed.
-     */
-    void process(PathPtr startPath, long maxEvent);
+    void process(PathPtr startPath, long maxEvent = 0);
 
     /**
      * Function to set number of processes for parallel processing.

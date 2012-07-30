@@ -55,6 +55,8 @@ float get_edep(const PXDCluster* hit) { return hit->getCharge(); }
 
 DedxPIDModule::DedxPIDModule() : Module()
 {
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+
   //Set module properties
   setDescription("Extract dE/dx (and some other things) from Tracks&GFTrackCandidates and PXDClusters, SVDTrueHits (not digitized) and CDCHits.");
 

@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/wait.h>
+#include <sys/prctl.h>
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
@@ -64,6 +65,8 @@ int ProcHandler::init_EvtServer(void)
     m_fEvtServer = 1; // I'm event server
     //    m_fEvtProcID = -10;
     m_fEvtProcID = 10000;
+    //die when parent dies
+    prctl(PR_SET_PDEATHSIG, SIGHUP);
   }
   return 0;
 }
@@ -88,6 +91,8 @@ int ProcHandler::init_EvtProc(int nproc)
       } else { // Event Process
         m_fEvtProc = 1;    // I'm event process
         m_fEvtProcID = i;
+        //die when parent dies
+        prctl(PR_SET_PDEATHSIG, SIGHUP);
       }
     }
   }
@@ -112,6 +117,8 @@ int ProcHandler::init_OutServer(int id)
     m_fOutputSrvID = id;
     //    m_fEvtProcID = -20;
     m_fEvtProcID = 20000 + id;
+    //die when parent dies
+    prctl(PR_SET_PDEATHSIG, SIGHUP);
   }
   return 0;
 }

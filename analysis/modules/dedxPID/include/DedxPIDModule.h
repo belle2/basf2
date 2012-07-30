@@ -8,6 +8,7 @@
 
 #include <framework/datastore/StoreArray.h>
 
+#include <string>
 #include <vector>
 
 class TH2F;
@@ -96,6 +97,9 @@ namespace Belle2 {
 
     /** dedx:momentum PDFs. */
     TH2F* m_pdfs[c_Dedx_num_detectors][c_Dedx_num_particles]; //m_pdfs[detector_type][particle_type]
+
+    /** parameter for GFTrack array name. */
+    std::string m_gftracks_name;
 
     //parameters: full likelihood vs. truncated mean
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */

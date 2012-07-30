@@ -59,6 +59,7 @@ DedxPIDModule::DedxPIDModule() : Module()
 
   //Set module properties
   setDescription("Extract dE/dx (and some other things) from Tracks&GFTrackCandidates and PXDClusters, SVDTrueHits (not digitized) and CDCHits.");
+  addParam("GFTracksColName", m_gftracks_name, "Name for GFTracks array. Leave empty for default ('GFTracks')", std::string(""));
 
   //Parameter definitions
   addParam("UseIndividualHits", m_useIndividualHits, "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", true);
@@ -107,7 +108,7 @@ void DedxPIDModule::initialize()
     const char* suffix = (!m_useIndividualHits) ? "_trunc" : "";
     for (int detector = 0; detector < c_Dedx_num_detectors; detector++) {
       int nBinsX, nBinsY;
-      float xMin, xMax, yMin, yMax;
+      double xMin, xMax, yMin, yMax;
       nBinsX = nBinsY = -1;
       xMin = xMax = yMin = yMax = 0.0;
       for (int particle = 0; particle < c_Dedx_num_particles; particle++) {
@@ -171,8 +172,9 @@ void DedxPIDModule::event()
     return; //probably nothing fitted
   }
 
-  StoreArray<GFTrack> gftracks; //same indices as tracks!
+  StoreArray<GFTrack> gftracks(m_gftracks_name);
   if (tracks.getEntries() != gftracks.getEntries()) {
+    //assuming same indices for tracks and gftracks
     //TODO replace with Tracks<->GFTracks relation when available
     B2FATAL("Tracks and GFTracks have different lengths?");
     return;
@@ -196,14 +198,15 @@ void DedxPIDModule::event()
   RelationArray* tracks_to_likelihoods = 0;
   if (!m_pdfFilename.empty()) {
     likelihood_array = new StoreArray<DedxLikelihood>;
-    tracks_to_likelihoods = new RelationArray(tracks, *likelihood_array);
+    tracks_to_likelihoods = new RelationArray(gftracks, *likelihood_array);
   }
   if (m_enableDebugOutput)
     dedx_array = new StoreArray<TrackDedx>("TrackDedx", DataStore::c_Event);
 
 
   //loop over all tracks
-  for (int iTrack = 0; iTrack < tracks.getEntries(); iTrack++) {
+  for (int iGFTrack = 0; iGFTrack < tracks.getEntries(); iGFTrack++) {
+    const int iTrack = iGFTrack;
     TrackDedx track; //temporary storage for track data
 
     if (num_mcparticles > 0) { //only do this if we actually know the mcparticles
@@ -231,7 +234,7 @@ void DedxPIDModule::event()
 
     m_trackID++;
 
-    GFAbsTrackRep* trackrep = gftracks[iTrack]->getCardinalRep();
+    GFAbsTrackRep* trackrep = gftracks[iGFTrack]->getCardinalRep();
 
     //get momentum (at origin) from fitted track
     TVector3 poca, dir_in_poca;
@@ -253,15 +256,15 @@ void DedxPIDModule::event()
     }
 
     track.m_chi2 = tracks[iTrack]->getChi2();
-    track.m_charge = (tracks[iTrack]->getOmega() >= 0) ? 1 : -1;
+    track.m_charge = (short)((tracks[iTrack]->getOmega() >= 0) ? 1 : -1);
 
     //used for PXD/SVD hits
     const HelixHelper helix_at_origin(poca, dir_in_poca, track.m_charge);
 
     //sort hits in the order they were created
     //this is required if I want to use the helix path length
-    const_cast<GFTrackCand& >(gftracks[iTrack]->getCand()).sortHits();
-    const GFTrackCand& gftrackcand = gftracks[iTrack]->getCand();
+    const_cast<GFTrackCand& >(gftracks[iGFTrack]->getCand()).sortHits();
+    const GFTrackCand& gftrackcand = gftracks[iGFTrack]->getCand();
     const int num_hits = gftrackcand.getNHits();
     if (num_hits == 0) {
       B2WARNING("Track has no associated hits, skipping");
@@ -471,8 +474,7 @@ void DedxPIDModule::event()
       //save likelihoods
       const int dedxLikelihoodIdx = likelihood_array->getEntries();
       new(likelihood_array->nextFreeAddress()) DedxLikelihood(track.m_logl, track.m_p);
-      tracks_to_likelihoods->add(iTrack, dedxLikelihoodIdx);
-      //TODO: add one for mcparticles?
+      tracks_to_likelihoods->add(iGFTrack, dedxLikelihoodIdx);
     }
   } //end loop over tracks
 

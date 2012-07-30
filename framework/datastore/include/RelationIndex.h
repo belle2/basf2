@@ -178,7 +178,7 @@ namespace Belle2 {
      *  @returns Pointer to the RelationIndex<FROM,TO>::Element, can be
      *           NULL if no relation exists
      */
-    const Element* getFirstTo(const FROM& from) const { return getFirst(&from); }
+    const Element* getFirstTo(const FROM& from) const { return getFirstTo(&from); }
 
     /** Return a pointer to the first relation Element of the given object.
      *
@@ -200,7 +200,7 @@ namespace Belle2 {
      *  @returns Pointer to the RelationIndex<FROM,TO>::Element, can be
      *           NULL if no relation exists
      */
-    const Element* getFirstFrom(const TO& to)   const { return getFirst(&to);   }
+    const Element* getFirstFrom(const TO& to)   const { return getFirstFrom(&to);   }
 
     /** Return a pointer to the first relation Element of the given object.
      *

@@ -112,8 +112,28 @@ namespace Belle2 {
     //Copy could be expensive and this should be a corner-case anyway
     EXPECT_EQ(relIndex.size(), 4u);
 
-    double dummy(0);
     typedef const RelationIndex<EventMetaData, RunMetaData>::Element el_t;
+    //check elements of last relation (both from objects point to to_obj)
+    const EventMetaData* first_from_obj = evtData[0];
+    const EventMetaData* from_obj = evtData[1];
+    const RunMetaData* to_obj = runData[0];
+    EXPECT_TRUE(first_from_obj == relIndex.getFirstFrom(to_obj)->from);
+    EXPECT_TRUE(to_obj == relIndex.getFirstFrom(to_obj)->to);
+    EXPECT_TRUE(1.0 == relIndex.getFirstFrom(to_obj)->weight);
+    EXPECT_TRUE(first_from_obj == relIndex.getFirstFrom(*to_obj)->from);
+    EXPECT_TRUE(to_obj == relIndex.getFirstTo(from_obj)->to);
+    EXPECT_TRUE(to_obj == relIndex.getFirstTo(*from_obj)->to);
+    EXPECT_TRUE(to_obj == relIndex.getFirstTo(first_from_obj)->to);
+
+    //check search for non-existing relations
+    EXPECT_TRUE(relIndex.getFirstFrom(0) == NULL);
+    EXPECT_TRUE(relIndex.getFirstTo(0) == NULL);
+    EXPECT_TRUE(relIndex.getFirstTo(0) == NULL);
+    EXPECT_TRUE(relIndex.getFirstTo(evtData[4]) == NULL);
+    EXPECT_TRUE(relIndex.getFirstFrom(runData[3]) == NULL);
+
+    //check size of found element lists
+    double dummy(0);
     {
       int size(0);
       BOOST_FOREACH(el_t & e, relIndex.getFrom(evtData[0])) {
@@ -130,7 +150,14 @@ namespace Belle2 {
       }
       EXPECT_EQ(size, 2);
     }
-
+    {
+      int size(0);
+      BOOST_FOREACH(el_t & e, relIndex.getTo(runData[4])) {
+        ++size;
+        dummy += e.weight;
+      }
+      EXPECT_EQ(size, 0);
+    }
   }
 
   /** Check wether out-of-bound indices are caught by RelationIndex. */

@@ -144,7 +144,7 @@ namespace Belle2 {
       const AccessorParams& accessorFrom = from.getAccessorParams();
       const AccessorParams& accessorTo   = to.getAccessorParams();
 
-      if (name == "") name = DataStore::defaultRelationName<FROM, TO>();
+      if (name == "") name = DataStore::relationName(accessorFrom.first, accessorTo.first);
       if (accessorFrom.second > durability || accessorTo.second > durability) {
         B2FATAL("Tried to create Relation '" << name
                 << "' with a durability larger than the StoreArrays it relates");
@@ -315,7 +315,7 @@ namespace Belle2 {
     void check() const { if (!m_storeObjPtr) B2FATAL("RelationArray does not point to valid StoreObject"); }
 
     /** Check that the AccessorParams stored in the relation and the one given to the constructor are the same. */
-    void checkRelation(const std::string& direction, const AccessorParams& array, const AccessorParams& rel) {
+    void checkRelation(const std::string& direction, const AccessorParams& array, const AccessorParams& rel) const {
       if (array != rel) {
         B2FATAL("Relation '" << m_name << "' exists but points " << direction << " wrong array:"
                 << " requested " << array.first << "(" << array.second << ")"

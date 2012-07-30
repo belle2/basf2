@@ -88,9 +88,14 @@ namespace Belle2 {
       return defaultObjectName<T>() + 's';
     }
 
-    /** Return the default storage name for an relation between the given types. */
+    /** Return the default storage name for a relation between the given types. */
     template<class FROM, class TO> static const std::string defaultRelationName() {
       return defaultArrayName<FROM>() + "To" + defaultArrayName<TO>();
+    }
+
+    /** Return storage name for a relation between two arrays of the given names. */
+    static std::string relationName(const std::string& fromName, const std::string& toName) {
+      return fromName + "To" + toName;
     }
 
     //------------------------------ Accessing objects and arrays ----------------------------------------------

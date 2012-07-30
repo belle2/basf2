@@ -97,7 +97,8 @@ void DedxPIDModule::initialize()
 
   if (!m_pdfFilename.empty()) {
     StoreArray<DedxLikelihood> likelihood_array;
-    RelationArray tracks_to_likelihoods(StoreArray<Track>(), likelihood_array);
+    StoreArray<GFTrack> gftracks(m_gftracks_name); //TODO: i don't actually want to create this here.
+    RelationArray tracks_to_likelihoods(gftracks, likelihood_array);
 
     //load pdfs
     TFile* pdf_file = new TFile(m_pdfFilename.c_str(), "READ");

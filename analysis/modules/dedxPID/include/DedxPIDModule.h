@@ -27,10 +27,9 @@ namespace Belle2 {
    * If a PDF file is specified using the 'PDFFile' parameter, likelihood values
    * for all particle hypotheses are calculated and saved in a DedxLikelihood object.
    *
-   * The 'EnableDebugOutput' option adds 'TrackDedx' objects
-   * The calculated values are stored in a TrackDedx object (one for each Track),
+   * The 'EnableDebugOutput' option adds TrackDedx objects (one for each GFTrack),
    * which includes individual dE/dx data points and their corresponding layer,
-   * and (optionally) hit information like reconstructed position, charge, etc.
+   * and hit information like reconstructed position, charge, etc.
    *
    *
     \correlationdiagram
@@ -47,8 +46,14 @@ namespace Belle2 {
 
     graph.module('DedxPID', [Track, GFTrack, MCParticle, CDCHit, SVDTrueHit, PXDTrueHit, PXDCluster], [DedxLikelihood, TrackDedx])
 
-    graph.relation(Track, DedxLikelihood)
+    graph.relation(GFTrack, DedxLikelihood)
     \endcorrelationdiagram
+   *
+   *
+   * The reconstruction of flight paths and the used likelihood ratio method are
+   * described and evaluated in
+   * <a href="http://www-ekp.physik.uni-karlsruhe.de/pub/web/thesis/iekp-ka2012-9.pdf">dE/dx Particle Identification and Pixel Detector Data Reduction for the Belle II Experiment</a> (Chapter 6)
+   *
    */
   class DedxPIDModule : public Module {
 

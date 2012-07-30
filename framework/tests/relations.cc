@@ -46,6 +46,14 @@ namespace Belle2 {
     EXPECT_TRUE(RelationArray(evtData, runData, "", DataStore::c_Event, false));
     string name = relation.getName();
     EXPECT_TRUE(RelationArray(name));
+
+    StoreArray<EventMetaData> evtData2("OwnName");
+    //check for OwnNameToRunMetaDatas
+    EXPECT_FALSE(RelationArray(evtData2, runData, "", DataStore::c_Event, false));
+    EXPECT_FALSE(RelationArray("OwnNameToRunMetaDatas", DataStore::c_Event));
+    RelationArray relation2(evtData2, runData);
+    EXPECT_TRUE(relation2.getName() == "OwnNameToRunMetaDatas");
+    EXPECT_TRUE(RelationArray(evtData2, runData, "", DataStore::c_Event, false));
   }
 
   /** Test that adding to an invalid relation yields a FATAL */
@@ -133,30 +141,35 @@ namespace Belle2 {
     EXPECT_TRUE(relIndex.getFirstFrom(runData[3]) == NULL);
 
     //check size of found element lists
-    double dummy(0);
     {
       int size(0);
+      double allweights(0);
       BOOST_FOREACH(el_t & e, relIndex.getFrom(evtData[0])) {
         ++size;
-        dummy += e.weight;
+        allweights += e.weight;
       }
       EXPECT_EQ(size, 3);
+      EXPECT_DOUBLE_EQ(allweights, 6.0);
     }
     {
       int size(0);
+      double allweights(0);
       BOOST_FOREACH(el_t & e, relIndex.getTo(runData[0])) {
         ++size;
-        dummy += e.weight;
+        allweights += e.weight;
       }
       EXPECT_EQ(size, 2);
+      EXPECT_DOUBLE_EQ(allweights, 2.0);
     }
     {
       int size(0);
+      double allweights(0);
       BOOST_FOREACH(el_t & e, relIndex.getTo(runData[4])) {
         ++size;
-        dummy += e.weight;
+        allweights += e.weight;
       }
       EXPECT_EQ(size, 0);
+      EXPECT_DOUBLE_EQ(allweights, 0.0);
     }
   }
 

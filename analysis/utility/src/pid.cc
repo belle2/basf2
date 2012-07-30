@@ -38,15 +38,25 @@ const TOPLikelihoods* getTOPLikelihoods(const Track& track)
 const DedxLikelihood* getDEDXLikelihood(const Track& track)
 {
   StoreArray<DedxLikelihood> dedxlogL;
+  StoreArray<GFTrack>        gfTracks;
   StoreArray<Track>          tracks;
 
-  RelationIndex<Track, DedxLikelihood> tracksToDEDXLogL(tracks, dedxlogL);
+  RelationIndex<GFTrack, DedxLikelihood> gfTracksToDEDXLogL(gfTracks, dedxlogL);
 
-  if (!(tracks && dedxlogL && tracksToDEDXLogL))
+  if (!(tracks && gfTracks && dedxlogL && gfTracksToDEDXLogL))
     return 0;
 
-  if (tracksToDEDXLogL.getFirstTo(&track))
-    return tracksToDEDXLogL.getFirstTo(&track)->to;
+  int trackIndex = tracks.getPtr()->IndexOf(&track);
+
+  if (trackIndex < 0)
+    return 0;
+
+  // It is assumed that Tracks and GFTracks have the same indices
+  if (!gfTracks[trackIndex])
+    return 0;
+
+  if (gfTracksToDEDXLogL.getFirstTo(gfTracks[trackIndex]))
+    return gfTracksToDEDXLogL.getFirstTo(gfTracks[trackIndex])->to;
 
   return 0;
 }

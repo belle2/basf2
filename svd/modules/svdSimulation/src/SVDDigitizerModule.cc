@@ -251,7 +251,7 @@ void SVDDigitizerModule::event()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDSimHit>  storeSimHits(m_storeSimHitsName);
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  unsigned int nSimHits = storeSimHits->GetEntries();
+  unsigned int nSimHits = storeSimHits.getEntries();
   if (nSimHits == 0) return;
 
   RelationIndex<MCParticle, SVDSimHit> relMCParticleSimHit(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);

@@ -207,7 +207,7 @@ void PXDDigitizerModule::event()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<PXDSimHit>  storeSimHits(m_storeSimHitsName);
   StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  unsigned int nSimHits = storeSimHits->GetEntries();
+  unsigned int nSimHits = storeSimHits.getEntries();
   //if (nSimHits == 0) return;
 
   RelationIndex<MCParticle, PXDSimHit> relMCParticleSimHit(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);

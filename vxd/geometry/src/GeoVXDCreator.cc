@@ -11,6 +11,7 @@
 #include <vxd/geometry/GeoVXDCreator.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/simulation/SensitiveDetector.h>
+#include <simulation/background/BkgSensitiveDetector.h>
 
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
@@ -123,6 +124,13 @@ namespace Belle2 {
       }
       vector<GeoVXDPlacement> subComponents = getSubComponents(params);
       createSubComponents(m_prefix + "." + name, c, subComponents);
+      if (m_activeChips && params.exists("activeChipID")) {
+        int chipID = params.getInt("activeChipID");
+        B2DEBUG(50, "Creating BkgSensitiveDetector for component " << name << " with chipID " <<  chipID);
+        BkgSensitiveDetector* sensitive = new BkgSensitiveDetector(m_prefix.c_str(), chipID);
+        c.volume->SetSensitiveDetector(sensitive);
+        m_sensitive.push_back(sensitive);
+      }
       m_componentCache[name] = c;
       return c;
     }

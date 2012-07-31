@@ -26,12 +26,13 @@ namespace Belle2 {
   /** This module use MC true Relations to define which hits belong to which particles and writes track candidates filled with necessary information into the DataStore.
    *
    *  The Relations MCParticles -> Hits for PXD, SVD and CDC are used.
-   *  At the moment CDCHits, PXDTrueHits and SVDTrueHits are used, at some point we may replace the TrueHits with Clusters
+   *  At the moment CDCHits, PXDTrueHits, SVDTrueHits, PXDCluster hits and SVDCluster hits can be used
    *  At the moment track candidates are created only for primary particles.
-   *
+   *  For every hit the true time information is extracted from the trueHits or simHit hits.
+   *  This Information is used to sort the hits in the correct order for the fitting of curling tracks.
    *  The created GFTrackCandidates can be fitted with GenFitterModule.
    *
-   *  @todo: check hit ordering and planeIds when adding hits to GFTrackCand, maybe create track candidates not only for primary particles
+   *  @todo: check planeIds when adding hits to GFTrackCand, maybe create track candidates not only for primary particles
    */
   class MCTrackFinderModule : public Module {
 

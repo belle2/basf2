@@ -91,7 +91,7 @@ elif option == 'intel':
     global_env['FC'] = 'ifort'
     global_env['AR'] = 'xiar'
     global_env['LD'] = 'xild'
-    global_env.Append(CCFLAGS = ['-wd383,981'])
+    global_env.Append(CCFLAGS = ['-wd383,981,1419'])
 else:
     print 'Aborted because of unknown build option:', option
     Exit(1)

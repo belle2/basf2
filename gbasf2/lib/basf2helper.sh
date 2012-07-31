@@ -14,18 +14,10 @@ unset VO_BELLE2_SW_DIR
 #avoid basf2 tools check
 export BELLE2_NO_TOOLS_CHECK=1
 
-#it used an old copy, (with this $2) so i commented it out, and set it 
-#manually:
-#. ${VO_BELLE_SW_DIR}/belle2/tools/setup_belle2.sh
-#WORKDIR=$PWD
-#cd ${VO_BELLE_SW_DIR}/belle2/releases/$2
-#setuprel $2
-#cd $WORKDIR
-
 . ${VO_BELLE_SW_DIR}/belle2/tools/setup_belle2.sh
 WORKDIR=$PWD
-cd ${VO_BELLE_SW_DIR}/belle2/releases/build-2012-05-02
-setuprel build-2012-05-02
+cd ${VO_BELLE_SW_DIR}/belle2/releases/$2
+setuprel $2
 cd $WORKDIR
 
 

@@ -110,8 +110,8 @@ def make_jdl(
     if site != '':
         if site != None:
             f.write('    Site = ' + site + ';\n')
-#    f.write('    Requirements = Member("VO-belle-' + swver
-#            + '",other.GlueHostApplicationSoftwareRunTimeEnvironment);\n')
+    f.write('    Requirements = Member("VO-belle-' + swver
+            + '",other.GlueHostApplicationSoftwareRunTimeEnvironment);\n')
     f.write('    InputSandbox = \n')
     f.write('    {\n')
     f.write('      "' + steering_file + '",\n')

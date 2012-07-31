@@ -12,6 +12,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <generators/dataobjects/MCParticle.h>
@@ -52,28 +53,11 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //Parameter definition
-
-  // names of input containers
-  addParam("MCParticlesColName", m_mcParticlesColName, "Name of collection holding the MCParticles", string(""));
-  //pxd specific
-  addParam("PXDHitsColName", m_pxdHitColName, "Name of collection holding the PXDHits", string(""));
-  addParam("MCParticlesToPXDHitsColName", m_mcParticleToPXDHits, "Name of collection holding the Relations  MCParticles->PXDHits", string(""));
-  //pxd cluster specific
-  addParam("PXDClustersColName", m_pxdClusterColName, "Name of collection holding the PXDClusters", string(""));
-  addParam("PXDClustersToMCParticlesColName", m_pxdClusterToMCParticle, "Name of collection holding the Relations  PXDClusters->MCParticles", string(""));
-
-  addParam("UseClusters", m_useClusters, "Set true if you want to use PXDClusters instead of PXDTrueHits (UsePXDHits should be set true too)", bool(false));
-  // svd specific
-  addParam("SVDHitsColName", m_svdHitColName, "Name of collection holding the SVDHits", string(""));
-  addParam("MCParticlesToSVDHitsColName", m_mcParticleToSVDHits, "Name of collection holding the Relations  MCParticles->SVDHits", string(""));
-
-  // cdc specific
-  addParam("CDCHitsColName", m_cdcHitColName, "Name of collection holding the CDCHits", string(""));
-  addParam("MCParticlesToCDCHitsColName", m_mcParticleToCDCHits, "Name of collection holding the Relations  MCParticles->CDCHits", string(""));
+  addParam("UseClusters", m_useClusters, "Set true if you want to use PXD/SVD clusters instead of PXD/SVD trueHits", bool(false));
 
   //choose which hits to use, all hits assigned to the track candidate will be used in the fit
   addParam("UsePXDHits", m_usePXDHits, "Set true if PXDHits or PXDClusters should be used", bool(true));
-  addParam("UseSVDHits", m_useSVDHits, "Set true if SVDHits should be used", bool(true));
+  addParam("UseSVDHits", m_useSVDHits, "Set true if SVDHits or SVDClusters should be used", bool(true));
   addParam("UseCDCHits", m_useCDCHits, "Set true if CDCHits should be used", bool(true));
 
   //choose for which particles a track candidate should be created
@@ -84,10 +68,6 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
 
   //smearing of MCMomentum
   addParam("Smearing", m_smearing, "Smearing of MCMomentum/MCVertex prior to storing it in GFTrackCandidate (in %). A negative value will switch off smearing. This is also the default.", -1.0);
-
-  // names of output containers
-  addParam("GFTrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the GFTrackCandidates (output)", string(""));
-  addParam("GFTrackCandToMCParticleColName", m_gfTrackCandToMCParticleColName, "Name of collection holding the relations between GFTrackCandidates and MCParticles (output)", string(""));
 
 }
 
@@ -100,90 +80,90 @@ MCTrackFinderModule::~MCTrackFinderModule()
 
 void MCTrackFinderModule::initialize()
 {
-  StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
-  StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
+  //output store arrays have to be registered in initialize()
+  StoreArray<GFTrackCand> trackCandidates;
+  StoreArray<MCParticle> mcParticles;
   RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
 }
 
 void MCTrackFinderModule::beginRun()
 {
   m_notEnoughtHitsCounter = 0;
+  m_noTrueHitCounter = 0;
 }
 
 
 void MCTrackFinderModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-  int eventCounter = eventMetaDataPtr->getEvent();
+  const int eventCounter = eventMetaDataPtr->getEvent();
   B2DEBUG(100, "*******   MCTrackFinderModule processing event number: " << eventCounter << " *******");
 
   //all the input containers. First: MCParticles
-  StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
-  int nMcParticles = mcParticles.getEntries();
-  B2DEBUG(149, "MCTrackFinder: total Number of MCParticles: " << nMcParticles);
-  if (nMcParticles == 0) {B2DEBUG(100, "MCTrackFinder: MCParticlesCollection is empty!");}
+  StoreArray<MCParticle> mcParticles;
+  const int nMcParticles = mcParticles.getEntries();
+  B2DEBUG(100, "MCTrackFinder: total Number of MCParticles: " << nMcParticles);
 
-  //PXD
-  StoreArray<PXDTrueHit> pxdTrueHits(m_pxdHitColName);
-  int nPXDHits = pxdTrueHits.getEntries();
-  B2DEBUG(149, "MCTrackFinder: Number of PXDHits: " << nPXDHits);
-  if (nPXDHits == 0) {B2DEBUG(100, "MCTrackFinder: PXDHitsCollection is empty!");}
+  //PXD trueHits
+  StoreArray<PXDTrueHit> pxdTrueHits;
+  const int nPXDHits = pxdTrueHits.getEntries();
+  B2DEBUG(100, "MCTrackFinder: Number of PXDHits: " << nPXDHits);
+
   RelationArray mcPartToPXDTrueHits(mcParticles, pxdTrueHits);
-  int nMcPartToPXDHits = mcPartToPXDTrueHits.getEntries();
-  B2DEBUG(149, "MCTrackFinder: Number of relations between MCParticles and PXDHits: " << nMcPartToPXDHits);
-  if (nMcPartToPXDHits == 0) B2DEBUG(100, "MCTrackFinder: MCParticlesToPXDHitsCollection is empty!");
+  const int nMcPartToPXDHits = mcPartToPXDTrueHits.getEntries();
+  B2DEBUG(100, "MCTrackFinder: Number of relations between MCParticles and PXDHits: " << nMcPartToPXDHits);
+
+  RelationIndex<MCParticle, PXDTrueHit> relMcPxdTrueHit;
 
   //PXD clusters
-  StoreArray<PXDCluster> pxdClusters(m_pxdClusterColName);
-  int nPXDClusters = pxdClusters.getEntries();
-  B2DEBUG(149, "MCTrackFinder: Number of PXDClusters: " << nPXDClusters);
-  if (nPXDClusters == 0) {B2DEBUG(100, "MCTrackFinder: PXDClustersCollection is empty!");}
+  StoreArray<PXDCluster> pxdClusters;
+  const int nPXDClusters = pxdClusters.getEntries();
+  B2DEBUG(100, "MCTrackFinder: Number of PXDClusters: " << nPXDClusters);
+
   RelationArray pxdClusterToMCParticle(pxdClusters, mcParticles);
-  int nPxdClusterToMCPart = pxdClusterToMCParticle.getEntries();
-  B2DEBUG(149, "MCTrackFinder: Number of relations between PXDCluster and MCParticles: " << nPxdClusterToMCPart);
-  if (nPxdClusterToMCPart == 0) B2DEBUG(100, "MCTrackFinder: PXDClustersToMCParticlesCollection is empty!");
+  const int nPxdClusterToMCPart = pxdClusterToMCParticle.getEntries();
+  B2DEBUG(100, "MCTrackFinder: Number of relations between PXDCluster and MCParticles: " << nPxdClusterToMCPart);
 
+  //SVD truehits
+  StoreArray<SVDTrueHit> svdTrueHits;
+  const int nSVDHits = svdTrueHits.getEntries();
+  B2DEBUG(100, "MCTrackFinder: Number of SVDDHits: " << nSVDHits);
 
-  //SVD
-  StoreArray<SVDTrueHit> svdTrueHits(m_svdHitColName);
-  int nSVDHits = svdTrueHits.getEntries();
-  B2DEBUG(149, "MCTrackFinder: Number of SVDDHits: " << nSVDHits);
-  if (nSVDHits == 0) {B2DEBUG(100, "MCTrackFinder: SVDHitsCollection is empty!");}
   RelationArray mcPartToSVDTrueHits(mcParticles, svdTrueHits);
-  int nMcPartToSVDHits = mcPartToSVDTrueHits.getEntries();
-  B2DEBUG(149, "MCTrackFinder: Number of relations between MCParticles and SVDHits: " << nMcPartToSVDHits);
-  if (nMcPartToSVDHits == 0) {B2DEBUG(100, "MCTrackFinder: MCParticlesToSVDHitsCollection is empty!");}
+  const int nMcPartToSVDHits = mcPartToSVDTrueHits.getEntries();
+  B2DEBUG(100, "MCTrackFinder: Number of relations between MCParticles and SVDHits: " << nMcPartToSVDHits);
+
+  RelationIndex<MCParticle, SVDTrueHit> relMcSvdTrueHit;
 
   //SVD clusters
-  StoreArray<SVDCluster> svdClusters("");
-  int nSVDClusters = svdClusters.getEntries();
-  B2DEBUG(149, "MCTrackFinder: Number of SVDClusters: " << nSVDClusters);
-  if (nSVDClusters == 0) {B2DEBUG(100, "MCTrackFinder: SVDClustersCollection is empty!");}
+  StoreArray<SVDCluster> svdClusters;
+  const int nSVDClusters = svdClusters.getEntries();
+  B2DEBUG(100, "MCTrackFinder: Number of SVDClusters: " << nSVDClusters);
+
   RelationArray svdClusterToMCParticle(svdClusters, mcParticles);
-  int nSvdClusterToMCPart = svdClusterToMCParticle.getEntries();
-  B2DEBUG(149, "MCTrackFinder: Number of relations between SVDCluster and MCParticles: " << nSvdClusterToMCPart);
-  if (nSvdClusterToMCPart == 0) B2DEBUG(100, "MCTrackFinder: SVDClustersToMCParticlesCollection is empty!");
+  const int nSvdClusterToMCPart = svdClusterToMCParticle.getEntries();
+  B2DEBUG(100, "MCTrackFinder: Number of relations between SVDCluster and MCParticles: " << nSvdClusterToMCPart);
 
   //CDC
-  StoreArray<CDCHit> cdcHits(m_cdcHitColName);
-  int nCDCHits = cdcHits.getEntries();
-  B2DEBUG(149, "MCTrackFinder: Number of CDCHits: " << nCDCHits);
-  if (nCDCHits == 0) {B2DEBUG(100, "MCTrackFinder: CDCHitsCollection is empty!");}
+  StoreArray<CDCHit> cdcHits;
+  const int nCDCHits = cdcHits.getEntries();
+  B2DEBUG(100, "MCTrackFinder: Number of CDCHits: " << nCDCHits);
+
   RelationArray mcPartToCDCHits(mcParticles, cdcHits);
-  int nMcPartToCDCHits = mcPartToCDCHits.getEntries();
-  B2DEBUG(149, "MCTrackFinder: Number of relations between MCParticles and CDCHits: " << nMcPartToCDCHits);
-  if (nMcPartToCDCHits == 0) {B2DEBUG(100, "MCTrackFinder: MCParticlesToCDCHitsCollection is empty!");}
+  const int nMcPartToCDCHits = mcPartToCDCHits.getEntries();
+  B2DEBUG(100, "MCTrackFinder: Number of relations between MCParticles and CDCHits: " << nMcPartToCDCHits);
+
   StoreArray<CDCSimHit> cdcSimHits("");
-  int nCDCSimHits = cdcSimHits.getEntries();
-  B2DEBUG(149, "MCTrackFinder: Number of CDCHits: " << nCDCSimHits);
-  if (nCDCSimHits == 0) {B2DEBUG(100, "MCTrackFinder: CDCSimHitsCollection is empty!");}
+  const int nCDCSimHits = cdcSimHits.getEntries();
+  B2DEBUG(100, "MCTrackFinder: Number of CDCHits: " << nCDCSimHits);
+
   RelationArray cdcSimHitToHitRel(cdcSimHits, cdcHits);
-  int nCdcSimHitToHitRel = cdcSimHitToHitRel.getEntries();
-  B2DEBUG(149, "MCTrackFinder: Number of relations between CDCSimHit and CDCHits: " << nCdcSimHitToHitRel);
-  if (nCdcSimHitToHitRel == 0) {B2DEBUG(100, "MCTrackFinder: MCParticlesToCDCHitsCollection is empty!");}
+  const int nCdcSimHitToHitRel = cdcSimHitToHitRel.getEntries();
+  B2DEBUG(100, "MCTrackFinder: Number of relations between CDCSimHit and CDCHits: " << nCdcSimHitToHitRel);
+
 
   //register StoreArray which will be filled by this module
-  StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
+  StoreArray<GFTrackCand> trackCandidates;
   RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
 
   //set the proper status
@@ -203,9 +183,10 @@ void MCTrackFinderModule::event()
   // loop over MCParticles.
   // it would be nice to optimize this, because there are actually ~1000 secondary MCParticles for each primary MCParticle
   for (int iPart = 0; iPart < nMcParticles; ++iPart) {
+    MCParticle* aMcParticlePtr = mcParticles[iPart];
     //make links only for interesting MCParticles: energy cut, which subdetector was reached and a 'dirty hack' to avoid atoms which are unknown to GenFit and check for neutrals
-    if (mcParticles[iPart]->getEnergy() > m_energyCut && mcParticles[iPart]->hasStatus(status) == true && abs(mcParticles[iPart]->getPDG()) < 100000000 && mcParticles[iPart]->getCharge() != forbiddenCharge) {
-      B2DEBUG(100, "Search a  track for the MCParticle with index: " << iPart << " (PDG: " << mcParticles[iPart]->getPDG() << ")");
+    if (aMcParticlePtr->hasStatus(status) == true && aMcParticlePtr->getEnergy() > m_energyCut &&  abs(aMcParticlePtr->getPDG()) < 100000000 && aMcParticlePtr->getCharge() != forbiddenCharge) {
+      B2DEBUG(100, "Search a  track for the MCParticle with index: " << iPart << " (PDG: " << aMcParticlePtr->getPDG() << ")");
 
       // create a list containing the indices to the PXDHits that belong to one track
       vector<int> pxdHitsIndices;
@@ -256,131 +237,168 @@ void MCTrackFinderModule::event()
           }
         }
       }
-      if (pxdHitsIndices.size() + svdHitsIndices.size() + cdcHitsIndices.size() < 1) {
-        ++m_notEnoughtHitsCounter; // do not try do make a track candidate
+
+      if (pxdHitsIndices.size() + svdHitsIndices.size() + cdcHitsIndices.size() < 3) {
+        ++m_notEnoughtHitsCounter;
+        continue; //goto next iPart iteration and do not try do make a track candidate
+      }
+      //Now create TrackCandidate
+      int counter = trackCandidates->GetLast() + 1;
+      B2DEBUG(100, "Create TrackCandidate  " << counter);
+
+      //create TrackCandidate
+      new(trackCandidates->AddrAt(counter)) GFTrackCand();
+
+      //set track parameters from MCParticle information
+      TVector3 positionTrue = aMcParticlePtr->getProductionVertex();
+      TVector3 momentumTrue = aMcParticlePtr->getMomentum();
+      int pdg = aMcParticlePtr->getPDG();
+
+      //it may have positive effect on the fit not to start with exactly precise true values (or it may be just interesting to study this)
+      //one can smear the starting momentum values with a gaussian
+      //this calculation is always performed, but with the default value of m_smearing = 0 it has no effect on momentum and position (true values are taken)
+      TVector3 momentum;
+      TVector3 position;
+      if (m_smearing > 0.0) {
+        double smearing = m_smearing / 100.0;  //the module parameter m_smearing goes from 0 to 100, smearing should go from 0 to 1
+
+        double smearedPX = gRandom->Gaus(momentumTrue.x(), smearing * momentumTrue.x());
+        double smearedPY = gRandom->Gaus(momentumTrue.y(), smearing * momentumTrue.y());
+        double smearedPZ = gRandom->Gaus(momentumTrue.z(), smearing * momentumTrue.z());
+        momentum.SetXYZ(smearedPX, smearedPY, smearedPZ);
+
+        double smearedX = gRandom->Gaus(positionTrue.x(), smearing * positionTrue.x());
+        double smearedY = gRandom->Gaus(positionTrue.y(), smearing * positionTrue.y());
+        double smearedZ = gRandom->Gaus(positionTrue.z(), smearing * positionTrue.z());
+        position.SetXYZ(smearedX, smearedY, smearedZ);
       } else {
-        //Now create TrackCandidate
-        int counter = trackCandidates->GetLast() + 1;
-        B2DEBUG(100, "Create TrackCandidate  " << counter);
+        position = positionTrue;
+        momentum = momentumTrue;
+      }
+      //Errors for the position/momentum values can also be passed to GFTrackCandidate
+      //Default values in Genfit are (1.,1.,1.,), they seem to be not good!!
+      //The best way to set the 'correct' errors has to be investigated....
+      TVector3 posError;
+      posError.SetXYZ(1.0, 1.0, 2.0);
+      TVector3 momError;
+      momError.SetXYZ(0.1, 0.1, 0.2);
 
-        //create TrackCandidate
-        new(trackCandidates->AddrAt(counter)) GFTrackCand();
+      //Finally set the complete track seed
+      trackCandidates[counter]->setComplTrackSeed(position, momentum, pdg, posError, momError);
 
-        //set track parameters from MCParticle information
-        TVector3 positionTrue = mcParticles[iPart]->getProductionVertex();
-        TVector3 momentumTrue = mcParticles[iPart]->getMomentum();
-        int pdg = mcParticles[iPart]->getPDG();
+      //Save the MCParticleID in the TrackCandidate
+      trackCandidates[counter]->setMcTrackId(iPart);
 
-        //it may have positive effect on the fit not to start with exactly precise true values (or it may be just interesting to study this)
-        //one can smear the starting momentum values with a gaussian
-        //this calculation is always performed, but with the default value of m_smearing = 0 it has no effect on momentum and position (true values are taken)
-        TVector3 momentum;
-        TVector3 position;
-        if (m_smearing > 0.0) {
-          double smearing = m_smearing / 100.0;  //the module parameter m_smearing goes from 0 to 100, smearing should go from 0 to 1
+      //create relation between the track candidates and the mcParticle (redundant to saving the MCId)
+      gfTrackCandToMCPart.add(counter, iPart);
+      B2DEBUG(100, " --- Create relation between GFTrackCand " << counter << " and MCParticle " << iPart);
 
-          double smearedPX = gRandom->Gaus(momentumTrue.x(), smearing * momentumTrue.x());
-          double smearedPY = gRandom->Gaus(momentumTrue.y(), smearing * momentumTrue.y());
-          double smearedPZ = gRandom->Gaus(momentumTrue.z(), smearing * momentumTrue.z());
-          momentum.SetXYZ(smearedPX, smearedPY, smearedPZ);
+      //member variable Dip is currently used to store the purity of the tracks, for MCTracks it is always 100 %
+      trackCandidates[counter]->setDip(100);
 
-          double smearedX = gRandom->Gaus(positionTrue.x(), smearing * positionTrue.x());
-          double smearedY = gRandom->Gaus(positionTrue.y(), smearing * positionTrue.y());
-          double smearedZ = gRandom->Gaus(positionTrue.z(), smearing * positionTrue.z());
-          position.SetXYZ(smearedX, smearedY, smearedZ);
-        } else {
-          position = positionTrue;
-          momentum = momentumTrue;
+      //assign indices of the Hits from all detectors, their are distinguishable by their DetID:
+      // pxd 0
+      //   svd 1
+      //     cdc 2
+      if (m_usePXDHits && m_useClusters == false) {
+        BOOST_FOREACH(int hitID, pxdHitsIndices) {
+          VxdID aVxdId = pxdTrueHits[hitID]->getSensorID();
+          float time = pxdTrueHits[hitID]->getGlobalTime();
+          trackCandidates[counter]->addHit(0, hitID, double(time), aVxdId.getID());
         }
-        //Errors for the position/momentum values can also be passed to GFTrackCandidate
-        //Default values in Genfit are (1.,1.,1.,), they seem to be not good!!
-        //The best way to set the 'correct' errors has to be investigated....
-        TVector3 posError;
-        posError.SetXYZ(1.0, 1.0, 2.0);
-        TVector3 momError;
-        momError.SetXYZ(0.1, 0.1, 0.2);
+        B2DEBUG(100, "     add " << pxdHitsIndices.size() << " PXDHits");
+      }
 
-        //Finally set the complete track seed
-        trackCandidates[counter]->setComplTrackSeed(position, momentum, pdg, posError, momError);
+      if (m_usePXDHits && m_useClusters) {
+        RelationIndex<PXDCluster, PXDTrueHit> relPxdClusterTrueHit;
+        BOOST_FOREACH(int hitID, pxdHitsIndices) {
 
-        //Save the MCParticleID in the TrackCandidate
-        trackCandidates[counter]->setMcTrackId(iPart);
-
-        //create relation between the track candidates and the mcParticle (redundant to saving the MCId)
-        gfTrackCandToMCPart.add(counter, iPart);
-        B2DEBUG(100, " --- Create relation between GFTrackCand " << counter << " and MCParticle " << iPart);
-
-        //member variable Dip is currently used to store the purity of the tracks, for MCTracks it is always 100 %
-        trackCandidates[counter]->setDip(100);
-
-        //assign indices of the Hits from all detectors, their are distinguishable by their DetID:
-        // pxd 0
-        //   svd 1
-        //     cdc 2
-        if (m_usePXDHits && m_useClusters == false) {
-          BOOST_FOREACH(int hitID, pxdHitsIndices) {
-            int uniqueSensorId = pxdTrueHits[hitID]->getSensorID();
-            float time = pxdTrueHits[hitID]->getGlobalTime();
-            trackCandidates[counter]->addHit(0, hitID, double(time), uniqueSensorId);
+          VxdID aVxdId = pxdClusters[hitID]->getSensorID();
+          RelationIndex<PXDCluster, PXDTrueHit>::range_from iterPairCluTr = relPxdClusterTrueHit.getFrom(pxdClusters[hitID]);
+          if (iterPairCluTr.first == iterPairCluTr.second) { // there is not trueHit! trow away hit because there is no time information for sorting
+            ++m_noTrueHitCounter;
+            continue;
           }
-          B2DEBUG(100, "     add " << pxdHitsIndices.size() << " PXDHits");
-        }
-
-        if (m_usePXDHits && m_useClusters) {
-          BOOST_FOREACH(int hitID, pxdHitsIndices) {
-            VxdID aVxdId = pxdClusters[hitID]->getSensorID();
-            //the real clusters do not have timing information, set layer ID instead ....
-            // I dont think using layer id as sorting parameter will work... I deactivated sorting when clusters are used until a better solution is found. (Moritz)
-            trackCandidates[counter]->addHit(0, hitID, 0, aVxdId.getID());
-          }
-          B2DEBUG(100, "     add " << pxdHitsIndices.size() << " PXDClusters");
-        }
-        if (m_useSVDHits && m_useClusters == false) {
-          BOOST_FOREACH(int hitID, svdHitsIndices) {
-            int uniqueSensorId = svdTrueHits[hitID]->getSensorID();
-            float time = svdTrueHits[hitID]->getGlobalTime();
-            trackCandidates[counter]->addHit(1, hitID, double(time), uniqueSensorId);
-          }
-          B2DEBUG(100, "     add " << svdHitsIndices.size() << " SVDHits");
-        }
-        if (m_useSVDHits && m_useClusters) {
-          BOOST_FOREACH(int hitID, svdHitsIndices) {
-            VxdID aVxdId = svdClusters[hitID]->getSensorID();
-            trackCandidates[counter]->addHit(1, hitID, 0, aVxdId.getID());
-          }
-          B2DEBUG(100, "     add " << svdHitsIndices.size() << " SVDClusters");
-        }
-
-
-        if (m_useCDCHits) {
-          int layerId = -999;  //absolute layerId of the hit (from 0 to 55)
-          double time = -1.0;  // global time of flight when hit was created
-
-          BOOST_FOREACH(int hitID, cdcHitsIndices) {
-            //calculate the layerId from information stored in the CDCHit
-            if (cdcHits[hitID]->getISuperLayer() == 0) layerId = cdcHits[hitID]->getILayer();
-            else layerId = 8 + (cdcHits[hitID]->getISuperLayer() - 1) * 6 + cdcHits[hitID]->getILayer();
-            //for the DAF algorithm within GenFit it is important to assign a planeId to each hit
-            //one can choose the layerId as the planeId, this would mean that hits from the same layer will 'compete' to be the 'best matching hit' in this layer
-            //one can also give to each hit a unique planeId, so that e.g. two correct hits in the same layer get similar weights (without 'competition')
-            //I am still not quite sure which way is the best one, this has to be tested...
-            int uniqueId = layerId * 10000 + cdcHits[hitID]->getIWire();
-            //set the time as the ordering parameter rho for genfit to do this search for any CDCSimHit that corresponds to the CDCHit and take the time from there
-            for (int j = 0; j != nCdcSimHitToHitRel; ++j) {
-              if (unsigned(hitID) == cdcSimHitToHitRel[j].getToIndex(0)) {
-                time = cdcSimHits[cdcSimHitToHitRel[j].getFromIndex()]->getFlightTime();
+          float time = -1;
+          RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcTr = relMcPxdTrueHit.getFrom(aMcParticlePtr);
+          while (iterPairCluTr.first != iterPairCluTr.second && time < 0) {// make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
+            while (iterPairMcTr.first != iterPairMcTr.second) {
+              if (iterPairMcTr.first->to == iterPairCluTr.first->to) {
+                time = iterPairCluTr.first->to->getGlobalTime();
+                break;
               }
+              ++iterPairMcTr.first;
             }
-            trackCandidates[counter]->addHit(2, hitID, time, uniqueId);
+            ++iterPairCluTr.first;
           }
-          B2DEBUG(100, "    add " << cdcHitsIndices.size() << " CDCHits");
+
+          trackCandidates[counter]->addHit(0, hitID, double(time), aVxdId.getID());
         }
-        // now after all the hits belonging to one track are added to a track candidate
-        // bring them into the right order inside the trackCand objects using the rho parameter
-        if (m_useClusters == false) {
-          trackCandidates[counter]->sortHits();
+        B2DEBUG(100, "     add " << pxdHitsIndices.size() << " PXDClusters");
+      }
+      if (m_useSVDHits && m_useClusters == false) {
+        BOOST_FOREACH(int hitID, svdHitsIndices) {
+          VxdID aVxdId = svdTrueHits[hitID]->getSensorID();
+          float time = svdTrueHits[hitID]->getGlobalTime();
+          trackCandidates[counter]->addHit(1, hitID, double(time), aVxdId.getID());
         }
-      } //endif
+        B2DEBUG(100, "     add " << svdHitsIndices.size() << " SVDHits");
+      }
+      if (m_useSVDHits && m_useClusters) {
+        RelationIndex<SVDCluster, SVDTrueHit> relSvdClusterTrueHit;
+        BOOST_FOREACH(int hitID, svdHitsIndices) {
+          VxdID aVxdId = svdClusters[hitID]->getSensorID();
+          RelationIndex<SVDCluster, SVDTrueHit>::range_from iterPairCluTr = relSvdClusterTrueHit.getFrom(svdClusters[hitID]);
+          if (iterPairCluTr.first == iterPairCluTr.second) { // there is not trueHit! trow away hit because there is no time information for sorting
+            ++m_noTrueHitCounter;
+            continue;
+          }
+          float time = -1;
+          RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcTr = relMcSvdTrueHit.getFrom(aMcParticlePtr);
+          while (iterPairCluTr.first != iterPairCluTr.second && time < 0) {// make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
+            while (iterPairMcTr.first != iterPairMcTr.second) {
+              if (iterPairMcTr.first->to == iterPairCluTr.first->to) {
+                time = iterPairCluTr.first->to->getGlobalTime();
+                break;
+              }
+              ++iterPairMcTr.first;
+            }
+            ++iterPairCluTr.first;
+          }
+          trackCandidates[counter]->addHit(1, hitID, double(time), aVxdId.getID());
+        }
+        B2DEBUG(100, "     add " << svdHitsIndices.size() << " SVDClusters");
+      }
+
+
+      if (m_useCDCHits) {
+        int layerId = -999;  //absolute layerId of the hit (from 0 to 55)
+
+        float time = -1;
+        BOOST_FOREACH(int hitID, cdcHitsIndices) {
+          //calculate the layerId from information stored in the CDCHit
+          if (cdcHits[hitID]->getISuperLayer() == 0) layerId = cdcHits[hitID]->getILayer();
+          else layerId = 8 + (cdcHits[hitID]->getISuperLayer() - 1) * 6 + cdcHits[hitID]->getILayer();
+          //for the DAF algorithm within GenFit it is important to assign a planeId to each hit
+          //one can choose the layerId as the planeId, this would mean that hits from the same layer will 'compete' to be the 'best matching hit' in this layer
+          //one can also give to each hit a unique planeId, so that e.g. two correct hits in the same layer get similar weights (without 'competition')
+          //I am still not quite sure which way is the best one, this has to be tested...
+          int uniqueId = layerId * 10000 + cdcHits[hitID]->getIWire();
+          //set the time as the ordering parameter rho for genfit to do this search for any CDCSimHit that corresponds to the CDCHit and take the time from there
+          for (int j = 0; j != nCdcSimHitToHitRel; ++j) {
+            if (unsigned(hitID) == cdcSimHitToHitRel[j].getToIndex(0)) {
+              time = cdcSimHits[cdcSimHitToHitRel[j].getFromIndex()]->getFlightTime();
+            }
+          }
+          trackCandidates[counter]->addHit(2, hitID, time, uniqueId);
+        }
+        B2DEBUG(100, "    add " << cdcHitsIndices.size() << " CDCHits");
+      }
+      // now after all the hits belonging to one track are added to a track candidate
+      // bring them into the right order inside the trackCand objects using the rho/time parameter
+      //trackCandidates[counter]->Print();
+      trackCandidates[counter]->sortHits();
+      //trackCandidates[counter]->Print();
     }
   }//end loop over MCParticles
 }
@@ -388,7 +406,10 @@ void MCTrackFinderModule::event()
 void MCTrackFinderModule::endRun()
 {
   if (m_notEnoughtHitsCounter != 0) {
-    B2INFO(m_notEnoughtHitsCounter << " tracks had 2 or less hits. No Track Candidates were created from them so they will not be passed to the track fitter");
+    B2WARNING(m_notEnoughtHitsCounter << " tracks had 2 or less hits. No Track Candidates were created from them so they will not be passed to the track fitter");
+  }
+  if (m_noTrueHitCounter != 0) {
+    B2WARNING(m_noTrueHitCounter << " cluster hits did not have a relation to a true hit and were therefore not included in a track candidate");
   }
 }
 

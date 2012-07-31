@@ -13,8 +13,6 @@
 
 #include <framework/core/Module.h>
 
-#include <string>
-
 namespace Belle2 {
   /**
    *  \addtogroup modules
@@ -72,25 +70,11 @@ namespace Belle2 {
 
   private:
 
-    std::string m_mcParticlesColName;                           /**< MCParticles collection name */
-
-    std::string m_pxdHitColName;                                /**< PXDHits collection name */
-    std::string m_mcParticleToPXDHits;                          /**< MCParticles <-> PXDHits relation name */
-
-    std::string m_pxdClusterColName;                            /**< PXDClusters collection name */
-    std::string m_pxdClusterToMCParticle;                       /**< PXDClusters <-> MCParticles relation name */
-
-    std::string m_svdHitColName;                                /**< SVDHits collection name */
-    std::string m_mcParticleToSVDHits;                          /**< MCParticles <-> SVDHits relation name */
-
-    std::string m_cdcHitColName;                                /**< CDCHits collection name */
-    std::string m_mcParticleToCDCHits;                          /**< MCParticles <-> CDCHits relation name */
-
     bool m_usePXDHits;                                          /**< Boolean to select if PXDHits should be used*/
     bool m_useSVDHits;                                          /**< Boolean to select if SVDHits should be used*/
     bool m_useCDCHits;                                          /**< Boolean to select if CDCHits should be used*/
 
-    bool m_useClusters;                                      /**< Boolean to select if PXD and SVD Clusters should be used instead of default TrueHits. */
+    bool m_useClusters;                                         /**< Boolean to select if PXD and SVD Clusters should be used instead of default TrueHits. */
 
     int m_whichParticles;                                       /**< Boolean to mark for which particles a track candidate should be created: 0 for all primaries, 1 for all tracks which reach PXD, 2 for all tracks which reach SVD, 3 for all tracks which reach CDC . */
     double m_energyCut;                                         /**< Create track candidates only for MCParticles with energy above this cut*/
@@ -99,11 +83,8 @@ namespace Belle2 {
 
     double m_smearing;                                          /**< Smearing of MCMomentum and MCVertex in % */
 
-    std::string m_gfTrackCandsColName;                          /**< TrackCandidates collection name */
-    std::string m_gfTrackCandToMCParticleColName;               /**< TrackCandidates to MCParticles relation name */
-
-    int m_notEnoughtHitsCounter;                                /**< 0 if the track has enough hits to create a GFTrackCand*/
-
+    int m_notEnoughtHitsCounter;                                /**< will hold number of tracks that do not have enough hits to form a track candidate (less than 3)*/
+    int m_noTrueHitCounter;                                     /**< will hold number of cluster hits that do not have a corresponding true hit*/
 
   };
 }

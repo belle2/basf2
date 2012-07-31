@@ -66,6 +66,7 @@ geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
 # SVDDIGI.param('statisticsFilename', 'SVDDiags.root')
 SVDDIGI.param('PoissonSmearing', True)
 SVDDIGI.param('ElectronicEffects', True)
+SVDDIGI.param('statisticsFilename', 'SVDTestDiags.root')
 SVDDIGI.param('storeWaveforms', True)
 
 # ============================================================================

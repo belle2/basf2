@@ -53,7 +53,7 @@ REG_MODULE(SVDDigitizer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDDigitizerModule::SVDDigitizerModule() : Module(), m_rootFile(0), m_histDiffusion_u(0), m_histDiffusion_v(0)
+SVDDigitizerModule::SVDDigitizerModule() : Module(), m_rootFile(0), m_histDiffusion_u(0), m_histDiffusion_v(0), m_histLorentz_u(0), m_histLorentz_v(0), m_signalDist_u(0), m_signalDist_v(0)
 {
   //Set module properties
   setDescription("Create SVDDigits from SVDSimHits");
@@ -216,6 +216,9 @@ void SVDDigitizerModule::initialize()
       m_waveTree->Branch("strip", &tree_strip, "strip/I");
       m_waveTree->Branch("signal", tree_signal, "signal[20]/D");
     }
+  } else {
+    // No waveforms can be stored if there is no statistics file.
+    m_storeWaveforms = false;
   }
   // Check if the global random number generator is available.
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
@@ -317,7 +320,7 @@ void SVDDigitizerModule::event()
     processHit();
   }
   // If storage of waveforms is required, store them in the statistics file.
-  if (m_waveTree) {
+  if (m_storeWaveforms) {
     m_rootFile->cd();
     saveWaveforms();
   }

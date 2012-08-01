@@ -63,6 +63,35 @@ param_Gamma = {
 makeGamma.param(param_Gamma)
 simpleoutput.param('outputFileName', 'output1.root')
 
+cdcDigitizer = register_module('CDCDigi')
+param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
+cdcDigitizer.param(param_cdcdigi)
+
+ext = register_module('Ext')
+ext.param('GFTracksColName', 'GFTracks')
+ext.param('ExtTrackCandsColName', 'ExtTrackCands')
+ext.param('ExtRecoHitsColName', 'ExtRecoHits')
+
+genfit = register_module('GenFitter')
+mctrackfinder = register_module('MCTrackFinder')
+param_mctrackfinder = {
+    'UseCDCHits': 1,
+    'UseSVDHits': 1,
+    'UsePXDHits': 1,
+    'Smearing': 0,
+    }
+mctrackfinder.param(param_mctrackfinder)
+
+trackfitter = register_module('GenFitter')
+trackfitter.logging.log_level = LogLevel.WARNING
+trackfitter.param('NIterations', 3)
+
+trackfitchecker = register_module('TrackFitChecker')
+trackfitchecker.logging.log_level = LogLevel.INFO
+trackfitchecker.param('testSi', True)
+trackfitchecker.param('testCdc', False)
+trackfitchecker.param('writeToTextFile', True)
+
 # Create paths
 main = create_path()
 main.add_module(evtmetagen)

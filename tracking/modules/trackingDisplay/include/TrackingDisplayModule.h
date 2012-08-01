@@ -11,11 +11,12 @@ namespace Belle2 {
 
   /** Visualize GFTrack objects and PXD/SVD/CDCSimHits (plus geometry).
    *
-   * The module will collect GFTracks and SimHits for each event and display
-   * them after all events have been processed.
-   * Most of the work is done by Genfit's GenfitDisplay class.
+   * The module will show GFTracks and SimHits for each event, allowing the
+   * user to continue with next event by pressing the '->' button. When events
+   * are read using SimpleInput, loading previous events is also possible.
    *
-   * Please send patches to <cpulvermacher@ekp.uni-karlsruhe.de>
+   * Most of the work is done by Genfit's GenfitDisplay class.
+   * Please send suggestions and patches to <cpulvermacher@ekp.uni-karlsruhe.de>
    */
   class TrackingDisplayModule : public Module {
   public:
@@ -23,8 +24,7 @@ namespace Belle2 {
     ~TrackingDisplayModule(); //< dtor
 
     void initialize(); //< Sets up geometry if needed.
-    void event(); //< Load GFTracks into event viewer.
-    void terminate(); //< Actually show events.
+    void event(); //< Show GFTracks & hits in event viewer until next event is requested.
   private:
     /** List of drawing options, a combination of:
      *

@@ -28,7 +28,7 @@ TrackingDisplayModule::TrackingDisplayModule() : Module(), m_display(0)
   addParam("AddSVDHits", m_addSVDHits, "Add SVDSimHits to display? Use with 'R' option.", true);
   addParam("AddCDCHits", m_addCDCHits, "Add CDCSimHits to display? Use with 'R' option.", true);
 
-  //make sure dictionaries for PXD/SVD hits are loaded
+  //make sure dictionaries for PXD/SVDrecohits are loaded
   //needs to be done here to have dictionaries available during SimpleInput::initialize()
   gSystem->Load("libpxd");
   gSystem->Load("libsvd");
@@ -53,7 +53,6 @@ void TrackingDisplayModule::initialize()
     //initialize magnetic field for genfit
     GFFieldManager::getInstance()->init(new GFGeant4Field());
   }
-
 
   if (m_addPXDHits or m_addSVDHits)
     VXD::GeoCache::getInstance();
@@ -118,14 +117,12 @@ void TrackingDisplayModule::event()
     }
   }
 
+  //delete event part
+  m_display->reset();
+
   //add current event to display
   m_display->addEvent(gftracks_vec);
-  if (hitVector.size() != 0)
-    m_display->addHits(hitVector);
-}
+  m_display->setHits(hitVector);
 
-void TrackingDisplayModule::terminate()
-{
-  //done, show viewer
   m_display->open();
 }

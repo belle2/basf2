@@ -19,12 +19,15 @@
 #ifndef GenfitDisplay_H
 #define GenfitDisplay_H
 
+#include <GFTrack.h>
+
 #include <TQObject.h>
+#include <TGButton.h>
 #include <TVector3.h>
+
 #include <string>
 #include <vector>
 
-class GFTrack;
 class TEveBox;
 
 namespace Belle2 {
@@ -54,6 +57,15 @@ namespace Belle2 {
      */
     void addEvent(const std::vector<GFTrack*>& tr);
 
+    /** @brief Add a vector of space point hits.
+     *
+     * The format is (x, y, z)
+     * Use setHits at the same time like addEvent, because Hits and Events
+     * must have the same size.
+     *
+     *  */
+    void setHits(const std::vector< std::vector<double> >& hits);
+
     /** @brief Go to the next event or step a certain number of events ahead.*/
     void next(unsigned int stp = 1);
 
@@ -61,10 +73,7 @@ namespace Belle2 {
     void prev(unsigned int stp = 1);
 
     /** @brief Go to event with index id.*/
-    void gotoEvent(unsigned int id);
-
-    /** @brief Get the total number of events stored.*/
-    int getNEvents();
+    void goToEvent(unsigned int id);
 
     /** @brief Set the display options.
      *
@@ -86,7 +95,7 @@ namespace Belle2 {
      *      representation is connected to the covariance matrix of the hit, scaled by the value
      *      set in setErrScale which is normally 1. See also option 'A' and 'S'. Normally used in
      *      connection with 'D'.\n\n
-     * 'R': Draw Hits added via the function addHits. Then option 'H' shouldn't be used, otherwise
+     * 'R': Draw Hits added via the function setHits. Then option 'H' shouldn't be used, otherwise
      *      the hits belonging to a track will be plotted twice. This feature is in a beta stage.\n\n
      * 'G': Draw geometry. Also draw the geometry in the gGeoManager. This feature is experimental
      *      and may lead to strange things being drawn.\n\n
@@ -112,15 +121,6 @@ namespace Belle2 {
     /** @brief Open the event display.*/
     void open();
 
-    /** @brief Add a vector of space point hits.
-     *
-     * The format is (x, y, z)
-     * Use addHits at the same time like addEvent, because Hits and Events
-     * must have the same size.
-     *
-     *  */
-    void addHits(const std::vector< std::vector<double> >& hits);
-
     /** Change projection to r-phi. */
     void setRPhiProjection();
 
@@ -139,21 +139,22 @@ namespace Belle2 {
      **/
     void saveEPS();
 
+
   private:
     /** @brief Build the buttons for event navigation.*/
     void makeGui();
 
     /** @brief Draw an event.*/
-    void drawEvent(unsigned int id);
+    void drawEvent();
 
-    /** @brief Create a box around o, orientet along u and v with widths ud, vd and depeth and
+    /** @brief Create a box around o, orientet along u and v with widths ud, vd and depth and
      *  return a pointer to the box object.
      */
-    TEveBox* boxCreator(TVector3 o, TVector3 u, TVector3 v, float ud, float vd, float depth);
+    TEveBox* boxCreator(const TVector3& o, TVector3 u, TVector3 v, float ud, float vd, float depth);
 
 
     /** Current event id */
-    int fEventId;
+    long fEventId;
 
     /** Rescale errors with this factor to ensure visibility. */
     double fErrorScale;
@@ -164,11 +165,20 @@ namespace Belle2 {
      */
     std::string fOption;
 
-    /** List of GFTracks (for each event). */
-    std::vector< std::vector<GFTrack*>* > fEvents;
+    /** Was GUI already built? */
+    bool m_guiInitialized;
 
-    /** Hits that are not part of GFTracks (for each event). */
-    std::vector< std::vector< std::vector<double> > > fHits;
+    /** List of GFTracks for current event. */
+    std::vector<GFTrack*> m_tracks;
+
+    /** Hits that are not part of GFTracks, stored as x/y/z tuple of doubles. */
+    std::vector< std::vector<double> > fHits;
+
+    /** Button to switch to previous event. */
+    TGButton* m_prevButton;
+
+    /** Button to switch to next event. */
+    TGButton* m_nextButton;
 
     /** Dictionary needed for signal/slot mechanism. */
     ClassDef(GenfitDisplay, 1)

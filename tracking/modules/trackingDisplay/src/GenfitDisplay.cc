@@ -1,5 +1,6 @@
 #include <tracking/modules/trackingDisplay/GenfitDisplay.h>
 
+#include <framework/core/InputController.h>
 #include <framework/logging/Logger.h>
 #include <geometry/GeometryManager.h>
 
@@ -26,8 +27,6 @@
 #include <TEveStraightLineSet.h>
 #include <TEveViewer.h>
 #include <TGLViewer.h>
-#include <TDecompSVD.h>
-#include <TGButton.h>
 #include <TGeoEltu.h>
 #include <TGeoManager.h>
 #include <TGeoMatrix.h>
@@ -37,7 +36,6 @@
 #include <TMath.h>
 #include <TMatrixT.h>
 #include <TMatrixDEigen.h>
-#include <TROOT.h>
 #include <TSystem.h>
 #include <TVector2.h>
 #include <TVectorD.h>
@@ -51,7 +49,11 @@
 
 using namespace Belle2;
 
-GenfitDisplay::GenfitDisplay()
+GenfitDisplay::GenfitDisplay():
+  fEventId(0),
+  m_guiInitialized(false),
+  m_prevButton(0),
+  m_nextButton(0)
 {
   if ((!gApplication) || (gApplication && gApplication->TestBit(TApplication::kDefaultApplication))) {
     B2INFO("gApplication not found, creating...");
@@ -64,6 +66,7 @@ GenfitDisplay::GenfitDisplay()
   gGeoManager->DefaultColors();
 
   fEventId = 0;
+  m_guiInitialized = false;
   setOptions();
   setErrScale();
 }
@@ -78,57 +81,65 @@ GenfitDisplay::~GenfitDisplay() { reset(); }
 
 void GenfitDisplay::reset()
 {
-  for (unsigned int i = 0; i < fEvents.size(); i++) {
-    for (unsigned int j = 0; j < fEvents.at(i)->size(); j++) {
-      //delete GFTrack
-      delete fEvents.at(i)->at(j);
-    }
-    //delete vector<GFTrack* >
-    delete fEvents.at(i);
+  for (unsigned int j = 0; j < m_tracks.size(); j++) {
+    //delete GFTrack
+    delete m_tracks.at(j);
   }
 
-  fEvents.clear();
+  m_tracks.clear();
   fHits.clear();
 }
 
 void GenfitDisplay::addEvent(const std::vector<GFTrack*>& evts)
 {
-  std::vector<GFTrack*>* vec = new std::vector<GFTrack*>;
   for (unsigned int i = 0; i < evts.size(); i++) {
-    vec->push_back(new GFTrack(*(evts.at(i))));
+    m_tracks.push_back(new GFTrack(*(evts.at(i))));
   }
-
-  fEvents.push_back(vec);
 }
 
 void GenfitDisplay::next(unsigned int stp)
 {
-  gotoEvent(fEventId + stp);
+  goToEvent(fEventId + stp);
 }
 
 void GenfitDisplay::prev(unsigned int stp)
 {
+  if (!InputController::canControlInput())
+    return;
   if (fEventId < (int)stp) {
-    gotoEvent(0);
+    goToEvent(0);
   } else {
-    gotoEvent(fEventId - stp);
+    goToEvent(fEventId - stp);
   }
 }
 
-int GenfitDisplay::getNEvents() { return fEvents.size(); }
-
-void GenfitDisplay::gotoEvent(unsigned int id)
+void GenfitDisplay::goToEvent(unsigned int id)
 {
-  if (fEvents.size() == 0) return;
-  if (id >= fEvents.size()) id = fEvents.size() - 1;
+  const long numEntries = InputController::numEntries();
+
+  if (!InputController::canControlInput() && fEventId != id - 1) {
+    B2ERROR("Cannot switch to event " << id << ", only works in conjunction with SimpleInput.");
+  }
+
+  //change UI state?
+  m_prevButton->SetEnabled(id > 0);
+  m_nextButton->SetEnabled(id + 1 < numEntries);
+
   if (fEventId == id) return;
-
   fEventId = id;
-
-  B2INFO("Switching to event " << id);
 
   if (gEve->GetCurrentEvent())
     gEve->GetCurrentEvent()->DestroyElements();
+  if (numEntries > 0 && InputController::canControlInput()) {
+    B2DEBUG(100, "Switching to event " << fEventId);
+    InputController::setNextEntry(fEventId);
+  }
+
+  B2DEBUG(100, "exiting event loop now.");
+  //exit event loop to allow basf2 to go to next event
+  gSystem->ExitLoop();
+
+  /*
   double old_error_scale = fErrorScale;
   drawEvent(fEventId);
   if (old_error_scale != fErrorScale) {
@@ -137,10 +148,17 @@ void GenfitDisplay::gotoEvent(unsigned int id)
     drawEvent(fEventId); // if autoscaling changed the error, draw again.
   }
   fErrorScale = old_error_scale;
+  */
 };
 
 void GenfitDisplay::open()
 {
+  if (m_guiInitialized && !gEve) {
+    //window closed?
+    B2WARNING("no TEveManager found, skipping display");
+    return;
+  }
+
   bool drawSilent = false;
   bool drawGeometry = false;
 
@@ -151,7 +169,7 @@ void GenfitDisplay::open()
   }
 
   // draw the geometry, does not really work yet. If it's fixed, the docu in the header file should be changed.
-  if (drawGeometry) {
+  if (!m_guiInitialized && drawGeometry) {
     TGeoNode* top_node = gGeoManager->GetTopNode();
     assert(top_node != NULL);
 
@@ -167,20 +185,22 @@ void GenfitDisplay::open()
     gEve->AddGlobalElement(eve_top_node);
   }
 
-  if (getNEvents() > 0) {
-    double old_error_scale = fErrorScale;
-    drawEvent(0);
-    if (old_error_scale != fErrorScale) gotoEvent(0); // if autoscaling changed the error, draw again.
-    fErrorScale = old_error_scale;
-  }
+  double old_error_scale = fErrorScale;
+  drawEvent();
+  //if (old_error_scale != fErrorScale) goToEvent(0); // if autoscaling changed the error, draw again.
+  fErrorScale = old_error_scale;
 
   if (!drawSilent) {
-    makeGui();
+    if (!m_guiInitialized) {
+      makeGui();
+      goToEvent(fEventId); //update button state
+      m_guiInitialized = true;
+    }
     gApplication->Run(true); //return from Run()
   }
 }
 
-void GenfitDisplay::drawEvent(unsigned int id)
+void GenfitDisplay::drawEvent()
 {
   // parse the option string ------------------------------------------------------------------------
   bool drawAutoScale = false;
@@ -207,26 +227,26 @@ void GenfitDisplay::drawEvent(unsigned int id)
   // finished parsing the option string -------------------------------------------------------------
 
   // draw SPHits  // quick n dirty hack
-  if (drawRawHits && id < fHits.size() && !fHits[id].empty()) {
-    TEvePointSet* pointSet = new TEvePointSet("Raw hits", fHits[id].size());
-    B2INFO("showing raw hits in event " << id << ": found " << fHits[id].size() << ".");
+  if (drawRawHits && !fHits.empty()) {
+    TEvePointSet* pointSet = new TEvePointSet("Raw hits", fHits.size());
+    B2INFO("showing raw hits in event " << fEventId << ": found " << fHits.size() << ".");
     pointSet->IncDenyDestroy();
     pointSet->SetMainColor(kGray);
     pointSet->SetMainTransparency(70);
-    for (unsigned int j = 0; j < fHits[id].size(); ++j) {
+    for (unsigned int j = 0; j < fHits.size(); ++j) {
       pointSet->SetNextPoint(
-        fHits[id][j][0],
-        fHits[id][j][1],
-        fHits[id][j][2]);
+        fHits[j][0],
+        fHits[j][1],
+        fHits[j][2]);
     }
     gEve->AddElement(pointSet);
   }
 
 
-  for (unsigned int i = 0; i < fEvents.at(id)->size(); i++) { // loop over all tracks in an event
-    GFTrack* track = fEvents.at(id)->at(i);
+  for (unsigned int i = 0; i < m_tracks.size(); i++) { // loop over all tracks in an event
+    GFTrack* track = m_tracks.at(i);
 
-    int irep = 0;
+    const int irep = 0;
     GFAbsTrackRep* rep = track->getTrackRep(irep);
 
     unsigned int numhits = track->getNumHits();
@@ -242,8 +262,6 @@ void GenfitDisplay::drawEvent(unsigned int id)
       }
     }
 
-    TVector3 plane_pos;
-    TVector3 track_pos;
     TVector3 old_track_pos;
 
     TEveStraightLineSet* track_lines = NULL;
@@ -283,8 +301,8 @@ void GenfitDisplay::drawEvent(unsigned int id)
           } else continue;
         }
       }
-      track_pos = rep->getPos(plane);
-      plane_pos = plane.getO();
+      const TVector3& track_pos = rep->getPos(plane);
+      const TVector3& plane_pos = plane.getO();
       TMatrixT<double> hit_coords;
       TMatrixT<double> hit_cov;
       hit->getMeasurement(rep, plane, rep->getState(), rep->getCov(), hit_coords, hit_cov);
@@ -295,7 +313,7 @@ void GenfitDisplay::drawEvent(unsigned int id)
       TVector3 u = plane.getU();
       TVector3 v = plane.getV();
 
-      std::string hit_type = hit->getPolicyName();
+      const std::string& hit_type = hit->getPolicyName();
 
       bool planar_hit = false;
       bool planar_pixel_hit = false;
@@ -340,6 +358,7 @@ void GenfitDisplay::drawEvent(unsigned int id)
       if (drawTrack) {
         if (track_lines == NULL) {
           track_lines = new TEveStraightLineSet(TString::Format("GFTrack %d (pVal: %e)", i, TMath::Prob(track->getChiSqu(), track->getNDF())));
+          track_lines->IncDenyDestroy();
         }
         if (j > 0) track_lines->AddLine(old_track_pos(0), old_track_pos(1), old_track_pos(2), track_pos(0), track_pos(1), track_pos(2));
         old_track_pos = track_pos;
@@ -601,13 +620,10 @@ void GenfitDisplay::drawEvent(unsigned int id)
 }
 
 
-void GenfitDisplay::addHits(const std::vector<std::vector<double> > &hits)
-{
-  fHits.push_back(hits);
-}
+void GenfitDisplay::setHits(const std::vector<std::vector<double> > &hits) { fHits = hits; }
 
 
-TEveBox* GenfitDisplay::boxCreator(TVector3 o, TVector3 u, TVector3 v, float ud, float vd, float depth)
+TEveBox* GenfitDisplay::boxCreator(const TVector3& o, TVector3 u, TVector3 v, float ud, float vd, float depth)
 {
   TEveBox* box = new TEveBox;
   float vertices[24];
@@ -651,7 +667,7 @@ TEveBox* GenfitDisplay::boxCreator(TVector3 o, TVector3 u, TVector3 v, float ud,
 void GenfitDisplay::makeGui()
 {
   TEveBrowser* browser = gEve->GetBrowser();
-  //browser->RemoveTab(TRootBrowser::kBottom, 0);
+  browser->HideBottomTab();
 
   browser->StartEmbedding(TRootBrowser::kLeft);
 
@@ -661,17 +677,15 @@ void GenfitDisplay::makeGui()
 
   TGHorizontalFrame* hf = new TGHorizontalFrame(frmMain);
   {
-
     TString icondir(Form("%s/icons/", gSystem->Getenv("ROOTSYS")));
-    TGButton* b = 0;
 
-    b = new TGPictureButton(hf, gClient->GetPicture(icondir + "GoBack.gif"));
-    hf->AddFrame(b);
-    b->Connect("Clicked()", "Belle2::GenfitDisplay", this, "prev()");
+    m_prevButton = new TGPictureButton(hf, gClient->GetPicture(icondir + "GoBack.gif"));
+    hf->AddFrame(m_prevButton);
+    m_prevButton->Connect("Clicked()", "Belle2::GenfitDisplay", this, "prev()");
 
-    b = new TGPictureButton(hf, gClient->GetPicture(icondir + "GoForward.gif"));
-    hf->AddFrame(b);
-    b->Connect("Clicked()", "Belle2::GenfitDisplay", this, "next()");
+    m_nextButton = new TGPictureButton(hf, gClient->GetPicture(icondir + "GoForward.gif"));
+    hf->AddFrame(m_nextButton);
+    m_nextButton->Connect("Clicked()", "Belle2::GenfitDisplay", this, "next()");
   }
   frmMain->AddFrame(hf);
 

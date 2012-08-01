@@ -10,6 +10,7 @@
 
 #include <framework/modules/simpleinput/SimpleInputModule.h>
 
+#include <framework/core/InputController.h>
 #include <framework/core/Environment.h>
 
 #include <TSystem.h>
@@ -60,9 +61,9 @@ SimpleInputModule::SimpleInputModule() : Module()
   addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of branches to be read into run map. Empty means all branches.", branchNames);
   addParam(c_SteerBranchNames[2], m_branchNames[2], "Names of branches to be read into persistent map. Empty means all branches.", branchNames);
 
-  addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0], "Names of branches NOT to be written from event map. Branches also in branchNames are not written.", branchNames);
-  addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of branches NOT to be written from run map. Branches also in branchNamesRun are not written.", branchNames);
-  addParam(c_SteerExcludeBranchNames[2], m_excludeBranchNames[2], "Names of branches NOT to be written from persistent map. Branches also in branchNamesPersistent are not written.", branchNames);
+  addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0], "Names of branches NOT to be read into event map. Takes precedence over branchNames.", branchNames);
+  addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of branches NOT to be read into run map. Takes precedence over branchNamesRun.", branchNames);
+  addParam(c_SteerExcludeBranchNames[2], m_excludeBranchNames[2], "Names of branches NOT to be read into persistent map. Takes precedence over branchNamesPersistent.", branchNames);
 }
 
 
@@ -129,6 +130,11 @@ void SimpleInputModule::initialize()
       }
     }
   }
+  if (m_tree[DataStore::c_Event]) {
+    InputController::setCanControlInput(true);
+    InputController::setNumEntries(m_tree[DataStore::c_Event]->GetEntries());
+  }
+  m_firstEntryLoaded = true;
 }
 
 
@@ -144,14 +150,16 @@ void SimpleInputModule::event()
 {
   m_file->cd();
 
+  const long nextEntry = InputController::getNextEntry();
+  if (nextEntry >= 0 && nextEntry < InputController::numEntries()) {
+    B2INFO("SimpleInput: will read " << nextEntry << " next.");
+    m_counterNumber[DataStore::c_Event] = nextEntry;
+    InputController::setNextEntry(-1);
+  }
+  if (m_counterNumber[DataStore::c_Event])
+    m_firstEntryLoaded = false;
   readTree(DataStore::c_Event);
   m_counterNumber[DataStore::c_Event]++;
-}
-
-
-void SimpleInputModule::endRun()
-{
-  B2DEBUG(200, "endRun called");
 }
 
 
@@ -168,7 +176,7 @@ void SimpleInputModule::readTree(DataStore::EDurability durability)
 
   // Check if there are still new entries available.
   B2DEBUG(200, "Durability" << durability)
-  if (m_counterNumber[durability] == 0) return; //first entry is read in initialize()
+  if (m_counterNumber[durability] == 0 && m_firstEntryLoaded) return; //first entry is read in initialize()
   if (m_counterNumber[durability] >= m_tree[durability]->GetEntriesFast()) return;
 
 

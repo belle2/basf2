@@ -56,14 +56,8 @@ namespace Belle2 {
     /** Running over all events */
     virtual void event();
 
-    /** Is called after processing the last event of a run */
-    /** Nothing so far.
-    */
-    virtual void endRun();
-
     /** Is called at the end of your Module */
     virtual void terminate();
-
 
   protected:
 
@@ -107,9 +101,10 @@ namespace Belle2 {
      */
     std::vector<std::string> m_excludeBranchNames[DataStore::c_NDurabilityTypes];
 
-    /** Event Number. */
-    /** Steerable number of events to be skipped before start.
-    */
+    /** Next entry to be read in event/run/persistent tree.
+     *
+     * Can be set from steering file for event durability to skip some events.
+     */
     int m_counterNumber[DataStore::c_NDurabilityTypes];
 
 
@@ -117,6 +112,9 @@ namespace Belle2 {
 
     /** TFile for input. */
     TFile* m_file;
+
+    /** Wether the entry 0 was already loaded. Set to false when entry 1 is accessed. */
+    bool m_firstEntryLoaded;
 
     /**  TTree for input. */
     TTree* m_tree[DataStore::c_NDurabilityTypes];
@@ -129,7 +127,6 @@ namespace Belle2 {
 
     /** Steering parameter names for m_excludeBranchNames. */
     const static std::string c_SteerExcludeBranchNames[DataStore::c_NDurabilityTypes];
-
   };
   /*! @} */
 

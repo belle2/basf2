@@ -26,6 +26,7 @@
 #include <TEveProjectionManager.h>
 #include <TEveStraightLineSet.h>
 #include <TEveViewer.h>
+#include <TGFileDialog.h>
 #include <TGLViewer.h>
 #include <TGeoEltu.h>
 #include <TGeoManager.h>
@@ -196,7 +197,9 @@ void GenfitDisplay::open()
       goToEvent(fEventId); //update button state
       m_guiInitialized = true;
     }
+    //make display interactive
     gApplication->Run(true); //return from Run()
+    //interactive part done, event data removed from scene
   }
 }
 
@@ -226,10 +229,11 @@ void GenfitDisplay::drawEvent()
   }
   // finished parsing the option string -------------------------------------------------------------
 
+  gEve->SetStatusLine(TString::Format("Showing event %ld, with %d tracks and %lu raw hits.", fEventId, (int)m_tracks.size(), (drawHits ? fHits.size() : 0)).Data());
+
   // draw SPHits  // quick n dirty hack
   if (drawRawHits && !fHits.empty()) {
     TEvePointSet* pointSet = new TEvePointSet("Raw hits", fHits.size());
-    B2INFO("showing raw hits in event " << fEventId << ": found " << fHits.size() << ".");
     pointSet->IncDenyDestroy();
     pointSet->SetMainColor(kGray);
     pointSet->SetMainTransparency(70);
@@ -658,9 +662,7 @@ TEveBox* GenfitDisplay::boxCreator(const TVector3& o, TVector3 u, TVector3 v, fl
   vertices[22] = o(1) - u(1) + v(1) + norm(1);
   vertices[23] = o(2) - u(2) + v(2) + norm(2);
 
-
-  for (int k = 0; k < 24; k += 3) box->SetVertex((k / 3), vertices[k], vertices[k + 1], vertices[k + 2]);
-
+  box->SetVertices(vertices);
   return box;
 }
 
@@ -709,13 +711,14 @@ void GenfitDisplay::makeGui()
   hf = new TGHorizontalFrame(frmMain);
   {
     TGButton* b = 0;
-    b = new TGTextButton(hf, "Save PNG");
+    b = new TGTextButton(hf, "Save Picture");
     hf->AddFrame(b);
-    b->Connect("Clicked()", "Belle2::GenfitDisplay", this, "savePNG()");
+    b->Connect("Clicked()", "Belle2::GenfitDisplay", this, "savePicture()");
 
-    b = new TGTextButton(hf, "Save EPS (SLOW, no transp.)");
+    b = new TGTextButton(hf, "Save Hi-Res Picture");
     hf->AddFrame(b);
-    b->Connect("Clicked()", "Belle2::GenfitDisplay", this, "saveEPS()");
+    b->Connect("Clicked()", "Belle2::GenfitDisplay", this, "saveHiResPicture()");
+
   }
   frmMain->AddFrame(hf);
 
@@ -739,23 +742,23 @@ void GenfitDisplay::setDefaultProjection()
   v->SetCurrentCamera(TGLViewer::kCameraPerspXOZ);
 }
 
-void GenfitDisplay::savePNG()
+void GenfitDisplay::savePicture(bool highres)
 {
-  static int n = 0;
-
+  TGFileInfo fi;
+  //deleting the pointer crashes, so I'm assuming this is magically cleaned up at some point
+  new TGFileDialog(gEve->GetBrowser()->GetClient()->GetDefaultRoot(), gEve->GetBrowser(), kFDSave, &fi);
+  if (!fi.fFilename)
+    return; //cancelled
   TGLViewer* v = gEve->GetDefaultGLViewer();
-  v->SavePicture(TString::Format("display%d.png", n));
-  B2INFO("Saved to display" << n << ".png");
-  n++;
-}
+  if (!highres)
+    v->SavePicture(fi.fFilename);
+  else
+    v->SavePictureWidth(fi.fFilename, 4000);
 
-void GenfitDisplay::saveEPS()
-{
-  static int n = 0;
+  B2INFO("Saved picture in: " << fi.fFilename)
 
-  TGLViewer* v = gEve->GetDefaultGLViewer();
-  v->SavePicture(TString::Format("display%d.eps", n));
-  n++;
+  //file dialog leaves empty box, redraw
+  gEve->Redraw3D(false); //do not reset camera when redrawing
 }
 
 ClassImp(GenfitDisplay)

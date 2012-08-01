@@ -127,24 +127,20 @@ namespace Belle2 {
     /** Change projection to 3D (default). */
     void setDefaultProjection();
 
-    /** Save the current view to displayN.png, where N starts at 0 and is incremented for each new picture.
+    /** Save the current view to a user-defined filename
      *
-     * Note that this may owerwrite existing files!
+     * @param highres save picture with 4000px width instead of screen size
      **/
-    void savePNG();
+    void savePicture(bool highres = false);
 
-    /** Save the current view to displayN.eps, where N starts at 0 and is incremented for each new picture.
-     *
-     * Note that this may owerwrite existing files!
-     **/
-    void saveEPS();
+    void saveHiResPicture() { savePicture(true); }
 
 
   private:
     /** @brief Build the buttons for event navigation.*/
     void makeGui();
 
-    /** @brief Draw an event.*/
+    /** @brief Draw current event.*/
     void drawEvent();
 
     /** @brief Create a box around o, orientet along u and v with widths ud, vd and depth and

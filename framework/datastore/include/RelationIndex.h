@@ -39,7 +39,7 @@ namespace Belle2 {
     const CDCSimHit* hit = cdcsimhits[iCDC];
 
     //assuming 'hit' was only created by a single particle
-    const relElement_t* rel = mcparticlesToCdcsimhits.getFirstFrom(hit);
+    const relElement_t* rel = mcparticlesToCdcsimhits.getFirstElementTo(hit);
     if(!rel) {
       B2WARNING("no MCParticle found for CDCSimHit " << iCDC);
       continue;
@@ -53,14 +53,14 @@ namespace Belle2 {
    *  belonging to a particle, one can use:
    *  \code
   const MCParticle* particle = ...;
-  BOOST_FOREACH(const relElement_t & rel, mcparticlesToCdcsimhits.getFrom(particle)) {
+  BOOST_FOREACH(const relElement_t & rel, mcparticlesToCdcsimhits.getElementsFrom(particle)) {
     const CDCSimHit* hit = rel.to;
     //...
   }
       \endcode
    *
-   *  The documentation of the relation element type used by getFirstFrom()/
-   *  getFirstTo() or during the BOOST_FOREACH loop can be found in
+   *  The documentation of the relation element type used by getFirstElementTo()/
+   *  getFirstElementFrom() or during the BOOST_FOREACH loop can be found in
    *  RelationIndexContainer<FROM, TO>::Element.
    *
    *  Note that the BOOST_FOREACH macro must always be used with a typedef similar
@@ -84,10 +84,14 @@ namespace Belle2 {
     /** Typedef for easy access to the to side of the index. */
     typedef typename ElementIndex::template index<TO>::type   index_to;
 
-    /** Iterator of the from side. */
+    /** Element iterator of the from side index.
+     *
+     * @note Both iterator_from and iterator_to point to objects of type Element,
+     *       but reflect the structure of the underlying index.
+     * */
     typedef typename index_from::const_iterator iterator_from;
 
-    /** Iterator of the to side. */
+    /** Element iterator of the to side index. */
     typedef typename index_to::const_iterator iterator_to;
 
     /** Pair of iterators specifing the range [first,second) of the from side. */
@@ -138,7 +142,7 @@ namespace Belle2 {
      *  @returns pair of iterators specifing the range [first,second) of
      *           elements which point from this object.
      */
-    range_from getFrom(const FROM* from) const { return m_from.equal_range(from);  }
+    range_from getElementsFrom(const FROM* from) const { return m_from.equal_range(from); }
 
     /** Return a range of all elements pointing from the given object.
      *
@@ -149,7 +153,7 @@ namespace Belle2 {
      *  @returns Pair of iterators specifing the range [first,second) of
      *           elements which point from this object
      */
-    range_from getFrom(const FROM& from) const { return m_from.equal_range(&from); }
+    range_from getElementsFrom(const FROM& from) const { return m_from.equal_range(&from); }
 
     /** Return a range of all elements pointing to the given object.
      *
@@ -160,7 +164,7 @@ namespace Belle2 {
      *  @returns Pair of iterators specifing the range [first,second) of
      *           elements which point to this object
      */
-    range_to   getTo(const TO* to)       const { return m_to.equal_range(to);      }
+    range_to getElementsTo(const TO* to) const { return m_to.equal_range(to); }
 
     /** Return a range of all elements pointing to the given object.
      *
@@ -171,7 +175,7 @@ namespace Belle2 {
      *  @returns Pair of iterators specifing the range [first,second) of
      *           elements which point to this object
      */
-    range_to   getTo(const TO& to)       const { return m_to.equal_range(&to);     }
+    range_to getElementsTo(const TO& to) const { return m_to.equal_range(&to); }
 
     /** Return a pointer to the first relation Element of the given object.
      *
@@ -180,7 +184,7 @@ namespace Belle2 {
      *  @returns Pointer to the RelationIndex<FROM,TO>::Element, can be
      *           NULL if no relation exists
      */
-    const Element* getFirstTo(const FROM& from) const { return getFirstTo(&from); }
+    const Element* getFirstElementFrom(const FROM& from) const { return getFirstElementFrom(&from); }
 
     /** Return a pointer to the first relation Element of the given object.
      *
@@ -189,7 +193,7 @@ namespace Belle2 {
      *  @returns Pointer to the RelationIndex<FROM,TO>::Element, can be
      *           NULL if no relation exists
      */
-    const Element* getFirstTo(const FROM* from) const {
+    const Element* getFirstElementFrom(const FROM* from) const {
       iterator_from it = m_from.find(from);
       if (it == m_from.end()) return 0;
       return &(*it);
@@ -202,7 +206,7 @@ namespace Belle2 {
      *  @returns Pointer to the RelationIndex<FROM,TO>::Element, can be
      *           NULL if no relation exists
      */
-    const Element* getFirstFrom(const TO& to)   const { return getFirstFrom(&to);   }
+    const Element* getFirstElementTo(const TO& to) const { return getFirstElementTo(&to); }
 
     /** Return a pointer to the first relation Element of the given object.
      *
@@ -211,7 +215,7 @@ namespace Belle2 {
      *  @returns Pointer to the RelationIndex<FROM,TO>::Element, can be
      *           NULL if no relation exists
      */
-    const Element* getFirstFrom(const TO* to)   const {
+    const Element* getFirstElementTo(const TO* to) const {
       iterator_to it = m_to.find(to);
       if (it == m_to.end()) return 0;
       return &(*it);
@@ -229,6 +233,16 @@ namespace Belle2 {
     /** Get the size of the index. */
     size_t size() const { return m_index.index().size(); }
 
+    //@{
+    /** Old functions to retrieve elements from index.
+     *
+     * @deprecated use getElementsFrom(), getFirstElementFrom(), ... instead
+     */
+    range_from getFrom(const FROM* from) const { return m_from.equal_range(from);  }
+    range_to   getTo(const TO* to)       const { return m_to.equal_range(to);      }
+    const Element* getFirstTo(const FROM* from) const { return getFirstElementFrom(from); }
+    const Element* getFirstFrom(const TO* to)   const { return getFirstElementTo(to); }
+    //@}
   protected:
     /** Reference to the IndexContainer. */
     const RelationIndexContainer<FROM, TO> &m_index;
@@ -237,9 +251,8 @@ namespace Belle2 {
     const index_from& m_from;
 
     /** Reference to the to index. */
-    const index_to&   m_to;
+    const index_to& m_to;
   };
 
 } // end namespace Belle2
-
 #endif

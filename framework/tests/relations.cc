@@ -125,26 +125,26 @@ namespace Belle2 {
     const EventMetaData* first_from_obj = evtData[0];
     const EventMetaData* from_obj = evtData[1];
     const RunMetaData* to_obj = runData[0];
-    EXPECT_TRUE(first_from_obj == relIndex.getFirstFrom(to_obj)->from);
-    EXPECT_TRUE(to_obj == relIndex.getFirstFrom(to_obj)->to);
-    EXPECT_TRUE(1.0 == relIndex.getFirstFrom(to_obj)->weight);
-    EXPECT_TRUE(first_from_obj == relIndex.getFirstFrom(*to_obj)->from);
-    EXPECT_TRUE(to_obj == relIndex.getFirstTo(from_obj)->to);
-    EXPECT_TRUE(to_obj == relIndex.getFirstTo(*from_obj)->to);
-    EXPECT_TRUE(to_obj == relIndex.getFirstTo(first_from_obj)->to);
+    EXPECT_TRUE(first_from_obj == relIndex.getFirstElementTo(to_obj)->from);
+    EXPECT_TRUE(to_obj == relIndex.getFirstElementTo(to_obj)->to);
+    EXPECT_TRUE(1.0 == relIndex.getFirstElementTo(to_obj)->weight);
+    EXPECT_TRUE(first_from_obj == relIndex.getFirstElementTo(*to_obj)->from);
+    EXPECT_TRUE(to_obj == relIndex.getFirstElementFrom(from_obj)->to);
+    EXPECT_TRUE(to_obj == relIndex.getFirstElementFrom(*from_obj)->to);
+    EXPECT_TRUE(to_obj == relIndex.getFirstElementFrom(first_from_obj)->to);
 
     //check search for non-existing relations
-    EXPECT_TRUE(relIndex.getFirstFrom(0) == NULL);
-    EXPECT_TRUE(relIndex.getFirstTo(0) == NULL);
-    EXPECT_TRUE(relIndex.getFirstTo(0) == NULL);
-    EXPECT_TRUE(relIndex.getFirstTo(evtData[4]) == NULL);
-    EXPECT_TRUE(relIndex.getFirstFrom(runData[3]) == NULL);
+    EXPECT_TRUE(relIndex.getFirstElementTo(0) == NULL);
+    EXPECT_TRUE(relIndex.getFirstElementFrom(0) == NULL);
+    EXPECT_TRUE(relIndex.getFirstElementFrom(0) == NULL);
+    EXPECT_TRUE(relIndex.getFirstElementFrom(evtData[4]) == NULL);
+    EXPECT_TRUE(relIndex.getFirstElementTo(runData[3]) == NULL);
 
     //check size of found element lists
     {
       int size(0);
       double allweights(0);
-      BOOST_FOREACH(el_t & e, relIndex.getFrom(evtData[0])) {
+      BOOST_FOREACH(el_t & e, relIndex.getElementsFrom(evtData[0])) {
         ++size;
         allweights += e.weight;
       }
@@ -154,7 +154,7 @@ namespace Belle2 {
     {
       int size(0);
       double allweights(0);
-      BOOST_FOREACH(el_t & e, relIndex.getTo(runData[0])) {
+      BOOST_FOREACH(el_t & e, relIndex.getElementsTo(runData[0])) {
         ++size;
         allweights += e.weight;
       }
@@ -164,7 +164,7 @@ namespace Belle2 {
     {
       int size(0);
       double allweights(0);
-      BOOST_FOREACH(el_t & e, relIndex.getTo(runData[4])) {
+      BOOST_FOREACH(el_t & e, relIndex.getElementsTo(runData[4])) {
         ++size;
         allweights += e.weight;
       }

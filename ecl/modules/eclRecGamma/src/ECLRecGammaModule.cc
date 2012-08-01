@@ -9,9 +9,9 @@
  **************************************************************************/
 
 #include <ecl/modules/eclRecGamma/ECLRecGammaModule.h>
-#include <ecl/dataobjects/MdstShower.h>
+#include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/HitAssignmentECL.h>
-#include <ecl/dataobjects/MdstGamma.h>
+#include <ecl/dataobjects/ECLGamma.h>
 
 
 #include <GFTrack.h>
@@ -43,7 +43,7 @@ ECLRecGammaModule::ECLRecGammaModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //input
-  addParam("MdstShowerinput", m_eclMdstShowerName,
+  addParam("ECLShowerinput", m_ECLShowerName,
            "//input of this module//shower infromation", string("ECLShower"));
 
   addParam("ECLHitAssignmentinput", m_eclHitAssignmentName,
@@ -54,7 +54,7 @@ ECLRecGammaModule::ECLRecGammaModule() : Module()
   addParam("ExtRecoHitsColName", m_extRecoHitsColName, "Name of collection holding the RecoHits from the extrapolation", string("ExtRecoHits"));
 
   //output
-  addParam("MdstGammaOutput", m_MdstGammaName,
+  addParam("ECLGammaOutput", m_ECLGammaName,
            "//output of this module//(showerId,px,py,pz)", string("ECLGamma"));
 
 
@@ -92,11 +92,11 @@ void ECLRecGammaModule::beginRun()
 void ECLRecGammaModule::event()
 {
   //Input Array
-  StoreArray<MdstShower> eclRecShowerArray(m_eclMdstShowerName);
+  StoreArray<ECLShower> eclRecShowerArray(m_ECLShowerName);
   StoreArray<HitAssignmentECL> eclHitAssignmentArray(m_eclHitAssignmentName);
 
   if (!eclRecShowerArray) {
-    B2ERROR("Can not find ECLRecCRHits" << m_eclMdstShowerName << ".");
+    B2ERROR("Can not find ECLRecCRHits" << m_ECLShowerName << ".");
   }
   if (!eclHitAssignmentArray) {
     B2ERROR("Can not find eclHitAssignment" << m_eclHitAssignmentName << ".");
@@ -108,7 +108,7 @@ void ECLRecGammaModule::event()
   readExtrapolate();//m_TrackCellId[i] =1 => Extrapolated cell
 
   for (int iShower = 0; iShower < hitNum; iShower++) {
-    MdstShower* aECLShower = eclRecShowerArray[iShower];
+    ECLShower* aECLShower = eclRecShowerArray[iShower];
     m_showerId = aECLShower->GetShowerId();
     m_energy = aECLShower->GetEnergy();
     m_theta = aECLShower->GetTheta();
@@ -140,9 +140,9 @@ void ECLRecGammaModule::event()
 
     if (!m_extMatch) { //no match to track => assign as gamma
 
-      StoreArray<MdstGamma> gammaArray(m_MdstGammaName);
+      StoreArray<ECLGamma> gammaArray(m_ECLGammaName);
       m_GNum = gammaArray->GetLast() + 1;
-      new(gammaArray->AddrAt(m_GNum)) MdstGamma();
+      new(gammaArray->AddrAt(m_GNum)) ECLGamma();
       gammaArray[m_GNum]->setShower(aECLShower);
 
 

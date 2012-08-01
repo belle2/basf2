@@ -88,8 +88,8 @@ namespace Belle2 {
     private:
       /** members of ECLRecShower Module
        */
-      /** Name of collection of MdstShower */
-      std::string m_eclMdstShowerName;
+      /** Name of collection of ECLShower */
+      std::string m_ECLShowerName;
       /** Name of collection of ECLDigi.*/
       std::string m_eclDigiCollectionName;
       /** Name of collection of ECLHitAssignment.*/

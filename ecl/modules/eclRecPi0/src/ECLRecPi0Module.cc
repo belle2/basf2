@@ -9,8 +9,8 @@
  **************************************************************************/
 
 #include <ecl/modules/eclRecPi0/ECLRecPi0Module.h>
-#include <ecl/dataobjects/MdstPi0.h>
-#include <ecl/dataobjects/MdstGamma.h>
+#include <ecl/dataobjects/ECLPi0.h>
+#include <ecl/dataobjects/ECLGamma.h>
 
 //#include <ecl/geometry/ECLGeometryPar.h>
 //#include <ecl/rec_lib/TEclCFCR.h>
@@ -52,14 +52,14 @@ REG_MODULE(ECLRecPi0)
 ECLRecPi0Module::ECLRecPi0Module() : Module()
 {
   //Set module properties
-  setDescription("Creates Mdst_pi0 from Mdst_gamma.");
+  setDescription("Creates ECL_pi0 from ECL_gamma.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //input
-  addParam("MdstGammaInput", m_MdstGammaName,
+  addParam("ECLGammaInput", m_ECLGammaName,
            "//Input of this RecPi0  module", string("ECLGamma"));
 
-  addParam("MdstPi0Output", m_MdstPi0Name,
+  addParam("ECLPi0Output", m_ECLPi0Name,
            "//output of this RecPi0 module", string("ECLPi0"));
 
 //  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
@@ -99,16 +99,16 @@ void ECLRecPi0Module::beginRun()
 void ECLRecPi0Module::event()
 {
 
-  StoreArray<MdstGamma> Gamma(m_MdstGammaName);
+  StoreArray<ECLGamma> Gamma(m_ECLGammaName);
 
   if (!Gamma) {
-    B2ERROR("Can not find ECLRecCRHits" << m_MdstGammaName << ".");
+    B2ERROR("Can not find ECLRecCRHits" << m_ECLGammaName << ".");
   }
   const int GNum = Gamma->GetEntriesFast();
 
 
   for (int iGamma = 0; iGamma < GNum - 1 ; iGamma++) {
-    MdstGamma* aGamma = Gamma[iGamma];
+    ECLGamma* aGamma = Gamma[iGamma];
     m_showerId1 = aGamma->getShowerId();
     m_px1 = aGamma->getpx();
     m_py1 = aGamma->getpy();
@@ -122,7 +122,7 @@ void ECLRecPi0Module::event()
     if (EGamma1 < gamma_energy_threshold)continue;
 
     for (int jGamma = iGamma + 1; jGamma < GNum; jGamma++) {
-      MdstGamma* aGamma2 = Gamma[jGamma];
+      ECLGamma* aGamma2 = Gamma[jGamma];
       m_showerId2 = aGamma2->getShowerId();
       m_px2 = aGamma2->getpx();
       m_py2 = aGamma2->getpy();
@@ -143,9 +143,9 @@ void ECLRecPi0Module::event()
         fit(lv_gamma1, lv_gamma2);
         if (pi0_mass_min < mass && mass < pi0_mass_max) {
 
-          StoreArray<MdstPi0> Pi0Array(m_MdstPi0Name);
+          StoreArray<ECLPi0> Pi0Array(m_ECLPi0Name);
           m_Pi0Num = Pi0Array->GetLast() + 1;
-          new(Pi0Array->AddrAt(m_Pi0Num)) MdstPi0();
+          new(Pi0Array->AddrAt(m_Pi0Num)) ECLPi0();
           Pi0Array[m_Pi0Num]->setShower1(aGamma->getShower());
           Pi0Array[m_Pi0Num]->setShower2(aGamma2->getShower());
 

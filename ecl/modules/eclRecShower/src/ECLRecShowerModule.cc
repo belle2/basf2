@@ -10,7 +10,7 @@
 
 #include <ecl/modules/eclRecShower/ECLRecShowerModule.h>
 #include <ecl/dataobjects/DigiECL.h>
-#include <ecl/dataobjects/MdstShower.h>
+#include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/HitAssignmentECL.h>
 
 
@@ -58,7 +58,7 @@ ECLRecShowerModule::ECLRecShowerModule() : Module()
            "Input Array // Output from ECLRecShower module or Data", string("ECLDigiHits"));
 
   //output
-  addParam("ECLRecShowerOutput", m_eclMdstShowerName,
+  addParam("ECLRecShowerOutput", m_ECLShowerName,
            "//Output of this module", string("ECLShower"));
 
 
@@ -147,9 +147,9 @@ void ECLRecShowerModule::event()
       }
 //        cout<<endl;
 
-      StoreArray<MdstShower> eclRecShowerArray(m_eclMdstShowerName);
+      StoreArray<ECLShower> eclRecShowerArray(m_ECLShowerName);
       m_hitNum = eclRecShowerArray->GetLast() + 1;
-      new(eclRecShowerArray->AddrAt(m_hitNum)) MdstShower();
+      new(eclRecShowerArray->AddrAt(m_hitNum)) ECLShower();
       eclRecShowerArray[m_hitNum]->setShowerId(nShower);
       eclRecShowerArray[m_hitNum]->setEnergy((float)(*iShower).second.Energy());
       eclRecShowerArray[m_hitNum]->setTheta((float)(*iShower).second.Theta());
@@ -174,9 +174,9 @@ void ECLRecShowerModule::event()
       eclRecShowerArray[m_hitNum]->setError(ErrorMatrix);
 
       nShower++;
-      if (((*iShower).second.Energy() > 0.05 && (*iShower).second.Energy() < 0.2)) {
-        checkflag = 1;
-      }
+//      if (((*iShower).second.Energy() > 0.05 && (*iShower).second.Energy() < 0.2)) {
+//        checkflag = 1;
+//      }
 
 
 

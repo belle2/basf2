@@ -15,4 +15,8 @@
 #pragma link C++ class Belle2::MdstGamma;
 #pragma link C++ class Belle2::MdstPi0;
 #pragma link C++ class Belle2::MdstShower;
+#pragma link C++ class Belle2::ECLGamma;
+#pragma link C++ class Belle2::ECLPi0;
+#pragma link C++ class Belle2::ECLShower;
+
 #endif

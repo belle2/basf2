@@ -111,19 +111,19 @@ namespace Belle2 {
 
     private:
 
-      /**  Name of collection of MdstGamma.*/
-      std::string m_MdstGammaName ;
-      /**  Name of collection of MdstPi0.*/
-      std::string m_MdstPi0Name ;
+      /**  Name of collection of ECLGamma.*/
+      std::string m_ECLGammaName ;
+      /**  Name of collection of ECLPi0.*/
+      std::string m_ECLPi0Name ;
       /** CPU time     */
       double m_timeCPU;
       /** Run number   */
       int    m_nRun;
       /** Event number */
       int    m_nEvent;
-      /** Mdst Gamma index */
+      /** ECL Gamma index */
       int    m_GNum;
-      /** Mdst Gamma index */
+      /** ECL Gamma index */
       int    m_Pi0Num;
       /** gamma1 information    */
       int    m_showerId1 ;

@@ -28,9 +28,9 @@ namespace Belle2 {
       GFTrackCand = graph.external_data('GFTrackCand')
       ECLRecGamma = graph.external_data('ECLRecGamma')
       ECLHitAssignment = graph.data('ECLHitAssignment')
-      MdstShower = graph.data('MdstShower')
-      MdstGamma = graph.data('MdstGamma')
-      graph.module('ECLRecGamma', [GFTrackCand, MdstShower], [MdstGamma])
+      ECLShower = graph.data('ECLShower')
+      ECLGamma = graph.data('ECLGamma')
+      graph.module('ECLRecGamma', [GFTrackCand, ECLShower], [ECLGamma])
 
       \endcorrelationdiagram
 
@@ -79,11 +79,11 @@ namespace Belle2 {
       /** members of ECLRecGamma Module
        */
       /** Name of input collection of this module */
-      std::string m_eclMdstShowerName;
+      std::string m_ECLShowerName;
       /**  Name of collection of ECLHitAssignment.*/
       std::string m_eclHitAssignmentName;
-      /**  Name of collection of MdstGamma.*/
-      std::string m_MdstGammaName ;
+      /**  Name of collection of ECLGamma.*/
+      std::string m_ECLGammaName ;
       /** Name of the GFTrack collection of the reconstructed tracks to be extrapolated */
       std::string m_gfTracksColName;
 
@@ -99,7 +99,7 @@ namespace Belle2 {
       int    m_nRun;
       /** Event number */
       int    m_nEvent;
-      /** Mdst Gamma index */
+      /** ECL Gamma index */
       int    m_GNum;
       /** extrapolated cell */
       bool   m_TrackCellId[8736];

@@ -188,7 +188,7 @@ namespace Belle2 {
      *
      *  @param params     AccessorParams for the (existing) Relation
      */
-    RelationArray(const AccessorParams& params):
+    explicit RelationArray(const AccessorParams& params):
       StoreObjPtr<RelationContainer>(0) {
       if (params.first == "") {
         B2FATAL("Cannot guess relation name, please supply correct name");

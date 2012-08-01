@@ -31,8 +31,10 @@ namespace Belle2 {
    *  from/to the given objects, this is especially simple:
    *  \code
   RelationIndex<MCParticle, CDCSimHit> mcparticlesToCdcsimhits;
-  typedef RelationIndex<MCParticle, CDCSimHit>::Element relElement_t;
+  if(!mcparticlesToCdcsimhits)
+    B2FATAL("No MCParticle -> CDCSimHit relation found!");
 
+  typedef RelationIndex<MCParticle, CDCSimHit>::Element relElement_t;
   for(int iCDC = 0; iCDC < cdcsimhits.getEntries(); iCDC++) {
     const CDCSimHit* hit = cdcsimhits[iCDC];
 

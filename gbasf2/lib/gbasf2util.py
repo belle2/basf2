@@ -68,7 +68,7 @@ class CLIParams:
 
     def setJobPriority(self, arg):
     # FIXME: check query is within range
-        self.priorty = arg
+        self.priority = arg
         return DIRAC.S_OK()
 
     def setQuery(self, arg):

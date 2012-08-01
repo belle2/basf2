@@ -37,17 +37,17 @@ namespace Belle2 {
       \endcorrelationdiagram
 
      */
-    class ECLRecCRModule : public Module {
+    class ECLRecShowerModule : public Module {
 
     public:
 
       /** Constructor.
        */
-      ECLRecCRModule();
+      ECLRecShowerModule();
 
       /** Destructor.
        */
-      ~ECLRecCRModule();
+      ~ECLRecShowerModule();
 
 
       /** Initialize variables, print info, and start CPU clock. */
@@ -72,13 +72,13 @@ namespace Belle2 {
       double squ(double x) { return x * x; }
 
       /**calculate error of Energy with Energy  */
-      double errorE(double E);
+      float errorE(double E);
 
       /**calculate error of Theta with Energy and Theta  */
-      double errorTheta(double Energy, double Theta);
+      float errorTheta(double Energy, double Theta);
 
       /**calculate error of Phi with Energy and Theta  */
-      double errorPhi(double Energy, double Theta);
+      float errorPhi(double Energy, double Theta);
 
 
     protected:
@@ -86,7 +86,7 @@ namespace Belle2 {
 
 
     private:
-      /** members of ECLRecCR Module
+      /** members of ECLRecShower Module
        */
       /** Name of collection of MdstShower */
       std::string m_eclMdstShowerName;
@@ -100,7 +100,7 @@ namespace Belle2 {
       int    m_nRun;
       /** Event number */
       int    m_nEvent;
-      /** ECLRecCR index */
+      /** ECLRecShower index */
       int    m_hitNum;
       /**  ECLHitAssignment. index */
       int    m_HANum;

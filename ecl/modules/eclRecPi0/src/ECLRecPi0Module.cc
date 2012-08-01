@@ -55,15 +55,12 @@ ECLRecPi0Module::ECLRecPi0Module() : Module()
   setDescription("Creates Mdst_pi0 from Mdst_gamma.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
-  //Set module properties
-  setDescription("Creates Mdst_gamma from ECLHits.");
-
   //input
   addParam("MdstGammaInput", m_MdstGammaName,
-           "//Input of this RecPi0  module", string("mdstGamma"));
+           "//Input of this RecPi0  module", string("ECLGamma"));
 
   addParam("MdstPi0Output", m_MdstPi0Name,
-           "//output of this RecPi0 module", string("mdstPi0"));
+           "//output of this RecPi0 module", string("ECLPi0"));
 
 //  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
 

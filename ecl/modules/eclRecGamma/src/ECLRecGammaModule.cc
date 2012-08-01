@@ -39,12 +39,12 @@ REG_MODULE(ECLRecGamma)
 ECLRecGammaModule::ECLRecGammaModule() : Module()
 {
   //Set module properties
-  setDescription("Creates Mdst_gamma from ECLHits.");
+  setDescription("Creates ECLGamma from ECLShower.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //input
   addParam("MdstShowerinput", m_eclMdstShowerName,
-           "//input of this module//shower infromation", string("mdstShower"));
+           "//input of this module//shower infromation", string("ECLShower"));
 
   addParam("ECLHitAssignmentinput", m_eclHitAssignmentName,
            "//input of this module//(showerID,Hits)", string("ECLHitAssignment"));
@@ -55,7 +55,7 @@ ECLRecGammaModule::ECLRecGammaModule() : Module()
 
   //output
   addParam("MdstGammaOutput", m_MdstGammaName,
-           "//output of this module//(showerId,px,py,pz)", string("mdstGamma"));
+           "//output of this module//(showerId,px,py,pz)", string("ECLGamma"));
 
 
   addParam("gammaEnergyCut", m_ecut, "gamma enegy threshold ", 0.02);
@@ -140,30 +140,28 @@ void ECLRecGammaModule::event()
 
     if (!m_extMatch) { //no match to track => assign as gamma
 
-//      double px = m_energy * sin(m_theta) * cos(m_phi);
-//      double py = m_energy * sin(m_theta) * sin(m_phi)
-//      double pz = m_energy * cos(m_theta);
-
-
       StoreArray<MdstGamma> gammaArray(m_MdstGammaName);
       m_GNum = gammaArray->GetLast() + 1;
       new(gammaArray->AddrAt(m_GNum)) MdstGamma();
       gammaArray[m_GNum]->setShower(aECLShower);
 
-//       cout<<"GAMMA "<<px<<" "<<py<<" "<<pz<<" "<<sqrt(px*px+py*py+pz*pz)<<endl;
+
       /*
+            double px = m_energy * sin(m_theta) * cos(m_phi);
+            double py = m_energy * sin(m_theta) * sin(m_phi);
+            double pz = m_energy * cos(m_theta);
 
-            cout<<"Event  "<<m_nEvent<<" Gamma "<<m_showerId<<" "<<sqrt(px*px+py*py+pz*pz)<<" m_extMatch  "<<m_extMatch<<endl;
-            cout<<"CellID ";
+                  cout<<"Event  "<<m_nEvent<<" Gamma "<<m_showerId<<" "<<sqrt(px*px+py*py+pz*pz)<<" m_extMatch  "<<m_extMatch<<endl;
+                  cout<<"CellID ";
 
-          for (int iHA = 0; iHA < hANum; iHA++) {
+                for (int iHA = 0; iHA < hANum; iHA++) {
 
-            HitAssignmentECL* aECLShower = eclHitAssignmentArray[iHA];
-            int m_HAShowerId = aECLShower->getShowerId();
-            int m_HAcellId = aECLShower->getCellId();
-            if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
-          }//for HA hANum
-           cout<<endl;
+                  HitAssignmentECL* aECLShower = eclHitAssignmentArray[iHA];
+                  int m_HAShowerId = aECLShower->getShowerId();
+                  int m_HAcellId = aECLShower->getCellId();
+                  if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
+                }//for HA hANum
+                 cout<<endl;
       */
     }//if !m_extMatch
 
@@ -220,9 +218,10 @@ void ECLRecGammaModule::readExtrapolate()
       unsigned int planeID;
       cand->getHitWithPlane(j, detID, hitID, planeID);
       if ((detID != myDetID) || (planeID == 0)) continue;
-//      cout<<"match Cell Id "<<planeID<<endl;
+//      cout<<"Ect CellId "<<planeID<<" ";
       m_TrackCellId[planeID] = 1;
     }//cand->getNHits()
+//      cout<<endl;
 //}//hypothesis
   }//gfTracks.getEntries()
 }

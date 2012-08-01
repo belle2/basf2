@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <ecl/modules/eclRecCR/ECLRecCRModule.h>
+#include <ecl/modules/eclRecShower/ECLRecShowerModule.h>
 #include <ecl/dataobjects/DigiECL.h>
 #include <ecl/dataobjects/MdstShower.h>
 #include <ecl/dataobjects/HitAssignmentECL.h>
@@ -41,25 +41,25 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLRecCR)
+REG_MODULE(ECLRecShower)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLRecCRModule::ECLRecCRModule() : Module()
+ECLRecShowerModule::ECLRecShowerModule() : Module()
 {
   //Set module properties
-  setDescription("Creates ECLRecCRHits from ECLDigi.");
+  setDescription("Creates ECLRecShower from ECLDigi.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //Parameter definition
   addParam("ECLRecInput", m_eclDigiCollectionName,
-           "Input Array // Output from ECLRecCR module or Data", string("ECLDigiHits"));
+           "Input Array // Output from ECLRecShower module or Data", string("ECLDigiHits"));
 
   //output
-  addParam("ECLRecCROutput", m_eclMdstShowerName,
-           "//Output of this module", string("mdstShower"));
+  addParam("ECLRecShowerOutput", m_eclMdstShowerName,
+           "//Output of this module", string("ECLShower"));
 
 
   addParam("ECLHitAssignmentinput", m_eclHitAssignmentName,
@@ -71,12 +71,12 @@ ECLRecCRModule::ECLRecCRModule() : Module()
 }
 
 
-ECLRecCRModule::~ECLRecCRModule()
+ECLRecShowerModule::~ECLRecShowerModule()
 {
 
 }
 
-void ECLRecCRModule::initialize()
+void ECLRecShowerModule::initialize()
 {
   // Initialize variables
   m_nRun    = 0 ;
@@ -86,18 +86,18 @@ void ECLRecCRModule::initialize()
   m_timeCPU = clock() * Unit::us;
 }
 
-void ECLRecCRModule::beginRun()
+void ECLRecShowerModule::beginRun()
 {
-  B2INFO("ECLRecCRModule: Processing run: " << m_nRun);
+  B2INFO("ECLRecShowerModule: Processing run: " << m_nRun);
 }
 
 
-void ECLRecCRModule::event()
+void ECLRecShowerModule::event()
 {
   //Input Array
   StoreArray<DigiECL> eclDigiArray(m_eclDigiCollectionName);
   if (!eclDigiArray) {
-    B2ERROR("Can not find ECLRecCRHits" << m_eclDigiCollectionName << ".");
+    B2ERROR("Can not find ECLRecShowerHits" << m_eclDigiCollectionName << ".");
   }
 
   int checkflag = 0;
@@ -213,25 +213,25 @@ void ECLRecCRModule::event()
 
 }
 
-void ECLRecCRModule::endRun()
+void ECLRecShowerModule::endRun()
 {
   m_nRun++;
 }
 
-void ECLRecCRModule::terminate()
+void ECLRecShowerModule::terminate()
 {
   m_timeCPU = clock() * Unit::us - m_timeCPU;
 
 }
 
-double ECLRecCRModule::errorE(double E)
+float ECLRecShowerModule::errorE(double E)
 {
   double sigmaE = 0.01 * E * sqrt(squ(0.066 / E) + squ(0.81) / sqrt(E) + squ(1.34)) ;
 //sigmaE / E = 0.066% / E +- 0.81% / (E)^(1/4)  +- 1.34%
-  return sigmaE;
+  return (float)sigmaE;
 
 }
-double ECLRecCRModule::errorTheta(double Energy, double Theta)
+float ECLRecShowerModule::errorTheta(double Energy, double Theta)
 {
 
   double sigmaX = 0.1 * (0.27 + 3.4 / sqrt(Energy) + 1.8 / sqrt(sqrt(Energy))) ;
@@ -245,17 +245,17 @@ double ECLRecCRModule::errorTheta(double Energy, double Theta)
   double theta_b = atan2(Rbarrel, zBackward);
 
   if (Theta < theta_f) {
-    return sigmaX * squ(cos(Theta)) / zForward;
+    return (float)(sigmaX * squ(cos(Theta)) / zForward);
   } else if (Theta > theta_b) {
-    return sigmaX * squ(cos(Theta)) / (-1 * zBackward);
+    return (float)(sigmaX * squ(cos(Theta)) / (-1 * zBackward));
   } else {
-    return sigmaX * sin(Theta) / Rbarrel   ;
+    return (float)(sigmaX * sin(Theta) / Rbarrel)   ;
   }
 
 
 }
 
-double ECLRecCRModule::errorPhi(double Energy, double Theta)
+float ECLRecShowerModule::errorPhi(double Energy, double Theta)
 {
 
   double sigmaX = 0.1 * (0.27 + 3.4 / sqrt(Energy) + 1.8 / sqrt(sqrt(Energy))) ;
@@ -269,11 +269,11 @@ double ECLRecCRModule::errorPhi(double Energy, double Theta)
   double theta_b = atan2(Rbarrel, zBackward);
 
   if (Theta < theta_f) {
-    return sigmaX / (zForward * tan(Theta))   ;
+    return (float)(sigmaX / (zForward * tan(Theta)))  ;
   } else if (Theta > theta_b) {
-    return sigmaX / (zBackward * tan(Theta))   ;
+    return (float)(sigmaX / (zBackward * tan(Theta)))   ;
   } else {
-    return sigmaX / Rbarrel;
+    return (float)(sigmaX / Rbarrel);
   }
 
 

@@ -7,7 +7,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationArray.h>
 
 const TOPLikelihoods* getTOPLikelihoods(const Track& track)
 {
@@ -68,13 +67,6 @@ const TOPLikelihoods* getTOPLikelihoods(const MCParticle* particle)
   StoreArray<TOPTrack>  topTracks;
   StoreArray<TOPLikelihoods> toplogL;
 
-  RelationArray  testrelTrackLikelihoods(topTracks, toplogL);
-  RelationArray  testrelMCParticleToTOPTrack(mcParticles, topTracks);
-
-  if (!(testrelTrackLikelihoods && testrelMCParticleToTOPTrack)) {
-    return 0;
-  }
-
   RelationIndex< TOPTrack, TOPLikelihoods > relTrackLikelihoods(topTracks, toplogL);
   RelationIndex<MCParticle, TOPTrack> relMCParticleToTOPTrack(mcParticles, topTracks);
 
@@ -101,12 +93,6 @@ const ARICHLikelihoods* getARICHLikelihoods(const MCParticle* particle)
   StoreArray<ARICHLikelihoods> arichLikelihoods;
   StoreArray<ARICHAeroHit> arichAeroHits;
   StoreArray<MCParticle> mcParticles;
-
-  RelationArray testarichAeroHitRel(mcParticles, arichAeroHits);
-  RelationArray testrelAeroToLikelihood(arichAeroHits, arichLikelihoods);
-
-  if (!(testarichAeroHitRel && testrelAeroToLikelihood))
-    return 0;
 
   RelationIndex<MCParticle, ARICHAeroHit> arichAeroHitRel(mcParticles, arichAeroHits);
   RelationIndex<ARICHAeroHit, ARICHLikelihoods> relAeroToLikelihood(arichAeroHits, arichLikelihoods);

@@ -118,15 +118,16 @@ void GenfitDisplay::goToEvent(unsigned int id)
 {
   const long numEntries = InputController::numEntries();
 
+  //change UI state?
+  m_prevButton->SetEnabled(id > 0);
+  m_nextButton->SetEnabled((id + 1 < numEntries) or !InputController::canControlInput());
+
+  if (fEventId == id) return;
+
   if (!InputController::canControlInput() && fEventId != id - 1) {
     B2ERROR("Cannot switch to event " << id << ", only works in conjunction with SimpleInput.");
   }
 
-  //change UI state?
-  m_prevButton->SetEnabled(id > 0);
-  m_nextButton->SetEnabled(id + 1 < numEntries);
-
-  if (fEventId == id) return;
   fEventId = id;
 
   if (gEve->GetCurrentEvent())

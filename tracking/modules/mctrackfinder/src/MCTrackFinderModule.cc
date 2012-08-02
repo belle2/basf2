@@ -71,7 +71,6 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
 
   // names of output containers
   addParam("GFTrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the GFTrackCandidates (output)", string(""));
-  addParam("GFTrackCandToMCParticleColName", m_gfTrackCandToMCParticleColName, "Name of collection holding the relations between GFTrackCandidates and MCParticles (output)", string(""));
 }
 
 
@@ -86,7 +85,7 @@ void MCTrackFinderModule::initialize()
   //output store arrays have to be registered in initialize()
   StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
   StoreArray<MCParticle> mcParticles;
-  RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles, m_gfTrackCandToMCParticleColName);
+  RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
 }
 
 void MCTrackFinderModule::beginRun()
@@ -167,7 +166,7 @@ void MCTrackFinderModule::event()
 
   //register StoreArray which will be filled by this module
   StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
-  RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles, m_gfTrackCandToMCParticleColName);
+  RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
 
   //set the proper status
   int status = 0;

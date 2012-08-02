@@ -89,7 +89,6 @@ namespace Belle2 {
     int m_noTrueHitCounter;                                     /**< will hold number of cluster hits that do not have a corresponding true hit*/
 
     std::string m_gfTrackCandsColName;                          /**< TrackCandidates collection name */
-    std::string m_gfTrackCandToMCParticleColName;               /**< TrackCandidates to MCParticles relation name */
   };
 }
 

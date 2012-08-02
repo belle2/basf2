@@ -35,9 +35,6 @@
 #include <GFTrack.h>
 #include <GFTrackCand.h>
 #include <tracking/dataobjects/Track.h>
-#include <ecl/dataobjects/RecCRECL.h>
-#include <ecl/dataobjects/MdstGamma.h>
-#include <ecl/dataobjects/MdstPi0.h>
 
 // kinematic fit
 #include <analysis/KFit/MassFitKFit.h>
@@ -49,6 +46,7 @@
 #include <TFile.h>
 #include <TLorentzVector.h>
 #include <TVector3.h>
+
 using namespace Belle2;
 using namespace Belle2::analysis;
 
@@ -76,9 +74,9 @@ namespace Belle2 {
     virtual void event();
 
     //
-    unsigned doKvFit(Particle& p, double& confLevel, int debug);
-    unsigned doKmFit(Particle& p, double& confLevel, int debug);
-    unsigned doKmvFit(Particle& p, double& confLevel, int debug);
+    unsigned doKvFit(Particle& p, double& confLevel);
+    unsigned doKmFit(Particle& p, double& confLevel);
+    unsigned doKmvFit(Particle& p, double& confLevel);
 
     // Generated info Related functions
     int isBtoD0PiDecay(MCParticle* part);
@@ -89,10 +87,7 @@ namespace Belle2 {
     std::string  m_mcParticlesColName;         /**< MCParticles collection name. */
     std::string  m_gfTrackCandColName;         /**< Track Candidates collection name. */
     std::string  m_gfTracksColName;            /**< GFTracks collection name. */
-    std::string  m_eclsColName;                /**< Ecl's collection name. */
     std::string  m_tracksColName;              /**< Tracks collection name. */
-    std::string  m_gammasColName;              /**< Gamma's collection name. */
-    std::string  m_pi0sColName;                /**< Pi0's collection name. */
 
     /** output root file name (given as Module parameter) */
     std::string m_dataOutFileName;

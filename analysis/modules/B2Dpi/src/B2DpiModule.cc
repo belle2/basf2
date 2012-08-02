@@ -57,12 +57,9 @@ B2DpiModule::B2DpiModule() : Module()
   addParam("outputFileName", m_dataOutFileName, "Output root file name of this module. Suffixes to distinguish them will be added automatically", string("B2Dpi"));
 
   addParam("MCParticlesColName", m_mcParticlesColName, "MCParticles collection name" , string(""));
-  addParam("GFTrackCandidatesColName",      m_gfTrackCandColName,     "GF Track cand. collection name",       string(""));
+  addParam("GFTrackCandidatesColName", m_gfTrackCandColName, "GF Track cand. collection name",       string(""));
   addParam("GFTracksColName", m_gfTracksColName, "GFTracks collection name", string(""));
   addParam("TracksColName", m_tracksColName, "Tracks collection name", string(""));
-  addParam("GammasColName", m_gammasColName, "Gammas collection name", string(""));
-  addParam("Pi0sColName", m_pi0sColName, "Pi0s collection name", string(""));
-  addParam("EclsColName", m_eclsColName, "Ecls collection name", string(""));
 }
 
 void B2DpiModule::initialize()
@@ -76,10 +73,7 @@ void B2DpiModule::initialize()
   StoreArray<MCParticle>     mcParticles(m_mcParticlesColName);
   StoreArray<GFTrackCand>    gfTrackCand(m_gfTrackCandColName);
   StoreArray<GFTrack>        gfTracks(m_gfTracksColName);
-  StoreArray<RecCRECL>       ecls(m_eclsColName);
   StoreArray<Track>          tracks(m_tracksColName);
-  StoreArray<MdstGamma>      gammas(m_gammasColName);
-  StoreArray<MdstPi0>        pi0s(m_pi0sColName);
 
   // Initializing the output root file
   string dataFileName = m_dataOutFileName + ".root";
@@ -87,34 +81,34 @@ void B2DpiModule::initialize()
   m_rootFile = new TFile(dataFileName.c_str(), "RECREATE");
   m_tree     = new TTree("m_tree", "B2Dpi tree");
 
-  m_tree->Branch("bsize",  &m_bsize,   "bsize/D");
-  m_tree->Branch("dmass",  &m_md,      "dmass/D");
-  m_tree->Branch("mbc",    &m_mbc,     "mbc/D");
-  m_tree->Branch("deltae", &m_deltae,  "deltae/D");
-  m_tree->Branch("dmassFit",  &m_md_fit,      "dmassFit/D");
-  m_tree->Branch("mbcFit",    &m_mbc_fit,     "mbcFit/D");
-  m_tree->Branch("deltaeFit", &m_deltae_fit,  "deltaeFit/D");
-  m_tree->Branch("cmse",   &m_cmse,    "cmse/D");
-  m_tree->Branch("bpvx",     &m_bp_vx,      "bpvx/D");
-  m_tree->Branch("bpvy",     &m_bp_vy,      "bpvy/D");
-  m_tree->Branch("bpvz",     &m_bp_vz,      "bpvz/D");
-  m_tree->Branch("bpevx",    &m_bp_evx,     "bpevx/D");
-  m_tree->Branch("bpevy",    &m_bp_evy,     "bpevy/D");
-  m_tree->Branch("bpevz",    &m_bp_evz,     "bpevz/D");
-  m_tree->Branch("gen_bpvx", &m_gen_bp_vx,  "gen_bp_vx/D");
-  m_tree->Branch("gen_bpvy", &m_gen_bp_vy,  "gen_bp_vy/D");
-  m_tree->Branch("gen_bpvz", &m_gen_bp_vz,  "gen_bp_vz/D");
-  m_tree->Branch("bpchi2",   &m_bp_chi2,    "bpchi2/D");
-  m_tree->Branch("d0vx",     &m_d0_vx,      "d0vx/D");
-  m_tree->Branch("d0vy",     &m_d0_vy,      "d0vy/D");
-  m_tree->Branch("d0vz",     &m_d0_vz,      "d0vz/D");
-  m_tree->Branch("d0evx",    &m_d0_evx,     "d0evx/D");
-  m_tree->Branch("d0evy",    &m_d0_evy,     "d0evy/D");
-  m_tree->Branch("d0evz",    &m_d0_evz,     "d0evz/D");
-  m_tree->Branch("gen_d0vx", &m_gen_d0_vx,  "gen_d0_vx/D");
-  m_tree->Branch("gen_d0vy", &m_gen_d0_vy,  "gen_d0_vy/D");
-  m_tree->Branch("gen_d0vz", &m_gen_d0_vz,  "gen_d0_vz/D");
-  m_tree->Branch("d0chi2",   &m_d0_chi2,    "d0chi2/D");
+  m_tree->Branch("bsize",     &m_bsize,      "bsize/D");
+  m_tree->Branch("dmass",     &m_md,         "dmass/D");
+  m_tree->Branch("mbc",       &m_mbc,        "mbc/D");
+  m_tree->Branch("deltae",    &m_deltae,     "deltae/D");
+  m_tree->Branch("dmassFit",  &m_md_fit,     "dmassFit/D");
+  m_tree->Branch("mbcFit",    &m_mbc_fit,    "mbcFit/D");
+  m_tree->Branch("deltaeFit", &m_deltae_fit, "deltaeFit/D");
+  m_tree->Branch("cmse",      &m_cmse,       "cmse/D");
+  m_tree->Branch("bpvx",      &m_bp_vx,      "bpvx/D");
+  m_tree->Branch("bpvy",      &m_bp_vy,      "bpvy/D");
+  m_tree->Branch("bpvz",      &m_bp_vz,      "bpvz/D");
+  m_tree->Branch("bpevx",     &m_bp_evx,     "bpevx/D");
+  m_tree->Branch("bpevy",     &m_bp_evy,     "bpevy/D");
+  m_tree->Branch("bpevz",     &m_bp_evz,     "bpevz/D");
+  m_tree->Branch("gen_bpvx",  &m_gen_bp_vx,  "gen_bp_vx/D");
+  m_tree->Branch("gen_bpvy",  &m_gen_bp_vy,  "gen_bp_vy/D");
+  m_tree->Branch("gen_bpvz",  &m_gen_bp_vz,  "gen_bp_vz/D");
+  m_tree->Branch("bpchi2",    &m_bp_chi2,    "bpchi2/D");
+  m_tree->Branch("d0vx",      &m_d0_vx,      "d0vx/D");
+  m_tree->Branch("d0vy",      &m_d0_vy,      "d0vy/D");
+  m_tree->Branch("d0vz",      &m_d0_vz,      "d0vz/D");
+  m_tree->Branch("d0evx",     &m_d0_evx,     "d0evx/D");
+  m_tree->Branch("d0evy",     &m_d0_evy,     "d0evy/D");
+  m_tree->Branch("d0evz",     &m_d0_evz,     "d0evz/D");
+  m_tree->Branch("gen_d0vx",  &m_gen_d0_vx,  "gen_d0_vx/D");
+  m_tree->Branch("gen_d0vy",  &m_gen_d0_vy,  "gen_d0_vy/D");
+  m_tree->Branch("gen_d0vz",  &m_gen_d0_vz,  "gen_d0_vz/D");
+  m_tree->Branch("d0chi2",    &m_d0_chi2,    "d0chi2/D");
 
   B2INFO("[B2Dpi Module]: Finished initialising the EvtGen Study Module.");
 
@@ -297,13 +291,12 @@ void B2DpiModule::event()
     // and save updated D0 mass, Mbc, DeltaE to ntuple
     // for comparison with the "unconstrained" values
     double confLevel(0);
-    int debug(-1);
 
-    doKmvFit(B[i].child(0), confLevel, debug);
+    doKmvFit(B[i].child(0), confLevel);
     m_d0_chi2 = confLevel;
 
     // perform vertex fit for B+ candidate
-    doKvFit(B[i], confLevel, debug);
+    doKvFit(B[i], confLevel);
     m_bp_chi2 = confLevel;
 
     // save m(Kpi), Mbc and DeltaE after the kinematic fits
@@ -338,7 +331,7 @@ void B2DpiModule::event()
 }
 
 unsigned
-B2DpiModule::doKvFit(Particle& p, double& confLevel, int debug)
+B2DpiModule::doKvFit(Particle& p, double& confLevel)
 {
 
   VertexFitKFit kv;
@@ -365,7 +358,7 @@ B2DpiModule::doKvFit(Particle& p, double& confLevel, int debug)
 
 
 unsigned
-B2DpiModule::doKmFit(Particle& p, double& confLevel, int debug)
+B2DpiModule::doKmFit(Particle& p, double& confLevel)
 {
 
   MassFitKFit km;
@@ -395,7 +388,7 @@ B2DpiModule::doKmFit(Particle& p, double& confLevel, int debug)
 
 
 unsigned
-B2DpiModule::doKmvFit(Particle& p, double& confLevel, int debug)
+B2DpiModule::doKmvFit(Particle& p, double& confLevel)
 {
 
   MassVertexFitKFit kmv;

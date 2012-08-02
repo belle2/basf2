@@ -22,7 +22,7 @@ sys.stdout = open(logFileName, 'w')
 import os
 
 from basf2 import *
-set_log_level(LogLevel.ERROR)
+# set_log_level(LogLevel.ERROR)
 
 # ---------------------------------------------------------------
 # EvtGen
@@ -185,10 +185,7 @@ analysis.param('outputFileName', rootFileName)
 # specify the names of Track collections
 analysis.param('GFTrackCandidatesColName', 'GFTrackCands')
 analysis.param('GFTracksColName', 'GFTracks')
-analysis.param('EclsColName', 'ECLRecCRHits')
 analysis.param('TracksColName', 'Tracks')
-analysis.param('GammasColName', 'mdstGamma')
-analysis.param('Pi0sColName', 'mdstPi0')
 
 # ---------------------------------------------------------------
 # Add all modules to the main path
@@ -210,15 +207,12 @@ main.add_module(cdcDigitizer)
 main.add_module(mctrackfinder)
 
 main.add_module(mcmatching)
-
 main.add_module(cdcfitting)
 
 # main.add_module(dedx)
-
 # main.add_module(ext)
 # main.add_module(topdigi)
 # main.add_module(topreco)
-
 # main.add_module(arichDigi)
 # main.add_module(arichRec)
 

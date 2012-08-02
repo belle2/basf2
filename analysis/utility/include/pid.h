@@ -27,6 +27,24 @@ const TOPLikelihoods* getTOPLikelihoods(const MCParticle* particle);
 const ARICHLikelihoods* getARICHLikelihoods(const MCParticle* particle);
 
 
+// returns the TOP flag
+int getTOPFlag(const Track& track)
+{
+  if (getTOPLikelihoods(track))
+    return getTOPLikelihoods(track)->getFlag();
+
+  return -2;
+}
+
+// returns the ARICH flag
+int getARICHFlag(const MCParticle* particle)
+{
+  if (getARICHLikelihoods(particle))
+    return getARICHLikelihoods(particle)->getFlag();
+
+  return -2;
+}
+
 
 // returns the difference between Log likelihoods of 2 hypotheses based on TOP response
 double getTOPPID(int hyp1, int hyp2, const TOPLikelihoods* logL);

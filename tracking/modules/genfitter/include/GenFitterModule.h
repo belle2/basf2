@@ -11,7 +11,12 @@
 #define GENFITTERMODULE_H
 
 #include <framework/core/Module.h>
+
 #include <fstream>
+#include <string>
+
+#include <GFKalman.h>
+#include <GFDaf.h>
 
 namespace Belle2 {
 
@@ -78,7 +83,6 @@ namespace Belle2 {
 
     std::string m_tracksColName;                     /**< Tracks collection name */
     std::string m_gfTracksColName;                   /**< GFTracks collection name */
-    std::string m_gfTracksToMCParticlesColName;      /**< GFTracks to MCParticles relation collection name */
 
     //These are two different counters, the counter for GFTrackCands refers to the number of input GFTrackCands. The number of total successfull/failed fits may be different, if GFTrackCand is fitted several times under different PDG hypothesises.
     int m_failedFitCounter;                          /**< Number of failed fits. */
@@ -100,7 +104,8 @@ namespace Belle2 {
 
     std::ofstream HelixParam;                        /**< Text output file name */
     bool m_createTextFile;                           /**< Boolean to select if an output file with helix parameters should be created. */
-
+    GFKalman m_kalmanFilter;                           /** The Genfit Kalman filter object */
+    GFDaf m_daf;                                        /** The Genfit Deterministic Annihiling (DAF) filter object */
 
   }; /** @} @} */
 } // end namespace Belle2

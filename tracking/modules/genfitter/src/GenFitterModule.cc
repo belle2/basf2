@@ -36,8 +36,6 @@
 
 #include <GFTrack.h>
 #include <GFTrackCand.h>
-#include <GFKalman.h>
-#include <GFDaf.h>
 #include <GFRecoHitProducer.h>
 #include <GFRecoHitFactory.h>
 #include <GFMaterialEffects.h>
@@ -51,7 +49,6 @@
 
 #include <cstdlib>
 #include <iomanip>
-#include <string>
 #include <cmath>
 #include <iostream>
 
@@ -95,7 +92,6 @@ GenFitterModule::GenFitterModule() :
   addParam("UseClusters", m_useClusters, "if set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used", false);
   //output
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the final GFTracks (will be created by this module)", string(""));
-  addParam("GFTracksToMCParticlesColName", m_gfTracksToMCParticlesColName, "Name of collection holding the relations between the final GFTracks and the original MCParticle (will be created by this module)", string(""));
   addParam("TracksColName", m_tracksColName, "Name of collection holding the final Tracks (will be created by this module)", string(""));
 
   addParam("HelixOutput", m_createTextFile, "Set true if you want to have a text file with perigee helix parameters of all tracks", bool(false));
@@ -120,7 +116,7 @@ void GenFitterModule::initialize()
   // Needed for the initialization of the RelationArray
   StoreArray < MCParticle > mcParticles(m_mcParticlesColName);
 
-  RelationArray gfTracksToMCPart(gfTracks, mcParticles, m_gfTracksToMCParticlesColName);
+  RelationArray gfTracksToMCPart(gfTracks, mcParticles);
 
   if (m_createTextFile) {
     HelixParam.open("HelixParam.txt");
@@ -134,6 +130,10 @@ void GenFitterModule::initialize()
   //get the magnetic field
   GFFieldManager::getInstance()->init(new GFGeant4Field());
   GFMaterialEffects::getInstance()->setMscModel("Highland");
+
+  //set parameters for the fitter algorithm objects
+  m_kalmanFilter.setNumIterations(m_nIter);
+  m_daf.setProbCut(m_probCut);
 
 }
 
@@ -196,7 +196,7 @@ void GenFitterModule::event()
   StoreArray < GFTrack > gfTracks(m_gfTracksColName);
 
   //Create a relation between the gftracks and their most probable 'mother' MC particle
-  RelationArray gfTracksToMCPart(gfTracks, mcParticles, m_gfTracksToMCParticlesColName);
+  RelationArray gfTracksToMCPart(gfTracks, mcParticles);
 
   //counter for fitted tracks, the number of fitted tracks may differ from the number of trackCandidates if the fit fails for some of them
   int trackCounter = -1;
@@ -323,16 +323,12 @@ void GenFitterModule::event()
       } else {
 
         //now fit the track
-        GFKalman k;
-        GFDaf daf;
         try {
-          //set some parameters, there are more possible parameters to set in genfit, but their effect was not tested so far..
-          k.setNumIterations(m_nIter);
-          daf.setProbCut(m_probCut);
+
           if (m_filterId == 0) {
-            k.processTrack(&gfTrack);
+            m_kalmanFilter.processTrack(&gfTrack);
           } else {
-            daf.processTrack(&gfTrack);
+            m_daf.processTrack(&gfTrack);
           }
 
           //gfTrack.Print();

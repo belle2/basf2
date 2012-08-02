@@ -124,10 +124,12 @@ namespace Belle2 {
     void registerTrackWiseData(const std::string& nameOfDataSample);
     void registerTrackWiseVecData(const std::string& nameOfDataSample, const int nVarsToTest);
     void registerLayerWiseData(const std::string& nameOfDataSample, const int nVarsToTest);
+    void registerTVector3(const std::string& nameOfDataSample); // to create a TVector3 branch in the costum root tree in this module's output
 
     void fillTrackWiseData(const std::string& nameOfDataSample, const double newData);
     void fillTrackWiseVecData(const std::string& nameOfDataSample, const std::vector<double>& newData);
     void fillLayerWiseData(const std::string& nameOfDataSample, const int accuVecIndex, const std::vector<double>& newData);
+    void fillTVector3(const std::string& nameOfDataSample, const TVector3& newData);
 
     void printTrackWiseStatistics(const std::string& nameOfDataSample, const bool count = false);
     void printTrackWiseVecStatistics(const std::string& nameOfDataSample, const std::vector<std::string>& trackWiseVarNames, const  bool count = false);
@@ -143,7 +145,7 @@ namespace Belle2 {
     std::vector<std::string> m_vertexTestsVarNames;
 
 
-    // the following 6 maps should not be accessed dirctely but only with the corresponding "register" "fill" and "print" fucntions
+    // the following 6 maps should not be accessed directly but only with the corresponding "register" "fill" and "print" functions
     //the following maps will be filled with the test data so that statistical quantities like mean and variance can be calculated
     std::map<std::string, StatisticsContainer > m_trackWiseDataSamples;
     std::map<std::string, std::vector<StatisticsContainer> > m_trackWiseVecDataSamples;
@@ -153,6 +155,7 @@ namespace Belle2 {
     std::map<std::string, float > m_trackWiseDataForRoot;
     std::map<std::string, std::vector<float>* > m_trackWiseVecDataForRoot;
     std::map<std::string, std::vector< std::vector <float> >* > m_layerWiseDataForRoot;
+    std::map<std::string, TVector3* > m_TVector3ForRoot; //this one is to store the mcparticle truth info for position and momentum
 
 //    // now the data itself also in c++ vectors so this module can use custom implemented estimator instead just the one provided by root and
     bool m_robust;

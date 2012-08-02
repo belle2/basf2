@@ -78,7 +78,7 @@ TrackFitCheckerModule::TrackFitCheckerModule() : Module()
   addParam("robustTests", m_robust, "activate additional robust statistical tests (median and MAD)", false);
 
   addParam("testCdc", m_testCdc, "execute the layer wise tests for CDC", false);
-  addParam("truthAvailable", m_truthAvailable, "is truth info available or every hit?", false);
+  addParam("truthAvailable", m_truthAvailable, "is truth info available for every hit?", false);
   addParam("inspectTracks", m_inspectTracks, "write track parameters into a text file for further inspection. When 0 this function is switched off. 1 or 2 will enable this function but have different arrangments of data in text file. EXPERIMENTAL", 0);
   addParam("writeToRootFile", m_writeToRootFile, "Set to True if you want the data from the statistical tests written into a root file", false);
   addParam("writeToTextFile", m_writeToFile, "Set to True if you want the results of the statistical tests written out in a normal text file", false);
@@ -147,7 +147,8 @@ void TrackFitCheckerModule::initialize()
     registerTrackWiseData("res_curvVertex");
     registerTrackWiseData("relRes_curvVertex");
     registerTrackWiseData("relRes_p_T");
-
+    registerTVector3("trueVertexPos");
+    registerTVector3("trueVertexMom");
   } else {
     m_rootFilePtr = NULL;
     m_statDataTreePtr = NULL;
@@ -262,7 +263,6 @@ void TrackFitCheckerModule::event()
   int eventCounter = eventMetaDataPtr->getEvent();
 
   B2DEBUG(100, "**********   TrackFitCheckerModule  processing event number: " << eventCounter << " ************");
-
   //simulated truth information
   StoreArray<MCParticle> aMcParticleArray("");
   StoreArray<PXDTrueHit> aPxdTrueHitArray("");
@@ -307,6 +307,10 @@ void TrackFitCheckerModule::event()
     const double charge = aMcParticleArray[mcParticleIndex]->getCharge();
     const TVector3 trueVertexMom = aMcParticleArray[mcParticleIndex]->getMomentum();
     const TVector3 trueVertexPos = aMcParticleArray[mcParticleIndex]->getVertex();
+
+    //write the mcparticle info to the root output
+    fillTVector3("trueVertexPos", trueVertexPos);
+    fillTVector3("trueVertexMom", trueVertexMom);
     //GFAbsTrackRep* propOnlyTrRepPtr = new RKTrackRep(trackCandidates[i]);
 
     const double chi2tot_bu = aTrackPtr->getChiSqu(); // returns the total chi2 from the backward filter
@@ -334,13 +338,14 @@ void TrackFitCheckerModule::event()
 
     aRKTrackRepPtr->setPropDir(-1);
     try {
+      B2DEBUG(100, "before propagation");
       aRKTrackRepPtr->extrapolateToPoint(trueVertexPos, poca, dirInPoca);
     } catch (GFException& e) {
       B2WARNING("Extrapolation of a track in Event " << eventCounter <<  " to his true vertex position failed. Track will be ignored in statistical tests");
       ++m_extrapFailed;
       continue;
     }
-
+    B2DEBUG(100, "after propagation");
 
     GFDetPlane planeThroughVertex(poca, dirInPoca); //get planeThroughVertex through fitted vertex position
 
@@ -868,13 +873,18 @@ void TrackFitCheckerModule::registerTrackWiseVecData(const string& nameOfDataSam
   }
 }
 
-// this function does not check whether m_writeToRootFile it true or not so it should only be called when it is true
+
 void TrackFitCheckerModule::registerTrackWiseData(const string& nameOfDataSample)
 {
   if (m_writeToRootFile == true) {
     m_trackWiseDataForRoot[nameOfDataSample] = float(-999);
     m_statDataTreePtr->Branch(nameOfDataSample.c_str(), &(m_trackWiseDataForRoot[nameOfDataSample]));
   }
+}
+void TrackFitCheckerModule::registerTVector3(const std::string& nameOfDataSample)
+{
+  m_TVector3ForRoot[nameOfDataSample] = new TVector3();
+  m_statDataTreePtr->Branch(nameOfDataSample.c_str(), "TVector3", &(m_TVector3ForRoot[nameOfDataSample]));
 }
 
 void TrackFitCheckerModule::fillLayerWiseData(const string& nameOfDataSample, const int accuVecIndex, const vector<double>& newData)
@@ -921,6 +931,13 @@ void TrackFitCheckerModule::fillTrackWiseData(const string& nameOfDataSample, co
   }
   if (m_robust == true) {
     m_trackWiseData[nameOfDataSample].push_back(newData);
+  }
+}
+
+void TrackFitCheckerModule::fillTVector3(const std::string& nameOfDataSample, const TVector3& newData)
+{
+  if (m_writeToRootFile == true) {
+    (*m_TVector3ForRoot[nameOfDataSample]) = newData;
   }
 }
 

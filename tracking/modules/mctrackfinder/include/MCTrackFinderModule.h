@@ -12,6 +12,7 @@
 #define MCTRACKFIDNERMODULE_H_
 
 #include <framework/core/Module.h>
+#include <string>
 
 namespace Belle2 {
   /**
@@ -87,6 +88,8 @@ namespace Belle2 {
     int m_notEnoughtHitsCounter;                                /**< will hold number of tracks that do not have enough hits to form a track candidate (less than 3)*/
     int m_noTrueHitCounter;                                     /**< will hold number of cluster hits that do not have a corresponding true hit*/
 
+    std::string m_gfTrackCandsColName;                          /**< TrackCandidates collection name */
+    std::string m_gfTrackCandToMCParticleColName;               /**< TrackCandidates to MCParticles relation name */
   };
 }
 

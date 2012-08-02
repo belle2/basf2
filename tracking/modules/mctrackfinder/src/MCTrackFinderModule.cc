@@ -69,6 +69,9 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   //smearing of MCMomentum
   addParam("Smearing", m_smearing, "Smearing of MCMomentum/MCVertex prior to storing it in GFTrackCandidate (in %). A negative value will switch off smearing. This is also the default.", -1.0);
 
+  // names of output containers
+  addParam("GFTrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the GFTrackCandidates (output)", string(""));
+  addParam("GFTrackCandToMCParticleColName", m_gfTrackCandToMCParticleColName, "Name of collection holding the relations between GFTrackCandidates and MCParticles (output)", string(""));
 }
 
 
@@ -81,9 +84,9 @@ MCTrackFinderModule::~MCTrackFinderModule()
 void MCTrackFinderModule::initialize()
 {
   //output store arrays have to be registered in initialize()
-  StoreArray<GFTrackCand> trackCandidates;
+  StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
   StoreArray<MCParticle> mcParticles;
-  RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
+  RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles, m_gfTrackCandToMCParticleColName);
 }
 
 void MCTrackFinderModule::beginRun()
@@ -163,8 +166,8 @@ void MCTrackFinderModule::event()
 
 
   //register StoreArray which will be filled by this module
-  StoreArray<GFTrackCand> trackCandidates;
-  RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
+  StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
+  RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles, m_gfTrackCandToMCParticleColName);
 
   //set the proper status
   int status = 0;

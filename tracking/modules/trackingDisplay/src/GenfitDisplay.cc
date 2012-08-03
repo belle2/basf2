@@ -245,7 +245,6 @@ void GenfitDisplay::drawEvent()
   // draw SPHits  // quick n dirty hack
   if (drawRawHits && !fHits.empty()) {
     TEvePointSet* pointSet = new TEvePointSet("Raw hits", fHits.size());
-    pointSet->IncDenyDestroy();
     pointSet->SetMainColor(kGray);
     pointSet->SetMainTransparency(70);
     for (unsigned int j = 0; j < fHits.size(); ++j) {
@@ -373,7 +372,6 @@ void GenfitDisplay::drawEvent()
       if (drawTrack) {
         if (track_lines == NULL) {
           track_lines = new TEveStraightLineSet(TString::Format("GFTrack %d (pVal: %e)", i, TMath::Prob(track->getChiSqu(), track->getNDF())));
-          track_lines->IncDenyDestroy();
         }
         if (j > 0) track_lines->AddLine(old_track_pos(0), old_track_pos(1), old_track_pos(2), track_pos(0), track_pos(1), track_pos(2));
         old_track_pos = track_pos;

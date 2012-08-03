@@ -23,7 +23,7 @@ LogConnectionTxtFile::LogConnectionTxtFile(const string& filename, bool append)
 
 LogConnectionTxtFile::~LogConnectionTxtFile()
 {
-  if (m_fileStream != NULL) delete m_fileStream;
+  delete m_fileStream;
 }
 
 
@@ -33,7 +33,7 @@ bool LogConnectionTxtFile::isConnected()
 }
 
 
-bool LogConnectionTxtFile::sendMessage(LogMessage message)
+bool LogConnectionTxtFile::sendMessage(const LogMessage& message)
 {
   if (isConnected()) {
     (*m_fileStream) << message;

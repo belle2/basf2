@@ -36,7 +36,7 @@ bool LogConnectionFilter::isConnected()
 }
 
 
-bool LogConnectionFilter::sendMessage(LogMessage message)
+bool LogConnectionFilter::sendMessage(const LogMessage& message)
 {
 
   if (message == m_previousMessage) {

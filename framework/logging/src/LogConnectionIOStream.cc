@@ -22,7 +22,7 @@ LogConnectionIOStream::LogConnectionIOStream(ostream& outputStream, bool color) 
 
 LogConnectionIOStream::~LogConnectionIOStream()
 {
-  if (m_stream != NULL) delete m_stream;
+  delete m_stream;
 }
 
 
@@ -32,17 +32,17 @@ bool LogConnectionIOStream::isConnected()
 }
 
 
-bool LogConnectionIOStream::sendMessage(LogMessage message)
+bool LogConnectionIOStream::sendMessage(const LogMessage& message)
 {
-  static const char* color_str[] = {
-    "\x1b[32m",        // Debug  : green
-    "",                // Info   : terminal default
-    "\x1b[33m",        // Warning: yellow
-    "\x1b[31m",        // Error  : red
-    "\x1b[07m\x1b[31m" // Fatal  : red reversed
-  };
   if (isConnected()) {
     if (m_color) {
+      static const char* color_str[] = {
+        "\x1b[32m",        // Debug  : green
+        "",                // Info   : terminal default
+        "\x1b[33m",        // Warning: yellow
+        "\x1b[31m",        // Error  : red
+        "\x1b[07m\x1b[31m" // Fatal  : red reversed
+      };
       (*m_stream) << color_str[message.getLogLevel()];
     }
     (*m_stream) << message;

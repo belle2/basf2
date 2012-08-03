@@ -119,7 +119,7 @@ namespace Belle2 {
     ELogLevel m_logLevel;               /**< The log messaging level. Defined as int for the parameter handling. */
     int m_debugLevel;                   /**< The debug messaging level. */
     ELogLevel m_abortLevel;             /**< The log level at which the execution should be stopped. */
-    unsigned int m_logInfo[c_Default];  /**< The kind of printed information per log level. */
+    unsigned int m_logInfo[c_Default];  /**< The kind of printed information per log level. (ORed combination of LogConfig::ELogInfo flags). */
 
   };
 

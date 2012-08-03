@@ -47,7 +47,7 @@ namespace Belle2 {
      * @param message The log message object.
      * @return Returns true if the message could be send.
      */
-    virtual bool sendMessage(LogMessage message);
+    virtual bool sendMessage(const LogMessage& message);
 
     /**
      * Returns true if the connection to the text file could be established.

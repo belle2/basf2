@@ -42,7 +42,7 @@ namespace Belle2 {
     /**
      * Compares two message.
      *
-     * @return Returns true if the messages.
+     * @return Returns true if the message contents are equal.
      */
     bool operator==(const LogMessage& message) const;
 
@@ -63,7 +63,7 @@ namespace Belle2 {
     /**
      * Configure which information should be printed.
      */
-    void setModule(std::string module) {m_module = module; };
+    void setModule(const std::string& module) {m_module = module; };
 
     /**
      * Configure which information should be printed.
@@ -88,7 +88,7 @@ namespace Belle2 {
     std::string m_file;       /**< The file name where the message was sent from. */
     unsigned int m_line;      /**< The line number in the source code where the message was sent from. */
 
-    unsigned int m_logInfo;   /**< The kind of printed information per log level. */
+    unsigned int m_logInfo;   /**< kind of information to show (ORed combination of LogConfig::ELogInfo flags). */
 
   };
 

@@ -11,7 +11,6 @@
 #ifndef LOGCONNECTIONBASE_H_
 #define LOGCONNECTIONBASE_H_
 
-#include <framework/logging/LogConfig.h>
 #include <framework/logging/LogMessage.h>
 
 #include <string>
@@ -37,7 +36,7 @@ namespace Belle2 {
      * @param message The log message object.
      * @return Returns true if the message could be send.
      */
-    virtual bool sendMessage(LogMessage message) = 0;
+    virtual bool sendMessage(const LogMessage& message) = 0;
 
     /**
      * Returns true if the connection could be established.

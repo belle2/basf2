@@ -61,7 +61,7 @@ GenfitDisplay::GenfitDisplay():
   }
   if (!gEve) {
     B2INFO("gEve not found, creating...");
-    TEveManager::Create(true, "V"); //hide file browser
+    TEveManager::Create(true, "IV"); //hide file browser
   }
   gGeoManager->DefaultColors();
 

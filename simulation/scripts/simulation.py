@@ -21,9 +21,6 @@ def add_simulation(path, components=None):
 
     # detector simulation
     g4sim = register_module('FullSim')
-    param_g4sim = {'RegisterOptics': 1, 'PhotonFraction': 0.3,
-                   'TrackingVerbosity': 0}
-    g4sim.param(param_g4sim)
     path.add_module(g4sim)
 
     # PXD simulation
@@ -43,16 +40,12 @@ def add_simulation(path, components=None):
     # CDC simulation
     if components == None or 'CDC' in components:
         cdc_digitizer = register_module('CDCDigi')
-        param_cdc_digitizer = {'Fraction': 1, 'Resolution1': 0.01,
-                               'Resolution2': 0.0}
-        cdc_digitizer.param(param_cdc_digitizer)
         path.add_module(cdc_digitizer)
 
     # TOP simulation
     if components == None or 'TOP' in components:
         top_digitizer = register_module('TOPDigi')
-        param_top_digitizer = {'PhotonFraction': 0.3}
-        top_digitizer.param(param_top_digitizer)
+        path.add_module(top_digitizer)
 
     # ARICH simulation
     if components == None or 'ARICH' in components:

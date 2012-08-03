@@ -125,11 +125,13 @@ namespace Belle2 {
     void registerTrackWiseVecData(const std::string& nameOfDataSample, const int nVarsToTest);
     void registerLayerWiseData(const std::string& nameOfDataSample, const int nVarsToTest);
     void registerTVector3(const std::string& nameOfDataSample); // to create a TVector3 branch in the costum root tree in this module's output
+    void registerInt(const std::string& nameOfDataSample);
 
     void fillTrackWiseData(const std::string& nameOfDataSample, const double newData);
     void fillTrackWiseVecData(const std::string& nameOfDataSample, const std::vector<double>& newData);
     void fillLayerWiseData(const std::string& nameOfDataSample, const int accuVecIndex, const std::vector<double>& newData);
     void fillTVector3(const std::string& nameOfDataSample, const TVector3& newData);
+    void fillInt(const std::string& nameOfDataSample, const int newData);
 
     void printTrackWiseStatistics(const std::string& nameOfDataSample, const bool count = false);
     void printTrackWiseVecStatistics(const std::string& nameOfDataSample, const std::vector<std::string>& trackWiseVarNames, const  bool count = false);
@@ -156,6 +158,7 @@ namespace Belle2 {
     std::map<std::string, std::vector<float>* > m_trackWiseVecDataForRoot;
     std::map<std::string, std::vector< std::vector <float> >* > m_layerWiseDataForRoot;
     std::map<std::string, TVector3* > m_TVector3ForRoot; //this one is to store the mcparticle truth info for position and momentum
+    std::map<std::string, int > m_intForRoot; //this one is to store some auxiliary (like if track was fitted successful) info about the tracks into the root file
 
 //    // now the data itself also in c++ vectors so this module can use custom implemented estimator instead just the one provided by root and
     bool m_robust;

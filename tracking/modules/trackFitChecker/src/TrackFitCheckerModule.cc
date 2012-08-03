@@ -149,6 +149,7 @@ void TrackFitCheckerModule::initialize()
     registerTrackWiseData("relRes_p_T");
     registerTVector3("trueVertexPos");
     registerTVector3("trueVertexMom");
+    registerInt("genfitStatusFlag");
   } else {
     m_rootFilePtr = NULL;
     m_statDataTreePtr = NULL;
@@ -311,10 +312,33 @@ void TrackFitCheckerModule::event()
     //write the mcparticle info to the root output
     fillTVector3("trueVertexPos", trueVertexPos);
     fillTVector3("trueVertexMom", trueVertexMom);
-    //GFAbsTrackRep* propOnlyTrRepPtr = new RKTrackRep(trackCandidates[i]);
+    RKTrackRep* aRKTrackRepPtr = static_cast<RKTrackRep*>(aTrackPtr->getCardinalRep());
+
+    const int genfitStatusFlag = aRKTrackRepPtr->getStatusFlag();
+    fillInt("genfitStatusFlag", genfitStatusFlag);
+
+    if (genfitStatusFlag not_eq 0) {
+      // we have a track that was not fitted successfully no tests can be done. Goto next track
+      if (m_writeToRootFile == true) {
+        m_statDataTreePtr->Fill(); // attention! this fill here means that all branches in the root tree besides trueVertexPos, trueVertexMom and genfitStatusFlag will have the value of the previous track. Keep this in mind when analyzing the tree afterwards
+      }
+      continue;
+    }
+    TVector3 poca; //point of closest approach will be overwritten
+    TVector3 dirInPoca; //direction of the track at the point of closest approach will be overwritten
+    aRKTrackRepPtr->setPropDir(-1);
+    try {
+      B2DEBUG(100, "before propagation");
+      aRKTrackRepPtr->extrapolateToPoint(trueVertexPos, poca, dirInPoca);
+    } catch (GFException& e) {
+      B2WARNING("Extrapolation of a track in Event " << eventCounter <<  " to his true vertex position failed. Track will be ignored in statistical tests");
+      ++m_extrapFailed;
+      continue;
+    }
+    B2DEBUG(100, "after propagation");
 
     const double chi2tot_bu = aTrackPtr->getChiSqu(); // returns the total chi2 from the backward filter
-    if (chi2tot_bu > m_totalChi2Cut) {//consider this track to be an outlier and discard it; jump to next iteration of loop
+    if (chi2tot_bu > m_totalChi2Cut) {//consider this track to be an outlier and discard it. Goto next track
       ++m_nCutawayTracks;
       continue;
     }
@@ -332,20 +356,6 @@ void TrackFitCheckerModule::event()
     TMatrixT<double> vertexCov(6, 6);
     vector<double> zVertexPosMom(6);
     vector<double> resVertexPosMom(6);
-    TVector3 poca; //point of closest approach will be overwritten
-    TVector3 dirInPoca; //direction of the track at the point of closest approach will be overwritten
-    RKTrackRep* aRKTrackRepPtr = static_cast<RKTrackRep*>(aTrackPtr->getCardinalRep());
-
-    aRKTrackRepPtr->setPropDir(-1);
-    try {
-      B2DEBUG(100, "before propagation");
-      aRKTrackRepPtr->extrapolateToPoint(trueVertexPos, poca, dirInPoca);
-    } catch (GFException& e) {
-      B2WARNING("Extrapolation of a track in Event " << eventCounter <<  " to his true vertex position failed. Track will be ignored in statistical tests");
-      ++m_extrapFailed;
-      continue;
-    }
-    B2DEBUG(100, "after propagation");
 
     GFDetPlane planeThroughVertex(poca, dirInPoca); //get planeThroughVertex through fitted vertex position
 
@@ -887,6 +897,12 @@ void TrackFitCheckerModule::registerTVector3(const std::string& nameOfDataSample
   m_statDataTreePtr->Branch(nameOfDataSample.c_str(), "TVector3", &(m_TVector3ForRoot[nameOfDataSample]));
 }
 
+void TrackFitCheckerModule::registerInt(const std::string& nameOfDataSample)
+{
+  m_intForRoot[nameOfDataSample] = int(-999);
+  m_statDataTreePtr->Branch(nameOfDataSample.c_str(), &(m_intForRoot[nameOfDataSample]));
+}
+
 void TrackFitCheckerModule::fillLayerWiseData(const string& nameOfDataSample, const int accuVecIndex, const vector<double>& newData)
 {
   const int nNewData = newData.size();
@@ -938,6 +954,13 @@ void TrackFitCheckerModule::fillTVector3(const std::string& nameOfDataSample, co
 {
   if (m_writeToRootFile == true) {
     (*m_TVector3ForRoot[nameOfDataSample]) = newData;
+  }
+}
+
+void TrackFitCheckerModule::fillInt(const std::string& nameOfDataSample, const int newData)
+{
+  if (m_writeToRootFile == true) {
+    m_intForRoot[nameOfDataSample] = newData;
   }
 }
 

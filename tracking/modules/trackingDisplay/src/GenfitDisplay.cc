@@ -15,7 +15,6 @@
 #include <TApplication.h>
 #include <TEveBrowser.h>
 #include <TEveBox.h>
-#include <TGTab.h>
 #include <TEveManager.h>
 #include <TEveEventManager.h>
 #include <TEveGeoNode.h>
@@ -62,7 +61,7 @@ GenfitDisplay::GenfitDisplay():
   }
   if (!gEve) {
     B2INFO("gEve not found, creating...");
-    TEveManager::Create();
+    TEveManager::Create(true, "V"); //hide file browser
   }
   gGeoManager->DefaultColors();
 
@@ -151,7 +150,7 @@ void GenfitDisplay::goToEvent(unsigned int id)
   }
   fErrorScale = old_error_scale;
   */
-};
+}
 
 void GenfitDisplay::open()
 {
@@ -184,8 +183,19 @@ void GenfitDisplay::open()
 
     TEveGeoTopNode* eve_top_node = new TEveGeoTopNode(gGeoManager, top_node);
     eve_top_node->IncDenyDestroy();
+    eve_top_node->SetVisLevel(2);
     gEve->AddGlobalElement(eve_top_node);
   }
+  TGeoVolume* ecl = gGeoManager->FindVolumeFast("logical_ecl");
+  if (ecl)
+    ecl->SetVisDaughters(false);
+  else
+    B2WARNING("ECL not found?");
+  TGeoVolume* cdc = gGeoManager->FindVolumeFast("logicalCDC");
+  if (cdc)
+    cdc->SetVisDaughters(false);
+  else
+    B2WARNING("CDC not found?");
 
   double old_error_scale = fErrorScale;
   drawEvent();
@@ -638,30 +648,16 @@ TEveBox* GenfitDisplay::boxCreator(const TVector3& o, TVector3 u, TVector3 v, fl
   v *= (0.5 * vd);
   norm *= (0.5 * depth);
 
-  vertices[0] = o(0) - u(0) - v(0) - norm(0);
-  vertices[1] = o(1) - u(1) - v(1) - norm(1);
-  vertices[2] = o(2) - u(2) - v(2) - norm(2);
-  vertices[3] = o(0) + u(0) - v(0) - norm(0);
-  vertices[4] = o(1) + u(1) - v(1) - norm(1);
-  vertices[5] = o(2) + u(2) - v(2) - norm(2);
-  vertices[6] = o(0) + u(0) - v(0) + norm(0);
-  vertices[7] = o(1) + u(1) - v(1) + norm(1);
-  vertices[8] = o(2) + u(2) - v(2) + norm(2);
-  vertices[9] = o(0) - u(0) - v(0) + norm(0);
-  vertices[10] = o(1) - u(1) - v(1) + norm(1);
-  vertices[11] = o(2) - u(2) - v(2) + norm(2);
-  vertices[12] = o(0) - u(0) + v(0) - norm(0);
-  vertices[13] = o(1) - u(1) + v(1) - norm(1);
-  vertices[14] = o(2) - u(2) + v(2) - norm(2);
-  vertices[15] = o(0) + u(0) + v(0) - norm(0);
-  vertices[16] = o(1) + u(1) + v(1) - norm(1);
-  vertices[17] = o(2) + u(2) + v(2) - norm(2);
-  vertices[18] = o(0) + u(0) + v(0) + norm(0);
-  vertices[19] = o(1) + u(1) + v(1) + norm(1);
-  vertices[20] = o(2) + u(2) + v(2) + norm(2);
-  vertices[21] = o(0) - u(0) + v(0) + norm(0);
-  vertices[22] = o(1) - u(1) + v(1) + norm(1);
-  vertices[23] = o(2) - u(2) + v(2) + norm(2);
+  for (int i = 0; i < 3; i++) {
+    vertices[i + 0]  = (float)(o(i) - u(i) - v(i) - norm(i));
+    vertices[i + 3]  = (float)(o(i) + u(i) - v(i) - norm(i));
+    vertices[i + 6]  = (float)(o(i) + u(i) - v(i) + norm(i));
+    vertices[i + 9]  = (float)(o(i) - u(i) - v(i) + norm(i));
+    vertices[i + 12] = (float)(o(i) - u(i) + v(i) - norm(i));
+    vertices[i + 15] = (float)(o(i) + u(i) + v(i) - norm(i));
+    vertices[i + 18] = (float)(o(i) + u(i) + v(i) + norm(i));
+    vertices[i + 21] = (float)(o(i) - u(i) + v(i) + norm(i));
+  }
 
   box->SetVertices(vertices);
   return box;

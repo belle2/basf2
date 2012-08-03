@@ -133,6 +133,7 @@ namespace Belle2 {
      **/
     void savePicture(bool highres = false);
 
+    /** alias for savePicture(true). */
     void saveHiResPicture() { savePicture(true); }
 
 

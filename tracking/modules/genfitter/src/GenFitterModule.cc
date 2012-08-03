@@ -95,6 +95,8 @@ GenFitterModule::GenFitterModule() :
   addParam("TracksColName", m_tracksColName, "Name of collection holding the final Tracks (will be created by this module)", string(""));
 
   addParam("HelixOutput", m_createTextFile, "Set true if you want to have a text file with perigee helix parameters of all tracks", bool(false));
+  addParam("DAFTemperatures", m_dafTemperatures, "set the annealing scheme (temperatures) for the DAF. Length of vector will determine DAF iterations", vector<double>(1, -999.0));
+
 }
 
 GenFitterModule::~GenFitterModule()
@@ -134,6 +136,16 @@ void GenFitterModule::initialize()
   //set parameters for the fitter algorithm objects
   m_kalmanFilter.setNumIterations(m_nIter);
   m_daf.setProbCut(m_probCut);
+  int nDafTemps = m_dafTemperatures.size();
+  if (nDafTemps == 1 && m_dafTemperatures[0] < 0.0) { // user did not set an annealing scheme. Set the default one.
+    m_daf.setBetas(81, 8, 4, 1, 1, 1);
+  } else if (nDafTemps <= 10 && nDafTemps >= 1) {
+    m_dafTemperatures.resize(10, -1.0);
+    m_daf.setBetas(m_dafTemperatures[0], m_dafTemperatures[1], m_dafTemperatures[2], m_dafTemperatures[3], m_dafTemperatures[4], m_dafTemperatures[5], m_dafTemperatures[6], m_dafTemperatures[7], m_dafTemperatures[8], m_dafTemperatures[9]);
+  } else {
+    m_daf.setBetas(81, 8, 4, 1, 1, 1);
+    B2ERROR("You either set 0 DAF temperatures or more than 10. This is not supported. The default scheme (81,8,4,1,1,1) was selected instead.");
+  }
 
 }
 

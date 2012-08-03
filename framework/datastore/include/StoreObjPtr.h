@@ -59,7 +59,7 @@ namespace Belle2 {
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreObjPtr">The basf2 developers</a>
    *  @sa If you want to store more than a single object of one type, use the StoreArray class.
    */
-  template <class T> class StoreObjPtr : StoreAccessorBase {
+  template <class T> class StoreObjPtr : public StoreAccessorBase {
   public:
     /** Constructor with assignment.
      *

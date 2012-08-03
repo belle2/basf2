@@ -150,12 +150,27 @@ void SimpleInputModule::event()
 {
   m_file->cd();
 
+  if (!m_tree[DataStore::c_Event])
+    return;
+
   const long nextEntry = InputController::getNextEntry();
   if (nextEntry >= 0 && nextEntry < InputController::numEntries()) {
     B2INFO("SimpleInput: will read " << nextEntry << " next.");
     m_counterNumber[DataStore::c_Event] = nextEntry;
-    InputController::setNextEntry(-1);
+    InputController::reset();
+  } else if (InputController::getNextExperiment() >= 0 && InputController::getNextRun() >= 0 && InputController::getNextEvent() >= 0) {
+    const int major = 1000000 * InputController::getNextExperiment() + InputController::getNextRun();
+    const int minor = InputController::getNextEvent();
+    const long entry = m_tree[DataStore::c_Event]->GetEntryNumberWithIndex(major, minor);
+    if (entry == -1) {
+      B2ERROR("Couldn't find entry with index " << major << ", " << minor);
+    } else {
+      B2INFO("SimpleInput: will read " << entry << " next.");
+      m_counterNumber[DataStore::c_Event] = entry;
+    }
+    InputController::reset();
   }
+
   if (m_counterNumber[DataStore::c_Event])
     m_firstEntryLoaded = false;
   readTree(DataStore::c_Event);

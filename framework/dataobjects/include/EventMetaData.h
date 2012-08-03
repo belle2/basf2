@@ -157,7 +157,7 @@ namespace Belle2 {
      */
     unsigned long m_experiment;
 
-    /** Experiment number.
+    /** Index of parent file.
      */
     int m_parent_index;
 

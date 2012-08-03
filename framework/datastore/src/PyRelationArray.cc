@@ -32,4 +32,4 @@ std::vector<unsigned int> PyRelationArray::getToIndices(unsigned int from) const
   return iter->second;
 }
 
-ClassImp(PyRelationArray);
+ClassImp(PyRelationArray)

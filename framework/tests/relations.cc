@@ -127,7 +127,7 @@ namespace Belle2 {
     const RunMetaData* to_obj = runData[0];
     EXPECT_TRUE(first_from_obj == relIndex.getFirstElementTo(to_obj)->from);
     EXPECT_TRUE(to_obj == relIndex.getFirstElementTo(to_obj)->to);
-    EXPECT_TRUE(1.0 == relIndex.getFirstElementTo(to_obj)->weight);
+    EXPECT_FLOAT_EQ(1.0, relIndex.getFirstElementTo(to_obj)->weight);
     EXPECT_TRUE(first_from_obj == relIndex.getFirstElementTo(*to_obj)->from);
     EXPECT_TRUE(to_obj == relIndex.getFirstElementFrom(from_obj)->to);
     EXPECT_TRUE(to_obj == relIndex.getFirstElementFrom(*from_obj)->to);

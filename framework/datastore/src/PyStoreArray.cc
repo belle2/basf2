@@ -2,4 +2,4 @@
 
 using namespace Belle2;
 
-ClassImp(PyStoreArray);
+ClassImp(PyStoreArray)

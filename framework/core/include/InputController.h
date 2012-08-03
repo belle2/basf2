@@ -21,16 +21,27 @@ namespace Belle2 {
      *
      * This is mainly useful for interactive applications (e.g. event display).
      *
-     * The input module should reset this to -1 once the entry was loaded.
+     * The input module should call reset() after the entry was loaded.
      */
     static void setNextEntry(long entry) { s_nextEntry = entry; }
 
-    //TODO:
-    /** Set the file entry to be loaded the next time event() is called. */
-    //static void setNextEntry(int exp, int run, int event);
-
     /** Return entry number set via setNextEntry(). */
     static long getNextEntry() { return s_nextEntry; }
+
+    /** Set the file entry to be loaded the next time event() is called, by evt/run/exp number.
+     *
+     * The input module should call reset() after the entry was loaded.
+     */
+    static void setNextEntry(long exp, long run, long event) { s_nextExperiment = exp; s_nextRun = run; s_nextEvent = event; }
+
+    /** Return experiment number set via setNextEntry(). */
+    static long getNextExperiment() { return s_nextExperiment; }
+
+    /** Return run number set via setNextEntry(). */
+    static long getNextRun() { return s_nextRun; }
+
+    /** Return event number set via setNextEntry(). */
+    static long getNextEvent() { return s_nextEvent; }
 
     /** Returns total number of entries in the event tree.
      *
@@ -41,6 +52,13 @@ namespace Belle2 {
     /** set total number of entries in the opened file. */
     static void setNumEntries(long n) { s_numEntries = n; }
 
+    /** Indicate that event was loaded and reset all members related to the next entry. */
+    static void reset() {
+      s_nextEntry = -1;
+      s_nextExperiment = -1;
+      s_nextRun = -1;
+      s_nextEvent = -1;
+    }
 
   private:
     InputController() { }
@@ -54,6 +72,19 @@ namespace Belle2 {
      *  -1 indicates that execution should continue normally.
      */
     static long s_nextEntry;
+
+    /** Experiment number to load next.
+     *
+     * -1 by default.
+     */
+    static long s_nextExperiment;
+
+    /** Run number to load next. */
+    static long s_nextRun;
+
+    /** Event (not entry!) to load next. */
+    static long s_nextEvent;
+
 
     /** total number of entries in event tree, or zero if none exists. */
     static long s_numEntries;

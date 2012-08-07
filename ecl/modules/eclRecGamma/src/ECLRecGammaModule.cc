@@ -126,9 +126,9 @@ void ECLRecGammaModule::event()
 
     for (int iHA = 0; iHA < hANum; iHA++) {
 
-      HitAssignmentECL* aECLShower = eclHitAssignmentArray[iHA];
-      int m_HAShowerId = aECLShower->getShowerId();
-      int m_HAcellId = aECLShower->getCellId();
+      HitAssignmentECL* aHitAssignmentECL = eclHitAssignmentArray[iHA];
+      int m_HAShowerId = aHitAssignmentECL->getShowerId();
+      int m_HAcellId = aHitAssignmentECL->getCellId();
 
       if (m_HAShowerId != m_showerId)continue;
       if (m_HAShowerId > m_showerId)break;

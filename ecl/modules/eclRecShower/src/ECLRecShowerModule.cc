@@ -100,7 +100,7 @@ void ECLRecShowerModule::event()
     B2ERROR("Can not find ECLRecShowerHits" << m_eclDigiCollectionName << ".");
   }
 
-  int checkflag = 0;
+//  int checkflag = 0;
   cout.unsetf(ios::scientific);
   cout.precision(6);
   TRecEclCF& cf = TRecEclCF::Instance();
@@ -130,7 +130,7 @@ void ECLRecShowerModule::event()
       ///
       /// Shower Attributes
       ///
-//      cout << "Event " << get_ID << " " << nShower << "shower Energy: " << (*iShower).second.Energy() << " Theta " << (*iShower).second.Theta() / PI * 180 << " Phi " << (*iShower).second.Phi() / PI * 180 << " " << iCR->Showers().size() << endl;
+//      cout << "shower  " << nShower << "shower Energy: " << (*iShower).second.Energy() << " Theta " << (*iShower).second.Theta() / PI * 180 << " Phi " << (*iShower).second.Phi() / PI * 180 << " " <<  (float)(*iShower).second.E9oE25()<< endl;
 
       TEclCFShower iSh = (*iShower).second;
       std::vector<MEclCFShowerHA> HAs = iSh.HitAssignment();

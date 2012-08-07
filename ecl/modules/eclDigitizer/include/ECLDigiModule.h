@@ -69,6 +69,9 @@ namespace Belle2 {
 
     protected:
     private:
+
+      /** Input ECLSimHit array name. */
+      std::string m_inColName;
       /** Name of collection of ECLHits.
        */
       std::string m_eclHitCollectionName;

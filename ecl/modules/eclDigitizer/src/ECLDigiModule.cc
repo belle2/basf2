@@ -265,8 +265,6 @@ void ECLDigiModule::event()
         eclDspArray[m_hitNum]->setCellId(iECLCell);
         eclDspArray[m_hitNum]->setDspA(FitA);
 
-
-        cout << "eclDspArray[m_hitNum]- " << m_hitNum << endl;
         StoreArray<DigiECL> eclDigiArray(m_eclDigiCollectionName);
         m_hitNum1 = eclDigiArray->GetLast() + 1;
         new(eclDigiArray->AddrAt(m_hitNum1)) DigiECL();

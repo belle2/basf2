@@ -25,7 +25,7 @@ class CLIParams:
     project = 'Ungrouped'
     priority = 0
     query = None
-    swver = 'build-2012-05-02'
+    swver = 'build-2012-07-18'
     sysconfig = 'Belle-v2r2'
     datatype = None
     experiments = None

@@ -20,8 +20,7 @@ cd ${VO_BELLE_SW_DIR}/belle2/releases/$2
 setuprel $2
 cd $WORKDIR
 
-
-basf2 -i > basf2.error 2>&1
+basf2 -info > basf2.error 2>&1
 if [ $? -ne 0 ]; then
   cat basf2.error
   echo "basf2 not installed correctly"

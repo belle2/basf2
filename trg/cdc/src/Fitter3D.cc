@@ -50,6 +50,7 @@
 
 #include "trg/cdc/Fitter3DUtility.h"
 
+#include "trg/cdc/EventTime.h"
 
 //...Global varibles...
 double rr[9];
@@ -108,9 +109,11 @@ namespace Belle2 {
   TRGCDCFitter3D::TRGCDCFitter3D(const string & name, 
                                  const string & rootFitter3DFile,
                                  const TRGCDC & TRGCDC,
+				 const TRGCDCEventTime * eventTime,
                                  bool fLRLUT)
     : _name(name),
     _cdc(TRGCDC),
+    _eventTime(eventTime),
     m_rootFitter3DFilename(rootFitter3DFile),
     m_flagWireLRLUT(fLRLUT){
 
@@ -289,18 +292,24 @@ namespace Belle2 {
     m_treeTrackFitter3D = new TTree("m_treeTrackFitter3D","track");
 
     m_tSTrackFitter3D = new TClonesArray("TVectorD");
+    m_mcTSTrackFitter3D = new TClonesArray("TVectorD");
     m_fitTrackFitter3D = new TClonesArray("TVectorD");
     m_szTrackFitter3D = new TClonesArray("TVectorD");
     m_mcTrackFitter3D = new TClonesArray("TVectorD");
     m_mcStatusTrackFitter3D = new TClonesArray("TVectorD");
     m_stTSsTrackFitter3D = new TClonesArray("TVectorD");
+    m_mcVertexTrackFitter3D = new TClonesArray("TVector3");
+    m_mc4VectorTrackFitter3D = new TClonesArray("TLorentzVector");
 
     m_treeTrackFitter3D->Branch("tSTrackFitter3D", &m_tSTrackFitter3D);
+    m_treeTrackFitter3D->Branch("mcTSTrackFitter3D", &m_mcTSTrackFitter3D);
     m_treeTrackFitter3D->Branch("fitTrackFitter3D", &m_fitTrackFitter3D);
     m_treeTrackFitter3D->Branch("szTrackFitter3D", &m_szTrackFitter3D);
     m_treeTrackFitter3D->Branch("mcTrackFitter3D", &m_mcTrackFitter3D);
     m_treeTrackFitter3D->Branch("mcStatusTrackFitter3D", &m_mcStatusTrackFitter3D);
     m_treeTrackFitter3D->Branch("stTSsTrackFitter3D", &m_stTSsTrackFitter3D);
+    m_treeTrackFitter3D->Branch("mcVertexTrackFitter3D", &m_mcVertexTrackFitter3D);
+    m_treeTrackFitter3D->Branch("mc4VectorTrackFitter3D", &m_mc4VectorTrackFitter3D);
 
     m_treeConstantsFitter3D = new TTree("m_treeConstantsFitter3D","constants");
     m_geometryFitter3D = new TVectorD(17);
@@ -358,6 +367,8 @@ namespace Belle2 {
     TRGCDCFitter3D::doit(const vector<TCTrack *> & trackListIn,
         vector<TCTrack *> & trackListOut) {
 
+      float evtTime=EvtTime()->getT0();
+      evtTime=evtTime*40/1000;
       
       //double m_Trg_PI = 3.141592653589793; 
       TRGDebug::enterStage("Fitter 3D");
@@ -365,16 +376,20 @@ namespace Belle2 {
       //	StoreArray<CDCHit> CDCHits("CDCHits");
       //	RelationArray cdcSimHitsToCDCHits(cdcArray,CDCHits);
       StoreArray<MCParticle> MCParticles("");
+	    StoreArray<CDCSimHit> SimHits("CDCSimHits");
       TClonesArray &tSTrackFitter3D = *m_tSTrackFitter3D;
+      TClonesArray &mcTSTrackFitter3D = *m_mcTSTrackFitter3D;
       TClonesArray &fitTrackFitter3D = *m_fitTrackFitter3D;
       TClonesArray &szTrackFitter3D = *m_szTrackFitter3D;
       TClonesArray &mcTrackFitter3D = *m_mcTrackFitter3D;
       TClonesArray &mcStatusTrackFitter3D = *m_mcStatusTrackFitter3D;
       TClonesArray &stTSsTrackFitter3D = *m_stTSsTrackFitter3D;
+      TClonesArray &mcVertexTrackFitter3D = *m_mcVertexTrackFitter3D;
+      TClonesArray &mc4VectorTrackFitter3D = *m_mc4VectorTrackFitter3D;
+
 
       //...TS study (loop over all TS's)...
       if(m_flagNonTSStudy == 1){
-	StoreArray<CDCSimHit> SimHits("CDCSimHits");
 	StoreArray<CDCHit> CDCHits("CDCHits");
 	RelationArray rels(SimHits,CDCHits);
         const TRGCDC & cdc = * TRGCDC::getTRGCDC();
@@ -404,11 +419,14 @@ namespace Belle2 {
       int z0nump1[4],z0nump2[4],z0den,iz0den;
 
       tSTrackFitter3D.Clear();
+      mcTSTrackFitter3D.Clear();
       fitTrackFitter3D.Clear();
       szTrackFitter3D.Clear();
       mcTrackFitter3D.Clear();
       mcStatusTrackFitter3D.Clear();
       stTSsTrackFitter3D.Clear();
+      mcVertexTrackFitter3D.Clear();
+      mc4VectorTrackFitter3D.Clear();
 
 
       //...Loop over track list...
@@ -445,6 +463,11 @@ namespace Belle2 {
         mcStatus[0] = trackMCParticle.getStatus();
         mcStatus[1] = trackMCParticle.getPDG();
         mcStatus[2] = trackMCParticle.getCharge();
+        TVector3 vertex;
+        TLorentzVector vector4;
+        vertex = trackMCParticle.getVertex();
+        vector4 = trackMCParticle.get4Vector();
+
 
         //       t.dump("detail");
 
@@ -480,8 +503,9 @@ namespace Belle2 {
 
           if( m_flagWireLRLUT == 1){
             ///...Using Drift time information
-            int lutcomp=s->LUT()->getLRLUT(s->hitPattern(),i);
+            int lutcomp=s->LUT()->getLRLUT(s->hitPattern(),s->superLayerId());
             float dphi=s->hit()->drift()*10;
+	    dphi-=evtTime;
             dphi=atan(dphi/rro[i]/1000);
             if(lutcomp==0){phi[i]-=dphi;}
             else if(lutcomp==1){phi[i]+=dphi;}
@@ -532,6 +556,32 @@ namespace Belle2 {
           // Save track segment information
           TVectorD tempPhi(9,phi2);
           new(tSTrackFitter3D[iFit]) TVectorD(tempPhi);
+          //cout<<"TS: "<<phi2[0]<<" "<<phi2[1]<<endl;
+
+          // Save mc track segment information
+          // Initialize values for track
+          int tSLayerId[9] = {2,16,28,40,52,10,22,34,46};
+          double driftTS[9] = {999,999,999,999,999,999,999,999,999};
+          TVectorD mcTS(27);
+          for( int iHits = 0; iHits < SimHits->GetEntriesFast(); iHits++){
+             CDCSimHit* aCDCSimHit = SimHits[iHits];
+             TVector3 posTrack = aCDCSimHit->getPosTrack();
+             int hitLayerId = aCDCSimHit->getLayerId(); 
+             double hitDriftLength = aCDCSimHit->getDriftLength() * Unit::cm;
+             // Find 9 TS values
+             for( int iTS = 0; iTS < 9; iTS++) {
+               if(hitLayerId == tSLayerId[iTS]) {
+                 if(driftTS[iTS]>hitDriftLength) {
+                   mcTS[3*iTS] = posTrack.x();
+                   mcTS[3*iTS+1] = posTrack.y();
+                   mcTS[3*iTS+2] = posTrack.z();
+                 }
+               }
+             } // Find 9 TS values
+          } // Loop for all CDC Sim hit values 
+          //cout<<"mcTS: "<<atan2(mcTS[1],mcTS[0])<<" "<<atan2(mcTS[4],mcTS[3])<<endl;
+          new(mcTSTrackFitter3D[iFit]) TVectorD(mcTS);
+
 
           // Sign Finder
           int mysign = findSign(phi2);
@@ -728,8 +778,10 @@ namespace Belle2 {
           tempMC[4] = mcCharge;
           new(mcTrackFitter3D[iFit]) TVectorD(tempMC);
 
-          // Save mc status
+          // Save mc information
           new(mcStatusTrackFitter3D[iFit]) TVectorD(mcStatus);
+          new(mcVertexTrackFitter3D[iFit]) TVector3(vertex);
+          new(mc4VectorTrackFitter3D[iFit]) TLorentzVector(vector4);
           
 
           // For integer space

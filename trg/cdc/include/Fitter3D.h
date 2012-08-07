@@ -28,6 +28,7 @@ namespace Belle2 {
 
 class TRGCDC;
 class TRGCDCTrack;
+class TRGCDCEventTime;
 
 /// A class to fit tracks in 3D
 class TRGCDCFitter3D {
@@ -38,6 +39,7 @@ class TRGCDCFitter3D {
     TRGCDCFitter3D(const std::string & name,
                    const std::string & rootFitter3DFile,
                    const TRGCDC &,
+		   const TRGCDCEventTime * eventTime,
                    const bool fLRLUT);
 
     /// Destructor
@@ -61,6 +63,9 @@ class TRGCDCFitter3D {
     void initialize(void);
 
     void terminate(void);
+   
+    /// returns eventTime
+    const TRGCDCEventTime * EvtTime(void) const;
 
   private:
 
@@ -101,6 +106,8 @@ class TRGCDCFitter3D {
     double m_phierror[5];
     double m_zerror[4];
 
+    // EventTime class
+    const TRGCDCEventTime * const _eventTime;
     protected:
 
       // The filename of root file for Fitter3D
@@ -112,6 +119,11 @@ class TRGCDCFitter3D {
       // Stores phi hit values
       // axphi1, axphi2, axphi3, axphi4, axphi5, stphi1, stphi2, stphi3, stphi4
       TClonesArray* m_tSTrackFitter3D;
+      // MC TS values
+      // 3*5 + 3*4 = 27
+      // ax1_x, ax1_y, ax1_z, ax2_x, ax2_y, ax2_z, ax3_x, ax3_y, ax3_z, ax4_x, ax4_y, ax4_z, ax5_x, ax5_y, ax5_z, 
+      // st1_x, st1_y, st1_z, st2_x, st2_y, st2_z, st3_x, st3_y, st3_z, st4_x, st4_y, st4_z
+      TClonesArray* m_mcTSTrackFitter3D;
       // Stores fit values
       // pT, phi0, z0, theta, charge
       TClonesArray* m_fitTrackFitter3D;
@@ -123,6 +135,8 @@ class TRGCDCFitter3D {
       TClonesArray* m_mcTrackFitter3D;
       // statusbit, pdg, charge
       TClonesArray* m_mcStatusTrackFitter3D;
+      TClonesArray* m_mcVertexTrackFitter3D;
+      TClonesArray* m_mc4VectorTrackFitter3D;
       // Stores geometry
       // r1, r2, r3, r4, r5, r6, r7, r8, r9, anglest1, anglest2, anglest3, anglest4, ztostraw1, ztostraw2, ztostraw3, ztostraw4
       TVectorD* m_geometryFitter3D;
@@ -144,6 +158,12 @@ inline
 std::string
 TRGCDCFitter3D::name(void) const {
     return _name;
+}
+
+inline
+const TRGCDCEventTime *
+TRGCDCFitter3D::EvtTime(void) const {
+    return _eventTime;
 }
 
 } // namespace Belle2

@@ -419,13 +419,15 @@ TRGCDC::initialize(bool houghFinderPerfect,
     _hFinder->perfect(houghFinderPerfect);
 
     //...event Time...
-    _eventTime= new TCEventTime(*this);
-    _eventTime->initialize();
+    TCEventTime * test = new TCEventTime(*this);
+    _eventTime.push_back(test);
+    _eventTime.back()->initialize();
 
     //...3D fitter...
     _fitter3D = new TCFitter3D("Fitter3D", 
                               _rootFitter3DFilename,
                               * this,
+			      _eventTime.back(),
                               _fLRLUT);
     _fitter3D->initialize();
 
@@ -755,10 +757,8 @@ TRGCDC::update(bool ) {
         //...Drift length(micron) to drift time(ns)...
         //   coefficient used here must be re-calculated.
         const float driftTimeMC =
-	    SimHits[iSimHit]->getDriftLength() * 10 * 1000 / 40 +
-      SimHits[iSimHit]->getFlightTime();
-
-	//cout << " -2 driftTimeMC=" << driftTimeMC << endl;
+	  SimHits[iSimHit]->getDriftLength() * 10 * 1000 / 40 +
+	  SimHits[iSimHit]->getFlightTime();
 
 	//...Trigger timing...
         TRGTime rise = TRGTime(driftTimeMC, true, _clockFE, w.name());
@@ -769,7 +769,8 @@ TRGCDC::update(bool ) {
 
 	//...Simulated drift distance...
 	const double driftLength =
-	    _clockFE.absoluteTime(w._timing[0]->time()) * 40 / 10 / 1000;
+	  _clockFE.absoluteTime(w._timing[0]->time()) * 40 / 10 / 1000;
+
 
 	//w._timing.dump("detail", " -1 ");
 
@@ -1329,7 +1330,7 @@ TRGCDC::simulate(void) {
     }
 
     //...Event Time...
-    _eventTime->getT0();
+    _eventTime.back()->getT0();
 
     //...3D tracker...
     vector<TCTrack *> trackList3D;
@@ -1373,7 +1374,7 @@ TRGCDC::simulate(void) {
     TClonesArray &evtTime = *m_evtTime;
     evtTime.Clear();
     TVectorD tempEvtTime(1);
-    tempEvtTime[0]=_eventTime->getT0();
+    tempEvtTime[0]=_eventTime.back()->getT0();
     new(evtTime[0]) TVectorD(tempEvtTime);
     //...MCParticle...
     StoreArray<MCParticle> mcParticles;

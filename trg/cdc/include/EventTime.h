@@ -38,7 +38,7 @@ namespace Belle2{
       
       void initialize(void);
       void terminate(void);
-      double getT0(void);
+      double getT0(void)const;
 
     
     private : 

@@ -41,7 +41,7 @@ namespace Belle2{
 	void TRGCDCEventTime::initialize(void){
 	}
 
-	double TRGCDCEventTime::getT0(void){
+	double TRGCDCEventTime::getT0 (void)const{
 	  TRGDebug::enterStage("Event Time");
 	  double tmin=1000;
 	  for (unsigned i=0;i<_cdc.nSegmentLayers();i++){
@@ -54,7 +54,9 @@ namespace Belle2{
 	      if(timing.active()){
 	      for(unsigned k=0;k<wires.size();k++){
 		if(wires[k]->hit()){
+//		  double dl=wires[k]->hit()->drift()*10*1000/40;
 		  double dt= wires[k]->timing()[0]->time();
+//		  cout << dt << endl;
 		  if(tmin>dt) tmin=dt;
 		}
 	      }

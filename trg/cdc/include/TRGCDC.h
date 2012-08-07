@@ -463,7 +463,9 @@ class TRGCDC {
     std::vector<TRGCDCLUT *> _luts;
 
     /// EventTime
-    TRGCDCEventTime *_eventTime;
+//    TRGCDCEventTime *_eventTime;
+
+    std::vector<TRGCDCEventTime *> _eventTime;
 
     /// root file
     TFile* m_file;

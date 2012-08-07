@@ -383,6 +383,9 @@ histoRes = ROOT.TH1F('histoRes', 'histoRes', histBins, -1. * histRange
 absDev = ROOT.TH1D('absDev', 'absDev', histBins, 0, histRange)
 
 c = ROOT.TCanvas()
+evtListCosth = ROOT.TEventList('evtListCosth', 'evtListCosth')
+evtListBin = ROOT.TEventList('evtListBin', 'evtListBin')
+evtListBinFlag = ROOT.TEventList('evtListBinFlag', 'evtListBinFlag')
 
 # loop over chain ------------------------------------------------------------------------------------------------------------------------------
 statusFlagCut = ROOT.TCut('genfitStatusFlag==0')
@@ -394,6 +397,14 @@ while costh < costhU - 0.5 * costhS:  # loop over costh
                          + ' && trueVertexMom.CosTheta()<' + str(costh
                          + costhS))
 
+    # select events in theta range
+    evtListCosth.Reset()
+    evtListBin.Reset()
+    evtListBinFlag.Reset()
+    chain.SetEventList(ROOT.NULL)
+    chain.Draw('>> evtListCosth', costhCUT)
+    chain.SetEventList(evtListCosth)
+
     binY = 1
     pt = ptL
     while pt < ptU - 0.5 * ptS:  # loop over pt
@@ -403,24 +414,34 @@ while costh < costhU - 0.5 * costhS:  # loop over costh
         binStFlCut = ROOT.TCut(statusFlagCut.GetTitle() + ' && '
                                + binCut.GetTitle())
 
-        print 'Bin(', binX, binY, '), pt = ', pt, '; costh = ', costh
+        print 'Bin(', binX, binY, '), costh =', costh, '; pt =', pt
+
+        # further select events in pt range
+        evtListBin.Reset()
+        evtListBinFlag.Reset()
+        chain.SetEventList(evtListCosth)
+        chain.Draw('>> evtListBin', binCut)
+        chain.SetEventList(evtListBin)
+
+        # further reduce event list to entries with statusFlag==0
+        chain.Draw('>> evtListBinFlag', statusFlagCut)
+        chain.SetEventList(evtListBinFlag)
 
         # efficiency
-        chain.Draw('genfitStatusFlag >> histo', binCut)
-        if histo.GetEntries() > 0:
+        if evtListBin.GetN() > 0:
             h_efficiency.SetBinContent(binX, binY,
-                                       histo.GetBinContent(histBins / 2 + 1)
-                                       / histo.GetEntries())  # only tracks with status flag 0 are ok
+                                       float(evtListBinFlag.GetN())
+                                       / float(evtListBin.GetN()))
 
         # p-values
-        chain.Draw('pValue_bu >> histo', binStFlCut)
+        chain.Draw('pValue_bu >> histo')
         if draw:
             c.Update()
         if histo.GetEntries() > 0:
             h_pValue_bu_mean.SetBinContent(binX, binY, histo.GetMean())
             h_pValue_bu_RMS.SetBinContent(binX, binY, histo.GetRMS())
 
-        chain.Draw('pValue_fu >> histo', binStFlCut)
+        chain.Draw('pValue_fu >> histo')
         if draw:
             c.Update()
         if histo.GetEntries() > 0:
@@ -429,7 +450,7 @@ while costh < costhU - 0.5 * costhS:  # loop over costh
 
         # resolutions
         iHist = 0
-        chain.Draw('relRes_curvVertex >> histoRes', binStFlCut)
+        chain.Draw('relRes_curvVertex >> histoRes')
         if draw:
             c.Update()
         if histoRes.GetEntries() > 0:
@@ -441,8 +462,7 @@ while costh < costhU - 0.5 * costhS:  # loop over costh
         # pull distributions
         for iVar in range(0, 6):  # x, y, z, px, py, pz
             iHist = 0
-            chain.Draw('pulls_vertexPosMom[' + str(iVar) + '] >> histo',
-                       binStFlCut)
+            chain.Draw('pulls_vertexPosMom[' + str(iVar) + '] >> histo')
             if draw:
                 c.Update()
             if histo.GetEntries() > 0:

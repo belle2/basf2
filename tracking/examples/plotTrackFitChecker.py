@@ -54,7 +54,7 @@ for iarg in range(len(sys.argv)):
         ofile = getArgsToNextOpt(sys.argv, iarg)
     if arg == '-draw':  # draw bin histograms during analysis
         draw = True
-    if arg == '-coarse':  # more coarse binning of 2D histogramms
+    if arg == '-coarse':  # more coarse binning of 2D histogramms (divide by ...)
         coarse = int(getArgsToNextOpt(sys.argv, iarg))
 
 if check > 1:
@@ -102,7 +102,7 @@ OutlierMax = 100  # range for outlier histograms
 resoScaling = 0.05  # scaling factor for resolution histograms
 
 MADtoSigma = 1.4826  # sigma = 1.4826*MAD (for gaussian distributions)
-outlierCut = 4.  # distance from median in terms of MAD std when to count as oulier
+outlierCut = 4.  # distance from median in terms of MAD std when to count as outlier
 
 pValue_mean_Ideal = 0.5  # ideal value of mean of p-value distribution
 pValue_RMS_Ideal = 1. / math.sqrt(12)  # ideal value of RMS of p-value distribution

@@ -1,5 +1,0 @@
-Import('env')
-
-env.Append(CPPDEFINES = {'RaveDllExport':''})
-env['LIBS'] = ['framework','geometry','genfit','generators_dataobjects' ,'RaveBase', 'RKTrackRep','$ROOT_LIBS']
-Return('env')

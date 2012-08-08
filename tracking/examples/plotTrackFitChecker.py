@@ -10,6 +10,9 @@
 #                                                                #
 ##################################################################
 
+# median and MAD can be slightly inaccurate since they are calculated from binned data!
+# However, errors of these values should in general be less than 1E-2
+
 import ROOT
 import glob
 import math
@@ -85,6 +88,7 @@ print 'Analysis output file: ', ofile
 chain.Print()
 
 # important numbers -----------------------------------------------------------------------------------------------------------------------------
+# 2D Histograms
 ptL = 0.2  # lower lower boundary of p_t
 ptU = 3.0  # upper boundary of p_t
 ptN = 14 / coarse  # number of p_t bins
@@ -99,13 +103,16 @@ pullMinMax = 1.  # range for pull mean/median histogramms
 RMSMax = 2.0  # range for RMS/MAD histograms
 OutlierMax = 100  # range for outlier histograms
 
-resoScaling = 0.05  # scaling factor for resolution histograms
+pValue_mean_Ideal = 0.5  # ideal value of mean of p-value distribution
+pValue_RMS_Ideal = 1. / math.sqrt(12)  # ideal value of RMS of p-value distribution
+
+# 1D Histograms
+histRange = 10.0  # range for the analysis histogram
+resoScaling = 0.05  # scaling factor for resolution analysis histogram
+histBins = 2000  # number of bins for the analysis histogram
 
 MADtoSigma = 1.4826  # sigma = 1.4826*MAD (for gaussian distributions)
 outlierCut = 4.  # distance from median in terms of MAD std when to count as outlier
-
-pValue_mean_Ideal = 0.5  # ideal value of mean of p-value distribution
-pValue_RMS_Ideal = 1. / math.sqrt(12)  # ideal value of RMS of p-value distribution
 
 # compute mean, RMS, median, MAD, number of outliers --------------------------------------------------------------------------------------------
 
@@ -375,8 +382,6 @@ for var in [
 histos.extend(pullHistos)
 
 # set up histo for storing the data for the bins of the analysis histograms
-histRange = 10.0
-histBins = 2000
 histo = ROOT.TH1F('histo', 'histo', histBins, -1. * histRange, histRange)
 histoRes = ROOT.TH1F('histoRes', 'histoRes', histBins, -1. * histRange
                      * resoScaling, histRange * resoScaling)
@@ -435,41 +440,41 @@ while costh < costhU - 0.5 * costhS:  # loop over costh
 
         # p-values
         chain.Draw('pValue_bu >> histo')
-        if draw:
-            c.Update()
         if histo.GetEntries() > 0:
             h_pValue_bu_mean.SetBinContent(binX, binY, histo.GetMean())
             h_pValue_bu_RMS.SetBinContent(binX, binY, histo.GetRMS())
+            if draw:
+                c.Update()
 
         chain.Draw('pValue_fu >> histo')
-        if draw:
-            c.Update()
         if histo.GetEntries() > 0:
             h_pValue_fu_mean.SetBinContent(binX, binY, histo.GetMean())
             h_pValue_fu_RMS.SetBinContent(binX, binY, histo.GetRMS())
+            if draw:
+                c.Update()
 
         # resolutions
         iHist = 0
         chain.Draw('relRes_curvVertex >> histoRes')
-        if draw:
-            c.Update()
         if histoRes.GetEntries() > 0:
             est = robustEstimator(histoRes)
             for val in est:
                 resHistos[iHist].SetBinContent(binX, binY, val)
                 iHist += 1
+            if draw:
+                c.Update()
 
         # pull distributions
         for iVar in range(0, 6):  # x, y, z, px, py, pz
             iHist = 0
             chain.Draw('pulls_vertexPosMom[' + str(iVar) + '] >> histo')
-            if draw:
-                c.Update()
             if histo.GetEntries() > 0:
                 est = robustEstimator(histo)
                 for val in est:
                     pullHistos[5 * iVar + iHist].SetBinContent(binX, binY, val)
                     iHist += 1
+                if draw:
+                    c.Update()
 
         pt += ptS
         binY += 1

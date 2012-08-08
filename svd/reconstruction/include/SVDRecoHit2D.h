@@ -36,7 +36,7 @@ namespace Belle2 {
    * //Iterate over the relation and create a list of hits
    * vector<SVDRecoHit*> hits;
    * RelationIndex<MCParticle,SVDTrueHit> relMCTrueHit;
-   * RelationIndex<MCParticle,SVDTrueHit>::range_from it = relMCTrueHit.getFrom(mcParticle);
+   * RelationIndex<MCParticle,SVDTrueHit>::range_from it = relMCTrueHit.getElementsFrom(mcParticle);
    * for(; it.first!=it.second; ++it.first){
    *   hits.push_back(new SVDRecoHit(it.first->to));
    * }

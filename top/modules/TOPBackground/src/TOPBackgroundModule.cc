@@ -136,8 +136,8 @@ namespace Belle2 {
         return 0;
       }
 
-      if (relSimHitToDigit.getFirstFrom(digit)) {
-        return relSimHitToDigit.getFirstFrom(digit)->from;
+      if (relSimHitToDigit.getFirstElementTo(digit)) {
+        return relSimHitToDigit.getFirstElementTo(digit)->from;
       }
 
       return 0;
@@ -162,8 +162,8 @@ namespace Belle2 {
 
         RelationIndex<MCParticle, TOPSimHit> relMCParticleToTOPSimHit(mcParticles, topSimhits);
 
-        if (relMCParticleToTOPSimHit.getFirstFrom(simHit)) {
-          const MCParticle* currParticle = relMCParticleToTOPSimHit.getFirstFrom(simHit)->from;
+        if (relMCParticleToTOPSimHit.getFirstElementTo(simHit)) {
+          const MCParticle* currParticle = relMCParticleToTOPSimHit.getFirstElementTo(simHit)->from;
 
           const MCParticle* mother = currParticle->getMother();
 

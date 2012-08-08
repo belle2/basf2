@@ -271,14 +271,14 @@ void SVDDigitizerModule::event()
   //Check sensor info and set pointers to current sensor
   for (unsigned int i = 0; i < nSimHits; ++i) {
     m_currentHit = storeSimHits[i];
-    const RelationIndex<MCParticle, SVDSimHit>::Element* mcRel = relMCParticleSimHit.getFirstFrom(m_currentHit);
+    const RelationIndex<MCParticle, SVDSimHit>::Element* mcRel = relMCParticleSimHit.getFirstElementTo(m_currentHit);
     if (mcRel) {
       m_currentParticle = mcRel->indexFrom;
     } else {
       B2ERROR("Could not find MCParticle which produced SVDSimhit " << i);
       m_currentParticle = -1;
     }
-    const RelationIndex<SVDTrueHit, SVDSimHit>::Element* trueRel = relTrueHitSimHit.getFirstFrom(m_currentHit);
+    const RelationIndex<SVDTrueHit, SVDSimHit>::Element* trueRel = relTrueHitSimHit.getFirstElementTo(m_currentHit);
     if (trueRel) {
       m_currentTrueHit = trueRel->indexFrom;
     } else {

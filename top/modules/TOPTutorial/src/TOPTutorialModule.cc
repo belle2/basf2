@@ -122,12 +122,12 @@ namespace Belle2 {
         return 0;
       }
 
-      if (relMCParticleToTOPTrack.getFirstTo(particle)) {
-        const TOPTrack* track = relMCParticleToTOPTrack.getFirstTo(particle)->to;
+      if (relMCParticleToTOPTrack.getFirstElementFrom(particle)) {
+        const TOPTrack* track = relMCParticleToTOPTrack.getFirstElementFrom(particle)->to;
 
-        if (relTrackLikelihoods.getFirstTo(track)) {
+        if (relTrackLikelihoods.getFirstElementFrom(track)) {
 
-          return relTrackLikelihoods.getFirstTo(track)->to;
+          return relTrackLikelihoods.getFirstElementFrom(track)->to;
 
         }
       }
@@ -157,11 +157,11 @@ namespace Belle2 {
         return 0;
       }
 
-      if (arichAeroHitRel.getFirstTo(particle)) {
-        const ARICHAeroHit* track = arichAeroHitRel.getFirstTo(particle)->to;
-        if (relAeroToLikelihood.getFirstTo(track)) {
+      if (arichAeroHitRel.getFirstElementFrom(particle)) {
+        const ARICHAeroHit* track = arichAeroHitRel.getFirstElementFrom(particle)->to;
+        if (relAeroToLikelihood.getFirstElementFrom(track)) {
 
-          return relAeroToLikelihood.getFirstTo(track)->to;
+          return relAeroToLikelihood.getFirstElementFrom(track)->to;
 
         }
       }
@@ -184,9 +184,9 @@ namespace Belle2 {
 
       RelationIndex<GFTrack, MCParticle> gftracktomc(gfTracks, mcParticles);
 
-      if (gftracktomc.getFirstTo(track)) {
+      if (gftracktomc.getFirstElementFrom(track)) {
 
-        return gftracktomc.getFirstTo(track)->to;
+        return gftracktomc.getFirstElementFrom(track)->to;
 
       }
 

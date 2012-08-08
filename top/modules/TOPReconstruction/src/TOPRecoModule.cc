@@ -313,8 +313,8 @@ namespace Belle2 {
       if (! rel) return 0;
 
       RelationIndex<GFTrack, MCParticle> irel(gfTracks, mcParticles);
-      if (irel.getFirstTo(track)) {
-        return irel.getFirstTo(track)->to;
+      if (irel.getFirstElementFrom(track)) {
+        return irel.getFirstElementFrom(track)->to;
       }
       return 0;
     }
@@ -331,8 +331,8 @@ namespace Belle2 {
       if (! rel) return -1;
 
       RelationIndex<MCParticle, TOPTrack> irel(mcParticles, topTracks);
-      if (irel.getFirstTo(particle)) {
-        return irel.getFirstTo(particle)->indexTo;
+      if (irel.getFirstElementFrom(particle)) {
+        return irel.getFirstElementFrom(particle)->indexTo;
       }
       return -1;
     }

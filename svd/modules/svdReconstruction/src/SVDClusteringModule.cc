@@ -374,11 +374,11 @@ void SVDClusteringModule::writeClusters(VxdID sensorID, int side)
       typedef const RelationIndex<SVDDigit, SVDTrueHit>::Element relTrueHit_type;
 
       //Fill map with MCParticle relations
-      BOOST_FOREACH(relMC_type & mcRel, relDigitMCParticle.getFrom(sample.getDigit())) {
+      BOOST_FOREACH(relMC_type & mcRel, relDigitMCParticle.getElementsFrom(sample.getDigit())) {
         mc_relations[mcRel.indexTo] += mcRel.weight;
       };
       //Fill map with SVDTrueHit relations
-      BOOST_FOREACH(relTrueHit_type & trueRel, relDigitTrueHit.getFrom(sample.getDigit())) {
+      BOOST_FOREACH(relTrueHit_type & trueRel, relDigitTrueHit.getElementsFrom(sample.getDigit())) {
         truehit_relations[trueRel.indexTo] += trueRel.weight;
       };
       //Add digit to the Cluster->Digit relation list

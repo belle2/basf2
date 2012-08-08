@@ -139,13 +139,13 @@ void VXDSimpleBackgroundModule::event()
   if (m_only6 == true) {
 
     vector<int> layerIds;
-    RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relMcPxdTrueHit.getFrom(aMcParticle);
+    RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relMcPxdTrueHit.getElementsFrom(aMcParticle);
     while (iterPairMcPxd.first not_eq iterPairMcPxd.second) {
       int layerId = iterPairMcPxd.first->to->getSensorID().getLayerNumber();
       layerIds.push_back(layerId);
       ++iterPairMcPxd.first;
     }
-    RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getFrom(aMcParticle);
+    RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getElementsFrom(aMcParticle);
     while (iterPairMcSvd.first not_eq iterPairMcSvd.second) {
       int layerId = iterPairMcSvd.first->to->getSensorID().getLayerNumber();
       layerIds.push_back(layerId);
@@ -207,7 +207,7 @@ void VXDSimpleBackgroundModule::event()
       }
 
       if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
-        RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relMcPxdTrueHit.getFrom(aMcParticle);
+        RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relMcPxdTrueHit.getElementsFrom(aMcParticle);
         while (iterPairMcPxd.first not_eq iterPairMcPxd.second) {
           if (iterPairMcPxd.first->to == aPxdTrueHit) {
             break;
@@ -314,7 +314,7 @@ void VXDSimpleBackgroundModule::event()
       }
 
       if (m_onlyPrimaries == true) {
-        RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getFrom(aMcParticle);
+        RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getElementsFrom(aMcParticle);
         while (iterPairMcSvd.first not_eq iterPairMcSvd.second) {
           if (iterPairMcSvd.first->to == aSvdTrueHit) {
             break;

@@ -99,13 +99,13 @@ void TrueHitTesterModule::event()
       const MCParticle* const aMcParticlePtr = aMcParticleArray[iPart];
       if (aMcParticlePtr->hasStatus(MCParticle::c_PrimaryParticle) == true) {
         vector<int> layerIds;
-        RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relMcPxdTrueHit.getFrom(aMcParticlePtr);
+        RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relMcPxdTrueHit.getElementsFrom(aMcParticlePtr);
         while (iterPairMcPxd.first not_eq iterPairMcPxd.second) {
           int layerId = iterPairMcPxd.first->to->getSensorID().getLayerNumber();
           layerIds.push_back(layerId);
           ++iterPairMcPxd.first;
         }
-        RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getFrom(aMcParticlePtr);
+        RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getElementsFrom(aMcParticlePtr);
         while (iterPairMcSvd.first not_eq iterPairMcSvd.second) {
           int layerId = iterPairMcSvd.first->to->getSensorID().getLayerNumber();
           layerIds.push_back(layerId);
@@ -149,12 +149,12 @@ void TrueHitTesterModule::event()
         //double pVertex = aMcParticlePtr->getMomentum();
         double energyLastHit = aMcParticlePtr->getEnergy() + mass;
         vector<VXDTrueHit const*> trueHitPtrs;
-        RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relMcPxdTrueHit.getFrom(aMcParticlePtr);
+        RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relMcPxdTrueHit.getElementsFrom(aMcParticlePtr);
         while (iterPairMcPxd.first not_eq iterPairMcPxd.second) {
           trueHitPtrs.push_back(static_cast<VXDTrueHit const*>(iterPairMcPxd.first->to));
           ++iterPairMcPxd.first;
         }
-        RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getFrom(aMcParticlePtr);
+        RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getElementsFrom(aMcParticlePtr);
         while (iterPairMcSvd.first not_eq iterPairMcSvd.second) {
           trueHitPtrs.push_back(static_cast<VXDTrueHit const*>(iterPairMcSvd.first->to));
           ++iterPairMcSvd.first;

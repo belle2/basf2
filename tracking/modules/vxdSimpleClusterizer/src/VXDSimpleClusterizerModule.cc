@@ -149,8 +149,8 @@ void VXDSimpleClusterizerModule::event()
   for (unsigned int currentTrueHit = 0; currentTrueHit not_eq nPxdTrueHits; ++currentTrueHit) {
 
     const PXDTrueHit* aPxdTrueHit = pxdTrueHits[currentTrueHit];
-    relIndexPxdTH2McP.getFirstFrom(aPxdTrueHit)->from->fixParticleList();
-    unsigned int particleID = relIndexPxdTH2McP.getFirstFrom(aPxdTrueHit)->from->getArrayIndex(); // WARNING:possible trap, might change in future revisions
+    relIndexPxdTH2McP.getFirstElementTo(aPxdTrueHit)->from->fixParticleList();
+    unsigned int particleID = relIndexPxdTH2McP.getFirstElementTo(aPxdTrueHit)->from->getArrayIndex(); // WARNING:possible trap, might change in future revisions
     float energy = aPxdTrueHit->getEnergyDep();
 
     if (energy < m_energyThreshold) { //ignore hit if energy deposit is too small
@@ -158,7 +158,7 @@ void VXDSimpleClusterizerModule::event()
     }
 
     if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
-      if (relIndexPxdTH2McP.getFirstFrom(aPxdTrueHit)->from->hasStatus(MCParticle::c_PrimaryParticle) == false) {
+      if (relIndexPxdTH2McP.getFirstElementTo(aPxdTrueHit)->from->hasStatus(MCParticle::c_PrimaryParticle) == false) {
         continue; // jump to next pxdTrueHit
       }
     }
@@ -197,8 +197,8 @@ void VXDSimpleClusterizerModule::event()
   for (unsigned int currentTrueHit = 0; currentTrueHit not_eq nSvdTrueHits; ++currentTrueHit) {
 
     const SVDTrueHit* aSvdTrueHit = svdTrueHits[currentTrueHit];
-    relIndexSvdTH2McP.getFirstFrom(aSvdTrueHit)->from->fixParticleList();
-    unsigned int particleID = relIndexSvdTH2McP.getFirstFrom(aSvdTrueHit)->from->getArrayIndex(); // WARNING:possible trap, might change in future revisions
+    relIndexSvdTH2McP.getFirstElementTo(aSvdTrueHit)->from->fixParticleList();
+    unsigned int particleID = relIndexSvdTH2McP.getFirstElementTo(aSvdTrueHit)->from->getArrayIndex(); // WARNING:possible trap, might change in future revisions
     float energy = aSvdTrueHit->getEnergyDep();
 
     if (energy < m_energyThresholdU + m_energyThresholdV) { //ignore hit if energy deposity is too snall
@@ -206,7 +206,7 @@ void VXDSimpleClusterizerModule::event()
     }
 
     if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
-      if (relIndexSvdTH2McP.getFirstFrom(aSvdTrueHit)->from->hasStatus(MCParticle::c_PrimaryParticle) == false) {
+      if (relIndexSvdTH2McP.getFirstElementTo(aSvdTrueHit)->from->hasStatus(MCParticle::c_PrimaryParticle) == false) {
         continue; // jump to next svdTrueHit
       }
     }

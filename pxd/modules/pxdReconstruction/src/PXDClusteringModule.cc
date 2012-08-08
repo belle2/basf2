@@ -263,11 +263,11 @@ void PXDClusteringModule::writeClusters(VxdID sensorID)
       typedef const RelationIndex<PXDDigit, PXDTrueHit>::Element relTrueHit_type;
 
       //Fill map with MCParticle relations
-      BOOST_FOREACH(relMC_type & mcRel, relDigitMCParticle.getFrom(px.get())) {
+      BOOST_FOREACH(relMC_type & mcRel, relDigitMCParticle.getElementsFrom(px.get())) {
         mc_relations[mcRel.indexTo] += mcRel.weight;
       };
       //Fill map with PXDTrueHit relations
-      BOOST_FOREACH(relTrueHit_type & trueRel, relDigitTrueHit.getFrom(px.get())) {
+      BOOST_FOREACH(relTrueHit_type & trueRel, relDigitTrueHit.getElementsFrom(px.get())) {
         truehit_relations[trueRel.indexTo] += trueRel.weight;
       };
       //Add digit to the Cluster->Digit relation list

@@ -316,13 +316,13 @@ void MCTrackFinderModule::event()
         BOOST_FOREACH(int hitID, pxdHitsIndices) {
 
           VxdID aVxdId = pxdClusters[hitID]->getSensorID();
-          RelationIndex<PXDCluster, PXDTrueHit>::range_from iterPairCluTr = relPxdClusterTrueHit.getFrom(pxdClusters[hitID]);
+          RelationIndex<PXDCluster, PXDTrueHit>::range_from iterPairCluTr = relPxdClusterTrueHit.getElementsFrom(pxdClusters[hitID]);
           if (iterPairCluTr.first == iterPairCluTr.second) { // there is not trueHit! trow away hit because there is no time information for sorting
             ++m_noTrueHitCounter;
             continue;
           }
           float time = -1;
-          RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcTr = relMcPxdTrueHit.getFrom(aMcParticlePtr);
+          RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcTr = relMcPxdTrueHit.getElementsFrom(aMcParticlePtr);
           while (iterPairCluTr.first != iterPairCluTr.second && time < 0) {// make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
             while (iterPairMcTr.first != iterPairMcTr.second) {
               if (iterPairMcTr.first->to == iterPairCluTr.first->to) {
@@ -350,13 +350,13 @@ void MCTrackFinderModule::event()
         RelationIndex<SVDCluster, SVDTrueHit> relSvdClusterTrueHit;
         BOOST_FOREACH(int hitID, svdHitsIndices) {
           VxdID aVxdId = svdClusters[hitID]->getSensorID();
-          RelationIndex<SVDCluster, SVDTrueHit>::range_from iterPairCluTr = relSvdClusterTrueHit.getFrom(svdClusters[hitID]);
+          RelationIndex<SVDCluster, SVDTrueHit>::range_from iterPairCluTr = relSvdClusterTrueHit.getElementsFrom(svdClusters[hitID]);
           if (iterPairCluTr.first == iterPairCluTr.second) { // there is not trueHit! trow away hit because there is no time information for sorting
             ++m_noTrueHitCounter;
             continue;
           }
           float time = -1;
-          RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcTr = relMcSvdTrueHit.getFrom(aMcParticlePtr);
+          RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcTr = relMcSvdTrueHit.getElementsFrom(aMcParticlePtr);
           while (iterPairCluTr.first != iterPairCluTr.second && time < 0) {// make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
             while (iterPairMcTr.first != iterPairMcTr.second) {
               if (iterPairMcTr.first->to == iterPairCluTr.first->to) {

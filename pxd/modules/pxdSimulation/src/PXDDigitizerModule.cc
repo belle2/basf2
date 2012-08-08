@@ -216,14 +216,14 @@ void PXDDigitizerModule::event()
   //Check sensor info and set pointers to current sensor
   for (unsigned int i = 0; i < nSimHits; ++i) {
     m_currentHit = storeSimHits[i];
-    const RelationIndex<MCParticle, PXDSimHit>::Element* mcRel = relMCParticleSimHit.getFirstFrom(m_currentHit);
+    const RelationIndex<MCParticle, PXDSimHit>::Element* mcRel = relMCParticleSimHit.getFirstElementTo(m_currentHit);
     if (mcRel) {
       m_currentParticle = mcRel->indexFrom;
     } else {
       B2ERROR("Could not find MCParticle which produced PXDSimhit " << i);
       m_currentParticle = -1;
     }
-    const RelationIndex<PXDTrueHit, PXDSimHit>::Element* trueRel = relTrueHitSimHit.getFirstFrom(m_currentHit);
+    const RelationIndex<PXDTrueHit, PXDSimHit>::Element* trueRel = relTrueHitSimHit.getFirstElementTo(m_currentHit);
     if (trueRel) {
       m_currentTrueHit = trueRel->indexFrom;
     } else {

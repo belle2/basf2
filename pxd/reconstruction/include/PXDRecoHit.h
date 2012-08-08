@@ -42,7 +42,7 @@ namespace Belle2 {
    * //Iterate over the relation and create a list of hits
    * vector<PXDRecoHit*> hits;
    * RelationIndex<MCParticle,PXDTrueHit> relMCTrueHit;
-   * RelationIndex<MCParticle,PXDTrueHit>::range_from it = relMCTrueHit.getFrom(mcParticle);
+   * RelationIndex<MCParticle,PXDTrueHit>::range_from it = relMCTrueHit.getElementsFrom(mcParticle);
    * for(; it.first!=it.second; ++it.first){
    *   hits.push_back(new PXDRecoHit(it.first->to, sigmaU, sigmaV));
    * }

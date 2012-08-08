@@ -159,8 +159,8 @@ namespace Belle2 {
 
       //Store the MCParticle index for the given SimHit index (list index) in the vector
       if (m_mcParticleWriteMode > 0) {
-        if (mcPartSimHitIndex.getFirstFrom(origSimHit) != NULL) {
-          const MCParticle* mcPart = mcPartSimHitIndex.getFirstFrom(origSimHit)->from;
+        if (mcPartSimHitIndex.getFirstElementTo(origSimHit) != NULL) {
+          const MCParticle* mcPart = mcPartSimHitIndex.getFirstElementTo(origSimHit)->from;
           if (mcPart != NULL) m_mcpToSimHitMap[colIndex] = mcPart->getArrayIndex();
           else m_mcpToSimHitMap[colIndex] = -1;
         }
@@ -183,16 +183,16 @@ namespace Belle2 {
         case 1: //seen in the subdetector
           for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
             SIMHIT* simHit = collection[iSimHit];
-            if (mcPartSimHitIndex.getFirstFrom(simHit) == NULL) continue;
-            const MCParticle* mcPart = mcPartSimHitIndex.getFirstFrom(simHit)->from;
+            if (mcPartSimHitIndex.getFirstElementTo(simHit) == NULL) continue;
+            const MCParticle* mcPart = mcPartSimHitIndex.getFirstElementTo(simHit)->from;
             if (mcPart != NULL) keepParticle[mcPart->getArrayIndex()] = true;
           }
           break;
         case 2: //seen in the subdetector + mothers
           for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
             SIMHIT* simHit = collection[iSimHit];
-            if (mcPartSimHitIndex.getFirstFrom(simHit) == NULL) continue;
-            const MCParticle* mcPart = mcPartSimHitIndex.getFirstFrom(simHit)->from;
+            if (mcPartSimHitIndex.getFirstElementTo(simHit) == NULL) continue;
+            const MCParticle* mcPart = mcPartSimHitIndex.getFirstElementTo(simHit)->from;
             if (mcPart != NULL) keepParticle[mcPart->getArrayIndex()] = true;
             MCParticle* mother = mcPart->getMother();
             while (mother != NULL) {

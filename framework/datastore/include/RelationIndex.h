@@ -232,17 +232,6 @@ namespace Belle2 {
 
     /** Get the size of the index. */
     size_t size() const { return m_index.index().size(); }
-
-    //@{
-    /** Old functions to retrieve elements from index.
-     *
-     * @deprecated use getElementsFrom(), getFirstElementFrom(), ... instead
-     */
-    range_from getFrom(const FROM* from) const { return m_from.equal_range(from);  }
-    range_to   getTo(const TO* to)       const { return m_to.equal_range(to);      }
-    const Element* getFirstTo(const FROM* from) const { return getFirstElementFrom(from); }
-    const Element* getFirstFrom(const TO* to)   const { return getFirstElementTo(to); }
-    //@}
   protected:
     /** Reference to the IndexContainer. */
     const RelationIndexContainer<FROM, TO> &m_index;

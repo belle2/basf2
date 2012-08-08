@@ -28,8 +28,8 @@ const TOPLikelihoods* getTOPLikelihoods(const Track& track)
   if (!gfTracks[trackIndex])
     return 0;
 
-  if (gfTracksToTOPLogL.getFirstTo(gfTracks[trackIndex]))
-    return gfTracksToTOPLogL.getFirstTo(gfTracks[trackIndex])->to;
+  if (gfTracksToTOPLogL.getFirstElementFrom(gfTracks[trackIndex]))
+    return gfTracksToTOPLogL.getFirstElementFrom(gfTracks[trackIndex])->to;
 
   return 0;
 }
@@ -54,8 +54,8 @@ const DedxLikelihood* getDEDXLikelihood(const Track& track)
   if (!gfTracks[trackIndex])
     return 0;
 
-  if (gfTracksToDEDXLogL.getFirstTo(gfTracks[trackIndex]))
-    return gfTracksToDEDXLogL.getFirstTo(gfTracks[trackIndex])->to;
+  if (gfTracksToDEDXLogL.getFirstElementFrom(gfTracks[trackIndex]))
+    return gfTracksToDEDXLogL.getFirstElementFrom(gfTracks[trackIndex])->to;
 
   return 0;
 }
@@ -74,12 +74,12 @@ const TOPLikelihoods* getTOPLikelihoods(const MCParticle* particle)
     return 0;
   }
 
-  if (relMCParticleToTOPTrack.getFirstTo(particle)) {
-    const TOPTrack* track = relMCParticleToTOPTrack.getFirstTo(particle)->to;
+  if (relMCParticleToTOPTrack.getFirstElementFrom(particle)) {
+    const TOPTrack* track = relMCParticleToTOPTrack.getFirstElementFrom(particle)->to;
 
-    if (relTrackLikelihoods.getFirstTo(track)) {
+    if (relTrackLikelihoods.getFirstElementFrom(track)) {
 
-      return relTrackLikelihoods.getFirstTo(track)->to;
+      return relTrackLikelihoods.getFirstElementFrom(track)->to;
 
     }
   }
@@ -100,10 +100,10 @@ const ARICHLikelihoods* getARICHLikelihoods(const MCParticle* particle)
   if (!(arichAeroHitRel && relAeroToLikelihood))
     return 0;
 
-  if (arichAeroHitRel.getFirstTo(particle)) {
-    const ARICHAeroHit* track = arichAeroHitRel.getFirstTo(particle)->to;
-    if (relAeroToLikelihood.getFirstTo(track))
-      return relAeroToLikelihood.getFirstTo(track)->to;
+  if (arichAeroHitRel.getFirstElementFrom(particle)) {
+    const ARICHAeroHit* track = arichAeroHitRel.getFirstElementFrom(particle)->to;
+    if (relAeroToLikelihood.getFirstElementFrom(track))
+      return relAeroToLikelihood.getFirstElementFrom(track)->to;
   }
 
   return 0;

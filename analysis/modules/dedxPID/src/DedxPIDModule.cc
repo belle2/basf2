@@ -434,7 +434,7 @@ void DedxPIDModule::event()
         typedef RelationIndex<PXDCluster, PXDTrueHit>::Element relElement_t;
         unsigned int hitID = pxdHitIDs[iHit];
         //get all relations that point to hitID
-        BOOST_FOREACH(const relElement_t & rel, pxdClustersToTrueHitsIndex->getTo(pxdTrueHits[hitID])) {
+        BOOST_FOREACH(const relElement_t & rel, pxdClustersToTrueHitsIndex->getElementsTo(pxdTrueHits[hitID])) {
           pxdClusterIDs.push_back(rel.indexFrom);
         }
       }

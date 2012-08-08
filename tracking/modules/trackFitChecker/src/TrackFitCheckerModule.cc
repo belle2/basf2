@@ -1015,11 +1015,11 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
 
           const PXDCluster* aPxdCluster = aPxdRecoHitPtr->getCluster();
           //now use the relations to get the trueHit
-          // RelationIndex<PXDCluster, PXDTrueHit>::range_from iterPair = relPxdClusterTrueHit.getFrom(aPxdCluster);
+          // RelationIndex<PXDCluster, PXDTrueHit>::range_from iterPair = relPxdClusterTrueHit.getElementsFrom(aPxdCluster);
 
           //aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(iterPair.first->to);
-          if (relPxdClusterTrueHit.getFirstTo(aPxdCluster) not_eq NULL) {
-            aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(relPxdClusterTrueHit.getFirstTo(aPxdCluster)->to);
+          if (relPxdClusterTrueHit.getFirstElementFrom(aPxdCluster) not_eq NULL) {
+            aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(relPxdClusterTrueHit.getFirstElementFrom(aPxdCluster)->to);
           }
 
 
@@ -1045,11 +1045,11 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
       if (m_truthAvailable == true) {
         RelationIndex<SVDCluster, SVDTrueHit> relSvdClusterTrueHit;
         const SVDCluster* aSvdCluster = aSvdRecoHitPtr->getCluster();
-        //RelationIndex<SVDCluster, SVDTrueHit>::range_from iterPair = relSvdClusterTrueHit.getFrom(aSvdCluster);
+        //RelationIndex<SVDCluster, SVDTrueHit>::range_from iterPair = relSvdClusterTrueHit.getElementsFrom(aSvdCluster);
 
         //aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(iterPair.first->to);
-        if (relSvdClusterTrueHit.getFirstTo(aSvdCluster) not_eq NULL) {
-          aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(relSvdClusterTrueHit.getFirstTo(aSvdCluster)->to);
+        if (relSvdClusterTrueHit.getFirstElementFrom(aSvdCluster) not_eq NULL) {
+          aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(relSvdClusterTrueHit.getFirstElementFrom(aSvdCluster)->to);
         }
 
         //assert(aVxdTrueHitPtr not_eq NULL);

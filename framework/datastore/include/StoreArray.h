@@ -19,6 +19,12 @@
 #include <utility>
 
 namespace Belle2 {
+  /** A wrapper class to hide unwanted TClonesArray members when using StoreArray::operator->. */
+  class ClonesArrayWrapper : public TClonesArray {
+  private:
+    /** hide TClonesArray::GetEntries() */
+    Int_t GetEntries() const { return 0; }
+  };
 
   /** Accessor to arrays stored in the data store.
    *
@@ -193,7 +199,7 @@ namespace Belle2 {
      *  may be lost on casual readers of the source code.
      */
     TClonesArray& operator *() const {return *m_storeArray;}
-    TClonesArray* operator ->() const {return m_storeArray;}
+    ClonesArrayWrapper* operator ->() const {return static_cast<ClonesArrayWrapper*>(m_storeArray);}
     TClonesArray* getPtr() const {return m_storeArray;}
     //@}
 

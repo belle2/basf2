@@ -147,7 +147,7 @@ namespace Belle2 {
     //------------------------------------------------
     // SimHits and their relations to MCParticles
     //------------------------------------------------
-    int nSimHits = collection->GetEntries();
+    int nSimHits = collection.getEntries();
     std::vector<int> mcpToSimHitMapEvent;
     if (m_mcParticleWriteMode > 0) m_mcpToSimHitMap.resize(m_mcpToSimHitMap.size() + nSimHits);
 

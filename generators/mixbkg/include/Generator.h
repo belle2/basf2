@@ -59,9 +59,9 @@ namespace Belle2 {
        * @param simHitCollection The name of the collection into which the SimHits should be added.
        * @param simHitRelation The name of the collection which connects the SimHits with the MCParticles.
        */
-      void addFile(const std::string &component, const std::string &generator,
-                   const std::string &filename, const std::string &simHitCollection,
-                   const std::string &simHitRelation);
+      void addFile(const std::string& component, const std::string& generator,
+                   const std::string& filename, const std::string& simHitCollection,
+                   const std::string& simHitRelation);
 
       /**
        * Returns if this generator is enabled or disabled.
@@ -108,12 +108,12 @@ namespace Belle2 {
     private:
 
       bool m_enabled;                 /**< Specifies if this component is enabled or disabled. */
-      TChain *m_files;                /**< The TChain of ROF root files. */
+      TChain* m_files;                /**< The TChain of ROF root files. */
       int m_numberROFs;               /**< Caches the number of ROFs. */
       int m_index;                    /**< The index of the current ROF. */
-      TClonesArray *m_readoutFrame;   /**< The current readout frame (a TClonesArray of SimHits). */
-      TClonesArray *m_mcParticles;    /**< The current MCParticle list (a TClonesArray of MCParticles). */
-      TClonesArray *m_mcPartRels;     /**< The current relation between a MCParticle and a SimHit (a TClonesArray of relations). */
+      TClonesArray* m_readoutFrame;   /**< The current readout frame (a TClonesArray of SimHits). */
+      TClonesArray* m_mcParticles;    /**< The current MCParticle list (a TClonesArray of MCParticles). */
+      TClonesArray* m_mcPartRels;     /**< The current relation between a MCParticle and a SimHit (a TClonesArray of relations). */
       std::string m_simHitCollection; /**< The name of the SimHit Collection. */
       std::string m_simHitRelation;   /**< The name of the SimHit to MCParticle Collection. */
 
@@ -127,11 +127,11 @@ namespace Belle2 {
     //===================================
     template<class SIMHITS>
     Generator<SIMHITS>::Generator() : m_enabled(true), m_files(new TChain("ROFTree")), m_numberROFs(-1), m_index(0),
-        m_readoutFrame(new TClonesArray(SIMHITS::Class_Name())),
-        m_mcParticles(new TClonesArray(MCParticle::Class_Name())),
-        m_mcPartRels(new TClonesArray(RelationElement::Class_Name())),
-        m_simHitCollection(""), m_simHitRelation(""),
-        m_component(""), m_generator("")
+      m_readoutFrame(new TClonesArray(SIMHITS::Class_Name())),
+      m_mcParticles(new TClonesArray(MCParticle::Class_Name())),
+      m_mcPartRels(new TClonesArray(RelationElement::Class_Name())),
+      m_simHitCollection(""), m_simHitRelation(""),
+      m_component(""), m_generator("")
     {
       m_files->SetBranchAddress("ReadoutFrames", &m_readoutFrame);
       m_files->SetBranchAddress("MCParticles", &m_mcParticles);
@@ -151,9 +151,9 @@ namespace Belle2 {
 
 
     template<class SIMHITS>
-    inline void Generator<SIMHITS>::addFile(const std::string &component, const std::string &generator,
-                                            const std::string &filename, const std::string &simHitCollection,
-                                            const std::string &simHitRelation)
+    inline void Generator<SIMHITS>::addFile(const std::string& component, const std::string& generator,
+                                            const std::string& filename, const std::string& simHitCollection,
+                                            const std::string& simHitRelation)
     {
       //Check if the collection name is consistent
       if ((!m_simHitCollection.empty()) && (m_simHitCollection.compare(simHitCollection) != 0)) {
@@ -211,7 +211,7 @@ namespace Belle2 {
 
       //Loop over the SimHit content of the ROF and add the SimHits to the DataStore SimHit collection.
       int simHitIndexOffset = simHitArray->GetLast() + 1; //The index offset in the global SimHit DataStoreArray
-      int nSimHits = m_readoutFrame->GetEntries();
+      int nSimHits = m_readoutFrame->GetEntriesFast();
       for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
         new(simHitArray->AddrAt(simHitIndexOffset + iSimHit)) SIMHITS(*(dynamic_cast<SIMHITS*>(m_readoutFrame->At(iSimHit))));
       }
@@ -219,12 +219,12 @@ namespace Belle2 {
       //Loop over the SimHit to MCParticle relation and add the MCParticles and Relations
       int mcPartIndexOffset = mcPartCollection->GetLast() + 1; //The index offset in the global MCParticle DataStoreArray
       int mcIndex = mcPartIndexOffset;
-      int nRel = m_mcPartRels->GetEntries();
+      int nRel = m_mcPartRels->GetEntriesFast();
       std::vector<int> addedToCol;
-      addedToCol.resize(m_mcParticles->GetEntries(), -1);
+      addedToCol.resize(m_mcParticles->GetEntriesFast(), -1);
       for (int iRel = 0; iRel < nRel; ++iRel) {
-        RelationElement *relation = dynamic_cast<RelationElement*>(m_mcPartRels->At(iRel));
-        MCParticle &currParticle = *(dynamic_cast<MCParticle*>(m_mcParticles->At(relation->getFromIndex())));
+        RelationElement* relation = dynamic_cast<RelationElement*>(m_mcPartRels->At(iRel));
+        MCParticle& currParticle = *(dynamic_cast<MCParticle*>(m_mcParticles->At(relation->getFromIndex())));
 
         //Check if the MCParticle has already been added to the collection
         if (addedToCol[relation->getFromIndex()] < 0) {
@@ -265,16 +265,16 @@ namespace Belle2 {
       new(bkgInfoCollection->AddrAt(bkgInfoCollection->GetLast() + 1)) BackgroundInfo(m_component, m_generator);
 
       //Add the MCParticles and a relation to the background info
-      int nPart = m_mcParticles->GetEntries();
+      int nPart = m_mcParticles->GetEntriesFast();
       for (int iPart = 0; iPart < nPart; ++iPart) {
         new(mcPartBkgCollection->AddrAt(mcPartBkgCollection->GetLast() + 1)) MCParticle(*(dynamic_cast<MCParticle*>(m_mcParticles->At(iPart))));
         bkgInfoRelCollection.add(mcPartBkgCollection->GetLast(), bkgInfoCollection->GetLast());
       }
 
       //Add the SimHit to MCParticle relations
-      nRel = m_mcPartRels->GetEntries();
+      nRel = m_mcPartRels->GetEntriesFast();
       for (int iRel = 0; iRel < nRel; ++iRel) {
-        RelationElement *relation = dynamic_cast<RelationElement*>(m_mcPartRels->At(iRel));
+        RelationElement* relation = dynamic_cast<RelationElement*>(m_mcPartRels->At(iRel));
         bkgSimHitRelCollection.add(relation->getFromIndex(), relation->getToIndex() + simHitIndexOffset);
       }
     }

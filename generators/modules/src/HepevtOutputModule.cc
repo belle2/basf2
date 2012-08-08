@@ -54,7 +54,7 @@ void HepevtOutputModule::event()
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   StoreArray<MCParticle> mcPartCollection;
 
-  int nPart = mcPartCollection->GetEntries();
+  int nPart = mcPartCollection.getEntries();
 
   //Find number of virtual particles
   int nVirtualPart = 0;

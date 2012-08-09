@@ -13,6 +13,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <cmath>
+#include <float.h>
 
 #include <TGeoMatrix.h>
 #include <TVector3.h>
@@ -194,7 +195,7 @@ namespace Belle2 {
        * @param vTolerance tolerance to be added on each side of the sensor in u direction
        * @return true if inside active area, false otherwise
        */
-      bool inside(double u, double v, double uTolerance = 0, double vTolerance = 0) const {
+      bool inside(double u, double v, double uTolerance = DBL_EPSILON, double vTolerance = DBL_EPSILON) const {
         double nu = u / (getWidth(v) + 2 * uTolerance) + 0.5;
         double nv = v / (getLength() + 2 * vTolerance) + 0.5;
         return 0 <= nu && nu <= 1 && 0 <= nv && nv <= 1;

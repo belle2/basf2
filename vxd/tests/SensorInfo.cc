@@ -39,7 +39,7 @@ namespace Belle2 {
         EXPECT_EQ(rect.getUCellID(u), (int)((u / 1.0 + 0.5) * 2));
         if (u < -0.5) EXPECT_EQ(rect.getUCellID(u, 0, true), 0);
         if (u > 0.5) EXPECT_EQ(rect.getUCellID(u, 0, true), rect.getUCells() - 1);
-        for (double v = -2.0 + 0.1; v <= 2.0; v += 0.2) {
+        for (double v = -2.0 + 0.11; v <= 2.0; v += 0.2) {
           EXPECT_EQ(rect.getVCellID(v), (int)((v / 2.0 + 0.5) * 4));
           if (v < -1.0) EXPECT_EQ(rect.getVCellID(v, true), 0);
           if (v > 1.0) EXPECT_EQ(rect.getVCellID(v, true), rect.getVCells() - 1);
@@ -72,7 +72,7 @@ namespace Belle2 {
       EXPECT_EQ(rect.getUPitch(1.0), 0.5);
       EXPECT_EQ(rect.getVPitch(), 0.5);
       for (double u = -2.0 + 0.1; u <= 2.0; u += 0.2) {
-        for (double v = -2.0 + 0.1; v <= 2.0; v += 0.2) {
+        for (double v = -2.0 + 0.11; v <= 2.0; v += 0.2) {
           EXPECT_EQ(rect.getUCellID(u, v), (int)((u / rect.getWidth(v) + 0.5) * 2));
           EXPECT_EQ(rect.getVCellID(v), (int)((v / 2.0 + 0.5) * 4));
           EXPECT_EQ(rect.inside(u, v), fabs(u) <= rect.getWidth(v) / 2.0 && fabs(v) <= 1.0);
@@ -108,7 +108,7 @@ namespace Belle2 {
       EXPECT_EQ(rect.getVCellPosition(4), 0.625);
       EXPECT_EQ(rect.getVCellPosition(5), 0.875);
       for (double u = -2.0 + 0.1; u <= 2.0; u += 0.2) {
-        for (double v = -2.0 + 0.1; v <= 2.0; v += 0.2) {
+        for (double v = -2.0 + 0.11; v <= 2.0; v += 0.2) {
           EXPECT_EQ(rect.getUCellID(u, v), (int)((u / rect.getWidth(v) + 0.5) * 2));
           if (v <= 0) {
             EXPECT_EQ(rect.getVCellID(v), (int)((v / 2.0 + 0.5) * 4));

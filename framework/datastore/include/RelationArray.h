@@ -156,7 +156,8 @@ namespace Belle2 {
         m_storeObjPtr->setToName(accessorTo.first);
         m_storeObjPtr->setToDurability(accessorTo.second);
       } else {
-        if (!m_storeObjPtr) {
+        if (!m_storeObjPtr or m_storeObjPtr->isDefaultConstructed()) {
+          m_storeObjPtr = 0; //make sure array is marked as invalid
           B2ERROR("Could not find relation with name " << name);
           return;
         }
@@ -179,6 +180,9 @@ namespace Belle2 {
         return;
       }
       assignObject(name, durability, false);
+      if (m_storeObjPtr and m_storeObjPtr->isDefaultConstructed()) {
+        m_storeObjPtr = 0; //make sure array is marked as invalid
+      }
     }
 
     /** Constructor which accepts the AccessorParams of the relation.
@@ -195,6 +199,9 @@ namespace Belle2 {
         return;
       }
       assignObject(params.first, params.second, false);
+      if (m_storeObjPtr and m_storeObjPtr->isDefaultConstructed()) {
+        m_storeObjPtr = 0; //make sure array is marked as invalid
+      }
     }
 
     /** Empty destructor */

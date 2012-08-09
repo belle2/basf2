@@ -64,6 +64,12 @@ namespace Belle2 {
     /** check for modification since creation or deserialization. */
     void setModified(bool modified)             { m_modified = modified; }
 
+    bool isDefaultConstructed() const {
+      return (m_fromName == "" and m_toName == ""
+              and m_elements.GetEntriesFast() == 0 and
+              m_fromDurability == -1 and m_toDurability == -1);
+    }
+
     /** Clear container to free memory. */
     virtual void Clear(Option_t* = "") {
       m_elements.Delete();

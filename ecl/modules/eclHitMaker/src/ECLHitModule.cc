@@ -14,7 +14,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-//#include <framework/dataobjects/Relation.h>
 #include <framework/logging/Logger.h>
 
 //ecl package headers
@@ -22,6 +21,8 @@
 #include <ecl/dataobjects/HitECL.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
+#include <generators/dataobjects/MCParticle.h>
+#include <framework/datastore/RelationArray.h>
 //root
 #include <TVector3.h>
 
@@ -74,6 +75,11 @@ void ECLHitModule::initialize()
   m_nRun    = 0 ;
   m_nEvent  = 0 ;
   m_hitNum = 0;
+
+  StoreArray<ECLSimHit> eclArray(m_inColName);
+  StoreArray<MCParticle> mcParticles;
+
+//  RelationArray mcPartToECLHitRel(mcParticles, eclHitArray);
 }
 
 void ECLHitModule::beginRun()
@@ -82,6 +88,157 @@ void ECLHitModule::beginRun()
 
 void ECLHitModule::event()
 {
+
+  StoreArray<ECLSimHit> eclArray(m_inColName);
+
+  if (!eclArray) {
+    B2ERROR("Can not find " << m_inColName << ".");
+  }
+
+  //---------------------------------------------------------------------
+  // Merge the hits in the same cell and save them into ECL signal map.
+  //---------------------------------------------------------------------
+
+  // Get number of hits in this event
+  int nHits = eclArray->GetEntriesFast();
+
+  double E_cell[8736][16] = {{0}};
+  double X_ave[8736][16] = {{0}};
+  double T_ave[8736][16] = {{0}};
+  double Tof_ave[8736][16] = {{0}};
+
+  // Get instance of ecl geometry parameters
+  ECLGeometryPar* eclp = ECLGeometryPar::Instance();
+  // Loop over all hits of steps
+  for (int iHits = 0; iHits < nHits; iHits++) {
+    // Get a hit
+    ECLSimHit* aECLSimHit = eclArray[iHits];
+
+
+    // Hit geom. info
+    int hitCellId       =   aECLSimHit->getCellId();
+    double hitE        = aECLSimHit->getEnergyDep() * Unit::GeV;
+    double hitTOF         = aECLSimHit->getFlightTime() * Unit::ns;
+    TVector3 HitInPos  =   aECLSimHit->getPosIn();
+//    TVector3 HitOutPos  =   aECLSimHit->getPosOut();
+
+    TVector3 PosCell =  eclp->GetCrystalPos(hitCellId);
+    TVector3 VecCell =  eclp->GetCrystalVec(hitCellId);
+    double local_pos = (15. - (HitInPos  - PosCell) * VecCell);
+
+    for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
+
+      if (hitCellId == iECLCell && hitTOF < 8000) {
+        int TimeIndex = (int) hitTOF / 500;
+        E_cell[iECLCell][TimeIndex] = E_cell[iECLCell][TimeIndex] + hitE;
+        X_ave[iECLCell][TimeIndex] = X_ave[iECLCell][TimeIndex] + hitE * local_pos;
+        Tof_ave[iECLCell][TimeIndex] = Tof_ave[iECLCell][TimeIndex] + hitE * hitTOF;
+
+      }
+    } // End loop crsyal 8736
+
+  }//for nHit
+
+
+  for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
+    for (int  TimeIndex = 0; TimeIndex < 16; TimeIndex++) {
+
+      if (E_cell[iECLCell][TimeIndex] > 1.0e-9) {
+
+        X_ave[iECLCell][TimeIndex] = X_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
+        T_ave[iECLCell][TimeIndex]  =  6.05 + 0.0749 * X_ave[iECLCell][TimeIndex] - 0.00112 * X_ave[iECLCell][TimeIndex] * X_ave[iECLCell][TimeIndex];
+        Tof_ave[iECLCell][TimeIndex] =  Tof_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
+        StoreArray<HitECL> eclHitArray(m_eclHitOutColName);
+
+//        cout<<iECLCell<<" "<<E_cell[iECLCell][TimeIndex]<<" "<<Tof_ave[iECLCell][TimeIndex] + T_ave[iECLCell][TimeIndex] <<endl;
+
+        m_hitNum = eclHitArray->GetLast() + 1;
+        new(eclHitArray->AddrAt(m_hitNum)) HitECL();
+        eclHitArray[m_hitNum]->setCellId(iECLCell);
+        eclHitArray[m_hitNum]->setEnergyDep(E_cell[iECLCell][TimeIndex]);
+        eclHitArray[m_hitNum]->setTimeAve(T_ave[iECLCell][TimeIndex] + Tof_ave[iECLCell][TimeIndex]);
+//        eclHitArray[m_hitNum]->setEnergyDep(T_ave[iECLCell][TimeIndex] );
+//        eclHitArray[m_hitNum]->setTimeAve(T_ave[iECLCell][TimeIndex] );
+      }//if Energy > 0
+    }//16 Time interval 16x 500 ns
+  } //store  each crystal hit
+
+//  eclArray->Delete();
+  m_nEvent++;
+
+
+  /*
+
+    StoreArray<MCParticle> mcParticles;                         //needed to use the relations with MCParticles
+    ECLTrackMap eclHitToMCTrackMap;
+    eclHitToMCTrackMap.clear();
+    ECLTrackMap eclTrackMap;
+    eclTrackMap.clear();
+    MCtracks myPrimary;
+    unsigned old_track=99999999;
+
+    RelationArray eclSimHitRel(mcParticles, eclSimArray);  //RelationsArray created by ECL SensitiveDetector
+
+      for (int index = 0; index < eclSimHitRel.getEntries(); index++) {
+
+           MCParticle * aMCParticle= mcParticles[eclSimHitRel[index].getFromIndex()];
+           TVector3 McP =  aMCParticle->getMomentum();
+           TVector3 Pvertex = aMCParticle->getProductionVertex();
+
+           //cout<< eclSimHitRel[index].getFromIndex()<<" "<<old_track<<" "<<aMCParticle->getArrayIndex()<<endl;
+         if(Pvertex.Perp()<125.0&&Pvertex.z()>-102.2&&Pvertex.z()<125.0&&eclSimHitRel[index].getFromIndex()!=old_track)
+           {
+               if(index!=0){
+                MCParticle * momMCParticle=mcParticles[ aMCParticle->getMother()->getArrayIndex()];
+                TVector3 momP =  momMCParticle->getMomentum();
+  //              cout<<" MotherPDG "<<momMCParticle->getPDG()<<" P "<< momP.x()<<" "<<momP.y()<<" "<<momP.z()<<endl;
+               }
+  //             cout<<" From inner VX "<<Pvertex.x()<<" "<<Pvertex.y()<<" "<<Pvertex.z() ;
+  //             cout<<" TrackPDG "<<aMCParticle->getPDG()<<" P "<<McP.x()<<" "<<McP.y()<<" "<<McP.z()<<" TrackID "<< eclSimHitRel[index].getFromIndex() <<endl;
+           }
+
+
+               old_track=eclSimHitRel[index].getFromIndex();
+
+        for (int hit = 0; hit < (int)eclSimHitRel[index].getToIndices().size(); hit++) {
+          ECLSimHit* aECLSimHit = eclSimArray[eclSimHitRel[index].getToIndex(hit)];
+  //          cout<<"MCIndex "<<index<<" "<<eclSimHitRel[index].getFromIndex()<<" Sim  "<< eclSimHitRel[index].getToIndex(hit)<<" "
+  //          <<aECLSimHit->getTrackId()<<" size "<< (int)eclSimHitRel[index].getToIndices().size()<<endl;
+
+            eclHitToMCTrackMap.insert(std::make_pair(eclSimHitRel[index].getToIndex(hit),eclSimHitRel[index].getFromIndex()));
+                 MCParticle * aMCParticle= mcParticles[eclSimHitRel[index].getFromIndex()];
+  //               int hitCellId       =   aECLSimHit->getCellId();
+                     TVector3 McP =  aMCParticle->getMomentum();
+                     TVector3 SimP =  aECLSimHit->getMomentum();
+  //         cout<<SimP.x()<<" "<<SimP.y()<<" "<<SimP.z()<<endl;
+  //         cout<<McP.x()<<" "<<McP.y()<<" "<<McP.z()<<endl;
+
+          }
+        }
+        int nMcParticles = mcParticles.getEntries();
+        int PrimaryTrack=-1;
+        int nPrimaryTrack=0;
+        for (int iPart = 0; iPart < nMcParticles; ++iPart) {
+
+      if(mcParticles[iPart]->getMother()==NULL){
+      //cout<<"Primary "<<iPart<<" "<<mcParticles[iPart]->getArrayIndex()<<"PDG  "<<mcParticles[iPart]->getPDG() <<" size of last Primary "<<eclTrackMap.size()  <<endl;
+      eclTrackMap.clear();
+      myPrimary.push_back(mcParticles[iPart]->getArrayIndex());
+      eclTrackMap.insert(vpair(mcParticles[iPart]->getArrayIndex(),mcParticles[iPart]->getArrayIndex()));
+      PrimaryTrack= mcParticles[iPart]->getPDG();
+      nPrimaryTrack++;
+      }else{
+      //cout<<"MCPart "<<iPart<<" "<<mcParticles[iPart]->getMother()->getArrayIndex()<<" PrimaryMother "<<nPrimaryTrack<<" "<<PrimaryTrack<<" size "<<eclTrackMap.size() <<endl;
+      eclTrackMap.insert(vpair(mcParticles[iPart]->getArrayIndex(), PrimaryTrack ));
+      }
+
+      if( iPart !=0 && (mcParticles[iPart]->getMother()==NULL||iPart==(nMcParticles-1) ))
+      cout<<"Primary "<<iPart<<" "<<mcParticles[iPart]->getArrayIndex()<<"PDG  "<<PrimaryTrack<<" " << nPrimaryTrack<<" size of Primary "<<eclTrackMap.size()  <<endl;
+
+
+     }
+  */
+
 
 }
 

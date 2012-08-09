@@ -84,6 +84,13 @@ PathPtr Framework::createPath() throw(PathManager::PathNotCreatedError)
 
 void Framework::process(PathPtr startPath, long maxEvent)
 {
+  static bool already_executed = false;
+  if (already_executed) {
+    B2FATAL("You can only call process() once per steering file!")
+    return;
+  }
+
+  already_executed = true;
   if (Environment::Instance().getNumberProcesses() == 0)
     m_eventProcessor->process(startPath, maxEvent);
   else if (maxEvent <= 0)

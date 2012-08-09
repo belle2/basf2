@@ -64,6 +64,7 @@ namespace Belle2 {
     /** check for modification since creation or deserialization. */
     void setModified(bool modified)             { m_modified = modified; }
 
+    /** Returns true if no information was set yet. */
     bool isDefaultConstructed() const {
       return (m_fromName == "" and m_toName == ""
               and m_elements.GetEntriesFast() == 0 and

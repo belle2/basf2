@@ -55,8 +55,6 @@ ECLDigiModule::ECLDigiModule() : Module()
   setDescription("Creates ECLDigiHits from ECLHits.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
-  addParam("ECLHitInputColName", m_inColName, "Input Array // Output from g4sim module", string("ECLSimHits"));
-
   //Parameter definition
   addParam("ECLDigiInput", m_eclHitCollectionName,
            "Input Array // Output from ECLHit module", string("ECLHits"));
@@ -102,89 +100,9 @@ void ECLDigiModule::beginRun()
 
 void ECLDigiModule::event()
 {
-  StoreArray<ECLSimHit> eclSimArray(m_inColName);
-  if (!eclSimArray) {
-    B2ERROR("Can not find " << m_inColName << ".");
-  }
-
-
-  StoreArray<HitECL>  eclArray(m_eclHitCollectionName);
-
-  //---------------------------------------------------------------------
-  // Merge the hits in the same cell and save them into ECL signal map.
-  //---------------------------------------------------------------------
-
-  // Get number of hits in this event
-  int nHits = eclSimArray->GetEntriesFast();
-
-  double E_cell[8736][16] = {{0}};
-  double X_ave[8736][16] = {{0}};
-  double T_ave[8736][16] = {{0}};
-  double Tof_ave[8736][16] = {{0}};
-
-  // Get instance of ecl geometry parameters
-  ECLGeometryPar* eclp = ECLGeometryPar::Instance();
-  // Loop over all hits of steps
-  for (int iHits = 0; iHits < nHits; iHits++) {
-    // Get a hit
-    ECLSimHit* aECLSimHit = eclSimArray[iHits];
-
-
-    // Hit geom. info
-    int hitCellId       =   aECLSimHit->getCellId();
-    double hitE        = aECLSimHit->getEnergyDep() * Unit::GeV;
-    double hitTOF         = aECLSimHit->getFlightTime() * Unit::ns;
-    TVector3 HitInPos  =   aECLSimHit->getPosIn();
-//    TVector3 HitOutPos  =   aECLSimHit->getPosOut();
-
-    TVector3 PosCell =  eclp->GetCrystalPos(hitCellId);
-    TVector3 VecCell =  eclp->GetCrystalVec(hitCellId);
-    double local_pos = (15. - (HitInPos  - PosCell) * VecCell);
-
-    for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-
-      if (hitCellId == iECLCell && hitTOF < 8000) {
-        int TimeIndex = (int) hitTOF / 500;
-        E_cell[iECLCell][TimeIndex] = E_cell[iECLCell][TimeIndex] + hitE;
-        X_ave[iECLCell][TimeIndex] = X_ave[iECLCell][TimeIndex] + hitE * local_pos;
-        Tof_ave[iECLCell][TimeIndex] = Tof_ave[iECLCell][TimeIndex] + hitE * hitTOF;
-
-      }
-    } // End loop crsyal 8736
-
-  }//for nHit
-
-
-  for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-    for (int  TimeIndex = 0; TimeIndex < 16; TimeIndex++) {
-
-      if (E_cell[iECLCell][TimeIndex] > 1.0e-9) {
-
-        X_ave[iECLCell][TimeIndex] = X_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
-        T_ave[iECLCell][TimeIndex]  =  6.05 + 0.0749 * X_ave[iECLCell][TimeIndex] - 0.00112 * X_ave[iECLCell][TimeIndex] * X_ave[iECLCell][TimeIndex];
-        Tof_ave[iECLCell][TimeIndex] =  Tof_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
-
-//        cout<<iECLCell<<" "<<E_cell[iECLCell][TimeIndex]<<" "<<Tof_ave[iECLCell][TimeIndex] + T_ave[iECLCell][TimeIndex] <<endl;
-
-        m_hitNum = eclArray->GetLast() + 1;
-        new(eclArray->AddrAt(m_hitNum)) HitECL();
-        eclArray[m_hitNum]->setCellId(iECLCell);
-        eclArray[m_hitNum]->setEnergyDep(E_cell[iECLCell][TimeIndex]);
-        eclArray[m_hitNum]->setTimeAve(T_ave[iECLCell][TimeIndex] + Tof_ave[iECLCell][TimeIndex]);
-//        eclArray[m_hitNum]->setEnergyDep(T_ave[iECLCell][TimeIndex] );
-//        eclArray[m_hitNum]->setTimeAve(T_ave[iECLCell][TimeIndex] );
-
-      }//if (E_cell> 1.0e-9)
-    }//TimeIndex
-  }//iECLCell
-
-
-  cout.setf(ios::fixed);
-  cout.precision(6);
-
   m_timeCPU = clock() * Unit::us;
   //Input Array
-//  StoreArray<HitECL>  eclArray(m_eclHitCollectionName);
+  StoreArray<HitECL>  eclArray(m_eclHitCollectionName);
   if (!eclArray) {
     B2ERROR("Can not find ECLDigiHits" << m_eclHitCollectionName << ".");
   }

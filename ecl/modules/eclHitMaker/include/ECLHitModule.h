@@ -59,6 +59,17 @@ namespace Belle2 {
       virtual void terminate();
 
 
+      typedef std::vector<int>   PrimaryPDG;
+      typedef std::vector<int>   MCtracks;
+      struct aTrack {
+        int cellId;
+        double energy;
+      };
+      typedef std::vector<MCtracks>   PrimaryTracks;
+      typedef std::map< int, int>  ECLTrackMap;
+      typedef std::pair< int, int> vpair;
+
+
     protected:
       /** Input array name. */
       std::string m_inColName;

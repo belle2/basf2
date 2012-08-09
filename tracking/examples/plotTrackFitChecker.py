@@ -26,7 +26,7 @@ infile = ''
 indir = os.getcwd()
 ofile = 'TrackFitCheckerPlots.root'
 draw = False
-coarse = 1
+coarse = 1.
 
 # argument parsing
 options = ['-f', '-d', '-of', '-draw', '-coarse']
@@ -58,7 +58,7 @@ for iarg in range(len(sys.argv)):
     if arg == '-draw':  # draw bin histograms during analysis
         draw = True
     if arg == '-coarse':  # more coarse binning of 2D histogramms (divide by ...)
-        coarse = int(getArgsToNextOpt(sys.argv, iarg))
+        coarse = float(getArgsToNextOpt(sys.argv, iarg))
 
 if check > 1:
     print 'Error: use either -d (input directory) or -f (input file) argument, but not both!'
@@ -87,16 +87,19 @@ if chain.GetEntriesFast() < 1:
 print 'Analysis output file: ', ofile
 chain.Print()
 
+if not draw:
+    ROOT.gROOT.SetBatch(True)
+
 # important numbers -----------------------------------------------------------------------------------------------------------------------------
 # 2D Histograms
 ptL = 0.2  # lower lower boundary of p_t
 ptU = 3.0  # upper boundary of p_t
-ptN = 14 / coarse  # number of p_t bins
+ptN = int(14 / coarse)  # number of p_t bins
 ptS = (ptU - ptL) / ptN  # width of p_t bins
 
 costhL = -0.85  # lower lower boundary of cos(theta)
 costhU = 0.95  # upper boundary of cos(theta)
-costhN = 18 / coarse  # number of cos(theta) bins
+costhN = int(18 / coarse)  # number of cos(theta) bins
 costhS = (costhU - costhL) / costhN  # width of cos(theta) bins
 
 pullMinMax = 1.  # range for pull mean/median histogramms
@@ -108,7 +111,7 @@ pValue_RMS_Ideal = 1. / math.sqrt(12)  # ideal value of RMS of p-value distribut
 
 # 1D Histograms
 histRange = 10.0  # range for the analysis histogram
-resoScaling = 0.05  # scaling factor for resolution analysis histogram
+resoScaling = 0.1  # scaling factor for resolution analysis histogram
 histBins = 2000  # number of bins for the analysis histogram
 
 MADtoSigma = 1.4826  # sigma = 1.4826*MAD (for gaussian distributions)
@@ -155,7 +158,7 @@ def robustEstimator(histo):
     return retVal
 
 
-# set up analysis histos -----------------------------------------------------------------------------------------------------------------------
+# set up 2D analysis histos -----------------------------------------------------------------------------------------------------------------------
 histos = []
 resHistos = []
 pullHistos = []
@@ -249,7 +252,7 @@ resHistos.append(h_relRes_curvVertex_mean)
 
 h_relRes_curvVertex_RMS = ROOT.TH2F(
     'h_relRes_curvVertex_RMS',
-    'mean of relative resolution of curvature at vertex',
+    'RMS of relative resolution of curvature at vertex',
     costhN,
     costhL,
     costhU,
@@ -381,16 +384,34 @@ for var in [
 
 histos.extend(pullHistos)
 
-# set up histo for storing the data for the bins of the analysis histograms
-histo = ROOT.TH1F('histo', 'histo', histBins, -1. * histRange, histRange)
-histoRes = ROOT.TH1F('histoRes', 'histoRes', histBins, -1. * histRange
-                     * resoScaling, histRange * resoScaling)
+# set up 1D histos for storing the data for the bins of the 2D analysis histograms
+anaHistos = []
+anaHistos.append(ROOT.TH1F('histo_p_bu', 'p-value bu', histBins, 0, 1))  # p val
+anaHistos.append(ROOT.TH1F('histo_p_fu', 'p-value fu', histBins, 0, 1))  # p val
+anaHistos.append(ROOT.TH1F('histoRes', 'relative momentum resolution',
+                 histBins, -1. * histRange * resoScaling, histRange
+                 * resoScaling))  # res
+anaHistos.append(ROOT.TH1F('histoPull0', 'Pulls x', histBins, -1. * histRange,
+                 histRange))  # x
+anaHistos.append(ROOT.TH1F('histoPull1', 'Pulls y', histBins, -1. * histRange,
+                 histRange))  # y
+anaHistos.append(ROOT.TH1F('histoPull2', 'Pulls z', histBins, -1. * histRange,
+                 histRange))  # z
+anaHistos.append(ROOT.TH1F('histoPull3', 'Pulls p_x', histBins, -1.
+                 * histRange, histRange))  # p_x
+anaHistos.append(ROOT.TH1F('histoPull4', 'Pulls p_y', histBins, -1.
+                 * histRange, histRange))  # p_y
+anaHistos.append(ROOT.TH1F('histoPull5', 'Pulls p_z', histBins, -1.
+                 * histRange, histRange))  # p_z
+
 absDev = ROOT.TH1D('absDev', 'absDev', histBins, 0, histRange)
 
-c = ROOT.TCanvas()
+# set up eventLists for event selection
 evtListCosth = ROOT.TEventList('evtListCosth', 'evtListCosth')
 evtListBin = ROOT.TEventList('evtListBin', 'evtListBin')
 evtListBinFlag = ROOT.TEventList('evtListBinFlag', 'evtListBinFlag')
+
+canvases = []  # canvases for plotting bin-wise data
 
 # loop over chain ------------------------------------------------------------------------------------------------------------------------------
 statusFlagCut = ROOT.TCut('genfitStatusFlag==0')
@@ -421,6 +442,13 @@ while costh < costhU - 0.5 * costhS:  # loop over costh
 
         print 'Bin(', binX, binY, '), costh =', costh, '; pt =', pt
 
+        # create canvas for plotting bin-wise data
+        canvases.append(ROOT.TCanvas('Bin(' + str(binX) + ',' + str(binY)
+                        + '); costh=' + str(costh) + ';pt=' + str(pt), 'Bin('
+                        + str(binX) + ',' + str(binY) + '); costh ='
+                        + str(costh) + '; pt =' + str(pt)))
+        canvases[-1].Divide(3, 3)
+
         # further select events in pt range
         evtListBin.Reset()
         evtListBinFlag.Reset()
@@ -439,42 +467,39 @@ while costh < costhU - 0.5 * costhS:  # loop over costh
                                        / float(evtListBin.GetN()))
 
         # p-values
-        chain.Draw('pValue_bu >> histo')
-        if histo.GetEntries() > 0:
-            h_pValue_bu_mean.SetBinContent(binX, binY, histo.GetMean())
-            h_pValue_bu_RMS.SetBinContent(binX, binY, histo.GetRMS())
-            if draw:
-                c.Update()
+        canvases[-1].cd(1)
+        chain.Draw('pValue_bu >> histo_p_bu')
+        if anaHistos[0].GetEntries() > 0:
+            h_pValue_bu_mean.SetBinContent(binX, binY, anaHistos[0].GetMean())
+            h_pValue_bu_RMS.SetBinContent(binX, binY, anaHistos[0].GetRMS())
 
-        chain.Draw('pValue_fu >> histo')
-        if histo.GetEntries() > 0:
-            h_pValue_fu_mean.SetBinContent(binX, binY, histo.GetMean())
-            h_pValue_fu_RMS.SetBinContent(binX, binY, histo.GetRMS())
-            if draw:
-                c.Update()
+        canvases[-1].cd(2)
+        chain.Draw('pValue_fu >> histo_p_fu')
+        if anaHistos[1].GetEntries() > 0:
+            h_pValue_fu_mean.SetBinContent(binX, binY, anaHistos[1].GetMean())
+            h_pValue_fu_RMS.SetBinContent(binX, binY, anaHistos[1].GetRMS())
 
         # resolutions
         iHist = 0
+        canvases[-1].cd(3)
         chain.Draw('relRes_curvVertex >> histoRes')
-        if histoRes.GetEntries() > 0:
-            est = robustEstimator(histoRes)
+        if anaHistos[2].GetEntries() > 0:
+            est = robustEstimator(anaHistos[2])
             for val in est:
                 resHistos[iHist].SetBinContent(binX, binY, val)
                 iHist += 1
-            if draw:
-                c.Update()
 
         # pull distributions
         for iVar in range(0, 6):  # x, y, z, px, py, pz
             iHist = 0
-            chain.Draw('pulls_vertexPosMom[' + str(iVar) + '] >> histo')
-            if histo.GetEntries() > 0:
-                est = robustEstimator(histo)
+            canvases[-1].cd(3 + iVar + 1)
+            chain.Draw('pulls_vertexPosMom[' + str(iVar) + '] >> histoPull'
+                       + str(iVar))
+            if anaHistos[3 + iVar].GetEntries() > 0:
+                est = robustEstimator(anaHistos[3 + iVar])
                 for val in est:
                     pullHistos[5 * iVar + iHist].SetBinContent(binX, binY, val)
                     iHist += 1
-                if draw:
-                    c.Update()
 
         pt += ptS
         binY += 1
@@ -492,4 +517,6 @@ for h in histos:
     h.GetXaxis().SetTitle('Generated cos#theta')
     h.GetYaxis().SetTitle('Generated p_{T}')
     h.Write()
+for canv in canvases:
+    canv.Write()
 

@@ -21,5 +21,13 @@ void example()
   tree->Draw("MCParticles.m_productionVertex_y:MCParticles.m_productionVertex_x>>hMCVertex");
   hMCVertex->Write();
 
+  // an example of a numerical value
+  TH1F* hNTrackCands = new TH1F("hNTrackCands", "Number of Track Candidates", 100, -0.5, 99.5);
+  tree->Draw("@GFTrackCands.size()>>hNTrackCands");
+  TNtuple* nTrackCands = new TNtuple("nTrackCands", "Average Number of Track Candidates", "number:rms");
+  nTrackCands->Fill(hNTrackCands->GetMean(), hNTrackCands->GetRMS());
+  delete hNTrackCands;
+  nTrackCands->Write();
+
   delete output;
 }

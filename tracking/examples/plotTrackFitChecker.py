@@ -90,6 +90,10 @@ chain.Print()
 if not draw:
     ROOT.gROOT.SetBatch(True)
 
+# output files
+orfile = ROOT.TFile(ofile, 'recreate')
+orfileBin = ROOT.TFile(ofile + '.bins.root', 'recreate')
+
 # important numbers -----------------------------------------------------------------------------------------------------------------------------
 # 2D Histograms
 ptL = 0.2  # lower lower boundary of p_t
@@ -444,9 +448,9 @@ while costh < costhU - 0.5 * costhS:  # loop over costh
 
         # create canvas for plotting bin-wise data
         canvases.append(ROOT.TCanvas('Bin(' + str(binX) + ',' + str(binY)
-                        + '); costh=' + str(costh) + ';pt=' + str(pt), 'Bin('
-                        + str(binX) + ',' + str(binY) + '); costh ='
-                        + str(costh) + '; pt =' + str(pt)))
+                        + ');costh=' + str(costh) + ';pt=' + str(pt), 'Bin('
+                        + str(binX) + ',' + str(binY) + '); costh = '
+                        + str(costh) + '; pt = ' + str(pt)))
         canvases[-1].Divide(3, 3)
 
         # further select events in pt range
@@ -501,6 +505,9 @@ while costh < costhU - 0.5 * costhS:  # loop over costh
                     pullHistos[5 * iVar + iHist].SetBinContent(binX, binY, val)
                     iHist += 1
 
+        orfileBin.cd()
+        canvases[-1].Write()
+
         pt += ptS
         binY += 1
     # end loop over pt
@@ -511,12 +518,9 @@ while costh < costhU - 0.5 * costhS:  # loop over costh
 
 # store histograms in output file --------------------------------------------------------------------------------------------------------------
 print 'Creating output file and storing histograms ...'
-orfile = ROOT.TFile(ofile, 'recreate')
 orfile.cd()
 for h in histos:
     h.GetXaxis().SetTitle('Generated cos#theta')
     h.GetYaxis().SetTitle('Generated p_{T}')
     h.Write()
-for canv in canvases:
-    canv.Write()
 

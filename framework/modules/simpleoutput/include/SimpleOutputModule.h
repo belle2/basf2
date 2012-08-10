@@ -164,8 +164,11 @@ namespace Belle2 {
      */
     bool m_done[DataStore::c_NDurabilityTypes];
 
-    /** Total number of branches. */
+    /** Total number of branches to be saved. */
     size_t m_size[DataStore::c_NDurabilityTypes];
+
+    /** Total number of items in the data store (in first event). */
+    size_t m_dataStoreSize[DataStore::c_NDurabilityTypes];
 
     /** Pointer to pointer, that can be utilised by the TTree.*/
     TObject** m_objects[DataStore::c_NDurabilityTypes];

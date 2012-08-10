@@ -270,8 +270,15 @@ void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
         sizeCounter++;
       }
     }
-    if (sizeCounter > m_size[durability]) {
-      B2FATAL("More data store items than in first event.");
+    if (map.size() > m_dataStoreSize[durability]) {
+      B2ERROR("The data store now contains more items than in first event (durability: " << durability << ")! This indicates that some objects/arrays have not been registered in a module's initialize() function. One of the following objects/arrays is responsible:");
+      for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
+        //search for branches not in m_branchNames
+        if (!binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), iter->first)) {
+          B2ERROR(iter->first);
+        }
+      }
+      B2FATAL("Aborting since the output module cannot save one of the branches listed above. Please register the object/array or notify the author of the module responsible!");
       return;
     }
   }
@@ -296,6 +303,7 @@ void SimpleOutputModule::setupBranches(DataStore::EDurability durability)
   if (m_size[durability]) {
     m_objects[durability] = new TObject* [m_size[durability]];
   }
+  m_dataStoreSize[durability] = map.size();
 
   m_branchNames[durability] = branchesToBeSaved;
   if (!m_branchNames[durability].empty()) {

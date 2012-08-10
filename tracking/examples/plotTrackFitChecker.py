@@ -85,7 +85,7 @@ if chain.GetEntriesFast() < 1:
     exit(1)
 
 print 'Analysis output file: ', ofile
-chain.Print()
+# chain.Print()
 
 if not draw:
     ROOT.gROOT.SetBatch(True)
@@ -106,12 +106,15 @@ costhU = 0.95  # upper boundary of cos(theta)
 costhN = int(18 / coarse)  # number of cos(theta) bins
 costhS = (costhU - costhL) / costhN  # width of cos(theta) bins
 
-pullMinMax = 1.  # range for pull mean/median histogramms
-RMSMax = 2.0  # range for RMS/MAD histograms
-OutlierMax = 100  # range for outlier histograms
+pullRange = 0.5  # range for pull mean/median histogramms around 0
+RMSRange = 0.5  # range for RMS/MAD histograms around 1
+OutlierMax = 50  # range for outlier histograms
 
 pValue_mean_Ideal = 0.5  # ideal value of mean of p-value distribution
 pValue_RMS_Ideal = 1. / math.sqrt(12)  # ideal value of RMS of p-value distribution
+
+pValue_mean_Range = 0.25  # range of p-value mean around ideal value
+pValue_RMS_Range = 0.125
 
 # 1D Histograms
 histRange = 10.0  # range for the analysis histogram
@@ -193,8 +196,8 @@ h_pValue_bu_mean = ROOT.TH2F(
     ptL,
     ptU,
     )
-h_pValue_bu_mean.SetMinimum(pValue_mean_Ideal - 0.5)
-h_pValue_bu_mean.SetMaximum(pValue_mean_Ideal + 0.5)
+h_pValue_bu_mean.SetMinimum(pValue_mean_Ideal - pValue_mean_Range)
+h_pValue_bu_mean.SetMaximum(pValue_mean_Ideal + pValue_mean_Range)
 histos.append(h_pValue_bu_mean)
 
 h_pValue_bu_RMS = ROOT.TH2F(
@@ -207,8 +210,8 @@ h_pValue_bu_RMS = ROOT.TH2F(
     ptL,
     ptU,
     )
-h_pValue_bu_RMS.SetMinimum(pValue_RMS_Ideal - 0.25)
-h_pValue_bu_RMS.SetMaximum(pValue_RMS_Ideal + 0.25)
+h_pValue_bu_RMS.SetMinimum(pValue_RMS_Ideal - pValue_RMS_Range)
+h_pValue_bu_RMS.SetMaximum(pValue_RMS_Ideal + pValue_RMS_Range)
 histos.append(h_pValue_bu_RMS)
 
 h_pValue_fu_mean = ROOT.TH2F(
@@ -221,8 +224,8 @@ h_pValue_fu_mean = ROOT.TH2F(
     ptL,
     ptU,
     )
-h_pValue_fu_mean.SetMinimum(pValue_mean_Ideal - 0.5)
-h_pValue_fu_mean.SetMaximum(pValue_mean_Ideal + 0.5)
+h_pValue_fu_mean.SetMinimum(pValue_mean_Ideal - pValue_mean_Range)
+h_pValue_fu_mean.SetMaximum(pValue_mean_Ideal + pValue_mean_Range)
 histos.append(h_pValue_fu_mean)
 
 h_pValue_fu_RMS = ROOT.TH2F(
@@ -235,8 +238,8 @@ h_pValue_fu_RMS = ROOT.TH2F(
     ptL,
     ptU,
     )
-h_pValue_fu_RMS.SetMinimum(pValue_RMS_Ideal - 0.25)
-h_pValue_fu_RMS.SetMaximum(pValue_RMS_Ideal + 0.25)
+h_pValue_fu_RMS.SetMinimum(pValue_RMS_Ideal - pValue_RMS_Range)
+h_pValue_fu_RMS.SetMaximum(pValue_RMS_Ideal + pValue_RMS_Range)
 histos.append(h_pValue_fu_RMS)
 
 # resolutions
@@ -250,8 +253,8 @@ h_relRes_curvVertex_mean = ROOT.TH2F(
     ptL,
     ptU,
     )
-h_relRes_curvVertex_mean.SetMinimum(-1. * pullMinMax * resoScaling)
-h_relRes_curvVertex_mean.SetMaximum(pullMinMax * resoScaling)
+h_relRes_curvVertex_mean.SetMinimum(-1. * pullRange * resoScaling)
+h_relRes_curvVertex_mean.SetMaximum(pullRange * resoScaling)
 resHistos.append(h_relRes_curvVertex_mean)
 
 h_relRes_curvVertex_RMS = ROOT.TH2F(
@@ -265,7 +268,7 @@ h_relRes_curvVertex_RMS = ROOT.TH2F(
     ptU,
     )
 h_relRes_curvVertex_RMS.SetMinimum(0)
-h_relRes_curvVertex_RMS.SetMaximum(RMSMax * resoScaling)
+h_relRes_curvVertex_RMS.SetMaximum(4. * RMSRange * resoScaling)
 resHistos.append(h_relRes_curvVertex_RMS)
 
 h_relRes_curvVertex_median = ROOT.TH2F(
@@ -278,8 +281,8 @@ h_relRes_curvVertex_median = ROOT.TH2F(
     ptL,
     ptU,
     )
-h_relRes_curvVertex_median.SetMinimum(-1. * pullMinMax * resoScaling)
-h_relRes_curvVertex_median.SetMaximum(pullMinMax * resoScaling)
+h_relRes_curvVertex_median.SetMinimum(-1. * pullRange * resoScaling)
+h_relRes_curvVertex_median.SetMaximum(pullRange * resoScaling)
 resHistos.append(h_relRes_curvVertex_median)
 
 h_relRes_curvVertex_MAD = ROOT.TH2F(
@@ -293,7 +296,7 @@ h_relRes_curvVertex_MAD = ROOT.TH2F(
     ptU,
     )
 h_relRes_curvVertex_MAD.SetMinimum(0)
-h_relRes_curvVertex_MAD.SetMaximum(RMSMax * resoScaling)
+h_relRes_curvVertex_MAD.SetMaximum(4. * RMSRange * resoScaling)
 resHistos.append(h_relRes_curvVertex_MAD)
 
 h_relRes_curvVertex_outliers = ROOT.TH2F(
@@ -331,8 +334,8 @@ for var in [
         ptL,
         ptU,
         ))
-    pullHistos[-1].SetMinimum(-1. * pullMinMax)
-    pullHistos[-1].SetMaximum(pullMinMax)
+    pullHistos[-1].SetMinimum(-1. * pullRange)
+    pullHistos[-1].SetMaximum(pullRange)
 
     pullHistos.append(ROOT.TH2F(
         'h_' + var + '_pull_RMS',
@@ -344,8 +347,8 @@ for var in [
         ptL,
         ptU,
         ))
-    pullHistos[-1].SetMinimum(0.)
-    pullHistos[-1].SetMaximum(RMSMax)
+    pullHistos[-1].SetMinimum(1. - RMSRange)
+    pullHistos[-1].SetMaximum(1. + RMSRange)
 
     pullHistos.append(ROOT.TH2F(
         'h_' + var + '_pull_median',
@@ -357,8 +360,8 @@ for var in [
         ptL,
         ptU,
         ))
-    pullHistos[-1].SetMinimum(-1. * pullMinMax)
-    pullHistos[-1].SetMaximum(pullMinMax)
+    pullHistos[-1].SetMinimum(-1. * pullRange)
+    pullHistos[-1].SetMaximum(pullRange)
 
     pullHistos.append(ROOT.TH2F(
         'h_' + var + '_pull_MAD',
@@ -370,8 +373,8 @@ for var in [
         ptL,
         ptU,
         ))
-    pullHistos[-1].SetMinimum(0.)
-    pullHistos[-1].SetMaximum(RMSMax)
+    pullHistos[-1].SetMinimum(1. - RMSRange)
+    pullHistos[-1].SetMaximum(1. + RMSRange)
 
     pullHistos.append(ROOT.TH2F(
         'h_' + var + '_pull_outliers',
@@ -435,6 +438,8 @@ while costh < costhU - 0.5 * costhS:  # loop over costh
     chain.Draw('>> evtListCosth', costhCUT)
     chain.SetEventList(evtListCosth)
 
+    print '# events in theta range: ', evtListCosth.GetN()
+
     binY = 1
     pt = ptL
     while pt < ptU - 0.5 * ptS:  # loop over pt
@@ -443,8 +448,6 @@ while costh < costhU - 0.5 * costhS:  # loop over costh
         binCut = ROOT.TCut(ptCUT.GetTitle() + ' && ' + costhCUT.GetTitle())
         binStFlCut = ROOT.TCut(statusFlagCut.GetTitle() + ' && '
                                + binCut.GetTitle())
-
-        print 'Bin(', binX, binY, '), costh =', costh, '; pt =', pt
 
         # create canvas for plotting bin-wise data
         canvases.append(ROOT.TCanvas('Bin(' + str(binX) + ',' + str(binY)
@@ -463,6 +466,10 @@ while costh < costhU - 0.5 * costhS:  # loop over costh
         # further reduce event list to entries with statusFlag==0
         chain.Draw('>> evtListBinFlag', statusFlagCut)
         chain.SetEventList(evtListBinFlag)
+
+        print 'Bin(', binX, binY, '), costh =', costh, '; pt =', pt, \
+            '   # events in bin: ', evtListBin.GetN(), \
+            '   # fitted events in bin: ', evtListBinFlag.GetN()
 
         # efficiency
         if evtListBin.GetN() > 0:
@@ -520,6 +527,7 @@ while costh < costhU - 0.5 * costhS:  # loop over costh
 print 'Creating output file and storing histograms ...'
 orfile.cd()
 for h in histos:
+    h.SetContour(255)
     h.GetXaxis().SetTitle('Generated cos#theta')
     h.GetYaxis().SetTitle('Generated p_{T}')
     h.Write()

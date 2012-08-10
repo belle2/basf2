@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 // Own include
-#include <arich/modules/arichDigitizer/ARICHDigiModule.h>
+#include <arich/modules/arichDigitizer/ARICHDigitizerModule.h>
 #include <framework/core/ModuleManager.h>
 #include <time.h>
 
@@ -37,14 +37,14 @@ namespace Belle2 {
     //                 Register the Module
     //-----------------------------------------------------------------
 
-    REG_MODULE(ARICHDigi)
+    REG_MODULE(ARICHDigitizer)
 
 
     //-----------------------------------------------------------------
     //                 Implementation
     //-----------------------------------------------------------------
 
-    ARICHDigiModule::ARICHDigiModule() : Module(),
+    ARICHDigitizerModule::ARICHDigitizerModule() : Module(),
       m_arichgp(ARICHGeometryPar::Instance())
     {
       // Set description()
@@ -55,12 +55,12 @@ namespace Belle2 {
       addParam("OutputColName", m_outColName, "Output collection name", string("ARICHHitArray"));
     }
 
-    ARICHDigiModule::~ARICHDigiModule()
+    ARICHDigitizerModule::~ARICHDigitizerModule()
     {
       if (m_arichgp) delete m_arichgp;
     }
 
-    void ARICHDigiModule::initialize()
+    void ARICHDigitizerModule::initialize()
     {
       // Initialize variables
       m_nRun    = 0 ;
@@ -76,14 +76,14 @@ namespace Belle2 {
       StoreArray<ARICHHit> arichHits;
     }
 
-    void ARICHDigiModule::beginRun()
+    void ARICHDigitizerModule::beginRun()
     {
       // Print run number
       B2INFO("ARICHDigi: Processing run: " << m_nRun);
 
     }
 
-    void ARICHDigiModule::event()
+    void ARICHDigitizerModule::event()
     {
 
       // Get the collection of ARICHSimHits from the Data store.
@@ -144,12 +144,12 @@ namespace Belle2 {
       m_nEvent++;
     }
 
-    void ARICHDigiModule::endRun()
+    void ARICHDigitizerModule::endRun()
     {
       m_nRun++;
     }
 
-    void ARICHDigiModule::terminate()
+    void ARICHDigitizerModule::terminate()
     {
       // CPU time end
       m_timeCPU = clock() * Unit::us - m_timeCPU;
@@ -159,12 +159,12 @@ namespace Belle2 {
 
     }
 
-    void ARICHDigiModule::printModuleParams() const
+    void ARICHDigitizerModule::printModuleParams() const
     {
 
     }
 
-    double ARICHDigiModule::QESuperBialkali(double energy)
+    double ARICHDigitizerModule::QESuperBialkali(double energy)
     {
       const float qe[44] = {0.197, 0.251 , 0.29 , 0.313 , 0.333 , 0.343 , 0.348 , 0.35 , 0.35, 0.348,
                             0.346, 0.343, 0.34, 0.335, 0.327 , 0.317 , 0.306 , 0.294 , 0.280 , 0.263 , 0.244 ,
@@ -205,7 +205,7 @@ namespace Belle2 {
       */
     }
 
-    int ARICHDigiModule::DetectorQE(double energy)
+    int ARICHDigitizerModule::DetectorQE(double energy)
     {
       return (gRandom->Uniform(1) < QESuperBialkali(energy));
     }

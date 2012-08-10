@@ -41,7 +41,7 @@ mcparticleprinter = register_module('PrintMCParticles')
 mcparticleprinter.param('maxLevel', -1)
 
 # ...CDC Digitizer...
-cdcdigitizer = register_module('CDCDigi')
+cdcdigitizer = register_module('CDCDigitizer')
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.00, 'Resolution2': 0.00}
 cdcdigitizer.param(param_cdcdigi)
 

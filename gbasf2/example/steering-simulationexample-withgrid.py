@@ -36,7 +36,7 @@ evtmetainfo = fw.register_module('EvtMetaInfo')
 paramloader = fw.register_module('ParamLoaderXML')
 geobuilder = fw.register_module('GeoBuilder')
 g4sim = fw.register_module('SimModule')
-cdcdigitizer = fw.register_module('CDCDigitizer')
+cdcdigitizer = fw.register_module('CDCDigitizertizer')
 out = fw.register_module('SimpleOutput')
 
 ##Set parameters

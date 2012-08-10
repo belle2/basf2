@@ -37,7 +37,7 @@ pGun.param(param_pGun)
 
 g4sim = register_module('FullSim')
 
-cdcDigitizer = register_module('CDCDigi')
+cdcDigitizer = register_module('CDCDigitizer')
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
 cdcDigitizer.param(param_cdcdigi)
 

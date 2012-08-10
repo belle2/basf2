@@ -29,7 +29,7 @@ g4sim = register_module('FullSim')
 mcparticle = register_module('PrintMCParticles')
 
 # Digitizer
-cdcDigitizer = register_module('CDCDigi')
+cdcDigitizer = register_module('CDCDigitizer')
 # pxdDigitizer = register_module('PXDDigitizer')
 # pxdClusterizer = register_module('PXDClustering')
 

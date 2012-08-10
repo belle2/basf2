@@ -14,7 +14,7 @@
 # The generator used in this example is geant4 particle gun (see example in the simulation or generator package).
 # FullSim performs the full simulation.
 
-# CDCDigi creates the detecotor response in the CDC for the simulated Hits.
+# CDCDigitizer creates the detecotor response in the CDC for the simulated Hits.
 
 # MCTrackFinder creates relations between MCParticles and CDCHits/PXDTrueHits/SVDTrueHits produced by it.
 # CDCTracking performs pattern recognition in the CDC based on conformal algorithm. GFTrackCandidates with corresponding hit indices and start values are created.
@@ -76,7 +76,7 @@ g4sim = register_module('FullSim')
 g4sim.logging.log_level = LogLevel.ERROR
 
 # digitizer
-cdcDigitizer = register_module('CDCDigi')
+cdcDigitizer = register_module('CDCDigitizer')
 
 # use one gaussian with resolution of 0.01 in the digitizer (to simplify the fitting)
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}

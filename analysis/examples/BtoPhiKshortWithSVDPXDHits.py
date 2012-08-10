@@ -69,7 +69,7 @@ g4sim.param(param_g4sim)
 
 # ---------------------------------------------------------------
 # CDC digitizer
-cdcDigitizer = register_module('CDCDigi')
+cdcDigitizer = register_module('CDCDigitizer')
 
 # use one gaussian with resolution of 0.01 in the digitizer (to simplify the fitting)
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
@@ -177,7 +177,7 @@ pxdfitting.param(param_pxdfitting)
 
 # ---------------------------------------------------------------
 # TOP - digitization
-topdigi = register_module('TOPDigi')
+topdigi = register_module('TOPDigitizer')
 param_digi = {'PhotonFraction': 0.3}
 topdigi.param(param_digi)
 
@@ -187,7 +187,7 @@ topreco = register_module('TOPReco')
 
 # ---------------------------------------------------------------
 # ARICH - digitization
-arichDigi = register_module('ARICHDigi')
+arichDigi = register_module('ARICHDigitizer')
 
 # ---------------------------------------------------------------
 # ARICH reconstruction

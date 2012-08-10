@@ -11,7 +11,7 @@
 # The generator used in this example is geant4 particle gun (see example in the simulation or generator package).
 # FullSim performs the full simulation.
 
-# CDCDigi creates the detector response in the CDC for the simulated Hits.
+# CDCDigitizer creates the detector response in the CDC for the simulated Hits.
 # For the PXD and SVD currently the TrueHits are used (created directly by the sensitive detector), will be replaced by realistic clusters later on.
 
 # MCTrackFinder creates relations between MCParticles and CDCHits/PXDTrueHits/SVDTrueHits produced by it.
@@ -71,7 +71,7 @@ g4sim = register_module('FullSim')
 g4sim.logging.log_level = LogLevel.ERROR
 
 # digitizer
-cdcDigitizer = register_module('CDCDigi')
+cdcDigitizer = register_module('CDCDigitizer')
 
 # use one gaussian with resolution of 0.01 in the digitizer (to simplify the fitting)
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}

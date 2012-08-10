@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 // Own include
-#include <top/modules/TOPDigitizer/TOPDigiModule.h>
+#include <top/modules/TOPDigitizer/TOPDigitizerModule.h>
 
 #include <framework/core/ModuleManager.h>
 #include <time.h>
@@ -39,14 +39,14 @@ namespace Belle2 {
     //                 Register the Module
     //-----------------------------------------------------------------
 
-    REG_MODULE(TOPDigi)
+    REG_MODULE(TOPDigitizer)
 
 
     //-----------------------------------------------------------------
     //                 Implementation
     //-----------------------------------------------------------------
 
-    TOPDigiModule::TOPDigiModule() : Module(),
+    TOPDigitizerModule::TOPDigitizerModule() : Module(),
       m_topgp(TOPGeometryPar::Instance())
     {
       // Set description()
@@ -65,11 +65,11 @@ namespace Belle2 {
 
     }
 
-    TOPDigiModule::~TOPDigiModule()
+    TOPDigitizerModule::~TOPDigitizerModule()
     {
     }
 
-    void TOPDigiModule::initialize()
+    void TOPDigitizerModule::initialize()
     {
       // Print set parameters
       printModuleParams();
@@ -80,12 +80,12 @@ namespace Belle2 {
       RelationArray relSimHitToDigit(topSimHits, topDigits);
     }
 
-    void TOPDigiModule::beginRun()
+    void TOPDigitizerModule::beginRun()
     {
 
     }
 
-    void TOPDigiModule::event()
+    void TOPDigitizerModule::event()
     {
 
       // input: simulated hits
@@ -145,31 +145,31 @@ namespace Belle2 {
     }
 
 
-    void TOPDigiModule::endRun()
+    void TOPDigitizerModule::endRun()
     {
 
     }
 
-    void TOPDigiModule::terminate()
+    void TOPDigitizerModule::terminate()
     {
 
     }
 
-    void TOPDigiModule::printModuleParams() const
+    void TOPDigitizerModule::printModuleParams() const
     {
       cout << "TOPDigi: PhotonFraction=" << m_photonFraction << endl;
       cout << "TOPDigi: T0jitter (rms)=" << m_T0jitter << endl;
       cout << "TOPDigi: ELjitter (rms)=" << m_ELjitter << endl;
     }
 
-    bool TOPDigiModule::DetectorQE(double energy)
+    bool TOPDigitizerModule::DetectorQE(double energy)
     {
       double rnd = gRandom->Rndm() * m_photonFraction;
       double eff = m_topgp->QE(energy) * m_topgp->getColEffi();
       return (rnd < eff);
     }
 
-    double TOPDigiModule::PMT_TTS()
+    double TOPDigitizerModule::PMT_TTS()
     {
       double prob = gRandom->Rndm();
       double s = 0;

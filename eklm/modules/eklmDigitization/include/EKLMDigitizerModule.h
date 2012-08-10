@@ -12,8 +12,8 @@
 
 
 
-#ifndef EKLMDIGITIZATIONMODULE_H
-#define EKLMDIGITIZATIONMODULE_H
+#ifndef EKLMDIGITIZERMODULE_H
+#define EKLMDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
 #include <string>
@@ -26,7 +26,7 @@ namespace Belle2 {
   /*!
     Simple module for reading EKLM hits
   */
-  class EKLMDigitizationModule : public Module {
+  class EKLMDigitizerModule : public Module {
 
   public:
 
@@ -37,13 +37,13 @@ namespace Belle2 {
       \param selfRegisterType True if this module is self-registering,
       otherwise false.
     */
-    EKLMDigitizationModule();
+    EKLMDigitizerModule();
 
     //! Destructor
     /*!
       Use the destructor to release the memory you allocated in the constructor.
     */
-    virtual ~EKLMDigitizationModule();
+    virtual ~EKLMDigitizerModule();
 
     //! Initialize the Module
     /*! This method is called only once before the actual event

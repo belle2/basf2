@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDIGI_H
-#define CDCDIGI_H
+#ifndef CDCDIGITIZER_H
+#define CDCDIGITIZER_H
 
 //basf2 framework headers
 #include <framework/core/Module.h>
@@ -47,7 +47,7 @@ namespace Belle2 {
    *
    */
 
-  class CDCDigiModule : public Module {
+  class CDCDigitizerModule : public Module {
 
   public:
 
@@ -56,10 +56,10 @@ namespace Belle2 {
     typedef std::pair< int, CDCSignal*> vpair;           /**< Pair of CDCSignalMap. */
 
     /** Constructor.*/
-    CDCDigiModule();
+    CDCDigitizerModule();
 
     /** Destructor.*/
-    virtual ~CDCDigiModule();
+    virtual ~CDCDigitizerModule();
 
     /** Initialize variables, print info, and start CPU clock. */
     virtual void initialize();
@@ -182,4 +182,4 @@ namespace Belle2 {
 
 } // end of Belle2 namespace
 
-#endif // CDCDIGI_H
+#endif // CDCDIGITIZER_H

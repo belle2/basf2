@@ -32,7 +32,7 @@ geometry = register_module('Geometry')
 # Run simulation
 simulation = register_module('FullSim')
 # ARICH digitization module
-arichDIGI = register_module('ARICHDigi')
+arichDIGI = register_module('ARICHDigitizer')
 # ARICH reconstruction module
 arichRECO = register_module('ARICHRec')
 # Save output of simulation

@@ -12,7 +12,7 @@
 
 #include <framework/core/ModuleManager.h>
 
-#include <eklm/modules/eklmDigitization/EKLMDigitizationModule.h>
+#include <eklm/modules/eklmDigitization/EKLMDigitizerModule.h>
 #include <eklm/simeklm/EKLMDigitizer.h>
 #include <eklm/geoeklm/EKLMTransformationFactory.h>
 
@@ -21,13 +21,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(EKLMDigitization)
+REG_MODULE(EKLMDigitizer)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-EKLMDigitizationModule::EKLMDigitizationModule() : Module()
+EKLMDigitizerModule::EKLMDigitizerModule() : Module()
 {
   setDescription("EKLM digitization module");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
@@ -35,22 +35,22 @@ EKLMDigitizationModule::EKLMDigitizationModule() : Module()
   addParam("StripInformationDB", m_stripInfromationDBFile, "File to read strip information", std::string("/tmp/out.dat"));
 }
 
-EKLMDigitizationModule::~EKLMDigitizationModule()
+EKLMDigitizerModule::~EKLMDigitizerModule()
 {
 }
 
-void EKLMDigitizationModule::initialize()
+void EKLMDigitizerModule::initialize()
 {
   B2INFO("EKLMDigitizationModule initialized");
   (EKLMTransformationFactory::getInstance())->readFromFile(m_stripInfromationDBFile.c_str());
 }
 
-void EKLMDigitizationModule::beginRun()
+void EKLMDigitizerModule::beginRun()
 {
   B2DEBUG(1, "EKLMDigitizationModule : beginRun");
 }
 
-void EKLMDigitizationModule::event()
+void EKLMDigitizerModule::event()
 {
   B2DEBUG(1, "EKLMDigitizationModule : event");
   B2DEBUG(1, " START DIGITIZATION");
@@ -62,10 +62,10 @@ void EKLMDigitizationModule::event()
 }
 
 
-void EKLMDigitizationModule::endRun()
+void EKLMDigitizerModule::endRun()
 {
 }
 
-void EKLMDigitizationModule::terminate()
+void EKLMDigitizerModule::terminate()
 {
 }

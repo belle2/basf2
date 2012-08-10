@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDIGIMODULE_H_
-#define ECLDIGIMODULE_H_
+#ifndef ECLDIGITIZERMODULE_H_
+#define ECLDIGITIZERMODULE_H_
 
 #include <framework/core/Module.h>
 #include <vector>
@@ -21,17 +21,17 @@ namespace Belle2 {
     /** Module for making ECLRecoHits of CDCHits.
      *
      */
-    class ECLDigiModule : public Module {
+    class ECLDigitizerModule : public Module {
 
     public:
 
       /** Constructor.
        */
-      ECLDigiModule();
+      ECLDigitizerModule();
 
       /** Destructor.
        */
-      ~ECLDigiModule();
+      ~ECLDigitizerModule();
 
 
       /** Initialize variables, print info, and start CPU clock. */
@@ -145,4 +145,4 @@ namespace Belle2 {
   }//ECL
 }//Belle2
 
-#endif /* EVTMETAINFO_H_ */
+#endif /* ECLDIGITIZERMODULE_H_ */

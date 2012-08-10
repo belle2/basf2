@@ -39,24 +39,24 @@ def add_simulation(path, components=None):
 
     # CDC simulation
     if components == None or 'CDC' in components:
-        cdc_digitizer = register_module('CDCDigi')
+        cdc_digitizer = register_module('CDCDigitizer')
         path.add_module(cdc_digitizer)
 
     # TOP simulation
     if components == None or 'TOP' in components:
-        top_digitizer = register_module('TOPDigi')
+        top_digitizer = register_module('TOPDigitizer')
         path.add_module(top_digitizer)
 
     # ARICH simulation
     if components == None or 'ARICH' in components:
-        arich_digitizer = register_module('ARICHDigi')
+        arich_digitizer = register_module('ARICHDigitizer')
         path.add_module(arich_digitizer)
 
     # ECL simulation
     if components == None or 'ECL' in components:
         ecl_hit = register_module('ECLHit')
         path.add_module(ecl_hit)
-        ecl_digitizer = register_module('ECLDigi')
+        ecl_digitizer = register_module('ECLDigitizer')
         path.add_module(ecl_digitizer)
 
     # BKLM simulation
@@ -66,7 +66,7 @@ def add_simulation(path, components=None):
 
     # EKLM simulation
     if components == None or 'EKLM' in components:
-        eklm_digitizer = register_module('EKLMDigitization')
+        eklm_digitizer = register_module('EKLMDigitizer')
         path.add_module(eklm_digitizer)
 
 

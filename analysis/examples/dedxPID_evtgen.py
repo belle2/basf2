@@ -41,7 +41,7 @@ main.add_module(geometry)
 main.add_module(evtgeninput)
 main.add_module(g4sim)
 
-cdcdigi = register_module('CDCDigi')
+cdcdigi = register_module('CDCDigitizer')
 main.add_module(cdcdigi)
 
 pxd_digi = register_module('PXDDigitizer')

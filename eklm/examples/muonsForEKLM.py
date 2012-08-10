@@ -67,7 +67,7 @@ mcprint = register_module('PrintMCParticles')
 # ------------  EKLM-related modules
 
 # EKLM digi
-eklmdigi = register_module('EKLMDigitization')
+eklmdigi = register_module('EKLMDigitizer')
 eklmdigi.log_level = LogLevel.INFO
 # EKLM reco
 eklmreco = register_module('EKLMReconstruction')

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <cdc/modules/cdcDigitizer/CDCDigiModule.h>
+#include <cdc/modules/cdcDigitizer/CDCDigitizerModule.h>
 
 //framework headers
 #include <framework/datastore/StoreObjPtr.h>
@@ -43,13 +43,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCDigi)
+REG_MODULE(CDCDigitizer)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCDigiModule::CDCDigiModule() : Module()
+CDCDigitizerModule::CDCDigitizerModule() : Module()
 {
   // Set description
   setDescription("CDCDigiModuletizer");
@@ -78,11 +78,11 @@ CDCDigiModule::CDCDigiModule() : Module()
            "Name of relation collection - Hit CDC to MCParticle (if nonzero, created)", string("SimHitToCDCHits"));
 }
 
-CDCDigiModule::~CDCDigiModule()
+CDCDigitizerModule::~CDCDigitizerModule()
 {
 }
 
-void CDCDigiModule::initialize()
+void CDCDigitizerModule::initialize()
 {
   // Initialize variables
   m_nRun    = 0 ;
@@ -109,11 +109,11 @@ void CDCDigiModule::initialize()
 
 }
 
-void CDCDigiModule::beginRun()
+void CDCDigitizerModule::beginRun()
 {
 }
 
-void CDCDigiModule::event()
+void CDCDigitizerModule::event()
 {
   //------------------------------------------
   // Get CDC hits collection from data store.
@@ -272,7 +272,7 @@ void CDCDigiModule::event()
   m_nEvent++;
 }
 
-double CDCDigiModule::smearDriftLength(double driftLength, double fraction, double mean1, double resolution1, double mean2, double resolution2)
+double CDCDigitizerModule::smearDriftLength(double driftLength, double fraction, double mean1, double resolution1, double mean2, double resolution2)
 {
   // Smear drift length using double Gaussian function
   double mean, resolution;
@@ -290,11 +290,11 @@ double CDCDigiModule::smearDriftLength(double driftLength, double fraction, doub
   return newDL * Unit::cm;
 }
 
-void CDCDigiModule::endRun()
+void CDCDigitizerModule::endRun()
 {
 }
 
-void CDCDigiModule::terminate()
+void CDCDigitizerModule::terminate()
 {
   // CPU time end
   m_timeCPU = clock() * Unit::us - m_timeCPU;
@@ -316,7 +316,7 @@ void CDCDigiModule::terminate()
   //     << ENDCOLOR);
 }
 
-void CDCDigiModule::genNoise(CDCSignalMap&)  //cdcSignalMap)
+void CDCDigitizerModule::genNoise(CDCSignalMap&)  //cdcSignalMap)
 {
   //-------------------------------------------------------------------------------
   // Method generating random noise using Gaussian distribution (input parameter:
@@ -354,7 +354,7 @@ void CDCDigiModule::genNoise(CDCSignalMap&)  //cdcSignalMap)
   */
 }
 
-double CDCDigiModule::getDriftTime(double driftLength, double tof, double propLength)
+double CDCDigitizerModule::getDriftTime(double driftLength, double tof, double propLength)
 {
   //---------------------------------------------------------------------------------
   // Method returning electron drift time (parameters: position in cm)
@@ -374,7 +374,7 @@ double CDCDigiModule::getDriftTime(double driftLength, double tof, double propLe
   return (1000 * driftTimeFactor * (driftLength / Unit::cm) / 4.0 + tofFactor * tof / Unit::ns + propagationDelayFactor * (propLength / Unit::cm) / 27.25 + m_eventTime);
 }
 
-void CDCDigiModule::printCDCSimHitInfo(const CDCSimHit& aHit) const
+void CDCDigitizerModule::printCDCSimHitInfo(const CDCSimHit& aHit) const
 {
   //----------------------
   // Printing a hit info.
@@ -396,7 +396,7 @@ void CDCDigiModule::printCDCSimHitInfo(const CDCSimHit& aHit) const
          << std::setprecision(0));
 }
 
-void CDCDigiModule::printCDCSimHitsInfo(std::string info, const CDCSimHitVec& hitVec) const
+void CDCDigitizerModule::printCDCSimHitsInfo(std::string info, const CDCSimHitVec& hitVec) const
 {
   //---------------------
   // Printing hits info.
@@ -409,7 +409,7 @@ void CDCDigiModule::printCDCSimHitsInfo(std::string info, const CDCSimHitVec& hi
   }
 }
 
-void CDCDigiModule::printModuleParams() const
+void CDCDigitizerModule::printModuleParams() const
 {
   //-----------------------------
   // Printing module parameters.
@@ -444,7 +444,7 @@ void CDCDigiModule::printModuleParams() const
          << "\n");
 }
 
-void CDCDigiModule::printCDCSignalInfo(std::string info, const CDCSignalMap& cdcSignalMap) const
+void CDCDigitizerModule::printCDCSignalInfo(std::string info, const CDCSignalMap& cdcSignalMap) const
 {
   //---------------------------------------------
   // Printing info about signals in each cell.

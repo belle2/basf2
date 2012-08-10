@@ -49,7 +49,7 @@ param_pGun = {
 pGun.param(param_pGun)
 
 eclHit = register_module('ECLHit')
-eclDigi = register_module('ECLDigi')
+eclDigi = register_module('ECLDigitizer')
 eclRecShower = register_module('ECLRecShower')
 makeGamma = register_module('ECLRecGamma')
 makePi0 = register_module('ECLRecPi0')
@@ -63,7 +63,7 @@ param_Gamma = {
 makeGamma.param(param_Gamma)
 simpleoutput.param('outputFileName', 'output1.root')
 
-cdcDigitizer = register_module('CDCDigi')
+cdcDigitizer = register_module('CDCDigitizer')
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
 cdcDigitizer.param(param_cdcdigi)
 

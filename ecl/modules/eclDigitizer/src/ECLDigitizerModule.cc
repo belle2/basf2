@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <ecl/modules/eclDigitizer/ECLDigiModule.h>
+#include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
 #include <ecl/dataobjects/HitECL.h>
 #include <ecl/dataobjects/DigiECL.h>
 #include <ecl/dataobjects/DspECL.h>
@@ -43,13 +43,13 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLDigi)
+REG_MODULE(ECLDigitizer)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLDigiModule::ECLDigiModule() : Module()
+ECLDigitizerModule::ECLDigitizerModule() : Module()
 {
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits.");
@@ -74,13 +74,13 @@ ECLDigiModule::ECLDigiModule() : Module()
 }
 
 
-ECLDigiModule::~ECLDigiModule()
+ECLDigitizerModule::~ECLDigitizerModule()
 {
   if (m_random) delete m_random;
 
 }
 
-void ECLDigiModule::initialize()
+void ECLDigitizerModule::initialize()
 {
   // Initialize variables
   m_nRun    = 0 ;
@@ -92,13 +92,13 @@ void ECLDigiModule::initialize()
   readDSPDB();
 }
 
-void ECLDigiModule::beginRun()
+void ECLDigitizerModule::beginRun()
 {
   B2INFO("ECLDigiModule: Processing run: " << m_nRun);
 }
 
 
-void ECLDigiModule::event()
+void ECLDigitizerModule::event()
 {
   m_timeCPU = clock() * Unit::us;
   //Input Array
@@ -208,19 +208,19 @@ void ECLDigiModule::event()
 
 }
 
-void ECLDigiModule::endRun()
+void ECLDigitizerModule::endRun()
 {
   m_nRun++;
 }
 
-void ECLDigiModule::terminate()
+void ECLDigitizerModule::terminate()
 {
   m_timeCPU = clock() * Unit::us - m_timeCPU;
 }
 
 
 
-double ECLDigiModule::ShaperDSP(double Ti)
+double ECLDigitizerModule::ShaperDSP(double Ti)
 {
   double svp = 0;
   double tr1 = Ti * 0.881944444;
@@ -247,7 +247,7 @@ double ECLDigiModule::ShaperDSP(double Ti)
 }
 
 
-double  ECLDigiModule::Sv123(double t, double t01, double tb1, double t02, double tb2, double td1, double ts1)
+double  ECLDigitizerModule::Sv123(double t, double t01, double tb1, double t02, double tb2, double td1, double ts1)
 {
 
   double sv123 = 0.;
@@ -359,7 +359,7 @@ double  ECLDigiModule::Sv123(double t, double t01, double tb1, double t02, doubl
 }
 
 
-void ECLDigiModule::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg43, int* fg31, int* fg32, int* fg33, int* y, int* ttrig, int* n16, int* ch, int* lar, int* ltr, int* lq)
+void ECLDigitizerModule::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg43, int* fg31, int* fg32, int* fg33, int* y, int* ttrig, int* n16, int* ch, int* lar, int* ltr, int* lq)
 {
 
 
@@ -631,7 +631,7 @@ ou:
 }
 
 
-void ECLDigiModule::readDSPDB()
+void ECLDigitizerModule::readDSPDB()
 {
 
   int par_f[192][16] = {

@@ -7,6 +7,7 @@ import config
 AddOption('--color', dest = 'color', nargs = 1, default = 'off', action = 'store', help = 'Enable color output. Possible values are: off, light, dark')
 AddOption('--verbose', dest = 'verbose', action = 'store_true', default = False, help='Enable verbose output')
 AddOption('--local', dest = 'local', action = 'store_true', default = False, help='Enable faster build of local code. No code in the central release should depend on the local code!')
+AddOption('--symlink', dest = 'symlink', action = 'store_true', default = False, help='Use symbolic links instead of copies for header files')
 AddOption('--extra-libpath', dest = 'extralibpath', action = 'store', help = 'Additional library path')
 
 SetOption('warn', 'no-fortran-cxx-mix')
@@ -38,7 +39,7 @@ if not os.environ.has_key('ROOTSYS'):
 
 # create construction environment
 global_env = Environment(ENV = os.environ,
-                         tools = ['default', 'root_dict', 'process_dir', 'reg_map', 'output', 'autoclean_dir'],
+                         tools = ['default', 'root_dict', 'sym_link', 'process_dir', 'reg_map', 'output', 'autoclean_dir'],
                          BUILDERS = {},
                          BUILDDIR = os.path.join('#build', subdir),
                          INCDIR = '#include',

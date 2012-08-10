@@ -8,6 +8,7 @@ from SCons.Script import GetOption
 # compile: blue
 # link   : green
 # install: purple
+# symlink: purple
 # map    : cyan
 # dict   : yellow
 # cleanup: black/white
@@ -17,6 +18,7 @@ color_map_none = {
     'compile': '',
     'link': '',
     'install': '',
+    'symlink': '',
     'map': '',
     'dict': '',
     'cleanup': '',
@@ -26,6 +28,7 @@ color_map_light = {
     'compile': '\033[94m',
     'link': '\033[92m',
     'install': '\033[95m',
+    'symlink': '\033[95m',
     'map': '\033[96m',
     'dict': '\033[93m',
     'cleanup': '\033[37m',
@@ -35,6 +38,7 @@ color_map_dark = {
     'compile': '\033[2m\033[34m',
     'link': '\033[2m\033[32m',
     'install': '\033[2m\033[35m',
+    'symlink': '\033[2m\033[35m',
     'map': '\033[2m\033[36m',
     'dict': '\033[2m\033[33m',
     'cleanup': '\033[30m',
@@ -59,6 +63,8 @@ def generate(env):
             LINKCOMSTR=color_map['link'] + '*** linking    : ${TARGET}'
                 + color_map['end'],
             INSTALLSTR=color_map['install'] + '*** installing : ${TARGET}'
+                + color_map['end'],
+            SYMLINKCOMSTR=color_map['symlink'] + '*** symlinking : ${TARGET}'
                 + color_map['end'],
             MAPCOMSTR=color_map['map'] + '*** map        : ${TARGET}'
                 + color_map['end'],

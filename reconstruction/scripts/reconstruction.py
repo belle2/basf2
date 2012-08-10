@@ -48,18 +48,11 @@ def add_reconstruction(path, components=None):
     if components == None or 'ECL' in components:
 
         # shower reconstruction
-        ecl_shower_rec = register_module('ECLRecCR')
+        ecl_shower_rec = register_module('ECLRecShower')
         path.add_module(ecl_shower_rec)
 
         # gamma reconstruction
         gamma_rec = register_module('ECLRecGamma')
-        param_gamma_rec = {
-            'gammaEnergyCut': 0.02,
-            'gammaE9o25Cut': 0.75,
-            'gammaWidthCut': 6.0,
-            'gammaNhitsCut': 0,
-            }
-        gamma_rec.param(param_gamma_rec)
         path.add_module(gamma_rec)
 
         # pi0 reconstruction

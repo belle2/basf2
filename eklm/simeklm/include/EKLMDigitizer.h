@@ -14,7 +14,7 @@
 
 #include <eklm/dataobjects/EKLMStepHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
-#include <eklm/dataobjects/EKLMStripHit.h>
+#include <eklm/dataobjects/EKLMDigit.h>
 #include <map>
 #include <vector>
 #include  "CLHEP/Vector/ThreeVector.h"
@@ -65,7 +65,7 @@ namespace Belle2 {
 
 
     /**
-     * merges hits from the same strip. Creates EKLMStripHits
+     * merges hits from the same strip. Creates EKLMDigits
      */
     void mergeSimHitsToStripHits(double);
 
@@ -92,9 +92,9 @@ namespace Belle2 {
     std::map<const G4VPhysicalVolume*, std::vector<EKLMSimHit*> > m_HitStripMap;
 
     /**
-     * vector of EKLMStripHits
+     * vector of EKLMDigits
      */
-    std::vector<EKLMStripHit*> m_HitVector;
+    std::vector<EKLMDigit*> m_HitVector;
 
     /**
      * sim hits vector
@@ -109,7 +109,7 @@ namespace Belle2 {
     /**
      * StripHit storage initialization
      */
-    StoreArray<EKLMStripHit> m_stripHitsArray;
+    StoreArray<EKLMDigit> m_stripHitsArray;
 
 
   };

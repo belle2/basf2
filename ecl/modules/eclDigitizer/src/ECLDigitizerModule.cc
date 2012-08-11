@@ -10,7 +10,7 @@
 
 #include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
 #include <ecl/dataobjects/HitECL.h>
-#include <ecl/dataobjects/DigiECL.h>
+#include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/DspECL.h>
 #include <ecl/dataobjects/TrigECL.h>
 #include <ecl/geometry/ECLGeometryPar.h>
@@ -183,9 +183,9 @@ void ECLDigitizerModule::event()
         eclDspArray[m_hitNum]->setCellId(iECLCell);
         eclDspArray[m_hitNum]->setDspA(FitA);
 
-        StoreArray<DigiECL> eclDigiArray(m_eclDigiCollectionName);
+        StoreArray<ECLDigit> eclDigiArray(m_eclDigiCollectionName);
         m_hitNum1 = eclDigiArray->GetLast() + 1;
-        new(eclDigiArray->AddrAt(m_hitNum1)) DigiECL();
+        new(eclDigiArray->AddrAt(m_hitNum1)) ECLDigit();
         eclDigiArray[m_hitNum1]->setCellId(iECLCell + 1);
         eclDigiArray[m_hitNum1]->setAmp(energyFit[iECLCell]);//E (GeV) = energyFit/20000;
         eclDigiArray[m_hitNum1]->setTimeFit(tFit[iECLCell]);//t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;

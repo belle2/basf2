@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <ecl/modules/eclRecPi0/ECLRecPi0Module.h>
+#include <ecl/modules/eclRecPi0/ECLPi0ReconstructorModule.h>
 #include <ecl/dataobjects/ECLPi0.h>
 #include <ecl/dataobjects/ECLGamma.h>
 
@@ -43,13 +43,13 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLRecPi0)
+REG_MODULE(ECLPi0Reconstructor)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLRecPi0Module::ECLRecPi0Module() : Module()
+ECLPi0ReconstructorModule::ECLPi0ReconstructorModule() : Module()
 {
   //Set module properties
   setDescription("Creates ECL_pi0 from ECL_gamma.");
@@ -67,12 +67,12 @@ ECLRecPi0Module::ECLRecPi0Module() : Module()
 }
 
 
-ECLRecPi0Module::~ECLRecPi0Module()
+ECLPi0ReconstructorModule::~ECLPi0ReconstructorModule()
 {
 
 }
 
-void ECLRecPi0Module::initialize()
+void ECLPi0ReconstructorModule::initialize()
 {
 
   gamma_energy_threshold = .02;
@@ -91,12 +91,12 @@ void ECLRecPi0Module::initialize()
   m_timeCPU = clock() * Unit::us;
 }
 
-void ECLRecPi0Module::beginRun()
+void ECLPi0ReconstructorModule::beginRun()
 {
 }
 
 
-void ECLRecPi0Module::event()
+void ECLPi0ReconstructorModule::event()
 {
 
   StoreArray<ECLGamma> Gamma(m_ECLGammaName);
@@ -172,18 +172,18 @@ void ECLRecPi0Module::event()
   m_nEvent++;
 }
 
-void ECLRecPi0Module::endRun()
+void ECLPi0ReconstructorModule::endRun()
 {
   m_nRun++;
 }
 
-void ECLRecPi0Module::terminate()
+void ECLPi0ReconstructorModule::terminate()
 {
 }
 
 
 
-void ECLRecPi0Module::fit(CLHEP::HepLorentzVector m_shower1, CLHEP::HepLorentzVector m_shower2)
+void ECLPi0ReconstructorModule::fit(CLHEP::HepLorentzVector m_shower1, CLHEP::HepLorentzVector m_shower2)
 {
 
   const double MASS_PI0 = .1349739;
@@ -313,7 +313,7 @@ void ECLRecPi0Module::fit(CLHEP::HepLorentzVector m_shower1, CLHEP::HepLorentzVe
 
 }
 
-double ECLRecPi0Module::errorE(CLHEP::HepLorentzVector shower)
+double ECLPi0ReconstructorModule::errorE(CLHEP::HepLorentzVector shower)
 {
   double E = shower.e();
   double sigmaE = 0.01 * E * sqrt(squ(0.066 / E) + squ(0.81) / sqrt(E) + squ(1.34)) ;
@@ -321,7 +321,7 @@ double ECLRecPi0Module::errorE(CLHEP::HepLorentzVector shower)
   return sigmaE;
 
 }
-double ECLRecPi0Module::errorTheta(CLHEP::HepLorentzVector shower)
+double ECLPi0ReconstructorModule::errorTheta(CLHEP::HepLorentzVector shower)
 {
 
   double Theta = shower.theta();
@@ -348,7 +348,7 @@ double ECLRecPi0Module::errorTheta(CLHEP::HepLorentzVector shower)
 
 
 }
-double ECLRecPi0Module::errorPhi(CLHEP::HepLorentzVector shower)
+double ECLPi0ReconstructorModule::errorPhi(CLHEP::HepLorentzVector shower)
 {
 
   double Theta = shower.theta();
@@ -375,7 +375,7 @@ double ECLRecPi0Module::errorPhi(CLHEP::HepLorentzVector shower)
 
 
 }
-double ECLRecPi0Module::cellR(CLHEP::HepLorentzVector shower)
+double ECLPi0ReconstructorModule::cellR(CLHEP::HepLorentzVector shower)
 {
 
   double zForward  =  196.2;

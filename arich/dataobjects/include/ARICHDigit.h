@@ -8,25 +8,25 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ARICHHIT_H
-#define ARICHHIT_H
+#ifndef ARICHDIGIT_H
+#define ARICHDIGIT_H
 
 // ROOT
 #include <TObject.h>
 
 namespace Belle2 {
 
-  //! ARIHCHit class for storing photon hit information.
+  //! ARICHDigit class for storing photon hit information.
 
-  /*! This class holds the ARICH hit information after digitization (obtained from ARICHSimHit after ARICHDigi module). Contains only module number, channel number and global time.
+  /*! This class holds the ARICH hit information after digitization (obtained from ARICHSimHit after ARICHDigitizer module). Contains only module number, channel number and global time.
   */
 
-  class ARICHHit : public TObject {
+  class ARICHDigit : public TObject {
 
   public:
 
     //! Default constructor for ROOT IO.
-    ARICHHit():
+    ARICHDigit():
       m_moduleID(-1),
       m_channelID(-1),
       m_globalTime(0) {
@@ -39,7 +39,7 @@ namespace Belle2 {
       \param channelID Id number of hit channel
       \param globalTime global time of hit
      */
-    ARICHHit(int moduleID, int channelID, double globalTime):
+    ARICHDigit(int moduleID, int channelID, double globalTime):
       m_moduleID(moduleID),
       m_channelID(channelID),
       m_globalTime(globalTime) {
@@ -47,7 +47,7 @@ namespace Belle2 {
     }
 
     //! Destructor
-    ~ARICHHit() {
+    ~ARICHDigit() {
       /*! Does nothing */
     }
 
@@ -75,7 +75,7 @@ namespace Belle2 {
     int m_channelID;          /**< ID number of hit channel */
     double m_globalTime;      /**< Global time of hit */
 
-    ClassDef(ARICHHit, 1); /**< the class title */
+    ClassDef(ARICHDigit, 1); /**< the class title */
 
   };
 

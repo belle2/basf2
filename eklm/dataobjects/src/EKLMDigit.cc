@@ -10,7 +10,7 @@
 
 #include <G4Box.hh>
 
-#include <eklm/dataobjects/EKLMStripHit.h>
+#include <eklm/dataobjects/EKLMDigit.h>
 //#include <eklm/geoeklm/G4PVPlacementGT.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
@@ -19,13 +19,13 @@ using namespace std;
 using namespace Belle2;
 
 
-ClassImp(Belle2::EKLMStripHit);
+ClassImp(Belle2::EKLMDigit);
 
 
 
 
 
-EKLMStripHit::EKLMStripHit(const EKLMSimHit* hit)
+EKLMDigit::EKLMDigit(const EKLMSimHit* hit)
   : EKLMHitBase((EKLMHitBase)(*hit)),
     m_Plane(hit->getPlane()),
     m_Strip(hit->getStrip()),
@@ -36,71 +36,71 @@ EKLMStripHit::EKLMStripHit(const EKLMSimHit* hit)
 
 
 
-double EKLMStripHit::getNumberPhotoElectrons() const
+double EKLMDigit::getNumberPhotoElectrons() const
 {
   return m_NumberPhotoElectrons;
 }
 
-void EKLMStripHit::setNumberPhotoElectrons(double npe)
+void EKLMDigit::setNumberPhotoElectrons(double npe)
 {
   m_NumberPhotoElectrons = npe;
 }
 
 
-bool EKLMStripHit::isGood() const
+bool EKLMDigit::isGood() const
 {
   return m_good;
 }
 
-void EKLMStripHit::isGood(bool status)
+void EKLMDigit::isGood(bool status)
 {
   m_good = status;
 }
 
 
-int EKLMStripHit::getPlane() const
+int EKLMDigit::getPlane() const
 {
   return m_Plane;
 }
-void EKLMStripHit::setPlane(int plane)
+void EKLMDigit::setPlane(int plane)
 {
   m_Plane = plane;
 }
-int EKLMStripHit::getStrip() const
+int EKLMDigit::getStrip() const
 {
   return m_Strip;
 }
-void EKLMStripHit::setStrip(int strip)
+void EKLMDigit::setStrip(int strip)
 {
   m_Strip = strip;
 }
 
-const TFitResult* EKLMStripHit::getFitResults() const
+const TFitResult* EKLMDigit::getFitResults() const
 {
   return &m_fitResults;
 }
 
-void EKLMStripHit::setFitResults(TFitResult& res)
+void EKLMDigit::setFitResults(TFitResult& res)
 {
   m_fitResults = res;
 }
 
-void EKLMStripHit::setFitResults(TFitResultPtr resPtr)
+void EKLMDigit::setFitResults(TFitResultPtr resPtr)
 {
   m_fitResults = *resPtr;
 }
 
-void EKLMStripHit::setFitStatus(int s)
+void EKLMDigit::setFitStatus(int s)
 {
   m_fitStatus = s;
 }
 
-int EKLMStripHit::getFitStatus()
+int EKLMDigit::getFitStatus()
 {
   return m_fitStatus;
 }
 
-EKLMStripID EKLMStripHit::getID() const
+EKLMStripID EKLMDigit::getID() const
 {
   EKLMStripID str;
   str.endcap = m_Endcap;
@@ -112,25 +112,25 @@ EKLMStripID EKLMStripHit::getID() const
 }
 
 
-const G4VPhysicalVolume* EKLMStripHit::getVolume() const
+const G4VPhysicalVolume* EKLMDigit::getVolume() const
 {
   return m_pv;
 }
 
-void EKLMStripHit::setVolume(const G4VPhysicalVolume* pv)
+void EKLMDigit::setVolume(const G4VPhysicalVolume* pv)
 {
   m_pv = pv;
 }
 
 
 
-void EKLMStripHit::setMCTS(double ts)
+void EKLMDigit::setMCTS(double ts)
 {m_timeshift = ts;}
 
-double EKLMStripHit::getMCTS() const
+double EKLMDigit::getMCTS() const
 {return m_timeshift;}
 
-void EKLMStripHit::Print() const
+void EKLMDigit::Print() const
 {
   std::cout << "Endcap: " << getEndcap()
             << " Layer: " << getLayer()

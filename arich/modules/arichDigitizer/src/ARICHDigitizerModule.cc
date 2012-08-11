@@ -14,7 +14,7 @@
 
 // Hit classes
 #include <arich/dataobjects/ARICHSimHit.h>
-#include <arich/dataobjects/ARICHHit.h>
+#include <arich/dataobjects/ARICHDigit.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -52,7 +52,7 @@ namespace Belle2 {
       setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
       // Add parameters
       addParam("InputColName", m_inColName, "Input collection name", string("ARICHSimHitArray"));
-      addParam("OutputColName", m_outColName, "Output collection name", string("ARICHHitArray"));
+      addParam("OutputColName", m_outColName, "Output collection name", string("ARICHDigitArray"));
     }
 
     ARICHDigitizerModule::~ARICHDigitizerModule()
@@ -73,13 +73,13 @@ namespace Belle2 {
       m_timeCPU = clock() * Unit::us;
 
       StoreArray<ARICHSimHit> arichSimHits;
-      StoreArray<ARICHHit> arichHits;
+      StoreArray<ARICHDigit> arichDigits;
     }
 
     void ARICHDigitizerModule::beginRun()
     {
       // Print run number
-      B2INFO("ARICHDigi: Processing run: " << m_nRun);
+      B2INFO("ARICHDigitizer: Processing run: " << m_nRun);
 
     }
 
@@ -92,10 +92,10 @@ namespace Belle2 {
       if (!arichSimHits) B2ERROR("ARICHDigitizerModule: Cannot find ARICHSimHit array.");
       //-----------------------------------------------------
 
-      // Get the collection of ARICHHits from the Data store,
+      // Get the collection of arichDigits from the Data store,
       // (or have one created)
       //-----------------------------------------------------
-      StoreArray<ARICHHit> arichHits;
+      StoreArray<ARICHDigit> arichDigits;
 
       //---------------------------------------------------------------------
       // Convert SimHits one by one to digitizer hits.
@@ -126,16 +126,16 @@ namespace Belle2 {
         TVector3 center = m_arichgp->getChannelCenterGlob(moduleID, channelID);
         // Check if channel already registered hit in this event(no multiple hits)
         bool newhit = true;
-        int nSig = arichHits->GetLast();
+        int nSig = arichDigits->GetLast();
         for (int iSig = 0; iSig <= nSig; ++iSig) {
-          ARICHHit* aHit = arichHits[iSig];
+          ARICHDigit* aHit = arichDigits[iSig];
           if (aHit->getModuleID() == moduleID && aHit->getChannelID() == channelID) { newhit = false; break; }
         }
         if (!newhit) continue;
 
         // Add new ARIHCHit to datastore
-        new(arichHits->AddrAt(nSig + 1)) ARICHHit();
-        ARICHHit* newHit = arichHits[nSig + 1];
+        new(arichDigits->AddrAt(nSig + 1)) ARICHDigit();
+        ARICHDigit* newHit = arichDigits[nSig + 1];
         newHit->setModuleID(moduleID);
         newHit->setChannelID(channelID);
         newHit->setGlobalTime(globaltime);
@@ -155,7 +155,7 @@ namespace Belle2 {
       m_timeCPU = clock() * Unit::us - m_timeCPU;
 
       // Announce
-      B2INFO("ARICHDigi finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
+      B2INFO("ARICHDigitizer finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
 
     }
 

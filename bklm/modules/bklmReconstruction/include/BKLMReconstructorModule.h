@@ -8,11 +8,11 @@
 
 namespace Belle2 {
 
-  //! Module BKLMReconstructionModule
+  //! Module BKLMReconstructorModule
   /*!
     Simple module for reading BKLM hits
   */
-  class BKLMReconstructionModule : public Module {
+  class BKLMReconstructorModule : public Module {
 
   public:
 
@@ -21,13 +21,13 @@ namespace Belle2 {
       Create and allocate memory for variables here. Add the module parameters in this method.
       \param selfRegisterType True if this module is self-registering, otherwise false.
     */
-    BKLMReconstructionModule();
+    BKLMReconstructorModule();
 
     //! Destructor
     /*!
        Use the destructor to release the memory you allocated in the constructor.
     */
-    virtual ~BKLMReconstructionModule();
+    virtual ~BKLMReconstructorModule();
 
     //! Initialize the Module
     /*! This method is called only once before the actual event processing starts.

@@ -3,7 +3,7 @@
 
 #include <eklm/geoeklm/EKLMTransformationFactory.h>
 
-#include <eklm/modules/eklmReconstruction/EKLMReconstructionModule.h>
+#include <eklm/modules/eklmReconstruction/EKLMReconstructorModule.h>
 #include <eklm/receklm/EKLMRecon.h>
 
 using namespace Belle2;
@@ -11,13 +11,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(EKLMReconstruction)
+REG_MODULE(EKLMReconstructor)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-EKLMReconstructionModule::EKLMReconstructionModule() : Module()
+EKLMReconstructorModule::EKLMReconstructorModule() : Module()
 {
 
   setDescription("EKLM reconstruction simple module for tests");
@@ -25,36 +25,36 @@ EKLMReconstructionModule::EKLMReconstructionModule() : Module()
   addParam("StripInformationDB", m_stripInfromationDBFile, "File to read strip information", std::string("/tmp/out.dat"));
 }
 
-EKLMReconstructionModule::~EKLMReconstructionModule()
+EKLMReconstructorModule::~EKLMReconstructorModule()
 {
 }
 
-void EKLMReconstructionModule::initialize()
+void EKLMReconstructorModule::initialize()
 {
-  B2INFO("EKLMReconstructionModule initialized");
+  B2INFO("EKLMReconstructorModule initialized");
   (EKLMTransformationFactory::getInstance())->readFromFile(m_stripInfromationDBFile.c_str());
 }
 
-void EKLMReconstructionModule::beginRun()
+void EKLMReconstructorModule::beginRun()
 {
-  B2DEBUG(1, "EKLMReconstructionModule : beginRun");
+  B2DEBUG(1, "EKLMReconstructorModule : beginRun");
 }
 
-void EKLMReconstructionModule::event()
+void EKLMReconstructorModule::event()
 {
 
   EKLMRecon* recon = new EKLMRecon();
-  B2INFO("EKLMReconstructionModule::event() called")
+  B2INFO("EKLMReconstructorModule::event() called")
   recon->readStripHits();
   recon->createSectorHits();
   recon->create2dHits();
   delete recon;
 }
 
-void EKLMReconstructionModule::endRun()
+void EKLMReconstructorModule::endRun()
 {
 }
 
-void EKLMReconstructionModule::terminate()
+void EKLMReconstructorModule::terminate()
 {
 }

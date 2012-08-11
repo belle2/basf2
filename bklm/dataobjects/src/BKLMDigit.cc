@@ -8,21 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <bklm/dataobjects/BKLMStrip.h>
+#include <bklm/dataobjects/BKLMDigit.h>
 
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
-ClassImp(BKLMStrip)
+ClassImp(BKLMDigit)
 
 //! empty constructor
-BKLMStrip::BKLMStrip() : TObject()
+BKLMDigit::BKLMDigit() : TObject()
 {
 }
 
 //! Constructor with initial values
-BKLMStrip::BKLMStrip(bool inRPC, int frontBack, int sector,
+BKLMDigit::BKLMDigit(bool inRPC, int frontBack, int sector,
                      int layer, char direction, int strip,
                      double tdc, double adc) :
   TObject(),
@@ -38,7 +38,7 @@ BKLMStrip::BKLMStrip(bool inRPC, int frontBack, int sector,
 }
 
 //! Copy constructor
-BKLMStrip::BKLMStrip(const BKLMStrip& h) :
+BKLMDigit::BKLMDigit(const BKLMDigit& h) :
   TObject(h),
   m_InRPC(h.m_InRPC),
   m_FrontBack(h.m_FrontBack),
@@ -51,7 +51,7 @@ BKLMStrip::BKLMStrip(const BKLMStrip& h) :
 {
 }
 
-bool BKLMStrip::match(const BKLMStrip* s) const
+bool BKLMDigit::match(const BKLMDigit* s) const
 {
   if (m_Strip     != s->getStrip()) return false;
   if (m_Direction != s->getDirection()) return false;

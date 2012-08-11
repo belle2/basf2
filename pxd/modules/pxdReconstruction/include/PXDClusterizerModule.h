@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDClusteringModule_H
-#define PXDClusteringModule_H
+#ifndef PXDClusterizerModule_H
+#define PXDClusterizerModule_H
 
 #include <framework/core/Module.h>
 #include <pxd/geometry/SensorInfo.h>
@@ -28,7 +28,7 @@ namespace Belle2 {
      * @{
      */
 
-    /** The PXDClustering module.
+    /** The PXDClusterizer module.
      *
      * This module is responsible to cluster all hits found in the PXD and
      * write them to the apropriate collections. It does this in a "streaming" way:
@@ -44,7 +44,7 @@ namespace Belle2 {
        PXDDigit   = graph.data('PXDDigit')
        PXDCluster = graph.data('PXDCluster')
 
-       graph.module('PXDClustering', [MCParticle, PXDDigit, PXDTrueHit], [PXDCluster])
+       graph.module('PXDClusterizer', [MCParticle, PXDDigit, PXDTrueHit], [PXDCluster])
        graph.relation(MCParticle, PXDTrueHit)
        graph.relation(PXDDigit,   MCParticle)
        graph.relation(PXDDigit,   PXDTrueHit)
@@ -54,14 +54,14 @@ namespace Belle2 {
        \endcorrelationdiagram
 
      */
-    class PXDClusteringModule : public Module {
+    class PXDClusterizerModule : public Module {
 
     public:
       /** Container to sort the hits by row and column */
       typedef std::set<Pixel> Sensor;
 
       /** Constructor defining the parameters */
-      PXDClusteringModule();
+      PXDClusterizerModule();
 
       /** Initialize the module */
       virtual void initialize();
@@ -129,4 +129,4 @@ namespace Belle2 {
   } //end PXD namespace;
 } // end namespace Belle2
 
-#endif // PXDClusteringModule_H
+#endif // PXDClusterizerModule_H

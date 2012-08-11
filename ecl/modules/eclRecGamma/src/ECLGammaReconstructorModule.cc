@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <ecl/modules/eclRecGamma/ECLRecGammaModule.h>
+#include <ecl/modules/eclRecGamma/ECLGammaReconstructorModule.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/HitAssignmentECL.h>
 #include <ecl/dataobjects/ECLGamma.h>
@@ -30,13 +30,13 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLRecGamma)
+REG_MODULE(ECLGammaReconstructor)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLRecGammaModule::ECLRecGammaModule() : Module()
+ECLGammaReconstructorModule::ECLGammaReconstructorModule() : Module()
 {
   //Set module properties
   setDescription("Creates ECLGamma from ECLShower.");
@@ -69,12 +69,12 @@ ECLRecGammaModule::ECLRecGammaModule() : Module()
 }
 
 
-ECLRecGammaModule::~ECLRecGammaModule()
+ECLGammaReconstructorModule::~ECLGammaReconstructorModule()
 {
 
 }
 
-void ECLRecGammaModule::initialize()
+void ECLGammaReconstructorModule::initialize()
 {
   // Initialize variables
   m_nRun    = 0 ;
@@ -84,12 +84,12 @@ void ECLRecGammaModule::initialize()
   m_timeCPU = clock() * Unit::us;
 }
 
-void ECLRecGammaModule::beginRun()
+void ECLGammaReconstructorModule::beginRun()
 {
 }
 
 
-void ECLRecGammaModule::event()
+void ECLGammaReconstructorModule::event()
 {
   //Input Array
   StoreArray<ECLShower> eclRecShowerArray(m_ECLShowerName);
@@ -171,16 +171,16 @@ void ECLRecGammaModule::event()
   m_nEvent++;
 }
 
-void ECLRecGammaModule::endRun()
+void ECLGammaReconstructorModule::endRun()
 {
   m_nRun++;
 }
 
-void ECLRecGammaModule::terminate()
+void ECLGammaReconstructorModule::terminate()
 {
 }
 
-bool ECLRecGammaModule::goodGamma(double ftheta, double energy, double nhit, double fe9oe25, double fwidth, double ecut, double e925cut, double widcut, double nhcut)
+bool ECLGammaReconstructorModule::goodGamma(double ftheta, double energy, double nhit, double fe9oe25, double fwidth, double ecut, double e925cut, double widcut, double nhcut)
 {
   bool ret = true;
   if (ftheta <  17.0) ret = false;
@@ -196,7 +196,7 @@ bool ECLRecGammaModule::goodGamma(double ftheta, double energy, double nhit, dou
   return ret;
 
 }
-void ECLRecGammaModule::readExtrapolate()
+void ECLGammaReconstructorModule::readExtrapolate()
 {
   for (int i = 0; i < 8736; i++) {
     m_TrackCellId[i] = false ;

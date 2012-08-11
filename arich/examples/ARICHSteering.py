@@ -34,7 +34,7 @@ simulation = register_module('FullSim')
 # ARICH digitization module
 arichDIGI = register_module('ARICHDigitizer')
 # ARICH reconstruction module
-arichRECO = register_module('ARICHRec')
+arichRECO = register_module('ARICHReconstructor')
 # Save output of simulation
 output = register_module('SimpleOutput')
 

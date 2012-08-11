@@ -24,7 +24,7 @@ EKLMHit2d::EKLMHit2d()
 }
 
 
-EKLMHit2d::EKLMHit2d(EKLMStripHit* xStrip, EKLMStripHit* yStrip)
+EKLMHit2d::EKLMHit2d(EKLMDigit* xStrip, EKLMDigit* yStrip)
 {
 
   m_XStrip = xStrip;
@@ -35,12 +35,12 @@ EKLMHit2d::EKLMHit2d(EKLMStripHit* xStrip, EKLMStripHit* yStrip)
 }
 
 
-const Belle2::EKLMStripHit* EKLMHit2d::getXStripHit() const
+const Belle2::EKLMDigit* EKLMHit2d::getXStripHit() const
 {
   return m_XStrip;
 }
 
-const Belle2::EKLMStripHit* EKLMHit2d::getYStripHit() const
+const Belle2::EKLMDigit* EKLMHit2d::getYStripHit() const
 {
   return m_YStrip;
 }

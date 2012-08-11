@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdReconstruction/PXDClusteringModule.h>
+#include <pxd/modules/pxdReconstruction/PXDClusterizerModule.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -33,13 +33,13 @@ using namespace Belle2::PXD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDClustering)
+REG_MODULE(PXDClusterizer)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDClusteringModule::PXDClusteringModule() : Module(), m_elNoise(200.0),
+PXDClusterizerModule::PXDClusterizerModule() : Module(), m_elNoise(200.0),
   m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(8.0), m_sizeHeadTail(3)
 {
   //Set module properties
@@ -80,7 +80,7 @@ PXDClusteringModule::PXDClusteringModule() : Module(), m_elNoise(200.0),
            "Assume Digits in Collection are orderd by sensor,row,column in ascending order", true);
 }
 
-void PXDClusteringModule::initialize()
+void PXDClusterizerModule::initialize()
 {
   //Register collections
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
@@ -100,7 +100,7 @@ void PXDClusteringModule::initialize()
   m_relDigitTrueHitName      = relDigitTrueHit.getName();
   m_relClusterTrueHitName    = relClusterTrueHit.getName();
 
-  B2INFO("PXDClustering Parameters (in default system units, *=cannot be set directly):");
+  B2INFO("PXDClusterizer Parameters (in default system units, *=cannot be set directly):");
   B2INFO(" -->  ElectronicNoise:    " << m_elNoise);
   B2INFO(" -->  NoiseSN:            " << m_cutAdjacent);
   B2INFO(" -->  SeedSN:             " << m_cutSeed);
@@ -121,7 +121,7 @@ void PXDClusteringModule::initialize()
   m_noiseMap.setNoiseLevel(m_elNoise);
 }
 
-inline void PXDClusteringModule::findCluster(const Pixel& px)
+inline void PXDClusterizerModule::findCluster(const Pixel& px)
 {
   ClusterCandidate* prev = m_cache.findCluster(px.getU(), px.getV());
   if (!prev) {
@@ -132,7 +132,7 @@ inline void PXDClusteringModule::findCluster(const Pixel& px)
   m_cache.setLast(px.getU(), px.getV(), prev);
 }
 
-void PXDClusteringModule::event()
+void PXDClusterizerModule::event()
 {
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
@@ -209,7 +209,7 @@ void PXDClusteringModule::event()
   }
 }
 
-void PXDClusteringModule::writeClusters(VxdID sensorID)
+void PXDClusterizerModule::writeClusters(VxdID sensorID)
 {
   if (m_clusters.empty()) return;
 

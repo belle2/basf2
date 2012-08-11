@@ -36,32 +36,32 @@ def add_reconstruction(path, components=None):
 
     # TOP reconstruction
     if components == None or 'TOP' in components:
-        top_rec = register_module('TOPReco')
+        top_rec = register_module('TOPReconstructor')
         path.add_module(top_rec)
 
     # ARICH reconstruction
     if components == None or 'ARICH' in components:
-        arich_rec = register_module('ARICHRec')
+        arich_rec = register_module('ARICHReconstructor')
         path.add_module(arich_rec)
 
     # ECL reconstruction
     if components == None or 'ECL' in components:
 
         # shower reconstruction
-        ecl_shower_rec = register_module('ECLRecShower')
+        ecl_shower_rec = register_module('ECLReconstructor')
         path.add_module(ecl_shower_rec)
 
         # gamma reconstruction
-        gamma_rec = register_module('ECLRecGamma')
+        gamma_rec = register_module('ECLGammaReconstructor')
         path.add_module(gamma_rec)
 
         # pi0 reconstruction
-        pi0_rec = register_module('ECLRecPi0')
+        pi0_rec = register_module('ECLPi0Reconstructor')
         path.add_module(pi0_rec)
 
     # EKLM reconstruction
     if components == None or 'EKLM' in components:
-        eklm_rec = register_module('EKLMReconstruction')
+        eklm_rec = register_module('EKLMReconstructor')
         path.add_module(eklm_rec)
 
 

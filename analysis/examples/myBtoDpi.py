@@ -155,7 +155,7 @@ topdigi.param(param_digi)
 
 # ---------------------------------------------------------------
 # TOP reconstruction
-topreco = register_module('TOPReco')
+topreco = register_module('TOPReconstructor')
 
 # ---------------------------------------------------------------
 # ARICH - digitization
@@ -163,16 +163,16 @@ arichDigi = register_module('ARICHDigitizer')
 
 # ---------------------------------------------------------------
 # ARICH reconstruction
-arichRec = register_module('ARICHRec')
+arichRec = register_module('ARICHReconstructor')
 
 # ---------------------------------------------------------------
 # GAMMA reconstruction
-# gammaRec = register_module('ECLRecGamma')
+# gammaRec = register_module('ECLGammaReconstructor')
 # gammaRec.param('MdstGammaOutput', 'mdstGamma')
 
 # ---------------------------------------------------------------
 # PI0 reconstruction
-# pi0Rec = register_module('ECLRecPi0')
+# pi0Rec = register_module('ECLPi0Reconstructor')
 # pi0Rec.param('MdstPi0Output', 'mdstPi0')
 
 # ---------------------------------------------------------------

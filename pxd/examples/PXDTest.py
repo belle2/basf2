@@ -33,11 +33,11 @@ simulation = register_module('FullSim')
 # PXD digitization module
 PXDDIGI = register_module('PXDDigitizer')
 # PXD clusterizer
-PXDCLUST = register_module('PXDClustering')
+PXDCLUST = register_module('PXDClusterizer')
 # SVD digitization module
 SVDDIGI = register_module('SVDDigitizer')
 # SVD clusterizer
-SVDCLUST = register_module('SVDClustering')
+SVDCLUST = register_module('SVDClusterizer')
 # Save output of simulation
 output = register_module('SimpleOutput')
 

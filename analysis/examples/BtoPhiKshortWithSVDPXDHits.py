@@ -183,7 +183,7 @@ topdigi.param(param_digi)
 
 # ---------------------------------------------------------------
 # TOP reconstruction
-topreco = register_module('TOPReco')
+topreco = register_module('TOPReconstructor')
 
 # ---------------------------------------------------------------
 # ARICH - digitization
@@ -191,7 +191,7 @@ arichDigi = register_module('ARICHDigitizer')
 
 # ---------------------------------------------------------------
 # ARICH reconstruction
-arichRec = register_module('ARICHRec')
+arichRec = register_module('ARICHReconstructor')
 
 # ---------------------------------------------------------------
 # Analysis module to study B0 -> Phi Kshort decays

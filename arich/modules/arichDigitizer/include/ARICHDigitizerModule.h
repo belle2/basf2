@@ -20,7 +20,7 @@ namespace Belle2 {
   namespace arich {
     //! ARICH digitizer module.
     /*!
-      This module takes the hits form G4 simulation (ARICHSimHit), applies q.e. of HAPDs, calculates and saves hit channel numbers (ARICHHit).
+      This module takes the hits form G4 simulation (ARICHSimHit), applies q.e. of HAPDs, calculates and saves hit channel numbers (ARICHDigit).
       If channel has multiple hits, only one is saved.
     */
     class ARICHDigitizerModule : public Module {
@@ -51,7 +51,7 @@ namespace Belle2 {
       /**
        * Event processor.
        *
-       * Convert ARICHSimHits of the event to ARICHHits.
+       * Convert ARICHSimHits of the event to arichDigits.
        */
       virtual void event();
 

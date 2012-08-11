@@ -1,6 +1,6 @@
 #include <framework/core/ModuleManager.h>
 
-#include <bklm/modules/bklmReconstruction/BKLMReconstructionModule.h>
+#include <bklm/modules/bklmReconstruction/BKLMReconstructorModule.h>
 
 using namespace std;
 using namespace Belle2;
@@ -8,38 +8,38 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(BKLMReconstruction)
+REG_MODULE(BKLMReconstructor)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-BKLMReconstructionModule::BKLMReconstructionModule() : Module()
+BKLMReconstructorModule::BKLMReconstructorModule() : Module()
 {
   setDescription("BKLM reconstruction simple module for tests");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 }
 
-BKLMReconstructionModule::~BKLMReconstructionModule()
+BKLMReconstructorModule::~BKLMReconstructorModule()
 {
 }
 
-void BKLMReconstructionModule::initialize()
+void BKLMReconstructorModule::initialize()
 {
 }
 
-void BKLMReconstructionModule::beginRun()
+void BKLMReconstructorModule::beginRun()
 {
 }
 
-void BKLMReconstructionModule::event()
+void BKLMReconstructorModule::event()
 {
 }
 
-void BKLMReconstructionModule::endRun()
+void BKLMReconstructorModule::endRun()
 {
 }
 
-void BKLMReconstructionModule::terminate()
+void BKLMReconstructorModule::terminate()
 {
 }

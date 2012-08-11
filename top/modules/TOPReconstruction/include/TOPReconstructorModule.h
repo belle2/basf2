@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPRECOMODULE_H
-#define TOPRECOMODULE_H
+#ifndef TOPRECONSTRUCTORMODULE_H
+#define TOPRECONSTRUCTORMODULE_H
 
 #include <framework/core/Module.h>
 #include <top/geometry/TOPGeometryPar.h>
@@ -26,15 +26,15 @@ namespace Belle2 {
     //! TOP reconstruction module.
     /*!
     */
-    class TOPRecoModule : public Module {
+    class TOPReconstructorModule : public Module {
 
     public:
 
       //! Constructor.
-      TOPRecoModule();
+      TOPReconstructorModule();
 
       //! Destructor.
-      virtual ~TOPRecoModule();
+      virtual ~TOPReconstructorModule();
 
       /**
        * Initialize the Module.
@@ -121,4 +121,4 @@ namespace Belle2 {
   } // top namespace
 } // Belle2 namespace
 
-#endif // TOPRECOMODULE_H
+#endif // TOPRECONSTRUCTORMODULE_H

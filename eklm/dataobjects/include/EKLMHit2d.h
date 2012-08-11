@@ -14,7 +14,7 @@
 #include <framework/datastore/DataStore.h>
 #include <TObject.h>
 
-#include  <eklm/dataobjects/EKLMStripHit.h>
+#include  <eklm/dataobjects/EKLMDigit.h>
 #include  "globals.hh"
 #include  <TVector3.h>
 #include <CLHEP/Vector/ThreeVector.h>
@@ -32,7 +32,7 @@ namespace Belle2 {
     EKLMHit2d();
 
     //! Constructor with two strips
-    EKLMHit2d(EKLMStripHit*, EKLMStripHit*);
+    EKLMHit2d(EKLMDigit*, EKLMDigit*);
 
     //! Destructor
     ~EKLMHit2d() {};
@@ -41,13 +41,13 @@ namespace Belle2 {
     void Print();
 
     //! add StripHit to 2dhit. returns false if impossible
-    //    bool addStripHit(const EKLMStripHit*);
+    //    bool addStripHit(const EKLMDigit*);
 
     //! returns pointer to the strip hit in X direction
-    const EKLMStripHit* getXStripHit() const;
+    const EKLMDigit* getXStripHit() const;
 
     //! returns pointer to the strip hit in Y direction
-    const EKLMStripHit* getYStripHit() const;
+    const EKLMDigit* getYStripHit() const;
 
     //! set coordinates of the crossing point
     void setCrossPoint(TVector3& point);
@@ -65,10 +65,10 @@ namespace Belle2 {
   private:
 
     //! reference to the X Strip hit
-    EKLMStripHit const* m_XStrip;  //-> {ROOT streamer directive}
+    EKLMDigit const* m_XStrip;  //-> {ROOT streamer directive}
 
     //! reference to the Y Strip hit
-    EKLMStripHit const* m_YStrip;  //-> {ROOT streamer directive}
+    EKLMDigit const* m_YStrip;  //-> {ROOT streamer directive}
 
     //! crossing point global coordinates
     TVector3  m_crossPoint;

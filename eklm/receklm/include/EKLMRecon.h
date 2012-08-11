@@ -12,7 +12,7 @@
 #define EKLMRECON_H
 
 #include<vector>
-#include<eklm/dataobjects/EKLMStripHit.h>
+#include<eklm/dataobjects/EKLMDigit.h>
 #include<eklm/dataobjects/EKLMSectorHit.h>
 #include<framework/datastore/StoreArray.h>
 
@@ -50,7 +50,7 @@ namespace Belle2 {
 
 
     //! vector of StripHits
-    std::vector <EKLMStripHit*> m_StripHitVector;
+    std::vector <EKLMDigit*> m_StripHitVector;
 
     //! vector of SectorHits
     std::vector <EKLMSectorHit*> m_SectorHitVector;
@@ -61,7 +61,7 @@ namespace Belle2 {
     /**
      * returns true if strip is along X (with pointer to hit)
      */
-    bool CheckStripOrientationX(const EKLMStripHit* h)
+    bool CheckStripOrientationX(const EKLMDigit* h)
     {return CheckStripOrientationX(h->getID());};
 
     /**
@@ -76,13 +76,13 @@ namespace Belle2 {
      * calculates chisq of the hit
      * and hittime
      */
-    bool doesIntersect(const EKLMStripHit* , const EKLMStripHit* ,
+    bool doesIntersect(const EKLMDigit* , const EKLMDigit* ,
                        TVector3&, double&, double&);
 
     /**
      * Adds trip hit to sector, return  true on success
      */
-    bool addStripHitToSector(EKLMSectorHit* , EKLMStripHit*);
+    bool addStripHitToSector(EKLMSectorHit* , EKLMDigit*);
 
 
 

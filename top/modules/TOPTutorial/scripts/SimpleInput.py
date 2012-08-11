@@ -22,7 +22,7 @@ input = register_module('SimpleInput')
 topdigi = register_module('TOPDigitizer')
 param_digi = {'PhotonFraction': 0.3}
 topdigi.param(param_digi)
-topreco = register_module('TOPReco')
+topreco = register_module('TOPReconstructor')
 # --------------------------------------
 # here we set the parameters of modules
 # --------------------------------------

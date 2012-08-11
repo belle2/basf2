@@ -33,7 +33,7 @@ simulation = register_module('FullSim')
 # SVD digitization module
 SVDDIGI = register_module('SVDDigitizer')
 # SVD clusterizer
-SVDCLUST = register_module('SVDClustering')
+SVDCLUST = register_module('SVDClusterizer')
 # Save output of simulation
 output = register_module('SimpleOutput')
 

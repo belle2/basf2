@@ -11,7 +11,7 @@
 
 #pragma link C++ class Belle2::EKLMSimHit;
 #pragma link C++ class Belle2::EKLMHitBase;
-#pragma link C++ class Belle2::EKLMStripHit;
+#pragma link C++ class Belle2::EKLMDigit;
 #pragma link C++ class Belle2::EKLMSectorHit;
 #pragma link C++ class Belle2::EKLMHit2d;
 

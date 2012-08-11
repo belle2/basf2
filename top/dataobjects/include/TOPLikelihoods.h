@@ -18,9 +18,9 @@ namespace Belle2 {
    * @{
    */
 
-  /*! Class to store TOP likelihoods (output of TOPReco)
+  /*! Class to store TOP likelihoods (output of TOPReconstructor)
    * relation to TOPTrack
-   * filled in top/modules/TOPReconstruction/src/TOPRecoModule.cc
+   * filled in top/modules/TOPReconstruction/src/TOPReconstructorModule.cc
    */
 
   class TOPLikelihoods : public TObject {

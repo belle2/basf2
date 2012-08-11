@@ -13,7 +13,7 @@
 
 
 #include <eklm/dataobjects/EKLMSimHit.h>
-#include <eklm/dataobjects/EKLMStripHit.h>
+#include <eklm/dataobjects/EKLMDigit.h>
 
 
 #include "TTree.h"

@@ -5,7 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::DigiECL;
+#pragma link C++ class Belle2::ECLDigit;
 #pragma link C++ class Belle2::DspECL;
 #pragma link C++ class Belle2::RecCRECL;
 #pragma link C++ class Belle2::TrigECL;

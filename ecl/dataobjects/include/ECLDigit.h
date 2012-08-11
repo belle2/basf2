@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DIGIECL_H
-#define DIGIECL_H
+#ifndef ECLDIGIT_H
+#define ECLDIGIT_H
 
 #include <framework/datastore/DataStore.h>
 
@@ -19,7 +19,7 @@
 namespace Belle2 {
 
   //! Example Detector
-  class DigiECL : public TObject {
+  class ECLDigit : public TObject {
   public:
 
     //! The cell id of this hit.
@@ -65,9 +65,9 @@ namespace Belle2 {
     //! Empty constructor
     /*! Recommended for ROOT IO
     */
-    DigiECL() {;}
+    ECLDigit() {;}
 
-    ClassDef(DigiECL, 1);/**< the class title */
+    ClassDef(ECLDigit, 1);/**< the class title */
 
   };
 

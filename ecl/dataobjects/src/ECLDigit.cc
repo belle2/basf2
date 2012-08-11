@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "ecl/dataobjects/DigiECL.h"
+#include "ecl/dataobjects/ECLDigit.h"
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(DigiECL)
+ClassImp(ECLDigit)

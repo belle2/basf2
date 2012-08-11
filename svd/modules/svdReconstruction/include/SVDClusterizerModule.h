@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SVDClusteringModule_H
-#define SVDClusteringModule_H
+#ifndef SVDClusterizerModule_H
+#define SVDClusterizerModule_H
 
 #include <framework/core/Module.h>
 #include <svd/geometry/SensorInfo.h>
@@ -30,7 +30,7 @@ namespace Belle2 {
      * @{
      */
 
-    /** SVDClusteringModule: The SVD Clusterizer.
+    /** SVDClusterizerModule: The SVD Clusterizer.
      *
      * This module produces clusters from SVDDigits (signal samples taken on
      * individual strips) by first performing 2D clustering in strip coordinate and
@@ -44,7 +44,7 @@ namespace Belle2 {
        SVDDigit   = graph.data('SVDDigit')
        SVDCluster = graph.data('SVDCluster')
 
-       graph.module('SVDClustering', [MCParticle, SVDDigit, SVDTrueHit], [SVDCluster])
+       graph.module('SVDClusterizer', [MCParticle, SVDDigit, SVDTrueHit], [SVDCluster])
        graph.relation(MCParticle, SVDTrueHit)
        graph.relation(SVDDigit,   MCParticle)
        graph.relation(SVDDigit,   SVDTrueHit)
@@ -54,7 +54,7 @@ namespace Belle2 {
        \endcorrelationdiagram
 
      */
-    class SVDClusteringModule : public Module {
+    class SVDClusterizerModule : public Module {
 
     public:
       /** Container to sort the digits by strip number and time */
@@ -67,7 +67,7 @@ namespace Belle2 {
       typedef std::map<VxdID, Sensor >::iterator SensorIterator;
 
       /** Constructor defining the parameters */
-      SVDClusteringModule();
+      SVDClusterizerModule();
 
       /** Initialize the module */
       virtual void initialize();
@@ -176,4 +176,4 @@ namespace Belle2 {
   } //end SVD namespace;
 } // end namespace Belle2
 
-#endif // SVDClusteringModule_H
+#endif // SVDClusterizerModule_H

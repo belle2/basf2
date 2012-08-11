@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <ecl/modules/eclRecShower/ECLRecShowerModule.h>
-#include <ecl/dataobjects/DigiECL.h>
+#include <ecl/modules/eclRecShower/ECLReconstructorModule.h>
+#include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/HitAssignmentECL.h>
 
@@ -41,13 +41,13 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLRecShower)
+REG_MODULE(ECLReconstructor)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLRecShowerModule::ECLRecShowerModule() : Module()
+ECLReconstructorModule::ECLReconstructorModule() : Module()
 {
   //Set module properties
   setDescription("Creates ECLRecShower from ECLDigi.");
@@ -55,7 +55,7 @@ ECLRecShowerModule::ECLRecShowerModule() : Module()
 
   //Parameter definition
   addParam("ECLRecInput", m_eclDigiCollectionName,
-           "Input Array // Output from ECLRecShower module or Data", string("ECLDigiHits"));
+           "Input Array // Output from ECLReconstructor module or Data", string("ECLDigiHits"));
 
   //output
   addParam("ECLRecShowerOutput", m_ECLShowerName,
@@ -71,12 +71,12 @@ ECLRecShowerModule::ECLRecShowerModule() : Module()
 }
 
 
-ECLRecShowerModule::~ECLRecShowerModule()
+ECLReconstructorModule::~ECLReconstructorModule()
 {
 
 }
 
-void ECLRecShowerModule::initialize()
+void ECLReconstructorModule::initialize()
 {
   // Initialize variables
   m_nRun    = 0 ;
@@ -86,16 +86,16 @@ void ECLRecShowerModule::initialize()
   m_timeCPU = clock() * Unit::us;
 }
 
-void ECLRecShowerModule::beginRun()
+void ECLReconstructorModule::beginRun()
 {
-  B2INFO("ECLRecShowerModule: Processing run: " << m_nRun);
+  B2INFO("ECLReconstructorModule: Processing run: " << m_nRun);
 }
 
 
-void ECLRecShowerModule::event()
+void ECLReconstructorModule::event()
 {
   //Input Array
-  StoreArray<DigiECL> eclDigiArray(m_eclDigiCollectionName);
+  StoreArray<ECLDigit> eclDigiArray(m_eclDigiCollectionName);
   if (!eclDigiArray) {
     B2ERROR("Can not find ECLRecShowerHits" << m_eclDigiCollectionName << ".");
   }
@@ -108,7 +108,7 @@ void ECLRecShowerModule::event()
   int hitNum = eclDigiArray->GetEntriesFast();
   TEclEnergyHit ss;
   for (int ii = 0; ii < hitNum; ii++) {
-    DigiECL* aECLDigi = eclDigiArray[ii];
+    ECLDigit* aECLDigi = eclDigiArray[ii];
     float FitEnergy    = (aECLDigi->getAmp()) / 20000.;//ADC count to GeV
 
     int cId          = (aECLDigi->getCellId() - 1);
@@ -197,7 +197,7 @@ void ECLRecShowerModule::event()
 
       }//vector<TEclCFCR>
       for (int ia = 0; ia < hitNum; ia++) {
-        DigiECL* aECLDigi = eclDigiArray[ia];
+        ECLDigit* aECLDigi = eclDigiArray[ia];
         float FitEnergy    = (aECLDigi->getAmp()) / 20000;//ADC count to GeV
         int cId          =  aECLDigi->getCellId();
         ECLGeometryPar* eclp = ECLGeometryPar::Instance();
@@ -213,25 +213,25 @@ void ECLRecShowerModule::event()
 
 }
 
-void ECLRecShowerModule::endRun()
+void ECLReconstructorModule::endRun()
 {
   m_nRun++;
 }
 
-void ECLRecShowerModule::terminate()
+void ECLReconstructorModule::terminate()
 {
   m_timeCPU = clock() * Unit::us - m_timeCPU;
 
 }
 
-float ECLRecShowerModule::errorE(double E)
+float ECLReconstructorModule::errorE(double E)
 {
   double sigmaE = 0.01 * E * sqrt(squ(0.066 / E) + squ(0.81) / sqrt(E) + squ(1.34)) ;
 //sigmaE / E = 0.066% / E +- 0.81% / (E)^(1/4)  +- 1.34%
   return (float)sigmaE;
 
 }
-float ECLRecShowerModule::errorTheta(double Energy, double Theta)
+float ECLReconstructorModule::errorTheta(double Energy, double Theta)
 {
 
   double sigmaX = 0.1 * (0.27 + 3.4 / sqrt(Energy) + 1.8 / sqrt(sqrt(Energy))) ;
@@ -255,7 +255,7 @@ float ECLRecShowerModule::errorTheta(double Energy, double Theta)
 
 }
 
-float ECLRecShowerModule::errorPhi(double Energy, double Theta)
+float ECLReconstructorModule::errorPhi(double Energy, double Theta)
 {
 
   double sigmaX = 0.1 * (0.27 + 3.4 / sqrt(Energy) + 1.8 / sqrt(sqrt(Energy))) ;

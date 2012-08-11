@@ -50,9 +50,9 @@ pGun.param(param_pGun)
 
 eclHit = register_module('ECLHit')
 eclDigi = register_module('ECLDigitizer')
-eclRecShower = register_module('ECLRecShower')
-makeGamma = register_module('ECLRecGamma')
-makePi0 = register_module('ECLRecPi0')
+eclRecShower = register_module('ECLReconstructor')
+makeGamma = register_module('ECLGammaReconstructor')
+makePi0 = register_module('ECLPi0Reconstructor')
 param_Gamma = {
     'gammaEnergyCut': 0.02,
     'gammaE9o25Cut': 0.75,

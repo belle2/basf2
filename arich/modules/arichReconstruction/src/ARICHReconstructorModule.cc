@@ -9,7 +9,7 @@
  **************************************************************************/
 // Own include
 
-#include <arich/modules/arichReconstruction/ARICHRecModule.h>
+#include <arich/modules/arichReconstruction/ARICHReconstructorModule.h>
 #include <time.h>
 
 #include <arich/dataobjects/ARICHAeroHit.h>
@@ -40,17 +40,17 @@ namespace Belle2 {
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-    REG_MODULE(ARICHRec)
+    REG_MODULE(ARICHReconstructor)
 
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-    ARICHRecModule::ARICHRecModule() : Module() , m_ana(0)
+    ARICHReconstructorModule::ARICHReconstructorModule() : Module() , m_ana(0)
     {
       // Set description()
-      setDescription("ARICHRec");
+      setDescription("ARICHReconstructor");
       setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
       std::vector<double> defMerit; defMerit.push_back(30.0); defMerit.push_back(30.0); defMerit.push_back(30.0);
       // Add parameters
@@ -63,12 +63,12 @@ namespace Belle2 {
       addParam("SinglePhotonResolution", m_singleRes, "Single photon resolution without pad", 0.03 * Unit::mm);
     }
 
-    ARICHRecModule::~ARICHRecModule()
+    ARICHReconstructorModule::~ARICHReconstructorModule()
     {
       if (m_ana) delete m_ana;
     }
 
-    void ARICHRecModule::initialize()
+    void ARICHReconstructorModule::initialize()
     {
       // Initialize variables
       m_nRun    = 0 ;
@@ -92,13 +92,13 @@ namespace Belle2 {
 
     }
 
-    void ARICHRecModule::beginRun()
+    void ARICHReconstructorModule::beginRun()
     {
       // Print run number
       B2INFO("ARICHReconstruction: Processing run: " << m_nRun);
     }
 
-    void ARICHRecModule::event()
+    void ARICHReconstructorModule::event()
     {
       //------------------------------------------------------
       // Get the collection of ARICHSimHits from the DataStore.
@@ -106,16 +106,16 @@ namespace Belle2 {
 
       StoreArray<ARICHAeroHit> arichAeroHits;
       if (!arichAeroHits) {
-        B2ERROR("ARICHRecModule: ARICHAeroHits unavailable.");
+        B2ERROR("ARICHReconstructorModule: ARICHAeroHits unavailable.");
       }
 
       //-----------------------------------------------------
-      // Get the collection of ARICHHits from the Data store,
+      // Get the collection of arichDigits from the Data store,
       // (or have one created)
       //-----------------------------------------------------
       StoreArray<ARICHTrack> arichTracks;
       if (!arichTracks) {
-        B2ERROR("ARICHRecModule: ARICHTracks unavailable.");
+        B2ERROR("ARICHReconstructorModule: ARICHTracks unavailable.");
       }
 
       //---------------------------------------------------------------------
@@ -149,23 +149,23 @@ namespace Belle2 {
       m_nEvent++;
     }
 
-    void ARICHRecModule::endRun()
+    void ARICHReconstructorModule::endRun()
     {
       m_nRun++;
     }
 
-    void ARICHRecModule::terminate()
+    void ARICHReconstructorModule::terminate()
     {
       // CPU time end
       m_timeCPU = clock() * Unit::us - m_timeCPU;
       // Announce
-      B2INFO("ARICHRecModule finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
+      B2INFO("ARICHReconstructorModule finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
 
     }
 
-    void ARICHRecModule::printModuleParams() const
+    void ARICHReconstructorModule::printModuleParams() const
     {
-      B2INFO("ARICHRecModule parameters:")
+      B2INFO("ARICHReconstructorModule parameters:")
       B2INFO("Input collection name:  " << m_inColName)
       B2INFO("Output collection name: " << m_outColName)
     }

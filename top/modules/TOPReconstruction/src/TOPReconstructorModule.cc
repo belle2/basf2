@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 // Own include
-#include "top/modules/TOPReconstruction/TOPRecoModule.h"
+#include "top/modules/TOPReconstruction/TOPReconstructorModule.h"
 #include "top/modules/TOPReconstruction/TOPreco.h"
 #include "top/modules/TOPReconstruction/TOPtrack.h"
 #include "top/modules/TOPReconstruction/TOPutil.h"
@@ -50,14 +50,14 @@ namespace Belle2 {
     //                 Register the Module
     //-----------------------------------------------------------------
 
-    REG_MODULE(TOPReco)
+    REG_MODULE(TOPReconstructor)
 
 
     //-----------------------------------------------------------------
     //                 Implementation
     //-----------------------------------------------------------------
 
-    TOPRecoModule::TOPRecoModule() : Module(),
+    TOPReconstructorModule::TOPReconstructorModule() : Module(),
       m_debugLevel(0),
       m_topgp(TOPGeometryPar::Instance())
     {
@@ -87,11 +87,11 @@ namespace Belle2 {
 
     }
 
-    TOPRecoModule::~TOPRecoModule()
+    TOPReconstructorModule::~TOPReconstructorModule()
     {
     }
 
-    void TOPRecoModule::initialize()
+    void TOPReconstructorModule::initialize()
     {
       // Initialize masses (PDG 2010, hard coding -> to be removed in future (?))
       m_Masses[0] = 0.510998910E-3;
@@ -120,12 +120,12 @@ namespace Belle2 {
 
     }
 
-    void TOPRecoModule::beginRun()
+    void TOPReconstructorModule::beginRun()
     {
 
     }
 
-    void TOPRecoModule::event()
+    void TOPReconstructorModule::event()
     {
       // input: digitized photons
 
@@ -211,23 +211,23 @@ namespace Belle2 {
     }
 
 
-    void TOPRecoModule::endRun()
+    void TOPReconstructorModule::endRun()
     {
 
     }
 
-    void TOPRecoModule::terminate()
+    void TOPReconstructorModule::terminate()
     {
 
     }
 
-    void TOPRecoModule::printModuleParams() const
+    void TOPReconstructorModule::printModuleParams() const
     {
 
     }
 
 
-    void TOPRecoModule::TOPconfigure()
+    void TOPReconstructorModule::TOPconfigure()
     {
       m_topgp->setBasfUnits();
 
@@ -302,7 +302,7 @@ namespace Belle2 {
     }
 
 
-    const MCParticle* TOPRecoModule::getMCParticle(const GFTrack* track)
+    const MCParticle* TOPReconstructorModule::getMCParticle(const GFTrack* track)
     {
       if (! track) return 0;
 
@@ -320,7 +320,7 @@ namespace Belle2 {
     }
 
 
-    int TOPRecoModule::getTOPTrackIndex(const MCParticle* particle)
+    int TOPReconstructorModule::getTOPTrackIndex(const MCParticle* particle)
     {
       if (! particle) return -1;
 
@@ -338,7 +338,7 @@ namespace Belle2 {
     }
 
 
-    void TOPRecoModule::getTracks(std::vector<TOPtrack> & tracks, int hypothesis)
+    void TOPReconstructorModule::getTracks(std::vector<TOPtrack> & tracks, int hypothesis)
     {
       unsigned int myDetID = 3; // TOP
       unsigned int NumBars = m_topgp->getNbars();

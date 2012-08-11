@@ -27,14 +27,14 @@ def add_simulation(path, components=None):
     if components == None or 'PXD' in components:
         pxd_digitizer = register_module('PXDDigitizer')
         path.add_module(pxd_digitizer)
-        pxd_clusterizer = register_module('PXDClustering')
+        pxd_clusterizer = register_module('PXDClusterizer')
         path.add_module(pxd_clusterizer)
 
     # SVD simulation
     if components == None or 'SVD' in components:
         svd_digitizer = register_module('SVDDigitizer')
         path.add_module(svd_digitizer)
-        svd_clusterizer = register_module('SVDClustering')
+        svd_clusterizer = register_module('SVDClusterizer')
         path.add_module(svd_clusterizer)
 
     # CDC simulation

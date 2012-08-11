@@ -11,7 +11,7 @@
 #include "arich/modules/arichReconstruction/ARICHReconstruction.h"
 #include "arich/modules/arichReconstruction/Utility.h"
 #include "arich/geometry/ARICHGeometryPar.h"
-#include "arich/dataobjects/ARICHHit.h"
+#include "arich/dataobjects/ARICHDigit.h"
 #include "arich/modules/arichReconstruction/ARICHTrack.h"
 
 // DataStore
@@ -267,8 +267,8 @@ namespace Belle2 {
 
       StoreArray<ARICHTrack> arichTracks;
       unsigned int tsize = arichTracks->GetLast() + 1;
-      StoreArray<ARICHHit> arichHits;
-      unsigned int hsize = arichHits->GetLast() + 1;
+      StoreArray<ARICHDigit> arichDigits;
+      unsigned int hsize = arichDigits->GetLast() + 1;
 
       if (tsize == 0) return 0;
 
@@ -411,7 +411,7 @@ namespace Belle2 {
         // loop over all photon hits
         for (unsigned int ifot = 0; ifot < hsize; ifot++) {
 
-          ARICHHit* h = arichHits[ifot];
+          ARICHDigit* h = arichDigits[ifot];
           int chID = h->getChannelID();
           int modID = h->getModuleID();
 

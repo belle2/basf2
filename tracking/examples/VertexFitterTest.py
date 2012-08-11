@@ -31,7 +31,7 @@ mcparticle = register_module('PrintMCParticles')
 # Digitizer
 cdcDigitizer = register_module('CDCDigitizer')
 # pxdDigitizer = register_module('PXDDigitizer')
-# pxdClusterizer = register_module('PXDClustering')
+# pxdClusterizer = register_module('PXDClusterizer')
 
 # Find MCTracks
 mctrackfinder = register_module('MCTrackFinder')

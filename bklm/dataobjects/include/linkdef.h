@@ -6,6 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::BKLMSimHit;
-#pragma link C++ class Belle2::BKLMStrip;
+#pragma link C++ class Belle2::BKLMDigit;
 
 #endif

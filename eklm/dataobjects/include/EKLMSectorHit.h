@@ -12,7 +12,7 @@
 #define EKLMSECTORHIT_H
 
 #include  <eklm/dataobjects/EKLMHitBase.h>
-#include  <eklm/dataobjects/EKLMStripHit.h>
+#include  <eklm/dataobjects/EKLMDigit.h>
 #include  <eklm/dataobjects/EKLMHit2d.h>
 #include  "globals.hh"
 
@@ -42,9 +42,9 @@ namespace Belle2 {
     void Print();
 
 
-    //! returns pointer to the vector of pointers to the EKLMStripHits included to
+    //! returns pointer to the vector of pointers to the EKLMDigits included to
     //! the EKLMSectorHit
-    std::vector <EKLMStripHit*> * getStripHitVector() ;
+    std::vector <EKLMDigit*> * getStripHitVector() ;
 
     //! returns pointer to the vector of pointers to 2d hits included to the
 
@@ -54,9 +54,9 @@ namespace Belle2 {
 
   private:
 
-    //! vector of pointers to the Belle2::EKLMStripHits included to the
+    //! vector of pointers to the Belle2::EKLMDigits included to the
     //! Belle2::EKLMSectorHit
-    std::vector<EKLMStripHit*> m_stripHitVector;
+    std::vector<EKLMDigit*> m_stripHitVector;
 
     //! vector of pointers to 2d hits included to the Belle2::EKLMSectorHit
     std::vector<EKLMHit2d*> m_hit2dVector;

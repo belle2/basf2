@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLRECGammaMODULE_H_
-#define ECLRECGammaMODULE_H_
+#ifndef ECLGAMMARECONSTRUCTORMODULE_H_
+#define ECLGAMMARECONSTRUCTORMODULE_H_
 
 #include <framework/core/Module.h>
 #include <vector>
@@ -21,31 +21,31 @@ namespace Belle2 {
     /**
      * ECL Reconstruction Gamma Module.
      *
-     * The detailed description of the ECLRecGammaModule
+     * The detailed description of the ECLGammaReconstructorModule
 
       \correlationdiagram
 
       GFTrackCand = graph.external_data('GFTrackCand')
-      ECLRecGamma = graph.external_data('ECLRecGamma')
+      ECLGammaReconstructor = graph.external_data('ECLGammaReconstructor')
       ECLHitAssignment = graph.data('ECLHitAssignment')
       ECLShower = graph.data('ECLShower')
       ECLGamma = graph.data('ECLGamma')
-      graph.module('ECLRecGamma', [GFTrackCand, ECLShower], [ECLGamma])
+      graph.module('ECLGammaReconstructor', [GFTrackCand, ECLShower], [ECLGamma])
 
       \endcorrelationdiagram
 
      */
-    class ECLRecGammaModule : public Module {
+    class ECLGammaReconstructorModule : public Module {
 
     public:
 
       /** Constructor.
        */
-      ECLRecGammaModule();
+      ECLGammaReconstructorModule();
 
       /** Destructor.
        */
-      ~ECLRecGammaModule();
+      ~ECLGammaReconstructorModule();
 
 
       /** Initialize variables, print info, and start CPU clock. */
@@ -76,7 +76,7 @@ namespace Belle2 {
 
 
     private:
-      /** members of ECLRecGamma Module
+      /** members of ECLGammaReconstructor Module
        */
       /** Name of input collection of this module */
       std::string m_ECLShowerName;
@@ -143,4 +143,4 @@ namespace Belle2 {
   }//ECL
 }//belle2
 
-#endif /* EVTMETAINFO_H_ */
+#endif

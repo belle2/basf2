@@ -221,7 +221,7 @@ namespace Belle2 {
       EKLMSimHit* simHit = it->second.front();
 
       // create new stripHit
-      EKLMStripHit* stripHit = new(m_stripHitsArray->AddrAt(m_stripHitsArray.getEntries()))EKLMStripHit(simHit);
+      EKLMDigit* stripHit = new(m_stripHitsArray->AddrAt(m_stripHitsArray.getEntries()))EKLMDigit(simHit);
 
       //***
       //      G4Box* box1 = (G4Box*)(simHit->getVolume()->GetLogicalVolume()->GetSolid()->GetConstituentSolid(0));

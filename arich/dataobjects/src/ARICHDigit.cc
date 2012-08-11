@@ -8,12 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <arich/dataobjects/ARICHHit.h>
+#include <arich/dataobjects/ARICHDigit.h>
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(ARICHHit)
+ClassImp(ARICHDigit)
 
 
 

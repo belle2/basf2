@@ -21,7 +21,7 @@ EKLMSectorHit::EKLMSectorHit(int nEndcap, int nLayer, int  nSector) :
   EKLMHitBase(nEndcap, nLayer, nSector)
 {}
 
-std::vector <EKLMStripHit*> * EKLMSectorHit::getStripHitVector()
+std::vector <EKLMDigit*> * EKLMSectorHit::getStripHitVector()
 {
   return & m_stripHitVector;
 }
@@ -39,7 +39,7 @@ void EKLMSectorHit::Print()
   std::cout << "Endcap: " << getEndcap()
             << " Layer: " << getLayer()
             << " Sector: " << getSector() << std::endl;
-  for (std::vector<EKLMStripHit*>::iterator it = m_stripHitVector.begin();
+  for (std::vector<EKLMDigit*>::iterator it = m_stripHitVector.begin();
        it != m_stripHitVector.end(); ++it)
     (*it)->Print();
 }

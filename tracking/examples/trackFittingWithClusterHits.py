@@ -40,12 +40,12 @@ pGun.param({
 g4sim = register_module('FullSim')
 SVDDIGI = register_module('SVDDigitizer')
 # SVDDIGI.logging.log_level = LogLevel.DEBUG
-SVDCLUST = register_module('SVDClustering')
+SVDCLUST = register_module('SVDClusterizer')
 # SVDCLUST.logging.log_level = LogLevel.DEBUG
 
 PXDDIGI = register_module('PXDDigitizer')
 # PXDDIGI.logging.log_level = LogLevel.DEBUG
-PXDCLUST = register_module('PXDClustering')
+PXDCLUST = register_module('PXDClusterizer')
 # PXDCLUST.param("AssumeSorted", False)
 mctrackfinder = register_module('MCTrackFinder')
 mctrackfinder.logging.log_level = LogLevel.WARNING

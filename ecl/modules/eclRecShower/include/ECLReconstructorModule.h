@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLRECCRMODULE_H_
-#define ECLRECCRMODULE_H_
+#ifndef ECLRECONSTRUCTORMODULE_H_
+#define ECLRECONSTRUCTORMODULE_H_
 
 #include <framework/core/Module.h>
 #include <vector>
@@ -19,7 +19,7 @@ namespace Belle2 {
   namespace ECL {
     /**
      *
-     * The detailed description of the ECLRecGamma module
+     * The detailed description of the ECLGammaReconstructor module
 
       \correlationdiagram
 
@@ -37,17 +37,17 @@ namespace Belle2 {
       \endcorrelationdiagram
 
      */
-    class ECLRecShowerModule : public Module {
+    class ECLReconstructorModule : public Module {
 
     public:
 
       /** Constructor.
        */
-      ECLRecShowerModule();
+      ECLReconstructorModule();
 
       /** Destructor.
        */
-      ~ECLRecShowerModule();
+      ~ECLReconstructorModule();
 
 
       /** Initialize variables, print info, and start CPU clock. */
@@ -86,7 +86,7 @@ namespace Belle2 {
 
 
     private:
-      /** members of ECLRecShower Module
+      /** members of ECLReconstructor Module
        */
       /** Name of collection of ECLShower */
       std::string m_ECLShowerName;
@@ -100,7 +100,7 @@ namespace Belle2 {
       int    m_nRun;
       /** Event number */
       int    m_nEvent;
-      /** ECLRecShower index */
+      /** ECLReconstructor index */
       int    m_hitNum;
       /**  ECLHitAssignment. index */
       int    m_HANum;
@@ -111,4 +111,4 @@ namespace Belle2 {
   }//ECL
 }//Belle2
 
-#endif /* EVTMETAINFO_H_ */
+#endif

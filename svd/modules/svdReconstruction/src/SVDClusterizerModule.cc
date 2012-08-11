@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <svd/modules/svdReconstruction/SVDClusteringModule.h>
+#include <svd/modules/svdReconstruction/SVDClusterizerModule.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -33,13 +33,13 @@ using namespace Belle2::SVD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDClustering)
+REG_MODULE(SVDClusterizer)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDClusteringModule::SVDClusteringModule() : Module(), m_elNoise(2000.0),
+SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
   m_cutSeed(5.0), m_cutAdjacent(2.5), m_cutCluster(8.0), m_sizeHeadTail(3),
   m_minSamples(3), m_timeTolerance(30), m_shapingTimeElectrons(55),
   m_shapingTimeHoles(60), m_samplingTime(30), m_refTime(0.0), m_assumeSorted(false)
@@ -111,7 +111,7 @@ SVDClusteringModule::SVDClusteringModule() : Module(), m_elNoise(2000.0),
            "Size of the acceptance window following the trigger", double(100));
 }
 
-void SVDClusteringModule::initialize()
+void SVDClusterizerModule::initialize()
 {
   //Register collections
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
@@ -132,7 +132,7 @@ void SVDClusteringModule::initialize()
   m_relClusterTrueHitName    = relClusterTrueHit.getName();
 
   // Report:
-  B2INFO("SVDClustering Parameters (in default system unit, *=cannot be set directly):");
+  B2INFO("SVDClusterizer Parameters (in default system unit, *=cannot be set directly):");
 
   B2INFO(" 1. COLLECTIONS:");
   B2INFO(" -->  MCParticles:        " << storeMCParticles.getName());
@@ -173,7 +173,7 @@ void SVDClusteringModule::initialize()
   m_noiseMap.setNoiseLevel(m_elNoise);
 }
 
-inline void SVDClusteringModule::findCluster(const Sample& sample)
+inline void SVDClusterizerModule::findCluster(const Sample& sample)
 {
   ClusterCandidate* prev = m_cache.findCluster(sample.getTime(), sample.getCellID());
   if (!prev) {
@@ -185,7 +185,7 @@ inline void SVDClusteringModule::findCluster(const Sample& sample)
 }
 
 
-void SVDClusteringModule::event()
+void SVDClusterizerModule::event()
 {
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDDigit>   storeDigits(m_storeDigitsName);
@@ -270,7 +270,7 @@ void SVDClusteringModule::event()
   }
 }
 
-void SVDClusteringModule::writeClusters(VxdID sensorID, int side)
+void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
 {
   if (m_clusters.empty()) return;
 

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ARICHRECMODULE_H
-#define ARICHRECMODULE_H
+#ifndef ARICHRECONSTRUCTORMODULE_H
+#define ARICHRECONSTRUCTORMODULE_H
 
 #include <framework/core/Module.h>
 
@@ -27,16 +27,16 @@ namespace Belle2 {
      * for different particle hypotheses and stores them in datastore.
      */
 
-    class ARICHRecModule : public Module {
+    class ARICHReconstructorModule : public Module {
 
     public:
 
 
       /*! Constructor.*/
-      ARICHRecModule();
+      ARICHReconstructorModule();
 
       /*! Destructor.*/
-      virtual ~ARICHRecModule();
+      virtual ~ARICHReconstructorModule();
 
       /**
        * Initialize the Module.
@@ -95,4 +95,4 @@ namespace Belle2 {
   } // arich namespace
 } // Belle2 namespace
 
-#endif // ARICHRECMODULE
+#endif // ARICHRECONSTRUCTORMODULE

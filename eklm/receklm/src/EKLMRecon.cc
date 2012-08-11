@@ -26,7 +26,7 @@ namespace Belle2 {
 
   void EKLMRecon::readStripHits()
   {
-    StoreArray<EKLMStripHit> stripHitsArray;
+    StoreArray<EKLMDigit> stripHitsArray;
     for (int i = 0; i < stripHitsArray.getEntries(); i++)
       if (stripHitsArray[i]->isGood())
         m_StripHitVector.push_back(stripHitsArray[i]);
@@ -39,7 +39,7 @@ namespace Belle2 {
     //    EKLMSectorHit *newSectorHit;
     StoreArray<EKLMSectorHit> sectorHitsArray;
 
-    for (std::vector<EKLMStripHit*>::iterator stripIter =
+    for (std::vector<EKLMDigit*>::iterator stripIter =
            m_StripHitVector.begin(); stripIter != m_StripHitVector.end();
          ++stripIter) {
       bool sectorNotFound = true;
@@ -65,7 +65,7 @@ namespace Belle2 {
 
   }
 
-  bool EKLMRecon::addStripHitToSector(EKLMSectorHit* sectorHit , EKLMStripHit* stripHit)
+  bool EKLMRecon::addStripHitToSector(EKLMSectorHit* sectorHit , EKLMDigit* stripHit)
   {
     if (stripHit->getEndcap() == sectorHit->getEndcap() &&
         stripHit->getLayer() == sectorHit->getLayer() &&
@@ -86,14 +86,14 @@ namespace Belle2 {
            m_SectorHitVector.begin(); sectorIter != m_SectorHitVector.end();
          sectorIter++) {
 
-      std::vector<EKLMStripHit*>::iterator itX = ((*sectorIter)->getStripHitVector())->begin();
+      std::vector<EKLMDigit*>::iterator itX = ((*sectorIter)->getStripHitVector())->begin();
 
-      for (std::vector<EKLMStripHit*>::iterator itX = (*sectorIter)->getStripHitVector()->begin();
+      for (std::vector<EKLMDigit*>::iterator itX = (*sectorIter)->getStripHitVector()->begin();
            itX != (*sectorIter)->getStripHitVector()->end(); ++itX) {
         // only X strips
         if (!CheckStripOrientationX(*itX))
           continue;
-        for (std::vector<EKLMStripHit*>::iterator itY = (*sectorIter)->getStripHitVector()->begin();
+        for (std::vector<EKLMDigit*>::iterator itY = (*sectorIter)->getStripHitVector()->begin();
              itY != (*sectorIter)->getStripHitVector()->end(); ++itY) {
           // only Y strips
           if (CheckStripOrientationX(*itY))
@@ -118,7 +118,7 @@ namespace Belle2 {
   }
 
 
-  bool EKLMRecon::doesIntersect(const EKLMStripHit* hit1, const EKLMStripHit* hit2,
+  bool EKLMRecon::doesIntersect(const EKLMDigit* hit1, const EKLMDigit* hit2,
                                 TVector3& crossPoint, double& chisq, double& time)
   {
     // general remark

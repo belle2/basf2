@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLRECPi0MODULE_H_
-#define ECLRECPi0MODULE_H_
+#ifndef ECLPI0RECONSTRUCTORMODULE_H_
+#define ECLPI0RECONSTRUCTORMODULE_H_
 
 #include <framework/core/Module.h>
 #include <vector>
@@ -23,17 +23,17 @@ namespace Belle2 {
     /** Module for making ECLRecoHits of CDCHits.
      *
      */
-    class ECLRecPi0Module : public Module {
+    class ECLPi0ReconstructorModule : public Module {
 
     public:
 
       /** Constructor.
        */
-      ECLRecPi0Module();
+      ECLPi0ReconstructorModule();
 
       /** Destructor.
        */
-      ~ECLRecPi0Module();
+      ~ECLPi0ReconstructorModule();
 
 
       /** Initialize variables, print info, and start CPU clock. */
@@ -159,4 +159,4 @@ namespace Belle2 {
   }//ECL
 }//Belle2
 
-#endif /* EVTMETAINFO_H_ */
+#endif

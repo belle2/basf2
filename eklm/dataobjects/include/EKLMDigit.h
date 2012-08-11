@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMSTRIPHIT_H
-#define EKLMSTRIPHIT_H
+#ifndef EKLMDigit_H
+#define EKLMDigit_H
 
 #include  <eklm/dataobjects/EKLMHitBase.h>
 #include  <eklm/dataobjects/EKLMSimHit.h>
@@ -25,18 +25,18 @@ namespace Belle2 {
 
   //! Main reconstruction hit class. Containes infromation about the
   //! hitted strips
-  class EKLMStripHit : public EKLMHitBase {
+  class EKLMDigit : public EKLMHitBase {
 
   public:
 
     //! Constructor
-    EKLMStripHit() {};
+    EKLMDigit() {};
 
     //! Constructor from the EKLMSimHit
-    EKLMStripHit(const EKLMSimHit* Hit);
+    EKLMDigit(const EKLMSimHit* Hit);
 
     //! Destructor
-    ~EKLMStripHit() {};
+    ~EKLMDigit() {};
 
     //! Print stip name and some other useful info
     void Print() const;
@@ -161,10 +161,10 @@ namespace Belle2 {
 
 
     //! Makes objects storable
-    ClassDef(Belle2::EKLMStripHit, 1);
+    ClassDef(Belle2::EKLMDigit, 1);
 
   };
 
 } // end of namespace Belle2
 
-#endif //EKLMSTRIPHIT_H
+#endif //EKLMDigit_H

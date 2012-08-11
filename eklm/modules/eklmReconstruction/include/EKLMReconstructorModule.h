@@ -8,11 +8,11 @@
 
 namespace Belle2 {
 
-  //! Module EKLMReconstructionModule
+  //! Module EKLMReconstructorModule
   /*!
     Simple module for reading EKLM hits
   */
-  class EKLMReconstructionModule : public Module {
+  class EKLMReconstructorModule : public Module {
 
   public:
 
@@ -23,13 +23,13 @@ namespace Belle2 {
       \param selfRegisterType True if this module is self-registering,
       otherwise false.
     */
-    EKLMReconstructionModule();
+    EKLMReconstructorModule();
 
     //! Destructor
     /*!
       Use the destructor to release the memory you allocated in the constructor.
     */
-    virtual ~EKLMReconstructionModule();
+    virtual ~EKLMReconstructorModule();
 
     //! Initialize the Module
     /*! This method is called only once before the actual event processing

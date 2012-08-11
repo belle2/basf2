@@ -151,7 +151,7 @@ simulation = register_module('FullSim')
 # SVD digitization module
 svddigi = register_module('SVDDigitizer')
 # SVD clustering module
-svdclust = register_module('SVDClustering')
+svdclust = register_module('SVDClusterizer')
 # Simpleoutput
 output = register_module('SimpleOutput')
 

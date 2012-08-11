@@ -70,7 +70,7 @@ mcprint = register_module('PrintMCParticles')
 eklmdigi = register_module('EKLMDigitizer')
 eklmdigi.log_level = LogLevel.INFO
 # EKLM reco
-eklmreco = register_module('EKLMReconstruction')
+eklmreco = register_module('EKLMReconstructor')
 eklmreco.log_level = LogLevel.INFO
 
 # Create main path

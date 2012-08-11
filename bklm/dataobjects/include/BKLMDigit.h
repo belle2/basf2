@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMSTRIP_H
-#define BKLMSTRIP_H
+#ifndef BKLMDIGIT_H
+#define BKLMDIGIT_H
 
 #include <TObject.h>
 
@@ -19,21 +19,21 @@ namespace Belle2 {
   /*! Per ROOT TObject convention, all data elements are public so that
       they can be seen in a ROOT browser.
   */
-  class BKLMStrip : public TObject {
+  class BKLMDigit : public TObject {
 
   public:
 
     //! Empty constructor for ROOT IO (needed to make the class storable)
-    BKLMStrip();
+    BKLMDigit();
 
     //! Constructor with initial values
-    BKLMStrip(bool, int, int, int, char, int, double, double);
+    BKLMDigit(bool, int, int, int, char, int, double, double);
 
     //! Copy constructor
-    BKLMStrip(const BKLMStrip&);
+    BKLMDigit(const BKLMDigit&);
 
     //! Destructor
-    virtual ~BKLMStrip() {}
+    virtual ~BKLMDigit() {}
 
     //! returns flag whether hit is in RPC (true) or scintillator (false)
     bool getInRPC() const { return m_InRPC; }
@@ -59,8 +59,8 @@ namespace Belle2 {
     //! returns pulse height
     double getADC() const { return m_ADC; }
 
-    //! determines if two BKLMStrips are equal based on geometry only
-    bool match(const BKLMStrip*) const;
+    //! determines if two BKLMDigits are equal based on geometry only
+    bool match(const BKLMDigit*) const;
 
     //! sets flag whether hit is in RPC (true) or scintillator (false)
     void setInRPC(bool inRPC) { m_InRPC = inRPC; }
@@ -111,7 +111,7 @@ namespace Belle2 {
     double m_ADC;
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMStrip, 1)
+    ClassDef(BKLMDigit, 1)
 
   private:
 
@@ -119,4 +119,4 @@ namespace Belle2 {
 
 } // end of namespace Belle2
 
-#endif //BKLMSTRIP_H
+#endif //BKLMDIGIT_H

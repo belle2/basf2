@@ -17,7 +17,7 @@ namespace Belle2 {
 
 
   /*! This is a class to store TOP likelihoods in datastore.
-   *  It is the output for reconstruction module (TOPReco).
+   *  It is the output for reconstruction module (TOPReconstructor).
    */
 
   class ARICHLikelihoods : public TObject {

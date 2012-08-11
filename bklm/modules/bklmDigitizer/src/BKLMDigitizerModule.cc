@@ -17,7 +17,7 @@
 //#include <framework/logging/Logger.h>
 
 #include <bklm/dataobjects/BKLMSimHit.h>
-#include <bklm/dataobjects/BKLMStrip.h>
+#include <bklm/dataobjects/BKLMDigit.h>
 
 using namespace std;
 using namespace Belle2;
@@ -49,7 +49,7 @@ void BKLMDigitizerModule::initialize()
   StoreArray<BKLMSimHit> simHits;
   StoreArray<MCParticle> particles;
   RelationArray particleToSimHits(particles, simHits);
-  StoreArray<BKLMStrip> strips;
+  StoreArray<BKLMDigit> strips;
   RelationArray stripToSimHits(strips, simHits);
   RelationArray simHitToStrip(simHits, strips);
 }
@@ -71,13 +71,13 @@ void BKLMDigitizerModule::event()
   unsigned int nSimHit = simHits->GetEntriesFast();
   if (nSimHit == 0) return;
 
-  StoreArray<BKLMStrip> strips("BKLMStrips");
+  StoreArray<BKLMDigit> strips("BKLMDigits");
   RelationArray stripToSimHits(strips, simHits);
   RelationArray simHitToStrip(simHits, strips);
 
   unsigned int nStrip = 0;
   unsigned int s = 0;
-  BKLMStrip* strip = new BKLMStrip();
+  BKLMDigit* strip = new BKLMDigit();
 
   vector<unsigned int> indices;
   vector<vector<unsigned int> > reverseIndices;
@@ -99,7 +99,7 @@ void BKLMDigitizerModule::event()
         if (strip->match(strips[s])) break;
       }
       if (s == nStrip) {
-        new(strips->AddrAt(s)) BKLMStrip(*strip);
+        new(strips->AddrAt(s)) BKLMDigit(*strip);
         vector<unsigned int> rev;
         reverseIndices.push_back(rev);
         nStrip++;
@@ -115,7 +115,7 @@ void BKLMDigitizerModule::event()
         if (strip->match(strips[s])) break;
       }
       if (s == nStrip) {
-        new(strips->AddrAt(s)) BKLMStrip(*strip);
+        new(strips->AddrAt(s)) BKLMDigit(*strip);
         vector<unsigned int> rev;
         reverseIndices.push_back(rev);
         nStrip++;

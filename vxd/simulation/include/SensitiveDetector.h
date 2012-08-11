@@ -61,7 +61,7 @@ namespace Belle2 {
        * handle. Ownership of the SensorInfo goes to the sensitive detector
        * instance
        */
-      SensitiveDetector(VXD::SensorInfoBase* sensorInfo, bool seeNeutrons = false, bool onlyPrimaryTrueHits = false);
+      SensitiveDetector(VXD::SensorInfoBase* sensorInfo, bool seeNeutrons = false, bool onlyPrimaryTrueHits = false, double sensitiveThreshold = 1.0);
 
     protected:
       /** Process one step inside the sensitive volume.
@@ -113,6 +113,8 @@ namespace Belle2 {
       bool m_seeNeutrons;
       /** Only create TrueHits for primary particles if true */
       bool m_onlyPrimaryTrueHits;
+      /** Threshold on deposited energy per step - discard step if less */
+      double m_sensitiveThreshold;
       /** List of all SimHit indices and their energy deposition belonging to the current volume traversal */
       std::vector<std::pair<unsigned int, float> > m_trueHitSteps;
       /** TrackID of the current volume traversal */
@@ -138,8 +140,9 @@ namespace Belle2 {
     };
 
     template <class SimHitClass, class TrueHitClass>
-    SensitiveDetector<SimHitClass, TrueHitClass>::SensitiveDetector(VXD::SensorInfoBase* sensorInfo, bool seeNeutrons, bool onlyPrimaryTrueHits):
+    SensitiveDetector<SimHitClass, TrueHitClass>::SensitiveDetector(VXD::SensorInfoBase* sensorInfo, bool seeNeutrons, bool onlyPrimaryTrueHits, double sensitiveThreshold):
       VXD::SensitiveDetectorBase(sensorInfo), m_seeNeutrons(seeNeutrons), m_onlyPrimaryTrueHits(onlyPrimaryTrueHits),
+      m_sensitiveThreshold(sensitiveThreshold),
       m_trueHitTrackID(0), m_trueHitCount(0), m_trueHitWeight(0.0), m_trueHitTime(0.0)
     {
       //Make sure all collections are registered
@@ -200,10 +203,8 @@ namespace Belle2 {
       const TVector3& posIn, const TVector3& posOut, const TVector3& momIn)
     {
 
-      //Ignore all Steps with less than 1eV Energydeposition for now
-      //FIXME: make this more elaborate
-      const double thresholdEnergy = 0.01 * Unit::eV;
-      if (fabs(energy) < thresholdEnergy) return -1;
+      //Ignore all Steps with less than threshold energy deposition
+      if (fabs(energy) < m_sensitiveThreshold) return -1;
 
       VxdID sensorID = m_info->getID();
       const double theta = (posOut - posIn).Theta() * Unit::rad;

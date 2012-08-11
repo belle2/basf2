@@ -191,6 +191,8 @@ namespace Belle2 {
       bool m_seeNeutrons;
       /** If true only create TrueHits from primary particles and ignore secondaries */
       bool m_onlyPrimaryTrueHits;
+      /** Minimum deposited energy per step in the SensitiveDetector (discard step if less) */
+      double m_sensitiveThreshold;
 
     }; // class GeoVXDCreator
 

@@ -386,8 +386,6 @@ void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
   // If we are close to the target plane, don't integrate
   if (fabs(distanceToPlane) > 1.0 * Unit::um) {
     // set integration region and integration points
-    double a = position.Z();
-    double b = 0.5 * sensorThickness - info.getGateDepth();
     double h = distanceToPlane / 2.0;
     double midpoint = position.Z() + 0.5 * distanceToPlane;
     std::vector<double> zKnots(5);

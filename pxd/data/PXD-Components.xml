@@ -85,7 +85,6 @@
       <DrainBorder unit="um">8.0</DrainBorder>
       <GateDepth unit="um">22</GateDepth>
       <DoublePixel>true</DoublePixel>
-
       <!-- Define the integration window to be 20µs. This probably should go
            somewhere else -->
       <IntegrationStart unit="us">-10.0</IntegrationStart>
@@ -161,7 +160,6 @@
       <DrainBorder unit="um">15.0</DrainBorder>
       <GateDepth unit="um">22</GateDepth>
       <DoublePixel>true</DoublePixel>
-
       <IntegrationStart unit="us">-10.0</IntegrationStart>
       <IntegrationEnd   unit="us"> 10.0</IntegrationEnd>
     </Active>

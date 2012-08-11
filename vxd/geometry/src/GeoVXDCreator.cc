@@ -46,7 +46,9 @@ namespace Belle2 {
   using namespace geometry;
   namespace VXD {
 
-    GeoVXDCreator::GeoVXDCreator(const string& prefix) : m_prefix(prefix), m_activeChips(false), m_seeNeutrons(false), m_onlyPrimaryTrueHits(false)
+    GeoVXDCreator::GeoVXDCreator(const string& prefix) :
+      m_prefix(prefix), m_activeChips(false), m_seeNeutrons(false),
+      m_onlyPrimaryTrueHits(false), m_sensitiveThreshold(1.0)
     {
     }
 
@@ -453,6 +455,7 @@ namespace Belle2 {
       m_activeChips = content.getBool("ActiveChips", false);
       m_seeNeutrons = content.getBool("SeeNeutrons", false);
       m_onlyPrimaryTrueHits = content.getBool("OnlyPrimaryTrueHits", false);
+      m_sensitiveThreshold = content.getWithUnit("SensitiveThreshold", 1.0 * Unit::eV);
       m_alignment = GearDir(content, "Alignment/");
       m_components = GearDir(content, "Components/");
       GearDir support(content, "Support/");

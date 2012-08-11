@@ -82,7 +82,7 @@ namespace Belle2 {
       SensorInfo* sensorInfo = new SensorInfo(dynamic_cast<SensorInfo&>(*sensor.info));
       sensorInfo->setID(sensorID);
       if (placement.flipV) sensorInfo->flipVSegmentation();
-      SensitiveDetector* sensitive = new SensitiveDetector(sensorInfo, m_seeNeutrons, m_onlyPrimaryTrueHits);
+      SensitiveDetector* sensitive = new SensitiveDetector(sensorInfo, m_seeNeutrons, m_onlyPrimaryTrueHits, m_sensitiveThreshold);
       return sensitive;
     }
 

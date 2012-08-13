@@ -48,6 +48,8 @@ namespace Belle2 {
 
     /** Return the sensorID of the sensor the energy was deposited in */
     VxdID getSensorID()         const { return m_sensorID; }
+    /** Return the sensorID of the sensor the energy was deposited in */
+    unsigned short getRawSensorID()         const { return m_sensorID; }
     /** Return the PDG code of the particle causing the energy deposition */
     int getPDGcode()            const { return m_pdg; }
     /** Return the start point of the energy deposition in local coordinates */

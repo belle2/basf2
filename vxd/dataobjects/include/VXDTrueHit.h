@@ -77,6 +77,8 @@ namespace Belle2 {
 
     /** Return the Sensor ID */
     VxdID getSensorID() const { return m_sensorID; }
+    /** Return raw Sensor ID. */
+    unsigned int getRawSensorID() const {return m_sensorID; }
     /** Return local u coordinate of hit */
     float getU() const { return m_u; }
     /** Return local v coordinate of hit */

@@ -53,6 +53,9 @@ namespace Belle2 {
      */
     VxdID getSensorID() const { return m_sensorID; }
 
+    /** Get raw sensor ID */
+    unsigned short getRawSensorID() const { return m_sensorID; }
+
     /** Get the direction of strips.
      * @return true if u-strips, otherwise false.
      */

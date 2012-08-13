@@ -83,11 +83,11 @@ simulation = register_module('FullSim')
 # PXD digitization module
 pxddigi = register_module('PXDDigitizer')
 # PXD clustering module
-pxdclust = register_module('PXDClustering')
+pxdclust = register_module('PXDClusterizer')
 # SVD digitization module
 svddigi = register_module('SVDDigitizer')
 # SVD clustering module
-svdclust = register_module('SVDClustering')
+svdclust = register_module('SVDClusterizer')
 # Simpleoutput
 output = register_module('SimpleOutput')
 

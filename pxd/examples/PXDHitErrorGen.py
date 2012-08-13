@@ -49,7 +49,7 @@ class PXDHitErrors(Module):
                         )
         self.file.write('TrueHit: u[cm], v[cm], charge[GeV], theta_u, theta_v \n'
                         )
-        self.file.write('Cluster: u[cm], v[cm], charge[e-], size, size_u, size_v \n'
+        self.file.write('Cluster: u[cm], v[cm], charge[e-], seed charge[e-], size, size_u, size_v \n'
                         )
         self.file.write('Digits: n_digits {u[cm] v[cm] charge[e-]} \n')
         self.file.write('\n')

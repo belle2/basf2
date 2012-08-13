@@ -47,11 +47,12 @@ namespace Belle2 {
 
   protected:
 
-    MCParticleGraph mpg;            /**< An instance of the MCParticle graph. */
+    MCParticleGraph mpg;        /**< An instance of the MCParticle graph. */
     EvtGenInterface m_Ievtgen;  /**< An instance of the EvtGen Interface. */
     std::string m_DECFileName;
     std::string m_userDECFileName;
     std::string m_pdlFileName;
+    std::string m_parentParticle;
     bool m_boost2LAB;
   };
 

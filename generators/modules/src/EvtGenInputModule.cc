@@ -47,6 +47,7 @@ EvtGenInputModule::EvtGenInputModule() : Module()
            Environment::Instance().getExternalsPath() + "/share/evtgen/DECAY.DEC");
   addParam("pdlFile", m_pdlFileName, "standard pdlfile name should be provided: default file is in externals/share/evtgen/evt.pdl",
            Environment::Instance().getExternalsPath() + "/share/evtgen/evt.pdl");
+  addParam("ParentParticle", m_parentParticle, "Parent Particle Name", string("Upsilon(4S)"));
   addParam("boost2LAB", m_boost2LAB, "Boolean to indicate whether the particles should be boosted to LAB frame", true);
 }
 
@@ -67,9 +68,9 @@ void EvtGenInputModule::initialize()
 
   //setup the DECAY files:
   if (!m_userDECFileName.empty())
-    m_Ievtgen.setup(m_DECFileName, m_pdlFileName, m_userDECFileName);
+    m_Ievtgen.setup(m_DECFileName, m_pdlFileName, m_parentParticle, m_userDECFileName);
   else
-    m_Ievtgen.setup(m_DECFileName, m_pdlFileName);
+    m_Ievtgen.setup(m_DECFileName, m_pdlFileName, m_parentParticle);
 
 
   //Initialize MCParticle collection

@@ -31,7 +31,7 @@
 using namespace std;
 using namespace Belle2;
 
-int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pdlFileName, const std::string& userFileName)
+int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pdlFileName, const std::string& parentParticle, const std::string& userFileName)
 {
   B2INFO("starting initialisation of EvtGen Interface. ");
 
@@ -44,17 +44,17 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pd
     m_Generator->readUDecay(userFileName.c_str());
   }
 
-  //setting up Ups4S in rest frame:
-  TLorentzVector pUPS4;
-  c_UPS4 = EvtPDL::getId(std::string("Upsilon(4S)"));
+  // Setup Parent Particle in rest frame
+  c_ParentParticle = EvtPDL::getId(parentParticle);
 
-  double mUPS4 = EvtPDL::getMass(c_UPS4);
-  pUPS4.SetXYZM(0.0, 0.0, 0.0, mUPS4);
-  //boosting UPS4 to lab frame:
-  pUPS4 = m_labboost * pUPS4;
-  m_pinit.set(pUPS4.E(), pUPS4.X(), pUPS4.Y(), pUPS4.Z());
+  TLorentzVector pParentParticle;
+  pParentParticle.SetXYZM(0.0, 0.0, 0.0, EvtPDL::getMass(c_ParentParticle));
 
-  B2INFO("finished initialising the EvtGen Interface. " << pUPS4.E() << "tt" << pUPS4.X() << "tt" << pUPS4.Y() << "tt" << pUPS4.Z());
+  // Boost to lab frame
+  pParentParticle = m_labboost * pParentParticle;
+  m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
+
+  B2INFO("finished initialising the EvtGen Interface. " << pParentParticle.E() << "tt" << pParentParticle.X() << "tt" << pParentParticle.Y() << "tt" << pParentParticle.Z());
 
   return 0;
 }
@@ -65,7 +65,7 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph)
   //  B2INFO("Starting event simulation.");
 
 
-  m_parent = EvtParticleFactory::particleFactory(c_UPS4, m_pinit);
+  m_parent = EvtParticleFactory::particleFactory(c_ParentParticle, m_pinit);
   m_parent->setVectorSpinDensity();
   B2INFO("Set starting particle");
   m_Generator->generateDecay(m_parent);

@@ -54,7 +54,7 @@ namespace Belle2 {
       if (m_Generator) delete m_Generator;
     }
 
-    int setup(const std::string& decayFileName, const std::string& pdlFileName, const std::string& userFileName = std::string(""));
+    int setup(const std::string& decayFileName, const std::string& pdlFileName, const std::string& parentParticle, const std::string& userFileName = std::string(""));
     int simulateEvent(MCParticleGraph& graph);
 
     TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
@@ -70,7 +70,7 @@ namespace Belle2 {
     EvtGenFwRandEngine m_eng;
     EvtGen* m_Generator;
     EvtVector4R m_pinit;
-    EvtId c_UPS4;
+    EvtId c_ParentParticle;
   };
 
 }

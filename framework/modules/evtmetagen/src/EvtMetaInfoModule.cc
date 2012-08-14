@@ -13,6 +13,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <boost/format.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -54,9 +55,7 @@ void EvtMetaInfoModule::event()
 {
   //Print event meta data information
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-  B2INFO("EXP NUMBER: " << eventMetaDataPtr->getExperiment());
-  B2INFO("RUN NUMBER: " << eventMetaDataPtr->getRun());
-  B2INFO("EVT NUMBER: " << eventMetaDataPtr->getEvent());
+  B2INFO(boost::format("EXP: %8d        RUN: %8d        EVT: %8d") % eventMetaDataPtr->getExperiment() % eventMetaDataPtr->getRun() % eventMetaDataPtr->getEvent()) ;
 }
 
 

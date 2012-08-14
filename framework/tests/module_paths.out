@@ -7,9 +7,7 @@
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
 [INFO] Setting return value to True
-[INFO] EXP NUMBER: 0
-[INFO] RUN NUMBER: 1
-[INFO] EVT NUMBER: 0
+[INFO] EXP:        0        RUN:        1        EVT:        0
 [INFO] Processed:   1 runs,      1 events
 [INFO] ============================================================================
 [INFO] DataStore collections in event 0
@@ -36,9 +34,7 @@
 [INFO] >>> Start new run: 2
 [INFO] ------------------------------------------------------------------------
 [INFO] Setting return value to True
-[INFO] EXP NUMBER: 1
-[INFO] RUN NUMBER: 2
-[INFO] EVT NUMBER: 0
+[INFO] EXP:        1        RUN:        2        EVT:        0
 [INFO] Processed:   2 runs,      3 events
 [INFO] ============================================================================
 [INFO] DataStore collections in event 0

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Detector xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Name>TBDetector</Name>
+  <Description>Test Beam Detector Base</Description>
+  
+  <xi:include href="GlobalParams.xml"/>
+
+
+  <!-- Define materials -->
+  <xi:include href="../../geometry/BasicMaterials.xml"/>
+  <xi:include href="TB-Materials.xml"/>
+  <xi:include href="../PXD-Materials.xml"/>
+
+  <!-- Magnetic field -->
+  <!--<xi:include href="../simulation/MagneticField.xml"/> -->
+
+  <!-- Subdedectors -->
+  <xi:include href="TBGeometry.xml"/>
+
+</Detector>

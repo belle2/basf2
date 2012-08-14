@@ -32,6 +32,7 @@ namespace Belle2 {
       enum SensorType {
         PXD = 0,  /**< PXD Sensor */
         SVD = 1,  /**< SVD Sensor */
+        TEL = 2,  /**< Testbeam telescope sensor */
         VXD = -1, /**< Any type of VXD Sensor */
       };
 

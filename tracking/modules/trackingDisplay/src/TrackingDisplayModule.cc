@@ -32,7 +32,7 @@ TrackingDisplayModule::TrackingDisplayModule() : Module(), m_display(0)
   //needs to be done here to have dictionaries available during SimpleInput::initialize()
   gSystem->Load("libpxd");
   gSystem->Load("libsvd");
-  gSystem->Load("libRKTrackRep");
+  gSystem->Load("libgenfitRK");
 }
 
 

@@ -157,7 +157,7 @@ particlegun.param('independentVertices', True)
 
 # Create Event information
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
+evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
 
 # Show progress of processing
 progress = register_module('Progress')

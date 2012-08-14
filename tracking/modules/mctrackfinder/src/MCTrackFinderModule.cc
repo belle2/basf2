@@ -64,7 +64,7 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   //this is just an attempt to find out what is the most suitable way to select particles, if you have other/better ideas, communicate it to the tracking group...
   addParam("WhichParticles", m_whichParticles, "Select for which particles a track candidate should be created: 0 for primaries, 1 for all tracks which created hits in the PXD, 2 for all tracks which created hits in the SVD, 3 for all tracks which created hits in the CDC", int(0));
   addParam("EnergyCut", m_energyCut, "Track candidates are only created for MCParticles with energy larger than this cut ", double(0.1));
-  addParam("Neutrals", m_neutrals, "Set true if track candidates should be created also for neutral particles", bool(true));
+  addParam("Neutrals", m_neutrals, "Set true if track candidates should be created also for neutral particles", bool(false));
 
   //smearing of MCMomentum
   addParam("Smearing", m_smearing, "Smearing of MCMomentum/MCVertex prior to storing it in GFTrackCandidate (in %). A negative value will switch off smearing. This is also the default.", -1.0);

@@ -157,7 +157,6 @@ void SimpleInputModule::event()
   if (nextEntry >= 0 && nextEntry < InputController::numEntries()) {
     B2INFO("SimpleInput: will read " << nextEntry << " next.");
     m_counterNumber[DataStore::c_Event] = nextEntry;
-    InputController::reset();
   } else if (InputController::getNextExperiment() >= 0 && InputController::getNextRun() >= 0 && InputController::getNextEvent() >= 0) {
     const int major = 1000000 * InputController::getNextExperiment() + InputController::getNextRun();
     const int minor = InputController::getNextEvent();
@@ -168,13 +167,12 @@ void SimpleInputModule::event()
       B2INFO("SimpleInput: will read " << entry << " next.");
       m_counterNumber[DataStore::c_Event] = entry;
     }
-    InputController::reset();
   }
+  InputController::eventLoaded(m_counterNumber[DataStore::c_Event]);
 
-  if (m_counterNumber[DataStore::c_Event])
-    m_firstEntryLoaded = false;
   readTree(DataStore::c_Event);
   m_counterNumber[DataStore::c_Event]++;
+  m_firstEntryLoaded = false; //only used in first event() call
 }
 
 

@@ -123,7 +123,7 @@ namespace Belle2 {
     };
 
     /** Very often the mass of charged stable Particles is needed. */
-    static const float chargedStableMass(const EChargedStable chargedStable = c_Pion);
+    static float chargedStableMass(const EChargedStable chargedStable = c_Pion);
 
 
 

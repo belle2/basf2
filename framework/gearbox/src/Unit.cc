@@ -109,9 +109,11 @@ namespace Belle2 {
   const double Unit::crossingAngleHER = 0.0415 * Unit::rad;
 
 //ChargedStable handling
-  const float Unit::chargedStableMass(const EChargedStable chargedStable = c_Pion)
+  float Unit::chargedStableMass(const EChargedStable chargedStable)
   {
     switch (chargedStable) {
+      case (c_Pion):
+        return 0.13957;
       case (c_Kaon):
         return 0.49868;
       case (c_Proton):
@@ -121,7 +123,7 @@ namespace Belle2 {
       case (c_Muon):
         return 0.10566;
     }
-    return 0.13957;
+    return 0.;
   }
 
   double Unit::convertValue(double value, const std::string& unitString)

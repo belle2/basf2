@@ -153,11 +153,12 @@ namespace Belle2 {
      *  @param name       Name under which a TClonesArray shall be stored in the DataStore.
      *  @param durability Decide when TClonesArray shall be destroyed.
      *  @param array      This reference to a TClonesArray pointer is either redirected to an existing TClonesArray,
-     *                    or to a newly created one.
+     *                    or to a newly created one. NULL if an array could be neither found nor created.
+     *  @param generate   Should we create a new slot if it doesn't exist yet? (only available during module initialisation!)
      */
     template <class T> bool handleArray(const std::string& name,
                                         const EDurability& durability,
-                                        TClonesArray*& array);
+                                        TClonesArray*& array, bool generate = true);
 
     /** Store existing TClonesArray.
      *
@@ -258,14 +259,23 @@ template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
 
 template <class T> bool Belle2::DataStore::handleArray(const std::string& name,
                                                        const Belle2::DataStore::EDurability& durability,
-                                                       TClonesArray*& array)
+                                                       TClonesArray*& array, bool generate)
 {
-  const bool registerNewArray = (m_storeObjMap[durability].find(name) == m_storeObjMap[durability].end());
+  const bool foundArray = (m_storeObjMap[durability].find(name) != m_storeObjMap[durability].end());
 
-  if (registerNewArray) { // new slot in map needs to be created
+  if (!foundArray) { // new slot in map needs to be created
+    if (!generate) {
+      array = 0;
+      return false; //don't do anything...
+    }
     if (!m_initializeActive) { // should only happen in the initialize phase
-      //shall soon be replaced with an B2ERROR message
       B2WARNING("Creating an array " << name << " and durability " << durability << " outside initialize(). Please register output arrays by also creating them in your Module's initialize() function!");
+      //TODO: add this at some point
+      /*
+      //disable creation and make array invalid.
+      array = 0;
+      return false;
+      */
     }
     if (array == 0) {
       array = new TClonesArray(T::Class()); // use default constructor
@@ -294,7 +304,7 @@ template <class T> bool Belle2::DataStore::handleArray(const std::string& name,
     }
   }
 
-  return registerNewArray;
+  return !foundArray;
 }
 
 #endif // DATASTORE_H

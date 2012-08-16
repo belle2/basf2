@@ -245,7 +245,7 @@ bool Belle2::StoreArray<T>::assignArray(const std::string& name, DataStore::EDur
   m_storeArray = 0;
 
   B2DEBUG(250, "Calling DataStore from StoreArray " << name);
-  return DataStore::Instance().handleArray<T>(m_name, durability, m_storeArray);
+  return DataStore::Instance().handleArray<T>(m_name, durability, m_storeArray, true);
 }
 
 #endif

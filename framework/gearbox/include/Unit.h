@@ -110,6 +110,23 @@ namespace Belle2 {
     static const double uTherm;       /**< Thermal Voltage at room temperature */
     static const double eMobilitySi;  /**< Electron mobility in intrinsic Silicon at room temperature */
 
+    /** Trackable Particles ID.
+     *
+     *  Pion is the first one, because usually pions are the most common particles and therefore often the standard.
+     */
+    enum EChargedStable {
+      c_Pion     = 0, /** Assume a Pion.      */
+      c_Kaon     = 1, /** Assume a Kaon.      */
+      c_Proton   = 2, /** Assume a Proton.    */
+      c_Electron = 3, /** Assume an Electron. */
+      c_Muon     = 4  /** Assume a Muon.      */
+    };
+
+    /** Very often the mass of charged stable Particles is needed. */
+    static const float chargedStableMass(const EChargedStable chargedStable = c_Pion);
+
+
+
     //SuperKEKB and Belle II constants
     static const double crossingAngleLER; /**< The crossing angle of the LER. */
     static const double crossingAngleHER; /**< The crossing angle of the LER. */

@@ -16,8 +16,8 @@
 
 #include <GFRaveVertexFactory.h>
 
-#include <TVector3.h>
-#include <TMatrixD.h>
+#include <vector>
+
 
 
 namespace Belle2 {
@@ -42,12 +42,12 @@ namespace Belle2 {
 
     int m_verbosity;      /**< verbosity parameter for the GFRaveFactory */
     std::string m_method;   /**< Name of method used by rave to find/fit the vertices */
-    bool m_useBeamSpot;  /**< flag to swtich on/off the usage of beam spot info for vertex fitting */
+    bool m_useBeamSpot;  /**< flag to switch on/off the usage of beam spot info for vertex fitting */
     GFRaveVertexFactory* m_gfRaveVertexFactoryPtr;   /**< pointer to the GFRaveVertexFactory that is the primary interface from Genfit to rave*/
     bool m_useGenfitPropagation; /**< flag to switch between Genfit and Rave propagation for vertex fitting */
 
-    TVector3 m_beamSpotPos;
-    TMatrixD m_beamSpotCov;
+    std::vector<double> m_beamSpotPos; /**< the user chosen beam spot position. User must provide a container with 3 (x,y,z) values */
+    std::vector<double> m_beamSpotCov; /**< the user chosen beam spot position covariance matrix. User must provide 9 values (will be interpreted as a 3x3 matrix)*/
 
   };
 }

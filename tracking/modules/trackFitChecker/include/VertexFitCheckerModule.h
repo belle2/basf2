@@ -78,10 +78,10 @@ namespace Belle2 {
     TTree* m_statDataTreePtr;
     TFile* m_rootFilePtr;
     int m_processedVertices;
-
-
-//     int m_verbosity;       /**< verbosity parameter for the GFRaveFactory */
-//     std::string m_method;    /**< Name of method used by rave to find/fit the vertices */
+    int m_badVertexPValueVertices;
+    int m_badTrackPValueVertices;
+    double  m_trackPValueCut;
+    double  m_vertexPValueCut;
 
 
   };

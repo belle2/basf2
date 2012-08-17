@@ -19,6 +19,10 @@
 
 #include <GFRaveVertex.h>
 
+#include <TVector3.h>
+#include <TMatrixD.h>
+
+
 using namespace Belle2;
 
 using std::string;
@@ -36,8 +40,8 @@ VertexerModule::VertexerModule() : Module()
   addParam("vertexingMethod", m_method, "Select vertexing method", string("kalman-smoothing:1"));
   addParam("useBeamSpot", m_useBeamSpot, "use beam spot info or not (not is default)", false);
   addParam("useGenfitPropagation", m_useGenfitPropagation, "use either the Genfit propagation (default) or the Rave propagation (vacuum only)", true);
-  addParam("beamSpotPostion", m_beamSpotPos, "the postion of the beam spot", TVector3());
-  addParam("beamSpotCovariance", m_beamSpotCov, "the covariance matrix of the beam spot postion", TMatrixD());
+  addParam("beamSpotPosition", m_beamSpotPos, "the position of the beam spot", vector<double>(0));
+  addParam("beamSpotCovariance", m_beamSpotCov, "the covariance matrix of the beam spot position", vector<double>(0));
 
 }
 
@@ -57,7 +61,17 @@ void VertexerModule::initialize()
   m_gfRaveVertexFactoryPtr = new GFRaveVertexFactory(m_verbosity, not m_useGenfitPropagation);
   m_gfRaveVertexFactoryPtr->setMethod(m_method);
   if (m_useBeamSpot == true) {
-    m_gfRaveVertexFactoryPtr->setBeamspot(m_beamSpotPos, m_beamSpotCov);
+    if (m_beamSpotPos.size() == 3 and m_beamSpotCov.size() == 9) {
+      TVector3 beamSpotPos(m_beamSpotPos[0], m_beamSpotPos[1], m_beamSpotPos[2]);
+      TMatrixD beamSpotCov(3, 3, &m_beamSpotCov[0]); //this is a hack... when C++2011 is used .data() should used instead
+      m_gfRaveVertexFactoryPtr->setBeamspot(beamSpotPos, beamSpotCov);
+//      beamSpotPos.Print();
+//      beamSpotCov.Print();
+    } else {
+      B2ERROR("beamSpotPostion did not have exactly 3 elements or beamSpotCovariance did not have exactly 9 elements therefore beam spot info cannot be used");
+    }
+
+
   }
 
 }
@@ -99,7 +113,7 @@ void VertexerModule::event()
 
   vector < GFRaveVertex* > verticesFromRave;
 
-  m_gfRaveVertexFactoryPtr->findVertices(&verticesFromRave, tracksForRave, true);
+  m_gfRaveVertexFactoryPtr->findVertices(&verticesFromRave, tracksForRave, m_useBeamSpot);
 
   const int nVerticesFromRave = verticesFromRave.size();
 //write the fitted vertices to the storeArray and clean up the stuff created with new

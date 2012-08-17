@@ -22,11 +22,17 @@
 #include <TVector3.h>
 #include <TMatrixD.h>
 
+#include <iostream>
+
 
 using namespace Belle2;
 
 using std::string;
 using std::vector;
+
+using std::cout;
+using std::endl;
+
 
 using boost::accumulators::mean;
 using boost::accumulators::median;
@@ -44,6 +50,8 @@ VertexFitCheckerModule::VertexFitCheckerModule() : Module()
   addParam("writeToRootFile", m_writeToRootFile, "Set to True if you want the data from the statistical tests written into a root file", false);
   addParam("writeToTextFile", m_writeToFile, "Set to True if you want the results of the statistical tests written out in a normal text file", false);
   addParam("outputFileName", m_dataOutFileName, "A common name for all output files of this module. Suffixes to distinguish them will be added automatically", string("vertexFitChecker"));
+  addParam("trackPValueCut", m_trackPValueCut, "if one track in a vertex has a p value lower than pValueCut, the vertex will be excluded from the statistical tests", -1.0);
+  addParam("tertexPValueCut", m_vertexPValueCut, "if a vertex has a p value lower than vertexPValueCut, the vertex will be excluded from the statistical tests", -1.0);
 
 }
 
@@ -68,7 +76,8 @@ void VertexFitCheckerModule::initialize()
     m_statDataTreePtr = NULL;
   }
   m_processedVertices = 0;
-
+  m_badVertexPValueVertices = 0;
+  m_badTrackPValueVertices = 0;
 
 
 
@@ -96,14 +105,28 @@ void VertexFitCheckerModule::event()
   for (int iVertex = 0; iVertex not_eq nVertices; ++iVertex) {
 
     const GFRaveVertex* aGFRaveVertexPtr = vertices[iVertex];
-
     const double chi2 = aGFRaveVertexPtr->getChi2();
     const int ndf = aGFRaveVertexPtr->getNdf();
     const double pValue = TMath::Prob(chi2, ndf);
+    //cout << "chi2,ndf,p: " << chi2 << " " << ndf << " " << pValue << endl;
+    if (pValue < m_vertexPValueCut) {
+      ++m_badVertexPValueVertices;
+      return;
+    }
+    const int nTracks = aGFRaveVertexPtr->getNTracks();
+    for (int i = 0; i not_eq nTracks; ++i) {
+      double pValueOfTrack = aGFRaveVertexPtr->getParameters(i)->getRep()->getPVal();
+      if (pValueOfTrack < m_trackPValueCut) { // if contributing track is bad ignore this vertex
+        ++m_badTrackPValueVertices;
+        return;
+      }
+    }
+
+
     fillVertexWiseData("pValue", pValue);
     const TVector3 vertexPos = aGFRaveVertexPtr->getPos();
     const TMatrixD vertexCov = aGFRaveVertexPtr->getCov();
-    const int nTracks = aGFRaveVertexPtr->getNTracks();
+
 
     if (m_writeToRootFile == true) {
       m_statDataTreePtr->Fill();
@@ -124,7 +147,12 @@ void VertexFitCheckerModule::terminate()
 
   B2INFO("Now following the results from the vertexFitChecker module");
 
-
+  if (m_badVertexPValueVertices not_eq 0) {
+    B2WARNING(m_badVertexPValueVertices << " vertices had a p value smaller than " << m_vertexPValueCut << " and were not included in the statistical tests");
+  }
+  if (m_badTrackPValueVertices not_eq 0) {
+    B2WARNING(m_badTrackPValueVertices << " vertices had at least on track with a p value smaller than " << m_trackPValueCut << " and were not included in the statistical tests");
+  }
   if (m_processedVertices <= 1) {
     B2WARNING("Only " << m_processedVertices << " vertices were processed. Statistics cannot be computed.");
   } else {
@@ -148,7 +176,7 @@ void VertexFitCheckerModule::terminate()
   }
 
   if (m_statDataTreePtr not_eq NULL) {
-    m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
+    m_rootFilePtr->cd(); //important! without this the framework root I/O (SimpleOutput etc) could mix with the root I/O of this module
     m_statDataTreePtr->Write();
     m_rootFilePtr->Close();
 

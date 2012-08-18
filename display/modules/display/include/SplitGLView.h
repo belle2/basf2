@@ -13,12 +13,9 @@
 #include "TGMenu.h"
 #include "TGStatusBar.h"
 #include "TGFileDialog.h"
-#include "TGMsgBox.h"
 #include "TGLPhysicalShape.h"
 #include "TGLLogicalShape.h"
-#include "HelpText.h"
 #include "TClass.h"
-#include "Riostream.h"
 #include "TGListTree.h"
 #include "TOrdCollection.h"
 #include "TArrayF.h"
@@ -29,15 +26,11 @@
 #include "TEveViewer.h"
 #include "TEveBrowser.h"
 #include "TEveProjectionManager.h"
-#include "TEveProjectionAxes.h"
 #include "TEveScene.h"
-#include "TEveGeoNode.h"
 #include "TEveEventManager.h"
-#include "TEveTrack.h"
 #include "TEveSelection.h"
 
 #include "TGSplitFrame.h"
-#include "TGLOverlayButton.h"
 #include "TGLEmbeddedViewer.h"
 #include "TGDockableFrame.h"
 #include "TGShapedFrame.h"
@@ -46,64 +39,6 @@
 #include "TEnv.h"
 
 namespace Belle2 {
-
-  /*
-  class HtmlObjTable : public TObject {
-    public:                     // make them public for shorter code
-
-      TString   fName;
-      Int_t     fNValues;      // number of values
-      Int_t     fNFields;      // number of fields
-      TArrayF*  fValues;
-      TString*  fLabels;
-      Bool_t    fExpand;
-
-      TString   fHtml;         // HTML output code
-
-      void Build();
-      void BuildTitle();
-      void BuildLabels();
-      void BuildTable();
-
-    public:
-      HtmlObjTable(const char* name, Int_t nfields, Int_t nvals, Bool_t exp = kTRUE);
-      virtual ~HtmlObjTable();
-
-      void     SetLabel(Int_t col, const char* label) { fLabels[col] = label; }
-      void     SetValue(Int_t col, Int_t row, Float_t val) { fValues[col].SetAt(val, row); }
-      TString  Html() const { return fHtml; }
-
-      ClassDef(HtmlObjTable, 0);
-  };
-
-  class HtmlSummary : public TObject {
-    public:                           // make them public for shorter code
-      Int_t           fNTables;
-      TOrdCollection* fObjTables;    // ->array of object tables
-      TString         fHtml;         // output HTML string
-      TString         fTitle;        // page title
-      TString         fHeader;       // HTML header
-      TString         fFooter;       // HTML footer
-
-      void     MakeHeader();
-      void     MakeFooter();
-
-    public:
-      HtmlSummary(const char* title);
-      virtual ~HtmlSummary();
-
-      HtmlObjTable*  AddTable(const char* name, Int_t nfields, Int_t nvals,
-          Bool_t exp = kTRUE, Option_t* opt = "");
-      HtmlObjTable*  GetTable(Int_t at) const { return (HtmlObjTable*)fObjTables->At(at); }
-      void           Build();
-      void           Clear(Option_t* option = "");
-      void           Reset(Option_t* option = "");
-      TString        Html() const { return fHtml; }
-
-      ClassDef(HtmlSummary, 0);
-  };
-  */
-
 
   /** Responsible for arranging the GL viewers and providing related functionality. */
   class SplitGLView : public TGMainFrame {
@@ -124,8 +59,6 @@ namespace Belle2 {
     void           OnMouseOver(TGLPhysicalShape* shape);
     /** handle Activated signals from GLViewer. */
     void           OnViewerActivated();
-    /** Open a Root file to display a geometry in the GL viewers. */
-    void           OpenFile(const char* fname);
     /** swap specified viewer with main view. */
     void           SwapToMainView(TGLViewerBase* viewer);
     /** toggle wether the active viewer may be rotated (not that useful for projections). */
@@ -134,8 +67,6 @@ namespace Belle2 {
     void           ToggleOrthoDolly();
     /** move viewer into standalone window. */
     void           UnDock(TGLViewerBase* viewer);
-    /** unused. */
-    static void    UpdateSummary();
 
     /** return R-Phi projection manager. */
     TEveProjectionManager* getRPhiMgr() const { return fRPhiMgr; }
@@ -146,10 +77,10 @@ namespace Belle2 {
 
     /** Which menu command was selected? */
     enum EMyCommands {
-      kFileOpen, kFileExit, kFileLoadConfig, kFileSaveConfig,
+      kFileExit,
       kHelpAbout, kGLPerspYOZ, kGLPerspXOZ, kGLPerspXOY, kGLXOY,
       kGLXOZ, kGLZOY, kGLOrthoRotate, kGLOrthoDolly, kSceneUpdate,
-      kSceneUpdateAll, kSummaryUpdate
+      kSceneUpdateAll
     };
 
   private:
@@ -157,8 +88,6 @@ namespace Belle2 {
     TGSplitFrame*          fSplitFrame;    /**< main (first) split frame */
     TGLEmbeddedViewer*     fGLViewer[3];   /**< GL viewers */
     TGLEmbeddedViewer*     fActViewer;     /**< active GL viewer */
-    //static HtmlSummary*    fgHtmlSummary;  /** summary HTML table */
-    //static TGHtml*         fgHtml;
     TGMenuBar*             fMenuBar;       /**< main menu bar */
     TGPopupMenu*           fMenuFile;      /**< 'File' popup menu */
     TGPopupMenu*           fMenuHelp;      /**< 'Help' popup menu */

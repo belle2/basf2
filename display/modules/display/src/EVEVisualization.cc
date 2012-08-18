@@ -18,7 +18,6 @@
    along with GENFIT.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <display/modules/display/EVEVisualization.h>
-#include <display/modules/display/SplitGLView.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/core/Environment.h>
@@ -43,17 +42,13 @@
 #include <TEveGeoNode.h>
 #include <TEveGeoShape.h>
 #include <TEveGeoShapeExtract.h>
-#include <TEveProjectionAxes.h>
 #include <TEveScene.h>
 #include <TEvePointSet.h>
 #include <TEveProjectionManager.h>
 #include <TEveStraightLineSet.h>
-#include <TEveViewer.h>
 #include <TEveTrack.h>
 #include <TEveTrackPropagator.h>
 #include <TFile.h>
-#include <TGFileDialog.h>
-#include <TGLViewer.h>
 #include <TGeoEltu.h>
 #include <TGeoManager.h>
 #include <TGeoMatrix.h>
@@ -68,9 +63,9 @@
 #include <TSystem.h>
 #include <TVector2.h>
 #include <TVectorD.h>
-#include "TGeoManager.h"
 
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include <assert.h>
 #include <cmath>
@@ -224,7 +219,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
   // finished parsing the option string -------------------------------------------------------------
 
   //copy original track
-  GFTrack* track = new GFTrack(*gftrack);
+  boost::scoped_ptr<GFTrack> track(new GFTrack(*gftrack));
 
   const int irep = 0;
   GFAbsTrackRep* rep = track->getTrackRep(irep);
@@ -265,7 +260,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
       TMatrixT<double> state;
       TMatrixT<double> cov;
       TMatrixT<double> auxInfo;
-      GFTools::getSmoothedData(track, irep, j, state, cov, plane, auxInfo);
+      GFTools::getSmoothedData(track.get(), irep, j, state, cov, plane, auxInfo);
       rep->setData(state, plane, &cov, &auxInfo);
     } else {
       try {
@@ -576,7 +571,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
         else
           gEve->AddElement(det_shape);
       }
-      // finished drawing wire hits -----------------------------------------------------
+      // finished drawing planar hits -----------------------------------------------------
     }
   }
 
@@ -591,8 +586,6 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
   if (track_lines) {
     m_gftracklist->AddElement(track_lines);
   }
-
-  delete track;
 }
 
 
@@ -662,11 +655,6 @@ void EVEVisualization::addSimHit(const TVector3& v, const MCParticle* particle)
   } else {
     points->SetNextPoint(v.x(), v.y(), v.z());
   }
-  /*
-  TEvePathMarkD refMark(TEvePathMarkD::kDaughter); //doesn't need momentum
-  refMark.fV.Set(v);
-  addMCParticle(particle)->AddPathMark(refMark);
-  */
 }
 
 void EVEVisualization::addECLHit(const HitECL* hit)

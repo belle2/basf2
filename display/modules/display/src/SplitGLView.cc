@@ -23,202 +23,9 @@ const char* rcfiletypes[] = {
 };
 
 
-//ClassImp(HtmlObjTable)
-//ClassImp(HtmlSummary)
 ClassImp(SplitGLView)
 
 
-//HtmlSummary* SplitGLView::fgHtmlSummary = 0;
-//TGHtml* SplitGLView::fgHtml = 0;
-
-
-/*
-HtmlObjTable::HtmlObjTable(const char* name, Int_t nfields, Int_t nvals, Bool_t exp) :
-  fName(name), fNValues(nvals), fNFields(nfields), fExpand(exp)
-{
-  // Constructor.
-
-  fValues = new TArrayF[fNFields];
-  for (int i = 0; i < fNFields; i++)
-    fValues[i].Set(nvals);
-  fLabels = new TString[fNFields];
-}
-
-HtmlObjTable::~HtmlObjTable()
-{
-  // Destructor.
-
-  delete [] fValues;
-  delete [] fLabels;
-}
-
-void HtmlObjTable::Build()
-{
-  // Build HTML code.
-
-  fHtml = "<table width=100% border=1 cellspacing=0 cellpadding=0 bgcolor=f0f0f0> ",
-
-  BuildTitle();
-  if (fExpand && (fNFields > 0) && (fNValues > 0)) {
-    BuildLabels();
-    BuildTable();
-  }
-
-  fHtml += "</table>";
-}
-
-void HtmlObjTable::BuildTitle()
-{
-  // Build table title.
-
-  fHtml += "<tr><td colspan=";
-  fHtml += Form("%d>", fNFields + 1);
-  fHtml += "<table width=100% border=0 cellspacing=2 cellpadding=0 bgcolor=6e6ea0>";
-  fHtml += "<tr><td align=left>";
-  fHtml += "<font face=Verdana size=3 color=ffffff><b><i>";
-  fHtml += fName;
-  fHtml += "</i></b></font></td>";
-  fHtml += "<td>";
-  fHtml += "<td align=right> ";
-  fHtml += "<font face=Verdana size=3 color=ffffff><b><i>";
-  fHtml += Form("Size = %d", fNValues);
-  fHtml += "</i></b></font></td></tr>";
-  fHtml += "</table>";
-  fHtml += "</td></tr>";
-}
-
-void HtmlObjTable::BuildLabels()
-{
-  // Build table labels.
-
-  Int_t i;
-  fHtml += "<tr bgcolor=c0c0ff>";
-  fHtml += "<th> </th>"; // for the check boxes
-  for (i = 0; i < fNFields; i++) {
-    fHtml += "<th> ";
-    fHtml += fLabels[i];
-    fHtml += " </th>"; // for the check boxes
-  }
-  fHtml += "</tr>";
-}
-
-void HtmlObjTable::BuildTable()
-{
-  // Build part of table with values.
-
-  for (int i = 0; i < fNValues; i++) {
-    if (i % 2)
-      fHtml += "<tr bgcolor=e0e0ff>";
-    else
-      fHtml += "<tr bgcolor=ffffff>";
-
-    TString name = fName;
-    name.ReplaceAll(" ", "_");
-    // checkboxes
-    fHtml += "<td bgcolor=d0d0ff align=\"center\">";
-    fHtml += "<input type=\"checkbox\" name=\"";
-    fHtml += name;
-    fHtml += Form("[%d]\">", i);
-    fHtml += "</td>";
-
-    for (int j = 0; j < fNFields; j++) {
-      fHtml += "<td width=";
-      fHtml += Form("%d%%", 100 / fNFields);
-      fHtml += " align=\"center\"";
-      fHtml += ">";
-      fHtml += Form("%1.4f", fValues[j][i]);
-      fHtml += "</td>";
-    }
-    fHtml += "</tr> ";
-  }
-}
-
-HtmlSummary::HtmlSummary(const char* title) : fNTables(0), fTitle(title)
-{
-  // Constructor.
-
-  fObjTables = new TOrdCollection();
-}
-
-HtmlSummary::~HtmlSummary()
-{
-  // Destructor.
-
-  Reset();
-}
-
-HtmlObjTable* HtmlSummary::AddTable(const char* name, Int_t nfields, Int_t nvals,
-                                    Bool_t exp, Option_t* option)
-{
-  // Add a new table in our list of tables.
-
-  TString opt = option;
-  opt.ToLower();
-  HtmlObjTable* table = new HtmlObjTable(name, nfields, nvals, exp);
-  fNTables++;
-  if (opt.Contains("first"))
-    fObjTables->AddFirst(table);
-  else
-    fObjTables->Add(table);
-  return table;
-}
-
-void HtmlSummary::Clear(Option_t* option)
-{
-  // Clear the table list.
-
-  if (option && option[0] == 'D')
-    fObjTables->Delete(option);
-  else
-    fObjTables->Clear(option);
-  fNTables = 0;
-}
-
-void HtmlSummary::Reset(Option_t*)
-{
-  // Reset (delete) the table list;
-
-  delete fObjTables; fObjTables = 0;
-  fNTables = 0;
-}
-
-void HtmlSummary::Build()
-{
-  // Build the summary.
-
-  MakeHeader();
-  for (int i = 0; i < fNTables; i++) {
-    GetTable(i)->Build();
-    fHtml += GetTable(i)->Html();
-  }
-  MakeFooter();
-}
-
-void HtmlSummary::MakeHeader()
-{
-  // Make HTML header.
-
-  fHeader  = "<html><head><title>";
-  fHeader += fTitle;
-  fHeader += "</title></head><body>";
-  fHeader += "<center><h2><font color=#2222ee><i>";
-  fHeader += fTitle;
-  fHeader += "</i></font></h2></center>";
-  fHtml    = fHeader;
-}
-
-void HtmlSummary::MakeFooter()
-{
-  // Make HTML footer.
-
-  fFooter  = "<br><p><br><center><strong><font size=2 color=#2222ee>";
-  fFooter += "Example of using Html widget to display tabular data";
-  fFooter += "<br>";
-  fFooter += "(c) 2007-2010 Bertrand Bellenot";
-  fFooter += "</font></strong></center></body></html>";
-  fHtml   += fFooter;
-}
-*/
 
 SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
   TGMainFrame(p, w, h), fActViewer(0)
@@ -227,10 +34,6 @@ SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
 
   // create the "file" popup menu
   fMenuFile = new TGPopupMenu(gClient->GetRoot());
-  //fMenuFile->AddEntry("&Open...", kFileOpen);
-  //fMenuFile->AddSeparator();
-  fMenuFile->AddEntry("&Update Summary", kSummaryUpdate);
-  fMenuFile->AddSeparator();
   fMenuFile->AddEntry("E&xit", kFileExit);
 
   // create the "camera" popup menu
@@ -374,29 +177,6 @@ SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
       }
     }
 
-    /*
-    TGHorizontalFrame* hfrm;
-    TGDockableFrame* dfrm;
-    TGPictureButton* button;
-
-    // get bottom right split frame
-    frm = fSplitFrame->GetSecond()->GetSecond()->GetSecond();
-    frm->SetName("Bottom_Right");
-
-    dfrm = new TGDockableFrame(frm);
-    dfrm->SetFixedSize(kFALSE);
-    dfrm->EnableHide(kFALSE);
-    hfrm = new TGHorizontalFrame(dfrm);
-    button = new TGPictureButton(hfrm, gClient->GetPicture("swap.png"));
-    button->SetToolTipText("Swap to big view");
-    hfrm->AddFrame(button);
-    button->Connect("Clicked()", "Belle2::SplitGLView", this, "SwapToMainView(TGLViewerBase*=0)");
-    fgHtmlSummary = new HtmlSummary("Belle2 Event Display Summary Table");
-    fgHtml = new TGHtml(hfrm, 100, 100, -1);
-    hfrm->AddFrame(fgHtml, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
-    dfrm->AddFrame(hfrm, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
-    frm->AddFrame(dfrm, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
-    */
   }
 
   if (gEve) {
@@ -440,19 +220,6 @@ void SplitGLView::HandleMenu(Int_t id)
 
   switch (id) {
 
-    case kFileOpen: {
-      static TString dir(".");
-      TGFileInfo fi;
-      fi.fFileTypes = filetypes;
-      fi.fIniDir    = StrDup(dir);
-      new TGFileDialog(gClient->GetRoot(), this, kFDOpen, &fi);
-      if (fi.fFilename)
-        OpenFile(fi.fFilename);
-      dir = fi.fIniDir;
-    }
-    break;
-
-
     case kFileExit:
       CloseWindow();
       break;
@@ -491,18 +258,12 @@ void SplitGLView::HandleMenu(Int_t id)
     case kSceneUpdate:
       if (fActViewer)
         fActViewer->UpdateScene();
-      UpdateSummary();
       break;
 
     case kSceneUpdateAll:
       for (int i = 0; i < 3; i++)
         fGLViewer[i]->UpdateScene();
 
-      UpdateSummary();
-      break;
-
-    case kSummaryUpdate:
-      UpdateSummary();
       break;
 
     case kHelpAbout: {
@@ -574,7 +335,7 @@ void SplitGLView::OnViewerActivated()
   fActViewer = dynamic_cast<TGLEmbeddedViewer*>(static_cast<TQObject*>(gTQSender));
 
   if (fActViewer == 0) {
-    printf("dyncast failed ...\n");
+    B2WARNING("OnViewerActivated() signal not from a TGLEmbeddedViewer?");
     return;
   }
 
@@ -596,33 +357,6 @@ void SplitGLView::OnViewerActivated()
     fMenuCamera->CheckEntry(kGLOrthoRotate);
   else
     fMenuCamera->UnCheckEntry(kGLOrthoRotate);
-}
-
-void SplitGLView::OpenFile(const char* fname)
-{
-  TString filename = fname;
-  // check if the file type is correct
-  if (!filename.EndsWith(".root")) {
-    new TGMsgBox(gClient->GetRoot(), this, "OpenFile",
-                 Form("The file \"%s\" is not a root file!", fname),
-                 kMBIconExclamation, kMBOk);
-    return;
-  }
-  // check if the root file contains a geometry
-  if (TGeoManager::Import(fname) == 0) {
-    new TGMsgBox(gClient->GetRoot(), this, "OpenFile",
-                 Form("The file \"%s\" does't contain a geometry", fname),
-                 kMBIconExclamation, kMBOk);
-    return;
-  }
-  gGeoManager->DefaultColors();
-  // delete previous primitives (if any)
-  fPad->GetListOfPrimitives()->Delete();
-  // and add the geometry to eve pad (container)
-  fPad->GetListOfPrimitives()->Add(gGeoManager->GetTopVolume());
-  // paint the geometry in each GL viewer
-  for (int i = 0; i < 3; i++)
-    fGLViewer[i]->PadPaint(fPad);
 }
 
 void SplitGLView::ToggleOrthoRotate()
@@ -691,8 +425,8 @@ void SplitGLView::SwapToMainView(TGLViewerBase* viewer)
   } else {
     TGCompositeFrame* src = ((TGLEmbeddedViewer*)viewer)->GetFrame();
     if (!src) return;
-    TGLOverlayButton* but = (TGLOverlayButton*)((TQObject*)gTQSender);
-    but->ResetState();
+    //TGLOverlayButton* but = (TGLOverlayButton*)((TQObject*)gTQSender);
+    //but->ResetState();
     parent = (TGCompositeFrame*)src->GetParent();
   }
   if (parent && parent->InheritsFrom("TGSplitFrame"))
@@ -705,69 +439,9 @@ void SplitGLView::UnDock(TGLViewerBase* viewer)
 
   TGCompositeFrame* src = ((TGLEmbeddedViewer*)viewer)->GetFrame();
   if (!src) return;
-  TGLOverlayButton* but = (TGLOverlayButton*)((TQObject*)gTQSender);
-  but->ResetState();
+  //TGLOverlayButton* but = (TGLOverlayButton*)((TQObject*)gTQSender);
+  //but->ResetState();
   TGCompositeFrame* parent = (TGCompositeFrame*)src->GetParent();
   if (parent && parent->InheritsFrom("TGSplitFrame"))
     ((TGSplitFrame*)parent)->ExtractFrame();
-}
-
-void SplitGLView::UpdateSummary()
-{
-  /*
-  // Update summary of current event.
-
-  TEveElement::List_i i;
-  TEveElement::List_i j;
-  Int_t k;
-  TEveElement* el;
-  HtmlObjTable* table;
-  TEveEventManager* mgr = gEve ? gEve->GetCurrentEvent() : 0;
-  if (mgr) {
-  fgHtmlSummary->Clear("D");
-  for (i = mgr->BeginChildren(); i != mgr->EndChildren(); ++i) {
-    el = ((TEveElement*)(*i));
-    if (el->IsA() == TEvePointSet::Class()) {
-      TEvePointSet* ps = (TEvePointSet*)el;
-      TString ename  = ps->GetElementName();
-      TString etitle = ps->GetElementTitle();
-      if (ename.First('\'') != kNPOS)
-        ename.Remove(ename.First('\''));
-      etitle.Remove(0, 2);
-      Int_t nel = atoi(etitle.Data());
-      table = fgHtmlSummary->AddTable(ename, 0, nel);
-    } else if (el->IsA() == TEveTrackList::Class()) {
-      TEveTrackList* tracks = (TEveTrackList*)el;
-      TString ename  = tracks->GetElementName();
-      if (ename.First('\'') != kNPOS)
-        ename.Remove(ename.First('\''));
-      table = fgHtmlSummary->AddTable(ename.Data(), 5,
-                                      tracks->NumChildren(), kTRUE, "first");
-      table->SetLabel(0, "Momentum");
-      table->SetLabel(1, "P_t");
-      table->SetLabel(2, "Phi");
-      table->SetLabel(3, "Theta");
-      table->SetLabel(4, "Eta");
-      k = 0;
-      for (j = tracks->BeginChildren(); j != tracks->EndChildren(); ++j) {
-        Float_t p     = ((TEveTrack*)(*j))->GetMomentum().Mag();
-        table->SetValue(0, k, p);
-        Float_t pt    = ((TEveTrack*)(*j))->GetMomentum().Perp();
-        table->SetValue(1, k, pt);
-        Float_t phi   = ((TEveTrack*)(*j))->GetMomentum().Phi();
-        table->SetValue(2, k, phi);
-        Float_t theta = ((TEveTrack*)(*j))->GetMomentum().Theta();
-        table->SetValue(3, k, theta);
-        Float_t eta   = ((TEveTrack*)(*j))->GetMomentum().Eta();
-        table->SetValue(4, k, eta);
-        ++k;
-      }
-    }
-  }
-  fgHtmlSummary->Build();
-  fgHtml->Clear();
-  fgHtml->ParseText((char*)fgHtmlSummary->Html().Data());
-  fgHtml->Layout();
-  }
-  */
 }

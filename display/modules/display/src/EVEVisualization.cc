@@ -300,7 +300,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
     bool wire_hit = false;
     double_t hit_u = 0;
     double_t hit_v = 0;
-    double_t plane_size = 4;
+    const float plane_size = 4.0;
     double_t hit_res_u = 0.5;
     //double_t hit_res_v = 0.5; //not actually used
 
@@ -320,17 +320,14 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
       }
     } else if (hit_type == "GFSpacepointHitPolicy") {
       space_hit = true;
-      plane_size = 4;
     } else if (hit_type == "GFWireHitPolicy") {
       wire_hit = true;
       hit_u = hit_coords(0, 0);
-      plane_size = 4;
     } else {
       B2WARNING("Hit " << j << ": Unknown policy name: skipping hit!");
       break;
     }
 
-    if (plane_size < 4) plane_size = 4;
     // finished setting variables ---------------------------------------------------------
 
     // draw track if corresponding option is set ------------------------------------------
@@ -422,7 +419,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
         TVector2 plane_coords = plane.LabToPlane(plane_pos);
         if (!planar_pixel_hit) {
           TEveBox* hit_box;
-          hit_box = boxCreator((plane_pos + (plane_coords.Px() - hit_u) * u), u, v, m_errorScale * std::sqrt(hit_res_u), plane_size, 0.0105);
+          hit_box = boxCreator((plane_pos + (plane_coords.Px() - hit_u) * u), u, v, (float)(m_errorScale * std::sqrt(hit_res_u)), plane_size, 0.0105);
           hit_box->SetMainColor(kYellow);
           hit_box->SetMainTransparency(0);
           if (track_lines)
@@ -676,12 +673,12 @@ void EVEVisualization::addECLHit(const HitECL* hit)
 {
   const int cell = hit->getCellId();
   const TVector3& pos = ECL::ECLGeometryPar::Instance()->GetCrystalPos(cell);
-  const float eta = pos.Eta();
-  const float phi = pos.Phi();
+  const float eta = (float)pos.Eta();
+  const float phi = (float)pos.Phi();
   //maybe these should depend on position?
   //crystals are ~6 by 6 cm in crossection
-  const static float dEta = 0.02;
-  const static float dPhi = 0.02;
+  static const float dEta = 0.02;
+  static const float dPhi = 0.02;
 
   m_eclsimhitdata->AddTower(eta - dEta, eta + dEta, phi - dPhi, phi + dPhi);
   m_eclsimhitdata->FillSlice(0, hit->getEnergyDep());
@@ -699,7 +696,7 @@ TEveTrack* EVEVisualization::addMCParticle(const MCParticle* particle)
     const TVector3& vertex = particle->getProductionVertex();
     int pdg = particle->getPDG();
     //TODO: remove this workaround once a fix is in the externals
-    const static bool unknown_pdg_is_unsafe = gROOT->GetVersionInt() <= 53401;
+    static const bool unknown_pdg_is_unsafe = gROOT->GetVersionInt() <= 53401;
     bool workaround_active = false;
     if (unknown_pdg_is_unsafe) {
       switch (abs(pdg)) {
@@ -713,7 +710,7 @@ TEveTrack* EVEVisualization::addMCParticle(const MCParticle* particle)
         default:
           workaround_active = true;
           //let TEveTrack pretend it's something safe.
-          if (particle->getCharge() == 0)
+          if (TMath::Nint(particle->getCharge()) == 0)
             pdg = 22;
           else
             pdg = (particle->getCharge() > 0) ? -11 : 11;
@@ -734,7 +731,7 @@ TEveTrack* EVEVisualization::addMCParticle(const MCParticle* particle)
 
     //neutrals and very short-lived particles should stop somewhere
     //(can result in wrong shapes for particles stopped in the detector, so not used there)
-    if (particle->getCharge() == 0 or !particle->hasStatus(MCParticle::c_StoppedInDetector)) {
+    if (TMath::Nint(particle->getCharge()) == 0 or !particle->hasStatus(MCParticle::c_StoppedInDetector)) {
       TEvePathMarkD decayMark(TEvePathMarkD::kDecay);
       decayMark.fV.Set(particle->getDecayVertex());
       m_mcparticleTracks[particle]->AddPathMark(decayMark);

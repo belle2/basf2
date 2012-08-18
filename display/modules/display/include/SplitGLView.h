@@ -144,6 +144,7 @@ namespace Belle2 {
     /** return TGLViewer that is active right now. */
     TGLViewer* getActiveGLViewer() const { return fActViewer; }
 
+    /** Which menu command was selected? */
     enum EMyCommands {
       kFileOpen, kFileExit, kFileLoadConfig, kFileSaveConfig,
       kHelpAbout, kGLPerspYOZ, kGLPerspXOZ, kGLPerspXOY, kGLXOY,

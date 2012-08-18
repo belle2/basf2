@@ -80,7 +80,7 @@ void DisplayUI::updateUI()
   m_nextButton->SetEnabled((m_currentEntry + 1 < numEntries) or !InputController::canControlInput());
   if (m_currentEntry != m_eventNumberWidget->GetIntNumber())
     m_eventNumberWidget->SetIntNumber(m_currentEntry);
-  StoreObjPtr<EventMetaData> eventMetaData("", DataStore::c_Event, false);
+  StoreObjPtr<EventMetaData> eventMetaData;
   m_eventLabel->SetTextColor(gROOT->GetColor(kBlack));
   if (!eventMetaData) {
     m_eventLabel->SetText("No EventMetaData object available.");
@@ -138,7 +138,7 @@ void DisplayUI::goToEventWidget()
 
 void DisplayUI::showJumpToEventDialog()
 {
-  StoreObjPtr<EventMetaData> eventMetaData("", DataStore::c_Event, false);
+  StoreObjPtr<EventMetaData> eventMetaData;
   if (!eventMetaData)
     return; //this should not actually happen.
 

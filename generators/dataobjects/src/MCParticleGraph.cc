@@ -203,6 +203,7 @@ void MCParticleGraph::generateList(const string& name, int options)
 {
   //Check if we can create MCParticles
   StoreArray<MCParticle> MCParticles(name);
+  if (!MCParticles) MCParticles.create();
   if (!MCParticles) {
     B2FATAL("MCParticle Collection is not valid, unable to create List of MCParticles");
     return;

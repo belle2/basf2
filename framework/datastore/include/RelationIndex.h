@@ -126,7 +126,7 @@ namespace Belle2 {
      */
     RelationIndex(const StoreArray<FROM> &from, const StoreArray<TO> &to, const std::string& name = "",
                   DataStore::EDurability durability = DataStore::c_Event):
-      m_index(RelationIndexManager::get<FROM, TO>(RelationArray(from, to, name, durability, false))),
+      m_index(RelationIndexManager::get<FROM, TO>(RelationArray(from, to, name, durability))),
       m_from(m_index.index().template get<FROM>()),
       m_to(m_index.index().template get<TO>()) {}
 

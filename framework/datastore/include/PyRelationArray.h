@@ -37,7 +37,7 @@ namespace Belle2 {
 
     /** returns number of relations */
     int getEntries() const {
-      return isValid() ? m_relations.getEntries() : 0;
+      return isValid() ? (*m_relations)->getEntries() : 0;
     }
 
     /** returns true if the associated RelationArray exists, false otherwise.
@@ -45,7 +45,7 @@ namespace Belle2 {
      * Note that getEntries() and getToIndices() are safe even for invalid
      * arrays.
      */
-    bool isValid() const { return (bool)m_relations; }
+    bool isValid() const { return m_relations && *m_relations; }
 
     /** returns a vector of 'to' indices corresponding to the given 'from' index, or an empty list if 'from' cannot be found.
      *
@@ -57,11 +57,11 @@ namespace Belle2 {
      *
      * @param i Index, should be in range [0, getEntries()-1]
      */
-    const RelationElement& operator [](int i) const { return m_relations[i];}
+    const RelationElement& operator [](int i) const { return (*m_relations)->elements(i);}
 
   private:
     /** wrapped object */
-    RelationArray m_relations;
+    RelationContainer** m_relations;
 
     /** maps from-index to to-indices */
     std::map<unsigned int, std::vector<unsigned int> > m_toindicesMap;

@@ -80,13 +80,14 @@ void SimpleInputModule::initialize()
     m_inputFileName = inputFileArgument;
 
   //Open TFile
+  TDirectory* dir = gDirectory;
   m_file = new TFile(m_inputFileName.c_str(), "READ");
+  dir->cd();
   if (!m_file or !m_file->IsOpen()) {
     B2FATAL("Couldn't open input file " + m_inputFileName);
     return;
   }
   B2INFO("Opened file " + m_inputFileName);
-  m_file->cd();
 
   for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
     if (m_treeNames[ii] == "NONE")
@@ -113,20 +114,42 @@ void SimpleInputModule::initialize()
     }
     B2INFO("Opened tree " + m_treeNames[ii]);
 
-    //Go over the branchlist and connect the branches with TObject pointers
-    for (int jj = 0; jj < m_tree[ii]->GetNbranches(); jj++) {
-      TBranch* branch = validBranch(jj, (DataStore::EDurability)ii);
-      if (branch) {
-        TObject* objectPtr = 0;
-        branch->SetAddress(&objectPtr);
+    const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(ii));
 
-        const string objectName = static_cast<string>(branch->GetName());
-        if (static_cast<string>(branch->GetClassName()) == "TClonesArray") {
-          DataStore::Instance().storeArray(static_cast<TClonesArray*>(objectPtr), objectName, (DataStore::EDurability)ii);
-        } else {
-          DataStore::Instance().storeObject(objectPtr, objectName, (DataStore::EDurability)ii);
-        }
+    //Go over the branchlist and connect the branches with DataStore entries
+    const TObjArray* branches = m_tree[ii]->GetListOfBranches();
+    for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
+      TBranch* branch = static_cast<TBranch*>(branches->At(jj));
+      if (!branch) continue;
+      const std::string branchName = branch->GetName();
+      //skip excluded branches, and branches not in m_branchNames (if it is not empty)
+      if (binary_search(m_excludeBranchNames[ii].begin(), m_excludeBranchNames[ii].end(), branchName) ||
+          (!m_branchNames[ii].empty() && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName))) {
+        continue;
+      }
+
+      //Get information about the object in the branch
+      TObject* objectPtr = 0;
+      branch->SetAddress(&objectPtr);
+      bool array = (static_cast<string>(branch->GetClassName()) == "TClonesArray");
+      TClass* objClass = objectPtr->IsA();
+      if (array) {
+        objClass = (static_cast<TClonesArray*>(objectPtr))->GetClass();
+      }
+
+      //Create a DataStore entry and connect the branch address to it
+      if (!DataStore::Instance().createEntry(branchName, (DataStore::EDurability)ii, objClass, array, false, true)) {
+        branch->SetStatus(0);
+        continue;
+      }
+      DataStore::StoreEntry* entry = (map.find(branchName))->second;
+      branch->SetAddress(&(entry->object));
+      m_entries[ii].push_back(entry);
+
+      //Read the persistent objects
+      if (ii == DataStore::c_Persistent) {
         branch->GetEntry(0);
+        entry->ptr = entry->object;
       }
     }
   }
@@ -134,7 +157,6 @@ void SimpleInputModule::initialize()
     InputController::setCanControlInput(true);
     InputController::setNumEntries(m_tree[DataStore::c_Event]->GetEntries());
   }
-  m_firstEntryLoaded = true;
 }
 
 
@@ -172,7 +194,6 @@ void SimpleInputModule::event()
 
   readTree(DataStore::c_Event);
   m_counterNumber[DataStore::c_Event]++;
-  m_firstEntryLoaded = false; //only used in first event() call
 }
 
 
@@ -189,47 +210,13 @@ void SimpleInputModule::readTree(DataStore::EDurability durability)
 
   // Check if there are still new entries available.
   B2DEBUG(200, "Durability" << durability)
-  if (m_counterNumber[durability] == 0 && m_firstEntryLoaded) return; //first entry is read in initialize()
   if (m_counterNumber[durability] >= m_tree[durability]->GetEntriesFast()) return;
 
-
-  //Go again over the branchlist and connect the branches with TObject pointers
-  for (int jj = 0; jj < m_tree[durability]->GetNbranches(); jj++) {
-    TBranch* branch = validBranch(jj, durability);
-    if (branch) {
-      if (static_cast<string>(branch->GetClassName()) != "TClonesArray") {
-        TObject* objectPtr = 0;
-        branch->SetAddress(&objectPtr);
-        DataStore::Instance().storeObject(objectPtr, static_cast<string>(branch->GetName()), durability);
-      }
-
-      //this will also (re)fill the TClonesArrays in the DataStore, we don't need to reassign any pointers
-      branch->GetEntry(m_counterNumber[durability]);
-    }
+  m_tree[durability]->GetEntry(m_counterNumber[durability]);
+  for (unsigned int i = 0; i < m_entries[durability].size(); i++) {
+    DataStore::StoreEntry* entry = m_entries[durability][i];
+    entry->ptr = entry->object;
   }
-}
-
-TBranch* SimpleInputModule::validBranch(int ibranch, DataStore::EDurability durability) const
-{
-  const TObjArray* branches = m_tree[durability]->GetListOfBranches();
-  TBranch* branch = static_cast<TBranch*>(branches->At(ibranch));
-  if (!branch) {
-    return 0;
-  }
-
-  //check if branch is in exclusion list
-  if (binary_search(m_excludeBranchNames[durability].begin(), m_excludeBranchNames[durability].end(), branch->GetName()))
-    return 0;
-
-  // an empty branch list will cause all branches to be accepted
-  if (m_branchNames[durability].size() == 0)
-    return branch;
-
-  // check if the branch is in the corresponding branch list
-  if (binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), branch->GetName()))
-    return branch;
-
-  return 0; //not found
 }
 
 bool SimpleInputModule::makeBranchNamesUnique(std::vector<std::string> &stringlist) const

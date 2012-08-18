@@ -50,8 +50,6 @@ namespace Belle2 {
    *
    *  As with other data store objects, you should register relations you want
    *  to store in your implementation of Module::initialize().
-   *  Just create a RelationArray of the appropriate type (as in the first line
-   *  of the example above).
    *
    *
    *  \sa RelationIndex provides a convenient interface to finding objects
@@ -59,7 +57,7 @@ namespace Belle2 {
    *  \sa The on-disk data structure is provided by RelationElement objects
    *      in a RelationContainer.
    */
-  class RelationArray: public StoreObjPtr<RelationContainer> {
+  class RelationArray: public StoreAccessorBase {
   public:
 
     /** Typedef to simplify use of correct index_type */
@@ -125,6 +123,83 @@ namespace Belle2 {
       VecType& m_replace;
     };
 
+    /** Register a relation array, that should be written to the output by default, in the data store.
+     *  This must be called in the initialzation phase.
+     *
+     *  @param name        Name under which the TClonesArray is stored.
+     *  @param durability  Specifies lifetime of array in question.
+     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
+     *  @return            True if the registration succeeded.
+     */
+    static bool registerPersistent(const std::string& name, DataStore::EDurability durability = DataStore::c_Event,
+                                   bool errorIfExisting = true) {
+      return DataStore::Instance().createEntry(name, durability, RelationContainer::Class(), false, false, errorIfExisting);
+    }
+
+    /** Register a relation array, that should not be written to the output by default, in the data store.
+     *  This must be called in the initialzation phase.
+     *
+     *  @param name        Name under which the TClonesArray is stored.
+     *  @param durability  Specifies lifetime of array in question.
+     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
+     *  @return            True if the registration succeeded.
+     */
+    static bool registerTransient(const std::string& name, DataStore::EDurability durability = DataStore::c_Event,
+                                  bool errorIfExisting = true) {
+      return DataStore::Instance().createEntry(name, durability, RelationContainer::Class(), false, true, errorIfExisting);
+    }
+
+    /** Check whether a relation array was registered before.
+     *
+     *  It will cause an error if the object does not exist.
+     *  This must be called in the initialzation phase.
+     *
+     *  @param name        Name under which the relation array is stored.
+     *  @param durability  Specifies lifetime of relation array in question.
+     *  @return            True if the object exists.
+     */
+    static bool required(const std::string& name, DataStore::EDurability durability = DataStore::c_Event) {
+      if (!DataStore::Instance().hasEntry(name, durability, RelationContainer::Class(), false)) {
+        B2ERROR("The required relation array with name " << name << " and durability " << durability << " does not exists.");
+        return false;
+      }
+      return true;
+    }
+
+    /** Create an empty relation array in the data store.
+     *
+     *  @param from      StoreArray the relation points from
+     *  @param to        StoreArray the relation points to
+     *  @param replace   Should an existing object be replaced?
+     *  @return          True if the creation succeeded.
+     **/
+    template <class FROM, class TO> bool create(const StoreArray<FROM>& from, const StoreArray<TO>& to, bool replace = false) {
+      const AccessorParams& accessorFrom = from.getAccessorParams();
+      const AccessorParams& accessorTo   = to.getAccessorParams();
+
+      if (accessorFrom.second > m_durability || accessorTo.second > m_durability) {
+        B2FATAL("Tried to create Relation '" << m_name
+                << "' with a durability larger than the StoreArrays it relates");
+      }
+
+      bool result = DataStore::Instance().createObject(0, replace, m_name, m_durability, RelationContainer::Class(), false);
+      if (result) {
+        (*m_relations)->setFromName(accessorFrom.first);
+        (*m_relations)->setFromDurability(accessorFrom.second);
+        (*m_relations)->setToName(accessorTo.first);
+        (*m_relations)->setToDurability(accessorTo.second);
+        if (!from) {
+          B2WARNING("DATASTORE BACKWARD COMPATIBILITY ISSUE: You have to *create* the array '" << accessorFrom.first << "' before you can use it!");
+          const_cast<StoreArray<FROM>&>(from).create();
+        }
+        if (!to) {
+          B2WARNING("DATASTORE BACKWARD COMPATIBILITY ISSUE: You have to *create* the array '" << accessorTo.first << "' before you can use it!");
+          const_cast<StoreArray<TO>&>(to).create();
+        }
+      }
+      return result;
+    };
+
     /** Constructor which takes both store arrays and performs some sanity checks on the relation.
      *
      *  If the relation already exists it will be checked that the relation
@@ -139,30 +214,15 @@ namespace Belle2 {
      *                   error is raised
      */
     template <class FROM, class TO> RelationArray(const StoreArray<FROM>& from, const StoreArray<TO>& to, std::string name = "",
-                                                  const DataStore::EDurability& durability = DataStore::c_Event, bool generate = true):
-      StoreObjPtr<RelationContainer>(0) {
-      const AccessorParams& accessorFrom = from.getAccessorParams();
-      const AccessorParams& accessorTo   = to.getAccessorParams();
-
-      if (name == "") name = DataStore::relationName(accessorFrom.first, accessorTo.first);
-      if (accessorFrom.second > durability || accessorTo.second > durability) {
-        B2FATAL("Tried to create Relation '" << name
-                << "' with a durability larger than the StoreArrays it relates");
-      }
-
-      if (assignObject(name, durability, generate)) {
-        m_storeObjPtr->setFromName(accessorFrom.first);
-        m_storeObjPtr->setFromDurability(accessorFrom.second);
-        m_storeObjPtr->setToName(accessorTo.first);
-        m_storeObjPtr->setToDurability(accessorTo.second);
+                                                  const DataStore::EDurability& durability = DataStore::c_Event):
+      StoreAccessorBase((name == "") ? DataStore::relationName(from.getName(), to.getName()) : name, durability) {
+      DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, RelationContainer::Class(), false);
+      m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(m_name, m_durability, RelationContainer::Class(), false));
+      if (!*m_relations) {
+        create(from, to);
       } else {
-        if (!m_storeObjPtr or m_storeObjPtr->isDefaultConstructed()) {
-          m_storeObjPtr = 0; //make sure array is marked as invalid
-          B2ERROR("Could not find relation with name " << name);
-          return;
-        }
-        checkRelation("from", accessorFrom, getFromAccessorParams());
-        checkRelation("to", accessorTo, getToAccessorParams());
+        checkRelation("from", from.getAccessorParams(), getFromAccessorParams());
+        checkRelation("to", to.getAccessorParams(), getToAccessorParams());
       }
     }
 
@@ -174,15 +234,14 @@ namespace Belle2 {
      *  @param name       Name of the (existing) Relation
      *  @param durability Durability of the (existing) Relation
      */
-    explicit RelationArray(const std::string& name, DataStore::EDurability durability = DataStore::c_Event): StoreObjPtr<RelationContainer>(0) {
+    explicit RelationArray(const std::string& name, DataStore::EDurability durability = DataStore::c_Event):
+      StoreAccessorBase(name, durability) {
       if (name == "") {
         B2FATAL("Cannot guess relation name, please supply correct name");
         return;
       }
-      assignObject(name, durability, false);
-      if (m_storeObjPtr and m_storeObjPtr->isDefaultConstructed()) {
-        m_storeObjPtr = 0; //make sure array is marked as invalid
-      }
+      DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, RelationContainer::Class(), false);
+      m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(m_name, m_durability, RelationContainer::Class(), false));
     }
 
     /** Constructor which accepts the AccessorParams of the relation.
@@ -193,42 +252,47 @@ namespace Belle2 {
      *  @param params     AccessorParams for the (existing) Relation
      */
     explicit RelationArray(const AccessorParams& params):
-      StoreObjPtr<RelationContainer>(0) {
+      StoreAccessorBase(params.first, params.second) {
       if (params.first == "") {
         B2FATAL("Cannot guess relation name, please supply correct name");
         return;
       }
-      assignObject(params.first, params.second, false);
-      if (m_storeObjPtr and m_storeObjPtr->isDefaultConstructed()) {
-        m_storeObjPtr = 0; //make sure array is marked as invalid
-      }
+      DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, RelationContainer::Class(), false);
+      m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(m_name, m_durability, RelationContainer::Class(), false));
     }
 
     /** Empty destructor */
     ~RelationArray() {}
 
+    /** Check whether the object was created.
+     *
+     *  @return          True if the object exists.
+     **/
+    inline bool isValid() const {return m_relations && *m_relations;}
+    inline operator bool()  const {return isValid();}   /**< Imitate pointer functionality. */
+
     /** Imitate array functionality. */
-    const RelationElement& operator[](int i) const { check(); return m_storeObjPtr->elements(i);}
+    const RelationElement& operator[](int i) const { check(); return (*m_relations)->elements(i);}
 
     /** Get the number of elements. */
-    int getEntries() const { check(); return m_storeObjPtr->getEntries(); }
+    int getEntries() const { check(); return (*m_relations)->getEntries(); }
 
     /** Return the AccessorParams the relation points from. */
-    const AccessorParams getFromAccessorParams() const { check(); return AccessorParams(m_storeObjPtr->getFromName(), (DataStore::EDurability) m_storeObjPtr->getFromDurability()); }
+    const AccessorParams getFromAccessorParams() const { check(); return AccessorParams((*m_relations)->getFromName(), (DataStore::EDurability)(*m_relations)->getFromDurability()); }
 
     /** Return the AccessorParams the relation points to. */
-    const AccessorParams getToAccessorParams()   const { check(); return AccessorParams(m_storeObjPtr->getToName(), (DataStore::EDurability) m_storeObjPtr->getToDurability()); }
+    const AccessorParams getToAccessorParams()   const { check(); return AccessorParams((*m_relations)->getToName(), (DataStore::EDurability)(*m_relations)->getToDurability()); }
 
     /** Get modified flag of underlying container. */
-    bool getModified() const { check(); return m_storeObjPtr->getModified(); }
+    bool getModified() const { check(); return (*m_relations)->getModified(); }
 
     /** Set modified flag of underlying container. */
-    void setModified(bool modified) { check(); m_storeObjPtr->setModified(modified); }
+    void setModified(bool modified) { check(); (*m_relations)->setModified(modified); }
 
     /** Clear all elements from the relation. */
     void clear() {
       setModified(true);
-      m_storeObjPtr->elements().Delete();
+      (*m_relations)->elements().Delete();
     }
 
     /** Add a new element to the relation
@@ -304,22 +368,16 @@ namespace Belle2 {
       const FunctionFrom& replaceFrom = FunctionFrom(),
       const FunctionTo& replaceTo = FunctionTo());
 
-  protected:
-
-    /** Imitate pointer functionality. */
-    const TClonesArray& operator *() const {return m_storeObjPtr->elements();};
-
-    /** Imitate pointer functionality. */
-    const TClonesArray* operator ->() const {return &m_storeObjPtr->elements();};
+  private:
 
     /** Return address where the next RelationElement should be created. */
     RelationElement* next() {
-      int index = m_storeObjPtr->elements().GetLast() + 1;
-      return static_cast<RelationElement*>(m_storeObjPtr->elements().AddrAt(index));
+      int index = (*m_relations)->elements().GetLast() + 1;
+      return static_cast<RelationElement*>((*m_relations)->elements().AddrAt(index));
     }
 
     /** check that pointer exits, otherwise bail out. */
-    void check() const { if (!m_storeObjPtr) B2FATAL("RelationArray does not point to valid StoreObject"); }
+    void check() const { if (!m_relations || !*m_relations) B2FATAL("RelationArray does not point to valid StoreObject"); }
 
     /** Check that the AccessorParams stored in the relation and the one given to the constructor are the same. */
     void checkRelation(const std::string& direction, const AccessorParams& array, const AccessorParams& rel) const {
@@ -331,12 +389,15 @@ namespace Belle2 {
       }
     }
 
+    /** Pointer that actually holds the relations. */
+    RelationContainer** m_relations;
+
   };
 
   template<class FunctionFrom, class FunctionTo>
   void RelationArray::consolidate(const FunctionFrom& replaceFrom, const FunctionTo& replaceTo)
   {
-    if (!m_storeObjPtr) {
+    if (!m_relations) {
       B2ERROR("Cannot consolidate relation if pointer to container is NULL");
       return;
     }
@@ -348,8 +409,8 @@ namespace Belle2 {
     //duplicate elements
     index_type lastFromIndex(0);
     buffer_t::iterator lastFromIter = buffer.end();
-    unsigned int nElements = m_storeObjPtr->getEntries();
-    TClonesArray& elements = m_storeObjPtr->elements();
+    unsigned int nElements = (*m_relations)->getEntries();
+    TClonesArray& elements = (*m_relations)->elements();
     for (unsigned int i = 0; i < nElements; ++i) {
       RelationElement& element = *static_cast<RelationElement*>(elements[i]);
       //Replace from index

@@ -85,9 +85,9 @@ void TxModule::event()
   int nobjs = 0;
   for (DataStore::StoreObjConstIter it = map.begin(); it != map.end(); ++it) {
     //    if ( it->second != NULL ) {
-    if (dynamic_cast<TClonesArray*>(it->second))
+    if (it->second->isArray)
       continue;
-    if (m_msghandler->add(it->second, it->first)) {
+    if (m_msghandler->add(it->second->ptr, it->first)) {
       B2INFO("Tx: adding obj " << it->first);
       nobjs++;
     }
@@ -97,9 +97,9 @@ void TxModule::event()
   int narrays = 0;
   for (DataStore::StoreObjConstIter it = map.begin(); it != map.end(); ++it) {
     //    if ( it->second != NULL ) {
-    if (dynamic_cast<TClonesArray*>(it->second) == 0)
+    if (!it->second->isArray)
       continue;
-    if (m_msghandler->add(it->second, it->first)) {
+    if (m_msghandler->add(it->second->ptr, it->first)) {
       B2INFO("Tx: adding array " << it->first);
       narrays++;
     }

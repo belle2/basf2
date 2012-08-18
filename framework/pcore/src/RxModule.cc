@@ -125,8 +125,9 @@ void RxModule::event()
   for (int i = 0; i < nobjs; i++) {
     //    TObject* obj = dynamic_cast<namelist.at(i).c_str()>objlist.at(i) );
     if (objlist.at(i) != NULL) {
-      DataStore::Instance().storeObject(objlist.at(i),
-                                        namelist.at(i));
+      DataStore::Instance().createObject(objlist.at(i), false,
+                                         namelist.at(i), DataStore::c_Event,
+                                         objlist.at(i)->Class(), false);
       //    printf ( "Rx: Restoring [Object] %s : Class=%s\n",
       //       namelist.at(i).c_str(), ((objlist.at(i))->ClassName()).c_str() );
       B2INFO("Rx: restored obj " << namelist.at(i));
@@ -147,8 +148,9 @@ void RxModule::event()
 
     //    fflush ( stdout );
     if (objlist.at(i + nobjs) != NULL) {
-      DataStore::Instance().storeArray((TClonesArray*)objlist.at(i + nobjs),
-                                       namelist.at(i + nobjs));
+      DataStore::Instance().createObject(objlist.at(i + nobjs), false,
+                                         namelist.at(i + nobjs), DataStore::c_Event,
+                                         ((TClonesArray*)objlist.at(i + nobjs))->GetClass(), true);
       B2INFO("Rx: restored array " << namelist.at(i + nobjs));
     } else {
       B2INFO("Rx: array " << namelist.at(i + nobjs) << " is Null. Omitted");

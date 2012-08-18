@@ -32,12 +32,10 @@ namespace Belle2 {
   class PyStoreObj : public TObject {
   public:
     /** constructor.
-    * @param name Name of the branch to be read/saved
+    * @param name Name of the entry to be accessed
     * @param durability 0: event, 1: run, 2: persistent
     */
-    explicit PyStoreObj(const std::string& name, int durability = 0):
-      TObject(),
-      m_storeobj(name, DataStore::EDurability(durability), false) { }
+    explicit PyStoreObj(const std::string& name, int durability = 0);
 
     ~PyStoreObj() { }
 
@@ -45,21 +43,13 @@ namespace Belle2 {
      *
      * Accessing the object's data is UNSAFE if this returns false.
      */
-    operator bool() const { return (bool)m_storeobj; }
+    operator bool() const { return m_storeObjPtr && *m_storeObjPtr; }
 
     /** Returns the attached data store object. */
-    TObject* obj() const { return &(*m_storeobj); }
-
-    /** returns the branch name */
-    std::string getName() const { return m_storeobj.getName(); }
-
-    /** Return  durability with which the object is saved in the DataStore.
-    * @return 0: event, 1: run, 2: persistent
-    */
-    int getDurability() const { return m_storeobj.getDurability(); }
+    TObject* obj() const { return *m_storeObjPtr; }
 
   private:
-    StoreObjPtr<TObject> m_storeobj; /**< wrapped object */
+    TObject** m_storeObjPtr; /**< Pointer to pointer to object */
 
     ClassDef(PyStoreObj, 0)
   };

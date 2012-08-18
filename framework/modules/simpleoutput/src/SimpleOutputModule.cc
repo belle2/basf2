@@ -51,14 +51,12 @@ SimpleOutputModule::SimpleOutputModule() : Module(), m_file(0), m_experiment(0),
   for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
     m_tree[jj] = 0;
     m_treeNames[jj] = "NONE";
-    m_size[jj] = 0;
-    m_objects[jj] = 0;
-    m_done[jj] = false;
   }
 
   //Parameter definition
   addParam("outputFileName"  , m_outputFileName, "TFile name.", string("SimpleOutput.root"));
   addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression.", 1);
+  addParam("splitLevel", m_splitLevel, "Branch split level.", 99);
 
   addParam(c_SteerTreeNames[0], m_treeNames[0], "TTree name for event data. NONE for no output.", string("tree"));
   addParam(c_SteerTreeNames[1], m_treeNames[1], "TTree name for run data. NONE for no output.", string("run"));
@@ -79,14 +77,16 @@ SimpleOutputModule::~SimpleOutputModule() { }
 
 void SimpleOutputModule::initialize()
 {
-  gSystem->Load("libdataobjects");
+  const int bufsize = 32000;
+
   //create a file level metadata object in the data store
-  StoreObjPtr<FileMetaData> fileMetaDataPtr("", DataStore::c_Persistent);
+  StoreObjPtr<FileMetaData>::registerPersistent("", DataStore::c_Persistent);
 
   const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
   if (!outputFileArgument.empty())
     m_outputFileName = outputFileArgument;
 
+  TDirectory* dir = gDirectory;
   m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
   if (m_file->IsZombie()) {
     B2FATAL("Couldn't open file '" << m_outputFileName << "' for writing!");
@@ -105,14 +105,47 @@ void SimpleOutputModule::initialize()
       }
     }
 
-    m_tree[ii] = new TTree(m_treeNames[ii].c_str(), m_treeNames[ii].c_str());
-
+    // check for duplicate branch names
     if (makeBranchNamesUnique(m_branchNames[ii]))
       B2WARNING(c_SteerBranchNames[ii] << " has duplicate entries.");
     if (makeBranchNamesUnique(m_excludeBranchNames[ii]))
       B2WARNING(c_SteerExcludeBranchNames[ii] << " has duplicate entries.");
     //m_branchNames[ii] and it's exclusion list are now sorted alphabetically and unique
+
+    const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(ii));
+
+    //check for branch names that are not in the DataStore
+    for (unsigned int iBranch = 0; iBranch < m_branchNames[ii].size(); iBranch++) {
+      if (map.find(m_branchNames[ii][iBranch]) == map.end()) {
+        B2WARNING("The branch " << m_branchNames[ii][iBranch] << " has no entry in the DataStore.");
+      }
+    }
+    for (unsigned int iBranch = 0; iBranch < m_excludeBranchNames[ii].size(); iBranch++) {
+      if (map.find(m_excludeBranchNames[ii][iBranch]) == map.end()) {
+        B2WARNING("The excluded branch " << m_excludeBranchNames[ii][iBranch] << " has no entry in the DataStore.");
+      }
+    }
+
+    //create the tree and branches
+    m_tree[ii] = new TTree(m_treeNames[ii].c_str(), m_treeNames[ii].c_str());
+    for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
+      const std::string& branchName = iter->first;
+      //skip transient entries, excluded branches, and branches not in m_branchNames (if it is not empty)
+      if (iter->second->isTransient ||
+          binary_search(m_excludeBranchNames[ii].begin(), m_excludeBranchNames[ii].end(), branchName) ||
+          (!m_branchNames[ii].empty() && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName))) {
+        continue;
+      }
+      m_tree[ii]->Branch(branchName.c_str(), &iter->second->object, bufsize, m_splitLevel);
+      m_tree[ii]->SetBranchAddress(branchName.c_str(), &iter->second->ptr);
+      if (iter->second->ptr != iter->second->object) {
+        iter->second->ptr = 0;
+      }
+      m_entries[ii].push_back(iter->second);
+      B2DEBUG(50, "The branch " << branchName << " was created.");
+    }
   }
+  dir->cd();
   B2DEBUG(1, "SimpleOutput initialised.");
 }
 
@@ -138,21 +171,16 @@ void SimpleOutputModule::beginRun()
 
 void SimpleOutputModule::event()
 {
-  //Restore Object Count:
-  if (!m_done[DataStore::c_Event]) {
-    m_nObjID = TProcessID::GetObjectCount();
-  } else {
-    TProcessID::SetObjectCount(m_nObjID);
-  }
-
   //fill Event data
   fillTree(DataStore::c_Event);
 
   //check for new parent file
   StoreObjPtr<FileMetaData> fileMetaDataPtr("", DataStore::c_Persistent);
-  int id = fileMetaDataPtr->getId();
-  if (id && (m_parents.empty() || (m_parents.back() != id))) {
-    m_parents.push_back(id);
+  if (fileMetaDataPtr) {
+    int id = fileMetaDataPtr->getId();
+    if (id && (m_parents.empty() || (m_parents.back() != id))) {
+      m_parents.push_back(id);
+    }
   }
 
   // keep track of file level metadata
@@ -182,8 +210,9 @@ void SimpleOutputModule::endRun()
 
 void SimpleOutputModule::terminate()
 {
-  //get pointer to event and file level metadata
+  //get pointer to file level metadata
   StoreObjPtr<FileMetaData> fileMetaDataPtr("", DataStore::c_Persistent);
+  fileMetaDataPtr.create(true);
 
   if (m_tree[DataStore::c_Event]) {
     //create an index for the event tree
@@ -222,6 +251,7 @@ void SimpleOutputModule::terminate()
   fillTree(DataStore::c_Persistent);
 
   //write the trees
+  TDirectory* dir = gDirectory;
   m_file->cd();
   for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
     if (m_tree[ii]) {
@@ -229,113 +259,25 @@ void SimpleOutputModule::terminate()
       m_tree[ii]->Write(m_treeNames[ii].c_str(), TObject::kWriteDelete);
     }
   }
+  dir->cd();
 
   // Clean up (moved from destructor)
   delete m_file;
-  for (size_t jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
-    delete[] m_objects[jj];
-  }
 
   B2DEBUG(1, "terminate called");
 
 }
 
-void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
+
+void SimpleOutputModule::fillTree(DataStore::EDurability durability)
 {
-  if (!m_tree[durability])
-    return;
+  if (!m_tree[durability]) return;
 
-  if (!m_done[durability]) {
-    //branches need to be set up here, because we need a list of object/array names from the data store
-    //TODO: once all modules initialize saved arrays in their initialize() method,
-    //this bit can also be moved to SimpleOutput::initialize().
-    setupBranches(durability);
-
-    //make sure setup is done only once
-    m_done[durability] = true;
-  } else {
-    // gather the object pointers for this entry
-    size_t sizeCounter = 0;
-    const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
-    for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
-      if (binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), iter->first)) {
-        if (iter->second != 0) {
-          m_objects[durability][sizeCounter] = iter->second;
-          m_tree[durability]->SetBranchAddress(iter->first.c_str(), &(m_objects[durability][sizeCounter]));
-        } else {
-          //no object exists, this will create a temporary owned & deleted by the branch
-          m_tree[durability]->SetBranchAddress(iter->first.c_str(), 0);
-        }
-
-        sizeCounter++;
-      }
-    }
-    if (map.size() > m_dataStoreSize[durability]) {
-      B2ERROR("The data store now contains more items than in first event (durability: " << durability << ")! This indicates that some objects/arrays have not been registered in a module's initialize() function. One of the following objects/arrays is responsible:");
-      for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
-        //search for branches not in m_branchNames
-        if (!binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), iter->first)) {
-          B2ERROR(iter->first);
-        }
-      }
-      B2FATAL("Aborting since the output module cannot save one of the branches listed above. Please register the object/array or notify the author of the module responsible!");
-      return;
+  //Check for entries whose object was not created.
+  for (unsigned int i = 0; i < m_entries[durability].size(); i++) {
+    if (!m_entries[durability][i]->ptr) {
+      B2WARNING("Trying to write non-existing object to branch " << m_entries[durability][i]->name << ". Using default object.");
     }
   }
   m_tree[durability]->Fill();
-}
-
-void SimpleOutputModule::setupBranches(DataStore::EDurability durability)
-{
-  std::vector<std::string> branchesToBeSaved;
-  //first objects, then arrays
-  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
-  for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
-    const std::string& branchName = iter->first;
-    //check if branchName is not excluded, and that it's in m_branchNames (which also may be empty for all branches)
-    if (!binary_search(m_excludeBranchNames[durability].begin(), m_excludeBranchNames[durability].end(), branchName)
-        && (m_branchNames[durability].empty() || binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName))) {
-      branchesToBeSaved.push_back(branchName);
-    }
-  }
-  //save total size
-  m_size[durability] = branchesToBeSaved.size();
-  if (m_size[durability]) {
-    m_objects[durability] = new TObject* [m_size[durability]];
-  }
-  m_dataStoreSize[durability] = map.size();
-
-  m_branchNames[durability] = branchesToBeSaved;
-  if (!m_branchNames[durability].empty()) {
-    //sort new branch name list
-    makeBranchNamesUnique(m_branchNames[durability]);
-
-    // print out branch names
-    B2DEBUG(2, "Sorted list of branch names for EDurability map " << durability << ":");
-    for (vector<string>::iterator stringIter = m_branchNames[durability].begin(); stringIter != m_branchNames[durability].end(); ++stringIter) {
-      B2DEBUG(2, *stringIter)
-    }
-  }
-
-
-  //loop over all objects/arrays in store and create branches if they're in m_branchNames (=enabled)
-  size_t sizeCounter = 0;
-  //first objects, then arrays
-  for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
-    if (binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), iter->first)) {
-      //TODO: once setupBranches() is moved into initialize(), iter->second cannot actually be NULL
-      if (iter->second != 0) {
-        m_objects[durability][sizeCounter] = iter->second;
-        m_tree[durability]->Branch(iter->first.c_str(), &(m_objects[durability][sizeCounter]));
-      } else {
-        //no object exists, this will create a temporary owned & deleted by the branch
-        m_tree[durability]->Branch(iter->first.c_str(), 0);
-      }
-
-      sizeCounter++;
-    }
-  }
-  if (sizeCounter != m_branchNames[durability].size()) {
-    B2FATAL("Number of initialized branches is different from constructed branch name list!");
-  }
 }

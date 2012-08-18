@@ -3,23 +3,29 @@
 using namespace Belle2;
 
 PyRelationArray::PyRelationArray(const std::string& name, int durability):
-  TObject(),
-  m_relations(name, DataStore::EDurability(durability))
+  m_relations(0)
 {
-  if (!isValid())
+  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(durability));
+  DataStore::StoreObjConstIter iter = map.find(name);
+  if ((iter == map.end()) || iter->second->isArray) {
     return;
+  }
+
+  m_relations = reinterpret_cast<RelationContainer**>(&iter->second->ptr);
 
   //build index
-  for (int i = 0; i < m_relations.getEntries(); i++) {
-    const RelationElement& relation = m_relations[i];
-    const int from = relation.getFromIndex();
+  if (*m_relations) {
+    for (int i = 0; i < (*m_relations)->getEntries(); i++) {
+      const RelationElement& relation = (*m_relations)->elements(i);
+      const int from = relation.getFromIndex();
 
-    if (m_toindicesMap.find(from) != m_toindicesMap.end()) {
-      //assuming that RelationArray has been consolidate()'ed
-      B2FATAL("PyRelationArray: key already exists!");
+      if (m_toindicesMap.find(from) != m_toindicesMap.end()) {
+        //assuming that RelationArray has been consolidate()'ed
+        B2FATAL("PyRelationArray: key already exists!");
+      }
+
+      m_toindicesMap[from] = relation.getToIndices();
     }
-
-    m_toindicesMap[from] = relation.getToIndices();
   }
 }
 

@@ -16,13 +16,26 @@ namespace Belle2 {
   protected:
     /** fill StoreArrays with entries from 0..9 */
     virtual void SetUp() {
+      DataStore::Instance().setInitializeActive(true);
+      StoreObjPtr<EventMetaData>::registerPersistent();
+      StoreArray<EventMetaData>::registerPersistent();
+      StoreArray<EventMetaData>::registerPersistent("EventMetaDatas_2");
+      StoreArray<EventMetaData>::registerPersistent("", DataStore::c_Run);
+      StoreArray<RunMetaData>::registerPersistent();
+      DataStore::Instance().setInitializeActive(false);
+
       StoreObjPtr<EventMetaData> evtPtr;
+      evtPtr.create();
       evtPtr->setEvent(42);
 
       StoreArray<EventMetaData> evtData;
+      evtData.create();
       StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
+      evtDataDifferentName.create();
       StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Run);
+      evtDataDifferentDurability.create();
       StoreArray<RunMetaData> runData;
+      runData.create();
 
       RunMetaData runmetadataobject(62.5, 62.5);
       for (int i = 0; i < 10; ++i) {
@@ -42,12 +55,14 @@ namespace Belle2 {
     virtual void TearDown() {
       for (int i = 0; i < DataStore::c_NDurabilityTypes; ++i) {
         DataStore::Instance().clearMaps((DataStore::EDurability) i);
+        const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(i));
+        const_cast<DataStore::StoreObjMap&>(map).clear();
       }
     }
 
   };
 
-  /** Tests the creation of arrays/objects and wether they're attached correctly. */
+  /** Tests the creation of arrays/objects and whether they're attached correctly. */
   TEST_F(DataStoreTest, AttachTest)
   {
     StoreObjPtr<EventMetaData> evtPtr;
@@ -67,18 +82,22 @@ namespace Belle2 {
   TEST_F(DataStoreTest, TypeTest)
   {
     //attach with incompatible type
-    EXPECT_FATAL(StoreArray<RunMetaData>("EventMetaDatas"));
-    EXPECT_FATAL(StoreObjPtr<RunMetaData>("EventMetaData"));
+    StoreArray<RunMetaData> evtData("EventMetaDatas");
+    EXPECT_FALSE(evtData);
+    StoreObjPtr<RunMetaData> evtData2("EventMetaData");
+    EXPECT_FALSE(evtData2);
 
     //attaching objects to array and vice versa shouldn't work
     //neither should the store allow objects with same name/durability
     //as existing arrays
-    EXPECT_FATAL(StoreArray<EventMetaData>("EventMetaData"));
-    EXPECT_FATAL(StoreObjPtr<EventMetaData>("EventMetaDatas"));
+    StoreArray<EventMetaData> array("EventMetaData");
+    EXPECT_FALSE(array);
+    StoreObjPtr<EventMetaData> obj("EventMetaDatas");
+    EXPECT_FALSE(obj);
 
     //getting a base class is OK
-    EXPECT_TRUE(StoreArray<TObject>("EventMetaDatas"));
-    EXPECT_TRUE(StoreObjPtr<TObject>("EventMetaData"));
+    EXPECT_TRUE(StoreArray<EventMetaData>("EventMetaDatas"));
+    EXPECT_TRUE(StoreObjPtr<EventMetaData>("EventMetaData"));
   }
 
   /** check meta data. */
@@ -110,18 +129,18 @@ namespace Belle2 {
   /** check read-only attaching for StoreObjPtrs */
   TEST_F(DataStoreTest, ReadOnlyAttach)
   {
-    StoreObjPtr<EventMetaData> a("", DataStore::c_Event, false);
+    StoreObjPtr<EventMetaData> a("", DataStore::c_Event);
     EXPECT_TRUE(a);
     EXPECT_EQ(a->getEvent(), (unsigned long)42);
-    StoreObjPtr<EventMetaData> b("nonexisting", DataStore::c_Event, false);
+    StoreObjPtr<EventMetaData> b("nonexisting", DataStore::c_Event);
     EXPECT_FALSE(b);
-    StoreObjPtr<EventMetaData> c("", DataStore::c_Run, false);
+    StoreObjPtr<EventMetaData> c("", DataStore::c_Run);
     EXPECT_FALSE(c);
-    StoreObjPtr<EventMetaData> d("", DataStore::c_Persistent, false);
+    StoreObjPtr<EventMetaData> d("", DataStore::c_Persistent);
     EXPECT_FALSE(d);
 
     //check we didn't insert a new object with 'd'
-    StoreObjPtr<EventMetaData> e("", DataStore::c_Persistent, false);
+    StoreObjPtr<EventMetaData> e("", DataStore::c_Persistent);
     EXPECT_FALSE(e);
   }
 
@@ -181,12 +200,12 @@ namespace Belle2 {
     DataStore::Instance().clearMaps(DataStore::c_Event);
 
     //right now this is NULL, but it's not actually clearly defined...
-    StoreObjPtr<EventMetaData> a("", DataStore::c_Event, false);
+    StoreObjPtr<EventMetaData> a("", DataStore::c_Event);
     EXPECT_FALSE(a);
 
     //should be a default constructed object
     StoreObjPtr<EventMetaData> b;
-    EXPECT_TRUE(*b == EventMetaData());
+    EXPECT_FALSE(b);
 
 
     //cleared arrays must be empty
@@ -194,9 +213,9 @@ namespace Belle2 {
     StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
     StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Run);
     StoreArray<RunMetaData> runData;
-    EXPECT_EQ(evtData.getEntries(), 0);
-    EXPECT_EQ(evtDataDifferentName.getEntries(), 0);
-    EXPECT_EQ(runData.getEntries(), 0);
+    EXPECT_FALSE(evtData);
+    EXPECT_FALSE(evtDataDifferentName);
+    EXPECT_FALSE(runData);
 
     //run durability, should be unaffected
     EXPECT_EQ(evtDataDifferentDurability.getEntries(), 10);

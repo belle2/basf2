@@ -17,6 +17,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
+#include <framework/core/Environment.h>
 
 #ifdef HAS_CALLGRIND
 #include <valgrind/callgrind.h>
@@ -28,7 +29,7 @@ using namespace std;
 using namespace Belle2;
 
 
-EventProcessor::EventProcessor(PathManager& pathManager) : m_pathManager(pathManager)
+EventProcessor::EventProcessor(PathManager& pathManager) : m_pathManager(pathManager), m_master(0)
 {
 
 }
@@ -45,15 +46,26 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
 #ifdef HAS_CALLGRIND
   CALLGRIND_START_INSTRUMENTATION;
 #endif
+  //Check whether the number of events was set via command line argument
+  int numEventsArgument = Environment::Instance().getNumberEventsOverride();
+  if ((numEventsArgument > 0) && ((maxEvent == 0) || (maxEvent > numEventsArgument))) {
+    maxEvent = numEventsArgument;
+  }
+
   //Get list of modules which could be executed during the data processing.
   ModulePtrList moduleList = m_pathManager.buildModulePathList(startPath);
 
   //Initialize modules
   processInitialize(moduleList);
 
+  //Don't start processing in case of no master module
+  if (!m_master) {
+    B2ERROR("There is no module that provides event and run numbers.");
+  }
+
   //Check if errors appeared. If yes, don't start the event processing.
   int numLogError = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
-  if (numLogError == 0) {
+  if ((numLogError == 0) && m_master) {
     processCore(startPath, moduleList, maxEvent); //Do the event processing
 
   } else {
@@ -106,12 +118,18 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 
     //Set the global log level
     logSystem.setModuleLogConfig(NULL);
+
+    //Check whether this is the master module
+    if (!m_master && DataStore::Instance().hasEntry(DataStore::objectName<EventMetaData>(""), DataStore::c_Event, EventMetaData::Class(), false)) {
+      m_master = module;
+    }
   }
   DataStore::Instance().setInitializeActive(false);
   stats.stopGlobal(ModuleStatistics::c_Init);
 #ifdef HAS_CALLGRIND
   CALLGRIND_DUMP_STATS_AT("initialize");
 #endif
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
 }
 
 
@@ -130,12 +148,9 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
   //Remember the previous event meta data, and identify end of data meta data
   EventMetaData previousEventMetaData;
-  EventMetaData noEventMetaData;
   EventMetaData endEventMetaData;
   endEventMetaData.setEndOfData();
-
-  //Pointer to master module;
-  Module* master = 0;
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
   ModuleStatistics& stats = ModuleStatistics::getInstance();
 
@@ -161,18 +176,10 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       //Set the global log level
       logSystem.setModuleLogConfig(NULL);
 
-      //Determine the master module
-      StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-      if (!master && (currEvent == 0) && eventMetaDataPtr) {
-        if (*eventMetaDataPtr != previousEventMetaData) {
-          master = module;
-        }
-      }
-
       //Check for end of data
-      if ((*eventMetaDataPtr == endEventMetaData) ||
-          ((module == master) && (*eventMetaDataPtr == noEventMetaData))) {
-        if (module != master) {
+      if ((eventMetaDataPtr && (*eventMetaDataPtr == endEventMetaData)) ||
+          ((module == m_master) && !eventMetaDataPtr)) {
+        if (module != m_master) {
           B2WARNING("Event processing stopped by non-master module " << module->getName());
         }
         endProcess = true;
@@ -180,7 +187,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       }
 
       //Handle event meta data changes of the master module
-      if (module == master) {
+      if (module == m_master) {
 
         //Check for a change of the run
         if ((eventMetaDataPtr->getExperiment() != previousEventMetaData.getExperiment()) ||
@@ -212,9 +219,8 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       } else {
 
         //Check for a second master module
-        if ((*eventMetaDataPtr != noEventMetaData) &&
-            (*eventMetaDataPtr != previousEventMetaData)) {
-          B2FATAL("Two master modules were discovered: " << master->getName()
+        if (eventMetaDataPtr && (*eventMetaDataPtr != previousEventMetaData)) {
+          B2FATAL("Two master modules were discovered: " << m_master->getName()
                   << " and " << module->getName());
         }
       }
@@ -231,12 +237,6 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       }
     }
 
-    //Stop processing in case of no master module
-    if (!master) {
-      B2WARNING("There is no module that provides event and run numbers. Stop processing");
-      endProcess = true;
-    }
-
     //Delete event related data in DataStore
     DataStore::Instance().clearMaps(DataStore::c_Event);
 
@@ -250,8 +250,8 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 #endif
 
   //End last run
-  if (master && (currEvent > 0)) {
-    StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  if (currEvent > 0) {
+    eventMetaDataPtr.create();
     *eventMetaDataPtr = previousEventMetaData;
     processEndRun(modulePathList);
   }

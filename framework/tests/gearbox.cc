@@ -44,7 +44,11 @@ namespace Belle2 {
   /** Test opening SQLite db and accessing nodes from Gearbox */
   TEST(GearBox, SQLite)
   {
+    DataStore::Instance().setInitializeActive(true);
+    StoreObjPtr<EventMetaData>::registerPersistent();
+    DataStore::Instance().setInitializeActive(false);
     StoreObjPtr<EventMetaData> eventMetaDataPtr;
+    eventMetaDataPtr.create();
     eventMetaDataPtr->setExperiment(1);
     eventMetaDataPtr->setRun(1);
 
@@ -60,6 +64,8 @@ namespace Belle2 {
     EXPECT_EQ(0.5, gb.getDouble("/detector/bar"));
     EXPECT_EQ(0.5, gb.getLength("/detector/bar"));
     gb.close();
+
+    const_cast<DataStore::StoreObjMap&>(DataStore::Instance().getStoreObjectMap(DataStore::c_Event)).clear();
   }
 #endif
 

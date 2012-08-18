@@ -174,8 +174,8 @@ namespace Belle2 {
     //Get related StoreArrays
     m_storeFrom = storeRel.getFromAccessorParams();
     m_storeTo = storeRel.getToAccessorParams();
-    StoreArray<FROM> storeFrom(m_storeFrom);
-    StoreArray<TO>   storeTo(m_storeTo);
+    StoreArray<FROM> storeFrom(m_storeFrom.first, m_storeFrom.second);
+    StoreArray<TO>   storeTo(m_storeTo.first, m_storeTo.second);
 
     //Get number of entries in relation and stores
     unsigned int nRel = storeRel.getEntries();

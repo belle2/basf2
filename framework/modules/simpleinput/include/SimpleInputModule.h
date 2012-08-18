@@ -63,9 +63,6 @@ namespace Belle2 {
 
 
   private:
-    /** Returns a pointer to the i'th branch of specified durability if valid and not disabled via branchNames, NULL otherwise */
-    TBranch* validBranch(int ibranch, DataStore::EDurability durability) const;
-
     /** Sorts stringlist alphabetically and removes any duplicates.
      *
      *  @return true, if duplicates are found
@@ -113,11 +110,11 @@ namespace Belle2 {
     /** TFile for input. */
     TFile* m_file;
 
-    /** Wether the entry 0 was already loaded. Set to false when entry 1 is accessed. */
-    bool m_firstEntryLoaded;
-
     /**  TTree for input. */
     TTree* m_tree[DataStore::c_NDurabilityTypes];
+
+    /** Vector of DataStore entries that are written to the output. */
+    std::vector<DataStore::StoreEntry*> m_entries[DataStore::c_NDurabilityTypes];
 
     /** Steering parameter names for m_treeNames. */
     const static std::string c_SteerTreeNames[DataStore::c_NDurabilityTypes];

@@ -21,31 +21,27 @@ namespace Belle2 {
   class PyStoreArray : public TObject {
   public:
     /** constructor.
-    * @param name Name of the branch to be read/saved
+    * @param name Name of the entry to be accessed
     * @param durability 0: event, 1: run, 2: persistent
     */
-    explicit PyStoreArray(const std::string& name, int durability = 0):
-      TObject(),
-      m_storearray(name, DataStore::EDurability(durability)) { }
+    explicit PyStoreArray(const std::string& name, int durability = 0);
 
     ~PyStoreArray() { }
 
+    /** Does this PyStoreArray contain a valid datastore array?
+     *
+     * Accessing the array's data is UNSAFE if this returns false.
+     */
+    operator bool() const { return m_storeArray && *m_storeArray; }
+
     /** returns object at index i, or null pointer if out of range */
-    TObject* operator [](int i) const {return m_storearray[i];}
+    TObject* operator [](int i) const {return (**m_storeArray)[i];}
 
     /** returns number of entries for current event. */
-    int getEntries() const { return m_storearray.getEntries(); }
-
-    /** returns the branch name */
-    std::string getName() const { return m_storearray.getName(); }
-
-    /** Return  durability with which the object is saved in the DataStore.
-    * @return 0: event, 1: run, 2: persistent
-    */
-    int getDurability() const { return m_storearray.getDurability(); }
+    int getEntries() const { return (*m_storeArray)->GetEntriesFast(); }
 
   private:
-    StoreArray<TObject> m_storearray; /**< wrapped object */
+    TClonesArray** m_storeArray; /**< Pointer to pointer to array */
 
     ClassDef(PyStoreArray, 0)
   };

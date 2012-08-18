@@ -76,9 +76,9 @@ void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
   //-----------------------------
   const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
   for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
-    if (dynamic_cast<TClonesArray*>(iter->second))
+    if (iter->second->isArray)
       continue;
-    const TObject* currCol = iter->second;
+    const TObject* currCol = iter->second->ptr;
 
     if (currCol != NULL) {
       B2INFO(boost::format("(Object)  %1%") % iter->first);
@@ -90,7 +90,9 @@ void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
   //Print the array information
   //-----------------------------
   for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
-    const TClonesArray* currCol = dynamic_cast<TClonesArray*>(iter->second);
+    if (!iter->second->isArray)
+      continue;
+    const TClonesArray* currCol = dynamic_cast<TClonesArray*>(iter->second->ptr);
 
     if (currCol != NULL) {
       B2INFO(boost::format("(Array)   %1% %|35t| %2%") % iter->first % currCol->GetEntriesFast());

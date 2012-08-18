@@ -78,10 +78,11 @@ namespace Belle2 {
    *  you to fill its data members using a custom constructor.
    *
    *
-   *  Note that if you want to create a new array in a module, you should
-   *  create an object of type StoreArray<T> in your implementation of
-   *  Module::initialize(). This registers the array in the data store and
-   *  lets other modules know you intend to fill it.
+   *  <h1>Storing an array</h1>
+   *  Note that you have to register an array in the initialize method of a
+   *  module first, and then create it (in the event method of a module for
+   *  durability c_Event) before you can use it. This procedure is the same
+   *  as for objects handled by StoreObjPtr.
    *
    *
    *  <h1>Internals</h1>
@@ -97,41 +98,91 @@ namespace Belle2 {
   template <class T>
   class StoreArray : public StoreAccessorBase {
   public:
-    /** Constructor with assignment.
+    /** Register an array, that should be written to the output by default, in the data store.
+     *  This must be called in the initialzation phase.
      *
-     *  This constructor calls the assignArray function.
      *  @param name        Name under which the TClonesArray is stored.
      *  @param durability  Specifies lifetime of array in question.
+     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
+     *  @return            True if the registration succeeded.
      */
-    explicit StoreArray(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
-      assignArray(name, durability);
+    static bool registerPersistent(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
+                                   bool errorIfExisting = true) {
+      return DataStore::Instance().createEntry(DataStore::arrayName<T>(name), durability, T::Class(), true, false, errorIfExisting);
     }
 
-    /** Constructor for usage with Relations etc.
+    /** Register an array, that should not be written to the output by default, in the data store.
+     *  This must be called in the initialzation phase.
      *
-     *  @param accessorParams   A pair with name and durability.
+     *  @param name        Name under which the TClonesArray is stored.
+     *  @param durability  Specifies lifetime of array in question.
+     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
+     *  @return            True if the registration succeeded.
      */
-    explicit StoreArray(AccessorParams accessorParams) {
-      assignArray(accessorParams.first, accessorParams.second);
+    static bool registerTransient(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
+                                  bool errorIfExisting = true) {
+      return DataStore::Instance().createEntry(DataStore::arrayName<T>(name), durability, T::Class(), true, true, errorIfExisting);
     }
 
-    /** Constructor for storage of TClonesArrays.
+    /** Check whether an array was registered before.
+     *  It will cause an error if the array does not exist.
+     *  This must be called in the initialzation phase.
      *
-     *  This is most likely needed for the multiprocessing implementation.
-     *  @param array       TClonesArray for storage.
-     *  @param name        Key under which TClonesArray is stored.
-     *  @param durability  Lifetime of stored TClonesArray.
+     *  @param name        Name under which the TClonesArray is stored.
+     *  @param durability  Specifies lifetime of array in question.
+     *  @return            True if the array exists.
      */
-    StoreArray(TClonesArray* const array, const std::string& name, DataStore::EDurability durability = DataStore::c_Event)
-      : m_name(name), m_durability(durability), m_storeArray(array) {
-      DataStore::Instance().handleArray<T>(m_name, durability, m_storeArray);
+    static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
+      std::string arrayName = DataStore::arrayName<T>(name);
+      if (!DataStore::Instance().hasEntry(arrayName, durability, T::Class(), false)) {
+        B2ERROR("The required DataStore entry with name " << arrayName << " and durability " << durability << " does not exists.");
+        return false;
+      }
+      return true;
     }
+
+    /** Constructor to access an array in the DataStore.
+     *
+     *  @param name       Name under which the array is stored in the DataStore.
+     *                    If an empty string is supplied, the type name will be used.
+     *  @param durability Decides durability map used for getting the accessed array.
+     */
+    explicit StoreArray(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event):
+      StoreAccessorBase(DataStore::arrayName<T>(name), durability) {
+      DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, T::Class(), true);
+      m_storeArray = reinterpret_cast<TClonesArray**>(DataStore::Instance().getObject(m_name, durability, T::Class(), true));
+    }
+
+    /** Create an empty array in the data store.
+     *
+     *  @param replace   Should an existing object be replaced?
+     *  @return          True if the creation succeeded.
+     **/
+    bool create(bool replace = false) {
+      return DataStore::Instance().createObject(0, replace, m_name, m_durability, T::Class(), true);
+    };
+
+    /** Add an existing array to the data store.
+     *
+     *  @param object    The object that should be put in the DataStore.
+     *  @param replace   Should an existing object be replaced?
+     *  @return          True if the creation succeeded.
+     **/
+    bool assign(TObject* object, bool replace = false) {
+      return DataStore::Instance().createObject(object, replace, m_name, m_durability, T::Class(), true);
+    };
+
+    /** Check whether the array was created.
+     *
+     *  @return          True if the array exists.
+     **/
+    inline bool isValid() const {return m_storeArray && *m_storeArray;}
 
     /** Is this StoreArray's data safe to access? */
-    operator bool() const {return m_storeArray;}
+    inline operator bool() const {return isValid();}
 
     /** Get the number of occupied slots in the array. */
-    inline int getEntries() const {return m_storeArray->GetEntriesFast();}
+    inline int getEntries() const {DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), true); return (*m_storeArray)->GetEntriesFast();}
 
     /** Access to the stored objects.
      *
@@ -142,7 +193,7 @@ namespace Belle2 {
       if (i >= getEntries() or i < 0)
         return 0;
       //type was checked by DataStore, so this is safe
-      return static_cast<T*>(m_storeArray->AddrAt(i));
+      return static_cast<T*>((*m_storeArray)->AddrAt(i));
     }
 
     /** Returns address of the next free position of the array.
@@ -159,7 +210,8 @@ namespace Belle2 {
      *  \return pointer to address just past the last array element
      */
     inline T* nextFreeAddress() {
-      return static_cast<T*>(m_storeArray->AddrAt(getEntries()));
+      DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), true);
+      return static_cast<T*>((*m_storeArray)->AddrAt(getEntries()));
     }
 
     /** Construct a new T object at the end of the array.
@@ -198,54 +250,18 @@ namespace Belle2 {
      *  function is recommended, as the difference between . and ->
      *  may be lost on casual readers of the source code.
      */
-    TClonesArray& operator *() const {return *m_storeArray;}
-    ClonesArrayWrapper* operator ->() const {return static_cast<ClonesArrayWrapper*>(m_storeArray);}
-    TClonesArray* getPtr() const {return m_storeArray;}
+    TClonesArray& operator *() const {DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), true); return **m_storeArray;}
+    ClonesArrayWrapper* operator ->() const {DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), true); return static_cast<ClonesArrayWrapper*>(*m_storeArray);}
+    TClonesArray* getPtr() const {DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), true); return *m_storeArray;}
     //@}
 
-    //------------------------ Getters for AccessorParams -----------------------------------------------------
-    /** Returns name/durability under which the object is saved in the DataStore. */
-    AccessorParams getAccessorParams() const {return make_pair(m_name, m_durability);};
-    /** Return name under which the object is saved in the DataStore. */
-    const std::string& getName() const { return m_name; }
-    /** Return durability with which the object is saved in the DataStore. */
-    DataStore::EDurability getDurability() const { return m_durability; }
-
-  protected:
-    /** Switch the array the StoreArray points to.
-     *
-     *  @param name       Key with which the TClonesArray is saved. An empty string is treated as equal to class name.
-     *  @param durability Specifies lifetime of array in question.
-     */
-    bool assignArray(const std::string& name, DataStore::EDurability durability = DataStore::c_Event);
-
+  private:
     /** Pointer that actually holds the TClonesArray. */
-    TClonesArray* m_storeArray;
-
-    /** Store name under which TClonesArray is saved. */
-    std::string m_name;
-
-    /**Store durability under which the TClonesArray is saved. */
-    DataStore::EDurability m_durability;
+    TClonesArray** m_storeArray;
 
   };
 
 } // end namespace Belle2
 
-//-------------------Implementation of template part of the class ---------------------------------
-template <class T>
-bool Belle2::StoreArray<T>::assignArray(const std::string& name, DataStore::EDurability durability)
-{
-  if (name == "") {
-    m_name = DataStore::defaultArrayName<T>();
-  } else {
-    m_name = name;
-  }
-  m_durability = durability;
-  m_storeArray = 0;
-
-  B2DEBUG(250, "Calling DataStore from StoreArray " << name);
-  return DataStore::Instance().handleArray<T>(m_name, durability, m_storeArray, true);
-}
 
 #endif

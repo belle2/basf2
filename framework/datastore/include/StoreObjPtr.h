@@ -29,11 +29,10 @@ namespace Belle2 {
   StoreObjPtr<EventMetaData> eventmetadata;
   B2INFO("we're currently in event " << eventmetadata->getEvent() << "!");
       \endcode
-   *  If no object 'EventMetaData' is found in the data store, a new one
-   *  will be created. This can be avoided by setting the generate parameter
-   *  of the constructor to false:
+   *  If no object 'EventMetaData' is found in the data store, the store
+   *  object pointer is invalid:
    *  \code
-  StoreObjPtr<EventMetaData> checkObj("", DataStore::c_Event, false);
+  StoreObjPtr<EventMetaData> checkObj;
   if(!checkObj) {
     B2INFO("an object called '" << checkObj.getName() << "' does not exist in the data store.");
   } else {
@@ -42,146 +41,135 @@ namespace Belle2 {
       \endcode
    *
    *  <h1>Storing objects</h1>
-   *  Storing objects works in the same way as the first example:
+   *  First, objects have to be registered in the data store during the
+   *  initialization phase, meaning in the initialize method of a module:
+   *  \code
+  //register a single cdchit
+  StoreObjPtr<CDCHit>::registerPersistent();
+  //register a single cdchit under the name "AnotherHit" and do not write
+  //it to the output file by default
+  StoreObjPtr<CDCHit>::registerTransient("AnotherHit");
+      \endcode
+   *  Before objects can be accessed they have to be created
+   *  (in each event if the durability is c_Event):
    *  \code
   //store a single cdchit
   StoreObjPtr<CDCHit> cdchit;
+  cdchit.create();
   cdchit->setCharge(5.0);
       \endcode
-   *  As in the very first example above, StoreObjPtr will create a new object
-   *  and add it to the data store (unless an object was found already).
-   *
-   *  Note that if you want to create a new object in a module, you should
-   *  create an object of type StoreObjPtr<T> in your implementation of
-   *  Module::initialize(). This registers the array in the data store and
-   *  lets other modules know you intend to fill it.
+   *  To put an existing object in the data store, use it as first argument
+   *  of the create method:
+   *  \code
+  //store a single cdchit
+  CDCHit* cdchit = new CDCHit;
+  StoreObjPtr<CDCHit> cdchit;
+  cdchit.create(cdchit);
+  cdchit->setCharge(5.0);
+      \endcode
+   *  Note that the datastore takes the ownership of the object!
    *
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreObjPtr">The basf2 developers</a>
    *  @sa If you want to store more than a single object of one type, use the StoreArray class.
    */
   template <class T> class StoreObjPtr : public StoreAccessorBase {
   public:
-    /** Constructor with assignment.
+    /** Register an object, that should be written to the output by default, in the data store.
+     *  This must be called in the initialzation phase.
      *
-     *  Note that if generate is set to false, the created StoreObjPtr may be
-     *  invalid if no object was found in the data store. Use operator bool()
-     *  before trying to access the object's data.
-     *
-     *  In case the object in the data store is incompatible with the type T,
-     *  the program will abort. Accessing a stored object through a StoreObjPtr
-     *  of a base class T will work. (Don't try to store them like that, though.)
-     *
-     *  @param name       Name under which the object to be hold by this pointer is stored.
-     *                    If an empty string is supplied, the type name will be used.
-     *  @param durability Decides durability map used for getting or creating the accessed object.
-     *  @param generate   Shall an object in the DataStore be created, if none exists with given name and durability?
-     *  @sa assignObject()
+     *  @param name        Name under which the object is stored.
+     *  @param durability  Specifies lifetime of object in question.
+     *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
+     *  @return            True if the registration succeeded.
      */
-    explicit StoreObjPtr(const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event, bool generate = true) {
-      assignObject(name, durability, generate);
+    static bool registerPersistent(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
+                                   bool errorIfExisting = true) {
+      return DataStore::Instance().createEntry(DataStore::objectName<T>(name), durability, T::Class(), false, false, errorIfExisting);
     }
 
-    /** Constructor for storing an existing object.
+    /** Register an object, that should not be written to the output by default, in the data store.
      *
-     *  @param AObject    Object that is to be saved in the data store.
-     *  @param name       Name under which the object to be hold by this pointer is stored.
-     *                    If an empty string is supplied, the type name will be used.
-     *  @param durability Decides durability map used for getting or creating the accessed object.
-     *  @sa assignObject()
+     *  This must be called in the initialzation phase.
+     *
+     *  @param name        Name under which the object is stored.
+     *  @param durability  Specifies lifetime of object in question.
+     *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
+     *  @return            True if the registration succeeded.
      */
-    explicit StoreObjPtr(T* const AObject, const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event) {
-      assignObject(name, durability, true, AObject);
+    static bool registerTransient(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
+                                  bool errorIfExisting = true) {
+      return DataStore::Instance().createEntry(DataStore::objectName<T>(name), durability, T::Class(), false, true, errorIfExisting);
     }
 
-    /** Constructor for usage with Relations etc.
+    /** Check whether an object was registered before.
      *
-     *  No new objects are created when using this constructor.
-     *  @param accessorParams   A pair with name and durability.
+     *  It will cause an error if the object does not exist.
+     *  This must be called in the initialzation phase.
+     *
+     *  @param name        Name under which the object is stored.
+     *  @param durability  Specifies lifetime of object in question.
+     *  @return            True if the object exists.
      */
-    explicit StoreObjPtr(AccessorParams accessorParams) {
-      assignObject(accessorParams.first, accessorParams.second, false);
+    static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
+      std::string objName = DataStore::objectName<T>(name);
+      if (!DataStore::Instance().hasEntry(objName, durability, T::Class(), false)) {
+        B2ERROR("The required DataStore entry with name " << objName << " and durability " << durability << " does not exists.");
+        return false;
+      }
+      return true;
     }
+
+    /** Constructor to access an object in the DataStore.
+     *
+     *  @param name       Name under which the object is stored in the DataStore.
+     *                    If an empty string is supplied, the type name will be used.
+     *  @param durability Decides durability map used for getting the accessed object.
+     */
+    explicit StoreObjPtr(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event):
+      StoreAccessorBase(DataStore::objectName<T>(name), durability) {
+      DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, T::Class(), false);
+      m_storeObjPtr = reinterpret_cast<T**>(DataStore::Instance().getObject(m_name, m_durability, T::Class(), false));
+    }
+
+    /** Create a default object in the data store.
+     *
+     *  @param replace   Should an existing object be replaced?
+     *  @return          True if the creation succeeded.
+     **/
+    bool create(bool replace = false) {
+      return DataStore::Instance().createObject(0, replace, m_name, m_durability, T::Class(), false);
+    };
+
+    /** Add an existing object to the data store.
+     *
+     *  @param object    The object that should be put in the DataStore.
+     *  @param replace   Should an existing object be replaced?
+     *  @return          True if the creation succeeded.
+     **/
+    bool assign(TObject* object, bool replace = false) {
+      return DataStore::Instance().createObject(object, replace, m_name, m_durability, T::Class(), false);
+    };
+
+    /** Check whether the object was created.
+     *
+     *  @return          True if the object exists.
+     **/
+    inline bool isValid() const {return m_storeObjPtr && *m_storeObjPtr;}
+
 
     /** Virtual destructor for inherited classes */
     virtual ~StoreObjPtr() {}
 
     //------------------------ Imitate pointer functionality -----------------------------------------------
-    inline T& operator *()  const {return *m_storeObjPtr;}  /**< Imitate pointer functionality. */
-    inline T* operator ->() const {return m_storeObjPtr;}   /**< Imitate pointer functionality. */
-    inline operator bool()  const {return m_storeObjPtr;}   /**< Imitate pointer functionality. */
+    inline T& operator *()  const {DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), false); return **m_storeObjPtr;}  /**< Imitate pointer functionality. */
+    inline T* operator ->() const {DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), false); return *m_storeObjPtr;}   /**< Imitate pointer functionality. */
+    inline operator bool()  const {return isValid();}   /**< Imitate pointer functionality. */
 
-    //------------------------ Getters for AccessorParams --------------------------------------------------
-    AccessorParams getAccessorParams() const {     /**< Returns name and durability under which the object is saved in the DataStore. */
-      return AccessorParams(m_name, m_durability);
-    }
-    const std::string& getName() const { return m_name; } /**< Return  name under which the object is saved in the DataStore. */
-    DataStore::EDurability getDurability() const { /**< Return durability with which the object is saved in the DataStore. */
-      return m_durability;
-    }
-
-  protected:
-    /** Constructor, no assignment.
-     *
-     *  The default constructor already assigns the TObject pointer. Since the
-     *  RelationArray needs to determine the name first and do some logic, we
-     *  need a constructor which does not do anything. Therefore this
-     *  constructor takes an int as argument to distuingish it from the default
-     *  constructor. DO NOT DELETE AGAIN.
-     *
-     *  This contructor doesn't request a name. You can later assign an object to it, if you like.
-     *
-     *  The argument is ignored but required to distuingish
-     *  between the default constructor and this one
-     */
-    explicit StoreObjPtr(int /*dummy*/)
-      : m_storeObjPtr(0), m_name(""), m_durability(DataStore::c_Event) {}
-
-
-    /** Assigning an object to the pointer.
-     *
-     *  This function actually calls the DataStore. If the DataStore is called for the first time during an execution of basf2,
-     *  a new slot in the DataStore is registered. Due to I/O handling, this is only allowed during the initialize function of modules.
-     *  If it happens at other times, a B2ERROR is produced. <br>
-     *  If there is already a slot registered in the DataStore under the given name and durability, this slot is used. If the slot is
-     *  occupied by an object of different type than the template class of StoreObjPtr, a B2FATAL error message is produced.
-     *  If the slot isn't occupied so far by an object, you can create a new one.
-     *
-     *  @param name       Name under which the object to be assigned is stored. An empty string is treated as name equal to the template class name.
-     *  @param durability Decides durability map used for getting or creating the accessed object.
-     *  @param generate   Shall an object in the DataStore be created, if none occupies the slot with given name and durability?
-     *                    For this purpose the default constructor of the template class is used and the created object assigned
-     *                    to the StoreObjPtr.
-     *  @param AObject    Object to add to the data store, NULL to connect to object
-     *                    existing in the data store or for creation of new object.
-     *  @return           Was a new object generated?
-     */
-    bool assignObject(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event, bool generate = false, T* const AObject = 0);
-
+  private:
     /** Store of actual pointer. */
-    T* m_storeObjPtr;
-
-    /** name under which object is saved. */
-    std::string m_name;
-
-    /**durability under which the object is saved. */
-    DataStore::EDurability m_durability;
+    T** m_storeObjPtr;
   };
 } // end namespace Belle2
 
-
-// ------------ Implementation of template class -----------------------------------------------------------
-template <class T> bool Belle2::StoreObjPtr<T>::assignObject(const std::string& name, Belle2::DataStore::EDurability durability, bool generate, T* const AObject)
-{
-  if (name == "") {
-    m_name = DataStore::defaultObjectName<T>();
-  } else {
-    m_name = name;
-  }
-  m_durability = durability;
-  m_storeObjPtr = AObject;
-
-  B2DEBUG(250, "Calling DataStore from StoreObjPtr." << name);
-  return DataStore::Instance().handleObject<T>(m_name, durability, generate, m_storeObjPtr);
-}
 
 #endif

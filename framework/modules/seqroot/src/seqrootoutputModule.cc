@@ -169,10 +169,10 @@ EvtMessage* SeqRootOutputModule::buildMessage(RECORD_TYPE rectype)
   int narrays = 0;
   int nobjs = 0;
   for (DataStore::StoreObjConstIter it = map.begin(); it != map.end(); ++it) {
-    if (m_msghandler->add(it->second, it->first)) {
+    if (m_msghandler->add(it->second->ptr, it->first)) {
       B2INFO("Tx: adding item " << it->first);
 
-      if (dynamic_cast<TClonesArray*>(it->second))
+      if (it->second->isArray)
         narrays++;
       else
         nobjs++;

@@ -44,7 +44,7 @@ EvtMetaInfoModule::~EvtMetaInfoModule()
 
 void EvtMetaInfoModule::beginRun()
 {
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
   B2INFO("========================================================================");
   B2INFO(">>> Start new run: " << eventMetaDataPtr->getRun());
   B2INFO("------------------------------------------------------------------------");
@@ -54,14 +54,15 @@ void EvtMetaInfoModule::beginRun()
 void EvtMetaInfoModule::event()
 {
   //Print event meta data information
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  if (!eventMetaDataPtr) return;
   B2INFO(boost::format("EXP: %8d        RUN: %8d        EVT: %8d") % eventMetaDataPtr->getExperiment() % eventMetaDataPtr->getRun() % eventMetaDataPtr->getEvent()) ;
 }
 
 
 void EvtMetaInfoModule::endRun()
 {
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
   B2INFO("------------------------------------------------------------------------");
   B2INFO("<<< End run: " << eventMetaDataPtr->getRun());
   B2INFO("========================================================================");

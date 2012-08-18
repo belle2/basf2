@@ -14,9 +14,19 @@ namespace Belle2 {
   protected:
     /** fill StoreArrays with entries from 0..9 */
     virtual void SetUp() {
+      DataStore::Instance().setInitializeActive(true);
+      StoreArray<EventMetaData>::registerPersistent();
+      StoreArray<RunMetaData>::registerPersistent();
+      DataStore::Instance().setInitializeActive(false);
+
+      evtData = new StoreArray<EventMetaData>;
+      evtData->create();
+      runData = new StoreArray<RunMetaData>;
+      runData->create();
+
       for (int i = 0; i < 10; ++i) {
-        new(evtData->AddrAt(i)) EventMetaData();
-        new(runData->AddrAt(i)) RunMetaData();
+        new((*evtData)->AddrAt(i)) EventMetaData();
+        new((*runData)->AddrAt(i)) RunMetaData();
       }
     }
 
@@ -24,42 +34,60 @@ namespace Belle2 {
     virtual void TearDown() {
       for (int i = 0; i < DataStore::c_NDurabilityTypes; ++i) {
         DataStore::Instance().clearMaps((DataStore::EDurability) i);
+        const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(i));
+        const_cast<DataStore::StoreObjMap&>(map).clear();
       }
+      delete evtData;
+      delete runData;
     }
 
-    StoreArray<EventMetaData> evtData; /**< event data array */
-    StoreArray<RunMetaData> runData; /**< run data array */
+    StoreArray<EventMetaData>* evtData; /**< event data array */
+    StoreArray<RunMetaData>* runData; /**< run data array */
   };
 
   /** Tests the creation of a Relation. */
   TEST_F(RelationTest, RelationCreate)
   {
-    RelationArray relation(evtData, runData);
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), runData->getName()));
+    DataStore::Instance().setInitializeActive(false);
+
+    RelationArray relation(*evtData, *runData);
     EXPECT_TRUE(relation);
   }
 
   /** Check finding of relations. */
   TEST_F(RelationTest, RelationFind)
   {
-    EXPECT_FALSE(RelationArray(evtData, runData, "", DataStore::c_Event, false));
-    RelationArray relation(evtData, runData);
-    EXPECT_TRUE(RelationArray(evtData, runData, "", DataStore::c_Event, false));
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), runData->getName()));
+    StoreArray<EventMetaData>::registerPersistent("OwnName");
+    RelationArray::registerPersistent(DataStore::relationName("OwnName", runData->getName()));
+    DataStore::Instance().setInitializeActive(false);
+
+    EXPECT_FALSE(RelationArray(DataStore::relationName(evtData->getName(), runData->getName())));
+    RelationArray relation(*evtData, *runData);
+    EXPECT_TRUE(RelationArray(*evtData, *runData, "", DataStore::c_Event));
     string name = relation.getName();
     EXPECT_TRUE(RelationArray(name));
 
     StoreArray<EventMetaData> evtData2("OwnName");
     //check for OwnNameToRunMetaDatas
-    EXPECT_FALSE(RelationArray(evtData2, runData, "", DataStore::c_Event, false));
+    EXPECT_FALSE(RelationArray(DataStore::relationName(evtData2.getName(), runData->getName()), DataStore::c_Event));
     EXPECT_FALSE(RelationArray("OwnNameToRunMetaDatas", DataStore::c_Event));
-    RelationArray relation2(evtData2, runData);
+    RelationArray relation2(evtData2, *runData);
     EXPECT_TRUE(relation2.getName() == "OwnNameToRunMetaDatas");
-    EXPECT_TRUE(RelationArray(evtData2, runData, "", DataStore::c_Event, false));
+    EXPECT_TRUE(RelationArray(evtData2, *runData, "", DataStore::c_Event));
   }
 
   /** Test that adding to an invalid relation yields a FATAL */
   TEST_F(RelationTest, AddInvalidDeathTest)
   {
-    RelationArray relation(evtData, runData, "", DataStore::c_Event, false);
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), runData->getName()));
+    DataStore::Instance().setInitializeActive(false);
+
+    RelationArray relation(DataStore::relationName(evtData->getName(), runData->getName()));
     EXPECT_FALSE(relation);
     EXPECT_FATAL(relation.add(0, 0, 1.0));
     EXPECT_FATAL(relation[0]);
@@ -71,14 +99,22 @@ namespace Belle2 {
   /** Test that Relations wich points to the wrong arrays yields a FATAL. */
   TEST_F(RelationTest, RelationWrongDeathTest)
   {
-    RelationArray relation1(evtData, runData, "test");
-    EXPECT_FATAL(RelationArray relation2(runData, evtData, "test"));
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent("test");
+    DataStore::Instance().setInitializeActive(false);
+
+    RelationArray relation1(*evtData, *runData, "test");
+    EXPECT_FATAL(RelationArray relation2(*runData, *evtData, "test"));
   }
 
   /** Check consolidation of RelationElements. */
   TEST_F(RelationTest, RelationConsolidate)
   {
-    RelationArray relation(evtData, runData);
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), runData->getName()));
+    DataStore::Instance().setInitializeActive(false);
+
+    RelationArray relation(*evtData, *runData);
     relation.add(0, 0, 1.0);
     relation.add(0, 1, 2.0);
     relation.add(0, 1, 3.0);
@@ -103,7 +139,11 @@ namespace Belle2 {
   /** Check creation of an index. */
   TEST_F(RelationTest, BuildIndex)
   {
-    RelationArray relation(evtData, runData);
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), runData->getName()));
+    DataStore::Instance().setInitializeActive(false);
+
+    RelationArray relation(*evtData, *runData);
     relation.add(0, 0, 1.0);
     relation.add(0, 1, 2.0);
     relation.add(0, 2, 3.0);
@@ -122,9 +162,9 @@ namespace Belle2 {
 
     typedef const RelationIndex<EventMetaData, RunMetaData>::Element el_t;
     //check elements of last relation (both from objects point to to_obj)
-    const EventMetaData* first_from_obj = evtData[0];
-    const EventMetaData* from_obj = evtData[1];
-    const RunMetaData* to_obj = runData[0];
+    const EventMetaData* first_from_obj = (*evtData)[0];
+    const EventMetaData* from_obj = (*evtData)[1];
+    const RunMetaData* to_obj = (*runData)[0];
     EXPECT_TRUE(first_from_obj == relIndex.getFirstElementTo(to_obj)->from);
     EXPECT_TRUE(to_obj == relIndex.getFirstElementTo(to_obj)->to);
     EXPECT_FLOAT_EQ(1.0, relIndex.getFirstElementTo(to_obj)->weight);
@@ -137,14 +177,14 @@ namespace Belle2 {
     EXPECT_TRUE(relIndex.getFirstElementTo(0) == NULL);
     EXPECT_TRUE(relIndex.getFirstElementFrom(0) == NULL);
     EXPECT_TRUE(relIndex.getFirstElementFrom(0) == NULL);
-    EXPECT_TRUE(relIndex.getFirstElementFrom(evtData[4]) == NULL);
-    EXPECT_TRUE(relIndex.getFirstElementTo(runData[3]) == NULL);
+    EXPECT_TRUE(relIndex.getFirstElementFrom((*evtData)[4]) == NULL);
+    EXPECT_TRUE(relIndex.getFirstElementTo((*runData)[3]) == NULL);
 
     //check size of found element lists
     {
       int size(0);
       double allweights(0);
-      BOOST_FOREACH(el_t & e, relIndex.getElementsFrom(evtData[0])) {
+      BOOST_FOREACH(el_t & e, relIndex.getElementsFrom((*evtData)[0])) {
         ++size;
         allweights += e.weight;
       }
@@ -154,7 +194,7 @@ namespace Belle2 {
     {
       int size(0);
       double allweights(0);
-      BOOST_FOREACH(el_t & e, relIndex.getElementsTo(runData[0])) {
+      BOOST_FOREACH(el_t & e, relIndex.getElementsTo((*runData)[0])) {
         ++size;
         allweights += e.weight;
       }
@@ -164,7 +204,7 @@ namespace Belle2 {
     {
       int size(0);
       double allweights(0);
-      BOOST_FOREACH(el_t & e, relIndex.getElementsTo(runData[4])) {
+      BOOST_FOREACH(el_t & e, relIndex.getElementsTo((*runData)[4])) {
         ++size;
         allweights += e.weight;
       }
@@ -176,7 +216,11 @@ namespace Belle2 {
   /** Check wether out-of-bound indices are caught by RelationIndex. */
   TEST_F(RelationTest, InconsitentIndexDeathTest)
   {
-    RelationArray relation(evtData, runData);
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), runData->getName()));
+    DataStore::Instance().setInitializeActive(false);
+
+    RelationArray relation(*evtData, *runData);
     relation.add(0, 10, 1.0);
     typedef RelationIndex<EventMetaData, RunMetaData> rel_t;
     EXPECT_FATAL(rel_t relIndex);
@@ -189,6 +233,10 @@ namespace Belle2 {
   /** Check behaviour when attaching to non-existing(=empty) relation */
   TEST_F(RelationTest, EmptyIndex)
   {
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), runData->getName()));
+    DataStore::Instance().setInitializeActive(false);
+
     RelationIndex<EventMetaData, RunMetaData> index;
     EXPECT_FALSE(index);
     EXPECT_EQ(index.size(), 0u);
@@ -199,14 +247,21 @@ namespace Belle2 {
   /** Attaching to relation with from and two swapped, and with different StoreArray of same type. */
   TEST_F(RelationTest, WrongRelationIndexDeathTest)
   {
-    RelationArray relation(runData, evtData, "test");
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent("test");
+    RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), runData->getName()));
+    StoreArray<EventMetaData>::registerPersistent("evts");
+    RelationArray::registerPersistent("test2");
+    DataStore::Instance().setInitializeActive(false);
+
+    RelationArray relation(*runData, *evtData, "test");
     typedef RelationIndex<EventMetaData, RunMetaData> rel_t;
-    EXPECT_FATAL(rel_t(evtData, runData, "test"));
-    EXPECT_FATAL(rel_t("test"));
+    EXPECT_FATAL(rel_t(*evtData, *runData, "test"));
+//    EXPECT_FATAL(rel_t("test"));
 
     StoreArray<EventMetaData> eventData("evts");
-    RelationArray relation2(evtData, runData, "test2");
-    EXPECT_FATAL(rel_t(eventData, runData, "test2"));
+    RelationArray relation2(*evtData, *runData, "test2");
+    EXPECT_FATAL(rel_t(eventData, *runData, "test2"));
     //This relation works and points to evtData, not eventData.
     //no check is performed, user is responsible to check
     //using getFromAccessorParams and getToAccessorParams

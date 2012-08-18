@@ -12,7 +12,6 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/core/Environment.h>
 
 #include <vector>
 
@@ -54,12 +53,7 @@ EvtMetaGenModule::~EvtMetaGenModule()
 void EvtMetaGenModule::initialize()
 {
   //Register the EventMetaData in the data store
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
-
-  //steering file content overwritten via command line arguments?
-  int numEventsArgument = Environment::Instance().getNumberEventsOverride();
-  if (numEventsArgument > 0)
-    m_evtNumList[0] = numEventsArgument;
+  StoreObjPtr<EventMetaData>::registerPersistent();
 
   //Make sure all lists have the same size
   unsigned int defListSize = m_expList.size();
@@ -92,6 +86,7 @@ void EvtMetaGenModule::event()
   }
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  eventMetaDataPtr.create();
   eventMetaDataPtr->setExperiment(m_expList[m_colIndex]);
   eventMetaDataPtr->setRun(m_runList[m_colIndex]);
   eventMetaDataPtr->setEvent(m_evtNumber);

@@ -20,12 +20,20 @@ namespace Belle2 {
 
   typedef std::pair<std::string, DataStore::EDurability> AccessorParams; /**< Pair of parameters needed to find an object in the DataStore. */
 
-  /** Abstract base class for the StoreObjPtr and the StoreArray for easier common treatment.
+  /** Base class for the StoreObjPtr and the StoreArray for easier common treatment.
    *
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreAccessorBase">The basf2 developers</a>
    */
   class StoreAccessorBase {
   public:
+
+    /** Constructor to access an array in the DataStore.
+     *
+     *  @param name       Name under which the object is stored in the DataStore.
+     *  @param durability Decides durability map used for getting the accessed object.
+     */
+    StoreAccessorBase(const std::string& name, DataStore::EDurability durability):
+      m_name(name), m_durability(durability) {};
 
     /** Destructor.
      *
@@ -34,8 +42,14 @@ namespace Belle2 {
     virtual ~StoreAccessorBase() {};
 
 
-    /** Returns name under which stored object is saved.  */
-    virtual AccessorParams getAccessorParams() const = 0;
+    /** Return name under which the object is saved in the DataStore. */
+    const std::string& getName() const { return m_name; }
+
+    /** Return durability with which the object is saved in the DataStore. */
+    DataStore::EDurability getDurability() const { return m_durability; }
+
+    /** Return pair of name and durability under which stored object is saved.  */
+    AccessorParams getAccessorParams() const {return make_pair(m_name, m_durability);};
 
     /** Check if two store accessors point to the same object/array. */
     virtual bool operator==(const StoreAccessorBase& other) {
@@ -46,6 +60,13 @@ namespace Belle2 {
     virtual bool operator!=(const StoreAccessorBase& other) {
       return !(*this == other);
     }
+
+  protected:
+    /** Store name under which TClonesArray is saved. */
+    std::string m_name;
+
+    /**Store durability under which the TClonesArray is saved. */
+    DataStore::EDurability m_durability;
 
   };
 }

@@ -125,16 +125,17 @@ void SeqRootInputModule::event()
   // 1. Objects
   for (int i = 0; i < nobjs; i++) {
     if (objlist.at(i) != NULL) {
-      DataStore::Instance().storeObject(
-        objlist.at(i), namelist.at(i), durability);
+      DataStore::Instance().createObject(objlist.at(i), false,
+                                         namelist.at(i), durability,
+                                         objlist.at(i)->IsA(), false);
       B2INFO("Store Object : " << namelist.at(i) << " stored");
     }
   }
   for (int i = 0; i < narrays; i++) {
     if (objlist.at(i + nobjs) != NULL) {
-      DataStore::Instance().storeArray(
-        (TClonesArray*)objlist.at(i + nobjs),
-        namelist.at(i + nobjs), durability);
+      DataStore::Instance().createObject(objlist.at(i + nobjs), false,
+                                         namelist.at(i + nobjs), durability,
+                                         ((TClonesArray*)objlist.at(i + nobjs))->GetClass(), true);
       B2INFO("Store Array : " << namelist.at(i) << " stored");
     }
   }

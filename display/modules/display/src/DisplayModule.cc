@@ -122,7 +122,7 @@ void DisplayModule::event()
   for (int i = 0; i < nCDCHits; i++) {
     const RelationIndexContainer<MCParticle, CDCSimHit>::Element* el = mcpart_to_cdchits.getFirstElementTo(cdchits[i]);
     if (!el) {
-      B2WARNING("MCParticle not found!");
+      B2WARNING("MCParticle not found for CDCSimHit, skipping hit!");
       continue;
     }
 
@@ -135,7 +135,7 @@ void DisplayModule::event()
   for (int i = 0; i < nPXDHits; i++) {
     const RelationIndexContainer<MCParticle, PXDSimHit>::Element* el = mcpart_to_pxdhits.getFirstElementTo(pxdhits[i]);
     if (!el) {
-      B2WARNING("MCParticle not found!");
+      B2WARNING("MCParticle not found for PXDSimHit, skipping hit!");
       continue;
     }
 
@@ -148,7 +148,7 @@ void DisplayModule::event()
   for (int i = 0; i < nSVDHits; i++) {
     const RelationIndexContainer<MCParticle, SVDSimHit>::Element* el = mcpart_to_svdhits.getFirstElementTo(svdhits[i]);
     if (!el) {
-      B2WARNING("MCParticle not found!");
+      B2WARNING("MCParticle not found for SVDSimHit, skipping hit!");
       continue;
     }
 
@@ -161,7 +161,7 @@ void DisplayModule::event()
   for (int i = 0; i < nTOPHits; i++) {
     const RelationIndexContainer<MCParticle, TOPSimHit>::Element* el = mcpart_to_tophits.getFirstElementTo(tophits[i]);
     if (!el) {
-      B2WARNING("MCParticle not found!");
+      B2WARNING("MCParticle not found for TOPSimHit, skipping hit!");
       continue;
     }
     if (!el->from->getMother()) {
@@ -178,7 +178,7 @@ void DisplayModule::event()
   for (int i = 0; i < nBKLMHits; i++) {
     const RelationIndexContainer<MCParticle, BKLMSimHit>::Element* el = mcpart_to_bklmhits.getFirstElementTo(bklmhits[i]);
     if (!el) {
-      B2WARNING("MCParticle not found!");
+      B2WARNING("MCParticle not found for BKLMSimHit, skipping hit!");
       continue;
     }
 
@@ -193,6 +193,7 @@ void DisplayModule::event()
       const RelationIndexContainer<MCParticle, EKLMSimHit>::Element* el = mcpart_to_eklmhits.getFirstElementTo(eklmhits[i]);
       if (!el) {
         B2WARNING("MCParticle not found!");
+      B2WARNING("MCParticle not found for EKLMSimHit, skipping hit!");
         continue;
       }
 

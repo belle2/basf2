@@ -826,7 +826,6 @@ void EVEVisualization::makeTracks()
     //calo3d->SetBackwardEndCapPos(-102.0); //inner edge of backward endcap
     calo3d->SetMaxValAbs(2.1);
     gEve->AddElement(calo3d);
-    B2INFO("Added calo3d, max value:" << m_eclsimhitdata->GetMaxVal(true));
   }
 }
 

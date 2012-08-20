@@ -12,7 +12,6 @@
 #define MODULE_H
 
 #include <boost/python.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/dict.hpp>
 
@@ -21,6 +20,7 @@
 #include <framework/core/ModuleParamList.h>
 #include <framework/logging/LogConfig.h>
 
+#include <boost/shared_ptr.hpp>
 #include <list>
 #include <string>
 #include <set>

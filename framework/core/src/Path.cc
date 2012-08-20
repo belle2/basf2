@@ -8,11 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <boost/python/register_ptr_to_python.hpp>
+
 #include <framework/core/Path.h>
 #include <framework/core/Module.h>
 
 #include <boost/foreach.hpp>
-#include <boost/python/register_ptr_to_python.hpp>
 
 using namespace Belle2;
 using namespace boost::python;

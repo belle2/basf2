@@ -11,15 +11,17 @@
 #ifndef MODULESTATISTICS_H
 #define MODULESTATISTICS_H
 
+#include <boost/python.hpp>
+#include <boost/array.hpp>
+
+#include <framework/gearbox/Unit.h>
+#include <framework/core/Module.h>
+#include <framework/core/utilities.h>
+
 #include <map>
 #include <cstring>
 #include <string>
 #include <numeric>
-#include <framework/gearbox/Unit.h>
-#include <framework/core/Module.h>
-#include <framework/core/utilities.h>
-#include <boost/python.hpp>
-#include <boost/array.hpp>
 
 namespace Belle2 {
 

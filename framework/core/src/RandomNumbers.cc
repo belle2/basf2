@@ -8,10 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <boost/python.hpp>
+
 #include <framework/core/RandomNumbers.h>
 #include <framework/logging/Logger.h>
-
-#include <boost/python.hpp>
 
 
 using namespace Belle2;

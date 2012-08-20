@@ -104,7 +104,7 @@ void SimpleInputModule::initialize()
       B2WARNING(c_SteerBranchNames[ii] << " has duplicate entries.");
     if (makeBranchNamesUnique(m_excludeBranchNames[ii]))
       B2WARNING(c_SteerExcludeBranchNames[ii] << " has duplicate entries.");
-    //m_branchNames[ii] and it's exclusion list are now sorted alphabetically and unique
+    //m_branchNames[ii] and its exclusion list are now sorted alphabetically and unique
 
     //Get TTree
     m_tree[ii] = dynamic_cast<TTree*>(m_file->Get(m_treeNames[ii].c_str()));

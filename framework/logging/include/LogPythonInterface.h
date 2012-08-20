@@ -11,9 +11,11 @@
 #ifndef LOGPYTHONINTERFACE_H_
 #define LOGPYTHONINTERFACE_H_
 
-#include <string>
 #include <boost/python.hpp>
+
 #include <framework/logging/LogConfig.h>
+
+#include <string>
 
 namespace Belle2 {
 

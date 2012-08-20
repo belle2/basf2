@@ -6,8 +6,8 @@
 // Date : 13 - Aug - 2010
 //-
 
-#include <framework/datastore/DataStore.h>
 #include <framework/modules/seqroot/seqrootoutputModule.h>
+#include <framework/datastore/DataStore.h>
 #include <framework/core/Environment.h>
 #include <stdlib.h>
 #include <sys/types.h>

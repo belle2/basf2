@@ -8,9 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <boost/python.hpp>
+
 #include <framework/dataobjects/FileMetaData.h>
 
-#include <boost/python.hpp>
 
 using namespace std;
 using namespace Belle2;

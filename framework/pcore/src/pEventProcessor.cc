@@ -6,8 +6,6 @@
  *  Updated : Jul. 25, 2011
  */
 
-#include <signal.h>
-
 #include <framework/pcore/pEventProcessor.h>
 #include <framework/core/Environment.h>
 #include <framework/core/PathManager.h>
@@ -19,6 +17,9 @@
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/TxModule.h>
+
+#include <signal.h>
+
 
 using namespace std;
 using namespace Belle2;

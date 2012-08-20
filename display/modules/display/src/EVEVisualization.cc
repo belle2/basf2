@@ -774,7 +774,9 @@ TEveTrack* EVEVisualization::addMCParticle(const MCParticle* particle)
     //create point set for hits
     if (m_mcparticleTracks[particle]->FirstChild())
       B2WARNING("track already has a child??");
-    TEvePointSet* points = new TEvePointSet(TString::Format("SimHits for MCParticle %d (%s)", particle->getIndex(), particle_name.Data()));
+    const TString pointsTitle = TString::Format("SimHits for MCParticle %d (%s)", particle->getIndex(), particle_name.Data());
+    TEvePointSet* points = new TEvePointSet(pointsTitle);
+    points->SetTitle(pointsTitle);
     points->SetMainColor(m_mcparticleTracks[particle]->GetLineColor());
     points->SetMainTransparency(70);
     m_mcparticleTracks[particle]->AddElement(points);

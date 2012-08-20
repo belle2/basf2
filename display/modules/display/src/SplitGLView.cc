@@ -149,8 +149,6 @@ SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
     // connect signals we are interested in
     fGLViewer[iFrame]->Connect("MouseOver(TGLPhysicalShape*)", "Belle2::SplitGLView", this,
                                "OnMouseOver(TGLPhysicalShape*)");
-    fGLViewer[iFrame]->Connect("Activated()", "Belle2::SplitGLView", this,
-                               "OnViewerActivated()");
     fGLViewer[iFrame]->Connect("Clicked(TObject*)", "Belle2::SplitGLView", this,
                                "OnClicked(TObject*)");
     fViewer[iFrame] = new TEveViewer(TString::Format("SplitGLViewer[%d]", iFrame));
@@ -178,6 +176,7 @@ SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
     }
 
   }
+  setActiveViewer(fGLViewer[0]);
 
   if (gEve) {
     gEve->GetListTree()->Connect("Clicked(TGListTreeItem*, Int_t, Int_t, Int_t)",
@@ -200,7 +199,6 @@ SplitGLView::~SplitGLView()
   for (int i = 0; i < 3; i++) {
     fGLViewer[i]->Disconnect("MouseOver(TGLPhysicalShape*)", this,
                              "OnMouseOver(TGLPhysicalShape*)");
-    fGLViewer[i]->Disconnect("Activated()", this, "OnViewerActivated()");
     delete fGLViewer[i];
   }
   delete fMenuFile;
@@ -215,8 +213,8 @@ void SplitGLView::HandleMenu(Int_t id)
 {
   // Handle menu items.
 
-  static TString rcdir(".");
-  static TString rcfile(".everc");
+  static const TString rcdir(".");
+  static const TString rcfile(".everc");
 
   switch (id) {
 
@@ -304,41 +302,30 @@ void SplitGLView::OnClicked(TObject* obj)
     fStatusBar->SetText(Form("User clicked on: \"%s\"", obj->GetName()), 1);
   else
     fStatusBar->SetText("", 1);
+
+  // change the active GL viewer to the one who emitted the signal
+  TGLEmbeddedViewer* sender = dynamic_cast<TGLEmbeddedViewer*>(static_cast<TQObject*>(gTQSender));
+
+  if (!sender) {
+    B2WARNING("OnClicked() signal not from a TGLEmbeddedViewer?");
+    return;
+  }
+  setActiveViewer(sender);
 }
 
-
-void SplitGLView::OnMouseOver(TGLPhysicalShape* shape)
+void SplitGLView::setActiveViewer(TGLEmbeddedViewer* v)
 {
-  // Slot used to handle "OnMouseOver" signal coming from any GL viewer.
-  // We receive a pointer on the physical shape in which the mouse cursor is.
+  // set the last active GL viewer frame to default color
+  if (fActViewer && fActViewer->GetFrame())
+    fActViewer->GetFrame()->ChangeBackground(GetDefaultFrameBackground());
 
-  // display informations on the physical shape in the status bar
-  if (shape && shape->GetLogical() && shape->GetLogical()->GetExternal())
-    fStatusBar->SetText(Form("Mouse Over: \"%s\"",
-                             shape->GetLogical()->GetExternal()->GetName()), 0);
-  else
-    fStatusBar->SetText("", 0);
-}
+  fActViewer = v;
 
-void SplitGLView::OnViewerActivated()
-{
   static Pixel_t green = 0;
   // get the highlight color (only once)
   if (green == 0) {
     gClient->GetColorByName("green", green);
   }
-  // set the last active GL viewer frame to default color
-  if (fActViewer && fActViewer->GetFrame())
-    fActViewer->GetFrame()->ChangeBackground(GetDefaultFrameBackground());
-
-  // change the active GL viewer to the one who emitted the signal
-  fActViewer = dynamic_cast<TGLEmbeddedViewer*>(static_cast<TQObject*>(gTQSender));
-
-  if (fActViewer == 0) {
-    B2WARNING("OnViewerActivated() signal not from a TGLEmbeddedViewer?");
-    return;
-  }
-
   // set the new active GL viewer frame to highlight color
   if (fActViewer->GetFrame())
     fActViewer->GetFrame()->ChangeBackground(green);
@@ -358,6 +345,21 @@ void SplitGLView::OnViewerActivated()
   else
     fMenuCamera->UnCheckEntry(kGLOrthoRotate);
 }
+
+
+void SplitGLView::OnMouseOver(TGLPhysicalShape* shape)
+{
+  // Slot used to handle "OnMouseOver" signal coming from any GL viewer.
+  // We receive a pointer on the physical shape in which the mouse cursor is.
+
+  // display informations on the physical shape in the status bar
+  if (shape && shape->GetLogical() && shape->GetLogical()->GetExternal())
+    fStatusBar->SetText(Form("Mouse Over: \"%s\"",
+                             shape->GetLogical()->GetExternal()->GetName()), 0);
+  else
+    fStatusBar->SetText("", 0);
+}
+
 
 void SplitGLView::ToggleOrthoRotate()
 {

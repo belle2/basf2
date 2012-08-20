@@ -53,12 +53,10 @@ namespace Belle2 {
     void           ItemClicked(TGListTreeItem* item, Int_t btn, Int_t x, Int_t y);
     /** menu item handler */
     void           HandleMenu(Int_t id);
-    /** show name of obj in status bar. */
+    /** make current viewer active & show name of obj in status bar. */
     void           OnClicked(TObject* obj);
     /** show name of shape in status bar. */
     void           OnMouseOver(TGLPhysicalShape* shape);
-    /** handle Activated signals from GLViewer. */
-    void           OnViewerActivated();
     /** swap specified viewer with main view. */
     void           SwapToMainView(TGLViewerBase* viewer);
     /** toggle wether the active viewer may be rotated (not that useful for projections). */
@@ -84,6 +82,9 @@ namespace Belle2 {
     };
 
   private:
+    //set fActViewer and update UI accordingly
+    void setActiveViewer(TGLEmbeddedViewer* v);
+
     TEvePad*               fPad;           /**< pad used as geometry container */
     TGSplitFrame*          fSplitFrame;    /**< main (first) split frame */
     TGLEmbeddedViewer*     fGLViewer[3];   /**< GL viewers */

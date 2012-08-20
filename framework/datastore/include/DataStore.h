@@ -159,7 +159,7 @@ namespace Belle2 {
      *  @param durability Decide with which durability map you want to perform the requested action.
      *  @param objClass   The class of the object.
      *  @param array      Whether it is a TClonesArray or not.
-     *  @return           Pointer to pointer to object.
+     *  @return           Pointer to pointer to object, NULL if none exists
      */
     TObject** getObject(const std::string& name, EDurability durability,
                         const TClass* objClass, bool array);

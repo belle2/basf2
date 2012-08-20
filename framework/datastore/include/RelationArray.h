@@ -240,7 +240,6 @@ namespace Belle2 {
         B2FATAL("Cannot guess relation name, please supply correct name");
         return;
       }
-      DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, RelationContainer::Class(), false);
       m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(m_name, m_durability, RelationContainer::Class(), false));
     }
 
@@ -257,7 +256,6 @@ namespace Belle2 {
         B2FATAL("Cannot guess relation name, please supply correct name");
         return;
       }
-      DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, RelationContainer::Class(), false);
       m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(m_name, m_durability, RelationContainer::Class(), false));
     }
 

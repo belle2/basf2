@@ -123,11 +123,10 @@ void RxModule::event()
 
   // Restore objects in DataStore
   for (int i = 0; i < nobjs; i++) {
-    //    TObject* obj = dynamic_cast<namelist.at(i).c_str()>objlist.at(i) );
     if (objlist.at(i) != NULL) {
       DataStore::Instance().createObject(objlist.at(i), false,
                                          namelist.at(i), DataStore::c_Event,
-                                         objlist.at(i)->Class(), false);
+                                         objlist.at(i)->IsA(), false);
       //    printf ( "Rx: Restoring [Object] %s : Class=%s\n",
       //       namelist.at(i).c_str(), ((objlist.at(i))->ClassName()).c_str() );
       B2INFO("Rx: restored obj " << namelist.at(i));

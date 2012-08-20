@@ -93,12 +93,11 @@ void DedxPIDModule::initialize()
 
   //register outputs (if needed)
   if (m_enableDebugOutput)
-    StoreArray<TrackDedx> dedx_array("TrackDedx", DataStore::c_Event);
+    StoreArray<TrackDedx>::registerPersistent("TrackDedx", DataStore::c_Event);
 
   if (!m_pdfFilename.empty()) {
-    StoreArray<DedxLikelihood> likelihood_array;
-    StoreArray<GFTrack> gftracks(m_gftracks_name); //TODO: i don't actually want to create this here.
-    RelationArray tracks_to_likelihoods(gftracks, likelihood_array);
+    StoreArray<DedxLikelihood>::registerPersistent();
+    RelationArray::registerPersistent(DataStore::defaultRelationName<GFTrack, DedxLikelihood>());
 
     //load pdfs
     TFile* pdf_file = new TFile(m_pdfFilename.c_str(), "READ");
@@ -199,10 +198,14 @@ void DedxPIDModule::event()
   RelationArray* tracks_to_likelihoods = 0;
   if (!m_pdfFilename.empty()) {
     likelihood_array = new StoreArray<DedxLikelihood>;
+    likelihood_array->create();
     tracks_to_likelihoods = new RelationArray(gftracks, *likelihood_array);
+    tracks_to_likelihoods->create(gftracks, *likelihood_array); //why specify them again here?
   }
-  if (m_enableDebugOutput)
+  if (m_enableDebugOutput) {
     dedx_array = new StoreArray<TrackDedx>("TrackDedx", DataStore::c_Event);
+    dedx_array->create();
+  }
 
 
   //loop over all tracks

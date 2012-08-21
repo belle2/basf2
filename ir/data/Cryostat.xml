@@ -33,7 +33,7 @@
 	</TubeL>
 
 	<A1spc1>
-		<N desc="Number of planes">41</N>
+		<N desc="Number of planes">37</N>
 
 		<Z0 unit="cm">62.05</Z0>
 		<Z1 unit="cm">67.50</Z1>
@@ -59,23 +59,19 @@
 		<Z21 unit="cm">169.60</Z21>
 		<Z22 unit="cm">227.29</Z22>
 		<Z23 unit="cm">227.29</Z23>
-		<Z24 unit="cm">247.00</Z24>
-		<Z25 unit="cm">247.00</Z25>
-		<Z26 unit="cm">253.00</Z26>
-		<Z27 unit="cm">253.00</Z27>
-		<Z28 unit="cm">261.30</Z28>
-		<Z29 unit="cm">261.30</Z29>
-		<Z30 unit="cm">262.70</Z30>
-		<Z31 unit="cm">262.70</Z31>
-		<Z32 unit="cm">264.10</Z32>
-		<Z33 unit="cm">264.10</Z33>
-		<Z34 unit="cm">336.12</Z34>
-		<Z35 unit="cm">336.12</Z35>
-		<Z36 unit="cm">337.30</Z36>
-		<Z37 unit="cm">337.30</Z37>
-		<Z38 unit="cm">337.98</Z38>
-		<Z39 unit="cm">337.98</Z39>
-		<Z40 unit="cm">394.81</Z40>
+		<Z24 unit="cm">261.30</Z24>
+		<Z25 unit="cm">261.30</Z25>
+		<Z26 unit="cm">262.70</Z26>
+		<Z27 unit="cm">262.70</Z27>
+		<Z28 unit="cm">264.10</Z28>
+		<Z29 unit="cm">264.10</Z29>
+		<Z30 unit="cm">336.12</Z30>
+		<Z31 unit="cm">336.12</Z31>
+		<Z32 unit="cm">337.30</Z32>
+		<Z33 unit="cm">337.30</Z33>
+		<Z34 unit="cm">337.98</Z34>
+		<Z35 unit="cm">337.98</Z35>
+		<Z36 unit="cm">394.81</Z36>
 
 		<R0 unit="cm">1.45</R0>
 		<R1 unit="cm">1.45</R1>
@@ -102,22 +98,18 @@
 		<R22 unit="cm">5.05</R22>
 		<R23 unit="cm">3.9</R23>
 		<R24 unit="cm">3.9</R24>
-		<R25 unit="cm">5.7</R25>
-		<R26 unit="cm">5.7</R26>
-		<R27 unit="cm">3.9</R27>
-		<R28 unit="cm">3.9</R28>
-		<R29 unit="cm">5.4</R29>
-		<R30 unit="cm">5.4</R30>
-		<R31 unit="cm">7.5</R31>
-		<R32 unit="cm">7.5</R32>
-		<R33 unit="cm">10.85</R33>
-		<R34 unit="cm">10.85</R34>
-		<R35 unit="cm">5.83</R35>
-		<R36 unit="cm">5.83</R36>
-		<R37 unit="cm">5.4</R37>
-		<R38 unit="cm">5.4</R38>
-		<R39 unit="cm">4.4</R39>
-		<R40 unit="cm">4.4</R40>
+		<R25 unit="cm">5.4</R25>
+		<R26 unit="cm">5.4</R26>
+		<R27 unit="cm">7.5</R27>
+		<R28 unit="cm">7.5</R28>
+		<R29 unit="cm">10.85</R29>
+		<R30 unit="cm">10.85</R30>
+		<R31 unit="cm">5.83</R31>
+		<R32 unit="cm">5.83</R32>
+		<R33 unit="cm">5.4</R33>
+		<R34 unit="cm">5.4</R34>
+		<R35 unit="cm">4.4</R35>
+		<R36 unit="cm">4.4</R36>
 
 		<Material desc="Right HER Beam pipe space 1">Vacuum</Material>
 	</A1spc1>
@@ -516,7 +508,7 @@
 	</A4mag4p9>
 
 	<B1spc1>
-		<N desc="Number of planes">32</N>
+		<N desc="Number of planes">28</N>
 
 		<Z0 unit="cm">62.05</Z0>
 		<Z1 unit="cm">67.50</Z1>
@@ -537,19 +529,15 @@
 		<Z16 unit="cm">163.70</Z16>
 		<Z17 unit="cm">227.30</Z17>
 		<Z18 unit="cm">227.30</Z18>
-		<Z19 unit="cm">247.00</Z19>
-		<Z20 unit="cm">247.00</Z20>
-		<Z21 unit="cm">253.00</Z21>
-		<Z22 unit="cm">253.00</Z22>
-		<Z23 unit="cm">261.39</Z23>
-		<Z24 unit="cm">261.39</Z24>
-		<Z25 unit="cm">264.10</Z25>
-		<Z26 unit="cm">264.10</Z26>
-		<Z27 unit="cm">336.12</Z27>
-		<Z28 unit="cm">336.12</Z28>
-		<Z29 unit="cm">337.90</Z29>
-		<Z30 unit="cm">337.90</Z30>
-		<Z31 unit="cm">393.81</Z31>
+		<Z19 unit="cm">261.39</Z19>
+		<Z20 unit="cm">261.39</Z20>
+		<Z21 unit="cm">264.10</Z21>
+		<Z22 unit="cm">264.10</Z22>
+		<Z23 unit="cm">336.12</Z23>
+		<Z24 unit="cm">336.12</Z24>
+		<Z25 unit="cm">337.90</Z25>
+		<Z26 unit="cm">337.90</Z26>
+		<Z27 unit="cm">393.81</Z27>
 
 		<R0 unit="cm">1.45</R0>
 		<R1 unit="cm">1.45</R1>
@@ -571,18 +559,14 @@
 		<R17 unit="cm">4.85</R17>
 		<R18 unit="cm">3.9</R18>
 		<R19 unit="cm">3.9</R19>
-		<R20 unit="cm">5.7</R20>
-		<R21 unit="cm">5.7</R21>
-		<R22 unit="cm">3.9</R22>
-		<R23 unit="cm">3.9</R23>
+		<R20 unit="cm">7.5</R20>
+		<R21 unit="cm">7.5</R21>
+		<R22 unit="cm">10.85</R22>
+		<R23 unit="cm">10.85</R23>
 		<R24 unit="cm">7.5</R24>
 		<R25 unit="cm">7.5</R25>
-		<R26 unit="cm">10.85</R26>
-		<R27 unit="cm">10.85</R27>
-		<R28 unit="cm">7.5</R28>
-		<R29 unit="cm">7.5</R29>
-		<R30 unit="cm">4.4</R30>
-		<R31 unit="cm">4.4</R31>
+		<R26 unit="cm">4.4</R26>
+		<R27 unit="cm">4.4</R27>
 
 		<Material desc="Right LER Beam pipe space 1">Vacuum</Material>
 	</B1spc1>
@@ -956,40 +940,63 @@
 	</B4mag4p9>
 
 	<C1wal1>
-		<N desc="Number of planes">14</N>
+		<N desc="Number of planes">15</N>
 
-		<Z0 unit="cm">63.35</Z0>
-		<Z1 unit="cm">88.37</Z1>
-		<Z2 unit="cm">99.27</Z2>
+		<Z0 unit="cm">64.85</Z0>
+		<Z1 unit="cm">88.89</Z1>
+		<Z2 unit="cm">88.89</Z2>
 		<Z3 unit="cm">99.27</Z3>
-		<Z4 unit="cm">107.67</Z4>
-		<Z5 unit="cm">214.00</Z5>
+		<Z4 unit="cm">99.27</Z4>
+		<Z5 unit="cm">107.67</Z5>
 		<Z6 unit="cm">214.00</Z6>
-		<Z7 unit="cm">253.00</Z7>
+		<Z7 unit="cm">214.00</Z7>
 		<Z8 unit="cm">253.00</Z8>
-		<Z9 unit="cm">336.75</Z9>
-		<Z10 unit="cm">357.48</Z10>
-		<Z11 unit="cm">376.15</Z11>
+		<Z9 unit="cm">253.00</Z9>
+		<Z10 unit="cm">336.75</Z10>
+		<Z11 unit="cm">357.48</Z11>
 		<Z12 unit="cm">376.15</Z12>
-		<Z13 unit="cm">382.15</Z13>
+		<Z13 unit="cm">376.15</Z13>
+		<Z14 unit="cm">382.15</Z14>
 
-		<R0 unit="cm">12.25</R0>
-		<R1 unit="cm">19.90</R1>
+		<R0 unit="cm">11.65</R0>
+		<R1 unit="cm">19.00</R1>
 		<R2 unit="cm">19.90</R2>
-		<R3 unit="cm">23.23</R3>
-		<R4 unit="cm">25.80</R4>
+		<R3 unit="cm">19.90</R3>
+		<R4 unit="cm">23.23</R4>
 		<R5 unit="cm">25.80</R5>
-		<R6 unit="cm">35.00</R6>
+		<R6 unit="cm">25.80</R6>
 		<R7 unit="cm">35.00</R7>
-		<R8 unit="cm">39.00</R8>
-		<R9 unit="cm">39.0</R9>
-		<R10 unit="cm">56.0</R10>
+		<R8 unit="cm">35.00</R8>
+		<R9 unit="cm">39.00</R9>
+		<R10 unit="cm">39.0</R10>
 		<R11 unit="cm">56.0</R11>
-		<R12 unit="cm">64.0</R12>
+		<R12 unit="cm">56.0</R12>
 		<R13 unit="cm">64.0</R13>
+		<R14 unit="cm">64.0</R14>
 
 		<Material desc="Vacuum vessel">SUS316L</Material>
         </C1wal1>
+
+        <C1wal2>
+		<N desc="Number of planes">4</N>
+
+		<Z0 unit="cm">63.35</Z0>
+		<Z1 unit="cm">64.85</Z1>
+		<Z2 unit="cm">64.85</Z2>
+		<Z3 unit="cm">88.89</Z3>
+
+		<R0 unit="cm">12.25</R0>
+		<R1 unit="cm">12.70</R1>
+		<R2 unit="cm">12.70</R2>
+		<R3 unit="cm">19.90</R3>
+
+		<r0 unit="cm">0.0</r0>
+		<r1 unit="cm">0.0</r1>
+		<r2 unit="cm">11.65</r2>
+		<r3 unit="cm">19.00</r3>
+
+		<Material desc="Tungsten shield forward">W</Material>
+        </C1wal2>
 
 	<C2spc1>
 		<N desc="Number of planes">8</N>
@@ -1057,7 +1064,7 @@
 		<Material desc="Vacuum space">Vacuum</Material>
         </C2spc2>
 
-        <C3wal2>
+        <C3wal1>
 		<N desc="Number of planes">7</N>
 
 		<Z0 unit="cm">65.85</Z0>
@@ -1077,9 +1084,9 @@
 		<R6 unit="cm">23.30</R6>
 
 		<Material desc="Cold shield">SUS316L</Material>
-        </C3wal2>
+        </C3wal1>
 
-        <C3wal3>
+        <C3wal2>
 		<N desc="Number of planes">6</N>
 
 		<Z0 unit="cm">257.45</Z0>
@@ -1097,9 +1104,9 @@
 		<R5 unit="cm">29.9</R5>
 
 		<Material desc="Cold shield">SUS316L</Material>
-        </C3wal3>
+        </C3wal2>
 
-        <C3wal4>
+        <C3wal3>
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">352.92</Z0>
@@ -1109,9 +1116,21 @@
 		<R1 unit="cm">37.7</R1>
 
 		<Material desc="Vacuum vessel">SUS316L</Material>
+	</C3wal3>
+
+        <C3wal4>
+		<N desc="Number of planes">2</N>
+
+		<Z0 unit="cm">252.45</Z0>
+		<Z1 unit="cm">257.45</Z1>
+
+		<R0 unit="cm">29.0</R0>
+		<R1 unit="cm">29.0</R1>
+
+		<Material desc="Tungsten shield in front of QCS2">W</Material>
 	</C3wal4>
 
-        <C4spc2>
+        <C4spc1>
 		<N desc="Number of planes">7</N>
 
 		<Z0 unit="cm">66.05</Z0>
@@ -1131,9 +1150,9 @@
 		<R6 unit="cm">22.60</R6>
 
 		<Material desc="Vacuum space">Vacuum</Material>
-        </C4spc2>
+        </C4spc1>
 
-        <C4spc4>
+        <C4spc2>
 		<N desc="Number of planes">4</N>
 
 		<Z0 unit="cm">257.75</Z0>
@@ -1147,9 +1166,9 @@
 		<R3 unit="cm">27.0</R3>
 
 		<Material desc="Vacuum space">Vacuum</Material>
-        </C4spc4>
+        </C4spc2>
 
-        <C5wal3>
+        <C5wal1>
 		<N desc="Number of planes">8</N>
 
 		<Z0 unit="cm">67.35</Z0>
@@ -1171,9 +1190,9 @@
 		<R7 unit="cm">19.80</R7>
 
 		<Material desc="Helium vessel">SUS316L</Material>
-        </C5wal3>
+        </C5wal1>
 
-        <C5wal5>
+        <C5wal2>
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">260.85</Z0>
@@ -1183,9 +1202,9 @@
 		<R1 unit="cm">26.4</R1>
 
 		<Material desc="Helium vessel">SUS316L</Material>
-        </C5wal5>
+        </C5wal2>
 
-        <C6spc3>
+        <C6spc1>
 		<N desc="Number of planes">7</N>
 
 		<Z0 unit="cm">68.35</Z0>
@@ -1205,9 +1224,9 @@
 		<R6 unit="cm">20.80</R6>
 
 		<Material desc="Liquid helium">Cryo_Liq_He</Material>
-        </C6spc3>
+        </C6spc1>
 
-        <C6spc6>
+        <C6spc2>
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">262.35</Z0>
@@ -1217,9 +1236,9 @@
 		<R1 unit="cm">24.9</R1>
 
 		<Material desc="Liquid helium">Cryo_Liq_He</Material>
-	</C6spc6>
+	</C6spc2>
 
-        <C7wal7>
+        <C7wal1>
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">262.45</Z0>
@@ -1229,7 +1248,7 @@
 		<R1 unit="cm">24.8</R1>
 
 		<Material desc="Iron yoke">Fe</Material>
-	</C7wal7>
+	</C7wal1>
 
         <C7lyr1>
 		<N desc="Number of planes">31</N>
@@ -1853,7 +1872,7 @@
         </C7lyr5>
 
 	<D1spc1>
-		<N desc="Number of planes">34</N>
+		<N desc="Number of planes">30</N>
 
 		<Z0 unit="cm">-62.05</Z0>
 		<Z1 unit="cm">-66.87</Z1>
@@ -1880,15 +1899,11 @@
 		<Z22 unit="cm">-221.40</Z22>
 		<Z23 unit="cm">-222.03</Z23>
 		<Z24 unit="cm">-222.03</Z24>
-		<Z25 unit="cm">-226.30</Z25>
-		<Z26 unit="cm">-226.30</Z26>
-		<Z27 unit="cm">-230.30</Z27>
-		<Z28 unit="cm">-230.30</Z28>
-		<Z29 unit="cm">-233.60</Z29>
-		<Z30 unit="cm">-233.60</Z30>
-		<Z31 unit="cm">-313.70</Z31>
-		<Z32 unit="cm">-313.70</Z32>
-		<Z33 unit="cm">-339.40</Z33>
+		<Z25 unit="cm">-233.60</Z25>
+		<Z26 unit="cm">-233.60</Z26>
+		<Z27 unit="cm">-313.70</Z27>
+		<Z28 unit="cm">-313.70</Z28>
+		<Z29 unit="cm">-339.40</Z29>
 
 		<R0 unit="cm">1.45</R0>
 		<R1 unit="cm">1.45</R1>
@@ -1916,14 +1931,10 @@
 		<R23 unit="cm">5.05</R23>
 		<R24 unit="cm">3.9</R24>
 		<R25 unit="cm">3.9</R25>
-		<R26 unit="cm">4.7</R26>
-		<R27 unit="cm">4.7</R27>
-		<R28 unit="cm">3.9</R28>
-		<R29 unit="cm">3.9</R29>
-		<R30 unit="cm">14.6</R30>
-		<R31 unit="cm">14.6</R31>
-		<R32 unit="cm">4.4</R32>
-		<R33 unit="cm">4.4</R33>
+		<R26 unit="cm">14.6</R26>
+		<R27 unit="cm">14.6</R27>
+		<R28 unit="cm">4.4</R28>
+		<R29 unit="cm">4.4</R29>
 
 		<Material desc="Left HER Beam pipe space">Vacuum</Material>
 	</D1spc1>
@@ -2268,7 +2279,7 @@
 	</D4mag3p6>
 
 	<E1spc1>
-		<N desc="Number of planes">31</N>
+		<N desc="Number of planes">27</N>
 
 		<Z0 unit="cm">-62.05</Z0>
 		<Z1 unit="cm">-66.87</Z1>
@@ -2294,13 +2305,9 @@
 		<Z21 unit="cm">-221.40</Z21>
 		<Z22 unit="cm">-222.04</Z22>
 		<Z23 unit="cm">-222.04</Z23>
-		<Z24 unit="cm">-226.50</Z24>
-		<Z25 unit="cm">-226.50</Z25>
-		<Z26 unit="cm">-230.50</Z26>
-		<Z27 unit="cm">-230.50</Z27>
-		<Z28 unit="cm">-235.00</Z28>
-		<Z29 unit="cm">-240.00</Z29>
-		<Z30 unit="cm">-339.40</Z30>
+		<Z24 unit="cm">-235.00</Z24>
+		<Z25 unit="cm">-240.00</Z25>
+		<Z26 unit="cm">-339.40</Z26>
 
 		<R0 unit="cm">1.45</R0>
 		<R1 unit="cm">1.45</R1>
@@ -2327,12 +2334,8 @@
 		<R22 unit="cm">4.85</R22>
 		<R23 unit="cm">3.9</R23>
 		<R24 unit="cm">3.9</R24>
-		<R25 unit="cm">4.7</R25>
-		<R26 unit="cm">4.7</R26>
-		<R27 unit="cm">3.9</R27>
-		<R28 unit="cm">3.9</R28>
-		<R29 unit="cm">4.4</R29>
-		<R30 unit="cm">4.4</R30>
+		<R25 unit="cm">4.4</R25>
+		<R26 unit="cm">4.4</R26>
 
 		<Material desc="Left LER Beam pipe space 1">Vacuum</Material>
 	</E1spc1>
@@ -2663,7 +2666,7 @@
 		<Material desc="Vacuum space">Vacuum</Material>
         </F2spc1>
 
-        <F3wal2>
+        <F3wal1>
 		<N desc="Number of planes">7</N>
 
 		<Z0 unit="cm">-65.23</Z0>
@@ -2683,9 +2686,9 @@
 		<R6 unit="cm">22.0</R6>
 
 		<Material desc="Vacuum vessel">SUS316L</Material>
-        </F3wal2>
+        </F3wal1>
 
-        <F3wal3>
+        <F3wal2>
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">-280.0</Z0>
@@ -2695,9 +2698,9 @@
 		<R1 unit="cm">37.0</R1>
 
 		<Material desc="Vacuum vessel">SUS316L</Material>
-	</F3wal3>
+	</F3wal2>
 
-        <F3wal4>
+        <F3wal3>
 		<N desc="Number of planes">2</N>
 
 		<Z0 unit="cm">-318.6</Z0>
@@ -2707,9 +2710,9 @@
 		<R1 unit="cm">37.0</R1>
 
 		<Material desc="Vacuum vessel">SUS316L</Material>
-	</F3wal4>
+	</F3wal3>
 
-        <F4spc2>
+        <F4spc1>
 		<N desc="Number of planes">7</N>
 
 		<Z0 unit="cm">-65.93</Z0>
@@ -2729,9 +2732,9 @@
 		<R6 unit="cm">21.3</R6>
 
 		<Material desc="Vacuum space">Vacuum</Material>
-        </F4spc2>
+        </F4spc1>
 
-        <F5wal3>
+        <F5wal1>
 		<N desc="Number of planes">7</N>
 
 		<Z0 unit="cm">-66.73</Z0>
@@ -2751,9 +2754,9 @@
 		<R6 unit="cm">15.5</R6>
 
 		<Material desc="Vacuum vessel">SUS316L</Material>
-        </F5wal3>
+        </F5wal1>
 
-        <F6spc3>
+        <F6spc1>
 		<N desc="Number of planes">7</N>
 
 		<Z0 unit="cm">-67.73</Z0>
@@ -2773,7 +2776,7 @@
 		<R6 unit="cm">15.21</R6>
 
 		<Material desc="Liquid helium">Cryo_Liq_He</Material>
-        </F6spc3>
+        </F6spc1>
 
         <F7lyr1>
 		<N desc="Number of planes">16</N>

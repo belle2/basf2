@@ -28,7 +28,7 @@ CDCLegendreTrackHit::CDCLegendreTrackHit(CDCHit* hit, int index)
 {
   m_storeIndex = index;
   m_driftTime = hit->getDriftTime();
-  m_charge = hit->getCharge();
+  m_charge = hit->getADCCount();
 
   m_wireId = hit->getIWire();
 
@@ -77,8 +77,8 @@ CDCLegendreTrackHit::~CDCLegendreTrackHit()
 void CDCLegendreTrackHit::setWirePosition()
 {
   //Get the position of the hit wire from CDCGeometryParameters
-  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar& cdcg(*cdcgp);
+  CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
+
 
   //center of the wire
   m_wirePosition.SetX(
@@ -153,8 +153,8 @@ void CDCLegendreTrackHit::assignToTrack(int ID)
 void CDCLegendreTrackHit::shiftAlongZ(const CDCLegendreTrackCandidate& track)
 {
   //Get the necessary position of the hit wire from CDCGeometryParameters
-  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar& cdcg(*cdcgp);
+  CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
+
 
   TVector3 forwardWirePoint; //forward end of the wire
   TVector3 backwardWirePoint; //backward end of the wire

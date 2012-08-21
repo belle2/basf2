@@ -1060,7 +1060,7 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
 
 
     } else if (aCdcRecoHitPtr not_eq NULL) {
-      m_trackData.accuVecIndices.push_back(aCdcRecoHitPtr->getLayerId() + m_nPxdLayers + m_nSvdLayers);
+      m_trackData.accuVecIndices.push_back(aCdcRecoHitPtr->getWireID().getICLayer() + m_nPxdLayers + m_nSvdLayers);
       m_trackData.detIds.push_back(2);
     } else {
       B2ERROR("An unknown type of recoHit was detected in TrackFitCheckerModule::event(). This hit will not be included in the statistical tests");

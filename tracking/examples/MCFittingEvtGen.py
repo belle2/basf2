@@ -52,7 +52,7 @@ geometry.param('Components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'
 evtgeninput = register_module('EvtGenInput')
 
 evtgeninput.param('boost2LAB', True)
-#DECFile and pdlFile have sane defaults
+# DECFile and pdlFile have sane defaults
 
 # simulation
 g4sim = register_module('FullSim')

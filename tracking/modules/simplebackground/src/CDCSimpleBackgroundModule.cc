@@ -69,8 +69,8 @@ void CDCSimpleBackgroundModule::event()
   int counter = cdcHits->GetLast() + 1; //counter for the additional hits
 
   //cdc geometry parameters information
-  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar& cdcg(*cdcgp);
+  CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
+
 
   //initialize variables which describe a CDCHit
   int superlayerId = -999;        //0 - 8

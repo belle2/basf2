@@ -5,7 +5,6 @@ import os
 import random
 from basf2 import *
 
-
 # register necessary modules
 evtmetagen = register_module('EvtMetaGen')
 
@@ -30,7 +29,6 @@ g4sim = register_module('FullSim')
 # make the simulation less noisy
 g4sim.logging.log_level = LogLevel.ERROR
 
-
 # create paths
 main = create_path()
 
@@ -46,17 +44,15 @@ main.add_module(g4sim)
 cdcdigi = register_module('CDCDigitizer')
 main.add_module(cdcdigi)
 
-
 pxd_digi = register_module('PXDDigitizer')
 main.add_module(pxd_digi)
 
 main.add_module(register_module('PXDClusterizer'))
 
-
 mctrackfinder = register_module('MCTrackFinder')
-mctrackfinder.param("UsePXDHits", True)
-mctrackfinder.param("UseSVDHits", True)
-mctrackfinder.param("UseCDCHits", True)
+mctrackfinder.param('UsePXDHits', True)
+mctrackfinder.param('UseSVDHits', True)
+mctrackfinder.param('UseCDCHits', True)
 main.add_module(mctrackfinder)
 
 genfit = register_module('GenFitter')

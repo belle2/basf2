@@ -153,8 +153,8 @@ void CDCSegment::update()
 int CDCSegment::getWireIdDiff() const
 {
 
-  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar& cdcg(*cdcgp);
+  CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
+
 
   int minWireId = 1000;
   int maxWireId = 0;

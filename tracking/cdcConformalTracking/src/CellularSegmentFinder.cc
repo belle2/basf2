@@ -47,8 +47,8 @@ int CellularSegmentFinder::WireIdDifference(CDCTrackHit hit1, CDCTrackHit hit2)
 {
 
   //create instance of CDCGeometryParameters to get number of wires per layer
-  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar& cdcg(*cdcgp);
+  CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
+
 
   //calculate wireId difference
   unsigned int wireIdDifference = abs(hit1.getWireId() - hit2.getWireId());
@@ -118,8 +118,8 @@ void CellularSegmentFinder::EvaluateStates(vector<CDCTrackHit> & cdcHits, int st
 
 void CellularSegmentFinder::CheckLayerNeighbours(CDCTrackHit aHit, vector<CDCTrackHit> & cdcHits)
 {
-  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar& cdcg(*cdcgp);
+  CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
+
 
   int nHits = cdcHits.size();
   for (int j = 0; j < nHits; j++) {

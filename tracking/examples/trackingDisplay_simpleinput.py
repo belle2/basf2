@@ -9,17 +9,15 @@
 #  basf2 -i MyInputFile.root tracking/examples/trackingDisplay_simpleinput.py
 #
 
-
 import os
 import random
 from basf2 import *
-
 
 # create paths
 main = create_path()
 
 input = register_module('SimpleInput')
-#set the input file, in this case, the output of MCFittingEvtGen.py example
+# set the input file, in this case, the output of MCFittingEvtGen.py example
 input.param('inputFileName', 'MCFittingEvtGenOutput.root')
 
 main.add_module(input)
@@ -30,7 +28,6 @@ geometry = register_module('Geometry')
 
 main.add_module(gearbox)
 main.add_module(geometry)
-
 
 display = register_module('TrackingDisplay')
 # The Options parameter is a combination of:

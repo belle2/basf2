@@ -112,8 +112,8 @@ void ExtrapolateToPXDModule::event()
   StoreArray<GFTrackCand> newGFTrackCands(m_gfTrackCandsColName);
 
   //get the CDCGeometryPar to get the hit coordinates
-  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar& cdcg(*cdcgp);
+  CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
+
 
   B2INFO("Copy GFTrackCands from input GFTracks, replace the momentum seed with the current fit result and create a new collection with " << nTracks << " GFTrackCands");
 

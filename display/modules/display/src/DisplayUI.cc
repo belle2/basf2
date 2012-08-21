@@ -229,7 +229,7 @@ void DisplayUI::makeGui()
 
   browser->StartEmbedding(TRootBrowser::kLeft);
 
-  TGMainFrame* frmMain = new TGMainFrame(gClient->GetRoot(), 1000, 600);
+  TGMainFrame* frmMain = new TGMainFrame(gClient->GetRoot(), 240, 600);
   frmMain->SetWindowName("Event Control main frame");
   frmMain->SetCleanup(kDeepCleanup);
 
@@ -241,7 +241,7 @@ void DisplayUI::makeGui()
       TString icondir(Form("%s/icons/", gSystem->Getenv("ROOTSYS")));
 
       m_prevButton = new TGPictureButton(hf, gClient->GetPicture(icondir + "GoBack.gif"));
-      hf->AddFrame(m_prevButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 2, 10, 10, 10));
+      hf->AddFrame(m_prevButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       m_prevButton->Connect("Clicked()", "Belle2::DisplayUI", this, "prev()");
 
       const long numEntries = InputController::numEntries();
@@ -250,7 +250,7 @@ void DisplayUI::makeGui()
                                               TGNumberFormat::kNELLimitMinMax,
                                               0, numEntries - 1);
       m_eventNumberWidget->SetState(InputController::canControlInput());
-      hf->AddFrame(m_eventNumberWidget, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 2, 10, 10, 10));
+      hf->AddFrame(m_eventNumberWidget, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       //note: parameter of ValueSet signal is _not_ the number just set.
       m_eventNumberWidget->Connect("ValueSet(Long_t)", "Belle2::DisplayUI", this, "goToEventWidget()");
       m_eventNumberWidget->GetNumberEntry()->Connect("ReturnPressed()", "Belle2::DisplayUI", this, "goToEventWidget()");
@@ -258,24 +258,24 @@ void DisplayUI::makeGui()
 
       if (InputController::canControlInput()) {
         TGLabel* maxEvents = new TGLabel(hf, TString::Format("/%ld", numEntries - 1));
-        hf->AddFrame(maxEvents, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 2, 10, 10, 10));
+        hf->AddFrame(maxEvents, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       }
 
       m_nextButton = new TGPictureButton(hf, gClient->GetPicture(icondir + "GoForward.gif"));
-      hf->AddFrame(m_nextButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 2, 10, 10, 10));
+      hf->AddFrame(m_nextButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       m_nextButton->Connect("Clicked()", "Belle2::DisplayUI", this, "next()");
     }
-    event_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 2, 10, 10, 10));
+    event_frame->AddFrame(hf, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
 
     TGButton* jumpToEventButton = new TGTextButton(event_frame, "Jump to event/run/exp");
     jumpToEventButton->SetEnabled(InputController::canControlInput());
-    event_frame->AddFrame(jumpToEventButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 2, 10, 10, 10));
+    event_frame->AddFrame(jumpToEventButton, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 5, 5, 5));
     jumpToEventButton->Connect("Clicked()", "Belle2::DisplayUI", this, "showJumpToEventDialog()");
 
     m_eventLabel = new TGLabel(event_frame);
-    event_frame->AddFrame(m_eventLabel, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 2, 10, 10, 10));
+    event_frame->AddFrame(m_eventLabel, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
   }
-  frmMain->AddFrame(event_frame, new TGLayoutHints(kLHintsCenterX , 2, 10, 10, 10));
+  frmMain->AddFrame(event_frame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));
 
   TGGroupFrame* viewer_frame = new TGGroupFrame(frmMain);
   viewer_frame->SetTitle("Current Viewer");
@@ -284,25 +284,25 @@ void DisplayUI::makeGui()
     TGHorizontalFrame* hf = new TGHorizontalFrame(viewer_frame);
     {
       b = new TGTextButton(hf, "Dark/light colors");
-      hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 2, 10, 10, 10));
+      hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 5, 5, 5));
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "toggleColorScheme()");
     }
-    viewer_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 2, 10, 10, 10));
+    viewer_frame->AddFrame(hf, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
 
     hf = new TGHorizontalFrame(viewer_frame);
     {
       b = new TGTextButton(hf, "Save Picture");
-      hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 2, 10, 10, 10));
+      hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "savePicture()");
 
       b = new TGTextButton(hf, "Save Hi-Res Picture");
-      hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 2, 10, 10, 10));
+      hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "saveHiResPicture()");
 
     }
-    viewer_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 2, 10, 10, 10));
+    viewer_frame->AddFrame(hf, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
   }
-  frmMain->AddFrame(viewer_frame, new TGLayoutHints(kLHintsCenterX , 2, 10, 10, 10));
+  frmMain->AddFrame(viewer_frame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));
 
   frmMain->MapSubwindows();
   frmMain->Resize();

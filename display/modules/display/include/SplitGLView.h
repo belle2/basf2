@@ -82,7 +82,7 @@ namespace Belle2 {
     };
 
   private:
-    //set fActViewer and update UI accordingly
+    /** set fActViewer and update UI accordingly. */
     void setActiveViewer(TGLEmbeddedViewer* v);
 
     TEvePad*               fPad;           /**< pad used as geometry container */

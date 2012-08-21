@@ -19,6 +19,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace cdc;
 
 
 REG_MODULE(CDCSimpleBackground)

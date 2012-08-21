@@ -14,32 +14,29 @@
 #include <cdc/dataobjects/ADCCountTranslatorBase.h>
 
 namespace Belle2 {
-  /** @addtogroup cdc_lib_objects
-   *  @ingroup lib_objects
-   *  @{ LinearGlobalADCCountTranslator
-   *  @}
-   */
-  /** This class simply assumes a linear translation through (0,0)*/
-  class LinearGlobalADCCountTranslator : public ADCCountTranslatorBase {
-  public:
-    /** Constructor with a default calibration constant. */
-    LinearGlobalADCCountTranslator(const float conversionFactor = 3.2 * 1e-8) :
-      m_conversionFactor(conversionFactor)
-    {}
+  namespace cdc {
+    /** This class simply assumes a linear translation through (0,0)*/
+    class LinearGlobalADCCountTranslator : public ADCCountTranslatorBase {
+    public:
+      /** Constructor with a default calibration constant. */
+      LinearGlobalADCCountTranslator(const float conversionFactor = 3.2 * 1e-8) :
+        m_conversionFactor(conversionFactor)
+      {}
 
-    /** Destructor. */
-    ~LinearGlobalADCCountTranslator() {}
+      /** Destructor. */
+      ~LinearGlobalADCCountTranslator() {}
 
-    /** just multiply with the conversion factor and return. */
-    float getCharge(unsigned short adcCount,
-                    const WireID&,
-                    float, float) {
-      return (adcCount * m_conversionFactor);
-    }
+      /** just multiply with the conversion factor and return. */
+      float getCharge(unsigned short adcCount,
+                      const WireID&,
+                      float, float) {
+        return (adcCount * m_conversionFactor);
+      }
 
-  private:
-    /** Conversion factor as determined from calibration. */
-    float m_conversionFactor;
-  };
+    private:
+      /** Conversion factor as determined from calibration. */
+      float m_conversionFactor;
+    };
+  }
 }
 #endif /* LINEARGLOBALADCCOUNTTRANSLATOR_H */

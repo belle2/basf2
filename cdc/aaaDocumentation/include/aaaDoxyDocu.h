@@ -17,10 +17,5 @@
  *  @}
  */
 
-
-/** @defgroup cdc_lib_objects
- *  @ingroup lib_objects
- *  @{
- *  Objects in libraries maintained by the cdc group.
- *  @}
- */
+/** Namespace for objects in the cdc package, that are neither dataobjects nor module elements. */
+namespace cdc {}

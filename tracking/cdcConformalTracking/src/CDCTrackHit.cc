@@ -18,6 +18,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace cdc;
 
 ClassImp(CDCTrackHit)
 

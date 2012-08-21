@@ -87,6 +87,7 @@
 
 using namespace CLHEP;
 using namespace Belle2;
+using namespace cdc;
 
 //  const double
 //  Helix::m_BFIELD = 15.0;            // KG

@@ -22,12 +22,6 @@ class G4LogicalVolume;
 class G4VPhysicalVolume;
 
 namespace Belle2 {
-  /** @addtogroup cdc_lib_objects
-   *  @ingroup lib_objects
-   *  @{ CDCGeometryPar
-   *  @}
-   */
-  /** */
   namespace cdc {
 
     //!  The GeoCDCCreator class.

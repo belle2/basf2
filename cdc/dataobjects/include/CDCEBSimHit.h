@@ -16,14 +16,19 @@
 #include <TObject.h>
 #include <TVector3.h>
 
-#define DEFAULT_CDCEBSIMHITS   "CDCEBSimHits"
-
 namespace Belle2 {
-
-  //! Example Detector
+  /** @addtogroup cdc_dataobjects
+   *  @ingroup dataobjects
+   *  @{ CDCEBSimHit
+   *  @todo CDCEBSimHit : calling a double to save phi a wire id is kind of strange...
+   *  @}
+   */
+  /** This SimHit type is used for background studies.
+   *
+   *  EB stands for electronic board.
+   */
   class CDCEBSimHit : public TObject {
   public:
-
     //! The layer id of this hit.
     int m_layerId;
 

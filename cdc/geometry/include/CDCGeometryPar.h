@@ -1,15 +1,17 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao                                                *
+ * Contributors: Guofu Cao, Martin Heck                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #ifndef CDCGEOMETRYPAR_H
 #define CDCGEOMETRYPAR_H
+
+#include <cdc/dataobjects/WireID.h>
 
 #include <vector>
 #include <string>
@@ -22,8 +24,12 @@
 #define MAX_N_KINK 30
 
 namespace Belle2 {
-
-//! The Class for CDC Geometry Parameters
+  /** @addtogroup cdc_lib_objects
+   *  @ingroup lib_objects
+   *  @{ CDCGeometryPar
+   *  @}
+   */
+  //! The Class for CDC Geometry Parameters
   /*! This class provides CDC gemetry paramters for simulation, reconstruction and so on.
       These parameters are gotten from gearbox.
   */
@@ -41,7 +47,7 @@ namespace Belle2 {
     /*!
         \return A reference to an instance of this class.
     */
-    static CDCGeometryPar* Instance();
+    static CDCGeometryPar& Instance();
 
     //! Clears
     void clear();
@@ -222,6 +228,11 @@ namespace Belle2 {
     */
     const TVector3 wireForwardPosition(int layerId, int cellId) const;
 
+    /** Same function taking different wire number parametrization. */
+    const TVector3 wireForwardPosition(const WireID wireID) const {
+      return wireForwardPosition(wireID.getICLayer(), wireID.getIWire());
+    }
+
     //! Returns an array of backward position of sense wires in each layer.
     /*!
         \param layerId The layer id.
@@ -229,6 +240,11 @@ namespace Belle2 {
         \return The backward position of wire cellId in layer layerId.
     */
     const TVector3 wireBackwardPosition(int layerId, int cellId) const;
+
+    /** Same function taking different wire number parametrization. */
+    const TVector3 wireBackwardPosition(const WireID wireID) const {
+      return wireBackwardPosition(wireID.getICLayer(), wireID.getIWire());
+    }
 
     //! Returns radius of sense wire in each layer.
     /*!

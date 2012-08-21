@@ -16,7 +16,7 @@
 
 //cdc package headers
 #include <cdc/dataobjects/CDCSimHit.h>
-#include <cdc/modules/cdcDigitizer/CDCSignal.h>
+#include <cdc/dataobjects/WireID.h>
 
 //C++/C standard lib elements.
 #include <string>
@@ -24,65 +24,40 @@
 #include <queue>
 #include <map>
 
-
-
-
-
 namespace Belle2 {
 
-
+  /** @addtogroup cdc_modules
+   *  @ingroup modules
+   *  @{CDCDigitizerModule
+   *  @todo CDCDigitizerModule: Event time jitter needs a different approach than the one, which is taken here. Instead of adding
+   *        a constant to all events, there needs to be an event by event time jitter, most likely determined by
+   *        the trigger time uncertainties. <br>
+   *        If the definition of the time format in the CDCHit is changed, it needs to be changed here, too, and in the SimpleDriftTimeTranslator.
+   *  @}
+   */
   /** The Class for Detailed Digitization of CDC.
    *
-   *  Currently a double Gaussian with steerable parameters is used for the digitization.
+   *  Currently a float Gaussian with steerable parameters is used for the digitization.
    *  If there are two or more hits in one cell, only the shortest drift length is selected.
    *  The signal amplitude is the sum of all hits deposited energy in this cell.
-   *
-   *  @todo More details will be considered soon, like X-T function, transfer time and so on.
-   *        There is a bug in the Relation between the first CDCHit and the CDCSignal.
-   *        This has to be corrected, but it is not critical for the current release.
-   *        Therefore I stop working on it for the moment and focus on the parts, that have to be finished this week.
-   *
-   *  @author  Guofu Cao;<br>
-   *           Issues regarding the Relations between SimHits and Hits: Martin Heck;
-   *
    */
-
   class CDCDigitizerModule : public Module {
 
   public:
-
-    typedef std::vector<CDCSimHit*>      CDCSimHitVec;   /**< For input from Geant4 simulation.*/
-    typedef std::map< int, CDCSignal*>  CDCSignalMap;    /**< Map of Cell ID -> signal.*/
-    typedef std::pair< int, CDCSignal*> vpair;           /**< Pair of CDCSignalMap. */
-
     /** Constructor.*/
     CDCDigitizerModule();
 
-    /** Destructor.*/
-    virtual ~CDCDigitizerModule();
-
     /** Initialize variables, print info, and start CPU clock. */
-    virtual void initialize();
-
-    /** Nothing so far.*/
-    virtual void beginRun();
+    void initialize();
 
     /** Actual digitization of all hits in the CDC.
      *
      *  The digitized hits are written into the DataStore.
      */
-    virtual void event();
+    void event();
 
-    /** Nothing so far. */
-    virtual void endRun();
-
-    /** Stopping of CPU clock.*/
-    virtual void terminate();
-
-  protected:
-
-
-    /** Method used to smear drift length.
+  private:
+    /** Method used to smear the drift length.
      *
      *  @param driftLength The value of drift length.
      *  @param fraction Fraction of the first Gaussian used to smear drift length.
@@ -93,16 +68,7 @@ namespace Belle2 {
      *
      *  @return Drift length after smearing.
      */
-    double smearDriftLength(double driftLength, double fraction, double mean1, double resolution1, double mean2, double resolution2);
-
-    /** Method to add noise to pure mc signal.
-     *
-     *  Generating of random noise using Gaussian distribution and add this effect
-     *  to the final results.
-     *
-     *  @param cdcSignalMap A map is used to store CDC signals and will be returned after adding noise.
-     */
-    void genNoise(CDCSignalMap& cdcSignalMap);
+    float smearDriftLength(float driftLength, float fraction, float mean1, float resolution1, float mean2, float resolution2);
 
     /** The method to get drift time based on drift length
      *
@@ -116,68 +82,40 @@ namespace Belle2 {
      *
      *  @todo implementation of non-cicular surfaces of constant drift time (in reverse).
      */
-    double getDriftTime(double driftLength, double tof, double propLength);
+    float getDriftTime(float driftLength, float tof, float propLength);
 
-    /** Method to print SimHit information.
-     *
-     *  @param hit Information of which hit shall be printed?
-     *
-     *  @todo Revisit the question if this funtion is optimally implemented. Perhaps some print funtion should be part
-     *        of the SimHit and other hits.
-     */
+    /** Charge to ADC Count converter. */
+    unsigned short getADCCount(const float charge);
 
-    void printCDCSimHitInfo(const CDCSimHit& hit) const;
+    std::string m_inputCDCSimHitsName;       /**< Input array name.  */
+    std::string m_outputCDCHitsName;         /**< Output array name. */
 
-    /** Method to print SimHit information of many hits.
-     *
-     *  @param info Extra information.
-     *  @param hitVec Vector to store SimHits.
-     */
-    void printCDCSimHitsInfo(std::string info, const CDCSimHitVec& hitVec) const;
+    std::string m_MCParticlesToSimHitsName;    /**< Relation for origin of incoming SimHits. */
+    std::string m_SimHitsTOCDCHitsName;      /**< Relation for outgoing CDCHits. */
 
-    /** Method to print module parameters.
-     *
-     *  @todo This method seems to print only the steerable parameters.
-     *        There is now the possibility to print steerable parameters in the framework.
-     */
-    void printModuleParams() const;
-
-    /** Method to print CDC signal information.
-     *
-     *  @param info Extra information
-     *  @param cdcSignalMap A map to store CDC signals.
-     *
-     *  @todo Again the question if not more of this work should be done in the CDCSignal.
-     */
-    void printCDCSignalInfo(std::string info, const CDCSignalMap& cdcSignalMap) const;
-
-
-    std::string m_inColName;                /**< Input array name. */
-    std::string m_outColName;               /**< Output array name. */
-    std::string m_cdcHitOutColName;         /**< Output array name. */
-    std::string m_relColNameSimHitToHit;    /**< Relation collection name - cdc signal (Digit)  <-> MCParticle */
-    std::string m_relColNameMCToSim;        /**< Relation collection name - MCParticle        <-> SimTrkHit */
-
+    bool m_useSimpleDigitization;            /**< Use float Gaussian Smearing instead of proper digitization. */
+    //--- Paramters for simple digitization -------------------------------------------------------------------------------------
     double m_fraction;          /**< Fraction of the first Gaussian used to smear drift length */
     double m_mean1;             /**< Mean value of the first Gassian used to smear drift length */
     double m_resolution1;       /**< Resolution of the first Gassian used to smear drift length */
     double m_mean2;             /**< Mean value of the second Gassian used to smear drift length */
     double m_resolution2;       /**< Resolution of the second Gassian used to smear drift length */
 
-    bool m_addTrueDriftTime;  /**< A switch used to control adding the true drift time into the total drift time or not */
-    bool m_addPropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
+    //--- Universal digitization parameters -------------------------------------------------------------------------------------
+    bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
     bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */
-    double m_eventTime;           /**< It is a timing of event, which includes a time jitter due to the trigger system */
+//    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
 
-    int   m_electronicEffects;       /*!< Add noise? */
-    double m_elNoise;                 /*!< Noise added to the signal */
-
-
-  private:
-
-    double m_timeCPU;                /*!< CPU time     */
-    int    m_nRun;                   /*!< Run number   */
-    int    m_nEvent;                 /*!< Event number */
+    /** Structure for saving the signal information. */
+    struct SignalInfo {
+      /** Constructor that initializes all members. */
+      SignalInfo(unsigned short simHitIndex = 0, WireID wireID = WireID(), float driftTime = 0, float charge = 0) :
+        m_simHitIndex(simHitIndex), m_wireID(wireID), m_driftTime(driftTime), m_charge(charge) {}
+      unsigned short m_simHitIndex;   /**< SimHit Index number. */
+      WireID         m_wireID;        /**< Wire Number object. */
+      float          m_driftTime;     /**< Shortest drift time of any SimHit in the cell. */
+      float          m_charge;        /**< Sum of charge for all SimHits in the cell. */
+    };
   };
 
 } // end of Belle2 namespace

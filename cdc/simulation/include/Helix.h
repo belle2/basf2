@@ -41,7 +41,12 @@ using CLHEP::HepLorentzVector;
 using CLHEP::HepMatrix;
 
 namespace Belle2 {
-
+  /** @addtogroup cdc_lib_objects
+   *  @ingroup lib_objects
+   *  @{ Helix
+   *  @todo Helix : Is this type of class perhaps needed in various packages, would this kind of mathematical structure perhaps make more sense in a framework/utilities folder?
+   *  @}
+   */
 /// Helix parameter class
   class Helix {
 

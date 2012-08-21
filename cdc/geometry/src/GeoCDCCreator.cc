@@ -66,7 +66,7 @@ namespace Belle2 {
     }
 
 
-    void GeoCDCCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+    void GeoCDCCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /*type*/)
     {
       //------------------------
       // Get global parameters
@@ -198,10 +198,10 @@ namespace Belle2 {
       //------------------------------
       // Construct mother volume
       //------------------------------
-      CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
-      //      double motherInnerR = cdcgp->motherInnerR();
-      //      double motherOuterR = cdcgp->motherOuterR();
-      //      double motherLength = cdcgp->motherLength();
+      CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
+      //      double motherInnerR = cdcgp.motherInnerR();
+      //      double motherOuterR = cdcgp.motherOuterR();
+      //      double motherLength = cdcgp.motherLength();
 
       //G4Tubs* solid_cdc = new G4Tubs("SolidCDC", motherInnerR*cm, motherOuterR*cm, motherLength*cm / 2.0, 0*deg, 360.*deg);
       //replace Tube with Polycone
@@ -211,8 +211,8 @@ namespace Belle2 {
       double momRmax[5];
 
       for (int iBound = 0 ; iBound < 5 ; iBound++) {
-        momZ[iBound] = cdcgp->momZ(iBound);
-        momRmin[iBound] = cdcgp->momRmin(iBound);
+        momZ[iBound] = cdcgp.momZ(iBound);
+        momRmin[iBound] = cdcgp.momRmin(iBound);
         //momRmax[iBound] = motherOuterR / Unit::mm;
         momRmax[iBound] = 1140.0;
       }

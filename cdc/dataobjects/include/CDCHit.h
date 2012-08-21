@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao, Martin Heck, and Makoto Uchida                *
+ * Contributors: Martin Heck                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,109 +13,115 @@
 
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-
-
+#include <cdc/dataobjects/WireID.h>
 #include <TObject.h>
 
 namespace Belle2 {
-
-  /** Class for saving raw hit data of the CDC.
+  /** @addtogroup cdc_dataobjects
+   *  @ingroup dataobjects
+   *  @{ CDCHit
+   *  @todo CDCHit : drift time format needs confirmation; is ns really the unit coming out of the unpacker? Is it signed/unsinged?
+   *  @}
+   */
+  /** Class that is the result of the unpacker in raw data and the result of the Digitizer in simulation.
    *
    *  This class is optimized for low disc usage. For reconstruction purposes use the corresponding
-   *  CDCRecoHit class. <br>
+   *  CDCRecoHit class or create your own class. <br>
    *
-   *  It stores <br>
-   *  Drift Time***, the accumulated charge in the hit cell,
-   *  the Super Layer of which the hit wire is part,
-   *  the Layer within the Super Layer,
-   *  and the wire number within the Layer.
-   *
-   *  ***Currently DriftLength
-   *
-   *  @author <a href="mailto:martin.heck@kit.edu?subject=DataStore">Martin Heck</a>
-   *  @todo At some point indeed drift time instead of drift length should be saved here.
-   *  @todo Perhaps the class has to be modified to be able to prevent streaming of the TObject elements.
+   *  It stores the "Drift Time",<br>
+   *  the accumulated ADC count of the charge in the hit cell,<br>
+   *  the Super Layer of which the hit wire is part,<br>
+   *  the Layer within the Super Layer,<br>
+   *  and the wire number within the Layer.<br>
    */
   class CDCHit : public TObject {
   public:
-
     /** Empty constructor for ROOT IO. */
-    CDCHit() {
-      // M.U. 2012.03.05
-      //      B2DEBUG(150, "Empty CDCHit Constructor called.");
+    CDCHit() :
+      m_eWire(65535), m_driftTime(0), m_adcCount(0) {
+      B2DEBUG(250, "Empty CDCHit Constructor called.");
     }
 
     /** Useful Constructor.
      *
-     *  Currently the setters are called for the actual assignation, for reducing the number of places where to encode
+     *  Currently the setters are called for the actual assignment, for reducing the number of places where to encode
      *  the transformation into the internal encoding.
      *
-     *  @param driftTime   currently assumes you give a drift LENGTH.
-     *  @param charge      accumulated charge in the drift cell for this hit.
+     *  @param driftTime   Actually the time measurement has contributions from different other effects, such as TOF, Event Time T0, ...
+     *  @param adcCount    ADC count of the accumulated charge in the drift cell for this hit.
      *  @param iSuperLayer Super Layer of the wire.
      *  @param iLayer      Layer number inside the Super Layer.
      *  @param iWire       Wire number in the Layer.
      */
-    CDCHit(const double& driftTime, const double& charge,
-           const int& iSuperLayer, const int& iLayer, int iWire);
+    CDCHit(short driftTime, unsigned short adcCount,
+           unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire);
+
+    /** Constructor using the WireID object. */
+    CDCHit(short driftTime, unsigned short adcCount, const WireID& wireID) {
+      setDriftTime(driftTime);
+      setADCCount(adcCount);
+      setWireID(wireID);
+    }
 
     /** Setter for Wire ID.
      *
+     *  The numbering scheme is the same as in the one used in
+     *  <a href="http://ekpbelle2.physik.uni-karlsruhe.de/~twiki/pub/Detector/CDC/WebHome/cdc_cell_num.pdf">this</a>
+     *  document.
      *  @param iSuperLayer Values should be between [0,   8].
      *  @param iLayer      Values should be between [0,   7], depending on the SuperLayer.
-     *  @param iWire       Values should be between [0, 511], depending on the wire radius.
+     *  @param iWire       Values should be between [0, 511], depending on the SuperLayer.
      */
-    void setWireId(const int& iSuperLayer, const int& iLayer, const int& iWire) {
-      // M.U. 2012.03.05
-      //      B2DEBUG(150, "setWireId called with" << iSuperLayer << ", " << iLayer << ", " << iWire);
-      m_wireId = static_cast<unsigned short int>(iWire + 512 * iLayer + 4096 * iSuperLayer);
+    void setWireID(unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire) {
+      B2DEBUG(250, "setWireId called with" << iSuperLayer << ", " << iLayer << ", " << iWire);
+      m_eWire = iWire + 512 * iLayer + 4096 * iSuperLayer;
+    }
+
+    /** Setter for Wire ID using the WireID object directly. */
+    void setWireID(const WireID& wireID) {
+      m_eWire = wireID.getEWire();
     }
 
     /** Setter for Drift Time.
      *
-     *  CAUTION!
-     *  Currently Drift Length is stored.
-     *
-     *  @param driftTime Drift Length of electrons from closest ionisation cluster.
+     *  @param driftTime  Measurement of Drift Time in ns.
      */
-    void setDriftTime(double driftTime) {
-      // M.U. 2012.03.05
-      //      B2DEBUG(150, "setDriftTime called with " << driftTime);
-      m_driftTime = static_cast<unsigned short int>(driftTime / Unit::um);
+    void setDriftTime(short driftTime) {
+      B2DEBUG(250, "setDriftTime called with " << driftTime);
+      m_driftTime = driftTime;
     }
 
-    /** Setter for charge.
-     *
-     *  The current value is just a reasonable value from looking into the simulation.
-     *  No special theoretical evaluation.
-     */
-    void setCharge(double charge) {
-      // E. Nakano 2012.04.20
-      m_charge = static_cast<unsigned short int>((100.0 / 3.2) * charge * 1e6);
+    /** Setter for ADC count. */
+    void setADCCount(unsigned short adcCount) {
+      m_adcCount = adcCount;
     }
 
     /** Getter for iWire. */
-    int getIWire() const {
-      return (m_wireId % 512);
+    unsigned short getIWire() const {
+      return WireID(m_eWire).getIWire();
     }
 
     /** Getter for iLayer. */
-    int getILayer() const {
-      return ((m_wireId % 4096) / 512);
+    unsigned short getILayer() const {
+      return WireID(m_eWire).getILayer();
     }
 
     /** Getter for iSuperLayer. */
-    int getISuperLayer() const {
-      return (m_wireId / 4096);
+    unsigned short getISuperLayer() const {
+      return WireID(m_eWire).getISuperLayer();
     }
 
-    /** Getter for Drift Time.
+    /** Getter for encoded wire number.
      *
-     *  CAUTION! <br>
-     *  Currently a drift length is given back, not a drift time!
+     *  This number can be used directly e.g. with the = operator to create a WireID object.
      */
-    double getDriftTime() const {
-      return (static_cast<double>(m_driftTime) * Unit::um);
+    unsigned short getID() const {
+      return m_eWire;
+    }
+
+    /** Getter for Drift Time. */
+    short getDriftTime() const {
+      return m_driftTime;
     }
 
     /** Getter for integrated charge.
@@ -124,44 +130,27 @@ namespace Belle2 {
      *        In principle, this charge can come from more than just the
      *        track, this hit belongs to.
      */
-    double getCharge() const {
-      return (1e-7 * static_cast<double>(m_charge));
+    unsigned short getADCCount() const {
+      return m_adcCount;
     }
 
-
   protected:
-
-    /** Layer encoding.
+    /** Wire encoding.
      *
-     *  SuperLayer: bits 1 -  4 (/4096)          <br>
-     *  Layer:      bits 5 -  7 (% 4096, / 512)   <br>
-     *  Wire:       bits 8 - 16 (% 512)
+     *  Details are now explained in the separate WireID object.
+     *  I save only the encoded wire number instead of an WireID object to avoid streaming issues with ROOT.
      */
-    unsigned short int m_wireId;
+    unsigned short m_eWire;
 
-    /** Drift Time.
-     *
-     *  CAUTION! <br>
-     *  Currently a drift lenght is saved instead of a drift time.
-     *
-     *  Drift time should be saved in such a unit, that at least um drift lenght precision is given.
-     *  Drift lenght is saved in um.
-     */
-    unsigned short int m_driftTime;
+    /** Drift Time in ns. */
+    short  m_driftTime;
 
-    /** Integrated charge in the cell.
-     *
-     *  Unit = ???
-     *
-     *  Input from external setters is multiplied by 10^-7.
-     */
-    unsigned short int m_charge;
+    /** ADC count of the integrated charge in the cell. */
+    unsigned short m_adcCount;
 
   private:
-
     /** ROOT Macro.*/
     ClassDef(CDCHit, 1);
-
   };
 
 } // end namespace Belle2

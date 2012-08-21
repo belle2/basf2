@@ -8,17 +8,35 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <cdc/dataobjects/CDCHit.h>
+#include "cdc/dataobjects/WireID.h"
 
-using namespace std;
 using namespace Belle2;
+using namespace std;
 
-ClassImp(CDCHit)
+ClassImp(WireID)
 
-CDCHit::CDCHit(short driftTime, unsigned short charge,
-               unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire)
+void WireID::setWireID(const unsigned short iCLayer, const unsigned short iWire)
 {
-  setDriftTime(driftTime);
-  setADCCount(charge);
+  B2DEBUG(250, "setWireID called with " << iCLayer << ", " << iWire);
+  if (iCLayer < 8) {
+    setWireID(0, iCLayer, iWire);
+  } else {
+    setWireID(((iCLayer - 8) / 6) + 1, (iCLayer - 2) % 6, iWire);
+  }
+}
+
+unsigned short WireID::getICLayer() const
+{
+  if (getISuperLayer() == 0) { return getILayer(); }
+  return 8 + (getISuperLayer() - 1) * 6 + getILayer();
+}
+
+WireID::WireID(const unsigned short iCLayer, const unsigned short iWire)
+{
+  setWireID(iCLayer, iWire);
+}
+
+WireID::WireID(const unsigned short iSuperLayer, const unsigned short iLayer, const unsigned short iWire)
+{
   setWireID(iSuperLayer, iLayer, iWire);
 }

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Guofu Cao, Martin Heck                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,44 +11,35 @@
 #ifndef CDCRECOHIT_H
 #define CDCRECOHIT_H
 
-#include <framework/gearbox/Unit.h>
-#include <cdc/geometry/CDCGeometryPar.h>
-
-#include <TVector3.h>
-#include <TMatrixD.h>
-
-//base class headers
 #include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/ADCCountTranslatorBase.h>
+#include <cdc/dataobjects/CDCGeometryTranslatorBase.h>
+#include <cdc/dataobjects/DriftTimeTranslatorBase.h>
 
-//genfit
 #include <genfit/GFRecoHitIfc.h>
 #include <genfit/GFWireHitPolicy.h>
 
+#include <TMatrixD.h>
 
+//#include <boost/shared_ptr.hpp> // produces trouble for cint because of "Error: void type variable can not be declared "
 
 namespace Belle2 {
-
-  /** This class is an enriched form of the CDCHit class.
-   *
-   *  It includes all information of CDCHit, plus it includes additional information
-   *  from geometry, calibration, GENFIT, etc. <br>
-   *  I don't inherit from CDCHit, because inheriting twice from TObject through different routes
-   *  is potentially dangerous.
-   *
-   *  @author <a href="mailto:martin.heck@kit.edu?subject=CDCRecoHit">Martin Heck</a>
-   *
-   *  @todo So far this class is mostly a stumb...
+  /** @addtogroup cdc_dataobjects
+   *  @ingroup dataobjects
+   *  @{ CDCRecoHit
+   *  @todo CDCRecoHit : once we go to ROOT 6, the pointer should be replaced with shared_ptr.
+   *  @}
    */
+  /** This class is used to transfer CDC information to the track fit. */
   class CDCRecoHit : public GFRecoHitIfc<GFWireHitPolicy>  {
 
   public:
-
     /** Default Constructor for ROOT IO.*/
     CDCRecoHit();
 
-
     /** Constructor needed for GenFit RecoHitFactory.
      *
+     *  This constructor assumes, that no information from tracking is currently known.
      */
     CDCRecoHit(const CDCHit* cdcHit);
 
@@ -57,7 +48,7 @@ namespace Belle2 {
 
     /** Creating a copy of this hit.
      *
-     * This function overwrites a function that GFRecoHitIfc inherits from GFRecoHit.
+     *  This function overwrites a function that GFRecoHitIfc inherits from GFRecoHit.
      */
     GFAbsRecoHit* clone();
 
@@ -67,75 +58,88 @@ namespace Belle2 {
      */
     TMatrixD getHMatrix(const GFAbsTrackRep* stateVector);
 
-    /** Returns the distance of the wire center from the origin (radius of the hit).
-     *
-     */
-    double getRho() const {return m_rho; } ;
+    /** Getter for WireID object. */
+    WireID getWireID() const {
+      return m_wireID;
+    }
 
-    /** Returns the layer number.
-     *
+    /** Setter for the Translators. */
+    static void setTranslators(ADCCountTranslatorBase*    const adcCountTranslator,
+                               CDCGeometryTranslatorBase* const cdcGeometryTranslator,
+                               DriftTimeTranslatorBase*   const driftTimeTranslator);
+    /*
+    static void setTranslators(boost::shared_ptr<ADCCountTranslatorBase>    const& adcCountTranslator,
+                         boost::shared_ptr<CDCGeometryTranslatorBase> const& cdcGeometryTranslator,
+                         boost::shared_ptr<DriftTimeTranslatorBase>   const& driftTimeTranslator);
      */
-    unsigned short int getLayerId() const {return m_layerId; } ;
 
-    /** Returns the wire id.
+    /** Setter for the update option.
      *
+     *  Currently it is strongly recommended to keep this option false.
      */
-    unsigned short int getWireId() const {return m_wireId; } ;
+    static void setUpdate(bool update = false);
 
-    /** Returns the super layer id.
+    /** Method, that actually interfaces to Genfit.
      *
+     *  This method is inherited from the GFAbsRecoHitIfc.
      */
-    unsigned short int getSuperLayerId() const {return m_superLayerId; } ;
-
-    /** Returns the sub layer id in the super layer.
-     *
-     */
-    unsigned short int getSubLayerId() const {return m_subLayerId; } ;
+    void getMeasurement(const GFAbsTrackRep*, const GFDetPlane& pl, const TMatrixT<double>&, const TMatrixT<double>&,
+                        TMatrixT<double>& m, TMatrixT<double>& V);
 
 
   private:
-
-    /** A parameter for GENFIT.
-     */
+    //--- GENFIT Stuff ----------------------------------------------------------------------------------------------------------
+    //NOTE: The endcap positions of the wire is stored in a variable inherited from GFRecoHitIfc<GFWireHitPolicy>.
+    /** A parameter for GENFIT. */
     static const int c_nParHitRep = 7;
 
+    /** Holds all elements of H Matrix.  A C-array is the only possibility to set TMatrixD elements with its constructor. */
+    static const double c_HMatrixContent[5];
 
-    const static double c_HMatrixContent[5];/**< holds all elements of H Matrix. A C array is only possibility to set TMatrixD elements with its constuctor*/
-    const static TMatrixD c_HMatrix; /**< H matrix needed for Genfit. getHMatrix will return this attribute*/
+    /** H matrix needed for Genfit. getHMatrix will return this attribute.*/
+    static const  TMatrixD c_HMatrix;
 
-    // Next two variables contain wire identification as used in cdc geometry.
+    //---------------------------------------------------------------------------------------------------------------------------
+    /** Accumulated charge within one drift cell as ADC count. */
+    unsigned short m_adcCount;
 
-    /** The wire has this layer number.
+    /** Accumulated charge within one cell.  UNIT??? */
+    float m_charge;
+
+    /** Drift Time as out of CDCHit. */
+    short m_driftTime;
+    /** Drift Length.
+     *
+     *  This is basically a cache to avoid recalculation of drift length every time.
      */
-    unsigned short int m_layerId;
-    /** Within the layer, this is the wire ID.
+    float m_driftLength;
+    /** Drift Length Resolution.
+     *
+     *  Similar issues as with the drif length.
      */
-    unsigned short int m_wireId;
+    float m_driftLengthResolution;
 
-    //Another useful layer identification for tracking.
-    /** Holds the SuperLayer.
-     *  A SuperLayer is defined by some consecutive layers, that are parallel.
+    /** Wire Identifier. */
+    WireID m_wireID;
+
+    /** Object for ADC Count translation. */
+    static ADCCountTranslatorBase*     s_adcCountTranslator;    //! Don't write to ROOT file, as pointer is meaningless, there
+    // static boost::shared_ptr<ADCCountTranslatorBase>   s_adcCountTranslator;    //! Don't write to ROOT file, as pointer is meaningless, there
+
+    /** Object for geometry translation. */
+    static CDCGeometryTranslatorBase*  s_cdcGeometryTranslator; //! Don't write to ROOT file, as pointer is meaningless, there
+    //static boost::shared_ptr<CDCGeometryTranslatorBase> s_cdcGeometryTranslator; //! Don't write to ROOT file, as pointer is meaningless, there
+
+    /** Object for getting drift-length and -resolution. */
+    static DriftTimeTranslatorBase*    s_driftTimeTranslator;   //! Don't write to ROOT file, as pointer is meaningless, there
+    //static boost::shared_ptr<DriftTimeTranslatorBase>   s_driftTimeTranslator;   //! Don't write to ROOT file, as pointer is meaningless, there
+
+    /** If set to false, the data from the cash is used for the get measurement function.
+     *
+     *  If set to true, the getMeasurement function tries to update the hit information using the current translators.
+     *  As with translator pointers, this is a static variable. So it is sufficient to switch this once to make all CDCRecoHits doing the same.
      */
-    unsigned short int m_superLayerId;
-    /** Number of Layer within a SuperLayer.
-    */
-    unsigned short int m_subLayerId;
-
-    /** Drift Time. As CDCHit for the moment holding the DRIFTLENGTH!
-     */
-    double m_driftTime;
-
-    /** Accumulated charge within one cell.
-    */
-    double m_charge;
-
-    /** The distance of the wire center from the origin (radius of the hit).
-      *
-      */
-    double m_rho;
-
-
-    //NOTE: The endcap positions of the wire is stored in a variable inherited from GFRecoHitIfc<GFWireHitPolicy>.
+    static bool s_update; //!                               Don't write to ROOT file, as pointer is meaningless, there
 
     /** ROOT Macro.*/
     ClassDef(CDCRecoHit, 2);

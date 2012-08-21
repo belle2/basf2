@@ -1,22 +1,14 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao, Martin Heck                                   *
+ * Contributors: Guofu Cao, Martin Heck,                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <cdc/dataobjects/CDCRecoHit.h>
-
-// genfit
-#include <genfit/RKTrackRep.h>
-#include <genfit/GFDetPlane.h>
-#include <cdc/geometry/CDCGeometryPar.h>
-
-#include <cmath>
-#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
@@ -26,50 +18,72 @@ ClassImp(CDCRecoHit);
 const double CDCRecoHit::c_HMatrixContent[5] = {0, 0, 0, 1, 0};
 const TMatrixD CDCRecoHit::c_HMatrix = TMatrixD(1, 5, c_HMatrixContent);
 
+//--- Translator initialization; should be removed, once this are shared_ptr ----------------------------------------------------
+ADCCountTranslatorBase*    CDCRecoHit::s_adcCountTranslator    = 0;
+CDCGeometryTranslatorBase* CDCRecoHit::s_cdcGeometryTranslator = 0;
+DriftTimeTranslatorBase*   CDCRecoHit::s_driftTimeTranslator   = 0;
+bool CDCRecoHit::s_update = false;
+
+
+void CDCRecoHit::setTranslators(ADCCountTranslatorBase*    const adcCountTranslator,
+                                CDCGeometryTranslatorBase* const cdcGeometryTranslator,
+                                DriftTimeTranslatorBase*   const driftTimeTranslator)
+/*
+static void setTranslators(boost::shared_ptr<ADCCountTranslatorBase>    const& adcCountTranslator,
+                           boost::shared_ptr<CDCGeometryTranslatorBase> const& cdcGeometryTranslator,
+                           boost::shared_ptr<DriftTimeTranslatorBase>   const& driftTimeTranslator)
+ */
+{
+  s_adcCountTranslator    = adcCountTranslator;
+  s_cdcGeometryTranslator = cdcGeometryTranslator;
+  s_driftTimeTranslator   = driftTimeTranslator;
+}
+
+void CDCRecoHit::setUpdate(bool update)
+{
+  s_update = update;
+}
+
 CDCRecoHit::CDCRecoHit()
-  : GFRecoHitIfc<GFWireHitPolicy> (c_nParHitRep)
+  : GFRecoHitIfc<GFWireHitPolicy> (c_nParHitRep),
+    m_adcCount(0), m_charge(0), m_driftTime(0), m_driftLength(0), m_driftLengthResolution(0), m_wireID(WireID())
 {
 }
 
 CDCRecoHit::CDCRecoHit(const CDCHit* cdcHit)
   : GFRecoHitIfc<GFWireHitPolicy> (c_nParHitRep)
 {
-
-  // Get the position of the hit wire from CDCGeometryParameters
-  // Maybe we should ask, if Instance could give back a reference directly instead of a pointer?
-  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar& cdcg(*cdcgp);
-
-  double resolution = 0.0001;  //temporary solution (hardcoded resolution), should later on depend on hit position, drifttime etc and come from a database
-
-  if (cdcHit->getISuperLayer() == 0) {
-    m_layerId = cdcHit->getILayer();
-  } else {
-    m_layerId = 8 + (cdcHit->getISuperLayer() - 1) * 6 + cdcHit->getILayer();
+  if (s_adcCountTranslator == 0 || s_cdcGeometryTranslator == 0 || s_driftTimeTranslator == 0) {
+    B2FATAL("Can't produce CDCRecoHits without setting of the translators.")
   }
 
-  m_wireId = cdcHit->getIWire();
+  // get information from cdcHit into local variables.
+  m_wireID      = cdcHit->getID();
 
-  m_superLayerId = cdcHit->getISuperLayer();
-  m_subLayerId   = cdcHit->getILayer();
+  m_driftTime             = cdcHit->getDriftTime();
+  m_driftLength           = s_driftTimeTranslator->getDriftLength(m_driftTime, m_wireID);
+  m_driftLengthResolution = s_driftTimeTranslator->getDriftLengthResolution(m_driftLength, m_wireID);
 
-  m_driftTime = cdcHit->getDriftTime();
-  m_charge    = cdcHit->getCharge();
+  m_adcCount    = cdcHit->getADCCount();
+  m_charge      = s_adcCountTranslator->getCharge(m_adcCount, m_wireID);
 
-  fHitCoord[0][0] = cdcg.wireForwardPosition(m_layerId, m_wireId).x(); // forward wire position
-  fHitCoord[1][0] = cdcg.wireForwardPosition(m_layerId, m_wireId).y();
-  fHitCoord[2][0] = cdcg.wireForwardPosition(m_layerId, m_wireId).z();
-  fHitCoord[3][0] = cdcg.wireBackwardPosition(m_layerId, m_wireId).x(); //backward wire position
-  fHitCoord[4][0] = cdcg.wireBackwardPosition(m_layerId, m_wireId).y();
-  fHitCoord[5][0] = cdcg.wireBackwardPosition(m_layerId, m_wireId).z();
-  fHitCoord[6][0] = cdcHit->getDriftTime();
+  // forward wire position
+  TVector3 dummyVector3 = s_cdcGeometryTranslator->getWireForwardPosition(m_wireID);
+  fHitCoord[0][0] = dummyVector3.X();
+  fHitCoord[1][0] = dummyVector3.y();
+  fHitCoord[2][0] = dummyVector3.z();
+  // backward wire position
+  dummyVector3 = s_cdcGeometryTranslator->getWireBackwardPosition(m_wireID);
+  fHitCoord[3][0] = dummyVector3.X();
+  fHitCoord[4][0] = dummyVector3.Y();
+  fHitCoord[5][0] = dummyVector3.Z();
 
-  fHitCov[6][6] = resolution;
+  fHitCoord[6][0] = m_driftLength;
+  fHitCov[6][6] = m_driftLengthResolution;
 
-  TVector3 distance = (cdcg.wireForwardPosition(m_layerId, m_wireId) + cdcg.wireForwardPosition(m_layerId, m_wireId)) * 0.5;
-  m_rho = distance.Mag();
-
-
+  B2DEBUG(250, "CDCRecoHit assigned drift-length " << m_driftLength
+          << ", drift-length resolution" << m_driftLengthResolution << ", dummyVector3"
+          << dummyVector3.X()  <<  ", " << dummyVector3.Y() << ", " << dummyVector3.Z());
 }
 
 GFAbsRecoHit* CDCRecoHit::clone()
@@ -77,13 +91,19 @@ GFAbsRecoHit* CDCRecoHit::clone()
   return new CDCRecoHit(*this);
 }
 
-TMatrixD CDCRecoHit::getHMatrix(const GFAbsTrackRep* stateVector)
+TMatrixD CDCRecoHit::getHMatrix(const GFAbsTrackRep* /*stateVector*/)
 {
   //don't check for specific Track Representation at the moment, as RKTrackRep is the only one we are currently using.
   return (c_HMatrix);
 }
 
-
-
-
-
+void CDCRecoHit::getMeasurement(const GFAbsTrackRep* trackRep, const GFDetPlane& plane, const TMatrixT<double>& whatever, const TMatrixT<double>& whatever2,
+                                TMatrixT<double>& m, TMatrixT<double>& V)
+{
+  if (s_update) {
+    B2FATAL("The extraction of track/hit parameters for the getMeasurement function has still to be implemented. \n"
+            << "Please avoid setting s_update to true for the moment.");
+  } else {
+    GFRecoHitIfc<GFWireHitPolicy>::getMeasurement(trackRep, plane, whatever, whatever2, m, V);
+  }
+}

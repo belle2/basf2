@@ -11,23 +11,23 @@
 #ifndef CDCSIMHIT_H
 #define CDCSIMHIT_H
 
+#include <cdc/dataobjects/WireID.h>
+
 #include <TObject.h>
 #include <TVector3.h>
 
-#define DEFAULT_CDCSIMHITS           "CDCSimHits"
-#define DEFAULT_MCPART_TO_CDCSIMHITS "MCPartToCDCSimHits"
-
 namespace Belle2 {
-
+  /** @addtogroup cdc_dataobjects
+   *  @ingroup dataobjects
+   *  @{ CDCSimHit
+   *  @}
+   */
   //! Example Detector
   class CDCSimHit : public TObject {
   public:
 
-    //! The layer id of this hit.
-    int m_layerId;
-
-    //! The wire id of this hit.
-    int m_wireId;
+    //! The WireID of the hit.
+    WireID m_wireID;
 
     //! The track id of this hit.
     int m_trackId;
@@ -65,11 +65,14 @@ namespace Belle2 {
     //! The flag to denote this hit is in the left or right side.
     int m_posFlag;
 
-    //! The method to set layer id
-    void setLayerId(int layerId) { m_layerId = layerId; }
-
-    //! The method to set wire id
-    void setWireId(int wireId) { m_wireId = wireId; }
+    /** Setter for Wire ID.
+     *
+     *  @param iCLayerID   number of layer with continuous counting method.
+     *  @param iWireID     number of wire within the layer.
+     */
+    void setWireID(int iCLayerID, int iWireID) {
+      m_wireID.setWireID(iCLayerID, iWireID);
+    }
 
     //! The method to set track id
     void setTrackId(int trackId) { m_trackId = trackId; }
@@ -107,11 +110,8 @@ namespace Belle2 {
     //! The method to set position flag
     void setPosFlag(int posFlag) { m_posFlag = posFlag; }
 
-    //! The method to get layer id
-    int getLayerId() const { return m_layerId; }
-
-    //! The method to get wire id
-    int getWireId() const { return m_wireId; }
+    /** Getter for WireID object. */
+    WireID getWireID() const {return m_wireID;}
 
     //! The method to get track id
     int getTrackId() const { return m_trackId; }
@@ -169,8 +169,7 @@ namespace Belle2 {
               TVector3 posOut,
               TVector3 posTrack,
               int posFlag) {
-      m_layerId = layerId;
-      m_wireId = wireId;
+      m_wireID.setWireID(layerId, wireId);
       m_trackId = trackId;
       m_pdg = pdg;
       m_driftLength = driftLength;
@@ -185,6 +184,7 @@ namespace Belle2 {
       m_posFlag = posFlag;
     }
 
+    /** ROOT Macro. */
     ClassDef(CDCSimHit, 1);
 
   };

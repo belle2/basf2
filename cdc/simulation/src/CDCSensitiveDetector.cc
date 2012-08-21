@@ -97,6 +97,7 @@ namespace Belle2 {
 
     // Get layer ID
     const unsigned layerId = v.GetCopyNo();
+    B2DEBUG(150, "LayerID in continuous counting method: " << layerId);
 
     //--------------------------------------------------------------------------
     // check if in electronics board, if true, CDCEBSimHit will be created.
@@ -112,8 +113,7 @@ namespace Belle2 {
     if (charge == 0.) return false;
 
     // Calculate cell ID
-    CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
-    CDCGeometryPar& cdcg(*cdcgp);
+    CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
 
     TVector3 tposIn(posIn.x() / cm, posIn.y() / cm, posIn.z() / cm);
     TVector3 tposOut(posOut.x() / cm, posOut.y() / cm, posOut.z() / cm);
@@ -334,8 +334,7 @@ namespace Belle2 {
 
     m_hitNumber = cdcArray->GetLast() + 1;
     new(cdcArray->AddrAt(m_hitNumber)) CDCSimHit();
-    cdcArray[m_hitNumber]->setLayerId(layerId);
-    cdcArray[m_hitNumber]->setWireId(wireId);
+    cdcArray[m_hitNumber]->setWireID(layerId, wireId);
     cdcArray[m_hitNumber]->setTrackId(trackID);
     cdcArray[m_hitNumber]->setPDGCode(pid);
     cdcArray[m_hitNumber]->setDriftLength(distance / cm);
@@ -368,7 +367,7 @@ namespace Belle2 {
                                      const G4ThreeVector& mom)
   {
     //change Later
-    StoreArray<CDCEBSimHit> cdcEBArray(DEFAULT_CDCEBSIMHITS);
+    StoreArray<CDCEBSimHit> cdcEBArray("");
     m_EBhitNumber = cdcEBArray->GetLast() + 1;
     new(cdcEBArray->AddrAt(m_EBhitNumber)) CDCEBSimHit();
     cdcEBArray[m_EBhitNumber]->setLayerId(layerId);
@@ -437,33 +436,33 @@ namespace Belle2 {
     //main
     G4int irTry = 0;
     //Belle::Geocdc_wire_Manager &w = Belle::Geocdc_wire_Manager::get_manager();
-    CDCGeometryPar* p_cdc = CDCGeometryPar::Instance();
+    CDCGeometryPar& p_cdc = CDCGeometryPar::Instance();
     // Calculate forward/backward position of current wire
-    TVector3 tfw0 = p_cdc->wireForwardPosition(layerId, 0);
+    TVector3 tfw0 = p_cdc.wireForwardPosition(layerId, 0);
     G4ThreeVector fw0(tfw0.x(), tfw0.y(), tfw0.z());
-    TVector3 tbw0 = p_cdc->wireBackwardPosition(layerId, 0);
+    TVector3 tbw0 = p_cdc.wireBackwardPosition(layerId, 0);
     G4ThreeVector bw0(tbw0.x(), tbw0.y(), tbw0.z());
-    //G4double dphi = 2.*CLHEP::pi/p_cdc->nWiresInLayer(layerId);
+    //G4double dphi = 2.*CLHEP::pi/p_cdc.nWiresInLayer(layerId);
     fw0 *= (1. / cm);
     bw0 *= (1. / cm);
 
     G4double slant;
-    if (0.0 == 0.5 * (p_cdc->nShifts(layerId))) {
+    if (0.0 == 0.5 * (p_cdc.nShifts(layerId))) {
       slant = 0.0;
     } else {
-      double delfi = 0.5 * (p_cdc->nShifts(layerId)) * 2.0 * CLHEP::pi / p_cdc->nWiresInLayer(layerId);
+      double delfi = 0.5 * (p_cdc.nShifts(layerId)) * 2.0 * CLHEP::pi / p_cdc.nWiresInLayer(layerId);
       double sinhdel = std::sin(delfi / 2.0);
       double z1 = fw0.z();
       double z2 = bw0.z();
-      slant = std::atan2(2.0 * (p_cdc->senseWireR(layerId)) * sinhdel, z1 - z2);
+      slant = std::atan2(2.0 * (p_cdc.senseWireR(layerId)) * sinhdel, z1 - z2);
     }
-    G4double xwb   = (p_cdc->wireBackwardPosition(layerId, ic1 - 1)).x();
-    G4double ywb   = (p_cdc->wireBackwardPosition(layerId, ic1 - 1)).y();
-    G4double zwb   = (p_cdc->wireBackwardPosition(layerId, ic1 - 1)).z();
-    G4double xwf   = (p_cdc->wireForwardPosition(layerId, ic1 - 1)).x();
-    G4double ywf   = (p_cdc->wireForwardPosition(layerId, ic1 - 1)).y();
-    G4double zwf   = (p_cdc->wireForwardPosition(layerId, ic1 - 1)).z();
-    G4double div   = p_cdc->nWiresInLayer(layerId);
+    G4double xwb   = (p_cdc.wireBackwardPosition(layerId, ic1 - 1)).x();
+    G4double ywb   = (p_cdc.wireBackwardPosition(layerId, ic1 - 1)).y();
+    G4double zwb   = (p_cdc.wireBackwardPosition(layerId, ic1 - 1)).z();
+    G4double xwf   = (p_cdc.wireForwardPosition(layerId, ic1 - 1)).x();
+    G4double ywf   = (p_cdc.wireForwardPosition(layerId, ic1 - 1)).y();
+    G4double zwf   = (p_cdc.wireForwardPosition(layerId, ic1 - 1)).z();
+    G4double div   = p_cdc.nWiresInLayer(layerId);
 
 L100:
     //copy arrays
@@ -1333,10 +1332,10 @@ line100:
     //--------------------------
     // Get wirepoint @ endplate
     //--------------------------
-    CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
-    TVector3 tfwp = cdcgp->wireForwardPosition(layerId, cellId);
+    CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
+    TVector3 tfwp = cdcgp.wireForwardPosition(layerId, cellId);
     G4ThreeVector fwp(tfwp.x(), tfwp.y(), tfwp.z());
-    TVector3 tbwp = cdcgp->wireBackwardPosition(layerId, cellId);
+    TVector3 tbwp = cdcgp.wireBackwardPosition(layerId, cellId);
     G4ThreeVector bwp(tbwp.x(), tbwp.y(), tbwp.z());
     G4ThreeVector wireLine = fwp - bwp;
     G4ThreeVector hitLine = posOut - posIn;

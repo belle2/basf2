@@ -9,6 +9,6 @@
 #pragma link C++ class Belle2::CDCRecoHit;
 #pragma link C++ class Belle2::CDCSimHit;
 #pragma link C++ class Belle2::CDCEBSimHit;
-//#pragma link C++ class Belle2::HitCDC;
+#pragma link C++ class Belle2::WireID;
 
 #endif

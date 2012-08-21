@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao                                                *
+ * Contributors: Guofu Cao, Martin Heck                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,10 +25,10 @@ using namespace Belle2;
 
 CDCGeometryPar* CDCGeometryPar::m_B4CDCGeometryParDB = 0;
 
-CDCGeometryPar* CDCGeometryPar::Instance()
+CDCGeometryPar& CDCGeometryPar::Instance()
 {
   if (!m_B4CDCGeometryParDB) m_B4CDCGeometryParDB = new CDCGeometryPar();
-  return m_B4CDCGeometryParDB;
+  return *m_B4CDCGeometryParDB;
 }
 
 CDCGeometryPar::CDCGeometryPar()

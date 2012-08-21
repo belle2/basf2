@@ -302,9 +302,9 @@ void DedxPIDModule::event()
         const int wire = cdcHits[cdc_idx]->getIWire();
         //B2INFO(m_trackID-1 << ": cdc layer: " << layer);
 
-        static CDCGeometryPar* cdcgeo = CDCGeometryPar::Instance();
-        const TVector3& wire_pos_f = cdcgeo->wireForwardPosition(current_layer, wire);
-        const TVector3& wire_pos_b = cdcgeo->wireBackwardPosition(current_layer, wire);
+        static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+        const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(current_layer, wire);
+        const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(current_layer, wire);
 
         const double path_length = cdchelix.pathLengthToLine(wire_pos_f, wire_pos_b);
         TVector3 hit_pos_helix = cdchelix.position(path_length);
@@ -356,7 +356,7 @@ void DedxPIDModule::event()
 
         const float phi = hit_pos.Phi() - local_momentum.Phi();
 
-        const float hit_charge = cdcHits[cdc_idx]->getCharge();
+        const float hit_charge = cdcHits[cdc_idx]->getADCCount();
 
         if (m_enableDebugOutput)
           track.addHit(hit_pos, current_layer, wire, (hit_pos - hit_pos_helix).Perp(), hit_charge, cdcHits[cdc_idx]->getDriftTime());
@@ -540,10 +540,10 @@ void DedxPIDModule::calculateMeans(float* mean, float* truncatedMean, float* tru
 
 float DedxPIDModule::getFlownDistanceCDC(int layerid, float theta, float phi)
 {
-  static CDCGeometryPar* geo = CDCGeometryPar::Instance();
+  static CDCGeometryPar& geo = CDCGeometryPar::Instance();
 
   //distance d between layers (smaller in inner superlayers)
-  const double d = geo->outerRadiusWireLayer()[layerid] - geo->innerRadiusWireLayer()[layerid];
+  const double d = geo.outerRadiusWireLayer()[layerid] - geo.innerRadiusWireLayer()[layerid];
 
   return TMath::Abs(d / (sin(theta) * cos(phi)));
 }

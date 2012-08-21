@@ -147,7 +147,7 @@ namespace Belle2 {
     std::vector<std::string> m_vertexTestsVarNames;
 
 
-    // the following 6 maps should not be accessed directly but only with the corresponding "register" "fill" and "print" functions
+    // the following maps should not be accessed directly but only with the corresponding "register" "fill" and "print" functions
     //the following maps will be filled with the test data so that statistical quantities like mean and variance can be calculated
     std::map<std::string, StatisticsContainer > m_trackWiseDataSamples;
     std::map<std::string, std::vector<StatisticsContainer> > m_trackWiseVecDataSamples;
@@ -160,7 +160,7 @@ namespace Belle2 {
     std::map<std::string, TVector3* > m_TVector3ForRoot; //this one is to store the mcparticle truth info for position and momentum
     std::map<std::string, int > m_intForRoot; //this one is to store some auxiliary (like if track was fitted successful) info about the tracks into the root file
 
-//    // now the data itself also in c++ vectors so this module can use custom implemented estimator instead just the one provided by root and
+//    // now the data itself also in c++ vectors so this module can use custom implemented estimators instead just the one provided by root and
     bool m_robust;
     std::map<std::string, std::vector<double > > m_trackWiseData;
     std::map<std::string, std::vector<std::vector<double> > > m_trackWiseVecData;

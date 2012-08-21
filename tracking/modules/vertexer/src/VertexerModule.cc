@@ -68,6 +68,7 @@ void VertexerModule::initialize()
 //      beamSpotPos.Print();
 //      beamSpotCov.Print();
     } else {
+      m_useBeamSpot = false;
       B2ERROR("beamSpotPostion did not have exactly 3 elements or beamSpotCovariance did not have exactly 9 elements therefore beam spot info cannot be used");
     }
 

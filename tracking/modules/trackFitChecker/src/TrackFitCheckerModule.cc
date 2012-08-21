@@ -862,11 +862,11 @@ void TrackFitCheckerModule::registerLayerWiseData(const string& nameOfDataSample
 {
   m_layerWiseDataSamples[nameOfDataSample].resize(m_nLayers, vector<StatisticsContainer>(nVarsToTest));
 
-  if (m_writeToRootFile == true) {
+  if (m_writeToRootFile == true and m_nLayers > 0) {
     m_layerWiseDataForRoot[nameOfDataSample] = new std::vector<vector<float> >(m_nLayers, vector<float>(nVarsToTest));
     m_statDataTreePtr->Branch(nameOfDataSample.c_str(), "std::vector<std::vector<float> >", &(m_layerWiseDataForRoot[nameOfDataSample]));
   }
-  if (m_robust == true) {
+  if (m_robust == true and m_nLayers > 0) {
     m_layerWiseData[nameOfDataSample].resize(m_nLayers, vector<vector<double> >(nVarsToTest));
   }
 }
@@ -909,12 +909,12 @@ void TrackFitCheckerModule::fillLayerWiseData(const string& nameOfDataSample, co
   for (int i = 0; i not_eq nNewData; ++i) {
     m_layerWiseDataSamples[nameOfDataSample][accuVecIndex][i](newData[i]);
   }
-  if (m_writeToRootFile == true) {
+  if (m_writeToRootFile == true and m_nLayers > 0) {
     for (int i = 0; i not_eq nNewData; ++i) {
       (*m_layerWiseDataForRoot[nameOfDataSample])[accuVecIndex][i] = float(newData[i]);
     }
   }
-  if (m_robust == true) {
+  if (m_robust == true and m_nLayers > 0) {
     for (int i = 0; i not_eq nNewData; ++i) {
       m_layerWiseData[nameOfDataSample][accuVecIndex][i].push_back(newData[i]);
     }

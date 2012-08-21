@@ -56,16 +56,29 @@ namespace Belle2 {
     void fillVertexWiseData(const std::string& nameOfDataSample, const double newData);
     void printVertexWiseStatistics(const std::string& nameOfDataSample, const bool count = false);
 
+    void registerVertexWiseVecData(const std::string& nameOfDataSample, const int nVarsToTest);
+    void fillVertexWiseVecData(const std::string& nameOfDataSample, const std::vector<double>& newData);
+    void printVertexWiseVecStatistics(const std::string& nameOfDataSample, const std::vector<std::string>& trackWiseVarNames, const  bool count = false);
+
+    void registerInt(const std::string& nameOfDataSample);
+    void fillInt(const std::string& nameOfDataSample, const int newData);
+
 
     std::map<std::string, StatisticsContainer > m_vertexWiseDataSamples;
+    std::map<std::string, std::vector<StatisticsContainer> > m_vertexWiseVecDataSamples;
 
+    std::map<std::string, std::vector<float>* > m_vertexWiseVecDataForRoot;
     std::map<std::string, float > m_vertexWiseDataForRoot;
+    std::map<std::string, int > m_intForRoot; //this one is to store some auxiliary (like if vertex was fitted successful) info about the tracks into the root file
+
 
     bool m_robust;
     std::map<std::string, std::vector<double > > m_vertexWiseData;
+    std::map<std::string, std::vector<std::vector<double> > > m_vertexWiseVecData;
     std::map<std::string, double > m_madScalingFactors; //scaling factor the mad to make it compariable to the standard deviation
     double calcMad(const std::vector<double>& data, const double& median);
     int countOutliers(const std::vector<double>& dataSample, const double mean, const double sigma, const double widthScaling);
+    //double calcMedian(std::vector<double> data);
 
     std::string m_dataOutFileName; //common part of all names of output files
 
@@ -80,6 +93,8 @@ namespace Belle2 {
     int m_processedVertices;
     int m_badVertexPValueVertices;
     int m_badTrackPValueVertices;
+    int m_vertexNotPureCounter;
+
     double  m_trackPValueCut;
     double  m_vertexPValueCut;
 

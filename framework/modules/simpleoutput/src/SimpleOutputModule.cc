@@ -136,11 +136,9 @@ void SimpleOutputModule::initialize()
           (!m_branchNames[ii].empty() && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName))) {
         continue;
       }
+
       m_tree[ii]->Branch(branchName.c_str(), &iter->second->object, bufsize, m_splitLevel);
-      m_tree[ii]->SetBranchAddress(branchName.c_str(), &iter->second->ptr);
-      if (iter->second->ptr != iter->second->object) {
-        iter->second->ptr = 0;
-      }
+      m_tree[ii]->SetBranchAddress(branchName.c_str(), &iter->second->object);
       m_entries[ii].push_back(iter->second);
       B2DEBUG(50, "The branch " << branchName << " was created.");
     }
@@ -277,6 +275,10 @@ void SimpleOutputModule::fillTree(DataStore::EDurability durability)
   for (unsigned int i = 0; i < m_entries[durability].size(); i++) {
     if (!m_entries[durability][i]->ptr) {
       B2WARNING("Trying to write non-existing object to branch " << m_entries[durability][i]->name << ". Using default object.");
+      //create object owned and deleted by branch
+      m_tree[durability]->SetBranchAddress(m_entries[durability][i]->name.c_str(), 0);
+    } else {
+      m_tree[durability]->SetBranchAddress(m_entries[durability][i]->name.c_str(), &m_entries[durability][i]->object);
     }
   }
   m_tree[durability]->Fill();

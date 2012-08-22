@@ -142,7 +142,7 @@ namespace Belle2 {
     static bool s_update; //!                               Don't write to ROOT file, as pointer is meaningless, there
 
     /** ROOT Macro.*/
-    ClassDef(CDCRecoHit, 2);
+    ClassDef(CDCRecoHit, 3);
   };
 
 }

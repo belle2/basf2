@@ -1,163 +1,148 @@
-// @(#)root/eve:$Id: SplitGLView.C 32183 2010-02-02 11:18:27Z bellenot $
-// Author: Bertrand Bellenot
-
-
 #include <display/modules/display/SplitGLView.h>
 #include <framework/logging/Logger.h>
 
-#include "TFormula.h"
-#include "TF1.h"
-#include "TH1F.h"
+#include "TApplication.h"
+#include "TGButton.h"
+#include "TGeoManager.h"
+#include "TSystem.h"
 
 using namespace Belle2;
-
-const char* filetypes[] = {
-  "ROOT files",    "*.root",
-  "All files",     "*",
-  0,               0
-};
-
-const char* rcfiletypes[] = {
-  "All files",     "*",
-  0,               0
-};
 
 
 ClassImp(SplitGLView)
 
 
-
 SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
-  TGMainFrame(p, w, h), fActViewer(0)
+  TGMainFrame(p, w, h), m_activeViewer(0)
 {
   // Main frame constructor.
 
   // create the "file" popup menu
-  fMenuFile = new TGPopupMenu(gClient->GetRoot());
-  fMenuFile->AddEntry("E&xit", kFileExit);
+  TGPopupMenu* fileMenu = new TGPopupMenu(gClient->GetRoot());
+  fileMenu->AddEntry("E&xit", kFileExit);
 
   // create the "camera" popup menu
-  fMenuCamera = new TGPopupMenu(gClient->GetRoot());
-  fMenuCamera->AddEntry("Perspective (Floor XOZ)", kGLPerspXOZ);
-  fMenuCamera->AddEntry("Perspective (Floor YOZ)", kGLPerspYOZ);
-  fMenuCamera->AddEntry("Perspective (Floor XOY)", kGLPerspXOY);
-  fMenuCamera->AddEntry("Orthographic (XOY)", kGLXOY);
-  fMenuCamera->AddEntry("Orthographic (XOZ)", kGLXOZ);
-  fMenuCamera->AddEntry("Orthographic (ZOY)", kGLZOY);
-  fMenuCamera->AddSeparator();
-  fMenuCamera->AddEntry("Ortho allow rotate", kGLOrthoRotate);
-  fMenuCamera->AddEntry("Ortho allow dolly",  kGLOrthoDolly);
+  m_cameraMenu = new TGPopupMenu(gClient->GetRoot());
+  m_cameraMenu->AddEntry("Perspective (Floor XOZ)", kGLPerspXOZ);
+  m_cameraMenu->AddEntry("Perspective (Floor YOZ)", kGLPerspYOZ);
+  m_cameraMenu->AddEntry("Perspective (Floor XOY)", kGLPerspXOY);
+  m_cameraMenu->AddEntry("Orthographic (XOY)", kGLXOY);
+  m_cameraMenu->AddEntry("Orthographic (XOZ)", kGLXOZ);
+  m_cameraMenu->AddEntry("Orthographic (ZOY)", kGLZOY);
+  m_cameraMenu->AddSeparator();
+  m_cameraMenu->AddEntry("Ortho allow rotate", kGLOrthoRotate);
+  m_cameraMenu->AddEntry("Ortho allow dolly",  kGLOrthoDolly);
 
-  fMenuScene = new TGPopupMenu(gClient->GetRoot());
-  fMenuScene->AddEntry("&Update Current", kSceneUpdate);
-  fMenuScene->AddEntry("Update &All", kSceneUpdateAll);
+  TGPopupMenu* sceneMenu = new TGPopupMenu(gClient->GetRoot());
+  sceneMenu->AddEntry("&Update Current", kSceneUpdate);
+  sceneMenu->AddEntry("Update &All", kSceneUpdateAll);
 
   // create the "help" popup menu
-  fMenuHelp = new TGPopupMenu(gClient->GetRoot());
-  fMenuHelp->AddEntry("&About", kHelpAbout);
+  TGPopupMenu* helpMenu = new TGPopupMenu(gClient->GetRoot());
+  helpMenu->AddEntry("&About", kHelpAbout);
 
   // create the main menu bar
-  fMenuBar = new TGMenuBar(this, 1, 1, kHorizontalFrame);
-  fMenuBar->AddPopup("&File", fMenuFile, new TGLayoutHints(kLHintsTop |
+  TGMenuBar* menuBar = new TGMenuBar(this, 1, 1, kHorizontalFrame);
+  menuBar->AddPopup("&File", fileMenu, new TGLayoutHints(kLHintsTop |
+                                                         kLHintsLeft, 0, 4, 0, 0));
+  menuBar->AddPopup("&Camera", m_cameraMenu, new TGLayoutHints(kLHintsTop |
+                    kLHintsLeft, 0, 4, 0, 0));
+  menuBar->AddPopup("&Scene", sceneMenu, new TGLayoutHints(kLHintsTop |
                                                            kLHintsLeft, 0, 4, 0, 0));
-  fMenuBar->AddPopup("&Camera", fMenuCamera, new TGLayoutHints(kLHintsTop |
-                     kLHintsLeft, 0, 4, 0, 0));
-  fMenuBar->AddPopup("&Scene", fMenuScene, new TGLayoutHints(kLHintsTop |
-                                                             kLHintsLeft, 0, 4, 0, 0));
-  fMenuBar->AddPopup("&Help", fMenuHelp, new TGLayoutHints(kLHintsTop |
-                                                           kLHintsRight));
+  menuBar->AddPopup("&Help", helpMenu, new TGLayoutHints(kLHintsTop |
+                                                         kLHintsRight));
 
-  AddFrame(fMenuBar, new TGLayoutHints(kLHintsTop | kLHintsExpandX));
+  AddFrame(menuBar, new TGLayoutHints(kLHintsTop | kLHintsExpandX));
 
   // connect menu signals to our menu handler slot
-  fMenuFile->Connect("Activated(Int_t)", "Belle2::SplitGLView", this,
-                     "HandleMenu(Int_t)");
-  fMenuCamera->Connect("Activated(Int_t)", "Belle2::SplitGLView", this,
-                       "HandleMenu(Int_t)");
-  fMenuScene->Connect("Activated(Int_t)", "Belle2::SplitGLView", this,
-                      "HandleMenu(Int_t)");
-  fMenuHelp->Connect("Activated(Int_t)", "Belle2::SplitGLView", this,
-                     "HandleMenu(Int_t)");
+  fileMenu->Connect("Activated(Int_t)", "Belle2::SplitGLView", this,
+                    "handleMenu(Int_t)");
+  m_cameraMenu->Connect("Activated(Int_t)", "Belle2::SplitGLView", this,
+                        "handleMenu(Int_t)");
+  sceneMenu->Connect("Activated(Int_t)", "Belle2::SplitGLView", this,
+                     "handleMenu(Int_t)");
+  helpMenu->Connect("Activated(Int_t)", "Belle2::SplitGLView", this,
+                    "handleMenu(Int_t)");
 
   if (gEve) {
     // use status bar from the browser
-    fStatusBar = gEve->GetBrowser()->GetStatusBar();
+    m_statusBar = gEve->GetBrowser()->GetStatusBar();
   } else {
     // create the status bar
     Int_t parts[] = {45, 15, 10, 30};
-    fStatusBar = new TGStatusBar(this, 50, 10);
-    fStatusBar->SetParts(parts, 4);
-    AddFrame(fStatusBar, new TGLayoutHints(kLHintsBottom | kLHintsExpandX,
-                                           0, 0, 10, 0));
+    m_statusBar = new TGStatusBar(this, 50, 10);
+    m_statusBar->SetParts(parts, 4);
+    AddFrame(m_statusBar, new TGLayoutHints(kLHintsBottom | kLHintsExpandX,
+                                            0, 0, 10, 0));
   }
 
   // create eve pad (our geometry container)
-  fPad = new TEvePad();
-  fPad->SetFillColor(kBlack);
+  m_pad = new TEvePad();
+  m_pad->SetFillColor(kBlack);
 
   // create the split frames
-  fSplitFrame = new TGSplitFrame(this, 800, 600);
-  AddFrame(fSplitFrame, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
+  m_splitFrame = new TGSplitFrame(this, 800, 600);
+  AddFrame(m_splitFrame, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
   // split it once
-  fSplitFrame->HSplit(434);
+  m_splitFrame->HSplit(434);
   // then split each part again (this will make four parts)
-  fSplitFrame->GetSecond()->VSplit(266);
-  //fSplitFrame->GetSecond()->GetSecond()->VSplit(266);
+  m_splitFrame->GetSecond()->VSplit(266);
+  //m_splitFrame->GetSecond()->GetSecond()->VSplit(266);
 
   for (int iFrame = 0; iFrame < 3; iFrame++) {
     TGSplitFrame* frm;
     if (iFrame == 0) {
       // get top (main) split frame
-      frm = fSplitFrame->GetFirst();
+      frm = m_splitFrame->GetFirst();
       frm->SetName("Main_View");
     } else if (iFrame == 1) {
       // get bottom left split frame
-      frm = fSplitFrame->GetSecond()->GetFirst();
+      frm = m_splitFrame->GetSecond()->GetFirst();
       frm->SetName("Bottom_Left");
     } else {
       // get bottom center split frame
-      frm = fSplitFrame->GetSecond()->GetSecond();
+      frm = m_splitFrame->GetSecond()->GetSecond();
       frm->SetName("Bottom_Center");
     }
 
     // create (embed) a GL viewer inside
-    fGLViewer[iFrame] = new TGLEmbeddedViewer(frm, fPad);
+    m_glViewer[iFrame] = new TGLEmbeddedViewer(frm, m_pad);
     /*
     TGLOverlayButton* but1, *but2;
-    but1 = new TGLOverlayButton(fGLViewer[iFrame], "Swap", 10.0, -10.0, 55.0, 16.0);
-    but1->Connect("Clicked(TGLViewerBase*)", "Belle2::SplitGLView", this, "SwapToMainView(TGLViewerBase*)");
-    but2 = new TGLOverlayButton(fGLViewer[iFrame], "Undock", 70.0, -10.0, 55.0, 16.0);
-    but2->Connect("Clicked(TGLViewerBase*)", "Belle2::SplitGLView", this, "UnDock(TGLViewerBase*)");
+    but1 = new TGLOverlayButton(m_glViewer[iFrame], "Swap", 10.0, -10.0, 55.0, 16.0);
+    but1->Connect("Clicked(TGLViewerBase*)", "Belle2::SplitGLView", this, "swapToMainView(TGLViewerBase*)");
+    but2 = new TGLOverlayButton(m_glViewer[iFrame], "Undock", 70.0, -10.0, 55.0, 16.0);
+    but2->Connect("Clicked(TGLViewerBase*)", "Belle2::SplitGLView", this, "unDock(TGLViewerBase*)");
     */
-    frm->AddFrame(fGLViewer[iFrame]->GetFrame(), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
+    frm->AddFrame(m_glViewer[iFrame]->GetFrame(), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
     TEveProjectionManager* projectionMgr = 0;
     if (iFrame == 0) {
       // set the camera to perspective (XOZ) for this viewer
-      fGLViewer[iFrame]->SetCurrentCamera(TGLViewer::kCameraPerspXOZ);
+      m_glViewer[iFrame]->SetCurrentCamera(TGLViewer::kCameraPerspXOZ);
     } else if (iFrame == 1) {
       // set the camera to orthographic (XOY) for this viewer
-      fGLViewer[iFrame]->SetCurrentCamera(TGLViewer::kCameraOrthoXOY);
-      fRhoZMgr = new TEveProjectionManager(TEveProjection::kPT_RhoZ);
-      projectionMgr = fRhoZMgr;
+      m_glViewer[iFrame]->SetCurrentCamera(TGLViewer::kCameraOrthoXOY);
+      m_rhozManager = new TEveProjectionManager(TEveProjection::kPT_RhoZ);
+      projectionMgr = m_rhozManager;
     } else {
       // set the camera to orthographic (XOY) for this viewer
-      fGLViewer[iFrame]->SetCurrentCamera(TGLViewer::kCameraOrthoXOY);
-      fRPhiMgr = new TEveProjectionManager(TEveProjection::kPT_RPhi);
-      projectionMgr = fRPhiMgr;
+      m_glViewer[iFrame]->SetCurrentCamera(TGLViewer::kCameraOrthoXOY);
+      m_rphiManager = new TEveProjectionManager(TEveProjection::kPT_RPhi);
+      projectionMgr = m_rphiManager;
     }
 
     // connect signals we are interested in
-    fGLViewer[iFrame]->Connect("MouseOver(TGLPhysicalShape*)", "Belle2::SplitGLView", this,
-                               "OnMouseOver(TGLPhysicalShape*)");
-    fGLViewer[iFrame]->Connect("Clicked(TObject*)", "Belle2::SplitGLView", this,
-                               "OnClicked(TObject*)");
-    fViewer[iFrame] = new TEveViewer(TString::Format("SplitGLViewer[%d]", iFrame));
-    fViewer[iFrame]->SetGLViewer(fGLViewer[iFrame], fGLViewer[iFrame]->GetFrame());
-    fViewer[iFrame]->IncDenyDestroy();
+    m_glViewer[iFrame]->Connect("MouseOver(TGLPhysicalShape*)", "Belle2::SplitGLView", this,
+                                "onMouseOver(TGLPhysicalShape*)");
+    m_glViewer[iFrame]->Connect("Clicked(TObject*)", "Belle2::SplitGLView", this,
+                                "onClicked(TObject*)");
+    m_viewer[iFrame] = new TEveViewer(TString::Format("SplitGLViewer[%d]", iFrame));
+    m_viewer[iFrame]->SetGLViewer(m_glViewer[iFrame], m_glViewer[iFrame]->GetFrame());
+    m_viewer[iFrame]->IncDenyDestroy();
     if (gEve) {
       if (iFrame == 0) {
-        fViewer[iFrame]->AddScene(gEve->GetGlobalScene());
-        fViewer[iFrame]->AddScene(gEve->GetEventScene());
+        m_viewer[iFrame]->AddScene(gEve->GetGlobalScene());
+        m_viewer[iFrame]->AddScene(gEve->GetEventScene());
       }
       TEveScene* s = 0;
       if (projectionMgr) {
@@ -165,10 +150,10 @@ SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
           s = gEve->SpawnNewScene("Rho-Z projection");
         if (iFrame == 2)
           s = gEve->SpawnNewScene("R-Phi projection");
-        fViewer[iFrame]->AddScene(s);
+        m_viewer[iFrame]->AddScene(s);
       }
 
-      gEve->GetViewers()->AddElement(fViewer[iFrame]);
+      gEve->GetViewers()->AddElement(m_viewer[iFrame]);
       if (projectionMgr) {
         s->AddElement(projectionMgr);
         gEve->AddToListTree(projectionMgr, kTRUE);
@@ -176,11 +161,11 @@ SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
     }
 
   }
-  setActiveViewer(fGLViewer[0]);
+  setActiveViewer(m_glViewer[0]);
 
   if (gEve) {
     gEve->GetListTree()->Connect("Clicked(TGListTreeItem*, Int_t, Int_t, Int_t)",
-                                 "Belle2::SplitGLView", this, "ItemClicked(TGListTreeItem*, Int_t, Int_t, Int_t)");
+                                 "Belle2::SplitGLView", this, "itemClicked(TGListTreeItem*, Int_t, Int_t, Int_t)");
   }
 
   Resize(GetDefaultSize());
@@ -191,25 +176,15 @@ SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
 SplitGLView::~SplitGLView()
 {
   // Clean up main frame...
-
-  fMenuFile->Disconnect("Activated(Int_t)", this, "HandleMenu(Int_t)");
-  fMenuCamera->Disconnect("Activated(Int_t)", this, "HandleMenu(Int_t)");
-  fMenuScene->Disconnect("Activated(Int_t)", this, "HandleMenu(Int_t)");
-  fMenuHelp->Disconnect("Activated(Int_t)", this, "HandleMenu(Int_t)");
   for (int i = 0; i < 3; i++) {
-    fGLViewer[i]->Disconnect("MouseOver(TGLPhysicalShape*)", this,
-                             "OnMouseOver(TGLPhysicalShape*)");
-    delete fGLViewer[i];
+    delete m_glViewer[i];
   }
-  delete fMenuFile;
-  delete fMenuScene;
-  delete fMenuCamera;
-  delete fMenuHelp;
-  delete fSplitFrame;
-  delete fPad;
+  delete m_cameraMenu;
+  delete m_splitFrame;
+  delete m_pad;
 }
 
-void SplitGLView::HandleMenu(Int_t id)
+void SplitGLView::handleMenu(Int_t id)
 {
   // Handle menu items.
 
@@ -223,44 +198,44 @@ void SplitGLView::HandleMenu(Int_t id)
       break;
 
     case kGLPerspYOZ:
-      if (fActViewer)
-        fActViewer->SetCurrentCamera(TGLViewer::kCameraPerspYOZ);
+      if (m_activeViewer)
+        m_activeViewer->SetCurrentCamera(TGLViewer::kCameraPerspYOZ);
       break;
     case kGLPerspXOZ:
-      if (fActViewer)
-        fActViewer->SetCurrentCamera(TGLViewer::kCameraPerspXOZ);
+      if (m_activeViewer)
+        m_activeViewer->SetCurrentCamera(TGLViewer::kCameraPerspXOZ);
       break;
     case kGLPerspXOY:
-      if (fActViewer)
-        fActViewer->SetCurrentCamera(TGLViewer::kCameraPerspXOY);
+      if (m_activeViewer)
+        m_activeViewer->SetCurrentCamera(TGLViewer::kCameraPerspXOY);
       break;
     case kGLXOY:
-      if (fActViewer)
-        fActViewer->SetCurrentCamera(TGLViewer::kCameraOrthoXOY);
+      if (m_activeViewer)
+        m_activeViewer->SetCurrentCamera(TGLViewer::kCameraOrthoXOY);
       break;
     case kGLXOZ:
-      if (fActViewer)
-        fActViewer->SetCurrentCamera(TGLViewer::kCameraOrthoXOZ);
+      if (m_activeViewer)
+        m_activeViewer->SetCurrentCamera(TGLViewer::kCameraOrthoXOZ);
       break;
     case kGLZOY:
-      if (fActViewer)
-        fActViewer->SetCurrentCamera(TGLViewer::kCameraOrthoZOY);
+      if (m_activeViewer)
+        m_activeViewer->SetCurrentCamera(TGLViewer::kCameraOrthoZOY);
       break;
     case kGLOrthoRotate:
-      ToggleOrthoRotate();
+      toggleOrthoRotate();
       break;
     case kGLOrthoDolly:
-      ToggleOrthoDolly();
+      toggleOrthoDolly();
       break;
 
     case kSceneUpdate:
-      if (fActViewer)
-        fActViewer->UpdateScene();
+      if (m_activeViewer)
+        m_activeViewer->UpdateScene();
       break;
 
     case kSceneUpdateAll:
       for (int i = 0; i < 3; i++)
-        fGLViewer[i]->UpdateScene();
+        m_glViewer[i]->UpdateScene();
 
       break;
 
@@ -294,20 +269,20 @@ void SplitGLView::HandleMenu(Int_t id)
   }
 }
 
-void SplitGLView::OnClicked(TObject* obj)
+void SplitGLView::onClicked(TObject* obj)
 {
   // Handle click events in GL viewer
 
   if (obj)
-    fStatusBar->SetText(Form("User clicked on: \"%s\"", obj->GetName()), 1);
+    m_statusBar->SetText(Form("User clicked on: \"%s\"", obj->GetName()), 1);
   else
-    fStatusBar->SetText("", 1);
+    m_statusBar->SetText("", 1);
 
   // change the active GL viewer to the one who emitted the signal
   TGLEmbeddedViewer* sender = dynamic_cast<TGLEmbeddedViewer*>(static_cast<TQObject*>(gTQSender));
 
   if (!sender) {
-    B2WARNING("OnClicked() signal not from a TGLEmbeddedViewer?");
+    B2WARNING("onClicked() signal not from a TGLEmbeddedViewer?");
     return;
   }
   setActiveViewer(sender);
@@ -316,10 +291,10 @@ void SplitGLView::OnClicked(TObject* obj)
 void SplitGLView::setActiveViewer(TGLEmbeddedViewer* v)
 {
   // set the last active GL viewer frame to default color
-  if (fActViewer && fActViewer->GetFrame())
-    fActViewer->GetFrame()->ChangeBackground(GetDefaultFrameBackground());
+  if (m_activeViewer && m_activeViewer->GetFrame())
+    m_activeViewer->GetFrame()->ChangeBackground(GetDefaultFrameBackground());
 
-  fActViewer = v;
+  m_activeViewer = v;
 
   static Pixel_t green = 0;
   // get the highlight color (only once)
@@ -327,77 +302,77 @@ void SplitGLView::setActiveViewer(TGLEmbeddedViewer* v)
     gClient->GetColorByName("green", green);
   }
   // set the new active GL viewer frame to highlight color
-  if (fActViewer->GetFrame())
-    fActViewer->GetFrame()->ChangeBackground(green);
+  if (m_activeViewer->GetFrame())
+    m_activeViewer->GetFrame()->ChangeBackground(green);
 
   // update menu entries to match active viewer's options
-  if (fActViewer->GetOrthoXOYCamera()->GetDollyToZoom() &&
-      fActViewer->GetOrthoXOZCamera()->GetDollyToZoom() &&
-      fActViewer->GetOrthoZOYCamera()->GetDollyToZoom())
-    fMenuCamera->UnCheckEntry(kGLOrthoDolly);
+  if (m_activeViewer->GetOrthoXOYCamera()->GetDollyToZoom() &&
+      m_activeViewer->GetOrthoXOZCamera()->GetDollyToZoom() &&
+      m_activeViewer->GetOrthoZOYCamera()->GetDollyToZoom())
+    m_cameraMenu->UnCheckEntry(kGLOrthoDolly);
   else
-    fMenuCamera->CheckEntry(kGLOrthoDolly);
+    m_cameraMenu->CheckEntry(kGLOrthoDolly);
 
-  if (fActViewer->GetOrthoXOYCamera()->GetEnableRotate() &&
-      fActViewer->GetOrthoXOYCamera()->GetEnableRotate() &&
-      fActViewer->GetOrthoXOYCamera()->GetEnableRotate())
-    fMenuCamera->CheckEntry(kGLOrthoRotate);
+  if (m_activeViewer->GetOrthoXOYCamera()->GetEnableRotate() &&
+      m_activeViewer->GetOrthoXOYCamera()->GetEnableRotate() &&
+      m_activeViewer->GetOrthoXOYCamera()->GetEnableRotate())
+    m_cameraMenu->CheckEntry(kGLOrthoRotate);
   else
-    fMenuCamera->UnCheckEntry(kGLOrthoRotate);
+    m_cameraMenu->UnCheckEntry(kGLOrthoRotate);
 }
 
 
-void SplitGLView::OnMouseOver(TGLPhysicalShape* shape)
+void SplitGLView::onMouseOver(TGLPhysicalShape* shape)
 {
-  // Slot used to handle "OnMouseOver" signal coming from any GL viewer.
+  // Slot used to handle "onMouseOver" signal coming from any GL viewer.
   // We receive a pointer on the physical shape in which the mouse cursor is.
 
   // display informations on the physical shape in the status bar
   if (shape && shape->GetLogical() && shape->GetLogical()->GetExternal())
-    fStatusBar->SetText(Form("Mouse Over: \"%s\"",
-                             shape->GetLogical()->GetExternal()->GetName()), 0);
+    m_statusBar->SetText(Form("Mouse Over: \"%s\"",
+                              shape->GetLogical()->GetExternal()->GetName()), 0);
   else
-    fStatusBar->SetText("", 0);
+    m_statusBar->SetText("", 0);
 }
 
 
-void SplitGLView::ToggleOrthoRotate()
+void SplitGLView::toggleOrthoRotate()
 {
   // Toggle state of the 'Ortho allow rotate' menu entry.
 
-  if (fMenuCamera->IsEntryChecked(kGLOrthoRotate))
-    fMenuCamera->UnCheckEntry(kGLOrthoRotate);
+  if (m_cameraMenu->IsEntryChecked(kGLOrthoRotate))
+    m_cameraMenu->UnCheckEntry(kGLOrthoRotate);
   else
-    fMenuCamera->CheckEntry(kGLOrthoRotate);
-  Bool_t state = fMenuCamera->IsEntryChecked(kGLOrthoRotate);
-  if (fActViewer) {
-    fActViewer->GetOrthoXOYCamera()->SetEnableRotate(state);
-    fActViewer->GetOrthoXOYCamera()->SetEnableRotate(state);
-    fActViewer->GetOrthoXOYCamera()->SetEnableRotate(state);
+    m_cameraMenu->CheckEntry(kGLOrthoRotate);
+  Bool_t state = m_cameraMenu->IsEntryChecked(kGLOrthoRotate);
+  if (m_activeViewer) {
+    m_activeViewer->GetOrthoXOYCamera()->SetEnableRotate(state);
+    m_activeViewer->GetOrthoXOYCamera()->SetEnableRotate(state);
+    m_activeViewer->GetOrthoXOYCamera()->SetEnableRotate(state);
   }
 }
 
-void SplitGLView::ToggleOrthoDolly()
+void SplitGLView::toggleOrthoDolly()
 {
   // Toggle state of the 'Ortho allow dolly' menu entry.
 
-  if (fMenuCamera->IsEntryChecked(kGLOrthoDolly))
-    fMenuCamera->UnCheckEntry(kGLOrthoDolly);
+  if (m_cameraMenu->IsEntryChecked(kGLOrthoDolly))
+    m_cameraMenu->UnCheckEntry(kGLOrthoDolly);
   else
-    fMenuCamera->CheckEntry(kGLOrthoDolly);
-  Bool_t state = ! fMenuCamera->IsEntryChecked(kGLOrthoDolly);
-  if (fActViewer) {
-    fActViewer->GetOrthoXOYCamera()->SetDollyToZoom(state);
-    fActViewer->GetOrthoXOZCamera()->SetDollyToZoom(state);
-    fActViewer->GetOrthoZOYCamera()->SetDollyToZoom(state);
+    m_cameraMenu->CheckEntry(kGLOrthoDolly);
+  Bool_t state = ! m_cameraMenu->IsEntryChecked(kGLOrthoDolly);
+  if (m_activeViewer) {
+    m_activeViewer->GetOrthoXOYCamera()->SetDollyToZoom(state);
+    m_activeViewer->GetOrthoXOZCamera()->SetDollyToZoom(state);
+    m_activeViewer->GetOrthoZOYCamera()->SetDollyToZoom(state);
   }
 }
 
-void SplitGLView::ItemClicked(TGListTreeItem* item, Int_t, Int_t, Int_t)
+void SplitGLView::itemClicked(TGListTreeItem* item, Int_t, Int_t, Int_t)
 {
   // Item has been clicked, based on mouse button do:
 
-  static const TEveException eh("SplitGLView::ItemClicked ");
+  static const TEveException eh("SplitGLView::itemClicked ");
   TEveElement* re = (TEveElement*)item->GetUserData();
   if (re == 0) return;
   TObject* obj = re->GetObject(eh);
@@ -411,12 +386,12 @@ void SplitGLView::ItemClicked(TGListTreeItem* item, Int_t, Int_t, Int_t)
   }
 }
 
-void SplitGLView::SwapToMainView(TGLViewerBase* viewer)
+void SplitGLView::swapToMainView(TGLViewerBase* viewer)
 {
   // Swap frame embedded in a splitframe to the main view (slot method).
 
   TGCompositeFrame* parent = 0;
-  if (!fSplitFrame->GetFirst()->GetFrame())
+  if (!m_splitFrame->GetFirst()->GetFrame())
     return;
   if (viewer == 0) {
     TGPictureButton* src = (TGPictureButton*)gTQSender;
@@ -435,7 +410,7 @@ void SplitGLView::SwapToMainView(TGLViewerBase* viewer)
     ((TGSplitFrame*)parent)->SwitchToMain();
 }
 
-void SplitGLView::UnDock(TGLViewerBase* viewer)
+void SplitGLView::unDock(TGLViewerBase* viewer)
 {
   // Undock frame embedded in a splitframe (slot method).
 

@@ -1,14 +1,11 @@
 #ifndef SPLITGLVIEW_H
 #define SPLITGLVIEW_H
 
-#include "TApplication.h"
-#include "TSystem.h"
 #include "TGFrame.h"
 #include "TGLayout.h"
 #include "TGSplitter.h"
 #include "TGLWidget.h"
 #include "TEvePad.h"
-#include "TGeoManager.h"
 #include "TString.h"
 #include "TGMenu.h"
 #include "TGStatusBar.h"
@@ -16,11 +13,6 @@
 #include "TGLPhysicalShape.h"
 #include "TGLLogicalShape.h"
 #include "TClass.h"
-#include "TGListTree.h"
-#include "TOrdCollection.h"
-#include "TArrayF.h"
-#include "TGHtml.h"
-#include "TPRegexp.h"
 
 #include "TEveManager.h"
 #include "TEveViewer.h"
@@ -32,46 +24,44 @@
 
 #include "TGSplitFrame.h"
 #include "TGLEmbeddedViewer.h"
-#include "TGDockableFrame.h"
-#include "TGShapedFrame.h"
-#include "TGButton.h"
-#include "TGTab.h"
-#include "TEnv.h"
 
 namespace Belle2 {
 
-  /** Responsible for arranging the GL viewers and providing related functionality. */
+  /** Responsible for arranging the GL viewers and providing related functionality.
+   *
+   *  Adapted from alice_esd_split.C example.
+   */
   class SplitGLView : public TGMainFrame {
 
   public:
     /** constructor. */
-    SplitGLView(const TGWindow* p = 0, UInt_t w = 800, UInt_t h = 600);
+    explicit SplitGLView(const TGWindow* p = 0, UInt_t w = 800, UInt_t h = 600);
     /** destructor. */
     virtual ~SplitGLView();
 
     /** handler for clicks inside GL viewer. */
-    void           ItemClicked(TGListTreeItem* item, Int_t btn, Int_t x, Int_t y);
+    void           itemClicked(TGListTreeItem* item, Int_t btn, Int_t x, Int_t y);
     /** menu item handler */
-    void           HandleMenu(Int_t id);
+    void           handleMenu(Int_t id);
     /** make current viewer active & show name of obj in status bar. */
-    void           OnClicked(TObject* obj);
+    void           onClicked(TObject* obj);
     /** show name of shape in status bar. */
-    void           OnMouseOver(TGLPhysicalShape* shape);
+    void           onMouseOver(TGLPhysicalShape* shape);
     /** swap specified viewer with main view. */
-    void           SwapToMainView(TGLViewerBase* viewer);
+    void           swapToMainView(TGLViewerBase* viewer);
     /** toggle wether the active viewer may be rotated (not that useful for projections). */
-    void           ToggleOrthoRotate();
+    void           toggleOrthoRotate();
     /** Toggle state of the 'Ortho allow dolly' menu entry. */
-    void           ToggleOrthoDolly();
+    void           toggleOrthoDolly();
     /** move viewer into standalone window. */
-    void           UnDock(TGLViewerBase* viewer);
+    void           unDock(TGLViewerBase* viewer);
 
     /** return R-Phi projection manager. */
-    TEveProjectionManager* getRPhiMgr() const { return fRPhiMgr; }
+    TEveProjectionManager* getRPhiMgr() const { return m_rphiManager; }
     /** return Rho-Z projection manager. */
-    TEveProjectionManager* getRhoZMgr() const { return fRhoZMgr; }
+    TEveProjectionManager* getRhoZMgr() const { return m_rhozManager; }
     /** return TGLViewer that is active right now. */
-    TGLViewer* getActiveGLViewer() const { return fActViewer; }
+    TGLViewer* getActiveGLViewer() const { return m_activeViewer; }
 
     /** Which menu command was selected? */
     enum EMyCommands {
@@ -82,27 +72,22 @@ namespace Belle2 {
     };
 
   private:
-    /** set fActViewer and update UI accordingly. */
+    /** set m_activeViewer and update UI accordingly. */
     void setActiveViewer(TGLEmbeddedViewer* v);
 
-    TEvePad*               fPad;           /**< pad used as geometry container */
-    TGSplitFrame*          fSplitFrame;    /**< main (first) split frame */
-    TGLEmbeddedViewer*     fGLViewer[3];   /**< GL viewers */
-    TGLEmbeddedViewer*     fActViewer;     /**< active GL viewer */
-    TGMenuBar*             fMenuBar;       /**< main menu bar */
-    TGPopupMenu*           fMenuFile;      /**< 'File' popup menu */
-    TGPopupMenu*           fMenuHelp;      /**< 'Help' popup menu */
-    TGPopupMenu*           fMenuCamera;    /**< 'Camera' popup menu */
-    TGPopupMenu*           fMenuScene;     /**< 'Scene' popup menu */
-    TGStatusBar*           fStatusBar;     /**< status bar */
+    TEvePad*               m_pad;           /**< pad used as geometry container */
+    TGSplitFrame*          m_splitFrame;    /**< main (first) split frame */
+    TGLEmbeddedViewer*     m_glViewer[3];   /**< GL viewers */
+    TGLEmbeddedViewer*     m_activeViewer;  /**< active GL viewer */
+    TGPopupMenu*           m_cameraMenu;    /**< 'Camera' popup menu */
+    TGStatusBar*           m_statusBar;     /**< status bar */
 
-    TEveViewer*            fViewer[3]; /**< eve viewers */
-    TEveProjectionManager* fRPhiMgr;   /**< R-Phi projection */
-    TEveProjectionManager* fRhoZMgr;   /**< Rho-Z projection */
+    TEveViewer*            m_viewer[3];     /**< eve viewers */
+    TEveProjectionManager* m_rphiManager;   /**< R-Phi projection */
+    TEveProjectionManager* m_rhozManager;   /**< Rho-Z projection */
 
     /** Generate root dictionaries. */
     ClassDef(SplitGLView, 0)
   };
 }
-
 #endif

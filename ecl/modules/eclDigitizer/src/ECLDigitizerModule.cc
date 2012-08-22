@@ -90,6 +90,13 @@ void ECLDigitizerModule::initialize()
   // CPU time start
   m_timeCPU = clock() * Unit::us;
   readDSPDB();
+
+  StoreArray<HitECL>  eclArray(m_eclHitCollectionName);
+  StoreArray<DspECL> eclDspArray(m_eclDspCollectionName);
+  StoreArray<ECLDigit> eclDigiArray(m_eclDigiCollectionName);
+  StoreArray<TrigECL> eclTrigArray(m_eclTrigCollectionName);
+
+
 }
 
 void ECLDigitizerModule::beginRun()
@@ -119,7 +126,8 @@ void ECLDigitizerModule::event()
   double AdcNoise[8736][31] = {{0}};
   double genNoise[8736][31] = {{0}};
 
-  double DeltaT = (24. - m_random->Uniform(0, 24));
+  double DeltaT = (24. - gRandom->Uniform(0, 24));
+
   for (int ii = 0; ii < hitNum; ii++) {
 
     HitECL* aECLHit = eclArray[ii];
@@ -135,7 +143,7 @@ void ECLDigitizerModule::event()
 
     //Noise generation
     for (int iCal = 0; iCal < 31; iCal++) {
-      genNoise[hitCellId][iCal] = m_random->Gaus(0, 1);
+      genNoise[hitCellId][iCal] =  gRandom->Gaus(0, 1);
     }
 
     for (int T_clock = 0; T_clock < 31; T_clock++) {

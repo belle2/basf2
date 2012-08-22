@@ -31,10 +31,12 @@ input.param('excludeBranchNames', ['PXDClusters'])
 # also load persistent tree (contains FileMetaData object)
 input.param('treeNamePersistent', 'persistent')
 
-# Create paths
 main = create_path()
 
-# Add modules to paths
+# not used for anything, just checking wether the master module
+# can be found if it's not the first module in the path.
+#main.add_module(register_module('Gearbox'))
+
 main.add_module(input)
 main.add_module(evtmetainfo)
 main.add_module(printcollections)

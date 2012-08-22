@@ -175,7 +175,8 @@ main.add_module(progress)
 
 # Process events
 nprocess(2)
-process(main)
+#process(main)
+B2FATAL("preprocessing test disabled (fails to terminate)")
 
 # check wether output file contains correct number of events
 from ROOT import TFile

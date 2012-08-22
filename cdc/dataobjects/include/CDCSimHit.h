@@ -185,7 +185,7 @@ namespace Belle2 {
     }
 
     /** ROOT Macro. */
-    ClassDef(CDCSimHit, 1);
+    ClassDef(CDCSimHit, 2);
 
   };
 

@@ -283,9 +283,9 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
     // finished getting the hit infos -----------------------------------------------------
 
     // sort hit infos into variables ------------------------------------------------------
-    TVector3 o = plane.getO();
-    TVector3 u = plane.getU();
-    TVector3 v = plane.getV();
+    const TVector3& o = plane.getO();
+    const TVector3& u = plane.getU();
+    const TVector3& v = plane.getV();
 
     const std::string& hit_type = hit->getPolicyName();
 
@@ -411,21 +411,23 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
 
       // draw planar hits, with distinction between strip and pixel hits ----------------
       if (planar_hit) {
-        TVector2 plane_coords = plane.LabToPlane(plane_pos);
+        TVector2 plane_coords = plane.LabToPlane(track_pos);
         if (!planar_pixel_hit) {
+          //currently unused in Belle2 {{{
           TEveBox* hit_box;
-          hit_box = boxCreator((plane_pos + (plane_coords.Px() - hit_u) * u), u, v, (float)(m_errorScale * std::sqrt(hit_res_u)), plane_size, 0.0105);
+          hit_box = boxCreator((track_pos + (plane_coords.Px() - hit_u) * u), u, v, (float)(m_errorScale * std::sqrt(hit_res_u)), plane_size, 0.0105);
           hit_box->SetMainColor(kYellow);
           hit_box->SetMainTransparency(0);
           if (track_lines)
             track_lines->AddElement(hit_box);
           else
             gEve->AddElement(hit_box);
+          //}}}
         } else {
           // calculate eigenvalues to draw error-ellipse ----------------------------
-          TMatrixDEigen eigen_values(hit_cov);
           TEveGeoShape* det_shape = new TEveGeoShape("planar hit");
           det_shape->IncDenyDestroy();
+          TMatrixDEigen eigen_values(hit_cov);
           TMatrixT<double> ev = eigen_values.GetEigenValues();
           TMatrixT<double> eVec = eigen_values.GetEigenVectors();
           double pseudo_res_0 = m_errorScale * std::sqrt(ev(0, 0));
@@ -452,7 +454,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
 
           // calculate the semiaxis of the error ellipse ----------------------------
           det_shape->SetShape(new TGeoEltu(pseudo_res_0, pseudo_res_1, 0.0105));
-          TVector3 pix_pos = plane_pos + (plane_coords.Px() - hit_u) * u + (plane_coords.Py() - hit_v) * v;
+          TVector3 pix_pos = track_pos + (plane_coords.Px() - hit_u) * u + (plane_coords.Py() - hit_v) * v;
           TVector3 u_semiaxis = (pix_pos + eVec(0, 0) * u + eVec(1, 0) * v) - pix_pos;
           TVector3 v_semiaxis = (pix_pos + eVec(0, 1) * u + eVec(1, 1) * v) - pix_pos;
           TVector3 norm = u.Cross(v);
@@ -474,6 +476,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
             gEve->AddElement(det_shape);
         }
       } else if (space_hit) {
+        //currently unused in Belle2 {{{
         // get eigenvalues of covariance to know how to draw the ellipsoid ------------
         TMatrixDEigen eigen_values(hit->getRawHitCov());
         TEveGeoShape* det_shape = new TEveGeoShape("spacepoint hit");
@@ -532,6 +535,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
           track_lines->AddElement(det_shape);
         else
           gEve->AddElement(det_shape);
+        //}}}
       } else if (wire_hit) {
         TEveGeoShape* det_shape = new TEveGeoShape("wire hit");
         det_shape->IncDenyDestroy();

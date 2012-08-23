@@ -66,9 +66,9 @@ namespace Belle2 {
       c_Input                       = 1,  /**< This module is an input module (reads data). */
       c_Output                      = 2,  /**< This module is an output module (writes data). */
       c_ParallelProcessingCertified = 4,  /**< This module can be run in parallel processing mode safely (has to comply with certain standards). */
-      c_RequiresGUISupport          = 8,   /**< This module requires the framework to have GUI support built-in. */
-      c_HistogramManager            = 16,  /**< This module is used to manage histograms accumulated by other modules */
-      c_InitializeInProcess         = 32  /**< initialize() function is called in forked process */
+      c_RequiresGUISupport          = 8,  /**< This module requires the framework to have GUI support built-in. */
+      c_HistogramManager            = 16, /**< This module is used to manage histograms accumulated by other modules */
+      c_InitializeInProcess         = 32  /**< initialize() function is called in same forked process event() is called in */
     };
 
     /**

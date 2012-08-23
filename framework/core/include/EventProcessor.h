@@ -102,10 +102,7 @@ namespace Belle2 {
     void processEndRun(const ModulePtrList& modulePathList);
 
     PathManager& m_pathManager; /**< Reference to the path manager, which takes care of creating and handling paths. */
-    Module* m_master;  /**< The master module that determines the experiment/run/event number **/
-
-  private:
-
+    const Module* m_master;  /**< The master module that determines the experiment/run/event number **/
   };
 
 }

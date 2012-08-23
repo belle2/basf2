@@ -10,7 +10,6 @@
 
 #include "framework/modules/evtmetagen/EvtMetaInfoModule.h"
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <boost/format.hpp>
@@ -30,9 +29,7 @@ REG_MODULE(EvtMetaInfo)
 EvtMetaInfoModule::EvtMetaInfoModule() : Module()
 {
   //Set module properties
-  setDescription("Prints the current event meta data information (exp, run, evt).");
-
-  //Parameter definition
+  setDescription("Prints the current event meta data information (exp, run, event numbers).");
 }
 
 

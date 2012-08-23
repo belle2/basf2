@@ -121,6 +121,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 
     //Check whether this is the master module
     if (!m_master && DataStore::Instance().hasEntry(DataStore::objectName<EventMetaData>(""), DataStore::c_Event, EventMetaData::Class(), false)) {
+      B2DEBUG(100, "Found master module " << module->getName());
       m_master = module;
     }
   }

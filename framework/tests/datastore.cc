@@ -82,22 +82,18 @@ namespace Belle2 {
   TEST_F(DataStoreTest, TypeTest)
   {
     //attach with incompatible type
-    StoreArray<RunMetaData> evtData("EventMetaDatas");
-    EXPECT_FALSE(evtData);
-    StoreObjPtr<RunMetaData> evtData2("EventMetaData");
-    EXPECT_FALSE(evtData2);
+    EXPECT_FATAL(StoreArray<RunMetaData> evtData("EventMetaDatas"));
+    EXPECT_FATAL(StoreObjPtr<RunMetaData> evtData2("EventMetaData"));
 
     //attaching objects to array and vice versa shouldn't work
     //neither should the store allow objects with same name/durability
     //as existing arrays
-    StoreArray<EventMetaData> array("EventMetaData");
-    EXPECT_FALSE(array);
-    StoreObjPtr<EventMetaData> obj("EventMetaDatas");
-    EXPECT_FALSE(obj);
+    EXPECT_FATAL(StoreArray<EventMetaData> array("EventMetaData"));
+    EXPECT_FATAL(StoreObjPtr<EventMetaData> obj("EventMetaDatas"));
 
-    //getting a base class is OK
-    EXPECT_TRUE(StoreArray<EventMetaData>("EventMetaDatas"));
-    EXPECT_TRUE(StoreObjPtr<EventMetaData>("EventMetaData"));
+    //getting a base class is not OK right now (why?)
+    EXPECT_FATAL(StoreArray<TObject>("EventMetaDatas"));
+    EXPECT_FATAL(StoreObjPtr<TObject>("EventMetaData"));
   }
 
   /** check meta data. */
@@ -199,26 +195,61 @@ namespace Belle2 {
     //clear event map (evtPtr is now invalid!)
     DataStore::Instance().clearMaps(DataStore::c_Event);
 
-    //right now this is NULL, but it's not actually clearly defined...
-    StoreObjPtr<EventMetaData> a("", DataStore::c_Event);
+    //right now this is NULL, since no object was actually created yet
+    StoreObjPtr<EventMetaData> a;
     EXPECT_FALSE(a);
 
-    //should be a default constructed object
     StoreObjPtr<EventMetaData> b;
     EXPECT_FALSE(b);
 
+    //create() should produce a default constructed object
+    b.create();
+    EXPECT_TRUE(*b == EventMetaData());
+    //since a should attach to same object...
+    EXPECT_TRUE(*a == *b);
+
+    a->setEvent(42);
+    //don't replace existing object
+    a.create(false);
+    EXPECT_EQ(a->getEvent(), (unsigned long)42);
+    //replace existing object
+    a.create(true);
+    EXPECT_NE(a->getEvent(), (unsigned long)42);
+
 
     //cleared arrays must be empty
+    /* TODO: readd these later on?
     StoreArray<EventMetaData> evtData;
     StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
-    StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Run);
     StoreArray<RunMetaData> runData;
-    EXPECT_FALSE(evtData);
-    EXPECT_FALSE(evtDataDifferentName);
-    EXPECT_FALSE(runData);
+    EXPECT_EQ(evtData.getEntries(), 0);
+    EXPECT_EQ(evtDataDifferentName.getEntries(), 0);
+    EXPECT_EQ(runData.getEntries(), 0);
+    */
 
     //run durability, should be unaffected
+    StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Run);
     EXPECT_EQ(evtDataDifferentDurability.getEntries(), 10);
+  }
+
+  /** check required() functionality */
+  TEST_F(DataStoreTest, RequireObjects)
+  {
+    EXPECT_TRUE(StoreObjPtr<EventMetaData>::required());
+    EXPECT_FALSE(StoreObjPtr<EventMetaData>::required("", DataStore::c_Run));
+    EXPECT_FALSE(StoreObjPtr<EventMetaData>::required("nonexisting2"));
+    EXPECT_FALSE(StoreObjPtr<EventMetaData>::required("", DataStore::c_Persistent));
+    //check we didn't create one...
+    EXPECT_FALSE(StoreObjPtr<EventMetaData>::required("nonexisting2"));
+
+    EXPECT_TRUE(StoreArray<EventMetaData>::required());
+    EXPECT_TRUE(StoreArray<EventMetaData>::required("EventMetaDatas_2"));
+    EXPECT_TRUE(StoreArray<EventMetaData>::required("", DataStore::c_Run));
+    EXPECT_FALSE(StoreArray<EventMetaData>::required("blah"));
+    EXPECT_FALSE(StoreArray<EventMetaData>::required("blah"));
+    EXPECT_TRUE(StoreArray<RunMetaData>::required());
+    //check we didn't create one...
+    EXPECT_FALSE(StoreArray<EventMetaData>::required("blah"));
   }
 
 }  // namespace

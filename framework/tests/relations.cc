@@ -25,8 +25,8 @@ namespace Belle2 {
       runData->create();
 
       for (int i = 0; i < 10; ++i) {
-        new((*evtData)->AddrAt(i)) EventMetaData();
-        new((*runData)->AddrAt(i)) RunMetaData();
+        evtData->appendNew();
+        runData->appendNew();
       }
     }
 
@@ -59,6 +59,8 @@ namespace Belle2 {
   /** Check finding of relations. */
   TEST_F(RelationTest, RelationFind)
   {
+    EXPECT_FALSE(RelationArray::required(DataStore::relationName(evtData->getName(), runData->getName())));
+
     DataStore::Instance().setInitializeActive(true);
     RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), runData->getName()));
     StoreArray<EventMetaData>::registerPersistent("OwnName");
@@ -77,7 +79,7 @@ namespace Belle2 {
     EXPECT_FALSE(RelationArray("OwnNameToRunMetaDatas", DataStore::c_Event));
     RelationArray relation2(evtData2, *runData);
     EXPECT_TRUE(relation2.getName() == "OwnNameToRunMetaDatas");
-    EXPECT_TRUE(RelationArray(evtData2, *runData, "", DataStore::c_Event));
+    EXPECT_TRUE(RelationArray(evtData2, *runData));
   }
 
   /** Test that adding to an invalid relation yields a FATAL */
@@ -257,7 +259,7 @@ namespace Belle2 {
     RelationArray relation(*runData, *evtData, "test");
     typedef RelationIndex<EventMetaData, RunMetaData> rel_t;
     EXPECT_FATAL(rel_t(*evtData, *runData, "test"));
-//    EXPECT_FATAL(rel_t("test"));
+    EXPECT_FATAL(rel_t("test"));
 
     StoreArray<EventMetaData> eventData("evts");
     RelationArray relation2(*evtData, *runData, "test2");

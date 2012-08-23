@@ -35,7 +35,7 @@ bool DataStore::checkType(const std::string& name, const StoreEntry* entry,
   // Check whether the existing entry and the requested object are both arrays or both single objects
   const char* entryType = (entry->isArray) ? "array" : "object";
   if (entry->isArray != array) {
-    B2ERROR("Existing entry '" << name << "' is an " << entryType << " and the requested one an " << ((array) ? "array" : "object"));
+    B2FATAL("Existing entry '" << name << "' is an " << entryType << " and the requested one an " << ((array) ? "array" : "object"));
     return false;
   }
 
@@ -45,7 +45,7 @@ bool DataStore::checkType(const std::string& name, const StoreEntry* entry,
     entryClass = static_cast<TClonesArray*>(entry->object)->GetClass();
   }
   if (entryClass != objClass) {
-    B2ERROR("Existing " << entryType << " '" << name << "' of type " << entryClass->GetName() << " doesn't match requested type " << objClass->GetName());
+    B2FATAL("Existing " << entryType << " '" << name << "' of type " << entryClass->GetName() << " doesn't match requested type " << objClass->GetName());
     return false;
   }
 
@@ -172,7 +172,7 @@ void DataStore::backwardCompatibleRegistration(const std::string& name, EDurabil
     if (m_initializeActive) {
       B2WARNING("DATASTORE BACKWARD COMPATIBILITY ISSUE: You have to *register* the " << type << " '" << name << "' before you can use it!");
     } else {
-      B2ERROR("DATASTORE BACKWARD COMPATIBILITY ISSUE: You have to *register* the " << type << " '" << name << "' *in the initialze method* before you can use it!");
+      B2ERROR("DATASTORE BACKWARD COMPATIBILITY ISSUE: You have to *register* the " << type << " '" << name << "' *in the initialize method* before you can use it!");
     }
     bool initializeActive = m_initializeActive;
     m_initializeActive = true;

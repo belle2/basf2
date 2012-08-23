@@ -187,12 +187,13 @@ namespace Belle2 {
       m_initializeActive = active;
     }
 
-    /** Clearing Maps of a specified durability.
+    /** Clears maps of a specified durability.
      *
      *  Called by the framework. Users should usually not use this function without a good reason.
-     *  Object maps are just deleted. ArrayMaps don't delete the TClonesArrays, but just their content.
-     *  The TClonesArray keeps the memory occupied and one can faster store objects into it.
-     *  @param durability Decides which Map is cleared.
+     *
+     *  Memory occupied by objects/arrays is only freed once a new object is created in its place (in createObject()).
+     *
+     *  @param durability Decides which map is cleared.
      */
     void clearMaps(EDurability durability = c_Event);
 

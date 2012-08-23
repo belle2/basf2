@@ -197,6 +197,12 @@ namespace Belle2 {
      */
     void clearMaps(EDurability durability = c_Event);
 
+    /** Frees memory occopied by data store items and removes all objects from the map.
+     *
+     *  Afterwards, m_storeObjMap[durability] is empty.
+     */
+    void reset(EDurability durability);
+
     /** FIXME: Temporary solution to provide backward compatibility for StoreObjPtr and StoreArray */
     void backwardCompatibleRegistration(const std::string& name, EDurability durability,
                                         const TClass* objClass, bool array);
@@ -210,7 +216,7 @@ namespace Belle2 {
 
   private:
     /** Destructor. */
-    ~DataStore() {};
+    ~DataStore();
 
     /** Check whether the given entry and the requested class match.
      *
@@ -222,8 +228,6 @@ namespace Belle2 {
      */
     bool checkType(const std::string& name, const StoreEntry* entry,
                    const TClass* objClass, bool array) const;
-
-    static DataStore* m_instance; /**< Pointer, that actually holds the store instance.*/
 
     /** Map for all objects/arrays in the data store.
      *

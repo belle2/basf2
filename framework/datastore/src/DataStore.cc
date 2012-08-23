@@ -13,19 +13,23 @@
 using namespace std;
 using namespace Belle2;
 
-DataStore* DataStore::m_instance = 0;
-
 
 DataStore& DataStore::Instance()
 {
-  //Access to singleton
-  if (!m_instance) { m_instance = new DataStore;}
-  return *m_instance;
+  static DataStore instance;
+  return instance;
 }
 
 
 DataStore::DataStore() : m_initializeActive(false)
 {
+}
+
+DataStore::~DataStore()
+{
+  //release all memory in data store
+  for (int i = 0; i < c_NDurabilityTypes; i++)
+    reset((EDurability)i);
 }
 
 
@@ -163,6 +167,16 @@ void DataStore::clearMaps(EDurability durability)
   }
 }
 
+void DataStore::reset(EDurability durability)
+{
+  for (StoreObjIter iter = m_storeObjMap[durability].begin(); iter != m_storeObjMap[durability].end(); ++iter) {
+    //delete stored object/array
+    delete iter->second->object;
+    //delete StoreEntry
+    delete iter->second;
+  }
+  m_storeObjMap[durability].clear();
+}
 
 void DataStore::backwardCompatibleRegistration(const std::string& name, EDurability durability,
                                                const TClass* objClass, bool array)

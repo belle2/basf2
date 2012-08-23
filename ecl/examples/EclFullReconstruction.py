@@ -20,7 +20,6 @@ geometry = register_module('Geometry')
 pGun = register_module('PGunInput')
 g4sim = register_module('FullSim')
 
-simpleoutput = register_module('SimpleOutput')
 
 # one event
 evtmetagen.param('ExpList', [0])
@@ -33,7 +32,7 @@ intseed = random.randint(1, 10000000)
 pGun = register_module('ParticleGun')
 param_pGun = {
     'pdgCodes': [22],
-    'nTracks': 5,
+    'nTracks': 1,
     'momentumGeneration': 'uniform',
     'momentumParams': [1., 1.],
     'thetaGeneration': 'fixed',
@@ -48,6 +47,7 @@ param_pGun = {
 
 pGun.param(param_pGun)
 
+
 eclHit = register_module('ECLHit')
 eclDigi = register_module('ECLDigitizer')
 eclRecShower = register_module('ECLReconstructor')
@@ -61,7 +61,6 @@ param_Gamma = {
     }
 
 makeGamma.param(param_Gamma)
-simpleoutput.param('outputFileName', 'output1.root')
 
 cdcDigitizer = register_module('CDCDigitizer')
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
@@ -110,6 +109,8 @@ main.add_module(eclDigi)
 main.add_module(eclRecShower)
 main.add_module(makeGamma)
 main.add_module(makePi0)
+simpleoutput = register_module('SimpleOutput')
+simpleoutput.param('outputFileName', 'Output.root')
 main.add_module(simpleoutput)
 
 process(main)

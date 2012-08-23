@@ -1,16 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-###########################################################################################################################
-#
-############################################################################################################################
-
 import sys
 
 if len(sys.argv) != 3:
     # the program name and the two arguments
     # stop the program and print an error message
-    sys.exit('Must provide two input parameters: [output_root_file_name] [#events_to_generate]'
+    sys.exit('Must provide two input parameters:'
+            '[output_root_file_name] [#events_to_generate]'
              )
 
 rootFileName = sys.argv[1]
@@ -35,7 +32,7 @@ evtgeninput.param('userDECFile', os.environ['BELLE2_LOCAL_DIR']
 
 # specify number of events to be generated in job
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [nOfEvents])  # we want to process nOfEvents events
+evtmetagen.param('EvtNumList', [nOfEvents])  # process nOfEvents events
 evtmetagen.param('RunList', [1])  # from run number 1
 evtmetagen.param('ExpList', [1])  # and experiment number 1
 
@@ -65,7 +62,8 @@ g4sim.logging.log_level = LogLevel.ERROR
 # CDC digitizer
 cdcDigitizer = register_module('CDCDigitizer')
 
-# use one gaussian with resolution of 0.01 in the digitizer (to simplify the fitting)
+# use one gaussian with resolution of 0.01 in the digitizer
+# (to simplify fitting)
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
 cdcDigitizer.param(param_cdcdigi)
 
@@ -89,7 +87,7 @@ mctrackfinder.param('UseCDCHits', True)
 mctrackfinder.param('UseSVDHits', True)
 mctrackfinder.param('UsePXDHits', True)
 mctrackfinder.param('GFTrackCandidatesColName', 'GFTrackCands')
-mctrackfinder.param('WhichParticles', 0)
+mctrackfinder.param('WhichParticles', ['primary'])
 
 # ---------------------------------------------------------------
 # match the found track candidates with MCParticles
@@ -105,7 +103,8 @@ cdcfitting = register_module('GenFitter')
 
 # set correct collection name as input and custom collection names as output
 # select DAF instead of Kalman as Filter
-# set the pdg hypothesis to the simulated one, if you want to fit with different pdg hypothesises, set 'allPDG' to true
+# set the pdg hypothesis to the simulated one, if you want to fit with
+# different pdg hypothesises, set 'allPDG' to true
 param_cdcfitting = {
     'GFTrackCandidatesColName': 'GFTrackCands',
     'TracksColName': 'Tracks',

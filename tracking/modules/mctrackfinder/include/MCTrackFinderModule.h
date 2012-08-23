@@ -78,7 +78,8 @@ namespace Belle2 {
 
     bool m_useClusters;                                         /**< Boolean to select if PXD and SVD Clusters should be used instead of default TrueHits. */
 
-    int m_whichParticles;                                       /**< Boolean to mark for which particles a track candidate should be created: 0 for all primaries, 1 for all tracks which reach PXD, 2 for all tracks which reach SVD, 3 for all tracks which reach CDC . */
+    std::vector<std::string> m_whichParticles;                  /**< List of keywords to mark what properties particles must have to get a track candidate . */
+    int m_particleProperties;                                   /**< Internal encoding of m_whichParticles to avoid string comparisons */
     double m_energyCut;                                         /**< Create track candidates only for MCParticles with energy above this cut*/
     bool m_neutrals;                                            /**< Boolean to mark if track candidates should also be created for neutral particles.*/
 
@@ -89,6 +90,7 @@ namespace Belle2 {
     int m_noTrueHitCounter;                                     /**< will hold number of cluster hits that do not have a corresponding true hit*/
 
     std::string m_gfTrackCandsColName;                          /**< TrackCandidates collection name */
+    int m_numberOfHits;                                         /**< Minimum number of hits per track to allow track candidate creation*/
   };
 }
 

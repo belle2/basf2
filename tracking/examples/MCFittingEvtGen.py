@@ -75,7 +75,8 @@ param_mctrackfinder = {'UseCDCHits': 1, 'UseSVDHits': 1, 'UsePXDHits': 1}
 
 # select which particles to use, here as example: use only particles which had
 # created hits in the CDC, have an energy > 0.1 and are charged
-param_mctrackfinder = {'WhichParticles': 3, 'EnergyCut': 0.1, 'Neutrals': 0}
+param_mctrackfinder = {'WhichParticles': ['primary'], 'EnergyCut': 0.1,
+                       'Neutrals': 0}
 mctrackfinder.param(param_mctrackfinder)
 
 # fitting

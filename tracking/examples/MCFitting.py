@@ -83,7 +83,7 @@ mctrackfinder = register_module('MCTrackFinder')
 # select which detectors you would like to use
 param_mctrackfinder = {'UseCDCHits': 1, 'UseSVDHits': 1, 'UsePXDHits': 1}
 # select which particles to use: primary particles
-param_mctrackfinder = {'WhichParticles': 0}
+param_mctrackfinder = {'WhichParticles': ['primary']}
 mctrackfinder.param(param_mctrackfinder)
 
 # fitting

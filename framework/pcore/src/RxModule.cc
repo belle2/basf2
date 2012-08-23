@@ -8,9 +8,6 @@
 
 #include <framework/pcore/RxModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-
 #include <stdlib.h>
 
 #define MAXEVTSIZE 400000000
@@ -67,9 +64,6 @@ RxModule::~RxModule()
 void RxModule::initialize()
 {
   m_msghandler = new MsgHandler(m_compressionLevel);
-
-  //Assuming we're in one of the event servers or the output server, we want to be the master module
-  StoreObjPtr<EventMetaData>::registerPersistent();
 
   B2INFO("Rx initialized.");
 }

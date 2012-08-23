@@ -35,7 +35,7 @@ main = create_path()
 
 # not used for anything, just checking wether the master module
 # can be found if it's not the first module in the path.
-#main.add_module(register_module('Gearbox'))
+main.add_module(register_module('Gearbox'))
 
 main.add_module(input)
 main.add_module(evtmetainfo)

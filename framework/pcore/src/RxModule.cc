@@ -7,6 +7,10 @@
 //-
 
 #include <framework/pcore/RxModule.h>
+
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+
 #include <stdlib.h>
 
 #define MAXEVTSIZE 400000000
@@ -27,7 +31,7 @@ RxModule::RxModule() : Module(), m_msghandler(0)
 {
   //Set module properties
   setDescription("Decode DataStore from RingBuffer");
-  //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
+  setPropertyFlags(c_Input | c_InitializeInProcess);
 
   m_rbuf = NULL;
   m_nsent = 0;
@@ -41,7 +45,7 @@ RxModule::RxModule(RingBuffer* rbuf) : Module(), m_msghandler(0)
 {
   //Set module properties
   setDescription("Decode DataStore from RingBuffer");
-  //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
+  setPropertyFlags(c_Input | c_InitializeInProcess);
   std::ostringstream buf; buf << "Rx" << rbuf->shmid();
   setModuleName(buf.str());
 
@@ -63,6 +67,9 @@ RxModule::~RxModule()
 void RxModule::initialize()
 {
   m_msghandler = new MsgHandler(m_compressionLevel);
+
+  //Assuming we're in one of the event servers or the output server, we want to be the master module
+  StoreObjPtr<EventMetaData>::registerPersistent();
 
   B2INFO("Rx initialized.");
 }

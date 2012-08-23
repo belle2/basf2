@@ -163,6 +163,7 @@ void pEventProcessor::process(PathPtr spath)
     if ((outpath->getModules()).size() > 0) {
       procHandler->init_OutServer(nout);
       if (procHandler->isOutputSrv()) {   // In output server process
+        m_master = 0; //allow resetting master module
         ModulePtrList outpath_modules = m_pathManager.buildModulePathList(outpath);
         ModulePtrList procinitmodules = init_modules_in_process(outpath_modules);
         if (procinitmodules.size() > 0)
@@ -180,6 +181,7 @@ void pEventProcessor::process(PathPtr spath)
   fflush(stdout);
   procHandler->init_EvtProc(numProcesses);
   if (procHandler->isEvtProc()) {
+    m_master = 0; //allow resetting master module
     PathPtr& mainpath = m_bodypathlist[m_bodypathlist.size() - 1];
     ModulePtrList main_modules = m_pathManager.buildModulePathList(mainpath);
     ModulePtrList procinitmodules = init_modules_in_process(main_modules);
@@ -291,7 +293,7 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
           inlist.push_back(txptr);
           // Inserv Rx at the top of next path
           ModulePtr rxptr(new RxModule(rbuf));
-          rxptr->initialize();
+          //RxModule has c_InitializeInProcess
           mainlist.push_back(rxptr);
           B2DEBUG(0, "Analyze Path : state=0->1, Tx and Rx are inserted");
           if (m_histoflag) {
@@ -329,7 +331,7 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
           mainlist.push_back(txptr);
           // Insert Rx at the top of next path
           ModulePtr rxptr(new RxModule(rbuf));
-          rxptr->initialize();
+          //RxModule has c_InitializeInProcess
           outlist.push_back(rxptr);
           B2DEBUG(0, "Analyze Path : state=1->2, Tx and Rx are inserted");
           if (m_histoflag) {

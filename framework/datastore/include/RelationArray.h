@@ -198,7 +198,7 @@ namespace Belle2 {
         }
       }
       return result;
-    };
+    }
 
     /** Constructor which takes both store arrays and performs some sanity checks on the relation.
      *

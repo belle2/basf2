@@ -134,7 +134,7 @@ namespace Belle2 {
      */
     static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
       std::string arrayName = DataStore::arrayName<T>(name);
-      if (!DataStore::Instance().hasEntry(arrayName, durability, T::Class(), false)) {
+      if (!DataStore::Instance().hasEntry(arrayName, durability, T::Class(), true)) {
         B2ERROR("The required DataStore entry with name " << arrayName << " and durability " << durability << " does not exists.");
         return false;
       }

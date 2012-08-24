@@ -17,7 +17,7 @@
 #include <TObject.h>
 
 namespace Belle2 {
-  /** @addtogroup cdc_dataobjects
+  /** @addtogroup CDC_dataobjects
    *  @ingroup dataobjects
    *  @{ CDCHit
    *  @todo CDCHit : drift time format needs confirmation; is ns really the unit coming out of the unpacker? Is it signed/unsinged?
@@ -152,7 +152,6 @@ namespace Belle2 {
     /** ROOT Macro.*/
     ClassDef(CDCHit, 2);
   };
-
 } // end namespace Belle2
 
 #endif

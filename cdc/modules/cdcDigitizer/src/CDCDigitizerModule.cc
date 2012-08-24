@@ -83,10 +83,9 @@ void CDCDigitizerModule::initialize()
 void CDCDigitizerModule::event()
 {
   // Get SimHit array, MCParticle array, and relation between the two.
+  StoreArray<CDCSimHit>::required(m_inputCDCSimHitsName);
   StoreArray<CDCSimHit> simHits(m_inputCDCSimHitsName);
-  if (!simHits) {
-    B2FATAL("Can not find " << m_inputCDCSimHitsName << ".");
-  }
+
   StoreArray<MCParticle> mcParticles;                //needed to use the relations with MCParticles
   RelationArray mcParticlesToCDCSimHits(mcParticles, simHits);  //RelationArray created by CDC SensitiveDetector
 

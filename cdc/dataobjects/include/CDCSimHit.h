@@ -17,7 +17,7 @@
 #include <TVector3.h>
 
 namespace Belle2 {
-  /** @addtogroup cdc_dataobjects
+  /** @addtogroup CDC_dataobjects
    *  @ingroup dataobjects
    *  @{ CDCSimHit
    *  @}
@@ -186,9 +186,6 @@ namespace Belle2 {
 
     /** ROOT Macro. */
     ClassDef(CDCSimHit, 2);
-
   };
-
 } // end namespace Belle2
-
 #endif

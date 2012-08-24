@@ -17,7 +17,7 @@
 #include <TVector3.h>
 
 namespace Belle2 {
-  /** @addtogroup cdc_dataobjects
+  /** @addtogroup CDC_dataobjects
    *  @ingroup dataobjects
    *  @{ CDCEBSimHit
    *  @todo CDCEBSimHit : calling a double to save phi a wire id is kind of strange...
@@ -104,9 +104,6 @@ namespace Belle2 {
     }
 
     ClassDef(CDCEBSimHit, 1);
-
   };
-
 } // end namespace Belle2
-
 #endif

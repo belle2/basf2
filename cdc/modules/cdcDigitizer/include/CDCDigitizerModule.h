@@ -26,7 +26,7 @@
 
 namespace Belle2 {
 
-  /** @addtogroup cdc_modules
+  /** @addtogroup CDC_modules
    *  @ingroup modules
    *  @{CDCDigitizerModule
    *  @todo CDCDigitizerModule: Event time jitter needs a different approach than the one, which is taken here. Instead of adding

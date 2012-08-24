@@ -24,7 +24,7 @@
 //#include <boost/shared_ptr.hpp> // produces trouble for cint because of "Error: void type variable can not be declared "
 
 namespace Belle2 {
-  /** @addtogroup cdc_dataobjects
+  /** @addtogroup CDC_dataobjects
    *  @ingroup dataobjects
    *  @{ CDCRecoHit
    *  @todo CDCRecoHit : once we go to ROOT 6, the pointer should be replaced with shared_ptr.
@@ -144,6 +144,5 @@ namespace Belle2 {
     /** ROOT Macro.*/
     ClassDef(CDCRecoHit, 3);
   };
-
 }
 #endif

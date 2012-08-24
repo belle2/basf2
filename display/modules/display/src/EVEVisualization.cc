@@ -842,12 +842,12 @@ void EVEVisualization::clearEvent()
 
   //also create new containers
   m_trackpropagator = new TEveTrackPropagator();
-  m_trackpropagator->SetMagField(0.0, 0.0, -1.5); //reversed convention!
+  m_trackpropagator->SetMagFieldObj(&m_bfield, false);
   m_trackpropagator->SetMaxR(380); //don't draw tracks outside detector
   m_gftracklist = new TEveTrackList("Fitted tracks", m_trackpropagator);
   m_gftrackpropagator = new TEveTrackPropagator();
   //TODO: add more complex magnetic field (important for BKLM)
-  m_gftrackpropagator->SetMagField(0.0, 0.0, -1.5); //reversed convention!
+  m_gftrackpropagator->SetMagFieldObj(&m_bfield, false);
   m_gftrackpropagator->SetMaxOrbs(0.01); //stop after track markers
   m_eclsimhitdata = new TEveCaloDataVec(1); //#slices
   m_eclsimhitdata->RefSliceInfo(0).Setup("ECL", 0.01, kRed); //set lower energy threshold here

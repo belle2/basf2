@@ -2,6 +2,7 @@
 #define EVEVISUALIZATION_H
 
 #include <generators/dataobjects/MCParticle.h>
+#include <geometry/bfieldmap/BFieldMap.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
@@ -12,6 +13,7 @@
 
 #include <GFTrack.h>
 
+#include <TEveTrackPropagator.h>
 #include <TVector3.h>
 #include <TString.h>
 
@@ -24,7 +26,6 @@ class TEveElementList;
 class TEvePointSet;
 class TEveTrack;
 class TEveTrackList;
-class TEveTrackPropagator;
 
 namespace Belle2 {
 
@@ -42,6 +43,26 @@ namespace Belle2 {
       TEveTrack* track; /**< the actual MC track. */
       TEvePointSet* simhits; /**< simhit positions. */
     };
+
+    /** Provide magnetic field values for TEveTrackPropagator. */
+    class EveVisBField : public TEveMagField {
+    public:
+      EveVisBField(): TEveMagField() { }
+      virtual ~EveVisBField() { }
+
+      /** return field strength at given coordinates, using Eve conventions. */
+      virtual TEveVector GetField(Float_t x, Float_t y, Float_t z) const {
+        TEveVector v;
+
+        v.Set(BFieldMap::Instance().getBField(TVector3(x, y, z)));
+        v.fZ *= -1; //Eve has inverted B field convention
+
+        return v;
+      }
+      /** maximal field strength (is this correct?) */
+      virtual Float_t GetMaxFieldMag() const { return 1.5; }
+    };
+
 
   public:
     /** Constructor.
@@ -187,6 +208,9 @@ namespace Belle2 {
 
     /** ECL hit data. */
     TEveCaloDataVec* m_eclsimhitdata;
+
+    /** The global magnetic field. */
+    EveVisBField m_bfield;
   };
 }
 #endif

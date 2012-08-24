@@ -158,6 +158,9 @@ namespace Belle2 {
     /** disable rendering of the volume 'name', or only its daughters if only_daughters is set. */
     void disableVolume(const char* name, bool only_daughters = false) { enableVolume(name, only_daughters, false); }
 
+    /** set fill color of the volume 'name' to 'col'. */
+    void setVolumeColor(const char* name, Color_t col);
+
     /** Rescale errors with this factor to ensure visibility. */
     double m_errorScale;
 

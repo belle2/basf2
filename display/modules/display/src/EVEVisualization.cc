@@ -107,9 +107,23 @@ void EVEVisualization::enableVolume(const char* name, bool only_daughters, bool 
   }
 }
 
+void EVEVisualization::setVolumeColor(const char* name, Color_t col)
+{
+  TGeoVolume* vol = gGeoManager->FindVolumeFast(name);
+  if (vol) {
+    //while TGeoVolume derives from TAttFill, the line color actually is important here
+    vol->SetLineColor(col);
+  } else {
+    B2WARNING("Volume " << name << " not found?");
+  }
+}
+
 void EVEVisualization::addGeometry()
 {
+  const bool saveExtract = false;
+
   B2INFO("Setting up geometry for TEve...");
+  //set colours by atomic mass number
   gGeoManager->DefaultColors();
 
   //Set transparency of geometry
@@ -147,9 +161,19 @@ void EVEVisualization::addGeometry()
   disableVolume("logi_B1spc1_name");
   disableVolume("logi_D1spc1_name");
   disableVolume("logi_E1spc1_name");
-  //Endcaps look strange on top level
-  //disableVolume("Endcap_1");
-  //disableVolume("Endcap_2");
+  if (saveExtract) {
+    //Endcaps look strange on top level
+    disableVolume("Endcap_1");
+    disableVolume("Endcap_2");
+  }
+
+  //set some nicer colors (at top level only)
+  setVolumeColor("PXD.Envelope", kGreen + 3);
+  setVolumeColor("SVD.Envelope", kOrange + 8);
+  setVolumeColor("logical_ecl", kOrange - 3);
+  setVolumeColor("BKLM.EnvelopeLogical", kGreen + 3);
+  setVolumeColor("Endcap_1", kGreen + 3);
+  setVolumeColor("Endcap_2", kGreen + 3);
 
   TGeoNode* top_node = gGeoManager->GetTopNode();
   assert(top_node != NULL);
@@ -157,6 +181,17 @@ void EVEVisualization::addGeometry()
   eve_top_node->IncDenyDestroy();
   eve_top_node->SetVisLevel(2);
   gEve->AddGlobalElement(eve_top_node);
+
+  if (saveExtract) {
+    TGeoManager* my_tgeomanager = gGeoManager;
+    eve_top_node->ExpandIntoListTrees();
+    eve_top_node->SaveExtract("geometry_extract.root", "Extract", false);
+
+    //this doesn't work too well...
+    //eve_top_node->ExpandIntoListTreesRecursively();
+    //eve_top_node->SaveExtract("display_geometry_full.root", "Extract", false);
+    gGeoManager = my_tgeomanager;
+  }
 
   //don't show full geo unless turned on by user
   eve_top_node->SetRnrSelfChildren(false, false);
@@ -186,14 +221,6 @@ void EVEVisualization::addGeometry()
 void EVEVisualization::saveGeometry(const std::string& name)
 {
   gGeoManager->Export(name.c_str());
-  /*
-     eve_top_node->ExpandIntoListTrees();
-     eve_top_node->SaveExtract("display_geometry.root", "Extract", false);
-     */
-
-  //this doesn't work too well...
-  //eve_top_node->ExpandIntoListTreesRecursively();
-  //eve_top_node->SaveExtract("display_geometry_full.root", "Extract", false);
 }
 
 void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)

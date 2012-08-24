@@ -223,7 +223,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
 
   const int irep = 0;
   //copy original track rep
-  GFAbsTrackRep* rep = track->getTrackRep(irep)->clone();
+  boost::scoped_ptr<GFAbsTrackRep> rep(track->getTrackRep(irep)->clone());
 
   unsigned int numhits = track->getNumHits();
   double charge = rep->getCharge();
@@ -254,7 +254,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
         GFTools::getSmoothedData(track.get(), irep, j, state, cov, plane, auxInfo);
         rep->setData(state, plane, &cov, &auxInfo);
       } else {
-        plane = hit->getDetPlane(rep);
+        plane = hit->getDetPlane(rep.get());
         rep->extrapolate(plane);
       }
     } catch (GFException& e) {
@@ -269,7 +269,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
     const TVector3& plane_pos = plane.getO();
     TMatrixT<double> hit_coords;
     TMatrixT<double> hit_cov;
-    hit->getMeasurement(rep, plane, rep->getState(), rep->getCov(), hit_coords, hit_cov);
+    hit->getMeasurement(rep.get(), plane, rep->getState(), rep->getCov(), hit_coords, hit_cov);
     // finished getting the hit infos -----------------------------------------------------
 
     // sort hit infos into variables ------------------------------------------------------

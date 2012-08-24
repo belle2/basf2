@@ -19,8 +19,9 @@
 #include <vector>
 
 class TEveBox;
-class TEveElementList;
 class TEveCaloDataVec;
+class TEveElementList;
+class TEvePointSet;
 class TEveTrack;
 class TEveTrackList;
 class TEveTrackPropagator;
@@ -35,6 +36,13 @@ namespace Belle2 {
    *  @sa DisplayModule
    */
   class EVEVisualization {
+
+    /** Hold MC tracks and associated visualisation objects. */
+    struct MCTrack {
+      TEveTrack* track; /**< the actual MC track. */
+      TEvePointSet* simhits; /**< simhit positions. */
+    };
+
   public:
     /** Constructor.
      */
@@ -79,8 +87,8 @@ namespace Belle2 {
     /** Add a ECL hit. */
     void addECLHit(const HitECL* hit);
 
-    /** Return TEveTrack pointer for given particle, add it if it doesn't exist yet. */
-    TEveTrack* addMCParticle(const MCParticle* particle);
+    /** Return MCTrack for given particle, add it if it doesn't exist yet. */
+    MCTrack& addMCParticle(const MCParticle* particle);
 
     /** Create visual representation of all tracks.
      *
@@ -162,8 +170,8 @@ namespace Belle2 {
     /** If true, hits created by secondary particles (e.g. delta electrons) will be assigned to the original primary particle. */
     bool m_assignToPrimaries;
 
-    /** map MCParticles to TEveTracks (so hits can be added to the correct track). */
-    std::map<const MCParticle*, TEveTrack*> m_mcparticleTracks;
+    /** map MCParticles to MCTrack (so hits can be added to the correct track). */
+    std::map<const MCParticle*, MCTrack> m_mcparticleTracks;
 
     /** parent object for reconstructed tracks. */
     TEveTrackList* m_gftracklist;

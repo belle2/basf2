@@ -653,12 +653,8 @@ void EVEVisualization::addSimHit(const EKLMSimHit* hit, const MCParticle* partic
 */
 void EVEVisualization::addSimHit(const TVector3& v, const MCParticle* particle)
 {
-  TEvePointSet* points = dynamic_cast<TEvePointSet*>(addMCParticle(particle)->FirstChild());
-  if (!points) {
-    B2WARNING("trackhit point set not found");
-  } else {
-    points->SetNextPoint(v.x(), v.y(), v.z());
-  }
+  TEvePointSet* simhits = addMCParticle(particle).simhits;
+  simhits->SetNextPoint(v.x(), v.y(), v.z());
 }
 
 void EVEVisualization::addECLHit(const HitECL* hit)
@@ -676,14 +672,14 @@ void EVEVisualization::addECLHit(const HitECL* hit)
   m_eclsimhitdata->FillSlice(0, hit->getEnergyDep());
 }
 
-TEveTrack* EVEVisualization::addMCParticle(const MCParticle* particle)
+EVEVisualization::MCTrack& EVEVisualization::addMCParticle(const MCParticle* particle)
 {
   if (m_assignToPrimaries) {
     while (!particle->hasStatus(MCParticle::c_PrimaryParticle) and particle->getMother())
       particle = particle->getMother();
   }
 
-  if (!m_mcparticleTracks[particle]) {
+  if (!m_mcparticleTracks[particle].track) {
     const TVector3& p = particle->getMomentum();
     const TVector3& vertex = particle->getProductionVertex();
     int pdg = particle->getPDG();
@@ -719,20 +715,20 @@ TEveTrack* EVEVisualization::addMCParticle(const MCParticle* particle)
     mctrack.fVDecay.Set(particle->getDecayVertex());
     mctrack.fDecayed = !boost::math::isinf(mctrack.fTDecay);
     mctrack.fIndex = particle->getIndex();
-    m_mcparticleTracks[particle] = new TEveTrack(&mctrack, m_trackpropagator);
+    m_mcparticleTracks[particle].track = new TEveTrack(&mctrack, m_trackpropagator);
 
     //neutrals and very short-lived particles should stop somewhere
     //(can result in wrong shapes for particles stopped in the detector, so not used there)
     if (TMath::Nint(particle->getCharge()) == 0 or !particle->hasStatus(MCParticle::c_StoppedInDetector)) {
       TEvePathMarkD decayMark(TEvePathMarkD::kDecay);
       decayMark.fV.Set(particle->getDecayVertex());
-      m_mcparticleTracks[particle]->AddPathMark(decayMark);
+      m_mcparticleTracks[particle].track->AddPathMark(decayMark);
     }
     TString particle_name(mctrack.GetName());
     //and since we don't want Ups(4S) to show up as 'gamma'...
     if (workaround_active) {
       particle_name = TString::Format("PDG: %d", particle->getPDG());
-      m_mcparticleTracks[particle]->SetName(particle_name);
+      m_mcparticleTracks[particle].track->SetName(particle_name);
     }
 
     //set track title (for popup)
@@ -740,51 +736,48 @@ TEveTrack* EVEVisualization::addMCParticle(const MCParticle* particle)
     if (particle->getMother())
       momLabel = TString::Format("\nMother: Idx=%d, PDG=%d)", particle->getMother()->getIndex(), particle->getMother()->getPDG());
 
-    m_mcparticleTracks[particle]->SetTitle(TString::Format(
-                                             "MCParticle Index=%d\n"
-                                             "Chg=%d, PDG=%d (%s)\n"
-                                             "pT=%.3f, pZ=%.3f\nV=(%.3f, %.3f, %.3f)"
-                                             "%s",
-                                             particle->getIndex(),
-                                             (int)particle->getCharge(), particle->getPDG(), particle_name.Data(),
-                                             mctrack.Pt(), mctrack.Pz(), mctrack.Vx(), mctrack.Vy(), mctrack.Vz(),
-                                             momLabel.Data()));
+    m_mcparticleTracks[particle].track->SetTitle(TString::Format(
+                                                   "MCParticle Index=%d\n"
+                                                   "Chg=%d, PDG=%d (%s)\n"
+                                                   "pT=%.3f, pZ=%.3f\nV=(%.3f, %.3f, %.3f)"
+                                                   "%s",
+                                                   particle->getIndex(),
+                                                   (int)particle->getCharge(), particle->getPDG(), particle_name.Data(),
+                                                   mctrack.Pt(), mctrack.Pz(), mctrack.Vx(), mctrack.Vy(), mctrack.Vz(),
+                                                   momLabel.Data()));
 
 
     //add some color (avoid black & white)
     switch (abs(particle->getPDG())) {
       case 11:
-        m_mcparticleTracks[particle]->SetLineColor(kAzure);
+        m_mcparticleTracks[particle].track->SetLineColor(kAzure);
         break;
       case 13:
-        m_mcparticleTracks[particle]->SetLineColor(kCyan + 1);
+        m_mcparticleTracks[particle].track->SetLineColor(kCyan + 1);
         break;
       case 22:
-        m_mcparticleTracks[particle]->SetLineColor(kSpring);
+        m_mcparticleTracks[particle].track->SetLineColor(kSpring);
         break;
       case 211:
-        m_mcparticleTracks[particle]->SetLineColor(kGray + 1);
+        m_mcparticleTracks[particle].track->SetLineColor(kGray + 1);
         break;
       case 321:
-        m_mcparticleTracks[particle]->SetLineColor(kRed + 1);
+        m_mcparticleTracks[particle].track->SetLineColor(kRed + 1);
         break;
       case 2212:
-        m_mcparticleTracks[particle]->SetLineColor(kOrange - 2);
+        m_mcparticleTracks[particle].track->SetLineColor(kOrange - 2);
         break;
       default:
-        m_mcparticleTracks[particle]->SetLineColor(kMagenta);
+        m_mcparticleTracks[particle].track->SetLineColor(kMagenta);
     }
 
     //create point set for hits
-    if (m_mcparticleTracks[particle]->FirstChild())
-      B2WARNING("track already has a child??");
     const TString pointsTitle = TString::Format("SimHits for MCParticle %d (%s)", particle->getIndex(), particle_name.Data());
-    TEvePointSet* points = new TEvePointSet(pointsTitle);
-    points->SetTitle(pointsTitle);
-    points->SetMainColor(m_mcparticleTracks[particle]->GetLineColor());
-    points->SetMainTransparency(70);
-    m_mcparticleTracks[particle]->AddElement(points);
-
+    m_mcparticleTracks[particle].simhits = new TEvePointSet(pointsTitle);
+    m_mcparticleTracks[particle].simhits->SetTitle(pointsTitle);
+    m_mcparticleTracks[particle].simhits->SetMainColor(m_mcparticleTracks[particle].track->GetLineColor());
+    m_mcparticleTracks[particle].simhits->SetMainTransparency(70);
+    m_mcparticleTracks[particle].track->AddElement(m_mcparticleTracks[particle].simhits);
   }
   return m_mcparticleTracks[particle];
 }
@@ -793,10 +786,10 @@ void EVEVisualization::makeTracks()
 {
   TEveTrackList* tracks = new TEveTrackList(m_trackpropagator);
   tracks->SetName("MCParticles");
-  std::map<const MCParticle*, TEveTrack*>::iterator it = m_mcparticleTracks.begin();
-  const std::map<const MCParticle*, TEveTrack*>::iterator& end = m_mcparticleTracks.end();
+  std::map<const MCParticle*, MCTrack>::iterator it = m_mcparticleTracks.begin();
+  const std::map<const MCParticle*, MCTrack>::iterator& end = m_mcparticleTracks.end();
   for (; it != end; ++it) {
-    tracks->AddElement(it->second);
+    tracks->AddElement(it->second.track);
   }
   gEve->AddElement(tracks);
   tracks->MakeTracks();

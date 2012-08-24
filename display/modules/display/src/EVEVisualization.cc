@@ -222,7 +222,8 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
   boost::scoped_ptr<GFTrack> track(new GFTrack(*gftrack));
 
   const int irep = 0;
-  GFAbsTrackRep* rep = track->getTrackRep(irep);
+  //copy original track rep
+  GFAbsTrackRep* rep = track->getTrackRep(irep)->clone();
 
   unsigned int numhits = track->getNumHits();
   double charge = rep->getCharge();
@@ -239,40 +240,29 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
 
   TEveTrack* track_lines = NULL;
 
-  // saving the initial state of the representation -----------------------------------------
-  GFDetPlane initial_plane = rep->getReferencePlane();
-  TMatrixT<double> initial_state(rep->getState());
-  TMatrixT<double> initial_cov(rep->getCov());
-  TMatrixT<double> initial_auxInfo;
-  if (rep->hasAuxInfo()) {
-    initial_auxInfo.ResizeTo(*(rep->getAuxInfo(initial_plane)));
-    initial_auxInfo = (*(rep->getAuxInfo(initial_plane)));
-  }
-  // saved initial state --------------------------------------------------------------------
-
   for (unsigned int j = 0; j < numhits; j++) { // loop over all hits in the track
 
     GFAbsRecoHit* hit = track->getHit(j);
     GFDetPlane plane;
 
     // get the hit infos ------------------------------------------------------------------
-    if (smoothing) {
-      TMatrixT<double> state;
-      TMatrixT<double> cov;
-      TMatrixT<double> auxInfo;
-      GFTools::getSmoothedData(track.get(), irep, j, state, cov, plane, auxInfo);
-      rep->setData(state, plane, &cov, &auxInfo);
-    } else {
-      try {
+    try {
+      if (smoothing) {
+        TMatrixT<double> state;
+        TMatrixT<double> cov;
+        TMatrixT<double> auxInfo;
+        GFTools::getSmoothedData(track.get(), irep, j, state, cov, plane, auxInfo);
+        rep->setData(state, plane, &cov, &auxInfo);
+      } else {
         plane = hit->getDetPlane(rep);
         rep->extrapolate(plane);
-      } catch (GFException& e) {
-        B2WARNING("Exception caught (getDetPlane): Hit " << j << " skipped! " << e.what());
-        if (e.isFatal()) {
-          B2WARNING("Fatal exception, skipping track");
-          break;
-        } else continue;
       }
+    } catch (GFException& e) {
+      B2WARNING("Exception caught (getDetPlane): Hit " << j << " skipped! " << e.what());
+      if (e.isFatal()) {
+        B2WARNING("Fatal exception, skipping track");
+        break;
+      } else continue;
     }
     const TVector3& track_pos = rep->getPos(plane);
     const TVector3& track_mom = rep->getMom(plane);
@@ -320,7 +310,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
       hit_u = hit_coords(0, 0);
     } else {
       B2WARNING("Hit " << j << ": Unknown policy name: skipping hit!");
-      break;
+      continue;
     }
 
     // finished setting variables ---------------------------------------------------------
@@ -579,14 +569,6 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
     }
   }
 
-  // resetting to the initial state ----------------------------------------------------------
-  rep->setData(initial_state, initial_plane, &initial_cov, &initial_auxInfo);
-
-  try {
-    rep->extrapolate(initial_plane);
-  } catch (GFException& e) {
-    B2WARNING("Error: Exception caught: could not extrapolate back to initial plane " << e.what());
-  }
   if (track_lines) {
     m_gftracklist->AddElement(track_lines);
   }

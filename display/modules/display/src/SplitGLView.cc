@@ -17,10 +17,6 @@ SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
 {
   // Main frame constructor.
 
-  // create the "file" popup menu
-  TGPopupMenu* fileMenu = new TGPopupMenu(gClient->GetRoot());
-  fileMenu->AddEntry("E&xit", kFileExit);
-
   // create the "camera" popup menu
   m_cameraMenu = new TGPopupMenu(gClient->GetRoot());
   m_cameraMenu->AddEntry("Perspective (Floor XOZ)", kGLPerspXOZ);
@@ -43,8 +39,6 @@ SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
 
   // create the main menu bar
   TGMenuBar* menuBar = new TGMenuBar(this, 1, 1, kHorizontalFrame);
-  menuBar->AddPopup("&File", fileMenu, new TGLayoutHints(kLHintsTop |
-                                                         kLHintsLeft, 0, 4, 0, 0));
   menuBar->AddPopup("&Camera", m_cameraMenu, new TGLayoutHints(kLHintsTop |
                     kLHintsLeft, 0, 4, 0, 0));
   menuBar->AddPopup("&Scene", sceneMenu, new TGLayoutHints(kLHintsTop |
@@ -55,8 +49,6 @@ SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
   AddFrame(menuBar, new TGLayoutHints(kLHintsTop | kLHintsExpandX));
 
   // connect menu signals to our menu handler slot
-  fileMenu->Connect("Activated(Int_t)", "Belle2::SplitGLView", this,
-                    "handleMenu(Int_t)");
   m_cameraMenu->Connect("Activated(Int_t)", "Belle2::SplitGLView", this,
                         "handleMenu(Int_t)");
   sceneMenu->Connect("Activated(Int_t)", "Belle2::SplitGLView", this,
@@ -192,11 +184,6 @@ void SplitGLView::handleMenu(Int_t id)
   static const TString rcfile(".everc");
 
   switch (id) {
-
-    case kFileExit:
-      CloseWindow();
-      break;
-
     case kGLPerspYOZ:
       if (m_activeViewer)
         m_activeViewer->SetCurrentCamera(TGLViewer::kCameraPerspYOZ);

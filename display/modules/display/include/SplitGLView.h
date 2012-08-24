@@ -65,7 +65,6 @@ namespace Belle2 {
 
     /** Which menu command was selected? */
     enum EMyCommands {
-      kFileExit,
       kHelpAbout, kGLPerspYOZ, kGLPerspXOZ, kGLPerspXOY, kGLXOY,
       kGLXOZ, kGLZOY, kGLOrthoRotate, kGLOrthoDolly, kSceneUpdate,
       kSceneUpdateAll

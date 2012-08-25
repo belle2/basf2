@@ -399,7 +399,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
       if (wire_hit && !drawHits) { //make sure to only draw once, even with both drawHits and drawDetectors
         TEveGeoShape* det_shape = new TEveGeoShape("wire hit");
         det_shape->IncDenyDestroy();
-        double pseudo_res_0 = m_errorScale * std::sqrt(hit_cov(0, 0));
+        double pseudo_res_0 = std::sqrt(hit_cov(0, 0));
         if (!drawHits) { // if the hits are also drawn, make the tube smaller to avoid intersecting volumes
           det_shape->SetShape(new TGeoTube(0, hit_u, plane_size));
         } else {
@@ -556,23 +556,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
       } else if (wire_hit) {
         TEveGeoShape* det_shape = new TEveGeoShape("wire hit");
         det_shape->IncDenyDestroy();
-        double pseudo_res_0 = m_errorScale * std::sqrt(hit_cov(0, 0));
-
-        // autoscale if necessary -----------------------------------------------------
-        if (drawAutoScale) {
-          if (pseudo_res_0 < 1e-5) {
-            std::cout << "Hit " << j << ": Invalid wire resolution (< 1e-5), autoscaling not possible!" << std::endl;
-          } else {
-            if (pseudo_res_0 < 0.0049) {
-              double cor = 0.005 / pseudo_res_0;
-              std::cout << "Hit " << j << ": Wire covariance too small, rescaling by " << cor;
-              m_errorScale *= cor;
-              pseudo_res_0 *= cor;
-              std::cout << " to " << m_errorScale << std::endl;
-            }
-          }
-        }
-        // finished autoscaling -------------------------------------------------------
+        double pseudo_res_0 = std::sqrt(hit_cov(0, 0));
 
         det_shape->SetShape(new TGeoTube(std::min(0., (double)(hit_u - pseudo_res_0)), hit_u + pseudo_res_0, plane_size));
         TVector3 norm = u.Cross(v);

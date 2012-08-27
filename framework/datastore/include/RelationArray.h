@@ -49,7 +49,12 @@ namespace Belle2 {
    *  added and also connected with the particles that created them.
    *
    *  As with other data store objects, you should register relations you want
-   *  to store in your implementation of Module::initialize().
+   *  to store in your implementation of Module::initialize(), e.g. when creating
+   *  a relation from MCParticles to SVDSimHits (with default name):
+   *
+   *  \code
+  RelationArray::registerPersistent<MCParticle, SVDSimHit>();
+      \endcode
    *
    *
    *  \sa RelationIndex provides a convenient interface to finding objects
@@ -123,6 +128,18 @@ namespace Belle2 {
       VecType& m_replace;
     };
 
+
+    /** Register a relation array, that should be written to the output by default, in the data store.
+     *  This must be called in the initialzation phase.
+     *
+     *  @param durability  Specifies lifetime of array in question.
+     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
+     *  @return            True if the registration succeeded.
+     */
+    template<class FROM, class TO> static bool registerPersistent(DataStore::EDurability durability = DataStore::c_Event,
+        bool errorIfExisting = true) {
+      return DataStore::Instance().createEntry(DataStore::defaultRelationName<FROM, TO>(), durability, RelationContainer::Class(), false, false, errorIfExisting);
+    }
     /** Register a relation array, that should be written to the output by default, in the data store.
      *  This must be called in the initialzation phase.
      *
@@ -136,6 +153,17 @@ namespace Belle2 {
       return DataStore::Instance().createEntry(name, durability, RelationContainer::Class(), false, false, errorIfExisting);
     }
 
+    /** Register a relation array, that should not be written to the output by default, in the data store.
+     *  This must be called in the initialzation phase.
+     *
+     *  @param durability  Specifies lifetime of array in question.
+     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
+     *  @return            True if the registration succeeded.
+     */
+    template<class FROM, class TO> static bool registerTransient(const std::string& name, DataStore::EDurability durability = DataStore::c_Event,
+        bool errorIfExisting = true) {
+      return DataStore::Instance().createEntry(DataStore::defaultRelationName<FROM, TO>(), durability, RelationContainer::Class(), false, true, errorIfExisting);
+    }
     /** Register a relation array, that should not be written to the output by default, in the data store.
      *  This must be called in the initialzation phase.
      *
@@ -213,7 +241,7 @@ namespace Belle2 {
      *                   ones from the related StoreArrays, an
      *                   error is raised
      */
-    template <class FROM, class TO> RelationArray(const StoreArray<FROM>& from, const StoreArray<TO>& to, std::string name = "",
+    template <class FROM, class TO> RelationArray(const StoreArray<FROM>& from, const StoreArray<TO>& to, const std::string& name = "",
                                                   const DataStore::EDurability& durability = DataStore::c_Event):
       StoreAccessorBase((name == "") ? DataStore::relationName(from.getName(), to.getName()) : name, durability) {
       DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, RelationContainer::Class(), false);

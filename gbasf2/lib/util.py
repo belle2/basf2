@@ -184,31 +184,19 @@ or to generate a new proxy?" \
 
     if not proxyinfo['OK'] or 'username' not in proxyinfo['Value'].keys() \
         or user_choice.upper() == 'G':
-        print 'No proxy found - trying to generate one'
-        proxyparams = DIRAC.FrameworkSystem.Client.ProxyGeneration.CLIParams()
-        proxyparams.diracGroup = 'belle'
-        proxyparams.proxyLifeTime = 604800
-        proxyparams.checkClock = True
-        proxyparams.debug = False
-        retVal = generateProxy(proxyparams)
-        if not retVal['OK']:
-            print retVal['Message']
+        if os.system('dirac-proxy-init -g belle -M -U'):
+            print 'Error happens when generate proxy'
             DIRAC.exit(1)
-        else:
-            proxyinfo = getProxyInfo()
-            if not proxyinfo['OK']:
-                print 'Error: %s' % proxyinfo['Message']
-                DIRAC.exit(1)
     else:
       # We need to enable the configuration service ourselves if we're not generating a proxy
         Script.enableCS()
+
+    proxyinfo = getProxyInfo()
+    if not proxyinfo['OK']:
+        print 'Error: %s' % proxyinfo['Message']
+        DIRAC.exit(1)
     proxyProps = proxyinfo['Value']
     userName = proxyProps['username']
-    if Properties.PROXY_MANAGEMENT not in proxyProps['groupProperties'] \
-        and userName != CS.getUsernameForDN(proxyProps['issuer'])['Value']:
-        print "You're trying to manage a proxy that is not yours, without permission!"
-        DIRAC.exit(1)
-
     DNresult = CS.getDNForUsername(userName)
     if not DNresult['OK']:
         print 'Oops %s' % DNresult['Message']
@@ -219,36 +207,8 @@ or to generate a new proxy?" \
         print 'User %s has no DN defined!' % userName
         DIRAC.exit(1)
 
-    # Next, check there's a proxy that's been uploaded
-    pmc = ProxyManagerClient()
-    PMCresult = pmc.userHasProxy(dnList[0], 'belle')
-    if not PMCresult['OK']:
-        print 'Could not retrieve the proxy list: %s' % PMCresult['Value']
-        DIRAC.exit(1)
-    else:
-        lifetime = pmc.getUploadedProxyLifeTime(dnList[0], 'belle')
-        if not lifetime['OK'] or lifetime['Value'] < 604799:
-            uploadResult = pmc.uploadProxy()
-            if not uploadResult['OK']:
-                print "Couldn't find a valid uploaded proxy, and couldn't upload one %s " \
-                    % uploadResult['Value']
-
-    # Finally, try to add the VOMS attributes
-    voms = VOMS()
-    VOMSresult = voms.setVOMSAttributes(proxyProps['chain'],
-            CS.getVOMSAttributeForGroup(proxyparams.diracGroup),
-            proxyparams.diracGroup)
-    if not VOMSresult['OK']:
-        print VOMSresult['Message']
-        print 'Warning : Cannot add voms attribute to the proxy'
-        print '          Accessing data in the grid storage from the user interface will not be possible.'
-        print '          The grid jobs will not be affected.'
-    else:
-        # dump VOMS proxy to file
-        print VOMSresult['Value'].dumpAllToFile(proxyProps['path'])
-
     # set path of proxy so  AMGA client picks it up
-    os.environ['X509_USER_PROXY'] = proxyProps['path']
+    os.environ['X509_USER_PROXY'] = proxyinfo['Value']['path']
     return proxyinfo
 
 

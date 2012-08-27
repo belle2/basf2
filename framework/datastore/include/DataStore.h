@@ -182,10 +182,16 @@ namespace Belle2 {
 
 
     //------------------------------ Start and end procedures --------------------------------------------------
-    /** Setter for m_initializeActive. */
+    /** Setter for m_initializeActive.
+     *
+     *  This should only be called by EventProcessor.
+     */
     void setInitializeActive(bool active) {
       m_initializeActive = active;
     }
+
+    /** Are we currently initializing modules? */
+    bool getInitializeActive() const { return m_initializeActive; }
 
     /** Clears maps of a specified durability.
      *

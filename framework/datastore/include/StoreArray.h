@@ -80,9 +80,10 @@ namespace Belle2 {
    *
    *  <h1>Storing an array</h1>
    *  Note that you have to register an array in the initialize method of a
-   *  module first, and then create it (in the event method of a module for
-   *  durability c_Event) before you can use it. This procedure is the same
-   *  as for objects handled by StoreObjPtr.
+   *  module first (using registerPersistent()), and then create() it
+   *  (in the event method of a module for *  durability c_Event) before
+   *  you can use it. This procedure is the same  as for objects handled by
+   *  StoreObjPtr.
    *
    *
    *  <h1>Internals</h1>

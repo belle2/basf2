@@ -184,9 +184,9 @@ void DataStore::backwardCompatibleRegistration(const std::string& name, EDurabil
   if (!hasEntry(name, durability, objClass, array)) {
     std::string type = (array ? "array" : "object");
     if (m_initializeActive) {
-      B2WARNING("DATASTORE BACKWARD COMPATIBILITY ISSUE: You have to *register* the " << type << " '" << name << "' before you can use it!");
+      B2WARNING("DATASTORE BACKWARD COMPATIBILITY ISSUE: Instead of creating an " << type << " '" << name << "' in your initialize() method, please use registerPersistent().");
     } else {
-      B2ERROR("DATASTORE BACKWARD COMPATIBILITY ISSUE: You have to *register* the " << type << " '" << name << "' *in the initialize method* before you can use it!");
+      B2ERROR("DATASTORE BACKWARD COMPATIBILITY ISSUE: You have to *register* the " << type << " '" << name << "' *in the initialize method* before you can use it! Unless you do this, your " << type  << " can not be saved by the output module!");
     }
     bool initializeActive = m_initializeActive;
     m_initializeActive = true;

@@ -18,6 +18,7 @@ from DIRAC.Core.Security.Misc import *
 from gbasf2util import CLIParams
 from AmgaSearch import AmgaSearch
 from DIRAC import gLogger
+from DIRAC import gConfig
 from util import CheckAndRemoveProjectIfForce, make_jdl, prepareProxy, make_tar
 
 
@@ -161,9 +162,10 @@ def main():
         print 'Something went wrong - leaving JDL and sandbox in place'
 
     print str(totalevents) + ' events to process!'
-  # FIXME - retrieve this URL automatically from DIRAC
-    print 'Now visit https://dirac.ifj.edu.pl/DIRAC/Belle-Development/belle/systems/projects/overview  and select Project ' \
-        + cliParams.getProject()
+
+    print 'Now visit https://dirac.cc.kek.jp/DIRAC/%s/belle/jobs/JobMonitor/display  \
+           to monitor your jobs' \
+        % gConfig.getValue('/DIRAC/Setup', [])[0]
     DIRAC.exit(exitCode)
 
 

@@ -273,6 +273,7 @@ void DisplayUI::makeGui()
     jumpToEventButton->Connect("Clicked()", "Belle2::DisplayUI", this, "showJumpToEventDialog()");
 
     m_eventLabel = new TGLabel(event_frame);
+    m_eventLabel->SetMinHeight(50);
     event_frame->AddFrame(m_eventLabel, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
   }
   frmMain->AddFrame(event_frame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));

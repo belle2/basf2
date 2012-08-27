@@ -60,7 +60,7 @@ def main():
     if status is None:
         status = ('New', 0)
 
-    if cliParams.getDataType == 'gen-mc':
+    if cliParams.getDataType() == 'gen-mc':
         results = {}
     else:
   # perform the metadata query

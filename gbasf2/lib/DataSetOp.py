@@ -23,7 +23,7 @@ if os.environ.has_key('BELLE2_RELEASE'):
     cliParams.setSwVer(os.environ['BELLE2_RELEASE'])
 # Script.parseCommandLine(ignoreErrors=True)
 import DIRAC
-from DIRAC.Core.Security.Misc import *
+from DIRAC.Core.Security.ProxyInfo import *
 from DIRAC.Core.Security import Properties
 # from DIRAC.ResourceStatusSystem.Utilities.CS import *
 from DIRAC.ConfigurationSystem.Client.Config import gConfig

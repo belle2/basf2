@@ -13,7 +13,7 @@ import os
 import tarfile
 import DIRAC
 from DIRAC.Core.Base import Script
-from DIRAC.Core.Security.Misc import *
+from DIRAC.Core.Security.ProxyInfo import *
 # used for commandline and steeringfile option parsing
 from gbasf2util import CLIParams
 from AmgaSearch import AmgaSearch

@@ -24,7 +24,7 @@ cliParams.registerSteeringOptions()
 
 import DIRAC
 from DIRAC import gLogger
-from DIRAC.Core.Security.Misc import *
+from DIRAC.Core.Security.ProxyInfo import *
 from DIRAC.ConfigurationSystem.Client.Config import gConfig
 from DIRAC.DataManagementSystem.Client.ReplicaManager import ReplicaManager
 from AmgaClient import AmgaClient

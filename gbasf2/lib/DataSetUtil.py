@@ -4,7 +4,7 @@
 from DIRAC.Core.Base import Script
 
 import DIRAC
-from DIRAC.Core.Security.Misc import *
+from DIRAC.Core.Security.ProxyInfo import *
 from gbasf2util import CLIParams
 
 

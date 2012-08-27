@@ -10,7 +10,7 @@ import DIRAC
 
 from DIRAC.FrameworkSystem.Client.ProxyGeneration import generateProxy
 from DIRAC.FrameworkSystem.Client.ProxyManagerClient import ProxyManagerClient
-from DIRAC.Core.Security.Misc import *
+from DIRAC.Core.Security.ProxyInfo import getProxyInfo
 from DIRAC.Core.Security import CS
 from DIRAC.Core.Security import Properties
 

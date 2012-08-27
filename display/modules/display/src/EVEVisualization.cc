@@ -428,11 +428,10 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
 
       // draw planar hits, with distinction between strip and pixel hits ----------------
       if (planar_hit) {
-        TVector2 plane_coords = plane.LabToPlane(track_pos);
         if (!planar_pixel_hit) {
           //currently unused in Belle2 {{{
           TEveBox* hit_box;
-          hit_box = boxCreator((track_pos + (plane_coords.Px() - hit_u) * u), u, v, (float)(m_errorScale * std::sqrt(hit_res_u)), plane_size, 0.0105);
+          hit_box = boxCreator((plane_pos + hit_u * u), u, v, m_errorScale * std::sqrt(hit_res_u), plane_size, 0.0105);
           hit_box->SetMainColor(kYellow);
           hit_box->SetMainTransparency(0);
           if (track_lines)
@@ -471,7 +470,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
 
           // calculate the semiaxis of the error ellipse ----------------------------
           det_shape->SetShape(new TGeoEltu(pseudo_res_0, pseudo_res_1, 0.0105));
-          TVector3 pix_pos = track_pos + (plane_coords.Px() - hit_u) * u + (plane_coords.Py() - hit_v) * v;
+          TVector3 pix_pos = plane_pos + hit_u * u + hit_v * v;
           TVector3 u_semiaxis = (pix_pos + eVec(0, 0) * u + eVec(1, 0) * v) - pix_pos;
           TVector3 v_semiaxis = (pix_pos + eVec(0, 1) * u + eVec(1, 1) * v) - pix_pos;
           TVector3 norm = u.Cross(v);

@@ -136,6 +136,7 @@ void SimpleInputModule::initialize()
       if (array) {
         objClass = (static_cast<TClonesArray*>(objectPtr))->GetClass();
       }
+      delete objectPtr;
 
       //Create a DataStore entry and connect the branch address to it
       if (!DataStore::Instance().createEntry(branchName, (DataStore::EDurability)ii, objClass, array, false, true)) {

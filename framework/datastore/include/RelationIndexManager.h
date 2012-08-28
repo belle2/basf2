@@ -50,10 +50,7 @@ namespace Belle2 {
         indexContainer = new RelationIndexContainer<FROM, TO>(relation.getAccessorParams());
         relations[name] = indexContainer;
       } else {
-        //forcing rebuild. this is a workaround for a bug introduced in r3555 resulting
-        //in RelationArray::getModified() always returning false.
-        //TODO: fix this and change this back to rebuild(false).
-        indexContainer->rebuild(true);
+        indexContainer->rebuild(false);
       }
       return *indexContainer;
     }

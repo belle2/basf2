@@ -213,6 +213,14 @@ void SimpleInputModule::readTree(DataStore::EDurability durability)
   B2DEBUG(200, "Durability" << durability)
   if (m_counterNumber[durability] >= m_tree[durability]->GetEntriesFast()) return;
 
+  for (unsigned int i = 0; i < m_entries[durability].size(); i++) {
+    //Make sure transient members of objects are reinitialised
+    DataStore::StoreEntry* entry = m_entries[durability][i];
+    if (!entry->isArray) {
+      delete entry->object;
+      entry->object = 0;
+    }
+  }
   m_tree[durability]->GetEntry(m_counterNumber[durability]);
   for (unsigned int i = 0; i < m_entries[durability].size(); i++) {
     DataStore::StoreEntry* entry = m_entries[durability][i];

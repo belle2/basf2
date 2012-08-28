@@ -10,6 +10,7 @@
 
 #include <framework/logging/LogMessage.h>
 
+#include <framework/pcore/ProcHandler.h>
 
 using namespace std;
 using namespace Belle2;
@@ -45,6 +46,10 @@ std::ostream& LogMessage::print(std::ostream& out) const
 {
   if (!m_logInfo || (m_logInfo & LogConfig::c_Level)) {
     out << "[" << LogConfig::logLevelToString(m_logLevel) << "] ";
+  }
+  if (ProcHandler::EvtProcID() != -1) {
+    //which process is this?
+    out << "(" << ProcHandler::EvtProcID() << ") ";
   }
   if (!m_logInfo || (m_logInfo & LogConfig::c_Message)) {
     out << m_message;

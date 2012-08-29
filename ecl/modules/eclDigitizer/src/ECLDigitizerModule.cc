@@ -76,7 +76,6 @@ ECLDigitizerModule::ECLDigitizerModule() : Module()
 
 ECLDigitizerModule::~ECLDigitizerModule()
 {
-  if (m_random) delete m_random;
 
 }
 
@@ -86,7 +85,6 @@ void ECLDigitizerModule::initialize()
   m_nRun    = 0 ;
   m_nEvent  = 0 ;
 
-  m_random = new TRandom3(0);
   // CPU time start
   m_timeCPU = clock() * Unit::us;
   readDSPDB();

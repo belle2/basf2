@@ -13,7 +13,6 @@
 
 #include <framework/core/Module.h>
 #include <vector>
-#include <TRandom3.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -92,8 +91,6 @@ namespace Belle2 {
 
 
 //    unsigned int m_randSeed;    /**< User-supplied random seed, default is 0. for ctime  */
-      /**< Random number generator.*/
-      TRandom3* m_random;
       /** CPU time     */
       double m_timeCPU;
       /** Run number   */

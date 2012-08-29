@@ -23,6 +23,10 @@
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <framework/logging/Logger.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
+#include <cdc/translators/LinearGlobalADCCountTranslator.h>
+#include <cdc/translators/SimpleDriftTimeTranslator.h>
+#include <cdc/translators/IdealCDCGeometryTranslator.h>
+
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
@@ -63,6 +67,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace cdc;
 
 REG_MODULE(GenFitter2)
 
@@ -141,6 +146,11 @@ void GenFitter2Module::initialize()
   } else if (m_hitType == "Cluster") {
     m_hitTypeId = 2;
   }
+
+  // Create new Translators and give them to the CDCRecoHits.
+  // The way, I'm going to do it here will produce some small resource leak, but this will stop, once we go to ROOT 6 and have the possibility to use sharead_ptr
+  CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new IdealCDCGeometryTranslator(), new SimpleDriftTimeTranslator());
+
 }
 
 void GenFitter2Module::beginRun()

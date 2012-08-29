@@ -30,7 +30,7 @@
 
 namespace Belle2 {
 
-  /** This module checks the correctness of the fitted vertices by conducting several statistical tests on them
+  /** This module checks the correctness of the fitted vertices produced by the Vertexer module (uses GFRave) by conducting several statistical tests on them
   */
 
   class VertexFitCheckerModule : public Module {

@@ -47,7 +47,7 @@ REG_MODULE(VertexFitChecker)
 
 VertexFitCheckerModule::VertexFitCheckerModule() : Module()
 {
-  setDescription("Wrapper module for GFRave. Will get GFTracks from the dataStore and put fitted GFRaveVertices onto the dataStore.");
+  setDescription("Checks the correctness of the fitted vertices produced by the Vertexer module (GFRave) by conducting several statistical tests on them");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   addParam("robustTests", m_robust, "activate additional robust statistical tests (median and MAD)", false);

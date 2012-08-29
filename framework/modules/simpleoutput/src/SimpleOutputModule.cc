@@ -77,6 +77,8 @@ SimpleOutputModule::~SimpleOutputModule() { }
 
 void SimpleOutputModule::initialize()
 {
+  //needed if preprocessing is used
+  gSystem->Load("libdataobjects");
   const int bufsize = 32000;
 
   //create a file level metadata object in the data store

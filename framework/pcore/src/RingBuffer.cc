@@ -146,6 +146,7 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
     m_bufinfo->ninsq = 0;
     m_bufinfo->nremq = 0;
   } else {
+    sem_lock(m_semid);    // Prevent simulnaneous initialization
     m_bufinfo = (struct RingBufInfo*) m_shmadr;
     m_buftop = m_shmadr + sizeof(struct RingBufInfo);
     m_bufinfo->nattached++;

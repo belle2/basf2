@@ -59,10 +59,10 @@ basf2 $1
 ##############################################################################
 # Work with output files, metadata
 ##############################################################################
-#if [ $? -eq 0 ] 
-#  then
-#    ./gbasf2output.py -s $1
-#  else
-#    cat basf2.error
-#    echo "basf2 execution occur error"
-#fi
+if [ $? -eq 0 ] 
+  then
+    ./gbasf2output.py -s $1
+  else
+    cat basf2.error
+    echo "basf2 execution occur error"
+fi

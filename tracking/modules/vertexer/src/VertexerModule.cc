@@ -23,6 +23,8 @@
 #include <TMatrixD.h>
 
 
+
+
 using namespace Belle2;
 
 using std::string;
@@ -48,7 +50,7 @@ VertexerModule::VertexerModule() : Module()
 
 void VertexerModule::initialize()
 {
-  //setup genfit geometry and magneic field in case you what to used data saved on disc because then the genifitter modul was not run
+  //setup genfit geometry and magneic field in case you what to used data saved on disc because then the genifitter module was not run
   // convert the geant4 geometry to a TGeo geometry
   geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
   geoManager.createTGeoRepresentation();
@@ -75,6 +77,8 @@ void VertexerModule::initialize()
 
   }
 
+
+
 }
 
 void VertexerModule::beginRun()
@@ -99,6 +103,7 @@ void VertexerModule::event()
   }
 
   StoreArray<GFRaveVertex> vertices; //the output datastore
+  vertices.create();
 
   B2DEBUG(100, " will feed  " << nGfTracks << " tracks to GFRave");
 

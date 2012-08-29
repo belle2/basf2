@@ -86,7 +86,7 @@ GenFitter2Module::GenFitter2Module() :
   addParam("mscModel", m_mscModel, "select the MSC model in Genfit", string("Highland"));
   addParam("hitType", m_hitType, "select what kind of hits are feeded to Genfit. Current Options \"TrueHit\", \"Cluster\" or \"VXDSimpleDigiHit\"", string("TrueHit"));
 
-  addParam("dafTemperatures", m_dafTemperatures, "set the anihiling scheme (temperatures) for the DAF. Length of vector will determine DAF iterations", vector<double>(3, 1.0));
+  addParam("dafTemperatures", m_dafTemperatures, "set the annealing scheme (temperatures) for the DAF. Length of vector will determine DAF iterations", vector<double>(1, -999.0));
 }
 
 GenFitter2Module::~GenFitter2Module()
@@ -118,7 +118,9 @@ void GenFitter2Module::initialize()
   m_kalmanFilter.setBlowUpFactor(m_blowUpFactor);
   m_daf.setProbCut(m_probCut);
   int nDafTemps = m_dafTemperatures.size();
-  if (nDafTemps <= 10) {
+  if (nDafTemps == 1 && m_dafTemperatures[0] < 0.0) { // user did not set an annealing scheme. Set the default one.
+    m_daf.setBetas(81, 8, 4, 1, 1, 1);
+  } else if (nDafTemps <= 10 && nDafTemps >= 1) {
     m_dafTemperatures.resize(10, -1.0);
     m_daf.setBetas(m_dafTemperatures[0], m_dafTemperatures[1], m_dafTemperatures[2], m_dafTemperatures[3], m_dafTemperatures[4], m_dafTemperatures[5], m_dafTemperatures[6], m_dafTemperatures[7], m_dafTemperatures[8], m_dafTemperatures[9]);
 //    cout << "m_dafTemperatures: ";
@@ -127,8 +129,8 @@ void GenFitter2Module::initialize()
 //    }
 //    cout << endl;
   } else {
-    m_daf.setBetas(1, 1, 1);
-    B2ERROR("An anihiling scheme for the DAF with more then 10 temperatures is not supported. The default scheme was selcted instead.");
+    m_daf.setBetas(81, 8, 4, 1, 1, 1);
+    B2ERROR("You either set 0 DAF temperatures or more than 10. This is not supported. The default scheme (81,8,4,1,1,1) was selected instead.");
   }
 
   //interpred the hittype option
@@ -159,7 +161,10 @@ void GenFitter2Module::event()
   if (nTrackCandidates == 0) {
     B2DEBUG(100, "GenFitter2: StoreArray<GFTrackCand> is empty!");
   }
-  int dataStoreCounter = 0; //counts the sucessfully fitted tracks in one event. Is used as index for the output datastore
+
+  StoreArray<GFTrack> fittedTracks; //holds the output of this module in the form of Genfit track objects
+  fittedTracks.create();
+
   for (int iTrackCand = 0; iTrackCand not_eq nTrackCandidates; ++iTrackCand) {
 
 
@@ -276,7 +281,6 @@ void GenFitter2Module::event()
 
     if (filterTrack == false) { // fit the track
 
-      StoreArray<GFTrack> fittedTracks; //holds the output of this module in the form of Genfit track objects
 
 
       //get fit starting values from the MCParticle
@@ -391,9 +395,8 @@ void GenFitter2Module::event()
       //          }
 
       if (genfitStatusFlag == 0) {
-        new(fittedTracks->AddrAt(dataStoreCounter)) GFTrack(track);
+        fittedTracks.appendNew(track);
         ++m_fitCounter;
-        ++dataStoreCounter;
       } else {
         B2WARNING("Genfit returned an error (with status flag " << genfitStatusFlag << ") during the fit of one track in event " << eventCounter);
         ++m_failedFitCounter;

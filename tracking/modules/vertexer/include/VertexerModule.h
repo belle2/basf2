@@ -22,7 +22,7 @@
 
 namespace Belle2 {
 
-  /** Very simple module to use GFRave from basf2. It will take GFTrack Ojects from the dataStore and feed them GFRave
+  /** Very simple module to use GFRave from basf2. It will take GFTrack objects from the dataStore and feed them to GFRave
    * which itself will use rave to do the vertex finding and fitting. The output are GFRaveVertex objects that will written to the dataStore
   */
 

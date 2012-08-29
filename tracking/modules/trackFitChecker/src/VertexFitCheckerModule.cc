@@ -25,6 +25,8 @@
 #include <iostream>
 #include <cmath>
 
+#include <Python.h>
+
 
 using namespace Belle2;
 
@@ -60,7 +62,7 @@ VertexFitCheckerModule::VertexFitCheckerModule() : Module()
 
 void VertexFitCheckerModule::initialize()
 {
-  //setup genfit geometry and magneic field in case you what to used data saved on disc because then the genifitter modul was not run
+  //setup genfit geometry and magnetic field in case you what to used data saved on disc because then the genifitter modul was not run
   // convert the geant4 geometry to a TGeo geometry
   geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
   geoManager.createTGeoRepresentation();
@@ -77,6 +79,7 @@ void VertexFitCheckerModule::initialize()
     registerVertexWiseVecData("res_vertexPos", 3);
     registerVertexWiseVecData("pulls_vertexPos", 3);
     registerInt("vertexFitStatus");
+    registerVertexWiseVecData("res_MCVertexPos", 3);
 
   } else {
     m_rootFilePtr = NULL;
@@ -86,12 +89,27 @@ void VertexFitCheckerModule::initialize()
   if (m_robust == true) { //set the scaling factors for the MAD. No MAD will be caclulated when
     m_madScalingFactors["res_vertexPos"] = 1.4826; //scaling factor for normal distribute variables
     m_madScalingFactors["pulls_vertexPos"] = 1.4826;
+    m_madScalingFactors["res_MCVertexPos"] = 1.4826;
   }
 
   m_processedVertices = 0;
   m_badVertexPValueVertices = 0;
   m_badTrackPValueVertices = 0;
   m_vertexNotPureCounter = 0;
+
+
+  // get parameter from python script
+//       PyObject* m = PyImport_AddModule("__main__");
+//       if (m) {
+//         vector<double> averageagel;;
+//         PyObject* v = PyObject_GetAttrString(m, "xVertexParams");
+//         if (v) {
+//           averageagel = PyInt_AsLong(v);
+//           Py_DECREF(v);
+//         }
+//         //B2INFO("Python averageagel = " << averageagel);
+//         //m_arichgp->setAverageAgel(averageagel > 0);
+//       }
 
 
 }
@@ -111,9 +129,25 @@ void VertexFitCheckerModule::event()
 
   StoreArray<MCParticle> mcParticles;
   //const int nMcParticles = mcParticles.getEntries();
-  //   StoreArray<GFTrack> gfTracks;
-  //   const int nGfTracks = gfTracks.getEntries();
+  StoreArray<GFTrack> gfTracks;
+  const int nGfTracks = gfTracks.getEntries();
   //input
+
+  //find all real vertices that led to fitted tracks with the simulation information
+  vector<const MCParticle*> motherParticles;
+  for (int i = 0; i not_eq nGfTracks; ++i) {
+    int mcIndex = gfTracks[i]->getCand().getMcTrackId();
+    const MCParticle* motherParticle = mcParticles[mcIndex]->getMother();
+    motherParticles.push_back(motherParticle);
+  }
+
+//  struct TrueVertex {
+//    TVector3 pos;
+//    //oder MCParicle*
+//    vector<const GFTrack*> tracks;
+//
+//  };
+
   StoreArray<GFRaveVertex> vertices;
 
   const int nVertices = vertices.getEntries();
@@ -132,23 +166,27 @@ void VertexFitCheckerModule::event()
     //now extract information from the tracks that rave assigned to the vertex
     vector<const MCParticle*> particlesCommingFromVertex;
     const int nTracks = aGFRaveVertexPtr->getNTracks();
+    bool skipVertex = false;
     for (int i = 0; i not_eq nTracks; ++i) {
       const GFRaveTrackParameters* const trackInfo = aGFRaveVertexPtr->getParameters(i);
       double pValueOfTrack = trackInfo->getRep()->getPVal();
       if (pValueOfTrack < m_trackPValueCut) { // if contributing track is bad ignore this vertex
         ++m_badTrackPValueVertices;
-        return; //wrong!! here I should goto the next vertex not ending the event function
+        skipVertex = true;
+        break;
       }
       particlesCommingFromVertex.push_back(mcParticles[trackInfo->getTrack()->getCand().getMcTrackId()]);
     }
-
+    if (skipVertex == true) {
+      continue;
+    }
 
     fillVertexWiseData("pValue", pValue);
 
     // check if all tracks associated with the vertex coming form the same mother particle
     // if not check if all tracks coming from the same coordinates
 
-    int nParticlesCommingFromVertex = particlesCommingFromVertex.size();
+    const int nParticlesCommingFromVertex = particlesCommingFromVertex.size();
     const MCParticle* const motherParticle = particlesCommingFromVertex[0]->getMother();
     const TVector3 mcVertexPos =  particlesCommingFromVertex[0]->getVertex();
     bool sameMother = true;
@@ -201,6 +239,14 @@ void VertexFitCheckerModule::event()
     pullPos[2] = resPos[2] / sqrt(vertexCov[2][2]);
     fillVertexWiseVecData("pulls_vertexPos", pullPos);
 
+    vector<double> resMCVertex(3);
+    resMCVertex[0] = mcVertexPos[0];
+    resMCVertex[1] = mcVertexPos[1];
+    resMCVertex[2] = mcVertexPos[2];
+
+    fillVertexWiseVecData("res_MCVertexPos", resMCVertex); //only makes sense with the particle gun...
+
+
     if (m_writeToRootFile == true) {
       m_statDataTreePtr->Fill();
     }
@@ -249,6 +295,7 @@ void VertexFitCheckerModule::terminate()
     varNames[2] = "z";
     printVertexWiseVecStatistics("res_vertexPos", varNames);
     printVertexWiseVecStatistics("pulls_vertexPos", varNames);
+    printVertexWiseVecStatistics("res_MCVertexPos", varNames);
     //write out the test results
     B2INFO("\n" << m_textOutput.str());
     if (m_writeToFile == true) {

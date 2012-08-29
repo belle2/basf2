@@ -97,7 +97,8 @@ def make_jdl(
     f = open(project + '-' + os.path.basename(lfn) + '.jdl', 'w')
     f.write('[\n')
     f.write('    Executable = "basf2helper.sh";\n')
-    f.write('    Arguments = "' + steering_file + ' ' + swver + '";\n')
+    f.write('    Arguments = "' + steering_file + ' ' + swver + ' ' + project
+            + '";\n')
     f.write('    JobGroup = ' + project + ';\n')
     f.write('    JobName = ' + os.path.basename(lfn) + ';\n')
     # parametric jobs that run multiple times (option -r)
@@ -225,6 +226,7 @@ def make_tar(project, files):
             except OSError:
                 print 'No such input file: ' + file
                 DIRAC.exit(1)
+        tar.close()
         return project + '-inputsandbox.tar.bz2'
     else:
         return None

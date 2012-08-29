@@ -1,5 +1,5 @@
 #!/bin/bash
-# basf2helper - performs top and tail work to allow basf2 to function well 
+# basf2helper - performs top and tail work to allow basf2 to function well
 #               in a grid environment
 # $1 = steering file
 # $2 = release
@@ -8,23 +8,46 @@
 ##############################################################################
 # Initialisation
 ##############################################################################
-VO_BELLE_SW_DIR=${VO_BELLE_SW_DIR:-$OSG_APP/belle}
-unset VO_BELLE2_SW_DIR
+
+ls / cvmfs / belle.cern.ch > cvmfs.error 2 > & 1
+if [ $ ? -ne 0 ]; then
+VO_BELLE_SW_DIR = $ {VO_BELLE_SW_DIR: -$OSG_APP / belle}
+                  else
+                  VO_BELLE_SW_DIR = $ {VO_BELLE_SW_DIR: - / cvmfs / belle.cern.ch}
+                                      fi
+
+                                      unset VO_BELLE2_SW_DIR
+
 
 #avoid basf2 tools check
-export BELLE2_NO_TOOLS_CHECK=1
+                                      export BELLE2_NO_TOOLS_CHECK = 1
 
-. ${VO_BELLE_SW_DIR}/belle2/tools/setup_belle2.sh
-WORKDIR=$PWD
-cd ${VO_BELLE_SW_DIR}/belle2/releases/$2
-setuprel $2
-cd $WORKDIR
+                                          . $ {VO_BELLE_SW_DIR} / belle2 / tools / setup_belle2.sh
+                                          WORKDIR = $PWD
 
-basf2 --info > basf2.error 2>&1
-if [ $? -ne 0 ]; then
-  cat basf2.error
-  echo "basf2 not installed correctly"
-  exit 1
+#uncompress the input sandbox
+
+##set up local release
+                                                    mkdir release
+                                                    cd release
+                                                    cp $ {VO_BELLE_SW_DIR} / belle2 / releases / $2 / .release .
+                                                    cp $ {VO_BELLE_SW_DIR} / belle2 / releases / $2 / .externals .
+                                                    cp $ {VO_BELLE_SW_DIR} / belle2 / releases / $2 / site_scons . - r
+                                                    ln - s site_scons / SConstruct SConstruct
+                                                    setuprel
+
+##copy source code to local release directory and compile it
+                                                    cp $ {WORKDIR} / $3 - inputsandbox.tar.bz2 .
+                                                    tar - jxvf $3 - inputsandbox.tar.bz2
+                                                    scons --local
+
+                                                    cd $WORKDIR
+
+                                                    basf2 --info > basf2.error 2 > & 1
+                                                    if [ $ ? -ne 0 ]; then
+cat basf2.error
+echo "basf2 not installed correctly"
+exit 1
 fi
 
 ##############################################################################
@@ -36,10 +59,10 @@ basf2 $1
 ##############################################################################
 # Work with output files, metadata
 ##############################################################################
-if [ $? -eq 0 ] 
+if [ $ ? -eq 0 ]
   then
-    ./gbasf2output.py -s $1
-  else
-    cat basf2.error
-    echo "basf2 execution occur error"
-fi
+  . / gbasf2output.py - s $1
+    else
+      cat basf2.error
+      echo "basf2 execution occur error"
+      fi

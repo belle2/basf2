@@ -35,6 +35,7 @@
 
 // ROOT
 #include <TVector3.h>
+#include <TRandom.h>
 
 using namespace std;
 using namespace Belle2;

@@ -77,7 +77,7 @@ SimpleOutputModule::~SimpleOutputModule() { }
 
 void SimpleOutputModule::initialize()
 {
-  //needed if preprocessing is used
+  //needed if parallel processing is used
   gSystem->Load("libdataobjects");
   const int bufsize = 32000;
 

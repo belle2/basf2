@@ -39,7 +39,6 @@
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/foreach.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
 #include <signal.h>
@@ -143,7 +142,7 @@ int main(int argc, char* argv[])
     ("steering", prog::value<string>(), "the python steering file")
     ("arg", prog::value<vector<string> >(&arguments), "additional arguments to be passed to the steering file")
     ("log_level,l", prog::value<string>(), "set log level (one of DEBUG, INFO, WARNING, or ERROR)")
-    ("events,n", prog::value<int>(), "override number of events for EvtMetaGen")
+    ("events,n", prog::value<int>(), "override number of events in first run for EvtMetaGen; otherwise set maximum number of events ")
     ("input,i", prog::value<string>(), "override name of input file for SimpleInput")
     ("output,o", prog::value<string>(), "override name of output file for SimpleOutput")
     ("processes,p", prog::value<int>(), "override number of parallel processes (0 to disable parallel processing)")

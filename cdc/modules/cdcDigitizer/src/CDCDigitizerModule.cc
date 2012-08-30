@@ -26,7 +26,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace cdc;
+using namespace CDC;
 
 // register module
 REG_MODULE(CDCDigitizer)

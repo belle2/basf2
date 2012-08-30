@@ -15,7 +15,7 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 
 namespace Belle2 {
-  namespace cdc {
+  namespace CDC {
     /** This class uses the ideal detector geometry for the translation of wire IDs into geometric positions. */
     class IdealCDCGeometryTranslator  : public CDCGeometryTranslatorBase {
     public:

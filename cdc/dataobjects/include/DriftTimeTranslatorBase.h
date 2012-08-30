@@ -15,7 +15,7 @@
 #include <TMath.h>
 
 namespace Belle2 {
-  namespace cdc {
+  namespace CDC {
     /** Base class for translation of Drift Time into Drift Length.
      *
      *  Specific implementations are implemented in the cdc library.

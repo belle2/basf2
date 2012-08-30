@@ -17,7 +17,7 @@
 
 namespace Belle2 {
 
-  namespace cdc {
+  namespace CDC {
     /** Abstract Base class for the ADC count translator. */
     class ADCCountTranslatorBase {
     public:

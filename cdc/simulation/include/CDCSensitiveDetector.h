@@ -16,7 +16,7 @@
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
 namespace Belle2 {
-  namespace cdc {
+  namespace CDC {
     //! The Class for CDC Sensitive Detector
     /*! In this class, every variable defined in CDCB4VHit will be calculated.
       And save CDCB4VHit into hits collection.

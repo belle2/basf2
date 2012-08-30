@@ -39,7 +39,7 @@
 #include <utility>
 
 using namespace Belle2;
-using namespace cdc;
+using namespace CDC;
 
 REG_MODULE(DedxPID)
 

@@ -17,5 +17,9 @@
  *  @}
  */
 
-/** Namespace for objects in the cdc package, that are neither dataobjects nor module elements. */
-namespace cdc {}
+
+/** */
+namespace Belle2 {
+  /** Namespace for objects in the cdc package, that are neither dataobjects nor module elements. */
+  namespace CDC {}
+}

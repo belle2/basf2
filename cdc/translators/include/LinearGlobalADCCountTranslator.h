@@ -14,7 +14,7 @@
 #include <cdc/dataobjects/ADCCountTranslatorBase.h>
 
 namespace Belle2 {
-  namespace cdc {
+  namespace CDC {
     /** This class simply assumes a linear translation through (0,0)*/
     class LinearGlobalADCCountTranslator : public ADCCountTranslatorBase {
     public:

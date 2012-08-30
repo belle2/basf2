@@ -42,7 +42,7 @@ using CLHEP::HepMatrix;
 
 namespace Belle2 {
   /** @todo Helix : Is this type of class perhaps needed in various packages, would this kind of mathematical structure perhaps make more sense in a framework/utilities folder? */
-  namespace cdc {
+  namespace CDC {
 /// Helix parameter class
     class Helix {
 

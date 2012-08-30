@@ -22,7 +22,7 @@ class G4LogicalVolume;
 class G4VPhysicalVolume;
 
 namespace Belle2 {
-  namespace cdc {
+  namespace CDC {
 
     //!  The GeoCDCCreator class.
     /*!

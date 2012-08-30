@@ -13,7 +13,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace cdc;
+using namespace CDC;
 
 float SimpleDriftTimeTranslator::getDriftLength(short driftTime,
                                                 const WireID& wireID,

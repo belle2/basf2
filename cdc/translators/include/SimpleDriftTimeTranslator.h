@@ -15,7 +15,7 @@
 #include <TVector3.h>
 
 namespace Belle2 {
-  namespace cdc {
+  namespace CDC {
     /** Translator mirroring the simple Digitization. */
     class SimpleDriftTimeTranslator : public DriftTimeTranslatorBase {
     public:

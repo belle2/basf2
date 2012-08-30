@@ -24,7 +24,7 @@
 #define MAX_N_KINK 30
 
 namespace Belle2 {
-  namespace cdc {
+  namespace CDC {
     //! The Class for CDC Geometry Parameters
     /*! This class provides CDC gemetry paramters for simulation, reconstruction and so on.
         These parameters are gotten from gearbox.

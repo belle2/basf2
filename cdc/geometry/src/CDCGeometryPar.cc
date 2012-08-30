@@ -22,7 +22,7 @@
 using namespace std;
 using namespace boost;
 using namespace Belle2;
-using namespace cdc;
+using namespace CDC;
 
 CDCGeometryPar* CDCGeometryPar::m_B4CDCGeometryParDB = 0;
 

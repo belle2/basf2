@@ -41,7 +41,7 @@ namespace Belle2 {
 
   using namespace geometry;
 
-  namespace cdc {
+  namespace CDC {
 //-----------------------------------------------------------------
 //                 Register the GeoCreator
 //-----------------------------------------------------------------

@@ -57,6 +57,7 @@ namespace Belle2 {
       m_sensitive = new CDCSensitiveDetector("CDCSensitiveDetector", (2 * 24)*eV, 10 * MeV);
       logical_cdc = 0;
       physical_cdc = 0;
+
     }
 
 
@@ -68,6 +69,8 @@ namespace Belle2 {
 
     void GeoCDCCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /*type*/)
     {
+
+
       //------------------------
       // Get global parameters
       //------------------------

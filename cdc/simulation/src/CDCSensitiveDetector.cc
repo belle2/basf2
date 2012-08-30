@@ -13,10 +13,13 @@
 
 #include <cdc/simulation/Helix.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/GeoCDCCreator.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Unit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCEBSimHit.h>
 
@@ -53,6 +56,13 @@ namespace Belle2 {
     StoreArray<CDCEBSimHit> cdcEBArray;
     RelationArray cdcSimHitRel(mcParticles, cdcSimHits);
     registerMCParticleRelation(cdcSimHitRel);
+
+
+    GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"CDC\"]/Content");
+    gd.append("/SensitiveDetector");
+    m_thresholdEnergyDeposit =  Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "eV");
+    //    B2INFO("Threshold energy " << m_thresholdEnergyDeposit);
+
   }
 
   void CDCSensitiveDetector::Initialize(G4HCofThisEvent*)
@@ -68,6 +78,13 @@ namespace Belle2 {
   {
     // Get deposited energy
     const G4double edep = aStep->GetTotalEnergyDeposit();
+
+    /* modified by M. Uchida 2012.08.29 */
+    //    if (edep == 0.) return false;
+
+    if (edep <= m_thresholdEnergyDeposit) return false;
+
+
 
     // Get step length
     const G4double stepLength = aStep->GetStepLength();
@@ -109,8 +126,12 @@ namespace Belle2 {
       return true;
     }
 
-    if (edep == 0.) return false;
+    // If neutral particles, ignore them.
+
     if (charge == 0.) return false;
+
+
+
 
     // Calculate cell ID
     CDCGeometryPar& cdcg = CDCGeometryPar::Instance();

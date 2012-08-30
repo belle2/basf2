@@ -55,6 +55,7 @@ namespace Belle2 {
       //! Sensitive detector
       CDCSensitiveDetector* m_sensitive;
 
+
     };
 
   } // end of cdc namespace

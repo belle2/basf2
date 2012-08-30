@@ -19,6 +19,9 @@
 #include <TTree.h>
 #include <TFile.h>
 
+//root
+#include <TMatrixT.h>
+
 // to get statistics functions of boost
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
@@ -62,7 +65,7 @@ namespace Belle2 {
 
     void registerInt(const std::string& nameOfDataSample);
     void fillInt(const std::string& nameOfDataSample, const int newData);
-
+    double calcChi2(const TMatrixT<double>& res, const TMatrixT<double>& R) const;
 
     std::map<std::string, StatisticsContainer > m_vertexWiseDataSamples;
     std::map<std::string, std::vector<StatisticsContainer> > m_vertexWiseVecDataSamples;

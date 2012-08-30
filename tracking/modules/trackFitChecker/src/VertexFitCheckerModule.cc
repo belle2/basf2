@@ -15,6 +15,7 @@
 #include <GFTrackCand.h>
 #include <GFConstField.h>
 #include <GFFieldManager.h>
+#include <GFTools.h>
 
 #include <GFRaveVertexFactory.h>
 #include <GFRaveVertex.h>
@@ -77,7 +78,7 @@ void VertexFitCheckerModule::initialize()
     //init objects to store track wise data
     registerVertexWiseData("pValue");
     registerVertexWiseVecData("res_vertexPos", 3);
-    registerVertexWiseVecData("pulls_vertexPos", 3);
+    registerVertexWiseVecData("pullsAndChi2_vertexPos", 4);
     registerInt("vertexFitStatus");
     registerVertexWiseVecData("res_MCVertexPos", 3);
 
@@ -88,7 +89,7 @@ void VertexFitCheckerModule::initialize()
 
   if (m_robust == true) { //set the scaling factors for the MAD. No MAD will be caclulated when
     m_madScalingFactors["res_vertexPos"] = 1.4826; //scaling factor for normal distribute variables
-    m_madScalingFactors["pulls_vertexPos"] = 1.4826;
+    m_madScalingFactors["pullsAndChi2_vertexPos"] = 1.4826;
     m_madScalingFactors["res_MCVertexPos"] = 1.4826;
   }
 
@@ -158,7 +159,7 @@ void VertexFitCheckerModule::event()
     const double chi2 = aGFRaveVertexPtr->getChi2();
     const int ndf = aGFRaveVertexPtr->getNdf();
     const double pValue = TMath::Prob(chi2, ndf);
-    //cout << "chi2,ndf,p: " << chi2 << " " << ndf << " " << pValue << endl;
+//    cout << "chi2,ndf,p: " << chi2 << " " << ndf << " " << pValue << endl;
     if (pValue < m_vertexPValueCut) {
       ++m_badVertexPValueVertices;
       continue; // goto next vertex
@@ -226,18 +227,24 @@ void VertexFitCheckerModule::event()
     fillInt("vertexFitStatus", 0); //status 0 means all tracks rave associated with one vertex are really belong to that vertex
     const TVector3 vertexPos = aGFRaveVertexPtr->getPos();
     const TMatrixD vertexCov = aGFRaveVertexPtr->getCov();
-
+    cout << "fitted vertex pos, cov" << endl;
+//    vertexPos.Print();
+//    vertexCov.Print();
     vector<double> resPos(3);
     resPos[0] = vertexPos[0] - mcVertexPos[0];
     resPos[1] = vertexPos[1] - mcVertexPos[1];
     resPos[2] = vertexPos[2] - mcVertexPos[2];
     fillVertexWiseVecData("res_vertexPos", resPos);
 
-    vector<double> pullPos(3);
+    vector<double> pullPos(4);
     pullPos[0] = resPos[0] / sqrt(vertexCov[0][0]);
     pullPos[1] = resPos[1] / sqrt(vertexCov[1][1]);
     pullPos[2] = resPos[2] / sqrt(vertexCov[2][2]);
-    fillVertexWiseVecData("pulls_vertexPos", pullPos);
+    // now the chi2
+
+    TMatrixD resPosMatrix(3, 1, &resPos[0]);
+    pullPos[3] = calcChi2(resPosMatrix, vertexCov);
+    fillVertexWiseVecData("pullsAndChi2_vertexPos", pullPos);
 
     vector<double> resMCVertex(3);
     resMCVertex[0] = mcVertexPos[0];
@@ -293,8 +300,10 @@ void VertexFitCheckerModule::terminate()
     varNames[0] = "x";
     varNames[1] = "y";
     varNames[2] = "z";
+    vector<string> varNamesWithChi2 = varNames;
+    varNamesWithChi2.push_back("chi2");
     printVertexWiseVecStatistics("res_vertexPos", varNames);
-    printVertexWiseVecStatistics("pulls_vertexPos", varNames);
+    printVertexWiseVecStatistics("pullsAndChi2_vertexPos", varNamesWithChi2);
     printVertexWiseVecStatistics("res_MCVertexPos", varNames);
     //write out the test results
     B2INFO("\n" << m_textOutput.str());
@@ -485,3 +494,12 @@ double VertexFitCheckerModule::calcMad(const std::vector<double>& data, const do
 //  sort(data.begin(), data.end());
 //  return  n % 2 == 0 ? (data[mid] + data[mid - 1]) / 2.0 : data[mid];
 //}
+
+// calculate a chi2 value from a residuum and it's covariance matrix R
+double VertexFitCheckerModule::calcChi2(const TMatrixT<double>& res, const TMatrixT<double>& R) const
+{
+  TMatrixT<double> invR;
+  GFTools::invertMatrix(R, invR);
+  TMatrixT<double> resT(TMatrixT<double>::kTransposed, res);
+  return (resT * invR * res)[0][0];
+}

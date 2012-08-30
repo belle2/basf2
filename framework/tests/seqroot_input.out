@@ -1,0 +1,121 @@
+[INFO] Steering file: framework/tests/seqroot_input.py
+>>> basf2 Python environment set
+>>> Framework object created: fw
+SeqFile: seqroot_input.sroot opened (fd=10)
+[INFO] Begin of new run
+[INFO] ============================================================================
+[INFO] DataStore collections in event 0
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  MCParticlesToARICHAeroHits
+[INFO] (Object)  MCParticlesToARICHSimHits
+[INFO] (Object)  MCParticlesToBeamBackHits
+[INFO] (Array)   ARICHAeroHits             1
+[INFO] (Array)   ARICHSimHits              72
+[INFO] (Array)   BeamBackHits              8
+[INFO] (Array)   MCParticles               762
+[INFO] 
+[INFO] (Type)    Name                      Number entries                     <Run>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] ============================================================================
+[INFO] Processed:   1 runs,      1 events
+[INFO] ============================================================================
+[INFO] DataStore collections in event 1
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  MCParticlesToARICHAeroHits
+[INFO] (Object)  MCParticlesToARICHSimHits
+[INFO] (Object)  MCParticlesToBeamBackHits
+[INFO] (Array)   ARICHAeroHits             1
+[INFO] (Array)   ARICHSimHits              78
+[INFO] (Array)   BeamBackHits              3
+[INFO] (Array)   MCParticles               753
+[INFO] 
+[INFO] (Type)    Name                      Number entries                     <Run>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] ============================================================================
+[INFO] Processed:   1 runs,      2 events
+[INFO] ============================================================================
+[INFO] DataStore collections in event 2
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  MCParticlesToARICHAeroHits
+[INFO] (Object)  MCParticlesToARICHSimHits
+[INFO] (Object)  MCParticlesToBeamBackHits
+[INFO] (Array)   ARICHAeroHits             1
+[INFO] (Array)   ARICHSimHits              109
+[INFO] (Array)   BeamBackHits              6
+[INFO] (Array)   MCParticles               807
+[INFO] 
+[INFO] (Type)    Name                      Number entries                     <Run>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] ============================================================================
+[INFO] Processed:   1 runs,      3 events
+[INFO] ============================================================================
+[INFO] DataStore collections in event 3
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  MCParticlesToARICHAeroHits
+[INFO] (Object)  MCParticlesToARICHSimHits
+[INFO] (Object)  MCParticlesToBeamBackHits
+[INFO] (Array)   ARICHAeroHits             1
+[INFO] (Array)   ARICHSimHits              56
+[INFO] (Array)   BeamBackHits              2
+[INFO] (Array)   MCParticles               732
+[INFO] 
+[INFO] (Type)    Name                      Number entries                     <Run>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] ============================================================================
+[INFO] Processed:   1 runs,      4 events
+[INFO] ============================================================================
+[INFO] DataStore collections in event 4
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  MCParticlesToARICHAeroHits
+[INFO] (Object)  MCParticlesToARICHSimHits
+[INFO] (Object)  MCParticlesToBeamBackHits
+[INFO] (Array)   ARICHAeroHits             1
+[INFO] (Array)   ARICHSimHits              9
+[INFO] (Array)   BeamBackHits              1
+[INFO] (Array)   MCParticles               392
+[INFO] 
+[INFO] (Type)    Name                      Number entries                     <Run>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] ============================================================================
+[INFO] Processed:   1 runs,      5 events
+Seq File 1 closed

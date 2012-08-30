@@ -17,7 +17,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <arpa/inet.h>
 
 
 using namespace std;
@@ -39,6 +38,7 @@ SeqRootInputModule::SeqRootInputModule() : Module()
   setPropertyFlags(c_Input | c_InitializeInProcess);
 
   m_file = 0;
+  m_nevt = -1;
 
   //Parameter definition
   addParam("inputFileName"  , m_inputFileName, "SeqRoot file name.", string("SeqRootInput.root"));
@@ -63,7 +63,10 @@ void SeqRootInputModule::initialize()
   // Message handler to encode serialized object
   m_msghandler = new MsgHandler(m_compressionLevel);
 
-  StoreObjPtr<EventMetaData>::registerPersistent();
+  //load first entry to register arrays
+  m_firstevent = false;
+  event();
+  m_firstevent = true;
 
   B2INFO("SeqRootInput: initialized.");
 }
@@ -81,6 +84,10 @@ void SeqRootInputModule::beginRun()
 
 void SeqRootInputModule::event()
 {
+  if (m_firstevent) {
+    m_firstevent = false;
+    return;
+  }
   m_msghandler->clear();
 
   // Get a SeqRoot record from the file
@@ -111,7 +118,6 @@ void SeqRootInputModule::event()
   B2INFO("nobjs = " << nobjs << ", narrays = " << narrays);
 
   // Decode message
-  DataStore::Instance().clearMaps();
   vector<TObject*> objlist;
   vector<string> namelist;
   m_msghandler->decode_msg(evtmsg, objlist, namelist);
@@ -120,26 +126,25 @@ void SeqRootInputModule::event()
 
   //  printf("size of objlist = %d\n", objlist.size());
 
-  // Clear arrays
-  //  DataStore::Instance().clearMaps(DataStore::c_Event);
-
   // Restore objects in DataStore
   // 1. Objects
-  for (int i = 0; i < nobjs; i++) {
+  for (int i = 0; i < nobjs + narrays; i++) {
+    bool array = (dynamic_cast<TClonesArray*>(objlist.at(i)) != 0);
     if (objlist.at(i) != NULL) {
+      const TClass* cl = objlist.at(i)->IsA();
+      if (array)
+        cl = static_cast<TClonesArray*>(objlist.at(i))->GetClass();
+
+      if (m_nevt == 0) //we're called from initialize()
+        DataStore::Instance().createEntry(namelist.at(i), durability, cl, array, false, true);
       DataStore::Instance().createObject(objlist.at(i), false,
                                          namelist.at(i), durability,
-                                         objlist.at(i)->IsA(), false);
-      B2INFO("Store Object : " << namelist.at(i) << " stored");
+                                         cl, array);
+      B2DEBUG(100, "Store " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
+    } else {
+      B2INFO("Store " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " is NULL!");
     }
-  }
-  for (int i = 0; i < narrays; i++) {
-    if (objlist.at(i + nobjs) != NULL) {
-      DataStore::Instance().createObject(objlist.at(i + nobjs), false,
-                                         namelist.at(i + nobjs), durability,
-                                         ((TClonesArray*)objlist.at(i + nobjs))->GetClass(), true);
-      B2INFO("Store Array : " << namelist.at(i) << " stored");
-    }
+
   }
   //  B2INFO ( "Event received : " << m_nrecv++ )
 

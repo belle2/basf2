@@ -63,6 +63,8 @@ void SeqRootInputModule::initialize()
   // Message handler to encode serialized object
   m_msghandler = new MsgHandler(m_compressionLevel);
 
+  StoreObjPtr<EventMetaData>::registerPersistent();
+
   B2INFO("SeqRootInput: initialized.");
 }
 

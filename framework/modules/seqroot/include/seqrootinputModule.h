@@ -15,6 +15,9 @@
 #include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/SeqFile.h>
 
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>

@@ -33,7 +33,6 @@ MsgHandler::MsgHandler(int complevel)
 MsgHandler::~MsgHandler(void)
 {
   //  printf("MsgHandler : destructor called.....\n");
-  B2INFO("MsgHandler : destructor called.....");
   free(m_cbuf);
 }
 

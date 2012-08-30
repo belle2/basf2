@@ -46,7 +46,7 @@ namespace Belle2 {
   public:
     /*! Empty constructor */
     EvtMessage(void);
-    /*! build EvtMessage from existing buffer */
+    /*! build EvtMessage from existing buffer (does not take ownership). */
     EvtMessage(char* buf);
     /*! build EvtMessage by allocating new message buffer */
     EvtMessage(char* sobjs, int size, RECORD_TYPE type);
@@ -99,7 +99,7 @@ namespace Belle2 {
 
   private:
     char* m_data;         ///< Pointer to the internal EvtMessage buffer
-    int   m_buftype;
+    int   m_buftype;      ///< If 1, clean up m_data in destructor
 
   };
 

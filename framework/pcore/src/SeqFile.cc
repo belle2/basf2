@@ -123,9 +123,3 @@ int SeqFile::read(char* buf, int size)
     return stat;
   }
 }
-
-
-
-
-
-

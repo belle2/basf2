@@ -38,6 +38,7 @@ SeqRootInputModule::SeqRootInputModule() : Module()
   setPropertyFlags(c_Input | c_InitializeInProcess);
 
   m_file = 0;
+  m_msghandler = 0;
   m_nevt = -1;
 
   //Parameter definition
@@ -50,6 +51,9 @@ SeqRootInputModule::SeqRootInputModule() : Module()
 
 SeqRootInputModule::~SeqRootInputModule()
 {
+  delete m_msghandler;
+  //Nope, file descriptor was already closed on EOF :(
+  //delete m_file;
 }
 
 void SeqRootInputModule::initialize()
@@ -93,10 +97,11 @@ void SeqRootInputModule::event()
   // Get a SeqRoot record from the file
   char* evtbuf = new char[MAXEVTSIZE];
   EvtMessage* evtmsg = NULL;
-  int size;
-  size = m_file->read(evtbuf, MAXEVTSIZE);
+  int size = m_file->read(evtbuf, MAXEVTSIZE);
   if (size == 0) {
-    delete m_file;
+    //Nope, file descriptor was already closed on EOF :(
+    //delete m_file;
+    delete[] evtbuf;
     return;
   } else {
     //    printf("SeqRootInput : read = %d\n", size);
@@ -123,6 +128,7 @@ void SeqRootInputModule::event()
   m_msghandler->decode_msg(evtmsg, objlist, namelist);
 
   delete[] evtbuf;
+  delete evtmsg;
 
   //  printf("size of objlist = %d\n", objlist.size());
 

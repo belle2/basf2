@@ -289,7 +289,6 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
           m_rbinlist.push_back(rbuf);
           // Insert Tx at the end of current path
           ModulePtr txptr(new TxModule(rbuf));
-          txptr->initialize();
           inlist.push_back(txptr);
           // Inserv Rx at the top of next path
           ModulePtr rxptr(new RxModule(rbuf));
@@ -327,7 +326,6 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
           m_rboutlist.push_back(rbuf);
           // Insert Tx at the end of current path
           ModulePtr txptr(new TxModule(rbuf));
-          txptr->initialize();
           mainlist.push_back(txptr);
           // Insert Rx at the top of next path
           ModulePtr rxptr(new RxModule(rbuf));

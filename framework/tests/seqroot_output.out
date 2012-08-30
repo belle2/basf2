@@ -1,0 +1,166 @@
+[INFO] Steering file: framework/tests/seqroot_output.py
+>>> basf2 Python environment set
+>>> Framework object created: fw
+[INFO] The random number seed is set to 42
+
+===================
+ParticleGun
+===================
+Description: particle gun to generate simple tracks
+-----------------------------------------------------------------------------
+  Name                 Type                 Default              Current                        Steering   Description
+-----------------------------------------------------------------------------
+  independentVertices  Boolean              False                False                          True       If false, all tracks of one event will start from the same vertex, otherwise a new vertex is generated for every particle
+  momentumGeneration   String               uniform              fixed                          True       Distribution used for generation the momentum, one of fixed, uniform, uniformPt or normal
+  momentumParams       List(Double)         0.05, 3.0            3.0                            True       Parameters for the momentum generation. Meaning of the parameters depends on the chosen distribution
+  nTracks              Double               1.0                  1.0                            True       The number of tracks to be generated per event. If <=0, one particle will be created for each entry in pdgCodes. Otherwise N particles will be created and the Particle ID for each particle will be picked randomly from pdgCodes
+  pdgCodes             List(Integer)        -11, 11              211, -211, 321, -321           True       PDG codes for generated particles
+  phiGeneration        String               uniform              uniform                        True       Distribution used for generation the azimuth angle, one of fixed, uniform, or normal
+  phiParams            List(Double)         0.0, 360.0           0.0, 360.0                     True       Parameters for the phi generation. Meaning of the parameters depends on the chosen distribution
+  thetaGeneration      String               uniform              uniform                        True       Distribution used for generation the polar angle, one of fixed, uniform, uniformCosinus or normal
+  thetaParams          List(Double)         17.0, 150.0          17.0, 25.0                     True       Parameters for the theta generation. Meaning of the parameters depends on the chosen distribution
+  varyNTracks          Boolean              False                False                          True       Vary the number of tracks per event using a Possion distribution? Only used if nTracks>0
+  vertexGeneration     String               normal               fixed                          True       Distribution used for generation the vertex, one of fixed, uniform, or normal
+  xVertexParams        List(Double)         0.0, 0.7             0.0                            True       Parameters for the x vertex generation. Meaning of the parameters depends on the chosen distribution
+  yVertexParams        List(Double)         0.0, 0.7             0.0                            True       Parameters for the y vertex generation. Meaning of the parameters depends on the chosen distribution
+  zVertexParams        List(Double)         0.0, 1.0             0.0                            True       Parameters for the z vertex generation. Meaning of the parameters depends on the chosen distribution
+
+
+*************************************************************
+ Geant4 version Name: geant4-09-05-patch-01    (20-March-2012)
+                      Copyright : Geant4 Collaboration
+                      Reference : NIM A 506 (2003), 250-303
+                            WWW : http://cern.ch/geant4
+*************************************************************
+
+[WARNING] DATASTORE BACKWARD COMPATIBILITY ISSUE: Instead of creating an array 'MCParticles' in your initialize() method, please use registerPersistent().
+G4PhysListFactory::GetReferencePhysList <QGSP_BERT>  EMoption= 0
+<<< Geant4 Physics List simulation engine: QGSP_BERT 3.4
+
+<<< Reference Physics List QGSP_BERT is built
+
+### Adding tracking cuts for neutron  TimeCut(ns)= 10000  KinEnergyCut(MeV)= 0
+G4Cerenkov::G4Cerenkov constructor
+NOTE: this is now a G4VProcess!
+Required change in UserPhysicsList: 
+change: pmanager->AddContinuousProcess(theCerenkovProcess);
+to:     pmanager->AddProcess(theCerenkovProcess);
+        pmanager->SetProcessOrdering(theCerenkovProcess,idxPostStep);
+SeqFile: seqout_test.sroot opened (fd=10)
+[INFO] Begin of new run
+[INFO] Processed:   1 runs,      1 events
+[INFO] ============================================================================
+[INFO] DataStore collections in event 0
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  MCParticlesToARICHAeroHits
+[INFO] (Object)  MCParticlesToARICHSimHits
+[INFO] (Object)  MCParticlesToBeamBackHits
+[INFO] (Array)   ARICHAeroHits             1
+[INFO] (Array)   ARICHSimHits              72
+[INFO] (Array)   BeamBackHits              8
+[INFO] (Array)   MCParticles               762
+[INFO] 
+[INFO] (Type)    Name                      Number entries                     <Run>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] ============================================================================
+[INFO] Processed:   1 runs,      2 events
+[INFO] ============================================================================
+[INFO] DataStore collections in event 1
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  MCParticlesToARICHAeroHits
+[INFO] (Object)  MCParticlesToARICHSimHits
+[INFO] (Object)  MCParticlesToBeamBackHits
+[INFO] (Array)   ARICHAeroHits             1
+[INFO] (Array)   ARICHSimHits              78
+[INFO] (Array)   BeamBackHits              3
+[INFO] (Array)   MCParticles               753
+[INFO] 
+[INFO] (Type)    Name                      Number entries                     <Run>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] ============================================================================
+[INFO] Processed:   1 runs,      3 events
+[INFO] ============================================================================
+[INFO] DataStore collections in event 2
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  MCParticlesToARICHAeroHits
+[INFO] (Object)  MCParticlesToARICHSimHits
+[INFO] (Object)  MCParticlesToBeamBackHits
+[INFO] (Array)   ARICHAeroHits             1
+[INFO] (Array)   ARICHSimHits              109
+[INFO] (Array)   BeamBackHits              6
+[INFO] (Array)   MCParticles               807
+[INFO] 
+[INFO] (Type)    Name                      Number entries                     <Run>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] ============================================================================
+[INFO] Processed:   1 runs,      4 events
+[INFO] ============================================================================
+[INFO] DataStore collections in event 3
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  MCParticlesToARICHAeroHits
+[INFO] (Object)  MCParticlesToARICHSimHits
+[INFO] (Object)  MCParticlesToBeamBackHits
+[INFO] (Array)   ARICHAeroHits             1
+[INFO] (Array)   ARICHSimHits              56
+[INFO] (Array)   BeamBackHits              2
+[INFO] (Array)   MCParticles               732
+[INFO] 
+[INFO] (Type)    Name                      Number entries                     <Run>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] ============================================================================
+[INFO] Processed:   1 runs,      5 events
+[INFO] ============================================================================
+[INFO] DataStore collections in event 4
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  MCParticlesToARICHAeroHits
+[INFO] (Object)  MCParticlesToARICHSimHits
+[INFO] (Object)  MCParticlesToBeamBackHits
+[INFO] (Array)   ARICHAeroHits             1
+[INFO] (Array)   ARICHSimHits              9
+[INFO] (Array)   BeamBackHits              1
+[INFO] (Array)   MCParticles               392
+[INFO] 
+[INFO] (Type)    Name                      Number entries                     <Run>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] ============================================================================
+Seq File 0 closed

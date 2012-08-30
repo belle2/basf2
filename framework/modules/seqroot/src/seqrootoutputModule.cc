@@ -132,7 +132,7 @@ void SeqRootOutputModule::endRun()
 
   //  printf ( "m_size = %f, m_size2 = %f, m_nevt = %d\n", m_size, m_size2, m_nevt );
   //  printf ( "avesize2 = %f, avesize = %f, avesize*avesize = %f\n", avesize2, avesize, avesize*avesize );
-  B2INFO("SeqRootOutput :  " << m_nevt << " events read with total bytes of " << m_size << " kB");
+  B2INFO("SeqRootOutput :  " << m_nevt << " events written with total bytes of " << m_size << " kB");
   B2INFO("SeqRootOutput : flow rate = " << flowmb << " (MB/s)");
   B2INFO("SeqRootOutput : event size = " << avesize << " +- " << sigma << " (kB)");
 

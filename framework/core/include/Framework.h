@@ -24,9 +24,6 @@
 #include <list>
 
 namespace Belle2 {
-  class EventProcessor;
-  class pEventProcessor;
-
   /**
    * The main Framework class.
    * This class combines all subsystems of the framework.
@@ -175,8 +172,6 @@ namespace Belle2 {
   protected:
 
     PathManager* m_pathManager;         /**< The path manager, which takes care of creating and handling paths. */
-    EventProcessor* m_eventProcessor;   /**< The event processor, which loops over the events and calls the modules. */
-    pEventProcessor* m_peventProcessor; /**< The event processor, which loops over the events and calls the modules. */
 
   };
 

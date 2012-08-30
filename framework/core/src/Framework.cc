@@ -31,8 +31,6 @@ using namespace Belle2;
 Framework::Framework()
 {
   m_pathManager = new PathManager();
-  m_eventProcessor = new EventProcessor(*m_pathManager);
-  m_peventProcessor = new pEventProcessor(*m_pathManager);
 
   RandomNumbers::initialize();
 }
@@ -40,8 +38,6 @@ Framework::Framework()
 
 Framework::~Framework()
 {
-  delete m_peventProcessor;
-  delete m_eventProcessor;
   delete m_pathManager;
 }
 
@@ -91,13 +87,16 @@ void Framework::process(PathPtr startPath, long maxEvent)
   }
 
   already_executed = true;
-  if (Environment::Instance().getNumberProcesses() == 0)
-    m_eventProcessor->process(startPath, maxEvent);
-  else if (maxEvent <= 0)
-    m_peventProcessor->process(startPath);
-  else
+  if (Environment::Instance().getNumberProcesses() == 0) {
+    EventProcessor processor(*m_pathManager);
+    processor.process(startPath, maxEvent);
+  } else if (maxEvent <= 0) {
+    pEventProcessor processor(*m_pathManager);
+    processor.process(startPath);
+  } else {
     B2FATAL("process(path, maxEvent) not supported when using parallel processing.")
   }
+}
 
 
 void Framework::setNumberProcesses(int number)

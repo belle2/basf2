@@ -15,6 +15,7 @@
 
 //root
 #include <TMatrixT.h>
+//stuff for root output
 #include <TTree.h>
 #include <TFile.h>
 
@@ -25,16 +26,13 @@
 #include <iomanip>
 
 
-
-//// to get statistics functions of boost
-//#include <boost/accumulators/accumulators.hpp>
-//#include <boost/accumulators/statistics/stats.hpp>
-//#include <boost/accumulators/statistics/mean.hpp>
-//#include <boost/accumulators/statistics/variance.hpp>
-//#include <boost/accumulators/statistics/count.hpp>
-
 namespace Belle2 {
-
+  /** This module gets the VXDTrueHits form the datastore and extracts information from the them in a format that is same as
+   * the local coordinates used by Genfit. In this way the information form the simulation can be compared for every layer with the
+   * smoother information from he track fitter. Additionally the Energy loss and scattering angles are extracted form the true hits
+   * if can be inspected with root afterwards. Basically this module presents you the simulation data directly before it enters the
+   * the fitter.
+   */
   class TrueHitTesterModule : public Module {
 
   public:
@@ -43,7 +41,7 @@ namespace Belle2 {
     TrueHitTesterModule();
 
     //! Destructor
-    virtual ~TrueHitTesterModule();
+    ~TrueHitTesterModule();
 
     //! Initialize the Module
     /*! Function is called only once at the beginning of your job at the beginning of the corresponding module.
@@ -51,14 +49,14 @@ namespace Belle2 {
 
         This method has to be implemented by subclasses.
     */
-    virtual void initialize();
+    void initialize();
 
     //! Called when entering a new run
     /*! At the beginning of each run, the function gives you the chance to change run dependent constants like alignment parameters, etc.
 
         This method has to be implemented by subclasses.
     */
-    virtual void beginRun();
+    void beginRun();
 
     //! Running over all events
     /*! Function is called for each evRunning over all events
@@ -74,7 +72,7 @@ namespace Belle2 {
 
         This method has to be implemented by subclasses.
     */
-    virtual void endRun();
+    void endRun();
 
     //! Is called at the end of your Module
     /*! Function is called only once at the end of your job at the end of the corresponding module.
@@ -82,31 +80,28 @@ namespace Belle2 {
 
         This method has to be implemented by subclasses.
     */
-    virtual void terminate();
+    void terminate();
 
 
   protected:
-    void registerLayerWiseData(const std::string& nameOfDataSample, const int nVarsToTest);
-    void fillLayerWiseData(const std::string& nameOfDataSample, const int accuVecIndex, const std::vector<double>& newData);
+    void registerLayerWiseData(const std::string& nameOfDataSample, const int nVarsToTest);  /** function to create std vector<vector<float> > branches in a root file*/
+    void fillLayerWiseData(const std::string& nameOfDataSample, const int accuVecIndex, const std::vector<double>& newData); /** function to put data into the root branches created by registerLayerWiseData */
 
-    std::vector<double> rootVecToStdVec(TMatrixT<double>& rootVector);
     //for root output
-    std::string m_dataOutFileName;
-    TFile* m_rootFilePtr;
-    TTree* m_trueHitDataTreePtr;
+    std::string m_dataOutFileName; /** name of the output file*/
+    TFile* m_rootFilePtr; /** the root file object for the custom root output*/
+    TTree* m_trueHitDataTreePtr; /** the root tree object for the custom root output. Use only accessed via fillLayerWiseData*/
 
-    std::map<std::string, float* > m_trackWiseDataForRoot;
-    std::map<std::string, std::vector<float>* > m_trackWiseVecDataForRoot;
-    std::map<std::string, std::vector<std::vector<float> >* > m_layerWiseDataForRoot;
+    std::map<std::string, std::vector<std::vector<float> >* > m_layerWiseDataForRoot; /** holds the branch varaibles for the costum root output. Only accessed via fillLayerWiseData*/
 
 
-    int m_nLayers; // number of Si layers. That is 6 of course.
-    int m_nPxdLayers; // number of PXD layer (2) so number of SVD layers will be m_nSiLayers - m_nPxdLayers
-    int m_nSvdLayers;
+    int m_nLayers; /** number of VXD layers. That is PXD + SVD layers*/
+    int m_nPxdLayers; /** number of PXD layers*/
+    int m_nSvdLayers; /** number of SVD layers*/
 
-    bool m_filter;
+    bool m_filter; /** this flag determins if only tracks with exaclty m_nLayers (=6) hits are used*/
 
-    int m_notPerfectCounter;
+    int m_notPerfectCounter; /** if m_filter is true this holds the number of tracks not having m_nLayers (=6) hits*/
 
 
   };

@@ -23,6 +23,10 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/dataobjects/VXDTrueHit.h>
 
+#include <vxd/geometry/GeoCache.h>
+#include <svd/geometry/SensorInfo.h>
+#include <pxd/geometry/SensorInfo.h>
+
 using namespace std;
 using namespace Belle2;
 //using namespace boost::accumulators;
@@ -54,8 +58,9 @@ TrueHitTesterModule::~TrueHitTesterModule()
 
 void TrueHitTesterModule::initialize()
 {
-  m_nPxdLayers = 2;
-  m_nSvdLayers = 4;
+  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  m_nPxdLayers = geo.getLayers(PXD::SensorInfo::PXD).size();
+  m_nSvdLayers = geo.getLayers(SVD::SensorInfo::SVD).size();
   m_nLayers = m_nPxdLayers + m_nSvdLayers;
 
   m_rootFilePtr = new TFile(m_dataOutFileName.c_str(), "RECREATE");
@@ -111,13 +116,13 @@ void TrueHitTesterModule::event()
           layerIds.push_back(layerId);
           ++iterPairMcSvd.first;
         }
-        if (layerIds.size() not_eq 6) {
+        if (layerIds.size() not_eq m_nLayers) {
           filterEvent = true;
           ++m_notPerfectCounter;
           break;
         } else {
           sort(layerIds.begin(), layerIds.end());
-          for (int l = 0; l not_eq 6; ++l) {
+          for (int l = 0; l not_eq m_nLayers; ++l) {
             if (l + 1 not_eq layerIds[l]) {
               filterEvent = true;
               ++m_notPerfectCounter;
@@ -211,7 +216,10 @@ void TrueHitTesterModule::event()
           trueStateOut[3][0] = aVxdTrueHitPtr->getExitU();
           trueStateOut[4][0] = aVxdTrueHitPtr->getExitV();
           TMatrixT<double> deltaTrueState = trueStateOut - trueStateIn;
-          fillLayerWiseData("deltaTrackParas", vecIndex, rootVecToStdVec(deltaTrueState));
+
+          vector<double> deltaTrueStateStdVec(deltaTrueState.GetMatrixArray(), deltaTrueState.GetMatrixArray() + deltaTrueState.GetNrows()); //convert TMatrixD to std::vector
+
+          fillLayerWiseData("deltaTrackParas", vecIndex, deltaTrueStateStdVec);
 
           dataSample.push_back(pTrueOutGlobal.DeltaPhi(pTrueInGlobal));
           dataSample.push_back(pTrueOutGlobal.Theta() - pTrueInGlobal.Theta());
@@ -251,7 +259,7 @@ void TrueHitTesterModule::terminate()
 
 void TrueHitTesterModule::registerLayerWiseData(const string& nameOfDataSample, const int nVarsToTest)
 {
-  m_layerWiseDataForRoot[nameOfDataSample] = new std::vector<vector<float> >(m_nLayers, vector<float>(nVarsToTest));
+  m_layerWiseDataForRoot[nameOfDataSample] = new vector<vector<float> >(m_nLayers, vector<float>(nVarsToTest));
   m_trueHitDataTreePtr->Branch(nameOfDataSample.c_str(), "std::vector<std::vector<float> >", &(m_layerWiseDataForRoot[nameOfDataSample]));
 }
 
@@ -262,14 +270,3 @@ void TrueHitTesterModule::fillLayerWiseData(const string& nameOfDataSample, cons
     (*m_layerWiseDataForRoot[nameOfDataSample])[accuVecIndex][i] = float(newData[i]);
   }
 }
-
-vector<double> TrueHitTesterModule::rootVecToStdVec(TMatrixT<double>&  rootVector)
-{
-  int n = rootVector.GetNrows();
-  vector<double> stdVec(n);
-  for (int i = 0; i not_eq n; ++i) {
-    stdVec[i] = rootVector[i][0];
-  }
-  return stdVec;
-}
-

@@ -56,6 +56,11 @@ namespace Belle2 {
   RelationArray::registerPersistent<MCParticle, SVDSimHit>();
       \endcode
    *
+   * or, if you have arrays with non-default names:
+   *  \code
+  //create MCParticles (default name) -> MySVDSimHits relation
+  RelationArray::registerPersistent<MCParticle, SVDSimHit>("", "MySVDSimHits");
+      \endcode
    *
    *  \sa RelationIndex provides a convenient interface to finding objects
    *      related to a given FROM/TO side object.
@@ -132,13 +137,17 @@ namespace Belle2 {
     /** Register a relation array, that should be written to the output by default, in the data store.
      *  This must be called in the initialzation phase.
      *
+     *  @param fromName    Name of from-array ("" for default name)
+     *  @param toName      Name of to-array ("" for default name)
      *  @param durability  Specifies lifetime of array in question.
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
      *  @return            True if the registration succeeded.
      */
-    template<class FROM, class TO> static bool registerPersistent(DataStore::EDurability durability = DataStore::c_Event,
+    template<class FROM, class TO> static bool registerPersistent(const std::string& fromName = "", const std::string& toName = "", DataStore::EDurability durability = DataStore::c_Event,
         bool errorIfExisting = true) {
-      return DataStore::Instance().createEntry(DataStore::defaultRelationName<FROM, TO>(), durability, RelationContainer::Class(), false, false, errorIfExisting);
+      const std::string& relName = DataStore::relationName(DataStore::arrayName<FROM>(fromName), DataStore::arrayName<TO>(toName));
+      return DataStore::Instance().createEntry(relName, durability, RelationContainer::Class(), false, false, errorIfExisting);
+
     }
     /** Register a relation array, that should be written to the output by default, in the data store.
      *  This must be called in the initialzation phase.

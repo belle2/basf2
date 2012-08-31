@@ -172,7 +172,7 @@ void CDCDigitizerModule::event()
 
     for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); iterSignalMap++) {
 
-      new(cdcHits->AddrAt(iCDCHits)) CDCHit(iterSignalMap->second.m_driftTime, getADCCount(iterSignalMap->second.m_charge),
+      new(cdcHits->AddrAt(iCDCHits)) CDCHit(10 * iterSignalMap->second.m_driftTime, getADCCount(iterSignalMap->second.m_charge),
                                             iterSignalMap->second.m_wireID);
 
       cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex, iCDCHits);     //add entry
@@ -225,7 +225,7 @@ float CDCDigitizerModule::getDriftTime(float driftLength, float tof, float propL
   if (!m_addTimeOfFlight)            tofFactor = 0;
 
   //drift speed: 4.0cm/us, propagation speed: 27.25cm/ns, provided by iwasaki-san and hard-coded here.
-  return (10000  * (driftLength / Unit::cm) / 4.0 + tofFactor * tof / Unit::ns + propagationDelayFactor * (propLength / Unit::cm) / 27.25 /*+ m_eventTime*/);
+  return (1000  * (driftLength / Unit::cm) / 4.0 + tofFactor * tof / Unit::ns + propagationDelayFactor * (propLength / Unit::cm) / 27.25 /*+ m_eventTime*/);
 }
 
 unsigned short CDCDigitizerModule::getADCCount(const float charge)

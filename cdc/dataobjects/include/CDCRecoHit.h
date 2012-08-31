@@ -64,13 +64,13 @@ namespace Belle2 {
     }
 
     /** Setter for the Translators. */
-    static void setTranslators(cdc::ADCCountTranslatorBase*    const adcCountTranslator,
-                               cdc::CDCGeometryTranslatorBase* const cdcGeometryTranslator,
-                               cdc::DriftTimeTranslatorBase*   const driftTimeTranslator);
+    static void setTranslators(CDC::ADCCountTranslatorBase*    const adcCountTranslator,
+                               CDC::CDCGeometryTranslatorBase* const cdcGeometryTranslator,
+                               CDC::DriftTimeTranslatorBase*   const driftTimeTranslator);
     /*
-    static void setTranslators(boost::shared_ptr<cdc::ADCCountTranslatorBase>    const& adcCountTranslator,
-                         boost::shared_ptr<cdc::CDCGeometryTranslatorBase> const& cdcGeometryTranslator,
-                         boost::shared_ptr<cdc::DriftTimeTranslatorBase>   const& driftTimeTranslator);
+    static void setTranslators(boost::shared_ptr<CDC::ADCCountTranslatorBase>    const& adcCountTranslator,
+                         boost::shared_ptr<CDC::CDCGeometryTranslatorBase> const& cdcGeometryTranslator,
+                         boost::shared_ptr<CDC::DriftTimeTranslatorBase>   const& driftTimeTranslator);
      */
 
     /** Setter for the update option.
@@ -123,15 +123,15 @@ namespace Belle2 {
     WireID m_wireID;
 
     /** Object for ADC Count translation. */
-    static cdc::ADCCountTranslatorBase*     s_adcCountTranslator;    //! Don't write to ROOT file, as pointer is meaningless, there
+    static CDC::ADCCountTranslatorBase*     s_adcCountTranslator;    //! Don't write to ROOT file, as pointer is meaningless, there
     // static boost::shared_ptr<ADCCountTranslatorBase>   s_adcCountTranslator;    //! Don't write to ROOT file, as pointer is meaningless, there
 
     /** Object for geometry translation. */
-    static cdc::CDCGeometryTranslatorBase*  s_cdcGeometryTranslator; //! Don't write to ROOT file, as pointer is meaningless, there
+    static CDC::CDCGeometryTranslatorBase*  s_cdcGeometryTranslator; //! Don't write to ROOT file, as pointer is meaningless, there
     //static boost::shared_ptr<CDCGeometryTranslatorBase> s_cdcGeometryTranslator; //! Don't write to ROOT file, as pointer is meaningless, there
 
     /** Object for getting drift-length and -resolution. */
-    static cdc::DriftTimeTranslatorBase*    s_driftTimeTranslator;   //! Don't write to ROOT file, as pointer is meaningless, there
+    static CDC::DriftTimeTranslatorBase*    s_driftTimeTranslator;   //! Don't write to ROOT file, as pointer is meaningless, there
     //static boost::shared_ptr<DriftTimeTranslatorBase>   s_driftTimeTranslator;   //! Don't write to ROOT file, as pointer is meaningless, there
 
     /** If set to false, the data from the cash is used for the get measurement function.

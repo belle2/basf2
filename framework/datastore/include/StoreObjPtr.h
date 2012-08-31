@@ -25,18 +25,15 @@ namespace Belle2 {
    *  <h1>Accessing existing objects</h1>
    *  This example creates a new StoreObjPtr for the EventMetaData object,
    *  using the default name (EventMetaData) and default durability (event).
+   *  If no object 'EventMetaData' is found in the data store, the store
+   *  object pointer is invalid.
    *  \code
   StoreObjPtr<EventMetaData> eventmetadata;
-  B2INFO("we're currently in event " << eventmetadata->getEvent() << "!");
-      \endcode
-   *  If no object 'EventMetaData' is found in the data store, the store
-   *  object pointer is invalid:
-   *  \code
-  StoreObjPtr<EventMetaData> checkObj;
-  if(!checkObj) {
-    B2INFO("an object called '" << checkObj.getName() << "' does not exist in the data store.");
+  if(!eventmetadata) {
+    B2INFO("an object called '" << eventmetadata.getName() << "' does not exist in the data store.");
   } else {
     //object exists, you can now access its data
+    B2INFO("we're currently in event " << eventmetadata->getEvent() << "!");
   }
       \endcode
    *
@@ -44,11 +41,13 @@ namespace Belle2 {
    *  First, objects have to be registered in the data store during the
    *  initialization phase, meaning in the initialize method of a module:
    *  \code
-  //register a single cdchit
-  StoreObjPtr<CDCHit>::registerPersistent();
-  //register a single cdchit under the name "AnotherHit" and do not write
-  //it to the output file by default
-  StoreObjPtr<CDCHit>::registerTransient("AnotherHit");
+  void MyModule::initialize() {
+    //register a single cdchit
+    StoreObjPtr<CDCHit>::registerPersistent();
+    //register a single cdchit under the name "AnotherHit" and do not write
+    //it to the output file by default
+    StoreObjPtr<CDCHit>::registerTransient("AnotherHit");
+  }
       \endcode
    *  Before objects can be accessed they have to be created
    *  (in each event if the durability is c_Event):

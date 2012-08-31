@@ -45,11 +45,6 @@ namespace Belle2 {
     */
     void process(PathPtr spath);
 
-    /*!
-      Keep this function just for backword compatibility
-    */
-    void process_old(PathPtr spath);
-
 
   private:
     /*! Analyze given path */
@@ -69,11 +64,6 @@ namespace Belle2 {
 
     /*! Extract modules to be initialized in forked process */
     ModulePtrList init_modules_in_process(const ModulePtrList& modlist);
-
-    /*! Initialize modules (a ka processInitialize() in EventProcessor.cc) */
-    void pProcessInitialize(const ModulePtrList&);
-
-
 
   protected:
 

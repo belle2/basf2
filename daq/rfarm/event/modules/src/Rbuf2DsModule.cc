@@ -7,6 +7,7 @@
 //-
 
 #include <daq/rfarm/event/modules/Rbuf2DsModule.h>
+#include <TSystem.h>
 #include <stdlib.h>
 
 using namespace std;
@@ -47,6 +48,8 @@ Rbuf2DsModule::~Rbuf2DsModule()
 
 void Rbuf2DsModule::initialize()
 {
+  gSystem->Load("libdataobjects");
+
   m_rbuf = new RingBuffer(m_rbufname.c_str(), RBUFSIZE);
   m_msghandler = new MsgHandler(m_compressionLevel);
 
@@ -100,23 +103,28 @@ void Rbuf2DsModule::event()
   // Restore objects in DataStore
   for (int i = 0; i < nobjs; i++) {
     if (objlist.at(i) != NULL) {
-      DataStore::Instance().storeObject(objlist.at(i),
-                                        namelist.at(i));
+      DataStore::Instance().createEntry(string(namelist.at(i)), durability,
+                                        (objlist.at(i))->Class(),
+                                        false, true, false);
+      DataStore::Instance().createObject(objlist.at(i), false,
+                                         namelist.at(i), DataStore::c_Event,
+                                         objlist.at(i)->IsA(), false);
       B2INFO("Rbuf2Ds: restored obj " << namelist.at(i));
     } else {
       B2INFO("Rbuf2Ds: obj " << namelist.at(i) << " is Null. Omitted");
     }
   }
-  B2INFO("Rx: Objs restored");
-
-  //  DataStore::Instance().clearMaps();
+  B2INFO("Rbuf2Ds: Objs restored");
 
   // Restore arrays in DataStore
   for (int i = 0; i < narrays; i++) {
-    TClonesArray* adrs = (TClonesArray*) objlist.at(i + nobjs);
     if (objlist.at(i + nobjs) != NULL) {
-      DataStore::Instance().storeArray((TClonesArray*)objlist.at(i + nobjs),
-                                       namelist.at(i + nobjs));
+      DataStore::Instance().createEntry(string(namelist.at(i + nobjs)), durability,
+                                        (objlist.at(i + nobjs))->Class(),
+                                        true, true, false);
+      DataStore::Instance().createObject(objlist.at(i + nobjs), false,
+                                         namelist.at(i + nobjs), DataStore::c_Event,
+                                         ((TClonesArray*)objlist.at(i + nobjs))->GetClass(), true);
       B2INFO("Rbuf2Ds: restored array " << namelist.at(i + nobjs));
     } else {
       B2INFO("Rbuf2Ds: array " << namelist.at(i + nobjs) << " is Null. Omitted");

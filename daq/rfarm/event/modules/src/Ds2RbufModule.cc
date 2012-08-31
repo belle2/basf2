@@ -70,6 +70,28 @@ void Ds2RbufModule::event()
   DataStore::EDurability durability = DataStore::c_Event;
 
   // Stream objects in msg_handler
+  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
+  int nobjs = 0;
+  for (DataStore::StoreObjConstIter it = map.begin(); it != map.end(); ++it) {
+    if (it->second->isArray)
+      continue;
+    if (m_msghandler->add(it->second->ptr, it->first)) {
+      B2INFO("Tx: adding obj " << it->first);
+      nobjs++;
+    }
+  }
+  // Stream arrays in msg_handler
+  int narrays = 0;
+  for (DataStore::StoreObjConstIter it = map.begin(); it != map.end(); ++it) {
+    if (!it->second->isArray)
+      continue;
+    if (m_msghandler->add(it->second->ptr, it->first)) {
+      B2INFO("Tx: adding array " << it->first);
+      narrays++;
+    }
+  }
+  /* O L D
+  // Stream objects in msg_handler
   const DataStore::StoreObjMap& objmap = DataStore::Instance().getObjectMap(durability);
   int nobjs = 0;
   for (DataStore::StoreObjConstIter it = objmap.begin(); it != objmap.end(); ++it) {
@@ -87,6 +109,7 @@ void Ds2RbufModule::event()
       narrays++;
     }
   }
+  */
   B2INFO("Ds2Rbuf: nobjs = " << nobjs << ", narrays = " << narrays <<
          " (pid=" << (int)getpid() << ")");
 

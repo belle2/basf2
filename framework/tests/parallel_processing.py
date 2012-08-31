@@ -7,7 +7,6 @@
 
 from basf2 import *
 
-set_log_level(LogLevel.WARNING)
 
 # to run the framework the used modules need to be registered
 particlegun = register_module('ParticleGun')

@@ -39,6 +39,7 @@ TxModule::TxModule(RingBuffer* rbuf) : Module(), m_msghandler(0)
 {
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
+  setPropertyFlags(c_Input | c_InitializeInProcess);
   //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
   std::ostringstream buf; buf << "Tx" << rbuf->shmid();
   setModuleName(buf.str());
@@ -62,7 +63,7 @@ void TxModule::initialize()
 {
   m_msghandler = new MsgHandler(m_compressionLevel);
 
-  B2INFO("Tx initialized.");
+  B2INFO(getName() << " initialized.");
 }
 
 

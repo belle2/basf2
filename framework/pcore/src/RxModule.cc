@@ -8,6 +8,8 @@
 
 #include <framework/pcore/RxModule.h>
 
+#include <TSystem.h>
+
 #include <stdlib.h>
 
 #define MAXEVTSIZE 400000000
@@ -31,7 +33,6 @@ RxModule::RxModule() : Module(), m_msghandler(0)
   setPropertyFlags(c_Input | c_InitializeInProcess);
 
   m_rbuf = NULL;
-  m_nsent = 0;
   m_compressionLevel = 0;
 
   //Parameter definition
@@ -47,7 +48,6 @@ RxModule::RxModule(RingBuffer* rbuf) : Module(), m_msghandler(0)
   setModuleName(buf.str());
 
   m_rbuf = rbuf;
-  m_nsent = 0;
   m_compressionLevel = 0;
 
   //Parameter definition
@@ -63,9 +63,14 @@ RxModule::~RxModule()
 
 void RxModule::initialize()
 {
+  gSystem->Load("libdataobjects");
   m_msghandler = new MsgHandler(m_compressionLevel);
 
-  B2INFO("Rx initialized.");
+
+  B2INFO(getName() << " reading branches in initialize().");
+  m_numEvents = -1;
+  event();
+  B2INFO(getName() << " initialized.");
 }
 
 
@@ -77,6 +82,10 @@ void RxModule::beginRun()
 
 void RxModule::event()
 {
+  m_numEvents++;
+  if (m_numEvents == 1)
+    return; //first event read in initialize()
+
   // Get a record from ringbuf
   int size;
 
@@ -125,6 +134,10 @@ void RxModule::event()
   // Restore objects in DataStore
   for (int i = 0; i < nobjs; i++) {
     if (objlist.at(i) != NULL) {
+      if (m_numEvents == 0) {
+        DataStore::Instance().createEntry(namelist.at(i), DataStore::c_Event,
+                                          objlist.at(i)->IsA(), false, false, true);
+      }
       DataStore::Instance().createObject(objlist.at(i), false,
                                          namelist.at(i), DataStore::c_Event,
                                          objlist.at(i)->IsA(), false);
@@ -148,6 +161,10 @@ void RxModule::event()
 
     //    fflush ( stdout );
     if (objlist.at(i + nobjs) != NULL) {
+      if (m_numEvents == 0) {
+        DataStore::Instance().createEntry(namelist.at(i + nobjs), DataStore::c_Event,
+                                          static_cast<TClonesArray*>(objlist.at(i + nobjs))->GetClass(), true, false, true);
+      }
       DataStore::Instance().createObject(objlist.at(i + nobjs), false,
                                          namelist.at(i + nobjs), DataStore::c_Event,
                                          ((TClonesArray*)objlist.at(i + nobjs))->GetClass(), true);
@@ -155,6 +172,7 @@ void RxModule::event()
     } else {
       B2INFO("Rx: array " << namelist.at(i + nobjs) << " is Null. Omitted");
     }
+
 
   }
   B2INFO("Rx: DataStore Restored!!");

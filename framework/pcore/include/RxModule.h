@@ -78,8 +78,8 @@ namespace Belle2 {
     //! Process contrl manager
     RbCtlMgr* m_rbctl;
 
-    //! No. of sent events
-    int m_nsent;
+    /** No of events */
+    int m_numEvents;
 
   };
 

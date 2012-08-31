@@ -117,13 +117,11 @@ void GenFitterModule::initialize()
   m_failedGFTrackCandFitCounter = 0;
   m_successfulGFTrackCandFitCounter = 0;
 
-  StoreArray < Track > tracks(m_tracksColName);
-  StoreArray < GFTrack > gfTracks(m_gfTracksColName);
+  StoreArray<Track>::registerPersistent(m_tracksColName);
+  StoreArray < GFTrack >::registerPersistent(m_gfTracksColName);
 
-  // Needed for the initialization of the RelationArray
-  StoreArray < MCParticle > mcParticles(m_mcParticlesColName);
 
-  RelationArray gfTracksToMCPart(gfTracks, mcParticles);
+  RelationArray::registerPersistent<GFTrack, MCParticle>(m_gfTracksColName, m_mcParticlesColName);
 
   if (m_createTextFile) {
     HelixParam.open("HelixParam.txt");
@@ -213,7 +211,10 @@ void GenFitterModule::event()
 
   //StoreArrays to store the fit results
   StoreArray < Track > tracks(m_tracksColName);
+  tracks.create();
   StoreArray < GFTrack > gfTracks(m_gfTracksColName);
+  gfTracks.create();
+
 
   //Create a relation between the gftracks and their most probable 'mother' MC particle
   RelationArray gfTracksToMCPart(gfTracks, mcParticles);

@@ -86,9 +86,9 @@ MCTrackFinderModule::~MCTrackFinderModule()
 void MCTrackFinderModule::initialize()
 {
   //output store arrays have to be registered in initialize()
-  StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
-  StoreArray<MCParticle> mcParticles;
-  RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
+  StoreArray<GFTrackCand>::registerPersistent(m_gfTrackCandsColName);
+  RelationArray::registerPersistent<GFTrackCand, MCParticle>(m_gfTrackCandsColName, "");
+
 
 
   m_particleProperties = 0;
@@ -188,6 +188,7 @@ void MCTrackFinderModule::event()
 
   //register StoreArray which will be filled by this module
   StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
+  trackCandidates.create();
   RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
 
   //an auxiliary variable to discard neutrals if necessary (assume that no particles with charge -999 exist)

@@ -460,7 +460,7 @@ int VertexFitCheckerModule::countOutliers(const vector<double>& dataSample, cons
   int n = dataSample.size();
   int nOutliers = 0;
   double halfInterval = widthScaling * sigma;
-  assert(halfInterval > 0.0); //both widthScaling and sigma must be positive therefore halfInterval, too!
+  assert(not(halfInterval < 0.0)); //both widthScaling and sigma must be positive therefore halfInterval, too!
   double lowerCut = mean - halfInterval;
   double upperCut = mean + halfInterval;
   B2DEBUG(100, "n=" << n << ",mean=" << mean << ",sigma=" << sigma << ",lowerCut=" << lowerCut << ",upperCut=" << upperCut);

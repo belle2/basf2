@@ -58,7 +58,7 @@ void VertexerModule::initialize()
   GFFieldManager::getInstance()->init(new GFGeant4Field());
 
   //register output datastore
-  StoreArray<GFRaveVertex> vertices;
+  StoreArray<GFRaveVertex>::registerPersistent();// vertices;
 
   m_gfRaveVertexFactoryPtr = new GFRaveVertexFactory(m_verbosity, not m_useGenfitPropagation);
   m_gfRaveVertexFactoryPtr->setMethod(m_method);
@@ -106,9 +106,6 @@ void VertexerModule::event()
   vertices.create();
 
   B2DEBUG(100, " will feed  " << nGfTracks << " tracks to GFRave");
-
-
-
 
   //get all tracks of one event
   vector<GFTrack*> tracksForRave(nGfTracks);

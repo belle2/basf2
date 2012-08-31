@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck & Oksana Brovchenko                          *
+ * Contributors: Moritz Nadler                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -40,6 +40,7 @@
 #include <tracking/gfbfield/GFGeant4Field.h>
 //genfit stuff
 #include <GFTrack.h>
+#include <GFTrackCand.h>
 //#include <GFKalman2.h>
 #include <GFRecoHitProducer.h>
 #include <GFRecoHitFactory.h>
@@ -67,7 +68,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace cdc;
+using namespace Belle2::CDC;
 
 REG_MODULE(GenFitter2)
 
@@ -116,8 +117,8 @@ void GenFitter2Module::initialize()
     GFMaterialEffects::getInstance()->setNoiseBrems(m_noiseBrems);
   }
   GFMaterialEffects::getInstance()->setMscModel(m_mscModel);
-  StoreArray<GFTrack> fittedTracks(""); //initialization of the the output container of this module
-
+  //register output storeArray
+  StoreArray<GFTrack>::registerPersistent();
   //set options for fitting algorithms
   m_kalmanFilter.setNumIterations(m_nGFIter);
   m_kalmanFilter.setBlowUpFactor(m_blowUpFactor);
@@ -355,8 +356,6 @@ void GenFitter2Module::event()
         factory.addProducer(1, svdClusterProducer);
         factory.addProducer(2, CDCProducer);
       }
-
-
 
       vector <GFAbsRecoHit*> factoryHits;
       //use the factory to create RecoHits for all Hits stored in the track candidate

@@ -119,7 +119,7 @@ namespace Belle2 {
     void isMatrixCov(const TMatrixT<double>& cov);
     bool isSymmetric(const TMatrixT<double>& aMatrix) const;
     bool hasMatrixNegDiagElement(const TMatrixT<double>& aMatrix) const;
-    std::vector<double> rootMatrixToStdVec(const TMatrixT<double>&  rootMatrix) const;
+
     // functions for dataflow inside module
     void registerTrackWiseData(const std::string& nameOfDataSample);
     void registerTrackWiseVecData(const std::string& nameOfDataSample, const int nVarsToTest);
@@ -207,6 +207,10 @@ namespace Belle2 {
 
 
     bool m_wAndPredPresentsTested;
+    //stuff for the text output for rave developers
+    bool m_exportTracksForRaveDeveloper;
+    std::ofstream m_forRaveOut;
+
     //stuff for root output
     bool m_writeToFile;
     bool m_writeToRootFile;

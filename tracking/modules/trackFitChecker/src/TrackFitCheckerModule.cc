@@ -82,6 +82,7 @@ TrackFitCheckerModule::TrackFitCheckerModule() : Module()
   addParam("inspectTracks", m_inspectTracks, "write track parameters into a text file for further inspection. When 0 this function is switched off. 1 or 2 will enable this function but have different arrangments of data in text file. EXPERIMENTAL", 0);
   addParam("writeToRootFile", m_writeToRootFile, "Set to True if you want the data from the statistical tests written into a root file", false);
   addParam("writeToTextFile", m_writeToFile, "Set to True if you want the results of the statistical tests written out in a normal text file", false);
+  addParam("exportTracksForRaveDeveloper", m_exportTracksForRaveDeveloper, "Writes tracks into text file in a format used by rave developers", false);
 }
 
 
@@ -247,6 +248,10 @@ void TrackFitCheckerModule::initialize()
     m_dataOut << "#\t\tq/p\tdu/dw\tdv/dw\tu\tv\tΔΦ\tΔθ\n";
     // m_dataOut.precision(14);
   }
+
+  if (m_exportTracksForRaveDeveloper == true) {
+    m_forRaveOut.open((m_dataOutFileName + "ForRaveDev.txt").c_str());
+  }
 }
 
 
@@ -262,6 +267,9 @@ void TrackFitCheckerModule::event()
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   int eventCounter = eventMetaDataPtr->getEvent();
+  if (m_exportTracksForRaveDeveloper == true) {
+    m_forRaveOut << "event: id=" << eventCounter << ";\n";
+  }
 
   B2DEBUG(100, "**********   TrackFitCheckerModule  processing event number: " << eventCounter << " ************");
   //simulated truth information
@@ -281,12 +289,17 @@ void TrackFitCheckerModule::event()
 
   //test one time for prediction and and weights
   if (nFittedTracks not_eq 0 and m_wAndPredPresentsTested == false) {
-    try {
-      double dafWeight = -1;
-      fittedTracks[0]->getBK(0)->getNumber("dafWeight", 0,  dafWeight);
-    } catch (GFException& e) {
+    if (m_testSi == true) {
+      try {
+        double dafWeight = -1;
+        fittedTracks[0]->getBK(0)->getNumber("dafWeight", 0,  dafWeight);
+      } catch (GFException& e) {
+        m_testDaf = false;
+      }
+    } else {
       m_testDaf = false;
     }
+
     try {
       TMatrixD state;
       fittedTracks[0]->getBK(0)->getMatrix("fPreSt", 0, state);
@@ -398,6 +411,17 @@ void TrackFitCheckerModule::event()
     //get fitted momentum at fitted vertex
 
     aTrackPtr->getPosMomCov(planeThroughVertex, vertexPos, vertexMom, vertexCov);
+    if (m_exportTracksForRaveDeveloper == true) {
+//      event: id=1; run=0; tag="FromMoritz";
+//      event:simvtx: id=11; name="primary"; x=1.27551020341343246e-05; y=1.06171173683833331e-05; z=0.525282680988311768.
+//      event:track: dpxpx=4.85574456419465095e-06; dpxpy=-5.26806408107531081e-07; dpxpz=-3.23616340568937519e-07; dpypy=4.40549194315139507e-07; dpypz=3.80698379458437548e-08; dpzpz=4.03946384998145186e-07; dxpx=-1.41775832125791709e-07; dxpy=-2.54225448943143737e-07; dxpz=-1.06664920686288894e-07; dxx=7.21623982840947298e-07; dxy=3.53794392550510399e-06; dxz=1.48993797581001075e-06; dypx=-7.71493264301975362e-07; dypy=-1.47695468584119419e-06; dypz=5.32912980171120437e-08; dyy=2.0532536153150725e-05; dyz=-2.58092269541423012e-07; dzpx=-1.11413567329900935e-07; dzpy=2.2227965336001507e-08; dzpz=-1.5877358812582075e-06; dzz=2.10240638408681937e-05; id=12; name="RT"; px=1.01044154167175293; py=-0.175035446882247925; pz=-0.0737569332122802734; q=-1; simid=0; vtxid=11; x=0.000254478829447180033; y=0.00140603561885654926; z=0.530362188816070557.
+//      event:track: dpxpx=0.000880925345796613633; dpxpy=-0.000209010591474188969; dpxpz=0.000437857140465834323; dpypy=5.57304966194143575e-05; dpypz=-0.000104576936602241317; dpzpz=0.000224891812502202765; dxpx=9.19048583251024311e-08; dxpy=-1.60230516237502996e-06; dxpz=3.49415495349561031e-06; dxx=5.21887071742276229e-06; dxy=3.91917091524863482e-06; dxz=-8.706050022698458e-06; dypx=6.30952254461446898e-06; dypy=-8.43669296753385824e-06; dypz=3.13480970841542995e-06; dyy=2.18592436972156176e-05; dyz=1.94766492526136232e-06; dzpx=2.64611429747526515e-06; dzpy=-5.71897928747292469e-07; dzpz=-5.59974734131818076e-06; dzz=1.83298594773835305e-05; id=13; name="RT"; px=3.52589607238769531; py=-0.7888450026512146; pz=1.7584986686706543; q=1; simid=1; vtxid=11; x=-0.000883664761204272509; y=-0.00399610539898276329; z=0.520958960056304932.
+//      event:fill
+      if (i == 0) {
+        m_forRaveOut << "event:simvtx: x=" << trueVertexPos[0] << "; y=" << trueVertexPos[1] << "; z=" << trueVertexPos[2] << ".\n"; //assuming all tracks in one event comming from the same vertex
+      }
+      m_forRaveOut << "event:track: dpxpx=" << vertexCov[3][3] << "; dpxpy=" << vertexCov[3][4] << "; dpxpz=" << vertexCov[3][5] << "; dpypy=" << vertexCov[4][4] << "; dpypz=" << vertexCov[4][5] << "; dpzpz=" << vertexCov[5][5] << "; dxpx=" << vertexCov[0][3] << "; dxpy=" << vertexCov[0][4] << "; dxpz=" << vertexCov[0][5] << "; dxx=" << vertexCov[0][0] << "; dxy=" << vertexCov[0][1] << "; dxz=" << vertexCov[0][2] << "; dypx=" << vertexCov[1][3] << "; dypy=" << vertexCov[1][4] << "; dypz=" << vertexCov[1][5] << "; dyy=" << vertexCov[1][1] << "; dyz=" << vertexCov[1][2] << "; dzpx=" << vertexCov[2][3] << "; dzpy=" << vertexCov[2][4] << "; dzpz=" << vertexCov[2][5] << "; dzz=" << vertexCov[2][2] << "; px=" << vertexMom[0] << "; py=" << vertexMom[1] << "; pz=" << vertexMom[2] << "; q=" << charge << "; x=" << vertexPos[0] << "; y=" << vertexPos[1] << "; z=" << vertexPos[2] << ".\n";
+    }
     double vertexAbsMom = vertexMom.Mag();
     fillTrackWiseData("absMomVertex", vertexAbsMom);
     double res_curvatureAtVertex =  1.0 / vertexMom.Pt() - 1.0 / trueVertexMom.Pt();
@@ -448,7 +472,12 @@ void TrackFitCheckerModule::event()
     if (m_writeToRootFile == true) {
       m_statDataTreePtr->Fill();
     }
+
+
     ++m_processedTracks;
+  }
+  if (m_exportTracksForRaveDeveloper == true) {
+    m_forRaveOut << "event:fill\n";
   }
 }
 
@@ -595,6 +624,9 @@ void TrackFitCheckerModule::terminate()
   if (m_inspectTracks  > 0) {
     m_dataOut.close();
   }
+  if (m_exportTracksForRaveDeveloper == true) {
+    m_forRaveOut.close();
+  }
 
 }
 
@@ -606,7 +638,7 @@ double TrackFitCheckerModule::calcChi2(const TMatrixT<double>& res, const TMatri
   TMatrixT<double> resT(TMatrixT<double>::kTransposed, res);
   return (resT * invR * res)[0][0];
 }
-// calculate a chi2 value from a residuum and it's covariance matrix R
+// calculate pulls from a residuum and it's covariance matrix R
 vector<double> TrackFitCheckerModule::calcZs(const TMatrixT<double>& res, const TMatrixT<double>& R) const
 {
   const int numOfZ = R.GetNcols();
@@ -1158,7 +1190,8 @@ void TrackFitCheckerModule::truthTests()  //
 //          measTrueTests[1] = res[0][0];
 //        }
 //      }
-      fillLayerWiseData("res_meas_t", accuVecIndex, rootMatrixToStdVec(res));
+      vector<double> resStdVec(res.GetMatrixArray(), res.GetMatrixArray() + res.GetNrows()); //convert TMatrixD to std::vector
+      fillLayerWiseData("res_meas_t", accuVecIndex, resStdVec);
       //res.Print();
       TMatrixT<double> V = m_trackData.Vs[iGFHit];
       //V.Print();
@@ -1484,7 +1517,7 @@ int TrackFitCheckerModule::countOutliers(const vector<double>& dataSample, const
   int n = dataSample.size();
   int nOutliers = 0;
   double halfInterval = widthScaling * sigma;
-  assert(halfInterval > 0.0); //both widthScaling and sigma must be positive therefore halfInterval, too!
+  assert(not(halfInterval < 0.0)); //both widthScaling and sigma must be positive therefore halfInterval, too!
   double lowerCut = mean - halfInterval;
   double upperCut = mean + halfInterval;
   B2DEBUG(100, "n=" << n << ",mean=" << mean << ",sigma=" << sigma << ",lowerCut=" << lowerCut << ",upperCut=" << upperCut);
@@ -1497,12 +1530,4 @@ int TrackFitCheckerModule::countOutliers(const vector<double>& dataSample, const
 }
 
 
-vector<double> TrackFitCheckerModule::rootMatrixToStdVec(const TMatrixT<double>&  rootMatrix) const
-{
-  int n = rootMatrix.GetNrows();
-  vector<double> stdVec(n);
-  for (int i = 0; i not_eq n; ++i) {
-    stdVec[i] = rootMatrix[i][0];
-  }
-  return stdVec;
-}
+

@@ -52,8 +52,7 @@ SeqRootInputModule::SeqRootInputModule() : Module()
 SeqRootInputModule::~SeqRootInputModule()
 {
   delete m_msghandler;
-  //Nope, file descriptor was already closed on EOF :(
-  //delete m_file;
+  delete m_file;
 }
 
 void SeqRootInputModule::initialize()
@@ -99,8 +98,8 @@ void SeqRootInputModule::event()
   EvtMessage* evtmsg = NULL;
   int size = m_file->read(evtbuf, MAXEVTSIZE);
   if (size == 0) {
-    //Nope, file descriptor was already closed on EOF :(
-    //delete m_file;
+    delete m_file;
+    m_file = 0;
     delete[] evtbuf;
     return;
   } else {

@@ -42,11 +42,11 @@ void pEventProcessor::process(PathPtr spath)
   signal(SIGSEGV, SIG_DFL);
 
   const int numProcesses = Environment::Instance().getNumberProcesses();
-  // 0. If nprocess is 0, pass control to kbasf2::process()
 
-  if (numProcesses == 0) {   // Single process -> fall back to kbasf2
-    //    process ( spath, maxev );
-    process(spath);
+  // 0. Should serial processing be used instead?
+  if (numProcesses == 0) {
+    B2WARNING("pEventProcessor::process() called for serial processing! Most likely a bug in Framework.");
+    EventProcessor::process(spath);
     return;
   }
 

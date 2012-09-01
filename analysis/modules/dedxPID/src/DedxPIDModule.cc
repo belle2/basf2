@@ -98,7 +98,7 @@ void DedxPIDModule::initialize()
 
   if (!m_pdfFilename.empty()) {
     StoreArray<DedxLikelihood>::registerPersistent();
-    RelationArray::registerPersistent(DataStore::defaultRelationName<GFTrack, DedxLikelihood>());
+    RelationArray::registerPersistent<GFTrack, DedxLikelihood>();
 
     //load pdfs
     TFile* pdf_file = new TFile(m_pdfFilename.c_str(), "READ");
@@ -563,7 +563,7 @@ template <class HitClass> void DedxPIDModule::saveSiHits(TrackDedx* track, const
   const int current_detector = geo.get(hits[hit_indices.at(0)]->getSensorID()).getType();
   assert(current_detector == c_PXD or current_detector == c_SVD);
 
-  std::vector<float> silicon_dedx; //used for averages
+  std::vector<float> silicon_dedx(num_hits); //used for averages
 
   for (int i = 0; i < num_hits; i++) {
     const HitClass* hit = hits[hit_indices.at(i)];

@@ -2,7 +2,7 @@
 #include <analysis/modules/dedxPID/HelixHelper.h>
 #include <analysis/modules/dedxPID/DedxConstants.h>
 
-#include <analysis/dataobjects/TrackDedx.h>
+#include <analysis/dataobjects/DedxTrack.h>
 #include <analysis/dataobjects/DedxLikelihood.h>
 
 #include <framework/core/Environment.h>
@@ -73,7 +73,7 @@ DedxPIDModule::DedxPIDModule() : Module()
   addParam("UseCDC", m_useCDC, "Use CDC hits for dE/dx calculation", true);
 
   addParam("TrackDistanceThreshold", m_trackDistanceThreshhold, "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
-  addParam("EnableDebugOutput", m_enableDebugOutput, "Wether to save information on tracks and associated hits and dE/dx values in TrackDedx objects.", false);
+  addParam("EnableDebugOutput", m_enableDebugOutput, "Wether to save information on tracks and associated hits and dE/dx values in DedxTrack objects.", false);
 
   addParam("PDFFile", m_pdfFilename, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", Environment::Instance().getDataSearchPath() + std::string("/analysis/dedxPID_PDFs_r3178.root"));
   addParam("IgnoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
@@ -94,7 +94,7 @@ void DedxPIDModule::initialize()
 
   //register outputs (if needed)
   if (m_enableDebugOutput)
-    StoreArray<TrackDedx>::registerPersistent("TrackDedx", DataStore::c_Event);
+    StoreArray<DedxTrack>::registerPersistent();
 
   if (!m_pdfFilename.empty()) {
     StoreArray<DedxLikelihood>::registerPersistent();
@@ -195,7 +195,7 @@ void DedxPIDModule::event()
 
   //output
   StoreArray<DedxLikelihood> *likelihood_array = 0;
-  StoreArray<TrackDedx> *dedx_array = 0;
+  StoreArray<DedxTrack> *dedx_array = 0;
   RelationArray* tracks_to_likelihoods = 0;
   if (!m_pdfFilename.empty()) {
     likelihood_array = new StoreArray<DedxLikelihood>;
@@ -204,7 +204,7 @@ void DedxPIDModule::event()
     tracks_to_likelihoods->create(gftracks, *likelihood_array); //why specify them again here?
   }
   if (m_enableDebugOutput) {
-    dedx_array = new StoreArray<TrackDedx>("TrackDedx", DataStore::c_Event);
+    dedx_array = new StoreArray<DedxTrack>();
     dedx_array->create();
   }
 
@@ -212,7 +212,7 @@ void DedxPIDModule::event()
   //loop over all tracks
   for (int iGFTrack = 0; iGFTrack < tracks.getEntries(); iGFTrack++) {
     const int iTrack = iGFTrack;
-    TrackDedx track; //temporary storage for track data
+    DedxTrack track; //temporary storage for track data
 
     if (num_mcparticles > 0) { //only do this if we actually know the mcparticles
       //find MCParticle corresponding to this track
@@ -222,7 +222,7 @@ void DedxPIDModule::event()
         if (m_onlyPrimaryParticles && !mcparticles[mcparticle_idx]->hasStatus(MCParticle::c_PrimaryParticle))
           continue; //not a primary particle, ignore
 
-        //add some MC truths to TrackDedx object
+        //add some MC truths to DedxTrack object
         track.m_pdg = mcparticles[mcparticle_idx]->getPDG();
         const MCParticle* mother = mcparticles[mcparticle_idx]->getMother();
         track.m_mother_pdg = mother ? mother->getPDG() : 0;
@@ -551,7 +551,7 @@ float DedxPIDModule::getFlownDistanceCDC(int layerid, float theta, float phi)
 
 //assume HitClass provides getU/V(), getSensorID(), getEnergyDep()
 //true for SVDRecoHit2D, PXDRecoHit, and associated TrueHits
-template <class HitClass> void DedxPIDModule::saveSiHits(TrackDedx* track, const HelixHelper& helix, const StoreArray<HitClass> &hits, const std::vector<unsigned int> &hit_indices) const
+template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const HelixHelper& helix, const StoreArray<HitClass> &hits, const std::vector<unsigned int> &hit_indices) const
 {
   const int num_hits = hit_indices.size();
   if (num_hits == 0)

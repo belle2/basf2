@@ -15,7 +15,7 @@ class TH2F;
 class TH1F;
 
 namespace Belle2 {
-  class TrackDedx;
+  class DedxTrack;
 
   /** \addtogroup modules
    * @{
@@ -27,7 +27,7 @@ namespace Belle2 {
    * If a PDF file is specified using the 'PDFFile' parameter, likelihood values
    * for all particle hypotheses are calculated and saved in a DedxLikelihood object.
    *
-   * The 'EnableDebugOutput' option adds TrackDedx objects (one for each GFTrack),
+   * The 'EnableDebugOutput' option adds DedxTrack objects (one for each GFTrack),
    * which includes individual dE/dx data points and their corresponding layer,
    * and hit information like reconstructed position, charge, etc.
    *
@@ -42,9 +42,9 @@ namespace Belle2 {
     PXDCluster = graph.external_data('PXDCluster')
 
     DedxLikelihood = graph.data('DedxLikelihood')
-    TrackDedx = graph.data('TrackDedx')
+    DedxTrack = graph.data('DedxTrack')
 
-    graph.module('DedxPID', [Track, GFTrack, MCParticle, CDCHit, SVDTrueHit, PXDTrueHit, PXDCluster], [DedxLikelihood, TrackDedx])
+    graph.module('DedxPID', [Track, GFTrack, MCParticle, CDCHit, SVDTrueHit, PXDTrueHit, PXDCluster], [DedxLikelihood, DedxTrack])
 
     graph.relation(GFTrack, DedxLikelihood)
     \endcorrelationdiagram
@@ -78,7 +78,7 @@ namespace Belle2 {
     static float getFlownDistanceCDC(int layerid, float theta, float phi);
 
     /** save energy loss and hit information from SVD/PXDHits to track */
-    template <class HitClass> void saveSiHits(TrackDedx* track, const HelixHelper& helix, const StoreArray<HitClass> &hits, const std::vector<unsigned int> &hit_indices) const;
+    template <class HitClass> void saveSiHits(DedxTrack* track, const HelixHelper& helix, const StoreArray<HitClass> &hits, const std::vector<unsigned int> &hit_indices) const;
 
 
     /** for all particles, save log-likelihood values into 'logl'.
@@ -113,7 +113,7 @@ namespace Belle2 {
 
     //parameters: technical stuff
     double m_trackDistanceThreshhold; /**< Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off. */
-    bool m_enableDebugOutput; /**< Wether to save information on tracks and associated hits and dE/dx values in TrackDedx objects */
+    bool m_enableDebugOutput; /**< Wether to save information on tracks and associated hits and dE/dx values in DedxTrack objects */
 
     //parameters: which particles and detectors to use
     bool m_onlyPrimaryParticles; /**< Only save data for primary particles (as determined by MC truth) */

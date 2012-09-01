@@ -1,5 +1,5 @@
-#ifndef TRACKDEDX_H
-#define TRACKDEDX_H
+#ifndef DEDXTRACK_H
+#define DEDXTRACK_H
 
 #include <analysis/modules/dedxPID/DedxConstants.h>
 
@@ -14,11 +14,11 @@ namespace Belle2 {
    * Contains information of individual hits belonging to a track
    * as well as calculated dE/dx values.
    */
-  class TrackDedx : public TObject {
+  class DedxTrack : public TObject {
     friend class DedxPIDModule;
   public:
     // default constructor
-    TrackDedx():
+    DedxTrack():
       m_event_id(0), m_track_id(0), m_pdg(0), m_slow_pion(false),
       m_p_vec(TVector3()), m_p(0), m_p_true(0),
       m_charge(0),
@@ -95,7 +95,7 @@ namespace Belle2 {
     //these are only filled in by DedxLikelihoodModule
     float m_logl[c_Dedx_num_particles]; /**< log likelihood for each particle, not including momentum prior */
 
-    ClassDef(TrackDedx, 1); /**< Build ROOT dictionary */
+    ClassDef(DedxTrack, 0); /**< Build ROOT dictionary */
   };
 }
 #endif

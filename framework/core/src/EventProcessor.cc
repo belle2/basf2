@@ -130,7 +130,6 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 #ifdef HAS_CALLGRIND
   CALLGRIND_DUMP_STATS_AT("initialize");
 #endif
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
 }
 
 

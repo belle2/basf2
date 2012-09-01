@@ -32,6 +32,7 @@ EvtMetaGenModule::EvtMetaGenModule() : Module()
 {
   //Set module properties
   setDescription("Sets the event meta data information (exp, run, evt).");
+  setPropertyFlags(c_InitializeInProcess);
 
   //Parameter definition
   std::vector<int> defaultExpRunList;

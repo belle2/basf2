@@ -258,6 +258,11 @@ namespace Belle2 {
       if (!*m_relations) {
         create(from, to);
       } else {
+        if (isValid() && (*m_relations)->isDefaultConstructed()) {
+          //no relation found, mark as invalid
+          m_relations = 0;
+          return;
+        }
         checkRelation("from", from.getAccessorParams(), getFromAccessorParams());
         checkRelation("to", to.getAccessorParams(), getToAccessorParams());
       }
@@ -278,6 +283,11 @@ namespace Belle2 {
         return;
       }
       m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(m_name, m_durability, RelationContainer::Class(), false));
+      if (isValid() && (*m_relations)->isDefaultConstructed()) {
+        //no relation found, mark as invalid
+        m_relations = 0;
+        return;
+      }
     }
 
     /** Constructor which accepts the AccessorParams of the relation.
@@ -294,6 +304,11 @@ namespace Belle2 {
         return;
       }
       m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(m_name, m_durability, RelationContainer::Class(), false));
+      if (isValid() && (*m_relations)->isDefaultConstructed()) {
+        //no relation found, mark as invalid
+        m_relations = 0;
+        return;
+      }
     }
 
     /** Empty destructor */

@@ -109,6 +109,26 @@ namespace Belle2 {
     EXPECT_FATAL(RelationArray relation2(*runData, *evtData, "test"));
   }
 
+  /** Some events may have default constructed relations (i.e. nothing
+   *  was inserted and create() was never called). For those, we don't
+   *  want the construction of the array fail with a FATAL.
+   */
+  TEST_F(RelationTest, RelationDefaultConstructed)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent("somethingnew");
+    DataStore::Instance().setInitializeActive(false);
+
+    RelationContainer* rel = new RelationContainer(); //default constructed object, as written to file
+    ASSERT_TRUE(DataStore::Instance().createObject(rel, false, "somethingnew", DataStore::c_Event, RelationContainer::Class(), false));
+
+    RelationArray array(*evtData, *runData, "somethingnew");
+    EXPECT_FALSE(array.isValid());
+
+    //shouldn't die here
+    RelationIndex<EventMetaData, RunMetaData> index(*evtData, *runData, "somethingnew");
+  }
+
   /** Check consolidation of RelationElements. */
   TEST_F(RelationTest, RelationConsolidate)
   {

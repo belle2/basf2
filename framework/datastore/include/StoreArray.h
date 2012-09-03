@@ -150,7 +150,10 @@ namespace Belle2 {
      */
     explicit StoreArray(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event):
       StoreAccessorBase(DataStore::arrayName<T>(name), durability) {
-      DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, T::Class(), true);
+      if (DataStore::Instance().getInitializeActive()) {
+        //if we're called during initialization, register the array and print a warning
+        DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, T::Class(), true);
+      }
       m_storeArray = reinterpret_cast<TClonesArray**>(DataStore::Instance().getObject(m_name, durability, T::Class(), true));
     }
 
@@ -183,7 +186,7 @@ namespace Belle2 {
     inline operator bool() const {return isValid();}
 
     /** Get the number of occupied slots in the array. */
-    inline int getEntries() const {DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), true); return (*m_storeArray)->GetEntriesFast();}
+    inline int getEntries() const { return isValid() ? ((*m_storeArray)->GetEntriesFast()) : (0);}
 
     /** Access to the stored objects.
      *
@@ -211,7 +214,7 @@ namespace Belle2 {
      *  \return pointer to address just past the last array element
      */
     inline T* nextFreeAddress() {
-      DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), true);
+      ensureAttached();
       return static_cast<T*>((*m_storeArray)->AddrAt(getEntries()));
     }
 
@@ -251,18 +254,22 @@ namespace Belle2 {
      *  function is recommended, as the difference between . and ->
      *  may be lost on casual readers of the source code.
      */
-    TClonesArray& operator *() const {DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), true); return **m_storeArray;}
-    ClonesArrayWrapper* operator ->() const {DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), true); return static_cast<ClonesArrayWrapper*>(*m_storeArray);}
-    TClonesArray* getPtr() const {DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), true); return *m_storeArray;}
+    TClonesArray& operator *() const { ensureAttached(); return **m_storeArray;}
+    ClonesArrayWrapper* operator ->() const { ensureAttached(); return static_cast<ClonesArrayWrapper*>(*m_storeArray);}
+    TClonesArray* getPtr() const { ensureAttached(); return *m_storeArray;}
     //@}
 
   private:
+    /** Ensure that this object is registered and attached. */
+    inline void ensureAttached() const {
+      DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, T::Class(), true);
+      DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), true);
+      if (!m_storeArray)
+        m_storeArray = reinterpret_cast<TClonesArray**>(DataStore::Instance().getObject(m_name, m_durability, T::Class(), true));
+    }
     /** Pointer that actually holds the TClonesArray. */
-    TClonesArray** m_storeArray;
+    mutable TClonesArray** m_storeArray;
 
   };
-
 } // end namespace Belle2
-
-
 #endif

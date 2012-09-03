@@ -40,8 +40,8 @@ class AmgaClient(object):
         'site': 'varchar(32)',
         'software': 'varchar(32)',
         'user': 'varchar(32)',
-        'log': 'varchar(32)',
         }
+#        'log': 'varchar(32)',
 
     config = None
     client = None
@@ -58,7 +58,8 @@ class AmgaClient(object):
             if os.environ.has_key('X509_USER_PROXY') and not gethostname() \
                 == 'kek2-uidev.cc.kek.jp':
                 print 'using X509 auth'
-                self.client = mdclient.MDClient('150.183.246.196', 8822, '')
+               # self.client = mdclient.MDClient('150.183.246.196', 8822, '')
+                self.client = mdclient.MDClient('202.13.207.226', 8822, '')
                # self.client = mdclient.MDClient('cgh10.collab.unimelb.edu.au',
                 #        8822, '')
                 self.client.requireSSL(os.environ['X509_USER_PROXY'],

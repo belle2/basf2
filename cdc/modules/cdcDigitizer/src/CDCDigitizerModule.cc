@@ -65,6 +65,10 @@ CDCDigitizerModule::CDCDigitizerModule() : Module()
            "A switch used to control adding propagation delay in the wire into the final drift time or not", false);
   addParam("AddTimeOfFlight",             m_addTimeOfFlight,
            "A switch used to control adding time of flight into the final drift time or not",                false);
+
+  //TDC Threshold
+  addParam("Threshold", m_tdcThreshold,
+           "dEdx value for TDC Threshold in eV", 2.0e6);
   // The following doesn't make any sense. The only reasonable steerable would be a switch to decide if the jitter shall be
   // activated. Then there has to be event by event jitter.
   /*  addParam("EventTime",                   m_eventTime,
@@ -118,6 +122,16 @@ void CDCDigitizerModule::event()
       float hitdEdx        = aCDCSimHit->getEnergyDep()   * Unit::GeV;
       float hitDriftLength = aCDCSimHit->getDriftLength() * Unit::cm;
       float hitTOF         = aCDCSimHit->getFlightTime()  * Unit::ns;
+      float dedxThreshold = m_tdcThreshold * Unit::eV;
+
+      // If hitdEdx < dedxThreshold (default 40 eV), the hit is ignored
+      // M. Uchida 2012.08.31
+      //
+      if (hitdEdx < dedxThreshold) {
+        B2DEBUG(250, "Below Ethreshold: " << hitdEdx << " " << dedxThreshold);
+        continue;
+      }
+
       B2DEBUG(250, "Energy deposition: " << hitdEdx << ", DriftLength: " << hitDriftLength << ", TOF: " << hitTOF);
 
       // calculate measurement time.

@@ -100,7 +100,7 @@ namespace Belle2 {
     double m_resolution1;       /**< Resolution of the first Gassian used to smear drift length */
     double m_mean2;             /**< Mean value of the second Gassian used to smear drift length */
     double m_resolution2;       /**< Resolution of the second Gassian used to smear drift length */
-
+    double m_tdcThreshold;       /* dEdx value for TDC Threshold in unit of eV */
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
     bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */

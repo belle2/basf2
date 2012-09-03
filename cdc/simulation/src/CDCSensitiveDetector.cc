@@ -348,6 +348,13 @@ namespace Belle2 {
                                    const G4ThreeVector& posTrack,
                                    const G4int lr)
   {
+
+
+    // Skip edep < m_thresholdEnergyDeoposit
+    // M. Uchida 2012.09.04
+
+    if (edep <= m_thresholdEnergyDeposit) return false;
+
     StoreArray<MCParticle> mcParticles;
     //change Later
     StoreArray<CDCSimHit> cdcArray;

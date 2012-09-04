@@ -19,6 +19,9 @@ namespace Belle2 {
   /**
    * \addtogroup modules
    * @{
+   * \addtogroup framework_modules
+   * \ingroup modules
+   * @{ EvtMetaInfoModule @} @}
    */
 
   /** The event meta data info module.
@@ -67,7 +70,6 @@ namespace Belle2 {
   private:
 
   };
-  /*! @} */
 }
 
 #endif /* EVTMETAINFOMODULE_H_ */

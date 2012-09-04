@@ -19,6 +19,9 @@ namespace Belle2 {
   /**
    * \addtogroup modules
    * @{
+   * \addtogroup framework_modules
+   * \ingroup modules
+   * @{ ProfileModule @} @}
    */
 
   /**
@@ -88,7 +91,6 @@ namespace Belle2 {
     MemTime m_endInfo;        /**< memory usage and time at end of event loop */
 
   };
-  /*! @} */
 }
 
 #endif /* PROFILEMODULE_H_ */

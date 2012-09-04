@@ -17,6 +17,9 @@ namespace Belle2 {
   /**
    * \addtogroup modules
    * @{
+   * \addtogroup framework_modules
+   * \ingroup modules
+   * @{ HistoManagerModule @} @}
    */
 
   /*! Class definition of HistoManager module */
@@ -39,8 +42,6 @@ namespace Belle2 {
     bool        m_initmain;
     bool        m_initialized;
   };
-
-  /*! @} */
 } // Namaspace Belle2
 
 #endif /* HISTO_MANAGER_H */

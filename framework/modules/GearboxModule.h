@@ -18,8 +18,12 @@
 
 
 namespace Belle2 {
-  /** \addtogroup modules
+  /**
+   * \addtogroup modules
    * @{
+   * \addtogroup framework_modules
+   * \ingroup modules
+   * @{ GearboxModule @} @}
    */
 
   /**
@@ -78,7 +82,6 @@ namespace Belle2 {
     std::string m_filename;  /**< The toplevel filename for the parameters */
 
   };
-  /*! @} */
 }
 
 #endif /* GEARBOXMODULE_H_ */

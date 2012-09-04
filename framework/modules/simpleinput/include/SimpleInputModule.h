@@ -25,6 +25,9 @@ namespace Belle2 {
   /**
    * \addtogroup modules
    * @{
+   * \addtogroup framework_modules
+   * \ingroup modules
+   * @{ SimpleInputModule @} @}
    */
 
   /** Module Simple Input.
@@ -125,8 +128,6 @@ namespace Belle2 {
     /** Steering parameter names for m_excludeBranchNames. */
     const static std::string c_SteerExcludeBranchNames[DataStore::c_NDurabilityTypes];
   };
-  /*! @} */
-
 } // end namespace Belle2
 
 #endif // SIMPLEINPUTMODULE_H

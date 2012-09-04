@@ -29,6 +29,9 @@ namespace Belle2 {
   /**
    * \addtogroup modules
    * @{
+   * \addtogroup framework_modules
+   * \ingroup modules
+   * @{ SeqRootInputModule @} @}
    */
 
   /*! A class definition of an input module for Sequential ROOT I/O */
@@ -82,8 +85,6 @@ namespace Belle2 {
     double m_size2;
 
   };
-
-  /*! @} */
 } // end namespace Belle2
 
-#endif // MODULEHELLO_H
+#endif

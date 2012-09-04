@@ -19,6 +19,9 @@ namespace Belle2 {
   /**
    * \addtogroup modules
    * @{
+   * \addtogroup framework_modules
+   * \ingroup modules
+   * @{ EvtMetaGenModule @} @}
    */
 
   /**
@@ -72,7 +75,6 @@ namespace Belle2 {
     std::vector<int> m_runList;      /**< The list (column) of runs. */
     std::vector<int> m_evtNumList;   /**< The list (column) of the number of events which should be processed. */
   };
-  /*! @} */
 }
 
 #endif /* EVTMETAGENMODULE_H_ */

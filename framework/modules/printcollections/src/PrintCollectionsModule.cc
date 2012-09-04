@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "framework/modules/datastore/PrintCollectionsModule.h"
+#include "framework/modules/printcollections/PrintCollectionsModule.h"
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>

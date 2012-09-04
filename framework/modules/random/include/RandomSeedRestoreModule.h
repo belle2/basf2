@@ -15,10 +15,12 @@
 
 
 namespace Belle2 {
-
   /**
    * \addtogroup modules
    * @{
+   * \addtogroup framework_modules
+   * \ingroup modules
+   * @{ RandomSeedRestoreModule @} @}
    */
 
   /**
@@ -55,8 +57,6 @@ namespace Belle2 {
 
     std::string m_fileName;    /**< The name of the file that contains the random number seed. */
   };
-
-  /*! @} */
 }
 
 #endif /* RANDOMSEEDRESTOREMODULE_H_ */

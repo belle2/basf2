@@ -27,6 +27,9 @@ namespace Belle2 {
   /**
    * \addtogroup modules
    * @{
+   * \addtogroup framework_modules
+   * \ingroup modules
+   * @{ SimpleOutputModule @} @}
    */
 
   /** Write objects from DataStore into a ROOT file.
@@ -188,8 +191,6 @@ namespace Belle2 {
      */
     unsigned long m_eventHigh;
   };
-
-  /*! @} */
 } // end namespace Belle2
 
 #endif // SIMPLEOUTPUTMODULE_H

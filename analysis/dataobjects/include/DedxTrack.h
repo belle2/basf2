@@ -95,7 +95,7 @@ namespace Belle2 {
     //these are only filled in by DedxLikelihoodModule
     float m_logl[c_Dedx_num_particles]; /**< log likelihood for each particle, not including momentum prior */
 
-    ClassDef(DedxTrack, 0); /**< Build ROOT dictionary */
+    ClassDef(DedxTrack, 1); /**< Build ROOT dictionary */
   };
 }
 #endif

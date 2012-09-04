@@ -32,6 +32,7 @@ namespace Belle2 {
 
     void initialize(); //< Sets up geometry if needed.
     void event(); //< Show GFTracks & hits in event viewer until next event is requested.
+    void terminate(); //< terminate gEve to avoid problems with root's cleanup
   private:
     /** List of drawing options, a combination of:
      *

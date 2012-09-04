@@ -228,3 +228,9 @@ void DisplayModule::event()
   if (reshow)
     event();
 }
+
+void DisplayModule::terminate()
+{
+  if (gEve)
+    gEve->Terminate();
+}

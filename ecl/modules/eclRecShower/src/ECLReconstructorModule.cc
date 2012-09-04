@@ -85,8 +85,8 @@ void ECLReconstructorModule::initialize()
   // CPU time start
   m_timeCPU = clock() * Unit::us;
   StoreArray<ECLDigit> eclDigiArray(m_eclDigiCollectionName);
-  StoreArray<HitAssignmentECL> eclHaArray(m_eclHitAssignmentName);
-  StoreArray<ECLShower> eclRecShowerArray(m_ECLShowerName);
+  StoreArray<HitAssignmentECL>::registerPersistent(m_eclHitAssignmentName);
+  StoreArray<ECLShower>::registerPersistent(m_ECLShowerName);
 
 
 }

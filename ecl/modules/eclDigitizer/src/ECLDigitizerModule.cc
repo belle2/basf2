@@ -91,9 +91,11 @@ void ECLDigitizerModule::initialize()
   readDSPDB();
 
   StoreArray<HitECL>  eclArray(m_eclHitCollectionName);
-  StoreArray<DspECL> eclDspArray(m_eclDspCollectionName);
-  StoreArray<ECLDigit> eclDigiArray(m_eclDigiCollectionName);
-  StoreArray<TrigECL> eclTrigArray(m_eclTrigCollectionName);
+  StoreArray<DspECL>::registerPersistent(m_eclDspCollectionName);
+  StoreArray<ECLDigit>::registerPersistent(m_eclDigiCollectionName);
+  StoreArray<TrigECL>::registerPersistent(m_eclTrigCollectionName);
+
+
 
 
 }

@@ -84,7 +84,7 @@ void ECLGammaReconstructorModule::initialize()
   m_timeCPU = clock() * Unit::us;
   StoreArray<ECLShower> eclRecShowerArray(m_ECLShowerName);
   StoreArray<HitAssignmentECL> eclHitAssignmentArray(m_eclHitAssignmentName);
-  StoreArray<ECLGamma> gammaArray(m_ECLGammaName);
+  StoreArray<ECLGamma>::registerPersistent(m_ECLGammaName);
   StoreArray<GFTrack> gfTracks(m_gfTracksColName);
   StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName);
   StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName);

@@ -90,7 +90,7 @@ void ECLPi0ReconstructorModule::initialize()
   // CPU time start
   m_timeCPU = clock() * Unit::us;
   StoreArray<ECLGamma> Gamma(m_ECLGammaName);
-  StoreArray<ECLPi0> Pi0Array(m_ECLPi0Name);
+  StoreArray<ECLPi0>::registerPersistent(m_ECLPi0Name);
 }
 
 void ECLPi0ReconstructorModule::beginRun()

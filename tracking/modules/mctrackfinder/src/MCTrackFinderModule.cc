@@ -131,7 +131,7 @@ void MCTrackFinderModule::event()
   //PXD trueHits
   StoreArray<PXDTrueHit> pxdTrueHits;
   const int nPXDHits = pxdTrueHits.getEntries();
-  B2DEBUG(100, "MCTrackFinder: Number of PXDHits: " << nPXDHits);
+  B2DEBUG(100, "MCTrackFinder: Number of PXDTrueHits: " << nPXDHits);
 
   RelationArray mcPartToPXDTrueHits(mcParticles, pxdTrueHits);
   const int nMcPartToPXDHits = mcPartToPXDTrueHits.getEntries();
@@ -179,7 +179,7 @@ void MCTrackFinderModule::event()
 
   StoreArray<CDCSimHit> cdcSimHits("");
   const int nCDCSimHits = cdcSimHits.getEntries();
-  B2DEBUG(100, "MCTrackFinder: Number of CDCHits: " << nCDCSimHits);
+  B2DEBUG(100, "MCTrackFinder: Number of CDCSimHits: " << nCDCSimHits);
 
   RelationArray cdcSimHitToHitRel(cdcSimHits, cdcHits);
   const int nCdcSimHitToHitRel = cdcSimHitToHitRel.getEntries();

@@ -139,6 +139,14 @@ void SimpleOutputModule::initialize()
         continue;
       }
 
+      const TClass* entryClass = iter->second->object->IsA();
+      if (iter->second->isArray) {
+        entryClass = static_cast<TClonesArray*>(iter->second->object)->GetClass();
+      }
+      if (entryClass->GetClassVersion() <= 0) {
+        B2ERROR("The version number in the ClassDef() macro for class " << entryClass->GetName() << " must be at least 1 to enable I/O!");
+      }
+
       m_tree[ii]->Branch(branchName.c_str(), &iter->second->object, bufsize, m_splitLevel);
       m_tree[ii]->SetBranchAddress(branchName.c_str(), &iter->second->object);
       m_entries[ii].push_back(iter->second);

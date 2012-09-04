@@ -92,6 +92,9 @@ double EVEVisualization::getErrScale() const { return m_errorScale; }
 
 EVEVisualization::~EVEVisualization()
 {
+  if (!gEve)
+    return; //objects are probably already freed by Eve
+
   delete m_eclsimhitdata;
   delete m_trackpropagator;
   delete m_gftrackpropagator;
@@ -822,6 +825,8 @@ void EVEVisualization::makeTracks()
 
 void EVEVisualization::clearEvent()
 {
+  if (!gEve)
+    return;
   m_mcparticleTracks.clear();
   //other things are cleaned up by TEve...
 

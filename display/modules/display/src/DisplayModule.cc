@@ -7,14 +7,6 @@
 #include <geometry/GeometryManager.h>
 #include <vxd/geometry/GeoCache.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <generators/dataobjects/MCParticle.h>
-#include <cdc/dataobjects/CDCSimHit.h>
-#include <pxd/dataobjects/PXDSimHit.h>
-#include <svd/dataobjects/SVDSimHit.h>
-#include <top/dataobjects/TOPSimHit.h>
-#include <bklm/dataobjects/BKLMSimHit.h>
-//#include <eklm/dataobjects/EKLMSimHit.h>
-#include <ecl/dataobjects/HitECL.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <GFTrack.h>

@@ -109,34 +109,33 @@ namespace Belle2 {
 
 
     /** Button to switch to previous event. */
-    TGButton* m_prevButton; //!
+    TGButton* m_prevButton;
 
     /** Button to switch to next event. */
-    TGButton* m_nextButton; //!
+    TGButton* m_nextButton;
 
     /** Event switcher with numeric entry. */
-    TGNumberEntry* m_eventNumberWidget; //!
+    TGNumberEntry* m_eventNumberWidget;
 
     /** show event/run/exp number for current event. */
-    TGLabel* m_eventLabel; //!
+    TGLabel* m_eventLabel;
 
     /** File name prefix (prefix + #event + "_" + projection + ".png"). */
-    TGTextEntry* m_autoFileNamePrefix; //!
+    TGTextEntry* m_autoFileNamePrefix;
 
     /** width of saved PNGs. */
-    TGNumberEntry* m_autoPictureWidth; //!
+    TGNumberEntry* m_autoPictureWidth;
 
     /** List of event data, including projections. */
-    TEveElementList* m_eventData; //!
+    TEveElementList* m_eventData;
 
 
     /** pointer to viewer class. */
-    SplitGLView* m_viewer; //!
+    SplitGLView* m_viewer;
 
 
-
-    /** Dictionary needed for signal/slot mechanism. */
-    ClassDef(DisplayUI, 1)
+    /** Dictionary needed for signal/slot mechanism (0 to disable I/O). */
+    ClassDef(DisplayUI, 0)
   };
 }
 #endif

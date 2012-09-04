@@ -31,7 +31,7 @@ REG_MODULE(Display)
 
 DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
 {
-  setDescription("Interactive visualisation of GFTrack objects and PXD/SVD/CDCSimHits (plus geometry)");
+  setDescription("Interactive visualisation of MCParticles, GFTracks and various SimHits (plus geometry).");
 
   addParam("Options", m_options, "Drawing options for GFTracks, a combination of ADHGMPSTX. See EVEVisualization::setOptions or the display.py example for an explanation.", std::string("MHTG"));
   addParam("AssignHitsToPrimaries", m_assignToPrimaries, "If true, hits created by secondary particles (e.g. delta electrons) will be assigned to the original primary particle.", true);
@@ -84,7 +84,7 @@ void DisplayModule::event()
 {
   if (!gEve) {
     //window closed?
-    B2WARNING("no TEveManager found, skipping display");
+    B2WARNING("No TEveManager found, skipping display. (hit Ctrl+C to exit)");
     return;
   }
 

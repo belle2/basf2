@@ -36,11 +36,10 @@ DisplayUI::DisplayUI():
   m_nextButton(0)
 {
   if ((!gApplication) || (gApplication && gApplication->TestBit(TApplication::kDefaultApplication))) {
-    B2INFO("gApplication not found, creating...");
     new TApplication("ROOT_application", 0, 0);
   }
   if (!gEve) {
-    B2INFO("gEve not found, creating...");
+    B2INFO("Creating TEve window ...");
     TEveManager::Create(true, "I"); //hide file browser
   }
 

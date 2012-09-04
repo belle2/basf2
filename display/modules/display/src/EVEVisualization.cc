@@ -197,7 +197,7 @@ void EVEVisualization::addGeometry()
   eve_top_node->SetRnrSelfChildren(false, false);
 
 
-  B2INFO("Loading geometry projections ...");
+  B2INFO("Loading geometry projections...");
 
   //Since TEveGeoShapeExtract() replaces the global TGeoManager (??!), we'll make a backup copy
   //TODO: remove once 5.34.2+ is in externals
@@ -406,11 +406,11 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
           det_shape->SetShape(new TGeoTube(0, hit_u - pseudo_res_0, plane_size));
         }
         TVector3 norm = u.Cross(v);
-        TGeoRotation* det_rot = new TGeoRotation("det_rot", (u.Theta() * 180) / TMath::Pi(), (u.Phi() * 180) / TMath::Pi(),
-                                                 (norm.Theta() * 180) / TMath::Pi(), (norm.Phi() * 180) / TMath::Pi(),
-                                                 (v.Theta() * 180) / TMath::Pi(), (v.Phi() * 180) / TMath::Pi()); // move the tube to the right place and rotate it correctly
-        TGeoMatrix* det_trans = new TGeoCombiTrans(o(0), o(1), o(2), det_rot);
-        det_shape->SetTransMatrix(*det_trans);
+        TGeoRotation det_rot("det_rot", (u.Theta() * 180) / TMath::Pi(), (u.Phi() * 180) / TMath::Pi(),
+                             (norm.Theta() * 180) / TMath::Pi(), (norm.Phi() * 180) / TMath::Pi(),
+                             (v.Theta() * 180) / TMath::Pi(), (v.Phi() * 180) / TMath::Pi()); // move the tube to the right place and rotate it correctly
+        TGeoCombiTrans det_trans(o(0), o(1), o(2), &det_rot);
+        det_shape->SetTransMatrix(det_trans);
         det_shape->SetMainColor(kCyan);
         det_shape->SetMainTransparency(0);
         if ((drawHits && (hit_u - pseudo_res_0 > 0)) || !drawHits) {
@@ -477,11 +477,11 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
           // finished calculating ---------------------------------------------------
 
           // rotate and translate everything correctly ------------------------------
-          TGeoRotation* det_rot = new TGeoRotation("det_rot", (u_semiaxis.Theta() * 180) / TMath::Pi(), (u_semiaxis.Phi() * 180) / TMath::Pi(),
-                                                   (v_semiaxis.Theta() * 180) / TMath::Pi(), (v_semiaxis.Phi() * 180) / TMath::Pi(),
-                                                   (norm.Theta() * 180) / TMath::Pi(), (norm.Phi() * 180) / TMath::Pi());
-          TGeoMatrix* det_trans = new TGeoCombiTrans(pix_pos(0), pix_pos(1), pix_pos(2), det_rot);
-          det_shape->SetTransMatrix(*det_trans);
+          TGeoRotation det_rot("det_rot", (u_semiaxis.Theta() * 180) / TMath::Pi(), (u_semiaxis.Phi() * 180) / TMath::Pi(),
+                               (v_semiaxis.Theta() * 180) / TMath::Pi(), (v_semiaxis.Phi() * 180) / TMath::Pi(),
+                               (norm.Theta() * 180) / TMath::Pi(), (norm.Phi() * 180) / TMath::Pi());
+          TGeoCombiTrans det_trans(pix_pos(0), pix_pos(1), pix_pos(2), &det_rot);
+          det_shape->SetTransMatrix(det_trans);
           // finished rotating and translating --------------------------------------
 
           det_shape->SetMainColor(kYellow);
@@ -506,9 +506,9 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
         // got everything we need -----------------------------------------------------
 
 
-        TGeoRotation* det_rot = new TGeoRotation("det_rot", (eVec1.Theta() * 180) / TMath::Pi(), (eVec1.Phi() * 180) / TMath::Pi(),
-                                                 (eVec2.Theta() * 180) / TMath::Pi(), (eVec2.Phi() * 180) / TMath::Pi(),
-                                                 (eVec3.Theta() * 180) / TMath::Pi(), (eVec3.Phi() * 180) / TMath::Pi()); // the rotation is already clear
+        TGeoRotation det_rot("det_rot", (eVec1.Theta() * 180) / TMath::Pi(), (eVec1.Phi() * 180) / TMath::Pi(),
+                             (eVec2.Theta() * 180) / TMath::Pi(), (eVec2.Phi() * 180) / TMath::Pi(),
+                             (eVec3.Theta() * 180) / TMath::Pi(), (eVec3.Phi() * 180) / TMath::Pi()); // the rotation is already clear
 
         // set the scaled eigenvalues -------------------------------------------------
         double pseudo_res_0 = m_errorScale * std::sqrt(ev(0, 0));
@@ -541,8 +541,8 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
         // finished autoscaling -------------------------------------------------------
 
         // rotate and translate -------------------------------------------------------
-        TGeoMatrix* det_trans = new TGeoGenTrans(o(0), o(1), o(2), 1 / (pseudo_res_0), 1 / (pseudo_res_1), 1 / (pseudo_res_2), det_rot);
-        det_shape->SetTransMatrix(*det_trans);
+        TGeoGenTrans det_trans(o(0), o(1), o(2), 1 / (pseudo_res_0), 1 / (pseudo_res_1), 1 / (pseudo_res_2), &det_rot);
+        det_shape->SetTransMatrix(det_trans);
         // finished rotating and translating ------------------------------------------
 
         det_shape->SetMainColor(kYellow);
@@ -561,11 +561,11 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
         TVector3 norm = u.Cross(v);
 
         // rotate and translate -------------------------------------------------------
-        TGeoRotation* det_rot = new TGeoRotation("det_rot", (u.Theta() * 180) / TMath::Pi(), (u.Phi() * 180) / TMath::Pi(),
-                                                 (norm.Theta() * 180) / TMath::Pi(), (norm.Phi() * 180) / TMath::Pi(),
-                                                 (v.Theta() * 180) / TMath::Pi(), (v.Phi() * 180) / TMath::Pi());
-        TGeoMatrix* det_trans = new TGeoCombiTrans(o(0), o(1), o(2), det_rot);
-        det_shape->SetTransMatrix(*det_trans);
+        TGeoRotation det_rot("det_rot", (u.Theta() * 180) / TMath::Pi(), (u.Phi() * 180) / TMath::Pi(),
+                             (norm.Theta() * 180) / TMath::Pi(), (norm.Phi() * 180) / TMath::Pi(),
+                             (v.Theta() * 180) / TMath::Pi(), (v.Phi() * 180) / TMath::Pi());
+        TGeoCombiTrans det_trans(o(0), o(1), o(2), &det_rot);
+        det_shape->SetTransMatrix(det_trans);
         // finished rotating and translating ------------------------------------------
 
         det_shape->SetMainColor(kYellow);

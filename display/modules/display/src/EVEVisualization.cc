@@ -76,7 +76,8 @@
 using namespace Belle2;
 
 EVEVisualization::EVEVisualization():
-  m_assignToPrimaries(false)
+  m_assignToPrimaries(false),
+  m_eclsimhitdata(0)
 {
   setOptions();
   setErrScale();
@@ -91,6 +92,7 @@ double EVEVisualization::getErrScale() const { return m_errorScale; }
 
 EVEVisualization::~EVEVisualization()
 {
+  delete m_eclsimhitdata;
   delete m_trackpropagator;
   delete m_gftrackpropagator;
 }
@@ -832,7 +834,8 @@ void EVEVisualization::clearEvent()
   //TODO: add more complex magnetic field (important for BKLM)
   m_gftrackpropagator->SetMagFieldObj(&m_bfield, false);
   m_gftrackpropagator->SetMaxOrbs(0.01); //stop after track markers
+  delete m_eclsimhitdata;
   m_eclsimhitdata = new TEveCaloDataVec(1); //#slices
-  m_eclsimhitdata->RefSliceInfo(0).Setup("ECL", 0.01, kRed); //set lower energy threshold here
   m_eclsimhitdata->IncDenyDestroy();
+  m_eclsimhitdata->RefSliceInfo(0).Setup("ECL", 0.01, kRed); //set lower energy threshold here
 }

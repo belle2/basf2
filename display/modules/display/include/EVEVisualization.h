@@ -182,7 +182,7 @@ namespace Belle2 {
     /** set fill color of the volume 'name' to 'col'. */
     void setVolumeColor(const char* name, Color_t col);
 
-    /** Rescale errors with this factor to ensure visibility. */
+    /** Rescale PXD/SVD errors with this factor to ensure visibility. */
     double m_errorScale;
 
     /** Option string for GFTrack visualisation.

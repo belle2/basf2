@@ -68,7 +68,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module()
 
   //TDC Threshold
   addParam("Threshold", m_tdcThreshold,
-           "dEdx value for TDC Threshold in eV", 2.0e6);
+           "dEdx value for TDC Threshold in eV", 0.0);
   // The following doesn't make any sense. The only reasonable steerable would be a switch to decide if the jitter shall be
   // activated. Then there has to be event by event jitter.
   /*  addParam("EventTime",                   m_eventTime,

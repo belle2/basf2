@@ -65,6 +65,9 @@ namespace Belle2 {
     /** Wether to show GFTracks */
     bool m_showGFTracks;
 
+    /** Non-interactively save visualisations for each event. */
+    bool m_automatic;
+
     /** pointer to actual display */
     DisplayUI* m_display;
 

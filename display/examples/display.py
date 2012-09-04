@@ -63,6 +63,9 @@ display.param('ShowAllPrimaries', True)
 # show tracks?
 display.param('ShowGFTracks', True)
 
+# save events non-interactively (without showing window)?
+display.param('Automatic', False)
+
 main.add_module(display)
 
 process(main)

@@ -12,6 +12,7 @@ class TEveElementList;
 class TGButton;
 class TGLabel;
 class TGNumberEntry;
+class TGTextEntry;
 
 namespace Belle2 {
   class SplitGLView;
@@ -24,8 +25,12 @@ namespace Belle2 {
    */
   class DisplayUI : public TQObject {
   public:
-    /** Constructor. */
-    DisplayUI();
+    /** Constructor.
+     *
+     * @param automatic if true, hide window and save events using automaticEvent()
+     */
+    DisplayUI(bool automatic = false);
+
     /** Destructor. */
     ~DisplayUI();
 
@@ -50,6 +55,11 @@ namespace Belle2 {
     /** remove all event data in current event. */
     void clearEvent();
 
+    /** switch to automatic mode, where visualisations are saved for each event, with no interactive control. */
+    void startAutomaticRun();
+
+    /*  The actual per-event functionality for automatic saving. */
+    void automaticEvent();
 
     /** Start interactive display for current event.
      *
@@ -94,6 +104,9 @@ namespace Belle2 {
     /** Show current event again after startDisplay() returns? */
     bool m_reshowCurrentEvent;
 
+    /** If true, disable interactive control and call automaticEvent() instead. */
+    bool m_automatic;
+
 
     /** Button to switch to previous event. */
     TGButton* m_prevButton; //!
@@ -107,8 +120,15 @@ namespace Belle2 {
     /** show event/run/exp number for current event. */
     TGLabel* m_eventLabel; //!
 
+    /** File name prefix (prefix + #event + "_" + projection + ".png"). */
+    TGTextEntry* m_autoFileNamePrefix; //!
+
+    /** width of saved PNGs. */
+    TGNumberEntry* m_autoPictureWidth; //!
+
     /** List of event data, including projections. */
     TEveElementList* m_eventData; //!
+
 
     /** pointer to viewer class. */
     SplitGLView* m_viewer; //!

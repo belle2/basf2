@@ -39,6 +39,7 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("ShowCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled AssignHitsToPrimaries). May be slow.", false);
   addParam("ShowNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled AssignHitsToPrimaries). May be slow.", false);
   addParam("ShowGFTracks", m_showGFTracks, "If true, fitted GFTracks will be shown in the display.", true);
+  addParam("Automatic", m_automatic, "Non-interactively save visualisations for each event.", false);
 
   //make sure dictionaries for PXD/SVDrecohits are loaded
   //needs to be done here to have dictionaries available during SimpleInput::initialize()
@@ -71,7 +72,7 @@ void DisplayModule::initialize()
   VXD::GeoCache::getInstance();
   ECL::ECLGeometryPar::Instance();
 
-  m_display = new DisplayUI();
+  m_display = new DisplayUI(m_automatic);
   m_visualizer = new EVEVisualization();
   m_visualizer->setOptions(m_options);
   if (!m_showNeutrals and !m_showCharged) //secondaries cannot be shown if they are merged into primaries

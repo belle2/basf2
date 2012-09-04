@@ -18,6 +18,7 @@
 #include <TGNumberEntry.h>
 #include <TGFileDialog.h>
 #include <TGInputDialog.h>
+#include <TGTextEntry.h>
 #include <TGLViewer.h>
 #include <TROOT.h>
 #include <TSystem.h>
@@ -29,9 +30,10 @@
 
 using namespace Belle2;
 
-DisplayUI::DisplayUI():
+DisplayUI::DisplayUI(bool automatic):
   m_currentEntry(0),
   m_guiInitialized(false),
+  m_automatic(automatic),
   m_prevButton(0),
   m_nextButton(0)
 {
@@ -40,7 +42,7 @@ DisplayUI::DisplayUI():
   }
   if (!gEve) {
     B2INFO("Creating TEve window ...");
-    TEveManager::Create(true, "I"); //hide file browser
+    TEveManager::Create(!m_automatic, "I"); //show window in interactive mode, hide file browser
   }
 
   TEveBrowser* browser = gEve->GetBrowser();
@@ -210,11 +212,15 @@ bool DisplayUI::startDisplay()
   m_eventData->AddElement(m_viewer->getRPhiMgr()->ImportElements((TEveElement*)gEve->GetEventScene()));
   m_eventData->AddElement(m_viewer->getRhoZMgr()->ImportElements((TEveElement*)gEve->GetEventScene()));
 
-  gEve->Redraw3D(false); //do not reset camera when redrawing
+  if (!m_automatic) {
+    gEve->Redraw3D(false); //do not reset camera when redrawing
 
-  //make display interactive
-  gApplication->Run(true); //return from Run()
-  //interactive part done, event data removed from scene
+    //make display interactive
+    gApplication->Run(true); //return from Run()
+    //interactive part done, event data removed from scene
+  } else {
+    automaticEvent();
+  }
 
   return m_reshowCurrentEvent;
 }
@@ -304,6 +310,40 @@ void DisplayUI::makeGui()
   }
   frmMain->AddFrame(viewer_frame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));
 
+  TGGroupFrame* automatisation_frame = new TGGroupFrame(frmMain);
+  automatisation_frame->SetTitle("Automatic Saving");
+  {
+    TGHorizontalFrame* hf = new TGHorizontalFrame(automatisation_frame);
+    {
+      TGLabel* prefixLabel = new TGLabel(hf, "Prefix:");
+      hf->AddFrame(prefixLabel, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
+
+      m_autoFileNamePrefix = new TGTextEntry(hf, "display_");
+      hf->AddFrame(m_autoFileNamePrefix, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
+    }
+    automatisation_frame->AddFrame(hf, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
+
+    TGButton* b = 0;
+    hf = new TGHorizontalFrame(automatisation_frame);
+    {
+      TGLabel* widthLabel = new TGLabel(hf, "Width (px):");
+      hf->AddFrame(widthLabel, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
+
+      m_autoPictureWidth = new TGNumberEntry(hf, 800, 5, 998, TGNumberFormat::kNESInteger,
+                                             TGNumberFormat::kNEANonNegative,
+                                             TGNumberFormat::kNELLimitMinMax,
+                                             100, 6000);
+      hf->AddFrame(m_autoPictureWidth, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
+
+      b = new TGTextButton(hf, "Save PNGs");
+      hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
+      b->Connect("Clicked()", "Belle2::DisplayUI", this, "startAutomaticRun()");
+    }
+    automatisation_frame->AddFrame(hf, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
+
+  }
+  frmMain->AddFrame(automatisation_frame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));
+
   frmMain->MapSubwindows();
   frmMain->Resize();
   frmMain->MapWindow();
@@ -324,6 +364,7 @@ void DisplayUI::toggleColorScheme()
     v->UseDarkColorSet();
   gEve->Redraw3D(false); //do not reset camera when redrawing
 }
+
 void DisplayUI::savePicture(bool highres)
 {
   TGFileInfo fi;
@@ -343,6 +384,40 @@ void DisplayUI::savePicture(bool highres)
 
   //file dialog leaves empty box, redraw
   gEve->Redraw3D(false); //do not reset camera when redrawing
+}
+
+void DisplayUI::startAutomaticRun()
+{
+  B2INFO("Starting automatic run.");
+  m_automatic = true;
+
+  //save current event, too
+  automaticEvent();
+
+  gSystem->ExitLoop();
+}
+
+void DisplayUI::automaticEvent()
+{
+  static int i = 0;
+  B2INFO("Saving event " << i);
+
+  //force immediate redraw
+  gEve->FullRedraw3D();
+
+  TEveViewerList* viewers = gEve->GetViewers();
+  TEveElement::List_ci end_it = viewers->EndChildren();
+  for (TEveElement::List_i it = viewers->BeginChildren(); it != end_it; ++it) {
+    TEveViewer* v = static_cast<TEveViewer*>(*it);
+    TGLViewer* glv = v->GetGLViewer();
+
+    TString projectionName(v->GetName());
+    projectionName.ReplaceAll(" viewer", "");
+    const int width = m_autoPictureWidth->GetIntNumber();
+    glv->SavePictureWidth(TString::Format("%s%d_%s.png", m_autoFileNamePrefix->GetText(), i, projectionName.Data()), width);
+  }
+
+  i++;
 }
 
 ClassImp(DisplayUI)

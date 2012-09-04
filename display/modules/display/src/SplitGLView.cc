@@ -108,19 +108,23 @@ SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
     */
     frm->AddFrame(m_glViewer[iFrame]->GetFrame(), new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
     TEveProjectionManager* projectionMgr = 0;
+    TString projectionName;
     if (iFrame == 0) {
       // set the camera to perspective (XOZ) for this viewer
       m_glViewer[iFrame]->SetCurrentCamera(TGLViewer::kCameraPerspXOZ);
+      projectionName = "3D";
     } else if (iFrame == 1) {
       // set the camera to orthographic (XOY) for this viewer
       m_glViewer[iFrame]->SetCurrentCamera(TGLViewer::kCameraOrthoXOY);
       m_rhozManager = new TEveProjectionManager(TEveProjection::kPT_RhoZ);
       projectionMgr = m_rhozManager;
+      projectionName = "Rho-Z";
     } else {
       // set the camera to orthographic (XOY) for this viewer
       m_glViewer[iFrame]->SetCurrentCamera(TGLViewer::kCameraOrthoXOY);
       m_rphiManager = new TEveProjectionManager(TEveProjection::kPT_RPhi);
       projectionMgr = m_rphiManager;
+      projectionName = "R-Phi";
     }
 
     // connect signals we are interested in
@@ -128,7 +132,7 @@ SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
                                 "onMouseOver(TGLPhysicalShape*)");
     m_glViewer[iFrame]->Connect("Clicked(TObject*)", "Belle2::SplitGLView", this,
                                 "onClicked(TObject*)");
-    m_viewer[iFrame] = new TEveViewer(TString::Format("SplitGLViewer[%d]", iFrame));
+    m_viewer[iFrame] = new TEveViewer(TString::Format("%s viewer", projectionName.Data()));
     m_viewer[iFrame]->SetGLViewer(m_glViewer[iFrame], m_glViewer[iFrame]->GetFrame());
     m_viewer[iFrame]->IncDenyDestroy();
     if (gEve) {
@@ -138,10 +142,7 @@ SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
       }
       TEveScene* s = 0;
       if (projectionMgr) {
-        if (iFrame == 1)
-          s = gEve->SpawnNewScene("Rho-Z projection");
-        if (iFrame == 2)
-          s = gEve->SpawnNewScene("R-Phi projection");
+        s = gEve->SpawnNewScene(TString::Format("%s projection", projectionName.Data()));
         m_viewer[iFrame]->AddScene(s);
       }
 

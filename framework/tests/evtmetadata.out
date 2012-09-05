@@ -8,5 +8,5 @@
 [INFO] 1	3	2
 [INFO] 2	3	2
 [INFO] 3	3	2
-[WARNING] Event processing stopped by non-master module EvtMetaDataTest
+[WARNING] Event processing stopped by non-master module EvtMetaDataTest  { module: -global- }
 [INFO] terminating EvtMetaDataTest

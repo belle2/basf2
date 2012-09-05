@@ -145,12 +145,13 @@ LogSystem::LogSystem() :
   m_moduleLogConfig(0)
 {
   unsigned int logInfo = LogConfig::c_Level + LogConfig::c_Message;
+  unsigned int warnLogInfo = LogConfig::c_Level + LogConfig::c_Message + LogConfig::c_Module;
   unsigned int debugLogInfo = LogConfig::c_Level + LogConfig::c_Message + LogConfig::c_Module + LogConfig::c_File + LogConfig::c_Line;
   unsigned int fatalLogInfo = LogConfig::c_Level + LogConfig::c_Message + LogConfig::c_Module + LogConfig::c_Function;
   m_logConfig.setLogInfo(LogConfig::c_Debug, debugLogInfo);
   m_logConfig.setLogInfo(LogConfig::c_Info, logInfo);
-  m_logConfig.setLogInfo(LogConfig::c_Warning, logInfo);
-  m_logConfig.setLogInfo(LogConfig::c_Error, logInfo);
+  m_logConfig.setLogInfo(LogConfig::c_Warning, warnLogInfo);
+  m_logConfig.setLogInfo(LogConfig::c_Error, warnLogInfo);
   m_logConfig.setLogInfo(LogConfig::c_Fatal, fatalLogInfo);
 
   resetMessageCounter();

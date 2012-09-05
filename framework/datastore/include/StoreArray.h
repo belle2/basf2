@@ -108,7 +108,7 @@ namespace Belle2 {
      *  @return            True if the registration succeeded.
      */
     static bool registerPersistent(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
-                                   bool errorIfExisting = true) {
+                                   bool errorIfExisting = false) {
       return DataStore::Instance().createEntry(DataStore::arrayName<T>(name), durability, T::Class(), true, false, errorIfExisting);
     }
 
@@ -121,7 +121,7 @@ namespace Belle2 {
      *  @return            True if the registration succeeded.
      */
     static bool registerTransient(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
-                                  bool errorIfExisting = true) {
+                                  bool errorIfExisting = false) {
       return DataStore::Instance().createEntry(DataStore::arrayName<T>(name), durability, T::Class(), true, true, errorIfExisting);
     }
 

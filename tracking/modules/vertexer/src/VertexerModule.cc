@@ -83,7 +83,7 @@ void VertexerModule::initialize()
 
 void VertexerModule::beginRun()
 {
-
+  m_ndfTooSmallCounter = 0;
 }
 
 void VertexerModule::event()
@@ -97,8 +97,13 @@ void VertexerModule::event()
   //StoreArray<MCParticle> mcParticles;
   StoreArray<GFTrackCand> trackCandidates;
 
-  if (nGfTracks == 0) {
-    B2DEBUG(100, "event " << eventCounter <<  " has 0 GFTrack objects. Nothing will be done for this event");
+  int ndf = 2 * nGfTracks;
+  if (m_useBeamSpot == true) {
+    ndf += 3;
+  }
+  if (ndf < 4) {
+    B2DEBUG(100, "event " << eventCounter <<  " has not enough information to fit at least one vertex. Event will be skipped");
+    ++m_ndfTooSmallCounter;
     return;
   }
 
@@ -128,10 +133,12 @@ void VertexerModule::event()
 }
 void VertexerModule::endRun()
 {
-
-
+  if (m_ndfTooSmallCounter not_eq 0) {
+    B2WARNING(m_ndfTooSmallCounter << " events had too little information to reconstruct at least one vertex");
+  }
 }
 void VertexerModule::terminate()
 {
+
   delete m_gfRaveVertexFactoryPtr;
 }

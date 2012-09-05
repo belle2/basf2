@@ -41,15 +41,12 @@
 //genfit stuff
 #include <GFTrack.h>
 #include <GFTrackCand.h>
-//#include <GFKalman2.h>
 #include <GFRecoHitProducer.h>
 #include <GFRecoHitFactory.h>
 #include <GFAbsTrackRep.h>
 #include <RKTrackRep.h>
 #include <GFConstField.h>
 #include <GFFieldManager.h>
-#include <GFRecoHitProducer.h>
-#include <GFRecoHitFactory.h>
 #include <GFMaterialEffects.h>
 #include <GFDetPlane.h>
 #include <GFTools.h>
@@ -79,7 +76,7 @@ GenFitter2Module::GenFitter2Module() :
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("useDaf", m_useDaf, "use the DAF instead of the std. Kalman filter", false);
   addParam("blowUpFactor", m_blowUpFactor, "factor multiplied with the cov of the Kalman filter when backward filter starts", 500.0);
-  addParam("only6", m_filter, "throw away tracks with do not have exactly 1 hit in every Si layer (so 6 hits altogether)", false);
+  addParam("only6", m_filter, "throw away tracks which do not have exactly 1 hit in every Si layer (so 6 hits altogether)", false);
   addParam("filterIterations", m_nGFIter, "number of Genfit iterations", 1);
   addParam("probCut", m_probCut, "Probability cut for the DAF (0.001, 0.005, 0.01)", 0.001);
   addParam("energyLossBetheBloch", m_energyLossBetheBloch, "activate the material effect: EnergyLossBetheBloch", true);
@@ -146,6 +143,8 @@ void GenFitter2Module::initialize()
     m_hitTypeId = 1;
   } else if (m_hitType == "Cluster") {
     m_hitTypeId = 2;
+  } else {
+    B2FATAL("Hit type unknown to GenFitter2. The only options are: \"TrueHit\", \"VXDSimpleDigiHit\" or \"Cluster\" but you set \"" << m_hitType << "\"");
   }
 
   // Create new Translators and give them to the CDCRecoHits.
@@ -292,8 +291,6 @@ void GenFitter2Module::event()
 
     if (filterTrack == false) { // fit the track
 
-
-
       //get fit starting values from the MCParticle
       TVector3 vertex = aTrackCandPointer->getPosSeed();
       TVector3 vertexSigma = aTrackCandPointer->getPosError();
@@ -316,7 +313,6 @@ void GenFitter2Module::event()
 
       GFRecoHitFactory factory;
 
-
       GFRecoHitProducer <PXDTrueHit, PXDRecoHit> * PXDProducer;
       GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> * SVDProducer;
       GFRecoHitProducer <CDCHit, CDCRecoHit> * CDCProducer;
@@ -326,7 +322,6 @@ void GenFitter2Module::event()
 
       GFRecoHitProducer <PXDCluster, PXDRecoHit> * pxdClusterProducer;
       GFRecoHitProducer <SVDCluster, SVDRecoHit> * svdClusterProducer;
-
       //create RecoHitProducers for PXD, SVD and CDC
       if (m_hitTypeId == 0) { // use the trueHits
         PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (&*pxdTrueHits);

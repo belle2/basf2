@@ -191,13 +191,13 @@ void GenFitterModule::event()
   //PXD clusters
   StoreArray<PXDCluster> pxdClusters("");
   int nPXDClusters = pxdClusters.getEntries();
-  B2DEBUG(149, "GenFitter2: Number of PXDClusters: " << nPXDClusters);
+  B2DEBUG(149, "GenFitter: Number of PXDClusters: " << nPXDClusters);
   if (nPXDClusters == 0) {B2DEBUG(100, "GenFitter2: PXDClustersCollection is empty!");}
 
   //SVD clusters
   StoreArray<SVDCluster> svdClusters("");
   int nSVDClusters = svdClusters.getEntries();
-  B2DEBUG(149, "GenFitter2: Number of SVDClusters: " << nSVDClusters);
+  B2DEBUG(149, "GenFitter: Number of SVDClusters: " << nSVDClusters);
   if (nSVDClusters == 0) {B2DEBUG(100, "GenFitter2: SVDClustersCollection is empty!");}
 
   if (m_filterId == 0) {

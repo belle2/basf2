@@ -87,9 +87,9 @@ VXDSimpleBackgroundModule::~VXDSimpleBackgroundModule()
 void VXDSimpleBackgroundModule::initialize()
 {
   //output containers
-  StoreArray<VXDSimpleDigiHit> pxdSimpleDigiHits("pxdSimpleDigiHits");
-  StoreArray<VXDSimpleDigiHit> svdSimpleDigiHits("svdSimpleDigiHits");
-  StoreArray<GFTrackCand> trackCandidates("");
+  StoreArray<VXDSimpleDigiHit>::registerPersistent("pxdSimpleDigiHits");
+  StoreArray<VXDSimpleDigiHit>::registerPersistent("svdSimpleDigiHits");
+  StoreArray<GFTrackCand>::registerPersistent();
   m_notPerfectCounter = 0;
 }
 
@@ -123,15 +123,19 @@ void VXDSimpleBackgroundModule::event()
   //SVD
   StoreArray<SVDTrueHit> svdTrueHits("");
   int nSvdTrueHits = svdTrueHits.getEntries();
-  B2DEBUG(100, "SiSimpleBackgroundModule: Number of SVDDHits: " << nSvdTrueHits);
+  B2DEBUG(100, "VXDSimpleBackgroundModule: Number of SVDDHits: " << nSvdTrueHits);
   if (nSvdTrueHits == 0) {B2DEBUG(100, "MCTrackFinder: SVDHitsCollection is empty!");}
 
 
 
   //output containers
   StoreArray<VXDSimpleDigiHit> pxdSimpleDigiHits("pxdSimpleDigiHits");
+  pxdSimpleDigiHits.create();
   StoreArray<VXDSimpleDigiHit> svdSimpleDigiHits("svdSimpleDigiHits");
+  svdSimpleDigiHits.create();
   StoreArray<GFTrackCand> trackCandidates("");
+  trackCandidates.create();
+
   MCParticle* aMcParticle = mcParticles[0];
 
   // if option is set ignore every track that does not have exactly 1 hit in every Si layer

@@ -61,7 +61,7 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   addParam("UseSVDHits", m_useSVDHits, "Set true if SVDHits or SVDClusters should be used", bool(true));
   addParam("UseCDCHits", m_useCDCHits, "Set true if CDCHits should be used", bool(true));
 
-  addParam("MinimalHitNumber", m_numberOfHits, "Set the smallest number of hits a track must have to create a track candidate", 3);
+  addParam("MinimalNDF", m_minimalNdf, "Set the smallest number of degrees of freedom all (NDF) the hits in one track have to accumulate to allow creation of a track candidate", 3);
 
   //choose for which particles a track candidate should be created
   //this is just an attempt to find out what is the most suitable way to select particles, if you have other/better ideas, communicate it to the tracking group...
@@ -89,8 +89,6 @@ void MCTrackFinderModule::initialize()
   StoreArray<GFTrackCand>::registerPersistent(m_gfTrackCandsColName);
   RelationArray::registerPersistent<GFTrackCand, MCParticle>(m_gfTrackCandsColName, "");
 
-
-
   m_particleProperties = 0;
   const int nProperties = m_whichParticles.size();
   for (int i = 0; i not_eq nProperties; ++i) {
@@ -106,7 +104,6 @@ void MCTrackFinderModule::initialize()
       B2FATAL("Invalid values were given to the MCTrackFinder parameter WhichParticles");
     }
   }
-
 
 }
 
@@ -215,7 +212,7 @@ void MCTrackFinderModule::event()
     }
     // check all properties that the mcparticle should have in one line.
     if ((mcParticleProperties bitand m_particleProperties) != m_particleProperties) {
-      B2DEBUG(100, "PDG: " << aMcParticlePtr->getPDG() <<  " actual properties " <<  mcParticleProperties << " demanded properties " << m_particleProperties);
+      B2DEBUG(100, "PDG: " << aMcParticlePtr->getPDG() <<  " | property mask of particle " <<  mcParticleProperties << " demanded property mask " << m_particleProperties);
       continue; //goto next mcParticle, do not make track candidate
     }
     //make links only for interesting MCParticles: energy cut, which subdetector was reached and a 'dirty hack' to avoid atoms which are unknown to GenFit and check for neutrals
@@ -225,6 +222,7 @@ void MCTrackFinderModule::event()
 
     B2DEBUG(100, "Search a  track for the MCParticle with index: " << iPart << " (PDG: " << aMcParticlePtr->getPDG() << ")");
 
+    int ndf = 0; // cout the ndf of one track candidate
     // create a list containing the indices to the PXDHits that belong to one track
     vector<int> pxdHitsIndices;
     if (m_useClusters == false) {
@@ -232,6 +230,7 @@ void MCTrackFinderModule::event()
         if (mcPartToPXDTrueHits[i].getFromIndex() == unsigned(iPart)) {
           for (unsigned int j = 0; j < mcPartToPXDTrueHits[i].getToIndices().size(); j++) {
             pxdHitsIndices.push_back(mcPartToPXDTrueHits[i].getToIndex(j));
+            ndf += 2;
           }
         }
       }
@@ -240,6 +239,7 @@ void MCTrackFinderModule::event()
         for (unsigned int j = 0; j < pxdClusterToMCParticle[i].getToIndices().size(); j++) {
           if (pxdClusterToMCParticle[i].getToIndex(j) == unsigned(iPart)) {
             pxdHitsIndices.push_back(pxdClusterToMCParticle[i].getFromIndex());
+            ndf += 2;
           }
         }
       }
@@ -252,6 +252,7 @@ void MCTrackFinderModule::event()
         if (mcPartToSVDTrueHits[i].getFromIndex() == unsigned(iPart)) {
           for (unsigned int j = 0; j < mcPartToSVDTrueHits[i].getToIndices().size(); j++) {
             svdHitsIndices.push_back(mcPartToSVDTrueHits[i].getToIndex(j));
+            ndf += 2;
           }
         }
       }
@@ -260,6 +261,7 @@ void MCTrackFinderModule::event()
         for (unsigned int j = 0; j < svdClusterToMCParticle[i].getToIndices().size(); j++) {
           if (svdClusterToMCParticle[i].getToIndex(j) == unsigned(iPart)) {
             svdHitsIndices.push_back(svdClusterToMCParticle[i].getFromIndex());
+            ndf += 1;
           }
         }
       }
@@ -271,11 +273,12 @@ void MCTrackFinderModule::event()
       if (mcPartToCDCHits[i].getFromIndex() == unsigned(iPart)) {
         for (unsigned int j = 0; j < mcPartToCDCHits[i].getToIndices().size(); j++) {
           cdcHitsIndices.push_back(mcPartToCDCHits[i].getToIndex(j));
+          ndf += 1;
         }
       }
     }
 
-    if (pxdHitsIndices.size() + svdHitsIndices.size() + cdcHitsIndices.size() < unsigned(m_numberOfHits)) {
+    if (ndf <= 5) {
       ++m_notEnoughtHitsCounter;
       continue; //goto next mcParticle, do not make track candidate
     }
@@ -418,6 +421,7 @@ void MCTrackFinderModule::event()
         for (int j = 0; j != nCdcSimHitToHitRel; ++j) {
           if (unsigned(hitID) == cdcSimHitToHitRel[j].getToIndex(0)) {
             time = cdcSimHits[cdcSimHitToHitRel[j].getFromIndex()]->getFlightTime();
+            break;
           }
         }
         trackCandidates[counter]->addHit(2, hitID, time, uniqueId);
@@ -436,7 +440,7 @@ void MCTrackFinderModule::event()
 void MCTrackFinderModule::endRun()
 {
   if (m_notEnoughtHitsCounter != 0) {
-    B2WARNING(m_notEnoughtHitsCounter << " tracks less than " << m_numberOfHits << " hits. No Track Candidates were created from them so they will not be passed to the track fitter");
+    B2WARNING(m_notEnoughtHitsCounter << " tracks had not enough hit to have at least " << m_minimalNdf << " number of degrees of freedom (NDF). No Track Candidates were created from them so they will not be passed to the track fitter");
   }
   if (m_noTrueHitCounter != 0) {
     B2WARNING(m_noTrueHitCounter << " cluster hits did not have a relation to a true hit and were therefore not included in a track candidate");

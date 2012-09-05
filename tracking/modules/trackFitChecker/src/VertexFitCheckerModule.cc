@@ -227,7 +227,7 @@ void VertexFitCheckerModule::event()
     fillInt("vertexFitStatus", 0); //status 0 means all tracks rave associated with one vertex are really belong to that vertex
     const TVector3 vertexPos = aGFRaveVertexPtr->getPos();
     const TMatrixD vertexCov = aGFRaveVertexPtr->getCov();
-    cout << "fitted vertex pos, cov" << endl;
+    //cout << "fitted vertex pos, cov" << endl;
 //    vertexPos.Print();
 //    vertexCov.Print();
     vector<double> resPos(3);

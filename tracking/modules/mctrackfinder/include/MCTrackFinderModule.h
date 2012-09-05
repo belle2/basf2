@@ -90,7 +90,7 @@ namespace Belle2 {
     int m_noTrueHitCounter;                                     /**< will hold number of cluster hits that do not have a corresponding true hit*/
 
     std::string m_gfTrackCandsColName;                          /**< TrackCandidates collection name */
-    int m_numberOfHits;                                         /**< Minimum number of hits per track to allow track candidate creation*/
+    int m_minimalNdf;                                         /**< Minimum number of hits per track to allow track candidate creation*/
   };
 }
 

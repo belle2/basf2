@@ -2,7 +2,7 @@
 
 from basf2 import *
 
-# suppress messages and warnings during processing:
+#...suppress messages and warnings during processing...
 set_log_level(LogLevel.ERROR)
 set_random_seed(0)
 
@@ -36,7 +36,7 @@ paramloader = register_module('Gearbox')
 geobuilder = register_module('Geometry')
 #geobuilder.log_level = LogLevel.INFO
 g4sim       = register_module('FullSim')
-cdcdigitizer = register_module('CDCDigitizer')
+cdcdigitizer = register_module('CDCDigi')
 out         = register_module('SimpleOutput')
 cdctrg      = fw.register_module("TRGCDC")
 #mcparticle  = fw.register_module('PrintMCParticles')

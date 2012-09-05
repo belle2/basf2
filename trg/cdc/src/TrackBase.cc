@@ -164,4 +164,46 @@ TRGCDCTrackBase::relation(void) const {
     return TCRelation(* this, relations);
 }
 
+const TRGCDCRelation
+TRGCDCTrackBase::relation3D(void) const {
+
+    TRGDebug::enterStage("MCInfo");
+
+    map<unsigned, unsigned> relations;
+    for (unsigned i = 0; i < _tsAll.size(); i++) {
+  
+  // Ignore axial layers
+  if(i%2==0) continue;
+
+	const TCCell & cell = * _tsAll[i]->cell();
+	const TCCHit & hit = * cell.hit();
+	const unsigned iMCParticle = hit.iMCParticle();
+	
+	map<unsigned, unsigned>::iterator it = relations.find(iMCParticle);
+	if (it != relations.end())
+	    ++it->second;
+	else
+	    relations[iMCParticle] = 1;
+
+	if (TRGDebug::level()) {
+	    cout << TRGDebug::tab() << cell.name() << ",MCParticle="
+		 << iMCParticle << endl;
+	}
+    }
+
+    if (TRGDebug::level()) {
+	map<unsigned, unsigned>::const_iterator it = relations.begin();
+	while (it != relations.end()) {
+	    cout << TRGDebug::tab()
+		 << it->first << ","
+		 << it->second << endl;
+	    ++it;
+	}
+    }
+
+    TRGDebug::leaveStage("MCInfo");
+
+    return TCRelation(* this, relations);
+}
+
 } // namespace Belle2

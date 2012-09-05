@@ -46,6 +46,7 @@ class TRGCDCSegmentHit;
 class TRGCDCFrontEnd;
 class TRGCDCMerger;
 class TRGCDCHoughFinder;
+class TRGCDCHough3DFinder;
 class TRGCDCFitter3D;
 class TRGCDCLUT;
 class TRGCDCTrack;
@@ -456,6 +457,9 @@ class TRGCDC {
     /// Hough finder.
     TRGCDCHoughFinder * _hFinder;
 
+    /// Hough 3D finder.
+    TRGCDCHough3DFinder * _h3DFinder;
+
     /// 3D fitter.
     TRGCDCFitter3D * _fitter3D;
 
@@ -640,6 +644,14 @@ std::vector<const TRGCDCSegmentHit *>
 TRGCDC::segmentHits(void) const {
     std::vector<const TRGCDCSegmentHit *> t;
     t.assign(_segmentHits.begin(), _segmentHits.end());
+    return t;
+}
+
+inline
+std::vector<const TRGCDCSegmentHit *>
+TRGCDC::segmentHits(unsigned a) const {
+    std::vector<const TRGCDCSegmentHit *> t;
+    t.assign(_segmentHitsSL[a].begin(), _segmentHitsSL[a].end());
     return t;
 }
 

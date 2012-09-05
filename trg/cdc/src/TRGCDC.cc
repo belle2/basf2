@@ -40,6 +40,7 @@
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/HoughFinder.h"
+#include "trg/cdc/Hough3DFinder.h"
 #include "trg/cdc/Fitter3D.h"
 #include "trg/cdc/Link.h"
 #include "trg/cdc/Relation.h"
@@ -150,6 +151,7 @@ namespace Belle2 {
       _clockFE("CDCFETrigge system clock", Belle2_GDL::GDLSystemClock, 8),
       _offset(5.3),
       _hFinder(0),
+      _h3DFinder(0),
       _fitter3D(0),
       _eventTime(0)
   {
@@ -426,6 +428,8 @@ namespace Belle2 {
                              houghFinderMeshY);
     _hFinder->perfect(houghFinderPerfect);
 
+    _h3DFinder = new TCH3DFinder(*this);
+
     //...event Time...
     TCEventTime* test = new TCEventTime(*this);
     _eventTime.push_back(test);
@@ -465,6 +469,7 @@ namespace Belle2 {
   TRGCDC::terminate(void)
   {
     _fitter3D->terminate();
+    _h3DFinder->terminate();
     m_file->Write();
     m_file->Close();
   }
@@ -1217,6 +1222,8 @@ namespace Belle2 {
 
     if (_hFinder)
       delete _hFinder;
+    if (_h3DFinder)
+      delete _h3DFinder;
     if (_fitter3D)
       delete _fitter3D;
 
@@ -1339,7 +1346,8 @@ namespace Belle2 {
     }
 
     //...Stereo finder...
-    perfect3DFinder(trackList);
+    _h3DFinder->doit(trackList);
+    //perfect3DFinder(trackList);
 
     //...Check tracks...
     if (TRGDebug::level()) {
@@ -1427,7 +1435,7 @@ namespace Belle2 {
       const TCTrack& aTrack = *trackList3D[i];
       if (aTrack.fitted()) {
         double fitPt = aTrack.pt();
-        double fitPhi0; //= aTrack.helix().phi0();
+        double fitPhi0; 
         if (aTrack.charge() > 0) fitPhi0 = aTrack.p().phi() - M_PI / 2;
         if (aTrack.charge() < 0) fitPhi0 = aTrack.p().phi() + M_PI / 2;
         double fitZ0 = aTrack.helix().dz();
@@ -1442,6 +1450,8 @@ namespace Belle2 {
 
         const TCRelation& trackRelation = aTrack.relation();
         const MCParticle& trackMCParticle = trackRelation.mcParticle(0);
+// iw:not used        const TCRelation& trackRelation3D = aTrack.relation3D();
+
         double mcPt = trackMCParticle.getMomentum().Pt();
         double mcPhi0;
         if (trackMCParticle.getCharge() > 0) mcPhi0 = trackMCParticle.getMomentum().Phi() - M_PI / 2;
@@ -1464,6 +1474,7 @@ namespace Belle2 {
     // mcStatus[0]: statusbit, mcStatus[1]: pdg, mcStatus[2]: charge
     TVectorD mcStatus(3);
     int iStoredPart = 0;
+    /*
     for (signed i = 0; i < mcParticles.getEntries(); i++) {
       if ((mcParticles[i]->hasStatus(2) || mcParticles[i]->hasStatus(64)) && mcParticles[i]->getCharge() != 0) {
         mcStatus[0] = mcParticles[i]->getStatus();
@@ -1476,6 +1487,58 @@ namespace Belle2 {
         iStoredPart += 1;
       }
     }
+    */
+    // Store trackIDs that make a TS in the superlayer.
+    vector<vector<unsigned > > trackIDsLayer;
+    // Loop over all layers
+    for(unsigned iLayers=0; iLayers<nSegmentLayers(); iLayers++){
+      trackIDsLayer.push_back(vector<unsigned>());
+      // Loop over all TS in superlayer.
+      vector<const TCSHit *> const & hits = segmentHits(iLayers);
+      for(unsigned j=0; j<hits.size(); j++) {
+        const TCWHit* wh = hits[j]->segment().center().hit();
+        if(! wh) continue;
+        const unsigned trackID = wh->iMCParticle();
+        //cout<<"Found trackID "<<trackID<<" in Layer["<<iLayers<<"]? "<<binary_search(trackIDsLayer[iLayers].begin(), trackIDsLayer[iLayers].end(), trackID)<<endl;
+        if(! binary_search(trackIDsLayer[iLayers].begin(), trackIDsLayer[iLayers].end(), trackID)){
+          trackIDsLayer[iLayers].push_back(trackID);
+          //cout<<"Layer: "<<iLayers<<" trackID: "<<trackID<<endl;
+        }
+        // For comparing
+        sort(trackIDsLayer[iLayers].begin(),trackIDsLayer[iLayers].end());
+      } // End of loop over all TS in superlayer
+    } // End of loop over all layers
+    // Find common trackIDs.
+    vector<unsigned > trackIDs;
+
+    // Loop over last layer candidates
+    for(unsigned iTS=0; iTS<trackIDsLayer[nSegmentLayers()-1].size(); iTS++){
+      unsigned tempID = trackIDsLayer[nSegmentLayers()-1][iTS];
+      bool trackOK = 1;
+      // Loop over rest of the layers to compare
+      for(unsigned iLayers=0; iLayers<nSegmentLayers()-1; iLayers++){
+        //cout<<"Find "<<tempID<<" in Layer["<<iLayers<<"]: "<<binary_search(trackIDsLayer[iLayers].begin(), trackIDsLayer[iLayers].end(), tempID)<<endl;
+        if(! binary_search(trackIDsLayer[iLayers].begin(), trackIDsLayer[iLayers].end(), tempID)){
+         trackOK *= 0; 
+        }
+      } // End of loop over rest of layers
+      if(trackOK==1) {
+        trackIDs.push_back(tempID);
+        //cout<<"trackID OK: "<<tempID<<endl;
+      }
+    } // End of loop over last layer candidates
+    // Loop over all the found mc tracks.
+    for(unsigned i = 0; i < trackIDs.size(); i++) {
+      mcStatus[0] = mcParticles[trackIDs[i]]->getStatus();
+      mcStatus[1] = mcParticles[trackIDs[i]]->getPDG();
+      mcStatus[2] = mcParticles[trackIDs[i]]->getCharge();
+      new(mcTrackStatus[iStoredPart]) TVectorD(mcStatus);
+      new(mcTrack4Vector[iStoredPart]) TLorentzVector(mcParticles[trackIDs[i]]->get4Vector());
+      new(mcTrackVertexVector[iStoredPart]) TVector3(mcParticles[trackIDs[i]]->getVertex());
+      //cout<<"Status: "<<mcParticles[trackIDs[i]]->getStatus()<<" PDG: "<<mcParticles[trackIDs[i]]->getPDG()<<" Charge: "<<mcParticles[trackIDs[i]]->getCharge()<<" pT: "<<mcParticles[trackIDs[i]]->get4Vector().Pt()<<endl;
+      iStoredPart += 1;
+    }
+
     //cout<<"Num Tracks: "<<iStoredPart<<endl;
 
     if (iFit != 0) {
@@ -1673,9 +1736,9 @@ namespace Belle2 {
             }
           }
         }
-        trk->append(new TCLink(0,
-                               best,
-                               best->cell().xyPosition()));
+        //trk->append(new TCLink(0,
+        //                       best,
+        //                       best->cell().xyPosition()));
       }
 
       if (TRGDebug::level())

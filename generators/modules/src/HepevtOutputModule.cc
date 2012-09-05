@@ -1,6 +1,6 @@
 /**************************************************************************
  * Belle II detector background library                                   *
- * Copyright(C) 2011  Belle II Collaboration                              *
+ * Copyright(C) 2011-2012  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll                                             *
@@ -40,6 +40,7 @@ HepevtOutputModule::HepevtOutputModule() : Module()
   addParam("OutputFilename", m_filename, "The filename of the output file");
   addParam("MirrorPz", m_mirrorPz, "If the directions of HER and LER are switched, mirror Pz.", false);
   addParam("StoreVirtualParticles", m_storeVirtualParticles, "Store also virtual particles in the HEPEvt file.", false);
+  addParam("FullFormat", m_fullFormat, "Write the full HepEvt format to file. Set it to false for a compact format.", true);
 }
 
 
@@ -73,7 +74,17 @@ void HepevtOutputModule::event()
 
     TVector3 mom = mcPart.getMomentum();
     if (m_mirrorPz) mom.SetZ(-1.0 * mom.Z());
-    m_fileStream << format("%10.6f%10.6f%10.6f%10.6f%10.6f%6i\n") % mom.X() % mom.Y() % mom.Z() % mcPart.getEnergy() % mcPart.getMass() % mcPart.getPDG();
+
+    if (m_fullFormat) {
+      int motherIndex = 0;
+      if (mcPart.getMother() != NULL) motherIndex = mcPart.getMother()->getIndex();
+
+      m_fileStream << format("  1%6i%6i%6i%6i%6i") % mcPart.getPDG() % motherIndex % motherIndex % mcPart.getFirstDaughter() % mcPart.getLastDaughter();
+      m_fileStream << format("%10.6f%10.6f%10.6f%10.6f%10.6f") % mom.X() % mom.Y() % mom.Z() % mcPart.getEnergy() % mcPart.getMass();
+      m_fileStream << format("%10.6f%10.6f%10.6f%10.6f\n") % mcPart.getVertex().X() % mcPart.getVertex().Y() % mcPart.getVertex().Z() % mcPart.getProductionTime();
+    } else {
+      m_fileStream << format("%10.6f%10.6f%10.6f%10.6f%10.6f%6i\n") % mom.X() % mom.Y() % mom.Z() % mcPart.getEnergy() % mcPart.getMass() % mcPart.getPDG();
+    }
   }
 }
 

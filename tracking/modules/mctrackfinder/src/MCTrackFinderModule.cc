@@ -61,7 +61,7 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   addParam("UseSVDHits", m_useSVDHits, "Set true if SVDHits or SVDClusters should be used", bool(true));
   addParam("UseCDCHits", m_useCDCHits, "Set true if CDCHits should be used", bool(true));
 
-  addParam("MinimalNDF", m_minimalNdf, "Set the smallest number of degrees of freedom all (NDF) the hits in one track have to accumulate to allow creation of a track candidate", 3);
+  addParam("MinimalNDF", m_minimalNdf, "Set the smallest number of degrees of freedom all (NDF) the hits in one track have to accumulate to allow creation of a track candidate", 5);
 
   //choose for which particles a track candidate should be created
   //this is just an attempt to find out what is the most suitable way to select particles, if you have other/better ideas, communicate it to the tracking group...
@@ -278,7 +278,7 @@ void MCTrackFinderModule::event()
       }
     }
 
-    if (ndf <= 5) {
+    if (ndf <= m_minimalNdf) {
       ++m_notEnoughtHitsCounter;
       continue; //goto next mcParticle, do not make track candidate
     }

@@ -123,13 +123,13 @@ namespace Belle2 {
     };
 
     /** Very often the mass of charged stable Particles is needed. */
-    static float chargedStableMass(const EChargedStable chargedStable = c_Pion);
+    static float chargedStableMass(EChargedStable chargedStable);
 
 
 
     //SuperKEKB and Belle II constants
-    static const double crossingAngleLER; /**< The crossing angle of the LER. */
-    static const double crossingAngleHER; /**< The crossing angle of the LER. */
+    static const double crossingAngleLER; /**< The crossing angle of the LER (between LER beam and solenoid axis). */
+    static const double crossingAngleHER; /**< The crossing angle of the HER (between HER beam and solenoid axis). */
 
 
     /**

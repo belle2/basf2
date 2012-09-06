@@ -109,7 +109,7 @@ namespace Belle2 {
   const double Unit::crossingAngleHER = 0.0415 * Unit::rad;
 
 //ChargedStable handling
-  float Unit::chargedStableMass(const EChargedStable chargedStable)
+  float Unit::chargedStableMass(EChargedStable chargedStable)
   {
     switch (chargedStable) {
       case (c_Pion):

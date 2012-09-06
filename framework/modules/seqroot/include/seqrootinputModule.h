@@ -11,9 +11,23 @@
 
 #include <framework/core/Module.h>
 #include <framework/core/Framework.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
+#include <framework/core/Environment.h>
+#include <framework/pcore/DataStoreStreamer.h>
 #include <framework/pcore/SeqFile.h>
+
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+
+#include <TSystem.h>
+
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+
 
 #include <boost/shared_ptr.hpp>
 #include <string>
@@ -21,7 +35,6 @@
 
 #include <sys/time.h>
 
-#include <framework/datastore/DataStore.h>
 
 #define MAXEVTSIZE 400000000*4
 
@@ -62,7 +75,6 @@ namespace Belle2 {
     //! Compression level
     int m_compressionLevel;
 
-
     //! Blocked file handler
     SeqFile* m_file;
     int m_fd;
@@ -70,11 +82,8 @@ namespace Belle2 {
     //! Total nr. of events in the file
     int m_nevt;
 
-
-    bool m_firstevent;
-
-    //! Messaage handler
-    MsgHandler* m_msghandler;
+    //! DataStoreStreamer
+    DataStoreStreamer* m_streamer;
 
     //! Time
     struct timeval m_t0;
@@ -83,6 +92,10 @@ namespace Belle2 {
     //! Data flow
     double m_size;
     double m_size2;
+
+    //! Obsolete
+    MsgHandler* m_msghandler;
+    bool m_firstevent;
 
   };
 } // end namespace Belle2

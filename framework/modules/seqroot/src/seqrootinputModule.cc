@@ -4,20 +4,10 @@
 //
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 13 - Aug - 2010
+//         6 - Sep - 2012     modified to use DataStoreStreamer, clean up
 //-
 
 #include <framework/modules/seqroot/seqrootinputModule.h>
-#include <framework/core/Environment.h>
-
-#include <TSystem.h>
-
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -34,11 +24,10 @@ REG_MODULE(SeqRootInput)
 SeqRootInputModule::SeqRootInputModule() : Module()
 {
   //Set module properties
-  setDescription("SeqROOT output module");
+  setDescription("SeqROOT input module");
   setPropertyFlags(c_Input | c_InitializeInProcess);
 
   m_file = 0;
-  m_msghandler = 0;
   m_nevt = -1;
 
   //Parameter definition
@@ -51,25 +40,35 @@ SeqRootInputModule::SeqRootInputModule() : Module()
 
 SeqRootInputModule::~SeqRootInputModule()
 {
-  delete m_msghandler;
-  delete m_file;
 }
 
 void SeqRootInputModule::initialize()
 {
   gSystem->Load("libdataobjects");
 
+  // Initialize DataStoreStreamer
+  m_streamer = new DataStoreStreamer(m_compressionLevel);
+
+
+  // Read the first event in SeqRoot file and restore in DataStore.
+  // This is necessary to create object tables before TTree initialization
+  // if used together with SimpleOutput.
+  char* evtbuf = new char[MAXEVTSIZE];
+  EvtMessage* evtmsg = NULL;
   // Open input file
   m_file = new SeqFile(m_inputFileName.c_str(), "r");
-  //  m_fd = open ( m_inputFileName.c_str(), O_RDONLY );
+  if (m_file->status() <= 0)
+    B2FATAL("SeqRootInput : Error in opening input file : " << m_inputFileName);
+  // Read first event
+  int size = m_file->read(evtbuf, MAXEVTSIZE);
+  if (size > 0) {
+    evtmsg = new EvtMessage(evtbuf);
+    m_streamer->restoreDataStore(evtmsg);
+  } else
+    B2FATAL("SeqRootInput : Error in reading first event")
 
-  // Message handler to encode serialized object
-  m_msghandler = new MsgHandler(m_compressionLevel);
-
-  //load first entry to register arrays
-  m_firstevent = false;
-  event();
-  m_firstevent = true;
+    delete evtmsg;
+  delete[] evtbuf;
 
   B2INFO("SeqRootInput: initialized.");
 }
@@ -87,11 +86,9 @@ void SeqRootInputModule::beginRun()
 
 void SeqRootInputModule::event()
 {
-  if (m_firstevent) {
-    m_firstevent = false;
-    return;
-  }
-  m_msghandler->clear();
+  m_nevt++;
+  // First event is already loaded
+  if (m_nevt == 0) return;
 
   // Get a SeqRoot record from the file
   char* evtbuf = new char[MAXEVTSIZE];
@@ -111,61 +108,13 @@ void SeqRootInputModule::event()
   double dsize = (double)size / 1000.0;
   m_size += dsize;
   m_size2 += dsize * dsize;
-  m_nevt++;
-
-  // Get number of objects
-  DataStore::EDurability durability = (DataStore::EDurability)(evtmsg->header())->reserved[0];
-  int nobjs = (evtmsg->header())->reserved[1];
-  int narrays = (evtmsg->header())->reserved[2];
-
-  //  printf ( "nobjs = %d, narrays = %d\n", nobjs, narrays );
-  B2INFO("nobjs = " << nobjs << ", narrays = " << narrays);
-
-  // Decode message
-  vector<TObject*> objlist;
-  vector<string> namelist;
-  m_msghandler->decode_msg(evtmsg, objlist, namelist);
-
-  delete[] evtbuf;
-  delete evtmsg;
-
-  //  printf("size of objlist = %d\n", objlist.size());
 
   // Restore objects in DataStore
-  // 1. Objects
-  for (int i = 0; i < nobjs + narrays; i++) {
-    bool array = (dynamic_cast<TClonesArray*>(objlist.at(i)) != 0);
-    if (objlist.at(i) != NULL) {
-      const TClass* cl = objlist.at(i)->IsA();
-      if (array)
-        cl = static_cast<TClonesArray*>(objlist.at(i))->GetClass();
+  m_streamer->restoreDataStore(evtmsg);
 
-      if (m_nevt == 0) //we're called from initialize()
-        DataStore::Instance().createEntry(namelist.at(i), durability, cl, array, false, true);
-      DataStore::Instance().createObject(objlist.at(i), false,
-                                         namelist.at(i), durability,
-                                         cl, array);
-      B2DEBUG(100, "Store " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
-    } else {
-      B2INFO("Store " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " is NULL!");
-    }
-
-  }
-  //  B2INFO ( "Event received : " << m_nrecv++ )
-
-  /*
-  // Check objects in DataStore
-  // 1. Stored Objects
-  const DataStore::StoreObjMap& objmap = DataStore::Instance().getObjectMap(durability);
-  for (DataStore::StoreObjConstIter it = objmap.begin(); it != objmap.end(); ++it) {
-    printf("Check Object : %s\n", (it->first).c_str());
-  }
-  // 2. Stored Arrays
-  const DataStore::StoreArrayMap& arymap = DataStore::Instance().getArrayMap(durability);
-  for (DataStore::StoreObjConstIter it = arymap.begin(); it != arymap.end(); ++it) {
-    printf("Check Array : %s\n", (it->first).c_str());
-  }
-  */
+  // Delete buffers
+  delete[] evtbuf;
+  delete evtmsg;
 }
 
 void SeqRootInputModule::endRun()
@@ -196,6 +145,7 @@ void SeqRootInputModule::endRun()
 
 void SeqRootInputModule::terminate()
 {
+  delete m_streamer;
   //  delete m_file;
   B2INFO("SeqRootInput: terminate called")
 }

@@ -4,6 +4,7 @@
 //
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 13 - Aug - 2010
+//         6 - Sep - 2012,  Use of DataStoreStreamer, clean up
 //-
 
 #include <framework/modules/seqroot/seqrootoutputModule.h>
@@ -31,6 +32,7 @@ SeqRootOutputModule::SeqRootOutputModule() : Module()
   //  setPropertyFlags(c_Output | c_ParallelProcessingCertified);
   m_file = 0;
   m_msghandler = 0;
+  m_streamer = 0;
 
   //Parameter definition
   addParam("outputFileName"  , m_outputFileName, "SeqRoot file name.", string("SeqRootOutput.root"));
@@ -42,6 +44,11 @@ SeqRootOutputModule::SeqRootOutputModule() : Module()
 
 SeqRootOutputModule::~SeqRootOutputModule()
 {
+  /* moved to terminate()
+  delete m_file;
+  delete m_msghandler;
+  delete m_streamer;
+  */
 }
 
 void SeqRootOutputModule::initialize()
@@ -49,10 +56,12 @@ void SeqRootOutputModule::initialize()
 
   // Open output file
   m_file = new SeqFile(m_outputFileName.c_str(), "w");
-  //  m_fd = open ( m_outputFileName.c_str(), O_CREAT|O_WRONLY, 0644 );
 
   // Message handler to encode serialized object
   m_msghandler = new MsgHandler(m_compressionLevel);
+
+  // DataStoreStreamer
+  m_streamer = new DataStoreStreamer(m_compressionLevel);
 
   B2INFO("SeqRootOutput: initialized.");
 
@@ -76,40 +85,25 @@ void SeqRootOutputModule::beginRun()
 
 void SeqRootOutputModule::event()
 {
-  EvtMessage* msg = buildMessage(MSG_EVENT);
-  //  printf ( "SeqRootOutput : MsgSize = %d\n", msg->size() );
+  // Stream DataStore in EvtMessage
+  // - Choice of two methods
+  //    Default is to use DataStoreStreamer class
+  //    buildMessage function is still kept for further testing purpose
+  EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
+  //  EvtMessage* msg = buildMessage(MSG_EVENT);
 
   // Store EvtMessage
   int stat = m_file->write(msg->buffer());
   //  printf("SeqRootOuput : write = %d\n", stat);
 
-  //  int sizebuf = htonl(msg->size());
-  //  unsigned long sizebuf = (unsigned int)msg->size();
-  //  int is = write ( m_fd, &sizebuf, 4 );
-  //  is = write ( m_fd, msg->buffer(), msg->size() );
-  //  printf ( "written bytes = %d\n", is );
-
-  // Try to decode the buffer for debugging
-  /*
-  DataStore::Instance().clearMaps();
-  vector<TObject*> objlist;
-  vector<string> namelist;
-  m_msghandler->clear();
-  m_msghandler->decode_msg ( msg, objlist, namelist );
-  */
+  // Clean up EvtMessage
+  delete msg;
 
   // Statistics
   double dsize = (double)stat / 1000.0;
-  //  if ( dsize>100.0 && dsize < 800.0 ) {
   m_size += dsize;
   m_size2 += dsize * dsize;
   m_nevt++;
-  //    printf ( "dsize = %f, dsize*dsize = %f; m_size=%f, m_size2=%f\n",
-  //       dsize, dsize*dsize, m_size, m_size2 );
-  //  }
-
-
-  //  B2INFO ( "Event sent : " << m_nsent++ )
 }
 
 void SeqRootOutputModule::endRun()
@@ -143,8 +137,8 @@ void SeqRootOutputModule::endRun()
 void SeqRootOutputModule::terminate()
 {
   delete m_msghandler;
+  delete m_streamer;
   delete m_file;
-  //  close ( m_fd );
 
   B2INFO("terminate called")
 }

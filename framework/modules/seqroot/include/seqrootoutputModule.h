@@ -15,11 +15,13 @@
 #include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/SeqFile.h>
 
+#include <framework/pcore/DataStoreStreamer.h>
+
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
 
-#include <framework/datastore/DataStore.h>
+//#include <framework/datastore/DataStore.h>
 
 namespace Belle2 {
   /**
@@ -74,6 +76,9 @@ namespace Belle2 {
 
     //! Messaage handler
     MsgHandler* m_msghandler;
+
+    //! DataStoreStreamer
+    DataStoreStreamer* m_streamer;
 
     //! Time
     struct timeval m_t0;

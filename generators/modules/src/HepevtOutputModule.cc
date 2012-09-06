@@ -79,7 +79,7 @@ void HepevtOutputModule::event()
       int motherIndex = 0;
       if (mcPart.getMother() != NULL) motherIndex = mcPart.getMother()->getIndex();
 
-      m_fileStream << format("  1%6i%6i%6i%6i%6i") % mcPart.getPDG() % motherIndex % motherIndex % mcPart.getFirstDaughter() % mcPart.getLastDaughter();
+      m_fileStream << format("  1%10i%6i%6i%6i%6i") % mcPart.getPDG() % motherIndex % motherIndex % mcPart.getFirstDaughter() % mcPart.getLastDaughter();
       m_fileStream << format("%10.6f%10.6f%10.6f%10.6f%10.6f") % mom.X() % mom.Y() % mom.Z() % mcPart.getEnergy() % mcPart.getMass();
       m_fileStream << format("%10.6f%10.6f%10.6f%10.6f\n") % mcPart.getVertex().X() % mcPart.getVertex().Y() % mcPart.getVertex().Z() % mcPart.getProductionTime();
     } else {

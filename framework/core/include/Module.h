@@ -68,7 +68,8 @@ namespace Belle2 {
       c_ParallelProcessingCertified = 4,  /**< This module can be run in parallel processing mode safely (has to comply with certain standards). */
       c_RequiresGUISupport          = 8,  /**< This module requires the framework to have GUI support built-in. */
       c_HistogramManager            = 16, /**< This module is used to manage histograms accumulated by other modules */
-      c_InitializeInProcess         = 32  /**< initialize() function is called in same forked process event() is called in */
+      c_InitializeInProcess         = 32, /**< initialize() function is called in same forked process event() is called in */
+      c_InitializeInMain            = 64  /**< initialize() function is called in the main process */
     };
 
     /**

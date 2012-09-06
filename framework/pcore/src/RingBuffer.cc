@@ -377,6 +377,31 @@ int RingBuffer::remq(int* buf)
   return nw;
 }
 
+int RingBuffer::spyq(int* buf)
+{
+  sem_lock(m_semid);
+  if (m_bufinfo->nbuf <= 0) {
+    sem_unlock(m_semid);
+    return 0;
+  }
+  //  printf ( "remq : nbuf = %d\n", m_bufinfo->nbuf );
+  int* r_ptr = m_buftop + m_bufinfo->rptr;
+  int nw = *r_ptr;
+  //  printf ( "RingBuffer : nw = %d\n", nw );
+  if (nw <= 0) {
+    printf("RingBuffer::spyq : buffer size = %d, skipped\n", nw);
+    printf("RingBuffer::spyq : entries = %d\n", m_bufinfo->nbuf);
+    sem_unlock(m_semid);
+    return 0;
+  }
+  //  printf ( "remq : taking buf from %d(%d)\n", m_bufinfo->rptr, nw );
+  // Copy buffer without modifying management parameters.
+  memcpy(buf, r_ptr + 2, nw * 4);
+  // Exit
+  sem_unlock(m_semid);
+  return nw;
+}
+
 int RingBuffer::numq(void)
 {
   return m_bufinfo->nbuf;

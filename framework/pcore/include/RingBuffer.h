@@ -60,6 +60,8 @@ namespace Belle2 {
     int insq(int* buf, int size);
     /*! Pick up a buffer from the RingBuffer */
     int remq(int* buf);
+    /*! Prefetch a buffer from the RingBuffer w/o removing it*/
+    int spyq(int* buf);
     /*! Returns number of buffers in the RingBuffer */
     int numq(void);
     /*! Clear the RingBuffer */

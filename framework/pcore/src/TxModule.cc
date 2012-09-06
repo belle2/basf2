@@ -21,7 +21,7 @@ REG_MODULE(Tx)
 //                 Implementation
 //-----------------------------------------------------------------
 
-TxModule::TxModule() : Module(), m_msghandler(0)
+TxModule::TxModule() : Module(), m_msghandler(0), m_streamer(0)
 {
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
@@ -35,7 +35,7 @@ TxModule::TxModule() : Module(), m_msghandler(0)
   B2DEBUG(1, "Tx: Constructor done.");
 }
 
-TxModule::TxModule(RingBuffer* rbuf) : Module(), m_msghandler(0)
+TxModule::TxModule(RingBuffer* rbuf) : Module(), m_msghandler(0), m_streamer(0)
 {
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
@@ -56,12 +56,14 @@ TxModule::TxModule(RingBuffer* rbuf) : Module(), m_msghandler(0)
 
 TxModule::~TxModule()
 {
-  delete m_msghandler;
+  delete m_streamer;
+  //  delete m_msghandler;
 }
 
 void TxModule::initialize()
 {
-  m_msghandler = new MsgHandler(m_compressionLevel);
+  //  m_msghandler = new MsgHandler(m_compressionLevel);
+  m_streamer = new DataStoreStreamer(m_compressionLevel);
 
   B2INFO(getName() << " initialized.");
 }
@@ -75,48 +77,8 @@ void TxModule::beginRun()
 
 void TxModule::event()
 {
-  // Clear msghandler
-  m_msghandler->clear();
-
-  // Set durability
-  DataStore::EDurability durability = DataStore::c_Event;
-
-  // Stream objects in msg_handler
-  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
-  int nobjs = 0;
-  for (DataStore::StoreObjConstIter it = map.begin(); it != map.end(); ++it) {
-    //    if ( it->second != NULL ) {
-    if (it->second->isArray)
-      continue;
-    if (m_msghandler->add(it->second->ptr, it->first)) {
-      B2INFO("Tx: adding obj " << it->first);
-      nobjs++;
-    }
-    //    }
-  }
-  // Stream arrays in msg_handler
-  int narrays = 0;
-  for (DataStore::StoreObjConstIter it = map.begin(); it != map.end(); ++it) {
-    //    if ( it->second != NULL ) {
-    if (!it->second->isArray)
-      continue;
-    if (m_msghandler->add(it->second->ptr, it->first)) {
-      B2INFO("Tx: adding array " << it->first);
-      narrays++;
-    }
-    //    }
-  }
-
-  //  printf ( "Tx: nobjs = %d, narrays = %d (pid=%d)\n", nobjs, narrays, (int)getpid() );
-  B2INFO("Tx: nobjs = " << nobjs << ", narrays = " << narrays <<
-         " (pid=" << (int)getpid() << ")");
-
-  // Encode event message
-  EvtMessage* msg = m_msghandler->encode_msg(MSG_EVENT);
-
-  (msg->header())->reserved[0] = (int)durability;
-  (msg->header())->reserved[1] = nobjs;       // No. of objects
-  (msg->header())->reserved[2] = narrays;    // No. of arrays
+  // Stream DataStore in EvtMessage
+  EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
 
   // Put the message in ring buffer
   for (;;) {
@@ -124,13 +86,9 @@ void TxModule::event()
     if (stat >= 0) break;
     usleep(200);
   }
+  m_nsent++;
 
   B2INFO("Tx: objs sent in buffer. Size = " << msg->size());
-
-  // Try to decode the buffer for debugging
-  //  vector<TObject*> objlist;
-  //  vector<string> namelist;
-  //  m_msghandler->decode_msg ( msg, objlist, namelist );
 
   // Release EvtMessage buffer
   delete msg;

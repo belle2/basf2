@@ -26,7 +26,7 @@ REG_MODULE(Rx)
 //                 Implementation
 //-----------------------------------------------------------------
 
-RxModule::RxModule() : Module(), m_msghandler(0)
+RxModule::RxModule() : Module(), m_msghandler(0), m_streamer(0), m_nrecv(-1)
 {
   //Set module properties
   setDescription("Decode DataStore from RingBuffer");
@@ -39,7 +39,7 @@ RxModule::RxModule() : Module(), m_msghandler(0)
   B2DEBUG(1, "Rx: Constructor done.");
 }
 
-RxModule::RxModule(RingBuffer* rbuf) : Module(), m_msghandler(0)
+RxModule::RxModule(RingBuffer* rbuf) : Module(), m_msghandler(0), m_streamer(0), m_nrecv(-1)
 {
   //Set module properties
   setDescription("Decode DataStore from RingBuffer");
@@ -58,19 +58,40 @@ RxModule::RxModule(RingBuffer* rbuf) : Module(), m_msghandler(0)
 
 RxModule::~RxModule()
 {
-  delete m_msghandler;
+  //  delete m_streamer;
+  //  delete m_msghandler;
 }
 
 void RxModule::initialize()
 {
   gSystem->Load("libdataobjects");
-  m_msghandler = new MsgHandler(m_compressionLevel);
+  //  m_msghandler = new MsgHandler(m_compressionLevel);
+
+  // Initialize DataStoreStreamer
+  m_streamer = new DataStoreStreamer(m_compressionLevel);
 
 
-  B2INFO(getName() << " reading branches in initialize().");
-  m_numEvents = -1;
-  event();
-  B2INFO(getName() << " initialized.");
+  // Read the first event in RingBuffer and restore in DataStore.
+  // This is necessary to create object tables before TTree initialization
+  // if used together with SimpleOutput.
+
+  // Prefetch the first record in Ring Buffer
+  int size;
+  char* evtbuf = new char[MAXEVTSIZE];
+  while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
+    //    printf ( "Rx : evtbuf is not available yet....\n" );
+    usleep(100);
+  }
+
+  // Restore objects in DataStore
+  EvtMessage* evtmsg = new EvtMessage(evtbuf);
+  m_streamer->restoreDataStore(evtmsg);
+
+  // Delete buffers
+  delete evtmsg;
+  delete[] evtbuf;
+
+  m_nrecv = -1;
 }
 
 
@@ -82,28 +103,21 @@ void RxModule::beginRun()
 
 void RxModule::event()
 {
-  m_numEvents++;
-  if (m_numEvents == 1)
-    return; //first event read in initialize()
+  m_nrecv++;
+  // First event is already loaded in initialize()
+  if (m_nrecv == 0) return;
 
   // Get a record from ringbuf
   int size;
-
   char* evtbuf = new char[MAXEVTSIZE];
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
     //    printf ( "Rx : evtbuf is not available yet....\n" );
     usleep(100);
   }
-
   B2INFO("Rx: got an event from RingBuffer, size=" << size <<
          " (proc= " << (int)getpid() << ")");
-  //  printf ( "Rx: got an event from RingBuffer, size=%d (proc=%d)\n", size,
-  //     (int)getpid() );
-  //  fflush ( stdout );
 
-  // Build EvtMessage and decompose it
-  vector<TObject*> objlist;
-  vector<string> namelist;
+  // Restore EvtMessage
   EvtMessage* msg = new EvtMessage(evtbuf);    // Have EvtMessage by ptr cpy
   if (msg->type() == MSG_TERMINATE) {
     B2INFO("Rx: got termination message. Exitting....");
@@ -113,87 +127,17 @@ void RxModule::event()
     // Flag End Of File !!!!!
     //    return msg->type(); // EOF
   }
-  m_msghandler->decode_msg(msg, objlist, namelist);
 
-  // Get Object info
-  //  RECORD_TYPE type = msg->type();
-  // DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
-  int nobjs = (msg->header())->reserved[1];
-  int narrays = (msg->header())->reserved[2];
+  // Restore DataStore
+  m_streamer->restoreDataStore(msg);
 
-  B2INFO("Rx: nobjs = " << nobjs << ", narrays = " << narrays <<
-         "(pid=" << (int)getpid() << ")");
-
-  //  printf ( "Rx : nobjs = %d, narrays = %d, (size=%d)\n", nobjs, narrays,
-  //     objlist.size() );
-
+  // Remove buffers
   delete[] evtbuf;
-
-  //  printf ( "Rx : Restoring objects\n" );
-
-  // Restore objects in DataStore
-  for (int i = 0; i < nobjs; i++) {
-    if (objlist.at(i) != NULL) {
-      if (m_numEvents == 0) {
-        DataStore::Instance().createEntry(namelist.at(i), DataStore::c_Event,
-                                          objlist.at(i)->IsA(), false, false, true);
-      }
-      DataStore::Instance().createObject(objlist.at(i), false,
-                                         namelist.at(i), DataStore::c_Event,
-                                         objlist.at(i)->IsA(), false);
-      //    printf ( "Rx: Restoring [Object] %s : Class=%s\n",
-      //       namelist.at(i).c_str(), ((objlist.at(i))->ClassName()).c_str() );
-      B2INFO("Rx: restored obj " << namelist.at(i));
-    } else {
-      B2INFO("Rx: obj " << namelist.at(i) << " is Null. Omitted");
-    }
-  }
-  B2INFO("Rx: Objs restored");
-
-  //  DataStore::Instance().clearMaps();
-
-  // Restore arrays in DataStore
-  for (int i = 0; i < narrays; i++) {
-    //    printf ( "Rx : restoring index=%d\n", i+nobjs );
-    //TClonesArray* adrs = (TClonesArray*) objlist.at(i + nobjs);
-    //    printf ( "Rx: Address of %s = %8.8x (pid=%d)\n", (namelist.at(i+nobjs)).c_str(), adrs, (int)getpid() );
-    //    printf ( "Rx: Restoring [Array] %s\n", namelist.at(i+nobjs).c_str() );
-
-    //    fflush ( stdout );
-    if (objlist.at(i + nobjs) != NULL) {
-      if (m_numEvents == 0) {
-        DataStore::Instance().createEntry(namelist.at(i + nobjs), DataStore::c_Event,
-                                          static_cast<TClonesArray*>(objlist.at(i + nobjs))->GetClass(), true, false, true);
-      }
-      DataStore::Instance().createObject(objlist.at(i + nobjs), false,
-                                         namelist.at(i + nobjs), DataStore::c_Event,
-                                         ((TClonesArray*)objlist.at(i + nobjs))->GetClass(), true);
-      B2INFO("Rx: restored array " << namelist.at(i + nobjs));
-    } else {
-      B2INFO("Rx: array " << namelist.at(i + nobjs) << " is Null. Omitted");
-    }
-
-
-  }
-  B2INFO("Rx: DataStore Restored!!");
-  /*
-  // Debug dump
-  DataStore::StoreObjMap objmap = DataStore::Instance().getObjectMap(DataStore::c_Event);
-  TObject* obj = objmap["MCParticlesToPXDSimHits"];
-  printf ( "Rx: objmap size = %d, MCParticlesToPXDSimHits = %8.8x (pid=%d)\n", objmap.size(), obj, getpid() );
-  //    if ( obj == NULL ) {
-  for ( DataStore::StoreObjIter it=objmap.begin(); it!=objmap.end(); ++it ) {
-    //      TObject* obj = *it;
-    printf ( "objmap containts %s, adr=%8.8x\n", ((*it).first).c_str(), (*it).second );
-  }
-  */
-
-  //  printf ( "Rx : Objects restored\n" );
-
   delete msg;
 
+  B2INFO("Rx: DataStore Restored!!");
+
   return;
-  //  return type;
 }
 
 void RxModule::endRun()

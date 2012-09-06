@@ -15,12 +15,13 @@
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RbCtlMgr.h>
 #include <framework/pcore/SeqFile.h>
+#include <framework/pcore/DataStoreStreamer.h>
 
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
 
-#include <framework/datastore/DataStore.h>
+//#include <framework/datastore/DataStore.h>
 
 
 namespace Belle2 {
@@ -48,32 +49,18 @@ namespace Belle2 {
 
     // Data members
   private:
-    //! Names of TTrees
-    std::string m_treeNames[DataStore::c_NDurabilityTypes];
-    //! Names of all branches for given durability
-    std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
-
-    //! List of object names in TTree
-    std::vector<std::string> m_objnames[DataStore::c_NDurabilityTypes];
-    //! List of objects in TTree
-    std::vector<TObject*> m_objects[DataStore::c_NDurabilityTypes];
-
-    //! List of array names in TTree
-    std::vector<std::string> m_arraynames[DataStore::c_NDurabilityTypes];
-    //! List of arrays in TTree
-    std::vector<TClonesArray*> m_arrays[DataStore::c_NDurabilityTypes];
 
     //!Compression parameter
     int m_compressionLevel;
 
-
-    // Parallel processing parameters
-
     //! RingBuffer ID
     RingBuffer* m_rbuf;
 
-    //! Messaage handler
+    //! Messaage handler (obsolete)
     MsgHandler* m_msghandler;
+
+    //! DataStoreStreamer
+    DataStoreStreamer* m_streamer;
 
     //! Process contrl manager
     RbCtlMgr* m_rbctl;

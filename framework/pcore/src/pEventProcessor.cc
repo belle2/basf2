@@ -58,6 +58,9 @@ void pEventProcessor::process(PathPtr spath)
   processInitialize(initmodules);
   //  dump_modules ( "extracted : ", initmodules );
 
+  //modules initialized globally shouldn't interfere with paths
+  DataStore::Instance().reset(DataStore::c_Event);
+
   // 2. Analyze start path and split into parallel paths
   m_histoflag = false;
   analyze_path(spath);
@@ -382,7 +385,8 @@ ModulePtrList pEventProcessor::init_modules_in_main(const ModulePtrList& modlist
   for (listIter = modlist.begin(); listIter != modlist.end(); listIter++) {
     Module* module = listIter->get();
     ModulePtr ptr = *listIter;
-    if (!module->hasProperties(Module::c_InitializeInProcess))
+    //    if (!module->hasProperties(Module::c_InitializeInProcess))
+    if (module->hasProperties(Module::c_InitializeInMain))
       tmpModuleList.push_back(ptr);
   }
 
@@ -396,7 +400,8 @@ ModulePtrList pEventProcessor::init_modules_in_process(const ModulePtrList& modl
 
   for (listIter = modlist.begin(); listIter != modlist.end(); listIter++) {
     Module* module = listIter->get();
-    if (module->hasProperties(Module::c_InitializeInProcess))
+    //    if (module->hasProperties(Module::c_InitializeInProcess))
+    if (!module->hasProperties(Module::c_InitializeInMain))
       tmpModuleList.push_back(*listIter);
   }
 

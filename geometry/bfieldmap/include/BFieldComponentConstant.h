@@ -44,7 +44,7 @@ namespace Belle2 {
      * @param y The y component of the magnetic field vector.
      * @param z The z component of the magnetic field vector.
      */
-    void setMagneticFieldValues(double x, double y, double z);
+    void setMagneticFieldValues(double x, double y, double z, double r);
 
 
   protected:
@@ -52,6 +52,7 @@ namespace Belle2 {
   private:
 
     double m_magneticField[3]; /**< The values for the homogeneous magnetic field vector. */
+    double maxRadius4BField;
 
   };
 

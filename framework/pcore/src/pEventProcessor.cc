@@ -58,9 +58,6 @@ void pEventProcessor::process(PathPtr spath)
   processInitialize(initmodules);
   //  dump_modules ( "extracted : ", initmodules );
 
-  //modules initialized globally shouldn't interfere with paths
-  DataStore::Instance().reset(DataStore::c_Event);
-
   // 2. Analyze start path and split into parallel paths
   m_histoflag = false;
   analyze_path(spath);

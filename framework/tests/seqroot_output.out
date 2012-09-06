@@ -33,7 +33,6 @@ Description: particle gun to generate simple tracks
                             WWW : http://cern.ch/geant4
 *************************************************************
 
-[WARNING] DATASTORE BACKWARD COMPATIBILITY ISSUE: Instead of creating an array 'MCParticles' in your initialize() method, please use registerPersistent().
 G4PhysListFactory::GetReferencePhysList <QGSP_BERT>  EMoption= 0
 <<< Geant4 Physics List simulation engine: QGSP_BERT 3.4
 

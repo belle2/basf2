@@ -74,7 +74,7 @@ void EvtGenInputModule::initialize()
 
 
   //Initialize MCParticle collection
-  StoreArray<MCParticle> MCParticles;
+  StoreArray<MCParticle>::registerPersistent();
 
   B2INFO("finished initialising the EvtGen Input Module. ");
 

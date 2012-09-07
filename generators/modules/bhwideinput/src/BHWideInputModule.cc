@@ -15,8 +15,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/dataobjects/RunMetaData.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/utilities/RunMetaData.h>
 
 #include <TLorentzVector.h>
 
@@ -52,12 +52,10 @@ BHWideInputModule::~BHWideInputModule()
 
 void BHWideInputModule::initialize()
 {
-  StoreObjPtr<RunMetaData> runMetaDataPtr("RunMetaData", DataStore::c_Run);
-
   //Depending on the settings, use the Belle II or Belle boost
   if (m_boostMode == 1) {
-    m_generator.setBoost(getBoost(runMetaDataPtr->getEnergyHER(), runMetaDataPtr->getEnergyLER(),
-                                  runMetaDataPtr->getCrossingAngle(), runMetaDataPtr->getAngleLER()));
+    m_generator.setBoost(getBoost(RunMetaData::getEnergyHER(), RunMetaData::getEnergyLER(),
+                                  RunMetaData::getCrossingAngle(), RunMetaData::getAngleLER()));
   } else {
     if (m_boostMode == 2) {
 

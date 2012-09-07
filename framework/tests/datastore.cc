@@ -1,5 +1,5 @@
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/dataobjects/RunMetaData.h>
+#include <framework/dataobjects/ProfileInfo.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -21,7 +21,7 @@ namespace Belle2 {
       StoreArray<EventMetaData>::registerPersistent();
       StoreArray<EventMetaData>::registerPersistent("EventMetaDatas_2");
       StoreArray<EventMetaData>::registerPersistent("", DataStore::c_Run);
-      StoreArray<RunMetaData>::registerPersistent();
+      StoreArray<ProfileInfo>::registerPersistent();
       DataStore::Instance().setInitializeActive(false);
 
       StoreObjPtr<EventMetaData> evtPtr;
@@ -34,10 +34,10 @@ namespace Belle2 {
       evtDataDifferentName.create();
       StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Run);
       evtDataDifferentDurability.create();
-      StoreArray<RunMetaData> runData;
-      runData.create();
+      StoreArray<ProfileInfo> profileInfo;
+      profileInfo.create();
 
-      RunMetaData runmetadataobject(62.5, 62.5);
+      ProfileInfo profileInfoObject(128, 60.0);
       for (int i = 0; i < 10; ++i) {
         EventMetaData* newobj;
         newobj = evtData.appendNew();
@@ -46,8 +46,8 @@ namespace Belle2 {
         newobj->setEvent(20 + i);
         newobj = new(evtDataDifferentDurability.nextFreeAddress()) EventMetaData(30 + i);
 
-        //copy-construct RunMetaData objects
-        new(runData.nextFreeAddress()) RunMetaData(runmetadataobject);
+        //copy-construct ProfileInfo objects
+        new(profileInfo.nextFreeAddress()) ProfileInfo(profileInfoObject);
       }
     }
 
@@ -74,16 +74,16 @@ namespace Belle2 {
     EXPECT_TRUE(evtDataDifferentName);
     StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Run);
     EXPECT_TRUE(evtDataDifferentDurability);
-    StoreArray<RunMetaData> runData;
-    EXPECT_TRUE(runData);
+    StoreArray<ProfileInfo> profileInfo;
+    EXPECT_TRUE(profileInfo);
   }
 
   /** Test attaching with different types */
   TEST_F(DataStoreTest, TypeTest)
   {
     //attach with incompatible type
-    EXPECT_FATAL(StoreArray<RunMetaData> evtData("EventMetaDatas"));
-    EXPECT_FATAL(StoreObjPtr<RunMetaData> evtData2("EventMetaData"));
+    EXPECT_FATAL(StoreArray<ProfileInfo> evtData("EventMetaDatas"));
+    EXPECT_FATAL(StoreObjPtr<ProfileInfo> evtData2("EventMetaData"));
 
     //attaching objects to array and vice versa shouldn't work
     //neither should the store allow objects with same name/durability
@@ -115,11 +115,11 @@ namespace Belle2 {
     EXPECT_FALSE(evtData == evtDataDifferentDurability);
 
     //different type
-    StoreArray<RunMetaData> runData;
-    EXPECT_FALSE(runData == evtData);
-    EXPECT_TRUE(runData != evtData);
+    StoreArray<ProfileInfo> profileInfo;
+    EXPECT_FALSE(profileInfo == evtData);
+    EXPECT_TRUE(profileInfo != evtData);
     //note: EXPECT_NE/EQ do things I don't understand. this doesn't work:
-    //EXPECT_NE(runData, evtData);
+    //EXPECT_NE(profileInfo, evtData);
   }
 
   /** check read-only attaching for StoreObjPtrs */
@@ -149,18 +149,18 @@ namespace Belle2 {
     StoreArray<EventMetaData> evtData;
     StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
     StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Run);
-    StoreArray<RunMetaData> runData;
+    StoreArray<ProfileInfo> profileInfo;
     EXPECT_EQ(evtData.getEntries(), 10);
     EXPECT_EQ(evtDataDifferentName.getEntries(), 10);
     EXPECT_EQ(evtDataDifferentDurability.getEntries(), 10);
-    EXPECT_EQ(runData.getEntries(), 10);
+    EXPECT_EQ(profileInfo.getEntries(), 10);
     for (int i = 0; i < 10; ++i) {
       EXPECT_EQ((int)evtData[i]->getEvent(), 10 + i);
       EXPECT_EQ((int)evtDataDifferentName[i]->getEvent(), 20 + i);
       EXPECT_EQ((int)evtDataDifferentDurability[i]->getEvent(), 30 + i);
 
-      float energy = runData[i]->getEnergyLER() + runData[i]->getEnergyHER();
-      EXPECT_FLOAT_EQ(energy, 125.0);
+      EXPECT_EQ(profileInfo[i]->getMemory(), 128);
+      EXPECT_FLOAT_EQ(profileInfo[i]->getTimeInSec(), 60.0);
     }
   }
 
@@ -170,11 +170,11 @@ namespace Belle2 {
     StoreArray<EventMetaData> evtData;
     StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
     StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Run);
-    StoreArray<RunMetaData> runData;
+    StoreArray<ProfileInfo> profileInfo;
     EXPECT_EQ((int)evtData.getPtr()->GetEntries(), 10);
     EXPECT_EQ((int)evtDataDifferentName.getPtr()->GetEntries(), 10);
     EXPECT_EQ((int)evtDataDifferentDurability.getPtr()->GetEntries(), 10);
-    EXPECT_EQ((int)runData.getPtr()->GetEntries(), 10);
+    EXPECT_EQ((int)profileInfo.getPtr()->GetEntries(), 10);
   }
 
   /** check out-of-bounds behaviour for arrays */
@@ -221,10 +221,10 @@ namespace Belle2 {
     /* TODO: readd these later on?
     StoreArray<EventMetaData> evtData;
     StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
-    StoreArray<RunMetaData> runData;
+    StoreArray<ProfileInfo> profileInfo;
     EXPECT_EQ(evtData.getEntries(), 0);
     EXPECT_EQ(evtDataDifferentName.getEntries(), 0);
-    EXPECT_EQ(runData.getEntries(), 0);
+    EXPECT_EQ(profileInfo.getEntries(), 0);
     */
 
     //run durability, should be unaffected
@@ -247,7 +247,7 @@ namespace Belle2 {
     EXPECT_TRUE(StoreArray<EventMetaData>::required("", DataStore::c_Run));
     EXPECT_FALSE(StoreArray<EventMetaData>::required("blah"));
     EXPECT_FALSE(StoreArray<EventMetaData>::required("blah"));
-    EXPECT_TRUE(StoreArray<RunMetaData>::required());
+    EXPECT_TRUE(StoreArray<ProfileInfo>::required());
     //check we didn't create one...
     EXPECT_FALSE(StoreArray<EventMetaData>::required("blah"));
   }

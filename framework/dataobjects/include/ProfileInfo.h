@@ -68,4 +68,4 @@ namespace Belle2 {
   }; //class
   /*! @} */
 } // namespace Belle2
-#endif // EVENTMETADATA
+#endif

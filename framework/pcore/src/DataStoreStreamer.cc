@@ -92,9 +92,9 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
       if (array)
         cl = static_cast<TClonesArray*>(objlist.at(i))->GetClass();
       if (m_initStatus == 0) {
-        DataStore::Instance().createEntry(namelist.at(i), durability, cl, array, false, true);
+        DataStore::Instance().createEntry(namelist.at(i), durability, cl, array, false, false);
       }
-      DataStore::Instance().createObject(objlist.at(i), false,
+      DataStore::Instance().createObject(objlist.at(i), true,
                                          namelist.at(i), durability,
                                          cl, array);
       B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");

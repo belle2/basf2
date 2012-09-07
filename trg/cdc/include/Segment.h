@@ -75,6 +75,11 @@ class TRGCDCSegment : public TRGCDCCell {
     void dump(const std::string & message = std::string(""),
               const std::string & prefix = std::string("")) const;
 
+///ktktkt
+	void initialize(void);
+	double phiPosition(void) const;
+
+
   public:// Utility functions
 
     /// returns axial segments.
@@ -112,6 +117,9 @@ class TRGCDCSegment : public TRGCDCCell {
 
     /// Wire hits.
     std::vector<const TRGCDCWireHit *> _hits;
+//ktktkt
+//	double rro[9];
+//	int ni[9];
 
   // Friends
     friend class TRGCDC;

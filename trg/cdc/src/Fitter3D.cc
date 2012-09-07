@@ -54,7 +54,7 @@
 
 //...Global varibles...
 double rr[9];
-double rro[9]={0.188,0.2934,0.4016, 0.5128,0.620,0.7312,0.8384,0.9496,1.0568};
+double rro[9];
 double anglest[4];
 double ztostraw[4];
 int ni[9];
@@ -326,15 +326,18 @@ namespace Belle2 {
     CDCGeometryPar* cdcp = CDCGeometryPar::Instance();
     //Initialize rr,ztostarw,anglest,ni
     rr[0]=cdcp->senseWireR(2)*0.01;
+    rro[0]=cdcp->senseWireR(2)*0.01;
     ni[0]=cdcp->nWiresInLayer(2)*2;
     for(int axSuperLayer=1;axSuperLayer<5;axSuperLayer++){
       rr[axSuperLayer]=cdcp->senseWireR(12*axSuperLayer+4)*0.01;
+      rro[2*axSuperLayer]=cdcp->senseWireR(12*axSuperLayer+4)*0.01;
       ni[2*axSuperLayer]=cdcp->nWiresInLayer(12*axSuperLayer+4)*2;
     }
     for(int stSuperLayer=0;stSuperLayer<4;stSuperLayer++){
       rr[stSuperLayer+5]=cdcp->senseWireR(12*stSuperLayer+10)*0.01;
       ztostraw[stSuperLayer]=cdcp->senseWireBZ(12*stSuperLayer+10)*0.01;
       anglest[stSuperLayer]=2*rr[stSuperLayer+5]*sin(m_Trg_PI*cdcp->nShifts(12*stSuperLayer+10)/(2*cdcp->nWiresInLayer(12*stSuperLayer+10)))/(cdcp->senseWireFZ(12*stSuperLayer+10)-cdcp->senseWireBZ(12*stSuperLayer+10))/0.01;
+      rro[2*stSuperLayer+1]=cdcp->senseWireR(12*stSuperLayer+10)*0.01;
       ni[2*stSuperLayer+1]=cdcp->nWiresInLayer(12*stSuperLayer+10)*2;
     }
 
@@ -506,7 +509,7 @@ namespace Belle2 {
             int lutcomp=s->LUT()->getLRLUT(s->hitPattern(),s->superLayerId());
             float dphi=s->hit()->drift()*10;
 	    dphi-=evtTime;
-            dphi=atan(dphi/rro[i]/1000);
+            dphi=atan(dphi/rro[s->superLayerId()]/1000);
             if(lutcomp==0){phi[i]-=dphi;}
             else if(lutcomp==1){phi[i]+=dphi;}
             else{
@@ -514,6 +517,7 @@ namespace Belle2 {
               //	nfrac--;
             }
           }
+	  //phi[i]=s->phiPosition();
         } // End of superlayer loop
 
 

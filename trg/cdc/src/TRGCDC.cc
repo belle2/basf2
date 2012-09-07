@@ -295,8 +295,14 @@ namespace Belle2 {
     _luts.back()->initialize(_innerTSLUTDataFilename);
     _luts.back()->initialize(_outerTSLUTDataFilename);
 
+    //...event Time...
+    _eventTime.push_back(new TCEventTime(*this));
+    _eventTime.back()->initialize();
+
 //  for (unsigned i = 0; _luts.size(); i++)
 //  _luts[i]->doit();
+
+    TRGCDCSegment *tstmp;
 
     //...Make TSF's...
     const unsigned nWiresInTS[2] = {15, 11};
@@ -387,12 +393,15 @@ namespace Belle2 {
                                               _luts.back(),
                                               cells);
 
+	tstmp=ts;
         //...Store it...
         _tss.push_back(ts);
         _tsSL[i].push_back(ts);
         layer->push_back(ts);
       }
     }
+
+    tstmp->initialize();
 
     //...Fill caches...
     if (_width) delete [] _width;
@@ -429,11 +438,6 @@ namespace Belle2 {
     _hFinder->perfect(houghFinderPerfect);
 
     _h3DFinder = new TCH3DFinder(*this);
-
-    //...event Time...
-    TCEventTime* test = new TCEventTime(*this);
-    _eventTime.push_back(test);
-    _eventTime.back()->initialize();
 
     //...3D fitter...
     _fitter3D = new TCFitter3D("Fitter3D",
@@ -1450,7 +1454,7 @@ namespace Belle2 {
 
         const TCRelation& trackRelation = aTrack.relation();
         const MCParticle& trackMCParticle = trackRelation.mcParticle(0);
-// iw:not used        const TCRelation& trackRelation3D = aTrack.relation3D();
+        const TCRelation& trackRelation3D = aTrack.relation3D();
 
         double mcPt = trackMCParticle.getMomentum().Pt();
         double mcPhi0;

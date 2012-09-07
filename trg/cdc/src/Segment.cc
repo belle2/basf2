@@ -22,6 +22,11 @@
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/LUT.h"
+#include "cdc/geometry/CDCGeometryPar.h"
+
+//... Global varibles...
+double wireR[9];
+int nWires[9];
 
 using namespace std;
 
@@ -44,9 +49,25 @@ TRGCDCSegment::TRGCDCSegment(unsigned id,
       _signal(std::string("TS_") + TRGUtil::itostring(id)) {
 }
 
+
 TRGCDCSegment::~TRGCDCSegment() {
 }
  
+//ktktkt
+void
+TRGCDCSegment::initialize(void){
+	cout << "Segment initialization" << endl;
+  CDCGeometryPar* cdcp=CDCGeometryPar::Instance();
+  wireR[0]=cdcp->senseWireR(2)*0.01;
+  nWires[0]=cdcp->nWiresInLayer(2)*2;
+  for(int i=0;i<4;i++){
+    wireR[2*i+1]=cdcp->senseWireR(12*i+10)*0.01;
+    wireR[2*(i+1)]=cdcp->senseWireR(12*(i+1)+4)*0.01;
+    nWires[2*i+1]=cdcp->nWiresInLayer(12*i+10)*2;
+    nWires[2*(i+1)]=cdcp->nWiresInLayer(12*(i+1)+4)*2;
+  }
+}
+
 void
 TRGCDCSegment::dump(const string & msg,
 		    const string & pre) const {
@@ -203,6 +224,19 @@ TRGCDCSegment::hitPattern(void) const {
 	    ptn |= (1 << i);
     }
     return ptn;
+}
+
+double
+TRGCDCSegment::phiPosition(void) const {
+	double phi=(double)localId()/nWires[superLayerId()]*4*M_PI;
+	int lutcomp=LUT()->getLRLUT(hitPattern(),superLayerId());
+	float dphi=hit()->drift()*10;
+	dphi=atan(dphi/wireR[superLayerId()]/1000);
+	if(lutcomp==0){phi-=dphi;}
+	else if(lutcomp==1){phi+=dphi;}
+	else{phi=phi;}
+	
+	return phi;
 }
 
 } // namespace Belle2

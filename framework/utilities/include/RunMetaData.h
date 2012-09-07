@@ -10,6 +10,7 @@
 #ifndef RUNMETADATA_H
 #define RUNMETADATA_H
 
+#include <framework/gearbox/Unit.h>
 
 namespace Belle2 {
   /** Store information that is constant during a run, and is needed during the event loop.
@@ -54,8 +55,7 @@ namespace Belle2 {
     /** Angle between beams. */
     static const float m_crossingAngle;
 
-    /** Angle in the lab system
-     */
+    /** Angle in the lab system */
     static const float m_angleLER;
 
   }; //class

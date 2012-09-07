@@ -7,6 +7,7 @@
 //-
 
 #include <framework/pcore/SeqFile.h>
+#include <framework/logging/Logger.h>
 
 #include <pthread.h>
 #include <stdio.h>
@@ -32,7 +33,7 @@ SeqFile::SeqFile(const char* filename, const char* rwflag)
     //    exit ( -1 );
   }
   strcpy(m_filename, filename);
-  printf("SeqFile: %s opened (fd=%d)\n", m_filename, m_fd);
+  B2INFO("SeqFile: " << m_filename << " opened (fd=" << m_fd << ")");
   m_nfile = 0;
   m_nb = 0;
   m_buf = NULL;

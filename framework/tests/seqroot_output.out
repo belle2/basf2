@@ -45,7 +45,6 @@ Required change in UserPhysicsList:
 change: pmanager->AddContinuousProcess(theCerenkovProcess);
 to:     pmanager->AddProcess(theCerenkovProcess);
         pmanager->SetProcessOrdering(theCerenkovProcess,idxPostStep);
-SeqFile: seqout_test.sroot opened (fd=10)
 [INFO] Begin of new run
 [INFO] Processed:   1 runs,      1 events
 [INFO] ============================================================================

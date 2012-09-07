@@ -61,8 +61,7 @@ namespace Belle2 {
      */
     virtual void initialize();
 
-    /** Does nothing.
-     */
+    /** Make sure the file doesn't contain more than one experiment. */
     virtual void beginRun();
 
     /** Write data in c_Event DataStore maps.
@@ -70,12 +69,6 @@ namespace Belle2 {
      *  Loops over all objects in event maps (in the first call of the function) and writes them to event-TTree.
      */
     virtual void event();
-
-    /** Write data in c_Run DataStore maps.
-     *
-     *  Loops over all objects in run maps (in the first call of the function) and writes them to run-TTree.
-     */
-    virtual void endRun();
 
     /** Write data in the c_Persistent DataStore maps.
      *

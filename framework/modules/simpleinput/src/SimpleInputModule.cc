@@ -28,9 +28,9 @@ REG_MODULE(SimpleInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-const std::string SimpleInputModule::c_SteerTreeNames[] = { "treeName", "treeNameRun", "treeNamePersistent" };
-const std::string SimpleInputModule::c_SteerBranchNames[] = { "branchNames", "branchNamesRun", "branchNamesPersistent" };
-const std::string SimpleInputModule::c_SteerExcludeBranchNames[] = { "excludeBranchNames", "excludeBranchNamesRun", "excludeBranchNamesPersistent" };
+const std::string SimpleInputModule::c_SteerTreeNames[] = { "treeName", "treeNamePersistent" };
+const std::string SimpleInputModule::c_SteerBranchNames[] = { "branchNames", "branchNamesPersistent" };
+const std::string SimpleInputModule::c_SteerExcludeBranchNames[] = { "excludeBranchNames", "excludeBranchNamesPersistent" };
 
 SimpleInputModule::SimpleInputModule() : Module()
 {
@@ -50,20 +50,17 @@ SimpleInputModule::SimpleInputModule() : Module()
   addParam("inputFileName", m_inputFileName, "TFile name.", string("SimpleInput.root"));
 
   addParam(c_SteerTreeNames[0], m_treeNames[0], "TTree name for event data. NONE for no input.", string("tree"));
-  addParam(c_SteerTreeNames[1], m_treeNames[1], "TTree name for run data. NONE for no input.", string("NONE"));
-  addParam(c_SteerTreeNames[2], m_treeNames[2], "TTree name for persistent data. NONE for no input.", string("NONE"));
+  addParam(c_SteerTreeNames[1], m_treeNames[1], "TTree name for persistent data. NONE for no input.", string("NONE"));
 
   addParam("eventNumber", m_counterNumber[0], "Skip this number of events before starting.", 0);
 
 
   vector<string> branchNames;
   addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of branches to be read into event map. Empty means all branches.", branchNames);
-  addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of branches to be read into run map. Empty means all branches.", branchNames);
-  addParam(c_SteerBranchNames[2], m_branchNames[2], "Names of branches to be read into persistent map. Empty means all branches.", branchNames);
+  addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of branches to be read into persistent map. Empty means all branches.", branchNames);
 
   addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0], "Names of branches NOT to be read into event map. Takes precedence over branchNames.", branchNames);
-  addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of branches NOT to be read into run map. Takes precedence over branchNamesRun.", branchNames);
-  addParam(c_SteerExcludeBranchNames[2], m_excludeBranchNames[2], "Names of branches NOT to be read into persistent map. Takes precedence over branchNamesPersistent.", branchNames);
+  addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of branches NOT to be read into persistent map. Takes precedence over branchNamesPersistent.", branchNames);
 }
 
 
@@ -158,14 +155,6 @@ void SimpleInputModule::initialize()
     InputController::setCanControlInput(true);
     InputController::setNumEntries(m_tree[DataStore::c_Event]->GetEntries());
   }
-}
-
-
-void SimpleInputModule::beginRun()
-{
-  B2DEBUG(200, "beginRun called.");
-  readTree(DataStore::c_Run);
-  m_counterNumber[DataStore::c_Run]++;
 }
 
 

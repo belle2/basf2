@@ -17,9 +17,6 @@
 [INFO] ----------------------------------------------------------------------------
 [INFO] (Object)  EventMetaData
 [INFO] 
-[INFO] (Type)    Name                      Number entries                     <Run>
-[INFO] ----------------------------------------------------------------------------
-[INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------
 [INFO] 
@@ -43,9 +40,6 @@
 [INFO] (Type)    Name                      Number entries                   <Event>
 [INFO] ----------------------------------------------------------------------------
 [INFO] (Object)  EventMetaData
-[INFO] 
-[INFO] (Type)    Name                      Number entries                     <Run>
-[INFO] ----------------------------------------------------------------------------
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------

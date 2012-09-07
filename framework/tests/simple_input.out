@@ -20,9 +20,6 @@
 [INFO] (Array)   PXDDigits                 177
 [INFO] (Array)   PXDTrueHits               40
 [INFO] 
-[INFO] (Type)    Name                      Number entries                     <Run>
-[INFO] ----------------------------------------------------------------------------
-[INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------
 [INFO] (Object)  FileMetaData
@@ -40,9 +37,6 @@
 [INFO] (Object)  PXDClustersToPXDTrueHits
 [INFO] (Array)   PXDDigits                 165
 [INFO] (Array)   PXDTrueHits               37
-[INFO] 
-[INFO] (Type)    Name                      Number entries                     <Run>
-[INFO] ----------------------------------------------------------------------------
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------
@@ -62,9 +56,6 @@
 [INFO] (Array)   PXDDigits                 150
 [INFO] (Array)   PXDTrueHits               59
 [INFO] 
-[INFO] (Type)    Name                      Number entries                     <Run>
-[INFO] ----------------------------------------------------------------------------
-[INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------
 [INFO] (Object)  FileMetaData
@@ -83,9 +74,6 @@
 [INFO] (Array)   PXDDigits                 103
 [INFO] (Array)   PXDTrueHits               18
 [INFO] 
-[INFO] (Type)    Name                      Number entries                     <Run>
-[INFO] ----------------------------------------------------------------------------
-[INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------
 [INFO] (Object)  FileMetaData
@@ -103,9 +91,6 @@
 [INFO] (Object)  PXDClustersToPXDTrueHits
 [INFO] (Array)   PXDDigits                 165
 [INFO] (Array)   PXDTrueHits               48
-[INFO] 
-[INFO] (Type)    Name                      Number entries                     <Run>
-[INFO] ----------------------------------------------------------------------------
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------

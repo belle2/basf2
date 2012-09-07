@@ -349,8 +349,6 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
     logSystem.setModuleLogConfig(NULL);
   }
 
-  //Delete run related data in DataStore
-  DataStore::Instance().clearMaps(DataStore::c_Run);
   stats.stopGlobal(ModuleStatistics::c_EndRun);
 #ifdef HAS_CALLGRIND
   CALLGRIND_DUMP_STATS_AT("endRun");

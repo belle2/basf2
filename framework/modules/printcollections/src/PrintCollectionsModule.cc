@@ -52,9 +52,6 @@ void PrintCollectionsModule::event()
   B2INFO("(Type)    Name                      Number entries                   <Event>");
   printCollections(DataStore::c_Event);
   B2INFO("")
-  B2INFO("(Type)    Name                      Number entries                     <Run>");
-  printCollections(DataStore::c_Run);
-  B2INFO("")
   B2INFO("(Type)    Name                      Number entries              <Persistent>");
   printCollections(DataStore::c_Persistent);
   B2INFO("")

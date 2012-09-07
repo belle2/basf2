@@ -29,7 +29,7 @@ namespace Belle2 {
    *  Currently the store supports either the storage of single objects, that inherit from TObject,
    *  or TClonesArrays, which are faster, if you have to store a large number of objects from the same type.
    *  Besides that, you have to chose the durability of the things you want to store. <br>
-   *  Currently you can chose between lifetimes of event, run, and persistent.
+   *  Currently you can chose between lifetimes of event and persistent.
    *  basf2 deletes the objects from the store according to the durability map in which the objects are stored.
    *
    *  @sa EDurability StoreObjPtr StoreArray
@@ -44,7 +44,6 @@ namespace Belle2 {
      */
     enum EDurability {
       c_Event,     /**< Object is deleted after event. */
-      c_Run,       /**< Object is deleted after run. */
       c_Persistent /**< Object is persistent. */
     };
 
@@ -53,7 +52,7 @@ namespace Belle2 {
      *  Probably useless, but in principle additional maps are easily created this way.
      */
     enum ENDurabilityTypes {
-      c_NDurabilityTypes = 3 /**< Total number of durability types. */
+      c_NDurabilityTypes = 2 /**< Total number of durability types. */
     };
 
     /** A struct for map entries **/

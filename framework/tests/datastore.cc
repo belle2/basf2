@@ -20,7 +20,7 @@ namespace Belle2 {
       StoreObjPtr<EventMetaData>::registerPersistent();
       StoreArray<EventMetaData>::registerPersistent();
       StoreArray<EventMetaData>::registerPersistent("EventMetaDatas_2");
-      StoreArray<EventMetaData>::registerPersistent("", DataStore::c_Run);
+      StoreArray<EventMetaData>::registerPersistent("", DataStore::c_Persistent);
       StoreArray<ProfileInfo>::registerPersistent();
       DataStore::Instance().setInitializeActive(false);
 
@@ -32,7 +32,7 @@ namespace Belle2 {
       evtData.create();
       StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
       evtDataDifferentName.create();
-      StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Run);
+      StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Persistent);
       evtDataDifferentDurability.create();
       StoreArray<ProfileInfo> profileInfo;
       profileInfo.create();
@@ -72,7 +72,7 @@ namespace Belle2 {
     EXPECT_TRUE(evtData);
     StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
     EXPECT_TRUE(evtDataDifferentName);
-    StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Run);
+    StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Persistent);
     EXPECT_TRUE(evtDataDifferentDurability);
     StoreArray<ProfileInfo> profileInfo;
     EXPECT_TRUE(profileInfo);
@@ -106,7 +106,7 @@ namespace Belle2 {
     StoreArray<EventMetaData> evtData;
     StoreArray<EventMetaData> evtData2("EventMetaDatas");
     StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
-    StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Run);
+    StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Persistent);
     EXPECT_TRUE(evtData.getName() == "EventMetaDatas");
     EXPECT_EQ(evtData.getDurability(), DataStore::c_Event);
     EXPECT_TRUE(evtData == evtData2);
@@ -130,7 +130,7 @@ namespace Belle2 {
     EXPECT_EQ(a->getEvent(), (unsigned long)42);
     StoreObjPtr<EventMetaData> b("nonexisting", DataStore::c_Event);
     EXPECT_FALSE(b);
-    StoreObjPtr<EventMetaData> c("", DataStore::c_Run);
+    StoreObjPtr<EventMetaData> c("", DataStore::c_Persistent);
     EXPECT_FALSE(c);
     StoreObjPtr<EventMetaData> d("", DataStore::c_Persistent);
     EXPECT_FALSE(d);
@@ -148,7 +148,7 @@ namespace Belle2 {
 
     StoreArray<EventMetaData> evtData;
     StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
-    StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Run);
+    StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Persistent);
     StoreArray<ProfileInfo> profileInfo;
     EXPECT_EQ(evtData.getEntries(), 10);
     EXPECT_EQ(evtDataDifferentName.getEntries(), 10);
@@ -169,7 +169,7 @@ namespace Belle2 {
   {
     StoreArray<EventMetaData> evtData;
     StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
-    StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Run);
+    StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Persistent);
     StoreArray<ProfileInfo> profileInfo;
     EXPECT_EQ((int)evtData.getPtr()->GetEntries(), 10);
     EXPECT_EQ((int)evtDataDifferentName.getPtr()->GetEntries(), 10);
@@ -228,7 +228,7 @@ namespace Belle2 {
     */
 
     //run durability, should be unaffected
-    StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Run);
+    StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Persistent);
     EXPECT_EQ(evtDataDifferentDurability.getEntries(), 10);
   }
 
@@ -236,7 +236,7 @@ namespace Belle2 {
   TEST_F(DataStoreTest, RequireObjects)
   {
     EXPECT_TRUE(StoreObjPtr<EventMetaData>::required());
-    EXPECT_FALSE(StoreObjPtr<EventMetaData>::required("", DataStore::c_Run));
+    EXPECT_FALSE(StoreObjPtr<EventMetaData>::required("", DataStore::c_Persistent));
     EXPECT_FALSE(StoreObjPtr<EventMetaData>::required("nonexisting2"));
     EXPECT_FALSE(StoreObjPtr<EventMetaData>::required("", DataStore::c_Persistent));
     //check we didn't create one...
@@ -244,7 +244,7 @@ namespace Belle2 {
 
     EXPECT_TRUE(StoreArray<EventMetaData>::required());
     EXPECT_TRUE(StoreArray<EventMetaData>::required("EventMetaDatas_2"));
-    EXPECT_TRUE(StoreArray<EventMetaData>::required("", DataStore::c_Run));
+    EXPECT_TRUE(StoreArray<EventMetaData>::required("", DataStore::c_Persistent));
     EXPECT_FALSE(StoreArray<EventMetaData>::required("blah"));
     EXPECT_FALSE(StoreArray<EventMetaData>::required("blah"));
     EXPECT_TRUE(StoreArray<ProfileInfo>::required());

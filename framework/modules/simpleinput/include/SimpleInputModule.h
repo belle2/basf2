@@ -53,9 +53,6 @@ namespace Belle2 {
     /** Initialize the Module */
     virtual void initialize();
 
-    /** Called when entering a new run */
-    virtual void beginRun();
-
     /** Running over all events */
     virtual void event();
 
@@ -101,7 +98,7 @@ namespace Belle2 {
      */
     std::vector<std::string> m_excludeBranchNames[DataStore::c_NDurabilityTypes];
 
-    /** Next entry to be read in event/run/persistent tree.
+    /** Next entry to be read in event/persistent tree.
      *
      * Can be set from steering file for event durability to skip some events.
      */

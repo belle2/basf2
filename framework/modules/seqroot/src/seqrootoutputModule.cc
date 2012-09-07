@@ -151,8 +151,10 @@ EvtMessage* SeqRootOutputModule::buildMessage(RECORD_TYPE rectype)
   m_msghandler->clear();
 
   DataStore::EDurability durability = DataStore::c_Event;
+  /*
   if (rectype == MSG_BEGIN_RUN)
     durability = DataStore::c_Run;
+    */
 
   // Collect objects and place them in msghandler
 

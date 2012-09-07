@@ -36,9 +36,9 @@ REG_MODULE(SimpleOutput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-const std::string SimpleOutputModule::c_SteerTreeNames[] = { "treeName", "treeNameRun", "treeNamePersistent" };
-const std::string SimpleOutputModule::c_SteerBranchNames[] = { "branchNames", "branchNamesRun", "branchNamesPersistent" };
-const std::string SimpleOutputModule::c_SteerExcludeBranchNames[] = { "excludeBranchNames", "excludeBranchNamesRun", "excludeBranchNamesPersistent" };
+const std::string SimpleOutputModule::c_SteerTreeNames[] = { "treeName", "treeNamePersistent" };
+const std::string SimpleOutputModule::c_SteerBranchNames[] = { "branchNames", "branchNamesPersistent" };
+const std::string SimpleOutputModule::c_SteerExcludeBranchNames[] = { "excludeBranchNames", "excludeBranchNamesPersistent" };
 
 SimpleOutputModule::SimpleOutputModule() : Module(), m_file(0), m_experiment(0), m_runLow(0), m_eventLow(0),
   m_runHigh(0), m_eventHigh(0)
@@ -59,17 +59,14 @@ SimpleOutputModule::SimpleOutputModule() : Module(), m_file(0), m_experiment(0),
   addParam("splitLevel", m_splitLevel, "Branch split level.", 99);
 
   addParam(c_SteerTreeNames[0], m_treeNames[0], "TTree name for event data. NONE for no output.", string("tree"));
-  addParam(c_SteerTreeNames[1], m_treeNames[1], "TTree name for run data. NONE for no output.", string("run"));
-  addParam(c_SteerTreeNames[2], m_treeNames[2], "TTree name for peristent data. NONE for no output.", string("persistent"));
+  addParam(c_SteerTreeNames[1], m_treeNames[1], "TTree name for peristent data. NONE for no output.", string("persistent"));
 
   vector<string> branchNames;
   addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of branches to be written from event map. Empty means all branches.", branchNames);
-  addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of branches to be written from run map. Empty means all branches.", branchNames);
-  addParam(c_SteerBranchNames[2], m_branchNames[2], "Names of branches to be written from persistent map. Empty means all branches.", branchNames);
+  addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of branches to be written from persistent map. Empty means all branches.", branchNames);
 
   addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0], "Names of branches NOT to be written from event map. Branches also in branchNames are not written.", branchNames);
-  addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of branches NOT to be written from run map. Branches also in branchNamesRun are not written.", branchNames);
-  addParam(c_SteerExcludeBranchNames[2], m_excludeBranchNames[2], "Names of branches NOT to be written from persistent map. Branches also in branchNamesPersistent are not written.", branchNames);
+  addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of branches NOT to be written from persistent map. Branches also in branchNamesPersistent are not written.", branchNames);
 }
 
 
@@ -204,15 +201,6 @@ void SimpleOutputModule::event()
     m_runHigh = eventMetaDataPtr->getRun();
     m_eventHigh = eventMetaDataPtr->getEvent();
   }
-}
-
-
-void SimpleOutputModule::endRun()
-{
-  //fill Run data
-  fillTree(DataStore::c_Run);
-
-  B2DEBUG(1, "endRun done.");
 }
 
 

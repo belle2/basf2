@@ -39,6 +39,8 @@
 #include <G4QuadrangularFacet.hh>
 #include <G4TriangularFacet.hh>
 
+#include <limits>
+
 using namespace std;
 
 namespace Belle2 {
@@ -170,7 +172,7 @@ namespace Belle2 {
         //Check if compoent will fit inside width,length. If we can resize do it if needed, otherwise bail
         double minWidth =  max(abs(p.u + sub.width / 2.0), abs(p.u - sub.width / 2.0));
         double minLength = max(abs(p.v + sub.length / 2.0), abs(p.v - sub.length / 2.0));
-        if (minWidth > component.width) {
+        if (minWidth > component.width + numeric_limits<double>::epsilon()) {
           if (!widthResize) {
             B2FATAL("Subcomponent " << p.name << " does not fit into volume: "
                     << "minWidth " << minWidth << " > " << component.width);
@@ -178,7 +180,7 @@ namespace Belle2 {
           component.width = minWidth * 2.0;
           component.width2 = minWidth * 2.0;
         }
-        if (minLength > component.length) {
+        if (minLength > component.length + numeric_limits<double>::epsilon()) {
           if (!lengthResize) {
             B2FATAL("Subcomponent " << p.name << " does not fit into volume: "
                     << "minLength " << minLength << " > " << component.length);

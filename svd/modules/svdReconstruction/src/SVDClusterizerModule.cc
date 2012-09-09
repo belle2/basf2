@@ -114,31 +114,41 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
 void SVDClusterizerModule::initialize()
 {
   //Register collections
-  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
-  StoreArray<SVDDigit>   storeDigits(m_storeDigitsName);
-  StoreArray<SVDCluster> storeClusters(m_storeClustersName);
-  StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
-  RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
-  RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
-  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
-  RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);
+  StoreArray<SVDCluster>::registerPersistent(m_storeClustersName);
+  RelationArray::registerPersistent<SVDCluster, MCParticle>(m_relClusterMCParticleName);
+  RelationArray::registerPersistent<SVDCluster, SVDDigit>(m_relClusterDigitName);
+  RelationArray::registerPersistent<SVDCluster, SVDTrueHit>(m_relClusterTrueHitName);
 
-  //Set names in case default was used
-  m_relDigitMCParticleName   = relDigitMCParticle.getName();
-  m_relClusterMCParticleName = relClusterMCParticle.getName();
-  m_relClusterDigitName      = relClusterDigit.getName();
-  m_relDigitTrueHitName      = relDigitTrueHit.getName();
-  m_relClusterTrueHitName    = relClusterTrueHit.getName();
+  //Set names in case default was used. This is needed to initialize RalationIndices.
+  m_relDigitMCParticleName   = DataStore::relationName(
+                                 DataStore::arrayName<SVDDigit>(m_storeDigitsName),
+                                 DataStore::arrayName<MCParticle>(m_storeMCParticlesName)
+                               );
+  m_relClusterMCParticleName = DataStore::relationName(
+                                 DataStore::arrayName<SVDCluster>(m_storeClustersName),
+                                 DataStore::arrayName<MCParticle>(m_storeMCParticlesName)
+                               );
+  m_relClusterDigitName      = DataStore::relationName(
+                                 DataStore::arrayName<SVDCluster>(m_storeClustersName),
+                                 DataStore::arrayName<SVDDigit>(m_storeDigitsName)
+                               );
+  m_relDigitTrueHitName      = DataStore::relationName(
+                                 DataStore::arrayName<SVDDigit>(m_storeDigitsName),
+                                 DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName)
+                               );
+  m_relClusterTrueHitName    = DataStore::relationName(
+                                 DataStore::arrayName<SVDCluster>(m_storeClustersName),
+                                 DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName)
+                               );
 
   // Report:
   B2INFO("SVDClusterizer Parameters (in default system unit, *=cannot be set directly):");
 
   B2INFO(" 1. COLLECTIONS:");
-  B2INFO(" -->  MCParticles:        " << storeMCParticles.getName());
-  B2INFO(" -->  Digits:             " << storeDigits.getName());
-  B2INFO(" -->  Clusters:           " << storeClusters.getName());
-  B2INFO(" -->  TrueHits:           " << storeTrueHits.getName());
+  B2INFO(" -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+  B2INFO(" -->  Digits:             " << DataStore::arrayName<SVDDigit>(m_storeDigitsName));
+  B2INFO(" -->  Clusters:           " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
+  B2INFO(" -->  TrueHits:           " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
   B2INFO(" -->  DigitMCRel:         " << m_relDigitMCParticleName);
   B2INFO(" -->  ClusterMCRel:       " << m_relClusterMCParticleName);
   B2INFO(" -->  ClusterDigitRel:    " << m_relClusterDigitName);
@@ -188,19 +198,24 @@ inline void SVDClusterizerModule::findCluster(const Sample& sample)
 void SVDClusterizerModule::event()
 {
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
   StoreArray<SVDDigit>   storeDigits(m_storeDigitsName);
   StoreArray<SVDCluster> storeClusters(m_storeClustersName);
-  StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
-  RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
-  RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
-  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
-  RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);
 
-  storeClusters->Clear();
+  if (!storeClusters.isValid())
+    storeClusters.create();
+  else
+    storeClusters->Clear();
+
+  RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
   relClusterMCParticle.clear();
+
+  RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
   relClusterDigit.clear();
+
+  RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);
   relClusterTrueHit.clear();
+
   int nDigits = storeDigits.getEntries();
   if (nDigits == 0) return;
 

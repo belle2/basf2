@@ -19,6 +19,7 @@
 #include <framework/datastore/RelationIndex.h>
 
 #include <generators/dataobjects/MCParticle.h>
+#include <pxd/testbeam/dataobjects/TelSimHit.h>
 #include <pxd/testbeam/dataobjects/TelTrueHit.h>
 #include <pxd/testbeam/dataobjects/TelCluster.h>
 #include <boost/foreach.hpp>
@@ -66,27 +67,34 @@ TelDigiClusterModule::TelDigiClusterModule() : Module()
 void TelDigiClusterModule::initialize()
 {
   //Register all required collections
-  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
-  StoreArray<TelTrueHit> storeTrueHits(m_storeTrueHitsName);
-  StoreArray<TelCluster> storeClusters(m_storeClustersName);
-  RelationArray relMCParticleTrueHit(storeMCParticles, storeTrueHits, m_relMCParticleTrueHitName);
-  RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
-  RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);
+  StoreArray<TelCluster>::registerPersistent(m_storeClustersName);
+  RelationArray::registerPersistent<MCParticle, TelTrueHit>(m_relMCParticleTrueHitName);
+  RelationArray::registerPersistent<TelCluster, MCParticle>(m_relClusterMCParticleName);
+  RelationArray::registerPersistent<TelCluster, TelTrueHit>(m_relClusterTrueHitName);
 
   //Set names in case default was used
-  m_relMCParticleTrueHitName = relMCParticleTrueHit.getName();
-  m_relClusterMCParticleName = relClusterMCParticle.getName();
-  m_relClusterTrueHitName    = relClusterTrueHit.getName();
+  m_relMCParticleTrueHitName = DataStore::relationName(
+                                 DataStore::arrayName<MCParticle>(m_storeMCParticlesName),
+                                 DataStore::arrayName<TelTrueHit>(m_storeTrueHitsName)
+                               );
+  m_relClusterMCParticleName = DataStore::relationName(
+                                 DataStore::arrayName<TelCluster>(m_storeClustersName),
+                                 DataStore::arrayName<MCParticle>(m_storeMCParticlesName)
+                               );
+  m_relClusterTrueHitName    = DataStore::relationName(
+                                 DataStore::arrayName<TelCluster>(m_storeClustersName),
+                                 DataStore::arrayName<TelTrueHit>(m_storeTrueHitsName)
+                               );;
 
   //Convert parameters to correct units
   m_resolutionU *= Unit::um;
   m_resolutionV *= Unit::um;
 
   B2INFO("TBDigiClusterModule Parameters (in default system units):");
-  B2INFO(" -->  TrueHits:           " << storeTrueHits.getName());
+  B2INFO(" -->  TrueHits:           " << DataStore::arrayName<TelTrueHit>(m_storeTrueHitsName));
   B2INFO(" -->  MCTrueHitRel:        " << m_relMCParticleTrueHitName);
-  B2INFO(" -->  MCParticles:        " << storeMCParticles.getName());
-  B2INFO(" -->  Clusters:           " << storeClusters.getName());
+  B2INFO(" -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+  B2INFO(" -->  Clusters:           " << DataStore::arrayName<TelCluster>(m_storeClustersName));
   B2INFO(" -->  ClusterMCRel:       " << m_relClusterMCParticleName);
   B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
 
@@ -104,14 +112,31 @@ void TelDigiClusterModule::event()
 {
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<TelTrueHit> storeTrueHits(m_storeTrueHitsName);
+
+  // FIXME: Provisional fix to ensure proper output when there are no SimHits:
+  // Create empty arrays, then empty relations will be created, too.
+  StoreArray<TelSimHit>  storeSimHits(""); // we don't need this here.
+  if (!storeSimHits.isValid())  storeSimHits.create();
+  if (!storeTrueHits.isValid()) storeTrueHits.create();
+  // For the same reason, initialize the RelationArrays - though the module doesn't need them.
+  RelationArray mcParticlesToSimHits(storeMCParticles, storeSimHits);
+  RelationArray mcParticlesToTrueHits(storeMCParticles, storeTrueHits);
+  RelationArray trueHitsToSimHits(storeTrueHits, storeSimHits);
+
   StoreArray<TelCluster> storeClusters(m_storeClustersName);
+  if (!storeClusters.isValid())
+    storeClusters.create();
+  else
+    storeClusters->Clear();
+
   RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
+  relClusterMCParticle.clear();
+
   RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);
-  RelationArray relMCParticleTrueHit(storeMCParticles, storeTrueHits, m_relMCParticleTrueHitName);
+  relClusterTrueHit.clear();
 
   unsigned int nTrueHits = storeTrueHits.getEntries();
   RelationIndex<MCParticle, TelTrueHit> relIndexMCParticleTrueHit(storeMCParticles, storeTrueHits, m_relMCParticleTrueHitName);
-
 
   for (unsigned int i = 0; i < nTrueHits; i++) {
     TelTrueHit* trueHit = storeTrueHits[i];

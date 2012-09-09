@@ -110,21 +110,28 @@ PXDDigitizerModule::PXDDigitizerModule() : Module(), m_rootFile(0), m_histSteps(
 
 void PXDDigitizerModule::initialize()
 {
-  //Register all required collections
-  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
-  StoreArray<PXDSimHit>  storeSimHits(m_storeSimHitsName);
-  StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
-  RelationArray relMCParticleSimHit(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);
-  RelationArray relTrueHitSimHit(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
-  RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
-  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
+  //Register output collections
+  StoreArray<PXDDigit>::registerPersistent(m_storeDigitsName);
+  RelationArray::registerPersistent<PXDDigit, MCParticle>(m_relDigitMCParticleName);
+  RelationArray::registerPersistent<PXDDigit, PXDTrueHit>(m_relDigitTrueHitName);
 
   //Set names in case default was used
-  m_relMCParticleSimHitName = relMCParticleSimHit.getName();
-  m_relTrueHitSimHitName    = relTrueHitSimHit.getName();
-  m_relDigitMCParticleName  = relDigitMCParticle.getName();
-  m_relDigitTrueHitName     = relDigitTrueHit.getName();
+  m_relMCParticleSimHitName = DataStore::relationName(
+                                DataStore::arrayName<MCParticle>(m_storeMCParticlesName),
+                                DataStore::arrayName<PXDSimHit>(m_storeSimHitsName)
+                              );
+  m_relTrueHitSimHitName    = DataStore::relationName(
+                                DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName),
+                                DataStore::arrayName<PXDSimHit>(m_storeSimHitsName)
+                              );
+  m_relDigitMCParticleName  = DataStore::relationName(
+                                DataStore::arrayName<PXDDigit>(m_storeDigitsName),
+                                DataStore::arrayName<MCParticle>(m_storeMCParticlesName)
+                              );
+  m_relDigitTrueHitName     = DataStore::relationName(
+                                DataStore::arrayName<PXDDigit>(m_storeDigitsName),
+                                DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName)
+                              );
 
   //Convert parameters to correct units
   m_elNoise *= Unit::e;
@@ -141,10 +148,10 @@ void PXDDigitizerModule::initialize()
   B2INFO(" -->  ElectronicNoise:    " << m_elNoise);
   B2INFO(" -->  NoiseSN:            " << m_SNAdjacent);
   B2INFO(" --> *NoiseFraction:      " << m_noiseFraction);
-  B2INFO(" -->  MCParticles:        " << storeMCParticles.getName());
-  B2INFO(" -->  Digits:             " << storeDigits.getName());
-  B2INFO(" -->  SimHits:            " << storeSimHits.getName());
-  B2INFO(" -->  TrueHits:           " << storeTrueHits.getName());
+  B2INFO(" -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+  B2INFO(" -->  SimHits:            " << DataStore::arrayName<PXDSimHit>(m_storeSimHitsName));
+  B2INFO(" -->  Digits:             " << DataStore::arrayName<PXDDigit>(m_storeDigitsName));
+  B2INFO(" -->  TrueHits:           " << DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName));
   B2INFO(" -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
   B2INFO(" -->  DigitMCRel:         " << m_relDigitMCParticleName);
   B2INFO(" -->  TrueSimRel:         " << m_relTrueHitSimHitName);
@@ -180,7 +187,7 @@ void PXDDigitizerModule::initialize()
 
 void PXDDigitizerModule::beginRun()
 {
-  //Fill map with all possible sensors This is to slow to be done every event so
+  //Fill map with all possible sensors This is too slow to be done every event so
   //we fill it once and only clear the content of the sensors per event, not
   //the whole map
   m_sensors.clear();
@@ -207,8 +214,33 @@ void PXDDigitizerModule::event()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<PXDSimHit>  storeSimHits(m_storeSimHitsName);
   StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
+
+  // FIXME: Provisional fix to ensure proper output when there are no SimHits:
+  // Create empty arrays, then empty relations will be created, too.
+  if (!storeSimHits.isValid())
+    storeSimHits.create();
+  if (!storeTrueHits.isValid())
+    storeTrueHits.create();
+  // For the same reason, initialize the RelationArrays.
+  RelationArray mcParticlesToSimHits(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);
+  RelationArray mcParticlesToTrueHits(storeMCParticles, storeTrueHits); // not used here
+  RelationArray trueHitsToSimHits(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
+
+
+  StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
+  if (!storeDigits.isValid())
+    storeDigits.create();
+  else
+    storeDigits->Clear();
+
+  RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
+  relDigitMCParticle.clear();
+
+  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
+  relDigitTrueHit.clear();
+
   unsigned int nSimHits = storeSimHits.getEntries();
-  //if (nSimHits == 0) return;
+  if (nSimHits == 0) return;
 
   RelationIndex<MCParticle, PXDSimHit> relMCParticleSimHit(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);
   RelationIndex<PXDTrueHit, PXDSimHit> relTrueHitSimHit(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
@@ -607,15 +639,10 @@ void PXDDigitizerModule::addNoiseDigits()
 void PXDDigitizerModule::saveDigits()
 {
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
-  StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
   StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
+  StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
   RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
   RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
-
-  //Clear out old digits
-  storeDigits->Clear();
-  relDigitMCParticle.clear();
-  relDigitTrueHit.clear();
 
   //Zero supression cut in electrons
   double charge_threshold = m_SNAdjacent * m_elNoise;

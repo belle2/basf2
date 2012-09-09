@@ -30,6 +30,8 @@ gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 # Run simulation
 simulation = register_module('FullSim')
+# Add the PXD digitizer, too, to avoid problems with empty events.
+PXDDIGI = register_module('PXDDigitizer')
 # SVD digitization module
 SVDDIGI = register_module('SVDDigitizer')
 # SVD clusterizer
@@ -79,6 +81,7 @@ main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(particlegun)
 main.add_module(simulation)
+main.add_module(PXDDIGI)
 main.add_module(SVDDIGI)
 main.add_module(SVDCLUST)
 main.add_module(output)

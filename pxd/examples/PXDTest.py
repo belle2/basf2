@@ -51,7 +51,7 @@ particlegun.param('pdgCodes', [-11, 11])
 
 # ============================================================================
 # Setting the number of tracks to be generated per event:
-particlegun.param('nTracks', 10)
+particlegun.param('nTracks', 1)
 
 # ============================================================================
 # Print the parameters of the particle gun
@@ -74,10 +74,6 @@ PXDDIGI.param('ElectronicEffects', False)
 PXDDIGI.param('NoiseSN', 1.0)
 PXDCLUST.param('NoiseSN', 1.0)
 
-SVDDIGI.param('statisticsFilename', 'SVDDiags.root')
-SVDDIGI.param('PoissonSmearing', True)
-SVDDIGI.param('ElectronicEffects', False)
-
 # ============================================================================
 # Do the simulation
 
@@ -90,8 +86,6 @@ main.add_module(particlegun)
 main.add_module(simulation)
 main.add_module(PXDDIGI)
 main.add_module(PXDCLUST)
-main.add_module(SVDDIGI)
-main.add_module(SVDCLUST)
 
 main.add_module(output)
 

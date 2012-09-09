@@ -82,33 +82,43 @@ PXDClusterizerModule::PXDClusterizerModule() : Module(), m_elNoise(200.0),
 
 void PXDClusterizerModule::initialize()
 {
-  //Register collections
-  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
-  StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
-  StoreArray<PXDCluster> storeClusters(m_storeClustersName);
-  StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
-  RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
-  RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
-  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
-  RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);
+  //Register output collections
+  StoreArray<PXDCluster>::registerPersistent(m_storeClustersName);
+  RelationArray::registerPersistent<PXDCluster, MCParticle>(m_relClusterMCParticleName);
+  RelationArray::registerPersistent<PXDCluster, PXDDigit>(m_relClusterDigitName);
+  RelationArray::registerPersistent<PXDCluster, PXDTrueHit>(m_relClusterTrueHitName);
 
-  //Set names in case default was used
-  m_relDigitMCParticleName   = relDigitMCParticle.getName();
-  m_relClusterMCParticleName = relClusterMCParticle.getName();
-  m_relClusterDigitName      = relClusterDigit.getName();
-  m_relDigitTrueHitName      = relDigitTrueHit.getName();
-  m_relClusterTrueHitName    = relClusterTrueHit.getName();
+  //Set names in case default was used. We need these for the RelationIndices.
+  m_relDigitMCParticleName   = DataStore::relationName(
+                                 DataStore::arrayName<PXDDigit>(m_storeDigitsName),
+                                 DataStore::arrayName<MCParticle>(m_storeMCParticlesName)
+                               );
+  m_relClusterMCParticleName = DataStore::relationName(
+                                 DataStore::arrayName<PXDCluster>(m_storeClustersName),
+                                 DataStore::arrayName<MCParticle>(m_storeMCParticlesName)
+                               );
+  m_relClusterDigitName      = DataStore::relationName(
+                                 DataStore::arrayName<PXDCluster>(m_storeClustersName),
+                                 DataStore::arrayName<PXDDigit>(m_storeDigitsName)
+                               );
+  m_relDigitTrueHitName      = DataStore::relationName(
+                                 DataStore::arrayName<PXDDigit>(m_storeDigitsName),
+                                 DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName)
+                               );
+  m_relClusterTrueHitName    = DataStore::relationName(
+                                 DataStore::arrayName<PXDCluster>(m_storeClustersName),
+                                 DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName)
+                               );
 
   B2INFO("PXDClusterizer Parameters (in default system units, *=cannot be set directly):");
   B2INFO(" -->  ElectronicNoise:    " << m_elNoise);
   B2INFO(" -->  NoiseSN:            " << m_cutAdjacent);
   B2INFO(" -->  SeedSN:             " << m_cutSeed);
   B2INFO(" -->  ClusterSN:          " << m_cutCluster);
-  B2INFO(" -->  MCParticles:        " << storeMCParticles.getName());
-  B2INFO(" -->  Digits:             " << storeDigits.getName());
-  B2INFO(" -->  Clusters:           " << storeClusters.getName());
-  B2INFO(" -->  TrueHits:           " << storeTrueHits.getName());
+  B2INFO(" -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+  B2INFO(" -->  Digits:             " << DataStore::arrayName<PXDDigit>(m_storeDigitsName));
+  B2INFO(" -->  Clusters:           " << DataStore::arrayName<PXDCluster>(m_storeClustersName));
+  B2INFO(" -->  TrueHits:           " << DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName));
   B2INFO(" -->  DigitMCRel:         " << m_relDigitMCParticleName);
   B2INFO(" -->  ClusterMCRel:       " << m_relClusterMCParticleName);
   B2INFO(" -->  ClusterDigitRel:    " << m_relClusterDigitName);
@@ -135,19 +145,24 @@ inline void PXDClusterizerModule::findCluster(const Pixel& px)
 void PXDClusterizerModule::event()
 {
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
   StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
   StoreArray<PXDCluster> storeClusters(m_storeClustersName);
-  StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
-  RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
-  RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
-  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
-  RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);
 
-  storeClusters->Clear();
+  if (!storeClusters.isValid())
+    storeClusters.create();
+  else
+    storeClusters->Clear();
+
+  RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
   relClusterMCParticle.clear();
+
+  RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
   relClusterDigit.clear();
+
+  RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);
   relClusterTrueHit.clear();
+
   int nPixels = storeDigits.getEntries();
   if (nPixels == 0) return;
 
@@ -216,8 +231,8 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
   //Get all datastore elements
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
-  StoreArray<PXDCluster> storeClusters(m_storeClustersName);
   StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
+  StoreArray<PXDCluster> storeClusters(m_storeClustersName);
   RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
   RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
   RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);

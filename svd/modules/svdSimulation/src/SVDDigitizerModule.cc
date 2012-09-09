@@ -131,20 +131,27 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(), m_rootFile(0), m_histDiffus
 void SVDDigitizerModule::initialize()
 {
   //Register all required collections
-  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
-  StoreArray<SVDSimHit>  storeSimHits(m_storeSimHitsName);
-  StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  StoreArray<SVDDigit>   storeDigits(m_storeDigitsName);
-  RelationArray relMCParticleSimHit(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);
-  RelationArray relTrueHitSimHit(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
-  RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
-  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
+  StoreArray<SVDDigit>::registerPersistent(m_storeDigitsName);
+  RelationArray::registerPersistent<SVDDigit, MCParticle>(m_relDigitMCParticleName);
+  RelationArray::registerPersistent<SVDDigit, SVDTrueHit>(m_relDigitTrueHitName);
 
-  //Set names in case default was used
-  m_relMCParticleSimHitName = relMCParticleSimHit.getName();
-  m_relTrueHitSimHitName    = relTrueHitSimHit.getName();
-  m_relDigitMCParticleName  = relDigitMCParticle.getName();
-  m_relDigitTrueHitName     = relDigitTrueHit.getName();
+  //Set names in case default was used. We need the names to initialize the RelationIndices.
+  m_relMCParticleSimHitName = DataStore::relationName(
+                                DataStore::arrayName<MCParticle>(m_storeMCParticlesName),
+                                DataStore::arrayName<SVDSimHit>(m_storeSimHitsName)
+                              );
+  m_relTrueHitSimHitName    = DataStore::relationName(
+                                DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName),
+                                DataStore::arrayName<SVDSimHit>(m_storeSimHitsName)
+                              );
+  m_relDigitMCParticleName  = DataStore::relationName(
+                                DataStore::arrayName<SVDDigit>(m_storeDigitsName),
+                                DataStore::arrayName<MCParticle>(m_storeMCParticlesName)
+                              );
+  m_relDigitTrueHitName     = DataStore::relationName(
+                                DataStore::arrayName<SVDDigit>(m_storeDigitsName),
+                                DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName)
+                              );;
 
   //Convert parameters to correct units
   m_segmentLength *= Unit::mm;
@@ -158,10 +165,10 @@ void SVDDigitizerModule::initialize()
 
   B2INFO("SVDDigitizer parameters (in default system units, *=cannot be set directly):");
   B2INFO(" DATASTORE COLLECTIONS:")
-  B2INFO(" -->  MCParticles:        " << storeMCParticles.getName());
-  B2INFO(" -->  Digits:             " << storeDigits.getName());
-  B2INFO(" -->  SimHits:            " << storeSimHits.getName());
-  B2INFO(" -->  TrueHits:           " << storeTrueHits.getName());
+  B2INFO(" -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+  B2INFO(" -->  Digits:             " << DataStore::arrayName<SVDDigit>(m_storeDigitsName));
+  B2INFO(" -->  SimHits:            " << DataStore::arrayName<SVDSimHit>(m_storeSimHitsName));
+  B2INFO(" -->  TrueHits:           " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
   B2INFO(" -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
   B2INFO(" -->  DigitMCRel:         " << m_relDigitMCParticleName);
   B2INFO(" -->  TrueSimRel:         " << m_relTrueHitSimHitName);
@@ -254,19 +261,34 @@ void SVDDigitizerModule::event()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDSimHit>  storeSimHits(m_storeSimHitsName);
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  unsigned int nSimHits = storeSimHits.getEntries();
-  if (nSimHits == 0) return;
+
+  // FIXME: Provisional fix to ensure proper output when there are no SimHits:
+  // Create empty arrays, then empty relations will be created, too.
+  if (!storeSimHits.isValid())  storeSimHits.create();
+  if (!storeTrueHits.isValid()) storeTrueHits.create();
+  // For the same reason, initialize the RelationArrays.
+  RelationArray mcParticlesToSimHits(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);
+  RelationArray mcParticlesToTrueHits(storeMCParticles, storeTrueHits); // not used here
+  RelationArray trueHitsToSimHits(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
 
   RelationIndex<MCParticle, SVDSimHit> relMCParticleSimHit(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);
   RelationIndex<SVDTrueHit, SVDSimHit> relTrueHitSimHit(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
 
   // Clear old SVDDigits
   StoreArray<SVDDigit> storeDigits(m_storeDigitsName);
+  if (!storeDigits.isValid())
+    storeDigits.create();
+  else
+    storeDigits->Clear();
+
   RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
-  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
-  storeDigits->Clear();
   relDigitMCParticle.clear();
+
+  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
   relDigitTrueHit.clear();
+
+  unsigned int nSimHits = storeSimHits.getEntries();
+  if (nSimHits == 0) return;
 
   //Check sensor info and set pointers to current sensor
   for (unsigned int i = 0; i < nSimHits; ++i) {
@@ -680,8 +702,8 @@ double SVDDigitizerModule::addNoise(double charge)
 void SVDDigitizerModule::saveDigits(double time)
 {
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
-  StoreArray<SVDDigit>   storeDigits(m_storeDigitsName);
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
+  StoreArray<SVDDigit>   storeDigits(m_storeDigitsName);
   RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
   RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
 

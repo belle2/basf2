@@ -145,20 +145,40 @@ namespace Belle2 {
       m_sensitiveThreshold(sensitiveThreshold),
       m_trueHitTrackID(0), m_trueHitCount(0), m_trueHitWeight(0.0), m_trueHitTime(0.0)
     {
-      //Make sure all collections are registered
-      StoreArray<MCParticle>   mcParticles;
-      StoreArray<SimHitClass>  simHits;
-      StoreArray<TrueHitClass> trueHits;
-      RelationArray relMCSimHit(mcParticles, simHits);
-      RelationArray relMCTrueHit(mcParticles, trueHits);
-      RelationArray relTrueSimHit(trueHits, simHits);
-      registerMCParticleRelation(relMCSimHit);
-      registerMCParticleRelation(relMCTrueHit);
+      //Register output collections.
+      // Note that we have many SensitiveDetector classes, so this will be attempted many times,
+      // therefore we have to suppress errors.
+      StoreArray<SimHitClass>::registerPersistent("", DataStore::c_Event, false);
+      StoreArray<TrueHitClass>::registerPersistent("", DataStore::c_Event, false);
+      RelationArray::registerPersistent<MCParticle, SimHitClass>("", "", DataStore::c_Event, false);
+      RelationArray::registerPersistent<MCParticle, TrueHitClass>("", "", DataStore::c_Event, false);
+      RelationArray::registerPersistent<TrueHitClass, SimHitClass>("", "", DataStore::c_Event, false);
+
+      // Register MCParticle relations
+      const std::string& relMCSimHitsName = DataStore::relationName(
+                                              DataStore::arrayName<MCParticle>(""),
+                                              DataStore::arrayName<SimHitClass>("")
+                                            );
+      registerMCParticleRelation(relMCSimHitsName.c_str());
+      const std::string& relMCTrueHitsName = DataStore::relationName(
+                                               DataStore::arrayName<MCParticle>(""),
+                                               DataStore::arrayName<TrueHitClass>("")
+                                             );
+      registerMCParticleRelation(relMCTrueHitsName.c_str());
     }
 
     template <class SimHitClass, class TrueHitClass>
     bool SensitiveDetector<SimHitClass, TrueHitClass>::step(G4Step* step, G4TouchableHistory*)
     {
+      // DataStore arrays must be in place even if we don't save anything.
+      StoreArray<MCParticle>  particles;
+      StoreArray<SimHitClass> simhits;
+      if (!simhits.isValid()) simhits.create();
+      StoreArray<TrueHitClass> truehits;
+      if (!truehits.isValid()) truehits.create();
+      RelationArray relMCSimHit(particles, simhits);
+      RelationArray relMCTrueHit(particles, truehits);
+
       // Get track
       const G4Track& track    = *step->GetTrack();
       // Get particle PDG code
@@ -212,6 +232,7 @@ namespace Belle2 {
       //Create new SimHit.
       StoreArray<MCParticle>  mcParticles;
       StoreArray<SimHitClass> simHits;
+      if (!simHits.isValid()) simHits.create();
       RelationArray relMCSimHit(mcParticles, simHits);
 
       const int hitIndex = simHits->GetLast() + 1 ;
@@ -295,6 +316,7 @@ namespace Belle2 {
         StoreArray<MCParticle>   mcParticles;
         StoreArray<SimHitClass>  simHits;
         StoreArray<TrueHitClass> trueHits;
+        if (!trueHits.isValid()) trueHits.create();
         RelationArray relMCTrueHits(mcParticles, trueHits);
         RelationArray relTrueSimHit(trueHits, simHits);
 

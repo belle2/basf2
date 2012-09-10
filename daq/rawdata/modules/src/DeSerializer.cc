@@ -52,6 +52,9 @@ void DeSerializerModule::initialize()
   // Open message handler
   m_msghandler = new MsgHandler(m_compressionLevel);
 
+  // Initialize EventMetaData
+  StoreObjPtr<EventMetaData>::registerPersistent();
+
   B2INFO("Rx initialized.");
 }
 

@@ -272,7 +272,6 @@ void SimpleOutputModule::fillTree(DataStore::EDurability durability)
   //Check for entries whose object was not created.
   for (unsigned int i = 0; i < m_entries[durability].size(); i++) {
     if (!m_entries[durability][i]->ptr) {
-      B2WARNING("Trying to write non-existing object to branch " << m_entries[durability][i]->name << ". Using default object.");
       //create object owned and deleted by branch
       m_tree[durability]->SetBranchAddress(m_entries[durability][i]->name.c_str(), 0);
     } else {

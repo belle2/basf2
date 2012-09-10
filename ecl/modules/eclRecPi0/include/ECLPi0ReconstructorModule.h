@@ -110,7 +110,8 @@ namespace Belle2 {
 
 
     private:
-
+      /**  Name of collection of ECLShower.*/
+      std::string m_ECLShowerName ;
       /**  Name of collection of ECLGamma.*/
       std::string m_ECLGammaName ;
       /**  Name of collection of ECLPi0.*/

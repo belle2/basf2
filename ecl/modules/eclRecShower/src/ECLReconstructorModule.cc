@@ -59,11 +59,11 @@ ECLReconstructorModule::ECLReconstructorModule() : Module()
 
   //output
   addParam("ECLRecShowerOutput", m_ECLShowerName,
-           "//Output of this module", string("ECLShower"));
+           "//Output of this module", string("ECLShowers"));
 
 
   addParam("ECLHitAssignmentinput", m_eclHitAssignmentName,
-           "//Output of this module", string("ECLHitAssignment"));
+           "//Output of this module", string("ECLHitAssignments"));
 
 
 //  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
@@ -84,7 +84,6 @@ void ECLReconstructorModule::initialize()
 
   // CPU time start
   m_timeCPU = clock() * Unit::us;
-  StoreArray<ECLDigit> eclDigiArray(m_eclDigiCollectionName);
   StoreArray<HitAssignmentECL>::registerPersistent(m_eclHitAssignmentName);
   StoreArray<ECLShower>::registerPersistent(m_ECLShowerName);
 

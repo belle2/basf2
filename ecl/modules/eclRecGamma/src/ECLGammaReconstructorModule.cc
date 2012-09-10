@@ -12,7 +12,7 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/HitAssignmentECL.h>
 #include <ecl/dataobjects/ECLGamma.h>
-
+#include <framework/datastore/RelationArray.h>
 
 #include <GFTrack.h>
 #include <GFTrackCand.h>
@@ -44,10 +44,10 @@ ECLGammaReconstructorModule::ECLGammaReconstructorModule() : Module()
 
   //input
   addParam("ECLShowerinput", m_ECLShowerName,
-           "//input of this module//shower infromation", string("ECLShower"));
+           "//input of this module//shower infromation", string("ECLShowers"));
 
   addParam("ECLHitAssignmentinput", m_eclHitAssignmentName,
-           "//input of this module//(showerID,Hits)", string("ECLHitAssignment"));
+           "//input of this module//(showerID,Hits)", string("ECLHitAssignments"));
 
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the reconstructed tracks", string("GFTracks"));
   addParam("ExtTrackCandsColName", m_extTrackCandsColName, "Name of collection holding the list of hits from each extrapolation", string("ExtTrackCands"));
@@ -55,7 +55,7 @@ ECLGammaReconstructorModule::ECLGammaReconstructorModule() : Module()
 
   //output
   addParam("ECLGammaOutput", m_ECLGammaName,
-           "//output of this module//(showerId,px,py,pz)", string("ECLGamma"));
+           "//output of this module//(showerId,px,py,pz)", string("ECLGammas"));
 
 
   addParam("gammaEnergyCut", m_ecut, "gamma enegy threshold ", 0.02);
@@ -82,13 +82,8 @@ void ECLGammaReconstructorModule::initialize()
 
   // CPU time start
   m_timeCPU = clock() * Unit::us;
-  StoreArray<ECLShower> eclRecShowerArray(m_ECLShowerName);
-  StoreArray<HitAssignmentECL> eclHitAssignmentArray(m_eclHitAssignmentName);
   StoreArray<ECLGamma>::registerPersistent(m_ECLGammaName);
-  StoreArray<GFTrack> gfTracks(m_gfTracksColName);
-  StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName);
-  StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName);
-
+  RelationArray::registerPersistent<ECLGamma, ECLShower>();
 }
 
 void ECLGammaReconstructorModule::beginRun()
@@ -101,6 +96,9 @@ void ECLGammaReconstructorModule::event()
   //Input Array
   StoreArray<ECLShower> eclRecShowerArray(m_ECLShowerName);
   StoreArray<HitAssignmentECL> eclHitAssignmentArray(m_eclHitAssignmentName);
+  StoreArray<ECLGamma> gammaArray(m_ECLGammaName);
+
+  RelationArray eclGammaToShower(gammaArray, eclRecShowerArray);
 
   if (!eclRecShowerArray) {
     B2ERROR("Can not find ECLRecCRHits" << m_ECLShowerName << ".");
@@ -147,29 +145,30 @@ void ECLGammaReconstructorModule::event()
 
     if (!m_extMatch) { //no match to track => assign as gamma
 
-      StoreArray<ECLGamma> gammaArray(m_ECLGammaName);
       m_GNum = gammaArray->GetLast() + 1;
       new(gammaArray->AddrAt(m_GNum)) ECLGamma();
-      gammaArray[m_GNum]->setShower(aECLShower);
+      gammaArray[m_GNum]->setShowerId(m_showerId);
 
+      eclGammaToShower.add(m_GNum, iShower);
+
+      double px = m_energy * sin(m_theta) * cos(m_phi);
+      double py = m_energy * sin(m_theta) * sin(m_phi);
+      double pz = m_energy * cos(m_theta);
 
       /*
-            double px = m_energy * sin(m_theta) * cos(m_phi);
-            double py = m_energy * sin(m_theta) * sin(m_phi);
-            double pz = m_energy * cos(m_theta);
+                    cout<<"EventGamma  "<<m_nEvent<<" Gamma "<<m_showerId<<" "<<sqrt(px*px+py*py+pz*pz)<<" m_extMatch  "<<m_extMatch<<endl;
 
-                  cout<<"Event  "<<m_nEvent<<" Gamma "<<m_showerId<<" "<<sqrt(px*px+py*py+pz*pz)<<" m_extMatch  "<<m_extMatch<<endl;
-                  cout<<"CellID ";
+                   cout<<"CellID ";
 
-                for (int iHA = 0; iHA < hANum; iHA++) {
+                  for (int iHA = 0; iHA < hANum; iHA++) {
 
-                  HitAssignmentECL* aECLShower = eclHitAssignmentArray[iHA];
-                  int m_HAShowerId = aECLShower->getShowerId();
-                  int m_HAcellId = aECLShower->getCellId();
-                  if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
-                }//for HA hANum
-                 cout<<endl;
-      */
+                    HitAssignmentECL* aECLShower = eclHitAssignmentArray[iHA];
+                    int m_HAShowerId = aECLShower->getShowerId();
+                    int m_HAcellId = aECLShower->getCellId();
+                    if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
+                  }//for HA hANum
+                   cout<<endl;
+        */
     }//if !m_extMatch
 
 

@@ -12,13 +12,8 @@
 #include <ecl/dataobjects/ECLPi0.h>
 #include <ecl/dataobjects/ECLGamma.h>
 
-//#include <ecl/geometry/ECLGeometryPar.h>
-//#include <ecl/rec_lib/TEclCFCR.h>
-//#include <ecl/rec_lib/TRecEclCF.h>
-//#include <ecl/rec_lib/TRecEclCFParameters.h>
-//#include <ecl/rec_lib/TEclCFShower.h>
-//#include <ecl/rec_lib/TRecEclCF.h>
-
+#include <ecl/dataobjects/ECLShower.h>
+#include <framework/datastore/RelationArray.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
@@ -56,11 +51,14 @@ ECLPi0ReconstructorModule::ECLPi0ReconstructorModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //input
+
+  addParam("ECLShowerinput", m_ECLShowerName,
+           "//input of this module//shower infromation", string("ECLShowers"));
   addParam("ECLGammaInput", m_ECLGammaName,
-           "//Input of this RecPi0  module", string("ECLGamma"));
+           "//Input of this RecPi0  module", string("ECLGammas"));
 
   addParam("ECLPi0Output", m_ECLPi0Name,
-           "//output of this RecPi0 module", string("ECLPi0"));
+           "//output of this RecPi0 module", string("ECLPi0s"));
 
 //  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
 
@@ -89,7 +87,6 @@ void ECLPi0ReconstructorModule::initialize()
 
   // CPU time start
   m_timeCPU = clock() * Unit::us;
-  StoreArray<ECLGamma> Gamma(m_ECLGammaName);
   StoreArray<ECLPi0>::registerPersistent(m_ECLPi0Name);
 }
 
@@ -102,74 +99,82 @@ void ECLPi0ReconstructorModule::event()
 {
 
   StoreArray<ECLGamma> Gamma(m_ECLGammaName);
-
-  if (!Gamma) {
-    B2ERROR("Can not find ECLRecCRHits" << m_ECLGammaName << ".");
-  }
-  const int GNum = Gamma->GetEntriesFast();
+  StoreArray<ECLShower> eclRecShowerArray(m_ECLShowerName);
+  RelationArray eclGammaToShower(Gamma, eclRecShowerArray);
 
 
-  for (int iGamma = 0; iGamma < GNum - 1 ; iGamma++) {
-    ECLGamma* aGamma = Gamma[iGamma];
-    m_showerId1 = aGamma->getShowerId();
-    m_px1 = aGamma->getpx();
-    m_py1 = aGamma->getpy();
-    m_pz1 = aGamma->getpz();
-    CLHEP::Hep3Vector p3Gamma1(m_px1, m_py1, m_pz1);
+  for (int iIndex = 0; iIndex < eclGammaToShower.getEntries() - 1 ; iIndex++) {
+    for (int iHit = 0; iHit < (int)eclGammaToShower[iIndex].getToIndices().size(); iHit++) {
 
-    //cout<<"Pi0   "<<m_px1<<" "<<m_py1<<" "<<m_pz1<<" "<<" "<<sqrt(m_px1*m_px1+m_py1*m_py1+m_pz1*m_pz1)<<endl;
+      ECLShower* aECLShower = eclRecShowerArray[ eclGammaToShower[iIndex].getToIndex(iHit) ];
+      m_showerId1 = aECLShower->GetShowerId();
+      double m_energy1 = aECLShower->GetEnergy();
+      double m_theta1 = aECLShower->GetTheta();
+      double m_phi1 = aECLShower->GetPhi();
+      m_px1 = m_energy1 * sin(m_theta1) * cos(m_phi1);
+      m_py1 = m_energy1 * sin(m_theta1) * sin(m_phi1);
+      m_pz1 = m_energy1 * cos(m_theta1);
 
-    // gamma energy cut
-    const double EGamma1 = p3Gamma1.mag();
-    if (EGamma1 < gamma_energy_threshold)continue;
+      CLHEP::Hep3Vector p3Gamma1(m_px1, m_py1, m_pz1);
 
-    for (int jGamma = iGamma + 1; jGamma < GNum; jGamma++) {
-      ECLGamma* aGamma2 = Gamma[jGamma];
-      m_showerId2 = aGamma2->getShowerId();
-      m_px2 = aGamma2->getpx();
-      m_py2 = aGamma2->getpy();
-      m_pz2 = aGamma2->getpz();
-
-      CLHEP::Hep3Vector p3Gamma2(m_px2, m_py2, m_pz2);
       // gamma energy cut
-      const double EGamma2 = p3Gamma2.mag();
-      if (EGamma2 < gamma_energy_threshold)continue;
-      CLHEP::Hep3Vector p3Rec = p3Gamma1 + p3Gamma2;
+      const double EGamma1 = p3Gamma1.mag();
+      if (EGamma1 < gamma_energy_threshold)continue;
+
+      for (int jIndex = iIndex + 1; jIndex < eclGammaToShower.getEntries() ; jIndex++) {
+        for (int jHit = 0; jHit < (int)eclGammaToShower[jIndex].getToIndices().size(); jHit++) {
+
+          ECLShower* aECLShower = eclRecShowerArray[ eclGammaToShower[jIndex].getToIndex(jHit) ];
+          m_showerId2 = aECLShower->GetShowerId();
+          double m_energy2 = aECLShower->GetEnergy();
+          double m_theta2 = aECLShower->GetTheta();
+          double m_phi2 = aECLShower->GetPhi();
+          m_px2 = m_energy2 * sin(m_theta2) * cos(m_phi2);
+          m_py2 = m_energy2 * sin(m_theta2) * sin(m_phi2);
+          m_pz2 = m_energy2 * cos(m_theta2);
+
+          CLHEP::Hep3Vector p3Gamma2(m_px2, m_py2, m_pz2);
+          // gamma energy cut
+          const double EGamma2 = p3Gamma2.mag();
+          if (EGamma2 < gamma_energy_threshold)continue;
+          CLHEP::Hep3Vector p3Rec = p3Gamma1 + p3Gamma2;
 
 
-      CLHEP::HepLorentzVector lv_gamma1(p3Gamma1, EGamma1);
-      CLHEP::HepLorentzVector lv_gamma2(p3Gamma2, EGamma2);
-      CLHEP::HepLorentzVector lv_rec = lv_gamma1 + lv_gamma2;
-      const double mass = lv_rec.mag();
-      if (fit_flag) {
-        fit(lv_gamma1, lv_gamma2);
-        if (pi0_mass_min < mass && mass < pi0_mass_max) {
+          CLHEP::HepLorentzVector lv_gamma1(p3Gamma1, EGamma1);
+          CLHEP::HepLorentzVector lv_gamma2(p3Gamma2, EGamma2);
+          CLHEP::HepLorentzVector lv_rec = lv_gamma1 + lv_gamma2;
+          const double mass = lv_rec.mag();
+          if (fit_flag) {
+            fit(lv_gamma1, lv_gamma2);
+            if (pi0_mass_min < mass && mass < pi0_mass_max) {
 
-          StoreArray<ECLPi0> Pi0Array(m_ECLPi0Name);
-          m_Pi0Num = Pi0Array->GetLast() + 1;
-          new(Pi0Array->AddrAt(m_Pi0Num)) ECLPi0();
-          Pi0Array[m_Pi0Num]->setShower1(aGamma->getShower());
-          Pi0Array[m_Pi0Num]->setShower2(aGamma2->getShower());
+              StoreArray<ECLPi0> Pi0Array(m_ECLPi0Name);
+              m_Pi0Num = Pi0Array->GetLast() + 1;
+              new(Pi0Array->AddrAt(m_Pi0Num)) ECLPi0();
+              Pi0Array[m_Pi0Num]->setShowerId1(m_showerId1);
+              Pi0Array[m_Pi0Num]->setShowerId2(m_showerId2);
 
-          Pi0Array[m_Pi0Num]->setenergy((float)m_pi0E);
-          Pi0Array[m_Pi0Num]->setpx((float)m_pi0px);
-          Pi0Array[m_Pi0Num]->setpy((float)m_pi0py);
-          Pi0Array[m_Pi0Num]->setpz((float)m_pi0pz);
+              Pi0Array[m_Pi0Num]->setenergy((float)m_pi0E);
+              Pi0Array[m_Pi0Num]->setpx((float)m_pi0px);
+              Pi0Array[m_Pi0Num]->setpy((float)m_pi0py);
+              Pi0Array[m_Pi0Num]->setpz((float)m_pi0pz);
 
-          Pi0Array[m_Pi0Num]->setmass((float)lv_rec.mag());
-          Pi0Array[m_Pi0Num]->setmassfit((float)m_pi0mass);
-          Pi0Array[m_Pi0Num]->setchi2((float)m_pi0chi2);
+              Pi0Array[m_Pi0Num]->setmass((float)lv_rec.mag());
+              Pi0Array[m_Pi0Num]->setmassfit((float)m_pi0mass);
+              Pi0Array[m_Pi0Num]->setchi2((float)m_pi0chi2);
 
-          //cout << "Event " << m_nEvent << " Pi0 from Gamma " << m_showerId1 << " " << m_showerId2 << " " << m_pi0E << " " << m_pi0mass << endl;
+              //cout << "Event " << m_nEvent << " Pi0 from Gamma " << m_showerId1 << " " << m_showerId2 << " " << m_pi0E << " " << m_pi0mass << endl;
+
+            }
+          } else if (pi0_mass_min < mass && mass < pi0_mass_max) {
+          }
+
+
 
         }
-      } else if (pi0_mass_min < mass && mass < pi0_mass_max) {
-      }
-
-
-
-    }//gamma2
-  }//gamma1
+      }//gamma2 jIndex jHit
+    }
+  }//gamma1 iIndex iHit
 
   m_nEvent++;
 }

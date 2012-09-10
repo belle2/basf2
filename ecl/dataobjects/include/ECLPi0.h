@@ -24,29 +24,20 @@ namespace Belle2 {
   public:
 
 
-    //! The shower point of this gamma1.
-    ECLShower* m_aECLShower1;
+    /**shower id of this Gamma. */
+    int m_showerId1;
+    //! The method to set showerId1
+    void setShowerId1(int showerId1) { m_showerId1 = showerId1; }
+    //! The method to get showerId1
+    int GetShowerId1() const { return m_showerId1 ; }
+    /**shower id of this Gamma. */
+    int m_showerId2;
+    //! The method to set showerId2
+    void setShowerId2(int showerId2) { m_showerId2 = showerId2; }
+    //! The method to get showerId2
+    int GetShowerId2() const { return m_showerId2 ; }
 
-    //! The method to set shower1 id
-    void setShower1(ECLShower* aECLShower) { m_aECLShower1 = aECLShower;}
 
-    //! The method to get shower1
-    ECLShower* getShower1() {return m_aECLShower1; }
-
-    //! The method to get shower1 id
-    int getShower1Id() const { return  m_aECLShower1->GetShowerId(); }
-
-    //! The shower point of this gamma2.
-    ECLShower* m_aECLShower2;
-
-    //! The method to set shower1 id
-    void setShower2(ECLShower* aECLShower) { m_aECLShower2 = aECLShower;}
-
-    //! The method to get shower1
-    ECLShower* getShower2() {return m_aECLShower2; }
-
-    //! The method to get shower1 id
-    int getShower2Id() const { return  m_aECLShower2->GetShowerId(); }
 
 
 

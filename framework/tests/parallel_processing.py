@@ -1,16 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 # Test the parallel processing functionality by simulating a few events
 # using 2 processes (so nothing too taxing)
 
 from basf2 import *
 
-
 # to run the framework the used modules need to be registered
 particlegun = register_module('ParticleGun')
-
 
 # ============================================================================
 # Setting the list of particle codes (PDG codes) for the generated particles
@@ -141,11 +138,7 @@ progress = register_module('Progress')
 gearbox = register_module('Gearbox')
 # Create geometry
 geometry = register_module('Geometry')
-geometry.param('Components', [
-    'MagneticField',
-    'BeamPipe',
-    'PXD',
-    ])
+geometry.param('Components', ['MagneticField', 'BeamPipe', 'PXD'])
 # Run simulation
 simulation = register_module('FullSim')
 param_g4sim = {'RegisterOptics': 1, 'PhotonFraction': 0.3,

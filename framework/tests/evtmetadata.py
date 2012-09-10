@@ -6,30 +6,34 @@ from ROOT import Belle2
 
 
 class EvtMetaDataTest(Module):
+
     """Prints EventMetaData objects and stops event processing in event 3."""
 
     def __init__(self):
         """constructor."""
+
         super(EvtMetaDataTest, self).__init__()
         self.setName('EvtMetaDataTest')
-        B2INFO("event\trun\texp")
+        B2INFO('event\trun\texp')
 
     def event(self):
         """reimplementation of Module::event()."""
+
         evtmetadata = Belle2.PyStoreObj('EventMetaData')
         if not evtmetadata:
-            B2ERROR("No EventMetaData found")
+            B2ERROR('No EventMetaData found')
         else:
             event = evtmetadata.obj().getEvent()
             run = evtmetadata.obj().getRun()
             exp = evtmetadata.obj().getExperiment()
-            B2INFO(str(event) + "\t" + str(run) + "\t" + str(exp))
+            B2INFO(str(event) + '\t' + str(run) + '\t' + str(exp))
             if event == 3:
                 # stop event processing.
                 evtmetadata.obj().setEndOfData()
 
     def terminate(self):
         """reimplementation of Module::terminate()."""
+
         B2INFO('terminating EvtMetaDataTest')
 
 
@@ -37,7 +41,6 @@ class EvtMetaDataTest(Module):
 
 # Create main path
 main = create_path()
-
 
 # exp 0 has only 2 events, so cannot trigger the test module,
 # exp 1 has no events and will be skipped

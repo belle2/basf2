@@ -8,26 +8,31 @@ from ROOT import Belle2
 
 
 class SelectOddEvents(Module):
+
     """For events with an odd event number, set module return value to False"""
 
     def __init__(self):
         """constructor."""
+
         super(SelectOddEvents, self).__init__()
         self.setName('SelectOddEvents')
 
     def event(self):
         """reimplementation of Module::event()."""
+
         evtmetadata = Belle2.PyStoreObj('EventMetaData')
         if not evtmetadata:
-            B2ERROR("No EventMetaData found")
+            B2ERROR('No EventMetaData found')
         else:
             event = evtmetadata.obj().getEvent()
-            B2INFO("Setting return value to " + str((event % 2) == 0))
+            B2INFO('Setting return value to ' + str(event % 2 == 0))
             self.return_value(event % 2 == 0)
 
     def terminate(self):
         """reimplementation of Module::terminate()."""
+
         B2INFO('terminating SelectOddEvents')
+
 
 # register necessary modules
 evtmetagen = register_module('EvtMetaGen')
@@ -39,7 +44,6 @@ evtmetagen.param('EvtNumList', [2, 1])
 evtmetainfo = register_module('EvtMetaInfo')
 progress = register_module('Progress')
 printcollections = register_module('PrintCollections')
-
 
 # create main path
 main = create_path()
@@ -57,7 +61,7 @@ subsubpath = create_path()
 subsubpath.add_module(progress)
 subsubpath.add_path(emptypath)
 
-#fill anotherpath now
+# fill anotherpath now
 module_with_condition = SelectOddEvents()
 anotherpath.add_module(module_with_condition)
 anotherpath.add_module(evtmetainfo)
@@ -70,7 +74,7 @@ print main
 
 # when the module returns false/0 (odd events), we jump to Progress instead:
 # [] -> evtmetagen -> [SelectOddEvents -> [Progress -> []]]
-module_with_condition.condition("<1", subsubpath)
+module_with_condition.condition('<1', subsubpath)
 
 process(main)
 

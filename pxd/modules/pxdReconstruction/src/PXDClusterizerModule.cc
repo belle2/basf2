@@ -63,16 +63,6 @@ PXDClusterizerModule::PXDClusterizerModule() : Module(), m_elNoise(200.0),
            "TrueHit collection name", string(""));
   addParam("MCParticles", m_storeMCParticlesName,
            "MCParticles collection name", string(""));
-  addParam("DigitMCRel", m_relDigitMCParticleName,
-           "Relation between digits and MCParticles", string(""));
-  addParam("ClusterMCRel", m_relClusterMCParticleName,
-           "Relation between clusters and MCParticles", string(""));
-  addParam("ClusterDigitRel", m_relClusterDigitName,
-           "Relation between clusters and Digits", string(""));
-  addParam("DigitTrueRel", m_relDigitTrueHitName,
-           "Relation between Digits and TrueHits", string(""));
-  addParam("ClusterTrueRel", m_relDigitTrueHitName,
-           "Relation between Clusters and TrueHits", string(""));
 
   addParam("TanLorentz", m_tanLorentzAngle,
            "Tangent of the Lorentz angle", double(0.25));
@@ -84,9 +74,9 @@ void PXDClusterizerModule::initialize()
 {
   //Register output collections
   StoreArray<PXDCluster>::registerPersistent(m_storeClustersName);
-  RelationArray::registerPersistent<PXDCluster, MCParticle>(m_relClusterMCParticleName);
-  RelationArray::registerPersistent<PXDCluster, PXDDigit>(m_relClusterDigitName);
-  RelationArray::registerPersistent<PXDCluster, PXDTrueHit>(m_relClusterTrueHitName);
+  RelationArray::registerPersistent<PXDCluster, MCParticle>();
+  RelationArray::registerPersistent<PXDCluster, PXDDigit>();
+  RelationArray::registerPersistent<PXDCluster, PXDTrueHit>();
 
   //Set names in case default was used. We need these for the RelationIndices.
   m_relDigitMCParticleName   = DataStore::relationName(

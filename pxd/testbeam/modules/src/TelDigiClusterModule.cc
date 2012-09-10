@@ -56,21 +56,15 @@ TelDigiClusterModule::TelDigiClusterModule() : Module()
            "TrueHit collection name", string(""));
   addParam("Clusters", m_storeClustersName,
            "TrueHit collection name", string(""));
-  addParam("MCTrueHitRel", m_relMCParticleTrueHitName,
-           "Relation between MCParticles and SimHits", string(""));
-  addParam("ClusterMCRel", m_relClusterMCParticleName,
-           "Relation between clusters and MCParticles", string(""));
-  addParam("ClusterTrueHitRel", m_relClusterTrueHitName,
-           "Relation between clusters and TrueHits", string(""));
 }
 
 void TelDigiClusterModule::initialize()
 {
   //Register all required collections
   StoreArray<TelCluster>::registerPersistent(m_storeClustersName);
-  RelationArray::registerPersistent<MCParticle, TelTrueHit>(m_relMCParticleTrueHitName);
-  RelationArray::registerPersistent<TelCluster, MCParticle>(m_relClusterMCParticleName);
-  RelationArray::registerPersistent<TelCluster, TelTrueHit>(m_relClusterTrueHitName);
+  RelationArray::registerPersistent<MCParticle, TelTrueHit>();
+  RelationArray::registerPersistent<TelCluster, MCParticle>();
+  RelationArray::registerPersistent<TelCluster, TelTrueHit>();
 
   //Set names in case default was used
   m_relMCParticleTrueHitName = DataStore::relationName(

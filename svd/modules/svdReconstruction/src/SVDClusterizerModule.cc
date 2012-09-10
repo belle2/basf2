@@ -57,16 +57,6 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
            "TrueHit collection name", string(""));
   addParam("MCParticles", m_storeMCParticlesName,
            "MCParticles collection name", string(""));
-  addParam("DigitMCRel", m_relDigitMCParticleName,
-           "Relation between digits and MCParticles", string(""));
-  addParam("ClusterMCRel", m_relClusterMCParticleName,
-           "Relation between clusters and MCParticles", string(""));
-  addParam("ClusterDigitRel", m_relClusterDigitName,
-           "Relation between clusters and Digits", string(""));
-  addParam("DigitTrueRel", m_relDigitTrueHitName,
-           "Relation between Digits and TrueHits", string(""));
-  addParam("ClusterTrueRel", m_relDigitTrueHitName,
-           "Relation between Clusters and TrueHits", string(""));
 
   // 2. Physics.
   // FIXME: The mean Lorentz angles should be set sensor-wise, or at least
@@ -115,9 +105,9 @@ void SVDClusterizerModule::initialize()
 {
   //Register collections
   StoreArray<SVDCluster>::registerPersistent(m_storeClustersName);
-  RelationArray::registerPersistent<SVDCluster, MCParticle>(m_relClusterMCParticleName);
-  RelationArray::registerPersistent<SVDCluster, SVDDigit>(m_relClusterDigitName);
-  RelationArray::registerPersistent<SVDCluster, SVDTrueHit>(m_relClusterTrueHitName);
+  RelationArray::registerPersistent<SVDCluster, MCParticle>();
+  RelationArray::registerPersistent<SVDCluster, SVDDigit>();
+  RelationArray::registerPersistent<SVDCluster, SVDTrueHit>();
 
   //Set names in case default was used. This is needed to initialize RalationIndices.
   m_relDigitMCParticleName   = DataStore::relationName(

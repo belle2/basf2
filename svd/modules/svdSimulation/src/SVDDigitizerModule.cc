@@ -70,14 +70,6 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(), m_rootFile(0), m_histDiffus
            "SimHit collection name", string(""));
   addParam("TrueHits", m_storeTrueHitsName,
            "TrueHit collection name", string(""));
-  addParam("MCSimHitRel", m_relMCParticleSimHitName,
-           "Relation between MCParticles and SimHits", string(""));
-  addParam("DigitMCRel", m_relDigitMCParticleName,
-           "Relation between Digits and MCParticles", string(""));
-  addParam("TrueSimRel", m_relTrueHitSimHitName,
-           "Relation between TrueHits and SimHits", string(""));
-  addParam("DigitTrueRel", m_relDigitTrueHitName,
-           "Relation between Digits and TrueHits", string(""));
 
   // 2. Physics
   addParam("Temperature", m_temperature,
@@ -132,8 +124,8 @@ void SVDDigitizerModule::initialize()
 {
   //Register all required collections
   StoreArray<SVDDigit>::registerPersistent(m_storeDigitsName);
-  RelationArray::registerPersistent<SVDDigit, MCParticle>(m_relDigitMCParticleName);
-  RelationArray::registerPersistent<SVDDigit, SVDTrueHit>(m_relDigitTrueHitName);
+  RelationArray::registerPersistent<SVDDigit, MCParticle>();
+  RelationArray::registerPersistent<SVDDigit, SVDTrueHit>();
 
   //Set names in case default was used. We need the names to initialize the RelationIndices.
   m_relMCParticleSimHitName = DataStore::relationName(

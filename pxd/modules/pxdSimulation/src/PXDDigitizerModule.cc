@@ -62,14 +62,6 @@ PXDDigitizerModule::PXDDigitizerModule() : Module(), m_rootFile(0), m_histSteps(
            "SimHit collection name", string(""));
   addParam("TrueHits", m_storeTrueHitsName,
            "TrueHit collection name", string(""));
-  addParam("MCSimHitRel", m_relMCParticleSimHitName,
-           "Relation between MCParticles and SimHits", string(""));
-  addParam("DigitMCRel", m_relDigitMCParticleName,
-           "Relation between Digits and MCParticles", string(""));
-  addParam("TrueSimRel", m_relTrueHitSimHitName,
-           "Relation between TrueHits and SimHits", string(""));
-  addParam("DigitTrueRel", m_relDigitTrueHitName,
-           "Relation between Digits and TrueHits", string(""));
 
   addParam("PoissonSmearing", m_applyPoisson,
            "Apply Poisson smearing of electrons collected on pixels?", true);
@@ -112,10 +104,10 @@ void PXDDigitizerModule::initialize()
 {
   //Register output collections
   StoreArray<PXDDigit>::registerPersistent(m_storeDigitsName);
-  RelationArray::registerPersistent<PXDDigit, MCParticle>(m_relDigitMCParticleName);
-  RelationArray::registerPersistent<PXDDigit, PXDTrueHit>(m_relDigitTrueHitName);
+  RelationArray::registerPersistent<PXDDigit, MCParticle>();
+  RelationArray::registerPersistent<PXDDigit, PXDTrueHit>();
 
-  //Set names in case default was used
+  //Set default names for the relations
   m_relMCParticleSimHitName = DataStore::relationName(
                                 DataStore::arrayName<MCParticle>(m_storeMCParticlesName),
                                 DataStore::arrayName<PXDSimHit>(m_storeSimHitsName)

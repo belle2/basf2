@@ -18,7 +18,6 @@
 #include <string>
 #include <set>
 #include <vector>
-//#include <boost/array.hpp>
 
 #include <root/TVector3.h>
 #include <root/TFile.h>

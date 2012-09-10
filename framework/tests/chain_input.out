@@ -1,0 +1,474 @@
+[INFO] Steering file: chain_input.py
+>>> basf2 Python environment set
+>>> Framework object created: fw
+[INFO] Added file chaintest_1.root
+[INFO] Added file chaintest_2.root
+[INFO] Opened tree 'tree' with 27 entries.
+[INFO] Added file chaintest_1.root
+[INFO] Added file chaintest_2.root
+[INFO] Opened tree 'persistent' with 2 entries.
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        1        EVT:        2
+[INFO] ============================================================================
+[INFO] DataStore collections in event 2
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                34
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] ============================================================================
+[INFO] DataStore collections in event 6
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                33
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        5
+[INFO] ============================================================================
+[INFO] DataStore collections in event 5
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                37
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] ============================================================================
+[INFO] DataStore collections in event 9
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                31
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] ============================================================================
+[INFO] DataStore collections in event 10
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                56
+[INFO] (Array)   PXDTrueHits               3
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] ============================================================================
+[INFO] DataStore collections in event 11
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                71
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] ============================================================================
+[INFO] DataStore collections in event 8
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                34
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] ============================================================================
+[INFO] DataStore collections in event 12
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                76
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] ============================================================================
+[INFO] DataStore collections in event 0
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                31
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] ============================================================================
+[INFO] DataStore collections in event 13
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                70
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] ============================================================================
+[INFO] DataStore collections in event 15
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                34
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] ============================================================================
+[INFO] DataStore collections in event 16
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                66
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        7
+[INFO] ============================================================================
+[INFO] DataStore collections in event 7
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                54
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] ============================================================================
+[INFO] DataStore collections in event 6
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                62
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        3
+[INFO] ============================================================================
+[INFO] DataStore collections in event 3
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                80
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] ============================================================================
+[INFO] DataStore collections in event 8
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                46
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] ============================================================================
+[INFO] DataStore collections in event 9
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                35
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] ============================================================================
+[INFO] DataStore collections in event 12
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                34
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        4
+[INFO] ============================================================================
+[INFO] DataStore collections in event 4
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                32
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] ============================================================================
+[INFO] DataStore collections in event 11
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                32
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] ============================================================================
+[INFO] DataStore collections in event 10
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                39
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] ============================================================================
+[INFO] DataStore collections in event 16
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                68
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] ============================================================================
+[INFO] DataStore collections in event 13
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                64
+[INFO] (Array)   PXDTrueHits               3
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:       17
+[INFO] ============================================================================
+[INFO] DataStore collections in event 17
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                34
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:       18
+[INFO] ============================================================================
+[INFO] DataStore collections in event 18
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                33
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:       14
+[INFO] ============================================================================
+[INFO] DataStore collections in event 14
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                40
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] ============================================================================
+[INFO] DataStore collections in event 15
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDTrueHitsToPXDSimHits
+[INFO] (Array)   PXDSimHits                40
+[INFO] (Array)   PXDTrueHits               2
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1
+[INFO] ========================================================================

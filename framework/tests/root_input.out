@@ -1,0 +1,103 @@
+[INFO] Steering file: framework/tests/root_input.py
+>>> basf2 Python environment set
+>>> Framework object created: fw
+[INFO] Added file simple_input.root
+[INFO] Opened tree 'tree' with 5 entries.
+[INFO] Added file simple_input.root
+[INFO] Opened tree 'persistent' with 1 entries.
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] ============================================================================
+[INFO] DataStore collections in event 0
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDClustersToPXDDigits
+[INFO] (Object)  PXDClustersToPXDTrueHits
+[INFO] (Array)   PXDDigits                 177
+[INFO] (Array)   PXDTrueHits               40
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        1
+[INFO] ============================================================================
+[INFO] DataStore collections in event 1
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDClustersToPXDDigits
+[INFO] (Object)  PXDClustersToPXDTrueHits
+[INFO] (Array)   PXDDigits                 165
+[INFO] (Array)   PXDTrueHits               37
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        2
+[INFO] ============================================================================
+[INFO] DataStore collections in event 2
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDClustersToPXDDigits
+[INFO] (Object)  PXDClustersToPXDTrueHits
+[INFO] (Array)   PXDDigits                 150
+[INFO] (Array)   PXDTrueHits               59
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        3
+[INFO] ============================================================================
+[INFO] DataStore collections in event 3
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDClustersToPXDDigits
+[INFO] (Object)  PXDClustersToPXDTrueHits
+[INFO] (Array)   PXDDigits                 103
+[INFO] (Array)   PXDTrueHits               18
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        1        EVT:        4
+[INFO] ============================================================================
+[INFO] DataStore collections in event 4
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDClustersToPXDDigits
+[INFO] (Object)  PXDClustersToPXDTrueHits
+[INFO] (Array)   PXDDigits                 165
+[INFO] (Array)   PXDTrueHits               48
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
+[INFO] 
+[INFO] ============================================================================
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1
+[INFO] ========================================================================

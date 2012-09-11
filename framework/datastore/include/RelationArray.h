@@ -143,7 +143,7 @@ namespace Belle2 {
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
      *  @return            True if the registration succeeded.
      */
-    template<class FROM, class TO> static bool registerPersistent(const std::string& fromName = "", const std::string& toName = "", DataStore::EDurability durability = DataStore::c_Event,
+    template<class FROM, class TO> static bool registerPersistent(const std::string& fromName, const std::string& toName, DataStore::EDurability durability = DataStore::c_Event,
         bool errorIfExisting = true) {
       const std::string& relName = DataStore::relationName(DataStore::arrayName<FROM>(fromName), DataStore::arrayName<TO>(toName));
       return DataStore::Instance().createEntry(relName, durability, RelationContainer::Class(), false, false, errorIfExisting);
@@ -152,7 +152,17 @@ namespace Belle2 {
     /** Register a relation array, that should be written to the output by default, in the data store.
      *  This must be called in the initialzation phase.
      *
-     *  @param name        Name under which the TClonesArray is stored.
+     *  @param durability  Specifies lifetime of array in question.
+     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
+     *  @return            True if the registration succeeded.
+     */
+    template<class FROM, class TO> static bool registerPersistent(DataStore::EDurability durability = DataStore::c_Event, bool errorIfExisting = true) {
+      return registerPersistent<FROM, TO>("", "", durability, errorIfExisting);
+    }
+    /** Register a relation array, that should be written to the output by default, in the data store.
+     *  This must be called in the initialzation phase.
+     *
+     *  @param name        Name under which the relation is stored.
      *  @param durability  Specifies lifetime of array in question.
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
      *  @return            True if the registration succeeded.
@@ -162,21 +172,35 @@ namespace Belle2 {
       return DataStore::Instance().createEntry(name, durability, RelationContainer::Class(), false, false, errorIfExisting);
     }
 
-    /** Register a relation array, that should not be written to the output by default, in the data store.
+    /** Register a relation array, that should NOT be written to the output by default, in the data store.
+     *  This must be called in the initialzation phase.
+     *
+     *  @param fromName    Name of from-array ("" for default name)
+     *  @param toName      Name of to-array ("" for default name)
+     *  @param durability  Specifies lifetime of array in question.
+     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
+     *  @return            True if the registration succeeded.
+     */
+    template<class FROM, class TO> static bool registerTransient(const std::string& fromName, const std::string& toName, DataStore::EDurability durability = DataStore::c_Event,
+        bool errorIfExisting = true) {
+      const std::string& relName = DataStore::relationName(DataStore::arrayName<FROM>(fromName), DataStore::arrayName<TO>(toName));
+      return DataStore::Instance().createEntry(relName, durability, RelationContainer::Class(), false, true, errorIfExisting);
+    }
+    /** Register a relation array, that should NOT be written to the output by default, in the data store.
      *  This must be called in the initialzation phase.
      *
      *  @param durability  Specifies lifetime of array in question.
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
      *  @return            True if the registration succeeded.
      */
-    template<class FROM, class TO> static bool registerTransient(const std::string& name, DataStore::EDurability durability = DataStore::c_Event,
+    template<class FROM, class TO> static bool registerTransient(DataStore::EDurability durability = DataStore::c_Event,
         bool errorIfExisting = true) {
-      return DataStore::Instance().createEntry(DataStore::defaultRelationName<FROM, TO>(), durability, RelationContainer::Class(), false, true, errorIfExisting);
+      return registerTransient<FROM, TO>("", "", durability, errorIfExisting);
     }
-    /** Register a relation array, that should not be written to the output by default, in the data store.
+    /** Register a relation array, that should NOT be written to the output by default, in the data store.
      *  This must be called in the initialzation phase.
      *
-     *  @param name        Name under which the TClonesArray is stored.
+     *  @param name        Name under which the relation is stored.
      *  @param durability  Specifies lifetime of array in question.
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
      *  @return            True if the registration succeeded.
@@ -189,7 +213,9 @@ namespace Belle2 {
     /** Check whether a relation array was registered before.
      *
      *  It will cause an error if the object does not exist.
-     *  This must be called in the initialzation phase.
+     *  You can use this in your module's initialize() function to require
+     *  some relation to be registered. If it is absent, the execution will abort,
+     *  allowing you to catch errors like missing modules early.
      *
      *  @param name        Name under which the relation array is stored.
      *  @param durability  Specifies lifetime of relation array in question.

@@ -48,6 +48,7 @@ TRGCDCModule::TRGCDCModule()
 //    _hFinderMeshY(96),
       _hFinderMeshY(24),
       _fLRLUT(1),
+      _fevtTime(1),
       _cdc(0),
       _sa(0) {
 
@@ -101,6 +102,10 @@ TRGCDCModule::TRGCDCModule()
              _fLRLUT,
              "Using L/R LUT in fitter3D",
              _fLRLUT);
+    addParam("EvtTime",
+             _fevtTime,
+             "Using event time in Segment",
+             _fevtTime);
 
     if (TRGDebug::level())
       cout << "TRGCDCModule ... created" << endl;
@@ -164,7 +169,8 @@ TRGCDCModule::beginRun() {
 				 _hFinderPerfect,
 				 _hFinderMeshX,
 				 _hFinderMeshY,
-         _fLRLUT);
+         _fLRLUT,
+	 _fevtTime);
 
     if (TRGDebug::level())
 	cout << "TRGCDCModule ... beginRun called " << endl;

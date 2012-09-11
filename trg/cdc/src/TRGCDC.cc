@@ -61,20 +61,18 @@ using namespace std;
 
 namespace Belle2 {
 
-  string
-  TRGCDC::name(void) const
-  {
+string
+TRGCDC::name(void) const {
     return "TRGCDC";
-  }
+}
 
-  string
-  TRGCDC::version(void) const
-  {
-    return string("TRGCDC 5.14");
-  }
+string
+TRGCDC::version(void) const {
+    return string("TRGCDC 5.20");
+}
 
-  TRGCDC*
-  TRGCDC::_cdc = 0;
+TRGCDC *
+TRGCDC::_cdc = 0;
 
   TRGCDC*
   TRGCDC::getTRGCDC(const string& configFile,
@@ -87,7 +85,8 @@ namespace Belle2 {
                     bool houghFinderPerfect,
                     unsigned houghFinderMeshX,
                     unsigned houghFinderMeshY,
-                    bool fLRLUT)
+                    bool fLRLUT,
+		    bool fevtTime)
   {
     if (_cdc) {
       //delete _cdc;
@@ -105,7 +104,8 @@ namespace Belle2 {
                         houghFinderPerfect,
                         houghFinderMeshX,
                         houghFinderMeshY,
-                        fLRLUT);
+                        fLRLUT,
+			fevtTime);
     } else {
       cout << "TRGCDC::getTRGCDC ... good-bye" << endl;
 //        delete _cdc;
@@ -133,7 +133,8 @@ namespace Belle2 {
                  bool houghFinderPerfect,
                  unsigned houghFinderMeshX,
                  unsigned houghFinderMeshY,
-                 bool fLRLUT)
+                 bool fLRLUT,
+		 bool fevtTime)
     : _debugLevel(0),
       _configFilename(configFile),
       _simulationMode(simulationMode),
@@ -143,6 +144,7 @@ namespace Belle2 {
       _rootTRGCDCFilename(rootTRGCDCFile),
       _rootFitter3DFilename(rootFitter3DFile),
       _fLRLUT(fLRLUT),
+      _fevtTime(fevtTime),
       _fudgeFactor(1.),
       _width(0),
       _r(0),
@@ -391,6 +393,7 @@ namespace Belle2 {
                                               * layer,
                                               w,
                                               _luts.back(),
+					      _eventTime.back(),
                                               cells);
 
 	tstmp=ts;
@@ -401,7 +404,7 @@ namespace Belle2 {
       }
     }
 
-    tstmp->initialize();
+    tstmp->initialize(_fevtTime);
 
     //...Fill caches...
     if (_width) delete [] _width;
@@ -444,7 +447,8 @@ namespace Belle2 {
                                _rootFitter3DFilename,
                                * this,
                                _eventTime.back(),
-                               _fLRLUT);
+                               _fLRLUT,
+			       _fevtTime);
     _fitter3D->initialize();
 
     //...For module simulation (Front-end)...
@@ -1454,7 +1458,7 @@ namespace Belle2 {
 
         const TCRelation& trackRelation = aTrack.relation();
         const MCParticle& trackMCParticle = trackRelation.mcParticle(0);
-        const TCRelation& trackRelation3D = aTrack.relation3D();
+//iw    const TCRelation& trackRelation3D = aTrack.relation3D();
 
         double mcPt = trackMCParticle.getMomentum().Pt();
         double mcPhi0;

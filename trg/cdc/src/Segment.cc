@@ -24,9 +24,12 @@
 #include "trg/cdc/LUT.h"
 #include "cdc/geometry/CDCGeometryPar.h"
 
+#include "trg/cdc/EventTime.h"
+
 //... Global varibles...
 double wireR[9];
 int nWires[9];
+bool flagevtTime;
 
 using namespace std;
 
@@ -38,6 +41,7 @@ TRGCDCSegment::TRGCDCSegment(unsigned id,
 			     const TCLayer & layer,
 			     const TCWire & w,
 			     const TCLUT * lut,
+			     const TRGCDCEventTime * eventTime,
 			     const std::vector<const TCWire *> & cells)
     : TCCell(id,
 	     layer.size(),
@@ -46,17 +50,17 @@ TRGCDCSegment::TRGCDCSegment(unsigned id,
 	     w.backwardPosition()),
       _lut(lut),
       _wires(cells),
-      _signal(std::string("TS_") + TRGUtil::itostring(id)) {
+      _signal(std::string("TS_") + TRGUtil::itostring(id)),
+      _eventTime(eventTime) {
 }
 
 
 TRGCDCSegment::~TRGCDCSegment() {
 }
  
-//ktktkt
 void
-TRGCDCSegment::initialize(void){
-	cout << "Segment initialization" << endl;
+TRGCDCSegment::initialize(bool fevtTime){
+  flagevtTime=fevtTime;
   CDCGeometryPar* cdcp=CDCGeometryPar::Instance();
   wireR[0]=cdcp->senseWireR(2)*0.01;
   nWires[0]=cdcp->nWiresInLayer(2)*2;
@@ -228,9 +232,14 @@ TRGCDCSegment::hitPattern(void) const {
 
 double
 TRGCDCSegment::phiPosition(void) const {
+  float evtTime=EvtTime()->getT0();
+  evtTime=evtTime*40/1000;
 	double phi=(double)localId()/nWires[superLayerId()]*4*M_PI;
 	int lutcomp=LUT()->getLRLUT(hitPattern(),superLayerId());
 	float dphi=hit()->drift()*10;
+	if(flagevtTime){
+		dphi-=evtTime;
+	}
 	dphi=atan(dphi/wireR[superLayerId()]/1000);
 	if(lutcomp==0){phi-=dphi;}
 	else if(lutcomp==1){phi+=dphi;}

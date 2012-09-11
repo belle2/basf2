@@ -73,7 +73,8 @@ class TRGCDC {
                               bool houghFinderPerfect = false,
                               unsigned houghFinderMeshX = 96,
                               unsigned houghFinderMeshY = 96,
-                              bool fLRLUT = 1);
+                              bool fLRLUT = 1,
+			      bool fevtTime = 1);
     
     /// returns TRGCDC object. TRGCDC should be created with specific
     /// configuration before calling this function.
@@ -92,7 +93,8 @@ class TRGCDC {
            bool houghFinderPerfect,
            unsigned houghFinderMeshX,
            unsigned houghFinderMeshY,
-           bool fLRLUT);
+           bool fLRLUT,
+	   bool fevtTime);
 
     /// Destructor
     virtual ~TRGCDC();
@@ -369,6 +371,9 @@ class TRGCDC {
 
     /// Switch for the LR LUT in Fitter3D.
     bool _fLRLUT;
+
+    /// Switch for the event tiem in Segment.
+    bool _fevtTime;
 
     /// Super layers.
     std::vector<std::vector<TRGCDCLayer *> *> _superLayers;

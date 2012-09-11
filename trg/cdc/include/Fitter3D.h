@@ -40,7 +40,8 @@ class TRGCDCFitter3D {
                    const std::string & rootFitter3DFile,
                    const TRGCDC &,
 		   const TRGCDCEventTime * eventTime,
-                   const bool fLRLUT);
+                   const bool fLRLUT,
+		   const bool fevtTime);
 
     /// Destructor
     virtual ~TRGCDCFitter3D();
@@ -150,6 +151,7 @@ class TRGCDCFitter3D {
       bool m_flagRealInt;
       bool m_flagWireLRLUT;
       bool m_flagNonTSStudy;
+      bool m_flagEvtTime;
 };
 
 //-----------------------------------------------------------------------------

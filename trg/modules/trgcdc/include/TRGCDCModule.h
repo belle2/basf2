@@ -94,6 +94,9 @@ class TRGCDCModule : public Module {
     /// Switch for the LR LUT in Fitter3D.
     bool _fLRLUT;
 
+    /// Switch for the event time in Segment.
+    bool _fevtTime;
+
   private:
 
     /// A pointer to a TRGCDC;

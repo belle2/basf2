@@ -110,12 +110,14 @@ namespace Belle2 {
                                  const string & rootFitter3DFile,
                                  const TRGCDC & TRGCDC,
 				 const TRGCDCEventTime * eventTime,
-                                 bool fLRLUT)
+                                 bool fLRLUT,
+				 bool fevtTime)
     : _name(name),
     _cdc(TRGCDC),
     _eventTime(eventTime),
     m_rootFitter3DFilename(rootFitter3DFile),
-    m_flagWireLRLUT(fLRLUT){
+    m_flagWireLRLUT(fLRLUT),
+    m_flagEvtTime(fevtTime){
 
       //...Initialization...
     }
@@ -502,13 +504,16 @@ namespace Belle2 {
           //	cout << lutcomp << endl;
           //...using LRLUT to determine Left/Right(assume drift() will return drift distance)
           const TCSegment * s = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
-          phi[i]=(double) s->localId()/ni[i]*4*m_Trg_PI;
+          phi[i]=(double) s->localId()/ni[s->superLayerId()]*4*m_Trg_PI;
 
+	  s->phiPosition();
           if( m_flagWireLRLUT == 1){
             ///...Using Drift time information
             int lutcomp=s->LUT()->getLRLUT(s->hitPattern(),s->superLayerId());
             float dphi=s->hit()->drift()*10;
-	    dphi-=evtTime;
+	    if(m_flagEvtTime==1){
+	    	dphi-=evtTime;
+	    }
             dphi=atan(dphi/rro[s->superLayerId()]/1000);
             if(lutcomp==0){phi[i]-=dphi;}
             else if(lutcomp==1){phi[i]+=dphi;}
@@ -517,7 +522,7 @@ namespace Belle2 {
               //	nfrac--;
             }
           }
-	  //phi[i]=s->phiPosition();
+	  phi[i]=s->phiPosition();
         } // End of superlayer loop
 
 

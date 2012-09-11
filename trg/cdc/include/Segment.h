@@ -29,6 +29,7 @@ class TRGCDCLayer;
 class TRGCDCLUT;
 class TRGCDCWireHit;
 class TRGCDCSegmentHit;
+class TRGCDCEventTime;
 
 /// A class to represent a wire in CDC.
 class TRGCDCSegment : public TRGCDCCell {
@@ -40,6 +41,7 @@ class TRGCDCSegment : public TRGCDCCell {
 		  const TRGCDCLayer & layer,
 		  const TRGCDCWire & w,
 		  const TRGCDCLUT * lut,
+		  const TRGCDCEventTime * eventTime,
 		  const std::vector<const TRGCDCWire *> & wires);
 
     /// Destructor
@@ -75,10 +77,17 @@ class TRGCDCSegment : public TRGCDCCell {
     void dump(const std::string & message = std::string(""),
               const std::string & prefix = std::string("")) const;
 
-///ktktkt
-	void initialize(void);
-	double phiPosition(void) const;
 
+    /// initilize variables.
+    void initialize(void);
+    void initialize(bool fevtTime);
+    
+    /// returns phi position.
+    double phiPosition(void) const;
+
+
+    /// returns event time.
+    const TRGCDCEventTime * EvtTime(void) const;
 
   public:// Utility functions
 
@@ -117,9 +126,9 @@ class TRGCDCSegment : public TRGCDCCell {
 
     /// Wire hits.
     std::vector<const TRGCDCWireHit *> _hits;
-//ktktkt
-//	double rro[9];
-//	int ni[9];
+
+    /// EventTime class.
+    const TRGCDCEventTime * const _eventTime;
 
   // Friends
     friend class TRGCDC;
@@ -172,6 +181,12 @@ TRGCDCSegment::center(void) const {
     if (_wires.size() == 15)
 	return * _wires[0];
     return * _wires[5];
+}
+
+inline
+const TRGCDCEventTime *
+TRGCDCSegment::EvtTime(void) const{
+    return _eventTime;
 }
 
 } // namespace Belle2

@@ -264,11 +264,12 @@ namespace Belle2 {
     inline void ensureAttached() const {
       DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, T::Class(), true);
       DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), true);
-      if (!m_storeArray)
-        m_storeArray = reinterpret_cast<TClonesArray**>(DataStore::Instance().getObject(m_name, m_durability, T::Class(), true));
+      if (!m_storeArray) {
+        const_cast<StoreArray*>(this)->m_storeArray = reinterpret_cast<TClonesArray**>(DataStore::Instance().getObject(m_name, m_durability, T::Class(), true));
+      }
     }
     /** Pointer that actually holds the TClonesArray. */
-    mutable TClonesArray** m_storeArray;
+    TClonesArray** m_storeArray;
 
   };
 } // end namespace Belle2

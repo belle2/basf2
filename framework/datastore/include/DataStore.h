@@ -32,7 +32,7 @@ namespace Belle2 {
    *  Currently you can chose between lifetimes of event and persistent.
    *  basf2 deletes the objects from the store according to the durability map in which the objects are stored.
    *
-   *  @sa EDurability StoreObjPtr StoreArray
+   *  @sa EDurability StoreObjPtr StoreArray RelationArray
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=DataStore">The basf2 developers</a>
    */
   class DataStore {
@@ -171,7 +171,7 @@ namespace Belle2 {
      *  @param durability Decide with which durability map you want to perform the requested action.
      *  @param objClass   The class of the object.
      *  @param array      Whether it is a TClonesArray or not.
-     *  @return           Pointer to pointer to created object.
+     *  @return           Wether the object was successfully inserted/created
      */
     bool createObject(TObject* object, bool replace, const std::string& name, EDurability durability,
                       const TClass* objClass, bool array);
@@ -185,9 +185,7 @@ namespace Belle2 {
      *
      *  This should only be called by EventProcessor.
      */
-    void setInitializeActive(bool active) {
-      m_initializeActive = active;
-    }
+    void setInitializeActive(bool active) { m_initializeActive = active; }
 
     /** Are we currently initializing modules? */
     bool getInitializeActive() const { return m_initializeActive; }

@@ -433,7 +433,7 @@ void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
       double weightByT = h * weightGL[iz] / v.Z();
       positionInPlane += weightByT * v;
       //tanLorentz2 += 0.5 * weightGL[iz] * getElectronMobility(currentEField.Mag())*m_hallFactor*m_currentBField.Y();
-      sigmaDrift2 += weightByT * 2 * Unit::uTherm * getElectronMobility(currentEField.Mag());
+      sigmaDrift2 += fabs(weightByT) * 2 * Unit::uTherm * getElectronMobility(currentEField.Mag());
     } // for knots
   } // Integration
   // Adjust sigmaDrift to _current_ Lorentz angle
@@ -456,7 +456,7 @@ void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
   int    nGroups     = (int)(electrons / m_elGroupSize) + 1;
   double groupCharge = electrons / nGroups;
 
-  B2DEBUG(30, "Sigma of drift diffusion is " << sigmaDrift_u << " in u, and " << sigmaDrift_v << " in v");
+  B2DEBUG(30, "Sigma of drift diffusion is " << sigmaDrift2 << ", i.p. " << sigmaDrift_u << " in u, and " << sigmaDrift_v << " in v");
   B2DEBUG(30, "Sigma of lateral diffusion is " << sigmaDiffus << " per step");
   B2DEBUG(40, "Splitting charge in " << nGroups << " groups of " << groupCharge << " electrons");
   for (int group = 0; group < nGroups; ++group) {
@@ -510,6 +510,7 @@ void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
               << ", uID=" << uID << ", vID=" << vID);
       if (m_histSteps) m_histSteps->Fill(m_elMaxSteps);
     }
+    B2DEBUG(40, "Adding charge " << groupCharge << " to digit (" << uID << "," << vID << ")");
     sensor[Digit(uID, vID)].add(groupCharge, m_currentParticle, m_currentTrueHit);
   }
 }

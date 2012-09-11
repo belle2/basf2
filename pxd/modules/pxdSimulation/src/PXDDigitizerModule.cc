@@ -104,8 +104,8 @@ void PXDDigitizerModule::initialize()
 {
   //Register output collections
   StoreArray<PXDDigit>::registerPersistent(m_storeDigitsName);
-  RelationArray::registerPersistent<PXDDigit, MCParticle>();
-  RelationArray::registerPersistent<PXDDigit, PXDTrueHit>();
+  RelationArray::registerPersistent<PXDDigit, MCParticle>(m_storeDigitsName, m_storeMCParticlesName);
+  RelationArray::registerPersistent<PXDDigit, PXDTrueHit>(m_storeDigitsName, m_storeTrueHitsName);
 
   //Set default names for the relations
   m_relMCParticleSimHitName = DataStore::relationName(

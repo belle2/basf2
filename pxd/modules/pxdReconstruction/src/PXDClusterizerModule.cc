@@ -74,9 +74,9 @@ void PXDClusterizerModule::initialize()
 {
   //Register output collections
   StoreArray<PXDCluster>::registerPersistent(m_storeClustersName);
-  RelationArray::registerPersistent<PXDCluster, MCParticle>();
-  RelationArray::registerPersistent<PXDCluster, PXDDigit>();
-  RelationArray::registerPersistent<PXDCluster, PXDTrueHit>();
+  RelationArray::registerPersistent<PXDCluster, MCParticle>(m_storeClustersName, m_storeMCParticlesName);
+  RelationArray::registerPersistent<PXDCluster, PXDDigit>(m_storeClustersName, m_storeDigitsName);
+  RelationArray::registerPersistent<PXDCluster, PXDTrueHit>(m_storeClustersName, m_storeTrueHitsName);
 
   //Set names in case default was used. We need these for the RelationIndices.
   m_relDigitMCParticleName   = DataStore::relationName(

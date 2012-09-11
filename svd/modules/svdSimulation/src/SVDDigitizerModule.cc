@@ -124,8 +124,8 @@ void SVDDigitizerModule::initialize()
 {
   //Register all required collections
   StoreArray<SVDDigit>::registerPersistent(m_storeDigitsName);
-  RelationArray::registerPersistent<SVDDigit, MCParticle>();
-  RelationArray::registerPersistent<SVDDigit, SVDTrueHit>();
+  RelationArray::registerPersistent<SVDDigit, MCParticle>(m_storeDigitsName, m_storeMCParticlesName);
+  RelationArray::registerPersistent<SVDDigit, SVDTrueHit>(m_storeDigitsName, m_storeMCParticlesName);
 
   //Set names in case default was used. We need the names to initialize the RelationIndices.
   m_relMCParticleSimHitName = DataStore::relationName(

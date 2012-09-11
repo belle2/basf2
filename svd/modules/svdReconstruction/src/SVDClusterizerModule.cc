@@ -105,9 +105,9 @@ void SVDClusterizerModule::initialize()
 {
   //Register collections
   StoreArray<SVDCluster>::registerPersistent(m_storeClustersName);
-  RelationArray::registerPersistent<SVDCluster, MCParticle>();
-  RelationArray::registerPersistent<SVDCluster, SVDDigit>();
-  RelationArray::registerPersistent<SVDCluster, SVDTrueHit>();
+  RelationArray::registerPersistent<SVDCluster, MCParticle>(m_storeClustersName, m_storeMCParticlesName);
+  RelationArray::registerPersistent<SVDCluster, SVDDigit>(m_storeClustersName, m_storeDigitsName);
+  RelationArray::registerPersistent<SVDCluster, SVDTrueHit>(m_storeClustersName, m_storeTrueHitsName);
 
   //Set names in case default was used. This is needed to initialize RalationIndices.
   m_relDigitMCParticleName   = DataStore::relationName(

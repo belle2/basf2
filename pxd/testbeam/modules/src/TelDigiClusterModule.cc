@@ -62,9 +62,8 @@ void TelDigiClusterModule::initialize()
 {
   //Register all required collections
   StoreArray<TelCluster>::registerPersistent(m_storeClustersName);
-  RelationArray::registerPersistent<MCParticle, TelTrueHit>();
-  RelationArray::registerPersistent<TelCluster, MCParticle>();
-  RelationArray::registerPersistent<TelCluster, TelTrueHit>();
+  RelationArray::registerPersistent<TelCluster, MCParticle>(m_storeClustersName, m_storeMCParticlesName);
+  RelationArray::registerPersistent<TelCluster, TelTrueHit>(m_storeClustersName, m_storeTrueHitsName);
 
   //Set names in case default was used
   m_relMCParticleTrueHitName = DataStore::relationName(

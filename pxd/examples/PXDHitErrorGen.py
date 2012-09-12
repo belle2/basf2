@@ -22,11 +22,27 @@ class PXDHitErrors(Module):
 
         super(PXDHitErrors, self).__init__()
         self.setName('PXDHitErrors')
-        self.file = open('PXDHitErrorOutput.txt', 'w')
+        self.filename = ''
+        # Use basf2 <scriptname> <asciiname> to set the name of this output file
+        if len(sys.argv) > 1:
+            self.filename = sys.argv[2]
+        if self.filename == '':
+            self.filename = 'PXDHitErrorOutput.txt'
+        self.file = open(self.filename, 'w')
         self.vxdid_factors = (8192, 256, 32)  # For decoding VxdID's
 
     def beginRun(self):
-        """ Do nothing """
+        """ Write legend for file columns """
+
+        self.file.write('LEGEND TO COLUMNS: \n')
+        self.file.write('SensorID Layer Ladder Sensor Truehit_index Cluster_index \n'
+                        )
+        self.file.write('TrueHit: u[cm], v[cm], charge[GeV], theta_u, theta_v \n'
+                        )
+        self.file.write('Cluster: u[cm], v[cm], charge[e-], seed charge[e-], size, size_u, size_v \n'
+                        )
+        self.file.write('Digits: n_digits {u[cm] v[cm] charge[e-]} \n')
+        self.file.write('\n')
 
     def event(self):
         """Find clusters with a truehit and print some stats."""
@@ -42,17 +58,6 @@ class PXDHitErrors(Module):
         nClusterRelations = relClustersToTrueHits.getEntries()
         relClustersToDigits = Belle2.PyRelationArray('PXDClustersToPXDDigits')
         nDigitRelations = relClustersToDigits.getEntries()
-
-        # Write legend for file columns
-        self.file.write('LEGEND TO COLUMNS: \n')
-        self.file.write('SensorID Layer Ladder Sensor Truehit_index Cluster_index \n'
-                        )
-        self.file.write('TrueHit: u[cm], v[cm], charge[GeV], theta_u, theta_v \n'
-                        )
-        self.file.write('Cluster: u[cm], v[cm], charge[e-], seed charge[e-], size, size_u, size_v \n'
-                        )
-        self.file.write('Digits: n_digits {u[cm] v[cm] charge[e-]} \n')
-        self.file.write('\n')
 
         # Start with the clusters and use the relation to get the corresponding digits and truehits.
         for cluster_index in range(nClusters):

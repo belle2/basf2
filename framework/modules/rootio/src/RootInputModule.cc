@@ -34,7 +34,7 @@ REG_MODULE(RootInput)
 RootInputModule::RootInputModule() : Module()
 {
   //Set module properties
-  setDescription("This module reads objects/arrays from a root file and writes them into the DataStore.");
+  setDescription("Reads objects/arrays from one or more .root files and makes them available through the DataStore.");
   setPropertyFlags(c_Input | c_InitializeInProcess);
 
   //Initialization of some member variables
@@ -53,7 +53,6 @@ RootInputModule::RootInputModule() : Module()
   addParam(c_SteerTreeNames[1], m_treeNames[1], "TTree name for persistent data. Empty string to disable.", string(""));
 
   addParam("eventNumber", m_counterNumber[0], "Skip this number of events before starting.", 0);
-
 
   addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of branches to be read into event map. Empty means all branches.", emptyvector);
   addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of branches to be read into persistent map. Empty means all branches.", emptyvector);

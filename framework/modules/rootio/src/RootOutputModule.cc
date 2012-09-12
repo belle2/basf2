@@ -55,8 +55,8 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experiment(0), m_r
   addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression.", 1);
   addParam("splitLevel", m_splitLevel, "Branch split level.", 99);
 
-  addParam(c_SteerTreeNames[0], m_treeNames[0], "TTree name for event data. Empty string no output.", string("tree"));
-  addParam(c_SteerTreeNames[1], m_treeNames[1], "TTree name for peristent data. Empty string no output.", string("persistent"));
+  addParam(c_SteerTreeNames[0], m_treeNames[0], "TTree name for event data. Empty string for no output.", string("tree"));
+  addParam(c_SteerTreeNames[1], m_treeNames[1], "TTree name for peristent data. Empty string for no output.", string("persistent"));
 
   vector<string> branchNames;
   addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of branches to be written from event map. Empty means all branches.", branchNames);
@@ -246,11 +246,9 @@ void RootOutputModule::terminate()
   }
   dir->cd();
 
-  // Clean up (moved from destructor)
   delete m_file;
 
-  B2DEBUG(1, "terminate called");
-
+  B2DEBUG(1, "terminate() finished");
 }
 
 

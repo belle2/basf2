@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
     ("help,h", "print all available options")
     ("version,v", "print version string")
     ("info", "print information about basf2")
-    ("modules,m", prog::value<string>()->implicit_value(""), "print a list of all available modules or optionally the module specified as an argument")
+    ("modules,m", prog::value<string>()->implicit_value(""), "print a list of all available modules; or give detailed information on a specific module given as an argument (case sensitive)")
     ;
 
     // Declare a group of options that will be
@@ -143,8 +143,8 @@ int main(int argc, char* argv[])
     ("arg", prog::value<vector<string> >(&arguments), "additional arguments to be passed to the steering file")
     ("log_level,l", prog::value<string>(), "set log level (one of DEBUG, INFO, WARNING, or ERROR)")
     ("events,n", prog::value<int>(), "override number of events in first run for EvtMetaGen; otherwise set maximum number of events ")
-    ("input,i", prog::value<string>(), "override name of input file for SimpleInput")
-    ("output,o", prog::value<string>(), "override name of output file for SimpleOutput")
+    ("input,i", prog::value<string>(), "override name of input file for RootInput")
+    ("output,o", prog::value<string>(), "override name of output file for RootOutput")
     ("processes,p", prog::value<int>(), "override number of parallel processes (0 to disable parallel processing)")
     ;
 

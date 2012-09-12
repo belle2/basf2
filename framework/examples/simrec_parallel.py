@@ -185,7 +185,8 @@ arichRec = register_module('ARICHReconstructor')
 # ---------------------------------------------------------------
 # digitizer
 cdcDigitizer = register_module('CDCDigitizer')
-# use one gaussian with resolution of 0.01 in the digitizer (to simplify the fitting)
+# use one gaussian with resolution of 0.01 in the digitizer (to simplify
+# the fitting)
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
 cdcDigitizer.param(param_cdcdigi)
 
@@ -215,7 +216,8 @@ cdcfitting = register_module('GenFitter')
 
 # set correct collection name as input and custom collection names as output
 # select DAF instead of Kalman as Filter
-# set the pdg hypothesis to the simulated one, if you want to fit with different pdg hypothesises, set 'allPDG' to true
+# set the pdg hypothesis to the simulated one, if you want to fit with
+# different pdg hypothesises, set 'allPDG' to true
 param_cdcfitting = {
     'GFTrackCandidatesColName': 'GFTrackCands_Trasan',
     'TracksColName': 'Tracks_Trasan',
@@ -239,7 +241,7 @@ toptut = register_module('TOPTutorial')
 evtmetagen.param({'EvtNumList': [1000], 'RunList': [1]})
 
 # Set output filename
-output = register_module('SimpleOutput')
+output = register_module('RootOutput')
 output.param('outputFileName', 'simout.root')
 
 # Debug modules

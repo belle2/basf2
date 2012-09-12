@@ -148,7 +148,7 @@ simulation.param(param_g4sim)
 evtmetagen.param({'EvtNumList': [5], 'RunList': [1]})
 
 # Set output filename
-output = register_module('SimpleOutput')
+output = register_module('RootOutput')
 output.param('outputFileName', 'parallel_processing_test.root')
 
 main = create_path()

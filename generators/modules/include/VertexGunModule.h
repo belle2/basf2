@@ -23,7 +23,7 @@
 namespace Belle2 {
 
   /** The VertexGun module.
-   * Generates an arbitrary number of vertices each with different arbitrary tracks. The properties of every track of every vertex are use
+   * Generates an arbitrary number of vertices each with different arbitrary tracks. The properties of every track of every vertex are used.
    * The output are MCParticle objects put into the data store.
    */
   class VertexGunModule : public Module {
@@ -46,28 +46,46 @@ namespace Belle2 {
   protected:
 
     //input parameters
-    std::vector<double> m_xParams1; /** first components of the vertex x position distributions parameter. Every element of the vector is given to one vertex in every event  */
-    std::vector<double> m_yParams1; /** first components of the vertex y position distributions parameter. Every element of the vector is given to one vertex in every event  */
-    std::vector<double> m_zParams1; /** first components of the vertex z position distributions parameter. Every element of the vector is given to one vertex in every event  */
-    std::vector<double> m_xParams2; /** second components of the vertex x position distributions parameter. Every element of the vector is given to one vertex in every event  */
-    std::vector<double> m_yParams2; /** second components of the vertex y position distributions parameter. Every element of the vector is given to one vertex in every event  */
-    std::vector<double> m_zParams2; /** second components of the vertex z position distributions parameter. Every element of the vector is given to one vertex in every event  */
-    std::vector<std::string> m_vertexDists; /** Names of the distributions used for the vertex creation */
-    std::vector<int> m_tracksPerVertex; /** Number of tracks per vertex. Every element of the vector is given to one vertex in every event */
-    std::vector<int> m_pdgCodes; /** pdg codes for every track in very vertex in one event */
-    std::vector<double> m_pParams1; /** first components of the momentum distributions parameter. Every element of the vector is given to the tracks in one vertex in every event  */
-    std::vector<double> m_pParams2; /** second components of the momentum distributions parameter. Every element of the vector is given to the tracks in one vertex in every event  */
-    std::vector<std::string> m_pDists;  /** Names of the distributions used for the momentum creation of the tacks in each vertex */
-    std::vector<double> m_phiParams1; /** first components of the phi distributions parameter. Every element of the vector is given to the tracks in one vertex in every event  */
-    std::vector<double> m_phiParams2; /** second components of the phi distributions parameter. Every element of the vector is given to the tracks in one vertex in every event  */
-    std::vector<std::string> m_phiDists; /** Names of the distributions used for the phi creation of the tacks in each vertex */
-    std::vector<double> m_thetaParams1; /** first components of the theta distributions parameter. Every element of the vector is given to the tracks in one vertex in every event  */
-    std::vector<double> m_thetaParams2; /** second components of the theta distributions parameter. Every element of the vector is given to the tracks in one vertex in every event  */
-    std::vector<std::string> m_thetaDists; /** Names of the distributions used for the theta creation of the tacks in each vertex */
+    /** first components of the vertex x position distributions parameter. Every element of the vector is given to one vertex in every event  */
+    std::vector<double> m_xParams1;
+    /** first components of the vertex y position distributions parameter. Every element of the vector is given to one vertex in every event  */
+    std::vector<double> m_yParams1;
+    /** first components of the vertex z position distributions parameter. Every element of the vector is given to one vertex in every event  */
+    std::vector<double> m_zParams1;
+    /** second components of the vertex x position distributions parameter. Every element of the vector is given to one vertex in every event  */
+    std::vector<double> m_xParams2;
+    /** second components of the vertex y position distributions parameter. Every element of the vector is given to one vertex in every event  */
+    std::vector<double> m_yParams2;
+    /** second components of the vertex z position distributions parameter. Every element of the vector is given to one vertex in every event  */
+    std::vector<double> m_zParams2;
+    /** Names of the distributions used for the vertex creation */
+    std::vector<std::string> m_vertexDists;
+    /** Number of tracks per vertex. Every element of the vector is given to one vertex in every event */
+    std::vector<int> m_tracksPerVertex;
+    /** pdg codes for every track in very vertex in one event */
+    std::vector<int> m_pdgCodes;
+    /** first components of the momentum distributions parameter. Every element of the vector is given to the tracks in one vertex in every event  */
+    std::vector<double> m_pParams1;
+    /** second components of the momentum distributions parameter. Every element of the vector is given to the tracks in one vertex in every event  */
+    std::vector<double> m_pParams2;
+    /** Names of the distributions used for the momentum creation of the tacks in each vertex */
+    std::vector<std::string> m_pDists;
+    /** first components of the phi distributions parameter. Every element of the vector is given to the tracks in one vertex in every event  */
+    std::vector<double> m_phiParams1;
+    /** second components of the phi distributions parameter. Every element of the vector is given to the tracks in one vertex in every event  */
+    std::vector<double> m_phiParams2;
+    /** Names of the distributions used for the phi creation of the tacks in each vertex */
+    std::vector<std::string> m_phiDists;
+    /** first components of the theta distributions parameter. Every element of the vector is given to the tracks in one vertex in every event  */
+    std::vector<double> m_thetaParams1;
+    /** second components of the theta distributions parameter. Every element of the vector is given to the tracks in one vertex in every event  */
+    std::vector<double> m_thetaParams2;
+    /** Names of the distributions used for the theta creation of the tacks in each vertex */
+    std::vector<std::string> m_thetaDists;
 
     //std::vector<bool> m_varyNumberOfTracks; not used at the moment
 
-    /** function to convert the strings the uses sets in the parameter list to the internal encoding */
+    /** function to convert the strings used in the parameter list to the internal encoding */
     ParticleGun::Distribution convertDistribution(std::string name);
 
     /** Instance of the particle gun */
@@ -75,7 +93,7 @@ namespace Belle2 {
     /** Parameters of the particle gun for every vertex in one event */
     std::vector<ParticleGun::Parameters> m_parametersForAllVertices;
 
-    /** String representation of the momentum distribution */
+    /** Particle graph to generate MCParticle list */
     MCParticleGraph m_particleGraph;
   };
 

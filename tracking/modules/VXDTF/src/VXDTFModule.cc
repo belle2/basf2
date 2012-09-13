@@ -261,19 +261,41 @@ void VXDTFModule::beginRun()
   B2DEBUG(50, "##### be careful, current TF status does not support more than one run per initialization! #####");
 
 
-  /// for each setup, fill parameters, calc numTotalLayers... WARNING: currently no failsafe implementation (no protection against bad user imputs)
+  /// for each setup, fill parameters, calc numTotalLayers... TODO: failsafe implementation (no protection against bad user imputs) lacks of style, longterm goal, export that procedure into a function
   int totalFriendCounter;
   m_usePXDorSVDorVXDhits = 0; /// needed, since in theory some passes could use SVD+PXD and some SVD-only. =0, when only PXDhits, = 1, when only svd-hits, =-1 when both cases occur
   for (int i = 0; i < int(m_PARAMsectorSetup.size()); ++i) {
     CurrentPassData* newPass = new CurrentPassData;
 
     newPass->sectorSetup = m_PARAMsectorSetup[i];
-    newPass->detectorType = m_PARAMdetectorType[i];
-    if (m_PARAMsetupWeigh[i] < 0) { m_PARAMsetupWeigh[i] = 0; } else if (m_PARAMsetupWeigh[i] > 100) { m_PARAMsetupWeigh[i] = 100; }
-    newPass->setupWeigh = m_PARAMsetupWeigh[i] * 0.01;
-    newPass->highestAllowedLayer = m_PARAMhighestAllowedLayer[i];
-    newPass->minLayer = m_PARAMminLayer[i];
-    newPass->minState = m_PARAMminState[i];
+
+    if (int (m_PARAMdetectorType.size()) < i - 1) {
+      newPass->detectorType = m_PARAMdetectorType[m_PARAMdetectorType.size() - 1];
+    } else {
+      newPass->detectorType = m_PARAMdetectorType[i];
+    }
+    if (int (m_PARAMsetupWeigh.size()) < i - 1) {
+      newPass->distance3D.first = m_PARAMsetupWeigh[m_PARAMsetupWeigh.size() - 1] * 0.01;
+    } else {
+      newPass->setupWeigh = m_PARAMsetupWeigh[i] * 0.01;
+      if (newPass->setupWeigh < 0) { newPass->setupWeigh = 0; } else if (newPass->setupWeigh > 1.) { newPass->setupWeigh = 1.; }
+    }
+    if (int (m_PARAMhighestAllowedLayer.size()) < i - 1) {
+      newPass->highestAllowedLayer = m_PARAMhighestAllowedLayer[m_PARAMhighestAllowedLayer.size() - 1];
+    } else {
+      newPass->highestAllowedLayer = m_PARAMhighestAllowedLayer[i];
+    }
+    if (int (m_PARAMminLayer.size()) < i - 1) {
+      newPass->minLayer = m_PARAMminLayer[m_PARAMminLayer.size() - 1];
+    } else {
+      newPass->minLayer = m_PARAMminLayer[i];
+    }
+    if (int (m_PARAMminState.size()) < i - 1) {
+      newPass->minState = m_PARAMminState[m_PARAMminState.size() - 1];
+    } else {
+      newPass->minState = m_PARAMminState[i];
+    }
+
 
     // calc numtotalLayers and chosenDetectorType:
     if (newPass->detectorType == 0) {
@@ -304,53 +326,160 @@ void VXDTFModule::beginRun()
     newPass->secConfigV = m_PARAMsectorConfigV; // currently same sectorConfig for each pass, future support of different setups prepared
 
     int sfCtr = 0, nfCtr = 0, tccfCtr = 0; // counting number of activated tests for each filter step
-    newPass->distance3D.first = m_PARAMactivateDistance3D[i];
+    ///sFinder:
+    if (int (m_PARAMactivateDistance3D.size()) < i - 1) {
+      newPass->distance3D.first = m_PARAMactivateDistance3D[m_PARAMactivateDistance3D.size() - 1];
+    } else {
+      newPass->distance3D.first = m_PARAMactivateDistance3D[i];
+    }
+    if (int (m_PARAMactivateDistanceXY.size()) < i - 1) {
+      newPass->distanceXY.first = m_PARAMactivateDistanceXY[m_PARAMactivateDistanceXY.size() - 1];
+    } else {
+      newPass->distanceXY.first = m_PARAMactivateDistanceXY[i];;
+    }
+    if (int (m_PARAMactivateDistanceZ.size()) < i - 1) {
+      newPass->distanceZ.first = m_PARAMactivateDistanceZ[m_PARAMactivateDistanceZ.size() - 1];
+    } else {
+      newPass->distanceZ.first = m_PARAMactivateDistanceZ[i];
+    }
+    if (int (m_PARAMactivateNormedDistance3D.size()) < i - 1) {
+      newPass->normedDistance3D.first = m_PARAMactivateNormedDistance3D[m_PARAMactivateNormedDistance3D.size() - 1];
+    } else {
+      newPass->normedDistance3D.first = m_PARAMactivateNormedDistance3D[i];
+    }
     if (newPass->distance3D.first == true) { sfCtr++; }
-    newPass->distanceXY.first = m_PARAMactivateDistanceXY[i];
     if (newPass->distanceXY.first == true) { sfCtr++; }
-    newPass->distanceZ.first = m_PARAMactivateDistanceZ[i];
     if (newPass->distanceZ.first == true) { sfCtr++; }
-    newPass->normedDistance3D.first = m_PARAMactivateNormedDistance3D[i];
     if (newPass->normedDistance3D.first == true) { sfCtr++; }
 
-    newPass->angles3D.first =  m_PARAMactivateAngles3D[i];
+    ///nbFinder:
+    if (int (m_PARAMactivateAngles3D.size()) < i - 1) {
+      newPass->angles3D.first = m_PARAMactivateAngles3D[m_PARAMactivateAngles3D.size() - 1];
+    } else {
+      newPass->angles3D.first =  m_PARAMactivateAngles3D[i];
+    }
+    if (int (m_PARAMactivateAnglesXY.size()) < i - 1) {
+      newPass->anglesXY.first = m_PARAMactivateAnglesXY[m_PARAMactivateAnglesXY.size() - 1];
+    } else {
+      newPass->anglesXY.first = m_PARAMactivateAnglesXY[i];
+    }
+    if (int (m_PARAMactivateAnglesRZ.size()) < i - 1) {
+      newPass->anglesRZ.first = m_PARAMactivateAnglesRZ[m_PARAMactivateAnglesRZ.size() - 1];
+    } else {
+      newPass->anglesRZ.first = m_PARAMactivateAnglesRZ[i];
+    }
+    if (int (m_PARAMactivateDistanceDeltaZ.size()) < i - 1) {
+      newPass->distanceDeltaZ.first = m_PARAMactivateDistanceDeltaZ[m_PARAMactivateDistanceDeltaZ.size() - 1];
+    } else {
+      newPass->distanceDeltaZ.first = m_PARAMactivateDistanceDeltaZ[i];
+    }
+    if (int (m_PARAMactivateDistance2IP.size()) < i - 1) {
+      newPass->distance2IP.first = m_PARAMactivateDistance2IP[m_PARAMactivateDistance2IP.size() - 1];
+    } else {
+      newPass->distance2IP.first =  m_PARAMactivateDistance2IP[i];
+    }
+    if (int (m_PARAMactivatePT.size()) < i - 1) {
+      newPass->pT.first = m_PARAMactivatePT[m_PARAMactivatePT.size() - 1];
+    } else {
+      newPass->pT.first =  m_PARAMactivatePT[i];
+    }
     if (newPass->angles3D.first == true) { nfCtr++; }
-    newPass->anglesXY.first = m_PARAMactivateAnglesXY[i];
     if (newPass->anglesXY.first == true) { nfCtr++; }
-    newPass->anglesRZ.first = m_PARAMactivateAnglesRZ[i];
     if (newPass->anglesRZ.first == true) { nfCtr++; }
-    newPass->distanceDeltaZ.first = m_PARAMactivateDistanceDeltaZ[i];
     if (newPass->distanceDeltaZ.first == true) { nfCtr++; }
-    newPass->distance2IP.first =  m_PARAMactivateDistance2IP[i];
     if (newPass->distance2IP.first == true) { nfCtr++; }
-    newPass->pT.first =  m_PARAMactivatePT[i];
     if (newPass->pT.first == true) { nfCtr++; }
 
-    newPass->zigzag.first = m_PARAMactivateZigZag[i];
+    /// post-TCC-filter:
+    if (int (m_PARAMactivateZigZag.size()) < i - 1) {
+      newPass->zigzag.first = m_PARAMactivateZigZag[m_PARAMactivateZigZag.size() - 1];
+    } else {
+      newPass->zigzag.first = m_PARAMactivateZigZag[i];
+    }
+    if (int (m_PARAMactivateDeltaPt.size()) < i - 1) {
+      newPass->deltaPt.first = m_PARAMactivateDeltaPt[m_PARAMactivateDeltaPt.size() - 1];
+    } else {
+      newPass->deltaPt.first = m_PARAMactivateDeltaPt[i];
+    }
+    if (int (m_PARAMactivateDeltaDistance2IP.size()) < i - 1) {
+      newPass->deltaDistance2IP.first = m_PARAMactivateDeltaDistance2IP[m_PARAMactivateDeltaDistance2IP.size() - 1];
+    } else {
+      newPass->deltaDistance2IP.first = m_PARAMactivateDeltaDistance2IP[i];
+    }
     if (newPass->zigzag.first == true) { tccfCtr++; }
-    newPass->deltaPt.first = m_PARAMactivateDeltaPt[i];
     if (newPass->deltaPt.first == true) { tccfCtr++; }
-    newPass->deltaDistance2IP.first = m_PARAMactivateDeltaDistance2IP[i];
     if (newPass->deltaDistance2IP.first == true) { tccfCtr++; }
 
     newPass->activatedSegFinderTests = sfCtr;
     newPass->activatedNbFinderTests = nfCtr;
     newPass->activatedTccFilterTests = tccfCtr;
-    B2INFO("Pass " << i << "VXD Track finder: " << sfCtr << " segFinder tests, " << nfCtr << " friendFinder tests and " << tccfCtr << " TCC filter tests are enabled.");
+    B2INFO("Pass " << i << " VXD Track finder: " << sfCtr << " segFinder tests, " << nfCtr << " friendFinder tests and " << tccfCtr << " TCC filter tests are enabled.");
 
-    newPass->distance3D.second = m_PARAMtuneDistance3D[i];
-    newPass->distanceXY.second = m_PARAMtuneDistanceXY[i];
-    newPass->distanceZ.second = m_PARAMtuneDistanceZ[i];
-    newPass->normedDistance3D.second = m_PARAMtuneNormedDistance3D[i];
-    newPass->angles3D.second = m_PARAMtuneAngles3D[i];
-    newPass->anglesXY.second = m_PARAMtuneAnglesXY[i];
-    newPass->anglesRZ.second = m_PARAMtuneAnglesRZ[i];
-    newPass->distanceDeltaZ.second  = m_PARAMtuneDistanceDeltaZ[i];
-    newPass->distance2IP.second  = m_PARAMtuneDistance2IP[i];
-    newPass->pT.second  = m_PARAMtunePT[i];
-    newPass->zigzag.second = m_PARAMtuneZigZag[i];
-    newPass->deltaPt.second = m_PARAMtuneDeltaPt[i];
-    newPass->deltaDistance2IP.second = m_PARAMtuneDeltaDistance2IP[i];
+    if (int (m_PARAMtuneDistance3D.size()) < i - 1) {
+      newPass->distance3D.second = m_PARAMtuneDistance3D[m_PARAMtuneDistance3D.size() - 1];
+    } else {
+      newPass->distance3D.second = m_PARAMtuneDistance3D[i];
+    }
+    if (int (m_PARAMtuneDistanceXY.size()) < i - 1) {
+      newPass->distanceXY.second = m_PARAMtuneDistanceXY[m_PARAMtuneDistanceXY.size() - 1];
+    } else {
+      newPass->distanceXY.second = m_PARAMtuneDistanceXY[i];;
+    }
+    if (int (m_PARAMtuneDistanceZ.size()) < i - 1) {
+      newPass->distanceZ.second = m_PARAMtuneDistanceZ[m_PARAMtuneDistanceZ.size() - 1];
+    } else {
+      newPass->distanceZ.second = m_PARAMtuneDistanceZ[i];
+    }
+    if (int (m_PARAMtuneNormedDistance3D.size()) < i - 1) {
+      newPass->normedDistance3D.second = m_PARAMtuneNormedDistance3D[m_PARAMtuneNormedDistance3D.size() - 1];
+    } else {
+      newPass->normedDistance3D.second = m_PARAMtuneNormedDistance3D[i];
+    }
+    if (int (m_PARAMtuneAngles3D.size()) < i - 1) {
+      newPass->angles3D.second = m_PARAMtuneAngles3D[m_PARAMtuneAngles3D.size() - 1];
+    } else {
+      newPass->angles3D.second =  m_PARAMtuneAngles3D[i];
+    }
+    if (int (m_PARAMtuneAnglesRZ.size()) < i - 1) {
+      newPass->anglesXY.second = m_PARAMtuneAnglesRZ[m_PARAMtuneAnglesRZ.size() - 1];
+    } else {
+      newPass->anglesXY.second = m_PARAMtuneAnglesRZ[i];
+    }
+    if (int (m_PARAMtuneAnglesRZ.size()) < i - 1) {
+      newPass->anglesRZ.second = m_PARAMtuneAnglesRZ[m_PARAMtuneAnglesRZ.size() - 1];
+    } else {
+      newPass->anglesRZ.second = m_PARAMtuneAnglesRZ[i];
+    }
+    if (int (m_PARAMtuneDistanceDeltaZ.size()) < i - 1) {
+      newPass->distanceDeltaZ.second = m_PARAMtuneDistanceDeltaZ[m_PARAMtuneDistanceDeltaZ.size() - 1];
+    } else {
+      newPass->distanceDeltaZ.second = m_PARAMtuneDistanceDeltaZ[i];
+    }
+    if (int (m_PARAMtuneDistance2IP.size()) < i - 1) {
+      newPass->distance2IP.second = m_PARAMtuneDistance2IP[m_PARAMtuneDistance2IP.size() - 1];
+    } else {
+      newPass->distance2IP.second =  m_PARAMtuneDistance2IP[i];
+    }
+    if (int (m_PARAMtunePT.size()) < i - 1) {
+      newPass->pT.second = m_PARAMtunePT[m_PARAMtunePT.size() - 1];
+    } else {
+      newPass->pT.second =  m_PARAMtunePT[i];
+    }
+    if (int (m_PARAMtuneZigZag.size()) < i - 1) {
+      newPass->zigzag.second = m_PARAMtuneZigZag[m_PARAMtuneZigZag.size() - 1];
+    } else {
+      newPass->zigzag.second = m_PARAMtuneZigZag[i];
+    }
+    if (int (m_PARAMtuneDeltaPt.size()) < i - 1) {
+      newPass->deltaPt.second = m_PARAMtuneDeltaPt[m_PARAMtuneDeltaPt.size() - 1];
+    } else {
+      newPass->deltaPt.second = m_PARAMtuneDeltaPt[i];
+    }
+    if (int (m_PARAMtuneDeltaDistance2IP.size()) < i - 1) {
+      newPass->deltaDistance2IP.second = m_PARAMtuneDeltaDistance2IP[m_PARAMtuneDeltaDistance2IP.size() - 1];
+    } else {
+      newPass->deltaDistance2IP.second = m_PARAMtuneDeltaDistance2IP[i];
+    }
 
 
 
@@ -928,9 +1057,9 @@ void VXDTFModule::event()
 
 void VXDTFModule::endRun()
 {
-  B2WARNING("VXDTF endRun, after " << m_eventCounter << " events, ZigZag triggered " << m_TESTERtriggeredZigZag << " times, and dpT triggered " << m_TESTERtriggeredDpT << " times, TCC approved " << m_TESTERapprovedByTCC << " TCs, " << m_badFriendCounter << " hits lost because of hit having no neighbouring hits in friend sector, " << m_TESTERbadHopfieldCtr << " times, the Hopfield network had no survivors!")
-  B2WARNING("VXDTF endRun, total number of TCs after TCC: " << m_TESTERcountTotalTCsAfterTCC << ", after TCC-filter: " << m_TESTERcountTotalTCsAfterTCCFilter << ", final: " << m_TESTERcountTotalTCsFinal)
-  B2WARNING("VXDTF endRun, numOfTimes cleanOverlappingSet got activated:" << m_TESTERcleanOverlappingSetStartedCtr << ", cleanOverlappingSet killed numTCs: " << m_TESTERfilteredOverlapsQI << ", numOfTimes cleanOverlappingSet did/didn't filter TCs: " << m_TESTERfilteredOverlapsQICtr << "/" << m_TESTERNotFilteredOverlapsQI)
+  B2INFO("VXDTF endRun, after " << m_eventCounter + 1 << " events, ZigZag triggered " << m_TESTERtriggeredZigZag << " times, and dpT triggered " << m_TESTERtriggeredDpT << " times, TCC approved " << m_TESTERapprovedByTCC << " TCs, " << m_badFriendCounter << " hits lost because of hit having no neighbouring hits in friend sector, " << m_TESTERbadHopfieldCtr << " times, the Hopfield network had no survivors!")
+  B2INFO("VXDTF endRun, total number of TCs after TCC: " << m_TESTERcountTotalTCsAfterTCC << ", after TCC-filter: " << m_TESTERcountTotalTCsAfterTCCFilter << ", final: " << m_TESTERcountTotalTCsFinal)
+  B2INFO("VXDTF endRun, numOfTimes cleanOverlappingSet got activated:" << m_TESTERcleanOverlappingSetStartedCtr << ", cleanOverlappingSet killed numTCs: " << m_TESTERfilteredOverlapsQI << ", numOfTimes cleanOverlappingSet did/didn't filter TCs: " << m_TESTERfilteredOverlapsQICtr << "/" << m_TESTERNotFilteredOverlapsQI)
 }
 
 void VXDTFModule::terminate()
@@ -1285,7 +1414,7 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
   TVector3 currentCoords, friendCoords, currentVector, tempVector;
   double currentDistance, currentDeltaValue;
   int simpleSegmentQI; // better than segmentApproved, but still digital (only min and max cutoff values), but could be weighed by order of relevance
-  int scoreQQQ;  //best would be quasi analogue quality indicator QAQI
+//   int scoreQQQ;  //best would be quasi analogue quality indicator QAQI
   int discardedSegmentsCounter = 0;
   OperationSequenceOfActivatedSectors::const_iterator secSequenceIter;
   MapOfSectors::iterator mainSecIter;
@@ -1328,7 +1457,7 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
       B2DEBUG(50, "Sector " << mainSecIter->first << " has got " << numOfFriendHits << " hits lying among his friends! ");
       for (int friendHit = 0; friendHit < numOfFriendHits; ++friendHit) {
         simpleSegmentQI = 0;
-        scoreQQQ = 0;
+//         scoreQQQ = 0;
         currentFriendID = allFriendHits[friendHit]->getSectorName();
         MapOfSectors::iterator currentFriendIter = currentPass->sectorMap.find(currentFriendID);
         friendLayerID = currentFriendID[0];
@@ -1642,9 +1771,7 @@ void VXDTFModule::cellularAutomaton(CurrentPassData* currentPass)
 {
   int activeCells = 1;
   int caRound = 0;
-  int numOfNeighbours = 0;
   int goodNeighbours, countedSegments, segState;
-  //   list<int> currentNeighbourList;
   ActiveSegmentsOfEvent::iterator currentSeg;
 
   while (activeCells != 0) {
@@ -1657,11 +1784,10 @@ void VXDTFModule::cellularAutomaton(CurrentPassData* currentPass)
 
       goodNeighbours = 0;
       list<VXDSegmentCell*>& currentNeighbourList = currentSeg->getInnerNeighbours();
-      numOfNeighbours = currentNeighbourList.size();
 
       list<VXDSegmentCell*>::iterator currentNeighbour = currentNeighbourList.begin();
       while (currentNeighbour != currentNeighbourList.end()) {
-        //TODO probably outdated: can't deal with cells of special shape (e.g. two-layer cells) yet -> search for test scenario
+        //TODO probably outdated: can't deal with cells of special shape (e.g. two-layer cells) in some uncommon scenario yet -> search for test scenario
         if (currentSeg->getState() == (*currentNeighbour)->getState()) {
           goodNeighbours++;
           ++currentNeighbour;
@@ -1708,8 +1834,6 @@ void VXDTFModule::tcCollector(CurrentPassData* currentPass)
   int mayorLayerID, nSegmentsInSector;
   int findTCsCounter = 0;
   int tccMinState = currentPass->minState;
-  TCsOfEvent::iterator tcMainIter = currentPass->tcVector.begin(); // keeps track of main position (original of current copy session)
-  TCsOfEvent::iterator tcSubIter = currentPass->tcVector.begin(); // iterates through the clones of the current original TC
   OperationSequenceOfActivatedSectors::iterator secSequenceIter;
   for (secSequenceIter = currentPass->sectorSequence.begin(); secSequenceIter != currentPass->sectorSequence.end(); ++secSequenceIter) {
     B2DEBUG(1000, "entering sector " << (*secSequenceIter).first);

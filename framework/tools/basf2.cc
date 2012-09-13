@@ -58,6 +58,7 @@ using namespace boost::python;
 
 namespace prog = boost::program_options;
 
+void executePythonFile(const string& pythonFile);
 
 void executePythonFile(const string& pythonFile)
 {

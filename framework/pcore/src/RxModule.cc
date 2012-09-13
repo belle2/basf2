@@ -26,46 +26,32 @@ REG_MODULE(Rx)
 //                 Implementation
 //-----------------------------------------------------------------
 
-RxModule::RxModule() : Module(), m_msghandler(0), m_streamer(0), m_nrecv(-1)
+RxModule::RxModule(RingBuffer* rbuf) : Module(), m_streamer(0), m_nrecv(-1)
 {
   //Set module properties
-  setDescription("Decode DataStore from RingBuffer");
+  setDescription("Decode data from RingBuffer into DataStore");
   setPropertyFlags(c_Input | c_InitializeInProcess);
-
-  m_rbuf = NULL;
-  m_compressionLevel = 0;
-
-  //Parameter definition
-  B2DEBUG(1, "Rx: Constructor done.");
-}
-
-RxModule::RxModule(RingBuffer* rbuf) : Module(), m_msghandler(0), m_streamer(0), m_nrecv(-1)
-{
-  //Set module properties
-  setDescription("Decode DataStore from RingBuffer");
-  setPropertyFlags(c_Input | c_InitializeInProcess);
-  std::ostringstream buf; buf << "Rx" << rbuf->shmid();
-  setModuleName(buf.str());
 
   m_rbuf = rbuf;
   m_compressionLevel = 0;
-
-  //Parameter definition
-  B2INFO("Rx: Constructor with RingBuffer done.");
+  if (rbuf) {
+    std::ostringstream buf; buf << "Rx" << rbuf->shmid();
+    setModuleName(buf.str());
+    B2INFO("Rx: Constructor with RingBuffer done.");
+  }
 }
 
 
 
 RxModule::~RxModule()
 {
+  //TODO: why isn't this cleaned up?
   //  delete m_streamer;
-  //  delete m_msghandler;
 }
 
 void RxModule::initialize()
 {
   gSystem->Load("libdataobjects");
-  //  m_msghandler = new MsgHandler(m_compressionLevel);
 
   // Initialize DataStoreStreamer
   m_streamer = new DataStoreStreamer(m_compressionLevel);
@@ -73,7 +59,7 @@ void RxModule::initialize()
 
   // Read the first event in RingBuffer and restore in DataStore.
   // This is necessary to create object tables before TTree initialization
-  // if used together with SimpleOutput.
+  // if used together with TTree based output (RootOutput module).
 
   // Prefetch the first record in Ring Buffer
   int size;

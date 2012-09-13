@@ -7,6 +7,9 @@
 //-
 
 #include <framework/pcore/TxModule.h>
+
+#include <framework/pcore/EvtMessage.h>
+
 #include <stdlib.h>
 
 using namespace std;
@@ -21,48 +24,27 @@ REG_MODULE(Tx)
 //                 Implementation
 //-----------------------------------------------------------------
 
-TxModule::TxModule() : Module(), m_msghandler(0), m_streamer(0)
-{
-  //Set module properties
-  setDescription("Encode DataStore into RingBuffer");
-  //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
-
-  m_rbuf = NULL;
-  m_nsent = 0;
-  m_compressionLevel = 0;
-
-  //Parameter definition
-  B2DEBUG(1, "Tx: Constructor done.");
-}
-
-TxModule::TxModule(RingBuffer* rbuf) : Module(), m_msghandler(0), m_streamer(0)
+TxModule::TxModule(RingBuffer* rbuf) : Module(), m_streamer(0)
 {
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
   setPropertyFlags(c_Input | c_InitializeInProcess);
-  //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
-  std::ostringstream buf; buf << "Tx" << rbuf->shmid();
-  setModuleName(buf.str());
 
   m_rbuf = rbuf;
   m_nsent = 0;
   m_compressionLevel = 0;
 
-  //Parameter definition
-  B2INFO("Tx: Constructor with RingBuffer done.");
+  if (rbuf) {
+    std::ostringstream buf; buf << "Tx" << rbuf->shmid();
+    setModuleName(buf.str());
+    B2INFO("Tx: Constructor with RingBuffer done.");
+  }
 }
 
-
-
-TxModule::~TxModule()
-{
-  delete m_streamer;
-  //  delete m_msghandler;
-}
+TxModule::~TxModule() { }
 
 void TxModule::initialize()
 {
-  //  m_msghandler = new MsgHandler(m_compressionLevel);
   m_streamer = new DataStoreStreamer(m_compressionLevel);
 
   B2INFO(getName() << " initialized.");
@@ -106,5 +88,7 @@ void TxModule::endRun()
 void TxModule::terminate()
 {
   B2INFO("terminate called")
+
+  delete m_streamer;
 }
 

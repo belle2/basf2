@@ -20,21 +20,18 @@
 #include <string>
 #include <vector>
 
-//#include <framework/datastore/DataStore.h>
-
 
 namespace Belle2 {
 
   /** Module to decode data store contents from RingBuffer. */
   class RxModule : public Module {
-
-    // Public functions
   public:
 
-    //! Constructor / Destructor
-    RxModule();
-    //! Use the given RingBuffer for data
-    RxModule(RingBuffer*);
+    /** Constructor.
+     *
+     * @param rbuf Use the given RingBuffer for data
+     */
+    RxModule(RingBuffer* rbuf = 0);
     virtual ~RxModule();
 
     //! Module functions to be called from main process
@@ -52,9 +49,6 @@ namespace Belle2 {
     //! RingBuffer ID
     RingBuffer* m_rbuf;
 
-    //! Messaage handler (obsolete)
-    MsgHandler* m_msghandler;
-
     //! DataStoreStreamer
     DataStoreStreamer* m_streamer;
 
@@ -64,9 +58,8 @@ namespace Belle2 {
     //! Process contrl manager
     RbCtlMgr* m_rbctl;
 
-    /** No of events */
+    /** Current event number. */
     int m_nrecv;
-    int m_numEvents; // obsolete
 
   };
 

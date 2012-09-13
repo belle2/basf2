@@ -52,7 +52,7 @@ void SeqRootInputModule::initialize()
 
   // Read the first event in SeqRoot file and restore in DataStore.
   // This is necessary to create object tables before TTree initialization
-  // if used together with SimpleOutput.
+  // if used together with TTree based output (RootOutput module).
   char* evtbuf = new char[MAXEVTSIZE];
   EvtMessage* evtmsg = NULL;
   // Open input file

@@ -54,7 +54,7 @@ namespace Belle2 {
    * In case the module condition for a given event is less than 1, the execution
    * will be diverted into another_path for this event. You could for example set
    * a special return value if an error occurs, and divert the execution into a
-   * path containing SimpleOutput if it is found; saving only the data producing/
+   * path containing RootOutput if it is found; saving only the data producing/
    * produced by the error.
    */
   class Module : public PathElement {

@@ -10,18 +10,9 @@
 #define TXMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RbCtlMgr.h>
-#include <framework/pcore/SeqFile.h>
 #include <framework/pcore/DataStoreStreamer.h>
-
-#include <boost/shared_ptr.hpp>
-#include <string>
-#include <vector>
-
-//#include <framework/datastore/DataStore.h>
 
 
 namespace Belle2 {
@@ -32,10 +23,11 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
-    TxModule();
-    //! Use the given RingBuffer for data
-    TxModule(RingBuffer*);
+    /** Constructor.
+     *
+     * @param rbuf Use the given RingBuffer for data
+     */
+    TxModule(RingBuffer* rbuf = 0);
     virtual ~TxModule();
 
     //! Module functions to be called from main process
@@ -55,9 +47,6 @@ namespace Belle2 {
 
     //! RingBuffer ID
     RingBuffer* m_rbuf;
-
-    //! Messaage handler (obsolete)
-    MsgHandler* m_msghandler;
 
     //! DataStoreStreamer
     DataStoreStreamer* m_streamer;

@@ -116,7 +116,7 @@ void TrueHitTesterModule::event()
           layerIds.push_back(layerId);
           ++iterPairMcSvd.first;
         }
-        if (layerIds.size() not_eq m_nLayers) {
+        if (layerIds.size() not_eq unsigned(m_nLayers)) {
           filterEvent = true;
           ++m_notPerfectCounter;
           break;

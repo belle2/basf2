@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This is the main index file for sectorMaps/fiendLists used by the VXDTFModule to support new ones, an entry within this list has to be added after adding the friendList-file to this directory-->
+<CATFParameters xmlns:xi="http://www.w3.org/2001/XInclude">
+	<xi:include href="../tracking/friendList_high_SVD.xml"/>
+	<xi:include href="../tracking/friendList_low_SVD.xml"/>
+	<xi:include href="../tracking/friendList_std_SVD.xml"/>
+</CATFParameters>

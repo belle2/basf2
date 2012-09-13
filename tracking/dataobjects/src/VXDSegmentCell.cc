@@ -23,7 +23,7 @@ VXDSegmentCell::VXDSegmentCell(VXDTFHit* pOuterHit, VXDTFHit* pInnerHit, std::ma
   m_pOuterHit(pOuterHit),
   m_pInnerHit(pInnerHit),
   m_pOuterSector(pOuterSector),
-  m_pInnerSector(pInnerSector) { m_state = 0; m_activated = true; m_seed = true; m_stateUpgrade = false; m_score = 0; }
+  m_pInnerSector(pInnerSector) { m_state = 0; m_activated = true; m_seed = true; m_stateUpgrade = false; }
 
 
 std::list<Belle2::VXDSegmentCell*>::iterator VXDSegmentCell::eraseInnerNeighbour(std::list<VXDSegmentCell*>::iterator it)

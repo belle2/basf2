@@ -61,7 +61,7 @@ namespace Belle2 {
     std::vector<int> getPXDHitIndices() { return m_pxdHitIndices; } /**< returns indices of pxdClusters forming current TC */
     std::list<int> getHopfieldHitIndices() { return m_hopfieldHitIndices; } /**< returns slightly adapted indices for hopfield use only (no real indices, but only unique ones...) */
     bool getOverlappingState() const { return m_overlapping; } /**< returns flag whether TC is sharing hits with other TCs or not */
-    bool getCondition() const { return m_alive; } /**< returns flag whether TC is still "alive" (part of the set of TCs which are probably real tracks based on the knowledge of the TF at the point of calling that function */)
+    bool getCondition() const { return m_alive; } /**< returns flag whether TC is still "alive" (part of the set of TCs which are probably real tracks based on the knowledge of the TF at the point of calling that function) */
     double getTrackQuality() { return m_qualityIndex; } /**< returns quality index of TC, has to be between 0 (bad) and 1 (perfect) */
     double getQQQ() { return m_qqq; } /**< returns aditional quality index */
     float getNeuronValue() const { return m_neuronValue; } /**< returns state of neuron during hopfield network */

@@ -30,11 +30,12 @@
 #include <vector>
 #include <map>
 #include <utility>
+#include <string>
 using std::vector;
 using std::map;
 using std::pair;
-#include <fstream>
-// // using std::ofstream;
+using std::string;
+// #include <fstream>
 #include <cmath>
 using std::sin;
 using std::cos;
@@ -44,15 +45,12 @@ using std::sqrt;
 using std::cerr;
 using std::endl;
 
-
 //root stuff
 #include <TRandom.h>
 //Boost-packages:
 #include <boost/foreach.hpp>
 
-
 using namespace Belle2;
-
 
 REG_MODULE(VXDSimpleClusterizer)
 
@@ -60,12 +58,12 @@ VXDSimpleClusterizerModule::VXDSimpleClusterizerModule() : Module()
 {
   setDescription("The VXDSimpleClusterizerModule generates PXD/SVD Clusters using TrueHits, energy threshold and gaussian smearing as well. Its purpose is fast clusterizing for tracking test procedures, using standardized PXD/SVD-Cluster");
 
-  addParam("energyThresholdU", m_energyThresholdU, "particles with energy deposit in U lower than this will not create a cluster in SVD (GeV)", 17.4E-6);
-  addParam("energyThresholdV", m_energyThresholdV, "particles with energy deposit in V lower than this will not create a cluster in SVD (GeV)", 28.6E-6);
-  addParam("energyThreshold", m_energyThreshold, "particles with energy deposit lower than this will not create a cluster in PXD (GeV)", 5E-6);
+  addParam("energyThresholdU", m_energyThresholdU, "particles with energy deposit in U lower than this will not create a cluster in SVD (GeV)", double(17.4E-6));
+  addParam("energyThresholdV", m_energyThresholdV, "particles with energy deposit in V lower than this will not create a cluster in SVD (GeV)", double(28.6E-6));
+  addParam("energyThreshold", m_energyThreshold, "particles with energy deposit lower than this will not create a cluster in PXD (GeV)", double(7E-6));
   addParam("onlyPrimaries", m_onlyPrimaries, "if true use only primary particles from the generator no particles created by Geant4", false);
-  addParam("setMeasSigma", m_setMeasSigma, "if positive value (in cm) is given it will be used as the sigma to smear the Clusters otherwise pitch/sqrt(12) will be used", -1.0);
-
+  addParam("uniSigma", m_uniSigma, "you can define the sigma of the smearing. Standard value is the sigma of the unifom distribution for 0-1: 1/sqrt(12)", double(1. / sqrt(12.)));
+  addParam("setMeasSigma", m_setMeasSigma, "if positive value (in cm) is given it will be used as the sigma to smear the Clusters otherwise pitch/uniSigma will be used", -1.0);
 }
 
 VXDSimpleClusterizerModule::~VXDSimpleClusterizerModule()
@@ -76,29 +74,31 @@ void VXDSimpleClusterizerModule::initialize()
 {
   //output containers, will be created when registered here
   // since clusterArrays are inconsistently defined, both versions are implemented
-  StoreArray<PXDCluster> pxdClusters("");
-  StoreArray<SVDCluster> svdClusters("");
-  StoreArray<MCParticle> mcParticles("");
-  StoreArray<PXDTrueHit> pxdTrueHits("");
-  StoreArray<SVDTrueHit> svdTrueHits("");
-  RelationArray relPXDClusterMCParticle(pxdClusters, mcParticles);
-  RelationArray relPXDClusterTrueHit(pxdClusters, pxdTrueHits);
-  RelationArray relSVDClusterMCParticle(svdClusters, mcParticles);
-  RelationArray relSVDClusterTrueHit(svdClusters, svdTrueHits);
-  RelationArray relMCParticlePXDCluster(mcParticles, pxdClusters);
-  RelationArray relTrueHitPXDCluster(pxdTrueHits, pxdClusters);
-  RelationArray relMCParticleSVDCluster(mcParticles, svdClusters);
-  RelationArray relTrueHitSVDCluster(svdTrueHits, svdClusters);
+  StoreArray<PXDCluster>::registerPersistent();
+  StoreArray<SVDCluster>::registerPersistent();
+
+
+  RelationArray::registerPersistent<PXDCluster, MCParticle>("", "");
+  RelationArray::registerPersistent<MCParticle, PXDCluster>("", "");
+  RelationArray::registerPersistent<SVDCluster, MCParticle>("", "");
+  RelationArray::registerPersistent<MCParticle, SVDCluster>("", "");
+
+  RelationArray::registerPersistent<PXDCluster, PXDTrueHit>("", "");
+  RelationArray::registerPersistent<PXDTrueHit, PXDCluster>("", "");
+  RelationArray::registerPersistent<SVDCluster, SVDTrueHit>("", "");
+  RelationArray::registerPersistent<SVDTrueHit, SVDCluster>("", "");
+
 }
 
 void VXDSimpleClusterizerModule::beginRun()
 {
-
+  string paramValue;
+  if (m_onlyPrimaries == true) { paramValue = "true, means that there are no secondary hits (for 1-track events this means no ghost hits guaranteed)"; } else { paramValue = "false, means that secondary hits can occur and increase the rate of ghost hits"; }
+  B2INFO("VXDSimpleClusterizer: parameter onlyPrimaries is set to " << paramValue)
 }
 
 void VXDSimpleClusterizerModule::event()
 {
-
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   int eventCounter = eventMetaDataPtr->getEvent();
 
@@ -121,10 +121,12 @@ void VXDSimpleClusterizerModule::event()
 
   RelationIndex<MCParticle, SVDTrueHit> relIndexSvdTH2McP(mcParticles, svdTrueHits, "");
 
-
   //output containers
+
   StoreArray<PXDCluster> pxdClusters("");
+  if (!pxdClusters.isValid())  pxdClusters.create();
   StoreArray<SVDCluster> svdClusters("");
+  if (!svdClusters.isValid())  svdClusters.create();
 
   RelationArray relPXDClusterMCParticle(pxdClusters, mcParticles);
   RelationArray relPXDClusterTrueHit(pxdClusters, pxdTrueHits);
@@ -141,19 +143,21 @@ void VXDSimpleClusterizerModule::event()
   relationMap relationMapMcP2PxdCls;
   relationMap relationMapMcP2SvdCls;
 
-
   double sigmaU = m_setMeasSigma;
   double sigmaV = m_setMeasSigma;
 
 ///////////////////////////////////////////////////// NOW THE PXD
-  for (unsigned int currentTrueHit = 0; currentTrueHit not_eq nPxdTrueHits; ++currentTrueHit) {
+  for (unsigned int currentTrueHit = 0; int (currentTrueHit) not_eq nPxdTrueHits; ++currentTrueHit) {
 
     const PXDTrueHit* aPxdTrueHit = pxdTrueHits[currentTrueHit];
     relIndexPxdTH2McP.getFirstElementTo(aPxdTrueHit)->from->fixParticleList();
     unsigned int particleID = relIndexPxdTH2McP.getFirstElementTo(aPxdTrueHit)->from->getArrayIndex(); // WARNING:possible trap, might change in future revisions
-    float energy = aPxdTrueHit->getEnergyDep();
+    double energy = aPxdTrueHit->getEnergyDep();
 
+    B2DEBUG(100, " PXD, current TrueHit has an energy deposit of " << energy * 1000.0 << "MeV ")
     if (energy < m_energyThreshold) { //ignore hit if energy deposit is too small
+      B2DEBUG(100, " PXD, TrueHit discarded because of energy deposit too small")
+      m_weakPXDHitCtr++;
       continue;
     }
 
@@ -165,20 +169,19 @@ void VXDSimpleClusterizerModule::event()
 
     //smear the pxdTrueHit and get needed variables for storing
     VxdID aVXDId = aPxdTrueHit->getSensorID();
-    float uTrue = aPxdTrueHit->getU();
-    float vTrue = aPxdTrueHit->getV();
-    float u = -20;
-    float v = -20;
+    double uTrue = aPxdTrueHit->getU();
+    double vTrue = aPxdTrueHit->getV();
+    double u = -20;
+    double v = -20;
     if (m_setMeasSigma < 0.0) {
       const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(aVXDId));
-      sigmaU = geometry.getUPitch(uTrue) / sqrt(12.);
-      sigmaV = geometry.getVPitch(vTrue) / sqrt(12.);
+      sigmaU = geometry.getUPitch(uTrue) * m_uniSigma;
+      sigmaV = geometry.getVPitch(vTrue) * m_uniSigma;
     }
     B2DEBUG(1000, "sigU sigV: " << sigmaU << " " << sigmaV);
 
     u = gRandom->Gaus(uTrue, sigmaU);
     v = gRandom->Gaus(vTrue, sigmaV);
-
 
     // Save as new 2D-PXD-cluster
     unsigned int clusterIndex = pxdClusters->GetLast() + 1;
@@ -189,19 +192,20 @@ void VXDSimpleClusterizerModule::event()
     relTrueHitPXDCluster.add(currentTrueHit, clusterIndex);
     relPXDClusterMCParticle.add(clusterIndex, particleID);
     relationMapMcP2PxdCls[particleID].push_back(clusterIndex);
-
   }
 
-
 ////////////////////////////////////////////////  NOW THE SVD
-  for (unsigned int currentTrueHit = 0; currentTrueHit not_eq nSvdTrueHits; ++currentTrueHit) {
+  for (unsigned int currentTrueHit = 0; int (currentTrueHit) not_eq nSvdTrueHits; ++currentTrueHit) {
 
     const SVDTrueHit* aSvdTrueHit = svdTrueHits[currentTrueHit];
     relIndexSvdTH2McP.getFirstElementTo(aSvdTrueHit)->from->fixParticleList();
     unsigned int particleID = relIndexSvdTH2McP.getFirstElementTo(aSvdTrueHit)->from->getArrayIndex(); // WARNING:possible trap, might change in future revisions
-    float energy = aSvdTrueHit->getEnergyDep();
+    double energy = aSvdTrueHit->getEnergyDep();
 
-    if (energy < m_energyThresholdU + m_energyThresholdV) { //ignore hit if energy deposity is too snall
+    B2DEBUG(100, " SVD, current TrueHit has an energy deposit of " << energy * 1000.0 << "MeV ")
+    if (energy < (m_energyThresholdU + m_energyThresholdV)) { //ignore hit if energy deposity is too snall
+      m_weakSVDHitCtr++;
+      B2DEBUG(100, " SVD, TrueHit discarded because of energy deposit too small")
       continue;
     }
 
@@ -211,29 +215,27 @@ void VXDSimpleClusterizerModule::event()
       }
     }
 
-
     // smear the SvdTrueHit and get needed variables for storing
     VxdID aVXDId = aSvdTrueHit->getSensorID();
-    float uTrue = aSvdTrueHit->getU();
-    float vTrue = aSvdTrueHit->getV();
-    float u = -20;
-    float v = -20;
+    double uTrue = aSvdTrueHit->getU();
+    double vTrue = aSvdTrueHit->getV();
+    double u = -20;
+    double v = -20;
     if (m_setMeasSigma < 0.0) {
       const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(aVXDId));
-      sigmaU = geometry.getUPitch(uTrue) / sqrt(12);
-      sigmaV = geometry.getVPitch(vTrue) / sqrt(12);
+      sigmaU = geometry.getUPitch(uTrue) * m_uniSigma;
+      sigmaV = geometry.getVPitch(vTrue) * m_uniSigma;
     }
     B2DEBUG(1000, "sigU sigV: " << sigmaU << " " << sigmaV);
 
     u = gRandom->Gaus(uTrue, sigmaU);
     v = gRandom->Gaus(vTrue, sigmaV);
 
-
     // Save as two new 1D-SVD-clusters
     unsigned int clusterIndex = svdClusters->GetLast() + 1;
-    float timeStamp = svdTrueHits[currentTrueHit]->getGlobalTime();
-    new(svdClusters->AddrAt(clusterIndex)) SVDCluster(aVXDId, true, u, timeStamp, 0, 1, 1, 1);
-    new(svdClusters->AddrAt(clusterIndex + 1)) SVDCluster(aVXDId, false, v, timeStamp, 0, 1, 1, 1);
+    double timeStamp = svdTrueHits[currentTrueHit]->getGlobalTime();
+    new(svdClusters->AddrAt(clusterIndex)) SVDCluster(aVXDId, true, u, timeStamp, 0, 1, 1, 3); // in a typical situation 3-5 Strips are excited per Hit -> set to 3
+    new(svdClusters->AddrAt(clusterIndex + 1)) SVDCluster(aVXDId, false, v, timeStamp, 0, 1, 1, 3);
 
     // add relations
     vector<unsigned int> clusterVector;
@@ -259,7 +261,6 @@ void VXDSimpleClusterizerModule::event()
     B2DEBUG(20, "mcParticle " << aRelation.first << " has " << aRelation.second.size() << " relations to SVD clusters");
   }
 
-
   B2DEBUG(10, "VXDSimpleClusterizerModule: Number of PXDHits: " << nPxdTrueHits);
   B2DEBUG(10, "VXDSimpleClusterizerModule: Number of SVDDHits: " << nSvdTrueHits);
   B2DEBUG(10, "VXDSimpleClusterizerModule: total Number of MCParticles: " << nMcParticles);
@@ -272,17 +273,13 @@ void VXDSimpleClusterizerModule::event()
   B2DEBUG(10, "relationMapMcP2PxdCls.size()" << relationMapMcP2PxdCls.size());
   B2DEBUG(10, "relationMapMcP2SvdCls.size()" << relationMapMcP2SvdCls.size());
   B2DEBUG(10, "------------------------------------------------------");
-
 }
 
 void VXDSimpleClusterizerModule::endRun()
 {
-
-
+  B2DEBUG(1, "EndRun: SimpleClusterizerModule discarded " << m_weakPXDHitCtr << " PXDTrueHits and " << m_weakSVDHitCtr << " SVDTrueHits total");
 }
 
 void VXDSimpleClusterizerModule::terminate()
 {
-
 }
-

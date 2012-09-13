@@ -58,11 +58,14 @@ namespace Belle2 {
     virtual void terminate();
 
   protected:
-    double m_energyThresholdU;
-    double m_energyThresholdV;
-    double m_energyThreshold;
-    bool m_onlyPrimaries;
-    double m_setMeasSigma;
+    double m_energyThresholdU; /**< set energy threshold for SVDClusters in u-direction in GeV (standard is 17.4E-6) */
+    double m_energyThresholdV; /**< set energy threshold for SVDClusters in v-direction in GeV (standard is 28.6E-6) */
+    double m_energyThreshold; /**< set energy threshold for PXDClusters in GeV (standard is 7E-6) */
+    bool m_onlyPrimaries; /**< set True if you do not want to have hits by secondary particles */
+    double m_uniSigma;  /**< you can define the sigma of the smearing. Standard value is the sigma of the unifom distribution for 0-1: 1/sqrt(12) */
+    double m_setMeasSigma; /**< if positive value (in cm) is given it will be used as the sigma to smear the Clusters otherwise pitch/uniSigma will be used */
+    int m_weakSVDHitCtr; /**< counts SVDHits whose energy deposit is lower than energyThreshold */
+    int m_weakPXDHitCtr; /**< counts PXDHits whose energy deposit is lower than energyThreshold */
 
   };
 } // end namespace Belle2

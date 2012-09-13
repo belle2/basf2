@@ -78,16 +78,17 @@ CDCDigitizerModule::CDCDigitizerModule() : Module()
 
 void CDCDigitizerModule::initialize()
 {
+  StoreArray<CDCSimHit>::required(m_inputCDCSimHitsName);
+
   // Register the arrays in the DataStore, that are to be added in this module.
-  StoreArray<CDCHit> cdcHits(m_outputCDCHitsName);
-  StoreArray<CDCSimHit> simHits(m_inputCDCSimHitsName);
-  RelationArray cdcSimHitsToCDCHits(simHits, cdcHits);
+  StoreArray<CDCHit>::registerPersistent(m_outputCDCHitsName);
+  RelationArray::registerPersistent<CDCSimHit, CDCHit>(m_inputCDCSimHitsName, m_outputCDCHitsName);
+  RelationArray::registerPersistent<MCParticle, CDCHit>("", m_outputCDCHitsName);
 }
 
 void CDCDigitizerModule::event()
 {
   // Get SimHit array, MCParticle array, and relation between the two.
-  StoreArray<CDCSimHit>::required(m_inputCDCSimHitsName);
   StoreArray<CDCSimHit> simHits(m_inputCDCSimHitsName);
 
   StoreArray<MCParticle> mcParticles;                //needed to use the relations with MCParticles

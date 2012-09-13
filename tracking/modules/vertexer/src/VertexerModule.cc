@@ -124,9 +124,11 @@ void VertexerModule::event()
   m_gfRaveVertexFactoryPtr->findVertices(&verticesFromRave, tracksForRave, m_useBeamSpot);
 
   const int nVerticesFromRave = verticesFromRave.size();
+  B2DEBUG(100, nVerticesFromRave << " vertices were found/fitted in event " << eventCounter);
 //write the fitted vertices to the storeArray and clean up the stuff created with new
   for (int i = 0; i not_eq nVerticesFromRave; ++i) {
     vertices.appendNew(*(verticesFromRave[i]));
+    B2DEBUG(100, "Vertex " << i << " has " << verticesFromRave[i]->getNTracks() << " tracks, total χ² value " << verticesFromRave[i]->getChi2() << " and position " <<  verticesFromRave[i]->getPos()[0] << " " <<  verticesFromRave[i]->getPos()[1] << " " <<  verticesFromRave[i]->getPos()[2])
     delete verticesFromRave[i];
   }
 

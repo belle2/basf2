@@ -48,7 +48,7 @@ namespace Belle2 {
 
     std::vector<double> m_beamSpotPos; /**< the user chosen beam spot position. User must provide a container with 3 (x,y,z) values */
     std::vector<double> m_beamSpotCov; /**< the user chosen beam spot position covariance matrix. User must provide 9 values (will be interpreted as a 3x3 matrix)*/
-    int m_ndfTooSmallCounter; /** counter for the events that have too little information (number of degrees of freedom (ndf)) to reconstruct at least one vertex */
+    int m_ndfTooSmallCounter; /**< counter for the events that have too little information (number of degrees of freedom (ndf)) to reconstruct at least one vertex */
   };
 }
 

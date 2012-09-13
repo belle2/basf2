@@ -84,24 +84,24 @@ namespace Belle2 {
 
 
   protected:
-    void registerLayerWiseData(const std::string& nameOfDataSample, const int nVarsToTest);  /** function to create std vector<vector<float> > branches in a root file*/
-    void fillLayerWiseData(const std::string& nameOfDataSample, const int accuVecIndex, const std::vector<double>& newData); /** function to put data into the root branches created by registerLayerWiseData */
+    void registerLayerWiseData(const std::string& nameOfDataSample, const int nVarsToTest);  /**< function to create std vector<vector<float> > branches in a root file*/
+    void fillLayerWiseData(const std::string& nameOfDataSample, const int accuVecIndex, const std::vector<double>& newData); /**< function to put data into the root branches created by registerLayerWiseData */
 
     //for root output
-    std::string m_dataOutFileName; /** name of the output file*/
-    TFile* m_rootFilePtr; /** the root file object for the custom root output*/
+    std::string m_dataOutFileName; /**< name of the output file*/
+    TFile* m_rootFilePtr; /**< the root file object for the custom root output*/
     TTree* m_trueHitDataTreePtr; /** the root tree object for the custom root output. Use only accessed via fillLayerWiseData*/
 
-    std::map<std::string, std::vector<std::vector<float> >* > m_layerWiseDataForRoot; /** holds the branch varaibles for the costum root output. Only accessed via fillLayerWiseData*/
+    std::map<std::string, std::vector<std::vector<float> >* > m_layerWiseDataForRoot; /**< holds the branch varaibles for the costum root output. Only accessed via fillLayerWiseData*/
 
 
-    int m_nLayers; /** number of VXD layers. That is PXD + SVD layers*/
-    int m_nPxdLayers; /** number of PXD layers*/
-    int m_nSvdLayers; /** number of SVD layers*/
+    int m_nLayers; /**< number of VXD layers. That is PXD + SVD layers*/
+    int m_nPxdLayers; /**< number of PXD layers*/
+    int m_nSvdLayers; /**< number of SVD layers*/
 
-    bool m_filter; /** this flag determins if only tracks with exaclty m_nLayers (=6) hits are used*/
+    bool m_filter; /**< this flag determins if only tracks with exaclty m_nLayers (=6) hits are used*/
 
-    int m_notPerfectCounter; /** if m_filter is true this holds the number of tracks not having m_nLayers (=6) hits*/
+    int m_notPerfectCounter; /**< if m_filter is true this holds the number of tracks not having m_nLayers (=6) hits*/
 
 
   };

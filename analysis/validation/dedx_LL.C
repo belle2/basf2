@@ -1,7 +1,6 @@
 #include <TFile.h>
 #include <TMath.h>
 #include <TTree.h>
-#include <TCanvas.h>
 #include <TF1.h>
 #include <TH2F.h>
 #include <TProfile.h>
@@ -10,8 +9,6 @@
 #include <TSystem.h>
 
 #include <iostream>
-
-using namespace Belle2;
 
 
 void plot(const TString &input_filename)
@@ -29,7 +26,7 @@ void plot(const TString &input_filename)
     return;
   }
 
-  TFile *output_file = new TFile("dedx_result.root", "RECREATE");
+  TFile *output_file = new TFile("dedx_LRplots.root", "RECREATE");
   output_file->cd();
 
   const int show_particles = 5;

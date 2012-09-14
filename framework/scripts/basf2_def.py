@@ -3,13 +3,17 @@
 
 from basf2_env import *
 
+import os
+import textwrap
+
 
 def register_module(name, shared_lib_path=None):
     """"
     This function registers a new module
 
     name: The name of the module type
-    shared_lib_path: An optional path to a shared library from which the module should be loaded
+    shared_lib_path: An optional path to a shared library from which the
+                     module should be loaded
     """
 
     if shared_lib_path is not None:
@@ -53,13 +57,55 @@ def nprocess(nproc):
     fw.set_nprocess(nproc)
 
 
+def print_all_modules(moduleList):
+    """
+    Loop over the list of available modules,
+    register them and print their information
+    """
+
+    # how many characters to print per line?
+    try:
+        # get terminal width
+        term_width = int(os.popen('stty size', 'r').read().split()[1])
+        if term_width < 50:
+            term_width = 50
+    except:
+        term_width = 80
+
+    for (moduleName, sharedLib) in sorted(moduleList.iteritems()):
+        try:
+            current_module = register_module(moduleName)
+        except:
+            B2ERROR('The module could not be loaded. This is most likely '
+                    + 'caused by a library with missing links.')
+
+        # use automatic word wrapping on module description
+        description = textwrap.wrap(current_module.description(),
+                term_width - 22)
+        continued = False
+        for text in description:
+            if continued:
+                moduleName = ''
+            print '%-20s  %-s' % (moduleName, text)
+            # ommit module name on all following lines
+            continued = True
+
+    print ''
+    print '------------------------------------------------------' \
+        + '-----------------------'
+    print ''
+    print 'To show detailed information on a module, including its parameters,'
+    print 'type \'basf2 -m ModuleName\'.'
+
+
 def print_params(module, print_values=True, shared_lib_path=None):
     """
     This function prints parameter information
 
     module: Print the parameter information of this module
     print_values: Set it to True to print the current values of the parameters
-    shared_lib_path: The path of the shared library from which the module was loaded
+    shared_lib_path: The path of the shared library from which the module was
+                     loaded
     """
 
     print ''
@@ -69,20 +115,28 @@ def print_params(module, print_values=True, shared_lib_path=None):
     print 'Description: %s' % module.description()
     if shared_lib_path is not None:
         print 'Found in:    %s' % shared_lib_path
-    print '-----------------------------------------------------------------------------'
+    print 80 * '-'
+
+    # how many characters to print per line?
+    try:
+        # get terminal width
+        term_width = int(os.popen('stty size', 'r').read().split()[1])
+    except:
+        term_width = 80
+
+    #gather output data in table
+    output = []
     if print_values:
-        print '  %-20s %-20s %-20s %-30s %-10s %s' % (
-            'Name',
+        output.append([
+            'Parameter',
             'Type',
             'Default',
             'Current',
             'Steering',
             'Description',
-            )
+            ])
     else:
-        print '  %-20s %-20s %-20s %s' % ('Name', 'Type', 'Default',
-                'Description')
-    print '-----------------------------------------------------------------------------'
+        output.append(['Parameter', 'Type', 'Default', 'Description'])
 
     paramList = module.available_params()
     for paramItem in paramList:
@@ -94,28 +148,68 @@ def print_params(module, print_values=True, shared_lib_path=None):
         if paramItem.forceInSteering:
             forceString = '*'
         if print_values:
-            print '%-1s %-20s %-20s %-20s %-30s %-10s %s' % (
-                forceString,
-                paramItem.name,
+            output.append([
+                forceString + paramItem.name,
                 paramItem.type,
                 defaultStr,
                 valueStr,
                 paramItem.setInSteering,
                 paramItem.description,
-                )
+                ])
         else:
-            print '%-1s %-20s %-20s %-20s %s' % (forceString, paramItem.name,
-                    paramItem.type, defaultStr, paramItem.description)
+            output.append([forceString + paramItem.name, paramItem.type,
+                defaultStr, paramItem.description])
+
+    #figure out how much space we need for each column (without separators)
+    column_lengths = [len(cell) for cell in output[0]]
+    for row in output:
+        for col, cell in enumerate(row):
+            column_lengths[col] = max(len(cell), column_lengths[col])
+
+    #both description and default value might be fairly long, set a limit
+    default_value_width = min(column_lengths[2], 20)
+    column_lengths[2] = default_value_width
+
+    #total width of printed table, minus description
+    total_width = sum(column_lengths[:-1]) + len(column_lengths) - 1
+    description_width = max(term_width - total_width, 10)
+    column_lengths[-1] = description_width
+
+    format_string = ' '.join(['%%-%ss' % length
+            for length in column_lengths])
+
+    header_shown = False
+    for row in output:
+        # use automatic word wrapping on module description (last field)
+        default_lines = textwrap.wrap(row[2], default_value_width)
+        description_lines = textwrap.wrap(row[-1], description_width)
+        for line in xrange(max(len(default_lines), len(description_lines))):
+            if line < len(default_lines):
+                row[2] = default_lines[line]
+            if line < len(description_lines):
+                row[-1] = description_lines[line]
+
+            print format_string % tuple(row)
+
+            # ommit other cols on all following lines
+            for i in xrange(len(row)):
+                row[i] = ''
+
+        if not header_shown:
+            print 80 * '-'
+            header_shown = True
     print ''
 
 
 def print_path(path, defaults=False, description=False):
     """
-    This function prints the modules in the given path and the module parameters.
+    This function prints the modules in the given path and the module
+    parameters.
     Parameters that are not set by the user are suppressed by default.
 
     defaults: Set it to True to print also the parameters with default values
-    description: Set it to True to print the descriptions of modules and parameters
+    description: Set to True to print the descriptions of modules and
+    parameters
     """
 
     B2INFO('Modules and parameter settings in the path:')
@@ -143,7 +237,8 @@ def print_path(path, defaults=False, description=False):
 
 def set_log_level(level):
     """
-    Sets the global log level which specifies up to which level the logging messages will be shown
+    Sets the global log level which specifies up to which level the
+    logging messages will be shown
 
     level: LogLevel.DEBUG/INFO/WARNING/ERROR/FATAL
     """
@@ -153,7 +248,8 @@ def set_log_level(level):
 
 def set_debug_level(level):
     """
-    Sets the global debug level which specifies up to which level the debug messages should be shown
+    Sets the global debug level which specifies up to which level the
+    debug messages should be shown
 
     level: The debug level. The default value is 100
     """
@@ -163,7 +259,8 @@ def set_debug_level(level):
 
 def log_to_console(color=False):
     """
-    Adds the standard output stream to the list of logging destinations. The shell logging destination is
+    Adds the standard output stream to the list of logging destinations.
+    The shell logging destination is
     added to the list by the framework by default.
     """
 
@@ -175,7 +272,9 @@ def log_to_file(filename, append=False):
     Adds a text file to the list of logging destinations.
 
     filename: The path and filename of the text file
-    append: Should the logging system append the messages to the end of the file (True) or create a new file for each event processing session (False). Default is False.
+    append: Should the logging system append the messages to the end of the
+    file (True) or create a new file for each event processing session (False).
+    Default is False.
     """
 
     logging.add_file(filename, append)
@@ -192,10 +291,9 @@ def reset_log():
 def set_data_search_path(datapath):
     """
     Sets the path which points to the data directory of the framework.
-    This method can be used to redirect the default data directory to a user specified one.
+    This method can be used to redirect the default data directory to a
+    user specified one.
     datapath: The direcotry in which the data for the framework is located.
     """
 
     fw.set_data_search_path(datapath)
-
-

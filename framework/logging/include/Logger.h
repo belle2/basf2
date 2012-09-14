@@ -17,7 +17,6 @@
 #include <framework/logging/LogMethod.h>
 
 #include <string>
-#include <iostream>
 #include <sstream>
 
 namespace Belle2 {

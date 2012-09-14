@@ -13,7 +13,6 @@
 
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogMessage.h>
-#include <framework/logging/LogConnectionBase.h>
 
 #include <string>
 #include <vector>
@@ -21,6 +20,7 @@
 
 
 namespace Belle2 {
+  class LogConnectionBase;
 
   /**
    * Class for logging debug, info and error messages.
@@ -34,9 +34,9 @@ namespace Belle2 {
    *
    *    By default the Logger sends messages to std::cout.
    *
-   *    Using preprocessor macros has two advantages. First the log statements can be removed
-   *    from the code completely by redefining the macros. Second they allow to add information
-   *    about the location (package, function, file, line).
+   *    Using preprocessor macros has two advantages.
+   *        - the log statements can be removed from the code completely by redefining the macros.
+   *        - they allow to add information about the location (package, function, file, line).
    *
    *    This class is designed as a singleton.
    */
@@ -81,7 +81,7 @@ namespace Belle2 {
      *                        Set to NULL to use the global log configuration.
      * @param moduleName Name of the module.
      */
-    void setModuleLogConfig(LogConfig* moduleLogConfig = 0, std::string moduleName = "-global-") {m_moduleLogConfig = moduleLogConfig; m_moduleName = moduleName; };
+    void setModuleLogConfig(LogConfig* moduleLogConfig = 0, const std::string& moduleName = "-global-") {m_moduleLogConfig = moduleLogConfig; m_moduleName = moduleName; };
 
     /**
      * Add the per package log configuration.
@@ -90,7 +90,7 @@ namespace Belle2 {
      * @param package The name of the package whose log configuration should be added.
      * @param logConfig The log configuration which should be assigned to the given package.
      */
-    void addPackageLogConfig(std::string package, LogConfig logConfig) {m_packageLogConfigs[package] = logConfig; };
+    void addPackageLogConfig(const std::string& package, const LogConfig& logConfig) {m_packageLogConfigs[package] = logConfig; };
 
     /**
      * Get the log configuration for the package with the given name.
@@ -108,7 +108,7 @@ namespace Belle2 {
      * @param debugLevel The level for debug messages. Only used for the debug level.
      * @return True if the log level of the log system is greater or equal the given level.
      */
-    bool isLevelEnabled(LogConfig::ELogLevel level, int debugLevel = 0, const std::string& package = "");
+    bool isLevelEnabled(LogConfig::ELogLevel level, int debugLevel = 0, const std::string& package = "") const;
 
     /**
      * Sends a log message using the log connection object.
@@ -128,7 +128,7 @@ namespace Belle2 {
      * @param logLevel The logging level which should be returned.
      * @return The number of message calls for the given log level.
      */
-    int getMessageCounter(LogConfig::ELogLevel logLevel);
+    int getMessageCounter(LogConfig::ELogLevel logLevel) const;
 
     /**
      * Returns the current log level used by the logging system.
@@ -139,7 +139,7 @@ namespace Belle2 {
      *
      * @return The current log level of the logging system.
      */
-    LogConfig::ELogLevel getCurrentLogLevel();
+    LogConfig::ELogLevel getCurrentLogLevel() const;
 
 
   private:
@@ -170,18 +170,6 @@ namespace Belle2 {
      * @param logLevel The logging level which should be increased by one.
      */
     void incMessageCounter(LogConfig::ELogLevel logLevel);
-
-    static LogSystem* m_instance; /**< Pointer that saves the instance of this class. */
-
-    /** Destroyer class to delete the instance of the LogSystem class when the program terminates. */
-    class SingletonDestroyer {
-    public: ~SingletonDestroyer() {
-        if (LogSystem::m_instance != NULL) delete LogSystem::m_instance;
-      }
-    };
-
-    friend class SingletonDestroyer;
-
   };
 
 } //end of namespace Belle2

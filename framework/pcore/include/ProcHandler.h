@@ -71,7 +71,14 @@ namespace Belle2 {
     /*! Return 1 if the process is an output_server */
     int isOutputSrv(void);
 
-    /*! Return ID of the event process */
+    /** Return ID of the current process.
+     *
+     * Return values mean:
+     *  -1:     no parallel processing used
+     *  <10000  one of the main processes (between input and output paths)
+     *  >=10000 input path
+     *  >=20000 output path
+     */
     static int EvtProcID(void);
 
     // Obsolete functions
@@ -81,7 +88,6 @@ namespace Belle2 {
     int isproc(int pid, char* exe);
     void display(void);
   };
-
-} // namespace Roobasf
+}
 
 #endif

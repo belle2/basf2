@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Thomas Kuhr                                             *
+ * Contributors: Andreas Moll, Thomas Kuhr                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,23 +13,18 @@
 #include <framework/logging/LogConnectionBase.h>
 #include <framework/logging/LogConnectionIOStream.h>
 
-
 #include <unistd.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 
 using namespace Belle2;
 using namespace std;
 
-LogSystem* LogSystem::m_instance = NULL;
-
 
 LogSystem& LogSystem::Instance()
 {
-  static SingletonDestroyer siDestroyer;
-  if (!m_instance) m_instance = new LogSystem();
-  return *m_instance;
+  static LogSystem instance;
+  return instance;
 }
 
 
@@ -48,15 +43,15 @@ void LogSystem::resetLogConnections()
 }
 
 
-bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, const std::string& package)
+bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, const std::string& package) const
 {
   LogConfig::ELogLevel logLevelLimit = LogConfig::c_Default;
   int debugLevelLimit = 0;
 
   // first check whether the log level of the current package is set
-  map<string, LogConfig>::iterator packageLogConfig = m_packageLogConfigs.find(package);
+  map<string, LogConfig>::const_iterator packageLogConfig = m_packageLogConfigs.find(package);
   if (packageLogConfig != m_packageLogConfigs.end()) {
-    LogConfig& logConfig = packageLogConfig->second;
+    const LogConfig& logConfig = packageLogConfig->second;
     if (logConfig.getLogLevel() != LogConfig::c_Default) {
       logLevelLimit = logConfig.getLogLevel();
       debugLevelLimit = logConfig.getDebugLevel();
@@ -120,13 +115,13 @@ void LogSystem::resetMessageCounter()
 }
 
 
-int LogSystem::getMessageCounter(LogConfig::ELogLevel logLevel)
+int LogSystem::getMessageCounter(LogConfig::ELogLevel logLevel) const
 {
   return m_messageCounter[logLevel];
 }
 
 
-LogConfig::ELogLevel LogSystem::getCurrentLogLevel()
+LogConfig::ELogLevel LogSystem::getCurrentLogLevel() const
 {
   //Check if module specific logging is set
   if (m_moduleLogConfig && (m_moduleLogConfig->getLogLevel() != LogConfig::c_Default)) {

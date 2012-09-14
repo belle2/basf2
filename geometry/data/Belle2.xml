@@ -44,4 +44,10 @@
   <xi:include href="../bklm/BKLM.xml"/>
   <xi:include href="../eklm/ESTR.xml"/>
   <xi:include href="../eklm/EKLM.xml"/>
+
+  <!-- VXD Tracking -->
+  <Tracking>
+    <xi:include href="../tracking/VXDTFindex.xml"/>
+  </Tracking>
+
 </Detector>

@@ -191,8 +191,8 @@ namespace Belle2 {
     /**
      * Configure the printed log information for the given level.
      *
-     * @param logLevel The log level.
-     * @param logInfo The log information that should be printed.
+     * @param logLevel The log level (one of LogConfig::ELogLevel)
+     * @param logInfo  What kind of info should be printed? ORed combination of LogConfig::ELogInfo flags.
      */
     void setLogInfo(int logLevel, unsigned int logInfo);
 
@@ -271,14 +271,14 @@ namespace Belle2 {
     /**
      * Returns the parsed condition operator
      *
-     * @ return Parsed condition operator
+     * @return Parsed condition operator
      */
     Belle2::CondParser::EConditionOperators getConditionOperator() const { return m_conditionOperator; };
 
     /**
      * Returns the parsed condition value
      *
-     * @ return Parsed condition value
+     * @return Parsed condition value
      */
     int getConditionValue() const { return m_conditionValue; };
 
@@ -331,7 +331,7 @@ namespace Belle2 {
     /**
      * Sets the description of the module.
      *
-     * @param description A short description of the module.
+     * @param description A description of the module.
      */
     void setDescription(const std::string& description);
 
@@ -339,8 +339,8 @@ namespace Belle2 {
      * Adds a new parameter to the module. This method has to be called in the constructor of the module.
      *
      * @param name The unique name of the parameter.
-     * @param paramVariable The local member variable of the module to which the value from the steering file is written.
-     * @param description: a short description of the parameter.
+     * @param paramVariable The member variable of the module to which the value from the steering file is written.
+     * @param description A description of the parameter.
      * @param defaultValue The default value of the parameter which is used if there was no value given in the steering file.
      */
     template<typename T>
@@ -351,8 +351,8 @@ namespace Belle2 {
      * The user has to set the value for this parameter in the steering file.
      *
      * @param name The unique name of the parameter.
-     * @param paramVariable The local member variable of the module to which the value from the steering file is written.
-     * @param description: a short description of the parameter.
+     * @param paramVariable The member variable of the module to which the value from the steering file is written.
+     * @param description A description of the parameter.
      */
     template<typename T>
     void addParam(const std::string& name, T& paramVariable, const std::string& description);

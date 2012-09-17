@@ -14,6 +14,11 @@
 ##############################################################################
 
 from basf2 import *
+import os
+
+
+#force terminal width of 80 columns to make output reproducible
+os.system('stty columns 80')
 
 set_random_seed(42)
 

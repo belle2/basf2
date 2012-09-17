@@ -436,7 +436,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
         if (!planar_pixel_hit) {
           //currently unused in Belle2 {{{
           TEveBox* hit_box;
-          hit_box = boxCreator((plane_pos + hit_u * u), u, v, m_errorScale * std::sqrt(hit_res_u), plane_size, 0.0105);
+          hit_box = boxCreator((plane_pos + hit_u * u), u, v, (float)(m_errorScale * std::sqrt(hit_res_u)), plane_size, 0.0105);
           hit_box->SetMainColor(kYellow);
           hit_box->SetMainTransparency(0);
           if (track_lines)
@@ -836,7 +836,6 @@ void EVEVisualization::clearEvent()
   m_trackpropagator->SetMaxR(380); //don't draw tracks outside detector
   m_gftracklist = new TEveTrackList("Fitted tracks", m_trackpropagator);
   m_gftrackpropagator = new TEveTrackPropagator();
-  //TODO: add more complex magnetic field (important for BKLM)
   m_gftrackpropagator->SetMagFieldObj(&m_bfield, false);
   m_gftrackpropagator->SetMaxOrbs(0.01); //stop after track markers
   delete m_eclsimhitdata;

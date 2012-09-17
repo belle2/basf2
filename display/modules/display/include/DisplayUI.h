@@ -58,7 +58,7 @@ namespace Belle2 {
     /** switch to automatic mode, where visualisations are saved for each event, with no interactive control. */
     void startAutomaticRun();
 
-    /*  The actual per-event functionality for automatic saving. */
+    /**  The actual per-event functionality for automatic saving. */
     void automaticEvent();
 
     /** Start interactive display for current event.

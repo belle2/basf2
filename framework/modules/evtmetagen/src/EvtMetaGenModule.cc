@@ -55,7 +55,7 @@ EvtMetaGenModule::~EvtMetaGenModule()
 void EvtMetaGenModule::initialize()
 {
   //Register the EventMetaData in the data store
-  StoreObjPtr<EventMetaData>::registerPersistent();
+  m_eventMetaDataPtr.registerAsPersistent();
 
   //steering file content overwritten via command line arguments?
   int numEventsArgument = Environment::Instance().getNumberEventsOverride();
@@ -92,11 +92,10 @@ void EvtMetaGenModule::event()
     }
   }
 
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  eventMetaDataPtr.create();
-  eventMetaDataPtr->setExperiment(m_expList[m_colIndex]);
-  eventMetaDataPtr->setRun(m_runList[m_colIndex]);
-  eventMetaDataPtr->setEvent(m_evtNumber);
+  m_eventMetaDataPtr.create();
+  m_eventMetaDataPtr->setExperiment(m_expList[m_colIndex]);
+  m_eventMetaDataPtr->setRun(m_runList[m_colIndex]);
+  m_eventMetaDataPtr->setEvent(m_evtNumber);
 
   m_evtNumber++;
 }

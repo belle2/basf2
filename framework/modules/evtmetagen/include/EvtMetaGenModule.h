@@ -12,6 +12,8 @@
 #define EVTMETAGENMODULE_H_
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <vector>
 
 
@@ -67,6 +69,8 @@ namespace Belle2 {
 
 
   private:
+
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
     unsigned long m_evtNumber; /**< The current event number. */
     int m_colIndex;  /**< The current index for the exp and run lists. */

@@ -100,7 +100,7 @@ namespace Belle2 {
   class StoreArray : public StoreAccessorBase {
   public:
     /** Register an array, that should be written to the output by default, in the data store.
-     *  This must be called in the initialzation phase.
+     *  This must be called in the initialization phase.
      *
      *  @param name        Name under which the TClonesArray is stored.
      *  @param durability  Specifies lifetime of array in question.
@@ -113,7 +113,7 @@ namespace Belle2 {
     }
 
     /** Register an array, that should not be written to the output by default, in the data store.
-     *  This must be called in the initialzation phase.
+     *  This must be called in the initialization phase.
      *
      *  @param name        Name under which the TClonesArray is stored.
      *  @param durability  Specifies lifetime of array in question.
@@ -149,12 +149,31 @@ namespace Belle2 {
      *  @param durability Decides durability map used for getting the accessed array.
      */
     explicit StoreArray(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event):
-      StoreAccessorBase(DataStore::arrayName<T>(name), durability) {
+      StoreAccessorBase(DataStore::arrayName<T>(name), durability), m_storeArray(0) {
       if (DataStore::Instance().getInitializeActive()) {
         //if we're called during initialization, register the array and print a warning
         DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, T::Class(), true);
       }
-      m_storeArray = reinterpret_cast<TClonesArray**>(DataStore::Instance().getObject(m_name, durability, T::Class(), true));
+    }
+
+    /** Register the array in the data store and include it in the output by default.
+     *  This must be called in the initialization phase.
+     *
+     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
+     *  @return            True if the registration succeeded.
+     */
+    bool registerAsPersistent(bool errorIfExisting = false) {
+      return DataStore::Instance().createEntry(m_name, m_durability, T::Class(), true, false, errorIfExisting);
+    }
+
+    /** Register the array in the data store and do not include it in the output by default.
+     *  This must be called in the initialization phase.
+     *
+     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
+     *  @return            True if the registration succeeded.
+     */
+    bool registerAsTransient(bool errorIfExisting = false) {
+      return DataStore::Instance().createEntry(m_name, m_durability, T::Class(), true, true, errorIfExisting);
     }
 
     /** Create an empty array in the data store.
@@ -180,7 +199,7 @@ namespace Belle2 {
      *
      *  @return          True if the array exists.
      **/
-    inline bool isValid() const {return m_storeArray && *m_storeArray;}
+    inline bool isValid() const { ensureAttached(); return m_storeArray && *m_storeArray;}
 
     /** Is this StoreArray's data safe to access? */
     inline operator bool() const {return isValid();}

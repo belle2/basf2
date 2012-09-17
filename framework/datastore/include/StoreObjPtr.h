@@ -74,7 +74,7 @@ namespace Belle2 {
   template <class T> class StoreObjPtr : public StoreAccessorBase {
   public:
     /** Register an object, that should be written to the output by default, in the data store.
-     *  This must be called in the initialzation phase.
+     *  This must be called in the initialization phase.
      *
      *  @param name        Name under which the object is stored.
      *  @param durability  Specifies lifetime of object in question.
@@ -88,7 +88,7 @@ namespace Belle2 {
 
     /** Register an object, that should not be written to the output by default, in the data store.
      *
-     *  This must be called in the initialzation phase.
+     *  This must be called in the initialization phase.
      *
      *  @param name        Name under which the object is stored.
      *  @param durability  Specifies lifetime of object in question.
@@ -125,9 +125,30 @@ namespace Belle2 {
      *  @param durability Decides durability map used for getting the accessed object.
      */
     explicit StoreObjPtr(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event):
-      StoreAccessorBase(DataStore::objectName<T>(name), durability) {
-      DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, T::Class(), false);
-      m_storeObjPtr = reinterpret_cast<T**>(DataStore::Instance().getObject(m_name, m_durability, T::Class(), false));
+      StoreAccessorBase(DataStore::objectName<T>(name), durability), m_storeObjPtr(0) {
+      if (DataStore::Instance().getInitializeActive()) {
+        DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, T::Class(), false);
+      }
+    }
+
+    /** Register the object in the data store and include it in the output by default.
+     *  This must be called in the initialization phase.
+     *
+     *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
+     *  @return            True if the registration succeeded.
+     */
+    bool registerAsPersistent(bool errorIfExisting = false) {
+      return DataStore::Instance().createEntry(m_name, m_durability, T::Class(), false, false, errorIfExisting);
+    }
+
+    /** Register the object in the data store and do not include it in the output by default.
+     *  This must be called in the initialization phase.
+     *
+     *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
+     *  @return            True if the registration succeeded.
+     */
+    bool registerAsTransient(bool errorIfExisting = false) {
+      return DataStore::Instance().createEntry(m_name, m_durability, T::Class(), false, true, errorIfExisting);
     }
 
     /** Create a default object in the data store.
@@ -153,18 +174,24 @@ namespace Belle2 {
      *
      *  @return          True if the object exists.
      **/
-    inline bool isValid() const {return m_storeObjPtr && *m_storeObjPtr;}
+    inline bool isValid() const {ensureAttached(); return m_storeObjPtr && *m_storeObjPtr;}
 
 
     /** Virtual destructor for inherited classes */
     virtual ~StoreObjPtr() {}
 
     //------------------------ Imitate pointer functionality -----------------------------------------------
-    inline T& operator *()  const {DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), false); return **m_storeObjPtr;}  /**< Imitate pointer functionality. */
-    inline T* operator ->() const {DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), false); return *m_storeObjPtr;}   /**< Imitate pointer functionality. */
+    inline T& operator *()  const {ensureAttached(); return **m_storeObjPtr;}  /**< Imitate pointer functionality. */
+    inline T* operator ->() const {ensureAttached(); return *m_storeObjPtr;}   /**< Imitate pointer functionality. */
     inline operator bool()  const {return isValid();}   /**< Imitate pointer functionality. */
 
   private:
+    /** Ensure that this object is attached. */
+    inline void ensureAttached() const {
+      if (!m_storeObjPtr) {
+        const_cast<StoreObjPtr*>(this)->m_storeObjPtr = reinterpret_cast<T**>(DataStore::Instance().getObject(m_name, m_durability, T::Class(), false));
+      }
+    }
     /** Store of actual pointer. */
     T** m_storeObjPtr;
   };

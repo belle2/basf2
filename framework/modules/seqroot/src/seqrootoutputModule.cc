@@ -42,14 +42,7 @@ SeqRootOutputModule::SeqRootOutputModule() : Module()
 }
 
 
-SeqRootOutputModule::~SeqRootOutputModule()
-{
-  /* moved to terminate()
-  delete m_file;
-  delete m_msghandler;
-  delete m_streamer;
-  */
-}
+SeqRootOutputModule::~SeqRootOutputModule() { }
 
 void SeqRootOutputModule::initialize()
 {

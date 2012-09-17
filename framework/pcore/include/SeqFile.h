@@ -30,17 +30,14 @@ namespace Belle2 {
     int read(char* buf, int max);
 
   private:
-    void flush_buffer(int);
 
   private:
-    char m_filename[256];
-    int m_fd;
-    int m_nb;
-    int m_nfile;
-    int* m_buf;
-    int m_ptr;
+    char m_filename[256]; /**< Name of the opened file. */
+    int m_fd; /**< file descriptor. */
+    int m_nb; /**< when saving a file, the total number of bytes written, 0 when reading. */
+    int m_nfile; /**< file counter, starting at 0 (files are split after BLOCKSIZE bytes). */
   };
 
-} // namespace Belle
+}
 
 #endif

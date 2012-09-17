@@ -21,7 +21,6 @@
 #include <string>
 #include <vector>
 
-//#include <framework/datastore/DataStore.h>
 
 namespace Belle2 {
   /**
@@ -64,12 +63,8 @@ namespace Belle2 {
     //! Compression level
     int m_compressionLevel;
 
-
     //! Blocked file handler
     SeqFile* m_file;
-    int m_fd;
-
-    // Parallel processing parameters
 
     //! Total nr. of events in the file
     int m_nevt;
@@ -81,12 +76,12 @@ namespace Belle2 {
     DataStoreStreamer* m_streamer;
 
     //! Time
-    struct timeval m_t0;
-    struct timeval m_tend;
+    struct timeval m_t0; /**< time at begin of current run. */
+    struct timeval m_tend; /**< time at end of current run. */
 
-    //! Data flow
-    double m_size;
-    double m_size2;
+    // Data flow
+    double m_size; /**< total transferred data, in kB. */
+    double m_size2; /**< sum of squares of data transferred in each event, in kB^2. */
 
   };
 } // end namespace Belle2

@@ -9,8 +9,6 @@
 #ifndef EVTMESSAGE_H
 #define EVTMESSAGE_H
 
-#include <framework/pcore/RingBuffer.h>
-
 #include "TMessage.h"
 #include <sys/time.h>
 
@@ -28,16 +26,17 @@
 
 namespace Belle2 {
 
+  /** What type of message is this? */
   enum RECORD_TYPE { MSG_EVENT, MSG_BEGIN_RUN, MSG_END_RUN, MSG_TERMINATE, MSG_NORECORD };
 
   /*! Header structure of streamed object list */
   struct EvtHeader {
-    int size;
-    RECORD_TYPE rectype;
-    struct timeval timestamp;
-    int src;
-    int dest;
-    int reserved[10];
+    int size; /**< Number of words in this record. */
+    RECORD_TYPE rectype; /**< Type of message. */
+    struct timeval timestamp; /**< Decode time. */
+    int src; /**< source IP. */
+    int dest; /**< destination IP. */
+    int reserved[10]; /**< For future use. */
   };
 
   /*! Class to manage streamed object */
@@ -114,6 +113,5 @@ namespace Belle2 {
     }
   };
 
-} // namespace Roobasf
-
+}
 #endif

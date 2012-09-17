@@ -36,8 +36,6 @@ SeqFile::SeqFile(const char* filename, const char* rwflag)
   B2INFO("SeqFile: " << m_filename << " opened (fd=" << m_fd << ")");
   m_nfile = 0;
   m_nb = 0;
-  m_buf = NULL;
-  m_ptr = 0;
 }
 
 SeqFile::~SeqFile()

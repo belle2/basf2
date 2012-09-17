@@ -90,7 +90,7 @@ namespace Belle2 {
     //for root output
     std::string m_dataOutFileName; /**< name of the output file*/
     TFile* m_rootFilePtr; /**< the root file object for the custom root output*/
-    TTree* m_trueHitDataTreePtr; /** the root tree object for the custom root output. Use only accessed via fillLayerWiseData*/
+    TTree* m_trueHitDataTreePtr; /**< the root tree object for the custom root output. Use only accessed via fillLayerWiseData*/
 
     std::map<std::string, std::vector<std::vector<float> >* > m_layerWiseDataForRoot; /**< holds the branch varaibles for the costum root output. Only accessed via fillLayerWiseData*/
 

@@ -46,7 +46,7 @@ TrueHitTesterModule::TrueHitTesterModule() : Module()
 
 //Parameter definition
   addParam("outputFileName", m_dataOutFileName, "Output file name", string("truehittester.root"));
-  addParam("filter", m_filter, "throw away tracks with do not have exactly 1 hit in every Si layer (will only work with single track events)", false);
+  addParam("only6", m_filter, "throw away tracks with do not have exactly 1 hit in every Si layer (will only work with single track events)", false);
 
 }
 
@@ -87,7 +87,7 @@ void TrueHitTesterModule::event()
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   int eventCounter = eventMetaDataPtr->getEvent();
-  B2INFO("********** TrueHitTesterModule  processing event number: " << eventCounter << " ************");
+  B2DEBUG(100, "********** TrueHitTesterModule  processing event number: " << eventCounter << " ************");
   //simulated particles and hits
   StoreArray<MCParticle> aMcParticleArray("");
   int nMcParticles = aMcParticleArray.getEntries();

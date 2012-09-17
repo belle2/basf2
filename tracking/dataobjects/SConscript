@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['genfit']
+env['LIBS'] = ['framework', 'genfit', 'vxd_dataobjects']
 Return('env')
 

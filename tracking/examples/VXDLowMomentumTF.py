@@ -80,8 +80,6 @@ print 'entering svdCATFmodule.py, importing ' + simInputFileName
 print 'starting {events:} events, analyzing {numTracks:} track(s) per event by using seed {theSeed:}.'.format(events=numEvents,
         numTracks=numTracks, theSeed=seedValue)
 
-vxdCoordExporter = register_module('vxdCoordExporter')
-
 pxdDigitizer = register_module('PXDDigitizer')
 svdDigitizer = register_module('SVDDigitizer')
 pxdClusterizer = register_module('PXDClusterizer')

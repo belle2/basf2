@@ -164,7 +164,7 @@ def print_params(module, print_values=True, shared_lib_path=None):
     column_lengths = [len(cell) for cell in output[0]]
     for row in output:
         for col, cell in enumerate(row):
-            column_lengths[col] = max(len(cell), column_lengths[col])
+            column_lengths[col] = max(len(str(cell)), column_lengths[col])
 
     #both description and default value might be fairly long, set a limit
     default_value_width = min(column_lengths[2], 20)
@@ -176,7 +176,8 @@ def print_params(module, print_values=True, shared_lib_path=None):
     column_lengths[-1] = description_width
 
     format_string = ' '.join(['%%-%ss' % length
-            for length in column_lengths])
+            for length in column_lengths[:-1]])
+    format_string += ' %s'
 
     header_shown = False
     for row in output:

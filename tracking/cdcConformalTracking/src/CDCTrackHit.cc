@@ -31,7 +31,7 @@ CDCTrackHit::CDCTrackHit(CDCHit* hit, int index)
 {
 
   m_storeIndex = index;
-  m_driftTime = hit->getDriftTime();
+  m_driftTime = hit->getTDCCount();
   m_charge = hit->getADCCount();
 
   m_wireId = hit->getIWire();

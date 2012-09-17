@@ -22,22 +22,22 @@ const TMatrixD CDCRecoHit::c_HMatrix = TMatrixD(1, 5, c_HMatrixContent);
 //--- Translator initialization; should be removed, once this are shared_ptr ----------------------------------------------------
 ADCCountTranslatorBase*    CDCRecoHit::s_adcCountTranslator    = 0;
 CDCGeometryTranslatorBase* CDCRecoHit::s_cdcGeometryTranslator = 0;
-DriftTimeTranslatorBase*   CDCRecoHit::s_driftTimeTranslator   = 0;
+TDCCountTranslatorBase*    CDCRecoHit::s_tdcCountTranslator    = 0;
 bool CDCRecoHit::s_update = false;
 
 
 void CDCRecoHit::setTranslators(ADCCountTranslatorBase*    const adcCountTranslator,
                                 CDCGeometryTranslatorBase* const cdcGeometryTranslator,
-                                DriftTimeTranslatorBase*   const driftTimeTranslator)
+                                TDCCountTranslatorBase*    const tdcCountTranslator)
 /*
 static void setTranslators(boost::shared_ptr<ADCCountTranslatorBase>    const& adcCountTranslator,
                            boost::shared_ptr<CDCGeometryTranslatorBase> const& cdcGeometryTranslator,
-                           boost::shared_ptr<DriftTimeTranslatorBase>   const& driftTimeTranslator)
+                           boost::shared_ptr<TDCCountTranslatorBase>   const& driftTimeTranslator)
  */
 {
   s_adcCountTranslator    = adcCountTranslator;
   s_cdcGeometryTranslator = cdcGeometryTranslator;
-  s_driftTimeTranslator   = driftTimeTranslator;
+  s_tdcCountTranslator    = tdcCountTranslator;
 }
 
 void CDCRecoHit::setUpdate(bool update)
@@ -47,23 +47,23 @@ void CDCRecoHit::setUpdate(bool update)
 
 CDCRecoHit::CDCRecoHit()
   : GFRecoHitIfc<GFWireHitPolicy> (c_nParHitRep),
-    m_adcCount(0), m_charge(0), m_driftTime(0), m_driftLength(0), m_driftLengthResolution(0), m_wireID(WireID())
+    m_adcCount(0), m_charge(0), m_tdcCount(0), m_driftLength(0), m_driftLengthResolution(0), m_wireID(WireID())
 {
 }
 
 CDCRecoHit::CDCRecoHit(const CDCHit* cdcHit)
   : GFRecoHitIfc<GFWireHitPolicy> (c_nParHitRep)
 {
-  if (s_adcCountTranslator == 0 || s_cdcGeometryTranslator == 0 || s_driftTimeTranslator == 0) {
+  if (s_adcCountTranslator == 0 || s_cdcGeometryTranslator == 0 || s_tdcCountTranslator == 0) {
     B2FATAL("Can't produce CDCRecoHits without setting of the translators.")
   }
 
   // get information from cdcHit into local variables.
   m_wireID      = cdcHit->getID();
 
-  m_driftTime             = cdcHit->getDriftTime();
-  m_driftLength           = s_driftTimeTranslator->getDriftLength(m_driftTime, m_wireID);
-  m_driftLengthResolution = s_driftTimeTranslator->getDriftLengthResolution(m_driftLength, m_wireID);
+  m_tdcCount              = cdcHit->getTDCCount();
+  m_driftLength           = s_tdcCountTranslator->getDriftLength(m_tdcCount, m_wireID);
+  m_driftLengthResolution = s_tdcCountTranslator->getDriftLengthResolution(m_driftLength, m_wireID);
 
   m_adcCount    = cdcHit->getADCCount();
   m_charge      = s_adcCountTranslator->getCharge(m_adcCount, m_wireID);

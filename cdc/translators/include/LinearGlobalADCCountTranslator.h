@@ -29,6 +29,7 @@ namespace Belle2 {
       /** just multiply with the conversion factor and return. */
       float getCharge(unsigned short adcCount,
                       const WireID&,
+                      bool,
                       float, float) {
         return (adcCount * m_conversionFactor);
       }

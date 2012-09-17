@@ -15,10 +15,10 @@ using namespace Belle2;
 
 ClassImp(CDCHit)
 
-CDCHit::CDCHit(short driftTime, unsigned short charge,
+CDCHit::CDCHit(unsigned short tdcCount, unsigned short charge,
                unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire)
 {
-  setDriftTime(driftTime);
+  setTDCCount(tdcCount);
   setADCCount(charge);
   setWireID(iSuperLayer, iLayer, iWire);
 }

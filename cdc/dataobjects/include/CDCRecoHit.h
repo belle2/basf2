@@ -14,7 +14,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/ADCCountTranslatorBase.h>
 #include <cdc/dataobjects/CDCGeometryTranslatorBase.h>
-#include <cdc/dataobjects/DriftTimeTranslatorBase.h>
+#include <cdc/dataobjects/TDCCountTranslatorBase.h>
 
 #include <genfit/GFRecoHitIfc.h>
 #include <genfit/GFWireHitPolicy.h>
@@ -66,11 +66,11 @@ namespace Belle2 {
     /** Setter for the Translators. */
     static void setTranslators(CDC::ADCCountTranslatorBase*    const adcCountTranslator,
                                CDC::CDCGeometryTranslatorBase* const cdcGeometryTranslator,
-                               CDC::DriftTimeTranslatorBase*   const driftTimeTranslator);
+                               CDC::TDCCountTranslatorBase*    const tdcCountTranslator);
     /*
     static void setTranslators(boost::shared_ptr<CDC::ADCCountTranslatorBase>    const& adcCountTranslator,
                          boost::shared_ptr<CDC::CDCGeometryTranslatorBase> const& cdcGeometryTranslator,
-                         boost::shared_ptr<CDC::DriftTimeTranslatorBase>   const& driftTimeTranslator);
+                         boost::shared_ptr<CDC::TDCCountTranslatorBase>   const& driftTimeTranslator);
      */
 
     /** Setter for the update option.
@@ -106,8 +106,9 @@ namespace Belle2 {
     /** Accumulated charge within one cell.  UNIT??? */
     float m_charge;
 
-    /** Drift Time as out of CDCHit. */
-    short m_driftTime;
+    /** TDC Count as out of CDCHit. */
+    unsigned short m_tdcCount;
+
     /** Drift Length.
      *
      *  This is basically a cache to avoid recalculation of drift length every time.
@@ -131,8 +132,8 @@ namespace Belle2 {
     //static boost::shared_ptr<CDCGeometryTranslatorBase> s_cdcGeometryTranslator; //! Don't write to ROOT file, as pointer is meaningless, there
 
     /** Object for getting drift-length and -resolution. */
-    static CDC::DriftTimeTranslatorBase*    s_driftTimeTranslator;   //! Don't write to ROOT file, as pointer is meaningless, there
-    //static boost::shared_ptr<DriftTimeTranslatorBase>   s_driftTimeTranslator;   //! Don't write to ROOT file, as pointer is meaningless, there
+    static CDC::TDCCountTranslatorBase*    s_tdcCountTranslator;   //! Don't write to ROOT file, as pointer is meaningless, there
+    //static boost::shared_ptr<TDCCountTranslatorBase>   s_driftTimeTranslator;   //! Don't write to ROOT file, as pointer is meaningless, there
 
     /** If set to false, the data from the cash is used for the get measurement function.
      *
@@ -142,7 +143,7 @@ namespace Belle2 {
     static bool s_update; //!                               Don't write to ROOT file, as pointer is meaningless, there
 
     /** ROOT Macro.*/
-    ClassDef(CDCRecoHit, 3);
+    ClassDef(CDCRecoHit, 4);
   };
 }
 #endif

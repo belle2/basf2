@@ -334,7 +334,7 @@ void ExtrapolateToPXDModule::event()
       int layerId = -999;
       if (superlayerId == 0)   layerId = cdcHits[i]->getILayer();
       else layerId = cdcHits[i]->getILayer() + superlayerId * 6 + 2 ;
-      double driftTime = cdcHits[i]->getDriftTime();
+      double driftTime = cdcHits[i]->getTDCCount();
 
       //get the center of the hit wire and use it as hit position
       wire.SetX((cdcg.wireForwardPosition(layerId, wireId).x() + cdcg.wireBackwardPosition(layerId, wireId).x()) / 2);

@@ -42,5 +42,4 @@ namespace Belle2 {
     };
   }
 }
-
 #endif /* CDCGEOMETRYTRANSLATORBASE_H */

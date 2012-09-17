@@ -187,7 +187,7 @@ void CDCDigitizerModule::event()
 
     for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); iterSignalMap++) {
 
-      new(cdcHits->AddrAt(iCDCHits)) CDCHit(10 * iterSignalMap->second.m_driftTime, getADCCount(iterSignalMap->second.m_charge),
+      new(cdcHits->AddrAt(iCDCHits)) CDCHit(static_cast<unsigned short>(iterSignalMap->second.m_driftTime), getADCCount(iterSignalMap->second.m_charge),
                                             iterSignalMap->second.m_wireID);
 
       cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex, iCDCHits);     //add entry

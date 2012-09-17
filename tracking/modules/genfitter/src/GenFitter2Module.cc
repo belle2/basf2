@@ -24,7 +24,7 @@
 #include <framework/logging/Logger.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
-#include <cdc/translators/SimpleDriftTimeTranslator.h>
+#include <cdc/translators/SimpleTDCCountTranslator.h>
 #include <cdc/translators/IdealCDCGeometryTranslator.h>
 
 #include <svd/reconstruction/SVDRecoHit2D.h>
@@ -149,7 +149,7 @@ void GenFitter2Module::initialize()
 
   // Create new Translators and give them to the CDCRecoHits.
   // The way, I'm going to do it here will produce some small resource leak, but this will stop, once we go to ROOT 6 and have the possibility to use sharead_ptr
-  CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new IdealCDCGeometryTranslator(), new SimpleDriftTimeTranslator());
+  CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new IdealCDCGeometryTranslator(), new SimpleTDCCountTranslator());
 
 }
 

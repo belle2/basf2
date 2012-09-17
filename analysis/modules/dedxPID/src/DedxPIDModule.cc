@@ -360,7 +360,7 @@ void DedxPIDModule::event()
         const float hit_charge = cdcHits[cdc_idx]->getADCCount();
 
         if (m_enableDebugOutput)
-          track.addHit(hit_pos, current_layer, wire, (hit_pos - hit_pos_helix).Perp(), hit_charge, cdcHits[cdc_idx]->getDriftTime());
+          track.addHit(hit_pos, current_layer, wire, (hit_pos - hit_pos_helix).Perp(), hit_charge, cdcHits[cdc_idx]->getTDCCount());
 
         num_hits_in_current_layer++;
         layer_charge += hit_charge;

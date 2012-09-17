@@ -16,9 +16,15 @@
 from basf2 import *
 import os
 
+term_width = 0
+try:
+    term_width = int(os.popen('stty size', 'r').read().split()[1])
 
-#force terminal width of 80 columns to make output reproducible
-os.system('stty columns 80')
+    #force terminal width of 80 columns to make output reproducible
+    os.system('stty columns 80')
+except:
+    pass
+
 
 set_random_seed(42)
 
@@ -204,3 +210,7 @@ main.add_module(register_module('PrintCollections'))
 
 # Process events
 process(main)
+
+if term_width > 0:
+    #reset terminal size to to previous value
+    os.system('stty columns ' + str(term_width))

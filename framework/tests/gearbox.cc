@@ -65,7 +65,7 @@ namespace Belle2 {
     EXPECT_EQ(0.5, gb.getLength("/detector/bar"));
     gb.close();
 
-    const_cast<DataStore::StoreObjMap&>(DataStore::Instance().getStoreObjectMap(DataStore::c_Event)).clear();
+    DataStore::Instance().reset(DataStore::c_Event);
   }
 #endif
 

@@ -279,9 +279,13 @@ namespace Belle2 {
     template <class FROM, class TO> RelationArray(const StoreArray<FROM>& from, const StoreArray<TO>& to, const std::string& name = "",
                                                   const DataStore::EDurability& durability = DataStore::c_Event):
       StoreAccessorBase((name == "") ? DataStore::relationName(from.getName(), to.getName()) : name, durability) {
-      DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, RelationContainer::Class(), false);
+      if (DataStore::Instance().getInitializeActive()) {
+        DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, RelationContainer::Class(), false);
+      }
       m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(m_name, m_durability, RelationContainer::Class(), false));
-      if (!*m_relations) {
+      if (!m_relations) {
+        return;
+      } else if (!*m_relations) {
         create(from, to);
       } else {
         if (isValid() && (*m_relations)->isDefaultConstructed()) {
@@ -351,7 +355,7 @@ namespace Belle2 {
     const RelationElement& operator[](int i) const { check(); return (*m_relations)->elements(i);}
 
     /** Get the number of elements. */
-    int getEntries() const { check(); return (*m_relations)->getEntries(); }
+    int getEntries() const { return isValid() ? ((*m_relations)->getEntries()) : 0; }
 
     /** Return the AccessorParams the relation points from. */
     const AccessorParams getFromAccessorParams() const { check(); return AccessorParams((*m_relations)->getFromName(), (DataStore::EDurability)(*m_relations)->getFromDurability()); }

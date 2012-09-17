@@ -7,7 +7,7 @@ from basf2 import *
 from subprocess import call
 
 numTracks = 1  # set number of tracks per event
-numEvents = 1000  # set number of events
+numEvents = 100  # set number of events
 seedValue = 1  # seed for rng
 pMin = 0.05  # pT min
 pMax = 0.5  # pT max
@@ -19,6 +19,8 @@ rSeed = seedValue
 print 'Starting VXDTFModule example file, rSeed = ' + str(seedValue) \
     + ', number of events: ' + str(numEvents) + ' with ' + str(numTracks) \
     + ' tracks per event'
+print 'INFO: Curling tracks are not supported yet.'
+print 'INFO: There is a known problem with SVDClusters in slanted parts combined with the VXD track finder, until this is fixed, theta values in the range of 17°-50° will deliver poor results.'
 
 set_log_level(LogLevel.ERROR)
 set_random_seed(seedValue)
@@ -34,7 +36,16 @@ evtmetainfo = register_module('EvtMetaInfo')
 gearbox = register_module('Gearbox')
 
 geometry = register_module('Geometry')
-geometry.param('Components', ['MagneticField', 'SVD'])
+geometry.param('Components', [
+    'BeamPipe',
+    'Cryostat',
+    'HeavyMetalShield',
+    'MagneticField',
+    'PXD',
+    'SVD',
+    'SVD-Support',
+    'CDC',
+    ])
 
 pGun = register_module('ParticleGun')
 param_pGun = {  # 13: muons, 211: charged pions, 11 electrons
@@ -44,8 +55,6 @@ param_pGun = {  # 13: muons, 211: charged pions, 11 electrons
     'varyNTracks': False,
     'momentumGeneration': 'uniformPt',
     'momentumParams': [pMin, pMax],
-    'phiGeneration': 'normal',
-    'phiParams': [180, 30],
     'thetaGeneration': 'uniform',
     'thetaParams': [tMin, tMax],
     'phiGeneration': 'uniform',
@@ -59,35 +68,11 @@ pGun.param(param_pGun)
 
 g4sim = register_module('FullSim')
 
-evtgeninput = register_module('EvtGenInput')
-
-simInputFileName = \
-    '{events:}events{numTracks:}tracksEachBetween{minP:}And{maxP:}GeVAndSeed{theSeed:}tMin{minTheta:}tMax{maxTheta:}noCurler.root'.format(
-    events=numEvents,
-    numTracks=numTracks,
-    minP=pMin,
-    maxP=pMax,
-    theSeed=seedValue,
-    minTheta=tMin,
-    maxTheta=tMax,
-    )
-# simInputFileName = '{events:}events{numTracks:}tracksEachAndSeed{theSeed:}.root'.format(events= numEvents, numTracks= tracks, theSeed=pGSeed)
-inputMod = register_module('SimpleInput')
-inputMod.param('inputFileName', simInputFileName)
-
-print ''
-print 'entering svdCATFmodule.py, importing ' + simInputFileName
-print 'starting {events:} events, analyzing {numTracks:} track(s) per event by using seed {theSeed:}.'.format(events=numEvents,
-        numTracks=numTracks, theSeed=seedValue)
-
-pxdDigitizer = register_module('PXDDigitizer')
 svdDigitizer = register_module('SVDDigitizer')
-pxdClusterizer = register_module('PXDClusterizer')
 svdClusterizer = register_module('SVDClusterizer')
 
 vxdtf = register_module('VXDTF')
 vxdtf.logging.log_level = LogLevel.INFO
-
 param_vxdtf = {  # #### tripple pass!
                  # minimal layer number allowed for TC-seeds
                  # minimal state allowed for TC-seeds. Higher numbers are more restrictive (better ghost rate), but remove good TCs as well

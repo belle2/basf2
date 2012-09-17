@@ -251,14 +251,6 @@ namespace Belle2 {
         (*m_relations)->setFromDurability(accessorFrom.second);
         (*m_relations)->setToName(accessorTo.first);
         (*m_relations)->setToDurability(accessorTo.second);
-        if (!from) {
-          B2WARNING("DATASTORE BACKWARD COMPATIBILITY ISSUE: You have to *create* the array '" << accessorFrom.first << "' before you can use it!");
-          const_cast<StoreArray<FROM>&>(from).create();
-        }
-        if (!to) {
-          B2WARNING("DATASTORE BACKWARD COMPATIBILITY ISSUE: You have to *create* the array '" << accessorTo.first << "' before you can use it!");
-          const_cast<StoreArray<TO>&>(to).create();
-        }
       }
       return result;
     }

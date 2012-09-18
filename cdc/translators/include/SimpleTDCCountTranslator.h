@@ -8,24 +8,25 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SIMPLEDRIFTTIMETRANSLATOR_H
-#define SIMPLEDRIFTTIMETRANSLATOR_H
+#ifndef SIMPLETDCCOUNTTRANSLATOR_H
+#define SIMPLETDCCOUNTTRANSLATOR_H
 
-#include <cdc/dataobjects/DriftTimeTranslatorBase.h>
+#include <cdc/dataobjects/TDCCountTranslatorBase.h>
+
 #include <TVector3.h>
 
 namespace Belle2 {
   namespace CDC {
     /** Translator mirroring the simple Digitization. */
-    class SimpleDriftTimeTranslator : public DriftTimeTranslatorBase {
+    class SimpleTDCCountTranslator : public TDCCountTranslatorBase {
     public:
       /** Constructor, with the additional information, if propagation in the wire shall be considered. */
-      SimpleDriftTimeTranslator(bool useInWirePropagationDelay = false) :
+      SimpleTDCCountTranslator(bool useInWirePropagationDelay = false) :
         m_useInWirePropagationDelay(useInWirePropagationDelay), m_eventTime(0) {
       }
 
       /** Destructor. */
-      ~SimpleDriftTimeTranslator() {};
+      ~SimpleTDCCountTranslator() {};
 
       /** If trigger jitter was simulated, in every event one has to give an estimate of the effect. */
       void setEventTime(short eventTime = 0) {
@@ -33,9 +34,9 @@ namespace Belle2 {
       }
 
       /** */
-      float getDriftLength(short driftTime,
-                           const WireID& wireID = WireID(),
-                           unsigned short timeOfFlightEstimator = 0,
+      float getDriftLength(unsigned short tdcCount,
+                           const WireID& wireID        = WireID(),
+                           float timeOfFlightEstimator = 0,
                            bool = false,
                            float z = 0, float = static_cast<float>(TMath::Pi() / 2.));
 
@@ -54,8 +55,8 @@ namespace Belle2 {
       bool m_useInWirePropagationDelay;
       TVector3 m_backWirePos;
 
-      short m_eventTime;
+      float m_eventTime;
     };
   }
 }
-#endif /* SIMPLEDRIFTTIMETRANSLATOR_H_ */
+#endif /* SimpleTDCCountTranslator_H_ */

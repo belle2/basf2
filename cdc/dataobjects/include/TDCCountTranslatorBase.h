@@ -12,6 +12,7 @@
 #define DRIFTTIMETRANSLATORBASE_H
 
 #include <cdc/dataobjects/WireID.h>
+
 #include <TMath.h>
 
 namespace Belle2 {
@@ -20,17 +21,17 @@ namespace Belle2 {
      *
      *  Specific implementations are implemented in the cdc library.
      */
-    class DriftTimeTranslatorBase {
+    class TDCCountTranslatorBase {
     public:
       /** Constructor. */
-      DriftTimeTranslatorBase() {}
+      TDCCountTranslatorBase() {}
 
       /** Destructor. */
-      virtual ~DriftTimeTranslatorBase() {}
+      virtual ~TDCCountTranslatorBase() {}
 
       /** Function for getting a drift length estimation.
        *
-       *  @param driftTime               This is the "drift time" saved in the CDCHit. Actually it can be the sum of various effects
+       *  @param tdcCount                This is the "drift time" saved in the CDCHit. Actually it can be the sum of various effects
        *                                 such as trigger time jitter, propagation time of the signal in the wire of the CDC etc.
        *                                 Actual translators should however get the appropriate drift length including the specified effects.
        *  @param wireID                  Object to identify hit wire.
@@ -43,10 +44,10 @@ namespace Belle2 {
        *
        *  @return  Best estimation of closest distance between the track and the wire.
        */
-      virtual float getDriftLength(short driftTime = 0,
-                                   const WireID& wireID = WireID(),
-                                   unsigned short timeOfFlightEstimator = 0,
-                                   bool ambiguityDiscrimiator = false,
+      virtual float getDriftLength(unsigned short tdcCount     = 0,
+                                   const WireID& wireID        = WireID(),
+                                   float timeOfFlightEstimator = 0.,
+                                   bool ambiguityDiscrimiator  = false,
                                    float z = 0, float theta = static_cast<float>(TMath::Pi() / 2.)) = 0;
 
       /** Uncertainty corresponding to drift length from getDriftLength of this class.
@@ -56,8 +57,8 @@ namespace Belle2 {
        *  @param z                       z-position for determining the in-wire-propagation time.
        *  @param theta                   Angle under which the particle moves through the drift-cell in r-phi.
        */
-      virtual float getDriftLengthResolution(float driftLength = 0.,
-                                             const WireID& wireID = WireID(),
+      virtual float getDriftLengthResolution(float driftLength          = 0.,
+                                             const WireID& wireID       = WireID(),
                                              bool ambiguityDiscrimiator = false,
                                              float z = 0, float theta = static_cast<float>(TMath::Pi() / 2.)) = 0;
     };

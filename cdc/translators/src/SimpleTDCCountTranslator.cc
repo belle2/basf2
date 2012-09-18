@@ -8,19 +8,22 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <cdc/translators/SimpleDriftTimeTranslator.h>
+#include <cdc/translators/SimpleTDCCountTranslator.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
-float SimpleDriftTimeTranslator::getDriftLength(short driftTime,
-                                                const WireID& wireID,
-                                                unsigned short timeOfFlightEstimator,
-                                                bool,
-                                                float z, float)
+float SimpleTDCCountTranslator::getDriftLength(unsigned short tdcCount,
+                                               const WireID& wireID,
+                                               float timeOfFlightEstimator,
+                                               bool,
+                                               float z, float)
 {
+  // translate TDC Count into time information:
+  float driftTime = static_cast<float>(tdcCount); // 1 Unit in the TDC count equals 1 ns
+
   // Need to undo everything the simple digitization does in reverse order.
   // First: Undo propagation in wire, if it was used:
   if (m_useInWirePropagationDelay) {
@@ -38,13 +41,13 @@ float SimpleDriftTimeTranslator::getDriftLength(short driftTime,
 
   //Now we have an estimate for the time it took from the ionisation to the hitting of the wire.
   //Need to reverse calculate the relation between drift lenght and drift time.
-  return (driftTime * 4e-4);
+  return (driftTime * 4e-3);
 }
 
-float SimpleDriftTimeTranslator::getDriftLengthResolution(float,
-                                                          const WireID& ,
-                                                          bool,
-                                                          float, float)
+float SimpleTDCCountTranslator::getDriftLengthResolution(float,
+                                                         const WireID& ,
+                                                         bool,
+                                                         float, float)
 {
   return 1e-4; // 100um **2 in cm**2
 }

@@ -82,18 +82,18 @@ namespace Belle2 {
   TEST_F(DataStoreTest, TypeTest)
   {
     //attach with incompatible type
-    EXPECT_FATAL(StoreArray<ProfileInfo> evtData("EventMetaDatas"));
-    EXPECT_FATAL(StoreObjPtr<ProfileInfo> evtData2("EventMetaData"));
+    EXPECT_FATAL(StoreArray<ProfileInfo>("EventMetaDatas").isValid());
+    EXPECT_FATAL(StoreObjPtr<ProfileInfo>("EventMetaData").isValid());
 
     //attaching objects to array and vice versa shouldn't work
     //neither should the store allow objects with same name/durability
     //as existing arrays
-    EXPECT_FATAL(StoreArray<EventMetaData> array("EventMetaData"));
-    EXPECT_FATAL(StoreObjPtr<EventMetaData> obj("EventMetaDatas"));
+    EXPECT_FATAL(StoreArray<EventMetaData>("EventMetaData").isValid());
+    EXPECT_FATAL(StoreObjPtr<EventMetaData>("EventMetaDatas").isValid());
 
-    //getting a base class is not OK right now (why?)
-    EXPECT_FATAL(StoreArray<TObject>("EventMetaDatas"));
-    EXPECT_FATAL(StoreObjPtr<TObject>("EventMetaData"));
+    //getting a base class is not OK.
+    EXPECT_FATAL(StoreArray<TObject>("EventMetaDatas").isValid());
+    EXPECT_FATAL(StoreObjPtr<TObject>("EventMetaData").isValid());
   }
 
   /** check meta data. */
@@ -159,7 +159,7 @@ namespace Belle2 {
       EXPECT_EQ((int)evtDataDifferentName[i]->getEvent(), 20 + i);
       EXPECT_EQ((int)evtDataDifferentDurability[i]->getEvent(), 30 + i);
 
-      EXPECT_EQ(profileInfo[i]->getMemory(), 128);
+      EXPECT_EQ(profileInfo[i]->getMemory(), 128u);
       EXPECT_FLOAT_EQ(profileInfo[i]->getTimeInSec(), 60.0);
     }
   }

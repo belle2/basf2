@@ -213,10 +213,18 @@ namespace Belle2 {
      *
      *  @return          True if the array exists.
      **/
-    inline bool isValid() const { ensureAttached(); return m_storeArray && *m_storeArray;}
+    inline bool isValid() const {
+      //If there's no array currently associated, we attach it
+      //However, this is entirely read-only, registering or creating the array
+      //would merely produce misleading errors.
+      if (!m_storeArray) {
+        const_cast<StoreArray*>(this)->m_storeArray = reinterpret_cast<TClonesArray**>(DataStore::Instance().getObject(m_name, m_durability, T::Class(), true));
+      }
+      return m_storeArray && *m_storeArray;
+    }
 
     /** Is this StoreArray's data safe to access? */
-    inline operator bool() const {return isValid();}
+    inline operator bool() const { return isValid(); }
 
     /** Get the number of occupied slots in the array. */
     inline int getEntries() const { return isValid() ? ((*m_storeArray)->GetEntriesFast()) : (0);}
@@ -227,6 +235,7 @@ namespace Belle2 {
      *  \return pointer to the created object, or NULL if out of bounds
      */
     inline T* operator [](int i) const {
+      ensureCreated();
       if (i >= getEntries() or i < 0)
         return 0;
       //type was checked by DataStore, so this is safe
@@ -247,7 +256,7 @@ namespace Belle2 {
      *  \return pointer to address just past the last array element
      */
     inline T* nextFreeAddress() {
-      ensureAttached();
+      ensureCreated();
       return static_cast<T*>((*m_storeArray)->AddrAt(getEntries()));
     }
 
@@ -287,14 +296,14 @@ namespace Belle2 {
      *  function is recommended, as the difference between . and ->
      *  may be lost on casual readers of the source code.
      */
-    TClonesArray& operator *() const { ensureAttached(); return **m_storeArray;}
-    ClonesArrayWrapper* operator ->() const { ensureAttached(); return static_cast<ClonesArrayWrapper*>(*m_storeArray);}
-    TClonesArray* getPtr() const { ensureAttached(); return *m_storeArray;}
+    TClonesArray& operator *() const { ensureCreated(); return **m_storeArray;}
+    ClonesArrayWrapper* operator ->() const { ensureCreated(); return static_cast<ClonesArrayWrapper*>(*m_storeArray);}
+    TClonesArray* getPtr() const { ensureCreated(); return *m_storeArray;}
     //@}
 
   private:
-    /** Ensure that this object is registered and attached. */
-    inline void ensureAttached() const {
+    /** Ensure that this object is registered, created and attached. */
+    inline void ensureCreated() const {
       DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, T::Class(), true);
       DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), true);
       if (!m_storeArray) {

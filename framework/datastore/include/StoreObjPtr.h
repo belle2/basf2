@@ -151,6 +151,21 @@ namespace Belle2 {
       return DataStore::Instance().createEntry(m_name, m_durability, T::Class(), false, true, errorIfExisting);
     }
 
+    /** Check whether an object was registered before.
+     *
+     *  It will cause an error if the object does not exist.
+     *  This must be called in the initialzation phase.
+     *
+     *  @param name        Name under which the object is stored.
+     */
+    bool isRequired() {
+      if (!DataStore::Instance().hasEntry(m_name, m_durability, T::Class(), false)) {
+        B2ERROR("The required DataStore entry with name " << m_name << " and durability " << m_durability << " does not exists.");
+        return false;
+      }
+      return true;
+    }
+
     /** Create a default object in the data store.
      *
      *  @param replace   Should an existing object be replaced?

@@ -176,6 +176,20 @@ namespace Belle2 {
       return DataStore::Instance().createEntry(m_name, m_durability, T::Class(), true, true, errorIfExisting);
     }
 
+    /** Check whether an array was registered before.
+     *  It will cause an error if the array does not exist.
+     *  This must be called in the initialzation phase.
+     *
+     *  @return            True if the array exists.
+     */
+    bool isRequired() {
+      if (!DataStore::Instance().hasEntry(m_name, m_durability, T::Class(), true)) {
+        B2ERROR("The required DataStore entry with name " << m_name << " and durability " << m_durability << " does not exists.");
+        return false;
+      }
+      return true;
+    }
+
     /** Create an empty array in the data store.
      *
      *  @param replace   Should an existing object be replaced?

@@ -5,20 +5,11 @@
 # the system by sourcing before calling
 
 # Yanliang Han
-# 2011-11
+# 2012-09-18
 
 DIRACROOT=${DIRACROOT:-$DIRAC/}
 . $DIRACROOT/bashrc
-# check if gbasf2 is unreachable by PATH
-path=`which gbasf2`
-gbasf2_path=`dirname path`/..
-find ${gbasf2_path}/lib -name gbasf2.py >/dev/null 2>&1
-if [ $? -eq 1 ]
-then
- BELLE2_LOCAL_DIR=${BELLE2_LOCAL_DIR:-.}
- ${BELLE2_LOCAL_DIR}/gbasf2/lib/gbasf2.py "$@"  
-else
- ${gbasf2_path}/lib/gbasf2.py "$@"
-fi
+
+${GBASF2ROOT}/lib/gbasf2.py "$@"
 
 exit $?

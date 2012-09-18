@@ -92,7 +92,7 @@ def make_jdl(
         lfn = lfns[0]
 
     import os
-    path = os.popen('which gbasf2').read()[:-11] + 'lib/'
+    path = os.environ['GBASF2LIB']
 
     f = open(project + '-' + os.path.basename(lfn) + '.jdl', 'w')
     f.write('[\n')
@@ -116,14 +116,14 @@ def make_jdl(
     f.write('    InputSandbox = \n')
     f.write('    {\n')
     f.write('      "' + steering_file + '",\n')
-    f.write('     ' + path + '"basf2helper.sh",\n')
-    f.write('     ' + path + '"gbasf2util.py",\n')
-    f.write('     ' + path + '"gbasf2output.py",\n')
-    f.write('     ' + path + '"AmgaClient.py",\n')
-    f.write('     ' + path + '"mdinterface.py",\n')
-    f.write('     ' + path + '"mdstandalone.py",\n')
-    f.write('     ' + path + '"mdclient.py",\n')
-    f.write('     ' + path + '"mdparser.py",\n')
+    f.write('     ' + path + '/' + '"basf2helper.sh",\n')
+    f.write('     ' + path + '/' + '"gbasf2util.py",\n')
+    f.write('     ' + path + '/' + '"gbasf2output.py",\n')
+    f.write('     ' + path + '/' + '"AmgaClient.py",\n')
+    f.write('     ' + path + '/' + '"mdinterface.py",\n')
+    f.write('     ' + path + '/' + '"mdstandalone.py",\n')
+    f.write('     ' + path + '/' + '"mdclient.py",\n')
+    f.write('     ' + path + '/' + '"mdparser.py",\n')
     if tar is not None:
         f.write('      "' + tar + '",\n')
     # if lfn != 'None':

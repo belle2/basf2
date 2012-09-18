@@ -4,7 +4,7 @@
 import os
 from basf2 import *
 set_log_level(LogLevel.INFO)
-project = 'Temp4'
+project = 'Temp5'
 type = 'gen-mc'
 swver = 'build-2012-07-18'
 # site = 'LCG.KISTI.kr'

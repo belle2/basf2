@@ -7,16 +7,7 @@
 
 DIRACROOT=${DIRACROOT:-$DIRAC}
 . $DIRACROOT/bashrc
-# check if gbasf2 is unreachable by PATH
-path=`which gbasf2`
-gbasf2_path=`dirname path`/..
-find ${gbasf2_path}/lib -name gb2_job_kill.py >/dev/null 2>&1
-if [ $? -eq 1 ]
-then
- BELLE2_LOCAL_DIR=${BELLE2_LOCAL_DIR:-..}
- ${BELLE2_LOCAL_DIR}/gbasf2/lib/gb2_job_kill.py "$@"
-else
- ${gbasf2_path}/lib/gb2_job_kill.py "$@"
-fi
+
+${GBASF2ROOT}/lib/gb2_job_kill.py "$@"
 
 exit $?

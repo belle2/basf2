@@ -58,9 +58,9 @@ class AmgaClient(object):
             if os.environ.has_key('X509_USER_PROXY') and not gethostname() \
                 == 'kek2-uidev.cc.kek.jp':
                 print 'using X509 auth'
-               # self.client = mdclient.MDClient('150.183.246.196', 8822, '')
+                # self.client = mdclient.MDClient('150.183.246.196', 8822, '')
                 self.client = mdclient.MDClient('202.13.207.226', 8822, '')
-               # self.client = mdclient.MDClient('cgh10.collab.unimelb.edu.au',
+                # self.client = mdclient.MDClient('cgh10.collab.unimelb.edu.au',
                 #        8822, '')
                 self.client.requireSSL(os.environ['X509_USER_PROXY'],
                                        os.environ['X509_USER_PROXY'])
@@ -370,11 +370,11 @@ if __name__ == '__main__':
     # print ac.getAttributes("/belle2/data/E11/FC")
     # print ac.getAttributes("/belle2/user/belle/hanyl/Ungrouped/")
     # print ac.getAttributesValues("/belle2/user/belle/hanyl/Ungrouped/",['lfn'])
-   # print ac.rm('/belle2/user/belle/hanyl/Ungrouped/effs30.root')
-   # print ac.rm('/belle2/user/belle/hanyl/Ungrouped/wutest1.root')
-   # print ac.rm('/belle2/user/belle/hanyl/Ungrouped/wutest2.root')
-   # print ac.removeDir('/belle2/user/belle/hanyl/Ungrouped')
-    print ac.checkEntry('/belle2/user/belle/wuwj/p9/file3.root')
-    print ac.checkEntry('/belle2/user/belle/wuwj/p9/file2.root')
-    print ac.checkEntry('/belle2/user/belle/wuwj/p9/file1.root')
+    # print ac.rm('/belle2/user/belle/hanyl/Ungrouped/effs30.root')
+    # print ac.rm('/belle2/user/belle/hanyl/Ungrouped/wutest1.root')
+    # print ac.rm('/belle2/user/belle/hanyl/Ungrouped/wutest2.root')
+    # print ac.removeDir('/belle2/user/belle/hanyl/Ungrouped')
+    # print ac.checkEntry('/belle2/user/belle/wuwj/p9/file3.root')
+    # print ac.checkEntry('/belle2/user/belle/wuwj/p9/file2.root')
+    # print ac.checkEntry('/belle2/user/belle/wuwj/p9/file1.root')
     # print ac.getSubdirectories('/belle2/user/belle/wuwj')

@@ -21,7 +21,7 @@ namespace Belle2 {
   GeometryModule::GeometryModule()
   {
     setDescription("Setup geometry description");
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+    setPropertyFlags(c_InitializeInMain);
     addParam("geometryPath", m_geometryPath,
              "Path where the parameters for the Geometry can be found", string("/Detector"));
     addParam("geometryType", m_geometryType,

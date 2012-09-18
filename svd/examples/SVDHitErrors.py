@@ -30,9 +30,8 @@ class SVDHitErrors(Module):
                         )
         self.file.write('TrueHit: u[cm], v[cm], charge[GeV], theta_u, theta_v \n'
                         )
-        self.file.write('Cluster: isU[0/1], uv[cm], charge[e-], seed charge[e-], size \n'
+        self.file.write('Cluster: isU[True/False], uv[cm], charge[e-], seed charge[e-], size \n'
                         )
-        self.file.write('Digits: n_digits {u[cm] charge[e-]} \n')
         self.file.write('\n')
 
     def event(self):

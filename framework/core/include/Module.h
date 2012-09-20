@@ -65,11 +65,11 @@ namespace Belle2 {
     enum EModulePropFlags {
       c_Input                       = 1,  /**< This module is an input module (reads data). */
       c_Output                      = 2,  /**< This module is an output module (writes data). */
-      c_ParallelProcessingCertified = 4,  /**< This module can be run in parallel processing mode safely (has to comply with certain standards). */
+      c_ParallelProcessingCertified = 4,  /**< This module can be run in parallel processing mode safely (All I/O must be done through the data store, in particular, the module must not read/write any files.) */
       c_RequiresGUISupport          = 8,  /**< This module requires the framework to have GUI support built-in. */
       c_HistogramManager            = 16, /**< This module is used to manage histograms accumulated by other modules */
-      c_InitializeInProcess         = 32, /**< initialize() function is called in same forked process event() is called in */
-      c_InitializeInMain            = 64  /**< initialize() function is called in the main process */
+      c_InitializeInProcess         = 32, /**< initialize() function is called in same forked process event() is called in (this is the default.)*/
+      c_InitializeInMain            = 64  /**< initialize() function is called in the main process, i.e. only once. Resources allocated there will be available to all forked processes, using copy-on-write pages (see 'man 2 fork').*/
     };
 
     /**
@@ -324,7 +324,7 @@ namespace Belle2 {
     /**
      * Sets the flags for the module properties.
      *
-     * @param propertyFlags The flags for the module properties.
+     * @param propertyFlags bitwise OR of EModulePropFlags
      */
     void setPropertyFlags(unsigned int propertyFlags);
 

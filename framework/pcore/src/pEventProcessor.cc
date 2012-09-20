@@ -9,10 +9,6 @@
 #include <framework/pcore/pEventProcessor.h>
 #include <framework/core/Environment.h>
 #include <framework/core/PathManager.h>
-#include <framework/core/ModuleManager.h>
-#include <framework/core/ModuleStatistics.h>
-#include <framework/pcore/pEventServer.h>
-#include <framework/pcore/pOutputServer.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>
@@ -64,11 +60,6 @@ void pEventProcessor::process(PathPtr spath)
   B2INFO("process : inlistpath size = " << m_inpathlist.size());
   B2INFO("process : bodypathlist size = " << m_bodypathlist.size());
   B2INFO("process : outpathlist size = " << m_outpathlist.size());
-  /*
-  printf ( "process : size of inpathlist = %d\n", m_inpathlist.size() );
-  printf ( "process : size of bodypathlist = %d\n", m_bodypathlist.size() );
-  printf ( "process : size of outpathlist = %d\n", m_outpathlist.size() );
-  */
 
   dump_path("Input Path ", m_inpathlist[0]);
   for (unsigned int i = 0; i < m_bodypathlist.size(); i++) {
@@ -169,7 +160,7 @@ void pEventProcessor::process(PathPtr spath)
       delete *it;
 
     delete term;
-    printf("process : completed\n");
+    B2INFO("process: completed");
   }
 }
 
@@ -228,7 +219,6 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
           inlist.push_back(txptr);
           // Inserv Rx at the top of next path
           ModulePtr rxptr(new RxModule(rbuf));
-          //RxModule has c_InitializeInProcess
           mainlist.push_back(rxptr);
           B2DEBUG(0, "Analyze Path : state=0->1, Tx and Rx are inserted");
           if (m_histoflag) {
@@ -265,7 +255,6 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
           mainlist.push_back(txptr);
           // Insert Rx at the top of next path
           ModulePtr rxptr(new RxModule(rbuf));
-          //RxModule has c_InitializeInProcess
           outlist.push_back(rxptr);
           B2DEBUG(0, "Analyze Path : state=1->2, Tx and Rx are inserted");
           if (m_histoflag) {
@@ -292,11 +281,8 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
       }
     }
   }
-  //  printf ( "mainlist size = %d\n", mainlist.size() );
   B2INFO("Analyze Path : mainlist size = " << mainlist.size());
-  //  printf ( "inlist size = %d\n", inlist.size() );
   B2INFO("Analyze Path : inlist size = " << mainlist.size());
-  //  printf ( "outlist size = %d\n", outlist.size() );
   B2INFO("Analyze Path : outlist size = " << mainlist.size());
 
   PathPtr inpath(new Path);
@@ -340,7 +326,6 @@ void pEventProcessor::dump_path(const std::string title, PathPtr path)
       strbuf << " -> ";
   }
   B2INFO(strbuf.str());
-  //  printf ( "%s\n", (strbuf.str()).c_str() );
 }
 
 void pEventProcessor::dump_modules(const std::string title, const ModulePtrList modlist)
@@ -359,7 +344,6 @@ void pEventProcessor::dump_modules(const std::string title, const ModulePtrList 
       strbuf << " -> ";
   }
   B2INFO(strbuf.str());
-  //  printf ( "%s\n", (strbuf.str()).c_str() );
 }
 
 std::string pEventProcessor::to_hex(PathPtr& path)
@@ -382,7 +366,6 @@ ModulePtrList pEventProcessor::init_modules_in_main(const ModulePtrList& modlist
   for (listIter = modlist.begin(); listIter != modlist.end(); listIter++) {
     Module* module = listIter->get();
     ModulePtr ptr = *listIter;
-    //    if (!module->hasProperties(Module::c_InitializeInProcess))
     if (module->hasProperties(Module::c_InitializeInMain))
       tmpModuleList.push_back(ptr);
   }
@@ -397,7 +380,6 @@ ModulePtrList pEventProcessor::init_modules_in_process(const ModulePtrList& modl
 
   for (listIter = modlist.begin(); listIter != modlist.end(); listIter++) {
     Module* module = listIter->get();
-    //    if (module->hasProperties(Module::c_InitializeInProcess))
     if (!module->hasProperties(Module::c_InitializeInMain))
       tmpModuleList.push_back(*listIter);
   }

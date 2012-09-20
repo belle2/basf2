@@ -56,8 +56,7 @@ bool MsgHandler::add(TObject* obj, string name)
   msg->Reset();
   msg->SetWriteMode();
   //  msg->EnableSchemaEvolutionForAll();
-  //  msg->SetCompressionLevel(m_complevel);
-  //  msg->Compress();
+  msg->SetCompressionLevel(m_complevel);
   int len = msg->BufferSize();
   /*
   if (msg->CompBuffer()) {
@@ -66,6 +65,7 @@ bool MsgHandler::add(TObject* obj, string name)
   }
   */
   msg->WriteObject(obj);
+  msg->Compress(); //no effect if m_complevel == 0
   //  msg->ForceWriteInfo(obj->, true );
 
   // For debug. Decode packed object once:

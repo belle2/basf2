@@ -33,6 +33,8 @@ namespace Belle2 {
    * like experiment, run and event number. It is meant to
    * be used in cases where no module generating this information
    * (e.g. an input module loading a file) is available.
+   *
+   * @sa EventMetaData
    */
   class EvtMetaGenModule : public Module {
 
@@ -70,7 +72,7 @@ namespace Belle2 {
 
   private:
 
-    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr; /**< Output object. */
 
     unsigned long m_evtNumber; /**< The current event number. */
     int m_colIndex;  /**< The current index for the exp and run lists. */

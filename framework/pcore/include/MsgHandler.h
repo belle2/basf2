@@ -38,9 +38,9 @@ namespace Belle2 {
     virtual int decode_msg(EvtMessage*, std::vector<TObject*>&, std::vector<std::string>&);
 
   private:
-    std::vector<TMessage*> m_buf;
+    std::vector<TMessage*> m_buf; /**< list of messages already added. */
     std::vector<std::string> m_name;
-    int m_complevel;
+    int m_complevel; /**< compression level, from 0 (none) to 9 (highest). */
     char* m_cbuf;
 
 

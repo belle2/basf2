@@ -14,6 +14,7 @@
 
 namespace Belle2 {
 
+  /** Stream/restore DataStore objects to/from EvtMessage. */
   class DataStoreStreamer {
   public:
 
@@ -40,7 +41,10 @@ namespace Belle2 {
 
     // DataStore->EvtMessage
     /** Store DataStore objects in EvtMessage
+     *
      *  @param durability Durability of DataStore objects to be streamed
+     *  @return pointer to EvtMessage, caller is responsible for deletion
+     *
      */
     EvtMessage* streamDataStore(DataStore::EDurability durability);
 
@@ -59,14 +63,12 @@ namespace Belle2 {
      */
     MsgHandler* m_msghandler;
 
-    /** m_compressionLevel
-     *
-     * Compression level in streaming
-     */
+    /** Compression level in streaming */
     int m_compressionLevel;
 
-    /** m_first
-     *  first event flag
+    /** first event flag.
+     *
+     *  0 during first event, 1 otherwise.
      */
     int m_initStatus;
 

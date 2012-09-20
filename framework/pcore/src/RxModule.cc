@@ -68,6 +68,7 @@ void RxModule::initialize()
     //    printf ( "Rx : evtbuf is not available yet....\n" );
     usleep(100);
   }
+  B2INFO("Rx initialization: got an event from RingBuffer, size=" << size);
 
   // Restore objects in DataStore
   EvtMessage* evtmsg = new EvtMessage(evtbuf);

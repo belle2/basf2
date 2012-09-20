@@ -16,7 +16,9 @@
 
 #include <TObject.h>
 #include <TVector3.h>
+#include "CLHEP/Vector/LorentzVector.h"
 
+using namespace CLHEP;
 namespace Belle2 {
 
   //! Example Detector
@@ -106,7 +108,14 @@ namespace Belle2 {
     //! The method to get momentum
     TVector3 getp() const { TVector3 momentum(m_px, m_py, m_pz); return momentum ; }
 
-
+    HepLorentzVector get4Momentum() const {
+      HepLorentzVector  momentum;
+      momentum.setPx(m_px);
+      momentum.setPy(m_py);
+      momentum.setPz(m_pz);
+      momentum.setE(m_energy);
+      return momentum;
+    }
     //! Empty constructor
     /*! Recommended for ROOT IO
     */

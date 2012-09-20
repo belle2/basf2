@@ -15,7 +15,7 @@
 
 #include <TObject.h>
 #include <TVector3.h>
-
+#include <math.h>
 namespace Belle2 {
 
   //! Example Detector
@@ -114,6 +114,20 @@ namespace Belle2 {
     float GetUncEnergy() const { return m_UncEnergy ; }
     //! The method to get return m_Time
     float GetTime() const { return m_Time ; }
+
+    TVector3 getMomentum() const {
+      TVector3 momentum(0., 0., 0.);
+      double m_px = m_Energy * sin(m_Theta) * cos(m_Phi);
+      double m_py = m_Energy * sin(m_Theta) * sin(m_Phi);
+      double m_pz = m_Energy * cos(m_Theta);
+
+      momentum.SetX(m_px);
+      momentum.SetY(m_py);
+      momentum.SetZ(m_pz);
+      return momentum;
+    }
+
+
 
     //! Empty constructor
     /*! Recommended for ROOT IO

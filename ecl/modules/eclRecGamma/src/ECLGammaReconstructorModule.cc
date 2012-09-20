@@ -21,7 +21,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-
+#include <TVector3.h>
 
 using namespace std;
 using namespace Belle2;
@@ -151,24 +151,25 @@ void ECLGammaReconstructorModule::event()
 
       eclGammaToShower.add(m_GNum, iShower);
 
+
+      /*
       double px = m_energy * sin(m_theta) * cos(m_phi);
       double py = m_energy * sin(m_theta) * sin(m_phi);
       double pz = m_energy * cos(m_theta);
 
-      /*
-                    cout<<"EventGamma  "<<m_nEvent<<" Gamma "<<m_showerId<<" "<<sqrt(px*px+py*py+pz*pz)<<" m_extMatch  "<<m_extMatch<<endl;
+                   cout<<"EventGamma  "<<m_nEvent<<" Gamma "<<m_showerId<<" "<<sqrt(px*px+py*py+pz*pz)<<" m_extMatch  "<<m_extMatch<<endl;
 
-                   cout<<"CellID ";
+                  cout<<"CellID ";
 
-                  for (int iHA = 0; iHA < hANum; iHA++) {
+                 for (int iHA = 0; iHA < hANum; iHA++) {
 
-                    HitAssignmentECL* aECLShower = eclHitAssignmentArray[iHA];
-                    int m_HAShowerId = aECLShower->getShowerId();
-                    int m_HAcellId = aECLShower->getCellId();
-                    if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
-                  }//for HA hANum
-                   cout<<endl;
-        */
+                   HitAssignmentECL* aECLShower = eclHitAssignmentArray[iHA];
+                   int m_HAShowerId = aECLShower->getShowerId();
+                   int m_HAcellId = aECLShower->getCellId();
+                   if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
+                 }//for HA hANum
+                  cout<<endl;
+       */
     }//if !m_extMatch
 
 

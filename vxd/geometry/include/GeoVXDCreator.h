@@ -193,6 +193,8 @@ namespace Belle2 {
       bool m_onlyPrimaryTrueHits;
       /** Minimum deposited energy per step in the SensitiveDetector (discard step if less) */
       double m_sensitiveThreshold;
+      /** If this is true, only active Materials will be placed for tracking studies. Dead Material will be ignored */
+      bool m_onlyActiveMaterial;
 
     }; // class GeoVXDCreator
 

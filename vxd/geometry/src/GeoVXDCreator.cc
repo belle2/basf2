@@ -50,7 +50,7 @@ namespace Belle2 {
 
     GeoVXDCreator::GeoVXDCreator(const string& prefix) :
       m_prefix(prefix), m_activeChips(false), m_seeNeutrons(false),
-      m_onlyPrimaryTrueHits(false), m_sensitiveThreshold(1.0)
+      m_onlyPrimaryTrueHits(false), m_sensitiveThreshold(1.0), m_onlyActiveMaterial(false)
     {
     }
 
@@ -331,7 +331,12 @@ namespace Belle2 {
         if (p.flipW) reflection = reflection * G4ReflectZ3D();
 
         G4VSolid* sensorShape = createTrapezoidal(name, s.width, s.width2, s.length, s.height);
-        s.volume = new G4LogicalVolume(sensorShape, Materials::get(s.material), name);
+        G4Material* sensorMaterial = Materials::get(s.material);
+        if (m_onlyActiveMaterial) {
+          s.volume = new G4LogicalVolume(sensorShape, Materials::get(m_defaultMaterial), name);
+        } else {
+          s.volume = new G4LogicalVolume(sensorShape, sensorMaterial, name);
+        }
         // Create sensitive Area: this Part is created separately since we want full control over the coordinate system:
         // local x (called u) should point in RPhi direction
         // local y (called v) should point in global z
@@ -341,7 +346,7 @@ namespace Belle2 {
         //Create appropriate sensitive detector instance
         SensitiveDetectorBase* sensitive = createSensitiveDetector(sensorID, s, p);
         m_sensitive.push_back(sensitive);
-        G4LogicalVolume* active = new G4LogicalVolume(activeShape,  Materials::get(s.material), name + ".Active",
+        G4LogicalVolume* active = new G4LogicalVolume(activeShape,  sensorMaterial, name + ".Active",
                                                       0, sensitive);
         active->SetUserLimits(new G4UserLimits(m_activeStepSize));
 
@@ -367,7 +372,8 @@ namespace Belle2 {
         G4ReflectionFactory::Instance()->Place(activePosition * reflection, name + ".Active", active, s.volume, false, (int)sensorID, false);
 
         //Now create all the other components and place the Sensor
-        GeoVXDAssembly assembly = createSubComponents(name, s, s.components, false, true);
+        GeoVXDAssembly assembly;
+        if (!m_onlyActiveMaterial) assembly = createSubComponents(name, s, s.components, false, true);
         G4RotationMatrix rotation(0, -M_PI / 2.0, -M_PI / 2.0);
         G4Transform3D sensorAlign = getAlignment(sensorID);
         G4Transform3D placement = G4Rotate3D(rotation) * sensorAlign * reflection;
@@ -381,7 +387,7 @@ namespace Belle2 {
         assembly.place(volume, placement);
 
         //See if we want to glue the modules together
-        if (!m_ladder.glueMaterial.empty()) {
+        if (!m_ladder.glueMaterial.empty() && !m_onlyActiveMaterial) {
           double u = s.width / 2.0 + m_ladder.glueSize;
           double v = s.length / 2.0;
           double w = s.height / 2.0 + m_ladder.glueSize;
@@ -462,6 +468,7 @@ namespace Belle2 {
       m_components = GearDir(content, "Components/");
       GearDir support(content, "Support/");
 
+      m_onlyActiveMaterial = content.getBool("OnlyActiveMaterial");
       m_defaultMaterial = content.getString("DefaultMaterial", "Air");
       G4Material* material = Materials::get(m_defaultMaterial);
       if (!material) B2FATAL("Default Material of VXD, '" << m_defaultMaterial << "', could not be found");
@@ -522,7 +529,7 @@ namespace Belle2 {
 
         //Place shell support
         double shellAngle = shell.getAngle("shellAngle", 0);
-        shellSupport.place(envelope, shellAlignment * G4RotateZ3D(shellAngle));
+        if (!m_onlyActiveMaterial) shellSupport.place(envelope, shellAlignment * G4RotateZ3D(shellAngle));
 
         BOOST_FOREACH(const GearDir & layer, shell.getNodes("Layer")) {
           int layerID = layer.getInt("@id");
@@ -530,7 +537,7 @@ namespace Belle2 {
 
           //Place Layer support
           GeoVXDAssembly layerSupport = createLayerSupport(layerID, support);
-          layerSupport.place(envelope, shellAlignment * G4RotateZ3D(shellAngle));
+          if (!m_onlyActiveMaterial) layerSupport.place(envelope, shellAlignment * G4RotateZ3D(shellAngle));
           GeoVXDAssembly ladderSupport = createLadderSupport(layerID, support);
 
           //Loop over defined ladders
@@ -538,7 +545,7 @@ namespace Belle2 {
             int ladderID = ladder.getInt("@id");
             double phi = ladder.getAngle("phi", 0);
             G4Transform3D ladderPlacement = placeLadder(ladderID, phi, envelope, shellAlignment);
-            ladderSupport.place(envelope, ladderPlacement);
+            if (!m_onlyActiveMaterial) ladderSupport.place(envelope, ladderPlacement);
           }
         }
       }

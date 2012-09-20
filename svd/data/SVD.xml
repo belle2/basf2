@@ -6,6 +6,12 @@
   -->
   <Creator library="svd">SVDCreator</Creator>
   <Content>
+    <!-- Set the default Material for the Envelope and Components which do not have a Material assigned -->
+    <DefaultMaterial>Air</DefaultMaterial>
+    <!--If this is true, all dead Material will be ignored and only the active
+        Material will be placed and the rest of the Detector will be filled
+        with DefaultMaterial -->
+    <OnlyActiveMaterial>false</OnlyActiveMaterial>
     <!-- Set the  stepsize to be used in senistive volumes -->
     <ActiveStepSize unit="um">5</ActiveStepSize>
     <!-- If this is true, TrueHits will only be created for primary particles,

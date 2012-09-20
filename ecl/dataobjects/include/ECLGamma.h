@@ -11,6 +11,7 @@
 #ifndef ECLGAMMA_H
 #define ECLGAMMA_H
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/DataStore.h>
 #include "ecl/dataobjects/ECLShower.h"
 #include <math.h>
@@ -33,6 +34,24 @@ namespace Belle2 {
 
     //! The method to get showerId
     int GetShowerId() const { return m_showerId ; }
+
+    TVector3 getMomentum() const {
+      TVector3 momentum(0., 0., 0.);
+      StoreArray<ECLShower> eclRecShowerArray;
+      ECLShower* aECLShower = eclRecShowerArray[m_showerId];
+      double m_energy = aECLShower->GetEnergy();
+      double m_theta = aECLShower->GetTheta();
+      double m_phi = aECLShower->GetPhi();
+      double m_px = m_energy * sin(m_theta) * cos(m_phi);
+      double m_py = m_energy * sin(m_theta) * sin(m_phi);
+      double m_pz = m_energy * cos(m_theta);
+
+      momentum.SetX(m_px);
+      momentum.SetY(m_py);
+      momentum.SetZ(m_pz);
+      return momentum;
+    }
+
 
     //! Empty constructor
     /*! Recommended for ROOT IO

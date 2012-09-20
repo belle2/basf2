@@ -156,10 +156,6 @@ void TrackFitCheckerModule::initialize()
     m_statDataTreePtr = NULL;
   }
 
-
-
-
-
   if (m_testCdc == true) {
     m_nCdcLayers = 56; //should come from the xml file
   } else {
@@ -232,7 +228,7 @@ void TrackFitCheckerModule::initialize()
   m_nCutawayTracks = 0;
   m_notPosDefCounter = 0;
   m_unSymmetricCounter = 0;
-
+  m_extrapFailed = 0;
   //these member variables will be set only once when the event loop starts
   m_wAndPredPresentsTested = false;
   m_testDaf = true;
@@ -282,7 +278,7 @@ void TrackFitCheckerModule::event()
 
 
   //genfit stuff
-  StoreArray<GFTrackCand> trackCandidates(""); // to create a new track rep for extrapolation only
+  //StoreArray<GFTrackCand> trackCandidates(""); // to create a new track rep for extrapolation only
   StoreArray<GFTrack> fittedTracks(""); // the results of the track fit
   const int nFittedTracks = fittedTracks.getEntries();
   //stringstreams for text file output of all forward tracking parameters
@@ -1098,9 +1094,9 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
       B2ERROR("An unknown type of recoHit was detected in TrackFitCheckerModule::event(). This hit will not be included in the statistical tests");
     }
 
-    if (m_testDaf == true or(aCdcRecoHitPtr not_eq NULL and m_testCdc == false) or(aPxdRecoHitPtr not_eq NULL and m_testSi == false)or(aSvdRecoHit2DPtr not_eq NULL and m_testSi == false)) {    // skip all other stuff when daf is tested because it is not used
-      continue;
-    }
+//    if (m_testDaf == true or(aCdcRecoHitPtr not_eq NULL and m_testCdc == false) or(aPxdRecoHitPtr not_eq NULL and m_testSi == false)or(aSvdRecoHit2DPtr not_eq NULL and m_testSi == false)) {    // skip all other stuff when daf is tested because it is not used // something is wrong with the skipping better leave it out
+//      continue;
+//    }
     GFDetPlane detPlaneOfRecoHit = aGFAbsRecoHitPtr->getDetPlane(aTrackPtr->getTrackRep(trackRepId));
 
 

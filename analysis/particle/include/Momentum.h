@@ -13,6 +13,7 @@
 #include <ecl/dataobjects/MdstGamma.h>
 #include <ecl/dataobjects/MdstPi0.h>
 #include <tracking/dataobjects/Track.h>
+#include <generators/dataobjects/MCParticle.h>
 #include <cmath>
 
 //#include "helix/Helix.h"
@@ -45,6 +46,13 @@ namespace Belle2 {
     Momentum(const MdstPi0&);
     /// Constructor with Mdst\_elid
     Momentum(RecCRECL&);
+
+    /**
+     * Construct Momentum from a MCParticle. The 4-momentum vector,
+     * position and production vertex are filled with generated values.
+     */
+    Momentum(const MCParticle*);
+
     /// Destructor
     virtual ~Momentum() {};
 

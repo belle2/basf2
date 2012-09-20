@@ -9,14 +9,25 @@
 #include "analysis/particle/Ptype.h"
 #include "analysis/particle/Relation.h"
 
+#include <generators/dataobjects/MCParticle.h>
+
 using namespace CLHEP;
 
-/// Particle class supplies you interfaces to various particle information, such as momentum, pid, etc. through its private member objects, Momentum, PID, Ptype, and Relation.
+/**
+ * A class to store the reconstructed Particle information.
+ * Particle class supplies you interfaces to various particle
+ * information, such as momentum, pid, etc. through its private
+ * member objects, Momentum, PID, Ptype, and Relation.
+ */
+
 namespace Belle2 {
+
   class Particle {
 
   public:
-    /// Default constructor
+    /**
+     *  Default constructor
+     */
     Particle();
 
     /// Copy constructor
@@ -34,6 +45,11 @@ namespace Belle2 {
     Particle(const MdstPi0&, const bool makeRelation = true);
     /// Constructor with Mdst\_ecl
     Particle(RecCRECL&);
+
+    /**
+     * Construct Particle from a MCParticle
+     */
+    Particle(const MCParticle*);
 
     /// Destructor
     virtual ~Particle();
@@ -147,6 +163,14 @@ namespace Belle2 {
 
     /// returns a reference to Mdst\_ecl.
     virtual const RecCRECL& mdstEcl(void) const { return m_relation->mdstEcl(); }
+
+    /**
+     * Returns a pointer to linked generated MCParticle. NULL if the particle doesn't
+     * have a MCParticle linked.
+     * @return A pointer to the linked MCParticle. NULL if the particle doesn't
+     * have a MCParticle linked.
+     */
+    virtual const MCParticle* getMCParticle(void) const { return m_relation->getMCParticle(); }
 
   public:// User Definition Object
     /// returns a pointer of "user definition object".

@@ -3,6 +3,7 @@
 using namespace Belle2;
 
 static Particle*     static_Particle(NULL);
+static MCParticle*   static_MCParticle(NULL);
 static Track*        static_Mdst_charged(NULL);
 static MdstPi0*      static_Mdst_pi0(NULL);
 static MdstGamma*    static_Mdst_gamma(NULL);
@@ -13,12 +14,13 @@ Relation::Relation()
   : m_flagChildModification(0),
     m_vee2ChildCounter(0), m_pi0ChildCounter(0)
 {
-  m_mother  = NULL;
-  m_mc      = NULL;
-  m_charged = NULL;
-  m_gamma   = NULL;
-  m_pi0     = NULL;
-  m_ecl     = NULL;
+  m_mother     = NULL;
+  m_mc         = NULL;
+  m_charged    = NULL;
+  m_gamma      = NULL;
+  m_pi0        = NULL;
+  m_ecl        = NULL;
+  m_mcParticle = NULL;
 }
 
 Relation::Relation(Particle* s)
@@ -27,12 +29,13 @@ Relation::Relation(Particle* s)
   m_self    = s;
   m_flagChildModification = 0;
 
-  m_mother  = NULL;
-  m_mc      = NULL;
-  m_charged = NULL;
-  m_gamma   = NULL;
-  m_pi0     = NULL;
-  m_ecl     = NULL;
+  m_mother     = NULL;
+  m_mc         = NULL;
+  m_charged    = NULL;
+  m_gamma      = NULL;
+  m_pi0        = NULL;
+  m_ecl        = NULL;
+  m_mcParticle = NULL;
 }
 
 //copy constructor
@@ -49,10 +52,11 @@ Relation::Relation(const Relation& a, Particle* s)
   } else {
     m_flagChildModification = 1;
   }
-  m_charged  = a.m_charged;
-  m_gamma    = a.m_gamma;
-  m_pi0      = a.m_pi0;
-  m_ecl      = a.m_ecl;
+  m_charged    = a.m_charged;
+  m_gamma      = a.m_gamma;
+  m_pi0        = a.m_pi0;
+  m_ecl        = a.m_ecl;
+  m_mcParticle = a.m_mcParticle;
 
 #if 0
   if (m_pi0)
@@ -70,11 +74,12 @@ Relation::Relation(const Track& a, Particle* s)
   m_charged = &a;
   m_flagChildModification = 0;
 
-  m_mother  = NULL;
-  m_mc      = NULL;
-  m_gamma   = NULL;
-  m_pi0     = NULL;
-  m_ecl     = NULL;
+  m_mother     = NULL;
+  m_mc         = NULL;
+  m_gamma      = NULL;
+  m_pi0        = NULL;
+  m_ecl        = NULL;
+  m_mcParticle = NULL;
 }
 
 //Constructor with Mdst\_pi0
@@ -85,11 +90,12 @@ Relation::Relation(const MdstPi0& a, const bool makeRelation, Particle* s)
   m_pi0  = &a;
   m_flagChildModification = 0;
 
-  m_mother  = NULL;
-  m_mc      = NULL;
-  m_charged = NULL;
-  m_gamma   = NULL;
-  m_ecl     = NULL;
+  m_mother     = NULL;
+  m_mc         = NULL;
+  m_charged    = NULL;
+  m_gamma      = NULL;
+  m_ecl        = NULL;
+  m_mcParticle = NULL;
 
 #if 0
   if (makeRelation) {
@@ -128,11 +134,12 @@ Relation::Relation(const MdstGamma& a, Particle* s)
   m_gamma = &a;
   m_flagChildModification = 0;
 
-  m_mother  = NULL;
-  m_mc      = NULL;
-  m_charged = NULL;
-  m_pi0     = NULL;
-  m_ecl     = NULL;
+  m_mother     = NULL;
+  m_mc         = NULL;
+  m_charged    = NULL;
+  m_pi0        = NULL;
+  m_ecl        = NULL;
+  m_mcParticle = NULL;
 }
 
 //Constructor with Mdst\_ecl
@@ -143,12 +150,32 @@ Relation::Relation(const RecCRECL& a, Particle* s)
   m_ecl  = &a;
   m_flagChildModification = 0;
 
-  m_mother  = NULL;
-  m_mc      = NULL;
-  m_charged = NULL;
-  m_pi0     = NULL;
-  m_gamma   = NULL;
+  m_mother     = NULL;
+  m_mc         = NULL;
+  m_charged    = NULL;
+  m_pi0        = NULL;
+  m_gamma      = NULL;
+  m_mcParticle = NULL;
 }
+
+/**
+ * Construct Relation from a MCParticle
+ */
+Relation::Relation(const MCParticle* a, Particle* s)
+  : m_vee2ChildCounter(0), m_pi0ChildCounter(0)
+{
+  m_self        = s;
+  m_mcParticle  = a;
+  m_flagChildModification = 0;
+
+  m_mother     = NULL;
+  m_mc         = NULL;
+  m_charged    = NULL;
+  m_pi0        = NULL;
+  m_gamma      = NULL;
+  m_ecl        = NULL;
+}
+
 
 // Destructor
 Relation::~Relation()
@@ -258,22 +285,26 @@ Relation::isIdenticalWith(const Relation& x, const unsigned& type) const
 {
   switch (type) {
     case PC_ALL:
-      if (m_charged && x.m_charged) return (m_charged == (x.m_charged));
-      if (m_gamma   && x.m_gamma)   return (m_gamma   == (x.m_gamma));
-      if (m_pi0     && x.m_pi0)     return (m_pi0     == (x.m_pi0));
-      if (m_ecl     && x.m_ecl)     return (m_ecl     == (x.m_ecl));
+      if (m_charged    && x.m_charged)        return (m_charged     == (x.m_charged));
+      if (m_mcParticle && x.m_mcParticle)     return (m_mcParticle  == (x.m_mcParticle));
+      if (m_gamma      && x.m_gamma)          return (m_gamma       == (x.m_gamma));
+      if (m_pi0        && x.m_pi0)            return (m_pi0         == (x.m_pi0));
+      if (m_ecl        && x.m_ecl)            return (m_ecl         == (x.m_ecl));
       return false;
     case PC_CHARGED:
-      if (m_charged && x.m_charged) return (m_charged == (x.m_charged));
+      if (m_charged   && x.m_charged)    return (m_charged    == (x.m_charged));
       return false;
     case PC_GAMMA:
-      if (m_gamma   && x.m_gamma)   return (m_gamma   == (x.m_gamma));
+      if (m_gamma     && x.m_gamma)      return (m_gamma      == (x.m_gamma));
       return false;
     case PC_PI0:
-      if (m_pi0     && x.m_pi0)     return (m_pi0     == (x.m_pi0));
+      if (m_pi0       && x.m_pi0)        return (m_pi0        == (x.m_pi0));
       return false;
     case PC_ECL:
-      if (m_ecl     && x.m_ecl)     return (m_ecl     == (x.m_ecl));
+      if (m_ecl       && x.m_ecl)        return (m_ecl        == (x.m_ecl));
+      return false;
+    case PC_MCPARTICLE:
+      if (m_mcParticle && x.m_mcParticle) return (m_mcParticle == (x.m_mcParticle));
       return false;
     default:
       return false;
@@ -287,19 +318,20 @@ Relation::operator = (const Relation& a)
 {
   if (this == &a) return *this;
 
-  m_self     = a.m_self;
-  m_mother   = a.m_mother;
-  m_mc       = a.m_mc;
-  m_children = a.children();
+  m_self       = a.m_self;
+  m_mother     = a.m_mother;
+  m_mc         = a.m_mc;
+  m_children   = a.children();
   //...m_finalStateParticles
   if (m_children.size() == 0) {
     m_flagChildModification = 0;
   } else {
     m_flagChildModification = 1;
   }
-  m_charged  = a.m_charged;
-  m_gamma    = a.m_gamma;
-  m_pi0      = a.m_pi0;
-  m_ecl      = a.m_ecl;
+  m_charged    = a.m_charged;
+  m_gamma      = a.m_gamma;
+  m_pi0        = a.m_pi0;
+  m_ecl        = a.m_ecl;
+  m_mcParticle = a.m_mcParticle;
   return *this;
 }

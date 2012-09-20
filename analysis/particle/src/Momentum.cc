@@ -421,6 +421,18 @@ Momentum::Momentum(RecCRECL& p)
   m_momentum = HepLorentzVector(px, py, pz, en);
 }
 
+Momentum::Momentum(const MCParticle* p)
+  : m_momentum(p->getMomentum().Px(), p->getMomentum().Py(), p->getMomentum().Pz(), p->getEnergy()),
+    m_position(p->getProductionVertex().X(), p->getProductionVertex().Y(), p->getProductionVertex().Z()),
+    m_error(7, 0),
+    m_vertex(p->getProductionVertex().X(), p->getProductionVertex().Y(), p->getProductionVertex().Z()),
+    m_vertexError(3, 0),
+    m_decayVertex(),
+    m_decayVertexError(3, 0)
+{
+}
+
+
 double
 Momentum::dMass(void) const
 {

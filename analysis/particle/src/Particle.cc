@@ -75,6 +75,14 @@ Particle::Particle(RecCRECL& a)
   m_pType    = new Ptype(22);
 }
 
+Particle::Particle(const MCParticle* a)
+  : m_usable(USABLE),  m_userInfo(NULL)
+{
+  m_momentum = new Momentum(a);
+  m_relation = new Relation(a, this);
+  m_pType    = new Ptype(a->getPDG());
+}
+
 // destructor
 Particle::~Particle()
 {

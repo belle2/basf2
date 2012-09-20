@@ -28,9 +28,9 @@ namespace Belle2 {
   class HistoModule : public Module {
   public:
     /*! Constructor */
-    HistoModule();
+    HistoModule() {};
     /*! Destructor */
-    virtual ~HistoModule();
+    virtual ~HistoModule() {};
 
     // Member functions (for event processing)
     /*! Function for dynamic initialization of module */

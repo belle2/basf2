@@ -3,7 +3,6 @@
 using namespace Belle2;
 
 static Particle*     static_Particle(NULL);
-static MCParticle*   static_MCParticle(NULL);
 static Track*        static_Mdst_charged(NULL);
 static MdstPi0*      static_Mdst_pi0(NULL);
 static MdstGamma*    static_Mdst_gamma(NULL);

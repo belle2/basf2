@@ -25,14 +25,13 @@ SeqRootInputModule::SeqRootInputModule() : Module()
 {
   //Set module properties
   setDescription("SeqROOT input module");
-  setPropertyFlags(c_Input | c_InitializeInProcess);
+  setPropertyFlags(c_Input);
 
   m_file = 0;
   m_nevt = -1;
 
   //Parameter definition
   addParam("inputFileName"  , m_inputFileName, "SeqRoot file name.", string("SeqRootInput.root"));
-  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression.", 0);
 
   B2DEBUG(1, "SeqRootInput: Constructor done.");
 }
@@ -47,7 +46,7 @@ void SeqRootInputModule::initialize()
   gSystem->Load("libdataobjects");
 
   // Initialize DataStoreStreamer
-  m_streamer = new DataStoreStreamer(m_compressionLevel);
+  m_streamer = new DataStoreStreamer();
 
 
   // Read the first event in SeqRoot file and restore in DataStore.

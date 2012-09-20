@@ -72,9 +72,6 @@ namespace Belle2 {
     //! File name
     std::string m_inputFileName;
 
-    //! Compression level
-    int m_compressionLevel;
-
     //! Blocked file handler
     SeqFile* m_file;
 

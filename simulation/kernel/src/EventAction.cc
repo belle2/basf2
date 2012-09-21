@@ -47,7 +47,7 @@ void EventAction::EndOfEventAction(const G4Event*)
   SensitiveDetectorBase::setActive(false);
 
   //Create the final MCParticle list and update the indices of the MCParticle graph particles.
-  m_mcParticleGraph.generateList(m_mcCollectionName);
+  m_mcParticleGraph.generateList(m_mcCollectionName, MCParticleGraph::c_clearParticles);
 
   //Build a TrackID to MCParticle index list
   vector<unsigned int> indices;

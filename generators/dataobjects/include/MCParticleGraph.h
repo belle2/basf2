@@ -60,8 +60,9 @@ namespace Belle2 {
       c_setNothing      = 0, /**< Do nothing special */
       c_setDecayVertex = 1, /**< Set the decay vertex to the production vertex of the last daughter (ordered by production time) */
       c_setDecayTime   = 2, /**< Set decay time to the largest production time of the daughters */
-      c_setDecayInfo   = 3, /**< Set decay time and vertex */
-      c_checkCyclic     = 4  /**< Check for cyclic dependencies */
+      c_setDecayInfo   = c_setDecayVertex | c_setDecayTime, /**< Set decay time and vertex */
+      c_checkCyclic     = 4,  /**< Check for cyclic dependencies */
+      c_clearParticles = 8 /**< Clear the particle list before adding the graph */
     };
 
     /**

@@ -65,6 +65,12 @@ public:
   ParticleSorter(MemoryPool<MCParticleGraph::GraphParticle>& particles, TClonesArray* plist, bool setVertex, bool setTime):
     m_index(0), m_particles(particles), m_plist(plist), m_setVertex(setVertex), m_setTime(setTime) {}
 
+  /**
+   * Set the starting index for the particle graph. Normally this is 0 so the first real particle has an id of 1
+   * but this can be used if there are already particles present so the first particle will have id N+1
+   * @param index number of particles already present
+   */
+  void setStartIndex(int index) { m_index = index; }
 
   /**
    * Sort the particles and generate MCParticle list.
@@ -228,8 +234,9 @@ void MCParticleGraph::generateList(const string& name, int options)
   }
 
   //Fill TClonesArray in correct order
-  MCParticles->Clear();
-  MCParticles->Expand(num_particles);
+  if (options & c_clearParticles) MCParticles->Clear();
+  MCParticles->Expand(num_particles + MCParticles.getEntries());
   MCParticleGraph::ParticleSorter psorter(m_particles, MCParticles.getPtr(), options & c_setDecayVertex, options & c_setDecayTime);
+  psorter.setStartIndex(MCParticles.getEntries());
   psorter.sort(g);
 }

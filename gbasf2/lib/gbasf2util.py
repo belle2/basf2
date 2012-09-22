@@ -81,7 +81,8 @@ class CLIParams:
             self.datatype = arg
             return DIRAC.S_OK()
         else:
-            return DIRAC.S_ERROR('Data Type can only be data or MC')
+            print "Error happens!!! Data Type can only be 'data','MC','gen-mc' or 'user'"
+            DIRAC.exit(2)
 
     def setExperiments(self, arg):
     # FIXME check experiment meets range and list of valid experiments
@@ -111,14 +112,16 @@ class CLIParams:
         if arg > 0:
             self.maxevents = arg.strip()
         else:
-            return DIRAC.S_ERROR
+            print 'Error happens!!! MaxEvent should be large than 0'
+            DIRAC.exit(2)
 
     def setNumberOfFiles(self, arg):
       # FIXME : check for integer
         if arg > 0:
             self.maxevents = arg.strip()
         else:
-            return DIRAC.S_ERROR
+            print 'Error happens!!! Number of files  should be large than 0'
+            DIRAC.exit(2)
 
     def setUserData(self, arg):
         '''set the project name for user data'''
@@ -227,8 +230,9 @@ class CLIParams:
                               '(optional) Job priority: 0 is default',
                               self.setJobPriority)
         Script.registerSwitch('m:', 'query=', 'Metadata Query', self.setQuery)
-        Script.registerSwitch('t:', 'type=', "Type of Data ('data' or 'MC')",
-                              self.setDataType)
+        Script.registerSwitch('t:', 'type=',
+                              "Type of Data ('data', 'MC','gen-mc' or 'user')"
+                              , self.setDataType)
         Script.registerSwitch('e:', 'experiments=',
                               'Experiments (comma separated list)',
                               self.setExperiments)

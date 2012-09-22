@@ -31,6 +31,8 @@ def main():
         4. submits the created jdls to the DIRAC Workload Management System
     '''
 
+    proxyinfo = prepareProxy()
+
     exitCode = 0
     errorList = []
     lfns = []
@@ -51,7 +53,6 @@ def main():
 
   # FIXME - think about enableCS here.
   # completes all necessary steps to setup the proxy we need, or exits out
-    proxyinfo = prepareProxy()
 
     cliParams.validOption()
     status = CheckAndRemoveProjectIfForce(proxyinfo['Value']['username'],

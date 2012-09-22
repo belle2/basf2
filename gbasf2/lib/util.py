@@ -165,39 +165,36 @@ def prepareProxy():
        return proxy infomation if proxy is generated correctly
     '''
 
-    from DIRAC.Core.Base import Script
-    Script.enableCS()
-    Script.parseCommandLine(ignoreErrors=True)
     proxyinfo = getProxyInfo()
-    timeleft = int(proxyinfo['Value']['secondsLeft'])
-    timeleft /= 3600
-    print "The proxy will be despired after %s hours. Do you want to continue \
+    if proxyinfo['OK']:
+        timeleft = int(proxyinfo['Value']['secondsLeft'])
+        timeleft /= 3600
+        print "The proxy will be despired after %s hours. Do you want to continue \
 or to generate a new proxy?" \
-        % timeleft
+            % timeleft
 
-    user_choice = raw_input('Please input C or G: ')
-    if user_choice.upper() == 'C':
-        return proxyinfo
-    elif user_choice.upper() != 'G':
-        print 'You should give C or G'
-        import sys
-        sys.exit(-1)
-
-    if not proxyinfo['OK'] or 'username' not in proxyinfo['Value'].keys() \
-        or user_choice.upper() == 'G':
-        if os.system('dirac-proxy-init -g belle -M -U'):
+        user_choice = raw_input('Please input C or G: ')
+        if user_choice.upper() == 'C':
+            pass
+        elif user_choice.upper() == 'G':
+            if os.system('dirac-proxy-init -g belle -M'):
+                print 'Error happens when generate proxy'
+                DIRAC.exit(1)
+        else:
+            print 'You should give C or G'
+            import sys
+            sys.exit(-1)
+    else:
+        if os.system('dirac-proxy-init -g belle -M'):
             print 'Error happens when generate proxy'
             DIRAC.exit(1)
-    else:
-      # We need to enable the configuration service ourselves if we're not generating a proxy
-        Script.enableCS()
 
-    proxyinfo = getProxyInfo()
-    if not proxyinfo['OK']:
-        print 'Error: %s' % proxyinfo['Message']
-        DIRAC.exit(1)
-    proxyProps = proxyinfo['Value']
-    userName = proxyProps['username']
+    while True:
+        proxyinfo = getProxyInfo()
+        if proxyinfo['Value'].has_key('username'):
+            break
+
+    userName = proxyinfo['Value']['username']
     DNresult = CS.getDNForUsername(userName)
     if not DNresult['OK']:
         print 'Oops %s' % DNresult['Message']

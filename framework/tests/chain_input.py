@@ -33,5 +33,34 @@ main.add_module(input)
 main.add_module(evtmetainfo)
 main.add_module(printcollections)
 
+from basf2 import Module
+from ROOT import Belle2
+
+
+class TestModule(Module):
+    """Test to read relations in the input files."""
+
+    def __init__(self):
+        """constructor."""
+        super(TestModule, self).__init__()
+        self.setName('TestModule')
+
+    def event(self):
+        """reimplementation of Module::event().
+
+        prints all from/to indices in the relation.
+        """
+        relationarray = Belle2.PyRelationArray('PXDTrueHitsToPXDSimHits')
+        num_relations = relationarray.getEntries()
+
+        #count number of PXDSimHits pointed to
+        for i in range(num_relations):
+            rel = relationarray[i]
+            for to in rel.getToIndices():
+                print "%s => %s" % (str(rel.getFromIndex()), str(to))
+
+
+main.add_module(TestModule())
+
 # Process events
 process(main)

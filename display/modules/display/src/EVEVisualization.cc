@@ -125,8 +125,6 @@ void EVEVisualization::setVolumeColor(const char* name, Color_t col)
 
 void EVEVisualization::addGeometry()
 {
-  const bool saveExtract = false;
-
   B2INFO("Setting up geometry for TEve...");
   //set colours by atomic mass number
   gGeoManager->DefaultColors();
@@ -166,11 +164,6 @@ void EVEVisualization::addGeometry()
   disableVolume("logi_B1spc1_name");
   disableVolume("logi_D1spc1_name");
   disableVolume("logi_E1spc1_name");
-  if (saveExtract) {
-    //Endcaps look strange on top level
-    disableVolume("Endcap_1");
-    disableVolume("Endcap_2");
-  }
 
   //set some nicer colors (at top level only)
   setVolumeColor("PXD.Envelope", kGreen + 3);
@@ -187,17 +180,6 @@ void EVEVisualization::addGeometry()
   eve_top_node->SetVisLevel(2);
   gEve->AddGlobalElement(eve_top_node);
 
-  if (saveExtract) {
-    TGeoManager* my_tgeomanager = gGeoManager;
-    eve_top_node->ExpandIntoListTrees();
-    eve_top_node->SaveExtract("geometry_extract.root", "Extract", false);
-
-    //this doesn't work too well...
-    //eve_top_node->ExpandIntoListTreesRecursively();
-    //eve_top_node->SaveExtract("display_geometry_full.root", "Extract", false);
-    gGeoManager = my_tgeomanager;
-  }
-
   //don't show full geo unless turned on by user
   eve_top_node->SetRnrSelfChildren(false, false);
 
@@ -213,6 +195,7 @@ void EVEVisualization::addGeometry()
   TEveGeoShapeExtract* gse = dynamic_cast<TEveGeoShapeExtract*>(f->Get("Extract"));
   TEveGeoShape* gs = TEveGeoShape::ImportShapeExtract(gse, 0);
   gs->SetRnrSelf(false);
+  gs->SetName("Minimal geometry extract");
   delete f;
 
   //I want to show full geo in unprojected view,
@@ -221,11 +204,6 @@ void EVEVisualization::addGeometry()
 
   //restore old TGeoManager
   gGeoManager = my_tgeomanager;
-}
-
-void EVEVisualization::saveGeometry(const std::string& name)
-{
-  gGeoManager->Export(name.c_str());
 }
 
 void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)

@@ -74,9 +74,6 @@ namespace Belle2 {
     /** Add TGeo geometry to Eve (only needs to be done once.) */
     void addGeometry();
 
-    /** export full geometry to file. */
-    void saveGeometry(const std::string& name);
-
     // === adding event data ===
 
     /** Add this GFTrack to event data.
@@ -142,8 +139,6 @@ namespace Belle2 {
      *      representation is connected to the covariance matrix of the hit, scaled by the value
      *      set in setErrScale which is normally 1. See also option 'A' and 'S'. Normally used in
      *      connection with 'D'.\n\n
-     * 'G': Draw geometry. Also draw the geometry in the gGeoManager. This feature is experimental
-     *      and may lead to strange things being drawn.\n\n
      * 'M': Draw track markers. Draw the intersection points between the track and the virtual
      *      (and/or real) detector planes. Can only be used in connection with 'T'.\n\n
      * 'P': Draw detector planes. Draws the virtual (and/or real) detector planes.\n\n
@@ -152,8 +147,6 @@ namespace Belle2 {
      *      with errors leads to problems.\n\n
      * 'T': Draw Track. Draw the track as straight lines between the virtual (and/or real) detector
      *      planes.\n\n
-     * 'X': Draw silent. Does not run the TApplication.
-     *
      */
     void setOptions(const std::string& opts = "MHTG");
 

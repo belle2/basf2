@@ -16,7 +16,7 @@ from basf2 import *
 # create paths
 main = create_path()
 
-input = register_module('SimpleInput')
+input = register_module('RootInput')
 # set the input file, in this case, the output of MCFittingEvtGen.py example
 input.param('inputFileName', 'MCFittingEvtGenOutput.root')
 

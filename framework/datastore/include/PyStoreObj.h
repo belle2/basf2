@@ -33,7 +33,7 @@ namespace Belle2 {
   public:
     /** constructor.
     * @param name Name of the entry to be accessed
-    * @param durability 0: event, 1: run, 2: persistent
+    * @param durability 0: event, 1: persistent
     */
     explicit PyStoreObj(const std::string& name, int durability = 0);
 

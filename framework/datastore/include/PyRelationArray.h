@@ -31,7 +31,7 @@ namespace Belle2 {
   public:
     /** Constructor
     * @param name Name of the relation array
-    * @param durability 0: event, 1: run, 2: persistent
+    * @param durability 0: event, 1: persistent
     */
     PyRelationArray(const std::string& name, int durability = 0);
 

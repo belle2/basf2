@@ -80,7 +80,7 @@ namespace Belle2 {
     //--------------------------------- default name stuff -----------------------------------------------------
     /** Return the default storage name for an object of the given type. */
     template<class T> static const std::string defaultObjectName() {
-      std::string classname = (T::Class()->GetName());
+      std::string classname = T::Class_Name();
       //Strip qualifiers like namespaces
       size_t colon = classname.rfind("::");
       if (colon != std::string::npos) {

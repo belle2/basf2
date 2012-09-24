@@ -27,6 +27,7 @@
 #include <boost/scoped_ptr.hpp>
 
 #include <cmath>
+#include <cstdlib>
 
 
 using namespace Belle2;
@@ -343,6 +344,25 @@ void DisplayUI::makeGui()
   }
   frmMain->AddFrame(automatisation_frame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));
 
+  TGGroupFrame* exit_frame = new TGGroupFrame(frmMain);
+  exit_frame->SetTitle("Closing");
+  {
+    TGHorizontalFrame* hf = new TGHorizontalFrame(exit_frame);
+    {
+      TGButton* b = new TGTextButton(hf, "Continue without display");
+      hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
+      b->Connect("Clicked()", "TEveBrowser", gEve->GetBrowser(), "CloseWindow()");
+
+      b = new TGTextButton(hf, "Exit");
+      hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
+      b->Connect("Clicked()", "Belle2::DisplayUI", this, "exit()");
+
+    }
+    exit_frame->AddFrame(hf, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
+
+  }
+  frmMain->AddFrame(exit_frame, new TGLayoutHints(kLHintsExpandX | kLHintsBottom, 5, 5, 5, 5));
+
   frmMain->MapSubwindows();
   frmMain->Resize();
   frmMain->MapWindow();
@@ -417,6 +437,15 @@ void DisplayUI::automaticEvent()
   }
 
   i++;
+}
+
+void DisplayUI::exit()
+{
+  gEve->CloseEveWindow();
+
+  //to avoid waiting for TGeoManager deletion ( https://savannah.cern.ch/bugs/?95757 ), we abort without any cleanup
+  //TODO: this should be changed to exit(0) once it's fixed in the externals
+  abort();
 }
 
 ClassImp(DisplayUI)

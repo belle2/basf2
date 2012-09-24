@@ -67,6 +67,7 @@ RootInputModule::~RootInputModule() { }
 void RootInputModule::initialize()
 {
   gSystem->Load("libdataobjects");
+  gSystem->Load("libTreePlayer");
   const std::string& inputFileArgument = Environment::Instance().getInputFileOverride();
   if (!inputFileArgument.empty()) {
     m_inputFileName = "";

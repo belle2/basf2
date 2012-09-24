@@ -65,11 +65,16 @@ void DisplayModule::initialize()
   ECL::ECLGeometryPar::Instance();
 
   m_display = new DisplayUI(m_automatic);
+  //pass some parameters to DisplayUI to be able to change them at run time
+  m_display->addParameter("Assign hits to primary particles", getParam<bool>("AssignHitsToPrimaries"));
+  m_display->addParameter("Show all primaries", getParam<bool>("ShowAllPrimaries"));
+  m_display->addParameter("Show all charged particles", getParam<bool>("ShowCharged"));
+  m_display->addParameter("Show all neutral particles", getParam<bool>("ShowNeutrals"));
+  m_display->addParameter("Show GFTracks", getParam<bool>("ShowGFTracks"));
+
+
   m_visualizer = new EVEVisualization();
   m_visualizer->setOptions(m_options);
-  if (!m_showNeutrals and !m_showCharged) //secondaries cannot be shown if they are merged into primaries
-    m_visualizer->setAssignToPrimaries(m_assignToPrimaries);
-
   m_visualizer->addGeometry();
 }
 
@@ -80,6 +85,11 @@ void DisplayModule::event()
     B2WARNING("No TEveManager found, skipping display. (hit Ctrl+C to exit)");
     return;
   }
+
+  //parameters might change, update here
+  if (!m_showNeutrals and !m_showCharged) //secondaries cannot be shown if they are merged into primaries
+    m_visualizer->setAssignToPrimaries(m_assignToPrimaries);
+
 
   //gather simhits
 

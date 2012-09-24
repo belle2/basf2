@@ -1,5 +1,6 @@
 #include <display/modules/display/DisplayUI.h>
 
+#include <framework/core/ModuleParam.h>
 #include <framework/core/InputController.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -59,6 +60,11 @@ DisplayUI::DisplayUI(bool automatic):
 
 
 DisplayUI::~DisplayUI() { }
+
+void DisplayUI::addParameter(const std::string& label, ModuleParam<bool> &param)
+{
+  m_paramList.push_back(make_pair(label, &param));
+}
 
 void DisplayUI::next()
 {
@@ -310,6 +316,20 @@ void DisplayUI::makeGui()
   }
   frmMain->AddFrame(viewer_frame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));
 
+  TGGroupFrame* param_frame = new TGGroupFrame(frmMain);
+  param_frame->SetTitle("Options");
+  {
+    const int nParams = m_paramList.size();
+    for (int i = 0; i < nParams; i++) {
+      TGCheckButton* b = new TGCheckButton(param_frame, m_paramList[i].first.c_str(), i);
+      b->SetToolTipText(m_paramList[i].second->getDescription().c_str());
+      b->SetState(m_paramList[i].second->getValue() ? kButtonDown : kButtonUp);
+      b->Connect("Clicked()", "Belle2::DisplayUI", this, TString::Format("handleParameterChange(=%d)", i));
+      param_frame->AddFrame(b, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
+    }
+  }
+  frmMain->AddFrame(param_frame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));
+
   TGGroupFrame* automatisation_frame = new TGGroupFrame(frmMain);
   automatisation_frame->SetTitle("Automatic Saving");
   {
@@ -344,6 +364,7 @@ void DisplayUI::makeGui()
   }
   frmMain->AddFrame(automatisation_frame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));
 
+  //this will be shown at the very bottom
   TGGroupFrame* exit_frame = new TGGroupFrame(frmMain);
   exit_frame->SetTitle("Closing");
   {
@@ -369,6 +390,20 @@ void DisplayUI::makeGui()
   browser->StopEmbedding();
 
   browser->SetTabTitle("Event Control", 0);
+}
+
+void DisplayUI::handleParameterChange(int id)
+{
+  if (id >= (int)m_paramList.size()) {
+    B2ERROR("widget ID too large!");
+    return;
+  }
+  //toggle value
+  m_paramList[id].second->setValue(!m_paramList[id].second->getValue());
+
+  //reprocess current event
+  m_reshowCurrentEvent = true;
+  gSystem->ExitLoop();
 }
 
 void DisplayUI::toggleColorScheme()

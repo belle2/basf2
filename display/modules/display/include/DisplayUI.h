@@ -1,10 +1,10 @@
 #ifndef DISPLAYUI_H
 #define DISPLAYUI_H
 
-
 #include <TQObject.h>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 class TEveBox;
@@ -15,6 +15,8 @@ class TGNumberEntry;
 class TGTextEntry;
 
 namespace Belle2 {
+  //forward declaration needed because CINT balks at inclusion of python headers in ModuleParam...
+  template <class T> class ModuleParam;
   class SplitGLView;
 
   /** Control TEve browser user interface.
@@ -33,6 +35,9 @@ namespace Belle2 {
 
     /** Destructor. */
     ~DisplayUI();
+
+    /** Generate UI elements so the given module parameter can be changed at run time. */
+    void addParameter(const std::string& label, ModuleParam<bool> &param);
 
     /** Go to next event. */
     void next();
@@ -72,6 +77,9 @@ namespace Belle2 {
     /** Toggle between light and dark color scheme for viewers. */
     void toggleColorScheme();
 
+    /** Called when one of the module parameters is changed via UI. */
+    void handleParameterChange(int id);
+
     /** Save the current view to a user-defined filename
      *
      * @param highres save picture with 4000px width instead of screen size
@@ -110,6 +118,8 @@ namespace Belle2 {
     /** If true, disable interactive control and call automaticEvent() instead. */
     bool m_automatic;
 
+    /** List of run time configurable module parameters. */
+    std::vector< std::pair<std::string, ModuleParam<bool>* > > m_paramList;
 
     /** Button to switch to previous event. */
     TGButton* m_prevButton;

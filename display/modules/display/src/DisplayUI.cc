@@ -23,6 +23,7 @@
 #include <TROOT.h>
 #include <TSystem.h>
 
+
 #include <boost/scoped_ptr.hpp>
 
 #include <cmath>
@@ -194,7 +195,7 @@ bool DisplayUI::startDisplay()
     makeGui();
 
     //import the geometry in the projection managers (only needs to be done once
-    B2INFO("Creating projections (may take a bit)...");
+    B2INFO("Creating projections ...");
     TEveScene* gs = gEve->GetGlobalScene();
     TEveProjectionManager* rphiManager = getViewer()->getRPhiMgr();
     if (rphiManager) {
@@ -204,7 +205,6 @@ bool DisplayUI::startDisplay()
     if (rhozManager) {
       rhozManager->ImportElements(gs);
     }
-    B2INFO("done.");
   }
 
   updateUI(); //update button state
@@ -278,7 +278,6 @@ void DisplayUI::makeGui()
     jumpToEventButton->Connect("Clicked()", "Belle2::DisplayUI", this, "showJumpToEventDialog()");
 
     m_eventLabel = new TGLabel(event_frame);
-    m_eventLabel->SetMinHeight(50);
     event_frame->AddFrame(m_eventLabel, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
   }
   frmMain->AddFrame(event_frame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));

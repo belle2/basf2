@@ -1,6 +1,7 @@
 #include <display/modules/display/SplitGLView.h>
 #include <framework/logging/Logger.h>
 
+#include <TEveGeoNode.h>
 #include "TApplication.h"
 #include "TGButton.h"
 #include "TGeoManager.h"
@@ -32,6 +33,8 @@ SplitGLView::SplitGLView(const TGWindow* p, UInt_t w, UInt_t h) :
   TGPopupMenu* sceneMenu = new TGPopupMenu(gClient->GetRoot());
   sceneMenu->AddEntry("&Update Current", kSceneUpdate);
   sceneMenu->AddEntry("Update &All", kSceneUpdateAll);
+  sceneMenu->AddSeparator();
+  sceneMenu->AddEntry("Save &Geometry Extract", kSaveGeometryExtract);
 
   // create the "help" popup menu
   TGPopupMenu* helpMenu = new TGPopupMenu(gClient->GetRoot());
@@ -177,6 +180,23 @@ SplitGLView::~SplitGLView()
   delete m_pad;
 }
 
+void SplitGLView::saveExtract()
+{
+  TGeoManager* my_tgeomanager = gGeoManager;
+  TEveGeoTopNode* eve_top_node = dynamic_cast<TEveGeoTopNode*>(gEve->GetGlobalScene()->FirstChild());
+  if (!eve_top_node) {
+    B2ERROR("Couldn't find TEveGeoTopNode");
+    return;
+  }
+  eve_top_node->ExpandIntoListTrees();
+  eve_top_node->SaveExtract("geometry_extract.root", "Extract", false);
+
+  //this doesn't work too well (i.e. crashes when geometry is drawn)
+  //eve_top_node->ExpandIntoListTreesRecursively();
+  //eve_top_node->SaveExtract("display_geometry_full.root", "Extract", false);
+  gGeoManager = my_tgeomanager;
+}
+
 void SplitGLView::handleMenu(Int_t id)
 {
   // Handle menu items.
@@ -224,7 +244,10 @@ void SplitGLView::handleMenu(Int_t id)
     case kSceneUpdateAll:
       for (int i = 0; i < 3; i++)
         m_glViewer[i]->UpdateScene();
+      break;
 
+    case kSaveGeometryExtract:
+      saveExtract();
       break;
 
     case kHelpAbout: {

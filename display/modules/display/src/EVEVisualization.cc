@@ -79,7 +79,6 @@ EVEVisualization::EVEVisualization():
   m_assignToPrimaries(false),
   m_eclsimhitdata(0)
 {
-  setOptions();
   setErrScale();
   clearEvent();
 }

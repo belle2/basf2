@@ -48,7 +48,7 @@ display = register_module('Display')
 # interactively by removing its checkmark in the 'Eve' tab.
 #
 # This option only makes sense when ShowGFTracks is true
-display.param('Options', 'AHTGM')  # default
+display.param('Options', 'AHTM')  # default
 
 # should hits always be assigned to a particle with c_PrimaryParticle flag?
 # with this option off, many tracking hits will be assigned to secondary e-

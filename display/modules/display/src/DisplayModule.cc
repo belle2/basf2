@@ -25,7 +25,7 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
 {
   setDescription("Interactive visualisation of MCParticles, GFTracks and various SimHits (plus geometry).");
 
-  addParam("Options", m_options, "Drawing options for GFTracks, a combination of ADHGMPSTX. See EVEVisualization::setOptions or the display.py example for an explanation.", std::string("MHTG"));
+  addParam("Options", m_options, "Drawing options for GFTracks, a combination of ADHMPST. See EVEVisualization::setOptions or the display.py example for an explanation.", std::string("AMHT"));
   addParam("AssignHitsToPrimaries", m_assignToPrimaries, "If true, hits created by secondary particles (e.g. delta electrons) will be assigned to the original primary particle.", true);
   addParam("ShowAllPrimaries", m_showAllPrimaries, "If true, all primary MCParticles will be shown, regardless of wether hits are produced.", false);
   addParam("ShowCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled AssignHitsToPrimaries). May be slow.", false);
@@ -34,7 +34,7 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("Automatic", m_automatic, "Non-interactively save visualisations for each event.", false);
 
   //make sure dictionaries for PXD/SVDrecohits are loaded
-  //needs to be done here to have dictionaries available during SimpleInput::initialize()
+  //needs to be done here to have dictionaries available during RootInput::initialize()
   gSystem->Load("libpxd");
   gSystem->Load("libsvd");
   gSystem->Load("libgenfitRK");
@@ -52,7 +52,6 @@ void DisplayModule::initialize()
 {
   if (!gGeoManager) { //TGeo geometry not initialized, do it ourselves
     //convert geant4 geometry to TGeo geometry
-    //in the moment tesselated solids used for the glue within the PXD cannot be converted to TGeo, the general solution still has to be found, at the moment you can just comment out lines 6 and 13 in  pxd/data/PXD-Components.xml.
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();
 

@@ -148,7 +148,7 @@ namespace Belle2 {
      * 'T': Draw Track. Draw the track as straight lines between the virtual (and/or real) detector
      *      planes.\n\n
      */
-    void setOptions(const std::string& opts = "MHTG");
+    void setOptions(const std::string& opts);
 
     /** @brief Set the scaling factor for the visualization of the errors.*/
     void setErrScale(double errScale = 1.);

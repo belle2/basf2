@@ -58,12 +58,10 @@ bool MsgHandler::add(TObject* obj, string name)
   //  msg->EnableSchemaEvolutionForAll();
   msg->SetCompressionLevel(m_complevel);
   int len = msg->BufferSize();
-  /*
   if (msg->CompBuffer()) {
     // Compression ON
     len = msg->CompLength();
   }
-  */
   msg->WriteObject(obj);
   msg->Compress(); //no effect if m_complevel == 0
   //  msg->ForceWriteInfo(obj->, true );
@@ -190,7 +188,13 @@ int MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
 
     msgptr += objlen + sizeof(int);
     totlen += objlen + sizeof(int);
-    delete tmsg; // tmpmsg should be deleted here also.
+
+    //TMessage doesn't honour the kIsOwner bit for the compression buffer and
+    //tries to delete the passed message.
+    //TODO: workaround: leak message; remove once fixed in ROOT
+    if (!tmsg->CompBuffer())
+      delete tmsg; // tmpmsg should be deleted here also.
+
     //    printf ( "decode : %s added to objlist; size=%d (pid=%d)\n",
     //           name.c_str(), objlen, (int)getpid()  );
     fflush(stdout);

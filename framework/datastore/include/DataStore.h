@@ -12,6 +12,7 @@
 #define DATASTORE_H
 
 #include <framework/logging/Logger.h>
+#include <framework/datastore/RelationEntry.h>
 
 #include <TObject.h>
 #include <TClonesArray.h>
@@ -179,6 +180,10 @@ namespace Belle2 {
     /** Get a reference to the object/array map. */
     const StoreObjMap& getStoreObjectMap(EDurability durability) { return m_storeObjMap[durability]; }
 
+    bool addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, double weight);
+    std::vector<Relation> getRelationsTo(TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, TClass* toClass, std::string name);
+    std::vector<Relation> getRelationsFrom(TObject* toObject, StoreEntry*& toEntry, int& toIndex, TClass* fromClass, std::string name);
+    std::vector<Relation> getRelationsWith(TObject* object, StoreEntry*& entry, int& index, TClass* withClass, std::string name);
 
     //------------------------------ Start and end procedures --------------------------------------------------
     /** Setter for m_initializeActive.
@@ -231,6 +236,8 @@ namespace Belle2 {
      */
     bool checkType(const std::string& name, const StoreEntry* entry,
                    const TClass* objClass, bool array) const;
+
+    bool findStoreEntry(const TObject* object, StoreEntry*& entry, int& index);
 
     /** Map for all objects/arrays in the data store.
      *

@@ -786,15 +786,17 @@ void EVEVisualization::makeTracks()
   }
   gEve->AddElement(m_gftracklist);
 
-  m_eclsimhitdata->DataChanged(); //update limits (Empty() wont' work otherwise)
+  m_eclsimhitdata->DataChanged(); //update limits (Empty() won't work otherwise)
   if (!m_eclsimhitdata->Empty()) {
     m_eclsimhitdata->SetAxisFromBins();
     TEveCalo3D* calo3d = new TEveCalo3D(m_eclsimhitdata, "ECLHits");
-    calo3d->SetBarrelRadius(127.00); //inner radius of ECL barrel
+    calo3d->SetBarrelRadius(125.80); //inner radius of ECL barrel
+#if ROOT_VERSION_CODE >= ROOT_VERSION(5,34,2)
+    calo3d->SetForwardEndCapPos(196.5); //inner edge of forward endcap
+    calo3d->SetBackwardEndCapPos(-102.0); //inner edge of backward endcap
+#else
     calo3d->SetEndCapPos(196.5); //inner edge of forward endcap
-    //TODO: needs a patched ROOT version
-    //calo3d->SetForwardEndCapPos(196.5); //inner edge of forward endcap
-    //calo3d->SetBackwardEndCapPos(-102.0); //inner edge of backward endcap
+#endif
     calo3d->SetMaxValAbs(2.1);
     gEve->AddElement(calo3d);
   }

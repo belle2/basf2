@@ -25,7 +25,9 @@ namespace Belle2 {
 
   template <class T> class RelationVector: public std::vector<RelationEntry> {
   public:
-    T* operator[](int i) const {static_cast<T*>(std::vector<RelationEntry>::operator [](i));}
+    T*     object(int i) const {return static_cast<T*>(std::vector<RelationEntry>::operator [](i).object);}
+    T*     operator[](int i) const {return object(i);}
+    double weight(int i) const {return static_cast<T*>(std::vector<RelationEntry>::operator [](i).weight);}
   };
 }
 

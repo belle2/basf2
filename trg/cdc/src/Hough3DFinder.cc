@@ -92,6 +92,7 @@ namespace Belle2 {
       m_mcVertexTrackHough3D = new TClonesArray("TVector3");
       m_mc4VectorTrackHough3D = new TClonesArray("TLorentzVector");
       m_bestTSsTrackHough3D = new TClonesArray("TVectorD");
+      m_mcTSsTrackHough3D = new TClonesArray("TVectorD");
       m_performanceTrackHough3D = new TClonesArray("TVectorD");
       m_treeTrackHough3D->Branch("st0TSsTrackHough3D", &m_st0TSsTrackHough3D);
       m_treeTrackHough3D->Branch("st1TSsTrackHough3D", &m_st1TSsTrackHough3D);
@@ -104,6 +105,7 @@ namespace Belle2 {
       m_treeTrackHough3D->Branch("mcVertexTrackHough3D", &m_mcVertexTrackHough3D);
       m_treeTrackHough3D->Branch("mc4VectorTrackHough3D", &m_mc4VectorTrackHough3D);
       m_treeTrackHough3D->Branch("bestTSsTrackHough3D", &m_bestTSsTrackHough3D);
+      m_treeTrackHough3D->Branch("mcTSsTrackHough3D", &m_mcTSsTrackHough3D);
       m_treeTrackHough3D->Branch("performanceTrackHough3D", &m_performanceTrackHough3D);
 
       m_treeEventHough3D = new TTree("m_treeEventHough3D","event");
@@ -124,9 +126,15 @@ namespace Belle2 {
 
       m_treeConstantsHough3D->Fill();
 
+      m_Hough3DFinder = new Hough3DFinder();
+      // cotStart, cotEnd, z0Start, z0End, cotSteps, z0Steps
+      float tempInitVariables[] = {-3,3,-2,2,1001,1001};
+      vector<float > initVariables(tempInitVariables, tempInitVariables+sizeof(tempInitVariables) / sizeof(tempInitVariables[0]) );
+      m_Hough3DFinder->initialize(geometryHough3D, initVariables);
     }
 
   TRGCDCHough3DFinder::~TRGCDCHough3DFinder(){
+    m_Hough3DFinder->destruct();
     // Deallocate HoughMesh
     for(int i=0; i<m_nCotSteps; i++){
       for(int j=0; j<m_nZ0Steps; j++){
@@ -157,6 +165,7 @@ namespace Belle2 {
     delete m_mcVertexTrackHough3D;
     delete m_mc4VectorTrackHough3D;
     delete m_bestTSsTrackHough3D;
+    delete m_mcTSsTrackHough3D;
     delete m_performanceTrackHough3D;
     delete m_treeEventHough3D;
     delete m_performanceEventHough3D;
@@ -171,7 +180,7 @@ namespace Belle2 {
   }
 
   void TRGCDCHough3DFinder::doit(vector<TCTrack *> & trackList){
-    int m_version=0;
+    int m_version=1;
     if(m_version==0) doitPerfectly(trackList);
     if(m_version==1) doitVersion1(trackList);
   }
@@ -190,6 +199,7 @@ namespace Belle2 {
     TClonesArray &mcVertexTrackHough3D = *m_mcVertexTrackHough3D;
     TClonesArray &mc4VectorTrackHough3D = *m_mc4VectorTrackHough3D;
     TClonesArray &bestTSsTrackHough3D = *m_bestTSsTrackHough3D;
+    TClonesArray &mcTSsTrackHough3D = *m_mcTSsTrackHough3D;
     TClonesArray &performanceTrackHough3D = *m_performanceTrackHough3D;
 
     TVectorD &performanceEventHough3D = *m_performanceEventHough3D;
@@ -205,6 +215,7 @@ namespace Belle2 {
     mcVertexTrackHough3D.Clear();
     mc4VectorTrackHough3D.Clear();
     bestTSsTrackHough3D.Clear();
+    mcTSsTrackHough3D.Clear();
     performanceTrackHough3D.Clear();
 
     //performanceEventHough3D.Clear();
@@ -293,215 +304,34 @@ namespace Belle2 {
       double mcZ0 = trackMCParticle.getVertex().Z()/100;
       double mcCot = trackMCParticle.getMomentum().Pz()/trackMCParticle.getMomentum().Pt();
 
-      // Change TS candidates to arcS and z plane.
-      vector<double > tsArcS;
-      vector<vector<double> > tsZ;
-      unsigned nLayers = _cdc.nStereoSuperLayers();
-      for(unsigned i=0; i<nLayers; i++){
-        tsArcS.push_back(calS(rho,m_rr[i]));
-        tsZ.push_back(vector<double>());
-        for(unsigned j=0; j<stTSs[i].size(); j++){
-          //fitPhi0 = mcPhi0;
-          tsZ[i].push_back(calZ(charge, m_anglest[i], m_ztostraw[i], m_rr[i], stTSs[i][j], rho, fitPhi0));
-        }
-      }
+      // Set input of finder
+      double tempTrackVariables[] = {charge, rho, fitPhi0};
+      vector<double > trackVariables(tempTrackVariables, tempTrackVariables+sizeof(tempTrackVariables) / sizeof(tempTrackVariables[0]) );
 
-      // Clear Hough Meshes.
-      for(int i=0; i<m_nCotSteps; i++){
-        for(int j=0; j<m_nZ0Steps; j++){
-          for(int k=0; k<4; k++){
-            m_houghMeshLayerDiff[i][j][k] = 999;
-            m_houghMeshLayer[i][j][k] = 0;
-          }
-          m_houghMesh[i][j] = 0;
-          m_houghMeshDiff[i][j] = 0.;
-        }
-      }
-      // Fill Hough mesh.
-      double tempCotStart, tempCotEnd;
-      double tempZ0Start, tempZ0End;
-      double tempZ01, tempZ02;
-      int tempHoughZ0;
-      float minDiffHough;
-      double actualCot, actualZ0;
-      // Find best vote.
-      double minZ0, houghMax;
-      double bestCot, bestZ0;
+      // Run finder
+      m_Hough3DFinder->runFinder(trackVariables, stTSs);
 
-      // Vote in Hough Mesh Layers.
-      for(int cotStep=0; cotStep<m_nCotSteps; cotStep++){
-        // Find cotStep range for mesh.
-        tempCotStart=(cotStep-0.5)*m_cotStepSize+m_cotStart;
-        tempCotEnd=(cotStep+0.5)*m_cotStepSize+m_cotStart;
-        //cout<<"tempCotStart: "<<tempCotStart<<" tempCotEnd: "<<tempCotEnd<<endl;
-
-        // Find z0 range for mesh per layer.
-        for(unsigned iLayer=0; iLayer<nLayers; iLayer++){
-          for(unsigned iTS=0; iTS<stTSs[iLayer].size(); iTS++){
-            // Find z0 for cot.
-            //cout<<"tsArcS: "<<tsArcS[iLayer]<<" tempCotStart: "<<tempCotStart<<" tsZ:"<<tsZ[iLayer][iTS]<<endl;
-            tempZ01=-tsArcS[iLayer]*tempCotStart+tsZ[iLayer][iTS];
-            tempZ02=-tsArcS[iLayer]*tempCotEnd+tsZ[iLayer][iTS];
-            
-            // Find start and end of range z0.
-            if(tempZ01<tempZ02){
-              tempZ0Start=tempZ01;
-              tempZ0End=tempZ02;
-            }
-            else{
-              tempZ0Start=tempZ02;
-              tempZ0End=tempZ01;
-            }
-            //cout<<"z0Start: "<<tempZ0Start<<endl;
-            //cout<<"z0End: "<<tempZ0End<<endl;
-
-            // Do proper rounding for plus and minus values.
-            if(tempZ0Start>0){
-              tempZ0Start=int(tempZ0Start/m_z0StepSize+0.5);
-            }
-            else{
-              tempZ0Start=int(tempZ0Start/m_z0StepSize-0.5);
-            }
-            if(tempZ0End>0){
-              tempZ0End=int(tempZ0End/m_z0StepSize+0.5);
-            }
-            else{
-              tempZ0End=int(tempZ0End/m_z0StepSize-0.5);
-            }
-
-            // To save time do z0 cut off here
-            if(tempZ0Start<-(m_nZ0Steps-1)/2) {
-              tempZ0Start = -(m_nZ0Steps-1)/2;
-            }
-            if(tempZ0End>(m_nZ0Steps-1)/2) {
-              tempZ0End = (m_nZ0Steps-1)/2;
-            }
-
-            // Fill Hough Mesh.
-            for(int z0Step=int(tempZ0Start);z0Step<=int(tempZ0End);z0Step++){
-              // Cut off if z0Step is bigger or smaller than z0 limit.
-              // Not needed anymore.
-              if(z0Step>(m_nZ0Steps-1)/2 || z0Step<-(m_nZ0Steps-1)/2) {
-                cout<<"cutoff because z0step is bigger or smaller than z0 limit ";
-                continue;
-              }
-
-              // Change temHoughZ0 if minus.
-              if(z0Step<0){
-                tempHoughZ0=(m_nZ0Steps-1)/2-z0Step;
-              }
-              else{ tempHoughZ0 = z0Step; }
-
-              //Change to actual value.
-              actualCot=cotStep*m_cotStepSize+m_cotStart;
-              actualZ0=z0Step*m_z0StepSize;
-              //cout<<"actualCot: "<<actualCot<<" actualZ0: "<<actualZ0<<endl;
-
-
-              m_houghMeshLayer[cotStep][tempHoughZ0][iLayer]=1;
-              // Find minimum z difference for the vote.
-              minDiffHough = abs(actualCot*tsArcS[iLayer]+actualZ0-tsZ[iLayer][iTS]);
-              if(m_houghMeshLayerDiff[cotStep][tempHoughZ0][iLayer]>minDiffHough){
-                m_houghMeshLayerDiff[cotStep][tempHoughZ0][iLayer]=minDiffHough;
-              }
-
-            } // End of z0 vote loop.
-          } // End of TS loop.
-        }  // End of layer loop.
-      } // End of cot vote loop.
-
-      // Filling HoughMesh. Combines the seperate HoughMeshLayers.
-      for(int houghCot=0;houghCot<m_nCotSteps;houghCot++){
-        for(int houghZ0=0;houghZ0<m_nZ0Steps;houghZ0++){
-          //Change back tempHoughZ0 if minus
-          if(houghZ0>(m_nZ0Steps-1)/2){
-            tempHoughZ0=(m_nZ0Steps-1)/2-houghZ0;
-          } else {
-            tempHoughZ0 = houghZ0;
-          }
-          //Change to actual value
-          actualCot=houghCot*m_cotStepSize+m_cotStart;
-          actualZ0=tempHoughZ0*m_z0StepSize;
-
-          for(int layer=0; layer<4; layer++){
-            m_houghMesh[houghCot][houghZ0] += m_houghMeshLayer[houghCot][houghZ0][layer];
-            if(m_houghMeshLayerDiff[houghCot][houghZ0][layer] != 999) m_houghMeshDiff[houghCot][houghZ0] += m_houghMeshLayerDiff[houghCot][houghZ0][layer];
-            //if(houghMeshLayer[houghCot][houghZ0][layer]==1) hhough00->Fill(actualCot,actualZ0);
-          } // End of combining votes
-        } // End loop for houghZ0
-      } // End loop for houghCot
-
-      // Find best vote. By finding highest votes and comparing all votes and pick minimum diff z.
-      houghMax = 0;
-      for(int houghCot=0;houghCot<m_nCotSteps;houghCot++){
-        for(int houghZ0=0;houghZ0<m_nZ0Steps;houghZ0++){
-          // Changes back values for minus
-          if(houghZ0>(m_nZ0Steps-1)/2){
-            tempHoughZ0=(m_nZ0Steps-1)/2-houghZ0;
-          }
-          else{ tempHoughZ0=houghZ0;}
-          // Find highest vote
-          if(houghMax<m_houghMesh[houghCot][houghZ0]){
-            houghMax=m_houghMesh[houghCot][houghZ0];
-            // If highest vote changes, need to initialize minZ0, minDiffHough
-            minZ0 = 9999;
-            minDiffHough = 9999;
-          }
-          // When highest vote
-          if(houghMax==m_houghMesh[houghCot][houghZ0]){
-            // For second finder version
-            // When z0 is minimum
-            //if(minZ0>abs(tempHoughZ0)) {
-            //  cout<<"minZ0: "<<minZ0<<" tempHoughZ0: "<<tempHoughZ0<<endl;
-            //  minZ0 = tempHoughZ0;
-            //  bestCot = houghCot;
-            //  bestZ0 = tempHoughZ0;
-            //}
-            // For third finder version
-            // When minDiffHough is minimum
-            if(minDiffHough>m_houghMeshDiff[houghCot][houghZ0]){
-              minDiffHough = m_houghMeshDiff[houghCot][houghZ0];
-              bestCot = houghCot;
-              bestZ0 = tempHoughZ0;
-            }
-          }
-        } // End of houghZ0 loop
-      } // End of houghCot loop
-      //cout<<"bestCot: "<<bestCot<<" bestZ0: "<<bestZ0<<" "<<"#Votes: "<<houghMax<<endl;
-      //cout<<"foundCot: "<<bestCot*m_cotStepSize+m_cotStart<<" foundZ0: "<<bestZ0*m_z0StepSize<<endl;
-      //cout<<"mcCot: "<<mcCot<<" mcZ0: "<<mcZ0<<endl;
-
-
-      // Finds the related TS from bestCot and bestZ0
-
-      // Find z and phiSt from bestCot and bestZ0 (arcS is dependent to pT)
-      double foundZ[4];
-      double foundPhiSt[4];
-      for(int i=0; i<4; i++){
-        foundZ[i] = (bestCot*m_cotStepSize+m_cotStart)*tsArcS[i]+(bestZ0*m_z0StepSize); 
-        foundPhiSt[i] = fitPhi0+charge*acos(m_rr[i]/2/rho)+2*asin((m_ztostraw[i]-foundZ[i])*tan(m_anglest[i])/2/m_rr[i]); 
-        if(foundPhiSt[i]>2*m_Trg_PI) foundPhiSt[i]-=2*m_Trg_PI;
-        if(foundPhiSt[i]<0) foundPhiSt[i]+=2*m_Trg_PI;
-      }
-      //cout<<"FoundPhiSt[0]: "<<foundPhiSt[0]<<" FoundPhiSt[1]: "<<foundPhiSt[1]<<" FoundPhiSt[2]: "<<foundPhiSt[2]<<" FoundPhiSt[3]: "<<foundPhiSt[3]<<endl;
-
-      // Find closest phi out of canidates
-      double minDiff[4]={999,999,999,999};
-      double bestTS[4]={999,999,999,999};
+      // Get results of finder
       const TCSHit* p_bestTS[4]={0,0,0,0};
-      for(unsigned iLayer=0; iLayer<nLayers; iLayer++){
-        for(unsigned iTS=0; iTS<stTSs[iLayer].size(); iTS++){
-          if(minDiff[iLayer]> abs(foundPhiSt[iLayer]-stTSs[iLayer][iTS])){
-            minDiff[iLayer] = abs(foundPhiSt[iLayer]-stTSs[iLayer][iTS]);
-            bestTS[iLayer] = stTSs[iLayer][iTS];
-            p_bestTS[iLayer] = p_stTSs[iLayer][iTS];
-          }
-        }
+      double bestZ0,bestCot,houghMax,minDiffHough;
+      double bestTS[4];
+      vector<double> tempResult;
+      m_Hough3DFinder->getValuesVersion1("bestTSIndex",tempResult);
+      for(int iTS=0; iTS<4; iTS++) {
+        p_bestTS[iTS] = p_stTSs[iTS][(int)tempResult[iTS]];
+        bestTS[iTS] = stTSs[iTS][(int)tempResult[iTS]];
       }
-      //cout<<"BestPhiSt[0]: "<<bestTS[0]<<" BestPhiSt[1]: "<<bestTS[1]<<" BestPhiSt[2]: "<<bestTS[2]<<" BestPhiSt[3]: "<<bestTS[3]<<endl;
+      m_Hough3DFinder->getValuesVersion1("bestZ0", tempResult);
+      bestZ0 = tempResult[0];
+      m_Hough3DFinder->getValuesVersion1("bestCot", tempResult);
+      bestCot = tempResult[0];
+      m_Hough3DFinder->getValuesVersion1("houghMax", tempResult);
+      houghMax = tempResult[0];
+      m_Hough3DFinder->getValuesVersion1("minDiffHough", tempResult);
+      minDiffHough = tempResult[0];
 
       // Find and append TS to track
-      for(unsigned iLayer=0; iLayer<nLayers; iLayer++){
+      for(unsigned iLayer=0; iLayer<4; iLayer++){
         //cout<<bestTS[iLayer]<<endl;
         //cout<<"hough3d["<<iLayer<<"]"<<endl;
         //p_bestTS[iLayer]->dump("state","");
@@ -560,6 +390,22 @@ namespace Belle2 {
       tempPerformanceTrack[0] = trackRelation3D.purity(0);
       tempPerformanceTrack[1] = iTrack;
       new(performanceTrackHough3D[iTrack]) TVectorD(tempPerformanceTrack);
+      
+      vector<const TCSHit*> mcTSList;
+      perfectFinder(trackList, iTrack, mcTSList);
+      TVectorD tempMcTSs(4);
+      // Initialize tempMCTSs;
+      for(unsigned iTS=0; iTS<4; iTS++){
+        tempMcTSs[iTS]=999;
+      }
+      // Set TS values to root file.
+      for(unsigned iTS=0; iTS<mcTSList.size(); iTS++){
+        int iSuperLayer = (int)(double(mcTSList[iTS]->cell().superLayerId())-1)/2;
+        tempMcTSs[iSuperLayer]=(double)mcTSList[iTS]->cell().localId()/m_nWires[iTS]*4*m_Trg_PI;
+        //cout<<mcTSList[iTS]->cell().localId()<<" "<<mcTSList[iTS]->cell().superLayerId()<<" ";
+      }
+      //cout<<endl;
+      new(mcTSsTrackHough3D[iTrack]) TVectorD(tempMcTSs);
 
     } // End of loop over all the tracks.
 
@@ -571,6 +417,64 @@ namespace Belle2 {
     TRGDebug::leaveStage("Hough 3D finder");
   }
 
+  void TRGCDCHough3DFinder::perfectFinder(vector<TCTrack *> &trackList, unsigned j, vector<const TCSHit*> &mcTSList){
+
+    //...G4 trackID...
+    unsigned id = trackList[j]->relation().contributor(0);
+    vector<const TCSHit*> tsList[9];
+
+    //...Segment loop...
+    const vector<const TCSHit*> hits = _cdc.segmentHits();
+    for (unsigned i = 0; i < hits.size(); i++) {
+      const TCSHit& ts = * hits[i];
+      if (ts.segment().axial()) continue;
+      if (! ts.timing().active()) continue;
+      const TCWHit* wh = ts.segment().center().hit();
+      if (! wh) continue;
+      const unsigned trackId = wh->iMCParticle();
+
+      if (id == trackId)
+        tsList[wh->wire().superLayerId()].push_back(& ts);
+    }
+
+    if (TRGDebug::level()) {
+      for (unsigned k = 0; k < 9; k++) {
+        if (k % 2) {
+          cout << TRGDebug::tab(4) << "superlayer " << k << ":";
+          for (unsigned l = 0; l < tsList[k].size(); l++) {
+            if (l)
+              cout << ",";
+            cout << tsList[k][l]->cell().name();
+          }
+          cout << endl;
+        }
+      }
+    }
+
+    //...Select best one in each super layer...
+    for (unsigned i = 0; i < 9; i++) {
+      const TCSHit* best = 0;
+      if (tsList[i].size() == 0) {
+        continue;
+      } else if (tsList[i].size() == 1) {
+        best = tsList[i][0];
+      } else {
+        int timeMin = 99999;
+        for (unsigned k = 0; k < tsList[i].size(); k++) {
+          const TRGSignal& timing = tsList[i][k]->timing();
+          const TRGTime& t = * timing[0];
+          if (t.time() < timeMin) {
+            timeMin = t.time();
+            best = tsList[i][k];
+          }
+        }
+      }
+      mcTSList.push_back(best);
+    }
+
+  }
+
+
   void TRGCDCHough3DFinder::doitPerfectly(vector<TCTrack *> & trackList){
 
     TRGDebug::enterStage("Perfect 3D Finder");
@@ -579,62 +483,13 @@ namespace Belle2 {
 
     //...Track loop....
     for (unsigned j = 0; j < trackList.size(); j++) {
-
       //...G4 trackID...
       TCTrack* trk = trackList[j];
-      unsigned id = trackList[j]->relation().contributor(0);
-      vector<const TCSHit*> tsList[9];
 
-      //...Segment loop...
-      const vector<const TCSHit*> hits = _cdc.segmentHits();
-      for (unsigned i = 0; i < hits.size(); i++) {
-        const TCSHit& ts = * hits[i];
-        if (ts.segment().axial()) continue;
-        if (! ts.timing().active()) continue;
-        const TCWHit* wh = ts.segment().center().hit();
-        if (! wh) continue;
-        const unsigned trackId = wh->iMCParticle();
-
-        if (id == trackId)
-          tsList[wh->wire().superLayerId()].push_back(& ts);
-      }
-
-      if (TRGDebug::level()) {
-        cout << TRGDebug::tab() << "My trk#" << j << endl;
-        for (unsigned k = 0; k < 9; k++) {
-          if (k % 2) {
-            cout << TRGDebug::tab(4) << "superlayer " << k << ":";
-            for (unsigned l = 0; l < tsList[k].size(); l++) {
-              if (l)
-                cout << ",";
-              cout << tsList[k][l]->cell().name();
-            }
-            cout << endl;
-          }
-        }
-      }
-
-      //...Select best one in each super layer...
-      for (unsigned i = 0; i < 9; i++) {
-        const TCSHit* best = 0;
-        if (tsList[i].size() == 0) {
-          continue;
-        } else if (tsList[i].size() == 1) {
-          best = tsList[i][0];
-        } else {
-          int timeMin = 99999;
-          for (unsigned k = 0; k < tsList[i].size(); k++) {
-            const TRGSignal& timing = tsList[i][k]->timing();
-            const TRGTime& t = * timing[0];
-            if (t.time() < timeMin) {
-              timeMin = t.time();
-              best = tsList[i][k];
-            }
-          }
-        }
-        trk->append(new TCLink(0,
-              best,
-              best->cell().xyPosition()));
+      vector<const TCSHit*> mcTSList;
+      perfectFinder(trackList, j, mcTSList);
+      for(unsigned iTS=0; iTS<mcTSList.size(); iTS++){
+        trk->append(new TCLink(0, mcTSList[iTS], mcTSList[iTS]->cell().xyPosition()));
       }
 
       if (TRGDebug::level())

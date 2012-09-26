@@ -15,6 +15,7 @@
 #define TRGCDCHough3DFinder_FLAG_
 
 #include <string>
+#include "trg/cdc/Hough3DUtility.h"
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCH3DFinder TRGCDCHough3DFinder
@@ -24,6 +25,7 @@ namespace Belle2 {
 
 class TRGCDC;
 class TRGCDCTrack;
+class TRGCDCSegmentHit;
 class TRGCDCLink;
 
 class TRGCDCHough3DFinder {
@@ -33,6 +35,7 @@ class TRGCDCHough3DFinder {
     ~TRGCDCHough3DFinder();
     // Member functions.
     void doit(std::vector<TRGCDCTrack *> & trackList);
+    void perfectFinder(std::vector<TRGCDCTrack *> &trackList, unsigned j, std::vector<const TRGCDCSegmentHit*> &mcTSList);
     void doitPerfectly(std::vector<TRGCDCTrack *> & trackList);
     void doitVersion1(std::vector<TRGCDCTrack *> & trackList);
     void terminate(void);
@@ -44,6 +47,7 @@ class TRGCDCHough3DFinder {
     double m_anglest[4];
     double m_Trg_PI;
     // Hough Variables.
+    Hough3DFinder* m_Hough3DFinder;
     double m_cotStart;
     double m_cotEnd;
     double m_z0Start;
@@ -81,6 +85,8 @@ class TRGCDCHough3DFinder {
     TClonesArray* m_mc4VectorTrackHough3D;
     // Stores best phi values. [st0, st1, st2, st3]
     TClonesArray* m_bestTSsTrackHough3D;
+    // Stores true phi values. [st0, st1, st2, st3]
+    TClonesArray* m_mcTSsTrackHough3D;
     // Stores performance values. [purity, Track #]
     TClonesArray* m_performanceTrackHough3D;
     // Stores performance values. [Total # tracks from 2D finder]

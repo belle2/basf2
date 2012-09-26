@@ -1,10 +1,12 @@
-
 #ifndef __CINT__
 #include "trg/cdc/Fitter3DUtility.h"
 #include <cmath>
 #endif
 
 #include <iostream>
+#include "TLorentzVector.h"
+#include "TVector3.h"
+#include "TVector2.h"
 
 using std::cout;
 using std::endl;
@@ -173,4 +175,28 @@ void rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot){
     zchi2 += (zz[i]-z0-cot*arcS[i])*(zz[i]-z0-cot*arcS[i])*iezz2[i];
   }
   zchi2 /= (4-2);
+}
+
+void findImpactPosition(TVector3 * mcPosition, TLorentzVector * mcMomentum, int charge, TVector2 & helixCenter, TVector3 & impactPosition){
+
+  // Finds the impact position. Everything is in cm, and GeV.
+  // Input:   production vertex (mcx, mcy, mcz),
+  //          momentum at production vertex (px, py, pz)
+  //          charge of particle.
+  // Output:  helix center's coordiante (hcx, hcy)
+  //          impact position (impactX, impactY, impactZ)
+
+  double rho = sqrt(pow(mcMomentum->Px(),2)+pow(mcMomentum->Py(),2))/0.3/1.5*100;
+  double hcx = mcPosition->X()+rho*cos(atan2(mcMomentum->Py(),mcMomentum->Px())-charge*TMath::Pi()/2);
+  double hcy = mcPosition->Y()+rho*sin(atan2(mcMomentum->Py(),mcMomentum->Px())-charge*TMath::Pi()/2);
+  helixCenter.Set(hcx,hcy);
+  double impactX = (helixCenter.Mod()-rho)/helixCenter.Mod()*helixCenter.X();
+  double impactY = (helixCenter.Mod()-rho)/helixCenter.Mod()*helixCenter.Y();
+  int signdS;
+  if(atan2(impactY, impactX) < atan2(mcPosition->Y(),mcPosition->X())) signdS = -1;
+  else signdS = 1;
+  double dS = 2*rho*asin(sqrt(pow(impactX-mcPosition->X(),2)+pow(impactY-mcPosition->Y(),2))/2/rho);
+  double impactZ = mcMomentum->Pz()/mcMomentum->Pt()*dS*signdS+mcPosition->Z();
+  impactPosition.SetXYZ(impactX, impactY, impactZ);
+
 }

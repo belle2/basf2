@@ -304,6 +304,9 @@ namespace Belle2 {
   private:
     /** Ensure that this object is registered, created and attached. */
     inline void ensureCreated() const {
+      if (m_storeArray && *m_storeArray)
+        return; //already attached, nothing to do
+
       DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, T::Class(), true);
       DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), true);
       if (!m_storeArray) {

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import sys
 import math
 from basf2 import *
@@ -21,11 +20,20 @@ h_phi = ROOT.TH1D('phi', 'Azimuth angle of particles', 200, -180, 180)
 h_theta = ROOT.TH1D('theta', 'Polar angle of particles', 200, 0, 180)
 h_costheta = ROOT.TH1D('costheta', 'Cosinus of the polar angle of particles',
                        200, -1, 1)
-h_vertex = ROOT.TH2D('xyvertex', 'XY Vertex of particles',
-                     200, -10, 10, 200, -10, 10)
+h_vertex = ROOT.TH2D(
+    'xyvertex',
+    'XY Vertex of particles',
+    200,
+    -10,
+    10,
+    200,
+    -10,
+    10,
+    )
 
 
 class ShowMCParticles(Module):
+
     """Simple module to collect some information about MCParticles"""
 
     def __init__(self):
@@ -53,7 +61,6 @@ class ShowMCParticles(Module):
                           mc.getProductionVertex().Y())
 
 
-# Create all modules needed to generate particles
 evtmetagen = register_module('EvtMetaGen')
 progress = register_module('Progress')
 particlegun = register_module('ParticleGun')
@@ -63,35 +70,31 @@ showMCPart = ShowMCParticles()
 evtmetagen.param({'EvtNumList': [10000], 'RunList': [1]})
 
 # Set parameters for particlegun
-particlegun.param({
-    # Generate 5 tracks
+particlegun.param({  # Generate 5 tracks But vary the number of tracks
+                     # according to Poisson distribution Generate pi+, pi-, e+
+                     # and e- with a normal distributed transversal momentum
+                     # with a center of 5 GeV and a width of 1 GeV a normal
+                     # distributed phi angle, center of 180 degree and a width
+                     # of 30 degree Generate theta angles uniform in cos theta
+                     # between 17 and 150 degree normal distributed vertex
+                     # generation around the origin with a sigma of 2cm in the
+                     # xy plane and no deviation in z all tracks sharing the
+                     # same vertex per event
     'nTracks': 5,
-    # But vary the number of tracks according to Poisson distribution
     'varyNTracks': True,
-    # Generate pi+, pi-, e+ and e-
     'pdgCodes': [211, -211, 11, -11],
-    # with a normal distributed transversal momentum
     'momentumGeneration': 'normalPt',
-    # with a center of 5 GeV and a width of 1 GeV
     'momentumParams': [5, 1],
-    # a normal distributed phi angle,
     'phiGeneration': 'normal',
-    # center of 180 degree and a width of 30 degree
     'phiParams': [180, 30],
-    # Generate theta angles uniform in cos theta
     'thetaGeneration': 'uniformCosinus',
-    # between 17 and 150 degree
     'thetaParams': [17, 150],
-    # normal distributed vertex generation
     'vertexGeneration': 'normal',
-    # around the origin with a sigma of 2cm in the xy plane
     'xVertexParams': [0, 2],
     'yVertexParams': [0, 2],
-    # and no deviation in z
     'zVertexParams': [0, 0],
-    # all tracks sharing the same vertex per event
     'independentVertices': False,
-})
+    })
 
 # create processing path
 main = create_path()
@@ -112,15 +115,18 @@ c.Divide(4, 2, 1e-5, 1e-5)
 
 # Draw all histograms
 histograms = [
-    h_nTracks, h_pdg, h_momentum, h_pt,
-    h_theta, h_costheta, h_phi,
-]
-
+    h_nTracks,
+    h_pdg,
+    h_momentum,
+    h_pt,
+    h_theta,
+    h_costheta,
+    h_phi,
+    ]
 for (i, h) in enumerate(histograms):
     c.cd(i + 1)
     h.SetMinimum(0)
     h.Draw()
-
 c.cd(i + 2)
 h_vertex.Draw('colz')
 c.Update()

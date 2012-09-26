@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import os
 from basf2 import *
 set_log_level(LogLevel.ERROR)
@@ -35,24 +34,28 @@ param_pGun = {  # this angle is only there to prevent curlers
     'zVertexParams': [0.0, 0.0],
     }
 pGun.param(param_pGun)
-
 g4sim = register_module('FullSim')
 
-# in this example I am switching off the effects only for Muons because energy loss for Muons is still active which means they still produce secondary particles
-# in the detector. If these particles also do not have any effects like decay the will curl in the detector for ever and the simulation needs ages to complete
+# in this example I am switching off the effects only for Muons because energy
+# loss for Muons is still active which means they still produce secondary
+# particles in the detector. If these particles also do not have any effects
+# like decay the will curl in the detector for ever and the simulation needs
+# ages to complete
 g4sim.param('UICommands', [  # "/process/inactivate     Transportation mu+",
                              # "/process/inactivate             muIoni mu+",
                              # "/process/inactivate            nKiller mu+",
                              # "/process/inactivate      ExtEnergyLoss mu+",
-                             # "/process/inactivate G4ErrorStepLengthLimit mu+",
-                             # "/process/inactivate ExtMagFieldLimitProcess mu+",
+                             # "/process/inactivate G4ErrorStepLengthLimit
+                             # mu+", "/process/inactivate
+                             # ExtMagFieldLimitProcess mu+",
                              # "/process/inactivate        StepLimiter mu+",
                              # "/process/inactivate     Transportation mu-",
                              # "/process/inactivate             muIoni mu-",
                              # "/process/inactivate            nKiller mu-",
                              # "/process/inactivate      ExtEnergyLoss mu-",
-                             # "/process/inactivate G4ErrorStepLengthLimit mu-",
-                             # "/process/inactivate ExtMagFieldLimitProcess mu-",
+                             # "/process/inactivate G4ErrorStepLengthLimit
+                             # mu-", "/process/inactivate
+                             # ExtMagFieldLimitProcess mu-",
     '/process/list',
     '/process/inactivate                msc mu+',
     '/process/inactivate              hIoni mu+',
@@ -168,14 +171,14 @@ g4sim.param('UICommands', [  # "/process/inactivate     Transportation mu+",
     '/process/inactivate      Scintillation mu-',
     ])
 # "/process/inactivate        StepLimiter mu-"
-
+#
 # digitizer
 cdcDigitizer = register_module('CDCDigitizer')
 
-# use one gaussian with resolution of 0.01 in the digitizer (to simplify the fitting)
+# use one gaussian with resolution of 0.01 in the digitizer (to simplify the
+# fitting)
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
 cdcDigitizer.param(param_cdcdigi)
-
 mctrackfinder = register_module('MCTrackFinder')
 param_mctrackfinder = {
     'UseCDCHits': 1,
@@ -189,11 +192,15 @@ mctrackfinder.param(param_mctrackfinder)
 trackfitter = register_module('GenFitter2')
 trackfitter.logging.log_level = LogLevel.WARNING
 trackfitter.param('noiseCoulomb', False)
-# you do not have to switch off bremsstrahlung in Genfit because it is only active for electrons (in Genfit!) anyway and this steering file uses only Muons
+# you do not have to switch off bremsstrahlung in Genfit because it is only
+# active for electrons (in Genfit!) anyway and this steering file uses only
+# Muons
 trackfitter.param('filterIterations', 3)
-
 trackfitchecker = register_module('TrackFitChecker')
-trackfitchecker.logging.log_level = LogLevel.INFO  # the results of the statistical tests will only show up at info or debug level
+trackfitchecker.logging.log_level = LogLevel.INFO  # the results of the
+                                                   # statistical tests will
+                                                   # only show up at info or
+                                                   # debug level
 trackfitchecker.param('testSi', False)
 trackfitchecker.param('writeToTextFile', True)
 trackfitchecker.param('writeToRootFile', True)
@@ -207,7 +214,6 @@ main = create_path()
 # Add modules to paths
 main.add_module(evtmetagen)
 main.add_module(evtmetainfo)
-
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pGun)
@@ -219,5 +225,4 @@ main.add_module(trackfitchecker)
 
 # Process events
 process(main)
-
 print statistics

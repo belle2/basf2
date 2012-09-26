@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-########################################################
-# This steering file shows all options for the
-# generation of four fermion final state events.
+######################################################## This steering file
+# shows all options for the generation of four fermion final state events.
 #
-# 100 four fermion final state QED events are generated
-# using the KoralW Fortran generator and some plots are
-# shown at the end.
+# 100 four fermion final state QED events are generated using the KoralW
+# Fortran generator and some plots are shown at the end.
 #
 # Example steering file - 2011 Belle II Collaboration
 ########################################################
@@ -77,24 +75,21 @@ class ShowMCParticles(Module):
                               mc.getProductionVertex().Y())
 
 
-## Register the event meta generator and set the number of events to 100
 evtmetagen = register_module('EvtMetaGen')
 evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
 
 ## Register the BHWideInput module
 koralw = register_module('KoralWInput')
 
-# Set the mode for the boost of the generated particles
-# 0 = no boost
-# 1 = BELLE II
-# 2 = BELLE
+# Set the mode for the boost of the generated particles 0 = no boost 1 = BELLE
+# II 2 = BELLE
 koralw.param('BoostMode', 1)
 
 # Set a random seed for the event generation
 koralw.param('RandomSeed', 2710)
 
-# Set the logging level for the KoralW module to INFO in order to
-# see the total cross section
+# Set the logging level for the KoralW module to INFO in order to see the total
+# cross section
 koralw.set_log_level(LogLevel.INFO)
 
 ## Register the Progress module and the Python histogram module
@@ -128,12 +123,10 @@ histograms = [
     h_costheta,
     h_phi,
     ]
-
 for (i, h) in enumerate(histograms):
     c.cd(i + 1)
     h.SetMinimum(0)
     h.Draw()
-
 c.cd(i + 2)
 h_vertex.Draw('colz')
 c.Update()

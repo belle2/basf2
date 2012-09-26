@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 from basf2 import *
 
 # ...Particle Gun...
@@ -23,10 +22,10 @@ particlegun.param('zVertexParams', [0, 0.00])
 
 # ...G4Sim...
 g4sim = register_module('FullSim')
-# Turn off physics processes
-#    "physics.mac" is located at "trg/examples/" or "tracking/examples"
-# g4sim.param('UICommands',['/control/execute physics.mac'])
-
+# Turn off physics processes "physics.mac" is located at "trg/examples/" or
+# "tracking/examples" g4sim.param('UICommands',['/control/execute
+# physics.mac'])
+#
 # ...EvtMetaGen...
 evtmetagen = register_module('EvtMetaGen')
 evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})

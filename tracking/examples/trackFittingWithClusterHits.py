@@ -7,18 +7,16 @@ from basf2 import *
 from subprocess import call
 set_log_level(LogLevel.ERROR)
 set_random_seed(3)
-
 evtmetagen = register_module('EvtMetaGen')
 evtmetagen.param('ExpList', [0])
 evtmetagen.param('RunList', [1])
 evtmetagen.param('EvtNumList', [1000])
-
 evtmetainfo = register_module('EvtMetaInfo')
-
 gearbox = register_module('Gearbox')
-
 geometry = register_module('Geometry')
-geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])  # only the tracking detectors will be simulated. Makes this example much faster
+
+# only the tracking detectors will be simulated. Makes this example much faster
+geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
 
 pGun = register_module('ParticleGun')
 # Set parameters for particlegun
@@ -36,7 +34,6 @@ pGun.param({
     'yVertexParams': [0.0, 0.0],
     'zVertexParams': [0.0, 0.0],
     })
-
 g4sim = register_module('FullSim')
 SVDDIGI = register_module('SVDDigitizer')
 # SVDDIGI.logging.log_level = LogLevel.DEBUG
@@ -63,7 +60,10 @@ trackfitter = register_module('GenFitter')
 trackfitter.logging.log_level = LogLevel.WARNING
 trackfitter.param('UseClusters', True)
 trackfitchecker = register_module('TrackFitChecker')
-trackfitchecker.logging.log_level = LogLevel.INFO  # the reults of the statistical tests will only show up at info or debug level
+trackfitchecker.logging.log_level = LogLevel.INFO  # the reults of the
+                                                   # statistical tests will
+                                                   # only show up at info or
+                                                   # debug level
 trackfitchecker.param('testSi', False)
 trackfitchecker.param('robustTests', True)
 
@@ -85,6 +85,4 @@ main.add_module(trackfitter)
 main.add_module(trackfitchecker)
 # Process events
 process(main)
-
 print statistics
-

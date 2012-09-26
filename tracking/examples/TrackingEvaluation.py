@@ -1,30 +1,42 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-###########################################################################################################################
-# This steering file is an example how to execute MC based track finding and fitting and 'realistic' track finding and fitting in one file. The results are stored in the TrackingOutput branch and allows a comparison between the two ways, and thus allows an evaluation of the pattern recognition.
-# This is just an example of how the evaluation can be performed, it is surely can and should be improved in the future, so it is just meant to be an orientation help for people who are starting to work on tracking in basf2 and not as ultimate solution.
+##############################################################################
+############################################## This steering file is an
+# example how to execute MC based track finding and fitting and 'realistic'
+# track finding and fitting in one file. The results are stored in the
+# TrackingOutput branch and allows a comparison between the two ways, and thus
+# allows an evaluation of the pattern recognition. This is just an example of
+# how the evaluation can be performed, it is surely can and should be improved
+# in the future, so it is just meant to be an orientation help for people who
+# are starting to work on tracking in basf2 and not as ultimate solution.
 #
+# This steering file creates the Belle II detector geometry, perfoms the
+# simulation, mc based and realistic pattern recognition in der CDC. Afterwards
+# the resulting tracks are fitted and stored in a suitable way.
 #
-# This steering file creates the Belle II detector geometry,
-# perfoms the simulation, mc based and realistic pattern recognition in der CDC. Afterwards the resulting tracks are fitted and stored in a suitable way.
+# EvtMetaGen and EvtMetaInfo generates and shows event meta data (see example
+# in the framework package). Gearbox and Geometry are used to create the Belle2
+# detector geometry. The generator used in this example is geant4 particle gun
+# (see example in the simulation or generator package). FullSim performs the
+# full simulation.
 #
-# EvtMetaGen and EvtMetaInfo generates and shows event meta data (see example in the framework package).
-# Gearbox and Geometry are used to create the Belle2 detector geometry.
-# The generator used in this example is geant4 particle gun (see example in the simulation or generator package).
-# FullSim performs the full simulation.
-
-# CDCDigitizer creates the detecotor response in the CDC for the simulated Hits.
-
-# MCTrackFinder creates relations between MCParticles and CDCHits/PXDTrueHits/SVDTrueHits produced by it.
-# CDCTracking performs pattern recognition in the CDC based on conformal algorithm. GFTrackCandidates with corresponding hit indices and start values are created.
-# GenFitter fits the found GFTrackCandidates and created two track collections: GFTracks (Genfit class) and Tracks (class with helix parametrization)
+# CDCDigitizer creates the detecotor response in the CDC for the simulated
+# Hits.
+#
+# MCTrackFinder creates relations between MCParticles and
+# CDCHits/PXDTrueHits/SVDTrueHits produced by it. CDCTracking performs pattern
+# recognition in the CDC based on conformal algorithm. GFTrackCandidates with
+# corresponding hit indices and start values are created. GenFitter fits the
+# found GFTrackCandidates and created two track collections: GFTracks (Genfit
+# class) and Tracks (class with helix parametrization)
 #
 # TrackingOutput creates the TrackingOutput objects to store the results.
 #
 # For details about module parameters just type > basf2 -m .
 #
-############################################################################################################################
+##############################################################################
+###############################################
 
 import os
 from basf2 import *
@@ -36,15 +48,14 @@ evtmetagen = register_module('EvtMetaGen')
 evtmetagen.param('ExpList', [0])
 evtmetagen.param('RunList', [1])
 evtmetagen.param('EvtNumList', [1])
-
 evtmetainfo = register_module('EvtMetaInfo')
 
 # create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 
-# simulate only tracking detectors
-# to simulate the whole detector included in BelleII.xml, comment the next line out
+# simulate only tracking detectors to simulate the whole detector included in
+# BelleII.xml, comment the next line out
 geometry.param('Components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'
                ])
 
@@ -67,7 +78,6 @@ param_pGun = {
     'yVertexParams': [0.0, 0.0],
     'zVertexParams': [0.0, 0.0],
     }
-
 pGun.param(param_pGun)
 
 # simulation
@@ -78,7 +88,8 @@ g4sim.logging.log_level = LogLevel.ERROR
 # digitizer
 cdcDigitizer = register_module('CDCDigitizer')
 
-# use one gaussian with resolution of 0.01 in the digitizer (to simplify the fitting)
+# use one gaussian with resolution of 0.01 in the digitizer (to simplify the
+# fitting)
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
 cdcDigitizer.param(param_cdcdigi)
 
@@ -107,7 +118,8 @@ mcfitting.param(param_mcfitting)
 # pattern recognition
 cdctracking = register_module('CDCTracking')
 
-# give the collection a custom name to mark that it is coming from pattern recognition
+# give the collection a custom name to mark that it is coming from pattern
+# recognition
 param_cdctracking = {'GFTrackCandidatesColName': 'GFTrackCands_PatternReco'}
 cdctracking.param(param_cdctracking)
 
@@ -122,8 +134,9 @@ mcmatching.param(param_mcmatching)
 cdcfitting = register_module('GenFitter')
 
 # set correct collection name as input and custom collection names as output
-# select DAF instead of Kalman as Filter
-# set the pdg hypothesis to the simulated one, if you want to fit with different pdg hypothesises, set 'allPDG' to true
+# select DAF instead of Kalman as Filter set the pdg hypothesis to the
+# simulated one, if you want to fit with different pdg hypothesises, set
+# 'allPDG' to true
 param_cdcfitting = {
     'GFTrackCandidatesColName': 'GFTrackCands_PatternReco',
     'TracksColName': 'Tracks_PatternReco',
@@ -135,14 +148,13 @@ param_cdcfitting = {
     'NIterations': 1,
     'ProbCut': 0.001,
     }
-
 cdcfitting.param(param_cdcfitting)
 
 # create TrackingOutputObjects
 trackingoutput = register_module('TrackingOutput')
 
 # output
-output = register_module('SimpleOutput')
+output = register_module('RootOutput')
 # write out only the interesting branch
 output.param('branchNames', ['TrackingOutputs'])
 output.param('outputFileName', 'TrackingEvaluationOutput.root')
@@ -153,21 +165,16 @@ main = create_path()
 # Add modules to paths
 main.add_module(evtmetagen)
 main.add_module(evtmetainfo)
-
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pGun)
 main.add_module(g4sim)
-
 main.add_module(cdcDigitizer)
-
 main.add_module(mctrackfinder)
 main.add_module(mcfitting)
-
 main.add_module(cdctracking)
 main.add_module(mcmatching)
 main.add_module(cdcfitting)
-
 main.add_module(trackingoutput)
 main.add_module(output)
 

@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# WARNING THIS EXAMPLES ONLY WORKS IF ONE MANULAY EDITS THE FILES SVD.xml IN svd/data AND PXD.xml IN pxd/data
-# MORE PRESISELY ONE HAS TO CHANGE THE LINE
-# <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">False</SeeNeutrons>
-# TO
-# <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">True</SeeNeutrons>
-# IN BOTH FILES
+# WARNING THIS EXAMPLES ONLY WORKS IF ONE MANULAY EDITS THE FILES SVD.xml IN
+# svd/data AND PXD.xml IN pxd/data MORE PRESISELY ONE HAS TO CHANGE THE LINE
+# <SeeNeutrons desc="Set to true to make sensitive detectors see
+# neutrons">False</SeeNeutrons> TO <SeeNeutrons desc="Set to true to make
+# sensitive detectors see neutrons">True</SeeNeutrons> IN BOTH FILES
 
 import os
 from basf2 import *
@@ -42,7 +41,6 @@ param_pGun = {  # this angle is only there to prevent curlers
     'zVertexParams': [0.0, 0.0],
     }
 pGun.param(param_pGun)
-
 g4sim = register_module('FullSim')
 g4sim.param('UICommands', [  # "/process/inactivate     Transportation",
                              # "/process/inactivate            nKiller",
@@ -118,17 +116,20 @@ param_mctrackfinder = {
     'Smearing': 0,
     }
 mctrackfinder.param(param_mctrackfinder)
-
 trackfitter = register_module('GenFitter2')
 trackfitter.logging.log_level = LogLevel.WARNING
 trackfitter.param('energyLossBetheBloch', False)
 trackfitter.param('noiseBetheBloch', False)
 trackfitter.param('noiseCoulomb', False)
-# you do not have to switch off bremsstrahlung in Genfit becuse it is only active for electrons (in Genfit!) anyway and this steering file uses only Pions
+# you do not have to switch off bremsstrahlung in Genfit becuse it is only
+# active for electrons (in Genfit!) anyway and this steering file uses only
+# Pions
 trackfitter.param('filterIterations', 3)
-
 trackfitchecker = register_module('TrackFitChecker')
-trackfitchecker.logging.log_level = LogLevel.INFO  # the reults of the statistical tests will only show up at info or debug level
+trackfitchecker.logging.log_level = LogLevel.INFO  # the reults of the
+                                                   # statistical tests will
+                                                   # only show up at info or
+                                                   # debug level
 trackfitchecker.param('testSi', False)
 trackfitchecker.param('writeToTextFile', True)
 trackfitchecker.param('writeToRootFile', True)
@@ -142,7 +143,6 @@ main = create_path()
 # Add modules to paths
 main.add_module(evtmetagen)
 main.add_module(evtmetainfo)
-
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pGun)
@@ -153,5 +153,4 @@ main.add_module(trackfitchecker)
 
 # Process events
 process(main)
-
 print statistics

@@ -38,24 +38,5 @@ namespace Belle2 {
   };
 
 }
-/*
-
-limitations:
-  only event durability
-  only default relation names
-  1-to-many -> many 1-to-1
-
-cache: this array
-
-map name -> array
-map type -> array of names/arrays
-
-addRelationTo
-  this->IsA()->GetName()
-  T::ClassName()
-
-cleanup/consolidate(kept/removed indices)
-
- */
 
 #endif /* RELATIONSINTERFACE_H */

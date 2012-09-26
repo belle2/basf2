@@ -43,12 +43,12 @@ namespace Belle2 {
     : _cdc(TRGCDC) {
       m_Trg_PI = 3.141592653589793;
       // Initialize rr, ztostraw, anglest, nWiresInStereoLayer.
-      CDCGeometryPar* cdcp = CDCGeometryPar::Instance();
+      cdc::CDCGeometryPar& cdcp = cdc::CDCGeometryPar::Instance();
       for(int stSuperLayer=0;stSuperLayer<4;stSuperLayer++){
-        m_rr[stSuperLayer]=cdcp->senseWireR(12*stSuperLayer+10)*0.01;
-        m_ztostraw[stSuperLayer]=cdcp->senseWireBZ(12*stSuperLayer+10)*0.01;
-        m_anglest[stSuperLayer]=2*m_rr[stSuperLayer]*sin(m_Trg_PI*cdcp->nShifts(12*stSuperLayer+10)/(2*cdcp->nWiresInLayer(12*stSuperLayer+10)))/(cdcp->senseWireFZ(12*stSuperLayer+10)-cdcp->senseWireBZ(12*stSuperLayer+10))/0.01;
-        m_nWires[stSuperLayer]=cdcp->nWiresInLayer(12*stSuperLayer+10)*2;
+        m_rr[stSuperLayer]=cdcp.senseWireR(12*stSuperLayer+10)*0.01;
+        m_ztostraw[stSuperLayer]=cdcp.senseWireBZ(12*stSuperLayer+10)*0.01;
+        m_anglest[stSuperLayer]=2*m_rr[stSuperLayer]*sin(m_Trg_PI*cdcp.nShifts(12*stSuperLayer+10)/(2*cdcp.nWiresInLayer(12*stSuperLayer+10)))/(cdcp.senseWireFZ(12*stSuperLayer+10)-cdcp.senseWireBZ(12*stSuperLayer+10))/0.01;
+        m_nWires[stSuperLayer]=cdcp.nWiresInLayer(12*stSuperLayer+10)*2;
       }
       // Hough Variables.
       m_cotStart = -3;

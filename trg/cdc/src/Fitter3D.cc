@@ -325,22 +325,22 @@ namespace Belle2 {
     m_flagNonTSStudy = 0;
 
     // Geometry
-    CDCGeometryPar* cdcp = CDCGeometryPar::Instance();
+    cdc::CDCGeometryPar& cdcp = cdc::CDCGeometryPar::Instance();
     //Initialize rr,ztostarw,anglest,ni
-    rr[0]=cdcp->senseWireR(2)*0.01;
-    rro[0]=cdcp->senseWireR(2)*0.01;
-    ni[0]=cdcp->nWiresInLayer(2)*2;
+    rr[0]=cdcp.senseWireR(2)*0.01;
+    rro[0]=cdcp.senseWireR(2)*0.01;
+    ni[0]=cdcp.nWiresInLayer(2)*2;
     for(int axSuperLayer=1;axSuperLayer<5;axSuperLayer++){
-      rr[axSuperLayer]=cdcp->senseWireR(12*axSuperLayer+4)*0.01;
-      rro[2*axSuperLayer]=cdcp->senseWireR(12*axSuperLayer+4)*0.01;
-      ni[2*axSuperLayer]=cdcp->nWiresInLayer(12*axSuperLayer+4)*2;
+      rr[axSuperLayer]=cdcp.senseWireR(12*axSuperLayer+4)*0.01;
+      rro[2*axSuperLayer]=cdcp.senseWireR(12*axSuperLayer+4)*0.01;
+      ni[2*axSuperLayer]=cdcp.nWiresInLayer(12*axSuperLayer+4)*2;
     }
     for(int stSuperLayer=0;stSuperLayer<4;stSuperLayer++){
-      rr[stSuperLayer+5]=cdcp->senseWireR(12*stSuperLayer+10)*0.01;
-      ztostraw[stSuperLayer]=cdcp->senseWireBZ(12*stSuperLayer+10)*0.01;
-      anglest[stSuperLayer]=2*rr[stSuperLayer+5]*sin(m_Trg_PI*cdcp->nShifts(12*stSuperLayer+10)/(2*cdcp->nWiresInLayer(12*stSuperLayer+10)))/(cdcp->senseWireFZ(12*stSuperLayer+10)-cdcp->senseWireBZ(12*stSuperLayer+10))/0.01;
-      rro[2*stSuperLayer+1]=cdcp->senseWireR(12*stSuperLayer+10)*0.01;
-      ni[2*stSuperLayer+1]=cdcp->nWiresInLayer(12*stSuperLayer+10)*2;
+      rr[stSuperLayer+5]=cdcp.senseWireR(12*stSuperLayer+10)*0.01;
+      ztostraw[stSuperLayer]=cdcp.senseWireBZ(12*stSuperLayer+10)*0.01;
+      anglest[stSuperLayer]=2*rr[stSuperLayer+5]*sin(m_Trg_PI*cdcp.nShifts(12*stSuperLayer+10)/(2*cdcp.nWiresInLayer(12*stSuperLayer+10)))/(cdcp.senseWireFZ(12*stSuperLayer+10)-cdcp.senseWireBZ(12*stSuperLayer+10))/0.01;
+      rro[2*stSuperLayer+1]=cdcp.senseWireR(12*stSuperLayer+10)*0.01;
+      ni[2*stSuperLayer+1]=cdcp.nWiresInLayer(12*stSuperLayer+10)*2;
     }
 
     // Save geometry to root file
@@ -410,7 +410,7 @@ namespace Belle2 {
 	      unsigned ind=wires[k]->hit()->iCDCHit();
 	      int simind=rels[ind].getFromIndex();
 	      CDCSimHit &h=*SimHits[simind];
-	      cout << "TSflag: " <<h.getLayerId()<< " " << ptn << " " <<h.getPosFlag() << endl;
+	      cout << "TSflag: " <<h.getWireID().getICLayer()<< " " << ptn << " " <<h.getPosFlag() << endl;
 	    }
 	  }
 	}
@@ -575,7 +575,7 @@ namespace Belle2 {
           for( int iHits = 0; iHits < SimHits->GetEntriesFast(); iHits++){
              CDCSimHit* aCDCSimHit = SimHits[iHits];
              TVector3 posTrack = aCDCSimHit->getPosTrack();
-             int hitLayerId = aCDCSimHit->getLayerId(); 
+             int hitLayerId = aCDCSimHit->getWireID().getICLayer(); 
              double hitDriftLength = aCDCSimHit->getDriftLength() * Unit::cm;
              // Find 9 TS values
              for( int iTS = 0; iTS < 9; iTS++) {

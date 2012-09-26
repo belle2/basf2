@@ -61,14 +61,14 @@ TRGCDCSegment::~TRGCDCSegment() {
 void
 TRGCDCSegment::initialize(bool fevtTime){
   flagevtTime=fevtTime;
-  CDCGeometryPar* cdcp=CDCGeometryPar::Instance();
-  wireR[0]=cdcp->senseWireR(2)*0.01;
-  nWires[0]=cdcp->nWiresInLayer(2)*2;
+  cdc::CDCGeometryPar& cdcp=cdc::CDCGeometryPar::Instance();
+  wireR[0]=cdcp.senseWireR(2)*0.01;
+  nWires[0]=cdcp.nWiresInLayer(2)*2;
   for(int i=0;i<4;i++){
-    wireR[2*i+1]=cdcp->senseWireR(12*i+10)*0.01;
-    wireR[2*(i+1)]=cdcp->senseWireR(12*(i+1)+4)*0.01;
-    nWires[2*i+1]=cdcp->nWiresInLayer(12*i+10)*2;
-    nWires[2*(i+1)]=cdcp->nWiresInLayer(12*(i+1)+4)*2;
+    wireR[2*i+1]=cdcp.senseWireR(12*i+10)*0.01;
+    wireR[2*(i+1)]=cdcp.senseWireR(12*(i+1)+4)*0.01;
+    nWires[2*i+1]=cdcp.nWiresInLayer(12*i+10)*2;
+    nWires[2*(i+1)]=cdcp.nWiresInLayer(12*(i+1)+4)*2;
   }
 }
 

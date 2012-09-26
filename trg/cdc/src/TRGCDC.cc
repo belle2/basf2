@@ -185,19 +185,19 @@ TRGCDC::_cdc = 0;
     }
   }
 
-  void
-  TRGCDC::initialize(bool houghFinderPerfect,
-                     unsigned houghFinderMeshX,
-                     unsigned houghFinderMeshY)
-  {
+void
+TRGCDC::initialize(bool houghFinderPerfect,
+		   unsigned houghFinderMeshX,
+		   unsigned houghFinderMeshY) {
 
     //...CDC...
-    Belle2::CDCGeometryPar& cdc2 = * Belle2::CDCGeometryPar::Instance();
+    Belle2::cdc::CDCGeometryPar & cdc2 =
+	Belle2::cdc::CDCGeometryPar::Instance();
     const unsigned nLayers = cdc2.nWireLayers();
 
     //...Loop over layers...
     int superLayerId = -1;
-    vector<TRGCDCLayer*> * superLayer;
+    vector<TRGCDCLayer *> * superLayer;
     unsigned lastNWires = 0;
     int lastShifts = -1000;
     int ia = -1;
@@ -208,88 +208,88 @@ TRGCDC::_cdc = 0;
     float fwrLast = 0;
     unsigned axialStereoSuperLayerId = 0;
     for (unsigned i = 0; i < nLayers; i++) {
-      const unsigned nWiresInLayer = cdc2.nWiresInLayer(i);
+	const unsigned nWiresInLayer = cdc2.nWiresInLayer(i);
 
-      //...Axial or stereo?...
-      int nShifts = cdc2.nShifts(i);
-      bool axial = true;
-      if (nShifts != 0)
-        axial = false;
+	//...Axial or stereo?...
+	int nShifts = cdc2.nShifts(i);
+	bool axial = true;
+	if (nShifts != 0)
+	    axial = false;
+	
+	unsigned axialStereoLayerId = 0;
+	if (axial) {
+	    ++ia;
+	    axialStereoLayerId = ia;
+	} else {
+	    ++is;
+	    axialStereoLayerId = is;
+	}
 
-      unsigned axialStereoLayerId = 0;
-      if (axial) {
-        ++ia;
-        axialStereoLayerId = ia;
-      } else {
-        ++is;
-        axialStereoLayerId = is;
-      }
+	//...Is this in a new super layer?...
+	if ((lastNWires != nWiresInLayer) || (lastShifts != nShifts)) {
+	    ++superLayerId;
+	    superLayer = new vector<TRGCDCLayer *>;
+	    _superLayers.push_back(superLayer);
+	    if (axial) {
+		++ias;
+		axialStereoSuperLayerId = ias;
+		_axialSuperLayers.push_back(superLayer);
+	    } else {
+		++iss;
+		axialStereoSuperLayerId = iss;
+		_stereoSuperLayers.push_back(superLayer);
+	    }
+	    lastNWires = nWiresInLayer;
+	    lastShifts = nShifts;
+	}
 
-      //...Is this in a new super layer?...
-      if ((lastNWires != nWiresInLayer) || (lastShifts != nShifts)) {
-        ++superLayerId;
-        superLayer = new vector<TRGCDCLayer*>;
-        _superLayers.push_back(superLayer);
-        if (axial) {
-          ++ias;
-          axialStereoSuperLayerId = ias;
-          _axialSuperLayers.push_back(superLayer);
-        } else {
-          ++iss;
-          axialStereoSuperLayerId = iss;
-          _stereoSuperLayers.push_back(superLayer);
-        }
-        lastNWires = nWiresInLayer;
-        lastShifts = nShifts;
-      }
+	//...Calculate radius...
+	const float swr = cdc2.senseWireR(i);
+	float fwr = cdc2.fieldWireR(i);
+	if (i == nLayers - 2)
+	    fwrLast = fwr;
+	else if (i == nLayers - 1)
+	    fwr = swr + (swr - fwrLast);
+	const float innerRadius = swr - (fwr - swr);
+	const float outerRadius = swr + (fwr - swr);
+	
+	if (TRGDebug::level() > 9)
+	    cout << "lyr " << i << ", in=" << innerRadius << ", out="
+		 << outerRadius << ", swr=" << swr << ", fwr" << fwr << endl;
 
-      //...Calculate radius...
-      const float swr = cdc2.senseWireR(i);
-      float fwr = cdc2.fieldWireR(i);
-      if (i == nLayers - 2)
-        fwrLast = fwr;
-      else if (i == nLayers - 1)
-        fwr = swr + (swr - fwrLast);
-      const float innerRadius = swr - (fwr - swr);
-      const float outerRadius = swr + (fwr - swr);
-
-      if (TRGDebug::level() > 9)
-        cout << "lyr " << i << ", in=" << innerRadius << ", out="
-             << outerRadius << ", swr=" << swr << ", fwr" << fwr << endl;
-
-      //...New layer...
-      TRGCDCLayer* layer = new TRGCDCLayer(i,
-                                           superLayerId,
-                                           _superLayers[superLayerId]->size(),
-                                           axialStereoLayerId,
-                                           axialStereoSuperLayerId,
-                                           cdc2.zOffsetWireLayer(i),
-                                           nShifts,
-                                           M_PI * cdc2.senseWireR(i)
-                                           * cdc2.senseWireR(i)
-                                           / double(nWiresInLayer),
-                                           nWiresInLayer,
-                                           innerRadius,
-                                           outerRadius);
-      _layers.push_back(layer);
-      superLayer->push_back(layer);
-      if (axial)
-        _axialLayers.push_back(layer);
-      else
-        _stereoLayers.push_back(layer);
-
-      //...Loop over all wires in a layer...
-      for (unsigned j = 0; j < nWiresInLayer; j++) {
-        const P3D fp = P3D(cdc2.wireForwardPosition(i, j).x(),
-                           cdc2.wireForwardPosition(i, j).y(),
-                           cdc2.wireForwardPosition(i, j).z());
-        const P3D bp = P3D(cdc2.wireBackwardPosition(i, j).x(),
-                           cdc2.wireBackwardPosition(i, j).y(),
-                           cdc2.wireBackwardPosition(i, j).z());
-        TCWire* tw = new TCWire(nWires++, j, * layer, fp, bp);
-        _wires.push_back(tw);
-        layer->push_back(tw);
-      }
+	//...New layer...
+	TRGCDCLayer* layer = new TRGCDCLayer(i,
+					     superLayerId,
+					    _superLayers[superLayerId]->size(),
+					     axialStereoLayerId,
+					     axialStereoSuperLayerId,
+					     cdc2.zOffsetWireLayer(i),
+					     nShifts,
+					     M_PI * cdc2.senseWireR(i)
+					     * cdc2.senseWireR(i)
+					     / double(nWiresInLayer),
+					     nWiresInLayer,
+					     innerRadius,
+					     outerRadius);
+	_layers.push_back(layer);
+	superLayer->push_back(layer);
+	if (axial)
+	    _axialLayers.push_back(layer);
+	else
+	    _stereoLayers.push_back(layer);
+	
+	//...Loop over all wires in a layer...
+	for (unsigned j = 0; j < nWiresInLayer; j++) {
+	    const P3D fp = P3D(cdc2.wireForwardPosition(i, j).x(),
+			       cdc2.wireForwardPosition(i, j).y(),
+			       cdc2.wireForwardPosition(i, j).z());
+	    const P3D bp = P3D(cdc2.wireBackwardPosition(i, j).x(),
+			       cdc2.wireBackwardPosition(i, j).y(),
+			       cdc2.wireBackwardPosition(i, j).z());
+	    TCWire* tw = new TCWire(nWires++, j, * layer, fp, bp);
+	    _wires.push_back(tw);
+	    layer->push_back(tw);
+	}
     }
 
     //...LUT for LR decision : common to all TS...
@@ -309,99 +309,99 @@ TRGCDC::_cdc = 0;
     //...Make TSF's...
     const unsigned nWiresInTS[2] = {15, 11};
     const int shape[2][30] = {
-      {
-        -2,  0,  // relative layer id, relative wire id
-        -1, -1,  // assuming layer offset 0.0, not 0.5
-        -1,  0,
-        0,  -1,
-        0,   0,
-        0,   1,
-        1,  -2,
-        1,  -1,
-        1,   0,
-        1,   1,
-        2,  -2,
-        2,  -1,
-        2,   0,
-        2,   1,
-        2,   2
-      },
-      {
-        -2, -1,
-        -2,  0,
-        -2,  1,
-        -1, -1,
-        -1,  0,
-        0,   0,
-        1,  -1,
-        1,   0,
-        2,  -1,
-        2,   0,
-        2,   1,
-        0,   0,
-        0,   0,
-        0,   0,
-        0,   0
-      }
+	{
+	    -2,  0,  // relative layer id, relative wire id
+	    -1, -1,  // assuming layer offset 0.0, not 0.5
+	    -1,  0,
+	    0,  -1,
+	    0,   0,
+	    0,   1,
+	    1,  -2,
+	    1,  -1,
+	    1,   0,
+	    1,   1,
+	    2,  -2,
+	    2,  -1,
+	    2,   0,
+	    2,   1,
+	    2,   2
+	},
+	{
+	    -2, -1,
+	    -2,  0,
+	    -2,  1,
+	    -1, -1,
+	    -1,  0,
+	    0,   0,
+	    1,  -1,
+	    1,   0,
+	    2,  -1,
+	    2,   0,
+	    2,   1,
+	    0,   0,
+	    0,   0,
+	    0,   0,
+	    0,   0
+	}
     };
     const int layerOffset[2] = {4, 2};
     unsigned id = 0;
     unsigned idTS = 0;
     for (unsigned i = 0; i < nSuperLayers(); i++) {
-      unsigned tsType = 0;
-      if (i)
-        tsType = 1;
+	unsigned tsType = 0;
+	if (i)
+	    tsType = 1;
 
-      const unsigned nLayers = _superLayers[i]->size();
-      if (nLayers < 5) {
-        cout << "TRGCDC !!! can not create TS because "
-             << "#layers is less than 5 in super layer " << i
-             << endl;
-        continue;
-      }
+	const unsigned nLayers = _superLayers[i]->size();
+	if (nLayers < 5) {
+	    cout << "TRGCDC !!! can not create TS because "
+		 << "#layers is less than 5 in super layer " << i
+		 << endl;
+	    continue;
+	}
 
-      //...TS layer... w is a central wire
-      const TCCell& ww = *(* _superLayers[i])[layerOffset[tsType]]->front();
-      TRGCDCLayer* layer = new TRGCDCLayer(id++, ww);
-      _tsLayers.push_back(layer);
+	//...TS layer... w is a central wire
+	const TCCell& ww = *(* _superLayers[i])[layerOffset[tsType]]->front();
+	TRGCDCLayer* layer = new TRGCDCLayer(id++, ww);
+	_tsLayers.push_back(layer);
 
-      //...Loop over all wires in a central wire layer...
-      const unsigned nWiresInLayer = ww.layer().nCells();
-      for (unsigned j = 0; j < nWiresInLayer; j++) {
-        const TCWire& w =
-          * (TCWire*)(* (* _superLayers[i])[layerOffset[tsType]])[j];
+	//...Loop over all wires in a central wire layer...
+	const unsigned nWiresInLayer = ww.layer().nCells();
+	for (unsigned j = 0; j < nWiresInLayer; j++) {
+	    const TCWire& w =
+		* (TCWire*)(* (* _superLayers[i])[layerOffset[tsType]])[j];
+	    
+	    const unsigned localId = w.localId();
+	    const unsigned layerId = w.layerId();
+	    vector<const TCWire*> cells;
+	    
+	    for (unsigned k = 0; k < nWiresInTS[tsType]; k++) {
+		const unsigned laid = layerId + shape[tsType][k * 2];
+		const unsigned loid = localId + shape[tsType][k * 2 + 1];
+		
+		const TCWire* c = wire(laid, loid);
+		if (! c)
+		    cout << "TRGCDC !!! no such a wire for TS : "
+			 << "layer id=" << laid << ", local id=" << loid
+			 << endl;
+		
+		cells.push_back(c);
+	    }
 
-        const unsigned localId = w.localId();
-        const unsigned layerId = w.layerId();
-        vector<const TCWire*> cells;
-
-        for (unsigned k = 0; k < nWiresInTS[tsType]; k++) {
-          const unsigned laid = layerId + shape[tsType][k * 2];
-          const unsigned loid = localId + shape[tsType][k * 2 + 1];
-
-          const TCWire* c = wire(laid, loid);
-          if (! c)
-            cout << "TRGCDC !!! no such a wire for TS : "
-                 << "layer id=" << laid << ", local id=" << loid
-                 << endl;
-
-          cells.push_back(c);
-        }
-
-        //...Create a track segment...
-        TRGCDCSegment* ts = new TRGCDCSegment(idTS++,
-                                              * layer,
-                                              w,
-                                              _luts.back(),
-					      _eventTime.back(),
-                                              cells);
-
-	tstmp=ts;
-        //...Store it...
-        _tss.push_back(ts);
-        _tsSL[i].push_back(ts);
-        layer->push_back(ts);
-      }
+	    //...Create a track segment...
+	    TRGCDCSegment* ts = new TRGCDCSegment(idTS++,
+						  * layer,
+						  w,
+						  _luts.back(),
+						  _eventTime.back(),
+						  cells);
+	    
+	    tstmp=ts;
+	    //...Store it...
+	    _tss.push_back(ts);
+	    _tsSL[i].push_back(ts);
+	    layer->push_back(ts);
+	}
     }
 
     tstmp->initialize(_fevtTime);
@@ -414,23 +414,23 @@ TRGCDC::_cdc = 0;
     _r = new float[nSuperLayers() + 1];
     _r2 = new float[nSuperLayers() + 1];
     for (unsigned i = 0; i < nSuperLayers(); i++) {
-      const vector<TRGCDCLayer*> & slayer = * _superLayers[i];
-      _width[i] = M_PI * 2 / float(slayer.back()->nCells());
-      _r[i] = slayer[0]->innerRadius();
-      _r2[i] = _r[i] * _r[i];
-      if (i == (nSuperLayers() - 1)) {
-        _r[i + 1] = slayer.back()->outerRadius();
-        _r2[i + 1] = _r[i + 1] * _r[i + 1];
-      }
+	const vector<TRGCDCLayer*> & slayer = * _superLayers[i];
+	_width[i] = M_PI * 2 / float(slayer.back()->nCells());
+	_r[i] = slayer[0]->innerRadius();
+	_r2[i] = _r[i] * _r[i];
+	if (i == (nSuperLayers() - 1)) {
+	    _r[i + 1] = slayer.back()->outerRadius();
+	    _r2[i + 1] = _r[i + 1] * _r[i + 1];
+	}
 
-      if (TRGDebug::level() > 9) {
-        const TCCell& wi = * slayer[0]->front();
-        const unsigned layerId = wi.layerId();
-        cout << layerId << "," << cdc2.senseWireR(layerId) << ","
-             << cdc2.fieldWireR(layerId) << endl;
-        cout << "    super layer " << i << " radius=" << _r[i] << "(r^2="
-             << _r2[i] << ")" << endl;
-      }
+	if (TRGDebug::level() > 9) {
+	    const TCCell& wi = * slayer[0]->front();
+	    const unsigned layerId = wi.layerId();
+	    cout << layerId << "," << cdc2.senseWireR(layerId) << ","
+		 << cdc2.fieldWireR(layerId) << endl;
+	    cout << "    super layer " << i << " radius=" << _r[i] << "(r^2="
+		 << _r2[i] << ")" << endl;
+	}
     }
 
     //...Hough Finder...
@@ -453,7 +453,7 @@ TRGCDC::_cdc = 0;
 
     //...For module simulation (Front-end)...
     configure();
-
+    
     //...Initialize root file...
     m_file = new TFile((char*)_rootTRGCDCFilename.c_str(), "RECREATE");
     m_tree = new TTree("m_tree", "tree");
@@ -471,16 +471,15 @@ TRGCDC::_cdc = 0;
     m_evtTime = new TClonesArray("TVectorD");
     m_treeAllTracks->Branch("evtTime", &m_evtTime);
 
-  }
+}
 
-  void
-  TRGCDC::terminate(void)
-  {
+void
+TRGCDC::terminate(void) {
     _fitter3D->terminate();
     _h3DFinder->terminate();
     m_file->Write();
     m_file->Close();
-  }
+}
 
   void
   TRGCDC::dump(const string& msg) const

@@ -15,3 +15,9 @@ using namespace Belle2;
 //                 Register the Module
 //-----------------------------------------------------------------
 REG_MODULE(SimpleOutput)
+
+void SimpleOutputModule::initialize()
+{
+  B2WARNING("The SimpleOutput module is deprecated. Please change SimpleOutput to RootOutput in your steering files.");
+  RootOutputModule::initialize();
+}

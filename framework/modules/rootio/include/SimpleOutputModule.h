@@ -38,6 +38,9 @@ namespace Belle2 {
      *  Deletion of objects, that were created in the Constructor.
      */
     virtual ~SimpleOutputModule() { }
+
+    /** print a 'deprecated' warning. */
+    virtual void initialize();
   };
 } // end namespace Belle2
 

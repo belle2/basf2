@@ -71,6 +71,8 @@ SimpleInputModule::~SimpleInputModule()
 
 void SimpleInputModule::initialize()
 {
+  B2WARNING("The SimpleInput module is deprecated. Please change SimpleInput to RootInput in your steering files.");
+
   gSystem->Load("libdataobjects");
   const std::string& inputFileArgument = Environment::Instance().getInputFileOverride();
   if (!inputFileArgument.empty())

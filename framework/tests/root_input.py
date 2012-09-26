@@ -8,7 +8,7 @@ from basf2 import *
 # copy input file into current dir to avoid having the full path in .out file
 try:
     shutil.copy(os.getenv('BELLE2_LOCAL_DIR')
-                + '/framework/tests/simple_input.root', '.')
+                + '/framework/tests/root_input.root', '.')
 except:
     pass  # we're probably in tests/ directory, no copy necessary
 
@@ -16,7 +16,7 @@ input = register_module('RootInput')
 evtmetainfo = register_module('EvtMetaInfo')
 printcollections = register_module('PrintCollections')
 
-input.param('inputFileName', 'simple_input.root')
+input.param('inputFileName', 'root_input.root')
 # load all branches, minus PXDClusters
 input.param('branchNames', [
     'EventMetaData',

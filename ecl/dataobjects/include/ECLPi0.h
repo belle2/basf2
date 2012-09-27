@@ -108,6 +108,7 @@ namespace Belle2 {
     //! The method to get momentum
     TVector3 getp() const { TVector3 momentum(m_px, m_py, m_pz); return momentum ; }
 
+    //! The method to get return  HepLorentzVector Momentum
     HepLorentzVector get4Momentum() const {
       HepLorentzVector  momentum;
       momentum.setPx(m_px);

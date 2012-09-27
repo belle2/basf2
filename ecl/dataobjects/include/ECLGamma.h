@@ -35,6 +35,7 @@ namespace Belle2 {
     //! The method to get showerId
     int GetShowerId() const { return m_showerId ; }
 
+    //! The method to get return  TVector3 Momentum
     TVector3 getMomentum() const {
       TVector3 momentum(0., 0., 0.);
       StoreArray<ECLShower> eclRecShowerArray;

@@ -115,6 +115,7 @@ namespace Belle2 {
     //! The method to get return m_Time
     float GetTime() const { return m_Time ; }
 
+    //! The method to get return  TVector3 Momentum
     TVector3 getMomentum() const {
       TVector3 momentum(0., 0., 0.);
       double m_px = m_Energy * sin(m_Theta) * cos(m_Phi);

@@ -58,8 +58,9 @@ namespace Belle2 {
       /** Stopping of CPU clock.*/
       virtual void terminate();
 
-
+      /** define a map for Primary Track*/
       typedef std::map< int, int>  PrimaryTrackMap;
+      /** define a multimap for hits in showers */
       typedef std::multimap< int, int> HitShowerMap;
 
     protected:

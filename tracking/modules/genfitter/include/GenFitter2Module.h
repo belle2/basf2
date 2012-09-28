@@ -90,6 +90,7 @@ namespace Belle2 {
     std::string m_hitType;
     int m_hitTypeId;
     std::vector<double> m_dafTemperatures;
+    int m_smoothing;
 
 
   };

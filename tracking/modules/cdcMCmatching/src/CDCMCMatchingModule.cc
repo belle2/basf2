@@ -94,7 +94,7 @@ void CDCMCMatchingModule::event()
   if (gfTrackCandidates.getEntries() != 0) {
     for (int i = 0; i < gfTrackCandidates.getEntries(); i++) { //loop over all TrackCandidates
 
-      vector<unsigned int> cdcHitsIndexList = gfTrackCandidates[i]->GetHitIDs(2);   //indices of CDCHits for the candidate
+      vector<unsigned int> cdcHitsIndexList = gfTrackCandidates[i]->getHitIDs(2);   //indices of CDCHits for the candidate
       vector <pair<int, int> > mcParticleContributions;  // vector to store pairs <MCParticleId, Number of Hits from this MCParticle>
       pair <int, float> bestMCId(-999, 0.0); //index and the hit fraction of the matched MCParticle
 

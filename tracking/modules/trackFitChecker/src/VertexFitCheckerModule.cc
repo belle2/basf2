@@ -280,8 +280,8 @@ void VertexFitCheckerModule::terminate()
     B2WARNING(m_badTrackPValueVertices << " vertices had at least on track with a p value smaller than " << m_trackPValueCut << " and were not included in the statistical tests");
   }
 
-  if (m_processedVertices <= 1) {
-    B2WARNING("Only " << m_processedVertices << " vertices were processed. Statistics cannot be computed.");
+  if (m_processedVertices <= 1 or m_processedVertices == m_vertexNotPureCounter) {
+    B2WARNING("Only " << m_processedVertices - m_vertexNotPureCounter << " vertices were processed. Statistics cannot be computed.");
   } else {
     m_textOutput << "Number of processed Vertices: " << m_processedVertices << "\n";
     if (m_vertexNotPureCounter not_eq 0) {

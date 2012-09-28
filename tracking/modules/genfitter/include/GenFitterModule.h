@@ -104,9 +104,9 @@ namespace Belle2 {
 
     std::ofstream HelixParam;                        /**< Text output file name */
     bool m_createTextFile;                           /**< Boolean to select if an output file with helix parameters should be created. */
-    GFKalman m_kalmanFilter;                         /** The Genfit Kalman filter object */
-    GFDaf m_daf;                                     /** The Genfit Deterministic Annealing filter (DAF) object */
-    std::vector<double> m_dafTemperatures;           /** holds the annealing scheme for the DAF. The number of vector elements is the number of DAF iterations */
+    GFKalman m_kalmanFilter;                         /**< The Genfit Kalman filter object */
+    GFDaf m_daf;                                     /**< The Genfit Deterministic Annealing filter (DAF) object */
+    std::vector<double> m_dafTemperatures;           /**< holds the annealing scheme for the DAF. The number of vector elements is the number of DAF iterations */
 
   }; /** @} @} */
 } // end namespace Belle2

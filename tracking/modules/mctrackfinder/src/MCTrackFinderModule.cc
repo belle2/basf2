@@ -215,8 +215,9 @@ void MCTrackFinderModule::event()
       B2DEBUG(100, "PDG: " << aMcParticlePtr->getPDG() <<  " | property mask of particle " <<  mcParticleProperties << " demanded property mask " << m_particleProperties);
       continue; //goto next mcParticle, do not make track candidate
     }
-    //make links only for interesting MCParticles: energy cut, which subdetector was reached and a 'dirty hack' to avoid atoms which are unknown to GenFit and check for neutrals
-    if (aMcParticlePtr->getEnergy() < m_energyCut ||  abs(aMcParticlePtr->getPDG()) > 100000000 || aMcParticlePtr->getCharge() == forbiddenCharge) {
+    //make links only for interesting MCParticles: energy cut and check for neutrals
+    if (aMcParticlePtr->getEnergy() < m_energyCut || aMcParticlePtr->getCharge() == forbiddenCharge) {
+      B2DEBUG(100, "particle energy too low or not the right charge. mc particle will be skiped");
       continue; //goto next mcParticle, do not make track candidate
     }
 
@@ -318,13 +319,15 @@ void MCTrackFinderModule::event()
     //Errors for the position/momentum values can also be passed to GFTrackCandidate
     //Default values in Genfit are (1.,1.,1.,), they seem to be not good!!
     //The best way to set the 'correct' errors has to be investigated....
-    TVector3 posError;
-    posError.SetXYZ(1.0, 1.0, 2.0);
-    TVector3 momError;
-    momError.SetXYZ(0.1, 0.1, 0.2);
-
+    TMatrixD stateSeed(6, 1);
+    TMatrixD covSeed(6, 6);
+    covSeed.Zero(); // just to be save
+    stateSeed[0][0] = position[0]; stateSeed[1][0] = position[1]; stateSeed[2][0] = position[2];
+    stateSeed[3][0] = momentum[0]; stateSeed[4][0] = momentum[1]; stateSeed[5][0] = momentum[2];
+    covSeed[0][0] = 1; covSeed[1][1] = 1; covSeed[2][3] = 2 * 2;
+    covSeed[3][3] = 0.1 * 0.1; covSeed[0][0] = 0.1 * 0.1; covSeed[0][0] = 0.2 * 0.2;
     //Finally set the complete track seed
-    trackCandidates[counter]->setComplTrackSeed(position, momentum, pdg, posError, momError);
+    trackCandidates[counter]->set6DSeedAndPdgCode(stateSeed, pdg, covSeed);
 
     //Save the MCParticleID in the TrackCandidate
     trackCandidates[counter]->setMcTrackId(iPart);
@@ -334,7 +337,7 @@ void MCTrackFinderModule::event()
     B2DEBUG(100, " --- Create relation between GFTrackCand " << counter << " and MCParticle " << iPart);
 
     //member variable Dip is currently used to store the purity of the tracks, for MCTracks it is always 100 %
-    trackCandidates[counter]->setDip(100);
+    //trackCandidates[counter]->setDip(100); //it is better to compare GFTrackCands from this module with a "real" track finder to get calculate the purity in a separate step than putting it into something with intended for something else
 
     //assign indices of the Hits from all detectors, their are distinguishable by their DetID:
     // pxd 0

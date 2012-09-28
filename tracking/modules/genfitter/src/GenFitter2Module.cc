@@ -61,7 +61,7 @@
 #include <boost/foreach.hpp>
 //root stuff
 #include <TVector3.h>
-
+#include <TGeoManager.h>
 
 using namespace std;
 using namespace Belle2;
@@ -88,7 +88,7 @@ GenFitter2Module::GenFitter2Module() :
   addParam("angleCut", m_angleCut, "only process tracks with scattering angles smaller then angleCut (The angles are calculated from TrueHits). If negative value given no selection will take place", -1.0);
   addParam("mscModel", m_mscModel, "select the MSC model in Genfit", string("Highland"));
   addParam("hitType", m_hitType, "select what kind of hits are feeded to Genfit. Current Options \"TrueHit\", \"Cluster\" or \"VXDSimpleDigiHit\"", string("TrueHit"));
-
+  addParam("smoothing", m_smoothing, "select smooting type in Kalman filter: 0 = non; 1 = normal; 2 = fast", 2);
   addParam("dafTemperatures", m_dafTemperatures, "set the annealing scheme (temperatures) for the DAF. Length of vector will determine DAF iterations", vector<double>(1, -999.0));
 }
 
@@ -98,11 +98,12 @@ GenFitter2Module::~GenFitter2Module()
 
 void GenFitter2Module::initialize()
 {
-  // convert the geant4 geometry to a TGeo geometry
-  geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-  geoManager.createTGeoRepresentation();
-  //pass the magnetic field to genfit
-  GFFieldManager::getInstance()->init(new GFGeant4Field());
+  if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
+    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+    geoManager.createTGeoRepresentation();
+    //pass the magnetic field to genfit
+    GFFieldManager::getInstance()->init(new GFGeant4Field());
+  }
   // activate / deactivate material effects in genfit
   if (m_noEffects == true) {
     GFMaterialEffects::getInstance()->setNoEffects(true); //not yet possible in current basd2 genfit version (but already possible upstream)
@@ -291,25 +292,27 @@ void GenFitter2Module::event()
 
     if (filterTrack == false) { // fit the track
 
-      //get fit starting values from the MCParticle
-      TVector3 vertex = aTrackCandPointer->getPosSeed();
-      TVector3 vertexSigma = aTrackCandPointer->getPosError();
-      TVector3 momentum = aTrackCandPointer->getDirSeed() * abs(1.0 / aTrackCandPointer->getQoverPseed());
-      TVector3 dirSigma = aTrackCandPointer->getDirError();
-
-
-      //B2DEBUG(100,"MCIndex: "<<mcindex);
-      B2DEBUG(100, "Start values: momentum: " << momentum.x() << "  " << momentum.y() << "  " << momentum.z() << " " << momentum.Mag());
-      B2DEBUG(100, "Start values: momentum std: " << dirSigma.x() << "  " << dirSigma.y() << "  " << dirSigma.z());
-      B2DEBUG(100, "Start values: vertex:   " << vertex.x() << "  " << vertex.y() << "  " << vertex.z());
-      B2DEBUG(100, "Start values: vertex std:   " << vertexSigma.x() << "  " << vertexSigma.y() << "  " << vertexSigma.z());
+      //get fit starting values from the from the track candidate
+      TMatrixD stateSeed = aTrackCandPointer->getStateSeed();
+      TMatrixD covSeed = aTrackCandPointer->getCovSeed();
+      TVector3 momentumSeed(stateSeed[3][0], stateSeed[4][0], stateSeed[5][0]);
+      TVector3 posSeed(stateSeed[3][0], stateSeed[4][0], stateSeed[5][0]);
+      B2DEBUG(100, "Start values: momentum (x,y,z,abs): " << momentumSeed.x() << "  " << momentumSeed.y() << "  " << momentumSeed.z() << " " << momentumSeed.Mag());
+      B2DEBUG(100, "Start values: momentum std: " << sqrt(covSeed[3][3]) << "  " << sqrt(covSeed[4][4]) << "  " << sqrt(covSeed[5][5]));
+      B2DEBUG(100, "Start values: pos:   " << posSeed.x() << "  " << posSeed.y() << "  " << posSeed.z());
+      B2DEBUG(100, "Start values: pos std:   " << sqrt(covSeed[0][0]) << "  " << sqrt(covSeed[1][1]) << "  " << sqrt(covSeed[2][2]));
       B2DEBUG(100, "Start values: pdg:      " << aTrackCandPointer->getPdgCode());
-      RKTrackRep* trackRep;
-      //Now create a GenFit track with this representation
 
-      trackRep = new RKTrackRep(aTrackCandPointer);
+      //Now create a GenFit track with this representation
+      RKTrackRep* trackRep = new RKTrackRep(aTrackCandPointer);
       trackRep->setPropDir(1); // setting the prop dir disables the automatic selection of the direction (but it still will automatically change when switching between forward and backward filter
-      GFTrack track(trackRep, true);
+      GFTrack track(trackRep); // the track now has ownership of the trackRep do not try do manually delete it
+      if (m_smoothing == 1) {
+        track.setSmoothing(true, false);
+      } else if (m_smoothing == 2) {
+        track.setSmoothing(true, true);
+      }
+
 
       GFRecoHitFactory factory;
 
@@ -326,35 +329,35 @@ void GenFitter2Module::event()
       if (m_hitTypeId == 0) { // use the trueHits
         PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (&*pxdTrueHits);
         SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> (&*svdTrueHits);
-        CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
       } else if (m_hitTypeId == 1) {
         pxdSimpleDigiHitProducer =  new GFRecoHitProducer <VXDSimpleDigiHit, PXDRecoHit> (&*pxdSimpleDigiHits);
         svdSimpleDigiHitProducer =  new GFRecoHitProducer <VXDSimpleDigiHit, SVDRecoHit2D> (&*svdSimpleDigiHits);
       } else if (m_hitTypeId == 2) {
         pxdClusterProducer =  new GFRecoHitProducer <PXDCluster, PXDRecoHit> (&*pxdClusters);
         svdClusterProducer =  new GFRecoHitProducer <SVDCluster, SVDRecoHit> (&*svdClusters);
+      }
+      if (nCdcHits not_eq 0) {
         CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
       }
-
 
       //add producers to the factory with correct detector Id
 
       if (m_hitTypeId == 0) { // use the trueHits
         factory.addProducer(0, PXDProducer);
         factory.addProducer(1, SVDProducer);
-        factory.addProducer(2, CDCProducer);
       } else if (m_hitTypeId == 1) {
         factory.addProducer(0, pxdSimpleDigiHitProducer);
         factory.addProducer(1, svdSimpleDigiHitProducer);
       } else if (m_hitTypeId == 2) {
         factory.addProducer(0, pxdClusterProducer);
         factory.addProducer(1, svdClusterProducer);
+      }
+      if (nCdcHits not_eq 0) {
         factory.addProducer(2, CDCProducer);
       }
 
-      vector <GFAbsRecoHit*> factoryHits;
       //use the factory to create RecoHits for all Hits stored in the track candidate
-      factoryHits = factory.createMany(*aTrackCandPointer);
+      vector <GFAbsRecoHit*> factoryHits = factory.createMany(*aTrackCandPointer);
 
       //add created hits to the track
       track.addHitVector(factoryHits);

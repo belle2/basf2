@@ -46,6 +46,7 @@
 #include <GFException.h>
 
 #include <TMatrixDEigen.h>
+#include <TGeoManager.h>
 
 //C++ st libs
 #include <cmath>
@@ -97,12 +98,14 @@ void TrackFitCheckerModule::initialize()
   //cerr << "m_inspectTracks " << m_inspectTracks << endl;
 
 
-  //setup genfit geometry and magneic field in case you what to used data saved on disc because then the genifitter modul was not run
-  // convert the geant4 geometry to a TGeo geometry
-  geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-  geoManager.createTGeoRepresentation();
-  //pass the magnetic field to genfit
-  GFFieldManager::getInstance()->init(new GFGeant4Field());
+
+  if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
+    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+    geoManager.createTGeoRepresentation();
+    //pass the magnetic field to genfit
+    GFFieldManager::getInstance()->init(new GFGeant4Field());
+  }
+
   //set all user parameters
   if (m_inspectTracks > 0 and m_truthAvailable == false) {
     m_inspectTracks = 0;
@@ -298,7 +301,7 @@ void TrackFitCheckerModule::event()
 
     try {
       TMatrixD state;
-      fittedTracks[0]->getBK(0)->getMatrix("fPreSt", 0, state);
+      fittedTracks[0]->getBK(0)->getMatrix("fSt", 0, state);
     } catch (GFException& e) {
       //m_layerWiseTests.havePredicitons = false;
       m_testPrediction = false;
@@ -1126,12 +1129,12 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
     m_trackData.covs_sm.push_back(cov);
 
     if (m_testPrediction == true) {
-      aTrackPtr->getBK(trackRepId)->getMatrix("fPreSt", iGFHit, state);
-      aTrackPtr->getBK(trackRepId)->getMatrix("fPreCov", iGFHit, cov);
+      aTrackPtr->getBK(trackRepId)->getMatrix("fSt", iGFHit, state);
+      aTrackPtr->getBK(trackRepId)->getMatrix("fCov", iGFHit, cov);
       m_trackData.states_fp.push_back(state);
       m_trackData.covs_fp.push_back(cov);
-      aTrackPtr->getBK(trackRepId)->getMatrix("bPreSt", iGFHit, state);
-      aTrackPtr->getBK(trackRepId)->getMatrix("bPreCov", iGFHit, cov);
+      aTrackPtr->getBK(trackRepId)->getMatrix("bSt", iGFHit, state);
+      aTrackPtr->getBK(trackRepId)->getMatrix("bCov", iGFHit, cov);
       m_trackData.states_bp.push_back(state);
       m_trackData.covs_bp.push_back(cov);
     } else if (m_inspectTracks > 0) {

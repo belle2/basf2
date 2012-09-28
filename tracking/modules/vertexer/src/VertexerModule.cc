@@ -21,7 +21,7 @@
 
 #include <TVector3.h>
 #include <TMatrixD.h>
-
+#include <TGeoManager.h>
 
 
 
@@ -50,13 +50,12 @@ VertexerModule::VertexerModule() : Module()
 
 void VertexerModule::initialize()
 {
-  //setup genfit geometry and magneic field in case you what to used data saved on disc because then the genifitter module was not run
-  // convert the geant4 geometry to a TGeo geometry
-  geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-  geoManager.createTGeoRepresentation();
-  //pass the magnetic field to genfit
-  GFFieldManager::getInstance()->init(new GFGeant4Field());
-
+  if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
+    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+    geoManager.createTGeoRepresentation();
+    //pass the magnetic field to genfit
+    GFFieldManager::getInstance()->init(new GFGeant4Field());
+  }
   //register output datastore
   StoreArray<GFRaveVertex>::registerPersistent();// vertices;
 
@@ -74,10 +73,7 @@ void VertexerModule::initialize()
       B2ERROR("beamSpotPostion did not have exactly 3 elements or beamSpotCovariance did not have exactly 9 elements therefore beam spot info cannot be used");
     }
 
-
   }
-
-
 
 }
 

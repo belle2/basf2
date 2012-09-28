@@ -59,7 +59,7 @@
 #include <boost/foreach.hpp>
 
 #include <TMath.h>
-
+#include <TGeoManager.h>
 
 using namespace std;
 using namespace Belle2;
@@ -127,13 +127,12 @@ void GenFitterModule::initialize()
     HelixParam.open("HelixParam.txt");
   }
 
-  //convert geant4 geometry to TGeo geometry
-  //in the moment tesselated solids used for the glue within the PXD cannot be converted to TGeo, the general solution still has to be found, at the moment you can just comment out lines 6 and 13 in  pxd/data/PXD-Components.xml.
-  geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-  geoManager.createTGeoRepresentation();
-
-  //get the magnetic field
-  GFFieldManager::getInstance()->init(new GFGeant4Field());
+  if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
+    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+    geoManager.createTGeoRepresentation();
+    //pass the magnetic field to genfit
+    GFFieldManager::getInstance()->init(new GFGeant4Field());
+  }
   GFMaterialEffects::getInstance()->setMscModel("Highland");
 
   //set parameters for the fitter algorithm objects
@@ -224,7 +223,7 @@ void GenFitterModule::event()
 
   for (int i = 0; i < trackCandidates.getEntries(); ++i) { //loop over all track candidates
     B2DEBUG(99, "#############  Fit track candidate Nr. : " << i << "  ################");
-
+    GFTrackCand* aTrackCandPointer = trackCandidates[i];
     GFAbsTrackRep* trackRep;  //initialize track representation
 
     //there is different information from mctracks and 'real' pattern recognition tracks, e.g. for PR tracks the PDG is unknown
@@ -235,7 +234,9 @@ void GenFitterModule::event()
       //check for user chosen pdg, otherwise put the true pdg in the vector
       if (m_pdg != -999) {
         pdg.push_back(m_pdg);
-      } else pdg.push_back(trackCandidates[i]->getPdgCode());
+      } else {
+        pdg.push_back(aTrackCandPointer->getPdgCode());
+      }
     }
 
     else {
@@ -257,10 +258,13 @@ void GenFitterModule::event()
     bool candFitted = false;   //boolean to mark if the track candidates was fitted successfully with at least one PDG hypothesis
 
     while (pdgCounter > 0) {  //while loop over all pdg hypothesises
-      if (m_mcTracks == true && m_pdg == -999)trackCandidates[i]->setPdgCode(pdg.at(pdgCounter - 1));
-      else trackCandidates[i]->setPdgCode(int(TMath::Sign(1., trackCandidates[i]->getQoverPseed()) * pdg.at(pdgCounter - 1)));
+      if (m_mcTracks == true && m_pdg == -999) {
+        aTrackCandPointer->setPdgCode(pdg.at(pdgCounter - 1));
+      } else {
+        aTrackCandPointer->setPdgCode(int(TMath::Sign(1., aTrackCandPointer->getQoverPseed()) * pdg.at(pdgCounter - 1)));
+      }
 
-      trackRep = new RKTrackRep(trackCandidates[i]);
+      trackRep = new RKTrackRep(aTrackCandPointer);
 
       if (m_mcTracks) {
         B2DEBUG(99, "Fit MCTrack with start values: ");
@@ -268,9 +272,16 @@ void GenFitterModule::event()
         B2DEBUG(99, "Fit pattern reco track with start values: ");
       }
 
-      B2DEBUG(99, "            momentum: " << trackCandidates[i]->getDirSeed().x() << "  " << trackCandidates[i]->getDirSeed().y() << "  " << trackCandidates[i]->getDirSeed().z());
-      B2DEBUG(99, "            vertex:   " << trackCandidates[i]->getPosSeed().x() << "  " << trackCandidates[i]->getPosSeed().y() << "  " << trackCandidates[i]->getPosSeed().z());
-      B2DEBUG(99, "            pdg:      " << trackCandidates[i]->getPdgCode());
+      //get fit starting values from the from the track candidate
+      TMatrixD stateSeed = aTrackCandPointer->getStateSeed();
+      TMatrixD covSeed = aTrackCandPointer->getCovSeed();
+      TVector3 momentumSeed(stateSeed[3][0], stateSeed[4][0], stateSeed[5][0]);
+      TVector3 posSeed(stateSeed[3][0], stateSeed[4][0], stateSeed[5][0]);
+      B2DEBUG(100, "Start values: momentum (x,y,z,abs): " << momentumSeed.x() << "  " << momentumSeed.y() << "  " << momentumSeed.z() << " " << momentumSeed.Mag());
+      B2DEBUG(100, "Start values: momentum std: " << sqrt(covSeed[3][3]) << "  " << sqrt(covSeed[4][4]) << "  " << sqrt(covSeed[5][5]));
+      B2DEBUG(100, "Start values: pos:   " << posSeed.x() << "  " << posSeed.y() << "  " << posSeed.z());
+      B2DEBUG(100, "Start values: pos std:   " << sqrt(covSeed[0][0]) << "  " << sqrt(covSeed[1][1]) << "  " << sqrt(covSeed[2][2]));
+      B2DEBUG(100, "Start values: pdg:      " << aTrackCandPointer->getPdgCode());
 
       GFTrack gfTrack(trackRep, true);  //create the track with the corresponding track representation
 
@@ -312,12 +323,11 @@ void GenFitterModule::event()
         factory.addProducer(2, CDCProducer);
       }
 
-      vector <GFAbsRecoHit*> factoryHits;
       //use the factory to create RecoHits for all Hits stored in the track candidate
-      factoryHits = factory.createMany(*trackCandidates[i]);
+      vector <GFAbsRecoHit*> factoryHits = factory.createMany(*aTrackCandPointer);
       //add created hits to the track
       gfTrack.addHitVector(factoryHits);
-      gfTrack.setCandidate(*trackCandidates[i]);
+      gfTrack.setCandidate(*aTrackCandPointer);
 
       B2DEBUG(99, "Total Nr of Hits assigned to the Track: " << gfTrack.getNumHits());
 
@@ -329,7 +339,7 @@ void GenFitterModule::event()
       for (unsigned int hit = 0; hit < gfTrack.getNumHits(); hit++) {
         unsigned int detId = 0;
         unsigned int hitId = 0;
-        trackCandidates[i]->getHit(hit, detId, hitId);
+        aTrackCandPointer->getHit(hit, detId, hitId);
         if (detId == 0) nPXD++;
         if (detId == 1) nSVD++;
         if (detId == 2) nCDC++;
@@ -377,8 +387,8 @@ void GenFitterModule::event()
               new(tracks->AddrAt(trackCounter)) Track(); //Track is created empty, helix parameters are not available because the fit failed, but other variables may give some hint on the reason for the failure
 
               //Create relation
-              if (trackCandidates[i]->getMcTrackId() != -999) {
-                gfTracksToMCPart.add(trackCounter, trackCandidates[i]->getMcTrackId());
+              if (aTrackCandPointer->getMcTrackId() != -999) {
+                gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
               }
 
               else B2WARNING("No MCParticle contributed to this track! No GFTrack<->MCParticle relation will be created!");
@@ -390,9 +400,9 @@ void GenFitterModule::event()
               tracks[trackCounter]->setNCDCHits(nCDC);
               tracks[trackCounter]->setNSVDHits(nSVD);
               tracks[trackCounter]->setNPXDHits(nPXD);
-              tracks[trackCounter]->setMCId(trackCandidates[i]->getMcTrackId());
-              tracks[trackCounter]->setPDG(trackCandidates[i]->getPdgCode());
-              tracks[trackCounter]->setPurity(trackCandidates[i]->getDip());
+              tracks[trackCounter]->setMCId(aTrackCandPointer->getMcTrackId());
+              tracks[trackCounter]->setPDG(aTrackCandPointer->getPdgCode());
+              tracks[trackCounter]->setPurity(aTrackCandPointer->getDip());
               tracks[trackCounter]->setPValue(pValue);
               //Set helix parameters
               tracks[trackCounter]->setD0(-999);
@@ -413,8 +423,8 @@ void GenFitterModule::event()
             new(tracks->AddrAt(trackCounter)) Track();  //Track is created empty, parameters are set later on
 
             //Create relation
-            if (trackCandidates[i]->getMcTrackId() != -999) {
-              gfTracksToMCPart.add(trackCounter, trackCandidates[i]->getMcTrackId());
+            if (aTrackCandPointer->getMcTrackId() != -999) {
+              gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
             }
 
             else B2WARNING("No MCParticle contributed to this track! No GFTrack<->MCParticle relation will be created!");
@@ -426,9 +436,9 @@ void GenFitterModule::event()
             tracks[trackCounter]->setNCDCHits(nCDC);
             tracks[trackCounter]->setNSVDHits(nSVD);
             tracks[trackCounter]->setNPXDHits(nPXD);
-            tracks[trackCounter]->setMCId(trackCandidates[i]->getMcTrackId());
-            tracks[trackCounter]->setPDG(trackCandidates[i]->getPdgCode());
-            tracks[trackCounter]->setPurity(trackCandidates[i]->getDip());
+            tracks[trackCounter]->setMCId(aTrackCandPointer->getMcTrackId());
+            tracks[trackCounter]->setPDG(aTrackCandPointer->getPdgCode());
+            tracks[trackCounter]->setPurity(aTrackCandPointer->getDip());
             tracks[trackCounter]->setPValue(pValue);
             tracks[trackCounter]->setExtrapFailed(false);
 

@@ -47,7 +47,7 @@ using std::endl;
 using namespace Belle2;
 
 
-REG_MODULE(VXDSimpleBackground)
+REG_MODULE(VXDSimpleBackground);
 
 VXDSimpleBackgroundModule::VXDSimpleBackgroundModule() : Module()
 {
@@ -63,8 +63,6 @@ VXDSimpleBackgroundModule::VXDSimpleBackgroundModule() : Module()
   addParam("backroundLayers", m_backroundLayers, "choose the layers that should have additional background hits. By default all layers will have background outliers", vector<bool>(6, true));
   addParam("backgroundRatio2", m_backgroundRatio2, "ratio of trueHits that already have one background hit will be accaponied by one additional dummy background hit (if backroundLayers is 0 this option has no effect)", 0.0);
   addParam("backgroundRatio", m_backgroundRatio, "ratio of dummy background hits ", 0.0);
-
-  //addParam("backgroundRadius", m_backgroundRadius, "defines a circle around the true hit which is the maximal distance of a background hit from a true hit", 4.0*15E-4);
 
   addParam("semiAxisFactorU", m_semiAxisFactorU, "factor multiplied to the u sigma to get a maximal semi axis for the creation of background hits", 1.0);
   addParam("semiAxisFactorV", m_semiAxisFactorV, "factor multiplied to the v sigma to get a maximal semi axis for the creation of background hits", 1.0);
@@ -133,7 +131,7 @@ void VXDSimpleBackgroundModule::event()
   pxdSimpleDigiHits.create();
   StoreArray<VXDSimpleDigiHit> svdSimpleDigiHits("svdSimpleDigiHits");
   svdSimpleDigiHits.create();
-  StoreArray<GFTrackCand> trackCandidates("");
+  StoreArray<GFTrackCand> trackCandidates;
   trackCandidates.create();
 
   MCParticle* aMcParticle = mcParticles[0];
@@ -192,9 +190,18 @@ void VXDSimpleBackgroundModule::event()
 
 
     trackCandidates[0]->setMcTrackId(0);//Save the MCParticleID in the TrackCandidate
-    TVector3 posError(1.0, 1.0, 2.0);
-    TVector3 momError(0.1, 0.1, 0.2);
-    trackCandidates[0]->setComplTrackSeed(aMcParticle->getProductionVertex(), aMcParticle->getMomentum(), aMcParticle->getPDG(), posError, momError);
+    TVector3 position = aMcParticle->getProductionVertex();
+    TVector3 momentum = aMcParticle->getMomentum();
+
+    TMatrixD stateSeed(6, 1);
+    TMatrixD covSeed(6, 6);
+    covSeed.Zero(); // just to be save
+    stateSeed[0][0] = position[0]; stateSeed[1][0] = position[1]; stateSeed[2][0] = position[2];
+    stateSeed[3][0] = momentum[0]; stateSeed[4][0] = momentum[1]; stateSeed[5][0] = momentum[2];
+    covSeed[0][0] = 1; covSeed[1][1] = 1; covSeed[2][3] = 2 * 2;
+    covSeed[3][3] = 0.1 * 0.1; covSeed[0][0] = 0.1 * 0.1; covSeed[0][0] = 0.2 * 0.2;
+    //Finally set the complete track seed
+    trackCandidates[0]->set6DSeedAndPdgCode(stateSeed, aMcParticle->getPDG(), covSeed);
 
 
     double sigmaU = m_setMeasSigma;

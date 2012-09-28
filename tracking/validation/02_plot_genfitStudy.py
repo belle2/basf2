@@ -24,6 +24,8 @@ from ROOT import std, TCut, TMath
 full = False
 # full = True
 
+ROOT.gROOT.ProcessLine('gROOT.SetBatch()')
+
 # argument parsing
 options = [
     '-f',

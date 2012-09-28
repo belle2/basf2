@@ -13,12 +13,16 @@
 # Example steering file - 2012 Belle II Collaboration
 ##############################################################################
 
+import ROOT
 import sys
 import shutil
+from ROOT import std
 from basf2 import *
 
 full = False
 # full = True
+
+ROOT.gROOT.ProcessLine('gROOT.SetBatch()')
 
 # argument parsing
 options = ['-full']

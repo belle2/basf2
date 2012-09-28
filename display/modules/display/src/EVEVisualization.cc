@@ -185,10 +185,6 @@ void EVEVisualization::addGeometry()
 
   B2INFO("Loading geometry projections...");
 
-  //Since TEveGeoShapeExtract() replaces the global TGeoManager (??!), we'll make a backup copy
-  //TODO: remove once 5.34.2+ is in externals
-  TGeoManager* my_tgeomanager = gGeoManager;
-
   const std::string extractPath = Environment::Instance().getDataSearchPath() + std::string("/display/geometry_extract.root");
   TFile* f = TFile::Open(extractPath.c_str(), "READ");
   TEveGeoShapeExtract* gse = dynamic_cast<TEveGeoShapeExtract*>(f->Get("Extract"));
@@ -200,9 +196,6 @@ void EVEVisualization::addGeometry()
   //I want to show full geo in unprojected view,
   //but I still need to add the extract to the geometry scene...
   gEve->AddGlobalElement(gs);
-
-  //restore old TGeoManager
-  gGeoManager = my_tgeomanager;
 }
 
 void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
@@ -657,28 +650,6 @@ EVEVisualization::MCTrack& EVEVisualization::addMCParticle(const MCParticle* par
     const TVector3& p = particle->getMomentum();
     const TVector3& vertex = particle->getProductionVertex();
     int pdg = particle->getPDG();
-    //TODO: remove this workaround once a fix is in the externals
-    static const bool unknown_pdg_is_unsafe = gROOT->GetVersionInt() <= 53401;
-    bool workaround_active = false;
-    if (unknown_pdg_is_unsafe) {
-      switch (abs(pdg)) {
-        case 11:
-        case 13:
-        case 22:
-        case 211:
-        case 321:
-        case 2212:
-          break;
-        default:
-          workaround_active = true;
-          //let TEveTrack pretend it's something safe.
-          if (TMath::Nint(particle->getCharge()) == 0)
-            pdg = 22;
-          else
-            pdg = (particle->getCharge() > 0) ? -11 : 11;
-          break;
-      }
-    }
     TParticle tparticle(pdg, particle->getStatus(),
                         (particle->getMother() ? particle->getMother()->getIndex() : 0), 0, particle->getFirstDaughter(), particle->getLastDaughter(),
                         p.x(), p.y(), p.z(), particle->getEnergy(),
@@ -699,11 +670,6 @@ EVEVisualization::MCTrack& EVEVisualization::addMCParticle(const MCParticle* par
       m_mcparticleTracks[particle].track->AddPathMark(decayMark);
     }
     TString particle_name(mctrack.GetName());
-    //and since we don't want Ups(4S) to show up as 'gamma'...
-    if (workaround_active) {
-      particle_name = TString::Format("PDG: %d", particle->getPDG());
-      m_mcparticleTracks[particle].track->SetName(particle_name);
-    }
 
     //set track title (for popup)
     TString momLabel = "";
@@ -791,12 +757,8 @@ void EVEVisualization::makeTracks()
     m_eclsimhitdata->SetAxisFromBins();
     TEveCalo3D* calo3d = new TEveCalo3D(m_eclsimhitdata, "ECLHits");
     calo3d->SetBarrelRadius(125.80); //inner radius of ECL barrel
-#if ROOT_VERSION_CODE >= ROOT_VERSION(5,34,2)
     calo3d->SetForwardEndCapPos(196.5); //inner edge of forward endcap
     calo3d->SetBackwardEndCapPos(-102.0); //inner edge of backward endcap
-#else
-    calo3d->SetEndCapPos(196.5); //inner edge of forward endcap
-#endif
     calo3d->SetMaxValAbs(2.1);
     gEve->AddElement(calo3d);
   }

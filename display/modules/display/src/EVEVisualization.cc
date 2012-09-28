@@ -190,6 +190,7 @@ void EVEVisualization::addGeometry()
   TEveGeoShapeExtract* gse = dynamic_cast<TEveGeoShapeExtract*>(f->Get("Extract"));
   TEveGeoShape* gs = TEveGeoShape::ImportShapeExtract(gse, 0);
   gs->SetRnrSelf(false);
+  gs->IncDenyDestroy();
   gs->SetName("Minimal geometry extract");
   delete f;
 

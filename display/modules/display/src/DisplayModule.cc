@@ -85,9 +85,11 @@ void DisplayModule::event()
     return;
   }
 
-  //parameters might change, update here
-  if (!m_showNeutrals and !m_showCharged) //secondaries cannot be shown if they are merged into primaries
-    m_visualizer->setAssignToPrimaries(m_assignToPrimaries);
+  //secondaries cannot be shown if they are merged into primaries
+  m_visualizer->setAssignToPrimaries(m_assignToPrimaries && !m_showNeutrals && !m_showCharged);
+  if (m_assignToPrimaries && (m_showNeutrals || m_showCharged)) {
+    B2WARNING("AssignHitsToPrimaries and ShowCharged/ShowNeutrals can not be used together!");
+  }
 
 
   //gather simhits

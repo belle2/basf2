@@ -206,6 +206,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
   bool drawDetectors = false;
   bool drawHits = false;
   bool drawScaleMan = false;
+  bool drawMarkers = false;
   bool drawPlanes = false;
   bool drawTrack = false;
 
@@ -214,6 +215,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
       if (m_options.at(i) == 'A') drawAutoScale = true;
       if (m_options.at(i) == 'D') drawDetectors = true;
       if (m_options.at(i) == 'H') drawHits = true;
+      if (m_options.at(i) == 'M') drawMarkers = true;
       if (m_options.at(i) == 'P') drawPlanes = true;
       if (m_options.at(i) == 'S') drawScaleMan = true;
       if (m_options.at(i) == 'T') drawTrack = true;
@@ -242,6 +244,44 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
   }
 
   TEveTrack* track_lines = NULL;
+  if (drawTrack) {
+    GFDetPlane plane = rep->getFirstPlane();
+    rep->extrapolate(plane);
+    const TVector3& track_pos = rep->getPos(plane);
+    const TVector3& track_mom = rep->getMom(plane);
+
+    TEveRecTrack rectrack;
+    rectrack.fP.Set(track_mom);
+    rectrack.fV.Set(track_pos);
+    rectrack.fSign = (int)charge;
+
+    track_lines = new TEveTrack(&rectrack, m_gftrackpropagator);
+    track_lines->SetName(label); //popup label set at end of function
+    track_lines->SetPropagator(m_gftrackpropagator);
+    if (charge > 0) {
+      track_lines->SetLineColor(kRed);
+    } else {
+      track_lines->SetLineColor(kBlue);
+    }
+    track_lines->SetLineWidth(2);
+    track_lines->SetTitle(TString::Format("%s\n"
+                                          "#hits: %u\n"
+                                          "pT=%.3f, pZ=%.3f\n"
+                                          "pVal: %e",
+                                          label.Data(), numhits,
+                                          track_mom.Pt(), track_mom.Pz(),
+                                          TMath::Prob(track->getChiSqu(), track->getNDF())));
+
+    track_lines->SetCharge((int)charge);
+
+    if (numhits == 0) {
+      //most likely the track was read from file, so we generate entire track shape from initial plane
+      m_gftrackpropagator->SetMaxOrbs(0.5);
+      track_lines->MakeTrack();
+    } else if (drawMarkers) {
+      track_lines->SetRnrPoints(true);
+    }
+  }
 
   for (unsigned int j = 0; j < numhits; j++) { // loop over all hits in the track
 
@@ -268,7 +308,6 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
       } else continue;
     }
     const TVector3& track_pos = rep->getPos(plane);
-    const TVector3& track_mom = rep->getMom(plane);
     const TVector3& plane_pos = plane.getO();
     TMatrixT<double> hit_coords;
     TMatrixT<double> hit_cov;
@@ -320,35 +359,10 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
 
     // draw track if corresponding option is set ------------------------------------------
     if (drawTrack) {
-      if (!track_lines) {
-        TEveRecTrack rectrack;
-        rectrack.fP.Set(track_mom);
-        rectrack.fV.Set(track_pos);
-
-        track_lines = new TEveTrack(&rectrack, m_gftrackpropagator);
-        track_lines->SetName(label); //popup label set at end of function
-        track_lines->SetPropagator(m_gftrackpropagator);
-        if (charge > 0) {
-          track_lines->SetLineColor(kRed);
-        } else {
-          track_lines->SetLineColor(kBlue);
-        }
-        track_lines->SetLineWidth(2);
-        track_lines->SetTitle(TString::Format("%s\n"
-                                              "#hits: %u\n"
-                                              "pT=%.3f, pZ=%.3f\n"
-                                              "pVal: %e",
-                                              label.Data(), numhits,
-                                              track_mom.Pt(), track_mom.Pz(),
-                                              TMath::Prob(track->getChiSqu(), track->getNDF())));
-
-        track_lines->SetCharge((int)charge);
-      } else {
-        TEvePathMarkD refMark(TEvePathMarkD::kDaughter); //doesn't need momentum
-        refMark.fV.Set(track_pos);
-        refMark.fTime = track_pos.Mag(); //path marks can later be sorted by 'time'...
-        track_lines->AddPathMark(refMark);
-      }
+      TEvePathMarkD refMark(TEvePathMarkD::kDaughter); //doesn't need momentum
+      refMark.fV.Set(track_pos);
+      refMark.fTime = track_pos.Mag(); //path marks can later be sorted by 'time'...
+      track_lines->AddPathMark(refMark);
     }
     // finished drawing track -------------------------------------------------------------
 
@@ -739,7 +753,6 @@ void EVEVisualization::makeTracks()
   for (size_t i = 0; i < m_options.length(); i++) {
     if (m_options.at(i) == 'M') {
       m_gftrackpropagator->SetRnrDaughters(true);
-      m_gftracklist->SetRnrPoints(true);
       //m_gftrackpropagator->SetRnrFV(true); //TODO: this crashes?
       TMarker m;
       m.SetMarkerColor(kSpring);

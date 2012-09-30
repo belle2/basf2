@@ -72,8 +72,7 @@ namespace Belle2 {
       // CPU time start
       m_timeCPU = clock() * Unit::us;
 
-      StoreArray<ARICHSimHit> arichSimHits;
-      StoreArray<ARICHDigit> arichDigits;
+      StoreArray<ARICHDigit>::registerPersistent();
     }
 
     void ARICHDigitizerModule::beginRun()
@@ -89,21 +88,20 @@ namespace Belle2 {
       // Get the collection of ARICHSimHits from the Data store.
       //------------------------------------------------------
       StoreArray<ARICHSimHit> arichSimHits;
-      if (!arichSimHits) B2ERROR("ARICHDigitizerModule: Cannot find ARICHSimHit array.");
       //-----------------------------------------------------
 
       // Get the collection of arichDigits from the Data store,
       // (or have one created)
       //-----------------------------------------------------
       StoreArray<ARICHDigit> arichDigits;
-
+      if (!arichDigits.isValid()) arichDigits.create();
       //---------------------------------------------------------------------
       // Convert SimHits one by one to digitizer hits.
       //---------------------------------------------------------------------
 
 
       // Get number of hits in this event
-      int nHits = arichSimHits->GetLast() + 1;
+      int nHits = arichSimHits.getEntries();
       // Loop over all hits
       for (int iHit = 0; iHit < nHits; ++iHit) {
         // Get a simhit
@@ -126,16 +124,13 @@ namespace Belle2 {
         TVector3 center = m_arichgp->getChannelCenterGlob(moduleID, channelID);
         // Check if channel already registered hit in this event(no multiple hits)
         bool newhit = true;
-        int nSig = arichDigits->GetLast();
-        for (int iSig = 0; iSig <= nSig; ++iSig) {
+        int nSig = arichDigits.getEntries();
+        for (int iSig = 0; iSig < nSig; ++iSig) {
           ARICHDigit* aHit = arichDigits[iSig];
           if (aHit->getModuleID() == moduleID && aHit->getChannelID() == channelID) { newhit = false; break; }
         }
         if (!newhit) continue;
-
-        // Add new ARIHCHit to datastore
-        new(arichDigits->AddrAt(nSig + 1)) ARICHDigit();
-        ARICHDigit* newHit = arichDigits[nSig + 1];
+        ARICHDigit* newHit = arichDigits.appendNew();
         newHit->setModuleID(moduleID);
         newHit->setChannelID(channelID);
         newHit->setGlobalTime(globaltime);

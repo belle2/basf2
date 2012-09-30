@@ -205,7 +205,9 @@ namespace Belle2 {
         if (supportZ == 0) supportZ = zPos / Unit::mm;
 
         G4Tubs* aerogelTube = new G4Tubs("aerogelTube", rin, rout, thick / 2. / Unit::mm, 0, 2 * M_PI);
-        G4LogicalVolume* laerogelTube = new G4LogicalVolume(aerogelTube, gapsMaterial, "AerogelTube");
+        std::stringstream tubeName;
+        tubeName << "AerogelTube_" << ilayer;
+        G4LogicalVolume* laerogelTube = new G4LogicalVolume(aerogelTube, gapsMaterial, tubeName.str().c_str());
 
         // build and place aerogel tiles in tube
 
@@ -219,7 +221,9 @@ namespace Belle2 {
           int nPhiTiles = int(circ / (tileY + tileGap)) + 1;
           double dphi = 2.*M_PI / double(nPhiTiles);
           G4Tubs* tileShape = new G4Tubs("tileShape", routT - rSize, routT, thick / 2. / Unit::mm, -dphi / 2. + tileGap / 2. / routT, dphi  - tileGap / routT);
-          G4LogicalVolume* ltile = new G4LogicalVolume(tileShape, aeroMaterial, "aeroTile");
+          std::stringstream tileName;
+          tileName << "AeroTile_" << iRad << "_" << ilayer;
+          G4LogicalVolume* ltile = new G4LogicalVolume(tileShape, aeroMaterial, tileName.str().c_str());
           setColor(*ltile, "rgb(0.0, 1.0, 1.0,1.0)");
           for (int iPhi = 0; iPhi < nPhiTiles; iPhi++) {
             double phi = dphi / 2. + iPhi * dphi;

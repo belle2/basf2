@@ -29,11 +29,10 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector():
       Simulation::SensitiveDetectorBase("ARICH", SensitiveDetector::TOP)
     {
-      StoreArray<MCParticle> mcParticles;
-      StoreArray<ARICHSimHit>  arichSimHits;
 
-      RelationArray  arichSimHitRel(mcParticles, arichSimHits);
-      registerMCParticleRelation(arichSimHitRel);
+      StoreArray<ARICHSimHit>::registerPersistent();
+      RelationArray::registerPersistent<MCParticle, ARICHSimHit>();
+
     }
 
 
@@ -72,12 +71,13 @@ namespace Belle2 {
 
       TVector3 locpos(localPosition.x() / cm, localPosition.y() / cm, localPosition.z() / cm);
       StoreArray<ARICHSimHit> arichSimHits;
-      int nentr = arichSimHits->GetLast() + 1;
-      new(arichSimHits->AddrAt(nentr)) ARICHSimHit(moduleID, locpos, globalTime, energy, parentID);
+      if (!arichSimHits.isValid()) arichSimHits.create();
+      new(arichSimHits.nextFreeAddress()) ARICHSimHit(moduleID, locpos, globalTime, energy, parentID);
 
       // add relation to MCParticle
       StoreArray<MCParticle> mcParticles;
       RelationArray  arichSimHitRel(mcParticles, arichSimHits);
+      int nentr = arichSimHits.getEntries() - 1;
       arichSimHitRel.add(trackID, nentr);
 
       // after detection photon track is killed

@@ -85,11 +85,9 @@ namespace Belle2 {
       // CPU time start
       m_timeCPU = clock() * Unit::us;
 
-      StoreArray<ARICHAeroHit> arichAeroHits;
-      StoreArray<ARICHTrack> arichTracks;
-      StoreArray<ARICHLikelihoods> arichLikelihoods;
-      RelationArray relAeroToLikelihood(arichAeroHits, arichLikelihoods);
-
+      StoreArray<ARICHTrack>::registerPersistent();
+      StoreArray<ARICHLikelihoods>::registerPersistent();
+      RelationArray::registerPersistent<ARICHAeroHit, ARICHLikelihoods>();
     }
 
     void ARICHReconstructorModule::beginRun()
@@ -105,45 +103,38 @@ namespace Belle2 {
       //------------------------------------------------------
 
       StoreArray<ARICHAeroHit> arichAeroHits;
-      if (!arichAeroHits) {
-        B2ERROR("ARICHReconstructorModule: ARICHAeroHits unavailable.");
-      }
 
       //-----------------------------------------------------
       // Get the collection of arichDigits from the Data store,
       // (or have one created)
       //-----------------------------------------------------
       StoreArray<ARICHTrack> arichTracks;
-      if (!arichTracks) {
-        B2ERROR("ARICHReconstructorModule: ARICHTracks unavailable.");
-      }
-
+      if (!arichTracks.isValid()) arichTracks.create();
       //---------------------------------------------------------------------
       // Convert SimHits one by one to digitizer hits.
       //---------------------------------------------------------------------
 
       // Get number of hits in this event
-      int nTracks = arichAeroHits->GetLast() + 1;
+      int nTracks = arichAeroHits.getEntries();
 
       // Loop over all tracks
       for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
         ARICHAeroHit* aeroHit = arichAeroHits[iTrack];
-        new(arichTracks->AddrAt(iTrack)) ARICHTrack(*aeroHit);
+        new(arichTracks.nextFreeAddress()) ARICHTrack(*aeroHit);
       } // for iTrack
 
       m_ana->ReconstructParticles();
       m_ana->Likelihood2();
 
       StoreArray<ARICHLikelihoods> arichLikelihoods;
-
+      if (!arichLikelihoods.isValid()) arichLikelihoods.create();
+      RelationArray  relAeroToLikelihood(arichAeroHits, arichLikelihoods);
       for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
         ARICHTrack* track = arichTracks[iTrack];
         double like[5]; double exp_phot[5];
         track->getLikelihood(like); track->getExpectedNOfPhotons(exp_phot);
-        new(arichLikelihoods->AddrAt(iTrack)) ARICHLikelihoods(1, like, 1, exp_phot);
-        RelationArray  relAeroToLikelihood(arichAeroHits, arichLikelihoods);
+        new(arichLikelihoods.nextFreeAddress()) ARICHLikelihoods(1, like, 1, exp_phot);
         relAeroToLikelihood.add(iTrack, iTrack);
-
       } // for iTrack
 
       m_nEvent++;

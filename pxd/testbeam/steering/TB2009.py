@@ -67,7 +67,7 @@ DUT_clust.set_log_level(LogLevel.INFO)
 TEL_digi = register_module('TelDigiCluster')
 
 # Save output of simulation
-output = register_module('SimpleOutput')
+output = register_module('RootOutput')
 output.param('outputFileName', 'TBSimulationOutput.root')
 
 # Path construction

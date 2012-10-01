@@ -24,8 +24,8 @@ simulation = register_module('FullSim')
 pxddigi = register_module('PXDDigitizer')
 # PXD clustering module
 pxdclust = register_module('PXDClusterizer')
-# Simpleoutput
-output = register_module('SimpleOutput')
+# RootOutput
+output = register_module('RootOutput')
 
 # Specify number of events to generate
 evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})

@@ -188,7 +188,7 @@ cluster.param('TanLorentz', 0.0)
 cluster.param('AssumeSorted', False)
 
 # Save output of simulation
-output = register_module('SimpleOutput')
+output = register_module('RootOutput')
 output.param('outputFileName', 'TBSimulationOutput.root')
 
 geosaver = register_module('ExportGeometry')

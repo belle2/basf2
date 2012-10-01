@@ -20,7 +20,6 @@ input = register_module('RootInput')
 # set the input file, in this case, the output of MCFittingEvtGen.py example
 input.param('inputFileName', 'MCFittingEvtGenOutput.root')
 
-main.add_module(input)
 
 # create geometry
 gearbox = register_module('Gearbox')
@@ -28,6 +27,8 @@ geometry = register_module('Geometry')
 
 main.add_module(gearbox)
 main.add_module(geometry)
+
+main.add_module(input)
 
 display = register_module('Display')
 

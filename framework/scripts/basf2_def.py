@@ -86,7 +86,7 @@ def print_all_modules(moduleList):
         for text in description:
             if continued:
                 moduleName = ''
-            print '%-20s  %-s' % (moduleName, text)
+            print '%-21s %-s' % (moduleName, text)
             # ommit module name on all following lines
             continued = True
 

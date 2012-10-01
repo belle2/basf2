@@ -37,7 +37,7 @@ SVDDIGI = register_module('SVDDigitizer')
 # SVD clusterizer
 SVDCLUST = register_module('SVDClusterizer')
 # Save output of simulation
-output = register_module('SimpleOutput')
+output = register_module('RootOutput')
 
 # ============================================================================
 # Set a fixed random seed for particle generation:

@@ -152,8 +152,8 @@ simulation = register_module('FullSim')
 svddigi = register_module('SVDDigitizer')
 # SVD clustering module
 svdclust = register_module('SVDClusterizer')
-# Simpleoutput
-output = register_module('SimpleOutput')
+# RootOutput
+output = register_module('RootOutput')
 
 analyze = Clusters2Truehits()
 

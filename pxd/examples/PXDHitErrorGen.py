@@ -153,8 +153,8 @@ simulation = register_module('FullSim')
 pxddigi = register_module('PXDDigitizer')
 # PXD clustering module
 pxdclust = register_module('PXDClusterizer')
-# Simpleoutput
-output = register_module('SimpleOutput')
+# RootOutput
+output = register_module('RootOutput')
 
 analyze = PXDHitErrors()
 

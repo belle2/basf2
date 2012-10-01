@@ -206,10 +206,8 @@ to:     pmanager->AddProcess(theCerenkovProcess);
 [INFO] (Object)  EventMetaData
 [INFO] (Object)  MCParticlesToARICHAeroHits
 [INFO] (Object)  MCParticlesToARICHSimHits
-[INFO] (Object)  MCParticlesToBeamBackHits
 [INFO] (Array)   ARICHAeroHits             1
 [INFO] (Array)   ARICHSimHits              72
-[INFO] (Array)   BeamBackHits              8
 [INFO] (Array)   MCParticles               762
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
@@ -226,10 +224,8 @@ to:     pmanager->AddProcess(theCerenkovProcess);
 [INFO] (Object)  EventMetaData
 [INFO] (Object)  MCParticlesToARICHAeroHits
 [INFO] (Object)  MCParticlesToARICHSimHits
-[INFO] (Object)  MCParticlesToBeamBackHits
 [INFO] (Array)   ARICHAeroHits             1
 [INFO] (Array)   ARICHSimHits              78
-[INFO] (Array)   BeamBackHits              3
 [INFO] (Array)   MCParticles               753
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
@@ -246,10 +242,8 @@ to:     pmanager->AddProcess(theCerenkovProcess);
 [INFO] (Object)  EventMetaData
 [INFO] (Object)  MCParticlesToARICHAeroHits
 [INFO] (Object)  MCParticlesToARICHSimHits
-[INFO] (Object)  MCParticlesToBeamBackHits
 [INFO] (Array)   ARICHAeroHits             1
 [INFO] (Array)   ARICHSimHits              109
-[INFO] (Array)   BeamBackHits              6
 [INFO] (Array)   MCParticles               807
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
@@ -266,10 +260,8 @@ to:     pmanager->AddProcess(theCerenkovProcess);
 [INFO] (Object)  EventMetaData
 [INFO] (Object)  MCParticlesToARICHAeroHits
 [INFO] (Object)  MCParticlesToARICHSimHits
-[INFO] (Object)  MCParticlesToBeamBackHits
 [INFO] (Array)   ARICHAeroHits             1
 [INFO] (Array)   ARICHSimHits              56
-[INFO] (Array)   BeamBackHits              2
 [INFO] (Array)   MCParticles               732
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
@@ -286,10 +278,8 @@ to:     pmanager->AddProcess(theCerenkovProcess);
 [INFO] (Object)  EventMetaData
 [INFO] (Object)  MCParticlesToARICHAeroHits
 [INFO] (Object)  MCParticlesToARICHSimHits
-[INFO] (Object)  MCParticlesToBeamBackHits
 [INFO] (Array)   ARICHAeroHits             1
 [INFO] (Array)   ARICHSimHits              9
-[INFO] (Array)   BeamBackHits              1
 [INFO] (Array)   MCParticles               392
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>

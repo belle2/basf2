@@ -107,7 +107,7 @@ void EVEVisualization::enableVolume(const char* name, bool only_daughters, bool 
       vol->SetVisibility(enable);
     vol->SetVisDaughters(enable);
   } else {
-    B2WARNING("Volume " << name << " not found?");
+    B2DEBUG(100, "Volume " << name << " not found?");
   }
 }
 
@@ -118,7 +118,7 @@ void EVEVisualization::setVolumeColor(const char* name, Color_t col)
     //while TGeoVolume derives from TAttFill, the line color actually is important here
     vol->SetLineColor(col);
   } else {
-    B2WARNING("Volume " << name << " not found?");
+    B2DEBUG(100, "Volume " << name << " not found?");
   }
 }
 
@@ -135,6 +135,7 @@ void EVEVisualization::addGeometry()
     volume->SetTransparency(50);
   }
 
+  /*
   //disable display of especially detailed subdetectors
   disableVolume("logical_ecl", true);
   disableVolume("LVCryo");
@@ -163,6 +164,7 @@ void EVEVisualization::addGeometry()
   disableVolume("logi_B1spc1_name");
   disableVolume("logi_D1spc1_name");
   disableVolume("logi_E1spc1_name");
+  */
 
   //set some nicer colors (at top level only)
   setVolumeColor("PXD.Envelope", kGreen + 3);

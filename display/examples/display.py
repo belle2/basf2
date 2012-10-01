@@ -9,8 +9,6 @@
 #  basf2 display/example/display.py -i MyInputFile.root
 #
 
-import os
-import random
 from basf2 import *
 
 # create paths
@@ -24,6 +22,9 @@ input.param('inputFileName', 'MCFittingEvtGenOutput.root')
 # create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
+# Since Geometry is only required for track extrapolation in inner detectors,
+# we'll exclude EKLM and ECL (saves about 20s in startup time)
+geometry.param('ExcludedComponents', ['EKLM', 'ECL'])
 
 main.add_module(gearbox)
 main.add_module(geometry)
@@ -33,8 +34,7 @@ main.add_module(input)
 display = register_module('Display')
 
 # The Options parameter is a combination of:
-# A autoscale errors - use when hits are too small to be seen
-#   (because of tiny errors)
+# A autoscale PXD/SVD errors - use when hits are too small to be seen
 # D draw detectors - draw simple detector representation (with different size)
 #   for each hit
 # H draw track hits
@@ -70,4 +70,4 @@ display.param('Automatic', False)
 main.add_module(display)
 
 process(main)
-print statistics
+print statistics(statistics.INIT)

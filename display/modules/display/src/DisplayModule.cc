@@ -59,10 +59,6 @@ void DisplayModule::initialize()
     GFFieldManager::getInstance()->init(new GFGeant4Field());
   }
 
-  //initialise geometry singletons
-  VXD::GeoCache::getInstance();
-  ECL::ECLGeometryPar::Instance();
-
   m_display = new DisplayUI(m_automatic);
   //pass some parameters to DisplayUI to be able to change them at run time
   m_display->addParameter("Assign hits to primary particles", getParam<bool>("AssignHitsToPrimaries"));

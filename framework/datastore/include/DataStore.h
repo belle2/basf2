@@ -211,12 +211,6 @@ namespace Belle2 {
      */
     void reset(EDurability durability);
 
-    /** FIXME: Temporary solution to provide backward compatibility for StoreObjPtr and StoreArray */
-    void backwardCompatibleRegistration(const std::string& name, EDurability durability,
-                                        const TClass* objClass, bool array);
-    void backwardCompatibleCreation(const std::string& name, EDurability durability,
-                                    const TClass* objClass, bool array);
-
 
   protected:
     /** Constructor is protected, as it is a singleton.*/

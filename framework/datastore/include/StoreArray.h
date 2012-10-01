@@ -149,12 +149,7 @@ namespace Belle2 {
      *  @param durability Decides durability map used for getting the accessed array.
      */
     explicit StoreArray(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event):
-      StoreAccessorBase(DataStore::arrayName<T>(name), durability), m_storeArray(0) {
-      if (DataStore::Instance().getInitializeActive()) {
-        //if we're called during initialization, register the array and print a warning
-        DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, T::Class(), true);
-      }
-    }
+      StoreAccessorBase(DataStore::arrayName<T>(name), durability), m_storeArray(0) {}
 
     /** Register the array in the data store and include it in the output by default.
      *  This must be called in the initialization phase.
@@ -214,12 +209,7 @@ namespace Belle2 {
      *  @return          True if the array exists.
      **/
     inline bool isValid() const {
-      //If there's no array currently associated, we attach it
-      //However, this is entirely read-only, registering or creating the array
-      //would merely produce misleading errors.
-      if (!m_storeArray) {
-        const_cast<StoreArray*>(this)->m_storeArray = reinterpret_cast<TClonesArray**>(DataStore::Instance().getObject(m_name, m_durability, T::Class(), true));
-      }
+      ensureAttached();
       return m_storeArray && *m_storeArray;
     }
 
@@ -235,7 +225,7 @@ namespace Belle2 {
      *  \return pointer to the created object, or NULL if out of bounds
      */
     inline T* operator [](int i) const {
-      ensureCreated();
+      if (!isValid()) return 0;
       if (i >= getEntries() or i < 0)
         return 0;
       //type was checked by DataStore, so this is safe
@@ -253,10 +243,10 @@ namespace Belle2 {
      *  If you only want to use T's default or copy constructor, use the safer
      *  appendNew() instead.
      *
-     *  \return pointer to address just past the last array element
+     *  \return pointer to address just past the last array element, or NULL if invalid
      */
     inline T* nextFreeAddress() {
-      ensureCreated();
+      if (!isValid()) return 0;
       return static_cast<T*>((*m_storeArray)->AddrAt(getEntries()));
     }
 
@@ -266,9 +256,9 @@ namespace Belle2 {
      *  it can be filled with data. The default constructor is used
      *  for the object's creation.
      *
-     *  \return pointer to the created object
+     *  \return pointer to the created object, or NULL if invalid
      */
-    inline T* appendNew() { return new(nextFreeAddress()) T(); }
+    inline T* appendNew() { return isValid() ? (new(nextFreeAddress()) T()) : 0; }
 
     /** Copy-construct a new T object at the end of the array.
      *
@@ -282,9 +272,9 @@ namespace Belle2 {
      *        of appendNew() or placement-new with a custom constructor (see
      *        documentation of nextFreeAddress() ) may be better.
      *
-     *  \return pointer to the created object
+     *  \return pointer to the created object, or NULL if invalid
      */
-    inline T* appendNew(const T& obj) { return new(nextFreeAddress()) T(obj); }
+    inline T* appendNew(const T& obj) { return isValid() ? (new(nextFreeAddress()) T(obj)) : 0; }
 
     //@{
     /** Raw access to the underlying TClonesArray.
@@ -296,19 +286,14 @@ namespace Belle2 {
      *  function is recommended, as the difference between . and ->
      *  may be lost on casual readers of the source code.
      */
-    TClonesArray& operator *() const { ensureCreated(); return **m_storeArray;}
-    ClonesArrayWrapper* operator ->() const { ensureCreated(); return static_cast<ClonesArrayWrapper*>(*m_storeArray);}
-    TClonesArray* getPtr() const { ensureCreated(); return *m_storeArray;}
+    TClonesArray& operator *() const { ensureAttached(); return **m_storeArray;}
+    ClonesArrayWrapper* operator ->() const { ensureAttached(); return static_cast<ClonesArrayWrapper*>(*m_storeArray);}
+    TClonesArray* getPtr() const { ensureAttached(); return *m_storeArray;}
     //@}
 
   private:
-    /** Ensure that this object is registered, created and attached. */
-    inline void ensureCreated() const {
-      if (m_storeArray && *m_storeArray)
-        return; //already attached, nothing to do
-
-      DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, T::Class(), true);
-      DataStore::Instance().backwardCompatibleCreation(m_name, m_durability, T::Class(), true);
+    /** Ensure that this object is attached. */
+    inline void ensureAttached() const {
       if (!m_storeArray) {
         const_cast<StoreArray*>(this)->m_storeArray = reinterpret_cast<TClonesArray**>(DataStore::Instance().getObject(m_name, m_durability, T::Class(), true));
       }

@@ -300,32 +300,3 @@ void DataStore::reset(EDurability durability)
   }
   m_storeObjMap[durability].clear();
 }
-
-void DataStore::backwardCompatibleRegistration(const std::string& name, EDurability durability,
-                                               const TClass* objClass, bool array)
-{
-  if (!hasEntry(name, durability, objClass, array)) {
-    std::string type = (array ? "array" : "object");
-    if (m_initializeActive) {
-      B2WARNING("DATASTORE BACKWARD COMPATIBILITY ISSUE: Instead of creating an " << type << " '" << name << "' in your initialize() method, please use registerPersistent(). See, for example, the doxygen documentation of StoreObjPtr, section 'Storing objects'.");
-    } else {
-      B2ERROR("DATASTORE BACKWARD COMPATIBILITY ISSUE: You have to *register* the " << type << " '" << name << "' *in the initialize method* before you can use it! Unless you do this, your " << type  << " can not be saved by the output module! See, for example, the doxygen documentation of StoreObjPtr, section 'Storing objects'.");
-    }
-    bool initializeActive = m_initializeActive;
-    m_initializeActive = true;
-    createEntry(name, durability, objClass, array, false, true);
-    m_initializeActive = initializeActive;
-  }
-}
-
-void DataStore::backwardCompatibleCreation(const std::string& name, EDurability durability,
-                                           const TClass* objClass, bool array)
-{
-  TObject** ptr = getObject(name, durability, objClass, array);
-  if (!ptr) return;
-  if (!*ptr) {
-    std::string type = (array ? "array" : "object");
-    B2WARNING("DATASTORE BACKWARD COMPATIBILITY ISSUE: You have to *create* the " << type << " '" << name << "' before you can use it! Please call create() on your " << type  << " in your Module's event() function before saving any data to it.");
-    createObject(0, true, name, durability, objClass, array);
-  }
-}

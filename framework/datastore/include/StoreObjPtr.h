@@ -125,11 +125,7 @@ namespace Belle2 {
      *  @param durability Decides durability map used for getting the accessed object.
      */
     explicit StoreObjPtr(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event):
-      StoreAccessorBase(DataStore::objectName<T>(name), durability), m_storeObjPtr(0) {
-      if (DataStore::Instance().getInitializeActive()) {
-        DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, T::Class(), false);
-      }
-    }
+      StoreAccessorBase(DataStore::objectName<T>(name), durability), m_storeObjPtr(0) {}
 
     /** Register the object in the data store and include it in the output by default.
      *  This must be called in the initialization phase.

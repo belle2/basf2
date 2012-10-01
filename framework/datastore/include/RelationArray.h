@@ -271,9 +271,6 @@ namespace Belle2 {
     template <class FROM, class TO> RelationArray(const StoreArray<FROM>& from, const StoreArray<TO>& to, const std::string& name = "",
                                                   const DataStore::EDurability& durability = DataStore::c_Event):
       StoreAccessorBase((name == "") ? DataStore::relationName(from.getName(), to.getName()) : name, durability) {
-      if (DataStore::Instance().getInitializeActive()) {
-        DataStore::Instance().backwardCompatibleRegistration(m_name, m_durability, RelationContainer::Class(), false);
-      }
       m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(m_name, m_durability, RelationContainer::Class(), false));
       if (!m_relations) {
         return;

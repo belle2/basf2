@@ -151,13 +151,18 @@ void ECLReconstructorModule::event()
       }
 //        cout<<endl;
 
+      double energyBfCorrect = (*iShower).second.Energy();
+      double preliminaryCalibration = 0.96260 - 0.14162E-01 * pow(log10(energyBfCorrect), 1)
+                                      - 0.10549E-01 * pow(log10(energyBfCorrect), 2)
+                                      + 0.18810E-01 * pow(log10(energyBfCorrect), 3)
+                                      + 0.12897E-01 * pow(log10(energyBfCorrect), 4) ;
 
-      double preliminaryCalibration = 1.05;
+
       StoreArray<ECLShower> eclRecShowerArray(m_ECLShowerName);
       m_hitNum = eclRecShowerArray->GetLast() + 1;
       new(eclRecShowerArray->AddrAt(m_hitNum)) ECLShower();
       eclRecShowerArray[m_hitNum]->setShowerId(nShower);
-      eclRecShowerArray[m_hitNum]->setEnergy((float)(*iShower).second.Energy()*preliminaryCalibration);
+      eclRecShowerArray[m_hitNum]->setEnergy((float)(*iShower).second.Energy() / preliminaryCalibration);
       eclRecShowerArray[m_hitNum]->setTheta((float)(*iShower).second.Theta());
       eclRecShowerArray[m_hitNum]->setPhi((float)(*iShower).second.Phi());
       eclRecShowerArray[m_hitNum]->setR((float)(*iShower).second.Distance());

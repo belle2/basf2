@@ -33,7 +33,7 @@ using namespace Belle2;
 
 int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pdlFileName, const std::string& parentParticle, const std::string& userFileName)
 {
-  B2INFO("starting initialisation of EvtGen Interface. ");
+  B2INFO("Begin initialisation of EvtGen Interface.");
 
   EvtRandom::setRandomEngine((EvtRandomEngine*)&m_eng);
   if (!m_Generator) {
@@ -45,16 +45,9 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pd
   }
 
   // Setup Parent Particle in rest frame
-  c_ParentParticle = EvtPDL::getId(parentParticle);
+  m_ParentParticle = EvtPDL::getId(parentParticle);
 
-  TLorentzVector pParentParticle;
-  pParentParticle.SetXYZM(0.0, 0.0, 0.0, EvtPDL::getMass(c_ParentParticle));
-
-  // Boost to lab frame
-  pParentParticle = m_labboost * pParentParticle;
-  m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
-
-  B2INFO("finished initialising the EvtGen Interface. " << pParentParticle.E() << "tt" << pParentParticle.X() << "tt" << pParentParticle.Y() << "tt" << pParentParticle.Z());
+  B2INFO("End initialisation of EvtGen Interface.");
 
   return 0;
 }
@@ -64,14 +57,21 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph)
 {
   //  B2INFO("Starting event simulation.");
 
+  TLorentzVector pParentParticle;
+  pParentParticle.SetXYZM(0.0, 0.0, 0.0, EvtPDL::getMass(m_ParentParticle));
 
-  m_parent = EvtParticleFactory::particleFactory(c_ParentParticle, m_pinit);
+  // Boost to lab frame
+  pParentParticle = m_labboost * pParentParticle;
+  m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
+
+  //B2INFO(pParentParticle.E() << "tt" << pParentParticle.X() << "tt" << pParentParticle.Y() << "tt" << pParentParticle.Z());
+
+  m_parent = EvtParticleFactory::particleFactory(m_ParentParticle, m_pinit);
   m_parent->setVectorSpinDensity();
   B2INFO("Set starting particle");
   m_Generator->generateDecay(m_parent);
 
   //  B2INFO("after generate Decay.");
-
 
   int iPart = addParticles2Graph(m_parent, graph);
   graph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
@@ -141,7 +141,6 @@ int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph
   }
 
   return nParticles;
-
 }
 
 
@@ -165,6 +164,4 @@ void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGrap
   gParticle->setValidVertex(true);
 
   gParticle->setSpinType((int)eParticle->getSpinType());
-
-
 }

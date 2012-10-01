@@ -70,7 +70,7 @@ namespace Belle2 {
     EvtGenFwRandEngine m_eng;
     EvtGen* m_Generator;
     EvtVector4R m_pinit;
-    EvtId c_ParentParticle;
+    EvtId m_ParentParticle;
   };
 
 }

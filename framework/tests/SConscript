@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['$ROOT_LIBS', 'Geom', '$XML_LIBS', '$GEANT4_LIBS', 'CLHEP', 'boost_regex']
+env['LIBS'] = ['$ROOT_LIBS', '$XML_LIBS']
 
 Return('env')

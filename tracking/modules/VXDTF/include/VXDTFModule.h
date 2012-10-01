@@ -311,6 +311,8 @@ namespace Belle2 {
     double m_tcThreshold;   /**< defines threshold for hopfield network. neurons having values below threshold are discarded */
 
     bool m_PARAMqiSmear; /**<  allows to smear QIs via qqq-Interface, needed when having more than one TC with the same QI */
+    bool m_PARAMcleanOverlappingSet; /**< when true, TCs which are found more than once (possible because of multipass) will get filtered */
+    bool m_PARAMuseHopfield; /**< allows to deactivate hopfield, so overlapping TCs are exported */
     double m_PARAMsmearMean; /**< allows to introduce a bias for QI (e.g. surpressing all values, ...)*/
     double m_PARAMsmearSigma; /**< bigger values deliver broader distribution*/
 

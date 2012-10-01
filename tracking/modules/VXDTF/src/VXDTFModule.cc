@@ -103,12 +103,12 @@ VXDTFModule::VXDTFModule() : Module()
   activateDistance3D.push_back(true);
   activateDistanceXY.push_back(true);
   activateDistanceZ.push_back(true);
-  activateNormedDistance3D.push_back(true);
+  activateNormedDistance3D.push_back(false);
   activateAngles3D.push_back(true);
   activateAnglesXY.push_back(true);
   activateAnglesRZ.push_back(true);
-  activateDistanceDeltaZ.push_back(true);
-  activatePT.push_back(true);
+  activateDistanceDeltaZ.push_back(false);
+  activatePT.push_back(false);
   activateDistance2IP.push_back(false);
   activateZigZag.push_back(true);
   activateDeltaPt.push_back(true);
@@ -184,6 +184,9 @@ VXDTFModule::VXDTFModule() : Module()
   //for testing purposes:
   addParam("highestAllowedLayer", m_PARAMhighestAllowedLayer, "set value below 6 if you want to exclude outer layers (standard is 6)", highestAllowedLayer);
   addParam("standardPdgCode", m_PARAMpdGCode, "standard value is 211 (pi+), ATTENTION, instead of using inconsistent sign of PdGList, in this module positively charged particles are always positive and negatively charged ones are negative (relevant for leptons)", int(211));
+
+  addParam("cleanOverlappingSet", m_PARAMcleanOverlappingSet, "when true, TCs which are found more than once (possible because of multipass) will get filtered", bool(true));
+  addParam("useHopfield", m_PARAMuseHopfield, "allows to deactivate hopfield, so overlapping TCs are exported", bool(true));
 
   addParam("qiSmear", m_PARAMqiSmear, " set True if you want to smear QI's of TCs (needed when no Kalman filter activated) ", bool(false));
   addParam("smearMean", m_PARAMsmearMean, " when qiSmear = True, bias of perturbation can be set here", double(0.0));
@@ -269,28 +272,28 @@ void VXDTFModule::beginRun()
 
     newPass->sectorSetup = m_PARAMsectorSetup[i];
 
-    if (int (m_PARAMdetectorType.size()) < i - 1) {
+    if (int (m_PARAMdetectorType.size()) < i) {
       newPass->detectorType = m_PARAMdetectorType[m_PARAMdetectorType.size() - 1];
     } else {
       newPass->detectorType = m_PARAMdetectorType[i];
     }
-    if (int (m_PARAMsetupWeigh.size()) < i - 1) {
+    if (int (m_PARAMsetupWeigh.size()) < i) {
       newPass->distance3D.first = m_PARAMsetupWeigh[m_PARAMsetupWeigh.size() - 1] * 0.01;
     } else {
       newPass->setupWeigh = m_PARAMsetupWeigh[i] * 0.01;
       if (newPass->setupWeigh < 0) { newPass->setupWeigh = 0; } else if (newPass->setupWeigh > 1.) { newPass->setupWeigh = 1.; }
     }
-    if (int (m_PARAMhighestAllowedLayer.size()) < i - 1) {
+    if (int (m_PARAMhighestAllowedLayer.size()) < i) {
       newPass->highestAllowedLayer = m_PARAMhighestAllowedLayer[m_PARAMhighestAllowedLayer.size() - 1];
     } else {
       newPass->highestAllowedLayer = m_PARAMhighestAllowedLayer[i];
     }
-    if (int (m_PARAMminLayer.size()) < i - 1) {
+    if (int (m_PARAMminLayer.size()) < i) {
       newPass->minLayer = m_PARAMminLayer[m_PARAMminLayer.size() - 1];
     } else {
       newPass->minLayer = m_PARAMminLayer[i];
     }
-    if (int (m_PARAMminState.size()) < i - 1) {
+    if (int (m_PARAMminState.size()) < i) {
       newPass->minState = m_PARAMminState[m_PARAMminState.size() - 1];
     } else {
       newPass->minState = m_PARAMminState[i];
@@ -327,22 +330,22 @@ void VXDTFModule::beginRun()
 
     int sfCtr = 0, nfCtr = 0, tccfCtr = 0; // counting number of activated tests for each filter step
     ///sFinder:
-    if (int (m_PARAMactivateDistance3D.size()) < i - 1) {
+    if (int (m_PARAMactivateDistance3D.size()) < i) {
       newPass->distance3D.first = m_PARAMactivateDistance3D[m_PARAMactivateDistance3D.size() - 1];
     } else {
       newPass->distance3D.first = m_PARAMactivateDistance3D[i];
     }
-    if (int (m_PARAMactivateDistanceXY.size()) < i - 1) {
+    if (int (m_PARAMactivateDistanceXY.size()) < i) {
       newPass->distanceXY.first = m_PARAMactivateDistanceXY[m_PARAMactivateDistanceXY.size() - 1];
     } else {
       newPass->distanceXY.first = m_PARAMactivateDistanceXY[i];;
     }
-    if (int (m_PARAMactivateDistanceZ.size()) < i - 1) {
+    if (int (m_PARAMactivateDistanceZ.size()) < i) {
       newPass->distanceZ.first = m_PARAMactivateDistanceZ[m_PARAMactivateDistanceZ.size() - 1];
     } else {
       newPass->distanceZ.first = m_PARAMactivateDistanceZ[i];
     }
-    if (int (m_PARAMactivateNormedDistance3D.size()) < i - 1) {
+    if (int (m_PARAMactivateNormedDistance3D.size()) < i) {
       newPass->normedDistance3D.first = m_PARAMactivateNormedDistance3D[m_PARAMactivateNormedDistance3D.size() - 1];
     } else {
       newPass->normedDistance3D.first = m_PARAMactivateNormedDistance3D[i];
@@ -353,32 +356,32 @@ void VXDTFModule::beginRun()
     if (newPass->normedDistance3D.first == true) { sfCtr++; }
 
     ///nbFinder:
-    if (int (m_PARAMactivateAngles3D.size()) < i - 1) {
+    if (int (m_PARAMactivateAngles3D.size()) < i) {
       newPass->angles3D.first = m_PARAMactivateAngles3D[m_PARAMactivateAngles3D.size() - 1];
     } else {
       newPass->angles3D.first =  m_PARAMactivateAngles3D[i];
     }
-    if (int (m_PARAMactivateAnglesXY.size()) < i - 1) {
+    if (int (m_PARAMactivateAnglesXY.size()) < i) {
       newPass->anglesXY.first = m_PARAMactivateAnglesXY[m_PARAMactivateAnglesXY.size() - 1];
     } else {
       newPass->anglesXY.first = m_PARAMactivateAnglesXY[i];
     }
-    if (int (m_PARAMactivateAnglesRZ.size()) < i - 1) {
+    if (int (m_PARAMactivateAnglesRZ.size()) < i) {
       newPass->anglesRZ.first = m_PARAMactivateAnglesRZ[m_PARAMactivateAnglesRZ.size() - 1];
     } else {
       newPass->anglesRZ.first = m_PARAMactivateAnglesRZ[i];
     }
-    if (int (m_PARAMactivateDistanceDeltaZ.size()) < i - 1) {
+    if (int (m_PARAMactivateDistanceDeltaZ.size()) < i) {
       newPass->distanceDeltaZ.first = m_PARAMactivateDistanceDeltaZ[m_PARAMactivateDistanceDeltaZ.size() - 1];
     } else {
       newPass->distanceDeltaZ.first = m_PARAMactivateDistanceDeltaZ[i];
     }
-    if (int (m_PARAMactivateDistance2IP.size()) < i - 1) {
+    if (int (m_PARAMactivateDistance2IP.size()) < i) {
       newPass->distance2IP.first = m_PARAMactivateDistance2IP[m_PARAMactivateDistance2IP.size() - 1];
     } else {
       newPass->distance2IP.first =  m_PARAMactivateDistance2IP[i];
     }
-    if (int (m_PARAMactivatePT.size()) < i - 1) {
+    if (int (m_PARAMactivatePT.size()) < i) {
       newPass->pT.first = m_PARAMactivatePT[m_PARAMactivatePT.size() - 1];
     } else {
       newPass->pT.first =  m_PARAMactivatePT[i];
@@ -391,17 +394,17 @@ void VXDTFModule::beginRun()
     if (newPass->pT.first == true) { nfCtr++; }
 
     /// post-TCC-filter:
-    if (int (m_PARAMactivateZigZag.size()) < i - 1) {
+    if (int (m_PARAMactivateZigZag.size()) < i) {
       newPass->zigzag.first = m_PARAMactivateZigZag[m_PARAMactivateZigZag.size() - 1];
     } else {
       newPass->zigzag.first = m_PARAMactivateZigZag[i];
     }
-    if (int (m_PARAMactivateDeltaPt.size()) < i - 1) {
+    if (int (m_PARAMactivateDeltaPt.size()) < i) {
       newPass->deltaPt.first = m_PARAMactivateDeltaPt[m_PARAMactivateDeltaPt.size() - 1];
     } else {
       newPass->deltaPt.first = m_PARAMactivateDeltaPt[i];
     }
-    if (int (m_PARAMactivateDeltaDistance2IP.size()) < i - 1) {
+    if (int (m_PARAMactivateDeltaDistance2IP.size()) < i) {
       newPass->deltaDistance2IP.first = m_PARAMactivateDeltaDistance2IP[m_PARAMactivateDeltaDistance2IP.size() - 1];
     } else {
       newPass->deltaDistance2IP.first = m_PARAMactivateDeltaDistance2IP[i];
@@ -415,67 +418,67 @@ void VXDTFModule::beginRun()
     newPass->activatedTccFilterTests = tccfCtr;
     B2INFO("Pass " << i << " VXD Track finder: " << sfCtr << " segFinder tests, " << nfCtr << " friendFinder tests and " << tccfCtr << " TCC filter tests are enabled.");
 
-    if (int (m_PARAMtuneDistance3D.size()) < i - 1) {
+    if (int (m_PARAMtuneDistance3D.size()) < i) {
       newPass->distance3D.second = m_PARAMtuneDistance3D[m_PARAMtuneDistance3D.size() - 1];
     } else {
       newPass->distance3D.second = m_PARAMtuneDistance3D[i];
     }
-    if (int (m_PARAMtuneDistanceXY.size()) < i - 1) {
+    if (int (m_PARAMtuneDistanceXY.size()) < i) {
       newPass->distanceXY.second = m_PARAMtuneDistanceXY[m_PARAMtuneDistanceXY.size() - 1];
     } else {
       newPass->distanceXY.second = m_PARAMtuneDistanceXY[i];;
     }
-    if (int (m_PARAMtuneDistanceZ.size()) < i - 1) {
+    if (int (m_PARAMtuneDistanceZ.size()) < i) {
       newPass->distanceZ.second = m_PARAMtuneDistanceZ[m_PARAMtuneDistanceZ.size() - 1];
     } else {
       newPass->distanceZ.second = m_PARAMtuneDistanceZ[i];
     }
-    if (int (m_PARAMtuneNormedDistance3D.size()) < i - 1) {
+    if (int (m_PARAMtuneNormedDistance3D.size()) < i) {
       newPass->normedDistance3D.second = m_PARAMtuneNormedDistance3D[m_PARAMtuneNormedDistance3D.size() - 1];
     } else {
       newPass->normedDistance3D.second = m_PARAMtuneNormedDistance3D[i];
     }
-    if (int (m_PARAMtuneAngles3D.size()) < i - 1) {
+    if (int (m_PARAMtuneAngles3D.size()) < i) {
       newPass->angles3D.second = m_PARAMtuneAngles3D[m_PARAMtuneAngles3D.size() - 1];
     } else {
       newPass->angles3D.second =  m_PARAMtuneAngles3D[i];
     }
-    if (int (m_PARAMtuneAnglesRZ.size()) < i - 1) {
+    if (int (m_PARAMtuneAnglesRZ.size()) < i) {
       newPass->anglesXY.second = m_PARAMtuneAnglesRZ[m_PARAMtuneAnglesRZ.size() - 1];
     } else {
       newPass->anglesXY.second = m_PARAMtuneAnglesRZ[i];
     }
-    if (int (m_PARAMtuneAnglesRZ.size()) < i - 1) {
+    if (int (m_PARAMtuneAnglesRZ.size()) < i) {
       newPass->anglesRZ.second = m_PARAMtuneAnglesRZ[m_PARAMtuneAnglesRZ.size() - 1];
     } else {
       newPass->anglesRZ.second = m_PARAMtuneAnglesRZ[i];
     }
-    if (int (m_PARAMtuneDistanceDeltaZ.size()) < i - 1) {
+    if (int (m_PARAMtuneDistanceDeltaZ.size()) < i) {
       newPass->distanceDeltaZ.second = m_PARAMtuneDistanceDeltaZ[m_PARAMtuneDistanceDeltaZ.size() - 1];
     } else {
       newPass->distanceDeltaZ.second = m_PARAMtuneDistanceDeltaZ[i];
     }
-    if (int (m_PARAMtuneDistance2IP.size()) < i - 1) {
+    if (int (m_PARAMtuneDistance2IP.size()) < i) {
       newPass->distance2IP.second = m_PARAMtuneDistance2IP[m_PARAMtuneDistance2IP.size() - 1];
     } else {
       newPass->distance2IP.second =  m_PARAMtuneDistance2IP[i];
     }
-    if (int (m_PARAMtunePT.size()) < i - 1) {
+    if (int (m_PARAMtunePT.size()) < i) {
       newPass->pT.second = m_PARAMtunePT[m_PARAMtunePT.size() - 1];
     } else {
       newPass->pT.second =  m_PARAMtunePT[i];
     }
-    if (int (m_PARAMtuneZigZag.size()) < i - 1) {
+    if (int (m_PARAMtuneZigZag.size()) < i) {
       newPass->zigzag.second = m_PARAMtuneZigZag[m_PARAMtuneZigZag.size() - 1];
     } else {
       newPass->zigzag.second = m_PARAMtuneZigZag[i];
     }
-    if (int (m_PARAMtuneDeltaPt.size()) < i - 1) {
+    if (int (m_PARAMtuneDeltaPt.size()) < i) {
       newPass->deltaPt.second = m_PARAMtuneDeltaPt[m_PARAMtuneDeltaPt.size() - 1];
     } else {
       newPass->deltaPt.second = m_PARAMtuneDeltaPt[i];
     }
-    if (int (m_PARAMtuneDeltaDistance2IP.size()) < i - 1) {
+    if (int (m_PARAMtuneDeltaDistance2IP.size()) < i) {
       newPass->deltaDistance2IP.second = m_PARAMtuneDeltaDistance2IP[m_PARAMtuneDeltaDistance2IP.size() - 1];
     } else {
       newPass->deltaDistance2IP.second = m_PARAMtuneDeltaDistance2IP[i];
@@ -952,24 +955,26 @@ void VXDTFModule::event()
   } else if (m_PARAMcalcQIType == "trackLength") {
     calcQIbyLength(m_tcVector, m_passSetupVector);  /// calcQIbyLength
   }
-  if (totalOverlaps > 2) {
+
+  if (totalOverlaps > 2 && m_PARAMcleanOverlappingSet == true) {
     int olSize = m_tcVectorOverlapped.size();
-    cleanOverlappingSet(m_tcVectorOverlapped);
+    cleanOverlappingSet(m_tcVectorOverlapped); /// removes TCs which are found more than once completely
     m_TESTERcleanOverlappingSetStartedCtr++;
     totalOverlaps = m_tcVectorOverlapped.size();
     B2DEBUG(10, "out of funcCleanOverlappingSet: tcVectorBefore.size(): " << olSize << ", tcVectorAfter.size(): " << totalOverlaps)
   }
 
-
-  /// checking overlapping TCs for best subset, if there are more than 2 different TC's
-  if (totalOverlaps > 2) {
-    hopfield(m_tcVectorOverlapped, m_PARAMomega); /// hopfield
-  } else if (totalOverlaps == 2) {
-    // for that easy situation we dont need the neuronal network, especially when the nn does sometimes chose the wrong one...
-    if (m_tcVectorOverlapped[0]->getTrackQuality() > m_tcVectorOverlapped[1]->getTrackQuality()) {
-      m_tcVectorOverlapped[1]->setCondition(false);
-    } else { m_tcVectorOverlapped[0]->setCondition(false); }
-  } else { B2DEBUG(10, " less than 2 overlapping Track Candidates found, no need for neuronal network") }
+  if (m_PARAMuseHopfield == true) {
+    /// checking overlapping TCs for best subset, if there are more than 2 different TC's
+    if (totalOverlaps > 2) {
+      hopfield(m_tcVectorOverlapped, m_PARAMomega); /// hopfield
+    } else if (totalOverlaps == 2) {
+      // for that easy situation we dont need the neuronal network, especially when the nn does sometimes chose the wrong one...
+      if (m_tcVectorOverlapped[0]->getTrackQuality() > m_tcVectorOverlapped[1]->getTrackQuality()) {
+        m_tcVectorOverlapped[1]->setCondition(false);
+      } else { m_tcVectorOverlapped[0]->setCondition(false); }
+    } else { B2DEBUG(10, " less than 2 overlapping Track Candidates found, no need for neuronal network") }
+  }
 
   B2DEBUG(10, "before exporting TCs, length of m_tcVector: " << m_tcVector.size() << ", m_tcVectorOverlapped: " << m_tcVectorOverlapped.size());
   TVector3 posIn, momIn;

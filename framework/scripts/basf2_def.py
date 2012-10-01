@@ -138,6 +138,7 @@ def print_params(module, print_values=True, shared_lib_path=None):
     else:
         output.append(['Parameter', 'Type', 'Default', 'Description'])
 
+    has_forced_params = False
     paramList = module.available_params()
     for paramItem in paramList:
         defaultStr = ', '.join(['%s' % defaultItem for defaultItem in
@@ -147,6 +148,8 @@ def print_params(module, print_values=True, shared_lib_path=None):
         forceString = ''
         if paramItem.forceInSteering:
             forceString = '*'
+            has_forced_params = True
+            defaultStr = ''
         if print_values:
             output.append([
                 forceString + paramItem.name,
@@ -200,6 +203,8 @@ def print_params(module, print_values=True, shared_lib_path=None):
             print 80 * '-'
             header_shown = True
     print ''
+    if has_forced_params:
+        print ' * denotes a required parameter.'
 
 
 def print_path(path, defaults=False, description=False):

@@ -685,10 +685,14 @@ EVEVisualization::MCTrack& EVEVisualization::addMCParticle(const MCParticle* par
       particle = particle->getMother();
   }
 
+  //particles with PDG 0 will not be shown (many created in TOP)
+  while (particle->getPDG() == 0 and particle->getMother())
+    particle = particle->getMother();
+
   if (!m_mcparticleTracks[particle].track) {
     const TVector3& p = particle->getMomentum();
     const TVector3& vertex = particle->getProductionVertex();
-    int pdg = particle->getPDG();
+    const int pdg = particle->getPDG();
     TParticle tparticle(pdg, particle->getStatus(),
                         (particle->getMother() ? particle->getMother()->getIndex() : 0), 0, particle->getFirstDaughter(), particle->getLastDaughter(),
                         p.x(), p.y(), p.z(), particle->getEnergy(),
@@ -727,7 +731,7 @@ EVEVisualization::MCTrack& EVEVisualization::addMCParticle(const MCParticle* par
 
 
     //add some color (avoid black & white)
-    switch (abs(particle->getPDG())) {
+    switch (abs(pdg)) {
       case 11:
         m_mcparticleTracks[particle].track->SetLineColor(kAzure);
         break;

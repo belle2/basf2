@@ -291,7 +291,7 @@ void DedxPIDModule::event()
       bool track_extrapolation_failed = false;
 
       //Loop over all CDC hits from this track
-      const std::vector<unsigned int>& cdc_hit_ids = gftrackcand.GetHitIDs(c_CDC);
+      const std::vector<unsigned int>& cdc_hit_ids = gftrackcand.getHitIDs(c_CDC);
       const int num_cdc_hits = cdc_hit_ids.size();
       for (int iCDC = 0; iCDC < num_cdc_hits; iCDC++) {
         const int cdc_idx = cdc_hit_ids[iCDC];
@@ -430,7 +430,7 @@ void DedxPIDModule::event()
 
     if (m_usePXD) {
       //get indices of PXDTrueHits
-      const std::vector<unsigned int>& pxdHitIDs = gftrackcand.GetHitIDs(c_PXD);
+      const std::vector<unsigned int>& pxdHitIDs = gftrackcand.getHitIDs(c_PXD);
 
       //and construct a list of associated PXDCluster indices
       std::vector<unsigned int> pxdClusterIDs;
@@ -448,7 +448,7 @@ void DedxPIDModule::event()
 
     if (m_useSVD) {
       //no way to access digitized SVD hits, so we'll just use the SVDTrueHits directly
-      const std::vector<unsigned int>& svd_hit_ids = gftrackcand.GetHitIDs(c_SVD);
+      const std::vector<unsigned int>& svd_hit_ids = gftrackcand.getHitIDs(c_SVD);
       saveSiHits(&track, helix_at_origin, svdTrueHits, svd_hit_ids);
     }
 

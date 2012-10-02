@@ -261,7 +261,7 @@ void GenFitterModule::event()
       if (m_mcTracks == true && m_pdg == -999) {
         aTrackCandPointer->setPdgCode(pdg.at(pdgCounter - 1));
       } else {
-        aTrackCandPointer->setPdgCode(int(TMath::Sign(1., aTrackCandPointer->getQoverPseed()) * pdg.at(pdgCounter - 1)));
+        aTrackCandPointer->setPdgCode(int(TMath::Sign(1., aTrackCandPointer->getChargeSeed()) * pdg.at(pdgCounter - 1)));
       }
 
       trackRep = new RKTrackRep(aTrackCandPointer);
@@ -402,7 +402,7 @@ void GenFitterModule::event()
               tracks[trackCounter]->setNPXDHits(nPXD);
               tracks[trackCounter]->setMCId(aTrackCandPointer->getMcTrackId());
               tracks[trackCounter]->setPDG(aTrackCandPointer->getPdgCode());
-              tracks[trackCounter]->setPurity(aTrackCandPointer->getDip());
+              //tracks[trackCounter]->setPurity(aTrackCandPointer->getDip()); //setDip will be deleted soon. If purity is used it has to be passed differently to the Track class
               tracks[trackCounter]->setPValue(pValue);
               //Set helix parameters
               tracks[trackCounter]->setD0(-999);

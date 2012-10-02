@@ -813,10 +813,15 @@ void EVEVisualization::clearEvent()
   m_tracklist->DestroyElements();
   m_gftracklist->DestroyElements();
 
+  //lower energy threshold for ECL
+  float ecl_threshold = 0.01;
+  if (m_eclsimhitdata)
+    ecl_threshold = m_eclsimhitdata->GetSliceThreshold(0);
+
   delete m_eclsimhitdata;
   m_eclsimhitdata = new TEveCaloDataVec(1); //#slices
   m_eclsimhitdata->IncDenyDestroy();
-  m_eclsimhitdata->RefSliceInfo(0).Setup("ECL", 0.01, kRed); //set lower energy threshold here
+  m_eclsimhitdata->RefSliceInfo(0).Setup("ECL", ecl_threshold, kRed);
 
   //other things are cleaned up by TEve...
 }

@@ -37,7 +37,7 @@ namespace Belle2 {
   for(int iPart = 0; iPart < particles.getEntries(); iPart++) {
     //... create new hit 'myhit'
     cdcsimhits.appendNew(myhit);
-    int cdcsimhitIdx = getEntries()-1; //index of last object stored
+    int cdcsimhitIdx = cdcsimhits.getEntries()-1; //index of last object stored
 
     //connect objects at indices iPart and cdcsimhitIdx
     particlesToCdchits.add(iPart, cdcsimhitIdx);

@@ -191,8 +191,8 @@ TRGCDC::initialize(bool houghFinderPerfect,
 		   unsigned houghFinderMeshY) {
 
     //...CDC...
-    Belle2::cdc::CDCGeometryPar & cdc2 =
-	Belle2::cdc::CDCGeometryPar::Instance();
+    Belle2::CDC::CDCGeometryPar & cdc2 =
+	Belle2::CDC::CDCGeometryPar::Instance();
     const unsigned nLayers = cdc2.nWireLayers();
 
     //...Loop over layers...

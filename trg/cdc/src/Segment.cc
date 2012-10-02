@@ -61,7 +61,7 @@ TRGCDCSegment::~TRGCDCSegment() {
 void
 TRGCDCSegment::initialize(bool fevtTime){
   flagevtTime=fevtTime;
-  cdc::CDCGeometryPar& cdcp=cdc::CDCGeometryPar::Instance();
+  CDC::CDCGeometryPar& cdcp=CDC::CDCGeometryPar::Instance();
   wireR[0]=cdcp.senseWireR(2)*0.01;
   nWires[0]=cdcp.nWiresInLayer(2)*2;
   for(int i=0;i<4;i++){

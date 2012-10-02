@@ -325,7 +325,7 @@ namespace Belle2 {
     m_flagNonTSStudy = 0;
 
     // Geometry
-    cdc::CDCGeometryPar& cdcp = cdc::CDCGeometryPar::Instance();
+    CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
     //Initialize rr,ztostarw,anglest,ni
     rr[0]=cdcp.senseWireR(2)*0.01;
     rro[0]=cdcp.senseWireR(2)*0.01;

@@ -43,7 +43,7 @@ namespace Belle2 {
     : _cdc(TRGCDC) {
       m_Trg_PI = 3.141592653589793;
       // Initialize rr, ztostraw, anglest, nWiresInStereoLayer.
-      cdc::CDCGeometryPar& cdcp = cdc::CDCGeometryPar::Instance();
+      CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
       for(int stSuperLayer=0;stSuperLayer<4;stSuperLayer++){
         m_rr[stSuperLayer]=cdcp.senseWireR(12*stSuperLayer+10)*0.01;
         m_ztostraw[stSuperLayer]=cdcp.senseWireBZ(12*stSuperLayer+10)*0.01;

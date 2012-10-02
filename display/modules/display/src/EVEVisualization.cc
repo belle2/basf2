@@ -80,6 +80,26 @@ EVEVisualization::EVEVisualization():
   m_eclsimhitdata(0)
 {
   setErrScale();
+
+  //create new containers
+  m_trackpropagator = new TEveTrackPropagator();
+  m_trackpropagator->IncDenyDestroy();
+  m_trackpropagator->SetMagFieldObj(&m_bfield, false);
+  m_trackpropagator->SetMaxR(380); //don't draw tracks outside detector
+
+  m_tracklist = new TEveTrackList(m_trackpropagator);
+  m_tracklist->IncDenyDestroy();
+  m_tracklist->SetName("MCParticles");
+  m_tracklist->SelectByP(0.01, 15.0); //don't show too many particles by default...
+
+  m_gftrackpropagator = new TEveTrackPropagator();
+  m_gftrackpropagator->IncDenyDestroy();
+  m_gftrackpropagator->SetMagFieldObj(&m_bfield, false);
+  m_gftrackpropagator->SetMaxOrbs(0.01); //stop after track markers
+
+  m_gftracklist = new TEveTrackList("Fitted tracks", m_gftrackpropagator);
+  m_gftracklist->IncDenyDestroy();
+
   clearEvent();
 }
 
@@ -95,6 +115,8 @@ EVEVisualization::~EVEVisualization()
     return; //objects are probably already freed by Eve
 
   delete m_eclsimhitdata;
+  delete m_tracklist;
+  delete m_gftracklist;
   delete m_trackpropagator;
   delete m_gftrackpropagator;
 }
@@ -741,16 +763,15 @@ EVEVisualization::MCTrack& EVEVisualization::addMCParticle(const MCParticle* par
 
 void EVEVisualization::makeTracks()
 {
-  TEveTrackList* tracks = new TEveTrackList(m_trackpropagator);
-  tracks->SetName("MCParticles");
   std::map<const MCParticle*, MCTrack>::iterator it = m_mcparticleTracks.begin();
   const std::map<const MCParticle*, MCTrack>::iterator& end = m_mcparticleTracks.end();
   for (; it != end; ++it) {
-    tracks->AddElement(it->second.track);
+    m_tracklist->AddElement(it->second.track);
   }
-  gEve->AddElement(tracks);
-  tracks->MakeTracks();
-  tracks->SelectByP(0.01, 15.0); //don't show too many particles by default...
+  gEve->AddElement(m_tracklist);
+  m_tracklist->MakeTracks();
+  //reapply momentum cuts (Pt cuts ignored, because they would override P cuts...)
+  m_tracklist->SelectByP(m_tracklist->GetMinP(), m_tracklist->GetMaxP());
 
   for (size_t i = 0; i < m_options.length(); i++) {
     if (m_options.at(i) == 'M') {
@@ -785,18 +806,13 @@ void EVEVisualization::clearEvent()
   if (!gEve)
     return;
   m_mcparticleTracks.clear();
-  //other things are cleaned up by TEve...
+  m_tracklist->DestroyElements();
+  m_gftracklist->DestroyElements();
 
-  //also create new containers
-  m_trackpropagator = new TEveTrackPropagator();
-  m_trackpropagator->SetMagFieldObj(&m_bfield, false);
-  m_trackpropagator->SetMaxR(380); //don't draw tracks outside detector
-  m_gftracklist = new TEveTrackList("Fitted tracks", m_trackpropagator);
-  m_gftrackpropagator = new TEveTrackPropagator();
-  m_gftrackpropagator->SetMagFieldObj(&m_bfield, false);
-  m_gftrackpropagator->SetMaxOrbs(0.01); //stop after track markers
   delete m_eclsimhitdata;
   m_eclsimhitdata = new TEveCaloDataVec(1); //#slices
   m_eclsimhitdata->IncDenyDestroy();
   m_eclsimhitdata->RefSliceInfo(0).Setup("ECL", 0.01, kRed); //set lower energy threshold here
+
+  //other things are cleaned up by TEve...
 }

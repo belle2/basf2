@@ -190,6 +190,9 @@ namespace Belle2 {
     /** map MCParticles to MCTrack (so hits can be added to the correct track). */
     std::map<const MCParticle*, MCTrack> m_mcparticleTracks;
 
+    /** parent object for MC tracks. */
+    TEveTrackList* m_tracklist;
+
     /** parent object for reconstructed tracks. */
     TEveTrackList* m_gftracklist;
 

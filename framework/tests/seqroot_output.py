@@ -16,16 +16,6 @@
 from basf2 import *
 import os
 
-term_width = 0
-try:
-    term_width = int(os.popen('stty size', 'r').read().split()[1])
-
-    #force terminal width of 80 columns to make output reproducible
-    os.system('stty columns 80')
-except:
-    pass
-
-
 set_random_seed(42)
 
 # suppress messages and warnings during processing:
@@ -155,9 +145,6 @@ particlegun.param('zVertexParams', [0])
 # default is False
 particlegun.param('independentVertices', False)
 
-# ============================================================================
-# Print the parameters of the particle gun
-print_params(particlegun)
 
 # ============================================================================
 # Now lets create the necessary modules to perform a simulation
@@ -210,7 +197,3 @@ main.add_module(register_module('PrintCollections'))
 
 # Process events
 process(main)
-
-if term_width > 0:
-    #reset terminal size to to previous value
-    os.system('stty columns ' + str(term_width))

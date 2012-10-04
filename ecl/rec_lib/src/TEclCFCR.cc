@@ -72,9 +72,7 @@ TEclCFCR::operator=(const TEclCFCR& rhs)
     fMass = rhs.fMass;
     fEnergy = rhs.fEnergy;
     fWidth = rhs.fWidth;
-    cout << "1 " << endl;
     fShowers = rhs.fShowers;
-    cout << "2 " << endl;
     fEnergyHits = rhs.fEnergyHits;  // is <map> op= standard?
     fSeeds = rhs.fSeeds;
     fFreeHits = rhs.fFreeHits;
@@ -282,10 +280,8 @@ TEclCFCR::UncAttributes(void)
 ///   ... anyway r,<r>,Rcm cannot be well-defined, need optimization
 ///   ... think about staggered case, it'll bias position
 {
-//   const std::vector<EclCrystalGeometry>& cg
-//      = EclCalorimeterGeometry::instance().crystalGeometries();
-  ECLGeometryPar cg;
 
+  ECLGeometryPar* cg = ECLGeometryPar::Instance();
   double e_sum = 0.0;
   TVector3  p_sum;
   TVector3  x_wsum;
@@ -293,9 +289,7 @@ TEclCFCR::UncAttributes(void)
        i != fEnergyHits.end(); ++i) {
     Identifier cid = (*i).first;
     double energy = (*i).second.Energy();
-//      const HepPoint3D& = cg[cid - 1].centerGlobal();
-//      TVector3  x = cg[cid - 1].centerGlobal();  // not safe.
-    TVector3 x = cg.GetCrystalPos(cid);
+    TVector3 x = cg->GetCrystalPos(cid);
 
     e_sum += energy; // total
     p_sum += energy * x.Unit();  // for gamma e=e*x/r
@@ -303,8 +297,6 @@ TEclCFCR::UncAttributes(void)
     x_wsum += energy * x;
   }
 
-  // naive cr mass
-//   fMass = sqrt(max (0.0, e_sum*e_sum - p_sum.Mag2()));
   fMass = sqrt(abs(e_sum * e_sum - p_sum.Mag2()));
   fEnergy = e_sum;
 
@@ -315,65 +307,55 @@ TEclCFCR::UncAttributes(void)
        i != fEnergyHits.end(); ++i) {
     Identifier cid = (*i).first;
     double energy = (*i).second.Energy();
-//      TVector3  r = cg[cid - 1].centerGlobal();
-    TVector3 r = cg.GetCrystalPos(cid);
+    TVector3 r = cg->GetCrystalPos(cid);
     TVector3  x_minus_xmin = r - x_min;
     x_minus_x_min_squared += x_minus_xmin.Mag2() * energy;
   }
 
   fWidth = sqrt(x_minus_x_min_squared / e_sum);
 
-
   ///_____________________ will be move to another place
   /// drive shower
-  {
-    for (EclCFShowerMap::iterator iShower = fShowers.begin();
-         iShower != fShowers.end(); ++iShower) {
-      TEclCFShower& s = (*iShower).second;
-      double e_sum = 0.0;
-      TVector3  p_sum;
-      TVector3  x_wsum;
-      for (std::vector<MEclCFShowerHA>::iterator iHA = s.fHA.begin();
-           iHA != s.fHA.end(); ++iHA) {
-        Identifier cid = iHA->Id();
-        double energy = (iHA->Fraction()) * fEnergyHits[cid].Energy();
-//      TVector3  x = cg[cid - 1].centerGlobal();
-        TVector3 x = cg.GetCrystalPos(cid);
-        e_sum += energy; // total
-        p_sum += energy * x.Unit();  // for gamma e=e*x/r == ux_wsum
+  for (EclCFShowerMap::iterator iShower = fShowers.begin();
+       iShower != fShowers.end(); ++iShower) {
+    TEclCFShower& s = (*iShower).second;
+    double e_sum = 0.0;
+    TVector3  p_sum;
+    TVector3  x_wsum;
+    for (std::vector<MEclCFShowerHA>::iterator iHA = s.fHA.begin();
+         iHA != s.fHA.end(); ++iHA) {
+      Identifier cid = iHA->Id();
+      double energy = (iHA->Fraction()) * fEnergyHits[cid].Energy();
+      TVector3 x = cg->GetCrystalPos(cid);
+      e_sum += energy; // total
+      p_sum += energy * x.Unit();  // for gamma e=e*x/r == ux_wsum
 
-        x_wsum += energy * x;
-      }
-
-      // naive shower mass
-//   fMass = sqrt(max (0.0, e_sum*e_sum - p_sum.Mag2()));
-      s.fMass = sqrt(abs(e_sum * e_sum - p_sum.Mag2()));
-
-      // this should be equal to uncEnergy!
-      s.fEnergy = e_sum;
-
-      TVector3  x_min = x_wsum * (1 / e_sum);
-      TVector3  u_min = p_sum * (1 / e_sum);
-
-      /// R,THETA,PHI is not WELL-DEFINED!
-      s.fDistance = x_min.Mag();  // define theta, phi properly!!!
-      s.fTheta = u_min.Theta();   // by u or x ?
-      s.fPhi = u_min.Phi();
-
-      double x_minus_x_min_squared = 0.0;
-      for (std::vector<MEclCFShowerHA>::iterator iHA = s.fHA.begin();
-           iHA != s.fHA.end(); ++iHA) {
-        Identifier cid = iHA->Id();
-        double energy = (iHA->Fraction()) * fEnergyHits[cid].Energy();
-//      TVector3  r = cg[cid - 1].centerGlobal();
-        TVector3 r = cg.GetCrystalPos(cid);
-        TVector3  x_minus_xmin = r - x_min;
-        x_minus_x_min_squared += x_minus_xmin.Mag2() * energy;
-      }
-
-      s.fWidth = sqrt(x_minus_x_min_squared / e_sum);
+      x_wsum += energy * x;
     }
-  }
+
+    s.fMass = sqrt(abs(e_sum * e_sum - p_sum.Mag2()));
+
+    // this should be equal to uncEnergy!
+    s.fEnergy = e_sum;
+
+    TVector3  x_min = x_wsum * (1 / e_sum);
+    TVector3  u_min = p_sum * (1 / e_sum);
+
+    /// R,THETA,PHI is not WELL-DEFINED!
+    s.fDistance = x_min.Mag();  // define theta, phi properly!!!
+    s.fTheta = u_min.Theta();   // by u or x ?
+    s.fPhi = u_min.Phi();
+    double x_minus_x_min_squared = 0.0;
+    for (std::vector<MEclCFShowerHA>::iterator iHA = s.fHA.begin();
+         iHA != s.fHA.end(); ++iHA) {
+      Identifier cid = iHA->Id();
+      double energy = (iHA->Fraction()) * fEnergyHits[cid].Energy();
+      TVector3 r = cg->GetCrystalPos(cid);
+      TVector3  x_minus_xmin = r - x_min;
+      x_minus_x_min_squared += x_minus_xmin.Mag2() * energy;
+    }
+    s.fWidth = sqrt(x_minus_x_min_squared / e_sum);
+  }//for iShower
 }
 
 

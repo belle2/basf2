@@ -100,20 +100,15 @@ namespace Belle2 {
       m_Masses[3] = 0.493677;
       m_Masses[4] = 0.938272013;
 
-      // Print set parameters
+      // Print module parameters
       printModuleParams();
 
-      // Data store
-      StoreArray<TOPDigit> topDigits;
-      StoreArray<GFTrack> gfTracks(m_gfTracksColName);
-      StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName);
-      StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName);
-      StoreArray<TOPTrack> topTracks;
-      StoreArray<TOPLikelihoods> toplogL;
-      RelationArray gfTrackLogL(gfTracks, toplogL);
-      RelationArray LogLextHit(toplogL, extRecoHits);
-      RelationArray LogLextTrackCand(toplogL, extTrackCands);
-      RelationArray topTrackLogL(topTracks, toplogL);
+      // Data store registration
+      StoreArray<TOPLikelihoods>::registerPersistent(m_topLogLColName);
+      RelationArray::registerPersistent<GFTrack, TOPLikelihoods>(m_gfTracksColName, m_topLogLColName);
+      RelationArray::registerPersistent<TOPLikelihoods, ExtRecoHit>(m_topLogLColName, m_extRecoHitsColName);
+      RelationArray::registerPersistent<TOPLikelihoods, GFTrackCand>(m_topLogLColName, m_extTrackCandsColName);
+      RelationArray::registerPersistent<TOPTrack, TOPLikelihoods>(m_topTrackColName, m_topLogLColName);
 
       // Configure TOP detector
       TOPconfigure();
@@ -129,19 +124,19 @@ namespace Belle2 {
     {
       // input: digitized photons
 
-      StoreArray<TOPDigit> topDigits;
+      StoreArray<TOPDigit> topDigits(m_topDigitColName);
 
       // input: reconstructed tracks
 
       StoreArray<GFTrack> gfTracks(m_gfTracksColName);
       StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName);
       StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName);
-      StoreArray<TOPTrack> topTracks;
+      StoreArray<TOPTrack> topTracks(m_topTrackColName);
 
       // output: log likelihoods
 
-      StoreArray<TOPLikelihoods> toplogL;
-      toplogL->Clear();
+      StoreArray<TOPLikelihoods> toplogL(m_topLogLColName);
+      toplogL.create();
 
       // output: relations
 
@@ -186,19 +181,22 @@ namespace Belle2 {
           reco.DumpHit(Local);
           reco.DumpLogL(Nhyp);
         }
+
         // get results
         double logl[Nhyp], expPhot[Nhyp];
         int nphot;
         reco.GetLogL(Nhyp, logl, expPhot, nphot);
+
         // store results
-        int nentr = toplogL.getEntries();
-        new(toplogL->AddrAt(nentr)) TOPLikelihoods(reco.Flag(), logl, nphot, expPhot);
+        new(toplogL.nextFreeAddress()) TOPLikelihoods(reco.Flag(), logl, nphot, expPhot);
+
         // make relations
-        gfTrackLogL.add(tracks[i].Label(LgfTrack), nentr);
-        LogLextHit.add(nentr, tracks[i].Label(LextHit));
-        LogLextTrackCand.add(nentr, tracks[i].Label(LextTrackCand));
+        int last = toplogL.getEntries() - 1;
+        gfTrackLogL.add(tracks[i].Label(LgfTrack), last);
+        LogLextHit.add(last, tracks[i].Label(LextHit));
+        LogLextTrackCand.add(last, tracks[i].Label(LextTrackCand));
         int iTopTrack = tracks[i].Label(LtopTrack);
-        if (iTopTrack >= 0) topTrackLogL.add(iTopTrack, nentr);
+        if (iTopTrack >= 0) topTrackLogL.add(iTopTrack, last);
       }
 
       // consolidate relatons

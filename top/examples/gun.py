@@ -68,7 +68,7 @@ cdcDigitizer.param(param_cdcdigi)
 mctrackfinder = register_module('MCTrackFinder')
 param_mctrackfinder = {'UseCDCHits': 1, 'UseSVDHits': 1, 'UsePXDHits': 1}
 # select which particles to use: primary particles
-param_mctrackfinder = {'WhichParticles': 0}
+param_mctrackfinder = {'WhichParticles': ['primary']}
 mctrackfinder.param(param_mctrackfinder)
 
 # Track fitting
@@ -101,7 +101,7 @@ topreco = register_module('TOPReconstructor')
 topreco.param('DebugLevel', 1)  # remove this line or set to 0 to suppress printout
 
 # Output
-output = register_module('SimpleOutput')
+output = register_module('RootOutput')
 output.param('outputFileName', 'TOPOutput.root')
 
 # Create path

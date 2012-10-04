@@ -60,8 +60,8 @@ namespace Belle2 {
                string(""));
       addParam("PhotonFraction", m_photonFraction,
                "Fraction of Cerenkov photons propagated in FullSim.", 0.3);
-      addParam("T0jitter", m_T0jitter, "r.m.s of T0 jitter", 25e-3);
-      addParam("ELjitter", m_ELjitter, "r.m.s of electronics jitter", 0.0);
+      addParam("T0jitter", m_T0jitter, "r.m.s of T0 jitter [ns]", 25e-3);
+      addParam("ELjitter", m_ELjitter, "r.m.s of electronics jitter [ns]", 50e-3);
 
     }
 
@@ -71,13 +71,12 @@ namespace Belle2 {
 
     void TOPDigitizerModule::initialize()
     {
-      // Print set parameters
-      printModuleParams();
+      // data store registration
+      StoreArray<TOPDigit>::registerPersistent(m_outColName);
+      RelationArray::registerPersistent<TOPSimHit, TOPDigit>(m_inColName, m_outColName);
 
-      // data store
-      StoreArray<TOPSimHit> topSimHits(m_inColName);
-      StoreArray<TOPDigit> topDigits(m_outColName);
-      RelationArray relSimHitToDigit(topSimHits, topDigits);
+      // print parameters
+      printModuleParams();
     }
 
     void TOPDigitizerModule::beginRun()
@@ -93,7 +92,8 @@ namespace Belle2 {
 
       // output: digitized hits
       StoreArray<TOPDigit> topDigits(m_outColName);
-      topDigits->Clear();
+      topDigits.create();
+
       RelationArray relSimHitToDigit(topSimHits, topDigits);
       relSimHitToDigit.clear();
 
@@ -109,8 +109,8 @@ namespace Belle2 {
       double Tmax = maxTDC * TDCwidth;
 
       int nHits = topSimHits.getEntries();
-      for (int i = 0; i < nHits; i++) {
-        TOPSimHit* aSimHit = topSimHits[i];
+      for (int iHit = 0; iHit < nHits; iHit++) {
+        TOPSimHit* aSimHit = topSimHits[iHit];
 
         // Apply quantum efficiency
         double energy = aSimHit->getEnergy();
@@ -124,21 +124,22 @@ namespace Belle2 {
         if (channelID == 0) continue;
 
         // add T0 jitter, TTS and electronic jitter to photon time
-        // and convert to TDC digits
         double tts = PMT_TTS();
         double tel = gRandom->Gaus(0., m_ELjitter);
         double time = t_beam + aSimHit->getTime() + tts + tel;
+
+        // convert to TDC digits
         if (time < 0) continue;
         if (time > Tmax) time = Tmax;
         int TDC = int(time / TDCwidth);
         if (TDC > maxTDC) TDC = maxTDC;
 
         // store result
-        int nentr = topDigits.getEntries();
-        new(topDigits->AddrAt(nentr)) TOPDigit(aSimHit->getBarID(), channelID, TDC);
+        new(topDigits.nextFreeAddress()) TOPDigit(aSimHit->getBarID(), channelID, TDC);
 
         // make relations
-        relSimHitToDigit.add(i, nentr);
+        int iDigit = topDigits.getEntries() - 1;
+        relSimHitToDigit.add(iHit, iDigit);
 
       }
 

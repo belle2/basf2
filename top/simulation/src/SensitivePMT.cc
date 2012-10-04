@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Petric                                             *
+ * Contributors: Marko Petric, Marko Staric                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -32,15 +32,8 @@ namespace Belle2 {
     SensitivePMT::SensitivePMT():
       Simulation::SensitiveDetectorBase("TOP", SensitivePMT::TOP)
     {
-      //! MCPacrticle store array needed for creation of relations
-      StoreArray<MCParticle> mcParticles;
-      //! TOPSimHits into which the hits will be stored
-      StoreArray<TOPSimHit>  topSimHits;
-
-      //! The relation array between MCParticle and TOPSimHit
-      RelationArray  relMCParticleToTOPSimHit(mcParticles, topSimHits);
-      //! Registraction of the relation array
-      registerMCParticleRelation(relMCParticleToTOPSimHit);
+      StoreArray<TOPSimHit>::registerPersistent();
+      RelationArray::registerPersistent<MCParticle, TOPSimHit>();
     }
 
 
@@ -117,18 +110,6 @@ namespace Belle2 {
       //! fill vector for momentum direction at hit point
       TVector3 Dir(dir.x() , dir.y() , dir.z());
 
-
-      /*!------------------------------------------------------------
-       *                Create TOPSimHit and save it to datastore
-       * ------------------------------------------------------------
-       */
-
-      //! Define TOPSimHit array to which the hit will be stored
-      StoreArray<TOPSimHit> topSimHits;
-
-      //! get the number of already stored TOPSimHits
-      G4int nentr = topSimHits.getEntries();
-
       //! convert to Basf units (photon energy in [eV]!)
       locpos = locpos * Unit::mm;
       glopos = glopos * Unit::mm;
@@ -136,24 +117,26 @@ namespace Belle2 {
       length = length * Unit::mm;
       energy = energy * Unit::MeV / Unit::eV;
 
-      //! Store the hit
-      new(topSimHits->AddrAt(nentr)) TOPSimHit(moduleID, barID, locpos, glopos,
-                                               Dir, Vpos, Vdir, globalTime,
-                                               globalTime - localTime, length,
-                                               energy, parentID, trackID);
 
-      /*!--------------------------------------------------------------------------
-       *                Make relation between TOPSimHit and MCParticle
-       * --------------------------------------------------------------------------
+
+      /*!------------------------------------------------------------
+       *                Create TOPSimHit and save it to datastore
+       * ------------------------------------------------------------
        */
 
-      //! Define the MCParticle class to be used for relation definition
-      StoreArray<MCParticle> mcParticles;
+      StoreArray<TOPSimHit> topSimHits;
+      if (!topSimHits.isValid()) topSimHits.create();
 
-      //! Define the relation array
+      new(topSimHits.nextFreeAddress()) TOPSimHit(moduleID, barID, locpos, glopos,
+                                                  Dir, Vpos, Vdir, globalTime,
+                                                  globalTime - localTime, length,
+                                                  energy, parentID, trackID);
+
+      // add relation to MCParticle
+      StoreArray<MCParticle> mcParticles;
       RelationArray relMCParticleToTOPSimHit(mcParticles, topSimHits);
-      //! add the relation
-      relMCParticleToTOPSimHit.add(trackID, nentr);
+      int last = topSimHits.getEntries() - 1;
+      relMCParticleToTOPSimHit.add(trackID, last);
 
 
       /*! After detection photon track is killed */

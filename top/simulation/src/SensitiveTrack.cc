@@ -36,15 +36,9 @@ namespace Belle2 {
       Simulation::SensitiveDetectorBase("TOP", SensitiveTrack::TOP),
       m_topgp(TOPGeometryPar::Instance())
     {
-      //! MCPacrticle store array needed for creation of relations
-      StoreArray<MCParticle> mcParticles;
-      //! TOPTracks into which the tracks will be stored
-      StoreArray<TOPTrack>  topTracks;
 
-      //! The relation array between MCParticle and TOPTrack
-      RelationArray  relMCParticleToTOPTrack(mcParticles, topTracks);
-      //! Registraction of the relation array
-      registerMCParticleRelation(relMCParticleToTOPTrack);
+      StoreArray<TOPTrack>::registerPersistent();
+      RelationArray::registerPersistent<MCParticle, TOPTrack>();
 
     }
 
@@ -130,18 +124,6 @@ namespace Belle2 {
       //!Get the charge of the particle
       int PDGCharge = (int)particle->GetPDGCharge();
 
-
-      /*!------------------------------------------------------------
-       *                Create TOPTrack and save it to datastore
-       * ------------------------------------------------------------
-       */
-
-      //! Define TOPTrack array to which the hit will be stored
-      StoreArray<TOPTrack> topTracks;
-
-      //! get the number of already stored topTracks
-      int nentr = topTracks.getEntries();
-
       //! convert to Basf units
       TPosition = TPosition * Unit::mm;
       TVPosition = TVPosition * Unit::mm;
@@ -149,10 +131,18 @@ namespace Belle2 {
       TVMomentum = TVMomentum  * Unit::MeV;
       tracklength = tracklength * Unit::mm;
 
-      //! Store hit
-      new(topTracks->AddrAt(nentr)) TOPTrack(trackID, PDG, PDGCharge, TPosition,
-                                             TVPosition, TMomentum, TVMomentum,
-                                             barID, tracklength, globalTime, localTime);
+
+      /*!------------------------------------------------------------
+       *                Create TOPTrack and save it to datastore
+       * ------------------------------------------------------------
+       */
+
+      StoreArray<TOPTrack> topTracks;
+      if (!topTracks.isValid()) topTracks.create();
+
+      new(topTracks.nextFreeAddress()) TOPTrack(trackID, PDG, PDGCharge, TPosition,
+                                                TVPosition, TMomentum, TVMomentum,
+                                                barID, tracklength, globalTime, localTime);
 
 
       /*!--------------------------------------------------------------------------
@@ -160,13 +150,10 @@ namespace Belle2 {
        * --------------------------------------------------------------------------
        */
 
-      //! Define the MCParticle class to be used for relation definition
       StoreArray<MCParticle> mcParticles;
-
-      //! Define the relation array
       RelationArray relMCParticleToTOPTrack(mcParticles, topTracks);
-      //! add the relation
-      relMCParticleToTOPTrack.add(trackID, nentr);
+      int last = topTracks.getEntries() - 1;
+      relMCParticleToTOPTrack.add(trackID, last);
 
       //! everything done successfully
       return true;

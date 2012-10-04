@@ -174,6 +174,7 @@ void TrackFitCheckerModule::initialize()
   }
   m_nSiLayers = m_nPxdLayers + m_nSvdLayers;
   m_nLayers = m_nPxdLayers + m_nSvdLayers + m_nCdcLayers;
+  B2DEBUG(100, "nLayers" << m_nLayers);
 
   //make all vector of vectors have the size of the number of current layers in use
   int vecSizeMeasTest = 3;
@@ -1060,7 +1061,11 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
         }
       }
     } else if (aSvdRecoHit2DPtr not_eq NULL) {
-      m_trackData.accuVecIndices.push_back(aSvdRecoHit2DPtr->getSensorID().getLayerNumber() - 1);
+      int accuVecIndex = aSvdRecoHit2DPtr->getSensorID().getLayerNumber() - 1;
+      if (m_nPxdLayers == 0) {
+        accuVecIndex -= 2; // if the PXD is not simulated the first SVD layer will use the 0 element in all the layer wise statistics container
+      }
+      m_trackData.accuVecIndices.push_back(accuVecIndex);
       m_trackData.detIds.push_back(1);
       if (m_truthAvailable == true) {
         aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(aSvdRecoHit2DPtr->getTrueHit());
@@ -1071,7 +1076,11 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
         }
       }
     } else if (aSvdRecoHitPtr not_eq NULL) {
-      m_trackData.accuVecIndices.push_back(aSvdRecoHitPtr->getSensorID().getLayerNumber() - 1);
+      int accuVecIndex = aSvdRecoHitPtr->getSensorID().getLayerNumber() - 1;
+      if (m_nPxdLayers == 0) {
+        accuVecIndex -= 2; // if the PXD is not simulated the first SVD layer will use the 0 element in all the layer wise statistics container
+      }
+      m_trackData.accuVecIndices.push_back(accuVecIndex);
       m_trackData.detIds.push_back(1);
       if (m_truthAvailable == true) {
         RelationIndex<SVDCluster, SVDTrueHit> relSvdClusterTrueHit;

@@ -283,8 +283,8 @@ void GenFitterModule::event()
       B2DEBUG(100, "Start values: pos std:   " << sqrt(covSeed[0][0]) << "  " << sqrt(covSeed[1][1]) << "  " << sqrt(covSeed[2][2]));
       B2DEBUG(100, "Start values: pdg:      " << aTrackCandPointer->getPdgCode());
 
-      GFTrack gfTrack(trackRep, true);  //create the track with the corresponding track representation
-
+      GFTrack gfTrack(trackRep);  //create the track with the corresponding track representation
+      gfTrack.setSmoothing(true, true); // activate smoothing and the saving of the prediction state to avoid recalculation of prediction during smoothing
       //B2INFO("       Initial Covariance matrix: ");
       //gfTrack.getTrackRep(0)->getCov().Print();
 

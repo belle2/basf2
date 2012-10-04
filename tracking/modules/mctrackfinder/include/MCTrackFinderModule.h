@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <string>
+#include <TMatrixD.h>
 
 namespace Belle2 {
   /**
@@ -83,14 +84,14 @@ namespace Belle2 {
     double m_energyCut;                                         /**< Create track candidates only for MCParticles with energy above this cut*/
     bool m_neutrals;                                            /**< Boolean to mark if track candidates should also be created for neutral particles.*/
 
-
-    double m_smearing;                                          /**< Smearing of MCMomentum and MCVertex in % */
-
-    int m_notEnoughtHitsCounter;                                /**< will hold number of tracks that do not have enough hits to form a track candidate (less than 3)*/
+    double m_smearing;                                          /**< Smearing of MCMomentum and MCVertex in %. This adds a relative error to the initial values without changing the default large initial covariance matrix using for fitting*/
+    std::vector<double> m_smearingCov;                                  /**< Covariance matrix used to smear the true pos and mom before passed to track candidate. This matrix will also passed to Genfit as the initial covarance matrix. If any diagonal value is negative this feature will not be used. OFF DIAGNOLA ELEMENTS DO NOT HAVE AN EFFECT AT THE MOMENT */
+    TMatrixD m_initialCov;                                      /**< The std::vector m_smearingCov will be translated into this TMatrixD*/
+    int m_notEnoughtHitsCounter;                                /**< will hold number of tracks that do not have enough hits to form a track candidate (total NDF less than 5)*/
     int m_noTrueHitCounter;                                     /**< will hold number of cluster hits that do not have a corresponding true hit*/
 
     std::string m_gfTrackCandsColName;                          /**< TrackCandidates collection name */
-    int m_minimalNdf;                                         /**< Minimum number of hits per track to allow track candidate creation*/
+    int m_minimalNdf;                                           /**< Minimum number of hits per track to allow track candidate creation*/
   };
 }
 

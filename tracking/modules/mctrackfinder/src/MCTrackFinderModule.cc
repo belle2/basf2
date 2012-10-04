@@ -71,7 +71,7 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
 
   //smearing of MCMomentum
   addParam("Smearing", m_smearing, "Smearing of MCMomentum/MCVertex prior to storing it in GFTrackCandidate (in %). A negative value will switch off smearing. This is also the default.", -1.0);
-
+  addParam("SmearingCov", m_smearingCov, "Covariance matrix used to smear the true pos and mom before passed to track candidate. This matrix will also passed to Genfit as the initial covarance matrix. If any diagonal value is negative this feature will not be used. OFF DIAGNOLA ELEMENTS DO NOT HAVE AN EFFECT AT THE MOMENT", vector<double>(36, -1.0));
   // names of output containers
   addParam("GFTrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the GFTrackCandidates (output)", string(""));
 }
@@ -103,6 +103,23 @@ void MCTrackFinderModule::initialize()
     } else {
       B2FATAL("Invalid values were given to the MCTrackFinder parameter WhichParticles");
     }
+  }
+
+  //transfom the smearingCov vector into a TMatrixD
+  //first check if it can be transformed into a 6x6 matrix
+  if (m_smearingCov.size() != 36) {
+    B2FATAL("SmearingCov does not have exactly 36 elements. So 6x6 covariance matrix can be formed from it");
+  }
+  m_initialCov.ResizeTo(6, 6);
+  m_initialCov = TMatrixD(6, 6, &m_smearingCov[0]);
+  for (int i = 0; i != 6; ++i) {
+    if (m_initialCov(i, i) < 0.0) {
+      m_initialCov(0, 0) = -1.0; // if first element of matrix is negative this using this matrix will be switched off
+    }
+  }
+
+  if (m_smearing > 0.0 && m_initialCov(0, 0) > 0.0) {
+    B2FATAL("Both relative smearing (Smearing) and using a smearing cov (SmearingCov) is activated but only one of both can be used");
   }
 
 }
@@ -279,6 +296,10 @@ void MCTrackFinderModule::event()
       }
     }
 
+    if (m_initialCov(0, 0) > 0.0) { //using a use set initial cov and corresponding smearing of inital state adds information
+      ndf += 5;
+    }
+
     if (ndf <= m_minimalNdf) {
       ++m_notEnoughtHitsCounter;
       continue; //goto next mcParticle, do not make track candidate
@@ -294,38 +315,48 @@ void MCTrackFinderModule::event()
     TVector3 positionTrue = aMcParticlePtr->getProductionVertex();
     TVector3 momentumTrue = aMcParticlePtr->getMomentum();
     int pdg = aMcParticlePtr->getPDG();
-
+    // if no kind of smearing is activated the initial values (seeds) for track fit will be the simulated truth
+    TVector3 momentum = momentumTrue;
+    TVector3 position = positionTrue;
+    TMatrixD stateSeed(6, 1); //this will
+    TMatrixD covSeed(6, 6);
+    covSeed.Zero(); // just to be save
+    covSeed[0][0] = 1; covSeed[1][1] = 1; covSeed[2][3] = 2 * 2;
+    covSeed[3][3] = 0.1 * 0.1; covSeed[0][0] = 0.1 * 0.1; covSeed[0][0] = 0.2 * 0.2;
     //it may have positive effect on the fit not to start with exactly precise true values (or it may be just interesting to study this)
     //one can smear the starting momentum values with a gaussian
     //this calculation is always performed, but with the default value of m_smearing = 0 it has no effect on momentum and position (true values are taken)
-    TVector3 momentum;
-    TVector3 position;
+
     if (m_smearing > 0.0) {
       double smearing = m_smearing / 100.0;  //the module parameter m_smearing goes from 0 to 100, smearing should go from 0 to 1
-
-      double smearedPX = gRandom->Gaus(momentumTrue.x(), smearing * momentumTrue.x());
-      double smearedPY = gRandom->Gaus(momentumTrue.y(), smearing * momentumTrue.y());
-      double smearedPZ = gRandom->Gaus(momentumTrue.z(), smearing * momentumTrue.z());
-      momentum.SetXYZ(smearedPX, smearedPY, smearedPZ);
 
       double smearedX = gRandom->Gaus(positionTrue.x(), smearing * positionTrue.x());
       double smearedY = gRandom->Gaus(positionTrue.y(), smearing * positionTrue.y());
       double smearedZ = gRandom->Gaus(positionTrue.z(), smearing * positionTrue.z());
       position.SetXYZ(smearedX, smearedY, smearedZ);
-    } else {
-      position = positionTrue;
-      momentum = momentumTrue;
+      double smearedPX = gRandom->Gaus(momentumTrue.x(), smearing * momentumTrue.x());
+      double smearedPY = gRandom->Gaus(momentumTrue.y(), smearing * momentumTrue.y());
+      double smearedPZ = gRandom->Gaus(momentumTrue.z(), smearing * momentumTrue.z());
+      momentum.SetXYZ(smearedPX, smearedPY, smearedPZ);
     }
+
     //Errors for the position/momentum values can also be passed to GFTrackCandidate
     //Default values in Genfit are (1.,1.,1.,), they seem to be not good!!
     //The best way to set the 'correct' errors has to be investigated....
-    TMatrixD stateSeed(6, 1);
-    TMatrixD covSeed(6, 6);
-    covSeed.Zero(); // just to be save
-    stateSeed[0][0] = position[0]; stateSeed[1][0] = position[1]; stateSeed[2][0] = position[2];
-    stateSeed[3][0] = momentum[0]; stateSeed[4][0] = momentum[1]; stateSeed[5][0] = momentum[2];
-    covSeed[0][0] = 1; covSeed[1][1] = 1; covSeed[2][3] = 2 * 2;
-    covSeed[3][3] = 0.1 * 0.1; covSeed[0][0] = 0.1 * 0.1; covSeed[0][0] = 0.2 * 0.2;
+    if (m_initialCov(0, 0) > 0.0) { // alternative seamring with according to a covariance matrix that will also be passed to genfit
+      double smearedX = gRandom->Gaus(positionTrue.x(), sqrt(m_initialCov(0, 0)));
+      double smearedY = gRandom->Gaus(positionTrue.y(), sqrt(m_initialCov(1, 1)));
+      double smearedZ = gRandom->Gaus(positionTrue.z(), sqrt(m_initialCov(2, 2)));
+      position.SetXYZ(smearedX, smearedY, smearedZ);
+      double smearedPX = gRandom->Gaus(momentumTrue.x(), sqrt(m_initialCov(3, 3)));
+      double smearedPY = gRandom->Gaus(momentumTrue.y(), sqrt(m_initialCov(4, 4)));
+      double smearedPZ = gRandom->Gaus(momentumTrue.z(), sqrt(m_initialCov(5, 5)));
+      momentum.SetXYZ(smearedPX, smearedPY, smearedPZ);
+      covSeed = m_initialCov;
+    }
+    stateSeed(0, 0) = position[0]; stateSeed(1, 0) = position[1]; stateSeed(2, 0) = position[2];
+    stateSeed(3, 0) = momentum[0]; stateSeed(4, 0) = momentum[1]; stateSeed(5, 0) = momentum[2];
+
     //Finally set the complete track seed
     trackCandidates[counter]->set6DSeedAndPdgCode(stateSeed, pdg, covSeed);
 

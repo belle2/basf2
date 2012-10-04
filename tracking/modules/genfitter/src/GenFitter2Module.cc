@@ -76,7 +76,7 @@ GenFitter2Module::GenFitter2Module() :
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("useDaf", m_useDaf, "use the DAF instead of the std. Kalman filter", false);
   addParam("blowUpFactor", m_blowUpFactor, "factor multiplied with the cov of the Kalman filter when backward filter starts", 500.0);
-  addParam("only6", m_filter, "throw away tracks which do not have exactly 1 hit in every Si layer (so 6 hits altogether)", false);
+  addParam("hitsPerTrack", m_nLayerWithHit, "if this option is set only tracks with given number of hits will be fitted. Negative number deactivate this option", -1);
   addParam("filterIterations", m_nGFIter, "number of Genfit iterations", 1);
   addParam("probCut", m_probCut, "Probability cut for the DAF (0.001, 0.005, 0.01)", 0.001);
   addParam("energyLossBetheBloch", m_energyLossBetheBloch, "activate the material effect: EnergyLossBetheBloch", true);
@@ -88,7 +88,7 @@ GenFitter2Module::GenFitter2Module() :
   addParam("angleCut", m_angleCut, "only process tracks with scattering angles smaller then angleCut (The angles are calculated from TrueHits). If negative value given no selection will take place", -1.0);
   addParam("mscModel", m_mscModel, "select the MSC model in Genfit", string("Highland"));
   addParam("hitType", m_hitType, "select what kind of hits are feeded to Genfit. Current Options \"TrueHit\", \"Cluster\" or \"VXDSimpleDigiHit\"", string("TrueHit"));
-  addParam("smoothing", m_smoothing, "select smooting type in Kalman filter: 0 = non; 1 = normal; 2 = fast", 2);
+  addParam("smoothing", m_smoothing, "select smoothing type in Kalman filter: 0 = non; 1 = normal; 2 = fast", 2);
   addParam("dafTemperatures", m_dafTemperatures, "set the annealing scheme (temperatures) for the DAF. Length of vector will determine DAF iterations", vector<double>(1, -999.0));
 }
 
@@ -218,8 +218,8 @@ void GenFitter2Module::event()
     B2DEBUG(100, "nTrackCandHits " << nTrackCandHits);
     // if option is set ignore every track that does not have exactly 1 hit in every Si layer
     bool filterTrack = false;
-    if (m_filter == true) {
-      if (nTrackCandHits not_eq 6) {
+    if (m_nLayerWithHit > 0) {
+      if (nTrackCandHits not_eq m_nLayerWithHit) {
         filterTrack = true;
         B2DEBUG(100, "Not exactly one hit in very Si layer. Track "  << eventCounter << " will not be reconstructed");
         ++m_notPerfectCounter;
@@ -247,8 +247,9 @@ void GenFitter2Module::event()
           layerIds[i] = layerId;
         }
         sort(layerIds.begin(), layerIds.end());
-        for (int l = 0; l not_eq nTrackCandHits; ++l) {
-          if (l + 1 not_eq layerIds[l]) {
+        int first = layerIds[0];
+        for (int l = 1; l not_eq nTrackCandHits; ++l) {
+          if (first + l  not_eq layerIds[l]) {
             filterTrack = true;
             B2DEBUG(100, "Not exactly one hit in very Si layer. Track "  << eventCounter << " will not be reconstructed");
             ++m_notPerfectCounter;

@@ -56,7 +56,9 @@ namespace Belle2 {
     StoreArray<CDCEBSimHit> cdcEBArray;
     RelationArray cdcSimHitRel(mcParticles, cdcSimHits);
     registerMCParticleRelation(cdcSimHitRel);
-
+    cdcSimHits.registerAsPersistent();
+    cdcEBArray.registerAsTransient();
+    RelationArray::registerPersistent<MCParticle, CDCSimHit>();
 
     GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"CDC\"]/Content");
     gd.append("/SensitiveDetector");
@@ -358,6 +360,7 @@ namespace Belle2 {
     StoreArray<MCParticle> mcParticles;
     //change Later
     StoreArray<CDCSimHit> cdcArray;
+    if (!cdcArray) cdcArray.create();
     RelationArray cdcSimHitRel(mcParticles, cdcArray);
 
     m_hitNumber = cdcArray->GetLast() + 1;

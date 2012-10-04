@@ -52,7 +52,7 @@ namespace Belle2 {
 
       /** Create a new element. */
       Element(RelationElement::index_type indexFrom,  RelationElement::index_type indexTo,
-              FROM* from, TO* to,  RelationElement::weight_type weight):
+              const FROM* from, const TO* to,  RelationElement::weight_type weight):
         indexFrom(indexFrom), indexTo(indexTo), from(from), to(to), weight(weight) {}
 
       /** index of the element from which the relation points. */
@@ -149,15 +149,14 @@ namespace Belle2 {
   template<class FROM, class TO> void RelationIndexContainer<FROM, TO>::rebuild(bool force)
   {
     RelationArray storeRel(m_storeRel);
-    if (!storeRel) {
-      B2WARNING("Relation " << m_storeRel.first << " does not exist, cannot build index");
+    m_valid = storeRel.isValid();
+    if (!m_valid) {
+      B2DEBUG(100, "Relation " << m_storeRel.first << " does not exist, cannot build index");
       m_index.clear();
-      m_valid = false;
       m_storeFrom = AccessorParams();
       m_storeTo = AccessorParams();
       return;
     }
-    m_valid = true;
 
     //Check if relation has been modified since we created the index
     //If not, keep old contents
@@ -187,7 +186,7 @@ namespace Belle2 {
       const RelationElement& r = storeRel[i];
       RelationElement::index_type idxFrom = r.getFromIndex();
       if (idxFrom >= nFrom) B2FATAL("Relation " <<  m_storeRel.first << " is inconsistent: from-index out of range");
-      FROM* from = storeFrom[idxFrom];
+      const FROM* from = storeFrom[idxFrom];
 
       //Loop over index and weight vector at once
       typedef std::vector< RelationElement::index_type> idx_t;
@@ -199,7 +198,7 @@ namespace Belle2 {
       for (; itIdx != indices.end() && itWgt != weights.end(); ++itIdx, ++itWgt) {
         RelationElement::index_type idxTo = *itIdx;
         if (idxTo >= nTo) B2FATAL("Relation " <<  m_storeRel.first << " is inconsistent: to-index out of range");
-        TO* to = storeTo[*itIdx];
+        const TO* to = storeTo[idxTo];
         m_index.insert(Element(idxFrom, idxTo, from, to, *itWgt));
       }
     }

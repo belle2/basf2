@@ -95,6 +95,9 @@ namespace Belle2 {
       m_NTDC = 0;
       m_TDCwidth = 0;
 
+      //! electronics jitter
+      m_ELjitter = 0;
+
       //! TTS
       m_NgaussTTS = 0;
 

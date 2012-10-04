@@ -73,6 +73,11 @@ namespace Belle2 {
       /** to return values in Gean units */
       void setGeanUnits() {m_unit = Unit::mm;}
 
+      /** Set electronics jitter
+       * @param jitter rms of electronics jitter in ns
+       */
+      void setELjitter(double jitter) {m_ELjitter = jitter;}
+
       //! Selectors
 
       /** Get number of quartz bars
@@ -246,6 +251,11 @@ namespace Belle2 {
        * @return width of TDC bit in ns
        */
       double getTDCbitwidth() const {return m_TDCwidth; }
+
+      /** Get electronics jitter
+       * @return rms of electronics jitter in ns
+       */
+      double getELjitter() const {return m_ELjitter; }
 
       /** Get number of Gaussian terms for TTS distribution
        * @return number of Gaussian terms
@@ -430,6 +440,9 @@ namespace Belle2 {
 
       int m_NTDC;                 /**< number of TDC bits */
       double m_TDCwidth;          /**< width of a bit in [ns] */
+
+      //! electronics jitter
+      double m_ELjitter;          /**< rms of electronics jitter*/
 
       //! time transition spread (TTS) defined as a sum of Gaussian terms
 

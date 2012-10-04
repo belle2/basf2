@@ -77,6 +77,9 @@ namespace Belle2 {
 
       // print parameters
       printModuleParams();
+
+      // store electronics jitter to make it known for reconstruction
+      m_topgp->setELjitter(m_ELjitter);
     }
 
     void TOPDigitizerModule::beginRun()

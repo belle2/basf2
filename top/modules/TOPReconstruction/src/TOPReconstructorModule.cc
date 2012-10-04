@@ -153,7 +153,7 @@ namespace Belle2 {
 
       std::vector<TOPtrack> tracks; // extrapolated tracks
       getTracks(tracks, 2); // use pion hypothesis
-      if (tracks.size() == 0) return;
+      if (tracks.empty()) return;
 
       // create reconstruction object
 
@@ -246,12 +246,14 @@ namespace Belle2 {
              m_topgp->getNpadx(), m_topgp->getNpady());
 
       int ng = m_topgp->getNgaussTTS();
+      double sigmaTDC = m_topgp->getELjitter();
       if (ng > 0) {
         double frac[ng], mean[ng], sigma[ng];
         for (int i = 0; i < ng; i++) {
           frac[i] = m_topgp->getTTSfrac(i);
           mean[i] = m_topgp->getTTSmean(i);
           sigma[i] = m_topgp->getTTSsigma(i);
+          sigma[i] = sqrt(sigma[i] * sigma[i] + sigmaTDC * sigmaTDC);
         }
         setTTS(ng, frac, mean, sigma);
       }

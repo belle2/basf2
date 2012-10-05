@@ -60,7 +60,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
 
   //Don't start processing in case of no master module
   if (!m_master) {
-    B2ERROR("There is no module that provides event and run numbers.");
+    B2ERROR("There is no module that provides event and run numbers. You must either add the EvtMetaGen module to your path, or, if using an input module, read EventMetaData objects from file.");
   }
 
   //Check if errors appeared. If yes, don't start the event processing.

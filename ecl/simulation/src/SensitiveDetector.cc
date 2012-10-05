@@ -169,6 +169,7 @@ namespace Belle2 {
       StoreArray<MCParticle> mcParticles;
       //change Later
       StoreArray<ECLSimHit> eclArray;
+      if (!eclArray) eclArray.create();
       RelationArray eclSimHitRel(mcParticles, eclArray);
 
       m_hitNumber = eclArray->GetLast() + 1;

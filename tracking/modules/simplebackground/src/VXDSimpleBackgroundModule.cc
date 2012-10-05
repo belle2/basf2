@@ -198,8 +198,8 @@ void VXDSimpleBackgroundModule::event()
     covSeed.Zero(); // just to be save
     stateSeed[0][0] = position[0]; stateSeed[1][0] = position[1]; stateSeed[2][0] = position[2];
     stateSeed[3][0] = momentum[0]; stateSeed[4][0] = momentum[1]; stateSeed[5][0] = momentum[2];
-    covSeed[0][0] = 1; covSeed[1][1] = 1; covSeed[2][3] = 2 * 2;
-    covSeed[3][3] = 0.1 * 0.1; covSeed[0][0] = 0.1 * 0.1; covSeed[0][0] = 0.2 * 0.2;
+    covSeed(0, 0) = 1; covSeed(1, 1) = 1; covSeed(2, 2) = 2 * 2;
+    covSeed(3, 3) = 0.1 * 0.1; covSeed(4, 4) = 0.1 * 0.1; covSeed(5, 5) = 0.2 * 0.2;
     //Finally set the complete track seed
     trackCandidates[0]->set6DSeedAndPdgCode(stateSeed, aMcParticle->getPDG(), covSeed);
 

@@ -144,7 +144,7 @@ namespace Belle2 {
      *  @return            True if the registration succeeded.
      */
     template<class FROM, class TO> static bool registerPersistent(const std::string& fromName, const std::string& toName, DataStore::EDurability durability = DataStore::c_Event,
-        bool errorIfExisting = true) {
+        bool errorIfExisting = false) {
       const std::string& relName = DataStore::relationName(DataStore::arrayName<FROM>(fromName), DataStore::arrayName<TO>(toName));
       return DataStore::Instance().createEntry(relName, durability, RelationContainer::Class(), false, false, errorIfExisting);
 
@@ -156,7 +156,7 @@ namespace Belle2 {
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
      *  @return            True if the registration succeeded.
      */
-    template<class FROM, class TO> static bool registerPersistent(DataStore::EDurability durability = DataStore::c_Event, bool errorIfExisting = true) {
+    template<class FROM, class TO> static bool registerPersistent(DataStore::EDurability durability = DataStore::c_Event, bool errorIfExisting = false) {
       return registerPersistent<FROM, TO>("", "", durability, errorIfExisting);
     }
     /** Register a relation array, that should be written to the output by default, in the data store.
@@ -168,7 +168,7 @@ namespace Belle2 {
      *  @return            True if the registration succeeded.
      */
     static bool registerPersistent(const std::string& name, DataStore::EDurability durability = DataStore::c_Event,
-                                   bool errorIfExisting = true) {
+                                   bool errorIfExisting = false) {
       return DataStore::Instance().createEntry(name, durability, RelationContainer::Class(), false, false, errorIfExisting);
     }
 
@@ -182,7 +182,7 @@ namespace Belle2 {
      *  @return            True if the registration succeeded.
      */
     template<class FROM, class TO> static bool registerTransient(const std::string& fromName, const std::string& toName, DataStore::EDurability durability = DataStore::c_Event,
-        bool errorIfExisting = true) {
+        bool errorIfExisting = false) {
       const std::string& relName = DataStore::relationName(DataStore::arrayName<FROM>(fromName), DataStore::arrayName<TO>(toName));
       return DataStore::Instance().createEntry(relName, durability, RelationContainer::Class(), false, true, errorIfExisting);
     }
@@ -194,7 +194,7 @@ namespace Belle2 {
      *  @return            True if the registration succeeded.
      */
     template<class FROM, class TO> static bool registerTransient(DataStore::EDurability durability = DataStore::c_Event,
-        bool errorIfExisting = true) {
+        bool errorIfExisting = false) {
       return registerTransient<FROM, TO>("", "", durability, errorIfExisting);
     }
     /** Register a relation array, that should NOT be written to the output by default, in the data store.
@@ -206,7 +206,7 @@ namespace Belle2 {
      *  @return            True if the registration succeeded.
      */
     static bool registerTransient(const std::string& name, DataStore::EDurability durability = DataStore::c_Event,
-                                  bool errorIfExisting = true) {
+                                  bool errorIfExisting = false) {
       return DataStore::Instance().createEntry(name, durability, RelationContainer::Class(), false, true, errorIfExisting);
     }
 

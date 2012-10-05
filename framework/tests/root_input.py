@@ -5,6 +5,19 @@ import os
 import shutil
 from basf2 import *
 
+from basf2 import Module
+from ROOT import Belle2
+
+
+class NoopModule(Module):
+    """Doesn't do anything."""
+
+    def __init__(self):
+        """constructor."""
+        super(NoopModule, self).__init__()
+        self.setName('NoopModule')
+
+
 # copy input file into current dir to avoid having the full path in .out file
 try:
     shutil.copy(os.getenv('BELLE2_LOCAL_DIR')
@@ -35,7 +48,7 @@ main = create_path()
 
 # not used for anything, just checking wether the master module
 # can be found if it's not the first module in the path.
-main.add_module(register_module('Gearbox'))
+main.add_module(NoopModule())
 
 main.add_module(input)
 main.add_module(evtmetainfo)

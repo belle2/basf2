@@ -10,6 +10,8 @@
 
 #include <framework/modules/GearboxModule.h>
 #include <framework/gearbox/Gearbox.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 using namespace std;
 using namespace Belle2;
@@ -40,6 +42,9 @@ GearboxModule::GearboxModule() : Module()
 
 void GearboxModule::initialize()
 {
+  //gearbox might need exp/run numbers
+  StoreObjPtr<EventMetaData>::required();
+
   Gearbox& gearbox = Gearbox::getInstance();
   gearbox.setBackends(m_backends);
   gearbox.open(m_filename);

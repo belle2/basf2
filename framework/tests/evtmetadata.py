@@ -5,6 +5,15 @@ from basf2 import *
 from ROOT import Belle2
 
 
+class NoopModule(Module):
+    """Doesn't do anything."""
+
+    def __init__(self):
+        """constructor."""
+        super(NoopModule, self).__init__()
+        self.setName('NoopModule')
+
+
 class EvtMetaDataTest(Module):
 
     """Prints EventMetaData objects and stops event processing in event 3."""
@@ -54,7 +63,7 @@ evtmetadatatest = EvtMetaDataTest()
 
 # not used for anything, just checking wether the master module
 # can be found if it's not the first module in the path.
-main.add_module(register_module('Gearbox'))
+main.add_module(NoopModule())
 
 main.add_module(evtmetagen)
 main.add_module(evtmetadatatest)

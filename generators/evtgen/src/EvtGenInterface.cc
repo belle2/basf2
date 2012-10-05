@@ -53,15 +53,14 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pd
 }
 
 
-int EvtGenInterface::simulateEvent(MCParticleGraph& graph)
+int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle)
 {
   //  B2INFO("Starting event simulation.");
 
-  TLorentzVector pParentParticle;
-  pParentParticle.SetXYZM(0.0, 0.0, 0.0, EvtPDL::getMass(m_ParentParticle));
+  //pParentParticle.SetXYZM(0.0, 0.0, 0.0, EvtPDL::getMass(m_ParentParticle));
 
-  // Boost to lab frame
-  pParentParticle = m_labboost * pParentParticle;
+  // Boost to CMS frame
+  pParentParticle = m_labboost.Inverse() * pParentParticle;
   m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
 
   //B2INFO(pParentParticle.E() << "tt" << pParentParticle.X() << "tt" << pParentParticle.Y() << "tt" << pParentParticle.Z());

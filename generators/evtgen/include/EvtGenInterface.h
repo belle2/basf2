@@ -55,7 +55,7 @@ namespace Belle2 {
     }
 
     int setup(const std::string& decayFileName, const std::string& pdlFileName, const std::string& parentParticle, const std::string& userFileName = std::string(""));
-    int simulateEvent(MCParticleGraph& graph);
+    int simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle);
 
     TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
 

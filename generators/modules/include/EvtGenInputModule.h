@@ -54,6 +54,13 @@ namespace Belle2 {
     std::string m_pdlFileName;
     std::string m_parentParticle;
     bool m_boost2LAB;
+    double m_EHER;
+    double m_ELER;
+    double m_HER_Espread;
+    double m_LER_Espread;
+    double m_crossing_angle;
+    double m_angle;
+
   };
 
 } // end namespace Belle2

@@ -12,8 +12,8 @@
 
 #include <ecl/simulation/SensitiveDetector.h>
 
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <ecl/dataobjects/ECLSimHit.h>
@@ -51,8 +51,8 @@ namespace Belle2 {
     {
       StoreArray<MCParticle> mcParticles;
       StoreArray<ECLSimHit> eclSimHits;
-      RelationArray eclSimHitRel(mcParticles, eclSimHits);
-      registerMCParticleRelation(eclSimHitRel);
+      StoreArray<ECLSimHit>::registerPersistent();
+      RelationArray::registerPersistent<MCParticle, ECLSimHit>();
     }
 
 

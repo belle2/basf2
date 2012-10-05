@@ -13,6 +13,8 @@
 
 //framework:
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <tracking/dataobjects/VXDTFHit.h>
@@ -37,6 +39,9 @@
 //boost:
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/casts.hpp>
+
+//genfit:
+#include <GFTrackCand.h>
 
 
 namespace Belle2 {
@@ -233,6 +238,14 @@ namespace Belle2 {
     void calcQIbyLength(TCsOfEvent& tcVector,
                         PassSetupVector& passSetups);
 
+    /** produce GFTrackCand for current TC */
+    GFTrackCand generateGFTrackCand(VXDTFTrackCandidate* currentTC);
+
+    /** calculate real kalman-QI's for each currently living TC */
+    std::vector<GFTrackCand> calcQIbyKalman(TCsOfEvent& tcVector,
+                                            StoreArray<PXDCluster>& pxdClusters,
+                                            StoreArray<SVDCluster>& svdClusters);
+
 
     /** because of geometrical reasons and the multipass-support, it is a rather common situation that the same track will be recovered twice or more.
      * In such a case, the whole number or at least a subset of hits are shared by several tracks.
@@ -315,6 +328,7 @@ namespace Belle2 {
     bool m_PARAMuseHopfield; /**< allows to deactivate hopfield, so overlapping TCs are exported */
     double m_PARAMsmearMean; /**< allows to introduce a bias for QI (e.g. surpressing all values, ...)*/
     double m_PARAMsmearSigma; /**< bigger values deliver broader distribution*/
+    bool m_PARAMstoreBrokenQI;/**< if true, TC survives QI-calculation-process even if fit was not possible */
 
     std::string m_PARAMcalcQIType; /**< allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength' */
 
@@ -344,6 +358,8 @@ namespace Belle2 {
     int m_TESTERNotFilteredOverlapsQI; /**< counts number of events, when cleanOverlappingSet was started but didn't filter TCs */
     int m_TESTERfilteredOverlapsQICtr; /**< counts number of times, when TCs get filtered by cleanOverlappingSet */
     int m_TESTERcleanOverlappingSetStartedCtr; /**< counts number of times, when cleanOverlappingSet get started */
+    int m_TESTERgoodFitsCtr; /**< counts number of times, the kalman fit worked well */
+    int m_TESTERbadFitsCtr; /**< counts number of times, the kalman fit didn't work */
 
   private:
 

@@ -11,12 +11,12 @@
 #include "tracking/modules/VXDTF/VXDTFModule.h"
 
 // framework
-#include <framework/datastore/StoreArray.h>
 #include <generators/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationIndex.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <pxd/dataobjects/PXDCluster.h>
+#include <geometry/GeometryManager.h>
+#include <geometry/bfieldmap/BFieldMap.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -25,18 +25,24 @@
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
+#include <tracking/gfbfield/GFGeant4Field.h>
 
 //genfit
-#include <GFTrackCand.h>
+
 #include <GFTrack.h>
 #include <GFRecoHitProducer.h>
 #include <GFRecoHitFactory.h>
 #include <GFAbsTrackRep.h>
 #include <RKTrackRep.h>
+#include <GFFieldManager.h>
+#include <GFConstField.h>
+#include <GFTools.h>
+#include <GFKalman.h>
 
 //root packages:
 #include <TMatrixT.h>
 #include <TMatrixD.h>
+#include <TGeoManager.h>
 
 //STL-packages;
 #include <algorithm>
@@ -52,6 +58,7 @@
 #include <boost/algorithm/string/classification.hpp> // needed for is_any_of
 #include <boost/lexical_cast.hpp>
 #include <boost/math/special_functions/sign.hpp>
+
 
 
 using namespace std;
@@ -193,7 +200,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("smearSigma", m_PARAMsmearSigma, " when qiSmear = True, degree of perturbation can be set here", double(0.1));
 
   addParam("calcQIType", m_PARAMcalcQIType, "allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength'", string("trackLength"));
-
+  addParam("storeBrokenQI", m_PARAMstoreBrokenQI, "if true, TC survives QI-calculation-process even if fit was not possible", bool(true));
 
   /// temporarily disabled (maybe used later)
   //  addParam("activateQQQMode", m_activateQQQMode, " set True to calc QQQ-values for TCs", bool(false));
@@ -216,6 +223,12 @@ void VXDTFModule::initialize()
   if (m_PARAMtuneCutoffs <= -50.0 || m_PARAMtuneCutoffs > 1000.0) {
     B2WARNING("VXDTF: chosen value for parameter 'tuneCutoffs' is invalid, reseting value to standard (=0.0)...")
     m_PARAMtuneCutoffs = 0;
+  }
+
+  if (gGeoManager == NULL) {
+    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+    geoManager.createTGeoRepresentation();
+    GFFieldManager::getInstance()->init(new GFGeant4Field());
   }
 
 /// TODO: further checks for validity needed!
@@ -250,6 +263,8 @@ void VXDTFModule::initialize()
   m_TESTERNotFilteredOverlapsQI = 0;
   m_TESTERfilteredOverlapsQICtr = 0;
   m_TESTERcleanOverlappingSetStartedCtr = 0;
+  m_TESTERgoodFitsCtr = 0;
+  m_TESTERbadFitsCtr = 0;
 }
 
 /** *************************************+************************************* **/
@@ -951,7 +966,7 @@ void VXDTFModule::event()
 
   ///calc QI for each TC:
   if (m_PARAMcalcQIType == "kalman") {
-
+    vector<GFTrackCand> temporalTrackCandidates = calcQIbyKalman(m_tcVector, aPxdClusterArray, aSvdClusterArray); /// calcQIbyKalman
   } else if (m_PARAMcalcQIType == "trackLength") {
     calcQIbyLength(m_tcVector, m_passSetupVector);  /// calcQIbyLength
   }
@@ -977,29 +992,10 @@ void VXDTFModule::event()
   }
 
   B2DEBUG(10, "before exporting TCs, length of m_tcVector: " << m_tcVector.size() << ", m_tcVectorOverlapped: " << m_tcVectorOverlapped.size());
-  TVector3 posIn, momIn;
-  vector<int> pxdHits, svdHits;
-  int pdgCode;
   BOOST_FOREACH(VXDTFTrackCandidate * currentTC, m_tcVector) {
     if (currentTC->getCondition() == false) { continue; }
 
-    posIn = currentTC->getInitialCoordinates();
-    momIn = currentTC->getInitialMomentum();
-    pdgCode = currentTC->getPDGCode();
-    pxdHits = currentTC->getPXDHitIndices();
-    svdHits = currentTC->getSVDHitIndices();
-
-    B2DEBUG(10, "generating GFTrackCandidates: posIn.Mag(): " << posIn.Mag() << ", momIn.Mag(): " << momIn.Mag() << ", pdgCode: " << pdgCode);
-    GFTrackCand gfTC;
-    gfTC.setComplTrackSeed(posIn, momIn, pdgCode, TVector3(0.1, 0.1, 0.1), TVector3(0.1, 0.1, 0.2));
-
-    BOOST_REVERSE_FOREACH(int hitIndex, pxdHits) {  // order of hits within VXDTFTrackCandidate: outer->inner hits. GFTrackCand: inner->outer hits
-      gfTC.addHit(0, hitIndex); // 0 means PXD
-    }
-    BOOST_REVERSE_FOREACH(int hitIndex, svdHits) {  // order of hits within VXDTFTrackCandidate: outer->inner hits. GFTrackCand: inner->outer hits
-      gfTC.addHit(1, hitIndex); // 1 means SVD
-    }
-
+    GFTrackCand gfTC = generateGFTrackCand(currentTC); /// generateGFTrackCand
     finalTrackCandidates.appendNew(gfTC);
   }
 
@@ -1065,6 +1061,7 @@ void VXDTFModule::endRun()
   B2INFO("VXDTF endRun, after " << m_eventCounter + 1 << " events, ZigZag triggered " << m_TESTERtriggeredZigZag << " times, and dpT triggered " << m_TESTERtriggeredDpT << " times, TCC approved " << m_TESTERapprovedByTCC << " TCs, " << m_badFriendCounter << " hits lost because of hit having no neighbouring hits in friend sector, " << m_TESTERbadHopfieldCtr << " times, the Hopfield network had no survivors!")
   B2INFO("VXDTF endRun, total number of TCs after TCC: " << m_TESTERcountTotalTCsAfterTCC << ", after TCC-filter: " << m_TESTERcountTotalTCsAfterTCCFilter << ", final: " << m_TESTERcountTotalTCsFinal)
   B2INFO("VXDTF endRun, numOfTimes cleanOverlappingSet got activated:" << m_TESTERcleanOverlappingSetStartedCtr << ", cleanOverlappingSet killed numTCs: " << m_TESTERfilteredOverlapsQI << ", numOfTimes cleanOverlappingSet did/didn't filter TCs: " << m_TESTERfilteredOverlapsQICtr << "/" << m_TESTERNotFilteredOverlapsQI)
+  B2INFO("VXDTF endRun, number of times, where a kalman fit was possible: " << m_TESTERgoodFitsCtr << ", where it failed: " << m_TESTERbadFitsCtr)
 }
 
 void VXDTFModule::terminate()
@@ -2104,7 +2101,97 @@ void VXDTFModule::calcQIbyLength(TCsOfEvent& tcVector, PassSetupVector& passSetu
 
 }
 
+vector <GFTrackCand> VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& pxdClusters, StoreArray<SVDCluster>& svdClusters)
+{
+  /// produce GFTrackCands for each currently living TC and calculate real kalman-QI's
+  GFKalman kalmanFilter;
+  kalmanFilter.setNumIterations(1); // TODO: hardcoded values should be set as steering file-parameter
+  kalmanFilter.setBlowUpFactor(500.0); // TODO: hardcoded values should be set as steering file-parameter
+  vector <GFTrackCand> temporalTCs;
 
+  BOOST_FOREACH(VXDTFTrackCandidate * currentTC, tcVector) {
+    if (currentTC->getCondition() == false) { continue; }
+    GFTrackCand aGFTC = generateGFTrackCand(currentTC);
+    GFTrackCand* aGFTCPtr = &aGFTC;
+
+    RKTrackRep* trackRep = new RKTrackRep(aGFTCPtr);
+    trackRep->setPropDir(1); // 1 = start moving outwards (seed has to be innermost hit), -1 start moving inwards (seed has to be outermost hit)
+
+    GFTrack track(trackRep);
+    track.setSmoothing(false, false);
+
+    GFRecoHitFactory factory;
+
+    if (int(currentTC->getPXDHitIndices().size()) not_eq 0) {
+      GFRecoHitProducer <PXDCluster, PXDRecoHit> * pxdClusterProducer;
+      pxdClusterProducer = new GFRecoHitProducer <PXDCluster, PXDRecoHit> (&*pxdClusters);
+      factory.addProducer(0, pxdClusterProducer);
+    }
+    if (int(currentTC->getSVDHitIndices().size()) not_eq 0) {
+      GFRecoHitProducer <SVDCluster, SVDRecoHit> * svdClusterProducer;
+      svdClusterProducer = new GFRecoHitProducer <SVDCluster, SVDRecoHit> (&*svdClusters);
+      factory.addProducer(1, svdClusterProducer);
+    }
+
+    vector<GFAbsRecoHit*> factoryHits = factory.createMany(*aGFTCPtr); // use the factory to create RecoHits for all Hits stored in the track candidate
+    track.addHitVector(factoryHits);
+    track.setCandidate(*aGFTCPtr);
+
+    kalmanFilter.processTrack(&track);
+
+    if (trackRep->getStatusFlag() == 0) {
+      B2DEBUG(10, "calcQI4TC suceeded: calculated kalmanQI: " << track.getChiSqu() << " with NDF: " << track.getNDF() << ", p-value: " << track.getCardinalRep()->getPVal())
+      currentTC->setTrackQuality(track.getCardinalRep()->getPVal());
+      m_TESTERgoodFitsCtr++;
+    } else {
+      B2DEBUG(10, "calcQI4TC failed...")
+      m_TESTERbadFitsCtr++;
+      currentTC->setTrackQuality(0.);
+
+      if (m_PARAMstoreBrokenQI == false) {
+        currentTC->setCondition(false); // do not store TCs with failed fits if param-flag is set to false
+      }
+    }
+
+
+  }
+
+  return temporalTCs;
+}
+
+GFTrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentTC)
+{
+  GFTrackCand newGFTrackCand;
+
+  TVector3 posIn = currentTC->getInitialCoordinates();
+  TVector3 momIn = currentTC->getInitialMomentum();
+  TMatrixD stateSeed(6, 1); //(x,y,z,px,py,pz)
+  TMatrixD covSeed(6, 6);
+  int pdgCode = currentTC->getPDGCode();
+  vector<int> pxdHits = currentTC->getPXDHitIndices();
+  vector<int> svdHits = currentTC->getSVDHitIndices();
+
+  stateSeed(0, 0) = posIn[0]; stateSeed(1, 0) = posIn[1]; stateSeed(2, 0) = posIn[2];
+  stateSeed(3, 0) = momIn[0]; stateSeed(4, 0) = momIn[1]; stateSeed(5, 0) = momIn[2];
+  covSeed.Zero();
+  covSeed(0, 0) = 0.1 * 0.1; covSeed(1, 1) = 0.1 * 0.1; covSeed(2, 2) = 0.2 * 0.2;
+  covSeed(3, 3) = 0.1 * 0.1; covSeed(4, 4) = 0.1 * 0.1; covSeed(5, 5) = 0.2 * 0.2;
+  B2DEBUG(10, "generating GFTrackCandidate: posIn.Mag(): " << posIn.Mag() << ", momIn.Mag(): " << momIn.Mag() << ", pdgCode: " << pdgCode);
+
+//  newGFTrackCand.setComplTrackSeed(posIn, momIn, pdgCode, TVector3(0.1, 0.1, 0.1), TVector3(0.1, 0.1, 0.2)); /// old method
+
+  newGFTrackCand.set6DSeedAndPdgCode(stateSeed, pdgCode, covSeed);
+
+
+  BOOST_REVERSE_FOREACH(int hitIndex, pxdHits) {  // order of hits within VXDTFTrackCandidate: outer->inner hits. GFTrackCand: inner->outer hits
+    newGFTrackCand.addHit(0, hitIndex); // 0 means PXD
+  }
+  BOOST_REVERSE_FOREACH(int hitIndex, svdHits) {  // order of hits within VXDTFTrackCandidate: outer->inner hits. GFTrackCand: inner->outer hits
+    newGFTrackCand.addHit(1, hitIndex); // 1 means SVD
+  }
+
+  return newGFTrackCand;
+}
 
 void VXDTFModule::cleanOverlappingSet(TCsOfEvent& tcVector)
 {

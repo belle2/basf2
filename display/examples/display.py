@@ -26,10 +26,10 @@ geometry = register_module('Geometry')
 # we'll exclude EKLM and ECL (saves about 20s in startup time)
 geometry.param('ExcludedComponents', ['EKLM', 'ECL'])
 
+main.add_module(input)
 main.add_module(gearbox)
 main.add_module(geometry)
 
-main.add_module(input)
 
 display = register_module('Display')
 

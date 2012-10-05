@@ -321,8 +321,8 @@ void MCTrackFinderModule::event()
     TMatrixD stateSeed(6, 1); //this will
     TMatrixD covSeed(6, 6);
     covSeed.Zero(); // just to be save
-    covSeed[0][0] = 1; covSeed[1][1] = 1; covSeed[2][3] = 2 * 2;
-    covSeed[3][3] = 0.1 * 0.1; covSeed[0][0] = 0.1 * 0.1; covSeed[0][0] = 0.2 * 0.2;
+    covSeed(0, 0) = 1; covSeed(1, 1) = 1; covSeed(2, 2) = 2 * 2;
+    covSeed(3, 3) = 0.1 * 0.1; covSeed(4, 4) = 0.1 * 0.1; covSeed(5, 5) = 0.2 * 0.2;
     //it may have positive effect on the fit not to start with exactly precise true values (or it may be just interesting to study this)
     //one can smear the starting momentum values with a gaussian
     //this calculation is always performed, but with the default value of m_smearing = 0 it has no effect on momentum and position (true values are taken)

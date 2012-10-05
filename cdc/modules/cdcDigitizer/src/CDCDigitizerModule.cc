@@ -181,6 +181,7 @@ void CDCDigitizerModule::event()
     unsigned int iCDCHits = 0;
 
     StoreArray<CDCHit> cdcHits(m_outputCDCHitsName);
+    cdcHits.create();
 
     RelationArray cdcSimHitsToCDCHits(simHits, cdcHits); //SimHit<->CDCHit
     RelationArray mcParticlesToCDCHits(mcParticles, cdcHits); //MCParticle<->CDCHit

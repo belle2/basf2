@@ -17,7 +17,6 @@ gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 
 # Simulation
-pGun = register_module('PGunInput')
 g4sim = register_module('FullSim')
 
 

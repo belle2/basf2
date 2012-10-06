@@ -187,12 +187,14 @@ void ECLDigitizerModule::event()
       if (energyFit[iECLCell] > 0) {
 
         StoreArray<DspECL> eclDspArray(m_eclDspCollectionName);
+        if (!eclDspArray) eclDspArray.create();
         m_hitNum = eclDspArray->GetLast() + 1;
         new(eclDspArray->AddrAt(m_hitNum)) DspECL();
         eclDspArray[m_hitNum]->setCellId(iECLCell);
         eclDspArray[m_hitNum]->setDspA(FitA);
 
         StoreArray<ECLDigit> eclDigiArray(m_eclDigiCollectionName);
+        if (!eclDigiArray) eclDigiArray.create();
         m_hitNum1 = eclDigiArray->GetLast() + 1;
         new(eclDigiArray->AddrAt(m_hitNum1)) ECLDigit();
         eclDigiArray[m_hitNum1]->setCellId(iECLCell + 1);
@@ -205,6 +207,7 @@ void ECLDigitizerModule::event()
   } //store  each crystal hit
 
   StoreArray<TrigECL> eclTrigArray(m_eclTrigCollectionName);
+  if (!eclTrigArray) eclTrigArray.create();
   m_hitNum2 = eclTrigArray->GetLast() + 1;
   new(eclTrigArray->AddrAt(m_hitNum2)) TrigECL();
 //  eclTrigArray[m_hitNum2]->setEventId(m_nEvent);

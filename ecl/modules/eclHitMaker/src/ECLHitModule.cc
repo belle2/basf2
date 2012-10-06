@@ -154,14 +154,12 @@ void ECLHitModule::event()
         StoreArray<HitECL> eclHitArray(m_eclHitOutColName);
 
 //        cout<<iECLCell<<" "<<E_cell[iECLCell][TimeIndex]<<" "<<Tof_ave[iECLCell][TimeIndex] + T_ave[iECLCell][TimeIndex] <<endl;
-
+        if (!eclHitArray) eclHitArray.create();
         m_hitNum = eclHitArray->GetLast() + 1;
         new(eclHitArray->AddrAt(m_hitNum)) HitECL();
         eclHitArray[m_hitNum]->setCellId(iECLCell);
         eclHitArray[m_hitNum]->setEnergyDep(E_cell[iECLCell][TimeIndex]);
         eclHitArray[m_hitNum]->setTimeAve(T_ave[iECLCell][TimeIndex] + Tof_ave[iECLCell][TimeIndex]);
-//        eclHitArray[m_hitNum]->setEnergyDep(T_ave[iECLCell][TimeIndex] );
-//        eclHitArray[m_hitNum]->setTimeAve(T_ave[iECLCell][TimeIndex] );
       }//if Energy > 0
     }//16 Time interval 16x 500 ns
   } //store  each crystal hit
@@ -169,64 +167,6 @@ void ECLHitModule::event()
 //  eclSimArray->Delete();
   m_nEvent++;
 
-  /*
-        StoreArray<MCParticle> mcParticles;                         //needed to use the relations with MCParticles
-        ECLTrackMap eclHitToMCTrackMap;
-        eclHitToMCTrackMap.clear();
-        ECLTrackMap eclTrackMap;
-        eclTrackMap.clear();
-        MCtracks myPrimary;
-        unsigned old_track=99999999;
-        RelationArray eclSimHitRel(mcParticles, eclSimArray);  //RelationsArray created by ECL SensitiveDetector
-
-          for (int index = 0; index < eclSimHitRel.getEntries(); index++) {
-
-               MCParticle * aMCParticle= mcParticles[eclSimHitRel[index].getFromIndex()];
-               TVector3 McP =  aMCParticle->getMomentum();
-               TVector3 Pvertex = aMCParticle->getProductionVertex();
-
-            for (int hit = 0; hit < (int)eclSimHitRel[index].getToIndices().size(); hit++) {
-              ECLSimHit* aECLSimHit = eclSimArray[eclSimHitRel[index].getToIndex(hit)];
-      //          cout<<"MCIndex "<<index<<" "<<eclSimHitRel[index].getFromIndex()<<" Sim  "<< eclSimHitRel[index].getToIndex(hit)<<" "
-      //          <<aECLSimHit->getTrackId()<<" size "<< (int)eclSimHitRel[index].getToIndices().size()<<endl;
-
-                eclHitToMCTrackMap.insert(std::make_pair(eclSimHitRel[index].getToIndex(hit),eclSimHitRel[index].getFromIndex()));
-                     MCParticle * aMCParticle= mcParticles[eclSimHitRel[index].getFromIndex()];
-      //               int hitCellId       =   aECLSimHit->getCellId();
-                         TVector3 McP =  aMCParticle->getMomentum();
-                         TVector3 SimP =  aECLSimHit->getMomentum();
-      //         cout<<SimP.x()<<" "<<SimP.y()<<" "<<SimP.z()<<endl;
-      //         cout<<McP.x()<<" "<<McP.y()<<" "<<McP.z()<<endl;
-
-              }
-            }
-
-            int nMcParticles = mcParticles.getEntries();
-            int PrimaryTrack=-1;
-            int nPrimaryTrack=0;
-            for (int iPart = 0; iPart < nMcParticles; ++iPart) {
-  //        cout<<iPart<<" Index  "<<mcParticles[iPart]->getArrayIndex()<<" PDG  "<<mcParticles[iPart]->getPDG()   <<endl;
-          if(mcParticles[iPart]->getMother()!=NULL) cout<<"MCPart"<<iPart<<" mom"<<mcParticles[iPart]->getMother()->getArrayIndex() <<endl;
-          else  cout<<"MCPart "<<iPart<<endl;
-
-          if(mcParticles[iPart]->getMother()==NULL){
-  //        cout<<"Primary "<<iPart<<" "<<mcParticles[iPart]->getArrayIndex()<<"PDG  "<<mcParticles[iPart]->getPDG() <<" size of last Primary "<<eclTrackMap.size()  <<endl;
-          eclTrackMap.clear();
-          myPrimary.push_back(mcParticles[iPart]->getArrayIndex());
-          eclTrackMap.insert(vpair(mcParticles[iPart]->getArrayIndex(),mcParticles[iPart]->getArrayIndex()));
-          PrimaryTrack= mcParticles[iPart]->getPDG();
-          nPrimaryTrack++;
-          }else{
-  //        cout<<"MCPart "<<iPart<<" "<<mcParticles[iPart]->getMother()->getArrayIndex() <<endl;
-          eclTrackMap.insert(vpair(mcParticles[iPart]->getArrayIndex(), PrimaryTrack ));
-          }
-
-  //        if( iPart !=0 && (mcParticles[iPart]->getMother()==NULL||iPart==(nMcParticles-1) ))
-  //        cout<<"Primary "<<iPart<<" "<<mcParticles[iPart]->getArrayIndex()<<"PDG  "<<PrimaryTrack<<" " << nPrimaryTrack<<" size of Primary "<<eclTrackMap.size()  <<endl;
-
-
-         }
-  */
 }
 
 

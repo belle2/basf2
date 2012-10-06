@@ -97,7 +97,7 @@ void ECLGammaReconstructorModule::event()
   StoreArray<ECLShower> eclRecShowerArray(m_ECLShowerName);
   StoreArray<HitAssignmentECL> eclHitAssignmentArray(m_eclHitAssignmentName);
   StoreArray<ECLGamma> gammaArray(m_ECLGammaName);
-
+  if (!gammaArray) gammaArray.create();
   RelationArray eclGammaToShower(gammaArray, eclRecShowerArray);
 
   if (!eclRecShowerArray) {

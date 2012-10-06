@@ -142,6 +142,7 @@ void ECLReconstructorModule::event()
            iHA != HAs.end(); ++iHA) {
 
         StoreArray<HitAssignmentECL> eclHaArray(m_eclHitAssignmentName);
+        if (!eclHaArray) eclHaArray.create();
         m_HANum = eclHaArray->GetLast() + 1;
         new(eclHaArray->AddrAt(m_HANum)) HitAssignmentECL();
         eclHaArray[m_HANum]->setShowerId(nShower);
@@ -159,6 +160,7 @@ void ECLReconstructorModule::event()
 
 
       StoreArray<ECLShower> eclRecShowerArray(m_ECLShowerName);
+      if (!eclRecShowerArray) eclRecShowerArray.create();
       m_hitNum = eclRecShowerArray->GetLast() + 1;
       new(eclRecShowerArray->AddrAt(m_hitNum)) ECLShower();
       eclRecShowerArray[m_hitNum]->setShowerId(nShower);

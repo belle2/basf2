@@ -149,6 +149,7 @@ void ECLPi0ReconstructorModule::event()
             if (pi0_mass_min < mass && mass < pi0_mass_max) {
 
               StoreArray<ECLPi0> Pi0Array(m_ECLPi0Name);
+              if (!Pi0Array) Pi0Array.create();
               m_Pi0Num = Pi0Array->GetLast() + 1;
               new(Pi0Array->AddrAt(m_Pi0Num)) ECLPi0();
               Pi0Array[m_Pi0Num]->setShowerId1(m_showerId1);

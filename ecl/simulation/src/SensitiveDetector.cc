@@ -51,6 +51,8 @@ namespace Belle2 {
     {
       StoreArray<MCParticle> mcParticles;
       StoreArray<ECLSimHit> eclSimHits;
+      RelationArray eclSimHitRel(mcParticles, eclSimHits);
+      registerMCParticleRelation(eclSimHitRel);
       StoreArray<ECLSimHit>::registerPersistent();
       RelationArray::registerPersistent<MCParticle, ECLSimHit>();
     }

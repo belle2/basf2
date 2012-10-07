@@ -38,8 +38,11 @@ namespace Belle2 {
 
     RelationArray  relBeamBackHitToMCParticle(mcParticles, beamBackHits);
     registerMCParticleRelation(relBeamBackHitToMCParticle);
-    StoreArray<BeamBackHit>::registerPersistent();
-    RelationArray::registerPersistent<MCParticle, BeamBackHit>();
+
+    beamBackHits.registerAsPersistent();
+    if (!DataStore::Instance().hasEntry(relBeamBackHitToMCParticle.getName(), DataStore::c_Event, RelationContainer::Class(), false)) {
+      RelationArray::registerPersistent<MCParticle, BeamBackHit>();
+    }
 
     std::string subDet = subDett;
     if (subDet == "IR")    m_subDet = 0;

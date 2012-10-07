@@ -11,6 +11,7 @@
 #include <simulation/background/BkgSensitiveDetector.h>
 #include <simulation/background/BkgNeutronWeight.h>
 #include <simulation/dataobjects/BeamBackHit.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
@@ -37,6 +38,8 @@ namespace Belle2 {
 
     RelationArray  relBeamBackHitToMCParticle(mcParticles, beamBackHits);
     registerMCParticleRelation(relBeamBackHitToMCParticle);
+    StoreArray<BeamBackHit>::registerPersistent();
+    RelationArray::registerPersistent<MCParticle, BeamBackHit>();
 
     std::string subDet = subDett;
     if (subDet == "IR")    m_subDet = 0;
@@ -96,6 +99,7 @@ namespace Belle2 {
         neutWeight = wt.getWeight(m_startEnergy / Unit::MeV);
       }
       StoreArray<BeamBackHit> beamBackHits;
+      if (!beamBackHits) beamBackHits.create();
       int nentr = beamBackHits->GetLast() + 1;
       new(beamBackHits->AddrAt(nentr)) BeamBackHit(m_subDet, m_identifier, pdgCode, m_trackID, m_startPos, m_startMom, m_startTime, endEnergy, m_startEnergy, m_energyDeposit, m_trackLength, neutWeight);
 

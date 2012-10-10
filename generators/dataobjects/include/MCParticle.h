@@ -24,16 +24,6 @@
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
-
-  //replacement function to warn users of the DEFAULT_MCPARTICLE macro that it is deprecated
-  //TODO: should be removed once all users of DEFAULT_MCPARTICLES have switched
-  inline std::string deprecated_DEFAULT_MCPARTICLES()
-  {
-    B2ERROR("DEFAULT_MCPARTICLES is deprecated, please use an empty string");
-    return "";
-  }
-  //#define DEFAULT_MCPARTICLES deprecated_DEFAULT_MCPARTICLES()
-
   /**
    * A Class to store the Monte Carlo particle information.
    */
@@ -231,7 +221,7 @@ namespace Belle2 {
      * @return The index of the MonteCarlo particle in the corresponding
      *         MCParticle list (starts with 1)
      */
-    int getIndex() const { return m_index; }
+    int getIndex() const { fixParticleList(); return m_index; }
 
     /**
      * Get 0-based index of the particle in the corresponding MCParticle list.
@@ -245,7 +235,7 @@ namespace Belle2 {
      *         generators, where the first particle has index 1. In the array
      *         the first particle has index 0.
      */
-    int getArrayIndex() const { return m_index - 1;  }
+    int getArrayIndex() const { fixParticleList(); return m_index - 1;  }
 
     /**
      * Get 1-based index of first daughter, 0 if no daughters.

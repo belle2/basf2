@@ -356,7 +356,7 @@ namespace Belle2 {
         int iTrackCand = itra * 5 + hypothesis;
         GFTrackCand* cand = extTrackCands[iTrackCand];
         if (! cand) continue;
-        std::vector<double> TOFs = cand->GetRhos();
+        std::vector<double> TOFs = cand->getRhos();
         for (unsigned int j = 0; j < cand->getNHits(); ++j) {
           unsigned int detID;
           unsigned int hitID;

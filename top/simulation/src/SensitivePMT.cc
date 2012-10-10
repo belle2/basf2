@@ -32,8 +32,15 @@ namespace Belle2 {
     SensitivePMT::SensitivePMT():
       Simulation::SensitiveDetectorBase("TOP", SensitivePMT::TOP)
     {
+      // registration
       StoreArray<TOPSimHit>::registerPersistent();
       RelationArray::registerPersistent<MCParticle, TOPSimHit>();
+
+      // additional registration of MCParticle relation (required for correct relations)
+      StoreArray<MCParticle> particles;
+      StoreArray<TOPSimHit>  hits;
+      RelationArray  relation(particles, hits);
+      registerMCParticleRelation(relation);
     }
 
 
@@ -139,11 +146,9 @@ namespace Belle2 {
       relMCParticleToTOPSimHit.add(trackID, last);
 
 
-      /*! After detection photon track is killed */
+      /*! After detection photon is killed */
 
       track.SetTrackStatus(fStopAndKill);
-
-      //! Since we have detected the particle we return true
 
       return true;
     }

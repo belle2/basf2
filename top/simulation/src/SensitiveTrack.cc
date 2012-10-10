@@ -36,10 +36,15 @@ namespace Belle2 {
       Simulation::SensitiveDetectorBase("TOP", SensitiveTrack::TOP),
       m_topgp(TOPGeometryPar::Instance())
     {
-
+      // registration
       StoreArray<TOPTrack>::registerPersistent();
       RelationArray::registerPersistent<MCParticle, TOPTrack>();
 
+      // additional registration of MCParticle relation (required for correct relations)
+      StoreArray<MCParticle> particles;
+      StoreArray<TOPTrack>  tracks;
+      RelationArray  relation(particles, tracks);
+      registerMCParticleRelation(relation);
     }
 
 
@@ -146,7 +151,7 @@ namespace Belle2 {
 
 
       /*!--------------------------------------------------------------------------
-       *                Make relation between TOPTracks and MCParticle
+       *                Make relation between TOPTrack and MCParticle
        * --------------------------------------------------------------------------
        */
 

@@ -65,6 +65,10 @@ namespace Belle2 {
     //! The flag to denote this hit is in the left or right side.
     int m_posFlag;
 
+
+    /** Time of energy deposition */
+    float m_globalTime;
+
     /** Setter for Wire ID.
      *
      *  @param iCLayerID   number of layer with continuous counting method.
@@ -183,6 +187,13 @@ namespace Belle2 {
       m_posTrack = posTrack;
       m_posFlag = posFlag;
     }
+
+    /** Shift the SimHit in time
+     * @param delta The value of the time shift.
+     */
+    void shiftInTime(float delta) { m_globalTime += delta; }
+
+
 
     /** ROOT Macro. */
     ClassDef(CDCSimHit, 2);

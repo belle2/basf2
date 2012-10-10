@@ -75,6 +75,21 @@ namespace Belle2 {
     class GraphParticle: public MCParticle {
 
     public:
+      /**
+       * Assign the values of an existing MCParticle to this GraphParticle.
+       * This assignment will leave all bookkeeping members of the
+       * GraphParticle untouched (decays, ignore status, track id) but will
+       * assign all values/flags from the MCParticle.
+       * @param particle Particle which values (momentum, energy, mass, vertex, etc.) shall be assigned
+       */
+      GraphParticle& operator=(const MCParticle& particle) {
+        MCParticle::operator=(particle);
+        //The pointer to the TClonesArray the MCParticle is stored in makes no
+        //sense inside the Graph so we set it to some invalid value to avoid
+        //the MCParticle::fixParticleList() to complain
+        m_plist = (TClonesArray*) - 1;
+        return *this;
+      }
 
       /**
        * Tells the graph that this particle decays into daughter.
@@ -156,7 +171,12 @@ namespace Belle2 {
        * @param index The vertex id of the particle in the graph.
        */
       GraphParticle(MCParticleGraph* graph, unsigned int vertexId): MCParticle(),
-        m_graph(graph), m_vertexId(vertexId), m_ignore(false), m_primary(true), m_trackID(0) {}
+        m_graph(graph), m_vertexId(vertexId), m_ignore(false), m_primary(true), m_trackID(0) {
+        //The pointer to the TClonesArray the MCParticle is stored in makes no
+        //sense inside the Graph so we set it to some invalid value to avoid
+        //the MCParticle::fixParticleList() to complain
+        m_plist = (TClonesArray*) - 1;
+      }
 
       /**
        * Set the 1-based index of the particle.
@@ -226,6 +246,14 @@ namespace Belle2 {
      * @see class MCParticle
      */
     void generateList(const std::string& name = "", int options = c_setNothing);
+
+
+    /**
+     * Load the MCParticle list given by name into the Graph
+     * @param name Name of the StoreArray for the MCParticle list
+     * @see class MCParticle
+     */
+    void loadList(const std::string& name = "");
 
     /**
      * Reset particles and decay information to make the class reusable.

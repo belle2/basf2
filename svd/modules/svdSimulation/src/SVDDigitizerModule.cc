@@ -289,7 +289,7 @@ void SVDDigitizerModule::event()
     if (mcRel) {
       m_currentParticle = mcRel->indexFrom;
     } else {
-      B2ERROR("Could not find MCParticle which produced SVDSimhit " << i);
+      //B2ERROR("Could not find MCParticle which produced SVDSimhit " << i);
       m_currentParticle = -1;
     }
     const RelationIndex<SVDTrueHit, SVDSimHit>::Element* trueRel = relTrueHitSimHit.getFirstElementTo(m_currentHit);

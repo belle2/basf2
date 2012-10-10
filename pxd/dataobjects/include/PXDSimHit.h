@@ -65,6 +65,10 @@ namespace Belle2 {
     float getEnergyDep()        const { return m_energyDep; }
     /** Return the time of the energy deposition */
     float getGlobalTime()       const { return m_globalTime; }
+    /** Shift the SimHit in time
+     * @param delta The value of the time shift.
+     */
+    void shiftInTime(float delta) { m_globalTime += delta; }
   private:
     /** ID of the sensor the energy was deposited in */
     unsigned short m_sensorID;

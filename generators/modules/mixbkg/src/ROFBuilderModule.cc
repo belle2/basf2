@@ -10,6 +10,9 @@
 
 #include <generators/modules/mixbkg/ROFBuilderModule.h>
 
+#include <framework/core/InputController.h>
+#include <framework/gearbox/Unit.h>
+
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
 
@@ -36,16 +39,25 @@ ROFBuilderModule::ROFBuilderModule() : Module()
   addParam("Subdetector", m_subdetector, "The subdetector for which the ROF Root file is created (1 = PXD, 2 = SVD).");
   addParam("SimHitCollectionName", m_simHitCollectionName, "The name of the SimHit collection.");
   addParam("SimHitMCPartRelationName", m_simHitMCPartRelationName, "The SimHit to MCParticle relation name.");
-  addParam("EventsPerReadoutFrame", m_eventsPerReadoutFrame, "The number of events that represent one readout frame.");
+  // Timing mode
+  addParam("TimeAwareMode", m_timeAwareMode, "Randomize events and generate time information in ROFs", bool(false));
+  // For timeless mode - fixed number of base events per ROF
+  addParam("EventsPerReadoutFrame", m_eventsPerReadoutFrame, "The number of events that represent one readout frame.", double(1));
+  // For time-aware mode - Poisson-distributed number of base events, placed uniformly in time.
+  addParam("WindowStart", m_windowStart, "Start time of subdetector acceptance window [ns]", -150.0);                 /**< Start of ROF windomw.*/
+  addParam("WindowSize", m_windowSize, "Size of subdetector acceptance window [ns]", 330.0);
+  addParam("BaseSampleSize", m_baseSampleSize, "Time equivalent of the base sample [us]", 200.0);
+
   addParam("OutputRootFileName", m_outputRootFileName, "The name of the ROF ROOT output file.");
   addParam("ComponentName", m_componentName, "The name of the background component (e.g. Touschek).");
   addParam("GeneratorName", m_generatorName, "The name of the background generator (e.g. SAD_LER).");
   addParam("MCParticleWriteMode", m_mcParticleWriteMode, "The MCParticle write mode.", 0);
 
-  //Create Subdetector class name list
+  //Create Subdetector class name list FIXME: Is it enough just to fill other subdetector names?
   m_SimHitClassNames.push_back("None");
   m_SimHitClassNames.push_back(PXDSimHit::Class_Name());
   m_SimHitClassNames.push_back(SVDSimHit::Class_Name());
+
 }
 
 
@@ -65,6 +77,7 @@ void ROFBuilderModule::initialize()
   m_rofTree->Branch("MCPartRels",  &m_mcPartRels);
 
   //The content tree (a tree is overkill here, but it avoids writing a specific class for the content)
+  // FIXME: Do I add frame window parameters here?
   m_contentTree->Branch("Subdetector", &m_subdetector, "SBD/I");
   m_contentTree->Branch("Component", &m_componentName);
   m_contentTree->Branch("Generator", &m_generatorName);
@@ -80,6 +93,23 @@ void ROFBuilderModule::initialize()
   m_event = 0;
   m_numberSimHits = 0;
   m_rofGraphUniqueID = -1;
+
+  if (m_timeAwareMode) {
+    // Initialize the event randomizer
+    // FIXME: Could be the randomization is strictly necessary only for Coulomb and Touschek!
+    int nBaseEvents = InputController::numEntries();
+    m_selector = new RandomPermutation(nBaseEvents);
+    // Set the first event number to read in InputController
+    InputController::setNextEntry(m_selector->getNext());
+
+    // Set time-dependent parameters.
+    m_baseSampleSize *= Unit::us;
+    m_windowStart *= Unit::ns;
+    m_windowSize *= Unit::ns;
+    double tau = 1.0 * m_baseSampleSize / nBaseEvents;
+    m_timer = new RandomTimer(tau, m_windowStart, m_windowSize);
+    m_eventTime = m_windowStart - 1; // so that we don't store an empty frame at the start
+  }
 
   map<int, string> writeModeLabels;
   writeModeLabels.insert(make_pair(0, "none"));
@@ -102,8 +132,16 @@ void ROFBuilderModule::initialize()
 
 void ROFBuilderModule::event()
 {
+  // If all input events have been processed, do nothing.
+  if (m_selector->isFinished()) return;
   //Check if a new readout frame has to be created
-  if (m_event >= ((m_currReadoutFrameIdx + 1) * m_eventsPerReadoutFrame)) {
+  bool frameDone = (m_event >= ((m_currReadoutFrameIdx + 1) * m_eventsPerReadoutFrame));
+  if (m_timeAwareMode) {
+    float newEventTime = m_timer->getNextTime();
+    frameDone = newEventTime < m_eventTime;
+    m_eventTime = newEventTime;
+  }
+  if (frameDone) {
     fillROFTree();
     B2INFO(">> Save readout frame: #" << m_currReadoutFrameIdx << " (" << m_numberSimHits << " SimHits" << ")")
 
@@ -124,13 +162,25 @@ void ROFBuilderModule::event()
   }
 
   m_event++;
+
+  if (m_timeAwareMode) {
+    // Set next event number to read in InputController
+    InputController::setNextEntry(m_selector->getNext());
+  }
+
 }
 
 
 void ROFBuilderModule::terminate()
 {
   //Check if a new readout frame has to be created
-  if (m_event >= ((m_currReadoutFrameIdx + 1) * m_eventsPerReadoutFrame)) {
+  bool frameDone = (m_event >= ((m_currReadoutFrameIdx + 1) * m_eventsPerReadoutFrame));
+  if (m_timeAwareMode) {
+    float newEventTime = m_timer->getNextTime();
+    frameDone = newEventTime < m_eventTime;
+    m_eventTime = newEventTime;
+  }
+  if (frameDone) {
     fillROFTree();
     B2INFO(">> Save readout frame: #" << m_currReadoutFrameIdx << " (" << m_numberSimHits << " SimHits" << ")")
   }
@@ -143,6 +193,11 @@ void ROFBuilderModule::terminate()
   delete m_mcPartRels;
   delete m_mcParticles;
   delete m_readoutFrame;
+
+  if (m_timeAwareMode) {
+    delete m_selector;
+    delete m_timer;
+  }
 }
 
 

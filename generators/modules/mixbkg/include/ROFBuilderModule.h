@@ -26,12 +26,74 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TClonesArray.h>
+#include <TRandom.h>
 
 #include <string>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 namespace Belle2 {
+
+  /**
+   * Class RandomPermutation: provide a random permutation of integers 0..n-1.
+   *
+   * This class is a generator: when created with a given size n, it provides (via
+   * RandomPermutation::Next) randomized integers from 0 to n-1.
+   */
+  class RandomPermutation {
+  public:
+    RandomPermutation(int n) : m_n(n), m_current(n), m_finished(false) {
+      m_data = new int[n];
+      for (int i = 0; i < n; ++i) m_data[i] = i;
+    }
+    ~RandomPermutation() { delete [] m_data; }
+    int getNext() { // On end, must first return the last element and then -1 to terminate RootInput normally.
+      if (m_finished) return -1;
+      if (m_current < 0) {
+        m_finished = true;
+        return m_n - 1;
+      }
+      int iSelect = gRandom->Integer(m_current--);
+      int result = m_data[m_current];
+      if (iSelect < m_current) {
+        result = m_data[iSelect];
+        m_data[iSelect] = m_data[m_current];
+      }
+      return result;
+    }
+    bool isFinished() const { return m_finished; }
+
+  private:
+    int m_n;              /**< Size of the array.*/
+    int* m_data;          /**< Array of indices.*/
+    int m_current;        /**< Current position in the array of indices.*/
+    bool m_finished;      /**< Indicates that the permuation has been exhausted.*/
+  };
+
+  /**
+   * Class RandomTimer: Provide exponentially distributied arrival times of beam
+   * background events.
+   * The class also wraps back the time sequence when the end of the acceptance window
+   * has been reached.
+   */
+  class RandomTimer {
+  public:
+    RandomTimer(float tau, float start, float size):
+      m_tau(tau), m_end(start + size), m_time(start)
+    { m_size = static_cast<float>(size); }
+    float getNextTime() {
+      m_time += static_cast<float>(gRandom->Exp(m_tau));
+      if (m_time > m_end) m_time -= m_size;
+      return m_time;
+    }
+  private:
+    double m_tau;   /**< mean time between events.*/
+    float m_size; /**< size of acceptance window (in time units.*/
+    double m_end;   /**< end time of acceptance window.*/
+    float m_time;  /**< current time within the window. */
+  };
+
 
   /**
    * The ROFBuilder module.
@@ -48,6 +110,33 @@ namespace Belle2 {
    * stored along with the SimHits. In order to minimize the data, only the MCParticles
    * which caused a SimHit are saved by default. But can optionally be extended by setting
    * the 'MCParticleWriteMode' parameter of the module.
+   *
+   * The 'time-aware" mode of the ROFBuilder randomizes the order of input events
+   * and builds sequences of SimHits (and the underlying MCParticles, if
+   * desired) randomized in event occurrence times.
+   * For the time-aware mode, set the corresponding parameter to true, and set
+   * the start time and size of the acceptance window of your subdetector (in ns).
+   * Also specify the time interval equivalent of the input data (in us).
+   * There is no fixed amount of events per ROF, since the number is randomized,
+   * and the corresponding parameter only has effect in the "timeless" mode.
+   * NOTES ON CURRENT IMPLEMENTATION:
+   * - The randomization of events takes time, especially when multiple files are
+   * used on input. I believe this can be improved, but not much.
+   * - Currently, the module cannot write MCParticles, as it has problems with
+   * events that don't have SimHits for the required subdetector and it cannot find
+   * the corresponding relation.
+   * - The module currently only works for PXD and SVD. Other subdetectors can
+   * be added relatively easily, BUT their SimHits have to implement a method to
+   * shift the SimHit in time, void shiftInTime(float delta) doing something
+   * like m_simHitTime += delta, whatever simHitTime is and is called. Then add
+   * your subdetector to the list of values for the ROFBuilder::m_subdetector and
+   * m_simHitClassNames.
+   * - A principal problem with this implementation is that it effectively
+   * discards long-lived background - the acceptance window applies to event (=
+   * mother MCParticle) times rather than to SimHits, so SimHits that take time
+   * to appear will simply be outside of the acceptance. My impression is that
+   * there is a measurable fraction of delayed background, so this will have to
+   * be improved.
    */
   class ROFBuilderModule : public Module {
 
@@ -84,6 +173,12 @@ namespace Belle2 {
                                                                            2 = like 0 but in addition all mother particles are stored,
                                                                            3 = all MCParticles*/
     std::string m_simHitMCPartRelationName; /**< The name of the SimHit to MCParticle relation. */
+    bool m_timeAwareMode;                 /**< If true, the events will be read in random order
+                                               and number of events per ROF calculated from time
+                                               window data.*/
+    double m_windowStart;                 /**< Start of ROF windomw.*/
+    double m_windowSize;                  /**< Size of ROF window.*/
+    double m_baseSampleSize;              /**< Size of the base data sample.*/
 
     //Variables
     MCParticleGraph m_rofMCParticleGraph;        /**< The MCParticle graph for one full readout frame. */
@@ -99,6 +194,9 @@ namespace Belle2 {
     int m_currReadoutFrameIdx;                   /**< The index of the current readout frame. */
     std::vector<std::string> m_SimHitClassNames; /**< Stores the SimHit class name for each subdetector type. */
     int m_numberSimHits;                         /**< The current number of SimHits. */
+    RandomPermutation* m_selector;               /**< The class that says which record of the input to read next. */
+    RandomTimer* m_timer;                        /**< The timer generates random event times. */
+    float m_eventTime;                           /**< The time shift for current event. */
 
 
   private:
@@ -155,7 +253,9 @@ namespace Belle2 {
     int simHitEvtOffset = colIndex;
     for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
       SIMHIT* origSimHit = collection[iSimHit];
-      new((*m_readoutFrame)[colIndex]) SIMHIT(*origSimHit);
+      SIMHIT* newSimHit = new((*m_readoutFrame)[colIndex]) SIMHIT(*origSimHit);
+      // In time-aware mode, shift the SimHit in time
+      if (m_timeAwareMode) newSimHit->shiftInTime(m_eventTime);
 
       //Store the MCParticle index for the given SimHit index (list index) in the vector
       if (m_mcParticleWriteMode > 0) {
@@ -211,6 +311,8 @@ namespace Belle2 {
       MCParticleGraph eventGraph;
       for (int iPart = 0; iPart < nMCPart; ++iPart) {
         MCParticle* currParticle = mcPartCollection[iPart];
+        if (m_timeAwareMode)
+          currParticle->setProductionTime(currParticle->getProductionTime() + m_eventTime);
         if (currParticle->getMother() != NULL) break;
         addParticleToEventGraph(eventGraph, *currParticle, 0, keepParticle);
       }

@@ -13,6 +13,7 @@
 
 #include <framework/datastore/StoreAccessorBase.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/logging/Logger.h>
 
 #include <TClonesArray.h>
 
@@ -279,12 +280,12 @@ namespace Belle2 {
     //@{
     /** Raw access to the underlying TClonesArray.
      *
-     *  In most cases, you'll want to avoid direct interaction with
-     *  TClonesArrays and use StoreArray functions like operator[],
-     *  getEntries() or appendNew() instead.
-     *  If you must access the TClonesArray, using the getPtr()
-     *  function is recommended, as the difference between . and ->
-     *  may be lost on casual readers of the source code.
+     *  \warning In most cases, you'll want to avoid direct interaction with
+     *           TClonesArrays and use StoreArray functions like operator[],
+     *           getEntries() or appendNew() instead.
+     *           If you must access the TClonesArray, using the getPtr()
+     *           function is recommended, as the difference between . and ->
+     *           may be lost on casual readers of the source code.
      */
     TClonesArray& operator *() const { ensureAttached(); return **m_storeArray;}
     ClonesArrayWrapper* operator ->() const { ensureAttached(); return static_cast<ClonesArrayWrapper*>(*m_storeArray);}

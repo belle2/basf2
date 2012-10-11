@@ -11,15 +11,13 @@
 #ifndef DATASTORE_H
 #define DATASTORE_H
 
-#include <framework/logging/Logger.h>
 #include <framework/datastore/RelationEntry.h>
 
-#include <TObject.h>
-#include <TClonesArray.h>
-#include <TClass.h>
-
 #include <string>
+#include <map>
 
+class TObject;
+class TClass;
 
 namespace Belle2 {
   /** In the store you can park objects, that have to be accessed by various modules.
@@ -27,8 +25,8 @@ namespace Belle2 {
    *  The store saves objects together with names and some flags in maps.
    *  Normal users should try to access the store via StoreAccessor classes like the
    *  StoreObjPtr or the StoreArray. <br>
-   *  Currently the store supports either the storage of single objects, that inherit from TObject,
-   *  or TClonesArrays, which are faster, if you have to store a large number of objects from the same type.
+   *  Currently the store supports either the storage of single objects (that inherit from TObject)
+   *  or TClonesArrays which can store a large number of objects of the same type.
    *  Besides that, you have to chose the durability of the things you want to store. <br>
    *  Currently you can chose between lifetimes of event and persistent.
    *  basf2 deletes the objects from the store according to the durability map in which the objects are stored.
@@ -61,8 +59,8 @@ namespace Belle2 {
       StoreEntry() : isArray(false), isTransient(false), object(0), ptr(0), name("") {};
       bool        isArray;     /**< Flag that indicates whether the object is a TClonesArray **/
       bool        isTransient; /**< Flag that indicates whether the object should be written to the output by default **/
-      TObject*    object;      /**< The pointer to the actual object **/
-      TObject*    ptr;         /**< The pointer to the returned object, either equal to 'object' or 0 **/
+      TObject*    object;      /**< The pointer to the actual object. Associated memory may exceed object durability, and is kept until the object is replaced.  **/
+      TObject*    ptr;         /**< The pointer to the returned object, either equal to 'object' or 0, depending on wether the object was created in the current event **/
       std::string name;        /**< Name of the entry. Equal to the key in the map. **/
     };
 
@@ -208,6 +206,7 @@ namespace Belle2 {
     /** Frees memory occopied by data store items and removes all objects from the map.
      *
      *  Afterwards, m_storeObjMap[durability] is empty.
+     *  Called by the framework. Users should usually not use this function without a good reason.
      */
     void reset(EDurability durability);
 

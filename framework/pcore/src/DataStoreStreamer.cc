@@ -8,6 +8,8 @@
 
 #include <framework/pcore/DataStoreStreamer.h>
 
+#include <TClonesArray.h>
+
 using namespace std;
 using namespace Belle2;
 

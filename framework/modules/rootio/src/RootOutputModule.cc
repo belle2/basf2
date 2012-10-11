@@ -17,6 +17,7 @@
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/Environment.h>
 
+#include <TClonesArray.h>
 #include <TTreeIndex.h>
 #include <TProcessID.h>
 #include <TSystem.h>

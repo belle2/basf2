@@ -14,6 +14,7 @@
 #include <framework/core/InputController.h>
 #include <framework/core/Environment.h>
 
+#include <TClonesArray.h>
 #include <TSystem.h>
 #include <TFile.h>
 

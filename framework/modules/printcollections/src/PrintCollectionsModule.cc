@@ -8,10 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "framework/modules/printcollections/PrintCollectionsModule.h"
+#include <framework/modules/printcollections/PrintCollectionsModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+
+#include <TClonesArray.h>
 
 #include <boost/format.hpp>
 
@@ -44,7 +46,7 @@ PrintCollectionsModule::~PrintCollectionsModule()
 
 void PrintCollectionsModule::event()
 {
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
   B2INFO("============================================================================");
   B2INFO("DataStore collections in event " << eventMetaDataPtr->getEvent());
   B2INFO("============================================================================");

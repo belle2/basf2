@@ -9,7 +9,12 @@
  **************************************************************************/
 
 #include <framework/datastore/DataStore.h>
+
+#include <framework/logging/Logger.h>
 #include <framework/dataobjects/RelationContainer.h>
+
+#include <TClonesArray.h>
+#include <TClass.h>
 
 using namespace std;
 using namespace Belle2;

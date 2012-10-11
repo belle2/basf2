@@ -52,6 +52,10 @@ void GearboxModule::initialize()
 
 void GearboxModule::beginRun()
 {
+  //if only file backend is used, we don't want to reread the data in every run
+  if (m_backends.size() == 1 && m_backends[0] == "file:")
+    return;
+
   Gearbox& gearbox = Gearbox::getInstance();
   gearbox.close();
   gearbox.open(m_filename);

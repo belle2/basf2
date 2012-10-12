@@ -99,6 +99,23 @@ TRGCDCRelation::purity(unsigned a) const {
     return float(na) / float(n);
 }
 
+float
+TRGCDCRelation::purity3D(unsigned trkID) const {
+
+    //...Count # of hits...
+    unsigned n = 0;
+    unsigned na = 0;
+    map<unsigned, unsigned>::const_iterator it = _relations.begin();
+    while (it != _relations.end()) {
+	n += it->second;
+	if (it->first == trkID)
+	    na = it->second;
+	++it;
+    }
+
+    return float(na) / float(n);
+}
+
 void
 TRGCDCRelation::dump(const std::string & ,
 		     const std::string & prefix) const {

@@ -387,7 +387,9 @@ namespace Belle2 {
       // performance values [purity, Track#]
       TVectorD tempPerformanceTrack(2);
       const TCRelation& trackRelation3D = aTrack.relation3D();
-      tempPerformanceTrack[0] = trackRelation3D.purity(0);
+      //cout<<"[Before] purity3D:   "<<trackRelation3D.purity(0)<<endl;
+      //cout<<"[After] purity3D:    "<<trackRelation3D.purity3D(aTrack.relation2D().contributor(0))<<endl;
+      tempPerformanceTrack[0] = trackRelation3D.purity3D(aTrack.relation2D().contributor(0));
       tempPerformanceTrack[1] = iTrack;
       new(performanceTrackHough3D[iTrack]) TVectorD(tempPerformanceTrack);
       

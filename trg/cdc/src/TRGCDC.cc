@@ -68,7 +68,7 @@ TRGCDC::name(void) const {
 
 string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.21");
+    return string("TRGCDC 5.23");
 }
 
 TRGCDC *
@@ -670,12 +670,14 @@ TRGCDC::terminate(void) {
 //     for (unsigned i = 0; i < _segmentHits.size(); i++)
 //         delete _segmentHits[i];
 
-    unsigned i = 0;
-    while (TCWire* w = _wires[i++])
+    for(unsigned i = 0; i < _wires.size(); i++){
+      TCWire* w = _wires[i];
       w->clear();
-    i = 0;
-    while (TCSegment* s = _tss[i++])
+    }
+    for(unsigned i = 0; i< _tss.size(); i++){
+      TCSegment* s = _tss[i];
       s->clear();
+    }
     _hitWires.clear();
     _hits.clear();
     _axialHits.clear();

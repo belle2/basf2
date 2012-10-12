@@ -95,6 +95,9 @@ class TRGCDCTrackBase {
     /// info. available.
     const TRGCDCRelation relation(void) const;
 
+    /// returns MC information for only axial layers.
+    const TRGCDCRelation relation2D(void) const;
+
     /// returns MC information for only stereo layers.
     const TRGCDCRelation relation3D(void) const;
 

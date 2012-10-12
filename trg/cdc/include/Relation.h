@@ -56,6 +56,9 @@ class TRGCDCRelation {
     /// returns i'th purity.
     float purity(unsigned i = 0) const;
 
+    /// returns purity for 3D for trkID particle which should be from 2D.
+    float purity3D(unsigned trkID) const;
+
     /// Dumps debug information.
     void dump(const std::string & message = std::string(""),
 	      const std::string & prefix = std::string("")) const;

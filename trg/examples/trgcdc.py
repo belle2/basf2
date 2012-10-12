@@ -1,4 +1,6 @@
 #!/user/bin/env python
+#
+# 2012/10/11 : param_cdcdigi, Threshold added
 
 from basf2 import *
 
@@ -36,7 +38,7 @@ paramloader = register_module('Gearbox')
 geobuilder = register_module('Geometry')
 #geobuilder.log_level = LogLevel.INFO
 g4sim       = register_module('FullSim')
-cdcdigitizer = register_module('CDCDigi')
+cdcdigitizer = register_module('CDCDigitizer')
 out         = register_module('SimpleOutput')
 cdctrg      = fw.register_module("TRGCDC")
 #mcparticle  = fw.register_module('PrintMCParticles')
@@ -77,7 +79,10 @@ geobuilder.param('Components', ['MagneticField', 'CDC'
                 ])
 
 #set digitizer to no smearing
-param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.00, 'Resolution2': 0.0}
+param_cdcdigi = {'Fraction': 1,
+                 'Resolution1': 0.,
+                 'Resolution2': 0.,
+                 'Threshold': -10.0}
 cdcdigitizer.param(param_cdcdigi)
 
 # For B Bbar events.

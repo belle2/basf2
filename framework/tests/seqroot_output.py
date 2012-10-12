@@ -193,7 +193,7 @@ main.add_module(simulation)
 # output path
 main.add_module(output)
 main.add_module(progress)
-main.add_module(register_module('PrintCollections'))
+#main.add_module(register_module('PrintCollections'))
 
 # Process events
 process(main)

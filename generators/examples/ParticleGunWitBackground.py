@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 ##############################################################################
-# This steering file which shows how to comibine a particle gun simulated data
+# This steering file shows how to comibine a particle gun simulated data
 # with background using the background mixer.
 #
 # Example steering file - 2012 Belle II Collaboration

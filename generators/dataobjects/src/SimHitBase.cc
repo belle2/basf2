@@ -1,23 +1,16 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
+ * Contributors: Peter Kvasnicka                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifdef __CINT__
+#include <generators/dataobjects/SimHitBase.h>
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
-#pragma link C++ nestedclasses;
+using namespace std;
+using namespace Belle2;
 
-#pragma link C++ class Belle2::MCParticle;
-#pragma link C++ class vector<Belle2::MCParticle*>;
-#pragma link C++ class Belle2::BackgroundInfo;
-#pragma link C++ class Belle2::SimHitBase;
-
-#endif
+ClassImp(SimHitBase)

@@ -3,11 +3,10 @@
 
 ##############################################################################
 #
-# This example steering file generates fake ROFs for the SVD.
-# The ROFs are not actually usable, the purpose is to demosntrate the use
-# of the ROFBuilder module.
+# This example steering file generates readout frames (ROFs) for the SVD.
 #
-# This is phase one of the processing underlying the background mixing.
+# This is phase one of the processing underlying the background mixing. You have
+# to produce a "catalogue" of ROFs for individual background/generator combinations.
 # The produced ROF files contain collections of background SimHits to be mixed
 # into events of simulated data by the MixBkg module - this is phase 2 of the
 # background mixing-related processing.
@@ -26,6 +25,7 @@ set_log_level(LogLevel.ERROR)
 
 # ROOTInput module
 rootinput = register_module('RootInput')
+# CHANGE THIS TO POINT TO THE APPROPRIATE FILE(S) ON YOUR FILESYSTEM!!!
 rootinput.param('inputFileName',
                 '~/work/belle2/BG/summer2012/output_Touschek_LER_0.root')
 rootinput.param('treeName', 'tree')
@@ -39,11 +39,11 @@ rofbuilder.param('SimHitMCPartRelationName', 'MCParticlesToSVDSimHits')
 rofbuilder.param('TimeAwareMode', True)
 rofbuilder.param('WindowStart', -150.0)  # ns
 rofbuilder.param('WindowSize', 330)  # ns
-rofbuilder.param('BaseSampleSize', 20)  # us
+rofbuilder.param('BaseSampleSize', 20)  # us, for a single background file.
 rofbuilder.param('OutputRootFileName', 'SVDROFs.root')
 rofbuilder.param('ComponentName', 'Touschek')
 rofbuilder.param('GeneratorName', 'SAD_LER')
-rofbuilder.param('MCParticleWriteMode', 0)
+rofbuilder.param('MCParticleWriteMode', 0)  # No MC Particles - currently only this works.
 rofbuilder.set_log_level(LogLevel.INFO)
 
 # Show progress of processing

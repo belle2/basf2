@@ -12,12 +12,13 @@
 
 #include <framework/core/InputController.h>
 #include <framework/gearbox/Unit.h>
-
+#include <generators/dataobjects/SimHitBase.h>
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
 
 #include <map>
 #include <boost/foreach.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -77,7 +78,7 @@ void ROFBuilderModule::initialize()
   m_rofTree->Branch("MCPartRels",  &m_mcPartRels);
 
   //The content tree (a tree is overkill here, but it avoids writing a specific class for the content)
-  // FIXME: Do I add frame window parameters here?
+  // FIXME: Shall I write window parameters here, too?
   m_contentTree->Branch("Subdetector", &m_subdetector, "SBD/I");
   m_contentTree->Branch("Component", &m_componentName);
   m_contentTree->Branch("Generator", &m_generatorName);
@@ -85,6 +86,19 @@ void ROFBuilderModule::initialize()
   m_contentTree->Branch("SimHitRelation", &m_simHitMCPartRelationName);
   m_contentTree->Branch("MCParticleWriteMode", &m_mcParticleWriteMode, "MCW/I");
   m_contentTree->Fill();
+
+  // Set the background tag for SimHits
+  bool isHER = (boost::to_upper_copy(m_generatorName).find("HER") != string::npos);
+  if (boost::to_upper_copy(m_componentName).find("COULOMB") != string::npos) {
+    m_backgroundTag = isHER ? SimHitBase::bg_Coulomb_HER : SimHitBase::bg_Coulomb_LER;
+  } else if (boost::to_upper_copy(m_componentName).find("RBB") != string::npos) {
+    m_backgroundTag = isHER ? SimHitBase::bg_RBB_HER : SimHitBase::bg_RBB_LER;
+  } else if (boost::to_upper_copy(m_componentName).find("TOUSCHEK") != string::npos) {
+    m_backgroundTag = isHER ? SimHitBase::bg_Touschek_HER : SimHitBase::bg_Touschek_LER;
+  } else if (boost::to_upper_copy(m_componentName).find("TWOPHOTON") != string::npos) {
+    m_backgroundTag = SimHitBase::bg_twoPhoton;
+  } else
+    m_backgroundTag = SimHitBase::bg_other;
 
   //Start a new readout frame
   m_rofMCParticleGraph.clear();

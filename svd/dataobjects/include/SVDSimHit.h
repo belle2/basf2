@@ -11,6 +11,7 @@
 #ifndef SVDSIMHIT_H
 #define SVDSIMHIT_H
 
+#include <generators/dataobjects/SimHitBase.h>
 // ROOT
 #include <TObject.h>
 #include <TVector3.h>
@@ -25,7 +26,7 @@ namespace Belle2 {
     * hit classes are used to generate detector response, they contain _local_
     * information.
     */
-  class SVDSimHit : public TObject {
+  class SVDSimHit : public SimHitBase {
   public:
     /** default constructor for ROOT */
     SVDSimHit(): m_sensorID(0), m_pdg(0), m_theta(0), m_energyDep(0), m_globalTime(0),
@@ -86,7 +87,7 @@ namespace Belle2 {
     /** Momentum of particle at start of energy deposition */
     TVector3 m_momIn;
 
-    ClassDef(SVDSimHit, 1)
+    ClassDef(SVDSimHit, 2)
   }; // class SVDSimHit
 
 } // namespace Belle2

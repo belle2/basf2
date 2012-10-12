@@ -11,8 +11,9 @@
 #ifndef PXDSIMHIT_H
 #define PXDSIMHIT_H
 
+#include <generators/dataobjects/SimHitBase.h>
+
 // ROOT
-#include <TObject.h>
 #include <TVector3.h>
 #include <vxd/dataobjects/VxdID.h>
 
@@ -28,10 +29,10 @@ namespace Belle2 {
     * hit classes are used to generate detector response, they contain _local_
     * information.
     */
-  class PXDSimHit : public TObject {
+  class PXDSimHit : public SimHitBase {
   public:
     /** default constructor for ROOT */
-    PXDSimHit(): m_sensorID(0), m_pdg(0), m_theta(0), m_energyDep(0), m_globalTime(0),
+    PXDSimHit(): SimHitBase(), m_sensorID(0), m_pdg(0), m_theta(0), m_energyDep(0), m_globalTime(0),
       m_posIn(0, 0, 0), m_posOut(0, 0, 0), m_momIn(0, 0, 0) {}
 
     /** Standard constructor
@@ -68,7 +69,8 @@ namespace Belle2 {
     /** Shift the SimHit in time
      * @param delta The value of the time shift.
      */
-    void shiftInTime(float delta) { m_globalTime += delta; }
+    virtual void shiftInTime(float delta) { m_globalTime += delta; }
+
   private:
     /** ID of the sensor the energy was deposited in */
     unsigned short m_sensorID;
@@ -87,7 +89,7 @@ namespace Belle2 {
     /** Momentum of particle at start of energy deposition */
     TVector3 m_momIn;
 
-    ClassDef(PXDSimHit, 1)
+    ClassDef(PXDSimHit, 2)
   };
 
   /** @}*/

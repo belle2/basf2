@@ -119,18 +119,29 @@ namespace Belle2 {
    * Also specify the time interval equivalent of the input data (in us).
    * There is no fixed amount of events per ROF, since the number is randomized,
    * and the corresponding parameter only has effect in the "timeless" mode.
-   * NOTES ON CURRENT IMPLEMENTATION:
+   *
+   * NOTES ON CURRENT IMPLEMENTATION (October 2012)
    * - The randomization of events takes time, especially when multiple files are
    * used on input. I believe this can be improved, but not much.
    * - Currently, the module cannot write MCParticles, as it has problems with
    * events that don't have SimHits for the required subdetector and it cannot find
-   * the corresponding relation.
+   * the corresponding relation. Will be fixed.
    * - The module currently only works for PXD and SVD. Other subdetectors can
-   * be added relatively easily, BUT their SimHits have to implement a method to
-   * shift the SimHit in time, void shiftInTime(float delta) doing something
-   * like m_simHitTime += delta, whatever simHitTime is and is called. Then add
-   * your subdetector to the list of values for the ROFBuilder::m_subdetector and
-   * m_simHitClassNames.
+   * be added relatively easily, BUT
+   * 1. their SimHits have to inherit from the SimHitBase class (currently in
+   * generators/dataobjects) and
+   * 2. (if time-aware mode is desired), re-implement SimHitBase::shiftInTime(float delta)
+   * to do something like m_simHitTime += delta, whatever simHitTime is and is
+   * called.
+   * 3. The subdetector than has to be added to the list of values for the
+   * ROFBuilder::m_subdetector andm_simHitClassNames (I will do this for all
+   * subdetectors).
+   * Please look at PXDSimHit or SVDSimHit implementations to see what to do.
+   * In particular, don't forget to change the version number of your SimHit in
+   * the ClassDef(..) call.
+   * By inheriting from SimHitBase, your SimHits also inherit the m_backgroundTag
+   * attribute (and the corresponding setter and getter), by which their origin
+   * can later be identified.
    * - A principal problem with this implementation is that it effectively
    * discards long-lived background - the acceptance window applies to event (=
    * mother MCParticle) times rather than to SimHits, so SimHits that take time
@@ -167,6 +178,7 @@ namespace Belle2 {
     std::string m_outputRootFileName;    /**< The name of the output Root file. */
     std::string m_componentName;         /**< The name of the background component (e.g. Touschek, QED etc.). */
     std::string m_generatorName;         /**< The name of the generator which was used to create the background (e.g. SAD_LER). */
+    unsigned int m_backgroundTag;        /**< The background tag for the SimHits in the generated ROFs.*/
     int m_mcParticleWriteMode;           /**< The MCParticle write mode:
                                                                            0 = no MCParticle are saved,
                                                                            1 = only the MCParticle which caused a SimHit in the subdetector (default),
@@ -256,6 +268,8 @@ namespace Belle2 {
       SIMHIT* newSimHit = new((*m_readoutFrame)[colIndex]) SIMHIT(*origSimHit);
       // In time-aware mode, shift the SimHit in time
       if (m_timeAwareMode) newSimHit->shiftInTime(m_eventTime);
+      // Set the background flag of the SimHit
+      newSimHit->setBackgroundTag(m_backgroundTag);
 
       //Store the MCParticle index for the given SimHit index (list index) in the vector
       if (m_mcParticleWriteMode > 0) {

@@ -36,6 +36,7 @@ namespace Belle2 {
    *  SuperLayer: bits 1 -  4 (/4096)           <br>
    *  Layer:      bits 5 -  7 (% 4096, / 512)   <br>
    *  Wire:       bits 8 - 16 (% 512)           <br>
+   *  Note: These operations could as well be achieved by bit-shifting operations.
    */
   class WireID : public TObject {
   public:

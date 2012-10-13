@@ -63,7 +63,7 @@ particlegun.param({  # Generate 5 tracks
 # Select subdetectors to be built
 # geometry.param('Components', ['PXD'])
 
-gearbox.param('Filename', 'pxd/testbeam/SimpleDEPFETModule.xml')
+gearbox.param('Filename', 'pxd/testbeam/SimpleDEPFETModule_Belle2.xml')
 
 # pxddigi.param('statisticsFilename', 'digi.root')
 pxddigi.param('ElectronicEffects', True)

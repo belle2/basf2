@@ -47,7 +47,7 @@ ExtrapolateToSVDModule::ExtrapolateToSVDModule() :
 
   setDescription(
     "Uses Tracks found (and fitted) in the CDC and extrapolates them to the SVD. Adds the most probable SVD hit candidates to the Tracks and creates new GFTrackCands collection. Execute GenFitter again after this module to refit these track candidates.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   //input
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the GFTracks found in the CDC and fitted with GenFitter", string(""));
@@ -70,7 +70,7 @@ ExtrapolateToSVDModule::~ExtrapolateToSVDModule()
 
 void ExtrapolateToSVDModule::initialize()
 {
-  StoreArray<GFTrackCand> newGFTrackCands(m_gfTrackCandsColName);
+  StoreArray<GFTrackCand>::registerPersistent(m_gfTrackCandsColName);
 
   if (m_textFileOutput) {
     Tracksfile.open("Tracks.txt");
@@ -103,6 +103,7 @@ void ExtrapolateToSVDModule::event()
 
   //initialize the new output collection
   StoreArray<GFTrackCand> newGFTrackCands(m_gfTrackCandsColName);
+  newGFTrackCands.create();
 
   //get the CDCGeometryPar to get the hit coordinates
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
@@ -112,7 +113,7 @@ void ExtrapolateToSVDModule::event()
 
   //fill the array of new GFTrackCands by copying the existing GFTrackCand from GFTracks, SVDHits will be added afterwards to these new GFTrackCands
   for (int i = 0; i < nTracks; i++) {
-    new(newGFTrackCands->AddrAt(i)) GFTrackCand(gftracks[i]->getCand());
+    newGFTrackCands.appendNew(gftracks[i]->getCand());
     //in the copy of GFTrackCand the 'old' start values are stored
     //the fit of the CDCHits should already provide a very good momentum estimation, so it makes sense to use the result of this fit as start values for the fit with svd hits
     //as for the vertex position, I am not sure how good it is after a cdc fit, so I do not change it...
@@ -177,7 +178,7 @@ void ExtrapolateToSVDModule::event()
       for (int iHit = 0; iHit < nSvdHits; iHit ++) { //loop over all SVDHits
 
         int sensorID = svdHits[iHit]->getSensorID();   //get unique sensor ID
-        VxdID aVXDId = VxdID(sensorID);
+        VxdID aVXDId(sensorID);
         const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID)); //get the SensorInfo to get the hit coordinates
 
         int layerId = aVXDId.getLayerNumber();

@@ -43,10 +43,6 @@ CDCMCMatchingModule::CDCMCMatchingModule() :
 
   addParam("GFTrackCandidatesColName", m_gfTrackCandsCollectionName, "Name of collection holding the GFTrackCandidates (output of the pattern recognition)", string("GFTrackCands_PatternReco"));
 
-  //output
-  addParam("GFTrackCandsToMCParticlesColName", m_gfTrackCandsToMCParticles, "Name of collection holding the relations between the GFTrackCandidates and the matched MCParticles (output of this module)", string("GFTrackCands_patternRecoToMCParticle"));
-
-
 }
 
 CDCMCMatchingModule::~CDCMCMatchingModule()
@@ -55,9 +51,8 @@ CDCMCMatchingModule::~CDCMCMatchingModule()
 
 void CDCMCMatchingModule::initialize()
 {
-  StoreArray<MCParticle> mcParticles(m_mcParticlesCollectionName);
-  StoreArray<GFTrackCand> gfTrackCandidates(m_gfTrackCandsCollectionName);
-  RelationArray gfTrackCandToMCPart(gfTrackCandidates, mcParticles, m_gfTrackCandsToMCParticles);
+  StoreArray<GFTrackCand>::required(m_gfTrackCandsCollectionName);
+  RelationArray::registerPersistent<GFTrackCand, MCParticle>(m_gfTrackCandsCollectionName, m_mcParticlesCollectionName);
 
 }
 
@@ -89,49 +84,47 @@ void CDCMCMatchingModule::event()
 
 
   //Create a relation between the track candidate and their most probable 'mother' MC particle
-  RelationArray gfTrackCandToMCPart(gfTrackCandidates, mcParticles, m_gfTrackCandsToMCParticles);
+  RelationArray gfTrackCandToMCPart(gfTrackCandidates, mcParticles);
 
-  if (gfTrackCandidates.getEntries() != 0) {
-    for (int i = 0; i < gfTrackCandidates.getEntries(); i++) { //loop over all TrackCandidates
+  for (int i = 0; i < gfTrackCandidates.getEntries(); i++) { //loop over all TrackCandidates
 
-      vector<unsigned int> cdcHitsIndexList = gfTrackCandidates[i]->getHitIDs(2);   //indices of CDCHits for the candidate
-      vector <pair<int, int> > mcParticleContributions;  // vector to store pairs <MCParticleId, Number of Hits from this MCParticle>
-      pair <int, float> bestMCId(-999, 0.0); //index and the hit fraction of the matched MCParticle
+    vector<unsigned int> cdcHitsIndexList = gfTrackCandidates[i]->getHitIDs(2);   //indices of CDCHits for the candidate
+    vector <pair<int, int> > mcParticleContributions;  // vector to store pairs <MCParticleId, Number of Hits from this MCParticle>
+    pair <int, float> bestMCId(-999, 0.0); //index and the hit fraction of the matched MCParticle
 
-      B2INFO("Track Candidate " << i << " has " << cdcHitsIndexList.size() << " CDCHits");
+    B2INFO("Track Candidate " << i << " has " << cdcHitsIndexList.size() << " CDCHits");
 
-      //now we have to find out which MCParticle created these hits
-      for (unsigned int j = 0; j < cdcHitsIndexList.size(); j++) { //loop over all Hits
+    //now we have to find out which MCParticle created these hits
+    for (unsigned int j = 0; j < cdcHitsIndexList.size(); j++) { //loop over all Hits
 
-        for (int k = 0; k < mcPartToCDCHits.getEntries(); k++) {   //loop over all MCParticle<->CDCHit relations
+      for (int k = 0; k < mcPartToCDCHits.getEntries(); k++) {   //loop over all MCParticle<->CDCHit relations
 
-          for (unsigned int mchit = 0; mchit < mcPartToCDCHits[k].getToIndices().size(); mchit++) { //loop over all hits to which the MCParticle points
+        for (unsigned int mchit = 0; mchit < mcPartToCDCHits[k].getToIndices().size(); mchit++) { //loop over all hits to which the MCParticle points
 
-            if (cdcHitsIndexList.at(j) == mcPartToCDCHits[k].getToIndex(mchit)) {         //if the hit to which this MCParticle points is in the list
+          if (cdcHitsIndexList.at(j) == mcPartToCDCHits[k].getToIndex(mchit)) {         //if the hit to which this MCParticle points is in the list
 
-              addMCParticle(mcParticleContributions, mcPartToCDCHits[k].getFromIndex()); //add the index of the MCParticle to the pair vector
+            addMCParticle(mcParticleContributions, mcPartToCDCHits[k].getFromIndex()); //add the index of the MCParticle to the pair vector
 
-            }
           }
         }
-      } //end loop over all Hits
+      }
+    } //end loop over all Hits
 
-      bestMCId = getBestMCId(mcParticleContributions, cdcHitsIndexList.size()); //evaluate the MCParticle with the largest contribution
+    bestMCId = getBestMCId(mcParticleContributions, cdcHitsIndexList.size()); //evaluate the MCParticle with the largest contribution
 
-      gfTrackCandidates[i]->setMcTrackId(bestMCId.first);    //assign the ID of this MCParticle to the candidate
-      gfTrackCandidates[i]->setDip(bestMCId.second);         //here I just 'misuse' one unused member variable from GFTrackCand called 'Dip' to store the 'purity' of the track
+    gfTrackCandidates[i]->setMcTrackId(bestMCId.first);    //assign the ID of this MCParticle to the candidate
+    gfTrackCandidates[i]->setDip(bestMCId.second);         //here I just 'misuse' one unused member variable from GFTrackCand called 'Dip' to store the 'purity' of the track
 
-      //check if there is an MCParticle contributing to the track (-999 as ID means its random composition of background hits)
-      if (bestMCId.first != -999) {
-        B2INFO("Assign MCId " << bestMCId.first << " (pdg: " << mcParticles[bestMCId.first]->getPDG() << ") to track candidate " << i);
-        //create a relation between the track candidate and the MCParticle (redundant to the ID assignment, but may however be useful)
-        gfTrackCandToMCPart.add(i, bestMCId.first);
-      } else B2WARNING("No MCParticle contributed to this track!");
+    //check if there is an MCParticle contributing to the track (-999 as ID means its random composition of background hits)
+    if (bestMCId.first != -999) {
+      B2INFO("Assign MCId " << bestMCId.first << " (pdg: " << mcParticles[bestMCId.first]->getPDG() << ") to track candidate " << i);
+      //create a relation between the track candidate and the MCParticle (redundant to the ID assignment, but may however be useful)
+      gfTrackCandToMCPart.add(i, bestMCId.first);
+    } else B2WARNING("No MCParticle contributed to this track!");
 
-      cdcHitsIndexList.clear();
-      mcParticleContributions.clear();
-    } //end loop over all track candidates
-  }
+    cdcHitsIndexList.clear();
+    mcParticleContributions.clear();
+  } //end loop over all track candidates
 
 }
 

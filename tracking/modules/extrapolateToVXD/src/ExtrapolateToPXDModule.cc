@@ -49,7 +49,7 @@ ExtrapolateToPXDModule::ExtrapolateToPXDModule() :
 
   setDescription(
     "Uses Tracks found (and fitted) in the CDC (and SVD) extrapolates them to the PXD. Adds the most probable PXD hit candidates to the existing Tracks and creates new GFTrackCands collection. Execute GenFitter again after this module to refit these track candidates.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   //input
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the GFTracks found in the CDC and fitted with GenFitter", string(""));
@@ -73,7 +73,7 @@ ExtrapolateToPXDModule::~ExtrapolateToPXDModule()
 
 void ExtrapolateToPXDModule::initialize()
 {
-  StoreArray<GFTrackCand> newGFTrackCands(m_gfTrackCandsColName);
+  StoreArray<GFTrackCand>::registerPersistent(m_gfTrackCandsColName);
 
   if (m_textFileOutput) {
     Tracksfile.open("Tracks.txt");
@@ -111,6 +111,7 @@ void ExtrapolateToPXDModule::event()
 
   //initialize the new output collection
   StoreArray<GFTrackCand> newGFTrackCands(m_gfTrackCandsColName);
+  newGFTrackCands.create();
 
   //get the CDCGeometryPar to get the hit coordinates
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
@@ -120,7 +121,7 @@ void ExtrapolateToPXDModule::event()
 
   //fill the array of new GFTrackCands by copying the existing GFTrackCand from GFTracks, SVDHits will be added afterwards to these new GFTrackCands
   for (int i = 0; i < nTracks; i++) {
-    new(newGFTrackCands->AddrAt(i)) GFTrackCand(gftracks[i]->getCand());
+    newGFTrackCands.appendNew(gftracks[i]->getCand());
 
     //in the copy of GFTrackCand the 'old' start values are stored
     //the fit of the CDC+SVD Hits should already provide a very good momentum and vertex estimation, so it makes sense to use the result of this fit as start values for the fit with PXD hits
@@ -191,7 +192,7 @@ void ExtrapolateToPXDModule::event()
       for (int iHit = 0; iHit < nPxdHits; iHit ++) { //loop over all PXDHits
 
         int sensorID = pxdHits[iHit]->getSensorID();   //get unique sensor ID
-        VxdID aVXDId = VxdID(sensorID);
+        VxdID aVXDId(sensorID);
         const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID)); //get the SensorInfo to get the hit coordinates
 
         int layerId = aVXDId.getLayerNumber();

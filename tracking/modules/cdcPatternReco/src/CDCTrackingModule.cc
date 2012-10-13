@@ -48,10 +48,10 @@ REG_MODULE(CDCTracking)
 CDCTrackingModule::CDCTrackingModule() : Module()
 {
   setDescription("Performs the pattern recognition in the CDC with the conformal finder: digitized CDCHits are combined to track candidates (GFTrackCand). (Works for tracks momentum > 0.5 GeV, no curl track finder included yet).");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("CDCSimHitsColName", m_cdcSimHitsColName, "Input CDCSimHits collection (only for cross check)", string("CDCSimHits"));
-  addParam("CDCHitsColName", m_cdcHitsColName, "Input CDCHits collection (should be created by CDCDigi module)", string("CDCHits"));
+  addParam("CDCSimHitsColName", m_cdcSimHitsColName, "Input CDCSimHits collection (only for cross check)", string(""));
+  addParam("CDCHitsColName", m_cdcHitsColName, "Input CDCHits collection (should be created by CDCDigitizer module)", string(""));
 
   addParam("CDCTrackCandidatesColName", m_cdcTrackCandsColName, "Output CDCTrackCandidates collection", string("CDCTrackCandidates"));
   addParam("GFTrackCandidatesColName", m_gfTrackCandsColName, "Output GFTrackCandidates collection", string("GFTrackCandidates_conformalFinder"));
@@ -78,16 +78,16 @@ void CDCTrackingModule::initialize()
   }
 
   //StoreArray with CDCTrackHits: a class derived from the original CDCHit, but also additional member variables and methods needed for tracking
-  StoreArray<CDCTrackHit> cdcTrackHits("CDCTrackHits");
+  StoreArray<CDCTrackHit>::registerPersistent();
 
   //StoreArray for CDCSegments: short track section within one superlayer
-  StoreArray<CDCSegment> cdcSegments("CDCSegments");
+  StoreArray<CDCSegment>::registerPersistent();
 
   //StoreArray for CDCTrackCandidates: this track candidate class is the output of the conformal finder
-  StoreArray<CDCTrackCandidate> cdcTrackCandidates(m_cdcTrackCandsColName);
+  StoreArray<CDCTrackCandidate>::registerPersistent(m_cdcTrackCandsColName);
 
   //StoreArray for GFTrackCandidates: interface class to Genfit, there should be one GFTrackCandidate for each CDCTrackCandidate
-  StoreArray <GFTrackCand> trackCandidates(m_gfTrackCandsColName);
+  StoreArray <GFTrackCand>::registerPersistent(m_gfTrackCandsColName);
 
 }
 
@@ -112,17 +112,19 @@ void CDCTrackingModule::event()
 
 
   //StoreArray with CDCTrackHits: a class derived from the original CDCHit, but also additional member variables and methods needed for tracking
-  StoreArray<CDCTrackHit> cdcTrackHits("CDCTrackHits");
+  StoreArray<CDCTrackHit> cdcTrackHits;
+  cdcTrackHits.create();
 
   //Create a CDCTrackHits from the CDCHits and store them in the same order in the new StoreArray
-  for (int i = 0; i < cdcHits.getEntries(); i++) {
-    CDCTrackHit trackHit(cdcHits[i], i);
-    new(cdcTrackHits->AddrAt(i)) CDCTrackHit(trackHit);
+  int nCdcHits = cdcHits.getEntries();
+  for (int i = 0; i < nCdcHits; i++) {
+    cdcTrackHits.appendNew(CDCTrackHit(cdcHits[i], i));
   }
 
 
   //create StoreArray for CDCSegments: short track section within one superlayer
-  StoreArray<CDCSegment> cdcSegments("CDCSegments");
+  StoreArray<CDCSegment> cdcSegments;
+  cdcSegments.create();
 
   //Combine CDCTrackHits to CDCSegments, fill cdcSegments with new created Segments
   B2INFO("Searching for Segments... ");
@@ -151,6 +153,7 @@ void CDCTrackingModule::event()
 
   //create StoreArray for CDCTrackCandidates: this track candidate class is the output of the conformal finder
   StoreArray<CDCTrackCandidate> cdcTrackCandidates(m_cdcTrackCandsColName);
+  cdcTrackCandidates.create();
 
 
   //combine axial segments to TrackCandidates, fill the StoreArray
@@ -190,11 +193,12 @@ void CDCTrackingModule::event()
 
   //StoreArray for GFTrackCandidates: interface class to Genfit
   StoreArray <GFTrackCand> gfTrackCandidates(m_gfTrackCandsColName);
+  gfTrackCandidates.create();
 
 
   for (int i = 0 ; i < cdcTrackCandidates.getEntries(); i++) {
 
-    new(gfTrackCandidates->AddrAt(i)) GFTrackCand();     //create one GFTrackCandidate for each CDCTrackCandidate
+    gfTrackCandidates.appendNew();     //create one GFTrackCandidate for each CDCTrackCandidate
 
     //set the values needed as start values for the fit in the GFTrackCandidate from the CDCTrackCandidate information
     //variables stored in the GFTrackCandidates are: vertex position + error, momentum + error, pdg value, indices for the Hits
@@ -235,7 +239,7 @@ void CDCTrackingModule::event()
     //now the correctly ordered hits can be added to the GFTrackCand
 
     B2DEBUG(100, " Add Hits: hitId   rho    planeId")
-    for (unsigned int iter = 0; iter < hitIndices.size(); iter++) {
+    for (unsigned int iter = 0; iter < hitIndices.size(); ++iter) {
       int hitID = hitIndices.at(iter); //hit index
       float rho = cdcTrackHits[hitID]->getWirePosition().Mag(); //distance to the origin
 

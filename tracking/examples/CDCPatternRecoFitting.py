@@ -107,7 +107,6 @@ param_cdcfitting = {
     'GFTrackCandidatesColName': 'GFTrackCands_PatternReco',
     'TracksColName': 'Tracks_PatternReco',
     'GFTracksColName': 'GFTracks_PatternReco',
-    'GFTracksToMCParticlesColName': 'GFTracksToMCParticles_PatternReco',
     'mcTracks': 0,
     'pdg': 211,
     'allPDG': 0,

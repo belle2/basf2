@@ -11,4 +11,8 @@
 
 using namespace Belle2;
 
-RelationIndexManager::RelationCache RelationIndexManager::m_cache;
+RelationIndexManager& RelationIndexManager::Instance()
+{
+  static RelationIndexManager instance;
+  return instance;
+}

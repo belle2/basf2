@@ -10,22 +10,23 @@
 #ifndef RelationIndexManager_H
 #define RelationIndexManager_H
 
-#include <boost/array.hpp>
 #include <framework/datastore/RelationIndexContainer.h>
+
+#include <boost/array.hpp>
 
 namespace Belle2 {
 
   /** Manager to keep a cache of existing RelationIndexContainers.
    *
-   *  This class keeps track of all RelationIndexContainers that where created
+   *  This singleton keeps track of all RelationIndexContainers that where created
    *  to make sure indices are not created more often than needed.
-   *
-   *  It is a purely static class
    *
    *  This class is only used internally, users should use RelationIndex/RelationArray to access/modify relations.
    */
   class RelationIndexManager {
   public:
+    /** Returns the singleton instance. */
+    static RelationIndexManager& Instance();
 
     /** Get a RelationIndexContainer.
      *
@@ -37,7 +38,7 @@ namespace Belle2 {
      *  @param relation Relation to build an index for
      *  @returns A RelationIndexContainer
      */
-    template<class FROM, class TO> static const RelationIndexContainer<FROM, TO> &get(const RelationArray& relation) {
+    template<class FROM, class TO> const RelationIndexContainer<FROM, TO> &get(const RelationArray& relation) {
       const std::string& name = relation.getName();
       DataStore::EDurability durability = relation.getDurability();
       RelationMap& relations =  m_cache[durability];
@@ -63,7 +64,7 @@ namespace Belle2 {
      *
      *  @param durability Which cache to clear
      */
-    static void clear(DataStore::EDurability durability = DataStore::c_Event) {
+    void clear(DataStore::EDurability durability = DataStore::c_Event) {
       RelationMap& relations = m_cache[durability];
       RelationMap::iterator end(relations.end());
       for (RelationMap::iterator it = relations.begin(); it != end; ++it)
@@ -72,12 +73,23 @@ namespace Belle2 {
     }
 
   protected:
+    /** Constructor hidden. */
+    RelationIndexManager() { }
+    /** Same for copy-constructor. */
+    RelationIndexManager(const RelationIndexManager&) { }
+
+    /** Clean cache on exit. */
+    ~RelationIndexManager() {
+      for (int i = 0; i < DataStore::c_NDurabilityTypes; i++)
+        clear((DataStore::EDurability)i);
+    }
+
     /** Maptype to keep track of all Containers of one durability */
     typedef std::map<std::string, RelationIndexBase* > RelationMap;
     /** Cachetype for all Containers */
     typedef boost::array<RelationMap, DataStore::c_NDurabilityTypes> RelationCache;
     /** Cache for all Containers */
-    static RelationCache m_cache;
+    RelationCache m_cache;
   };
 
 } // end namespace Belle2

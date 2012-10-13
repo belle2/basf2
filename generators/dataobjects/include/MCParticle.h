@@ -19,6 +19,7 @@
 #include <TLorentzVector.h>
 
 #include <cmath>
+#include <climits>
 #include <vector>
 
 #include <framework/logging/Logger.h>
@@ -123,7 +124,7 @@ namespace Belle2 {
      *         and it matches the the status it returns the value of the
      *         bitmask and 0 if not.
      */
-    unsigned int getStatus(unsigned int bitmask = -1) const { return m_status & bitmask; }
+    unsigned int getStatus(unsigned int bitmask = UINT_MAX) const { return m_status & bitmask; }
 
     /**
      * Return if specific status bit is set.

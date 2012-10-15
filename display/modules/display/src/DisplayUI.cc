@@ -116,7 +116,7 @@ void DisplayUI::goToEvent(Long_t id)
   if (numEntries > 0 && InputController::canControlInput()) {
     B2DEBUG(100, "Switching to event " << id);
     m_eventLabel->SetTextColor(gROOT->GetColor(kRed + 1));
-    m_eventLabel->SetText("Loading...");
+    m_eventLabel->SetText(" \nLoading...\n ");
     InputController::setNextEntry(id);
   } else {
     m_currentEntry++;
@@ -133,7 +133,7 @@ void DisplayUI::goToEvent(Long_t event, Long_t run, Long_t experiment)
   if (numEntries > 0 && InputController::canControlInput()) {
     B2DEBUG(100, "Switching to event " << event << " in run " << run << ", experiment " << experiment);
     m_eventLabel->SetTextColor(gROOT->GetColor(kRed + 1));
-    m_eventLabel->SetText("Loading...");
+    m_eventLabel->SetText(" \nLoading...\n ");
     InputController::setNextEntry(experiment, run, event);
   }
   B2DEBUG(100, "exiting event loop now.");
@@ -478,9 +478,7 @@ void DisplayUI::exit()
 {
   gEve->CloseEveWindow();
 
-  //to avoid waiting for TGeoManager deletion ( https://savannah.cern.ch/bugs/?95757 ), we abort without any cleanup
-  //TODO: this should be changed to exit(0) once it's fixed in the externals
-  abort();
+  ::exit(0);
 }
 
 ClassImp(DisplayUI)

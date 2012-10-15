@@ -10,7 +10,7 @@
 
 #include <ecl/modules/eclRecGamma/ECLGammaReconstructorModule.h>
 #include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/HitAssignmentECL.h>
+#include <ecl/dataobjects/ECLHitAssignment.h>
 #include <ecl/dataobjects/ECLGamma.h>
 #include <framework/datastore/RelationArray.h>
 
@@ -42,21 +42,6 @@ ECLGammaReconstructorModule::ECLGammaReconstructorModule() : Module()
   setDescription("Creates ECLGamma from ECLShower.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
-  //input
-  addParam("ECLShowerinput", m_ECLShowerName,
-           "//input of this module//shower infromation", string("ECLShowers"));
-
-  addParam("ECLHitAssignmentinput", m_eclHitAssignmentName,
-           "//input of this module//(showerID,Hits)", string("ECLHitAssignments"));
-
-  addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the reconstructed tracks", string("GFTracks"));
-  addParam("ExtTrackCandsColName", m_extTrackCandsColName, "Name of collection holding the list of hits from each extrapolation", string("ExtTrackCands"));
-  addParam("ExtRecoHitsColName", m_extRecoHitsColName, "Name of collection holding the RecoHits from the extrapolation", string("ExtRecoHits"));
-
-  //output
-  addParam("ECLGammaOutput", m_ECLGammaName,
-           "//output of this module//(showerId,px,py,pz)", string("ECLGammas"));
-
 
   addParam("gammaEnergyCut", m_ecut, "gamma enegy threshold ", 0.02);
   addParam("gammaE9o25Cut", m_e925cut, "gamma E9o25 threshold ", 0.75);
@@ -82,8 +67,10 @@ void ECLGammaReconstructorModule::initialize()
 
   // CPU time start
   m_timeCPU = clock() * Unit::us;
-  StoreArray<ECLGamma>::registerPersistent(m_ECLGammaName);
-  RelationArray::registerPersistent<ECLGamma, ECLShower>();
+  StoreArray<ECLGamma>::registerPersistent();
+  RelationArray::registerPersistent<ECLGamma, ECLShower>("", "");
+
+
 }
 
 void ECLGammaReconstructorModule::beginRun()
@@ -94,18 +81,19 @@ void ECLGammaReconstructorModule::beginRun()
 void ECLGammaReconstructorModule::event()
 {
   //Input Array
-  StoreArray<ECLShower> eclRecShowerArray(m_ECLShowerName);
-  StoreArray<HitAssignmentECL> eclHitAssignmentArray(m_eclHitAssignmentName);
-  StoreArray<ECLGamma> gammaArray(m_ECLGammaName);
+  StoreArray<ECLShower> eclRecShowerArray;
+  StoreArray<ECLHitAssignment> eclHitAssignmentArray;
+  StoreArray<ECLGamma> gammaArray;
   if (!gammaArray) gammaArray.create();
-  RelationArray eclGammaToShower(gammaArray, eclRecShowerArray);
+// RelationArray eclGammaToShower(gammaArray, eclRecShowerArray);
 
   if (!eclRecShowerArray) {
-    B2ERROR("Can not find ECLRecCRHits" << m_ECLShowerName << ".");
+    B2ERROR("Can not find ECLShowers.");
   }
   if (!eclHitAssignmentArray) {
-    B2ERROR("Can not find eclHitAssignment" << m_eclHitAssignmentName << ".");
+    B2ERROR("Can not find eclHitAssignment.");
   }
+
   const int hitNum = eclRecShowerArray->GetEntriesFast();
   const int hANum = eclHitAssignmentArray->GetEntriesFast();
 
@@ -131,9 +119,9 @@ void ECLGammaReconstructorModule::event()
 
     for (int iHA = 0; iHA < hANum; iHA++) {
 
-      HitAssignmentECL* aHitAssignmentECL = eclHitAssignmentArray[iHA];
-      int m_HAShowerId = aHitAssignmentECL->getShowerId();
-      int m_HAcellId = aHitAssignmentECL->getCellId();
+      ECLHitAssignment* aECLHitAssignment = eclHitAssignmentArray[iHA];
+      int m_HAShowerId = aECLHitAssignment->getShowerId();
+      int m_HAcellId = aECLHitAssignment->getCellId();
 
       if (m_HAShowerId != m_showerId)continue;
       if (m_HAShowerId > m_showerId)break;
@@ -149,7 +137,7 @@ void ECLGammaReconstructorModule::event()
       new(gammaArray->AddrAt(m_GNum)) ECLGamma();
       gammaArray[m_GNum]->setShowerId(m_showerId);
 
-      eclGammaToShower.add(m_GNum, iShower);
+      //eclGammaToShower.add(m_GNum, iShower);
 
 
       /*
@@ -163,7 +151,7 @@ void ECLGammaReconstructorModule::event()
 
                  for (int iHA = 0; iHA < hANum; iHA++) {
 
-                   HitAssignmentECL* aECLShower = eclHitAssignmentArray[iHA];
+                   ECLHitAssignment* aECLShower = eclHitAssignmentArray[iHA];
                    int m_HAShowerId = aECLShower->getShowerId();
                    int m_HAcellId = aECLShower->getCellId();
                    if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
@@ -209,9 +197,9 @@ void ECLGammaReconstructorModule::readExtrapolate()
     m_TrackCellId[i] = false ;
   }
 
-  StoreArray<GFTrack> gfTracks(m_gfTracksColName);
-  StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName);
-  StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName);
+  StoreArray<GFTrack> gfTracks;
+  StoreArray<GFTrackCand> extTrackCands;
+  StoreArray<ExtRecoHit> extRecoHits;
   unsigned int myDetID = 5; // ECL in this example
   for (int t = 0; t < gfTracks.getEntries(); ++t) {
 //GFTrack* track = gfTracks[i];

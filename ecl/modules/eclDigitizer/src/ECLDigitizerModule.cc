@@ -11,8 +11,8 @@
 #include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/DspECL.h>
-#include <ecl/dataobjects/TrigECL.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -56,20 +56,6 @@ ECLDigitizerModule::ECLDigitizerModule() : Module()
   setDescription("Creates ECLDigiHits from ECLHits.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
-  //Parameter definition
-  addParam("ECLDigiInput", m_eclHitCollectionName,
-           "Input Array // Output from ECLHit module", string("ECLHits"));
-
-  //output
-  addParam("ECLDigiCollection", m_eclDigiCollectionName,
-           "//Output of this module//(EventNo,CellId,FittingEnergyDep, FittingTimeAve )", string("ECLDigiHits"));
-
-  addParam("ECLDspCollection", m_eclDspCollectionName,
-           "Output of this module//the detected A[0:16] to be fitted ", string("ECLShaperArray"));
-
-  addParam("ECLTrigCollection", m_eclTrigCollectionName,
-           "Record the Random Time of Trig", string("ECLRandomTrig"));
-
 //  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
 
 }
@@ -90,10 +76,9 @@ void ECLDigitizerModule::initialize()
   m_timeCPU = clock() * Unit::us;
   readDSPDB();
 
-  StoreArray<ECLHit>  eclArray(m_eclHitCollectionName);
-  StoreArray<DspECL>::registerPersistent(m_eclDspCollectionName);
-  StoreArray<ECLDigit>::registerPersistent(m_eclDigiCollectionName);
-  StoreArray<TrigECL>::registerPersistent(m_eclTrigCollectionName);
+  StoreArray<ECLDsp>::registerPersistent();
+  StoreArray<ECLDigit>::registerPersistent();
+  StoreArray<ECLTrig>::registerPersistent();
 
 
 
@@ -110,9 +95,9 @@ void ECLDigitizerModule::event()
 {
   m_timeCPU = clock() * Unit::us;
   //Input Array
-  StoreArray<ECLHit>  eclArray(m_eclHitCollectionName);
+  StoreArray<ECLHit>  eclArray;
   if (!eclArray) {
-    B2ERROR("Can not find ECLDigiHits" << m_eclHitCollectionName << ".");
+    B2ERROR("Can not find ECLHit Array.");
   }
 
   int hitNum = eclArray->GetEntriesFast();
@@ -186,14 +171,14 @@ void ECLDigitizerModule::event()
 
       if (energyFit[iECLCell] > 0) {
 
-        StoreArray<DspECL> eclDspArray(m_eclDspCollectionName);
+        StoreArray<ECLDsp> eclDspArray;
         if (!eclDspArray) eclDspArray.create();
         m_hitNum = eclDspArray->GetLast() + 1;
-        new(eclDspArray->AddrAt(m_hitNum)) DspECL();
+        new(eclDspArray->AddrAt(m_hitNum)) ECLDsp();
         eclDspArray[m_hitNum]->setCellId(iECLCell);
         eclDspArray[m_hitNum]->setDspA(FitA);
 
-        StoreArray<ECLDigit> eclDigiArray(m_eclDigiCollectionName);
+        StoreArray<ECLDigit> eclDigiArray;
         if (!eclDigiArray) eclDigiArray.create();
         m_hitNum1 = eclDigiArray->GetLast() + 1;
         new(eclDigiArray->AddrAt(m_hitNum1)) ECLDigit();
@@ -206,10 +191,10 @@ void ECLDigitizerModule::event()
     }//if Energy > 0.1 MeV
   } //store  each crystal hit
 
-  StoreArray<TrigECL> eclTrigArray(m_eclTrigCollectionName);
+  StoreArray<ECLTrig> eclTrigArray;
   if (!eclTrigArray) eclTrigArray.create();
   m_hitNum2 = eclTrigArray->GetLast() + 1;
-  new(eclTrigArray->AddrAt(m_hitNum2)) TrigECL();
+  new(eclTrigArray->AddrAt(m_hitNum2)) ECLTrig();
 //  eclTrigArray[m_hitNum2]->setEventId(m_nEvent);
   eclTrigArray[m_hitNum2]->setTimeTrig(DeltaT * 12. / 508.); //t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
 

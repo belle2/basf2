@@ -59,12 +59,7 @@ ECLHitModule::ECLHitModule() : Module()
   setDescription("ECLHitMakerModule");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
-  // Add parameters
-  // I/O
-  addParam("ECLHitInputColName", m_inColName, "Input Array // Output from g4sim module", string("ECLSimHits"));
-  addParam("ECLHitOutColName", m_eclHitOutColName, "Output of this module//(EventNo,CellId,EnergyDep,TimeAve )", string("ECLHits"));
 }
-
 ECLHitModule::~ECLHitModule()
 {
 }
@@ -76,9 +71,7 @@ void ECLHitModule::initialize()
   m_nEvent  = 0 ;
   m_hitNum = 0;
 
-  StoreArray<ECLSimHit> eclSimArray(m_inColName);
-  StoreArray<MCParticle> mcParticles;
-  StoreArray<ECLHit>::registerPersistent(m_eclHitOutColName);
+  StoreArray<ECLHit>::registerPersistent();
 
 
 
@@ -92,10 +85,10 @@ void ECLHitModule::beginRun()
 void ECLHitModule::event()
 {
 
-  StoreArray<ECLSimHit> eclSimArray(m_inColName);
+  StoreArray<ECLSimHit> eclSimArray;
 
   if (!eclSimArray) {
-    B2ERROR("Can not find " << m_inColName << ".");
+    B2ERROR("Can not find eclSimArray.");
   }
 
   //---------------------------------------------------------------------
@@ -151,7 +144,7 @@ void ECLHitModule::event()
         X_ave[iECLCell][TimeIndex] = X_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
         T_ave[iECLCell][TimeIndex]  =  6.05 + 0.0749 * X_ave[iECLCell][TimeIndex] - 0.00112 * X_ave[iECLCell][TimeIndex] * X_ave[iECLCell][TimeIndex];
         Tof_ave[iECLCell][TimeIndex] =  Tof_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
-        StoreArray<ECLHit> eclHitArray(m_eclHitOutColName);
+        StoreArray<ECLHit> eclHitArray;
 
 //        cout<<iECLCell<<" "<<E_cell[iECLCell][TimeIndex]<<" "<<Tof_ave[iECLCell][TimeIndex] + T_ave[iECLCell][TimeIndex] <<endl;
         if (!eclHitArray) eclHitArray.create();

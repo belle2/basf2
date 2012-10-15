@@ -49,19 +49,6 @@ ECLPi0ReconstructorModule::ECLPi0ReconstructorModule() : Module()
   //Set module properties
   setDescription("Creates ECL_pi0 from ECL_gamma.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
-
-  //input
-
-  addParam("ECLShowerinput", m_ECLShowerName,
-           "//input of this module//shower infromation", string("ECLShowers"));
-  addParam("ECLGammaInput", m_ECLGammaName,
-           "//Input of this RecPi0  module", string("ECLGammas"));
-
-  addParam("ECLPi0Output", m_ECLPi0Name,
-           "//output of this RecPi0 module", string("ECLPi0s"));
-
-//  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
-
 }
 
 
@@ -87,7 +74,7 @@ void ECLPi0ReconstructorModule::initialize()
 
   // CPU time start
   m_timeCPU = clock() * Unit::us;
-  StoreArray<ECLPi0>::registerPersistent(m_ECLPi0Name);
+  StoreArray<ECLPi0>::registerPersistent();
 }
 
 void ECLPi0ReconstructorModule::beginRun()
@@ -98,10 +85,9 @@ void ECLPi0ReconstructorModule::beginRun()
 void ECLPi0ReconstructorModule::event()
 {
 
-  StoreArray<ECLGamma> Gamma(m_ECLGammaName);
-  StoreArray<ECLShower> eclRecShowerArray(m_ECLShowerName);
+  StoreArray<ECLGamma> Gamma;
+  StoreArray<ECLShower> eclRecShowerArray;
   RelationArray eclGammaToShower(Gamma, eclRecShowerArray);
-
 
   for (int iIndex = 0; iIndex < eclGammaToShower.getEntries() - 1 ; iIndex++) {
     for (int iHit = 0; iHit < (int)eclGammaToShower[iIndex].getToIndices().size(); iHit++) {
@@ -148,7 +134,7 @@ void ECLPi0ReconstructorModule::event()
             fit(lv_gamma1, lv_gamma2);
             if (pi0_mass_min < mass && mass < pi0_mass_max) {
 
-              StoreArray<ECLPi0> Pi0Array(m_ECLPi0Name);
+              StoreArray<ECLPi0> Pi0Array;
               if (!Pi0Array) Pi0Array.create();
               m_Pi0Num = Pi0Array->GetLast() + 1;
               new(Pi0Array->AddrAt(m_Pi0Num)) ECLPi0();

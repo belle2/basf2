@@ -11,7 +11,7 @@
 #include <ecl/modules/eclRecShower/ECLReconstructorModule.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/HitAssignmentECL.h>
+#include <ecl/dataobjects/ECLHitAssignment.h>
 
 
 #include <ecl/geometry/ECLGeometryPar.h>
@@ -52,22 +52,6 @@ ECLReconstructorModule::ECLReconstructorModule() : Module()
   //Set module properties
   setDescription("Creates ECLRecShower from ECLDigi.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
-
-  //Parameter definition
-  addParam("ECLRecInput", m_eclDigiCollectionName,
-           "Input Array // Output from ECLReconstructor module or Data", string("ECLDigiHits"));
-
-  //output
-  addParam("ECLRecShowerOutput", m_ECLShowerName,
-           "//Output of this module", string("ECLShowers"));
-
-
-  addParam("ECLHitAssignmentinput", m_eclHitAssignmentName,
-           "//Output of this module", string("ECLHitAssignments"));
-
-
-//  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
-
 }
 
 
@@ -84,8 +68,8 @@ void ECLReconstructorModule::initialize()
 
   // CPU time start
   m_timeCPU = clock() * Unit::us;
-  StoreArray<HitAssignmentECL>::registerPersistent(m_eclHitAssignmentName);
-  StoreArray<ECLShower>::registerPersistent(m_ECLShowerName);
+  StoreArray<ECLHitAssignment>::registerPersistent();
+  StoreArray<ECLShower>::registerPersistent();
 
 
 }
@@ -99,9 +83,9 @@ void ECLReconstructorModule::beginRun()
 void ECLReconstructorModule::event()
 {
   //Input Array
-  StoreArray<ECLDigit> eclDigiArray(m_eclDigiCollectionName);
+  StoreArray<ECLDigit> eclDigiArray;
   if (!eclDigiArray) {
-    B2ERROR("Can not find ECLRecShowerHits" << m_eclDigiCollectionName << ".");
+    B2ERROR("Can not find eclDigiArray.");
   }
 
 //  int checkflag = 0;
@@ -141,10 +125,10 @@ void ECLReconstructorModule::event()
       for (std::vector<MEclCFShowerHA>::iterator iHA = HAs.begin();
            iHA != HAs.end(); ++iHA) {
 
-        StoreArray<HitAssignmentECL> eclHaArray(m_eclHitAssignmentName);
+        StoreArray<ECLHitAssignment> eclHaArray;
         if (!eclHaArray) eclHaArray.create();
         m_HANum = eclHaArray->GetLast() + 1;
-        new(eclHaArray->AddrAt(m_HANum)) HitAssignmentECL();
+        new(eclHaArray->AddrAt(m_HANum)) ECLHitAssignment();
         eclHaArray[m_HANum]->setShowerId(nShower);
         eclHaArray[m_HANum]->setCellId(iHA->Id());
 
@@ -159,7 +143,7 @@ void ECLReconstructorModule::event()
                                       + 0.12897E-01 * pow(log10(energyBfCorrect), 4) ;
 
 
-      StoreArray<ECLShower> eclRecShowerArray(m_ECLShowerName);
+      StoreArray<ECLShower> eclRecShowerArray;
       if (!eclRecShowerArray) eclRecShowerArray.create();
       m_hitNum = eclRecShowerArray->GetLast() + 1;
       new(eclRecShowerArray->AddrAt(m_hitNum)) ECLShower();

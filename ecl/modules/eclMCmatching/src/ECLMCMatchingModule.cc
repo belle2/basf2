@@ -22,7 +22,7 @@
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/HitAssignmentECL.h>
+#include <ecl/dataobjects/ECLHitAssignment.h>
 
 #include <generators/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationArray.h>
@@ -63,16 +63,6 @@ ECLMCMatchingModule::ECLMCMatchingModule() : Module()
   setDescription("ECLMCMatchingModule");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
-  // Add parameters
-  // I/O
-  addParam("ECLHitInputColName", m_inColName, "Input Array // Output from g4sim module", string("ECLSimHits"));
-  addParam("ECLHitOutColName", m_eclHitOutColName, "Output of this module//(EventNo,CellId,EnergyDep,TimeAve )", string("ECLHits"));
-  addParam("ECLDigiCollection", m_eclDigiCollectionName,
-           "//Output of this module//(EventNo,CellId,FittingEnergyDep, FittingTimeAve )", string("ECLDigiHits"));
-  //input
-  addParam("ECLShowerinput", m_ECLShowerName, "//input of this module//shower infromation", string("ECLShowers"));
-
-  addParam("ECLHitAssignmentinput", m_eclHitAssignmentName, "//input of this module//(showerID,Hits)", string("ECLHitAssignments"));
 }
 
 ECLMCMatchingModule::~ECLMCMatchingModule()
@@ -84,9 +74,9 @@ void ECLMCMatchingModule::initialize()
   // Initialize variables
   m_nRun    = 0 ;
   m_nEvent  = 0 ;
-  RelationArray::registerPersistent<ECLHit, MCParticle>(m_eclHitOutColName, "");
-  RelationArray::registerPersistent<ECLDigit, MCParticle>(m_eclDigiCollectionName, "");
-  RelationArray::registerPersistent<ECLShower, MCParticle>(m_ECLShowerName, "");
+  RelationArray::registerPersistent<ECLHit, MCParticle>("", "");
+  RelationArray::registerPersistent<ECLDigit, MCParticle>("", "");
+  RelationArray::registerPersistent<ECLShower, MCParticle>("", "");
 
 
 
@@ -143,8 +133,8 @@ void ECLMCMatchingModule::event()
   }
 
 
-  StoreArray<ECLSimHit> eclSimArray(m_inColName);
-  StoreArray<ECLHit> eclHitArray(m_eclHitOutColName);
+  StoreArray<ECLSimHit> eclSimArray;
+  StoreArray<ECLHit> eclHitArray;
   RelationArray eclSimHitRel(mcParticles, eclSimArray);
   RelationArray eclHitToMCPart(eclHitArray, mcParticles);
 
@@ -188,7 +178,7 @@ void ECLMCMatchingModule::event()
   }//for index
 
 
-  StoreArray<ECLDigit> eclDigiArray(m_eclDigiCollectionName);
+  StoreArray<ECLDigit> eclDigiArray;
   RelationArray  eclDigiToMCPart(eclDigiArray, mcParticles);
 
   int hitNum1 = eclDigiArray->GetEntriesFast();
@@ -212,8 +202,8 @@ void ECLMCMatchingModule::event()
     }
   }
 
-  StoreArray<ECLShower> eclRecShowerArray(m_ECLShowerName);
-  StoreArray<HitAssignmentECL> eclHitAssignmentArray(m_eclHitAssignmentName);
+  StoreArray<ECLShower> eclRecShowerArray;
+  StoreArray<ECLHitAssignment> eclHitAssignmentArray;
   RelationArray  eclShowerToMCPart(eclRecShowerArray, mcParticles);
 
 
@@ -226,9 +216,9 @@ void ECLMCMatchingModule::event()
     ECLShower* aECLShower = eclRecShowerArray[iShower];
     double showerId = aECLShower->GetShowerId();
     for (int iHA = 0; iHA < hANum; iHA++) {
-      HitAssignmentECL* aHitAssignmentECL = eclHitAssignmentArray[iHA];
-      int m_HAShowerId = aHitAssignmentECL->getShowerId();
-      int m_HAcellId = aHitAssignmentECL->getCellId();
+      ECLHitAssignment* aECLHitAssignment = eclHitAssignmentArray[iHA];
+      int m_HAShowerId = aECLHitAssignment->getShowerId();
+      int m_HAcellId = aECLHitAssignment->getCellId();
       if (m_HAShowerId != showerId)continue;
       if (m_HAShowerId > showerId)break;
       eclShowerMap.insert(pair<int, int>(m_HAcellId, m_HAShowerId));

@@ -16,6 +16,8 @@
 #include <TClonesArray.h>
 #include <TClass.h>
 
+#include <fstream>
+
 using namespace std;
 using namespace Belle2;
 
@@ -71,6 +73,13 @@ bool DataStore::createEntry(const std::string& name, EDurability durability,
     B2ERROR("Attempt to register object '" << name << "' outside the initialization phase.");
     return false;
   }
+
+  //add to current module's outputs
+  ModuleInfo& info = m_moduleInfo[m_currentModule];
+  if (objClass == RelationContainer::Class())
+    info.outputRelations.insert(name);
+  else
+    info.outputs.insert(name);
 
   // Check whether the map entry already exists
   if (m_storeObjMap[durability].find(name) != m_storeObjMap[durability].end()) {
@@ -304,4 +313,84 @@ void DataStore::reset(EDurability durability)
     delete iter->second;
   }
   m_storeObjMap[durability].clear();
+}
+
+bool DataStore::require(const std::string& name, EDurability durability,
+                        const TClass* objClass, bool array)
+{
+  if (m_initializeActive) {
+    ModuleInfo& info = m_moduleInfo[m_currentModule];
+    if (objClass == RelationContainer::Class())
+      info.inputRelations.insert(name);
+    else
+      info.inputs.insert(name);
+  }
+
+  if (!hasEntry(name, durability, objClass, array)) {
+    B2ERROR("The required DataStore entry with name " << name << " and durability " << durability << " does not exists.");
+    return false;
+  }
+  return true;
+}
+
+void DataStore::generateDotFile() const
+{
+  std::ofstream file("dataflow.dot");
+
+  typedef std::map<std::string, ModuleInfo>::const_iterator InfoMapIter;
+  for (InfoMapIter it = m_moduleInfo.begin(); it != m_moduleInfo.end(); ++it) {
+    if (it->second.inputs.empty() && it->second.outputs.empty())
+      return;
+
+    const std::string& name = it->first;
+    file << "digraph " << name << " {\n";
+    file << "  " << name << ";\n";
+
+    for (int i = 0; i < 2; i++) {
+      std::set<std::string> objects = it->second.inputs;
+      std::set<std::string> relations = it->second.inputRelations;
+      //colors for input
+      std::string fillcolor = "cadetblue3";
+      std::string arrowcolor = "cornflowerblue";
+      std::string unknownarraycolor = "gray82";
+      if (i == 1) {
+        objects = it->second.outputs;
+        relations = it->second.outputRelations;
+
+        //colors for output
+        fillcolor = "orange";
+        arrowcolor = "firebrick";
+      }
+
+      for (std::set<std::string>::const_iterator setit = objects.begin(); setit != objects.end(); ++setit) {
+        file << "  " << *setit << " [shape=box,style=filled,fillcolor=" << fillcolor << "];\n";
+        if (i == 0)
+          file << "  " << *setit << " -> " << name  << " [color=" << arrowcolor << "];\n";
+        else
+          file << "  " << name << " -> " << *setit << " [color=" << arrowcolor << "];\n";
+      }
+
+      for (std::set<std::string>::const_iterator setit = relations.begin(); setit != relations.end(); ++setit) {
+        const std::string& relname = *setit;
+        size_t pos = relname.rfind("To");
+        if (pos != relname.find("To")) {
+          B2WARNING("generateDotFile(): couldn't split relation name!")
+          //Searching for parts in input/output lists might be helpful...
+          continue;
+        }
+
+        const std::string from = relname.substr(0, pos);
+        const std::string to = relname.substr(pos + 2);
+
+        //any connected arrays that are neither input nor output?
+        if (it->second.outputs.count(from) == 0 && it->second.inputs.count(from) == 0)
+          file << "  " << from << " [shape=box,style=filled,fillcolor=" << unknownarraycolor << "];\n";
+        if (it->second.outputs.count(to) == 0 && it->second.inputs.count(to) == 0)
+          file << "  " << to << " [shape=box,style=filled,fillcolor=" << unknownarraycolor << "];\n";
+
+        file << "  " << from << " -> " << to << " [color=" << arrowcolor << ",style=dashed];\n";
+      }
+    }
+    file << "}\n\n";
+  }
 }

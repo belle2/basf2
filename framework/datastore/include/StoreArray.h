@@ -134,11 +134,7 @@ namespace Belle2 {
      */
     static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
       std::string arrayName = DataStore::arrayName<T>(name);
-      if (!DataStore::Instance().hasEntry(arrayName, durability, T::Class(), true)) {
-        B2ERROR("The required DataStore entry with name " << arrayName << " and durability " << durability << " does not exists.");
-        return false;
-      }
-      return true;
+      return DataStore::Instance().hasEntry(arrayName, durability, T::Class(), true);
     }
 
     /** Constructor to access an array in the DataStore.
@@ -177,11 +173,7 @@ namespace Belle2 {
      *  @return            True if the array exists.
      */
     bool isRequired() {
-      if (!DataStore::Instance().hasEntry(m_name, m_durability, T::Class(), true)) {
-        B2ERROR("The required DataStore entry with name " << m_name << " and durability " << m_durability << " does not exists.");
-        return false;
-      }
-      return true;
+      return DataStore::Instance().require(m_name, m_durability, T::Class(), true);
     }
 
     /** Create an empty array in the data store.

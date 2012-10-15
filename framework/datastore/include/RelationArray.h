@@ -222,11 +222,7 @@ namespace Belle2 {
      *  @return            True if the object exists.
      */
     static bool required(const std::string& name, DataStore::EDurability durability = DataStore::c_Event) {
-      if (!DataStore::Instance().hasEntry(name, durability, RelationContainer::Class(), false)) {
-        B2ERROR("The required relation array with name " << name << " and durability " << durability << " does not exists.");
-        return false;
-      }
-      return true;
+      return DataStore::Instance().require(name, durability, RelationContainer::Class(), false);
     }
 
     /** Create an empty relation array in the data store.

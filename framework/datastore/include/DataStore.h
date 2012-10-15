@@ -14,6 +14,7 @@
 #include <framework/datastore/RelationEntry.h>
 
 #include <string>
+#include <set>
 #include <map>
 
 class TObject;
@@ -62,6 +63,14 @@ namespace Belle2 {
       TObject*    object;      /**< The pointer to the actual object. Associated memory may exceed object durability, and is kept until the object is replaced.  **/
       TObject*    ptr;         /**< The pointer to the returned object, either equal to 'object' or 0, depending on wether the object was created in the current event **/
       std::string name;        /**< Name of the entry. Equal to the key in the map. **/
+    };
+
+    /** Stores information on inputs/outputs of a module, as obtained by require()/createEntry(); */
+    struct ModuleInfo {
+      std::set<std::string> inputs;
+      std::set<std::string> inputRelations;
+      std::set<std::string> outputs;
+      std::set<std::string> outputRelations;
     };
 
     // Convenient typedefs.
@@ -149,6 +158,17 @@ namespace Belle2 {
     bool hasEntry(const std::string& name, EDurability durability,
                   const TClass* objClass, bool array);
 
+    /** Produce ERROR message if no entry of the given type is registered in the DataStore.
+     *
+     *  @param name       Name under which you want to save the object in the DataStore.
+     *  @param durability Decide with which durability map you want to perform the requested action.
+     *  @param objClass   The class of the object.
+     *  @param array      Whether it is a TClonesArray or not.
+     *  @return           True if the requested object exists.
+     */
+    bool require(const std::string& name, EDurability durability,
+                 const TClass* objClass, bool array);
+
     /** Get a pointer to a pointer of an object in the DataStore.
      *
      *  If the map of requested durability already contains an object under the key name with a DIFFERENT type
@@ -210,10 +230,19 @@ namespace Belle2 {
      */
     void reset(EDurability durability);
 
+    /** Set the current module
+     *
+     * Currently called only in EventProcessor::processInitialize()
+     */
+    void setModule(const std::string& name) { m_currentModule = name; }
+
+    /** Create DOT file with input/output diagrams for each module. */
+    void generateDotFile() const;
 
   protected:
     /** Constructor is protected, as it is a singleton.*/
     explicit DataStore();
+    DataStore(const DataStore&) { }
 
   private:
     /** Destructor. */
@@ -243,6 +272,12 @@ namespace Belle2 {
      * Creating new map slots is only allowed in a Module's initialize() function.
      */
     bool m_initializeActive;
+
+    /** Stores the current module, used to fill m_moduleInfo. */
+    std::string m_currentModule;
+
+    /** Stores information on inputs/outputs of each module, as obtained by require()/createEntry(); */
+    std::map<std::string, ModuleInfo> m_moduleInfo;
   };
 } // namespace Belle2
 

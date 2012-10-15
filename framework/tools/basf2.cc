@@ -147,6 +147,7 @@ int main(int argc, char* argv[])
     ("input,i", prog::value<string>(), "override name of input file for RootInput")
     ("output,o", prog::value<string>(), "override name of output file for RootOutput")
     ("processes,p", prog::value<int>(), "override number of parallel processes (0 to disable parallel processing)")
+    ("visualize-dataflow", "Generate data flow diagrams (dataflow.dot) for the executed steering file.")
     ;
 
     prog::options_description cmdlineOptions;
@@ -229,6 +230,10 @@ int main(int argc, char* argv[])
       }
 
       LogSystem::Instance().getLogConfig()->setLogLevel((LogConfig::ELogLevel)level);
+    }
+
+    if (varMap.count("visualize-dataflow")) {
+      Environment::Instance().setVisualizeDataFlow(true);
     }
 
 

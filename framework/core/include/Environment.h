@@ -129,6 +129,13 @@ namespace Belle2 {
      */
     const std::string& getSteering() const { return m_steering; };
 
+    /** Wether to generate DOT files with data store inputs/outputs of each module. */
+    void setVisualizeDataFlow(bool on) { m_visualizeDataFlow = on; }
+
+    /** Wether to generate DOT files with data store inputs/outputs of each module. */
+    bool getVisualizeDataFlow() { return m_visualizeDataFlow; }
+
+
   private:
 
     std::string m_dataSearchPath; /**< The path in which the data files, such as geometry files, are stored. */
@@ -139,6 +146,7 @@ namespace Belle2 {
     std::string m_inputFileOverride; /**< Override name of input file for input module */
     std::string m_outputFileOverride; /**< Override name of output file for output module */
     int m_numberProcessesOverride; /**< Override m_numberProcesses if >= 0 */
+    bool m_visualizeDataFlow; /** Wether to generate DOT files with data store inputs/outputs of each module. */
 
     /**
      * The constructor is hidden to avoid that someone creates an instance of this class.

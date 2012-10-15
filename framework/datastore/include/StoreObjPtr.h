@@ -111,11 +111,7 @@ namespace Belle2 {
      */
     static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
       std::string objName = DataStore::objectName<T>(name);
-      if (!DataStore::Instance().hasEntry(objName, durability, T::Class(), false)) {
-        B2ERROR("The required DataStore entry with name " << objName << " and durability " << durability << " does not exists.");
-        return false;
-      }
-      return true;
+      return DataStore::Instance().require(objName, durability, T::Class(), false);
     }
 
     /** Constructor to access an object in the DataStore.
@@ -155,11 +151,7 @@ namespace Belle2 {
      *  @param name        Name under which the object is stored.
      */
     bool isRequired() {
-      if (!DataStore::Instance().hasEntry(m_name, m_durability, T::Class(), false)) {
-        B2ERROR("The required DataStore entry with name " << m_name << " and durability " << m_durability << " does not exists.");
-        return false;
-      }
-      return true;
+      return DataStore::Instance().require(m_name, m_durability, T::Class(), false);
     }
 
     /** Create a default object in the data store.

@@ -110,6 +110,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 
     //Set the module dependent log level
     logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
+    DataStore::Instance().setModule(module->getName());
 
     //Do initialization
     stats.startModule();
@@ -130,6 +131,10 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 #ifdef HAS_CALLGRIND
   CALLGRIND_DUMP_STATS_AT("initialize");
 #endif
+
+  //do we want to visualize DataStore input/ouput?
+  if (Environment::Instance().getVisualizeDataFlow())
+    DataStore::Instance().generateDotFile();
 }
 
 

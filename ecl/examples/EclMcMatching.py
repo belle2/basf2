@@ -34,7 +34,7 @@ param_pGun = {
     'nTracks': 1,
     'momentumGeneration': 'uniform',
     'momentumParams': [1., 1.],
-    'thetaGeneration': 'fixed',
+    'thetaGeneration': 'uniform',
     'thetaParams': [50., 130.],
     'phiGeneration': 'uniform',
     'phiParams': [0, 360],

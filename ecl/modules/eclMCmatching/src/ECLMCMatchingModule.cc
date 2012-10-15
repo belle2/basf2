@@ -84,9 +84,11 @@ void ECLMCMatchingModule::initialize()
   // Initialize variables
   m_nRun    = 0 ;
   m_nEvent  = 0 ;
-  RelationArray::registerPersistent<HitECL, MCParticle>();
-  RelationArray::registerPersistent<ECLDigit, MCParticle>();
-  RelationArray::registerPersistent<ECLShower, MCParticle>();
+  RelationArray::registerPersistent<HitECL, MCParticle>(m_eclHitOutColName, "");
+  RelationArray::registerPersistent<ECLDigit, MCParticle>(m_eclDigiCollectionName, "");
+  RelationArray::registerPersistent<ECLShower, MCParticle>(m_ECLShowerName, "");
+
+
 
 }
 
@@ -246,7 +248,7 @@ void ECLMCMatchingModule::event()
         if (ShowerIndex != -1 && ShowerOldTrack[ShowerIndex] != (int)eclDigiToMCPart[index].getToIndex(iMCpart)) {
           eclShowerToMCPart.add(ShowerIndex, eclDigiToMCPart[index].getToIndex(iMCpart));
           //cout << "ShowerRel" << m_nEvent << " " << cId << " shower" << ShowerIndex << " mom" << eclDigiToMCPart[index].getToIndex(iMCpart)
-          //     << " PDG " << mcParticles[eclDigiToMCPart[index].getToIndex(iMCpart)]->getPDG()
+          //      << " PDG " << mcParticles[eclDigiToMCPart[index].getToIndex(iMCpart)]->getPDG()
           //     << endl;
           ShowerOldTrack[ShowerIndex] = eclDigiToMCPart[index].getToIndex(iMCpart);
         }

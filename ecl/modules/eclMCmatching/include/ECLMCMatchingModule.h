@@ -63,20 +63,6 @@ namespace Belle2 {
       /** define a multimap for hits in showers */
       typedef std::multimap< int, int> HitShowerMap;
 
-    protected:
-      /** Input array name. */
-      std::string m_inColName;
-      /** Name of input Hit collection of this module.
-        */
-      std::string m_eclHitOutColName;
-      /** Name of input DigiHit collection of this module.
-        */
-      std::string m_eclDigiCollectionName;
-      /** Name of input collection of this module */
-      std::string m_ECLShowerName;
-      /**  Name of collection of ECLHitAssignment.*/
-      std::string m_eclHitAssignmentName;
-
 
     private:
 

@@ -88,12 +88,6 @@ namespace Belle2 {
     private:
       /** members of ECLReconstructor Module
        */
-      /** Name of collection of ECLShower */
-      std::string m_ECLShowerName;
-      /** Name of collection of ECLDigi.*/
-      std::string m_eclDigiCollectionName;
-      /** Name of collection of ECLHitAssignment.*/
-      std::string m_eclHitAssignmentName;
       /** CPU time     */
       double m_timeCPU;
       /** Run number   */

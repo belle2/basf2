@@ -69,28 +69,6 @@ namespace Belle2 {
     protected:
     private:
 
-      /** Input ECLSimHit array name. */
-      std::string m_inColName;
-      /** Name of collection of ECLHits.
-       */
-      std::string m_eclHitCollectionName;
-
-      /** Name of output Hit collection of this module.
-        */
-      std::string m_eclDigiCollectionName;
-
-
-      /** Name of output ECLShaperArray collection of this module.
-        */
-      std::string m_eclDspCollectionName;
-
-
-      /** Name of the  Random Time of Trig record
-        */
-      std::string m_eclTrigCollectionName;
-
-
-//    unsigned int m_randSeed;    /**< User-supplied random seed, default is 0. for ctime  */
       /** CPU time     */
       double m_timeCPU;
       /** Run number   */

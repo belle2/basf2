@@ -70,18 +70,10 @@ namespace Belle2 {
             typedef std::pair< int, int> vpair;
       */
 
-    protected:
-      /** Input array name. */
-      std::string m_inColName;
-      /** Output array name. */
-      std::string m_eclHitOutColName;
-
-      /** The current number of created hits in an event. Used to fill the DataStore ECL array.*/
-      int m_hitNum;
-
 
     private:
-
+      /** The current number of created hits in an event. Used to fill the DataStore ECL array.*/
+      int m_hitNum;
       /** CPU time     */
       double m_timeCPU;
       /** Run number   */

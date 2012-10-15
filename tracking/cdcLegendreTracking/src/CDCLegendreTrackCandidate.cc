@@ -10,6 +10,8 @@
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+
 #include <framework/datastore/StoreArray.h>
 #include <cmath>
 #include <cstdlib>
@@ -19,20 +21,16 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(CDCLegendreTrackCandidate)
-
 CDCLegendreTrackCandidate::CDCLegendreTrackCandidate() :
-  m_theta(-999), m_r(-999), m_y0(-999), m_slope(-999), m_charge(-999), m_ID(
-    -999), m_assignHits(true)
+  m_theta(-999), m_r(-999), m_xc(-999), m_yc(-999), m_charge(-999)
 {
 }
 
 CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(
   CDCLegendreTrackCandidate& candidate) :
-  TObject(), m_theta(candidate.m_theta), m_r(candidate.m_r), m_y0(
-    candidate.m_y0), m_slope(candidate.m_slope), m_charge(
-      candidate.m_charge), m_ID(candidate.m_ID), m_assignHits(
-        candidate.m_assignHits)
+  m_theta(candidate.m_theta), m_r(candidate.m_r), m_xc(candidate.m_xc), m_yc(
+    candidate.m_yc), m_charge(
+      candidate.m_charge)
 {
   m_TrackHits = candidate.getTrackHits();
 }
@@ -41,29 +39,41 @@ CDCLegendreTrackCandidate::~CDCLegendreTrackCandidate()
 {
 }
 
-CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(int ID, double theta,
-                                                     double r, int charge, std::string cdcHitsDatastoreName,
-                                                     double resolutionAxial, double resolutionStereo, bool assignHits) :
-  m_theta(theta), m_r(r), m_y0(m_r / sin(m_theta)), m_slope(
-    -1 / tan(m_theta)), m_charge(charge), m_ID(ID), m_assignHits(
-      assignHits)
+CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(double theta, double r, int charge,
+                                                     const std::list<CDCLegendreTrackHit*> & trackHitList) :
+  m_theta(theta), m_r(r), m_xc(cos(theta) / r), m_yc(sin(theta) / r), m_charge(charge), m_axialHits(0), m_stereoHits(0), m_allHits(0)
 {
-  AddAxialHits(cdcHitsDatastoreName, resolutionAxial);
+  //only accepts hits, which support the correct curvature
+  BOOST_FOREACH(CDCLegendreTrackHit * hit, trackHitList) {
+    if ((m_charge == charge_positive || m_charge == charge_negative)
+        && hit->getCurvatureSignWrt(getXc(), getYc()) != m_charge)
+      continue;
 
-  AddStereoHits(cdcHitsDatastoreName, resolutionStereo);
+    m_TrackHits.push_back(hit);
+  }
 
-  m_uniqueHits = getNUniqueHits();
+  DetermineHitNumbers();
+
+}
+
+void CDCLegendreTrackCandidate::DetermineHitNumbers()
+{
+  BOOST_FOREACH(CDCLegendreTrackHit * hit, m_TrackHits) {
+    if (hit->getIsAxial())
+      ++m_axialHits;
+    else
+      ++m_stereoHits;
+    ++m_allHits;
+  }
+
 }
 
 TVector3 CDCLegendreTrackCandidate::getMomentumEstimation() const
 {
-  double yc = getYc();
-  double xc = getXc();
-
-  double R = sqrt(xc * xc + yc * yc);
+  double R = fabs(1 / m_r);
   double pt = R * 1.5 * 0.00299792458;
 
-  TVector2 mom2 = (TVector2(xc, yc).Rotate(TMath::Pi() / 2).Unit()) * pt * getChargeSign();
+  TVector2 mom2 = (TVector2(m_xc, m_yc).Rotate(TMath::Pi() / 2).Unit()) * pt * getChargeSign();
 
   double mom_z = getZMomentumEstimation(mom2);
 
@@ -77,6 +87,7 @@ double CDCLegendreTrackCandidate::getZMomentumEstimation(TVector2 mom2) const
   std::vector<double> median_vector;
 
   BOOST_FOREACH(CDCLegendreTrackHit * trackHit, m_TrackHits) {
+
     if (trackHit->getIsAxial())
       continue;
 
@@ -91,78 +102,14 @@ double CDCLegendreTrackCandidate::getZMomentumEstimation(TVector2 mom2) const
     median_vector.push_back(atan2(z, r));
   }
 
+  if (median_vector.size() == 0)
+    return (0.0001);
+
   sort(median_vector.begin(), median_vector.end());
 
   double medianTheta = median_vector.at(median_vector.size() / 2);
 
   return (tan(medianTheta) * sqrt(mom2.X() * mom2.X() + mom2.Y() * mom2.Y()));
-}
-
-void CDCLegendreTrackCandidate::AddAxialHits(std::string cdcHitsDatastoreName,
-                                             double resolution)
-{
-  if (m_charge != charge_positive && m_charge != charge_negative
-      && m_charge != charge_curler) {
-    B2ERROR(
-      "Undefined charge given to CDCLegendreTrackCandidate::AddAxialHits");
-    exit(EXIT_FAILURE);
-  }
-
-  StoreArray<CDCLegendreTrackHit> cdcLegendreTrackHits(cdcHitsDatastoreName);
-
-  for (int i = 0; i < cdcLegendreTrackHits.getEntries(); i++) {
-    //add only axial hits
-    if (not cdcLegendreTrackHits[i]->getIsAxial())
-      continue;
-
-    //add only hits within the resolution range
-    if (DistanceTo(*cdcLegendreTrackHits[i]) > resolution)
-      continue;
-
-    if ((m_charge == charge_positive || m_charge == charge_negative)
-        && cdcLegendreTrackHits[i]->getCurvatureSignWrt(getXc(),
-                                                        getYc()) != m_charge)
-      continue;
-
-    m_TrackHits.push_back(cdcLegendreTrackHits[i]);
-    if (m_assignHits)
-      cdcLegendreTrackHits[i]->assignToTrack(m_ID);
-  }
-}
-
-void CDCLegendreTrackCandidate::AddStereoHits(std::string cdcHitsDatastoreName,
-                                              double resolution)
-{
-  if (m_charge != charge_positive && m_charge != charge_negative
-      && m_charge != charge_curler) {
-    B2ERROR(
-      "Undefined charge given to CDCLegendreTrackCandidate::AddStereoHits");
-    exit(EXIT_FAILURE);
-  }
-
-  StoreArray<CDCLegendreTrackHit> cdcLegendreTrackHits(cdcHitsDatastoreName);
-
-  for (int i = 0; i < cdcLegendreTrackHits.getEntries(); i++) {
-    if (cdcLegendreTrackHits[i]->getIsAxial())
-      continue;
-
-    if ((m_charge == charge_positive || m_charge == charge_negative)
-        && cdcLegendreTrackHits[i]->getCurvatureSignWrt(getXc(), getYc()) != getChargeSign())
-      continue;
-
-    if (OriginalDistanceTo(*cdcLegendreTrackHits[i]) > 2.)
-      continue;
-
-    cdcLegendreTrackHits[i]->shiftAlongZ(*this);
-
-    double d_new = DistanceTo(*cdcLegendreTrackHits[i]);
-
-    if (d_new < resolution) {
-      m_TrackHits.push_back(cdcLegendreTrackHits[i]);
-      if (m_assignHits)
-        cdcLegendreTrackHits[i]->assignToTrack(m_ID);
-    }
-  }
 }
 
 double CDCLegendreTrackCandidate::DistanceTo(
@@ -194,8 +141,10 @@ double CDCLegendreTrackCandidate::DistanceTo(double xc, double yc,
     yw = tHit.getWirePosition().Y();
   }
 
+  //distace of the centers of the drift circle and the track
   double d = sqrt((xc - xw) * (xc - xw) + (yc - yw) * (yc - yw));
 
+  //take into account the two radii correctly
   if (d > max(rw, rc))
     d = fabs(d - (rc + rw));
   else
@@ -205,17 +154,11 @@ double CDCLegendreTrackCandidate::DistanceTo(double xc, double yc,
 }
 
 int CDCLegendreTrackCandidate::getChargeAssumption(
-  std::string cdcHitsDatastoreName, double theta, double r,
-  double resolution)
+  double theta, double r, const std::list<CDCLegendreTrackHit*> & trackHits)
 {
-  StoreArray<CDCLegendreTrackHit> cdcLegendreTrackHits(
-    cdcHitsDatastoreName.c_str());
-
-  double y0 = r / sin(theta);
-  double slope = -1 / tan(theta);
-  double yc = 1 / y0;
-  double xc = 1 / (-1 * y0 / slope);
-  double rc = sqrt(xc * xc + yc * yc);
+  double yc = TMath::Sin(theta) / r;
+  double xc = TMath::Cos(theta) / r;
+  double rc = fabs(1 / r);
 
   if (rc < 56.5)
     return charge_curler;
@@ -223,11 +166,8 @@ int CDCLegendreTrackCandidate::getChargeAssumption(
   int vote_pos = 0;
   int vote_neg = 0;
 
-  for (int i = 0; i < cdcLegendreTrackHits.getEntries(); i++) {
-    if (DistanceTo(xc, yc, *cdcLegendreTrackHits[i]) >= resolution)
-      continue;
-
-    int curve_sign = cdcLegendreTrackHits[i]->getCurvatureSignWrt(xc, yc);
+  BOOST_FOREACH(CDCLegendreTrackHit * Hit, trackHits) {
+    int curve_sign = Hit->getCurvatureSignWrt(xc, yc);
 
     if (curve_sign == CDCLegendreTrackCandidate::charge_positive)
       ++vote_pos;
@@ -250,19 +190,27 @@ int CDCLegendreTrackCandidate::getChargeAssumption(
     return charge_negative;
 }
 
-int CDCLegendreTrackCandidate::getNUniqueHits() const
-{
-  int nUnique = 0;
-
-  BOOST_FOREACH(CDCLegendreTrackHit * trackHit, m_TrackHits) {
-    if (trackHit->getAssignedTracks().size() == 1)
-      ++nUnique;
-  }
-
-  return nUnique;
-}
-
 int CDCLegendreTrackCandidate::getChargeSign() const
 {
   return m_charge / abs(m_charge);
+}
+
+void CDCLegendreTrackCandidate::setR(double r)
+{
+  m_r = r;
+  m_xc = cos(m_theta) / r;
+  m_yc = sin(m_theta) / r;
+}
+
+void CDCLegendreTrackCandidate::setTheta(double theta)
+{
+  m_theta = theta;
+  m_xc = cos(theta) / m_r;
+  m_yc = sin(theta) / m_r;
+}
+
+void CDCLegendreTrackCandidate::addHit(CDCLegendreTrackHit* hit)
+{
+  if ((m_charge == charge_curler) || hit->getCurvatureSignWrt(getXc(), getYc()) == m_charge)
+    m_TrackHits.push_back(hit);
 }

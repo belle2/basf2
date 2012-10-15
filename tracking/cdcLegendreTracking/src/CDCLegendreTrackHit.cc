@@ -3,14 +3,17 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oksana Brovchenko, Bastian Kronenbitter                  *
+ * Contributors: Bastian Kronenbitter                                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
+
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/translators/SimpleTDCCountTranslator.h>
 
 #include <cmath>
 #include <TMath.h>
@@ -19,19 +22,14 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
-ClassImp(CDCLegendreTrackHit)
-
-CDCLegendreTrackHit::CDCLegendreTrackHit()
+CDCLegendreTrackHit::CDCLegendreTrackHit(CDCHit* hit, int ID) : m_storeID(ID), m_wireId(hit->getIWire())
 {
-}
+  CDC::SimpleTDCCountTranslator sDriftTimeTranslator;
+  m_driftTime = sDriftTimeTranslator.getDriftLength(hit->getTDCCount(), WireID(hit->getID()));
+  //FIXME: Provide correct parameters, as soon as driftTimeTranslator supports them
+  m_deltaDriftTime = sDriftTimeTranslator.getDriftLengthResolution(-999., WireID(hit->getID()), false, -999., -999.);
 
-CDCLegendreTrackHit::CDCLegendreTrackHit(CDCHit* hit, int index)
-{
-  m_storeIndex = index;
-  m_driftTime = hit->getTDCCount();
   m_charge = hit->getADCCount();
-
-  m_wireId = hit->getIWire();
 
   m_superlayerId = hit->getISuperLayer();
 
@@ -53,9 +51,9 @@ CDCLegendreTrackHit::CDCLegendreTrackHit(CDCHit* hit, int index)
   m_wirePositionOrig = m_wirePosition;
 }
 
-CDCLegendreTrackHit::CDCLegendreTrackHit(const CDCLegendreTrackHit& rhs) : TObject()
+CDCLegendreTrackHit::CDCLegendreTrackHit(const CDCLegendreTrackHit& rhs)
 {
-  m_storeIndex = rhs.getStoreIndex();
+  m_storeID = rhs.m_storeID;
   m_driftTime = rhs.getDriftTime();
   m_charge = rhs.m_charge;
   m_wireId = rhs.getWireId();
@@ -67,8 +65,6 @@ CDCLegendreTrackHit::CDCLegendreTrackHit(const CDCLegendreTrackHit& rhs) : TObje
   //set hit coordinates in normal space and conformal plane
   setWirePosition();
   ConformalTransformation();
-
-  m_TrackIndices = rhs.getTrackIndices();
 }
 
 CDCLegendreTrackHit::~CDCLegendreTrackHit()
@@ -80,17 +76,14 @@ void CDCLegendreTrackHit::setWirePosition()
   //Get the position of the hit wire from CDCGeometryParameters
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
 
+  TVector3 wireBegin = cdcg.wireForwardPosition(m_layerId, m_wireId);
+  TVector3 wireEnd   = cdcg.wireBackwardPosition(m_layerId, m_wireId);
 
-  //center of the wire
-  m_wirePosition.SetX(
-    (cdcg.wireForwardPosition(m_layerId, m_wireId).x()
-     + cdcg.wireBackwardPosition(m_layerId, m_wireId).x()) / 2);
-  m_wirePosition.SetY(
-    (cdcg.wireForwardPosition(m_layerId, m_wireId).y()
-     + cdcg.wireBackwardPosition(m_layerId, m_wireId).y()) / 2);
-  m_wirePosition.SetZ(
-    (cdcg.wireForwardPosition(m_layerId, m_wireId).z()
-     + cdcg.wireBackwardPosition(m_layerId, m_wireId).z()) / 2);
+  double fraction = (m_zReference - wireBegin.z()) / (wireEnd.z() - wireBegin.z());
+
+  m_wirePosition.SetZ(m_zReference);
+  m_wirePosition.SetX(wireBegin.x() + fraction * (wireEnd.x() - wireBegin.x()));
+  m_wirePosition.SetY(wireBegin.y() + fraction * (wireEnd.y() - wireBegin.y()));
 }
 
 void CDCLegendreTrackHit::ConformalTransformation()
@@ -99,11 +92,13 @@ void CDCLegendreTrackHit::ConformalTransformation()
   double y = m_wirePosition.y();
 
   //transformation of the coordinates from normal to conformal plane
-  m_conformalX = 2 * x / (x * x + y * y);
-  m_conformalY = 2 * y / (x * x + y * y);
+  //this is not the actual wire position but the transformed center of the drift circle
+  m_conformalX = 2 * x / (x * x + y * y - m_driftTime * m_driftTime);
+  m_conformalY = 2 * y / (x * x + y * y - m_driftTime * m_driftTime);
 
-  //correct would be (x * x + y * y - m_driftTime * m_driftTime) but very good approximation
-  m_conformalDriftTime = 2 * m_driftTime / (x * x + y * y);
+  //conformal drift time =  (x * x + y * y - m_driftTime * m_driftTime)
+  m_conformalDriftTime = 2 * m_driftTime / (x * x + y * y - m_driftTime * m_driftTime);
+
 }
 
 double CDCLegendreTrackHit::getPhi() const
@@ -146,16 +141,13 @@ int CDCLegendreTrackHit::getCurvatureSignWrt(double xc, double yc) const
     return CDCLegendreTrackCandidate::charge_negative;
 }
 
-void CDCLegendreTrackHit::assignToTrack(int ID)
+void CDCLegendreTrackHit::approach(const CDCLegendreTrackCandidate& track)
 {
-  m_TrackIndices.push_back(ID);
-}
+  if (m_isAxial)
+    return;
 
-void CDCLegendreTrackHit::shiftAlongZ(const CDCLegendreTrackCandidate& track)
-{
   //Get the necessary position of the hit wire from CDCGeometryParameters
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
-
 
   TVector3 forwardWirePoint; //forward end of the wire
   TVector3 backwardWirePoint; //backward end of the wire
@@ -188,11 +180,10 @@ void CDCLegendreTrackHit::shiftAlongZ(const CDCLegendreTrackCandidate& track)
   for (int i = 0; i < 101; i++) {
     //loop over the parameter vector ( = loop over the length of the wire)
 
-    //new point along the wire
+    //calculation of the shortest distance between the hit point and the track in the conformal plane
     m_wirePosition.SetX(forwardWirePoint.x() + parameter[i] * wireVector.x());
     m_wirePosition.SetY(forwardWirePoint.y() + parameter[i] * wireVector.y());
 
-    //calculation of the shortest distance between the hit point and the track in the conformal plane
     distance = track.DistanceTo(*this);
 
     //search for the wire point which gives the shortest distance
@@ -207,12 +198,7 @@ void CDCLegendreTrackHit::shiftAlongZ(const CDCLegendreTrackCandidate& track)
   double y = forwardWirePoint.y() + parameter[bestIndex] * wireVector.y();
   double z = forwardWirePoint.z() + parameter[bestIndex] * wireVector.z();
 
-  double cx = 2 * x / (x * x + y * y);
-  double cy = 2 * y / (x * x + y * y);
-
-  m_wirePosition.SetX(x);
-  m_wirePosition.SetY(y);
-  m_wirePosition.SetZ(z);
-  m_conformalX = cx;
-  m_conformalY = cy;
+  m_wirePosition.SetXYZ(x, y, z);
+  m_conformalX = 2 * x / (x * x + y * y);
+  m_conformalY = 2 * y / (x * x + y * y);
 }

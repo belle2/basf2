@@ -26,7 +26,9 @@ namespace Belle2 {
    *  @{ CDCLegendreTrackingModule @} @}
    */
 
-
+  /** Forward declaration to avoid including the corresponding header file*/
+  class CDCLegendreTrackHit;
+  class CDCLegendreTrackCandidate;
 
   /** CDC tracking module, using Legendre transformation of the drift time circles.
    * This is a module, performing tracking in the CDC. It is based on the paper "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers" by T. Alexopoulus, et al. NIM A592 456-462 (2008)
@@ -77,49 +79,36 @@ namespace Belle2 {
   private:
 
     std::string m_cdcHitsColName; /**< Input digitized hits collection name (output of CDCDigitizer module) */
-    std::string m_cdcLegendreTrackCandsColName; /**< Output tracks collection name*/
     std::string m_gfTrackCandsColName; /**< Output genfit track candidates collection name*/
 
-    int m_nTracks; /**< Counter for the number of found tracks*/
+    std::list<CDCLegendreTrackHit*> m_hitList; /**< List of the hits used for track finding. This is the vector, which is used for memory management! */
+    std::list<CDCLegendreTrackCandidate*> m_trackList; /** List of track candidates. Mainly used for memory management! */
 
-    int m_nbinsTheta; /**< Number of bins in theta direction in the Legendre plane, parameter of the module*/
-    int m_nbinsR; /**< Number of bins in r direction in the Legendre plane, parameter of the module*/
-    double m_distTheta; /**< Minimal distance of two peaks in theta direction, parameter of the module*/
-    double m_distR; /**< Minimal distance of two peaks in t direction, parameter of the module*/
-    int m_distThetaInBins; /**< Minimal distance of two peaks in theta direction in bins*/
-    int m_distRInBins; /**< Minimal distance of two peaks in t direction ins bins*/
-    double m_threshold; /**< Threshold for votes in the legendre plane, parameter of the module*/
+    int m_threshold; /**< Threshold for votes in the legendre plane, parameter of the module*/
     double m_thresholdUnique; /**< Threshold of unique TrackHits for track building*/
+    double m_stepScale; /**< Scale of steps for SteppedHough*/
+    int m_initialAxialHits; /**< Initial number of axial hits in the stepped hough algorithm*/
+    int m_nbinsTheta; /**< Number of bins in theta, derived from m_maxLevel*/
 
-    double m_resolutionAxial; /**< Total resolution, used for the assignment of axial hits to tracks*/
     double m_resolutionStereo; /**< Total resolution, used for the assignment of stereo hits to tracks*/
 
     double m_rMin; /**< Minimum in r direction, initialized in initializer list of the module*/
     double m_rMax; /**< Maximum in r direction, initialized in initializer list of the module*/
 
+    int m_maxLevel; /**< Maximum Level of FastHough Algorithm*/
+
     const static double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
+    const static double m_rc = 0.0176991150442477874; /**< threshold of r, which defines curlers*/
 
-    double* sin_theta; /**< Lookup array for calculation of sin*/
-    double* cos_theta; /**< Lookup array for calculation of cos*/
+    double* m_sin_theta; /**< Lookup array for calculation of sin*/
+    double* m_cos_theta; /**< Lookup array for calculation of cos*/
 
-    /** Calculate bin of r for given value.
-    * Small helper function to calculate the bin of the r variable in the Legendre plane.
-    * @param r continuous value of r
-    * @return bin number of given value r
-    */
-    inline int calcBin(double r);
+    bool m_reconstructCurler; /**< Stores, curlers shall be reconstructed*/
 
-
-    /** Calculate center of given bin
-    * Small helper function to calculate the center of a bin with given maximum, minimum and number of bins.
-    * @param bin Number of bin
-    * @param min minimal value
-    * @param max maximal value
-    * @param nbins total number of bins
-    * @return center of given bin
-    */
-    inline double getBinCenter(int bin, double min, double max, int nbins);
-
+    /**
+     * @brief small helper function, to check if four values have the same sign
+     */
+    inline bool sameSign(double, double, double, double);
 
     /** Sort hits for fitting.
      * This method sorts hit indices to bring them in a correct order, which is needed for the fitting
@@ -127,29 +116,82 @@ namespace Belle2 {
      * @param CDCLegendreTrackHits name of the CDCTrackHits array. In this way the sort funtion can get all necessary information about the hits.
      * @param charge estimated charge of the track, which is needed for hits from the same layer to be ordered correctly.
      */
-    void sortHits(std::vector<int> & hitIndices,
-                  std::string CDCLegendreTrackHits, double charge);
+    void sortHits(std::vector<CDCLegendreTrackHit*> & hitIndices, int charge);
 
     /**
-     *
+     * Function used in the event function, which contains the search for tracks, calling multiply the Fast Hough algorithm, always just searching for one track and afterwards removin the according hits from the hit list.
      */
-    static bool tupleComp(boost::tuple<int, double, int, double> tuple1,
-                          boost::tuple<int, double, int, double> tuple2);
+    void DoSteppedTrackFinding();
 
-    std::vector<std::pair<int, int> > DoTrackFinding();
+    /**
+     * The track finding often finds two curling tracks, originating from the same particle. This function merges them.
+     */
+    void MergeCurler();
 
-    void createLegendreTrackCandidates(
-      std::vector<std::pair<int, int> > tracks);
+    /**
+     * In this function, the stereo hits are assigned to the track candidates.
+     */
+    void AsignStereoHits();
+
+    /**
+     * @brief Function to create a track candidate
+     * @param track construction of std::pairs, describing the track candidate by the axial hits, belonging to it and the parameter r and theta
+     * @param trackHitList list of all track hits, which are used for track finding. Hits belonging to the track candidate will be deleted from it.
+     */
+    void createLegendreTrackCandidate(const std::pair<std::list<CDCLegendreTrackHit*>, std::pair<double, double> > &track, std::list<CDCLegendreTrackHit*>* trackHitList);
+
+
+    /**
+     * @brief Perform the necessary operations after the track candidate has been constructed
+     * @param track The constructed track candidate
+     * @param trackHitList list of al track hits, which are used for track finding. Hits belonging to the track candidate will be deleted from it.
+     * This function leaves room for other operations like further quality checks or even the actual fitting of the track candidate.
+     */
+    void processTrack(CDCLegendreTrackCandidate* track, std::list<CDCLegendreTrackHit*>* trackHitList);
 
     /** Creates GeantFit Track Candidates from CDCLegendreTrackCandidates */
     void createGFTrackCandidates();
 
+    /**
+     * @brief Recursively called function to perform the Fast Hough algorithm, modified to only deliver the candidate with the most contributing hits
+     * @param candidate Pointer to the found track candidate. Will remain untouched, if no candidate is found
+     * @param hits The hits, which are used for track finding
+     * @param level the number, how often the function is called recursively. If it hits max_level, function will be left and the parameter candidate assigned
+     * @param theta_min lower border of theta in bins
+     * @param theta_max upper border of theta in bins
+     * @param r_min lower border of r
+     * @param r_max upper border of r
+     * There are multiple description of the Fast Hough algorithm. This implementation follows not a special one, but tries to be as simple as possible.
+     * At each step, the remaining voting plane is divided in 2x2 squares and the voting procedure is performed in each of them, following NIM A 592 (456 - 462).
+     * Only bins with more bins than the current maximum are further investigated where the current maximum is determined of the configured threshold or the number of hits of an already found track candidate.
+     */
+    void MaxFastHough(std::pair<std::list<CDCLegendreTrackHit*>, std::pair<double, double> > *candidate,
+                      const std::list<CDCLegendreTrackHit*> &hits, const int level, const int theta_min,
+                      const int theta_max, const double r_min, const double r_max, const unsigned limit);
+
+    /**
+     * @brief Function to merge two track candidates
+     * All hits of track 2 are assigned to track 1 and the mean of the r and theta values of the two tracks are assigned to track 1
+     * Track 2 is deleted.
+     */
+    void mergeTracks(CDCLegendreTrackCandidate* cand1, CDCLegendreTrackCandidate* cand2);
+
+    /**
+     * All objects in m_hitList and m_trackList are deleted and the two lists are cleared.
+     * Necessary since we cannot use smart pointers up to now.
+     */
+    void clear_pointer_vectors();
+
   };
 
-//helper functor to sort track candidates by votes
-  struct SortCandidatesByVotes {
-    bool operator()(const std::pair<int, std::pair<int, int> > &lhs,
-                    const std::pair<int, std::pair<int, int> > &rhs) const;
+  /**
+   * Small helper class to perform sorting of hits in the CDC pattern reco
+   */
+  struct CDCTracking_SortHit {
+
+    CDCTracking_SortHit(int charge) : m_charge(charge) {}
+    bool operator()(CDCLegendreTrackHit* hit1, CDCLegendreTrackHit* hit2);
+    int m_charge;
   };
 
 } // end namespace Belle2

@@ -11,23 +11,24 @@
 #ifndef CDCLEGENDRETRACKCANDIDATE_H
 #define CDCLEGENDRETRACKCANDIDATE_H
 
-#include "TObject.h"
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+#include "TVector3.h"
+#include "TVector2.h"
+#include <list>
 
 namespace Belle2 {
 
   class CDCLegendreTrackHit;
 
   /** Class for track candidates after CDC pattern recognition. */
-  class CDCLegendreTrackCandidate: public TObject {
+  class CDCLegendreTrackCandidate {
   public:
 
     /** Enum for charge hypotheses of track.*/
     enum ChargeHypotheses {
-      charge_positive = 1,    /**< Enum value positive charge. */
-      charge_negative = -1,   /**< Enum value negative charge. */
-      charge_two_tracks = 2,  /**< Enum value two tracks with the same values of r and theta charge. */
-      charge_curler = 4       /**< Enum value curler (d < r(CDC). */
+      charge_positive = 1, /**< Enum value positive charge. */
+      charge_negative = -1, /**< Enum value negative charge. */
+      charge_two_tracks = 2, /**< Enum value two tracks with the same values of r and theta charge. */
+      charge_curler = 4 /**< Enum value curler (d < r(CDC). */
     };
 
     /** Empty constructor. */
@@ -42,26 +43,17 @@ namespace Belle2 {
     ~CDCLegendreTrackCandidate();
 
     /**Construct a Track Candidate from give theta and r value (in conformal plane)
-     * @param id unique id of the track
      * @param theta theta value of track
      * @param r r value of track
      * @param charge charge assumption of track, defined by enum ChargeHypotheses
-     * @param resolutionAxial maximal allowed distance of an axial hit
-     * @param resolutionStereo maximal allowed distance of a stereo hit
-     * @param assignHits controls, whether hits are assigned to track or not
+     * @param trackHitList List of Hits, which are assigned to the track
      */
-    CDCLegendreTrackCandidate(int id, double theta, double r, int charge,
-                              std::string cdcHitsDatastoreName, double resolutionAxial, double resolutionStereo,
-                              bool assignHits = true);
+    CDCLegendreTrackCandidate(double theta, double r, int charge,
+                              const std::list<CDCLegendreTrackHit*> & trackHitList);
 
-    /**Return list of assigned hits.*/
+    /**Return vector of assigned hits.*/
     std::vector<Belle2::CDCLegendreTrackHit*> getTrackHits() {
       return m_TrackHits;
-    }
-
-    /** Return (unique) trackID.*/
-    int getID() const {
-      return m_ID;
     }
 
     /** Return theta value of track.*/
@@ -74,24 +66,14 @@ namespace Belle2 {
       return m_r;
     }
 
-    /** Return y0 value of track.*/
-    double getY0() const {
-      return m_y0;
-    }
-
-    /** Return slope value of track.*/
-    double getSlope() const {
-      return m_slope;
-    }
-
     /**Return Xc value of track.*/
     double getXc() const {
-      return 1 / (-1 * m_y0 / m_slope);
+      return m_xc;
     }
 
     /**Return Yc value of track.*/
     double getYc() const {
-      return 1 / m_y0;
+      return m_yc;
     }
 
     /**Return charge hypotheses of track.
@@ -102,17 +84,36 @@ namespace Belle2 {
     }
 
     /** Return charge sign of track.
-     * Sure to be 1 or -1 (1 for curler and two tracks).
+     * Sure to be 1 or -1 (1 for curlers)
      */
     int getChargeSign() const;
 
-    /** Return number of unique hits, when the track was constructed.*/
-    int getStartingUniqueHits() const {
-      return m_uniqueHits;
+    /** Return number of assigned hits.*/
+    int getNHits() const {
+      return m_allHits;
+    }
+
+    /** Return number of assigned axial hits.*/
+    int getNAxialHits() const {
+      return m_axialHits;
+    }
+
+    /** Return number of assigned stereo hits.*/
+    int getNStereoHits() const {
+      return m_stereoHits;
     }
 
     /** Return momentum estimation of the track.*/
     TVector3 getMomentumEstimation() const;
+
+    /** Setter for m_r, adopts m_xc and m_yc.*/
+    void setR(double r);
+
+    /** Setter for m_theta, adopts m_xc and m_yc.*/
+    void setTheta(double theta);
+
+    /** Adds a hit to the trackHitVector.*/
+    void addHit(CDCLegendreTrackHit* hit);
 
     /** Calculate distance to a given track hit.*/
     double DistanceTo(const CDCLegendreTrackHit&) const;
@@ -120,56 +121,53 @@ namespace Belle2 {
     /** Calculate distance to a given track hit (before finding of z-position).*/
     double OriginalDistanceTo(const CDCLegendreTrackHit&) const;
 
-    /** Calculate distance of a given track to a given track hit.
+    /**
+     * @brief Calculate distance of a given track to a given track hit.
      * Static function, so parameters of track needs to provided.
      * Also calculation of original distance (before finding of z-position) is possible
      * @param xc Xc value of track
      * @param yx Yc value of track
      * @param orig flag for calculation of original distance
      */
-    static double DistanceTo(double xc, double yc, const CDCLegendreTrackHit&, bool orig = false);
+    static double DistanceTo(double xc, double yc, const CDCLegendreTrackHit&,
+                             bool orig = false);
 
-    /** Return charge estimation of track with given parameters.
-     * @param cdcHitsDatastoreName Name of DataStore containing LegendreTrackHits
-     * @param theta theta value of track
-     * @param r r value of track
-     * @return charge assumption, defined by enum ChargeHypotheses
+    /**
+     * @brief Get charge assumption based on the provided Hits
+     * @param theta theta value of the potential track candidate
+     * @param r r value of the potential track candidate
+     * @param trackHits list of track hits, which is used to determine the charge assumption
+     * @return int, base on the enum ChargeHypotheses
+     * Determines the charge assumption of a potential track candidate, using its curvature with respect to all hits. A voting system is used to separate single and two tracks
      */
-    static int getChargeAssumption(std::string cdcHitsDatastoreName,
-                                   double theta, double r, double resolution);
+    static int getChargeAssumption(
+      double theta, double r, const std::list<CDCLegendreTrackHit*> & trackHits);
 
   private:
 
     std::vector<CDCLegendreTrackHit*> m_TrackHits; /**< vector to store TrackCandidateHits belonging to this TrackCandidate */
 
-    const double m_theta; /**< theta_value of the track candidate, given by Legendre track finding*/
-    const double m_r; /**< r_value of the track candidate, given by Legendre track finding*/
-    const double m_y0; /**< y-axis intercept in the conformal plane, calculated from theta and r*/
-    const double m_slope; /**< slope in the conformal plane, calculated from theta and r*/
+    double m_theta; /**< theta_value of the track candidate, given by Legendre track finding*/
+    double m_r; /**< r_value of the track candidate, given by Legendre track finding*/
+    double m_xc; /**< xc value in conformal plane*/
+    double m_yc; /**< yc value in conformal plane*/
     const int m_charge; /**< charge assumption of track*/
 
-    const int m_ID; /** track ID, unique for the event*/
-    const bool m_assignHits; /**< flag for hit assignment (wheter they are assigned to the track or not).*/
-    int m_uniqueHits; /**< Number of unique hits, when the track is contstructed.*/
+    int m_axialHits; /**< Number of axial hits, belonging to the track*/
+    int m_stereoHits; /**< Number of stereo hits, belonging to the track*/
+    int m_allHits; /**< Number of total hits, belonging to the track*/
 
     /**
-     * Function to add axial hits to track.
-     * @param cdcHitsDatastoreName name of DataStore containing LegendreTrackHits
-     * @param resolution maximal allowed distance of a hit to the track
+     * @brief Delivers an estimation of the z momentum of the track
+     * @param mom x and y momentum, used to determine the absolute of the z momentum
+     * Determines an estimate for the z momentum of the track, based on the position of the stereo hits. Only the first two stereo superlayers are taken into account. The actual value is based on the median of all values of the single track hits.
      */
-    void AddAxialHits(std::string cdcHitsDatastoreName, double resolution);
-
-    /**
-     * Function to add stereo hits to track.
-     * @param cdcHitsDatastoreName name of DataStore containing LegendreTrackHits
-     * @param resolution maximal allowed distance of a hit to the track
-     */
-    void AddStereoHits(std::string cdcHitsDatastoreName, double resolution);
-
     double getZMomentumEstimation(TVector2 mom2) const;
-    int getNUniqueHits() const;
 
-    ClassDef(CDCLegendreTrackCandidate, 1) /** ROOT ClassDef macro to make this class a ROOT class.*/
+    /**
+     * Updates m_axialHits, m_stereoHits, and m_allHits
+     */
+    void DetermineHitNumbers();
 
   };
 //end class CDCLegendreTrackCandidate

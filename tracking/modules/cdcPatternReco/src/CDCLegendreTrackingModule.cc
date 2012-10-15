@@ -10,12 +10,10 @@
 
 #include <tracking/modules/cdcPatternReco/CDCLegendreTrackingModule.h>
 
-//#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-#include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
@@ -29,7 +27,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/tuple/tuple.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/utility.hpp>
 
 #include <iostream>
 #include <algorithm>
@@ -46,7 +44,7 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
   Module(), m_rMin(-0.15), m_rMax(0.15)
 {
   setDescription(
-    "Performs the pattern recognition in the CDC with the conformal finder: digitized CDCHits are combined to track candidates (GFTrackCand). (Works for tracks momentum > 0.5 GeV, no curl track finder included yet).");
+    "Performs the pattern recognition in the CDC with the conformal finder: digitized CDCHits are combined to track candidates (GFTrackCand)");
 
   addParam("CDCHitsColName", m_cdcHitsColName,
            "Input CDCHits collection (should be created by CDCDigi module)",
@@ -56,26 +54,22 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
            "Output GFTrackCandidates collection",
            string("GFTrackCandidates_LegendreFinder"));
 
-  addParam("NbinsTheta", m_nbinsTheta,
-           "Number of bins in theta direction of the legendre plane", 1000);
-  addParam("NbinsR", m_nbinsR,
-           "Number of bins in r direction of the legendre plane", 1000);
-  addParam("DistTheta", m_distTheta,
-           "Minimal distance of two tracks in theta direction", m_PI / 30);
-  addParam("DistR", m_distR, "Minimal distance of two tracks in r direction",
-           0.004);
-  addParam("Threshold", m_threshold, "Threshold for peak finder", 30.);
+  addParam("Threshold", m_threshold, "Threshold for peak finder", 10);
 
-  addParam("ThresholdUnique", m_thresholdUnique,
-           "Threshold of unique hits for track building", 30.);
+  addParam("InitialAxialHits", m_initialAxialHits,
+           "Starting value of axial hits for the stepped Hough", 30);
 
-  addParam("Resolution AxialHits", m_resolutionAxial,
-           "Total resolution, used for the assignment of axial hits to tracks",
-           0.3);
+  addParam("StepScale", m_stepScale, "Scale size for Stepped Hough", 0.75);
 
   addParam("Resolution StereoHits", m_resolutionStereo,
-           "Total resolution, used for the assignment of stereo hits to tracks",
-           0.05);
+           "Total resolution, used for the assignment of stereo hits to tracks (in sigma)",
+           200.);
+
+  addParam("MaxLevel", m_maxLevel,
+           "Maximal level of recursive calling of FastHough algorithm", 10);
+
+  addParam("Reconstruct Curler", m_reconstructCurler,
+           "Flag, whether curlers should be reconstructed", true);
 }
 
 CDCLegendreTrackingModule::~CDCLegendreTrackingModule()
@@ -85,29 +79,21 @@ CDCLegendreTrackingModule::~CDCLegendreTrackingModule()
 
 void CDCLegendreTrackingModule::initialize()
 {
-  //StoreArray with CDCLegendreTrackHits: a class derived from the original CDCHit, but also additional member variables and methods needed for tracking
-  StoreArray<CDCLegendreTrackHit> cdcLegendreTrackHits(
-    "CDCLegendreTrackHits");
+  //StoreArray for GFTrackCandidates
+  StoreArray<GFTrackCand>::registerPersistent(m_gfTrackCandsColName);
 
-  //StoreArray for CDCTrackCandidates: this track candidate class is the output of the conformal finder
-  StoreArray<CDCLegendreTrackCandidate> cdcLegendreTrackCandidates(
-    "CDCLegendreTrackCandidates");
+  //Initialize look-up table
+  m_nbinsTheta = static_cast<int>(std::pow(2.0, m_maxLevel));
 
-  //StoreArray for GFTrackCandidates: interface class to Genfit, there should be one GFTrackCandidate for each CDCTrackCandidate
-  StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
+  double bin_width = m_PI / m_nbinsTheta;
+  m_sin_theta = new double[m_nbinsTheta + 1];
+  m_cos_theta = new double[m_nbinsTheta + 1];
 
-  //Calculation of minimal distances in bins from given values
-  m_distThetaInBins = int(m_distTheta / m_PI * m_nbinsTheta);
-  m_distRInBins = int(m_distR / (m_rMax - m_rMin) * m_nbinsR);
-
-  //calculate the needed sin and cos values and store in array
-  sin_theta = new double[m_nbinsTheta];
-  cos_theta = new double[m_nbinsTheta];
-
-  for (int i = 0; i < m_nbinsTheta; i++) {
-    sin_theta[i] = sin((i + 0.5) * m_PI / m_nbinsTheta);
-    cos_theta[i] = cos((i + 0.5) * m_PI / m_nbinsTheta);
+  for (int i = 0; i <= m_nbinsTheta; ++i) {
+    m_sin_theta[i] = sin(i * bin_width);
+    m_cos_theta[i] = cos(i * bin_width);
   }
+
 }
 
 void CDCLegendreTrackingModule::beginRun()
@@ -126,217 +112,252 @@ void CDCLegendreTrackingModule::event()
   if (cdcHits.getEntries() == 0)
     B2WARNING("CDCTracking: cdcHitsCollection is empty!");
 
-  //StoreArray with CDCTrackHits: a class derived from the original CDCHit, but also additional member variables and methods needed for tracking
-  //MH: Assume you want to be able to write this stuff out, otherwise std::vector smarter, because you can later use iterators.
-  StoreArray<CDCLegendreTrackHit> cdcLegendreTrackHits(
-    "CDCLegendreTrackHits");
+  if (cdcHits.getEntries() > 1500) {
+    B2INFO("** Skipping track finding due to too large number of hits **");
+    return;
+  }
 
+  //Convert CDCHits to own Hit class
   for (int iHit = 0; iHit < cdcHits.getEntries(); iHit++) {
-    new(cdcLegendreTrackHits->AddrAt(iHit)) CDCLegendreTrackHit(
-      cdcHits[iHit], iHit);
+    CDCLegendreTrackHit* trackHit = new CDCLegendreTrackHit(cdcHits[iHit],
+                                                            iHit);
+
+    m_hitList.push_back(trackHit);
   }
 
   //perform track finding
-  std::vector<std::pair<int, int> > tracks = DoTrackFinding();
-
-  //create LegendreTrackCandidates
-  createLegendreTrackCandidates(tracks);
+  DoSteppedTrackFinding();
+  MergeCurler();
+  AsignStereoHits();
 
   //create GenFit Track candidates
   createGFTrackCandidates();
 
+  //memory management
+  clear_pointer_vectors();
 }
 
-std::vector<std::pair<int, int> > CDCLegendreTrackingModule::DoTrackFinding()
+void CDCLegendreTrackingModule::DoSteppedTrackFinding()
 {
+  std::list<CDCLegendreTrackHit*> hits;
 
-  //StoreArray with CDCTrackHits: a class derived from the original CDCHit, but also additional member variables and methods needed for tracking
-  StoreArray<CDCLegendreTrackHit> cdcLegendreTrackHits(
-    "CDCLegendreTrackHits");
+  //Putting all axial hits into a vector to use them all for track finding
+  BOOST_FOREACH(CDCLegendreTrackHit * trackHit, m_hitList) {
 
-  //Create 2 dimensional array, this is the plane in the legendre space
-  std::auto_ptr<std::vector<std::vector<int> > > m_legendrePlane(
-    new std::vector<std::vector<int> >(m_nbinsTheta,
-                                       std::vector<int>(m_nbinsR, 0)));
+    if (trackHit->getIsAxial())
 
-  //create Radius variable once as the loops are very long
-  float r = 0;
-
-  for (int iHit = 0; iHit < cdcLegendreTrackHits.getEntries(); ++iHit) {
-    if (not cdcLegendreTrackHits[iHit]->getIsAxial())
-      continue;
-
-    //Do the transformation in legendre plane and voting (according to NIM A592 456 (2008))
-    for (int theta_bin = 0; theta_bin < m_nbinsTheta; ++theta_bin) {
-      r = cdcLegendreTrackHits[iHit]->getConformalX()
-          * cos_theta[theta_bin]
-          + cdcLegendreTrackHits[iHit]->getConformalY()
-          * sin_theta[theta_bin];
-
-      if (++(*m_legendrePlane)[theta_bin][calcBin(r + cdcLegendreTrackHits[iHit]->getConformalDriftTime())] == m_threshold) {
-        //put something into the candidates.
-      }
-      if (++(*m_legendrePlane)[theta_bin][calcBin(r - cdcLegendreTrackHits[iHit]->getConformalDriftTime())]) {
-        //put something into the candidates.
-      }
-    }
+      hits.push_back(trackHit);
   }
 
-  //Find maximum in legendre plane
-  //MH: this should be before the other loop
-  //MH: Are vector here really the right container? You don't strictly need random access, but you are later going to delete stuff in the middle.
-  std::vector<std::pair<int, std::pair<int, int> > > candidates;
-  std::vector<std::pair<int, int> > tracks;
+  int n_hits = 999;
+  double limit = m_initialAxialHits;
 
-  //Find all entries with number of votes greater threshold and fill in candidates list
-  //MH: This is very inefficient. Should be deleted and just picking up the number of hits after voting in the candidate list.
-  for (int i = 0; i < m_nbinsTheta; ++i) {
-    for (int j = 0; j < m_nbinsR; ++j) {
-      if ((*m_legendrePlane)[i][j] > m_threshold) {
-        candidates.push_back(
-          std::make_pair((*m_legendrePlane)[i][j],
-                         std::make_pair(i, j)));
-      }
-    }
-  }
+  //Start loop, where tracks are searched for
+  do {
+    std::list<CDCLegendreTrackHit*> c_list;
+    std::pair<std::list<CDCLegendreTrackHit*>, std::pair<double, double> > candidate =
+      std::make_pair(c_list, std::make_pair(-999, -999));
 
-  //Sort once
-  std::sort(candidates.begin(), candidates.end(), SortCandidatesByVotes());
+    MaxFastHough(&candidate, hits, 1, 0, m_nbinsTheta, m_rMin, m_rMax,
+                 static_cast<unsigned>(limit));
 
-  //Kick out entries nearer to the maximum than the defined minimal distance
-  while (!candidates.empty()) {
+    n_hits = candidate.first.size();
 
-    std::pair<int, int> p = candidates[0].second;
-    int Theta_pri = p.first;
-    int R_pri = p.second;
-
-    //check remaining track candidates
-    for (std::vector<std::pair<int, std::pair<int, int> > >::iterator i =
-           candidates.begin() + 1; i != candidates.end();) {
-      int Theta = i->second.first;
-      int R = i->second.second;
-
-      //check for distance
-      if (fabs(Theta_pri - Theta) < m_distThetaInBins && fabs(R_pri - R) < m_distRInBins) {
-        //MH: Here you are erasing from in between in a vector. Can be replace with list, see above.
-        i = candidates.erase(i); //erase added candidate and keep iterator valid
-      } else {
-        ++i;
-      }
-
+    //if no track is found
+    if (n_hits == 0) {
+      limit *= m_stepScale;
+      n_hits = 999;
     }
 
-    tracks.push_back(std::make_pair(Theta_pri, R_pri));
-    //MH: Again erasing from vector
-    candidates.erase(candidates.begin());
-  }
+    // if track is found and has enough hits
+    else if (n_hits >= m_threshold) {
+      createLegendreTrackCandidate(candidate, &hits);
 
-  return tracks;
+      limit = n_hits * m_stepScale;
+    }
+
+    //perform search until found track has too few hits or threshold is too small and no tracks are found
+  } while (n_hits >= m_threshold
+           && (limit / m_stepScale >= m_threshold || n_hits != 999)
+           && hits.size() >= (unsigned) m_threshold);
+
 }
 
-void CDCLegendreTrackingModule::createLegendreTrackCandidates(
-  std::vector<std::pair<int, int> > tracks)
+void CDCLegendreTrackingModule::MergeCurler()
 {
-  int id_track = 0;
-  std::pair<int, int> trackCandidate;
-  //now it gets a little bit ugly, first we create all possible tracks, but in the end we only want to use the tracks with enough unique hits. Therefore we first need to store them somewhere else (since storing in the TClonesArray requires calling the constructor and deleting something from it might be problematic)
-  boost::ptr_vector<CDCLegendreTrackCandidate> vTrackCandidates;
+  //loop over all candidates
+  for (std::list<CDCLegendreTrackCandidate*>::iterator it1 =
+         m_trackList.begin(); it1 != m_trackList.end(); ++it1) {
+    CDCLegendreTrackCandidate* cand1 = *it1;
 
-  BOOST_FOREACH(trackCandidate, tracks) {
-    //get actual theta and r values for each track candidate
-    double track_theta = getBinCenter(trackCandidate.first, 0, m_PI,
-                                      m_nbinsTheta);
-    double track_r = getBinCenter(trackCandidate.second, m_rMin, m_rMax,
-                                  m_nbinsR);
+    //check only curler
+    if (fabs(cand1->getR()) > m_rc) {
 
-    //get charge estimation for the track candidate
-    int charge = CDCLegendreTrackCandidate::getChargeAssumption("CDCLegendreTrackHits", track_theta, track_r, m_resolutionAxial);
+      //loop over remaining candidates
+      std::list<CDCLegendreTrackCandidate*>::iterator it2 = boost::next(it1);
+      while (it2 != m_trackList.end()) {
+        CDCLegendreTrackCandidate* cand2 = *it2;
+        ++it2;
 
-    //right now, we don't want to find curlers
-    if (charge == CDCLegendreTrackCandidate::charge_curler)
-      continue;
+        if (fabs(cand2->getR()) > m_rc) {
 
-    //for curlers, negative, and positive tracks we want to create one track candidate
-    if (charge == CDCLegendreTrackCandidate::charge_positive
-        || charge == CDCLegendreTrackCandidate::charge_negative
-        || charge == CDCLegendreTrackCandidate::charge_curler) {
-      vTrackCandidates.push_back(
-        new CDCLegendreTrackCandidate(id_track, track_theta,
-                                      track_r, charge, "CDCLegendreTrackHits",
-                                      m_resolutionAxial, m_resolutionStereo));
-      ++id_track;
-    }
+          //check if the two tracks lie next to each other
+          if (fabs(cand1->getR() - cand2->getR()) < 0.03
+              && fabs(cand1->getTheta() - cand2->getTheta()) < 0.15)
 
-    //here we create two oppositely charged tracks (with the same theta and r value)
-    else if (charge == CDCLegendreTrackCandidate::charge_two_tracks) {
-      vTrackCandidates.push_back(
-        new CDCLegendreTrackCandidate(id_track, track_theta,
-                                      track_r, CDCLegendreTrackCandidate::charge_positive,
-                                      "CDCLegendreTrackHits", m_resolutionAxial,
-                                      m_resolutionStereo));
-      ++id_track;
-
-      vTrackCandidates.push_back(
-        new CDCLegendreTrackCandidate(id_track, track_theta,
-                                      track_r, CDCLegendreTrackCandidate::charge_negative,
-                                      "CDCLegendreTrackHits", m_resolutionAxial,
-                                      m_resolutionStereo));
-      ++id_track;
-    }
-    //This shouldn't happen, check CDCLegendreTrackCandidate::getChargeAssumption()
-    else {
-      B2ERROR(
-        "Strange behavior of CDCLegendreTrackCandidate::getChargeAssumption");
-      exit(EXIT_FAILURE);
-    }
-
-  }
-
-  //create StoreArray for CDCTrackCandidates: this track candidate class is one of the output of the Legendre finder
-  StoreArray<CDCLegendreTrackCandidate> cdcLegendreTrackCandidates(
-    "CDCLegendreTrackCandidates");
-  int addr_track = 0;
-  BOOST_FOREACH(CDCLegendreTrackCandidate & trackCandidate, vTrackCandidates) {
-    //here comes the check for unique hits, now the tracks are constructed again within the TClonesArray
-    if (trackCandidate.getStartingUniqueHits() > m_thresholdUnique) {
-      new(cdcLegendreTrackCandidates->AddrAt(addr_track)) CDCLegendreTrackCandidate(
-        trackCandidate.getID(), trackCandidate.getTheta(),
-        trackCandidate.getR(), trackCandidate.getCharge(),
-        "CDCLegendreTrackHits", m_resolutionAxial,
-        m_resolutionStereo, false);
-      ++addr_track;
+            mergeTracks(cand1, cand2);
+        }
+      }
     }
   }
+}
 
-  B2INFO("Found " << addr_track << " tracks");
+void CDCLegendreTrackingModule::AsignStereoHits()
+{
+  BOOST_FOREACH(CDCLegendreTrackHit * hit, m_hitList) {
+    if (!hit->getIsAxial()) {
+      CDCLegendreTrackCandidate* best = NULL;
+      double best_chi2 = 999;
+
+      BOOST_FOREACH(CDCLegendreTrackCandidate * candidate, m_trackList) {
+        //precut on distance between track and stereo hit
+        if (candidate->DistanceTo(*hit) <= 5.) {
+          //Hit needs to have the correct curvature
+          if ((candidate->getCharge() == CDCLegendreTrackCandidate::charge_curler) || hit->getCurvatureSignWrt(candidate->getXc(), candidate->getYc()) == candidate->getCharge()) {
+            //check nearest position of the hit to the track
+            hit->approach(*candidate);
+            double chi2 = candidate->DistanceTo(*hit) / hit->getDeltaDriftTime();
+
+            if (chi2 < m_resolutionStereo) {
+              //search for minimal distance
+              if (chi2 < best_chi2) {
+                best = candidate;
+                best_chi2 = chi2;
+              }
+            }
+          }
+        }
+      }
+
+      //if there is track near enough
+      if (best != NULL) {
+        best->addHit(hit);
+      }
+    }
+  }
+}
+
+void CDCLegendreTrackingModule::mergeTracks(CDCLegendreTrackCandidate* cand1,
+                                            CDCLegendreTrackCandidate* cand2)
+{
+
+  cand1->setR((cand1->getR() + cand2->getR()) / 2);
+  cand1->setTheta((cand1->getTheta() + cand2->getTheta()) / 2);
+
+  BOOST_FOREACH(CDCLegendreTrackHit * hit, cand2->getTrackHits()) {
+    cand1->addHit(hit);
+  }
+
+  m_trackList.remove(cand2);
+
+  delete cand2;
+
+  cand2 = NULL;
+
+}
+
+void CDCLegendreTrackingModule::createLegendreTrackCandidate(
+  const std::pair<std::list<CDCLegendreTrackHit*>, std::pair<double, double> > &track,
+  std::list<CDCLegendreTrackHit*>* trackHitList)
+{
+
+  //get theta and r values for each track candidate
+  double track_theta = track.second.first;
+  double track_r = track.second.second;
+
+  //get charge estimation for the track candidate
+  int charge = CDCLegendreTrackCandidate::getChargeAssumption(track_theta,
+                                                              track_r, track.first);
+
+  //for curlers, negative, and positive tracks we want to create one track candidate
+  if (charge == CDCLegendreTrackCandidate::charge_positive
+      || charge == CDCLegendreTrackCandidate::charge_negative
+      || charge == CDCLegendreTrackCandidate::charge_curler) {
+    CDCLegendreTrackCandidate* trackCandidate = new CDCLegendreTrackCandidate(
+      track_theta, track_r, charge, track.first);
+
+    processTrack(trackCandidate, trackHitList);
+  }
+
+  //here we create two oppositely charged tracks (with the same theta and r value)
+  else if (charge == CDCLegendreTrackCandidate::charge_two_tracks) {
+    CDCLegendreTrackCandidate* trackCandidate_pos =
+      new CDCLegendreTrackCandidate(track_theta, track_r,
+                                    CDCLegendreTrackCandidate::charge_positive, track.first);
+
+    CDCLegendreTrackCandidate* trackCandidate_neg =
+      new CDCLegendreTrackCandidate(track_theta, track_r,
+                                    CDCLegendreTrackCandidate::charge_negative, track.first);
+
+    processTrack(trackCandidate_pos, trackHitList);
+
+    processTrack(trackCandidate_neg, trackHitList);
+  }
+  //This shouldn't happen, check CDCLegendreTrackCandidate::getChargeAssumption()
+  else {
+    B2ERROR(
+      "Strange behavior of CDCLegendreTrackCandidate::getChargeAssumption");
+    exit(EXIT_FAILURE);
+  }
+}
+
+void CDCLegendreTrackingModule::processTrack(
+  CDCLegendreTrackCandidate* trackCandidate,
+  std::list<CDCLegendreTrackHit*>* trackHitList)
+{
+  //check if the number has enough axial hits (might be less due to the curvature check).
+  if (trackCandidate->getNAxialHits() >= m_threshold) {
+    m_trackList.push_back(trackCandidate);
+
+    BOOST_FOREACH(CDCLegendreTrackHit * hit, trackCandidate->getTrackHits()) {
+      trackHitList->remove(hit);
+    }
+  }
+
+  else {
+    BOOST_FOREACH(CDCLegendreTrackHit * hit, trackCandidate->getTrackHits()) {
+      trackHitList->remove(hit);
+    }
+
+    //memory management, since we cannot use smart pointers in function interfaces
+    delete trackCandidate;
+    trackCandidate = NULL;
+  }
+
 }
 
 void CDCLegendreTrackingModule::createGFTrackCandidates()
 {
-  StoreArray<CDCLegendreTrackCandidate> cdcLegendreTrackCandidates(
-    "CDCLegendreTrackCandidates");
-  StoreArray<CDCLegendreTrackHit> cdcLegendreTrackHits(
-    "CDCLegendreTrackHits");
-
-//StoreArray for GFTrackCandidates: interface class to Genfit
+  //StoreArray for GFTrackCandidates: interface class to Genfit
   StoreArray<GFTrackCand> gfTrackCandidates(m_gfTrackCandsColName);
+  gfTrackCandidates.create();
 
-  for (int i = 0; i < cdcLegendreTrackCandidates.getEntries(); i++) {
+  int i = 0;
 
+  BOOST_FOREACH(CDCLegendreTrackCandidate * trackCand, m_trackList) {
     new(gfTrackCandidates->AddrAt(i)) GFTrackCand();  //create one GFTrackCandidate for each CDCTrackCandidate
 
     //set the values needed as start values for the fit in the GFTrackCandidate from the CDCTrackCandidate information
     //variables stored in the GFTrackCandidates are: vertex position + error, momentum + error, pdg value, indices for the Hits
-
     TVector3 position;
-    position.SetXYZ(0.0, 0.0, 0.0); //at the moment there is no vertex determination in the ConformalFinder, but maybe the origin or the innermost hit are good enough as start values...
+    position.SetXYZ(0.0, 0.0, 0.0);//at the moment there is no vertex determination in the ConformalFinder, but maybe the origin or the innermost hit are good enough as start values...
     //position = cdcTrackCandidates[i]->getInnerMostHit().getWirePosition();
 
     TVector3 momentum =
-      cdcLegendreTrackCandidates[i]->getMomentumEstimation();
+      trackCand->getMomentumEstimation();
 
     //Pattern recognition can determine only the charge, so here some dummy pdg value is set (with the correct charge), the pdg hypothesis can be then overwritten in the GenFitterModule
-    int pdg = cdcLegendreTrackCandidates[i]->getChargeSign() * (211);
+    int pdg = trackCand->getChargeSign() * (211);
 
     //The initial covariance matrix is calculated from these errors and it is important (!!) that it is not completely wrong
     TVector3 posError;
@@ -355,26 +376,16 @@ void CDCLegendreTrackingModule::createGFTrackCandidates()
             "momentum seed:  (" << momentum.x() << ", " << momentum.y() << ", " << momentum.z() << ")   position error: (" << momError.x() << ", " << momError.y() << ", " << momError.z() << ") ");
 
     //find indices of the Hits
-    vector<int> hitIndices;
-    for (unsigned int j = 0;
-         j < cdcLegendreTrackCandidates[i]->getTrackHits().size(); j++) {
-      hitIndices.push_back(
-        cdcLegendreTrackCandidates[i]->getTrackHits().at(j)->getStoreIndex());
-    }
+    std::vector<CDCLegendreTrackHit*> trackHitVector = trackCand->getTrackHits();
 
-    //GenFit needs the hits in a correct order, here the hitIndices are sorted from small r to large r
-    //it may also happen that there are two hits in the same layer (same r), their order is then chosen according to the curvature (charge) of the track
-    double charge = TMath::Sign(1., gfTrackCandidates[i]->getQoverPseed());
-
-    sortHits(hitIndices, "CDCLegendreTrackHits", charge);
-
-    //now the correctly ordered hits can be added to the GFTrackCand
+    sortHits(trackHitVector, trackCand->getChargeSign());
 
     B2DEBUG(100, " Add Hits: hitId rho planeId")
 
-    for (unsigned int iter = 0; iter < hitIndices.size(); iter++) {
-      int hitID = hitIndices.at(iter); //hit index
-      float rho = cdcLegendreTrackHits[hitID]->getWirePosition().Mag(); //distance to the origin
+    BOOST_FOREACH(CDCLegendreTrackHit * trackHit, trackHitVector) {
+      int hitID = trackHit->getStoreIndex();
+
+      float rho = trackHit->getWirePosition().Mag(); //distance to the origin
 
       //for the DAF algorithm within GenFit it is important to assign a planeId to each hit
       //one can choose the layerId as the planeId, this would mean that hits from the same layer will 'compete' to be the 'best matching hit' in this layer
@@ -382,12 +393,12 @@ void CDCLegendreTrackingModule::createGFTrackCandidates()
       //I am still not quite sure which way is the best one, this has to be tested...
 
       //int layerId = cdcTrackHits[hitID]->getLayerId();
-      int uniqueId = cdcLegendreTrackHits[hitID]->getLayerId() * 10000
-                     + cdcLegendreTrackHits[hitID]->getWireId(); //a value which should be unique for each hit
+      int uniqueId = trackHit->getLayerId() * 10000
+                     + trackHit->getWireId();//a value which should be unique for each hit
 
       gfTrackCandidates[i]->addHit(2, hitID, rho, uniqueId);
     }
-    hitIndices.clear();
+    ++i;
   }
 }
 
@@ -398,71 +409,137 @@ void CDCLegendreTrackingModule::endRun()
 
 void CDCLegendreTrackingModule::terminate()
 {
-  B2INFO("CDCTrackingModule: total number of found tracks: " << m_nTracks);
-
-  delete[] cos_theta;
-  delete[] sin_theta;
-
+  delete[] m_cos_theta;
+  delete[] m_sin_theta;
 }
 
-inline int CDCLegendreTrackingModule::calcBin(double r)
+void CDCLegendreTrackingModule::MaxFastHough(
+  std::pair<std::list<CDCLegendreTrackHit*>, std::pair<double, double> > *candidate,
+  const std::list<CDCLegendreTrackHit*> &hits, const int level,
+  const int theta_min, const int theta_max, const double r_min,
+  const double r_max, const unsigned limit)
 {
-  //MH: Better way: Make calculation, that can be done once just once, e.g. ModuleMemeber m_value = 1./((m_rMax - m_rMin)*m_nbinsR)
-  //return static_cast<int>((r - m_rMin)* m_value);
-  //Function allows as well smarter r binning.
-  return (int((r - m_rMin) / (m_rMax - m_rMin) * m_nbinsR));
-}
-
-inline double CDCLegendreTrackingModule::getBinCenter(int bin, double min,
-                                                      double max, int nbins)
-{
-  return (min + (bin + 0.5) * (max - min) / nbins);
-}
-
-void CDCLegendreTrackingModule::sortHits(std::vector<int> & hitIndices,
-                                         std::string CDCLegendreTrackHits, double charge)
-{
-  StoreArray<CDCLegendreTrackHit> cdcLegendreTrackHits(CDCLegendreTrackHits);
-
-  vector<boost::tuple<int, double, int, double> > hitsToSort;
-
-//fill the tuple with the information from the hits
-  for (unsigned int i = 0; i < hitIndices.size(); i++) {
-    int hitId = hitIndices.at(i);
-    boost::tuple<int, double, int, double> newtouple(hitId,
-                                                     cdcLegendreTrackHits[hitId]->getWirePosition().Mag(),
-                                                     cdcLegendreTrackHits[hitId]->getWireId(), charge);
-    hitsToSort.push_back(newtouple);
+  if (not m_reconstructCurler
+      && (r_min* r_max >= 0 && fabs(r_min) > m_rc && fabs(r_max) > m_rc)) {
+    return;
   }
 
-  stable_sort(hitsToSort.begin(), hitsToSort.end(), tupleComp);
+  //calculate bin borders of 2x2 bin "histogram"
+  int thetaBin[3];
+  thetaBin[0] = theta_min;
+  thetaBin[1] = theta_min + (theta_max - theta_min) / 2;
+  thetaBin[2] = theta_max;
 
-//refill the hitIndices with the correct ordered indices
-  for (unsigned i = 0; i < hitIndices.size(); i++) {
-    hitIndices.at(i) = hitsToSort.at(i).get<0>();
+  double r[3];
+  r[0] = r_min;
+  r[1] = r_min + 0.5 * (r_max - r_min);
+  r[2] = r_max;
+
+  //2 x 2 voting plane
+  std::list<CDCLegendreTrackHit*> voted_hits[2][2];
+
+  double r_temp, r_1, r_2;
+  double dist_1[3][3];
+  double dist_2[3][3];
+
+  //Voting within the four bins
+  BOOST_FOREACH(CDCLegendreTrackHit * hit, hits) {
+    for (int t_index = 0; t_index < 3; ++t_index) {
+      r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]]
+               + hit->getConformalY() * m_sin_theta[thetaBin[t_index]];
+      r_1 = r_temp + hit->getConformalDriftTime();
+      r_2 = r_temp - hit->getConformalDriftTime();
+
+      //calculate distances of lines to horizontal bin border
+      for (int r_index = 0; r_index < 3; ++r_index) {
+        dist_1[t_index][r_index] = r[r_index] - r_1;
+        dist_2[t_index][r_index] = r[r_index] - r_2;
+      }
+    }
+
+    //actual voting, based on the distances (test, if line is passing though the bin)
+    for (int t_index = 0; t_index < 2; ++t_index) {
+      for (int r_index = 0; r_index < 2; ++r_index) {
+        //curves are assumed to be straight lines, might be a reasonable assumption locally
+        if (!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index], dist_1[t_index + 1][r_index + 1]))
+          voted_hits[t_index][r_index].push_back(hit);
+        else if (!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index], dist_2[t_index + 1][r_index + 1]))
+          voted_hits[t_index][r_index].push_back(hit);
+      }
+    }
+
   }
 
+//Processing, which bins are further investigated
+  for (int t_index = 0; t_index < 2; ++t_index) {
+    for (int r_index = 0; r_index < 2; ++r_index) {
+
+      //bin must contain more hits than the limit and maximal found track candidate
+      if (voted_hits[t_index][r_index].size() >= limit
+          && voted_hits[t_index][r_index].size() > candidate->first.size()) {
+
+        //if max level of fast Hough is reached, mark candidate and return
+        if (level == m_maxLevel) {
+          double theta = static_cast<double>(thetaBin[t_index]
+                                             + thetaBin[t_index + 1]) / 2 * m_PI / m_nbinsTheta;
+
+          if (not m_reconstructCurler && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc)
+            return;
+
+          candidate->first = voted_hits[t_index][r_index];
+          candidate->second = std::make_pair(theta,
+                                             (r[r_index] + r[r_index + 1]) / 2);
+
+          return;
+        } else {
+          //Recursive calling of the function with higher level and smaller box
+          MaxFastHough(candidate, voted_hits[t_index][r_index], level + 1,
+                       thetaBin[t_index], thetaBin[t_index + 1], r[r_index],
+                       r[r_index + 1], limit);
+        }
+      }
+    }
+  }
 }
 
-bool CDCLegendreTrackingModule::tupleComp(
-  boost::tuple<int, double, int, double> tuple1,
-  boost::tuple<int, double, int, double> tuple2)
+inline bool CDCLegendreTrackingModule::sameSign(double n1, double n2,
+                                                double n3, double n4)
 {
+  if (n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0)
+    return true;
+  else if (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0)
+    return true;
+  else
+    return false;
+}
 
+void CDCLegendreTrackingModule::sortHits(
+  std::vector<CDCLegendreTrackHit*> & hits, int charge)
+{
+  CDCTracking_SortHit sorter(charge);
+  stable_sort(hits.begin(), hits.end(), sorter);
+}
+
+bool CDCTracking_SortHit::operator()(CDCLegendreTrackHit* hit1, CDCLegendreTrackHit* hit2)
+{
   bool result = true;
+  boost::tuple<int, double, int, double> tuple1(hit1->getStoreIndex(),
+                                                hit1->getWirePosition().Mag(), hit1->getWireId());
+  boost::tuple<int, double, int, double> tuple2(hit2->getStoreIndex(),
+                                                hit2->getWirePosition().Mag(), hit2->getWireId());
 
-//the comparison function for the tuples created by the sort function
+  //the comparison function for the tuples created by the sort function
 
   if ((int) tuple1.get<1>() == (int) tuple2.get<1>()) {
     //special case: several hits in the same layer
-//now we have to proceed differently for positive and negative tracks
-//in a common case we just have to check the wireIds and decide the order according to the charge
-//if however the track is crossing the wireId 0, we have again to treat it specially
-//the number 100 is just a more or less arbitrary number, assuming that no track will be 'crossing' 100 different wireIds
+    //now we have to proceed differently for positive and negative tracks
+    //in a common case we just have to check the wireIds and decide the order according to the charge
+    //if however the track is crossing the wireId 0, we have again to treat it specially
+    //the number 100 is just a more or less arbitrary number, assuming that no track will be 'crossing' 100 different wireIds
 
     //in general this solution does not look very elegant, so if you have some suggestions how to improve it, do not hesitate to tell me
 
-    if (tuple1.get<3>() < 0) {
+    if (m_charge < 0) {
       //negative charge
 
       //check for special case with wireId 0
@@ -502,7 +579,7 @@ bool CDCLegendreTrackingModule::tupleComp(
 
   }
 
-//usual case: hits sorted by the rho value
+  //usual case: hits sorted by the rho value
   else
     result = (tuple1.get<1>() < tuple2.get<1>());
 
@@ -510,10 +587,17 @@ bool CDCLegendreTrackingModule::tupleComp(
 
 }
 
-bool SortCandidatesByVotes::operator()(
-  const std::pair<int, std::pair<int, int> > &lhs,
-  const std::pair<int, std::pair<int, int> > &rhs) const
+void CDCLegendreTrackingModule::clear_pointer_vectors()
 {
-  return lhs.first > rhs.first;
+
+  BOOST_FOREACH(CDCLegendreTrackHit * hit, m_hitList) {
+    delete hit;
+  }
+  m_hitList.clear();
+
+  BOOST_FOREACH(CDCLegendreTrackCandidate * track, m_trackList) {
+    delete track;
+  }
+  m_trackList.clear();
 }
 

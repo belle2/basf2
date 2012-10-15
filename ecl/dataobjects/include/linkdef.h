@@ -10,6 +10,7 @@
 #pragma link C++ class Belle2::RecCRECL;
 #pragma link C++ class Belle2::TrigECL;
 #pragma link C++ class Belle2::ECLSimHit;
+#pragma link C++ class Belle2::ECLHit;
 #pragma link C++ class Belle2::HitECL;
 #pragma link C++ class Belle2::HitAssignmentECL;
 #pragma link C++ class Belle2::MdstGamma;

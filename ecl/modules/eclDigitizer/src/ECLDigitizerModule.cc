@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
-#include <ecl/dataobjects/HitECL.h>
+#include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/DspECL.h>
 #include <ecl/dataobjects/TrigECL.h>
@@ -90,7 +90,7 @@ void ECLDigitizerModule::initialize()
   m_timeCPU = clock() * Unit::us;
   readDSPDB();
 
-  StoreArray<HitECL>  eclArray(m_eclHitCollectionName);
+  StoreArray<ECLHit>  eclArray(m_eclHitCollectionName);
   StoreArray<DspECL>::registerPersistent(m_eclDspCollectionName);
   StoreArray<ECLDigit>::registerPersistent(m_eclDigiCollectionName);
   StoreArray<TrigECL>::registerPersistent(m_eclTrigCollectionName);
@@ -110,7 +110,7 @@ void ECLDigitizerModule::event()
 {
   m_timeCPU = clock() * Unit::us;
   //Input Array
-  StoreArray<HitECL>  eclArray(m_eclHitCollectionName);
+  StoreArray<ECLHit>  eclArray(m_eclHitCollectionName);
   if (!eclArray) {
     B2ERROR("Can not find ECLDigiHits" << m_eclHitCollectionName << ".");
   }
@@ -131,7 +131,7 @@ void ECLDigitizerModule::event()
 
   for (int ii = 0; ii < hitNum; ii++) {
 
-    HitECL* aECLHit = eclArray[ii];
+    ECLHit* aECLHit = eclArray[ii];
     // Hit geom. info
 //    int hitEventId       =  aECLHit->getEventId();
 

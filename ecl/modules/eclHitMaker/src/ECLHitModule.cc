@@ -18,7 +18,7 @@
 
 //ecl package headers
 #include <ecl/dataobjects/ECLSimHit.h>
-#include <ecl/dataobjects/HitECL.h>
+#include <ecl/dataobjects/ECLHit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
 #include <generators/dataobjects/MCParticle.h>
@@ -78,7 +78,7 @@ void ECLHitModule::initialize()
 
   StoreArray<ECLSimHit> eclSimArray(m_inColName);
   StoreArray<MCParticle> mcParticles;
-  StoreArray<HitECL>::registerPersistent(m_eclHitOutColName);
+  StoreArray<ECLHit>::registerPersistent(m_eclHitOutColName);
 
 
 
@@ -151,12 +151,12 @@ void ECLHitModule::event()
         X_ave[iECLCell][TimeIndex] = X_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
         T_ave[iECLCell][TimeIndex]  =  6.05 + 0.0749 * X_ave[iECLCell][TimeIndex] - 0.00112 * X_ave[iECLCell][TimeIndex] * X_ave[iECLCell][TimeIndex];
         Tof_ave[iECLCell][TimeIndex] =  Tof_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
-        StoreArray<HitECL> eclHitArray(m_eclHitOutColName);
+        StoreArray<ECLHit> eclHitArray(m_eclHitOutColName);
 
 //        cout<<iECLCell<<" "<<E_cell[iECLCell][TimeIndex]<<" "<<Tof_ave[iECLCell][TimeIndex] + T_ave[iECLCell][TimeIndex] <<endl;
         if (!eclHitArray) eclHitArray.create();
         m_hitNum = eclHitArray->GetLast() + 1;
-        new(eclHitArray->AddrAt(m_hitNum)) HitECL();
+        new(eclHitArray->AddrAt(m_hitNum)) ECLHit();
         eclHitArray[m_hitNum]->setCellId(iECLCell);
         eclHitArray[m_hitNum]->setEnergyDep(E_cell[iECLCell][TimeIndex]);
         eclHitArray[m_hitNum]->setTimeAve(T_ave[iECLCell][TimeIndex] + Tof_ave[iECLCell][TimeIndex]);

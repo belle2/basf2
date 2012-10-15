@@ -18,7 +18,7 @@
 
 //ecl package headers
 #include <ecl/dataobjects/ECLSimHit.h>
-#include <ecl/dataobjects/HitECL.h>
+#include <ecl/dataobjects/ECLHit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLShower.h>
@@ -84,7 +84,7 @@ void ECLMCMatchingModule::initialize()
   // Initialize variables
   m_nRun    = 0 ;
   m_nEvent  = 0 ;
-  RelationArray::registerPersistent<HitECL, MCParticle>(m_eclHitOutColName, "");
+  RelationArray::registerPersistent<ECLHit, MCParticle>(m_eclHitOutColName, "");
   RelationArray::registerPersistent<ECLDigit, MCParticle>(m_eclDigiCollectionName, "");
   RelationArray::registerPersistent<ECLShower, MCParticle>(m_ECLShowerName, "");
 
@@ -144,14 +144,14 @@ void ECLMCMatchingModule::event()
 
 
   StoreArray<ECLSimHit> eclSimArray(m_inColName);
-  StoreArray<HitECL> eclHitArray(m_eclHitOutColName);
+  StoreArray<ECLHit> eclHitArray(m_eclHitOutColName);
   RelationArray eclSimHitRel(mcParticles, eclSimArray);
   RelationArray eclHitToMCPart(eclHitArray, mcParticles);
 
 
   int hitNum = eclHitArray->GetEntriesFast();
   for (int ii = 0; ii < hitNum; ii++) {
-    HitECL* aECLHit = eclHitArray[ii];
+    ECLHit* aECLHit = eclHitArray[ii];
     int hitCellId       =  aECLHit->getCellId();
     double hitTimeAve       =  aECLHit->getTimeAve()   * Unit::ns;
     int TimeIndex = (int) hitTimeAve / 500;
@@ -201,7 +201,7 @@ void ECLMCMatchingModule::event()
   }
   const int eclHitToMCPartn = eclHitToMCPart.getEntries() ;
   for (int index = 0; index < eclHitToMCPartn; index++) {
-    HitECL* aECLHit = eclHitArray[eclHitToMCPart[index].getFromIndex()];
+    ECLHit* aECLHit = eclHitArray[eclHitToMCPart[index].getFromIndex()];
     int hitCellId       =  aECLHit->getCellId();
 
     for (int iMCpart = 0; iMCpart < (int)eclHitToMCPart[index].getToIndices().size(); iMCpart++) {
@@ -235,6 +235,7 @@ void ECLMCMatchingModule::event()
     }//for HA hANum
   }//ShowerNum
 
+  //cout<<"Total showers in Event "<<m_nEvent<<" : "<< ShowerNum<<endl;
   for (int index = 0; index < eclDigiToMCPart.getEntries(); index++) {
     ECLDigit* aECLDigi = eclDigiArray[eclDigiToMCPart[index].getFromIndex()];
     int cId          = (aECLDigi->getCellId() - 1);
@@ -247,9 +248,9 @@ void ECLMCMatchingModule::event()
         ShowerIndex =  iter++->second ;
         if (ShowerIndex != -1 && ShowerOldTrack[ShowerIndex] != (int)eclDigiToMCPart[index].getToIndex(iMCpart)) {
           eclShowerToMCPart.add(ShowerIndex, eclDigiToMCPart[index].getToIndex(iMCpart));
-          //cout << "ShowerRel" << m_nEvent << " " << cId << " shower" << ShowerIndex << " mom" << eclDigiToMCPart[index].getToIndex(iMCpart)
-          //      << " PDG " << mcParticles[eclDigiToMCPart[index].getToIndex(iMCpart)]->getPDG()
-          //     << endl;
+          // cout << "ShowerRel" << m_nEvent << " " << cId << " shower" << ShowerIndex << " mom" << eclDigiToMCPart[index].getToIndex(iMCpart)
+          //       << " PDG " << mcParticles[eclDigiToMCPart[index].getToIndex(iMCpart)]->getPDG()
+          //      << endl;
           ShowerOldTrack[ShowerIndex] = eclDigiToMCPart[index].getToIndex(iMCpart);
         }
       }

@@ -79,12 +79,10 @@ namespace Belle2 {
    *  you to fill its data members using a custom constructor.
    *
    *
-   *  <h1>Storing an array</h1>
+   *  <h1>Registration of arrays</h1>
    *  Note that you have to register an array in the initialize method of a
-   *  module first (using registerPersistent()), and then create() it
-   *  (in the event() method of a module for durability c_Event) before
-   *  you can use it. This procedure is the same  as for objects handled by
-   *  StoreObjPtr.
+   *  module first (using registerPersistent()) before you can use it.
+   *  This procedure is the same  as for objects handled by StoreObjPtr.
    *
    *
    *  <h1>Internals</h1>
@@ -223,10 +221,10 @@ namespace Belle2 {
     /** Access to the stored objects.
      *
      *  \param i Array index, should be in 0..getEntries()-1
-     *  \return pointer to the created object, or NULL if out of bounds
+     *  \return pointer to the object, or NULL if out of bounds
      */
     inline T* operator [](int i) const {
-      if (!isValid()) return 0;
+      ensureCreated();
       if (i >= getEntries() or i < 0)
         return 0;
       //type was checked by DataStore, so this is safe
@@ -247,7 +245,7 @@ namespace Belle2 {
      *  \return pointer to address just past the last array element, or NULL if invalid
      */
     inline T* nextFreeAddress() {
-      if (!isValid()) return 0;
+      ensureCreated();
       return static_cast<T*>((*m_storeArray)->AddrAt(getEntries()));
     }
 
@@ -287,9 +285,9 @@ namespace Belle2 {
      *           function is recommended, as the difference between . and ->
      *           may be lost on casual readers of the source code.
      */
-    TClonesArray& operator *() const { ensureAttached(); return **m_storeArray;}
-    ClonesArrayWrapper* operator ->() const { ensureAttached(); return static_cast<ClonesArrayWrapper*>(*m_storeArray);}
-    TClonesArray* getPtr() const { ensureAttached(); return *m_storeArray;}
+    TClonesArray& operator *() const { ensureCreated(); return **m_storeArray;}
+    ClonesArrayWrapper* operator ->() const { ensureCreated(); return static_cast<ClonesArrayWrapper*>(*m_storeArray);}
+    TClonesArray* getPtr() const { ensureCreated(); return *m_storeArray;}
     //@}
 
   private:
@@ -297,6 +295,15 @@ namespace Belle2 {
     inline void ensureAttached() const {
       if (!m_storeArray) {
         const_cast<StoreArray*>(this)->m_storeArray = reinterpret_cast<TClonesArray**>(DataStore::Instance().getObject(m_name, m_durability, T::Class(), true));
+      }
+    }
+    /** Ensure that the array has been created.
+     *
+     * Called automatically by write operations.
+     */
+    inline void ensureCreated() const {
+      if (!isValid()) {
+        const_cast<StoreArray*>(this)->create();
       }
     }
     /** Pointer that actually holds the TClonesArray. */

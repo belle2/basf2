@@ -34,6 +34,12 @@ namespace Belle2 {
     {
       StoreArray<ARICHAeroHit>::registerPersistent();
       RelationArray::registerPersistent<MCParticle, ARICHAeroHit>();
+
+      StoreArray<MCParticle> particles;
+      StoreArray<ARICHAeroHit> hits;
+      RelationArray relation(particles, hits);
+      registerMCParticleRelation(relation);
+
     }
 
     bool SensitiveAero::step(G4Step* aStep, G4TouchableHistory*)

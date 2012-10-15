@@ -33,6 +33,11 @@ namespace Belle2 {
       StoreArray<ARICHSimHit>::registerPersistent();
       RelationArray::registerPersistent<MCParticle, ARICHSimHit>();
 
+      StoreArray<MCParticle> particles;
+      StoreArray<ARICHSimHit> hits;
+      RelationArray relation(particles, hits);
+      registerMCParticleRelation(relation);
+
     }
 
 

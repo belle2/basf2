@@ -68,7 +68,7 @@ double PIDLikelihood::getProbability(EParticle p1, EParticle p2) const
 
 double PIDLikelihood::probability(float logl1, float logl2) const
 {
-  double dlogl = logl1 - logl2;
+  double dlogl = logl2 - logl1;
   if (dlogl < 0) {
     double elogl = exp(dlogl);
     return 1.0 / (1.0 + elogl);

@@ -86,6 +86,7 @@ void ECLReconstructorModule::event()
   StoreArray<ECLDigit> eclDigiArray;
   if (!eclDigiArray) {
     B2ERROR("Can not find eclDigiArray.");
+    return;
   }
 
 //  int checkflag = 0;
@@ -93,6 +94,8 @@ void ECLReconstructorModule::event()
   cout.precision(6);
   TRecEclCF& cf = TRecEclCF::Instance();
   cf.Clear();
+
+  //cout<<"Event "<< m_nEvent<<" Total input entries of Digi Array  "<<eclDigiArray->GetEntriesFast()<<endl;
   int hitNum = eclDigiArray->GetEntriesFast();
   TEclEnergyHit ss;
   for (int ii = 0; ii < hitNum; ii++) {
@@ -206,12 +209,13 @@ void ECLReconstructorModule::event()
     }
 
   */
+  //cout<<"Event "<< m_nEvent<<" Total output number of Shower Array "<<++m_hitNum<<endl;
   m_nEvent++;
-
 }
 
 void ECLReconstructorModule::endRun()
 {
+
   m_nRun++;
 }
 

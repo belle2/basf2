@@ -100,6 +100,7 @@ void ECLDigitizerModule::event()
     B2ERROR("Can not find ECLHit Array.");
   }
 
+  //cout<<"Total Hits in Digi "<<eclArray->GetEntriesFast()<<endl;
   int hitNum = eclArray->GetEntriesFast();
 
   int energyFit[8736] = {0}; //fit output : Amplitude
@@ -200,9 +201,8 @@ void ECLDigitizerModule::event()
 
 
 
+  //cout<<"Event "<< m_nEvent<<" Total output entries of Digi Array "<<++m_hitNum1<<endl;
   m_nEvent++;
-  m_timeCPU = clock() * Unit::us;
-
 }
 
 void ECLDigitizerModule::endRun()

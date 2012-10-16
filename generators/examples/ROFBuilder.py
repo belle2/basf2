@@ -21,29 +21,66 @@ from basf2 import *
 # show warnings during processing
 set_log_level(LogLevel.ERROR)
 
+# NOTE: To produce ROFs for a subdetector, its SimHits have to inherit from
+# SimHitBase classs (generators/dataobjects), and for timed background, they
+# have to override the SimHitBase::shiftInTime method.
+subdetectorCodes = {
+    'PXD': 1,
+    'SVD': 2,
+    'C3DC': 3,
+    'TOP': 4,
+    'ARICH': 5,
+    'ECL': 6,
+    'EKLM': 7,
+    'BKLM': 8,
+    }
+
+# *******************************************************************************
+# USER SETTINGS
+subdetectorName = 'SVD'
+bgType = 'RBB'
+bgSource = 'HER'
+bgGenerator = 'BBBREMS'
+
+inputDir = '~/work/belle2/BG/summer2012'
+# A single background file !
+inputName = '{d}/output_{t}_{s}_0.root'.format(d=inputDir, t=bgType,
+        s=bgSource)
+bgTime = 20  # us
+
+outputDir = '.'
+outputName = '{d}/rof_{det}_{t}_{s}.root'.format(d=outputDir,
+        det=subdetectorName, t=bgType, s=bgSource)
+windowStart = -150  # ns
+windowSize = 330  # ns
+# *******************************************************************************
+
 # Register modules
 
 # ROOTInput module
 rootinput = register_module('RootInput')
 # CHANGE THIS TO POINT TO THE APPROPRIATE FILE(S) ON YOUR FILESYSTEM!!!
-rootinput.param('inputFileName',
-                '~/work/belle2/BG/summer2012/output_Touschek_LER_0.root')
+rootinput.param('inputFileName', inputName)
 rootinput.param('treeName', 'tree')
 # rootinput.set_log_level(LogLevel.INFO)
 
 # ROFBulder module
 rofbuilder = register_module('ROFBuilder')
-rofbuilder.param('Subdetector', 2)  # SVD
-rofbuilder.param('SimHitCollectionName', 'SVDSimHits')
-rofbuilder.param('SimHitMCPartRelationName', 'MCParticlesToSVDSimHits')
+rofbuilder.param('Subdetector', subdetectorCodes[subdetectorName])
+rofbuilder.param('SimHitCollectionName', subdetectorName + 'SimHits')
+rofbuilder.param('SimHitMCPartRelationName', 'MCParticlesTo' + subdetectorName
+                 + 'SimHits')
 rofbuilder.param('TimeAwareMode', True)
-rofbuilder.param('WindowStart', -150.0)  # ns
-rofbuilder.param('WindowSize', 330)  # ns
-rofbuilder.param('BaseSampleSize', 20)  # us, for a single background file.
-rofbuilder.param('OutputRootFileName', 'SVDROFs.root')
-rofbuilder.param('ComponentName', 'Touschek')
-rofbuilder.param('GeneratorName', 'SAD_LER')
+rofbuilder.param('WindowStart', windowStart)  # ns
+rofbuilder.param('WindowSize', windowSize)  # ns
+rofbuilder.param('BaseSampleSize', bgTime)  # us
+rofbuilder.param('OutputRootFileName', outputName)
+rofbuilder.param('ComponentName', bgType)
+rofbuilder.param('GeneratorName', bgGenerator + '_' + bgSource)
 rofbuilder.param('MCParticleWriteMode', 0)  # No MC Particles - currently only this works.
+# Set this to True only if RBB data have to be over-used, ie, used to generate
+# more frames than their nominal number.
+rofbuilder.param('RandomizeNonSAD', False)  # This is the default
 rofbuilder.set_log_level(LogLevel.INFO)
 
 # Show progress of processing

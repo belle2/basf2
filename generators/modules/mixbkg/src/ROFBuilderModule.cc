@@ -15,6 +15,14 @@
 #include <generators/dataobjects/SimHitBase.h>
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <top/dataobjects/TOPSimHit.h>
+#include <arich/dataobjects/ARICHSimHit.h>
+#include <ecl/dataobjects/ECLSimHit.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
+#include <bklm/dataobjects/BKLMSimHit.h>
+
+
 
 #include <map>
 #include <boost/foreach.hpp>
@@ -42,6 +50,7 @@ ROFBuilderModule::ROFBuilderModule() : Module()
   addParam("SimHitMCPartRelationName", m_simHitMCPartRelationName, "The SimHit to MCParticle relation name.");
   // Timing mode
   addParam("TimeAwareMode", m_timeAwareMode, "Randomize events and generate time information in ROFs", bool(false));
+  addParam("RandomizeNonSAD", m_randomizeNonSAD, "Randomize other than SAD events?", bool(false));
   // For timeless mode - fixed number of base events per ROF
   addParam("EventsPerReadoutFrame", m_eventsPerReadoutFrame, "The number of events that represent one readout frame.", double(1));
   // For time-aware mode - Poisson-distributed number of base events, placed uniformly in time.
@@ -58,7 +67,12 @@ ROFBuilderModule::ROFBuilderModule() : Module()
   m_SimHitClassNames.push_back("None");
   m_SimHitClassNames.push_back(PXDSimHit::Class_Name());
   m_SimHitClassNames.push_back(SVDSimHit::Class_Name());
-
+  m_SimHitClassNames.push_back(CDCSimHit::Class_Name());
+  m_SimHitClassNames.push_back(TOPSimHit::Class_Name());
+  m_SimHitClassNames.push_back(ARICHSimHit::Class_Name());
+  m_SimHitClassNames.push_back(ECLSimHit::Class_Name());
+  m_SimHitClassNames.push_back(EKLMSimHit::Class_Name());
+  m_SimHitClassNames.push_back(BKLMSimHit::Class_Name());
 }
 
 
@@ -88,6 +102,7 @@ void ROFBuilderModule::initialize()
   m_contentTree->Fill();
 
   // Set the background tag for SimHits
+  // FIXME: Move this to SimHitBase code to keep related things together.
   bool isHER = (boost::to_upper_copy(m_generatorName).find("HER") != string::npos);
   if (boost::to_upper_copy(m_componentName).find("COULOMB") != string::npos) {
     m_backgroundTag = isHER ? SimHitBase::bg_Coulomb_HER : SimHitBase::bg_Coulomb_LER;
@@ -108,14 +123,22 @@ void ROFBuilderModule::initialize()
   m_numberSimHits = 0;
   m_rofGraphUniqueID = -1;
 
-  if (m_timeAwareMode) {
+  // Randomize events?
+  bool isSAD = boost::to_upper_copy(m_generatorName).find("SAD") != string::npos;
+  m_randomize = m_timeAwareMode && (isSAD || m_randomizeNonSAD);
+
+  // Number of events on input
+  int nBaseEvents = InputController::numEntries();
+
+  if (m_randomize) {
     // Initialize the event randomizer
     // FIXME: Could be the randomization is strictly necessary only for Coulomb and Touschek!
-    int nBaseEvents = InputController::numEntries();
     m_selector = new RandomPermutation(nBaseEvents);
     // Set the first event number to read in InputController
     InputController::setNextEntry(m_selector->getNext());
+  }
 
+  if (m_timeAwareMode) {
     // Set time-dependent parameters.
     m_baseSampleSize *= Unit::us;
     m_windowStart *= Unit::ns;
@@ -123,6 +146,7 @@ void ROFBuilderModule::initialize()
     double tau = 1.0 * m_baseSampleSize / nBaseEvents;
     m_timer = new RandomTimer(tau, m_windowStart, m_windowSize);
     m_eventTime = m_windowStart - 1; // so that we don't store an empty frame at the start
+    m_eventsPerReadoutFrame = nBaseEvents / m_baseSampleSize * m_windowSize;
   }
 
   map<int, string> writeModeLabels;
@@ -134,12 +158,20 @@ void ROFBuilderModule::initialize()
   B2INFO("=======================================================")
   B2INFO("                    ROFBuilder                         ")
   B2INFO("-------------------------------------------------------")
-  B2INFO("Events per ROF       : " << m_eventsPerReadoutFrame)
+  B2INFO("Operation mode       : " << (m_timeAwareMode ? "Time-Aware" : "Timeless"))
+  B2INFO("Events per ROF       : " << m_eventsPerReadoutFrame << (m_timeAwareMode ? " (average) " : ""))
   B2INFO("Output file          : " << m_outputRootFileName)
   B2INFO("Subdetector SimHits  : " << m_SimHitClassNames[m_subdetector])
   B2INFO("Component            : " << m_componentName)
   B2INFO("Generator            : " << m_generatorName)
   B2INFO("MCParticle Write Mode: " << writeModeLabels[m_mcParticleWriteMode])
+  if (m_timeAwareMode) {
+    B2INFO("Window size  (ns)    : " << m_windowSize)
+    B2INFO("Window start (ns)    : " << m_windowStart)
+    B2INFO("Base sample size (ns): " << m_baseSampleSize)
+    B2INFO("Events on input      : " << nBaseEvents)
+    B2INFO("Randomize events     : " << m_randomize)
+  }
   B2INFO("-------------------------------------------------------")
 }
 
@@ -147,7 +179,7 @@ void ROFBuilderModule::initialize()
 void ROFBuilderModule::event()
 {
   // If all input events have been processed, do nothing.
-  if (m_selector->isFinished()) return;
+  if (m_randomize && m_selector->isFinished()) return;
   //Check if a new readout frame has to be created
   bool frameDone = (m_event >= ((m_currReadoutFrameIdx + 1) * m_eventsPerReadoutFrame));
   if (m_timeAwareMode) {
@@ -173,11 +205,23 @@ void ROFBuilderModule::event()
       break;
     case 2 : addSimHitsToROF<SVDSimHit>();
       break;
+    case 3 : //addSimHitsToROF<CDCSimHit>();
+      break;
+    case 4 : //addSimHitsToROF<TOPSimHit>();
+      break;
+    case 5 : //addSimHitsToROF<ARICHSimHit>();
+      break;
+    case 6 : //addSimHitsToROF<ECLSimHit>();
+      break;
+    case 7 : //addSimHitsToROF<EKLMSimHit>();
+      break;
+    case 8 : //addSimHitsToROF<BKLMSimHit>();
+      break;
   }
 
   m_event++;
 
-  if (m_timeAwareMode) {
+  if (m_randomize) {
     // Set next event number to read in InputController
     InputController::setNextEntry(m_selector->getNext());
   }
@@ -208,10 +252,9 @@ void ROFBuilderModule::terminate()
   delete m_mcParticles;
   delete m_readoutFrame;
 
-  if (m_timeAwareMode) {
-    delete m_selector;
-    delete m_timer;
-  }
+  if (m_randomize) delete m_selector;
+  if (m_timeAwareMode) delete m_timer;
+
 }
 
 

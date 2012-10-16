@@ -21,8 +21,6 @@
 #include <generators/dataobjects/MCParticle.h>
 #include <generators/dataobjects/MCParticleGraph.h>
 
-#include <pxd/dataobjects/PXDSimHit.h>
-
 #include <TFile.h>
 #include <TTree.h>
 #include <TClonesArray.h>
@@ -191,8 +189,13 @@ namespace Belle2 {
     double m_windowStart;                 /**< Start of ROF windomw.*/
     double m_windowSize;                  /**< Size of ROF window.*/
     double m_baseSampleSize;              /**< Size of the base data sample.*/
+    bool m_randomizeNonSAD;               /**< Randomize events for other than SAD generator?*/
+    /* Note: This may be needed if the sample
+     * is going to be over-used.
+     */
 
     //Variables
+    bool m_randomize;                            /**< Randomize the order of events? */
     MCParticleGraph m_rofMCParticleGraph;        /**< The MCParticle graph for one full readout frame. */
     std::vector<int> m_mcpToSimHitMap;           /**< List for one full readout frame that maps a SimHit index (the list index) to a MCParticle index. */
     int m_rofGraphUniqueID;                      /**< Unique identifier for the nodes of the ROF graph. */

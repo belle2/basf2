@@ -10,8 +10,6 @@
 #ifndef RUNMETADATA_H
 #define RUNMETADATA_H
 
-#include <framework/gearbox/Unit.h>
-
 namespace Belle2 {
   /** Store information that is constant during a run, and is needed during the event loop.
    *
@@ -27,10 +25,10 @@ namespace Belle2 {
     static float getEnergyHER() { return m_energyHER; }
 
     /** Crossing angle getter. */
-    static float getCrossingAngle() { return m_crossingAngle; }
+    static float getCrossingAngle();
 
     /** LER angle getter (>0). */
-    static float getAngleLER() { return m_angleLER; }
+    static float getAngleLER();
 
     /** set LER energy. */
     static void setEnergyLER(float e) { m_energyLER = e; }
@@ -51,13 +49,6 @@ namespace Belle2 {
     /** \f$\gamma\f$ factor in the lab frame.
      */
     static float m_energyHER;
-
-    /** Angle between beams. */
-    static const float m_crossingAngle;
-
-    /** Angle in the lab system */
-    static const float m_angleLER;
-
   }; //class
 } // namespace Belle2
 #endif

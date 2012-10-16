@@ -29,7 +29,7 @@ namespace Belle2 {
     /** Crossing angle getter. */
     static float getCrossingAngle() { return m_crossingAngle; }
 
-    /** LER angle getter. */
+    /** LER angle getter (>0). */
     static float getAngleLER() { return m_angleLER; }
 
     /** set LER energy. */

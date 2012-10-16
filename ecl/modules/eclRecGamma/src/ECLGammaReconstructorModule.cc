@@ -84,8 +84,8 @@ void ECLGammaReconstructorModule::event()
   StoreArray<ECLShower> eclRecShowerArray;
   StoreArray<ECLHitAssignment> eclHitAssignmentArray;
   StoreArray<ECLGamma> gammaArray;
-  if (!gammaArray) gammaArray.create();
-// RelationArray eclGammaToShower(gammaArray, eclRecShowerArray);
+
+  RelationArray eclGammaToShower(gammaArray, eclRecShowerArray);
 
   if (!eclRecShowerArray) {
     B2ERROR("Can not find ECLShowers.");
@@ -97,9 +97,9 @@ void ECLGammaReconstructorModule::event()
   const int hitNum = eclRecShowerArray->GetEntriesFast();
   const int hANum = eclHitAssignmentArray->GetEntriesFast();
 
-
   readExtrapolate();//m_TrackCellId[i] =1 => Extrapolated cell
 
+  //cout<<"Event "<< m_nEvent<<" Total input number of Shower Array "<<hitNum<<endl;
   for (int iShower = 0; iShower < hitNum; iShower++) {
     ECLShower* aECLShower = eclRecShowerArray[iShower];
     m_showerId = aECLShower->GetShowerId();
@@ -133,36 +133,36 @@ void ECLGammaReconstructorModule::event()
 
     if (!m_extMatch) { //no match to track => assign as gamma
 
+      if (!gammaArray) gammaArray.create();
       m_GNum = gammaArray->GetLast() + 1;
       new(gammaArray->AddrAt(m_GNum)) ECLGamma();
       gammaArray[m_GNum]->setShowerId(m_showerId);
 
-      //eclGammaToShower.add(m_GNum, iShower);
-
-
+      eclGammaToShower.add(m_GNum, iShower);
       /*
-      double px = m_energy * sin(m_theta) * cos(m_phi);
-      double py = m_energy * sin(m_theta) * sin(m_phi);
-      double pz = m_energy * cos(m_theta);
+            double px = m_energy * sin(m_theta) * cos(m_phi);
+            double py = m_energy * sin(m_theta) * sin(m_phi);
+            double pz = m_energy * cos(m_theta);
 
-                   cout<<"EventGamma  "<<m_nEvent<<" Gamma "<<m_showerId<<" "<<sqrt(px*px+py*py+pz*pz)<<" m_extMatch  "<<m_extMatch<<endl;
+                         cout<<"EventGamma  "<<m_nEvent<<" Gamma "<<m_showerId<<" "<<sqrt(px*px+py*py+pz*pz)<<" m_extMatch  "<<m_extMatch<<endl;
 
-                  cout<<"CellID ";
+                        cout<<"CellID ";
 
-                 for (int iHA = 0; iHA < hANum; iHA++) {
+                       for (int iHA = 0; iHA < hANum; iHA++) {
 
-                   ECLHitAssignment* aECLShower = eclHitAssignmentArray[iHA];
-                   int m_HAShowerId = aECLShower->getShowerId();
-                   int m_HAcellId = aECLShower->getCellId();
-                   if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
-                 }//for HA hANum
-                  cout<<endl;
-       */
+                         ECLHitAssignment* aECLShower = eclHitAssignmentArray[iHA];
+                         int m_HAShowerId = aECLShower->getShowerId();
+                         int m_HAcellId = aECLShower->getCellId();
+                         if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
+                       }//for HA hANum
+                        cout<<endl;
+             */
     }//if !m_extMatch
 
 
   }//for shower hitNum
 
+  //cout<<"Event "<< m_nEvent<<" Total output number of Gamma Array "<<++m_GNum<<endl;
   m_nEvent++;
 }
 

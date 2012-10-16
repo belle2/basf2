@@ -16,6 +16,7 @@
 
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
 
 #include <TFile.h>
 #include <TChain.h>
@@ -36,15 +37,15 @@ MixBackground::~MixBackground()
 }
 
 
-void MixBackground::addFile(const std::string &filename)
+void MixBackground::addFile(const std::string& filename)
 {
   //Load the content information of the file(s) given by filename
   int subdetector = 0;
   int mcParticleWriteMode = 0;
-  string *bkgComponent = new string("");
-  string *bkgGenerator = new string("");
-  string *bkgSimHitCollection = new string("");
-  string *bkgSimHitRelation = new string("");
+  string* bkgComponent = new string("");
+  string* bkgGenerator = new string("");
+  string* bkgSimHitCollection = new string("");
+  string* bkgSimHitRelation = new string("");
   TChain chain("ContentTree");
   chain.SetBranchAddress("Subdetector", &subdetector);
   chain.SetBranchAddress("Component", &bkgComponent);
@@ -55,9 +56,9 @@ void MixBackground::addFile(const std::string &filename)
   chain.Add(filename.c_str());
 
   //Loop over the files and add them into the correct section
-  TObjArray *fileElements = chain.GetListOfFiles();
+  TObjArray* fileElements = chain.GetListOfFiles();
   TIter next(fileElements);
-  TChainElement *chEl = 0;
+  TChainElement* chEl = 0;
   int index = 0;
   while ((chEl = (TChainElement*)next())) {
     TFile file(chEl->GetTitle());
@@ -79,6 +80,8 @@ void MixBackground::addFile(const std::string &filename)
         case 1 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<PXDSimHit>()));
           break;
         case 2 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<SVDSimHit>()));
+          break;
+        case 3 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<CDCSimHit>()));
           break;
       }
       mapIter = m_detectorBackgrounds.find(subdetector);

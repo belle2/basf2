@@ -3,7 +3,7 @@
  * Copyright(C) 2012  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Hiroyuki Nakayama                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -92,6 +92,19 @@ double BBBrem::generateEvent(MCParticleGraph& mcGraph)
   //Store the incoming particles as virtual particles, the outgoing particles as real particles
   storeParticle(mcGraph, p1, 11, true);
   storeParticle(mcGraph, q1, -11, true);
+
+  // BBBrem emits gammma only from electron(p1)
+  // To emit gamma from positron we need to swap electron and positron here
+  bool swapflag = (gRandom->Uniform() > 0.5) ? true : false;
+  if (swapflag) {
+    double tmp[4];
+    for (int i = 0; i < 4; i++) tmp[i] = p2[i];
+    for (int i = 0; i < 4; i++) p2[i]  = q2[i];
+    for (int i = 0; i < 4; i++) q2[i] = tmp[i];
+    p2[2] = -p2[2];
+    q2[2] = -q2[2];
+    qk[2] = -qk[2];
+  }
 
   //Store the outgoing particles as real particles
   storeParticle(mcGraph, p2, 11);

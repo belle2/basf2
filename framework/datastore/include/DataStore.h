@@ -67,10 +67,11 @@ namespace Belle2 {
 
     /** Stores information on inputs/outputs of a module, as obtained by require()/createEntry(); */
     struct ModuleInfo {
-      std::set<std::string> inputs;
-      std::set<std::string> inputRelations;
-      std::set<std::string> outputs;
-      std::set<std::string> outputRelations;
+      std::set<std::string> inputs; /**< required input objects/arrays*/
+      std::set<std::string> inputRelations; /**< required input relations */
+      std::set<std::string> outputs;/**< output objects/arrays */
+      std::set<std::string> outputRelations;/**< ouput relations. */
+
     };
 
     // Convenient typedefs.
@@ -242,6 +243,7 @@ namespace Belle2 {
   protected:
     /** Constructor is protected, as it is a singleton.*/
     explicit DataStore();
+    /** same for copy constructor */
     DataStore(const DataStore&) { }
 
   private:

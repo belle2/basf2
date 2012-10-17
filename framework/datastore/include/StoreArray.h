@@ -134,7 +134,7 @@ namespace Belle2 {
      */
     static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
       std::string arrayName = DataStore::arrayName<T>(name);
-      return DataStore::Instance().hasEntry(arrayName, durability, T::Class(), true);
+      return DataStore::Instance().require(arrayName, durability, T::Class(), true);
     }
 
     /** Constructor to access an array in the DataStore.

@@ -237,8 +237,8 @@ namespace Belle2 {
      */
     void setModule(const std::string& name) { m_currentModule = name; }
 
-    /** Create DOT file with input/output diagrams for each module. */
-    void generateDotFile() const;
+    /** return information on inputs/outputs of each module, as obtained by require()/createEntry(); */
+    const std::map<std::string, ModuleInfo>& getModuleInfoMap() const { return m_moduleInfo; }
 
   protected:
     /** Constructor is protected, as it is a singleton.*/

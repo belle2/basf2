@@ -18,6 +18,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/Environment.h>
+#include <framework/core/DataFlowVisualization.h>
 
 #ifdef HAS_CALLGRIND
 #include <valgrind/callgrind.h>
@@ -133,8 +134,16 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 #endif
 
   //do we want to visualize DataStore input/ouput?
-  if (Environment::Instance().getVisualizeDataFlow())
-    DataStore::Instance().generateDotFile();
+  if (Environment::Instance().getVisualizeDataFlow()) {
+    DataFlowVisualization v(DataStore::Instance().getModuleInfoMap(), modulePathList);
+    //generate graphs for each module
+    v.generateModulePlots("dataflow.dot");
+
+    //single graph for entire steering file
+    v.generateModulePlots("dataflow_all.dot", true);
+
+    B2INFO("Data flow diagrams created. You can use 'dot dataflow.dot -Tps -o dataflow.ps' to create a PostScript file from them.");
+  }
 }
 
 

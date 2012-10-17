@@ -1,5 +1,0 @@
-Import('env')
- 	
-env['LIBS'] = ['framework','top_dataobjects','arich_dataobjects','generators','generators_dataobjects']
- 	
-Return('env')

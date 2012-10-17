@@ -9,7 +9,7 @@
 #include <top/dataobjects/TOPSimHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 //#include <eklm/dataobjects/EKLMSimHit.h>
-#include <ecl/dataobjects/HitECL.h>
+#include <ecl/dataobjects/ECLHit.h>
 
 #include <GFTrack.h>
 
@@ -103,7 +103,7 @@ namespace Belle2 {
     void addSimHit(const TVector3& v, const MCParticle* particle);
 
     /** Add a ECL hit. */
-    void addECLHit(const HitECL* hit);
+    void addECLHit(const ECLHit* hit);
 
     /** Return MCTrack for given particle, add it if it doesn't exist yet. */
     MCTrack& addMCParticle(const MCParticle* particle);

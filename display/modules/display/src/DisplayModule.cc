@@ -201,7 +201,7 @@ void DisplayModule::event()
     }
     */
 
-  StoreArray<HitECL> eclhits("ECLHits"); //now that's intuitive.
+  StoreArray<ECLHit> eclhits;
   const int nECLHits = eclhits.getEntries();
   for (int i = 0; i < nECLHits; i++) {
     m_visualizer->addECLHit(eclhits[i]);

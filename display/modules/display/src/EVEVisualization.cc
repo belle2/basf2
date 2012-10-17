@@ -663,7 +663,7 @@ void EVEVisualization::addSimHit(const TVector3& v, const MCParticle* particle)
   simhits->SetNextPoint(v.x(), v.y(), v.z());
 }
 
-void EVEVisualization::addECLHit(const HitECL* hit)
+void EVEVisualization::addECLHit(const ECLHit* hit)
 {
   const int cell = hit->getCellId();
   const TVector3& pos = ECL::ECLGeometryPar::Instance()->GetCrystalPos(cell);

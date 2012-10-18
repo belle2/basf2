@@ -333,7 +333,7 @@ namespace Belle2 {
         if (currParticle->getMother() != NULL) break;
         addParticleToEventGraph(eventGraph, *currParticle, 0, keepParticle);
       }
-      eventGraph.generateList("ROFBuilderMCParticleEvent");
+      eventGraph.generateList("ROFBuilderMCParticleEvent", MCParticleGraph::c_clearParticles);
       StoreArray<MCParticle> mcParticleEventCol("ROFBuilderMCParticleEvent");
       int nMCPartEvent = mcParticleEventCol.getEntries();
 

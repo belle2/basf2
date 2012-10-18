@@ -101,6 +101,11 @@ void ROFBuilderModule::initialize()
   m_contentTree->Branch("MCParticleWriteMode", &m_mcParticleWriteMode, "MCW/I");
   m_contentTree->Fill();
 
+  // Register the auxiliary MCParticle StoreArray in the DataStore.
+  // Guess why we have to register two StoreArrays.
+  StoreArray<MCParticle>::registerTransient("ROFBuilderMCParticleEvent");
+  StoreArray<MCParticle>::registerTransient("ROFBuilderMCParticleEvent2");
+
   // Set the background tag for SimHits
   // FIXME: Move this to SimHitBase code to keep related things together.
   bool isHER = (boost::to_upper_copy(m_generatorName).find("HER") != string::npos);
@@ -178,8 +183,12 @@ void ROFBuilderModule::initialize()
 
 void ROFBuilderModule::event()
 {
-  // If all input events have been processed, do nothing.
-  if (m_randomize && m_selector->isFinished()) return;
+  // This MUST WORK!
+  StoreArray<MCParticle> rofMCParts("ROFBuilderMCParticleEvent2");
+  if (!rofMCParts.isValid()) rofMCParts.create();
+  if (!rofMCParts.isValid()) B2ERROR("Cannot create the fucking array, shit.")
+    // If all input events have been processed, do nothing.
+    if (m_randomize && m_selector->isFinished()) return;
   //Check if a new readout frame has to be created
   bool frameDone = (m_event >= ((m_currReadoutFrameIdx + 1) * m_eventsPerReadoutFrame));
   if (m_timeAwareMode) {
@@ -263,8 +272,8 @@ void ROFBuilderModule::fillROFTree()
   //Fill the MCParticles if the MCParticle write mode is set
   if (m_mcParticleWriteMode > 0) {
 
-    m_rofMCParticleGraph.generateList("ROFBuilderMCParticleROF");
-    StoreArray<MCParticle> mcParticleEventROF("ROFBuilderMCParticleROF");
+    m_rofMCParticleGraph.generateList("ROFBuilderMCParticleEvent2", MCParticleGraph::c_clearParticles);
+    StoreArray<MCParticle> mcParticleEventROF("ROFBuilderMCParticleEvent2");
 
     int nParticles = mcParticleEventROF.getEntries();
     for (int iParticle = 0; iParticle < nParticles; ++iParticle) {

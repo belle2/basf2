@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPLIKELIHOODS_H
-#define TOPLIKELIHOODS_H
+#ifndef TOPLIKELIHOOD_H
+#define TOPLIKELIHOOD_H
 
 #include <TObject.h>
 
@@ -18,16 +18,18 @@ namespace Belle2 {
    * @{
    */
 
-  /*! Opsolete -> please use TOPLikelihood
+  /*! Class to store TOP log likelihoods (output of TOPReconstructor)
+   * relation from GFTracks
+   * filled in top/modules/TOPReconstruction/src/TOPReconstructorModule.cc
    */
 
-  class TOPLikelihoods : public TObject {
+  class TOPLikelihood : public TObject {
 
   public:
 
     /*! default constructor */
 
-    TOPLikelihoods(): m_flag(0), m_logL_e(0), m_logL_mu(0), m_logL_pi(0), m_logL_K(0),
+    TOPLikelihood(): m_flag(0), m_logL_e(0), m_logL_mu(0), m_logL_pi(0), m_logL_K(0),
       m_logL_p(0), m_Nphot(0), m_Nphot_e(0), m_Nphot_mu(0), m_Nphot_pi(0),
       m_Nphot_K(0), m_Nphot_p(0) {
     }
@@ -47,18 +49,18 @@ namespace Belle2 {
      * @param Nphot_p  expected photons for proton
      */
 
-    TOPLikelihoods(int flag,
-                   double logL_e,
-                   double logL_mu,
-                   double logL_pi,
-                   double logL_K,
-                   double logL_p,
-                   int Nphot,
-                   double Nphot_e,
-                   double Nphot_mu,
-                   double Nphot_pi,
-                   double Nphot_K,
-                   double Nphot_p) {
+    TOPLikelihood(int flag,
+                  double logL_e,
+                  double logL_mu,
+                  double logL_pi,
+                  double logL_K,
+                  double logL_p,
+                  int Nphot,
+                  double Nphot_e,
+                  double Nphot_mu,
+                  double Nphot_pi,
+                  double Nphot_K,
+                  double Nphot_p) {
       m_flag = flag;
       m_logL_e  = logL_e;
       m_logL_mu = logL_mu;
@@ -80,7 +82,7 @@ namespace Belle2 {
      * @param Nphot_expect number of expected photons in order e, mu, pi, K, p
      */
 
-    TOPLikelihoods(int flag, double logL[5], int Nphot, double Nphot_expect[5]) {
+    TOPLikelihood(int flag, double logL[5], int Nphot, double Nphot_expect[5]) {
       m_flag = flag;
       m_logL_e  = logL[0];
       m_logL_mu = logL[1];
@@ -169,7 +171,7 @@ namespace Belle2 {
     double m_Nphot_K;    /**< number of expected photons for kaon hypothesis */
     double m_Nphot_p;    /**< number of expected photons for proton hypothesis */
 
-    ClassDef(TOPLikelihoods, 1); /**< ClassDef */
+    ClassDef(TOPLikelihood, 1); /**< ClassDef */
 
   };
 

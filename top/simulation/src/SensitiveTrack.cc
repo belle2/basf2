@@ -3,13 +3,13 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Petric                                             *
+ * Contributors: Marko Petric, Marko Staric                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <top/simulation/SensitiveTrack.h>
-#include <top/dataobjects/TOPTrack.h>
+#include <top/dataobjects/TOPBarHit.h>
 #include <top/geometry/TOPGeometryPar.h>
 
 #include <G4Step.hh>
@@ -37,13 +37,13 @@ namespace Belle2 {
       m_topgp(TOPGeometryPar::Instance())
     {
       // registration
-      StoreArray<TOPTrack>::registerPersistent();
-      RelationArray::registerPersistent<MCParticle, TOPTrack>();
+      StoreArray<TOPBarHit>::registerPersistent();
+      RelationArray::registerPersistent<MCParticle, TOPBarHit>();
 
       // additional registration of MCParticle relation (required for correct relations)
       StoreArray<MCParticle> particles;
-      StoreArray<TOPTrack>  tracks;
-      RelationArray  relation(particles, tracks);
+      StoreArray<TOPBarHit>  barhits;
+      RelationArray  relation(particles, barhits);
       registerMCParticleRelation(relation);
     }
 
@@ -56,13 +56,13 @@ namespace Belle2 {
       //! get particle track
       G4Track* aTrack = aStep->GetTrack();
 
-      //! check which particle did hit the bar
+      //! check which particle hit the bar
       G4ParticleDefinition* particle = aTrack->GetDefinition();
 
       //! query for it's PDG number
       int  PDG = (int)(particle->GetPDGEncoding());
 
-      // Save all tracks excluding opticalphotons
+      // Save all tracks excluding optical photons
       if (PDG == 0) return false;
 
       //! get the preposition, a step before current position
@@ -81,17 +81,6 @@ namespace Belle2 {
       if (fabs(fabs(localPosition.y()) - (m_topgp->getQthickness() / 2)) > 10e-6) {
         return false ;
       }
-
-      //! This few lines are for debugging
-      /*
-       B2INFO("SensitiveTrack: " << aTrack->GetDefinition()->GetParticleName()
-       << " " << aTrack->GetTrackID()
-       << " " << aTrack->GetParentID()
-       << " " << G4BestUnit(localPosition, "Length")
-       << " " << G4BestUnit(worldPosition, "Length")
-       << " " << G4BestUnit(aTrack->GetMomentum(), "Energy")
-       << " " << G4BestUnit(aTrack->GetGlobalTime(), "Time")
-       << " Edep is " << G4BestUnit(aStep->GetTotalEnergyDeposit(), "Energy"));*/
 
       //! Get track ID
       int trackID = aTrack->GetTrackID();
@@ -123,10 +112,10 @@ namespace Belle2 {
                           vmomentum * aTrack->GetVertexMomentumDirection().y(),
                           vmomentum * aTrack->GetVertexMomentumDirection().z());
 
-      //! Get the ID of the bar that was hit
+      //! Get bar ID
       int barID = PrePosition->GetTouchableHandle()->GetReplicaNumber(2);
 
-      //!Get the charge of the particle
+      //! Get the charge of the particle
       int PDGCharge = (int)particle->GetPDGCharge();
 
       //! convert to Basf units
@@ -138,27 +127,27 @@ namespace Belle2 {
 
 
       /*!------------------------------------------------------------
-       *                Create TOPTrack and save it to datastore
+       *                Create TOPBarHit and save it to datastore
        * ------------------------------------------------------------
        */
 
-      StoreArray<TOPTrack> topTracks;
+      StoreArray<TOPBarHit> topTracks;
       if (!topTracks.isValid()) topTracks.create();
 
-      new(topTracks.nextFreeAddress()) TOPTrack(trackID, PDG, PDGCharge, TPosition,
-                                                TVPosition, TMomentum, TVMomentum,
-                                                barID, tracklength, globalTime, localTime);
+      new(topTracks.nextFreeAddress()) TOPBarHit(trackID, PDG, PDGCharge, TPosition,
+                                                 TVPosition, TMomentum, TVMomentum,
+                                                 barID, tracklength, globalTime, localTime);
 
 
       /*!--------------------------------------------------------------------------
-       *                Make relation between TOPTrack and MCParticle
+       *                Make relation between TOPBarHit and MCParticle
        * --------------------------------------------------------------------------
        */
 
       StoreArray<MCParticle> mcParticles;
-      RelationArray relMCParticleToTOPTrack(mcParticles, topTracks);
+      RelationArray relMCParticleToTOPBarHit(mcParticles, topTracks);
       int last = topTracks.getEntries() - 1;
-      relMCParticleToTOPTrack.add(trackID, last);
+      relMCParticleToTOPBarHit.add(trackID, last);
 
       //! everything done successfully
       return true;

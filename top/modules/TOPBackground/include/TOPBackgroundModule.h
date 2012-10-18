@@ -39,10 +39,8 @@
 #include <TMultiGraph.h>
 #include <TLegend.h>
 
-
-#include <top/dataobjects/TOPTrack.h>
 #include <top/dataobjects/TOPDigit.h>
-#include <top/dataobjects/TOPTrack.h>
+#include <top/dataobjects/TOPBarHit.h>
 #include <top/dataobjects/TOPSimHit.h>
 #include <simulation/dataobjects/BeamBackHit.h>
 #include <generators/dataobjects/MCParticle.h>

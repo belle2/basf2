@@ -83,7 +83,7 @@ namespace Belle2 {
       std::string m_extRecoHitsColName;   /**< Ext reconstructed hits (input) */
       std::string m_topDigitColName;      /**< Digitized data (input) */
       std::string m_topLogLColName;       /**< TOP log likelihoods (output) */
-      std::string m_topTrackColName;      /**< MC particle hit (to set relation to) */
+      std::string m_barHitColName;      /**< MC particle hit (to set relation to) */
       int m_debugLevel; /**< debug level */
       double m_minBkgPerQbar;  /**< minimal assumed background photons per bar */
       double m_ScaleN0;  /**< scale factor for N0 */
@@ -105,13 +105,13 @@ namespace Belle2 {
       double m_Masses[Nhyp];  /**< particle masses */
 
       //! Label tags
-      enum {LgfTrack = 0, LextTrackCand, LextHit, LtopTrack};
+      enum {LgfTrack = 0, LextTrackCand, LextHit, LbarHit};
 
       //! MC particle associated with GF track
       const MCParticle* getMCParticle(const GFTrack* track);
 
-      //! index of TOPTrack of a given MC patricle or -1
-      int getTOPTrackIndex(const MCParticle* particle);
+      //! index of TOPBarHit of a given MC patricle or -1
+      int getTOPBarHitIndex(const MCParticle* particle);
 
       //! get extrapolated tracks
       void getTracks(std::vector<TOPtrack> & tracks, int hypothesis);

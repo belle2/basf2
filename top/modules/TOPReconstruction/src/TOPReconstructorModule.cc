@@ -22,9 +22,9 @@
 #include <GFTrackCand.h>
 #include <tracking/dataobjects/ExtRecoHit.h>
 #include <top/dataobjects/TOPDigit.h>
-#include <top/dataobjects/TOPLikelihoods.h>
+#include <top/dataobjects/TOPLikelihood.h>
 #include <generators/dataobjects/MCParticle.h>
-#include <top/dataobjects/TOPTrack.h>
+#include <top/dataobjects/TOPBarHit.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -76,9 +76,9 @@ namespace Belle2 {
                string("ExtRecoHits"));
       addParam("TOPDigitColName", m_topDigitColName, "TOP digits",
                string(""));
-      addParam("TOPLikelihoodsColName", m_topLogLColName, "TOP likelihoods",
+      addParam("TOPLikelihoodColName", m_topLogLColName, "TOP likelihoods",
                string(""));
-      addParam("TOPTrackColName", m_topTrackColName, "MCParticle hits at bars",
+      addParam("TOPBarHitColName", m_barHitColName, "MCParticle hits at bars",
                string(""));
       addParam("DebugLevel", m_debugLevel, "Debug level", 0);
       addParam("minBkgPerBar", m_minBkgPerQbar,
@@ -104,11 +104,11 @@ namespace Belle2 {
       printModuleParams();
 
       // Data store registration
-      StoreArray<TOPLikelihoods>::registerPersistent(m_topLogLColName);
-      RelationArray::registerPersistent<GFTrack, TOPLikelihoods>(m_gfTracksColName, m_topLogLColName);
-      RelationArray::registerPersistent<TOPLikelihoods, ExtRecoHit>(m_topLogLColName, m_extRecoHitsColName);
-      RelationArray::registerPersistent<TOPLikelihoods, GFTrackCand>(m_topLogLColName, m_extTrackCandsColName);
-      RelationArray::registerPersistent<TOPTrack, TOPLikelihoods>(m_topTrackColName, m_topLogLColName);
+      StoreArray<TOPLikelihood>::registerPersistent(m_topLogLColName);
+      RelationArray::registerPersistent<GFTrack, TOPLikelihood>(m_gfTracksColName, m_topLogLColName);
+      RelationArray::registerPersistent<TOPLikelihood, ExtRecoHit>(m_topLogLColName, m_extRecoHitsColName);
+      RelationArray::registerPersistent<TOPLikelihood, GFTrackCand>(m_topLogLColName, m_extTrackCandsColName);
+      RelationArray::registerPersistent<TOPBarHit, TOPLikelihood>(m_barHitColName, m_topLogLColName);
 
       // Configure TOP detector
       TOPconfigure();
@@ -131,11 +131,11 @@ namespace Belle2 {
       StoreArray<GFTrack> gfTracks(m_gfTracksColName);
       StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName);
       StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName);
-      StoreArray<TOPTrack> topTracks(m_topTrackColName);
+      StoreArray<TOPBarHit> barHits(m_barHitColName);
 
       // output: log likelihoods
 
-      StoreArray<TOPLikelihoods> toplogL(m_topLogLColName);
+      StoreArray<TOPLikelihood> toplogL(m_topLogLColName);
       toplogL.create();
 
       // output: relations
@@ -146,8 +146,8 @@ namespace Belle2 {
       LogLextHit.clear();
       RelationArray LogLextTrackCand(toplogL, extTrackCands);
       LogLextTrackCand.clear();
-      RelationArray topTrackLogL(topTracks, toplogL);
-      topTrackLogL.clear();
+      RelationArray barHitLogL(barHits, toplogL);
+      barHitLogL.clear();
 
       // collect reconstructed tracks extrapolated to TOP
 
@@ -188,15 +188,15 @@ namespace Belle2 {
         reco.GetLogL(Nhyp, logl, expPhot, nphot);
 
         // store results
-        new(toplogL.nextFreeAddress()) TOPLikelihoods(reco.Flag(), logl, nphot, expPhot);
+        new(toplogL.nextFreeAddress()) TOPLikelihood(reco.Flag(), logl, nphot, expPhot);
 
         // make relations
         int last = toplogL.getEntries() - 1;
         gfTrackLogL.add(tracks[i].Label(LgfTrack), last);
         LogLextHit.add(last, tracks[i].Label(LextHit));
         LogLextTrackCand.add(last, tracks[i].Label(LextTrackCand));
-        int iTopTrack = tracks[i].Label(LtopTrack);
-        if (iTopTrack >= 0) topTrackLogL.add(iTopTrack, last);
+        int ibarHit = tracks[i].Label(LbarHit);
+        if (ibarHit >= 0) barHitLogL.add(ibarHit, last);
       }
 
       // consolidate relatons
@@ -204,7 +204,7 @@ namespace Belle2 {
       gfTrackLogL.consolidate();
       LogLextHit.consolidate();
       LogLextTrackCand.consolidate();
-      topTrackLogL.consolidate();
+      barHitLogL.consolidate();
 
     }
 
@@ -320,17 +320,17 @@ namespace Belle2 {
     }
 
 
-    int TOPReconstructorModule::getTOPTrackIndex(const MCParticle* particle)
+    int TOPReconstructorModule::getTOPBarHitIndex(const MCParticle* particle)
     {
       if (! particle) return -1;
 
       StoreArray<MCParticle> mcParticles;
-      StoreArray<TOPTrack> topTracks;
+      StoreArray<TOPBarHit> barHits;
 
-      RelationArray rel(mcParticles, topTracks);
+      RelationArray rel(mcParticles, barHits);
       if (! rel) return -1;
 
-      RelationIndex<MCParticle, TOPTrack> irel(mcParticles, topTracks);
+      RelationIndex<MCParticle, TOPBarHit> irel(mcParticles, barHits);
       if (irel.getFirstElementFrom(particle)) {
         return irel.getFirstElementFrom(particle)->indexTo;
       }
@@ -352,7 +352,7 @@ namespace Belle2 {
         const MCParticle* particle = getMCParticle(track);
         int Lund = 0;
         if (particle) Lund = particle->getPDG();
-        int iTopTrack = getTOPTrackIndex(particle);
+        int iTopTrack = getTOPBarHitIndex(particle);
         int iTrackCand = itra * 5 + hypothesis;
         GFTrackCand* cand = extTrackCands[iTrackCand];
         if (! cand) continue;
@@ -383,7 +383,7 @@ namespace Belle2 {
           trk.setLabel(LgfTrack, itra);
           trk.setLabel(LextTrackCand, iTrackCand);
           trk.setLabel(LextHit, hitID);
-          trk.setLabel(LtopTrack, iTopTrack);
+          trk.setLabel(LbarHit, iTopTrack);
           tracks.push_back(trk);
         }
       }

@@ -6,8 +6,8 @@ from basf2 import *
 # --------------------------------------------------------------------
 # Example of using TOP reconstruction
 # needs reconstructed tracks (GFTrack), extrapolated to TOP (Ext)
-# log likelihoods in TOPLikelihoodss
-# relation from GFTracks to TOPLikelihoodss
+# log likelihoods in TOPLikelihoods
+# relation from GFTracks to TOPLikelihoods
 # --------------------------------------------------------------------
 
 # suppress messages and warnings during processing:

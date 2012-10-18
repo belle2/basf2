@@ -3,13 +3,13 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Petric                                             *
+ * Contributors: Marko Petric, Marko Staric                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPQUARTZHIT_H
-#define TOPQUARTZHIT_H
+#ifndef TOPBARHIT_H
+#define TOPBARHIT_H
 
 #include <TObject.h>
 #include <TVector3.h>
@@ -19,15 +19,17 @@ namespace Belle2 {
    * @{
    */
 
-  /*! Opsolete Class -> please use TOPBarHit instead
+  /*! Class to store MC particle track parameters at impact to TOP
+   * relation to MCParticle
+   * filled in top/simulation/src/SensitiveTrack.cc
    */
 
-  class TOPTrack : public TObject {
+  class TOPBarHit : public TObject {
   public:
 
     /*! Default constructor
      */
-    TOPTrack():
+    TOPBarHit():
       m_trackID(-1),
       m_particleID(-1),
       m_charge(0),
@@ -54,7 +56,7 @@ namespace Belle2 {
      * @param globaltime global time
      * @param localtime  local time
      */
-    TOPTrack(
+    TOPBarHit(
       int trackID,
       int particleID,
       int charge,
@@ -149,7 +151,7 @@ namespace Belle2 {
     double m_globaltime;       /**< global time at impact */
     double m_localtime;        /**< local time at impact */
 
-    ClassDef(TOPTrack, 1);     /**< ClassDef */
+    ClassDef(TOPBarHit, 1);     /**< ClassDef */
 
   };
 
@@ -157,4 +159,5 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif  // TOPQUARTZHIT_H
+#endif
+

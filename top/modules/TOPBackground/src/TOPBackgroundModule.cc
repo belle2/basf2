@@ -148,7 +148,7 @@ namespace Belle2 {
       StoreArray<TOPSimHit>  topSimhits;
       StoreArray<MCParticle> mcParticles;
       StoreArray<TOPDigit> topDigits;
-      StoreArray<TOPTrack> topTracks;
+      StoreArray<TOPBarHit> topTracks;
 
       int nHits = topDigits.getEntries();
       for (int i = 0; i < nHits; i++) {
@@ -214,7 +214,7 @@ namespace Belle2 {
 
       nHits = topTracks.getEntries();
       for (int iHit = 0; iHit < nHits; ++iHit) {
-        TOPTrack* toptrk = topTracks[iHit];
+        TOPBarHit* toptrk = topTracks[iHit];
 
         int PDG = toptrk->getParticleID();
         int barID = toptrk->getBarID();

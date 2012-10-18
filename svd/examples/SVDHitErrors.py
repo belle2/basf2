@@ -28,9 +28,9 @@ class SVDHitErrors(Module):
         self.file.write('LEGEND TO COLUMNS: \n')
         self.file.write('SensorID Layer Ladder Sensor Truehit_index Cluster_index \n'
                         )
-        self.file.write('TrueHit: u[cm], v[cm], charge[GeV], theta_u, theta_v \n'
+        self.file.write('TrueHit: u[cm], v[cm], time[ns], charge[GeV], theta_u, theta_v \n'
                         )
-        self.file.write('Cluster: isU[True/False], uv[cm], charge[e-], seed charge[e-], size \n'
+        self.file.write('Cluster: isU[True/False], uv[cm], time[ns], charge[e-], seed charge[e-], size \n'
                         )
         self.file.write('\n')
 
@@ -83,15 +83,25 @@ class SVDHitErrors(Module):
                 thetaV = math.atan2(truehit.getExitV() - truehit.getEntryV(),
                                     0.0075)
                 s_th = \
-                    '{uTH:10.5f} {vTH:10.5f} {eTH:10.7f} {thetaU:6.3f} {thetaV:6.3f} '.format(uTH=truehit.getU(),
-                        vTH=truehit.getV(), eTH=truehit.getEnergyDep(),
-                        thetaU=thetaU, thetaV=thetaV)
+                    '{uTH:10.5f} {vTH:10.5f} {tTH:10.2f} {eTH:10.7f} {thetaU:6.3f} {thetaV:6.3f} '.format(
+                    uTH=truehit.getU(),
+                    vTH=truehit.getV(),
+                    tTH=truehit.getGlobalTime(),
+                    eTH=truehit.getEnergyDep(),
+                    thetaU=thetaU,
+                    thetaV=thetaV,
+                    )
                 s += s_th
                 # Cluster information
                 s_cl = \
-                    '{isU} {uvCL:10.5f} {eCL:10.1f} {eSeed:10.1f} {size:5d} '.format(isU=cluster.isUCluster(),
-                        uvCL=cluster.getPosition(), eCL=cluster.getCharge(),
-                        eSeed=cluster.getSeedCharge(), size=cluster.getSize())
+                    '{isU} {uvCL:10.5f} {tCL:10.2f} {eCL:10.1f} {eSeed:10.1f} {size:5d} '.format(
+                    isU=cluster.isUCluster(),
+                    uvCL=cluster.getPosition(),
+                    tCL=cluster.getClsTime() - 50,
+                    eCL=cluster.getCharge(),
+                    eSeed=cluster.getSeedCharge(),
+                    size=cluster.getSize(),
+                    )
                 s += s_cl
                 # NO DIGITS by now.
                 s += '\n'

@@ -18,7 +18,6 @@ input = register_module('RootInput')
 # set the input file, in this case, the output of MCFittingEvtGen.py example
 input.param('inputFileName', 'MCFittingEvtGenOutput.root')
 
-
 # create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
@@ -29,7 +28,6 @@ geometry.param('ExcludedComponents', ['EKLM', 'ECL'])
 main.add_module(input)
 main.add_module(gearbox)
 main.add_module(geometry)
-
 
 display = register_module('Display')
 
@@ -63,6 +61,13 @@ display.param('ShowAllPrimaries', True)
 
 # show tracks?
 display.param('ShowGFTracks', True)
+
+# show track candidates?
+# You most likely don't want this unless you are a tracking developer
+display.param('ShowGFTrackCands', False)
+# If ShowGFTrackCands is true, you can set this option to switch between
+# PXD/SVDClusters and PXD/SVDTrueHits
+display.param('UseClusters', False)
 
 # save events non-interactively (without showing window)?
 display.param('Automatic', False)

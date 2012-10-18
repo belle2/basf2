@@ -77,6 +77,7 @@ using namespace Belle2;
 
 EVEVisualization::EVEVisualization():
   m_assignToPrimaries(false),
+  m_trackcandlist(0),
   m_eclsimhitdata(0)
 {
   setErrScale();
@@ -117,6 +118,7 @@ EVEVisualization::~EVEVisualization()
   delete m_eclsimhitdata;
   delete m_tracklist;
   delete m_gftracklist;
+  delete m_trackcandlist;
   delete m_trackpropagator;
   delete m_gftrackpropagator;
 }
@@ -793,6 +795,9 @@ void EVEVisualization::makeTracks()
   }
   gEve->AddElement(m_gftracklist);
 
+  if (m_trackcandlist)
+    gEve->AddElement(m_trackcandlist);
+
   m_eclsimhitdata->DataChanged(); //update limits (Empty() won't work otherwise)
   if (!m_eclsimhitdata->Empty()) {
     m_eclsimhitdata->SetAxisFromBins();
@@ -812,6 +817,8 @@ void EVEVisualization::clearEvent()
   m_mcparticleTracks.clear();
   m_tracklist->DestroyElements();
   m_gftracklist->DestroyElements();
+  if (m_trackcandlist)
+    m_trackcandlist->DestroyElements();
 
   //lower energy threshold for ECL
   float ecl_threshold = 0.01;

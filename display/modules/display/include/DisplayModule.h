@@ -66,6 +66,12 @@ namespace Belle2 {
     /** Wether to show GFTracks */
     bool m_showGFTracks;
 
+    /** Wether to show GFTrackCands */
+    bool m_showGFTrackCands;
+
+    /** Wether to use cluster hits for GFTrackCands */
+    bool m_useClusters;
+
     /** Non-interactively save visualisations for each event. */
     bool m_automatic;
 

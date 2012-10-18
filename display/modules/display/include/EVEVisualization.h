@@ -1,21 +1,32 @@
 #ifndef EVEVISUALIZATION_H
 #define EVEVISUALIZATION_H
 
+#include <framework/datastore/StoreArray.h>
+
 #include <generators/dataobjects/MCParticle.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <cdc/dataobjects/CDCSimHit.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <svd/dataobjects/SVDTrueHit.h>
 #include <top/dataobjects/TOPSimHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 //#include <eklm/dataobjects/EKLMSimHit.h>
 #include <ecl/dataobjects/ECLHit.h>
+#include <vxd/geometry/GeoCache.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <GFTrack.h>
+#include <GFTrackCand.h>
 
 #include <TEveTrackPropagator.h>
 #include <TVector3.h>
 #include <TString.h>
+#include <TEveTrack.h>
 
 #include <string>
 #include <vector>
@@ -24,7 +35,6 @@ class TEveBox;
 class TEveCaloDataVec;
 class TEveElementList;
 class TEvePointSet;
-class TEveTrack;
 class TEveTrackList;
 
 namespace Belle2 {
@@ -80,6 +90,10 @@ namespace Belle2 {
      *
      *  Adapted from GenfitDisplay, originally written by Karl Bicker. */
     void addTrack(const GFTrack* gftrack, const TString& label = "");
+
+    /** Add a GFTrackCand, to evaluate track finding. */
+    template<class PXDType, class SVDType> void addTrackCandidate(const GFTrackCand* trackCand, const TString& label,
+        const StoreArray<PXDType> &pxdhits, const StoreArray<SVDType> &svdhits, const StoreArray<CDCHit> &cdchits);
 
     /** Add a CDCSimHit. */
     void addSimHit(const CDCSimHit* hit, const MCParticle* particle);
@@ -175,6 +189,29 @@ namespace Belle2 {
     /** set fill color of the volume 'name' to 'col'. */
     void setVolumeColor(const char* name, Color_t col);
 
+    /** returns position of given VXD hit in global coordinates. */
+    template <class SomeVXDHit> TVector3 getGlobalPos(const SomeVXDHit* hit) {
+      static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
+      const TVector3 local_pos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
+      const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
+      return sensor.pointToGlobal(local_pos);
+    }
+
+    /** specialisation for SVDCluster */
+    TVector3 getGlobalPos(const SVDCluster*) {
+      B2ERROR("getGlobalPos() not yet implemented for SVDCluster :(");
+      //TODO: How to get these for strips?
+      return TVector3(0, 0, 0);
+    }
+
+    TVector3 getGlobalPos(const CDCHit* hit) {
+      static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
+      const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
+      const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
+      return 0.5 * (wire_pos_f + wire_pos_b);
+    }
+
     /** Rescale PXD/SVD errors with this factor to ensure visibility. */
     double m_errorScale;
 
@@ -196,6 +233,9 @@ namespace Belle2 {
     /** parent object for reconstructed tracks. */
     TEveTrackList* m_gftracklist;
 
+    /** parent object for track candidates. */
+    TEveTrackList* m_trackcandlist;
+
     /** Track propagator for MCParticles*/
     TEveTrackPropagator* m_trackpropagator;
 
@@ -208,5 +248,110 @@ namespace Belle2 {
     /** The global magnetic field. */
     EveVisBField m_bfield;
   };
+
+  template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const GFTrackCand* trackCand, const TString& label,
+      const StoreArray<PXDType> &pxdhits, const StoreArray<SVDType> &svdhits, const StoreArray<CDCHit> &cdchits)
+  {
+    // parse the option string ------------------------------------------------------------------------
+    bool drawHits = false;
+    bool drawTrack = false;
+
+    if (m_options != "") {
+      for (size_t i = 0; i < m_options.length(); i++) {
+        if (m_options.at(i) == 'H') drawHits = true;
+        if (m_options.at(i) == 'T') drawTrack = true;
+      }
+    }
+    // finished parsing the option string -------------------------------------------------------------
+
+
+    //track seeds
+    const double qOverP = trackCand->getQoverPseed();
+    TVector3 track_pos = trackCand->getPosSeed();
+    TVector3 track_mom = trackCand->getDirSeed() * (1.0 / TMath::Abs(qOverP));
+    //TVector3 track_mom = trackCand->getMomSeed(); //TODO: requires newer genfit
+
+    TEveTrack* track_lines = NULL;
+    TEvePointSet* hits = new TEvePointSet("RecoHits");
+    hits->SetMainColor(kOrange + 2);
+    hits->SetMainTransparency(70);
+    const unsigned int numhits = trackCand->getNHits();
+    for (unsigned int iHit = 0; iHit < numhits; iHit++) { // loop over all hits in the track
+
+      //get hit and detector indices from candidate
+      unsigned int detId;
+      unsigned int hitId;
+      trackCand->getHit(iHit, detId, hitId);
+
+      //get actual hit data from associated StoreArray
+      TVector3 global_pos;
+      if (detId == 0) { //PXD
+        if (!pxdhits)
+          continue;
+        const PXDType* hit = pxdhits[hitId];
+        assert(hit);
+
+        global_pos = getGlobalPos(hit);
+      } else if (detId == 1) { //SVD
+        if (!svdhits)
+          continue;
+        const SVDType* hit = svdhits[hitId];
+        assert(hit);
+        global_pos = getGlobalPos(hit);
+      } else if (detId == 2) { //CDC
+        if (!cdchits)
+          continue;
+        const CDCHit* hit = cdchits[hitId];
+        assert(hit);
+        global_pos = getGlobalPos(hit);
+      } else {
+        B2ERROR("Got invalid detector ID from track candidate, skipping hit!")
+        continue;
+      }
+
+      // draw track if corresponding option is set ------------------------------------------
+      if (drawTrack) {
+        if (!track_lines) {
+          TEveRecTrack rectrack;
+          rectrack.fP.Set(track_mom);
+          rectrack.fV.Set(track_pos);
+
+          track_lines = new TEveTrack(&rectrack, m_gftrackpropagator);
+          track_lines->SetName(label); //popup label set at end of function
+          track_lines->SetPropagator(m_gftrackpropagator);
+          track_lines->SetLineColor(kOrange + 2);
+          track_lines->SetLineWidth(1);
+          track_lines->SetTitle(TString::Format("%s\n"
+                                                "#hits: %u\n",
+                                                label.Data(), numhits));
+
+          track_lines->SetCharge((int)(qOverP / TMath::Abs(qOverP)));
+        }
+        /*
+         TEvePathMarkD refMark(TEvePathMarkD::kDaughter); //doesn't need momentum
+         refMark.fV.Set(global_pos);
+         //TODO use rho here?
+         refMark.fTime = global_pos.Mag(); //path marks can later be sorted by 'time'...
+         track_lines->AddPathMark(refMark);
+         */
+        hits->SetNextPoint(global_pos.x(), global_pos.y(), global_pos.z());
+      }
+
+
+      if (drawHits) {
+
+      }
+    }
+
+    if (track_lines) {
+      if (!m_trackcandlist) {
+        m_trackcandlist = new TEveTrackList("Track candidates", m_gftrackpropagator);
+        m_trackcandlist->IncDenyDestroy();
+      }
+
+      track_lines->AddElement(hits);
+      m_trackcandlist->AddElement(track_lines);
+    }
+  }
 }
 #endif

@@ -31,6 +31,8 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("ShowCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled AssignHitsToPrimaries). May be slow.", false);
   addParam("ShowNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled AssignHitsToPrimaries). May be slow.", false);
   addParam("ShowGFTracks", m_showGFTracks, "If true, fitted GFTracks will be shown in the display.", true);
+  addParam("ShowGFTrackCands", m_showGFTrackCands, "If true, track candidates (GFTrackCands array) will be shown in the display.", false);
+  addParam("UseClusters", m_useClusters, "Use PXD/SVD clusters for GFTrackCands visualisation", false);
   addParam("Automatic", m_automatic, "Non-interactively save visualisations for each event.", false);
 
   //make sure dictionaries for PXD/SVDrecohits are loaded
@@ -43,8 +45,6 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
 
 DisplayModule::~DisplayModule()
 {
-  delete m_visualizer;
-  delete m_display;
 }
 
 
@@ -66,6 +66,7 @@ void DisplayModule::initialize()
   m_display->addParameter("Show all charged particles", getParam<bool>("ShowCharged"));
   m_display->addParameter("Show all neutral particles", getParam<bool>("ShowNeutrals"));
   m_display->addParameter("Show GFTracks", getParam<bool>("ShowGFTracks"));
+  m_display->addParameter("Show GFTrackCandidates", getParam<bool>("ShowGFTrackCands"));
 
 
   m_visualizer = new EVEVisualization();
@@ -216,6 +217,26 @@ void DisplayModule::event()
       m_visualizer->addTrack(gftracks[i], TString::Format("GFTrack %d", i));
   }
 
+  if (m_showGFTrackCands) {
+    StoreArray<GFTrackCand> gftrackcands;
+    const int nCands = gftrackcands.getEntries();
+    if (m_useClusters) {
+      //use PXDClusters, SVDClusters instead of TrueHits
+      StoreArray<PXDCluster> pxdhits;
+      StoreArray<SVDCluster> svdhits;
+      StoreArray<CDCHit> cdchits;
+      for (int i = 0; i < nCands; i++)
+        m_visualizer->addTrackCandidate<PXDCluster, SVDCluster>(gftrackcands[i], TString::Format("GFTrackCand %d", i), pxdhits, svdhits, cdchits);
+
+    } else {
+      StoreArray<PXDTrueHit> pxdhits;
+      StoreArray<SVDTrueHit> svdhits;
+      StoreArray<CDCHit> cdchits;
+      for (int i = 0; i < nCands; i++)
+        m_visualizer->addTrackCandidate<PXDTrueHit, SVDTrueHit>(gftrackcands[i], TString::Format("GFTrackCand %d", i), pxdhits, svdhits, cdchits);
+    }
+  }
+
 
   m_visualizer->makeTracks();
 
@@ -232,4 +253,7 @@ void DisplayModule::terminate()
 {
   if (gEve)
     gEve->Terminate();
+
+  delete m_visualizer;
+  delete m_display;
 }

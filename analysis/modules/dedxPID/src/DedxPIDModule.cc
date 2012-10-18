@@ -56,7 +56,7 @@ float get_edep(const PXDCluster* hit) { return hit->getCharge(); }
 
 DedxPIDModule::DedxPIDModule() : Module()
 {
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   //Set module properties
   setDescription("Extract dE/dx (and some other things) from Tracks&GFTrackCandidates and PXDClusters, SVDTrueHits (not digitized) and CDCHits.");
@@ -91,6 +91,10 @@ void DedxPIDModule::initialize()
   if (!m_enableDebugOutput and m_pdfFilename.empty()) {
     B2ERROR("No PDFFile given and debug output disabled. DedxPID module will produce no output!");
   }
+
+  //required inputs
+  StoreArray<Track>::required();
+  StoreArray<GFTrack>::required();
 
   //register outputs (if needed)
   if (m_enableDebugOutput)
@@ -199,13 +203,10 @@ void DedxPIDModule::event()
   RelationArray* tracks_to_likelihoods = 0;
   if (!m_pdfFilename.empty()) {
     likelihood_array = new StoreArray<DedxLikelihood>;
-    likelihood_array->create();
     tracks_to_likelihoods = new RelationArray(gftracks, *likelihood_array);
-    tracks_to_likelihoods->create(gftracks, *likelihood_array); //why specify them again here?
   }
   if (m_enableDebugOutput) {
     dedx_array = new StoreArray<DedxTrack>();
-    dedx_array->create();
   }
 
 

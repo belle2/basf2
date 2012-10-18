@@ -213,6 +213,8 @@ namespace Belle2 {
     RandomTimer* m_timer;                        /**< The timer generates random event times. */
     float m_eventTime;                           /**< The time shift for current event. */
 
+    static const std::string s_auxMCParticlesName; /**< Name of the StoreArray used for MCParticleGraph::generateList().*/
+
 
   private:
 
@@ -333,8 +335,8 @@ namespace Belle2 {
         if (currParticle->getMother() != NULL) break;
         addParticleToEventGraph(eventGraph, *currParticle, 0, keepParticle);
       }
-      eventGraph.generateList("ROFBuilderMCParticleEvent", MCParticleGraph::c_clearParticles);
-      StoreArray<MCParticle> mcParticleEventCol("ROFBuilderMCParticleEvent");
+      eventGraph.generateList(s_auxMCParticlesName.c_str(), MCParticleGraph::c_clearParticles);
+      StoreArray<MCParticle> mcParticleEventCol(s_auxMCParticlesName.c_str());
       int nMCPartEvent = mcParticleEventCol.getEntries();
 
       //Create a list that relates the old MCParticle index (list index) with the new (after compressing) MCParticle index.

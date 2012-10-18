@@ -78,7 +78,7 @@ rofbuilder.param('OutputRootFileName', outputName)
 rofbuilder.param('ComponentName', bgType)
 rofbuilder.param('GeneratorName', bgGenerator + '_' + bgSource)
 # With SimHits, save MCParticles that caused them and their predecessors.
-rofbuilder.param('MCParticleWriteMode', 2)
+rofbuilder.param('MCParticleWriteMode', 1)
 # Set this to True only if RBB data have to be over-used, ie, used to generate
 # more frames than their nominal number.
 rofbuilder.param('RandomizeNonSAD', False)  # This is the default

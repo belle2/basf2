@@ -40,6 +40,8 @@ REG_MODULE(ROFBuilder)
 //                 Implementation
 //-----------------------------------------------------------------
 
+const string ROFBuilderModule::s_auxMCParticlesName = "ROFBuilderMCParticleEvent";
+
 ROFBuilderModule::ROFBuilderModule() : Module()
 {
   //Set module properties
@@ -102,9 +104,7 @@ void ROFBuilderModule::initialize()
   m_contentTree->Fill();
 
   // Register the auxiliary MCParticle StoreArray in the DataStore.
-  // Guess why we have to register two StoreArrays.
-  StoreArray<MCParticle>::registerTransient("ROFBuilderMCParticleEvent");
-  StoreArray<MCParticle>::registerTransient("ROFBuilderMCParticleEvent2");
+  StoreArray<MCParticle>::registerTransient(s_auxMCParticlesName.c_str());
 
   // Set the background tag for SimHits
   // FIXME: Move this to SimHitBase code to keep related things together.
@@ -184,7 +184,7 @@ void ROFBuilderModule::initialize()
 void ROFBuilderModule::event()
 {
   // This MUST WORK!
-  StoreArray<MCParticle> rofMCParts("ROFBuilderMCParticleEvent2");
+  StoreArray<MCParticle> rofMCParts(s_auxMCParticlesName.c_str());
   if (!rofMCParts.isValid()) rofMCParts.create();
   if (!rofMCParts.isValid()) B2ERROR("Cannot create the fucking array, shit.")
     // If all input events have been processed, do nothing.
@@ -272,8 +272,8 @@ void ROFBuilderModule::fillROFTree()
   //Fill the MCParticles if the MCParticle write mode is set
   if (m_mcParticleWriteMode > 0) {
 
-    m_rofMCParticleGraph.generateList("ROFBuilderMCParticleEvent2", MCParticleGraph::c_clearParticles);
-    StoreArray<MCParticle> mcParticleEventROF("ROFBuilderMCParticleEvent2");
+    m_rofMCParticleGraph.generateList(s_auxMCParticlesName.c_str(), MCParticleGraph::c_clearParticles);
+    StoreArray<MCParticle> mcParticleEventROF(s_auxMCParticlesName.c_str());
 
     int nParticles = mcParticleEventROF.getEntries();
     for (int iParticle = 0; iParticle < nParticles; ++iParticle) {

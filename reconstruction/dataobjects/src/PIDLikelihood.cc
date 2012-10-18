@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Belle2;
 
-void PIDLikelihood::setLikelihoods(const TOPLikelihoods* logl)
+void PIDLikelihood::setLikelihoods(const TOPLikelihood* logl)
 {
 
   if (logl->getFlag() != 1) return;

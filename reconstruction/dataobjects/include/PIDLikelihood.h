@@ -12,7 +12,7 @@
 #define PIDLIKELIHOOD_H
 
 #include <TObject.h>
-#include <top/dataobjects/TOPLikelihoods.h>
+#include <top/dataobjects/TOPLikelihood.h>
 #include <arich/dataobjects/ARICHLikelihoods.h>
 #include <analysis/dataobjects/DedxLikelihood.h>
 
@@ -45,14 +45,14 @@ namespace Belle2 {
     }
 
     /*! set TOP likelihoods and corresponding reconstruction flag
-     * @param logl TOPLikelihoods pointer
+     * @param logl TOPLikelihood pointer
      */
-    void setLikelihoods(const TOPLikelihoods* logl);
+    void setLikelihoods(const TOPLikelihood* logl);
 
     /*! set TOP likelihoods and corresponding reconstruction flag
-     * @param logl TOPLikelihoods reference
+     * @param logl TOPLikelihood reference
      */
-    void setLikelihoods(const TOPLikelihoods& logl) {setLikelihoods(&logl);}
+    void setLikelihoods(const TOPLikelihood& logl) {setLikelihoods(&logl);}
 
     /*! set ARICH likelihoods and corresponding reconstruction flag
      * @param logl ARICHLikelihoods pointer

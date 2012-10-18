@@ -60,8 +60,8 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experiment(0), m_r
   addParam(c_SteerTreeNames[1], m_treeNames[1], "TTree name for peristent data. Empty string for no output.", string("persistent"));
 
   vector<string> branchNames;
-  addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of branches to be written from event map. Empty means all branches.", branchNames);
-  addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of branches to be written from persistent map. Empty means all branches.", branchNames);
+  addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of branches to be written from event map. Empty means all branches. Transient objects added here will also be saved.", branchNames);
+  addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of branches to be written from persistent map. Empty means all branches. Transient objects added here will also be saved.", branchNames);
 
   addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0], "Names of branches NOT to be written from event map. Branches also in branchNames are not written.", branchNames);
   addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of branches NOT to be written from persistent map. Branches also in branchNamesPersistent are not written.", branchNames);
@@ -130,7 +130,7 @@ void RootOutputModule::initialize()
     for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
       const std::string& branchName = iter->first;
       //skip transient entries, excluded branches, and branches not in m_branchNames (if it is not empty)
-      if (iter->second->isTransient ||
+      if ((iter->second->isTransient && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName)) ||
           binary_search(m_excludeBranchNames[ii].begin(), m_excludeBranchNames[ii].end(), branchName) ||
           (!m_branchNames[ii].empty() && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName))) {
         continue;

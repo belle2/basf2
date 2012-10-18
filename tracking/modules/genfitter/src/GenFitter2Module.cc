@@ -159,6 +159,7 @@ void GenFitter2Module::beginRun()
   m_notPerfectCounter = 0;
   m_failedFitCounter = 0;
   m_fitCounter = 0;
+  m_largeAngleCounter = 0;
 }
 
 void GenFitter2Module::event()

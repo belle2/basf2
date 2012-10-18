@@ -214,7 +214,7 @@ void TrackFitCheckerModule::initialize()
   registerLayerWiseData("DAF_chi2s", 5);
   //registerLayerWiseData("DAF_weights_BG", 3);
 
-  if (m_robust == true) { //set the scaling factors for the MAD. No MAD will be caclulated when
+  if (m_robust == true) { //set the scaling factors for the MAD. No MAD will be caclulated when this value is not there or 0
     m_madScalingFactors["pulls_vertexPosMom"] = 1.4826; //scaling factor for normal distribute variables
     m_madScalingFactors["absMomVertex"] = 1.4826;
     m_madScalingFactors["res_vertexPosMom"] = 1.4826;
@@ -222,6 +222,8 @@ void TrackFitCheckerModule::initialize()
     m_madScalingFactors["res_curvVertex"] = 1.4826;
     m_madScalingFactors["relRes_curvVertex"] = 1.4826;
     m_madScalingFactors["relRes_p_T"] = 1.4826;
+    m_madScalingFactors["pValue_bu"] = 4.0 / 3.0;
+    m_madScalingFactors["pValue_fu"] = 4.0 / 3.0;
   }
 
 

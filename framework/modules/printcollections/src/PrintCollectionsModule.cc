@@ -40,9 +40,12 @@ PrintCollectionsModule::PrintCollectionsModule()
 
 PrintCollectionsModule::~PrintCollectionsModule()
 {
-
 }
 
+void PrintCollectionsModule::initialize()
+{
+  StoreObjPtr<EventMetaData>::required();
+}
 
 void PrintCollectionsModule::event()
 {

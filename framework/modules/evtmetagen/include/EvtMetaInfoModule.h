@@ -44,6 +44,9 @@ namespace Belle2 {
     /** Destructor of the module. */
     virtual ~EvtMetaInfoModule();
 
+    /** initialization. */
+    virtual void initialize();
+
     /**
      * Prints a header for each new run.
      *

@@ -8,6 +8,7 @@ namespace Belle2 {
   /** class to visualize data flow between modules. */
   class DataFlowVisualization {
   public:
+    /** Constructor. */
     DataFlowVisualization(const std::map<std::string, DataStore::ModuleInfo>& moduleInfo, const ModulePtrList& modules);
 
     /** Create graphs with datastore inputs/outputs of each module
@@ -17,7 +18,9 @@ namespace Belle2 {
      * */
     void generateModulePlots(const std::string& filename, bool steeringFileFlow = false);
   private:
+    /** Stores information on inputs/outputs of each module, as obtained by require()/createEntry(); */
     const std::map<std::string, DataStore::ModuleInfo>& m_moduleInfo;
+    /** List of modules, in order of initialisation. */
     const ModulePtrList& m_modules;
   };
 }

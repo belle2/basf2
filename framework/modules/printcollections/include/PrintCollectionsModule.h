@@ -40,6 +40,9 @@ namespace Belle2 {
     /** Destructor of the module. */
     virtual ~PrintCollectionsModule();
 
+    /** initialization. */
+    virtual void initialize();
+
     /** Prints information for each collection in the DataStore. */
     virtual void event();
 

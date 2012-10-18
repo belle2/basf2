@@ -117,6 +117,8 @@ void GenFitterModule::initialize()
   m_failedGFTrackCandFitCounter = 0;
   m_successfulGFTrackCandFitCounter = 0;
 
+  StoreArray<GFTrackCand>::required(m_gfTrackCandsColName);
+
   StoreArray<Track>::registerPersistent(m_tracksColName);
   StoreArray < GFTrack >::registerPersistent(m_gfTracksColName);
 

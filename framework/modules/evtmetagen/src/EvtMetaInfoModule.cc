@@ -38,6 +38,10 @@ EvtMetaInfoModule::~EvtMetaInfoModule()
 
 }
 
+void EvtMetaInfoModule::initialize()
+{
+  StoreObjPtr<EventMetaData>::required();
+}
 
 void EvtMetaInfoModule::beginRun()
 {

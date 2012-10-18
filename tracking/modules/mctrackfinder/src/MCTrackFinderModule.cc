@@ -85,6 +85,8 @@ MCTrackFinderModule::~MCTrackFinderModule()
 
 void MCTrackFinderModule::initialize()
 {
+  StoreArray<MCParticle>::required();
+
   //output store arrays have to be registered in initialize()
   StoreArray<GFTrackCand>::registerPersistent(m_gfTrackCandsColName);
   RelationArray::registerPersistent<GFTrackCand, MCParticle>(m_gfTrackCandsColName, "");

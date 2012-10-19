@@ -49,12 +49,12 @@ namespace Belle2 {
       //! Get particle track
       G4Track& track  = *aStep->GetTrack();
 
-      /*! Check if the particle that hit the sensitive are is actualy a optical photon */
+      /*! Check if it is an optical photon */
       if (track.GetDefinition()->GetParticleName() != "opticalphoton") return false;
 
       /*! Get time (check for proper global time) of track */
 
-      //! get global time from bunch crossing
+      //! get global time
       double globalTime = track.GetGlobalTime();
       //! get local time. Time that passed from the cration of the particle.
       double localTime = track.GetLocalTime();
@@ -80,13 +80,13 @@ namespace Belle2 {
       //! get direction of the momentum at hit point
       const G4ThreeVector dir = track.GetMomentumDirection();
 
-      //! get module ID number
-      int moduleID = track.GetTouchableHandle()->GetReplicaNumber(1);
-      //! get number of the bar in which the module is housed
+      //! get pmt ID
+      int pmtID = track.GetTouchableHandle()->GetReplicaNumber(1);
+      //! get ID of the bar in which the pmt is housed
       int barID = track.GetTouchableHandle()->GetReplicaNumber(4);
 
       //! This is here just for debuging
-      //B2INFO("replica number: " << moduleID << " bar number: " << barID)
+      //B2INFO("replica number: " << pmtID << " bar number: " << barID)
 
       //! get photon energy
       double energy = track.GetKineticEnergy();
@@ -124,7 +124,8 @@ namespace Belle2 {
       length = length * Unit::mm;
       energy = energy * Unit::MeV / Unit::eV;
 
-
+      double x = locpos.x();
+      double y = locpos.y();
 
       /*!------------------------------------------------------------
        *                Create TOPSimHit and save it to datastore
@@ -134,10 +135,7 @@ namespace Belle2 {
       StoreArray<TOPSimHit> topSimHits;
       if (!topSimHits.isValid()) topSimHits.create();
 
-      new(topSimHits.nextFreeAddress()) TOPSimHit(moduleID, barID, locpos, glopos,
-                                                  Dir, Vpos, Vdir, globalTime,
-                                                  globalTime - localTime, length,
-                                                  energy, parentID, trackID);
+      new(topSimHits.nextFreeAddress()) TOPSimHit(barID, pmtID, x, y, globalTime, energy);
 
       // add relation to MCParticle
       StoreArray<MCParticle> mcParticles;

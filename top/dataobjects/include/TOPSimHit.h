@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Petric                                             *
+ * Contributors: Marko Petric, Marko Staric                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,8 +19,8 @@ namespace Belle2 {
    * @{
    */
 
-  /*! Class to store G4 Cerenkov photons entering PMT's
-   * input for digitization module (TOPDigi).
+  /*! Class to store simulated hits of Cherenkov photons on PMT's
+   * input for digitization module (TOPDigitizer).
    * relation to MCParticle
    * filled in top/simulation/src/SensitivePMT.cc
    */
@@ -31,149 +31,81 @@ namespace Belle2 {
     /*! Default constructor
      */
     TOPSimHit():
-      m_moduleID(0),
       m_barID(0),
-      m_position(0, 0, 0),
-      m_gposition(0, 0, 0),
-      m_direction(0, 0, 0),
-      m_vposition(0, 0, 0),
-      m_vdirection(0, 0, 0),
-      m_globalTime(0),
-      m_localTime(0),
-      m_length(0),
-      m_energy(0),
-      m_parentID(0),
-      m_trackID(0) {
+      m_pmtID(0),
+      m_x(0.0),
+      m_y(0.0),
+      m_globalTime(0.0),
+      m_energy(0.0) {
     }
 
     /*!  Full constructor.
-     * @param pmtID         PMT ID
-     * @param barID         bar ID
-     * @param position      detection position in local (PMT) frame
-     * @param gposition     detection point
-     * @param direction     detection direction
-     * @param vposition     emission point
-     * @param vdirection    emission direction
-     * @param globalTime    detection time
-     * @param emissionTime  emission time
-     * @param length        photon track length
-     * @param energy        photon energy in [eV]
-     * @param parentID      geant4 id of parent particle
-     * @param trackID       geant4 id of photon
+     * @param barID       bar ID
+     * @param pmtID       PMT ID
+     * @param xLocal      detection position x in local PMT frame
+     * @param yLocal      detection position y in local PMT frame
+     * @param globalTime  detection time
+     * @param energy_eV   photon energy in [eV]
      */
     TOPSimHit(
-      int pmtID,
       int barID,
-      TVector3 position,
-      TVector3 gposition,
-      TVector3 direction,
-      TVector3 vposition,
-      TVector3 vdirection,
+      int pmtID,
+      double xLocal,
+      double yLocal,
       double globalTime,
-      double emissionTime,
-      double length,
-      double energy,
-      int parentID,
-      int trackID):
-      m_moduleID(pmtID),
-      m_barID(barID),
-      m_position(position),
-      m_gposition(gposition),
-      m_direction(direction),
-      m_vposition(vposition),
-      m_vdirection(vdirection),
-      m_globalTime(globalTime),
-      m_localTime(emissionTime),
-      m_length(length),
-      m_energy(energy),
-      m_parentID(parentID),
-      m_trackID(trackID) {
+      double energy_eV
+    ) {
+      m_barID = barID;
+      m_pmtID = pmtID;
+      m_x = (float) xLocal;
+      m_y = (float) yLocal;
+      m_globalTime = (float) globalTime;
+      m_energy = (float) energy_eV;
     }
-
-    /*! Get PMT ID
-     * @return PMT ID
-     */
-    int getPmtID() const { return m_moduleID; }
-
-    /*! Get PMT ID (for backward comp. - same as getPmtID)
-     * @return PMT ID
-     */
-    int getModuleID() const { return m_moduleID; }
 
     /*! Get bar ID
      * @return bar ID
      */
     int getBarID() const { return m_barID; }
 
-    /*! Get local position of hit (in PMT coordinates)
+    /*! Get PMT ID
+     * @return PMT ID
+     */
+    int getPmtID() const { return m_pmtID; }
+
+    /*! Get local position of hit (in PMT frame)
      * @return local position
      */
-    const TVector3& getPosition() const { return m_position; }
+    TVector2 getPosition() const { TVector2 vec(m_x, m_y); return vec; }
 
-    /*! Get global position of hit
-     * @return detection point
+    /*! Get local x position of hit (in PMT frame)
+     * @return local x position
      */
-    const TVector3& getGPosition() const { return m_gposition; }
+    double getX() const { return m_x; }
 
-    /*! Get photon direction at detection (global frame)
-     * @return direction vector at detection
+    /*! Get local y position of hit (in PMT frame)
+     * @return local y position
      */
-    const TVector3& getDirection() const { return m_direction; }
-
-    /*! Get position at emission (global frame)
-     * @return emission point
-     */
-    const TVector3& getVposition() const { return m_vposition; }
-
-    /*! Get photon direction at emission (global frame)
-     * @return direction vector at emission
-     */
-    const TVector3& getVdirection() const { return m_vdirection; }
+    double getY() const { return m_y; }
 
     /*! Get detection time
      * @return detection time
      */
     double getTime() const { return m_globalTime; }
 
-    /*! Get emission time
-     * @return emission time
-     */
-    double getEmissionTime() const { return m_localTime; }
-
-    /*! Get propagation length
-     * @return propagation length
-     */
-    double getLength() const { return m_length; }
-
     /*! Get photon energy
      * @return photon energy in [eV]
      */
     double getEnergy() const { return m_energy; }
 
-    /*! Get G4 ID of parent particle
-     * @return GeantID
-     */
-    int getParentID() const { return m_parentID; }
-
-    /*! Get G4 ID of photon
-     * @return GeantID
-     */
-    int getTrackID() const { return m_trackID; }
-
   private:
-    int m_moduleID;           /**< PMT ID */
-    int m_barID;              /**< bar ID */
-    TVector3 m_position;      /**< detection position in local (PMT) frame */
-    TVector3 m_gposition;     /**< detection position  */
-    TVector3 m_direction;     /**< detection direction vector */
-    TVector3 m_vposition;     /**< emission point */
-    TVector3 m_vdirection;    /**< emission direction vector */
-    double m_globalTime;      /**< detection time */
-    double m_localTime;       /**< emission time */
-    double m_length;          /**< photon propagation length */
-    double m_energy;          /**< photon energy in [eV] */
-    int m_parentID;           /**< G4 ID of parent particle */
-    int m_trackID;            /**< G4 ID of photon */
+
+    int m_barID;          /**< bar ID */
+    int m_pmtID;          /**< PMT ID */
+    float m_x;            /**< detection position in local PMT frame, x component */
+    float m_y;            /**< detection position in local PMT frame, y component */
+    float m_globalTime;   /**< detection time */
+    float m_energy;       /**< photon energy in [eV] */
 
     ClassDef(TOPSimHit, 1); /**< ClassDef */
 

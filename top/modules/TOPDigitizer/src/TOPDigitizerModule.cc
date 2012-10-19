@@ -120,8 +120,8 @@ namespace Belle2 {
         if (!DetectorQE(energy)) continue;
 
         // Do spatial digitization
-        double x = aSimHit->getPosition().X();
-        double y = aSimHit->getPosition().Y();
+        double x = aSimHit->getX();
+        double y = aSimHit->getY();
         int pmtID = aSimHit->getPmtID();
         int channelID = m_topgp->getChannelID(x, y, pmtID);
         if (channelID == 0) continue;

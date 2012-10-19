@@ -15,7 +15,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <top/dataobjects/TOPSimHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
-//#include <eklm/dataobjects/EKLMSimHit.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <vxd/geometry/GeoCache.h>
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -111,7 +111,7 @@ namespace Belle2 {
     void addSimHit(const BKLMSimHit* hit, const MCParticle* particle);
 
     /** Add a EKLMSimHit. */
-    //void addSimHit(const EKLMSimHit* hit, const MCParticle* particle);
+    void addSimHit(const EKLMSimHit* hit, const MCParticle* particle);
 
     /** Add simhit as a simple point. */
     void addSimHit(const TVector3& v, const MCParticle* particle);

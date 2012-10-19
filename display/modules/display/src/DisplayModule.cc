@@ -186,21 +186,18 @@ void DisplayModule::event()
     m_visualizer->addSimHit(bklmhits[i], el->from);
   }
 
-  /* doesn't work right now
-    StoreArray<EKLMSimHit> eklmhits;
-    RelationIndex<MCParticle, EKLMSimHit> mcpart_to_eklmhits(mcparticles, eklmhits);
-    const int nEKLMHits = eklmhits.getEntries();
-    for (int i = 0; i < nEKLMHits; i++) {
-      const RelationIndexContainer<MCParticle, EKLMSimHit>::Element* el = mcpart_to_eklmhits.getFirstElementTo(eklmhits[i]);
-      if (!el) {
-        B2WARNING("MCParticle not found!");
+  StoreArray<EKLMSimHit> eklmhits;
+  RelationIndex<MCParticle, EKLMSimHit> mcpart_to_eklmhits(mcparticles, eklmhits);
+  const int nEKLMHits = eklmhits.getEntries();
+  for (int i = 0; i < nEKLMHits; i++) {
+    const RelationIndexContainer<MCParticle, EKLMSimHit>::Element* el = mcpart_to_eklmhits.getFirstElementTo(eklmhits[i]);
+    if (!el) {
       B2WARNING("MCParticle not found for EKLMSimHit, skipping hit!");
-        continue;
-      }
-
-      m_visualizer->addSimHit(eklmhits[i], el->from);
+      continue;
     }
-    */
+
+    m_visualizer->addSimHit(eklmhits[i], el->from);
+  }
 
   StoreArray<ECLHit> eclhits;
   const int nECLHits = eclhits.getEntries();

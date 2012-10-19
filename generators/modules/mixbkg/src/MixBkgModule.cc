@@ -44,7 +44,11 @@ void MixBkgModule::initialize()
 
   m_mixBackground.setAnalysisMode(m_analysisMode);
   if (m_analysisMode) {
-    B2INFO(">> Analysis mode: ON")
+    B2INFO(">> Analysis mode: ON");
+    // Register analysis-mode specific background collections
+    StoreArray<BackgroundInfo>::registerPersistent("BackgroundInfos");
+    StoreArray<MCParticle>::registerPersistent("BackgroundMCParticles");
+
   } else {
     B2INFO(">> Analysis mode: OFF")
   }

@@ -22,11 +22,11 @@ set_random_seed(1028307)
 
 # ============================================================================
 # Set the list of particle codes (PDG codes) for the particles to be generated.
-particlegun.param('pdgCodes', [-11, 11])
+particlegun.param('pdgCodes', [-211, 211])
 
 # ============================================================================
 # Number of tracks to be generated per event:
-particlegun.param('nTracks', 10)
+particlegun.param('nTracks', 1)
 
 # ============================================================================
 # Vary the number of track
@@ -64,7 +64,7 @@ particlegun.param('independentVertices', True)
 #
 # Create Event information
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
+evtmetagen.param({'EvtNumList': [60], 'RunList': [1]})
 # Show progress of processing
 progress = register_module('Progress')
 # Load parameters
@@ -76,7 +76,8 @@ geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
 simulation = register_module('FullSim')
 # Mix some background to simulation data
 bgmixer = register_module('MixBkg')
-bgmixer.param('BackgroundFiles', ['SVDROFs.root'])
+bgmixer.param('BackgroundFiles', ['rof*.root'])
+bgmixer.param('AnalysisMode', False)
 bgmixer.set_log_level(LogLevel.INFO)
 # Simulate SVD response
 svddigi = register_module('SVDDigitizer')

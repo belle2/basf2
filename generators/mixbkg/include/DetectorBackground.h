@@ -52,9 +52,9 @@ namespace Belle2 {
        * @param simHitCollection The name of the collection into which the SimHits should be added.
        * @param simHitRelation The name of the collection which connects the SimHits with the MCParticles.
        */
-      virtual void addFile(const std::string &component, const std::string &generator,
-                           const std::string &filename, const std::string &simHitCollection,
-                           const std::string &simHitRelation) = 0;
+      virtual void addFile(const std::string& component, const std::string& generator,
+                           const std::string& filename, const std::string& simHitCollection,
+                           const std::string& simHitRelation) = 0;
 
       /**
        * Returns the highest number of readout frames this subdetector contains.
@@ -122,9 +122,9 @@ namespace Belle2 {
        * @param simHitCollection The name of the collection into which the SimHits should be added.
        * @param simHitRelation The name of the collection which connects the SimHits with the MCParticles.
        */
-      void addFile(const std::string &component, const std::string &generator,
-                   const std::string &filename, const std::string &simHitCollection,
-                   const std::string &simHitRelation);
+      void addFile(const std::string& component, const std::string& generator,
+                   const std::string& filename, const std::string& simHitCollection,
+                   const std::string& simHitRelation);
 
       /**
        * Adds or retrieves a background component.
@@ -189,9 +189,9 @@ namespace Belle2 {
 
 
     template<class SIMHITS>
-    inline void DetectorBackground<SIMHITS>::addFile(const std::string &component, const std::string &generator,
-                                                     const std::string &filename, const std::string &simHitCollection,
-                                                     const std::string &simHitRelation)
+    inline void DetectorBackground<SIMHITS>::addFile(const std::string& component, const std::string& generator,
+                                                     const std::string& filename, const std::string& simHitCollection,
+                                                     const std::string& simHitRelation)
     {
       //Check if the component with the name already exists. If not create the component.
       MapIterator mapIter = m_components.find(component);

@@ -17,6 +17,11 @@
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
+#include <top/dataobjects/TOPSimHit.h>
+#include <arich/dataobjects/ARICHSimHit.h>
+#include <ecl/dataobjects/ECLSimHit.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
+#include <bklm/dataobjects/BKLMSimHit.h>
 
 #include <TFile.h>
 #include <TChain.h>
@@ -82,6 +87,16 @@ void MixBackground::addFile(const std::string& filename)
         case 2 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<SVDSimHit>()));
           break;
         case 3 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<CDCSimHit>()));
+          break;
+        case 4 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<TOPSimHit>()));
+          break;
+        case 5 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<ARICHSimHit>()));
+          break;
+        case 6 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<ECLSimHit>()));
+          break;
+        case 7 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<EKLMSimHit>()));
+          break;
+        case 8 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<BKLMSimHit>()));
           break;
       }
       mapIter = m_detectorBackgrounds.find(subdetector);

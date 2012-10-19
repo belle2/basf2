@@ -47,9 +47,9 @@ namespace Belle2 {
        * @param simHitCollection The name of the collection into which the SimHits should be added.
        * @param simHitRelation The name of the collection which connects the SimHits with the MCParticles.
        */
-      void addFile(const std::string &component, const std::string &generator,
-                   const std::string &filename, const std::string &simHitCollection,
-                   const std::string &simHitRelation);
+      void addFile(const std::string& component, const std::string& generator,
+                   const std::string& filename, const std::string& simHitCollection,
+                   const std::string& simHitRelation);
 
       /**
        * Returns if this component is enabled or disabled.
@@ -120,9 +120,9 @@ namespace Belle2 {
 
 
     template<class SIMHITS>
-    inline void Component<SIMHITS>::addFile(const std::string &component, const std::string &generator,
-                                            const std::string &filename, const std::string &simHitCollection,
-                                            const std::string &simHitRelation)
+    inline void Component<SIMHITS>::addFile(const std::string& component, const std::string& generator,
+                                            const std::string& filename, const std::string& simHitCollection,
+                                            const std::string& simHitRelation)
     {
       //Check if the generator with the name already exists. If not create the generator.
       MapIterator mapIter = m_generators.find(component);

@@ -183,17 +183,13 @@ void ROFBuilderModule::initialize()
 
 void ROFBuilderModule::event()
 {
-  // This MUST WORK!
-  StoreArray<MCParticle> rofMCParts(s_auxMCParticlesName.c_str());
-  if (!rofMCParts.isValid()) rofMCParts.create();
-  if (!rofMCParts.isValid()) B2ERROR("Cannot create the fucking array, shit.")
-    // If all input events have been processed, do nothing.
-    if (m_randomize && m_selector->isFinished()) return;
+  // If all input events have been processed, do nothing.
+  if (m_randomize && m_selector->isFinished()) return;
   //Check if a new readout frame has to be created
   bool frameDone = (m_event >= ((m_currReadoutFrameIdx + 1) * m_eventsPerReadoutFrame));
   if (m_timeAwareMode) {
     float newEventTime = m_timer->getNextTime();
-    frameDone = newEventTime < m_eventTime;
+    frameDone = m_timer->isEndOfFrame();
     m_eventTime = newEventTime;
   }
   if (frameDone) {
@@ -207,7 +203,15 @@ void ROFBuilderModule::event()
 
     m_numberSimHits = 0;
   }
-
+  // For frames shorter than events: Check for overflow and save empty frames if necessary.
+  if (m_timeAwareMode) {
+    if (m_timer->isOverFlow()) m_eventTime = m_timer->getNextTime();
+    while (m_timer->isOverFlow()) {
+      m_eventTime = m_timer->getNextTime();
+      fillROFTree();
+      B2INFO(">> Save readout frame: #" << m_currReadoutFrameIdx << " (0*SimHits)")
+    }
+  }
   //Depending on the subdetector, add the appropriate SimHits to the ROF
   switch (m_subdetector) {
     case 1 : addSimHitsToROF<PXDSimHit>();

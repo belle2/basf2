@@ -78,18 +78,29 @@ namespace Belle2 {
   class RandomTimer {
   public:
     RandomTimer(float tau, float start, float size):
-      m_tau(tau), m_end(start + size), m_time(start)
+      m_tau(tau), m_end(start + size), m_time(start), m_endFrame(false), m_overFlow(false)
     { m_size = static_cast<float>(size); }
     float getNextTime() {
-      m_time += static_cast<float>(gRandom->Exp(m_tau));
-      if (m_time > m_end) m_time -= m_size;
+      if (!m_overFlow) m_time += static_cast<float>(gRandom->Exp(m_tau));
+      if (m_time > m_end) {
+        m_time -= m_size;
+        if (m_time > m_end) m_overFlow = true;
+        m_endFrame = true;
+      } else {
+        m_endFrame = false;
+        m_overFlow = false;
+      }
       return m_time;
     }
+    bool isEndOfFrame() const {return m_endFrame;}
+    bool isOverFlow() const {return m_overFlow; }
   private:
     double m_tau;   /**< mean time between events.*/
     float m_size; /**< size of acceptance window (in time units.*/
     double m_end;   /**< end time of acceptance window.*/
     float m_time;  /**< current time within the window. */
+    bool m_endFrame; /**< indicates end-of-frame status. */
+    bool m_overFlow; /**< indicates that current time is longer than event time.*/
   };
 
 

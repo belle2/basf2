@@ -44,7 +44,7 @@ bgGenerator = 'BBBREMS'
 
 inputDir = '~/work/belle2/BG/summer2012'
 # A single background file !
-inputName = '{d}/output_{t}_{s}_0.root'.format(d=inputDir, t=bgType,
+inputName = '{d}/output_{t}_{s}_*.root'.format(d=inputDir, t=bgType,
         s=bgSource)
 bgTime = 20  # us
 
@@ -71,6 +71,7 @@ rofbuilder.param('SimHitCollectionName', subdetectorName + 'SimHits')
 rofbuilder.param('SimHitMCPartRelationName', 'MCParticlesTo' + subdetectorName
                  + 'SimHits')
 rofbuilder.param('TimeAwareMode', True)
+# rofbuilder.param('EventsPerReadoutFrame',0.33)
 rofbuilder.param('WindowStart', windowStart)  # ns
 rofbuilder.param('WindowSize', windowSize)  # ns
 rofbuilder.param('BaseSampleSize', bgTime)  # us
@@ -78,7 +79,7 @@ rofbuilder.param('OutputRootFileName', outputName)
 rofbuilder.param('ComponentName', bgType)
 rofbuilder.param('GeneratorName', bgGenerator + '_' + bgSource)
 # With SimHits, save MCParticles that caused them and their predecessors.
-rofbuilder.param('MCParticleWriteMode', 1)
+rofbuilder.param('MCParticleWriteMode', 2)
 # Set this to True only if RBB data have to be over-used, ie, used to generate
 # more frames than their nominal number.
 rofbuilder.param('RandomizeNonSAD', False)  # This is the default

@@ -32,6 +32,14 @@ namespace Belle2 {
     gd.append("/SensitiveDetector");
     m_ThresholdEnergyDeposit = Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "MeV");
     m_ThresholdHitTime = Unit::convertValue(gd.getDouble("HitTimeThreshold") , "ns");
+
+    StoreArray<EKLMStepHit> stepHits;
+    StoreArray<MCParticle> particles;
+    RelationArray particleToStepHits(particles, stepHits);
+    registerMCParticleRelation(particleToStepHits);
+
+    StoreArray<EKLMStepHit>::registerPersistent();
+    RelationArray::registerPersistent<MCParticle, EKLMStepHit>();
   }
 
   //-----------------------------------------------------
@@ -155,7 +163,9 @@ namespace Belle2 {
     /**
      * creates step hit and store in to DataStore
      */
-    EKLMStepHit* hit = new(m_stepHitsArray->AddrAt(m_stepHitsArray.getEntries()))
+    StoreArray<EKLMStepHit> stepHits;
+    int hitNumber = stepHits->GetLast() + 1;
+    EKLMStepHit* hit = new(stepHits->AddrAt(hitNumber))
     EKLMStepHit(momentumRoot, E, trackID, paretntTrackID, pv);
     if (hit == NULL) {
       B2ERROR("EKLMSensitiveDetector.cc:: Memory allocation error. Cannot allocate hit in stepHitsArray");
@@ -167,7 +177,6 @@ namespace Belle2 {
     hit->setPDG(PDGcode);
     hit->setTime(hitTime);
     hit->setEnergy(Ekin);
-
 
     /**
      * Get information on mother volumes and store them to the hit
@@ -205,6 +214,12 @@ namespace Belle2 {
 
     pvgt = pvgt->getMother();
     hit->setEndcap(pvgt->getID()); // Endcap ID
+
+    StoreArray<MCParticle> particles;
+    RelationArray particleToStepHits(particles, stepHits);
+    particleToStepHits.add(track.GetTrackID(), hitNumber);
+
+
     /*
 
     if (pvgt->getVolumeType() ==2 )

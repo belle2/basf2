@@ -66,7 +66,7 @@ namespace Belle2 {
     /**
      * initialize array for hit stogare
      */
-    StoreArray<EKLMStepHit> m_stepHitsArray;
+    //    StoreArray<EKLMStepHit> m_stepHitsArray;
 
 
 

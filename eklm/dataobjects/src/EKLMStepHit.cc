@@ -11,12 +11,61 @@
 #include <eklm/dataobjects/EKLMStepHit.h>
 #include <framework/logging/Logger.h>
 
+#include "G4VPhysicalVolume.hh"
 
 using namespace Belle2;
 using namespace std;
 
+
 ClassImp(EKLMStepHit);
 
+EKLMStepHit::EKLMStepHit(
+  const TVector3 momentum,
+  const double E ,
+  const int  trID,
+  const int  ptrID,
+  const G4VPhysicalVolume* pv
+)
+  :
+  EKLMHitBase()
+{
+  m_energy = E;
+  m_momentum = momentum;
+  m_trackID = trID;
+  m_parentTrackID = ptrID;
+  m_pv = pv;
+  m_pvName = pv->GetName();
+}
+
+
+EKLMStepHit::EKLMStepHit(
+  const int Endcap,
+  const int Layer,
+  const int Sector,
+  const int Plane,
+  const int Strip,
+  const int PDG,
+  const double Time,
+  const double EDep,
+  const TVector3 GlobalPosition,
+  const TVector3 LocalPosition,
+  const TVector3 momentum,
+  const double E ,
+  const int  trID,
+  const int  ptrID,
+  const G4VPhysicalVolume* pv
+) :
+  EKLMHitBase(Endcap, Layer, Sector, PDG, Time,  EDep, GlobalPosition, LocalPosition)
+{
+  m_Plane = Plane;
+  m_Strip = Strip;
+  m_energy = E;
+  m_momentum = momentum;
+  m_trackID = trID;
+  m_parentTrackID = ptrID;
+  m_pv = pv;
+  m_pvName = pv->GetName();
+}
 
 
 double EKLMStepHit::getEnergy() const

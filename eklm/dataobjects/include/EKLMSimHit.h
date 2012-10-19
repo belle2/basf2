@@ -15,11 +15,11 @@
 #include <TObject.h>
 
 
-#include "G4VPhysicalVolume.hh"
 #include <eklm/dataobjects/EKLMHitBase.h>
 #include <eklm/dataobjects/EKLMStepHit.h>
 
 
+class G4VPhysicalVolume;
 #include <string>
 namespace Belle2 {
 
@@ -161,7 +161,7 @@ namespace Belle2 {
     /**
      * Volume type (for Background studies)
      */
-    G4int m_volType;
+    int m_volType;
 
 
     // Needed to make root object storable

@@ -13,8 +13,8 @@
 #define EKLMSTEPHIT_H
 
 #include <eklm/dataobjects/EKLMHitBase.h>
-#include "G4VPhysicalVolume.hh"
 
+class G4VPhysicalVolume;
 
 
 namespace Belle2 {
@@ -45,18 +45,7 @@ namespace Belle2 {
       const int  trID,
       const int  ptrID,
       const G4VPhysicalVolume* pv
-    )
-      :
-      EKLMHitBase() {
-      m_energy = E;
-      m_momentum = momentum;
-      m_trackID = trID;
-      m_parentTrackID = ptrID;
-      m_pv = pv;
-      m_pvName = pv->GetName();
-    }
-
-
+    );
 
     //! Full constructor.
     /*!
@@ -66,10 +55,6 @@ namespace Belle2 {
     \param m_position the global position at which the track occured
     \param m_momentum the of the particle that produced the hit
     */
-
-
-
-
     EKLMStepHit(
       const int Endcap,
       const int Layer,
@@ -86,17 +71,7 @@ namespace Belle2 {
       const int  trID,
       const int  ptrID,
       const G4VPhysicalVolume* pv
-    ) :
-      EKLMHitBase(Endcap, Layer, Sector, PDG, Time,  EDep, GlobalPosition, LocalPosition) {
-      m_Plane = Plane;
-      m_Strip = Strip;
-      m_energy = E;
-      m_momentum = momentum;
-      m_trackID = trID;
-      m_parentTrackID = ptrID;
-      m_pv = pv;
-      m_pvName = pv->GetName();
-    }
+    );
 
     virtual EKLMStripID getID() const;
 

@@ -10,6 +10,7 @@
 
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <framework/logging/Logger.h>
+#include "G4VPhysicalVolume.hh"
 #include<iostream>
 #include<fstream>
 

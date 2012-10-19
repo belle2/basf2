@@ -205,6 +205,7 @@ namespace Belle2 {
       return TVector3(0, 0, 0);
     }
 
+    /** specialisation for CDCHit. */
     TVector3 getGlobalPos(const CDCHit* hit) {
       static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
       const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));

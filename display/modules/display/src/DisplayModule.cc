@@ -117,43 +117,43 @@ void DisplayModule::event()
     }
   }
 
-  StoreArray<CDCSimHit> cdchits;
-  RelationIndex<MCParticle, CDCSimHit> mcpart_to_cdchits(mcparticles, cdchits);
-  const int nCDCHits = cdchits.getEntries();
+  StoreArray<CDCSimHit> cdcsimhits;
+  RelationIndex<MCParticle, CDCSimHit> mcpart_to_cdchits(mcparticles, cdcsimhits);
+  const int nCDCHits = cdcsimhits.getEntries();
   for (int i = 0; i < nCDCHits; i++) {
-    const RelationIndexContainer<MCParticle, CDCSimHit>::Element* el = mcpart_to_cdchits.getFirstElementTo(cdchits[i]);
+    const RelationIndexContainer<MCParticle, CDCSimHit>::Element* el = mcpart_to_cdchits.getFirstElementTo(cdcsimhits[i]);
     if (!el) {
       B2WARNING("MCParticle not found for CDCSimHit, skipping hit!");
       continue;
     }
 
-    m_visualizer->addSimHit(cdchits[i], el->from);
+    m_visualizer->addSimHit(cdcsimhits[i], el->from);
   }
 
-  StoreArray<PXDSimHit> pxdhits;
-  RelationIndex<MCParticle, PXDSimHit> mcpart_to_pxdhits(mcparticles, pxdhits);
-  const int nPXDHits = pxdhits.getEntries();
+  StoreArray<PXDSimHit> pxdsimhits;
+  RelationIndex<MCParticle, PXDSimHit> mcpart_to_pxdhits(mcparticles, pxdsimhits);
+  const int nPXDHits = pxdsimhits.getEntries();
   for (int i = 0; i < nPXDHits; i++) {
-    const RelationIndexContainer<MCParticle, PXDSimHit>::Element* el = mcpart_to_pxdhits.getFirstElementTo(pxdhits[i]);
+    const RelationIndexContainer<MCParticle, PXDSimHit>::Element* el = mcpart_to_pxdhits.getFirstElementTo(pxdsimhits[i]);
     if (!el) {
       B2WARNING("MCParticle not found for PXDSimHit, skipping hit!");
       continue;
     }
 
-    m_visualizer->addSimHit(pxdhits[i], el->from);
+    m_visualizer->addSimHit(pxdsimhits[i], el->from);
   }
 
-  StoreArray<SVDSimHit> svdhits;
-  RelationIndex<MCParticle, SVDSimHit> mcpart_to_svdhits(mcparticles, svdhits);
-  const int nSVDHits = svdhits.getEntries();
+  StoreArray<SVDSimHit> svdsimhits;
+  RelationIndex<MCParticle, SVDSimHit> mcpart_to_svdhits(mcparticles, svdsimhits);
+  const int nSVDHits = svdsimhits.getEntries();
   for (int i = 0; i < nSVDHits; i++) {
-    const RelationIndexContainer<MCParticle, SVDSimHit>::Element* el = mcpart_to_svdhits.getFirstElementTo(svdhits[i]);
+    const RelationIndexContainer<MCParticle, SVDSimHit>::Element* el = mcpart_to_svdhits.getFirstElementTo(svdsimhits[i]);
     if (!el) {
       B2WARNING("MCParticle not found for SVDSimHit, skipping hit!");
       continue;
     }
 
-    m_visualizer->addSimHit(svdhits[i], el->from);
+    m_visualizer->addSimHit(svdsimhits[i], el->from);
   }
 
   StoreArray<TOPSimHit> tophits;

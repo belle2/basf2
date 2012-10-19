@@ -274,7 +274,8 @@ namespace Belle2 {
     TEveTrack* track_lines = NULL;
     TEvePointSet* hits = new TEvePointSet("RecoHits");
     hits->SetMainColor(kOrange + 2);
-    hits->SetMainTransparency(70);
+    hits->SetMarkerStyle(6);
+    hits->SetMainTransparency(50);
     const unsigned int numhits = trackCand->getNHits();
     for (unsigned int iHit = 0; iHit < numhits; iHit++) { // loop over all hits in the track
 

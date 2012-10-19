@@ -156,7 +156,7 @@ void EVEVisualization::addGeometry()
   TObjArray* volumes = gGeoManager->GetListOfVolumes();
   for (int i = 0; i < volumes->GetEntriesFast(); i++) {
     TGeoVolume* volume = static_cast<TGeoVolume*>(volumes->At(i));
-    volume->SetTransparency(50);
+    volume->SetTransparency(70);
   }
 
   /*
@@ -760,8 +760,9 @@ EVEVisualization::MCTrack& EVEVisualization::addMCParticle(const MCParticle* par
     const TString pointsTitle = TString::Format("SimHits for MCParticle %d (%s)", particle->getIndex(), particle_name.Data());
     m_mcparticleTracks[particle].simhits = new TEvePointSet(pointsTitle);
     m_mcparticleTracks[particle].simhits->SetTitle(pointsTitle);
+    m_mcparticleTracks[particle].simhits->SetMarkerStyle(6);
     m_mcparticleTracks[particle].simhits->SetMainColor(m_mcparticleTracks[particle].track->GetLineColor());
-    m_mcparticleTracks[particle].simhits->SetMainTransparency(70);
+    m_mcparticleTracks[particle].simhits->SetMainTransparency(50);
     m_mcparticleTracks[particle].track->AddElement(m_mcparticleTracks[particle].simhits);
   }
   return m_mcparticleTracks[particle];

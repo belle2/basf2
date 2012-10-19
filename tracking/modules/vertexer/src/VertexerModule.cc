@@ -50,6 +50,7 @@ VertexerModule::VertexerModule() : Module()
 
 void VertexerModule::initialize()
 {
+  StoreArray<GFTrack>::required();
   if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();
@@ -64,7 +65,7 @@ void VertexerModule::initialize()
   if (m_useBeamSpot == true) {
     if (m_beamSpotPos.size() == 3 and m_beamSpotCov.size() == 9) {
       TVector3 beamSpotPos(m_beamSpotPos[0], m_beamSpotPos[1], m_beamSpotPos[2]);
-      TMatrixD beamSpotCov(3, 3, &m_beamSpotCov[0]); //this is a hack... when C++2011 is used .data() should used instead
+      TMatrixD beamSpotCov(3, 3, &m_beamSpotCov[0]); //when C++2011 is used .data() should used instead
       m_gfRaveVertexFactoryPtr->setBeamspot(beamSpotPos, beamSpotCov);
 //      beamSpotPos.Print();
 //      beamSpotCov.Print();
@@ -80,6 +81,7 @@ void VertexerModule::initialize()
 void VertexerModule::beginRun()
 {
   m_ndfTooSmallCounter = 0;
+  m_fittedVertices = 0;
 }
 
 void VertexerModule::event()
@@ -91,7 +93,7 @@ void VertexerModule::event()
   StoreArray<GFTrack> gfTracks;
   const int nGfTracks = gfTracks.getEntries();
   //StoreArray<MCParticle> mcParticles;
-  StoreArray<GFTrackCand> trackCandidates;
+  //StoreArray<GFTrackCand> trackCandidates;
 
   int ndf = 2 * nGfTracks;
   if (m_useBeamSpot == true) {
@@ -121,6 +123,7 @@ void VertexerModule::event()
 
   const int nVerticesFromRave = verticesFromRave.size();
   B2DEBUG(100, nVerticesFromRave << " vertices were found/fitted in event " << eventCounter);
+  m_fittedVertices += nVerticesFromRave;
 //write the fitted vertices to the storeArray and clean up the stuff created with new
   for (int i = 0; i not_eq nVerticesFromRave; ++i) {
     vertices.appendNew(*(verticesFromRave[i]));
@@ -134,9 +137,9 @@ void VertexerModule::endRun()
   if (m_ndfTooSmallCounter not_eq 0) {
     B2WARNING(m_ndfTooSmallCounter << " events had too little information to reconstruct at least one vertex");
   }
+  B2INFO(m_fittedVertices << " vertices were fitted by Rave in this Run");
 }
 void VertexerModule::terminate()
 {
-
   delete m_gfRaveVertexFactoryPtr;
 }

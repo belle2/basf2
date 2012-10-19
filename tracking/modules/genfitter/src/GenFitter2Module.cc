@@ -98,6 +98,8 @@ GenFitter2Module::~GenFitter2Module()
 
 void GenFitter2Module::initialize()
 {
+
+  StoreArray<GFTrackCand>::required();
   if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();

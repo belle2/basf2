@@ -94,11 +94,8 @@ TrackFitCheckerModule::~TrackFitCheckerModule()
 
 void TrackFitCheckerModule::initialize()
 {
-
-  //cerr << "m_inspectTracks " << m_inspectTracks << endl;
-
-
-
+  StoreArray<GFTrack>::required();
+  StoreArray<MCParticle>::required();
   if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();
@@ -448,8 +445,9 @@ void TrackFitCheckerModule::event()
     zVertexPosMom[5] = resVertexPosMom[5] / sqrt(vertexCov[5][5]);
     fillTrackWiseVecData("pulls_vertexPosMom", zVertexPosMom);
     B2DEBUG(100, "filled all track wise tests");
+    //cerr << "fick dich du dummes arschloch!!!!!!!!!!!" << endl;
     if (m_nLayers not_eq 0) { // now the layer wise tests
-
+      //cerr << "m_nLayers: " << m_nLayers << endl;
       extractTrackData(aTrackPtr, charge); // read all the data for the layer wise tests from GFTracks
       B2DEBUG(100, "extractTrackData finished successfully");
       // do the layer wise test uses only data from GFTrack object
@@ -1002,7 +1000,7 @@ void TrackFitCheckerModule::fillInt(const std::string& nameOfDataSample, const i
 void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const double charge)
 {
 
-
+  //cerr << "1";
   //make sure anything from the last track is cleared;
   m_trackData.accuVecIndices.clear();
   m_trackData.detIds.clear();
@@ -1028,13 +1026,15 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
   TMatrixT<double> cov;
   for (int iGFHit = 0; iGFHit not_eq m_trackData.nHits; ++iGFHit) {
     GFAbsRecoHit*  aGFAbsRecoHitPtr = aTrackPtr->getHit(iGFHit);
-
+    //cerr << "2 iGFHit " << iGFHit << "\n";
     VXDTrueHit const* aVxdTrueHitPtr = NULL;
     PXDRecoHit const*  aPxdRecoHitPtr = dynamic_cast<PXDRecoHit const* >(aGFAbsRecoHitPtr);
     SVDRecoHit2D const*  aSvdRecoHit2DPtr =  dynamic_cast<SVDRecoHit2D  const* >(aGFAbsRecoHitPtr);
     SVDRecoHit const*  aSvdRecoHitPtr =  dynamic_cast<SVDRecoHit  const* >(aGFAbsRecoHitPtr);
     CDCRecoHit const*  aCdcRecoHitPtr = dynamic_cast<CDCRecoHit const* >(aGFAbsRecoHitPtr); // cannot use the additional const here because the getter fuctions inside the CDCRecoHit class are not decleared as const (although they could be const)
+
     if (aPxdRecoHitPtr not_eq NULL) {
+      //cerr << "aPxdRecoHitPtr";
       m_trackData.accuVecIndices.push_back(aPxdRecoHitPtr->getSensorID().getLayerNumber() - 1);
       m_trackData.detIds.push_back(0);
       if (m_truthAvailable == true) {
@@ -1063,6 +1063,7 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
         }
       }
     } else if (aSvdRecoHit2DPtr not_eq NULL) {
+      //cerr << "aSvdRecoHit2DPtr";
       int accuVecIndex = aSvdRecoHit2DPtr->getSensorID().getLayerNumber() - 1;
       if (m_nPxdLayers == 0) {
         accuVecIndex -= 2; // if the PXD is not simulated the first SVD layer will use the 0 element in all the layer wise statistics container
@@ -1078,6 +1079,7 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
         }
       }
     } else if (aSvdRecoHitPtr not_eq NULL) {
+      //cerr << "aSvdRecoHitPtr";
       int accuVecIndex = aSvdRecoHitPtr->getSensorID().getLayerNumber() - 1;
       if (m_nPxdLayers == 0) {
         accuVecIndex -= 2; // if the PXD is not simulated the first SVD layer will use the 0 element in all the layer wise statistics container
@@ -1102,6 +1104,7 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
 
 
     } else if (aCdcRecoHitPtr not_eq NULL) {
+      //cerr << "aCdcRecoHitPtr";
       m_trackData.accuVecIndices.push_back(aCdcRecoHitPtr->getWireID().getICLayer() + m_nPxdLayers + m_nSvdLayers);
       m_trackData.detIds.push_back(2);
     } else {
@@ -1111,16 +1114,17 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
 //    if (m_testDaf == true or(aCdcRecoHitPtr not_eq NULL and m_testCdc == false) or(aPxdRecoHitPtr not_eq NULL and m_testSi == false)or(aSvdRecoHit2DPtr not_eq NULL and m_testSi == false)) {    // skip all other stuff when daf is tested because it is not used // something is wrong with the skipping better leave it out
 //      continue;
 //    }
-    GFDetPlane detPlaneOfRecoHit = aGFAbsRecoHitPtr->getDetPlane(aTrackPtr->getTrackRep(trackRepId));
+    //cerr << "4";
+    GFDetPlane detPlaneOfRecoHit = aGFAbsRecoHitPtr->getDetPlane(rep);
 
-
+    //cerr << "5";
 
     TMatrixD m;
     TMatrixD V;
     //cerr << "bin hier vor get measurement\n";
     aGFAbsRecoHitPtr->getMeasurement(rep, detPlaneOfRecoHit, rep->getState(), rep->getCov(), m, V);
     //cerr << "und jetzt danach\n";
-    m_trackData.Hs.push_back(aGFAbsRecoHitPtr->getHMatrix(aTrackPtr->getTrackRep(0)));
+    m_trackData.Hs.push_back(aGFAbsRecoHitPtr->getHMatrix(rep));
     m_trackData.ms.push_back(m);
     m_trackData.Vs.push_back(V);
 
@@ -1133,7 +1137,7 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
     aTrackPtr->getBK(trackRepId)->getMatrix("bUpCov", iGFHit, cov);
     m_trackData.states_bu.push_back(state);
     m_trackData.covs_bu.push_back(cov);
-    //cerr << "gebias\n";
+    //cerr << "getbias\n";
     GFTools::getBiasedSmoothedData(aTrackPtr, trackRepId, iGFHit, state, cov);
     //cerr << "und jetzt danach\n";
     m_trackData.states_sm.push_back(state);
@@ -1229,6 +1233,7 @@ void TrackFitCheckerModule::normalTests()
   TMatrixT<double> res;
   TMatrixT<double> R;
   for (int iGFHit = 0; iGFHit not_eq m_trackData.nHits; ++iGFHit) {
+    B2DEBUG(100, "function normalTests() processing hit " << iGFHit);
     int detId = m_trackData.detIds[iGFHit];
     int accuVecIndex = m_trackData.accuVecIndices[iGFHit];
     if (detId == 0 or detId == 1) {

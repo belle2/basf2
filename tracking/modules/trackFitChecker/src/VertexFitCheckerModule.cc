@@ -22,6 +22,7 @@
 
 #include <TVector3.h>
 #include <TMatrixD.h>
+#include <TGeoManager.h>
 
 #include <iostream>
 #include <cmath>
@@ -63,12 +64,16 @@ VertexFitCheckerModule::VertexFitCheckerModule() : Module()
 
 void VertexFitCheckerModule::initialize()
 {
-  //setup genfit geometry and magnetic field in case you what to used data saved on disc because then the genifitter modul was not run
-  // convert the geant4 geometry to a TGeo geometry
-  geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-  geoManager.createTGeoRepresentation();
-  //pass the magnetic field to genfit
-  GFFieldManager::getInstance()->init(new GFGeant4Field());
+
+  StoreArray<GFTrack>::required();
+  StoreArray<GFRaveVertex>::required();
+  StoreArray<MCParticle>::required();
+  if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
+    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+    geoManager.createTGeoRepresentation();
+    //pass the magnetic field to genfit
+    GFFieldManager::getInstance()->init(new GFGeant4Field());
+  }
   //configure the output
   m_textOutput.precision(4);
   if (m_writeToRootFile == true) {
@@ -152,6 +157,7 @@ void VertexFitCheckerModule::event()
   StoreArray<GFRaveVertex> vertices;
 
   const int nVertices = vertices.getEntries();
+  B2DEBUG(100, "there are " << nVertices << " in this event");
 
   for (int iVertex = 0; iVertex not_eq nVertices; ++iVertex) {
 
@@ -171,6 +177,7 @@ void VertexFitCheckerModule::event()
     for (int i = 0; i not_eq nTracks; ++i) {
       const GFRaveTrackParameters* const trackInfo = aGFRaveVertexPtr->getParameters(i);
       double pValueOfTrack = trackInfo->getRep()->getPVal();
+      B2DEBUG(100, "p value of track " << i << " in vertex " << iVertex << " is " << pValueOfTrack);
       if (pValueOfTrack < m_trackPValueCut) { // if contributing track is bad ignore this vertex
         ++m_badTrackPValueVertices;
         skipVertex = true;

@@ -644,21 +644,21 @@ void EVEVisualization::addSimHit(const SVDSimHit* hit, const MCParticle* particl
 }
 void EVEVisualization::addSimHit(const TOPSimHit* hit, const MCParticle* particle)
 {
+  /* TODO: conversion possible from local coordinates?
   const TVector3& global_pos = hit->getVposition(); //at photon emission
   addSimHit(global_pos, particle);
+  */
 }
 void EVEVisualization::addSimHit(const BKLMSimHit* hit, const MCParticle* particle)
 {
   const TVector3& global_pos = hit->getHitPosition();
   addSimHit(global_pos, particle);
 }
-/*
 void EVEVisualization::addSimHit(const EKLMSimHit* hit, const MCParticle* particle)
 {
   const TVector3* global_pos = hit->getPosition();
   addSimHit(*global_pos, particle);
 }
-*/
 void EVEVisualization::addSimHit(const TVector3& v, const MCParticle* particle)
 {
   TEvePointSet* simhits = addMCParticle(particle).simhits;

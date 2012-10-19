@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-// Own include
 
+// Own include
 #include <top/modules/TOPBackground/TOPBackgroundModule.h>
 #include <framework/core/ModuleManager.h>
 #include <time.h>
@@ -23,7 +23,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <TClonesArray.h>
-// Framwrok
+// Framwork
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
@@ -216,36 +216,33 @@ namespace Belle2 {
       for (int iHit = 0; iHit < nHits; ++iHit) {
         TOPBarHit* toptrk = topTracks[iHit];
 
-        int PDG = toptrk->getParticleID();
+        int PDG = toptrk->getPDG();
         int barID = toptrk->getBarID();
 
         if (PDG == 2112) {
-          nflux_bar->Fill(toptrk->getPosition().Z(), (barID - 1) * 22.5, 1. / 917.65 / m_TimeOfSimulation * yearns * 2.);
-          norigin->Fill(toptrk->getVPosition().Z());
+          nflux_bar->Fill(toptrk->getPosition().Z(), (barID - 1) * 22.5,
+                          1. / 917.65 / m_TimeOfSimulation * yearns * 2.);
+          norigin->Fill(toptrk->getProductionPoint().Z());
         } else {
           if (PDG == 22) {
-            gflux_bar->Fill(toptrk->getPosition().Z(), (barID - 1) * 22.5, 1. / 917.65 / m_TimeOfSimulation * 2.);
-            gorigin->Fill(toptrk->getVPosition().Z());
-
+            gflux_bar->Fill(toptrk->getPosition().Z(), (barID - 1) * 22.5,
+                            1. / 917.65 / m_TimeOfSimulation * 2.);
+            gorigin->Fill(toptrk->getProductionPoint().Z());
             genergy2->Fill(toptrk->getMomentum().Mag() * 1000);
-
-            origin_zx->SetPoint(count, toptrk->getVPosition().Z(), toptrk->getVPosition().X());
-            origin_zy->SetPoint(count, toptrk->getVPosition().Z() / 0.999143, toptrk->getVPosition().Y());
+            origin_zx->SetPoint(count, toptrk->getProductionPoint().Z(),
+                                toptrk->getProductionPoint().X());
+            origin_zy->SetPoint(count, toptrk->getProductionPoint().Z() / 0.999143,
+                                toptrk->getProductionPoint().Y());
             count++;
 
           } else {
-            cflux_bar->Fill(toptrk->getPosition().Z(), (barID - 1) * 22.5, 1. / 917.65 / m_TimeOfSimulation * 2.);
-            corigin->Fill(toptrk->getVPosition().Z());
+            cflux_bar->Fill(toptrk->getPosition().Z(), (barID - 1) * 22.5,
+                            1. / 917.65 / m_TimeOfSimulation * 2.);
+            corigin->Fill(toptrk->getProductionPoint().Z());
           }
         }
 
-
-
-
       }
-
-
-
     }
 
 

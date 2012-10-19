@@ -56,28 +56,27 @@ namespace Belle2 {
       //! get particle track
       G4Track* aTrack = aStep->GetTrack();
 
-      //! check which particle hit the bar
+      //! check which particle hits the bar
       G4ParticleDefinition* particle = aTrack->GetDefinition();
-
-      //! query for it's PDG number
       int  PDG = (int)(particle->GetPDGEncoding());
 
-      // Save all tracks excluding optical photons
+      // Save all particles except optical photons
       if (PDG == 0) return false;
 
       //! get the preposition, a step before current position
       G4StepPoint* PrePosition =  aStep->GetPreStepPoint();
 
+      //! Check that the hit comes from the bar boundary
+      if (PrePosition->GetStepStatus() != fGeomBoundary) return false;
+
       //! get lab frame position of the prestep point
       G4ThreeVector worldPosition = PrePosition->GetPosition();
-
-      //! Check that the hit come from the boundary
-      if (PrePosition->GetStepStatus() != fGeomBoundary) return false;
 
       //! Transform lab frame to bar frame
       G4ThreeVector localPosition = PrePosition->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
 
-      //! Check that it is on the outside boundary not on the glue boundary
+      //! Check that it is not on the glue boundary or similar
+      //!!!! this check is not a whole story -> to be re-written
       if (fabs(fabs(localPosition.y()) - (m_topgp->getQthickness() / 2)) > 10e-6) {
         return false ;
       }
@@ -91,65 +90,37 @@ namespace Belle2 {
       //! get global time
       double globalTime = PrePosition->GetGlobalTime();
 
-      //! get local time
-      double localTime = PrePosition->GetLocalTime();
-
       //! momentum on the boundary
       G4ThreeVector momentum = PrePosition->GetMomentum();
-
-      //! calculate momentum at vertex position
-      double Ekin = aTrack->GetVertexKineticEnergy();
-      double vmomentum = sqrt(Ekin * Ekin + 2 * Ekin * particle->GetPDGMass());
 
       //! Fill three vectors that hold momentum and position
       TVector3 TPosition(worldPosition.x(), worldPosition.y(), worldPosition.z());
       TVector3 TMomentum(momentum.x(), momentum.y(), momentum.z());
+      TVector3 TOrigin(aTrack->GetVertexPosition().x(),
+                       aTrack->GetVertexPosition().y(),
+                       aTrack->GetVertexPosition().z());
 
-      TVector3 TVPosition(aTrack->GetVertexPosition().x(),
-                          aTrack->GetVertexPosition().y(),
-                          aTrack->GetVertexPosition().z());
-      TVector3 TVMomentum(vmomentum * aTrack->GetVertexMomentumDirection().x(),
-                          vmomentum * aTrack->GetVertexMomentumDirection().y(),
-                          vmomentum * aTrack->GetVertexMomentumDirection().z());
+      //! convert to Basf units
+      TPosition = TPosition * Unit::mm;
+      TMomentum = TMomentum  * Unit::MeV;
+      TOrigin = TOrigin * Unit::mm;
+      tracklength = tracklength * Unit::mm;
 
       //! Get bar ID
       int barID = PrePosition->GetTouchableHandle()->GetReplicaNumber(2);
 
-      //! Get the charge of the particle
-      int PDGCharge = (int)particle->GetPDGCharge();
+      //! write the hit to datastore
+      StoreArray<TOPBarHit> barHits;
+      if (!barHits.isValid()) barHits.create();
+      new(barHits.nextFreeAddress()) TOPBarHit(barID, PDG, TOrigin, TPosition,
+                                               TMomentum, globalTime, tracklength);
 
-      //! convert to Basf units
-      TPosition = TPosition * Unit::mm;
-      TVPosition = TVPosition * Unit::mm;
-      TMomentum = TMomentum  * Unit::MeV;
-      TVMomentum = TVMomentum  * Unit::MeV;
-      tracklength = tracklength * Unit::mm;
-
-
-      /*!------------------------------------------------------------
-       *                Create TOPBarHit and save it to datastore
-       * ------------------------------------------------------------
-       */
-
-      StoreArray<TOPBarHit> topTracks;
-      if (!topTracks.isValid()) topTracks.create();
-
-      new(topTracks.nextFreeAddress()) TOPBarHit(trackID, PDG, PDGCharge, TPosition,
-                                                 TVPosition, TMomentum, TVMomentum,
-                                                 barID, tracklength, globalTime, localTime);
-
-
-      /*!--------------------------------------------------------------------------
-       *                Make relation between TOPBarHit and MCParticle
-       * --------------------------------------------------------------------------
-       */
-
+      //! set the relation
       StoreArray<MCParticle> mcParticles;
-      RelationArray relMCParticleToTOPBarHit(mcParticles, topTracks);
-      int last = topTracks.getEntries() - 1;
-      relMCParticleToTOPBarHit.add(trackID, last);
+      RelationArray rel(mcParticles, barHits);
+      int last = barHits.getEntries() - 1;
+      rel.add(trackID, last);
 
-      //! everything done successfully
       return true;
     }
 

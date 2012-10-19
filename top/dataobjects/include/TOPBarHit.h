@@ -30,126 +30,105 @@ namespace Belle2 {
     /*! Default constructor
      */
     TOPBarHit():
-      m_trackID(-1),
-      m_particleID(-1),
-      m_charge(0),
-      m_position(0, 0, 0),
-      m_vposition(0, 0, 0),
-      m_momentum(0, 0, 0),
-      m_vmomentum(0, 0, 0),
-      m_barID(-1),
-      m_length(0.),
-      m_globaltime(0.),
-      m_localtime(0.) {
+      m_barID(0),
+      m_pdg(0),
+      m_x0(0.0),
+      m_y0(0.0),
+      m_z0(0.0),
+      m_x(0.0),
+      m_y(0.0),
+      m_z(0.0),
+      m_px(0.0),
+      m_py(0.0),
+      m_pz(0.0),
+      m_time(0.0),
+      m_length(0.) {
     }
 
-    /*!  Full constructor.
-     * @param trackID    Geant4 track id
-     * @param particleID PDG encoding
-     * @param charge     charge
-     * @param position   impact point
-     * @param vposition  production point
-     * @param momentum   impact momentum vector
-     * @param vmomentum  production momentum vector
+    /*!  Full constructor
      * @param barID      bar ID
-     * @param length     track length
-     * @param globaltime global time
-     * @param localtime  local time
+     * @param PDG        PDG code of particle
+     * @param origin     production point
+     * @param impact     impact point
+     * @param momentum   impact momentum
+     * @param time       impact time
+     * @param length     length of particle trajectory to impact point
      */
     TOPBarHit(
-      int trackID,
-      int particleID,
-      int charge,
-      TVector3 position,
-      TVector3 vposition,
-      TVector3 momentum,
-      TVector3 vmomentum,
       int barID,
-      double length,
-      double globaltime,
-      double localtime
+      int PDG,
+      TVector3 origin,
+      TVector3 impact,
+      TVector3 momentum,
+      double time,
+      double length
     ) {
-      m_trackID = trackID;
-      m_particleID = particleID;
-      m_charge = charge;
-      m_position = position;
-      m_vposition = vposition;
-      m_momentum = momentum;
-      m_vmomentum = vmomentum;
       m_barID = barID;
-      m_length = length;
-      m_globaltime = globaltime;
-      m_localtime = localtime;
+      m_pdg = PDG;
+      m_x0 = (float) origin.x();
+      m_y0 = (float) origin.y();
+      m_z0 = (float) origin.z();
+      m_x = (float) impact.x();
+      m_y = (float) impact.y();
+      m_z = (float) impact.z();
+      m_px = (float) momentum.x();
+      m_py = (float) momentum.y();
+      m_pz = (float) momentum.z();
+      m_time = (float) time;
+      m_length = (float) length;
     }
 
-    /*! Get G4 track ID
-     * @return G4 track ID
+    /*! Get bar ID
+     * @return bar ID
      */
-    int getTrackID() const { return m_trackID; }
+    int getBarID() const { return m_barID;}
 
-    /*! Get PDG code
+    /*! Get PDG code of particle
      * @return PDG code
      */
-    int getParticleID() const { return m_particleID; }
-
-    /*! Get particle charge
-     * @return charge
-     */
-    int getCharge() const { return m_charge;}
-
-    /*! Get impact point
-     * @return impact position
-     */
-    const TVector3& getPosition() const { return m_position; }
+    int getPDG() const { return m_pdg; }
 
     /*! Get production point
      * @return production position
      */
-    const TVector3& getVPosition() const { return m_vposition; }
+    TVector3 getProductionPoint() const { TVector3 vec(m_x0, m_y0, m_z0); return vec; }
+
+    /*! Get impact point
+     * @return impact position
+     */
+    TVector3 getPosition() const { TVector3 vec(m_x, m_y, m_z); return vec; }
 
     /*! Get impact momentum
      * @return impact momentum vector
      */
-    const TVector3& getMomentum() const { return m_momentum; }
-
-    /*! Get production momentum
-     * @return production momentum vector
-     */
-    const TVector3& getVMomentum() const { return m_vmomentum; }
-
-    /*! Get impact bar ID
-     * @return bar ID
-     */
-    int getBarID() const { return m_barID;}
+    TVector3 getMomentum() const { TVector3 vec(m_px, m_py, m_pz); return vec; }
 
     /*! Get tract length from production to impact point
      * @return track length
      */
     double getLength() const { return m_length; }
 
-    /*! Get time since the begining of event
-     * @return global time
+    /*! Get time of impact
+     * @return time
      */
-    double getGlobalTime() const { return m_globaltime; }
+    double getTime() const { return m_time; }
 
-    /*! Get time since production of particle
-     * @return local time
-     */
-    double getLocalTime() const { return m_localtime; }
 
   private:
 
-    int m_trackID;             /**< G4 track id */
-    int m_particleID;          /**< PDG code */
-    int m_charge;              /**< charge */
-    TVector3 m_position;       /**< impact point */
-    TVector3 m_vposition;      /**< production point */
-    TVector3 m_momentum;       /**< impact momentum vector */
-    TVector3 m_vmomentum;      /**< production momentum vector */
-    int m_barID;               /**< bar ID */
-    double m_length;           /**< track length */
-    double m_globaltime;       /**< global time at impact */
-    double m_localtime;        /**< local time at impact */
+    int m_barID;          /**< bar ID */
+    int m_pdg;            /**< PDG code of particle */
+    float m_x0;           /**< production point, x component */
+    float m_y0;           /**< production point, y component */
+    float m_z0;           /**< production point, z component */
+    float m_x;            /**< impact point, x component */
+    float m_y;            /**< impact point, y component */
+    float m_z;            /**< impact point, z component */
+    float m_px;           /**< impact momentum, x component */
+    float m_py;           /**< impact momentum, y component */
+    float m_pz;           /**< impact momentum, z component */
+    float m_time;         /**< impact time */
+    float m_length;       /**< length of particle trajectory to impact point */
 
     ClassDef(TOPBarHit, 1);     /**< ClassDef */
 

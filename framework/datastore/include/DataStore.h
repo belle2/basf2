@@ -87,9 +87,8 @@ namespace Belle2 {
     static DataStore& Instance();
 
     //--------------------------------- default name stuff -----------------------------------------------------
-    /** Return the default storage name for an object of the given type. */
-    template<class T> static const std::string defaultObjectName() {
-      std::string classname = T::Class_Name();
+    /** Return the default storage name for given class name. */
+    static const std::string defaultObjectName(std::string classname) {
       //Strip qualifiers like namespaces
       size_t colon = classname.rfind("::");
       if (colon != std::string::npos) {
@@ -98,9 +97,19 @@ namespace Belle2 {
       return classname;
     }
 
+    /** Return the default storage name for an object of the given type. */
+    template<class T> static const std::string defaultObjectName() {
+      return defaultObjectName(T::Class_Name());
+    }
+
     /** Return the storage name for an object of the given type and name. */
     template<class T> static const std::string objectName(const std::string& name) {
       return ((name == "") ? defaultObjectName<T>() : name);
+    }
+
+    /** Return the default storage name for an given class name. */
+    static const std::string defaultArrayName(std::string classname) {
+      return defaultObjectName(classname) + 's';
     }
 
     /** Return the default storage name for an array of the given type. */
@@ -199,10 +208,115 @@ namespace Belle2 {
     /** Get a reference to the object/array map. */
     const StoreObjMap& getStoreObjectMap(EDurability durability) { return m_storeObjMap[durability]; }
 
+    /** Add a relation from an object in a store array to another object in a store array.
+     *
+     *  @param fromObject     Pointer to the object from which the relation points.
+     *  @param fromEntry      Data store entry that contains the fromObject. Used for caching. Will be set if 0.
+     *  @param fromIndex      Index in TClonesArray that contains the fromObject. Used for caching. Will be set if < 0..
+     *  @param toObject       Pointer to the object to which the relation points.
+     *  @param weight         Weight of the relation.
+     *  @return               True if the relation was created, false otherwise.
+     */
     bool addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, double weight);
-    std::vector<RelationEntry> getRelationsTo(TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, TClass* toClass, std::string name);
-    std::vector<RelationEntry> getRelationsFrom(TObject* toObject, StoreEntry*& toEntry, int& toIndex, TClass* fromClass, std::string name);
-    std::vector<RelationEntry> getRelationsWith(TObject* object, StoreEntry*& entry, int& index, TClass* withClass, std::string name);
+
+    /** Get the relations from an object to other objects in a store array.
+     *
+     *  @param fromObject     Pointer to the object from which the relations point.
+     *  @param fromEntry      Data store entry that contains the fromObject. Used for caching. Will be set if 0.
+     *  @param fromIndex      Index in TClonesArray that contains the fromObject. Used for caching. Will be set if < 0..
+     *  @param toClass        Class of the objects to which the relations point.
+     *  @param name           The name of the store array to which the relations point.
+     *                        If empty the default store array name for toClass will be used.
+     *  @return               Vector of relation entry objects.
+     */
+    std::vector<RelationEntry> getRelationsFromTo(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, TClass* toClass, std::string name);
+
+    /** Get the relations to an object from other objects in a store array.
+     *
+     *  @param toObject       Pointer to the object to which the relations point.
+     *  @param toEntry        Data store entry that contains the toObject. Used for caching. Will be set if 0.
+     *  @param toIndex        Index in TClonesArray that contains the toObject. Used for caching. Will be set if < 0..
+     *  @param fromClass      Class of the objects from which the relations point.
+     *  @param name           The name of the store array from which the relations point.
+     *                        If empty the default store array name for fromClass will be used.
+     *  @return               Vector of relation entry objects.
+     */
+    std::vector<RelationEntry> getRelationsToFrom(const TObject* toObject, StoreEntry*& toEntry, int& toIndex, TClass* fromClass, std::string name);
+
+    /** Get the relations between an object and other objects in a store array.
+     *
+     *  Relations in both directions are returned. The direction is encoded in the sign
+     *  of the weight. Relations that point to the object have a negative weight.
+     *  @param object         Pointer to the object from or to which the relations point.
+     *  @param entry          Data store entry that contains the object. Used for caching. Will be set if 0.
+     *  @param index          Index in TClonesArray that contains the object. Used for caching. Will be set if < 0..
+     *  @param withClass      Class of the objects to or from which the relations point.
+     *  @param name           The name of the store array to or from which the relations point.
+     *                        If empty the default store array name for withClass will be used.
+     *  @return               Vector of relation entry objects.
+     */
+    std::vector<RelationEntry> getRelationsWith(const TObject* object, StoreEntry*& entry, int& index, TClass* withClass, std::string name);
+
+    /** Add a relation from an object in a store array to another object in a store array.
+     *
+     *  @sa RelationsInterface::addRelationTo
+     *  @param fromObject     Pointer to the object from which the relation points.
+     *  @param toObject       Pointer to the object to which the relation points.
+     *  @param weight         Weight of the relation.
+     *  @return               True if the relation was created, false otherwise.
+     */
+    static bool addRelationFromTo(const TObject* fromObject, const TObject* toObject, double weight = 1) {
+      DataStore::StoreEntry* storeEntry = 0;
+      int index = -1;
+      return Instance().addRelation(fromObject, storeEntry, index, toObject, weight);
+    }
+
+    /** Get the relations from an object to other objects in a store array.
+     *
+     *  @sa RelationsInterface::getRelationsTo
+     *  @param object         Pointer to the object from which the relations point.
+     *  @tparam T             Class of the objects to which the relations point.
+     *  @param name           The name of the store array to which the relations point.
+     *                        If empty the default store array name for toClass will be used.
+     *  @return               Vector of relation entry objects.
+     */
+    template <class T> static RelationVector<T> getRelationsFromObj(const TObject* object, std::string name = "") {
+      StoreEntry* storeEntry = 0;
+      int index = -1;
+      return RelationVector<T>(Instance().getRelationsFromTo(object, storeEntry, index, T::Class(), name));
+    }
+
+    /** Get the relations to an object from other objects in a store array.
+     *
+     *  @sa RelationsInterface::getRelationsFrom
+     *  @param object         Pointer to the object to which the relations point.
+     *  @tparam T             Class of the objects from which the relations point.
+     *  @param name           The name of the store array from which the relations point.
+     *                        If empty the default store array name for fromClass will be used.
+     *  @return               Vector of relation entry objects.
+     */
+    template <class T> static RelationVector<T> getRelationsToObj(const TObject* object, std::string name = "") {
+      StoreEntry* storeEntry = 0;
+      int index = -1;
+      return RelationVector<T>(Instance().getRelationsToFrom(object, storeEntry, index, T::Class(), name));
+    }
+
+    /** Get the relations between an object and other objects in a store array.
+     *
+     *  Relations in both directions are returned. The direction is encoded in the sign
+     *  of the weight. Relations that point to the object have a negative weight.
+     *  @sa RelationsInterface::getRelationsWith
+     *  @param object         Pointer to the object from or to which the relations point.
+     *  @tparam T             Class of the objects to or from which the relations point.
+     *  @param name           The name of the store array to or from which the relations point.
+     *                        If empty the default store array name for withClass will be used.
+     *  @return               Vector of relation entry objects.
+     */
+    template <class T> static RelationVector<T> getRelationsWithObj(const TObject* object, std::string name = "") {
+      StoreEntry* storeEntry = 0;
+      int index = -1;
+      return RelationVector<T>(Instance().getRelationsWith(object, storeEntry, index, T::Class(), name));
+    }
 
     //------------------------------ Start and end procedures --------------------------------------------------
     /** Setter for m_initializeActive.

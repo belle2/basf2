@@ -174,34 +174,35 @@ bool DataStore::createObject(TObject* object, bool replace, const std::string& n
 
 bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& entry, int& index)
 {
-  if (!entry) {
-    TClass* objectClass = object->IsA();
-    for (StoreObjIter iter = m_storeObjMap[c_Event].begin(); iter != m_storeObjMap[c_Event].end(); ++iter) {
-      if (iter->second->ptr && iter->second->isArray) {
-        TClonesArray* array = static_cast<TClonesArray*>(iter->second->ptr);
-        TClass* arrayClass = array->GetClass();
-        if (arrayClass == objectClass) {
-          index = array->IndexOf(object);
-          if (index >= 0) {
-            entry = iter->second;
-            return true;
-          }
+  if (entry && entry->ptr && (index >= 0)) {
+    if (static_cast<TClonesArray*>(entry->ptr)->At(index) == object) return true;
+    index = static_cast<TClonesArray*>(entry->ptr)->IndexOf(object);
+    if (index >= 0) return true;
+  }
+  entry = 0;
+  index = -1;
+
+  TClass* objectClass = object->IsA();
+  for (StoreObjIter iter = m_storeObjMap[c_Event].begin(); iter != m_storeObjMap[c_Event].end(); ++iter) {
+    if (iter->second->ptr && iter->second->isArray) {
+      TClonesArray* array = static_cast<TClonesArray*>(iter->second->ptr);
+      TClass* arrayClass = array->GetClass();
+      if (arrayClass == objectClass) {
+        index = array->IndexOf(object);
+        if (index >= 0) {
+          entry = iter->second;
+          return true;
         }
       }
     }
-    return false;
   }
-
-  if (!entry->ptr) return false;
-  index = static_cast<TClonesArray*>(entry->ptr)->IndexOf(object);
-  return (index >= 0);
+  return false;
 }
 
 bool DataStore::addRelation(const TObject* fromObject, DataStore::StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, double weight)
 {
-  if (fromIndex < 0) {
-    if (!findStoreEntry(fromObject, fromEntry, fromIndex)) return false;
-  }
+  if (!findStoreEntry(fromObject, fromEntry, fromIndex)) return false;
+
   StoreEntry* toEntry = 0;
   int toIndex = -1;
   if (!findStoreEntry(toObject, toEntry, toIndex)) return false;
@@ -216,15 +217,15 @@ bool DataStore::addRelation(const TObject* fromObject, DataStore::StoreEntry*& f
   return true;
 }
 
-std::vector<RelationEntry> DataStore::getRelationsTo(TObject* fromObject, DataStore::StoreEntry*& fromEntry, int& fromIndex, TClass* toClass, std::string name)
+std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObject, DataStore::StoreEntry*& fromEntry, int& fromIndex, TClass* toClass, std::string name)
 {
   std::vector<RelationEntry> result;
 
-  if (fromIndex < 0) {
-    if (!findStoreEntry(fromObject, fromEntry, fromIndex)) return result;
-  }
+  if (!findStoreEntry(fromObject, fromEntry, fromIndex)) return result;
+
   string toName = name;
-  if (name.empty()) name = toClass->GetName();
+  if (name.empty()) toName = defaultArrayName(toClass->GetName());
+
   if (m_storeObjMap[c_Event].find(toName) == m_storeObjMap[c_Event].end()) return result;
   TClonesArray* toArray = static_cast<TClonesArray*>(m_storeObjMap[c_Event][toName]->ptr);
   if (!toArray) return result;
@@ -248,15 +249,15 @@ std::vector<RelationEntry> DataStore::getRelationsTo(TObject* fromObject, DataSt
   return result;
 }
 
-std::vector<RelationEntry> DataStore::getRelationsFrom(TObject* toObject, DataStore::StoreEntry*& toEntry, int& toIndex, TClass* fromClass, std::string name)
+std::vector<RelationEntry> DataStore::getRelationsToFrom(const TObject* toObject, DataStore::StoreEntry*& toEntry, int& toIndex, TClass* fromClass, std::string name)
 {
   std::vector<RelationEntry> result;
 
-  if (toIndex < 0) {
-    if (!findStoreEntry(toObject, toEntry, toIndex)) return result;
-  }
+  if (!findStoreEntry(toObject, toEntry, toIndex)) return result;
+
   string fromName = name;
-  if (name.empty()) name = fromClass->GetName();
+  if (name.empty()) fromName = defaultArrayName(fromClass->GetName());
+
   if (m_storeObjMap[c_Event].find(fromName) == m_storeObjMap[c_Event].end()) return result;
   TClonesArray* fromArray = static_cast<TClonesArray*>(m_storeObjMap[c_Event][fromName]->ptr);
   if (!fromArray) return result;
@@ -280,11 +281,11 @@ std::vector<RelationEntry> DataStore::getRelationsFrom(TObject* toObject, DataSt
   return result;
 }
 
-std::vector<RelationEntry> DataStore::getRelationsWith(TObject* object, DataStore::StoreEntry*& entry, int& index, TClass* withClass, std::string name)
+std::vector<RelationEntry> DataStore::getRelationsWith(const TObject* object, DataStore::StoreEntry*& entry, int& index, TClass* withClass, std::string name)
 {
-  std::vector<RelationEntry> result = getRelationsTo(object, entry, index, withClass, name);
+  std::vector<RelationEntry> result = getRelationsFromTo(object, entry, index, withClass, name);
 
-  std::vector<RelationEntry> fromResult = getRelationsFrom(object, entry, index, withClass, name);
+  std::vector<RelationEntry> fromResult = getRelationsToFrom(object, entry, index, withClass, name);
   for (unsigned int i = 0; i < fromResult.size(); i++) {
     fromResult[i].weight = -fromResult[i].weight;
   }

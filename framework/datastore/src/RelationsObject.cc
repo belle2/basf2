@@ -8,12 +8,5 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/datastore/RelationsInterface.h>
-
-using namespace Belle2;
-
-bool RelationsInterface::addRelationTo(const TObject* object, double weight)
-{
-  return DataStore::Instance().addRelation(reinterpret_cast<TObject*>(this), m_cacheDataStoreEntry, m_cacheArrayIndex, object, weight);
-}
+#include <framework/datastore/RelationsObject.h>
 

@@ -367,7 +367,7 @@ namespace Belle2 {
     /** Check whether the given entry and the requested class match.
      *
      *  @param name       Name of the DataStore map entry.
-     *  @param entry      The existing DataSotre entry.
+     *  @param entry      The existing DataStore entry.
      *  @param objClass   The class of the object.
      *  @param array      Whether it is a TClonesArray or not.
      *  @return           True if both types match.
@@ -375,6 +375,13 @@ namespace Belle2 {
     bool checkType(const std::string& name, const StoreEntry* entry,
                    const TClass* objClass, bool array) const;
 
+    /** Find an object in an array in the data store.
+     *
+     *  @param object     Pointer to the object.
+     *  @param entry      The DataStore entry that contains the object.
+     *  @param index      The index of the object in the array.
+     *  @return           True if the object was found in the data store
+     */
     bool findStoreEntry(const TObject* object, StoreEntry*& entry, int& index);
 
     /** Map for all objects/arrays in the data store.

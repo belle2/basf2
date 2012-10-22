@@ -20,6 +20,7 @@
 
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/GearDir.h> // needed for reading xml-files
 #include <svd/reconstruction/SVDRecoHit2D.h>

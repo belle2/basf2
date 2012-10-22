@@ -130,8 +130,8 @@ namespace Belle2 {
        * Get accumulated calls for a given counter type
        * @param type which counter to return. c_Total returns the sums of all other counters
        */
-      double getCalls(ECounters type = c_Event) const {
-        if (type >= c_Total) return std::accumulate(m_calls.begin(), m_calls.end(), 0.0);
+      unsigned int getCalls(ECounters type = c_Event) const {
+        if (type >= c_Total) return std::accumulate(m_calls.begin(), m_calls.end(), 0);
         return m_calls[type];
       }
     protected:

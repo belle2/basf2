@@ -73,10 +73,14 @@ namespace Belle2 {
     ModulePtrList m_input_list;
     /** output modules with multi-process support */
     ModulePtrList m_output_list;
+    /** handler to fork and manage processes. */
     ProcHandler* procHandler;
 
+    /** list of input paths (contains one path. why a list?) */
     std::vector<PathPtr> m_inpathlist;
+    /** list of main paths (contains one path. why a list?) */
     std::vector<PathPtr> m_bodypathlist;
+    /** list of output paths (contains one path. why a list?) */
     std::vector<PathPtr> m_outpathlist;
 
     /** input RingBuffers */

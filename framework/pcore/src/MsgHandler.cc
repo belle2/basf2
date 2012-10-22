@@ -13,8 +13,6 @@
 //#include <iostream>
 //#include <cassert>
 
-// #include "pcore/EvtMessage.h"
-
 
 #define MAX_BUFFER_SIZE 400000000
 #define MAX_OBJECT_SIZE 1000000
@@ -26,14 +24,14 @@ MsgHandler::MsgHandler(int complevel)
 {
   //  printf("MsgHandler : constructor called.....\n");
   B2INFO("MsgHandler : constructor called.....");
-  m_cbuf = (char*) malloc(MAX_BUFFER_SIZE);
+  //m_cbuf = (char*) malloc(MAX_BUFFER_SIZE);
   m_complevel = complevel;
 }
 
 MsgHandler::~MsgHandler(void)
 {
   //  printf("MsgHandler : destructor called.....\n");
-  free(m_cbuf);
+  //free(m_cbuf);
 }
 
 void MsgHandler::clear(void)
@@ -41,7 +39,7 @@ void MsgHandler::clear(void)
   m_buf.clear();
 }
 
-bool MsgHandler::add(TObject* obj, string name)
+bool MsgHandler::add(const TObject* obj, const string& name)
 {
   /*
   if ( obj == NULL ) {

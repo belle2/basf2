@@ -30,7 +30,7 @@ namespace Belle2 {
     /*! Clear object list */
     virtual void clear(void);
     /*! Add an object to be streamed */
-    virtual bool add(TObject*, std::string name);
+    virtual bool add(const TObject*, const std::string& name);
 
     /*! Stream object list into an EvtMessage */
     virtual EvtMessage* encode_msg(RECORD_TYPE rectype);
@@ -39,9 +39,9 @@ namespace Belle2 {
 
   private:
     std::vector<TMessage*> m_buf; /**< list of messages already added. */
-    std::vector<std::string> m_name;
+    std::vector<std::string> m_name; /**< names of objects stored in m_buf. */
     int m_complevel; /**< compression level, from 0 (none) to 9 (highest). */
-    char* m_cbuf;
+    //char* m_cbuf; //TODO remove?
 
 
   };

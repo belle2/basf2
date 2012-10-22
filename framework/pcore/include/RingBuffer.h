@@ -26,20 +26,20 @@ namespace Belle2 {
 
   /*! A structure to manage ring buffer. Placed on top of the shared memory. */
   struct RingBufInfo {
-    int size;
+    int size; /**< ring buffer size, minus this header. */
     int remain;
     int wptr;
     int prevwptr;
     int rptr;
     int nbuf;
-    int semid;
-    int nattached;
+    int semid; /**< Semaphore ID. */
+    int nattached; /**< Number of RingBuffer instances currently attached to this buffer. */
     int redzone;
     int readbuf;
     int mode;
     int msgid;
-    int ninsq;
-    int nremq;
+    int ninsq; /**< Count insq() calls for this buffer. */
+    int nremq; /**< Count remq() calls for this buffer. */
   };
 
   /*! Class to manage a Ring Buffer placed in an IPC shared memory */
@@ -75,37 +75,34 @@ namespace Belle2 {
     int ninsq(void);
     int nremq(void);
 
+    /** Return number of insq() calls. */
     int insq_counter(void);
+    /** Return number of remq() calls. */
     int remq_counter(void);
 
   private:
-    int compress(void);
+    /** Lock the given semaphore. */
     int sem_lock(int);
+    /** Unlock the given semaphore. */
     int sem_unlock(int);
 
   private:
-    bool m_new;
+    bool m_new; /**< True if we created the ring buffer ourselves (and need to clean it). */
     bool m_file;
     std::string m_pathname;
-    int  m_pathfd;
-    key_t m_shmkey;
-    key_t m_semkey;
+    int  m_pathfd; /** Associated file descriptor. */
+    key_t m_shmkey; /**< SHM key, see shmget(2). */
+    key_t m_semkey; /**< Semaphore key, see semget(2). */
 
-    int  m_shmid;
-    int* m_shmadr;
-    int  m_shmsize;
-    struct RingBufInfo* m_bufinfo;
-    int* m_buftop;
-    int  m_semid;
-    int  m_msgid;
-    int  m_remq_counter;
-    int  m_insq_counter;
+    int  m_shmid; /**< ID of shared memory segment. (See shmget(2)) */
+    int* m_shmadr; /**< Address of attached shared memory segment. (See shmat(2)) */
+    int  m_shmsize; /**< Size of shared memory segment, in bytes. */
+    struct RingBufInfo* m_bufinfo; /**< structure to manage ring buffer. Placed on top of the shared memory. */
+    int* m_buftop; /**< Points to memory after the end of m_bufinfo. */
+    int  m_semid; /**< Semaphore ID. */
+    int  m_remq_counter; /**< count remq() calls. */
+    int  m_insq_counter; /**< count insq() calls. */
   };
 
-} // namespace Roobasf
-
-
+}
 #endif
-
-
-

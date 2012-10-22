@@ -53,6 +53,7 @@ namespace Belle2 {
     DataStore::Instance().setInitializeActive(false);
 
     RelationArray relation(*evtData, *profileData);
+    relation.create();
     EXPECT_TRUE(relation);
   }
 
@@ -69,6 +70,7 @@ namespace Belle2 {
 
     EXPECT_FALSE(RelationArray(DataStore::relationName(evtData->getName(), profileData->getName())));
     RelationArray relation(*evtData, *profileData);
+    relation.create();
     EXPECT_TRUE(RelationArray(*evtData, *profileData, "", DataStore::c_Event));
     string name = relation.getName();
     EXPECT_TRUE(RelationArray(name));
@@ -78,24 +80,9 @@ namespace Belle2 {
     EXPECT_FALSE(RelationArray(DataStore::relationName(evtData2.getName(), profileData->getName()), DataStore::c_Event));
     EXPECT_FALSE(RelationArray("OwnNameToProfileInfos", DataStore::c_Event));
     RelationArray relation2(evtData2, *profileData);
+    relation2.create();
     EXPECT_TRUE(relation2.getName() == "OwnNameToProfileInfos");
     EXPECT_TRUE(RelationArray(evtData2, *profileData));
-  }
-
-  /** Test that adding to an invalid relation yields a FATAL */
-  TEST_F(RelationTest, AddInvalidDeathTest)
-  {
-    DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), profileData->getName()));
-    DataStore::Instance().setInitializeActive(false);
-
-    RelationArray relation(DataStore::relationName(evtData->getName(), profileData->getName()));
-    EXPECT_FALSE(relation);
-    EXPECT_FATAL(relation.add(0, 0, 1.0));
-    EXPECT_FATAL(relation[0]);
-    EXPECT_FATAL(relation.getFromAccessorParams());
-    EXPECT_FATAL(relation.getToAccessorParams());
-    EXPECT_FATAL(relation.getModified());
   }
 
   /** Test that Relations wich points to the wrong arrays yields a FATAL. */
@@ -106,7 +93,13 @@ namespace Belle2 {
     DataStore::Instance().setInitializeActive(false);
 
     RelationArray relation1(*evtData, *profileData, "test");
-    EXPECT_FATAL(RelationArray relation2(*profileData, *evtData, "test"));
+    relation1.create();
+    EXPECT_FATAL(RelationArray(*profileData, *evtData, "test").isValid());
+    EXPECT_FATAL(RelationArray(*profileData, *evtData, "test").add(0, 0, 1.0));
+    EXPECT_FATAL(RelationArray(*profileData, *evtData, "test")[0]);
+    EXPECT_FATAL(RelationArray(*profileData, *evtData, "test").getFromAccessorParams());
+    EXPECT_FATAL(RelationArray(*profileData, *evtData, "test").getToAccessorParams());
+    EXPECT_FATAL(RelationArray(*profileData, *evtData, "test").getModified());
   }
 
   /** Some events may have default constructed relations (i.e. nothing
@@ -236,7 +229,7 @@ namespace Belle2 {
   }
 
   /** Check wether out-of-bound indices are caught by RelationIndex. */
-  TEST_F(RelationTest, InconsitentIndexDeathTest)
+  TEST_F(RelationTest, InconsistentIndexDeathTest)
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), profileData->getName()));
@@ -277,13 +270,16 @@ namespace Belle2 {
     DataStore::Instance().setInitializeActive(false);
 
     RelationArray relation(*profileData, *evtData, "test");
+    relation.create();
     typedef RelationIndex<EventMetaData, ProfileInfo> rel_t;
     EXPECT_FATAL(rel_t(*evtData, *profileData, "test"));
     EXPECT_FATAL(rel_t("test"));
 
     StoreArray<EventMetaData> eventData("evts");
     RelationArray relation2(*evtData, *profileData, "test2");
+    relation2.create();
     EXPECT_FATAL(rel_t(eventData, *profileData, "test2"));
+
     //This relation works and points to evtData, not eventData.
     //no check is performed, user is responsible to check
     //using getFromAccessorParams and getToAccessorParams

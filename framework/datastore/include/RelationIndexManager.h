@@ -39,6 +39,9 @@ namespace Belle2 {
      *  @returns A RelationIndexContainer
      */
     template<class FROM, class TO> const RelationIndexContainer<FROM, TO> &get(const RelationArray& relation) {
+      //do some type checking...
+      relation.isValid();
+
       const std::string& name = relation.getName();
       DataStore::EDurability durability = relation.getDurability();
       RelationMap& relations =  m_cache[durability];

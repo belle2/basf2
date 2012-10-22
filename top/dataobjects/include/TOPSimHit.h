@@ -11,6 +11,7 @@
 #ifndef TOPSIMHIT_H
 #define TOPSIMHIT_H
 
+#include <generators/dataobjects/SimHitBase.h>
 #include <TObject.h>
 #include <TVector3.h>
 
@@ -25,12 +26,13 @@ namespace Belle2 {
    * filled in top/simulation/src/SensitivePMT.cc
    */
 
-  class TOPSimHit : public TObject {
+  class TOPSimHit : public SimHitBase {
   public:
 
     /*! Default constructor
      */
     TOPSimHit():
+      SimHitBase(),
       m_barID(0),
       m_pmtID(0),
       m_x(0.0),
@@ -54,7 +56,7 @@ namespace Belle2 {
       double yLocal,
       double globalTime,
       double energy_eV
-    ) {
+    ): SimHitBase() {
       m_barID = barID;
       m_pmtID = pmtID;
       m_x = (float) xLocal;
@@ -98,6 +100,11 @@ namespace Belle2 {
      */
     double getEnergy() const { return m_energy; }
 
+    /** Shift the SimHit in time (needed for beam background mixing)
+     * @param delta The value of the time shift.
+     */
+    void shiftInTime(float delta) { m_globalTime += delta; }
+
   private:
 
     int m_barID;          /**< bar ID */
@@ -107,7 +114,7 @@ namespace Belle2 {
     float m_globalTime;   /**< detection time */
     float m_energy;       /**< photon energy in [eV] */
 
-    ClassDef(TOPSimHit, 1); /**< ClassDef */
+    ClassDef(TOPSimHit, 2); /**< ClassDef */
 
   };
 

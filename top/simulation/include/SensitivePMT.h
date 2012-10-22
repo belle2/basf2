@@ -12,7 +12,6 @@
 #define TOPSENSITIVEDETECTOR_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
-#include <top/dataobjects/TOPSimHit.h>
 
 namespace Belle2 {
   namespace TOP {
@@ -25,12 +24,11 @@ namespace Belle2 {
 
       /**
        * Constructor.
-       * @param name Name of the sensitive detector. Do we still need that?
        */
       SensitivePMT();
 
       /**
-       * Process each step and calculate variables defined in TOPSimHit.
+       * Process each step, fill TOPSimHit and TOPSimPhoton
        * @param aStep Current Geant4 step in the sensitive medium.
        * @result true if a hit was stored, o.w. false.
        */

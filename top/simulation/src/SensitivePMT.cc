@@ -9,8 +9,8 @@
  **************************************************************************/
 
 #include <top/simulation/SensitivePMT.h>
-
 #include <top/dataobjects/TOPSimHit.h>
+#include <top/dataobjects/TOPSimPhoton.h>
 
 #include <G4Track.hh>
 #include <G4Step.hh>
@@ -35,6 +35,8 @@ namespace Belle2 {
       // registration
       StoreArray<TOPSimHit>::registerPersistent();
       RelationArray::registerPersistent<MCParticle, TOPSimHit>();
+      StoreArray<TOPSimPhoton>::registerTransient();
+      RelationArray::registerTransient<TOPSimHit, TOPSimPhoton>();
 
       // additional registration of MCParticle relation (required for correct relations)
       StoreArray<MCParticle> particles;
@@ -46,106 +48,67 @@ namespace Belle2 {
 
     G4bool SensitivePMT::step(G4Step* aStep, G4TouchableHistory*)
     {
-      //! Get particle track
+      // particle track
       G4Track& track  = *aStep->GetTrack();
 
-      /*! Check if it is an optical photon */
+      // check if it is an optical photon
       if (track.GetDefinition()->GetParticleName() != "opticalphoton") return false;
 
-      /*! Get time (check for proper global time) of track */
-
-      //! get global time
-      double globalTime = track.GetGlobalTime();
-      //! get local time. Time that passed from the cration of the particle.
-      double localTime = track.GetLocalTime();
-
-      //! Check all the times exist. Maybe this is not necesary!
-      if (isnan(globalTime)) {
-        B2ERROR("TOP Sensitive PMT: global time is nan !");
-        return false;
-      }
-      if (isnan(localTime)) {
-        B2ERROR("TOP Sensitive PMT: local time is nan !");
-        return false;
-      }
-
-
-      //! get the possition of the particle in the lab frame - global possition
-      const G4ThreeVector& worldPosition = track.GetPosition();
-
-      //! Transform to local position
-      const G4ThreeVector localPosition = track.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
-
-
-      //! get direction of the momentum at hit point
-      const G4ThreeVector dir = track.GetMomentumDirection();
-
-      //! get pmt ID
+      // pmt and bar ID
       int pmtID = track.GetTouchableHandle()->GetReplicaNumber(1);
-      //! get ID of the bar in which the pmt is housed
       int barID = track.GetTouchableHandle()->GetReplicaNumber(4);
 
-      //! This is here just for debuging
-      //B2INFO("replica number: " << pmtID << " bar number: " << barID)
-
-      //! get photon energy
+      // photon at detection
+      const G4ThreeVector& g_detPoint = track.GetPosition();
+      const G4ThreeVector& g_detMomDir = track.GetMomentumDirection();
+      TVector3 detPoint(g_detPoint.x(), g_detPoint.y(), g_detPoint.z());
+      TVector3 detMomDir(g_detMomDir.x(), g_detMomDir.y(), g_detMomDir.z());
+      double detTime = track.GetGlobalTime();
       double energy = track.GetKineticEnergy();
-
-      //! get the length of the track
       double length = track.GetTrackLength();
 
-      //Get ID of parent particle and track (this is mainly used at the moment for separation of backgound and signal, but will be later dropped -> use relation )
-      int parentID = track.GetParentID();
-      int trackID = track.GetTrackID();
+      // photon at emission
+      const G4ThreeVector& g_emiPoint = track.GetVertexPosition();
+      const G4ThreeVector& g_emiMomDir = track.GetVertexMomentumDirection();
+      TVector3 emiPoint(g_emiPoint.x(), g_emiPoint.y(), g_emiPoint.z());
+      TVector3 emiMomDir(g_emiMomDir.x(), g_emiMomDir.y(), g_emiMomDir.z());
+      double emiTime = track.GetGlobalTime() - track.GetLocalTime();
 
-      /*! get vertex information of the track */
-      //! get vertex position
-      const G4ThreeVector vpos = track.GetVertexPosition();
-      //! get direction of the momentun at the vertex point
-      const G4ThreeVector vdir = track.GetVertexMomentumDirection();
-
-      /*! Fill vector for later storage in TOPSimHit */
-
-      //! fill vector for local position
-      TVector3 locpos(localPosition.x(), localPosition.y() , localPosition.z());
-      //! fill vector for global position
-      TVector3 glopos(worldPosition.x() , worldPosition.y() , worldPosition.z());
-      //! fill vector for vertex position
-      TVector3 Vpos(vpos.x() , vpos.y() , vpos.z());
-      //! fill vector for momentum direction at the vertex
-      TVector3 Vdir(vdir.x() , vdir.y() , vdir.z());
-      //! fill vector for momentum direction at hit point
-      TVector3 Dir(dir.x() , dir.y() , dir.z());
-
-      //! convert to Basf units (photon energy in [eV]!)
-      locpos = locpos * Unit::mm;
-      glopos = glopos * Unit::mm;
-      Vpos = Vpos * Unit::mm;
-      length = length * Unit::mm;
+      // convert to Basf units (photon energy in [eV]!)
+      emiPoint = emiPoint * Unit::mm;
+      detPoint = detPoint * Unit::mm;
       energy = energy * Unit::MeV / Unit::eV;
+      length = length * Unit::mm;
 
-      double x = locpos.x();
-      double y = locpos.y();
+      // hit position in local frame, converted to Basf units
+      G4ThreeVector localPosition = track.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(g_detPoint);
+      double xLocal = localPosition.x() * Unit::mm;
+      double yLocal = localPosition.y() * Unit::mm;
 
-      /*!------------------------------------------------------------
-       *                Create TOPSimHit and save it to datastore
-       * ------------------------------------------------------------
-       */
+      // write to store arrays; add relations
 
-      StoreArray<TOPSimHit> topSimHits;
-      if (!topSimHits.isValid()) topSimHits.create();
+      StoreArray<TOPSimHit> hits;
+      if (!hits.isValid()) hits.create();
+      new(hits.nextFreeAddress()) TOPSimHit(barID, pmtID, xLocal, yLocal,
+                                            detTime, energy);
 
-      new(topSimHits.nextFreeAddress()) TOPSimHit(barID, pmtID, x, y, globalTime, energy);
+      StoreArray<MCParticle> particles;
+      RelationArray relParticleHit(particles, hits);
+      int lastHit = hits.getEntries() - 1;
+      int trackID = track.GetTrackID();
+      relParticleHit.add(trackID, lastHit);
 
-      // add relation to MCParticle
-      StoreArray<MCParticle> mcParticles;
-      RelationArray relMCParticleToTOPSimHit(mcParticles, topSimHits);
-      int last = topSimHits.getEntries() - 1;
-      relMCParticleToTOPSimHit.add(trackID, last);
+      StoreArray<TOPSimPhoton> photons;
+      if (!photons.isValid()) photons.create();
+      new(photons.nextFreeAddress()) TOPSimPhoton(barID, emiPoint, emiMomDir, emiTime,
+                                                  detPoint, detMomDir, detTime,
+                                                  length, energy);
 
+      RelationArray relHitPhot(hits, photons);
+      int lastPhot = photons.getEntries() - 1;
+      relHitPhot.add(lastHit, lastPhot);
 
-      /*! After detection photon is killed */
-
+      // kill photon after detection
       track.SetTrackStatus(fStopAndKill);
 
       return true;

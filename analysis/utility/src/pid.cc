@@ -2,19 +2,19 @@
 
 #include <GFTrack.h>
 
-#include <top/dataobjects/TOPTrack.h>
+#include <top/dataobjects/TOPBarHit.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
 
-const TOPLikelihoods* getTOPLikelihoods(const Track& track)
+const TOPLikelihood* getTOPLikelihood(const Track& track)
 {
-  StoreArray<TOPLikelihoods> toplogL;
+  StoreArray<TOPLikelihood> toplogL;
   StoreArray<GFTrack>        gfTracks;
   StoreArray<Track>          tracks;
 
-  RelationIndex<GFTrack, TOPLikelihoods> gfTracksToTOPLogL(gfTracks, toplogL);
+  RelationIndex<GFTrack, TOPLikelihood> gfTracksToTOPLogL(gfTracks, toplogL);
 
   if (!(tracks && gfTracks && toplogL && gfTracksToTOPLogL))
     return 0;
@@ -60,22 +60,22 @@ const DedxLikelihood* getDEDXLikelihood(const Track& track)
   return 0;
 }
 
-const TOPLikelihoods* getTOPLikelihoods(const MCParticle* particle)
+const TOPLikelihood* getTOPLikelihood(const MCParticle* particle)
 {
 
   StoreArray<MCParticle> mcParticles;
-  StoreArray<TOPTrack>  topTracks;
-  StoreArray<TOPLikelihoods> toplogL;
+  StoreArray<TOPBarHit>  topTracks;
+  StoreArray<TOPLikelihood> toplogL;
 
-  RelationIndex< TOPTrack, TOPLikelihoods > relTrackLikelihoods(topTracks, toplogL);
-  RelationIndex<MCParticle, TOPTrack> relMCParticleToTOPTrack(mcParticles, topTracks);
+  RelationIndex< TOPBarHit, TOPLikelihood > relTrackLikelihoods(topTracks, toplogL);
+  RelationIndex<MCParticle, TOPBarHit> relMCParticleToTOPBarHit(mcParticles, topTracks);
 
-  if (!(relTrackLikelihoods && relMCParticleToTOPTrack)) {
+  if (!(relTrackLikelihoods && relMCParticleToTOPBarHit)) {
     return 0;
   }
 
-  if (relMCParticleToTOPTrack.getFirstElementFrom(particle)) {
-    const TOPTrack* track = relMCParticleToTOPTrack.getFirstElementFrom(particle)->to;
+  if (relMCParticleToTOPBarHit.getFirstElementFrom(particle)) {
+    const TOPBarHit* track = relMCParticleToTOPBarHit.getFirstElementFrom(particle)->to;
 
     if (relTrackLikelihoods.getFirstElementFrom(track)) {
 
@@ -109,7 +109,7 @@ const ARICHLikelihoods* getARICHLikelihoods(const MCParticle* particle)
   return 0;
 }
 
-double getTOPPID(int hyp1, int hyp2, const TOPLikelihoods* logL)
+double getTOPPID(int hyp1, int hyp2, const TOPLikelihood* logL)
 {
   double logl1 = 0.;
   double logl2 = 0.;

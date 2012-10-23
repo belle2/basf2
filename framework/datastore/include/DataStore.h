@@ -227,6 +227,7 @@ namespace Belle2 {
      *  @param toClass        Class of the objects to which the relations point.
      *  @param name           The name of the store array to which the relations point.
      *                        If empty the default store array name for toClass will be used.
+     *                        If the special name "ALL" is given all store arrays containing objects of type toClass are considered.
      *  @return               Vector of relation entry objects.
      */
     std::vector<RelationEntry> getRelationsFromTo(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, TClass* toClass, std::string name);
@@ -239,6 +240,7 @@ namespace Belle2 {
      *  @param fromClass      Class of the objects from which the relations point.
      *  @param name           The name of the store array from which the relations point.
      *                        If empty the default store array name for fromClass will be used.
+     *                        If the special name "ALL" is given all store arrays containing objects of type fromClass are considered.
      *  @return               Vector of relation entry objects.
      */
     std::vector<RelationEntry> getRelationsToFrom(const TObject* toObject, StoreEntry*& toEntry, int& toIndex, TClass* fromClass, std::string name);
@@ -253,6 +255,7 @@ namespace Belle2 {
      *  @param withClass      Class of the objects to or from which the relations point.
      *  @param name           The name of the store array to or from which the relations point.
      *                        If empty the default store array name for withClass will be used.
+     *                        If the special name "ALL" is given all store arrays containing objectt of type withClass are considered.
      *  @return               Vector of relation entry objects.
      */
     std::vector<RelationEntry> getRelationsWith(const TObject* object, StoreEntry*& entry, int& index, TClass* withClass, std::string name);
@@ -278,6 +281,7 @@ namespace Belle2 {
      *  @tparam T             Class of the objects to which the relations point.
      *  @param name           The name of the store array to which the relations point.
      *                        If empty the default store array name for toClass will be used.
+     *                        If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return               Vector of relation entry objects.
      */
     template <class T> static RelationVector<T> getRelationsFromObj(const TObject* object, std::string name = "") {
@@ -293,6 +297,7 @@ namespace Belle2 {
      *  @tparam T             Class of the objects from which the relations point.
      *  @param name           The name of the store array from which the relations point.
      *                        If empty the default store array name for fromClass will be used.
+     *                        If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return               Vector of relation entry objects.
      */
     template <class T> static RelationVector<T> getRelationsToObj(const TObject* object, std::string name = "") {
@@ -310,6 +315,7 @@ namespace Belle2 {
      *  @tparam T             Class of the objects to or from which the relations point.
      *  @param name           The name of the store array to or from which the relations point.
      *                        If empty the default store array name for withClass will be used.
+     *                        If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return               Vector of relation entry objects.
      */
     template <class T> static RelationVector<T> getRelationsWithObj(const TObject* object, std::string name = "") {

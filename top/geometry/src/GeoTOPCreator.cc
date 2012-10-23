@@ -81,7 +81,7 @@ namespace Belle2 {
 
 
     void GeoTOPCreator::create(const GearDir& content, G4LogicalVolume& topVolume,
-                               GeometryTypes type)
+                               GeometryTypes)
     {
 
       isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
@@ -116,7 +116,7 @@ namespace Belle2 {
 
 
 
-    G4AssemblyVolume* GeoTOPCreator::buildBar(const GearDir& content, const int moduleID)
+    G4AssemblyVolume* GeoTOPCreator::buildBar(const GearDir& content, const int)
     {
 
       /*!  Read parameters  */

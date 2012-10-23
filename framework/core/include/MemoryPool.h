@@ -58,7 +58,7 @@ namespace Belle2 {
      * @param i The index of the memory segment.
      * @return Pointer to the memory segment.
      */
-    T* at(size_t i) { return (i < 0 || i >= m_entries) ? 0 : (*this)[i]; }
+    T* at(size_t i) { return (i >= m_entries) ? 0 : (*this)[i]; }
 
     /**
      * Clear number of entries, does not free memory or call destructors.

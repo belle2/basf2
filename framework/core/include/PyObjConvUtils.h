@@ -53,7 +53,7 @@ namespace Belle2 {
   void PyObjConvUtils::addSTLVectorToList(const T& value, boost::python::list& outputList)
   {
     typename T::const_iterator listIter;
-    for (listIter = value.begin(); listIter != value.end(); listIter++) {
+    for (listIter = value.begin(); listIter != value.end(); ++listIter) {
       outputList.append(boost::python::object(*listIter));
     }
   }

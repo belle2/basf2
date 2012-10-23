@@ -9,6 +9,7 @@
 
 #include <framework/modules/seqroot/seqrootoutputModule.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/core/Environment.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -46,6 +47,9 @@ SeqRootOutputModule::~SeqRootOutputModule() { }
 
 void SeqRootOutputModule::initialize()
 {
+  const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
+  if (!outputFileArgument.empty())
+    m_outputFileName = outputFileArgument;
 
   // Open output file
   m_file = new SeqFile(m_outputFileName.c_str(), "w");

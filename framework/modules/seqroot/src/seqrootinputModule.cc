@@ -9,6 +9,8 @@
 
 #include <framework/modules/seqroot/seqrootinputModule.h>
 
+#include <framework/core/Environment.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -45,9 +47,13 @@ void SeqRootInputModule::initialize()
 {
   gSystem->Load("libdataobjects");
 
+  const std::string& inputFileArgument = Environment::Instance().getInputFileOverride();
+  if (!inputFileArgument.empty()) {
+    m_inputFileName = inputFileArgument;
+  }
+
   // Initialize DataStoreStreamer
   m_streamer = new DataStoreStreamer();
-
 
   // Read the first event in SeqRoot file and restore in DataStore.
   // This is necessary to create object tables before TTree initialization
@@ -63,10 +69,11 @@ void SeqRootInputModule::initialize()
   if (size > 0) {
     evtmsg = new EvtMessage(evtbuf);
     m_streamer->restoreDataStore(evtmsg);
-  } else
+  } else {
     B2FATAL("SeqRootInput : Error in reading first event")
+  }
 
-    delete evtmsg;
+  delete evtmsg;
   delete[] evtbuf;
 
   B2INFO("SeqRootInput: initialized.");

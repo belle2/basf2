@@ -102,6 +102,7 @@ void ECLPi0ReconstructorModule::event()
       m_pz1 = m_energy1 * cos(m_theta1);
 
       CLHEP::Hep3Vector p3Gamma1(m_px1, m_py1, m_pz1);
+      //cout<<"PiGamma  "<<m_nEvent<<" Gamma1 "<<m_showerId1<<" "<<m_energy1<<endl;
 
       // gamma energy cut
       const double EGamma1 = p3Gamma1.mag();
@@ -118,7 +119,7 @@ void ECLPi0ReconstructorModule::event()
           m_px2 = m_energy2 * sin(m_theta2) * cos(m_phi2);
           m_py2 = m_energy2 * sin(m_theta2) * sin(m_phi2);
           m_pz2 = m_energy2 * cos(m_theta2);
-
+          //cout<<"PiGamma  "<<m_nEvent<<" Gamma2 "<<m_showerId2<<" "<<m_energy2<<endl;
           CLHEP::Hep3Vector p3Gamma2(m_px2, m_py2, m_pz2);
           // gamma energy cut
           const double EGamma2 = p3Gamma2.mag();

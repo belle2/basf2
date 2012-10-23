@@ -34,7 +34,7 @@ namespace Belle2 {
       ~SensitiveDetector();
 
       //! Register ECL hits collection into G4HCofThisEvent
-//      void Initialize(G4HCofThisEvent* HCTE);
+      void Initialize(G4HCofThisEvent* HCTE);
 
       //! Process each step and calculate variables defined in ECLHit (not yet prepared)
       bool step(G4Step* aStep, G4TouchableHistory* history);
@@ -70,8 +70,10 @@ namespace Belle2 {
       /** members of  SensitiveDetector  */
       G4double m_thresholdEnergyDeposit;/** Energy Deposit  threshold  */
       G4double m_thresholdKineticEnergy;/** Kinetic Energy  threshold  */
-      int m_hitNumber;                  /** The current number of created hits in an event. Used to fill the DataStore ECL array.*/
-      int m_EBhitNumber;                /**  The current number of created hits in an event. Used to fill the DataStore ECL EB array.*/
+      int m_simhitNumber;                  /** The current number of created hits in an event. Used to fill the DataStore ECLSimHit. */
+      int m_hitNum;                  /** The current number of created hits in an event. Used to fill the DataStore ECLHit.*/
+      int m_EvnetNumber;                /**  The current number of created hits in an event. Used to fill the DataStore ECL EB array. */
+      int m_oldEvnetNumber;                /**  The current number of created hits in an event. Used to fill the DataStore  */
       ECLGeometryPar eclp;              /**ECLGeometryPar  convert the G4Volume name to cellID */
       int m_trackID;                    /** track id */
       G4ThreeVector m_startPos;         /**  Position of prestep */
@@ -85,6 +87,18 @@ namespace Belle2 {
       double m_energyDeposit;     /** energy deposited in volume */
       double m_trackLength;       /** length of the track in the volume */
 
+      int ECLHitIndex[8736][16]; /** Hit index of StoreArray */
+      int iECLCell;
+      int TimeIndex;
+      TVector3 PosCell;
+      TVector3 VecCell;
+      double local_pos;
+      double T_ave;
+      int firstcall;
+      typedef std::map< int, int>  PrimaryTrackMap; /** define a map type for Primary Track*/
+      PrimaryTrackMap eclPrimaryMap; /** the map to store Primary Track*/
+      int oldPrimary;
+      int PrimaryTrackId;
 
     };
   } // end of namespace ecl

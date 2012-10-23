@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
-#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
@@ -53,7 +53,7 @@ REG_MODULE(ECLDigitizer)
 ECLDigitizerModule::ECLDigitizerModule() : Module()
 {
   //Set module properties
-  setDescription("Creates ECLDigiHits from ECLHits.");
+  setDescription("Creates ECLDigiHits from ECLSimHits.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
 //  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
@@ -95,9 +95,9 @@ void ECLDigitizerModule::event()
 {
   m_timeCPU = clock() * Unit::us;
   //Input Array
-  StoreArray<ECLHit>  eclArray;
+  StoreArray<ECLSimHit>  eclArray;
   if (!eclArray) {
-    B2ERROR("Can not find ECLHit Array.");
+    B2ERROR("Can not find ECLSimHit Array.");
   }
 
   //cout<<"Total Hits in Digi "<<eclArray->GetEntriesFast()<<endl;
@@ -117,13 +117,13 @@ void ECLDigitizerModule::event()
 
   for (int ii = 0; ii < hitNum; ii++) {
 
-    ECLHit* aECLHit = eclArray[ii];
+    ECLSimHit* aECLSimHit = eclArray[ii];
     // Hit geom. info
-//    int hitEventId       =  aECLHit->getEventId();
+//    int hitEventId       =  aECLSimHit->getEventId();
 
-    int hitCellId       =  aECLHit->getCellId();
-    double hitE         =  aECLHit->getEnergyDep() / Unit::GeV;
-    double hitTimeAve       =  aECLHit->getTimeAve()   / Unit::us;
+    int hitCellId       =  aECLSimHit->getCellId();
+    double hitE         =  aECLSimHit->getEnergyDep() / Unit::GeV;
+    double hitTimeAve       =  aECLSimHit->getTimeAve()   / Unit::us;
     double sampleTime ;
 
     E_tmp[hitCellId] = hitE + E_tmp[hitCellId];//for summation deposit energy; do fit if this summation > 0.1 MeV

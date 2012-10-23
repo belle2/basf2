@@ -347,7 +347,7 @@ namespace Belle2 {
         double cDx2 = k_Bb / 2;
         double cDy1 = k_Bh / 2;
         double cDx3 = k_BA / 2;
-        double cDx4 = k_Bb / 2 * k_BA / k_Ba;
+        double cDx4 = (k_BA + (k_Bb - k_Ba) * k_BH / k_Bh) / 2 ; //Bb / 2 * k_BA / k_Ba;
         double cDy2 = k_BH / 2;
         double cDz = k_BLL / 2;
         if (iBrCry >= 30) {zsign = -1;}

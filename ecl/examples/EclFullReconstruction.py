@@ -19,7 +19,6 @@ geometry = register_module('Geometry')
 # Simulation
 g4sim = register_module('FullSim')
 
-
 # one event
 evtmetagen.param('ExpList', [0])
 evtmetagen.param('RunList', [1])
@@ -45,7 +44,6 @@ param_pGun = {
     }
 
 pGun.param(param_pGun)
-
 
 eclHit = register_module('ECLHit')
 eclDigi = register_module('ECLDigitizer')

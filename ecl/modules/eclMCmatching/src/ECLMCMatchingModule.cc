@@ -18,7 +18,7 @@
 
 //ecl package headers
 #include <ecl/dataobjects/ECLSimHit.h>
-#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLShower.h>
@@ -58,7 +58,7 @@ REG_MODULE(ECLMCMatching)
 ECLMCMatchingModule::ECLMCMatchingModule() : Module()
 {
   // Set description
-//  setDescription("ECLHitMakerModule");
+//  setDescription("ECLSimHitMakerModule");
 
   setDescription("ECLMCMatchingModule");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
@@ -74,7 +74,7 @@ void ECLMCMatchingModule::initialize()
   // Initialize variables
   m_nRun    = 0 ;
   m_nEvent  = 0 ;
-  RelationArray::registerPersistent<ECLHit, MCParticle>("", "");
+  RelationArray::registerPersistent<ECLSimHit, MCParticle>("", "");
   RelationArray::registerPersistent<ECLDigit, MCParticle>("", "");
   RelationArray::registerPersistent<ECLShower, MCParticle>("", "");
 
@@ -132,51 +132,50 @@ void ECLMCMatchingModule::event()
     }
   }
 
-
   StoreArray<ECLSimHit> eclSimArray;
-  StoreArray<ECLHit> eclHitArray;
+  StoreArray<ECLSimHit> eclHitArray;
   RelationArray eclSimHitRel(mcParticles, eclSimArray);
   RelationArray eclHitToMCPart(eclHitArray, mcParticles);
 
+  /*
+    int hitNum = eclHitArray->GetEntriesFast();
+    for (int ii = 0; ii < hitNum; ii++) {
+      ECLSimHit* aECLSimHit = eclHitArray[ii];
+      int hitCellId       =  aECLSimHit->getCellId();
+      double hitTimeAve       =  aECLSimHit->getTimeAve()   * Unit::ns;
+      int TimeIndex = (int) hitTimeAve / 500;
+      HitIndex[hitCellId][TimeIndex] = ii;
+    }
 
-  int hitNum = eclHitArray->GetEntriesFast();
-  for (int ii = 0; ii < hitNum; ii++) {
-    ECLHit* aECLHit = eclHitArray[ii];
-    int hitCellId       =  aECLHit->getCellId();
-    double hitTimeAve       =  aECLHit->getTimeAve()   * Unit::ns;
-    int TimeIndex = (int) hitTimeAve / 500;
-    HitIndex[hitCellId][TimeIndex] = ii;
-  }
+    for (int index = 0; index < eclSimHitRel.getEntries(); index++) {
 
-  for (int index = 0; index < eclSimHitRel.getEntries(); index++) {
+      MCParticle* aMCParticle = mcParticles[eclSimHitRel[index].getFromIndex()];
+      TVector3 McP =  aMCParticle->getMomentum();
+      TVector3 Pvertex = aMCParticle->getProductionVertex();
 
-    MCParticle* aMCParticle = mcParticles[eclSimHitRel[index].getFromIndex()];
-    TVector3 McP =  aMCParticle->getMomentum();
-    TVector3 Pvertex = aMCParticle->getProductionVertex();
+      int PrimaryIndex = -1;
+      map<int, int>::iterator iter = eclPrimaryMap.find(eclSimHitRel[index].getFromIndex());
+      if (iter != eclPrimaryMap.end()) {
+        PrimaryIndex = iter->second;
+      } else cout << "CantFind Track in eclPrimaryMap " << eclSimHitRel[index].getFromIndex() << endl;
 
-    int PrimaryIndex = -1;
-    map<int, int>::iterator iter = eclPrimaryMap.find(eclSimHitRel[index].getFromIndex());
-    if (iter != eclPrimaryMap.end()) {
-      PrimaryIndex = iter->second;
-    } else cout << "CantFind Track in eclPrimaryMap " << eclSimHitRel[index].getFromIndex() << endl;
-
-    for (int hit = 0; hit < (int)eclSimHitRel[index].getToIndices().size(); hit++) {
-      ECLSimHit* aECLSimHit = eclSimArray[eclSimHitRel[index].getToIndex(hit)];
-      int hitCellId         = aECLSimHit->getCellId();
-      double hitE           = aECLSimHit->getEnergyDep() * Unit::GeV;
-      double hitTOF         = aECLSimHit->getFlightTime() * Unit::ns;
-      int TimeIndex = (int) hitTOF / 500;
+      for (int hit = 0; hit < (int)eclSimHitRel[index].getToIndices().size(); hit++) {
+        ECLSimHit* aECLSimHit = eclSimArray[eclSimHitRel[index].getToIndex(hit)];
+        int hitCellId         = aECLSimHit->getCellId();
+        double hitE           = aECLSimHit->getEnergyDep() * Unit::GeV;
+        //double hitTOF         = aECLSimHit->getFlightTime() * Unit::ns;
+        int TimeIndex = (int) hitTOF / 500;
 
 
-      if (hitTOF < 8000 && hitE > 30e-6) {
-        if (PrimaryIndex != -1 && HitIndex[hitCellId][TimeIndex] != -1 && HitOldTrack[hitCellId][TimeIndex] != PrimaryIndex) {
-          eclHitToMCPart.add(HitIndex[hitCellId][TimeIndex], PrimaryIndex);
-          HitOldTrack[hitCellId][TimeIndex] = PrimaryIndex;
-        }
-      }//if hitTOF < 8000&&E_cell[hitCellId][TimeIndex] > 30e-6)
-    }//for (int hit = 0
-  }//for index
-
+        if (hitTOF < 8000 && hitE > 30e-6) {
+          if (PrimaryIndex != -1 && HitIndex[hitCellId][TimeIndex] != -1 && HitOldTrack[hitCellId][TimeIndex] != PrimaryIndex) {
+            eclHitToMCPart.add(HitIndex[hitCellId][TimeIndex], PrimaryIndex);
+            HitOldTrack[hitCellId][TimeIndex] = PrimaryIndex;
+          }
+        }//if hitTOF < 8000&&E_cell[hitCellId][TimeIndex] > 30e-6)
+      }//for (int hit = 0
+    }//for index
+  */
 
   StoreArray<ECLDigit> eclDigiArray;
   RelationArray  eclDigiToMCPart(eclDigiArray, mcParticles);
@@ -191,8 +190,8 @@ void ECLMCMatchingModule::event()
   }
   const int eclHitToMCPartn = eclHitToMCPart.getEntries() ;
   for (int index = 0; index < eclHitToMCPartn; index++) {
-    ECLHit* aECLHit = eclHitArray[eclHitToMCPart[index].getFromIndex()];
-    int hitCellId       =  aECLHit->getCellId();
+    ECLSimHit* aECLSimHit = eclHitArray[eclHitToMCPart[index].getFromIndex()];
+    int hitCellId       =  aECLSimHit->getCellId();
 
     for (int iMCpart = 0; iMCpart < (int)eclHitToMCPart[index].getToIndices().size(); iMCpart++) {
       if (DigiIndex[hitCellId] != -1 && DigiOldTrack[hitCellId] != (int)eclHitToMCPart[index].getToIndex(iMCpart)) {

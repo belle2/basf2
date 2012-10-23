@@ -12,21 +12,24 @@
 
 #include <ecl/simulation/SensitiveDetector.h>
 
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+#include <ecl/dataobjects/ECLSim.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
+
 
 #include <string>
 #include <sstream>
 #include <iostream>
 #include <iomanip>
 
-
-
+#include <G4TrackingManager.hh>
+#include <G4Track.hh>
 #include <G4Step.hh>
 #include <G4SteppingManager.hh>
 #include <G4SDManager.hh>
@@ -48,14 +51,17 @@ namespace Belle2 {
 
     SensitiveDetector::SensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
       Simulation::SensitiveDetectorBase(name, ECL), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
-      m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_trackID(-999)
+      m_thresholdKineticEnergy(thresholdKineticEnergy), m_simhitNumber(0), m_trackID(-999), firstcall(0)
     {
-      StoreArray<MCParticle> mcParticles;
-      StoreArray<ECLSimHit> eclSimHits;
-      RelationArray eclSimHitRel(mcParticles, eclSimHits);
-      registerMCParticleRelation(eclSimHitRel);
+      StoreArray<ECLSim>eclSims;
+      StoreArray<MCParticle>mcParticles;
+
+      RelationArray eclSimRel(mcParticles, eclSims);
+      registerMCParticleRelation(eclSimRel);
+      StoreArray<ECLSim>::registerPersistent();
       StoreArray<ECLSimHit>::registerPersistent();
-      RelationArray::registerPersistent<MCParticle, ECLSimHit>();
+      RelationArray::registerPersistent<MCParticle, ECLSim>("", "");
+      RelationArray::registerPersistent<ECLSimHit, MCParticle>("", "");
     }
 
 
@@ -64,9 +70,8 @@ namespace Belle2 {
 
     }
 
-//    void SensitiveDetector::Initialize(G4HCofThisEvent* HCTE)
-//    {
-//    }
+    void SensitiveDetector::Initialize(G4HCofThisEvent*)
+    {}
 
 //-----------------------------------------------------
 // Method invoked for every step in sensitive detector
@@ -77,8 +82,8 @@ namespace Belle2 {
 
       const G4StepPoint& preStep  = *aStep->GetPreStepPoint();
       const G4StepPoint& postStep = * aStep->GetPostStepPoint();
-      G4Track& track  = *aStep->GetTrack();
 
+      G4Track& track  = * aStep->GetTrack();
       if (m_trackID != track.GetTrackID()) {
         //TrackID changed, store track informations
         m_trackID = track.GetTrackID();
@@ -156,8 +161,6 @@ namespace Belle2 {
 
     void SensitiveDetector::EndOfEvent(G4HCofThisEvent*)
     {
-
-      B2INFO("End Of Event");
     }
 
     int SensitiveDetector::saveSimHit(
@@ -171,24 +174,74 @@ namespace Belle2 {
     {
       StoreArray<MCParticle> mcParticles;
       //change Later
-      StoreArray<ECLSimHit> eclArray;
+      StoreArray<ECLSim> eclArray;
       if (!eclArray) eclArray.create();
-      RelationArray eclSimHitRel(mcParticles, eclArray);
-
-      m_hitNumber = eclArray->GetLast() + 1;
-      new(eclArray->AddrAt(m_hitNumber)) ECLSimHit();
-      eclArray[m_hitNumber]->setCellId(cellId);
-      eclArray[m_hitNumber]->setTrackId(trackID);
-      eclArray[m_hitNumber]->setPDGCode(pid);
-      eclArray[m_hitNumber]->setFlightTime(tof / ns);
-      eclArray[m_hitNumber]->setEnergyDep(edep / GeV);
+      RelationArray eclSimRel(mcParticles, eclArray);
+      m_simhitNumber = eclArray->GetLast() + 1;
+      new(eclArray->AddrAt(m_simhitNumber)) ECLSim();
+      eclArray[m_simhitNumber]->setCellId(cellId);
+      eclArray[m_simhitNumber]->setTrackId(trackID);
+      eclArray[m_simhitNumber]->setPDGCode(pid);
+      eclArray[m_simhitNumber]->setFlightTime(tof / ns);
+      eclArray[m_simhitNumber]->setEnergyDep(edep / GeV);
       TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
-      eclArray[m_hitNumber]->setMomentum(momentum);
-      eclArray[m_hitNumber]->setPosIn(posAve);
-      B2DEBUG(150, "HitNumber: " << m_hitNumber);
-      eclSimHitRel.add(trackID, m_hitNumber);
-      return (m_hitNumber);
-    }
+      eclArray[m_simhitNumber]->setMomentum(momentum);
+      eclArray[m_simhitNumber]->setPosIn(posAve);
+      B2DEBUG(150, "HitNumber: " << m_simhitNumber);
+      eclSimRel.add(trackID, m_simhitNumber);
+
+      StoreArray<ECLSimHit> eclSimHitArray;
+      RelationArray eclSimHitToMCPart(eclSimHitArray, mcParticles);
+      StoreObjPtr<EventMetaData> eventMetaDataPtr;
+      int m_currentEvnetNumber = eventMetaDataPtr->getEvent();
+
+      if (!eclSimHitArray) eclSimHitArray.create();
+      //cout<<PrimaryTrackId<<" "<<trackID<<endl;
+      //cout<<"firstcall "<<firstcall<<" m_oldEvnetNumber "<<m_oldEvnetNumber<<endl;
+      if (firstcall == 0 || m_currentEvnetNumber != m_oldEvnetNumber) {
+        m_oldEvnetNumber = m_currentEvnetNumber;
+        for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
+          for (int  TimeIndex = 0; TimeIndex < 16; TimeIndex++) {
+            ECLHitIndex[iECLCell][TimeIndex] = -1;
+          }
+        }
+        firstcall++;
+      }
+      if (m_currentEvnetNumber == m_oldEvnetNumber) {
+        if ((tof / ns) < 8000) {
+          TimeIndex = (int)(tof / ns) / 500;
+          double E_cell = (edep / GeV);
+          if (ECLHitIndex[cellId][TimeIndex] == -1) {
+            m_hitNum = eclSimHitArray->GetLast() + 1;
+            new(eclSimHitArray->AddrAt(m_hitNum)) ECLSimHit();
+
+            ECLGeometryPar* eclp = ECLGeometryPar::Instance();
+            PosCell =  eclp->GetCrystalPos(cellId);
+            VecCell =  eclp->GetCrystalVec(cellId);
+            local_pos = (15. - (posAve  - PosCell) * VecCell);
+            T_ave =  6.05 + 0.0749 * local_pos - 0.00112 * local_pos * local_pos + (tof / ns)  ;
+
+            ECLHitIndex[cellId][TimeIndex] = m_hitNum;
+            eclSimHitArray[m_hitNum]->setCellId(cellId);
+            eclSimHitArray[m_hitNum]->setEnergyDep(E_cell);
+            eclSimHitArray[m_hitNum]->setTimeAve(T_ave);
+          } else {
+            m_hitNum = ECLHitIndex[cellId][TimeIndex];
+            double old_edep = eclSimHitArray[m_hitNum]->getEnergyDep();
+            double old_TimeAve = eclSimHitArray[m_hitNum]->getTimeAve();
+
+            //cout<<m_currentEvnetNumber<<" "<<m_hitNum
+            //    <<" old cellId  "<<eclSimHitArray[m_hitNum]->getCellId()<<" new "<<cellId
+            //    <<" oldE "<<old_edep<<" + newE "<<E_cell<<"= "<<old_edep+E_cell
+            //    <<" oldT "<<old_TimeAve<<" newT  "<<T_ave
+            //    <<"= "<< (old_edep*old_TimeAve+ E_cell*T_ave)/(old_edep+E_cell)<<endl;
+            eclSimHitArray[m_hitNum]->setEnergyDep(old_edep + E_cell);
+            eclSimHitArray[m_hitNum]->setTimeAve((old_edep * old_TimeAve + E_cell * T_ave) / (old_edep + E_cell));
+          }
+        }
+      }//if m_oldEvnetNumber==m_oldEvnetNumber
+      return (m_simhitNumber);
+    }//saveSimHit
 
 
 

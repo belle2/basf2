@@ -220,11 +220,11 @@ void ROFBuilderModule::event()
       break;
     case 3 : //addSimHitsToROF<CDCSimHit>();
       break;
-    case 4 : //addSimHitsToROF<TOPSimHit>();
+    case 4 : addSimHitsToROF<TOPSimHit>();
       break;
     case 5 : //addSimHitsToROF<ARICHSimHit>();
       break;
-    case 6 : //addSimHitsToROF<ECLSimHit>();
+    case 6 : addSimHitsToROF<ECLSimHit>();
       break;
     case 7 : //addSimHitsToROF<EKLMSimHit>();
       break;

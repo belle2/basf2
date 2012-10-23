@@ -6,8 +6,7 @@ import sys
 if len(sys.argv) != 3:
     # the program name and the two arguments
     # stop the program and print an error message
-    sys.exit('Must provide two input parameters:'
-            '[output_root_file_name] [#events_to_generate]'
+    sys.exit('Must provide two input parameters:[output_root_file_name] [#events_to_generate]'
              )
 
 rootFileName = sys.argv[1]
@@ -52,35 +51,18 @@ geometry.param('Components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'
 # ---------------------------------------------------------------
 # simulation
 g4sim = register_module('FullSim')
+# make the simulation less noisy
 g4sim.logging.log_level = LogLevel.ERROR
-
-# param_g4sim = {'RegisterOptics': 1, 'PhotonFraction': 0.3,
-#               'TrackingVerbosity': 0}
-# g4sim.param(param_g4sim)
 
 # ---------------------------------------------------------------
 # CDC digitizer
 cdcDigitizer = register_module('CDCDigitizer')
 
-# use one gaussian with resolution of 0.01 in the digitizer
-# (to simplify fitting)
-param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
-cdcDigitizer.param(param_cdcdigi)
-
 # ---------------------------------------------------------------
-# Add CDC background hits
-# It doesn't work yet, so it's set to 0
-cdcBackground = register_module('CDCSimpleBackground')
-cdcBackground.param('BGLevelHits', 0.0)
-cdcBackground.param('BGLevelClusters', 0.0)
-
-# ---------------------------------------------------------------
-# Track finding is performed with Trasan module
-# found tracks are saved to "GFTrackCands_Trasan" collection
-# trasan = register_module('Trasan')
-# trasan.param('DebugLevel', 0)
-# trasan.param('GFTrackCandidatesColName', 'GFTrackCands_Trasan')
-#
+pxd_digi = register_module('PXDDigitizer')
+pxd_cls = register_module('PXDClusterizer')
+svd_digi = register_module('SVDDigitizer')
+svd_cls = register_module('SVDClusterizer')
 
 mctrackfinder = register_module('MCTrackFinder')
 mctrackfinder.param('UseCDCHits', True)
@@ -99,28 +81,28 @@ mcmatching.param(param_mcmatching)
 
 # ---------------------------------------------------------------
 # Track fitting is performed with GenFit
-cdcfitting = register_module('GenFitter')
+trackfitting = register_module('GenFitter')
 
 # set correct collection name as input and custom collection names as output
 # select DAF instead of Kalman as Filter
 # set the pdg hypothesis to the simulated one, if you want to fit with
 # different pdg hypothesises, set 'allPDG' to true
-param_cdcfitting = {
-    'GFTrackCandidatesColName': 'GFTrackCands',
-    'TracksColName': 'Tracks',
-    'GFTracksColName': 'GFTracks',
-    'GFTracksToMCParticlesColName': 'GFTracksToMCParticles',
-    'StoreFailedTracks': 0,
-    'mcTracks': 1,
-    'pdg': 211,
-    'allPDG': 0,
-    'FilterId': 0,
-    'NIterations': 1,
-    'ProbCut': 0.001,
-    }
-
-cdcfitting.param(param_cdcfitting)
-
+# param_cdcfitting = {
+#     'GFTrackCandidatesColName': 'GFTrackCands',
+#     'TracksColName': 'Tracks',
+#     'GFTracksColName': 'GFTracks',
+#     'GFTracksToMCParticlesColName': 'GFTracksToMCParticles',
+#     'StoreFailedTracks': 0,
+#     'mcTracks': 1,
+#     'pdg': 211,
+#     'allPDG': 0,
+#     'FilterId': 0,
+#     'NIterations': 1,
+#     'ProbCut': 0.001,
+#     }
+#
+# cdcfitting.param(param_cdcfitting)
+#
 # ---------------------------------------------------------------
 # dE/dx PID
 dedx = register_module('DedxPID')
@@ -165,16 +147,6 @@ arichDigi = register_module('ARICHDigitizer')
 arichRec = register_module('ARICHReconstructor')
 
 # ---------------------------------------------------------------
-# GAMMA reconstruction
-# gammaRec = register_module('ECLGammaReconstructor')
-# gammaRec.param('MdstGammaOutput', 'mdstGamma')
-
-# ---------------------------------------------------------------
-# PI0 reconstruction
-# pi0Rec = register_module('ECLPi0Reconstructor')
-# pi0Rec.param('MdstPi0Output', 'mdstPi0')
-
-# ---------------------------------------------------------------
 # Analysis module to study B0 -> Phi Kshort decays
 analysis = register_module('B2Dpi')
 
@@ -199,14 +171,17 @@ main.add_module(geometry)
 main.add_module(g4sim)
 
 main.add_module(cdcDigitizer)
-# main.add_module(cdcBackground)
 
-# main.add_module(trasan)
-# main.add_module(cdctracking)
+main.add_module(pxd_digi)
+main.add_module(pxd_cls)
+
+main.add_module(svd_digi)
+main.add_module(svd_cls)
+
 main.add_module(mctrackfinder)
 
 main.add_module(mcmatching)
-main.add_module(cdcfitting)
+main.add_module(trackfitting)
 
 # main.add_module(dedx)
 # main.add_module(ext)

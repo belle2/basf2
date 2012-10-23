@@ -55,14 +55,14 @@ namespace Belle2 {
      *
      *  @return           Vector of RelationEntry objects.
      */
-    std::vector<RelationEntry> relations() {return m_relations;}
+    const std::vector<RelationEntry>& relations() const {return m_relations;}
 
 
     /** Get number of relations.
      *
      *  @return           Number of relations.
      */
-    size_t size() {return m_relations.size();}
+    size_t size() const {return m_relations.size();}
 
     /** Get object with index.
      *

@@ -65,7 +65,7 @@ namespace Belle2 {
      *                 If empty the default store array name for class T will be used.
      *  @return        A vector of relations.
      */
-    template <class T> RelationVector<T> getRelationsTo(std::string name = "") {
+    template <class T> RelationVector<T> getRelationsTo(std::string name = "") const {
       return RelationVector<T>(DataStore::Instance().getRelationsFromTo(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name));
     }
 
@@ -76,7 +76,7 @@ namespace Belle2 {
      *                 If empty the default store array name for class T will be used.
      *  @return        A vector of relations.
      */
-    template <class T> RelationVector<T> getRelationsFrom(std::string name = "") {
+    template <class T> RelationVector<T> getRelationsFrom(std::string name = "") const {
       return RelationVector<T>(DataStore::Instance().getRelationsToFrom(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name));
     }
 
@@ -89,7 +89,7 @@ namespace Belle2 {
      *                 If empty the default store array name for class T will be used.
      *  @return        A vector of relations.
      */
-    template <class T> RelationVector<T> getRelationsWith(std::string name = "") {
+    template <class T> RelationVector<T> getRelationsWith(std::string name = "") const {
       return RelationVector<T>(DataStore::Instance().getRelationsWith(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name));
     }
 

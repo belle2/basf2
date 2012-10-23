@@ -41,6 +41,8 @@ namespace Belle2 {
       delete profileData;
     }
 
+    void findRelationsCheckContents();
+
     StoreArray<EventMetaData>* evtData; /**< event data array */
     StoreArray<ProfileInfo>* profileData; /**< run data array */
   };
@@ -284,6 +286,55 @@ namespace Belle2 {
     //no check is performed, user is responsible to check
     //using getFromAccessorParams and getToAccessorParams
     EXPECT_TRUE(rel_t("test2"));
+  }
+
+  /** Check contents of previously created relations. */
+  void RelationTest::findRelationsCheckContents()
+  {
+    const EventMetaData* fromObj = (*evtData)[0];
+    RelationVector<ProfileInfo> toRels = DataStore::getRelationsFromObj<ProfileInfo>(fromObj);
+    EXPECT_EQ(toRels.size(), 3);
+    //this is assuming stable order, correct?
+    EXPECT_DOUBLE_EQ(toRels.weight(0), 1.0);
+    EXPECT_DOUBLE_EQ(toRels.weight(1), 2.0);
+    EXPECT_DOUBLE_EQ(toRels.weight(2), 3.0);
+
+    EXPECT_TRUE(toRels.object(0) == (*profileData)[0]);
+    EXPECT_TRUE(toRels.object(1) == (*profileData)[1]);
+    EXPECT_TRUE(toRels.object(2) == (*profileData)[2]);
+
+    const ProfileInfo* toObj = (*profileData)[2];
+    RelationVector<EventMetaData> fromRels = DataStore::getRelationsToObj<EventMetaData>(toObj);
+    EXPECT_EQ(fromRels.size(), 1);
+    EXPECT_DOUBLE_EQ(fromRels.weight(0), 3.0);
+    EXPECT_TRUE(fromRels.object(0) == fromObj);
+    EXPECT_TRUE(fromRels[0] == fromObj);
+
+    //some things that shouldn't return anything
+    EXPECT_EQ(DataStore::getRelationsFromObj<EventMetaData>(fromObj).size(), 0);
+    EXPECT_EQ(DataStore::getRelationsToObj<ProfileInfo>(fromObj).size(), 0);
+    EXPECT_EQ(DataStore::getRelationsToObj<EventMetaData>(fromObj).size(), 0);
+  }
+
+  /** Test DataStore members for finding relations. */
+  TEST_F(RelationTest, FindRelations)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), profileData->getName()));
+    DataStore::Instance().setInitializeActive(false);
+
+    RelationArray relation(*evtData, *profileData);
+    relation.add(0, 0, 1.0);
+    relation.add(0, 1, 2.0);
+    relation.add(0, 2, 3.0);
+
+    findRelationsCheckContents();
+
+
+    //check that results don't change after consolidation
+    relation.consolidate();
+    findRelationsCheckContents();
+
   }
 
 }  // namespace

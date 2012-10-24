@@ -348,7 +348,7 @@ void GenFitterModule::event()
 
       B2DEBUG(99, "            (CDC: " << nCDC << ", SVD: " << nSVD << ", PXD: " << nPXD << ")");
 
-      if (gfTrack.getNumHits() < 3) {
+      if (gfTrack.getNumHits() < 3) { // this should not be nessesary because track finder should only produce track candidates with enough hits to calculate a momentum
         B2WARNING("GenFitter: only " << gfTrack.getNumHits() << " were assigned to the Track! This Track will not be fitted!");
         ++m_failedFitCounter;
       } else {
@@ -438,7 +438,7 @@ void GenFitterModule::event()
             tracks[trackCounter]->setNPXDHits(nPXD);
             tracks[trackCounter]->setMCId(aTrackCandPointer->getMcTrackId());
             tracks[trackCounter]->setPDG(aTrackCandPointer->getPdgCode());
-            tracks[trackCounter]->setPurity(aTrackCandPointer->getDip());
+            //tracks[trackCounter]->setPurity(aTrackCandPointer->getDip()); //setDip will be deleted soon. If purity is used it has to be passed differently to the Track class
             tracks[trackCounter]->setPValue(pValue);
             tracks[trackCounter]->setExtrapFailed(false);
 

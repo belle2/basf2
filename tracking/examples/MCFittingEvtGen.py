@@ -69,10 +69,10 @@ mctrackfinder = register_module('MCTrackFinder')
 # select which detectors you would like to use
 param_mctrackfinder = {'UseCDCHits': 1, 'UseSVDHits': 1, 'UsePXDHits': 1}
 
-# select which particles to use, here as example: use only particles which had
-# created hits in the CDC, have an energy > 0.1 and are charged
-param_mctrackfinder = {'WhichParticles': ['primary'], 'EnergyCut': 0.1,
-                       'Neutrals': 0}
+# select which particles to use, here as example: only particles which created
+# hits in all tracking detectors (PXD, SVD and CDC) but do not have to be
+# marked as primary
+param_mctrackfinder = {'WhichParticles': ['PXD', 'SVD', 'CDC']}
 mctrackfinder.param(param_mctrackfinder)
 
 # fitting

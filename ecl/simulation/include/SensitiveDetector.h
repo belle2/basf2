@@ -88,17 +88,15 @@ namespace Belle2 {
       double m_trackLength;       /** length of the track in the volume */
 
       int ECLHitIndex[8736][16]; /** Hit index of StoreArray */
-      int iECLCell;
-      int TimeIndex;
-      TVector3 PosCell;
-      TVector3 VecCell;
-      double local_pos;
-      double T_ave;
-      int firstcall;
+      int iECLCell;              /** Hit Energy of StoreArray */
+      int TimeIndex;             /** Hit Time of StoreArray */
+      TVector3 PosCell;          /** center of crystal position */
+      TVector3 VecCell;          /** vector of crystal axis */
+      double local_pos;          /** position alongthe vector of crystal axis   */
+      double T_ave;              /** flight time to diode sensor  */
+      int firstcall;             /** flag of first call   */
       typedef std::map< int, int>  PrimaryTrackMap; /** define a map type for Primary Track*/
       PrimaryTrackMap eclPrimaryMap; /** the map to store Primary Track*/
-      int oldPrimary;
-      int PrimaryTrackId;
 
     };
   } // end of namespace ecl

@@ -203,18 +203,33 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
 
 bool DataStore::addRelation(const TObject* fromObject, DataStore::StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, double weight)
 {
+  // get entry from which the relation points
   if (!findStoreEntry(fromObject, fromEntry, fromIndex)) return false;
 
+  // get entry to which the relation points
   StoreEntry* toEntry = 0;
   int toIndex = -1;
   if (!findStoreEntry(toObject, toEntry, toIndex)) return false;
 
+  // get the relations from -> to
   string relationsName = relationName(fromEntry->name, toEntry->name);
   if (m_storeObjMap[c_Event].find(relationsName) == m_storeObjMap[c_Event].end()) return false;
-  TObject* entry = m_storeObjMap[c_Event][relationsName]->ptr;
-  if (!entry) return false;
+  StoreEntry* entry = m_storeObjMap[c_Event][relationsName];
 
-  TClonesArray& relations = static_cast<RelationContainer*>(entry)->elements();
+  // auto create relations if needed
+  if (!entry->ptr) {
+    delete entry->object;
+    RelationContainer* relations = new RelationContainer;
+    relations->setFromName(fromEntry->name);
+    relations->setFromDurability(c_Event);
+    relations->setToName(toEntry->name);
+    relations->setToDurability(c_Event);
+    entry->object = relations;
+    entry->ptr = entry->object;
+  }
+
+  // add relation
+  TClonesArray& relations = static_cast<RelationContainer*>(entry->ptr)->elements();
   new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(fromIndex, toIndex, weight);
   return true;
 }
@@ -223,8 +238,10 @@ std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObje
 {
   std::vector<RelationEntry> result;
 
+  // get entry from which the relations point
   if (!findStoreEntry(fromObject, fromEntry, fromIndex)) return result;
 
+  // get names of store arrys to which the relations point
   std::vector<string> toNames;
   if (name == "ALL") {
     for (StoreObjIter iter = m_storeObjMap[c_Event].begin(); iter != m_storeObjMap[c_Event].end(); ++iter) {
@@ -241,16 +258,19 @@ std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObje
     toNames.push_back(name);
   }
 
+  // loop over to store arrays
   for (std::vector<string>::iterator toName = toNames.begin(); toName != toNames.end(); ++toName) {
     if (m_storeObjMap[c_Event].find(*toName) == m_storeObjMap[c_Event].end()) continue;
     TClonesArray* toArray = static_cast<TClonesArray*>(m_storeObjMap[c_Event][*toName]->ptr);
     if (!toArray) continue;
 
+    // get the relations from -> to
     string relationsName = relationName(fromEntry->name, *toName);
     if (m_storeObjMap[c_Event].find(relationsName) == m_storeObjMap[c_Event].end()) continue;
     TObject* entry = m_storeObjMap[c_Event][relationsName]->ptr;
     if (!entry) continue;
 
+    // loop over relations and collect those pointing from the fromObject
     TClonesArray& relations = static_cast<RelationContainer*>(entry)->elements();
     for (int iRelation = 0; iRelation < relations.GetEntriesFast(); iRelation++) {
       RelationElement* element = static_cast<RelationElement*>(relations[iRelation]);
@@ -270,8 +290,10 @@ std::vector<RelationEntry> DataStore::getRelationsToFrom(const TObject* toObject
 {
   std::vector<RelationEntry> result;
 
+  // get entry to which the relations point
   if (!findStoreEntry(toObject, toEntry, toIndex)) return result;
 
+  // get names of store arrys from which the relations point
   std::vector<string> fromNames;
   if (name == "ALL") {
     for (StoreObjIter iter = m_storeObjMap[c_Event].begin(); iter != m_storeObjMap[c_Event].end(); ++iter) {
@@ -288,16 +310,19 @@ std::vector<RelationEntry> DataStore::getRelationsToFrom(const TObject* toObject
     fromNames.push_back(name);
   }
 
+  // loop over from store arrays
   for (std::vector<string>::iterator fromName = fromNames.begin(); fromName != fromNames.end(); ++fromName) {
     if (m_storeObjMap[c_Event].find(*fromName) == m_storeObjMap[c_Event].end()) continue;
     TClonesArray* fromArray = static_cast<TClonesArray*>(m_storeObjMap[c_Event][*fromName]->ptr);
     if (!fromArray) continue;
 
+    // get the relations from -> to
     string relationsName = relationName(*fromName, toEntry->name);
     if (m_storeObjMap[c_Event].find(relationsName) == m_storeObjMap[c_Event].end()) continue;
     TObject* entry = m_storeObjMap[c_Event][relationsName]->ptr;
     if (!entry) return result;
 
+    // loop over relations and collect those pointing to the toObject
     TClonesArray& relations = static_cast<RelationContainer*>(entry)->elements();
     for (int iRelation = 0; iRelation < relations.GetEntriesFast(); iRelation++) {
       RelationElement* element = static_cast<RelationElement*>(relations[iRelation]);

@@ -38,15 +38,15 @@ subdetectorCodes = {
 # *******************************************************************************
 # USER SETTINGS
 subdetectorName = 'SVD'
-bgType = 'RBB'
-bgSource = 'HER'
-bgGenerator = 'BBBREMS'
+bgType = 'Touschek'
+bgSource = 'LER'
+bgGenerator = 'SAD'
 
 inputDir = '~/work/belle2/BG/summer2012'
 # A single background file !
 inputName = '{d}/output_{t}_{s}_*.root'.format(d=inputDir, t=bgType,
         s=bgSource)
-bgTime = 20  # us
+bgTime = 80  # us
 
 outputDir = '.'
 outputName = '{d}/rof_{det}_{t}_{s}.root'.format(d=outputDir,

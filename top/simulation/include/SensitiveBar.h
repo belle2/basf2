@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPSENSITIVETRACK_H
-#define TOPSENSITIVETRACK_H
+#ifndef TOPSENSITIVEBAR_H
+#define TOPSENSITIVEBAR_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <top/geometry/TOPGeometryPar.h>
@@ -20,14 +20,14 @@ namespace Belle2 {
 
     //! Optional (temporary) class providing the information on MCParticle at TOP bars
 
-    class SensitiveTrack : public Simulation::SensitiveDetectorBase {
+    class SensitiveBar : public Simulation::SensitiveDetectorBase {
 
     public:
 
       /**
        * Constructor.
        */
-      SensitiveTrack();
+      SensitiveBar();
 
       /**
        * Process each step and fill TOPBarHits

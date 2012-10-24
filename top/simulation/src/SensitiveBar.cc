@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <top/simulation/SensitiveTrack.h>
+#include <top/simulation/SensitiveBar.h>
 #include <top/dataobjects/TOPBarHit.h>
 #include <top/geometry/TOPGeometryPar.h>
 
@@ -32,8 +32,8 @@ using namespace std;
 namespace Belle2 {
   namespace TOP {
 
-    SensitiveTrack::SensitiveTrack():
-      Simulation::SensitiveDetectorBase("TOP", SensitiveTrack::TOP),
+    SensitiveBar::SensitiveBar():
+      Simulation::SensitiveDetectorBase("TOP", SensitiveBar::TOP),
       m_topgp(TOPGeometryPar::Instance())
     {
       // registration
@@ -48,7 +48,7 @@ namespace Belle2 {
     }
 
 
-    bool SensitiveTrack::step(G4Step* aStep, G4TouchableHistory*)
+    bool SensitiveBar::step(G4Step* aStep, G4TouchableHistory*)
     {
 
       m_topgp->setGeanUnits();

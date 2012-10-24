@@ -19,9 +19,9 @@ namespace Belle2 {
    * @{
    */
 
-  /*! Class to store MC particle track parameters at impact to TOP
+  /*! Class to store track parameters of incoming MC particles
    * relation to MCParticle
-   * filled in top/simulation/src/SensitiveTrack.cc
+   * filled in top/simulation/src/SensitiveBar.cc
    */
 
   class TOPBarHit : public TObject {

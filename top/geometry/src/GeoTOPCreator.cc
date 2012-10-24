@@ -18,7 +18,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <top/simulation/SensitivePMT.h>
-#include <top/simulation/SensitiveTrack.h>
+#include <top/simulation/SensitiveBar.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 
 #include <cmath>
@@ -67,7 +67,7 @@ namespace Belle2 {
     GeoTOPCreator::GeoTOPCreator(): isBeamBkgStudy(0)
     {
       m_sensitivePMT = new SensitivePMT();
-      m_sensitiveTrack = new SensitiveTrack();
+      m_sensitiveBar = new SensitiveBar();
       m_topgp = TOPGeometryPar::Instance();
     }
 
@@ -75,7 +75,7 @@ namespace Belle2 {
     GeoTOPCreator::~GeoTOPCreator()
     {
       if (m_sensitivePMT) delete m_sensitivePMT;
-      if (m_sensitiveTrack) delete m_sensitiveTrack;
+      if (m_sensitiveBar) delete m_sensitiveBar;
       if (m_topgp) delete m_topgp;
     }
 
@@ -93,8 +93,8 @@ namespace Belle2 {
       m_topgp->Initialize(content);
       m_topgp->setGeanUnits();
 
-      G4int moduleID = 0;
-      //build one segment
+      G4int moduleID = 0; // this is dummy
+      // build one module
       G4LogicalVolume* module = buildTOPModule(content, moduleID);
 
       G4double Radius = m_topgp->getRadius() + m_topgp->getQthickness() / 2.0;
@@ -188,7 +188,7 @@ namespace Belle2 {
       G4LogicalVolume* qbar = new G4LogicalVolume(bar, quartzMaterial, "cuttest");
 
       //!make quartz bar sensitive for tracking.
-      qbar->SetSensitiveDetector(m_sensitiveTrack);
+      qbar->SetSensitiveDetector(m_sensitiveBar);
 
       //! set the color of the bar
       setColor(*qbar, "rgb(0.0,0.75,1.0,1.0)");

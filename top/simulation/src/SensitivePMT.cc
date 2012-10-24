@@ -48,31 +48,31 @@ namespace Belle2 {
 
     G4bool SensitivePMT::step(G4Step* aStep, G4TouchableHistory*)
     {
-      // particle track
-      G4Track& track  = *aStep->GetTrack();
+      // photon track
+      G4Track& photon  = *aStep->GetTrack();
 
-      // check if it is an optical photon
-      if (track.GetDefinition()->GetParticleName() != "opticalphoton") return false;
+      // check if it is realy an optical photon
+      if (photon.GetDefinition()->GetParticleName() != "opticalphoton") return false;
 
       // pmt and bar ID
-      int pmtID = track.GetTouchableHandle()->GetReplicaNumber(1);
-      int barID = track.GetTouchableHandle()->GetReplicaNumber(4);
+      int pmtID = photon.GetTouchableHandle()->GetReplicaNumber(1);
+      int barID = photon.GetTouchableHandle()->GetReplicaNumber(4);
 
       // photon at detection
-      const G4ThreeVector& g_detPoint = track.GetPosition();
-      const G4ThreeVector& g_detMomDir = track.GetMomentumDirection();
+      const G4ThreeVector& g_detPoint = photon.GetPosition();
+      const G4ThreeVector& g_detMomDir = photon.GetMomentumDirection();
       TVector3 detPoint(g_detPoint.x(), g_detPoint.y(), g_detPoint.z());
       TVector3 detMomDir(g_detMomDir.x(), g_detMomDir.y(), g_detMomDir.z());
-      double detTime = track.GetGlobalTime();
-      double energy = track.GetKineticEnergy();
-      double length = track.GetTrackLength();
+      double detTime = photon.GetGlobalTime();
+      double energy = photon.GetKineticEnergy();
+      double length = photon.GetTrackLength();
 
       // photon at emission
-      const G4ThreeVector& g_emiPoint = track.GetVertexPosition();
-      const G4ThreeVector& g_emiMomDir = track.GetVertexMomentumDirection();
+      const G4ThreeVector& g_emiPoint = photon.GetVertexPosition();
+      const G4ThreeVector& g_emiMomDir = photon.GetVertexMomentumDirection();
       TVector3 emiPoint(g_emiPoint.x(), g_emiPoint.y(), g_emiPoint.z());
       TVector3 emiMomDir(g_emiMomDir.x(), g_emiMomDir.y(), g_emiMomDir.z());
-      double emiTime = track.GetGlobalTime() - track.GetLocalTime();
+      double emiTime = photon.GetGlobalTime() - photon.GetLocalTime();
 
       // convert to Basf units (photon energy in [eV]!)
       emiPoint = emiPoint * Unit::mm;
@@ -81,7 +81,7 @@ namespace Belle2 {
       length = length * Unit::mm;
 
       // hit position in local frame, converted to Basf units
-      G4ThreeVector localPosition = track.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(g_detPoint);
+      G4ThreeVector localPosition = photon.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(g_detPoint);
       double xLocal = localPosition.x() * Unit::mm;
       double yLocal = localPosition.y() * Unit::mm;
 
@@ -95,8 +95,8 @@ namespace Belle2 {
       StoreArray<MCParticle> particles;
       RelationArray relParticleHit(particles, hits);
       int lastHit = hits.getEntries() - 1;
-      int trackID = track.GetTrackID();
-      relParticleHit.add(trackID, lastHit);
+      int parentID = photon.GetParentID();
+      relParticleHit.add(parentID, lastHit);
 
       StoreArray<TOPSimPhoton> photons;
       if (!photons.isValid()) photons.create();
@@ -109,7 +109,7 @@ namespace Belle2 {
       relHitPhot.add(lastHit, lastPhot);
 
       // kill photon after detection
-      track.SetTrackStatus(fStopAndKill);
+      photon.SetTrackStatus(fStopAndKill);
 
       return true;
     }

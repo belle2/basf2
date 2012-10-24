@@ -190,7 +190,7 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
       TClonesArray* array = static_cast<TClonesArray*>(iter->second->ptr);
       const TClass* arrayClass = array->GetClass();
       if (arrayClass == objectClass) {
-        if (array->Last()) {
+        if (object == array->Last()) {
           //quickly find entry if it's at the end of the array
           index = array->GetLast();
         } else {

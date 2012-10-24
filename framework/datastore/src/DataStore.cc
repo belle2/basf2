@@ -184,13 +184,19 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
   index = -1;
 
   // search for the object and set the entry and index
-  TClass* objectClass = object->IsA();
+  const TClass* objectClass = object->IsA();
   for (StoreObjIter iter = m_storeObjMap[c_Event].begin(); iter != m_storeObjMap[c_Event].end(); ++iter) {
     if (iter->second->ptr && iter->second->isArray) {
       TClonesArray* array = static_cast<TClonesArray*>(iter->second->ptr);
-      TClass* arrayClass = array->GetClass();
+      const TClass* arrayClass = array->GetClass();
       if (arrayClass == objectClass) {
-        index = array->IndexOf(object);
+        if (array->Last()) {
+          //quickly find entry if it's at the end of the array
+          index = array->GetLast();
+        } else {
+          index = array->IndexOf(object);
+        }
+
         if (index >= 0) {
           entry = iter->second;
           return true;
@@ -212,7 +218,7 @@ bool DataStore::addRelation(const TObject* fromObject, DataStore::StoreEntry*& f
   if (!findStoreEntry(toObject, toEntry, toIndex)) return false;
 
   // get the relations from -> to
-  string relationsName = relationName(fromEntry->name, toEntry->name);
+  const string& relationsName = relationName(fromEntry->name, toEntry->name);
   if (m_storeObjMap[c_Event].find(relationsName) == m_storeObjMap[c_Event].end()) return false;
   StoreEntry* entry = m_storeObjMap[c_Event][relationsName];
 
@@ -234,7 +240,7 @@ bool DataStore::addRelation(const TObject* fromObject, DataStore::StoreEntry*& f
   return true;
 }
 
-std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObject, DataStore::StoreEntry*& fromEntry, int& fromIndex, TClass* toClass, std::string name)
+std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObject, DataStore::StoreEntry*& fromEntry, int& fromIndex, const TClass* toClass, const std::string& name)
 {
   std::vector<RelationEntry> result;
 
@@ -286,7 +292,7 @@ std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObje
   return result;
 }
 
-std::vector<RelationEntry> DataStore::getRelationsToFrom(const TObject* toObject, DataStore::StoreEntry*& toEntry, int& toIndex, TClass* fromClass, std::string name)
+std::vector<RelationEntry> DataStore::getRelationsToFrom(const TObject* toObject, DataStore::StoreEntry*& toEntry, int& toIndex, const TClass* fromClass, const std::string& name)
 {
   std::vector<RelationEntry> result;
 
@@ -338,7 +344,7 @@ std::vector<RelationEntry> DataStore::getRelationsToFrom(const TObject* toObject
   return result;
 }
 
-std::vector<RelationEntry> DataStore::getRelationsWith(const TObject* object, DataStore::StoreEntry*& entry, int& index, TClass* withClass, std::string name)
+std::vector<RelationEntry> DataStore::getRelationsWith(const TObject* object, DataStore::StoreEntry*& entry, int& index, const TClass* withClass, const std::string& name)
 {
   std::vector<RelationEntry> result = getRelationsFromTo(object, entry, index, withClass, name);
 

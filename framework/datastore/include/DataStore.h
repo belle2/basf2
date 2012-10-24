@@ -230,7 +230,7 @@ namespace Belle2 {
      *                        If the special name "ALL" is given all store arrays containing objects of type toClass are considered.
      *  @return               Vector of relation entry objects.
      */
-    std::vector<RelationEntry> getRelationsFromTo(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, TClass* toClass, std::string name);
+    std::vector<RelationEntry> getRelationsFromTo(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TClass* toClass, const std::string& name);
 
     /** Get the relations to an object from other objects in a store array.
      *
@@ -243,7 +243,7 @@ namespace Belle2 {
      *                        If the special name "ALL" is given all store arrays containing objects of type fromClass are considered.
      *  @return               Vector of relation entry objects.
      */
-    std::vector<RelationEntry> getRelationsToFrom(const TObject* toObject, StoreEntry*& toEntry, int& toIndex, TClass* fromClass, std::string name);
+    std::vector<RelationEntry> getRelationsToFrom(const TObject* toObject, StoreEntry*& toEntry, int& toIndex, const TClass* fromClass, const std::string& name);
 
     /** Get the relations between an object and other objects in a store array.
      *
@@ -258,7 +258,7 @@ namespace Belle2 {
      *                        If the special name "ALL" is given all store arrays containing objectt of type withClass are considered.
      *  @return               Vector of relation entry objects.
      */
-    std::vector<RelationEntry> getRelationsWith(const TObject* object, StoreEntry*& entry, int& index, TClass* withClass, std::string name);
+    std::vector<RelationEntry> getRelationsWith(const TObject* object, StoreEntry*& entry, int& index, const TClass* withClass, const std::string& name);
 
     /** Add a relation from an object in a store array to another object in a store array.
      *
@@ -284,7 +284,7 @@ namespace Belle2 {
      *                        If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return               Vector of relation entry objects.
      */
-    template <class T> static RelationVector<T> getRelationsFromObj(const TObject* object, std::string name = "") {
+    template <class T> static RelationVector<T> getRelationsFromObj(const TObject* object, const std::string& name = "") {
       StoreEntry* storeEntry = 0;
       int index = -1;
       return RelationVector<T>(Instance().getRelationsFromTo(object, storeEntry, index, T::Class(), name));
@@ -300,7 +300,7 @@ namespace Belle2 {
      *                        If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return               Vector of relation entry objects.
      */
-    template <class T> static RelationVector<T> getRelationsToObj(const TObject* object, std::string name = "") {
+    template <class T> static RelationVector<T> getRelationsToObj(const TObject* object, const std::string& name = "") {
       StoreEntry* storeEntry = 0;
       int index = -1;
       return RelationVector<T>(Instance().getRelationsToFrom(object, storeEntry, index, T::Class(), name));
@@ -318,7 +318,7 @@ namespace Belle2 {
      *                        If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return               Vector of relation entry objects.
      */
-    template <class T> static RelationVector<T> getRelationsWithObj(const TObject* object, std::string name = "") {
+    template <class T> static RelationVector<T> getRelationsWithObj(const TObject* object, const std::string& name = "") {
       StoreEntry* storeEntry = 0;
       int index = -1;
       return RelationVector<T>(Instance().getRelationsWith(object, storeEntry, index, T::Class(), name));

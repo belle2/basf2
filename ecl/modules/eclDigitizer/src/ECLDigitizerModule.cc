@@ -121,7 +121,7 @@ void ECLDigitizerModule::event()
     // Hit geom. info
 //    int hitEventId       =  aECLSimHit->getEventId();
 
-    int hitCellId       =  aECLSimHit->getCellId();
+    int hitCellId       =  aECLSimHit->getCellId() - 1; //0~8735
     double hitE         =  aECLSimHit->getEnergyDep() / Unit::GeV;
     double hitTimeAve       =  aECLSimHit->getTimeAve()   / Unit::us;
     double sampleTime ;
@@ -176,14 +176,14 @@ void ECLDigitizerModule::event()
         if (!eclDspArray) eclDspArray.create();
         m_hitNum = eclDspArray->GetLast() + 1;
         new(eclDspArray->AddrAt(m_hitNum)) ECLDsp();
-        eclDspArray[m_hitNum]->setCellId(iECLCell);
+        eclDspArray[m_hitNum]->setCellId(iECLCell + 1);
         eclDspArray[m_hitNum]->setDspA(FitA);
 
         StoreArray<ECLDigit> eclDigiArray;
         if (!eclDigiArray) eclDigiArray.create();
         m_hitNum1 = eclDigiArray->GetLast() + 1;
         new(eclDigiArray->AddrAt(m_hitNum1)) ECLDigit();
-        eclDigiArray[m_hitNum1]->setCellId(iECLCell + 1);
+        eclDigiArray[m_hitNum1]->setCellId(iECLCell + 1);//iECLCell + 1= 1~8736
         eclDigiArray[m_hitNum1]->setAmp(energyFit[iECLCell]);//E (GeV) = energyFit/20000;
         eclDigiArray[m_hitNum1]->setTimeFit(tFit[iECLCell]);//t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
         eclDigiArray[m_hitNum1]->setQuality(qualityFit[iECLCell]);

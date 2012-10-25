@@ -18,15 +18,17 @@
 #include <generators/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
+//#include <cdc/geometry/CDCGeometryPar.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <vxd/dataobjects/VxdID.h>
-
+//#include <framework/dataobjects/SimpleVec.h>
 #include <GFTrackCand.h>
 
 #include <boost/foreach.hpp>
+//#include <boost/math/special_functions/sign.hpp>
 
 #include <TRandom.h>
 
@@ -37,6 +39,8 @@
 
 using namespace std;
 using namespace Belle2;
+
+//using boost::math::sign;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -65,7 +69,7 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
 
   //choose for which particles a track candidate should be created
   //this is just an attempt to find out what is the most suitable way to select particles, if you have other/better ideas, communicate it to the tracking group...
-  addParam("WhichParticles", m_whichParticles, "List of keywords to mark what properties particles must have to get a track candidate. If several properties are given all of them must be true: \"primary\" particle must come from the generator, \"PXD\" particle must have hits in PXD, \"SVD\" particle must have hits in SVD, \"CDC\" particle must have hits in CDC", vector<string>(1, "primary"));
+  addParam("WhichParticles", m_whichParticles, "List of keywords to mark what properties particles must have to get a track candidate. If several properties are given all of them must be true: \"primary\" particle must come from the generator, \"PXD\" particle must have hits in PXD, \"SVD\" particle must have hits in SVD, \"CDC\" particle must have hits in CDC, \"TOP\" particle must have hits in TOP, \"ECL\" particle must have hits in ECL, \"KLM\" particle must have hits in KLM" , vector<string>(1, "primary"));
   addParam("EnergyCut", m_energyCut, "Track candidates are only created for MCParticles with energy larger than this cut ", double(0.1));
   addParam("Neutrals", m_neutrals, "Set true if track candidates should be created also for neutral particles", bool(false));
 
@@ -89,8 +93,13 @@ void MCTrackFinderModule::initialize()
 
   //output store arrays have to be registered in initialize()
   StoreArray<GFTrackCand>::registerPersistent(m_gfTrackCandsColName);
+
+//  StoreArray<SimpleVec<char> >::registerPersistent("leftRightAmbiInfo");
+
   RelationArray::registerPersistent<GFTrackCand, MCParticle>(m_gfTrackCandsColName, "");
 
+// StoreArray<vector<char> >::retgisterTransient("leftRightAmbiInfo");
+  // build a bit mask with all properties a MCParticle should have to lead to the creation of a track candidate
   m_particleProperties = 0;
   const int nProperties = m_whichParticles.size();
   for (int i = 0; i not_eq nProperties; ++i) {
@@ -102,6 +111,12 @@ void MCTrackFinderModule::initialize()
       m_particleProperties += 4;
     } else if (m_whichParticles[i] == "CDC") {
       m_particleProperties += 8;
+    } else if (m_whichParticles[i] == "TOP") {
+      m_particleProperties += 16;
+    } else if (m_whichParticles[i] == "ECL") {
+      m_particleProperties += 32;
+    } else if (m_whichParticles[i] == "KLM") {
+      m_particleProperties += 64;
     } else {
       B2FATAL("Invalid values were given to the MCTrackFinder parameter WhichParticles");
     }
@@ -203,6 +218,8 @@ void MCTrackFinderModule::event()
 
 
   //register StoreArray which will be filled by this module
+//  StoreArray<SimpleVec<char> > leftRightAmbiInfo("leftRightAmbiInfo");
+//  leftRightAmbiInfo.create();
   StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
   trackCandidates.create();
   RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
@@ -228,6 +245,15 @@ void MCTrackFinderModule::event()
     }
     if (aMcParticlePtr->hasStatus(MCParticle::c_SeenInCDC)) {
       mcParticleProperties += 8;
+    }
+    if (aMcParticlePtr->hasStatus(MCParticle::c_SeenInTOP)) {
+      mcParticleProperties += 16;
+    }
+    if (aMcParticlePtr->hasStatus(MCParticle::c_LastSeenInECL)) {
+      mcParticleProperties += 32;
+    }
+    if (aMcParticlePtr->hasStatus(MCParticle::c_LastSeenInKLM)) {
+      mcParticleProperties += 64;
     }
     // check all properties that the mcparticle should have in one line.
     if ((mcParticleProperties bitand m_particleProperties) != m_particleProperties) {
@@ -448,22 +474,39 @@ void MCTrackFinderModule::event()
 
 
     if (m_useCDCHits) {
+      //CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
       float time = -1;
+      vector<char> leftRight;
       BOOST_FOREACH(int hitID, cdcHitsIndices) {
         //for the DAF algorithm within GenFit it is important to assign a planeId to each hit
         //I am still not quite sure which way is the best one, this has to be tested...
-        int uniqueId = cdcHits[hitID]->getID();
+        unsigned short wireId = cdcHits[hitID]->getID();
         //set the time as the ordering parameter rho for genfit to do this search for any CDCSimHit that corresponds to the CDCHit and take the time from there
+        //be aware that this is some kind of hack because it is not garanteed by the framework that the "first" simhit belonging to a cdchit is really comming from the original particle
+        //it might also come from a secondary particle created by material effects. But the code here seems to work.
+        CDCSimHit* aCDCSimHitPtr = NULL;
         for (int j = 0; j != nCdcSimHitToHitRel; ++j) {
           if (unsigned(hitID) == cdcSimHitToHitRel[j].getToIndex(0)) {
-            time = cdcSimHits[cdcSimHitToHitRel[j].getFromIndex()]->getFlightTime();
+            aCDCSimHitPtr = cdcSimHits[cdcSimHitToHitRel[j].getFromIndex()];
             break;
           }
         }
-        trackCandidates[counter]->addHit(2, hitID, time, uniqueId);
+        time = aCDCSimHitPtr->getFlightTime();
+        trackCandidates[counter]->addHit(2, hitID, time, wireId);
+//        TVector3 simHitPos = aCDCSimHitPtr->getPosTrack();
+//        TVector3 simMom = aCDCSimHitPtr->getMomentum();
+//        TVector3 simHitPosOnWire = aCDCSimHitPtr->getPosWire();
+//        TVector3  wireStartPos = cdcGeometry.wireBackwardPosition(WireID(wireId));
+//        TVector3 wireDir = simHitPosOnWire - wireStartPos;
+//        TVector3 wireToSimHit = simHitPos - simHitPosOnWire;
+//        leftRight.push_back(sign(wireToSimHit * ( wireDir.Cross(simMom) )));
       }
       B2DEBUG(100, "    add " << cdcHitsIndices.size() << " CDCHits");
+//      leftRightAmbiInfo.appendNew(SimpleVec<char>(leftRight)); // not sorted will not work with curling tracks
     }
+
+
+
     // now after all the hits belonging to one track are added to a track candidate
     // bring them into the right order inside the trackCand objects using the rho/time parameter
     //trackCandidates[counter]->Print();
@@ -476,7 +519,7 @@ void MCTrackFinderModule::event()
 void MCTrackFinderModule::endRun()
 {
   if (m_notEnoughtHitsCounter != 0) {
-    B2WARNING(m_notEnoughtHitsCounter << " tracks had not enough hit to have at least " << m_minimalNdf << " number of degrees of freedom (NDF). No Track Candidates were created from them so they will not be passed to the track fitter");
+    B2WARNING(m_notEnoughtHitsCounter << " tracks had not enough hits to have at least " << m_minimalNdf << " number of degrees of freedom (NDF). No Track Candidates were created from them so they will not be passed to the track fitter");
   }
   if (m_noTrueHitCounter != 0) {
     B2WARNING(m_noTrueHitCounter << " cluster hits did not have a relation to a true hit and were therefore not included in a track candidate");

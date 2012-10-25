@@ -53,15 +53,22 @@ namespace Belle2 {
       Simulation::SensitiveDetectorBase(name, ECL), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
       m_thresholdKineticEnergy(thresholdKineticEnergy), m_simhitNumber(0), m_trackID(-999), firstcall(0)
     {
-      StoreArray<ECLSim>eclSims;
-      StoreArray<MCParticle>mcParticles;
 
+      StoreArray<ECLSim>eclSims;
+      StoreArray<ECLSimHit>eclSimHits;
+      StoreArray<MCParticle>mcParticles;
       RelationArray eclSimRel(mcParticles, eclSims);
       registerMCParticleRelation(eclSimRel);
+      RelationArray eclSimHitRel(mcParticles, eclSimHits);
+      registerMCParticleRelation(eclSimHitRel);
+
+      eclSims.registerAsPersistent();
+      eclSimHits.registerAsPersistent();
       StoreArray<ECLSim>::registerPersistent();
       StoreArray<ECLSimHit>::registerPersistent();
       RelationArray::registerPersistent<MCParticle, ECLSim>("", "");
-      RelationArray::registerPersistent<ECLSimHit, MCParticle>("", "");
+      RelationArray::registerPersistent<MCParticle, ECLSimHit>("", "");
+
     }
 
 
@@ -192,7 +199,7 @@ namespace Belle2 {
       eclSimRel.add(trackID, m_simhitNumber);
 
       StoreArray<ECLSimHit> eclSimHitArray;
-      RelationArray eclSimHitToMCPart(eclSimHitArray, mcParticles);
+      RelationArray eclSimHitRel(mcParticles, eclSimHitArray);
       StoreObjPtr<EventMetaData> eventMetaDataPtr;
       int m_currentEvnetNumber = eventMetaDataPtr->getEvent();
 
@@ -226,6 +233,8 @@ namespace Belle2 {
             eclSimHitArray[m_hitNum]->setCellId(cellId + 1);
             eclSimHitArray[m_hitNum]->setEnergyDep(E_cell);
             eclSimHitArray[m_hitNum]->setTimeAve(T_ave);
+            eclSimHitRel.add(trackID, m_hitNum);
+
           } else {
             m_hitNum = ECLHitIndex[cellId][TimeIndex];
             double old_edep = eclSimHitArray[m_hitNum]->getEnergyDep();
@@ -238,6 +247,8 @@ namespace Belle2 {
             //    <<"= "<< (old_edep*old_TimeAve+ E_cell*T_ave)/(old_edep+E_cell)<<endl;
             eclSimHitArray[m_hitNum]->setEnergyDep(old_edep + E_cell);
             eclSimHitArray[m_hitNum]->setTimeAve((old_edep * old_TimeAve + E_cell * T_ave) / (old_edep + E_cell));
+            eclSimHitRel.add(trackID, m_hitNum);
+
           }
         }
       }//if m_oldEvnetNumber==m_oldEvnetNumber

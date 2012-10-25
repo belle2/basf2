@@ -15,10 +15,6 @@
 #include <TVector3.h>
 
 #include <generators/dataobjects/SimHitBase.h>
-// ROOT
-#include <TObject.h>
-#include <TVector3.h>
-#include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
 

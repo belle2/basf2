@@ -70,7 +70,7 @@ namespace Belle2 {
     */
     ECLSimHit() {;}
     /** ROOT Macro.*/
-    ClassDef(ECLSimHit, 2);
+    ClassDef(ECLSimHit, 3);
 
   };
 

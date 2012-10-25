@@ -17,7 +17,7 @@
 #include <framework/logging/Logger.h>
 
 //ecl package headers
-#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLSim.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLDigit.h>
@@ -110,6 +110,8 @@ void ECLMCMatchingModule::event()
                cout<<" "<<m_nEvent<<"Track "<<mcParticles[iPart]->getArrayIndex()
                <<" PDG "<<mcParticles[iPart]->getPDG()
                <<" P "<<mcParticles[iPart]->getMomentum().Mag()
+               <<" theta "<< mcParticles[iPart]->getMomentum().Theta()* 180 /M_PI
+               <<" phi "<<   mcParticles[iPart]->getMomentum().Phi()* 180 /M_PI
                <<" vx "<< mcParticles[iPart]->getProductionVertex().Perp()<<" "<<mcParticles[iPart]->getProductionVertex().z()<<endl;
         else
                cout<<" "<<m_nEvent<<"Track "<<mcParticles[iPart]->getArrayIndex()
@@ -132,51 +134,8 @@ void ECLMCMatchingModule::event()
     }
   }
 
-  StoreArray<ECLSimHit> eclSimArray;
-  StoreArray<ECLSimHit> eclHitArray;
-  RelationArray eclSimHitRel(mcParticles, eclSimArray);
-  RelationArray eclHitToMCPart(eclHitArray, mcParticles);
-
-  /*
-    int hitNum = eclHitArray->GetEntriesFast();
-    for (int ii = 0; ii < hitNum; ii++) {
-      ECLSimHit* aECLSimHit = eclHitArray[ii];
-      int hitCellId       =  aECLSimHit->getCellId();
-      double hitTimeAve       =  aECLSimHit->getTimeAve()   * Unit::ns;
-      int TimeIndex = (int) hitTimeAve / 500;
-      HitIndex[hitCellId][TimeIndex] = ii;
-    }
-
-    for (int index = 0; index < eclSimHitRel.getEntries(); index++) {
-
-      MCParticle* aMCParticle = mcParticles[eclSimHitRel[index].getFromIndex()];
-      TVector3 McP =  aMCParticle->getMomentum();
-      TVector3 Pvertex = aMCParticle->getProductionVertex();
-
-      int PrimaryIndex = -1;
-      map<int, int>::iterator iter = eclPrimaryMap.find(eclSimHitRel[index].getFromIndex());
-      if (iter != eclPrimaryMap.end()) {
-        PrimaryIndex = iter->second;
-      } else cout << "CantFind Track in eclPrimaryMap " << eclSimHitRel[index].getFromIndex() << endl;
-
-      for (int hit = 0; hit < (int)eclSimHitRel[index].getToIndices().size(); hit++) {
-        ECLSimHit* aECLSimHit = eclSimArray[eclSimHitRel[index].getToIndex(hit)];
-        int hitCellId         = aECLSimHit->getCellId();
-        double hitE           = aECLSimHit->getEnergyDep() * Unit::GeV;
-        //double hitTOF         = aECLSimHit->getFlightTime() * Unit::ns;
-        int TimeIndex = (int) hitTOF / 500;
-
-
-        if (hitTOF < 8000 && hitE > 30e-6) {
-          if (PrimaryIndex != -1 && HitIndex[hitCellId][TimeIndex] != -1 && HitOldTrack[hitCellId][TimeIndex] != PrimaryIndex) {
-            eclHitToMCPart.add(HitIndex[hitCellId][TimeIndex], PrimaryIndex);
-            HitOldTrack[hitCellId][TimeIndex] = PrimaryIndex;
-          }
-        }//if hitTOF < 8000&&E_cell[hitCellId][TimeIndex] > 30e-6)
-      }//for (int hit = 0
-    }//for index
-  */
-
+  StoreArray<ECLSimHit> eclSimHitArray;
+  RelationArray eclSimHitRel(mcParticles, eclSimHitArray);
   StoreArray<ECLDigit> eclDigiArray;
   RelationArray  eclDigiToMCPart(eclDigiArray, mcParticles);
 
@@ -188,18 +147,27 @@ void ECLMCMatchingModule::event()
     if (FitEnergy < 0.) {continue;}
     DigiIndex[cId] = ii;
   }
-  const int eclHitToMCPartn = eclHitToMCPart.getEntries() ;
-  for (int index = 0; index < eclHitToMCPartn; index++) {
-    ECLSimHit* aECLSimHit = eclHitArray[eclHitToMCPart[index].getFromIndex()];
-    int hitCellId       =  aECLSimHit->getCellId();
 
-    for (int iMCpart = 0; iMCpart < (int)eclHitToMCPart[index].getToIndices().size(); iMCpart++) {
-      if (DigiIndex[hitCellId] != -1 && DigiOldTrack[hitCellId] != (int)eclHitToMCPart[index].getToIndex(iMCpart)) {
-        eclDigiToMCPart.add(DigiIndex[hitCellId], eclHitToMCPart[index].getToIndex(iMCpart));
-        DigiOldTrack[hitCellId] = eclHitToMCPart[index].getToIndex(iMCpart);
+
+  for (int index = 0; index < eclSimHitRel.getEntries(); index++) {
+
+    //MCParticle* aMCParticle = mcParticles[eclSimHitRel[index].getFromIndex()];
+    int PrimaryIndex = -1;
+    map<int, int>::iterator iter = eclPrimaryMap.find(eclSimHitRel[index].getFromIndex());
+    if (iter != eclPrimaryMap.end()) {
+      PrimaryIndex = iter->second;
+    } else cout << "CantFind Track in eclPrimaryMap " << eclSimHitRel[index].getFromIndex() << endl;
+
+    for (int hit = 0; hit < (int)eclSimHitRel[index].getToIndices().size(); hit++) {
+      ECLSimHit* aECLSimHit = eclSimHitArray[eclSimHitRel[index].getToIndex(hit)];
+      int hitCellId         = aECLSimHit->getCellId() - 1;
+      if (DigiIndex[hitCellId] != -1 && DigiOldTrack[hitCellId] != PrimaryIndex) {
+        eclDigiToMCPart.add(DigiIndex[hitCellId], PrimaryIndex);
+        DigiOldTrack[hitCellId] = PrimaryIndex;
       }
-    }
-  }
+    }//for (int hit = 0
+  }//for index
+
 
   StoreArray<ECLShower> eclRecShowerArray;
   StoreArray<ECLHitAssignment> eclHitAssignmentArray;
@@ -237,15 +205,30 @@ void ECLMCMatchingModule::event()
         ShowerIndex =  iter++->second ;
         if (ShowerIndex != -1 && ShowerOldTrack[ShowerIndex] != (int)eclDigiToMCPart[index].getToIndex(iMCpart)) {
           eclShowerToMCPart.add(ShowerIndex, eclDigiToMCPart[index].getToIndex(iMCpart));
-          // cout << "ShowerRel" << m_nEvent << " " << cId << " shower" << ShowerIndex << " mom" << eclDigiToMCPart[index].getToIndex(iMCpart)
-          //       << " PDG " << mcParticles[eclDigiToMCPart[index].getToIndex(iMCpart)]->getPDG()
+
+          ECLShower* aECLShower = eclRecShowerArray[ShowerIndex];
+
+          //cout << "ShowerRel" << m_nEvent << " " << cId << " shower" << ShowerIndex
+          //      << " Energy "<<  aECLShower->GetEnergy()
+          //      << " theta "<<  aECLShower->GetTheta()* 180 /M_PI <<" phi "<<  aECLShower->GetPhi()* 180 /M_PI
+          //      << " mom" << eclDigiToMCPart[index].getToIndex(iMCpart)
+          //      << " PDG " << mcParticles[eclDigiToMCPart[index].getToIndex(iMCpart)]->getPDG()
           //      << endl;
           ShowerOldTrack[ShowerIndex] = eclDigiToMCPart[index].getToIndex(iMCpart);
-        }
+
+          //double showerId = aECLShower->GetShowerId();
+          //for (int iHA = 0; iHA < hANum; iHA++) {
+          //ECLHitAssignment* aECLHitAssignment = eclHitAssignmentArray[iHA];
+          //int m_HAShowerId = aECLHitAssignment->getShowerId();
+          //int m_HAcellId = aECLHitAssignment->getCellId();
+          //if (m_HAShowerId !=showerId )continue;
+          //if (m_HAShowerId > showerId)break;
+          //cout<<"HA "<<m_nEvent <<" "<<m_HAcellId<<" "<< eclDigiToMCPart[index].getToIndex(iMCpart)<<endl;
+          //}//for HA hANum
+        }//ShowerIndex != -1
       }
     }//for iMCpart
   }//for index
-
   m_nEvent++;
 
 }

@@ -29,14 +29,15 @@ intseed = random.randint(1, 10000000)
 
 pGun = register_module('ParticleGun')
 param_pGun = {
+#    'pdgCodes': [22,11,-11,13,-13,211,-211,2212,-2212,111],
     'pdgCodes': [22],
-    'nTracks': 1,
+    'nTracks': 6,
     'momentumGeneration': 'uniform',
     'momentumParams': [1., 1.],
     'thetaGeneration': 'uniform',
     'thetaParams': [50., 130.],
     'phiGeneration': 'uniform',
-    'phiParams': [0, 360],
+    'phiParams': [0, 360.],
     'vertexGeneration': 'uniform',
     'xVertexParams': [0.0, 0.0],
     'yVertexParams': [0.0, 0.0],
@@ -45,7 +46,6 @@ param_pGun = {
 
 pGun.param(param_pGun)
 
-eclHit = register_module('ECLHit')
 eclDigi = register_module('ECLDigitizer')
 eclRecShower = register_module('ECLReconstructor')
 makeMatch = register_module('ECLMCMatching')
@@ -58,7 +58,6 @@ main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pGun)
 main.add_module(g4sim)
-main.add_module(eclHit)
 main.add_module(eclDigi)
 main.add_module(eclRecShower)
 main.add_module(makeMatch)

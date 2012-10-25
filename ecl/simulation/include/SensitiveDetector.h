@@ -74,7 +74,6 @@ namespace Belle2 {
       int m_hitNum;                  /** The current number of created hits in an event. Used to fill the DataStore ECLHit.*/
       int m_EvnetNumber;                /**  The current number of created hits in an event. Used to fill the DataStore ECL EB array. */
       int m_oldEvnetNumber;                /**  The current number of created hits in an event. Used to fill the DataStore  */
-      ECLGeometryPar eclp;              /**ECLGeometryPar  convert the G4Volume name to cellID */
       int m_trackID;                    /** track id */
       G4ThreeVector m_startPos;         /**  Position of prestep */
       G4ThreeVector m_endPos;     /**  Position of poststep*/

@@ -55,13 +55,18 @@ namespace Belle2 {
     {
       StoreArray<ECLSim>eclSims;
       StoreArray<MCParticle>mcParticles;
-
+      StoreArray<ECLSimHit>eclSimHits;
       RelationArray eclSimRel(mcParticles, eclSims);
       registerMCParticleRelation(eclSimRel);
-      StoreArray<ECLSim>::registerPersistent();
-      StoreArray<ECLSimHit>::registerPersistent();
+      RelationArray eclSimHitRel(mcParticles, eclSimHits);
+      registerMCParticleRelation(eclSimHitRel);
+
+      eclSims.registerAsPersistent();
+      eclSimHits.registerAsPersistent();
+      //StoreArray<ECLSim>::registerPeristent();
+      //StoreArray<ECLSimHit>::registerPersistent();
       RelationArray::registerPersistent<MCParticle, ECLSim>("", "");
-      RelationArray::registerPersistent<ECLSimHit, MCParticle>("", "");
+      RelationArray::registerPersistent<MCParticle, ECLSimHit>("", "");
     }
 
 
@@ -120,8 +125,17 @@ namespace Belle2 {
         // Get layer ID
 
         if (v.GetName().find("Crystal") != string::npos) {
+          ECLGeometryPar* eclp = ECLGeometryPar::Instance();
+          m_cellID = eclp->ECLVolNameToCellID(v.GetName());
+          //eclp->Mapping(m_cellID);
+          //TVector3 x = eclp->GetCrystalPos(m_cellID);
+          //cout << v.GetName()<<" "<<m_cellID<<" "<<eclp->GetThetaID()<<" "<<eclp->GetPhiID()
+          //     <<" theta "<< position.Theta()* 180 /M_PI
+          //     <<" phi "<<   position.Phi()* 180 /M_PI
+          //     <<" theta "<< x.Theta()* 180 /M_PI
+          //     <<" phi "<<   x.Phi()* 180 /M_PI
+          //    <<endl;
 
-          m_cellID = eclp.ECLVolNameToCellID(v.GetName());
           int saveIndex = -999;
           double dTotalEnergy = 1 / m_energyDeposit; //avoid the error  no match for 'operator/'
           if (m_energyDeposit > 0.)saveIndex = saveSimHit(m_cellID, m_trackID, pdgCode, m_WightedTime / m_energyDeposit , m_energyDeposit, m_momentum, m_WightedPos * dTotalEnergy);
@@ -191,12 +205,11 @@ namespace Belle2 {
       eclSimRel.add(trackID, m_simhitNumber);
 
       StoreArray<ECLSimHit> eclSimHitArray;
-      RelationArray eclSimHitToMCPart(eclSimHitArray, mcParticles);
+      RelationArray eclSimHitRel(mcParticles, eclSimHitArray);
       StoreObjPtr<EventMetaData> eventMetaDataPtr;
       int m_currentEvnetNumber = eventMetaDataPtr->getEvent();
 
       if (!eclSimHitArray) eclSimHitArray.create();
-      //cout<<PrimaryTrackId<<" "<<trackID<<endl;
       //cout<<"firstcall "<<firstcall<<" m_oldEvnetNumber "<<m_oldEvnetNumber<<endl;
       if (firstcall == 0 || m_currentEvnetNumber != m_oldEvnetNumber) {
         m_oldEvnetNumber = m_currentEvnetNumber;
@@ -225,6 +238,7 @@ namespace Belle2 {
             eclSimHitArray[m_hitNum]->setCellId(cellId);
             eclSimHitArray[m_hitNum]->setEnergyDep(E_cell);
             eclSimHitArray[m_hitNum]->setTimeAve(T_ave);
+            eclSimHitRel.add(trackID, m_hitNum);
           } else {
             m_hitNum = ECLHitIndex[cellId][TimeIndex];
             double old_edep = eclSimHitArray[m_hitNum]->getEnergyDep();
@@ -237,6 +251,7 @@ namespace Belle2 {
             //    <<"= "<< (old_edep*old_TimeAve+ E_cell*T_ave)/(old_edep+E_cell)<<endl;
             eclSimHitArray[m_hitNum]->setEnergyDep(old_edep + E_cell);
             eclSimHitArray[m_hitNum]->setTimeAve((old_edep * old_TimeAve + E_cell * T_ave) / (old_edep + E_cell));
+            eclSimHitRel.add(trackID, m_hitNum);
           }
         }
       }//if m_oldEvnetNumber==m_oldEvnetNumber

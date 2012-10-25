@@ -353,6 +353,8 @@ int ECLGeometryPar::ECLVolNameToCellID(const G4String VolumeName)
 
     }
   } else if (string(VolumeName.c_str()).find("Br") != string::npos) {
+
+    GSector = atoi(temp4) - 2 ; //atoi(temp4) = 1-144
     if (GSector == -1) GSector = 143;
     cellID = 1152 + (iCry) * 144 + GSector;
 
@@ -1012,8 +1014,7 @@ namespace Belle2 {
     char temp1[10], temp2[10], temp3[10], temp4[30], temp5[30], temp6[10], temp7[10];
     int cellID = 0;
     sscanf(VolumeName.c_str(), "%[^'_']_%[^'_']_%[^'_']_%[^'_']_%[^'_']_%[^'_']_%s", temp1, temp2, temp3, temp4, temp5, temp6, temp7);
-
-    int GSector = atoi(temp4) - 1;
+    int GSector = (atoi(temp4) - 1) ;
     int iCry = atoi(temp6) - 1;
 
     if (VolumeName.c_str() == 0) {
@@ -1050,6 +1051,7 @@ namespace Belle2 {
 
       }
     } else if (string(VolumeName.c_str()).find("Br") != string::npos) {
+      GSector = GSector - 1;
       if (GSector == -1) GSector = 143;
       cellID = 1152 + (iCry) * 144 + GSector;
 

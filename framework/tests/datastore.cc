@@ -91,9 +91,9 @@ namespace Belle2 {
     EXPECT_FATAL(StoreArray<EventMetaData>("EventMetaData").isValid());
     EXPECT_FATAL(StoreObjPtr<EventMetaData>("EventMetaDatas").isValid());
 
-    //getting a base class is not OK.
-    EXPECT_FATAL(StoreArray<TObject>("EventMetaDatas").isValid());
-    EXPECT_FATAL(StoreObjPtr<TObject>("EventMetaData").isValid());
+    //getting a base class is OK
+    EXPECT_TRUE(StoreArray<TObject>("EventMetaDatas").isValid());
+    EXPECT_TRUE(StoreObjPtr<TObject>("EventMetaData").isValid());
   }
 
   /** check meta data. */

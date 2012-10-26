@@ -12,6 +12,7 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/RelationContainer.h>
+#include <framework/datastore/RelationIndex.h>
 
 #include <TClonesArray.h>
 #include <TClass.h>
@@ -19,6 +20,12 @@
 using namespace std;
 using namespace Belle2;
 
+
+/** dummy class, since boost::multi_index requires unique types for the indices.
+ *
+ *  By omitting the ClassDef() macro, this actually looks like TObject to root.
+ */
+class TObject2 : public TObject { };
 
 DataStore& DataStore::Instance()
 {
@@ -54,7 +61,7 @@ bool DataStore::checkType(const std::string& name, const StoreEntry* entry,
   if (entry->isArray) {
     entryClass = static_cast<TClonesArray*>(entry->object)->GetClass();
   }
-  if (entryClass != objClass) {
+  if (!entryClass->InheritsFrom(objClass)) {
     B2FATAL("Existing " << entryType << " '" << name << "' of type " << entryClass->GetName() << " doesn't match requested type " << objClass->GetName());
     return false;
   }
@@ -265,27 +272,23 @@ std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObje
   }
 
   // loop over to store arrays
-  for (std::vector<string>::iterator toName = toNames.begin(); toName != toNames.end(); ++toName) {
-    if (m_storeObjMap[c_Event].find(*toName) == m_storeObjMap[c_Event].end()) continue;
-    TClonesArray* toArray = static_cast<TClonesArray*>(m_storeObjMap[c_Event][*toName]->ptr);
-    if (!toArray) continue;
+  for (std::vector<string>::const_iterator toName = toNames.begin(); toName != toNames.end(); ++toName) {
+    const StoreObjIter& arrayIter = m_storeObjMap[c_Event].find(*toName);
+    if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == NULL) continue;
 
     // get the relations from -> to
-    string relationsName = relationName(fromEntry->name, *toName);
-    if (m_storeObjMap[c_Event].find(relationsName) == m_storeObjMap[c_Event].end()) continue;
-    TObject* entry = m_storeObjMap[c_Event][relationsName]->ptr;
-    if (!entry) continue;
+    const string& relationsName = relationName(fromEntry->name, *toName);
+    RelationIndex<TObject2, TObject> relIndex(relationsName, c_Event);
+    if (!relIndex)
+      continue;
 
-    // loop over relations and collect those pointing from the fromObject
-    TClonesArray& relations = static_cast<RelationContainer*>(entry)->elements();
-    for (int iRelation = 0; iRelation < relations.GetEntriesFast(); iRelation++) {
-      RelationElement* element = static_cast<RelationElement*>(relations[iRelation]);
-      if (element->getFromIndex() == (unsigned int)fromIndex) {
-        for (unsigned int iToIndex = 0; iToIndex < element->getSize(); iToIndex++) {
-          TObject* toObject = toArray->At(element->getToIndex(iToIndex));
-          if (toObject) result.push_back(RelationEntry(toObject, element->getWeight(iToIndex)));
-        }
-      }
+    //hack alert, since boost::multi_index requires unique types for the indices
+    typedef RelationIndex<TObject2, TObject>::Element relElement_t;
+    //get relations with fromObject
+    BOOST_FOREACH(const relElement_t & rel, relIndex.getElementsFrom(static_cast<const TObject2*>(fromObject))) {
+      TObject* const toObject = const_cast<TObject * const>(rel.to);
+      if (toObject)
+        result.push_back(RelationEntry(toObject, rel.weight));
     }
   }
 
@@ -317,27 +320,23 @@ std::vector<RelationEntry> DataStore::getRelationsToFrom(const TObject* toObject
   }
 
   // loop over from store arrays
-  for (std::vector<string>::iterator fromName = fromNames.begin(); fromName != fromNames.end(); ++fromName) {
-    if (m_storeObjMap[c_Event].find(*fromName) == m_storeObjMap[c_Event].end()) continue;
-    TClonesArray* fromArray = static_cast<TClonesArray*>(m_storeObjMap[c_Event][*fromName]->ptr);
-    if (!fromArray) continue;
+  for (std::vector<string>::const_iterator fromName = fromNames.begin(); fromName != fromNames.end(); ++fromName) {
+    const StoreObjIter& arrayIter = m_storeObjMap[c_Event].find(*fromName);
+    if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == NULL) continue;
 
     // get the relations from -> to
-    string relationsName = relationName(*fromName, toEntry->name);
-    if (m_storeObjMap[c_Event].find(relationsName) == m_storeObjMap[c_Event].end()) continue;
-    TObject* entry = m_storeObjMap[c_Event][relationsName]->ptr;
-    if (!entry) return result;
+    const string& relationsName = relationName(*fromName, toEntry->name);
+    RelationIndex<TObject, TObject2> relIndex(relationsName, c_Event);
+    if (!relIndex)
+      continue;
 
-    // loop over relations and collect those pointing to the toObject
-    TClonesArray& relations = static_cast<RelationContainer*>(entry)->elements();
-    for (int iRelation = 0; iRelation < relations.GetEntriesFast(); iRelation++) {
-      RelationElement* element = static_cast<RelationElement*>(relations[iRelation]);
-      for (unsigned int iToIndex = 0; iToIndex < element->getSize(); iToIndex++) {
-        if (element->getToIndex(iToIndex) == (unsigned int)toIndex) {
-          TObject* fromObject = fromArray->At(element->getFromIndex());
-          if (fromObject) result.push_back(RelationEntry(fromObject, element->getWeight(iToIndex)));
-        }
-      }
+    //hack alert, since boost::multi_index requires unique types for the indices
+    typedef RelationIndex<TObject, TObject2>::Element relElement_t;
+    //get relations with toObject
+    BOOST_FOREACH(const relElement_t & rel, relIndex.getElementsTo(static_cast<const TObject2*>(toObject))) {
+      TObject* const fromObject = const_cast<TObject * const>(rel.from);
+      if (fromObject)
+        result.push_back(RelationEntry(fromObject, rel.weight));
     }
   }
 

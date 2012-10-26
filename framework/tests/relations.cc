@@ -323,6 +323,20 @@ namespace Belle2 {
     RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), profileData->getName()));
     DataStore::Instance().setInitializeActive(false);
 
+    //check non-existing relations (registered)
+    const EventMetaData* fromObj = (*evtData)[0];
+    RelationVector<ProfileInfo> toRels = DataStore::getRelationsFromObj<ProfileInfo>(fromObj);
+    EXPECT_EQ(toRels.size(), 0);
+    const ProfileInfo* toObj = (*profileData)[2];
+    RelationVector<EventMetaData> fromRels = DataStore::getRelationsToObj<EventMetaData>(toObj);
+    EXPECT_EQ(fromRels.size(), 0);
+
+    //check non-existing relations (unregistered)
+    RelationVector<EventMetaData> toRels2 = DataStore::getRelationsFromObj<EventMetaData>(fromObj);
+    EXPECT_EQ(toRels2.size(), 0);
+    RelationVector<ProfileInfo> fromRels2 = DataStore::getRelationsToObj<ProfileInfo>(toObj);
+    EXPECT_EQ(fromRels2.size(), 0);
+
     RelationArray relation(*evtData, *profileData);
     relation.add(0, 0, 1.0);
     relation.add(0, 1, 2.0);

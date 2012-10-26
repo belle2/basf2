@@ -13,6 +13,7 @@
 #include <generators/evtgen/EvtGenInterface.h>
 #include <generators/utilities/cm2LabBoost.h>
 #include <generators/dataobjects/MCParticleGraph.h>
+#include <generators/evtgen/EvtGenModelRegister.h>
 
 #include <string>
 #include <queue>
@@ -36,9 +37,15 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pd
   B2INFO("Begin initialisation of EvtGen Interface.");
 
   EvtRandom::setRandomEngine((EvtRandomEngine*)&m_eng);
+
+  // Official BelleII models
+  std::list<EvtDecayBase*> extraModels = EvtGenModelRegister::getModels();
+
+  // Method to add User EvtGen models here
+
   if (!m_Generator) {
     int mixingType = EvtCPUtil::Coherent;
-    m_Generator = new EvtGen(DECFileName.c_str(), pdlFileName.c_str(), (EvtRandomEngine*)&m_eng, 0, 0, mixingType);
+    m_Generator = new EvtGen(DECFileName.c_str(), pdlFileName.c_str(), (EvtRandomEngine*)&m_eng, 0, &extraModels, mixingType);
   }
   if (!userFileName.empty()) {
     m_Generator->readUDecay(userFileName.c_str());

@@ -7,7 +7,11 @@
 #include "EvtGenBase/EvtPDL.hh"
 #include "EvtGenBase/EvtTensor4C.hh"
 
+#include <generators/evtgen/EvtGenModelRegister.h>
+
 #include "generators/evtgen/models/EvtB0toKsKK.h"
+
+B2_EVTGEN_REGISTER_MODEL(EvtB0toKsKK);
 
 EvtB0toKsKK::~EvtB0toKsKK() {}
 

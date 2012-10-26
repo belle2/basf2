@@ -21,12 +21,6 @@ using namespace std;
 using namespace Belle2;
 
 
-/** dummy class, since boost::multi_index requires unique types for the indices.
- *
- *  By omitting the ClassDef() macro, this actually looks like TObject to root.
- */
-class TObject2 : public TObject { };
-
 DataStore& DataStore::Instance()
 {
   static DataStore instance;
@@ -278,14 +272,14 @@ std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObje
 
     // get the relations from -> to
     const string& relationsName = relationName(fromEntry->name, *toName);
-    RelationIndex<TObject2, TObject> relIndex(relationsName, c_Event);
+    RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
     if (!relIndex)
       continue;
 
     //hack alert, since boost::multi_index requires unique types for the indices
-    typedef RelationIndex<TObject2, TObject>::Element relElement_t;
+    typedef RelationIndex<TObject, TObject>::Element relElement_t;
     //get relations with fromObject
-    BOOST_FOREACH(const relElement_t & rel, relIndex.getElementsFrom(static_cast<const TObject2*>(fromObject))) {
+    BOOST_FOREACH(const relElement_t & rel, relIndex.getElementsFrom(fromObject)) {
       TObject* const toObject = const_cast<TObject * const>(rel.to);
       if (toObject)
         result.push_back(RelationEntry(toObject, rel.weight));
@@ -326,14 +320,14 @@ std::vector<RelationEntry> DataStore::getRelationsToFrom(const TObject* toObject
 
     // get the relations from -> to
     const string& relationsName = relationName(*fromName, toEntry->name);
-    RelationIndex<TObject, TObject2> relIndex(relationsName, c_Event);
+    RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
     if (!relIndex)
       continue;
 
     //hack alert, since boost::multi_index requires unique types for the indices
-    typedef RelationIndex<TObject, TObject2>::Element relElement_t;
+    typedef RelationIndex<TObject, TObject>::Element relElement_t;
     //get relations with toObject
-    BOOST_FOREACH(const relElement_t & rel, relIndex.getElementsTo(static_cast<const TObject2*>(toObject))) {
+    BOOST_FOREACH(const relElement_t & rel, relIndex.getElementsTo(toObject)) {
       TObject* const fromObject = const_cast<TObject * const>(rel.from);
       if (fromObject)
         result.push_back(RelationEntry(fromObject, rel.weight));

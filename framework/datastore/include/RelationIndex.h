@@ -79,10 +79,10 @@ namespace Belle2 {
     typedef typename RelationIndexContainer<FROM, TO>::ElementIndex ElementIndex;
 
     /** Typedef for easy access to the from side of the index. */
-    typedef typename ElementIndex::template index<FROM>::type index_from;
+    typedef typename ElementIndex::template nth_index<0>::type index_from;
 
     /** Typedef for easy access to the to side of the index. */
-    typedef typename ElementIndex::template index<TO>::type   index_to;
+    typedef typename ElementIndex::template nth_index<1>::type   index_to;
 
     /** Element iterator of the from side index.
      *
@@ -109,8 +109,8 @@ namespace Belle2 {
      */
     explicit RelationIndex(const std::string& name = (DataStore::defaultRelationName<FROM, TO>()), DataStore::EDurability durability = DataStore::c_Event):
       m_index(RelationIndexManager::Instance().get<FROM, TO>(RelationArray(name, durability))),
-      m_from(m_index.index().template get<FROM>()),
-      m_to(m_index.index().template get<TO>()) {}
+      m_from(m_index.index().template get<0>()),
+      m_to(m_index.index().template get<1>()) {}
 
     /** Constructor with checks.
      *
@@ -127,8 +127,8 @@ namespace Belle2 {
     RelationIndex(const StoreArray<FROM> &from, const StoreArray<TO> &to, const std::string& name = "",
                   DataStore::EDurability durability = DataStore::c_Event):
       m_index(RelationIndexManager::Instance().get<FROM, TO>(RelationArray(from, to, name, durability))),
-      m_from(m_index.index().template get<FROM>()),
-      m_to(m_index.index().template get<TO>()) {}
+      m_from(m_index.index().template get<0>()),
+      m_to(m_index.index().template get<1>()) {}
 
     /** check if index is based on valid relation. */
     operator bool() const { return m_index; }

@@ -218,14 +218,12 @@ namespace Belle2 {
 
 
     //cleared arrays must be empty
-    /* TODO: readd these later on?
     StoreArray<EventMetaData> evtData;
     StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
     StoreArray<ProfileInfo> profileInfo;
     EXPECT_EQ(evtData.getEntries(), 0);
     EXPECT_EQ(evtDataDifferentName.getEntries(), 0);
     EXPECT_EQ(profileInfo.getEntries(), 0);
-    */
 
     //run durability, should be unaffected
     StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Persistent);

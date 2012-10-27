@@ -234,7 +234,7 @@ namespace Belle2 {
      *  If you only want to use T's default or copy constructor, use the safer
      *  appendNew() instead.
      *
-     *  \return pointer to address just past the last array element, or NULL if invalid
+     *  \return pointer to address just past the last array element
      */
     inline T* nextFreeAddress() {
       ensureCreated();
@@ -247,9 +247,9 @@ namespace Belle2 {
      *  it can be filled with data. The default constructor is used
      *  for the object's creation.
      *
-     *  \return pointer to the created object, or NULL if invalid
+     *  \return pointer to the created object
      */
-    inline T* appendNew() { return isValid() ? (new(nextFreeAddress()) T()) : 0; }
+    inline T* appendNew() { return new(nextFreeAddress()) T(); }
 
     /** Copy-construct a new T object at the end of the array.
      *
@@ -263,9 +263,9 @@ namespace Belle2 {
      *        of appendNew() or placement-new with a custom constructor (see
      *        documentation of nextFreeAddress() ) may be better.
      *
-     *  \return pointer to the created object, or NULL if invalid
+     *  \return pointer to the created object
      */
-    inline T* appendNew(const T& obj) { return isValid() ? (new(nextFreeAddress()) T(obj)) : 0; }
+    inline T* appendNew(const T& obj) { return new(nextFreeAddress()) T(obj); }
 
     //@{
     /** Raw access to the underlying TClonesArray.

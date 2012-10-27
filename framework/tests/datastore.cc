@@ -29,9 +29,8 @@ namespace Belle2 {
       evtPtr->setEvent(42);
 
       StoreArray<EventMetaData> evtData;
-      evtData.create();
       StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
-      evtDataDifferentName.create();
+      evtDataDifferentName.create(); //StoreArrays can be explicitly created (can also be omitted)
       StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Persistent);
       evtDataDifferentDurability.create();
       StoreArray<ProfileInfo> profileInfo;

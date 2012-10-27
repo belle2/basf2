@@ -7,10 +7,10 @@
 //-
 
 #include <framework/modules/histomanager/HistoManagerModule.h>
-#include <framework/core/Environment.h>
 
-#include <framework/core/Framework.h>
+#include <framework/core/Environment.h>
 #include <framework/pcore/ProcHandler.h>
+#include <framework/pcore/RbTuple.h>
 
 using namespace Belle2;
 using namespace std;
@@ -31,7 +31,7 @@ HistoManagerModule::HistoManagerModule() : Module(), m_initmain(false), m_initia
   setDescription("Module to manage histograms/Ntuples/TTrees");
 
   // Parameters
-  addParam("HistoFileName", m_histfile, "Histogram File Name", string("histofile.root"));
+  addParam("HistoFileName", m_histfile, "Name of histogram output file.", string("histofile.root"));
 }
 
 HistoManagerModule::~HistoManagerModule()

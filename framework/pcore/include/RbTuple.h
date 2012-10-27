@@ -9,20 +9,16 @@
 // Modified : 27 - Jul - 2010, for pbasf2
 //-
 
-#include <framework/core/HistoModule.h>
-#include <framework/logging/Logger.h>
 
 #include <vector>
 
-#include "TChain.h"
-#include "TFile.h"
-#include "TH1.h"
-#include "TTree.h"
-#include "TKey.h"
-#include "Riostream.h"
-
+class TDirectory;
+class TFile;
+class TList;
 
 namespace Belle2 {
+  class Module;
+
   /*! Class to manage histograms defined in registered modules */
   /*
      Modules with histogram definitions are supposed to be derived from
@@ -61,15 +57,16 @@ namespace Belle2 {
     ~RbTupleManager(void);
 
 
+    /** Merge given list of root files, code from 'hadd' tool. */
     void MergeRootfile(TDirectory*, TList*);
 
   private:
-    static RbTupleManager* m_instance;
+    static RbTupleManager* m_instance; /**< singleton instance. */
 
-    std::vector<Module*> m_histdefs;
-    int m_nproc;
-    char m_filename[1024];
-    TFile* m_root;
+    std::vector<Module*> m_histdefs; /**< registered HistoModules. */
+    int m_nproc; /**< Number of parallel processes. */
+    char m_filename[1024]; /**< Name of histogram output file. */
+    TFile* m_root; /**< Histogram output file. */
   };
 
 } // Belle2 namespace

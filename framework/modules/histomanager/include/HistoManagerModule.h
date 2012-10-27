@@ -9,7 +9,6 @@
 //-
 
 #include <framework/core/Module.h>
-#include <framework/pcore/RbTuple.h>
 
 #include <string>
 
@@ -38,8 +37,8 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
-    std::string m_histfile;
-    bool        m_initmain;
+    std::string m_histfile; /**< Name of histogram output file. */
+    bool        m_initmain; /**< True if initialize() was called. */
     bool        m_initialized;
   };
 } // Namaspace Belle2

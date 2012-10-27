@@ -6,7 +6,10 @@
 // Date : 21 - Apr - 2009
 //-
 
+#include <framework/core/HistoModule.h>
 #include <framework/pcore/RbTuple.h>
+
+#include <framework/logging/Logger.h>
 
 #include <sys/types.h>
 #include <unistd.h>

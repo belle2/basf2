@@ -280,7 +280,7 @@ std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObje
     typedef RelationIndex<TObject, TObject>::Element relElement_t;
     //get relations with fromObject
     BOOST_FOREACH(const relElement_t & rel, relIndex.getElementsFrom(fromObject)) {
-      TObject* const toObject = const_cast<TObject * const>(rel.to);
+      TObject* const toObject = const_cast<TObject*>(rel.to);
       if (toObject)
         result.push_back(RelationEntry(toObject, rel.weight));
     }
@@ -328,7 +328,7 @@ std::vector<RelationEntry> DataStore::getRelationsToFrom(const TObject* toObject
     typedef RelationIndex<TObject, TObject>::Element relElement_t;
     //get relations with toObject
     BOOST_FOREACH(const relElement_t & rel, relIndex.getElementsTo(toObject)) {
-      TObject* const fromObject = const_cast<TObject * const>(rel.from);
+      TObject* const fromObject = const_cast<TObject*>(rel.from);
       if (fromObject)
         result.push_back(RelationEntry(fromObject, rel.weight));
     }

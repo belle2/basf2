@@ -20,9 +20,7 @@ namespace Belle2 {
       DataStore::Instance().setInitializeActive(false);
 
       evtData = new StoreArray<EventMetaData>;
-      evtData->create();
       profileData = new StoreArray<ProfileInfo>;
-      profileData->create();
 
       for (int i = 0; i < 10; ++i) {
         evtData->appendNew();
@@ -55,6 +53,7 @@ namespace Belle2 {
     DataStore::Instance().setInitializeActive(false);
 
     RelationArray relation(*evtData, *profileData);
+    EXPECT_FALSE(relation); //creation only happens on write access or explicitly
     relation.create();
     EXPECT_TRUE(relation);
   }
@@ -348,7 +347,95 @@ namespace Belle2 {
     //check that results don't change after consolidation
     relation.consolidate();
     findRelationsCheckContents();
+  }
 
+  /** Test DataStore members for adding relations. */
+  TEST_F(RelationTest, AddRelations)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), profileData->getName()));
+    DataStore::Instance().setInitializeActive(false);
+
+    DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[0], 1.0);
+    DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[1], 2.0);
+    DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[2], 3.0);
+
+    findRelationsCheckContents();
+  }
+
+  /** Test DataStore::getRelationsWith. */
+  TEST_F(RelationTest, GetRelationsWith)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), profileData->getName()));
+    DataStore::Instance().setInitializeActive(false);
+
+    DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[0], 1.0);
+    DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[1], 2.0);
+    DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[2], 3.0);
+
+    //some objects with no relations to given type
+    EXPECT_EQ(DataStore::Instance().getRelationsWithObj<EventMetaData>((*evtData)[0]).size(), 0);
+    EXPECT_EQ(DataStore::Instance().getRelationsWithObj<EventMetaData>((*profileData)[3]).size(), 0);
+
+    RelationVector<ProfileInfo> profRels = DataStore::Instance().getRelationsWithObj<ProfileInfo>((*evtData)[0]);
+    EXPECT_EQ(profRels.size(), 3);
+    EXPECT_EQ(profRels.weight(0), 1.0); //should be positive
+
+    RelationVector<EventMetaData> eventRels = DataStore::Instance().getRelationsWithObj<EventMetaData>((*profileData)[0]);
+    EXPECT_EQ(eventRels.size(), 1);
+    EXPECT_EQ(eventRels.weight(0), -1.0); //points to given object, negative weight
+  }
+
+  /** Test searching all "ALL" storearrays for objects. */
+  TEST_F(RelationTest, SearchAll)
+  {
+    //2nd array of this type
+    StoreArray<ProfileInfo> profileData2("ProfileInfos2");
+
+    DataStore::Instance().setInitializeActive(true);
+    profileData2.registerAsPersistent();
+    RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), profileData->getName()));
+    RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), profileData2.getName()));
+    DataStore::Instance().setInitializeActive(false);
+
+    DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[0], 1.0);
+    DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[1], 2.0);
+    DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[2], 3.0);
+
+    //add one object (plus relation) to the other array
+    profileData2.appendNew();
+    DataStore::Instance().addRelationFromTo((*evtData)[0], profileData2[0], 42.0);
+
+    //profileData2 shouldn't be searched by default when searching or EventMetaData objects
+    findRelationsCheckContents();
+
+    //actually test "ALL" option
+    const EventMetaData* fromObj = (*evtData)[0];
+    RelationVector<ProfileInfo> toRels = DataStore::getRelationsFromObj<ProfileInfo>(fromObj, "ALL");
+    EXPECT_EQ(toRels.size(), 4);
+    //order might be anything, check sum of weights
+    double sum = 0.0;
+    for (int i = 0; i < (int)toRels.size(); i++) {
+      sum += toRels.weight(i);
+    }
+    EXPECT_DOUBLE_EQ(sum, 42.0 + 1 + 2 + 3);
+
+    //finding with default TO name
+    EXPECT_EQ(DataStore::getRelationsFromObj<ProfileInfo>(fromObj, profileData->getName()).size(), 3);
+    //finding with TO name of 2nd array
+    EXPECT_EQ(DataStore::getRelationsFromObj<ProfileInfo>(fromObj, profileData2.getName()).size(), 1);
+    //and something that doesn't exist
+    EXPECT_EQ(DataStore::getRelationsFromObj<ProfileInfo>(fromObj, "DoesntExist").size(), 0);
+
+    const ProfileInfo* toObj = profileData2[0];
+    //object should also be found without specifying the name
+    EXPECT_EQ(DataStore::getRelationsToObj<EventMetaData>(toObj).size(), 1);
+    //or with 'ALL"
+    EXPECT_EQ(DataStore::getRelationsToObj<EventMetaData>(toObj, "ALL").size(), 1);
+
+    //no relations to this type
+    EXPECT_EQ(DataStore::getRelationsFromObj<EventMetaData>(fromObj, "ALL").size(), 0);
   }
 
 }  // namespace

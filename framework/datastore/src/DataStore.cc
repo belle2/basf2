@@ -245,7 +245,7 @@ bool DataStore::addRelation(const TObject* fromObject, DataStore::StoreEntry*& f
   return true;
 }
 
-std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObject, DataStore::StoreEntry*& fromEntry, int& fromIndex, const TClass* toClass, const std::string& name)
+std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObject, DataStore::StoreEntry*& fromEntry, int& fromIndex, const TClass* toClass, const std::string& toName)
 {
   std::vector<RelationEntry> result;
 
@@ -254,7 +254,7 @@ std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObje
 
   // get names of store arrys to which the relations point
   std::vector<string> toNames;
-  if (name == "ALL") {
+  if (toName == "ALL") {
     for (StoreObjIter iter = m_storeObjMap[c_Event].begin(); iter != m_storeObjMap[c_Event].end(); ++iter) {
       if (iter->second->ptr && iter->second->isArray) {
         TClonesArray* array = static_cast<TClonesArray*>(iter->second->ptr);
@@ -263,10 +263,10 @@ std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObje
         }
       }
     }
-  } else if (name.empty()) {
+  } else if (toName.empty()) {
     toNames.push_back(defaultArrayName(toClass->GetName()));
   } else {
-    toNames.push_back(name);
+    toNames.push_back(toName);
   }
 
   // loop over to store arrays
@@ -293,7 +293,7 @@ std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObje
   return result;
 }
 
-std::vector<RelationEntry> DataStore::getRelationsToFrom(const TObject* toObject, DataStore::StoreEntry*& toEntry, int& toIndex, const TClass* fromClass, const std::string& name)
+std::vector<RelationEntry> DataStore::getRelationsToFrom(const TObject* toObject, DataStore::StoreEntry*& toEntry, int& toIndex, const TClass* fromClass, const std::string& fromName)
 {
   std::vector<RelationEntry> result;
 
@@ -302,7 +302,7 @@ std::vector<RelationEntry> DataStore::getRelationsToFrom(const TObject* toObject
 
   // get names of store arrys from which the relations point
   std::vector<string> fromNames;
-  if (name == "ALL") {
+  if (fromName == "ALL") {
     for (StoreObjIter iter = m_storeObjMap[c_Event].begin(); iter != m_storeObjMap[c_Event].end(); ++iter) {
       if (iter->second->ptr && iter->second->isArray) {
         TClonesArray* array = static_cast<TClonesArray*>(iter->second->ptr);
@@ -311,10 +311,10 @@ std::vector<RelationEntry> DataStore::getRelationsToFrom(const TObject* toObject
         }
       }
     }
-  } else if (name.empty()) {
+  } else if (fromName.empty()) {
     fromNames.push_back(defaultArrayName(fromClass->GetName()));
   } else {
-    fromNames.push_back(name);
+    fromNames.push_back(fromName);
   }
 
   // loop over from store arrays

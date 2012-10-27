@@ -184,6 +184,10 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
   entry = 0;
   index = -1;
 
+  //searching for NULL should be safe
+  if (!object)
+    return false;
+
   // search for the object and set the entry and index
   const TClass* objectClass = object->IsA();
   for (StoreObjIter iter = m_storeObjMap[c_Event].begin(); iter != m_storeObjMap[c_Event].end(); ++iter) {

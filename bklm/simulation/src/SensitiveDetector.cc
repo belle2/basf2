@@ -48,6 +48,8 @@ namespace Belle2 {
       StoreArray<BKLMSimHit> simHits;
       RelationArray particleToSimHits(particles, simHits);
       registerMCParticleRelation(particleToSimHits);
+      StoreArray<BKLMSimHit>::registerPersistent();
+      RelationArray::registerPersistent<MCParticle, BKLMSimHit>();
     }
 
     //-----------------------------------------------------

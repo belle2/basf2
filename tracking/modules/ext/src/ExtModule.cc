@@ -139,6 +139,8 @@ void ExtModule::initialize()
 
   StoreArray<GFTrackCand> dummyCands(m_extTrackCandsColName);
   StoreArray<ExtRecoHit> dummyHits(m_extRecoHitsColName);
+  StoreArray<GFTrackCand>::registerPersistent(m_extTrackCandsColName);
+  StoreArray<ExtRecoHit>::registerPersistent(m_extRecoHitsColName);
 
   return;
 

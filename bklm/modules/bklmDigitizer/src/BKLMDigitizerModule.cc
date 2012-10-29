@@ -52,6 +52,11 @@ void BKLMDigitizerModule::initialize()
   StoreArray<BKLMDigit> strips;
   RelationArray stripToSimHits(strips, simHits);
   RelationArray simHitToStrip(simHits, strips);
+  StoreArray<BKLMSimHit>::registerPersistent();
+  StoreArray<BKLMDigit>::registerPersistent();
+  RelationArray::registerPersistent<MCParticle, BKLMSimHit>();
+  RelationArray::registerPersistent<BKLMDigit, BKLMSimHit>();
+  RelationArray::registerPersistent<BKLMSimHit, BKLMDigit>();
 }
 
 void BKLMDigitizerModule::beginRun()

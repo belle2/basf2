@@ -31,8 +31,8 @@ namespace Belle2 {
     float m_Phi;
     /**Distance of this shower. */
     float m_R;
-    /**Error of this shower. */
-    float m_Error[6];
+    /**Error of E, theta, phi for this shower. */
+    float m_Error[3];
     /**Mass of this shower. */
     float m_Mass;
     /**Width of this shower. */
@@ -63,7 +63,7 @@ namespace Belle2 {
     void setPhi(float Phi) { m_Phi = Phi; }
     //! The method to set Distance
     void setR(float R) { m_R = R; }
-    //! The method to set Error
+    //! The method to set Error  E, theta, phi
     void setError(float  ErrorArray[3]) { for (int i = 0; i < 3; i++) { m_Error[i] = ErrorArray[i];} }
     //! The method to set Mass
     void setMass(float Mass) { m_Mass = Mass; }
@@ -94,8 +94,16 @@ namespace Belle2 {
     float GetPhi() const { return m_Phi ; }
     //! The method to get Distance
     float GetR() const { return m_R ; }
-    //! The method to get Error
-    void GetError(float  ErrorArray[6]) { for (int i = 0; i < 6; i++) { ErrorArray[i] = m_Error[i] ;} }
+    //! The method to get Error E, theta, phi
+    void GetError(float  ErrorArray[3]) { for (int i = 0; i < 3; i++) { ErrorArray[i] = m_Error[i] ;} }
+    //! The method to get Error E
+    float GetEnergyError() { return m_Error[0] ;}
+    //! The method to get Error thet
+    float GetThetaError() { return  m_Error[1] ;}
+    //! The method to get Error phi
+    float GetPhiError() {return m_Error[2] ;}
+
+
     //! The method to get Mass
     float GetMass() const { return m_Mass ; }
     //! The method to get Width

@@ -18,6 +18,7 @@
 #include <cmath>
 #include <TMath.h>
 
+#include <iostream>
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -141,10 +142,10 @@ int CDCLegendreTrackHit::getCurvatureSignWrt(double xc, double yc) const
     return CDCLegendreTrackCandidate::charge_negative;
 }
 
-void CDCLegendreTrackHit::approach(const CDCLegendreTrackCandidate& track)
+bool CDCLegendreTrackHit::approach(const CDCLegendreTrackCandidate& track)
 {
   if (m_isAxial)
-    return;
+    return false;
 
   //Get the necessary position of the hit wire from CDCGeometryParameters
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
@@ -164,7 +165,7 @@ void CDCLegendreTrackHit::approach(const CDCLegendreTrackCandidate& track)
   backwardWirePoint.SetZ(cdcg.wireBackwardPosition(m_layerId, m_wireId).z());
 
   //direction of the wire
-  wireVector = backwardWirePoint - forwardWirePoint;
+  wireVector = forwardWirePoint - backwardWirePoint;
 
   double distance; //distance between the hit und the intersection point ( = shortest distance from hit to "track line")
   double distanceMax = 5;  //start value for the search
@@ -181,8 +182,8 @@ void CDCLegendreTrackHit::approach(const CDCLegendreTrackCandidate& track)
     //loop over the parameter vector ( = loop over the length of the wire)
 
     //calculation of the shortest distance between the hit point and the track in the conformal plane
-    m_wirePosition.SetX(forwardWirePoint.x() + parameter[i] * wireVector.x());
-    m_wirePosition.SetY(forwardWirePoint.y() + parameter[i] * wireVector.y());
+    m_wirePosition.SetX(backwardWirePoint.x() + parameter[i] * wireVector.x());
+    m_wirePosition.SetY(backwardWirePoint.y() + parameter[i] * wireVector.y());
 
     distance = track.DistanceTo(*this);
 
@@ -194,11 +195,89 @@ void CDCLegendreTrackHit::approach(const CDCLegendreTrackCandidate& track)
   }
 
   //assign the new better wire point as hit position
-  double x = forwardWirePoint.x() + parameter[bestIndex] * wireVector.x();
-  double y = forwardWirePoint.y() + parameter[bestIndex] * wireVector.y();
-  double z = forwardWirePoint.z() + parameter[bestIndex] * wireVector.z();
+  double x = backwardWirePoint.x() + parameter[bestIndex] * wireVector.x();
+  double y = backwardWirePoint.y() + parameter[bestIndex] * wireVector.y();
+  double z = backwardWirePoint.z() + parameter[bestIndex] * wireVector.z();
 
   m_wirePosition.SetXYZ(x, y, z);
-  m_conformalX = 2 * x / (x * x + y * y);
-  m_conformalY = 2 * y / (x * x + y * y);
+  ConformalTransformation();
+
+  return true;
+}
+
+bool CDCLegendreTrackHit::approach2(const CDCLegendreTrackCandidate& track)
+{
+  if (m_isAxial)
+    return false;
+
+  //Get the necessary position of the hit wire from CDCGeometryParameters
+  CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
+
+  TVector3 forwardWirePoint; //forward end of the wire
+  TVector3 backwardWirePoint; //backward end of the wire
+  TVector3 wireVector;  //direction of the wire
+
+  //forward end of the wire
+  forwardWirePoint.SetX(cdcg.wireForwardPosition(m_layerId, m_wireId).x());
+  forwardWirePoint.SetY(cdcg.wireForwardPosition(m_layerId, m_wireId).y());
+  forwardWirePoint.SetZ(cdcg.wireForwardPosition(m_layerId, m_wireId).z());
+
+  //backward end of the wire
+  backwardWirePoint.SetX(cdcg.wireBackwardPosition(m_layerId, m_wireId).x());
+  backwardWirePoint.SetY(cdcg.wireBackwardPosition(m_layerId, m_wireId).y());
+  backwardWirePoint.SetZ(cdcg.wireBackwardPosition(m_layerId, m_wireId).z());
+
+  //direction of the wire
+  wireVector = forwardWirePoint - backwardWirePoint;
+
+  double hx0 = backwardWirePoint.X();
+  double hy0 = backwardWirePoint.Y();
+
+  double vx = wireVector.X();
+  double vy = wireVector.Y();
+
+  double tx = track.getXc();
+  double ty = track.getYc();
+
+  double r_t = sqrt(tx * tx + ty * ty);
+  double r_h = m_driftTime;
+
+  double d = sqrt((m_wirePositionOrig.X() - tx) * (m_wirePositionOrig.X() - tx) + (m_wirePositionOrig.Y() - ty) * (m_wirePositionOrig.Y() - ty));
+  double radii;
+
+  if (d > max(r_t, r_h))
+    radii = r_t + r_h;
+  else
+    radii = fabs(r_t - r_h);
+
+  double p = 2. / (vx * vx + vy * vy) * (vx * (hx0 - tx) + vy * (hy0 - ty));
+  double q = 1. / (vx * vx + vy * vy) * ((hx0 - tx) * (hx0 - tx) + (hy0 - ty) * (hy0 - ty) - radii * radii);
+
+  double l1 = -1.*p / 2 + sqrt(p * p / 4 - q);
+  double l2 = -1.*p / 2 - sqrt(p * p / 4 - q);
+
+  double l;
+
+  if (isnan(l1) && isnan(l2))
+    return false;
+  else if (isnan(l1))
+    l = l2;
+  else if (isnan(l2))
+    l = l1;
+  else
+    l = fabs(l1 - 0.5) < fabs(l2 - 0.5) ? l1 : l2;
+
+  if (l < 0)
+    l = 0;
+  else if (l > 1)
+    l = 1;
+
+  double x = backwardWirePoint.x() + l * wireVector.x();
+  double y = backwardWirePoint.y() + l * wireVector.y();
+  double z = backwardWirePoint.z() + l * wireVector.z();
+
+  m_wirePosition.SetXYZ(x, y, z);
+  ConformalTransformation();
+
+  return true;
 }

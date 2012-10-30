@@ -1,5 +1,5 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
+09 * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -86,7 +86,9 @@ double CDCLegendreTrackCandidate::getZMomentumEstimation(TVector2 mom2) const
 {
   std::vector<double> median_vector;
 
-  BOOST_FOREACH(CDCLegendreTrackHit * trackHit, m_TrackHits) {
+  for (std::vector<CDCLegendreTrackHit*>::const_iterator it = m_TrackHits.begin(); it != m_TrackHits.end(); ++it) {
+
+    CDCLegendreTrackHit* trackHit = *it;
 
     if (trackHit->getIsAxial())
       continue;
@@ -109,7 +111,9 @@ double CDCLegendreTrackCandidate::getZMomentumEstimation(TVector2 mom2) const
 
   double medianTheta = median_vector.at(median_vector.size() / 2);
 
-  return (tan(medianTheta) * sqrt(mom2.X() * mom2.X() + mom2.Y() * mom2.Y()));
+  double zmom = tan(medianTheta) * sqrt(mom2.X() * mom2.X() + mom2.Y() * mom2.Y());
+
+  return zmom;
 }
 
 double CDCLegendreTrackCandidate::DistanceTo(
@@ -141,16 +145,20 @@ double CDCLegendreTrackCandidate::DistanceTo(double xc, double yc,
     yw = tHit.getWirePosition().Y();
   }
 
-  //distace of the centers of the drift circle and the track
+  //distance of the centers of the drift circle and the track
   double d = sqrt((xc - xw) * (xc - xw) + (yc - yw) * (yc - yw));
 
   //take into account the two radii correctly
-  if (d > max(rw, rc))
-    d = fabs(d - (rc + rw));
-  else
-    d = fabs(max(rw, rc) - (d + min(rw, rc)));
+  double sum_r = (rc + rw);
+  double dif_r = fabs(rc - rw);
 
-  return d;
+  double distance;
+  if (d > max(rw, rc))
+    distance = fabs(d - sum_r);
+  else
+    distance = fabs(d - dif_r);
+
+  return distance;
 }
 
 int CDCLegendreTrackCandidate::getChargeAssumption(
@@ -213,4 +221,18 @@ void CDCLegendreTrackCandidate::addHit(CDCLegendreTrackHit* hit)
 {
   if ((m_charge == charge_curler) || hit->getCurvatureSignWrt(getXc(), getYc()) == m_charge)
     m_TrackHits.push_back(hit);
+}
+
+int CDCLegendreTrackCandidate::getInnermostAxialLayer()
+{
+  int minLayer = 999;
+
+  BOOST_FOREACH(CDCLegendreTrackHit * hit, m_TrackHits) {
+    if (hit->getIsAxial()) {
+      if (hit->getLayerId() < minLayer)
+        minLayer = hit->getLayerId();
+    }
+  }
+
+  return minLayer;
 }

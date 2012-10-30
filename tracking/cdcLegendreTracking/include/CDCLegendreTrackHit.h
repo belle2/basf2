@@ -85,8 +85,11 @@ namespace Belle2 {
     /** Return curvature sign with respect to a certain point in the conformal plain.*/
     int getCurvatureSignWrt(double xc, double yc) const;
 
-    /** Finds the point of closest approach to a given track candidate adjusts the wire position accordingly.*/
-    void approach(const CDCLegendreTrackCandidate&);
+    /** Finds the point of closest approach to a given track candidate adjusts the wire position accordingly.
+     * @return Status of the approach. False if no nearest point could be found.
+     * */
+    bool approach(const CDCLegendreTrackCandidate&);
+    bool approach2(const CDCLegendreTrackCandidate&);
 
     /** Sets the position of the hit to given point in 3D space.*/
     void setPosition(const TVector3& position) {

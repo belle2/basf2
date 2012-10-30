@@ -143,6 +143,11 @@ namespace Belle2 {
     static int getChargeAssumption(
       double theta, double r, const std::list<CDCLegendreTrackHit*> & trackHits);
 
+    /**
+     * @brief return Layer ID of the contributing axial hit with the small layer ID.
+     */
+    int getInnermostAxialLayer();
+
   private:
 
     std::vector<CDCLegendreTrackHit*> m_TrackHits; /**< vector to store TrackCandidateHits belonging to this TrackCandidate */

@@ -177,6 +177,11 @@ namespace Belle2 {
     void mergeTracks(CDCLegendreTrackCandidate* cand1, CDCLegendreTrackCandidate* cand2);
 
     /**
+     * @brief Implementation of check for quality criteria after the track candidate was produced.
+     */
+    bool fullfillsQualityCriteria(CDCLegendreTrackCandidate* cand);
+
+    /**
      * All objects in m_hitList and m_trackList are deleted and the two lists are cleared.
      * Necessary since we cannot use smart pointers up to now.
      */

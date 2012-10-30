@@ -57,13 +57,13 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
   addParam("Threshold", m_threshold, "Threshold for peak finder", 10);
 
   addParam("InitialAxialHits", m_initialAxialHits,
-           "Starting value of axial hits for the stepped Hough", 30);
+           "Starting value of axial hits for the stepped Hough", 48);
 
   addParam("StepScale", m_stepScale, "Scale size for Stepped Hough", 0.75);
 
   addParam("Resolution StereoHits", m_resolutionStereo,
            "Total resolution, used for the assignment of stereo hits to tracks (in sigma)",
-           200.);
+           2.);
 
   addParam("MaxLevel", m_maxLevel,
            "Maximal level of recursive calling of FastHough algorithm", 10);
@@ -225,14 +225,15 @@ void CDCLegendreTrackingModule::AsignStereoHits()
           //Hit needs to have the correct curvature
           if ((candidate->getCharge() == CDCLegendreTrackCandidate::charge_curler) || hit->getCurvatureSignWrt(candidate->getXc(), candidate->getYc()) == candidate->getCharge()) {
             //check nearest position of the hit to the track
-            hit->approach(*candidate);
-            double chi2 = candidate->DistanceTo(*hit) / hit->getDeltaDriftTime();
+            if (hit->approach2(*candidate)) {
+              double chi2 = candidate->DistanceTo(*hit) / sqrt(hit->getDeltaDriftTime());
 
-            if (chi2 < m_resolutionStereo) {
-              //search for minimal distance
-              if (chi2 < best_chi2) {
-                best = candidate;
-                best_chi2 = chi2;
+              if (chi2 < m_resolutionStereo) {
+                //search for minimal distance
+                if (chi2 < best_chi2) {
+                  best = candidate;
+                  best_chi2 = chi2;
+                }
               }
             }
           }
@@ -251,19 +252,21 @@ void CDCLegendreTrackingModule::mergeTracks(CDCLegendreTrackCandidate* cand1,
                                             CDCLegendreTrackCandidate* cand2)
 {
 
-  cand1->setR((cand1->getR() + cand2->getR()) / 2);
-  cand1->setTheta((cand1->getTheta() + cand2->getTheta()) / 2);
+  cand1->setR(
+    (cand1->getR() * cand1->getNHits() + cand2->getR() * cand2->getNHits())
+    / (cand1->getNHits() + cand2->getNHits()));
+  cand1->setTheta(
+    (cand1->getTheta() * cand1->getNHits()
+     + cand2->getTheta() * cand2->getNHits())
+    / (cand1->getNHits() + cand2->getNHits()));
 
   BOOST_FOREACH(CDCLegendreTrackHit * hit, cand2->getTrackHits()) {
     cand1->addHit(hit);
   }
 
   m_trackList.remove(cand2);
-
   delete cand2;
-
   cand2 = NULL;
-
 }
 
 void CDCLegendreTrackingModule::createLegendreTrackCandidate(
@@ -316,7 +319,7 @@ void CDCLegendreTrackingModule::processTrack(
   std::list<CDCLegendreTrackHit*>* trackHitList)
 {
   //check if the number has enough axial hits (might be less due to the curvature check).
-  if (trackCandidate->getNAxialHits() >= m_threshold) {
+  if (fullfillsQualityCriteria(trackCandidate)) {
     m_trackList.push_back(trackCandidate);
 
     BOOST_FOREACH(CDCLegendreTrackHit * hit, trackCandidate->getTrackHits()) {
@@ -336,6 +339,17 @@ void CDCLegendreTrackingModule::processTrack(
 
 }
 
+bool CDCLegendreTrackingModule::fullfillsQualityCriteria(CDCLegendreTrackCandidate* trackCandidate)
+{
+  if (trackCandidate->getNAxialHits() < m_threshold)
+    return false;
+
+  if (trackCandidate->getInnermostAxialLayer() > 2)
+    return false;
+
+  return true;
+}
+
 void CDCLegendreTrackingModule::createGFTrackCandidates()
 {
   //StoreArray for GFTrackCandidates: interface class to Genfit
@@ -345,7 +359,7 @@ void CDCLegendreTrackingModule::createGFTrackCandidates()
   int i = 0;
 
   BOOST_FOREACH(CDCLegendreTrackCandidate * trackCand, m_trackList) {
-    new(gfTrackCandidates->AddrAt(i)) GFTrackCand();  //create one GFTrackCandidate for each CDCTrackCandidate
+    new(gfTrackCandidates->AddrAt(i)) GFTrackCand(); //create one GFTrackCandidate for each CDCTrackCandidate
 
     //set the values needed as start values for the fit in the GFTrackCandidate from the CDCTrackCandidate information
     //variables stored in the GFTrackCandidates are: vertex position + error, momentum + error, pdg value, indices for the Hits
@@ -483,7 +497,8 @@ void CDCLegendreTrackingModule::MaxFastHough(
           double theta = static_cast<double>(thetaBin[t_index]
                                              + thetaBin[t_index + 1]) / 2 * m_PI / m_nbinsTheta;
 
-          if (not m_reconstructCurler && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc)
+          if (not m_reconstructCurler
+              && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc)
             return;
 
           candidate->first = voted_hits[t_index][r_index];
@@ -520,7 +535,8 @@ void CDCLegendreTrackingModule::sortHits(
   stable_sort(hits.begin(), hits.end(), sorter);
 }
 
-bool CDCTracking_SortHit::operator()(CDCLegendreTrackHit* hit1, CDCLegendreTrackHit* hit2)
+bool CDCTracking_SortHit::operator()(CDCLegendreTrackHit* hit1,
+                                     CDCLegendreTrackHit* hit2)
 {
   bool result = true;
   boost::tuple<int, double, int, double> tuple1(hit1->getStoreIndex(),

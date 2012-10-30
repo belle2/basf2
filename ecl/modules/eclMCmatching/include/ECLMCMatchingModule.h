@@ -61,7 +61,7 @@ namespace Belle2 {
       /** define a map for Primary Track*/
       typedef std::map< int, int>  PrimaryTrackMap;
       /** define a multimap for hits in showers */
-      typedef std::multimap< int, int> HitShowerMap;
+      typedef std::multimap< int, int> MultiMap;
 
 
     private:

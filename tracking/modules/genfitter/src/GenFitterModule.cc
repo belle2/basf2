@@ -36,7 +36,7 @@
 #include <cdc/translators/SimpleTDCCountTranslator.h>
 #include <cdc/translators/IdealCDCGeometryTranslator.h>
 
-#include <tracking/dataobjects/TrackOld.h>
+#include <tracking/dataobjects/Track.h>
 
 #include <GFTrack.h>
 #include <GFTrackCand.h>
@@ -117,7 +117,9 @@ void GenFitterModule::initialize()
   m_failedGFTrackCandFitCounter = 0;
   m_successfulGFTrackCandFitCounter = 0;
 
-  StoreArray<TrackOld>::registerPersistent(m_tracksColName);
+  StoreArray<GFTrackCand>::required(m_gfTrackCandsColName);
+
+  StoreArray<Track>::registerPersistent(m_tracksColName);
   StoreArray < GFTrack >::registerPersistent(m_gfTracksColName);
 
 
@@ -209,7 +211,7 @@ void GenFitterModule::event()
 
 
   //StoreArrays to store the fit results
-  StoreArray < TrackOld > tracks(m_tracksColName);
+  StoreArray < Track > tracks(m_tracksColName);
   tracks.create();
   StoreArray < GFTrack > gfTracks(m_gfTracksColName);
   gfTracks.create();
@@ -382,7 +384,7 @@ void GenFitterModule::event()
 
               //Create output tracks
               new(gfTracks->AddrAt(trackCounter)) GFTrack(gfTrack);  //GFTrack can be assigned directly
-              new(tracks->AddrAt(trackCounter)) TrackOld(); //Track is created empty, helix parameters are not available because the fit failed, but other variables may give some hint on the reason for the failure
+              new(tracks->AddrAt(trackCounter)) Track(); //Track is created empty, helix parameters are not available because the fit failed, but other variables may give some hint on the reason for the failure
 
               //Create relation
               if (aTrackCandPointer->getMcTrackId() != -999) {
@@ -418,7 +420,7 @@ void GenFitterModule::event()
             //Create output tracks
             new(gfTracks->AddrAt(trackCounter)) GFTrack(gfTrack);  //GFTrack can be assigned directly
 
-            new(tracks->AddrAt(trackCounter)) TrackOld();  //Track is created empty, parameters are set later on
+            new(tracks->AddrAt(trackCounter)) Track();  //Track is created empty, parameters are set later on
 
             //Create relation
             if (aTrackCandPointer->getMcTrackId() != -999) {

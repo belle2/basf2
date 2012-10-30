@@ -270,12 +270,12 @@ std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObje
   }
 
   // loop over to store arrays
-  for (std::vector<string>::const_iterator toName = toNames.begin(); toName != toNames.end(); ++toName) {
-    const StoreObjIter& arrayIter = m_storeObjMap[c_Event].find(*toName);
+  for (std::vector<string>::const_iterator toNameIt = toNames.begin(); toNameIt != toNames.end(); ++toNameIt) {
+    const StoreObjIter& arrayIter = m_storeObjMap[c_Event].find(*toNameIt);
     if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == NULL) continue;
 
     // get the relations from -> to
-    const string& relationsName = relationName(fromEntry->name, *toName);
+    const string& relationsName = relationName(fromEntry->name, *toNameIt);
     RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
     if (!relIndex)
       continue;
@@ -318,12 +318,12 @@ std::vector<RelationEntry> DataStore::getRelationsToFrom(const TObject* toObject
   }
 
   // loop over from store arrays
-  for (std::vector<string>::const_iterator fromName = fromNames.begin(); fromName != fromNames.end(); ++fromName) {
-    const StoreObjIter& arrayIter = m_storeObjMap[c_Event].find(*fromName);
+  for (std::vector<string>::const_iterator fromNameIt = fromNames.begin(); fromNameIt != fromNames.end(); ++fromNameIt) {
+    const StoreObjIter& arrayIter = m_storeObjMap[c_Event].find(*fromNameIt);
     if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == NULL) continue;
 
     // get the relations from -> to
-    const string& relationsName = relationName(*fromName, toEntry->name);
+    const string& relationsName = relationName(*fromNameIt, toEntry->name);
     RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
     if (!relIndex)
       continue;

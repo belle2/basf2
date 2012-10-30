@@ -189,7 +189,7 @@ void RootInputModule::event()
 
   const long nextEntry = InputController::getNextEntry();
   if (nextEntry >= 0 && nextEntry < InputController::numEntries()) {
-    B2INFO("RootInput: will read " << nextEntry << " next.");
+    B2INFO("RootInput: will read entry " << nextEntry << " next.");
     m_counterNumber[DataStore::c_Event] = nextEntry;
   } else if (InputController::getNextExperiment() >= 0 && InputController::getNextRun() >= 0 && InputController::getNextEvent() >= 0) {
     const int major = 1000000 * InputController::getNextExperiment() + InputController::getNextRun();

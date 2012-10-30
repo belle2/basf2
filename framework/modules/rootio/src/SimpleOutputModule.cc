@@ -16,6 +16,11 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 REG_MODULE(SimpleOutput)
 
+SimpleOutputModule::SimpleOutputModule(): RootOutputModule()
+{
+  setDescription("Deprecated, please use RootOutput instead.");
+}
+
 void SimpleOutputModule::initialize()
 {
   B2WARNING("The SimpleOutput module is deprecated. Please change SimpleOutput to RootOutput in your steering files.");

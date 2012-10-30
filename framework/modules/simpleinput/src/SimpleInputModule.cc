@@ -36,7 +36,7 @@ const std::string SimpleInputModule::c_SteerExcludeBranchNames[] = { "excludeBra
 SimpleInputModule::SimpleInputModule() : Module()
 {
   //Set module properties
-  setDescription("This module reads objects/arrays from a root file and writes them into the DataStore.");
+  setDescription("Deprecated, please use RootInput instead.");
   setPropertyFlags(c_Input | c_InitializeInProcess);
 
   //Initialization of some member variables

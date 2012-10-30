@@ -31,7 +31,7 @@ namespace Belle2 {
 
     /** Constructor.
      */
-    SimpleOutputModule(): RootOutputModule() { }
+    SimpleOutputModule();
 
     /** Destructor.
      *

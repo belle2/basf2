@@ -51,9 +51,10 @@ main.add_module(cdcdigi)
 pxd_digi = register_module('PXDDigitizer')
 main.add_module(pxd_digi)
 
-main.add_module(register_module('PXDClusterizer'))
+# currently broken
+# main.add_module(register_module('EKLMDigitizer'))
 
-main.add_module(register_module('ECLHit'))
+main.add_module(register_module('PXDClusterizer'))
 
 mctrackfinder = register_module('MCTrackFinder')
 mctrackfinder.param('UsePXDHits', True)

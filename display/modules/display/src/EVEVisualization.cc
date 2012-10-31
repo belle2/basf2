@@ -665,7 +665,7 @@ void EVEVisualization::addSimHit(const TVector3& v, const MCParticle* particle)
   simhits->SetNextPoint(v.x(), v.y(), v.z());
 }
 
-void EVEVisualization::addECLHit(const ECLHit* hit)
+void EVEVisualization::addECLSimHit(const ECLSimHit* hit)
 {
   const int cell = hit->getCellId();
   const TVector3& pos = ECL::ECLGeometryPar::Instance()->GetCrystalPos(cell);
@@ -802,7 +802,7 @@ void EVEVisualization::makeTracks()
   m_eclsimhitdata->DataChanged(); //update limits (Empty() won't work otherwise)
   if (!m_eclsimhitdata->Empty()) {
     m_eclsimhitdata->SetAxisFromBins();
-    TEveCalo3D* calo3d = new TEveCalo3D(m_eclsimhitdata, "ECLHits");
+    TEveCalo3D* calo3d = new TEveCalo3D(m_eclsimhitdata, "ECLSimHits");
     calo3d->SetBarrelRadius(125.80); //inner radius of ECL barrel
     calo3d->SetForwardEndCapPos(196.5); //inner edge of forward endcap
     calo3d->SetBackwardEndCapPos(-102.0); //inner edge of backward endcap

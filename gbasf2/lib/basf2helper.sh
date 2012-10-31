@@ -25,21 +25,24 @@ export BELLE2_NO_TOOLS_CHECK=1
 . ${VO_BELLE_SW_DIR}/belle2/tools/setup_belle2.sh
 WORKDIR=$PWD
 
-#uncompress the input sandbox
+############setup central release
+cd ${VO_BELLE_SW_DIR}/belle2/releases/$2
+setuprel $2
+
 
 ##set up local release
-mkdir release
-cd release
-cp ${VO_BELLE_SW_DIR}/belle2/releases/$2/.release .
-cp ${VO_BELLE_SW_DIR}/belle2/releases/$2/.externals .
-cp ${VO_BELLE_SW_DIR}/belle2/releases/$2/site_scons . -r
-ln -s site_scons/SConstruct SConstruct
-setuprel
-
-##copy source code to local release directory and compile it
-cp ${WORKDIR}/$3-inputsandbox.tar.bz2 .
-tar -jxvf $3-inputsandbox.tar.bz2
-scons --local
+###mkdir release
+###cd release
+###cp ${VO_BELLE_SW_DIR}/belle2/releases/$2/.release .
+###cp ${VO_BELLE_SW_DIR}/belle2/releases/$2/.externals .
+###cp ${VO_BELLE_SW_DIR}/belle2/releases/$2/site_scons . -r
+###ln -s site_scons/SConstruct SConstruct
+###setuprel
+###
+#####copy source code to local release directory and compile it
+###cp ${WORKDIR}/$3-inputsandbox.tar.bz2 .
+###tar -jxvf $3-inputsandbox.tar.bz2
+###scons --local
 
 cd $WORKDIR
 

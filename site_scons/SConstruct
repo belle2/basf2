@@ -9,6 +9,7 @@ AddOption('--verbose', dest = 'verbose', action = 'store_true', default = False,
 AddOption('--local', dest = 'local', action = 'store_true', default = False, help='Enable faster build of local code. No code in the central release should depend on the local code!')
 AddOption('--symlink', dest = 'symlink', action = 'store_true', default = False, help='Use symbolic links instead of copies for header files')
 AddOption('--extra-libpath', dest = 'extralibpath', action = 'store', help = 'Additional library path')
+AddOption('--extra-ccflags', dest = 'extraccflags', action = 'store', help = 'Additional compiler flags')
 
 SetOption('warn', 'no-fortran-cxx-mix')
 try:
@@ -51,9 +52,9 @@ global_env = Environment(ENV = os.environ,
                          EXTINCDIR = os.path.join('$EXTDIR', 'include'),
                          EXTLIBDIR = os.path.join('$EXTDIR', 'lib', extsubdir),
                          EXTBINDIR = os.path.join('$EXTDIR', 'bin', extsubdir),
-                         CCFLAGS = ['-Wall'],
+                         CCFLAGS = ['-Wall', '-I$EXTINCDIR', '-I' + sysconfig.get_python_inc()],
                          CPPDEFINES = {'_PACKAGE_': '\\"$PACKAGE\\"'},
-                         CPPPATH = ['include', '$EXTINCDIR', sysconfig.get_python_inc()],
+                         CPPPATH = ['include'],
                          LIBPATH = ['$LIBDIR', '$EXTLIBDIR', os.path.join(os.environ['ROOTSYS'], 'lib')],
                          DATAOBJECT_LIBS = [],
                          TOOLS_LIBS = {},
@@ -61,9 +62,17 @@ global_env = Environment(ENV = os.environ,
                          TEST_LIBS = [],
                          TEST_FILES = [])
 
-# include extra library paths
+# recalculate MD5 sums only if the time stamp differs
+global_env.Decider('MD5-timestamp')
+
+# cache implicit dependencies (#includes)
+SetOption('implicit_cache', 1)
+
+# include extra library paths and compiler flags
 if GetOption('extralibpath'):
     global_env.Append(LIBPATH = GetOption('extralibpath').split(':'))
+if GetOption('extraccflags'):
+    global_env.Append(CCFLAGS = GetOption('extraccflags').split())
 
 # check for debug flag
 option = os.environ['BELLE2_OPTION']

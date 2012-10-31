@@ -80,12 +80,6 @@ fw.set_data_search_path(basf2datadir)
 fw.set_externals_path(envarExtDir)
 
 # -----------------------------------------------
-#         Load evtgen particle tables
-# -----------------------------------------------
-if not fw.read_evtgen_table(os.path.join(envarExtDir, 'share/evtgen/evt.pdl')):
-    print """ERROR: Could not load the evtgen table file!"""
-
-# -----------------------------------------------
 #             Print output
 # -----------------------------------------------
 print '>>> basf2 Python environment set'

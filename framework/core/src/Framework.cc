@@ -118,16 +118,6 @@ int Framework::getNumberProcesses() const
 }
 
 
-bool Framework::readEvtGenTableFromFile(const std::string& filename)
-{
-  if (FileSystem::isFile(filename)) {
-    TDatabasePDG::Instance()->ReadEvtGenTable(filename.c_str());
-    return true;
-  }
-  return false;
-}
-
-
 //=====================================================================
 //                          Python API
 //=====================================================================
@@ -189,6 +179,5 @@ void Framework::exposePythonAPI()
   .def("create_path", &Framework::createPath)
   .def("process", &Framework::process, process_overloads())
   .def("set_nprocess", &Framework::setNumberProcesses)
-  .def("read_evtgen_table", &Framework::readEvtGenTableFromFile)
   ;
 }

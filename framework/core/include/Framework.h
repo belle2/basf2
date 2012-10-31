@@ -130,13 +130,6 @@ namespace Belle2 {
     */
     int getNumberProcesses() const;
 
-    /**
-     * Reads the particle information from the evtgen table file specified by its filename.
-     * @param filename The path and the file which should be read and its content stored into TDatabasePDG.
-     * @return True if the filename exists and the content could be read.
-    */
-    bool readEvtGenTableFromFile(const std::string& filename);
-
 
     //--------------------------------------------------
     //                   Python API

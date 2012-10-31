@@ -29,11 +29,10 @@ intseed = random.randint(1, 10000000)
 
 pGun = register_module('ParticleGun')
 param_pGun = {
-#    'pdgCodes': [22,11,-11,13,-13,211,-211,2212,-2212,111],
-    'pdgCodes': [22],
+    'pdgCodes': [22, 111],
     'nTracks': 6,
     'momentumGeneration': 'uniform',
-    'momentumParams': [1., 1.],
+    'momentumParams': [1., 2.],
     'thetaGeneration': 'uniform',
     'thetaParams': [50., 130.],
     'phiGeneration': 'uniform',

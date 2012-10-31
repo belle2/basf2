@@ -29,7 +29,7 @@ intseed = random.randint(1, 10000000)
 
 pGun = register_module('ParticleGun')
 param_pGun = {
-    'pdgCodes': [22],
+    'pdgCodes': [111],
     'nTracks': 1,
     'momentumGeneration': 'uniform',
     'momentumParams': [1., 1.],
@@ -45,7 +45,6 @@ param_pGun = {
 
 pGun.param(param_pGun)
 
-eclHit = register_module('ECLHit')
 eclDigi = register_module('ECLDigitizer')
 eclRecShower = register_module('ECLReconstructor')
 makeGamma = register_module('ECLGammaReconstructor')
@@ -96,12 +95,11 @@ main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pGun)
 main.add_module(g4sim)
-main.add_module(cdcDigitizer)
-main.add_module(mctrackfinder)
-main.add_module(trackfitter)
-main.add_module(trackfitchecker)
-main.add_module(ext)
-main.add_module(eclHit)
+# main.add_module(cdcDigitizer)
+# main.add_module(mctrackfinder)
+# main.add_module(trackfitter)
+# main.add_module(trackfitchecker)
+# main.add_module(ext)
 main.add_module(eclDigi)
 main.add_module(eclRecShower)
 main.add_module(makeGamma)

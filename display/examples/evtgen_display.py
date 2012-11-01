@@ -53,8 +53,6 @@ main.add_module(pxd_digi)
 
 main.add_module(register_module('PXDClusterizer'))
 
-main.add_module(register_module('ECLHit'))
-
 mctrackfinder = register_module('MCTrackFinder')
 mctrackfinder.param('UsePXDHits', True)
 mctrackfinder.param('UseSVDHits', True)

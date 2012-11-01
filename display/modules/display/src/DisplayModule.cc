@@ -199,10 +199,10 @@ void DisplayModule::event()
     m_visualizer->addSimHit(eklmhits[i], el->from);
   }
 
-  StoreArray<ECLSimHit> eclhits;
+  StoreArray<ECLHit> eclhits;
   const int nECLHits = eclhits.getEntries();
   for (int i = 0; i < nECLHits; i++) {
-    m_visualizer->addECLSimHit(eclhits[i]);
+    m_visualizer->addECLHit(eclhits[i]);
   }
 
 

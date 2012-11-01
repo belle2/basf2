@@ -16,7 +16,7 @@
 #include <top/dataobjects/TOPSimHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
-#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLHit.h>
 #include <vxd/geometry/GeoCache.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
@@ -117,7 +117,7 @@ namespace Belle2 {
     void addSimHit(const TVector3& v, const MCParticle* particle);
 
     /** Add a ECL hit. */
-    void addECLSimHit(const ECLSimHit* hit);
+    void addECLHit(const ECLHit* hit);
 
     /** Return MCTrack for given particle, add it if it doesn't exist yet. */
     MCTrack& addMCParticle(const MCParticle* particle);

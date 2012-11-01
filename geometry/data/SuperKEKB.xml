@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SuperKEKB>
+  <LER>
+    <energy unit="GeV">4.0</energy>
+    <energyError unit="GeV">0.002375</energyError>
+    <angle unit="rad">-0.0415</angle>
+  </LER>
+  <HER>
+    <energy unit="GeV">7.0</energy>
+    <energyError unit="GeV">0.00513</energyError>
+    <angle unit="rad">0.0415</angle>
+  </HER>
+</SuperKEKB>

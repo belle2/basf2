@@ -28,6 +28,9 @@
   <!--xi:include href="../geometry/MagneticField2d.xml"/-->
   <!--xi:include href="../geometry/MagneticField3d.xml"/-->
 
+  <!-- Accelerator -->
+  <xi:include href="SuperKEKB.xml"/>
+
   <!-- Subdedectors -->
   <xi:include href="../structure/COIL.xml"/>
   <xi:include href="../structure/STR.xml"/>

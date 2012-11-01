@@ -147,29 +147,30 @@ void ECLGammaReconstructorModule::event()
       gammaArray[m_GNum]->setShowerId(m_showerId);
 
       eclGammaToShower.add(m_GNum, iShower);
-      double px = m_energy * sin(m_theta) * cos(m_phi);
-      double py = m_energy * sin(m_theta) * sin(m_phi);
-      double pz = m_energy * cos(m_theta);
 
       /*
-            cout << "EventGamma  " << m_nEvent << " Gamma " << m_showerId << " " << sqrt(px * px + py * py + pz * pz) << " m_extMatch  " << m_extMatch << endl;
-                                    cout<<"CellID ";
+            double px = m_energy * sin(m_theta) * cos(m_phi);
+            double py = m_energy * sin(m_theta) * sin(m_phi);
+            double pz = m_energy * cos(m_theta);
 
-                                   for (int iHA = 0; iHA < hANum; iHA++) {
+                  cout << "EventGamma  " << m_nEvent << " Gamma " << m_showerId << " " << sqrt(px * px + py * py + pz * pz) << " m_extMatch  " << m_extMatch << endl;
+                                          cout<<"CellID ";
 
-                                     ECLHitAssignment* aECLShower = eclHitAssignmentArray[iHA];
-                                     int m_HAShowerId = aECLShower->getShowerId();
-                                     int m_HAcellId = aECLShower->getCellId();
-                                     if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
-                                   }//for HA hANum
-                                    cout<<endl;
-                         */
+                                         for (int iHA = 0; iHA < hANum; iHA++) {
+
+                                           ECLHitAssignment* aECLShower = eclHitAssignmentArray[iHA];
+                                           int m_HAShowerId = aECLShower->getShowerId();
+                                           int m_HAcellId = aECLShower->getCellId();
+                                           if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
+                                         }//for HA hANum
+                                          cout<<endl;
+                               */
     }//if !m_extMatch
 
 
   }//for shower hitNum
 
-  cout << "Event " << m_nEvent << " Total output number of Gamma Array " << ++m_GNum << endl;
+  //cout << "Event " << m_nEvent << " Total output number of Gamma Array " << ++m_GNum << endl;
   m_nEvent++;
 }
 

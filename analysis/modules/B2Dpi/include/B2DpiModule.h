@@ -23,9 +23,6 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 
-#include <top/dataobjects/TOPTrack.h>
-#include <top/dataobjects/TOPLikelihoods.h>
-
 // What is the difference,
 // between RelationArray and RelationIndex
 #include <framework/datastore/RelationArray.h>

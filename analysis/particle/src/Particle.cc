@@ -51,6 +51,7 @@ Particle::Particle(const Track& a, const Ptype& ptype,
   m_pType    = new Ptype(ptype);
 }
 
+#if 0
 Particle::Particle(const MdstGamma& a)
   : m_usable(USABLE),  m_userInfo(NULL)
 {
@@ -58,21 +59,22 @@ Particle::Particle(const MdstGamma& a)
   m_relation = new Relation(a, this);
   m_pType    = new Ptype(22);
 }
+#endif
 
-Particle::Particle(const MdstPi0& a, const bool makeRelation)
-  : m_usable(USABLE),  m_userInfo(NULL)
-{
-  m_momentum = new Momentum(a);
-  m_relation = new Relation(a, makeRelation, this);
-  m_pType    = new Ptype(111);
-}
-
-Particle::Particle(RecCRECL& a)
+Particle::Particle(const ECLShower& a)
   : m_usable(USABLE),  m_userInfo(NULL)
 {
   m_momentum = new Momentum(a);
   m_relation = new Relation(a, this);
   m_pType    = new Ptype(22);
+}
+
+Particle::Particle(const ECLPi0& a, const bool makeRelation)
+  : m_usable(USABLE),  m_userInfo(NULL)
+{
+  m_momentum = new Momentum(a);
+  m_relation = new Relation(a, makeRelation, this);
+  m_pType    = new Ptype(111);
 }
 
 Particle::Particle(const MCParticle* a)

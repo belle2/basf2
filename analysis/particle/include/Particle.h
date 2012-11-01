@@ -40,11 +40,9 @@ namespace Belle2 {
     Particle(const Track&, const Ptype&,
              const Hep3Vector & = Hep3Vector(0., 0., 0.));
     /// Constructor with Mdst\_gamma
-    Particle(const MdstGamma&);
+    Particle(const ECLShower&);
     /// Constructor with Mdst\_pi0
-    Particle(const MdstPi0&, const bool makeRelation = true);
-    /// Constructor with Mdst\_ecl
-    Particle(RecCRECL&);
+    Particle(const ECLPi0&, const bool makeRelation = true);
 
     /**
      * Construct Particle from a MCParticle
@@ -156,13 +154,10 @@ namespace Belle2 {
     virtual const Track& mdstCharged(void) const { return m_relation->mdstCharged(); }
 
     /// returns a reference to Mdst\_gamma.
-    virtual const MdstGamma& mdstGamma(void) const { return m_relation->mdstGamma(); }
+    virtual const ECLShower& mdstGamma(void) const { return m_relation->mdstGamma(); }
 
     /// returns a reference to Mdst\_pi0.
-    virtual const MdstPi0& mdstPi0(void) const { return m_relation->mdstPi0(); }
-
-    /// returns a reference to Mdst\_ecl.
-    virtual const RecCRECL& mdstEcl(void) const { return m_relation->mdstEcl(); }
+    virtual const ECLPi0& mdstPi0(void) const { return m_relation->mdstPi0(); }
 
     /**
      * Returns a pointer to linked generated MCParticle. NULL if the particle doesn't

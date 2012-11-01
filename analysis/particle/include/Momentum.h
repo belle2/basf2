@@ -9,9 +9,9 @@
 #include "CLHEP/Matrix/SymMatrix.h"
 #include "CLHEP/Matrix/Matrix.h"
 
-#include <ecl/dataobjects/RecCRECL.h>
-#include <ecl/dataobjects/MdstGamma.h>
-#include <ecl/dataobjects/MdstPi0.h>
+#include <ecl/dataobjects/ECLShower.h>
+//#include <ecl/dataobjects/MdstGamma.h>
+#include <ecl/dataobjects/ECLPi0.h>
 #include <tracking/dataobjects/Track.h>
 #include <generators/dataobjects/MCParticle.h>
 #include <cmath>
@@ -41,11 +41,11 @@ namespace Belle2 {
     Momentum(const Track&, const Ptype&,
              const Hep3Vector & = Hep3Vector(0., 0., 0.));
     /// Constructor with Mdst\_gamma
-    Momentum(const MdstGamma&);
-    /// Constructor with Mdst\_pi0
-    Momentum(const MdstPi0&);
+    //    Momentum(const MdstGamma&);
     /// Constructor with Mdst\_elid
-    Momentum(RecCRECL&);
+    Momentum(const ECLShower&);
+    /// Constructor with Mdst\_pi0
+    Momentum(const ECLPi0&);
 
     /**
      * Construct Momentum from a MCParticle. The 4-momentum vector,

@@ -33,6 +33,10 @@
 #include <GFTrackCand.h>
 #include <tracking/dataobjects/Track.h>
 
+// ECL
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLPi0.h>
+
 // kinematic fit
 #include <analysis/KFit/MassFitKFit.h>
 #include <analysis/KFit/MassVertexFitKFit.h>
@@ -85,6 +89,9 @@ namespace Belle2 {
     std::string  m_gfTrackCandColName;         /**< Track Candidates collection name. */
     std::string  m_gfTracksColName;            /**< GFTracks collection name. */
     std::string  m_tracksColName;              /**< Tracks collection name. */
+    std::string  m_gammasColName;              /**< Gammas collection name. */
+    std::string  m_eclsColName;                /**< ECLs collection name. */
+    std::string  m_pi0sColName;                /**< pi0s collection name. */
 
     /** output root file name (given as Module parameter) */
     std::string m_dataOutFileName;

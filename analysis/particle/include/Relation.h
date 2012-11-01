@@ -10,9 +10,8 @@
 namespace Belle2 {
   class Particle;
   class Track;
-  class MdstGamma;
-  class MdstPi0;
-  class RecCRECL;
+  class ECLShower;
+  class ECLPi0;
   class MCParticle;
 }
 
@@ -30,11 +29,9 @@ namespace Belle2 {
     /// Constructor with Mdst\_charged
     Relation(const Track&, Particle * = NULL);
     /// Constructor with Mdst\_gamma
-    Relation(const MdstGamma&, Particle * = NULL);
+    Relation(const ECLShower&, Particle * = NULL);
     /// Constructor with Mdst\_pi0
-    Relation(const MdstPi0&, const bool makeRelation = true, Particle * = NULL);
-    /// Constructor with Mdst\_ecl
-    Relation(const RecCRECL&, Particle * = NULL);
+    Relation(const ECLPi0&, const bool makeRelation = true, Particle * = NULL);
 
     /**
      * Construct Relation from a MCParticle
@@ -97,22 +94,16 @@ namespace Belle2 {
     virtual const Track& mdstCharged(const Track& a) { return *(m_charged = &a);}
 
     /// returns a reference to Mdst\_gamma.
-    virtual const MdstGamma& mdstGamma(void) const;
+    virtual const ECLShower& mdstGamma(void) const;
 
     /// sets a reference to Mdst\_gamma and returns it.
-    virtual const MdstGamma& mdstGamma(const MdstGamma& a) { return *(m_gamma = &a);}
+    virtual const ECLShower& mdstGamma(const ECLShower& a) { return *(m_gamma = &a);}
 
     /// returns a reference to Mdst\_pi0.
-    virtual const MdstPi0& mdstPi0(void) const;
+    virtual const ECLPi0& mdstPi0(void) const;
 
     /// sets a reference to Mdst\_pi0 and returns it.
-    virtual const MdstPi0& mdstPi0(const MdstPi0& a) { return *(m_pi0 = &a); }
-
-    /// returns a reference to Mdst\_ecl.
-    virtual const RecCRECL& mdstEcl(void) const;
-
-    /// sets a reference to Mdst\_ecl and returns it.
-    virtual const RecCRECL& mdstEcl(const RecCRECL& a) { return *(m_ecl = &a); }
+    virtual const ECLPi0& mdstPi0(const ECLPi0& a) { return *(m_pi0 = &a); }
 
     /**
      * Returns a pointer to linked generated MCParticle. NULL if the particle doesn't
@@ -147,9 +138,8 @@ namespace Belle2 {
     std::vector<Particle*> m_children;
     Particle* m_mc;
     const Track*      m_charged;
-    const MdstGamma*  m_gamma;
-    const MdstPi0*    m_pi0;
-    const RecCRECL*   m_ecl;
+    const ECLShower*  m_gamma;
+    const ECLPi0*     m_pi0;
     const MCParticle* m_mcParticle; /**< Pointer to the linked MCParticle */
 
     mutable unsigned int m_flagChildModification;

@@ -381,7 +381,8 @@ Momentum::Momentum(const Track& p, const Ptype& ptype,
 #endif
 }
 
-Momentum::Momentum(const MdstGamma& p)
+#if 0
+Momentum::Momentum(const ECLGamma& p)
   : m_momentum(p.getpx(), p.getpy(), p.getpz(),
                sqrt(p.getpx()*p.getpx() + p.getpy()*p.getpy() + p.getpz()*p.getpz())),
   m_position(),
@@ -392,19 +393,9 @@ Momentum::Momentum(const MdstGamma& p)
   m_decayVertexError(3, 0)
 {
 }
+#endif
 
-Momentum::Momentum(const MdstPi0& p)
-  : m_momentum(p.getpx(), p.getpy(), p.getpz(), p.getenergy()),
-    m_position(),
-    m_error(7, 0),
-    m_vertex(),
-    m_vertexError(3, 0),
-    m_decayVertex(),
-    m_decayVertexError(3, 0)
-{
-}
-
-Momentum::Momentum(RecCRECL& p)
+Momentum::Momentum(const ECLShower& p)
   : m_position(),
     m_error(7, 0),
     m_vertex(),
@@ -419,6 +410,17 @@ Momentum::Momentum(RecCRECL& p)
   double py = en * sin(th) * sin(ph);
   double pz = en * cos(th);
   m_momentum = HepLorentzVector(px, py, pz, en);
+}
+
+Momentum::Momentum(const ECLPi0& p)
+  : m_momentum(p.getpx(), p.getpy(), p.getpz(), p.getenergy()),
+    m_position(),
+    m_error(7, 0),
+    m_vertex(),
+    m_vertexError(3, 0),
+    m_decayVertex(),
+    m_decayVertexError(3, 0)
+{
 }
 
 Momentum::Momentum(const MCParticle* p)

@@ -75,6 +75,8 @@ void ECLPi0ReconstructorModule::initialize()
   // CPU time start
   m_timeCPU = clock() * Unit::us;
   StoreArray<ECLPi0>::registerPersistent();
+
+  RelationArray::registerPersistent<ECLPi0, ECLShower>("", "");
 }
 
 void ECLPi0ReconstructorModule::beginRun()
@@ -88,6 +90,9 @@ void ECLPi0ReconstructorModule::event()
   StoreArray<ECLGamma> Gamma;
   StoreArray<ECLShower> eclRecShowerArray;
   RelationArray eclGammaToShower(Gamma, eclRecShowerArray);
+  StoreArray<ECLPi0> Pi0Array;
+  RelationArray eclPi0ToShower(Pi0Array, eclRecShowerArray);
+
 
   for (int iIndex = 0; iIndex < eclGammaToShower.getEntries() - 1 ; iIndex++) {
     for (int iHit = 0; iHit < (int)eclGammaToShower[iIndex].getToIndices().size(); iHit++) {
@@ -135,7 +140,6 @@ void ECLPi0ReconstructorModule::event()
             fit(lv_gamma1, lv_gamma2);
             if (pi0_mass_min < mass && mass < pi0_mass_max) {
 
-              StoreArray<ECLPi0> Pi0Array;
               if (!Pi0Array) Pi0Array.create();
               m_Pi0Num = Pi0Array->GetLast() + 1;
               new(Pi0Array->AddrAt(m_Pi0Num)) ECLPi0();
@@ -150,7 +154,8 @@ void ECLPi0ReconstructorModule::event()
               Pi0Array[m_Pi0Num]->setmass((float)lv_rec.mag());
               Pi0Array[m_Pi0Num]->setmassfit((float)m_pi0mass);
               Pi0Array[m_Pi0Num]->setchi2((float)m_pi0chi2);
-
+              eclPi0ToShower.add(m_Pi0Num, m_showerId1);
+              eclPi0ToShower.add(m_Pi0Num, m_showerId2);
               //cout << "Event " << m_nEvent << " Pi0 from Gamma " << m_showerId1 << " " << m_showerId2 << " " << m_pi0E << " " << m_pi0mass << endl;
 
             }

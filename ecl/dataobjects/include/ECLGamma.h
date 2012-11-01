@@ -54,6 +54,47 @@ namespace Belle2 {
     }
 
 
+    float getPx() const {
+      StoreArray<ECLShower> eclRecShowerArray;
+      ECLShower* aECLShower = eclRecShowerArray[m_showerId];
+      double m_energy = aECLShower->GetEnergy();
+      double m_theta = aECLShower->GetTheta();
+      double m_phi = aECLShower->GetPhi();
+      double m_px = m_energy * sin(m_theta) * cos(m_phi);
+      return (float)m_px;
+    }
+
+
+    float getPy() const {
+      StoreArray<ECLShower> eclRecShowerArray;
+      ECLShower* aECLShower = eclRecShowerArray[m_showerId];
+      double m_energy = aECLShower->GetEnergy();
+      double m_theta = aECLShower->GetTheta();
+      double m_phi = aECLShower->GetPhi();
+      double m_py = m_energy * sin(m_theta) * sin(m_phi);
+      return (float)m_py;
+    }
+
+
+    float getPz() const {
+      StoreArray<ECLShower> eclRecShowerArray;
+      ECLShower* aECLShower = eclRecShowerArray[m_showerId];
+      double m_energy = aECLShower->GetEnergy();
+      double m_theta = aECLShower->GetTheta();
+      double m_pz = m_energy * cos(m_theta);
+
+      return (float)m_pz;
+    }
+
+
+    float getEnergy() const {
+      TVector3 momentum(0., 0., 0.);
+      StoreArray<ECLShower> eclRecShowerArray;
+      ECLShower* aECLShower = eclRecShowerArray[m_showerId];
+      double m_energy = aECLShower->GetEnergy();
+      return (float)m_energy;
+    }
+
     //! Empty constructor
     /*! Recommended for ROOT IO
     */

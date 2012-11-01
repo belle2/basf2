@@ -16,13 +16,5 @@
 #pragma link C++ class Belle2::ECLPi0;
 #pragma link C++ class Belle2::ECLShower;
 
-#pragma link C++ class Belle2::DspECL;
-#pragma link C++ class Belle2::RecCRECL;
-#pragma link C++ class Belle2::TrigECL;
-#pragma link C++ class Belle2::HitECL;
-#pragma link C++ class Belle2::HitAssignmentECL;
-#pragma link C++ class Belle2::MdstGamma;
-#pragma link C++ class Belle2::MdstPi0;
-#pragma link C++ class Belle2::MdstShower;
 
 #endif

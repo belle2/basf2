@@ -5,6 +5,7 @@ using namespace Belle2;
 static Particle*     static_Particle(NULL);
 static Track*        static_Mdst_charged(NULL);
 static ECLShower*    static_ECL_shower(NULL);
+static ECLGamma*     static_ECL_gamma(NULL);
 static ECLPi0*       static_ECL_pi0(NULL);
 
 //Default constructor
@@ -15,6 +16,7 @@ Relation::Relation()
   m_mother     = NULL;
   m_mc         = NULL;
   m_charged    = NULL;
+  m_ecl        = NULL;
   m_gamma      = NULL;
   m_pi0        = NULL;
   m_mcParticle = NULL;
@@ -29,6 +31,7 @@ Relation::Relation(Particle* s)
   m_mother     = NULL;
   m_mc         = NULL;
   m_charged    = NULL;
+  m_ecl        = NULL;
   m_gamma      = NULL;
   m_pi0        = NULL;
   m_mcParticle = NULL;
@@ -49,6 +52,7 @@ Relation::Relation(const Relation& a, Particle* s)
     m_flagChildModification = 1;
   }
   m_charged    = a.m_charged;
+  m_ecl        = a.m_ecl;
   m_gamma      = a.m_gamma;
   m_pi0        = a.m_pi0;
   m_mcParticle = a.m_mcParticle;
@@ -71,6 +75,7 @@ Relation::Relation(const Track& a, Particle* s)
 
   m_mother     = NULL;
   m_mc         = NULL;
+  m_ecl        = NULL;
   m_gamma      = NULL;
   m_pi0        = NULL;
   m_mcParticle = NULL;
@@ -80,6 +85,22 @@ Relation::Relation(const Track& a, Particle* s)
 Relation::Relation(const ECLShower& a, Particle* s)
   : m_vee2ChildCounter(0), m_pi0ChildCounter(0)
 {
+  m_self = s;
+  m_ecl  = &a;
+  m_flagChildModification = 0;
+
+  m_mother     = NULL;
+  m_mc         = NULL;
+  m_charged    = NULL;
+  m_gamma      = NULL;
+  m_pi0        = NULL;
+  m_mcParticle = NULL;
+}
+
+//Constructor with Mdst\_gamma
+Relation::Relation(const ECLGamma& a, Particle* s)
+  : m_vee2ChildCounter(0), m_pi0ChildCounter(0)
+{
   m_self  = s;
   m_gamma = &a;
   m_flagChildModification = 0;
@@ -87,6 +108,7 @@ Relation::Relation(const ECLShower& a, Particle* s)
   m_mother     = NULL;
   m_mc         = NULL;
   m_charged    = NULL;
+  m_ecl        = NULL;
   m_pi0        = NULL;
   m_mcParticle = NULL;
 }
@@ -102,6 +124,7 @@ Relation::Relation(const ECLPi0& a, const bool makeRelation, Particle* s)
   m_mother     = NULL;
   m_mc         = NULL;
   m_charged    = NULL;
+  m_ecl        = NULL;
   m_gamma      = NULL;
   m_mcParticle = NULL;
 
@@ -147,8 +170,9 @@ Relation::Relation(const MCParticle* a, Particle* s)
   m_mother     = NULL;
   m_mc         = NULL;
   m_charged    = NULL;
-  m_pi0        = NULL;
+  m_ecl        = NULL;
   m_gamma      = NULL;
+  m_pi0        = NULL;
 }
 
 
@@ -172,7 +196,7 @@ Relation::mother(void) const
 {
   if (m_mother) return *m_mother;
   else if (static_Particle) return *static_Particle;
-  // Tagir   else return *(static_Particle=new Particle);
+  // Tagir else return *(static_Particle=new Particle);
 }
 
 Particle&
@@ -230,10 +254,19 @@ Relation::mdstCharged(void) const
 
 // returns a reference to Mdst\_gamma.
 const ECLShower&
+Relation::mdstEcl(void) const
+{
+  if (m_ecl) return *m_ecl;
+  else if (static_ECL_shower) return *static_ECL_shower;
+  // Tagir   else return *(static_Mdst_gamma=new Mdst_gamma);
+}
+
+// returns a reference to Mdst\_gamma.
+const ECLGamma&
 Relation::mdstGamma(void) const
 {
   if (m_gamma) return *m_gamma;
-  else if (static_ECL_shower) return *static_ECL_shower;
+  else if (static_ECL_gamma) return *static_ECL_gamma;
   // Tagir   else return *(static_Mdst_gamma=new Mdst_gamma);
 }
 
@@ -253,11 +286,15 @@ Relation::isIdenticalWith(const Relation& x, const unsigned& type) const
     case PC_ALL:
       if (m_charged    && x.m_charged)        return (m_charged     == (x.m_charged));
       if (m_mcParticle && x.m_mcParticle)     return (m_mcParticle  == (x.m_mcParticle));
+      if (m_ecl        && x.m_ecl)            return (m_ecl         == (x.m_ecl));
       if (m_gamma      && x.m_gamma)          return (m_gamma       == (x.m_gamma));
       if (m_pi0        && x.m_pi0)            return (m_pi0         == (x.m_pi0));
       return false;
     case PC_CHARGED:
       if (m_charged   && x.m_charged)    return (m_charged    == (x.m_charged));
+      return false;
+    case PC_ECL:
+      if (m_ecl       && x.m_ecl)        return (m_ecl        == (x.m_ecl));
       return false;
     case PC_GAMMA:
       if (m_gamma     && x.m_gamma)      return (m_gamma      == (x.m_gamma));
@@ -291,6 +328,7 @@ Relation::operator = (const Relation& a)
     m_flagChildModification = 1;
   }
   m_charged    = a.m_charged;
+  m_ecl        = a.m_ecl;
   m_gamma      = a.m_gamma;
   m_pi0        = a.m_pi0;
   m_mcParticle = a.m_mcParticle;

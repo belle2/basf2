@@ -51,15 +51,13 @@ Particle::Particle(const Track& a, const Ptype& ptype,
   m_pType    = new Ptype(ptype);
 }
 
-#if 0
-Particle::Particle(const MdstGamma& a)
+Particle::Particle(const ECLGamma& a)
   : m_usable(USABLE),  m_userInfo(NULL)
 {
   m_momentum = new Momentum(a);
   m_relation = new Relation(a, this);
   m_pType    = new Ptype(22);
 }
-#endif
 
 Particle::Particle(const ECLShower& a)
   : m_usable(USABLE),  m_userInfo(NULL)

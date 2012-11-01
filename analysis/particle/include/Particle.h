@@ -39,8 +39,10 @@ namespace Belle2 {
     /// Constructor with Mdst\_charged(by pType)
     Particle(const Track&, const Ptype&,
              const Hep3Vector & = Hep3Vector(0., 0., 0.));
-    /// Constructor with Mdst\_gamma
+    /// Constructor with Mdst\_ecl
     Particle(const ECLShower&);
+    /// Constructor with Mdst\_gamma
+    Particle(const ECLGamma&);
     /// Constructor with Mdst\_pi0
     Particle(const ECLPi0&, const bool makeRelation = true);
 
@@ -154,7 +156,10 @@ namespace Belle2 {
     virtual const Track& mdstCharged(void) const { return m_relation->mdstCharged(); }
 
     /// returns a reference to Mdst\_gamma.
-    virtual const ECLShower& mdstGamma(void) const { return m_relation->mdstGamma(); }
+    virtual const ECLShower& mdstEcl(void) const { return m_relation->mdstEcl(); }
+
+    /// returns a reference to Mdst\_gamma.
+    virtual const ECLGamma& mdstGamma(void) const { return m_relation->mdstGamma(); }
 
     /// returns a reference to Mdst\_pi0.
     virtual const ECLPi0& mdstPi0(void) const { return m_relation->mdstPi0(); }

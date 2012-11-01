@@ -381,19 +381,16 @@ Momentum::Momentum(const Track& p, const Ptype& ptype,
 #endif
 }
 
-#if 0
 Momentum::Momentum(const ECLGamma& p)
-  : m_momentum(p.getpx(), p.getpy(), p.getpz(),
-               sqrt(p.getpx()*p.getpx() + p.getpy()*p.getpy() + p.getpz()*p.getpz())),
-  m_position(),
-  m_error(7, 0),
-  m_vertex(),
-  m_vertexError(3, 0),
-  m_decayVertex(),
-  m_decayVertexError(3, 0)
+  : m_momentum(p.getPx(), p.getPy(), p.getPz(), p.getEnergy()),
+    m_position(),
+    m_error(7, 0),
+    m_vertex(),
+    m_vertexError(3, 0),
+    m_decayVertex(),
+    m_decayVertexError(3, 0)
 {
 }
-#endif
 
 Momentum::Momentum(const ECLShower& p)
   : m_position(),

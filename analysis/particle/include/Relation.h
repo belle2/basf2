@@ -11,6 +11,7 @@ namespace Belle2 {
   class Particle;
   class Track;
   class ECLShower;
+  class ECLGamma;
   class ECLPi0;
   class MCParticle;
 }
@@ -30,6 +31,8 @@ namespace Belle2 {
     Relation(const Track&, Particle * = NULL);
     /// Constructor with Mdst\_gamma
     Relation(const ECLShower&, Particle * = NULL);
+    /// Constructor with Mdst\_gamma
+    Relation(const ECLGamma&, Particle * = NULL);
     /// Constructor with Mdst\_pi0
     Relation(const ECLPi0&, const bool makeRelation = true, Particle * = NULL);
 
@@ -94,10 +97,16 @@ namespace Belle2 {
     virtual const Track& mdstCharged(const Track& a) { return *(m_charged = &a);}
 
     /// returns a reference to Mdst\_gamma.
-    virtual const ECLShower& mdstGamma(void) const;
+    virtual const ECLShower& mdstEcl(void) const;
 
     /// sets a reference to Mdst\_gamma and returns it.
-    virtual const ECLShower& mdstGamma(const ECLShower& a) { return *(m_gamma = &a);}
+    virtual const ECLShower& mdstEcl(const ECLShower& a) { return *(m_ecl = &a);}
+
+    /// returns a reference to Mdst\_gamma.
+    virtual const ECLGamma& mdstGamma(void) const;
+
+    /// sets a reference to Mdst\_gamma and returns it.
+    virtual const ECLGamma& mdstGamma(const ECLGamma& a) { return *(m_gamma = &a);}
 
     /// returns a reference to Mdst\_pi0.
     virtual const ECLPi0& mdstPi0(void) const;
@@ -138,7 +147,8 @@ namespace Belle2 {
     std::vector<Particle*> m_children;
     Particle* m_mc;
     const Track*      m_charged;
-    const ECLShower*  m_gamma;
+    const ECLShower*  m_ecl;
+    const ECLGamma*   m_gamma;
     const ECLPi0*     m_pi0;
     const MCParticle* m_mcParticle; /**< Pointer to the linked MCParticle */
 

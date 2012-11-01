@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
-#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
@@ -20,7 +20,7 @@
 #include <framework/logging/Logger.h>
 
 //ecl package headers
-#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLHit.h>
 
 //C++ STL
 #include <cstdlib>
@@ -53,7 +53,7 @@ REG_MODULE(ECLDigitizer)
 ECLDigitizerModule::ECLDigitizerModule() : Module()
 {
   //Set module properties
-  setDescription("Creates ECLDigiHits from ECLSimHits.");
+  setDescription("Creates ECLDigiHits from ECLHits.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
 //  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
@@ -95,9 +95,9 @@ void ECLDigitizerModule::event()
 {
   m_timeCPU = clock() * Unit::us;
   //Input Array
-  StoreArray<ECLSimHit>  eclArray;
+  StoreArray<ECLHit>  eclArray;
   if (!eclArray) {
-    B2ERROR("Can not find ECLSimHit Array.");
+    B2ERROR("Can not find ECLHit Array.");
   }
 
   //cout<<"Total Hits in Digi "<<eclArray->GetEntriesFast()<<endl;
@@ -117,13 +117,13 @@ void ECLDigitizerModule::event()
 
   for (int ii = 0; ii < hitNum; ii++) {
 
-    ECLSimHit* aECLSimHit = eclArray[ii];
+    ECLHit* aECLHit = eclArray[ii];
     // Hit geom. info
-//    int hitEventId       =  aECLSimHit->getEventId();
+//    int hitEventId       =  aECLHit->getEventId();
 
-    int hitCellId       =  aECLSimHit->getCellId() - 1; //0~8735
-    double hitE         =  aECLSimHit->getEnergyDep() / Unit::GeV;
-    double hitTimeAve       =  aECLSimHit->getTimeAve()   / Unit::us;
+    int hitCellId       =  aECLHit->getCellId() - 1; //0~8735
+    double hitE         =  aECLHit->getEnergyDep() / Unit::GeV;
+    double hitTimeAve       =  aECLHit->getTimeAve()   / Unit::us;
     double sampleTime ;
 
     E_tmp[hitCellId] = hitE + E_tmp[hitCellId];//for summation deposit energy; do fit if this summation > 0.1 MeV

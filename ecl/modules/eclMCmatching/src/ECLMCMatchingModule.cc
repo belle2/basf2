@@ -18,7 +18,7 @@
 
 //ecl package headers
 #include <ecl/dataobjects/ECLSim.h>
-#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLHit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLShower.h>
@@ -58,7 +58,7 @@ REG_MODULE(ECLMCMatching)
 ECLMCMatchingModule::ECLMCMatchingModule() : Module()
 {
   // Set description
-//  setDescription("ECLSimHitMakerModule");
+//  setDescription("ECLHitMakerModule");
 
   setDescription("ECLMCMatchingModule");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
@@ -74,7 +74,7 @@ void ECLMCMatchingModule::initialize()
   // Initialize variables
   m_nRun    = 0 ;
   m_nEvent  = 0 ;
-  RelationArray::registerPersistent<ECLSimHit, MCParticle>("", "");
+  RelationArray::registerPersistent<ECLHit, MCParticle>("", "");
   RelationArray::registerPersistent<ECLDigit, MCParticle>("", "");
   RelationArray::registerPersistent<ECLShower, MCParticle>("", "");
 
@@ -105,23 +105,23 @@ void ECLMCMatchingModule::event()
   eclPrimaryMap.clear();
   int nMcParticles = mcParticles.getEntries();
   for (int iPart = 0; iPart < nMcParticles; ++iPart) {
-    /*
-       if(mcParticles[iPart]->getMother()==NULL)
-                cout<<" "<<m_nEvent<<"Track "<<mcParticles[iPart]->getArrayIndex()
-                <<" PDG "<<mcParticles[iPart]->getPDG()
-                <<" P "<<mcParticles[iPart]->getMomentum().Mag()
-                <<" theta "<< mcParticles[iPart]->getMomentum().Theta()* 180 /M_PI
-                <<" phi "<<   mcParticles[iPart]->getMomentum().Phi()* 180 /M_PI
-                <<" vx "<< mcParticles[iPart]->getProductionVertex().Perp()<<" "<<mcParticles[iPart]->getProductionVertex().z()<<endl;
-         else
-                cout<<" "<<m_nEvent<<"Track "<<mcParticles[iPart]->getArrayIndex()
-                <<" PDG "<<mcParticles[iPart]->getPDG()
-                <<" P "<<mcParticles[iPart]->getMomentum().Mag()
-                <<" vx "<< mcParticles[iPart]->getProductionVertex().Perp()<<" "<<mcParticles[iPart]->getProductionVertex().z()
-                <<" Mother "<< mcParticles[iPart]->getMother()->getArrayIndex()
-                <<" PDG "<<mcParticles[mcParticles[iPart]->getMother()->getArrayIndex()]->getPDG()
-                <<" P "<<mcParticles[mcParticles[iPart]->getMother()->getArrayIndex()]->getMomentum().Mag()<<endl;
-     */
+
+    if (mcParticles[iPart]->getMother() == NULL)
+      cout << " " << m_nEvent << "Track " << mcParticles[iPart]->getArrayIndex()
+           << " PDG " << mcParticles[iPart]->getPDG()
+           << " P " << mcParticles[iPart]->getMomentum().Mag()
+           << " theta " << mcParticles[iPart]->getMomentum().Theta() * 180 / M_PI
+           << " phi " <<   mcParticles[iPart]->getMomentum().Phi() * 180 / M_PI
+           << " vx " << mcParticles[iPart]->getProductionVertex().Perp() << " " << mcParticles[iPart]->getProductionVertex().z() << endl;
+    /*      else
+                 cout<<" "<<m_nEvent<<"Track "<<mcParticles[iPart]->getArrayIndex()
+                 <<" PDG "<<mcParticles[iPart]->getPDG()
+                 <<" P "<<mcParticles[iPart]->getMomentum().Mag()
+                 <<" vx "<< mcParticles[iPart]->getProductionVertex().Perp()<<" "<<mcParticles[iPart]->getProductionVertex().z()
+                 <<" Mother "<< mcParticles[iPart]->getMother()->getArrayIndex()
+                 <<" PDG "<<mcParticles[mcParticles[iPart]->getMother()->getArrayIndex()]->getPDG()
+                 <<" P "<<mcParticles[mcParticles[iPart]->getMother()->getArrayIndex()]->getMomentum().Mag()<<endl;
+      */
     if (mcParticles[iPart]->getMother() == NULL) {
 
       if (mcParticles[iPart]->getArrayIndex() == -1)
@@ -134,8 +134,8 @@ void ECLMCMatchingModule::event()
     }
   }
 
-  StoreArray<ECLSimHit> eclSimHitArray;
-  RelationArray eclSimHitRel(mcParticles, eclSimHitArray);
+  StoreArray<ECLHit> eclHitArray;
+  RelationArray eclHitRel(mcParticles, eclHitArray);
   StoreArray<ECLDigit> eclDigiArray;
   RelationArray  eclDigiToMCPart(eclDigiArray, mcParticles);
 
@@ -149,18 +149,18 @@ void ECLMCMatchingModule::event()
   }
 
 
-  for (int index = 0; index < eclSimHitRel.getEntries(); index++) {
+  for (int index = 0; index < eclHitRel.getEntries(); index++) {
 
-    //MCParticle* aMCParticle = mcParticles[eclSimHitRel[index].getFromIndex()];
+    //MCParticle* aMCParticle = mcParticles[eclHitRel[index].getFromIndex()];
     int PrimaryIndex = -1;
-    map<int, int>::iterator iter = eclPrimaryMap.find(eclSimHitRel[index].getFromIndex());
+    map<int, int>::iterator iter = eclPrimaryMap.find(eclHitRel[index].getFromIndex());
     if (iter != eclPrimaryMap.end()) {
       PrimaryIndex = iter->second;
-    } else cout << "CantFind Track in eclPrimaryMap " << eclSimHitRel[index].getFromIndex() << endl;
+    } else cout << "CantFind Track in eclPrimaryMap " << eclHitRel[index].getFromIndex() << endl;
 
-    for (int hit = 0; hit < (int)eclSimHitRel[index].getToIndices().size(); hit++) {
-      ECLSimHit* aECLSimHit = eclSimHitArray[eclSimHitRel[index].getToIndex(hit)];
-      int hitCellId         = aECLSimHit->getCellId() - 1;
+    for (int hit = 0; hit < (int)eclHitRel[index].getToIndices().size(); hit++) {
+      ECLHit* aECLHit = eclHitArray[eclHitRel[index].getToIndex(hit)];
+      int hitCellId         = aECLHit->getCellId() - 1;
       if (DigiIndex[hitCellId] != -1 && DigiOldTrack[hitCellId] != PrimaryIndex) {
         eclDigiToMCPart.add(DigiIndex[hitCellId], PrimaryIndex);
         DigiOldTrack[hitCellId] = PrimaryIndex;
@@ -221,13 +221,13 @@ void ECLMCMatchingModule::event()
         if (ShowerIndex != -1 && OldRel == 0) {
           eclShowerToMCPart.add(ShowerIndex, eclDigiToMCPart[index].getToIndex(iMCpart));
 
-          //ECLShower* aECLShower = eclRecShowerArray[ShowerIndex];
-          //cout << "ShowerRel" << m_nEvent << " " << cId << " shower" << ShowerIndex
-          //      << " Energy "<<  aECLShower->GetEnergy()
-          //      << " theta "<<  aECLShower->GetTheta()* 180 /M_PI <<" phi "<<  aECLShower->GetPhi()* 180 /M_PI
-          //      << " mom" << eclDigiToMCPart[index].getToIndex(iMCpart)
-          //      << " PDG " << mcParticles[eclDigiToMCPart[index].getToIndex(iMCpart)]->getPDG()
-          //      << endl;
+          ECLShower* aECLShower = eclRecShowerArray[ShowerIndex];
+          cout << "ShowerRel" << m_nEvent << " " << cId << " shower" << ShowerIndex
+               << " Energy " <<  aECLShower->GetEnergy()
+               << " theta " <<  aECLShower->GetTheta() * 180 / M_PI << " phi " <<  aECLShower->GetPhi() * 180 / M_PI
+               << " mom" << eclDigiToMCPart[index].getToIndex(iMCpart)
+               << " PDG " << mcParticles[eclDigiToMCPart[index].getToIndex(iMCpart)]->getPDG()
+               << endl;
           ShowerOldTrackMap.insert(pair<int, int>(ShowerIndex, eclDigiToMCPart[index].getToIndex(iMCpart)));
 
         }//ShowerIndex != -1

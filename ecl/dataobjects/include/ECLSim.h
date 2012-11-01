@@ -19,7 +19,7 @@
 namespace Belle2 {
 
   /**
-    * ClassSVDSimHit - Geant4 simulated hit for the ECL.
+    * ClassECLSimHit - Geant4 simulated hit for the ECL.
     *
     * This class holds particle hit data from geant4 simulation. As the simulated
     * hit classes are used to generate detector response, they contain _local_
@@ -106,7 +106,7 @@ namespace Belle2 {
     */
     ECLSim() {;}
 
-    ClassDef(ECLSim, 1);/**< the class title */
+    ClassDef(ECLSim, 3);/**< the class title */
 
   };
 

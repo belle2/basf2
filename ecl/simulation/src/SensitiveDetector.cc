@@ -18,8 +18,8 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <ecl/dataobjects/ECLSim.h>
 #include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLHit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
 
@@ -54,20 +54,20 @@ namespace Belle2 {
       m_thresholdKineticEnergy(thresholdKineticEnergy), m_simhitNumber(0), m_trackID(-999), firstcall(0)
     {
 
-      StoreArray<ECLSim>eclSims;
       StoreArray<ECLSimHit>eclSimHits;
+      StoreArray<ECLHit>eclHits;
       StoreArray<MCParticle>mcParticles;
-      RelationArray eclSimRel(mcParticles, eclSims);
-      registerMCParticleRelation(eclSimRel);
       RelationArray eclSimHitRel(mcParticles, eclSimHits);
       registerMCParticleRelation(eclSimHitRel);
+      RelationArray eclHitRel(mcParticles, eclHits);
+      registerMCParticleRelation(eclHitRel);
 
-      eclSims.registerAsPersistent();
       eclSimHits.registerAsPersistent();
-      StoreArray<ECLSim>::registerPersistent();
+      eclHits.registerAsPersistent();
       StoreArray<ECLSimHit>::registerPersistent();
-      RelationArray::registerPersistent<MCParticle, ECLSim>("", "");
+      StoreArray<ECLHit>::registerPersistent();
       RelationArray::registerPersistent<MCParticle, ECLSimHit>("", "");
+      RelationArray::registerPersistent<MCParticle, ECLHit>("", "");
 
     }
 
@@ -182,11 +182,11 @@ namespace Belle2 {
     {
       StoreArray<MCParticle> mcParticles;
       //change Later
-      StoreArray<ECLSim> eclArray;
+      StoreArray<ECLSimHit> eclArray;
       if (!eclArray) eclArray.create();
-      RelationArray eclSimRel(mcParticles, eclArray);
+      RelationArray eclSimHitRel(mcParticles, eclArray);
       m_simhitNumber = eclArray->GetLast() + 1;
-      new(eclArray->AddrAt(m_simhitNumber)) ECLSim();
+      new(eclArray->AddrAt(m_simhitNumber)) ECLSimHit();
       eclArray[m_simhitNumber]->setCellId(cellId + 1);
       eclArray[m_simhitNumber]->setTrackId(trackID);
       eclArray[m_simhitNumber]->setPDGCode(pid);
@@ -196,14 +196,14 @@ namespace Belle2 {
       eclArray[m_simhitNumber]->setMomentum(momentum);
       eclArray[m_simhitNumber]->setPosIn(posAve);
       B2DEBUG(150, "HitNumber: " << m_simhitNumber);
-      eclSimRel.add(trackID, m_simhitNumber);
+      eclSimHitRel.add(trackID, m_simhitNumber);
 
-      StoreArray<ECLSimHit> eclSimHitArray;
-      RelationArray eclSimHitRel(mcParticles, eclSimHitArray);
+      StoreArray<ECLHit> eclHitArray;
+      RelationArray eclHitRel(mcParticles, eclHitArray);
       StoreObjPtr<EventMetaData> eventMetaDataPtr;
       int m_currentEvnetNumber = eventMetaDataPtr->getEvent();
 
-      if (!eclSimHitArray) eclSimHitArray.create();
+      if (!eclHitArray) eclHitArray.create();
       //cout<<PrimaryTrackId<<" "<<trackID<<endl;
       //cout<<"firstcall "<<firstcall<<" m_oldEvnetNumber "<<m_oldEvnetNumber<<endl;
       if (firstcall == 0 || m_currentEvnetNumber != m_oldEvnetNumber) {
@@ -220,8 +220,8 @@ namespace Belle2 {
           TimeIndex = (int)(tof / ns) / 500;
           double E_cell = (edep / GeV);
           if (ECLHitIndex[cellId][TimeIndex] == -1) {
-            m_hitNum = eclSimHitArray->GetLast() + 1;
-            new(eclSimHitArray->AddrAt(m_hitNum)) ECLSimHit();
+            m_hitNum = eclHitArray->GetLast() + 1;
+            new(eclHitArray->AddrAt(m_hitNum)) ECLHit();
 
             ECLGeometryPar* eclp = ECLGeometryPar::Instance();
             PosCell =  eclp->GetCrystalPos(cellId);
@@ -230,24 +230,24 @@ namespace Belle2 {
             T_ave =  6.05 + 0.0749 * local_pos - 0.00112 * local_pos * local_pos + (tof / ns)  ;
 
             ECLHitIndex[cellId][TimeIndex] = m_hitNum;
-            eclSimHitArray[m_hitNum]->setCellId(cellId + 1);
-            eclSimHitArray[m_hitNum]->setEnergyDep(E_cell);
-            eclSimHitArray[m_hitNum]->setTimeAve(T_ave);
-            eclSimHitRel.add(trackID, m_hitNum);
+            eclHitArray[m_hitNum]->setCellId(cellId + 1);
+            eclHitArray[m_hitNum]->setEnergyDep(E_cell);
+            eclHitArray[m_hitNum]->setTimeAve(T_ave);
+            eclHitRel.add(trackID, m_hitNum);
 
           } else {
             m_hitNum = ECLHitIndex[cellId][TimeIndex];
-            double old_edep = eclSimHitArray[m_hitNum]->getEnergyDep();
-            double old_TimeAve = eclSimHitArray[m_hitNum]->getTimeAve();
+            double old_edep = eclHitArray[m_hitNum]->getEnergyDep();
+            double old_TimeAve = eclHitArray[m_hitNum]->getTimeAve();
 
             //cout<<m_currentEvnetNumber<<" "<<m_hitNum
-            //    <<" old cellId  "<<eclSimHitArray[m_hitNum]->getCellId()<<" new "<<cellId
+            //    <<" old cellId  "<<eclHitArray[m_hitNum]->getCellId()<<" new "<<cellId
             //    <<" oldE "<<old_edep<<" + newE "<<E_cell<<"= "<<old_edep+E_cell
             //    <<" oldT "<<old_TimeAve<<" newT  "<<T_ave
             //    <<"= "<< (old_edep*old_TimeAve+ E_cell*T_ave)/(old_edep+E_cell)<<endl;
-            eclSimHitArray[m_hitNum]->setEnergyDep(old_edep + E_cell);
-            eclSimHitArray[m_hitNum]->setTimeAve((old_edep * old_TimeAve + E_cell * T_ave) / (old_edep + E_cell));
-            eclSimHitRel.add(trackID, m_hitNum);
+            eclHitArray[m_hitNum]->setEnergyDep(old_edep + E_cell);
+            eclHitArray[m_hitNum]->setTimeAve((old_edep * old_TimeAve + E_cell * T_ave) / (old_edep + E_cell));
+            eclHitRel.add(trackID, m_hitNum);
 
           }
         }

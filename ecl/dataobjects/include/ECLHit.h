@@ -16,10 +16,19 @@
 #include <TObject.h>
 #include <TVector3.h>
 
+#include <generators/dataobjects/SimHitBase.h>
+
 namespace Belle2 {
 
-  //! Example Detector
-  class ECLHit : public TObject {
+  /**
+    * ClassECLHit - Geant4 simulated hit for the ECL.
+    *
+    * This class holds particle hit data from geant4 simulation. As the simulated
+    * hit classes are used to generate detector response, they contain _local_
+    * information.
+    */
+  class ECLHit : public SimHitBase {
+
   public:
 
 
@@ -58,7 +67,7 @@ namespace Belle2 {
     */
     ECLHit() {;}
     /** ROOT Macro.*/
-    ClassDef(ECLHit, 1);
+    ClassDef(ECLHit, 3);
 
   };
 

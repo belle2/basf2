@@ -19,6 +19,8 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
+#include <framework/gearbox/GearDir.h>
 
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
@@ -51,12 +53,6 @@ EvtGenInputModule::EvtGenInputModule() : Module()
            Environment::Instance().getExternalsPath() + "/share/evtgen/evt.pdl");
   addParam("ParentParticle", m_parentParticle, "Parent Particle Name", string("Upsilon(4S)"));
   addParam("boost2LAB", m_boost2LAB, "Boolean to indicate whether the particles should be boosted to LAB frame", true);
-  addParam("HER_Energy", m_EHER, "Energy for HER[GeV]", 7 * Unit::GeV);
-  addParam("LER_Energy", m_ELER, "Energy for LER[GeV]", 4 * Unit::GeV);
-  addParam("HER_Spread", m_HER_Espread, "Energy spread for HER[GeV]", 0.00513 * Unit::GeV);
-  addParam("LER_Spread", m_LER_Espread, "Energy spread for LER[GeV]", 0.002375 * Unit::GeV);
-  addParam("CrossingAngle", m_crossing_angle, "Beam pipe crossing angle[mrad]", 83 * Unit::mrad);
-  addParam("RotationAngle", m_angle, "Rotation with respect to e- beampie[mrad]", 41.5 * Unit::mrad);
 }
 
 
@@ -75,7 +71,19 @@ void EvtGenInputModule::initialize()
   StoreArray<MCParticle>::registerPersistent();
 
   B2INFO("finished initialising the EvtGen Input Module. ");
+}
 
+
+void EvtGenInputModule::beginRun()
+{
+  GearDir ler("/Detector/SuperKEKB/LER/");
+  GearDir her("/Detector/SuperKEKB/HER/");
+  m_ELER = ler.getDouble("energy");
+  m_EHER = her.getDouble("energy");
+  m_LER_Espread = ler.getDouble("energyError");
+  m_HER_Espread = her.getDouble("energyError");
+  m_crossing_angle = her.getDouble("angle") - ler.getDouble("angle");
+  m_angle = her.getDouble("angle");
 }
 
 
@@ -86,17 +94,17 @@ void EvtGenInputModule::event()
 
   //Initialize the beam energy for each event separatly
 
-  double mEle = Unit::electronMass;
+  double mEle = Const::electronMass;
 
-  double angleLerToB = M_PI - m_angle * Unit::mrad;
-  double Eler = gRandom->Gaus(m_ELER, m_LER_Espread) * Unit::GeV; //Beam energy spread
+  double angleLerToB = M_PI - m_angle;
+  double Eler = gRandom->Gaus(m_ELER, m_LER_Espread); //Beam energy spread
   double pLerZ = Eler * cos(angleLerToB);
   double pLerX = Eler * sin(angleLerToB);
   double pLerY = 0.;
 
 
-  double angleHerToB = (m_crossing_angle * Unit::mrad) - (m_angle * Unit::mrad);
-  double Eher = gRandom->Gaus(m_EHER, m_HER_Espread) * Unit::GeV; //Beam energy spread
+  double angleHerToB = m_crossing_angle - m_angle;
+  double Eher = gRandom->Gaus(m_EHER, m_HER_Espread); //Beam energy spread
   double pHerZ = Eher * cos(angleHerToB);
   double pHerX = Eher * sin(angleHerToB);
   double pHerY = 0.;
@@ -115,8 +123,8 @@ void EvtGenInputModule::event()
 
   //Do we need to boost?
   if (!m_boost2LAB) {
-    double cross_angle = m_crossing_angle * Unit::mrad;
-    double angle = m_angle * Unit::mrad;
+    double cross_angle = m_crossing_angle;
+    double angle = m_angle;
     m_Ievtgen.m_labboost = getBoost(Eher, Eler, cross_angle, angle);
   }
 

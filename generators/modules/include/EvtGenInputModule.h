@@ -42,6 +42,9 @@ namespace Belle2 {
     /** Initializes the module. */
     virtual void initialize();
 
+    /** Method is called for each run. */
+    virtual void beginRun();
+
     /** Method is called for each event. */
     virtual void event();
 
@@ -54,12 +57,12 @@ namespace Belle2 {
     std::string m_pdlFileName;
     std::string m_parentParticle;
     bool m_boost2LAB;
-    double m_EHER;
-    double m_ELER;
-    double m_HER_Espread;
-    double m_LER_Espread;
-    double m_crossing_angle;
-    double m_angle;
+    double m_EHER;              /**< Energy for HER [GeV]. */
+    double m_ELER;              /**< Energy for LER [GeV]. */
+    double m_HER_Espread;       /**< Energy spread for HER [GeV]. */
+    double m_LER_Espread;       /**< Energy spread for LER [GeV]. */
+    double m_crossing_angle;    /**< Beam pipe crossing angle [rad]. */
+    double m_angle;             /**< Rotation with respect to e- beampie [rad]. */
 
   };
 

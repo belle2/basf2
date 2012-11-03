@@ -13,7 +13,7 @@
 //#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <cdc/dataobjects/CDCSimHit.h>
@@ -251,7 +251,7 @@ void CDCTrackingModule::event()
       //int layerId = cdcTrackHits[hitID]->getLayerId();
       int uniqueId = cdcTrackHits[hitID]->getLayerId() * 10000 + cdcTrackHits[hitID]->getWireId(); //a value which should be unique for each hit
 
-      gfTrackCandidates[i]->addHit(2, hitID, rho, uniqueId);
+      gfTrackCandidates[i]->addHit(Const::CDC, hitID, rho, uniqueId);
       B2DEBUG(100, "             " << hitID << "     " << rho << "  " << uniqueId);
 
     }

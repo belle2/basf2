@@ -2323,9 +2323,6 @@ namespace Belle {
     //...No MC info now...
     // trackCandidates[counter]->setMcTrackId(iPart);
 
-    //...What is Dip??? Let's skip this...
-    // trackCandidates[counter]->setDip(100);
-
     //...CDC hit info... I don't know this is correct or not
     const unsigned n = t.links().length();
     for (unsigned i = 0; i < n; i++) {
@@ -2335,7 +2332,7 @@ namespace Belle {
       const double driftTime = h.drift();
       const unsigned uniqueId = layerId * 10000 + h.wire().localId();
 
-      trackCandidates[counter]->addHit(2, hitID, driftTime, uniqueId);
+      trackCandidates[counter]->addHit(3, hitID, driftTime, uniqueId);
     }
 
     return 0;

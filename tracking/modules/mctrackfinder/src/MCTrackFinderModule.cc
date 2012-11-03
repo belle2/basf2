@@ -15,20 +15,21 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/gearbox/Const.h>
 #include <generators/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
-//#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <vxd/dataobjects/VxdID.h>
-//#include <framework/dataobjects/SimpleVec.h>
+#include <framework/dataobjects/SimpleVec.h>
 #include <GFTrackCand.h>
 
 #include <boost/foreach.hpp>
-//#include <boost/math/special_functions/sign.hpp>
+#include <boost/math/special_functions/sign.hpp>
 
 #include <TRandom.h>
 
@@ -40,7 +41,7 @@
 using namespace std;
 using namespace Belle2;
 
-//using boost::math::sign;
+using boost::math::sign;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -94,11 +95,9 @@ void MCTrackFinderModule::initialize()
   //output store arrays have to be registered in initialize()
   StoreArray<GFTrackCand>::registerPersistent(m_gfTrackCandsColName);
 
-//  StoreArray<SimpleVec<char> >::registerPersistent("leftRightAmbiInfo");
-
   RelationArray::registerPersistent<GFTrackCand, MCParticle>(m_gfTrackCandsColName, "");
 
-// StoreArray<vector<char> >::retgisterTransient("leftRightAmbiInfo");
+  StoreArray<SimpleVec<char> >::registerTransient("leftRightAmbiInfo");
   // build a bit mask with all properties a MCParticle should have to lead to the creation of a track candidate
   m_particleProperties = 0;
   const int nProperties = m_whichParticles.size();
@@ -218,8 +217,8 @@ void MCTrackFinderModule::event()
 
 
   //register StoreArray which will be filled by this module
-//  StoreArray<SimpleVec<char> > leftRightAmbiInfo("leftRightAmbiInfo");
-//  leftRightAmbiInfo.create();
+  StoreArray<SimpleVec<char> > leftRightAmbiInfo("leftRightAmbiInfo");
+  leftRightAmbiInfo.create();
   StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
   trackCandidates.create();
   RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
@@ -398,15 +397,15 @@ void MCTrackFinderModule::event()
     //member variable Dip is currently used to store the purity of the tracks, for MCTracks it is always 100 %
     //trackCandidates[counter]->setDip(100); //it is better to compare GFTrackCands from this module with a "real" track finder to get calculate the purity in a separate step than putting it into something with intended for something else
 
-    //assign indices of the Hits from all detectors, their are distinguishable by their DetID:
-    // pxd 0
-    //   svd 1
-    //     cdc 2
+    //assign indices of the Hits from all detectors, their are distinguishable by their DetID. The official detector ids in basf2 are:
+    // pxd 1
+    //   svd 2
+    //     cdc 3
     if (m_usePXDHits && m_useClusters == false) {
       BOOST_FOREACH(int hitID, pxdHitsIndices) {
         VxdID aVxdId = pxdTrueHits[hitID]->getSensorID();
         float time = pxdTrueHits[hitID]->getGlobalTime();
-        trackCandidates[counter]->addHit(0, hitID, double(time), aVxdId.getID());
+        trackCandidates[counter]->addHit(Const::PXD, hitID, double(time), aVxdId.getID());
       }
       B2DEBUG(100, "     add " << pxdHitsIndices.size() << " PXDHits");
     }
@@ -434,7 +433,7 @@ void MCTrackFinderModule::event()
           ++iterPairCluTr.first;
         }
 
-        trackCandidates[counter]->addHit(0, hitID, double(time), aVxdId.getID());
+        trackCandidates[counter]->addHit(Const::PXD, hitID, double(time), aVxdId.getID());
       }
       B2DEBUG(100, "     add " << pxdHitsIndices.size() << " PXDClusters");
     }
@@ -442,7 +441,7 @@ void MCTrackFinderModule::event()
       BOOST_FOREACH(int hitID, svdHitsIndices) {
         VxdID aVxdId = svdTrueHits[hitID]->getSensorID();
         float time = svdTrueHits[hitID]->getGlobalTime();
-        trackCandidates[counter]->addHit(1, hitID, double(time), aVxdId.getID());
+        trackCandidates[counter]->addHit(Const::SVD, hitID, double(time), aVxdId.getID());
       }
       B2DEBUG(100, "     add " << svdHitsIndices.size() << " SVDHits");
     }
@@ -467,14 +466,14 @@ void MCTrackFinderModule::event()
           }
           ++iterPairCluTr.first;
         }
-        trackCandidates[counter]->addHit(1, hitID, double(time), aVxdId.getID());
+        trackCandidates[counter]->addHit(Const::SVD, hitID, double(time), aVxdId.getID());
       }
       B2DEBUG(100, "     add " << svdHitsIndices.size() << " SVDClusters");
     }
 
 
     if (m_useCDCHits) {
-      //CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
+      CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
       float time = -1;
       vector<char> leftRight;
       BOOST_FOREACH(int hitID, cdcHitsIndices) {
@@ -492,17 +491,17 @@ void MCTrackFinderModule::event()
           }
         }
         time = aCDCSimHitPtr->getFlightTime();
-        trackCandidates[counter]->addHit(2, hitID, time, wireId);
-//        TVector3 simHitPos = aCDCSimHitPtr->getPosTrack();
-//        TVector3 simMom = aCDCSimHitPtr->getMomentum();
-//        TVector3 simHitPosOnWire = aCDCSimHitPtr->getPosWire();
-//        TVector3  wireStartPos = cdcGeometry.wireBackwardPosition(WireID(wireId));
-//        TVector3 wireDir = simHitPosOnWire - wireStartPos;
-//        TVector3 wireToSimHit = simHitPos - simHitPosOnWire;
-//        leftRight.push_back(sign(wireToSimHit * ( wireDir.Cross(simMom) )));
+        trackCandidates[counter]->addHit(Const::CDC, hitID, time, wireId);
+        TVector3 simHitPos = aCDCSimHitPtr->getPosTrack();
+        TVector3 simMom = aCDCSimHitPtr->getMomentum();
+        TVector3 simHitPosOnWire = aCDCSimHitPtr->getPosWire();
+        TVector3  wireStartPos = cdcGeometry.wireBackwardPosition(WireID(wireId));
+        TVector3 wireDir = simHitPosOnWire - wireStartPos;
+        TVector3 wireToSimHit = simHitPos - simHitPosOnWire;
+        leftRight.push_back(sign(wireToSimHit * (wireDir.Cross(simMom))));
       }
       B2DEBUG(100, "    add " << cdcHitsIndices.size() << " CDCHits");
-//      leftRightAmbiInfo.appendNew(SimpleVec<char>(leftRight)); // not sorted will not work with curling tracks
+      leftRightAmbiInfo.appendNew(SimpleVec<char>(leftRight)); // not sorted will not work with curling tracks
     }
 
 

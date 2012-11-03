@@ -12,7 +12,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <cdc/dataobjects/CDCHit.h>
@@ -228,7 +228,7 @@ void ExtrapolateToPXDModule::event()
             //without the extra sorting it will probably be the innermost CDC hit
             //thats why the cut on gap is quiet tolerant...
             newGFTrackCands[iTrack]->getHit(0, detId, hitId);
-            if (detId == 1) {
+            if (detId == Const::SVD) {
               float u = svdHits[hitId]->getU();
               float v = svdHits[hitId]->getV();
               TVector3 local(u, v, 0.0);
@@ -260,7 +260,7 @@ void ExtrapolateToPXDModule::event()
         //int layerId = aVXDId.getLayer();
         //int ladderId = aVXDId.getLadder();
         //addHit(detectorID, hitID, rho (distance from the origin to sort hits), planeId (Id of the sensor, needed for DAF))
-        newGFTrackCands[iTrack]->addHit(0, bestHitID, double(time), uniqueSensorId);
+        newGFTrackCands[iTrack]->addHit(Const::PXD, bestHitID, double(time), uniqueSensorId);
         B2INFO("-->Add hit from layer " << iLayer << " with ID " << bestHitID << " ( distance: " << minDistance << " )");
       } else B2INFO("(--> Best Hit still too far away from the extrapolated point, will not be added to the GFTrackCand!)");
 
@@ -286,7 +286,7 @@ void ExtrapolateToPXDModule::event()
         unsigned int hitId = 0;
         newGFTrackCands[i]->getHit(hit, detId, hitId); //get the hit and proceed differently depending on subdetector
 
-        if (detId == 2) {   //CDC
+        if (detId == Const::CDC) {   //CDC
           TVector3 wire(0.0, 0.0, 0.0);
           int wireId = cdcHits[hitId]->getIWire();
           int superlayerId = cdcHits[hitId]->getISuperLayer();
@@ -301,7 +301,7 @@ void ExtrapolateToPXDModule::event()
 
           Tracksfile << "\t" << std::setprecision(5) << wire.X()  << " \t" <<  wire.y() << " \t" <<  wire.z() << endl;
         }
-        if (detId == 1) {    //SVD
+        if (detId == Const::SVD) {    //SVD
           int sensorID = svdHits[hitId]->getSensorID();
           const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
           float u = svdHits[hitId]->getU();
@@ -313,7 +313,7 @@ void ExtrapolateToPXDModule::event()
           Tracksfile << "\t" << std::setprecision(5) << positionSVD.X()  << " \t" <<  positionSVD.y() << " \t" <<  positionSVD.z() << endl;
         }
 
-        if (detId == 0) {    //PXD
+        if (detId == Const::PXD) {    //PXD
           int sensorID = pxdHits[hitId]->getSensorID();
           const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
           float u = pxdHits[hitId]->getU();

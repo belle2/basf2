@@ -11,6 +11,7 @@
 #include <tracking/modules/simplebackground/VXDSimpleBackgroundModule.h>
 #include <vxd/dataobjects/VXDSimpleDigiHit.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <pxd/geometry/SensorInfo.h>
@@ -270,7 +271,7 @@ void VXDSimpleBackgroundModule::event()
 
       float time = pxdTrueHits[i]->getGlobalTime();
       int uniqueSensorId = aVXDId.getID();
-      trackCandidates[0]->addHit(0, iDigiHit, double(time), uniqueSensorId);
+      trackCandidates[0]->addHit(Const::PXD, iDigiHit, double(time), uniqueSensorId);
       ++iDigiHit;
       if (m_backroundLayers[aVXDId.getLayerNumber() - 1] == true and gRandom->Uniform() <= m_backgroundRatio) {
         double randomAngle = -2.0;
@@ -289,7 +290,7 @@ void VXDSimpleBackgroundModule::event()
         u = uTrue + randomFactor * uSemiAxis * sin(randomAngle);
         v = vTrue + randomFactor * vSemiAxis * cos(randomAngle);
         new(pxdSimpleDigiHits->AddrAt(iDigiHit)) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, NULL, false);
-        trackCandidates[0]->addHit(0, iDigiHit, double(time), uniqueSensorId);
+        trackCandidates[0]->addHit(Const::PXD, iDigiHit, double(time), uniqueSensorId);
         ++iDigiHit;
         if (gRandom->Uniform() <= m_backgroundRatio2) {   // add a second BG hit
           randomAngle = -2.0;
@@ -308,7 +309,7 @@ void VXDSimpleBackgroundModule::event()
           u = uTrue + randomFactor * uSemiAxis * sin(randomAngle);
           v = vTrue + randomFactor * vSemiAxis * cos(randomAngle);
           new(pxdSimpleDigiHits->AddrAt(iDigiHit)) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, NULL, false);
-          trackCandidates[0]->addHit(0, iDigiHit, double(time), uniqueSensorId);
+          trackCandidates[0]->addHit(Const::PXD, iDigiHit, double(time), uniqueSensorId);
           ++iDigiHit;
         }
       }
@@ -372,7 +373,7 @@ void VXDSimpleBackgroundModule::event()
       new(svdSimpleDigiHits->AddrAt(iDigiHit)) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, static_cast<const VXDTrueHit*>(aSvdTrueHit), noOutlier);
       float time = svdTrueHits[i]->getGlobalTime();
       int uniqueSensorId = aVXDId.getID();
-      trackCandidates[0]->addHit(1, iDigiHit, double(time), uniqueSensorId);
+      trackCandidates[0]->addHit(Const::SVD, iDigiHit, double(time), uniqueSensorId);
       ++iDigiHit;
 
       if (m_backroundLayers[aVXDId.getLayerNumber() - 1] == true and gRandom->Uniform() < m_backgroundRatio) {
@@ -392,7 +393,7 @@ void VXDSimpleBackgroundModule::event()
         u = uTrue + randomFactor * uSemiAxis * sin(randomAngle);
         v = vTrue + randomFactor * vSemiAxis * cos(randomAngle);
         new(svdSimpleDigiHits->AddrAt(iDigiHit)) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, NULL, false);
-        trackCandidates[0]->addHit(1, iDigiHit, double(time), uniqueSensorId);
+        trackCandidates[0]->addHit(Const::SVD, iDigiHit, double(time), uniqueSensorId);
         ++iDigiHit;
         if (gRandom->Uniform() <= m_backgroundRatio2) {   // add a second BG hit
           randomAngle = -2.0;
@@ -411,7 +412,7 @@ void VXDSimpleBackgroundModule::event()
           u = uTrue + randomFactor * uSemiAxis * sin(randomAngle);
           v = vTrue + randomFactor * vSemiAxis * cos(randomAngle);
           new(svdSimpleDigiHits->AddrAt(iDigiHit)) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, NULL, false);
-          trackCandidates[0]->addHit(1, iDigiHit, double(time), uniqueSensorId);
+          trackCandidates[0]->addHit(Const::SVD, iDigiHit, double(time), uniqueSensorId);
           ++iDigiHit;
         }
       }

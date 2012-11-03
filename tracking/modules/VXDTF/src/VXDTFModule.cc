@@ -13,6 +13,7 @@
 // framework
 #include <generators/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationIndex.h>
+#include <framework/gearbox/Const.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <geometry/GeometryManager.h>
@@ -2185,10 +2186,10 @@ GFTrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentTC)
 
 
   BOOST_REVERSE_FOREACH(int hitIndex, pxdHits) {  // order of hits within VXDTFTrackCandidate: outer->inner hits. GFTrackCand: inner->outer hits
-    newGFTrackCand.addHit(0, hitIndex); // 0 means PXD
+    newGFTrackCand.addHit(Const::PXD, hitIndex); // 0 means PXD
   }
   BOOST_REVERSE_FOREACH(int hitIndex, svdHits) {  // order of hits within VXDTFTrackCandidate: outer->inner hits. GFTrackCand: inner->outer hits
-    newGFTrackCand.addHit(1, hitIndex); // 1 means SVD
+    newGFTrackCand.addHit(Const::SVD, hitIndex); // 1 means SVD
   }
 
   return newGFTrackCand;

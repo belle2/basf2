@@ -13,7 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-
+#include <framework/gearbox/Const.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
@@ -410,7 +410,7 @@ void CDCLegendreTrackingModule::createGFTrackCandidates()
       int uniqueId = trackHit->getLayerId() * 10000
                      + trackHit->getWireId();//a value which should be unique for each hit
 
-      gfTrackCandidates[i]->addHit(2, hitID, rho, uniqueId);
+      gfTrackCandidates[i]->addHit(Const::CDC, hitID, rho, uniqueId);
     }
     ++i;
   }

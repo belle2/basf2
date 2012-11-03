@@ -18,10 +18,12 @@
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-
+#include <framework/dataobjects/SimpleVec.h>
+#include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
-#include <framework/logging/Logger.h>
+
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
 #include <cdc/translators/SimpleTDCCountTranslator.h>
@@ -90,6 +92,7 @@ GenFitter2Module::GenFitter2Module() :
   addParam("hitType", m_hitType, "select what kind of hits are feeded to Genfit. Current Options \"TrueHit\", \"Cluster\" or \"VXDSimpleDigiHit\"", string("TrueHit"));
   addParam("smoothing", m_smoothing, "select smoothing type in Kalman filter: 0 = non; 1 = normal; 2 = fast", 2);
   addParam("dafTemperatures", m_dafTemperatures, "set the annealing scheme (temperatures) for the DAF. Length of vector will determine DAF iterations", vector<double>(1, -999.0));
+  addParam("leftRightAmbiInfo", m_uselrAmbiInfo, "set true if the information to resolve the left right ambiguity from a track finder should be used", false);
 }
 
 GenFitter2Module::~GenFitter2Module()
@@ -178,46 +181,46 @@ void GenFitter2Module::event()
 
   StoreArray<GFTrack> fittedTracks; //holds the output of this module in the form of Genfit track objects
   fittedTracks.create();
+  StoreArray<SimpleVec<char> > leftRightAmbiInfo("leftRightAmbiInfo");
+  const int nLeftRightAmbiInfo = leftRightAmbiInfo.getEntries();
+
+  StoreArray<SVDTrueHit> svdTrueHits("");
+  const int nSvdTrueHits = svdTrueHits.getEntries();
+  if (nSvdTrueHits == 0) {
+    B2DEBUG(100, "GenFitter2: StoreArray<SVDTrueHit> is empty!");
+  }
+  StoreArray<PXDTrueHit> pxdTrueHits("");
+  const int nPxdTrueHits = pxdTrueHits.getEntries();
+  if (nPxdTrueHits == 0) {
+    B2DEBUG(100, "GenFitter2: GFTrackCandidatesCollection is empty!");
+  }
+  StoreArray<CDCHit> cdcHits("");
+  const int nCdcHits = cdcHits.getEntries();
+  if (nCdcHits == 0) {
+    B2DEBUG(100, "GenFitter2: StoreArray<CDCHit> is empty!");
+  }
+
+  StoreArray<VXDSimpleDigiHit> pxdSimpleDigiHits("pxdSimpleDigiHits");
+  StoreArray<VXDSimpleDigiHit> svdSimpleDigiHits("svdSimpleDigiHits");
+  B2DEBUG(100, "pxdSimpleDigiHits.getEntries() " << pxdSimpleDigiHits.getEntries());
+  B2DEBUG(100, "svdSimpleDigiHits.getEntries() " << svdSimpleDigiHits.getEntries());
+
+  //PXD clusters
+  StoreArray<PXDCluster> pxdClusters("");
+  const int nPXDClusters = pxdClusters.getEntries();
+  B2DEBUG(149, "GenFitter2: Number of PXDClusters: " << nPXDClusters);
+  if (nPXDClusters == 0) {B2DEBUG(100, "GenFitter2: PXDClustersCollection is empty!");}
+
+  //SVD clusters
+  StoreArray<SVDCluster> svdClusters("");
+  const int nSVDClusters = svdClusters.getEntries();
+  B2DEBUG(149, "GenFitter2: Number of SVDClusters: " << nSVDClusters);
+  if (nSVDClusters == 0) {B2DEBUG(100, "GenFitter2: SVDClustersCollection is empty!");}
 
   for (int iTrackCand = 0; iTrackCand not_eq nTrackCandidates; ++iTrackCand) {
 
-
-    StoreArray<SVDTrueHit> svdTrueHits("");
-    int nSvdTrueHits = svdTrueHits.getEntries();
-    if (nSvdTrueHits == 0) {
-      B2DEBUG(100, "GenFitter2: StoreArray<SVDTrueHit> is empty!");
-    }
-    StoreArray<PXDTrueHit> pxdTrueHits("");
-    int nPxdTrueHits = pxdTrueHits.getEntries();
-    if (nPxdTrueHits == 0) {
-      B2DEBUG(100, "GenFitter2: GFTrackCandidatesCollection is empty!");
-    }
-    StoreArray<CDCHit> cdcHits("");
-    int nCdcHits = cdcHits.getEntries();
-    if (nCdcHits == 0) {
-      B2DEBUG(100, "GenFitter2: StoreArray<CDCHit> is empty!");
-    }
-
-    StoreArray<VXDSimpleDigiHit> pxdSimpleDigiHits("pxdSimpleDigiHits");
-    StoreArray<VXDSimpleDigiHit> svdSimpleDigiHits("svdSimpleDigiHits");
-    B2DEBUG(100, "pxdSimpleDigiHits.getEntries() " << pxdSimpleDigiHits.getEntries());
-    B2DEBUG(100, "svdSimpleDigiHits.getEntries() " << svdSimpleDigiHits.getEntries());
-
-    //PXD clusters
-    StoreArray<PXDCluster> pxdClusters("");
-    int nPXDClusters = pxdClusters.getEntries();
-    B2DEBUG(149, "GenFitter2: Number of PXDClusters: " << nPXDClusters);
-    if (nPXDClusters == 0) {B2DEBUG(100, "GenFitter2: PXDClustersCollection is empty!");}
-
-    //SVD clusters
-    StoreArray<SVDCluster> svdClusters("");
-    int nSVDClusters = svdClusters.getEntries();
-    B2DEBUG(149, "GenFitter2: Number of SVDClusters: " << nSVDClusters);
-    if (nSVDClusters == 0) {B2DEBUG(100, "GenFitter2: SVDClustersCollection is empty!");}
-
-
     GFTrackCand* aTrackCandPointer = trackCandidates[iTrackCand];
-    int nTrackCandHits = aTrackCandPointer->getNHits();
+    const int nTrackCandHits = aTrackCandPointer->getNHits();
     B2DEBUG(100, "nTrackCandHits " << nTrackCandHits);
     // if option is set ignore every track that does not have exactly 1 hit in every Si layer
     bool filterTrack = false;
@@ -233,14 +236,14 @@ void GenFitter2Module::event()
           unsigned int hitId = UINT_MAX;
           aTrackCandPointer->getHit(i, detId, hitId);
           int layerId = -1;
-          if (detId == 0) {
+          if (detId == Const::PXD) {
             if (m_hitTypeId == 1) {
               layerId = pxdSimpleDigiHits[hitId]->getSensorID().getLayerNumber();
             } else if (m_hitTypeId == 0) {
               layerId = pxdTrueHits[hitId]->getSensorID().getLayerNumber();
             }
           }
-          if (detId == 1) {
+          if (detId == Const::SVD) {
             if (m_hitTypeId == 1) {
               layerId = svdSimpleDigiHits[hitId]->getSensorID().getLayerNumber();
             } else if (m_hitTypeId == 0) {
@@ -271,10 +274,10 @@ void GenFitter2Module::event()
         unsigned int hitId = UINT_MAX;
         aTrackCandPointer->getHit(i, detId, hitId);
         VXDTrueHit const* aVxdTrueHitPtr = NULL;
-        if (detId == 0) {
+        if (detId == Const::PXD) {
           aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(pxdTrueHits[hitId]);
         }
-        if (detId == 1) {
+        if (detId == Const::SVD) {
           aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(svdTrueHits[hitId]);
         }
         TVector3 pTrueIn = aVxdTrueHitPtr->getEntryMomentum();
@@ -333,30 +336,30 @@ void GenFitter2Module::event()
       if (m_hitTypeId == 0) { // use the trueHits
         if (nPxdTrueHits not_eq 0) {
           PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (&*pxdTrueHits);
-          factory.addProducer(0, PXDProducer);
+          factory.addProducer(Const::PXD, PXDProducer);
         }
         if (nSvdTrueHits not_eq 0) {
           SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> (&*svdTrueHits);
-          factory.addProducer(1, SVDProducer);
+          factory.addProducer(Const::SVD, SVDProducer);
         }
       } else if (m_hitTypeId == 1) {
         pxdSimpleDigiHitProducer =  new GFRecoHitProducer <VXDSimpleDigiHit, PXDRecoHit> (&*pxdSimpleDigiHits);
         svdSimpleDigiHitProducer =  new GFRecoHitProducer <VXDSimpleDigiHit, SVDRecoHit2D> (&*svdSimpleDigiHits);
-        factory.addProducer(0, pxdSimpleDigiHitProducer);
-        factory.addProducer(1, svdSimpleDigiHitProducer);
+        factory.addProducer(Const::PXD, pxdSimpleDigiHitProducer);
+        factory.addProducer(Const::SVD, svdSimpleDigiHitProducer);
       } else if (m_hitTypeId == 2) {
         if (nPXDClusters not_eq 0) {
           pxdClusterProducer =  new GFRecoHitProducer <PXDCluster, PXDRecoHit> (&*pxdClusters);
-          factory.addProducer(0, pxdClusterProducer);
+          factory.addProducer(Const::PXD, pxdClusterProducer);
         }
         if (nSVDClusters not_eq 0) {
           svdClusterProducer =  new GFRecoHitProducer <SVDCluster, SVDRecoHit> (&*svdClusters);
-          factory.addProducer(1, svdClusterProducer);
+          factory.addProducer(Const::SVD, svdClusterProducer);
         }
       }
       if (nCdcHits not_eq 0) {
         CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
-        factory.addProducer(2, CDCProducer);
+        factory.addProducer(Const::CDC, CDCProducer);
       }
 
       //use the factory to create RecoHits for all Hits stored in the track candidate
@@ -366,7 +369,22 @@ void GenFitter2Module::event()
       track.addHitVector(factoryHits);
       track.setCandidate(*aTrackCandPointer);
 
-      B2DEBUG(100, "Total Nr of Hits assigned to the Track: " << track.getNumHits());
+      //tell the CDCRecoHits how the left/right ambiguity of wire hits should be resolved (this info should come from the track finder)
+      int nHitsInTrack = track.getNumHits();
+      if (nLeftRightAmbiInfo not_eq 0 and m_uselrAmbiInfo == true) {
+        int ambiInfoIndex = 0;
+        vector<char> lrInfo = leftRightAmbiInfo[iTrackCand]->getVector();
+        for (int i = 0; i not_eq nHitsInTrack; ++i) {
+          CDCRecoHit* aCdcRecoHit = dynamic_cast<CDCRecoHit*>(track.getHit(i));
+          if (aCdcRecoHit not_eq NULL) {
+            //cout << "l/r: for " <<  ambiInfoIndex << " is " << int(lrInfo[ambiInfoIndex]) << "\n";
+            aCdcRecoHit->setLeftRightResolution(lrInfo[ambiInfoIndex]);
+            ++ambiInfoIndex;
+          }
+        }
+      }
+
+      B2DEBUG(100, "Total Nr of Hits assigned to the Track: " << nHitsInTrack);
       /*for ( int iHit = 0; iHit not_eq track.getNumHits(); ++iHit){
         GFAbsRecoHit* const aGFAbsRecoHitPtr = track.getHit(iHit);
 

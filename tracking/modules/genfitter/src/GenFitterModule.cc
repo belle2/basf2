@@ -12,7 +12,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <geometry/GeometryManager.h>
@@ -302,25 +302,25 @@ void GenFitterModule::event()
       if (m_useClusters == false) { // use the trueHits
         if (pxdTrueHits.getEntries() not_eq 0) {
           PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (&*pxdTrueHits);
-          factory.addProducer(0, PXDProducer);
+          factory.addProducer(Const::PXD, PXDProducer);
         }
         if (svdTrueHits.getEntries() not_eq 0) {
           SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> (&*svdTrueHits);
-          factory.addProducer(1, SVDProducer);
+          factory.addProducer(Const::SVD, SVDProducer);
         }
       } else {
         if (nPXDClusters not_eq 0) {
           pxdClusterProducer =  new GFRecoHitProducer <PXDCluster, PXDRecoHit> (&*pxdClusters);
-          factory.addProducer(0, pxdClusterProducer);
+          factory.addProducer(Const::PXD, pxdClusterProducer);
         }
         if (nSVDClusters not_eq 0) {
           svdClusterProducer =  new GFRecoHitProducer <SVDCluster, SVDRecoHit> (&*svdClusters);
-          factory.addProducer(1, svdClusterProducer);
+          factory.addProducer(Const::SVD, svdClusterProducer);
         }
       }
       if (cdcHits.getEntries() not_eq 0) {
         CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
-        factory.addProducer(2, CDCProducer);
+        factory.addProducer(Const::CDC, CDCProducer);
       }
 
       //use the factory to create RecoHits for all Hits stored in the track candidate
@@ -340,12 +340,16 @@ void GenFitterModule::event()
         unsigned int detId = 0;
         unsigned int hitId = 0;
         aTrackCandPointer->getHit(hit, detId, hitId);
-        if (detId == 0) nPXD++;
-        if (detId == 1) nSVD++;
-        if (detId == 2) nCDC++;
-        if (detId != 0 && detId != 1 && detId != 2) B2WARNING("Hit from unknown detectorID has contributed to this track!");
+        if (detId == Const::PXD) {
+          nPXD++;
+        } else if (detId == Const::SVD) {
+          nSVD++;
+        } else if (detId == Const::CDC) {
+          nCDC++;
+        } else {
+          B2WARNING("Hit from unknown detectorID has contributed to this track! The unknown id is: " << detId);
+        }
       }
-
       B2DEBUG(99, "            (CDC: " << nCDC << ", SVD: " << nSVD << ", PXD: " << nPXD << ")");
 
       if (gfTrack.getNumHits() < 3) { // this should not be nessesary because track finder should only produce track candidates with enough hits to calculate a momentum

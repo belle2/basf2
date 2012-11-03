@@ -14,7 +14,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
-
+#include <framework/gearbox/Const.h>
 #include <generators/dataobjects/MCParticle.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
@@ -272,9 +272,9 @@ void TrackFitCheckerModule::event()
 
   B2DEBUG(100, "**********   TrackFitCheckerModule  processing event number: " << eventCounter << " ************");
   //simulated truth information
-  StoreArray<MCParticle> aMcParticleArray("");
-  StoreArray<PXDTrueHit> aPxdTrueHitArray("");
-  StoreArray<SVDTrueHit> aSvdTrueHitArray("");
+  StoreArray<MCParticle> aMcParticleArray;
+  StoreArray<PXDTrueHit> aPxdTrueHitArray;
+  StoreArray<SVDTrueHit> aSvdTrueHitArray;
   //StoreArray<CDCTrueSimHit> aCdcTrueHitArray(""); //maybe one day this will be there :-)
 
 
@@ -1036,7 +1036,7 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
     if (aPxdRecoHitPtr not_eq NULL) {
       //cerr << "aPxdRecoHitPtr";
       m_trackData.accuVecIndices.push_back(aPxdRecoHitPtr->getSensorID().getLayerNumber() - 1);
-      m_trackData.detIds.push_back(0);
+      m_trackData.detIds.push_back(Const::PXD);
       if (m_truthAvailable == true) {
         aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(aPxdRecoHitPtr->getTrueHit()); // first check if there is a pointer directly to the true hit
         if (aVxdTrueHitPtr == NULL) {
@@ -1069,7 +1069,7 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
         accuVecIndex -= 2; // if the PXD is not simulated the first SVD layer will use the 0 element in all the layer wise statistics container
       }
       m_trackData.accuVecIndices.push_back(accuVecIndex);
-      m_trackData.detIds.push_back(1);
+      m_trackData.detIds.push_back(Const::SVD);
       if (m_truthAvailable == true) {
         aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(aSvdRecoHit2DPtr->getTrueHit());
         if (aVxdTrueHitPtr == NULL) {
@@ -1085,7 +1085,7 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
         accuVecIndex -= 2; // if the PXD is not simulated the first SVD layer will use the 0 element in all the layer wise statistics container
       }
       m_trackData.accuVecIndices.push_back(accuVecIndex);
-      m_trackData.detIds.push_back(1);
+      m_trackData.detIds.push_back(Const::SVD);
       if (m_truthAvailable == true) {
         RelationIndex<SVDCluster, SVDTrueHit> relSvdClusterTrueHit;
         const SVDCluster* aSvdCluster = aSvdRecoHitPtr->getCluster();
@@ -1106,7 +1106,7 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
     } else if (aCdcRecoHitPtr not_eq NULL) {
       //cerr << "aCdcRecoHitPtr";
       m_trackData.accuVecIndices.push_back(aCdcRecoHitPtr->getWireID().getICLayer() + m_nPxdLayers + m_nSvdLayers);
-      m_trackData.detIds.push_back(2);
+      m_trackData.detIds.push_back(Const::CDC);
     } else {
       B2ERROR("An unknown type of recoHit was detected in TrackFitCheckerModule::event(). This hit will not be included in the statistical tests");
     }
@@ -1178,7 +1178,7 @@ void TrackFitCheckerModule::truthTests()  //
 
   for (int iGFHit = 0; iGFHit not_eq m_trackData.nHits; ++iGFHit) {
     int detId = m_trackData.detIds[iGFHit];
-    if (detId == 0 or detId == 1) {  //at the moment there is only truth info for PXD and SVD hits
+    if (detId == Const::PXD or detId == Const::SVD) {  //at the moment there is only truth info for PXD and SVD hits
       int accuVecIndex = m_trackData.accuVecIndices[iGFHit];
 
       TMatrixT<double> trueState = m_trackData.states_t[iGFHit];
@@ -1236,11 +1236,11 @@ void TrackFitCheckerModule::normalTests()
     B2DEBUG(100, "function normalTests() processing hit " << iGFHit);
     int detId = m_trackData.detIds[iGFHit];
     int accuVecIndex = m_trackData.accuVecIndices[iGFHit];
-    if (detId == 0 or detId == 1) {
+    if (detId == Const::PXD or detId == Const::SVD) {
       if (m_testSi == false) {
         continue;
       }
-    } else if (detId == 2) {
+    } else if (detId == Const::CDC) {
       if (m_testCdc == false) {
         continue;
       }

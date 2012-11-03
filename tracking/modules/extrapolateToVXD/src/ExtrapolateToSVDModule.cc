@@ -12,7 +12,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <cdc/dataobjects/CDCHit.h>
@@ -148,6 +148,7 @@ void ExtrapolateToSVDModule::event()
       momError.SetXYZ(pxErr, pyErr, pzErr);
       //set the result momentum as seed
       //newGFTrackCands[i]->setTrackSeed(gftracks[i]->getCand().getPosSeed(), resultMomentum, sign / resultMomentum.Mag());
+      //maybe it would be better to start with the position of the inner most hit that gets added as the position seed
       newGFTrackCands[i]->setComplTrackSeed(gftracks[i]->getCand().getPosSeed(), resultMomentum, gftracks[i]->getCand().getPdgCode(), posError, momError);
     } catch (...) {
       B2WARNING("Something went wrong during the extrapolation! Old start values will be used");
@@ -211,7 +212,7 @@ void ExtrapolateToSVDModule::event()
             unsigned int detId = 0;
             unsigned int hitId = 0;
             newGFTrackCands[iTrack]->getHit(0, detId, hitId); //get the hit, assume that all hits are from CDC and sorted, so the hit 0 should be the innermost CDCHit
-            if (detId == 2) {
+            if (detId == Const::CDC) {
               TVector3 wire(0.0, 0.0, 0.0);
               int wireId = cdcHits[hitId]->getIWire();
               int superlayerId = cdcHits[hitId]->getISuperLayer();
@@ -248,7 +249,7 @@ void ExtrapolateToSVDModule::event()
         //int layerId = aVXDId.getLayer();
         //int ladderId = aVXDId.getLadder();
         //addHit(detectorID, hitID, rho (distance from the origin to sort hits), planeId (Id of the sensor, needed for DAF))
-        newGFTrackCands[iTrack]->addHit(1, bestHitID, double(time), uniqueSensorId);
+        newGFTrackCands[iTrack]->addHit(Const::SVD, bestHitID, double(time), uniqueSensorId);
         B2INFO("-->Add hit from layer " << iLayer << " with ID " << bestHitID << " ( distance: " << minDistance << " )");
       } else B2INFO("(--> Best Hit still too far away from the extrapolated point, will not be added to the GFTrackCand!)");
 
@@ -274,7 +275,7 @@ void ExtrapolateToSVDModule::event()
         unsigned int hitId = 0;
         newGFTrackCands[i]->getHit(hit, detId, hitId); //get the hit and proceed differently depending on subdetector
 
-        if (detId == 2) {   //CDC
+        if (Const::CDC == 2) {   //CDC
           TVector3 wire(0.0, 0.0, 0.0);
           int wireId = cdcHits[hitId]->getIWire();
           int superlayerId = cdcHits[hitId]->getISuperLayer();
@@ -289,7 +290,7 @@ void ExtrapolateToSVDModule::event()
 
           Tracksfile << "\t" << std::setprecision(5) << wire.X()  << " \t" <<  wire.y() << " \t" <<  wire.z() << endl;
         }
-        if (detId == 1) {    //SVD
+        if (detId == Const::SVD) {    //SVD
           int sensorID = svdHits[hitId]->getSensorID();
           const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
           float u = svdHits[hitId]->getU();

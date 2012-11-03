@@ -25,6 +25,7 @@ namespace Belle2 {
    * unit of the framework.
    *
    * This class cannot be instantiated, use the static members directly.
+   * The implemantation can be found in UnitConst.cc
    */
   class Unit {
 
@@ -101,35 +102,19 @@ namespace Belle2 {
     static const double TinStdUnits;  /**< [Vs/m^2] */
 
     //Various constants
-    static const double speedOfLight; /**< [cm/ns] */
-    static const double kBoltzmann;   /**< Boltzmann constant in GeV/K. */
-    static const double ehEnergy;     /**< Energy needed to create an electron-hole pair in Si at std. T. */
-    static const double electronMass; /**< Electron mass in MeV. */
-    static const double fineStrConst; /**< The fine structure constant. */
-    static const double permSi;       /**< Permittivity of Silicon */
-    static const double uTherm;       /**< Thermal Voltage at room temperature */
-    static const double eMobilitySi;  /**< Electron mobility in intrinsic Silicon at room temperature */
-
-    /** Trackable Particles ID.
-     *
-     *  Pion is the first one, because usually pions are the most common particles and therefore often the standard.
-     */
-    enum EChargedStable {
-      c_Pion     = 0, /** Assume a Pion.      */
-      c_Kaon     = 1, /** Assume a Kaon.      */
-      c_Proton   = 2, /** Assume a Proton.    */
-      c_Electron = 3, /** Assume an Electron. */
-      c_Muon     = 4  /** Assume a Muon.      */
-    };
-
-    /** Very often the mass of charged stable Particles is needed. */
-    static float chargedStableMass(EChargedStable chargedStable);
-
+    static const double speedOfLight __attribute__((deprecated));  /**< [cm/ns] */
+    static const double kBoltzmann __attribute__((deprecated));    /**< Boltzmann constant in GeV/K. */
+    static const double ehEnergy __attribute__((deprecated));      /**< Energy needed to create an electron-hole pair in Si at std. T. */
+    static const double electronMass __attribute__((deprecated));  /**< Electron mass in MeV. */
+    static const double fineStrConst __attribute__((deprecated));  /**< The fine structure constant. */
+    static const double permSi __attribute__((deprecated));        /**< Permittivity of Silicon */
+    static const double uTherm __attribute__((deprecated));        /**< Thermal Voltage at room temperature */
+    static const double eMobilitySi __attribute__((deprecated));   /**< Electron mobility in intrinsic Silicon at room temperature */
 
 
     //SuperKEKB and Belle II constants
-    static const double crossingAngleLER; /**< The crossing angle of the LER (between LER beam and solenoid axis). */
-    static const double crossingAngleHER; /**< The crossing angle of the HER (between HER beam and solenoid axis). */
+    static const double crossingAngleLER __attribute__((deprecated));  /**< The crossing angle of the LER (between LER beam and solenoid axis). */
+    static const double crossingAngleHER __attribute__((deprecated));  /**< The crossing angle of the HER (between HER beam and solenoid axis). */
 
 
     /**

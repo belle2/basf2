@@ -3,17 +3,25 @@
  * Copyright(C) 2010-2012  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Martin Heck, Martin Ritter                 *
+ * Contributors: Andreas Moll, Martin Heck, Martin Ritter, Thomas Kuhr    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/**************************************************************************
+ * This file contains the implemantations for Unit.h and Const.h to avoid *
+ * problems with the order of the initialization of constants.            *
+ **************************************************************************/
+
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <TMath.h>
 
 using namespace Belle2;
 using namespace std;
+
+/*** The implementation of the Unit class defined in Unit.h starts here ***/
 
 namespace Belle2 {
 
@@ -108,24 +116,6 @@ namespace Belle2 {
   const double Unit::crossingAngleLER = -0.0415 * Unit::rad;
   const double Unit::crossingAngleHER = 0.0415 * Unit::rad;
 
-//ChargedStable handling
-  float Unit::chargedStableMass(EChargedStable chargedStable)
-  {
-    switch (chargedStable) {
-      case (c_Pion):
-        return 0.13957;
-      case (c_Kaon):
-        return 0.49868;
-      case (c_Proton):
-        return 0.93827;
-      case (c_Electron):
-        return 0.000511;
-      case (c_Muon):
-        return 0.10566;
-    }
-    return 0.;
-  }
-
   double Unit::convertValue(double value, const std::string& unitString)
   {
     map<string, double>::const_iterator it = m_conversionFactors.find(unitString);
@@ -144,4 +134,56 @@ namespace Belle2 {
     return value;
   }
 
+}
+
+
+/*** The implementation of the Const class defined in Const.h starts here ***/
+
+const TParticlePDG* Const::ParticleType::particlePDG() const
+{
+  return EvtGenDatabasePDG::instance()->GetParticle(m_pdgCode);
+}
+
+double Const::ParticleType::mass() const
+{
+  return particlePDG()->Mass();
+}
+
+const Const::ParticleType Const::electron = Const::ParticleType(11);
+const Const::ParticleType Const::muon = Const::ParticleType(13);
+const Const::ParticleType Const::pion = Const::ParticleType(211);
+const Const::ParticleType Const::kaon = Const::ParticleType(321);
+const Const::ParticleType Const::proton = Const::ParticleType(2212);
+const Const::ParticleType Const::photon = Const::ParticleType(22);
+const Const::ParticleType Const::pi0 = Const::ParticleType(111);
+const Const::ParticleType Const::neutron = Const::ParticleType(2112);
+const Const::ParticleType Const::Kshort = Const::ParticleType(310);
+const Const::ParticleType Const::Klong = Const::ParticleType(130);
+
+const double Const::electronMass = Const::electron.mass();
+const double Const::muonMass = Const::muon.mass();
+const double Const::pionMass = Const::pion.mass();
+const double Const::kaonMass = Const::kaon.mass();
+const double Const::protonMass = Const::proton.mass();
+const double Const::pi0Mass = Const::pi0.mass();
+const double Const::neutronMass = Const::neutron.mass();
+const double Const::K0Mass = Const::Kshort.mass();
+
+const double Const::speedOfLight   = 29.9792458;
+const double Const::kBoltzmann     = 8.617343 * 1.0e-5 * Unit::eV / Unit::K;
+const double Const::ehEnergy       = 3.65 * Unit::eV;
+const double Const::fineStrConst   = 1.0 / 137.036;
+const double Const::permSi         = 11.9 * 8.8542 * 1e-18 * Unit::C / Unit::V / Unit::um;
+const double Const::uTherm         = 0.026 * Unit::V;
+const double Const::eMobilitySi    = 1415 * Unit::cm2 / Unit::V / Unit::s;
+
+
+TDatabasePDG* Const::EvtGenDatabasePDG::instance()
+{
+  if (!fgInstance) {
+    std::string fileName = std::getenv("BELLE2_EXTERNALS_DIR");
+    fileName += "/share/evtgen/evt.pdl";
+    TDatabasePDG::Instance()->ReadEvtGenTable(fileName.c_str());
+  }
+  return TDatabasePDG::Instance();
 }

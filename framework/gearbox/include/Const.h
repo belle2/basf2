@@ -21,6 +21,7 @@ namespace Belle2 {
    * This class provides a set of constants for the framework.
    *
    * This class cannot be instantiated, use the static members directly.
+   * The implemantation can be found in UnitConst.cc
    */
   class Const {
 
@@ -49,21 +50,35 @@ namespace Belle2 {
        */
       const TParticlePDG* particlePDG() const;
 
+      /**
+       * Particle mass.
+       * @return The mass of the particle.
+       */
+      double mass() const;
+
     private:
       int m_pdgCode;  /** PDG code of the particle **/
     };
 
     static const ParticleType electron;  /**< electron particle */
     static const ParticleType muon;      /**< muon particle */
-    static const ParticleType pion;      /**< pion particle */
-    static const ParticleType kaon;      /**< kaon particle */
+    static const ParticleType pion;      /**< charged pion particle */
+    static const ParticleType kaon;      /**< charged kaon particle */
     static const ParticleType proton;    /**< proton particle */
+    static const ParticleType photon;    /**< photon particle */
+    static const ParticleType pi0;       /**< neutral pion particle */
+    static const ParticleType neutron;   /**< neutron particle */
+    static const ParticleType Kshort;    /**< K^0_S particle */
+    static const ParticleType Klong;     /**< K^0_L particle */
 
     static const double electronMass;    /**< electron mass */
     static const double muonMass;        /**< muon mass */
-    static const double pionMass;        /**< pion mass */
-    static const double kaonMass;        /**< kaon mass */
+    static const double pionMass;        /**< charged pion mass */
+    static const double kaonMass;        /**< charged kaon mass */
     static const double protonMass;      /**< proton mass */
+    static const double pi0Mass;         /**< neutral pion mass */
+    static const double neutronMass;     /**< neutron mass */
+    static const double K0Mass;          /**< neutral kaon mass */
 
     static const double speedOfLight; /**< [cm/ns] */
     static const double kBoltzmann;   /**< Boltzmann constant in GeV/K. */

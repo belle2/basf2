@@ -156,23 +156,6 @@ void DisplayModule::event()
     m_visualizer->addSimHit(svdsimhits[i], el->from);
   }
 
-  StoreArray<TOPSimHit> tophits;
-  RelationIndex<MCParticle, TOPSimHit> mcpart_to_tophits(mcparticles, tophits);
-  const int nTOPHits = tophits.getEntries();
-  for (int i = 0; i < nTOPHits; i++) {
-    const RelationIndexContainer<MCParticle, TOPSimHit>::Element* el = mcpart_to_tophits.getFirstElementTo(tophits[i]);
-    if (!el) {
-      B2WARNING("MCParticle not found for TOPSimHit, skipping hit!");
-      continue;
-    }
-    if (!el->from->getMother()) {
-      B2WARNING("photon found in TOP without parent particle?");
-      continue;
-    }
-
-    m_visualizer->addSimHit(tophits[i], el->from);
-  }
-
   StoreArray<BKLMSimHit> bklmhits;
   RelationIndex<MCParticle, BKLMSimHit> mcpart_to_bklmhits(mcparticles, bklmhits);
   const int nBKLMHits = bklmhits.getEntries();

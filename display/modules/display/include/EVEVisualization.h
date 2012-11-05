@@ -13,7 +13,6 @@
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <top/dataobjects/TOPSimHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <ecl/dataobjects/ECLHit.h>
@@ -103,9 +102,6 @@ namespace Belle2 {
 
     /** Add a SVDSimHit. */
     void addSimHit(const SVDSimHit* hit, const MCParticle* particle);
-
-    /** Add a TOPSimHit. */
-    void addSimHit(const TOPSimHit* hit, const MCParticle* particle);
 
     /** Add a BKLMSimHit. */
     void addSimHit(const BKLMSimHit* hit, const MCParticle* particle);

@@ -642,13 +642,6 @@ void EVEVisualization::addSimHit(const SVDSimHit* hit, const MCParticle* particl
   const TVector3& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
-void EVEVisualization::addSimHit(const TOPSimHit* hit, const MCParticle* particle)
-{
-  /* TODO: conversion possible from local coordinates?
-  const TVector3& global_pos = hit->getVposition(); //at photon emission
-  addSimHit(global_pos, particle);
-  */
-}
 void EVEVisualization::addSimHit(const BKLMSimHit* hit, const MCParticle* particle)
 {
   const TVector3& global_pos = hit->getHitPosition();

@@ -25,16 +25,18 @@ namespace Belle2 {
    */
 
 
-  /** This module use MC true Relations to define which hits belong to which particles and writes track candidates filled with necessary information into the DataStore.
+  /** This module uses the simulated truth information (MCParticles and their relations) to determine which hits belong to which particles
+   * and writes track candidates filled with necessary information into the DataStore.
    *
    *  The Relations MCParticles -> Hits for PXD, SVD and CDC are used.
    *  At the moment CDCHits, PXDTrueHits, SVDTrueHits, PXDCluster hits and SVDCluster hits can be used
-   *  At the moment track candidates are created only for primary particles.
+   *  By default only track candidates for primary particles (= particles from the generator) are created
+   *  but this can be changed with the WhichParticles option.
    *  For every hit the true time information is extracted from the trueHits or simHit hits.
    *  This Information is used to sort the hits in the correct order for the fitting of curling tracks.
    *  The created GFTrackCandidates can be fitted with GenFitterModule.
    *
-   *  @todo: check planeIds when adding hits to GFTrackCand, maybe create track candidates not only for primary particles
+   *  @todo: maybe the asingment of planeIds and the true timing information is not 100 % accurate in every use case
    */
   class MCTrackFinderModule : public Module {
 
@@ -85,7 +87,7 @@ namespace Belle2 {
     bool m_neutrals;                                            /**< Boolean to mark if track candidates should also be created for neutral particles.*/
 
     double m_smearing;                                          /**< Smearing of MCMomentum and MCVertex in %. This adds a relative error to the initial values without changing the default large initial covariance matrix using for fitting*/
-    std::vector<double> m_smearingCov;                                  /**< Covariance matrix used to smear the true pos and mom before passed to track candidate. This matrix will also passed to Genfit as the initial covarance matrix. If any diagonal value is negative this feature will not be used. OFF DIAGNOLA ELEMENTS DO NOT HAVE AN EFFECT AT THE MOMENT */
+    std::vector<double> m_smearingCov;                          /**< Covariance matrix used to smear the true pos and mom before passed to track candidate. This matrix will also passed to Genfit as the initial covarance matrix. If any diagonal value is negative this feature will not be used. OFF DIAGNOLA ELEMENTS DO NOT HAVE AN EFFECT AT THE MOMENT */
     TMatrixD m_initialCov;                                      /**< The std::vector m_smearingCov will be translated into this TMatrixD*/
     int m_notEnoughtHitsCounter;                                /**< will hold number of tracks that do not have enough hits to form a track candidate (total NDF less than 5)*/
     int m_noTrueHitCounter;                                     /**< will hold number of cluster hits that do not have a corresponding true hit*/

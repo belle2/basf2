@@ -8,10 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <TLorentzVector.h>
-#include <TLorentzRotation.h>
 #include <framework/utilities/Boosts.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
+
+#include <TLorentzVector.h>
+#include <TLorentzRotation.h>
 
 using namespace Belle2;
 
@@ -30,10 +32,10 @@ TLorentzRotation Boosts::getLab2CMSBoost(const float& energyLER, const float& en
 
   // Getting the various LorentzVectors.
   TLorentzVector lorentzVecLER;
-  lorentzVecLER.SetXYZM(energyLER * sin(angleLerToB), 0., energyLER * cos(angleLerToB), Unit::electronMass);
+  lorentzVecLER.SetXYZM(energyLER * sin(angleLerToB), 0., energyLER * cos(angleLerToB), Const::electronMass);
 
   TLorentzVector lorentzVecHER;
-  lorentzVecHER.SetXYZM(energyHER * sin(angleHerToB), 0., energyHER * cos(angleHerToB), Unit::electronMass);
+  lorentzVecHER.SetXYZM(energyHER * sin(angleHerToB), 0., energyHER * cos(angleHerToB), Const::electronMass);
 
   TLorentzVector lorentzVecY4S = lorentzVecHER + lorentzVecLER;
   B2DEBUG(250, "lorentzVecY4S (or other resonance): Gamma " << lorentzVecY4S.Gamma() << ", Mass " << lorentzVecY4S.M());

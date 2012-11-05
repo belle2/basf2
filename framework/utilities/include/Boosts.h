@@ -11,8 +11,8 @@
 #ifndef BOOSTS_H
 #define BOOSTS_H
 
-#include "TLorentzRotation.h"
 #include <framework/gearbox/Unit.h>
+#include "TLorentzRotation.h"
 
 
 
@@ -24,8 +24,6 @@ namespace Belle2 {
    *  You don't have to construct an object of this class yourself, but you can directly
    *  call the functions of the class by writing e.g.
    *  Boosts::getCMS2LabB...
-   *  @TODO Can this stay at the generators package, or do we really want to have it in the the framework package?
-   *  @sa RunMetaData
    */
   class Boosts {
   public:

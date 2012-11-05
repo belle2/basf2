@@ -16,7 +16,7 @@
 #include "top/modules/TOPReconstruction/TOPtrack.h"
 #include "top/modules/TOPReconstruction/TOPf77fun.h"
 #include <TRandom3.h>
-#include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 
 namespace Belle2 {
   namespace TOP {
@@ -64,7 +64,7 @@ namespace Belle2 {
     {
       double pmom = p();
       double beta = pmom / sqrt(pmom * pmom + mass * mass);
-      m_Tlen = tof * Unit::speedOfLight * beta;
+      m_Tlen = tof * Const::speedOfLight * beta;
     }
 
     int TOPtrack::Hyp()
@@ -87,7 +87,7 @@ namespace Belle2 {
       track2top_(r, p, &q, &t, &m);
       m_X = r[0]; m_Y = r[1]; m_Z = r[2];
       m_Px = p[0]; m_Py = p[1]; m_Pz = p[2];
-      m_Tlen += t * Unit::speedOfLight;
+      m_Tlen += t * Const::speedOfLight;
       m_atTop = true;
       m_QbarID = m;
       return m;

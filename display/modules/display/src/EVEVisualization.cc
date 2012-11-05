@@ -671,10 +671,14 @@ void EVEVisualization::addECLHit(const ECLHit* hit)
   const TVector3& pos = ECL::ECLGeometryPar::Instance()->GetCrystalPos(cell);
   const float eta = (float)pos.Eta();
   const float phi = (float)pos.Phi();
-  //maybe these should depend on position?
+
   //crystals are ~6 by 6 cm in crossection
-  static const float dEta = 0.02;
-  static const float dPhi = 0.02;
+  TVector3 dPhiVec = pos.Cross(TVector3(0., 0., 1.0));
+  dPhiVec.SetMag(3.0); //half a crystal width in phi
+  const float dPhi = pos.DeltaPhi(pos + dPhiVec);
+  TVector3 dEtaVec = pos.Cross(dPhiVec);
+  dEtaVec.SetMag(3.0); //half a crystal width in eta
+  const float dEta = TMath::Abs((pos + dEtaVec).Eta() - eta);
 
   m_eclsimhitdata->AddTower(eta - dEta, eta + dEta, phi - dPhi, phi + dPhi);
   m_eclsimhitdata->FillSlice(0, hit->getEnergyDep());

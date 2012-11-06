@@ -34,7 +34,7 @@ Rbuf2DsModule::Rbuf2DsModule() : Module()
            0);
 
   m_rbuf = NULL;
-  m_nsent = 0;
+  m_nrecv = 0;
   m_compressionLevel = 0;
 
   //Parameter definition
@@ -51,7 +51,33 @@ void Rbuf2DsModule::initialize()
   gSystem->Load("libdataobjects");
 
   m_rbuf = new RingBuffer(m_rbufname.c_str(), RBUFSIZE);
-  m_msghandler = new MsgHandler(m_compressionLevel);
+  //  m_msghandler = new MsgHandler(m_compressionLevel);
+
+  // Initialize DataStoreStreamer
+  m_streamer = new DataStoreStreamer(m_compressionLevel);
+
+
+  // Read the first event in RingBuffer and restore in DataStore.
+  // This is necessary to create object tables before TTree initialization
+  // if used together with SimpleOutput.
+
+  // Prefetch the first record in Ring Buffer
+  int size;
+  char* evtbuf = new char[MAXEVTSIZE];
+  while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
+    //    printf ( "Rx : evtbuf is not available yet....\n" );
+    usleep(100);
+  }
+
+  // Restore objects in DataStore
+  EvtMessage* evtmsg = new EvtMessage(evtbuf);
+  m_streamer->restoreDataStore(evtmsg);
+
+  // Delete buffers
+  delete evtmsg;
+  delete[] evtbuf;
+
+  m_nrecv = -1;
 
   B2INFO("Rx initialized.");
 }
@@ -65,6 +91,10 @@ void Rbuf2DsModule::beginRun()
 
 void Rbuf2DsModule::event()
 {
+  m_nrecv++;
+  // First event is already loaded
+  if (m_nrecv == 0) return;
+
   // Get a record from ringbuf
   int size;
 
@@ -86,55 +116,15 @@ void Rbuf2DsModule::event()
     // Flag End Of File !!!!!
     //    return msg->type(); // EOF
   }
-  m_msghandler->decode_msg(msg, objlist, namelist);
 
-  // Get Object info
-  DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
-  int nobjs = (msg->header())->reserved[1];
-  int narrays = (msg->header())->reserved[2];
-
-  B2INFO("Rbuf2Ds: nobjs = " << nobjs << ", narrays = " << narrays <<
-         "(pid=" << (int)getpid() << ")");
+  // Restore DataStore
+  // Restore DataStore
+  m_streamer->restoreDataStore(msg);
 
   delete[] evtbuf;
-
-  //  printf ( "Rx : Restoring objects\n" );
-
-  // Restore objects in DataStore
-  for (int i = 0; i < nobjs; i++) {
-    if (objlist.at(i) != NULL) {
-      DataStore::Instance().createEntry(string(namelist.at(i)), durability,
-                                        (objlist.at(i))->Class(),
-                                        false, true, false);
-      DataStore::Instance().createObject(objlist.at(i), false,
-                                         namelist.at(i), DataStore::c_Event,
-                                         objlist.at(i)->IsA(), false);
-      B2INFO("Rbuf2Ds: restored obj " << namelist.at(i));
-    } else {
-      B2INFO("Rbuf2Ds: obj " << namelist.at(i) << " is Null. Omitted");
-    }
-  }
-  B2INFO("Rbuf2Ds: Objs restored");
-
-  // Restore arrays in DataStore
-  for (int i = 0; i < narrays; i++) {
-    if (objlist.at(i + nobjs) != NULL) {
-      DataStore::Instance().createEntry(string(namelist.at(i + nobjs)), durability,
-                                        (objlist.at(i + nobjs))->Class(),
-                                        true, true, false);
-      DataStore::Instance().createObject(objlist.at(i + nobjs), false,
-                                         namelist.at(i + nobjs), DataStore::c_Event,
-                                         ((TClonesArray*)objlist.at(i + nobjs))->GetClass(), true);
-      B2INFO("Rbuf2Ds: restored array " << namelist.at(i + nobjs));
-    } else {
-      B2INFO("Rbuf2Ds: array " << namelist.at(i + nobjs) << " is Null. Omitted");
-    }
-
-  }
-  B2INFO("Rbuf2Ds: DataStore Restored!!");
-
   delete msg;
 
+  B2INFO("Rbuf2Ds: DataStore Restored!!");
   return;
   //  return type;
 }

@@ -49,7 +49,8 @@ void Ds2RbufModule::initialize()
 {
 
   m_rbuf = new RingBuffer(m_rbufname.c_str(), RBUFSIZE);
-  m_msghandler = new MsgHandler(m_compressionLevel);
+  //  m_msghandler = new MsgHandler(m_compressionLevel);
+  m_streamer = new DataStoreStreamer(m_compressionLevel);
 
   B2INFO("Ds2Rbuf initialized.");
 }
@@ -63,64 +64,10 @@ void Ds2RbufModule::beginRun()
 
 void Ds2RbufModule::event()
 {
-  // Clear msghandler
-  m_msghandler->clear();
+  // Stream DataStore in EvtMessage
+  EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
 
-  // Set durability
-  DataStore::EDurability durability = DataStore::c_Event;
-
-  // Stream objects in msg_handler
-  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
-  int nobjs = 0;
-  for (DataStore::StoreObjConstIter it = map.begin(); it != map.end(); ++it) {
-    if (it->second->isArray)
-      continue;
-    if (m_msghandler->add(it->second->ptr, it->first)) {
-      B2INFO("Tx: adding obj " << it->first);
-      nobjs++;
-    }
-  }
-  // Stream arrays in msg_handler
-  int narrays = 0;
-  for (DataStore::StoreObjConstIter it = map.begin(); it != map.end(); ++it) {
-    if (!it->second->isArray)
-      continue;
-    if (m_msghandler->add(it->second->ptr, it->first)) {
-      B2INFO("Tx: adding array " << it->first);
-      narrays++;
-    }
-  }
-  /* O L D
-  // Stream objects in msg_handler
-  const DataStore::StoreObjMap& objmap = DataStore::Instance().getObjectMap(durability);
-  int nobjs = 0;
-  for (DataStore::StoreObjConstIter it = objmap.begin(); it != objmap.end(); ++it) {
-    if (m_msghandler->add(it->second, it->first)) {
-      B2INFO("Tx: adding obj " << it->first);
-      nobjs++;
-    }
-  }
-  // Stream arrays in msg_handler
-  const DataStore::StoreArrayMap& arymap = DataStore::Instance().getArrayMap(durability);
-  int narrays = 0;
-  for (DataStore::StoreObjConstIter it = arymap.begin(); it != arymap.end(); ++it) {
-    if (m_msghandler->add(it->second, it->first)) {
-      B2INFO("Ds2Rbuf: adding array " << it->first);
-      narrays++;
-    }
-  }
-  */
-  B2INFO("Ds2Rbuf: nobjs = " << nobjs << ", narrays = " << narrays <<
-         " (pid=" << (int)getpid() << ")");
-
-  // Encode event message
-  EvtMessage* msg = m_msghandler->encode_msg(MSG_EVENT);
-
-  (msg->header())->reserved[0] = (int)durability;
-  (msg->header())->reserved[1] = nobjs;       // No. of objects
-  (msg->header())->reserved[2] = narrays;    // No. of arrays
-
-  printf("message size = %d\n", msg->size());
+  //  printf("message size = %d\n", msg->size());
   // Put the message in ring buffer
   for (;;) {
     int stat = m_rbuf->insq((int*)msg->buffer(), (msg->size() - 1) / 4 + 1);
@@ -132,6 +79,9 @@ void Ds2RbufModule::event()
 
   // Release EvtMessage buffer
   delete msg;
+
+  // return
+  m_rbuf++;
 
 }
 
@@ -146,6 +96,10 @@ void Ds2RbufModule::endRun()
 
 void Ds2RbufModule::terminate()
 {
+  delete m_streamer;
+
+  // RingBuffer should not be deleted
+
   B2INFO("Ds2Rbuf: terminate called")
 }
 

@@ -18,7 +18,8 @@
 #include <string>
 #include <vector>
 
-#include <framework/datastore/DataStore.h>
+#include <framework/pcore/DataStoreStreamer.h>
+//#include <framework/datastore/DataStore.h>
 
 #define RBUFSIZE 100000000
 #define MAXEVTSIZE 10000000
@@ -53,14 +54,17 @@ namespace Belle2 {
     std::string m_rbufname;
     RingBuffer* m_rbuf;
 
-    //! Messaage handler
+    //! Messaage handler (obsolete)
     MsgHandler* m_msghandler;
+
+    //! DataStore streamer
+    DataStoreStreamer* m_streamer;
 
     //! Compression Level
     int m_compressionLevel;
 
     //! No. of sent events
-    int m_nsent;
+    int m_nrecv;
 
   };
 

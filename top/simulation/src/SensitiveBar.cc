@@ -12,9 +12,12 @@
 #include <top/dataobjects/TOPBarHit.h>
 #include <top/geometry/TOPGeometryPar.h>
 
+#include <simulation/kernel/UserInfo.h>
 #include <G4Step.hh>
 #include <G4Track.hh>
 #include <G4UnitsTable.hh>
+#include <G4ParticleDefinition.hh>
+#include <G4ParticleTypes.hh>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -25,6 +28,7 @@
 #include <framework/gearbox/Unit.h>
 
 #include <TVector3.h>
+#include <TRandom3.h>
 #include <cmath>
 
 using namespace std;
@@ -53,17 +57,32 @@ namespace Belle2 {
 
       m_topgp->setGeanUnits();
 
-      //! get particle track
+      //! get track and particle definition
       G4Track* aTrack = aStep->GetTrack();
-
-      //! check which particle hits the bar
       G4ParticleDefinition* particle = aTrack->GetDefinition();
-      int  PDG = (int)(particle->GetPDGEncoding());
 
-      // Save all particles except optical photons
-      if (PDG == 0) return false;
+      //! if optical photon, apply QE and return false
+      if (particle == G4OpticalPhoton::OpticalPhotonDefinition()) {
+        Simulation::TrackInfo* info =
+          dynamic_cast<Simulation::TrackInfo*>(aTrack->GetUserInformation());
+        if (!info) return false;
+        if (info->getStatus() < 2) {
+          double energy = aTrack->GetKineticEnergy() * Unit::MeV / Unit::eV;
+          double qeffi = m_topgp->QE(energy) * m_topgp->getColEffi();
+          double fraction = info->getFraction();
+          if (gRandom->Uniform() * fraction > qeffi) {
+            aTrack->SetTrackStatus(fStopAndKill);
+            return false;
+          }
+          info->setStatus(2);
+          info->setFraction(qeffi);
+        }
+        return false;
+      }
 
-      //! get the preposition, a step before current position
+      //! continue for other particles
+
+      //! get the prestep position, a step before current position
       G4StepPoint* PrePosition =  aStep->GetPreStepPoint();
 
       //! Check that the hit comes from the bar boundary
@@ -108,6 +127,9 @@ namespace Belle2 {
 
       //! Get bar ID
       int barID = PrePosition->GetTouchableHandle()->GetReplicaNumber(2);
+
+      //! Get PDG
+      int PDG = (int)(particle->GetPDGEncoding());
 
       //! write the hit to datastore
       StoreArray<TOPBarHit> barHits;

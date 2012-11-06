@@ -12,8 +12,12 @@
 #include <top/dataobjects/TOPSimHit.h>
 #include <top/dataobjects/TOPSimPhoton.h>
 
-#include <G4Track.hh>
+#include <simulation/kernel/UserInfo.h>
 #include <G4Step.hh>
+#include <G4Track.hh>
+#include <G4UnitsTable.hh>
+#include <G4ParticleDefinition.hh>
+#include <G4ParticleTypes.hh>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -22,7 +26,9 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
+
 #include <TVector3.h>
+#include <TRandom3.h>
 
 using namespace std;
 
@@ -30,7 +36,8 @@ namespace Belle2 {
   namespace TOP {
 
     SensitivePMT::SensitivePMT():
-      Simulation::SensitiveDetectorBase("TOP", SensitivePMT::TOP)
+      Simulation::SensitiveDetectorBase("TOP", SensitivePMT::TOP),
+      m_topgp(TOPGeometryPar::Instance())
     {
       // registration
       StoreArray<TOPSimHit>::registerPersistent();
@@ -51,8 +58,23 @@ namespace Belle2 {
       // photon track
       G4Track& photon  = *aStep->GetTrack();
 
-      // check if it is realy an optical photon
+      // check if the track is an optical photon
       if (photon.GetDefinition()->GetParticleName() != "opticalphoton") return false;
+
+      // apply quantum efficiency if not yet done
+      bool applyQE = true;
+      Simulation::TrackInfo* info =
+        dynamic_cast<Simulation::TrackInfo*>(photon.GetUserInformation());
+      if (info) applyQE = info->getStatus() < 2;
+      if (applyQE) {
+        double energy = photon.GetKineticEnergy() * Unit::MeV / Unit::eV;
+        double qeffi = m_topgp->QE(energy) * m_topgp->getColEffi();
+        double fraction = info->getFraction();
+        if (gRandom->Uniform() * fraction > qeffi) {
+          photon.SetTrackStatus(fStopAndKill);
+          return false;
+        }
+      }
 
       // pmt and bar ID
       int pmtID = photon.GetTouchableHandle()->GetReplicaNumber(1);

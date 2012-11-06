@@ -12,6 +12,7 @@
 #define TOPSENSITIVEDETECTOR_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 namespace Belle2 {
   namespace TOP {
@@ -37,9 +38,10 @@ namespace Belle2 {
 
     private:
 
+      TOPGeometryPar* m_topgp; /**< geometry parameters from xml */
 
-    }; // SensitivePMT class
-  } // end of namespace top
+    };
+  } // end of namespace TOP
 } // end of namespace Belle2
 
 #endif /* TOPSENSITIVEDETECTOR_H */

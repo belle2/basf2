@@ -59,7 +59,7 @@ namespace Belle2 {
       addParam("OutputColName", m_outColName, "Output collection name (TOPDigits)",
                string(""));
       addParam("PhotonFraction", m_photonFraction,
-               "Fraction of Cerenkov photons propagated in FullSim.", 0.3);
+               "now not used - to be removed", 0.3);
       addParam("T0jitter", m_T0jitter, "r.m.s of T0 jitter [ns]", 25e-3);
       addParam("ELjitter", m_ELjitter, "r.m.s of electronics jitter [ns]", 50e-3);
 
@@ -114,10 +114,6 @@ namespace Belle2 {
       int nHits = topSimHits.getEntries();
       for (int iHit = 0; iHit < nHits; iHit++) {
         TOPSimHit* aSimHit = topSimHits[iHit];
-
-        // Apply quantum efficiency
-        double energy = aSimHit->getEnergy();
-        if (!DetectorQE(energy)) continue;
 
         // Do spatial digitization
         double x = aSimHit->getX();

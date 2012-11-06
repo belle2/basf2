@@ -20,7 +20,8 @@ namespace Belle2 {
     //! TOP digitizer module.
     /*
      * This module takes hits form G4 simulation (TOPSimHit),
-     * applies q.e. of PMTs, TTS, T0jitter and do spatial and time digitization
+     * applies TTS, T0jitter and do spatial and time digitization
+     * (QE moved to the simulation: applied in SensitiveBar, SensitivePMT)
      * output to TOPDigiHit.
      */
     class TOPDigitizerModule : public Module {
@@ -72,7 +73,7 @@ namespace Belle2 {
 
       std::string m_inColName;    /**< Input collection name */
       std::string m_outColName;   /**< Output collection name */
-      double m_photonFraction;    /**< Fraction of Cer. photons propagated in FullSim */
+      double m_photonFraction;    /**< not used - to be removed */
       double m_T0jitter;          /**< r.m.s of T0 jitter */
       double m_ELjitter;          /**< r.m.s of electronics jitter */
 
@@ -80,6 +81,7 @@ namespace Belle2 {
       TOPGeometryPar* m_topgp;
 
       /*! Apply quantum times collection efficiency via hit or miss method
+       * now not used in digitization
        * @param energy energy of photon in eV
        * @return true if photon is detected
        */

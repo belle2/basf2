@@ -86,7 +86,25 @@ namespace Belle2 {
     void getMeasurement(const GFAbsTrackRep*, const GFDetPlane& pl, const TMatrixT<double>&, const TMatrixT<double>&,
                         TMatrixT<double>& m, TMatrixT<double>& V);
 
+    /** Setter to determine how to resolve the left/right ambiguity:
+     *
+     *  -1: negative (left) side on vector (wire direction) x (track direction) <br>
+     *   0: auto select (take side with smallest distance to track) <br>
+     *   1: positive (right) side on vector (wire direction) x (track direction)
+     */
+    void setLeftRightResolution(int lr) {
+      fPolicy.setLeftRightResolution(lr);
+    }
 
+    /** Get how this wire hit will resolve the left/right ambiguity:
+     *
+     *  -1: negative (left) side on vector (wire direction) x (track direction) <br>
+     *   0: auto select (take side with smallest distance to track) <br>
+     *   1: positive (right) side on vector (wire direction) x (track direction)
+     */
+    int getLeftRightResolution() {
+      return fPolicy.getLeftRightResolution();
+    }
   private:
     //--- GENFIT Stuff ----------------------------------------------------------------------------------------------------------
     //NOTE: The endcap positions of the wire is stored in a variable inherited from GFRecoHitIfc<GFWireHitPolicy>.

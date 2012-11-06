@@ -53,7 +53,7 @@ namespace Belle2 {
       return momentum;
     }
 
-
+    //! The method to get return  px Momentum
     float getPx() const {
       StoreArray<ECLShower> eclRecShowerArray;
       ECLShower* aECLShower = eclRecShowerArray[m_showerId];
@@ -65,6 +65,7 @@ namespace Belle2 {
     }
 
 
+    //! The method to get return py Momentum
     float getPy() const {
       StoreArray<ECLShower> eclRecShowerArray;
       ECLShower* aECLShower = eclRecShowerArray[m_showerId];
@@ -75,7 +76,7 @@ namespace Belle2 {
       return (float)m_py;
     }
 
-
+    //! The method to get return pz Momentum
     float getPz() const {
       StoreArray<ECLShower> eclRecShowerArray;
       ECLShower* aECLShower = eclRecShowerArray[m_showerId];
@@ -86,13 +87,45 @@ namespace Belle2 {
       return (float)m_pz;
     }
 
-
+    //! The method to get return  Momentum
     float getEnergy() const {
       TVector3 momentum(0., 0., 0.);
       StoreArray<ECLShower> eclRecShowerArray;
       ECLShower* aECLShower = eclRecShowerArray[m_showerId];
       double m_energy = aECLShower->GetEnergy();
       return (float)m_energy;
+    }
+
+    //! The method to get return TMatrixT  4 Momentum Error Matrix
+    TMatrixT<double> getErrorMatrix() const {
+      TMatrixT<double> m_errorMatrix;
+      for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+          m_errorMatrix[i][j] = 0;
+        }
+      }
+
+      StoreArray<ECLShower> eclRecShowerArray;
+      ECLShower* aECLShower = eclRecShowerArray[m_showerId];
+      double EnergyError = aECLShower->GetEnergyError();
+      double ThetaError = aECLShower->GetThetaError();
+      double PhiError = aECLShower->GetPhiError();
+      double m_energy = aECLShower->GetEnergy();
+      double m_theta = aECLShower->GetTheta();
+      double m_phi = aECLShower->GetPhi();
+
+      m_errorMatrix[0][0] = EnergyError * EnergyError;
+      m_errorMatrix[1][1] = (sin(m_theta) * cos(m_phi) * EnergyError) * (sin(m_theta) * cos(m_phi) * EnergyError)
+                            + (m_energy * cos(m_theta) * cos(m_phi) * ThetaError) * (m_energy * cos(m_theta) * cos(m_phi) * ThetaError)
+                            + (m_energy * sin(m_theta) * sin(m_phi) * PhiError) * (m_energy * sin(m_theta) * sin(m_phi) * PhiError);
+      m_errorMatrix[2][2] = (sin(m_theta) * sin(m_phi) * EnergyError) * (sin(m_theta) * sin(m_phi) * EnergyError)
+                            + (m_energy * cos(m_theta) * sin(m_phi) * ThetaError) * (m_energy * cos(m_theta) * sin(m_phi) * ThetaError)
+                            + (m_energy * sin(m_theta) * cos(m_phi) * PhiError) * (m_energy * sin(m_theta) * cos(m_phi) * PhiError);
+
+      m_errorMatrix[3][3] = (cos(m_theta) * EnergyError) * (cos(m_theta) * EnergyError)
+                            + (m_energy * sin(m_theta) * ThetaError) * (m_energy * sin(m_theta) * ThetaError);
+
+      return m_errorMatrix;
     }
 
     //! Empty constructor

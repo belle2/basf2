@@ -50,7 +50,8 @@ void TxSocketModule::initialize()
   m_sock = new EvtSocketSend(m_dest, m_port);
 
   // Create Message Handler
-  m_msghandler = new MsgHandler(m_compressionLevel);
+  //  m_msghandler = new MsgHandler(m_compressionLevel);
+  m_streamer = new DataStoreStreamer(m_compressionLevel);
 
   B2INFO("Tx initialized.");
 }
@@ -64,40 +65,8 @@ void TxSocketModule::beginRun()
 
 void TxSocketModule::event()
 {
-  // Clear msghandler
-  m_msghandler->clear();
-
-  // Set durability
-  DataStore::EDurability durability = DataStore::c_Event;
-
-  // Stream objects in msg_handler
-  const DataStore::StoreObjMap& objmap = DataStore::Instance().getObjectMap(durability);
-  int nobjs = 0;
-  for (DataStore::StoreObjConstIter it = objmap.begin(); it != objmap.end(); ++it) {
-    if (m_msghandler->add(it->second, it->first)) {
-      B2INFO("TxSocket: adding obj " << it->first);
-      nobjs++;
-    }
-  }
-  // Stream arrays in msg_handler
-  const DataStore::StoreArrayMap& arymap = DataStore::Instance().getArrayMap(durability);
-  int narrays = 0;
-  for (DataStore::StoreObjConstIter it = arymap.begin(); it != arymap.end(); ++it) {
-    if (m_msghandler->add(it->second, it->first)) {
-      B2INFO("TxSocket: adding array " << it->first);
-      narrays++;
-    }
-  }
-  B2INFO("TxSocket: nobjs = " << nobjs << ", narrays = " << narrays <<
-         " (pid=" << (int)getpid() << ")");
-
-
-  // Encode event message
-  EvtMessage* msg = m_msghandler->encode_msg(MSG_EVENT);
-
-  (msg->header())->reserved[0] = (int)durability;
-  (msg->header())->reserved[1] = nobjs;       // No. of objects
-  (msg->header())->reserved[2] = narrays;    // No. of arrays
+  // Stream DataStore in EvtMessage
+  EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
 
   // Send the message to Socket
   int stat = m_sock->send(msg);

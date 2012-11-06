@@ -30,7 +30,7 @@ RxSocketModule::RxSocketModule() : Module()
   //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
 
   addParam("Port", m_port, "Receiver Port", 1111);
-  m_nsent = 0;
+  m_nrecv = 0;
   m_compressionLevel = 0;
 
   //Parameter definition
@@ -44,12 +44,29 @@ RxSocketModule::~RxSocketModule()
 
 void RxSocketModule::initialize()
 {
+  // Load data objects definitions
+  gSystem->Load("libdataobjects");
 
   // Open receiving socekt
   m_recv = new EvtSocketRecv(m_port);
 
   // Open message handler
-  m_msghandler = new MsgHandler(m_compressionLevel);
+  //  m_msghandler = new MsgHandler(m_compressionLevel);
+
+  // Initialize DataStoreStreamer
+  m_streamer = new DataStoreStreamer(m_compressionLevel);
+
+  // Prefetch first record in RxSocket
+  EvtMessage* msg = m_recv->recv();
+  if (msg == NULL) {
+    return;
+  }
+  m_streamer->restoreDataStore(msg);
+
+  // Delete buffers
+  delete msg;
+
+  m_nrecv = -1;
 
   B2INFO("Rx initialized.");
 }
@@ -63,12 +80,17 @@ void RxSocketModule::beginRun()
 
 void RxSocketModule::event()
 {
+  m_nrecv++;
+  // First event is already loaded
+  if (m_nrecv == 0) return;
+
   // Get a record from socket
   EvtMessage* msg = m_recv->recv();
   if (msg == NULL) {
     return;
   }
   B2INFO("Rx: got an event from Socket, size=" << msg->size());
+  // Check for termination record
   if (msg->type() == MSG_TERMINATE) {
     B2INFO("Rx: got termination message. Exitting....");
     return;
@@ -76,40 +98,14 @@ void RxSocketModule::event()
     //    return msg->type(); // EOF
   }
 
-  // Build EvtMessage and decompose it
-  vector<TObject*> objlist;
-  vector<string> namelist;
-  m_msghandler->decode_msg(msg, objlist, namelist);
-  B2INFO("Rx: message decoded!");
-
-  // Get Object info
-  RECORD_TYPE type = msg->type();
-  DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
-  int nobjs = (msg->header())->reserved[1];
-  int narrays = (msg->header())->reserved[2];
-
-  //  printf ( "Rx: nobjs = %d, narrays = %d\n", nobjs, narrays );
-
-  // Restore objects in DataStore
-  for (int i = 0; i < nobjs; i++) {
-    DataStore::Instance().storeObject(objlist.at(i),
-                                      namelist.at(i));
-    B2INFO("Rx: restored obj " << namelist.at(i));
-  }
-  B2INFO("Rx: Objs restored");
-
-  // Restore arrays in DataStore
-  for (int i = 0; i < narrays; i++) {
-    DataStore::Instance().storeArray((TClonesArray*)objlist.at(i + nobjs),
-                                     namelist.at(i + nobjs));
-    B2INFO("Rx: restored array " << namelist.at(i + nobjs));
-  }
+  // Restore DataStore
+  m_streamer->restoreDataStore(msg);
   B2INFO("Rx: DataStore Restored!!");
 
+  // Delete EvtMessage
   delete msg;
 
   return;
-  //  return type;
 }
 
 void RxSocketModule::endRun()

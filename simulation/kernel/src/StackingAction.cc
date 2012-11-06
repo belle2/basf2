@@ -3,18 +3,20 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj                                             *
+ * Contributors: Luka Santelj, Marko Staric                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <simulation/kernel/StackingAction.h>
+#include <simulation/kernel/UserInfo.h>
 #include <framework/logging/Logger.h>
 
 #include <G4ParticleDefinition.hh>
 #include <G4ParticleTypes.hh>
 #include <G4Track.hh>
 #include <G4RunManager.hh>
+
 
 using namespace std;
 using namespace Belle2;
@@ -34,18 +36,28 @@ StackingAction::~StackingAction()
 
 G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* aTrack)
 {
-  // If optical photon is produced in "Cerenkov" it has "m_photonFraction" probability
-  // for being propagated.
-  if (aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
-    // particle is optical photon
-    if (aTrack->GetParentID() > 0) {
-      // particle is secondary
-      if (aTrack->GetCreatorProcess()->GetProcessName() == "Cerenkov") {
-        // particle is Cerenkov photon
-        if (gRandom->Uniform() > m_photonFraction) return fKill;   /**< The random number generator used for rejecting Cerenkov photons.*/
-      }
-    }
-  }
+
+  // look for optical photon
+  if (aTrack->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition())
+    return fUrgent;
+
+  // look for Cerenkov photon
+  if (aTrack->GetCreatorProcess()->GetProcessName() != "Cerenkov") return fUrgent;
+
+  // get track info
+  TrackInfo* info = dynamic_cast<TrackInfo*>(aTrack->GetUserInformation());
+  if (!info) return fUrgent;
+
+  // chech if prescaling already done
+  if (info->getStatus() != 0) return fUrgent;
+
+  // if not, do it
+  if (gRandom->Uniform() > m_photonFraction) return fKill;
+
+  // set new status and store prescaling fraction
+  info->setStatus(1);
+  info->setFraction(m_photonFraction);
+
   return fUrgent;
 }
 

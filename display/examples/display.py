@@ -46,7 +46,7 @@ display = register_module('Display')
 # Note that you can always turn off an individual detector component or track
 # interactively by removing its checkmark in the 'Eve' tab.
 #
-# This option only makes sense when ShowGFTracks is true
+# This option only makes sense when ShowGFTracks/ShowGFTrackCands is used
 display.param('Options', 'AHTM')  # default
 
 # should hits always be assigned to a particle with c_PrimaryParticle flag?
@@ -59,6 +59,9 @@ display.param('ShowAllPrimaries', True)
 # show all charged MCParticles? (SLOW)
 # display.param('ShowCharged', True)
 
+# show all neutral MCParticles? (SLOW)
+# display.param('ShowNeutrals', True)
+
 # show tracks?
 display.param('ShowGFTracks', True)
 
@@ -67,7 +70,7 @@ display.param('ShowGFTracks', True)
 display.param('ShowGFTrackCands', False)
 # If ShowGFTrackCands is true, you can set this option to switch between
 # PXD/SVDClusters and PXD/SVDTrueHits
-display.param('UseClusters', False)
+display.param('UseClusters', True)
 
 # save events non-interactively (without showing window)?
 display.param('Automatic', False)

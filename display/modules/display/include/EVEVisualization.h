@@ -22,10 +22,12 @@
 #include <GFTrack.h>
 #include <GFTrackCand.h>
 
+#include <TEveStraightLineSet.h>
 #include <TEveTrackPropagator.h>
 #include <TVector3.h>
 #include <TString.h>
 #include <TEveTrack.h>
+#include <TEveManager.h>
 
 #include <string>
 #include <vector>
@@ -185,28 +187,43 @@ namespace Belle2 {
     /** set fill color of the volume 'name' to 'col'. */
     void setVolumeColor(const char* name, Color_t col);
 
-    /** returns position of given VXD hit in global coordinates. */
-    template <class SomeVXDHit> TVector3 getGlobalPos(const SomeVXDHit* hit) {
+    /** adds given VXD hit to lines. */
+    template <class SomeVXDHit> void addRecoHit(const SomeVXDHit* hit, TEveStraightLineSet* lines) {
       static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
       const TVector3 local_pos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
       const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
-      return sensor.pointToGlobal(local_pos);
+      const TVector3 global_pos = sensor.pointToGlobal(local_pos);
+      lines->AddMarker(global_pos.x(), global_pos.y(), global_pos.z());
     }
 
     /** specialisation for SVDCluster */
-    TVector3 getGlobalPos(const SVDCluster*) {
-      B2ERROR("getGlobalPos() not yet implemented for SVDCluster :(");
-      //TODO: How to get these for strips?
-      return TVector3(0, 0, 0);
+    void addRecoHit(const SVDCluster* hit, TEveStraightLineSet* lines) {
+      static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
+      const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
+
+      TVector3 a, b;
+      if (hit->isUCluster()) {
+        const float u = hit->getPosition();
+        a = sensor.pointToGlobal(TVector3(sensor.getBackwardWidth() / sensor.getWidth(0) * u, -0.5 * sensor.getLength(), 0.0));
+        b = sensor.pointToGlobal(TVector3(sensor.getForwardWidth() / sensor.getWidth(0) * u, +0.5 * sensor.getLength(), 0.0));
+      } else {
+        const float v = hit->getPosition();
+        a = sensor.pointToGlobal(TVector3(-0.5 * sensor.getWidth(v), v, 0.0));
+        b = sensor.pointToGlobal(TVector3(+0.5 * sensor.getWidth(v), v, 0.0));
+      }
+
+      lines->AddLine(a.x(), a.y(), a.z(), b.x(), b.y(), b.z());
     }
 
     /** specialisation for CDCHit. */
-    TVector3 getGlobalPos(const CDCHit* hit) {
+    void addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines) {
       static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
       const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
       const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
-      return 0.5 * (wire_pos_f + wire_pos_b);
+
+      lines->AddLine(wire_pos_f.x(), wire_pos_f.y(), wire_pos_f.z(), wire_pos_b.x(), wire_pos_b.y(), wire_pos_b.z());
     }
 
     /** Rescale PXD/SVD errors with this factor to ensure visibility. */
@@ -249,6 +266,8 @@ namespace Belle2 {
   template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const GFTrackCand* trackCand, const TString& label,
       const StoreArray<PXDType> &pxdhits, const StoreArray<SVDType> &svdhits, const StoreArray<CDCHit> &cdchits)
   {
+    const Color_t trackCandColor = kBlue + 1;
+
     // parse the option string ------------------------------------------------------------------------
     bool drawHits = false;
     bool drawTrack = false;
@@ -269,86 +288,87 @@ namespace Belle2 {
     //TVector3 track_mom = trackCand->getMomSeed(); //TODO: requires newer genfit
 
     TEveTrack* track_lines = NULL;
-    TEvePointSet* hits = new TEvePointSet("RecoHits");
-    hits->SetMainColor(kOrange + 2);
-    hits->SetMarkerStyle(6);
-    hits->SetMainTransparency(50);
+
+    TEveStraightLineSet* lines = new TEveStraightLineSet("RecoHits");
+    lines->SetMainColor(trackCandColor);
+    lines->SetMarkerColor(trackCandColor);
+    lines->SetMarkerStyle(6);
+    lines->SetMainTransparency(50);
+
     const unsigned int numhits = trackCand->getNHits();
-    for (unsigned int iHit = 0; iHit < numhits; iHit++) { // loop over all hits in the track
+    if (drawHits) {
+      for (unsigned int iHit = 0; iHit < numhits; iHit++) { // loop over all hits in the track
 
-      //get hit and detector indices from candidate
-      unsigned int detId;
-      unsigned int hitId;
-      trackCand->getHit(iHit, detId, hitId);
+        //get hit and detector indices from candidate
+        unsigned int detId;
+        unsigned int hitId;
+        trackCand->getHit(iHit, detId, hitId);
 
-      //get actual hit data from associated StoreArray
-      TVector3 global_pos;
-      if (detId == 0) { //PXD
-        if (!pxdhits)
+        //get actual hit data from associated StoreArray
+        TVector3 global_pos;
+        if (detId == 0) { //PXD
+          if (!pxdhits)
+            continue;
+          const PXDType* hit = pxdhits[hitId];
+          if (!hit) {
+            B2ERROR("No " << PXDType::Class_Name() << " found at index " << hitId << "!");
+            continue;
+          }
+          addRecoHit(hit, lines);
+        } else if (detId == 1) { //SVD
+          if (!svdhits)
+            continue;
+          const SVDType* hit = svdhits[hitId];
+          if (!hit) {
+            B2ERROR("No " << SVDType::Class_Name() << " found at index " << hitId << "!");
+            continue;
+          }
+          addRecoHit(hit, lines);
+        } else if (detId == 2) { //CDC
+          if (!cdchits)
+            continue;
+          const CDCHit* hit = cdchits[hitId];
+          if (!hit) {
+            B2ERROR("No " << CDCHit::Class_Name() << " found at index " << hitId << "!");
+            continue;
+          }
+          addRecoHit(hit, lines);
+        } else {
+          B2ERROR("Got invalid detector ID from track candidate, skipping hit!")
           continue;
-        const PXDType* hit = pxdhits[hitId];
-        assert(hit);
-
-        global_pos = getGlobalPos(hit);
-      } else if (detId == 1) { //SVD
-        if (!svdhits)
-          continue;
-        const SVDType* hit = svdhits[hitId];
-        assert(hit);
-        global_pos = getGlobalPos(hit);
-      } else if (detId == 2) { //CDC
-        if (!cdchits)
-          continue;
-        const CDCHit* hit = cdchits[hitId];
-        assert(hit);
-        global_pos = getGlobalPos(hit);
-      } else {
-        B2ERROR("Got invalid detector ID from track candidate, skipping hit!")
-        continue;
-      }
-
-      // draw track if corresponding option is set ------------------------------------------
-      if (drawTrack) {
-        if (!track_lines) {
-          TEveRecTrack rectrack;
-          rectrack.fP.Set(track_mom);
-          rectrack.fV.Set(track_pos);
-
-          track_lines = new TEveTrack(&rectrack, m_gftrackpropagator);
-          track_lines->SetName(label); //popup label set at end of function
-          track_lines->SetPropagator(m_gftrackpropagator);
-          track_lines->SetLineColor(kOrange + 2);
-          track_lines->SetLineWidth(1);
-          track_lines->SetTitle(TString::Format("%s\n"
-                                                "#hits: %u\n",
-                                                label.Data(), numhits));
-
-          track_lines->SetCharge((int)(qOverP / TMath::Abs(qOverP)));
         }
-        /*
-         TEvePathMarkD refMark(TEvePathMarkD::kDaughter); //doesn't need momentum
-         refMark.fV.Set(global_pos);
-         //TODO use rho here?
-         refMark.fTime = global_pos.Mag(); //path marks can later be sorted by 'time'...
-         track_lines->AddPathMark(refMark);
-         */
-        hits->SetNextPoint(global_pos.x(), global_pos.y(), global_pos.z());
-      }
-
-
-      if (drawHits) {
-
       }
     }
 
-    if (track_lines) {
-      if (!m_trackcandlist) {
-        m_trackcandlist = new TEveTrackList("Track candidates", m_gftrackpropagator);
-        m_trackcandlist->IncDenyDestroy();
-      }
+    if (!m_trackcandlist) {
+      m_trackcandlist = new TEveTrackList("Track candidates", m_gftrackpropagator);
+      m_trackcandlist->IncDenyDestroy();
+    }
 
-      track_lines->AddElement(hits);
+    // draw track if corresponding option is set ------------------------------------------
+    if (drawTrack) {
+      TEveRecTrack rectrack;
+      rectrack.fP.Set(track_mom);
+      rectrack.fV.Set(track_pos);
+
+      track_lines = new TEveTrack(&rectrack, m_gftrackpropagator);
+      track_lines->SetName(label); //popup label set at end of function
+      track_lines->SetPropagator(m_gftrackpropagator);
+      track_lines->SetLineColor(trackCandColor);
+      track_lines->SetLineWidth(1);
+      track_lines->SetTitle(TString::Format("%s\n"
+                                            "#hits: %u\n"
+                                            "pT=%.3f, pZ=%.3f",
+                                            label.Data(), numhits,
+                                            track_mom.Pt(), track_mom.Pz()));
+
+      track_lines->SetCharge((int)(qOverP / TMath::Abs(qOverP)));
+
+
+      track_lines->AddElement(lines);
       m_trackcandlist->AddElement(track_lines);
+    } else {
+      m_trackcandlist->AddElement(lines);
     }
   }
 }

@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Guofu Cao                                  *
+ * Contributors: Andreas Moll, Guofu Cao, Marko Staric                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -96,6 +96,9 @@ namespace Belle2 {
     bool m_useNativeGeant4;                /**< If set to true, uses the Geant4 navigator and native detector construction class. */
     std::vector<std::string> m_uiCommands; /**< A list of Geant4 UI commands that should be applied before the simulation starts. */
     bool m_EnableVisualization;            /**< If set to true the Geant4 visualization support is enabled. */
+    bool m_storeOpticalPhotons; /**< controls storing of optical photons in MCParticles */
+    bool m_storeSecondaries; /**< contorls storing of low energy Geant secondaries in MCParticles */
+    double m_energyCut; /**< kinetic energy cut for low energy Geant secondaries */
 
   private:
 

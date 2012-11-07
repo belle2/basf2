@@ -70,6 +70,9 @@ FullSimModule::FullSimModule() : Module(), m_visManager(NULL)
   addParam("MaxNumberSteps", m_maxNumberSteps, "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
   addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 0.3);
   addParam("EnableVisualization", m_EnableVisualization, "If set to True the Geant4 visualization support is enabled.", false);
+  addParam("StoreOpticalPhotons", m_storeOpticalPhotons, "If set to True optical photons are stored in MCParticles", false);
+  addParam("StoreAllSecondaries", m_storeSecondaries, "If set to True all secondaries produced by Geant are stored in MCParticles, otherwise only those above SecondariesEnergyCut", false);
+  addParam("SecondariesEnergyCut", m_energyCut, "[MeV] Kinetic energy cut for storing secondaries", 1.0);
 
   vector<string> defaultCommands;
   addParam("UICommands", m_uiCommands, "A list of Geant4 UI commands that should be applied before the simulation starts.", defaultCommands);
@@ -120,6 +123,9 @@ void FullSimModule::initialize()
 
   //Add the tracking action which handles the secondary particles created by Geant4.
   TrackingAction* trackingAction = new TrackingAction(m_mcParticleGraph);
+  trackingAction->setIgnoreOpticalPhotons(!m_storeOpticalPhotons);
+  trackingAction->setIgnoreSecondaries(!m_storeSecondaries);
+  trackingAction->setKineticEnergyCut(m_energyCut);
   runManager.SetUserAction(trackingAction);
 
   //Add the stepping action which provides additional security checks

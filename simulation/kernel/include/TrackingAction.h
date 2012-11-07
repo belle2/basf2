@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Marko Staric                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -55,10 +55,33 @@ namespace Belle2 {
        */
       void PostUserTrackingAction(const G4Track* track);
 
+      /**
+       * Set ignore flag for optical photons
+       * if set to true, optical photons will not be stored in MCParticles collection
+       * @param ignore flag
+       */
+      void setIgnoreOpticalPhotons(bool ignore = true) {m_IgnoreOpticalPhotons = ignore;}
+
+      /**
+       * Set ignore flag for low energy Geant-produced secondary particles
+       * if set to true, secondaries below KineticEnergyCut will not be stored in MCParticles collection
+       * @param ignore flag
+       */
+      void setIgnoreSecondaries(bool ignore = true) {m_IgnoreSecondaries = ignore;}
+
+      /**
+       * Set kinetic energy cut for secondaries
+       * @param cut_MeV kinetic energy in MeV
+       */
+      void setKineticEnergyCut(double cut_MeV) {m_EnergyCut = cut_MeV;}
+
 
     protected:
 
       MCParticleGraph& m_mcParticleGraph; /**< Reference to the MCParticle graph which is updated by the tracking action. */
+      bool m_IgnoreOpticalPhotons; /**< do not store optical photons in MCParticles */
+      bool m_IgnoreSecondaries; /**< do not store low energy secondaries in MCParticles */
+      double m_EnergyCut; /**< kinetic energy cut for secondaries [MeV] */
 
     };
 

@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao, Andreas Moll                                  *
+ * Contributors: Guofu Cao, Andreas Moll, Marko Staric                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,11 +15,13 @@
 
 #include <G4TrackingManager.hh>
 #include <G4Track.hh>
+#include <G4ParticleDefinition.hh>
+#include <G4ParticleTypes.hh>
 
 using namespace Belle2;
 using namespace Belle2::Simulation;
 
-TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph): G4UserTrackingAction(), m_mcParticleGraph(mcParticleGraph)
+TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph): G4UserTrackingAction(), m_mcParticleGraph(mcParticleGraph), m_IgnoreOpticalPhotons(false), m_IgnoreSecondaries(false), m_EnergyCut(0.0)
 {
 
 }
@@ -63,6 +65,7 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
     currParticle.setMomentum(dpMom.x(), dpMom.y(), dpMom.z());
     currParticle.setProductionTime(track->GetGlobalTime() * Unit::ns);
     currParticle.setProductionVertex(trVtxPos.x(), trVtxPos.y(), trVtxPos.z());
+
   } catch (CouldNotFindUserInfo& exc) {
     B2FATAL(exc.what())
   }
@@ -73,20 +76,36 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
 {
   G4StepPoint* postStep = track->GetStep()->GetPostStepPoint();
 
-  //Get particle of current track
+  // Get particle of current track
   try {
     MCParticleGraph::GraphParticle& currParticle = TrackInfo::getInfo(*track);
 
-    //Add particle and decay Information to all secondaries
+    // Add particle and decay Information to all secondaries
     BOOST_FOREACH(G4Track * daughterTrack, *fpTrackingManager->GimmeSecondaries()) {
 
-      //Add the particle to the particle graph and as UserInfo to the track
-      //if it is a secondary particle created by Geant4.
+      // Add the particle to the particle graph and as UserInfo to the track
+      // if it is a secondary particle created by Geant4.
       if (daughterTrack->GetDynamicParticle()->GetPrimaryParticle() == NULL && daughterTrack->GetUserInformation() == NULL) {
-        MCParticleGraph::GraphParticle& graphParticle = m_mcParticleGraph.addParticle();
-        const_cast<G4Track*>(daughterTrack)->SetUserInformation(new TrackInfo(graphParticle));
+        MCParticleGraph::GraphParticle& daughterParticle = m_mcParticleGraph.addParticle();
+        const_cast<G4Track*>(daughterTrack)->SetUserInformation(new TrackInfo(daughterParticle));
 
-        currParticle.decaysInto(graphParticle); //Add the decay
+        currParticle.decaysInto(daughterParticle); //Add the decay
+
+        // Optical photons and low energy secondaries:  steering of output to MCParticles
+        if (daughterTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
+          if (m_IgnoreOpticalPhotons) daughterParticle.setIgnore();
+          // to apply quantum efficiency only once, if optical photon is a daugher of optical photon
+          if (track->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
+            TrackInfo* currInfo = dynamic_cast<TrackInfo*>(track->GetUserInformation());
+            TrackInfo* daughterInfo = dynamic_cast<TrackInfo*>(daughterTrack->GetUserInformation());
+            daughterInfo->setStatus(currInfo->getStatus());
+            daughterInfo->setFraction(currInfo->getFraction());
+          }
+        } else {
+          if (m_IgnoreSecondaries && daughterTrack->GetKineticEnergy() < m_EnergyCut)
+            daughterParticle.setIgnore();
+        }
+
       }
     }
     //If the track is just suspended we can return here: the rest should be filled once the track is done

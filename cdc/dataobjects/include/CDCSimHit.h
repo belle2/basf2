@@ -12,6 +12,7 @@
 #define CDCSIMHIT_H
 
 #include <cdc/dataobjects/WireID.h>
+#include <generators/dataobjects/SimHitBase.h>
 
 #include <TObject.h>
 #include <TVector3.h>
@@ -23,7 +24,8 @@ namespace Belle2 {
    *  @}
    */
   //! Example Detector
-  class CDCSimHit : public TObject {
+  class CDCSimHit : public SimHitBase {
+
   public:
 
     //! The WireID of the hit.
@@ -156,7 +158,8 @@ namespace Belle2 {
     //! Empty constructor
     /*! Recommended for ROOT IO
     */
-    CDCSimHit() {;}
+    CDCSimHit(): SimHitBase() {;}
+
 
     //! Useful Constructor
     CDCSimHit(int layerId,
@@ -172,7 +175,7 @@ namespace Belle2 {
               TVector3 posIn,
               TVector3 posOut,
               TVector3 posTrack,
-              int posFlag) {
+              int posFlag): SimHitBase() {
       m_wireID.setWireID(layerId, wireId);
       m_trackId = trackId;
       m_pdg = pdg;
@@ -191,8 +194,7 @@ namespace Belle2 {
     /** Shift the SimHit in time
      * @param delta The value of the time shift.
      */
-    void shiftInTime(float delta) { m_globalTime += delta; }
-
+    virtual void shiftInTime(float delta) { m_globalTime += delta; }
 
 
     /** ROOT Macro. */

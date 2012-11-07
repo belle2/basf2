@@ -1,5 +1,4 @@
 Import('env')
 
-env['LIBS'] = ['framework','genfit']
-
+env['LIBS'] = ['generators_dataobjects', 'framework','genfit']
 Return('env')

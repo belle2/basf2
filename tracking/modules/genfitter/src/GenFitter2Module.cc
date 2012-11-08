@@ -378,7 +378,7 @@ void GenFitter2Module::event()
           CDCRecoHit* aCdcRecoHit = dynamic_cast<CDCRecoHit*>(track.getHit(i));
           if (aCdcRecoHit not_eq NULL) {
             //cout << "l/r: for " <<  ambiInfoIndex << " is " << int(lrInfo[ambiInfoIndex]) << "\n";
-            aCdcRecoHit->setLeftRightResolution(lrInfo[ambiInfoIndex]);
+            //aCdcRecoHit->setLeftRightResolution(lrInfo[ambiInfoIndex]); //new genfit feature that is not yet in the current externals
             ++ambiInfoIndex;
           }
         }

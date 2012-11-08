@@ -1818,6 +1818,7 @@ void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
                             geometry::GeometryTypes type)
 {
   int i;
+  (void)type;
   readXMLData(content);
   m_sensitive = new EKLMSensitiveDetector("EKLMSensitiveDetector");
   if (m_sensitive == NULL) {

@@ -43,32 +43,25 @@ namespace Belle2 {
 
   using namespace geometry;
 
-  //  namespace eklm {
-  //-----------------------------------------------------------------
-  //                 Register the Creator
-  //-----------------------------------------------------------------
-
   geometry::CreatorFactory<GeoESTRCreator> GeoESTRFactory("ESTRCreator");
-  //-----------------------------------------------------------------
-  //                 Implementation
-  //-----------------------------------------------------------------
 
   GeoESTRCreator::GeoESTRCreator()
   {
-
   }
 
 
   GeoESTRCreator::~GeoESTRCreator()
   {
-
   }
 
-  void GeoESTRCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+  void GeoESTRCreator::create(const GearDir& content,
+                              G4LogicalVolume& topVolume,
+                              geometry::GeometryTypes type)
   {
-
+    (void)content;
+    (void)topVolume;
+    (void)type;
   }
 
-  //  }
 }
 

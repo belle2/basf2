@@ -20,25 +20,37 @@
 
 namespace Belle2 {
 
-  //! The GeoESTRCreator class.
-  /*!
-    The creator for the Belle II Endcap Structure
-  */
+  /**
+   * Creator of the Belle II Endcap Structure.
+   * @details
+   * This class does not actually create the geometry;
+   * it is created by the GeoEKLMBelleII class.
+   */
   class GeoESTRCreator : public geometry::CreatorBase {
 
   public:
 
-    //! Constructor of the GeoESTRCreator class.
+    /**
+     * Constructor.
+     */
     GeoESTRCreator();
 
-    //! Destructor of the GeoESTRCreator class.
-    virtual ~GeoESTRCreator();
+    /**
+     * Destructor of the GeoESTRCreator class.
+     */
+    ~GeoESTRCreator();
 
-    //! Creates the ROOT Objects for the structure geometry.
-    /*!
-      \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
-    */
-    virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+    /**
+     * Function to actually create the geometry, has to be overridden by
+     * derived classes
+     * @param content   GearDir pointing to the parameters which
+     *        should be used for construction
+     * @param topVolume Top volume in which the geometry has to be
+     *        placed
+     * @param type    Type of geometry to be build
+     */
+    void create(const GearDir& content, G4LogicalVolume& topVolume,
+                geometry::GeometryTypes type);
 
   private:
 

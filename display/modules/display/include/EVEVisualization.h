@@ -2,6 +2,7 @@
 #define EVEVISUALIZATION_H
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 
 #include <generators/dataobjects/MCParticle.h>
 #include <geometry/bfieldmap/BFieldMap.h>
@@ -306,7 +307,7 @@ namespace Belle2 {
 
         //get actual hit data from associated StoreArray
         TVector3 global_pos;
-        if (detId == 0) { //PXD
+        if (detId == Const::PXD) {
           if (!pxdhits)
             continue;
           const PXDType* hit = pxdhits[hitId];
@@ -315,7 +316,7 @@ namespace Belle2 {
             continue;
           }
           addRecoHit(hit, lines);
-        } else if (detId == 1) { //SVD
+        } else if (detId == Const::SVD) {
           if (!svdhits)
             continue;
           const SVDType* hit = svdhits[hitId];
@@ -324,7 +325,7 @@ namespace Belle2 {
             continue;
           }
           addRecoHit(hit, lines);
-        } else if (detId == 2) { //CDC
+        } else if (detId == Const::CDC) {
           if (!cdchits)
             continue;
           const CDCHit* hit = cdchits[hitId];

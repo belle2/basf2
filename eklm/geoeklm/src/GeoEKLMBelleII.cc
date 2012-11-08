@@ -256,32 +256,6 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   }
 }
 
-/**
- * ReflectCoordinates - get reflected coordinates
- */
-void GeoEKLMBelleII::ReflectCoordinates(double xin, double yin, double* xout,
-                                        double* yout, int quarter)
-{
-  switch (quarter) {
-    case 1:
-      *xout = xin;
-      *yout = yin;
-      break;
-    case 2:
-      *xout = -xin;
-      *yout = yin;
-      break;
-    case 3:
-      *xout = -xin;
-      *yout = -yin;
-      break;
-    case 4:
-      *xout = xin;
-      *yout = -yin;
-      break;
-  }
-}
-
 /*
  * createEndcap - create endcap
  * @iEndcap: number of endcap

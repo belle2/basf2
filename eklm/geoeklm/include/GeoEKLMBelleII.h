@@ -172,12 +172,6 @@ namespace Belle2 {
     void readXMLData(const GearDir& content);
 
     /**
-     * ReflectCoordinates - get reflected coordinates
-     */
-    void ReflectCoordinates(double xin, double yin, double* xout, double* yout,
-                            int quarter);
-
-    /**
      * createEndcap - create endcap
      * @iEndcap: number of endcap
      * @mlv: mother logical volume

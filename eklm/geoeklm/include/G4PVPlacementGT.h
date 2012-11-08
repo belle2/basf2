@@ -19,7 +19,7 @@
 namespace Belle2 {
 
   /**
-   * G4PVPlacementGT - G4PVPlacement with Global Transformation information
+   * G4PVPlacement with Global Transformation information.
    */
   class G4PVPlacementGT : public G4PVPlacement {
 
@@ -49,42 +49,42 @@ namespace Belle2 {
                     int id = 0, int mode = 0);
 
     /**
-     * getTransform - get transformation.
+     * Get transformation.
      */
     G4Transform3D getTransform();
 
     /**
-     * getID - get identifier.
+     * Get identifier.
      */
     int getID() const;
 
     /**
-     * getMode - get detector mode
+     * Get detector mode
      */
     int getMode() const;
 
     /**
-     * getVolumeType - get VolumeType
+     * Get volume type.
      */
     int  getVolumeType() const;
 
     /**
-     * setVolumeType - set VolumeType
+     * Set volume type.
      */
     void setVolumeType(int) ;
 
     /**
-     * getMother - get mother G4PVPlacementGT;
+     * Get mother G4PVPlacementGT.
      */
     const G4PVPlacementGT* getMother() const;
 
     /**
-     * getName - get volume Name
+     * Get volume name.
      */
     const std::string getName() const;
 
     /**
-     * getIdHistory -- get id hierarchy
+     * Get id hierarchy.
      */
     std::vector<int> getIdHistory() const;
 
@@ -123,7 +123,7 @@ namespace Belle2 {
 
 
     /**
-     * Name
+     * Name.
      */
     const std::string m_name;
 
@@ -133,7 +133,7 @@ namespace Belle2 {
     const G4PVPlacementGT* m_mother;
 
     /**
-     * ID ierarchy
+     * ID hierarchy.
      */
     std::vector<int> m_idHistory;
 

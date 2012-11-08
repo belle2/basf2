@@ -18,7 +18,7 @@
 namespace Belle2 {
 
   /**
-   * G4TriangularPrism - triangular prism
+   * Triangular prism.
    */
   class G4TriangularPrism {
 
@@ -26,12 +26,12 @@ namespace Belle2 {
 
     /**
      * Constructor.
-     * @r1: first point radius
-     * @phi1: first point angle
-     * @r2: second point radius
-     * @phi2: second point angle
-     * @halfZlen: half of Z length
-     *
+     * @param[in] r1        First point radius.
+     * @param[in] phi1      First point angle.
+     * @param[in] r2        Second point radius.
+     * @param[in] phi2      Second point angle.
+     * @param[in] halfZlen  Half of Z length.
+     * @details
      * Coordinates of the third point are (0, 0)
      */
     G4TriangularPrism(const G4String& name, double r1, double phi1,
@@ -43,7 +43,11 @@ namespace Belle2 {
     ~G4TriangularPrism();
 
     /**
-     * getSolid - get solid
+     * Get solid.
+     * @return Solid corresponding to the prism.
+     * @details
+     * The resulting G4VSolid* is allocated via operator new and must be
+     * deleted when is is not necessary.
      */
     G4VSolid* getSolid();
 

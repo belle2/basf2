@@ -48,20 +48,13 @@
 using namespace Belle2;
 
 /* Register the creator */
-//GeoEKLMBelleII regGeoEKLMBelleII;
 geometry::CreatorFactory<GeoEKLMBelleII> GeoEKLMFactory("EKLMBelleII");
 
-/*
- * GeoEKLMBelleII - GeoEKLMBelleII constructor
- */
 GeoEKLMBelleII::GeoEKLMBelleII()
 {
   SectorSupportSize.CornerAngle = -1;
 }
 
-/*
- * ~GeoEKLMBelleII - GeoEKLMBelleII destructor
- */
 GeoEKLMBelleII::~GeoEKLMBelleII()
 {
   int i, j;
@@ -73,9 +66,6 @@ GeoEKLMBelleII::~GeoEKLMBelleII()
   delete m_sensitive;
 }
 
-/*
- * createMaterials - creation of materials
- */
 void GeoEKLMBelleII::createMaterials()
 {
   Air = geometry::Materials::get("Air");
@@ -87,9 +77,6 @@ void GeoEKLMBelleII::createMaterials()
   Silicon = geometry::Materials::get("EKLMSilicon");
 }
 
-/*
- * readPositionData - read position data from XML database
- */
 void GeoEKLMBelleII::readPositionData(struct EKLMElementPosition& epos,
                                       GearDir& content)
 {
@@ -101,10 +88,6 @@ void GeoEKLMBelleII::readPositionData(struct EKLMElementPosition& epos,
   epos.Z = content.getLength("PositionZ") * cm;
 }
 
-/*
- * readXMLData - read parameters from XML database
- * @content: GearDir to read from
- */
 void GeoEKLMBelleII::readXMLData(const GearDir& content)
 {
   int i;
@@ -256,11 +239,6 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   }
 }
 
-/*
- * createEndcap - create endcap
- * @iEndcap: number of endcap
- * @mlv: mother logical volume
- */
 void GeoEKLMBelleII::createEndcap(int iEndcap, G4LogicalVolume* mlv)
 {
   int i;
@@ -327,12 +305,6 @@ void GeoEKLMBelleII::createEndcap(int iEndcap, G4LogicalVolume* mlv)
     createLayer(i, iEndcap, physiEndcap);
 }
 
-/*
- * createLayer - create layer
- * @iLayer: number of layer
- * @iEndcap: number of endcap
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createLayer(int iLayer, int iEndcap,
                                  G4PVPlacementGT* mpvgt)
 {
@@ -370,11 +342,6 @@ void GeoEKLMBelleII::createLayer(int iLayer, int iEndcap,
     createSector(i, physiLayer);
 }
 
-/*
- * createSector - create sector
- * @iSector: number of sector
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createSector(int iSector, G4PVPlacementGT* mpvgt)
 {
   int i;
@@ -429,9 +396,6 @@ void GeoEKLMBelleII::createSector(int iSector, G4PVPlacementGT* mpvgt)
       createSectionReadoutBoard(i, j, physiSector);
 }
 
-/**
- * Calculate board transformations
- */
 void GeoEKLMBelleII::calcBoardTransform()
 {
   int i;
@@ -453,11 +417,6 @@ void GeoEKLMBelleII::calcBoardTransform()
   }
 }
 
-/**
- * createSectorCover - create sector cover
- * @iCover: number of cover
- * @@mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
 {
   double z;
@@ -537,13 +496,6 @@ void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
   printVolumeMass(logicCover);
 }
 
-/**
- * createSectorSuportBoxX - create X side of sector support structure
- * @mpvgt: mother physical volume with global transformation
- * @t: transformation (output)
- *
- * Sets t to the transformation of the box.
- */
 G4Box* GeoEKLMBelleII::createSectorSupportBoxX(G4PVPlacementGT* mpvgt,
                                                G4Transform3D& t)
 {
@@ -560,13 +512,6 @@ G4Box* GeoEKLMBelleII::createSectorSupportBoxX(G4PVPlacementGT* mpvgt,
                    0.5 * SectorSupportPosition.length);
 }
 
-/**
- * createSectorSuportBoxY - create Y side of sector support structure
- * @mpvgt: mother physical volume with global transformation
- * @t: transformation (output)
- *
- * Sets t to the transformation of the box.
- */
 G4Box* GeoEKLMBelleII::createSectorSupportBoxY(G4PVPlacementGT* mpvgt,
                                                G4Transform3D& t)
 {
@@ -582,9 +527,6 @@ G4Box* GeoEKLMBelleII::createSectorSupportBoxY(G4PVPlacementGT* mpvgt,
                    0.5 * SectorSupportPosition.length);
 }
 
-/**
- * getSectorSupportCornerAngle - get cutted corner angle
- */
 double GeoEKLMBelleII::getSectorSupportCornerAngle()
 {
   double x1;
@@ -602,14 +544,6 @@ double GeoEKLMBelleII::getSectorSupportCornerAngle()
   return SectorSupportSize.CornerAngle;
 }
 
-/**
- * createSectorSuportBoxTop - create box in the cutted corner of sector
- * support structure
- * @mpvgt: mother physical volume with global transformation
- * @t: transformation (output)
- *
- * Sets t to the transformation of the box.
- */
 G4Box* GeoEKLMBelleII::createSectorSupportBoxTop(G4PVPlacementGT* mpvgt,
                                                  G4Transform3D& t)
 {
@@ -633,11 +567,6 @@ G4Box* GeoEKLMBelleII::createSectorSupportBoxTop(G4PVPlacementGT* mpvgt,
                    0.5 * SectorSupportPosition.length);
 }
 
-/**
- * createSectorSupportInnerTube - create inner tube of sector support structure
- * @mpvgt: mother physical volume with global transformation
- * @mlv: mother logical volume
- */
 G4Tubs* GeoEKLMBelleII::createSectorSupportInnerTube(G4PVPlacementGT* mpvgt)
 {
   double x1;
@@ -657,11 +586,6 @@ G4Tubs* GeoEKLMBelleII::createSectorSupportInnerTube(G4PVPlacementGT* mpvgt)
                     std::min(ang1, ang2) * rad, fabs(ang1 - ang2) * rad);
 }
 
-/**
- * createSectorSupportOuterTube - create outer tube of sector support structure
- * @iSector: number of sector
- * @mpvgt: mother physical volume with global transformation
- */
 G4Tubs* GeoEKLMBelleII::createSectorSupportOuterTube(G4PVPlacementGT* mpvgt)
 {
   double x1;
@@ -686,10 +610,6 @@ G4Tubs* GeoEKLMBelleII::createSectorSupportOuterTube(G4PVPlacementGT* mpvgt)
                     std::min(ang1, ang2) * rad, fabs(ang1 - ang2) * rad);
 }
 
-/**
- * createSectorSupportCorner1 - create sector support corner 1
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT* mpvgt)
 {
   double lx;
@@ -766,10 +686,6 @@ void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT* mpvgt)
   printVolumeMass(logicCorner1);
 }
 
-/*
- * createSectorSupportCorner2 - create sector support corner 2
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT* mpvgt)
 {
   double r;
@@ -826,10 +742,6 @@ void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT* mpvgt)
   printVolumeMass(logicCorner2);
 }
 
-/*
- * createSectorSupportCorner3 - create sector support corner 3
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT* mpvgt)
 {
   double r;
@@ -887,10 +799,6 @@ void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT* mpvgt)
   printVolumeMass(logicCorner3);
 }
 
-/*
- * createSectorSupportCorner4 - create sector support corner 4
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT* mpvgt)
 {
   double r;
@@ -948,10 +856,6 @@ void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT* mpvgt)
   printVolumeMass(logicCorner4);
 }
 
-/*
- * createSectorSupport - create sector support structure
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createSectorSupport(G4PVPlacementGT* mpvgt)
 {
   G4Box* solidBoxX;
@@ -1039,12 +943,6 @@ void GeoEKLMBelleII::createSectorSupport(G4PVPlacementGT* mpvgt)
   printVolumeMass(logicSectorSupport);
 }
 
-/**
- * subtractBoardSolids - subtract board solids from planes
- * @plane: plane solid without boards subtracted
- * @iPlane: plane number
- * @Plane_name: plane name
- */
 G4SubtractionSolid* GeoEKLMBelleII::
 subtractBoardSolids(G4SubtractionSolid* plane, int iPlane,
                     std::string Plane_Name)
@@ -1086,11 +984,6 @@ subtractBoardSolids(G4SubtractionSolid* plane, int iPlane,
   return ss[nPlane - 1][nBoard - 1];
 }
 
-/*
- * createPlane - create plane
- * @iPlane: number of plane
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
 {
   int i;
@@ -1261,12 +1154,6 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
     createStripVolume(i, physiPlane);
 }
 
-/**
- * createSectionReadoutBoard - create readout board
- * @iPlane: number of plane
- * @iBoard: number of board
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
                                                G4PVPlacementGT* mpvgt)
 {
@@ -1309,10 +1196,6 @@ void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
       createStripBoard(i, physiSectionReadoutBoard);
 }
 
-/**
- * createBaseBoard - create base board of section readout board
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createBaseBoard(G4PVPlacementGT* mpvgt)
 {
   G4Box* solidBaseBoard;
@@ -1345,11 +1228,6 @@ void GeoEKLMBelleII::createBaseBoard(G4PVPlacementGT* mpvgt)
   printVolumeMass(logicBaseBoard);
 }
 
-/**
- * createStripBoard - create strip readout board
- * @iBoard: number of board
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
 {
   G4Box* solidStripBoard;
@@ -1392,12 +1270,6 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
   printVolumeMass(logicStripBoard);
 }
 
-/**
- * createSectionSupport - create section support
- * @iSectionSupport: number of section support
- * @iPlane: number of plane
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createSectionSupport(int iSectionSupport, int iPlane,
                                           G4PVPlacementGT* mpvgt)
 {
@@ -1486,12 +1358,6 @@ void GeoEKLMBelleII::createSectionSupport(int iSectionSupport, int iPlane,
   printVolumeMass(logicSectionSupport);
 }
 
-/**
- * createPlasticListElement - create plastic list element
- * @iListPlane: number of list plane
- * @iList: number of list element
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
                                               G4PVPlacementGT* mpvgt)
 {
@@ -1539,11 +1405,6 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
   printVolumeMass(logicList);
 }
 
-/**
- * createStripVolume - create strip volume (strip + SiPM)
- * @iStrip: number of strip
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT* mpvgt)
 {
   G4Box* solidStripVolume;
@@ -1582,12 +1443,6 @@ void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT* mpvgt)
     createSiPM(iStrip, physiStripVolume);
 }
 
-
-/*
- * createStrip - create strip
- * @iStrip: number of strip
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createStrip(int iStrip, G4PVPlacementGT* mpvgt)
 {
   G4Box* solidStrip;
@@ -1632,11 +1487,6 @@ void GeoEKLMBelleII::createStrip(int iStrip, G4PVPlacementGT* mpvgt)
   printVolumeMass(logicStrip);
 }
 
-/**
- * createStripGroove - create strip groove
- * @iStrip: number of strip
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createStripGroove(int iStrip, G4PVPlacementGT* mpvgt)
 {
   G4Box* solidGroove;
@@ -1668,11 +1518,6 @@ void GeoEKLMBelleII::createStripGroove(int iStrip, G4PVPlacementGT* mpvgt)
   printVolumeMass(logicGroove);
 }
 
-/**
- * createStripSensitive - create strip sensitive volume
- * @iStrip: number of strip
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt)
 {
   G4Box* solidSensitiveBox;
@@ -1732,11 +1577,6 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt)
   printVolumeMass(logicSensitive);
 }
 
-/**
- * createSiPM - create silicon cube in the place of SiPM for radiation study
- * @iStrip: number of strip
- * @mpvgt: mother physical volume with global transformation
- */
 void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT* mpvgt)
 {
   G4Box* solidSiPM;
@@ -1774,7 +1614,6 @@ void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT* mpvgt)
   printVolumeMass(logicSiPM);
 }
 
-/* Print volume mass */
 void GeoEKLMBelleII::printVolumeMass(G4LogicalVolume* lv)
 {
   if (m_mode == 2)
@@ -1782,12 +1621,6 @@ void GeoEKLMBelleII::printVolumeMass(G4LogicalVolume* lv)
            lv->GetMass() / g);
 }
 
-/*
- * create - creation of the detector geometry
- * @content: XML directory
- * @topVolume: Geant world volume
- * @type:
- */
 void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
                             geometry::GeometryTypes type)
 {

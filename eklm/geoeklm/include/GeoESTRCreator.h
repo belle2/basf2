@@ -36,18 +36,17 @@ namespace Belle2 {
     GeoESTRCreator();
 
     /**
-     * Destructor of the GeoESTRCreator class.
+     * Destructor.
      */
     ~GeoESTRCreator();
 
     /**
      * Function to actually create the geometry, has to be overridden by
-     * derived classes
+     * derived classes.
      * @param content   GearDir pointing to the parameters which
-     *        should be used for construction
-     * @param topVolume Top volume in which the geometry has to be
-     *        placed
-     * @param type    Type of geometry to be build
+     *                  should be used for construction.
+     * @param topVolume Top volume in which the geometry has to be placed.
+     * @param type      Type of geometry to be build.
      */
     void create(const GearDir& content, G4LogicalVolume& topVolume,
                 geometry::GeometryTypes type);

@@ -9,6 +9,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
+#include <framework/gearbox/Const.h>
 
 #include <tracking/dataobjects/Track.h>
 #include <generators/dataobjects/MCParticle.h>
@@ -292,7 +293,7 @@ void DedxPIDModule::event()
       bool track_extrapolation_failed = false;
 
       //Loop over all CDC hits from this track
-      const std::vector<unsigned int>& cdc_hit_ids = gftrackcand.getHitIDs(c_CDC);
+      const std::vector<unsigned int>& cdc_hit_ids = gftrackcand.getHitIDs(Const::CDC);
       const int num_cdc_hits = cdc_hit_ids.size();
       for (int iCDC = 0; iCDC < num_cdc_hits; iCDC++) {
         const int cdc_idx = cdc_hit_ids[iCDC];
@@ -431,7 +432,7 @@ void DedxPIDModule::event()
 
     if (m_usePXD) {
       //get indices of PXDTrueHits
-      const std::vector<unsigned int>& pxdHitIDs = gftrackcand.getHitIDs(c_PXD);
+      const std::vector<unsigned int>& pxdHitIDs = gftrackcand.getHitIDs(Const::PXD);
 
       //and construct a list of associated PXDCluster indices
       std::vector<unsigned int> pxdClusterIDs;
@@ -449,8 +450,8 @@ void DedxPIDModule::event()
 
     if (m_useSVD) {
       //no way to access digitized SVD hits, so we'll just use the SVDTrueHits directly
-      const std::vector<unsigned int>& svd_hit_ids = gftrackcand.getHitIDs(c_SVD);
-      saveSiHits(&track, helix_at_origin, svdTrueHits, svd_hit_ids);
+      const std::vector<unsigned int>& svdHitIDs = gftrackcand.getHitIDs(Const::SVD);
+      saveSiHits(&track, helix_at_origin, svdTrueHits, svdHitIDs);
     }
 
 
@@ -562,7 +563,8 @@ template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const
 
   //figure out which detector to assign hits to
   const int current_detector = geo.get(hits[hit_indices.at(0)]->getSensorID()).getType();
-  assert(current_detector == c_PXD or current_detector == c_SVD);
+  assert(current_detector == VXD::SensorInfoBase::PXD or current_detector == VXD::SensorInfoBase::SVD);
+  assert(current_detector <= 1); //used as array index
 
   std::vector<float> silicon_dedx(num_hits); //used for averages
 

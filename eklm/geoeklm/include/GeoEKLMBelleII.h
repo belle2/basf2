@@ -32,8 +32,7 @@ namespace Belle2 {
   class G4TriangularPrism;
 
   /**
-   * struct EKLMElementPosition - position information for the elements
-   * of detector
+   * Position information for the elements of detector.
    */
   struct EKLMElementPosition {
     double innerR;   /**< inner radius */
@@ -45,7 +44,7 @@ namespace Belle2 {
   };
 
   /**
-   * struct EKLMSectorSupportSize - sector support size data
+   * Sector support size data.
    */
   struct EKLMSectorSupportSize {
     double Thickness;        /**< thickness */
@@ -72,7 +71,7 @@ namespace Belle2 {
   };
 
   /**
-   * struct EKLMBoardSize - readout board size data
+   * Readout board size data.
    */
   struct EKLMBoardSize {
     double length;       /**< length */
@@ -86,14 +85,14 @@ namespace Belle2 {
   };
 
   /**
-   * struct EKLMStripBoardPosition - strip readout board position data
+   * Strip readout board position data.
    */
   struct EKLMStripBoardPosition {
     double x;         /**< x coordinate */
   };
 
   /**
-   * struct EKLMBoardPosition - readout board position data
+   * Readout board position data.
    */
   struct EKLMBoardPosition {
     double r;      /**< radius of far edge of the board */
@@ -101,7 +100,7 @@ namespace Belle2 {
   };
 
   /**
-   * struct EKLMSectionSupportPosition - section support position
+   * Section support position.
    */
   struct EKLMSectionSupportPosition {
     double deltal_right;  /**< right (X-plane) delta L */
@@ -113,7 +112,7 @@ namespace Belle2 {
   };
 
   /**
-   * Struct EKLMStripSize - strip size data.
+   * Strip size data.
    */
   struct EKLMStripSize {
     double width;                      /**< width */
@@ -546,10 +545,8 @@ namespace Belle2 {
      */
     struct EKLMStripSize StripSize;
 
-    /**
-     * Detector mode. See description of possible values in G4PVPlacementGT.h
-     */
-    int m_mode;
+    /** Detector mode.*/
+    enum EKLMDetectorMode m_mode;
 
     /**
      * Sensitive detector

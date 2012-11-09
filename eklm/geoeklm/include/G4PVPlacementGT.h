@@ -18,6 +18,19 @@
 
 namespace Belle2 {
 
+  /** Mode of detector operation. */
+  enum EKLMDetectorMode {
+    /** Normal mode. */
+    EKLM_DETECTOR_NORMAL = 0,
+    /** Background study. */
+    EKLM_DETECTOR_BACKGROUND = 1,
+    /**
+     * Debug mode.
+     * When constructing geometry, print masses of all volumes and exit.
+     */
+    EKLM_DETECTOR_PRINTMASSES = 2,
+  };
+
   /**
    * G4PVPlacement with Global Transformation information.
    */
@@ -35,7 +48,8 @@ namespace Belle2 {
                     G4LogicalVolume* pCurrentLogical,
                     const G4String& pName,
                     G4LogicalVolume* pMotherLogical,
-                    int id = 0, int mode = 0);
+                    int id = 0,
+                    enum EKLMDetectorMode mode = EKLM_DETECTOR_NORMAL);
 
     /**
      * Constructor.
@@ -46,7 +60,8 @@ namespace Belle2 {
                     const G4Transform3D& Transform3D,
                     G4LogicalVolume* pCurrentLogical,
                     const G4String& pName,
-                    int id = 0, int mode = 0);
+                    int id = 0,
+                    enum EKLMDetectorMode mode = EKLM_DETECTOR_NORMAL);
 
     /**
      * Get transformation.
@@ -61,7 +76,7 @@ namespace Belle2 {
     /**
      * Get detector mode
      */
-    int getMode() const;
+    enum EKLMDetectorMode getMode() const;
 
     /**
      * Get volume type.
@@ -97,19 +112,11 @@ namespace Belle2 {
      */
     G4Transform3D m_transform;
 
-    /**
-     * Identifier.
-     */
+    /** Identifier. */
     int m_id;
 
-    /**
-     * Detector mode.
-     * 0 -- normal detector operation
-     * 1 -- background studies setup
-     * 2 -- when constructing geometry, print masses of all volumes and exit.
-     */
-    int m_mode;
-
+    /** Detector mode. */
+    enum EKLMDetectorMode m_mode;
 
     /**
      * Volume Type
@@ -119,8 +126,6 @@ namespace Belle2 {
      *  2 -- sensitive Electronic Boards (background studies only)
      */
     int m_type;
-
-
 
     /**
      * Name.

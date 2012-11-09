@@ -93,7 +93,11 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   int i;
   int j;
   GearDir gd(content);
-  m_mode = gd.getInt("Mode");
+  m_mode = (enum EKLMDetectorMode)gd.getInt("Mode");
+  if (m_mode < 0 || m_mode > 2) {
+    B2FATAL("EKLM started with unknown geometry mode " << m_mode << ".");
+    exit(EINVAL);
+  }
   m_outputFile = gd.getString("StripLengthAndTransformationMatrixDBFile");
   GearDir EndCap(gd);
   EndCap.append("/EndCap");
@@ -1191,7 +1195,7 @@ void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
     exit(ENOMEM);
   }
   createBaseBoard(physiSectionReadoutBoard);
-  if (m_mode != 0)
+  if (m_mode != EKLM_DETECTOR_NORMAL)
     for (i = 1; i <= nStripBoard; i++)
       createStripBoard(i, physiSectionReadoutBoard);
 }
@@ -1243,7 +1247,7 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
-  if (m_mode == 0)
+  if (m_mode == EKLM_DETECTOR_NORMAL)
     logicStripBoard = new G4LogicalVolume(solidStripBoard, Silicon,
                                           Board_Name);
   else
@@ -1396,8 +1400,8 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
   if (iListPlane == 2)
     z = -z;
   t = G4Translate3D(StripPosition[iList - 1].X, y, z);
-  physiList = new G4PVPlacementGT(mpvgt, t, logicList, List_Name, iList,
-                                  iListPlane);
+  physiList = new G4PVPlacementGT(mpvgt, t, logicList, List_Name,
+                                  iList * 100 + iListPlane);
   if (physiList == NULL) {
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
@@ -1438,8 +1442,7 @@ void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT* mpvgt)
     exit(ENOMEM);
   }
   createStrip(iStrip, physiStripVolume);
-
-  if (m_mode != 0)
+  if (m_mode != EKLM_DETECTOR_NORMAL)
     createSiPM(iStrip, physiStripVolume);
 }
 
@@ -1551,7 +1554,7 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
-  if (m_mode == 0)
+  if (m_mode == EKLM_DETECTOR_NORMAL)
     logicSensitive = new G4LogicalVolume(solidSensitive, Polystyrene,
                                          Sensitive_Name, 0, m_sensitive, 0);
   else
@@ -1590,7 +1593,7 @@ void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT* mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
-  if (m_mode == 0)
+  if (m_mode == EKLM_DETECTOR_NORMAL)
     logicSiPM = new G4LogicalVolume(solidSiPM, Silicon, SiPM_Name);
   else
     logicSiPM = new G4LogicalVolume(solidSiPM, Silicon, SiPM_Name, 0,
@@ -1616,7 +1619,7 @@ void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT* mpvgt)
 
 void GeoEKLMBelleII::printVolumeMass(G4LogicalVolume* lv)
 {
-  if (m_mode == 2)
+  if (m_mode == EKLM_DETECTOR_PRINTMASSES)
     printf("Volume %s: mass = %g g\n", lv->GetName().c_str(),
            lv->GetMass() / g);
 }
@@ -1636,8 +1639,8 @@ void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
   createMaterials();
   for (i = 1; i <= 2; i++)
     createEndcap(i, &topVolume);
-  if (m_mode == 2) {
-    printf("EKLM started in mode 2. Exiting now.\n");
+  if (m_mode == EKLM_DETECTOR_PRINTMASSES) {
+    printf("EKLM started in mode EKLM_DETECTOR_PRINTMASSES. Exiting now.\n");
     exit(0);
   }
 

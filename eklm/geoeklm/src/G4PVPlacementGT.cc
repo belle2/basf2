@@ -20,7 +20,8 @@ namespace Belle2 {
                                    G4LogicalVolume* pCurrentLogical,
                                    const G4String& pName,
                                    G4LogicalVolume* pMotherLogical,
-                                   int id, int mode) :
+                                   int id,
+                                   enum EKLMDetectorMode mode) :
     G4PVPlacement(Transform3D, pCurrentLogical, pName, pMotherLogical, false,
                   1, false),
     m_name(pName)
@@ -37,7 +38,8 @@ namespace Belle2 {
                                    const G4Transform3D& Transform3D,
                                    G4LogicalVolume* pCurrentLogical,
                                    const G4String& pName,
-                                   int id, int mode) :
+                                   int id,
+                                   enum EKLMDetectorMode mode) :
     G4PVPlacement(Transform3D, pCurrentLogical, pName,
                   motherPVPlacementGT->GetLogicalVolume(), false, 1, false),
     m_name(pName)
@@ -65,7 +67,8 @@ namespace Belle2 {
   {
     return m_idHistory;
   }
-  int G4PVPlacementGT::getMode() const
+
+  enum EKLMDetectorMode G4PVPlacementGT::getMode() const
   {
     return m_mode;
   }

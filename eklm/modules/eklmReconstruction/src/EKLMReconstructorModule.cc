@@ -31,8 +31,10 @@ EKLMReconstructorModule::~EKLMReconstructorModule()
 
 void EKLMReconstructorModule::initialize()
 {
-  B2INFO("EKLMReconstructorModule initialized");
+  StoreArray<EKLMSectorHit>::registerPersistent();
+  StoreArray<EKLMHit2d>::registerPersistent();
   (EKLMTransformationFactory::getInstance())->readFromFile(m_stripInfromationDBFile.c_str());
+  B2INFO("EKLMReconstructorModule initialized");
 }
 
 void EKLMReconstructorModule::beginRun()

@@ -41,8 +41,10 @@ EKLMDigitizerModule::~EKLMDigitizerModule()
 
 void EKLMDigitizerModule::initialize()
 {
-  B2INFO("EKLMDigitizationModule initialized");
+  StoreArray<EKLMSimHit>::registerPersistent();
+  StoreArray<EKLMDigit>::registerPersistent();
   (EKLMTransformationFactory::getInstance())->readFromFile(m_stripInfromationDBFile.c_str());
+  B2INFO("EKLMDigitizationModule initialized");
 }
 
 void EKLMDigitizerModule::beginRun()

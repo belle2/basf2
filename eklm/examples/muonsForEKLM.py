@@ -33,17 +33,17 @@ evtmetagen.param('EvtNumList', [20])
 evtmetagen.param('RunList', [1])
 
 # Particle gun
-particlegun = register_module('PGunInput')
+particlegun = register_module('ParticleGun')
 particlegun.param('nTracks', 1)
-particlegun.param('PIDcodes', [13, -13])
-particlegun.param('pPar1', 20)
-particlegun.param('pPar2', 20.01)
+particlegun.param('pdgCodes', [13, -13])
+particlegun.param('momentumGeneration', 'uniform')
+particlegun.param('momentumParams', [1, 3])
 
-particlegun.param('thetaPar1', 25)
-particlegun.param('thetaPar2', 25.01)
+particlegun.param('thetaGeneration', 'uniform')
+particlegun.param('thetaParams', [17, 150])
 
-particlegun.param('phiPar1', 20)
-particlegun.param('phiPar2', 20.01)
+particlegun.param('phiGeneration', 'uniform')
+particlegun.param('phiParams', [0, 360])
 
 # Geometry parameter loader
 paramloader = register_module('Gearbox')
@@ -58,8 +58,8 @@ geobuilder.param('Components', ['EKLM'])
 g4sim = register_module('FullSim')
 
 # Root file output
-simpleoutput = register_module('SimpleOutput')
-simpleoutput.param('outputFileName', 'muForEKLM.root')
+output = register_module('RootOutput')
+output.param('outputFileName', 'muForEKLM.root')
 
 # MC printuots
 mcprint = register_module('PrintMCParticles')
@@ -86,7 +86,7 @@ main.add_module(g4sim)
 main.add_module(eklmdigi)
 main.add_module(eklmreco)
 
-main.add_module(simpleoutput)
+main.add_module(output)
 
 # Process 100 events
 process(main)

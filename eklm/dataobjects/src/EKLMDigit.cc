@@ -18,23 +18,17 @@
 using namespace std;
 using namespace Belle2;
 
-
 ClassImp(Belle2::EKLMDigit);
-
-
-
-
 
 EKLMDigit::EKLMDigit(const EKLMSimHit* hit)
   : EKLMHitBase((EKLMHitBase)(*hit)),
     m_Plane(hit->getPlane()),
     m_Strip(hit->getStrip()),
     m_NumberPhotoElectrons(-1),
-    m_pv(hit->getVolume()),
-    m_MCtime(hit->getTime())
-{}
-
-
+    m_MCtime(hit->getTime()),
+    m_pv(hit->getVolume())
+{
+}
 
 double EKLMDigit::getNumberPhotoElectrons() const
 {
@@ -46,7 +40,6 @@ void EKLMDigit::setNumberPhotoElectrons(double npe)
   m_NumberPhotoElectrons = npe;
 }
 
-
 bool EKLMDigit::isGood() const
 {
   return m_good;
@@ -57,19 +50,21 @@ void EKLMDigit::isGood(bool status)
   m_good = status;
 }
 
-
 int EKLMDigit::getPlane() const
 {
   return m_Plane;
 }
+
 void EKLMDigit::setPlane(int plane)
 {
   m_Plane = plane;
 }
+
 int EKLMDigit::getStrip() const
 {
   return m_Strip;
 }
+
 void EKLMDigit::setStrip(int strip)
 {
   m_Strip = strip;

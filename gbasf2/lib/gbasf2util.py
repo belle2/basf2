@@ -381,9 +381,12 @@ class CLIParams:
                             else:
                                 eachline += "sinput.param('inputFileName','" \
                                     + files[0] + "')\n"
+                if eachline.find('project') > -1:
+                    eachline = '#' + eachline
             fnew.write(eachline)
         for lfn in lfns:
             fnew.write('LFN="%s"\r\n' % lfn)
+        fnew.write('project="%s"\r\n' % self.project)
         fold.close()
         fnew.close()
         return NewSteeringFile

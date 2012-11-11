@@ -88,11 +88,11 @@ void HepevtInputModule::initialize()
     if (m_runNum == 0 && m_expNum == 0)
       B2WARNING("HEPEVT reader acts as master module, but no run and experiment number set. Using defaults.");
     //register EventMetaData object in data store
-    StoreObjPtr<EventMetaData> eventMetaDataPtr;
+    StoreObjPtr<EventMetaData>::registerPersistent("EventMetaData");
   }
 
   //Initialize MCParticle collection
-  StoreArray<MCParticle> MCParticles;
+  StoreArray<MCParticle>::registerPersistent("MCParticles");
 }
 
 
@@ -100,7 +100,8 @@ void HepevtInputModule::event()
 {
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-  B2INFO("HEPEVT processes event NR " << eventMetaDataPtr->getEvent());
+  if (!eventMetaDataPtr) eventMetaDataPtr.create();
+  // B2INFO("HEPEVT processes event NR " << eventMetaDataPtr->getEvent());
 
   try {
     mpg.clear();

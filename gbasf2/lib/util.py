@@ -106,6 +106,7 @@ def make_jdl(
         f.write('   Parameters = %d;\n' % repetitionOfJob)
         f.write('   ParameterStart = 1;\n')
         f.write('   ParameterStep = 1;\n')
+        f.write('   ExecutionEnvironment = {"GBASF2_PARAMETER=%n"};\n')
     f.write('    PilotType = "private";\n')
     f.write('    SystemConfig = ' + sysconfig + ';\n')
     if site != '':

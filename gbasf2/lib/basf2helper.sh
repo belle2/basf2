@@ -46,6 +46,21 @@ setuprel $2
 
 cd $WORKDIR
 
+# Modify output filename of parametric job
+GBASF2_PARAMETER=${GBASF2_PARAMETER:--1}
+if [ $GBASF2_PARAMETER -ge 0 ]; then
+cat<<EOF>tmp.awk
+\$0 ~ "outputFileName" {sfx=\$2;
+sub(/\.[A-Za-z0-9]+')$/,"-"$GBASF2_PARAMETER,\$2);
+sub(/^.+\./,".",sfx);
+print \$1 \$2 sfx}
+\$0 !~ "outputFileName" {print \$0}
+EOF
+awk -f tmp.awk $1 > tmp.$1
+mv -f tmp.$1 $1
+rm tmp.awk
+fi
+
 basf2 --info > basf2.error 2>&1
 if [ $? -ne 0 ]; then
   cat basf2.error

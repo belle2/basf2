@@ -48,7 +48,7 @@ parser.add_option(
     '--resolutionStereo',
     dest='resolutionStereo',
     type=float,
-    default='200.',
+    default='2.',
     help='resolution of stereo hits',
     )
 parser.add_option(

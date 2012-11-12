@@ -148,6 +148,12 @@ namespace Belle2 {
      */
     int getInnermostAxialLayer();
 
+    /**
+     *  Returns a weight, calculated from the contributing hits.
+     *  Quite useless right now, but is an example how quality cuts based on information from contributing hits could look like.
+     */
+    double getLayerWaight();
+
   private:
 
     std::vector<CDCLegendreTrackHit*> m_TrackHits; /**< vector to store TrackCandidateHits belonging to this TrackCandidate */

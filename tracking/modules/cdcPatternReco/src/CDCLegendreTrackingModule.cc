@@ -344,7 +344,7 @@ bool CDCLegendreTrackingModule::fullfillsQualityCriteria(CDCLegendreTrackCandida
   if (trackCandidate->getNAxialHits() < m_threshold)
     return false;
 
-  if (trackCandidate->getInnermostAxialLayer() > 2)
+  if (trackCandidate->getLayerWaight() < 1)
     return false;
 
   return true;

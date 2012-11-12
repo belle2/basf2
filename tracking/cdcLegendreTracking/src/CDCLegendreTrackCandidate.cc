@@ -236,3 +236,23 @@ int CDCLegendreTrackCandidate::getInnermostAxialLayer()
 
   return minLayer;
 }
+
+double CDCLegendreTrackCandidate::getLayerWaight()
+{
+  int maxLayer = -999;
+  BOOST_FOREACH(CDCLegendreTrackHit * hit, m_TrackHits) {
+    if (hit->getIsAxial()) {
+      if (hit->getLayerId() > maxLayer)
+        maxLayer = hit->getLayerId();
+    }
+  }
+
+  double layerWaight = 0;
+  BOOST_FOREACH(CDCLegendreTrackHit * hit, m_TrackHits) {
+    if (hit->getIsAxial()) {
+      layerWaight += 1. / (hit->getLayerId() + 1);
+    }
+  }
+
+  return layerWaight;
+}

@@ -183,9 +183,15 @@ void DisplayModule::event()
   }
 
   StoreArray<ECLHit> eclhits;
+  RelationIndex<MCParticle, ECLHit> mcpart_to_eclhits(mcparticles, eclhits);
   const int nECLHits = eclhits.getEntries();
   for (int i = 0; i < nECLHits; i++) {
-    m_visualizer->addECLHit(eclhits[i]);
+    const RelationIndexContainer<MCParticle, ECLHit>::Element* el = mcpart_to_eclhits.getFirstElementTo(eclhits[i]);
+    if (!el) {
+      B2WARNING("MCParticle not found for ECLHit, skipping hit!");
+      continue;
+    }
+    m_visualizer->addECLHit(eclhits[i], el->from);
   }
 
 

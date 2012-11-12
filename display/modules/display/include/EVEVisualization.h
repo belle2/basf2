@@ -116,7 +116,7 @@ namespace Belle2 {
     void addSimHit(const TVector3& v, const MCParticle* particle);
 
     /** Add a ECL hit. */
-    void addECLHit(const ECLHit* hit);
+    void addECLHit(const ECLHit* hit, const MCParticle* particle);
 
     /** Return MCTrack for given particle, add it if it doesn't exist yet. */
     MCTrack& addMCParticle(const MCParticle* particle);

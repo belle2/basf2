@@ -90,7 +90,7 @@ void VertexerModule::event()
   const int eventCounter = eventMetaDataPtr->getEvent();
 
   B2DEBUG(100, "********   VertexerModule  processing event number: " << eventCounter << " ************");
-  StoreArray<GFTrack> gfTracks;
+  StoreArray<GFTrack> gfTracks(m_gfTracksColName);
   const int nGfTracks = gfTracks.getEntries();
   //StoreArray<MCParticle> mcParticles;
   //StoreArray<GFTrackCand> trackCandidates;

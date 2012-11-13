@@ -44,7 +44,7 @@ VertexerModule::VertexerModule() : Module()
   addParam("useGenfitPropagation", m_useGenfitPropagation, "use either the Genfit propagation (default) or the Rave propagation (vacuum only)", true);
   addParam("beamSpotPosition", m_beamSpotPos, "the position of the beam spot", vector<double>(0));
   addParam("beamSpotCovariance", m_beamSpotCov, "the covariance matrix of the beam spot position", vector<double>(0));
-
+  addParam("GFTracksColName", m_gfTracksColName, "Name of collection of GFTracks used for input", string(""));
 }
 
 

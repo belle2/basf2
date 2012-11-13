@@ -50,6 +50,7 @@ namespace Belle2 {
     std::vector<double> m_beamSpotCov; /**< the user chosen beam spot position covariance matrix. User must provide 9 values (will be interpreted as a 3x3 matrix)*/
     int m_ndfTooSmallCounter; /**< counter for the events that have too little information (number of degrees of freedom (ndf)) to reconstruct at least one vertex */
     int m_fittedVertices; /**< counts the number of vertices rave was able to fit */
+    std::string m_gfTracksColName; /**< Name of collection of GFTracks used for input */
   };
 }
 

@@ -23,12 +23,13 @@
 #include <vector>
 
 #include <framework/logging/Logger.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
   /**
    * A Class to store the Monte Carlo particle information.
    */
-  class MCParticle: public TObject {
+  class MCParticle: public RelationsObject {
   public:
 
     //Define exceptions
@@ -498,7 +499,7 @@ namespace Belle2 {
 
     EspinType m_spinType;        /**< Spin type of the particle as provided by the generator. */
     /** Class definition required for the creation of the ROOT dictionary. */
-    ClassDef(MCParticle, 1);
+    ClassDef(MCParticle, 2);
   };
 
 

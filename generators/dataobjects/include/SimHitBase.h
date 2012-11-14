@@ -11,8 +11,7 @@
 #ifndef SIMHITBASE_H
 #define SIMHITBASE_H
 
-// ROOT
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 
 namespace Belle2 {
@@ -27,7 +26,7 @@ namespace Belle2 {
     * to be usable for background mixing.
     * It implements a background type tag and a method to shift the SimHit in time.
     */
-  class SimHitBase : public TObject {
+  class SimHitBase : public RelationsObject {
   public:
     /** Enum for background tags. */
     enum BG_TAG { bg_none         = 0, /**< No background.*/
@@ -65,7 +64,7 @@ namespace Belle2 {
     /** Background tag */
     unsigned short m_backgroundTag;
 
-    ClassDef(SimHitBase, 1)
+    ClassDef(SimHitBase, 2)
   };
 
   /** @}*/

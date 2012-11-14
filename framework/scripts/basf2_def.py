@@ -3,12 +3,23 @@
 
 from basf2_env import *
 
-import os
 import textwrap
+from subprocess import Popen, PIPE
+
+
+def get_terminal_width():
+    """
+    Returns width of terminal in characters, or 80 if unknown.
+    """
+    try:
+        pipe = Popen('stty size', shell=True, stdout=PIPE, stderr=PIPE)
+        return int(pipe.stdout.read().split()[1])
+    except:
+        return 80
 
 
 def register_module(name, shared_lib_path=None):
-    """"
+    """
     This function registers a new module
 
     name: The name of the module type
@@ -63,14 +74,9 @@ def print_all_modules(moduleList):
     register them and print their information
     """
 
-    # how many characters to print per line?
-    try:
-        # get terminal width
-        term_width = int(os.popen('stty size', 'r').read().split()[1])
-        if term_width < 50:
-            term_width = 50
-    except:
-        term_width = 80
+    term_width = get_terminal_width()
+    if term_width < 50:
+        term_width = 50
 
     for (moduleName, sharedLib) in sorted(moduleList.iteritems()):
         try:
@@ -91,8 +97,7 @@ def print_all_modules(moduleList):
             continued = True
 
     print ''
-    print '------------------------------------------------------' \
-        + '-----------------------'
+    print term_width * '-'
     print ''
     print 'To show detailed information on a module, including its parameters,'
     print 'type \'basf2 -m ModuleName\'.'
@@ -108,6 +113,8 @@ def print_params(module, print_values=True, shared_lib_path=None):
                      loaded
     """
 
+    term_width = get_terminal_width()
+
     print ''
     print '==================='
     print '%s' % module.name()
@@ -115,14 +122,7 @@ def print_params(module, print_values=True, shared_lib_path=None):
     print 'Description: %s' % module.description()
     if shared_lib_path is not None:
         print 'Found in:    %s' % shared_lib_path
-    print 80 * '-'
-
-    # how many characters to print per line?
-    try:
-        # get terminal width
-        term_width = int(os.popen('stty size', 'r').read().split()[1])
-    except:
-        term_width = 80
+    print term_width * '-'
 
     #gather output data in table
     output = []
@@ -200,7 +200,7 @@ def print_params(module, print_values=True, shared_lib_path=None):
                 row[i] = ''
 
         if not header_shown:
-            print 80 * '-'
+            print term_width * '-'
             header_shown = True
     print ''
     if has_forced_params:

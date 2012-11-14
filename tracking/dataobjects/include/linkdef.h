@@ -13,7 +13,7 @@
 #pragma link C++ class Belle2::VXDTFHit;
 #pragma link C++ class Belle2::VXDSegmentCell;
 #pragma link C++ class Belle2::VXDTFTrackCandidate;
-// #pragma link C++ class Belle2::VXDTFInfoBoard;
+#pragma link C++ class Belle2::VXDTFInfoBoard;
 //#pragma link C++ class Belle2::VertexFitterVertexContainer;
 
 #endif

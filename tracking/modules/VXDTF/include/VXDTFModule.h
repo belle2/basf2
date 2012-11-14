@@ -21,6 +21,7 @@
 #include <tracking/dataobjects/VXDSegmentCell.h>
 #include <tracking/dataobjects/VXDSector.h>
 #include <tracking/dataobjects/VXDTFTrackCandidate.h>
+#include <tracking/dataobjects/VXDTFInfoBoard.h>
 
 //C++ base / C++ stl:
 #include <fstream>
@@ -39,6 +40,9 @@
 //boost:
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/casts.hpp>
+#ifndef __CINT__
+#include <boost/unordered_map.hpp>
+#endif
 
 //genfit:
 #include <GFTrackCand.h>
@@ -59,10 +63,15 @@ namespace Belle2 {
 
     struct CurrentPassData; /**< forward declaration  */
 
-    typedef std::map<std::string, VXDSector*> MapOfSectors;
+//      boost::unordered_map
+
+//    typedef std::map<std::string, VXDSector*> MapOfSectors;
+//    typedef std::map<std::string, Cutoff*> CutoffMap;
+//     typedef std::map<std::string, CutoffMap*> MapOfCutoffTypes;
+    typedef boost::unordered_map<std::string, VXDSector*> MapOfSectors;
     typedef std::pair<std::string, VXDSector* > secMapEntry;
-    typedef std::map<std::string, Cutoff*> CutoffMap;
-    typedef std::map<std::string, CutoffMap*> MapOfCutoffTypes;
+    typedef boost::unordered_map<std::string, Cutoff*> CutoffMap;
+    typedef boost::unordered_map<std::string, CutoffMap*> MapOfCutoffTypes;
     typedef std::vector<VXDTFHit*> HitsOfEvent;
     typedef std::list<VXDSegmentCell*> ActiveSegmentsOfEvent; /**< is list since random deleting processes are needed */
     typedef std::vector<VXDSegmentCell*> TotalSegmentsOfEvent; /**< is vector since no entries are deleted and random access is needed  */
@@ -73,26 +82,30 @@ namespace Belle2 {
 
 
     /** structs for internal use **/
-    struct SensorStruct { /**< needed for SVDCluster sorting  */
+    /** SensorStruct needed for SVDCluster sorting, stores u and v clusters of Sensor  */
+    struct SensorStruct {
       std::vector<std::pair<int, Belle2::SVDCluster*> > uClusters; /**< .first is arrayIndex in StoreArray, .second is pointer to the Cluster itself */
       std::vector<std::pair<int, Belle2::SVDCluster*> > vClusters; /**< same as uClusters, but for vClusters  */
     };
 
 
-    struct ClusterHit { /**< needed for SVDCluster sorting */
+    /** needed for SVDCluster sorting, represents a 2D-cluster (combining 2 1D-clusters) */
+    struct ClusterHit {
       SVDCluster* uCluster; /**< pointer to uCluster of current Hit */
       SVDCluster* vCluster; /**< pointer to vCluster of current Hit */
       int uClusterIndex; /**< index number of uCluster of current Hit */
       int vClusterIndex; /**< index number of uCluster of current Hit */
     };
 
-    struct ClusterUsage { /**< stores information to each cluster which TC is using it */
+    /** stores information to each cluster which TC is using it */
+    struct ClusterUsage {
       std::vector<TCsOfEvent > PXDClusters; /**< carries index numbers of all pxd clusters and stores pointers to all TCs using them */
       std::vector<TCsOfEvent> SVDClusters; /**< same as above but for svd clusters (information, whether its u or v is not important) */
     };
 
 
-    struct CurrentPassData { /**< all the information of a pass is stored within a copy of that struct. This allows grouping of that information. */
+    /** all the information of a pass is stored within a copy of that struct. This allows grouping of that information. */
+    struct CurrentPassData {
       /** ** filled once ** **/
       MapOfSectors sectorMap; /**< carries the whole lookup-table including the information of which sectors can be combined */
 
@@ -106,8 +119,8 @@ namespace Belle2 {
       int minState; /**< lowest state considered for seeds during TCC */
 
       /** soon to come (maybe even layer-specific): **/
-      std::vector<float> secConfigU;  /**< defines subdivition of sensors U */
-      std::vector<float> secConfigV; /**< defines subdivition of sensors V */
+      std::vector<double> secConfigU;  /**< defines subdivition of sensors U */
+      std::vector<double> secConfigV; /**< defines subdivition of sensors V */
 
       /** for segFinder, compares 2 hits**/
       Filter distance3D; /**< carries information about the filter 'distance3D', type pair<bool isActivated, double tuningParameter> */
@@ -199,8 +212,8 @@ namespace Belle2 {
         TVector3 localHit,
         TVector3 sensorSize,
         VXDTFModule::MapOfSectors& m_sectorMap,
-        std::vector<float>& uConfig,
-        std::vector<float>& vConfig);
+        std::vector<double>& uConfig,
+        std::vector<double>& vConfig);
 
 
     /** needed for sorting sectorSequence and compares strings... */
@@ -226,8 +239,8 @@ namespace Belle2 {
 
 
     /** filters TCs via deltaPt, ZigZag and deltaDistance2IP */
-    void tcFilter(CurrentPassData* currentPass,
-                  int passNumber);
+    int tcFilter(CurrentPassData* currentPass,
+                 int passNumber);
 
 
     /** name is program, needed for GFTrackCand export */
@@ -256,8 +269,14 @@ namespace Belle2 {
      * This leads to a constant surpression of all overlapping TCs.
      * The result is that all the neuron values stay below the threshold until the neuronal network stops and all overlapping TCs get deactivated.
      * Since this is a problem the hopfield network was not developed for, we have to filter these cases. Another issue is the situation, where the majority of hits are shared, but there are some foreign hits included too.
-     * They have to be treated differently and therefore can not be filtered the way currently implemented. */
-    void cleanOverlappingSet(TCsOfEvent& tcVector);
+     * They have to be treated differently and therefore can not be filtered the way currently implemented.
+     * returns number of deleted TCs.
+     */
+    int cleanOverlappingSet(TCsOfEvent& tcVector);
+
+
+    /** reset all reused containers and delete others which are existing only for one event. */
+    void cleanEvent(CurrentPassData* currentPass, std::string centerSector);
 
 
   protected:
@@ -305,8 +324,8 @@ namespace Belle2 {
     /// needed for pass handling:
     PassSetupVector m_passSetupVector; /**< contains information for each pass */
 
-    std::vector<float> m_PARAMsectorConfigU; /**< allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
-    std::vector<float> m_PARAMsectorConfigV; /**< allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
+    std::vector<double> m_PARAMsectorConfigU; /**< allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
+    std::vector<double> m_PARAMsectorConfigV; /**< allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
     int m_PARAMpdGCode; /**< tandard value is 211 (pi+), ATTENTION, instead of using inconsistent sign of PdGList, in this module positively charged particles are always positive and negatively charged ones are negative (relevant for leptons) */
 
     int m_chargeSignFactor; /**< particle dependent. for leptons it is 1, for other particles it's -1... */
@@ -319,6 +338,11 @@ namespace Belle2 {
     int m_eventCounter; /**< knows current event number */
     int m_badSectorRangeCounter; /**< counts number of hits which couldn't be attached to an existing sector of a pass */
     int m_badFriendCounter; /**< counts number of hits having no neighbour hits in friend sectors of current sector */
+    int m_totalPXDClusters; /**< counts total number of PXDClusters during run */
+    int m_totalSVDClusters; /**< counts total number of SVdClusters during run */
+    int m_totalSVDClusterCombis; /**< counts total number of possible combinations of SVDClusters during run */
+    int m_numOfSectorSetups; /**< stores info about number of sector setups loaded into the track finder */
+    bool m_KFBackwardFilter; /**< determines whether the kalman filter moves inwards or backwards, bool means inwards */
 
     double m_PARAMomega; /**< tuning parameter for hopfield network */
     double m_tcThreshold;   /**< defines threshold for hopfield network. neurons having values below threshold are discarded */
@@ -329,6 +353,7 @@ namespace Belle2 {
     double m_PARAMsmearMean; /**< allows to introduce a bias for QI (e.g. surpressing all values, ...)*/
     double m_PARAMsmearSigma; /**< bigger values deliver broader distribution*/
     bool m_PARAMstoreBrokenQI;/**< if true, TC survives QI-calculation-process even if fit was not possible */
+    bool m_TESTERexpandedTestingRoutines; /**< set true if you want to export expanded infos of TCs for further analysis */
 
     std::string m_PARAMcalcQIType; /**< allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength' */
 
@@ -354,12 +379,21 @@ namespace Belle2 {
     int m_TESTERcountTotalTCsAfterTCCFilter; /**< counts number of TCs which survived the tcc filter */
     int m_TESTERcountTotalTCsFinal; /**< counts number of TCs which survived until the end of event */
     int m_TESTERbadHopfieldCtr; /**< counts number of events, where no TC survived the Hopfield network */
+    int m_TESTERfilteredBadSeedTCs; /**< counts number of TCs which were filtered by calcInitialValues4TCs because of bad seed properties */
     int m_TESTERfilteredOverlapsQI; /**< counts number of TCs filtered by total overlap rule (cleanOverlappingSet) */
     int m_TESTERNotFilteredOverlapsQI; /**< counts number of events, when cleanOverlappingSet was started but didn't filter TCs */
     int m_TESTERfilteredOverlapsQICtr; /**< counts number of times, when TCs get filtered by cleanOverlappingSet */
     int m_TESTERcleanOverlappingSetStartedCtr; /**< counts number of times, when cleanOverlappingSet get started */
     int m_TESTERgoodFitsCtr; /**< counts number of times, the kalman fit worked well */
     int m_TESTERbadFitsCtr; /**< counts number of times, the kalman fit didn't work */
+    int m_TESTERbrokenEventsCtr; /**< counts number of events, where the TF had to be stopped */
+    int m_TESTERdistortedHitCtr; /**< counts number of times, where hit was not situated on the sensor plane */
+    std::vector<std::string> m_TESTERbadSensors; /**< collects SensorIDs of outofrange-hits coding: -layer_ladder_sensor */
+    int m_TESTERtotalsegmentsSFCtr; /**< counts total number of segments produced by the SF */
+    int m_TESTERtotalsegmentsNFCtr; /**< counts total number of segments surviving the NF */
+    int m_TESTERdiscardedSegmentsSFCtr; /**< counts total number of segments discarded by the SF */
+    int m_TESTERdiscardedSegmentsNFCtr; /**< counts total number of segments discarded by the SF */
+
 
   private:
 

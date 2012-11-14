@@ -7,10 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-/// NOTE:These Classes are needed by dataobjects, but shall not be compatible to the datastore for performance reasons, therefore only implemented as .h-file (compare to VXDID)
 #ifndef VXDTFTRACKCANDIDATE_H
 #define VXDTFTRACKCANDIDATE_H
-
 
 
 #include <tracking/dataobjects/VXDTFHit.h>
@@ -44,15 +42,7 @@ namespace Belle2 {
     VXDTFTrackCandidate() { m_overlapping = false; m_alive = true; m_qualityIndex = 1.0; }
 
     /**copy constructor**/
-    VXDTFTrackCandidate(VXDTFTrackCandidate*& other) :
-      m_attachedHits((*other).m_attachedHits),
-      m_attachedCells((*other).m_attachedCells),
-      m_svdHitIndices((*other).m_svdHitIndices),
-      m_pxdHitIndices((*other).m_pxdHitIndices),
-      m_hopfieldHitIndices((*other).m_hopfieldHitIndices),
-      m_overlapping((*other).m_overlapping),
-      m_alive((*other).m_alive),
-      m_qualityIndex((*other).m_qualityIndex) { /*m_neuronValue = 0; m_overlapping = false; m_alive = true; m_qualityIndex = 1.0;*/ }
+    VXDTFTrackCandidate(VXDTFTrackCandidate*& other);
 
     /** getter **/
     std::vector<Belle2::VXDSegmentCell*> getSegments(); /**< returns segments forming current TC */
@@ -60,15 +50,17 @@ namespace Belle2 {
     std::vector<int> getSVDHitIndices() { return m_svdHitIndices; } /**< returns indices of svdClusters forming current TC */
     std::vector<int> getPXDHitIndices() { return m_pxdHitIndices; } /**< returns indices of pxdClusters forming current TC */
     std::list<int> getHopfieldHitIndices() { return m_hopfieldHitIndices; } /**< returns slightly adapted indices for hopfield use only (no real indices, but only unique ones...) */
-    bool getOverlappingState() const { return m_overlapping; } /**< returns flag whether TC is sharing hits with other TCs or not */
+    bool getOverlappingState(); /**< returns flag whether TC is sharing hits with other TCs or not */
     bool getCondition() const { return m_alive; } /**< returns flag whether TC is still "alive" (part of the set of TCs which are probably real tracks based on the knowledge of the TF at the point of calling that function) */
     double getTrackQuality() { return m_qualityIndex; } /**< returns quality index of TC, has to be between 0 (bad) and 1 (perfect) */
     double getQQQ() { return m_qqq; } /**< returns aditional quality index */
     float getNeuronValue() const { return m_neuronValue; } /**< returns state of neuron during hopfield network */
-    TVector3 getInitialCoordinates() const { return m_initialHit; } /**< returns initial coordinates needed for export as GFTrackCandid */
-    TVector3 getInitialMomentum() const { return m_initialMomentum; } /**< returns initial momentum needed for export as GFTrackCandid */
+    TVector3 getInitialCoordinates() const { return m_initialHit; } /**< returns initial coordinates needed for export as GFTrackCand */
+    TVector3 getInitialMomentum() const { return m_initialMomentum; } /**< returns initial momentum needed for export as GFTrackCand */
     int getPDGCode() const { return m_pdgCode; } /**< returns estimated PDGCode (its always a pion, but charge changes depending of the sign of the curvature of the track) needed for export as GFTrackCandid */
     int getPassIndex() { return m_passIndex; } /**< TCs are passDependent and are merged at the end of the TF-process to be filtered there */
+    bool getFitSucceeded() { return m_fitSucceeded; } /**< returns true if kalman fit was possible and returned a result itself */
+    int size() { return m_attachedHits.size(); }
 
     /** setter **/
     void addSVDClusterIndex(int anIndex); /**< add index number of SVDCluster attached to current TC */
@@ -84,6 +76,7 @@ namespace Belle2 {
     void removeVirtualHit(); /**< removes virtual hit which is needed for most filtering steps */
     void setInitialValue(TVector3 aHit, TVector3 pVector, int pdg); /**< set initial values for TC, needed by GFTrackCand */
     void setPassIndex(int anIndex); /**< sets pass index number containing current TC */
+    void setFitSucceeded(bool yesNo); /**< set true, if kalman fit was possible, else: false */
 
 
   protected:
@@ -100,6 +93,7 @@ namespace Belle2 {
     float m_neuronValue;  /**< QI for hopfield network */
     int m_pdgCode;  /**< estimated PDGCode of TC */
     int m_passIndex;  /**< TF supports several passes per event, this value is needed for some passSpecific parameters. */
+    bool m_fitSucceeded; /**< returns true if kalman fit was possible and returned a result itself */
 
     TVector3 m_initialHit;  /**< coordinates of initial hit of TC */
     TVector3 m_initialMomentum;  /**< momentum of initial hit of TC */

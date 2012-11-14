@@ -15,6 +15,10 @@
 
 #include <list>
 #include <map>
+#include <string>
+#ifndef __CINT__
+#include <boost/unordered_map.hpp>
+#endif
 
 #include <TVector3.h>
 
@@ -22,6 +26,7 @@
 #include <tracking/dataobjects/VXDSector.h>
 
 #include <TObject.h>
+
 
 namespace Belle2 {
 
@@ -37,6 +42,10 @@ namespace Belle2 {
    */
   class VXDSegmentCell: public TObject {
   public:
+//    using boost::unordered_map;
+#ifndef __CINT__
+    typedef boost::unordered_map<std::string, VXDSector*> MapOfSectors;
+#endif
 
     /** Default constructor for the ROOT IO. */
     VXDSegmentCell():
@@ -51,7 +60,9 @@ namespace Belle2 {
     //      * @param pOuterSector pointer to sector in which the outer hit lies.
     //      * @param pInnerSector pointer to sector in which the inner hit lies.
     //      */
-    VXDSegmentCell(VXDTFHit* pOuterHit, VXDTFHit* pInnerHit, std::map<std::string, VXDSector*>::iterator pOuterSector, std::map<std::string, VXDSector*>::iterator pInnerSector);
+#ifndef __CINT__
+    VXDSegmentCell(VXDTFHit* pOuterHit, VXDTFHit* pInnerHit, MapOfSectors::iterator pOuterSector, MapOfSectors::iterator pInnerSector);
+#endif
 
     int getState() const { return m_state; } /**< returns state of Cell (CA-feature) */
     bool isSeed() const { return m_seed; } /**< returns whether Cell is allowed to be a seed for TCs */
@@ -77,8 +88,10 @@ namespace Belle2 {
   protected:
     VXDTFHit* m_pOuterHit; /**< pointer to hit forming the outer end of the SegmentCell. */
     VXDTFHit* m_pInnerHit; /**< pointer to hit forming the inner end of the SegmentCell. */
-    std::map<std::string, VXDSector*>::iterator m_pOuterSector; /**< link to sector carrying outer hit */
-    std::map<std::string, VXDSector*>::iterator m_pInnerSector; /**< link to sector carrying inner hit */
+#ifndef __CINT__
+    MapOfSectors::iterator m_pOuterSector; /**< link to sector carrying outer hit */
+    MapOfSectors::iterator m_pInnerSector; /**< link to sector carrying inner hit */
+#endif
     int m_state; /**< state of Cell during CA process, begins with 0 */
     bool m_activated; /**< activation state. Living Cells (active) are allowed to evolve in the CA, dead ones (inactive) are not allowed */
     bool m_stateUpgrade; /**< sets flag whether Cell is allowed to increase state during update step within CA */

@@ -22,9 +22,36 @@ using namespace Belle2;
 
 
 ClassImp(VXDTFTrackCandidate)
+
+
+VXDTFTrackCandidate::VXDTFTrackCandidate(VXDTFTrackCandidate*& other) :
+  m_attachedHits((*other).m_attachedHits),
+  m_attachedCells((*other).m_attachedCells),
+  m_svdHitIndices((*other).m_svdHitIndices),
+  m_pxdHitIndices((*other).m_pxdHitIndices),
+  m_hopfieldHitIndices((*other).m_hopfieldHitIndices),
+  m_overlapping((*other).m_overlapping),
+  m_alive((*other).m_alive),
+  m_qualityIndex((*other).m_qualityIndex)
+{
+  if (m_alive == true) { BOOST_FOREACH(VXDTFHit * aHit, m_attachedHits) { aHit->addTrackCandidate(); } }   // each time it gets copied, its hits have to be informed about that step
+  /*m_neuronValue = 0; m_overlapping = false; m_alive = true; m_qualityIndex = 1.0;*/
+}
+
 /** getter **/
 std::vector<Belle2::VXDSegmentCell*> VXDTFTrackCandidate::getSegments() { return m_attachedCells; }
 std::vector<Belle2::VXDTFHit*> VXDTFTrackCandidate::getHits() { return m_attachedHits; }
+bool VXDTFTrackCandidate::getOverlappingState()
+{
+  return m_overlapping;
+///   int currentNumber = 1;
+///   BOOST_FOREACH(VXDTFHit * aHit, m_attachedHits) {
+///     if ( currentNumber != aHit->getNumberOfTrackCandidates() ) {
+///       return true;
+///     }
+///   }
+///   return false;
+}
 
 /** setter **/
 void VXDTFTrackCandidate::addSVDClusterIndex(int anIndex) { m_svdHitIndices.push_back(anIndex); }
@@ -40,8 +67,11 @@ void VXDTFTrackCandidate::addSegments(Belle2::VXDSegmentCell* pCell) { m_attache
 //    m_attachedCells.push_back(vCells[i]);
 //  }
 // }
-void VXDTFTrackCandidate::addHits(VXDTFHit* pHit) { m_attachedHits.push_back(pHit); }
-
+void VXDTFTrackCandidate::addHits(VXDTFHit* pHit)
+{
+  pHit->addTrackCandidate();
+  m_attachedHits.push_back(pHit);
+}
 // void VXDTFTrackCandidate::addHits(std::vector<VXDTFHit*> vHits) { /// TODO: check whether this memberfunction is still needed
 //  int num = vHits.size();
 //  for (int i = 0; i < num; i++) {
@@ -60,13 +90,18 @@ void VXDTFTrackCandidate::setQQQ(double qqqScore, double maxScore)
 
 void VXDTFTrackCandidate::setCondition(bool newCondition)
 {
-  m_alive = newCondition;
-  if (newCondition == false) {
+  if (m_alive == true && newCondition == false) {   // in this case, the TC will be deactivated
     BOOST_FOREACH(VXDTFHit * aHit, m_attachedHits) {
       aHit->removeTrackCandidate();
     }
+  } else if (m_alive == false && newCondition == true) {   // in this case the TC will be (re)activated
+    BOOST_FOREACH(VXDTFHit * aHit, m_attachedHits) {
+      aHit->addTrackCandidate();
+    }
   }
+  m_alive = newCondition;
 }
+
 
 void VXDTFTrackCandidate::setNeuronValue(float aValue) { m_neuronValue = aValue; }
 
@@ -90,7 +125,6 @@ void VXDTFTrackCandidate::removeVirtualHit()   /// removing virtual hit/segment 
     m_attachedHits = tempHitVector;
   }
 
-
   virtualIndex = -1;
   numOfEntries = m_attachedCells.size();
   for (int thisSeg = 0 ; thisSeg < numOfEntries; ++thisSeg) {
@@ -113,3 +147,5 @@ void VXDTFTrackCandidate::removeVirtualHit()   /// removing virtual hit/segment 
 void VXDTFTrackCandidate::setInitialValue(TVector3 aHit, TVector3 pVector, int pdg) { m_initialHit = aHit; m_initialMomentum = pVector; m_pdgCode = pdg; }
 
 void VXDTFTrackCandidate::setPassIndex(int anIndex) { m_passIndex = anIndex; }
+
+void VXDTFTrackCandidate::setFitSucceeded(bool yesNo) { m_fitSucceeded = yesNo; }

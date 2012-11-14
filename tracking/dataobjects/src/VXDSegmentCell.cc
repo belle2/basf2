@@ -19,7 +19,7 @@ using namespace Belle2;
 ClassImp(VXDSegmentCell)
 
 
-VXDSegmentCell::VXDSegmentCell(VXDTFHit* pOuterHit, VXDTFHit* pInnerHit, std::map<std::string, VXDSector*>::iterator pOuterSector, std::map<std::string, VXDSector*>::iterator pInnerSector):
+VXDSegmentCell::VXDSegmentCell(VXDTFHit* pOuterHit, VXDTFHit* pInnerHit, MapOfSectors::iterator pOuterSector, MapOfSectors::iterator pInnerSector):
   m_pOuterHit(pOuterHit),
   m_pInnerHit(pInnerHit),
   m_pOuterSector(pOuterSector),

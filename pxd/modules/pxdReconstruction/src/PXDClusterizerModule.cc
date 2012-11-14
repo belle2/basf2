@@ -44,6 +44,8 @@ PXDClusterizerModule::PXDClusterizerModule() : Module(), m_elNoise(200.0),
 {
   //Set module properties
   setDescription("Cluster PXDHits");
+  setPropertyFlags(c_ParallelProcessingCertified);
+
   addParam("ElectronicNoise", m_elNoise,
            "Noise added by the electronics, set in ENC", m_elNoise);
   addParam("NoiseSN", m_cutAdjacent,

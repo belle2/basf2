@@ -14,10 +14,10 @@ if len(sys.argv) == 2:
     if sys.argv[1] in avModList:
         try:
             current_module = register_module(sys.argv[1])
+            print_params(current_module, False, avModList[sys.argv[1]])
         except:
             B2ERROR('The module could not be loaded. This is most likely '
                     + 'caused by a library with missing links.')
-        print_params(current_module, False, avModList[sys.argv[1]])
     else:
         B2ERROR('Print module information: A module with the name "'
                 + sys.argv[1] + '" does not exist!')

@@ -18,6 +18,90 @@ def get_terminal_width():
         return 80
 
 
+def pretty_print_table(table, column_widths, first_row_is_heading=True):
+    """
+    Pretty print a given table, by using available terminal size and
+    word wrapping fields as needed.
+
+    table: A 2d list of table fields. Each row must have the same length.
+    column_width: list of column widths, needs to be of same length as rows
+                  in 'table'. Available fields are:
+                  -n  as needed, up to n characters, word wrap if longer
+                  n   n characters (fixed)
+                  *   use all available space, good for description fields
+                      (can only be used ONCE)
+    first_row_is_heading: header specifies if we should take the first row
+                          as table header and offset it a bit
+    """
+
+    #figure out how much space we need for each column (without separators)
+    act_column_widths = [len(cell) for cell in table[0]]
+    for row in table:
+        for col, cell in enumerate(row):
+            act_column_widths[col] = max(len(str(cell)),
+                    act_column_widths[col])
+
+    #adjust act_column_widths to comply with user-specified widths
+    total_used_width = 0
+    long_column = -1  # index of * column, if found
+    for col, opt in enumerate(column_widths):
+        if opt == '*':
+            if long_column >= 0:
+                print 'column_widths option "*" can only be used once!'
+                return
+
+            # handled after other fields are set
+            long_column = col
+            continue
+        elif type(opt) is int and opt > 0:
+            # fixed width
+            act_column_widths[col] = opt
+        elif type(opt) is int and opt < 0:
+            # width may be at most 'opt'
+            act_column_widths[col] = min(act_column_widths[col], -opt)
+        else:
+            print 'Invalid column_widths option "' + str(opt) + '"'
+            return
+        total_used_width += act_column_widths[col]
+
+    # add separators
+    total_used_width += len(act_column_widths) - 1
+
+    term_width = get_terminal_width()
+    if long_column >= 0:
+        # TODO: add option for minimum widh?
+        remaining_space = max(term_width - total_used_width, 10)
+        act_column_widths[long_column] = remaining_space
+
+    format_string = ' '.join(['%%-%ss' % length
+            for length in act_column_widths[:-1]])
+    # don't print extra spaces at end of each line
+    format_string += ' %s'
+
+    # print table
+    if first_row_is_heading:
+        print term_width * '-'
+
+    header_shown = False
+    for row in table:
+        # use automatic word wrapping on module description (last field)
+        wrapped_row = [textwrap.wrap(str(row[i]), width)
+                for i, width in enumerate(act_column_widths)]
+        max_lines = max([len(col) for col in wrapped_row])
+        for line in xrange(max_lines):
+            for i, cell in enumerate(row):
+                if line < len(wrapped_row[i]):
+                    row[i] = wrapped_row[i][line]
+                else:
+                    row[i] = ''
+
+            print format_string % tuple(row)
+
+        if not header_shown and first_row_is_heading:
+            print term_width * '-'
+            header_shown = True
+
+
 def register_module(name, shared_lib_path=None):
     """
     This function registers a new module
@@ -75,9 +159,8 @@ def print_all_modules(moduleList):
     """
 
     term_width = get_terminal_width()
-    if term_width < 50:
-        term_width = 50
 
+    table = []
     for (moduleName, sharedLib) in sorted(moduleList.iteritems()):
         try:
             current_module = register_module(moduleName)
@@ -85,16 +168,9 @@ def print_all_modules(moduleList):
             B2ERROR('The module could not be loaded. This is most likely '
                     + 'caused by a library with missing links.')
 
-        # use automatic word wrapping on module description
-        description = textwrap.wrap(current_module.description(),
-                term_width - 22)
-        continued = False
-        for text in description:
-            if continued:
-                moduleName = ''
-            print '%-21s %-s' % (moduleName, text)
-            # ommit module name on all following lines
-            continued = True
+        table.append([moduleName, current_module.description()])
+
+    pretty_print_table(table, [25, '*'], first_row_is_heading=False)
 
     print ''
     print term_width * '-'
@@ -113,16 +189,13 @@ def print_params(module, print_values=True, shared_lib_path=None):
                      loaded
     """
 
-    term_width = get_terminal_width()
-
     print ''
-    print '==================='
-    print '%s' % module.name()
-    print '==================='
+    print '=' * (len(module.name()) + 4)
+    print '  %s' % module.name()
+    print '=' * (len(module.name()) + 4)
     print 'Description: %s' % module.description()
     if shared_lib_path is not None:
         print 'Found in:    %s' % shared_lib_path
-    print term_width * '-'
 
     #gather output data in table
     output = []
@@ -163,45 +236,11 @@ def print_params(module, print_values=True, shared_lib_path=None):
             output.append([forceString + paramItem.name, paramItem.type,
                 defaultStr, paramItem.description])
 
-    #figure out how much space we need for each column (without separators)
-    column_lengths = [len(cell) for cell in output[0]]
-    for row in output:
-        for col, cell in enumerate(row):
-            column_lengths[col] = max(len(str(cell)), column_lengths[col])
+    column_widths = [-25] * len(output[0])
+    column_widths[2] = -20  # default values
+    column_widths[-1] = '*'  # description
 
-    #both description and default value might be fairly long, set a limit
-    default_value_width = min(column_lengths[2], 20)
-    column_lengths[2] = default_value_width
-
-    #total width of printed table, minus description
-    total_width = sum(column_lengths[:-1]) + len(column_lengths) - 1
-    description_width = max(term_width - total_width, 10)
-    column_lengths[-1] = description_width
-
-    format_string = ' '.join(['%%-%ss' % length
-            for length in column_lengths[:-1]])
-    format_string += ' %s'
-
-    header_shown = False
-    for row in output:
-        # use automatic word wrapping on module description (last field)
-        default_lines = textwrap.wrap(row[2], default_value_width)
-        description_lines = textwrap.wrap(row[-1], description_width)
-        for line in xrange(max(len(default_lines), len(description_lines))):
-            if line < len(default_lines):
-                row[2] = default_lines[line]
-            if line < len(description_lines):
-                row[-1] = description_lines[line]
-
-            print format_string % tuple(row)
-
-            # ommit other cols on all following lines
-            for i in xrange(len(row)):
-                row[i] = ''
-
-        if not header_shown:
-            print term_width * '-'
-            header_shown = True
+    pretty_print_table(output, column_widths)
     print ''
     if has_forced_params:
         print ' * denotes a required parameter.'

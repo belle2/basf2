@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Implementation of AmgaClient class used for communication with AMGA metadata catalog
+# AmgaClient class used for communication with AMGA metadata catalog
 # Author: Milosz Zdybal (milosz.zdybal@ifj.edu.pl)
 # 2010-01
 # Editor: Tom Fifield (fifieldt@unimelb.edu.au)
 # 2010-11
-
 import mdclient
 import mdinterface
 import sys
@@ -40,8 +39,7 @@ class AmgaClient(object):
         'site': 'varchar(32)',
         'software': 'varchar(32)',
         'user': 'varchar(32)',
-        }
-#        'log': 'varchar(32)',
+    }
 
     config = None
     client = None
@@ -55,25 +53,15 @@ class AmgaClient(object):
 
         try:
             # First, try to connect a proxy
-            if os.environ.has_key('X509_USER_PROXY') and not gethostname() \
-                == 'kek2-uidev.cc.kek.jp':
+            if 'X509_USER_PROXY' in os.environ:
                 print 'using X509 auth'
-                # self.client = mdclient.MDClient('150.183.246.196', 8822, '')
                 self.client = mdclient.MDClient('202.13.207.226', 8822, '')
-                # self.client = mdclient.MDClient('cgh10.collab.unimelb.edu.au',
-                #        8822, '')
                 self.client.requireSSL(os.environ['X509_USER_PROXY'],
                                        os.environ['X509_USER_PROXY'])
             else:
-                print 'using password auth'
-              # self.client = mdclient.MDClient('amga.ijs.si', 8822, '', '')
-                self.client = mdclient.MDClient('cgh10.collab.unimelb.edu.au',
-                        8822, 'belle_user', 'belle')
+                raise Exception('Could not find X509 proxy')
         except Exception, ex:
-              # self.client = mdclient.MDClient('cgh7.collab.unimelb.edu.au', 8822, '', '')
-              # self.client = mdclient.MDClient('150.183.246.196', 8822,
-              #         'belle_user', 'belle')
-            print 'Count not connect to AMGA server:', ex
+            print 'Could not connect to AMGA server:', ex
 
         self.client.execute('whoami')
         print self.client.fetchRow()
@@ -93,10 +81,10 @@ class AmgaClient(object):
         else:
             while not self.client.eot():
                 result.append(dir + '/' + self.client.fetchRow().split('/'
-                              )[-1])
+                                                                       )[-1])
         return result
 
-#################################################################################
+##########################################################################
 # added by wuwj@ihep.ac.cn
 
     def checkEntry(self, entry):
@@ -120,7 +108,8 @@ class AmgaClient(object):
 
         guids = []
         # self.client.selectAttr([experiment], query)
-        attribute = experiment + ':guid'  # hanyl  "not perfect, experiment should be list
+        # hanyl  "not perfect, experiment should be list
+        attribute = experiment + ':guid'
         self.client.selectAttr([attribute], query)  # hanyl
         while not self.client.eot():
             guids.append('guid:' + self.client.fetchRow())
@@ -162,12 +151,8 @@ class AmgaClient(object):
 
 ###############################################################################
 
-    def directQueryWithAttributes(
-        self,
-        experiment,
-        query,
-        attributes,
-        ):
+    def directQueryWithAttributes(self, experiment, query, attributes):
+
         '''
         Query with ability to define parameters in SQL way.
         Returns dict of attribute values, indexed by path and attribute names
@@ -232,7 +217,7 @@ class AmgaClient(object):
             self.client.cd(path)
         except mdinterface.CommandException, ex:
         # it doesn't exist - create
-            print 'The directory %s does not exists, try to create it' % path  # hanyl
+            print 'The directory %s does not exists, try to create it' % path
             try:
                 self.checkDirectory('/'.join(path.split('/')[0:-1]))
                 self.client.createDir(path)
@@ -258,7 +243,7 @@ class AmgaClient(object):
     def bulkInsert(self, basepath, entries):
         '''
       Loops through a list of entries, inserting as efficiently as possible
-      entries[entry_name] = (['key1', 'key2', 'key3'],['value1', value2, value3])
+      entries[entry_name]=(['key1', 'key2', 'key3'],['value1', value2, value3])
       TODO: use direct SQL mode.
       '''
 
@@ -266,7 +251,7 @@ class AmgaClient(object):
             for entry in entries.keys():
                 try:
                     self.client.addEntry(basepath + '/' + entry,
-                            entries[entry][0], entries[entry][1])
+                                         entries[entry][0], entries[entry][1])
                 except mdinterface.CommandException, ex:
                     print 'Error:', ex
                     return False
@@ -294,8 +279,8 @@ class AmgaClient(object):
 
     def getAttributesValues(self, basepath, attrs):
         '''
-      returns the values of given attributes in a given directory, or False on failure
-      attrs is a list of attributes, as ['id','lfn','guid']
+      returns the values of given attributes in a given directory, or False on
+       failure. attrs is a list of attributes, as ['id','lfn','guid']
       '''
 
         entries = {}
@@ -347,7 +332,7 @@ class AmgaClient(object):
             for key in self.user_dataset_attributes.keys():
                 try:
                     self.client.addAttr(basepath, key,
-                            self.user_dataset_attributes[key])
+                                        self.user_dataset_attributes[key])
                 except mdinterface.CommandException, ex:
                     print 'Error:', ex
                     return False
@@ -365,11 +350,13 @@ if __name__ == '__main__':
     print ac.getSubdirectories('/belle2/user/belle/wuwj/p8/', relative=True)
     # print ac.getGUIDs("/belle2/data/E11/FC","id<5")
     # print ac.directQuery("/belle2/data/E11/FC","id<5")    #problem
-    # print ac.directQueryWithAttributes("/belle2/user/belle/hanyl/Ungrouped/","id>0",["lfn"])
+    # print ac.directQueryWithAttributes("/belle2/user/belle/hanyl/Ungrouped",
+    #                                      "id>0",["lfn"])
     # print ac.checkDirectory("/belle2/data/E11/FC/TEST")
     # print ac.getAttributes("/belle2/data/E11/FC")
     # print ac.getAttributes("/belle2/user/belle/hanyl/Ungrouped/")
-    # print ac.getAttributesValues("/belle2/user/belle/hanyl/Ungrouped/",['lfn'])
+    # print ac.getAttributesValues("/belle2/user/belle/hanyl/Ungrouped/",
+    #                               ['lfn'])
     # print ac.rm('/belle2/user/belle/hanyl/Ungrouped/effs30.root')
     # print ac.rm('/belle2/user/belle/hanyl/Ungrouped/wutest1.root')
     # print ac.rm('/belle2/user/belle/hanyl/Ungrouped/wutest2.root')

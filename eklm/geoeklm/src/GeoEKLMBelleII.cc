@@ -1269,9 +1269,7 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
     B2FATAL(MemErr);
     exit(ENOMEM);
   }
-  // mark this object as StripBoard
-  physiStripBoard->setVolumeType(2);
-
+  physiStripBoard->setVolumeType(EKLM_SENSITIVE_BOARD);
   printVolumeMass(logicStripBoard);
 }
 
@@ -1575,9 +1573,7 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt)
     B2FATAL(MemErr);
     exit(ENOMEM);
   }
-  // mark this object as Sensitivtrip
-  physiSensitive->setVolumeType(0);
-
+  physiSensitive->setVolumeType(EKLM_SENSITIVE_STRIP);
   printVolumeMass(logicSensitive);
 }
 
@@ -1612,9 +1608,7 @@ void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT* mpvgt)
     B2FATAL(MemErr);
     exit(ENOMEM);
   }
-  //mark volume as SiPM
-  physiSiPM->setVolumeType(1);
-
+  physiSiPM->setVolumeType(EKLM_SENSITIVE_SIPM);
   printVolumeMass(logicSiPM);
 }
 

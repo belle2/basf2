@@ -31,6 +31,18 @@ namespace Belle2 {
     EKLM_DETECTOR_PRINTMASSES = 2,
   };
 
+  /** Type of sensitive detector corresponding to this volume. */
+  enum EKLMSensitiveType {
+    /** Not sensitive. */
+    EKLM_NOT_SENSITIVE = -1,
+    /** Strip. */
+    EKLM_SENSITIVE_STRIP = 0,
+    /** SiPM. */
+    EKLM_SENSITIVE_SIPM = 1,
+    /** Readout boards. */
+    EKLM_SENSITIVE_BOARD = 2,
+  };
+
   /**
    * G4PVPlacement with Global Transformation information.
    */
@@ -81,12 +93,12 @@ namespace Belle2 {
     /**
      * Get volume type.
      */
-    int  getVolumeType() const;
+    enum EKLMSensitiveType getVolumeType() const;
 
     /**
      * Set volume type.
      */
-    void setVolumeType(int) ;
+    void setVolumeType(enum EKLMSensitiveType) ;
 
     /**
      * Get mother G4PVPlacementGT.
@@ -118,14 +130,8 @@ namespace Belle2 {
     /** Detector mode. */
     enum EKLMDetectorMode m_mode;
 
-    /**
-     * Volume Type
-     * -1 -- default value
-     *  0 -- sensitive strips
-     *  1 -- sensitive SiPM (background studies only)
-     *  2 -- sensitive Electronic Boards (background studies only)
-     */
-    int m_type;
+    /** Sensitive detectior type. */
+    enum EKLMSensitiveType m_type;
 
     /**
      * Name.

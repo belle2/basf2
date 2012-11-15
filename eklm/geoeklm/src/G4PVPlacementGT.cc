@@ -30,7 +30,7 @@ namespace Belle2 {
     m_id = id;
     m_mode = mode;
     m_mother = NULL;
-    m_type = -1; ///default value
+    m_type = EKLM_NOT_SENSITIVE;
     m_idHistory.push_back(id);
   }
 
@@ -48,7 +48,7 @@ namespace Belle2 {
     m_id = id;
     m_mode = mode;
     m_mother = motherPVPlacementGT;
-    m_type = -1; ///default value
+    m_type = EKLM_NOT_SENSITIVE;
     m_idHistory = motherPVPlacementGT->getIdHistory();
     m_idHistory.push_back(id);
   }
@@ -73,15 +73,16 @@ namespace Belle2 {
     return m_mode;
   }
 
-  int G4PVPlacementGT::getVolumeType() const
+  enum EKLMSensitiveType G4PVPlacementGT::getVolumeType() const
   {
     return m_type;
   }
 
-  void G4PVPlacementGT::setVolumeType(int t)
+  void G4PVPlacementGT::setVolumeType(enum EKLMSensitiveType t)
   {
     if (m_mode == 0 && t > 0)
-      B2WARNING("Attempt to create volume needed only during Background studies in normal opeation mode!");
+      B2WARNING("Attempt to create volume needed only during "
+                "background studies in normal opeation mode.");
     m_type = t;
   }
 

@@ -110,7 +110,7 @@ void DisplayUI::goToEvent(Long_t id)
   if (m_currentEntry == id) return;
 
   if (!InputController::canControlInput() && m_currentEntry != id - 1) {
-    B2ERROR("Cannot switch to event " << id << ", only works in conjunction with SimpleInput.");
+    B2ERROR("Cannot switch to event " << id << ", only works in conjunction with RootInput.");
   }
 
   if (numEntries > 0 && InputController::canControlInput()) {

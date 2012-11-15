@@ -14,7 +14,7 @@ namespace Belle2 {
    *
    * The module will show MCParticles and fitted Tracks for each event, allowing the
    * user to continue with next event by pressing the '->' button. When events
-   * are read using SimpleInput, loading previous events is also possible.
+   * are read using RootInput, loading previous events is also possible.
    *
    * The DisplayModule itself is responsible for fetching data on hits, tracks and
    * relations from the data store, and passes them along to the EVEVisualization class,

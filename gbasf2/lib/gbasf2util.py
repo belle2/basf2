@@ -11,7 +11,8 @@ from DIRAC import gLogger
 from DIRAC.Core.Base import Script
 
 # initial implementation uses CLI and steering file
-# potentially we can also get some parameters from the user environment in the future
+# potentially we can also get some parameters from
+# the user environment in the future
 
 # class name is CLIParams to be consistent with DIRAC
 
@@ -81,7 +82,7 @@ class CLIParams:
             self.datatype = arg
             return DIRAC.S_OK()
         else:
-            print "Error happens!!! Data Type can only be 'data','MC','gen-mc' or 'user'"
+            print "Error: Data Type can only be 'data','MC','gen-mc' or 'user'"
             DIRAC.exit(2)
 
     def setExperiments(self, arg):
@@ -191,7 +192,8 @@ class CLIParams:
 
     def showHelp(self, dummy=False):
         """
-      Printout help message including a Usage message if defined via setUsageMessage method
+      Printout help message including a Usage message if defined via
+      setUsageMessage method
       """
 
         cmdlist = Script.localCfg.commandOptionList
@@ -211,16 +213,17 @@ class CLIParams:
                                optionTuple[1].ljust(15), optionTuple[2]))
         DIRAC.exit(0)
 
-  # registers alll of the possible commandline options with the DIRAC Script handler
-  # This is also used to generate the --help option
+  # registers alll of the possible commandline options with the DIRAC Script
+  # handler this is also used to generate the --help option
 
     def registerCLISwitches(self):
         Script.localCfg.commandOptionList = []  # hanyl clear Script's options
         Script.registerSwitch('h', 'help', 'show the usage', self.showHelp)
         Script.registerSwitch('s:', 'steering=', 'basf2 steering file',
                               self.setSteeringFile)
-        Script.registerSwitch('r:', 'repetition=', 'Repetition of a Job submit'
-                              , self.setRepetitionOfJob)
+        Script.registerSwitch('r:', 'repetition=',
+                              'Repetition of a Job submit',
+                              self.setRepetitionOfJob)
         Script.registerSwitch('p:', 'project=', 'Name for project',
                               self.setProject)
         Script.registerSwitch('c:', 'evtpermin=',
@@ -231,8 +234,8 @@ class CLIParams:
                               self.setJobPriority)
         Script.registerSwitch('m:', 'query=', 'Metadata Query', self.setQuery)
         Script.registerSwitch('t:', 'type=',
-                              "Type of Data ('data', 'MC','gen-mc' or 'user')"
-                              , self.setDataType)
+                              "Type of Data ('data', 'MC','gen-mc' or 'user')",
+                              self.setDataType)
         Script.registerSwitch('e:', 'experiments=',
                               'Experiments (comma separated list)',
                               self.setExperiments)
@@ -242,8 +245,9 @@ class CLIParams:
                               '(Advanced) DIRAC System Configuration Version',
                               self.setSysConfig)
         Script.registerSwitch('f:', 'inputsandboxfiles=',
-                              '(optional) Files required for the job (comma separated list, max 10MB)'
-                              , self.setInputFiles)
+                              '(optional) Files required for the job\
+                              (comma separated list, max 10MB)',
+                              self.setInputFiles)
         Script.registerSwitch('x:', 'maxevents=',
                               '(optional) Maximum number of events to use',
                               self.setMaxEvents)
@@ -254,8 +258,8 @@ class CLIParams:
                               '(optional) The project name of user data',
                               self.setUserData)
         Script.registerSwitch('', 'site=',
-                              '(optional) The site name to which you want to submit'
-                              , self.setSite)
+                              '(optional) The site name to which you want\
+                              to submit', self.setSite)
         Script.registerSwitch('', 'LogLevel=', 'Log Level', self.setLogLevel)
 
         # Script.addDefaultOptionValue('LogLevel', 'debug')
@@ -264,8 +268,8 @@ class CLIParams:
 
     def registerSteeringOptions(self):
         if self.steering_file is None:
-            return DIRAC.S_ERROR("No steering file defined - can't get options."
-                                 )
+            return DIRAC.S_ERROR("No steering file defined - can't get\
+                                 options.")
         else:
       # hackhackhack option-function mapping :)
             options = {
@@ -283,7 +287,7 @@ class CLIParams:
                 'userdata': 'setUserData',
                 'LogLevel': 'setLogLevel',
                 'site': 'setSite',
-                }
+            }
       # read the options
             f = open(self.steering_file)
             for line in f:
@@ -300,7 +304,8 @@ class CLIParams:
         """
 
         if self.getDataType() is None:  # check the datatype
-            print 'No datatype is given. We will set datatype to data. Continue?'
+            print 'No datatype is given. We will set datatype to data.\
+            Continue?'
             noinput = raw_input('Please type Y or N: ')
             if noinput.upper() == 'N':
                 os.sys.exit(-1)
@@ -310,7 +315,8 @@ class CLIParams:
             self.setDataType('data')
         elif self.getDataType() == 'data' or self.getDataType() == 'MC':
             if self.getExperiments() is None:  # check the experiments
-                print 'No experiments is given. We will set experiments to all. Continue?'
+                print 'No experiments is given. We will set experiments to\
+                all. Continue?'
                 noinput = raw_input('Please type Y or N: ')
                 if noinput.upper() == 'N':
                     os.sys.exit(-1)
@@ -333,8 +339,8 @@ class CLIParams:
             self.setQuery('2>1')
 
     def makeSteeringFile(self, lfns, number):
-        """Make steering file for the given lfn by adding the number as a suffix of lfn
-           return the new steering file.
+        """Make steering file for the given lfn by adding the number as a
+           suffix of lfn return the new steering file.
         """
 
         files = []
@@ -358,13 +364,14 @@ class CLIParams:
                         + tail.split('.')[1]
                     eachline = head + ',' + tail
                 if self.getDataType == 'gen-user':
-                    if eachline.find('SimpleInput') > -1:  # close the original input
+                    if eachline.find('SimpleInput') > -1:  # close orig. input
                         eachline = '#' + eachline
-                    if eachline.find('from basf2 import *') > -1:  # the input file
+                    if eachline.find('from basf2 import *') > -1:  # input file
                         if eachline.endswith('\r\n'):
                             eachline += '\r\n'
                             eachline += \
-                                "sinput = fw.register_module('SimpleInput')\r\n"
+                                "sinput = fw.register_module('SimpleInput')"
+                            eachline += '\r\n'
                             if len(files) > 1:
                                 eachline += "sinput.param('inputFileName'," \
                                     + str(files) + ')\r\n'

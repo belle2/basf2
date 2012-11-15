@@ -23,7 +23,10 @@ evtpermin = '40'
 swver = 'release-00-01-00'
 # (optional) Files to be send with the job
 inputsandboxfiles = \
-    'g4sim.macro,Belle2-buildfix-simulation.xml,ARICHMaterials.xml,BasicMaterials.xml,CDCBelleII.xml,EKLMBelleII.xml,EKLMMaterials.xml,GlobalParams.xml,IRBelleIISymm.xml,PXDMaterials.xml,SVDMaterials.xml,TOPBelleII.xml,TOPMaterials.xml'
+    'g4sim.macro,Belle2-buildfix-simulation.xml,ARICHMaterials.xml,\
+     BasicMaterials.xml,CDCBelleII.xml,EKLMBelleII.xml,EKLMMaterials.xml,\
+     GlobalParams.xml,IRBelleIISymm.xml,PXDMaterials.xml,SVDMaterials.xml,\
+     TOPBelleII.xml,TOPMaterials.xml'
 # (optional) max events - the maximum number of events to use
 maxevents = '100000'
 
@@ -45,7 +48,7 @@ param_evtmetagen = {
     'RunList': [2],
     'EvtStartList': [7001],
     'EvtEndList': [9000],
-    }
+}
 
 evtmetagen.param(param_evtmetagen)
 

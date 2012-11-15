@@ -23,11 +23,13 @@ from util import CheckAndRemoveProjectIfForce, make_jdl, prepareProxy, make_tar
 
 
 def main():
-    ''' gBasf2 takes a number of options - either from the commandline or in a steering file (see
-        gbasf2utils.py) and uses them to (currently)
-        1. conduct a metadata query to match appropriate data to work with - a set of LFNs
+    ''' gBasf2 takes a number of options - either from the commandline or
+        in a steering file (see gbasf2utils.py) and uses them to (currently)
+        1. conduct a metadata query to match appropriate data to work with
+        - a set of LFNs
         2. performs all necessary tasks to get the user a proxy
-        3. construct a project based on the name provided and appropriate JDLs - presently just 1 per job
+        3. construct a project based on the name provided and appropriate JDLs
+         - presently just 1 per job
         4. submits the created jdls to the DIRAC Workload Management System
     '''
 
@@ -39,7 +41,7 @@ def main():
 
   # setup options
     cliParams = CLIParams()
-    if os.environ.has_key('BELLE2_RELEASE'):
+    if 'BELLE2_RELEASE' in os.environ:
         cliParams.setSwVer(os.environ['BELLE2_RELEASE'])
     cliParams.registerCLISwitches()
     Script.parseCommandLine(ignoreErrors=True)
@@ -56,7 +58,7 @@ def main():
 
     cliParams.validOption()
     status = CheckAndRemoveProjectIfForce(proxyinfo['Value']['username'],
-            cliParams.getProject())
+                                          cliParams.getProject())
   # added the next 2 lines because status[1] was nonetype for some reason
     if status is None:
         status = ('New', 0)
@@ -119,31 +121,30 @@ def main():
             continue
         gLogger.info('The lfn used is %s.' % str(lfns))
         numberOfJobs += 1
-        jdl = make_jdl(  # Events/sec into CPUSecs
-                         # XXX
-                         # results[result]['lfn'].replace('belle2', 'belle'),
-            cliParams.makeSteeringFile(lfns, numberOfJobs),
-            cliParams.getRepetitionOfJob(),
-            cliParams.getProject(),
-            int(float(results[result]['events']) / (cliParams.getEvtPerMin()
-                / 60.0)),
-            cliParams.getJobPriority(),
-            lfns,
-            cliParams.getSysConfig(),
-            cliParams.getSwVer(),
-            tar,
-            numberOfJobs,
-            cliParams.getSite(),
-            )
+        #converts events/sec into CPUsecs, badly :)
+        jdl = make_jdl(cliParams.makeSteeringFile(lfns, numberOfJobs),
+                       cliParams.getRepetitionOfJob(),
+                       cliParams.getProject(),
+                       int(float(results[result]['events']) /
+                           (cliParams.getEvtPerMin() / 60.0)),
+                       cliParams.getJobPriority(),
+                       lfns,
+                       cliParams.getSysConfig(),
+                       cliParams.getSwVer(),
+                       tar,
+                       numberOfJobs,
+                       cliParams.getSite(),
+                       )
         subresult = dirac.submit(jdl)
         if subresult['OK']:
             print 'JobID = %s' % subresult['Value']
             # remove the JDL - we keep it on error
             os.remove(jdl)
             totalevents = totalevents + int(results[result]['events'])
-            # Yes, that's right - this is done after submission, so MaxEvents isn't really max!
+            # Yes, that's right - this is done after submission,
+            # so MaxEvents isn't really max!
             if totalevents > cliParams.getMaxEvents():
-                print 'Maximum number of events exceeded - skipping the other files'
+                print 'Max number of events exceeded, skipping other files'
                 break
         else:
             errorList.append('[' + results[result]['lfn'] + '] '
@@ -164,7 +165,8 @@ def main():
 
     print str(totalevents) + ' events to process!'
 
-    print 'Now visit https://dirac.cc.kek.jp/DIRAC/%s/belle/jobs/JobMonitor/display  \
+    print 'Now visit\
+           https://dirac.cc.kek.jp/DIRAC/%s/belle/jobs/JobMonitor/display\
            to monitor your jobs' \
         % gConfig.getValue('/DIRAC/Setup', [])[0]
     DIRAC.exit(exitCode)

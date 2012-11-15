@@ -23,14 +23,8 @@ except ImportError, e:
 
 class MDClient(MDInterface):
 
-    def __init__(
-        self,
-        host,
-        port,
-        login='anonymous',
-        password='',
-        keepalive=True,
-        ):
+    def __init__(self, host, port, login='anonymous', password='',
+                 keepalive=True, ):
 
         self.connected = 0
         self.host = host
@@ -78,14 +72,8 @@ class MDClient(MDInterface):
             if self.keyFile:
                 s = open(self.keyFile).read()
                 key = parsePEMKey(s, private=True)
-            self.sslSock.handshakeClientCert(
-                cert,
-                key,
-                self.session,
-                None,
-                None,
-                False,
-                )
+            self.sslSock.handshakeClientCert(cert, key, self.session,
+                                             None, None, False, )
             self.sslSock.closeSocket = False
         else:
             if DEBUG:
@@ -208,7 +196,7 @@ class MDClient(MDInterface):
         self.EOT = 0
         self.buffer = ''
         line = self.__fetchRow()
-        if line == None:
+        if line is None:
             raise IOError('Server sent empty response')
         pos = line.find(' ')
         msg = ''
@@ -270,8 +258,8 @@ class MDClient(MDInterface):
             pos = self.buffer.find('\004')
             if pos > -1:
                 # Need to find two EOT chars if protocol > 1
-                while self.protocolVersion > 1 and self.buffer.find('\004',
-                        pos + 1) < 0:
+                while (self.protocolVersion > 1 and
+                       self.buffer.find('\004', pos + 1) < 0):
                     if self.sslSock:
                         line = self.sslSock.read(1024)
                     else:
@@ -351,12 +339,7 @@ class MDClient(MDInterface):
             attributes.append(attribute)
         return (file, attributes)
 
-    def setAttr(
-        self,
-        file,
-        keys,
-        values,
-        ):
+    def setAttr(self, file, keys, values, ):
 
         command = 'setattr ' + file
         for i in range(len(keys)):
@@ -365,12 +348,7 @@ class MDClient(MDInterface):
             command += ' ' + str(values[i])
         self.execute(command)
 
-    def addEntry(
-        self,
-        file,
-        keys,
-        values,
-        ):
+    def addEntry(self, file, keys, values, ):
 
         command = 'addentry ' + file
         for i in range(len(keys)):
@@ -385,13 +363,7 @@ class MDClient(MDInterface):
             command += ' ' + e
         self.execute(command)
 
-    def addAttr(
-        self,
-        file,
-        name,
-        t,
-        ):
-
+    def addAttr(self, file, name, t, ):
         command = 'addattr ' + file + ' ' + name + ' ' + t
         self.execute(command)
 
@@ -462,13 +434,7 @@ class MDClient(MDInterface):
             attributes.append(attribute)
         return attributes
 
-    def updateAttr(
-        self,
-        pattern,
-        updateExpr,
-        condition,
-        ):
-
+    def updateAttr(self, pattern, updateExpr, condition, ):
         command = 'updateattr ' + pattern
         for i in updateExpr:
             (var, exp) = self.splitUpdateClause(i)
@@ -476,13 +442,7 @@ class MDClient(MDInterface):
         command += ' ' + self.__quoteValue(condition)
         self.execute(command)
 
-    def update(
-        self,
-        pattern,
-        updateExpr,
-        condition,
-        ):
-
+    def update(self, pattern, updateExpr, condition, ):
         command = 'update ' + pattern
         for i in updateExpr:
             (var, exp) = self.splitUpdateClause(i)
@@ -513,14 +473,7 @@ class MDClient(MDInterface):
         command = 'commit'
         self.execute(command)
 
-    def sequenceCreate(
-        self,
-        name,
-        directory,
-        increment=1,
-        start=1,
-        ):
-
+    def sequenceCreate(self, name, directory, increment=1, start=1, ):
         command = 'sequence_create ' + name + ' ' + directory + ' '
         command += str(increment) + ' ' + str(start)
         self.execute(command)
@@ -538,48 +491,24 @@ class MDClient(MDInterface):
         command = 'cd ' + dir
         self.execute(command)
 
-    def constraintAddNotNull(
-        self,
-        directory,
-        attribute,
-        name,
-        ):
-
+    def constraintAddNotNull(self, directory, attribute, name, ):
         command = 'constraint_add_not_null ' + directory + ' ' + attribute \
             + ' ' + name
         self.execute(command)
 
-    def constraintAddUnique(
-        self,
-        directory,
-        attribute,
-        name,
-        ):
-
-        command = 'constraint_add_unique ' + directory + ' ' + attribute + ' ' \
+    def constraintAddUnique(self, directory, attribute, name, ):
+        command = 'constraint_add_unique ' + directory + ' ' + attribute + ' '\
             + name
         self.execute(command)
 
-    def constraintAddReference(
-        self,
-        directory,
-        attribute,
-        reffered_attr,
-        name,
-        ):
-
+    def constraintAddReference(self, directory, attribute, reffered_attr,
+                               name, ):
         command = 'constraint_add_reference ' + directory + ' ' + attribute \
             + ' ' + reffered_attr
         command = command + ' ' + name
         self.execute(command)
 
-    def constraintAddCheck(
-        self,
-        directory,
-        check,
-        name,
-        ):
-
+    def constraintAddCheck(self, directory, check, name, ):
         command = 'constraint_add_check ' + directory + ' ' \
             + self.__quoteValue(check) + ' ' + name
         self.execute(command)
@@ -608,5 +537,3 @@ class MDClient(MDInterface):
         while not self.eot():
             result = result + self.__fetchRow() + '\n'
         return result
-
-

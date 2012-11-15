@@ -38,7 +38,7 @@ param_evtmetagen = {
     'RunList': [1],
     'EvtStartList': [0],
     'EvtEndList': [100],
-    }
+}
 
 evtmetagen.param(param_evtmetagen)
 

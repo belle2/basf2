@@ -15,13 +15,7 @@ DEBUG = False
 
 class MDParser:
 
-    def __init__(
-        self,
-        query,
-        tables,
-        mainTable,
-        loadTable,
-        ):
+    def __init__(self, query, tables, mainTable, loadTable,):
 
         self.reINT = re.compile("\d+")
         self.reFLOAT = re.compile("\.\d+\.\d+")
@@ -107,7 +101,7 @@ class MDParser:
             return ('END', 0)
 
         t = self.reINT.match(self.q[self.__qp:])
-        if t != None:
+        if t is not None:
             t = t.group()
             self.__qp = self.__qp + len(t)
             if DEBUGS:
@@ -116,7 +110,7 @@ class MDParser:
             return ('CONST', int(t))
 
         t = self.reFLOAT.match(self.q[self.__qp:])
-        if t != None:
+        if t is not None:
             t = t.group()
             self.__qp = self.__qp + len(t)
             if DEBUGS:
@@ -140,7 +134,7 @@ class MDParser:
         if DEBUGS:
             print 'Reading token 4 '
         t = self.reTABLEREF.match(self.q[self.__qp:])
-        if t != None:
+        if t is not None:
             t = t.group()
             self.__qp = self.__qp + len(t)
             if DEBUGS:
@@ -149,7 +143,7 @@ class MDParser:
             return ('TABLEREF', t)
 
         t = self.reNAME.match(self.q[self.__qp:])
-        if t != None:
+        if t is not None:
             t = t.group()
             self.__qp = self.__qp + len(t)
             if DEBUGS:
@@ -199,7 +193,7 @@ class MDParser:
 
         # string
         t = self.reSTRING.match(self.q[self.__qp:])
-        if t != None:
+        if t is not None:
             t = t.group()
             self.__qp = self.__qp + len(t)
             t = t[1:-1]
@@ -229,13 +223,7 @@ class MDParser:
 
         return self.__evalVar(token, v)
 
-    def __pEvaluateOp(
-        self,
-        op,
-        exp1,
-        exp2,
-        ):
-
+    def __pEvaluateOp(self, op, exp1, exp2, ):
         if DEBUG:
             print 'Evaluating operation: ', exp1, op, exp2
         if op == '=':
@@ -277,7 +265,7 @@ class MDParser:
             # Ok, that's a hack, it really only helps for absolute paths...
             if DEBUG:
                 print 'TABLE BEFORE ', table
-            if not self.tables.has_key(table):
+            if table not in self.tables:
                 (mdtable, table) = self.loadTable(table)
             if DEBUG:
                 print 'TABLE AFTER ', table
@@ -290,14 +278,14 @@ class MDParser:
                 print 'Evaluating ', table, v, row
             if v == 'FILE':
                 return ('CONST', str(row[0]))
-            if not mdtable.attributeDict.has_key(v):
+            if v not in mdtable.attributeDict:
                 raise CommandException(8, 'Illegal query, unknown ' + v)
             if mdtable.typeDict[v] == 'int':
                 if row[mdtable.attributeDict[v] + 1] == '':
                     return ('CONST', None)
                 nv = int(row[mdtable.attributeDict[v] + 1])
             elif mdtable.typeDict[v] == 'float' or mdtable.typeDict[v] \
-                == 'double':
+                                     == 'double':
                 nv = float(row[mdtable.attributeDict[v] + 1])
                 if DEBUG:
                     print 'CONST ', row[mdtable.attributeDict[v] + 1]
@@ -360,8 +348,8 @@ class MDParser:
             (op, opv) = self.__readToken()
             if DEBUG:
                 print 'Comparison: got op ' + op + ' '
-            if op == '=' or op == '>' or op == '<' or op == '<=' or op == '>=' \
-                or op == '!=':
+            if op == '=' or op == '>' or op == '<' or op == '<=' or op == '>='\
+                    or op == '!=':
                 (ntoken, nv) = self.__pComparison()
                 if not ntoken:
                     raise CommandException(8, 'Illegal query: expecting comp')
@@ -469,5 +457,3 @@ class MDParser:
         if DEBUG:
             print 'Factor: Found token ' + str(v)
         return (token, v)
-
-

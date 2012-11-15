@@ -49,13 +49,11 @@ CDCRecoHit::CDCRecoHit()
   : GFRecoHitIfc<GFWireHitPolicy> (c_nParHitRep),
     m_adcCount(0), m_charge(0), m_tdcCount(0), m_driftLength(0), m_driftLengthResolution(0), m_wireID(WireID())
 {
-  fPolicy.setLeftRightResolution(0);
 }
 
 CDCRecoHit::CDCRecoHit(const CDCHit* cdcHit)
   : GFRecoHitIfc<GFWireHitPolicy> (c_nParHitRep)
 {
-  fPolicy.setLeftRightResolution(0);
   if (s_adcCountTranslator == 0 || s_cdcGeometryTranslator == 0 || s_tdcCountTranslator == 0) {
     B2FATAL("Can't produce CDCRecoHits without setting of the translators.")
   }

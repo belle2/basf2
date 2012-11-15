@@ -44,8 +44,9 @@
 
 #include <eklm/geoeklm/EKLMTransformationFactory.h>
 
-
 using namespace Belle2;
+
+static const char MemErr[] = "Memory allocation error.";
 
 /* Register the creator */
 geometry::CreatorFactory<GeoEKLMBelleII> GeoEKLMFactory("EKLMBelleII");
@@ -127,7 +128,7 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   for (j = 0; j < nPlane; j++) {
     BoardPosition[j] = new struct EKLMBoardPosition[nBoard];
     if (BoardPosition[j] == NULL) {
-      B2FATAL("Memory allocation error.");
+      B2FATAL(MemErr);
       exit(ENOMEM);
     }
     for (i = 0; i < nBoard; i++) {
@@ -140,7 +141,7 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   }
   StripBoardPosition = new EKLMStripBoardPosition[nStripBoard];
   if (StripBoardPosition == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   for (i = 0; i < nStripBoard; i++) {
@@ -196,7 +197,7 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   StripSize.rss_size = Strips.getLength("RSSSize") * cm;
   StripPosition = new struct EKLMElementPosition[nStrip];
   if (StripPosition == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   for (i = 0; i < nStrip; i++) {
@@ -217,7 +218,7 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
     SectionSupportPosition[j] = new struct
         EKLMSectionSupportPosition[nSection + 1];
     if (SectionSupportPosition[j] == NULL) {
-      B2FATAL("Memory allocation error.");
+      B2FATAL(MemErr);
       exit(ENOMEM);
     }
     for (i = 0; i <= nSection; i++) {
@@ -284,7 +285,7 @@ void GeoEKLMBelleII::createEndcap(int iEndcap, G4LogicalVolume* mlv)
   atube = new G4Tubs("tempatube", rminsub, rmaxsub, zsub, 0.0, 360.0 * deg);
   solidEndcap = new G4SubtractionSolid(Endcap_Name, boct, atube);
   if (solidEndcap == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   if (iEndcap == 1)
@@ -294,7 +295,7 @@ void GeoEKLMBelleII::createEndcap(int iEndcap, G4LogicalVolume* mlv)
   t = G4Translate3D(EndcapPosition.X, EndcapPosition.Y, z);
   logicEndcap = new G4LogicalVolume(solidEndcap, Iron, Endcap_Name);
   if (logicEndcap == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicEndcap, true);
@@ -302,7 +303,7 @@ void GeoEKLMBelleII::createEndcap(int iEndcap, G4LogicalVolume* mlv)
   physiEndcap = new G4PVPlacementGT(t, t, logicEndcap, Endcap_Name, mlv,
                                     iEndcap);
   if (physiEndcap == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   for (i = 1; i <= nLayer; i++)
@@ -323,12 +324,12 @@ void GeoEKLMBelleII::createLayer(int iLayer, int iEndcap,
                           LayerPosition.outerR, LayerPosition.length / 2.0,
                           0. * deg, 360. * deg);
   if (solidLayer == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicLayer = new G4LogicalVolume(solidLayer, Air, Layer_Name);
   if (logicLayer == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicLayer, false);
@@ -339,7 +340,7 @@ void GeoEKLMBelleII::createLayer(int iLayer, int iEndcap,
   t = G4Translate3D(0.0, 0.0, LayerPosition.Z);
   physiLayer = new G4PVPlacementGT(mpvgt, t, logicLayer, Layer_Name, iLayer);
   if (physiLayer == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   for (i = 1; i <= 4; i++)
@@ -360,12 +361,12 @@ void GeoEKLMBelleII::createSector(int iSector, G4PVPlacementGT* mpvgt)
                            SectorPosition.outerR, 0.5 * SectorPosition.length,
                            0.0, 90.0 * deg);
   if (solidSector == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicSector = new G4LogicalVolume(solidSector, Air, Sector_Name);
   if (logicSector == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicSector, false);
@@ -386,7 +387,7 @@ void GeoEKLMBelleII::createSector(int iSector, G4PVPlacementGT* mpvgt)
   physiSector = new G4PVPlacementGT(mpvgt, t, logicSector, Sector_Name,
                                     iSector);
   if (physiSector == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   createSectorSupport(physiSector);
@@ -408,7 +409,7 @@ void GeoEKLMBelleII::calcBoardTransform()
     BoardTransform[i] = (G4Transform3D**)
                         malloc(sizeof(G4Transform3D*) * nBoard);
     if (BoardTransform[i] == NULL) {
-      B2FATAL("Memory allocation error.");
+      B2FATAL(MemErr);
       exit(ENOMEM);
     }
     for (j = 0; j < nBoard; j++) {
@@ -448,7 +449,7 @@ void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
                             0.5 * SectorSupportPosition.outerR,
                             0.5 * lz);
   if (solidCoverTube == NULL || solidCoverBox == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   box = new G4Box("SubtractionBox_" + Cover_Name,
@@ -456,7 +457,7 @@ void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
                   0.5 * SectorSupportPosition.outerR,
                   lz);
   if (box == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   ang = getSectorSupportCornerAngle();
@@ -473,17 +474,17 @@ void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
   is = new G4IntersectionSolid("Intersection_" + Cover_Name, solidCoverTube,
                                solidCoverBox, t1);
   if (is == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   solidCover = new G4SubtractionSolid(Cover_Name, is, box, t2);
   if (solidCover == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicCover = new G4LogicalVolume(solidCover, Duralumin, Cover_Name);
   if (logicCover == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicCover, false);
@@ -494,7 +495,7 @@ void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
   t = G4Translate3D(0., 0., z);
   physiCover = new G4PVPlacementGT(mpvgt, t, logicCover, Cover_Name, iCover);
   if (physiCover == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   printVolumeMass(logicCover);
@@ -647,7 +648,7 @@ void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT* mpvgt)
                                0.5 * SectorSupportSize.Corner1Thickness);
   if (solidCorner1Tube == NULL || solidCorner1Box1 == NULL ||
       solidCorner1Box2 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   x = SectorSupportPosition.X + 0.5 * (SectorSupportSize.CornerX +
@@ -665,18 +666,18 @@ void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT* mpvgt)
   is1 = new G4IntersectionSolid("Intersection1_" + Corner1_Name,
                                 solidCorner1Tube, solidCorner1Box1, t1);
   if (is1 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   solidCorner1 = new G4IntersectionSolid(Corner1_Name, is1, solidCorner1Box2,
                                          t2);
   if (solidCorner1 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicCorner1 = new G4LogicalVolume(solidCorner1, Duralumin, Corner1_Name);
   if (logicCorner1 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicCorner1, true);
@@ -684,7 +685,7 @@ void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT* mpvgt)
   t = G4Translate3D(0., 0., SectorSupportSize.Corner1Z);
   physiCorner1 = new G4PVPlacementGT(mpvgt, t, logicCorner1, Corner1_Name);
   if (physiCorner1 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   printVolumeMass(logicCorner1);
@@ -715,11 +716,11 @@ void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT* mpvgt)
                                             Corner2Thickness);
   solidCorner2Tubs = createSectorSupportOuterTube(mpvgt);
   if (solidCorner2Prism == NULL || solidCorner2Tubs == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   if (solidCorner2Prism->getSolid() == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   t1 = G4Translate3D(-x, -y, 0.);
@@ -727,12 +728,12 @@ void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT* mpvgt)
                                         solidCorner2Prism->getSolid(),
                                         solidCorner2Tubs, t1);
   if (solidCorner2 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicCorner2 = new G4LogicalVolume(solidCorner2, Duralumin, Corner2_Name);
   if (logicCorner2 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicCorner2, true);
@@ -740,7 +741,7 @@ void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT* mpvgt)
   t = G4Translate3D(x, y, SectorSupportSize.Corner2Z);
   physiCorner2 = new G4PVPlacementGT(mpvgt, t, logicCorner2, Corner2_Name);
   if (physiCorner2 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   printVolumeMass(logicCorner2);
@@ -772,11 +773,11 @@ void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT* mpvgt)
                                             Corner3Thickness);
   solidCorner3Tubs = createSectorSupportInnerTube(mpvgt);
   if (solidCorner3Prism == NULL || solidCorner3Tubs == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   if (solidCorner3Prism->getSolid() == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   t1 = G4Translate3D(-x, -y, 0.);
@@ -784,12 +785,12 @@ void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT* mpvgt)
                                         solidCorner3Prism->getSolid(),
                                         solidCorner3Tubs, t1);
   if (solidCorner3 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicCorner3 = new G4LogicalVolume(solidCorner3, Duralumin, Corner3_Name);
   if (logicCorner3 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicCorner3, true);
@@ -797,7 +798,7 @@ void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT* mpvgt)
   t = G4Translate3D(x, y, SectorSupportSize.Corner3Z);
   physiCorner3 = new G4PVPlacementGT(mpvgt, t, logicCorner3, Corner3_Name);
   if (physiCorner3 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   printVolumeMass(logicCorner3);
@@ -829,11 +830,11 @@ void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT* mpvgt)
                                             Corner4Thickness);
   solidCorner4Tubs = createSectorSupportInnerTube(mpvgt);
   if (solidCorner4Prism == NULL || solidCorner4Tubs == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   if (solidCorner4Prism->getSolid() == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   t1 = G4Translate3D(-x, -y, 0.);
@@ -841,12 +842,12 @@ void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT* mpvgt)
                                         solidCorner4Prism->getSolid(),
                                         solidCorner4Tubs, t1);
   if (solidCorner4 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicCorner4 = new G4LogicalVolume(solidCorner4, Duralumin, Corner4_Name);
   if (logicCorner4 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicCorner4, true);
@@ -854,7 +855,7 @@ void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT* mpvgt)
   t = G4Translate3D(x, y, SectorSupportSize.Corner4Z);
   physiCorner4 = new G4PVPlacementGT(mpvgt, t, logicCorner4, Corner4_Name);
   if (physiCorner4 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   printVolumeMass(logicCorner4);
@@ -891,45 +892,45 @@ void GeoEKLMBelleII::createSectorSupport(G4PVPlacementGT* mpvgt)
                                    0., 90.*deg);
   if (solidBoxX == NULL || solidBoxY == NULL || solidOuterTube == NULL ||
       solidInnerTube == NULL || solidLimitationTube == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   t = G4Translate3D(0., 0., SectorSupportPosition.Z);
   us1 = new G4UnionSolid("Union1_" + SectorSupportName, solidInnerTube,
                          solidBoxY, tby);
   if (us1 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   us2 = new G4UnionSolid("Union2_" + SectorSupportName, us1, solidBoxX,
                          tbx);
   if (us2 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   us3 = new G4UnionSolid("Union3_" + SectorSupportName, us2,
                          solidOuterTube, G4Translate3D(0., 0., 0.));
   if (us3 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   us4 = new G4UnionSolid("Union4_" + SectorSupportName,
                          us3, solidBoxTop, tbt);
   if (us4 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   solidSectorSupport = new G4IntersectionSolid(SectorSupportName, us4,
                                                solidLimitationTube,
                                                G4Translate3D(0., 0., 0.));
   if (solidSectorSupport == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicSectorSupport = new G4LogicalVolume(solidSectorSupport, Duralumin,
                                            SectorSupportName);
   if (logicSectorSupport == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicSectorSupport, true);
@@ -937,7 +938,7 @@ void GeoEKLMBelleII::createSectorSupport(G4PVPlacementGT* mpvgt)
   physiSectorSupport = new G4PVPlacementGT(mpvgt, t, logicSectorSupport,
                                            SectorSupportName);
   if (physiSectorSupport == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   createSectorSupportCorner1(mpvgt);
@@ -1044,19 +1045,19 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
   if (solidPlaneTube == NULL || solidPlaneBox == NULL ||
       solidPlanePrism1 == NULL || solidPlanePrism2 == NULL ||
       solidPlanePrism3 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   if (solidPlanePrism1->getSolid() == NULL ||
       solidPlanePrism2->getSolid() == NULL ||
       solidPlanePrism3->getSolid() == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   box1 = new G4Box("Box1_" + Plane_Name, 0.5 * box_lx, 0.5 * box_lx,
                    PlanePosition.length);
   if (box1 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   t1 = G4Translate3D(0.5 * (PlanePosition.outerR + box_x),
@@ -1101,40 +1102,40 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
   is = new G4IntersectionSolid("Intersection_" + Plane_Name, solidPlaneTube,
                                solidPlaneBox, t1);
   if (is == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   ss1 = new G4SubtractionSolid("Subtraction1_" + Plane_Name, is, box1, t2);
   if (ss1 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   ss2 = new G4SubtractionSolid("Subtraction2_" + Plane_Name, ss1,
                                solidPlanePrism1->getSolid(), t3);
   if (ss2 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   ss3 = new G4SubtractionSolid("Subtraction3_" + Plane_Name, ss2,
                                solidPlanePrism2->getSolid(), t4);
   if (ss3 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   ss4 = new G4SubtractionSolid("Subtraction4_" + Plane_Name, ss3,
                                solidPlanePrism3->getSolid(), t5);
   if (ss4 == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   solidPlane = subtractBoardSolids(ss4, iPlane, Plane_Name);
   if (solidPlane == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicPlane = new G4LogicalVolume(solidPlane, Air, Plane_Name);
   if (logicPlane == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicPlane, false);
@@ -1146,7 +1147,7 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
   }
   physiPlane = new G4PVPlacementGT(mpvgt, t, logicPlane, Plane_Name, iPlane);
   if (physiPlane == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   for (i = 1; i <= nSection + 1; i++)
@@ -1174,13 +1175,13 @@ void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
                                        0.5 * BoardSize.height,
                                        0.5 * BoardSize.width);
   if (solidSectionReadoutBoard == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicSectionReadoutBoard = new G4LogicalVolume(solidSectionReadoutBoard, Air,
                                                  Board_Name);
   if (logicSectionReadoutBoard == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicSectionReadoutBoard, false);
@@ -1191,7 +1192,7 @@ void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
                                                  Board_Name,
                                                  10 * iPlane + iBoard);
   if (physiSectionReadoutBoard == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   createBaseBoard(physiSectionReadoutBoard);
@@ -1211,13 +1212,13 @@ void GeoEKLMBelleII::createBaseBoard(G4PVPlacementGT* mpvgt)
                              0.5 * BoardSize.base_height,
                              0.5 * BoardSize.base_width);
   if (solidBaseBoard == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicBaseBoard = new G4LogicalVolume(solidBaseBoard, Silicon,
                                        Board_Name);
   if (logicBaseBoard == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicBaseBoard, true);
@@ -1226,7 +1227,7 @@ void GeoEKLMBelleII::createBaseBoard(G4PVPlacementGT* mpvgt)
                     0.);
   physiBaseBoard = new G4PVPlacementGT(mpvgt, t, logicBaseBoard, Board_Name);
   if (physiBaseBoard == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   printVolumeMass(logicBaseBoard);
@@ -1244,7 +1245,7 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
                               0.5 * BoardSize.strip_height,
                               0.5 * BoardSize.strip_width);
   if (solidStripBoard == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   if (m_mode == EKLM_DETECTOR_NORMAL)
@@ -1254,7 +1255,7 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
     logicStripBoard = new G4LogicalVolume(solidStripBoard, Silicon,
                                           Board_Name, 0, m_sensitive, 0);
   if (logicStripBoard == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicStripBoard, true);
@@ -1265,7 +1266,7 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
   physiStripBoard = new G4PVPlacementGT(mpvgt, t, logicStripBoard, Board_Name,
                                         iBoard, m_mode);
   if (physiStripBoard == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   // mark this object as StripBoard
@@ -1314,7 +1315,7 @@ void GeoEKLMBelleII::createSectionSupport(int iSectionSupport, int iPlane,
                              0.5 * SectionSupportTopWidth,
                              0.5 * SectionSupportTopThickness);
   if (solidBoxTop == NULL || solidBoxMiddle == NULL || solidBoxBottom == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   t1 = G4Translate3D(0., 0., 0.5 * (SectionSupportMiddleThickness +
@@ -1328,19 +1329,19 @@ void GeoEKLMBelleII::createSectionSupport(int iSectionSupport, int iPlane,
   us = new G4UnionSolid("Union1_" + SectionSupportName, solidBoxMiddle,
                         solidBoxTop, t1);
   if (us == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   solidSectionSupport = new G4UnionSolid(SectionSupportName, us, solidBoxBottom,
                                          t2);
   if (solidSectionSupport == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicSectionSupport = new G4LogicalVolume(solidSectionSupport, Duralumin,
                                             SectionSupportName);
   if (logicSectionSupport == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicSectionSupport, true);
@@ -1356,7 +1357,7 @@ void GeoEKLMBelleII::createSectionSupport(int iSectionSupport, int iPlane,
                                             SectionSupportName,
                                             iSectionSupport);
   if (physiSectionSupport == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   printVolumeMass(logicSectionSupport);
@@ -1381,12 +1382,12 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
   solidList = new G4Box(List_Name, 0.5 * StripPosition[iList - 1].length,
                         0.5 * ly, 0.5 * PlasticListWidth);
   if (solidList == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicList = new G4LogicalVolume(solidList, Polystyrol, List_Name);
   if (logicList == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicList, false);
@@ -1403,7 +1404,7 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
   physiList = new G4PVPlacementGT(mpvgt, t, logicList, List_Name,
                                   iList * 100 + iListPlane);
   if (physiList == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   printVolumeMass(logicList);
@@ -1423,13 +1424,13 @@ void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT* mpvgt)
                                0.5 * StripSize.width,
                                0.5 * StripSize.thickness);
   if (solidStripVolume == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicStripVolume = new G4LogicalVolume(solidStripVolume, Air,
                                          StripVolume_Name);
   if (logicStripVolume == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicStripVolume, false);
@@ -1438,7 +1439,7 @@ void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT* mpvgt)
   physiStripVolume = new G4PVPlacementGT(mpvgt, t, logicStripVolume,
                                          StripVolume_Name, iStrip);
   if (physiStripVolume == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   createStrip(iStrip, physiStripVolume);
@@ -1456,12 +1457,12 @@ void GeoEKLMBelleII::createStrip(int iStrip, G4PVPlacementGT* mpvgt)
   solidStrip = new G4Box(Strip_Name, 0.5 * StripPosition[iStrip - 1].length,
                          0.5 * StripSize.width, 0.5 * StripSize.thickness);
   if (solidStrip == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicStrip = new G4LogicalVolume(solidStrip, Polystyrene, Strip_Name);
   if (logicStrip == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicStrip, true);
@@ -1469,7 +1470,7 @@ void GeoEKLMBelleII::createStrip(int iStrip, G4PVPlacementGT* mpvgt)
   t = G4Translate3D(-0.5 * StripSize.rss_size, 0., 0.);
   physiStrip = new G4PVPlacementGT(mpvgt, t, logicStrip, Strip_Name, iStrip);
   if (physiStrip == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   createStripGroove(iStrip, physiStrip);
@@ -1501,12 +1502,12 @@ void GeoEKLMBelleII::createStripGroove(int iStrip, G4PVPlacementGT* mpvgt)
                           0.5 * StripSize.groove_width,
                           0.5 * StripSize.groove_depth);
   if (solidGroove == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   logicGroove = new G4LogicalVolume(solidGroove, Gel, Groove_Name);
   if (logicGroove == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setColor(*logicGroove, "#00ff00ff");
@@ -1515,7 +1516,7 @@ void GeoEKLMBelleII::createStripGroove(int iStrip, G4PVPlacementGT* mpvgt)
                     0.5 * (StripSize.thickness - StripSize.groove_depth));
   physiGroove = new G4PVPlacementGT(mpvgt, t, logicGroove, Groove_Name, iStrip);
   if (physiGroove == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   printVolumeMass(logicGroove);
@@ -1543,7 +1544,7 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt)
                                    0.5 * StripSize.groove_width,
                                    0.5 * StripSize.groove_depth);
   if (solidSensitiveBox == NULL || solidSensitiveGroove == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   t1 = G4Translate3D(0., 0.,
@@ -1551,7 +1552,7 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt)
   solidSensitive = new G4SubtractionSolid(Sensitive_Name, solidSensitiveBox,
                                           solidSensitiveGroove, t1);
   if (solidSensitive == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   if (m_mode == EKLM_DETECTOR_NORMAL)
@@ -1562,7 +1563,7 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt)
                                          Sensitive_Name, 0, m_sensitive,
                                          0);
   if (logicSensitive == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setColor(*logicSensitive, "#ffffffff");
@@ -1571,7 +1572,7 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt)
   physiSensitive = new G4PVPlacementGT(mpvgt, t, logicSensitive, Sensitive_Name,
                                        iStrip, m_mode);
   if (physiSensitive == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   // mark this object as Sensitivtrip
@@ -1590,7 +1591,7 @@ void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT* mpvgt)
   solidSiPM = new G4Box(SiPM_Name, 0.5 * StripSize.rss_size,
                         0.5 * StripSize.rss_size, 0.5 * StripSize.rss_size);
   if (solidSiPM == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   if (m_mode == EKLM_DETECTOR_NORMAL)
@@ -1599,7 +1600,7 @@ void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT* mpvgt)
     logicSiPM = new G4LogicalVolume(solidSiPM, Silicon, SiPM_Name, 0,
                                     m_sensitive, 0);
   if (logicSiPM == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicSiPM, true);
@@ -1608,7 +1609,7 @@ void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT* mpvgt)
   physiSiPM = new G4PVPlacementGT(mpvgt, t, logicSiPM, SiPM_Name, iStrip,
                                   m_mode);
   if (physiSiPM == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
   //mark volume as SiPM
@@ -1632,7 +1633,7 @@ void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
   readXMLData(content);
   m_sensitive = new EKLMSensitiveDetector("EKLMSensitiveDetector");
   if (m_sensitive == NULL) {
-    B2FATAL("Memory allocation error.");
+    B2FATAL(MemErr);
     exit(ENOMEM);
   }
 

@@ -10,12 +10,12 @@
 """
 kill some submitted jobs or project
 Usage:
- 1) kill one job    
+ 1) kill one job
     ./gkill.py -j 8059
  2) kill several jobs
     ./gkill.py -j "8058,8059"
  3) kill a project
-    ./gkill.py -p <project name> 
+    ./gkill.py -p <project name>
 """
 
 import DIRAC
@@ -53,7 +53,7 @@ if project is not None:
     if result['OK']:
         jobs = ','.join(result['Value'])
         print 'There are %d jobs for the project %s.' % (len(result['Value']),
-                project)
+                                                         project)
         if len(result['Value']) != 0:
             print 'They are %s.' % jobs
     else:

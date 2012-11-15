@@ -16,8 +16,8 @@ Script.registerSwitch('', 'Site=', 'Execution site')
 Script.registerSwitch('', 'Owner=', 'Owner (DIRAC nickname)')
 Script.registerSwitch('', 'Project=', 'Select jobs for specified project')
 Script.registerSwitch('', 'Date=',
-                      'Date in YYYY-MM-DD format, if not specified default is 2011-07-04'
-                      )
+                      'Date in YYYY-MM-DD format, if not specified default is\
+                       2011-07-04')
 Script.registerSwitch('', 'JobID=', 'One or more JobID can be given')
 Script.parseCommandLine(ignoreErrors=True)
 
@@ -63,13 +63,11 @@ if jobid is None:
     selDate = date
     if not date:
         selDate = '2011-07-04'
-    condition = {
-        'Status': status,
-        'MinorStatus': minorStatus,
-        'ApplicationStatus': appStatus,
-        'Owner': owner,
-        'JobGroup': project,
-        }
+    condition = {'Status': status,
+                 'MinorStatus': minorStatus,
+                 'ApplicationStatus': appStatus,
+                 'Owner': owner,
+                 'JobGroup': project, }
     for key in condition.keys():
         if condition[key] is None:
             del condition[key]

@@ -8,6 +8,7 @@ REG_MODULE(Template)
 
 TemplateModule::TemplateModule(bool selfReg) : Module()
 {
+  B2INFO(selfReg);
   setDescription("Add a description of your module here");
 }
 

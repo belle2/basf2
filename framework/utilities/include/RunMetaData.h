@@ -11,18 +11,15 @@
 #define RUNMETADATA_H
 
 namespace Belle2 {
-  /** Store information that is constant during a run, and is needed during the event loop.
-   *
-   *  @todo Instead of retrieving hardcoded information from RunMetaData, these data
-   *        should come from the database.
+  /** Interface to the accelerator parameters stored in the database/gearbox.
    */
   class RunMetaData {
   public:
     /** LER energy getter. */
-    static float getEnergyLER() { return m_energyLER; }
+    static float getEnergyLER();
 
     /** HER energy getter. */
-    static float getEnergyHER() { return m_energyHER; }
+    static float getEnergyHER();
 
     /** Crossing angle getter. */
     static float getCrossingAngle();
@@ -30,25 +27,11 @@ namespace Belle2 {
     /** LER angle getter (>0). */
     static float getAngleLER();
 
-    /** set LER energy. */
-    static void setEnergyLER(float e) { m_energyLER = e; }
-
-    /** set HER energy. */
-    static void setEnergyHER(float e) { m_energyHER = e; }
-
 
   private:
     /** prevent instantiation. */
     RunMetaData();
     ~RunMetaData();
-
-    /** Center of Mass Energy.
-     */
-    static float m_energyLER;
-
-    /** \f$\gamma\f$ factor in the lab frame.
-     */
-    static float m_energyHER;
   }; //class
 } // namespace Belle2
 #endif

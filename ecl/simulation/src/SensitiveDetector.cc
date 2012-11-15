@@ -133,7 +133,6 @@ namespace Belle2 {
           int saveIndex = -999;
           double dTotalEnergy = 1 / m_energyDeposit; //avoid the error  no match for 'operator/'
           if (m_energyDeposit > 0.)saveIndex = saveSimHit(m_cellID, m_trackID, pdgCode, m_WightedTime / m_energyDeposit , m_energyDeposit, m_momentum, m_WightedPos * dTotalEnergy);
-          if (m_energyDeposit == 0. && m_momentum.r() > 0.01 * GeV)saveIndex = saveSimHit(m_cellID, m_trackID, pdgCode, (m_startTime + m_endTime) / 2 , m_energyDeposit, m_momentum, position);
         }
 
         //Reset TrackID

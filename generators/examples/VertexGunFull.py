@@ -2,123 +2,108 @@
 # -*- coding: utf-8 -*-
 
 ##############################################################################
-# This steering file which shows all usage options for the vertex gun module in
-# the generators package. The generated particles from the vertex gun are then
-# fed through a full Geant4 simulation and the output is stored in a root file.
-# The vertex gun is similar to the particle gun but instead creating either one
-# vertex where all particle in a event come from or creating tracks that all
-# come from different points it can create several vertices per event. The user
-# can specify the number of vertices and the exact properties of all particles
-# coming from each vertex. Most parameters have the same or similar meaning
-# than the particle gun's parameters but have to be state for all vertices in
-# the event
+# This steering file shows how to use several ParticleGun modules in series to
+# emuleate the behavoir of a "vertex gun". A vertex gun places 2 or more
+# vertices at user chosen postions with user difined particles and track
+# parameters.
+# Its main use is to test vertex fitting algorithms in a clean artificial
+# enviroment
 #
-# The different options for the particle gun are explained below.
-# Uncomment/comment different lines to get the wanted settings
+# This creates 3 vertices with 3 instances of the ParticleGun module and passes
+# them to the Geant4 simulation
 #
-# Example steering file - 2011 Belle II Collaboration
+# Example steering file - 2012 the Belle II Collaboration
 ##############################################################################
 
 from basf2 import *
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
-
-# to run the framework the used modules need to be registered
-vertexgun = register_module('VertexGun')
-
-# ============================================================================
-# Setting the random seed for particle generation: this number can be any int,
-# preferably large a value of 0 will use a different random seed each time
-# default is 3452346.
 set_random_seed(1028307)
 
-# ============================================================================
-# Setting the number of tracks independently for every vertex in one event. The
-# length of this list determines the number of vertices per event this number
-# can be any list of ints >= 1 default is [2,2]
-vertexgun.param('tracksPerVertex', [4, 3, 2])
+# first vertex
+vertex1 = register_module('ParticleGun')
+
+# setting the number of tracks and pdg codes for the first vertex
+vertex1.param('nTracks', -1)  # a negative track number means one track for
+                              # every PDG code
+vertex1.param('pdgCodes', [-11, 11, -13, 13])
+
+# set the starting parameters of the particle originating from the first vertex
+vertex1.param('momentumGeneration', 'normal')
+vertex1.param('momentumParams', [1, 0.05])
+
+vertex1.param('thetaGeneration', 'uniform')
+vertex1.param('thetaParams', [17, 150])
+
+vertex1.param('phiGeneration', 'uniform')
+vertex1.param('phiParams', [0, 360])
+
+# make sure all particles of vertex1 in one event start at the same postion
+vertex1.param('independentVertices', False)
+
+vertex1.param('vertexGeneration', 'fixed')
+vertex1.param('xVertexParams', [0.0, 0.0])
+vertex1.param('yVertexParams', [0.0, 0.0])
+vertex1.param('zVertexParams', [0.0, 0.0])
+
+# second vertex
+vertex2 = register_module('ParticleGun')
+
+# setting the number of tracks and pdg codes for the first vertex
+vertex2.param('nTracks', -1)  # a negative track number means one track for
+                              # every PDG code
+vertex2.param('pdgCodes', [-211, 211, -211])
+
+# set the starting parameters of the particle originating from the first vertex
+vertex2.param('momentumGeneration', 'normal')
+vertex2.param('momentumParams', [1, 0.05])
+
+vertex2.param('thetaGeneration', 'uniform')
+vertex2.param('thetaParams', [17, 150])
+
+vertex2.param('phiGeneration', 'uniform')
+vertex2.param('phiParams', [0, 360])
+
+# make sure all particles of vertex2 in one event start at the same postion
+vertex2.param('independentVertices', False)
+
+vertex2.param('vertexGeneration', 'fixed')
+vertex2.param('xVertexParams', [1, 1])
+vertex2.param('yVertexParams', [1, 1])
+vertex2.param('zVertexParams', [1, 1])
+
+# third vertex
+vertex3 = register_module('ParticleGun')
+
+# setting the number of tracks and pdg codes for the first vertex
+vertex3.param('nTracks', -1)  # a negative track number means one track for
+                              # every PDG code
+vertex3.param('pdgCodes', [-11, 11])
+
+# set the starting parameters of the particle originating from the first vertex
+vertex3.param('momentumGeneration', 'normal')
+vertex3.param('momentumParams', [0.5, 0.01])
+
+vertex3.param('thetaGeneration', 'uniform')
+vertex3.param('thetaParams', [60, 120])
+
+vertex3.param('phiGeneration', 'uniform')
+vertex3.param('phiParams', [0, 360])
+
+# make sure all particles of vertex3 in one event start at the same postion
+vertex3.param('independentVertices', False)
+
+vertex3.param('vertexGeneration', 'fixed')
+vertex3.param('xVertexParams', [0, 0])
+vertex3.param('yVertexParams', [0, 0])
+vertex3.param('zVertexParams', [3, 3])
 
 # ============================================================================
-# Setting the list of particle codes (PDG codes) for the generated particles
-# The user has to provide exactly one pdg code per track. That means the pdg
-# code list must be as long as the sum of all elements in the tracksPerVertex
-# list. In this example the 4 first elements will only be used by the first
-# vertex. Every track generated by at this vertex will get one of the pdg codes
-# randomly assigned
-vertexgun.param('pdgCodes', [
-    -11,
-    11,
-    -13,
-    13,
-    -211,
-    211,
-    -211,
-    -11,
-    11,
-    ])
-
-# ============================================================================
-# Setting the parameters for the random generation of particles momenta: Five
-# different distributions can be used: - fixed:     always use the exact same
-# value - uniform:   uniform distribution between min and max - uniformPt:
-# uniform distribution of transverse momentum between min and max - normal:
-# normal distribution around mean with width of sigma - normalPt:  normal
-# distribution of transverse momentum around mean with width of sigma
-#
-# The difference to the particle gun is that you have to set all track
-# properties for every vertex individually so all parmaters are list with the
-# same length
-vertexgun.param('momentumGeneration', ['normal', 'normal', 'normal'])
-# The next list of parameters corresponds to the first element of the
-# momentumParams list of the particle gun
-vertexgun.param('momentumParams1', [1, 1, 0.5])
-# The next list of parameters corresponds to the second element of the
-# momentumParams list of the particle gun. The same scheme applies to all the
-# other Param1, Param2
-vertexgun.param('momentumParams2', [0.05, 0.05, 0.01])
-
-# ============================================================================
-# Setting the parameters for the random generation of the particle polar angle:
-# Four different distributions can be used: - fixed:     always use the exact
-# same value - uniform:   uniform distribution between min and max -
-# uniformCosinus: uniform distribution of cos(theta) between min and max -
-# normal:    normal distribution around mean width width of sigma
-#
-# The default is a uniform theta distribution between 17 and 150 degrees
-vertexgun.param('thetaGeneration', ['uniform', 'uniform', 'uniform'])
-vertexgun.param('thetaParams1', [17, 17, 60])
-vertexgun.param('thetaParams2', [150, 150, 120])
-
-# ============================================================================
-# Setting the parameters for the random generation of the particle azimuth
-# angle: Three different distributions can be used: - fixed:     always use the
-# exact same value - uniform:   uniform distribution between min and max -
-# normal:    normal distribution around mean width width of sigma
-#
-# The default is a uniform theta distribution between 0 and 360 degrees
-vertexgun.param('phiGeneration', ['uniform', 'uniform', 'uniform'])
-vertexgun.param('phiParams1', [0, 0, 0])
-vertexgun.param('phiParams2', [360, 360, 360])
-
-# ============================================================================
-# Setting the parameters for random generation of the event vertex Three
-# different distributions can be used: - fixed:     always use the exact same
-# value - uniform:   uniform distribution between min and max - normal: normal
-# distribution around mean with width of sigma
-#
-# The default is a uniform distribution of the vertex
-vertexgun.param('vertexGeneration', ['fixed', 'fixed', 'fixed'])
-vertexgun.param('xVertexParams1', [0, 1, 0])
-vertexgun.param('xVertexParams2', [0, 1, 0])
-vertexgun.param('yVertexParams1', [0, 1, 0])
-vertexgun.param('yVertexParams2', [0, 1, 0])
-vertexgun.param('zVertexParams1', [0, 1, 3])
-vertexgun.param('zVertexParams2', [0, 1, 3])
-
-# ============================================================================
-# Print the parameters of the particle gun
-print_params(vertexgun)
+# Print the parameters of the particle guns
+print_params(vertex1)
+print_params(vertex2)
+print_params(vertex3)
 
 # ============================================================================
 # Now lets create the necessary modules to perform a simulation
@@ -152,7 +137,9 @@ main.add_module(evtmetagen)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)
-main.add_module(vertexgun)
+main.add_module(vertex1)
+main.add_module(vertex2)
+main.add_module(vertex3)
 main.add_module(mcparticleprinter)
 main.add_module(simulation)
 main.add_module(output)

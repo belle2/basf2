@@ -12,8 +12,8 @@ Script.registerSwitch('', 'Site=', 'Execution site')
 Script.registerSwitch('', 'Owner=', 'Owner (DIRAC nickname)')
 Script.registerSwitch('', 'Project=', 'Select jobs for specified job group')
 Script.registerSwitch('', 'Date=',
-                      'Date in YYYY-MM-DD format, if not specified default is today'
-                      )
+                      'Date in YYYY-MM-DD format, if not specified\
+                       default is today')
 Script.parseCommandLine(ignoreErrors=True)
 
 status = None
@@ -53,13 +53,11 @@ for switch in Script.getUnprocessedSwitches():
 selDate = date
 if not date:
     selDate = '2011-07-03'
-condition = {
-    'Status': status,
-    'MinorStatus': minorStatus,
-    'ApplicationStatus': appStatus,
-    'Owner': owner,
-    'JobGroup': project,
-    }
+condition = {'Status': status,
+             'MinorStatus': minorStatus,
+             'ApplicationStatus': appStatus,
+             'Owner': owner,
+             'JobGroup': project, }
 for key in condition.keys():
     if condition[key] is None:
         del condition[key]

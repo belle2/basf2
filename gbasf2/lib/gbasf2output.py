@@ -3,8 +3,8 @@
 
 #
 # gBasf2 - http://b2comp.kek.jp/~twiki/bin/view/Computing/GBasf2
-# gBasf2output is the script that uploads files to the grid and registers them into file and
-# metadata catalogs
+# gBasf2output is the script that uploads files to the grid and registers
+# them into file and metadata catalogs
 #
 # Tom Fifield (fifieldt@unimelb.edu.au) - 2011-01
 #
@@ -16,7 +16,7 @@ from gbasf2util import CLIParams
 
 # parse options
 cliParams = CLIParams()
-if os.environ.has_key('BELLE2_RELEASE'):
+if 'BELLE2_RELEASE' in os.environ:
     cliParams.setSwVer(os.environ['BELLE2_RELEASE'])
 cliParams.registerCLISwitches()
 Script.parseCommandLine(ignoreErrors=True)

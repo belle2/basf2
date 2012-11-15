@@ -39,6 +39,9 @@ namespace Belle2 {
 
     /**
      * Destructor.
+     * @details
+     * The resulting solid m_is (access by getSolid()) is not deleted here.
+     * It is meant to be deleted by Geant.
      */
     ~G4TriangularPrism();
 
@@ -47,7 +50,8 @@ namespace Belle2 {
      * @return Solid corresponding to the prism.
      * @details
      * The resulting G4VSolid* is allocated via operator new and must be
-     * deleted when is is not necessary.
+     * deleted when is is not necessary. If it is used in Geant geometry,
+     * do not delete it.
      */
     G4VSolid* getSolid();
 

@@ -63,7 +63,11 @@ GeoEKLMBelleII::~GeoEKLMBelleII()
     for (j = 0; j < nBoard; j++)
       delete BoardTransform[i][j];
     free(BoardTransform[i]);
+    free(BoardPosition[i]);
+    free(SectionSupportPosition[i]);
   }
+  free(StripPosition);
+  free(StripBoardPosition);
   delete m_sensitive;
 }
 
@@ -126,7 +130,8 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   BoardSize.strip_height = Boards.getLength("StripHeight") * cm;
   nStripBoard = Boards.getInt("nStripBoard");
   for (j = 0; j < nPlane; j++) {
-    BoardPosition[j] = new struct EKLMBoardPosition[nBoard];
+    BoardPosition[j] = (struct EKLMBoardPosition*)
+                       malloc(nBoard * sizeof(struct EKLMBoardPosition));
     if (BoardPosition[j] == NULL) {
       B2FATAL(MemErr);
       exit(ENOMEM);
@@ -139,7 +144,8 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
       BoardPosition[j][i].r = BoardContent.getLength("Radius") * cm;
     }
   }
-  StripBoardPosition = new EKLMStripBoardPosition[nStripBoard];
+  StripBoardPosition = (struct EKLMStripBoardPosition*)
+                       malloc(nStripBoard * sizeof(struct EKLMStripBoardPosition));
   if (StripBoardPosition == NULL) {
     B2FATAL(MemErr);
     exit(ENOMEM);
@@ -195,7 +201,8 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
                                          getLength("NoScintillationThickness")
                                          * cm;
   StripSize.rss_size = Strips.getLength("RSSSize") * cm;
-  StripPosition = new struct EKLMElementPosition[nStrip];
+  StripPosition = (struct EKLMElementPosition*)
+                  malloc(nStrip * sizeof(struct EKLMElementPosition));
   if (StripPosition == NULL) {
     B2FATAL(MemErr);
     exit(ENOMEM);
@@ -215,8 +222,8 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   SectionSupportMiddleWidth = Sections.getLength("MiddleWidth") * cm;
   SectionSupportMiddleThickness = Sections.getLength("MiddleThickness") * cm;
   for (j = 0; j < nPlane; j++) {
-    SectionSupportPosition[j] = new struct
-        EKLMSectionSupportPosition[nSection + 1];
+    SectionSupportPosition[j] = (struct EKLMSectionSupportPosition*)
+                                malloc((nSection + 1) * sizeof(struct EKLMSectionSupportPosition));
     if (SectionSupportPosition[j] == NULL) {
       B2FATAL(MemErr);
       exit(ENOMEM);
@@ -744,6 +751,7 @@ void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT* mpvgt)
     B2FATAL(MemErr);
     exit(ENOMEM);
   }
+  delete solidCorner2Prism;
   printVolumeMass(logicCorner2);
 }
 
@@ -801,6 +809,7 @@ void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT* mpvgt)
     B2FATAL(MemErr);
     exit(ENOMEM);
   }
+  delete solidCorner3Prism;
   printVolumeMass(logicCorner3);
 }
 
@@ -858,6 +867,7 @@ void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT* mpvgt)
     B2FATAL(MemErr);
     exit(ENOMEM);
   }
+  delete solidCorner4Prism;
   printVolumeMass(logicCorner4);
 }
 
@@ -1157,6 +1167,9 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
       createPlasticListElement(i, j, physiPlane);
   for (i = 1; i <= nStrip; i++)
     createStripVolume(i, physiPlane);
+  delete solidPlanePrism1;
+  delete solidPlanePrism2;
+  delete solidPlanePrism3;
 }
 
 void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,

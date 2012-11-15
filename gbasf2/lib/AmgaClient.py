@@ -4,8 +4,8 @@
 # AmgaClient class used for communication with AMGA metadata catalog
 # Author: Milosz Zdybal (milosz.zdybal@ifj.edu.pl)
 # 2010-01
-# Editor: Tom Fifield (fifieldt@unimelb.edu.au)
-# 2010-11
+# Editor: Tom Fifield (fifieldt@unimelb.edu.au), WenJing Wu (wuwj@ihep.ac.cn),
+#         YanLiang Han (hanyl@ihep.ac.cn)
 import mdclient
 import mdinterface
 import sys
@@ -60,10 +60,15 @@ class AmgaClient(object):
                                        os.environ['X509_USER_PROXY'])
             else:
                 raise Exception('Could not find X509 proxy')
+
+            # try the most basic command to see if the connection is really up
+            self.client.execute('whoami')
+
         except Exception, ex:
             print 'Could not connect to AMGA server:', ex
+            print 'Please lodge a support ticket for help:\
+            https://belle2.cc.kek.jp/redmine/projects/support/issues/new'
 
-        self.client.execute('whoami')
         print self.client.fetchRow()
 
 ###############################################################################
@@ -85,12 +90,11 @@ class AmgaClient(object):
         return result
 
 ##########################################################################
-# added by wuwj@ihep.ac.cn
 
     def checkEntry(self, entry):
         '''
-....check if an entry exists
-....'''
+        check if an entry exists
+        '''
 
         dirname = os.path.dirname(entry)
         files = self.getSubdirectories(dirname)
@@ -127,18 +131,6 @@ class AmgaClient(object):
 
         tmp = []
         results = []
-
-       # self.client.find(experiment, query)
-       # while not self.client.eot():
-       #     tmp.append(experiment + '/' + self.client.fetchRow())
-
-       # for t in tmp:
-       #     print t
-       #     self.client.getattr(t, ['lfn', 'events'])
-       #     self.client.fetchRow()
-       #     results.append(self.client.fetchRow())
-
-       # return results
 
         self.client.execute('SELECT ' + 'lfn,events' + ' FROM ' + experiment
                             + ' WHERE ' + query.replace(' and ', ' AND '))
@@ -189,19 +181,6 @@ class AmgaClient(object):
                     tmplfn = row
 
             results[tmplfn] = tmp
-
-        # self.client.find(experiment, query)
-        # while not self.client.eot():
-        #    tmp.append(experiment + '/' + self.client.fetchRow())
-
-        # for t in tmp:
-        #    self.client.getattr(t, attributes)
-        #  # ignore the first row
-        #    self.client.fetchRow()
-        #  # attributes are returned as a dict (index is path) of dicts
-        #    results[t] = {}
-        #    for attribute in attributes:
-        #        results[t][attribute] = self.client.fetchRow()
 
         return results
 
@@ -274,9 +253,6 @@ class AmgaClient(object):
 
 ###############################################################################
 
-###############################################################################
-## Wenjing Wu wuwj@ihep.ac.cn
-
     def getAttributesValues(self, basepath, attrs):
         '''
       returns the values of given attributes in a given directory, or False on
@@ -291,12 +267,10 @@ class AmgaClient(object):
                 entries[file] = values
             return entries
         except mdinterface.CommandException, ex:
-    # ....print "->",file,values
             print 'getAttributesValues Error:', ex
             return False
 
 ###############################################################################
-## Wenjing Wu wuwj@ihep.ac.cn
 
     def rm(self, path):
         '''remove a path'''
@@ -309,8 +283,6 @@ class AmgaClient(object):
             return False
 
 ###############################################################################
-## Wenjing Wu wuwj@ihep.ac.cn
-
     def removeDir(self, dir):
         '''remove a dir'''
 

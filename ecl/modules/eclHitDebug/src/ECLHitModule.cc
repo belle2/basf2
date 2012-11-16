@@ -107,7 +107,7 @@ void ECLHitModule::event()
 
 
     // Hit geom. info
-    int hitCellId       =   aECLSimHit->getCellId();
+    int hitCellId       =   aECLSimHit->getCellId() - 1;
     double hitE        = aECLSimHit->getEnergyDep() * Unit::GeV;
     double hitTOF         = aECLSimHit->getFlightTime() * Unit::ns;
     TVector3 HitInPos  =   aECLSimHit->getPosIn();
@@ -148,7 +148,7 @@ void ECLHitModule::event()
 //        cout<<iECLCell<<" "<<E_cell[iECLCell][TimeIndex]<<" "<<Tof_ave[iECLCell][TimeIndex] + T_ave[iECLCell][TimeIndex] <<endl;
         m_hitNum = eclHitArray->GetLast() + 1;
         new(eclHitArray->AddrAt(m_hitNum)) ECLDebugHit();
-        eclHitArray[m_hitNum]->setCellId(iECLCell);
+        eclHitArray[m_hitNum]->setCellId(iECLCell + 1);
         eclHitArray[m_hitNum]->setEnergyDep(E_cell[iECLCell][TimeIndex]);
         eclHitArray[m_hitNum]->setTimeAve(Tof_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex]);
       }//if Energy > 0

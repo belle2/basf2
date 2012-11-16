@@ -67,7 +67,7 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
     if (m_params.pdgCodes.size() == 1) {
       //only one PDGcode available, always take this one
       p.setPDG(m_params.pdgCodes[0]);
-    } else if (nTracks <= 0) {
+    } else if (m_params.nTracks <= 0) {
       //0 or negative nTracks, take the ids sequentially
       p.setPDG(m_params.pdgCodes[i]);
     } else {

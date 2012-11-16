@@ -15,6 +15,8 @@
 #include <framework/datastore/DataStore.h>
 #include "ecl/dataobjects/ECLShower.h"
 #include <math.h>
+#include "CLHEP/Matrix/Matrix.h"
+#include "CLHEP/Matrix/SymMatrix.h"
 
 
 #include <TObject.h>
@@ -114,17 +116,44 @@ namespace Belle2 {
       double m_theta = aECLShower->GetTheta();
       double m_phi = aECLShower->GetPhi();
 
-      m_errorMatrix[0][0] = EnergyError * EnergyError;
-      m_errorMatrix[1][1] = (sin(m_theta) * cos(m_phi) * EnergyError) * (sin(m_theta) * cos(m_phi) * EnergyError)
-                            + (m_energy * cos(m_theta) * cos(m_phi) * ThetaError) * (m_energy * cos(m_theta) * cos(m_phi) * ThetaError)
-                            + (m_energy * sin(m_theta) * sin(m_phi) * PhiError) * (m_energy * sin(m_theta) * sin(m_phi) * PhiError);
-      m_errorMatrix[2][2] = (sin(m_theta) * sin(m_phi) * EnergyError) * (sin(m_theta) * sin(m_phi) * EnergyError)
-                            + (m_energy * cos(m_theta) * sin(m_phi) * ThetaError) * (m_energy * cos(m_theta) * sin(m_phi) * ThetaError)
-                            + (m_energy * sin(m_theta) * cos(m_phi) * PhiError) * (m_energy * sin(m_theta) * cos(m_phi) * PhiError);
 
-      m_errorMatrix[3][3] = (cos(m_theta) * EnergyError) * (cos(m_theta) * EnergyError)
-                            + (m_energy * sin(m_theta) * ThetaError) * (m_energy * sin(m_theta) * ThetaError);
+      CLHEP::HepSymMatrix  errEcl(3, 0);   // 3x3 initialize to zero
+      errEcl[ 0 ][ 0 ] = EnergyError * EnergyError; // Energy
+      errEcl[ 1 ][ 0 ] = 0;
+      errEcl[ 1 ][ 1 ] = PhiError * PhiError; // Phi
+      errEcl[ 2 ][ 0 ] = 0;
+      errEcl[ 2 ][ 1 ] = 0;
+      errEcl[ 2 ][ 2 ] = ThetaError * ThetaError; // Theta
 
+      CLHEP::HepMatrix  jacobian(4, 3, 0);
+      double  cosPhi = cos(m_phi);
+      double  sinPhi = sin(m_phi);
+      double  cosTheta = cos(m_theta);
+      double  sinTheta = sin(m_theta);
+      double   E = m_energy;
+
+      jacobian[ 0 ][ 0 ] =       cosPhi * sinTheta;
+      jacobian[ 0 ][ 1 ] =  -E * sinPhi * sinTheta;
+      jacobian[ 0 ][ 2 ] =   E * cosPhi * cosTheta;
+      jacobian[ 1 ][ 0 ] =       sinPhi * sinTheta;
+      jacobian[ 1 ][ 1 ] =   E * cosPhi * sinTheta;
+      jacobian[ 1 ][ 2 ] =   E * sinPhi * cosTheta;
+      jacobian[ 2 ][ 0 ] =            cosTheta;
+      jacobian[ 2 ][ 1 ] =           0.0;
+      jacobian[ 2 ][ 2 ] =  -E      * sinTheta;
+      jacobian[ 3 ][ 0 ] =           1.0;
+      jacobian[ 3 ][ 1 ] =           0.0;
+      jacobian[ 3 ][ 2 ] =           0.0;
+      CLHEP::HepSymMatrix errCart(4, 0);
+      errCart = errEcl.similarity(jacobian);
+
+
+      for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= i ; j++) {
+          m_errorMatrix[i][j] = errCart[i][j];
+          m_errorMatrix[j][i] = errCart[i][j];
+        }
+      }
       return m_errorMatrix;
     }
 

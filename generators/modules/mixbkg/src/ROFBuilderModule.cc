@@ -218,7 +218,7 @@ void ROFBuilderModule::event()
       break;
     case 2 : addSimHitsToROF<SVDSimHit>();
       break;
-    case 3 : addSimHitsToROF<CDCSimHit>();
+    case 3 : //addSimHitsToROF<CDCSimHit>();
       break;
     case 4 : addSimHitsToROF<TOPSimHit>();
       break;

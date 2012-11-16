@@ -64,21 +64,21 @@ namespace Belle2 {
       std::vector<const SVDTrueHit*> svdTrueHits; /**< pointer to SVD-trueHits which could be assigned to svd-clusters */
       std::vector<CompatibilityIndex> compatiblePartners; /**< knows each partner which shares hits with current TC */
 
-      bool isMCtrackCandidate; // is it MC TF TC?
-      int indexNumber; // TODO no idea
-      int finalAssignedID; // for mcTCs, their own ID in the tcVector for mcTCs. for CA, the ID of the mcTC which got the highest number of compatible hits
-      double qualityIndex; // the higher, the better. numGoodHits / numTotalHitsOfmcTC
-      int numOfCorrectlyAssignedHits; // numGoodHits
-      int numOfBadAssignedHits; // Hits which are in the caTC but not in the assigned mcTC (contaminated)
-      bool successfullyFound;
-      int pdgCode;
-      TVector3 direction; // initial momentum vector (interesting for comparison)
-      TVector3 vertex; // initial vertex position (only valid for mcTCs)
-      bool survivedFit; // is true if GFTC survived fit within VXDTF
+      bool isMCtrackCandidate; /**< is it MC TF TC?  */
+      int indexNumber; /**< index number in StoreArray  */
+      int finalAssignedID; /**< for mcTCs, their own ID in the tcVector for mcTCs. for CA, the ID of the mcTC which got the highest number    of compatible hits  */
+      double qualityIndex; /**< the higher, the better. numGoodHits / numTotalHitsOfmcTC  */
+      int numOfCorrectlyAssignedHits; /**< numGoodHits  */
+      int numOfBadAssignedHits; /**< Hits which are in the caTC but not in the assigned mcTC (contaminated)  */
+      bool successfullyFound; /**< is true if reconstruction was successful */
+      int pdgCode; /**<  for caTCs, guess of pdg-code, for mcTCs, actual pdg-code */
+      TVector3 direction; /**< initial momentum vector (interesting for comparison)  */
+      TVector3 vertex; /**< initial vertex position (only valid for mcTCs)  */
+      bool survivedFit; /**< is true if GFTC survived fit within VXDTF */
 
-      double probValue; // probability value of kalmanfit
-      double pTValue; // carries the real/guessed magnitude of the transverse part of the Momentum vector
-      double pValue; // magnitude of total momentum
+      double probValue; /**< probability value of kalmanfit */
+      double pTValue; /**< carries the real/guessed magnitude of the transverse part of the Momentum vector */
+      double pValue; /**< magnitude of total momentum */
 
     };
 
@@ -113,8 +113,11 @@ namespace Belle2 {
     /** prints info to console of compatible mcTC and caTC */
     void printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXDTrackCandidate& caTC);  // used for exporting information
 
-    /** used for exporting info to console about mcTC (should not be used for caTCs, printed information would be misleading). This function is somewhat redundant to voud PrintInfo, but allows better structure of output  */
+    /** used for exporting info to console about mcTC (should not be used for caTCs, use printCA instead). This function is somewhat redundant to voud PrintInfo, but allows better structure of output  */
     void printMC(bool info, VXDTrackCandidate& mcTC);
+
+    /** used for exporting info to console about caTC (should not be used for mcTCs, use printMC instead). This function is somewhat redundant to voud PrintInfo, but allows better structure of output  */
+    void printCA(bool type, VXDTrackCandidate& caTC);
 
   protected:
     bool m_PARAMFileExportMcTracks; /**< possibly needed later (currently not in use), exports McTracks to File */

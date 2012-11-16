@@ -243,6 +243,11 @@ namespace Belle2 {
                  int passNumber);
 
 
+    /** using paper "Effective circle fitting for particle trajectories"
+     * from V. Karimäki (Nucl.Instr.and Meth. in Physics Research, A305 (1991), Elsevier)
+     * to calculate pT */
+    double circleFit(std::vector<VXDTFHit*> hits);
+
     /** name is program, needed for GFTrackCand export */
     void calcInitialValues4TCs(TCsOfEvent& tcVector);
 
@@ -279,6 +284,8 @@ namespace Belle2 {
     void cleanEvent(CurrentPassData* currentPass, std::string centerSector);
 
 
+    /** random generator function */
+//    ptrdiff_t rngWrapper(ptrdiff_t i);
   protected:
     TCsOfEvent m_tcVector; /**< carries links to all track candidates found within event (during tcc filter, bad ones get kicked, lateron they simply get deactivated) */
     TCsOfEvent m_tcVectorOverlapped; /**< links only to track candidates which share at least one cluster with others*/

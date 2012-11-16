@@ -301,6 +301,7 @@ namespace Belle2 {
     int m_PARAMdetectorType; /**< sets detector type -1 for VXD, Const::PXD for PXD and Const::SVD for SVD */
     int m_longTrackCounter; /**< counts number of tracks having more than 30 hits */
     int m_longTrackletCounter; /**< counts tracklets having more than the theoretically possible number of hits (should therefore always be 0 )*/
+    int m_badFilterValueCtr; /**< counts number of times, when calculation of filters produced "nan" */
     int m_numOfLayers; /**< knows number of layers used in chosen detector type */
     int m_totalHitCounter; /**< counts total number of hits occured */
     int m_PARAMminTrackletLength; /**< threshold for minimum tracklet length (without IP). tracklets having less hits than this value will not be checked */

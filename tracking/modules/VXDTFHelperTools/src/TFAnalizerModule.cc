@@ -30,6 +30,7 @@
 
 //C++-stuff
 #include <iostream>
+#include <iomanip> // for setprecision on cout-doubles
 #include <string>
 #include <functional>
 
@@ -218,12 +219,20 @@ void TFAnalizerModule::event()
     BOOST_FOREACH(int iD, foundIDs) { if (iD == mcTC.indexNumber) { foundFlag = true; } }
     m_totalRealHits += int(mcTC.coordinates.size() / 2);
     if (foundFlag == true) {
-      printMC(true, mcTC);
+      printMC(true, mcTC); /// printMC
       m_totalRealHits += int(mcTC.coordinates.size() / 2);
     } else {
-      printMC(false, mcTC);
+      printMC(false, mcTC); /// printMC
     }
   } // print info about all found and lost mcTCs
+
+  BOOST_FOREACH(VXDTrackCandidate & caTC, caTcVector) {
+    if (caTC.finalAssignedID == -1 || caTC.qualityIndex < m_PARAMqiThreshold) {
+      printCA(false, caTC); /// printCA
+    } else {
+      printCA(true, caTC); /// printCA
+    }
+  } // print info about all ghost and good caTCs
 
 
   B2DEBUG(1, "Event " << m_eventCounter << ": There are " << int(mcTcVector.size()) << " mcTCs, ")
@@ -283,13 +292,13 @@ void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXD
   B2INFO("PRINTINFO: At event " << m_eventCounter <<
          ": mcType §" << tcType <<
          "§ having §" << mcTC.coordinates.size() <<
-         "§ hits with theta of §" << theta <<
-         "§° got pT of §" << mcTC.pTValue <<
-         "§ GeV/c, assigned caTC got pT of §" << caTC.pTValue <<
-         "§ GeV/c, and probValue of §" << caTC.probValue <<
-         "§. Their residual of pT was §" << residual <<
-         "§ GeV/c, their residual of angle was §" << angle <<
-         "§ in grad, their residual of transverse angle was §" << transverseAngle <<
+         "§ hits with theta of §" << setprecision(2) << theta <<
+         "§° got pT of §" << setprecision(4) << mcTC.pTValue <<
+         "§ GeV/c, assigned caTC got pT of §" << setprecision(4) << caTC.pTValue <<
+         "§ GeV/c, and probValue of §" << setprecision(5) << caTC.probValue <<
+         "§. Their residual of pT was §" << setprecision(4) << residual <<
+         "§ GeV/c, their residual of angle was §" << setprecision(4) << angle <<
+         "§ in grad, their residual of transverse angle was §" << setprecision(4) << transverseAngle <<
          "§ with PDGCode of mcTC: §" << mcTC.pdgCode <<
          "§ and PDGCode of caTC: §" << caTC.pdgCode <<
          "§") // '§' will be used to filter
@@ -329,15 +338,36 @@ void TFAnalizerModule::printMC(bool type, VXDTrackCandidate& mcTC)
 
   B2INFO(info << ": At event " << m_eventCounter <<
          ": MC with ID " << mcTC.indexNumber << " having §" << mcTC.coordinates.size() <<
-         "§ hits with theta of §" << theta <<
-         "§° got pT of §" << mcTC.pTValue <<
-         "§ GeV/c and vertex distance to origin: §" << distVertex2Zero <<
-         "§cm, transverseDistance: §" << distTVertex2Zero <<
-         "§cm, zDistance: §" << distZVertex2Zero <<
-         "§, and pdg of: " << pdg) // '§' will be used to filter
+         "§ hits with theta of §" << setprecision(2) << theta <<
+         "§° got pT of §" << setprecision(4) << mcTC.pTValue <<
+         "§ GeV/c and vertex distance to origin: §" << setprecision(4) << distVertex2Zero <<
+         "§cm, transverseDistance: §" << setprecision(4) << distTVertex2Zero <<
+         "§cm, zDistance: §" << setprecision(4) << distZVertex2Zero <<
+         "§, and pdg of: " << setprecision(4) << pdg) // '§' will be used to filter
 }
 
 
+
+void TFAnalizerModule::printCA(bool type, VXDTrackCandidate& caTC)
+{
+  string info;
+  if (type == true) { info = "FOUNDCATCINFO"; } else { info = "LOSTCATCINFO"; }
+
+  TVector3 zDir; // vector parallel to z-axis
+  zDir.SetXYZ(0., 0., 1.);
+  TVector3 caDirection = caTC.direction;
+
+  double theta = caDirection.Angle(zDir);
+  theta = theta * 180.*TMath::InvPi();
+  int pdg = caTC.pdgCode;
+
+  B2INFO(info << ": At event " << m_eventCounter <<
+         ": CA with assigned ID " << caTC.finalAssignedID <<
+         " having §" << caTC.coordinates.size() <<
+         "§ hits with theta of §" << setprecision(2) << theta <<
+         "§° got pT of §" << setprecision(4) << caTC.pTValue <<
+         "§ GeV/c, QI of §" << setprecision(3) << caTC.qualityIndex << "§ and pdg of: " << pdg) // '§' will be used to filter
+}
 
 
 
@@ -488,9 +518,9 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
     newTC.qualityIndex = 0;
 
     /// read additional info:
-    int index = aTC->getMcTrackId();
-    newTC.probValue = infoBoards[index]->getProbValue();
-    newTC.survivedFit = infoBoards[index]->isFitPossible();
+    int gfIndex = aTC->getMcTrackId();
+    newTC.probValue = infoBoards[gfIndex]->getProbValue();
+    newTC.survivedFit = infoBoards[gfIndex]->isFitPossible();
   }
   B2DEBUG(20, " end of extractHits. TC isMCTC: " << isMCTC << ", PDGCode: " << pdgCode << ", finalAssignedID: " << newTC.finalAssignedID << ", indexNumber: " << newTC.indexNumber << ", pValue: " << pValue << ", pT: " << pT)
   tcVector.push_back(newTC);
@@ -564,7 +594,7 @@ void TFAnalizerModule::checkCompatibility(VXDTrackCandidate& mcTC, VXDTrackCandi
   compatibilityValue = double(goodHitsInCaTC) / double(totalMCHits);
   B2DEBUG(10, "calculated compatibilityValue: " << compatibilityValue << ", caTC.qualityIndex: " << caTC.qualityIndex)
 
-  if (caTC.qualityIndex < compatibilityValue) {
+  if (caTC.qualityIndex < compatibilityValue) {  // in this case, the current mcTC suits better for the caTC guess than for the last one.
     caTC.qualityIndex = compatibilityValue;
     caTC.finalAssignedID = mcTC.finalAssignedID;
     caTC.numOfCorrectlyAssignedHits = goodHitsInCaTC;

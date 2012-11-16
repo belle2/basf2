@@ -21,6 +21,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <math.h>
 #include <TRandom.h>
 using namespace std;
 using namespace Belle2;
@@ -108,6 +109,7 @@ void FilterCalculatorModule::beginRun()
   m_totalHitCounter = 0;
   m_longTrackCounter = 0;
   m_numOfLayers = 0;
+  m_badFilterValueCtr = 0;
   if (m_PARAMdetectorType == -1) {
     m_numOfLayers = 6;
   } else if (m_PARAMdetectorType == Const::PXD) {
@@ -574,7 +576,9 @@ void FilterCalculatorModule::event()
 
               deltapT = abs(abs(pTAB) - abs(pTBC));
 
-              thisSectorPos->second.addValue(friendSector, "deltaPt", deltapT);
+              if (isnan(deltapT) == false) {
+                thisSectorPos->second.addValue(friendSector, "deltaPt", deltapT);
+              } else { m_badFilterValueCtr++; }
 
               if (m_PARAMtrackErrorTracks == true) {
                 if (pTAB > 5.0 * pMaxInMeV * 0.001 || pTAB < 0.2 * pMinInMeV * 0.001) { /** pTAB - inner pair of segments **/
@@ -591,7 +595,9 @@ void FilterCalculatorModule::event()
 
               deltaDist2IP = abs(dist2IPAB - dist2IPBC);
 
-              thisSectorPos->second.addValue(friendSector, "deltaDist2IP", deltaDist2IP);
+              if (isnan(deltaDist2IP) == false) {
+                thisSectorPos->second.addValue(friendSector, "deltaDist2IP", deltaDist2IP);
+              } else { m_badFilterValueCtr++; }
             }
 
             ++it4HitsFilter; // -"- 4hit-Filters...
@@ -637,11 +643,17 @@ void FilterCalculatorModule::event()
 
             if (m_PARAMlogTRadiustoIPDistance == true) {
               dist2IP = abs(intersectionAB.Mag() - inverseKappaAB); // distance between interaction point and intersection point.
-              thisSectorPos->second.addValue(friendSector, "dist2IP", dist2IP);
+
+              if (isnan(dist2IP) == false) {
+                thisSectorPos->second.addValue(friendSector, "dist2IP", dist2IP);
+              } else { m_badFilterValueCtr++; }
             }
             if (m_PARAMlogPt == true) {
               pTAB = 0.45 * inverseKappaAB * 0.01; // pT[GeV/c] = 0.3*B[T]*r[m] = 0.45*r[cm]/100
-              thisSectorPos->second.addValue(friendSector, "pT", pTAB);
+
+              if (isnan(pTAB) == false) {
+                thisSectorPos->second.addValue(friendSector, "pT", pTAB);
+              } else { m_badFilterValueCtr++; }
             }
           }
 
@@ -655,7 +667,9 @@ void FilterCalculatorModule::event()
 
             distanceDeltaZ = segVec2(1) / seg2Length - segVec1(1) / seg1Length;
 
-            thisSectorPos->second.addValue(friendSector, "distanceDeltaZ", distanceDeltaZ);
+            if (isnan(distanceDeltaZ) == false) {
+              thisSectorPos->second.addValue(friendSector, "distanceDeltaZ", distanceDeltaZ);
+            } else { m_badFilterValueCtr++; }
           }
 
           if (m_PARAMlogAngles3D == true) {
@@ -664,7 +678,9 @@ void FilterCalculatorModule::event()
 
             angles3D = acos((segmentVector1.Dot(segmentVector2)) / (seg1Length * seg2Length));
 
-            thisSectorPos->second.addValue(friendSector, "angles3D", angles3D);
+            if (isnan(angles3D) == false) {
+              thisSectorPos->second.addValue(friendSector, "angles3D", angles3D);
+            } else { m_badFilterValueCtr++; }
           }
 
           if (m_PARAMlogAnglesXY == true) {
@@ -675,7 +691,9 @@ void FilterCalculatorModule::event()
 
             anglesXY = acos((segVec1.Dot(segVec2)) / (seg1Length * seg2Length));
 
-            thisSectorPos->second.addValue(friendSector, "anglesXY", anglesXY);
+            if (isnan(anglesXY) == false) {
+              thisSectorPos->second.addValue(friendSector, "anglesXY", anglesXY);
+            }  else { m_badFilterValueCtr++; }
           }
 
           if (m_PARAMlogAnglesRZ == true) {
@@ -688,7 +706,9 @@ void FilterCalculatorModule::event()
 
             anglesRZ = acos((segVec1.Dot(segVec2)) / (seg1Length * seg2Length));
 
-            thisSectorPos->second.addValue(friendSector, "anglesRZ", anglesRZ);
+            if (isnan(anglesRZ) == false) {
+              thisSectorPos->second.addValue(friendSector, "anglesRZ", anglesRZ);
+            } else { m_badFilterValueCtr++; }
           }
 
           ++it3HitsFilter; // -"- 3hit-Filters...
@@ -713,20 +733,26 @@ void FilterCalculatorModule::event()
           segVec1.SetXYZ(segmentVector[0], segmentVector[1], 0.);
           distanceXY = segVec1.Mag();
 
-          thisSectorPos->second.addValue(friendSector, "distanceXY", distanceXY);
+          if (isnan(distanceXY) == false) {
+            thisSectorPos->second.addValue(friendSector, "distanceXY", distanceXY);
+          } else { m_badFilterValueCtr++; }
         }
 
         if (m_PARAMlogDistanceZ == true) {
           segVec1.SetXYZ(0., 0., segmentVector[2]);
           distanceZ = segVec1.Mag();
 
-          thisSectorPos->second.addValue(friendSector, "distanceZ", distanceZ);
+          if (isnan(distanceZ) == false) {
+            thisSectorPos->second.addValue(friendSector, "distanceZ", distanceZ);
+          } else { m_badFilterValueCtr++; }
         }
 
         if (m_PARAMlogDistance3D == true) {
           distance3D = segmentVector.Mag();
 
-          thisSectorPos->second.addValue(friendSector, "distance3D", distance3D);
+          if (isnan(distance3D) == false) {
+            thisSectorPos->second.addValue(friendSector, "distance3D", distance3D);
+          } else { m_badFilterValueCtr++; }
         }
 
         if (m_PARAMlogNormedDistance3D == true) {
@@ -735,8 +761,9 @@ void FilterCalculatorModule::event()
           distanceR = segVec1.Mag();
 
           normedDistance3D = distance3D / distanceR;
-
-          thisSectorPos->second.addValue(friendSector, "normedDistance3D", normedDistance3D);
+          if (isnan(normedDistance3D) == false) {
+            thisSectorPos->second.addValue(friendSector, "normedDistance3D", normedDistance3D);
+          } else { m_badFilterValueCtr++; }
         }
 
         ++it2HitsFilter; //important for 2hit-Filters: points to current hit of 2-hit-processes
@@ -764,6 +791,7 @@ void FilterCalculatorModule::endRun()
   B2INFO(" there were " << m_longTrackCounter << " Tracks having more than " << m_numOfLayers * 2 << " hits...")
   B2INFO(" there were " << m_longTrackletCounter << " Tracklets having more than " << m_numOfLayers * 2 << " hits!!!")
   B2INFO(" totalGlobalCoordValue: " << m_totalGlobalCoordValue << ", totalLocalCoordValue: " << m_totalLocalCoordValue << ", of " << totalHitCounter << " hits total (" << m_totalHitCounter << " counted manually) ")
+  B2INFO(m_badFilterValueCtr << " times, a filter produced invalid results ('nan')")
   B2INFO("~~~~~~~~~~~FilterCalculator - endRun ~~~~~~~~~~")
 }
 

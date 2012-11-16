@@ -858,7 +858,7 @@ void VXDTFModule::event()
 
       hitLocal.SetXYZ(aClusterPtr->getPosition(), aSecondClusterPtr->getPosition(), 0); // WARNING: this version is wrong for slanted parts, therefore only a temporary solution
 
-      VxdID aVxdID = aClusterPtr->getSensorID();
+      aVxdID = aClusterPtr->getSensorID();
       aLayerID = aVxdID.getLayerNumber();
       VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
       hitGlobal = aSensorInfo.pointToGlobal(hitLocal);
@@ -1133,6 +1133,7 @@ void VXDTFModule::event()
   ///calc QI for each TC:
   if (m_PARAMcalcQIType == "kalman" and allowKalman == true) {
     vector<GFTrackCand> temporalTrackCandidates = calcQIbyKalman(m_tcVector, aPxdClusterArray, aSvdClusterArray); /// calcQIbyKalman
+    /// TODO temporalTrackCandidates not used. could save time when reusing this info for GFTrackCand-export... TODO
   } else if (m_PARAMcalcQIType == "trackLength" and allowKalman == false) {
     calcQIbyLength(m_tcVector, m_passSetupVector);                              /// calcQIbyLength
   }
@@ -1760,16 +1761,17 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
 int VXDTFModule::neighbourFinder(CurrentPassData* currentPass)
 {
   int NFdiscardedSegmentsCounter = 0;
-  string outerLayerID, centerLayerID, innerLayerID, currentFriendID;
+  string  centerLayerID, currentFriendID; // not needed: outerLayerID, innerLayerID
   TVector3 outerCoords, outerCenterCoords, centerCoords, innerCenterCoords, innerCoords, outerVector, centerVector, innerVector, outerTempVector;
   TVector3 innerTempVector, cpA/*central point of innerSegment*/, cpB/*central point of mediumSegment*/, nA/*normal vector of segment a*/, nB/*normal vector of segment b*/, intersectionAB;
   int simpleSegmentQI; // better than segmentApproved, but still digital (only min and max cutoff values), but could be weighed by order of relevance
+  int centerLayerIDNumber = 0;
   OperationSequenceOfActivatedSectors::const_iterator secSequenceIter;
   MapOfSectors::iterator mainSecIter;
   MapOfSectors::iterator friendSecIter;
   for (secSequenceIter = currentPass->sectorSequence.begin(); secSequenceIter != currentPass->sectorSequence.end(); ++secSequenceIter) {
     B2DEBUG(1000, "SectorSequence is named " << (*secSequenceIter).first);
-    MapOfSectors::const_iterator mainSecIter = (*secSequenceIter).second;
+    mainSecIter = (*secSequenceIter).second;
 
     vector<VXDSegmentCell*> outerSegments = mainSecIter->second->getInnerSegmentCells(); // loading segments of sector
     int nOuterSegments = outerSegments.size();
@@ -1779,6 +1781,7 @@ int VXDTFModule::neighbourFinder(CurrentPassData* currentPass)
       outerVector = outerCoords - centerCoords;
       currentFriendID = outerSegments[thisOuterSegment]->getInnerHit()->getSectorName();
       centerLayerID = currentFriendID[0];
+      centerLayerIDNumber = boost::lexical_cast<int>(centerLayerID);
 
       //       vector<VXDSegmentCell*> innerSegments = outerSegments[thisOuterSegment]->getInnerHit()->getAttachedInnerCell();
       const vector<int>& innerSegments = outerSegments[thisOuterSegment]->getInnerHit()->getAttachedInnerCell();
@@ -1788,7 +1791,7 @@ int VXDTFModule::neighbourFinder(CurrentPassData* currentPass)
         VXDSegmentCell* currentInnerSeg = currentPass->totalCellVector[innerSegments[thisInnerSegment]];
         innerCoords = currentInnerSeg->getInnerHit()->getHitCoordinates();
         innerVector = centerCoords - innerCoords;
-        innerLayerID = currentInnerSeg->getInnerHit()->getSectorName()[0];
+//         innerLayerID = currentInnerSeg->getInnerHit()->getSectorName()[0];
 
         simpleSegmentQI = 0;
 
@@ -1924,7 +1927,7 @@ int VXDTFModule::neighbourFinder(CurrentPassData* currentPass)
         outerSegments[thisOuterSegment]->addInnerNeighbour(currentInnerSeg);
         currentInnerSeg->addOuterNeighbour(outerSegments[thisOuterSegment]);
 
-        if (centerLayerID < currentPass->highestAllowedLayer) {
+        if (centerLayerIDNumber < currentPass->highestAllowedLayer) {
           currentInnerSeg->setSeed(false);
         }
       } // iterating through inner segments
@@ -1972,7 +1975,6 @@ void VXDTFModule::cellularAutomaton(CurrentPassData* currentPass)
   int activeCells = 1;
   int caRound = 0;
   int goodNeighbours, countedSegments, segState;
-  ActiveSegmentsOfEvent::iterator currentSeg;
 
   while (activeCells != 0) {
     activeCells = 0;
@@ -2231,6 +2233,57 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber)
 
 
 
+double VXDTFModule::circleFit(vector<VXDTFHit*> hits)
+{
+  TVector3 hitPos;
+  double meanX = 0, meanY = 0, meanX2 = 0, meanY2 = 0, meanR2 = 0, meanR4 = 0, meanXR2 = 0, meanYR2 = 0, meanXY = 0; //mean values
+  double r2 = 0, x = 0, y = 0, x2 = 0, y2 = 0, divisor = 1 / double(hits.size()); // coords and divisor which is the same for all of them
+  double covXX = 0, covXY = 0, covYY = 0, covXR2 = 0, covYR2 = 0, covR2R2 = 0; // covariances
+  double q1 = 0, q2 = 0; // helping variables, to make the code more readable
+  // looping over all hits and do the division afterwards
+  BOOST_FOREACH(VXDTFHit * hit, hits) {
+    hitPos = hit->getHitCoordinates();
+    x = hitPos.X();
+    y = hitPos.Y();
+    x2 = x * x;
+    y2 = y * y;
+    r2 = x2 + y2;
+    meanX += x;
+    meanY += y;
+    meanXY += x * y;
+    meanX2 += x2;
+    meanY2 += y2;
+    meanXR2 += x * r2;
+    meanYR2 += y * r2;
+    meanR2 += r2;
+    meanR4 += r2 * r2;
+  }
+  meanX *= divisor;
+  meanY *= divisor;
+  meanXY *= divisor;
+  meanY2 *= divisor;
+  meanX2 *= divisor;
+  meanXR2 *= divisor;
+  meanYR2 *= divisor;
+  meanR2 *= divisor;
+  meanR4 *= divisor;
+
+  covXX = meanX2 - meanX * meanX;
+  covXY = meanXY - meanX * meanY;
+  covYY = meanY2 - meanY * meanY;
+  covXR2 = meanXR2 - meanX * meanR2;
+  covYR2 = meanYR2 - meanY * meanR2;
+  covR2R2 = meanR4 - meanR2 * meanR2;
+
+  q1 = covR2R2 * covXY - covXR2 * covYR2;
+  q2 = covR2R2 * (covXX - covYY) - covXR2 * covXX + covYR2 * covYR2;
+  double phi = 0.5 * atan(2 * q1 / q2); // physical meaning: direction of flight at point of closest approach to origin (not relevant here, since we need the direction of flight at a completely different location)
+  double invKappa = covR2R2 / (sin(phi) * covXR2 - cos(phi) * covYR2); // 1/curvature in X-Y-plane = radius of fitting circle, used for pT-calculation
+  return invKappa;
+}
+
+
+
 void VXDTFModule::calcInitialValues4TCs(TCsOfEvent& tcVector)
 {
   vector<VXDTFHit*> currentHits;
@@ -2244,48 +2297,6 @@ void VXDTFModule::calcInitialValues4TCs(TCsOfEvent& tcVector)
     if (aTC->getCondition() == false) { continue; }
     currentHits = aTC->getHits();
     numOfCurrentHits = currentHits.size();
-
-// // // //     for (int i = 2; i < numOfCurrentHits - 3; ++i) {
-// // // //       hitA = currentHits[numOfCurrentHits - 1]->getHitCoordinates(); // innermost hit and initial value for GFTrackCandidate
-// // // //       hitA_T = hitA; hitA_T.SetZ(0.);
-// // // //       hitB = currentHits[numOfCurrentHits - 2]->getHitCoordinates();
-// // // //       hitB_T = hitB; hitB_T.SetZ(0.);
-// // // //       hitC = currentHits[0]->getHitCoordinates();
-// // // //       hitC_T = hitC; hitC_T.SetZ(0.);
-// // // //
-// // // //       segAB = hitB - hitA;
-// // // //       theta = segAB.Angle(zVector);
-// // // //       segAB.SetZ(0.);
-// // // //       segBC = hitC_T - hitB_T;
-// // // //       cpAB = 0.5 * segAB + hitA_T; // central point of innerSegment
-// // // //       cpBC = 0.5 * segBC + hitB_T;// central point of mediumSegment
-// // // //       nAB = segAB.Orthogonal();
-// // // //       nBC = segBC.Orthogonal();
-// // // //
-// // // //       signCurvature = sign(nBC * segAB);
-// // // //
-// // // //       muVal = (((cpAB(1) - cpBC(1)) / nBC(1)) + (((cpBC(0) - cpAB(0)) / nAB(0)) * nAB(1) / nBC(1))) / (1. - ((nBC(0) / nAB(0)) * (nAB(1) / nBC(1))));
-// // // //       intersection.SetX(cpBC(0) + muVal * nBC(0)); // x-coord of intersection point
-// // // //       intersection.SetY(cpBC(1) + muVal * nBC(1)); // y-coord of intersection point
-// // // //       intersection.SetZ(0.);
-// // // //       radialVector = (intersection - hitA);
-// // // //       radiusInCm = radialVector.Mag(); // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
-// // // //       pT = 0.45 * radiusInCm * 0.01; // pT[GeV/c] = 0.3*B[T]*r[m] = 0.45*r[cm]/100 = 0.45*r*0.01 length of pT
-// // // //       pZ = pT * tan(theta);
-// // // //       preFactor = pT / (radialVector.Mag());
-// // // //       pTVector = preFactor * radialVector.Orthogonal() ;
-// // // //
-// // // //       if ((hitA + pTVector).Mag() < hitA.Mag()) { pTVector = pTVector * -1; }
-// // // //
-// // // //       pVector = pTVector;
-// // // //       pVector.SetZ(pZ);
-// // // //       double pValue = pVector.Mag();
-// // // //       //     if (pValue < 0.035 || pValue > 5.0) { aTC->setCondition(false); continue; }
-// // // //
-// // // //       // the sign of curvature determines the charge of the particle, negative sign for curvature means positively charged particle. The signFactor is needed since the sign of PDG-codes are not defined by their charge but by being a particle or an antiparticle
-// // // //       pdGCode = signCurvature * m_PARAMpdGCode * m_chargeSignFactor;
-// // // //     }
-// // // //     hitA = currentHits[numOfCurrentHits - 1]->getHitCoordinates();
 
 /// method A: 3 neighbouring inner hits:
     if (m_KFBackwardFilter == true) {
@@ -2346,10 +2357,16 @@ void VXDTFModule::calcInitialValues4TCs(TCsOfEvent& tcVector)
     } else {
       radialVector = (intersection - hitA);
     }
-    radiusInCm = radialVector.Mag(); // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
+    /// following line needed for method A-C:
+    ///   radiusInCm = radialVector.Mag(); // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
+
+    /// method D: using circleFit
+    radiusInCm = circleFit(currentHits);
+
     pT = 0.45 * radiusInCm * 0.01; // pT[GeV/c] = 0.3*B[T]*r[m] = 0.45*r[cm]/100 = 0.45*r*0.01 length of pT
+//     B2INFO("event: "<<m_eventCounter<<": calculated pT: " << pT);
     pZ = pT / tan(theta);
-    preFactor = pT / (radialVector.Mag());
+    preFactor = pT / radiusInCm;
     pTVector = preFactor * radialVector.Orthogonal() ;
 
     if (m_KFBackwardFilter == true) {

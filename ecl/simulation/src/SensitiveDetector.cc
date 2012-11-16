@@ -197,14 +197,17 @@ namespace Belle2 {
       B2DEBUG(150, "HitNumber: " << m_simhitNumber);
       eclSimHitRel.add(trackID, m_simhitNumber);
 
+
       StoreArray<ECLHit> eclHitArray;
       RelationArray eclHitRel(mcParticles, eclHitArray);
       StoreObjPtr<EventMetaData> eventMetaDataPtr;
       int m_currentEvnetNumber = eventMetaDataPtr->getEvent();
 
+
+
       if (!eclHitArray) eclHitArray.create();
-      //cout<<PrimaryTrackId<<" "<<trackID<<endl;
-      //cout<<"firstcall "<<firstcall<<" m_oldEvnetNumber "<<m_oldEvnetNumber<<endl;
+
+
       if (firstcall == 0 || m_currentEvnetNumber != m_oldEvnetNumber) {
         m_oldEvnetNumber = m_currentEvnetNumber;
         for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
@@ -214,6 +217,8 @@ namespace Belle2 {
         }
         firstcall++;
       }
+
+
       if (m_currentEvnetNumber == m_oldEvnetNumber) {
         if ((tof / ns) < 8000) {
           TimeIndex = (int)(tof / ns) / 500;
@@ -239,18 +244,19 @@ namespace Belle2 {
             double old_edep = eclHitArray[m_hitNum]->getEnergyDep();
             double old_TimeAve = eclHitArray[m_hitNum]->getTimeAve();
 
-            //cout<<m_currentEvnetNumber<<" "<<m_hitNum
-            //    <<" old cellId  "<<eclHitArray[m_hitNum]->getCellId()<<" new "<<cellId
-            //    <<" oldE "<<old_edep<<" + newE "<<E_cell<<"= "<<old_edep+E_cell
-            //    <<" oldT "<<old_TimeAve<<" newT  "<<T_ave
-            //    <<"= "<< (old_edep*old_TimeAve+ E_cell*T_ave)/(old_edep+E_cell)<<endl;
+            ECLGeometryPar* eclp = ECLGeometryPar::Instance();
+            PosCell =  eclp->GetCrystalPos(cellId);
+            VecCell =  eclp->GetCrystalVec(cellId);
+            local_pos = (15. - (posAve  - PosCell) * VecCell);
+            T_ave =  6.05 + 0.0749 * local_pos - 0.00112 * local_pos * local_pos + (tof / ns)  ;
+
             eclHitArray[m_hitNum]->setEnergyDep(old_edep + E_cell);
             eclHitArray[m_hitNum]->setTimeAve((old_edep * old_TimeAve + E_cell * T_ave) / (old_edep + E_cell));
             eclHitRel.add(trackID, m_hitNum);
 
           }
         }
-      }//if m_oldEvnetNumber==m_oldEvnetNumber
+      } else {    B2ERROR("m_currentEvnetNumber  ERROR");} //if m_oldEvnetNumber==m_oldEvnetNumber
       return (m_simhitNumber);
     }//saveSimHit
 

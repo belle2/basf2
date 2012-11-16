@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <ecl/modules/eclHitDebug/ECLHitModule.h>
+#include <ecl/modules/eclHitDebug/ECLHitDebugModule.h>
 
 //framework headers
 #include <framework/datastore/StoreObjPtr.h>
@@ -45,27 +45,27 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLHit)
+REG_MODULE(ECLHitDebug)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLHitModule::ECLHitModule() : Module()
+ECLHitDebugModule::ECLHitDebugModule() : Module()
 {
   // Set description
-//  setDescription("ECLHitMakerModule");
+//  setDescription("ECLDebugHitMakerModule");
 
-  setDescription("ECLHitMakerModule");
+  setDescription("ECLHitDebugModule");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
 }
 
-ECLHitModule::~ECLHitModule()
+ECLHitDebugModule::~ECLHitDebugModule()
 {
 }
 
-void ECLHitModule::initialize()
+void ECLHitDebugModule::initialize()
 {
   // Initialize variables
   m_nRun    = 0 ;
@@ -77,11 +77,11 @@ void ECLHitModule::initialize()
 //  RelationArray mcPartToECLHitRel(mcParticles, eclHitArray);
 }
 
-void ECLHitModule::beginRun()
+void ECLHitDebugModule::beginRun()
 {
 }
 
-void ECLHitModule::event()
+void ECLHitDebugModule::event()
 {
 
   StoreArray<ECLSimHit> eclSimArray;
@@ -160,12 +160,12 @@ void ECLHitModule::event()
 }
 
 
-void ECLHitModule::endRun()
+void ECLHitDebugModule::endRun()
 {
   m_nRun++;
 }
 
-void ECLHitModule::terminate()
+void ECLHitDebugModule::terminate()
 {
 }
 

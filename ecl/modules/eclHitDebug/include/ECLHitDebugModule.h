@@ -9,8 +9,8 @@
  **************************************************************************/
 
 
-#ifndef ECLHITMODULE_H_
-#define ECLHITMODULE_H_
+#ifndef ECLHITDEBUGMODULE_H_
+#define ECLHITDEBUGMODULE_H_
 
 //basf2 framework headers
 #include <framework/core/Module.h>
@@ -31,14 +31,14 @@ namespace Belle2 {
   namespace ECL {
 
     /** Class to represent the hit of one cell */
-    class ECLHitModule : public Module {
+    class ECLHitDebugModule : public Module {
 
     public:
       /** Constructor.*/
-      ECLHitModule();
+      ECLHitDebugModule();
 
       /** Destructor.*/
-      virtual ~ECLHitModule();
+      virtual ~ECLHitDebugModule();
 
       /** Initialize variables, print info, and start CPU clock. */
       virtual void initialize();

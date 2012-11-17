@@ -85,7 +85,7 @@ void ECLReconstructorModule::event()
   //Input Array
   StoreArray<ECLDigit> eclDigiArray;
   if (!eclDigiArray) {
-    B2ERROR("Can not find eclDigiArray.");
+    B2DEBUG(100, "ECLDigit in empty in event " << m_nEvent);
     return;
   }
 

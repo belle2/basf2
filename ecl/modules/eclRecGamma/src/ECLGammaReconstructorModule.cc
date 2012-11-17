@@ -96,10 +96,10 @@ void ECLGammaReconstructorModule::event()
   RelationArray eclGammaToShower(gammaArray, eclRecShowerArray);
 
   if (!eclRecShowerArray) {
-    B2ERROR("Can not find ECLShowers.");
+    B2DEBUG(100, "ECLShowers in empty in event " << m_nEvent);
   }
   if (!eclHitAssignmentArray) {
-    B2ERROR("Can not find eclHitAssignment.");
+    B2DEBUG(100, "ECLHitAssignment in empty in event " << m_nEvent);
   }
 
   const int hitNum = eclRecShowerArray->GetEntriesFast();

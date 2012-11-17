@@ -87,7 +87,6 @@ void ECLDigitizerModule::initialize()
 
 void ECLDigitizerModule::beginRun()
 {
-  B2INFO("ECLDigiModule: Processing run: " << m_nRun);
 }
 
 
@@ -97,7 +96,7 @@ void ECLDigitizerModule::event()
   //Input Array
   StoreArray<ECLHit>  eclArray;
   if (!eclArray) {
-    B2ERROR("Can not find ECLHit Array.");
+    B2DEBUG(100, "ECLHit in empty in event " << m_nEvent);
   }
 
   //cout<<"Total Hits in Digi "<<eclArray->GetEntriesFast()<<endl;

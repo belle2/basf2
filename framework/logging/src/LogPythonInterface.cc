@@ -135,6 +135,7 @@ void LogPythonInterface::exposePythonAPI()
   .value("FUNCTION", LogConfig::c_Function)
   .value("FILE", LogConfig::c_File)
   .value("LINE", LogConfig::c_Line)
+  .value("TIMESTAMP", LogConfig::c_Timestamp)
   ;
 
   //Interface LogConfig class

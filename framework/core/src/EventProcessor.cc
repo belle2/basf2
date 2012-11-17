@@ -78,6 +78,18 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
 #ifdef HAS_CALLGRIND
   CALLGRIND_STOP_INSTRUMENTATION;
 #endif
+
+  //print summary on warnings/errors
+  int numLogWarn = LogSystem::Instance().getMessageCounter(LogConfig::c_Warning);
+  numLogError = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
+  LogConfig& logConfig = *LogSystem::Instance().getLogConfig();
+  // only show level & message
+  logConfig.setLogInfo(LogConfig::c_Warning, LogConfig::c_Level | LogConfig::c_Message);
+  logConfig.setLogInfo(LogConfig::c_Error, LogConfig::c_Level | LogConfig::c_Message);
+  if (numLogWarn)
+    B2WARNING(numLogWarn << " warnings occured.");
+  if (numLogError)
+    B2ERROR(numLogError << " errors occured.");
 }
 
 

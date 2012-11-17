@@ -10,3 +10,4 @@
 [INFO] 3	3	2
 [WARNING] Event processing stopped by non-master module EvtMetaDataTest  { module: -global- }
 [INFO] terminating EvtMetaDataTest
+[WARNING] 1 warnings occured.

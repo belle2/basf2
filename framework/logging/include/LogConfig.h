@@ -37,7 +37,8 @@ namespace Belle2 {
                     c_Package = 0x08,  /**< Package in which the message was emitted. */
                     c_Function = 0x10, /**< Function in which the message was emitted. */
                     c_File = 0x20,     /**< Source file in which the message was emitted. */
-                    c_Line = 0x40      /**< Line in source file in which the message was emitted. */
+                    c_Line = 0x40,     /**< Line in source file in which the message was emitted. */
+                    c_Timestamp = 0x80 /**< Time at which the message was emitted. */
                   };
 
     /**

@@ -10,6 +10,7 @@
 
 #include <framework/logging/LogMessage.h>
 
+#include <framework/core/utilities.h>
 #include <framework/pcore/ProcHandler.h>
 
 using namespace std;
@@ -44,6 +45,11 @@ bool LogMessage::operator==(const LogMessage& message) const
 
 std::ostream& LogMessage::print(std::ostream& out) const
 {
+  if (!m_logInfo || (m_logInfo & LogConfig::c_Timestamp)) {
+    const static double startClock = Utils::getClock();
+    out.precision(3);
+    out << std::fixed << (Utils::getClock() - startClock) / Unit::s << ": ";
+  }
   if (!m_logInfo || (m_logInfo & LogConfig::c_Level)) {
     out << "[" << LogConfig::logLevelToString(m_logLevel) << "] ";
   }

@@ -89,7 +89,7 @@ svddigi = register_module('SVDDigitizer')
 # SVD clustering module
 svdclust = register_module('SVDClusterizer')
 # Simpleoutput
-output = register_module('SimpleOutput')
+output = register_module('RootOutput')
 
 # Specify number of events to generate
 evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})

@@ -18,7 +18,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/utilities/RunMetaData.h>
+#include <framework/gearbox/GearDir.h>
 
 #include <TLorentzVector.h>
 
@@ -62,8 +62,11 @@ void KoralWInputModule::initialize()
 
   //Depending on the settings use the Belle II or Belle boost
   if (m_boostMode == 1) {
-    m_generator.setBoost(getBoost(RunMetaData::getEnergyHER(), RunMetaData::getEnergyLER(),
-                                  RunMetaData::getCrossingAngle(), RunMetaData::getAngleLER()));
+    GearDir ler("/Detector/SuperKEKB/LER/");
+    GearDir her("/Detector/SuperKEKB/HER/");
+
+    m_generator.setBoost(getBoost(her.getDouble("energy"), ler.getDouble("energy"),
+                                  her.getDouble("angle") - ler.getDouble("angle"), ler.getDouble("angle")));
   } else {
     if (m_boostMode == 2) {
 

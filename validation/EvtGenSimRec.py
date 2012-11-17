@@ -37,9 +37,9 @@ add_simulation(main, components)
 add_reconstruction(main, components)
 
 # output
-simpleoutput = register_module('SimpleOutput')
-simpleoutput.param('outputFileName', '../EvtGenSimRec.root')
-main.add_module(simpleoutput)
+output = register_module('RootOutput')
+output.param('outputFileName', '../EvtGenSimRec.root')
+main.add_module(output)
 
 process(main)
 

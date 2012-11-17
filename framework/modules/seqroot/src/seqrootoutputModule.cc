@@ -37,7 +37,7 @@ SeqRootOutputModule::SeqRootOutputModule() : Module()
 
   //Parameter definition
   addParam("outputFileName"  , m_outputFileName, "SeqRoot file name.", string("SeqRootOutput.root"));
-  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression.", 0);
+  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticable effect. NOTE: Because of a ROOT bug, enabling this currently causes memory leaks..", 0);
 
   B2DEBUG(1, "SeqRootOutput: Constructor done.");
 }

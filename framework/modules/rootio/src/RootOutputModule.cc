@@ -53,7 +53,7 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experiment(0), m_r
 
   //Parameter definition
   addParam("outputFileName"  , m_outputFileName, "Name of the output file.", string("RootOutput.root"));
-  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression.", 1);
+  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticable effect.", 1);
   addParam("splitLevel", m_splitLevel, "Branch split level.", 99);
 
   addParam(c_SteerTreeNames[0], m_treeNames[0], "TTree name for event data. Empty string for no output.", string("tree"));

@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
@@ -79,7 +79,7 @@ PXDRecoHit::PXDRecoHit(const PXDCluster* hit, float sigmaU, float sigmaV, float 
   fHitCov(1, 0) = covUV;
   fHitCov(1, 1) = sigmaV * sigmaV;
   // Set physical parameters
-  m_energyDep = hit->getCharge() * Unit::ehEnergy;
+  m_energyDep = hit->getCharge() * Const::ehEnergy;
   //m_energyDepError = 0;
   // Setup geometry information
   setDetectorPlane();
@@ -104,7 +104,7 @@ PXDRecoHit::PXDRecoHit(const PXDCluster* hit):
   fHitCov(1, 0) = 0;
   fHitCov(1, 1) = sigmaV * sigmaV;
   // Set physical parameters
-  m_energyDep = hit->getCharge() * Unit::ehEnergy;
+  m_energyDep = hit->getCharge() * Const::ehEnergy;
   //m_energyDepError = 0;
   // Setup geometry information
   setDetectorPlane();
@@ -127,7 +127,7 @@ PXDRecoHit::PXDRecoHit(const VXDSimpleDigiHit* hit):
   fHitCov(1, 0) = 0;
   fHitCov(1, 1) = sigmaV * sigmaV;
   // Set physical parameters
-  //m_energyDep = hit->getCharge() * Unit::ehEnergy;
+  //m_energyDep = hit->getCharge() * Const::ehEnergy;
   //m_energyDepError = 0;
   // Setup geometry information
   setDetectorPlane();

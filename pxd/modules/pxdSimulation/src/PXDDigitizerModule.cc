@@ -13,6 +13,7 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -306,7 +307,7 @@ void PXDDigitizerModule::processHit()
   TVector3 direction = stopPoint - startPoint;
   double trackLength = direction.Mag();
   //Calculate the number of electrons
-  double electrons = m_currentHit->getEnergyDep() * Unit::GeV / Unit::ehEnergy;
+  double electrons = m_currentHit->getEnergyDep() * Unit::GeV / Const::ehEnergy;
 
   if (m_currentHit->getPDGcode() == 22 || trackLength <= numeric_limits<double>::epsilon()) {
     //Photons deposit the energy at the end of their step
@@ -345,7 +346,7 @@ const TVector3 PXDDigitizerModule::getEField(const TVector3& point) const
   const SensorInfo& info = *m_currentSensorInfo;
   double sensorThickness = info.getThickness();
 
-  double depletionVoltage = 0.5 * Unit::e * info.getBulkDoping() / Unit::permSi * sensorThickness * sensorThickness;
+  double depletionVoltage = 0.5 * Unit::e * info.getBulkDoping() / Const::permSi * sensorThickness * sensorThickness;
   double gateZ = 0.5 * sensorThickness - info.getGateDepth();
   double Ez = 2 * depletionVoltage * (point.Z() - gateZ) / sensorThickness / sensorThickness;
 
@@ -433,7 +434,7 @@ void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
       double weightByT = h * weightGL[iz] / v.Z();
       positionInPlane += weightByT * v;
       //tanLorentz2 += 0.5 * weightGL[iz] * getElectronMobility(currentEField.Mag())*m_hallFactor*m_currentBField.Y();
-      sigmaDrift2 += fabs(weightByT) * 2 * Unit::uTherm * getElectronMobility(currentEField.Mag());
+      sigmaDrift2 += fabs(weightByT) * 2 * Const::uTherm * getElectronMobility(currentEField.Mag());
     } // for knots
   } // Integration
   // Adjust sigmaDrift to _current_ Lorentz angle
@@ -450,7 +451,7 @@ void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
   // Diffusion: Free diffusion + drift due to magnetic force. We use asymptotic mobility
   // here, as the drift is perpendicular to the "macro" E field.
   TVector3 E0(0, 0, 0);
-  double sigmaDiffus = sqrt(2 * Unit::uTherm  * getElectronMobility(0) * m_elStepTime);
+  double sigmaDiffus = sqrt(2 * Const::uTherm  * getElectronMobility(0) * m_elStepTime);
   //Divide into groups of m_elGroupSize electrons and simulate lateral diffusion of each group by doing a
   //random walk with free electron mobility in uv-plane
   int    nGroups     = (int)(electrons / m_elGroupSize) + 1;
@@ -495,7 +496,7 @@ void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
       //Random walk with drift
       //collectionTime += m_elStepTime;
       step3.SetXYZ(gRandom->Gaus(0.0, sigmaDiffus), gRandom->Gaus(0.0, sigmaDiffus), 0);
-      step3 += m_hallFactor * Unit::eMobilitySi * step3.Cross(m_currentBField);
+      step3 += m_hallFactor * Const::eMobilitySi * step3.Cross(m_currentBField);
       uPos += step3.X();
       vPos += step3.Y();
     }

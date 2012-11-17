@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/geometry/SensorInfo.h>
@@ -80,7 +80,7 @@ SVDRecoHit2D::SVDRecoHit2D(const VXDSimpleDigiHit* hit):
   fHitCov(1, 0) = 0;
   fHitCov(1, 1) = sigmaV * sigmaV;
   // Set physical parameters
-  //m_energyDep = hit->getCharge() * Unit::ehEnergy;
+  //m_energyDep = hit->getCharge() * Const::ehEnergy;
   //m_energyDepError = 0;
   // Setup geometry information
   setDetectorPlane();

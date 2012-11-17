@@ -13,6 +13,7 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -371,7 +372,7 @@ void SVDDigitizerModule::processHit()
   TVector3 direction = stopPoint - startPoint;
   double trackLength = direction.Mag();
   //Calculate the number of electrons and holes
-  double carriers = m_currentHit->getEnergyDep() * Unit::GeV / Unit::ehEnergy;
+  double carriers = m_currentHit->getEnergyDep() * Unit::GeV / Const::ehEnergy;
 
   if (m_currentHit->getPDGcode() == 22 || trackLength < 0.1 * Unit::um) {
     //Photons deposit the energy at the end of their step
@@ -477,7 +478,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers)
   TVector3 v_e = getVelocity(electron, mean_e);
   double driftTime_e = distanceToFrontPlane / v_e.Z();
   TVector3 center_e = position + driftTime_e * v_e;
-  double D_e = Unit::kBoltzmann * m_temperature / Unit::e * getElectronMobility(getEField(mean_e).Mag());
+  double D_e = Const::kBoltzmann * m_temperature / Unit::e * getElectronMobility(getEField(mean_e).Mag());
   double sigma_e = sqrt(2.0 * D_e * driftTime_e);
   double tanLorentz_e = v_e.Y() / v_e.Z();
   sigma_e *= sqrt(1.0 + tanLorentz_e * tanLorentz_e);
@@ -487,7 +488,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers)
   TVector3 v_h = getVelocity(hole, mean_h);
   double driftTime_h = - distanceToBackPlane / v_h.Z();
   TVector3 center_h = position + driftTime_h * v_h;
-  double D_h = Unit::kBoltzmann * m_temperature / Unit::e * getElectronMobility(getEField(mean_h).Mag());
+  double D_h = Const::kBoltzmann * m_temperature / Unit::e * getElectronMobility(getEField(mean_h).Mag());
   double sigma_h = sqrt(2.0 * D_h * driftTime_h);
   double tanLorentz_h = v_h.X() / v_h.Z(); // Is this OK?
   sigma_h *= sqrt(1.0 + tanLorentz_h * tanLorentz_h);

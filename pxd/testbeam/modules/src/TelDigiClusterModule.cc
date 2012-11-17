@@ -12,6 +12,7 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -136,7 +137,7 @@ void TelDigiClusterModule::event()
     const RelationIndex<MCParticle, TelTrueHit>::Element* mcRel = relIndexMCParticleTrueHit.getFirstElementTo(trueHit);
     int particleID = (int)mcRel->indexFrom ;
     int sensorID = (int)trueHit->getSensorID();
-    float charge = trueHit->getEnergyDep() * Unit::GeV / Unit::ehEnergy;
+    float charge = trueHit->getEnergyDep() * Unit::GeV / Const::ehEnergy;
     float u = trueHit->getU();
     float v = trueHit->getV();
     u = gRandom->Gaus(u, m_resolutionU);

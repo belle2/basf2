@@ -79,7 +79,7 @@ void RootOutputModule::initialize()
   const int bufsize = 32000;
 
   //create a file level metadata object in the data store
-  StoreObjPtr<FileMetaData>::registerPersistent("", DataStore::c_Persistent);
+  StoreObjPtr<FileMetaData>::registerPersistent("", DataStore::c_Persistent, false);
 
   const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
   if (!outputFileArgument.empty())

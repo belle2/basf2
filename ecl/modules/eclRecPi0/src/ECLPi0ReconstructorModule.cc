@@ -93,81 +93,70 @@ void ECLPi0ReconstructorModule::event()
   StoreArray<ECLPi0> Pi0Array;
   RelationArray eclPi0ToShower(Pi0Array, eclRecShowerArray);
 
+  for (int iGamma = 0; iGamma < eclGammaToShower.getEntries(); iGamma++) {
+    if (eclGammaToShower[iGamma].getToIndices().size() != 1) {
+      B2ERROR("Relation Gamma To Shower is not only one in event " << m_nEvent << " nShower " << eclGammaToShower[iGamma].getToIndices().size());
+    }
+  }
 
-  for (int iIndex = 0; iIndex < eclGammaToShower.getEntries() - 1 ; iIndex++) {
-    for (int iHit = 0; iHit < (int)eclGammaToShower[iIndex].getToIndices().size(); iHit++) {
+  const int hitNum = Gamma->GetEntriesFast();
+  for (int iGamma1 = 0; iGamma1 < hitNum - 1; iGamma1++) {
+    ECLGamma* aECLGamma1 = Gamma[iGamma1];
+    double EGamma1 =  aECLGamma1->getEnergy();
+    m_px1 = aECLGamma1->getPx();
+    m_py1 = aECLGamma1->getPy();
+    m_pz1 = aECLGamma1->getPz();
 
-      ECLShower* aECLShower = eclRecShowerArray[ eclGammaToShower[iIndex].getToIndex(iHit) ];
-      m_showerId1 = aECLShower->GetShowerId();
-      double m_energy1 = aECLShower->GetEnergy();
-      double m_theta1 = aECLShower->GetTheta();
-      double m_phi1 = aECLShower->GetPhi();
-      m_px1 = m_energy1 * sin(m_theta1) * cos(m_phi1);
-      m_py1 = m_energy1 * sin(m_theta1) * sin(m_phi1);
-      m_pz1 = m_energy1 * cos(m_theta1);
+    CLHEP::Hep3Vector p3Gamma1(m_px1, m_py1, m_pz1);
+    // gamma energy cut
+    if (EGamma1 < gamma_energy_threshold)continue;
 
-      CLHEP::Hep3Vector p3Gamma1(m_px1, m_py1, m_pz1);
-      //cout<<"PiGamma  "<<m_nEvent<<" Gamma1 "<<m_showerId1<<" "<<m_energy1<<endl;
 
+    for (int iGamma2 = iGamma1 + 1; iGamma2 < hitNum; iGamma2++) {
+      ECLGamma* aECLGamma2 = Gamma[iGamma2];
+      double EGamma2 =  aECLGamma2->getEnergy();
+      m_px2 = aECLGamma2->getPx();
+      m_py2 = aECLGamma2->getPy();
+      m_pz2 = aECLGamma2->getPz();
+
+      CLHEP::Hep3Vector p3Gamma2(m_px2, m_py2, m_pz2);
       // gamma energy cut
-      const double EGamma1 = p3Gamma1.mag();
-      if (EGamma1 < gamma_energy_threshold)continue;
-
-      for (int jIndex = iIndex + 1; jIndex < eclGammaToShower.getEntries() ; jIndex++) {
-        for (int jHit = 0; jHit < (int)eclGammaToShower[jIndex].getToIndices().size(); jHit++) {
-
-          ECLShower* aECLShower = eclRecShowerArray[ eclGammaToShower[jIndex].getToIndex(jHit) ];
-          m_showerId2 = aECLShower->GetShowerId();
-          double m_energy2 = aECLShower->GetEnergy();
-          double m_theta2 = aECLShower->GetTheta();
-          double m_phi2 = aECLShower->GetPhi();
-          m_px2 = m_energy2 * sin(m_theta2) * cos(m_phi2);
-          m_py2 = m_energy2 * sin(m_theta2) * sin(m_phi2);
-          m_pz2 = m_energy2 * cos(m_theta2);
-          //cout<<"PiGamma  "<<m_nEvent<<" Gamma2 "<<m_showerId2<<" "<<m_energy2<<endl;
-          CLHEP::Hep3Vector p3Gamma2(m_px2, m_py2, m_pz2);
-          // gamma energy cut
-          const double EGamma2 = p3Gamma2.mag();
-          if (EGamma2 < gamma_energy_threshold)continue;
-          CLHEP::Hep3Vector p3Rec = p3Gamma1 + p3Gamma2;
+      if (EGamma2 < gamma_energy_threshold)continue;
 
 
-          CLHEP::HepLorentzVector lv_gamma1(p3Gamma1, EGamma1);
-          CLHEP::HepLorentzVector lv_gamma2(p3Gamma2, EGamma2);
-          CLHEP::HepLorentzVector lv_rec = lv_gamma1 + lv_gamma2;
-          const double mass = lv_rec.mag();
-          if (fit_flag) {
-            fit(lv_gamma1, lv_gamma2);
-            if (pi0_mass_min < mass && mass < pi0_mass_max) {
+      //CLHEP::Hep3Vector p3Rec = p3Gamma1 + p3Gamma2;
+      CLHEP::HepLorentzVector lv_gamma1(p3Gamma1, EGamma1);
+      CLHEP::HepLorentzVector lv_gamma2(p3Gamma2, EGamma2);
+      CLHEP::HepLorentzVector lv_rec = lv_gamma1 + lv_gamma2;
+      const double mass = lv_rec.mag();
+      if (fit_flag) {
+        fit(lv_gamma1, lv_gamma2);
+        if (pi0_mass_min < mass && mass < pi0_mass_max) {
 
-              if (!Pi0Array) Pi0Array.create();
-              m_Pi0Num = Pi0Array->GetLast() + 1;
-              new(Pi0Array->AddrAt(m_Pi0Num)) ECLPi0();
-              Pi0Array[m_Pi0Num]->setShowerId1(m_showerId1);
-              Pi0Array[m_Pi0Num]->setShowerId2(m_showerId2);
+          if (!Pi0Array) Pi0Array.create();
+          m_Pi0Num = Pi0Array->GetLast() + 1;
+          new(Pi0Array->AddrAt(m_Pi0Num)) ECLPi0();
+          Pi0Array[m_Pi0Num]->setShowerId1(m_showerId1);
+          Pi0Array[m_Pi0Num]->setShowerId2(m_showerId2);
 
-              Pi0Array[m_Pi0Num]->setenergy((float)m_pi0E);
-              Pi0Array[m_Pi0Num]->setpx((float)m_pi0px);
-              Pi0Array[m_Pi0Num]->setpy((float)m_pi0py);
-              Pi0Array[m_Pi0Num]->setpz((float)m_pi0pz);
+          Pi0Array[m_Pi0Num]->setenergy((float)m_pi0E);
+          Pi0Array[m_Pi0Num]->setpx((float)m_pi0px);
+          Pi0Array[m_Pi0Num]->setpy((float)m_pi0py);
+          Pi0Array[m_Pi0Num]->setpz((float)m_pi0pz);
 
-              Pi0Array[m_Pi0Num]->setmass((float)lv_rec.mag());
-              Pi0Array[m_Pi0Num]->setmassfit((float)m_pi0mass);
-              Pi0Array[m_Pi0Num]->setchi2((float)m_pi0chi2);
-              eclPi0ToShower.add(m_Pi0Num, m_showerId1);
-              eclPi0ToShower.add(m_Pi0Num, m_showerId2);
-              //cout << "Event " << m_nEvent << " Pi0 from Gamma " << m_showerId1 << " " << m_showerId2 << " " << m_pi0E << " " << m_pi0mass << endl;
-
-            }
-          } else if (pi0_mass_min < mass && mass < pi0_mass_max) {
-          }
-
-
+          Pi0Array[m_Pi0Num]->setmass((float)lv_rec.mag());
+          Pi0Array[m_Pi0Num]->setmassfit((float)m_pi0mass);
+          Pi0Array[m_Pi0Num]->setchi2((float)m_pi0chi2);
+          eclPi0ToShower.add(m_Pi0Num, m_showerId1);
+          eclPi0ToShower.add(m_Pi0Num, m_showerId2);
+          //cout << "Event " << m_nEvent << " Pi0 from Gamma " << m_showerId1 << " " << m_showerId2 << " " << m_pi0E << " " << m_pi0mass << endl;
 
         }
-      }//gamma2 jIndex jHit
-    }
-  }//gamma1 iIndex iHit
+      } else if (pi0_mass_min < mass && mass < pi0_mass_max) {
+      }
+
+    }//iGamma2
+  }//iGamma1
 
   m_nEvent++;
 }

@@ -13,10 +13,8 @@ progress = register_module('Progress')
 paramloader = register_module('Gearbox')
 geometry = register_module('Geometry')
 geometry.param('Components', ['TOP'])
-input = register_module('SimpleInput')
+input = register_module('RootInput')
 topdigi = register_module('TOPDigitizer')
-param_digi = {'PhotonFraction': 0.3}
-topdigi.param(param_digi)
 topback = register_module('TOPBackground')
 
 param_back = {'TimeOfSimulation': 200.0, 'Type': 'Touschek_HER',

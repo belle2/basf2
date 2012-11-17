@@ -95,8 +95,6 @@ ext.param('ExtRecoHitsColName', 'ExtRecoHits')  # output from ext
 
 # TOP reconstruction
 topdigi = register_module('TOPDigitizer')
-param_digi = {'PhotonFraction': 0.3}
-topdigi.param(param_digi)
 topreco = register_module('TOPReconstructor')
 topreco.param('DebugLevel', 1)  # remove this line or set to 0 to suppress printout
 

@@ -52,7 +52,10 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* aTrac
   if (info->getStatus() != 0) return fUrgent;
 
   // if not, do it
-  if (gRandom->Uniform() > m_photonFraction) return fKill;
+  if (gRandom->Uniform() > m_photonFraction) {
+    TrackInfo::getInfo(*aTrack).setIgnore();
+    return fKill;
+  }
 
   // set new status and store prescaling fraction
   info->setStatus(1);

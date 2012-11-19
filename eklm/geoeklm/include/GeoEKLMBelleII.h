@@ -239,14 +239,6 @@ namespace Belle2 {
     void createMaterials();
 
     /**
-     * Read position data from XML database.
-     * @param[out] epos    Position data.
-     * @param[in]  content GearDir to read from.
-     */
-    void readPositionData(struct EKLMElementPosition& epos,
-                          GearDir& content);
-
-    /**
      * Read parameters from XML database
      * @param[in] content GearDir to read from.
      */

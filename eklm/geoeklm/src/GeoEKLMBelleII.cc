@@ -139,15 +139,49 @@ void GeoEKLMBelleII::createMaterials()
   mat.silicon = geometry::Materials::get("EKLMSilicon");
 }
 
-void GeoEKLMBelleII::readPositionData(struct EKLMElementPosition& epos,
-                                      GearDir& content)
+/**
+ * Read position data.
+ * @param epos Position data.
+ * @param gd   XML data directory.
+ */
+static void readPositionData(struct EKLMElementPosition* epos, GearDir* gd)
 {
-  epos.innerR = content.getLength("InnerR") * cm;
-  epos.outerR = content.getLength("OuterR") * cm;
-  epos.length = content.getLength("Length") * cm;
-  epos.X = content.getLength("PositionX") * cm;
-  epos.Y = content.getLength("PositionY") * cm;
-  epos.Z = content.getLength("PositionZ") * cm;
+  epos->innerR = gd->getLength("InnerR") * cm;
+  epos->outerR = gd->getLength("OuterR") * cm;
+  epos->length = gd->getLength("Length") * cm;
+  epos->X = gd->getLength("PositionX") * cm;
+  epos->Y = gd->getLength("PositionY") * cm;
+  epos->Z = gd->getLength("PositionZ") * cm;
+}
+
+/**
+ * Read sector support size data.
+ * @param sss Sector support size data.
+ * @param gd  XML data directory.
+ */
+static void readSectorSupportData(struct EKLMSectorSupportSize* sss,
+                                  GearDir* gd)
+{
+  sss->Thickness = gd->getLength("Thickness") * cm;
+  sss->DeltaLY = gd->getLength("DeltaLY") * cm;
+  sss->CornerX = gd->getLength("CornerX") * cm;
+  sss->TopCornerHeight = gd->getLength("TopCornerHeight") * cm;
+  sss->Corner1LX = gd->getLength("Corner1LX") * cm;
+  sss->Corner1Width = gd->getLength("Corner1Width") * cm;
+  sss->Corner1Thickness = gd->getLength("Corner1Thickness") * cm;
+  sss->Corner1Z = gd->getLength("Corner1Z") * cm;
+  sss->Corner2LX = gd->getLength("Corner2LX") * cm;
+  sss->Corner2LY = gd->getLength("Corner2LY") * cm;
+  sss->Corner2Thickness = gd->getLength("Corner2Thickness") * cm;
+  sss->Corner2Z = gd->getLength("Corner2Z") * cm;
+  sss->Corner3LX = gd->getLength("Corner3LX") * cm;
+  sss->Corner3LY = gd->getLength("Corner3LY") * cm;
+  sss->Corner3Thickness = gd->getLength("Corner3Thickness") * cm;
+  sss->Corner3Z = gd->getLength("Corner3Z") * cm;
+  sss->Corner4LX = gd->getLength("Corner4LX") * cm;
+  sss->Corner4LY = gd->getLength("Corner4LY") * cm;
+  sss->Corner4Thickness = gd->getLength("Corner4Thickness") * cm;
+  sss->Corner4Z = gd->getLength("Corner4Z") * cm;
 }
 
 void GeoEKLMBelleII::readXMLData(const GearDir& content)
@@ -161,16 +195,16 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   m_outputFile = gd.getString("StripLengthAndTransformationMatrixDBFile");
   GearDir EndCap(gd);
   EndCap.append("/EndCap");
-  readPositionData(EndcapPosition, EndCap);
+  readPositionData(&EndcapPosition, &EndCap);
   EndcapPosition.Z = EndcapPosition.Z + EndcapPosition.length / 2.0;
   nLayer = EndCap.getInt("nLayer");
   GearDir Layer(EndCap);
   Layer.append("/Layer");
-  readPositionData(LayerPosition, Layer);
+  readPositionData(&LayerPosition, &Layer);
   Layer_shiftZ = Layer.getLength("ShiftZ") * cm;
   GearDir Sector(Layer);
   Sector.append("/Sector");
-  readPositionData(SectorPosition, Sector);
+  readPositionData(&SectorPosition, &Sector);
   nPlane = Sector.getInt("nPlane");
   nBoard = Sector.getInt("nBoard");
   GearDir Boards(Sector);
@@ -210,35 +244,11 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   }
   GearDir SectorSupport(Sector);
   SectorSupport.append("/SectorSupport");
-  readPositionData(SectorSupportPosition, SectorSupport);
-  SectorSupportSize.Thickness = SectorSupport.getLength("Thickness") * cm;
-  SectorSupportSize.DeltaLY = SectorSupport.getLength("DeltaLY") * cm;
-  SectorSupportSize.CornerX = SectorSupport.getLength("CornerX") * cm;
-  SectorSupportSize.TopCornerHeight = SectorSupport.
-                                      getLength("TopCornerHeight") * cm;
-  SectorSupportSize.Corner1LX = SectorSupport.getLength("Corner1LX") * cm;
-  SectorSupportSize.Corner1Width = SectorSupport.getLength("Corner1Width") * cm;
-  SectorSupportSize.Corner1Thickness = SectorSupport.
-                                       getLength("Corner1Thickness") * cm;
-  SectorSupportSize.Corner1Z = SectorSupport.getLength("Corner1Z") * cm;
-  SectorSupportSize.Corner2LX = SectorSupport.getLength("Corner2LX") * cm;
-  SectorSupportSize.Corner2LY = SectorSupport.getLength("Corner2LY") * cm;
-  SectorSupportSize.Corner2Thickness = SectorSupport.
-                                       getLength("Corner2Thickness") * cm;
-  SectorSupportSize.Corner2Z = SectorSupport.getLength("Corner2Z") * cm;
-  SectorSupportSize.Corner3LX = SectorSupport.getLength("Corner3LX") * cm;
-  SectorSupportSize.Corner3LY = SectorSupport.getLength("Corner3LY") * cm;
-  SectorSupportSize.Corner3Thickness = SectorSupport.
-                                       getLength("Corner3Thickness") * cm;
-  SectorSupportSize.Corner3Z = SectorSupport.getLength("Corner3Z") * cm;
-  SectorSupportSize.Corner4LX = SectorSupport.getLength("Corner4LX") * cm;
-  SectorSupportSize.Corner4LY = SectorSupport.getLength("Corner4LY") * cm;
-  SectorSupportSize.Corner4Thickness = SectorSupport.
-                                       getLength("Corner4Thickness") * cm;
-  SectorSupportSize.Corner4Z = SectorSupport.getLength("Corner4Z") * cm;
+  readPositionData(&SectorSupportPosition, &SectorSupport);
+  readSectorSupportData(&SectorSupportSize, &SectorSupport);
   GearDir Plane(Sector);
   Plane.append("/Plane");
-  readPositionData(PlanePosition, Plane);
+  readPositionData(&PlanePosition, &Plane);
   nSection = Plane.getInt("nSection");
   PlasticListWidth = Plane.getLength("PlasticListWidth") * cm;
   PlasticListDeltaL = Plane.getLength("PlasticListDeltaL") * cm;

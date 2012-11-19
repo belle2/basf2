@@ -306,22 +306,22 @@ class CLIParams:
         if self.getDataType() is None:  # check the datatype
             print 'No datatype is given. We will set datatype to data.\
             Continue?'
-            noinput = raw_input('Please type Y or N: ')
+            noinput = raw_input('Please type [Y] or N: ')
             if noinput.upper() == 'N':
                 os.sys.exit(-1)
-            elif noinput.upper() != 'Y':
-                print 'You should give Y or N'
+            elif noinput.upper() != 'Y' and noinput.upper() != '':
+                print 'You should give Y or N, or press Enter'
                 os.sys.exit(-1)
             self.setDataType('data')
         elif self.getDataType() == 'data' or self.getDataType() == 'MC':
             if self.getExperiments() is None:  # check the experiments
                 print 'No experiments is given. We will set experiments to\
                 all. Continue?'
-                noinput = raw_input('Please type Y or N: ')
+                noinput = raw_input('Please type [Y] or N: ')
                 if noinput.upper() == 'N':
                     os.sys.exit(-1)
-                elif noinput.upper() != 'Y':
-                    print 'You should give Y or N'
+                elif noinput.upper() != 'Y' and noinput.upper() != '':
+                    print 'You should give Y or N, or press Enter'
                     os.sys.exit(-1)
                 tmp = []
                 ac = AmgaClient.AmgaClient()
@@ -330,11 +330,11 @@ class CLIParams:
                 self.setExperiments(','.join(tmp))
         if self.getQuery() is None:  # check the query
             print 'No query is given. We will set query to true. Continue?'
-            noinput = raw_input('Please type Y or N: ')
+            noinput = raw_input('Please type [Y] or N: ')
             if noinput.upper() == 'N':
                 os.sys.exit(-1)
-            elif noinput.upper() != 'Y':
-                print 'You should give Y or N'
+            elif noinput.upper() != 'Y' and noinput.upper() != '':
+                print 'You should give Y or N, or press Enter'
                 os.sys.exit(-1)
             self.setQuery('2>1')
 

@@ -370,6 +370,7 @@ namespace Belle2 {
     cdcArray[m_hitNumber]->setPDGCode(pid);
     cdcArray[m_hitNumber]->setDriftLength(distance / cm);
     cdcArray[m_hitNumber]->setFlightTime(tof / ns);
+    cdcArray[m_hitNumber]->setGlobalTime(tof / ns);
     cdcArray[m_hitNumber]->setEnergyDep(edep / GeV);
     cdcArray[m_hitNumber]->setStepLength(stepLength / cm);
     TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);

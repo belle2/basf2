@@ -100,10 +100,14 @@ namespace Belle2 {
     double m_resolution1;       /**< Resolution of the first Gassian used to smear drift length */
     double m_mean2;             /**< Mean value of the second Gassian used to smear drift length */
     double m_resolution2;       /**< Resolution of the second Gassian used to smear drift length */
-    double m_tdcThreshold;       /* dEdx value for TDC Threshold in unit of eV */
+    double m_tdcThreshold;      /**< dEdx value for TDC Threshold in unit of eV */
+    double m_tMin;              /**< Lower edge of time window in ns */
+    double m_tMaxOuter;         /**< Upper edge of time window in ns for the outer layers*/
+    double m_tMaxInner;         /**< Upper edge of time window in ns for the inner layers */
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
     bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */
+    bool m_outputNegativeDriftTime;     /**< A switch to output negative drift time to CDCHit */
 //    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
 
     /** Structure for saving the signal information. */

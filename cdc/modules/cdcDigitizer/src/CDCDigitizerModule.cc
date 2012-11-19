@@ -65,10 +65,14 @@ CDCDigitizerModule::CDCDigitizerModule() : Module()
            "A switch used to control adding propagation delay in the wire into the final drift time or not", false);
   addParam("AddTimeOfFlight",             m_addTimeOfFlight,
            "A switch used to control adding time of flight into the final drift time or not",                false);
+  addParam("OutputNegativeDriftTime", m_outputNegativeDriftTime, "Output negative drift time", false);
 
   //TDC Threshold
   addParam("Threshold", m_tdcThreshold,
            "dEdx value for TDC Threshold in eV", 40.0);
+  addParam("tMin", m_tMin, "Lower edge of time window in ns", -100.);
+  addParam("tMaxOuter", m_tMaxOuter, "Upper edge of time window in ns for the outer layers", 500.);
+  addParam("tMaxInner", m_tMaxInner, "Upper edge of time window in ns for the inner layers", 300.);
   // The following doesn't make any sense. The only reasonable steerable would be a switch to decide if the jitter shall be
   // activated. Then there has to be event by event jitter.
   /*  addParam("EventTime",                   m_eventTime,
@@ -128,10 +132,10 @@ void CDCDigitizerModule::event()
       // If hitdEdx < dedxThreshold (default 40 eV), the hit is ignored
       // M. Uchida 2012.08.31
       //
-      if (hitdEdx < dedxThreshold) {
-        B2DEBUG(250, "Below Ethreshold: " << hitdEdx << " " << dedxThreshold);
-        continue;
-      }
+      //      if (hitdEdx < dedxThreshold) {
+      //        B2DEBUG(250, "Below Ethreshold: " << hitdEdx << " " << dedxThreshold);
+      //        continue;
+      //      }
 
       B2DEBUG(250, "Energy deposition: " << hitdEdx << ", DriftLength: " << hitDriftLength << ", TOF: " << hitTOF);
 
@@ -144,6 +148,20 @@ void CDCDigitizerModule::event()
       hitDriftLength        = smearDriftLength(hitDriftLength, m_fraction, m_mean1, m_resolution1, m_mean2, m_resolution2);
       float hitDriftTime   = getDriftTime(hitDriftLength, hitTOF, propLength);
 
+      //add randamized event time for a beam bg. hit
+      if (aCDCSimHit->getBackgroundTag() != 0) {
+        hitDriftTime +=
+          aCDCSimHit->getGlobalTime() - aCDCSimHit->getFlightTime();
+      }
+
+      //apply time window cut
+      double tMax = m_tMaxOuter;
+      if (wireID.getICLayer() < 8) tMax = m_tMaxInner;
+      if (hitDriftTime < m_tMin || hitDriftTime > tMax) continue;
+
+      //remove negative drift time upon request
+      if (!m_outputNegativeDriftTime && hitDriftTime < 0.) continue;
+
       bool ifNewDigi = true;
       // The first SimHit is always a new digit, but the looping will anyhow end immediately.
       for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); iterSignalMap++) {
@@ -155,7 +173,8 @@ void CDCDigitizerModule::event()
           ifNewDigi = false;
 
           // ... smallest drift time has to be checked, ...
-          if (hitDriftTime < iterSignalMap->second.m_driftTime) {
+          //    if (hitDriftTime < iterSignalMap->second.m_driftTime) {
+          if (hitdEdx > dedxThreshold && hitDriftTime < iterSignalMap->second.m_driftTime) {
             iterSignalMap->second.m_simHitIndex = iHits;
             iterSignalMap->second.m_driftTime   = hitDriftTime;
 
@@ -186,9 +205,11 @@ void CDCDigitizerModule::event()
     RelationArray cdcSimHitsToCDCHits(simHits, cdcHits); //SimHit<->CDCHit
     RelationArray mcParticlesToCDCHits(mcParticles, cdcHits); //MCParticle<->CDCHit
 
-    for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); iterSignalMap++) {
+    for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); ++iterSignalMap) {
 
-      new(cdcHits->AddrAt(iCDCHits)) CDCHit(static_cast<unsigned short>((iterSignalMap->second.m_driftTime) + 0.5), getADCCount(iterSignalMap->second.m_charge),
+      //      new(cdcHits->AddrAt(iCDCHits)) CDCHit(static_cast<unsigned short>((iterSignalMap->second.m_driftTime) + 0.5), getADCCount(iterSignalMap->second.m_charge),
+      //                                            iterSignalMap->second.m_wireID);
+      new(cdcHits.nextFreeAddress()) CDCHit(static_cast<unsigned short>((iterSignalMap->second.m_driftTime) + 0.5), getADCCount(iterSignalMap->second.m_charge),
                                             iterSignalMap->second.m_wireID);
 
       cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex, iCDCHits);     //add entry

@@ -92,6 +92,9 @@ namespace Belle2 {
     //! The method to set flight time
     void setFlightTime(double flightTime) { m_flightTime = flightTime; }
 
+    //! The method to set global time
+    void setGlobalTime(double globalTime) { m_globalTime = globalTime; }
+
     //! The method to set deposited energy
     void setEnergyDep(double edep) { m_edep = edep; }
 
@@ -155,6 +158,9 @@ namespace Belle2 {
     //! The method to get position flag
     int getPosFlag() const { return m_posFlag; }
 
+    //! The method to get global time
+    float getGlobalTime() const { return m_globalTime; }
+
     //! Empty constructor
     /*! Recommended for ROOT IO
     */
@@ -194,11 +200,13 @@ namespace Belle2 {
     /** Shift the SimHit in time
      * @param delta The value of the time shift.
      */
-    virtual void shiftInTime(float delta) { m_globalTime += delta; }
+    virtual void shiftInTime(float delta) {
+      m_globalTime = m_flightTime + delta;
+    }
 
 
     /** ROOT Macro. */
-    ClassDef(CDCSimHit, 3);
+    ClassDef(CDCSimHit, 4);
   };
 } // end namespace Belle2
 #endif

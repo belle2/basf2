@@ -13,7 +13,8 @@
 
 using namespace Belle2;
 
-EKLMTransformationFactory* EKLMTransformationFactory::EKLMTransformationFactory_instance = 0;
+EKLMTransformationFactory*
+EKLMTransformationFactory::EKLMTransformationFactory_instance = 0;
 
 
 EKLMTransformationFactory:: EKLMTransformationFactory()
@@ -28,7 +29,8 @@ EKLMTransformationFactory* EKLMTransformationFactory::getInstance()
   return EKLMTransformationFactory_instance;
 }
 
-void EKLMTransformationFactory::addMatrixEntry(int endcap, int layer, int sector, int plane, int strip, G4Transform3D matrix)
+void EKLMTransformationFactory::addMatrixEntry(int endcap, int layer,
+                                               int sector, int plane, int strip, G4Transform3D matrix)
 {
   if (endcap < 1 || endcap > 2) {
     B2FATAL("Invalid endcap number!");
@@ -50,7 +52,8 @@ void EKLMTransformationFactory::addMatrixEntry(int endcap, int layer, int sector
     B2FATAL("Invalid strip number!");
     return;
   }
-  stripMatrixArray[endcap - 1][layer - 1][sector - 1][plane - 1][strip - 1] = matrix;
+  stripMatrixArray[endcap - 1][layer - 1][sector - 1][plane - 1][strip - 1] =
+    matrix;
 }
 
 void EKLMTransformationFactory::addLengthEntry(int strip, double length)
@@ -60,7 +63,8 @@ void EKLMTransformationFactory::addLengthEntry(int strip, double length)
     return ;
   }
   //  std::cout << strip << " " << length << " " << stripLengthArray[strip - 1] << std::endl;
-  if (stripLengthArray[strip - 1] != 0 && (int)stripLengthArray[strip - 1] != (int)length) {
+  if (stripLengthArray[strip - 1] != 0 &&
+      (int)stripLengthArray[strip - 1] != (int)length) {
     B2FATAL("Strip length mismatch!");
     return ;
   }
@@ -77,7 +81,11 @@ double EKLMTransformationFactory::getStripLength(int strip)
 }
 
 
-G4Transform3D EKLMTransformationFactory::getTransformation(int endcap, int layer, int sector, int plane, int strip)
+G4Transform3D EKLMTransformationFactory::getTransformation(int endcap,
+                                                           int layer,
+                                                           int sector,
+                                                           int plane,
+                                                           int strip)
 {
   if (endcap < 1 || endcap > 2) {
     B2FATAL("Invalid endcap number!");
@@ -99,7 +107,8 @@ G4Transform3D EKLMTransformationFactory::getTransformation(int endcap, int layer
     B2FATAL("Invalid strip number!");
     return G4Transform3D();
   }
-  return stripMatrixArray[endcap - 1][layer - 1][sector - 1][plane - 1][strip - 1];
+  return
+    stripMatrixArray[endcap - 1][layer - 1][sector - 1][plane - 1][strip - 1];
 }
 
 void EKLMTransformationFactory::readFromFile(const char* filename)
@@ -159,13 +168,15 @@ void EKLMTransformationFactory::readFromFile(const char* filename)
 
 }
 
-void EKLMTransformationFactory::readFromXMLFile(const GearDir&  stripTransformationDir)
+void EKLMTransformationFactory::readFromXMLFile(
+  const GearDir& stripTransformationDir)
 {
   GearDir dir(stripTransformationDir);
   dir.append("/StripTransformationMatrixAndLengthDatabase");
   for (int i = 0; i < 2 * 14 * 4 * 2 * 75; i++) {
     GearDir StripMatrixContent(dir);
-    StripMatrixContent.append((boost::format("/StripMatrix[%1%]") % (i + 1)).str());
+    StripMatrixContent.append((boost::format("/StripMatrix[%1%]") %
+                               (i + 1)).str());
 
     CLHEP::HepRotation rot;
     rot.set(CLHEP::HepRep3x3(StripMatrixContent.getDouble("XX"),
@@ -195,7 +206,8 @@ void EKLMTransformationFactory::readFromXMLFile(const GearDir&  stripTransformat
 
   for (int i = 1; i <= 75; i++) {
     GearDir StripLengthContent(dir);
-    StripLengthContent.append((boost::format("/StripLength[%1%]") % (i)).str());
+    StripLengthContent.append((boost::format("/StripLength[%1%]") %
+                               (i)).str());
 
     addLengthEntry(i, StripLengthContent.getInt("Length"));
   }
@@ -216,7 +228,8 @@ void EKLMTransformationFactory::writeToFile(const char* filename)const
       for (int sector = 1; sector <= 4; sector++)
         for (int plane = 1; plane <= 2; plane++)
           for (int strip = 1; strip <= 75; strip++) {
-            G4Transform3D matrix = stripMatrixArray[endcap - 1][layer - 1][sector - 1][plane - 1][strip - 1];
+            G4Transform3D matrix = stripMatrixArray[endcap - 1][layer - 1]
+                                   [sector - 1][plane - 1][strip - 1];
             out << matrix.xx() << " ";
             out << matrix.xy() << " ";
             out << matrix.xz() << " ";
@@ -245,7 +258,9 @@ void EKLMTransformationFactory::writeToFile(const char* filename)const
 void EKLMTransformationFactory::writeToXMLFile(char* filename)
 {
   std::ofstream out(filename, std::ios_base::trunc);
-  out << "<!--  this file is authomatically created by EKLM geometry creator-->" << std::endl;
+  out
+      << "<!--  this file is authomatically created by EKLM geometry creator-->"
+      << std::endl;
   out << "<!--  do not manuallly change this file -->" << std::endl;
   out << "<StripTransformationMatrixAndLengthDatabase>" << std::endl;
 
@@ -255,30 +270,48 @@ void EKLMTransformationFactory::writeToXMLFile(char* filename)
       for (int sector = 1; sector <= 4; sector++)
         for (int plane = 1; plane <= 2; plane++)
           for (int strip = 1; strip <= 75; strip++) {
-            G4Transform3D matrix = stripMatrixArray[endcap - 1][layer - 1][sector - 1][plane - 1][strip - 1];
+            G4Transform3D matrix = stripMatrixArray[endcap - 1][layer - 1]
+                                   [sector - 1][plane - 1][strip - 1];
             out << "<StripMatrix id=\"" << i++ << "\">" << std::endl;
-            out << "        <XX  desc=\"XX matrix element\">" << matrix.xx() << "</XX>" << std::endl;
-            out << "        <XY  desc=\"XY matrix element\">" << matrix.xy() << "</XY>" << std::endl;
-            out << "        <XZ  desc=\"XZ matrix element\">" << matrix.xz() << "</XZ>" << std::endl;
+            out << "        <XX  desc=\"XX matrix element\">"
+                << matrix.xx() << "</XX>" << std::endl;
+            out << "        <XY  desc=\"XY matrix element\">"
+                << matrix.xy() << "</XY>" << std::endl;
+            out << "        <XZ  desc=\"XZ matrix element\">"
+                << matrix.xz() << "</XZ>" << std::endl;
 
-            out << "        <YX  desc=\"YX matrix element\">" << matrix.yx() << "</YX>" << std::endl;
-            out << "        <YY  desc=\"YY matrix element\">" << matrix.yy() << "</YY>" << std::endl;
-            out << "        <YZ  desc=\"YZ matrix element\">" << matrix.yz() << "</YZ>" << std::endl;
+            out << "        <YX  desc=\"YX matrix element\">"
+                << matrix.yx() << "</YX>" << std::endl;
+            out << "        <YY  desc=\"YY matrix element\">"
+                << matrix.yy() << "</YY>" << std::endl;
+            out << "        <YZ  desc=\"YZ matrix element\">"
+                << matrix.yz() << "</YZ>" << std::endl;
 
-            out << "        <ZX  desc=\"ZX matrix element\">" << matrix.zx() << "</ZX>" << std::endl;
-            out << "        <ZY  desc=\"ZY matrix element\">" << matrix.zy() << "</ZY>" << std::endl;
-            out << "        <ZZ  desc=\"ZZ matrix element\">" << matrix.zz() << "</ZZ>" << std::endl;
+            out << "        <ZX  desc=\"ZX matrix element\">"
+                << matrix.zx() << "</ZX>" << std::endl;
+            out << "        <ZY  desc=\"ZY matrix element\">"
+                << matrix.zy() << "</ZY>" << std::endl;
+            out << "        <ZZ  desc=\"ZZ matrix element\">"
+                << matrix.zz() << "</ZZ>" << std::endl;
 
-            out << "        <DX  desc=\"DX matrix element\">" << matrix.dx() << "</DX>" << std::endl;
-            out << "        <DY  desc=\"DY matrix element\">" << matrix.dy() << "</DY>" << std::endl;
-            out << "        <DZ  desc=\"DZ matrix element\">" << matrix.dz() << "</DZ>" << std::endl;
+            out << "        <DX  desc=\"DX matrix element\">"
+                << matrix.dx() << "</DX>" << std::endl;
+            out << "        <DY  desc=\"DY matrix element\">"
+                << matrix.dy() << "</DY>" << std::endl;
+            out << "        <DZ  desc=\"DZ matrix element\">"
+                << matrix.dz() << "</DZ>" << std::endl;
 
 
-            out << "        <Endcap  desc=\" Endcap # \">" << endcap << "</Endcap>" << std::endl;
-            out << "        <Layer  desc=\" Layer # \">" << layer << "</Layer>" << std::endl;
-            out << "        <Sector  desc=\" Sector # \">" << sector << "</Sector>" << std::endl;
-            out << "        <Plane  desc=\" Plane # \">" << plane << "</Plane>" << std::endl;
-            out << "        <Strip  desc=\" Strip # \">" << strip << "</Strip>" << std::endl;
+            out << "        <Endcap  desc=\" Endcap # \">"
+                << endcap << "</Endcap>" << std::endl;
+            out << "        <Layer  desc=\" Layer # \">"
+                << layer << "</Layer>" << std::endl;
+            out << "        <Sector  desc=\" Sector # \">"
+                << sector << "</Sector>" << std::endl;
+            out << "        <Plane  desc=\" Plane # \">"
+                << plane << "</Plane>" << std::endl;
+            out << "        <Strip  desc=\" Strip # \">"
+                << strip << "</Strip>" << std::endl;
 
             out << "</StripMatrix>" << std::endl;
           }
@@ -301,7 +334,8 @@ void EKLMTransformationFactory::clear()
       for (int layer = 1; layer <= 14; layer++)
         for (int sector = 1; sector <= 4; sector++)
           for (int plane = 1; plane <= 2; plane++)
-            stripMatrixArray[endcap - 1][layer - 1][sector - 1][plane - 1][strip - 1] = G4Transform3D();
+            stripMatrixArray[endcap - 1][layer - 1][sector - 1][plane - 1]
+            [strip - 1] = G4Transform3D();
   }
 }
 

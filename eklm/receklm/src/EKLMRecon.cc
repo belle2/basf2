@@ -19,7 +19,8 @@ namespace Belle2 {
 
   EKLMRecon::EKLMRecon()
   {
-    GearDir Digitizer = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Digitizer");
+    GearDir Digitizer = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]"
+                                "/Content/Digitizer");
     m_firstPhotonlightSpeed = Digitizer.getDouble("FirstPhotonSpeed");
     m_sigmaT = Digitizer.getDouble("TimeResolution");
   }
@@ -53,7 +54,8 @@ namespace Belle2 {
         }
       }
       if (sectorNotFound) {
-        EKLMSectorHit* newSectorHit = new(sectorHitsArray->AddrAt(sectorHitsArray.getEntries()))
+        EKLMSectorHit* newSectorHit =
+          new(sectorHitsArray->AddrAt(sectorHitsArray.getEntries()))
         EKLMSectorHit((*stripIter)->getEndcap(),
                       (*stripIter)->getLayer(),
                       (*stripIter)->getSector());
@@ -65,7 +67,8 @@ namespace Belle2 {
 
   }
 
-  bool EKLMRecon::addStripHitToSector(EKLMSectorHit* sectorHit , EKLMDigit* stripHit)
+  bool EKLMRecon::addStripHitToSector(EKLMSectorHit* sectorHit,
+                                      EKLMDigit* stripHit)
   {
     if (stripHit->getEndcap() == sectorHit->getEndcap() &&
         stripHit->getLayer() == sectorHit->getLayer() &&
@@ -86,14 +89,14 @@ namespace Belle2 {
            m_SectorHitVector.begin(); sectorIter != m_SectorHitVector.end();
          sectorIter++) {
 
-      std::vector<EKLMDigit*>::iterator itX = ((*sectorIter)->getStripHitVector())->begin();
-
-      for (std::vector<EKLMDigit*>::iterator itX = (*sectorIter)->getStripHitVector()->begin();
+      for (std::vector<EKLMDigit*>::iterator itX =
+             (*sectorIter)->getStripHitVector()->begin();
            itX != (*sectorIter)->getStripHitVector()->end(); ++itX) {
         // only X strips
         if (!CheckStripOrientationX(*itX))
           continue;
-        for (std::vector<EKLMDigit*>::iterator itY = (*sectorIter)->getStripHitVector()->begin();
+        for (std::vector<EKLMDigit*>::iterator itY =
+               (*sectorIter)->getStripHitVector()->begin();
              itY != (*sectorIter)->getStripHitVector()->end(); ++itY) {
           // only Y strips
           if (CheckStripOrientationX(*itY))
@@ -105,7 +108,9 @@ namespace Belle2 {
           if (!(doesIntersect(*itX, *itY, crossPoint, chisq, time)))
             continue;
 
-          EKLMHit2d* hit2d = new(m_hit2dArray->AddrAt(m_hit2dArray.getEntries()))EKLMHit2d(*itX, *itY);
+          EKLMHit2d* hit2d =
+            new(m_hit2dArray->AddrAt(m_hit2dArray.getEntries()))
+          EKLMHit2d(*itX, *itY);
           hit2d->setCrossPoint(crossPoint);
           hit2d->setChiSq(chisq);
           hit2d->setTime(time);
@@ -154,10 +159,14 @@ namespace Belle2 {
 
     if (CheckStripOrientationX(hit1)) { // strip is X-oriented
       {
-        if (fabs(pt1.x() - pt2.x()) <= max1 && fabs(pt1.y() - pt2.y()) <= max2 &&
-            fabs(pt2.x()) <= fabs(pt1.x()) && fabs(pt1.y()) <= fabs(pt2.y())) {   // there is a crossing
-          t1 = hit1->getTime() - fabs(pt1.x() - pt2.x()) * Unit::mm / m_firstPhotonlightSpeed;
-          t2 = hit2->getTime() - fabs(pt2.y() - pt1.y()) * Unit::mm / m_firstPhotonlightSpeed;
+        if (fabs(pt1.x() - pt2.x()) <= max1 &&
+            fabs(pt1.y() - pt2.y()) <= max2 &&
+            fabs(pt2.x()) <= fabs(pt1.x()) &&
+            fabs(pt1.y()) <= fabs(pt2.y())) {   // there is a crossing
+          t1 = hit1->getTime() - fabs(pt1.x() - pt2.x()) * Unit::mm /
+               m_firstPhotonlightSpeed;
+          t2 = hit2->getTime() - fabs(pt2.y() - pt1.y()) * Unit::mm /
+               m_firstPhotonlightSpeed;
 
           crossPoint.SetX(pt2.x()*Unit::mm);
           crossPoint.SetY(pt1.y()*Unit::mm);
@@ -168,10 +177,14 @@ namespace Belle2 {
       }
     } else { // Y-oriented strip
       {
-        if (fabs(pt1.x() - pt2.x()) <= max2 && fabs(pt1.y() - pt2.y()) <= max1 &&
-            fabs(pt1.x()) <= fabs(pt2.x()) && fabs(pt2.y()) <= fabs(pt1.y())) { // there is a crossing
-          t1 = hit1->getTime() - fabs(pt1.y() - pt2.y()) * Unit::mm / m_firstPhotonlightSpeed;
-          t2 = hit2->getTime() - fabs(pt1.x() - pt2.x()) * Unit::mm / m_firstPhotonlightSpeed;
+        if (fabs(pt1.x() - pt2.x()) <= max2 &&
+            fabs(pt1.y() - pt2.y()) <= max1 &&
+            fabs(pt1.x()) <= fabs(pt2.x()) &&
+            fabs(pt2.y()) <= fabs(pt1.y())) { // there is a crossing
+          t1 = hit1->getTime() - fabs(pt1.y() - pt2.y()) * Unit::mm /
+               m_firstPhotonlightSpeed;
+          t2 = hit2->getTime() - fabs(pt1.x() - pt2.x()) * Unit::mm /
+               m_firstPhotonlightSpeed;
 
           crossPoint.SetX(pt1.x()*Unit::mm);
           crossPoint.SetY(pt2.y()*Unit::mm);

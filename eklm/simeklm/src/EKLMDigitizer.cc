@@ -43,7 +43,8 @@ namespace Belle2 {
       it = m_stepHitVolumeMap.find((stepHitsArray[i])->getVolume());
 
       if (it == m_stepHitVolumeMap.end()) { //  new entry
-        vector<EKLMStepHit*> *vectorHits = new vector<EKLMStepHit*> (1, (stepHitsArray[i]));
+        vector<EKLMStepHit*> *vectorHits =
+          new vector<EKLMStepHit*> (1, (stepHitsArray[i]));
 
         m_stepHitVolumeMap.insert(pair<const G4VPhysicalVolume*, vector<EKLMStepHit*> >((stepHitsArray[i])->getVolume(), *vectorHits));
       } else {
@@ -63,15 +64,16 @@ namespace Belle2 {
 
 
     //loop over volumes
-    for (map<const G4VPhysicalVolume*, vector<EKLMStepHit*> >::iterator volumeIterator = m_stepHitVolumeMap.begin();
+    for (map<const G4VPhysicalVolume*, vector<EKLMStepHit*> >::iterator
+         volumeIterator = m_stepHitVolumeMap.begin();
          volumeIterator != m_stepHitVolumeMap.end(); volumeIterator++) {
-
 
       // we have only tree graphs here, so edge is completely defined by it's track ID
       // map to store (edge  <--> hit) == (vertex <--> hit) correspondence
       map < int , EKLMStepHit*> hitMap;
 
-      for (vector<EKLMStepHit*>::iterator i = volumeIterator->second.begin(); i != volumeIterator->second.end(); i++) {
+      for (vector<EKLMStepHit*>::iterator i = volumeIterator->second.begin();
+           i != volumeIterator->second.end(); i++) {
         // ID key
         int key = (*i)->getTrackID();
 
@@ -117,7 +119,8 @@ namespace Belle2 {
       // use special ParentTrackID for the tracks coming from abroad  remains these trees splittable
       int non_exsisting_rtracks_counter = hitMap.size();
 
-      for (map < int , EKLMStepHit*>::iterator hitIterator = hitMap.begin(); hitIterator != hitMap.end(); hitIterator++) {
+      for (map < int , EKLMStepHit*>::iterator hitIterator = hitMap.begin();
+           hitIterator != hitMap.end(); hitIterator++) {
 
         //search for parent entry in the map
         map < int , EKLMStepHit*>::iterator parentIterator =
@@ -125,9 +128,11 @@ namespace Belle2 {
 
         if (parentIterator != hitMap.end()) { // nothing found
           // see comments above on the vertex numbering
-          add_edge(distance(hitMap.begin(), hitIterator), distance(hitMap.begin(), parentIterator)  , G);
+          add_edge(distance(hitMap.begin(), hitIterator),
+                   distance(hitMap.begin(), parentIterator)  , G);
         } else {
-          add_edge(distance(hitMap.begin(), hitIterator), non_exsisting_rtracks_counter++  , G);
+          add_edge(distance(hitMap.begin(), hitIterator),
+                   non_exsisting_rtracks_counter++  , G);
         }
       }
 
@@ -138,16 +143,20 @@ namespace Belle2 {
       map <int, EKLMSimHit*> graphComponentToSimHit;
 
       // loop over the vertices
-      for (map < int , EKLMStepHit*>::iterator hitIterator = hitMap.begin(); hitIterator != hitMap.end(); hitIterator++) {
+      for (map < int , EKLMStepHit*>::iterator hitIterator = hitMap.begin();
+           hitIterator != hitMap.end(); hitIterator++) {
         // get EKLMStepHit corresponding to the current vertex
         EKLMStepHit* stepHit = hitIterator->second;
 
         // search for the current component in the map
-        map <int, EKLMSimHit*>::iterator current = graphComponentToSimHit.find(component[distance(hitMap.begin(), hitIterator)]);
+        map <int, EKLMSimHit*>::iterator current =
+          graphComponentToSimHit.find(component[distance(hitMap.begin(), hitIterator)]);
         if (current == graphComponentToSimHit.end()) {    // no  entry for this component
 
           // create new EKLMSimHit and store all information into it
-          EKLMSimHit* simHit = new(m_simHitsArray->AddrAt(m_simHitsArray.getEntries()))  EKLMSimHit(stepHit);
+          EKLMSimHit* simHit =
+            new(m_simHitsArray->AddrAt(m_simHitsArray.getEntries()))
+          EKLMSimHit(stepHit);
           // insert hit to the map
           graphComponentToSimHit.insert(pair<int, EKLMSimHit*>(component[distance(hitMap.begin(), hitIterator)], simHit));
 
@@ -160,10 +169,12 @@ namespace Belle2 {
           // compare hittime. The leading one has smallest time
           if (current->second->getTime() < stepHit->getTime()) {
             // new hit is successor, add edep of the successor to the ancestor
-            current->second->setEDep(current->second->getEDep() + stepHit->getEDep());
+            current->second->setEDep(current->second->getEDep() +
+                                     stepHit->getEDep());
           } else {
             // new hit is ancestor,  modify everything
-            current->second->setEDep(current->second->getEDep() + stepHit->getEDep());
+            current->second->setEDep(current->second->getEDep() +
+                                     stepHit->getEDep());
             current->second->setPosition(stepHit->getPosition());
             current->second->setTime(stepHit->getTime());
             current->second->setPDG(stepHit->getPDG());
@@ -221,7 +232,9 @@ namespace Belle2 {
       EKLMSimHit* simHit = it->second.front();
 
       // create new stripHit
-      EKLMDigit* stripHit = new(m_stripHitsArray->AddrAt(m_stripHitsArray.getEntries()))EKLMDigit(simHit);
+      EKLMDigit* stripHit =
+        new(m_stripHitsArray->AddrAt(m_stripHitsArray.getEntries()))
+      EKLMDigit(simHit);
 
       //***
       //      G4Box* box1 = (G4Box*)(simHit->getVolume()->GetLogicalVolume()->GetSolid()->GetConstituentSolid(0));

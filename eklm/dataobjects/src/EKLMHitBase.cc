@@ -27,7 +27,9 @@ EKLMHitBase::EKLMHitBase()
   m_LocalPosition = TVector3(0., 0., 0.);
 }
 
-EKLMHitBase::EKLMHitBase(int Endcap, int Layer, int Sector, int PDG, double Time, double EDep, TVector3  GlobalPosition, TVector3  LocalPosition)
+EKLMHitBase::EKLMHitBase(int Endcap, int Layer, int Sector, int PDG,
+                         double Time, double EDep,
+                         TVector3 GlobalPosition, TVector3 LocalPosition)
 {
   m_Endcap = Endcap;
   m_Layer = Layer;

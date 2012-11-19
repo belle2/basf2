@@ -30,8 +30,10 @@ namespace Belle2 {
     GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
     m_mode = gd.getInt("Mode");
     gd.append("/SensitiveDetector");
-    m_ThresholdEnergyDeposit = Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "MeV");
-    m_ThresholdHitTime = Unit::convertValue(gd.getDouble("HitTimeThreshold") , "ns");
+    m_ThresholdEnergyDeposit =
+      Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "MeV");
+    m_ThresholdHitTime =
+      Unit::convertValue(gd.getDouble("HitTimeThreshold") , "ns");
 
     StoreArray<EKLMStepHit> stepHits;
     StoreArray<MCParticle> particles;
@@ -83,7 +85,8 @@ namespace Belle2 {
     }
     // No time cut for background studeis
     if (hitTime > m_ThresholdHitTime && m_mode == 0) {
-      B2INFO("EKLMSensitiveDetector: ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!");
+      B2INFO("EKLMSensitiveDetector: "
+             " ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!");
       return false;
     }
 
@@ -118,14 +121,18 @@ namespace Belle2 {
      * GEANT returns in mm!
      * convert to standard units (cm)
      */
-    const TVector3  gposRoot = TVector3(Unit::convertValue(gpos.x(), "mm"), Unit::convertValue(gpos.y(), "mm"), Unit::convertValue(gpos.z(), "mm"));
+    const TVector3  gposRoot = TVector3(Unit::convertValue(gpos.x(), "mm"),
+                                        Unit::convertValue(gpos.y(), "mm"),
+                                        Unit::convertValue(gpos.z(), "mm"));
 
     /**
      * no conversion btw. G4ThreeVector and TVector3 Sad but true
      * GEANT returns in mm!
      * convert to standard units(cm)
      */
-    const TVector3  lposRoot = TVector3(Unit::convertValue(lpos.x(), "mm"), Unit::convertValue(lpos.y(), "mm"), Unit::convertValue(lpos.z(), "mm"));
+    const TVector3  lposRoot = TVector3(Unit::convertValue(lpos.x(), "mm"),
+                                        Unit::convertValue(lpos.y(), "mm"),
+                                        Unit::convertValue(lpos.z(), "mm"));
 
     /**
      * Get Momentum of the particle

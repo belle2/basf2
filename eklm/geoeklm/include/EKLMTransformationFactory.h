@@ -34,8 +34,10 @@ namespace Belle2 {
 
     //! returns transformation matrix for the strip
     //! with EKLMStripID structure
-    G4Transform3D getTransformation(EKLMStripID id)
-    {return getTransformation(id.endcap, id.layer, id.sector, id.plane, id.strip);}
+    G4Transform3D getTransformation(EKLMStripID id) {
+      return getTransformation(id.endcap, id.layer, id.sector, id.plane,
+                               id.strip);
+    }
 
     //! returns transformation matrix for the strip
     //! where strip ID is taken from the parent class via virtual function

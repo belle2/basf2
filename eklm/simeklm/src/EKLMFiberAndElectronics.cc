@@ -106,9 +106,11 @@ namespace Belle2 {
 
 
       // fill histograms
-      timesToShape(hitTimes(gRandom->Poisson(nPEmean), (*iHit)->getTime(), false), m_digitizedAmplitudeDirect);
+      timesToShape(hitTimes(gRandom->Poisson(nPEmean), (*iHit)->getTime(),
+                            false), m_digitizedAmplitudeDirect);
       if (m_mirrorReflectiveIndex > 0)
-        timesToShape(hitTimes(gRandom->Poisson(nPEmean), (*iHit)->getTime(), true), m_digitizedAmplitudeReflected);
+        timesToShape(hitTimes(gRandom->Poisson(nPEmean), (*iHit)->getTime(),
+                              true), m_digitizedAmplitudeReflected);
 
     }
 
@@ -135,9 +137,12 @@ namespace Belle2 {
 
     // if save histograms if outputFilename is non-empty
     if (m_outputFilename.size() != 0) {
-      const char* info = (string("Histograms will be saved with ") + m_outputFilename + string(" prefix. To switch it off change OutputFile parameter in EKLM.xml to void")).c_str();
+      const char* info = (string("Histograms will be saved with ") +
+                          m_outputFilename +
+                          string(" prefix. To switch it off change OutputFile parameter in EKLM.xml to void")).c_str();
       B2INFO(info);
-      string filename = m_outputFilename + *m_stripName + boost::lexical_cast<string>(gRandom->Integer(10000000)) + ".root";
+      string filename = m_outputFilename + *m_stripName +
+                        boost::lexical_cast<string>(gRandom->Integer(10000000)) + ".root";
       TFile* hfile = new TFile(filename.c_str(), "NEW");
       hfile->Append(m_digitizedAmplitudeDirect);
       hfile->Append(m_digitizedAmplitudeReflected);
@@ -167,7 +172,8 @@ namespace Belle2 {
   void EKLMFiberAndElectronics::addRandomSiPMNoise()
   {
     for (int iTimeStep = 0; iTimeStep < m_nTimeDigitizationSteps; iTimeStep++)
-      m_digitizedAmplitude->AddBinContent(iTimeStep + 1,  gRandom->Poisson(m_meanSiPMNoise));
+      m_digitizedAmplitude->AddBinContent(iTimeStep + 1,
+                                          gRandom->Poisson(m_meanSiPMNoise));
   }
 
   double EKLMFiberAndElectronics::signalShape(double t)
@@ -182,7 +188,8 @@ namespace Belle2 {
     return exp(-dist / m_attenuationLength);
   }
 
-  vector<double>  EKLMFiberAndElectronics::hitTimes(int nPE, double timeShift, bool isReflected)
+  vector<double> EKLMFiberAndElectronics::hitTimes(int nPE, double timeShift,
+                                                   bool isReflected)
   {
     vector <double> hitTimesVector;
     // start selection procedure
@@ -208,7 +215,8 @@ namespace Belle2 {
       // Scintillator de-excitation time  && Fiber  de-excitation time
       double deExcitationTime = gRandom->Exp(m_scintillatorDeExcitationTime)
                                 + gRandom->Exp(m_fiberDeExcitationTime);
-      double hitTime = lightPropagationTime(hitDist) + deExcitationTime + timeShift;
+      double hitTime = lightPropagationTime(hitDist) + deExcitationTime +
+                       timeShift;
       // std::cout<<"TRMPORARY BUG IN EKLMFiberAndElectronics.cc"<<std::endl;
 //       double hitTime = lightPropagationTime(hitDist) + timeShift;
 
@@ -223,7 +231,8 @@ namespace Belle2 {
                                              TH1D* shape)
   {
     //    for (unsigned  i = 0; i < times.size(); i++)
-    for (std::vector<double>::const_iterator i = times.begin(); i != times.end(); i++)
+    for (std::vector<double>::const_iterator i = times.begin();
+         i != times.end(); i++)
       for (int iTimeStep = 0; iTimeStep < m_nTimeDigitizationSteps; iTimeStep++)
         shape->AddBinContent(iTimeStep + 1,
                              signalShape(iTimeStep * m_timeDigitizationStep -

@@ -55,7 +55,8 @@ EKLMStepHit::EKLMStepHit(
   const int  ptrID,
   const G4VPhysicalVolume* pv
 ) :
-  EKLMHitBase(Endcap, Layer, Sector, PDG, Time,  EDep, GlobalPosition, LocalPosition)
+  EKLMHitBase(Endcap, Layer, Sector, PDG, Time, EDep, GlobalPosition,
+              LocalPosition)
 {
   m_Plane = Plane;
   m_Strip = Strip;

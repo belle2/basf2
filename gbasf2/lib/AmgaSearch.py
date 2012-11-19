@@ -58,23 +58,19 @@ class AmgaSearch(object):
 
     def setExperiments(self, experiments):
         '''
-        Set experiment number to search in. If nothing is set, all experiments will be used.
+        Set experiment number to search in.
+        If nothing is set, all experiments will be used.
         Argument is list of experiment numbers, i.e. [12, 31, 65]
         '''
 
         if type(experiments) is not list:
             self.experiments = []
-            # XXX should throw something here... We have to discuss exceptions policy.
+            # XXX should throw something here... We have to discuss exceptions
         self.experiments = experiments
 
 ###############################################################################
 
-    def setAttributesWithOperators(
-        self,
-        attributes,
-        operators,
-        values,
-        ):
+    def setAttributesWithOperators(self, attributes, operators, values):
         '''
         Prepare attributes array
         Arguments:
@@ -165,14 +161,12 @@ class AmgaSearch(object):
             raise Exception('No query. Aborting.')
 
         aq = AmgaQuery()
-        results = aq.searchQueryWithAttributes(
-            dataType=self.dataType,
-            experiments=self.experiments,
-            query=self.queryString,
-            attributes=self.attributes,
-            project=self.project,
-            username=self.username,
-            )
+        results = aq.searchQueryWithAttributes(dataType=self.dataType,
+                                               experiments=self.experiments,
+                                               query=self.queryString,
+                                               attributes=self.attributes,
+                                               project=self.project,
+                                               username=self.username)
         return results
 
 ###############################################################################

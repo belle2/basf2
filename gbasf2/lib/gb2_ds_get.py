@@ -31,12 +31,12 @@ def main():
     if not os.path.exists(ds_dir):
         os.mkdir(ds_dir)
     else:
-        s = \
-            'you have downloaded this dataset before, how would you like to verify the files?By file size(s) or by file checksum(c)?: '
+        s = 'you have downloaded this dataset before, how would you like\
+            to verify the files?By file size(s) or by file checksum(c)?: '
         ow = raw_input(s)
         while ow != 's' and ow != 'c':
-            s = \
-                'please input "s" to choose file size, or "c" to choose file checksum: '
+            s = 'please input "s" to choose file size,\
+                 or "c" to choose file checksum: '
             ow = raw_input(s)
 
     ds_get(entries, ds_dir, ow)
@@ -44,4 +44,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

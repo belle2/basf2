@@ -25,8 +25,9 @@ def CheckAndRemoveProjectIfForce(username=None, project=None):
     ac = AmgaClient()
     directory = '/belle2/user/belle/' + username + '/' + project
     if ac.checkDirectoryOnly(directory):
-        print 'The project has been in the AMGA server. Do you want to give up(G), or ' \
-            + 'force to execute it by remove the previous one(R), or add this project the previous(A)?'
+        print 'The project has been in the AMGA server. Do you want to give\
+              up(G), or force to execute it by remove the previous one(R),\
+              or add this project the previous(A)?'
         user_input = raw_input('Please enter G, R or A: ')
         if user_input.upper() == 'G':
             print 'You have terminated the project'
@@ -44,8 +45,8 @@ def CheckAndRemoveProjectIfForce(username=None, project=None):
                 Script.parseCommandLine(ignoreErrors=True)
                 dirac = Dirac.Dirac()
                 for result in results:
-                    rm_result = dirac.removeFile(results[result]['lfn'
-                            ].replace('belle2', 'belle'))
+                    tmpres = results[result]['lfn'].replace('belle2', 'belle')
+                    rm_result = dirac.removeFile(tmpres)
                     if rm_result['OK']:
                         print 'we have removed %s in the storage element' \
                             % results[result]['lfn'].replace('belle2', 'belle')
@@ -68,21 +69,11 @@ def CheckAndRemoveProjectIfForce(username=None, project=None):
         return projectStatus
 
 
-def make_jdl(
-    steering_file,
-    repetitionOfJob,
-    project,
-    CPUTime,
-    priority,
-    lfns,
-    sysconfig,
-    swver,
-    tar,
-    num=0,
-    site='',
-    ):
-    '''make_jdl takes the options defined by the user and and lfn and makes a basic
-       JDL file. This is then written into a temporary file in the same directory.
+def make_jdl(steering_file, repetitionOfJob, project, CPUTime, priority, lfns,
+             sysconfig, swver, tar, num=0, site=''):
+    '''make_jdl takes the options defined by the user and and lfn and makes a
+       basic JDL file. This is then written into a temporary file in the same
+       directory.
        Returns the path of the JDL
     '''
 
@@ -110,7 +101,7 @@ def make_jdl(
     f.write('    PilotType = "private";\n')
     f.write('    SystemConfig = ' + sysconfig + ';\n')
     if site != '':
-        if site != None:
+        if site not None:
             f.write('    Site = ' + site + ';\n')
 #    f.write('    Requirements = Member("VO-belle-' + swver
 #            + '",other.GlueHostApplicationSoftwareRunTimeEnvironment);\n')
@@ -160,7 +151,8 @@ def make_jdl(
 
 
 def prepareProxy():
-    '''check for proxy prescence and if not present, make it, upload it, VOMS it
+    '''check for proxy prescence and if not present
+       make it, upload it, VOMS it
        FIXME - upload proxy for lifetime of certificate
        FIXME - warn on certificate validity
        return proxy infomation if proxy is generated correctly
@@ -171,9 +163,8 @@ def prepareProxy():
         timeleft = int(proxyinfo['Value']['secondsLeft'])
         timeleft /= 3600
         if timeleft < 12 and timeleft > 0:
-            print "The proxy will expire after %s hours. Do you want to continue \
-or to generate a new proxy?" \
-                % timeleft
+            print "The proxy will expire after %s hours. Do you want to\
+                  continue or to generate a new proxy?" % timeleft
 
             user_choice = raw_input('Please input C or G: ')
             if user_choice.upper() == 'C':
@@ -197,7 +188,7 @@ or to generate a new proxy?" \
 
     while True:
         proxyinfo = getProxyInfo()
-        if proxyinfo['Value'].has_key('username'):
+        if 'usrename' in proxyinfo['Value']:
             break
 
     userName = proxyinfo['Value']['username']
@@ -218,7 +209,8 @@ or to generate a new proxy?" \
 
 def make_tar(project, files):
     '''basic function to make a tar of input files, written to pwd
-       FIXME - upload to SandboxSE, return an URL and reuse URL to speed up submission
+       FIXME - upload to SandboxSE, return an URL and reuse URL to
+       speed up submission
     '''
 
     if files is not None:
@@ -233,5 +225,3 @@ def make_tar(project, files):
         return project + '-inputsandbox.tar.bz2'
     else:
         return None
-
-

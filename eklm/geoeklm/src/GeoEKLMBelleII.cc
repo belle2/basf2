@@ -39,9 +39,6 @@
 #include <iostream>
 #include <boost/lexical_cast.hpp>
 
-#include <errno.h>
-
-
 #include <eklm/geoeklm/EKLMTransformationFactory.h>
 
 using namespace Belle2;
@@ -99,10 +96,8 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   int j;
   GearDir gd(content);
   m_mode = (enum EKLMDetectorMode)gd.getInt("Mode");
-  if (m_mode < 0 || m_mode > 2) {
+  if (m_mode < 0 || m_mode > 2)
     B2FATAL("EKLM started with unknown geometry mode " << m_mode << ".");
-    exit(EINVAL);
-  }
   m_outputFile = gd.getString("StripLengthAndTransformationMatrixDBFile");
   GearDir EndCap(gd);
   EndCap.append("/EndCap");
@@ -132,10 +127,8 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   for (j = 0; j < nPlane; j++) {
     BoardPosition[j] = (struct EKLMBoardPosition*)
                        malloc(nBoard * sizeof(struct EKLMBoardPosition));
-    if (BoardPosition[j] == NULL) {
+    if (BoardPosition[j] == NULL)
       B2FATAL(MemErr);
-      exit(ENOMEM);
-    }
     for (i = 0; i < nBoard; i++) {
       GearDir BoardContent(Boards);
       BoardContent.append((boost::format("/BoardData[%1%]") % (j + 1)).str());
@@ -146,10 +139,8 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   }
   StripBoardPosition = (struct EKLMStripBoardPosition*)
                        malloc(nStripBoard * sizeof(struct EKLMStripBoardPosition));
-  if (StripBoardPosition == NULL) {
+  if (StripBoardPosition == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   for (i = 0; i < nStripBoard; i++) {
     GearDir StripBoardContent(Boards);
     StripBoardContent.append((boost::format("/StripBoardData/Board[%1%]") %
@@ -203,10 +194,8 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   StripSize.rss_size = Strips.getLength("RSSSize") * cm;
   StripPosition = (struct EKLMElementPosition*)
                   malloc(nStrip * sizeof(struct EKLMElementPosition));
-  if (StripPosition == NULL) {
+  if (StripPosition == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   for (i = 0; i < nStrip; i++) {
     GearDir StripContent(Strips);
     StripContent.append((boost::format("/Strip[%1%]") % (i + 1)).str());
@@ -224,10 +213,8 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   for (j = 0; j < nPlane; j++) {
     SectionSupportPosition[j] = (struct EKLMSectionSupportPosition*)
                                 malloc((nSection + 1) * sizeof(struct EKLMSectionSupportPosition));
-    if (SectionSupportPosition[j] == NULL) {
+    if (SectionSupportPosition[j] == NULL)
       B2FATAL(MemErr);
-      exit(ENOMEM);
-    }
     for (i = 0; i <= nSection; i++) {
       GearDir SectionSupportContent(Sections);
       SectionSupportContent.append((boost::format("/SectionSupportData[%1%]") % (j +
@@ -291,28 +278,22 @@ void GeoEKLMBelleII::createEndcap(int iEndcap, G4LogicalVolume* mlv)
                          rmin, rmax);
   atube = new G4Tubs("tempatube", rminsub, rmaxsub, zsub, 0.0, 360.0 * deg);
   solidEndcap = new G4SubtractionSolid(Endcap_Name, boct, atube);
-  if (solidEndcap == NULL) {
+  if (solidEndcap == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   if (iEndcap == 1)
     z = -EndcapPosition.Z + 94.0 * cm;
   else
     z = EndcapPosition.Z;
   t = G4Translate3D(EndcapPosition.X, EndcapPosition.Y, z);
   logicEndcap = new G4LogicalVolume(solidEndcap, Iron, Endcap_Name);
-  if (logicEndcap == NULL) {
+  if (logicEndcap == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicEndcap, true);
   geometry::setColor(*logicEndcap, "#ffffff22");
   physiEndcap = new G4PVPlacementGT(t, t, logicEndcap, Endcap_Name, mlv,
                                     iEndcap);
-  if (physiEndcap == NULL) {
+  if (physiEndcap == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   for (i = 1; i <= nLayer; i++)
     createLayer(i, iEndcap, physiEndcap);
 }
@@ -330,15 +311,11 @@ void GeoEKLMBelleII::createLayer(int iLayer, int iEndcap,
   solidLayer = new G4Tubs(Layer_Name, LayerPosition.innerR,
                           LayerPosition.outerR, LayerPosition.length / 2.0,
                           0. * deg, 360. * deg);
-  if (solidLayer == NULL) {
+  if (solidLayer == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicLayer = new G4LogicalVolume(solidLayer, Air, Layer_Name);
-  if (logicLayer == NULL) {
+  if (logicLayer == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicLayer, false);
   LayerPosition.Z = -EndcapPosition.length / 2.0 + iLayer * Layer_shiftZ +
                     0.5 * LayerPosition.length;
@@ -346,10 +323,8 @@ void GeoEKLMBelleII::createLayer(int iLayer, int iEndcap,
     LayerPosition.Z = -LayerPosition.Z;
   t = G4Translate3D(0.0, 0.0, LayerPosition.Z);
   physiLayer = new G4PVPlacementGT(mpvgt, t, logicLayer, Layer_Name, iLayer);
-  if (physiLayer == NULL) {
+  if (physiLayer == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   for (i = 1; i <= 4; i++)
     createSector(i, physiLayer);
 }
@@ -367,15 +342,11 @@ void GeoEKLMBelleII::createSector(int iSector, G4PVPlacementGT* mpvgt)
   solidSector = new G4Tubs(Sector_Name, SectorPosition.innerR,
                            SectorPosition.outerR, 0.5 * SectorPosition.length,
                            0.0, 90.0 * deg);
-  if (solidSector == NULL) {
+  if (solidSector == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicSector = new G4LogicalVolume(solidSector, Air, Sector_Name);
-  if (logicSector == NULL) {
+  if (logicSector == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicSector, false);
   switch (iSector) {
     case 1:
@@ -393,10 +364,8 @@ void GeoEKLMBelleII::createSector(int iSector, G4PVPlacementGT* mpvgt)
   }
   physiSector = new G4PVPlacementGT(mpvgt, t, logicSector, Sector_Name,
                                     iSector);
-  if (physiSector == NULL) {
+  if (physiSector == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   createSectorSupport(physiSector);
   for (i = 1; i <= 2; i++)
     createSectorCover(i, physiSector);
@@ -415,10 +384,8 @@ void GeoEKLMBelleII::calcBoardTransform()
   for (i = 0; i < nPlane; i++) {
     BoardTransform[i] = (G4Transform3D**)
                         malloc(sizeof(G4Transform3D*) * nBoard);
-    if (BoardTransform[i] == NULL) {
+    if (BoardTransform[i] == NULL)
       B2FATAL(MemErr);
-      exit(ENOMEM);
-    }
     for (j = 0; j < nBoard; j++) {
       BoardTransform[i][j] = new G4Transform3D(
         G4RotateZ3D(BoardPosition[i][j].phi) *
@@ -455,18 +422,14 @@ void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
                             0.5 * SectorSupportPosition.outerR,
                             0.5 * SectorSupportPosition.outerR,
                             0.5 * lz);
-  if (solidCoverTube == NULL || solidCoverBox == NULL) {
+  if (solidCoverTube == NULL || solidCoverBox == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   box = new G4Box("SubtractionBox_" + Cover_Name,
                   0.5 * SectorSupportPosition.outerR,
                   0.5 * SectorSupportPosition.outerR,
                   lz);
-  if (box == NULL) {
+  if (box == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   ang = getSectorSupportCornerAngle();
   t1 = G4Translate3D(0.5 * PlanePosition.outerR + SectorSupportPosition.X,
                      0.5 * PlanePosition.outerR + SectorSupportPosition.Y,
@@ -480,20 +443,14 @@ void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
                      0.) * G4RotateZ3D(ang);
   is = new G4IntersectionSolid("Intersection_" + Cover_Name, solidCoverTube,
                                solidCoverBox, t1);
-  if (is == NULL) {
+  if (is == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   solidCover = new G4SubtractionSolid(Cover_Name, is, box, t2);
-  if (solidCover == NULL) {
+  if (solidCover == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicCover = new G4LogicalVolume(solidCover, Duralumin, Cover_Name);
-  if (logicCover == NULL) {
+  if (logicCover == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicCover, false);
   geometry::setColor(*logicCover, "#ff000022");
   z = 0.25 * (SectorPosition.length + SectorSupportPosition.length);
@@ -501,10 +458,8 @@ void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
     z = -z;
   t = G4Translate3D(0., 0., z);
   physiCover = new G4PVPlacementGT(mpvgt, t, logicCover, Cover_Name, iCover);
-  if (physiCover == NULL) {
+  if (physiCover == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   printVolumeMass(logicCover);
 }
 
@@ -654,10 +609,8 @@ void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT* mpvgt)
                                0.5 * SectorSupportSize.Corner1Width,
                                0.5 * SectorSupportSize.Corner1Thickness);
   if (solidCorner1Tube == NULL || solidCorner1Box1 == NULL ||
-      solidCorner1Box2 == NULL) {
+      solidCorner1Box2 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   x = SectorSupportPosition.X + 0.5 * (SectorSupportSize.CornerX +
                                        SectorSupportSize.Corner1LX +
                                        SectorSupportSize.Thickness);
@@ -672,29 +625,21 @@ void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT* mpvgt)
        G4RotateZ3D(getSectorSupportCornerAngle());
   is1 = new G4IntersectionSolid("Intersection1_" + Corner1_Name,
                                 solidCorner1Tube, solidCorner1Box1, t1);
-  if (is1 == NULL) {
+  if (is1 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   solidCorner1 = new G4IntersectionSolid(Corner1_Name, is1, solidCorner1Box2,
                                          t2);
-  if (solidCorner1 == NULL) {
+  if (solidCorner1 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicCorner1 = new G4LogicalVolume(solidCorner1, Duralumin, Corner1_Name);
-  if (logicCorner1 == NULL) {
+  if (logicCorner1 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicCorner1, true);
   geometry::setColor(*logicCorner1, "#ff0000ff");
   t = G4Translate3D(0., 0., SectorSupportSize.Corner1Z);
   physiCorner1 = new G4PVPlacementGT(mpvgt, t, logicCorner1, Corner1_Name);
-  if (physiCorner1 == NULL) {
+  if (physiCorner1 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   printVolumeMass(logicCorner1);
 }
 
@@ -722,35 +667,25 @@ void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT* mpvgt)
                                             0.5 * SectorSupportSize.
                                             Corner2Thickness);
   solidCorner2Tubs = createSectorSupportOuterTube(mpvgt);
-  if (solidCorner2Prism == NULL || solidCorner2Tubs == NULL) {
+  if (solidCorner2Prism == NULL || solidCorner2Tubs == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
-  if (solidCorner2Prism->getSolid() == NULL) {
+  if (solidCorner2Prism->getSolid() == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   t1 = G4Translate3D(-x, -y, 0.);
   solidCorner2 = new G4SubtractionSolid(Corner2_Name,
                                         solidCorner2Prism->getSolid(),
                                         solidCorner2Tubs, t1);
-  if (solidCorner2 == NULL) {
+  if (solidCorner2 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicCorner2 = new G4LogicalVolume(solidCorner2, Duralumin, Corner2_Name);
-  if (logicCorner2 == NULL) {
+  if (logicCorner2 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicCorner2, true);
   geometry::setColor(*logicCorner2, "#ff0000ff");
   t = G4Translate3D(x, y, SectorSupportSize.Corner2Z);
   physiCorner2 = new G4PVPlacementGT(mpvgt, t, logicCorner2, Corner2_Name);
-  if (physiCorner2 == NULL) {
+  if (physiCorner2 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   delete solidCorner2Prism;
   printVolumeMass(logicCorner2);
 }
@@ -780,35 +715,25 @@ void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT* mpvgt)
                                             0.5 * SectorSupportSize.
                                             Corner3Thickness);
   solidCorner3Tubs = createSectorSupportInnerTube(mpvgt);
-  if (solidCorner3Prism == NULL || solidCorner3Tubs == NULL) {
+  if (solidCorner3Prism == NULL || solidCorner3Tubs == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
-  if (solidCorner3Prism->getSolid() == NULL) {
+  if (solidCorner3Prism->getSolid() == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   t1 = G4Translate3D(-x, -y, 0.);
   solidCorner3 = new G4SubtractionSolid(Corner3_Name,
                                         solidCorner3Prism->getSolid(),
                                         solidCorner3Tubs, t1);
-  if (solidCorner3 == NULL) {
+  if (solidCorner3 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicCorner3 = new G4LogicalVolume(solidCorner3, Duralumin, Corner3_Name);
-  if (logicCorner3 == NULL) {
+  if (logicCorner3 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicCorner3, true);
   geometry::setColor(*logicCorner3, "#ff0000ff");
   t = G4Translate3D(x, y, SectorSupportSize.Corner3Z);
   physiCorner3 = new G4PVPlacementGT(mpvgt, t, logicCorner3, Corner3_Name);
-  if (physiCorner3 == NULL) {
+  if (physiCorner3 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   delete solidCorner3Prism;
   printVolumeMass(logicCorner3);
 }
@@ -838,35 +763,25 @@ void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT* mpvgt)
                                             0.5 * SectorSupportSize.
                                             Corner4Thickness);
   solidCorner4Tubs = createSectorSupportInnerTube(mpvgt);
-  if (solidCorner4Prism == NULL || solidCorner4Tubs == NULL) {
+  if (solidCorner4Prism == NULL || solidCorner4Tubs == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
-  if (solidCorner4Prism->getSolid() == NULL) {
+  if (solidCorner4Prism->getSolid() == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   t1 = G4Translate3D(-x, -y, 0.);
   solidCorner4 = new G4SubtractionSolid(Corner4_Name,
                                         solidCorner4Prism->getSolid(),
                                         solidCorner4Tubs, t1);
-  if (solidCorner4 == NULL) {
+  if (solidCorner4 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicCorner4 = new G4LogicalVolume(solidCorner4, Duralumin, Corner4_Name);
-  if (logicCorner4 == NULL) {
+  if (logicCorner4 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicCorner4, true);
   geometry::setColor(*logicCorner4, "#ff0000ff");
   t = G4Translate3D(x, y, SectorSupportSize.Corner4Z);
   physiCorner4 = new G4PVPlacementGT(mpvgt, t, logicCorner4, Corner4_Name);
-  if (physiCorner4 == NULL) {
+  if (physiCorner4 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   delete solidCorner4Prism;
   printVolumeMass(logicCorner4);
 }
@@ -901,56 +816,40 @@ void GeoEKLMBelleII::createSectorSupport(G4PVPlacementGT* mpvgt)
                                    0.5 * SectorSupportPosition.length,
                                    0., 90.*deg);
   if (solidBoxX == NULL || solidBoxY == NULL || solidOuterTube == NULL ||
-      solidInnerTube == NULL || solidLimitationTube == NULL) {
+      solidInnerTube == NULL || solidLimitationTube == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   t = G4Translate3D(0., 0., SectorSupportPosition.Z);
   us1 = new G4UnionSolid("Union1_" + SectorSupportName, solidInnerTube,
                          solidBoxY, tby);
-  if (us1 == NULL) {
+  if (us1 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   us2 = new G4UnionSolid("Union2_" + SectorSupportName, us1, solidBoxX,
                          tbx);
-  if (us2 == NULL) {
+  if (us2 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   us3 = new G4UnionSolid("Union3_" + SectorSupportName, us2,
                          solidOuterTube, G4Translate3D(0., 0., 0.));
-  if (us3 == NULL) {
+  if (us3 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   us4 = new G4UnionSolid("Union4_" + SectorSupportName,
                          us3, solidBoxTop, tbt);
-  if (us4 == NULL) {
+  if (us4 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   solidSectorSupport = new G4IntersectionSolid(SectorSupportName, us4,
                                                solidLimitationTube,
                                                G4Translate3D(0., 0., 0.));
-  if (solidSectorSupport == NULL) {
+  if (solidSectorSupport == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicSectorSupport = new G4LogicalVolume(solidSectorSupport, Duralumin,
                                            SectorSupportName);
-  if (logicSectorSupport == NULL) {
+  if (logicSectorSupport == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicSectorSupport, true);
   geometry::setColor(*logicSectorSupport, "#ff0000ff");
   physiSectorSupport = new G4PVPlacementGT(mpvgt, t, logicSectorSupport,
                                            SectorSupportName);
-  if (physiSectorSupport == NULL) {
+  if (physiSectorSupport == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   createSectorSupportCorner1(mpvgt);
   createSectorSupportCorner2(mpvgt);
   createSectorSupportCorner3(mpvgt);
@@ -1054,22 +953,16 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
                                            90. * deg, PlanePosition.length);
   if (solidPlaneTube == NULL || solidPlaneBox == NULL ||
       solidPlanePrism1 == NULL || solidPlanePrism2 == NULL ||
-      solidPlanePrism3 == NULL) {
+      solidPlanePrism3 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   if (solidPlanePrism1->getSolid() == NULL ||
       solidPlanePrism2->getSolid() == NULL ||
-      solidPlanePrism3->getSolid() == NULL) {
+      solidPlanePrism3->getSolid() == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   box1 = new G4Box("Box1_" + Plane_Name, 0.5 * box_lx, 0.5 * box_lx,
                    PlanePosition.length);
-  if (box1 == NULL) {
+  if (box1 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   t1 = G4Translate3D(0.5 * (PlanePosition.outerR + box_x),
                      0.5 * (PlanePosition.outerR + box_x), 0.);
   if (iPlane == 2)
@@ -1111,43 +1004,29 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
     t5 = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t5;
   is = new G4IntersectionSolid("Intersection_" + Plane_Name, solidPlaneTube,
                                solidPlaneBox, t1);
-  if (is == NULL) {
+  if (is == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   ss1 = new G4SubtractionSolid("Subtraction1_" + Plane_Name, is, box1, t2);
-  if (ss1 == NULL) {
+  if (ss1 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   ss2 = new G4SubtractionSolid("Subtraction2_" + Plane_Name, ss1,
                                solidPlanePrism1->getSolid(), t3);
-  if (ss2 == NULL) {
+  if (ss2 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   ss3 = new G4SubtractionSolid("Subtraction3_" + Plane_Name, ss2,
                                solidPlanePrism2->getSolid(), t4);
-  if (ss3 == NULL) {
+  if (ss3 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   ss4 = new G4SubtractionSolid("Subtraction4_" + Plane_Name, ss3,
                                solidPlanePrism3->getSolid(), t5);
-  if (ss4 == NULL) {
+  if (ss4 == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   solidPlane = subtractBoardSolids(ss4, iPlane, Plane_Name);
-  if (solidPlane == NULL) {
+  if (solidPlane == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicPlane = new G4LogicalVolume(solidPlane, Air, Plane_Name);
-  if (logicPlane == NULL) {
+  if (logicPlane == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicPlane, false);
   if (iPlane == 1) {
     t = G4Translate3D(PlanePosition.X, PlanePosition.Y, PlanePosition.Z);
@@ -1156,10 +1035,8 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
         G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.));
   }
   physiPlane = new G4PVPlacementGT(mpvgt, t, logicPlane, Plane_Name, iPlane);
-  if (physiPlane == NULL) {
+  if (physiPlane == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   for (i = 1; i <= nSection + 1; i++)
     createSectionSupport(i, iPlane, physiPlane);
   for (i = 1; i <= 2; i++)
@@ -1187,16 +1064,12 @@ void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
                                        0.5 * BoardSize.length,
                                        0.5 * BoardSize.height,
                                        0.5 * BoardSize.width);
-  if (solidSectionReadoutBoard == NULL) {
+  if (solidSectionReadoutBoard == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicSectionReadoutBoard = new G4LogicalVolume(solidSectionReadoutBoard, Air,
                                                  Board_Name);
-  if (logicSectionReadoutBoard == NULL) {
+  if (logicSectionReadoutBoard == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicSectionReadoutBoard, false);
   physiSectionReadoutBoard = new G4PVPlacementGT(mpvgt,
                                                  *BoardTransform[iPlane - 1]
@@ -1204,10 +1077,8 @@ void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
                                                  logicSectionReadoutBoard,
                                                  Board_Name,
                                                  10 * iPlane + iBoard);
-  if (physiSectionReadoutBoard == NULL) {
+  if (physiSectionReadoutBoard == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   createBaseBoard(physiSectionReadoutBoard);
   if (m_mode != EKLM_DETECTOR_NORMAL)
     for (i = 1; i <= nStripBoard; i++)
@@ -1224,25 +1095,19 @@ void GeoEKLMBelleII::createBaseBoard(G4PVPlacementGT* mpvgt)
   solidBaseBoard = new G4Box(Board_Name, 0.5 * BoardSize.length,
                              0.5 * BoardSize.base_height,
                              0.5 * BoardSize.base_width);
-  if (solidBaseBoard == NULL) {
+  if (solidBaseBoard == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicBaseBoard = new G4LogicalVolume(solidBaseBoard, Silicon,
                                        Board_Name);
-  if (logicBaseBoard == NULL) {
+  if (logicBaseBoard == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicBaseBoard, true);
   geometry::setColor(*logicBaseBoard, "#0000ffff");
   t = G4Translate3D(0., -0.5 * BoardSize.height + 0.5 * BoardSize.base_height,
                     0.);
   physiBaseBoard = new G4PVPlacementGT(mpvgt, t, logicBaseBoard, Board_Name);
-  if (physiBaseBoard == NULL) {
+  if (physiBaseBoard == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   printVolumeMass(logicBaseBoard);
 }
 
@@ -1257,20 +1122,16 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
   solidStripBoard = new G4Box(Board_Name, 0.5 * BoardSize.strip_length,
                               0.5 * BoardSize.strip_height,
                               0.5 * BoardSize.strip_width);
-  if (solidStripBoard == NULL) {
+  if (solidStripBoard == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   if (m_mode == EKLM_DETECTOR_NORMAL)
     logicStripBoard = new G4LogicalVolume(solidStripBoard, Silicon,
                                           Board_Name);
   else
     logicStripBoard = new G4LogicalVolume(solidStripBoard, Silicon,
                                           Board_Name, 0, m_sensitive, 0);
-  if (logicStripBoard == NULL) {
+  if (logicStripBoard == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicStripBoard, true);
   geometry::setColor(*logicStripBoard, "#0000ffff");
   t = G4Translate3D(-0.5 * BoardSize.length + StripBoardPosition[iBoard - 1].x,
@@ -1278,10 +1139,8 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
                     0.5 * BoardSize.strip_height, 0.);
   physiStripBoard = new G4PVPlacementGT(mpvgt, t, logicStripBoard, Board_Name,
                                         iBoard, m_mode);
-  if (physiStripBoard == NULL) {
+  if (physiStripBoard == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   physiStripBoard->setVolumeType(EKLM_SENSITIVE_BOARD);
   printVolumeMass(logicStripBoard);
 }
@@ -1325,10 +1184,8 @@ void GeoEKLMBelleII::createSectionSupport(int iSectionSupport, int iPlane,
                              [iSectionSupport - 1].length,
                              0.5 * SectionSupportTopWidth,
                              0.5 * SectionSupportTopThickness);
-  if (solidBoxTop == NULL || solidBoxMiddle == NULL || solidBoxBottom == NULL) {
+  if (solidBoxTop == NULL || solidBoxMiddle == NULL || solidBoxBottom == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   t1 = G4Translate3D(0., 0., 0.5 * (SectionSupportMiddleThickness +
                                     SectionSupportTopThickness));
   t2 = G4Translate3D(0.5 * (SectionSupportPosition[iPlane - 1]
@@ -1339,22 +1196,16 @@ void GeoEKLMBelleII::createSectionSupport(int iSectionSupport, int iPlane,
                                  SectionSupportTopThickness));
   us = new G4UnionSolid("Union1_" + SectionSupportName, solidBoxMiddle,
                         solidBoxTop, t1);
-  if (us == NULL) {
+  if (us == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   solidSectionSupport = new G4UnionSolid(SectionSupportName, us, solidBoxBottom,
                                          t2);
-  if (solidSectionSupport == NULL) {
+  if (solidSectionSupport == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicSectionSupport = new G4LogicalVolume(solidSectionSupport, Duralumin,
                                             SectionSupportName);
-  if (logicSectionSupport == NULL) {
+  if (logicSectionSupport == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicSectionSupport, true);
   geometry::setColor(*logicSectionSupport, "#ff0000ff");
   t = G4Translate3D(0.5 * (SectionSupportPosition[iPlane - 1]
@@ -1367,10 +1218,8 @@ void GeoEKLMBelleII::createSectionSupport(int iSectionSupport, int iPlane,
   physiSectionSupport = new G4PVPlacementGT(mpvgt, t, logicSectionSupport,
                                             SectionSupportName,
                                             iSectionSupport);
-  if (physiSectionSupport == NULL) {
+  if (physiSectionSupport == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   printVolumeMass(logicSectionSupport);
 }
 
@@ -1392,15 +1241,11 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
     ly = ly - PlasticListDeltaL;
   solidList = new G4Box(List_Name, 0.5 * StripPosition[iList - 1].length,
                         0.5 * ly, 0.5 * PlasticListWidth);
-  if (solidList == NULL) {
+  if (solidList == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicList = new G4LogicalVolume(solidList, Polystyrol, List_Name);
-  if (logicList == NULL) {
+  if (logicList == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicList, false);
   geometry::setColor(*logicList, "#00ff00ff");
   y = StripPosition[iList - 1].Y;
@@ -1414,10 +1259,8 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
   t = G4Translate3D(StripPosition[iList - 1].X, y, z);
   physiList = new G4PVPlacementGT(mpvgt, t, logicList, List_Name,
                                   iList * 100 + iListPlane);
-  if (physiList == NULL) {
+  if (physiList == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   printVolumeMass(logicList);
 }
 
@@ -1434,25 +1277,19 @@ void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT* mpvgt)
                                       StripSize.rss_size),
                                0.5 * StripSize.width,
                                0.5 * StripSize.thickness);
-  if (solidStripVolume == NULL) {
+  if (solidStripVolume == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicStripVolume = new G4LogicalVolume(solidStripVolume, Air,
                                          StripVolume_Name);
-  if (logicStripVolume == NULL) {
+  if (logicStripVolume == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicStripVolume, false);
   t = G4Translate3D(StripPosition[iStrip - 1].X + 0.5 * StripSize.rss_size,
                     StripPosition[iStrip - 1].Y, 0.0);
   physiStripVolume = new G4PVPlacementGT(mpvgt, t, logicStripVolume,
                                          StripVolume_Name, iStrip);
-  if (physiStripVolume == NULL) {
+  if (physiStripVolume == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   createStrip(iStrip, physiStripVolume);
   if (m_mode != EKLM_DETECTOR_NORMAL)
     createSiPM(iStrip, physiStripVolume);
@@ -1467,23 +1304,17 @@ void GeoEKLMBelleII::createStrip(int iStrip, G4PVPlacementGT* mpvgt)
   std::string Strip_Name = "Strip_" + mpvgt->GetName();
   solidStrip = new G4Box(Strip_Name, 0.5 * StripPosition[iStrip - 1].length,
                          0.5 * StripSize.width, 0.5 * StripSize.thickness);
-  if (solidStrip == NULL) {
+  if (solidStrip == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicStrip = new G4LogicalVolume(solidStrip, Polystyrene, Strip_Name);
-  if (logicStrip == NULL) {
+  if (logicStrip == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicStrip, true);
   geometry::setColor(*logicStrip, "#ffffffff");
   t = G4Translate3D(-0.5 * StripSize.rss_size, 0., 0.);
   physiStrip = new G4PVPlacementGT(mpvgt, t, logicStrip, Strip_Name, iStrip);
-  if (physiStrip == NULL) {
+  if (physiStrip == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   createStripGroove(iStrip, physiStrip);
   createStripSensitive(iStrip, physiStrip);
 
@@ -1512,24 +1343,18 @@ void GeoEKLMBelleII::createStripGroove(int iStrip, G4PVPlacementGT* mpvgt)
   solidGroove = new G4Box(Groove_Name, 0.5 * StripPosition[iStrip - 1].length,
                           0.5 * StripSize.groove_width,
                           0.5 * StripSize.groove_depth);
-  if (solidGroove == NULL) {
+  if (solidGroove == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   logicGroove = new G4LogicalVolume(solidGroove, Gel, Groove_Name);
-  if (logicGroove == NULL) {
+  if (logicGroove == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setColor(*logicGroove, "#00ff00ff");
   geometry::setVisibility(*logicGroove, true);
   t = G4Translate3D(0., 0.,
                     0.5 * (StripSize.thickness - StripSize.groove_depth));
   physiGroove = new G4PVPlacementGT(mpvgt, t, logicGroove, Groove_Name, iStrip);
-  if (physiGroove == NULL) {
+  if (physiGroove == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   printVolumeMass(logicGroove);
 }
 
@@ -1554,18 +1379,14 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt)
                                    0.5 * StripPosition[iStrip - 1].length,
                                    0.5 * StripSize.groove_width,
                                    0.5 * StripSize.groove_depth);
-  if (solidSensitiveBox == NULL || solidSensitiveGroove == NULL) {
+  if (solidSensitiveBox == NULL || solidSensitiveGroove == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   t1 = G4Translate3D(0., 0.,
                      0.5 * (StripSize.thickness - StripSize.groove_depth));
   solidSensitive = new G4SubtractionSolid(Sensitive_Name, solidSensitiveBox,
                                           solidSensitiveGroove, t1);
-  if (solidSensitive == NULL) {
+  if (solidSensitive == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   if (m_mode == EKLM_DETECTOR_NORMAL)
     logicSensitive = new G4LogicalVolume(solidSensitive, Polystyrene,
                                          Sensitive_Name, 0, m_sensitive, 0);
@@ -1573,19 +1394,15 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt)
     logicSensitive = new G4LogicalVolume(solidSensitive, Polystyrene,
                                          Sensitive_Name, 0, m_sensitive,
                                          0);
-  if (logicSensitive == NULL) {
+  if (logicSensitive == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setColor(*logicSensitive, "#ffffffff");
   geometry::setVisibility(*logicSensitive, false);
   t = G4Translate3D(0., 0., 0.);
   physiSensitive = new G4PVPlacementGT(mpvgt, t, logicSensitive, Sensitive_Name,
                                        iStrip, m_mode);
-  if (physiSensitive == NULL) {
+  if (physiSensitive == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   physiSensitive->setVolumeType(EKLM_SENSITIVE_STRIP);
   printVolumeMass(logicSensitive);
 }
@@ -1599,28 +1416,22 @@ void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT* mpvgt)
   std::string SiPM_Name = "SiPM_" + mpvgt->GetName();
   solidSiPM = new G4Box(SiPM_Name, 0.5 * StripSize.rss_size,
                         0.5 * StripSize.rss_size, 0.5 * StripSize.rss_size);
-  if (solidSiPM == NULL) {
+  if (solidSiPM == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   if (m_mode == EKLM_DETECTOR_NORMAL)
     logicSiPM = new G4LogicalVolume(solidSiPM, Silicon, SiPM_Name);
   else
     logicSiPM = new G4LogicalVolume(solidSiPM, Silicon, SiPM_Name, 0,
                                     m_sensitive, 0);
-  if (logicSiPM == NULL) {
+  if (logicSiPM == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   geometry::setVisibility(*logicSiPM, true);
   geometry::setColor(*logicSiPM, "#0000ffff");
   t = G4Translate3D(0.5 * StripPosition[iStrip - 1].length, 0., 0.);
   physiSiPM = new G4PVPlacementGT(mpvgt, t, logicSiPM, SiPM_Name, iStrip,
                                   m_mode);
-  if (physiSiPM == NULL) {
+  if (physiSiPM == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
   physiSiPM->setVolumeType(EKLM_SENSITIVE_SIPM);
   printVolumeMass(logicSiPM);
 }
@@ -1639,11 +1450,8 @@ void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
   (void)type;
   readXMLData(content);
   m_sensitive = new EKLMSensitiveDetector("EKLMSensitiveDetector");
-  if (m_sensitive == NULL) {
+  if (m_sensitive == NULL)
     B2FATAL(MemErr);
-    exit(ENOMEM);
-  }
-
   createMaterials();
   for (i = 1; i <= 2; i++)
     createEndcap(i, &topVolume);

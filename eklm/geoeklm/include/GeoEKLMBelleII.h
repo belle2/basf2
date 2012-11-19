@@ -183,6 +183,26 @@ namespace Belle2 {
   };
 
   /**
+   * Materials for EKLM.
+   */
+  struct EKLMMaterials {
+    /** Air. */
+    G4Material* air;
+    /** Polystyrene. */
+    G4Material* polystyrene;
+    /** Polystyrol. */
+    G4Material* polystyrol;
+    /** Iron. */
+    G4Material* iron;
+    /** Duralumin. */
+    G4Material* duralumin;
+    /** Silicon. */
+    G4Material* silicon;
+    /** Gel. */
+    G4Material* gel;
+  };
+
+  /**
    * Class GeoEKLMBelleII.
    * The creator for the  EKLM geometry of the Belle II detector.
    */
@@ -438,45 +458,11 @@ namespace Belle2 {
      */
     void freeSolids();
 
-    /**
-     * Solids.
-     */
+    /** Solids. */
     struct EKLMSolids solids;
 
-    /**
-     * Air.
-     */
-    G4Material* Air;
-
-    /**
-     * Polystyrene.
-     */
-    G4Material* Polystyrene;
-
-    /**
-     * Polystyrol.
-     */
-    G4Material* Polystyrol;
-
-    /**
-     * Iron.
-     */
-    G4Material* Iron;
-
-    /**
-     * Duralumin.
-     */
-    G4Material* Duralumin;
-
-    /**
-     * Silicon.
-     */
-    G4Material* Silicon;
-
-    /**
-     * Gel.
-     */
-    G4Material* Gel;
+    /** Materials. */
+    struct EKLMMaterials mat;
 
     /**
      * Number of layers.

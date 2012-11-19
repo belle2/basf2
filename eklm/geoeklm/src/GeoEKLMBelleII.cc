@@ -130,13 +130,13 @@ void GeoEKLMBelleII::freeSolids()
 
 void GeoEKLMBelleII::createMaterials()
 {
-  Air = geometry::Materials::get("Air");
-  Polystyrene = geometry::Materials::get("EKLMPolystyrene");
-  Polystyrol = geometry::Materials::get("EKLMPolystyrol");
-  Gel = geometry::Materials::get("EKLMGel");
-  Iron = geometry::Materials::get("EKLMIron");
-  Duralumin = geometry::Materials::get("EKLMDuralumin");
-  Silicon = geometry::Materials::get("EKLMSilicon");
+  mat.air = geometry::Materials::get("Air");
+  mat.polystyrene = geometry::Materials::get("EKLMPolystyrene");
+  mat.polystyrol = geometry::Materials::get("EKLMPolystyrol");
+  mat.gel = geometry::Materials::get("EKLMGel");
+  mat.iron = geometry::Materials::get("EKLMIron");
+  mat.duralumin = geometry::Materials::get("EKLMDuralumin");
+  mat.silicon = geometry::Materials::get("EKLMSilicon");
 }
 
 void GeoEKLMBelleII::readPositionData(struct EKLMElementPosition& epos,
@@ -347,7 +347,7 @@ void GeoEKLMBelleII::createEndcap(int iEndcap, G4LogicalVolume* mlv)
   else
     z = EndcapPosition.Z;
   t = G4Translate3D(EndcapPosition.X, EndcapPosition.Y, z);
-  logicEndcap = new G4LogicalVolume(solidEndcap, Iron, Endcap_Name);
+  logicEndcap = new G4LogicalVolume(solidEndcap, mat.iron, Endcap_Name);
   if (logicEndcap == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicEndcap, true);
@@ -376,7 +376,7 @@ void GeoEKLMBelleII::createLayer(int iLayer, int iEndcap,
                             0. * deg, 360. * deg);
   if (solidLayer == NULL)
     B2FATAL(MemErr);
-  logicLayer = new G4LogicalVolume(solidLayer, Air, Layer_Name);
+  logicLayer = new G4LogicalVolume(solidLayer, mat.air, Layer_Name);
   if (logicLayer == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicLayer, false);
@@ -408,7 +408,7 @@ void GeoEKLMBelleII::createSector(int iSector, G4PVPlacementGT* mpvgt)
                              0.0, 90.0 * deg);
   if (solidSector == NULL)
     B2FATAL(MemErr);
-  logicSector = new G4LogicalVolume(solidSector, Air, Sector_Name);
+  logicSector = new G4LogicalVolume(solidSector, mat.air, Sector_Name);
   if (logicSector == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicSector, false);
@@ -514,7 +514,7 @@ void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
   }
   if (solidCover == NULL)
     B2FATAL(MemErr);
-  logicCover = new G4LogicalVolume(solidCover, Duralumin, Cover_Name);
+  logicCover = new G4LogicalVolume(solidCover, mat.duralumin, Cover_Name);
   if (logicCover == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicCover, false);
@@ -699,7 +699,7 @@ void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT* mpvgt)
   }
   if (solidCorner1 == NULL)
     B2FATAL(MemErr);
-  logicCorner1 = new G4LogicalVolume(solidCorner1, Duralumin, Corner1_Name);
+  logicCorner1 = new G4LogicalVolume(solidCorner1, mat.duralumin, Corner1_Name);
   if (logicCorner1 == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicCorner1, true);
@@ -748,7 +748,7 @@ void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT* mpvgt)
   }
   if (solidCorner2 == NULL)
     B2FATAL(MemErr);
-  logicCorner2 = new G4LogicalVolume(solidCorner2, Duralumin, Corner2_Name);
+  logicCorner2 = new G4LogicalVolume(solidCorner2, mat.duralumin, Corner2_Name);
   if (logicCorner2 == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicCorner2, true);
@@ -798,7 +798,7 @@ void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT* mpvgt)
   }
   if (solidCorner3 == NULL)
     B2FATAL(MemErr);
-  logicCorner3 = new G4LogicalVolume(solidCorner3, Duralumin, Corner3_Name);
+  logicCorner3 = new G4LogicalVolume(solidCorner3, mat.duralumin, Corner3_Name);
   if (logicCorner3 == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicCorner3, true);
@@ -848,7 +848,7 @@ void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT* mpvgt)
   }
   if (solidCorner4 == NULL)
     B2FATAL(MemErr);
-  logicCorner4 = new G4LogicalVolume(solidCorner4, Duralumin, Corner4_Name);
+  logicCorner4 = new G4LogicalVolume(solidCorner4, mat.duralumin, Corner4_Name);
   if (logicCorner4 == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicCorner4, true);
@@ -916,7 +916,7 @@ void GeoEKLMBelleII::createSectorSupport(G4PVPlacementGT* mpvgt)
   }
   if (solidSectorSupport == NULL)
     B2FATAL(MemErr);
-  logicSectorSupport = new G4LogicalVolume(solidSectorSupport, Duralumin,
+  logicSectorSupport = new G4LogicalVolume(solidSectorSupport, mat.duralumin,
                                            SectorSupportName);
   if (logicSectorSupport == NULL)
     B2FATAL(MemErr);
@@ -1090,7 +1090,7 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
   }
   if (solids.plane[iPlane - 1].plane == NULL)
     B2FATAL(MemErr);
-  logicPlane = new G4LogicalVolume(solids.plane[iPlane - 1].plane, Air, Plane_Name);
+  logicPlane = new G4LogicalVolume(solids.plane[iPlane - 1].plane, mat.air, Plane_Name);
   if (logicPlane == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicPlane, false);
@@ -1130,7 +1130,7 @@ void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
                                          0.5 * BoardSize.width);
   if (solidSectionReadoutBoard == NULL)
     B2FATAL(MemErr);
-  logicSectionReadoutBoard = new G4LogicalVolume(solidSectionReadoutBoard, Air,
+  logicSectionReadoutBoard = new G4LogicalVolume(solidSectionReadoutBoard, mat.air,
                                                  Board_Name);
   if (logicSectionReadoutBoard == NULL)
     B2FATAL(MemErr);
@@ -1162,7 +1162,7 @@ void GeoEKLMBelleII::createBaseBoard(G4PVPlacementGT* mpvgt)
                                0.5 * BoardSize.base_width);
   if (solidBaseBoard == NULL)
     B2FATAL(MemErr);
-  logicBaseBoard = new G4LogicalVolume(solidBaseBoard, Silicon,
+  logicBaseBoard = new G4LogicalVolume(solidBaseBoard, mat.silicon,
                                        Board_Name);
   if (logicBaseBoard == NULL)
     B2FATAL(MemErr);
@@ -1191,10 +1191,10 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
   if (solidStripBoard == NULL)
     B2FATAL(MemErr);
   if (m_mode == EKLM_DETECTOR_NORMAL)
-    logicStripBoard = new G4LogicalVolume(solidStripBoard, Silicon,
+    logicStripBoard = new G4LogicalVolume(solidStripBoard, mat.silicon,
                                           Board_Name);
   else
-    logicStripBoard = new G4LogicalVolume(solidStripBoard, Silicon,
+    logicStripBoard = new G4LogicalVolume(solidStripBoard, mat.silicon,
                                           Board_Name, 0, m_sensitive, 0);
   if (logicStripBoard == NULL)
     B2FATAL(MemErr);
@@ -1265,7 +1265,7 @@ void GeoEKLMBelleII::createSectionSupport(int iSectionSupport, int iPlane,
   }
   if (solids.secsup[iPlane - 1][iSectionSupport - 1].secsup == NULL)
     B2FATAL(MemErr);
-  logicSectionSupport = new G4LogicalVolume(solids.secsup[iPlane - 1][iSectionSupport - 1].secsup, Duralumin,
+  logicSectionSupport = new G4LogicalVolume(solids.secsup[iPlane - 1][iSectionSupport - 1].secsup, mat.duralumin,
                                             SectionSupportName);
   if (logicSectionSupport == NULL)
     B2FATAL(MemErr);
@@ -1309,7 +1309,7 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
   if (solids.list[iList - 1] == NULL)
     B2FATAL(MemErr);
   logicList = new G4LogicalVolume(solids.list[iList - 1],
-                                  Polystyrol, List_Name);
+                                  mat.polystyrol, List_Name);
   if (logicList == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicList, false);
@@ -1345,7 +1345,7 @@ void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT* mpvgt)
                                             0.5 * StripSize.thickness);
   if (solids.stripvol[iStrip - 1] == NULL)
     B2FATAL(MemErr);
-  logicStripVolume = new G4LogicalVolume(solids.stripvol[iStrip - 1], Air,
+  logicStripVolume = new G4LogicalVolume(solids.stripvol[iStrip - 1], mat.air,
                                          StripVolume_Name);
   if (logicStripVolume == NULL)
     B2FATAL(MemErr);
@@ -1375,7 +1375,7 @@ void GeoEKLMBelleII::createStrip(int iStrip, G4PVPlacementGT* mpvgt)
   if (solids.strip[iStrip - 1] == NULL)
     B2FATAL(MemErr);
   logicStrip = new G4LogicalVolume(solids.strip[iStrip - 1],
-                                   Polystyrene, Strip_Name);
+                                   mat.polystyrene, Strip_Name);
   if (logicStrip == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicStrip, true);
@@ -1417,7 +1417,7 @@ void GeoEKLMBelleII::createStripGroove(int iStrip, G4PVPlacementGT* mpvgt)
   if (solids.groove[iStrip - 1] == NULL)
     B2FATAL(MemErr);
   logicGroove = new G4LogicalVolume(solids.groove[iStrip - 1],
-                                    Gel, Groove_Name);
+                                    mat.gel, Groove_Name);
   if (logicGroove == NULL)
     B2FATAL(MemErr);
   geometry::setColor(*logicGroove, "#00ff00ff");
@@ -1456,7 +1456,7 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt)
   if (solids.scint[iStrip - 1].sens == NULL)
     B2FATAL(MemErr);
   logicSensitive = new G4LogicalVolume(solids.scint[iStrip - 1].sens,
-                                       Polystyrene, Sensitive_Name,
+                                       mat.polystyrene, Sensitive_Name,
                                        0, m_sensitive, 0);
   if (logicSensitive == NULL)
     B2FATAL(MemErr);
@@ -1484,9 +1484,9 @@ void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT* mpvgt)
   if (solidSiPM == NULL)
     B2FATAL(MemErr);
   if (m_mode == EKLM_DETECTOR_NORMAL)
-    logicSiPM = new G4LogicalVolume(solidSiPM, Silicon, SiPM_Name);
+    logicSiPM = new G4LogicalVolume(solidSiPM, mat.silicon, SiPM_Name);
   else
-    logicSiPM = new G4LogicalVolume(solidSiPM, Silicon, SiPM_Name, 0,
+    logicSiPM = new G4LogicalVolume(solidSiPM, mat.silicon, SiPM_Name, 0,
                                     m_sensitive, 0);
   if (logicSiPM == NULL)
     B2FATAL(MemErr);

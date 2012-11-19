@@ -22,7 +22,9 @@
 #include <G4Tubs.hh>
 #include <G4Box.hh>
 #include <G4Transform3D.hh>
+#include <G4UnionSolid.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4IntersectionSolid.hh>
 
 #include <string>
 #include <vector>
@@ -121,6 +123,63 @@ namespace Belle2 {
     double groove_width;               /**< groove width */
     double no_scintillation_thickness; /**< non-scintillating layer */
     double rss_size;                   /**< radiation study SiPM size */
+  };
+
+  /**
+   * Plane solids.
+   */
+  struct EKLMPlaneSolids {
+    G4Tubs* tube;                   /**< Tube. */
+    G4Box* box1;                    /**< Box. */
+    G4Box* box2;                    /**< Box to subtract corner 1. */
+    G4TriangularPrism* prism1;      /**< Corner 2. */
+    G4TriangularPrism* prism2;      /**< Corner 3. */
+    G4TriangularPrism* prism3;      /**< Corner 4. */
+    G4IntersectionSolid* is;        /**< Arc. */
+    G4SubtractionSolid* ss1;        /**< Arc - corner 1. */
+    G4SubtractionSolid* ss2;        /**< Arc - corners 1, 2. */
+    G4SubtractionSolid* ss3;        /**< Arc - corners 1, 2, 3. */
+    G4SubtractionSolid* ss4;        /**< Arc - all corners. */
+    G4SubtractionSolid* plane;      /**< Arc - all corners - boards. */
+  };
+
+  /**
+   * Section support solids.
+   */
+  struct EKLMSectionSupportSolids {
+    G4Box* topbox;        /**< Top box. */
+    G4Box* midbox;        /**< Middle box. */
+    G4Box* botbox;        /**< Bottom box. */
+    G4UnionSolid* us;     /**< Top box + middle box. */
+    G4UnionSolid* secsup; /**< Section support. */
+  };
+
+  /**
+   * Scintillator solids.
+   */
+  struct EKLMScintillatorSolids {
+    G4Box* box;               /**< Box (auxiliary). */
+    G4SubtractionSolid* sens; /**< Sensitive area. */
+  };
+
+  /**
+   * All solids for EKLM.
+   */
+  struct EKLMSolids {
+    /** Element of plastic list. */
+    G4Box** list;
+    /** Strip + SiPM volume. */
+    G4Box** stripvol;
+    /** Strips. */
+    G4Box** strip;
+    /** Strip grooves. */
+    G4Box** groove;
+    /** Scintillator. */
+    struct EKLMScintillatorSolids* scint;
+    /** Plane. */
+    struct EKLMPlaneSolids* plane;
+    /** Section support. */
+    struct EKLMSectionSupportSolids** secsup;
   };
 
   /**
@@ -368,6 +427,21 @@ namespace Belle2 {
      * @param[in] lv  Logical volume.
      */
     void printVolumeMass(G4LogicalVolume* lv);
+
+    /**
+     * Allocate memory for solids and set contents to zero.
+     */
+    void mallocSolids();
+
+    /**
+     * Deallocate memory for solids.
+     */
+    void freeSolids();
+
+    /**
+     * Solids.
+     */
+    struct EKLMSolids solids;
 
     /**
      * Air.

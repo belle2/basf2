@@ -28,13 +28,9 @@
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Polyhedra.hh>
-#include <G4SubtractionSolid.hh>
 #include <G4PVPlacement.hh>
 #include <G4Transform3D.hh>
 #include <G4ReflectedSolid.hh>
-#include <G4UnionSolid.hh>
-#include <G4SubtractionSolid.hh>
-#include <G4IntersectionSolid.hh>
 
 #include <iostream>
 #include <boost/lexical_cast.hpp>
@@ -66,6 +62,70 @@ GeoEKLMBelleII::~GeoEKLMBelleII()
   free(StripPosition);
   free(StripBoardPosition);
   delete m_sensitive;
+  freeSolids();
+}
+
+void GeoEKLMBelleII::mallocSolids()
+{
+  int i;
+  solids.list = (G4Box**)malloc(nStrip * sizeof(G4Box*));
+  if (solids.list == NULL)
+    B2FATAL(MemErr);
+  solids.stripvol = (G4Box**)malloc(nStrip * sizeof(G4Box*));
+  if (solids.stripvol == NULL)
+    B2FATAL(MemErr);
+  solids.strip = (G4Box**)malloc(nStrip * sizeof(G4Box*));
+  if (solids.strip == NULL)
+    B2FATAL(MemErr);
+  solids.groove = (G4Box**)malloc(nStrip * sizeof(G4Box*));
+  if (solids.groove == NULL)
+    B2FATAL(MemErr);
+  solids.scint = (struct EKLMScintillatorSolids*)
+                 malloc(nStrip * sizeof(struct EKLMScintillatorSolids));
+  if (solids.scint == NULL)
+    B2FATAL(MemErr);
+  solids.plane = (struct EKLMPlaneSolids*)
+                 malloc(nPlane * sizeof(struct EKLMPlaneSolids));
+  if (solids.plane == NULL)
+    B2FATAL(MemErr);
+  solids.secsup = (struct EKLMSectionSupportSolids**)
+                  malloc(nPlane * sizeof(struct EKLMSectionSupportSolids*));
+  if (solids.secsup == NULL)
+    B2FATAL(MemErr);
+  for (i = 0; i < nPlane; i++) {
+    solids.secsup[i] = (struct EKLMSectionSupportSolids*)
+                       malloc((nSection + 1) *
+                              sizeof(struct EKLMSectionSupportSolids));
+    if (solids.plane == NULL)
+      B2FATAL(MemErr);
+  }
+  for (i = 0; i < nStrip; i++) {
+    solids.list[i] = NULL;
+    solids.stripvol[i] = NULL;
+    solids.strip[i] = NULL;
+    solids.groove[i] = NULL;
+  }
+  memset(solids.scint, 0, nStrip * sizeof(struct EKLMScintillatorSolids));
+  memset(solids.plane, 0, nPlane * sizeof(struct EKLMPlaneSolids));
+  for (i = 0; i < nPlane; i++)
+    memset(solids.secsup[i], 0,
+           (nSection + 1) * sizeof(struct EKLMSectionSupportSolids));
+}
+
+void GeoEKLMBelleII::freeSolids()
+{
+  int i;
+  free(solids.list);
+  free(solids.stripvol);
+  free(solids.strip);
+  free(solids.groove);
+  free(solids.scint);
+  for (i = 0; i < nPlane; i++) {
+    free(solids.secsup[i]);
+    delete solids.plane[i].prism1;
+    delete solids.plane[i].prism2;
+    delete solids.plane[i].prism3;
+  }
 }
 
 void GeoEKLMBelleII::createMaterials()
@@ -924,18 +984,6 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
   double box_x;
   double box_lx;
   double ang;
-  G4Tubs* solidPlaneTube;
-  G4Box* solidPlaneBox;
-  G4Box* box1;
-  G4TriangularPrism* solidPlanePrism1;
-  G4TriangularPrism* solidPlanePrism2;
-  G4TriangularPrism* solidPlanePrism3;
-  G4IntersectionSolid* is;
-  G4SubtractionSolid* ss1;
-  G4SubtractionSolid* ss2;
-  G4SubtractionSolid* ss3;
-  G4SubtractionSolid* ss4;
-  G4SubtractionSolid* solidPlane;
   G4LogicalVolume* logicPlane;
   G4PVPlacementGT* physiPlane;
   G4Transform3D t;
@@ -946,101 +994,103 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
   G4Transform3D t5;
   std::string Plane_Name = "Plane_" + boost::lexical_cast<std::string>(iPlane) + "_" +
                            mpvgt->GetName();
-  solidPlaneTube = new G4Tubs("Tube_" + Plane_Name, PlanePosition.innerR,
-                              PlanePosition.outerR, 0.5 * PlanePosition.length,
-                              0.0, 90.0 * deg);
-  box_x = std::max(SectorSupportPosition.Y, SectorSupportPosition.X) +
-          SectorSupportSize.Thickness;
-  box_lx =  PlanePosition.outerR - box_x;
-  solidPlaneBox = new G4Box("Box_" + Plane_Name, 0.5 * box_lx, 0.5 * box_lx,
-                            0.5 * PlanePosition.length);
-  solidPlanePrism1 = new G4TriangularPrism("TriangularPrism1_" + Plane_Name,
-                                           SectorSupportSize.Corner2LY,
-                                           90. * deg,
-                                           SectorSupportSize.Corner2LX,
-                                           180. * deg, PlanePosition.length);
-  solidPlanePrism2 = new G4TriangularPrism("TriangularPrism2_" + Plane_Name,
-                                           SectorSupportSize.Corner3LX, 0.,
-                                           SectorSupportSize.Corner3LY,
-                                           90. * deg, PlanePosition.length);
-  solidPlanePrism3 = new G4TriangularPrism("TriangularPrism3_" + Plane_Name,
-                                           SectorSupportSize.Corner4LX, 0.,
-                                           SectorSupportSize.Corner4LY,
-                                           90. * deg, PlanePosition.length);
-  if (solidPlaneTube == NULL || solidPlaneBox == NULL ||
-      solidPlanePrism1 == NULL || solidPlanePrism2 == NULL ||
-      solidPlanePrism3 == NULL)
-    B2FATAL(MemErr);
-  if (solidPlanePrism1->getSolid() == NULL ||
-      solidPlanePrism2->getSolid() == NULL ||
-      solidPlanePrism3->getSolid() == NULL)
-    B2FATAL(MemErr);
-  box1 = new G4Box("Box1_" + Plane_Name, 0.5 * box_lx, 0.5 * box_lx,
-                   PlanePosition.length);
-  if (box1 == NULL)
-    B2FATAL(MemErr);
-  t1 = G4Translate3D(0.5 * (PlanePosition.outerR + box_x),
-                     0.5 * (PlanePosition.outerR + box_x), 0.);
-  if (iPlane == 2)
-    t1 = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t1;
-  ang = getSectorSupportCornerAngle();
-  x = std::max(SectorSupportPosition.Y, SectorSupportPosition.X);
-  y = SectorSupportPosition.outerR -
-      SectorSupportSize.DeltaLY -
-      SectorSupportSize.TopCornerHeight;
-  if (iPlane == 1) {
-    t2 = G4Translate3D(x + 0.5 * box_lx * cos(ang) - 0.5 * box_lx * sin(ang),
-                       y + 0.5 * box_lx * cos(ang) + 0.5 * box_lx * sin(ang),
-                       0.) * G4RotateZ3D(ang);
-  } else {
-    t2 = G4Translate3D(y + 0.5 * box_lx * cos(ang) + 0.5 * box_lx * sin(ang),
-                       x + 0.5 * box_lx * cos(ang) - 0.5 * box_lx * sin(ang),
-                       0.) * G4RotateZ3D(-ang);
+  if (solids.plane[iPlane - 1].plane == NULL) {
+    solids.plane[iPlane - 1].tube = new G4Tubs("Tube_" + Plane_Name, PlanePosition.innerR,
+                                               PlanePosition.outerR, 0.5 * PlanePosition.length,
+                                               0.0, 90.0 * deg);
+    box_x = std::max(SectorSupportPosition.Y, SectorSupportPosition.X) +
+            SectorSupportSize.Thickness;
+    box_lx =  PlanePosition.outerR - box_x;
+    solids.plane[iPlane - 1].box1 = new G4Box("Box_" + Plane_Name, 0.5 * box_lx, 0.5 * box_lx,
+                                              0.5 * PlanePosition.length);
+    solids.plane[iPlane - 1].prism1 = new G4TriangularPrism("TriangularPrism1_" + Plane_Name,
+                                                            SectorSupportSize.Corner2LY,
+                                                            90. * deg,
+                                                            SectorSupportSize.Corner2LX,
+                                                            180. * deg, PlanePosition.length);
+    solids.plane[iPlane - 1].prism2 = new G4TriangularPrism("TriangularPrism2_" + Plane_Name,
+                                                            SectorSupportSize.Corner3LX, 0.,
+                                                            SectorSupportSize.Corner3LY,
+                                                            90. * deg, PlanePosition.length);
+    solids.plane[iPlane - 1].prism3 = new G4TriangularPrism("TriangularPrism3_" + Plane_Name,
+                                                            SectorSupportSize.Corner4LX, 0.,
+                                                            SectorSupportSize.Corner4LY,
+                                                            90. * deg, PlanePosition.length);
+    if (solids.plane[iPlane - 1].tube == NULL || solids.plane[iPlane - 1].box1 == NULL ||
+        solids.plane[iPlane - 1].prism1 == NULL || solids.plane[iPlane - 1].prism2 == NULL ||
+        solids.plane[iPlane - 1].prism3 == NULL)
+      B2FATAL(MemErr);
+    if (solids.plane[iPlane - 1].prism1->getSolid() == NULL ||
+        solids.plane[iPlane - 1].prism2->getSolid() == NULL ||
+        solids.plane[iPlane - 1].prism3->getSolid() == NULL)
+      B2FATAL(MemErr);
+    solids.plane[iPlane - 1].box2 = new G4Box("Box1_" + Plane_Name, 0.5 * box_lx, 0.5 * box_lx,
+                                              PlanePosition.length);
+    if (solids.plane[iPlane - 1].box2 == NULL)
+      B2FATAL(MemErr);
+    t1 = G4Translate3D(0.5 * (PlanePosition.outerR + box_x),
+                       0.5 * (PlanePosition.outerR + box_x), 0.);
+    if (iPlane == 2)
+      t1 = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t1;
+    ang = getSectorSupportCornerAngle();
+    x = std::max(SectorSupportPosition.Y, SectorSupportPosition.X);
+    y = SectorSupportPosition.outerR -
+        SectorSupportSize.DeltaLY -
+        SectorSupportSize.TopCornerHeight;
+    if (iPlane == 1) {
+      t2 = G4Translate3D(x + 0.5 * box_lx * cos(ang) - 0.5 * box_lx * sin(ang),
+                         y + 0.5 * box_lx * cos(ang) + 0.5 * box_lx * sin(ang),
+                         0.) * G4RotateZ3D(ang);
+    } else {
+      t2 = G4Translate3D(y + 0.5 * box_lx * cos(ang) + 0.5 * box_lx * sin(ang),
+                         x + 0.5 * box_lx * cos(ang) - 0.5 * box_lx * sin(ang),
+                         0.) * G4RotateZ3D(-ang);
+    }
+    r = SectorSupportPosition.outerR - SectorSupportSize.Thickness;
+    y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
+    x = sqrt(r * r - y * y);
+    t3 = G4Translate3D(x, y, 0.);
+    if (iPlane == 2)
+      t3 = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t3;
+    r = SectorSupportPosition.innerR + SectorSupportSize.Thickness;
+    y = SectorSupportPosition.Y + SectorSupportSize.Thickness +
+        SectorSupportSize.Corner3LY;
+    x = sqrt(r * r - y * y);
+    y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
+    t4 = G4Translate3D(x, y, 0.);
+    if (iPlane == 2)
+      t4 = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t4;
+    x = SectorSupportPosition.X + SectorSupportSize.Thickness +
+        SectorSupportSize.Corner4LX;
+    y = sqrt(r * r - x * x);
+    x = SectorSupportPosition.X + SectorSupportSize.Thickness;
+    t5 = G4Translate3D(x, y, 0.);
+    if (iPlane == 2)
+      t5 = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t5;
+    solids.plane[iPlane - 1].is = new G4IntersectionSolid("Intersection_" + Plane_Name, solids.plane[iPlane - 1].tube,
+                                                          solids.plane[iPlane - 1].box1, t1);
+    if (solids.plane[iPlane - 1].is == NULL)
+      B2FATAL(MemErr);
+    solids.plane[iPlane - 1].ss1 = new G4SubtractionSolid("Subtraction1_" + Plane_Name, solids.plane[iPlane - 1].is, solids.plane[iPlane - 1].box2, t2);
+    if (solids.plane[iPlane - 1].ss1 == NULL)
+      B2FATAL(MemErr);
+    solids.plane[iPlane - 1].ss2 = new G4SubtractionSolid("Subtraction2_" + Plane_Name, solids.plane[iPlane - 1].ss1,
+                                                          solids.plane[iPlane - 1].prism1->getSolid(), t3);
+    if (solids.plane[iPlane - 1].ss2 == NULL)
+      B2FATAL(MemErr);
+    solids.plane[iPlane - 1].ss3 = new G4SubtractionSolid("Subtraction3_" + Plane_Name, solids.plane[iPlane - 1].ss2,
+                                                          solids.plane[iPlane - 1].prism2->getSolid(), t4);
+    if (solids.plane[iPlane - 1].ss3 == NULL)
+      B2FATAL(MemErr);
+    solids.plane[iPlane - 1].ss4 = new G4SubtractionSolid("Subtraction4_" + Plane_Name, solids.plane[iPlane - 1].ss3,
+                                                          solids.plane[iPlane - 1].prism3->getSolid(), t5);
+    if (solids.plane[iPlane - 1].ss4 == NULL)
+      B2FATAL(MemErr);
+    solids.plane[iPlane - 1].plane = subtractBoardSolids(solids.plane[iPlane - 1].ss4, iPlane, Plane_Name);
   }
-  r = SectorSupportPosition.outerR - SectorSupportSize.Thickness;
-  y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
-  x = sqrt(r * r - y * y);
-  t3 = G4Translate3D(x, y, 0.);
-  if (iPlane == 2)
-    t3 = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t3;
-  r = SectorSupportPosition.innerR + SectorSupportSize.Thickness;
-  y = SectorSupportPosition.Y + SectorSupportSize.Thickness +
-      SectorSupportSize.Corner3LY;
-  x = sqrt(r * r - y * y);
-  y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
-  t4 = G4Translate3D(x, y, 0.);
-  if (iPlane == 2)
-    t4 = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t4;
-  x = SectorSupportPosition.X + SectorSupportSize.Thickness +
-      SectorSupportSize.Corner4LX;
-  y = sqrt(r * r - x * x);
-  x = SectorSupportPosition.X + SectorSupportSize.Thickness;
-  t5 = G4Translate3D(x, y, 0.);
-  if (iPlane == 2)
-    t5 = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t5;
-  is = new G4IntersectionSolid("Intersection_" + Plane_Name, solidPlaneTube,
-                               solidPlaneBox, t1);
-  if (is == NULL)
+  if (solids.plane[iPlane - 1].plane == NULL)
     B2FATAL(MemErr);
-  ss1 = new G4SubtractionSolid("Subtraction1_" + Plane_Name, is, box1, t2);
-  if (ss1 == NULL)
-    B2FATAL(MemErr);
-  ss2 = new G4SubtractionSolid("Subtraction2_" + Plane_Name, ss1,
-                               solidPlanePrism1->getSolid(), t3);
-  if (ss2 == NULL)
-    B2FATAL(MemErr);
-  ss3 = new G4SubtractionSolid("Subtraction3_" + Plane_Name, ss2,
-                               solidPlanePrism2->getSolid(), t4);
-  if (ss3 == NULL)
-    B2FATAL(MemErr);
-  ss4 = new G4SubtractionSolid("Subtraction4_" + Plane_Name, ss3,
-                               solidPlanePrism3->getSolid(), t5);
-  if (ss4 == NULL)
-    B2FATAL(MemErr);
-  solidPlane = subtractBoardSolids(ss4, iPlane, Plane_Name);
-  if (solidPlane == NULL)
-    B2FATAL(MemErr);
-  logicPlane = new G4LogicalVolume(solidPlane, Air, Plane_Name);
+  logicPlane = new G4LogicalVolume(solids.plane[iPlane - 1].plane, Air, Plane_Name);
   if (logicPlane == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicPlane, false);
@@ -1060,9 +1110,6 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
       createPlasticListElement(i, j, physiPlane);
   for (i = 1; i <= nStrip; i++)
     createStripVolume(i, physiPlane);
-  delete solidPlanePrism1;
-  delete solidPlanePrism2;
-  delete solidPlanePrism3;
 }
 
 void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
@@ -1167,61 +1214,58 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
 void GeoEKLMBelleII::createSectionSupport(int iSectionSupport, int iPlane,
                                           G4PVPlacementGT* mpvgt)
 {
-  G4Box* solidBoxTop;
-  G4Box* solidBoxMiddle;
-  G4Box* solidBoxBottom;
   G4Transform3D t;
   G4Transform3D t1;
   G4Transform3D t2;
-  G4UnionSolid* us;
-  G4UnionSolid* solidSectionSupport;
   G4LogicalVolume* logicSectionSupport;
   G4PVPlacementGT* physiSectionSupport;
   std::string SectionSupportName = "SectionSupport_" +
                                    boost::lexical_cast<std::string>(iSectionSupport) +
                                    "_" + mpvgt->GetName();
-  solidBoxTop = new G4Box("BoxTop_" + SectionSupportName,
-                          0.5 * (SectionSupportPosition[iPlane - 1]
-                                 [iSectionSupport - 1].length -
-                                 SectionSupportPosition[iPlane - 1]
-                                 [iSectionSupport - 1].deltal_left -
-                                 SectionSupportPosition[iPlane - 1]
-                                 [iSectionSupport - 1].deltal_right),
-                          0.5 * SectionSupportTopWidth,
-                          0.5 * SectionSupportTopThickness);
-  solidBoxMiddle =  new G4Box("BoxMiddle_" + SectionSupportName,
-                              0.5 * (SectionSupportPosition[iPlane - 1]
-                                     [iSectionSupport - 1].length -
-                                     SectionSupportPosition[iPlane - 1]
-                                     [iSectionSupport - 1].deltal_left -
-                                     SectionSupportPosition[iPlane - 1]
-                                     [iSectionSupport - 1].deltal_right),
-                              0.5 * SectionSupportMiddleWidth,
-                              0.5 * SectionSupportMiddleThickness);
-  solidBoxBottom = new G4Box("BoxBottom_" + SectionSupportName,
-                             0.5 * SectionSupportPosition[iPlane - 1]
-                             [iSectionSupport - 1].length,
-                             0.5 * SectionSupportTopWidth,
-                             0.5 * SectionSupportTopThickness);
-  if (solidBoxTop == NULL || solidBoxMiddle == NULL || solidBoxBottom == NULL)
+  if (solids.secsup[iPlane - 1][iSectionSupport - 1].secsup == NULL) {
+    solids.secsup[iPlane - 1][iSectionSupport - 1].topbox = new G4Box("BoxTop_" + SectionSupportName,
+        0.5 * (SectionSupportPosition[iPlane - 1]
+               [iSectionSupport - 1].length -
+               SectionSupportPosition[iPlane - 1]
+               [iSectionSupport - 1].deltal_left -
+               SectionSupportPosition[iPlane - 1]
+               [iSectionSupport - 1].deltal_right),
+        0.5 * SectionSupportTopWidth,
+        0.5 * SectionSupportTopThickness);
+    solids.secsup[iPlane - 1][iSectionSupport - 1].midbox =  new G4Box("BoxMiddle_" + SectionSupportName,
+        0.5 * (SectionSupportPosition[iPlane - 1]
+               [iSectionSupport - 1].length -
+               SectionSupportPosition[iPlane - 1]
+               [iSectionSupport - 1].deltal_left -
+               SectionSupportPosition[iPlane - 1]
+               [iSectionSupport - 1].deltal_right),
+        0.5 * SectionSupportMiddleWidth,
+        0.5 * SectionSupportMiddleThickness);
+    solids.secsup[iPlane - 1][iSectionSupport - 1].botbox = new G4Box("BoxBottom_" + SectionSupportName,
+        0.5 * SectionSupportPosition[iPlane - 1]
+        [iSectionSupport - 1].length,
+        0.5 * SectionSupportTopWidth,
+        0.5 * SectionSupportTopThickness);
+    if (solids.secsup[iPlane - 1][iSectionSupport - 1].topbox == NULL || solids.secsup[iPlane - 1][iSectionSupport - 1].midbox == NULL || solids.secsup[iPlane - 1][iSectionSupport - 1].botbox == NULL)
+      B2FATAL(MemErr);
+    t1 = G4Translate3D(0., 0., 0.5 * (SectionSupportMiddleThickness +
+                                      SectionSupportTopThickness));
+    t2 = G4Translate3D(0.5 * (SectionSupportPosition[iPlane - 1]
+                              [iSectionSupport - 1].deltal_right -
+                              SectionSupportPosition[iPlane - 1]
+                              [iSectionSupport - 1].deltal_left),
+                       0., -0.5 * (SectionSupportMiddleThickness +
+                                   SectionSupportTopThickness));
+    solids.secsup[iPlane - 1][iSectionSupport - 1].us = new G4UnionSolid("Union1_" + SectionSupportName, solids.secsup[iPlane - 1][iSectionSupport - 1].midbox,
+        solids.secsup[iPlane - 1][iSectionSupport - 1].topbox, t1);
+    if (solids.secsup[iPlane - 1][iSectionSupport - 1].us == NULL)
+      B2FATAL(MemErr);
+    solids.secsup[iPlane - 1][iSectionSupport - 1].secsup = new G4UnionSolid(SectionSupportName, solids.secsup[iPlane - 1][iSectionSupport - 1].us, solids.secsup[iPlane - 1][iSectionSupport - 1].botbox,
+        t2);
+  }
+  if (solids.secsup[iPlane - 1][iSectionSupport - 1].secsup == NULL)
     B2FATAL(MemErr);
-  t1 = G4Translate3D(0., 0., 0.5 * (SectionSupportMiddleThickness +
-                                    SectionSupportTopThickness));
-  t2 = G4Translate3D(0.5 * (SectionSupportPosition[iPlane - 1]
-                            [iSectionSupport - 1].deltal_right -
-                            SectionSupportPosition[iPlane - 1]
-                            [iSectionSupport - 1].deltal_left),
-                     0., -0.5 * (SectionSupportMiddleThickness +
-                                 SectionSupportTopThickness));
-  us = new G4UnionSolid("Union1_" + SectionSupportName, solidBoxMiddle,
-                        solidBoxTop, t1);
-  if (us == NULL)
-    B2FATAL(MemErr);
-  solidSectionSupport = new G4UnionSolid(SectionSupportName, us, solidBoxBottom,
-                                         t2);
-  if (solidSectionSupport == NULL)
-    B2FATAL(MemErr);
-  logicSectionSupport = new G4LogicalVolume(solidSectionSupport, Duralumin,
+  logicSectionSupport = new G4LogicalVolume(solids.secsup[iPlane - 1][iSectionSupport - 1].secsup, Duralumin,
                                             SectionSupportName);
   if (logicSectionSupport == NULL)
     B2FATAL(MemErr);
@@ -1248,21 +1292,24 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
   double ly;
   double y;
   double z;
-  G4Box* solidList;
   G4LogicalVolume* logicList;
   G4PVPlacementGT* physiList;
   G4Transform3D t;
   std::string List_Name = "List_" + boost::lexical_cast<std::string>(iList) + "_ListPlane_"
                           + boost::lexical_cast<std::string>(iListPlane) + "_" +
                           mpvgt->GetName();
-  ly = StripSize.width;
-  if (iList % 15 <= 1)
-    ly = ly - PlasticListDeltaL;
-  solidList = new G4Box(List_Name, 0.5 * StripPosition[iList - 1].length,
-                        0.5 * ly, 0.5 * PlasticListWidth);
-  if (solidList == NULL)
+  if (solids.list[iList - 1] == NULL) {
+    ly = StripSize.width;
+    if (iList % 15 <= 1)
+      ly = ly - PlasticListDeltaL;
+    solids.list[iList - 1] = new G4Box(List_Name,
+                                       0.5 * StripPosition[iList - 1].length,
+                                       0.5 * ly, 0.5 * PlasticListWidth);
+  }
+  if (solids.list[iList - 1] == NULL)
     B2FATAL(MemErr);
-  logicList = new G4LogicalVolume(solidList, Polystyrol, List_Name);
+  logicList = new G4LogicalVolume(solids.list[iList - 1],
+                                  Polystyrol, List_Name);
   if (logicList == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicList, false);
@@ -1285,20 +1332,20 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
 
 void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT* mpvgt)
 {
-  G4Box* solidStripVolume;
   G4LogicalVolume* logicStripVolume;
   G4PVPlacementGT* physiStripVolume;
   G4Transform3D t;
   std::string StripVolume_Name = "StripVolume_" + boost::lexical_cast<std::string>(iStrip)
                                  + "_" + mpvgt->GetName();
-  solidStripVolume = new G4Box(StripVolume_Name,
-                               0.5 * (StripPosition[iStrip - 1].length +
-                                      StripSize.rss_size),
-                               0.5 * StripSize.width,
-                               0.5 * StripSize.thickness);
-  if (solidStripVolume == NULL)
+  if (solids.stripvol[iStrip - 1] == NULL)
+    solids.stripvol[iStrip - 1] = new G4Box(StripVolume_Name,
+                                            0.5 * (StripPosition[iStrip - 1].length +
+                                                   StripSize.rss_size),
+                                            0.5 * StripSize.width,
+                                            0.5 * StripSize.thickness);
+  if (solids.stripvol[iStrip - 1] == NULL)
     B2FATAL(MemErr);
-  logicStripVolume = new G4LogicalVolume(solidStripVolume, Air,
+  logicStripVolume = new G4LogicalVolume(solids.stripvol[iStrip - 1], Air,
                                          StripVolume_Name);
   if (logicStripVolume == NULL)
     B2FATAL(MemErr);
@@ -1316,16 +1363,19 @@ void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT* mpvgt)
 
 void GeoEKLMBelleII::createStrip(int iStrip, G4PVPlacementGT* mpvgt)
 {
-  G4Box* solidStrip;
   G4LogicalVolume* logicStrip;
   G4PVPlacementGT* physiStrip;
   G4Transform3D t;
   std::string Strip_Name = "Strip_" + mpvgt->GetName();
-  solidStrip = new G4Box(Strip_Name, 0.5 * StripPosition[iStrip - 1].length,
-                         0.5 * StripSize.width, 0.5 * StripSize.thickness);
-  if (solidStrip == NULL)
+  if (solids.strip[iStrip - 1] == NULL)
+    solids.strip[iStrip - 1] = new G4Box(Strip_Name,
+                                         0.5 * StripPosition[iStrip - 1].length,
+                                         0.5 * StripSize.width,
+                                         0.5 * StripSize.thickness);
+  if (solids.strip[iStrip - 1] == NULL)
     B2FATAL(MemErr);
-  logicStrip = new G4LogicalVolume(solidStrip, Polystyrene, Strip_Name);
+  logicStrip = new G4LogicalVolume(solids.strip[iStrip - 1],
+                                   Polystyrene, Strip_Name);
   if (logicStrip == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicStrip, true);
@@ -1354,17 +1404,20 @@ void GeoEKLMBelleII::createStrip(int iStrip, G4PVPlacementGT* mpvgt)
 
 void GeoEKLMBelleII::createStripGroove(int iStrip, G4PVPlacementGT* mpvgt)
 {
-  G4Box* solidGroove;
   G4LogicalVolume* logicGroove;
   G4PVPlacementGT* physiGroove;
   G4Transform3D t;
   std::string Groove_Name = "Groove_" + mpvgt->GetName();
-  solidGroove = new G4Box(Groove_Name, 0.5 * StripPosition[iStrip - 1].length,
-                          0.5 * StripSize.groove_width,
-                          0.5 * StripSize.groove_depth);
-  if (solidGroove == NULL)
+  if (solids.groove[iStrip - 1] == NULL) {
+    solids.groove[iStrip - 1] = new G4Box(Groove_Name,
+                                          0.5 * StripPosition[iStrip - 1].length,
+                                          0.5 * StripSize.groove_width,
+                                          0.5 * StripSize.groove_depth);
+  }
+  if (solids.groove[iStrip - 1] == NULL)
     B2FATAL(MemErr);
-  logicGroove = new G4LogicalVolume(solidGroove, Gel, Groove_Name);
+  logicGroove = new G4LogicalVolume(solids.groove[iStrip - 1],
+                                    Gel, Groove_Name);
   if (logicGroove == NULL)
     B2FATAL(MemErr);
   geometry::setColor(*logicGroove, "#00ff00ff");
@@ -1379,40 +1432,32 @@ void GeoEKLMBelleII::createStripGroove(int iStrip, G4PVPlacementGT* mpvgt)
 
 void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt)
 {
-  G4Box* solidSensitiveBox;
-  G4Box* solidSensitiveGroove;
-  G4SubtractionSolid* solidSensitive;
   G4LogicalVolume* logicSensitive;
   G4PVPlacementGT* physiSensitive;
   G4Transform3D t;
   G4Transform3D t1;
   std::string Sensitive_Name = "Sensitive_" + mpvgt->GetName();
-  solidSensitiveBox = new G4Box("Box_" + Sensitive_Name,
-                                0.5 * StripPosition[iStrip - 1].length -
-                                StripSize.no_scintillation_thickness,
-                                0.5 * StripSize.width -
-                                StripSize.no_scintillation_thickness,
-                                0.5 * StripSize.thickness -
-                                StripSize.no_scintillation_thickness);
-  solidSensitiveGroove = new G4Box("Groove_" + Sensitive_Name,
-                                   0.5 * StripPosition[iStrip - 1].length,
-                                   0.5 * StripSize.groove_width,
-                                   0.5 * StripSize.groove_depth);
-  if (solidSensitiveBox == NULL || solidSensitiveGroove == NULL)
+  if (solids.scint[iStrip - 1].sens == NULL) {
+    solids.scint[iStrip - 1].box = new G4Box("Box_" + Sensitive_Name,
+                                             0.5 * StripPosition[iStrip - 1].length -
+                                             StripSize.no_scintillation_thickness,
+                                             0.5 * StripSize.width -
+                                             StripSize.no_scintillation_thickness,
+                                             0.5 * StripSize.thickness -
+                                             StripSize.no_scintillation_thickness);
+    if (solids.scint[iStrip - 1].box == NULL)
+      B2FATAL(MemErr);
+    t1 = G4Translate3D(0., 0.,
+                       0.5 * (StripSize.thickness - StripSize.groove_depth));
+    solids.scint[iStrip - 1].sens = new G4SubtractionSolid(Sensitive_Name,
+                                                           solids.scint[iStrip - 1].box,
+                                                           solids.groove[iStrip - 1], t1);
+  }
+  if (solids.scint[iStrip - 1].sens == NULL)
     B2FATAL(MemErr);
-  t1 = G4Translate3D(0., 0.,
-                     0.5 * (StripSize.thickness - StripSize.groove_depth));
-  solidSensitive = new G4SubtractionSolid(Sensitive_Name, solidSensitiveBox,
-                                          solidSensitiveGroove, t1);
-  if (solidSensitive == NULL)
-    B2FATAL(MemErr);
-  if (m_mode == EKLM_DETECTOR_NORMAL)
-    logicSensitive = new G4LogicalVolume(solidSensitive, Polystyrene,
-                                         Sensitive_Name, 0, m_sensitive, 0);
-  else
-    logicSensitive = new G4LogicalVolume(solidSensitive, Polystyrene,
-                                         Sensitive_Name, 0, m_sensitive,
-                                         0);
+  logicSensitive = new G4LogicalVolume(solids.scint[iStrip - 1].sens,
+                                       Polystyrene, Sensitive_Name,
+                                       0, m_sensitive, 0);
   if (logicSensitive == NULL)
     B2FATAL(MemErr);
   geometry::setColor(*logicSensitive, "#ffffffff");
@@ -1473,6 +1518,7 @@ void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
   if (m_sensitive == NULL)
     B2FATAL(MemErr);
   createMaterials();
+  mallocSolids();
   for (i = 1; i <= 2; i++)
     createEndcap(i, &topVolume);
   if (m_mode == EKLM_DETECTOR_PRINTMASSES) {

@@ -75,19 +75,19 @@ def main():
         for outputfile in glob.glob('*.root'):
             gLogger.debug('the outputfile is %s' % outputfile)
             if outputfile in cliParams.getInputFiles() or outputfile \
-                in inputfiles:
+                    in inputfiles:
                 continue
             lfn = outputpath + '/' + outputfile
             print 'trying to upload/register ' + lfn
             # XXX - we're using belle VO for belle2 data. Badness.
             cr_result = repman.putAndRegister(lfn.replace('belle2', 'belle'),
-                    outputfile, se)
+                                              outputfile, se)
             if not cr_result['OK']:
                 gLogger.error(cr_result)
                 DIRAC.exit(1)
             else:
-                cr_result = cr_result['Value']['Successful'
-                        ][lfn.replace('belle2', 'belle')]
+                cr_result = cr_result['Value']['Successful']
+                cr_result = cr_result[lfn.replace('belle2', 'belle')]
                 # XXX - need to get guid/checksum in another call, they are not
                 #       returned by putAndRegister
                 # entries[lfn] = (['lfn', 'guid', 'adler32'], [lfn,
@@ -96,11 +96,11 @@ def main():
                 try:
                     mfile = open(outputfile.rsplit('.', 1)[0] + '.metadata')
                     for line in mfile:
-                        line_parts = line.split(': ', 1)
+                        parts = line.split(': ', 1)
                         # make sure we have both a key and a value!
-                        if len(line_parts) == 2:
-                            entries[outputfile][0].append(line_parts[0])
-                            entries[outputfile][1].append(line_parts[1].rstrip())
+                        if len(parts) == 2:
+                            entries[outputfile][0].append(parts[0])
+                            entries[outputfile][1].append(parts[1].rstrip())
                 except IOError:
                     print 'no metadata file, using defaults'
         # if this isn't an existing dataset, we need to set the attributes

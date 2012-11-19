@@ -170,7 +170,7 @@ def prepareProxy():
     if proxyinfo['OK']:
         timeleft = int(proxyinfo['Value']['secondsLeft'])
         timeleft /= 3600
-        if timeleft < 12:
+        if timeleft < 12 and timeleft > 0:
             print "The proxy will expire after %s hours. Do you want to continue \
 or to generate a new proxy?" \
                 % timeleft
@@ -186,6 +186,10 @@ or to generate a new proxy?" \
                 print 'You should give C or G'
                 import sys
                 sys.exit(-1)
+        elif timeleft == 0:
+            if os.system('dirac-proxy-init -g belle -M'):
+                print 'Error happens when generate proxy'
+                DIRAC.exit(1)
     else:
         if os.system('dirac-proxy-init -g belle -M'):
             print 'Error happens when generate proxy'

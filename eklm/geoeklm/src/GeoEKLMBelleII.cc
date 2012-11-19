@@ -138,7 +138,8 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
     }
   }
   StripBoardPosition = (struct EKLMStripBoardPosition*)
-                       malloc(nStripBoard * sizeof(struct EKLMStripBoardPosition));
+                       malloc(nStripBoard *
+                              sizeof(struct EKLMStripBoardPosition));
   if (StripBoardPosition == NULL)
     B2FATAL(MemErr);
   for (i = 0; i < nStripBoard; i++) {
@@ -212,15 +213,16 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   SectionSupportMiddleThickness = Sections.getLength("MiddleThickness") * cm;
   for (j = 0; j < nPlane; j++) {
     SectionSupportPosition[j] = (struct EKLMSectionSupportPosition*)
-                                malloc((nSection + 1) * sizeof(struct EKLMSectionSupportPosition));
+                                malloc((nSection + 1) *
+                                       sizeof(struct EKLMSectionSupportPosition));
     if (SectionSupportPosition[j] == NULL)
       B2FATAL(MemErr);
     for (i = 0; i <= nSection; i++) {
       GearDir SectionSupportContent(Sections);
-      SectionSupportContent.append((boost::format("/SectionSupportData[%1%]") % (j +
-                                    1)).str());
-      SectionSupportContent.append((boost::format("/SectionSupport[%1%]") % (i +
-                                    1)).str());
+      SectionSupportContent.append((boost::format(
+                                      "/SectionSupportData[%1%]") % (j + 1)).str());
+      SectionSupportContent.append((boost::format(
+                                      "/SectionSupport[%1%]") % (i +  1)).str());
       SectionSupportPosition[j][i].length = SectionSupportContent.
                                             getLength("Length") * cm;
       SectionSupportPosition[j][i].x = SectionSupportContent.
@@ -302,15 +304,16 @@ void GeoEKLMBelleII::createLayer(int iLayer, int iEndcap,
                                  G4PVPlacementGT* mpvgt)
 {
   int i;
-  G4Tubs* solidLayer;
+  static G4Tubs* solidLayer = NULL;
   G4LogicalVolume* logicLayer;
   G4PVPlacementGT* physiLayer;
   G4Transform3D t;
   std::string Layer_Name = "Layer_" + boost::lexical_cast<std::string>(iLayer) + "_" +
                            mpvgt->GetName();
-  solidLayer = new G4Tubs(Layer_Name, LayerPosition.innerR,
-                          LayerPosition.outerR, LayerPosition.length / 2.0,
-                          0. * deg, 360. * deg);
+  if (solidLayer == NULL)
+    solidLayer = new G4Tubs(Layer_Name, LayerPosition.innerR,
+                            LayerPosition.outerR, LayerPosition.length / 2.0,
+                            0. * deg, 360. * deg);
   if (solidLayer == NULL)
     B2FATAL(MemErr);
   logicLayer = new G4LogicalVolume(solidLayer, Air, Layer_Name);
@@ -333,15 +336,16 @@ void GeoEKLMBelleII::createSector(int iSector, G4PVPlacementGT* mpvgt)
 {
   int i;
   int j;
-  G4Tubs* solidSector;
+  static G4Tubs* solidSector = NULL;
   G4LogicalVolume* logicSector;
   G4PVPlacementGT* physiSector;
   G4Transform3D t;
   std::string Sector_Name = "Sector_" + boost::lexical_cast<std::string>(iSector) + "_" +
                             mpvgt->GetName();
-  solidSector = new G4Tubs(Sector_Name, SectorPosition.innerR,
-                           SectorPosition.outerR, 0.5 * SectorPosition.length,
-                           0.0, 90.0 * deg);
+  if (solidSector == NULL)
+    solidSector = new G4Tubs(Sector_Name, SectorPosition.innerR,
+                             SectorPosition.outerR, 0.5 * SectorPosition.length,
+                             0.0, 90.0 * deg);
   if (solidSector == NULL)
     B2FATAL(MemErr);
   logicSector = new G4LogicalVolume(solidSector, Air, Sector_Name);
@@ -401,51 +405,53 @@ void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
   double z;
   double lz;
   double ang;
-  G4Tubs* solidCoverTube;
-  G4Box* solidCoverBox;
-  G4Box* box;
-  G4IntersectionSolid* is;
-  G4SubtractionSolid* solidCover;
+  static G4Tubs* solidCoverTube;
+  static G4Box* solidCoverBox;
+  static G4Box* box;
+  static G4IntersectionSolid* is;
+  static G4SubtractionSolid* solidCover = NULL;
   G4LogicalVolume* logicCover;
   G4PVPlacementGT* physiCover;
   G4Transform3D t1;
   G4Transform3D t2;
   G4Transform3D t;
-  lz = 0.5 * (SectorPosition.length - SectorSupportPosition.length);
   std::string Cover_Name = "Cover_" + boost::lexical_cast<std::string>(iCover) + "_" +
                            mpvgt->GetName();
-  solidCoverTube = new G4Tubs("Tube_" + Cover_Name,
-                              SectorSupportPosition.innerR,
-                              SectorSupportPosition.outerR, 0.5 * lz, 0.0,
-                              90.0 * deg);
-  solidCoverBox = new G4Box("Box_" + Cover_Name,
-                            0.5 * SectorSupportPosition.outerR,
-                            0.5 * SectorSupportPosition.outerR,
-                            0.5 * lz);
-  if (solidCoverTube == NULL || solidCoverBox == NULL)
-    B2FATAL(MemErr);
-  box = new G4Box("SubtractionBox_" + Cover_Name,
-                  0.5 * SectorSupportPosition.outerR,
-                  0.5 * SectorSupportPosition.outerR,
-                  lz);
-  if (box == NULL)
-    B2FATAL(MemErr);
-  ang = getSectorSupportCornerAngle();
-  t1 = G4Translate3D(0.5 * PlanePosition.outerR + SectorSupportPosition.X,
-                     0.5 * PlanePosition.outerR + SectorSupportPosition.Y,
-                     0.);
-  t2 = G4Translate3D(SectorSupportPosition.X +
-                     0.5 * SectorSupportPosition.outerR * cos(ang) -
-                     0.5 * SectorSupportPosition.outerR * sin(ang),
-                     SectorSupportPosition.outerR - SectorSupportSize.DeltaLY +
-                     0.5 * SectorSupportPosition.outerR * cos(ang) +
-                     0.5 * SectorSupportPosition.outerR * sin(ang),
-                     0.) * G4RotateZ3D(ang);
-  is = new G4IntersectionSolid("Intersection_" + Cover_Name, solidCoverTube,
-                               solidCoverBox, t1);
-  if (is == NULL)
-    B2FATAL(MemErr);
-  solidCover = new G4SubtractionSolid(Cover_Name, is, box, t2);
+  if (solidCover == NULL) {
+    lz = 0.5 * (SectorPosition.length - SectorSupportPosition.length);
+    solidCoverTube = new G4Tubs("Tube_" + Cover_Name,
+                                SectorSupportPosition.innerR,
+                                SectorSupportPosition.outerR, 0.5 * lz, 0.0,
+                                90.0 * deg);
+    solidCoverBox = new G4Box("Box_" + Cover_Name,
+                              0.5 * SectorSupportPosition.outerR,
+                              0.5 * SectorSupportPosition.outerR,
+                              0.5 * lz);
+    if (solidCoverTube == NULL || solidCoverBox == NULL)
+      B2FATAL(MemErr);
+    box = new G4Box("SubtractionBox_" + Cover_Name,
+                    0.5 * SectorSupportPosition.outerR,
+                    0.5 * SectorSupportPosition.outerR,
+                    lz);
+    if (box == NULL)
+      B2FATAL(MemErr);
+    ang = getSectorSupportCornerAngle();
+    t1 = G4Translate3D(0.5 * PlanePosition.outerR + SectorSupportPosition.X,
+                       0.5 * PlanePosition.outerR + SectorSupportPosition.Y,
+                       0.);
+    t2 = G4Translate3D(SectorSupportPosition.X +
+                       0.5 * SectorSupportPosition.outerR * cos(ang) -
+                       0.5 * SectorSupportPosition.outerR * sin(ang),
+                       SectorSupportPosition.outerR - SectorSupportSize.DeltaLY +
+                       0.5 * SectorSupportPosition.outerR * cos(ang) +
+                       0.5 * SectorSupportPosition.outerR * sin(ang),
+                       0.) * G4RotateZ3D(ang);
+    is = new G4IntersectionSolid("Intersection_" + Cover_Name, solidCoverTube,
+                                 solidCoverBox, t1);
+    if (is == NULL)
+      B2FATAL(MemErr);
+    solidCover = new G4SubtractionSolid(Cover_Name, is, box, t2);
+  }
   if (solidCover == NULL)
     B2FATAL(MemErr);
   logicCover = new G4LogicalVolume(solidCover, Duralumin, Cover_Name);
@@ -581,54 +587,56 @@ void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT* mpvgt)
 {
   double lx;
   double x;
-  G4Tubs* solidCorner1Tube;
-  G4Box* solidCorner1Box1;
-  G4Box* solidCorner1Box2;
-  G4IntersectionSolid* is1;
-  G4IntersectionSolid* solidCorner1;
+  static G4Tubs* solidCorner1Tube;
+  static G4Box* solidCorner1Box1;
+  static G4Box* solidCorner1Box2;
+  static G4IntersectionSolid* is1;
+  static G4IntersectionSolid* solidCorner1 = NULL;
   G4LogicalVolume* logicCorner1;
   G4PVPlacementGT* physiCorner1;
   G4Transform3D t;
   G4Transform3D t1;
   G4Transform3D t2;
   std::string Corner1_Name = "Corner1_" + mpvgt->GetName();
-  lx = SectorSupportSize.CornerX + SectorSupportSize.Corner1LX -
-       SectorSupportSize.Thickness;
-  solidCorner1Tube = new G4Tubs("Tube_" + Corner1_Name, 0.,
-                                SectorSupportPosition.outerR -
-                                SectorSupportSize.Thickness,
-                                0.5 * SectorSupportSize.Corner1Thickness,
-                                0., 90. * deg);
-  solidCorner1Box1 = new G4Box("Box1_" + Corner1_Name, 0.5 * lx,
-                               0.5 * SectorSupportPosition.outerR,
-                               0.5 * SectorSupportSize.Corner1Thickness);
-  solidCorner1Box2 = new G4Box("Box2_" + Corner1_Name,
-                               0.5 * (lx / cos(getSectorSupportCornerAngle()) +
-                                      SectorSupportSize.Corner1Width *
-                                      sin(getSectorSupportCornerAngle())),
-                               0.5 * SectorSupportSize.Corner1Width,
-                               0.5 * SectorSupportSize.Corner1Thickness);
-  if (solidCorner1Tube == NULL || solidCorner1Box1 == NULL ||
-      solidCorner1Box2 == NULL)
-    B2FATAL(MemErr);
-  x = SectorSupportPosition.X + 0.5 * (SectorSupportSize.CornerX +
-                                       SectorSupportSize.Corner1LX +
-                                       SectorSupportSize.Thickness);
-  t1 = G4Translate3D(x, 0.5 * SectorSupportPosition.outerR, 0.);
-  t2 = G4Translate3D(x, SectorSupportPosition.outerR -
-                     SectorSupportSize.DeltaLY -
-                     (SectorSupportSize.Thickness +
-                      0.5 * SectorSupportSize.Corner1Width) /
-                     cos(getSectorSupportCornerAngle()) +
-                     (SectorSupportSize.Thickness + 0.5 * lx) *
-                     tan(getSectorSupportCornerAngle()), 0.) *
-       G4RotateZ3D(getSectorSupportCornerAngle());
-  is1 = new G4IntersectionSolid("Intersection1_" + Corner1_Name,
-                                solidCorner1Tube, solidCorner1Box1, t1);
-  if (is1 == NULL)
-    B2FATAL(MemErr);
-  solidCorner1 = new G4IntersectionSolid(Corner1_Name, is1, solidCorner1Box2,
-                                         t2);
+  if (solidCorner1 == NULL) {
+    lx = SectorSupportSize.CornerX + SectorSupportSize.Corner1LX -
+         SectorSupportSize.Thickness;
+    solidCorner1Tube = new G4Tubs("Tube_" + Corner1_Name, 0.,
+                                  SectorSupportPosition.outerR -
+                                  SectorSupportSize.Thickness,
+                                  0.5 * SectorSupportSize.Corner1Thickness,
+                                  0., 90. * deg);
+    solidCorner1Box1 = new G4Box("Box1_" + Corner1_Name, 0.5 * lx,
+                                 0.5 * SectorSupportPosition.outerR,
+                                 0.5 * SectorSupportSize.Corner1Thickness);
+    solidCorner1Box2 = new G4Box("Box2_" + Corner1_Name,
+                                 0.5 * (lx / cos(getSectorSupportCornerAngle()) +
+                                        SectorSupportSize.Corner1Width *
+                                        sin(getSectorSupportCornerAngle())),
+                                 0.5 * SectorSupportSize.Corner1Width,
+                                 0.5 * SectorSupportSize.Corner1Thickness);
+    if (solidCorner1Tube == NULL || solidCorner1Box1 == NULL ||
+        solidCorner1Box2 == NULL)
+      B2FATAL(MemErr);
+    x = SectorSupportPosition.X + 0.5 * (SectorSupportSize.CornerX +
+                                         SectorSupportSize.Corner1LX +
+                                         SectorSupportSize.Thickness);
+    t1 = G4Translate3D(x, 0.5 * SectorSupportPosition.outerR, 0.);
+    t2 = G4Translate3D(x, SectorSupportPosition.outerR -
+                       SectorSupportSize.DeltaLY -
+                       (SectorSupportSize.Thickness +
+                        0.5 * SectorSupportSize.Corner1Width) /
+                       cos(getSectorSupportCornerAngle()) +
+                       (SectorSupportSize.Thickness + 0.5 * lx) *
+                       tan(getSectorSupportCornerAngle()), 0.) *
+         G4RotateZ3D(getSectorSupportCornerAngle());
+    is1 = new G4IntersectionSolid("Intersection1_" + Corner1_Name,
+                                  solidCorner1Tube, solidCorner1Box1, t1);
+    if (is1 == NULL)
+      B2FATAL(MemErr);
+    solidCorner1 = new G4IntersectionSolid(Corner1_Name, is1, solidCorner1Box2,
+                                           t2);
+  }
   if (solidCorner1 == NULL)
     B2FATAL(MemErr);
   logicCorner1 = new G4LogicalVolume(solidCorner1, Duralumin, Corner1_Name);
@@ -645,36 +653,39 @@ void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT* mpvgt)
 
 void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT* mpvgt)
 {
-  double r;
-  double x;
-  double y;
-  G4TriangularPrism* solidCorner2Prism;
-  G4Tubs* solidCorner2Tubs;
-  G4SubtractionSolid* solidCorner2;
+  static double r;
+  static double x;
+  static double y;
+  static G4TriangularPrism* solidCorner2Prism;
+  static G4Tubs* solidCorner2Tubs;
+  static G4SubtractionSolid* solidCorner2 = NULL;
   G4LogicalVolume* logicCorner2;
   G4PVPlacementGT* physiCorner2;
   G4Transform3D t;
   G4Transform3D t1;
   std::string Corner2_Name = "Corner2_" + mpvgt->GetName();
-  r = SectorSupportPosition.outerR - SectorSupportSize.Thickness;
-  y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
-  x = sqrt(r * r - y * y);
-  solidCorner2Prism = new G4TriangularPrism("Prism_" + Corner2_Name,
-                                            SectorSupportSize.Corner2LY,
-                                            90. * deg,
-                                            SectorSupportSize.Corner2LX,
-                                            180. * deg,
-                                            0.5 * SectorSupportSize.
-                                            Corner2Thickness);
-  solidCorner2Tubs = createSectorSupportOuterTube(mpvgt);
-  if (solidCorner2Prism == NULL || solidCorner2Tubs == NULL)
-    B2FATAL(MemErr);
-  if (solidCorner2Prism->getSolid() == NULL)
-    B2FATAL(MemErr);
-  t1 = G4Translate3D(-x, -y, 0.);
-  solidCorner2 = new G4SubtractionSolid(Corner2_Name,
-                                        solidCorner2Prism->getSolid(),
-                                        solidCorner2Tubs, t1);
+  if (solidCorner2 == NULL) {
+    r = SectorSupportPosition.outerR - SectorSupportSize.Thickness;
+    y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
+    x = sqrt(r * r - y * y);
+    solidCorner2Prism = new G4TriangularPrism("Prism_" + Corner2_Name,
+                                              SectorSupportSize.Corner2LY,
+                                              90. * deg,
+                                              SectorSupportSize.Corner2LX,
+                                              180. * deg,
+                                              0.5 * SectorSupportSize.
+                                              Corner2Thickness);
+    solidCorner2Tubs = createSectorSupportOuterTube(mpvgt);
+    if (solidCorner2Prism == NULL || solidCorner2Tubs == NULL)
+      B2FATAL(MemErr);
+    if (solidCorner2Prism->getSolid() == NULL)
+      B2FATAL(MemErr);
+    t1 = G4Translate3D(-x, -y, 0.);
+    solidCorner2 = new G4SubtractionSolid(Corner2_Name,
+                                          solidCorner2Prism->getSolid(),
+                                          solidCorner2Tubs, t1);
+    delete solidCorner2Prism;
+  }
   if (solidCorner2 == NULL)
     B2FATAL(MemErr);
   logicCorner2 = new G4LogicalVolume(solidCorner2, Duralumin, Corner2_Name);
@@ -686,43 +697,45 @@ void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT* mpvgt)
   physiCorner2 = new G4PVPlacementGT(mpvgt, t, logicCorner2, Corner2_Name);
   if (physiCorner2 == NULL)
     B2FATAL(MemErr);
-  delete solidCorner2Prism;
   printVolumeMass(logicCorner2);
 }
 
 void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT* mpvgt)
 {
-  double r;
-  double x;
-  double y;
-  G4TriangularPrism* solidCorner3Prism;
-  G4Tubs* solidCorner3Tubs;
-  G4SubtractionSolid* solidCorner3;
+  static double r;
+  static double x;
+  static double y;
+  static G4TriangularPrism* solidCorner3Prism;
+  static G4Tubs* solidCorner3Tubs;
+  static G4SubtractionSolid* solidCorner3 = NULL;
   G4LogicalVolume* logicCorner3;
   G4PVPlacementGT* physiCorner3;
   G4Transform3D t;
   G4Transform3D t1;
   std::string Corner3_Name = "Corner3_" + mpvgt->GetName();
-  r = SectorSupportPosition.innerR + SectorSupportSize.Thickness;
-  y = SectorSupportPosition.Y + SectorSupportSize.Thickness +
-      SectorSupportSize.Corner3LY;
-  x = sqrt(r * r - y * y);
-  y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
-  solidCorner3Prism = new G4TriangularPrism("Prism_" + Corner3_Name,
-                                            SectorSupportSize.Corner3LX, 0.,
-                                            SectorSupportSize.Corner3LY,
-                                            90. * deg,
-                                            0.5 * SectorSupportSize.
-                                            Corner3Thickness);
-  solidCorner3Tubs = createSectorSupportInnerTube(mpvgt);
-  if (solidCorner3Prism == NULL || solidCorner3Tubs == NULL)
-    B2FATAL(MemErr);
-  if (solidCorner3Prism->getSolid() == NULL)
-    B2FATAL(MemErr);
-  t1 = G4Translate3D(-x, -y, 0.);
-  solidCorner3 = new G4SubtractionSolid(Corner3_Name,
-                                        solidCorner3Prism->getSolid(),
-                                        solidCorner3Tubs, t1);
+  if (solidCorner3 == NULL) {
+    r = SectorSupportPosition.innerR + SectorSupportSize.Thickness;
+    y = SectorSupportPosition.Y + SectorSupportSize.Thickness +
+        SectorSupportSize.Corner3LY;
+    x = sqrt(r * r - y * y);
+    y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
+    solidCorner3Prism = new G4TriangularPrism("Prism_" + Corner3_Name,
+                                              SectorSupportSize.Corner3LX, 0.,
+                                              SectorSupportSize.Corner3LY,
+                                              90. * deg,
+                                              0.5 * SectorSupportSize.
+                                              Corner3Thickness);
+    solidCorner3Tubs = createSectorSupportInnerTube(mpvgt);
+    if (solidCorner3Prism == NULL || solidCorner3Tubs == NULL)
+      B2FATAL(MemErr);
+    if (solidCorner3Prism->getSolid() == NULL)
+      B2FATAL(MemErr);
+    t1 = G4Translate3D(-x, -y, 0.);
+    solidCorner3 = new G4SubtractionSolid(Corner3_Name,
+                                          solidCorner3Prism->getSolid(),
+                                          solidCorner3Tubs, t1);
+    delete solidCorner3Prism;
+  }
   if (solidCorner3 == NULL)
     B2FATAL(MemErr);
   logicCorner3 = new G4LogicalVolume(solidCorner3, Duralumin, Corner3_Name);
@@ -734,43 +747,45 @@ void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT* mpvgt)
   physiCorner3 = new G4PVPlacementGT(mpvgt, t, logicCorner3, Corner3_Name);
   if (physiCorner3 == NULL)
     B2FATAL(MemErr);
-  delete solidCorner3Prism;
   printVolumeMass(logicCorner3);
 }
 
 void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT* mpvgt)
 {
-  double r;
-  double x;
-  double y;
-  G4TriangularPrism* solidCorner4Prism;
-  G4Tubs* solidCorner4Tubs;
-  G4SubtractionSolid* solidCorner4;
+  static double r;
+  static double x;
+  static double y;
+  static G4TriangularPrism* solidCorner4Prism;
+  static G4Tubs* solidCorner4Tubs;
+  static G4SubtractionSolid* solidCorner4 = NULL;
   G4LogicalVolume* logicCorner4;
   G4PVPlacementGT* physiCorner4;
   G4Transform3D t;
   G4Transform3D t1;
   std::string Corner4_Name = "Corner4_" + mpvgt->GetName();
-  r = SectorSupportPosition.innerR + SectorSupportSize.Thickness;
-  x = SectorSupportPosition.X + SectorSupportSize.Thickness +
-      SectorSupportSize.Corner4LX;
-  y = sqrt(r * r - x * x);
-  x = SectorSupportPosition.X + SectorSupportSize.Thickness;
-  solidCorner4Prism = new G4TriangularPrism("Corner4_" + mpvgt->GetName(),
-                                            SectorSupportSize.Corner4LX, 0.,
-                                            SectorSupportSize.Corner4LY,
-                                            90. * deg,
-                                            0.5 * SectorSupportSize.
-                                            Corner4Thickness);
-  solidCorner4Tubs = createSectorSupportInnerTube(mpvgt);
-  if (solidCorner4Prism == NULL || solidCorner4Tubs == NULL)
-    B2FATAL(MemErr);
-  if (solidCorner4Prism->getSolid() == NULL)
-    B2FATAL(MemErr);
-  t1 = G4Translate3D(-x, -y, 0.);
-  solidCorner4 = new G4SubtractionSolid(Corner4_Name,
-                                        solidCorner4Prism->getSolid(),
-                                        solidCorner4Tubs, t1);
+  if (solidCorner4 == NULL) {
+    r = SectorSupportPosition.innerR + SectorSupportSize.Thickness;
+    x = SectorSupportPosition.X + SectorSupportSize.Thickness +
+        SectorSupportSize.Corner4LX;
+    y = sqrt(r * r - x * x);
+    x = SectorSupportPosition.X + SectorSupportSize.Thickness;
+    solidCorner4Prism = new G4TriangularPrism("Corner4_" + mpvgt->GetName(),
+                                              SectorSupportSize.Corner4LX, 0.,
+                                              SectorSupportSize.Corner4LY,
+                                              90. * deg,
+                                              0.5 * SectorSupportSize.
+                                              Corner4Thickness);
+    solidCorner4Tubs = createSectorSupportInnerTube(mpvgt);
+    if (solidCorner4Prism == NULL || solidCorner4Tubs == NULL)
+      B2FATAL(MemErr);
+    if (solidCorner4Prism->getSolid() == NULL)
+      B2FATAL(MemErr);
+    t1 = G4Translate3D(-x, -y, 0.);
+    solidCorner4 = new G4SubtractionSolid(Corner4_Name,
+                                          solidCorner4Prism->getSolid(),
+                                          solidCorner4Tubs, t1);
+    delete solidCorner4Prism;
+  }
   if (solidCorner4 == NULL)
     B2FATAL(MemErr);
   logicCorner4 = new G4LogicalVolume(solidCorner4, Duralumin, Corner4_Name);
@@ -782,23 +797,22 @@ void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT* mpvgt)
   physiCorner4 = new G4PVPlacementGT(mpvgt, t, logicCorner4, Corner4_Name);
   if (physiCorner4 == NULL)
     B2FATAL(MemErr);
-  delete solidCorner4Prism;
   printVolumeMass(logicCorner4);
 }
 
 void GeoEKLMBelleII::createSectorSupport(G4PVPlacementGT* mpvgt)
 {
-  G4Box* solidBoxX;
-  G4Box* solidBoxY;
-  G4Box* solidBoxTop;
-  G4Tubs* solidOuterTube;
-  G4Tubs* solidInnerTube;
-  G4Tubs* solidLimitationTube;
-  G4UnionSolid* us1;
-  G4UnionSolid* us2;
-  G4UnionSolid* us3;
-  G4UnionSolid* us4;
-  G4IntersectionSolid* solidSectorSupport;
+  static G4Box* solidBoxX;
+  static G4Box* solidBoxY;
+  static G4Box* solidBoxTop;
+  static G4Tubs* solidOuterTube;
+  static G4Tubs* solidInnerTube;
+  static G4Tubs* solidLimitationTube;
+  static G4UnionSolid* us1;
+  static G4UnionSolid* us2;
+  static G4UnionSolid* us3;
+  static G4UnionSolid* us4;
+  static G4IntersectionSolid* solidSectorSupport = NULL;
   G4LogicalVolume* logicSectorSupport;
   G4PVPlacementGT* physiSectorSupport;
   G4Transform3D t;
@@ -806,38 +820,40 @@ void GeoEKLMBelleII::createSectorSupport(G4PVPlacementGT* mpvgt)
   G4Transform3D tby;
   G4Transform3D tbt;
   std::string SectorSupportName = "Support_" + mpvgt->GetName();
-  solidBoxX = createSectorSupportBoxX(mpvgt, tbx);
-  solidBoxY = createSectorSupportBoxY(mpvgt, tby);
-  solidBoxTop = createSectorSupportBoxTop(mpvgt, tbt);
-  solidOuterTube = createSectorSupportOuterTube(mpvgt);
-  solidInnerTube = createSectorSupportInnerTube(mpvgt);
-  solidLimitationTube = new G4Tubs("LimitationTube_" + SectorSupportName,
-                                   0., SectorSupportPosition.outerR,
-                                   0.5 * SectorSupportPosition.length,
-                                   0., 90.*deg);
-  if (solidBoxX == NULL || solidBoxY == NULL || solidOuterTube == NULL ||
-      solidInnerTube == NULL || solidLimitationTube == NULL)
-    B2FATAL(MemErr);
-  t = G4Translate3D(0., 0., SectorSupportPosition.Z);
-  us1 = new G4UnionSolid("Union1_" + SectorSupportName, solidInnerTube,
-                         solidBoxY, tby);
-  if (us1 == NULL)
-    B2FATAL(MemErr);
-  us2 = new G4UnionSolid("Union2_" + SectorSupportName, us1, solidBoxX,
-                         tbx);
-  if (us2 == NULL)
-    B2FATAL(MemErr);
-  us3 = new G4UnionSolid("Union3_" + SectorSupportName, us2,
-                         solidOuterTube, G4Translate3D(0., 0., 0.));
-  if (us3 == NULL)
-    B2FATAL(MemErr);
-  us4 = new G4UnionSolid("Union4_" + SectorSupportName,
-                         us3, solidBoxTop, tbt);
-  if (us4 == NULL)
-    B2FATAL(MemErr);
-  solidSectorSupport = new G4IntersectionSolid(SectorSupportName, us4,
-                                               solidLimitationTube,
-                                               G4Translate3D(0., 0., 0.));
+  if (solidSectorSupport == NULL) {
+    solidBoxX = createSectorSupportBoxX(mpvgt, tbx);
+    solidBoxY = createSectorSupportBoxY(mpvgt, tby);
+    solidBoxTop = createSectorSupportBoxTop(mpvgt, tbt);
+    solidOuterTube = createSectorSupportOuterTube(mpvgt);
+    solidInnerTube = createSectorSupportInnerTube(mpvgt);
+    solidLimitationTube = new G4Tubs("LimitationTube_" + SectorSupportName,
+                                     0., SectorSupportPosition.outerR,
+                                     0.5 * SectorSupportPosition.length,
+                                     0., 90.*deg);
+    if (solidBoxX == NULL || solidBoxY == NULL || solidOuterTube == NULL ||
+        solidInnerTube == NULL || solidLimitationTube == NULL)
+      B2FATAL(MemErr);
+    t = G4Translate3D(0., 0., SectorSupportPosition.Z);
+    us1 = new G4UnionSolid("Union1_" + SectorSupportName, solidInnerTube,
+                           solidBoxY, tby);
+    if (us1 == NULL)
+      B2FATAL(MemErr);
+    us2 = new G4UnionSolid("Union2_" + SectorSupportName, us1, solidBoxX,
+                           tbx);
+    if (us2 == NULL)
+      B2FATAL(MemErr);
+    us3 = new G4UnionSolid("Union3_" + SectorSupportName, us2,
+                           solidOuterTube, G4Translate3D(0., 0., 0.));
+    if (us3 == NULL)
+      B2FATAL(MemErr);
+    us4 = new G4UnionSolid("Union4_" + SectorSupportName,
+                           us3, solidBoxTop, tbt);
+    if (us4 == NULL)
+      B2FATAL(MemErr);
+    solidSectorSupport = new G4IntersectionSolid(SectorSupportName, us4,
+                                                 solidLimitationTube,
+                                                 G4Translate3D(0., 0., 0.));
+  }
   if (solidSectorSupport == NULL)
     B2FATAL(MemErr);
   logicSectorSupport = new G4LogicalVolume(solidSectorSupport, Duralumin,
@@ -1053,17 +1069,18 @@ void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
                                                G4PVPlacementGT* mpvgt)
 {
   int i;
-  G4Box* solidSectionReadoutBoard;
+  static G4Box* solidSectionReadoutBoard = NULL;
   G4LogicalVolume* logicSectionReadoutBoard;
   G4PVPlacementGT* physiSectionReadoutBoard;
   std::string Board_Name = "SectionReadoutBoard_" +
                            boost::lexical_cast<std::string>(iBoard) + "_Plane_" +
                            boost::lexical_cast<std::string>(iPlane) + "_" +
                            mpvgt->GetName();
-  solidSectionReadoutBoard = new G4Box(Board_Name,
-                                       0.5 * BoardSize.length,
-                                       0.5 * BoardSize.height,
-                                       0.5 * BoardSize.width);
+  if (solidSectionReadoutBoard == NULL)
+    solidSectionReadoutBoard = new G4Box(Board_Name,
+                                         0.5 * BoardSize.length,
+                                         0.5 * BoardSize.height,
+                                         0.5 * BoardSize.width);
   if (solidSectionReadoutBoard == NULL)
     B2FATAL(MemErr);
   logicSectionReadoutBoard = new G4LogicalVolume(solidSectionReadoutBoard, Air,
@@ -1087,14 +1104,15 @@ void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
 
 void GeoEKLMBelleII::createBaseBoard(G4PVPlacementGT* mpvgt)
 {
-  G4Box* solidBaseBoard;
+  static G4Box* solidBaseBoard = NULL;
   G4LogicalVolume* logicBaseBoard;
   G4PVPlacementGT* physiBaseBoard;
   G4Transform3D t;
   std::string Board_Name = "BaseBoard_" + mpvgt->GetName();
-  solidBaseBoard = new G4Box(Board_Name, 0.5 * BoardSize.length,
-                             0.5 * BoardSize.base_height,
-                             0.5 * BoardSize.base_width);
+  if (solidBaseBoard == NULL)
+    solidBaseBoard = new G4Box(Board_Name, 0.5 * BoardSize.length,
+                               0.5 * BoardSize.base_height,
+                               0.5 * BoardSize.base_width);
   if (solidBaseBoard == NULL)
     B2FATAL(MemErr);
   logicBaseBoard = new G4LogicalVolume(solidBaseBoard, Silicon,
@@ -1113,15 +1131,16 @@ void GeoEKLMBelleII::createBaseBoard(G4PVPlacementGT* mpvgt)
 
 void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
 {
-  G4Box* solidStripBoard;
+  static G4Box* solidStripBoard = NULL;
   G4LogicalVolume* logicStripBoard;
   G4PVPlacementGT* physiStripBoard;
   G4Transform3D t;
   std::string Board_Name = "StripBoard_" + boost::lexical_cast<std::string>(iBoard) + "_" +
                            mpvgt->GetName();
-  solidStripBoard = new G4Box(Board_Name, 0.5 * BoardSize.strip_length,
-                              0.5 * BoardSize.strip_height,
-                              0.5 * BoardSize.strip_width);
+  if (solidStripBoard == NULL)
+    solidStripBoard = new G4Box(Board_Name, 0.5 * BoardSize.strip_length,
+                                0.5 * BoardSize.strip_height,
+                                0.5 * BoardSize.strip_width);
   if (solidStripBoard == NULL)
     B2FATAL(MemErr);
   if (m_mode == EKLM_DETECTOR_NORMAL)
@@ -1409,13 +1428,14 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt)
 
 void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT* mpvgt)
 {
-  G4Box* solidSiPM;
+  static G4Box* solidSiPM = NULL;
   G4LogicalVolume* logicSiPM;
   G4PVPlacementGT* physiSiPM;
   G4Transform3D t;
   std::string SiPM_Name = "SiPM_" + mpvgt->GetName();
-  solidSiPM = new G4Box(SiPM_Name, 0.5 * StripSize.rss_size,
-                        0.5 * StripSize.rss_size, 0.5 * StripSize.rss_size);
+  if (solidSiPM == NULL)
+    solidSiPM = new G4Box(SiPM_Name, 0.5 * StripSize.rss_size,
+                          0.5 * StripSize.rss_size, 0.5 * StripSize.rss_size);
   if (solidSiPM == NULL)
     B2FATAL(MemErr);
   if (m_mode == EKLM_DETECTOR_NORMAL)

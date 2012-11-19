@@ -19,54 +19,65 @@
 #include <string>
 #include <vector>
 
-
-
 namespace Belle2 {
 
-  //! Class for handling hits in the whole sector. Needed to form 2d hits
-  //! in a comfortable way
+  /**
+   * Class for handling hits in the whole sector. Needed to form 2d hits
+   * in a comfortable way.
+   */
   class EKLMSectorHit : public EKLMHitBase  {
 
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     EKLMSectorHit() {};
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     EKLMSectorHit(int nEndcap, int nLayer, int nSector);
 
-    //! Destructor
+    /**
+     * Destructor.
+     */
     ~EKLMSectorHit() {};
 
-    //! Print information about the sector hit
+    /**
+     * Print information about the sector hit.
+     */
     void Print();
 
-
-    //! returns pointer to the vector of pointers to the EKLMDigits included to
-    //! the EKLMSectorHit
+    /**
+     * Get pointer to the vector of pointers to the EKLMDigits included to
+     * the EKLMSectorHit.
+     * @return Pointer.
+     */
     std::vector <EKLMDigit*> * getStripHitVector() ;
 
-    //! returns pointer to the vector of pointers to 2d hits included to the
-
-    //! Belle2::EKLMSectorHit
+    /**
+     * Get pointer to the vector of pointers to 2d hits included to the
+     * EKLMSectorHit.
+     * @return Pointer.
+     */
     std::vector <EKLMHit2d*>* get2dHitVector() ;
-
 
   private:
 
-    //! vector of pointers to the Belle2::EKLMDigits included to the
-    //! Belle2::EKLMSectorHit
+    /**
+     * Vector of pointers to the Belle2::EKLMDigits included to the
+     * EKLMSectorHit.
+     */
     std::vector<EKLMDigit*> m_stripHitVector;
 
-    //! vector of pointers to 2d hits included to the Belle2::EKLMSectorHit
+    /** Vector of pointers to 2d hits included to the EKLMSectorHit. */
     std::vector<EKLMHit2d*> m_hit2dVector;
 
-    //! Needed to make objects storable
+    /** Needed to make objects storable. */
     ClassDef(Belle2::EKLMSectorHit, 1);
 
-
   };
-
 
 } // end of namespace Belle2
 

@@ -28,94 +28,67 @@ namespace Belle2 {
 
 
   /**
-   * Digitize EKLMSimHits  to get EKLM StripHits
-   * Usually called by eklmDigitizerModule
+   * Digitize EKLMSimHits  to get EKLM StripHits.
+   * @details
+   * Usually called by eklmDigitizerModule.
    */
   class EKLMDigitizer {
 
   public:
 
     /**
-     * Constructor
+     * Constructor.
      */
     EKLMDigitizer() {};
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~EKLMDigitizer() {};
 
-
-
     /**
-     * Read hits from the store, sort sim hits and fill m_HitStripMap
+     * Read hits from the store, sort sim hits and fill m_HitStripMap.
      */
     void readAndSortStepHits();
 
     /**
-     * Creates SimHits from StepHits using boost:graph mechanism
+     * Create SimHits from StepHits using boost:graph mechanism.
      */
     void makeSimHits();
 
-    //-------------------------------------------------------
     /**
-     * Read hits from the store, sort sim hits and fill m_HitStripMap
+     * Read hits from the store, sort sim hits and fill m_HitStripMap.
      */
     void readAndSortSimHits();
 
-
     /**
-     * merges hits from the same strip. Creates EKLMDigits
+     * Merges hits from the same strip. Create EKLMDigits.
      */
     void mergeSimHitsToStripHits(double);
 
-
-
-
   private:
 
-    /**
-     * std::map for EKLMStepHit
-     *    sorting according sensitive volumes
-     *   < PhysVol1 *  , vector< EKLMStepHit1*, EKLMStepHit2*, EKLMStepHit3* ...    > >
-     *   < PhysVol2 *  , vector< EKLMStepHit1*, EKLMStepHit2*, EKLMStepHit3* ...    > >
-     *   < PhysVol3 *  , vector< EKLMStepHit1*, EKLMStepHit2*, EKLMStepHit3* ...    > >
-     */
+    /** Map for EKLMStepHit sorting according sensitive volumes. */
     std::map<const G4VPhysicalVolume*, std::vector<EKLMStepHit*> >
     m_stepHitVolumeMap;
 
-
-    //-------------------------------------------------------
-
-    /**
-     * std::map for hits sorting according strip name
-     */
+    /** Map for hits sorting according strip name. */
     std::map<const G4VPhysicalVolume*, std::vector<EKLMSimHit*> >
     m_HitStripMap;
 
-    /**
-     * vector of EKLMDigits
-     */
+    /** Vector of EKLMDigits. */
     std::vector<EKLMDigit*> m_HitVector;
 
-    /**
-     * sim hits vector
-     */
+    /** Sim hits vector. */
     std::vector<EKLMSimHit*> m_simHitsVector;
 
-    /**
-     * SimHit storage initialization
-     */
+    /** SimHit storage initialization. */
     StoreArray<EKLMSimHit> m_simHitsArray;
 
-    /**
-     * StripHit storage initialization
-     */
+    /** StripHit storage initialization. */
     StoreArray<EKLMDigit> m_stripHitsArray;
 
-
   };
-
 
 } // end of namespace Belle2
 

@@ -106,7 +106,6 @@ EKLMStripID EKLMDigit::getID() const
   return str;
 }
 
-
 const G4VPhysicalVolume* EKLMDigit::getVolume() const
 {
   return m_pv;
@@ -117,13 +116,15 @@ void EKLMDigit::setVolume(const G4VPhysicalVolume* pv)
   m_pv = pv;
 }
 
-
-
 void EKLMDigit::setMCTS(double ts)
-{m_timeshift = ts;}
+{
+  m_timeshift = ts;
+}
 
 double EKLMDigit::getMCTS() const
-{return m_timeshift;}
+{
+  return m_timeshift;
+}
 
 void EKLMDigit::Print() const
 {

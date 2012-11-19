@@ -23,63 +23,85 @@
 #include <string>
 namespace Belle2 {
 
-  //! Class for 2d hits handling
+  /**
+   * Class for 2d hits handling.
+   */
   class EKLMHit2d : public EKLMHitBase  {
 
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     EKLMHit2d();
 
-    //! Constructor with two strips
+    /**
+     * Constructor with two strips
+     */
     EKLMHit2d(EKLMDigit*, EKLMDigit*);
 
-    //! Destructor
+    /**
+     * Destructor.
+     */
     ~EKLMHit2d() {};
 
-    //! Print 2d hit information
+    /**
+     * Print 2d hit information.
+     */
     void Print();
 
-    //! add StripHit to 2dhit. returns false if impossible
-    //    bool addStripHit(const EKLMDigit*);
-
-    //! returns pointer to the strip hit in X direction
+    /**
+     * Get X hit.
+     * @return Pointer to the strip hit in X direction.
+     */
     const EKLMDigit* getXStripHit() const;
 
-    //! returns pointer to the strip hit in Y direction
+    /**
+     * Get Y hit.
+     * @return Pointer to the strip hit in Y direction.
+     */
     const EKLMDigit* getYStripHit() const;
 
-    //! set coordinates of the crossing point
+    /**
+     * Set coordinates of the crossing point.
+     * @param[in] point Coordinates.
+     */
     void setCrossPoint(TVector3& point);
 
-    //! returns coordinates of the crossing point
+    /**
+     * Get crossing point.
+     * @return coordinates of the crossing point.
+     */
     TVector3 getCrossPoint()  const;
 
-    //! calculates ChiSquare of the crossing point
+    /**
+     * Set Chi^2 of the crossing point.
+     * @param[in] chi Chi^2.
+     */
     void setChiSq(double chi);
 
-    //! returns  ChiSquare of the crossing point
+    /**
+     * Get Chi^2 of the crossing point.
+     * @return Chi^2.
+     */
     double getChiSq() const;
-
 
   private:
 
-    //! reference to the X Strip hit
+    /** Reference to the X Strip hit. */
     EKLMDigit const* m_XStrip;  //-> {ROOT streamer directive}
 
-    //! reference to the Y Strip hit
+    /** Reference to the Y Strip hit. */
     EKLMDigit const* m_YStrip;  //-> {ROOT streamer directive}
 
-    //! crossing point global coordinates
+    /** Crossing point global coordinates. */
     TVector3  m_crossPoint;
 
-    //! ChiSq of the hit
+    /** Chi^2 of the hit. */
     double m_ChiSq;
 
-    //! Needed to make Belle2::EKLMHit2d storable
+    /** Needed to make Belle2::EKLMHit2d storable. */
     ClassDef(Belle2::EKLMHit2d, 1);
-
-
 
   };
 

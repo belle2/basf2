@@ -94,9 +94,6 @@ void EKLMHitBase::setSector(int Sector)
   m_Sector = Sector;
 }
 
-
-
-
 int EKLMHitBase::getPDG() const
 {
   return m_PDG;
@@ -107,8 +104,6 @@ void EKLMHitBase::setPDG(int PDG)
   m_PDG = PDG;
 }
 
-
-
 double EKLMHitBase::getTime() const
 {
   return m_Time;
@@ -118,8 +113,6 @@ void EKLMHitBase::setTime(double Time)
 {
   m_Time = Time;
 }
-
-
 
 double EKLMHitBase::getEDep() const
 {
@@ -149,7 +142,6 @@ void EKLMHitBase::setPosition(const TVector3* position)
 {
   m_GlobalPosition = *position;
 }
-
 
 const TVector3* EKLMHitBase::getLocalPosition() const
 {

@@ -206,5 +206,10 @@ namespace Belle2 {
     return (fabs(sin(tinv.getRotation().phiX())) < 0.01);
   }
 
+  bool EKLMRecon::CheckStripOrientationX(const EKLMDigit* h)
+  {
+    return CheckStripOrientationX(h->getID());
+  }
+
 
 }//namespace

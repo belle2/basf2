@@ -14,11 +14,11 @@
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <eklm/dataobjects/EKLMStepHit.h>
 
-
 namespace Belle2 {
 
   /**
-   * The Class for EKLM Sensitive Detector
+   * The Class for EKLM Sensitive Detector.
+   * @details
    * In this class, every variables defined in EKLMStepHit will be calculated.
    * EKLMStepHits are saved into hits collection.
    */
@@ -28,47 +28,40 @@ namespace Belle2 {
   public:
 
     /**
-     * Constructor
+     * Constructor.
      */
     EKLMSensitiveDetector(G4String name);
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~EKLMSensitiveDetector() {};
 
     /**
      * Process each step and calculate variables for EKLMStepHit
-     * store EKLMStepHit
+     * store EKLMStepHit.
      */
     bool step(G4Step* aStep, G4TouchableHistory* history);
 
   private:
     /**
-     *  all hits with energies less than m_ThresholdEnergyDeposit
-     * will be dropped
+     * All hits with energies less than m_ThresholdEnergyDeposit
+     * will be dropped.
      */
     G4double m_ThresholdEnergyDeposit;
 
     /**
-     *  all hits with time large  than m_ThresholdHitTime
-     * will be dropped
+     * All hits with time large  than m_ThresholdHitTime
+     * will be dropped.
      */
     G4double m_ThresholdHitTime;
 
     /**
-     * sensitive detector operation mode
+     * Sensitive detector operation mode.
      * 0 - normal operation
      * 1 - bkg studies
      */
     int m_mode;
-
-    /**
-     * initialize array for hit stogare
-     */
-    //    StoreArray<EKLMStepHit> m_stepHitsArray;
-
-
 
   };
 

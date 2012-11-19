@@ -30,7 +30,8 @@ EKLMTransformationFactory* EKLMTransformationFactory::getInstance()
 }
 
 void EKLMTransformationFactory::addMatrixEntry(int endcap, int layer,
-                                               int sector, int plane, int strip, G4Transform3D matrix)
+                                               int sector, int plane,
+                                               int strip, G4Transform3D matrix)
 {
   if (endcap < 1 || endcap > 2) {
     B2FATAL("Invalid endcap number!");
@@ -80,6 +81,15 @@ double EKLMTransformationFactory::getStripLength(int strip)
   return stripLengthArray[strip - 1];
 }
 
+double EKLMTransformationFactory::getStripLength(const EKLMHitBase* hit)
+{
+  return getStripLength(hit->getID());
+}
+
+double EKLMTransformationFactory::getStripLength(EKLMStripID id)
+{
+  return getStripLength(id.strip);
+}
 
 G4Transform3D EKLMTransformationFactory::getTransformation(int endcap,
                                                            int layer,
@@ -111,9 +121,20 @@ G4Transform3D EKLMTransformationFactory::getTransformation(int endcap,
     stripMatrixArray[endcap - 1][layer - 1][sector - 1][plane - 1][strip - 1];
 }
 
+G4Transform3D EKLMTransformationFactory::getTransformation(EKLMStripID id)
+{
+  return getTransformation(id.endcap, id.layer, id.sector, id.plane,
+                           id.strip);
+}
+
+G4Transform3D EKLMTransformationFactory::getTransformation(
+  const EKLMHitBase* hit)
+{
+  return getTransformation(hit->getID());
+}
+
 void EKLMTransformationFactory::readFromFile(const char* filename)
 {
-  //  std::cout << " ------------ Q" << std::endl;
   std::ifstream in(filename);
   for (int endcap = 1; endcap <= 2; endcap++)
     for (int layer = 1; layer <= 14; layer++)
@@ -213,15 +234,8 @@ void EKLMTransformationFactory::readFromXMLFile(
   }
 }
 
-
-void EKLMTransformationFactory::writeToXMLFile(std::string filename)
-{
-  writeToXMLFile(filename.c_str());
-}
-
 void EKLMTransformationFactory::writeToFile(const char* filename)const
 {
-  //  std::cout << " ------------ Q " << filename << std::endl;
   std::ofstream out(filename, std::ios_base::trunc);
   for (int endcap = 1; endcap <= 2; endcap++)
     for (int layer = 1; layer <= 14; layer++)
@@ -253,7 +267,6 @@ void EKLMTransformationFactory::writeToFile(const char* filename)const
   for (int strip = 1; strip <= 75; strip++)
     out << strip << " " << stripLengthArray[strip - 1] << std::endl;
 }
-
 
 void EKLMTransformationFactory::writeToXMLFile(char* filename)
 {
@@ -325,7 +338,6 @@ void EKLMTransformationFactory::writeToXMLFile(char* filename)
   out << "</StripTransformationMatrixAndLengthDatabase>" << std::endl;
 }
 
-
 void EKLMTransformationFactory::clear()
 {
   for (int strip = 1; strip <= 75; strip++) {
@@ -338,7 +350,4 @@ void EKLMTransformationFactory::clear()
             [strip - 1] = G4Transform3D();
   }
 }
-
-
-
 

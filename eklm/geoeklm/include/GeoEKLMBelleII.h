@@ -37,92 +37,92 @@ namespace Belle2 {
    * Position information for the elements of detector.
    */
   struct EKLMElementPosition {
-    double innerR;   /**< inner radius */
-    double outerR;   /**< outer radius */
-    double length;   /**< length */
-    double X;        /**< X coordinate */
-    double Y;        /**< Y coordinate */
-    double Z;        /**< Z coordinate */
+    double innerR;   /**< Inner radius. */
+    double outerR;   /**< Outer radius. */
+    double length;   /**< Length. */
+    double X;        /**< X coordinate. */
+    double Y;        /**< Y coordinate. */
+    double Z;        /**< Z coordinate. */
   };
 
   /**
    * Sector support size data.
    */
   struct EKLMSectorSupportSize {
-    double Thickness;        /**< thickness */
-    double DeltaLY;          /**< outerR - Y of upper edge of BoxY */
-    double CornerX;          /**< coordinate X of corner 1 */
-    double TopCornerHeight;  /**< corner 1 height (subtraction from plane) */
-    double Corner1LX;        /**< corner 1 X length */
-    double Corner1Width;     /**< corner 1 width */
-    double Corner1Thickness; /**< corner 1 thickness */
-    double Corner1Z;         /**< corner 1 Z coordinate */
-    double Corner2LX;        /**< corner 2 X length */
-    double Corner2LY;        /**< corner 2 Y length */
-    double Corner2Thickness; /**< corner 2 thickness */
-    double Corner2Z;         /**< corner 2 Z coordinate */
-    double Corner3LX;        /**< corner 3 X length */
-    double Corner3LY;        /**< corner 3 Y length */
-    double Corner3Thickness; /**< corner 3 thickness */
-    double Corner3Z;         /**< corner 3 Z coordinate */
-    double Corner4LX;        /**< corner 4 X length */
-    double Corner4LY;        /**< corner 4 Y length */
-    double Corner4Thickness; /**< corner 4 thickness */
-    double Corner4Z;         /**< corner 4 Z coordinate */
-    double CornerAngle;      /**< corner 1 angle */
+    double Thickness;        /**< Yhickness. */
+    double DeltaLY;          /**< outerR - Y of upper edge of BoxY. */
+    double CornerX;          /**< Coordinate X of corner 1. */
+    double TopCornerHeight;  /**< Corner 1 height (subtraction from plane). */
+    double Corner1LX;        /**< Corner 1 X length. */
+    double Corner1Width;     /**< Corner 1 width. */
+    double Corner1Thickness; /**< Corner 1 thickness. */
+    double Corner1Z;         /**< Corner 1 Z coordinate. */
+    double Corner2LX;        /**< Corner 2 X length. */
+    double Corner2LY;        /**< Corner 2 Y length. */
+    double Corner2Thickness; /**< Corner 2 thickness. */
+    double Corner2Z;         /**< Corner 2 Z coordinate. */
+    double Corner3LX;        /**< Corner 3 X length. */
+    double Corner3LY;        /**< Corner 3 Y length. */
+    double Corner3Thickness; /**< Corner 3 thickness. */
+    double Corner3Z;         /**< Corner 3 Z coordinate. */
+    double Corner4LX;        /**< Corner 4 X length. */
+    double Corner4LY;        /**< Corner 4 Y length. */
+    double Corner4Thickness; /**< Corner 4 thickness. */
+    double Corner4Z;         /**< Corner 4 Z coordinate. */
+    double CornerAngle;      /**< Corner 1 angle. */
   };
 
   /**
    * Readout board size data.
    */
   struct EKLMBoardSize {
-    double length;       /**< length */
-    double width;        /**< width */
-    double height;       /**< height */
-    double base_width;   /**< width of base board */
-    double base_height;  /**< height of base board */
-    double strip_length; /**< length of strip readout board */
-    double strip_width;  /**< width of strip readout board */
-    double strip_height; /**< height of strip readout board */
+    double length;       /**< Length. */
+    double width;        /**< Width. */
+    double height;       /**< Height. */
+    double base_width;   /**< Width of base board. */
+    double base_height;  /**< Height of base board. */
+    double strip_length; /**< Length of strip readout board. */
+    double strip_width;  /**< Width of strip readout board. */
+    double strip_height; /**< Height of strip readout board. */
   };
 
   /**
    * Strip readout board position data.
    */
   struct EKLMStripBoardPosition {
-    double x;         /**< x coordinate */
+    double x;         /**< X coordinate. */
   };
 
   /**
    * Readout board position data.
    */
   struct EKLMBoardPosition {
-    double r;      /**< radius of far edge of the board */
-    double phi;    /**< angle */
+    double r;      /**< Radius of far edge of the board. */
+    double phi;    /**< Angle. */
   };
 
   /**
    * Section support position.
    */
   struct EKLMSectionSupportPosition {
-    double deltal_right;  /**< right (X-plane) delta L */
-    double deltal_left;   /**< left (X-plane) delta L */
-    double length;        /**< length */
-    double x;             /**< X coordinate */
-    double y;             /**< Y coordinate */
-    double z;             /**< Z coordinate */
+    double deltal_right;  /**< Right (X-plane) delta L. */
+    double deltal_left;   /**< Left (X-plane) delta L. */
+    double length;        /**< Length */
+    double x;             /**< X coordinate. */
+    double y;             /**< Y coordinate. */
+    double z;             /**< Z coordinate. */
   };
 
   /**
    * Strip size data.
    */
   struct EKLMStripSize {
-    double width;                      /**< width */
-    double thickness;                  /**< thickness */
-    double groove_depth;               /**< groove depth */
-    double groove_width;               /**< groove width */
-    double no_scintillation_thickness; /**< non-scintillating layer */
-    double rss_size;                   /**< radiation study SiPM size */
+    double width;                      /**< Width. */
+    double thickness;                  /**< Thickness. */
+    double groove_depth;               /**< Groove depth. */
+    double groove_width;               /**< Groove width. */
+    double no_scintillation_thickness; /**< Non-scintillating layer. */
+    double rss_size;                   /**< Radiation study SiPM size. */
   };
 
   /**
@@ -166,40 +166,26 @@ namespace Belle2 {
    * All solids for EKLM.
    */
   struct EKLMSolids {
-    /** Element of plastic list. */
-    G4Box** list;
-    /** Strip + SiPM volume. */
-    G4Box** stripvol;
-    /** Strips. */
-    G4Box** strip;
-    /** Strip grooves. */
-    G4Box** groove;
-    /** Scintillator. */
-    struct EKLMScintillatorSolids* scint;
-    /** Plane. */
-    struct EKLMPlaneSolids* plane;
-    /** Section support. */
-    struct EKLMSectionSupportSolids** secsup;
+    G4Box** list;                             /**< Element of plastic list. */
+    G4Box** stripvol;                         /**< Strip + SiPM volume. */
+    G4Box** strip;                            /**< Strips. */
+    G4Box** groove;                           /**< Strip grooves. */
+    struct EKLMScintillatorSolids* scint;     /**< Scintillator. */
+    struct EKLMPlaneSolids* plane;            /**< Plane. */
+    struct EKLMSectionSupportSolids** secsup; /**< Section support. */
   };
 
   /**
    * Materials for EKLM.
    */
   struct EKLMMaterials {
-    /** Air. */
-    G4Material* air;
-    /** Polystyrene. */
-    G4Material* polystyrene;
-    /** Polystyrol. */
-    G4Material* polystyrol;
-    /** Iron. */
-    G4Material* iron;
-    /** Duralumin. */
-    G4Material* duralumin;
-    /** Silicon. */
-    G4Material* silicon;
-    /** Gel. */
-    G4Material* gel;
+    G4Material* air;         /**< Air. */
+    G4Material* polystyrene; /**< Polystyrene. */
+    G4Material* polystyrol;  /**< Polystyrol. */
+    G4Material* iron;        /**< Iron. */
+    G4Material* duralumin;   /**< Duralumin. */
+    G4Material* silicon;     /**< Silicon. */
+    G4Material* gel;         /**< Gel. */
   };
 
   /**
@@ -450,72 +436,6 @@ namespace Belle2 {
      */
     void freeSolids();
 
-    /** Solids. */
-    struct EKLMSolids solids;
-
-    /** Materials. */
-    struct EKLMMaterials mat;
-
-    /**
-     * Number of layers.
-     */
-    int nLayer;
-
-    /**
-     * Number of planes in one sector.
-     */
-    int nPlane;
-
-    /**
-     * Number of readout boards in one sector.
-     */
-    int nBoard;
-
-    /**
-     * Number of strip readout boards on one section readout board.
-     */
-    int nStripBoard;
-
-    /**
-     * Number of strips in one plane.
-     */
-    int nStrip;
-
-    /**
-     * Number of sections is one plane
-     */
-    int nSection;
-
-    /**
-     * Position data for endcaps.
-     */
-    struct EKLMElementPosition EndcapPosition;
-
-    /**
-     * Position data for layers.
-     */
-    struct EKLMElementPosition LayerPosition;
-
-    /**
-     * Z distance between two layers.
-     */
-    double Layer_shiftZ;
-
-    /**
-     * Position data for sectors.
-     */
-    struct EKLMElementPosition SectorPosition;
-
-    /**
-     * Position data for sector support structure.
-     */
-    struct EKLMElementPosition SectorSupportPosition;
-
-    /**
-     * Sector support size data.
-     */
-    struct EKLMSectorSupportSize SectorSupportSize;
-
     /**
      * Get cutted corner angle.
      * @return Angle.
@@ -523,95 +443,104 @@ namespace Belle2 {
     double getSectorSupportCornerAngle();
 
     /**
-     * Readout board size data
-     */
-    struct EKLMBoardSize BoardSize;
-
-    /**
-     * Positions of readout boards
-     */
-    struct EKLMBoardPosition* BoardPosition[2];
-
-    /**
-     * Transformations of boards from sector reference frame
-     */
-    G4Transform3D** BoardTransform[2];
-
-    /**
      * Calculate board transformations.
      */
     void calcBoardTransform();
 
-    /**
-     * Positions of strip readout boards.
-     */
+    /** Solids. */
+    struct EKLMSolids solids;
+
+    /** Materials. */
+    struct EKLMMaterials mat;
+
+    /** Number of layers. */
+    int nLayer;
+
+    /** Number of planes in one sector. */
+    int nPlane;
+
+    /** Number of readout boards in one sector. */
+    int nBoard;
+
+    /** Number of strip readout boards on one section readout board. */
+    int nStripBoard;
+
+    /** Number of strips in one plane. */
+    int nStrip;
+
+    /** Number of sections is one plane. */
+    int nSection;
+
+    /** Position data for endcaps. */
+    struct EKLMElementPosition EndcapPosition;
+
+    /** Position data for layers. */
+    struct EKLMElementPosition LayerPosition;
+
+    /** Z distance between two layers. */
+    double Layer_shiftZ;
+
+    /** Position data for sectors. */
+    struct EKLMElementPosition SectorPosition;
+
+    /** Position data for sector support structure. */
+    struct EKLMElementPosition SectorSupportPosition;
+
+    /** Sector support size data. */
+    struct EKLMSectorSupportSize SectorSupportSize;
+
+    /** Readout board size data. */
+    struct EKLMBoardSize BoardSize;
+
+    /** Positions of readout boards. */
+    struct EKLMBoardPosition* BoardPosition[2];
+
+    /** Transformations of boards from sector reference frame. */
+    G4Transform3D** BoardTransform[2];
+
+    /** Positions of strip readout boards. */
     struct EKLMStripBoardPosition* StripBoardPosition;
 
-    /**
-     * Position data for planes.
-     */
+    /** Position data for planes. */
     struct EKLMElementPosition PlanePosition;
 
-    /**
-     * Position data for section support structure.
-     */
+    /** Position data for section support structure. */
     struct EKLMSectionSupportPosition* SectionSupportPosition[2];
 
-    /**
-     * Section support structure top box width.
-     */
+    /** Section support structure top box width. */
     double SectionSupportTopWidth;
 
-    /**
-     * Section support structure top box thickness.
-     */
+    /** Section support structure top box thickness. */
     double SectionSupportTopThickness;
 
-    /**
-     * Section support structure middle box width.
-     */
+    /** Section support structure middle box width. */
     double SectionSupportMiddleWidth;
 
-    /**
-     * Section support structure middle box thickness.
-     */
+    /** Section support structure middle box thickness. */
     double SectionSupportMiddleThickness;
 
-    /**
-     * Plastic list width
-     */
+    /** Plastic list width. */
     double PlasticListWidth;
 
-    /**
-     * Distance from edge of last strip to edge of plastic list
-     */
+    /** Distance from edge of last strip to edge of plastic list. */
     double PlasticListDeltaL;
 
-    /**
-     * Position data for strips.
-     */
+    /** Position data for strips. */
     struct EKLMElementPosition* StripPosition;
 
-    /**
-     * Strip size data.
-     */
+    /** Strip size data. */
     struct EKLMStripSize StripSize;
 
-    /** Detector mode.*/
+    /** Detector mode. */
     enum EKLMDetectorMode m_mode;
 
-    /**
-     * Sensitive detector
-     */
+    /** Sensitive detector. */
     EKLMSensitiveDetector* m_sensitive;
 
-    /**
-     * File to store transformation matrices
-     */
+    /** File to store transformation matrices. */
     std::string m_outputFile;
 
   };
-
 
 }
 

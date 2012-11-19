@@ -18,82 +18,132 @@
 
 namespace Belle2 {
 
+  /**
+   * Strip transformations.
+   */
   class EKLMTransformationFactory {
 
   public:
+
+    /**
+     * Get instance.
+     * @return EKLMTransformationFactory*.
+     */
     static EKLMTransformationFactory* getInstance();
 
-    //! adds strip transformation matrix entry
-    void addMatrixEntry(int , int, int, int , int, G4Transform3D);
-    //! adds strip length entry
-    void addLengthEntry(int , double);
+    /**
+     * Add strip transformation matrix entry.
+     * @param[in] endcap Endcap number.
+     * @param[in] layer  Layer number.
+     * @param[in] sector Sector number.
+     * @param[in] plane  Plane number.
+     * @param[in] strip  Strip number.
+     * @param[in] matrix G4Transform3D.
+     */
+    void addMatrixEntry(int endcap, int layer, int sector, int plane,
+                        int strip, G4Transform3D matrix);
 
-    //! returns transformation matrix for the strip
-    //! [#endcap][#layer][#sector][#plane][#strip]
-    G4Transform3D getTransformation(int , int , int , int , int) ;
+    /**
+     * Add strip length entry.
+     * @param[in] strip  Strip number.
+     * @param[in] length Length.
+     */
+    void addLengthEntry(int strip, double length);
 
-    //! returns transformation matrix for the strip
-    //! with EKLMStripID structure
-    G4Transform3D getTransformation(EKLMStripID id) {
-      return getTransformation(id.endcap, id.layer, id.sector, id.plane,
-                               id.strip);
-    }
+    /**
+     * Get transformation matrix for the strip.
+     * @param[in] endcap Endcap number.
+     * @param[in] layer  Layer number.
+     * @param[in] sector Sector number.
+     * @param[in] plane  Plane number.
+     * @param[in] strip  Strip number.
+     * @return Transformation.
+     */
+    G4Transform3D getTransformation(int endcap, int layer, int sector,
+                                    int plane, int strip);
 
-    //! returns transformation matrix for the strip
-    //! where strip ID is taken from the parent class via virtual function
-    G4Transform3D getTransformation(const EKLMHitBase* hit)
-    {return getTransformation(hit->getID());}
+    /**
+     * Get transformation matrix for the strip.
+     * @param[in] id Strip identifier.
+     * @return Transformation.
+     */
+    G4Transform3D getTransformation(EKLMStripID id);
 
-    //! returns length of the  the strip
-    double getStripLength(int) ;
+    /**
+     * Get transformation matrix for the strip.
+     * where strip ID is taken from the parent class via virtual function.
+     * @return Transformation.
+     */
+    G4Transform3D getTransformation(const EKLMHitBase* hit);
 
-    //! returns length of the  the strip
-    //! where strip ID is taken from the parent class
-    double getStripLength(const EKLMHitBase* hit)
-    {return getStripLength(hit->getID());}
+    /**
+     * Get strip length.
+     * @return Length of the the strip.
+     */
+    double getStripLength(int);
 
-    //! returns length of the  the strip
-    //! with EKLMStripID structure
-    double getStripLength(EKLMStripID id)
-    {return getStripLength(id.strip);}
+    /**
+     * Get strip length.
+     * @return Length of the the strip.
+     */
+    double getStripLength(const EKLMHitBase* hit);
 
+    /**
+     * Get strip length.
+     * @return Length of the the strip.
+     */
+    double getStripLength(EKLMStripID id);
 
-    //! reads information from file to memory
-    void readFromXMLFile(const GearDir&);
+    /**
+     * Reads information from XML file.
+     * @param[in] gd XML data directory.
+     */
+    void readFromXMLFile(const GearDir& gd);
 
-    //! reads information from file to memory
-    void readFromFile(const char*);
+    /**
+     * Read information from file to memory.
+     * @param[in] filename Name of file.
+     */
+    void readFromFile(const char* filename);
 
-
-
-
-    //! write collected information  to XML file
+    /**
+     * Write collected information to file.'
+     * @param[in] filename Name of file.
+     */
     void writeToFile(const char* filename) const;
 
-    //! write collected information  to XML file
-    void writeToXMLFile(std::string filename);
-    //! write collected information  to XML file
+    /**
+     * Write collected information to XML file.
+     * @param[in] filename Name of file.
+     */
     void writeToXMLFile(char* filename);
 
-    //! clear
+    /**
+     * Clear.
+     */
     void clear();
 
   private:
+
+    /** Instance. */
     static EKLMTransformationFactory* EKLMTransformationFactory_instance;
 
-    //constructor
+    /**
+     * Constructor.
+     */
     EKLMTransformationFactory();
 
-    //! G4Transform3D  matrix for the strip
-    G4Transform3D stripMatrixArray[2][14][4][2][75]; // [#endcap][#layer][#sector][#plane][#strip]
+    /**
+     * G4Transform3D matrix for the strip.
+     * @details
+     * [#endcap][#layer][#sector][#plane][#strip]
+     */
+    G4Transform3D stripMatrixArray[2][14][4][2][75];
 
-    //!  the strip length
-    double stripLengthArray[75]; // [#strip]
-
+    /** The strip length. */
+    double stripLengthArray[75];
 
   };
-
-
 
 }
 

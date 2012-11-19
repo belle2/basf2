@@ -23,144 +23,176 @@
 #include <string>
 namespace Belle2 {
 
-  //! Main reconstruction hit class. Containes infromation about the
-  //! hitted strips
+  /**
+   * Main reconstruction hit class. Contains information about the
+   * hitted strips.
+   */
   class EKLMDigit : public EKLMHitBase {
 
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     EKLMDigit() {};
 
-    //! Constructor from the EKLMSimHit
+    /**
+     * Constructor from the EKLMSimHit.
+     * @param[in] Hit EKLMSimHit.
+     */
     EKLMDigit(const EKLMSimHit* Hit);
 
-    //! Destructor
+    /**
+     * Destructor.
+     */
     ~EKLMDigit() {};
 
-    //! Print stip name and some other useful info
+    /**
+     * Print stip name and some other useful information.
+     */
     void Print() const;
 
+    /**
+     * Get identifier.
+     * @return Identifier.
+     */
     virtual EKLMStripID getID() const;
 
-
-    //! returns number of photo electrons
+    /**
+     * Get number of photoelectrons.
+     * @return Number of photoelectrons.
+     */
     double getNumberPhotoElectrons() const;
 
-    //! sets the number of photo electorns
-    void setNumberPhotoElectrons(double);
+    /**
+     * Set the number of photo electorns.
+     * @param[in] npe Number of photoelectrons.
+     */
+    void setNumberPhotoElectrons(double npe);
 
-
-
-    //! returns physical volume
+    /**
+     * Get physical volume.
+     * @return Geant physical volume.
+     */
     const G4VPhysicalVolume* getVolume() const;
 
-    //! set physical volume
+    /**
+     * Set physical volume.
+     * @param[in] pv Geant physical volume.
+     */
     void setVolume(const G4VPhysicalVolume* pv);
 
     /**
-     * whether hit could be used late (if it passed discriminator threshold)
-     * (getter)
+     * Whether hit could be used late (if it passed discriminator threshold)
+     * (getter).
+     * @return True if could be used.
      */
     bool isGood() const;
 
     /**
-     * whether hit could be used late (if it passed discriminator threshold)
-     * (setter)
+     * Whether hit could be used late (if it passed discriminator threshold)
+     * (setter).
+     * @param[in] status True if could be used.
      */
-    void isGood(bool) ;
-
+    void isGood(bool status) ;
 
     /**
      * Get plane number.
+     * @return Plane number.
      */
     int getPlane() const;
 
     /**
      * Set plane number.
+     * @param[in] Plane Plane number.
      */
     void setPlane(int Plane);
 
     /**
      * Get strip number.
+     * @return Strip number.
      */
     int getStrip() const;
 
     /**
      * Set strip number.
+     * @param[in] Strip Strip number.
      */
     void setStrip(int Strip);
 
     /**
-     * Get fit results
+     * Get fit results.
+     * @return Fit results.
      */
     const TFitResult* getFitResults() const;
 
     /**
-     * Get fit status
+     * Get fit status.
+     * @return Fit status.
      */
     int getFitStatus();
 
     /**
-     * Set fit status
+     * Set fit status.
+     * @param[in] s Fit status.
      */
     void setFitStatus(int s);
 
     /**
-     * Set fit results
+     * Set fit results.
+     * @param[in] res Fit results.
      */
     void setFitResults(TFitResult& res);
 
-
     /**
-     * Set fit results
+     * Set fit results.
+     * @param[in] resPtr Fit results.
      */
     void setFitResults(TFitResultPtr resPtr);
 
-
+    /**
+     * Set MC time shift.
+     * @param[in] ts Time shift.
+     */
     void setMCTS(double ts);
-    double getMCTS() const;
 
+    /**
+     * Get MC time shift.
+     * @return Time shift.
+     */
+    double getMCTS() const;
 
   private:
 
-
-    /**
-     * Number of plane.
-     */
+    /** Number of plane. */
     int m_Plane;
 
-    /**
-     * Number of strip.
-     */
+    /** Number of strip. */
     int m_Strip;
 
-    /**
-     *  if hit passes threshold
-     */
+    /** If hit passes threshold. */
     bool m_good;
 
-
-
-    //! number of photo electrons
+    /** Number of photo electrons. */
     double m_NumberPhotoElectrons;
 
-    //! number of photo electrons
+    /** Fit status. */
     int m_fitStatus;
 
-
+    /** MC time. */
+    /** FIXME: This variable is unused. Delete it? */
     double m_MCtime;
+
+    /** MC time shift. */
     double m_timeshift;
 
-
-    //! Physical volume (for simulation)
+    /** Physical volume (for simulation). */
     const G4VPhysicalVolume* m_pv;   //! {ROOT streamer directive}
 
-    //! Fit results object
+    /** Fit results object. */
     TFitResult m_fitResults;
 
-
-    //! Makes objects storable
+    /** Makes objects storable. */
     ClassDef(Belle2::EKLMDigit, 1);
 
   };

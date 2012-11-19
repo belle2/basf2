@@ -25,7 +25,8 @@ EKLMSimHit::EKLMSimHit():
   m_pv(NULL),
   m_pvName("not initialized"),
   m_volType(0)
-{}
+{
+}
 
 EKLMSimHit::EKLMSimHit(const EKLMStepHit* stepHit)
   : EKLMHitBase((EKLMHitBase)*stepHit),
@@ -34,7 +35,8 @@ EKLMSimHit::EKLMSimHit(const EKLMStepHit* stepHit)
     m_pv(stepHit->getVolume()),
     m_pvName(m_pv->GetName()),
     m_volType(stepHit->getVolumeType())
-{}
+{
+}
 
 const G4VPhysicalVolume* EKLMSimHit::getVolume() const
 {
@@ -51,7 +53,6 @@ bool  EKLMSimHit::getVolType() const
   return m_volType;
 }
 
-
 EKLMStripID EKLMSimHit::getID() const
 {
   EKLMStripID str;
@@ -63,34 +64,32 @@ EKLMStripID EKLMSimHit::getID() const
   return str;
 }
 
-
-void  EKLMSimHit::setVolType(int vt)
+void EKLMSimHit::setVolType(int vt)
 {
   m_volType = vt;
 }
 
-
-const TVector3*   EKLMSimHit::getMomentum() const
+const TVector3* EKLMSimHit::getMomentum() const
 {
   return & m_momentum;
 }
 
-void  EKLMSimHit::setMomentum(const TVector3& p)
+void EKLMSimHit::setMomentum(const TVector3& p)
 {
   m_momentum = p;
 }
 
-void  EKLMSimHit::setMomentum(const TVector3* p)
+void EKLMSimHit::setMomentum(const TVector3* p)
 {
   m_momentum = *p;
 }
 
-double  EKLMSimHit::getEnergy() const
+double EKLMSimHit::getEnergy() const
 {
   return m_energy;
 }
 
-void  EKLMSimHit::setEnergy(double e)
+void EKLMSimHit::setEnergy(double e)
 {
   m_energy = e;
 }
@@ -99,19 +98,21 @@ int EKLMSimHit::getPlane() const
 {
   return m_Plane;
 }
+
 void EKLMSimHit::setPlane(int plane)
 {
   m_Plane = plane;
 }
+
 int EKLMSimHit::getStrip() const
 {
   return m_Strip;
 }
+
 void EKLMSimHit::setStrip(int strip)
 {
   m_Strip = strip;
 }
-
 
 void EKLMSimHit::Save(char* filename)
 {
@@ -126,6 +127,3 @@ void EKLMSimHit::Save(char* filename)
   save_hit.close();
 }
 
-
-
-//} //end of Belle2 namespace

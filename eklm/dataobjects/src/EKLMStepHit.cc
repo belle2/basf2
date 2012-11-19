@@ -85,7 +85,6 @@ const TVector3* EKLMStepHit::getMomentum() const
   return & m_momentum;
 }
 
-
 void EKLMStepHit::setMomentum(TVector3&    momentum)
 {
   m_momentum = momentum;
@@ -101,24 +100,20 @@ void EKLMStepHit::setTrackID(int track)
   m_trackID = track;
 }
 
-
 int EKLMStepHit::getParentTrackID() const
 {
   return m_parentTrackID;
 }
-
 
 void EKLMStepHit::setParentTrackID(int track)
 {
   m_parentTrackID = track;
 }
 
-
 string EKLMStepHit::getName()  const
 {
   return m_pvName;
 }
-
 
 void EKLMStepHit::setName(string& name)
 {
@@ -135,8 +130,6 @@ EKLMStripID EKLMStepHit::getID() const
   str.strip = m_Strip;
   return str;
 }
-
-
 
 const G4VPhysicalVolume* EKLMStepHit::getVolume()  const
 {
@@ -160,20 +153,23 @@ void EKLMStepHit::setVolumeType(int type)
   m_volType = type;
 }
 
-
 int EKLMStepHit::getPlane() const
 {
   return m_Plane;
 }
+
 void EKLMStepHit::setPlane(int plane)
 {
   m_Plane = plane;
 }
+
 int EKLMStepHit::getStrip() const
 {
   return m_Strip;
 }
+
 void EKLMStepHit::setStrip(int strip)
 {
   m_Strip = strip;
 }
+

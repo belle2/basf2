@@ -20,80 +20,92 @@
 
 namespace Belle2 {
 
-  //! class for creation 1d, 2d hits and clusters identification
+  /**
+   * Class for creation of 1d, 2d hits and cluster identification.
+   */
   class EKLMRecon   {
 
   public:
-    //! constructor with default values
+
+    /**
+     * Constructor.
+     */
     EKLMRecon();
 
-
-    //! destructor
+    /**
+     * Destructor.
+     */
     ~EKLMRecon() {};
 
-    //! read StripHits from the datastore
+    /**
+     * Read StripHits from the datastore.
+     */
     void readStripHits();
 
-    //! creates Sector hits and fill it with StripHits
+    /**
+     * Create Sector hits and fill it with StripHits.
+     */
     void createSectorHits();
 
-    //! Creates 2d hits in each SectorHit
+    /**
+     * Create 2d hits in each SectorHit.
+     */
     void create2dHits();
 
 
   private:
 
-    /**
-     * Storage
-     */
+    /** Storage. */
     StoreArray<EKLMHit2d>m_hit2dArray;
 
-
-    //! vector of StripHits
+    /** Vector of StripHits. */
     std::vector <EKLMDigit*> m_StripHitVector;
 
-    //! vector of SectorHits
+    /** Vector of SectorHits. */
     std::vector <EKLMSectorHit*> m_SectorHitVector;
 
-    //! vector of  2d hits
+    /** Vector of 2d hits. */
     std::vector <EKLMHit2d*> m_hit2dVector;
 
     /**
-     * returns true if strip is along X (with pointer to hit)
+     * Check strip orientation.
+     * @return true if strip is along X.
      */
-    bool CheckStripOrientationX(const EKLMDigit* h)
-    {return CheckStripOrientationX(h->getID());};
+    bool CheckStripOrientationX(const EKLMDigit* h);
 
     /**
-     * returns true if strip is along X (with StripID)
+     * Check strip orientation.
+     * @return true if strip is along X.
      */
     bool CheckStripOrientationX(EKLMStripID);
 
+    /**
+     * Check whether strips intersect.
+     * @details
+     * Determines crossing point in the global rest frame,
+     * calculates Chi^2 of the hit and hittime.
+     * @param[in]  hit1       First hit.
+     * @param[in]  hit2       Second hit.
+     * @param[out] crossPoint Crossing point.
+     * @param[out] chisq      Chi^2.
+     * @param[out] time       Time.
+     * @return true if strips have intersection.
+     */
+    bool doesIntersect(const EKLMDigit* hit1, const EKLMDigit* hit2,
+                       TVector3& crossPoint, double& chisq, double& time);
 
     /**
-     * returns true strips have intersection
-     * determins crossing point in the global rest frame
-     * calculates chisq of the hit
-     * and hittime
+     * Add strip hit to sector.
+     * @param[in,out] sectorHit Sector hit.
+     * @param[in]     stripHit  Strip hit.
+     * @return true on success.
      */
-    bool doesIntersect(const EKLMDigit* , const EKLMDigit* ,
-                       TVector3&, double&, double&);
+    bool addStripHitToSector(EKLMSectorHit* sectorHit, EKLMDigit* stripHit);
 
-    /**
-     * Adds trip hit to sector, return  true on success
-     */
-    bool addStripHitToSector(EKLMSectorHit* , EKLMDigit*);
-
-
-
-    /**
-     * Speed of the first photon
-     */
+    /** Speed of the first photon. */
     double m_firstPhotonlightSpeed;
 
-    /**
-     * Time smearing
-     */
+    /** Time smearing. */
     double m_sigmaT;
 
   };

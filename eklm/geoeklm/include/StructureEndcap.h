@@ -18,36 +18,40 @@
 
 namespace Belle2 {
 
-  //  namespace eklm {
-
-  //! The Class for Structure Geometry Parameters
-  /*! This class provides Structure gemetry paramters for simulation, reconstruction and so on.
-    These parameters are gotten from gearbox.
-  */
+  /**
+   * The Class for Structure Geometry Parameters.
+   * This class provides Structure gemetry paramters for simulation,
+   * reconstruction and so on.
+   * These parameters are gotten from gearbox.
+   */
   class StructureEndcap {
 
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     StructureEndcap();
 
-    //! Destructor
+    /**
+     * Destructor.
+     */
     virtual ~StructureEndcap();
 
-    //! Static method to get a reference to the CDCGeometryPar instance.
-    /*!
-      \return A reference to an instance of this class.
-    */
-
-    ///////////////static CDCGeometryPar* Instance();
-
-    //! Clears
+    /**
+     * Clear.
+     */
     void clear();
 
-    //! Gets geometry parameters from gearbox.
+    /**
+     * Get geometry parameters from gearbox.
+     */
     void read();
 
-    //! to get the position of the Endcap KLM module slot of the specified layer and sector
+    /**
+     * Get the position of the Endcap KLM module slot of the specified
+     * layer and sector.
+     */
     const TVector3 endcapModulePos(int, int) const;
 
     //! Endcap KLM shape = octagonal - tube

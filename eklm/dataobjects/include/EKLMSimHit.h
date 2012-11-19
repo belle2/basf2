@@ -24,79 +24,87 @@ class G4VPhysicalVolume;
 namespace Belle2 {
 
   /**
-   * Class to handle simulation hits
+   * Class to handle simulation hits.
    */
-
   class EKLMSimHit : public EKLMHitBase  {
 
   public:
 
     /**
-     * default constructor needed to make the class storable
+     * Default constructor needed to make the class storable.
      */
     EKLMSimHit();
 
     /**
-     *  Constructor with StepHit
+     * Constructor with StepHit.
+     * @param[in] stepHit EKLMStepHit.
      */
     EKLMSimHit(const EKLMStepHit* stepHit);
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~EKLMSimHit() {};
 
     /**
-     *returns physical volume
+     * Get Geant physical volume.
+     * @return Physical volume.
      */
     const G4VPhysicalVolume* getVolume()  const;
 
     /**
-     * set physical volume
+     * Set Geant physical volume.
+     * @param[in] pv Physical volume.
      */
-    void setVolume(const G4VPhysicalVolume*);
+    void setVolume(const G4VPhysicalVolume* pv);
 
     /**
-     * returns volume type (needed for background study mode)
+     * Get volume type (needed for background study mode).
+     * @return Volume type.
      */
-    bool  getVolType() const;
+    bool getVolType() const;
 
     /**
-     * sets volume type (needed for background study mode)
+     * Sets volume type (needed for background study mode).
+     * @param[in] vt Volume type.
      */
-    void  setVolType(int);
+    void setVolType(int vt);
 
     /**
-     * returns  particle momentum
+     * Get particle momentum.
+     * @return Momentum.
      */
-    const TVector3*   getMomentum() const;
+    const TVector3* getMomentum() const;
 
     /**
-     * sets  particle momentum
+     * Set particle momentum.
+     * @param[in] p Momentum.
      */
-    void  setMomentum(const TVector3& p);
+    void setMomentum(const TVector3& p);
 
     /**
-     * sets  particle momentum
+     * Set particle momentum.
+     * @param[in] p Momentum.
      */
     void  setMomentum(const TVector3* p);
 
-
     /**
-     * returns  particle energy
+     * Get particle energy.
+     * @return Energy.
      */
     double  getEnergy() const;
 
     /**
-     * sets  particle energy
+     * Set particle energy.
+     * @param[in] e Energy.
      */
-    void  setEnergy(double);
+    void setEnergy(double e);
 
-
-
-    //! dumps hit into ASCII file
+    /**
+     * Dumps hit into ASCII file.
+     * @param[in] filename Name of file.
+     */
     void Save(char* filename);
-
 
     /**
      * Get plane number.
@@ -105,70 +113,55 @@ namespace Belle2 {
 
     /**
      * Set plane number.
+     * @param[in] Plane Plane number.
      */
     void setPlane(int Plane);
 
     /**
      * Get strip number.
+     * @return Strip number.
      */
     int getStrip() const;
 
     /**
      * Set strip number.
+     * @param[in] Strip Strip number.
      */
     void setStrip(int Strip);
 
-
+    /**
+     * Get identifier.
+     * @return Identifier.
+     */
     virtual EKLMStripID getID() const;
-
 
   private:
 
-    /**
-     *particle energy
-     */
+    /** Particle energy. */
     double m_energy;
 
-    /**
-     * particle momentum
-     */
+    /** Particle momentum. */
     TVector3 m_momentum;
 
-
-    /**
-     *Physical volume
-     */
+    /** Physical volume. */
     const  G4VPhysicalVolume* m_pv; //! {ROOT streamer directive}
 
-
-    /**
-     * Number of plane.
-     */
+    /** Number of plane. */
     int m_Plane;
 
-    /**
-     * Number of strip.
-     */
+    /** Number of strip. */
     int m_Strip;
 
-
-    /**
-     * Name of the volume
-     */
+    /** Name of the volume. */
     std::string m_pvName;
 
-
-    /**
-     * Volume type (for Background studies)
-     */
+    /** Volume type (for Background studies). */
     int m_volType;
 
-
-    // Needed to make root object storable
+    /** Needed to make root object storable. */
     ClassDef(Belle2::EKLMSimHit, 1);
 
   };
-
 
 } // end of namespace Belle2
 

@@ -115,7 +115,6 @@ namespace Belle2 {
      */
     std::vector<int> getIdHistory() const;
 
-
   private:
 
     /**
@@ -147,7 +146,6 @@ namespace Belle2 {
      * ID hierarchy.
      */
     std::vector<int> m_idHistory;
-
 
   };
 

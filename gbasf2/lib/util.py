@@ -170,21 +170,22 @@ def prepareProxy():
     if proxyinfo['OK']:
         timeleft = int(proxyinfo['Value']['secondsLeft'])
         timeleft /= 3600
-        print "The proxy will be despired after %s hours. Do you want to continue \
+        if timeleft < 12:
+            print "The proxy will expire after %s hours. Do you want to continue \
 or to generate a new proxy?" \
-            % timeleft
+                % timeleft
 
-        user_choice = raw_input('Please input C or G: ')
-        if user_choice.upper() == 'C':
-            pass
-        elif user_choice.upper() == 'G':
-            if os.system('dirac-proxy-init -g belle -M'):
-                print 'Error happens when generate proxy'
-                DIRAC.exit(1)
-        else:
-            print 'You should give C or G'
-            import sys
-            sys.exit(-1)
+            user_choice = raw_input('Please input C or G: ')
+            if user_choice.upper() == 'C':
+                pass
+            elif user_choice.upper() == 'G':
+                if os.system('dirac-proxy-init -g belle -M'):
+                    print 'Error happens when generate proxy'
+                    DIRAC.exit(1)
+            else:
+                print 'You should give C or G'
+                import sys
+                sys.exit(-1)
     else:
         if os.system('dirac-proxy-init -g belle -M'):
             print 'Error happens when generate proxy'

@@ -13,6 +13,7 @@
 from AmgaClient import AmgaClient
 from DIRAC.Core.Base import Script
 import os
+import re
 import sys
 import glob
 import getopt
@@ -39,11 +40,12 @@ def get_dst_ses(repman, src_se):
     ses = gConfig.getSections('/Resources/StorageElements')['Value']
         # ses.remove('SandboxSE')#this is used for old version of Dirac
     ses.remove('CentralSE')
-    ses.remove('ProductionSandboxSE')
+    # ses.remove('ProductionSandboxSE')
     selist = repman._getSEProximity(ses)
         # print selist
     for se in selist['Value']:
-        if se not in src_se:
+        sb = re.search(r'(SandboxSE)', se, re.M | re.I)
+        if se not in src_se and not sb:
             dst_ses.append(se)
     return dst_ses
 

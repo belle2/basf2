@@ -34,18 +34,17 @@ def main():
             else:
                 myse = src_ses[0]
                 if del_se != '':
-                    print 'no replica at <%s>,delete replica from <%s> instead' \
-                        % (del_se, myse)
+                    print 'no replica at <%s>,delete replica from <%s>\
+                           instead' % (del_se, myse)
 
             print 'deleting replica from <%s>' % myse
             ds_del_file_replica(lfn, myse)
         ds_list_replica(entries, 1, 0)
     else:
-        print 'You are not allowed to decrease replicas of dataset belonging to ', \
-            User
+        print 'You are not allowed to decrease replicas of dataset\
+               belonging to ', User
         sys.exit(-1)
 
 
 if __name__ == '__main__':
     main()
-

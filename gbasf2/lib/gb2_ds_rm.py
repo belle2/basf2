@@ -15,8 +15,8 @@ def main():
     Project = dsparam.getProject()
     dstse = dsparam.getDstSE()
     dspath = '/belle2/user/belle/' + User + '/' + Project
-    s = \
-        'This operation will remove the dataset %s completely,\nand it is not recoverable, are you sure to go ahead?(yes or no?)' \
+    s = 'This operation will remove the dataset %s completely,\n\
+        and it is not recoverable, are you sure to go ahead?(yes or no?)' \
         % dspath
     a = raw_input(s)
     while a != 'yes' and a != 'no':
@@ -41,4 +41,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

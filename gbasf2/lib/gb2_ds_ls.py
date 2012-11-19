@@ -17,7 +17,8 @@ def main():
     ListReplica = dsparam.getListReplica()
     ListSite = dsparam.getListSite()
     print 'dspath is %s ,ListReplica is %d, listsite is %d' % (dspath,
-            ListReplica, ListSite)
+                                                               ListReplica,
+                                                               ListSite)
     from DataSetOp import ds_list_replica
     from AmgaClient import AmgaClient
 
@@ -32,4 +33,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

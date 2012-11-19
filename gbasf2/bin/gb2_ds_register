@@ -1,21 +1,15 @@
 #!/bin/bash
-# Yanliang Han
-# 2011-11
-# copy file to storage element and register it to LFC and AMGA
+# Thomas Kuhr, Tom Fifield
+# 2010-01
+# As DIRAC uses its own versions of some libraries, let's try to avoid trashing
+# the system by sourcing before calling
 
-DIRACROOT=${DIRACROOT:-$DIRAC/..}
-. $DIRACROOT/../bashrc
-# check if gbasf2 is unreachable by PATH
-path=`which gbasf2`
-gbasf2_path=`dirname path`/..
-find ${gbasf2_path}/lib -name gbasf2.py >/dev/null 2>&1
+# Wenjing Wu
+# 2012-11
 
-if [ $? -eq 1 ]
-then
- BELLE2_LOCAL_DIR=${BELLE2_LOCAL_DIR:-..}
- ${BELLE2_LOCAL_DIR}/gbasf2/lib/gbasf2output.py "$@"
-else
- ${gbasf2_path}/lib/gbasf2output.py "$@"
-fi
+DIRACROOT=${DIRACROOT:-$DIRAC}
+. $DIRACROOT/bashrc
+
+${GBASF2ROOT}/lib/gb2_ds_register.py "$@"
 
 exit $?

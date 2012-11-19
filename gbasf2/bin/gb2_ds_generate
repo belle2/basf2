@@ -1,21 +1,15 @@
-#!/usr/bin/env python
-import sys
-from DataSetUtil import DSParam
-def main():
+#!/bin/bash
+# Thomas Kuhr, Tom Fifield
+# 2010-01
+# As DIRAC uses its own versions of some libraries, let's try to avoid trashing
+# the system by sourcing before calling
 
-	dsparam=DSParam(sys.argv[0])
-	dsparam.register_param()
-	from DIRAC.Core.Base import Script
-	Script.parseCommandLine(ignoreErrors=True)
-	Project=dsparam.getProject()
-	User=dsparam.getUser()
-	dstse=dsparam.getDstSE()
-	dspath="/belle2/user/belle/"+User+"/"+Project
-	#print "ds_path is ",dspath, "dstse is ",dstse
-	from DataSetOp import ds_generate
+# Wenjing Wu
+# 2012-11
 
-        ds_generate(dspath,dstse)
+DIRACROOT=${DIRACROOT:-$DIRAC}
+. $DIRACROOT/bashrc
 
-if  __name__ == '__main__':
-    main()
+${GBASF2ROOT}/lib/gb2_ds_generate.py "$@"
 
+exit $?

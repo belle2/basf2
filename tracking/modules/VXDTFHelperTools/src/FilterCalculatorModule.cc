@@ -88,7 +88,6 @@ FilterCalculatorModule::FilterCalculatorModule() : Module()
 
 FilterCalculatorModule::~FilterCalculatorModule()
 {
-  cerr << " final brainfuck... " << endl;
 }
 
 

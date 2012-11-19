@@ -121,6 +121,7 @@ void TFAnalizerModule::event()
 
   StoreArray<PXDTrueHit> pxdTrueHits;
   StoreArray<SVDTrueHit> svdTrueHits;
+//  StoreArray<McParticle> mcParticles;
   RelationIndex<PXDCluster, PXDTrueHit> relPXDCluster2TrueHit; /* <FROM, TO> */
   RelationIndex<SVDCluster, SVDTrueHit> relSVDCluster2TrueHit;
   RelationArray relPXDClusterTrueHit(pxdClusters, pxdTrueHits);
@@ -343,7 +344,8 @@ void TFAnalizerModule::printMC(bool type, VXDTrackCandidate& mcTC)
          "§ GeV/c and vertex distance to origin: §" << setprecision(4) << distVertex2Zero <<
          "§cm, transverseDistance: §" << setprecision(4) << distTVertex2Zero <<
          "§cm, zDistance: §" << setprecision(4) << distZVertex2Zero <<
-         "§, and pdg of: " << setprecision(4) << pdg) // '§' will be used to filter
+         "§, and pdg of: §" << setprecision(4) << pdg <<
+         "§") // '§' will be used to filter
 }
 
 

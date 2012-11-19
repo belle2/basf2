@@ -141,11 +141,10 @@ class DSParam:
         Script.registerSwitch('s:', 'dst_se=', 'destination SE', self.setDstSE)
         Script.registerSwitch('d:', 'dst_dir=', 'destination local directory',
                               self.setDstDir)
-        Script.registerSwitch('r', 'replica', 'list  replicas from all sites '
-                              , self.setListReplica)
+        Script.registerSwitch('r', 'replica',
+                              'list  replicas from all sites ',
+                              self.setListReplica)
         Script.registerSwitch('i', 'site', 'list  replicas by sites ',
                               self.setListSite)
         Script.registerSwitch('h', 'help', 'print help information ',
                               self.print_help)
-
-

@@ -201,7 +201,6 @@ def prepareProxy():
     if not dnList:
         print 'User %s has no DN defined!' % userName
         DIRAC.exit(1)
-    print proxyinfo['Value']
     if ('hasVOMS' not in proxyinfo['Value'] or
             not proxyinfo['Value']['hasVOMS']):
         print 'ERROR: Proxy has no VOMS extensions. Please check using\n\

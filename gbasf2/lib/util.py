@@ -188,7 +188,7 @@ def prepareProxy():
 
     while True:
         proxyinfo = getProxyInfo()
-        if 'usrename' in proxyinfo['Value']:
+        if 'username' in proxyinfo['Value']:
             break
 
     userName = proxyinfo['Value']['username']

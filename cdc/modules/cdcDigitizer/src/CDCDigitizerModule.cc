@@ -34,7 +34,8 @@ REG_MODULE(CDCDigitizer)
 CDCDigitizerModule::CDCDigitizerModule() : Module()
 {
   // Set description
-  setDescription("CDCDigitizerModule");
+  //  setDescription("CDCDigitizerModule");
+  setDescription("CDCDigitizer  Creates CDCDigits from CDCSimHits.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   // Add parameters

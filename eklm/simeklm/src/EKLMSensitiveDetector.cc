@@ -13,9 +13,9 @@
 
 #include <framework/logging/Logger.h>
 #include <eklm/geoeklm/G4PVPlacementGT.h>
+#include <eklm/geoeklm/EKLMObjectNumbers.h>
 
 #include "G4Step.hh"
-
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
@@ -23,12 +23,13 @@
 
 namespace Belle2 {
 
+  using namespace EKLM;
 
   EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name)
     : Simulation::SensitiveDetectorBase(name, KLM)
   {
     GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
-    m_mode = gd.getInt("Mode");
+    m_mode = (enum EKLMDetectorMode)gd.getInt("Mode");
     gd.append("/SensitiveDetector");
     m_ThresholdEnergyDeposit =
       Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "MeV");
@@ -61,7 +62,7 @@ namespace Belle2 {
      * use "<=" instead of "<" to drop hits from neutrinos etc unless eDepositionThreshold is non-negative
      * Background studies m_mode=1 accepts all tracks
      */
-    if (eDep <= m_ThresholdEnergyDeposit && m_mode == 0)
+    if (eDep <= m_ThresholdEnergyDeposit && m_mode == EKLM_DETECTOR_NORMAL)
       return false;
 
     /**
@@ -164,16 +165,13 @@ namespace Belle2 {
      */
     const int paretntTrackID = track.GetParentID();
 
-
-
-
     /**
      * creates step hit and store in to DataStore
      */
     StoreArray<EKLMStepHit> stepHits;
     int hitNumber = stepHits->GetLast() + 1;
     EKLMStepHit* hit = new(stepHits->AddrAt(hitNumber))
-    EKLMStepHit(momentumRoot, E, trackID, paretntTrackID, pv);
+    EKLMStepHit(momentumRoot, E, trackID, paretntTrackID);
     if (hit == NULL) {
       B2ERROR("EKLMSensitiveDetector.cc:: Memory allocation error. Cannot allocate hit in stepHitsArray");
       return false;
@@ -188,24 +186,28 @@ namespace Belle2 {
     /**
      * Get information on mother volumes and store them to the hit
      */
+
     const G4PVPlacementGT* pvgt = (G4PVPlacementGT*)pv;
 
     hit->setVolumeType(pvgt->getVolumeType());
     switch (pvgt->getVolumeType()) {
-      case 0: // StripSensitive
+      case EKLM_SENSITIVE_STRIP:
+        hit->setVolumeID(pvgt->getID());
         pvgt = pvgt->getMother();  // Strip
         pvgt = pvgt->getMother();  // StripVolume
-        hit->setStrip(pvgt->getID());
+        hit->setStrip(stripLocalNumber(pvgt->getID()));
         pvgt = pvgt->getMother();  // Plane
-        hit->setPlane(pvgt->getID());
+        hit->setPlane(planeLocalNumber(pvgt->getID()));
         break;
-      case 1: // SiPM
+      case EKLM_SENSITIVE_SIPM:
+        hit->setVolumeID(100000 + pvgt->getID());
         pvgt = pvgt->getMother();  // StripVolume
-        hit->setStrip(pvgt->getID());
+        hit->setStrip(stripLocalNumber(pvgt->getID()));
         pvgt = pvgt->getMother();  // Plane
-        hit->setPlane(pvgt->getID());
+        hit->setPlane(planeLocalNumber(pvgt->getID()));
         break;
-      case 2: // StripBoard
+      case EKLM_SENSITIVE_BOARD:
+        hit->setVolumeID(200000 + pvgt->getID());
         pvgt = pvgt->getMother();  // SectionReadoutBoard
         hit->setStrip(-1);
         hit->setPlane(-1);
@@ -214,10 +216,10 @@ namespace Belle2 {
         B2ERROR("EKLMSensitiveDetector.cc:: Try to get hit information from insensitive volumes");
     }
     pvgt = pvgt->getMother(); // Sector
-    hit->setSector(pvgt->getID()); // Sector ID
+    hit->setSector(sectorLocalNumber(pvgt->getID())); // Sector ID
 
     pvgt = pvgt->getMother();
-    hit->setLayer(pvgt->getID());  // Layer ID
+    hit->setLayer(layerLocalNumber(pvgt->getID()));  // Layer ID
 
     pvgt = pvgt->getMother();
     hit->setEndcap(pvgt->getID()); // Endcap ID
@@ -225,7 +227,6 @@ namespace Belle2 {
     StoreArray<MCParticle> particles;
     RelationArray particleToStepHits(particles, stepHits);
     particleToStepHits.add(track.GetTrackID(), hitNumber);
-
 
     /*
 

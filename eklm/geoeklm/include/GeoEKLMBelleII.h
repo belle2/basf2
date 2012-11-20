@@ -11,10 +11,13 @@
 #ifndef GEOEKLMBELLEII_H_
 #define GEOEKLMBELLEII_H_
 
+#include <sys/types.h>
+
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <eklm/simeklm/EKLMSensitiveDetector.h>
 #include <eklm/geoeklm/G4PVPlacementGT.h>
+#include <eklm/geoeklm/G4TriangularPrism.h>
 
 #include <G4LogicalVolume.hh>
 #include <G4Material.hh>
@@ -30,8 +33,6 @@
 #include <vector>
 
 namespace Belle2 {
-
-  class G4TriangularPrism;
 
   /**
    * Position information for the elements of detector.
@@ -189,6 +190,18 @@ namespace Belle2 {
   };
 
   /**
+   * Volume numbers.
+   */
+  struct EKLMVolumeNumbers {
+    int endcap; /**< Endcap. */
+    int layer;  /**< Layer. */
+    int sector; /**< Sector. */
+    int plane;  /**< Plane. */
+    int strip;  /**< Strip. */
+    int board;  /**< Board. */
+  };
+
+  /**
    * Class GeoEKLMBelleII.
    * The creator for the  EKLM geometry of the Belle II detector.
    */
@@ -225,35 +238,31 @@ namespace Belle2 {
     void createMaterials();
 
     /**
-     * Read parameters from XML database
+     * Read parameters from XML database.
      * @param[in] content GearDir to read from.
      */
     void readXMLData(const GearDir& content);
 
     /**
-     * Create endcap
-     * @param[in] iEndcap Number of endcap.
+     * Create endcap.
      * @param[in] mlv     Mother logical volume.
      */
-    void createEndcap(int iEndcap, G4LogicalVolume* mlv);
+    void createEndcap(G4LogicalVolume* mlv);
 
     /**
      * Create layer.
-     * @param[in] iLayer  Number of layer.
-     * @param[in] iEndcap Number of endcap.
      * @param[in] mpvgt   Mother physical volume with global transformation.
      */
-    void createLayer(int iLayer, int iEndcap, G4PVPlacementGT* mpvgt);
+    void createLayer(G4PVPlacementGT* mpvgt);
 
     /**
      * Create sector.
-     * @param[in] iSector Number of sector.
      * @param[in] mpvgt   Mother physical volume with global transformation.
      */
-    void createSector(int iSector, G4PVPlacementGT* mpvgt);
+    void createSector(G4PVPlacementGT* mpvgt);
 
     /**
-     * Create sector cover
+     * Create sector cover.
      * @param[in] iCover Number of cover.
      * @param[in] mpvgt  Mother physical volume with global transformation.
      */
@@ -331,27 +340,22 @@ namespace Belle2 {
     /**
      * Subtract board solids from planes.
      * @param[in] plane      Plane solid without boards subtracted.
-     * @param[in] iPlane     Plane number.
      * @param[in] Plane_name Plane name.
      */
     G4SubtractionSolid* subtractBoardSolids(G4SubtractionSolid* plane,
-                                            int iPlane, std::string Plane_Name);
+                                            std::string Plane_Name);
 
     /**
      * Create plane.
-     * @param[in] iPlane Number of plane.
      * @param[in] mpvgt  Mother physical volume with global transformation.
      */
-    void createPlane(int iPlane, G4PVPlacementGT* mpvgt);
+    void createPlane(G4PVPlacementGT* mpvgt);
 
     /**
      * Create readout board.
-     * @param[in] iPlane Number of plane.
-     * @param[in] iBoard Number of board.
      * @param[in] mpvgt  Mother physical volume with global transformation.
      */
-    void createSectionReadoutBoard(int iPlane, int iBoard,
-                                   G4PVPlacementGT* mpvgt);
+    void createSectionReadoutBoard(G4PVPlacementGT* mpvgt);
 
     /**
      * Create base board of section readout board.
@@ -369,12 +373,10 @@ namespace Belle2 {
     /**
      * Create section support.
      * @param[in] iSectionSupport Number of section support.
-     * @param[in] iPlane          Number of plane.
      * @param[in] mpvgt           Mother physical volume
      *                            with global transformation.
      */
-    void createSectionSupport(int iSectionSupport, int iPlane,
-                              G4PVPlacementGT* mpvgt);
+    void createSectionSupport(int iSectionSupport, G4PVPlacementGT* mpvgt);
 
     /**
      * Create plastic list element
@@ -387,38 +389,33 @@ namespace Belle2 {
 
     /**
      * Create strip volume (strip + SiPM).
-     * @param[in] iStrip Number of strip.
      * @param[in] mpvgt  Mother physical volume with global transformation.
      */
-    void createStripVolume(int iStrip, G4PVPlacementGT* mpvgt);
+    void createStripVolume(G4PVPlacementGT* mpvgt);
 
     /**
      * Create strip.
-     * @param[in] iStrip Number of strip.
      * @param[in] mpvgt  Mother physical volume with global transformation.
      */
-    void createStrip(int iStrip, G4PVPlacementGT* mpvgt);
+    void createStrip(G4PVPlacementGT* mpvgt);
 
     /**
      * Create strip groove.
-     * @param[in] iStrip Number of strip.
      * @param[in] mpvgt  Mother physical volume with global transformation.
      */
-    void createStripGroove(int iStrip, G4PVPlacementGT* mpvgt);
+    void createStripGroove(G4PVPlacementGT* mpvgt);
 
     /**
      * Create strip sensitive volume.
-     * @param[in] iStrip Number of strip.
      * @param[in] mpvgt  Mother physical volume with global transformation.
      */
-    void createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt);
+    void createStripSensitive(G4PVPlacementGT* mpvgt);
 
     /**
      * Create silicon cube in the place of SiPM for radiation study.
-     * @param[in] iStrip Number of strip.
      * @param[in] mpvgt  Mother physical volume with global transformation.
      */
-    void createSiPM(int iStrip, G4PVPlacementGT* mpvgt);
+    void createSiPM(G4PVPlacementGT* mpvgt);
 
     /**
      * Print mass of volume if m_mode == 2.
@@ -452,6 +449,9 @@ namespace Belle2 {
 
     /** Materials. */
     struct EKLMMaterials mat;
+
+    /** Current volumes. */
+    struct EKLMVolumeNumbers curvol;
 
     /** Number of layers. */
     int nLayer;

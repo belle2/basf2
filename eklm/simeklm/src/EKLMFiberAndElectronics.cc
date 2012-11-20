@@ -10,6 +10,7 @@
 
 #include <eklm/simeklm/EKLMFiberAndElectronics.h>
 #include <eklm/geoeklm/GeoEKLMBelleII.h>
+#include <eklm/geoeklm/EKLMTransformationFactory.h>
 
 #include "G4Box.hh"
 #include "TRandom.h"
@@ -24,13 +25,9 @@
 using namespace CLHEP;
 using namespace std;
 
-
 namespace Belle2 {
 
-
-
-
-  EKLMFiberAndElectronics::EKLMFiberAndElectronics(pair < const G4VPhysicalVolume*,
+  EKLMFiberAndElectronics::EKLMFiberAndElectronics(pair < int,
                                                    vector<EKLMSimHit*> >
                                                    entry)
   {
@@ -50,9 +47,9 @@ namespace Belle2 {
     m_meanSiPMNoise = Digitizer.getDouble("BackgroundPoissonMean");
     m_enableConstBkg = Digitizer.getDouble("EnableConstantBackgroundInTheFit");
 
-    m_stripName = &entry.first->GetName();
+    m_stripName = "Strip" + boost::lexical_cast<std::string>(entry.first);
 
-    m_histRange = m_nTimeDigitizationSteps *   m_timeDigitizationStep;
+    m_histRange = m_nTimeDigitizationSteps * m_timeDigitizationStep;
 
     // create histos
     m_digitizedAmplitudeDirect = new TH1D("digitizedAmplitudeDirect", "",
@@ -60,20 +57,20 @@ namespace Belle2 {
                                           m_histRange);
 
     m_digitizedAmplitudeDirect->SetNameTitle("digitizedAmplitudeDirect",
-                                             m_stripName->c_str());
+                                             m_stripName.c_str());
 
     m_digitizedAmplitudeReflected = new TH1D("digitizedAmplitudeReflected", "",
                                              m_nTimeDigitizationSteps, 0,
                                              m_histRange);
 
     m_digitizedAmplitudeReflected->SetNameTitle("digitizedAmplitudeReflected",
-                                                m_stripName->c_str());
+                                                m_stripName.c_str());
 
     m_digitizedAmplitude = new TH1D("digitizedAmplitude", "",
                                     m_nTimeDigitizationSteps, 0,
                                     m_histRange);
 
-    m_digitizedAmplitude->SetNameTitle("digitizedAmplitude", m_stripName->c_str());
+    m_digitizedAmplitude->SetNameTitle("digitizedAmplitude", m_stripName.c_str());
 
     // define fit function
     m_fitFunction = new TF1("fitFunction", EKLMSignalShapeFitFunction, 0, m_histRange, 5);
@@ -141,7 +138,7 @@ namespace Belle2 {
                           m_outputFilename +
                           string(" prefix. To switch it off change OutputFile parameter in EKLM.xml to void")).c_str();
       B2INFO(info);
-      string filename = m_outputFilename + *m_stripName +
+      string filename = m_outputFilename + m_stripName +
                         boost::lexical_cast<string>(gRandom->Integer(10000000)) + ".root";
       TFile* hfile = new TFile(filename.c_str(), "NEW");
       hfile->Append(m_digitizedAmplitudeDirect);
@@ -154,17 +151,13 @@ namespace Belle2 {
     }
   }
 
-
-  //***********************************************************
-
   void EKLMFiberAndElectronics::lightPropagationDistance(EKLMSimHit* sh)
   {
     // actually, it is not too safe to use GetConstituentSolid(0).
     // here we rely on the fact that the first child is a real strip G4box
     // similar problem appears in EKLMRecon.cc
-    G4Box* box = (G4Box*)(sh->getVolume()->GetLogicalVolume()->GetSolid()->GetConstituentSolid(0));
-    // Native Geant4 units are mm, here we account for that
-    double half_len = box->GetXHalfLength() * Unit::mm;
+    double half_len = 0.5 * (EKLMTransformationFactory::getInstance())->
+                      getStripLength(sh->getStrip()) * Unit::mm;
     double local_pos = sh->getLocalPosition()->x() ; // already in cm!!!
     m_hitDist = make_pair(half_len - local_pos, 3.0 * half_len + local_pos);
   }
@@ -262,12 +255,6 @@ namespace Belle2 {
   {
     return (int)m_fitResultsPtr;
   }
-
-
-
-  //----------------------------------------------------------
-
-
 
   double EKLMSignalShapeFitFunction(double* _x, double* par)
   {

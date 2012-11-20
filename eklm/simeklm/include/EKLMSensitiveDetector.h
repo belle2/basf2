@@ -58,10 +58,8 @@ namespace Belle2 {
 
     /**
      * Sensitive detector operation mode.
-     * 0 - normal operation
-     * 1 - bkg studies
      */
-    int m_mode;
+    enum EKLMDetectorMode m_mode;
 
   };
 

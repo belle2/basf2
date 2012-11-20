@@ -47,16 +47,16 @@ namespace Belle2 {
     ~EKLMSimHit() {};
 
     /**
-     * Get Geant physical volume.
-     * @return Physical volume.
+     * Get volume identifier.
+     * @return Identifier.
      */
-    const G4VPhysicalVolume* getVolume()  const;
+    int getVolumeID() const;
 
     /**
-     * Set Geant physical volume.
-     * @param[in] pv Physical volume.
+     * Set volume identifier.
+     * @param[in] id Identifier.
      */
-    void setVolume(const G4VPhysicalVolume* pv);
+    void setVolumeID(int id);
 
     /**
      * Get volume type (needed for background study mode).
@@ -68,7 +68,7 @@ namespace Belle2 {
      * Sets volume type (needed for background study mode).
      * @param[in] vt Volume type.
      */
-    void setVolType(int vt);
+    void setVolType(enum EKLMSensitiveType vt);
 
     /**
      * Get particle momentum.
@@ -92,7 +92,7 @@ namespace Belle2 {
      * Get particle energy.
      * @return Energy.
      */
-    double  getEnergy() const;
+    double getEnergy() const;
 
     /**
      * Set particle energy.
@@ -143,8 +143,8 @@ namespace Belle2 {
     /** Particle momentum. */
     TVector3 m_momentum;
 
-    /** Physical volume. */
-    const  G4VPhysicalVolume* m_pv; //! {ROOT streamer directive}
+    /** Volume identifier. */
+    int m_volid;
 
     /** Number of plane. */
     int m_Plane;
@@ -152,11 +152,8 @@ namespace Belle2 {
     /** Number of strip. */
     int m_Strip;
 
-    /** Name of the volume. */
-    std::string m_pvName;
-
     /** Volume type (for Background studies). */
-    int m_volType;
+    enum EKLMSensitiveType m_volType;
 
     /** Needed to make root object storable. */
     ClassDef(Belle2::EKLMSimHit, 1);

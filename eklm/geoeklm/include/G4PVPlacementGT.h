@@ -110,11 +110,6 @@ namespace Belle2 {
      */
     const std::string getName() const;
 
-    /**
-     * Get id hierarchy.
-     */
-    std::vector<int> getIdHistory() const;
-
   private:
 
     /**
@@ -132,20 +127,11 @@ namespace Belle2 {
     /** Sensitive detectior type. */
     enum EKLMSensitiveType m_type;
 
-    /**
-     * Name.
-     */
+    /** Name. */
     const std::string m_name;
 
-    /**
-     * Mother G4PVPlacementGT.
-     */
+    /** Mother G4PVPlacementGT. */
     const G4PVPlacementGT* m_mother;
-
-    /**
-     * ID hierarchy.
-     */
-    std::vector<int> m_idHistory;
 
   };
 

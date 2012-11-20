@@ -30,8 +30,7 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMFiberAndElectronics(std::pair < const G4VPhysicalVolume*,
-                            std::vector<EKLMSimHit*> >);
+    EKLMFiberAndElectronics(std::pair <int, std::vector<EKLMSimHit*> >);
 
     /**
      * Destructor.
@@ -87,10 +86,8 @@ namespace Belle2 {
      */
     std::pair<double, double> m_hitDist;
 
-    /**
-     * Name of the strip
-     */
-    const std::string* m_stripName;
+    /** Name of the strip. */
+    std::string m_stripName;
 
     /**
      * Filename prefix for files saved.
@@ -107,7 +104,6 @@ namespace Belle2 {
      * Should be accessible via XML.
      */
     int m_nTimeDigitizationSteps;
-
 
     /** ADC digitization step. */
     int m_timeDigitizationStep;

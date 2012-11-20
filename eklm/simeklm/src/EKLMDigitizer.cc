@@ -13,12 +13,10 @@
 
 #include <framework/logging/Logger.h>
 
-#include "G4VPhysicalVolume.hh"
 #include <eklm/geoeklm/G4PVPlacementGT.h>
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
-
 
 #include "G4Box.hh"
 #include <framework/gearbox/Unit.h>
@@ -39,14 +37,14 @@ namespace Belle2 {
     for (int i = 0; i < stepHitsArray.getEntries(); i++) {
 
       // search for entries of the same strip
-      map<const G4VPhysicalVolume*, vector<EKLMStepHit*> >::iterator
-      it = m_stepHitVolumeMap.find((stepHitsArray[i])->getVolume());
+      map<int, vector<EKLMStepHit*> >::iterator
+      it = m_stepHitVolumeMap.find((stepHitsArray[i])->getVolumeID());
 
       if (it == m_stepHitVolumeMap.end()) { //  new entry
         vector<EKLMStepHit*> *vectorHits =
           new vector<EKLMStepHit*> (1, (stepHitsArray[i]));
 
-        m_stepHitVolumeMap.insert(pair<const G4VPhysicalVolume*, vector<EKLMStepHit*> >((stepHitsArray[i])->getVolume(), *vectorHits));
+        m_stepHitVolumeMap.insert(pair<int, vector<EKLMStepHit*> >((stepHitsArray[i])->getVolumeID(), *vectorHits));
       } else {
         it->second.push_back(stepHitsArray[i]);
       }
@@ -64,7 +62,7 @@ namespace Belle2 {
 
 
     //loop over volumes
-    for (map<const G4VPhysicalVolume*, vector<EKLMStepHit*> >::iterator
+    for (map<int, vector<EKLMStepHit*> >::iterator
          volumeIterator = m_stepHitVolumeMap.begin();
          volumeIterator != m_stepHitVolumeMap.end(); volumeIterator++) {
 
@@ -198,14 +196,14 @@ namespace Belle2 {
     for (int i = 0; i < m_simHitsArray.getEntries(); i++) {
 
       // search for entries of the same strip
-      map<const G4VPhysicalVolume*, vector<EKLMSimHit*> >::iterator
-      it = m_HitStripMap.find((m_simHitsArray[i])->getVolume());
+      map<int, vector<EKLMSimHit*> >::iterator
+      it = m_HitStripMap.find((m_simHitsArray[i])->getVolumeID());
 
       if (it == m_HitStripMap.end()) { //  new entry
         vector<EKLMSimHit*> *vectorHits =
           new vector<EKLMSimHit*> (1, (m_simHitsArray[i]));
-        m_HitStripMap.insert(pair<const G4VPhysicalVolume*, vector<EKLMSimHit*> >
-                             ((m_simHitsArray[i])->getVolume(), *vectorHits));
+        m_HitStripMap.insert(pair<int, vector<EKLMSimHit*> >
+                             ((m_simHitsArray[i])->getVolumeID(), *vectorHits));
       } else {
         it->second.push_back(m_simHitsArray[i]);
       }
@@ -218,7 +216,7 @@ namespace Belle2 {
   //!  are simulated in EKLMFiberAndElectronics class
   void EKLMDigitizer::mergeSimHitsToStripHits(double threshold)
   {
-    for (map<const G4VPhysicalVolume*, vector<EKLMSimHit*> >::iterator it =
+    for (map<int, vector<EKLMSimHit*> >::iterator it =
            m_HitStripMap.begin(); it != m_HitStripMap.end(); it++) {
 
 

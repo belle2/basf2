@@ -22,9 +22,8 @@ EKLMSimHit::EKLMSimHit():
   EKLMHitBase(),
   m_energy(0.),
   m_momentum(TVector3(0., 0., 0.)),
-  m_pv(NULL),
-  m_pvName("not initialized"),
-  m_volType(0)
+  m_volid(0),
+  m_volType(EKLM_SENSITIVE_STRIP)
 {
 }
 
@@ -32,20 +31,19 @@ EKLMSimHit::EKLMSimHit(const EKLMStepHit* stepHit)
   : EKLMHitBase((EKLMHitBase)*stepHit),
     m_energy(stepHit->getEnergy()),
     m_momentum(*(stepHit->getMomentum())),
-    m_pv(stepHit->getVolume()),
-    m_pvName(m_pv->GetName()),
+    m_volid(stepHit->getVolumeID()),
     m_volType(stepHit->getVolumeType())
 {
 }
 
-const G4VPhysicalVolume* EKLMSimHit::getVolume() const
+int EKLMSimHit::getVolumeID() const
 {
-  return m_pv;
+  return m_volid;
 }
 
-void EKLMSimHit::setVolume(const G4VPhysicalVolume* pv)
+void EKLMSimHit::setVolumeID(int id)
 {
-  m_pv = pv;
+  m_volid = id;
 }
 
 bool  EKLMSimHit::getVolType() const
@@ -64,7 +62,7 @@ EKLMStripID EKLMSimHit::getID() const
   return str;
 }
 
-void EKLMSimHit::setVolType(int vt)
+void EKLMSimHit::setVolType(enum EKLMSensitiveType vt)
 {
   m_volType = vt;
 }

@@ -71,16 +71,16 @@ namespace Belle2 {
     void setNumberPhotoElectrons(double npe);
 
     /**
-     * Get physical volume.
-     * @return Geant physical volume.
+     * Get volume identifier.
+     * @return Identifier.
      */
-    const G4VPhysicalVolume* getVolume() const;
+    int getVolumeID() const;
 
     /**
-     * Set physical volume.
-     * @param[in] pv Geant physical volume.
+     * Set volume identifier.
+     * @param[in] id Identifier.
      */
-    void setVolume(const G4VPhysicalVolume* pv);
+    void setVolumeID(int id);
 
     /**
      * Whether hit could be used late (if it passed discriminator threshold)
@@ -186,8 +186,8 @@ namespace Belle2 {
     /** MC time shift. */
     double m_timeshift;
 
-    /** Physical volume (for simulation). */
-    const G4VPhysicalVolume* m_pv;   //! {ROOT streamer directive}
+    /** Volume identifier. */
+    int m_volid;
 
     /** Fit results object. */
     TFitResult m_fitResults;

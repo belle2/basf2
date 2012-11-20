@@ -12,8 +12,7 @@
 #define EKLMSTEPHIT_H
 
 #include <eklm/dataobjects/EKLMHitBase.h>
-
-class G4VPhysicalVolume;
+#include <eklm/geoeklm/G4PVPlacementGT.h>
 
 namespace Belle2 {
 
@@ -34,7 +33,7 @@ namespace Belle2 {
       m_momentum(0., 0., 0.),
       m_trackID(-1),
       m_parentTrackID(-1),
-      m_pv(0),
+      m_volid(0),
       m_Plane(0),
       m_Strip(0) {}
 
@@ -45,8 +44,7 @@ namespace Belle2 {
       const TVector3 momentum,
       const double E ,
       const int  trID,
-      const int  ptrID,
-      const G4VPhysicalVolume* pv
+      const int  ptrID
     );
 
     /**
@@ -67,7 +65,7 @@ namespace Belle2 {
       const double E ,
       const int  trID,
       const int  ptrID,
-      const G4VPhysicalVolume* pv
+      const int volID
     );
 
     virtual EKLMStripID getID() const;
@@ -133,28 +131,28 @@ namespace Belle2 {
     void setName(std::string& name);
 
     /**
-     * Get volume.
-     * @return Physical volume.
+     * Get volume identifier.
+     * @return Identifier.
      */
-    const G4VPhysicalVolume* getVolume()  const ;
+    int getVolumeID() const;
 
     /**
-     * Set Gean physical volume.
-     * @param[in] vol Physical volume.
+     * Set volume identifier.
+     * @param[in] id Identifier.
      */
-    void setVolume(const G4VPhysicalVolume* vol);
+    void setVolumeID(int id);
 
     /**
      * Get volume type.
      * @return Volume type.
      */
-    int  getVolumeType()  const ;
+    enum EKLMSensitiveType getVolumeType() const;
 
     /**
      * Set volume type.
      * @param[in] type Volume type.
      */
-    void setVolumeType(int type);
+    void setVolumeType(enum EKLMSensitiveType type);
 
     /**
      * Get plane number.
@@ -188,19 +186,14 @@ namespace Belle2 {
     /** Momentum of the hit. */
     TVector3 m_momentum;
 
-
     /** Track ID. */
     int m_trackID;
 
     /** Parent track ID. */
     int m_parentTrackID;
 
-    /**
-     * Physical volume.
-     * @details
-     * We do not want to  allow anyone to change the PV.
-     */
-    const G4VPhysicalVolume* m_pv;      //! {ROOT streamer directive}
+    /** Volume identifier. */
+    int m_volid;
 
     /** Number of plane. */
     int m_Plane;
@@ -208,11 +201,8 @@ namespace Belle2 {
     /** Number of strip. */
     int m_Strip;
 
-    /** Volume type: 0 --> stip, 1 --> SiPM , 2 --> ElectronicBoard. */
-    int m_volType;
-
-    /** Volume name */
-    std::string m_pvName;
+    /** Volume type. */
+    enum EKLMSensitiveType m_volType;
 
     /** The class title. */
     ClassDef(EKLMStepHit, 1);

@@ -26,7 +26,7 @@ EKLMDigit::EKLMDigit(const EKLMSimHit* hit)
     m_Strip(hit->getStrip()),
     m_NumberPhotoElectrons(-1),
     m_MCtime(hit->getTime()),
-    m_pv(hit->getVolume())
+    m_volid(hit->getVolumeID())
 {
 }
 
@@ -106,14 +106,14 @@ EKLMStripID EKLMDigit::getID() const
   return str;
 }
 
-const G4VPhysicalVolume* EKLMDigit::getVolume() const
+int EKLMDigit::getVolumeID() const
 {
-  return m_pv;
+  return m_volid;
 }
 
-void EKLMDigit::setVolume(const G4VPhysicalVolume* pv)
+void EKLMDigit::setVolumeID(int id)
 {
-  m_pv = pv;
+  m_volid = id;
 }
 
 void EKLMDigit::setMCTS(double ts)

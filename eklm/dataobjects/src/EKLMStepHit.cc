@@ -11,8 +11,6 @@
 #include <eklm/dataobjects/EKLMStepHit.h>
 #include <framework/logging/Logger.h>
 
-#include "G4VPhysicalVolume.hh"
-
 using namespace Belle2;
 using namespace std;
 
@@ -23,8 +21,7 @@ EKLMStepHit::EKLMStepHit(
   const TVector3 momentum,
   const double E ,
   const int  trID,
-  const int  ptrID,
-  const G4VPhysicalVolume* pv
+  const int  ptrID
 )
   :
   EKLMHitBase()
@@ -33,8 +30,6 @@ EKLMStepHit::EKLMStepHit(
   m_momentum = momentum;
   m_trackID = trID;
   m_parentTrackID = ptrID;
-  m_pv = pv;
-  m_pvName = pv->GetName();
 }
 
 
@@ -53,7 +48,7 @@ EKLMStepHit::EKLMStepHit(
   const double E ,
   const int  trID,
   const int  ptrID,
-  const G4VPhysicalVolume* pv
+  const int volID
 ) :
   EKLMHitBase(Endcap, Layer, Sector, PDG, Time, EDep, GlobalPosition,
               LocalPosition)
@@ -64,8 +59,7 @@ EKLMStepHit::EKLMStepHit(
   m_momentum = momentum;
   m_trackID = trID;
   m_parentTrackID = ptrID;
-  m_pv = pv;
-  m_pvName = pv->GetName();
+  m_volid = volID;
 }
 
 
@@ -110,16 +104,6 @@ void EKLMStepHit::setParentTrackID(int track)
   m_parentTrackID = track;
 }
 
-string EKLMStepHit::getName()  const
-{
-  return m_pvName;
-}
-
-void EKLMStepHit::setName(string& name)
-{
-  m_pvName = name;
-}
-
 EKLMStripID EKLMStepHit::getID() const
 {
   EKLMStripID str;
@@ -131,25 +115,23 @@ EKLMStripID EKLMStepHit::getID() const
   return str;
 }
 
-const G4VPhysicalVolume* EKLMStepHit::getVolume()  const
+int EKLMStepHit::getVolumeID() const
 {
-  return m_pv;
+  return m_volid;
 }
 
-void EKLMStepHit::setVolume(const G4VPhysicalVolume* vol)
+void EKLMStepHit::setVolumeID(int id)
 {
-  m_pv = vol;
+  m_volid = id;
 }
 
-int  EKLMStepHit::getVolumeType()  const
+enum EKLMSensitiveType EKLMStepHit::getVolumeType()  const
 {
   return m_volType;
 }
 
-void EKLMStepHit::setVolumeType(int type)
+void EKLMStepHit::setVolumeType(enum EKLMSensitiveType type)
 {
-  if (type != 0 && type != 1 && type != 2)
-    B2ERROR("Wrong Volume Type!");
   m_volType = type;
 }
 

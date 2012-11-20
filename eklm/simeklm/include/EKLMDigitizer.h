@@ -69,12 +69,10 @@ namespace Belle2 {
   private:
 
     /** Map for EKLMStepHit sorting according sensitive volumes. */
-    std::map<const G4VPhysicalVolume*, std::vector<EKLMStepHit*> >
-    m_stepHitVolumeMap;
+    std::map<int, std::vector<EKLMStepHit*> > m_stepHitVolumeMap;
 
     /** Map for hits sorting according strip name. */
-    std::map<const G4VPhysicalVolume*, std::vector<EKLMSimHit*> >
-    m_HitStripMap;
+    std::map<int, std::vector<EKLMSimHit*> > m_HitStripMap;
 
     /** Vector of EKLMDigits. */
     std::vector<EKLMDigit*> m_HitVector;

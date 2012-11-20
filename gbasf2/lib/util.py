@@ -101,7 +101,7 @@ def make_jdl(steering_file, repetitionOfJob, project, CPUTime, priority, lfns,
     f.write('    PilotType = "private";\n')
     f.write('    SystemConfig = ' + sysconfig + ';\n')
     if site != '':
-        if site not None:
+        if site is not None:
             f.write('    Site = ' + site + ';\n')
 #    f.write('    Requirements = Member("VO-belle-' + swver
 #            + '",other.GlueHostApplicationSoftwareRunTimeEnvironment);\n')

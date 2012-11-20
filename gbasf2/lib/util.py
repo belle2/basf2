@@ -201,6 +201,14 @@ def prepareProxy():
     if not dnList:
         print 'User %s has no DN defined!' % userName
         DIRAC.exit(1)
+    print proxyinfo['Value']
+    if ('hasVOMS' not in proxyinfo['Value'] or
+            not proxyinfo['Value']['hasVOMS']):
+        print 'ERROR: Proxy has no VOMS extensions. Please check using\n\
+        voms-proxy-init --voms belle that you are registered in the belle\n\
+        VOMS server. If not, follow the instructions on the wiki, or contact\n\
+        support: https://belle2.cc.kek.jp/redmine/projects/support/issues/new'
+        DIRAC.exit(1)
 
     # set path of proxy so  AMGA client picks it up
     os.environ['X509_USER_PROXY'] = proxyinfo['Value']['path']

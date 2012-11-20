@@ -1,0 +1,2 @@
+TUnixSystem::SetDisplay:0: RuntimeWarning: DISPLAY not set, setting it to :pts/62:S.1
+TClass::TClass:0: RuntimeWarning: no dictionary for class Belle2::DataStore::StoreEntry is available

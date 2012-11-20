@@ -10,19 +10,23 @@ from ROOT import Belle2
 
 
 class NoopModule(Module):
+
     """Doesn't do anything."""
 
     def __init__(self):
         """constructor."""
+
         super(NoopModule, self).__init__()
         self.setName('NoopModule')
 
 
 class TestModule(Module):
+
     """Test to read relations in the input files."""
 
     def __init__(self):
         """constructor."""
+
         super(TestModule, self).__init__()
         self.setName('TestModule')
 
@@ -31,14 +35,17 @@ class TestModule(Module):
 
         prints all from/to indices in the relation.
         """
+
         relationarray = Belle2.PyRelationArray('PXDTrueHitsToPXDSimHits')
         num_relations = relationarray.getEntries()
+        simhits = Belle2.PyStoreArray('PXDSimHits')
 
-        #count number of PXDSimHits pointed to
+        # count number of PXDSimHits pointed to
         for i in range(num_relations):
             rel = relationarray[i]
             for to in rel.getToIndices():
-                print "%s => %s" % (str(rel.getFromIndex()), str(to))
+                print '%s => %s (edep: %g)' % (str(rel.getFromIndex()),
+                        str(to), simhits[to].getEnergyDep())
 
 
 # copy input file into current dir to avoid having the full path in .out file
@@ -68,7 +75,6 @@ main.add_module(NoopModule())
 main.add_module(input)
 main.add_module(evtmetainfo)
 main.add_module(printcollections)
-
 
 main.add_module(TestModule())
 

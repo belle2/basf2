@@ -1,5 +1,7 @@
 #include <framework/datastore/PyStoreArray.h>
 
+#include <framework/datastore/DataStore.h>
+
 using namespace Belle2;
 
 ClassImp(PyStoreArray)
@@ -10,7 +12,7 @@ PyStoreArray::PyStoreArray(const std::string& name, int durability):
   const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(durability));
   DataStore::StoreObjConstIter iter = map.find(name);
   if ((iter != map.end()) && iter->second->isArray) {
-    m_storeArray = reinterpret_cast<TClonesArray**>(&(iter->second->ptr));
+    m_storeArray = reinterpret_cast<TClonesArray*>(iter->second->ptr);
   }
 }
 

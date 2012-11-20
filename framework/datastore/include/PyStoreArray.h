@@ -1,7 +1,7 @@
 #ifndef PYSTOREARRAY_H
 #define PYSTOREARRAY_H
 
-#include <framework/datastore/StoreArray.h>
+#include "TClonesArray.h"
 
 #include <string>
 
@@ -32,16 +32,16 @@ namespace Belle2 {
      *
      * Accessing the array's data is UNSAFE if this returns false.
      */
-    operator bool() const { return m_storeArray && *m_storeArray; }
+    operator bool() const { return m_storeArray; }
 
     /** returns object at index i, or null pointer if out of range */
-    TObject* operator [](int i) const {return (**m_storeArray)[i];}
+    TObject* operator [](int i) const {return (*m_storeArray)[i];}
 
     /** returns number of entries for current event. */
-    int getEntries() const { return (*m_storeArray)->GetEntriesFast(); }
+    int getEntries() const { return m_storeArray->GetEntriesFast(); }
 
   private:
-    TClonesArray** m_storeArray; /**< Pointer to pointer to array */
+    TClonesArray* m_storeArray; /**< Pointer to array */
 
     ClassDef(PyStoreArray, 0)
   };

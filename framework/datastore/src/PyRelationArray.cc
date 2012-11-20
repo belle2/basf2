@@ -1,5 +1,7 @@
 #include <framework/datastore/PyRelationArray.h>
 
+#include <framework/datastore/DataStore.h>
+
 using namespace Belle2;
 
 PyRelationArray::PyRelationArray(const std::string& name, int durability):
@@ -11,12 +13,12 @@ PyRelationArray::PyRelationArray(const std::string& name, int durability):
     return;
   }
 
-  m_relations = reinterpret_cast<RelationContainer**>(&iter->second->ptr);
+  m_relations = reinterpret_cast<RelationContainer*>(iter->second->ptr);
 
   //build index
-  if (*m_relations) {
-    for (int i = 0; i < (*m_relations)->getEntries(); i++) {
-      const RelationElement& relation = (*m_relations)->elements(i);
+  if (m_relations) {
+    for (int i = 0; i < m_relations->getEntries(); i++) {
+      const RelationElement& relation = m_relations->elements(i);
       const int from = relation.getFromIndex();
 
       if (m_toindicesMap.find(from) != m_toindicesMap.end()) {

@@ -18,7 +18,7 @@ namespace Belle2 {
   * \note While it is not possible to add objects/arrays to the data store, you
   *       can modify the contents of existing ones.
   */
-  class PyStoreArray : public TObject {
+  class PyStoreArray {
   public:
     /** constructor.
     * @param name Name of the entry to be accessed
@@ -42,8 +42,6 @@ namespace Belle2 {
 
   private:
     TClonesArray* m_storeArray; /**< Pointer to array */
-
-    ClassDef(PyStoreArray, 0)
   };
 }
 #endif

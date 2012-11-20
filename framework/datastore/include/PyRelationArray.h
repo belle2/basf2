@@ -3,8 +3,6 @@
 
 #include <framework/dataobjects/RelationContainer.h>
 
-#include "TObject.h"
-
 #include <string>
 #include <vector>
 #include <map>
@@ -27,7 +25,7 @@ namespace Belle2 {
     #do something with hit
      \endcode
    */
-  class PyRelationArray : public TObject {
+  class PyRelationArray {
   public:
     /** Constructor
     * @param name Name of the relation array
@@ -65,8 +63,6 @@ namespace Belle2 {
 
     /** maps from-index to to-indices */
     std::map<unsigned int, std::vector<unsigned int> > m_toindicesMap;
-
-    ClassDef(PyRelationArray, 0); /**< Build ROOT dictionary */
   };
 }
 #endif

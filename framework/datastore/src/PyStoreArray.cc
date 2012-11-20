@@ -4,8 +4,6 @@
 
 using namespace Belle2;
 
-ClassImp(PyStoreArray)
-
 PyStoreArray::PyStoreArray(const std::string& name, int durability):
   m_storeArray(0)
 {
@@ -15,4 +13,3 @@ PyStoreArray::PyStoreArray(const std::string& name, int durability):
     m_storeArray = reinterpret_cast<TClonesArray*>(iter->second->ptr);
   }
 }
-

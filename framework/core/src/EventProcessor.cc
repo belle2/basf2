@@ -162,7 +162,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent)
 {
   if (signal(SIGINT, signalHandler) == SIG_ERR) {
-    B2FATAL("Cannot setup signal handler\n");
+    B2FATAL("Cannot setup SIGINT signal handler\n");
   }
 #ifdef HAS_CALLGRIND
   CALLGRIND_ZERO_STATS;
@@ -243,7 +243,6 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
         previousEventMetaData = *eventMetaDataPtr;
 
       } else {
-
         //Check for a second master module
         if (eventMetaDataPtr && (*eventMetaDataPtr != previousEventMetaData)) {
           B2FATAL("Two master modules were discovered: " << m_master->getName()
@@ -251,6 +250,9 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
         }
       }
 
+      if (ctrl_c) {
+        endProcess = true;
+      }
       if (!endProcess) {
         //Check for a module condition, evaluate it and if it is true switch to a new path
         if (module->evalCondition()) {
@@ -268,7 +270,6 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
     currEvent++;
     if ((maxEvent > 0) && (currEvent >= maxEvent)) endProcess = true;
-    if (ctrl_c) endProcess = true;
     stats.stopGlobal(ModuleStatistics::c_Event);
   }
 #ifdef HAS_CALLGRIND

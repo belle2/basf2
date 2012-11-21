@@ -71,6 +71,8 @@ namespace Belle2 {
     /** Time of energy deposition */
     float m_globalTime;
 
+
+  public:
     /** Setter for Wire ID.
      *
      *  @param iCLayerID   number of layer with continuous counting method.

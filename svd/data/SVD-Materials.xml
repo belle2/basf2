@@ -41,7 +41,7 @@
   <Material name="SVD-KaptonPitchAdapter">
     <state>Solid</state>
     <Components>
-      <Material fraction="0.7886">SVD-KaptonClean</Material>
+      <Material fraction="0.7887">SVD-KaptonClean</Material>
       <Material fraction="0.1577">Cu</Material>
       <Material fraction="0.0410">Ni</Material>
       <Material fraction="0.0126">Au</Material>

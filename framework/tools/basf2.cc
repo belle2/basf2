@@ -84,8 +84,12 @@ void executePythonFile(const string& pythonFile)
 
 int main(int argc, char* argv[])
 {
-  //Variable declarations
-  string pythonFile;
+  //remove SIGPIPE handler set by ROOT which sometimes caused infinite loops
+  //See https://savannah.cern.ch/bugs/?97991
+  //default action is to abort
+  if (signal(SIGPIPE, SIG_DFL) == SIG_ERR) {
+    B2FATAL("Cannot remove SIGPIPE signal handler");
+  }
 
   //Check for the Belle2 environment variable
   char* belle2LocalDir = getenv("BELLE2_LOCAL_DIR");
@@ -119,6 +123,7 @@ int main(int argc, char* argv[])
 
   bool runInteractiveMode = true;
   vector<string> arguments;
+  string pythonFile;
 
   try {
     //---------------------------------------------------

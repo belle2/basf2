@@ -18,11 +18,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include "TDatabasePDG.h"
-
 #include <boost/python.hpp>
-#include <signal.h>
-
 
 using namespace std;
 using namespace boost::python;
@@ -81,12 +77,6 @@ PathPtr Framework::createPath() throw(PathManager::PathNotCreatedError)
 
 void Framework::process(PathPtr startPath, long maxEvent)
 {
-  //remove SIGPIPE handler set by ROOT which sometimes caused infinite loops
-  //See https://savannah.cern.ch/bugs/?97991
-  if (signal(SIGPIPE, SIG_DFL) == SIG_ERR) {
-    B2FATAL("Cannot setup signal handler");
-  }
-
   static bool already_executed = false;
   if (already_executed) {
     B2FATAL("You can only call process() once per steering file!")

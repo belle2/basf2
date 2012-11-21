@@ -9,6 +9,7 @@
 #include <TSystem.h>
 
 #include <iostream>
+#include <cstdlib>
 
 
 void plot(const TString &input_filename)
@@ -18,12 +19,16 @@ void plot(const TString &input_filename)
   TFile *f = new TFile(input_filename, "READ");
   if(!f) {
     std::cerr << "Couldn't read file!\n";
-    return;
+    exit(1);
   }
   TTree *tree = (TTree*)f->Get("tree");
   if(!tree) {
     std::cerr << "Couldn't find 'tree'!\n";
-    return;
+    exit(1);
+  }
+  if(tree->GetEntries() == 0 || tree->GetBranch("DedxTracks.m_p") == 0) {
+    std::cerr << "Input file doesn't contain dE/dx data, aborting!\n";
+    exit(1);
   }
 
   TFile *output_file = new TFile("dedx_curves.root", "RECREATE");

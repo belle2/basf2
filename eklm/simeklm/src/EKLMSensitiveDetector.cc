@@ -170,12 +170,13 @@ namespace Belle2 {
      */
     StoreArray<EKLMStepHit> stepHits;
     int hitNumber = stepHits->GetLast() + 1;
+    /*
+     * Memory allocation is performed by stepHits->AddrAt(), if necessary.
+     * If it fails, this function would not return.
+     * No further check is needed.
+     */
     EKLMStepHit* hit = new(stepHits->AddrAt(hitNumber))
     EKLMStepHit(momentumRoot, E, trackID, paretntTrackID);
-    if (hit == NULL) {
-      B2ERROR("EKLMSensitiveDetector.cc:: Memory allocation error. Cannot allocate hit in stepHitsArray");
-      return false;
-    }
     hit->setLocalPosition(&lposRoot);
     hit->setPosition(&gposRoot);
     hit->setEDep(eDep);
@@ -184,7 +185,7 @@ namespace Belle2 {
     hit->setEnergy(Ekin);
 
     /**
-     * Get information on mother volumes and store them to the hit
+     * Get information on mother volumes and store them to the hit.
      */
 
     const G4PVPlacementGT* pvgt = (G4PVPlacementGT*)pv;
@@ -227,48 +228,6 @@ namespace Belle2 {
     StoreArray<MCParticle> particles;
     RelationArray particleToStepHits(particles, stepHits);
     particleToStepHits.add(track.GetTrackID(), hitNumber);
-
-    /*
-
-    if (pvgt->getVolumeType() ==2 )
-      {
-    std::cerr<<"Type 2"<<std::endl;
-    return true;
-      }
-    if (pvgt->getVolumeType() >= 0) {
-      pvgt = pvgt->getMother();
-
-      if (hit->getVolumeType() == 0) { // Sensitive strip
-        pvgt = pvgt->getMother();
-      }
-      hit->setStrip(pvgt->getID()); // StripVolume ID for Strip and SiPM and BaseBoard ID for StripBoard
-
-      //     if (hit->getVolumeType() == 0 || hit->getVolumeType() == 1) { // Sensitive strip
-      // Sensitive strip
-      pvgt = pvgt->getMother();
-
-      hit->setPlane(pvgt->getID());  // Plane ID for Stripand and SiPM and SectionBoard ID for StripBoard
-
-      pvgt = pvgt->getMother();
-      hit->setSector(pvgt->getID()); // Sector ID
-
-      pvgt = pvgt->getMother();
-      hit->setLayer(pvgt->getID());  // Layer ID
-
-      pvgt = pvgt->getMother();
-      hit->setEndcap(pvgt->getID()); // Endcap ID
-
-    } else
-      B2ERROR("EKLMSensitiveDetector.cc:: Try to get hit information from insensitive volumes");
-    */
-
-
-
-    //     StoreArray<MCParticle> MCParticlesArray;
-    //     RelationArray particleToSimHitsRelation(MCParticlesArray, simHitsArray);
-    //     registerMCParticleRelation(particleToSimHitsRelation);
-    //     particleToSimHitsRelation.add(track.GetTrackID(),
-    //                                   simHitsArray.getEntries());
 
     return true;
   }

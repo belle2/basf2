@@ -16,6 +16,7 @@ evtmetainfo = register_module('EvtMetaInfo')
 # create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
+geometry.param('ExcludedComponents', ['EKLM'])
 
 # EvtGen to provide generic BB events
 evtgeninput = register_module('EvtGenInput')

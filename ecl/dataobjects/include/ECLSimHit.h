@@ -11,105 +11,112 @@
 #ifndef ECLSIMHIT_H
 #define ECLSIMHIT_H
 
-#include <TObject.h>
 #include <TVector3.h>
-
 #include <generators/dataobjects/SimHitBase.h>
 
 namespace Belle2 {
 
-  /**
-    * ClassSVDSimHit - Geant4 simulated hit for the ECL.
+  /** \addtogroup dataobjects
+   * @{
+   */
+
+  /** ClassECLSimHit - Geant4 simulated hit for the ECL.
     *
     * This class holds particle hit data from geant4 simulation. As the simulated
-    * hit classes are used to generate detector response, they contain _local_
-    * information.
+    * hit classes are used to generate detector response information.
+    * relation to MCParticle
+    * filled in ecl/simulation/src/SensitiveDetector.cc
     */
+
   class ECLSimHit : public SimHitBase {
-
-
-////namespace Belle2 {
-
-//  //! Example Detector
-////  class ECLSimHit : public TObject {
   public:
+    /** default constructor for ROOT */
+    ECLSimHit() {;}
 
-    //! The cell id of this hit.
-    int m_cellId;
-
-    //! The track id of this hit.
-    int m_trackId;
-
-    //! Particle PDG (can be one of secondaries).
-    int m_pdg;
-
-    //!  Flight time from IP.
-    double m_flightTime;
-
-    //! Deposited energy of this hit.
-    double m_edep;
-
-    //! The momentum of pre-step.
-    TVector3 m_momentum;
-
-    //! Position of pre-step.
-    TVector3 m_posIn;
-
-    //! The method to set cell id
+    /*! Set Cell ID
+     */
     void setCellId(int cellId) { m_cellId = cellId; }
 
-    //! The method to set track id
+    /*! Set Track ID
+     */
     void setTrackId(int trackId) { m_trackId = trackId; }
 
-    //! The method to set PDG code
+    /*! Set Particle PDG (can be one of secondaries)
+     */
     void setPDGCode(int pdg) { m_pdg = pdg; }
 
-
-    //! The method to set flight time
+    /*! Set Flight time from IP
+     */
     void setFlightTime(double flightTime) { m_flightTime = flightTime; }
 
-    //! The method to set deposited energy
+    /*! Set Deposit energy
+     */
     void setEnergyDep(double edep) { m_edep = edep; }
 
-    //! The method to set momentum
+    /*! Set Momentum
+     */
     void setMomentum(TVector3 momentum) { m_momentum = momentum; }
 
-
-    //! The method to set position of pre-step
+    /*! Set Position
+     */
     void setPosIn(TVector3 posIn) { m_posIn = posIn; }
 
 
-    //! The method to get cell id
+    /*! Get Cell ID
+     * @return Cell ID
+     */
     int getCellId() const { return m_cellId; }
 
-    //! The method to get track id
+    /*! Get Track ID
+     * @return Track ID
+     */
     int getTrackId() const { return m_trackId; }
 
-    //! The method to get PDG code
+    /*! Get Particle PDG (can be one of secondaries)
+     * @return Particle PDG (can be one of secondaries)
+     */
     int getPDGCode() const { return m_pdg; }
 
-
-    //! The method to get flight time
+    /*! Get Flight time from IP
+     * @return Flight time from IP
+     */
     double getFlightTime() const { return m_flightTime; }
 
-    //! The method to get deposited energy
+    /*! Get Deposit energy
+     * @return Deposit energy
+     */
     double getEnergyDep() const { return m_edep; }
 
-    //! The method to get momentum
+    /*! Get Momentum
+     * @return Momentum
+     */
     TVector3 getMomentum() const { return m_momentum; }
 
-    //! The method to get position
+    /*! Get Position
+     * @return Position
+     */
     TVector3 getPosIn() const { return m_posIn; }
 
-    //! Empty constructor
-    /*! Recommended for ROOT IO
-    */
-    ECLSimHit() {;}
+    /** Shift the SimHit in time (needed for beam background mixing)
+     * @param delta The value of the time shift.
+     */
+    void shiftInTime(float delta) {  m_flightTime += delta; }
+
+
+  private:
+    int m_cellId;            /**< Cell ID */
+    int m_trackId;           /**< Track ID */
+    int m_pdg;               /**< Particle PDG (can be one of secondaries) */
+    double m_flightTime;     /**< Flight time from IP */
+    double m_edep;           /**< Deposit energy */
+    TVector3 m_momentum;     /**< momentum */
+    TVector3 m_posIn;        /**< Position */
+
 
     ClassDef(ECLSimHit, 3);/**< the class title */
 
   };
-
+  /** @}*/
 } // end namespace Belle2
 
 #endif

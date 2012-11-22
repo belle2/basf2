@@ -32,7 +32,7 @@
 
 namespace Belle2 {
 
-  namespace generators {
+  namespace background {
 
     /**
      * This class represents a background generator (e.g. SAD_LER).

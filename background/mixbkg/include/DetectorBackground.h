@@ -13,7 +13,7 @@
 
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/logging/Logger.h>
-#include <generators/mixbkg/Component.h>
+#include <background/mixbkg/Component.h>
 
 #include <typeinfo>
 #include <string>
@@ -22,7 +22,7 @@
 
 namespace Belle2 {
 
-  namespace generators {
+  namespace background {
 
     /**
      * The base class for each subdetector background contribution.

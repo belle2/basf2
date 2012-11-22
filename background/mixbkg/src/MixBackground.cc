@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/mixbkg/MixBackground.h>
+#include <background/mixbkg/MixBackground.h>
 #include <framework/logging/Logger.h>
 
 #include <framework/datastore/DataStore.h>
@@ -29,7 +29,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace generators;
+using namespace background;
 
 
 MixBackground::~MixBackground()

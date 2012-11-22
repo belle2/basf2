@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/modules/mixbkg/EventRandomizerModule.h>
+#include <background/modules/mixbkg/EventRandomizerModule.h>
 #include <framework/core/InputController.h>
 
 using namespace Belle2;

@@ -13,7 +13,7 @@
 
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/logging/Logger.h>
-#include <generators/mixbkg/Generator.h>
+#include <background/mixbkg/Generator.h>
 
 #include <string>
 #include <map>
@@ -21,7 +21,7 @@
 
 namespace Belle2 {
 
-  namespace generators {
+  namespace background {
 
     /**
      * This class represents a background component (e.g. Touschek)

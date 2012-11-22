@@ -12,7 +12,7 @@
 #define MIXBKGMODULE_H
 
 #include <framework/core/Module.h>
-#include <generators/mixbkg/MixBackground.h>
+#include <background/mixbkg/MixBackground.h>
 
 #include <string>
 #include <vector>
@@ -60,7 +60,7 @@ namespace Belle2 {
     bool m_analysisMode; /**< Activates the analysis mode which stores all background MCParticles (+mothers) and background info in a separate collection. */
 
     //Variables
-    generators::MixBackground m_mixBackground; /**< The background mixing library.*/
+    background::MixBackground m_mixBackground; /**< The background mixing library.*/
 
   };
 

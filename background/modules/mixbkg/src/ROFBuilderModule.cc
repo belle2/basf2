@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/modules/mixbkg/ROFBuilderModule.h>
+#include <background/modules/mixbkg/ROFBuilderModule.h>
 
 #include <framework/core/InputController.h>
 #include <framework/gearbox/Unit.h>

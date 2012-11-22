@@ -11,14 +11,14 @@
 #ifndef MIXBACKGROUND_H
 #define MIXBACKGROUND_H
 
-#include <generators/mixbkg/DetectorBackground.h>
+#include <background/mixbkg/DetectorBackground.h>
 
 #include <string>
 #include <map>
 
 namespace Belle2 {
 
-  namespace generators {
+  namespace background {
 
     /**
      * The background mixing library.

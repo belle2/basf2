@@ -8,13 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/modules/mixbkg/MixBkgModule.h>
+#include <background/modules/mixbkg/MixBkgModule.h>
 
 #include <boost/format.hpp>
 
 using namespace std;
 using namespace Belle2;
-using namespace generators;
+using namespace background;
 
 //-----------------------------------------------------------------
 //                 Register the Module

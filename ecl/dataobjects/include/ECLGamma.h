@@ -23,25 +23,41 @@
 #include <TVector3.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
-  //! Example Detector
+  /*! Class to store ECL Gamma which are selected with criteria as Belle from ECL Shower
+   * relation to ECLShower
+   * filled in ecl/modules/eclRecGamma/src/ECLGammaReconstructorModule.cc
+   */
+
   class ECLGamma : public TObject {
   public:
+    /** default constructor for ROOT */
+    ECLGamma() {;}
 
-    /**shower id of this Gamma. */
-    int m_showerId;
+    /*! Set Shower ID
+     */
+    void setShowerId(int ShowerId) { m_ShowerId = ShowerId; }
 
-    //! The method to set showerId
-    void setShowerId(int showerId) { m_showerId = showerId; }
+    /*! Get Shower Id
+     * @return Shower Id
+     */
+    int GetShowerId() const { return m_ShowerId ; }
 
-    //! The method to get showerId
-    int GetShowerId() const { return m_showerId ; }
+    /*! Get Shower Id
+     * @return Shower Id
+     */
+    int getShowerId() const { return m_ShowerId ; }
 
-    //! The method to get return  TVector3 Momentum
+    /*! Get TVector3 Momentum reading ECLShower through ShowerId
+     * @return Momentum from ECLShower
+     */
     TVector3 getMomentum() const {
       TVector3 momentum(0., 0., 0.);
       StoreArray<ECLShower> eclRecShowerArray;
-      ECLShower* aECLShower = eclRecShowerArray[m_showerId];
+      ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
       double m_energy = aECLShower->GetEnergy();
       double m_theta = aECLShower->GetTheta();
       double m_phi = aECLShower->GetPhi();
@@ -55,10 +71,12 @@ namespace Belle2 {
       return momentum;
     }
 
-    //! The method to get return  px Momentum
+    /*! Get px Momentum reading ECLShower through ShowerId
+     * @return px Momentum from ECLShower
+     */
     float getPx() const {
       StoreArray<ECLShower> eclRecShowerArray;
-      ECLShower* aECLShower = eclRecShowerArray[m_showerId];
+      ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
       double m_energy = aECLShower->GetEnergy();
       double m_theta = aECLShower->GetTheta();
       double m_phi = aECLShower->GetPhi();
@@ -67,10 +85,12 @@ namespace Belle2 {
     }
 
 
-    //! The method to get return py Momentum
+    /*! Get py Momentum reading ECLShower through ShowerId
+     * @return py Momentum from ECLShower
+     */
     float getPy() const {
       StoreArray<ECLShower> eclRecShowerArray;
-      ECLShower* aECLShower = eclRecShowerArray[m_showerId];
+      ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
       double m_energy = aECLShower->GetEnergy();
       double m_theta = aECLShower->GetTheta();
       double m_phi = aECLShower->GetPhi();
@@ -78,10 +98,12 @@ namespace Belle2 {
       return (float)m_py;
     }
 
-    //! The method to get return pz Momentum
+    /*! Get pz Momentum reading ECLShower through ShowerId
+     * @return pz Momentum from ECLShower
+     */
     float getPz() const {
       StoreArray<ECLShower> eclRecShowerArray;
-      ECLShower* aECLShower = eclRecShowerArray[m_showerId];
+      ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
       double m_energy = aECLShower->GetEnergy();
       double m_theta = aECLShower->GetTheta();
       double m_pz = m_energy * cos(m_theta);
@@ -89,16 +111,21 @@ namespace Belle2 {
       return (float)m_pz;
     }
 
-    //! The method to get return  Momentum
+    /*! Get Energy by reading ECLShower through ShowerId
+     * @return Momentum from ECLShower
+     */
     float getEnergy() const {
       TVector3 momentum(0., 0., 0.);
       StoreArray<ECLShower> eclRecShowerArray;
-      ECLShower* aECLShower = eclRecShowerArray[m_showerId];
+      ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
       double m_energy = aECLShower->GetEnergy();
       return (float)m_energy;
     }
 
     //! The method to get return TMatrixT  4 Momentum Error Matrix
+    /*! Get  TMatrixT  4 Momentum Error Matrix by reading ECLShower through ShowerId
+     * @return Matrix which from convertion from Error E, Theta, Phi of ECLShower
+     */
     TMatrixT<double> getErrorMatrix() const {
       TMatrixT<double> m_errorMatrix;
       for (int i = 0; i < 4; i++) {
@@ -108,7 +135,7 @@ namespace Belle2 {
       }
 
       StoreArray<ECLShower> eclRecShowerArray;
-      ECLShower* aECLShower = eclRecShowerArray[m_showerId];
+      ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
       double EnergyError = aECLShower->GetEnergyError();
       double ThetaError = aECLShower->GetThetaError();
       double PhiError = aECLShower->GetPhiError();
@@ -157,15 +184,15 @@ namespace Belle2 {
       return m_errorMatrix;
     }
 
-    //! Empty constructor
-    /*! Recommended for ROOT IO
-    */
-    ECLGamma() {;}
-    /** ROOT Macro.*/
-    ClassDef(ECLGamma, 1);
+
+
+
+  private:
+    int m_ShowerId;        /**< shower id of this Gamma */
+    ClassDef(ECLGamma, 1); /**< ClassDef  */
 
   };
-
+  /** @}*/
 } // end namespace Belle2
 
 #endif

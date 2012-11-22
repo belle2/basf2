@@ -35,82 +35,92 @@ namespace Belle2 {
 
     /*! Set Cell ID
      */
-    void setCellId(int cellId) { m_cellId = cellId; }
+    void setCellId(int CellId) { m_CellId = CellId; }
 
     /*! Set Track ID
      */
-    void setTrackId(int trackId) { m_trackId = trackId; }
+    void setTrackId(int TrackId) { m_TrackId = TrackId; }
 
     /*! Set Particle PDG (can be one of secondaries)
      */
-    void setPDGCode(int pdg) { m_pdg = pdg; }
+    void setPDGCode(int Pdg) { m_Pdg = Pdg; }
 
     /*! Set Flight time from IP
      */
-    void setFlightTime(double flightTime) { m_flightTime = flightTime; }
+    void setFlightTime(double FlightTime) { m_FlightTime = (float) FlightTime; }
 
     /*! Set Deposit energy
      */
-    void setEnergyDep(double edep) { m_edep = edep; }
+    void setEnergyDep(double Edep) { m_Edep = (float) Edep; }
 
     /*! Set Momentum
      */
-    void setMomentum(TVector3 momentum) { m_momentum = momentum; }
+    void setMomentum(TVector3 Momentum) { m_Momentum = Momentum; }
 
     /*! Set Position
      */
-    void setPosIn(TVector3 posIn) { m_posIn = posIn; }
+    void setPosIn(TVector3 Position) { m_Position = Position; }
+
+    /*! Set Position
+     */
+    void setPosition(TVector3 Position) { m_Position = Position; }
 
 
     /*! Get Cell ID
      * @return Cell ID
      */
-    int getCellId() const { return m_cellId; }
+    int getCellId() const { return m_CellId; }
 
     /*! Get Track ID
      * @return Track ID
      */
-    int getTrackId() const { return m_trackId; }
+    int getTrackId() const { return m_TrackId; }
 
     /*! Get Particle PDG (can be one of secondaries)
      * @return Particle PDG (can be one of secondaries)
      */
-    int getPDGCode() const { return m_pdg; }
+    int getPDGCode() const { return m_Pdg; }
 
     /*! Get Flight time from IP
      * @return Flight time from IP
      */
-    double getFlightTime() const { return m_flightTime; }
+    double getFlightTime() const { return (double)m_FlightTime; }
 
     /*! Get Deposit energy
      * @return Deposit energy
      */
-    double getEnergyDep() const { return m_edep; }
+    double getEnergyDep() const { return (double) m_Edep; }
 
     /*! Get Momentum
      * @return Momentum
      */
-    TVector3 getMomentum() const { return m_momentum; }
+    TVector3 getMomentum() const { return m_Momentum; }
 
     /*! Get Position
      * @return Position
      */
-    TVector3 getPosIn() const { return m_posIn; }
+    TVector3 getPosIn() const { return m_Position; }
+
+    /*! Get Position
+     * @return Position
+     */
+    TVector3 getPosition() const { return m_Position; }
+
 
     /** Shift the SimHit in time (needed for beam background mixing)
      * @param delta The value of the time shift.
      */
-    void shiftInTime(float delta) {  m_flightTime += delta; }
+    void shiftInTime(float delta) {  m_FlightTime += delta; }
 
 
   private:
-    int m_cellId;            /**< Cell ID */
-    int m_trackId;           /**< Track ID */
-    int m_pdg;               /**< Particle PDG (can be one of secondaries) */
-    double m_flightTime;     /**< Flight time from IP */
-    double m_edep;           /**< Deposit energy */
-    TVector3 m_momentum;     /**< momentum */
-    TVector3 m_posIn;        /**< Position */
+    int m_CellId;            /**< Cell ID */
+    int m_TrackId;           /**< Track ID */
+    int m_Pdg;               /**< Particle PDG (can be one of secondaries) */
+    float m_FlightTime;      /**< Flight time from IP */
+    float m_Edep;            /**< Deposit energy */
+    TVector3 m_Momentum;     /**< Momentum */
+    TVector3 m_Position;        /**< Position */
 
 
     ClassDef(ECLSimHit, 3);/**< the class title */

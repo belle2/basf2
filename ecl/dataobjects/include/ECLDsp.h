@@ -11,52 +11,53 @@
 #ifndef ECLDSP_H
 #define ECLDSP_H
 
-//#include <framework/datastore/DataStore.h>
-
 #include <TObject.h>
-#include <TVector3.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
-  //! Example Detector
+  /*! Class to store ECL simulated rawdata of Dsp array for fit
+   *  before digitization fit (output of ECLDsp)
+   * relation to ECLHit
+   * filled in ecl/modules/eclDigitizer/src/ECLDigitizerModule.cc
+   */
+
   class ECLDsp : public TObject {
   public:
+    /** default constructor for ROOT */
+    ECLDsp() {;}
 
+    /*! Set Cell ID
+     */
+    void setCellId(int CellId) { m_CellId = CellId; }
 
-
-    //! The cell id of this hit.
-    int m_cellId;
-
-    //!  Fit Dsp Array  of this hit.
-    int m_DspA[31];
-
-    //! The method to set cell id
-    void setCellId(int cellId) { m_cellId = cellId; }
-
-    //! The method to set  m_DspArray
-
+    /*! Set Dsp array
+     */
     void setDspA(int  DspArray[31]) { for (int i = 0; i < 31; i++) { m_DspA[i] = DspArray[i];} }
 
 
-    //! The method to get cell id
-    int getCellId() const { return m_cellId; }
+    /*! Get Cell ID
+     * @return cell ID
+     */
+    int getCellId() const { return m_CellId; }
 
-    //! The method to getDspArray
+    /*! Get Dsp Array
+     * @return Dsp Array 0~31
+     */
     void getDspA(int  DspArray[31]) const { for (int i = 0; i < 31; i++) {  DspArray[i] = m_DspA[i] ;} }
 
 
+  private:
 
+    int m_CellId;      /**< Cell ID */
+    int m_DspA[31];    /**< Dsp Array 0~31 for fit   */
 
-    //! Empty constructor
-    /*! Recommended for ROOT IO
-    */
-    ECLDsp() {;}
-
-
-    ClassDef(ECLDsp, 1);/**< the class title */
+    ClassDef(ECLDsp, 1);/**< ClassDef */
 
   };
-
+  /** @}*/
 } // end namespace Belle2
 
 #endif

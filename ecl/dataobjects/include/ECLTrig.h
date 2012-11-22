@@ -11,44 +11,49 @@
 #ifndef ECLTRIG_H
 #define ECLTRIG_H
 
-#include <framework/datastore/DataStore.h>
-
+#include <TObject.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
-  //! Example Detector
+  /*! Class to store ECLTrig, still need to be study
+   * relation to ECLHit
+   * filled in ecl/modules/eclDigitizer/src/ECLDigitizerModule.cc
+   */
+
   class ECLTrig : public TObject {
   public:
-
-
-    //! The cell id of this hit.
-    int m_cellId;
-
-    //!  Fit time of this hit.
-    double m_TimeTrig;
-
-    //! The method to set cell id
-    void setCellId(int cellId) { m_cellId = cellId; }
-
-    //! The method to get Fitt time
-    void setTimeTrig(double TimeTrig) { m_TimeTrig = TimeTrig; }
-
-    //! The method to get cell id
-    int getCellId() const { return m_cellId; }
-
-    //! The method to get Fit time
-    double getTimeTrig() const { return m_TimeTrig; }
-
-
-    //! Empty constructor
-    /*! Recommended for ROOT IO
-    */
+    /** default constructor for ROOT */
     ECLTrig() {;}
 
-    ClassDef(ECLTrig, 1);/**< the class title */
+
+    /*! Set  Cell ID
+     */
+    void setCellId(int CellId) { m_CellId = CellId; }
+    /*! Set Trig Time
+     */
+    void setTimeTrig(double TimeTrig) { m_TimeTrig = TimeTrig; }
+    /*! Get Cell ID
+     * @return cell ID
+     */
+    int getCellId() const { return m_CellId; }
+
+    /*! Get Trig Time
+     * @return Trig Time
+     */
+    double getTimeTrig() const { return m_TimeTrig; }
+
+  private:
+    int m_CellId;      /**< Cell ID */
+    double m_TimeTrig; /**< Trig Time */
+
+
+    ClassDef(ECLTrig, 1);/**< ClassDef */
 
   };
-
+  /** @}*/
 } // end namespace Belle2
 
 #endif

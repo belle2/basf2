@@ -184,7 +184,7 @@ void ECLMCMatchingModule::event()
   const int hANum = eclHitAssignmentArray->GetEntriesFast();
   for (int iShower = 0; iShower < ShowerNum; iShower++) {
     ECLShower* aECLShower = eclRecShowerArray[iShower];
-    double showerId = aECLShower->GetShowerId();
+    double showerId = aECLShower->getShowerId();
     for (int iHA = 0; iHA < hANum; iHA++) {
       ECLHitAssignment* aECLHitAssignment = eclHitAssignmentArray[iHA];
       int m_HAShowerId = aECLHitAssignment->getShowerId();
@@ -225,8 +225,8 @@ void ECLMCMatchingModule::event()
           eclShowerToMCPart.add(ShowerIndex, eclDigiToMCPart[index].getToIndex(iMCpart));
           // ECLShower* aECLShower = eclRecShowerArray[ShowerIndex];
           // cout << "Event" << m_nEvent  << " RecShower" << ShowerIndex
-          //      << " Energy " <<  aECLShower->GetEnergy()
-          //      << " theta " <<  aECLShower->GetTheta() * 180 / M_PI << " phi " <<  aECLShower->GetPhi() * 180 / M_PI
+          //      << " Energy " <<  aECLShower->getEnergy()
+          //      << " theta " <<  aECLShower->getTheta() * 180 / M_PI << " phi " <<  aECLShower->getPhi() * 180 / M_PI
           //      << " mom" << eclDigiToMCPart[index].getToIndex(iMCpart)
           //      << " PDG " << mcParticles[eclDigiToMCPart[index].getToIndex(iMCpart)]->getPDG()
           //      << endl;
@@ -248,8 +248,8 @@ void ECLMCMatchingModule::event()
              for (int iMCpart = 0; iMCpart < (int)eclShowerToMCPart[index].getToIndices().size(); iMCpart++) {
               ECLShower* aECLShower = eclRecShowerArray[ eclGammaToShower[iIndex].getToIndex(iHit) ];
               cout << "Event " << m_nEvent << " Rec Gamma from shower" << eclShowerToMCPart[index].getFromIndex()
-                   << " Energy " <<  aECLShower->GetEnergy()
-                   << " theta " <<  aECLShower->GetTheta() * 180 / M_PI << " phi " <<  aECLShower->GetPhi() * 180 / M_PI
+                   << " Energy " <<  aECLShower->getEnergy()
+                   << " theta " <<  aECLShower->getTheta() * 180 / M_PI << " phi " <<  aECLShower->getPhi() * 180 / M_PI
                    << " From primary track" <<  eclShowerToMCPart[index].getToIndex(iMCpart)
                    << " PDG " << mcParticles[ eclShowerToMCPart[index].getToIndex(iMCpart)]->getPDG()
                    << endl;
@@ -270,8 +270,8 @@ void ECLMCMatchingModule::event()
              for (int iMCpart = 0; iMCpart < (int)eclShowerToMCPart[index].getToIndices().size(); iMCpart++) {
               ECLShower* aECLShower = eclRecShowerArray[ eclPi0ToShower[iIndex].getToIndex(iHit) ];
               cout << "Event" << m_nEvent << " Rec Pi0 from shower" << eclShowerToMCPart[index].getFromIndex()
-                   << " Energy " <<  aECLShower->GetEnergy()
-                   << " theta " <<  aECLShower->GetTheta() * 180 / M_PI << " phi " <<  aECLShower->GetPhi() * 180 / M_PI
+                   << " Energy " <<  aECLShower->getEnergy()
+                   << " theta " <<  aECLShower->getTheta() * 180 / M_PI << " phi " <<  aECLShower->getPhi() * 180 / M_PI
                    << " From primary track" <<  eclShowerToMCPart[index].getToIndex(iMCpart)
                    << " PDG " << mcParticles[ eclShowerToMCPart[index].getToIndex(iMCpart)]->getPDG()
                    << endl;

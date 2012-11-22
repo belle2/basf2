@@ -11,66 +11,75 @@
 #ifndef ECLDIGIT_H
 #define ECLDIGIT_H
 
-#include <framework/datastore/DataStore.h>
-
 #include <TObject.h>
-#include <TVector3.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
-  //! Example Detector
+  /*! Class to store ECL digitized hits (output of ECLDigi)
+   * relation to ECLHit
+   * filled in ecl/modules/eclDigitizer/src/ECLDigitizerModule.cc
+   */
+
   class ECLDigit : public TObject {
   public:
+    /** default constructor for ROOT */
+    ECLDigit() {;}
 
-    //! The cell id of this hit.
-    int m_cellId;
+    /*! Set  Cell ID
+     */
+    void setCellId(int CellId) { m_CellId = CellId; }
 
-    //! Deposited energy of this hit.
-    int m_Amp;
-
-    //!  Fit time of this hit.
-    int m_TimeFit;
-
-    //!  Fit Quality of this hit.
-    int m_Quality;
-
-
-    //! The method to set cell id
-    void setCellId(int cellId) { m_cellId = cellId; }
-
-    //! The method to set Fit deposited energy
+    /*! Set Fitting Amplitude
+     */
     void setAmp(int Amp) { m_Amp = Amp; }
 
-    //! The method to get Fitt time
+
+    /*! Set Fitting Time
+     */
     void setTimeFit(int TimeFit) { m_TimeFit = TimeFit; }
 
-    //! The method to get  Fit Quality
+
+    /*! Set Fitting Quality
+     */
     void setQuality(int Quality) { m_Quality = Quality; }
 
 
-    //! The method to get cell id
-    int getCellId() const { return m_cellId; }
+    /*! Get Cell ID
+     * @return cell ID
+     */
+    int getCellId() const { return m_CellId; }
 
-    //! The method to get Fit deposited energy
+
+    /*! Get Fitting Amplitude
+     * @return Fitting Amplitude
+     */
     int getAmp() const { return m_Amp; }
 
-    //! The method to get Fit time
+    /*! Get Fitting Time
+     * @return Fitting Time
+     */
     int getTimeFit() const { return m_TimeFit; }
 
-    //! The method to get Fit Quality
+    /*! Get Fitting Quality
+     * @return Fitting Quality
+     */
     int getQuality() const { return m_Quality; }
 
+  private:
+
+    int m_CellId;      /**< Cell ID */
+    int m_Amp;         /**< Fitting Amplitude */
+    int m_TimeFit;     /**< Fitting Time */
+    int m_Quality;     /**< Fitting Quality */
 
 
-    //! Empty constructor
-    /*! Recommended for ROOT IO
-    */
-    ECLDigit() {;}
-
-    ClassDef(ECLDigit, 1);/**< the class title */
+    ClassDef(ECLDigit, 1);/**< ClassDef */
 
   };
-
+  /** @}*/
 } // end namespace Belle2
 
 #endif

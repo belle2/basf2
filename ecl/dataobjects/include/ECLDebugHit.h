@@ -11,66 +11,69 @@
 #ifndef ECLDEBUGHIT_H
 #define ECLDEBUGHIT_H
 
-#include <framework/datastore/DataStore.h>
-
 #include <TObject.h>
-#include <TVector3.h>
-
-#include <generators/dataobjects/SimHitBase.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
-  /**
-    * ClassECLDebugHit - Geant4 simulated hit for the ECL.
-    *
-    * This class holds particle hit data from geant4 simulation. As the simulated
-    * hit classes are used to generate detector response, they contain _local_
-    * information.
-    */
+  /*! Class to store the average of ECLSimHit  on crystals for debug only
+   * input for digitization module (ECLDigitizer).
+   * relation to MCParticle
+   * filled in ecl/simulation/src/SensitiveDetector.cc
+   */
+
   class ECLDebugHit : public TObject {
-
   public:
+    /** default constructor for ROOT */
+    ECLDebugHit() {;}
 
-
-    //! The cell id of this hit.
-    int m_cellId;
-
-    //! Deposited energy of this hit.
-    double m_edep;
-
-    //! Hit average time
-    double m_TimeAve;
-
-    //! The method to set cell id
+    /*! Set  Cell ID
+     */
     void setCellId(int cellId) { m_cellId = cellId; }
 
-    //! The method to set deposited energy
-    void setEnergyDep(double edep) { m_edep = edep; }
+    /*! Set deposit energy
+     */
+    void setEnergyDep(double Edep) { m_Edep = (float) Edep; }
 
-    //! The method to set hit average time
-    void setTimeAve(double TimeAve) { m_TimeAve = TimeAve; }
+    /*! Set  average time
+     */
+    void setTimeAve(double TimeAve) { m_TimeAve = (float)TimeAve; }
 
-    //! The method to get cell id
+
+    /*! Get Cell ID
+     * @return cell ID
+     */
     int getCellId() const { return m_cellId; }
 
-    //! The method to get deposited energy
-    double getEnergyDep() const { return m_edep; }
+    /*! Get deposit energy
+     * @return deposit energy
+     */
+    double getEnergyDep() const { return (double) m_Edep; }
 
-    //! The method to get hit average time
-    double getTimeAve() const {return m_TimeAve;}
+    /*! Get average time
+     * @return deposit energy
+     */
+    double getTimeAve() const {return (double) m_TimeAve;}
+
+    /** Shift the Hit in time (needed for beam background mixing)
+     * @param delta The value of the time shift.
+     */
+    void shiftInTime(float delta) {  m_TimeAve += delta; }
 
 
+  private:
 
+    int m_cellId;      /**< Cell ID */
+    float m_Edep;      /**< deposited energy */
+    float m_TimeAve;   /**< average time */
 
-    //! Empty constructor
-    /*! Recommended for ROOT IO
-    */
-    ECLDebugHit() {;}
-    /** ROOT Macro.*/
-    ClassDef(ECLDebugHit, 1);
+    ClassDef(ECLDebugHit, 1); /**< ClassDef */
 
   };
 
+  /** @}*/
 } // end namespace Belle2
 
 #endif

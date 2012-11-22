@@ -11,117 +11,221 @@
 #ifndef ECLSHOWER_H
 #define ECLSHOWER_H
 
-#include <framework/datastore/DataStore.h>
-
 #include <TObject.h>
 #include <TVector3.h>
 #include <math.h>
-namespace Belle2 {
 
-  //! Example Detector
+namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
+
+  /*! Class to store ECL Showers which are reconstructed from ECLDigit as Belle method
+   * relation to ECLDigit
+   * filled in ecl/modules/eclRecShower/src/ECLReconstructorModule.cc
+   */
+
   class ECLShower : public TObject {
   public:
-    /**shower id of this shower. */
-    int m_showerId;
-    /**Energy of this shower. */
-    float m_Energy;
-    /**Theta of this shower. */
-    float m_Theta;
-    /**Phi of this shower. */
-    float m_Phi;
-    /**Distance of this shower. */
-    float m_R;
-    /**Error of E, theta, phi for this shower. */
-    float m_Error[3];
-    /**Mass of this shower. */
-    float m_Mass;
-    /**Width of this shower. */
-    float m_Width;
-    /**E9oE25 of this shower. */
-    float m_E9oE25;
-    /**E9oE25unf of this shower. */
-    float m_E9oE25unf;
-    /**NHits of this shower. */
-    float m_NHits;
-    /**Status of this shower. */
-    int m_Status;
-    /**Grade of this shower. */
-    int m_Grade;
-    /**EUncEnergy of this shower. */
-    float m_UncEnergy;
-    /**Time of this shower. */
-    float m_Time;
+    /** default constructor for ROOT */
+    ECLShower() {;}
 
 
-    //! The method to set showerId
-    void setShowerId(int showerId) { m_showerId = showerId; }
-    //! The method to set Energy
+    /*! Set Shower ID
+     */
+    void setShowerId(int ShowerId) { m_ShowerId = ShowerId; }
+    /*! Set Energy
+     */
     void setEnergy(float Energy) { m_Energy = Energy; }
-    //! The method to set Theta
+    /*! Set Theta (rad)
+     */
     void setTheta(float Theta) { m_Theta = Theta; }
-    //! The method to set Phi
+    /*! Set Phi (rad)
+     */
     void setPhi(float Phi) { m_Phi = Phi; }
-    //! The method to set Distance
+    /*! Set R
+     */
     void setR(float R) { m_R = R; }
-    //! The method to set Error  E, theta, phi
+    /*! Set  Error of E, theta, phi
+     */
     void setError(float  ErrorArray[3]) { for (int i = 0; i < 3; i++) { m_Error[i] = ErrorArray[i];} }
-    //! The method to set Mass
+    /*! Set Mass
+     */
     void setMass(float Mass) { m_Mass = Mass; }
-    //! The method to set Width
+    /*! Set Width
+     */
     void setWidth(float Width) { m_Width = Width; }
-    //! The method to set E9oE25
+    /*! Set E9oE25
+     */
     void setE9oE25(float E9oE25) { m_E9oE25 = E9oE25; }
-    //! The method to set E9oE25unf
+    /*! Set E9oE25unf
+     */
     void setE9oE25unf(float E9oE25unf) { m_E9oE25unf = E9oE25unf; }
-    //! The method to set NHits
+    /*! Set NHits
+     */
     void setNHits(float NHits) { m_NHits = NHits; }
-    //! The method to set Status
+    /*! Set Status
+     */
     void setStatus(int Status) { m_Status = Status; }
-    //! The method to set Grade
+    /*! Set Grade
+     */
     void setGrade(int Grade) { m_Grade = Grade ; }
-    //! The method to set m_UncEnergy
+    /*! Set UncEnergy
+     */
     void setUncEnergy(float UncEnergy) { m_UncEnergy = UncEnergy; }
-    //! The method to set m_Time
+    /*! Set Time
+     */
     void setTime(float Time) { m_Time = Time; }
 
-    //! The method to get showerId
-    int GetShowerId() const { return m_showerId ; }
-    //! The method to get Energy
+    /*! Get Shower Id
+     * @return Shower Id
+     */
+    int GetShowerId() const { return m_ShowerId ; }
+    /*! Get Energy
+     * @return Energy
+     */
     float GetEnergy() const { return m_Energy ; }
-    //! The method to get Theta
+    /*! Get Theta
+     * @return Theta
+     */
     float GetTheta() const { return m_Theta ; }
-    //! The method to get Phi
+    /*! Get Phi
+     * @return Phi
+     */
     float GetPhi() const { return m_Phi ; }
-    //! The method to get Distance
+    /*! Get R
+     * @return R
+     */
     float GetR() const { return m_R ; }
-    //! The method to get Error E, theta, phi
+    /*! Get Error of E, theta, phi
+     * @return Error E, theta, phi
+     */
     void GetError(float  ErrorArray[3]) { for (int i = 0; i < 3; i++) { ErrorArray[i] = m_Error[i] ;} }
-    //! The method to get Error E
+    /*! Get Error of Energy
+     * @return Error of Energy
+     */
     float GetEnergyError() { return m_Error[0] ;}
-    //! The method to get Error thet
+    /*! Get Error of theta
+     * @return Error of theta
+     */
     float GetThetaError() { return  m_Error[1] ;}
-    //! The method to get Error phi
+    /*! Get Error of phi
+     * @return Error of phi
+     */
     float GetPhiError() {return m_Error[2] ;}
-
-
-    //! The method to get Mass
+    /*! Get Mass
+     * @return Mass
+     */
     float GetMass() const { return m_Mass ; }
-    //! The method to get Width
+    /*! Get Width
+     * @return Width
+     */
     float GetWidth() const { return m_Width ; }
-    //! The method to get E9oE25
+    /*! Get E9oE25
+     * @return E9oE25
+     */
     float GetE9oE25() const { return m_E9oE25 ; }
-    //! The method to get E9oE25unf
+    /*! Get E9oE25unf
+     * @return E9oE25unf
+     */
     float GetE9oE25unf() const { return m_E9oE25unf ; }
-    //! The method to get NHits
+    /*! Get NHits
+     * @return NHits
+     */
     float GetNHits() const { return m_NHits ; }
-    //! The method to get Status
+    /*! Get Status
+     * @return Status
+     */
     int GetStatus() const { return m_Status ; }
-    //! The method to get Grade
+    /*! Get Grade
+     * @return Grade
+     */
     int GetGrade() const { return m_Grade  ; }
-    //! The method to get return m_UncEnergy
+    /*! Get UncEnergy
+     * @return UncEnergy
+     */
     float GetUncEnergy() const { return m_UncEnergy ; }
-    //! The method to get return m_Time
+    /*! Get Time
+     * @return Time
+     */
     float GetTime() const { return m_Time ; }
+
+
+    /*! Get Shower Id
+     * @return Shower Id
+     */
+    int getShowerId() const { return m_ShowerId ; }
+    /*! Get Energy
+     * @return Energy
+     */
+    float getEnergy() const { return m_Energy ; }
+    /*! Get Theta
+     * @return Theta
+     */
+    float getTheta() const { return m_Theta ; }
+    /*! Get Phi
+     * @return Phi
+     */
+    float getPhi() const { return m_Phi ; }
+    /*! Get R
+     * @return R
+     */
+    float getR() const { return m_R ; }
+    /*! Get Error of E, theta, phi
+     * @return Error E, theta, phi
+     */
+    void getError(float  ErrorArray[3]) { for (int i = 0; i < 3; i++) { ErrorArray[i] = m_Error[i] ;} }
+    /*! Get Error of Energy
+     * @return Error of Energy
+     */
+    float getEnergyError() { return m_Error[0] ;}
+    /*! Get Error of theta
+     * @return Error of theta
+     */
+    float getThetaError() { return  m_Error[1] ;}
+    /*! Get Error of phi
+     * @return Error of phi
+     */
+    float getPhiError() {return m_Error[2] ;}
+    /*! Get Mass
+     * @return Mass
+     */
+    float getMass() const { return m_Mass ; }
+    /*! Get Width
+     * @return Width
+     */
+    float getWidth() const { return m_Width ; }
+    /*! Get E9oE25
+     * @return E9oE25
+     */
+    float getE9oE25() const { return m_E9oE25 ; }
+    /*! Get E9oE25unf
+     * @return E9oE25unf
+     */
+    float getE9oE25unf() const { return m_E9oE25unf ; }
+    /*! Get NHits
+     * @return NHits
+     */
+    float getNHits() const { return m_NHits ; }
+    /*! Get Status
+     * @return Status
+     */
+    int getStatus() const { return m_Status ; }
+    /*! Get Grade
+     * @return Grade
+     */
+    int getGrade() const { return m_Grade  ; }
+    /*! Get UncEnergy
+     * @return UncEnergy
+     */
+    float getUncEnergy() const { return m_UncEnergy ; }
+    /*! Get Time
+     * @return Time
+     */
+    float getTime() const { return m_Time ; }
+
+
+
 
     //! The method to get return  TVector3 Momentum
     TVector3 getMomentum() const {
@@ -137,16 +241,27 @@ namespace Belle2 {
     }
 
 
+  private:
+    int m_ShowerId;        /**< Shower ID */
+    float m_Energy;        /**< Energy (GeV) */
+    float m_Theta;         /**< Theta (rad) */
+    float m_Phi;           /**< Phi (rad) */
+    float m_R;             /**< R inherit from Belle */
+    float m_Error[3];      /**< Error of Energy, Theta and Phi */
+    float m_Mass;          /**< Mass, inherit from Belle */
+    float m_Width;         /**< Width, inherit from Belle */
+    float m_E9oE25;        /**< E9oE25, inherit from Belle */
+    float m_E9oE25unf;     /**< E9oE25unf, inherit from Belle */
+    float m_NHits;         /**< NHits, inherit from Belle */
+    int m_Status;          /**< Status, inherit from Belle */
+    int m_Grade;           /**< Grade, inherit from Belle */
+    float m_UncEnergy;     /**< UncEnergy, inherit from Belle */
+    float m_Time;          /**< Time, new parameter for Belle2, wait for more stude */
 
-    //! Empty constructor
-    /*! Recommended for ROOT IO
-    */
-    ECLShower() {;}
-
-    ClassDef(ECLShower, 1);/**< the class title */
+    ClassDef(ECLShower, 1);/**< ClassDef */
 
   };
-
+  /** @}*/
 } // end namespace Belle2
 
 #endif

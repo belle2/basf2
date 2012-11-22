@@ -11,8 +11,6 @@
 #ifndef ECLHIT_H
 #define ECLHIT_H
 
-#include <framework/datastore/DataStore.h>
-#include <TVector3.h>
 #include <generators/dataobjects/SimHitBase.h>
 
 namespace Belle2 {
@@ -33,31 +31,31 @@ namespace Belle2 {
 
     /*! Set  Cell ID
      */
-    void setCellId(int cellId) { m_cellId = cellId; }
+    void setCellId(int CellId) { m_CellId = CellId; }
 
     /*! Set deposit energy
      */
-    void setEnergyDep(double edep) { m_edep = edep; }
+    void setEnergyDep(double Edep) { m_Edep = (float) Edep; }
 
     /*! Set  average time
      */
-    void setTimeAve(double TimeAve) { m_TimeAve = TimeAve; }
+    void setTimeAve(double TimeAve) { m_TimeAve = (float)TimeAve; }
 
 
     /*! Get Cell ID
      * @return cell ID
      */
-    int getCellId() const { return m_cellId; }
+    int getCellId() const { return m_CellId; }
 
     /*! Get deposit energy
      * @return deposit energy
      */
-    double getEnergyDep() const { return m_edep; }
+    double getEnergyDep() const { return (double) m_Edep; }
 
     /*! Get average time
      * @return deposit energy
      */
-    double getTimeAve() const {return m_TimeAve;}
+    double getTimeAve() const {return (double) m_TimeAve;}
 
     /** Shift the Hit in time (needed for beam background mixing)
      * @param delta The value of the time shift.
@@ -67,9 +65,9 @@ namespace Belle2 {
 
   private:
 
-    int m_cellId;      /**< Cell ID */
-    double m_edep;     /**< deposited energy */
-    double m_TimeAve;  /**< average time */
+    int m_CellId;      /**< Cell ID */
+    float m_Edep;      /**< deposited energy */
+    float m_TimeAve;   /**< average time */
 
     ClassDef(ECLHit, 3); /**< ClassDef */
 

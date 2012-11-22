@@ -20,112 +20,162 @@
 
 using namespace CLHEP;
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
-  //! Example Detector
+  /*! Class to store ECL Showers which are reconstructed from ECLDigit as Belle method
+   * relation to ECLGamma
+   * filled in ecl/modules/eclRecShower/src/ECLReconstructorModule.cc
+   * modify the name of function as convention,
+   * still keep old function getmassfit not in convention to avoid compiling error 2012.11.22
+   */
+
   class ECLPi0 : public TObject {
   public:
+    /** default constructor for ROOT */
+    ECLPi0() {;}
 
 
-    /**shower id of this Gamma. */
-    int m_showerId1;
-    //! The method to set showerId1
-    void setShowerId1(int showerId1) { m_showerId1 = showerId1; }
-    //! The method to get showerId1
-    int GetShowerId1() const { return m_showerId1 ; }
-    /**shower id of this Gamma. */
-    int m_showerId2;
-    //! The method to set showerId2
-    void setShowerId2(int showerId2) { m_showerId2 = showerId2; }
-    //! The method to get showerId2
-    int GetShowerId2() const { return m_showerId2 ; }
+    /*! Set Shower ID of higher energy gamma
+     */
+    void setShowerId1(int ShowerId1) { m_ShowerId1 = ShowerId1; }
+
+    /*! Set Shower ID of lower energy gamma
+     */
+    void setShowerId2(int ShowerId2) { m_ShowerId2 = ShowerId2; }
+    /*! Set Energy
+     */
+    void setEnergy(float Energy) { m_Energy = Energy; }
+    /*! Set Px
+     */
+    void setPx(float Px) { m_Px = Px; }
+    /*! Set Py
+     */
+    void setPy(float Py) { m_Py = Py; }
+    /*! Set Pz
+     */
+    void setPz(float Pz) { m_Pz = Pz; }
+    /*! Set Mass
+     */
+    void setMass(float Mass) { m_Mass = Mass; }
+    /*! Set Mass after mass constraint fit
+     */
+    void setMassFit(float MassFit) { m_MassFit = MassFit; }
+    /*! Set Chi square after mass constraint fit
+     */
+    void setChi2(float Chi2) { m_Chi2 = Chi2; }
 
 
-
-
-
-
-    //! The energy of this Pi0.
-    float m_energy;
-
-    //! The px of this Pi0.
-    float m_px;
-
-    //! The py of this Pi0.
-    float m_py;
-
-    //! The pz of this Pi0.
-    float m_pz;
-
-    //! The mass of this Pi0.
-    float m_mass;
-
-    //! The massfit of this Pi0.
-    float m_massfit;
-
-    //! The chi2 of this Pi0.
-    float m_chi2;
-
-
-    //! The method to set energy
-    void setenergy(float energy) { m_energy = energy; }
-
-    //! The method to set px
-    void setpx(float px) { m_px = px; }
-
-    //! The method to set py
-    void setpy(float py) { m_py = py; }
-
-    //! The method to set pz
-    void setpz(float pz) { m_pz = pz; }
-
-    //! The method to set mass
-    void setmass(float mass) { m_mass = mass; }
-
-    //! The method to set massfit
-    void setmassfit(float massfit) { m_massfit = massfit; }
-
-    //! The method to set fit chi2
-    void setchi2(float chi2) { m_chi2 = chi2; }
-
-
-    //! The method to get energy
-    float getenergy() const { return m_energy; }
-    //! The method to get px
-    float getpx() const { return m_px; }
-    //! The method to get py
-    float getpy() const { return m_py; }
-    //! The method to get pz
-    float getpz() const { return m_pz; }
-
-    //! The method to get mass
-    float getmass() const { return m_mass; }
-    //! The method to get massfit
-    float getmassfit() const { return m_massfit; }
-    //! The method to get energy
-    float getchi2() const { return m_chi2; }
-
-
-    //! The method to get momentum
-    TVector3 getp() const { TVector3 momentum(m_px, m_py, m_pz); return momentum ; }
-
-    //! The method to get return  HepLorentzVector Momentum
+    /*! Get ShowerId1
+     * @return ShowerId1
+     */
+    int GetShowerId1() const { return m_ShowerId1 ; }
+    /*! Get ShowerId2
+     * @return ShowerId2
+     */
+    int GetShowerId2() const { return m_ShowerId2 ; }
+    /*! Get Energy
+     * @return Energy;
+     */
+    float getenergy() const { return m_Energy; }
+    /*! Get Px
+     * @return Px
+     */
+    float getpx() const { return m_Px; }
+    /*! Get Py
+     * @return Py
+     */
+    float getpy() const { return m_Py; }
+    /*! Get Pz
+     * @return Pz
+     */
+    float getpz() const { return m_Pz; }
+    /*! Get Mass
+     * @return Mass
+     */
+    float getmass() const { return m_Mass; }
+    /*! Get  Mass after mass constraint fit
+     * @return  Mass after mass constraint fit
+     */
+    float getmassfit() const { return m_MassFit; }
+    /*! Get Chi square after mass constraint fit
+     * @return Chi square after mass constraint fit
+     */
+    float getchi2() const { return m_Chi2; }
+    /*! Get Momentum after mass constraint fit
+     * @return TVector3 Momentum  after mass constraint fit
+     */
+    TVector3 getp() const { TVector3 momentum(m_Px, m_Py, m_Pz); return momentum ; }
+    /*! Get Momentum after mass constraint fit
+     * @return HepLorentzVector Momentum  after mass constraint fit
+     */
     HepLorentzVector get4Momentum() const {
       HepLorentzVector  momentum;
-      momentum.setPx(m_px);
-      momentum.setPy(m_py);
-      momentum.setPz(m_pz);
-      momentum.setE(m_energy);
+      momentum.setPx(m_Px);
+      momentum.setPy(m_Py);
+      momentum.setPz(m_Pz);
+      momentum.setE(m_Energy);
       return momentum;
     }
-    //! Empty constructor
-    /*! Recommended for ROOT IO
-    */
-    ECLPi0() {;}
-    /** ROOT Macro.*/
-    ClassDef(ECLPi0, 1);
+
+
+    /*! Get ShowerId1
+     * @return ShowerId1
+     */
+    int getShowerId1() const { return m_ShowerId1 ; }
+    /*! Get ShowerId2
+     * @return ShowerId2
+     */
+    int getShowerId2() const { return m_ShowerId2 ; }
+    /*! Get Energy
+     * @return Energy;
+     */
+    float getEnergy() const { return m_Energy; }
+    /*! Get Px
+     * @return Px
+     */
+    float getPx() const { return m_Px; }
+    /*! Get Py
+     * @return Py
+     */
+    float getPy() const { return m_Py; }
+    /*! Get Pz
+     * @return Pz
+     */
+    float getPz() const { return m_Pz; }
+    /*! Get Mass
+     * @return Mass
+     */
+    float getMass() const { return m_Mass; }
+    /*! Get  Mass after mass constraint fit
+     * @return  Mass after mass constraint fit
+     */
+    float getMassFit() const { return m_MassFit; }
+    /*! Get Chi square after mass constraint fit
+     * @return Chi square after mass constraint fit
+     */
+    float getChi2() const { return m_Chi2; }
+
+
+
+  private:
+    int m_ShowerId1;       /**< Shower Id of higher enegry Gamma */
+    int m_ShowerId2;       /**< Shower Id of lower enegry Gamma */
+    float m_Energy;        /**< Energy (GeV) */
+    float m_Px;            /**< Px (GeV) */
+    float m_Py;            /**< Py (GeV) */
+    float m_Pz;            /**< Pz (GeV) */
+    float m_Mass;          /**< combined Mass  (GeV) */
+    float m_MassFit;       /**< MassFit (GeV) */
+    float m_Chi2;          /**< Chi square of fit (GeV) */
+
+
+    ClassDef(ECLPi0, 1);/**< ClassDef */
 
   };
-
+  /** @}*/
 } // end namespace Belle2
+
 
 #endif

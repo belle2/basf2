@@ -139,14 +139,14 @@ void ECLPi0ReconstructorModule::event()
           Pi0Array[m_Pi0Num]->setShowerId1(m_showerId1);
           Pi0Array[m_Pi0Num]->setShowerId2(m_showerId2);
 
-          Pi0Array[m_Pi0Num]->setenergy((float)m_pi0E);
-          Pi0Array[m_Pi0Num]->setpx((float)m_pi0px);
-          Pi0Array[m_Pi0Num]->setpy((float)m_pi0py);
-          Pi0Array[m_Pi0Num]->setpz((float)m_pi0pz);
+          Pi0Array[m_Pi0Num]->setEnergy((float)m_pi0E);
+          Pi0Array[m_Pi0Num]->setPx((float)m_pi0px);
+          Pi0Array[m_Pi0Num]->setPy((float)m_pi0py);
+          Pi0Array[m_Pi0Num]->setPz((float)m_pi0pz);
 
-          Pi0Array[m_Pi0Num]->setmass((float)lv_rec.mag());
-          Pi0Array[m_Pi0Num]->setmassfit((float)m_pi0mass);
-          Pi0Array[m_Pi0Num]->setchi2((float)m_pi0chi2);
+          Pi0Array[m_Pi0Num]->setMass((float)lv_rec.mag());
+          Pi0Array[m_Pi0Num]->setMassFit((float)m_pi0mass);
+          Pi0Array[m_Pi0Num]->setChi2((float)m_pi0chi2);
           eclPi0ToShower.add(m_Pi0Num, m_showerId1);
           eclPi0ToShower.add(m_Pi0Num, m_showerId2);
           //cout << "Event " << m_nEvent << " Pi0 from Gamma " << m_showerId1 << " " << m_showerId2 << " " << m_pi0E << " " << m_pi0mass << endl;

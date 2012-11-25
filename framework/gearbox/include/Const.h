@@ -12,6 +12,7 @@
 #define CONST_H
 
 #include <TDatabasePDG.h>
+#include <set>
 
 namespace Belle2 {
 
@@ -30,7 +31,15 @@ namespace Belle2 {
     /**
      * The enum for identifying the detector components.
      */
-    enum EDetector {IR, PXD, SVD, CDC, TOP, ARICH, ECL, BKLM, EKLM};
+    enum EDetector {IR = 0x0001, PXD = 0x0002, SVD = 0x0004, CDC = 0x0008,
+                    TOP = 0x0010, ARICH = 0x0020, ECL = 0x0040, BKLM = 0x0080,
+                    EKLM = 0x0100
+                   };
+
+    /**
+     * The vector of all detectors.
+     */
+    static const std::vector<EDetector> detectors;
 
     /**
      * The ParticleType class for identifying different particle types.
@@ -43,6 +52,17 @@ namespace Belle2 {
        * @param pdgCode the Particle Data Group code that identifies the particle.
        */
       explicit ParticleType(int pdgCode): m_pdgCode(pdgCode) {};
+
+      /**
+       * Comparison operator to be usable in sets.
+       * @param other the type of the other particle for the comparison.
+       */
+      bool operator < (const ParticleType& other) const;
+
+      /**
+       * Conversion of ParticleType to ParticleSet.
+       */
+      operator std::set<ParticleType>() const {return std::set<ParticleType>(this, this + 1);}
 
       /**
        * Accessor for root TParticlePDG object.
@@ -80,6 +100,9 @@ namespace Belle2 {
     static const double neutronMass;     /**< neutron mass */
     static const double K0Mass;          /**< neutral kaon mass */
 
+    typedef std::set<ParticleType> ParticleSet;  /**< typedef for sets of particles */
+    static const ParticleSet chargedStable;      /**< set of charged stable particles */
+
     static const double speedOfLight; /**< [cm/ns] */
     static const double kBoltzmann;   /**< Boltzmann constant in GeV/K. */
     static const double ehEnergy;     /**< Energy needed to create an electron-hole pair in Si at std. T. */
@@ -108,6 +131,11 @@ namespace Belle2 {
     };
   };
 
+  /**
+   * Combination of particle sets.
+   */
 }
+
+Belle2::Const::ParticleSet operator + (const Belle2::Const::ParticleSet& firstSet, const Belle2::Const::ParticleSet& secondSet);
 
 #endif /* CONST_H */

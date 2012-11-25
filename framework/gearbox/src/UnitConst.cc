@@ -139,6 +139,16 @@ namespace Belle2 {
 
 /*** The implementation of the Const class defined in Const.h starts here ***/
 
+Const::EDetector detectorsArray[] = {Const::IR, Const::PXD, Const::SVD, Const::CDC,
+                                     Const::TOP, Const::ARICH, Const::ECL, Const::BKLM, Const::EKLM
+                                    };
+const std::vector<Const::EDetector> Const::detectors(detectorsArray, detectorsArray + 9);
+
+bool Const::ParticleType::operator < (const Const::ParticleType& other) const
+{
+  return m_pdgCode < other.m_pdgCode;
+}
+
 const TParticlePDG* Const::ParticleType::particlePDG() const
 {
   return EvtGenDatabasePDG::instance()->GetParticle(m_pdgCode);
@@ -168,6 +178,15 @@ const double Const::protonMass = Const::proton.mass();
 const double Const::pi0Mass = Const::pi0.mass();
 const double Const::neutronMass = Const::neutron.mass();
 const double Const::K0Mass = Const::Kshort.mass();
+
+Const::ParticleSet operator + (const Const::ParticleSet& firstSet, const Const::ParticleSet& secondSet)
+{
+  Const::ParticleSet result(firstSet);
+  result.insert(secondSet.begin(), secondSet.end());
+  return result;
+}
+
+const Const::ParticleSet Const::chargedStable = Const::electron + Const::muon + Const::pion + Const::kaon + Const::proton;
 
 const double Const::speedOfLight   = 29.9792458;
 const double Const::kBoltzmann     = 8.617343 * 1.0e-5 * Unit::eV / Unit::K;

@@ -16,10 +16,40 @@
 
 namespace Belle2 {
   namespace ECL {
-
-    /** Module for making ECLRecoHits of CDCHits.
-     *
+    /**
+     *  \addtogroup modules
+     *  @{
+     *  \addtogroup ECL_modules
+     *  \ingroup modules
+     *  @{ECLDigitizerModule  @} @}
      */
+
+
+    /** The ECLDigitizer module.
+     *
+     * This module is responsible to digitize all hits found in the ECL from ECLHit
+     * First, we simualte the sampling array by waveform and amplitude of hit, and
+     * smear this sampling array by corresponding error matrix.
+     * We then fit the array as hardware of shaper DSP board to obtain the fit result
+     * of amplitude, time and quality.
+     * The initial parameters of fit and algorithm are same as hardware.
+     * This module outputs two array which are ECLDsp and ECLDigit.
+
+       \correlationdiagram
+       ECLHit = graph.data('ECLHit')
+       ECLDigit   = graph.data('ECLDigit')
+       ECLDsp = graph.data('ECLDsp')
+
+       graph.module('ECLDigitizer', [ECLHit], [ECLDigit,ECLDsp])
+       graph.relation(ECLDigitizer, ECLHit)
+       graph.relation(ECLDigitizer, ECLDigit)
+       graph.relation(ECLDigitizer, ECLDsp)
+       \endcorrelationdiagram
+
+     */
+
+
+
     class ECLDigitizerModule : public Module {
 
     public:
@@ -69,10 +99,6 @@ namespace Belle2 {
     protected:
     private:
 
-      /** CPU time     */
-      double m_timeCPU;
-      /** Run number   */
-      int    m_nRun;
       /** Event number */
       int    m_nEvent;
       /** index of eclDsp */

@@ -68,12 +68,8 @@ ECLDigitizerModule::~ECLDigitizerModule()
 
 void ECLDigitizerModule::initialize()
 {
-  // Initialize variables
-  m_nRun    = 0 ;
   m_nEvent  = 0 ;
 
-  // CPU time start
-  m_timeCPU = clock() * Unit::us;
   readDSPDB();
 
   StoreArray<ECLDsp>::registerPersistent();
@@ -92,7 +88,6 @@ void ECLDigitizerModule::beginRun()
 
 void ECLDigitizerModule::event()
 {
-  m_timeCPU = clock() * Unit::us;
   //Input Array
   StoreArray<ECLHit>  eclArray;
   if (!eclArray) {
@@ -100,8 +95,6 @@ void ECLDigitizerModule::event()
   }
 
   //cout<<"Total Hits in Digi "<<eclArray->GetEntriesFast()<<endl;
-  int hitNum = eclArray->GetEntriesFast();
-
   int energyFit[8736] = {0}; //fit output : Amplitude
   int tFit[8736] = {0};    //fit output : T_ave
   int qualityFit[8736] = {0};    //fit output : T_ave
@@ -114,7 +107,7 @@ void ECLDigitizerModule::event()
 
   double DeltaT = (24. - gRandom->Uniform(0, 24));
 
-  for (int ii = 0; ii < hitNum; ii++) {
+  for (int ii = 0; ii <  eclArray->GetEntriesFast(); ii++) {
 
     ECLHit* aECLHit = eclArray[ii];
     // Hit geom. info
@@ -206,12 +199,10 @@ void ECLDigitizerModule::event()
 
 void ECLDigitizerModule::endRun()
 {
-  m_nRun++;
 }
 
 void ECLDigitizerModule::terminate()
 {
-  m_timeCPU = clock() * Unit::us - m_timeCPU;
 }
 
 

@@ -121,7 +121,7 @@ Momentum::Momentum(const Track& p, const double thisMass,
   // is given by
   // cov(px,E) = cov(px,px) * dE/dpx + cov(px,py) * dE/dpy + cov(px,pz) * dE/dpz
   // (similarly for covariance of E and py or pz)
-  // and variance of E os given by
+  // and variance of E is given by
   // cov(E,E)  = cov(px,px) * |dE/dpx|^2 + cov(py,py) * |dE/dpy|^2 + cov(pz,pz) * |dE/dpz|^2
   //           + 2 * cov(px,py) * dE/dpx * dE/dpy
   //           + 2 * cov(px,pz) * dE/dpx * dE/dpz
@@ -410,7 +410,7 @@ Momentum::Momentum(const ECLShower& p)
 }
 
 Momentum::Momentum(const ECLPi0& p)
-  : m_momentum(p.getpx(), p.getpy(), p.getpz(), p.getenergy()),
+  : m_momentum(p.getPx(), p.getPy(), p.getPz(), p.getEnergy()),
     m_position(),
     m_error(7, 0),
     m_vertex(),

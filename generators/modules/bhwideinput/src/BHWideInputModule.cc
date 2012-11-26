@@ -58,7 +58,7 @@ void BHWideInputModule::initialize()
     GearDir her("/Detector/SuperKEKB/HER/");
 
     m_generator.setBoost(getBoost(her.getDouble("energy"), ler.getDouble("energy"),
-                                  her.getDouble("angle") - ler.getDouble("angle"), ler.getDouble("angle")));
+                                  her.getDouble("angle") - ler.getDouble("angle"), her.getDouble("angle")));
   } else {
     if (m_boostMode == 2) {
 

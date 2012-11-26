@@ -66,7 +66,7 @@ void BBBremInputModule::initialize()
   //Depending on the settings use the Belle II or Belle boost
   if (m_boostMode == 1) {
     m_generator.setBoost(getBoost(her.getDouble("energy"), ler.getDouble("energy"),
-                                  her.getDouble("angle") - ler.getDouble("angle"), ler.getDouble("angle")));
+                                  her.getDouble("angle") - ler.getDouble("angle"), her.getDouble("angle")));
   } else {
     if (m_boostMode == 2) {
       m_generator.setBoost(getBoost(7.998213, 3.499218, 22.0 * Unit::mrad, 0.0));

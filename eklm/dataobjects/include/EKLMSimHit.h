@@ -53,18 +53,6 @@ namespace Belle2 {
     void setVolumeID(int id);
 
     /**
-     * Get volume type (needed for background study mode).
-     * @return Volume type.
-     */
-    bool getVolType() const;
-
-    /**
-     * Sets volume type (needed for background study mode).
-     * @param[in] vt Volume type.
-     */
-    void setVolType(enum EKLMSensitiveType vt);
-
-    /**
      * Get particle momentum.
      * @return Momentum.
      */
@@ -145,9 +133,6 @@ namespace Belle2 {
 
     /** Number of strip. */
     int m_Strip;
-
-    /** Volume type (for Background studies). */
-    enum EKLMSensitiveType m_volType;
 
     /** Needed to make root object storable. */
     ClassDef(Belle2::EKLMSimHit, 1);

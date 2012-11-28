@@ -141,17 +141,6 @@ namespace Belle2 {
      */
     void setVolumeID(int id);
 
-    /**
-     * Get volume type.
-     * @return Volume type.
-     */
-    enum EKLMSensitiveType getVolumeType() const;
-
-    /**
-     * Set volume type.
-     * @param[in] type Volume type.
-     */
-    void setVolumeType(enum EKLMSensitiveType type);
 
     /**
      * Get plane number.
@@ -199,9 +188,6 @@ namespace Belle2 {
 
     /** Number of strip. */
     int m_Strip;
-
-    /** Volume type. */
-    enum EKLMSensitiveType m_volType;
 
     /** The class title. */
     ClassDef(EKLMStepHit, 1);

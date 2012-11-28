@@ -920,11 +920,10 @@ namespace Belle {
   const Point3D
   ORIGIN = Point3D(0., 0., 0.);
 
-  std::string
-  Trasan::version(void) const
-  {
-    return "5.01";
-  }
+std::string
+Trasan::version(void) const {
+    return "5.02";
+}
 
 //...Definitions...
   Trasan*
@@ -1116,9 +1115,8 @@ namespace Belle {
 
   }
 
-  void
-  Trasan::initialize()
-  {
+void
+Trasan::initialize() {
 
 #ifdef TRASAN_DEBUG_DETAIL
     b_debugLevel = 2;
@@ -1342,7 +1340,8 @@ namespace Belle {
     dump("parameter");
 
     TrasanTest = b_test;
-  }
+    Belle2::StoreArray<GFTrackCand>::registerPersistent(_gfTrackCandsName);
+}
 
   void
   Trasan::terminate()

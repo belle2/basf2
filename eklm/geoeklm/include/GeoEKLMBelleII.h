@@ -18,6 +18,7 @@
 #include <eklm/simeklm/EKLMSensitiveDetector.h>
 #include <eklm/geoeklm/G4PVPlacementGT.h>
 #include <eklm/geoeklm/G4TriangularPrism.h>
+#include <eklm/geoeklm/GeoESTRCreator.h>
 
 #include <G4LogicalVolume.hh>
 #include <G4Material.hh>
@@ -470,6 +471,9 @@ namespace Belle2 {
 
     /** Number of sections is one plane. */
     int nSection;
+
+    /** ESTR Geometry data. */
+    struct ESTR::GeometryParams ESTRPar;
 
     /** Position data for endcaps. */
     struct EKLMElementPosition EndcapPosition;

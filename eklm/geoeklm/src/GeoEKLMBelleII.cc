@@ -9,23 +9,13 @@
 *  This software is provided "as is" without any warranty.               *
 * ***********************************************************************/
 
-#include <eklm/geoeklm/GeoEKLMBelleII.h>
-#include <eklm/geoeklm/G4PVPlacementGT.h>
-#include <eklm/geoeklm/G4TriangularPrism.h>
-#include <eklm/geoeklm/EKLMObjectNumbers.h>
-#include <eklm/simeklm/EKLMSensitiveDetector.h>
-#include <eklm/geoeklm/StructureEndcap.h>
+/* System headers. */
+#include <errno.h>
+#include <math.h>
 
-#include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
-
-#include <cmath>
+/* External headers. */
 #include <boost/format.hpp>
-
-#include <geometry/CreatorFactory.h>
-#include <geometry/Materials.h>
-#include <geometry/utilities.h>
-
+#include <boost/lexical_cast.hpp>
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Polyhedra.hh>
@@ -33,10 +23,19 @@
 #include <G4Transform3D.hh>
 #include <G4ReflectedSolid.hh>
 
-#include <iostream>
-#include <boost/lexical_cast.hpp>
-
+/* Belle2 headers. */
+#include <eklm/geoeklm/G4PVPlacementGT.h>
+#include <eklm/geoeklm/G4TriangularPrism.h>
+#include <eklm/geoeklm/EKLMObjectNumbers.h>
 #include <eklm/geoeklm/EKLMTransformationFactory.h>
+#include <eklm/simeklm/EKLMSensitiveDetector.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Unit.h>
+#include <geometry/CreatorFactory.h>
+#include <geometry/Materials.h>
+#include <geometry/utilities.h>
+
+#include <eklm/geoeklm/GeoEKLMBelleII.h>
 
 using namespace Belle2;
 using namespace EKLM;
@@ -64,6 +63,9 @@ GeoEKLMBelleII::~GeoEKLMBelleII()
   free(StripPosition);
   free(StripBoardPosition);
   delete m_sensitive;
+  free(ESTRPar.z);
+  free(ESTRPar.rmin);
+  free(ESTRPar.rmax);
   freeSolids();
 }
 
@@ -317,43 +319,22 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
 void GeoEKLMBelleII::createEndcap(G4LogicalVolume* mlv)
 {
   double z;
-  double phi;
-  double dphi;
-  int nsides;
-  int nBoundary;
-  double zsub;
-  double rminsub;
-  double rmaxsub;
   G4Polyhedra* boct;
   G4Tubs* atube;
   G4SubtractionSolid* solidEndcap;
   G4LogicalVolume* logicEndcap;
   G4PVPlacementGT* physiEndcap;
   G4Transform3D t;
-  StructureEndcap EndcapMgr;
-  EndcapMgr.read();
-  phi = EndcapMgr.phi();
-  dphi = EndcapMgr.dphi();
-  nsides = EndcapMgr.nsides();
-  nBoundary = EndcapMgr.nBoundary();
-  double struct_z[nBoundary];
-  double rmin[nBoundary];
-  double rmax[nBoundary];
-  for (int izBoundary  = 0; izBoundary < nBoundary; izBoundary++) {
-    struct_z[izBoundary] = EndcapMgr.z(izBoundary);
-    rmin[izBoundary] = EndcapMgr.rmin(izBoundary);
-    rmax[izBoundary] = EndcapMgr.rmax(izBoundary);
-  }
-  //m_matnamesub = EndcapMgr.matnamesub();
-  zsub = EndcapMgr.zsub();
-  rminsub = EndcapMgr.rminsub();
-  rmaxsub = EndcapMgr.rmaxsub();
   std::string Endcap_Name = "Endcap_" +
                             boost::lexical_cast<std::string>(curvol.endcap);
-  boct = new(std::nothrow) G4Polyhedra("tempoct", phi, dphi, nsides,
-                                       nBoundary, struct_z, rmin, rmax);
-  atube = new(std::nothrow) G4Tubs("tempatube", rminsub, rmaxsub, zsub,
+  boct = new(std::nothrow) G4Polyhedra("tempoct", ESTRPar.phi, ESTRPar.dphi,
+                                       ESTRPar.nsides, ESTRPar.nboundary,
+                                       ESTRPar.z,  ESTRPar.rmin, ESTRPar.rmax);
+  atube = new(std::nothrow) G4Tubs("tempatube",  ESTRPar.rminsub,
+                                   ESTRPar.rmaxsub,  ESTRPar.zsub,
                                    0.0, 360.0 * deg);
+  if (boct == NULL || atube == NULL)
+    B2FATAL(MemErr);
   solidEndcap = new(std::nothrow) G4SubtractionSolid(Endcap_Name, boct, atube);
   if (solidEndcap == NULL)
     B2FATAL(MemErr);
@@ -1650,6 +1631,8 @@ void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
 {
   (void)type;
   readXMLData(content);
+  if (readESTRData(&ESTRPar) == ENOMEM)
+    B2FATAL(MemErr);
   m_sensitive =
     new(std::nothrow) EKLMSensitiveDetector("EKLMSensitiveDetector");
   if (m_sensitive == NULL)

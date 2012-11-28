@@ -9,59 +9,81 @@
  *  This software is provided "as is" without any warranty.               *
  **************************************************************************/
 
-#include <eklm/geoeklm/GeoESTRCreator.h>
-//#include <eklm/geoeklm/StructureEndcap.h>
+/* System headers. */
+#include <errno.h>
 
-#include <geometry/Materials.h>
-#include <geometry/CreatorFactory.h>
-#include <geometry/utilities.h>
-
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
-
-#include <cmath>
+/* External headers. */
 #include <boost/format.hpp>
-#include <iostream>
-#include <fstream>
+#include <globals.hh>
 
-#include <G4LogicalVolume.hh>
-#include <G4PVPlacement.hh>
-#include <G4Tubs.hh>
-#include <G4Polycone.hh>
-#include <G4Polyhedra.hh>
-#include <G4Box.hh>
-#include <G4SubtractionSolid.hh>
-#include <G4Transform3D.hh>
-#include <G4UserLimits.hh>
-#include <G4VisAttributes.hh>
+/* Belle2 headers. */
+#include <geometry/CreatorFactory.h>
+#include <framework/gearbox/GearDir.h>
 
-using namespace std;
+#include <eklm/geoeklm/GeoESTRCreator.h>
 
-namespace Belle2 {
+using namespace Belle2;
 
-  using namespace geometry;
+geometry::CreatorFactory<ESTR::GeoESTRCreator> GeoESTRFactory("ESTRCreator");
 
-  geometry::CreatorFactory<GeoESTRCreator> GeoESTRFactory("ESTRCreator");
-
-  GeoESTRCreator::GeoESTRCreator()
-  {
+int ESTR::readESTRData(struct ESTR::GeometryParams* par)
+{
+  int i;
+  GearDir d("Detector/DetectorComponent[@name=\"ESTR\"]/Content");
+  GearDir d1(d);
+  GearDir d2(d);
+  GearDir d3(d);
+  d1.append("/EndcapKLM");
+  d2.append("/EndcapKLMsub");
+  d3.append("/EndcapKLMSlot");
+  par->phi = d1.getAngle("Phi") * CLHEP::rad;
+  par->dphi = d1.getAngle("Dphi") * CLHEP::rad;
+  par->nsides = d1.getInt("Nsides");
+  par->nboundary = d1.getNumberNodes("ZBoundary");
+  par->z = (double*)malloc(par->nboundary * sizeof(double));
+  par->rmin = (double*)malloc(par->nboundary * sizeof(double));
+  par->rmax = (double*)malloc(par->nboundary * sizeof(double));
+  if (par->z == NULL || par->rmin == NULL || par->rmax == NULL)
+    return ENOMEM;
+  for (i = 0; i < par->nboundary; i++) {
+    GearDir d4(d1);
+    d4.append((boost::format("/ZBoundary[%1%]") % (i + 1)).str());
+    par->z[i] = d4.getLength("Zposition") * CLHEP::cm;
+    par->rmin[i] = d4.getLength("InnerRadius") * CLHEP::cm;
+    par->rmax[i] = d4.getLength("OuterRadius") * CLHEP::cm;
   }
+  par->zsub = d2.getLength("Length") * CLHEP::cm;
+  par->rminsub = d2.getLength("InnerRadius") * CLHEP::cm;
+  par->rmaxsub = d2.getLength("OuterRadius") * CLHEP::cm;
+  par->thick_eiron = d3.getLength("THICK_EIRON") * CLHEP::cm;
+  par->thick_eiron_meas = d3.getLength("THICK_EIRON_MEAS") * CLHEP::cm;
+  par->thick_eslot = d3.getLength("THICK_ESLOT") * CLHEP::cm;
+  par->thick_eslot_meas = d3.getLength("THICK_ESLOT_MEAS") * CLHEP::cm;
+  par->thick_emod = d3.getLength("THICK_EMOD") * CLHEP::cm;
+  par->rmin_emod = d3.getLength("RMIN_EMOD") * CLHEP::cm;
+  par->rmax_emod = d3.getLength("RMAX_EMOD") * CLHEP::cm;
+  par->rmin_eslot = d3.getLength("RMIN_ESLOT") * CLHEP::cm;
+  par->rmax_eslot = d3.getLength("RMAX_ESLOT") * CLHEP::cm;
+  par->rshift_eslot = d3.getLength("RSHIFT_ESLOT") * CLHEP::cm;
+  par->rmax_glass = d3.getLength("RMAX_GLASS") * CLHEP::cm;
+  return 0;
+}
 
+ESTR::GeoESTRCreator::GeoESTRCreator()
+{
+}
 
-  GeoESTRCreator::~GeoESTRCreator()
-  {
-  }
+ESTR::GeoESTRCreator::~GeoESTRCreator()
+{
+}
 
-  void GeoESTRCreator::create(const GearDir& content,
-                              G4LogicalVolume& topVolume,
-                              geometry::GeometryTypes type)
-  {
-    (void)content;
-    (void)topVolume;
-    (void)type;
-  }
-
+void ESTR::GeoESTRCreator::create(
+  const GearDir& content,
+  G4LogicalVolume& topVolume,
+  geometry::GeometryTypes type)
+{
+  (void)content;
+  (void)topVolume;
+  (void)type;
 }
 

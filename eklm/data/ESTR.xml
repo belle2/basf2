@@ -4,10 +4,8 @@
     <Content>
 	<Rotation desc="Rotation of the structure with respect to the Detector" unit="rad">0.0</Rotation>
 	<OffsetZ desc="The offset of the Structure in z with respect to the IP" unit="cm">47.0</OffsetZ>
-	<Material desc="Starting material of Structure Vessel">Air</Material>
 		
 	<EndcapKLM>
-		<Material desc="Starting material of Endcap KLM Vessel">Iron</Material>
 		<Nsides desc="number of sides of Barrel KLM Vessel">8</Nsides>
 		<Phi unit="deg">-22.5</Phi>
 		<Dphi unit="deg">360.0</Dphi>
@@ -24,15 +22,12 @@
 	</EndcapKLM>
 
 	<EndcapKLMsub>
-		<Material desc="Starting material of Endcap KLM Vessel">Iron</Material>
 		<Length unit="cm">66.1</Length>
 		<InnerRadius unit="cm">110.5</InnerRadius>
 		<OuterRadius unit="cm">128.0</OuterRadius>
 	</EndcapKLMsub>
 
 	<EndcapKLMSlot>
-		<Material desc="Starting material of Endcap KLM Slot">Iron</Material>
-		<MaterialModule desc="Starting material of Endcap KLM Module">Air</MaterialModule>
 		<THICK_EIRON unit="cm">4.7</THICK_EIRON>
 		<THICK_EIRON_MEAS unit="cm">4.7</THICK_EIRON_MEAS>
 		<THICK_ESLOT unit="cm">4.4</THICK_ESLOT>

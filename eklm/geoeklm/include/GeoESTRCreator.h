@@ -88,7 +88,7 @@ namespace Belle2 {
       double* z;
       double* rmin;
       double* rmax;
-      int zsub;
+      double zsub;
       double rminsub;
       double rmaxsub;
       double thick_eiron;

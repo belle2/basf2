@@ -187,10 +187,7 @@ namespace Belle2 {
     /**
      * Get information on mother volumes and store them to the hit.
      */
-
     const G4PVPlacementGT* pvgt = (G4PVPlacementGT*)pv;
-
-    hit->setVolumeType(pvgt->getVolumeType());
     switch (pvgt->getVolumeType()) {
       case EKLM_SENSITIVE_STRIP:
         hit->setVolumeID(pvgt->getID());

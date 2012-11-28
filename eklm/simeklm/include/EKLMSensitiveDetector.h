@@ -13,6 +13,7 @@
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <eklm/dataobjects/EKLMStepHit.h>
+#include <eklm/geoeklm/G4PVPlacementGT.h>
 
 namespace Belle2 {
 

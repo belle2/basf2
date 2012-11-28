@@ -10,7 +10,6 @@
 
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <framework/logging/Logger.h>
-#include "G4VPhysicalVolume.hh"
 #include<iostream>
 #include<fstream>
 
@@ -22,8 +21,7 @@ EKLMSimHit::EKLMSimHit():
   EKLMHitBase(),
   m_energy(0.),
   m_momentum(TVector3(0., 0., 0.)),
-  m_volid(0),
-  m_volType(EKLM_SENSITIVE_STRIP)
+  m_volid(0)
 {
 }
 
@@ -31,8 +29,7 @@ EKLMSimHit::EKLMSimHit(const EKLMStepHit* stepHit)
   : EKLMHitBase((EKLMHitBase)*stepHit),
     m_energy(stepHit->getEnergy()),
     m_momentum(*(stepHit->getMomentum())),
-    m_volid(stepHit->getVolumeID()),
-    m_volType(stepHit->getVolumeType())
+    m_volid(stepHit->getVolumeID())
 {
 }
 
@@ -46,11 +43,6 @@ void EKLMSimHit::setVolumeID(int id)
   m_volid = id;
 }
 
-bool  EKLMSimHit::getVolType() const
-{
-  return m_volType;
-}
-
 EKLMStripID EKLMSimHit::getID() const
 {
   EKLMStripID str;
@@ -60,11 +52,6 @@ EKLMStripID EKLMSimHit::getID() const
   str.plane = m_Plane;
   str.strip = m_Strip;
   return str;
-}
-
-void EKLMSimHit::setVolType(enum EKLMSensitiveType vt)
-{
-  m_volType = vt;
 }
 
 const TVector3* EKLMSimHit::getMomentum() const

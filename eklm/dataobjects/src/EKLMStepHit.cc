@@ -125,16 +125,6 @@ void EKLMStepHit::setVolumeID(int id)
   m_volid = id;
 }
 
-enum EKLMSensitiveType EKLMStepHit::getVolumeType()  const
-{
-  return m_volType;
-}
-
-void EKLMStepHit::setVolumeType(enum EKLMSensitiveType type)
-{
-  m_volType = type;
-}
-
 int EKLMStepHit::getPlane() const
 {
   return m_Plane;

@@ -12,7 +12,6 @@
 #define EKLMSTEPHIT_H
 
 #include <eklm/dataobjects/EKLMHitBase.h>
-#include <eklm/geoeklm/G4PVPlacementGT.h>
 
 namespace Belle2 {
 

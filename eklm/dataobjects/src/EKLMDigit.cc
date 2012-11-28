@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <G4Box.hh>
-
 #include <eklm/dataobjects/EKLMDigit.h>
-//#include <eklm/geoeklm/G4PVPlacementGT.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 

@@ -11,16 +11,10 @@
 #ifndef EKLMSIMHIT_H
 #define EKLMSIMHIT_H
 
-
 #include <TObject.h>
-
-
 #include <eklm/dataobjects/EKLMHitBase.h>
 #include <eklm/dataobjects/EKLMStepHit.h>
 
-
-class G4VPhysicalVolume;
-#include <string>
 namespace Belle2 {
 
   /**

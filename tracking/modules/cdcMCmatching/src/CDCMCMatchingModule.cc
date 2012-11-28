@@ -115,7 +115,8 @@ void CDCMCMatchingModule::event()
     bestMCId = getBestMCId(mcParticleContributions, cdcHitsIndexList.size()); //evaluate the MCParticle with the largest contribution
 
     gfTrackCandidates[i]->setMcTrackId(bestMCId.first);    //assign the ID of this MCParticle to the candidate
-    gfTrackCandidates[i]->setDip(bestMCId.second);         //here I just 'misuse' one unused member variable from GFTrackCand called 'Dip' to store the 'purity' of the track
+    //setDip will not exist anymore very soon so I (Moritz) commented it out
+    //gfTrackCandidates[i]->setDip(bestMCId.second);         //here I just 'misuse' one unused member variable from GFTrackCand called 'Dip' to store the 'purity' of the track
 
     //check if there is an MCParticle contributing to the track (-999 as ID means its random composition of background hits)
     if (bestMCId.first != -999) {

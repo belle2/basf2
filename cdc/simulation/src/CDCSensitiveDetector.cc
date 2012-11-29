@@ -133,8 +133,6 @@ namespace Belle2 {
     if (charge == 0.) return false;
 
 
-
-
     // Calculate cell ID
     CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
 

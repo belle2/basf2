@@ -112,7 +112,8 @@ void CDCDigitizerModule::event()
 
     // Loop over all hits
     B2DEBUG(250, "Number of CDCSimHits in the current event: " << simHits.getEntries());
-    for (int iHits = 0; iHits < simHits.getEntries(); iHits++) {
+    int nHits = simHits.getEntries();
+    for (int iHits = 0; iHits < nHits; iHits++) {
       // Get a hit
       CDCSimHit* aCDCSimHit = simHits[iHits];
 
@@ -145,7 +146,7 @@ void CDCDigitizerModule::event()
       B2DEBUG(250, "Propagation in wire length: " << propLength);
 
       // smear drift length
-      hitDriftLength        = smearDriftLength(hitDriftLength, m_fraction, m_mean1, m_resolution1, m_mean2, m_resolution2);
+      hitDriftLength        = smearDriftLength(hitDriftLength);
       float hitDriftTime   = getDriftTime(hitDriftLength, hitTOF, propLength);
 
       //add randamized event time for a beam bg. hit
@@ -160,7 +161,7 @@ void CDCDigitizerModule::event()
       if (hitDriftTime < m_tMin || hitDriftTime > tMax) continue;
 
       //remove negative drift time upon request
-      if (!m_outputNegativeDriftTime && hitDriftTime < 0.) continue;
+      //      if (!m_outputNegativeDriftTime && hitDriftTime < 0.) continue;
 
       bool ifNewDigi = true;
       // The first SimHit is always a new digit, but the looping will anyhow end immediately.
@@ -206,9 +207,9 @@ void CDCDigitizerModule::event()
     RelationArray mcParticlesToCDCHits(mcParticles, cdcHits); //MCParticle<->CDCHit
 
     for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); ++iterSignalMap) {
-
-      //      new(cdcHits->AddrAt(iCDCHits)) CDCHit(static_cast<unsigned short>((iterSignalMap->second.m_driftTime) + 0.5), getADCCount(iterSignalMap->second.m_charge),
-      //                                            iterSignalMap->second.m_wireID);
+      //remove negative drift time (TDC) upon request
+      if (!m_outputNegativeDriftTime &&
+          iterSignalMap->second.m_driftTime < -0.5) continue;
       new(cdcHits.nextFreeAddress()) CDCHit(static_cast<unsigned short>((iterSignalMap->second.m_driftTime) + 0.5), getADCCount(iterSignalMap->second.m_charge),
                                             iterSignalMap->second.m_wireID);
 
@@ -224,20 +225,19 @@ void CDCDigitizerModule::event()
       iCDCHits++;
     }
   } else {
-    B2FATAL("Proper digitization is not available.")
+    B2FATAL("Proper digitization is not available.");
   }
 }
 
-float CDCDigitizerModule::smearDriftLength(float driftLength, float fraction, float mean1, float resolution1, float mean2, float resolution2)
+float CDCDigitizerModule::smearDriftLength(float driftLength)
 {
-  // Smear drift length using float Gaussian function
   float mean, resolution;
-  if (gRandom->Uniform() <= fraction) {
-    mean = mean1;
-    resolution = resolution1;
+  if (gRandom->Uniform() <= m_fraction) {
+    mean = m_mean1;
+    resolution = m_resolution1;
   } else {
-    mean = mean2;
-    resolution = resolution2;
+    mean = m_mean2;
+    resolution = m_resolution2;
   }
 
   // Smear drift length

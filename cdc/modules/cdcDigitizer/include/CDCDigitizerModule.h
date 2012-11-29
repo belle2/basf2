@@ -68,7 +68,8 @@ namespace Belle2 {
      *
      *  @return Drift length after smearing.
      */
-    float smearDriftLength(float driftLength, float fraction, float mean1, float resolution1, float mean2, float resolution2);
+    //    float smearDriftLength(float driftLength, float fraction, float mean1, float resolution1, float mean2, float resolution2);
+    float smearDriftLength(float driftLength);
 
     /** The method to get drift time based on drift length
      *

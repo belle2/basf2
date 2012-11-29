@@ -25,6 +25,7 @@
 #endif
 
 #include <signal.h>
+#include <unistd.h>
 
 using namespace std;
 using namespace Belle2;
@@ -100,6 +101,13 @@ static bool ctrl_c = false;
 static void signalHandler(int)
 {
   ctrl_c = true;
+
+  //signal handlers are called asynchronously, making many standard functions (including output) dangerous
+  //write() is, however, safe, so we'll use that to write to stderr.
+  const char msg[] = "Received Ctrl+C, basf2 will exit safely. (Press Ctrl+\\ (SIGQUIT) to abort immediately - this may break output files.)\n";
+  const int len = sizeof(msg) / sizeof(char) - 1; //minus NULL byte
+
+  write(STDERR_FILENO, msg, len);
 }
 
 void EventProcessor::processInitialize(const ModulePtrList& modulePathList)

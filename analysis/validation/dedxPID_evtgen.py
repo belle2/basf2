@@ -30,10 +30,10 @@ dedx_params = {
 dedx.param(dedx_params)
 
 main = create_path()
+main.add_module(input)
+
 main.add_module(gearbox)
 main.add_module(geometry)
-
-main.add_module(input)
 
 main.add_module(dedx)
 

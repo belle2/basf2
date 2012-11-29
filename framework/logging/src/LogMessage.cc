@@ -46,7 +46,7 @@ bool LogMessage::operator==(const LogMessage& message) const
 std::ostream& LogMessage::print(std::ostream& out) const
 {
   if (!m_logInfo || (m_logInfo & LogConfig::c_Timestamp)) {
-    const static double startClock = Utils::getClock();
+    static const double startClock = Utils::getClock();
     out.precision(3);
     out << std::fixed << (Utils::getClock() - startClock) / Unit::s << ": ";
   }

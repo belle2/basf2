@@ -44,7 +44,7 @@ namespace Belle2 {
      */
     enum EDurability {
       c_Event,     /**< Object is deleted after event. */
-      c_Persistent /**< Object is persistent. */
+      c_Persistent /**< Object is available during entire execution time (not related to persistent/transient distinction). */
     };
 
     /** Number of Durability Types.
@@ -108,7 +108,7 @@ namespace Belle2 {
     }
 
     /** Return the default storage name for an given class name. */
-    static const std::string defaultArrayName(std::string classname) {
+    static const std::string defaultArrayName(const std::string& classname) {
       return defaultObjectName(classname) + 's';
     }
 
@@ -360,13 +360,12 @@ namespace Belle2 {
     /** return information on inputs/outputs of each module, as obtained by require()/createEntry(); */
     const std::map<std::string, ModuleInfo>& getModuleInfoMap() const { return m_moduleInfo; }
 
-  protected:
-    /** Constructor is protected, as it is a singleton.*/
-    explicit DataStore();
-    /** same for copy constructor */
-    DataStore(const DataStore&) { }
 
   private:
+    /** Hidden constructor, as it is a singleton.*/
+    explicit DataStore();
+    /** same for copy constructor */
+    DataStore(const DataStore&);
     /** Destructor. */
     ~DataStore();
 

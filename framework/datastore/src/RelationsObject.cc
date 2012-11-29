@@ -10,3 +10,4 @@
 
 #include <framework/datastore/RelationsObject.h>
 
+templateClassImp(RelationsInterface)

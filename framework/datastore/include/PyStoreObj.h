@@ -3,6 +3,8 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <TObject.h>
+
 #include <string>
 
 namespace Belle2 {

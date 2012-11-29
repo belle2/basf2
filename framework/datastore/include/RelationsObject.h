@@ -11,11 +11,12 @@
 #ifndef RELATIONSOBJECT_H
 #define RELATIONSOBJECT_H
 
+#include <framework/datastore/DataStore.h>
+
+#include <TObject.h>
+
 #include <vector>
 #include <string>
-#include <TObject.h>
-#include <framework/datastore/RelationEntry.h>
-#include <framework/datastore/DataStore.h>
 
 namespace Belle2 {
 
@@ -54,7 +55,7 @@ namespace Belle2 {
      *  @param weight  The weight of the relation.
      *  @return        Flag whether the creation of the relation succeeded.
      */
-    bool addRelationTo(const TObject* object, double weight = 1) {
+    bool addRelationTo(const TObject* object, double weight = 1) const {
       return DataStore::Instance().addRelation(this, m_cacheDataStoreEntry, m_cacheArrayIndex, object, weight);
     }
 
@@ -66,7 +67,7 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return        A vector of relations.
      */
-    template <class T> RelationVector<T> getRelationsTo(std::string name = "") const {
+    template <class T> RelationVector<T> getRelationsTo(const std::string& name = "") const {
       return RelationVector<T>(DataStore::Instance().getRelationsFromTo(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name));
     }
 
@@ -78,7 +79,7 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return        A vector of relations.
      */
-    template <class T> RelationVector<T> getRelationsFrom(std::string name = "") const {
+    template <class T> RelationVector<T> getRelationsFrom(const std::string& name = "") const {
       return RelationVector<T>(DataStore::Instance().getRelationsToFrom(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name));
     }
 
@@ -92,7 +93,7 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return        A vector of relations.
      */
-    template <class T> RelationVector<T> getRelationsWith(std::string name = "") const {
+    template <class T> RelationVector<T> getRelationsWith(const std::string& name = "") const {
       return RelationVector<T>(DataStore::Instance().getRelationsWith(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name));
     }
 

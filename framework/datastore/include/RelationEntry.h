@@ -13,7 +13,8 @@
 
 #include <vector>
 #include <string>
-#include <TObject.h>
+
+class TObject;
 
 namespace Belle2 {
 

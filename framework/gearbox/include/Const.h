@@ -77,7 +77,7 @@ namespace Belle2 {
       double mass() const;
 
     private:
-      int m_pdgCode;  /** PDG code of the particle **/
+      int m_pdgCode;  /**< PDG code of the particle **/
     };
 
     static const ParticleType electron;  /**< electron particle */

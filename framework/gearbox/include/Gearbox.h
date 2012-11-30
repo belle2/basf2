@@ -95,6 +95,14 @@ namespace Belle2 {
       return p.value;
     }
 
+    /**
+     * Get the parameter path as a string.
+     * if the parameter is empty or does not exist, defaultValue will be
+     * returned.
+     * @param path path of the parameter to get
+     * @param defaultValue value to return if the path es empty or does not exist
+     * @return value of the parameter
+     */
     std::string getString(const std::string& path, const std::string& defaultValue) const {
       return gearbox::Interface::getString(path, defaultValue);
     }

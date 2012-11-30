@@ -24,7 +24,8 @@ namespace Belle2 {
   namespace ESTR {
 
     /**
-     * ESTR geometry parameters.
+     * @struct GeometryParams
+     * @brief ESTR geometry parameters.
      *
      * @var GeometryParams::phi
      * The starting angle of the octagonal Endcap KLM shape.
@@ -37,6 +38,15 @@ namespace Belle2 {
      *
      * @var GeometryParams::nboundary
      * The number of boundaries perpendicular to the z-axis.
+     *
+     * @var GeometryParams::z
+     * The z coordinate of the section specified by input id (=boundary id).
+     *
+     * @var GeometryParams::rmin
+     * The radius of the circle tangent to the sides of the inner polygon.
+     *
+     * @var GeometryParams::rmax
+     * The radius of the circle tangent to the sides of the outer polygon.
      *
      * @var GeometryParams::zsub
      * The length of the tube.

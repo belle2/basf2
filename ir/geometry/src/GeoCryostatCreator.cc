@@ -1812,9 +1812,6 @@ namespace Belle2 {
       G4Material* mat_C1wal1 = Materials::get(strMat_C1wal1);
       G4LogicalVolume* logi_C1wal1 = new G4LogicalVolume(geo_C1wal1, mat_C1wal1, "logi_C1wal1_name");
 
-      //logi_C1wal1->SetSensitiveDetector(m_sensitive);
-      //logi_C1wal1->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1));
-
       //put volume
       setColor(*logi_C1wal1, cC1wal1.getString("Color", "#CC0000"));
       setVisibility(*logi_C1wal1, false);
@@ -1855,9 +1852,6 @@ namespace Belle2 {
       string strMat_C1wal2 = cC1wal2.getString("Material");
       G4Material* mat_C1wal2 = Materials::get(strMat_C1wal2);
       G4LogicalVolume* logi_C1wal2 = new G4LogicalVolume(geo_C1wal2, mat_C1wal2, "logi_C1wal2_name");
-
-      //logi_C1wal2->SetSensitiveDetector(m_sensitive);
-      //logi_C1wal2->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1));
 
       //put volume
       setColor(*logi_C1wal2, cC1wal2.getString("Color", "#CC0000"));
@@ -3687,9 +3681,6 @@ namespace Belle2 {
       G4Material* mat_F1wal1 = Materials::get(strMat_F1wal1);
       G4LogicalVolume* logi_F1wal1 = new G4LogicalVolume(geo_F1wal1, mat_F1wal1, "logi_F1wal1_name");
 
-      //logi_F1wal1->SetSensitiveDetector(m_sensitive);
-      //logi_F1wal1->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1));
-
       //put volume
       setColor(*logi_F1wal1, cF1wal1.getString("Color", "#CC0000"));
       setVisibility(*logi_F1wal1, false);
@@ -4150,6 +4141,113 @@ namespace Belle2 {
       setColor(*logi_F7lyr5, cF7lyr5.getString("Color", "#CC0000"));
       setVisibility(*logi_F7lyr5, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7lyr5, "phys_F7lyr5_name", logi_F6spc1, false, 0);
+
+
+      //---------------------------
+      // for dose simulation
+      //---------------------------
+
+      //logi_C1wal1->SetSensitiveDetector(m_sensitive);
+      /*
+      logi_A1spc1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1));
+      logi_B1spc1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2));
+      logi_A2wal1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 3));
+      logi_A3wal1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 4));
+      logi_A3wal2    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 5));
+      logi_A4mag1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 6));
+      logi_A4mag2p1  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 7));
+      logi_A4mag2p2  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 8));
+      logi_A4mag2p3  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 9));
+      logi_A4mag2p4  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 10));
+      logi_A4mag3p1  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 11));
+      logi_A4mag3p2  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 12));
+      logi_A4mag4p1  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 13));
+      logi_A4mag4p2  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 14));
+      logi_A4mag4p3  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 15));
+      logi_A4mag4p4  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 16));
+      logi_A4mag4p5  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 17));
+      logi_A4mag4p6  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 18));
+      logi_A4mag4p7  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 19));
+      logi_A4mag4p8  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 20));
+      logi_A4mag4p9  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 21));
+      logi_B2wal1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 22));
+      logi_B3wal1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 23));
+      logi_B3wal2    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 24));
+      logi_B4mag1p1  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 25));
+      logi_B4mag1p2  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 26));
+      logi_B4mag1p3  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 27));
+      logi_B4mag2    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 28));
+      logi_B4mag3p1  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 29));
+      logi_B4mag3p2  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 30));
+      logi_B4mag3p3  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 31));
+      logi_B4mag3p4  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 32));
+      logi_B4mag3p5  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 33));
+      logi_B4mag3p6  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 34));
+      logi_B4mag4p1  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 35));
+      logi_B4mag4p7  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 36));
+      logi_B4mag4p8  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 37));
+      logi_B4mag4p9  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 38));
+      logi_C1wal1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 39));
+      logi_C1wal2    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 40));
+      logi_C2spc1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 41));
+      logi_C2spc2    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 42));
+      logi_C3wal1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 43));
+      logi_C3wal2    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 44));
+      logi_C3wal3    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 45));
+      logi_C3wal4    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 46));
+      logi_C4spc1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 47));
+      logi_C4spc2    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 48));
+      logi_C5wal1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 49));
+      logi_C5wal2    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 50));
+      logi_C6spc1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 51));
+      logi_C6spc2    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 52));
+      logi_C7wal1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 53));
+      logi_C7lyr1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 54));
+      logi_C7lyr2    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 55));
+      logi_C7lyr3    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 56));
+      logi_C7lyr4    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 57));
+      logi_C7lyr5    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 58));
+      logi_D1spc1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 59));
+      logi_E1spc1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 60));
+      logi_D2wal1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 61));
+      logi_D3wal1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 62));
+      logi_D3wal2    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 63));
+      logi_D4mag1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 64));
+      logi_D4mag2p1  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 65));
+      logi_D4mag2p2  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 66));
+      logi_D4mag2p3  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 67));
+      logi_D4mag2p4  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 68));
+      logi_D4mag3p1  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 69));
+      logi_D4mag3p2  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 70));
+      logi_D4mag3p3  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 71));
+      logi_D4mag3p4  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 72));
+      logi_D4mag3p5  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 73));
+      logi_D4mag3p6  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 74));
+      logi_E2wal1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 75));
+      logi_E3wal1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 76));
+      logi_E4mag1p1  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 77));
+      logi_E4mag1p2  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 78));
+      logi_E4mag1p3  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 79));
+      logi_E4mag2    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 80));
+      logi_E4mag3p1  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 81));
+      logi_E4mag3p2  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 82));
+      logi_E4mag3p3  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 83));
+      logi_E4mag3p4  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 84));
+      logi_E4mag3p5  ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 85));
+      logi_F1wal1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 86));
+      logi_F2spc1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 87));
+      logi_F3wal1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 88));
+      logi_F3wal2    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 89));
+      logi_F3wal3    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 90));
+      logi_F4spc1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 91));
+      logi_F5wal1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 92));
+      logi_F6spc1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 93));
+      logi_F7lyr1    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 94));
+      logi_F7lyr2    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 95));
+      logi_F7lyr3    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 96));
+      logi_F7lyr4    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 97));
+      logi_F7lyr5    ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 98));
+      */
 
     }
   }

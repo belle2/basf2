@@ -176,8 +176,8 @@ SplitGLView::~SplitGLView()
     delete m_glViewer[i];
   }
   delete m_cameraMenu;
-  delete m_splitFrame;
   delete m_pad;
+  // m_splitFrame is part of this frame, and cleaned automatically ...;
 }
 
 void SplitGLView::saveExtract()

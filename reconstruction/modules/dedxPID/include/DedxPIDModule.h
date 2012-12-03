@@ -4,7 +4,6 @@
 #include <framework/core/Module.h>
 
 #include <reconstruction/modules/dedxPID/DedxConstants.h>
-#include <reconstruction/modules/dedxPID/HelixHelper.h>
 
 #include <framework/datastore/StoreArray.h>
 
@@ -16,6 +15,7 @@ class TH1F;
 
 namespace Belle2 {
   class DedxTrack;
+  class HelixHelper;
 
   /** \addtogroup modules
    * @{
@@ -88,11 +88,11 @@ namespace Belle2 {
      * @param dedx  dE/dx value
      * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
-    void saveLogLikelihood(float(&logl)[c_Dedx_num_particles], float p, float dedx, TH2F* const* pdf) const;
+    void saveLogLikelihood(float(&logl)[Dedx::c_num_particles], float p, float dedx, TH2F* const* pdf) const;
 
     /** should info from this detector be included in likelihood? */
-    bool detectorEnabled(DedxDetector d) const {
-      return (d == c_PXD and m_usePXD) or(d == c_SVD and m_useSVD) or(d == c_CDC and m_useCDC);
+    bool detectorEnabled(Dedx::Detector d) const {
+      return (d == Dedx::c_PXD and m_usePXD) or(d == Dedx::c_SVD and m_useSVD) or(d == Dedx::c_CDC and m_useCDC);
     }
 
 
@@ -101,7 +101,7 @@ namespace Belle2 {
     int m_numExtrapolations; /**< number of times GFTrackCand::extrapolate... was called after the origin */
 
     /** dedx:momentum PDFs. */
-    TH2F* m_pdfs[c_Dedx_num_detectors][c_Dedx_num_particles]; //m_pdfs[detector_type][particle_type]
+    TH2F* m_pdfs[Dedx::c_num_detectors][Dedx::c_num_particles]; //m_pdfs[detector_type][particle_type]
 
     /** parameter for GFTrack array name. */
     std::string m_gftracks_name;

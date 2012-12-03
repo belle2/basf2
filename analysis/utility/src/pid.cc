@@ -190,7 +190,7 @@ double getARICHPID(int hyp1, int hyp2, const ARICHLikelihoods* logL)
   return 0;
 }
 
-double getDEDXPID(DedxParticle hyp1, DedxParticle hyp2, const DedxLikelihood* logL)
+double getDEDXPID(Dedx::Particle hyp1, Dedx::Particle hyp2, const DedxLikelihood* logL)
 {
   if (logL)
     return logL->getLogLikelihood(hyp1) - logL->getLogLikelihood(hyp2);

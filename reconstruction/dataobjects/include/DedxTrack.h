@@ -27,11 +27,11 @@ namespace Belle2 {
       m_last_layer(-1),
       m_length(0.0) {
       //for all detectors
-      for (int i = 0; i < c_Dedx_num_detectors; i++)
+      for (int i = 0; i < Dedx::c_num_detectors; i++)
         m_dedx_avg[i] = m_dedx_avg_truncated[i] = m_dedx_avg_truncated_err[i] = 0.0;
 
       //for all particles
-      for (int i = 0; i < c_Dedx_num_particles; i++) {
+      for (int i = 0; i < Dedx::c_num_particles; i++) {
         m_logl[i] = 0.0;
       }
     }
@@ -88,12 +88,12 @@ namespace Belle2 {
     std::vector<float> dist; /**< distance flown through active medium in current segment */
     std::vector<int> dedx_flayer; /**< layer id corresponding to dedx & dist */
 
-    float m_dedx_avg[c_Dedx_num_detectors]; /**< dEdX averaged for one subdetector */
-    float m_dedx_avg_truncated[c_Dedx_num_detectors]; /**< dEdX averaged for one subdetector, truncated mean */
-    float m_dedx_avg_truncated_err[c_Dedx_num_detectors]; /**< standard deviation of m_dedx_avg_truncated */
+    float m_dedx_avg[Dedx::c_num_detectors]; /**< dEdX averaged for one subdetector */
+    float m_dedx_avg_truncated[Dedx::c_num_detectors]; /**< dEdX averaged for one subdetector, truncated mean */
+    float m_dedx_avg_truncated_err[Dedx::c_num_detectors]; /**< standard deviation of m_dedx_avg_truncated */
 
     //these are only filled in by DedxLikelihoodModule
-    float m_logl[c_Dedx_num_particles]; /**< log likelihood for each particle, not including momentum prior */
+    float m_logl[Dedx::c_num_particles]; /**< log likelihood for each particle, not including momentum prior */
 
     ClassDef(DedxTrack, 1); /**< Build ROOT dictionary */
   };

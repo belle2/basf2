@@ -25,17 +25,17 @@ namespace Belle2 {
       TObject(),
       m_p(0.0) {
       //for all particles
-      for (int i = 0; i < c_Dedx_num_particles; i++) {
+      for (int i = 0; i < Dedx::c_num_particles; i++) {
         m_logl[i] = 0.0;
       }
     }
 
-    /** actually const float (&logl)[c_Dedx_num_particles], but CINT complains. */
+    /** actually const float (&logl)[Dedx::c_num_particles], but CINT complains. */
     DedxLikelihood(const float* logl, float p):
       TObject(),
       m_p(p) {
       //for all particles
-      for (int i = 0; i < c_Dedx_num_particles; i++) {
+      for (int i = 0; i < Dedx::c_num_particles; i++) {
         m_logl[i] = logl[i];
       }
     }
@@ -54,13 +54,13 @@ namespace Belle2 {
      * @param type  The desired particle hypothesis.
      */
 
-    float getLogLikelihood(DedxParticle type) const { return m_logl[type]; }
+    float getLogLikelihood(Dedx::Particle type) const { return m_logl[type]; }
 
     /** returns exp(getLogLikelihood(type)) with sufficient precision. */
-    double getLikelihood(DedxParticle type) const { return exp((double)m_logl[type]); }
+    double getLikelihood(Dedx::Particle type) const { return exp((double)m_logl[type]); }
 
     /** corresponding setter for m_logl. */
-    void setLogLikelihood(DedxParticle type, float logl) { m_logl[type] = logl; }
+    void setLogLikelihood(Dedx::Particle type, float logl) { m_logl[type] = logl; }
 
     /** the associated track momentum at the origin*/
     float getMomentum() const { return m_p; }
@@ -85,14 +85,14 @@ namespace Belle2 {
      *
      * @param type  The desired particle hypothesis.
      */
-    double getProbability(DedxParticle type) const;
+    double getProbability(Dedx::Particle type) const;
 
     /** set the prior distributions for the momentum.
      *
      * If you want getProbability() to return meaningful values, you should probably call this.
      * Since this is a static function, this only needs to be done once.
      *
-     * @param momentumPrior Array of TH1F pointers with c_Dedx_num_particles entries.
+     * @param momentumPrior Array of TH1F pointers with Dedx::c_num_particles entries.
      *                      DedxLikelihood does not take ownership of the associated memory.
      */
     static void setMomentumPriors(TH1F** momentumPrior) { s_momentumPrior = momentumPrior; }
@@ -105,10 +105,10 @@ namespace Belle2 {
     static void loadMomentumPriorsFromFile(const std::string& filename);
 
   private:
-    float m_logl[c_Dedx_num_particles]; /**< log likelihood for each particle, not including momentum prior */
+    float m_logl[Dedx::c_num_particles]; /**< log likelihood for each particle, not including momentum prior */
     float m_p; /**< track momentum used for PDF lookups */
 
-    static TH1F** s_momentumPrior; /**< prior distributions for the momentum, an array with c_Dedx_num_particles elements */
+    static TH1F** s_momentumPrior; /**< prior distributions for the momentum, an array with Dedx::c_num_particles elements */
 
     ClassDef(DedxLikelihood, 1); /**< Build ROOT dictionary */
   };

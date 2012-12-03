@@ -10,13 +10,13 @@ using namespace Belle2;
 
 TH1F** DedxLikelihood::s_momentumPrior = 0;
 
-double DedxLikelihood::getProbability(DedxParticle type) const
+double DedxLikelihood::getProbability(Dedx::Particle type) const
 {
   double numerator = 0.0;
   double denominator = 0.0;
   const Int_t p_bin = s_momentumPrior ? (s_momentumPrior[0]->GetXaxis()->FindFixBin(m_p)) : 0;
-  for (int i = 0; i < c_Dedx_num_particles; i++) {
-    double likelihood = exp((double)getLogLikelihood((DedxParticle)i));
+  for (int i = 0; i < Dedx::c_num_particles; i++) {
+    double likelihood = exp((double)getLogLikelihood((Dedx::Particle)i));
 
     //get momentum prior
     if (s_momentumPrior) {
@@ -42,10 +42,10 @@ void DedxLikelihood::loadMomentumPriorsFromFile(const std::string& filename)
   if (!pdf_file->IsOpen())
     B2FATAL("Couldn't open pdf file: " << filename);
 
-  s_momentumPrior = new TH1F*[c_Dedx_num_particles];
+  s_momentumPrior = new TH1F*[Dedx::c_num_particles];
   //load momentum PDFs
-  for (int particle = 0; particle < c_Dedx_num_particles; particle++) {
-    const int pdg_code = c_Dedx_pdg_codes[particle];
+  for (int particle = 0; particle < Dedx::c_num_particles; particle++) {
+    const int pdg_code = Dedx::c_pdg_codes[particle];
     s_momentumPrior[particle] = dynamic_cast<TH1F*>(pdf_file->Get(TString::Format("momentum_%i", pdg_code)));
 
     if (!s_momentumPrior[particle]) {

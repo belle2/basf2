@@ -41,6 +41,7 @@
 
 using namespace Belle2;
 using namespace CDC;
+using namespace Dedx;
 
 REG_MODULE(DedxPID)
 
@@ -112,13 +113,13 @@ void DedxPIDModule::initialize()
 
     //load dedx:momentum PDFs
     const char* suffix = (!m_useIndividualHits) ? "_trunc" : "";
-    for (int detector = 0; detector < c_Dedx_num_detectors; detector++) {
+    for (int detector = 0; detector < c_num_detectors; detector++) {
       int nBinsX, nBinsY;
       double xMin, xMax, yMin, yMax;
       nBinsX = nBinsY = -1;
       xMin = xMax = yMin = yMax = 0.0;
-      for (int particle = 0; particle < c_Dedx_num_particles; particle++) {
-        const int pdg_code = c_Dedx_pdg_codes[particle];
+      for (int particle = 0; particle < c_num_particles; particle++) {
+        const int pdg_code = c_pdg_codes[particle];
         m_pdfs[detector][particle] =
           dynamic_cast<TH2F*>(pdf_file->Get(TString::Format("hist_d%i_%i%s", detector, pdg_code, suffix)));
 
@@ -462,8 +463,8 @@ void DedxPIDModule::event()
 
     if (!m_useIndividualHits) {
       //calculate likelihoods for truncated mean
-      for (int detector = 0; detector < c_Dedx_num_detectors; detector++) {
-        if (!detectorEnabled(static_cast<DedxDetector>(detector)))
+      for (int detector = 0; detector < c_num_detectors; detector++) {
+        if (!detectorEnabled(static_cast<Detector>(detector)))
           continue; //unwanted detector
 
         saveLogLikelihood(track.m_logl, track.m_p, track.m_dedx_avg_truncated[detector], m_pdfs[detector]);
@@ -601,7 +602,7 @@ template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const
       silicon_dedx.push_back(dedx);
       track->m_dedx_avg[current_detector] += dedx;
       track->addDedx(layer, total_distance, dedx);
-      if (!m_pdfFilename.empty() and m_useIndividualHits and detectorEnabled(static_cast<DedxDetector>(current_detector))) {
+      if (!m_pdfFilename.empty() and m_useIndividualHits and detectorEnabled(static_cast<Detector>(current_detector))) {
         saveLogLikelihood(track->m_logl, track->m_p, dedx, m_pdfs[current_detector]);
       }
     } else {
@@ -620,13 +621,13 @@ template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const
 }
 
 
-void DedxPIDModule::saveLogLikelihood(float(&logl)[c_Dedx_num_particles], float p, float dedx, TH2F* const* pdf) const
+void DedxPIDModule::saveLogLikelihood(float(&logl)[c_num_particles], float p, float dedx, TH2F* const* pdf) const
 {
   //all pdfs have the same dimensions
   const Int_t bin_x = pdf[0]->GetXaxis()->FindFixBin(p);
   const Int_t bin_y = pdf[0]->GetYaxis()->FindFixBin(dedx);
 
-  for (int iParticle = 0; iParticle < c_Dedx_num_particles; iParticle++) {
+  for (int iParticle = 0; iParticle < c_num_particles; iParticle++) {
     if (!pdf[iParticle])
       continue;
     double probability = 0.0;

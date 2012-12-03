@@ -45,11 +45,11 @@ void PIDLikelihood::setLikelihoods(const DedxLikelihood* logl)
 {
 
   setFlag(c_Dedx);
-  m_logl[c_Dedx][PIDLikelihood::c_Electron] = logl->getLogLikelihood(Belle2::c_Electron);
-  m_logl[c_Dedx][PIDLikelihood::c_Muon] = logl->getLogLikelihood(Belle2::c_Muon);
-  m_logl[c_Dedx][PIDLikelihood::c_Pion] = logl->getLogLikelihood(Belle2::c_Pion);
-  m_logl[c_Dedx][PIDLikelihood::c_Kaon] = logl->getLogLikelihood(Belle2::c_Kaon);
-  m_logl[c_Dedx][PIDLikelihood::c_Proton] = logl->getLogLikelihood(Belle2::c_Proton);
+  m_logl[c_Dedx][PIDLikelihood::c_Electron] = logl->getLogLikelihood(Dedx::c_Electron);
+  m_logl[c_Dedx][PIDLikelihood::c_Muon] = logl->getLogLikelihood(Dedx::c_Muon);
+  m_logl[c_Dedx][PIDLikelihood::c_Pion] = logl->getLogLikelihood(Dedx::c_Pion);
+  m_logl[c_Dedx][PIDLikelihood::c_Kaon] = logl->getLogLikelihood(Dedx::c_Kaon);
+  m_logl[c_Dedx][PIDLikelihood::c_Proton] = logl->getLogLikelihood(Dedx::c_Proton);
 }
 
 

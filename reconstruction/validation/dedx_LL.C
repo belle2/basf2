@@ -13,7 +13,7 @@
 
 void plot(const TString &input_filename)
 {
-  gSystem->Load("libanalysis_dataobjects");
+  gSystem->Load("libreconstruction_dataobjects");
 
   TFile *f = new TFile(input_filename, "READ");
   if(!f) {

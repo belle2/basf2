@@ -31,25 +31,6 @@ namespace Belle2 {
    * which includes individual dE/dx data points and their corresponding layer,
    * and hit information like reconstructed position, charge, etc.
    *
-   *
-    \correlationdiagram
-    Track = graph.external_data('Track')
-    GFTrack = graph.external_data('GFTrack')
-    MCParticle = graph.external_data('MCParticle')
-    CDCHit = graph.external_data('CDCHit')
-    SVDTrueHit = graph.external_data('SVDTrueHit')
-    PXDTrueHit = graph.external_data('PXDTrueHit')
-    PXDCluster = graph.external_data('PXDCluster')
-
-    DedxLikelihood = graph.data('DedxLikelihood')
-    DedxTrack = graph.data('DedxTrack')
-
-    graph.module('DedxPID', [Track, GFTrack, MCParticle, CDCHit, SVDTrueHit, PXDTrueHit, PXDCluster], [DedxLikelihood, DedxTrack])
-
-    graph.relation(GFTrack, DedxLikelihood)
-    \endcorrelationdiagram
-   *
-   *
    * The reconstruction of flight paths and the used likelihood ratio method are
    * described and evaluated in
    * <a href="http://www-ekp.physik.uni-karlsruhe.de/pub/web/thesis/iekp-ka2012-9.pdf">dE/dx Particle Identification and Pixel Detector Data Reduction for the Belle II Experiment</a> (Chapter 6)

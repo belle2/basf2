@@ -6,6 +6,8 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::PIDLikelihood;
+#pragma link C++ class Belle2::DedxTrack;
+#pragma link C++ class Belle2::DedxLikelihood;
 
 
 #endif

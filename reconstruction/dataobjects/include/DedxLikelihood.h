@@ -2,7 +2,7 @@
 #define DEDXLIKELIHOOD_H
 
 //only used for a few constants, no linking necessary
-#include <analysis/modules/dedxPID/DedxConstants.h>
+#include <reconstruction/modules/dedxPID/DedxConstants.h>
 
 #include <TObject.h>
 
@@ -99,7 +99,7 @@ namespace Belle2 {
 
     /** Load prior distributions from a file.
      *
-     * For generic BB events, the PDF file in analysis/data/ contains suitable
+     * For generic BB events, the PDF file in reconstruction/data/ contains suitable
      * prior distributions.
      */
     static void loadMomentumPriorsFromFile(const std::string& filename);

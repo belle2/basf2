@@ -1,9 +1,9 @@
-#include <analysis/modules/dedxPID/DedxPIDModule.h>
-#include <analysis/modules/dedxPID/HelixHelper.h>
-#include <analysis/modules/dedxPID/DedxConstants.h>
+#include <reconstruction/modules/dedxPID/DedxPIDModule.h>
+#include <reconstruction/modules/dedxPID/HelixHelper.h>
+#include <reconstruction/modules/dedxPID/DedxConstants.h>
 
-#include <analysis/dataobjects/DedxTrack.h>
-#include <analysis/dataobjects/DedxLikelihood.h>
+#include <reconstruction/dataobjects/DedxTrack.h>
+#include <reconstruction/dataobjects/DedxLikelihood.h>
 
 #include <framework/core/Environment.h>
 #include <framework/datastore/StoreArray.h>
@@ -76,7 +76,7 @@ DedxPIDModule::DedxPIDModule() : Module()
   addParam("TrackDistanceThreshold", m_trackDistanceThreshhold, "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
   addParam("EnableDebugOutput", m_enableDebugOutput, "Wether to save information on tracks and associated hits and dE/dx values in DedxTrack objects.", false);
 
-  addParam("PDFFile", m_pdfFilename, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", Environment::Instance().getDataSearchPath() + std::string("/analysis/dedxPID_PDFs_r3701_235k_events_upper_80perc_trunc.root"));
+  addParam("PDFFile", m_pdfFilename, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", Environment::Instance().getDataSearchPath() + std::string("/reconstruction/dedxPID_PDFs_r3701_235k_events_upper_80perc_trunc.root"));
   addParam("IgnoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 }
 

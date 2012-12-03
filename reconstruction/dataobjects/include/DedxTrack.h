@@ -1,7 +1,7 @@
 #ifndef DEDXTRACK_H
 #define DEDXTRACK_H
 
-#include <analysis/modules/dedxPID/DedxConstants.h>
+#include <reconstruction/modules/dedxPID/DedxConstants.h>
 
 #include <TObject.h>
 #include <TVector3.h>

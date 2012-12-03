@@ -10,7 +10,7 @@
 // PID Likelihoods
 #include <top/dataobjects/TOPLikelihood.h>
 #include <arich/dataobjects/ARICHLikelihoods.h>
-#include <analysis/dataobjects/DedxLikelihood.h>
+#include <reconstruction/dataobjects/DedxLikelihood.h>
 
 using namespace Belle2;
 

@@ -1,4 +1,4 @@
-#include <analysis/dataobjects/DedxLikelihood.h>
+#include <reconstruction/dataobjects/DedxLikelihood.h>
 #include <framework/logging/Logger.h>
 
 #include <TH1F.h>

@@ -3,8 +3,8 @@
 
 #include <framework/core/Module.h>
 
-#include <analysis/modules/dedxPID/DedxConstants.h>
-#include <analysis/modules/dedxPID/HelixHelper.h>
+#include <reconstruction/modules/dedxPID/DedxConstants.h>
+#include <reconstruction/modules/dedxPID/HelixHelper.h>
 
 #include <framework/datastore/StoreArray.h>
 

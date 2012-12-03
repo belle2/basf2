@@ -169,13 +169,13 @@ void DisplayModule::event()
     m_visualizer->addSimHit(bklmhits[i], el->from);
   }
 
-  StoreArray<EKLMSimHit> eklmhits;
-  RelationIndex<MCParticle, EKLMSimHit> mcpart_to_eklmhits(mcparticles, eklmhits);
+  StoreArray<EKLMStepHit> eklmhits;
+  RelationIndex<MCParticle, EKLMStepHit> mcpart_to_eklmhits(mcparticles, eklmhits);
   const int nEKLMHits = eklmhits.getEntries();
   for (int i = 0; i < nEKLMHits; i++) {
-    const RelationIndexContainer<MCParticle, EKLMSimHit>::Element* el = mcpart_to_eklmhits.getFirstElementTo(eklmhits[i]);
+    const RelationIndexContainer<MCParticle, EKLMStepHit>::Element* el = mcpart_to_eklmhits.getFirstElementTo(eklmhits[i]);
     if (!el) {
-      B2WARNING("MCParticle not found for EKLMSimHit, skipping hit!");
+      B2WARNING("MCParticle not found for EKLMStepHit, skipping hit!");
       continue;
     }
 

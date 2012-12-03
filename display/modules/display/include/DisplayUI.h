@@ -92,6 +92,9 @@ namespace Belle2 {
     /** return viewer class. */
     SplitGLView* getViewer() { return m_viewer; }
 
+    /** Close window and continue execution. */
+    void closeAndContinue();
+
     /** Close window and exit immediately. */
     void exit();
 

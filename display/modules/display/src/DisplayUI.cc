@@ -372,7 +372,7 @@ void DisplayUI::makeGui()
     {
       TGButton* b = new TGTextButton(hf, "Continue without display");
       hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
-      b->Connect("Clicked()", "TEveBrowser", gEve->GetBrowser(), "CloseWindow()");
+      b->Connect("Clicked()", "Belle2::DisplayUI", this, "closeAndContinue()");
 
       b = new TGTextButton(hf, "Exit");
       hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
@@ -472,6 +472,13 @@ void DisplayUI::automaticEvent()
   }
 
   i++;
+}
+
+void DisplayUI::closeAndContinue()
+{
+  gEve->GetBrowser()->CloseWindow();
+
+  gSystem->ExitLoop();
 }
 
 void DisplayUI::exit()

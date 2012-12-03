@@ -478,7 +478,11 @@ void DisplayUI::exit()
 {
   gEve->CloseEveWindow();
 
-  ::exit(0);
+  //stop event processing after current event
+  StoreObjPtr<EventMetaData> eventMetaData;
+  eventMetaData->setEndOfData();
+
+  gSystem->ExitLoop();
 }
 
 ClassImp(DisplayUI)

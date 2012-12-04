@@ -57,9 +57,11 @@
 #include <iostream>
 
 #include <boost/foreach.hpp>
-
+#include <boost/math/special_functions/sign.hpp>
 #include <TMath.h>
 #include <TGeoManager.h>
+#include <TDatabasePDG.h>
+
 
 using namespace std;
 using namespace Belle2;
@@ -84,17 +86,13 @@ GenFitterModule::GenFitterModule() :
 
   addParam("MCParticlesColName", m_mcParticlesColName,
            "Name of collection holding the MCParticles (need to create relations between found tracks and MCParticles)", string(""));
-
-  //the tracks from MCTrackFinder are treated slightly different from tracks from pattern recognition (uknown pdg), so this parameter should be set true from mcTrack and false for pattern reco tracks
-  addParam("mcTracks", m_mcTracks, "Set true if the track candidates are from MCTrackFinder, set false if they are coming from the pattern recognition", bool(true));
   //select the filter and set some parameters
   addParam("FilterId", m_filterId, "Set 0 to use Kalman Filter, 1 to use DAF", int(0));
   addParam("NIterations", m_nIter, "Number of iterations for the Kalman filter", int(1));
   addParam("ProbCut", m_probCut, "Probability cut for the DAF (0.001, 0.005, 0.01)", double(0.001));
   addParam("StoreFailedTracks", m_storeFailed, "Set true if the tracks where the fit failed should also be stored in the output", bool(false));
-  addParam("pdg", m_pdg, "Set the pdg hypothesis (positive charge) for the track (if set to -999, MC/default pdg will be used)", int(-999));
-  addParam("allPDG", m_allPDG, "Set true if you want each track fitted 4 times with different pdg hypothesises (-11,-13, 211, 321), active only for pattern recognition tracks", bool(false));
   addParam("UseClusters", m_useClusters, "if set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used", false);
+  addParam("PDGCodes", m_pdgCodes, "List of PDG codes used to set the mass hypothesis for the fit. All your codes will be tried with every track. The sign of your codes will be ignored and the charge will always come from the GFTrackCand. If you do not set any PDG code the code will be taken from the GFTrackCand. This is the default behavior)", vector<int>(0));
   //output
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the final GFTracks (will be created by this module)", string(""));
   addParam("TracksColName", m_tracksColName, "Name of collection holding the final Tracks (will be created by this module)", string(""));
@@ -136,6 +134,17 @@ void GenFitterModule::initialize()
     GFFieldManager::getInstance()->init(new GFGeant4Field());
   }
   GFMaterialEffects::getInstance()->setMscModel("Highland");
+
+  //read the pdgCode options and set attributes accordingly
+  int nPdgCodes = m_pdgCodes.size();
+  if (nPdgCodes == 0) {
+    m_usePdgCodeFromTrackCand = true;
+  } else {
+    m_usePdgCodeFromTrackCand = false;
+    for (int i = 0; i != nPdgCodes; ++i) {
+      m_pdgCodes[i] = abs(m_pdgCodes[i]);
+    }
+  }
 
   //set parameters for the fitter algorithm objects
   m_kalmanFilter.setNumIterations(m_nIter);
@@ -203,9 +212,7 @@ void GenFitterModule::event()
 
   if (m_filterId == 0) {
     B2DEBUG(99, "Kalman filter with " << m_nIter << " iterations will be used ");
-  }
-
-  else {
+  } else {
     B2DEBUG(99, "DAF will wit probability cut " << m_probCut << " will be used ");
   }
 
@@ -230,49 +237,31 @@ void GenFitterModule::event()
 
     //there is different information from mctracks and 'real' pattern recognition tracks, e.g. for PR tracks the PDG is unknown
 
-    vector<int> pdg;   //vector to store the pdg hypothesises
-    if (m_mcTracks == true) {
-      //for GFTrackCandidates from MCTrackFinder all information is already there
-      //check for user chosen pdg, otherwise put the true pdg in the vector
-      if (m_pdg != -999) {
-        pdg.push_back(m_pdg);
-      } else {
-        pdg.push_back(aTrackCandPointer->getPdgCode());
+    if (m_usePdgCodeFromTrackCand == true) {
+      m_pdgCodes.clear(); //clear the pdg code from the last track
+      m_pdgCodes.push_back(aTrackCandPointer->getPdgCode());
+      if (m_pdgCodes[0] == 0) {
+        B2FATAL("The current GFTrackCand has not valid PDG code (it is 0) AND you did not set any valid PDG Code in GenFitter module to use instead");
       }
     }
 
-    else {
-      //the idea is to use different possible pdg values (with correct charge) and fit them all and only afterwards select the best hypothesis
-      if (m_allPDG == true) {
-        pdg.push_back(-11);
-        pdg.push_back(-13);
-        pdg.push_back(211);
-        pdg.push_back(321);
-      } else {
-        if (m_pdg != -999) {
-          pdg.push_back(m_pdg);
-        } else pdg.push_back(-13);    //just choose some random common pdg, in this case muon
-      }
-    }
-
-    int pdgCounter = pdg.size();   //number of pdg hypothesises
-
+    const int nPdg = m_pdgCodes.size();  //number of pdg hypothesises
     bool candFitted = false;   //boolean to mark if the track candidates was fitted successfully with at least one PDG hypothesis
 
-    while (pdgCounter > 0) {  //while loop over all pdg hypothesises
-      if (m_mcTracks == true && m_pdg == -999) {
-        aTrackCandPointer->setPdgCode(pdg.at(pdgCounter - 1));
-      } else {
-        aTrackCandPointer->setPdgCode(int(TMath::Sign(1., aTrackCandPointer->getChargeSeed()) * pdg.at(pdgCounter - 1)));
+    for (int iPdg = 0; iPdg != nPdg; ++iPdg) {  // loop over all pdg hypothesises
+      TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(m_pdgCodes[iPdg]);
+      int currentPdgCode = boost::math::sign(aTrackCandPointer->getChargeSeed()) * m_pdgCodes[iPdg];
+      if (currentPdgCode == 0) {
+        B2FATAL("Either the charge of the current GFTRackCand is 0 or you set 0 as a PDG code");
       }
-
-      trackRep = new RKTrackRep(aTrackCandPointer);
-
-      if (m_mcTracks) {
-        B2DEBUG(99, "Fit MCTrack with start values: ");
-      } else {
-        B2DEBUG(99, "Fit pattern reco track with start values: ");
+      if (part->Charge() > 0.0) {
+        aTrackCandPointer->setPdgCode(currentPdgCode);
+      } else { // leptons need pdg codes with the sign of the code opposite of the sign of the particle charge
+        aTrackCandPointer->setPdgCode(-1 * currentPdgCode);
       }
+      trackRep = new RKTrackRep(aTrackCandPointer); //give the seed helix parameters and cov and the pdg code to the track fitter
+
+      B2DEBUG(99, "Fit track with start values: ");
 
       //get fit starting values from the from the track candidate
       TMatrixD stateSeed = aTrackCandPointer->getStateSeed();
@@ -549,18 +538,14 @@ void GenFitterModule::event()
           B2WARNING("Something went wrong during the fit!");
           ++m_failedFitCounter;
         }
-
-
-      } //end loop over all track candidates
-
+      }
       factory.clear();
-      pdgCounter--;
-    } //end while
+    } //end loop over all pdg hypothesis
 
     if (candFitted == true) m_successfulGFTrackCandFitCounter++;
     else m_failedGFTrackCandFitCounter++;
 
-  }// end else (track has hits)
+  }//end loop over all track candidates
   B2DEBUG(99, "GenFitter event summary: " << trackCounter + 1 << " tracks were processed");
 
 }

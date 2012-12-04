@@ -96,11 +96,9 @@ namespace Belle2 {
     double m_probCut;                                /**< Probability cut for the DAF filter (0.001, 0.005, 0.01). */
 
     bool m_storeFailed;                              /**< Boolean to mark if failed track fits should also be stored as Tracks. */
-    int m_pdg;                                       /**< PDG hypothesis for the track fit. If -999: MC/default values will be used. */
-    bool m_allPDG;                                   /**< Boolean to mark if the track should be fitted with all implemented pdg hypothesises.*/
     bool m_useClusters;                              /**< Boolean to mark if PXD/SVD cluster hits should be used instead of true hits in the.*/
-    std::vector<int> m_pdgCodes;
-    bool m_usePdgCodeFromTrackCand;
+    std::vector<int> m_pdgCodes;                     /**< holds the PDG codes the user sets. If empty the PDG code from GFTrackCand will be written into it*/
+    bool m_usePdgCodeFromTrackCand;                  /**< flag to indicate if PDG code will be taken from GFTrackCand or from user input in m_pdgCodes*/
     std::ofstream HelixParam;                        /**< Text output file name */
     bool m_createTextFile;                           /**< Boolean to select if an output file with helix parameters should be created. */
     GFKalman m_kalmanFilter;                         /**< The Genfit Kalman filter object */

@@ -129,7 +129,7 @@ namespace Belle2 {
       m_fitFunction->FixParameter(4, 0);
 
     // do fit
-    m_fitResultsPtr = m_digitizedAmplitude->Fit(m_fitFunction, "LLSQB");
+    m_fitResultsPtr = m_digitizedAmplitude->Fit(m_fitFunction, "LSQN");
 
 
     // if save histograms if outputFilename is non-empty

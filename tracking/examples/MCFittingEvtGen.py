@@ -52,6 +52,7 @@ evtgeninput.param('boost2LAB', True)
 #
 # simulation
 g4sim = register_module('FullSim')
+g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
 # make the simulation less noisy
 g4sim.logging.log_level = LogLevel.ERROR
 
@@ -76,17 +77,18 @@ param_mctrackfinder = {'WhichParticles': ['PXD', 'SVD', 'CDC']}
 mctrackfinder.param(param_mctrackfinder)
 
 # fitting
-cdcfitting = register_module('GenFitter')
+trackfitting = register_module('GenFitter')
 
 # fit the tracks with one iteration of Kalman filter
-param_cdcfitting = {
+# 'PDGCodes': [] means use the pdgCodes from the MCTrackFinder wich are the correct ones
+param_trackfitting = {
     'StoreFailedTracks': 0,
-    'mcTracks': 1,
     'FilterId': 0,
+    'PDGCodes': [],
     'NIterations': 1,
     'ProbCut': 0.001,
     }
-cdcfitting.param(param_cdcfitting)
+trackfitting.param(param_trackfitting)
 
 # output
 output = register_module('RootOutput')
@@ -104,7 +106,7 @@ main.add_module(evtgeninput)
 main.add_module(g4sim)
 main.add_module(cdcDigitizer)
 main.add_module(mctrackfinder)
-main.add_module(cdcfitting)
+main.add_module(trackfitting)
 main.add_module(output)
 
 # Process events

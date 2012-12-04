@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import os
 from basf2 import *
 set_log_level(LogLevel.ERROR)
@@ -170,6 +171,7 @@ g4sim.param('UICommands', [  # "/process/inactivate     Transportation mu+",
     '/process/inactivate           Cerenkov mu-',
     '/process/inactivate      Scintillation mu-',
     ])
+g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
 # "/process/inactivate        StepLimiter mu-"
 #
 # digitizer
@@ -195,7 +197,7 @@ trackfitter.param('noiseCoulomb', False)
 # you do not have to switch off bremsstrahlung in Genfit because it is only
 # active for electrons (in Genfit!) anyway and this steering file uses only
 # Muons
-trackfitter.param('filterIterations', 3)
+trackfitter.param('filterIterations', 2)
 trackfitchecker = register_module('TrackFitChecker')
 trackfitchecker.logging.log_level = LogLevel.INFO  # the results of the
                                                    # statistical tests will

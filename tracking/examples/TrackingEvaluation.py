@@ -108,7 +108,6 @@ mcfitting = register_module('GenFitter')
 # fit the tracks with one iteration of Kalman filter
 param_mcfitting = {
     'StoreFailedTracks': 0,
-    'mcTracks': 1,
     'FilterId': 0,
     'NIterations': 1,
     'ProbCut': 0.001,
@@ -141,9 +140,7 @@ param_cdcfitting = {
     'GFTrackCandidatesColName': 'GFTrackCands_PatternReco',
     'TracksColName': 'Tracks_PatternReco',
     'GFTracksColName': 'GFTracks_PatternReco',
-    'mcTracks': 0,
-    'pdg': 211,
-    'allPDG': 0,
+    'PDGCodes': [211],
     'FilterId': 1,
     'NIterations': 1,
     'ProbCut': 0.001,

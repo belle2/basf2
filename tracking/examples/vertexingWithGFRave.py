@@ -49,7 +49,7 @@ param_mctrackfinder = {
     }
 mctrackfinder.param(param_mctrackfinder)
 trackfitter = register_module('GenFitter')
-# trackfitter.param("only6", True)
+
 trackfitter.logging.log_level = LogLevel.WARNING
 trackfitter.param('NIterations', 2)
 trackfitchecker = register_module('TrackFitChecker')

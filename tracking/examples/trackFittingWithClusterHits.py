@@ -35,6 +35,7 @@ pGun.param({
     'zVertexParams': [0.0, 0.0],
     })
 g4sim = register_module('FullSim')
+g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
 SVDDIGI = register_module('SVDDigitizer')
 # SVDDIGI.logging.log_level = LogLevel.DEBUG
 SVDCLUST = register_module('SVDClusterizer')
@@ -54,6 +55,7 @@ param_mctrackfinder = {
     'UseClusters': True,
     }
 mctrackfinder.param(param_mctrackfinder)
+
 # mctrackfinder.logging.log_level = LogLevel.DEBUG
 
 trackfitter = register_module('GenFitter')

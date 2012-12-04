@@ -36,6 +36,7 @@ param_pGun = {
 pGun.param(param_pGun)
 
 g4sim = register_module('FullSim')
+g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
 
 cdcDigitizer = register_module('CDCDigitizer')
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
@@ -52,11 +53,12 @@ mctrackfinder.param(param_mctrackfinder)
 
 trackfitter = register_module('GenFitter')
 trackfitter.logging.log_level = LogLevel.WARNING
-trackfitter.param('NIterations', 3)
+trackfitter.param('NIterations', 2)
 
 trackfitchecker = register_module('TrackFitChecker')
 trackfitchecker.logging.log_level = LogLevel.INFO  # the reults of the statistical tests will only show up at info or debug level
-trackfitchecker.param('testSi', True)
+# trackfitchecker.param('testSi', True)
+trackfitchecker.param('robustTests', True)
 trackfitchecker.param('testCdc', False)
 trackfitchecker.param('writeToTextFile', True)  # especially when CDC hits are anlyzed the the info on the termianl becomes unreadable. look into the file statisticaltests.txt instead (at the moment the file name is hard coded
 

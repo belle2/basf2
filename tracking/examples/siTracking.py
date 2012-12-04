@@ -37,6 +37,7 @@ param_pGun = {
 pGun.param(param_pGun)
 
 g4sim = register_module('FullSim')
+g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
 
 mctrackfinder = register_module('MCTrackFinder')
 param_mctrackfinder = {
@@ -54,7 +55,7 @@ trackfitchecker.logging.log_level = LogLevel.INFO  # the reults of the statistic
 trackfitchecker.param('testSi', True)
 trackfitchecker.param('writeToTextFile', True)
 trackfitchecker.param('writeToRootFile', True)
-trackfitchecker.param('inspectTracks', True)
+trackfitchecker.param('inspectTracks', False)
 trackfitchecker.param('outputFileName', 'siTracking')
 
 # Create paths

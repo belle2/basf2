@@ -124,7 +124,7 @@ trackfitter.param('noiseCoulomb', False)
 # you do not have to switch off bremsstrahlung in Genfit becuse it is only
 # active for electrons (in Genfit!) anyway and this steering file uses only
 # Pions
-trackfitter.param('filterIterations', 3)
+trackfitter.param('filterIterations', 2)
 trackfitchecker = register_module('TrackFitChecker')
 trackfitchecker.logging.log_level = LogLevel.INFO  # the reults of the
                                                    # statistical tests will

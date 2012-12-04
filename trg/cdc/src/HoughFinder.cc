@@ -50,7 +50,7 @@ namespace Belle2 {
 
 string
 TRGCDCHoughFinder::version(void) const {
-    return string("TRGCDCHoughFinder 5.12");
+    return string("TRGCDCHoughFinder 5.24");
 }
 
 TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
@@ -378,7 +378,7 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
 	const TCWHit * wh = ts.segment().center().hit();
 	if (! wh) continue;
 	const CDCSimHit & sh = * wh->simHit();
-	const int trackId = sh.m_trackId;
+	const int trackId = sh.getTrackId();
 	if (! trackMap[trackId])
 	    trackMap[trackId] = new vector<const TCSegment *>();	    
 	trackMap[trackId]->push_back(& ts.segment());

@@ -79,14 +79,12 @@ namespace Belle2 {
   bool CDCSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   {
     // Get deposited energy
-    const G4double edep = aStep->GetTotalEnergyDeposit();
+    G4double edep = aStep->GetTotalEnergyDeposit();
 
-    /* modified by M. Uchida 2012.08.29 */
-    //    if (edep == 0.) return false;
 
+
+    edep *= MeV; // convert unit from MeV to GeV
     if (edep <= m_thresholdEnergyDeposit) return false;
-
-
 
     // Get step length
     const G4double stepLength = aStep->GetStepLength();
@@ -348,12 +346,6 @@ namespace Belle2 {
                                    const G4ThreeVector& posTrack,
                                    const G4int lr)
   {
-
-
-    // Skip edep < m_thresholdEnergyDeoposit
-    // M. Uchida 2012.09.04
-
-    if (edep <= m_thresholdEnergyDeposit) return false;
 
     StoreArray<MCParticle> mcParticles;
     //change Later

@@ -82,7 +82,7 @@ namespace Belle2 {
     G4double edep = aStep->GetTotalEnergyDeposit();
 
 
-
+    // Discard the hit below Edep_th
     edep *= MeV; // convert unit from MeV to GeV
     if (edep <= m_thresholdEnergyDeposit) return false;
 
@@ -346,6 +346,9 @@ namespace Belle2 {
                                    const G4ThreeVector& posTrack,
                                    const G4int lr)
   {
+
+    // Discard the hit below Edep_th
+    if (edep <= m_thresholdEnergyDeposit) return 0;
 
     StoreArray<MCParticle> mcParticles;
     //change Later

@@ -79,11 +79,11 @@ namespace Belle2 {
   bool CDCSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   {
     // Get deposited energy
-    G4double edep = aStep->GetTotalEnergyDeposit();
+    // convert unit from MeV to GeV
+    const G4double edep = aStep->GetTotalEnergyDeposit() * MeV;
 
 
     // Discard the hit below Edep_th
-    edep *= MeV; // convert unit from MeV to GeV
     if (edep <= m_thresholdEnergyDeposit) return false;
 
     // Get step length

@@ -172,14 +172,12 @@ cdcfitting = register_module('GenFitter')
 
 # set correct collection name as input and custom collection names as output
 # select DAF instead of Kalman as Filter
-# set the pdg hypothesis to the simulated one, if you want to fit with different pdg hypothesises, set 'allPDG' to true
+# set the pdg hypothesis to the simulated one, if you want to fit with different pdg hypothesises, just state them all in the PDGCodes list
 param_cdcfitting = {
     'GFTrackCandidatesColName': 'GFTrackCands',
     'GFTracksColName': 'GFTracks',
     'TracksColName': 'Tracks',
-    'mcTracks': 0,
-    'pdg': 211,
-    'allPDG': 0,
+    'PDGCodes': [211],
     'FilterId': 1,
     'NIterations': 1,
     'ProbCut': 0.001,

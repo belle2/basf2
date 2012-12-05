@@ -72,12 +72,7 @@ mctrackfinder.logging.log_level = LogLevel.INFO
 trackFitter = register_module('GenFitter')
 
 # fit the tracks with one iteration of Kalman filter
-param_fitting = {
-    'StoreFailedTracks': 0,
-    'mcTracks': 1,
-    'FilterId': 0,
-    'NIterations': 1,
-    }
+param_fitting = {'StoreFailedTracks': 0, 'FilterId': 0, 'NIterations': 1}
 trackFitter.param(param_fitting)
 trackFitter.logging.log_level = LogLevel.WARNING
 trackfitchecker = register_module('TrackFitChecker')

@@ -408,15 +408,21 @@ void DisplayUI::handleParameterChange(int id)
 
 void DisplayUI::toggleColorScheme()
 {
-  TGLViewer* v = m_viewer->getActiveGLViewer();
-  bool dark = v->ColorSet().Background().GetColorIndex() != kWhite;
-  v->RefLightColorSet().Background().SetColor(kWhite);
-  v->RefDarkColorSet().Background().SetColor(kBlack);
-  if (dark)
-    v->UseLightColorSet();
-  else
-    v->UseDarkColorSet();
-  gEve->Redraw3D(false); //do not reset camera when redrawing
+  TEveViewerList* viewers = gEve->GetViewers();
+  TEveElement::List_ci end_it = viewers->EndChildren();
+  for (TEveElement::List_i it = viewers->BeginChildren(); it != end_it; ++it) {
+    TEveViewer* v = static_cast<TEveViewer*>(*it);
+    TGLViewer* glv = v->GetGLViewer();
+
+    bool dark = glv->ColorSet().Background().GetColorIndex() != kWhite;
+    glv->RefLightColorSet().Background().SetColor(kWhite);
+    glv->RefDarkColorSet().Background().SetColor(kBlack);
+    if (dark)
+      glv->UseLightColorSet();
+    else
+      glv->UseDarkColorSet();
+    glv->DoDraw();
+  }
 }
 
 void DisplayUI::savePicture(bool highres)

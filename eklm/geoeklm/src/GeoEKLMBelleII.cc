@@ -29,6 +29,7 @@
 #include <eklm/geoeklm/EKLMObjectNumbers.h>
 #include <eklm/geoeklm/EKLMTransformationFactory.h>
 #include <eklm/simeklm/EKLMSensitiveDetector.h>
+#include <framework/core/Environment.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <geometry/CreatorFactory.h>
@@ -45,28 +46,58 @@ static const char MemErr[] = "Memory allocation error.";
 /* Register the creator */
 geometry::CreatorFactory<GeoEKLMBelleII> GeoEKLMFactory("EKLMBelleII");
 
+void GeoEKLMBelleII::constructor(bool geo)
+{
+  std::string fname;
+  haveGeoDat = false;
+  haveGeo = false;
+  fname = Environment::Instance().getDataSearchPath() +
+          "/eklm/eklm_alignment.dat";
+  transf = NULL;
+  if (geo) {
+    transf = new(std::nothrow) EKLM::TransformData;
+    if (transf == NULL)
+      B2FATAL(MemErr);
+    if (readTransforms(fname.c_str(), transf) != 0)
+      B2FATAL("Cannot read transformation data file " << fname);
+  }
+}
+
 GeoEKLMBelleII::GeoEKLMBelleII()
 {
-  SectorSupportSize.CornerAngle = -1;
+  constructor(true);
+}
+
+GeoEKLMBelleII::GeoEKLMBelleII(bool geo)
+{
+  constructor(geo);
 }
 
 GeoEKLMBelleII::~GeoEKLMBelleII()
 {
   int i, j;
-  for (i = 0; i < nPlane; i++) {
-    for (j = 0; j < nBoard; j++)
-      delete BoardTransform[i][j];
-    free(BoardTransform[i]);
-    free(BoardPosition[i]);
-    free(SectionSupportPosition[i]);
+  if (transf != NULL)
+    delete transf;
+  if (haveGeoDat) {
+    for (i = 0; i < nPlane; i++) {
+      free(BoardPosition[i]);
+      free(SectionSupportPosition[i]);
+    }
+    free(StripPosition);
+    free(StripBoardPosition);
+    free(ESTRPar.z);
+    free(ESTRPar.rmin);
+    free(ESTRPar.rmax);
   }
-  free(StripPosition);
-  free(StripBoardPosition);
-  delete m_sensitive;
-  free(ESTRPar.z);
-  free(ESTRPar.rmin);
-  free(ESTRPar.rmax);
-  freeSolids();
+  if (haveGeo) {
+    for (i = 0; i < nPlane; i++) {
+      for (j = 0; j < nBoard; j++)
+        delete BoardTransform[i][j];
+      free(BoardTransform[i]);
+    }
+    delete m_sensitive;
+    freeSolids();
+  }
 }
 
 void GeoEKLMBelleII::mallocSolids()
@@ -188,11 +219,13 @@ static void readSectorSupportData(struct EKLMSectorSupportSize* sss,
   sss->Corner4Z = gd->getLength("Corner4Z") * cm;
 }
 
-void GeoEKLMBelleII::readXMLData(const GearDir& content)
+void GeoEKLMBelleII::readXMLData()
 {
   int i;
   int j;
-  GearDir gd(content);
+  if (readESTRData(&ESTRPar) == ENOMEM)
+    B2FATAL(MemErr);
+  GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
   m_mode = (enum EKLMDetectorMode)gd.getInt("Mode");
   if (m_mode < 0 || m_mode > 2)
     B2FATAL("EKLM started with unknown geometry mode " << m_mode << ".");
@@ -314,17 +347,85 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
                                                  getLength("DeltaLLeft") * cm;
     }
   }
+  haveGeoDat = true;
 }
+
+/****************************** TRANSFORMATIONS ******************************/
+
+void GeoEKLMBelleII::getEndcapTransform(HepGeom::Transform3D* t, int n)
+{
+  if (!haveGeoDat)
+    readXMLData();
+  if (n == 0)
+    *t = HepGeom::Translate3D(EndcapPosition.X, EndcapPosition.Y,
+                              -EndcapPosition.Z + 94.0 * CLHEP::cm);
+  else
+    *t = HepGeom::Translate3D(EndcapPosition.X, EndcapPosition.Y,
+                              EndcapPosition.Z) *
+         HepGeom::RotateY3D(180.*CLHEP::deg);
+}
+
+void GeoEKLMBelleII::getLayerTransform(HepGeom::Transform3D* t, int n)
+{
+  if (!haveGeoDat)
+    readXMLData();
+  *t = HepGeom::Translate3D(0.0, 0.0, -EndcapPosition.length / 2.0 +
+                            (n + 1) * Layer_shiftZ +
+                            0.5 * LayerPosition.length);
+}
+
+void GeoEKLMBelleII::getSectorTransform(HepGeom::Transform3D* t, int n)
+{
+  if (!haveGeoDat)
+    readXMLData();
+  switch (n) {
+    case 0:
+      *t = HepGeom::Translate3D(0., 0., 0.);
+      break;
+    case 1:
+      *t = HepGeom::RotateY3D(180.0 * CLHEP::deg);
+      break;
+    case 2:
+      *t = HepGeom::RotateZ3D(90.0 * CLHEP::deg) *
+           HepGeom::RotateY3D(180.0 * CLHEP::deg);
+      break;
+    case 3:
+      *t = HepGeom::RotateZ3D(-90.0 * CLHEP::deg);
+      break;
+  }
+}
+
+void GeoEKLMBelleII::getPlaneTransform(HepGeom::Transform3D* t, int n)
+{
+  if (!haveGeoDat)
+    readXMLData();
+  if (n == 0)
+    *t = HepGeom::Translate3D(PlanePosition.X, PlanePosition.Y,
+                              PlanePosition.Z);
+  else
+    *t = HepGeom::Translate3D(PlanePosition.X, PlanePosition.Y,
+                              -PlanePosition.Z) *
+         HepGeom::Rotate3D(180. * CLHEP::deg,
+                           HepGeom::Vector3D<double>(1., 1., 0.));
+}
+
+void GeoEKLMBelleII::getStripTransform(HepGeom::Transform3D* t, int n)
+{
+  if (!haveGeoDat)
+    readXMLData();
+  *t = HepGeom::Translate3D(StripPosition[n].X, StripPosition[n].Y, 0.0);
+}
+
+/************************** CREATION OF VOLUMES ******************************/
 
 void GeoEKLMBelleII::createEndcap(G4LogicalVolume* mlv)
 {
-  double z;
   G4Polyhedra* boct;
   G4Tubs* atube;
   G4SubtractionSolid* solidEndcap;
   G4LogicalVolume* logicEndcap;
   G4PVPlacementGT* physiEndcap;
-  G4Transform3D t;
+  G4Transform3D* t;
   std::string Endcap_Name = "Endcap_" +
                             boost::lexical_cast<std::string>(curvol.endcap);
   boct = new(std::nothrow) G4Polyhedra("tempoct", ESTRPar.phi, ESTRPar.dphi,
@@ -338,19 +439,15 @@ void GeoEKLMBelleII::createEndcap(G4LogicalVolume* mlv)
   solidEndcap = new(std::nothrow) G4SubtractionSolid(Endcap_Name, boct, atube);
   if (solidEndcap == NULL)
     B2FATAL(MemErr);
-  if (curvol.endcap == 1)
-    z = -EndcapPosition.Z + 94.0 * cm;
-  else
-    z = EndcapPosition.Z;
-  t = G4Translate3D(EndcapPosition.X, EndcapPosition.Y, z);
   logicEndcap =
     new(std::nothrow) G4LogicalVolume(solidEndcap, mat.iron, Endcap_Name);
   if (logicEndcap == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicEndcap, true);
   geometry::setColor(*logicEndcap, "#ffffff22");
+  t = &transf->endcap[curvol.endcap - 1];
   physiEndcap =
-    new(std::nothrow) G4PVPlacementGT(t, t, logicEndcap,
+    new(std::nothrow) G4PVPlacementGT(*t, *t, logicEndcap,
                                       Endcap_Name, mlv,
                                       curvol.endcap);
   if (physiEndcap == NULL)
@@ -364,7 +461,6 @@ void GeoEKLMBelleII::createLayer(G4PVPlacementGT* mpvgt)
   static G4Tubs* solidLayer = NULL;
   G4LogicalVolume* logicLayer;
   G4PVPlacementGT* physiLayer;
-  G4Transform3D t;
   std::string Layer_Name = "Layer_" +
                            boost::lexical_cast<std::string>(curvol.layer) +
                            "_" + mpvgt->GetName();
@@ -380,14 +476,10 @@ void GeoEKLMBelleII::createLayer(G4PVPlacementGT* mpvgt)
   if (logicLayer == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicLayer, false);
-  LayerPosition.Z = -EndcapPosition.length / 2.0 +
-                    curvol.layer * Layer_shiftZ +
-                    0.5 * LayerPosition.length;
-  if (curvol.endcap == 1)
-    LayerPosition.Z = -LayerPosition.Z;
-  t = G4Translate3D(0.0, 0.0, LayerPosition.Z);
   physiLayer =
-    new(std::nothrow) G4PVPlacementGT(mpvgt, t, logicLayer, Layer_Name,
+    new(std::nothrow) G4PVPlacementGT(mpvgt,
+                                      transf->layer[curvol.endcap - 1][curvol.layer - 1],
+                                      logicLayer, Layer_Name,
                                       layerNumber(curvol.endcap, curvol.layer));
   if (physiLayer == NULL)
     B2FATAL(MemErr);
@@ -401,7 +493,6 @@ void GeoEKLMBelleII::createSector(G4PVPlacementGT* mpvgt)
   static G4Tubs* solidSector = NULL;
   G4LogicalVolume* logicSector;
   G4PVPlacementGT* physiSector;
-  G4Transform3D t;
   std::string Sector_Name = "Sector_" +
                             boost::lexical_cast<std::string>(curvol.sector) +
                             "_" + mpvgt->GetName();
@@ -417,22 +508,10 @@ void GeoEKLMBelleII::createSector(G4PVPlacementGT* mpvgt)
   if (logicSector == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicSector, false);
-  switch (curvol.sector) {
-    case 1:
-      t = G4Translate3D(0., 0., 0.);
-      break;
-    case 2:
-      t = G4RotateY3D(180.0 * deg);
-      break;
-    case 3:
-      t = G4RotateZ3D(90.0 * deg) * G4RotateY3D(180.0 * deg);
-      break;
-    case 4:
-      t = G4RotateZ3D(-90.0 * deg);
-      break;
-  }
   physiSector =
-    new(std::nothrow) G4PVPlacementGT(mpvgt, t, logicSector, Sector_Name,
+    new(std::nothrow) G4PVPlacementGT(mpvgt,
+                                      transf->sector[curvol.endcap - 1][curvol.layer - 1][curvol.sector - 1],
+                                      logicSector, Sector_Name,
                                       sectorNumber(curvol.endcap, curvol.layer,
                                                    curvol.sector));
   if (physiSector == NULL)
@@ -1030,7 +1109,6 @@ void GeoEKLMBelleII::createPlane(G4PVPlacementGT* mpvgt)
   double ang;
   G4LogicalVolume* logicPlane;
   G4PVPlacementGT* physiPlane;
-  G4Transform3D t;
   G4Transform3D t1;
   G4Transform3D t2;
   G4Transform3D t3;
@@ -1164,13 +1242,9 @@ void GeoEKLMBelleII::createPlane(G4PVPlacementGT* mpvgt)
   if (logicPlane == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicPlane, false);
-  if (curvol.plane == 1) {
-    t = G4Translate3D(PlanePosition.X, PlanePosition.Y, PlanePosition.Z);
-  } else {
-    t = G4Translate3D(PlanePosition.X, PlanePosition.Y, -PlanePosition.Z) *
-        G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.));
-  }
-  physiPlane = new(std::nothrow) G4PVPlacementGT(mpvgt, t, logicPlane, Plane_Name,
+  physiPlane = new(std::nothrow) G4PVPlacementGT(mpvgt,
+                                                 transf->plane[curvol.endcap - 1][curvol.layer - 1][curvol.sector - 1][curvol.plane - 1],
+                                                 logicPlane, Plane_Name,
                                                  planeNumber(curvol.endcap, curvol.layer,
                                                              curvol.sector, curvol.plane));
   if (physiPlane == NULL)
@@ -1453,9 +1527,8 @@ void GeoEKLMBelleII::createStripVolume(G4PVPlacementGT* mpvgt)
   if (logicStripVolume == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicStripVolume, false);
-  t = G4Translate3D(StripPosition[curvol.strip - 1].X +
-                    0.5 * StripSize.rss_size,
-                    StripPosition[curvol.strip - 1].Y, 0.0);
+  t = transf->strip[curvol.endcap - 1][curvol.layer - 1][curvol.endcap - 1][curvol.plane - 1][curvol.strip - 1] *
+      G4Translate3D(0.5 * StripSize.rss_size, 0.0, 0.0);
   physiStripVolume = new(std::nothrow)
   G4PVPlacementGT(mpvgt, t, logicStripVolume, StripVolume_Name,
                   stripNumber(curvol.endcap, curvol.layer, curvol.sector,
@@ -1629,10 +1702,9 @@ void GeoEKLMBelleII::printVolumeMass(G4LogicalVolume* lv)
 void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
                             geometry::GeometryTypes type)
 {
+  (void)content;
   (void)type;
-  readXMLData(content);
-  if (readESTRData(&ESTRPar) == ENOMEM)
-    B2FATAL(MemErr);
+  readXMLData();
   m_sensitive =
     new(std::nothrow) EKLMSensitiveDetector("EKLMSensitiveDetector");
   if (m_sensitive == NULL)
@@ -1645,6 +1717,7 @@ void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
     printf("EKLM started in mode EKLM_DETECTOR_PRINTMASSES. Exiting now.\n");
     exit(0);
   }
+  haveGeo = true;
   // save infrormation to file
   if (m_outputFile.size() != 0)
     (EKLMTransformationFactory::getInstance())->

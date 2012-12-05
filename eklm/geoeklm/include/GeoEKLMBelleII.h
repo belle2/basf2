@@ -16,6 +16,7 @@
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <eklm/simeklm/EKLMSensitiveDetector.h>
+#include <eklm/geoeklm/EKLMTransformData.h>
 #include <eklm/geoeklm/G4PVPlacementGT.h>
 #include <eklm/geoeklm/G4TriangularPrism.h>
 #include <eklm/geoeklm/GeoESTRCreator.h>
@@ -33,518 +34,590 @@
 #include <string>
 #include <vector>
 
+/**
+ * @file
+ * EKLM geometry.
+ */
+
 namespace Belle2 {
 
-  /**
-   * Position information for the elements of detector.
-   */
-  struct EKLMElementPosition {
-    double innerR;   /**< Inner radius. */
-    double outerR;   /**< Outer radius. */
-    double length;   /**< Length. */
-    double X;        /**< X coordinate. */
-    double Y;        /**< Y coordinate. */
-    double Z;        /**< Z coordinate. */
-  };
-
-  /**
-   * Sector support size data.
-   */
-  struct EKLMSectorSupportSize {
-    double Thickness;        /**< Yhickness. */
-    double DeltaLY;          /**< outerR - Y of upper edge of BoxY. */
-    double CornerX;          /**< Coordinate X of corner 1. */
-    double TopCornerHeight;  /**< Corner 1 height (subtraction from plane). */
-    double Corner1LX;        /**< Corner 1 X length. */
-    double Corner1Width;     /**< Corner 1 width. */
-    double Corner1Thickness; /**< Corner 1 thickness. */
-    double Corner1Z;         /**< Corner 1 Z coordinate. */
-    double Corner2LX;        /**< Corner 2 X length. */
-    double Corner2LY;        /**< Corner 2 Y length. */
-    double Corner2Thickness; /**< Corner 2 thickness. */
-    double Corner2Z;         /**< Corner 2 Z coordinate. */
-    double Corner3LX;        /**< Corner 3 X length. */
-    double Corner3LY;        /**< Corner 3 Y length. */
-    double Corner3Thickness; /**< Corner 3 thickness. */
-    double Corner3Z;         /**< Corner 3 Z coordinate. */
-    double Corner4LX;        /**< Corner 4 X length. */
-    double Corner4LY;        /**< Corner 4 Y length. */
-    double Corner4Thickness; /**< Corner 4 thickness. */
-    double Corner4Z;         /**< Corner 4 Z coordinate. */
-    double CornerAngle;      /**< Corner 1 angle. */
-  };
-
-  /**
-   * Readout board size data.
-   */
-  struct EKLMBoardSize {
-    double length;       /**< Length. */
-    double width;        /**< Width. */
-    double height;       /**< Height. */
-    double base_width;   /**< Width of base board. */
-    double base_height;  /**< Height of base board. */
-    double strip_length; /**< Length of strip readout board. */
-    double strip_width;  /**< Width of strip readout board. */
-    double strip_height; /**< Height of strip readout board. */
-  };
-
-  /**
-   * Strip readout board position data.
-   */
-  struct EKLMStripBoardPosition {
-    double x;         /**< X coordinate. */
-  };
-
-  /**
-   * Readout board position data.
-   */
-  struct EKLMBoardPosition {
-    double r;      /**< Radius of far edge of the board. */
-    double phi;    /**< Angle. */
-  };
-
-  /**
-   * Section support position.
-   */
-  struct EKLMSectionSupportPosition {
-    double deltal_right;  /**< Right (X-plane) delta L. */
-    double deltal_left;   /**< Left (X-plane) delta L. */
-    double length;        /**< Length */
-    double x;             /**< X coordinate. */
-    double y;             /**< Y coordinate. */
-    double z;             /**< Z coordinate. */
-  };
-
-  /**
-   * Strip size data.
-   */
-  struct EKLMStripSize {
-    double width;                      /**< Width. */
-    double thickness;                  /**< Thickness. */
-    double groove_depth;               /**< Groove depth. */
-    double groove_width;               /**< Groove width. */
-    double no_scintillation_thickness; /**< Non-scintillating layer. */
-    double rss_size;                   /**< Radiation study SiPM size. */
-  };
-
-  /**
-   * Plane solids.
-   */
-  struct EKLMPlaneSolids {
-    G4Tubs* tube;                   /**< Tube. */
-    G4Box* box1;                    /**< Box. */
-    G4Box* box2;                    /**< Box to subtract corner 1. */
-    G4TriangularPrism* prism1;      /**< Corner 2. */
-    G4TriangularPrism* prism2;      /**< Corner 3. */
-    G4TriangularPrism* prism3;      /**< Corner 4. */
-    G4IntersectionSolid* is;        /**< Arc. */
-    G4SubtractionSolid* ss1;        /**< Arc - corner 1. */
-    G4SubtractionSolid* ss2;        /**< Arc - corners 1, 2. */
-    G4SubtractionSolid* ss3;        /**< Arc - corners 1, 2, 3. */
-    G4SubtractionSolid* ss4;        /**< Arc - all corners. */
-    G4SubtractionSolid* plane;      /**< Arc - all corners - boards. */
-  };
-
-  /**
-   * Section support solids.
-   */
-  struct EKLMSectionSupportSolids {
-    G4Box* topbox;        /**< Top box. */
-    G4Box* midbox;        /**< Middle box. */
-    G4Box* botbox;        /**< Bottom box. */
-    G4UnionSolid* us;     /**< Top box + middle box. */
-    G4UnionSolid* secsup; /**< Section support. */
-  };
-
-  /**
-   * Scintillator solids.
-   */
-  struct EKLMScintillatorSolids {
-    G4Box* box;               /**< Box (auxiliary). */
-    G4SubtractionSolid* sens; /**< Sensitive area. */
-  };
-
-  /**
-   * All solids for EKLM.
-   */
-  struct EKLMSolids {
-    G4Box** list;                             /**< Element of plastic list. */
-    G4Box** stripvol;                         /**< Strip + SiPM volume. */
-    G4Box** strip;                            /**< Strips. */
-    G4Box** groove;                           /**< Strip grooves. */
-    struct EKLMScintillatorSolids* scint;     /**< Scintillator. */
-    struct EKLMPlaneSolids* plane;            /**< Plane. */
-    struct EKLMSectionSupportSolids** secsup; /**< Section support. */
-  };
-
-  /**
-   * Materials for EKLM.
-   */
-  struct EKLMMaterials {
-    G4Material* air;         /**< Air. */
-    G4Material* polystyrene; /**< Polystyrene. */
-    G4Material* polystyrol;  /**< Polystyrol. */
-    G4Material* iron;        /**< Iron. */
-    G4Material* duralumin;   /**< Duralumin. */
-    G4Material* silicon;     /**< Silicon. */
-    G4Material* gel;         /**< Gel. */
-  };
-
-  /**
-   * Volume numbers.
-   */
-  struct EKLMVolumeNumbers {
-    int endcap; /**< Endcap. */
-    int layer;  /**< Layer. */
-    int sector; /**< Sector. */
-    int plane;  /**< Plane. */
-    int strip;  /**< Strip. */
-    int board;  /**< Board. */
-  };
-
-  /**
-   * Class GeoEKLMBelleII.
-   * The creator for the  EKLM geometry of the Belle II detector.
-   */
-  class GeoEKLMBelleII : public geometry::CreatorBase {
-
-  public:
+  namespace EKLM {
 
     /**
-     * Constructor.
+     * Position information for the elements of detector.
      */
-    GeoEKLMBelleII();
+    struct EKLMElementPosition {
+      double innerR;   /**< Inner radius. */
+      double outerR;   /**< Outer radius. */
+      double length;   /**< Length. */
+      double X;        /**< X coordinate. */
+      double Y;        /**< Y coordinate. */
+      double Z;        /**< Z coordinate. */
+    };
 
     /**
-     * Destructor.
+     * Sector support size data.
      */
-    ~GeoEKLMBelleII();
+    struct EKLMSectorSupportSize {
+      double Thickness;        /**< Yhickness. */
+      double DeltaLY;          /**< outerR - Y of upper edge of BoxY. */
+      double CornerX;          /**< Coordinate X of corner 1. */
+      double TopCornerHeight;  /**< Corner 1 height (subtraction from plane). */
+      double Corner1LX;        /**< Corner 1 X length. */
+      double Corner1Width;     /**< Corner 1 width. */
+      double Corner1Thickness; /**< Corner 1 thickness. */
+      double Corner1Z;         /**< Corner 1 Z coordinate. */
+      double Corner2LX;        /**< Corner 2 X length. */
+      double Corner2LY;        /**< Corner 2 Y length. */
+      double Corner2Thickness; /**< Corner 2 thickness. */
+      double Corner2Z;         /**< Corner 2 Z coordinate. */
+      double Corner3LX;        /**< Corner 3 X length. */
+      double Corner3LY;        /**< Corner 3 Y length. */
+      double Corner3Thickness; /**< Corner 3 thickness. */
+      double Corner3Z;         /**< Corner 3 Z coordinate. */
+      double Corner4LX;        /**< Corner 4 X length. */
+      double Corner4LY;        /**< Corner 4 Y length. */
+      double Corner4Thickness; /**< Corner 4 thickness. */
+      double Corner4Z;         /**< Corner 4 Z coordinate. */
+      double CornerAngle;      /**< Corner 1 angle. */
+    };
 
     /**
-     * Creation of the detector geometry.
-     * @param content   XML data directory.
-     * @param topVolume Geant world volume.
-     * @param type      Geometry type.
+     * Readout board size data.
      */
-    void create(const GearDir& content, G4LogicalVolume& topVolume,
-                geometry::GeometryTypes type);
-
-  protected:
-
-  private:
+    struct EKLMBoardSize {
+      double length;       /**< Length. */
+      double width;        /**< Width. */
+      double height;       /**< Height. */
+      double base_width;   /**< Width of base board. */
+      double base_height;  /**< Height of base board. */
+      double strip_length; /**< Length of strip readout board. */
+      double strip_width;  /**< Width of strip readout board. */
+      double strip_height; /**< Height of strip readout board. */
+    };
 
     /**
-     * Creation of materials.
+     * Strip readout board position data.
      */
-    void createMaterials();
+    struct EKLMStripBoardPosition {
+      double x;         /**< X coordinate. */
+    };
 
     /**
-     * Read parameters from XML database.
-     * @param[in] content GearDir to read from.
+     * Readout board position data.
      */
-    void readXMLData(const GearDir& content);
+    struct EKLMBoardPosition {
+      double r;      /**< Radius of far edge of the board. */
+      double phi;    /**< Angle. */
+    };
 
     /**
-     * Create endcap.
-     * @param[in] mlv     Mother logical volume.
+     * Section support position.
      */
-    void createEndcap(G4LogicalVolume* mlv);
+    struct EKLMSectionSupportPosition {
+      double deltal_right;  /**< Right (X-plane) delta L. */
+      double deltal_left;   /**< Left (X-plane) delta L. */
+      double length;        /**< Length */
+      double x;             /**< X coordinate. */
+      double y;             /**< Y coordinate. */
+      double z;             /**< Z coordinate. */
+    };
 
     /**
-     * Create layer.
-     * @param[in] mpvgt   Mother physical volume with global transformation.
+     * Strip size data.
      */
-    void createLayer(G4PVPlacementGT* mpvgt);
+    struct EKLMStripSize {
+      double width;                      /**< Width. */
+      double thickness;                  /**< Thickness. */
+      double groove_depth;               /**< Groove depth. */
+      double groove_width;               /**< Groove width. */
+      double no_scintillation_thickness; /**< Non-scintillating layer. */
+      double rss_size;                   /**< Radiation study SiPM size. */
+    };
 
     /**
-     * Create sector.
-     * @param[in] mpvgt   Mother physical volume with global transformation.
+     * Plane solids.
      */
-    void createSector(G4PVPlacementGT* mpvgt);
+    struct EKLMPlaneSolids {
+      G4Tubs* tube;                   /**< Tube. */
+      G4Box* box1;                    /**< Box. */
+      G4Box* box2;                    /**< Box to subtract corner 1. */
+      G4TriangularPrism* prism1;      /**< Corner 2. */
+      G4TriangularPrism* prism2;      /**< Corner 3. */
+      G4TriangularPrism* prism3;      /**< Corner 4. */
+      G4IntersectionSolid* is;        /**< Arc. */
+      G4SubtractionSolid* ss1;        /**< Arc - corner 1. */
+      G4SubtractionSolid* ss2;        /**< Arc - corners 1, 2. */
+      G4SubtractionSolid* ss3;        /**< Arc - corners 1, 2, 3. */
+      G4SubtractionSolid* ss4;        /**< Arc - all corners. */
+      G4SubtractionSolid* plane;      /**< Arc - all corners - boards. */
+    };
 
     /**
-     * Create sector cover.
-     * @param[in] iCover Number of cover.
-     * @param[in] mpvgt  Mother physical volume with global transformation.
+     * Section support solids.
      */
-    void createSectorCover(int iCover, G4PVPlacementGT* mpvgt);
+    struct EKLMSectionSupportSolids {
+      G4Box* topbox;        /**< Top box. */
+      G4Box* midbox;        /**< Middle box. */
+      G4Box* botbox;        /**< Bottom box. */
+      G4UnionSolid* us;     /**< Top box + middle box. */
+      G4UnionSolid* secsup; /**< Section support. */
+    };
 
     /**
-     * Create sector support structure.
-     * @param[in] mpvgt Mother physical volume with global transformation.
+     * Scintillator solids.
      */
-    void createSectorSupport(G4PVPlacementGT* mpvgt);
+    struct EKLMScintillatorSolids {
+      G4Box* box;               /**< Box (auxiliary). */
+      G4SubtractionSolid* sens; /**< Sensitive area. */
+    };
 
     /**
-     * Create inner tube of sector support structure.
-     * @param[in] mpvgt Mother physical volume with global transformation.
+     * All solids for EKLM.
      */
-    G4Tubs* createSectorSupportInnerTube(G4PVPlacementGT* mpvgt);
+    struct EKLMSolids {
+      G4Box** list;                             /**< Element of plastic list. */
+      G4Box** stripvol;                         /**< Strip + SiPM volume. */
+      G4Box** strip;                            /**< Strips. */
+      G4Box** groove;                           /**< Strip grooves. */
+      struct EKLMScintillatorSolids* scint;     /**< Scintillator. */
+      struct EKLMPlaneSolids* plane;            /**< Plane. */
+      struct EKLMSectionSupportSolids** secsup; /**< Section support. */
+    };
 
     /**
-     * Create outer tube of sector support structure.
-     * @param[in] mpvgt Mother physical volume with global transformation.
+     * Materials for EKLM.
      */
-    G4Tubs* createSectorSupportOuterTube(G4PVPlacementGT* mpvgt);
+    struct EKLMMaterials {
+      G4Material* air;         /**< Air. */
+      G4Material* polystyrene; /**< Polystyrene. */
+      G4Material* polystyrol;  /**< Polystyrol. */
+      G4Material* iron;        /**< Iron. */
+      G4Material* duralumin;   /**< Duralumin. */
+      G4Material* silicon;     /**< Silicon. */
+      G4Material* gel;         /**< Gel. */
+    };
 
     /**
-     * Create X side of sector support structure.
-     * @param[in]  mpvgt Mother physical volume with global transformation.
-     * @param[out] t     Transformation.
-     * @details
-     * Sets t to the transformation of the box.
+     * Volume numbers.
      */
-    G4Box* createSectorSupportBoxX(G4PVPlacementGT* mpvgt, G4Transform3D& t);
+    struct EKLMVolumeNumbers {
+      int endcap; /**< Endcap. */
+      int layer;  /**< Layer. */
+      int sector; /**< Sector. */
+      int plane;  /**< Plane. */
+      int strip;  /**< Strip. */
+      int board;  /**< Board. */
+    };
 
     /**
-     * Create Y side of sector support structure.
-     * @param[in]  mpvgt Mother physical volume with global transformation.
-     * @param[out] t     Transformation.
-     * @details
-     * Sets t to the transformation of the box.
+     * Class GeoEKLMBelleII.
+     * The creator for the  EKLM geometry of the Belle II detector.
      */
-    G4Box* createSectorSupportBoxY(G4PVPlacementGT* mpvgt, G4Transform3D& t);
+    class GeoEKLMBelleII : public geometry::CreatorBase {
 
-    /**
-     * Create box in the cutted corner of sector support structure.
-     * @param[in]  mpvgt Mother physical volume with global transformation.
-     * @param[out] t     Transformation.
-     * @details
-     * Sets t to the transformation of the box.
-     */
-    G4Box* createSectorSupportBoxTop(G4PVPlacementGT* mpvgt, G4Transform3D& t);
+    public:
 
-    /**
-     * Create sector support corner 1.
-     * @param[in] mpvgt Mother physical volume with global transformation.
-     */
-    void createSectorSupportCorner1(G4PVPlacementGT* mpvgt);
+      /**
+       * Default constructor.
+       */
+      GeoEKLMBelleII();
 
-    /**
-     * Create sector support corner 2.
-     * @param[in] mpvgt Mother physical volume with global transformation.
-     */
-    void createSectorSupportCorner2(G4PVPlacementGT* mpvgt);
+      /**
+       * Constructor with optional geometry data loading.
+       * @param[in] geo True to load transfomation data.
+       */
+      GeoEKLMBelleII(bool geo);
 
-    /**
-     * Create sector support corner 3.
-     * @param[in] mpvgt Mother physical volume with global transformation.
-     */
-    void createSectorSupportCorner3(G4PVPlacementGT* mpvgt);
+      /**
+       * Destructor.
+       */
+      ~GeoEKLMBelleII();
 
-    /**
-     * Create sector support corner 4.
-     * @param[in] mpvgt Mother physical volume with global transformation.
-     */
-    void createSectorSupportCorner4(G4PVPlacementGT* mpvgt);
+      /**
+       * Creation of the detector geometry.
+       * @param content   XML data directory.
+       * @param topVolume Geant world volume.
+       * @param type      Geometry type.
+       */
+      void create(const GearDir& content, G4LogicalVolume& topVolume,
+                  geometry::GeometryTypes type);
 
-    /**
-     * Subtract board solids from planes.
-     * @param[in] plane      Plane solid without boards subtracted.
-     * @param[in] Plane_name Plane name.
-     */
-    G4SubtractionSolid* subtractBoardSolids(G4SubtractionSolid* plane,
-                                            std::string Plane_Name);
+      /**
+       * Get endcap transformation.
+       * @param[out] t Transformation.
+       * @param[in]  n Number of endcap.
+       * @details
+       * Numbers start from 0.
+       */
+      void getEndcapTransform(HepGeom::Transform3D* t, int n);
 
-    /**
-     * Create plane.
-     * @param[in] mpvgt  Mother physical volume with global transformation.
-     */
-    void createPlane(G4PVPlacementGT* mpvgt);
+      /**
+       * Get layer transformation.
+       * @param[out] t Transformation.
+       * @param[in]  n Number of layer.
+       * @details
+       * Numbers start from 0.
+       */
+      void getLayerTransform(HepGeom::Transform3D* t, int n);
 
-    /**
-     * Create readout board.
-     * @param[in] mpvgt  Mother physical volume with global transformation.
-     */
-    void createSectionReadoutBoard(G4PVPlacementGT* mpvgt);
+      /**
+       * Get sector transformation.
+       * @param[out] t Transformation.
+       * @param[in]  n Number of sector.
+       * @details
+       * Numbers start from 0.
+       */
+      void getSectorTransform(HepGeom::Transform3D* t, int n);
 
-    /**
-     * Create base board of section readout board.
-     * @param[in] mpvgt Mother physical volume with global transformation.
-     */
-    void createBaseBoard(G4PVPlacementGT* mpvgt);
+      /**
+       * Get plane transformation.
+       * @param[out] t Transformation.
+       * @param[in]  n Number of plane.
+       * @details
+       * Numbers start from 0.
+       */
+      void getPlaneTransform(HepGeom::Transform3D* t, int n);
 
-    /**
-     * Create strip readout board.
-     * @param[in] iBoard Number of board.
-     * @param[in] mpvgt  Mother physical volume with global transformation.
-     */
-    void createStripBoard(int iBoard, G4PVPlacementGT* mpvgt);
+      /**
+       * Get strip transformation.
+       * @param[out] t Transformation.
+       * @param[in]  n Number of strip.
+       * @details
+       * Numbers start from 0.
+       */
+      void getStripTransform(HepGeom::Transform3D* t, int n);
 
-    /**
-     * Create section support.
-     * @param[in] iSectionSupport Number of section support.
-     * @param[in] mpvgt           Mother physical volume
-     *                            with global transformation.
-     */
-    void createSectionSupport(int iSectionSupport, G4PVPlacementGT* mpvgt);
+    private:
 
-    /**
-     * Create plastic list element
-     * @param[in] iListPlane Number of list plane.
-     * @param[in] iList      Number of list.
-     * @param[in] mpvgt      Mother physical volume with global transformation.
-     */
-    void createPlasticListElement(int iListPlane, int iList,
-                                  G4PVPlacementGT* mpvgt);
+      /**
+       * Constructor actions.
+       * @param[in] geo True to load transfomation data.
+       */
+      void constructor(bool geo);
 
-    /**
-     * Create strip volume (strip + SiPM).
-     * @param[in] mpvgt  Mother physical volume with global transformation.
-     */
-    void createStripVolume(G4PVPlacementGT* mpvgt);
+      /**
+       * Creation of materials.
+       */
+      void createMaterials();
 
-    /**
-     * Create strip.
-     * @param[in] mpvgt  Mother physical volume with global transformation.
-     */
-    void createStrip(G4PVPlacementGT* mpvgt);
+      /**
+       * Read parameters from XML database.
+       */
+      void readXMLData();
 
-    /**
-     * Create strip groove.
-     * @param[in] mpvgt  Mother physical volume with global transformation.
-     */
-    void createStripGroove(G4PVPlacementGT* mpvgt);
+      /**
+       * Create endcap.
+       * @param[in] mlv     Mother logical volume.
+       */
+      void createEndcap(G4LogicalVolume* mlv);
 
-    /**
-     * Create strip sensitive volume.
-     * @param[in] mpvgt  Mother physical volume with global transformation.
-     */
-    void createStripSensitive(G4PVPlacementGT* mpvgt);
+      /**
+       * Create layer.
+       * @param[in] mpvgt   Mother physical volume with global transformation.
+       */
+      void createLayer(G4PVPlacementGT* mpvgt);
 
-    /**
-     * Create silicon cube in the place of SiPM for radiation study.
-     * @param[in] mpvgt  Mother physical volume with global transformation.
-     */
-    void createSiPM(G4PVPlacementGT* mpvgt);
+      /**
+       * Create sector.
+       * @param[in] mpvgt   Mother physical volume with global transformation.
+       */
+      void createSector(G4PVPlacementGT* mpvgt);
 
-    /**
-     * Print mass of volume if m_mode == 2.
-     * @param[in] lv  Logical volume.
-     */
-    void printVolumeMass(G4LogicalVolume* lv);
+      /**
+       * Create sector cover.
+       * @param[in] iCover Number of cover.
+       * @param[in] mpvgt  Mother physical volume with global transformation.
+       */
+      void createSectorCover(int iCover, G4PVPlacementGT* mpvgt);
 
-    /**
-     * Allocate memory for solids and set contents to zero.
-     */
-    void mallocSolids();
+      /**
+       * Create sector support structure.
+       * @param[in] mpvgt Mother physical volume with global transformation.
+       */
+      void createSectorSupport(G4PVPlacementGT* mpvgt);
 
-    /**
-     * Deallocate memory for solids.
-     */
-    void freeSolids();
+      /**
+       * Create inner tube of sector support structure.
+       * @param[in] mpvgt Mother physical volume with global transformation.
+       */
+      G4Tubs* createSectorSupportInnerTube(G4PVPlacementGT* mpvgt);
 
-    /**
-     * Get cutted corner angle.
-     * @return Angle.
-     */
-    double getSectorSupportCornerAngle();
+      /**
+       * Create outer tube of sector support structure.
+       * @param[in] mpvgt Mother physical volume with global transformation.
+       */
+      G4Tubs* createSectorSupportOuterTube(G4PVPlacementGT* mpvgt);
 
-    /**
-     * Calculate board transformations.
-     */
-    void calcBoardTransform();
+      /**
+       * Create X side of sector support structure.
+       * @param[in]  mpvgt Mother physical volume with global transformation.
+       * @param[out] t     Transformation.
+       * @details
+       * Sets t to the transformation of the box.
+       */
+      G4Box* createSectorSupportBoxX(G4PVPlacementGT* mpvgt, G4Transform3D& t);
 
-    /** Solids. */
-    struct EKLMSolids solids;
+      /**
+       * Create Y side of sector support structure.
+       * @param[in]  mpvgt Mother physical volume with global transformation.
+       * @param[out] t     Transformation.
+       * @details
+       * Sets t to the transformation of the box.
+       */
+      G4Box* createSectorSupportBoxY(G4PVPlacementGT* mpvgt, G4Transform3D& t);
 
-    /** Materials. */
-    struct EKLMMaterials mat;
+      /**
+       * Create box in the cutted corner of sector support structure.
+       * @param[in]  mpvgt Mother physical volume with global transformation.
+       * @param[out] t     Transformation.
+       * @details
+       * Sets t to the transformation of the box.
+       */
+      G4Box* createSectorSupportBoxTop(G4PVPlacementGT* mpvgt, G4Transform3D& t);
 
-    /** Current volumes. */
-    struct EKLMVolumeNumbers curvol;
+      /**
+       * Create sector support corner 1.
+       * @param[in] mpvgt Mother physical volume with global transformation.
+       */
+      void createSectorSupportCorner1(G4PVPlacementGT* mpvgt);
 
-    /** Number of layers. */
-    int nLayer;
+      /**
+       * Create sector support corner 2.
+       * @param[in] mpvgt Mother physical volume with global transformation.
+       */
+      void createSectorSupportCorner2(G4PVPlacementGT* mpvgt);
 
-    /** Number of planes in one sector. */
-    int nPlane;
+      /**
+       * Create sector support corner 3.
+       * @param[in] mpvgt Mother physical volume with global transformation.
+       */
+      void createSectorSupportCorner3(G4PVPlacementGT* mpvgt);
 
-    /** Number of readout boards in one sector. */
-    int nBoard;
+      /**
+       * Create sector support corner 4.
+       * @param[in] mpvgt Mother physical volume with global transformation.
+       */
+      void createSectorSupportCorner4(G4PVPlacementGT* mpvgt);
 
-    /** Number of strip readout boards on one section readout board. */
-    int nStripBoard;
+      /**
+       * Subtract board solids from planes.
+       * @param[in] plane      Plane solid without boards subtracted.
+       * @param[in] Plane_name Plane name.
+       */
+      G4SubtractionSolid* subtractBoardSolids(G4SubtractionSolid* plane,
+                                              std::string Plane_Name);
 
-    /** Number of strips in one plane. */
-    int nStrip;
+      /**
+       * Create plane.
+       * @param[in] mpvgt  Mother physical volume with global transformation.
+       */
+      void createPlane(G4PVPlacementGT* mpvgt);
 
-    /** Number of sections is one plane. */
-    int nSection;
+      /**
+       * Create readout board.
+       * @param[in] mpvgt  Mother physical volume with global transformation.
+       */
+      void createSectionReadoutBoard(G4PVPlacementGT* mpvgt);
 
-    /** ESTR Geometry data. */
-    struct ESTR::GeometryParams ESTRPar;
+      /**
+       * Create base board of section readout board.
+       * @param[in] mpvgt Mother physical volume with global transformation.
+       */
+      void createBaseBoard(G4PVPlacementGT* mpvgt);
 
-    /** Position data for endcaps. */
-    struct EKLMElementPosition EndcapPosition;
+      /**
+       * Create strip readout board.
+       * @param[in] iBoard Number of board.
+       * @param[in] mpvgt  Mother physical volume with global transformation.
+       */
+      void createStripBoard(int iBoard, G4PVPlacementGT* mpvgt);
 
-    /** Position data for layers. */
-    struct EKLMElementPosition LayerPosition;
+      /**
+       * Create section support.
+       * @param[in] iSectionSupport Number of section support.
+       * @param[in] mpvgt           Mother physical volume
+       *                            with global transformation.
+       */
+      void createSectionSupport(int iSectionSupport, G4PVPlacementGT* mpvgt);
 
-    /** Z distance between two layers. */
-    double Layer_shiftZ;
+      /**
+       * Create plastic list element
+       * @param[in] iListPlane Number of list plane.
+       * @param[in] iList      Number of list.
+       * @param[in] mpvgt      Mother physical volume with global transformation.
+       */
+      void createPlasticListElement(int iListPlane, int iList,
+                                    G4PVPlacementGT* mpvgt);
 
-    /** Position data for sectors. */
-    struct EKLMElementPosition SectorPosition;
+      /**
+       * Create strip volume (strip + SiPM).
+       * @param[in] mpvgt  Mother physical volume with global transformation.
+       */
+      void createStripVolume(G4PVPlacementGT* mpvgt);
 
-    /** Position data for sector support structure. */
-    struct EKLMElementPosition SectorSupportPosition;
+      /**
+       * Create strip.
+       * @param[in] mpvgt  Mother physical volume with global transformation.
+       */
+      void createStrip(G4PVPlacementGT* mpvgt);
 
-    /** Sector support size data. */
-    struct EKLMSectorSupportSize SectorSupportSize;
+      /**
+       * Create strip groove.
+       * @param[in] mpvgt  Mother physical volume with global transformation.
+       */
+      void createStripGroove(G4PVPlacementGT* mpvgt);
 
-    /** Readout board size data. */
-    struct EKLMBoardSize BoardSize;
+      /**
+       * Create strip sensitive volume.
+       * @param[in] mpvgt  Mother physical volume with global transformation.
+       */
+      void createStripSensitive(G4PVPlacementGT* mpvgt);
 
-    /** Positions of readout boards. */
-    struct EKLMBoardPosition* BoardPosition[2];
+      /**
+       * Create silicon cube in the place of SiPM for radiation study.
+       * @param[in] mpvgt  Mother physical volume with global transformation.
+       */
+      void createSiPM(G4PVPlacementGT* mpvgt);
 
-    /** Transformations of boards from sector reference frame. */
-    G4Transform3D** BoardTransform[2];
+      /**
+       * Print mass of volume if m_mode == 2.
+       * @param[in] lv  Logical volume.
+       */
+      void printVolumeMass(G4LogicalVolume* lv);
 
-    /** Positions of strip readout boards. */
-    struct EKLMStripBoardPosition* StripBoardPosition;
+      /**
+       * Allocate memory for solids and set contents to zero.
+       */
+      void mallocSolids();
 
-    /** Position data for planes. */
-    struct EKLMElementPosition PlanePosition;
+      /**
+       * Deallocate memory for solids.
+       */
+      void freeSolids();
 
-    /** Position data for section support structure. */
-    struct EKLMSectionSupportPosition* SectionSupportPosition[2];
+      /**
+       * Get cutted corner angle.
+       * @return Angle.
+       */
+      double getSectorSupportCornerAngle();
 
-    /** Section support structure top box width. */
-    double SectionSupportTopWidth;
+      /**
+       * Calculate board transformations.
+       */
+      void calcBoardTransform();
 
-    /** Section support structure top box thickness. */
-    double SectionSupportTopThickness;
+      /** Solids. */
+      struct EKLMSolids solids;
 
-    /** Section support structure middle box width. */
-    double SectionSupportMiddleWidth;
+      /** Materials. */
+      struct EKLMMaterials mat;
 
-    /** Section support structure middle box thickness. */
-    double SectionSupportMiddleThickness;
+      /** Current volumes. */
+      struct EKLMVolumeNumbers curvol;
 
-    /** Plastic list width. */
-    double PlasticListWidth;
+      /** Transformations. */
+      struct TransformData* transf;
 
-    /** Distance from edge of last strip to edge of plastic list. */
-    double PlasticListDeltaL;
+      /** Number of layers. */
+      int nLayer;
 
-    /** Position data for strips. */
-    struct EKLMElementPosition* StripPosition;
+      /** Number of planes in one sector. */
+      int nPlane;
 
-    /** Strip size data. */
-    struct EKLMStripSize StripSize;
+      /** Number of readout boards in one sector. */
+      int nBoard;
 
-    /** Detector mode. */
-    enum EKLMDetectorMode m_mode;
+      /** Number of strip readout boards on one section readout board. */
+      int nStripBoard;
 
-    /** Sensitive detector. */
-    EKLMSensitiveDetector* m_sensitive;
+      /** Number of strips in one plane. */
+      int nStrip;
 
-    /** File to store transformation matrices. */
-    std::string m_outputFile;
+      /** Number of sections is one plane. */
+      int nSection;
 
-  };
+      /** True if geometry data is loaded. */
+      bool haveGeoDat;
+
+      /** True if geometry is constructed. */
+      bool haveGeo;
+
+      /** ESTR Geometry data. */
+      struct ESTR::GeometryParams ESTRPar;
+
+      /** Position data for endcaps. */
+      struct EKLMElementPosition EndcapPosition;
+
+      /** Position data for layers. */
+      struct EKLMElementPosition LayerPosition;
+
+      /** Z distance between two layers. */
+      double Layer_shiftZ;
+
+      /** Position data for sectors. */
+      struct EKLMElementPosition SectorPosition;
+
+      /** Position data for sector support structure. */
+      struct EKLMElementPosition SectorSupportPosition;
+
+      /** Sector support size data. */
+      struct EKLMSectorSupportSize SectorSupportSize;
+
+      /** Readout board size data. */
+      struct EKLMBoardSize BoardSize;
+
+      /** Positions of readout boards. */
+      struct EKLMBoardPosition* BoardPosition[2];
+
+      /** Transformations of boards from sector reference frame. */
+      G4Transform3D** BoardTransform[2];
+
+      /** Positions of strip readout boards. */
+      struct EKLMStripBoardPosition* StripBoardPosition;
+
+      /** Position data for planes. */
+      struct EKLMElementPosition PlanePosition;
+
+      /** Position data for section support structure. */
+      struct EKLMSectionSupportPosition* SectionSupportPosition[2];
+
+      /** Section support structure top box width. */
+      double SectionSupportTopWidth;
+
+      /** Section support structure top box thickness. */
+      double SectionSupportTopThickness;
+
+      /** Section support structure middle box width. */
+      double SectionSupportMiddleWidth;
+
+      /** Section support structure middle box thickness. */
+      double SectionSupportMiddleThickness;
+
+      /** Plastic list width. */
+      double PlasticListWidth;
+
+      /** Distance from edge of last strip to edge of plastic list. */
+      double PlasticListDeltaL;
+
+      /** Position data for strips. */
+      struct EKLMElementPosition* StripPosition;
+
+      /** Strip size data. */
+      struct EKLMStripSize StripSize;
+
+      /** Detector mode. */
+      enum EKLMDetectorMode m_mode;
+
+      /** Sensitive detector. */
+      EKLMSensitiveDetector* m_sensitive;
+
+      /** File to store transformation matrices. */
+      std::string m_outputFile;
+
+    };
+
+  }
 
 }
 

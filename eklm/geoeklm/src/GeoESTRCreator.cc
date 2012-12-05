@@ -29,7 +29,7 @@ geometry::CreatorFactory<ESTR::GeoESTRCreator> GeoESTRFactory("ESTRCreator");
 int ESTR::readESTRData(struct ESTR::GeometryParams* par)
 {
   int i;
-  GearDir d("Detector/DetectorComponent[@name=\"ESTR\"]/Content");
+  GearDir d("/Detector/DetectorComponent[@name=\"ESTR\"]/Content");
   GearDir d1(d);
   GearDir d2(d);
   GearDir d3(d);

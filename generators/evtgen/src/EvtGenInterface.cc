@@ -26,6 +26,11 @@
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
+#include <EvtGenExternal/EvtExternalGenList.hh>
+#include <EvtGenBase/EvtAbsRadCorr.hh>
+#include <EvtGenBase/EvtDecayBase.hh>
+
+
 #include <TLorentzVector.h>
 #include <TMath.h>
 
@@ -41,11 +46,17 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pd
   // Official BelleII models
   std::list<EvtDecayBase*> extraModels = EvtGenModelRegister::getModels();
 
+  //fill model list with pythia, photos etc.
+  EvtExternalGenList genList;
+  EvtAbsRadCorr* radCorrEngine = genList.getPhotosModel();
+  list<EvtDecayBase*> modelList = genList.getListOfModels();
+  extraModels.insert(extraModels.end(), modelList.begin(), modelList.end());
+
   // Method to add User EvtGen models here
 
   if (!m_Generator) {
     int mixingType = EvtCPUtil::Coherent;
-    m_Generator = new EvtGen(DECFileName.c_str(), pdlFileName.c_str(), (EvtRandomEngine*)&m_eng, 0, &extraModels, mixingType);
+    m_Generator = new EvtGen(DECFileName.c_str(), pdlFileName.c_str(), (EvtRandomEngine*)&m_eng, radCorrEngine, &extraModels, mixingType);
   }
   if (!userFileName.empty()) {
     m_Generator->readUDecay(userFileName.c_str());

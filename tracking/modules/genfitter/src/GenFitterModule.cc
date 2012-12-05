@@ -267,7 +267,7 @@ void GenFitterModule::event()
       TMatrixD stateSeed = aTrackCandPointer->getStateSeed();
       TMatrixD covSeed = aTrackCandPointer->getCovSeed();
       TVector3 momentumSeed(stateSeed[3][0], stateSeed[4][0], stateSeed[5][0]);
-      TVector3 posSeed(stateSeed[3][0], stateSeed[4][0], stateSeed[5][0]);
+      TVector3 posSeed(stateSeed[0][0], stateSeed[1][0], stateSeed[2][0]);
       B2DEBUG(100, "Start values: momentum (x,y,z,abs): " << momentumSeed.x() << "  " << momentumSeed.y() << "  " << momentumSeed.z() << " " << momentumSeed.Mag());
       B2DEBUG(100, "Start values: momentum std: " << sqrt(covSeed[3][3]) << "  " << sqrt(covSeed[4][4]) << "  " << sqrt(covSeed[5][5]));
       B2DEBUG(100, "Start values: pos:   " << posSeed.x() << "  " << posSeed.y() << "  " << posSeed.z());

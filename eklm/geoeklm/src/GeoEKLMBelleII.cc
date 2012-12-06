@@ -49,6 +49,7 @@ geometry::CreatorFactory<GeoEKLMBelleII> GeoEKLMFactory("EKLMBelleII");
 void GeoEKLMBelleII::constructor(bool geo)
 {
   std::string fname;
+  SectorSupportSize.CornerAngle = -1;
   haveGeoDat = false;
   haveGeo = false;
   fname = Environment::Instance().getDataSearchPath() +
@@ -1527,7 +1528,7 @@ void GeoEKLMBelleII::createStripVolume(G4PVPlacementGT* mpvgt)
   if (logicStripVolume == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicStripVolume, false);
-  t = transf->strip[curvol.endcap - 1][curvol.layer - 1][curvol.endcap - 1][curvol.plane - 1][curvol.strip - 1] *
+  t = transf->strip[curvol.endcap - 1][curvol.layer - 1][curvol.sector - 1][curvol.plane - 1][curvol.strip - 1] *
       G4Translate3D(0.5 * StripSize.rss_size, 0.0, 0.0);
   physiStripVolume = new(std::nothrow)
   G4PVPlacementGT(mpvgt, t, logicStripVolume, StripVolume_Name,

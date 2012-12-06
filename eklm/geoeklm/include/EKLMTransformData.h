@@ -23,7 +23,23 @@ namespace Belle2 {
   namespace EKLM {
 
     /**
-     * Transformations.
+     * @struct TransformData
+     * @brief Transformations.
+     *
+     * @var TransformData::endcap
+     * Endcap transformations.
+     *
+     * @var TransformData::layer
+     * Layer transformations.
+     *
+     * @var TransformData::sector
+     * Sector transformations.
+     *
+     * @var TransformData::plane
+     * Plane transformations.
+     *
+     * @var TransformData::strip
+     * Strip transformations.
      */
     struct TransformData {
       HepGeom::Transform3D endcap[2];

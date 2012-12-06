@@ -363,6 +363,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cfloat>
+#include <framework/gearbox/Const.h>
 #include "tracking/modules/trasan/Strings.h"
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/WireHitMC.h"
@@ -2332,7 +2333,7 @@ namespace Belle {
       const double driftTime = h.drift();
       const unsigned uniqueId = layerId * 10000 + h.wire().localId();
 
-      trackCandidates[counter]->addHit(3, hitID, driftTime, uniqueId);
+      trackCandidates[counter]->addHit(Const::CDC, hitID, driftTime, uniqueId);
     }
 
     return 0;

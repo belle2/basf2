@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Timofey Uglov                                           *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,8 +11,9 @@
 #ifndef EKLMDIGITIZERMODULE_H
 #define EKLMDIGITIZERMODULE_H
 
+/* Belle2 headers. */
 #include <framework/core/Module.h>
-#include <string>
+#include <eklm/geoeklm/TransformData.h>
 
 namespace Belle2 {
 
@@ -66,8 +67,8 @@ namespace Belle2 {
     /** Strip hits with npe lower this value will be marked as bad. */
     double m_discriminatorThreshold;
 
-    /** Strip transformation file. */
-    std::string m_stripInfromationDBFile;
+    /** Transformation data. */
+    struct EKLM::TransformData m_transf;
 
   };
 } // end namespace Belle2

@@ -11,7 +11,12 @@
 #ifndef EKLMTRANSFORMDATA_H_
 #define EKLMTRANSFORMDATA_H_
 
+/* External headers. */
 #include <CLHEP/Geometry/Transform3D.h>
+
+/* Belle2 headers. */
+#include <eklm/dataobjects/EKLMDigit.h>
+#include <framework/core/Environment.h>
 
 /**
  * @file
@@ -51,27 +56,48 @@ namespace Belle2 {
 
     /**
      * Write transformations to file.
-     * @param[in] file Name of file.
      * @param[in] dat  Transformation data.
+     * @param[in] file Name of file.
      * @return 0  Successful.
      * @return -1 Error.
      */
-    int writeTransforms(const char* file, struct TransformData* dat);
+    int writeTransforms(struct TransformData* dat, const char* file);
 
     /**
      * Read transformations from file.
-     * @param[in]  file Name of file.
      * @param[out] dat  Transformation data.
+     * @param[in]  file Name of file.
      * @return 0  Successful.
      * @return -1 Error.
      */
-    int readTransforms(const char* file, struct TransformData* dat);
+    int readTransforms(
+      struct TransformData* dat,
+      const char* file =
+        std::string(Environment::Instance().getDataSearchPath() +
+                    "/eklm/eklm_alignment.dat").c_str());
 
     /**
      * Fill transformations.
      * @param[out] dat Transformation data.
      */
     void fillTransforms(struct TransformData* dat);
+
+    /**
+     * Make transformations global from local.
+     * @param[in,out] dat Transformation data.
+     */
+    void transformsToGlobal(struct TransformData* dat);
+
+    /**
+     * Get strip transformation by hit.
+     * @param[in] dat Transformation data.
+     * @param[in] hit Hit.
+     * @return Transformation.
+     * @details
+     * Output units are mm.
+     */
+    HepGeom::Transform3D* getStripTransform(struct TransformData* dat,
+                                            EKLMDigit* hit);
 
   }
 

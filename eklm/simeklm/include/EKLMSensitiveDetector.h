@@ -17,54 +17,58 @@
 
 namespace Belle2 {
 
-  /**
-   * The Class for EKLM Sensitive Detector.
-   * @details
-   * In this class, every variables defined in EKLMStepHit will be calculated.
-   * EKLMStepHits are saved into hits collection.
-   */
-
-  class EKLMSensitiveDetector : public Simulation::SensitiveDetectorBase  {
-
-  public:
+  namespace EKLM {
 
     /**
-     * Constructor.
+     * The Class for EKLM Sensitive Detector.
+     * @details
+     * In this class, every variables defined in EKLMStepHit will be calculated.
+     * EKLMStepHits are saved into hits collection.
      */
-    EKLMSensitiveDetector(G4String name);
 
-    /**
-     * Destructor.
-     */
-    ~EKLMSensitiveDetector() {};
+    class EKLMSensitiveDetector : public Simulation::SensitiveDetectorBase  {
 
-    /**
-     * Process each step and calculate variables for EKLMStepHit
-     * store EKLMStepHit.
-     */
-    bool step(G4Step* aStep, G4TouchableHistory* history);
+    public:
 
-  private:
-    /**
-     * All hits with energies less than m_ThresholdEnergyDeposit
-     * will be dropped.
-     */
-    G4double m_ThresholdEnergyDeposit;
+      /**
+       * Constructor.
+       */
+      EKLMSensitiveDetector(G4String name);
 
-    /**
-     * All hits with time large  than m_ThresholdHitTime
-     * will be dropped.
-     */
-    G4double m_ThresholdHitTime;
+      /**
+       * Destructor.
+       */
+      ~EKLMSensitiveDetector() {};
 
-    /**
-     * Sensitive detector operation mode.
-     */
-    enum EKLMDetectorMode m_mode;
+      /**
+       * Process each step and calculate variables for EKLMStepHit
+       * store EKLMStepHit.
+       */
+      bool step(G4Step* aStep, G4TouchableHistory* history);
 
-  };
+    private:
+      /**
+       * All hits with energies less than m_ThresholdEnergyDeposit
+       * will be dropped.
+       */
+      G4double m_ThresholdEnergyDeposit;
 
-} // end of namespace Belle2
+      /**
+       * All hits with time large  than m_ThresholdHitTime
+       * will be dropped.
+       */
+      G4double m_ThresholdHitTime;
+
+      /**
+       * Sensitive detector operation mode.
+       */
+      enum EKLMDetectorMode m_mode;
+
+    };
+
+  }
+
+}
 
 #endif
 

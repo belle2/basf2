@@ -16,7 +16,7 @@
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <eklm/simeklm/EKLMSensitiveDetector.h>
-#include <eklm/geoeklm/EKLMTransformData.h>
+#include <eklm/geoeklm/TransformData.h>
 #include <eklm/geoeklm/G4PVPlacementGT.h>
 #include <eklm/geoeklm/G4TriangularPrism.h>
 #include <eklm/geoeklm/GeoESTRCreator.h>
@@ -46,7 +46,7 @@ namespace Belle2 {
     /**
      * Position information for the elements of detector.
      */
-    struct EKLMElementPosition {
+    struct ElementPosition {
       double innerR;   /**< Inner radius. */
       double outerR;   /**< Outer radius. */
       double length;   /**< Length. */
@@ -58,7 +58,7 @@ namespace Belle2 {
     /**
      * Sector support size data.
      */
-    struct EKLMSectorSupportSize {
+    struct SectorSupportSize {
       double Thickness;        /**< Yhickness. */
       double DeltaLY;          /**< outerR - Y of upper edge of BoxY. */
       double CornerX;          /**< Coordinate X of corner 1. */
@@ -85,7 +85,7 @@ namespace Belle2 {
     /**
      * Readout board size data.
      */
-    struct EKLMBoardSize {
+    struct BoardSize {
       double length;       /**< Length. */
       double width;        /**< Width. */
       double height;       /**< Height. */
@@ -99,14 +99,14 @@ namespace Belle2 {
     /**
      * Strip readout board position data.
      */
-    struct EKLMStripBoardPosition {
+    struct StripBoardPosition {
       double x;         /**< X coordinate. */
     };
 
     /**
      * Readout board position data.
      */
-    struct EKLMBoardPosition {
+    struct BoardPosition {
       double r;      /**< Radius of far edge of the board. */
       double phi;    /**< Angle. */
     };
@@ -114,7 +114,7 @@ namespace Belle2 {
     /**
      * Section support position.
      */
-    struct EKLMSectionSupportPosition {
+    struct SectionSupportPosition {
       double deltal_right;  /**< Right (X-plane) delta L. */
       double deltal_left;   /**< Left (X-plane) delta L. */
       double length;        /**< Length */
@@ -126,7 +126,7 @@ namespace Belle2 {
     /**
      * Strip size data.
      */
-    struct EKLMStripSize {
+    struct StripSize {
       double width;                      /**< Width. */
       double thickness;                  /**< Thickness. */
       double groove_depth;               /**< Groove depth. */
@@ -138,7 +138,7 @@ namespace Belle2 {
     /**
      * Plane solids.
      */
-    struct EKLMPlaneSolids {
+    struct PlaneSolids {
       G4Tubs* tube;                   /**< Tube. */
       G4Box* box1;                    /**< Box. */
       G4Box* box2;                    /**< Box to subtract corner 1. */
@@ -156,7 +156,7 @@ namespace Belle2 {
     /**
      * Section support solids.
      */
-    struct EKLMSectionSupportSolids {
+    struct SectionSupportSolids {
       G4Box* topbox;        /**< Top box. */
       G4Box* midbox;        /**< Middle box. */
       G4Box* botbox;        /**< Bottom box. */
@@ -167,7 +167,7 @@ namespace Belle2 {
     /**
      * Scintillator solids.
      */
-    struct EKLMScintillatorSolids {
+    struct ScintillatorSolids {
       G4Box* box;               /**< Box (auxiliary). */
       G4SubtractionSolid* sens; /**< Sensitive area. */
     };
@@ -175,20 +175,20 @@ namespace Belle2 {
     /**
      * All solids for EKLM.
      */
-    struct EKLMSolids {
+    struct Solids {
       G4Box** list;                             /**< Element of plastic list. */
       G4Box** stripvol;                         /**< Strip + SiPM volume. */
       G4Box** strip;                            /**< Strips. */
       G4Box** groove;                           /**< Strip grooves. */
-      struct EKLMScintillatorSolids* scint;     /**< Scintillator. */
-      struct EKLMPlaneSolids* plane;            /**< Plane. */
-      struct EKLMSectionSupportSolids** secsup; /**< Section support. */
+      struct ScintillatorSolids* scint;     /**< Scintillator. */
+      struct PlaneSolids* plane;            /**< Plane. */
+      struct SectionSupportSolids** secsup; /**< Section support. */
     };
 
     /**
      * Materials for EKLM.
      */
-    struct EKLMMaterials {
+    struct Materials {
       G4Material* air;         /**< Air. */
       G4Material* polystyrene; /**< Polystyrene. */
       G4Material* polystyrol;  /**< Polystyrol. */
@@ -201,7 +201,7 @@ namespace Belle2 {
     /**
      * Volume numbers.
      */
-    struct EKLMVolumeNumbers {
+    struct VolumeNumbers {
       int endcap; /**< Endcap. */
       int layer;  /**< Layer. */
       int sector; /**< Sector. */
@@ -508,13 +508,13 @@ namespace Belle2 {
       void calcBoardTransform();
 
       /** Solids. */
-      struct EKLMSolids solids;
+      struct Solids solids;
 
       /** Materials. */
-      struct EKLMMaterials mat;
+      struct Materials mat;
 
       /** Current volumes. */
-      struct EKLMVolumeNumbers curvol;
+      struct VolumeNumbers curvol;
 
       /** Transformations. */
       struct TransformData* transf;
@@ -547,40 +547,40 @@ namespace Belle2 {
       struct ESTR::GeometryParams ESTRPar;
 
       /** Position data for endcaps. */
-      struct EKLMElementPosition EndcapPosition;
+      struct ElementPosition EndcapPosition;
 
       /** Position data for layers. */
-      struct EKLMElementPosition LayerPosition;
+      struct ElementPosition LayerPosition;
 
       /** Z distance between two layers. */
       double Layer_shiftZ;
 
       /** Position data for sectors. */
-      struct EKLMElementPosition SectorPosition;
+      struct ElementPosition SectorPosition;
 
       /** Position data for sector support structure. */
-      struct EKLMElementPosition SectorSupportPosition;
+      struct ElementPosition SectorSupportPosition;
 
       /** Sector support size data. */
-      struct EKLMSectorSupportSize SectorSupportSize;
+      struct SectorSupportSize SectorSupportSize;
 
       /** Readout board size data. */
-      struct EKLMBoardSize BoardSize;
+      struct BoardSize BoardSize;
 
       /** Positions of readout boards. */
-      struct EKLMBoardPosition* BoardPosition[2];
+      struct BoardPosition* BoardPosition[2];
 
       /** Transformations of boards from sector reference frame. */
       G4Transform3D** BoardTransform[2];
 
       /** Positions of strip readout boards. */
-      struct EKLMStripBoardPosition* StripBoardPosition;
+      struct StripBoardPosition* StripBoardPosition;
 
       /** Position data for planes. */
-      struct EKLMElementPosition PlanePosition;
+      struct ElementPosition PlanePosition;
 
       /** Position data for section support structure. */
-      struct EKLMSectionSupportPosition* SectionSupportPosition[2];
+      struct SectionSupportPosition* SectionSupportPosition[2];
 
       /** Section support structure top box width. */
       double SectionSupportTopWidth;
@@ -601,19 +601,16 @@ namespace Belle2 {
       double PlasticListDeltaL;
 
       /** Position data for strips. */
-      struct EKLMElementPosition* StripPosition;
+      struct ElementPosition* StripPosition;
 
       /** Strip size data. */
-      struct EKLMStripSize StripSize;
+      struct StripSize StripSize;
 
       /** Detector mode. */
       enum EKLMDetectorMode m_mode;
 
       /** Sensitive detector. */
       EKLMSensitiveDetector* m_sensitive;
-
-      /** File to store transformation matrices. */
-      std::string m_outputFile;
 
     };
 

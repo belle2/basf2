@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Timofey Uglov                                           *
+ * Contributors:  Timofey Uglov, Kirill Chilikin                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,8 +11,9 @@
 #ifndef EKLMRECONSTRUCTIONMODULE_H
 #define EKLMRECONSTRUCTIONMODULE_H
 
+/* Belle2 headers. */
+#include <eklm/geoeklm/TransformData.h>
 #include <framework/core/Module.h>
-#include <string>
 
 namespace Belle2 {
 
@@ -63,8 +64,8 @@ namespace Belle2 {
   protected:
   private:
 
-    /** Strip transformation file. */
-    std::string m_stripInfromationDBFile;
+    /** Transformation data. */
+    struct EKLM::TransformData m_transf;
 
     /** Light speed for first photon. */
     double m_firstPhotonlightSpeed;
@@ -73,6 +74,8 @@ namespace Belle2 {
     double m_sigmaT;
 
   };
-} // end namespace Belle2
+
+}
+
 #endif
 

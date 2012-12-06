@@ -8,18 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* External headers. */
+#include <TVector3.h>
+
+/* Belle2 headers. */
 #include <eklm/dataobjects/EKLMSectorHit.h>
 #include <framework/logging/Logger.h>
-#include "TVector3.h"
 
 using namespace Belle2;
-
 
 ClassImp(Belle2::EKLMSectorHit)
 
 EKLMSectorHit::EKLMSectorHit(int nEndcap, int nLayer, int  nSector) :
   EKLMHitBase(nEndcap, nLayer, nSector)
-{}
+{
+}
 
 std::vector <EKLMDigit*> * EKLMSectorHit::getStripHitVector()
 {
@@ -31,8 +34,6 @@ std::vector <EKLMHit2d*> * EKLMSectorHit::get2dHitVector()
   return  & m_hit2dVector;
 }
 
-
-
 void EKLMSectorHit::Print()
 {
   std::cout << "------------  Sector Hit  -------------- " << std::endl;
@@ -43,3 +44,4 @@ void EKLMSectorHit::Print()
        it != m_stripHitVector.end(); ++it)
     (*it)->Print();
 }
+

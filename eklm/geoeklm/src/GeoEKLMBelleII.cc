@@ -27,9 +27,7 @@
 #include <eklm/geoeklm/G4PVPlacementGT.h>
 #include <eklm/geoeklm/G4TriangularPrism.h>
 #include <eklm/geoeklm/EKLMObjectNumbers.h>
-#include <eklm/geoeklm/EKLMTransformationFactory.h>
 #include <eklm/simeklm/EKLMSensitiveDetector.h>
-#include <framework/core/Environment.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <geometry/CreatorFactory.h>
@@ -39,42 +37,40 @@
 #include <eklm/geoeklm/GeoEKLMBelleII.h>
 
 using namespace Belle2;
-using namespace EKLM;
 
 static const char MemErr[] = "Memory allocation error.";
 
 /* Register the creator */
-geometry::CreatorFactory<GeoEKLMBelleII> GeoEKLMFactory("EKLMBelleII");
+geometry::CreatorFactory<EKLM::GeoEKLMBelleII> GeoEKLMFactory("EKLMBelleII");
 
-void GeoEKLMBelleII::constructor(bool geo)
+/******************************* CONSTRUCTORS ********************************/
+
+void EKLM::GeoEKLMBelleII::constructor(bool geo)
 {
-  std::string fname;
   SectorSupportSize.CornerAngle = -1;
   haveGeoDat = false;
   haveGeo = false;
-  fname = Environment::Instance().getDataSearchPath() +
-          "/eklm/eklm_alignment.dat";
   transf = NULL;
   if (geo) {
     transf = new(std::nothrow) EKLM::TransformData;
     if (transf == NULL)
       B2FATAL(MemErr);
-    if (readTransforms(fname.c_str(), transf) != 0)
-      B2FATAL("Cannot read transformation data file " << fname);
+    if (readTransforms(transf) != 0)
+      B2FATAL("Cannot read transformation data file.");
   }
 }
 
-GeoEKLMBelleII::GeoEKLMBelleII()
+EKLM::GeoEKLMBelleII::GeoEKLMBelleII()
 {
   constructor(true);
 }
 
-GeoEKLMBelleII::GeoEKLMBelleII(bool geo)
+EKLM::GeoEKLMBelleII::GeoEKLMBelleII(bool geo)
 {
   constructor(geo);
 }
 
-GeoEKLMBelleII::~GeoEKLMBelleII()
+EKLM::GeoEKLMBelleII::~GeoEKLMBelleII()
 {
   int i, j;
   if (transf != NULL)
@@ -101,7 +97,9 @@ GeoEKLMBelleII::~GeoEKLMBelleII()
   }
 }
 
-void GeoEKLMBelleII::mallocSolids()
+/***************************** MEMORY ALLOCATION *****************************/
+
+void EKLM::GeoEKLMBelleII::mallocSolids()
 {
   int i;
   solids.list = (G4Box**)malloc(nStrip * sizeof(G4Box*));
@@ -116,22 +114,22 @@ void GeoEKLMBelleII::mallocSolids()
   solids.groove = (G4Box**)malloc(nStrip * sizeof(G4Box*));
   if (solids.groove == NULL)
     B2FATAL(MemErr);
-  solids.scint = (struct EKLMScintillatorSolids*)
-                 malloc(nStrip * sizeof(struct EKLMScintillatorSolids));
+  solids.scint = (struct EKLM::ScintillatorSolids*)
+                 malloc(nStrip * sizeof(struct EKLM::ScintillatorSolids));
   if (solids.scint == NULL)
     B2FATAL(MemErr);
-  solids.plane = (struct EKLMPlaneSolids*)
-                 malloc(nPlane * sizeof(struct EKLMPlaneSolids));
+  solids.plane = (struct EKLM::PlaneSolids*)
+                 malloc(nPlane * sizeof(struct EKLM::PlaneSolids));
   if (solids.plane == NULL)
     B2FATAL(MemErr);
-  solids.secsup = (struct EKLMSectionSupportSolids**)
-                  malloc(nPlane * sizeof(struct EKLMSectionSupportSolids*));
+  solids.secsup = (struct EKLM::SectionSupportSolids**)
+                  malloc(nPlane * sizeof(struct EKLM::SectionSupportSolids*));
   if (solids.secsup == NULL)
     B2FATAL(MemErr);
   for (i = 0; i < nPlane; i++) {
-    solids.secsup[i] = (struct EKLMSectionSupportSolids*)
+    solids.secsup[i] = (struct EKLM::SectionSupportSolids*)
                        malloc((nSection + 1) *
-                              sizeof(struct EKLMSectionSupportSolids));
+                              sizeof(struct EKLM::SectionSupportSolids));
     if (solids.plane == NULL)
       B2FATAL(MemErr);
   }
@@ -141,14 +139,14 @@ void GeoEKLMBelleII::mallocSolids()
     solids.strip[i] = NULL;
     solids.groove[i] = NULL;
   }
-  memset(solids.scint, 0, nStrip * sizeof(struct EKLMScintillatorSolids));
-  memset(solids.plane, 0, nPlane * sizeof(struct EKLMPlaneSolids));
+  memset(solids.scint, 0, nStrip * sizeof(struct EKLM::ScintillatorSolids));
+  memset(solids.plane, 0, nPlane * sizeof(struct EKLM::PlaneSolids));
   for (i = 0; i < nPlane; i++)
     memset(solids.secsup[i], 0,
-           (nSection + 1) * sizeof(struct EKLMSectionSupportSolids));
+           (nSection + 1) * sizeof(struct EKLM::SectionSupportSolids));
 }
 
-void GeoEKLMBelleII::freeSolids()
+void EKLM::GeoEKLMBelleII::freeSolids()
 {
   int i;
   free(solids.list);
@@ -164,7 +162,9 @@ void GeoEKLMBelleII::freeSolids()
   }
 }
 
-void GeoEKLMBelleII::createMaterials()
+/********************************** XML DATA *********************************/
+
+void EKLM::GeoEKLMBelleII::createMaterials()
 {
   mat.air = geometry::Materials::get("Air");
   mat.polystyrene = geometry::Materials::get("EKLMPolystyrene");
@@ -180,7 +180,7 @@ void GeoEKLMBelleII::createMaterials()
  * @param epos Position data.
  * @param gd   XML data directory.
  */
-static void readPositionData(struct EKLMElementPosition* epos, GearDir* gd)
+static void readPositionData(struct EKLM::ElementPosition* epos, GearDir* gd)
 {
   epos->innerR = gd->getLength("InnerR") * cm;
   epos->outerR = gd->getLength("OuterR") * cm;
@@ -195,7 +195,7 @@ static void readPositionData(struct EKLMElementPosition* epos, GearDir* gd)
  * @param sss Sector support size data.
  * @param gd  XML data directory.
  */
-static void readSectorSupportData(struct EKLMSectorSupportSize* sss,
+static void readSectorSupportData(struct EKLM::SectorSupportSize* sss,
                                   GearDir* gd)
 {
   sss->Thickness = gd->getLength("Thickness") * cm;
@@ -220,7 +220,7 @@ static void readSectorSupportData(struct EKLMSectorSupportSize* sss,
   sss->Corner4Z = gd->getLength("Corner4Z") * cm;
 }
 
-void GeoEKLMBelleII::readXMLData()
+void EKLM::GeoEKLMBelleII::readXMLData()
 {
   int i;
   int j;
@@ -230,7 +230,6 @@ void GeoEKLMBelleII::readXMLData()
   m_mode = (enum EKLMDetectorMode)gd.getInt("Mode");
   if (m_mode < 0 || m_mode > 2)
     B2FATAL("EKLM started with unknown geometry mode " << m_mode << ".");
-  m_outputFile = gd.getString("StripLengthAndTransformationMatrixDBFile");
   GearDir EndCap(gd);
   EndCap.append("/EndCap");
   readPositionData(&EndcapPosition, &EndCap);
@@ -257,8 +256,8 @@ void GeoEKLMBelleII::readXMLData()
   BoardSize.strip_height = Boards.getLength("StripHeight") * cm;
   nStripBoard = Boards.getInt("nStripBoard");
   for (j = 0; j < nPlane; j++) {
-    BoardPosition[j] = (struct EKLMBoardPosition*)
-                       malloc(nBoard * sizeof(struct EKLMBoardPosition));
+    BoardPosition[j] = (struct EKLM::BoardPosition*)
+                       malloc(nBoard * sizeof(struct EKLM::BoardPosition));
     if (BoardPosition[j] == NULL)
       B2FATAL(MemErr);
     for (i = 0; i < nBoard; i++) {
@@ -269,9 +268,9 @@ void GeoEKLMBelleII::readXMLData()
       BoardPosition[j][i].r = BoardContent.getLength("Radius") * cm;
     }
   }
-  StripBoardPosition = (struct EKLMStripBoardPosition*)
+  StripBoardPosition = (struct EKLM::StripBoardPosition*)
                        malloc(nStripBoard *
-                              sizeof(struct EKLMStripBoardPosition));
+                              sizeof(struct EKLM::StripBoardPosition));
   if (StripBoardPosition == NULL)
     B2FATAL(MemErr);
   for (i = 0; i < nStripBoard; i++) {
@@ -301,8 +300,8 @@ void GeoEKLMBelleII::readXMLData()
                                          getLength("NoScintillationThickness")
                                          * cm;
   StripSize.rss_size = Strips.getLength("RSSSize") * cm;
-  StripPosition = (struct EKLMElementPosition*)
-                  malloc(nStrip * sizeof(struct EKLMElementPosition));
+  StripPosition = (struct EKLM::ElementPosition*)
+                  malloc(nStrip * sizeof(struct EKLM::ElementPosition));
   if (StripPosition == NULL)
     B2FATAL(MemErr);
   for (i = 0; i < nStrip; i++) {
@@ -321,8 +320,8 @@ void GeoEKLMBelleII::readXMLData()
   SectionSupportMiddleThickness = Sections.getLength("MiddleThickness") * cm;
   for (j = 0; j < nPlane; j++) {
     SectionSupportPosition[j] =
-      (struct EKLMSectionSupportPosition*)
-      malloc((nSection + 1) * sizeof(struct EKLMSectionSupportPosition));
+      (struct EKLM::SectionSupportPosition*)
+      malloc((nSection + 1) * sizeof(struct EKLM::SectionSupportPosition));
     if (SectionSupportPosition[j] == NULL)
       B2FATAL(MemErr);
     for (i = 0; i <= nSection; i++) {
@@ -353,7 +352,7 @@ void GeoEKLMBelleII::readXMLData()
 
 /****************************** TRANSFORMATIONS ******************************/
 
-void GeoEKLMBelleII::getEndcapTransform(HepGeom::Transform3D* t, int n)
+void EKLM::GeoEKLMBelleII::getEndcapTransform(HepGeom::Transform3D* t, int n)
 {
   if (!haveGeoDat)
     readXMLData();
@@ -366,7 +365,7 @@ void GeoEKLMBelleII::getEndcapTransform(HepGeom::Transform3D* t, int n)
          HepGeom::RotateY3D(180.*CLHEP::deg);
 }
 
-void GeoEKLMBelleII::getLayerTransform(HepGeom::Transform3D* t, int n)
+void EKLM::GeoEKLMBelleII::getLayerTransform(HepGeom::Transform3D* t, int n)
 {
   if (!haveGeoDat)
     readXMLData();
@@ -375,7 +374,7 @@ void GeoEKLMBelleII::getLayerTransform(HepGeom::Transform3D* t, int n)
                             0.5 * LayerPosition.length);
 }
 
-void GeoEKLMBelleII::getSectorTransform(HepGeom::Transform3D* t, int n)
+void EKLM::GeoEKLMBelleII::getSectorTransform(HepGeom::Transform3D* t, int n)
 {
   if (!haveGeoDat)
     readXMLData();
@@ -396,7 +395,7 @@ void GeoEKLMBelleII::getSectorTransform(HepGeom::Transform3D* t, int n)
   }
 }
 
-void GeoEKLMBelleII::getPlaneTransform(HepGeom::Transform3D* t, int n)
+void EKLM::GeoEKLMBelleII::getPlaneTransform(HepGeom::Transform3D* t, int n)
 {
   if (!haveGeoDat)
     readXMLData();
@@ -410,7 +409,7 @@ void GeoEKLMBelleII::getPlaneTransform(HepGeom::Transform3D* t, int n)
                            HepGeom::Vector3D<double>(1., 1., 0.));
 }
 
-void GeoEKLMBelleII::getStripTransform(HepGeom::Transform3D* t, int n)
+void EKLM::GeoEKLMBelleII::getStripTransform(HepGeom::Transform3D* t, int n)
 {
   if (!haveGeoDat)
     readXMLData();
@@ -419,7 +418,7 @@ void GeoEKLMBelleII::getStripTransform(HepGeom::Transform3D* t, int n)
 
 /************************** CREATION OF VOLUMES ******************************/
 
-void GeoEKLMBelleII::createEndcap(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMBelleII::createEndcap(G4LogicalVolume* mlv)
 {
   G4Polyhedra* boct;
   G4Tubs* atube;
@@ -457,7 +456,7 @@ void GeoEKLMBelleII::createEndcap(G4LogicalVolume* mlv)
     createLayer(physiEndcap);
 }
 
-void GeoEKLMBelleII::createLayer(G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createLayer(G4PVPlacementGT* mpvgt)
 {
   static G4Tubs* solidLayer = NULL;
   G4LogicalVolume* logicLayer;
@@ -488,7 +487,7 @@ void GeoEKLMBelleII::createLayer(G4PVPlacementGT* mpvgt)
     createSector(physiLayer);
 }
 
-void GeoEKLMBelleII::createSector(G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createSector(G4PVPlacementGT* mpvgt)
 {
   int i;
   static G4Tubs* solidSector = NULL;
@@ -528,7 +527,7 @@ void GeoEKLMBelleII::createSector(G4PVPlacementGT* mpvgt)
       createSectionReadoutBoard(physiSector);
 }
 
-void GeoEKLMBelleII::calcBoardTransform()
+void EKLM::GeoEKLMBelleII::calcBoardTransform()
 {
   int i;
   int j;
@@ -547,7 +546,7 @@ void GeoEKLMBelleII::calcBoardTransform()
   }
 }
 
-void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
 {
   double z;
   double lz;
@@ -622,8 +621,8 @@ void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
   printVolumeMass(logicCover);
 }
 
-G4Box* GeoEKLMBelleII::createSectorSupportBoxX(G4PVPlacementGT* mpvgt,
-                                               G4Transform3D& t)
+G4Box* EKLM::GeoEKLMBelleII::createSectorSupportBoxX(G4PVPlacementGT* mpvgt,
+                                                     G4Transform3D& t)
 {
   double x1;
   double x2;
@@ -639,8 +638,8 @@ G4Box* GeoEKLMBelleII::createSectorSupportBoxX(G4PVPlacementGT* mpvgt,
                                  0.5 * SectorSupportPosition.length);
 }
 
-G4Box* GeoEKLMBelleII::createSectorSupportBoxY(G4PVPlacementGT* mpvgt,
-                                               G4Transform3D& t)
+G4Box* EKLM::GeoEKLMBelleII::createSectorSupportBoxY(G4PVPlacementGT* mpvgt,
+                                                     G4Transform3D& t)
 {
   double y1;
   double y2;
@@ -655,7 +654,7 @@ G4Box* GeoEKLMBelleII::createSectorSupportBoxY(G4PVPlacementGT* mpvgt,
                                  0.5 * SectorSupportPosition.length);
 }
 
-double GeoEKLMBelleII::getSectorSupportCornerAngle()
+double EKLM::GeoEKLMBelleII::getSectorSupportCornerAngle()
 {
   double x1;
   double y1;
@@ -672,8 +671,8 @@ double GeoEKLMBelleII::getSectorSupportCornerAngle()
   return SectorSupportSize.CornerAngle;
 }
 
-G4Box* GeoEKLMBelleII::createSectorSupportBoxTop(G4PVPlacementGT* mpvgt,
-                                                 G4Transform3D& t)
+G4Box* EKLM::GeoEKLMBelleII::createSectorSupportBoxTop(G4PVPlacementGT* mpvgt,
+                                                       G4Transform3D& t)
 {
   double x1;
   double y1;
@@ -696,7 +695,7 @@ G4Box* GeoEKLMBelleII::createSectorSupportBoxTop(G4PVPlacementGT* mpvgt,
                                  0.5 * SectorSupportPosition.length);
 }
 
-G4Tubs* GeoEKLMBelleII::createSectorSupportInnerTube(G4PVPlacementGT* mpvgt)
+G4Tubs* EKLM::GeoEKLMBelleII::createSectorSupportInnerTube(G4PVPlacementGT* mpvgt)
 {
   double x1;
   double y1;
@@ -716,7 +715,7 @@ G4Tubs* GeoEKLMBelleII::createSectorSupportInnerTube(G4PVPlacementGT* mpvgt)
                                   std::min(ang1, ang2) * rad, fabs(ang1 - ang2) * rad);
 }
 
-G4Tubs* GeoEKLMBelleII::createSectorSupportOuterTube(G4PVPlacementGT* mpvgt)
+G4Tubs* EKLM::GeoEKLMBelleII::createSectorSupportOuterTube(G4PVPlacementGT* mpvgt)
 {
   double x1;
   double y1;
@@ -741,7 +740,7 @@ G4Tubs* GeoEKLMBelleII::createSectorSupportOuterTube(G4PVPlacementGT* mpvgt)
                                   std::min(ang1, ang2) * rad, fabs(ang1 - ang2) * rad);
 }
 
-void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT* mpvgt)
 {
   double lx;
   double x;
@@ -816,7 +815,7 @@ void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT* mpvgt)
   printVolumeMass(logicCorner1);
 }
 
-void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT* mpvgt)
 {
   static double r;
   static double x;
@@ -869,7 +868,7 @@ void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT* mpvgt)
   printVolumeMass(logicCorner2);
 }
 
-void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT* mpvgt)
 {
   static double r;
   static double x;
@@ -923,7 +922,7 @@ void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT* mpvgt)
   printVolumeMass(logicCorner3);
 }
 
-void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT* mpvgt)
 {
   static double r;
   static double x;
@@ -977,7 +976,7 @@ void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT* mpvgt)
   printVolumeMass(logicCorner4);
 }
 
-void GeoEKLMBelleII::createSectorSupport(G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createSectorSupport(G4PVPlacementGT* mpvgt)
 {
   static G4Box* solidBoxX;
   static G4Box* solidBoxY;
@@ -1056,7 +1055,7 @@ void GeoEKLMBelleII::createSectorSupport(G4PVPlacementGT* mpvgt)
   printVolumeMass(logicSectorSupport);
 }
 
-G4SubtractionSolid* GeoEKLMBelleII::
+G4SubtractionSolid* EKLM::GeoEKLMBelleII::
 subtractBoardSolids(G4SubtractionSolid* plane, std::string Plane_Name)
 {
   int i;
@@ -1098,7 +1097,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, std::string Plane_Name)
   return ss[nPlane - 1][nBoard - 1];
 }
 
-void GeoEKLMBelleII::createPlane(G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createPlane(G4PVPlacementGT* mpvgt)
 {
   int i;
   int j;
@@ -1259,7 +1258,7 @@ void GeoEKLMBelleII::createPlane(G4PVPlacementGT* mpvgt)
     createStripVolume(physiPlane);
 }
 
-void GeoEKLMBelleII::createSectionReadoutBoard(G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createSectionReadoutBoard(G4PVPlacementGT* mpvgt)
 {
   int i;
   static G4Box* solidSectionReadoutBoard = NULL;
@@ -1299,7 +1298,7 @@ void GeoEKLMBelleII::createSectionReadoutBoard(G4PVPlacementGT* mpvgt)
       createStripBoard(i, physiSectionReadoutBoard);
 }
 
-void GeoEKLMBelleII::createBaseBoard(G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createBaseBoard(G4PVPlacementGT* mpvgt)
 {
   static G4Box* solidBaseBoard = NULL;
   G4LogicalVolume* logicBaseBoard;
@@ -1328,7 +1327,7 @@ void GeoEKLMBelleII::createBaseBoard(G4PVPlacementGT* mpvgt)
   printVolumeMass(logicBaseBoard);
 }
 
-void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
 {
   static G4Box* solidStripBoard = NULL;
   G4LogicalVolume* logicStripBoard;
@@ -1369,8 +1368,8 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
   printVolumeMass(logicStripBoard);
 }
 
-void GeoEKLMBelleII::createSectionSupport(int iSectionSupport,
-                                          G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createSectionSupport(int iSectionSupport,
+                                                G4PVPlacementGT* mpvgt)
 {
   G4Transform3D t;
   G4Transform3D t1;
@@ -1458,8 +1457,8 @@ void GeoEKLMBelleII::createSectionSupport(int iSectionSupport,
   printVolumeMass(logicSectionSupport);
 }
 
-void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
-                                              G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
+                                                    G4PVPlacementGT* mpvgt)
 {
   double ly;
   double y;
@@ -1505,7 +1504,7 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
   printVolumeMass(logicList);
 }
 
-void GeoEKLMBelleII::createStripVolume(G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createStripVolume(G4PVPlacementGT* mpvgt)
 {
   G4LogicalVolume* logicStripVolume;
   G4PVPlacementGT* physiStripVolume;
@@ -1541,7 +1540,7 @@ void GeoEKLMBelleII::createStripVolume(G4PVPlacementGT* mpvgt)
     createSiPM(physiStripVolume);
 }
 
-void GeoEKLMBelleII::createStrip(G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createStrip(G4PVPlacementGT* mpvgt)
 {
   G4LogicalVolume* logicStrip;
   G4PVPlacementGT* physiStrip;
@@ -1570,17 +1569,10 @@ void GeoEKLMBelleII::createStrip(G4PVPlacementGT* mpvgt)
     B2FATAL(MemErr);
   createStripGroove(physiStrip);
   createStripSensitive(physiStrip);
-  //*** saving information to EKLMTransformationFactory
-  (EKLMTransformationFactory::getInstance())
-  ->addMatrixEntry(curvol.endcap, curvol.layer, curvol.sector, curvol.plane,
-                   curvol.strip, physiStrip->getTransform());
-  (EKLMTransformationFactory::getInstance())
-  ->addLengthEntry(curvol.strip, StripPosition[curvol.strip - 1].length);
-  //** done
   printVolumeMass(logicStrip);
 }
 
-void GeoEKLMBelleII::createStripGroove(G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createStripGroove(G4PVPlacementGT* mpvgt)
 {
   G4LogicalVolume* logicGroove;
   G4PVPlacementGT* physiGroove;
@@ -1612,7 +1604,7 @@ void GeoEKLMBelleII::createStripGroove(G4PVPlacementGT* mpvgt)
   printVolumeMass(logicGroove);
 }
 
-void GeoEKLMBelleII::createStripSensitive(G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createStripSensitive(G4PVPlacementGT* mpvgt)
 {
   G4LogicalVolume* logicSensitive;
   G4PVPlacementGT* physiSensitive;
@@ -1658,7 +1650,7 @@ void GeoEKLMBelleII::createStripSensitive(G4PVPlacementGT* mpvgt)
   printVolumeMass(logicSensitive);
 }
 
-void GeoEKLMBelleII::createSiPM(G4PVPlacementGT* mpvgt)
+void EKLM::GeoEKLMBelleII::createSiPM(G4PVPlacementGT* mpvgt)
 {
   static G4Box* solidSiPM = NULL;
   G4LogicalVolume* logicSiPM;
@@ -1693,15 +1685,16 @@ void GeoEKLMBelleII::createSiPM(G4PVPlacementGT* mpvgt)
   printVolumeMass(logicSiPM);
 }
 
-void GeoEKLMBelleII::printVolumeMass(G4LogicalVolume* lv)
+void EKLM::GeoEKLMBelleII::printVolumeMass(G4LogicalVolume* lv)
 {
   if (m_mode == EKLM_DETECTOR_PRINTMASSES)
     printf("Volume %s: mass = %g g\n", lv->GetName().c_str(),
            lv->GetMass() / g);
 }
 
-void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
-                            geometry::GeometryTypes type)
+void EKLM::GeoEKLMBelleII::create(const GearDir& content,
+                                  G4LogicalVolume& topVolume,
+                                  geometry::GeometryTypes type)
 {
   (void)content;
   (void)type;
@@ -1719,9 +1712,5 @@ void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
     exit(0);
   }
   haveGeo = true;
-  // save infrormation to file
-  if (m_outputFile.size() != 0)
-    (EKLMTransformationFactory::getInstance())->
-    writeToFile(m_outputFile.c_str());
 }
 

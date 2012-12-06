@@ -1,10 +1,16 @@
+/*************************************************************************
+*  BASF2 (Belle Analysis Framework 2)                                    *
+*  Copyright(C) 2010 - Belle II Collaboration                            *
+*                                                                        *
+*  Author: The Belle II Collaboration                                    *
+*  Contributors: Timofey Uglov, Kirill Chilikin                          *
+*                                                                        *
+*  This software is provided "as is" without any warranty.               *
+* ***********************************************************************/
 
 #include <framework/core/ModuleManager.h>
-
-#include <eklm/geoeklm/EKLMTransformationFactory.h>
-
 #include <eklm/modules/eklmReconstruction/EKLMReconstructorModule.h>
-#include <eklm/receklm/EKLMRecon.h>
+#include <eklm/receklm/Reconstructor.h>
 
 using namespace Belle2;
 
@@ -19,11 +25,8 @@ REG_MODULE(EKLMReconstructor)
 
 EKLMReconstructorModule::EKLMReconstructorModule() : Module()
 {
-
   setDescription("EKLM reconstruction simple module for tests");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
-  addParam("StripInformationDB", m_stripInfromationDBFile,
-           "File to read strip information", std::string("/tmp/out.dat"));
 }
 
 EKLMReconstructorModule::~EKLMReconstructorModule()
@@ -34,8 +37,9 @@ void EKLMReconstructorModule::initialize()
 {
   StoreArray<EKLMSectorHit>::registerPersistent();
   StoreArray<EKLMHit2d>::registerPersistent();
-  (EKLMTransformationFactory::getInstance())->
-  readFromFile(m_stripInfromationDBFile.c_str());
+  if (EKLM::readTransforms(&m_transf) != 0)
+    B2FATAL("Cannot read transformation data file.");
+  EKLM::transformsToGlobal(&m_transf);
   B2INFO("EKLMReconstructorModule initialized");
 }
 
@@ -46,8 +50,7 @@ void EKLMReconstructorModule::beginRun()
 
 void EKLMReconstructorModule::event()
 {
-
-  EKLMRecon* recon = new EKLMRecon();
+  EKLM::Reconstructor* recon = new EKLM::Reconstructor(&m_transf);
   B2INFO("EKLMReconstructorModule::event() called")
   recon->readStripHits();
   recon->createSectorHits();

@@ -3,36 +3,27 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Timofey Uglov                                           *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-
-#include <framework/core/ModuleManager.h>
-
+/* Belle2 headers. */
 #include <eklm/modules/eklmDigitization/EKLMDigitizerModule.h>
-#include <eklm/simeklm/EKLMDigitizer.h>
-#include <eklm/geoeklm/EKLMTransformationFactory.h>
+#include <eklm/simeklm/Digitizer.h>
+#include <framework/core/ModuleManager.h>
 
 using namespace Belle2;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
 REG_MODULE(EKLMDigitizer)
-
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
 
 EKLMDigitizerModule::EKLMDigitizerModule() : Module()
 {
   setDescription("EKLM digitization module");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
-  addParam("DiscriminatorThreshold", m_discriminatorThreshold, "Strip hits with npe lower this value will be marked as bad", double(7.));
-  addParam("StripInformationDB", m_stripInfromationDBFile, "File to read strip information", std::string("/tmp/out.dat"));
+  addParam("DiscriminatorThreshold", m_discriminatorThreshold,
+           "Strip hits with npe lower this value will be marked as bad",
+           double(7.));
 }
 
 EKLMDigitizerModule::~EKLMDigitizerModule()
@@ -43,7 +34,9 @@ void EKLMDigitizerModule::initialize()
 {
   StoreArray<EKLMSimHit>::registerPersistent();
   StoreArray<EKLMDigit>::registerPersistent();
-  (EKLMTransformationFactory::getInstance())->readFromFile(m_stripInfromationDBFile.c_str());
+  if (EKLM::readTransforms(&m_transf) != 0)
+    B2FATAL("Cannot read transformation data file.");
+  EKLM::transformsToGlobal(&m_transf);
   B2INFO("EKLMDigitizationModule initialized");
 }
 
@@ -56,13 +49,12 @@ void EKLMDigitizerModule::event()
 {
   B2DEBUG(1, "EKLMDigitizationModule : event");
   B2DEBUG(1, " START DIGITIZATION");
-  EKLMDigitizer digi;
+  EKLM::Digitizer digi(&m_transf);
   digi.readAndSortStepHits();
   digi.makeSimHits();
   digi.readAndSortSimHits();
   digi.mergeSimHitsToStripHits(m_discriminatorThreshold);
 }
-
 
 void EKLMDigitizerModule::endRun()
 {

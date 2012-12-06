@@ -14,7 +14,7 @@
 
 /* Belle2 headers. */
 #include <eklm/geoeklm/GeoEKLMBelleII.h>
-#include <eklm/geoeklm/EKLMTransformData.h>
+#include <eklm/geoeklm/TransformData.h>
 
 using namespace Belle2;
 
@@ -83,7 +83,7 @@ static int readTransform(int fd, HepGeom::Transform3D* t)
   return 0;
 }
 
-int EKLM::writeTransforms(const char* file, struct EKLM::TransformData* dat)
+int EKLM::writeTransforms(struct EKLM::TransformData* dat, const char* file)
 {
   int i1;
   int i2;
@@ -117,7 +117,7 @@ int EKLM::writeTransforms(const char* file, struct EKLM::TransformData* dat)
   return 0;
 }
 
-int EKLM::readTransforms(const char* file, struct EKLM::TransformData* dat)
+int EKLM::readTransforms(struct EKLM::TransformData* dat, const char* file)
 {
   int i1;
   int i2;
@@ -158,7 +158,7 @@ void EKLM::fillTransforms(struct TransformData* dat)
   int i3;
   int i4;
   int i5;
-  GeoEKLMBelleII g(false);
+  EKLM::GeoEKLMBelleII g(false);
   for (i1 = 0; i1 < 2; i1++) {
     g.getEndcapTransform(&(dat->endcap[i1]), i1);
     for (i2 = 0; i2 < 14; i2++) {
@@ -174,5 +174,37 @@ void EKLM::fillTransforms(struct TransformData* dat)
       }
     }
   }
+}
+
+void EKLM::transformsToGlobal(struct EKLM::TransformData* dat)
+{
+  int i1;
+  int i2;
+  int i3;
+  int i4;
+  int i5;
+  for (i1 = 0; i1 < 2; i1++) {
+    for (i2 = 0; i2 < 14; i2++) {
+      dat->layer[i1][i2] = dat->endcap[i1] * dat->layer[i1][i2];
+      for (i3 = 0; i3 < 4; i3++) {
+        dat->sector[i1][i2][i3] = dat->layer[i1][i2] * dat->sector[i1][i2][i3];
+        for (i4 = 0; i4 < 2; i4++) {
+          dat->plane[i1][i2][i3][i4] = dat->sector[i1][i2][i3] *
+                                       dat->plane[i1][i2][i3][i4];
+          for (i5 = 0; i5 < 75; i5++) {
+            dat->strip[i1][i2][i3][i4][i5] = dat->plane[i1][i2][i3][i4] *
+                                             dat->strip[i1][i2][i3][i4][i5];
+          }
+        }
+      }
+    }
+  }
+}
+
+HepGeom::Transform3D* EKLM::getStripTransform(struct EKLM::TransformData* dat,
+                                              EKLMDigit* hit)
+{
+  return &(dat->strip[hit->getEndcap() - 1][hit->getLayer() - 1]
+           [hit->getSector() - 1][hit->getPlane() - 1][hit->getStrip() - 1]);
 }
 

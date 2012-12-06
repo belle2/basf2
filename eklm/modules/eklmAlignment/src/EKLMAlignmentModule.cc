@@ -10,7 +10,7 @@
 
 /* Belle2 headers. */
 #include <framework/core/ModuleManager.h>
-#include <eklm/geoeklm/EKLMTransformData.h>
+#include <eklm/geoeklm/TransformData.h>
 #include <eklm/modules/eklmAlignment/EKLMAlignmentModule.h>
 
 using namespace Belle2;
@@ -45,7 +45,7 @@ void EKLMAlignmentModule::endRun()
 {
   struct EKLM::TransformData dat;
   EKLM::fillTransforms(&dat);
-  if (EKLM::writeTransforms(m_out.c_str(), &dat) != 0) {
+  if (EKLM::writeTransforms(&dat, m_out.c_str()) != 0) {
     B2ERROR("EKLMAlignmentModule: cannot fill output file.");
     return;
   }

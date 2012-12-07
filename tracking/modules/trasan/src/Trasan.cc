@@ -2043,9 +2043,8 @@ Trasan::initialize() {
     }
   }
 
-  void
-  Trasan::banner(void) const
-  {
+void
+Trasan::banner(void) const {
     std::cout << "\n";
     std::cout << "=========================================================\n";
     std::cout << "      Trasan : Belle Tracking Module                     \n";
@@ -2260,6 +2259,7 @@ Trasan::initialize() {
     std::cout << " 4.04     : 22-Sep-2008 : YI : valgrinded\n";
 #endif
     std::cout << " 5.00     : 29-Sep-2010 : YI : for Belle2\n";
+    std::cout << " 5.02     : 07-Dec-2012 : YI : Sorting wires correctly\n";
     std::cout << "=========================================================\n";
     std::cout << version() << " notices " << std::endl;
 //  std::cout << "  This is a test version for the production 2001 summar.\n";

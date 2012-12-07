@@ -767,11 +767,10 @@ namespace Belle {
   {
   }
 
-  string
-  TTrackManager::version(void) const
-  {
-    return string("5.01");
-  }
+string
+TTrackManager::version(void) const {
+    return string("5.02");
+}
 
   void
   TTrackManager::dump(const string& msg, const string& pref) const
@@ -2294,14 +2293,25 @@ namespace Belle {
     new(trackCandidates->AddrAt(counter)) GFTrackCand();
 
     //...Helix parameters... Need to check pivot position
-    TVector3 momentum(t.helix().momentum().x(),
-                      t.helix().momentum().y(),
-                      t.helix().momentum().z());
-    TVector3 position(t.helix().x().x(),
-                      t.helix().x().y(),
-                      t.helix().x().z());
+    //    TVector3 momentum(t.helix().momentum().x(),
+    //                      t.helix().momentum().y(),
+    //                      t.helix().momentum().z());
+    //    TVector3 position(t.helix().x().x(),
+    //                      t.helix().x().y(),
+    //                      t.helix().x().z());
+    //
+    //    cout << t.helix().pivot() << endl;
 
-    cout << t.helix().pivot() << endl;
+    THelix hAtOrigin = t.helix();
+    hAtOrigin.ignoreErrorMatrix();
+    hAtOrigin.pivot(ORIGIN);
+    TVector3 momentum(hAtOrigin.momentum().x(),
+		      hAtOrigin.momentum().y(),
+		      hAtOrigin.momentum().z());
+    TVector3 position(hAtOrigin.x().x(),
+		      hAtOrigin.x().y(),
+		      hAtOrigin.x().z());
+    //    cout << hAtOrigin.pivot() << endl;
 
     //...Erros on helix parameters...
     //   I don't know the meaning of these errors.
@@ -2326,8 +2336,29 @@ namespace Belle {
 
     //...CDC hit info... I don't know this is correct or not
     const unsigned n = t.links().length();
+
+    //sort in order of |dphi| in a brute-force way; to be replaced with a smarter way
+    float df[n];
+    for (unsigned i = 0; i < n; ++i) {
+      df[i] = fabs(t.links()[i]->dPhi());
+    }
+    unsigned sort[n];
+    float dfmin;
+    float dfmin_pre = -1.e10;
+    for (unsigned i = 0; i < n; ++i) {
+      dfmin = 1.e10;
+      for (unsigned j = 0; j < n; ++j) {
+        if (df[j] < dfmin && df[j] > dfmin_pre) {
+          dfmin   = df[j];
+	  sort[i] = j;
+        } 
+      }
+      dfmin_pre = dfmin;
+    }
+    
     for (unsigned i = 0; i < n; i++) {
-      const Belle2::TRGCDCWireHit& h = * t.links()[i]->hit();
+      //      const Belle2::TRGCDCWireHit& h = * t.links()[i]->hit();
+      const Belle2::TRGCDCWireHit& h = * t.links()[sort[i]]->hit();
       const unsigned layerId = h.wire().layerId();
       const unsigned hitID = h.iCDCHit();
       const double driftTime = h.drift();

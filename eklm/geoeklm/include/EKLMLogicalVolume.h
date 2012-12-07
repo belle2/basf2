@@ -50,8 +50,7 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMLogicalVolume(EKLMLogicalVolume* mlv,
-                      G4VSolid* pSolid,
+    EKLMLogicalVolume(G4VSolid* pSolid,
                       G4Material* pMaterial,
                       const G4String& name,
                       int id = 0,
@@ -84,9 +83,6 @@ namespace Belle2 {
 
     /** Identifier. */
     int m_id;
-
-    /** Mother. */
-    EKLMLogicalVolume* m_mother;
 
     /** Detector mode. */
     enum EKLMDetectorMode m_mode;

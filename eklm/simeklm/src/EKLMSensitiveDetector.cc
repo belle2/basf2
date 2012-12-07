@@ -45,6 +45,8 @@ EKLM::EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name)
 //-----------------------------------------------------
 bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
+  G4TouchableHandle hist = aStep->GetPreStepPoint()->
+                           GetTouchableHandle();
 
   /**
    * Get deposited energy
@@ -108,8 +110,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   /**
    * Global -> Local position
    */
-  const G4ThreeVector& lpos = aStep->GetPostStepPoint()->
-                              GetTouchableHandle()->GetHistory()->
+  const G4ThreeVector& lpos = hist->GetHistory()->
                               GetTopTransform().TransformPoint(gpos);
 
   /**
@@ -182,40 +183,59 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   /**
    * Get information on mother volumes and store them to the hit.
    */
-  EKLMLogicalVolume* pvgt = (EKLMLogicalVolume*)pv->GetLogicalVolume();
-  switch (pvgt->getVolumeType()) {
+  EKLMLogicalVolume* lv = (EKLMLogicalVolume*)pv->GetLogicalVolume();
+  int depth;
+  switch (lv->getVolumeType()) {
     case EKLM_SENSITIVE_STRIP:
-      hit->setVolumeID(pvgt->getID());
-      pvgt = pvgt->getMother();  // Strip
-      pvgt = pvgt->getMother();  // StripVolume
-      hit->setStrip(EKLM::stripLocalNumber(pvgt->getID()));
-      pvgt = pvgt->getMother();  // Plane
-      hit->setPlane(EKLM::planeLocalNumber(pvgt->getID()));
+      /* StripVolume */
+      depth = 2;
+      lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
+      depth++;
+      hit->setVolumeID(lv->getID());
+      hit->setStrip(EKLM::stripLocalNumber(lv->getID()));
+      /* Plane */
+      lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
+      depth++;
+      hit->setPlane(EKLM::planeLocalNumber(lv->getID()));
       break;
     case EKLM_SENSITIVE_SIPM:
-      hit->setVolumeID(100000 + pvgt->getID());
-      pvgt = pvgt->getMother();  // StripVolume
-      hit->setStrip(EKLM::stripLocalNumber(pvgt->getID()));
-      pvgt = pvgt->getMother();  // Plane
-      hit->setPlane(EKLM::planeLocalNumber(pvgt->getID()));
+      /* StripVolume */
+      depth = 1;
+      lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
+      depth++;
+      hit->setVolumeID(100000 + lv->getID());
+      hit->setStrip(EKLM::stripLocalNumber(lv->getID()));
+      /* Plane */
+      lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
+      depth++;
+      hit->setPlane(EKLM::planeLocalNumber(lv->getID()));
       break;
     case EKLM_SENSITIVE_BOARD:
-      hit->setVolumeID(200000 + pvgt->getID());
-      pvgt = pvgt->getMother();  // SectionReadoutBoard
+      /* SectionReadoutBoard */
+      depth = 1;
+      lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
+      depth++;
+      hit->setVolumeID(200000 + lv->getID());
       hit->setStrip(-1);
       hit->setPlane(-1);
       break;
-    default:
-      B2ERROR("EKLMSensitiveDetector.cc:: Try to get hit information from insensitive volumes");
+    case EKLM_NOT_SENSITIVE:
+      B2ERROR("EKLMSensitiveDetector: step in not sensitive volume!");
   }
-  pvgt = pvgt->getMother(); // Sector
-  hit->setSector(sectorLocalNumber(pvgt->getID())); // Sector ID
+  /* Sector */
+  lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
+  depth++;
+  hit->setSector(sectorLocalNumber(lv->getID()));
 
-  pvgt = pvgt->getMother();
-  hit->setLayer(layerLocalNumber(pvgt->getID()));  // Layer ID
+  /* Layer */
+  lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
+  depth++;
+  hit->setLayer(layerLocalNumber(lv->getID()));
 
-  pvgt = pvgt->getMother();
-  hit->setEndcap(pvgt->getID()); // Endcap ID
+  /* Endcap */
+  lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
+  depth++;
+  hit->setEndcap(lv->getID());
 
   StoreArray<MCParticle> particles;
   RelationArray particleToStepHits(particles, stepHits);

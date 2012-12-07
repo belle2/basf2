@@ -15,8 +15,7 @@
 using namespace Belle2;
 
 EKLMLogicalVolume::
-EKLMLogicalVolume(EKLMLogicalVolume* mlv,
-                  G4VSolid* pSolid,
+EKLMLogicalVolume(G4VSolid* pSolid,
                   G4Material* pMaterial,
                   const G4String& name,
                   int id,
@@ -25,7 +24,6 @@ EKLMLogicalVolume(EKLMLogicalVolume* mlv,
                   enum EKLMSensitiveType type) :
   G4LogicalVolume(pSolid, pMaterial, name, NULL, pSDetector, NULL, true)
 {
-  m_mother = mlv;
   m_id = id;
   m_mode = mode;
   m_type = type;
@@ -34,11 +32,6 @@ EKLMLogicalVolume(EKLMLogicalVolume* mlv,
 int EKLMLogicalVolume::getID() const
 {
   return m_id;
-}
-
-EKLMLogicalVolume* EKLMLogicalVolume::getMother() const
-{
-  return m_mother;
 }
 
 enum EKLMDetectorMode EKLMLogicalVolume::getMode() const

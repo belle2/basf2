@@ -19,8 +19,8 @@
 #include <eklm/geoeklm/TransformData.h>
 #include <eklm/geoeklm/G4TriangularPrism.h>
 #include <eklm/geoeklm/GeoESTRCreator.h>
+#include <eklm/geoeklm/EKLMLogicalVolume.h>
 
-#include <G4LogicalVolume.hh>
 #include <G4Material.hh>
 #include <G4PVPlacement.hh>
 #include <G4Tubs.hh>
@@ -189,7 +189,7 @@ namespace Belle2 {
      * Logical volumes of EKLM.
      */
     struct LogicalVolumes {
-      G4LogicalVolume** stripvol;  /**< Strip volumes. */
+      EKLMLogicalVolume** stripvol;  /**< Strip volumes. */
     };
 
     /**

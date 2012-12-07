@@ -176,10 +176,11 @@ namespace Belle2 {
      * All solids for EKLM.
      */
     struct Solids {
-      G4Box** list;                             /**< Element of plastic list. */
-      G4Box** stripvol;                         /**< Strip + SiPM volume. */
-      G4Box** strip;                            /**< Strips. */
-      G4Box** groove;                           /**< Strip grooves. */
+      G4Box** list;                         /**< Element of plastic list. */
+      G4Box** stripvol;                     /**< Strip + SiPM volume. */
+      G4Box** strip;                        /**< Strips. */
+      G4Box** groove;                       /**< Strip grooves. */
+      G4Box* sipm;                          /**< SiPM. */
       struct ScintillatorSolids* scint;     /**< Scintillator. */
       struct PlaneSolids* plane;            /**< Plane. */
       struct SectionSupportSolids** secsup; /**< Section support. */
@@ -305,6 +306,11 @@ namespace Belle2 {
        * Read parameters from XML database.
        */
       void readXMLData();
+
+      /**
+       * Create solids.
+       */
+      void createSolids();
 
       /**
        * Create endcap.

@@ -416,6 +416,73 @@ void EKLM::GeoEKLMBelleII::getStripTransform(HepGeom::Transform3D* t, int n)
   *t = HepGeom::Translate3D(StripPosition[n].X, StripPosition[n].Y, 0.0);
 }
 
+/*************************** CREATION OF SOLIDS ******************************/
+
+void EKLM::GeoEKLMBelleII::createSolids()
+{
+  int i;
+  char name[128];
+  HepGeom::Transform3D t;
+  /* Strips. */
+  for (i = 0; i < nStrip; i++) {
+    /* Strip volumes. */
+    snprintf(name, 128, "StripVolume_%d", i + 1);
+    solids.stripvol[i] =
+      new(std::nothrow) G4Box(name,
+                              0.5 * (StripPosition[i].length +
+                                     StripSize.rss_size),
+                              0.5 * StripSize.width,
+                              0.5 * StripSize.thickness);
+    if (solids.stripvol[i] == NULL)
+      B2FATAL(MemErr);
+    /* Strips. */
+    snprintf(name, 128, "Strip_%d", i + 1);
+    solids.strip[i] =
+      new(std::nothrow) G4Box(name,
+                              0.5 * StripPosition[i].length,
+                              0.5 * StripSize.width,
+                              0.5 * StripSize.thickness);
+    if (solids.strip[i] == NULL)
+      B2FATAL(MemErr);
+    /* Strip grooves. */
+    snprintf(name, 128, "Groove_%d", i + 1);
+    solids.groove[i] =
+      new(std::nothrow) G4Box(name,
+                              0.5 * StripPosition[i].length,
+                              0.5 * StripSize.groove_width,
+                              0.5 * StripSize.groove_depth);
+    if (solids.groove[i] == NULL)
+      B2FATAL(MemErr);
+    /* Strip sensitive volumes (scintillator). */
+    snprintf(name, 128, "StripSensitive_%d_box", i + 1);
+    solids.scint[i].box =
+      new(std::nothrow) G4Box(name,
+                              0.5 * StripPosition[i].length -
+                              StripSize.no_scintillation_thickness,
+                              0.5 * StripSize.width -
+                              StripSize.no_scintillation_thickness,
+                              0.5 * StripSize.thickness -
+                              StripSize.no_scintillation_thickness);
+    if (solids.scint[i].box == NULL)
+      B2FATAL(MemErr);
+    snprintf(name, 128, "StripSensitive_%d", i + 1);
+    t = HepGeom::Translate3D(0., 0., 0.5 * (StripSize.thickness -
+                                            StripSize.groove_depth));
+    solids.scint[i].sens =
+      new(std::nothrow) G4SubtractionSolid(name,
+                                           solids.scint[i].box,
+                                           solids.groove[i], t);
+    if (solids.scint[i].sens == NULL)
+      B2FATAL(MemErr);
+  }
+  /* SiPM (not really a SiPM; a cube in the place of SiPM) */
+  solids.sipm =
+    new(std::nothrow) G4Box("SiPM", 0.5 * StripSize.rss_size,
+                            0.5 * StripSize.rss_size, 0.5 * StripSize.rss_size);
+  if (solids.sipm == NULL)
+    B2FATAL(MemErr);
+}
+
 /************************** CREATION OF VOLUMES ******************************/
 
 void EKLM::GeoEKLMBelleII::createEndcap(G4LogicalVolume* mlv)
@@ -1512,15 +1579,6 @@ void EKLM::GeoEKLMBelleII::createStripVolume(G4PVPlacementGT* mpvgt)
   std::string StripVolume_Name = "StripVolume_" +
                                  boost::lexical_cast<std::string>(curvol.strip)
                                  + "_" + mpvgt->GetName();
-  if (solids.stripvol[curvol.strip - 1] == NULL)
-    solids.stripvol[curvol.strip - 1] =
-      new(std::nothrow) G4Box(StripVolume_Name,
-                              0.5 * (StripPosition[curvol.strip - 1].length +
-                                     StripSize.rss_size),
-                              0.5 * StripSize.width,
-                              0.5 * StripSize.thickness);
-  if (solids.stripvol[curvol.strip - 1] == NULL)
-    B2FATAL(MemErr);
   logicStripVolume =
     new(std::nothrow) G4LogicalVolume(solids.stripvol[curvol.strip - 1], mat.air,
                                       StripVolume_Name);
@@ -1546,14 +1604,6 @@ void EKLM::GeoEKLMBelleII::createStrip(G4PVPlacementGT* mpvgt)
   G4PVPlacementGT* physiStrip;
   G4Transform3D t;
   std::string Strip_Name = "Strip_" + mpvgt->GetName();
-  if (solids.strip[curvol.strip - 1] == NULL)
-    solids.strip[curvol.strip - 1] =
-      new(std::nothrow) G4Box(Strip_Name,
-                              0.5 * StripPosition[curvol.strip - 1].length,
-                              0.5 * StripSize.width,
-                              0.5 * StripSize.thickness);
-  if (solids.strip[curvol.strip - 1] == NULL)
-    B2FATAL(MemErr);
   logicStrip = new(std::nothrow) G4LogicalVolume(solids.strip[curvol.strip - 1],
                                                  mat.polystyrene, Strip_Name);
   if (logicStrip == NULL)
@@ -1578,15 +1628,6 @@ void EKLM::GeoEKLMBelleII::createStripGroove(G4PVPlacementGT* mpvgt)
   G4PVPlacementGT* physiGroove;
   G4Transform3D t;
   std::string Groove_Name = "Groove_" + mpvgt->GetName();
-  if (solids.groove[curvol.strip - 1] == NULL) {
-    solids.groove[curvol.strip - 1] =
-      new(std::nothrow) G4Box(Groove_Name,
-                              0.5 * StripPosition[curvol.strip - 1].length,
-                              0.5 * StripSize.groove_width,
-                              0.5 * StripSize.groove_depth);
-  }
-  if (solids.groove[curvol.strip - 1] == NULL)
-    B2FATAL(MemErr);
   logicGroove =
     new(std::nothrow) G4LogicalVolume(solids.groove[curvol.strip - 1],
                                       mat.gel, Groove_Name);
@@ -1611,26 +1652,6 @@ void EKLM::GeoEKLMBelleII::createStripSensitive(G4PVPlacementGT* mpvgt)
   G4Transform3D t;
   G4Transform3D t1;
   std::string Sensitive_Name = "Sensitive_" + mpvgt->GetName();
-  if (solids.scint[curvol.strip - 1].sens == NULL) {
-    solids.scint[curvol.strip - 1].box =
-      new(std::nothrow) G4Box("Box_" + Sensitive_Name,
-                              0.5 * StripPosition[curvol.strip - 1].length -
-                              StripSize.no_scintillation_thickness,
-                              0.5 * StripSize.width -
-                              StripSize.no_scintillation_thickness,
-                              0.5 * StripSize.thickness -
-                              StripSize.no_scintillation_thickness);
-    if (solids.scint[curvol.strip - 1].box == NULL)
-      B2FATAL(MemErr);
-    t1 = G4Translate3D(0., 0.,
-                       0.5 * (StripSize.thickness - StripSize.groove_depth));
-    solids.scint[curvol.strip - 1].sens =
-      new(std::nothrow) G4SubtractionSolid(Sensitive_Name,
-                                           solids.scint[curvol.strip - 1].box,
-                                           solids.groove[curvol.strip - 1], t1);
-  }
-  if (solids.scint[curvol.strip - 1].sens == NULL)
-    B2FATAL(MemErr);
   logicSensitive =
     new(std::nothrow) G4LogicalVolume(solids.scint[curvol.strip - 1].sens,
                                       mat.polystyrene, Sensitive_Name,
@@ -1652,23 +1673,16 @@ void EKLM::GeoEKLMBelleII::createStripSensitive(G4PVPlacementGT* mpvgt)
 
 void EKLM::GeoEKLMBelleII::createSiPM(G4PVPlacementGT* mpvgt)
 {
-  static G4Box* solidSiPM = NULL;
   G4LogicalVolume* logicSiPM;
   G4PVPlacementGT* physiSiPM;
   G4Transform3D t;
   std::string SiPM_Name = "SiPM_" + mpvgt->GetName();
-  if (solidSiPM == NULL)
-    solidSiPM =
-      new(std::nothrow) G4Box(SiPM_Name, 0.5 * StripSize.rss_size,
-                              0.5 * StripSize.rss_size, 0.5 * StripSize.rss_size);
-  if (solidSiPM == NULL)
-    B2FATAL(MemErr);
   if (m_mode == EKLM_DETECTOR_NORMAL)
     logicSiPM =
-      new(std::nothrow) G4LogicalVolume(solidSiPM, mat.silicon, SiPM_Name);
+      new(std::nothrow) G4LogicalVolume(solids.sipm, mat.silicon, SiPM_Name);
   else
     logicSiPM =
-      new(std::nothrow) G4LogicalVolume(solidSiPM, mat.silicon, SiPM_Name, 0,
+      new(std::nothrow) G4LogicalVolume(solids.sipm, mat.silicon, SiPM_Name, 0,
                                         m_sensitive, 0);
   if (logicSiPM == NULL)
     B2FATAL(MemErr);
@@ -1705,6 +1719,7 @@ void EKLM::GeoEKLMBelleII::create(const GearDir& content,
     B2FATAL(MemErr);
   createMaterials();
   mallocSolids();
+  createSolids();
   for (curvol.endcap = 1; curvol.endcap <= 2; curvol.endcap++)
     createEndcap(&topVolume);
   if (m_mode == EKLM_DETECTOR_PRINTMASSES) {

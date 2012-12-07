@@ -212,7 +212,7 @@ namespace Belle2 {
      *
      *  @param fromObject     Pointer to the object from which the relation points.
      *  @param fromEntry      Data store entry that contains the fromObject. Used for caching. Will be set if 0.
-     *  @param fromIndex      Index in TClonesArray that contains the fromObject. Used for caching. Will be set if < 0..
+     *  @param fromIndex      Index in TClonesArray that contains the fromObject. Used for caching. Will be set if < 0.
      *  @param toObject       Pointer to the object to which the relation points.
      *  @param weight         Weight of the relation.
      *  @return               True if the relation was created, false otherwise.
@@ -223,7 +223,7 @@ namespace Belle2 {
      *
      *  @param fromObject     Pointer to the object from which the relations point.
      *  @param fromEntry      Data store entry that contains the fromObject. Used for caching. Will be set if 0.
-     *  @param fromIndex      Index in TClonesArray that contains the fromObject. Used for caching. Will be set if < 0..
+     *  @param fromIndex      Index in TClonesArray that contains the fromObject. Used for caching. Will be set if < 0.
      *  @param toClass        Class of the objects to which the relations point.
      *  @param toName         The name of the store array to which the relations point.
      *                        If empty the default store array name for toClass will be used.
@@ -236,7 +236,7 @@ namespace Belle2 {
      *
      *  @param toObject       Pointer to the object to which the relations point.
      *  @param toEntry        Data store entry that contains the toObject. Used for caching. Will be set if 0.
-     *  @param toIndex        Index in TClonesArray that contains the toObject. Used for caching. Will be set if < 0..
+     *  @param toIndex        Index in TClonesArray that contains the toObject. Used for caching. Will be set if < 0.
      *  @param fromClass      Class of the objects from which the relations point.
      *  @param fromName       The name of the store array from which the relations point.
      *                        If empty the default store array name for fromClass will be used.
@@ -251,7 +251,7 @@ namespace Belle2 {
      *  of the weight. Relations that point to the object have a negative weight.
      *  @param object         Pointer to the object from or to which the relations point.
      *  @param entry          Data store entry that contains the object. Used for caching. Will be set if 0.
-     *  @param index          Index in TClonesArray that contains the object. Used for caching. Will be set if < 0..
+     *  @param index          Index in TClonesArray that contains the object. Used for caching. Will be set if < 0.
      *  @param withClass      Class of the objects to or from which the relations point.
      *  @param name           The name of the store array to or from which the relations point.
      *                        If empty the default store array name for withClass will be used.
@@ -259,6 +259,47 @@ namespace Belle2 {
      *  @return               Vector of relation entry objects.
      */
     std::vector<RelationEntry> getRelationsWith(const TObject* object, StoreEntry*& entry, int& index, const TClass* withClass, const std::string& name);
+
+    /** Get the first relation from an object to another object in a store array.
+     *
+     *  @param fromObject     Pointer to the object from which the relation points.
+     *  @param fromEntry      Data store entry that contains the fromObject. Used for caching. Will be set if 0.
+     *  @param fromIndex      Index in TClonesArray that contains the fromObject. Used for caching. Will be set if < 0.
+     *  @param toClass        Class of the objects to which the relation points.
+     *  @param toName         The name of the store array to which the relation points.
+     *                        If empty the default store array name for toClass will be used.
+     *                        If the special name "ALL" is given all store arrays containing objects of type toClass are considered.
+     *  @return               The entry of the first related object.
+     */
+    RelationEntry getRelationFromTo(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TClass* toClass, const std::string& toName);
+
+    /** Get the first relation to an object from another object in a store array.
+     *
+     *  @param toObject       Pointer to the object to which the relation points.
+     *  @param toEntry        Data store entry that contains the toObject. Used for caching. Will be set if 0.
+     *  @param toIndex        Index in TClonesArray that contains the toObject. Used for caching. Will be set if < 0.
+     *  @param fromClass      Class of the objects from which the relation points.
+     *  @param fromName       The name of the store array from which the relation points.
+     *                        If empty the default store array name for fromClass will be used.
+     *                        If the special name "ALL" is given all store arrays containing objects of type fromClass are considered.
+     *  @return               The entry of the first related object.
+     */
+    RelationEntry getRelationToFrom(const TObject* toObject, StoreEntry*& toEntry, int& toIndex, const TClass* fromClass, const std::string& fromName);
+
+    /** Get the first relation between an object and another object in a store array.
+     *
+     *  Relations in both directions are considered. The direction is encoded in the sign
+     *  of the weight. Relations that point to the object have a negative weight.
+     *  @param object         Pointer to the object from or to which the relation points.
+     *  @param entry          Data store entry that contains the object. Used for caching. Will be set if 0.
+     *  @param index          Index in TClonesArray that contains the object. Used for caching. Will be set if < 0.
+     *  @param withClass      Class of the objects to or from which the relation points.
+     *  @param name           The name of the store array to or from which the relation points.
+     *                        If empty the default store array name for withClass will be used.
+     *                        If the special name "ALL" is given all store arrays containing objectt of type withClass are considered.
+     *  @return               The entry of the first related object.
+     */
+    RelationEntry getRelationWith(const TObject* object, StoreEntry*& entry, int& index, const TClass* withClass, const std::string& name);
 
     /** Add a relation from an object in a store array to another object in a store array.
      *
@@ -388,6 +429,14 @@ namespace Belle2 {
      *  @return           True if the object was found in the data store
      */
     bool findStoreEntry(const TObject* object, StoreEntry*& entry, int& index);
+
+    /** Fill the vector with the names of store arrays.
+     *
+     *  @param names      The resulting vector of array names.
+     *  @param arrayName  A given array name, the special string "ALL" for all arrays of the given class, or an empty string for the default array name.
+     *  @param arrayClass The class of the array(s).
+     */
+    void getArrayNames(std::vector<std::string>& names, const std::string& arrayName, const TClass* arrayClass);
 
     /** Map for all objects/arrays in the data store.
      *

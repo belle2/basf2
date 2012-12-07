@@ -97,6 +97,42 @@ namespace Belle2 {
       return RelationVector<T>(DataStore::Instance().getRelationsWith(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name));
     }
 
+    /** Get the object to which this object has a relation.
+     *
+     *  @tparam T      The class of objects to which the relation points.
+     *  @param name    The name of the store array to which the relation points.
+     *                 If empty the default store array name for class T will be used.
+     *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *  @return        The related object or a null pointer.
+     */
+    template <class T> const T* getRelatedTo(const std::string& name = "") const {
+      return static_cast<const T*>(DataStore::Instance().getRelationFromTo(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name).object);
+    }
+
+    /** Get the object from which this object has a relation.
+     *
+     *  @tparam T      The class of objects from which the relation points.
+     *  @param name    The name of the store array from which the relation points.
+     *                 If empty the default store array name for class T will be used.
+     *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *  @return        The related object or a null pointer.
+     */
+    template <class T> const T* getRelatedFrom(const std::string& name = "") const {
+      return static_cast<const T*>(DataStore::Instance().getRelationToFrom(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name).object);
+    }
+
+    /** Get the object to or from which this object has a relation.
+     *
+     *  @tparam T      The class of objects to or from which the relation points.
+     *  @param name    The name of the store array to or from which the relation points.
+     *                 If empty the default store array name for class T will be used.
+     *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *  @return        The related object or a null pointer.
+     */
+    template <class T> const T* getRelated(const std::string& name = "") const {
+      return static_cast<const T*>(DataStore::Instance().getRelationWith(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name).object);
+    }
+
     /**
      * @{
      * define versions without template arguments, to be useful withing python modules.

@@ -40,6 +40,21 @@ namespace Belle2 {
     /** returns number of entries for current event. */
     int getEntries() const { return m_storeArray->GetEntriesFast(); }
 
+    /** Allow iteration using for in Python.
+     *
+     * That is, this should work:
+     *
+     * \code
+        simhits = Belle2.PyStoreArray('PXDSimHits')
+        for hit in simhits:
+            print "Edep: ", str(hit.getEnergyDep())
+       \endcode
+     **/
+    TIter __iter__() const {
+      //will create empty iterator if NULL pointer
+      return TIter(m_storeArray);
+    }
+
   private:
     TClonesArray* m_storeArray; /**< Pointer to array */
   };

@@ -369,7 +369,7 @@ void EKLM::GeoEKLMBelleII::getLayerTransform(HepGeom::Transform3D* t, int n)
 {
   if (!haveGeoDat)
     readXMLData();
-  *t = HepGeom::Translate3D(0.0, 0.0, -EndcapPosition.length / 2.0 +
+  *t = HepGeom::Translate3D(0.0, 0.0, EndcapPosition.length / 2.0 -
                             (n + 1) * Layer_shiftZ +
                             0.5 * LayerPosition.length);
 }

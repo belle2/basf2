@@ -12,7 +12,6 @@
 #include <G4Step.hh>
 
 /* Belle2 headers. */
-#include <eklm/geoeklm/G4PVPlacementGT.h>
 #include <eklm/geoeklm/EKLMObjectNumbers.h>
 #include <eklm/simeklm/EKLMSensitiveDetector.h>
 #include <framework/gearbox/GearDir.h>
@@ -183,7 +182,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   /**
    * Get information on mother volumes and store them to the hit.
    */
-  const G4PVPlacementGT* pvgt = (G4PVPlacementGT*)pv;
+  EKLMLogicalVolume* pvgt = (EKLMLogicalVolume*)pv->GetLogicalVolume();
   switch (pvgt->getVolumeType()) {
     case EKLM_SENSITIVE_STRIP:
       hit->setVolumeID(pvgt->getID());

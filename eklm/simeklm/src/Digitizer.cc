@@ -14,7 +14,6 @@
 #include <boost/graph/connected_components.hpp>
 
 /* Belle2 headers. */
-#include <eklm/geoeklm/G4PVPlacementGT.h>
 #include <eklm/simeklm/Digitizer.h>
 #include <eklm/simeklm/FiberAndElectronics.h>
 #include <framework/gearbox/Unit.h>

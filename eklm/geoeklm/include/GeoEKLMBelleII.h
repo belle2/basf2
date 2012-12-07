@@ -17,7 +17,6 @@
 #include <framework/gearbox/GearDir.h>
 #include <eklm/simeklm/EKLMSensitiveDetector.h>
 #include <eklm/geoeklm/TransformData.h>
-#include <eklm/geoeklm/G4PVPlacementGT.h>
 #include <eklm/geoeklm/G4TriangularPrism.h>
 #include <eklm/geoeklm/GeoESTRCreator.h>
 
@@ -173,7 +172,7 @@ namespace Belle2 {
     };
 
     /**
-     * All solids for EKLM.
+     * All solids of EKLM.
      */
     struct Solids {
       G4Box** list;                         /**< Element of plastic list. */
@@ -184,6 +183,13 @@ namespace Belle2 {
       struct ScintillatorSolids* scint;     /**< Scintillator. */
       struct PlaneSolids* plane;            /**< Plane. */
       struct SectionSupportSolids** secsup; /**< Section support. */
+    };
+
+    /**
+     * Logical volumes of EKLM.
+     */
+    struct LogicalVolumes {
+      G4LogicalVolume** stripvol;  /**< Strip volumes. */
     };
 
     /**
@@ -320,91 +326,91 @@ namespace Belle2 {
 
       /**
        * Create layer.
-       * @param[in] mpvgt   Mother physical volume with global transformation.
+       * @param[in] mlv     Mother logical volume.
        */
-      void createLayer(G4PVPlacementGT* mpvgt);
+      void createLayer(G4LogicalVolume* mlv);
 
       /**
        * Create sector.
-       * @param[in] mpvgt   Mother physical volume with global transformation.
+       * @param[in] mlv     Mother logical volume.
        */
-      void createSector(G4PVPlacementGT* mpvgt);
+      void createSector(G4LogicalVolume* mlv);
 
       /**
        * Create sector cover.
        * @param[in] iCover Number of cover.
-       * @param[in] mpvgt  Mother physical volume with global transformation.
+       * @param[in] mlv    Mother logical volume.
        */
-      void createSectorCover(int iCover, G4PVPlacementGT* mpvgt);
+      void createSectorCover(int iCover, G4LogicalVolume* mlv);
 
       /**
        * Create sector support structure.
-       * @param[in] mpvgt Mother physical volume with global transformation.
+       * @param[in] mlv   Mother logical volume.
        */
-      void createSectorSupport(G4PVPlacementGT* mpvgt);
+      void createSectorSupport(G4LogicalVolume* mlv);
 
       /**
        * Create inner tube of sector support structure.
-       * @param[in] mpvgt Mother physical volume with global transformation.
+       * @param[in] mlv   Mother logical volume.
        */
-      G4Tubs* createSectorSupportInnerTube(G4PVPlacementGT* mpvgt);
+      G4Tubs* createSectorSupportInnerTube(G4LogicalVolume* mlv);
 
       /**
        * Create outer tube of sector support structure.
-       * @param[in] mpvgt Mother physical volume with global transformation.
+       * @param[in] mlv   Mother logical volume.
        */
-      G4Tubs* createSectorSupportOuterTube(G4PVPlacementGT* mpvgt);
+      G4Tubs* createSectorSupportOuterTube(G4LogicalVolume* mlv);
 
       /**
        * Create X side of sector support structure.
-       * @param[in]  mpvgt Mother physical volume with global transformation.
+       * @param[in]  mlv   Mother logical volume.
        * @param[out] t     Transformation.
        * @details
        * Sets t to the transformation of the box.
        */
-      G4Box* createSectorSupportBoxX(G4PVPlacementGT* mpvgt, G4Transform3D& t);
+      G4Box* createSectorSupportBoxX(G4LogicalVolume* mlv, G4Transform3D& t);
 
       /**
        * Create Y side of sector support structure.
-       * @param[in]  mpvgt Mother physical volume with global transformation.
+       * @param[in]  mlv   Mother logical volume.
        * @param[out] t     Transformation.
        * @details
        * Sets t to the transformation of the box.
        */
-      G4Box* createSectorSupportBoxY(G4PVPlacementGT* mpvgt, G4Transform3D& t);
+      G4Box* createSectorSupportBoxY(G4LogicalVolume* mlv, G4Transform3D& t);
 
       /**
        * Create box in the cutted corner of sector support structure.
-       * @param[in]  mpvgt Mother physical volume with global transformation.
+       * @param[in]  mlv   Mother logical volume.
        * @param[out] t     Transformation.
        * @details
        * Sets t to the transformation of the box.
        */
-      G4Box* createSectorSupportBoxTop(G4PVPlacementGT* mpvgt, G4Transform3D& t);
+      G4Box* createSectorSupportBoxTop(G4LogicalVolume* mlv, G4Transform3D& t);
 
       /**
        * Create sector support corner 1.
-       * @param[in] mpvgt Mother physical volume with global transformation.
+       * @param[in] mlv   Mother logical volume.
        */
-      void createSectorSupportCorner1(G4PVPlacementGT* mpvgt);
+      void createSectorSupportCorner1(G4LogicalVolume* mlv);
 
       /**
        * Create sector support corner 2.
-       * @param[in] mpvgt Mother physical volume with global transformation.
+       * @param[in] mlv   Mother logical volume.
        */
-      void createSectorSupportCorner2(G4PVPlacementGT* mpvgt);
+      void createSectorSupportCorner2(G4LogicalVolume* mlv);
 
       /**
        * Create sector support corner 3.
-       * @param[in] mpvgt Mother physical volume with global transformation.
+       * @param[in] mlv   Mother logical volume.
        */
-      void createSectorSupportCorner3(G4PVPlacementGT* mpvgt);
+      void createSectorSupportCorner3(G4LogicalVolume* mlv);
 
       /**
        * Create sector support corner 4.
-       * @param[in] mpvgt Mother physical volume with global transformation.
+       * @param[in] mlv   Mother logical volume.
        */
-      void createSectorSupportCorner4(G4PVPlacementGT* mpvgt);
+      void createSectorSupportCorner4(G4LogicalVolume* mlv);
 
       /**
        * Subtract board solids from planes.
@@ -416,75 +422,74 @@ namespace Belle2 {
 
       /**
        * Create plane.
-       * @param[in] mpvgt  Mother physical volume with global transformation.
+       * @param[in] mlv    Mother logical volume.
        */
-      void createPlane(G4PVPlacementGT* mpvgt);
+      void createPlane(G4LogicalVolume* mlv);
 
       /**
        * Create readout board.
-       * @param[in] mpvgt  Mother physical volume with global transformation.
+       * @param[in] mlv    Mother logical volume.
        */
-      void createSectionReadoutBoard(G4PVPlacementGT* mpvgt);
+      void createSectionReadoutBoard(G4LogicalVolume* mlv);
 
       /**
        * Create base board of section readout board.
-       * @param[in] mpvgt Mother physical volume with global transformation.
+       * @param[in] mlv   Mother logical volume.
        */
-      void createBaseBoard(G4PVPlacementGT* mpvgt);
+      void createBaseBoard(G4LogicalVolume* mlv);
 
       /**
        * Create strip readout board.
        * @param[in] iBoard Number of board.
-       * @param[in] mpvgt  Mother physical volume with global transformation.
+       * @param[in] mlv    Mother logical volume.
        */
-      void createStripBoard(int iBoard, G4PVPlacementGT* mpvgt);
+      void createStripBoard(int iBoard, G4LogicalVolume* mlv);
 
       /**
        * Create section support.
        * @param[in] iSectionSupport Number of section support.
-       * @param[in] mpvgt           Mother physical volume
-       *                            with global transformation.
+       * @param[in] mlv             Mother logical volume.
        */
-      void createSectionSupport(int iSectionSupport, G4PVPlacementGT* mpvgt);
+      void createSectionSupport(int iSectionSupport, G4LogicalVolume* mlv);
 
       /**
        * Create plastic list element
        * @param[in] iListPlane Number of list plane.
        * @param[in] iList      Number of list.
-       * @param[in] mpvgt      Mother physical volume with global transformation.
+       * @param[in] mlv        Mother logical volume.
        */
       void createPlasticListElement(int iListPlane, int iList,
-                                    G4PVPlacementGT* mpvgt);
+                                    G4LogicalVolume* mlv);
 
       /**
        * Create strip volume (strip + SiPM).
-       * @param[in] mpvgt  Mother physical volume with global transformation.
+       * @param[in] mlv    Mother logical volume.
        */
-      void createStripVolume(G4PVPlacementGT* mpvgt);
+      void createStripVolume(G4LogicalVolume* mlv);
 
       /**
        * Create strip.
-       * @param[in] mpvgt  Mother physical volume with global transformation.
+       * @param[in] mlv Mother logical volume.
        */
-      void createStrip(G4PVPlacementGT* mpvgt);
+      void createStrip(G4LogicalVolume* mlv);
 
       /**
        * Create strip groove.
-       * @param[in] mpvgt  Mother physical volume with global transformation.
+       * @param[in] mlv Mother logical volume.
        */
-      void createStripGroove(G4PVPlacementGT* mpvgt);
+      void createStripGroove(G4LogicalVolume* mlv);
 
       /**
        * Create strip sensitive volume.
-       * @param[in] mpvgt  Mother physical volume with global transformation.
+       * @param[in] mlv Mother logical volume.
        */
-      void createStripSensitive(G4PVPlacementGT* mpvgt);
+      void createStripSensitive(G4LogicalVolume* mlv);
 
       /**
        * Create silicon cube in the place of SiPM for radiation study.
-       * @param[in] mpvgt  Mother physical volume with global transformation.
+       * @param[in] mlv Mother logical volume.
        */
-      void createSiPM(G4PVPlacementGT* mpvgt);
+      void createSiPM(G4LogicalVolume* mlv);
 
       /**
        * Print mass of volume if m_mode == 2.
@@ -493,14 +498,14 @@ namespace Belle2 {
       void printVolumeMass(G4LogicalVolume* lv);
 
       /**
-       * Allocate memory for solids and set contents to zero.
+       * Allocate memory for volumes and set contents to zero where necessary.
        */
-      void mallocSolids();
+      void mallocVolumes();
 
       /**
-       * Deallocate memory for solids.
+       * Deallocate memory for volumes.
        */
-      void freeSolids();
+      void freeVolumes();
 
       /**
        * Get cutted corner angle.
@@ -515,6 +520,9 @@ namespace Belle2 {
 
       /** Solids. */
       struct Solids solids;
+
+      /** Logical volumes. */
+      struct LogicalVolumes logvol;
 
       /** Materials. */
       struct Materials mat;

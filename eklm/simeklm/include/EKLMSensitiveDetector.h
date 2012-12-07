@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Timofey Uglov                            *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,7 +13,7 @@
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <eklm/dataobjects/EKLMStepHit.h>
-#include <eklm/geoeklm/G4PVPlacementGT.h>
+#include <eklm/geoeklm/EKLMLogicalVolume.h>
 
 namespace Belle2 {
 

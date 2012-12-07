@@ -2364,7 +2364,7 @@ TTrackManager::version(void) const {
       const double driftTime = h.drift();
       const unsigned uniqueId = layerId * 10000 + h.wire().localId();
 
-      trackCandidates[counter]->addHit(Const::CDC, hitID, driftTime, uniqueId);
+      trackCandidates[counter]->addHit(Belle2::Const::CDC, hitID, driftTime, uniqueId);
     }
 
     return 0;

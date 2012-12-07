@@ -50,20 +50,20 @@ namespace Belle2 {
      *
      *  @param relations  The vector of relation objects.
      */
-    RelationVector(const std::vector<RelationEntry>& relations): m_relations(relations) {}
+    RelationVector(const std::vector<Belle2::RelationEntry>& relations): m_relations(relations) {}
 
     /** Accessor for the relations vector.
      *
      *  @return           Vector of RelationEntry objects.
      */
-    const std::vector<RelationEntry>& relations() const {return m_relations;}
+    const std::vector<Belle2::RelationEntry>& relations() const {return m_relations;}
 
 
     /** Get number of relations.
      *
      *  @return           Number of relations.
      */
-    size_t size() const {return m_relations.size();}
+    size_t size() const { return m_relations.size();}
 
     /** Get object with index.
      *
@@ -86,8 +86,16 @@ namespace Belle2 {
      */
     double weight(int index) const {return m_relations[index].weight;}
 
+    /**
+     * @{
+     * dummy functions to get ROOT to generate a checked __getitem__() that handles out-of-range errors.
+     */
+    void begin() { }
+    void end() { }
+    /** @} */
+
   private:
-    std::vector<RelationEntry> m_relations;  /**< The vector of relation entries */
+    std::vector<Belle2::RelationEntry> m_relations;  /**< The vector of relation entries */
   };
 }
 

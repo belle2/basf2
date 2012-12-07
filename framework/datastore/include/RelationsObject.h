@@ -97,6 +97,21 @@ namespace Belle2 {
       return RelationVector<T>(DataStore::Instance().getRelationsWith(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name));
     }
 
+    /**
+     * @{
+     * define versions without template arguments, to be useful withing python modules.
+     */
+    RelationVector<TObject> getRelationsTo(const std::string& name = "") const {
+      return getRelationsTo<TObject>(name);
+    }
+    RelationVector<TObject> getRelationsFrom(const std::string& name = "") const {
+      return getRelationsFrom<TObject>(name);
+    }
+    RelationVector<TObject> getRelationsWith(const std::string& name = "") const {
+      return getRelationsWith<TObject>(name);
+    }
+    /** @} */
+
   private:
 
     ClassDef(RelationsInterface, 0)

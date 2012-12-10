@@ -68,7 +68,7 @@ TRGCDC::name(void) const {
 
 string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.24");
+    return string("TRGCDC 5.25");
 }
 
 TRGCDC *
@@ -705,7 +705,8 @@ TRGCDC::terminate(void) {
     clear();
 
     //...CDCSimHit...
-    StoreArray<CDCSimHit> SimHits("CDCSimHits");
+//iw StoreArray<CDCSimHit> SimHits("CDCSimHits");
+    StoreArray<CDCSimHit> SimHits;
     if (! SimHits) {
       cout << "TRGCDC !!! can not access to CDCSimHits" << endl;
       TRGDebug::leaveStage("TRGCDC update");

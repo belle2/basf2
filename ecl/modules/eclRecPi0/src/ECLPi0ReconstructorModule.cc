@@ -28,13 +28,21 @@
 #include  "CLHEP/Vector/ThreeVector.h"
 #include  "CLHEP/Vector/LorentzVector.h"
 #include  "CLHEP/Matrix/Matrix.h"
+#include <TMatrixFSym.h>
+
+#include <analysis/utility/makeMother.h>
+#include <analysis/KFit/MassFitKFit.h>
+#include "analysis/particle/Particle.h"
+
 
 #define PI 3.14159265358979323846
 
 using namespace std;
 using namespace Belle2;
-using namespace ECL;
-
+using namespace Belle2::analysis;
+using namespace Belle2::ECL;
+//using namespace Belle2::analysis;
+using namespace analysis;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -60,10 +68,6 @@ ECLPi0ReconstructorModule::~ECLPi0ReconstructorModule()
 void ECLPi0ReconstructorModule::initialize()
 {
 
-  gamma_energy_threshold = .02;
-  opening_angle_cut_margin = M_PI / 180.; // 1 degree
-  // pi0_mass_min = .134 - .0054 * 3, // 3 sigma
-  // pi0_mass_max = .134 + .0054 * 3, // 3 sigma
   pi0_mass_min = 0.08; // Modify: 20040112 KM
   pi0_mass_max = 0.18; // Modify: 20040112 KM
   fit_flag = 1;
@@ -99,38 +103,78 @@ void ECLPi0ReconstructorModule::event()
     }
   }
 
-  const int hitNum = Gamma->GetEntriesFast();
-  for (int iGamma1 = 0; iGamma1 < hitNum - 1; iGamma1++) {
+  for (int iGamma1 = 0; iGamma1 < Gamma->GetEntriesFast() - 1; iGamma1++) {
     ECLGamma* aECLGamma1 = Gamma[iGamma1];
     double EGamma1 =  aECLGamma1->getEnergy();
     m_px1 = aECLGamma1->getPx();
     m_py1 = aECLGamma1->getPy();
     m_pz1 = aECLGamma1->getPz();
 
+    CLHEP::HepSymMatrix   errorGamma1(7, 0);
+    readErrorMatrix(iGamma1, errorGamma1);
+
     CLHEP::Hep3Vector p3Gamma1(m_px1, m_py1, m_pz1);
-    // gamma energy cut
-    if (EGamma1 < gamma_energy_threshold)continue;
 
-
-    for (int iGamma2 = iGamma1 + 1; iGamma2 < hitNum; iGamma2++) {
+    for (int iGamma2 = iGamma1 + 1; iGamma2 < Gamma->GetEntriesFast(); iGamma2++) {
       ECLGamma* aECLGamma2 = Gamma[iGamma2];
       double EGamma2 =  aECLGamma2->getEnergy();
       m_px2 = aECLGamma2->getPx();
       m_py2 = aECLGamma2->getPy();
       m_pz2 = aECLGamma2->getPz();
+      CLHEP::HepSymMatrix   errorGamma2(7, 0);
+      readErrorMatrix(iGamma2, errorGamma2);
+      /*
+          aECLGamma2-> getErrorMatrix(GammaErrorMatrix);
+            for (int i = 0; i < 4; i++) {
+              for (int j = 0; j <=i ; j++) {
+                errorGamma2[i][j]=GammaErrorMatrix[i][j];
+              }
+            }
+          errorGamma2[4][4]=1.;
+          errorGamma2[5][5]=1.;
+          errorGamma2[6][6]=1.;
+            cout<<"FillGamma2 ErrorMatrix ";
+            for (int i = 0; i < 7; i++) {
+              for (int j = 0; j <=i ; j++) {
+                cout<<errorGamma2[i][j]<<" ";
+              }
+            }
+           cout<<endl;
+      */
 
       CLHEP::Hep3Vector p3Gamma2(m_px2, m_py2, m_pz2);
-      // gamma energy cut
-      if (EGamma2 < gamma_energy_threshold)continue;
-
 
       //CLHEP::Hep3Vector p3Rec = p3Gamma1 + p3Gamma2;
       CLHEP::HepLorentzVector lv_gamma1(p3Gamma1, EGamma1);
       CLHEP::HepLorentzVector lv_gamma2(p3Gamma2, EGamma2);
       CLHEP::HepLorentzVector lv_rec = lv_gamma1 + lv_gamma2;
+
+      CLHEP::Hep3Vector xGamma1(0, 0, 0);
+      CLHEP::Hep3Vector xGamma2(0, 0, 0);
+
       const double mass = lv_rec.mag();
       if (fit_flag) {
-        fit(lv_gamma1, lv_gamma2);
+//        fit(lv_gamma1, lv_gamma2);
+
+        Particle p;
+        MassFitKFit km;
+        km.setMagneticField(1.5);
+        km.addTrack(lv_gamma1, xGamma1, errorGamma1, 0);
+        km.addTrack(lv_gamma2, xGamma2, errorGamma2, 0);
+        const double MASS_PI0 = 0.1349739;
+
+        km.setInvariantMass(MASS_PI0);
+
+        unsigned err = km.doFit();
+        double confLevel(0);
+        if (!err) {
+          confLevel = km.getCHIsq();
+          makeMother(km, p);
+        } else {cout << m_nEvent << " km.doFit err " << endl;  }
+
+        CLHEP::HepLorentzVector momentumFitGamma1 = km.getTrackMomentum(0);
+        CLHEP::HepLorentzVector momentumFitGamma2 = km.getTrackMomentum(1);
+        CLHEP::HepLorentzVector momentumRec = momentumFitGamma1 + momentumFitGamma2;
         if (pi0_mass_min < mass && mass < pi0_mass_max) {
 
           if (!Pi0Array) Pi0Array.create();
@@ -139,14 +183,23 @@ void ECLPi0ReconstructorModule::event()
           Pi0Array[m_Pi0Num]->setShowerId1(m_showerId1);
           Pi0Array[m_Pi0Num]->setShowerId2(m_showerId2);
 
-          Pi0Array[m_Pi0Num]->setEnergy((float)m_pi0E);
-          Pi0Array[m_Pi0Num]->setPx((float)m_pi0px);
-          Pi0Array[m_Pi0Num]->setPy((float)m_pi0py);
-          Pi0Array[m_Pi0Num]->setPz((float)m_pi0pz);
-
+          Pi0Array[m_Pi0Num]->setEnergy((float)p.e());
+          Pi0Array[m_Pi0Num]->setPx((float)p.px());
+          Pi0Array[m_Pi0Num]->setPy((float)p.py());
+          Pi0Array[m_Pi0Num]->setPz((float)p.pz());
           Pi0Array[m_Pi0Num]->setMass((float)lv_rec.mag());
-          Pi0Array[m_Pi0Num]->setMassFit((float)m_pi0mass);
-          Pi0Array[m_Pi0Num]->setChi2((float)m_pi0chi2);
+          Pi0Array[m_Pi0Num]->setMassFit((float)p.mass());
+          Pi0Array[m_Pi0Num]->setChi2((float)confLevel);
+
+          /*
+                    Pi0Array[m_Pi0Num]->setEnergy((float)m_pi0E);
+                    Pi0Array[m_Pi0Num]->setPx((float)m_pi0px);
+                    Pi0Array[m_Pi0Num]->setPy((float)m_pi0py);
+                    Pi0Array[m_Pi0Num]->setPz((float)m_pi0pz);
+                    Pi0Array[m_Pi0Num]->setMass((float)lv_rec.mag());
+                    Pi0Array[m_Pi0Num]->setMassFit((float)m_pi0mass);
+                    Pi0Array[m_Pi0Num]->setChi2((float)m_pi0chi2);
+          */
           eclPi0ToShower.add(m_Pi0Num, m_showerId1);
           eclPi0ToShower.add(m_Pi0Num, m_showerId2);
           //cout << "Event " << m_nEvent << " Pi0 from Gamma " << m_showerId1 << " " << m_showerId2 << " " << m_pi0E << " " << m_pi0mass << endl;
@@ -168,6 +221,27 @@ void ECLPi0ReconstructorModule::endRun()
 
 void ECLPi0ReconstructorModule::terminate()
 {
+}
+
+
+void ECLPi0ReconstructorModule::readErrorMatrix(int GammaIndex, CLHEP::HepSymMatrix& errorGamma1)
+{
+
+  StoreArray<ECLGamma> Gamma;
+  ECLGamma* aECLGamma1 = Gamma[GammaIndex];
+  TMatrixFSym GammaErrorMatrix(4);
+  aECLGamma1-> getErrorMatrix(GammaErrorMatrix);
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j <= i ; j++) {
+
+      errorGamma1[i][j] = GammaErrorMatrix[i][j];
+    }
+  }
+  errorGamma1[4][4] = 1.;
+  errorGamma1[5][5] = 1.;
+  errorGamma1[6][6] = 1.;
+
+
 }
 
 

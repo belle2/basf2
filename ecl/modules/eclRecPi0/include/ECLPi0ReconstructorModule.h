@@ -16,6 +16,8 @@
 #include <TRandom3.h>
 #include  "CLHEP/Vector/LorentzVector.h"
 
+#include  "CLHEP/Matrix/Matrix.h"
+#include <TMatrixFSym.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -53,6 +55,9 @@ namespace Belle2 {
 
       /** Stopping of CPU clock.*/
       virtual void terminate();
+
+      /** read Error Matrix with Shower Id   */
+      void readErrorMatrix(int GammaIndex, CLHEP::HepSymMatrix& errorGamma);
 
       /** mass constraint fit of  pi0      */
       void fit(CLHEP::HepLorentzVector m_shower1, CLHEP::HepLorentzVector m_shower2);

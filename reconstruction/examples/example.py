@@ -39,9 +39,9 @@ add_reconstruction(main, components)
 # or add_reconstruction(main) to run the reconstruction of all detectors
 
 # output
-simpleoutput = register_module('SimpleOutput')
-simpleoutput.param('outputFileName', 'output.root')
-main.add_module(simpleoutput)
+output = register_module('RootOutput')
+output.param('outputFileName', 'output.root')
+main.add_module(output)
 
 process(main)
 

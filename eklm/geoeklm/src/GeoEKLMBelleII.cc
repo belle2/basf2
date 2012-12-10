@@ -13,6 +13,9 @@
 #include <errno.h>
 #include <math.h>
 
+/* C++ headers. */
+#include <new>
+
 /* External headers. */
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
@@ -101,6 +104,9 @@ EKLM::GeoEKLMBelleII::~GeoEKLMBelleII()
 void EKLM::GeoEKLMBelleII::mallocVolumes()
 {
   int i;
+  solids.plane = (G4VSolid**)malloc(nPlane * sizeof(G4VSolid*));
+  if (solids.plane == NULL)
+    B2FATAL(MemErr);
   solids.psheet = (G4VSolid**)malloc(nSection * sizeof(G4VSolid*));
   if (solids.psheet == NULL)
     B2FATAL(MemErr);
@@ -125,10 +131,6 @@ void EKLM::GeoEKLMBelleII::mallocVolumes()
                  malloc(nStrip * sizeof(struct EKLM::ScintillatorSolids));
   if (solids.scint == NULL)
     B2FATAL(MemErr);
-  solids.plane = (struct EKLM::PlaneSolids*)
-                 malloc(nPlane * sizeof(struct EKLM::PlaneSolids));
-  if (solids.plane == NULL)
-    B2FATAL(MemErr);
   solids.secsup = (struct EKLM::SectionSupportSolids**)
                   malloc(nPlane * sizeof(struct EKLM::SectionSupportSolids*));
   if (solids.secsup == NULL)
@@ -137,14 +139,13 @@ void EKLM::GeoEKLMBelleII::mallocVolumes()
     solids.secsup[i] = (struct EKLM::SectionSupportSolids*)
                        malloc((nSection + 1) *
                               sizeof(struct EKLM::SectionSupportSolids));
-    if (solids.plane == NULL)
+    if (solids.secsup[i] == NULL)
       B2FATAL(MemErr);
   }
   for (i = 0; i < nStrip; i++)
     logvol.stripvol[i] = NULL;
   for (i = 0; i < nSection; i++)
     logvol.psheet[i] = NULL;
-  memset(solids.plane, 0, nPlane * sizeof(struct EKLM::PlaneSolids));
   for (i = 0; i < nPlane; i++)
     memset(solids.secsup[i], 0,
            (nSection + 1) * sizeof(struct EKLM::SectionSupportSolids));
@@ -153,18 +154,15 @@ void EKLM::GeoEKLMBelleII::mallocVolumes()
 void EKLM::GeoEKLMBelleII::freeVolumes()
 {
   int i;
+  free(solids.plane);
   free(solids.psheet);
   free(solids.stripvol);
   free(logvol.stripvol);
   free(solids.strip);
   free(solids.groove);
   free(solids.scint);
-  for (i = 0; i < nPlane; i++) {
+  for (i = 0; i < nPlane; i++)
     free(solids.secsup[i]);
-    delete solids.plane[i].prism1;
-    delete solids.plane[i].prism2;
-    delete solids.plane[i].prism3;
-  }
 }
 
 /********************************** XML DATA *********************************/
@@ -454,6 +452,166 @@ void EKLM::GeoEKLMBelleII::createEndcapSolid()
     B2FATAL(MemErr);
 }
 
+void EKLM::GeoEKLMBelleII::createPlaneSolid(int n)
+{
+  double r;
+  double x;
+  double y;
+  double box_x;
+  double box_lx;
+  double ang;
+  HepGeom::Transform3D t1;
+  HepGeom::Transform3D t2;
+  HepGeom::Transform3D t3;
+  HepGeom::Transform3D t4;
+  HepGeom::Transform3D t5;
+  char name[128];
+  G4Tubs* tb;
+  G4Box* b1;
+  G4Box* b2;
+  G4TriangularPrism* pr1;
+  G4TriangularPrism* pr2;
+  G4TriangularPrism* pr3;
+  G4IntersectionSolid* is;
+  G4SubtractionSolid* ss1;
+  G4SubtractionSolid* ss2;
+  G4SubtractionSolid* ss3;
+  G4SubtractionSolid* ss4;
+  /* Basic solids. */
+  snprintf(name, 128, "Plane_%d_Tube", n + 1);
+  try {
+    tb = new G4Tubs(name, PlanePosition.innerR, PlanePosition.outerR,
+                    0.5 * PlanePosition.length, 0.0, 90.0 * deg);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  snprintf(name, 128, "Plane_%d_Box_1", n + 1);
+  box_x = std::max(SectorSupportPosition.Y, SectorSupportPosition.X) +
+          SectorSupportSize.Thickness;
+  box_lx =  PlanePosition.outerR - box_x;
+  try {
+    b1 = new(std::nothrow) G4Box(name, 0.5 * box_lx, 0.5 * box_lx,
+                                 0.5 * PlanePosition.length);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  snprintf(name, 128, "Plane_%d_Triangular_Prism_1", n + 1);
+  try {
+    pr1 = new G4TriangularPrism(name, SectorSupportSize.Corner2LY, 90. * deg,
+                                SectorSupportSize.Corner2LX,
+                                180. * deg, PlanePosition.length);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  snprintf(name, 128, "Plane_%d_Triangular_Prism_2", n + 1);
+  try {
+    pr2 = new G4TriangularPrism(name, SectorSupportSize.Corner3LX, 0.,
+                                SectorSupportSize.Corner3LY,
+                                90. * deg, PlanePosition.length);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  snprintf(name, 128, "Plane_%d_Triangular_Prism_3", n + 1);
+  try {
+    pr3 = new G4TriangularPrism(name, SectorSupportSize.Corner4LX, 0.,
+                                SectorSupportSize.Corner4LY,
+                                90. * deg, PlanePosition.length);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  snprintf(name, 128, "Plane_%d_Box_2", n + 1);
+  try {
+    b2 = new(std::nothrow) G4Box(name, 0.5 * box_lx, 0.5 * box_lx,
+                                 PlanePosition.length);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  /* Calculate transformations for boolean solids. */
+  t1 = HepGeom::Translate3D(0.5 * (PlanePosition.outerR + box_x),
+                            0.5 * (PlanePosition.outerR + box_x), 0.);
+  if (n == 1)
+    t1 = HepGeom::Rotate3D(180. * deg,
+                           HepGeom::Vector3D<double>(1., 1., 0.)) * t1;
+  ang = getSectorSupportCornerAngle();
+  x = std::max(SectorSupportPosition.Y, SectorSupportPosition.X);
+  y = SectorSupportPosition.outerR -
+      SectorSupportSize.DeltaLY -
+      SectorSupportSize.TopCornerHeight;
+  if (n == 0) {
+    t2 = HepGeom::Translate3D(x + 0.5 * box_lx * cos(ang) -
+                              0.5 * box_lx * sin(ang),
+                              y + 0.5 * box_lx * cos(ang) +
+                              0.5 * box_lx * sin(ang),
+                              0.) * HepGeom::RotateZ3D(ang);
+  } else {
+    t2 = HepGeom::Translate3D(y + 0.5 * box_lx * cos(ang) +
+                              0.5 * box_lx * sin(ang),
+                              x + 0.5 * box_lx * cos(ang) -
+                              0.5 * box_lx * sin(ang),
+                              0.) * HepGeom::RotateZ3D(-ang);
+  }
+  r = SectorSupportPosition.outerR - SectorSupportSize.Thickness;
+  y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
+  x = sqrt(r * r - y * y);
+  t3 = HepGeom::Translate3D(x, y, 0.);
+  if (n == 1)
+    t3 = HepGeom::Rotate3D(180. * deg,
+                           HepGeom::Vector3D<double>(1., 1., 0.)) * t3;
+  r = SectorSupportPosition.innerR + SectorSupportSize.Thickness;
+  y = SectorSupportPosition.Y + SectorSupportSize.Thickness +
+      SectorSupportSize.Corner3LY;
+  x = sqrt(r * r - y * y);
+  y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
+  t4 = HepGeom::Translate3D(x, y, 0.);
+  if (n == 1)
+    t4 = HepGeom::Rotate3D(180. * deg,
+                           HepGeom::Vector3D<double>(1., 1., 0.)) * t4;
+  x = SectorSupportPosition.X + SectorSupportSize.Thickness +
+      SectorSupportSize.Corner4LX;
+  y = sqrt(r * r - x * x);
+  x = SectorSupportPosition.X + SectorSupportSize.Thickness;
+  t5 = HepGeom::Translate3D(x, y, 0.);
+  if (n == 1)
+    t5 = HepGeom::Rotate3D(180. * deg,
+                           HepGeom::Vector3D<double>(1., 1., 0.)) * t5;
+  /* Boolean solids. */
+  snprintf(name, 128, "Plane_%d_Intersection", n + 1);
+  try {
+    is = new G4IntersectionSolid(name, tb, b1, t1);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  snprintf(name, 128, "Plane_%d_Subtraction_1", n + 1);
+  try {
+    ss1 = new G4SubtractionSolid(name, is, b2, t2);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  snprintf(name, 128, "Plane_%d_Subtraction_2", n + 1);
+  try {
+    ss2 = new G4SubtractionSolid(name, ss1, pr1->getSolid(), t3);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  snprintf(name, 128, "Plane_%d_Subtraction_3", n + 1);
+  try {
+    ss3 = new G4SubtractionSolid(name, ss2, pr2->getSolid(), t4);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  snprintf(name, 128, "Plane_%d_Subtraction_4", n + 1);
+  try {
+    ss4 = new G4SubtractionSolid(name, ss3, pr3->getSolid(), t5);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  snprintf(name, 128, "Plane_%d", n + 1);
+  solids.plane[n] = subtractBoardSolids(ss4, n);
+  delete pr1;
+  delete pr2;
+  delete pr3;
+}
+
 void EKLM::GeoEKLMBelleII::createPlasticSheetSolid(int n)
 {
   int i;
@@ -524,7 +682,11 @@ void EKLM::GeoEKLMBelleII::createSolids()
   int i;
   char name[128];
   HepGeom::Transform3D t;
+  /* High level volumes. */
   createEndcapSolid();
+  calcBoardTransform();
+  for (i = 0; i < nPlane; i++)
+    createPlaneSolid(i);
   /* Strips. */
   for (i = 0; i < nStrip; i++) {
     /* Strip volumes. */
@@ -679,7 +841,6 @@ void EKLM::GeoEKLMBelleII::createSector(G4LogicalVolume* mlv)
   createSectorSupport(logicSector);
   for (i = 1; i <= 2; i++)
     createSectorCover(i, logicSector);
-  calcBoardTransform();
   for (curvol.plane = 1; curvol.plane <= nPlane; curvol.plane++)
     createPlane(logicSector);
   for (curvol.plane = 1; curvol.plane <= nPlane; curvol.plane++)
@@ -1004,8 +1165,6 @@ void EKLM::GeoEKLMBelleII::createSectorSupportCorner2(G4LogicalVolume* mlv)
     solidCorner2Tubs = createSectorSupportOuterTube(mlv);
     if (solidCorner2Prism == NULL || solidCorner2Tubs == NULL)
       B2FATAL(MemErr);
-    if (solidCorner2Prism->getSolid() == NULL)
-      B2FATAL(MemErr);
     t1 = G4Translate3D(-x, -y, 0.);
     solidCorner2 =
       new(std::nothrow) G4SubtractionSolid(Corner2_Name,
@@ -1059,8 +1218,6 @@ void EKLM::GeoEKLMBelleII::createSectorSupportCorner3(G4LogicalVolume* mlv)
     solidCorner3Tubs = createSectorSupportInnerTube(mlv);
     if (solidCorner3Prism == NULL || solidCorner3Tubs == NULL)
       B2FATAL(MemErr);
-    if (solidCorner3Prism->getSolid() == NULL)
-      B2FATAL(MemErr);
     t1 = G4Translate3D(-x, -y, 0.);
     solidCorner3 =
       new(std::nothrow) G4SubtractionSolid(Corner3_Name,
@@ -1113,8 +1270,6 @@ void EKLM::GeoEKLMBelleII::createSectorSupportCorner4(G4LogicalVolume* mlv)
                                           Corner4Thickness);
     solidCorner4Tubs = createSectorSupportInnerTube(mlv);
     if (solidCorner4Prism == NULL || solidCorner4Tubs == NULL)
-      B2FATAL(MemErr);
-    if (solidCorner4Prism->getSolid() == NULL)
       B2FATAL(MemErr);
     t1 = G4Translate3D(-x, -y, 0.);
     solidCorner4 =
@@ -1220,7 +1375,7 @@ void EKLM::GeoEKLMBelleII::createSectorSupport(G4LogicalVolume* mlv)
 }
 
 G4SubtractionSolid* EKLM::GeoEKLMBelleII::
-subtractBoardSolids(G4SubtractionSolid* plane, std::string Plane_Name)
+subtractBoardSolids(G4SubtractionSolid* plane, int n)
 {
   int i;
   int j;
@@ -1229,7 +1384,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, std::string Plane_Name)
   G4SubtractionSolid** ss[2];
   G4SubtractionSolid* prev_solid;
   solidBoardBox =
-    new(std::nothrow) G4Box("PlateBox_" + Plane_Name, 0.5 * BoardSize.length,
+    new(std::nothrow) G4Box("PlateBox", 0.5 * BoardSize.length,
                             0.5 * BoardSize.height,
                             0.5 * (PlanePosition.length + PlanePosition.Z));
   for (i = 0; i < nPlane; i++) {
@@ -1238,7 +1393,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, std::string Plane_Name)
       return NULL;
     for (j = 0; j < nBoard; j++) {
       t = *BoardTransform[i][j];
-      if (curvol.plane == 2)
+      if (n == 1)
         t = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t;
       if (i == 0) {
         if (j == 0)
@@ -1254,7 +1409,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, std::string Plane_Name)
       ss[i][j] =
         new(std::nothrow) G4SubtractionSolid("BoardSubtraction_" +
                                              boost::lexical_cast<std::string>(i) + "_" +
-                                             boost::lexical_cast<std::string>(j) + Plane_Name,
+                                             boost::lexical_cast<std::string>(j),
                                              prev_solid, solidBoardBox, t);
     }
   }
@@ -1265,144 +1420,13 @@ void EKLM::GeoEKLMBelleII::createPlane(G4LogicalVolume* mlv)
 {
   int i;
   int j;
-  double r;
-  double x;
-  double y;
-  double box_x;
-  double box_lx;
-  double ang;
   EKLMLogicalVolume* logicPlane;
   G4PVPlacement* physiPlane;
-  G4Transform3D t1;
-  G4Transform3D t2;
-  G4Transform3D t3;
-  G4Transform3D t4;
-  G4Transform3D t5;
   std::string Plane_Name = "Plane_" +
                            boost::lexical_cast<std::string>(curvol.plane) + "_" +
                            mlv->GetName();
-  if (solids.plane[curvol.plane - 1].plane == NULL) {
-    solids.plane[curvol.plane - 1].tube =
-      new(std::nothrow) G4Tubs("Tube_" + Plane_Name, PlanePosition.innerR,
-                               PlanePosition.outerR, 0.5 * PlanePosition.length,
-                               0.0, 90.0 * deg);
-    box_x = std::max(SectorSupportPosition.Y, SectorSupportPosition.X) +
-            SectorSupportSize.Thickness;
-    box_lx =  PlanePosition.outerR - box_x;
-    solids.plane[curvol.plane - 1].box1 =
-      new(std::nothrow) G4Box("Box_" + Plane_Name, 0.5 * box_lx, 0.5 * box_lx,
-                              0.5 * PlanePosition.length);
-    solids.plane[curvol.plane - 1].prism1 =
-      new(std::nothrow) G4TriangularPrism("TriangularPrism1_" + Plane_Name,
-                                          SectorSupportSize.Corner2LY,
-                                          90. * deg,
-                                          SectorSupportSize.Corner2LX,
-                                          180. * deg, PlanePosition.length);
-    solids.plane[curvol.plane - 1].prism2 =
-      new(std::nothrow) G4TriangularPrism("TriangularPrism2_" + Plane_Name,
-                                          SectorSupportSize.Corner3LX, 0.,
-                                          SectorSupportSize.Corner3LY,
-                                          90. * deg, PlanePosition.length);
-    solids.plane[curvol.plane - 1].prism3 =
-      new(std::nothrow) G4TriangularPrism("TriangularPrism3_" + Plane_Name,
-                                          SectorSupportSize.Corner4LX, 0.,
-                                          SectorSupportSize.Corner4LY,
-                                          90. * deg, PlanePosition.length);
-    if (solids.plane[curvol.plane - 1].tube == NULL ||
-        solids.plane[curvol.plane - 1].box1 == NULL ||
-        solids.plane[curvol.plane - 1].prism1 == NULL ||
-        solids.plane[curvol.plane - 1].prism2 == NULL ||
-        solids.plane[curvol.plane - 1].prism3 == NULL)
-      B2FATAL(MemErr);
-    if (solids.plane[curvol.plane - 1].prism1->getSolid() == NULL ||
-        solids.plane[curvol.plane - 1].prism2->getSolid() == NULL ||
-        solids.plane[curvol.plane - 1].prism3->getSolid() == NULL)
-      B2FATAL(MemErr);
-    solids.plane[curvol.plane - 1].box2 =
-      new(std::nothrow) G4Box("Box1_" + Plane_Name,
-                              0.5 * box_lx, 0.5 * box_lx,
-                              PlanePosition.length);
-    if (solids.plane[curvol.plane - 1].box2 == NULL)
-      B2FATAL(MemErr);
-    t1 = G4Translate3D(0.5 * (PlanePosition.outerR + box_x),
-                       0.5 * (PlanePosition.outerR + box_x), 0.);
-    if (curvol.plane == 2)
-      t1 = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t1;
-    ang = getSectorSupportCornerAngle();
-    x = std::max(SectorSupportPosition.Y, SectorSupportPosition.X);
-    y = SectorSupportPosition.outerR -
-        SectorSupportSize.DeltaLY -
-        SectorSupportSize.TopCornerHeight;
-    if (curvol.plane == 1) {
-      t2 = G4Translate3D(x + 0.5 * box_lx * cos(ang) - 0.5 * box_lx * sin(ang),
-                         y + 0.5 * box_lx * cos(ang) + 0.5 * box_lx * sin(ang),
-                         0.) * G4RotateZ3D(ang);
-    } else {
-      t2 = G4Translate3D(y + 0.5 * box_lx * cos(ang) + 0.5 * box_lx * sin(ang),
-                         x + 0.5 * box_lx * cos(ang) - 0.5 * box_lx * sin(ang),
-                         0.) * G4RotateZ3D(-ang);
-    }
-    r = SectorSupportPosition.outerR - SectorSupportSize.Thickness;
-    y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
-    x = sqrt(r * r - y * y);
-    t3 = G4Translate3D(x, y, 0.);
-    if (curvol.plane == 2)
-      t3 = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t3;
-    r = SectorSupportPosition.innerR + SectorSupportSize.Thickness;
-    y = SectorSupportPosition.Y + SectorSupportSize.Thickness +
-        SectorSupportSize.Corner3LY;
-    x = sqrt(r * r - y * y);
-    y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
-    t4 = G4Translate3D(x, y, 0.);
-    if (curvol.plane == 2)
-      t4 = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t4;
-    x = SectorSupportPosition.X + SectorSupportSize.Thickness +
-        SectorSupportSize.Corner4LX;
-    y = sqrt(r * r - x * x);
-    x = SectorSupportPosition.X + SectorSupportSize.Thickness;
-    t5 = G4Translate3D(x, y, 0.);
-    if (curvol.plane == 2)
-      t5 = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t5;
-    solids.plane[curvol.plane - 1].is =
-      new(std::nothrow) G4IntersectionSolid("Intersection_" + Plane_Name,
-                                            solids.plane[curvol.plane - 1].tube,
-                                            solids.plane[curvol.plane - 1].box1, t1);
-    if (solids.plane[curvol.plane - 1].is == NULL)
-      B2FATAL(MemErr);
-    solids.plane[curvol.plane - 1].ss1 =
-      new(std::nothrow) G4SubtractionSolid("Subtraction1_" + Plane_Name,
-                                           solids.plane[curvol.plane - 1].is,
-                                           solids.plane[curvol.plane - 1].box2, t2);
-    if (solids.plane[curvol.plane - 1].ss1 == NULL)
-      B2FATAL(MemErr);
-    solids.plane[curvol.plane - 1].ss2 =
-      new(std::nothrow) G4SubtractionSolid("Subtraction2_" + Plane_Name,
-                                           solids.plane[curvol.plane - 1].ss1,
-                                           solids.plane[curvol.plane - 1].prism1->getSolid(),
-                                           t3);
-    if (solids.plane[curvol.plane - 1].ss2 == NULL)
-      B2FATAL(MemErr);
-    solids.plane[curvol.plane - 1].ss3 =
-      new(std::nothrow) G4SubtractionSolid("Subtraction3_" + Plane_Name,
-                                           solids.plane[curvol.plane - 1].ss2,
-                                           solids.plane[curvol.plane - 1].prism2->getSolid(),
-                                           t4);
-    if (solids.plane[curvol.plane - 1].ss3 == NULL)
-      B2FATAL(MemErr);
-    solids.plane[curvol.plane - 1].ss4 =
-      new(std::nothrow) G4SubtractionSolid("Subtraction4_" + Plane_Name,
-                                           solids.plane[curvol.plane - 1].ss3,
-                                           solids.plane[curvol.plane - 1].prism3->getSolid(),
-                                           t5);
-    if (solids.plane[curvol.plane - 1].ss4 == NULL)
-      B2FATAL(MemErr);
-    solids.plane[curvol.plane - 1].plane =
-      subtractBoardSolids(solids.plane[curvol.plane - 1].ss4, Plane_Name);
-  }
-  if (solids.plane[curvol.plane - 1].plane == NULL)
-    B2FATAL(MemErr);
   logicPlane =
-    new(std::nothrow) EKLMLogicalVolume(solids.plane[curvol.plane - 1].plane,
+    new(std::nothrow) EKLMLogicalVolume(solids.plane[curvol.plane - 1],
                                         mat.air, Plane_Name,
                                         planeNumber(curvol.endcap, curvol.layer, curvol.sector, curvol.plane));
   if (logicPlane == NULL)

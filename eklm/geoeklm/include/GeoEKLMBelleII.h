@@ -135,24 +135,6 @@ namespace Belle2 {
     };
 
     /**
-     * Plane solids.
-     */
-    struct PlaneSolids {
-      G4Tubs* tube;                   /**< Tube. */
-      G4Box* box1;                    /**< Box. */
-      G4Box* box2;                    /**< Box to subtract corner 1. */
-      G4TriangularPrism* prism1;      /**< Corner 2. */
-      G4TriangularPrism* prism2;      /**< Corner 3. */
-      G4TriangularPrism* prism3;      /**< Corner 4. */
-      G4IntersectionSolid* is;        /**< Arc. */
-      G4SubtractionSolid* ss1;        /**< Arc - corner 1. */
-      G4SubtractionSolid* ss2;        /**< Arc - corners 1, 2. */
-      G4SubtractionSolid* ss3;        /**< Arc - corners 1, 2, 3. */
-      G4SubtractionSolid* ss4;        /**< Arc - all corners. */
-      G4SubtractionSolid* plane;      /**< Arc - all corners - boards. */
-    };
-
-    /**
      * Section support solids.
      */
     struct SectionSupportSolids {
@@ -176,13 +158,13 @@ namespace Belle2 {
      */
     struct Solids {
       G4VSolid* endcap;                     /**< Endcap. */
+      G4VSolid** plane;                     /**< Plane. */
       G4VSolid** psheet;                    /**< Element of plastic sheet. */
       G4Box** stripvol;                     /**< Strip + SiPM volume. */
       G4Box** strip;                        /**< Strips. */
       G4Box** groove;                       /**< Strip grooves. */
       G4Box* sipm;                          /**< SiPM. */
       struct ScintillatorSolids* scint;     /**< Scintillator. */
-      struct PlaneSolids* plane;            /**< Plane. */
       struct SectionSupportSolids** secsup; /**< Section support. */
     };
 
@@ -332,6 +314,12 @@ namespace Belle2 {
       void createEndcapSolid();
 
       /**
+       * Create plane solid.
+       * @param[in] n Number of plane, from 0 to 1.
+       */
+      void createPlaneSolid(int n);
+
+      /**
        * Create plastic sheet solids.
        * @param[in] n Number of sector, from 0 to 4.
        */
@@ -438,11 +426,11 @@ namespace Belle2 {
 
       /**
        * Subtract board solids from planes.
-       * @param[in] plane      Plane solid without boards subtracted.
-       * @param[in] Plane_name Plane name.
+       * @param[in] plane Plane solid without boards subtracted.
+       * @param[in] n     Number of plane, from 0 to 1.
        */
       G4SubtractionSolid* subtractBoardSolids(G4SubtractionSolid* plane,
-                                              std::string Plane_Name);
+                                              int n);
 
       /**
        * Create plane.

@@ -10,6 +10,7 @@
 
 #include <eklm/geoeklm/G4TriangularPrism.h>
 #include <cmath>
+#include <new>
 
 using namespace std;
 using namespace Belle2;
@@ -31,7 +32,7 @@ G4TriangularPrism::G4TriangularPrism(const G4String& name,
   m_tube = new(nothrow) G4Tubs("Tube_" + name, 0., max(r1, r2), halfZlen,
                                phi1, fabs(phi2 - phi1));
   if (m_tube == NULL)
-    return;
+    goto err_mem1;
   if (r1 >= r2) {
     rl = r1;
     rs = r2;
@@ -46,13 +47,22 @@ G4TriangularPrism::G4TriangularPrism(const G4String& name,
   cos_alpha = 1.0 / sqrt(1.0 + tg_alpha * tg_alpha);
   m_box = new(nothrow) G4Box("Box_" + name, rl * sin_alpha,
                              rl * cos_alpha, halfZlen);
+  if (m_box == NULL)
+    goto err_mem2;
   if (r1 >= r2)
     t = G4RotateZ3D((phi1 + alpha) * rad - 90.0 * deg);
   else
     t = G4RotateZ3D((phi2 - alpha) * rad + 90.0 * deg);
-  if (m_box == NULL)
-    return;
   m_is = new(nothrow) G4IntersectionSolid(name, m_tube, m_box, t);
+  if (m_is == NULL)
+    goto err_mem3;
+  return;
+err_mem3:
+  delete m_box;
+err_mem2:
+  delete m_tube;
+err_mem1:
+  throw(std::bad_alloc());
 }
 
 G4TriangularPrism::~G4TriangularPrism()

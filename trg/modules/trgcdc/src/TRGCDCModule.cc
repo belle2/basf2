@@ -132,8 +132,12 @@ TRGCDCModule::TRGCDCModule()
     //...Stop curl buck...
     if (_curlBackStop) {
       G4RunManager* g4rm = G4RunManager::GetRunManager();
-      _sa = new TCSAction();
-      g4rm->SetUserAction(_sa);
+      if(g4rm!=0){
+        if(g4rm->GetUserPhysicsList()!=0){
+         _sa = new TCSAction();
+         g4rm->SetUserAction(_sa);
+        }
+      }
     }
     TRGDebug::level(_debugLevel);
 

@@ -135,7 +135,7 @@ namespace Belle2 {
 
     /**
      * @{
-     * define versions without template arguments, to be useful withing python modules.
+     * define versions without template arguments, to be useful within python modules.
      */
     RelationVector<TObject> getRelationsTo(const std::string& name = "") const {
       return getRelationsTo<TObject>(name);
@@ -145,6 +145,15 @@ namespace Belle2 {
     }
     RelationVector<TObject> getRelationsWith(const std::string& name = "") const {
       return getRelationsWith<TObject>(name);
+    }
+    const TObject* getRelatedTo(const std::string& name = "") const {
+      return getRelatedTo<TObject>(name);
+    }
+    const TObject* getRelatedFrom(const std::string& name = "") const {
+      return getRelatedFrom<TObject>(name);
+    }
+    const TObject* getRelated(const std::string& name = "") const {
+      return getRelated<TObject>(name);
     }
     /** @} */
 

@@ -365,6 +365,54 @@ namespace Belle2 {
       return RelationVector<T>(Instance().getRelationsWith(object, storeEntry, index, T::Class(), name));
     }
 
+    /** Get the object to which another object has a relation.
+     *
+     *  @param object  Pointer to the object from which the relation points.
+     *  @tparam T      The class of objects to which the relation points.
+     *  @param name    The name of the store array to which the relation points.
+     *                 If empty the default store array name for class T will be used.
+     *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *  @return        The related object or a null pointer.
+     */
+    template <class T> static const T* getRelatedFromObj(const TObject* object, const std::string& name = "") {
+      if (!object) return 0;
+      StoreEntry* storeEntry = 0;
+      int index = -1;
+      return static_cast<const T*>(DataStore::Instance().getRelationFromTo(object, storeEntry, index, T::Class(), name).object);
+    }
+
+    /** Get the object from which another object has a relation.
+     *
+     *  @param object  Pointer to the object to which the relation points.
+     *  @tparam T      The class of objects from which the relation points.
+     *  @param name    The name of the store array from which the relation points.
+     *                 If empty the default store array name for class T will be used.
+     *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *  @return        The related object or a null pointer.
+     */
+    template <class T> static const T* getRelatedToObj(const TObject* object, const std::string& name = "") {
+      if (!object) return 0;
+      StoreEntry* storeEntry = 0;
+      int index = -1;
+      return static_cast<const T*>(DataStore::Instance().getRelationToFrom(object, storeEntry, index, T::Class(), name).object);
+    }
+
+    /** Get the object to or from which another object has a relation.
+     *
+     *  @param object  Pointer to the object to or from which the relation points.
+     *  @tparam T      The class of objects to or from which the relation points.
+     *  @param name    The name of the store array to or from which the relation points.
+     *                 If empty the default store array name for class T will be used.
+     *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *  @return        The related object or a null pointer.
+     */
+    template <class T> static const T* getRelated(const TObject* object, const std::string& name = "") {
+      if (!object) return 0;
+      StoreEntry* storeEntry = 0;
+      int index = -1;
+      return static_cast<const T*>(DataStore::Instance().getRelationWith(object, storeEntry, index, T::Class(), name).object);
+    }
+
     //------------------------------ Start and end procedures --------------------------------------------------
     /** Setter for m_initializeActive.
      *

@@ -175,7 +175,7 @@ namespace Belle2 {
      * All solids of EKLM.
      */
     struct Solids {
-      G4Box** list;                         /**< Element of plastic list. */
+      G4VSolid** psheet;                    /**< Element of plastic sheet. */
       G4Box** stripvol;                     /**< Strip + SiPM volume. */
       G4Box** strip;                        /**< Strips. */
       G4Box** groove;                       /**< Strip grooves. */
@@ -190,6 +190,7 @@ namespace Belle2 {
      */
     struct LogicalVolumes {
       EKLMLogicalVolume** stripvol;  /**< Strip volumes. */
+      G4LogicalVolume** psheet;      /**< Plastic sheet. */
     };
 
     /**
@@ -312,6 +313,23 @@ namespace Belle2 {
        * Read parameters from XML database.
        */
       void readXMLData();
+
+      /**
+       * Get plastic sheet element transformation.
+       * @param[out] t Transformation.
+       * @param[in]  n Number of list.
+       * @details
+       * Numbers start from 0.
+       * This function is intended for construction of the list solids, so
+       * the transformation does not include z shift.
+       */
+      void getSheetTransform(HepGeom::Transform3D* t, int n);
+
+      /**
+       * Create plastic sheet solids.
+       * @praan[in] n Number of sector, from 0 to 4.
+       */
+      void createPlasticSheetSolid(int n);
 
       /**
        * Create solids.
@@ -454,12 +472,12 @@ namespace Belle2 {
 
       /**
        * Create plastic list element
-       * @param[in] iListPlane Number of list plane.
-       * @param[in] iList      Number of list.
-       * @param[in] mlv        Mother logical volume.
+       * @param[in] iSheetPlane Number of list plane.
+       * @param[in] iSheet      Number of list.
+       * @param[in] mlv         Mother logical volume.
        */
-      void createPlasticListElement(int iListPlane, int iList,
-                                    G4LogicalVolume* mlv);
+      void createPlasticSheetElement(int iSheetPlane, int iSheet,
+                                     G4LogicalVolume* mlv);
 
       /**
        * Create strip volume (strip + SiPM).
@@ -609,10 +627,10 @@ namespace Belle2 {
       double SectionSupportMiddleThickness;
 
       /** Plastic list width. */
-      double PlasticListWidth;
+      double PlasticSheetWidth;
 
       /** Distance from edge of last strip to edge of plastic list. */
-      double PlasticListDeltaL;
+      double PlasticSheetDeltaL;
 
       /** Position data for strips. */
       struct ElementPosition* StripPosition;

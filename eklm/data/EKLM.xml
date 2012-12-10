@@ -197,8 +197,8 @@
 	    <PositionY  desc="Y position" unit="mm">0</PositionY>
 	    <PositionZ  desc="Z position" unit="mm">6.0</PositionZ>
             <nSection desc="Number of sections in one plane">5</nSection>
-            <PlasticListWidth unit="mm">1.0</PlasticListWidth>
-            <PlasticListDeltaL unit="mm">10.0</PlasticListDeltaL>
+            <PlasticSheetWidth unit="mm">1.0</PlasticSheetWidth>
+            <PlasticSheetDeltaL unit="mm">10.0</PlasticSheetDeltaL>
             <Sections>
               <TopWidth unit="mm">21.0</TopWidth>
               <TopThickness unit="mm">1.5</TopThickness>

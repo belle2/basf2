@@ -101,8 +101,12 @@ EKLM::GeoEKLMBelleII::~GeoEKLMBelleII()
 void EKLM::GeoEKLMBelleII::mallocVolumes()
 {
   int i;
-  solids.list = (G4Box**)malloc(nStrip * sizeof(G4Box*));
-  if (solids.list == NULL)
+  solids.psheet = (G4VSolid**)malloc(nSection * sizeof(G4VSolid*));
+  if (solids.psheet == NULL)
+    B2FATAL(MemErr);
+  logvol.psheet = (G4LogicalVolume**)
+                  malloc(nSection * sizeof(G4LogicalVolume*));
+  if (logvol.psheet == NULL)
     B2FATAL(MemErr);
   solids.stripvol = (G4Box**)malloc(nStrip * sizeof(G4Box*));
   if (solids.stripvol == NULL)
@@ -136,10 +140,10 @@ void EKLM::GeoEKLMBelleII::mallocVolumes()
     if (solids.plane == NULL)
       B2FATAL(MemErr);
   }
-  for (i = 0; i < nStrip; i++) {
-    solids.list[i] = NULL;
+  for (i = 0; i < nStrip; i++)
     logvol.stripvol[i] = NULL;
-  }
+  for (i = 0; i < nSection; i++)
+    logvol.psheet[i] = NULL;
   memset(solids.plane, 0, nPlane * sizeof(struct EKLM::PlaneSolids));
   for (i = 0; i < nPlane; i++)
     memset(solids.secsup[i], 0,
@@ -149,7 +153,7 @@ void EKLM::GeoEKLMBelleII::mallocVolumes()
 void EKLM::GeoEKLMBelleII::freeVolumes()
 {
   int i;
-  free(solids.list);
+  free(solids.psheet);
   free(solids.stripvol);
   free(logvol.stripvol);
   free(solids.strip);
@@ -288,8 +292,8 @@ void EKLM::GeoEKLMBelleII::readXMLData()
   Plane.append("/Plane");
   readPositionData(&PlanePosition, &Plane);
   nSection = Plane.getInt("nSection");
-  PlasticListWidth = Plane.getLength("PlasticListWidth") * cm;
-  PlasticListDeltaL = Plane.getLength("PlasticListDeltaL") * cm;
+  PlasticSheetWidth = Plane.getLength("PlasticSheetWidth") * cm;
+  PlasticSheetDeltaL = Plane.getLength("PlasticSheetDeltaL") * cm;
   GearDir Strips(Plane);
   Strips.append("/Strips");
   nStrip = Strips.getNumberNodes("Strip");
@@ -417,7 +421,85 @@ void EKLM::GeoEKLMBelleII::getStripTransform(HepGeom::Transform3D* t, int n)
   *t = HepGeom::Translate3D(StripPosition[n].X, StripPosition[n].Y, 0.0);
 }
 
+void EKLM::GeoEKLMBelleII::getSheetTransform(HepGeom::Transform3D* t, int n)
+{
+  double y;
+  if (!haveGeoDat)
+    readXMLData();
+  y = StripPosition[n].Y;
+  if (n % 15 == 0)
+    y = y + 0.5 * PlasticSheetDeltaL;
+  else if (n % 15 == 14)
+    y = y - 0.5 * PlasticSheetDeltaL;
+  *t = HepGeom::Translate3D(StripPosition[n].X, y, 0.0);
+}
+
 /*************************** CREATION OF SOLIDS ******************************/
+
+void EKLM::GeoEKLMBelleII::createPlasticSheetSolid(int n)
+{
+  int i;
+  int m;
+  double ly;
+  char name[128];
+  G4Box* b[15];
+  G4UnionSolid* u1[8];
+  G4UnionSolid* u2[4];
+  G4UnionSolid* u3[2];
+  HepGeom::Transform3D tl[15];
+  HepGeom::Transform3D tli[15];
+  HepGeom::Transform3D t;
+  /* Transformations. */
+  for (i = 0; i < 15; i++) {
+    m = 15 * n + i;
+    getSheetTransform(&(tl[i]), m);
+    tli[i] = tl[i].inverse();
+  }
+  /* Sheet elements. */
+  for (i = 0; i < 15; i++) {
+    snprintf(name, 128, "PlasticSheet_%d_Element_%d", n + 1, i + 1);
+    ly = StripSize.width;
+    if (i == 0 || i == 14)
+      ly = ly - PlasticSheetDeltaL;
+    m = 15 * n + i;
+    b[i] = new(std::nothrow) G4Box(name,
+                                   0.5 * StripPosition[m].length,
+                                   0.5 * ly, 0.5 * PlasticSheetWidth);
+    if (b[i] == NULL)
+      B2FATAL(MemErr);
+  }
+  /* First level unions (7 * 2 + 1). */
+  for (i = 0; i < 7; i++) {
+    snprintf(name, 128, "PlasticSheet_%d_Union1_%d", n + 1, i + 1);
+    t = tli[2 * i] * tl[2 * i + 1];
+    u1[i] = new(std::nothrow) G4UnionSolid(name, b[2 * i], b[2 * i + 1], t);
+    if (u1[i] == NULL)
+      B2FATAL(MemErr);
+  }
+  u1[7] = (G4UnionSolid*)b[14];
+  /* Second level unions (3 * 4 + 1 * 3). */
+  for (i = 0; i < 4; i++) {
+    snprintf(name, 128, "PlasticSheet_%d_Union2_%d", n + 1, i + 1);
+    t = tli[4 * i] * tl[4 * i + 2];
+    u2[i] = new(std::nothrow) G4UnionSolid(name, u1[2 * i], u1[2 * i + 1], t);
+    if (u2[i] == NULL)
+      B2FATAL(MemErr);
+  }
+  /* Third level unions (1 * 8 + 1 * 7). */
+  for (i = 0; i < 2; i++) {
+    snprintf(name, 128, "PlasticSheet_%d_Union3_%d", n + 1, i + 1);
+    t = tli[8 * i] * tl[8 * i + 4];
+    u3[i] = new(std::nothrow) G4UnionSolid(name, u2[2 * i], u2[2 * i + 1], t);
+    if (u3[i] == NULL)
+      B2FATAL(MemErr);
+  }
+  /* Plastic sheet. */
+  snprintf(name, 128, "PlasticSheet_%d", n + 1);
+  t = tli[0] * tl[8];
+  solids.psheet[n] = new(std::nothrow) G4UnionSolid(name, u3[0], u3[1], t);
+  if (solids.psheet[n] == NULL)
+    B2FATAL(MemErr);
+}
 
 void EKLM::GeoEKLMBelleII::createSolids()
 {
@@ -455,7 +537,7 @@ void EKLM::GeoEKLMBelleII::createSolids()
     if (solids.groove[i] == NULL)
       B2FATAL(MemErr);
     /* Strip sensitive volumes (scintillator). */
-    snprintf(name, 128, "StripSensitive_%d_box", i + 1);
+    snprintf(name, 128, "StripSensitive_%d_Box", i + 1);
     solids.scint[i].box =
       new(std::nothrow) G4Box(name,
                               0.5 * StripPosition[i].length -
@@ -476,12 +558,17 @@ void EKLM::GeoEKLMBelleII::createSolids()
     if (solids.scint[i].sens == NULL)
       B2FATAL(MemErr);
   }
+  /* Plastic sheet elements. */
+  for (i = 0; i < nSection; i++)
+    createPlasticSheetSolid(i);
   /* SiPM (not really a SiPM; a cube in the place of SiPM) */
-  solids.sipm =
-    new(std::nothrow) G4Box("SiPM", 0.5 * StripSize.rss_size,
-                            0.5 * StripSize.rss_size, 0.5 * StripSize.rss_size);
-  if (solids.sipm == NULL)
-    B2FATAL(MemErr);
+  if (m_mode != EKLM_DETECTOR_NORMAL) {
+    solids.sipm =
+      new(std::nothrow) G4Box("SiPM", 0.5 * StripSize.rss_size,
+                              0.5 * StripSize.rss_size, 0.5 * StripSize.rss_size);
+    if (solids.sipm == NULL)
+      B2FATAL(MemErr);
+  }
 }
 
 /************************** CREATION OF VOLUMES ******************************/
@@ -1323,8 +1410,8 @@ void EKLM::GeoEKLMBelleII::createPlane(G4LogicalVolume* mlv)
   for (i = 1; i <= nSection + 1; i++)
     createSectionSupport(i, logicPlane);
   for (i = 1; i <= 2; i++)
-    for (j = 1; j <= nStrip; j++)
-      createPlasticListElement(i, j, logicPlane);
+    for (j = 1; j <= nSection; j++)
+      createPlasticSheetElement(i, j, logicPlane);
   for (curvol.strip = 1; curvol.strip <= nStrip; curvol.strip++)
     createStripVolume(logicPlane);
 }
@@ -1527,51 +1614,37 @@ void EKLM::GeoEKLMBelleII::createSectionSupport(int iSectionSupport,
   printVolumeMass(logicSectionSupport);
 }
 
-void EKLM::GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
-                                                    G4LogicalVolume* mlv)
+void EKLM::GeoEKLMBelleII::createPlasticSheetElement(int iSheetPlane, int iSheet,
+                                                     G4LogicalVolume* mlv)
 {
-  double ly;
-  double y;
   double z;
-  G4LogicalVolume* logicList;
-  G4PVPlacement* physiList;
+  G4PVPlacement* physiSheet;
   G4Transform3D t;
-  std::string List_Name = "List_" +
-                          boost::lexical_cast<std::string>(iList) +
-                          "_ListPlane_" +
-                          boost::lexical_cast<std::string>(iListPlane) +
-                          "_" + mlv->GetName();
-  if (solids.list[iList - 1] == NULL) {
-    ly = StripSize.width;
-    if (iList % 15 <= 1)
-      ly = ly - PlasticListDeltaL;
-    solids.list[iList - 1] =
-      new(std::nothrow) G4Box(List_Name,
-                              0.5 * StripPosition[iList - 1].length,
-                              0.5 * ly, 0.5 * PlasticListWidth);
+  std::string Sheet_Name = "Sheet_" +
+                           boost::lexical_cast<std::string>(iSheet) +
+                           "_SheetPlane_" +
+                           boost::lexical_cast<std::string>(iSheetPlane) +
+                           "_" + mlv->GetName();
+  if (logvol.psheet[iSheet - 1] == NULL) {
+    logvol.psheet[iSheet - 1] =
+      new(std::nothrow) G4LogicalVolume(solids.psheet[iSheet - 1],
+                                        mat.polystyrol, Sheet_Name);
+    if (logvol.psheet[iSheet - 1] == NULL)
+      B2FATAL(MemErr);
+    geometry::setVisibility(*logvol.psheet[iSheet - 1], false);
+    geometry::setColor(*logvol.psheet[iSheet - 1], "#00ff00ff");
   }
-  if (solids.list[iList - 1] == NULL)
-    B2FATAL(MemErr);
-  logicList = new(std::nothrow) G4LogicalVolume(solids.list[iList - 1],
-                                                mat.polystyrol, List_Name);
-  if (logicList == NULL)
-    B2FATAL(MemErr);
-  geometry::setVisibility(*logicList, false);
-  geometry::setColor(*logicList, "#00ff00ff");
-  y = StripPosition[iList - 1].Y;
-  if (iList % 15 == 1)
-    y = y + 0.5 * PlasticListDeltaL;
-  else if (iList % 15 == 0)
-    y = y - 0.5 * PlasticListDeltaL;
-  z = 0.5 * (StripSize.thickness + PlasticListWidth);
-  if (iListPlane == 2)
+  z = 0.5 * (StripSize.thickness + PlasticSheetWidth);
+  if (iSheetPlane == 2)
     z = -z;
-  t = G4Translate3D(StripPosition[iList - 1].X, y, z);
-  physiList = new(std::nothrow) G4PVPlacement(t, logicList, List_Name, mlv,
-                                              false, 1, false);
-  if (physiList == NULL)
+  getSheetTransform(&t, (iSheet - 1) * 15);
+  t = t * G4Translate3D(0, 0, z);
+  physiSheet = new(std::nothrow) G4PVPlacement(t, logvol.psheet[iSheet - 1],
+                                               Sheet_Name, mlv,
+                                               false, 1, false);
+  if (physiSheet == NULL)
     B2FATAL(MemErr);
-  printVolumeMass(logicList);
+  printVolumeMass(logvol.psheet[iSheet - 1]);
 }
 
 void EKLM::GeoEKLMBelleII::createStripVolume(G4LogicalVolume* mlv)

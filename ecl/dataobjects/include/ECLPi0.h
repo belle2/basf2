@@ -66,46 +66,6 @@ namespace Belle2 {
      */
     void setChi2(float Chi2) { m_Chi2 = Chi2; }
 
-
-    /*! Get ShowerId1
-     * @return ShowerId1
-     */
-    int GetShowerId1() const { return m_ShowerId1 ; }
-    /*! Get ShowerId2
-     * @return ShowerId2
-     */
-    int GetShowerId2() const { return m_ShowerId2 ; }
-    /*! Get Energy
-     * @return Energy;
-     */
-    float getenergy() const { return m_Energy; }
-    /*! Get Px
-     * @return Px
-     */
-    float getpx() const { return m_Px; }
-    /*! Get Py
-     * @return Py
-     */
-    float getpy() const { return m_Py; }
-    /*! Get Pz
-     * @return Pz
-     */
-    float getpz() const { return m_Pz; }
-    /*! Get Mass
-     * @return Mass
-     */
-    float getmass() const { return m_Mass; }
-    /*! Get  Mass after mass constraint fit
-     * @return  Mass after mass constraint fit
-     */
-    float getmassfit() const { return m_MassFit; }
-    /*! Get Chi square after mass constraint fit
-     * @return Chi square after mass constraint fit
-     */
-    float getchi2() const { return m_Chi2; }
-    /*! Get Momentum after mass constraint fit
-     * @return TVector3 Momentum  after mass constraint fit
-     */
     TVector3 getp() const { TVector3 momentum(m_Px, m_Py, m_Pz); return momentum ; }
     /*! Get Momentum after mass constraint fit
      * @return HepLorentzVector Momentum  after mass constraint fit

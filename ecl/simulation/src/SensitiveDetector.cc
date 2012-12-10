@@ -221,7 +221,7 @@ namespace Belle2 {
 
       if (m_currentEvnetNumber == m_oldEvnetNumber) {
         if ((tof / ns) < 8000) {
-          TimeIndex = (int)(tof / ns) / 500;
+          TimeIndex = (int)((tof / ns) / 500);
           double E_cell = (edep / GeV);
           if (ECLHitIndex[cellId][TimeIndex] == -1) {
             m_hitNum = eclHitArray->GetLast() + 1;

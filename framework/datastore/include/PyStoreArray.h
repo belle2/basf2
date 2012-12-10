@@ -12,6 +12,10 @@ namespace Belle2 {
   * it doesn't use templates). Thanks to Python, you can still access all
   * public functions and data members of the actual type.
   *
+  * Relations can also be accessed using functions like RelationsObject::getRelationsTo()
+  * as long as the data objects are derived from RelationsObject. A full example
+  * for accessing simhits and some related objects can be found in framework/examples/cdcplotmodule.py
+  *
   * You can check the runtime type information of the returned objects by
   * using Python's built-in type() function.
   *

@@ -3,6 +3,8 @@
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
+import matplotlib.cm as colormap
+
 
 from basf2 import *
 from ROOT import Belle2
@@ -10,7 +12,7 @@ from ROOT import Belle2
 import os
 
 
-def plot(x, y, show=0):
+def plot(x, y, col, show=0):
     """
     Plot a list of x/y values, plus CDC superlayer boundaries.
 
@@ -22,14 +24,15 @@ def plot(x, y, show=0):
 
     # draw the x/y arrays. note that looping over the hits and
     # drawing them individually would be much slower
-    ax.plot(
-        x,
-        y,
-        marker='.',
-        color='blue',
-        linestyle='None',
-        markersize=1,
-        )
+    for i in range(len(col)):
+        ax.plot(
+            x[i],
+            y[i],
+            marker='.',
+            color=col[i],
+            linestyle='None',
+            markersize=1,
+            )
 
     ax.set_title('CDCSimHits')
     ax.set_xlabel('x [cm]')
@@ -71,12 +74,6 @@ class CDCPlotModule(Module):
     ## event counter
     num_events = 0
 
-    ## list of x positions
-    trackhits_x = []
-
-    ## corresponding list of y positions
-    trackhits_y = []
-
     def __init__(self):
         """constructor."""
         super(CDCPlotModule, self).__init__()
@@ -87,24 +84,45 @@ class CDCPlotModule(Module):
 
         loops over the CDCSimHits in the current event.
         """
-        store = Belle2.PyStoreArray('CDCSimHits')
-        entries = store.getEntries()
-        for i in range(entries):
-            hitpos = store[i].m_posWire  # TVector3
-            self.trackhits_x.append(hitpos.x())
-            self.trackhits_y.append(hitpos.y())
+        simhits = Belle2.PyStoreArray('CDCSimHits')
+
+        trackhits_x = []
+        trackhits_y = []
+        indices = []
+
+        mcparts = []
+        for hit in simhits:
+            hitpos = hit.m_posWire  # TVector3
+            # get index of first related mcparticle
+            mcpart = hit.getRelationsFrom("MCParticles")[0].getArrayIndex()
+            if not mcpart in mcparts:
+                idx = len(mcparts)
+                mcparts.append(mcpart)
+                indices.append(idx)
+                trackhits_x.append([])
+                trackhits_y.append([])
+            # add simhit to the list corresponding to this particle
+            idx = mcparts.index(mcpart)
+            trackhits_x[idx].append(hitpos.x())
+            trackhits_y[idx].append(hitpos.y())
+
+        # plot the (x,y) list on a matplotlib figure
+        num_tracks = max(indices) + 1
+        col = [colormap.jet(1.0 * c / (num_tracks - 1)) for c in indices]
+        fig = plot(trackhits_x, trackhits_y, col)
+
+        filename = 'cdchits_%i.png' % (self.num_events)
+        if os.path.lexists(filename):
+            B2WARNING(filename + ' exists, overwriting ...')
+        else:
+            B2INFO('creating ' + filename + ' ...')
+        fig.savefig(filename)
+
         self.num_events += 1
 
     def terminate(self):
         """reimplementation of Module::terminate()."""
         B2INFO('terminating CDCPlotModule')
-        # plot the (x,y) list on a matplotlib figure
-        fig = plot(self.trackhits_x, self.trackhits_y)
-        if os.path.lexists('hits_all.png'):
-            B2WARNING('hits_all.png exists, overwriting ...')
-        else:
-            B2INFO('creating hits_all.png ...')
-        fig.savefig('hits_all')
 
 
 # Normal steering file part begins here

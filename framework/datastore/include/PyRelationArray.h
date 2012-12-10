@@ -10,6 +10,10 @@
 namespace Belle2 {
   /** a Python wrapper for RelationArray.
    *
+   * \note For saved objects deriving from RelationsObject you don't need to use this class.
+   *       Instead you can access relations directly from each object, see
+   *       framework/examples/cdcplotmodule.py for a full example.
+   *
    * Note that constructing the map used by getToIndices() requires looping
    * over all relations, so you'll want to have only one PyRelationArray per
    * name and event.

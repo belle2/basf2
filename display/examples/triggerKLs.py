@@ -31,10 +31,8 @@ class PyTrigger(Module):
         """reimplementation of Module::event()."""
 
         mcparticles = Belle2.PyStoreArray('MCParticles')
-        npart = mcparticles.getEntries()
         returnvalue = 0
-        for i in range(npart):
-            p = mcparticles[i]
+        for p in mcparticles:
             if p.getPDG() == 130:
                 B2INFO("found a K_L!")
                 returnvalue = 1

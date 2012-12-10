@@ -436,6 +436,24 @@ void EKLM::GeoEKLMBelleII::getSheetTransform(HepGeom::Transform3D* t, int n)
 
 /*************************** CREATION OF SOLIDS ******************************/
 
+void EKLM::GeoEKLMBelleII::createEndcapSolid()
+{
+  G4Polyhedra* op;
+  G4Tubs* tb;
+  op = new(std::nothrow) G4Polyhedra("Endcap_Octagonal_Prism",
+                                     ESTRPar.phi, ESTRPar.dphi,
+                                     ESTRPar.nsides, ESTRPar.nboundary,
+                                     ESTRPar.z,  ESTRPar.rmin, ESTRPar.rmax);
+  tb = new(std::nothrow) G4Tubs("Endcap_Tube",  ESTRPar.rminsub,
+                                ESTRPar.rmaxsub,  ESTRPar.zsub,
+                                0.0, 360.0 * deg);
+  if (op == NULL || tb == NULL)
+    B2FATAL(MemErr);
+  solids.endcap = new(std::nothrow) G4SubtractionSolid("Endcap", op, tb);
+  if (solids.endcap == NULL)
+    B2FATAL(MemErr);
+}
+
 void EKLM::GeoEKLMBelleII::createPlasticSheetSolid(int n)
 {
   int i;
@@ -506,6 +524,7 @@ void EKLM::GeoEKLMBelleII::createSolids()
   int i;
   char name[128];
   HepGeom::Transform3D t;
+  createEndcapSolid();
   /* Strips. */
   for (i = 0; i < nStrip; i++) {
     /* Strip volumes. */
@@ -565,7 +584,8 @@ void EKLM::GeoEKLMBelleII::createSolids()
   if (m_mode != EKLM_DETECTOR_NORMAL) {
     solids.sipm =
       new(std::nothrow) G4Box("SiPM", 0.5 * StripSize.rss_size,
-                              0.5 * StripSize.rss_size, 0.5 * StripSize.rss_size);
+                              0.5 * StripSize.rss_size,
+                              0.5 * StripSize.rss_size);
     if (solids.sipm == NULL)
       B2FATAL(MemErr);
   }
@@ -575,27 +595,13 @@ void EKLM::GeoEKLMBelleII::createSolids()
 
 void EKLM::GeoEKLMBelleII::createEndcap(G4LogicalVolume* mlv)
 {
-  G4Polyhedra* boct;
-  G4Tubs* atube;
-  G4SubtractionSolid* solidEndcap;
   EKLMLogicalVolume* logicEndcap;
   G4PVPlacement* physiEndcap;
   G4Transform3D* t;
   std::string Endcap_Name = "Endcap_" +
                             boost::lexical_cast<std::string>(curvol.endcap);
-  boct = new(std::nothrow) G4Polyhedra("tempoct", ESTRPar.phi, ESTRPar.dphi,
-                                       ESTRPar.nsides, ESTRPar.nboundary,
-                                       ESTRPar.z,  ESTRPar.rmin, ESTRPar.rmax);
-  atube = new(std::nothrow) G4Tubs("tempatube",  ESTRPar.rminsub,
-                                   ESTRPar.rmaxsub,  ESTRPar.zsub,
-                                   0.0, 360.0 * deg);
-  if (boct == NULL || atube == NULL)
-    B2FATAL(MemErr);
-  solidEndcap = new(std::nothrow) G4SubtractionSolid(Endcap_Name, boct, atube);
-  if (solidEndcap == NULL)
-    B2FATAL(MemErr);
   logicEndcap =
-    new(std::nothrow) EKLMLogicalVolume(solidEndcap, mat.iron, Endcap_Name,
+    new(std::nothrow) EKLMLogicalVolume(solids.endcap, mat.iron, Endcap_Name,
                                         curvol.endcap);
   if (logicEndcap == NULL)
     B2FATAL(MemErr);

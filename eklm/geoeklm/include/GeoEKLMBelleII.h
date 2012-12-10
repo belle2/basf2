@@ -175,6 +175,7 @@ namespace Belle2 {
      * All solids of EKLM.
      */
     struct Solids {
+      G4VSolid* endcap;                     /**< Endcap. */
       G4VSolid** psheet;                    /**< Element of plastic sheet. */
       G4Box** stripvol;                     /**< Strip + SiPM volume. */
       G4Box** strip;                        /**< Strips. */
@@ -326,8 +327,13 @@ namespace Belle2 {
       void getSheetTransform(HepGeom::Transform3D* t, int n);
 
       /**
+       * Create endcap solid.
+       */
+      void createEndcapSolid();
+
+      /**
        * Create plastic sheet solids.
-       * @praan[in] n Number of sector, from 0 to 4.
+       * @param[in] n Number of sector, from 0 to 4.
        */
       void createPlasticSheetSolid(int n);
 

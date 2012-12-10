@@ -46,7 +46,7 @@ cdctrg      = fw.register_module("TRGCDC")
 #...G4Sim...
 # Turn off physics processes
 #    "physics.mac" is located at "trg/examples/".
-g4sim.param('UICommands',['/control/execute physics.mac'])
+#g4sim.param('UICommands',['/control/execute physics.mac'])
 
 #...EvtMetaGen...
 evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})

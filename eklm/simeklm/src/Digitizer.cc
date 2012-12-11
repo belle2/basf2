@@ -21,6 +21,8 @@
 
 using namespace Belle2;
 
+static const char MemErr[] = "Memory allocation error.";
+
 EKLM::Digitizer::Digitizer(struct EKLM::TransformData* transf)
 {
   m_transf = transf;
@@ -42,8 +44,12 @@ void EKLM::Digitizer::readAndSortStepHits()
     it = m_stepHitVolumeMap.find((stepHitsArray[i])->getVolumeID());
 
     if (it == m_stepHitVolumeMap.end()) { //  new entry
-      std::vector<EKLMStepHit*> *vectorHits =
-        new std::vector<EKLMStepHit*> (1, (stepHitsArray[i]));
+      std::vector<EKLMStepHit*> *vectorHits;
+      try {
+        vectorHits = new std::vector<EKLMStepHit*> (1, (stepHitsArray[i]));
+      } catch (std::bad_alloc& ba) {
+        B2FATAL(MemErr);
+      }
 
       m_stepHitVolumeMap.insert(std::pair<int, std::vector<EKLMStepHit*> >((stepHitsArray[i])->getVolumeID(), *vectorHits));
     } else {
@@ -201,8 +207,12 @@ void EKLM::Digitizer::readAndSortSimHits()
     it = m_HitStripMap.find((m_simHitsArray[i])->getVolumeID());
 
     if (it == m_HitStripMap.end()) { //  new entry
-      std::vector<EKLMSimHit*> *vectorHits =
-        new std::vector<EKLMSimHit*> (1, (m_simHitsArray[i]));
+      std::vector<EKLMSimHit*> *vectorHits;
+      try {
+        vectorHits = new std::vector<EKLMSimHit*> (1, (m_simHitsArray[i]));
+      } catch (std::bad_alloc& ba) {
+        B2FATAL(MemErr);
+      }
       m_HitStripMap.insert(std::pair<int, std::vector<EKLMSimHit*> >
                            ((m_simHitsArray[i])->getVolumeID(), *vectorHits));
     } else {

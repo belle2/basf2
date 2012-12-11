@@ -14,6 +14,8 @@
 
 using namespace Belle2;
 
+static const char MemErr[] = "Memory allocation error.";
+
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -50,7 +52,12 @@ void EKLMReconstructorModule::beginRun()
 
 void EKLMReconstructorModule::event()
 {
-  EKLM::Reconstructor* recon = new EKLM::Reconstructor(&m_transf);
+  EKLM::Reconstructor* recon;
+  try {
+    recon = new EKLM::Reconstructor(&m_transf);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
   B2INFO("EKLMReconstructorModule::event() called")
   recon->readStripHits();
   recon->createSectorHits();

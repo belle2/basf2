@@ -35,8 +35,6 @@ void EKLM::Reconstructor::readStripHits()
 
 void EKLM::Reconstructor::createSectorHits()
 {
-
-  //    EKLMSectorHit *newSectorHit;
   StoreArray<EKLMSectorHit> sectorHitsArray;
 
   for (std::vector<EKLMDigit*>::iterator stripIter =

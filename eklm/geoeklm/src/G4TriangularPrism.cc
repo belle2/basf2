@@ -12,7 +12,6 @@
 #include <cmath>
 #include <new>
 
-using namespace std;
 using namespace Belle2;
 
 G4TriangularPrism::G4TriangularPrism(const G4String& name,
@@ -29,10 +28,12 @@ G4TriangularPrism::G4TriangularPrism(const G4String& name,
   double cos_alpha;
   G4Transform3D t;
   m_is = NULL;
-  m_tube = new(nothrow) G4Tubs("Tube_" + name, 0., max(r1, r2), halfZlen,
-                               phi1, fabs(phi2 - phi1));
-  if (m_tube == NULL)
+  try {
+    m_tube = new G4Tubs("Tube_" + name, 0., std::max(r1, r2), halfZlen,
+                        phi1, fabs(phi2 - phi1));
+  } catch (std::bad_alloc& ba) {
     goto err_mem1;
+  }
   if (r1 >= r2) {
     rl = r1;
     rs = r2;
@@ -45,17 +46,21 @@ G4TriangularPrism::G4TriangularPrism(const G4String& name,
   alpha = atan(tg_alpha);
   sin_alpha = tg_alpha / sqrt(1.0 + tg_alpha * tg_alpha);
   cos_alpha = 1.0 / sqrt(1.0 + tg_alpha * tg_alpha);
-  m_box = new(nothrow) G4Box("Box_" + name, rl * sin_alpha,
-                             rl * cos_alpha, halfZlen);
-  if (m_box == NULL)
+  try {
+    m_box = new G4Box("Box_" + name, rl * sin_alpha,
+                      rl * cos_alpha, halfZlen);
+  } catch (std::bad_alloc& ba) {
     goto err_mem2;
+  }
   if (r1 >= r2)
     t = G4RotateZ3D((phi1 + alpha) * rad - 90.0 * deg);
   else
     t = G4RotateZ3D((phi2 - alpha) * rad + 90.0 * deg);
-  m_is = new(nothrow) G4IntersectionSolid(name, m_tube, m_box, t);
-  if (m_is == NULL)
+  try {
+    m_is = new G4IntersectionSolid(name, m_tube, m_box, t);
+  } catch (std::bad_alloc& ba) {
     goto err_mem3;
+  }
   return;
 err_mem3:
   delete m_box;

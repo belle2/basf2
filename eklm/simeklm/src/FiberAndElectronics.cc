@@ -23,6 +23,8 @@
 
 using namespace Belle2;
 
+static const char MemErr[] = "Memory allocation error.";
+
 EKLM::FiberAndElectronics::FiberAndElectronics(
   std::pair < int, std::vector<EKLMSimHit*> > entry,
   struct EKLM::TransformData* transf)
@@ -48,29 +50,43 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   m_histRange = m_nTimeDigitizationSteps * m_timeDigitizationStep;
 
   // create histos
-  m_digitizedAmplitudeDirect = new TH1D("digitizedAmplitudeDirect", "",
-                                        m_nTimeDigitizationSteps, 0,
-                                        m_histRange);
+  try {
+    m_digitizedAmplitudeDirect = new TH1D("digitizedAmplitudeDirect", "",
+                                          m_nTimeDigitizationSteps, 0,
+                                          m_histRange);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
 
   m_digitizedAmplitudeDirect->SetNameTitle("digitizedAmplitudeDirect",
                                            m_stripName.c_str());
-
-  m_digitizedAmplitudeReflected = new TH1D("digitizedAmplitudeReflected", "",
-                                           m_nTimeDigitizationSteps, 0,
-                                           m_histRange);
+  try {
+    m_digitizedAmplitudeReflected = new TH1D("digitizedAmplitudeReflected", "",
+                                             m_nTimeDigitizationSteps, 0,
+                                             m_histRange);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
 
   m_digitizedAmplitudeReflected->SetNameTitle("digitizedAmplitudeReflected",
                                               m_stripName.c_str());
-
-  m_digitizedAmplitude = new TH1D("digitizedAmplitude", "",
-                                  m_nTimeDigitizationSteps, 0,
-                                  m_histRange);
+  try {
+    m_digitizedAmplitude = new TH1D("digitizedAmplitude", "",
+                                    m_nTimeDigitizationSteps, 0,
+                                    m_histRange);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
 
   m_digitizedAmplitude->SetNameTitle("digitizedAmplitude", m_stripName.c_str());
 
   // define fit function
-  m_fitFunction = new TF1("fitFunction", EKLM::SignalShapeFitFunction,
-                          0, m_histRange, 5);
+  try {
+    m_fitFunction = new TF1("fitFunction", EKLM::SignalShapeFitFunction,
+                            0, m_histRange, 5);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
 
   // define vector of hits
   m_vectorHits = entry.second;
@@ -138,7 +154,12 @@ void EKLM::FiberAndElectronics::processEntry()
     B2INFO(info);
     std::string filename = m_outputFilename + m_stripName +
                            boost::lexical_cast<std::string>(gRandom->Integer(10000000)) + ".root";
-    TFile* hfile = new TFile(filename.c_str(), "NEW");
+    TFile* hfile;
+    try {
+      hfile = new TFile(filename.c_str(), "NEW");
+    } catch (std::bad_alloc& ba) {
+      B2FATAL(MemErr);
+    }
     hfile->Append(m_digitizedAmplitudeDirect);
     hfile->Append(m_digitizedAmplitudeReflected);
     hfile->Append(m_digitizedAmplitude);

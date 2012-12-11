@@ -70,6 +70,7 @@ pGun.param(param_pGun)
 
 # simulation
 g4sim = register_module('FullSim')
+g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
 # make the simulation less noisy
 g4sim.logging.log_level = LogLevel.ERROR
 

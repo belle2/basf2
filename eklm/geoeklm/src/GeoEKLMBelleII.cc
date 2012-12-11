@@ -166,6 +166,7 @@ void EKLM::GeoEKLMBelleII::freeVolumes()
   free(solids.scint);
   for (i = 0; i < nPlane; i++)
     free(solids.secsup[i]);
+  free(solids.secsup);
 }
 
 /********************************** XML DATA *********************************/
@@ -1384,6 +1385,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
   G4Box* solidBoardBox;
   G4SubtractionSolid** ss[2];
   G4SubtractionSolid* prev_solid;
+  G4SubtractionSolid* res;
   solidBoardBox =
     new(std::nothrow) G4Box("PlateBox", 0.5 * BoardSize.length,
                             0.5 * BoardSize.height,
@@ -1414,7 +1416,10 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
                                              prev_solid, solidBoardBox, t);
     }
   }
-  return ss[nPlane - 1][nBoard - 1];
+  res = ss[nPlane - 1][nBoard - 1];
+  for (i = 0; i < nPlane; i++)
+    delete ss[i];
+  return res;
 }
 
 void EKLM::GeoEKLMBelleII::createPlane(G4LogicalVolume* mlv)

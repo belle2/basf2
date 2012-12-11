@@ -71,6 +71,12 @@ namespace Belle2 {
       const TParticlePDG* particlePDG() const;
 
       /**
+       * PDG code.
+       * @return The PDG code of the particle.
+       */
+      int pdgCode() const {return m_pdgCode;};
+
+      /**
        * Particle mass.
        * @return The mass of the particle.
        */

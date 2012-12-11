@@ -63,6 +63,7 @@ namespace Belle2 {
     GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"CDC\"]/Content");
     gd.append("/SensitiveDetector");
     m_thresholdEnergyDeposit =  Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "eV");
+    m_thresholdEnergyDeposit *= GeV;  //GeV to MeV
     //    B2INFO("Threshold energy " << m_thresholdEnergyDeposit);
 
   }
@@ -79,8 +80,7 @@ namespace Belle2 {
   bool CDCSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   {
     // Get deposited energy
-    // convert unit from MeV to GeV
-    const G4double edep = aStep->GetTotalEnergyDeposit() * MeV;
+    const G4double edep = aStep->GetTotalEnergyDeposit();
 
 
     // Discard the hit below Edep_th

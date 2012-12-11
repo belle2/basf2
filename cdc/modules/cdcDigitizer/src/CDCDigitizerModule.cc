@@ -133,10 +133,10 @@ void CDCDigitizerModule::event()
       // If hitdEdx < dedxThreshold (default 40 eV), the hit is ignored
       // M. Uchida 2012.08.31
       //
-      //      if (hitdEdx < dedxThreshold) {
-      //        B2DEBUG(250, "Below Ethreshold: " << hitdEdx << " " << dedxThreshold);
-      //        continue;
-      //      }
+      if (hitdEdx < dedxThreshold) {
+        B2DEBUG(250, "Below Ethreshold: " << hitdEdx << " " << dedxThreshold);
+        continue;
+      }
 
       B2DEBUG(250, "Energy deposition: " << hitdEdx << ", DriftLength: " << hitDriftLength << ", TOF: " << hitTOF);
 
@@ -174,8 +174,7 @@ void CDCDigitizerModule::event()
           ifNewDigi = false;
 
           // ... smallest drift time has to be checked, ...
-          //    if (hitDriftTime < iterSignalMap->second.m_driftTime) {
-          if (hitdEdx > dedxThreshold && hitDriftTime < iterSignalMap->second.m_driftTime) {
+          if (hitDriftTime < iterSignalMap->second.m_driftTime) {
             iterSignalMap->second.m_simHitIndex = iHits;
             iterSignalMap->second.m_driftTime   = hitDriftTime;
 

@@ -26,7 +26,7 @@ namespace Belle2 {
   //! Example Detector
   class CDCSimHit : public SimHitBase {
 
-  public:
+  private:
 
     //! The WireID of the hit.
     WireID m_wireID;

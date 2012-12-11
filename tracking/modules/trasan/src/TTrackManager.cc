@@ -2361,10 +2361,13 @@ TTrackManager::version(void) const {
       const Belle2::TRGCDCWireHit& h = * t.links()[sort[i]]->hit();
       const unsigned layerId = h.wire().layerId();
       const unsigned hitID = h.iCDCHit();
-      const double driftTime = h.drift();
+      //      const double driftTime = h.drift();
+      const HepGeom::Point3D<double> & onTrack = t.links()[sort[i]]->positionOnTrack();
+      const double rho = onTrack.mag();
       const unsigned uniqueId = layerId * 10000 + h.wire().localId();
 
-      trackCandidates[counter]->addHit(Belle2::Const::CDC, hitID, driftTime, uniqueId);
+      //      trackCandidates[counter]->addHit(Belle2::Const::CDC, hitID, driftTime, uniqueId);
+      trackCandidates[counter]->addHit(Belle2::Const::CDC, hitID, rho, uniqueId);
     }
 
     return 0;

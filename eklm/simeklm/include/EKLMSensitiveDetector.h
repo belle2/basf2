@@ -13,7 +13,7 @@
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <eklm/dataobjects/EKLMStepHit.h>
-#include <eklm/geoeklm/EKLMLogicalVolume.h>
+#include <eklm/geoeklm/GeoEKLMTypes.h>
 
 namespace Belle2 {
 
@@ -33,7 +33,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      EKLMSensitiveDetector(G4String name);
+      EKLMSensitiveDetector(G4String name, enum EKLMSensitiveType type);
 
       /**
        * Destructor.
@@ -60,9 +60,14 @@ namespace Belle2 {
       G4double m_ThresholdHitTime;
 
       /**
+       * Sensitive detector type.
+       */
+      enum EKLMSensitiveType m_type;
+
+      /**
        * Sensitive detector operation mode.
        */
-      enum EKLMDetectorMode m_mode;
+      enum EKLM::EKLMDetectorMode m_mode;
 
     };
 

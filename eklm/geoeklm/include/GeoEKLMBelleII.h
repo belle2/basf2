@@ -19,8 +19,9 @@
 #include <eklm/geoeklm/TransformData.h>
 #include <eklm/geoeklm/G4TriangularPrism.h>
 #include <eklm/geoeklm/GeoESTRCreator.h>
-#include <eklm/geoeklm/EKLMLogicalVolume.h>
+#include <eklm/geoeklm/GeoEKLMTypes.h>
 
+#include <G4LogicalVolume.hh>
 #include <G4Material.hh>
 #include <G4PVPlacement.hh>
 #include <G4Tubs.hh>
@@ -172,7 +173,7 @@ namespace Belle2 {
      * Logical volumes of EKLM.
      */
     struct LogicalVolumes {
-      EKLMLogicalVolume** stripvol;  /**< Strip volumes. */
+      G4LogicalVolume** stripvol;    /**< Strip volumes. */
       G4LogicalVolume** psheet;      /**< Plastic sheet. */
     };
 
@@ -635,8 +636,8 @@ namespace Belle2 {
       /** Detector mode. */
       enum EKLMDetectorMode m_mode;
 
-      /** Sensitive detector. */
-      EKLMSensitiveDetector* m_sensitive;
+      /** Sensitive detectors. */
+      EKLMSensitiveDetector* m_sensitive[3];
 
     };
 

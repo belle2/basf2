@@ -27,8 +27,6 @@
 #include <G4ReflectedSolid.hh>
 
 /* Belle2 headers. */
-#include <eklm/geoeklm/EKLMLogicalVolume.h>
-#include <eklm/geoeklm/EKLMObjectNumbers.h>
 #include <eklm/geoeklm/G4TriangularPrism.h>
 #include <eklm/geoeklm/GeoEKLMBelleII.h>
 #include <eklm/simeklm/EKLMSensitiveDetector.h>
@@ -94,7 +92,11 @@ EKLM::GeoEKLMBelleII::~GeoEKLMBelleII()
         delete BoardTransform[i][j];
       free(BoardTransform[i]);
     }
-    delete m_sensitive;
+    delete m_sensitive[0];
+    if (m_mode == EKLM_DETECTOR_BACKGROUND) {
+      delete m_sensitive[1];
+      delete m_sensitive[2];
+    }
     freeVolumes();
   }
 }
@@ -118,7 +120,7 @@ void EKLM::GeoEKLMBelleII::mallocVolumes()
   if (solids.stripvol == NULL)
     B2FATAL(MemErr);
   logvol.stripvol =
-    (EKLMLogicalVolume**)malloc(nStrip * sizeof(EKLMLogicalVolume*));
+    (G4LogicalVolume**)malloc(nStrip * sizeof(G4LogicalVolume*));
   if (logvol.stripvol == NULL)
     B2FATAL(MemErr);
   solids.strip = (G4Box**)malloc(nStrip * sizeof(G4Box*));
@@ -156,6 +158,7 @@ void EKLM::GeoEKLMBelleII::freeVolumes()
   int i;
   free(solids.plane);
   free(solids.psheet);
+  free(logvol.psheet);
   free(solids.stripvol);
   free(logvol.stripvol);
   free(solids.strip);
@@ -757,14 +760,13 @@ void EKLM::GeoEKLMBelleII::createSolids()
 
 void EKLM::GeoEKLMBelleII::createEndcap(G4LogicalVolume* mlv)
 {
-  EKLMLogicalVolume* logicEndcap;
+  G4LogicalVolume* logicEndcap;
   G4PVPlacement* physiEndcap;
   G4Transform3D* t;
   std::string Endcap_Name = "Endcap_" +
                             boost::lexical_cast<std::string>(curvol.endcap);
   logicEndcap =
-    new(std::nothrow) EKLMLogicalVolume(solids.endcap, mat.iron, Endcap_Name,
-                                        curvol.endcap);
+    new(std::nothrow) G4LogicalVolume(solids.endcap, mat.iron, Endcap_Name);
   if (logicEndcap == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicEndcap, true);
@@ -772,7 +774,7 @@ void EKLM::GeoEKLMBelleII::createEndcap(G4LogicalVolume* mlv)
   t = &transf->endcap[curvol.endcap - 1];
   physiEndcap =
     new(std::nothrow) G4PVPlacement(*t, logicEndcap, Endcap_Name, mlv, false,
-                                    1, false);
+                                    curvol.endcap, false);
   if (physiEndcap == NULL)
     B2FATAL(MemErr);
   for (curvol.layer = 1; curvol.layer <= nLayer; curvol.layer++)
@@ -782,7 +784,7 @@ void EKLM::GeoEKLMBelleII::createEndcap(G4LogicalVolume* mlv)
 void EKLM::GeoEKLMBelleII::createLayer(G4LogicalVolume* mlv)
 {
   static G4Tubs* solidLayer = NULL;
-  EKLMLogicalVolume* logicLayer;
+  G4LogicalVolume* logicLayer;
   G4PVPlacement* physiLayer;
   std::string Layer_Name = "Layer_" +
                            boost::lexical_cast<std::string>(curvol.layer) +
@@ -795,15 +797,14 @@ void EKLM::GeoEKLMBelleII::createLayer(G4LogicalVolume* mlv)
   if (solidLayer == NULL)
     B2FATAL(MemErr);
   logicLayer =
-    new(std::nothrow) EKLMLogicalVolume(solidLayer, mat.air, Layer_Name,
-                                        layerNumber(curvol.endcap, curvol.layer));
+    new(std::nothrow) G4LogicalVolume(solidLayer, mat.air, Layer_Name);
   if (logicLayer == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicLayer, false);
   physiLayer =
     new(std::nothrow) G4PVPlacement(transf->layer[curvol.endcap - 1][curvol.layer - 1],
                                     logicLayer, Layer_Name, mlv, false,
-                                    1, false);
+                                    curvol.layer, false);
   if (physiLayer == NULL)
     B2FATAL(MemErr);
   for (curvol.sector = 1; curvol.sector <= 4; curvol.sector++)
@@ -814,7 +815,7 @@ void EKLM::GeoEKLMBelleII::createSector(G4LogicalVolume* mlv)
 {
   int i;
   static G4Tubs* solidSector = NULL;
-  EKLMLogicalVolume* logicSector;
+  G4LogicalVolume* logicSector;
   G4PVPlacement* physiSector;
   std::string Sector_Name = "Sector_" +
                             boost::lexical_cast<std::string>(curvol.sector) +
@@ -827,15 +828,14 @@ void EKLM::GeoEKLMBelleII::createSector(G4LogicalVolume* mlv)
   if (solidSector == NULL)
     B2FATAL(MemErr);
   logicSector =
-    new(std::nothrow) EKLMLogicalVolume(solidSector, mat.air, Sector_Name,
-                                        sectorNumber(curvol.endcap, curvol.layer, curvol.sector));
+    new(std::nothrow) G4LogicalVolume(solidSector, mat.air, Sector_Name);
   if (logicSector == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicSector, false);
   physiSector =
     new(std::nothrow) G4PVPlacement(transf->sector[curvol.endcap - 1][curvol.layer - 1][curvol.sector - 1],
                                     logicSector, Sector_Name, mlv, false,
-                                    1, false);
+                                    curvol.sector, false);
   if (physiSector == NULL)
     B2FATAL(MemErr);
   createSectorSupport(logicSector);
@@ -843,9 +843,10 @@ void EKLM::GeoEKLMBelleII::createSector(G4LogicalVolume* mlv)
     createSectorCover(i, logicSector);
   for (curvol.plane = 1; curvol.plane <= nPlane; curvol.plane++)
     createPlane(logicSector);
-  for (curvol.plane = 1; curvol.plane <= nPlane; curvol.plane++)
-    for (curvol.board = 1; curvol.board <= nBoard; curvol.board++)
-      createSectionReadoutBoard(logicSector);
+  if (m_mode == EKLM_DETECTOR_BACKGROUND)
+    for (curvol.plane = 1; curvol.plane <= nPlane; curvol.plane++)
+      for (curvol.board = 1; curvol.board <= nBoard; curvol.board++)
+        createSectionReadoutBoard(logicSector);
 }
 
 void EKLM::GeoEKLMBelleII::calcBoardTransform()
@@ -1420,21 +1421,20 @@ void EKLM::GeoEKLMBelleII::createPlane(G4LogicalVolume* mlv)
 {
   int i;
   int j;
-  EKLMLogicalVolume* logicPlane;
+  G4LogicalVolume* logicPlane;
   G4PVPlacement* physiPlane;
   std::string Plane_Name = "Plane_" +
                            boost::lexical_cast<std::string>(curvol.plane) + "_" +
                            mlv->GetName();
   logicPlane =
-    new(std::nothrow) EKLMLogicalVolume(solids.plane[curvol.plane - 1],
-                                        mat.air, Plane_Name,
-                                        planeNumber(curvol.endcap, curvol.layer, curvol.sector, curvol.plane));
+    new(std::nothrow) G4LogicalVolume(solids.plane[curvol.plane - 1],
+                                      mat.air, Plane_Name);
   if (logicPlane == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicPlane, false);
   physiPlane = new(std::nothrow) G4PVPlacement(transf->plane[curvol.endcap - 1][curvol.layer - 1][curvol.sector - 1][curvol.plane - 1],
                                                logicPlane, Plane_Name, mlv,
-                                               false, 1, false);
+                                               false, curvol.plane, false);
   if (physiPlane == NULL)
     B2FATAL(MemErr);
   for (i = 1; i <= nSection + 1; i++)
@@ -1450,7 +1450,7 @@ void EKLM::GeoEKLMBelleII::createSectionReadoutBoard(G4LogicalVolume* mlv)
 {
   int i;
   static G4Box* solidSectionReadoutBoard = NULL;
-  EKLMLogicalVolume* logicSectionReadoutBoard;
+  G4LogicalVolume* logicSectionReadoutBoard;
   G4PVPlacement* physiSectionReadoutBoard;
   std::string Board_Name = "SectionReadoutBoard_" +
                            boost::lexical_cast<std::string>(curvol.board) +
@@ -1466,23 +1466,23 @@ void EKLM::GeoEKLMBelleII::createSectionReadoutBoard(G4LogicalVolume* mlv)
   if (solidSectionReadoutBoard == NULL)
     B2FATAL(MemErr);
   logicSectionReadoutBoard =
-    new(std::nothrow) EKLMLogicalVolume(solidSectionReadoutBoard,
-                                        mat.air,
-                                        Board_Name,
-                                        boardNumber(curvol.endcap, curvol.layer, curvol.sector, curvol.plane, curvol.board));
+    new(std::nothrow) G4LogicalVolume(solidSectionReadoutBoard,
+                                      mat.air,
+                                      Board_Name);
   if (logicSectionReadoutBoard == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicSectionReadoutBoard, false);
   physiSectionReadoutBoard =
     new(std::nothrow) G4PVPlacement(*BoardTransform[curvol.plane - 1][curvol.board - 1],
                                     logicSectionReadoutBoard,
-                                    Board_Name, mlv, false, 1, false);
+                                    Board_Name, mlv, false,
+                                    (curvol.plane - 1) * 5 + curvol.board,
+                                    false);
   if (physiSectionReadoutBoard == NULL)
     B2FATAL(MemErr);
   createBaseBoard(logicSectionReadoutBoard);
-  if (m_mode != EKLM_DETECTOR_NORMAL)
-    for (i = 1; i <= nStripBoard; i++)
-      createStripBoard(i, logicSectionReadoutBoard);
+  for (i = 1; i <= nStripBoard; i++)
+    createStripBoard(i, logicSectionReadoutBoard);
 }
 
 void EKLM::GeoEKLMBelleII::createBaseBoard(G4LogicalVolume* mlv)
@@ -1518,7 +1518,7 @@ void EKLM::GeoEKLMBelleII::createBaseBoard(G4LogicalVolume* mlv)
 void EKLM::GeoEKLMBelleII::createStripBoard(int iBoard, G4LogicalVolume* mlv)
 {
   static G4Box* solidStripBoard = NULL;
-  EKLMLogicalVolume* logicStripBoard;
+  G4LogicalVolume* logicStripBoard;
   G4PVPlacement* physiStripBoard;
   G4Transform3D t;
   std::string Board_Name = "StripBoard_" +
@@ -1531,16 +1531,9 @@ void EKLM::GeoEKLMBelleII::createStripBoard(int iBoard, G4LogicalVolume* mlv)
                               0.5 * BoardSize.strip_width);
   if (solidStripBoard == NULL)
     B2FATAL(MemErr);
-  if (m_mode == EKLM_DETECTOR_NORMAL)
-    logicStripBoard =
-      new(std::nothrow) EKLMLogicalVolume(solidStripBoard, mat.silicon,
-                                          Board_Name, 0, 0, m_mode,
-                                          EKLM_NOT_SENSITIVE);
-  else
-    logicStripBoard =
-      new(std::nothrow) EKLMLogicalVolume(solidStripBoard, mat.silicon,
-                                          Board_Name, 0, m_sensitive, m_mode,
-                                          EKLM_SENSITIVE_BOARD);
+  logicStripBoard =
+    new(std::nothrow) G4LogicalVolume(solidStripBoard, mat.silicon,
+                                      Board_Name, 0, m_sensitive[2], 0);
   if (logicStripBoard == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicStripBoard, true);
@@ -1686,22 +1679,21 @@ void EKLM::GeoEKLMBelleII::createStripVolume(G4LogicalVolume* mlv)
                                  + "_" + mlv->GetName();
   if (logvol.stripvol[curvol.strip - 1] == NULL) {
     logvol.stripvol[curvol.strip - 1] =
-      new(std::nothrow) EKLMLogicalVolume(solids.stripvol[curvol.strip - 1],
-                                          mat.air,
-                                          StripVolume_Name,
-                                          stripNumber(curvol.endcap, curvol.layer, curvol.sector, curvol.plane, curvol.strip));
+      new(std::nothrow) G4LogicalVolume(solids.stripvol[curvol.strip - 1],
+                                        mat.air,
+                                        StripVolume_Name);
     if (logvol.stripvol[curvol.strip - 1] == NULL)
       B2FATAL(MemErr);
     geometry::setVisibility(*logvol.stripvol[curvol.strip - 1], false);
     createStrip(logvol.stripvol[curvol.strip - 1]);
-    if (m_mode != EKLM_DETECTOR_NORMAL)
+    if (m_mode == EKLM_DETECTOR_BACKGROUND)
       createSiPM(logvol.stripvol[curvol.strip - 1]);
   }
   t = transf->strip[curvol.endcap - 1][curvol.layer - 1][curvol.sector - 1][curvol.plane - 1][curvol.strip - 1] *
       G4Translate3D(0.5 * StripSize.rss_size, 0.0, 0.0);
   physiStripVolume = new(std::nothrow)
   G4PVPlacement(t, logvol.stripvol[curvol.strip - 1], StripVolume_Name, mlv,
-                false, 1, false);
+                false, curvol.strip, false);
   if (physiStripVolume == NULL)
     B2FATAL(MemErr);
 }
@@ -1754,16 +1746,15 @@ void EKLM::GeoEKLMBelleII::createStripGroove(G4LogicalVolume* mlv)
 
 void EKLM::GeoEKLMBelleII::createStripSensitive(G4LogicalVolume* mlv)
 {
-  EKLMLogicalVolume* logicSensitive;
+  G4LogicalVolume* logicSensitive;
   G4PVPlacement* physiSensitive;
   G4Transform3D t;
   G4Transform3D t1;
   std::string Sensitive_Name = "Sensitive_" + mlv->GetName();
   logicSensitive =
-    new(std::nothrow) EKLMLogicalVolume(solids.scint[curvol.strip - 1].sens,
-                                        mat.polystyrene, Sensitive_Name,
-                                        0, m_sensitive, m_mode,
-                                        EKLM_SENSITIVE_STRIP);
+    new(std::nothrow) G4LogicalVolume(solids.scint[curvol.strip - 1].sens,
+                                      mat.polystyrene, Sensitive_Name,
+                                      0, m_sensitive[0], 0);
   if (logicSensitive == NULL)
     B2FATAL(MemErr);
   geometry::setColor(*logicSensitive, "#ffffffff");
@@ -1783,14 +1774,9 @@ void EKLM::GeoEKLMBelleII::createSiPM(G4LogicalVolume* mlv)
   G4PVPlacement* physiSiPM;
   G4Transform3D t;
   std::string SiPM_Name = "SiPM_" + mlv->GetName();
-  if (m_mode == EKLM_DETECTOR_NORMAL)
-    logicSiPM =
-      new(std::nothrow) EKLMLogicalVolume(solids.sipm, mat.silicon, SiPM_Name,
-                                          0, 0, m_mode, EKLM_SENSITIVE_SIPM);
-  else
-    logicSiPM =
-      new(std::nothrow) EKLMLogicalVolume(solids.sipm, mat.silicon, SiPM_Name, 0,
-                                          m_sensitive, m_mode, EKLM_SENSITIVE_SIPM);
+  logicSiPM =
+    new(std::nothrow) G4LogicalVolume(solids.sipm, mat.silicon, SiPM_Name, 0,
+                                      m_sensitive[1], 0);
   if (logicSiPM == NULL)
     B2FATAL(MemErr);
   geometry::setVisibility(*logicSiPM, true);
@@ -1798,7 +1784,7 @@ void EKLM::GeoEKLMBelleII::createSiPM(G4LogicalVolume* mlv)
   t = G4Translate3D(0.5 * StripPosition[curvol.strip - 1].length, 0., 0.);
   physiSiPM =
     new(std::nothrow) G4PVPlacement(t, logicSiPM, SiPM_Name, mlv, false,
-                                    curvol.strip, false);
+                                    1, false);
   if (physiSiPM == NULL)
     B2FATAL(MemErr);
   printVolumeMass(logicSiPM);
@@ -1818,8 +1804,29 @@ void EKLM::GeoEKLMBelleII::create(const GearDir& content,
   (void)content;
   (void)type;
   readXMLData();
-  m_sensitive =
-    new(std::nothrow) EKLMSensitiveDetector("EKLMSensitiveDetector");
+  try {
+    m_sensitive[0] =
+      new EKLMSensitiveDetector("EKLMSensitiveStrip",
+                                EKLM_SENSITIVE_STRIP);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  if (m_mode == EKLM_DETECTOR_BACKGROUND) {
+    try {
+      m_sensitive[1] =
+        new EKLMSensitiveDetector("EKLMSensitiveSiPM",
+                                  EKLM_SENSITIVE_SIPM);
+    } catch (std::bad_alloc& ba) {
+      B2FATAL(MemErr);
+    }
+    try {
+      m_sensitive[2] =
+        new EKLMSensitiveDetector("EKLMSensitiveBoard",
+                                  EKLM_SENSITIVE_BOARD);
+    } catch (std::bad_alloc& ba) {
+      B2FATAL(MemErr);
+    }
+  }
   if (m_sensitive == NULL)
     B2FATAL(MemErr);
   createMaterials();

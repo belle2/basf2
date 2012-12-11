@@ -20,9 +20,11 @@
 
 using namespace Belle2;
 
-EKLM::EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name)
+EKLM::EKLMSensitiveDetector::
+EKLMSensitiveDetector(G4String name, enum EKLMSensitiveType type)
   : Simulation::SensitiveDetectorBase(name, KLM)
 {
+  m_type = type;
   GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
   m_mode = (enum EKLMDetectorMode)gd.getInt("Mode");
   gd.append("/SensitiveDetector");
@@ -87,12 +89,6 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
            " ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!");
     return false;
   }
-
-  /**
-   * get reference to a physical volume
-   */
-  const G4VPhysicalVolume* pv = aStep->GetPreStepPoint()->GetPhysicalVolume();
-
 
   /**
    * Get particle information
@@ -183,59 +179,39 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   /**
    * Get information on mother volumes and store them to the hit.
    */
-  EKLMLogicalVolume* lv = (EKLMLogicalVolume*)pv->GetLogicalVolume();
-  int depth;
-  switch (lv->getVolumeType()) {
+  switch (m_type) {
     case EKLM_SENSITIVE_STRIP:
-      /* StripVolume */
-      depth = 2;
-      lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
-      depth++;
-      hit->setVolumeID(lv->getID());
-      hit->setStrip(EKLM::stripLocalNumber(lv->getID()));
-      /* Plane */
-      lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
-      depth++;
-      hit->setPlane(EKLM::planeLocalNumber(lv->getID()));
+      hit->setStrip(hist->GetVolume(2)->GetCopyNo());
+      hit->setPlane(hist->GetVolume(3)->GetCopyNo());
+      hit->setSector(hist->GetVolume(4)->GetCopyNo());
+      hit->setLayer(hist->GetVolume(5)->GetCopyNo());
+      hit->setEndcap(hist->GetVolume(6)->GetCopyNo());
+      hit->setVolumeID(stripNumber(hit->getEndcap(), hit->getLayer(),
+                                   hit->getSector(), hit->getPlane(),
+                                   hit->getStrip()));
       break;
     case EKLM_SENSITIVE_SIPM:
-      /* StripVolume */
-      depth = 1;
-      lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
-      depth++;
-      hit->setVolumeID(100000 + lv->getID());
-      hit->setStrip(EKLM::stripLocalNumber(lv->getID()));
-      /* Plane */
-      lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
-      depth++;
-      hit->setPlane(EKLM::planeLocalNumber(lv->getID()));
+      hit->setStrip(hist->GetVolume(1)->GetCopyNo());
+      hit->setPlane(hist->GetVolume(2)->GetCopyNo());
+      hit->setSector(hist->GetVolume(3)->GetCopyNo());
+      hit->setLayer(hist->GetVolume(4)->GetCopyNo());
+      hit->setEndcap(hist->GetVolume(5)->GetCopyNo());
+      hit->setVolumeID(stripNumber(hit->getEndcap(), hit->getLayer(),
+                                   hit->getSector(), hit->getPlane(),
+                                   hit->getStrip()) + 100000);
       break;
     case EKLM_SENSITIVE_BOARD:
-      /* SectionReadoutBoard */
-      depth = 1;
-      lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
-      depth++;
-      hit->setVolumeID(200000 + lv->getID());
-      hit->setStrip(-1);
-      hit->setPlane(-1);
+      int brd = hist->GetVolume(1)->GetCopyNo() - 1;
+      hit->setStrip((brd - 1) % 5 + 1); /* Board number, not strip. */
+      hit->setPlane((brd - 1) / 5 + 1);
+      hit->setSector(hist->GetVolume(2)->GetCopyNo());
+      hit->setLayer(hist->GetVolume(3)->GetCopyNo());
+      hit->setEndcap(hist->GetVolume(4)->GetCopyNo());
+      hit->setVolumeID(boardNumber(hit->getEndcap(), hit->getLayer(),
+                                   hit->getSector(), hit->getPlane(),
+                                   hit->getStrip()) + 200000);
       break;
-    case EKLM_NOT_SENSITIVE:
-      B2ERROR("EKLMSensitiveDetector: step in not sensitive volume!");
   }
-  /* Sector */
-  lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
-  depth++;
-  hit->setSector(sectorLocalNumber(lv->getID()));
-
-  /* Layer */
-  lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
-  depth++;
-  hit->setLayer(layerLocalNumber(lv->getID()));
-
-  /* Endcap */
-  lv = (EKLMLogicalVolume*)(hist->GetVolume(depth)->GetLogicalVolume());
-  depth++;
-  hit->setEndcap(lv->getID());
 
   StoreArray<MCParticle> particles;
   RelationArray particleToStepHits(particles, stepHits);

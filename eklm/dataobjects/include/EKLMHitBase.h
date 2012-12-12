@@ -18,15 +18,6 @@
 
 namespace Belle2 {
 
-  /** Strip identifier. */
-  struct EKLMStripID {
-    int endcap; /**< Endcap. */
-    int layer;  /**< Layer. */
-    int sector; /**< Sector. */
-    int plane;  /**< Plane. */
-    int strip;  /**< Strip. */
-  };
-
   /**
    * Base Hit reconstruction class.
    * @details
@@ -56,12 +47,6 @@ namespace Belle2 {
      * Destructor.
      */
     ~EKLMHitBase() {};
-
-    /**
-     * Get ID.
-     * @return Identifier.
-     */
-    virtual EKLMStripID getID() const;
 
     /**
      * Get endcap number.

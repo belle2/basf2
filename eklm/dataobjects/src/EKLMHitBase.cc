@@ -53,17 +53,6 @@ EKLMHitBase::EKLMHitBase(int Endcap, int Layer, int Sector)
   m_LocalPosition = TVector3(0., 0., 0.);
 }
 
-EKLMStripID EKLMHitBase::getID() const
-{
-  EKLMStripID str;
-  str.endcap = m_Endcap;
-  str.layer = m_Layer;
-  str.sector = m_Sector;
-  str.plane = -1;
-  str.strip = -1;
-  return str;
-}
-
 int EKLMHitBase::getEndcap() const
 {
   return m_Endcap;

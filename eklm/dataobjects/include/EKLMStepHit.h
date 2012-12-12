@@ -67,8 +67,6 @@ namespace Belle2 {
       const int volID
     );
 
-    virtual EKLMStripID getID() const;
-
     /**
      * Get energy of the particle.
      * @return Energy.

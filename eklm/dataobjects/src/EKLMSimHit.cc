@@ -43,17 +43,6 @@ void EKLMSimHit::setVolumeID(int id)
   m_volid = id;
 }
 
-EKLMStripID EKLMSimHit::getID() const
-{
-  EKLMStripID str;
-  str.endcap = m_Endcap;
-  str.layer = m_Layer;
-  str.sector = m_Sector;
-  str.plane = m_Plane;
-  str.strip = m_Strip;
-  return str;
-}
-
 const TVector3* EKLMSimHit::getMomentum() const
 {
   return & m_momentum;

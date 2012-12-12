@@ -53,12 +53,6 @@ namespace Belle2 {
     void Print() const;
 
     /**
-     * Get identifier.
-     * @return Identifier.
-     */
-    virtual EKLMStripID getID() const;
-
-    /**
      * Get number of photoelectrons.
      * @return Number of photoelectrons.
      */

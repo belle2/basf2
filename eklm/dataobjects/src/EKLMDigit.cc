@@ -92,17 +92,6 @@ int EKLMDigit::getFitStatus()
   return m_fitStatus;
 }
 
-EKLMStripID EKLMDigit::getID() const
-{
-  EKLMStripID str;
-  str.endcap = m_Endcap;
-  str.layer = m_Layer;
-  str.sector = m_Sector;
-  str.plane = m_Plane;
-  str.strip = m_Strip;
-  return str;
-}
-
 int EKLMDigit::getVolumeID() const
 {
   return m_volid;

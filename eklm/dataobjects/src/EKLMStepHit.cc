@@ -104,17 +104,6 @@ void EKLMStepHit::setParentTrackID(int track)
   m_parentTrackID = track;
 }
 
-EKLMStripID EKLMStepHit::getID() const
-{
-  EKLMStripID str;
-  str.endcap = m_Endcap;
-  str.layer = m_Layer;
-  str.sector = m_Sector;
-  str.plane = m_Plane;
-  str.strip = m_Strip;
-  return str;
-}
-
 int EKLMStepHit::getVolumeID() const
 {
   return m_volid;

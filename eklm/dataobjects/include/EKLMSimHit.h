@@ -111,12 +111,6 @@ namespace Belle2 {
      */
     void setStrip(int Strip);
 
-    /**
-     * Get identifier.
-     * @return Identifier.
-     */
-    virtual EKLMStripID getID() const;
-
   private:
 
     /** Particle energy. */

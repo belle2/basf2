@@ -1,10 +1,20 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2012 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Pulvermacher
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #ifndef DEDXLIKELIHOOD_H
 #define DEDXLIKELIHOOD_H
 
 //only used for a few constants, no linking necessary
 #include <reconstruction/modules/dedxPID/DedxConstants.h>
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 #include <string>
 #include <cmath>
@@ -18,11 +28,11 @@ namespace Belle2 {
 
   /** Container for likelihoods obtained by the dE/dx PID (DedxPIDModule).
    */
-  class DedxLikelihood : public TObject {
+  class DedxLikelihood : public RelationsObject {
   public:
     /** default constructor */
     DedxLikelihood():
-      TObject(),
+      RelationsObject(),
       m_p(0.0) {
       //for all particles
       for (int i = 0; i < Dedx::c_num_particles; i++) {
@@ -32,7 +42,7 @@ namespace Belle2 {
 
     /** actually const float (&logl)[Dedx::c_num_particles], but CINT complains. */
     DedxLikelihood(const float* logl, float p):
-      TObject(),
+      RelationsObject(),
       m_p(p) {
       //for all particles
       for (int i = 0; i < Dedx::c_num_particles; i++) {
@@ -110,7 +120,7 @@ namespace Belle2 {
 
     static TH1F** s_momentumPrior; /**< prior distributions for the momentum, an array with Dedx::c_num_particles elements */
 
-    ClassDef(DedxLikelihood, 1); /**< Build ROOT dictionary */
+    ClassDef(DedxLikelihood, 2); /**< Build ROOT dictionary */
   };
   /*! @} */
 }

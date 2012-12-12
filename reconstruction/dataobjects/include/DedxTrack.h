@@ -1,9 +1,19 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2012 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Pulvermacher
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #ifndef DEDXTRACK_H
 #define DEDXTRACK_H
 
 #include <reconstruction/modules/dedxPID/DedxConstants.h>
+#include <framework/datastore/RelationsObject.h>
 
-#include <TObject.h>
 #include <TVector3.h>
 
 #include <vector>
@@ -14,11 +24,12 @@ namespace Belle2 {
    * Contains information of individual hits belonging to a track
    * as well as calculated dE/dx values.
    */
-  class DedxTrack : public TObject {
+  class DedxTrack : public RelationsObject {
     friend class DedxPIDModule;
   public:
     // default constructor
     DedxTrack():
+      RelationsObject(),
       m_event_id(0), m_track_id(0), m_pdg(0), m_slow_pion(false),
       m_p_vec(TVector3()), m_p(0), m_p_true(0),
       m_charge(0),
@@ -95,7 +106,7 @@ namespace Belle2 {
     //these are only filled in by DedxLikelihoodModule
     float m_logl[Dedx::c_num_particles]; /**< log likelihood for each particle, not including momentum prior */
 
-    ClassDef(DedxTrack, 1); /**< Build ROOT dictionary */
+    ClassDef(DedxTrack, 2); /**< Build ROOT dictionary */
   };
 }
 #endif

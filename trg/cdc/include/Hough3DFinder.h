@@ -35,14 +35,18 @@ class TRGCDCHough3DFinder {
     ~TRGCDCHough3DFinder();
     // Member functions.
     void doit(std::vector<TRGCDCTrack *> & trackList);
+    void doit(std::vector<TRGCDCTrack *> & trackList, int m_eventNum);
     void perfectFinder(std::vector<TRGCDCTrack *> &trackList, unsigned j, std::vector<const TRGCDCSegmentHit*> &mcTSList);
     void doitPerfectly(std::vector<TRGCDCTrack *> & trackList);
-    void doitVersion1(std::vector<TRGCDCTrack *> & trackList);
+    void doitFind(std::vector<TRGCDCTrack *> & trackList);
     void terminate(void);
     // Members.
     const TRGCDC & _cdc;
+    int m_eventNum;
     int m_nWires[4];
     double m_rr[4];
+    double m_axR[5];
+    int m_axNWires[5];
     double m_ztostraw[4];
     double m_anglest[4];
     double m_Trg_PI;
@@ -87,12 +91,40 @@ class TRGCDCHough3DFinder {
     TClonesArray* m_bestTSsTrackHough3D;
     // Stores true phi values. [st0, st1, st2, st3]
     TClonesArray* m_mcTSsTrackHough3D;
+    TClonesArray* m_mcSt0TSsTrackHough3D;
+    TClonesArray* m_mcSt1TSsTrackHough3D;
+    TClonesArray* m_mcSt2TSsTrackHough3D;
+    TClonesArray* m_mcSt3TSsTrackHough3D;
     // Stores performance values. [purity, Track #]
     TClonesArray* m_performanceTrackHough3D;
+    // Stores deltaWireDiff
+    TClonesArray* m_deltaWireDiffTrackHough3D;
+    // Stores fitz
+    TClonesArray* m_fitZTrackHough3D;
+    // Stores mc stereo's axial position.
+    // 4*2 = 8
+    // st1_x, st1_y, st2_x, st2_y, st3_x, st3_y, st4_x, st4_y
+    TClonesArray* m_mcStAxXYTrackHough3D;
     // Stores performance values. [Total # tracks from 2D finder]
     TVectorD* m_performanceEventHough3D;
     // Stores geometry values. [rr0, rr1, rr2, rr3, anglest0, anglest1, anglest2, anglest3, ztostraw0, ztostraw1, ztostraw2, ztostraw3]
     TVectorD* m_geometryHough3D;
+    TVectorD* m_modeHough3D;
+    TVectorD* m_initVariablesHough3D;
+    // Stores geoFinder candidate phi
+    TClonesArray* m_st0GeoCandidatesPhiTrackHough3D;
+    TClonesArray* m_st1GeoCandidatesPhiTrackHough3D;
+    TClonesArray* m_st2GeoCandidatesPhiTrackHough3D;
+    TClonesArray* m_st3GeoCandidatesPhiTrackHough3D;
+    // Stores geoFinder candidate diff wires
+    TClonesArray* m_st0GeoCandidatesDiffStWiresTrackHough3D;
+    TClonesArray* m_st1GeoCandidatesDiffStWiresTrackHough3D;
+    TClonesArray* m_st2GeoCandidatesDiffStWiresTrackHough3D;
+    TClonesArray* m_st3GeoCandidatesDiffStWiresTrackHough3D;
+    // Stores geoFinder stAx phi [ for each stereo layer ]
+    TClonesArray* m_stAxPhiTrackHough3D;
+    // Stores event and track ID;
+    TClonesArray* m_eventTrackIDTrackHough3D;
 
 };
 

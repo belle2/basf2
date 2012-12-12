@@ -476,6 +476,9 @@ class TRGCDC {
 
     std::vector<TRGCDCEventTime *> _eventTime;
 
+    /// Event number
+    int m_eventNum;
+
     /// root file
     TFile* m_file;
     TTree* m_tree;

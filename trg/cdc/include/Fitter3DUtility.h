@@ -11,6 +11,10 @@ void rPhiFit(double *rr, double *phi2, double *phierror, double &rho, double &my
 
 void rPhiFit2(double *rr, double *phi2, double *phierror, double &rho, double &myphi0, int nTS);
 
+double calStAxPhi(int &mysign, double &anglest, double &ztostraw, double &rr, double &rho, double &myphi0);
+
+double calDeltaPhi(int &mysign, double &anglest, double &ztostraw, double &rr, double &phi2, double &rho, double &myphi0);
+
 double calZ(int &mysign, double &anglest, double &ztostraw, double &rr, double &phi2, double &rho, double &myphi0);
 
 double calS(double &rho, double &rr);

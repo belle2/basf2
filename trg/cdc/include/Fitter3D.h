@@ -55,6 +55,8 @@ class TRGCDCFitter3D {
     std::string version(void) const;
 
     /// do track fitting.
+    void doit(const std::vector<TRGCDCTrack *> & trackListIn,
+             std::vector<TRGCDCTrack *> & trackListOut, int eventNum);
     int doit(const std::vector<TRGCDCTrack *> & trackListIn,
              std::vector<TRGCDCTrack *> & trackListOut);
 
@@ -109,6 +111,10 @@ class TRGCDCFitter3D {
 
     // EventTime class
     const TRGCDCEventTime * const _eventTime;
+
+    // Event number
+    int m_eventNum;
+
     protected:
 
       // The filename of root file for Fitter3D
@@ -128,9 +134,15 @@ class TRGCDCFitter3D {
       // Stores fit values
       // pT, phi0, z0, theta, charge
       TClonesArray* m_fitTrackFitter3D;
+      // wire (pT, phi0), charge
+      TClonesArray* m_wFit2DTrackFitter3D;
       // Stores s and z hit values
       // s1, s2, s3, s4, z1, z2, z3, z4
       TClonesArray* m_szTrackFitter3D;
+      // Stores stereo's axial phi with wire fit
+      TClonesArray* m_wStAxPhiTrackFitter3D;
+      // Stores stereo's axial phi with drift fit
+      TClonesArray* m_stAxPhiTrackFitter3D;
       // Stores MC values
       // MCpT, MCphi0, MCz0, MCtheta, MCcharge
       TClonesArray* m_mcTrackFitter3D;
@@ -138,14 +150,20 @@ class TRGCDCFitter3D {
       TClonesArray* m_mcStatusTrackFitter3D;
       TClonesArray* m_mcVertexTrackFitter3D;
       TClonesArray* m_mc4VectorTrackFitter3D;
+      TClonesArray* m_mcHelixCenterTrackFitter3D;
+      TClonesArray* m_mcImpactPositionTrackFitter3D;
       // Stores geometry
       // r1, r2, r3, r4, r5, r6, r7, r8, r9, anglest1, anglest2, anglest3, anglest4, ztostraw1, ztostraw2, ztostraw3, ztostraw4
       TVectorD* m_geometryFitter3D;
+      // # wires ax1, ax2, ax3, ax4, ax5, st1, st2, st3, st4, st5
+      TVectorD* m_nWiresFitter3D;
       // Stores error values
       // phierror1, phierror2, phierror3, phierror4, phierror5, zerror1, zerror2, zerror3, zerror4
       TVectorD* m_errorFitter3D;
       // Stores Stereo phi candidates upto 25 * 4 layers.
       TClonesArray* m_stTSsTrackFitter3D;
+      // Stores event and track ID;
+      TClonesArray* m_eventTrackIDTrackFitter3D;
 
     public:
       bool m_flagRealInt;

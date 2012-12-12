@@ -68,7 +68,7 @@ TRGCDC::name(void) const {
 
 string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.25");
+    return string("TRGCDC 5.27");
 }
 
 TRGCDC *
@@ -454,6 +454,9 @@ TRGCDC::initialize(bool houghFinderPerfect,
     //...For module simulation (Front-end)...
     configure();
     
+    //...Initialize event number...
+    m_eventNum = 1;
+
     //...Initialize root file...
     m_file = new TFile((char*)_rootTRGCDCFilename.c_str(), "RECREATE");
     m_tree = new TTree("m_tree", "tree");
@@ -1356,8 +1359,7 @@ TRGCDC::terminate(void) {
     }
 
     //...Stereo finder...
-    _h3DFinder->doit(trackList);
-    //perfect3DFinder(trackList);
+    _h3DFinder->doit(trackList, m_eventNum);
 
     //...Check tracks...
     if (TRGDebug::level()) {
@@ -1381,7 +1383,7 @@ TRGCDC::terminate(void) {
 
     //...3D tracker...
     vector<TCTrack*> trackList3D;
-    _fitter3D->doit(trackList, trackList3D);
+    _fitter3D->doit(trackList, trackList3D, m_eventNum);
 
     //...End of simulation...
 
@@ -1555,6 +1557,8 @@ TRGCDC::terminate(void) {
       m_tree->Fill();
     }
     m_treeAllTracks->Fill();
+
+    m_eventNum += 1;
 
     TRGDebug::leaveStage("TRGCDC simulation");
     return;

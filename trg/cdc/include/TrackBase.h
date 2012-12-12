@@ -85,6 +85,12 @@ class TRGCDCTrackBase {
     /// set fit status
     void setFitted(bool fitted);
 
+    /// set track ID.
+    void setTrackID(int trackID);
+
+    // get track ID.
+    int getTrackID();
+
     /// returns object type.
     virtual unsigned objectType(void) const;
 
@@ -157,6 +163,9 @@ class TRGCDCTrackBase {
 
     /// Fitting status.
     mutable bool _fitted;
+
+    /// ID of tracks.
+    int m_trackID;
 
     friend class TRGCDCFitter;
     friend class TRGCDCCircleFitter;
@@ -244,6 +253,18 @@ const TRGCDCFitter * const
 TRGCDCTrackBase::fitter(const TRGCDCFitter * a) {
     _fitted = false;
     return _fitter = a;
+}
+
+inline
+void 
+TRGCDCTrackBase::setTrackID(int trackID) {
+  m_trackID = trackID;
+}
+
+inline
+int
+TRGCDCTrackBase::getTrackID() {
+  return m_trackID;
 }
 
 } // namespace Belle2

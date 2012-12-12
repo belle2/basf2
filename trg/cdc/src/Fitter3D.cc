@@ -296,27 +296,41 @@ namespace Belle2 {
     m_tSTrackFitter3D = new TClonesArray("TVectorD");
     m_mcTSTrackFitter3D = new TClonesArray("TVectorD");
     m_fitTrackFitter3D = new TClonesArray("TVectorD");
+    m_wFit2DTrackFitter3D = new TClonesArray("TVectorD");
     m_szTrackFitter3D = new TClonesArray("TVectorD");
+    m_wStAxPhiTrackFitter3D = new TClonesArray("TVectorD");
+    m_stAxPhiTrackFitter3D = new TClonesArray("TVectorD");
     m_mcTrackFitter3D = new TClonesArray("TVectorD");
     m_mcStatusTrackFitter3D = new TClonesArray("TVectorD");
     m_stTSsTrackFitter3D = new TClonesArray("TVectorD");
     m_mcVertexTrackFitter3D = new TClonesArray("TVector3");
     m_mc4VectorTrackFitter3D = new TClonesArray("TLorentzVector");
+    m_mcHelixCenterTrackFitter3D = new TClonesArray("TVector2");
+    m_mcImpactPositionTrackFitter3D = new TClonesArray("TVector3");
+    m_eventTrackIDTrackFitter3D = new TClonesArray("TVectorD");
 
     m_treeTrackFitter3D->Branch("tSTrackFitter3D", &m_tSTrackFitter3D);
     m_treeTrackFitter3D->Branch("mcTSTrackFitter3D", &m_mcTSTrackFitter3D);
     m_treeTrackFitter3D->Branch("fitTrackFitter3D", &m_fitTrackFitter3D);
+    m_treeTrackFitter3D->Branch("wFit2DTrackFitter3D", &m_wFit2DTrackFitter3D);
     m_treeTrackFitter3D->Branch("szTrackFitter3D", &m_szTrackFitter3D);
+    m_treeTrackFitter3D->Branch("wStAxPhiTrackFitter3D", &m_wStAxPhiTrackFitter3D);
+    m_treeTrackFitter3D->Branch("stAxPhiTrackFitter3D", &m_stAxPhiTrackFitter3D);
     m_treeTrackFitter3D->Branch("mcTrackFitter3D", &m_mcTrackFitter3D);
     m_treeTrackFitter3D->Branch("mcStatusTrackFitter3D", &m_mcStatusTrackFitter3D);
     m_treeTrackFitter3D->Branch("stTSsTrackFitter3D", &m_stTSsTrackFitter3D);
     m_treeTrackFitter3D->Branch("mcVertexTrackFitter3D", &m_mcVertexTrackFitter3D);
     m_treeTrackFitter3D->Branch("mc4VectorTrackFitter3D", &m_mc4VectorTrackFitter3D);
+    m_treeTrackFitter3D->Branch("mcHelixCenterTrackFitter3D", &m_mcHelixCenterTrackFitter3D);
+    m_treeTrackFitter3D->Branch("mcImpactPositionTrackFitter3D", &m_mcImpactPositionTrackFitter3D);
+    m_treeTrackFitter3D->Branch("eventTrackIDTrackFitter3D", &m_eventTrackIDTrackFitter3D);
 
     m_treeConstantsFitter3D = new TTree("m_treeConstantsFitter3D","constants");
     m_geometryFitter3D = new TVectorD(17);
+    m_nWiresFitter3D = new TVectorD(9);
     m_errorFitter3D = new TVectorD(9);
     m_treeConstantsFitter3D->Branch("geometryFitter3D", &m_geometryFitter3D);
+    m_treeConstantsFitter3D->Branch("nWiresFitter3D", &m_nWiresFitter3D);
     m_treeConstantsFitter3D->Branch("errorFitter3D", &m_errorFitter3D);
 
 
@@ -345,12 +359,17 @@ namespace Belle2 {
 
     // Save geometry to root file
     TVectorD &geometryFitter3D = *m_geometryFitter3D;
+    TVectorD &nWiresFitter3D = *m_nWiresFitter3D;
     for(int i=0; i<9; i++){
       geometryFitter3D[i] = rr[i];
+    }
+    for(int i=0; i<5; i++){
+      nWiresFitter3D[i] = ni[2*i];
     }
     for(int i=0; i<4; i++){
       geometryFitter3D[i+9] = anglest[i];
       geometryFitter3D[i+13] = ztostraw[i];
+      nWiresFitter3D[i+5] = ni[2*i+1];
     }
 
     // Save error to root file
@@ -366,7 +385,11 @@ namespace Belle2 {
 
   }
 
-
+  void TRGCDCFitter3D::doit(const vector<TCTrack *> & trackListIn,
+        vector<TCTrack *> & trackListOut, int eventNum) {
+    m_eventNum = eventNum;
+    doit(trackListIn, trackListOut);
+  }
 
   int
     TRGCDCFitter3D::doit(const vector<TCTrack *> & trackListIn,
@@ -385,12 +408,18 @@ namespace Belle2 {
       TClonesArray &tSTrackFitter3D = *m_tSTrackFitter3D;
       TClonesArray &mcTSTrackFitter3D = *m_mcTSTrackFitter3D;
       TClonesArray &fitTrackFitter3D = *m_fitTrackFitter3D;
+      TClonesArray &wFit2DTrackFitter3D = *m_wFit2DTrackFitter3D;
       TClonesArray &szTrackFitter3D = *m_szTrackFitter3D;
+      TClonesArray &wStAxPhiTrackFitter3D = *m_wStAxPhiTrackFitter3D;
+      TClonesArray &stAxPhiTrackFitter3D = *m_stAxPhiTrackFitter3D;
       TClonesArray &mcTrackFitter3D = *m_mcTrackFitter3D;
       TClonesArray &mcStatusTrackFitter3D = *m_mcStatusTrackFitter3D;
       TClonesArray &stTSsTrackFitter3D = *m_stTSsTrackFitter3D;
       TClonesArray &mcVertexTrackFitter3D = *m_mcVertexTrackFitter3D;
       TClonesArray &mc4VectorTrackFitter3D = *m_mc4VectorTrackFitter3D;
+      TClonesArray &mcHelixCenterTrackFitter3D = *m_mcHelixCenterTrackFitter3D;
+      TClonesArray &mcImpactPositionTrackFitter3D = *m_mcImpactPositionTrackFitter3D;
+      TClonesArray &eventTrackIDTrackFitter3D = *m_eventTrackIDTrackFitter3D;
 
 
       //...TS study (loop over all TS's)...
@@ -416,22 +445,24 @@ namespace Belle2 {
 	}
       }
 
-
-
-
-
       double cotnum=0,sxx=0,z0num=0;
       int z0nump1[4],z0nump2[4],z0den,iz0den;
 
       tSTrackFitter3D.Clear();
       mcTSTrackFitter3D.Clear();
       fitTrackFitter3D.Clear();
+      wFit2DTrackFitter3D.Clear();
       szTrackFitter3D.Clear();
+      wStAxPhiTrackFitter3D.Clear();
+      stAxPhiTrackFitter3D.Clear();
       mcTrackFitter3D.Clear();
       mcStatusTrackFitter3D.Clear();
       stTSsTrackFitter3D.Clear();
       mcVertexTrackFitter3D.Clear();
       mc4VectorTrackFitter3D.Clear();
+      mcHelixCenterTrackFitter3D.Clear();
+      mcImpactPositionTrackFitter3D.Clear();
+      eventTrackIDTrackFitter3D.Clear();
 
 
       //...Loop over track list...
@@ -441,13 +472,14 @@ namespace Belle2 {
       
       for (unsigned iInput = 0; iInput < nInput; iInput++) {
         double phi[9]={0,0,0,0,0,0,0,0,0};
+        double phi_w[9]={0,0,0,0,0,0,0,0,0};
         int ckt=1;
 
         //...Access to a track...
-        TCTrack & t = * trackListIn[iInput];
+        TCTrack & aTrack = * trackListIn[iInput];
 
         // Access to track's MC particle.
-        const TCRelation & trackRelation = t.relation();
+        const TCRelation & trackRelation = aTrack.relation();
         //unsigned nMCtracks = trackRelation.nContributors();
         // Biggest contibutor is 0. Next is 1 and so on.
         //float purity = trackRelation.purity(0);
@@ -472,7 +504,9 @@ namespace Belle2 {
         TLorentzVector vector4;
         vertex = trackMCParticle.getVertex();
         vector4 = trackMCParticle.get4Vector();
-
+        TVector2 helixCenter;
+        TVector3 impactPosition;
+        findImpactPosition(&vertex, &vector4, int(mcStatus[2]), helixCenter, impactPosition);
 
         //       t.dump("detail");
 
@@ -481,7 +515,7 @@ namespace Belle2 {
 
           //...Access to track segment list in this super layer...
           //const vector<const TCSegment *> & segments = t.trackSegments(i);
-          const vector<TCLink *> & links = t.links(i);
+          const vector<TCLink *> & links = aTrack.links(i);
           const unsigned nSegments = links.size();
 
           //...Presently nSegments should be 1...
@@ -504,40 +538,44 @@ namespace Belle2 {
           //	cout << lutcomp << endl;
           //...using LRLUT to determine Left/Right(assume drift() will return drift distance)
           const TCSegment * s = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
-          phi[i]=(double) s->localId()/ni[s->superLayerId()]*4*m_Trg_PI;
-
-	  s->phiPosition();
-          if( m_flagWireLRLUT == 1){
-            ///...Using Drift time information
-            int lutcomp=s->LUT()->getLRLUT(s->hitPattern(),s->superLayerId());
-            float dphi=s->hit()->drift()*10;
-	    if(m_flagEvtTime==1){
-	    	dphi-=evtTime;
-	    }
-            dphi=atan(dphi/rro[s->superLayerId()]/1000);
-            if(lutcomp==0){phi[i]-=dphi;}
-            else if(lutcomp==1){phi[i]+=dphi;}
-            else{
-              phi[i]=phi[i];
-              //	nfrac--;
-            }
-          }
-	  phi[i]=s->phiPosition();
+          phi_w[i]=(double) s->localId()/ni[s->superLayerId()]*4*m_Trg_PI;
+          phi[i]=s->phiPosition();
+//
+//          if( m_flagWireLRLUT == 1){
+//            ///...Using Drift time information
+//            int lutcomp=s->LUT()->getLRLUT(s->hitPattern(),s->superLayerId());
+//            float dphi=s->hit()->drift()*10;
+//	          if(m_flagEvtTime==1){
+//	    	      dphi-=evtTime;
+//	          }
+//            dphi=atan(dphi/rro[s->superLayerId()]/1000);
+//            if(lutcomp==0){phi[i]-=dphi;}
+//            else if(lutcomp==1){phi[i]+=dphi;}
+//            else{
+//              phi[i]=phi[i];
+//              //	nfrac--;
+//            }
+//          }
         } // End of superlayer loop
-
 
         double z0=-999, cot=-999;
         double pt=-999, myphi0=-999;
+        double myphi0_w=-999;
+        double pt_w=-999;
         //...Do fitting job here (or call a fitting function)...
         if(ckt){
           double phi2[9]={phi[0], phi[2],phi[4],phi[6],phi[8],phi[1],phi[3],phi[5],phi[7]};
+          double phi2_w[9]={phi_w[0], phi_w[2],phi_w[4],phi_w[6],phi_w[8],phi_w[1],phi_w[3],phi_w[5],phi_w[7]};
           double zz[4], arcS[4];
+          TVectorD wStAxPhi(4);
+          TVectorD stAxPhi(4);
           int qqq=0;
           double rr_conv[4];
           double iezz2[4];
           double myphiz[4];	
           double ztheta=-999,ss=0.,sx=0.;
           double rho;
+          double rho_w;
 
           //kkk++;
           //re-ordering
@@ -555,7 +593,7 @@ namespace Belle2 {
           for(unsigned i=0; i< _cdc.nStereoSuperLayers(); i++){
             vector<const TCSHit*> hits = _cdc.stereoSegmentHits(i);
             for(unsigned j=0; j<hits.size(); j++){
-              if(j>25) continue;
+              if(j>24) continue;
               stTSs[25*i+j] = (double)hits[j]->cell().localId()/ni[2*i+1]*4*m_Trg_PI;
             }
           }
@@ -593,11 +631,14 @@ namespace Belle2 {
 
 
           // Sign Finder
-          int mysign = findSign(phi2);
+          //int mysign = findSign(phi2);
+          int mysign = int(aTrack.charge());
 
           // r-phi fitter(2D Fitter) ->calculate pt and radius of track-> input for 3D fitter.
           rPhiFit(rr,phi2,m_phierror,rho,myphi0);
+          rPhiFit(rr,phi2_w,m_phierror,rho_w,myphi0_w);
           pt = 0.3*rho*1.5;
+          pt_w = 0.3*rho_w*1.5;
 
           if(m_flagRealInt == 1){
             //Change input into relative values.
@@ -685,6 +726,8 @@ namespace Belle2 {
             // Calculate z position from rho and myphi0 and phi2
             for(unsigned i=0; i<4; i++){
               zz[i]=calZ(mysign, anglest[i], ztostraw[i],  rr[i+5], phi2[i+5], rho, myphi0);
+              wStAxPhi[i]=calStAxPhi(mysign, anglest[i], ztostraw[i],  rr[i+5], rho_w, myphi0_w);
+              stAxPhi[i]=calStAxPhi(mysign, anglest[i], ztostraw[i],  rr[i+5], rho, myphi0);
               rr_conv[i]=rr[i+5];
               iezz2[i] = 1/m_zerror[i]/m_zerror[i];
             }   
@@ -703,6 +746,10 @@ namespace Belle2 {
             tempSz[i+4] = zz[i];
           }
           new(szTrackFitter3D[iFit]) TVectorD(tempSz);
+
+          // Save stereo's axial phi
+          new(wStAxPhiTrackFitter3D[iFit]) TVectorD(wStAxPhi);
+          new(stAxPhiTrackFitter3D[iFit]) TVectorD(stAxPhi);
 
           // RZ Fit
           if(m_flagRealInt == 1){
@@ -779,6 +826,13 @@ namespace Belle2 {
           tempFit[4]=mysign;
           new(fitTrackFitter3D[iFit]) TVectorD(tempFit);
 
+          // Save fit values
+          TVectorD tempWFit(3);
+          tempWFit[0]=pt_w;
+          tempWFit[1]=myphi0_w;
+          tempWFit[2]=mysign;
+          new(wFit2DTrackFitter3D[iFit]) TVectorD(tempWFit);
+
           TVectorD tempMC(5);
           tempMC[0] = mcPt;
           tempMC[1] = mcPhi0;
@@ -791,6 +845,14 @@ namespace Belle2 {
           new(mcStatusTrackFitter3D[iFit]) TVectorD(mcStatus);
           new(mcVertexTrackFitter3D[iFit]) TVector3(vertex);
           new(mc4VectorTrackFitter3D[iFit]) TLorentzVector(vector4);
+          new(mcHelixCenterTrackFitter3D[iFit]) TVector2(helixCenter);
+          new(mcImpactPositionTrackFitter3D[iFit]) TVector3(impactPosition);
+
+          // Save event and track ID
+          TVectorD eventTrackID(2);
+          eventTrackID[0] = m_eventNum;
+          eventTrackID[1] = aTrack.getTrackID();
+          new(eventTrackIDTrackFitter3D[iFit]) TVectorD(eventTrackID);
           
 
           // For integer space
@@ -806,19 +868,19 @@ namespace Belle2 {
       // Set Helix parameters
       TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0));
       CLHEP::HepVector a(5);
-      a = t.helix().a();
+      a = aTrack.helix().a();
       if(ckt){
-        t.setFitted(1);
+        aTrack.setFitted(1);
         a[3] = z0; 
         a[4] = cot;
       } else {
-        t.setFitted(0);
+        aTrack.setFitted(0);
       }
       helix.a(a);
-      t.setHelix(helix);
+      aTrack.setHelix(helix);
 
       // Fill track list
-      trackListOut.push_back(&t);
+      trackListOut.push_back(&aTrack);
 
       } // End trackList loop 
 

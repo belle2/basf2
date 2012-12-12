@@ -34,7 +34,8 @@ TRGCDCTrackBase::TRGCDCTrackBase(const TRGCDCTrackBase & t)
       _tsAll(t._tsAll),
       _nTs(t._nTs),
       _fitter(t._fitter),
-      _fitted(t._fitted) {
+      _fitted(t._fitted),
+      m_trackID(t.m_trackID) {
     _ts = new vector<TCLink *>[_nTs];
     for (unsigned i = 0; i < _nTs; i++)
 	_ts[i].assign(t._ts[i].begin(), t._ts[i].end());
@@ -47,7 +48,8 @@ TRGCDCTrackBase::TRGCDCTrackBase(const string & name, double charge)
       _ts(0),
       _nTs(TRGCDC::getTRGCDC()->nSuperLayers()),
       _fitter(0),
-      _fitted(false) {
+      _fitted(false),
+      m_trackID(9999){
     _ts = new vector<TCLink *>[_nTs];
 }
 

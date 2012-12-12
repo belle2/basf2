@@ -121,6 +121,44 @@ void rPhiFit2(double *rr, double *phi2, double *phierror, double &rho, double &m
   
 }
 
+double calStAxPhi(int &mysign, double &anglest, double &ztostraw, double &rr, double &rho, double &myphi0){
+  if(1==2) cout<<anglest<<ztostraw<<endl; // Removes warnings when compileing
+
+  double myphiz, acos_real;
+  double Trg_PI=3.141592653589793; 
+  //Find phifit-phist
+  acos_real=acos(rr/(2*rho));
+  if(mysign==1){
+    myphiz = +acos_real+myphi0;
+  }
+  else{
+    myphiz = -acos_real+myphi0;
+  }
+  if(myphiz>Trg_PI) myphiz-=2*Trg_PI;
+  if(myphiz<-Trg_PI) myphiz+=2*Trg_PI;
+
+  return myphiz;
+}
+
+double calDeltaPhi(int &mysign, double &anglest, double &ztostraw, double &rr, double &phi2, double &rho, double &myphi0){
+  if(1==2) cout<<anglest<<ztostraw<<endl; // Removes warnings when compileing
+
+  double myphiz, acos_real;
+  double Trg_PI=3.141592653589793; 
+  //Find phifit-phist
+  acos_real=acos(rr/(2*rho));
+  if(mysign==1){
+    myphiz = -acos_real-myphi0+phi2;
+  }
+  else{
+    myphiz = +acos_real-myphi0+phi2;
+  }
+  if(myphiz>Trg_PI) myphiz-=2*Trg_PI;
+  if(myphiz<-Trg_PI) myphiz+=2*Trg_PI;
+
+  return myphiz;
+}
+
 double calZ(int &mysign, double &anglest, double &ztostraw, double &rr, double &phi2, double &rho, double &myphi0){
   double myphiz, acos_real;
   double Trg_PI=3.141592653589793; 

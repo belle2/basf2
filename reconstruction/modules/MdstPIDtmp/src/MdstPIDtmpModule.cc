@@ -14,7 +14,7 @@
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <reconstruction/modules/MdstPIDtmp/getRelated.h>
+#include <framework/datastore/RelationArray.h>
 
 // data objects:
 #include <reconstruction/dataobjects/PIDLikelihood.h>
@@ -73,31 +73,31 @@ namespace Belle2 {
     // output
     StoreArray<PIDLikelihood> pidLikelihoods;
     pidLikelihoods.create();
-    RelationArray relTrackPid(tracks, pidLikelihoods);
 
     // loop over reconstructed tracks and collect likelihoods
     for (int itra = 0; itra < tracks.getEntries(); ++itra) {
 
       // append new and set relation
       PIDLikelihood* pid = pidLikelihoods.appendNew();
-      int last = pidLikelihoods.getEntries() - 1;
-      relTrackPid.add(itra, last);
+      DataStore::addRelationFromTo(tracks[itra], pid);
 
       // reconstructed track
       const GFTrack* track = tracks[itra];
 
       // set top likelihoods
-      const TOPLikelihood* top = getRelated<TOPLikelihood, GFTrack>(track);
+      const TOPLikelihood* top = DataStore::getRelated<TOPLikelihood>(track);
       if (top) pid->setLikelihoods(top);
 
       // set arich likelihoods
-      const MCParticle* part = getRelated<MCParticle, GFTrack>(track);
-      const ARICHAeroHit* aero = getRelated<ARICHAeroHit, MCParticle>(part);
-      const ARICHLikelihoods* arich = getRelated<ARICHLikelihoods, ARICHAeroHit>(aero);
-      if (arich) pid->setLikelihoods(arich);
+      const MCParticle* part = DataStore::getRelated<MCParticle>(track);
+      if (part) {
+        const ARICHAeroHit* aero = part->getRelated<ARICHAeroHit>();
+        const ARICHLikelihoods* arich = DataStore::getRelated<ARICHLikelihoods>(aero);
+        if (arich) pid->setLikelihoods(arich);
+      }
 
       // set dedx likelihoods
-      const DedxLikelihood* dedx = getRelated<DedxLikelihood, GFTrack>(track);
+      const DedxLikelihood* dedx = DataStore::getRelated<DedxLikelihood>(track);
       if (dedx) pid->setLikelihoods(dedx);
     }
 

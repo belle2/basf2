@@ -1,7 +1,7 @@
 #include <analysis/utility/makeMother.h>
 #include <analysis/KFit/MakeMotherKFit.h>
 
-unsigned makeMother(VertexFitKFit& kv, Particle& mother)
+unsigned makeMother(VertexFitKFit& kv, Belle1::Particle& mother)
 {
 
   unsigned n = kv.getTrackCount();
@@ -30,7 +30,7 @@ unsigned makeMother(VertexFitKFit& kv, Particle& mother)
   return 1;
 }
 
-unsigned makeMother(MassFitKFit& km, Particle& mother)
+unsigned makeMother(MassFitKFit& km, Belle1::Particle& mother)
 {
 
   unsigned n = km.getTrackCount();
@@ -66,7 +66,7 @@ unsigned makeMother(MassFitKFit& km, Particle& mother)
 }
 
 /* Updates the momentum of mother particle after mass constrained vertex fit. */
-unsigned makeMother(MassVertexFitKFit& km, Particle& mother)
+unsigned makeMother(MassVertexFitKFit& km, Belle1::Particle& mother)
 {
 
   unsigned n = km.getTrackCount();

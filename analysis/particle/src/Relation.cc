@@ -1,12 +1,12 @@
 #include "analysis/particle/Relation.h"
 
-using namespace Belle2;
+using namespace Belle1;
 
 static Particle*     static_Particle(NULL);
-static Track*        static_Mdst_charged(NULL);
-static ECLShower*    static_ECL_shower(NULL);
-static ECLGamma*     static_ECL_gamma(NULL);
-static ECLPi0*       static_ECL_pi0(NULL);
+static Belle2::Track*        static_Mdst_charged(NULL);
+static Belle2::ECLShower*    static_ECL_shower(NULL);
+static Belle2::ECLGamma*     static_ECL_gamma(NULL);
+static Belle2::ECLPi0*       static_ECL_pi0(NULL);
 
 //Default constructor
 Relation::Relation()
@@ -66,7 +66,7 @@ Relation::Relation(const Relation& a, Particle* s)
 }
 
 //Constructor with Mdst\_charged
-Relation::Relation(const Track& a, Particle* s)
+Relation::Relation(const Belle2::Track& a, Particle* s)
   : m_vee2ChildCounter(0), m_pi0ChildCounter(0)
 {
   m_self    = s;
@@ -82,7 +82,7 @@ Relation::Relation(const Track& a, Particle* s)
 }
 
 //Constructor with Mdst\_gamma
-Relation::Relation(const ECLShower& a, Particle* s)
+Relation::Relation(const Belle2::ECLShower& a, Particle* s)
   : m_vee2ChildCounter(0), m_pi0ChildCounter(0)
 {
   m_self = s;
@@ -98,7 +98,7 @@ Relation::Relation(const ECLShower& a, Particle* s)
 }
 
 //Constructor with Mdst\_gamma
-Relation::Relation(const ECLGamma& a, Particle* s)
+Relation::Relation(const Belle2::ECLGamma& a, Particle* s)
   : m_vee2ChildCounter(0), m_pi0ChildCounter(0)
 {
   m_self  = s;
@@ -114,7 +114,7 @@ Relation::Relation(const ECLGamma& a, Particle* s)
 }
 
 //Constructor with Mdst\_pi0
-Relation::Relation(const ECLPi0& a, const bool makeRelation, Particle* s)
+Relation::Relation(const Belle2::ECLPi0& a, const bool makeRelation, Particle* s)
   : m_vee2ChildCounter(0), m_pi0ChildCounter(0)
 {
   m_self = s;
@@ -158,9 +158,9 @@ Relation::Relation(const ECLPi0& a, const bool makeRelation, Particle* s)
 }
 
 /**
- * Construct Relation from a MCParticle
+ * Construct Relation from a Belle2::MCParticle
  */
-Relation::Relation(const MCParticle* a, Particle* s)
+Relation::Relation(const Belle2::MCParticle* a, Particle* s)
   : m_vee2ChildCounter(0), m_pi0ChildCounter(0)
 {
   m_self        = s;
@@ -244,16 +244,16 @@ Relation::mc(void)
 
 // Interfaces for MDST banks.
 // returns a reference to Mdst\_charged.
-const Track&
+const Belle2::Track&
 Relation::mdstCharged(void) const
 {
   if (m_charged) return *m_charged;
   else if (static_Mdst_charged) return *static_Mdst_charged;
-  // Tagir   else return *(static_Mdst_charged=new Track);
+  // Tagir   else return *(static_Mdst_charged=new Belle2::Track);
 }
 
 // returns a reference to Mdst\_gamma.
-const ECLShower&
+const Belle2::ECLShower&
 Relation::mdstEcl(void) const
 {
   if (m_ecl) return *m_ecl;
@@ -262,7 +262,7 @@ Relation::mdstEcl(void) const
 }
 
 // returns a reference to Mdst\_gamma.
-const ECLGamma&
+const Belle2::ECLGamma&
 Relation::mdstGamma(void) const
 {
   if (m_gamma) return *m_gamma;
@@ -271,7 +271,7 @@ Relation::mdstGamma(void) const
 }
 
 // returns a reference to Mdst\_pi0.
-const ECLPi0&
+const Belle2::ECLPi0&
 Relation::mdstPi0(void) const
 {
   if (m_pi0) return *m_pi0;

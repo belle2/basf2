@@ -1,6 +1,6 @@
 #include "analysis/particle/Momentum.h"
 
-using namespace Belle2;
+using namespace Belle1;
 
 Momentum::Momentum()
   : m_momentum(),
@@ -64,7 +64,7 @@ Momentum::Momentum(const HepLorentzVector& p,
 /*
    Warning
  */
-Momentum::Momentum(const Track& p, const double thisMass,
+Momentum::Momentum(const Belle2::Track& p, const double thisMass,
                    const Hep3Vector& newPivot)
   : m_momentum(p.getMomentum().Px(), p.getMomentum().Py(), p.getMomentum().Pz(),
                sqrt(p.getMomentum().Px()*p.getMomentum().Px() +
@@ -214,7 +214,7 @@ Momentum::Momentum(const Track& p, const double thisMass,
 #endif
 }
 
-Momentum::Momentum(const Track& p, const Ptype& ptype,
+Momentum::Momentum(const Belle2::Track& p, const Ptype& ptype,
                    const Hep3Vector& newPivot)
   : m_error(7, 0),
     m_vertex(),
@@ -381,7 +381,7 @@ Momentum::Momentum(const Track& p, const Ptype& ptype,
 #endif
 }
 
-Momentum::Momentum(const ECLGamma& p)
+Momentum::Momentum(const Belle2::ECLGamma& p)
   : m_momentum(p.getPx(), p.getPy(), p.getPz(), p.getEnergy()),
     m_position(),
     m_error(7, 0),
@@ -392,7 +392,7 @@ Momentum::Momentum(const ECLGamma& p)
 {
 }
 
-Momentum::Momentum(const ECLShower& p)
+Momentum::Momentum(const Belle2::ECLShower& p)
   : m_position(),
     m_error(7, 0),
     m_vertex(),
@@ -409,7 +409,7 @@ Momentum::Momentum(const ECLShower& p)
   m_momentum = HepLorentzVector(px, py, pz, en);
 }
 
-Momentum::Momentum(const ECLPi0& p)
+Momentum::Momentum(const Belle2::ECLPi0& p)
   : m_momentum(p.getPx(), p.getPy(), p.getPz(), p.getEnergy()),
     m_position(),
     m_error(7, 0),
@@ -420,7 +420,7 @@ Momentum::Momentum(const ECLPi0& p)
 {
 }
 
-Momentum::Momentum(const MCParticle* p)
+Momentum::Momentum(const Belle2::MCParticle* p)
   : m_momentum(p->getMomentum().Px(), p->getMomentum().Py(), p->getMomentum().Pz(), p->getEnergy()),
     m_position(p->getProductionVertex().X(), p->getProductionVertex().Y(), p->getProductionVertex().Z()),
     m_error(7, 0),

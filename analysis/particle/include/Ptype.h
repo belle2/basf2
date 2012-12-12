@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-namespace Belle2 {
+namespace Belle1 {
 
   class Ptype {
   public:

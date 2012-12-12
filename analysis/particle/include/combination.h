@@ -4,7 +4,7 @@
 #include "analysis/particle/Particle.h"
 #include "analysis/particle/constant.h"
 
-using namespace Belle2;
+using namespace Belle1;
 
 /// Utilies for Making Combination of Particle.
 ///

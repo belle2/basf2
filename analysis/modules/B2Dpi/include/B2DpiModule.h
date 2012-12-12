@@ -75,9 +75,9 @@ namespace Belle2 {
     virtual void event();
 
     //
-    unsigned doKvFit(Particle& p, double& confLevel);
-    unsigned doKmFit(Particle& p, double& confLevel);
-    unsigned doKmvFit(Particle& p, double& confLevel);
+    unsigned doKvFit(Belle1::Particle& p, double& confLevel);
+    unsigned doKmFit(Belle1::Particle& p, double& confLevel);
+    unsigned doKmvFit(Belle1::Particle& p, double& confLevel);
 
     // Generated info Related functions
     int isBtoD0PiDecay(MCParticle* part);

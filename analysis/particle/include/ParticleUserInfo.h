@@ -1,7 +1,7 @@
 #ifndef PARTICLE_CLASS_PARTICLE_USER_INFO_H
 #define PARTICLE_CLASS_PARTICLE_USER_INFO_H
 
-namespace Belle2 {
+namespace Belle1 {
   class ParticleUserInfo {
 
   public:

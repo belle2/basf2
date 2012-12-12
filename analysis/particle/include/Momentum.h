@@ -23,7 +23,7 @@
 using namespace CLHEP;
 
 /// Mometum class supplies you interfaces for various values of particle, such as its momentum, position, and vertex info. etc..
-namespace Belle2 {
+namespace Belle1 {
   class Momentum {
 
   public:// Constructor
@@ -35,23 +35,23 @@ namespace Belle2 {
     Momentum(const HepLorentzVector&,
              const HepSymMatrix& error = HepSymMatrix(4, 0));
     /// Constructor with Mdst\_charged
-    Momentum(const Track&, const double mass,
+    Momentum(const Belle2::Track&, const double mass,
              const Hep3Vector & = Hep3Vector(0., 0., 0.));
     /// Constructor with Mdst\_charged
-    Momentum(const Track&, const Ptype&,
+    Momentum(const Belle2::Track&, const Ptype&,
              const Hep3Vector & = Hep3Vector(0., 0., 0.));
     /// Constructor with Mdst\_ecl
-    Momentum(const ECLShower&);
+    Momentum(const Belle2::ECLShower&);
     /// Constructor with Mdst\_gamma
-    Momentum(const ECLGamma&);
+    Momentum(const Belle2::ECLGamma&);
     /// Constructor with Mdst\_pi0
-    Momentum(const ECLPi0&);
+    Momentum(const Belle2::ECLPi0&);
 
     /**
      * Construct Momentum from a MCParticle. The 4-momentum vector,
      * position and production vertex are filled with generated values.
      */
-    Momentum(const MCParticle*);
+    Momentum(const Belle2::MCParticle*);
 
     /// Destructor
     virtual ~Momentum() {};

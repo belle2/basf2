@@ -1,6 +1,6 @@
 #include "analysis/particle/Ptype.h"
 
-using namespace Belle2;
+using namespace Belle1;
 
 Ptype::Ptype(const int lund)
   : m_lund(lund),

@@ -3,21 +3,22 @@
 
 #include "analysis/particle/constant.h"
 
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLGamma.h>
+#include <ecl/dataobjects/ECLPi0.h>
+#include <tracking/dataobjects/Track.h>
+#include <generators/dataobjects/MCParticle.h>
+
 #include <iostream>
 #include <string>
 #include <vector>
 
-namespace Belle2 {
+namespace Belle1 {
   class Particle;
-  class Track;
-  class ECLShower;
-  class ECLGamma;
-  class ECLPi0;
-  class MCParticle;
 }
 
 /// Relation class supplies you interfaces to other objects, such as mother particle, MC particle, and MDST banks.
-namespace Belle2 {
+namespace Belle1 {
   class Relation {
 
   public:
@@ -28,18 +29,18 @@ namespace Belle2 {
     /// Tagir
     Relation(Particle * = NULL);
     /// Constructor with Mdst\_charged
-    Relation(const Track&, Particle * = NULL);
+    Relation(const Belle2::Track&, Particle * = NULL);
     /// Constructor with Mdst\_gamma
-    Relation(const ECLShower&, Particle * = NULL);
+    Relation(const Belle2::ECLShower&, Particle * = NULL);
     /// Constructor with Mdst\_gamma
-    Relation(const ECLGamma&, Particle * = NULL);
+    Relation(const Belle2::ECLGamma&, Particle * = NULL);
     /// Constructor with Mdst\_pi0
-    Relation(const ECLPi0&, const bool makeRelation = true, Particle * = NULL);
+    Relation(const Belle2::ECLPi0&, const bool makeRelation = true, Particle * = NULL);
 
     /**
      * Construct Relation from a MCParticle
      */
-    Relation(const MCParticle*, Particle * = NULL);
+    Relation(const Belle2::MCParticle*, Particle * = NULL);
 
     /// Destructor
     virtual ~Relation();
@@ -91,28 +92,28 @@ namespace Belle2 {
 
   public:// Interfaces for MDST banks.
     /// returns a reference to Mdst\_charged.
-    virtual const Track& mdstCharged(void) const;
+    virtual const Belle2::Track& mdstCharged(void) const;
 
     /// sets a reference to Mdst\_charged and returns it.
-    virtual const Track& mdstCharged(const Track& a) { return *(m_charged = &a);}
+    virtual const Belle2::Track& mdstCharged(const Belle2::Track& a) { return *(m_charged = &a);}
 
     /// returns a reference to Mdst\_gamma.
-    virtual const ECLShower& mdstEcl(void) const;
+    virtual const Belle2::ECLShower& mdstEcl(void) const;
 
     /// sets a reference to Mdst\_gamma and returns it.
-    virtual const ECLShower& mdstEcl(const ECLShower& a) { return *(m_ecl = &a);}
+    virtual const Belle2::ECLShower& mdstEcl(const Belle2::ECLShower& a) { return *(m_ecl = &a);}
 
     /// returns a reference to Mdst\_gamma.
-    virtual const ECLGamma& mdstGamma(void) const;
+    virtual const Belle2::ECLGamma& mdstGamma(void) const;
 
     /// sets a reference to Mdst\_gamma and returns it.
-    virtual const ECLGamma& mdstGamma(const ECLGamma& a) { return *(m_gamma = &a);}
+    virtual const Belle2::ECLGamma& mdstGamma(const Belle2::ECLGamma& a) { return *(m_gamma = &a);}
 
     /// returns a reference to Mdst\_pi0.
-    virtual const ECLPi0& mdstPi0(void) const;
+    virtual const Belle2::ECLPi0& mdstPi0(void) const;
 
     /// sets a reference to Mdst\_pi0 and returns it.
-    virtual const ECLPi0& mdstPi0(const ECLPi0& a) { return *(m_pi0 = &a); }
+    virtual const Belle2::ECLPi0& mdstPi0(const Belle2::ECLPi0& a) { return *(m_pi0 = &a); }
 
     /**
      * Returns a pointer to linked generated MCParticle. NULL if the particle doesn't
@@ -120,14 +121,14 @@ namespace Belle2 {
      * @return A pointer to the linked MCParticle. NULL if the particle doesn't
      * have a MCParticle linked.
      */
-    virtual const MCParticle* getMCParticle(void) const { return m_mcParticle; }
+    virtual const Belle2::MCParticle* getMCParticle(void) const { return m_mcParticle; }
 
     /**
      * Sets a pointer to linked generated MCParticle and returns it.
      * @param  mcLink A pointer to the linked MCParticle.
      * @return A pointer to the linked MCParticle.
      */
-    virtual const MCParticle* setMCParticle(const MCParticle* mcLink) { return m_mcParticle = mcLink; }
+    virtual const Belle2::MCParticle* setMCParticle(const Belle2::MCParticle* mcLink) { return m_mcParticle = mcLink; }
 
     /**
      * Resets the link to MCParticle. The pointer to MCParticle is set to NULL.
@@ -146,11 +147,11 @@ namespace Belle2 {
     Particle* m_mother;
     std::vector<Particle*> m_children;
     Particle* m_mc;
-    const Track*      m_charged;
-    const ECLShower*  m_ecl;
-    const ECLGamma*   m_gamma;
-    const ECLPi0*     m_pi0;
-    const MCParticle* m_mcParticle; /**< Pointer to the linked MCParticle */
+    const Belle2::Track*      m_charged;
+    const Belle2::ECLShower*  m_ecl;
+    const Belle2::ECLGamma*   m_gamma;
+    const Belle2::ECLPi0*     m_pi0;
+    const Belle2::MCParticle* m_mcParticle; /**< Pointer to the linked MCParticle */
 
     mutable unsigned int m_flagChildModification;
 

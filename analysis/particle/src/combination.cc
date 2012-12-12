@@ -1,6 +1,6 @@
 #include "analysis/particle/combination.h"
 
-using namespace Belle2;
+using namespace Belle1;
 
 /* bool
    checkSame(const Particle &p1,

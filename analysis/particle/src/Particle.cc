@@ -1,6 +1,6 @@
 #include "analysis/particle/Particle.h"
 
-using namespace Belle2;
+using namespace Belle1;
 
 static ParticleUserInfo* static_ParticleUserInfo(NULL);
 
@@ -42,7 +42,7 @@ Particle::Particle(const Momentum& a, const Ptype& ptype)
   m_pType    = new Ptype(ptype);
 }
 
-Particle::Particle(const Track& a, const Ptype& ptype,
+Particle::Particle(const Belle2::Track& a, const Ptype& ptype,
                    const Hep3Vector& pivot)
   : m_usable(USABLE),  m_userInfo(NULL)
 {
@@ -51,7 +51,7 @@ Particle::Particle(const Track& a, const Ptype& ptype,
   m_pType    = new Ptype(ptype);
 }
 
-Particle::Particle(const ECLGamma& a)
+Particle::Particle(const Belle2::ECLGamma& a)
   : m_usable(USABLE),  m_userInfo(NULL)
 {
   m_momentum = new Momentum(a);
@@ -59,7 +59,7 @@ Particle::Particle(const ECLGamma& a)
   m_pType    = new Ptype(22);
 }
 
-Particle::Particle(const ECLShower& a)
+Particle::Particle(const Belle2::ECLShower& a)
   : m_usable(USABLE),  m_userInfo(NULL)
 {
   m_momentum = new Momentum(a);
@@ -67,7 +67,7 @@ Particle::Particle(const ECLShower& a)
   m_pType    = new Ptype(22);
 }
 
-Particle::Particle(const ECLPi0& a, const bool makeRelation)
+Particle::Particle(const Belle2::ECLPi0& a, const bool makeRelation)
   : m_usable(USABLE),  m_userInfo(NULL)
 {
   m_momentum = new Momentum(a);
@@ -75,7 +75,7 @@ Particle::Particle(const ECLPi0& a, const bool makeRelation)
   m_pType    = new Ptype(111);
 }
 
-Particle::Particle(const MCParticle* a)
+Particle::Particle(const Belle2::MCParticle* a)
   : m_usable(USABLE),  m_userInfo(NULL)
 {
   m_momentum = new Momentum(a);

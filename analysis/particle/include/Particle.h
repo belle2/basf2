@@ -9,8 +9,6 @@
 #include "analysis/particle/Ptype.h"
 #include "analysis/particle/Relation.h"
 
-#include <generators/dataobjects/MCParticle.h>
-
 using namespace CLHEP;
 
 /**
@@ -20,7 +18,7 @@ using namespace CLHEP;
  * member objects, Momentum, PID, Ptype, and Relation.
  */
 
-namespace Belle2 {
+namespace Belle1 {
 
   class Particle {
 
@@ -37,19 +35,19 @@ namespace Belle2 {
     /// Constructors with Momentum
     Particle(const Momentum&, const Ptype&);
     /// Constructor with Mdst\_charged(by pType)
-    Particle(const Track&, const Ptype&,
+    Particle(const Belle2::Track&, const Ptype&,
              const Hep3Vector & = Hep3Vector(0., 0., 0.));
     /// Constructor with Mdst\_ecl
-    Particle(const ECLShower&);
+    Particle(const Belle2::ECLShower&);
     /// Constructor with Mdst\_gamma
-    Particle(const ECLGamma&);
+    Particle(const Belle2::ECLGamma&);
     /// Constructor with Mdst\_pi0
-    Particle(const ECLPi0&, const bool makeRelation = true);
+    Particle(const Belle2::ECLPi0&, const bool makeRelation = true);
 
     /**
      * Construct Particle from a MCParticle
      */
-    Particle(const MCParticle*);
+    Particle(const Belle2::MCParticle*);
 
     /// Destructor
     virtual ~Particle();
@@ -153,16 +151,16 @@ namespace Belle2 {
     virtual Particle& mc(void)  { return m_relation->mc(); }
 
     /// returns a reference to Mdst\_charged.
-    virtual const Track& mdstCharged(void) const { return m_relation->mdstCharged(); }
+    virtual const Belle2::Track& mdstCharged(void) const { return m_relation->mdstCharged(); }
 
     /// returns a reference to Mdst\_gamma.
-    virtual const ECLShower& mdstEcl(void) const { return m_relation->mdstEcl(); }
+    virtual const Belle2::ECLShower& mdstEcl(void) const { return m_relation->mdstEcl(); }
 
     /// returns a reference to Mdst\_gamma.
-    virtual const ECLGamma& mdstGamma(void) const { return m_relation->mdstGamma(); }
+    virtual const Belle2::ECLGamma& mdstGamma(void) const { return m_relation->mdstGamma(); }
 
     /// returns a reference to Mdst\_pi0.
-    virtual const ECLPi0& mdstPi0(void) const { return m_relation->mdstPi0(); }
+    virtual const Belle2::ECLPi0& mdstPi0(void) const { return m_relation->mdstPi0(); }
 
     /**
      * Returns a pointer to linked generated MCParticle. NULL if the particle doesn't
@@ -170,7 +168,7 @@ namespace Belle2 {
      * @return A pointer to the linked MCParticle. NULL if the particle doesn't
      * have a MCParticle linked.
      */
-    virtual const MCParticle* getMCParticle(void) const { return m_relation->getMCParticle(); }
+    virtual const Belle2::MCParticle* getMCParticle(void) const { return m_relation->getMCParticle(); }
 
   public:// User Definition Object
     /// returns a pointer of "user definition object".

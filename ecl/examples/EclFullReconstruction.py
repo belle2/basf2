@@ -22,7 +22,7 @@ g4sim = register_module('FullSim')
 # one event
 evtmetagen.param('ExpList', [0])
 evtmetagen.param('RunList', [1])
-evtmetagen.param('EvtNumList', [10])
+evtmetagen.param('EvtNumList', [3])
 
 import random
 intseed = random.randint(1, 10000000)
@@ -106,7 +106,7 @@ main.add_module(eclRecShower)
 main.add_module(makeGamma)
 main.add_module(makePi0)
 main.add_module(makeMatch)
-simpleoutput = register_module('SimpleOutput')
+simpleoutput = register_module('RootOutput')
 simpleoutput.param('outputFileName', 'Output.root')
 main.add_module(simpleoutput)
 

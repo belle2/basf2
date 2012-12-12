@@ -156,7 +156,7 @@ void ECLPi0ReconstructorModule::event()
       if (fit_flag) {
 //        fit(lv_gamma1, lv_gamma2);
 
-        Particle p;
+        Belle1::Particle p;
         MassFitKFit km;
         km.setMagneticField(1.5);
         km.addTrack(lv_gamma1, xGamma1, errorGamma1, 0);

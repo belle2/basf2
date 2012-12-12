@@ -1,6 +1,7 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'ecl_dataobjects', 'analysis',
-               '$ROOT_LIBS']
+env['LIBS'] = ['framework', 'ecl_dataobjects', 'analysis', 'generators_dataobjects',
+               'tracking_dataobjects','$ROOT_LIBS']
+
 
 Return('env')

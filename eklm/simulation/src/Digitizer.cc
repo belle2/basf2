@@ -14,8 +14,8 @@
 #include <boost/graph/connected_components.hpp>
 
 /* Belle2 headers. */
-#include <eklm/simeklm/Digitizer.h>
-#include <eklm/simeklm/FiberAndElectronics.h>
+#include <eklm/simulation/Digitizer.h>
+#include <eklm/simulation/FiberAndElectronics.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 

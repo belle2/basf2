@@ -17,7 +17,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMSectorHit.h>
-#include <eklm/geoeklm/TransformData.h>
+#include <eklm/geometry/TransformData.h>
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {

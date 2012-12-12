@@ -8,7 +8,7 @@
 *  This software is provided "as is" without any warranty.               *
 * ***********************************************************************/
 
-#include <eklm/geoeklm/G4TriangularPrism.h>
+#include <eklm/geometry/G4TriangularPrism.h>
 #include <cmath>
 #include <new>
 

@@ -10,7 +10,7 @@
 
 /* Belle2 headers. */
 #include <framework/core/ModuleManager.h>
-#include <eklm/geoeklm/TransformData.h>
+#include <eklm/geometry/TransformData.h>
 #include <eklm/modules/eklmAlignment/EKLMAlignmentModule.h>
 
 using namespace Belle2;

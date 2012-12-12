@@ -8,7 +8,7 @@
 *  This software is provided "as is" without any warranty.               *
 * ***********************************************************************/
 
-#include <eklm/geoeklm/EKLMObjectNumbers.h>
+#include <eklm/geometry/EKLMObjectNumbers.h>
 
 using namespace Belle2;
 

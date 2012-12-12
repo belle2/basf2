@@ -15,9 +15,9 @@
 #include <TFile.h>
 
 /* Belle2 headers. */
-#include <eklm/geoeklm/GeoEKLMBelleII.h>
-#include <eklm/geoeklm/StripData.h>
-#include <eklm/simeklm/FiberAndElectronics.h>
+#include <eklm/geometry/GeoEKLMBelleII.h>
+#include <eklm/geometry/StripData.h>
+#include <eklm/simulation/FiberAndElectronics.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 

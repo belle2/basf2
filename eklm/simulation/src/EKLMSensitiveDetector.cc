@@ -12,8 +12,8 @@
 #include <G4Step.hh>
 
 /* Belle2 headers. */
-#include <eklm/geoeklm/EKLMObjectNumbers.h>
-#include <eklm/simeklm/EKLMSensitiveDetector.h>
+#include <eklm/geometry/EKLMObjectNumbers.h>
+#include <eklm/simulation/EKLMSensitiveDetector.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>

@@ -27,9 +27,9 @@
 #include <G4ReflectedSolid.hh>
 
 /* Belle2 headers. */
-#include <eklm/geoeklm/G4TriangularPrism.h>
-#include <eklm/geoeklm/GeoEKLMBelleII.h>
-#include <eklm/simeklm/EKLMSensitiveDetector.h>
+#include <eklm/geometry/G4TriangularPrism.h>
+#include <eklm/geometry/GeoEKLMBelleII.h>
+#include <eklm/simulation/EKLMSensitiveDetector.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <geometry/CreatorFactory.h>

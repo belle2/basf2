@@ -13,8 +13,8 @@
 #include <unistd.h>
 
 /* Belle2 headers. */
-#include <eklm/geoeklm/GeoEKLMBelleII.h>
-#include <eklm/geoeklm/TransformData.h>
+#include <eklm/geometry/GeoEKLMBelleII.h>
+#include <eklm/geometry/TransformData.h>
 
 using namespace Belle2;
 

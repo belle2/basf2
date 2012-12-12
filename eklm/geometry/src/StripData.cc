@@ -9,7 +9,7 @@
 * ***********************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/geoeklm/StripData.h>
+#include <eklm/geometry/StripData.h>
 
 using namespace Belle2;
 

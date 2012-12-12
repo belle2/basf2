@@ -13,7 +13,7 @@
 
 /* Belle2 headers. */
 #include <framework/core/Module.h>
-#include <eklm/geoeklm/TransformData.h>
+#include <eklm/geometry/TransformData.h>
 
 namespace Belle2 {
 

@@ -20,7 +20,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/geoeklm/TransformData.h>
+#include <eklm/geometry/TransformData.h>
 
 namespace Belle2 {
 

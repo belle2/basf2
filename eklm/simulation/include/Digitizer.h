@@ -19,7 +19,7 @@
 #include <CLHEP/Vector/ThreeVector.h>
 
 /* Belle2 headers. */
-#include <eklm/geoeklm/TransformData.h>
+#include <eklm/geometry/TransformData.h>
 #include <eklm/dataobjects/EKLMStepHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>

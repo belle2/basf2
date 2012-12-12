@@ -13,7 +13,7 @@
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <eklm/dataobjects/EKLMStepHit.h>
-#include <eklm/geoeklm/GeoEKLMTypes.h>
+#include <eklm/geometry/GeoEKLMTypes.h>
 
 namespace Belle2 {
 

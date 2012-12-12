@@ -15,11 +15,11 @@
 
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
-#include <eklm/simeklm/EKLMSensitiveDetector.h>
-#include <eklm/geoeklm/TransformData.h>
-#include <eklm/geoeklm/G4TriangularPrism.h>
-#include <eklm/geoeklm/GeoESTRCreator.h>
-#include <eklm/geoeklm/GeoEKLMTypes.h>
+#include <eklm/simulation/EKLMSensitiveDetector.h>
+#include <eklm/geometry/TransformData.h>
+#include <eklm/geometry/G4TriangularPrism.h>
+#include <eklm/geometry/GeoESTRCreator.h>
+#include <eklm/geometry/GeoEKLMTypes.h>
 
 #include <G4LogicalVolume.hh>
 #include <G4Material.hh>

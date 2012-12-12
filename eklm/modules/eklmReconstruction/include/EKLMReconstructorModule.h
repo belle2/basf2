@@ -12,7 +12,7 @@
 #define EKLMRECONSTRUCTIONMODULE_H
 
 /* Belle2 headers. */
-#include <eklm/geoeklm/TransformData.h>
+#include <eklm/geometry/TransformData.h>
 #include <framework/core/Module.h>
 
 namespace Belle2 {

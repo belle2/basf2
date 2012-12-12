@@ -10,7 +10,7 @@
 
 #include <framework/core/ModuleManager.h>
 #include <eklm/modules/eklmReconstruction/EKLMReconstructorModule.h>
-#include <eklm/receklm/Reconstructor.h>
+#include <eklm/reconstruction/Reconstructor.h>
 
 using namespace Belle2;
 

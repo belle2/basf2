@@ -20,7 +20,7 @@
 #include <geometry/CreatorFactory.h>
 #include <framework/gearbox/GearDir.h>
 
-#include <eklm/geoeklm/GeoESTRCreator.h>
+#include <eklm/geometry/GeoESTRCreator.h>
 
 using namespace Belle2;
 

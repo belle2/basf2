@@ -9,8 +9,8 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/receklm/Reconstructor.h>
-#include <eklm/geoeklm/StripData.h>
+#include <eklm/reconstruction/Reconstructor.h>
+#include <eklm/geometry/StripData.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 

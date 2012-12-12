@@ -4747,16 +4747,18 @@ namespace Belle2 {
       // for dose simulation
       //---------------------------
 
-      //gate-shield
-      //logi_ShieldL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1));
-      //logi_ShieldR->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2));
+      //neutron shield (poly)
+      logi_ShieldL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1));
+      logi_ShieldR->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2));
 
-      //virtual material outsire gate-shield
+      //additional neutron shield (concrete)
       logi_Shield2L->SetSensitiveDetector(new BkgSensitiveDetector("IR", 3));
       logi_Shield2R->SetSensitiveDetector(new BkgSensitiveDetector("IR", 4));
 
-      //wall shield (poly+concrete)
-      logi_WALL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 5));
+      //gate shield (concrete)
+      //logi_WALL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 5));
+
+      //virtual material outsire gate-shield
       logi_WALL2->SetSensitiveDetector(new BkgSensitiveDetector("IR", 6));
 
     }

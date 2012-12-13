@@ -5,6 +5,7 @@ from SCons.Script import *
 import os
 import platform
 from distutils import sysconfig
+from ctypes import cdll
 
 
 def CheckEnvVar(conf, var, text=None):
@@ -54,6 +55,19 @@ def CheckFile(conf, dir, text=None):
     return result
 
 
+def CheckLibrary(conf, lib):
+    """check for the loading of a library"""
+
+    conf.Message('Checking for %s...' % lib)
+    try:
+        cdll.LoadLibrary(lib)
+        result = 1
+    except:
+        result = 0
+    conf.Result(result)
+    return result
+
+
 def configure_belle2(conf):
     """check the Belle II environment"""
 
@@ -94,7 +108,7 @@ def configure_system(conf):
     # TEve
     conf.env['HAS_TEVE'] = False
     conf.env['TEVE_LIBS'] = []
-    if conf.CheckFile(os.path.join(os.environ['ROOTSYS'], 'lib', 'libEve.so')):
+    if conf.CheckLibrary('libEve.so'):
         conf.env['HAS_TEVE'] = True
         conf.env['TEVE_LIBS'] = ['Gui', 'Eve', 'Ged', 'RGL', 'TreePlayer']
 
@@ -143,6 +157,7 @@ def configure(env):
         'CheckConfigTool': CheckConfigTool,
         'CheckPackage': CheckPackage,
         'CheckFile': CheckFile,
+        'CheckLibrary': CheckLibrary,
         })
 
     if not configure_belle2(conf) or not configure_system(conf) \

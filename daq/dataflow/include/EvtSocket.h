@@ -15,6 +15,8 @@
 
 #define MAXEVTSIZE 80000000
 
+typedef unsigned short u_short;
+
 using namespace Belle2;
 
 class EvtSocketSend {

@@ -10,7 +10,9 @@
 
 #include <string>
 
-#define D2_SOCKBUF_SIZE  4096
+#define D2_SOCKBUF_SIZE  8000000
+
+typedef unsigned short u_short;
 
 namespace Belle2 {
 

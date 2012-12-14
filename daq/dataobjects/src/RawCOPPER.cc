@@ -40,6 +40,11 @@ void RawCOPPER::copy(int* bufin)
   m_allocated = true;
 }
 
+int RawCOPPER::size()
+{
+  return m_nwords;
+}
+
 int* RawCOPPER::allocate_buffer(int nwords)
 {
   m_nwords = nwords;

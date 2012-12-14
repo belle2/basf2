@@ -29,6 +29,9 @@ namespace Belle2 {
     //! copy rawdata into internal buffer
     virtual void copy(int*);
 
+    //! get size of buffer
+    virtual int size();
+
     //! allocate buffer
     virtual int* allocate_buffer(int nwords);
 

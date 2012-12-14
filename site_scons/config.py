@@ -5,7 +5,7 @@ from SCons.Script import *
 import os
 import platform
 from distutils import sysconfig
-from ctypes import cdll
+import subprocess
 
 
 def CheckEnvVar(conf, var, text=None):
@@ -59,10 +59,12 @@ def CheckLibrary(conf, lib):
     """check for the loading of a library"""
 
     conf.Message('Checking for %s...' % lib)
-    try:
-        cdll.LoadLibrary(lib)
+    process = subprocess.Popen(['ldd', lib], stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    output = process.communicate()[0]
+    if process.returncode == 0 and not 'not found' in output:
         result = 1
-    except:
+    else:
         result = 0
     conf.Result(result)
     return result
@@ -108,7 +110,8 @@ def configure_system(conf):
     # TEve
     conf.env['HAS_TEVE'] = False
     conf.env['TEVE_LIBS'] = []
-    if conf.CheckLibrary('libEve.so'):
+    if conf.CheckLibrary(os.path.join(os.environ['ROOTSYS'], 'lib', 'libEve.so'
+                         )):
         conf.env['HAS_TEVE'] = True
         conf.env['TEVE_LIBS'] = ['Gui', 'Eve', 'Ged', 'RGL', 'TreePlayer']
 

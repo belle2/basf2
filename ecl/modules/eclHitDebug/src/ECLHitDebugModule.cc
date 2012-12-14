@@ -127,14 +127,12 @@ void ECLHitDebugModule::event()
     //cout<<"DBSimHit"<<m_nEvent<<" " <<cellId<<" "<<hitE<<" "<<hitTOF<<" +  "<<local_pos<<" "<< <<endl;
 
 
-    for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-
-      if (hitCellId == iECLCell && hitTOF < 8000) {
-        int TimeIndex = (int) hitTOF / interval;
-        E_cell[iECLCell][TimeIndex] = E_cell[iECLCell][TimeIndex] + hitE;
-        Tof_ave[iECLCell][TimeIndex]  += (6.05 + 0.0749 * local_pos - 0.00112 * local_pos * local_pos + hitTOF) * hitE ;
-      }
-    } // End loop crsyal 8736
+    int iECLCell = hitCellId;
+    if (hitCellId == iECLCell && hitTOF < 8000) {
+      int TimeIndex = (int) hitTOF / interval;
+      E_cell[iECLCell][TimeIndex] = E_cell[iECLCell][TimeIndex] + hitE;
+      Tof_ave[iECLCell][TimeIndex]  += (6.05 + 0.0749 * local_pos - 0.00112 * local_pos * local_pos + hitTOF) * hitE ;
+    }
 
   }//for nHit
 
@@ -142,7 +140,7 @@ void ECLHitDebugModule::event()
   for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
     for (int  TimeIndex = 0; TimeIndex < Nbin; TimeIndex++) {
 
-      if (E_cell[iECLCell][TimeIndex] > 1.0e-9) {
+      if (E_cell[iECLCell][TimeIndex] > 0) {
 
         StoreArray<ECLDebugHit> eclHitArray;
         if (!eclHitArray) eclHitArray.create();

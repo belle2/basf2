@@ -47,6 +47,8 @@ pGun.param(param_pGun)
 
 eclDigi = register_module('ECLDigitizer')
 eclRecShower = register_module('ECLReconstructor')
+makeGamma = register_module('ECLGammaReconstructor')
+makePi0 = register_module('ECLPi0Reconstructor')
 makeMatch = register_module('ECLMCMatching')
 
 # Create paths
@@ -59,8 +61,10 @@ main.add_module(pGun)
 main.add_module(g4sim)
 main.add_module(eclDigi)
 main.add_module(eclRecShower)
+main.add_module(makeGamma)
+main.add_module(makePi0)
 main.add_module(makeMatch)
-simpleoutput = register_module('SimpleOutput')
+simpleoutput = register_module('RootOutput')
 simpleoutput.param('outputFileName', 'Output.root')
 main.add_module(simpleoutput)
 

@@ -1,8 +1,6 @@
 #ifndef PYSTOREOBJ_H
 #define PYSTOREOBJ_H
 
-#include <framework/datastore/StoreObjPtr.h>
-
 #include <TObject.h>
 
 #include <string>
@@ -41,6 +39,32 @@ namespace Belle2 {
 
     ~PyStoreObj() { }
 
+    /** Create a default object in the data store.
+     *
+     *  The object created will be of the type given by the 'name' argument of the ctor
+     *  (assuming it's in the Belle2 namespace).
+     *
+     *  @param replace   Should an existing object be replaced?
+     *  @return          True if the creation succeeded.
+     **/
+    bool create(bool replace = false);
+
+    /** Register the object in the data store and include it in the output by default.
+     *  This must be called in the initialization phase.
+     *
+     *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
+     *  @return            True if the registration succeeded.
+     */
+    bool registerAsPersistent(bool errorIfExisting = false);
+
+    /** Register the object in the data store and do not include it in the output by default.
+     *  This must be called in the initialization phase.
+     *
+     *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
+     *  @return            True if the registration succeeded.
+     */
+    bool registerAsTransient(bool errorIfExisting = false);
+
     /** Does this PyStoreObj contain a valid datastore object?
      *
      * Accessing the object's data is UNSAFE if this returns false.
@@ -51,7 +75,12 @@ namespace Belle2 {
     TObject* obj() const { return *m_storeObjPtr; }
 
   private:
+    /** Return TClass for given name; or NULL if not found. */
+    TClass* getClass(const std::string& name);
+
     TObject** m_storeObjPtr; /**< Pointer to pointer to object */
+    std::string m_name;
+    int m_durability;
 
     ClassDef(PyStoreObj, 0)
   };

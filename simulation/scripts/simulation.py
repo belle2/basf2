@@ -54,8 +54,6 @@ def add_simulation(path, components=None):
 
     # ECL simulation
     if components == None or 'ECL' in components:
-        ecl_hit = register_module('ECLHit')
-        path.add_module(ecl_hit)
         ecl_digitizer = register_module('ECLDigitizer')
         path.add_module(ecl_digitizer)
 

@@ -142,18 +142,31 @@ void Module::setReturnValue(bool value)
 
 void Module::setParamObject(const std::string& name, const boost::python::object& pyObj)
 {
+  LogSystem& logSystem = LogSystem::Instance();
+  logSystem.setModuleLogConfig(&(getLogConfig()), getName());
+
   m_moduleParamList.setParamObjectPython(name, pyObj);
+
+  logSystem.setModuleLogConfig(NULL);
 }
 
 
 void Module::setParamList(const std::string& name, const boost::python::list& pyList)
 {
+  LogSystem& logSystem = LogSystem::Instance();
+  logSystem.setModuleLogConfig(&(getLogConfig()), getName());
+
   m_moduleParamList.setParamListPython(name, pyList);
+
+  logSystem.setModuleLogConfig(NULL);
 }
 
 
 void Module::setParamDict(const boost::python::dict& dictionary)
 {
+  LogSystem& logSystem = LogSystem::Instance();
+  logSystem.setModuleLogConfig(&(getLogConfig()), getName());
+
   boost::python::list dictKeys = dictionary.keys();
   int nKey = boost::python::len(dictKeys);
 
@@ -175,6 +188,8 @@ void Module::setParamDict(const boost::python::dict& dictionary)
       B2ERROR("Setting the module parameters from a python dictionary: invalid key in dictionary!");
     }
   }
+
+  logSystem.setModuleLogConfig(NULL);
 }
 
 

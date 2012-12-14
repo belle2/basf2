@@ -80,7 +80,7 @@ void ECLPi0ReconstructorModule::initialize()
   m_timeCPU = clock() * Unit::us;
   StoreArray<ECLPi0>::registerPersistent();
 
-  RelationArray::registerPersistent<ECLPi0, ECLShower>("", "");
+  RelationArray::registerPersistent<ECLPi0, ECLGamma>("", "");
 }
 
 void ECLPi0ReconstructorModule::beginRun()

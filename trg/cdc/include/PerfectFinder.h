@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // $Id$
 //-----------------------------------------------------------------------------
-// Filename : HoughFinder.h
+// Filename : PerfectFinder.h
 // Section  : TRG CDC
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
@@ -11,38 +11,32 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#ifndef TRGCDCHoughFinder_FLAG_
-#define TRGCDCHoughFinder_FLAG_
+#ifndef TRGCDCPerfectFinder_FLAG_
+#define TRGCDCPerfectFinder_FLAG_
 
 #include <string>
-#include "trg/cdc/HoughPlaneMulti2.h"
-#include "trg/cdc/HoughTransformationCircle.h"
-#include "trg/cdc/PeakFinder.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define TCHFinder TRGCDCHoughFinder
+#define TCPFinder TRGCDCPerfectFinder
 #endif
 
 namespace Belle2 {
 
 class TRGCDC;
-class TRGCDCPeakFinder;
 class TRGCDCTrack;
 class TRGCDCLink;
 
-/// A class to find tracks using Hough algorithm
-class TRGCDCHoughFinder {
+/// A class to find 2D tracks using MC information
+class TRGCDCPerfectFinder {
 
   public:
 
     /// Contructor.
-    TRGCDCHoughFinder(const std::string & name,
-                      const TRGCDC &,
-                      unsigned nX,
-                      unsigned nY);
+    TRGCDCPerfectFinder(const std::string & name,
+			const TRGCDC &);
 
     /// Destructor
-    virtual ~TRGCDCHoughFinder();
+    virtual ~TRGCDCPerfectFinder();
 
   public:
 
@@ -55,41 +49,41 @@ class TRGCDCHoughFinder {
     /// do track finding.
     int doit(std::vector<TRGCDCTrack *> & trackList);
 
-  public:
-
-    /// sets and returns switch to do perfect finding.
-    bool perfect(bool);
+    /// returns MC track list which contributes to CDC hits.
+    const std::vector<int> & trackListMC(void) const;
 
   private:
 
-    /// selects the best(fastest) hits in each super layer.
-    std::vector<TRGCDCLink *> selectBestHits(
-	const std::vector<TRGCDCLink *> & links) const;
+    /// do perfect finding.
+    int doitPerfectly(std::vector<TRGCDCTrack *> & trackList);
+
+    /// do perfect finding (for single-track events).
+    int doitPerfectlySingleTrack(std::vector<TRGCDCTrack *> & trackList);
 
   private:
 
-    /// Name.
+    /// Name
     const std::string _name;
 
-    /// CDCTRG.
+    /// CDCTRG
     const TRGCDC & _cdc;
 
-    /// Hough planes, for + and - charges.
-    TRGCDCHoughPlaneMulti2 * _plane[2];
-
-    /// Circle Hough transformtion.
-    TRGCDCHoughTransformationCircle _circleH;
-
-    /// Peak finder.
-    TRGCDCPeakFinder _peakFinder;
+    /// MC track ID list
+    std::vector<int> _mcList;
 };
 
 //-----------------------------------------------------------------------------
 
 inline
 std::string
-TRGCDCHoughFinder::name(void) const {
+TRGCDCPerfectFinder::name(void) const {
     return _name;
+}
+
+inline
+const std::vector<int> &
+TRGCDCPerfectFinder::trackListMC(void) const {
+    return _mcList;
 }
 
 } // namespace Belle2

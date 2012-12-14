@@ -45,6 +45,7 @@ class TRGCDCSegment;
 class TRGCDCSegmentHit;
 class TRGCDCFrontEnd;
 class TRGCDCMerger;
+class TRGCDCPerfectFinder;
 class TRGCDCHoughFinder;
 class TRGCDCHough3DFinder;
 class TRGCDCFitter3D;
@@ -66,11 +67,12 @@ class TRGCDC {
     static TRGCDC * getTRGCDC(const std::string & configFile,
 			      unsigned simulationMode = 0,
 			      unsigned firmwareSimulationMode = 0,
+                              bool perfect2DFinder = false,
+                              bool perfect3DFinder = false,
 			      const std::string & innerTSLUTDataFile = "?",
 			      const std::string & outerTSLUTDataFile = "?",
-            const std::string & rootTRGCDCFile = "?",
-            const std::string & rootFitter3DFile = "?",
-                              bool houghFinderPerfect = false,
+			      const std::string & rootTRGCDCFile = "?",
+			      const std::string & rootFitter3DFile = "?",
                               unsigned houghFinderMeshX = 96,
                               unsigned houghFinderMeshY = 96,
                               bool fLRLUT = 1,
@@ -86,11 +88,12 @@ class TRGCDC {
     TRGCDC(const std::string & configFile,
 	   unsigned simulationMode,
 	   unsigned firmwareSimulationMode,
+	   bool perfect2DFinder,
+	   bool perfect3DFinder,
 	   const std::string & innerTSLUTDataFile,
 	   const std::string & outerTSLUTDataFile,
-     const std::string & rootTRGCDCFile,
-     const std::string & rootFitter3DFile,
-           bool houghFinderPerfect,
+	   const std::string & rootTRGCDCFile,
+	   const std::string & rootFitter3DFile,
            unsigned houghFinderMeshX,
            unsigned houghFinderMeshY,
            bool fLRLUT,
@@ -100,9 +103,7 @@ class TRGCDC {
     virtual ~TRGCDC();
 
     /// initializes CDC geometry.
-    void initialize(bool houghFinderPerfect,
-                    unsigned houghFinderMeshX,
-                    unsigned houghFinderMeshY);
+    void initialize(unsigned houghFinderMeshX, unsigned houghFinderMeshY);
 
     /// configures trigger modules for firmware simulation.
     void configure(void);
@@ -272,7 +273,7 @@ class TRGCDC {
     std::vector<const TRGCDCWireHitMC *> hitsMC(void) const;
 
     /// returns bad hits(finding invalid hits).
-//    std::vector<const TRGCDCWireHit *> badHits(void) const;
+//  std::vector<const TRGCDCWireHit *> badHits(void) const;
 
   public:// Utility functions
 
@@ -356,6 +357,12 @@ class TRGCDC {
 
     /// Firmware simulation mode.
     unsigned _firmwareSimulationMode;
+
+    /// Switch to activate perfect 2D finder.
+    const bool _perfect2DFinder;
+
+    /// Switch to activate perfect 3D finder.
+    const bool _perfect3DFinder;
 
     /// The filename of LUT for the inner-most track segments.
     std::string _innerTSLUTDataFilename;
@@ -459,6 +466,12 @@ class TRGCDC {
     /// CDC trigger merger boards.
     std::vector<TRGCDCMerger *> _mergers;
 
+    /// Perfect 2D finder.
+    TRGCDCPerfectFinder * _pFinder;
+
+    /// Perfect 3D finder.
+    TRGCDCPerfectFinder * _p3DFinder;
+
     /// Hough finder.
     TRGCDCHoughFinder * _hFinder;
 
@@ -472,8 +485,7 @@ class TRGCDC {
     std::vector<TRGCDCLUT *> _luts;
 
     /// EventTime
-//    TRGCDCEventTime *_eventTime;
-
+//  TRGCDCEventTime *_eventTime;
     std::vector<TRGCDCEventTime *> _eventTime;
 
     /// Event number

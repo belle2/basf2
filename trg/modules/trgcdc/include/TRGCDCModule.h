@@ -82,8 +82,11 @@ class TRGCDCModule : public Module {
     /// Switch to simulate firmwares. 0:do nothing, 1:do everything
     int _firmwareSimulationMode;
 
-    /// Switch for the perfect finder.
-    bool _hFinderPerfect;
+    /// Switch to activate perfect 2D finder.
+    bool _perfect2DFinder;
+
+    /// Switch to activate perfect 3D finder.
+    bool _perfect3DFinder;
 
     /// \# of X mesh for the Hough finder.
     int _hFinderMeshX;

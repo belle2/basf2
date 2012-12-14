@@ -66,6 +66,9 @@ class TRGCDCDisplay : public Gtk::Window {
     /// returns present condition for wire name display.
     bool wireName(void) const;
 
+    /// stops display in next dispay run command.
+    void stop(void);
+
   public: // Status
 
     /// sets present stage of display.

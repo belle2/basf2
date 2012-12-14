@@ -138,6 +138,13 @@ TRGCDCDisplay::clear(void) {
     _info = "";
 }
 
+void
+TRGCDCDisplay::stop(void) {
+    _nonStop = false;
+    _skip = false;
+    _skipEvent = false;
+}
+
 } // namespace Belle2
 
 #endif

@@ -42,7 +42,8 @@ TRGCDCModule::TRGCDCModule()
       _curlBackStop(0),
       _simulationMode(0),
       _firmwareSimulationMode(0),
-      _hFinderPerfect(false),
+      _perfect2DFinder(false),
+      _perfect3DFinder(false),
 //    _hFinderMeshX(96),
       _hFinderMeshX(180),
 //    _hFinderMeshY(96),
@@ -81,15 +82,22 @@ TRGCDCModule::TRGCDCModule()
              _curlBackStop,
              "Curl back stop parameter",
              _curlBackStop);
-    addParam("HoughFinderPerfect",
-             _hFinderPerfect,
-             "Hough finder perfect option",
-             _hFinderPerfect);
-    addParam("SimulationMode", _simulationMode, "TRGCDC simulation mode", _simulationMode);
+    addParam("SimulationMode",
+	     _simulationMode,
+	     "TRGCDC simulation mode",
+	     _simulationMode);
     addParam("FirmwareSimulationMode",
 	     _firmwareSimulationMode,
 	     "TRGCDC firmware simulation mode",
 	     _firmwareSimulationMode);
+    addParam("2DFinderPerfect",
+             _perfect2DFinder,
+             "2D finder perfect option",
+             _perfect2DFinder);
+    addParam("3DFinderPerfect",
+             _perfect3DFinder,
+             "3D finder perfect option",
+             _perfect3DFinder);
     addParam("HoughFinderMeshX",
              _hFinderMeshX,
              "Hough finder # mesh in x",
@@ -108,8 +116,8 @@ TRGCDCModule::TRGCDCModule()
              _fevtTime);
 
     if (TRGDebug::level())
-      cout << "TRGCDCModule ... created" << endl;
-  }
+	cout << "TRGCDCModule ... created" << endl;
+}
 
   TRGCDCModule::~TRGCDCModule()
   {
@@ -125,35 +133,34 @@ TRGCDCModule::TRGCDCModule()
       cout << "TRGCDCModule ... destructed " << endl;
   }
 
-  void
-  TRGCDCModule::initialize()
-  {
+void
+TRGCDCModule::initialize() {
 
     //...Stop curl buck...
     if (_curlBackStop) {
-      G4RunManager* g4rm = G4RunManager::GetRunManager();
-      if(g4rm!=0){
-        if(g4rm->GetUserPhysicsList()!=0){
-         _sa = new TCSAction();
-         g4rm->SetUserAction(_sa);
-        }
-      }
+	G4RunManager* g4rm = G4RunManager::GetRunManager();
+	if(g4rm!=0){
+	    if(g4rm->GetUserPhysicsList()!=0){
+		_sa = new TCSAction();
+		g4rm->SetUserAction(_sa);
+	    }
+	}
     }
     TRGDebug::level(_debugLevel);
 
     if (TRGDebug::level()) {
-      cout << "TRGCDCModule::initialize ... options" << endl;
-      cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
-           << endl;
-      cout << TRGDebug::tab(4) << "back stop = " << _curlBackStop << endl;
-      cout << TRGDebug::tab(4) << "finder perfect = " << _hFinderPerfect
-           << endl;
-      cout << TRGDebug::tab(4) << "Hough finder Mesh X = " << _hFinderMeshX
-           << endl;
-      cout << TRGDebug::tab(4) << "Hough finder Mesh Y = " << _hFinderMeshY
-           << endl;
+	cout << "TRGCDCModule::initialize ... options" << endl;
+	cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
+	     << endl;
+	cout << TRGDebug::tab(4) << "back stop = " << _curlBackStop << endl;
+	cout << TRGDebug::tab(4) << "2D finder perfect = " << _perfect2DFinder
+	     << endl;
+	cout << TRGDebug::tab(4) << "Hough finder Mesh X = " << _hFinderMeshX
+	     << endl;
+	cout << TRGDebug::tab(4) << "Hough finder Mesh Y = " << _hFinderMeshY
+	     << endl;
     }
-  }
+}
 
 void
 TRGCDCModule::beginRun() {
@@ -166,15 +173,16 @@ TRGCDCModule::beginRun() {
 	_cdc = TRGCDC::getTRGCDC(_configFilename,
 				 _simulationMode,
 				 _firmwareSimulationMode,
+				 _perfect2DFinder,
+				 _perfect3DFinder,
 				 _innerTSLUTDataFilename,
 				 _outerTSLUTDataFilename,
-         _rootTRGCDCFilename,
-         _rootFitter3DFilename,
-				 _hFinderPerfect,
+				 _rootTRGCDCFilename,
+				 _rootFitter3DFilename,
 				 _hFinderMeshX,
 				 _hFinderMeshY,
-         _fLRLUT,
-	 _fevtTime);
+				 _fLRLUT,
+				 _fevtTime);
 
     if (TRGDebug::level())
 	cout << "TRGCDCModule ... beginRun called " << endl;

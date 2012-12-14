@@ -18,7 +18,7 @@
 #include <vector>
 
 #ifdef TRGCDC_SHORT_NAMES
-#define TCPFinder TRGCDCPeakFinder
+#define TCPeakFinder TRGCDCPeakFinder
 #endif
 
 namespace Belle2 {

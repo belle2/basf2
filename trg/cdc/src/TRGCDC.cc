@@ -1523,7 +1523,7 @@ TRGCDC::simulate(void) {
     } // End of loop over last layer candidates
 
     //...MC track information...
-    const unsigned localSwitch = 1;           // 0:for found MC trk only
+    const unsigned localSwitch = 0;           // 0:for found MC trk only
                                               // 1:for all MC trk
     // mcStatus[0]: statusbit, mcStatus[1]: pdg, mcStatus[2]: charge
     TVectorD mcStatus(3);

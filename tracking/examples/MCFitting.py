@@ -70,7 +70,8 @@ pGun.param(param_pGun)
 
 # simulation
 g4sim = register_module('FullSim')
-g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
+# this is needed for the MCTrackFinder to work correctly
+g4sim.param('StoreAllSecondaries', True)
 # make the simulation less noisy
 g4sim.logging.log_level = LogLevel.ERROR
 
@@ -100,7 +101,6 @@ cdcfitting = register_module('GenFitter')
 # fit the tracks with one iteration of Kalman filter
 param_cdcfitting = {
     'StoreFailedTracks': 0,
-    'mcTracks': 1,
     'FilterId': 0,
     'NIterations': 1,
     'ProbCut': 0.001,

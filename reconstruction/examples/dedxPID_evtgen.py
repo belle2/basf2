@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import os
 import random
 from basf2 import *
@@ -61,8 +62,8 @@ dedx_params = {
     'TrackDistanceThreshold': 4.0,
     'EnableDebugOutput': True,
     'PDFFile': os.path.join(basf2datadir,
-        'reconstruction/dedxPID_PDFs_r3701_235k_events_upper_80perc_trunc.root'
-        ),
+                            'reconstruction/dedxPID_PDFs_r3701_235k_events_upper_80perc_trunc.root'
+                            ),
     'IgnoreMissingParticles': False,
     }
 dedx.param(dedx_params)

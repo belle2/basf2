@@ -14,7 +14,7 @@ input = register_module('RootInput')
 input.param('inputFileName', '../EvtGenSimRec.root')
 
 dedx = register_module('DedxPID')
-dedx_params = {
+dedx_params = {  # use default PDF file
     'UseIndividualHits': True,
     'RemoveLowest': 0.15,
     'RemoveHighest': 0.15,
@@ -24,7 +24,6 @@ dedx_params = {
     'UseCDC': True,
     'TrackDistanceThreshold': 4.0,
     'EnableDebugOutput': True,
-#use default PDF file
     'IgnoreMissingParticles': False,
     }
 dedx.param(dedx_params)
@@ -39,7 +38,7 @@ main.add_module(dedx)
 
 output = register_module('RootOutput')
 output.param('outputFileName', 'EvtGenSimRec_dedx.root')
-#avoid some issues with missing dictionaries for rktrackrep etc.
+# avoid some issues with missing dictionaries for rktrackrep etc.
 output.param('branchNames', ['DedxLikelihoods', 'DedxTracks', 'EventMetaData'])
 main.add_module(output)
 

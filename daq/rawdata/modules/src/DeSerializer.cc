@@ -28,7 +28,9 @@ DeSerializerModule::DeSerializerModule() : Module()
   setDescription("Encode DataStore into RingBuffer");
   //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
 
-  addParam("Port", m_port, "Receiver Port", 1111);
+  vector<int> default_port;
+  default_port.push_back(1111);
+  addParam("Port", m_port, "Receiver Ports (list)", default_port);
   m_nsent = 0;
   m_compressionLevel = 0;
   m_buffer = new int[MAXEVTSIZE];
@@ -46,14 +48,19 @@ DeSerializerModule::~DeSerializerModule()
 void DeSerializerModule::initialize()
 {
 
-  // Open receiving socekt
-  m_recv = new EvtSocketRecv(m_port);
+  // Open receiver sockets
+  for (unsigned int i = 0; i < m_port.size(); i++) {
+    m_recv.push_back(new EvtSocketRecv(m_port[i]));
+  }
 
   // Open message handler
   m_msghandler = new MsgHandler(m_compressionLevel);
 
-  // Initialize EventMetaData
-  StoreObjPtr<EventMetaData>::registerPersistent();
+  // Initialize EvtMetaData
+  m_eventMetaDataPtr.registerAsPersistent();
+
+  // Initialize Array of RawCOPPER
+  StoreArray<RawCOPPER>::registerPersistent();
 
   B2INFO("Rx initialized.");
 }
@@ -64,71 +71,39 @@ void DeSerializerModule::beginRun()
   B2INFO("beginRun called.");
 }
 
-
 void DeSerializerModule::event()
 {
-  // Event Meta Data
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  eventMetaDataPtr->setExperiment(1);
-  eventMetaDataPtr->setRun(1);
-  eventMetaDataPtr->setEvent(m_nsent);
+  // DataStore interface
+  StoreArray<RawCOPPER> rawcprary;
 
-  // Get a record from socket
-  int stat = m_recv->recv_buffer((char*)m_buffer);
-  if (stat <= 0) {
-    return;
+  // Read sockets and fill RawCOPPER object
+  for (unsigned int i = 0; i < m_recv.size(); i++) {
+    // Get a record from socket
+    int stat = m_recv[i]->recv_buffer((char*)m_buffer);
+    if (stat <= 0) {
+      return; // Exit if EoD is found without updating EventMetaData
+    }
+    B2INFO("DeSer: port = " << m_port[i] << " stat = " << stat <<
+           " : size=" << m_buffer[0]
+           << " hdr = " << m_buffer[1] <<  " data = " << m_buffer[2]);
+    //  int nw = m_buffer[0];
+
+    // Fill RawCOPPER
+    RawCOPPER rawcpr(m_buffer);
+
+    // Put it in DataStore
+    rawcprary.appendNew(rawcpr);
   }
-  B2INFO("DeSer: stat = " << stat << " : size=" << m_buffer[0]
-         << " hdr = " << m_buffer[1] <<  " data = " << m_buffer[2]);
-  /*
-  if (msg->type() == MSG_TERMINATE){
-    B2INFO ( "Rx: got termination message. Exitting...." );
-    return;
-    // Flag End Of File !!!!!
-    //    return msg->type(); // EOF
-  }
 
-  // Build EvtMessage and decompose it
-  vector<TObject*> objlist;
-  vector<string> namelist;
-  m_msghandler->decode_msg(msg, objlist, namelist);
-  B2INFO ( "Rx: message decoded!" );
-
-  // Get Object info
-  RECORD_TYPE type = msg->type();
-  DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
-  int nobjs = (msg->header())->reserved[1];
-  int narrays = (msg->header())->reserved[2];
-
-  //  printf ( "Rx: nobjs = %d, narrays = %d\n", nobjs, narrays );
-
-  // Restore objects in DataStore
-  for (int i = 0; i < nobjs; i++) {
-    DataStore::Instance().storeObject(objlist.at(i),
-                                      namelist.at(i));
-    B2INFO ( "Rx: restored obj " << namelist.at(i) );
-  }
-  B2INFO ( "Rx: Objs restored" );
-
-  // Restore arrays in DataStore
-  for (int i = 0; i < narrays; i++) {
-    DataStore::Instance().storeArray((TClonesArray*)objlist.at(i + nobjs),
-                                     namelist.at(i+nobjs));
-    B2INFO ( "Rx: restored array " << namelist.at(i+nobjs) );
-  }
-  B2INFO ( "Rx: DataStore Restored!!" );
-
-  delete msg;
-  */
+  // Update EventMetaData
+  m_eventMetaDataPtr.create();
+  m_eventMetaDataPtr->setExperiment(1);
+  m_eventMetaDataPtr->setRun(1);
+  m_eventMetaDataPtr->setEvent(m_nsent);
 
   m_nsent++;
 
-  //  if ( m_nsent%1000 == 0 ) printf ( "event = %d\n", m_nsent );
-  //  printf ( "event = %d\n", m_nsent );
-
-
   return;
-  //  return type;
 }
 
 void DeSerializerModule::endRun()

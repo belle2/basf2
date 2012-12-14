@@ -11,7 +11,7 @@
 using namespace std;
 using namespace Belle2;
 
-extern RawCDC* RAWCDC;
+//extern RawCDC* RAWCDC;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -66,9 +66,12 @@ void SerializerModule::beginRun()
 void SerializerModule::event()
 {
   // Hand written streamer
-  int* buf = RAWCDC->buffer();
+  //  int* buf = RAWCDC->buffer();
+  //  int nbytes = buf[0] * 4;
+
+  StoreObjPtr<RawCOPPER> rawcopper;
+  int* buf = rawcopper->buffer();
   int nbytes = buf[0] * 4;
-  //  nbytes = 4;
 
   int stat = m_sock->send_buffer(nbytes, (char*)buf);
 

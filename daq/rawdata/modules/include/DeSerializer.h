@@ -18,6 +18,7 @@
 #include <framework/pcore/MsgHandler.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <daq/dataflow/EvtSocket.h>
 
@@ -51,11 +52,14 @@ namespace Belle2 {
 
     // Parallel processing parameters
 
+    // Event Meta Data
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+
     //! Receiver Port
-    int m_port;
+    std::vector<int> m_port;
 
     //! Reciever Socket
-    EvtSocketRecv* m_recv;
+    std::vector<EvtSocketRecv*> m_recv;
 
     //! Messaage handler
     MsgHandler* m_msghandler;
@@ -68,6 +72,12 @@ namespace Belle2 {
 
     //! buffer
     int* m_buffer;
+
+    // For monitoring
+    timeval m_t0;
+    double m_totbytes;
+    int m_ncycle;
+
 
   };
 

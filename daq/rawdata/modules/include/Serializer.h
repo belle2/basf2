@@ -20,6 +20,7 @@
 #include <daq/dataflow/EvtSocket.h>
 
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <daq/dataobjects/RawCDC.h>

@@ -18,6 +18,7 @@
 #include <framework/core/Environment.h>
 
 #include <TClonesArray.h>
+#include <TBaseClass.h>
 #include <TTreeIndex.h>
 #include <TProcessID.h>
 #include <TSystem.h>
@@ -136,13 +137,13 @@ void RootOutputModule::initialize()
         continue;
       }
 
-      const TClass* entryClass = iter->second->object->IsA();
+      TClass* entryClass = iter->second->object->IsA();
       if (iter->second->isArray) {
         entryClass = static_cast<TClonesArray*>(iter->second->object)->GetClass();
       }
-      if (entryClass->GetClassVersion() <= 0) {
+
+      if (!hasStreamers(entryClass))
         B2ERROR("The version number in the ClassDef() macro for class " << entryClass->GetName() << " must be at least 1 to enable I/O!");
-      }
 
       m_tree[ii]->Branch(branchName.c_str(), &iter->second->object, bufsize, m_splitLevel);
       m_tree[ii]->SetBranchAddress(branchName.c_str(), &iter->second->object);
@@ -151,6 +152,26 @@ void RootOutputModule::initialize()
     }
   }
   dir->cd();
+}
+
+bool RootOutputModule::hasStreamers(TClass* cl)
+{
+  if (cl == TObject::Class())
+    return false;
+
+  if (cl->GetClassVersion() <= 0) {
+    // version number == 0 means no streamers for this class, check base classes
+    TList* baseClasses = cl->GetListOfBases();
+    TIter it(baseClasses);
+    while (TBaseClass* base = static_cast<TBaseClass*>(it())) {
+      if (hasStreamers(base->GetClassPointer()))
+        return true;
+    }
+    //nothing found
+    return false;
+  } else {
+    return true;
+  }
 }
 
 void RootOutputModule::beginRun()

@@ -93,10 +93,18 @@ void ECLHitDebugModule::event()
   // Get number of hits in this event
   int nHits = eclSimArray->GetEntriesFast();
 
-  double E_cell[8736][16] = {{0}};
-  //double X_ave[8736][16] = {{0}};
-  //double T_ave[8736][16] = {{0}};
-  double Tof_ave[8736][16] = {{0}};
+  //double E_cell[8736][16] = {{0}};
+  //double Tof_ave[8736][16] = {{0}};
+
+
+  int const Nbin = 80;
+  int const interval = 8000 / Nbin;
+  static float E_cell[8736][Nbin];
+  static float Tof_ave[8736][Nbin];
+  memset(E_cell, 0, sizeof(float) * 8736 * Nbin);
+  memset(Tof_ave, 0, sizeof(float) * 8736 * Nbin);
+
+
 
   // Get instance of ecl geometry parameters
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
@@ -122,10 +130,8 @@ void ECLHitDebugModule::event()
     for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
 
       if (hitCellId == iECLCell && hitTOF < 8000) {
-        int TimeIndex = (int) hitTOF / 500;
+        int TimeIndex = (int) hitTOF / interval;
         E_cell[iECLCell][TimeIndex] = E_cell[iECLCell][TimeIndex] + hitE;
-//        X_ave[iECLCell][TimeIndex] = X_ave[iECLCell][TimeIndex] + hitE * local_pos;
-//        Tof_ave[iECLCell][TimeIndex] = Tof_ave[iECLCell][TimeIndex] + hitE * hitTOF;
         Tof_ave[iECLCell][TimeIndex]  += (6.05 + 0.0749 * local_pos - 0.00112 * local_pos * local_pos + hitTOF) * hitE ;
       }
     } // End loop crsyal 8736
@@ -134,14 +140,9 @@ void ECLHitDebugModule::event()
 
 
   for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-    for (int  TimeIndex = 0; TimeIndex < 16; TimeIndex++) {
+    for (int  TimeIndex = 0; TimeIndex < Nbin; TimeIndex++) {
 
       if (E_cell[iECLCell][TimeIndex] > 1.0e-9) {
-
-//        X_ave[iECLCell][TimeIndex] = X_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
-//        T_ave[iECLCell][TimeIndex]  =  6.05 + 0.0749 * X_ave[iECLCell][TimeIndex] - 0.00112 * X_ave[iECLCell][TimeIndex] * X_ave[iECLCell][TimeIndex];
-//        Tof_ave[iECLCell][TimeIndex] =  Tof_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
-
 
         StoreArray<ECLDebugHit> eclHitArray;
         if (!eclHitArray) eclHitArray.create();

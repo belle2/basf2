@@ -211,7 +211,7 @@ namespace Belle2 {
       if (firstcall == 0 || m_currentEvnetNumber != m_oldEvnetNumber) {
         m_oldEvnetNumber = m_currentEvnetNumber;
         for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-          for (int  TimeIndex = 0; TimeIndex < 16; TimeIndex++) {
+          for (int  TimeIndex = 0; TimeIndex < 80; TimeIndex++) {
             ECLHitIndex[iECLCell][TimeIndex] = -1;
           }
         }
@@ -221,7 +221,7 @@ namespace Belle2 {
 
       if (m_currentEvnetNumber == m_oldEvnetNumber) {
         if ((tof / ns) < 8000) {
-          TimeIndex = (int)((tof / ns) / 500);
+          TimeIndex = (int)((tof / ns) / 100);
           double E_cell = (edep / GeV);
           if (ECLHitIndex[cellId][TimeIndex] == -1) {
             m_hitNum = eclHitArray->GetLast() + 1;

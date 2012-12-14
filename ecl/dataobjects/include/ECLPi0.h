@@ -66,7 +66,6 @@ namespace Belle2 {
      */
     void setChi2(float Chi2) { m_Chi2 = Chi2; }
 
-    TVector3 getp() const { TVector3 momentum(m_Px, m_Py, m_Pz); return momentum ; }
     /*! Get Momentum after mass constraint fit
      * @return HepLorentzVector Momentum  after mass constraint fit
      */

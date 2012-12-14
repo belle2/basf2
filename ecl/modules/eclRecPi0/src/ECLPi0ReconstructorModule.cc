@@ -95,7 +95,7 @@ void ECLPi0ReconstructorModule::event()
   StoreArray<ECLShower> eclRecShowerArray;
   RelationArray eclGammaToShower(Gamma, eclRecShowerArray);
   StoreArray<ECLPi0> Pi0Array;
-  RelationArray eclPi0ToShower(Pi0Array, eclRecShowerArray);
+  RelationArray eclPi0ToGamma(Pi0Array, Gamma);
 
   for (int iGamma = 0; iGamma < eclGammaToShower.getEntries(); iGamma++) {
     if (eclGammaToShower[iGamma].getToIndices().size() != 1) {
@@ -106,6 +106,7 @@ void ECLPi0ReconstructorModule::event()
   for (int iGamma1 = 0; iGamma1 < Gamma->GetEntriesFast() - 1; iGamma1++) {
     ECLGamma* aECLGamma1 = Gamma[iGamma1];
     double EGamma1 =  aECLGamma1->getEnergy();
+    m_showerId1 = aECLGamma1->getShowerId();
     m_px1 = aECLGamma1->getPx();
     m_py1 = aECLGamma1->getPy();
     m_pz1 = aECLGamma1->getPz();
@@ -118,6 +119,7 @@ void ECLPi0ReconstructorModule::event()
     for (int iGamma2 = iGamma1 + 1; iGamma2 < Gamma->GetEntriesFast(); iGamma2++) {
       ECLGamma* aECLGamma2 = Gamma[iGamma2];
       double EGamma2 =  aECLGamma2->getEnergy();
+      m_showerId2 = aECLGamma2->getShowerId();
       m_px2 = aECLGamma2->getPx();
       m_py2 = aECLGamma2->getPy();
       m_pz2 = aECLGamma2->getPz();
@@ -200,8 +202,8 @@ void ECLPi0ReconstructorModule::event()
                     Pi0Array[m_Pi0Num]->setMassFit((float)m_pi0mass);
                     Pi0Array[m_Pi0Num]->setChi2((float)m_pi0chi2);
           */
-          eclPi0ToShower.add(m_Pi0Num, m_showerId1);
-          eclPi0ToShower.add(m_Pi0Num, m_showerId2);
+          eclPi0ToGamma.add(m_Pi0Num, iGamma1);
+          eclPi0ToGamma.add(m_Pi0Num, iGamma2);
           //cout << "Event " << m_nEvent << " Pi0 from Gamma " << m_showerId1 << " " << m_showerId2 << " " << m_pi0E << " " << m_pi0mass << endl;
 
         }

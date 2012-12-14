@@ -81,8 +81,9 @@ bool DataStore::createEntry(const std::string& name, EDurability durability,
     info.outputs.insert(name);
 
   // Check whether the map entry already exists
-  if (m_storeObjMap[durability].find(name) != m_storeObjMap[durability].end()) {
-    StoreEntry* entry = m_storeObjMap[durability][name];
+  const StoreObjConstIter& it = m_storeObjMap[durability].find(name);
+  if (it != m_storeObjMap[durability].end()) {
+    StoreEntry* entry = it->second;
 
     // Complain about existing entry
     if (errorIfExisting) {
@@ -123,8 +124,10 @@ bool DataStore::createEntry(const std::string& name, EDurability durability,
 bool DataStore::hasEntry(const std::string& name, EDurability durability,
                          const TClass* objClass, bool array)
 {
-  if (m_storeObjMap[durability].find(name) != m_storeObjMap[durability].end()) {
-    return checkType(name, m_storeObjMap[durability][name], objClass, array);
+  const StoreObjConstIter& it = m_storeObjMap[durability].find(name);
+
+  if (it != m_storeObjMap[durability].end()) {
+    return checkType(name, it->second, objClass, array);
   } else {
     return false;
   }
@@ -242,8 +245,9 @@ bool DataStore::addRelation(const TObject* fromObject, DataStore::StoreEntry*& f
 
   // get the relations from -> to
   const string& relationsName = relationName(fromEntry->name, toEntry->name);
-  if (m_storeObjMap[c_Event].find(relationsName) == m_storeObjMap[c_Event].end()) return false;
-  StoreEntry* entry = m_storeObjMap[c_Event][relationsName];
+  const StoreObjConstIter& it = m_storeObjMap[c_Event].find(relationsName);
+  if (it == m_storeObjMap[c_Event].end()) return false;
+  StoreEntry* entry = it->second;
 
   // auto create relations if needed
   if (!entry->ptr) {

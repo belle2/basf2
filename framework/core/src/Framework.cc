@@ -83,15 +83,21 @@ void Framework::process(PathPtr startPath, long maxEvent)
     return;
   }
 
-  already_executed = true;
-  if (Environment::Instance().getNumberProcesses() == 0) {
-    EventProcessor processor(*m_pathManager);
-    processor.process(startPath, maxEvent);
-  } else if (maxEvent <= 0) {
-    pEventProcessor processor(*m_pathManager);
-    processor.process(startPath);
-  } else {
-    B2FATAL("process(path, maxEvent) not supported when using parallel processing.")
+  try {
+    already_executed = true;
+    if (Environment::Instance().getNumberProcesses() == 0) {
+      EventProcessor processor(*m_pathManager);
+      processor.process(startPath, maxEvent);
+    } else if (maxEvent <= 0) {
+      pEventProcessor processor(*m_pathManager);
+      processor.process(startPath);
+    } else {
+      B2FATAL("process(path, maxEvent) not supported when using parallel processing.")
+    }
+  } catch (...) {
+    B2ERROR("Uncaught exception encountered!"); //should show module name
+    throw; //and let python's global handler do the rest
+    //TODO: having a stack trace would be nicer, but somehow a handler I set using std::set_terminate() never gets called
   }
 }
 

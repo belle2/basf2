@@ -43,7 +43,7 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   m_attenuationLength = Digitizer.getLength("AttenuationLength");
   m_expCoefficient = Digitizer.getDouble("SignalShapeExpCoefficient");
   m_meanSiPMNoise = Digitizer.getDouble("BackgroundPoissonMean");
-  m_enableConstBkg = Digitizer.getDouble("EnableConstantBackgroundInTheFit");
+  m_enableConstBkg = Digitizer.getInt("EnableConstantBackgroundInTheFit");
 
   m_stripName = "Strip" + boost::lexical_cast<std::string>(entry.first);
 
@@ -139,7 +139,7 @@ void EKLM::FiberAndElectronics::processEntry()
   m_fitFunction->SetParameters(10, 2., 0.04, 50, m_enableConstBkg);
   m_fitFunction->SetParLimits(0, 0, m_histRange);
   m_fitFunction->SetParLimits(1, 0, m_histRange);
-  if (abs(m_enableConstBkg) < 0.0001)
+  if (m_enableConstBkg == 0)
     m_fitFunction->FixParameter(4, 0);
 
   // do fit

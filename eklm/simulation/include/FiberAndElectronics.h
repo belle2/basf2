@@ -148,11 +148,9 @@ namespace Belle2 {
       double m_meanSiPMNoise;
 
       /**
-       * If non-zero used as a seed value for constant background fraction
-       * in the fit.
        * If zero fix constant background fraction to zero.
        */
-      double m_enableConstBkg;
+      int m_enableConstBkg;
 
       /** Deexcitation time for scintillator (unit=ns). */
       double m_scintillatorDeExcitationTime;

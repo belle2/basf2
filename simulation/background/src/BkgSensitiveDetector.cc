@@ -40,9 +40,7 @@ namespace Belle2 {
     registerMCParticleRelation(relBeamBackHitToMCParticle);
 
     beamBackHits.registerAsPersistent();
-    if (!DataStore::Instance().hasEntry(relBeamBackHitToMCParticle.getName(), DataStore::c_Event, RelationContainer::Class(), false)) {
-      RelationArray::registerPersistent<MCParticle, BeamBackHit>();
-    }
+    relBeamBackHitToMCParticle.registerAsPersistent();
 
     std::string subDet = subDett;
     if (subDet == "IR")    m_subDet = 0;
@@ -102,9 +100,8 @@ namespace Belle2 {
         neutWeight = wt.getWeight(m_startEnergy / Unit::MeV);
       }
       StoreArray<BeamBackHit> beamBackHits;
-      if (!beamBackHits) beamBackHits.create();
-      int nentr = beamBackHits->GetLast() + 1;
-      new(beamBackHits->AddrAt(nentr)) BeamBackHit(m_subDet, m_identifier, pdgCode, m_trackID, m_startPos, m_startMom, m_startTime, endEnergy, m_startEnergy, m_energyDeposit, m_trackLength, neutWeight);
+      int nentr = beamBackHits.getEntries();
+      new(beamBackHits.nextFreeAddress()) BeamBackHit(m_subDet, m_identifier, pdgCode, m_trackID, m_startPos, m_startMom, m_startTime, endEnergy, m_startEnergy, m_energyDeposit, m_trackLength, neutWeight);
 
 
       // create relation to MCParticle

@@ -91,33 +91,37 @@ void EvtGenInputModule::event()
 {
   B2INFO("Starting event simulation.");
 
+  double mEle;
+  double angleLerToB, Eler, pLerX, pLerY, pLerZ;
+  double angleHerToB, Eher, pHerX, pHerY, pHerZ;
+  TLorentzVector vlLer, vlHer, pParentParticle;
 
   //Initialize the beam energy for each event separatly
+  for (;;) {
+    mEle = Const::electronMass;
 
-  double mEle = Const::electronMass;
-
-  double angleLerToB = M_PI - m_angle;
-  double Eler = gRandom->Gaus(m_ELER, m_LER_Espread); //Beam energy spread
-  double pLerZ = Eler * cos(angleLerToB);
-  double pLerX = Eler * sin(angleLerToB);
-  double pLerY = 0.;
+    angleLerToB = M_PI - m_angle;
+    Eler = gRandom->Gaus(m_ELER, m_LER_Espread); //Beam energy spread
+    pLerZ = Eler * cos(angleLerToB);
+    pLerX = Eler * sin(angleLerToB);
+    pLerY = 0.;
 
 
-  double angleHerToB = m_crossing_angle - m_angle;
-  double Eher = gRandom->Gaus(m_EHER, m_HER_Espread); //Beam energy spread
-  double pHerZ = Eher * cos(angleHerToB);
-  double pHerX = Eher * sin(angleHerToB);
-  double pHerY = 0.;
+    angleHerToB = m_crossing_angle - m_angle;
+    Eher = gRandom->Gaus(m_EHER, m_HER_Espread); //Beam energy spread
+    pHerZ = Eher * cos(angleHerToB);
+    pHerX = Eher * sin(angleHerToB);
+    pHerY = 0.;
 
-  TLorentzVector vlLer;
-  vlLer.SetXYZM(pLerX, pLerY, pLerZ, mEle);
+    vlLer.SetXYZM(pLerX, pLerY, pLerZ, mEle);
 
-  TLorentzVector vlHer;
-  vlHer.SetXYZM(pHerX, pHerY, pHerZ, mEle);
+    vlHer.SetXYZM(pHerX, pHerY, pHerZ, mEle);
 
-  TLorentzVector pParentParticle;
+    pParentParticle = (vlHer + vlLer);
 
-  pParentParticle = (vlHer + vlLer);
+    if (pParentParticle.M() > EvtPDL::getMinMass(EvtPDL::getId(m_parentParticle)) &&
+        pParentParticle.M() < EvtPDL::getMaxMass(EvtPDL::getId(m_parentParticle))) break;
+  }
 
   //end initialization
 

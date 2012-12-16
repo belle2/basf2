@@ -22,14 +22,14 @@ g4sim = register_module('FullSim')
 # one event
 evtmetagen.param('ExpList', [0])
 evtmetagen.param('RunList', [1])
-evtmetagen.param('EvtNumList', [3])
+evtmetagen.param('EvtNumList', [1000])
 
 import random
 intseed = random.randint(1, 10000000)
 
 pGun = register_module('ParticleGun')
 param_pGun = {
-    'pdgCodes': [111],
+    'pdgCodes': [13],
     'nTracks': 1,
     'momentumGeneration': 'uniform',
     'momentumParams': [1., 1.],
@@ -107,7 +107,7 @@ main.add_module(makeGamma)
 main.add_module(makePi0)
 main.add_module(makeMatch)
 simpleoutput = register_module('RootOutput')
-simpleoutput.param('outputFileName', 'Output.root')
+simpleoutput.param('outputFileName', '../ECLMuonOutput.root')
 main.add_module(simpleoutput)
 
 process(main)

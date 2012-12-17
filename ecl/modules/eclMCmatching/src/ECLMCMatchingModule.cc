@@ -259,28 +259,26 @@ void ECLMCMatchingModule::event()
         }//for the shower to reconstruct gamma
       }//for all eclGammaToShower relation
       }//if gammaArray exit
+  */
 
-      StoreArray<ECLPi0> Pi0Array;
-      RelationArray eclPi0ToShower(Pi0Array, eclRecShowerArray);
-      if(Pi0Array){
-      for (int iIndex = 0; iIndex < eclPi0ToShower.getEntries() ; iIndex++) {
-        for (int iHit = 0; iHit < (int)eclPi0ToShower[iIndex].getToIndices().size(); iHit++) {
-          for (int index = 0; index < eclShowerToMCPart.getEntries(); index++) {
-          if(eclPi0ToShower[iIndex].getToIndex(iHit) == eclShowerToMCPart[index].getFromIndex()){
-             for (int iMCpart = 0; iMCpart < (int)eclShowerToMCPart[index].getToIndices().size(); iMCpart++) {
-              ECLShower* aECLShower = eclRecShowerArray[ eclPi0ToShower[iIndex].getToIndex(iHit) ];
-              cout << "Event" << m_nEvent << " Rec Pi0 from shower" << eclShowerToMCPart[index].getFromIndex()
-                   << " Energy " <<  aECLShower->getEnergy()
-                   << " theta " <<  aECLShower->getTheta() * 180 / M_PI << " phi " <<  aECLShower->getPhi() * 180 / M_PI
-                   << " From primary track" <<  eclShowerToMCPart[index].getToIndex(iMCpart)
-                   << " PDG " << mcParticles[ eclShowerToMCPart[index].getToIndex(iMCpart)]->getPDG()
-                   << endl;
-             }//for all matched mcparticle
-          }//if same shower ID
-          }//for all eclShowerToMCPart relation
+  /*
+    StoreArray<ECLPi0> Pi0Array;
+    StoreArray<ECLGamma> gammaArray;
+    RelationArray eclPi0ToGamma(Pi0Array, gammaArray);
+    if (Pi0Array) {
+      for (int iIndex = 0; iIndex < eclPi0ToGamma.getEntries() ; iIndex++) {
+        for (int iHit = 0; iHit < (int)eclPi0ToGamma[iIndex].getToIndices().size(); iHit++) {
+
+          ECLGamma* aECLGamma = gammaArray[ eclPi0ToGamma[iIndex].getToIndex(iHit) ];
+          cout << "Event" << m_nEvent << " Rec Pi0 from Gamma " <<  aECLGamma->getShowerId()
+               << " Energy " <<  aECLGamma->getEnergy()
+               << " Px " <<  aECLGamma->getPx()
+               << " Py " <<  aECLGamma->getPy()
+               << " Pz " <<  aECLGamma->getPz()
+               << endl;
         }//for the shower to reconstruct gamma
-      }//for all eclGammaToShower relation
-      }//if pi0Array exit
+      }//for all Pi0ToGamma relation
+    }//if pi0Array exit
   */
   m_nEvent++;
 

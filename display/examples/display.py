@@ -22,8 +22,8 @@ input.param('inputFileName', 'MCFittingEvtGenOutput.root')
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 # Since Geometry is only required for track extrapolation in inner detectors,
-# we'll exclude EKLM and ECL (saves about 20s in startup time)
-geometry.param('ExcludedComponents', ['EKLM', 'ECL'])
+# we'll exclude ECL (saves about 10s in startup time)
+geometry.param('ExcludedComponents', ['ECL'])
 
 main.add_module(input)
 main.add_module(gearbox)
@@ -79,4 +79,3 @@ main.add_module(display)
 
 process(main)
 #print statistics(statistics.INIT)
-print statistics

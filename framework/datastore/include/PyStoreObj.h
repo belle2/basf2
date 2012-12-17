@@ -79,8 +79,8 @@ namespace Belle2 {
     TClass* getClass(const std::string& name);
 
     TObject** m_storeObjPtr; /**< Pointer to pointer to object */
-    std::string m_name;
-    int m_durability;
+    std::string m_name; /**< Name of data store entry. */
+    int m_durability; /**< Durability of data store entry. */
 
     ClassDef(PyStoreObj, 0)
   };

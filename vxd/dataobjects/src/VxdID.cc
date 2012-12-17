@@ -28,7 +28,7 @@ namespace Belle2 {
         int next = in.get();
         if (next == '.') next = in.get();
         //If it is a wildcard we return 0 as id, otherwise we put it back in the stream
-        if (next == '*') {
+        if (next == '*' or in.eof()) {
           return 0;
         } else {
           in.unget();

@@ -8,11 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* System headers. */
+#include <stdio.h>
+
 /* Belle2 headr4es. */
 #include <eklm/dataobjects/EKLMHit2d.h>
 
 using namespace Belle2;
-using namespace std;
 
 ClassImp(Belle2::EKLMHit2d);
 
@@ -61,21 +63,20 @@ double EKLMHit2d::getChiSq() const
 
 void EKLMHit2d::Print()
 {
-  std::cout << "------------  Hit 2d  -------------- " << std::endl;
-  std::cout << "Endcap: " << getEndcap()
-            << " Layer: " << getLayer()
-            << " Sector: " << getSector() << "\n";
-  std::cout << "X: ";
+  printf("------------  Hit 2d  -------------- \n"
+         "Endcap: %d Layer: %d Sector: %d\n",
+         getEndcap(), getLayer(), getSector());
+  printf("X: ");
   m_XStrip->Print();
-  std::cout << "Y: ";
+  printf("Y: ");
   m_YStrip->Print();
-  std::cout << "intersection:";
+  printf("Intersection: ");
   m_crossPoint.Print();
-
-  std::cout << "ChiSq: " << m_ChiSq << std::endl;
+  printf("Chi squared: %f\n", m_ChiSq);
 }
 
 void EKLMHit2d::setChiSq(double chisq)
 {
   m_ChiSq = chisq;
 }
+

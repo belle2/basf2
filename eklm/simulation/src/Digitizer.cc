@@ -62,7 +62,6 @@ void EKLM::Digitizer::readAndSortStepHits()
 
 void EKLM::Digitizer::makeSimHits()
 {
-  using namespace boost;
   B2DEBUG(1, "EKLM::Digitizer::makeSimHits()");
 
 
@@ -117,7 +116,7 @@ void EKLM::Digitizer::makeSimHits()
     // istead of Track ID itself (which could be quite large).
     // this procedure drastically decreases number of graph vertices
 
-    adjacency_list <> G;
+    boost::adjacency_list <> G;
 
     // we here restore the tree of hits using TrackID and ParentTrackID information
     // There is a possibility for two hit trees wich are connected by parentTrackID outside the volume

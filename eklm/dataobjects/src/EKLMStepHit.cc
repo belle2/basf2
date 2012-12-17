@@ -13,8 +13,6 @@
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
-using namespace std;
-
 
 ClassImp(EKLMStepHit);
 
@@ -63,12 +61,10 @@ EKLMStepHit::EKLMStepHit(
   m_volid = volID;
 }
 
-
 double EKLMStepHit::getEnergy() const
 {
   return m_energy;
 }
-
 
 void EKLMStepHit::setEnergy(double E)
 {

@@ -13,7 +13,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 
-using namespace std;
 using namespace Belle2;
 
 ClassImp(Belle2::EKLMDigit);
@@ -115,10 +114,6 @@ double EKLMDigit::getMCTS() const
 
 void EKLMDigit::Print() const
 {
-  std::cout << "Endcap: " << getEndcap()
-            << " Layer: " << getLayer()
-            << " Sector: " << getSector()
-            << " Plane: " << getPlane()
-            << " Strip: " << getStrip()
-            << " # Time: " << m_Time << "\n";
+  printf("Endcap: %d Layer: %d Sector: %d Plane: %d Strip: %d # Time: %f\n",
+         getEndcap(), getLayer(), getSector(), getPlane(), getStrip(), m_Time);
 }

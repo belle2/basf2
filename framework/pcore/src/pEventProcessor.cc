@@ -1,5 +1,5 @@
 /*
- * pEventProcessor.cc
+ * pEventPrxocessor.cc
  *
  *  Created on: Oct 26, 2010
  *      Author: R.Itoh, IPNS, KEK
@@ -191,6 +191,7 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
       /*
       if ( iter == modlist.begin() &&
       module->hasProperties ( Module::c_HistogramManager ) ) {
+      if ( module->hasProperties ( Module::c_HistogramManager ) ) {
       m_histoflag = true;
       m_histoman = *iter;  // Register histomanager module if exists
       }
@@ -204,8 +205,10 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
           analyze_path(next, module, state);
         }
         if (module->hasProperties(Module::c_HistogramManager)) {
+          // Initialize histogram manager if found in the path
           m_histoflag = true;
           m_histoman = *iter;
+          module->initialize();
         }
       } else {
         state = 1;

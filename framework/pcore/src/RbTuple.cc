@@ -8,6 +8,7 @@
 
 #include <framework/core/HistoModule.h>
 #include <framework/pcore/RbTuple.h>
+#include <framework/pcore/ProcHandler.h>
 
 #include <framework/logging/Logger.h>
 
@@ -53,24 +54,28 @@ void RbTupleManager::init(int nprocess, const char* filename)
   strcpy(m_filename, filename);
   m_nproc = nprocess;
 
-  // Open current directory
-  std::string dir = ".";
-  DIR* dp;
-  struct dirent* dirp;
-  if ((dp = opendir(dir.c_str())) == NULL) {
-    B2ERROR("Error to open directory" << dir);
-    return;
-  }
-
-  // Scan the directory and delete temporary files
-  std::string compfile = std::string(filename) + ".";
-  while ((dirp = readdir(dp)) != NULL) {
-    std::string curfile = std::string(dirp->d_name);
-    if (curfile.compare(0, compfile.size(), compfile) == 0) {
-      unlink(curfile.c_str());
+  if (ProcHandler::EvtProcID() == -1 && m_nproc > 0) {
+    // should be called only from main
+    // Open current directory
+    std::string dir = ".";
+    DIR* dp;
+    struct dirent* dirp;
+    if ((dp = opendir(dir.c_str())) == NULL) {
+      B2ERROR("Error to open directory" << dir);
+      return;
     }
+
+    // Scan the directory and delete temporary files
+    std::string compfile = std::string(filename) + ".";
+    while ((dirp = readdir(dp)) != NULL) {
+      std::string curfile = std::string(dirp->d_name);
+      if (curfile.compare(0, compfile.size(), compfile) == 0) {
+        unlink(curfile.c_str());
+      }
+    }
+    closedir(dp);
+    cout << "HistoManager : old temporary histogram files deleted" << endl;
   }
-  closedir(dp);
 }
 
 // Function to register histogram definitions
@@ -102,7 +107,7 @@ int RbTupleManager::begin(int procid)
     hmod->defineHisto();
   }
 
-  //  printf ( "RbTupleManager::Histograms defined\n" );
+  //  printf ( "RbTupleManager::Histograms defined in proc %d\n", procid );
 
   return 0;
 }

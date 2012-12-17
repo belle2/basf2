@@ -1,16 +1,19 @@
-/*************************************************************************
-*  BASF2 (Belle Analysis Framework 2)                                    *
-*  Copyright(C) 2010 - Belle II Collaboration                            *
-*                                                                        *
-*  Author: The Belle II Collaboration                                    *
-*  Contributors: Kirill Chilikin                                         *
-*                                                                        *
-*  This software is provided "as is" without any warranty.               *
-* ***********************************************************************/
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2011  Belle II Collaboration                              *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Kirill Chilikin                                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
-#include <eklm/geometry/G4TriangularPrism.h>
+/* C++ headers. */
 #include <cmath>
 #include <new>
+
+/* Belle2 headers. */
+#include <eklm/geometry/G4TriangularPrism.h>
 
 using namespace Belle2;
 

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Timofey Uglov, Kirill Chilikin                           *
@@ -11,10 +11,9 @@
 #ifndef EKLMHITBASE_H
 #define EKLMHITBASE_H
 
-#include <sys/types.h>
+/* Extrenal headers. */
 #include <TObject.h>
 #include <TVector3.h>
-#include  <string>
 
 namespace Belle2 {
 

@@ -8,19 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOEKLMBELLEII_H_
-#define GEOEKLMBELLEII_H_
+#ifndef GEOEKLMBELLEII_H
+#define GEOEKLMBELLEII_H
 
+/* System headers. */
 #include <sys/types.h>
 
-#include <geometry/CreatorBase.h>
-#include <framework/gearbox/GearDir.h>
-#include <eklm/simulation/EKLMSensitiveDetector.h>
-#include <eklm/geometry/TransformData.h>
-#include <eklm/geometry/G4TriangularPrism.h>
-#include <eklm/geometry/GeoESTRCreator.h>
-#include <eklm/geometry/GeoEKLMTypes.h>
+/* C++ headers. */
+#include <string>
+#include <vector>
 
+/* External headers. */
 #include <G4LogicalVolume.hh>
 #include <G4Material.hh>
 #include <G4PVPlacement.hh>
@@ -31,8 +29,14 @@
 #include <G4SubtractionSolid.hh>
 #include <G4IntersectionSolid.hh>
 
-#include <string>
-#include <vector>
+/* Belle2 headers. */
+#include <geometry/CreatorBase.h>
+#include <framework/gearbox/GearDir.h>
+#include <eklm/simulation/EKLMSensitiveDetector.h>
+#include <eklm/geometry/TransformData.h>
+#include <eklm/geometry/G4TriangularPrism.h>
+#include <eklm/geometry/GeoESTRCreator.h>
+#include <eklm/geometry/GeoEKLMTypes.h>
 
 /**
  * @file

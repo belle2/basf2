@@ -1,12 +1,11 @@
 /**************************************************************************
- *  BASF2 (Belle Analysis Framework 2)                                    *
- *  Copyright(C) 2010 - Belle II Collaboration                            *
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2011  Belle II Collaboration                              *
  *                                                                        *
- *  Author: The Belle II Collaboration                                    *
- *  Contributors:                                                         *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Takanori Hara, Kirill Chilikin                           *
  *                                                                        *
- *                                                                        *
- *  This software is provided "as is" without any warranty.               *
+ * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 /* System headers. */
@@ -17,10 +16,9 @@
 #include <globals.hh>
 
 /* Belle2 headers. */
-#include <geometry/CreatorFactory.h>
-#include <framework/gearbox/GearDir.h>
-
 #include <eklm/geometry/GeoESTRCreator.h>
+#include <framework/gearbox/GearDir.h>
+#include <geometry/CreatorFactory.h>
 
 using namespace Belle2;
 

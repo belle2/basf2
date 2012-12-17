@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Timofey Uglov, Kirill Chilikin                           *
@@ -11,6 +11,7 @@
 #ifndef EKLMSENSETIVEDETECTOR_H
 #define EKLMSENSETIVEDETECTOR_H
 
+/* Belle2 headers. */
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <eklm/dataobjects/EKLMStepHit.h>
 #include <eklm/geometry/GeoEKLMTypes.h>

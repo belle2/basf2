@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Timofey Uglov                                            *
@@ -11,16 +11,16 @@
 #ifndef EKLMHIT2D_H
 #define EKLMHIT2D_H
 
-#include <framework/datastore/DataStore.h>
-#include <TObject.h>
-
-#include  <eklm/dataobjects/EKLMDigit.h>
-#include  "globals.hh"
-#include  <TVector3.h>
+/* External headers. */
 #include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Geometry/Point3D.h>
+#include <TObject.h>
+#include <TVector3.h>
 
-#include <string>
+/* Belle2 headers. */
+#include <eklm/dataobjects/EKLMDigit.h>
+#include <framework/datastore/DataStore.h>
+
 namespace Belle2 {
 
   /**

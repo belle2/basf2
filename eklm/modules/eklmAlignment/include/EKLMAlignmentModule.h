@@ -1,18 +1,20 @@
-/*************************************************************************
-*  BASF2 (Belle Analysis Framework 2)                                    *
-*  Copyright(C) 2010 - Belle II Collaboration                            *
-*                                                                        *
-*  Author: The Belle II Collaboration                                    *
-*  Contributors: Kirill Chilikin                                         *
-*                                                                        *
-*  This software is provided "as is" without any warranty.               *
-* ***********************************************************************/
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2012  Belle II Collaboration                              *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Kirill Chilikin                                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
-#ifndef EKLMALIGNMENTMODULE_H_
-#define EKLMALIGNMENTMODULE_H_
+#ifndef EKLMALIGNMENTMODULE_H
+#define EKLMALIGNMENTMODULE_H
 
+/* C++ headers. */
 #include <string>
 
+/* Belle2 headers. */
 #include <framework/core/Module.h>
 
 namespace Belle2 {

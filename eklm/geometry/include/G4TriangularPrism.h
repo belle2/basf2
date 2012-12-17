@@ -1,19 +1,20 @@
-/*************************************************************************
-*  BASF2 (Belle Analysis Framework 2)                                    *
-*  Copyright(C) 2010 - Belle II Collaboration                            *
-*                                                                        *
-*  Author: The Belle II Collaboration                                    *
-*  Contributors: Kirill Chilikin                                         *
-*                                                                        *
-*  This software is provided "as is" without any warranty.               *
-* ***********************************************************************/
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2011  Belle II Collaboration                              *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Kirill Chilikin                                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
-#ifndef G4TRIANGULARPRISM_H_
-#define G4TRIANGULARPRISM_H_
+#ifndef G4TRIANGULARPRISM_H
+#define G4TRIANGULARPRISM_H
 
-#include "G4IntersectionSolid.hh"
-#include "G4Tubs.hh"
-#include "G4Box.hh"
+/* External headers. */
+#include <G4IntersectionSolid.hh>
+#include <G4Tubs.hh>
+#include <G4Box.hh>
 
 namespace Belle2 {
 

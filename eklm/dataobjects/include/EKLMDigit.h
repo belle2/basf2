@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Timofey Uglov, Kirill Chilikin                           *
@@ -8,19 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDigit_H
-#define EKLMDigit_H
+#ifndef EKLMDIGIT_H
+#define EKLMDIGIT_H
 
-#include  <eklm/dataobjects/EKLMHitBase.h>
-#include  <eklm/dataobjects/EKLMSimHit.h>
-#include  "globals.hh"
-#include  "CLHEP/Vector/ThreeVector.h"
-#include  "TFitResultPtr.h"
-#include  "TFitResult.h"
+/* External headers. */
+#include <CLHEP/Vector/ThreeVector.h>
+#include <TFitResultPtr.h>
+#include <TFitResult.h>
 
-#include "G4VPhysicalVolume.hh"
+/* Belle2 headers. */
+#include <eklm/dataobjects/EKLMHitBase.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
 
-#include <string>
 namespace Belle2 {
 
   /**

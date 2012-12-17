@@ -1,17 +1,15 @@
-/*************************************************************************
-*  BASF2 (Belle Analysis Framework 2)                                    *
-*  Copyright(C) 2010 - Belle II Collaboration                            *
-*                                                                        *
-*  Author: The Belle II Collaboration                                    *
-*  Contributors: Kirill Chilikin                                         *
-*                                                                        *
-*  This software is provided "as is" without any warranty.               *
-* ***********************************************************************/
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2012  Belle II Collaboration                              *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Kirill Chilikin                                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
-#ifndef EKLMOBJECTNUMBERS_H_
-#define EKLMOBJECTNUMBERS_H_
-
-#include <sys/types.h>
+#ifndef EKLMOBJECTNUMBERS_H
+#define EKLMOBJECTNUMBERS_H
 
 namespace Belle2 {
   namespace EKLM {

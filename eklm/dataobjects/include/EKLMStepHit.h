@@ -1,16 +1,17 @@
-/*************************************************************************
-* BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributor: Timofey Uglov                                             *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2011  Belle II Collaboration                              *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Timofey Uglov                                            *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #ifndef EKLMSTEPHIT_H
 #define EKLMSTEPHIT_H
 
+/* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitBase.h>
 
 namespace Belle2 {

@@ -27,22 +27,22 @@
 	<Material name="EKLMIron">
 		<density unit="g/cm3">7.874</density>
 		<Components>
-			<Element fraction="1.0">Fe</Element> 
+			<Element fraction="1.0">Fe</Element>
 		</Components>
 	</Material>
 	<Material name="EKLMSilicon">
 		<density unit="g/cm3">2.329</density>
 		<Components>
-			<Element fraction="1.0">Si</Element> 
+			<Element fraction="1.0">Si</Element>
 		</Components>
 	</Material>
 	<Material name="EKLMDuralumin">
 		<density unit="g/cm3">2.70</density>
 		<Components>
-			<Element fraction="0.935">Al</Element> 
-			<Element fraction="0.044">Cu</Element> 
-			<Element fraction="0.015">Mg</Element> 
-			<Element fraction="0.006">Mn</Element> 
+			<Element fraction="0.935">Al</Element>
+			<Element fraction="0.044">Cu</Element>
+			<Element fraction="0.015">Mg</Element>
+			<Element fraction="0.006">Mn</Element>
 		</Components>
 	</Material>
 </Materials>

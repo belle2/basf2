@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Timofey Uglov                                            *
@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMRECON_H
-#define EKLMRECON_H
+#ifndef EKLMRECONSTRUCTOR_H
+#define EKLMRECONSTRUCTOR_H
 
 /* C++ headers. */
 #include <vector>

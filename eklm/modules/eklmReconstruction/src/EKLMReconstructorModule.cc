@@ -1,16 +1,17 @@
-/*************************************************************************
-*  BASF2 (Belle Analysis Framework 2)                                    *
-*  Copyright(C) 2010 - Belle II Collaboration                            *
-*                                                                        *
-*  Author: The Belle II Collaboration                                    *
-*  Contributors: Timofey Uglov, Kirill Chilikin                          *
-*                                                                        *
-*  This software is provided "as is" without any warranty.               *
-* ***********************************************************************/
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010  Belle II Collaboration                              *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
-#include <framework/core/ModuleManager.h>
+/* Belle2 headers. */
 #include <eklm/modules/eklmReconstruction/EKLMReconstructorModule.h>
 #include <eklm/reconstruction/Reconstructor.h>
+#include <framework/core/ModuleManager.h>
 
 using namespace Belle2;
 

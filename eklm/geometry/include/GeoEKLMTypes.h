@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2012  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Kirill Chilikin                                          *
@@ -13,8 +13,8 @@
  * Two enumerations (separate file to avoid header circular dependency).
  */
 
-#ifndef GEOEKLMTYPES_H_
-#define GEOEKLMTYPES_H_
+#ifndef GEOEKLMTYPES_H
+#define GEOEKLMTYPES_H
 
 namespace Belle2 {
 

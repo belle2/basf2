@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Timofey Uglov                                            *
@@ -8,10 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* C++ headers. */
+#include <iostream>
+#include <fstream>
+
+/* Belle2 headers. */
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <framework/logging/Logger.h>
-#include<iostream>
-#include<fstream>
 
 using namespace Belle2;
 

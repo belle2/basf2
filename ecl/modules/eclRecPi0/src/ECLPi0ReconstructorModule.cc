@@ -114,6 +114,16 @@ void ECLPi0ReconstructorModule::event()
     CLHEP::HepSymMatrix   errorGamma1(7, 0);
     readErrorMatrix(iGamma1, errorGamma1);
 
+    /*
+             cout<<"FillGamma1 ErrorMatrix ";
+             for (int i = 0; i < 7; i++) {
+               for (int j = 0; j <=i ; j++) {
+                 cout<<errorGamma1[i][j]<<" ";
+               }
+             }
+            cout<<endl;
+
+    */
     CLHEP::Hep3Vector p3Gamma1(m_px1, m_py1, m_pz1);
 
     for (int iGamma2 = iGamma1 + 1; iGamma2 < Gamma->GetEntriesFast(); iGamma2++) {
@@ -143,7 +153,6 @@ void ECLPi0ReconstructorModule::event()
             }
            cout<<endl;
       */
-
       CLHEP::Hep3Vector p3Gamma2(m_px2, m_py2, m_pz2);
 
       //CLHEP::Hep3Vector p3Rec = p3Gamma1 + p3Gamma2;
@@ -174,9 +183,6 @@ void ECLPi0ReconstructorModule::event()
           makeMother(km, p);
         } else {cout << m_nEvent << " km.doFit err " << endl;  }
 
-        CLHEP::HepLorentzVector momentumFitGamma1 = km.getTrackMomentum(0);
-        CLHEP::HepLorentzVector momentumFitGamma2 = km.getTrackMomentum(1);
-        CLHEP::HepLorentzVector momentumRec = momentumFitGamma1 + momentumFitGamma2;
         if (pi0_mass_min < mass && mass < pi0_mass_max) {
 
           if (!Pi0Array) Pi0Array.create();
@@ -192,6 +198,31 @@ void ECLPi0ReconstructorModule::event()
           Pi0Array[m_Pi0Num]->setMass((float)lv_rec.mag());
           Pi0Array[m_Pi0Num]->setMassFit((float)p.mass());
           Pi0Array[m_Pi0Num]->setChi2((float)confLevel);
+
+          /*
+                      cout<<m_nEvent <<"g1  ErrorMatrix ";
+                      for (int i = 0; i < 7; i++) {
+                        for (int j = 0; j <=i ; j++) {
+                          cout<<errorGamma1[i][j]<<" ";
+                        }
+                      }
+                     cout<<endl;
+                      cout<<m_nEvent<<"g2  ErrorMatrix ";
+                      for (int i = 0; i < 7; i++) {
+                        for (int j = 0; j <=i ; j++) {
+                          cout<<errorGamma2[i][j]<<" ";
+                        }
+                      }
+                     cout<<endl;
+
+                      cout<<m_nEvent<<"Pi0 ErrorMatrix ";
+                      for (int i = 0; i < 7; i++) {
+                        for (int j = 0; j <=i ; j++) {
+                          cout<<p.momentum().dpx()[i][j]<<" ";
+                        }
+                      }
+                     cout<<endl<<endl;
+          */
 
           /*
                     Pi0Array[m_Pi0Num]->setEnergy((float)m_pi0E);

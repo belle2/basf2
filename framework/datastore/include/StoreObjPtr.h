@@ -28,43 +28,43 @@ namespace Belle2 {
    *  If no object 'EventMetaData' is found in the data store, the store
    *  object pointer is invalid.
    *  \code
-  StoreObjPtr<EventMetaData> eventmetadata;
-  if(!eventmetadata) {
-    B2INFO("an object called '" << eventmetadata.getName() << "' does not exist in the data store.");
-  } else {
-    //object exists, you can now access its data
-    B2INFO("we're currently in event " << eventmetadata->getEvent() << "!");
-  }
+      StoreObjPtr<EventMetaData> eventmetadata;
+      if(!eventmetadata) {
+        B2INFO("an object called '" << eventmetadata.getName() << "' does not exist in the data store.");
+      } else {
+        //object exists, you can now access its data
+        B2INFO("we're currently in event " << eventmetadata->getEvent() << "!");
+      }
       \endcode
    *
    *  <h1>Storing objects</h1>
    *  First, objects have to be registered in the data store during the
    *  initialization phase, meaning in the initialize method of a module:
    *  \code
-  void MyModule::initialize() {
-    //register a single cdchit
-    StoreObjPtr<CDCHit>::registerPersistent();
-    //register a single cdchit under the name "AnotherHit" and do not write
-    //it to the output file by default
-    StoreObjPtr<CDCHit>::registerTransient("AnotherHit");
-  }
+      void MyModule::initialize() {
+        //register a single cdchit
+        StoreObjPtr<CDCHit>::registerPersistent();
+        //register a single cdchit under the name "AnotherHit" and do not write
+        //it to the output file by default
+        StoreObjPtr<CDCHit>::registerTransient("AnotherHit");
+      }
       \endcode
    *  Before objects can be accessed they have to be created
    *  (in each event if the durability is c_Event):
    *  \code
-  //store a single cdchit
-  StoreObjPtr<CDCHit> cdchit;
-  cdchit.create();
-  cdchit->setCharge(5.0);
+      //store a single cdchit
+      StoreObjPtr<CDCHit> cdchit;
+      cdchit.create();
+      cdchit->setCharge(5.0);
       \endcode
    *  To put an existing object in the data store, use it as first argument
    *  of the create method:
    *  \code
-  //store a single cdchit
-  CDCHit* cdchit = new CDCHit;
-  StoreObjPtr<CDCHit> cdchit;
-  cdchit.create(cdchit);
-  cdchit->setCharge(5.0);
+      //store a single cdchit
+      CDCHit* cdchit = new CDCHit;
+      StoreObjPtr<CDCHit> cdchit;
+      cdchit.create(cdchit);
+      cdchit->setCharge(5.0);
       \endcode
    *  Note that the datastore takes the ownership of the object!
    *

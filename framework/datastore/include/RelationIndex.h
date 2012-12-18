@@ -30,33 +30,33 @@ namespace Belle2 {
    *  on the other side connected to it. If there can be at most one relation
    *  from/to the given objects, this is especially simple:
    *  \code
-  RelationIndex<MCParticle, CDCSimHit> mcparticlesToCdcsimhits;
-  if(!mcparticlesToCdcsimhits)
-    B2FATAL("No MCParticle -> CDCSimHit relation found!");
+      RelationIndex<MCParticle, CDCSimHit> mcparticlesToCdcsimhits;
+      if(!mcparticlesToCdcsimhits)
+        B2FATAL("No MCParticle -> CDCSimHit relation found!");
 
-  typedef RelationIndex<MCParticle, CDCSimHit>::Element relElement_t;
-  for(int iCDC = 0; iCDC < cdcsimhits.getEntries(); iCDC++) {
-    const CDCSimHit* hit = cdcsimhits[iCDC];
+      typedef RelationIndex<MCParticle, CDCSimHit>::Element relElement_t;
+      for(int iCDC = 0; iCDC < cdcsimhits.getEntries(); iCDC++) {
+        const CDCSimHit* hit = cdcsimhits[iCDC];
 
-    //assuming 'hit' was only created by a single particle
-    const relElement_t* rel = mcparticlesToCdcsimhits.getFirstElementTo(hit);
-    if(!rel) {
-      B2WARNING("no MCParticle found for CDCSimHit " << iCDC);
-      continue;
-    }
-    B2INFO("this CDCHit came from a particle with PDG code " << rel->from->getPDG());
-  }
+        //assuming 'hit' was only created by a single particle
+        const relElement_t* rel = mcparticlesToCdcsimhits.getFirstElementTo(hit);
+        if(!rel) {
+          B2WARNING("no MCParticle found for CDCSimHit " << iCDC);
+          continue;
+        }
+        B2INFO("this CDCHit came from a particle with PDG code " << rel->from->getPDG());
+      }
       \endcode
    *
    *  If more than one associated object exists, one can loop over them using
    *  BOOST_FOREACH. For example, when one instead wants to find the CDCSimHits
    *  belonging to a particle, one can use:
    *  \code
-  const MCParticle* particle = ...;
-  BOOST_FOREACH(const relElement_t & rel, mcparticlesToCdcsimhits.getElementsFrom(particle)) {
-    const CDCSimHit* hit = rel.to;
-    //...
-  }
+      const MCParticle* particle = ...;
+      BOOST_FOREACH(const relElement_t & rel, mcparticlesToCdcsimhits.getElementsFrom(particle)) {
+        const CDCSimHit* hit = rel.to;
+        //...
+      }
       \endcode
    *
    *  The documentation of the relation element type used by getFirstElementTo()/

@@ -141,7 +141,7 @@ namespace Belle2 {
     /**
      * Update an item, thus marking it as recently accessed and putting it to
      * the front of the list
-     * @param iterator to the item to update
+     * @param item iterator to the item to update
      */
     void update(const iterator& item) {
       m_container.relocate(m_container.begin(), item);

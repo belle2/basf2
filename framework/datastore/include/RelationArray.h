@@ -32,15 +32,15 @@ namespace Belle2 {
    *  you can use RelationArray to create relations between entries:
    *
    *  \code
-  RelationArray particlesToCdchits(particles, cdcsimhits);
-  for(int iPart = 0; iPart < particles.getEntries(); iPart++) {
-    //... create new hit 'myhit'
-    cdcsimhits.appendNew(myhit);
-    int cdcsimhitIdx = cdcsimhits.getEntries()-1; //index of last object stored
+      RelationArray particlesToCdchits(particles, cdcsimhits);
+      for(int iPart = 0; iPart < particles.getEntries(); iPart++) {
+        //... create new hit 'myhit'
+        cdcsimhits.appendNew(myhit);
+        int cdcsimhitIdx = cdcsimhits.getEntries()-1; //index of last object stored
 
-    //connect objects at indices iPart and cdcsimhitIdx
-    particlesToCdchits.add(iPart, cdcsimhitIdx);
-  }
+        //connect objects at indices iPart and cdcsimhitIdx
+        particlesToCdchits.add(iPart, cdcsimhitIdx);
+      }
       \endcode
    *
    *  This example loops over the 'particles' array and might for example
@@ -52,13 +52,13 @@ namespace Belle2 {
    *  a relation from MCParticles to SVDSimHits (with default name):
    *
    *  \code
-  RelationArray::registerPersistent<MCParticle, SVDSimHit>();
+      RelationArray::registerPersistent<MCParticle, SVDSimHit>();
       \endcode
    *
    * or, if you have arrays with non-default names:
    *  \code
-  //create MCParticles (default name) -> MySVDSimHits relation
-  RelationArray::registerPersistent<MCParticle, SVDSimHit>("", "MySVDSimHits");
+      //create MCParticles (default name) -> MySVDSimHits relation
+      RelationArray::registerPersistent<MCParticle, SVDSimHit>("", "MySVDSimHits");
       \endcode
    *
    *  \sa RelationIndex provides a convenient interface to finding objects

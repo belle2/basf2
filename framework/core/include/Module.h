@@ -49,7 +49,7 @@ namespace Belle2 {
    * Modules can also define a return value (int or bool) using setReturnValue(),
    * which can be used in the steering file to split the Path based on the set value:
    *  \code
-  module_with_condition.condition("<1", another_path)
+      module_with_condition.condition("<1", another_path)
       \endcode
    * In case the module condition for a given event is less than 1, the execution
    * will be diverted into another_path for this event. You could for example set

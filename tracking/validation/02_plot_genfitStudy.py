@@ -10,6 +10,11 @@
 #                                                                #
 ##################################################################
 
+##################################################################
+coarse = 1
+
+##################################################################
+
 # median and MAD can be slightly inaccurate since they are calculated from binned data!
 # However, errors of these values should in general be less than 1E-2
 
@@ -19,84 +24,32 @@ import math
 import sys
 import os
 import array
+import time
 from ROOT import std, TCut, TMath
 
+ROOT.gROOT.SetBatch(True)
+
+# get input file: newest file that matches the output name of the steering script
+filelist = glob.glob('../genfit_*StatData.root')
+filelist = filter(lambda x: not os.path.isdir(x), filelist)
+infile = max(filelist, key=lambda x: os.stat(x).st_mtime)
+
+outFileName = 'TrackFitCheckerPlots_' + infile[infile.find('genfit_')
+    + 7:infile.find('StatData.root')]
+outFileNameBins = outFileName + '_Bins.root'
+outFileName += '.root'
+print 'Analysis input file: ', infile
+print 'Analysis output file: ', outFileName
+print 'Analysis output file with histograms for each bin: ', outFileNameBins
+
+# check if FULL test
 full = False
-# full = True
-
-ROOT.gROOT.ProcessLine('gROOT.SetBatch()')
-
-# argument parsing
-options = [
-    '-f',
-    '-d',
-    '-of',
-    '-draw',
-    '-coarse',
-    '-full',
-    ]
-opts = set(options)
-
-
-def getArgsToNextOpt(stringlist, index):
-    id = index + 1
-    args = []
-    while id < len(stringlist):
-        if stringlist[id] in options:
-            return args[0]
-        args.append(stringlist[id])
-        id += 1
-    return args[0]
-
-
-coarse = 1
-check = 0
-for iarg in range(len(sys.argv)):
-    arg = sys.argv[iarg]
-    if arg == '-f':  # input file
-        infile = str(getArgsToNextOpt(sys.argv, iarg))
-        check += 1
-    if arg == '-d':  # input directory, collect all root files in directory
-        indir = str(getArgsToNextOpt(sys.argv, iarg))
-        check += 1
-    if arg == '-of':  # output root file
-        ofile = getArgsToNextOpt(sys.argv, iarg)
-    if arg == '-draw':  # draw bin histograms during analysis
-        draw = True
-    if arg == '-coarse':  # more coarse binning of 2D histogramms (divide by ...)
-        coarse = float(getArgsToNextOpt(sys.argv, iarg))
-    if arg == '-full':  # do full test
-        full = True
-
-if check > 1:
-    print 'Error: use either -d (input directory) or -f (input file) argument, but not both!'
-    exit(1)
-
-# default arguments
-indir = os.getcwd()
-if full:
-    infile = indir + '/../genfit_cdcsvdpxdFULLStatData.root'
-    ofile = 'TrackFitCheckerPlotsFULL.root'
-else:
-    infile = indir + '/../genfit_cdcsvdpxdStatData.root'
-    ofile = 'TrackFitCheckerPlots.root'
-
-draw = False
-coarse = 1.
+if '_FULL' in infile:
+    full = True
 
 # input chain
 chain = ROOT.TChain('m_statDataTreePtr')
-
-if len(infile) > 1:
-    print 'input file: ', infile
-    chain.Add(infile)
-else:
-    infiles = glob.glob(indir + '/*.root')
-    if len(infiles) < 1:
-        print 'Error: no *.root files in ', indir
-        exit(1)
-    print 'Input files: ', infiles
-    chain.Add(indir + '/*.root')
+chain.Add(infile)
 
 # check if tree is there
 chain.GetEntry()
@@ -104,15 +57,8 @@ if chain.GetEntriesFast() < 1:
     print 'Error: m_statDataTreePtr tree has no entries'
     exit(1)
 
-print 'Analysis output file: ', ofile
-# chain.Print()
-
-if not draw:
-    ROOT.gROOT.SetBatch(True)
-
 # output files
-orfile = ROOT.TFile(ofile, 'recreate')
-# orfileBin = ROOT.TFile(ofile + '.bins.root', 'recreate')
+outFile = ROOT.TFile(outFileName, 'recreate')
 
 # important numbers -----------------------------------------------------------------------------------------------------------------------------
 # 2D Histograms
@@ -139,7 +85,7 @@ pValue_RMS_Range = 0.125
 # 1D Histograms
 histRange = 10.0  # range for the analysis histogram
 resoScaling = 0.1  # scaling factor for resolution analysis histogram
-histBins = 2000  # number of bins for the analysis histogram
+histBins = 1000  # number of bins for the analysis histogram
 
 MADtoSigma = 1.4826  # sigma = 1.4826*MAD (for gaussian distributions)
 outlierCut = 4.  # distance from median in terms of MAD std when to count as outlier
@@ -435,12 +381,14 @@ absDev = ROOT.TH1D('absDev', 'absDev', histBins, 0, histRange)
 
 # loop over chain ------------------------------------------------------------------------------------------------------------------------------
 if full:
+    outFileBins = ROOT.TFile(outFileName + '.bins.root', 'recreate')
+
     # set up eventLists for event selection
     evtListCosth = ROOT.TEventList('evtListCosth', 'evtListCosth')
     evtListBin = ROOT.TEventList('evtListBin', 'evtListBin')
     evtListBinFlag = ROOT.TEventList('evtListBinFlag', 'evtListBinFlag')
 
-    # canvases = []  # canvases for plotting bin-wise data
+    canvases = []  # canvases for plotting bin-wise data
 
     statusFlagCut = ROOT.TCut('genfitStatusFlag==0')
 
@@ -471,11 +419,12 @@ if full:
                                    + binCut.GetTitle())
 
             # create canvas for plotting bin-wise data
-            # canvases.append(ROOT.TCanvas('Bin(' + str(binX) + ',' + str(binY)
-            #                + ');costh=' + str(costh) + ';pt=' + str(pt), 'Bin('
-            #                + str(binX) + ',' + str(binY) + '); costh = '
-            #                + str(costh) + '; pt = ' + str(pt)))
-            # canvases[-1].Divide(3, 3)
+            canvases.append(ROOT.TCanvas('Bin(' + str(binX) + ',' + str(binY)
+                            + ');costh=' + str(costh) + ';pt=' + str(pt),
+                            'Bin(' + str(binX) + ',' + str(binY)
+                            + '); costh = ' + str(costh) + '; pt = '
+                            + str(pt)))
+            canvases[-1].Divide(3, 3)
 
             # further select events in pt range
             evtListBin.Reset()
@@ -499,7 +448,7 @@ if full:
                         / float(evtListBin.GetN()))
 
             # p-values
-            # canvases[-1].cd(1)
+            canvases[-1].cd(1)
             chain.Draw('pValue_bu >> histo_p_bu')
             if anaHistos[0].GetEntries() > 0:
                 h_pValue_bu_mean.SetBinContent(binX, binY,
@@ -507,7 +456,7 @@ if full:
                 h_pValue_bu_RMS.SetBinContent(binX, binY,
                         anaHistos[0].GetRMS())
 
-            # canvases[-1].cd(2)
+            canvases[-1].cd(2)
             chain.Draw('pValue_fu >> histo_p_fu')
             if anaHistos[1].GetEntries() > 0:
                 h_pValue_fu_mean.SetBinContent(binX, binY,
@@ -517,7 +466,7 @@ if full:
 
             # resolutions
             iHist = 0
-            # canvases[-1].cd(3)
+            canvases[-1].cd(3)
             chain.Draw('relRes_curvVertex >> histoRes')
             if anaHistos[2].GetEntries() > 0:
                 est = robustEstimator(anaHistos[2])
@@ -528,7 +477,7 @@ if full:
             # pull distributions
             for iVar in range(0, 6):  # x, y, z, px, py, pz
                 iHist = 0
-                # canvases[-1].cd(3 + iVar + 1)
+                canvases[-1].cd(3 + iVar + 1)
                 chain.Draw('pulls_vertexPosMom[' + str(iVar) + '] >> histoPull'
                             + str(iVar))
                 if anaHistos[3 + iVar].GetEntries() > 0:
@@ -538,8 +487,8 @@ if full:
                                 val)
                         iHist += 1
 
-            # orfileBin.cd()
-            # canvases[-1].Write()
+            outFileBins.cd()
+            canvases[-1].Write()
 
             pt += ptS
             binY += 1
@@ -551,7 +500,7 @@ if full:
 
     # store histograms in output file --------------------------------------------------------------------------------------------------------------
     print 'Creating output file and storing histograms ...'
-    orfile.cd()
+    outFile.cd()
     ROOT.gROOT.ProcessLine('gStyle.SetPaintTextFormat("1.4f")')
     for h in histos:
         h.SetContour(255)
@@ -563,8 +512,6 @@ else:
 
        # full == false
 
-    orfile.cd()
-
     Efficiency = ROOT.TNtuple('Efficiency', 'Efficiency of the track fitter',
                               'number')
 
@@ -574,27 +521,29 @@ else:
 
     efficiency = float(evtListFlag.GetN()) / float(chain.GetEntries())
     Efficiency.Fill(efficiency)
-    Efficiency.Write()
 
     # p-values
     chain.Draw('pValue_bu >> histo_p_bu')
     anaHistos[0].Fit('pol1', 'M')
-    anaHistos[0].Write()
 
     chain.Draw('pValue_fu >> histo_p_fu')
     anaHistos[1].Fit('pol1', 'M')
-    anaHistos[1].Write()
 
     # resolutions
     iHist = 0
     chain.Draw('relRes_curvVertex >> histoRes')
     anaHistos[2].Fit('gaus', 'LM')
-    anaHistos[2].Write()
     # pull distributions
     for iVar in range(0, 6):  # x, y, z, px, py, pz
         iHist = 0
         chain.Draw('pulls_vertexPosMom[' + str(iVar) + '] >> histoPull'
                    + str(iVar))
         anaHistos[3 + iVar].Fit('gaus', 'LM')
-        anaHistos[3 + iVar].Write()
+
+    outFile.cd()
+    Efficiency.Write()
+    for h in anaHistos:
+        h.Write()
+
+outFile.Close()
 

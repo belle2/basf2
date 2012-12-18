@@ -363,7 +363,7 @@ void DedxPIDModule::event()
         const float hit_charge = cdcHits[cdc_idx]->getADCCount();
 
         if (m_enableDebugOutput)
-          track.addHit(hit_pos, current_layer, wire, (hit_pos - hit_pos_helix).Perp(), hit_charge, cdcHits[cdc_idx]->getTDCCount());
+          track.addHit(hit_pos, current_layer, wire, (hit_pos - hit_pos_helix).Perp(), hit_charge, track_extrapolation_failed, cdcHits[cdc_idx]->getTDCCount());
 
         num_hits_in_current_layer++;
         layer_charge += hit_charge;
@@ -590,7 +590,7 @@ template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const
     const float hit_edep = get_edep(hit); //not a charge, but at least it's uncorrected
 
     if (m_enableDebugOutput)
-      track->addHit(global_pos, layer, hit->getSensorID(), angle, hit_edep);
+      track->addHit(global_pos, layer, hit->getSensorID(), angle, hit_edep, false);
 
 
     //active medium traversed, in cm (can traverse one sensor at most)

@@ -48,7 +48,7 @@ namespace Belle2 {
     }
 
     /** add a single hit to the object */
-    void addHit(const TVector3& pos, int layer, int sensorid, float phi, float energydep, float drift_length = 0.0) {
+    void addHit(const TVector3& pos, int layer, int sensorid, float phi, float energydep, bool extrapFailed, float drift_length = 0.0) {
       wx.push_back(pos.X());
       wy.push_back(pos.Y());
       wz.push_back(pos.Z());
@@ -56,6 +56,7 @@ namespace Belle2 {
       sensorUID.push_back(sensorid);
       phiWireTrack.push_back(phi);
       edep.push_back(energydep);
+      extrapolationFailed.push_back(extrapFailed);
       driftLength.push_back(drift_length);
       if ((layer < 0 and layer < m_last_layer) or(layer >= 0 and layer > m_last_layer))
         m_last_layer = layer;
@@ -83,7 +84,6 @@ namespace Belle2 {
     int m_last_layer; /**< layer id of outermost hit */
     double m_length; /**< total distance travelled by the track */
 
-
     //arrays with one entry per hit
     std::vector<float> edep; /**< uncorrected energy deposition (or charge for CDC hits) */
     std::vector<int> flayer; /**< full layer id, -1..-2 for PXD -2..-6 for SVD */
@@ -93,6 +93,7 @@ namespace Belle2 {
     std::vector<float> wz; /**< hit position */
     std::vector<int> sensorUID; /**< unique sensor ID (wire ID in CDC) */
     std::vector<float> driftLength; /**< drift length in CDC (0 for other hits) */
+    std::vector<bool> extrapolationFailed; /**< true for hits where the extrapolation failed. */
 
     //arrays with one entry per layer (or so. just don't mix them with the hit arrays)
     std::vector<float> dedx; /**< extracted specific energy loss (arbitrary units, different between detectors) */
@@ -106,7 +107,7 @@ namespace Belle2 {
     //these are only filled in by DedxLikelihoodModule
     float m_logl[Dedx::c_num_particles]; /**< log likelihood for each particle, not including momentum prior */
 
-    ClassDef(DedxTrack, 2); /**< Build ROOT dictionary */
+    ClassDef(DedxTrack, 3); /**< Build ROOT dictionary */
   };
 }
 #endif

@@ -159,7 +159,7 @@ namespace Belle2 {
 
   private:
 
-    ClassDef(RelationsInterface, 0)
+    ClassDef(RelationsInterface, 0);
 
     /** Cache of the data store entry to which this object belongs. */
     mutable DataStore::StoreEntry* m_cacheDataStoreEntry;  //!

@@ -44,12 +44,12 @@ namespace Belle2 {
    *  entries in an array of CDCSimHits:
    *
       \code
-  StoreArray<CDCSimHit> cdcsimhits;
-  //loop over all CDC simhits
-  for(int iCDC = 0; iCDC < cdcsimhits.getEntries(); iCDC++) {
-    const CDCSimHit* hit = cdcsimhits[iCDC]; //get iCDC'th entry in StoreArray
-    // Use hit's data here...
-  }
+      StoreArray<CDCSimHit> cdcsimhits;
+      //loop over all CDC simhits
+      for(int iCDC = 0; iCDC < cdcsimhits.getEntries(); iCDC++) {
+        const CDCSimHit* hit = cdcsimhits[iCDC]; //get iCDC'th entry in StoreArray
+        // Use hit's data here...
+      }
       \endcode
    *
    *  Objects linked together using relations can also be obtained through
@@ -61,10 +61,10 @@ namespace Belle2 {
    *  something like:
    *
       \code
-  StoreArray<CDCSimHit> cdcsimhits;
-  //...
-  CDCSimHit* newhit = cdcsimhits.appendNew();
-  //fill newhit with data here...
+      StoreArray<CDCSimHit> cdcsimhits;
+      //...
+      CDCSimHit* newhit = cdcsimhits.appendNew();
+      //fill newhit with data here...
       \endcode
    *
    *  alternatively, you can copy an existing object into the array using
@@ -72,7 +72,7 @@ namespace Belle2 {
    *  If performance is especially important, you can also create a new object
    *  using 'placement-new':
    *  \code
-  new (cdcsimhits.nextFreeAddress()) CDCSimHit(some ctor arguments);
+      new (cdcsimhits.nextFreeAddress()) CDCSimHit(some ctor arguments);
       \endcode
 
    *  This creates a new CDCSimHit at the end of the array and allows
@@ -227,7 +227,7 @@ namespace Belle2 {
      *
      *  To add an element to the array, use:
      *  \code
-    new (myStoreArray.nextFreeAddress()) T(some ctor arguments);
+        new (myStoreArray.nextFreeAddress()) T(some ctor arguments);
         \endcode
      *  which constructs a new T object at the end of myStoreArray.
      *

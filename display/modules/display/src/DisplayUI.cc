@@ -239,6 +239,9 @@ void DisplayUI::makeGui()
   m_guiInitialized = true;
   TEveBrowser* browser = gEve->GetBrowser();
 
+  //workaround for regression in root 5.34/03: closing display window from WM wouldn't stop event loop
+  browser->Connect("CloseWindow()", "TApplication", gApplication, "Terminate()");
+
   browser->StartEmbedding(TRootBrowser::kLeft);
 
   TGMainFrame* frmMain = new TGMainFrame(gClient->GetRoot(), 240, 600);

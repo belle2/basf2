@@ -199,18 +199,10 @@ void DedxPIDModule::event()
   if (m_usePXD)
     pxdClustersToTrueHitsIndex = new RelationIndex<PXDCluster, PXDTrueHit> (pxdClusters, pxdTrueHits);
 
-  //output
-  StoreArray<DedxLikelihood> *likelihood_array = 0;
-  StoreArray<DedxTrack> *dedx_array = 0;
-  RelationArray* tracks_to_likelihoods = 0;
-  if (!m_pdfFilename.empty()) {
-    likelihood_array = new StoreArray<DedxLikelihood>;
-    tracks_to_likelihoods = new RelationArray(gftracks, *likelihood_array);
-  }
-  if (m_enableDebugOutput) {
-    dedx_array = new StoreArray<DedxTrack>();
-  }
-
+  //outputs
+  StoreArray<DedxLikelihood> likelihood_array;
+  StoreArray<DedxTrack> dedx_array;
+  RelationArray tracks_to_likelihoods(gftracks, likelihood_array);
 
   //loop over all tracks
   for (int iGFTrack = 0; iGFTrack < tracks.getEntries(); iGFTrack++) {
@@ -476,19 +468,16 @@ void DedxPIDModule::event()
       track.m_event_id = m_eventID - 1;
       track.m_track_id = m_trackID - 1;
 
-      dedx_array->appendNew(track);
+      dedx_array.appendNew(track);
     }
-    if (likelihood_array) {
+    if (!m_pdfFilename.empty()) {
       //save likelihoods
-      const int dedxLikelihoodIdx = likelihood_array->getEntries();
-      new(likelihood_array->nextFreeAddress()) DedxLikelihood(track.m_logl, track.m_p);
-      tracks_to_likelihoods->add(iGFTrack, dedxLikelihoodIdx);
+      const int dedxLikelihoodIdx = likelihood_array.getEntries();
+      new(likelihood_array.nextFreeAddress()) DedxLikelihood(track.m_logl, track.m_p);
+      tracks_to_likelihoods.add(iGFTrack, dedxLikelihoodIdx);
     }
   } //end loop over tracks
 
-  delete dedx_array;
-  delete tracks_to_likelihoods;
-  delete likelihood_array;
   delete pxdClustersToTrueHitsIndex;
 }
 

@@ -439,8 +439,21 @@ void DisplayUI::savePicture(bool highres)
   if (!highres) {
     v->SavePicture(fi.fFilename);
   } else {
-    B2INFO("Saving high-resolution picture..."); //may take a while
-    v->SavePictureWidth(fi.fFilename, 4000);
+    char returnString[256];
+    new TGInputDialog(gEve->GetBrowser()->GetClient()->GetDefaultRoot(), gEve->GetBrowser(),
+                      "Bitmap width (pixels) [Note: Values larger than ~5000 may cause crashes.]",
+                      "4000", //default
+                      returnString);
+    if (returnString[0] == '\0')
+      return; //cancelled
+    const TString t(returnString);
+    if (!t.IsDigit()) {
+      B2ERROR("Given width is not a number!");
+      return;
+    }
+    const int width = t.Atoi();
+    B2INFO("Saving bitmap (width: " << width << "px)..."); //may take a while
+    v->SavePictureWidth(fi.fFilename, width);
   }
 
   B2INFO("Saved picture in: " << fi.fFilename)

@@ -240,7 +240,7 @@ void DisplayUI::makeGui()
   TEveBrowser* browser = gEve->GetBrowser();
 
   //workaround for regression in root 5.34/03: closing display window from WM wouldn't stop event loop
-  browser->Connect("CloseWindow()", "TApplication", gApplication, "Terminate()");
+  browser->Connect("CloseWindow()", "TSystem", gSystem, "ExitLoop()");
 
   browser->StartEmbedding(TRootBrowser::kLeft);
 
@@ -485,20 +485,16 @@ void DisplayUI::automaticEvent()
 
 void DisplayUI::closeAndContinue()
 {
-  gEve->GetBrowser()->CloseWindow();
-
-  gSystem->ExitLoop();
+  gEve->GetBrowser()->SendCloseMessage();
 }
 
 void DisplayUI::exit()
 {
-  gEve->CloseEveWindow();
+  gEve->GetBrowser()->SendCloseMessage();
 
   //stop event processing after current event
   StoreObjPtr<EventMetaData> eventMetaData;
   eventMetaData->setEndOfData();
-
-  gSystem->ExitLoop();
 }
 
 ClassImp(DisplayUI)

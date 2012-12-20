@@ -3,7 +3,7 @@
  * Copyright(C) 2010  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Timofey Uglov                                            *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -21,6 +21,7 @@
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/geometry/TransformData.h>
+#include <eklm/simulation/FPGAFitter.h>
 
 namespace Belle2 {
 
@@ -72,6 +73,9 @@ namespace Belle2 {
       /** Transformation data. */
       struct EKLM::TransformData* m_transf;
 
+      /** Digital amplitude. */
+      int* m_ADCAmplitude;
+
       /** Pointer to histogram with forward hits. */
       TH1D* m_digitizedAmplitudeDirect;
 
@@ -80,6 +84,9 @@ namespace Belle2 {
 
       /** Pointer to resulting histogram. */
       TH1D* m_digitizedAmplitude;
+
+      /** FPGA fit status. */
+      enum FPGAFitStatus m_FPGAStat;
 
       /** Pointer to fit function. */
       TF1* m_fitFunction;
@@ -164,7 +171,7 @@ namespace Belle2 {
        * @details
        * Used to calculate distance from SiPm to the Hit using time delay.
        */
-      double  m_firstPhotonlightSpeed;
+      double m_firstPhotonlightSpeed;
 
       /**
        * Convert time to the histogram (TDC).
@@ -215,6 +222,11 @@ namespace Belle2 {
        * @return Amplitude attenuation.
        */
       double distanceAttenuation(double dist);
+
+      /**
+       * Simulate ADC (create digital signal from analog),
+       */
+      void simulateADC();
 
       /** Minimal hit time. */
       double m_min_time;

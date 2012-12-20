@@ -14,7 +14,7 @@
 #include <TH1D.h>
 #include <TFile.h>
 
-/* Belle2 headers. */
+/*i Belle2 headers. */
 #include <eklm/geometry/GeoEKLMBelleII.h>
 #include <eklm/geometry/StripData.h>
 #include <eklm/simulation/FiberAndElectronics.h>
@@ -49,37 +49,31 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
 
   m_histRange = m_nTimeDigitizationSteps * m_timeDigitizationStep;
 
-  // create histos
+  /* Histograms. */
+  m_ADCAmplitude = (int*)malloc(m_nTimeDigitizationSteps * sizeof(int));
+  if (m_ADCAmplitude == NULL)
+    B2FATAL(MemErr);
   try {
-    m_digitizedAmplitudeDirect = new TH1D("digitizedAmplitudeDirect", "",
-                                          m_nTimeDigitizationSteps, 0,
-                                          m_histRange);
+    m_digitizedAmplitudeDirect =
+      new TH1D("digitizedAmplitudeDirect", m_stripName.c_str(),
+               m_nTimeDigitizationSteps, 0, m_histRange);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-
-  m_digitizedAmplitudeDirect->SetNameTitle("digitizedAmplitudeDirect",
-                                           m_stripName.c_str());
   try {
-    m_digitizedAmplitudeReflected = new TH1D("digitizedAmplitudeReflected", "",
-                                             m_nTimeDigitizationSteps, 0,
-                                             m_histRange);
+    m_digitizedAmplitudeReflected =
+      new TH1D("digitizedAmplitudeReflected", m_stripName.c_str(),
+               m_nTimeDigitizationSteps, 0, m_histRange);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-
-  m_digitizedAmplitudeReflected->SetNameTitle("digitizedAmplitudeReflected",
-                                              m_stripName.c_str());
   try {
-    m_digitizedAmplitude = new TH1D("digitizedAmplitude", "",
-                                    m_nTimeDigitizationSteps, 0,
-                                    m_histRange);
+    m_digitizedAmplitude =
+      new TH1D("digitizedAmplitude", m_stripName.c_str(),
+               m_nTimeDigitizationSteps, 0, m_histRange);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-
-  m_digitizedAmplitude->SetNameTitle("digitizedAmplitude", m_stripName.c_str());
-
   // define fit function
   try {
     m_fitFunction = new TF1("fitFunction", EKLM::SignalShapeFitFunction,
@@ -96,6 +90,7 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
 
 EKLM::FiberAndElectronics::~FiberAndElectronics()
 {
+  free(m_ADCAmplitude);
   delete m_digitizedAmplitudeDirect;
   delete m_digitizedAmplitudeReflected;
   delete m_digitizedAmplitude;
@@ -104,7 +99,6 @@ EKLM::FiberAndElectronics::~FiberAndElectronics()
 
 void EKLM::FiberAndElectronics::processEntry()
 {
-
   for (std::vector<EKLMSimHit*> ::iterator iHit = m_vectorHits.begin();
        iHit != m_vectorHits.end(); iHit++) {
 
@@ -141,6 +135,11 @@ void EKLM::FiberAndElectronics::processEntry()
   m_fitFunction->SetParLimits(1, 0, m_histRange);
   if (m_enableConstBkg == 0)
     m_fitFunction->FixParameter(4, 0);
+
+  simulateADC();
+  m_FPGAStat = FPGAFit(m_ADCAmplitude, m_nTimeDigitizationSteps);
+  if (m_FPGAStat == c_FPGANoSignal)
+    return;
 
   // do fit
   m_fitResultsPtr = m_digitizedAmplitude->Fit(m_fitFunction, "LSQN");
@@ -251,6 +250,15 @@ void EKLM::FiberAndElectronics::timesToShape(const std::vector <double> & times,
                                        *i));
 }
 
+void EKLM::FiberAndElectronics::simulateADC()
+{
+  int i;
+  for (i = 0; i < m_nTimeDigitizationSteps; i++) {
+    m_ADCAmplitude[i] = 0.5 * ADCRange *
+                        m_digitizedAmplitude->GetBinContent(i + 1);
+  }
+}
+
 double EKLM::FiberAndElectronics::lightPropagationTime(double L)
 {
   return L / m_firstPhotonlightSpeed;
@@ -271,6 +279,8 @@ double EKLM::FiberAndElectronics::getFitResults(int i) const
 
 int EKLM::FiberAndElectronics::getFitStatus() const
 {
+  if (m_FPGAStat != c_FPGASuccessfulFit)
+    return -1;
   return (int)m_fitResultsPtr;
 }
 

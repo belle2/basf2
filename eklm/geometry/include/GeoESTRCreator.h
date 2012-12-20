@@ -22,7 +22,7 @@
 
 namespace Belle2 {
 
-  namespace ESTR {
+  namespace EKLM {
 
     /**
      * @struct GeometryParams
@@ -91,7 +91,7 @@ namespace Belle2 {
      * @var GeometryParams::rmax_glass
      * The maximum radius of the glass used in KLM module (not used now).
      */
-    struct GeometryParams {
+    struct ESTRGeometryParams {
       double phi;
       double dphi;
       int nsides;
@@ -123,40 +123,7 @@ namespace Belle2 {
      * @details
      * Allocates memory for z, rmin and rmax arrays.
      */
-    int readESTRData(struct GeometryParams* par);
-
-    /**
-     * Creator of the Belle II Endcap Structure.
-     */
-    class GeoESTRCreator : public geometry::CreatorBase {
-
-    public:
-
-      /**
-       * Constructor.
-       */
-      GeoESTRCreator();
-
-      /**
-       * Destructor.
-       */
-      ~GeoESTRCreator();
-
-      /**
-       * Create ESTR geometry.
-       * @param content   GearDir pointing to the parameters which
-       *                  should be used for construction.
-       * @param topVolume Top volume in which the geometry has to be placed.
-       * @param type      Type of geometry to be build.
-       * @details
-       * ESTR geometry is actually created in EKLM geometry creation code.
-       */
-      void create(const GearDir& content, G4LogicalVolume& topVolume,
-                  geometry::GeometryTypes type);
-
-    private:
-
-    };
+    int readESTRData(struct ESTRGeometryParams* par);
 
   }
 

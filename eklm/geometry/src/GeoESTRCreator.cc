@@ -18,16 +18,13 @@
 /* Belle2 headers. */
 #include <eklm/geometry/GeoESTRCreator.h>
 #include <framework/gearbox/GearDir.h>
-#include <geometry/CreatorFactory.h>
 
 using namespace Belle2;
 
-geometry::CreatorFactory<ESTR::GeoESTRCreator> GeoESTRFactory("ESTRCreator");
-
-int ESTR::readESTRData(struct ESTR::GeometryParams* par)
+int EKLM::readESTRData(struct EKLM::ESTRGeometryParams* par)
 {
   int i;
-  GearDir d("/Detector/DetectorComponent[@name=\"ESTR\"]/Content");
+  GearDir d("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/ESTR");
   GearDir d1(d);
   GearDir d2(d);
   GearDir d3(d);
@@ -65,23 +62,5 @@ int ESTR::readESTRData(struct ESTR::GeometryParams* par)
   par->rshift_eslot = d3.getLength("RSHIFT_ESLOT") * CLHEP::cm;
   par->rmax_glass = d3.getLength("RMAX_GLASS") * CLHEP::cm;
   return 0;
-}
-
-ESTR::GeoESTRCreator::GeoESTRCreator()
-{
-}
-
-ESTR::GeoESTRCreator::~GeoESTRCreator()
-{
-}
-
-void ESTR::GeoESTRCreator::create(
-  const GearDir& content,
-  G4LogicalVolume& topVolume,
-  geometry::GeometryTypes type)
-{
-  (void)content;
-  (void)topVolume;
-  (void)type;
 }
 

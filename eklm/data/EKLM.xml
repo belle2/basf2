@@ -4,6 +4,47 @@
   <Version>0</Version>
   <Creator library="eklm">EKLMBelleII</Creator>
   <Content>
+    <ESTR>
+	<Rotation desc="Rotation of the structure with respect to the Detector" unit="rad">0.0</Rotation>
+	<OffsetZ desc="The offset of the Structure in z with respect to the IP" unit="cm">47.0</OffsetZ>
+		
+	<EndcapKLM>
+		<Nsides desc="number of sides of Barrel KLM Vessel">8</Nsides>
+		<Phi unit="deg">-22.5</Phi>
+		<Dphi unit="deg">360.0</Dphi>
+		<ZBoundary id="1">
+			<Zposition unit="cm">-66.05</Zposition>
+			<InnerRadius unit="cm">111.0</InnerRadius>
+			<OuterRadius unit="cm">353.5</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="2">
+			<Zposition unit="cm">66.05</Zposition>
+			<InnerRadius unit="cm">111.0</InnerRadius>
+			<OuterRadius unit="cm">353.5</OuterRadius>
+		</ZBoundary>
+	</EndcapKLM>
+
+	<EndcapKLMsub>
+		<Length unit="cm">66.1</Length>
+		<InnerRadius unit="cm">110.5</InnerRadius>
+		<OuterRadius unit="cm">128.0</OuterRadius>
+	</EndcapKLMsub>
+
+	<EndcapKLMSlot>
+		<THICK_EIRON unit="cm">4.7</THICK_EIRON>
+		<THICK_EIRON_MEAS unit="cm">4.7</THICK_EIRON_MEAS>
+		<THICK_ESLOT unit="cm">4.4</THICK_ESLOT>
+		<THICK_ESLOT_MEAS unit="cm">4.4</THICK_ESLOT_MEAS>
+		<THICK_EMOD unit="cm">4.0</THICK_EMOD>	
+		<RMIN_EMOD unit="cm">130.0</RMIN_EMOD>	
+		<RMAX_EMOD unit="cm">332.0</RMAX_EMOD>	
+		<RMIN_ESLOT unit="cm">130.0</RMIN_ESLOT>	
+		<RMAX_ESLOT unit="cm">334.0</RMAX_ESLOT>	
+		<RSHIFT_ESLOT unit="cm">5.0</RSHIFT_ESLOT>
+		<RMAX_GLASS unit="cm">320.0</RMAX_GLASS>
+	</EndcapKLMSlot>
+
+    </ESTR>
     <Mode desc="0 -- normal operation, 1 -- bg study">0</Mode>
     <SensitiveDetector>
      <EnergyDepositionThreshold desc="All hits with smaller energy will be dropped at SensitiveDetector level" unit="MeV">0.0</EnergyDepositionThreshold>

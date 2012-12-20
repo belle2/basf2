@@ -575,7 +575,7 @@ namespace Belle2 {
       bool haveGeo;
 
       /** ESTR Geometry data. */
-      struct ESTR::GeometryParams ESTRPar;
+      struct ESTRGeometryParams ESTRPar;
 
       /** Position data for endcaps. */
       struct ElementPosition EndcapPosition;

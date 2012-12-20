@@ -280,7 +280,7 @@ void DisplayUI::makeGui()
       hf->AddFrame(m_nextButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       m_nextButton->Connect("Clicked()", "Belle2::DisplayUI", this, "next()");
     }
-    event_frame->AddFrame(hf, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
+    event_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
 
     TGButton* jumpToEventButton = new TGTextButton(event_frame, "Jump to event/run/exp");
     jumpToEventButton->SetEnabled(InputController::canControlInput());
@@ -288,9 +288,9 @@ void DisplayUI::makeGui()
     jumpToEventButton->Connect("Clicked()", "Belle2::DisplayUI", this, "showJumpToEventDialog()");
 
     m_eventLabel = new TGLabel(event_frame);
-    event_frame->AddFrame(m_eventLabel, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
+    event_frame->AddFrame(m_eventLabel, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 5, 5, 5));
   }
-  frmMain->AddFrame(event_frame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));
+  frmMain->AddFrame(event_frame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
 
   TGGroupFrame* viewer_frame = new TGGroupFrame(frmMain);
   viewer_frame->SetTitle("Current Viewer");
@@ -302,7 +302,7 @@ void DisplayUI::makeGui()
       hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 5, 5, 5));
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "toggleColorScheme()");
     }
-    viewer_frame->AddFrame(hf, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
+    viewer_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
 
     hf = new TGHorizontalFrame(viewer_frame);
     {
@@ -315,9 +315,9 @@ void DisplayUI::makeGui()
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "saveHiResPicture()");
 
     }
-    viewer_frame->AddFrame(hf, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
+    viewer_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
   }
-  frmMain->AddFrame(viewer_frame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));
+  frmMain->AddFrame(viewer_frame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
 
   TGGroupFrame* param_frame = new TGGroupFrame(frmMain);
   param_frame->SetTitle("Options");
@@ -331,7 +331,7 @@ void DisplayUI::makeGui()
       param_frame->AddFrame(b, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
     }
   }
-  frmMain->AddFrame(param_frame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));
+  frmMain->AddFrame(param_frame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
 
   TGGroupFrame* automatisation_frame = new TGGroupFrame(frmMain);
   automatisation_frame->SetTitle("Automatic Saving");
@@ -344,7 +344,7 @@ void DisplayUI::makeGui()
       m_autoFileNamePrefix = new TGTextEntry(hf, "display_");
       hf->AddFrame(m_autoFileNamePrefix, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
     }
-    automatisation_frame->AddFrame(hf, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
+    automatisation_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
 
     TGButton* b = 0;
     hf = new TGHorizontalFrame(automatisation_frame);
@@ -362,10 +362,10 @@ void DisplayUI::makeGui()
       hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "startAutomaticRun()");
     }
-    automatisation_frame->AddFrame(hf, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
+    automatisation_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
 
   }
-  frmMain->AddFrame(automatisation_frame, new TGLayoutHints(kLHintsExpandX, 5, 5, 5, 5));
+  frmMain->AddFrame(automatisation_frame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
 
   //this will be shown at the very bottom
   TGGroupFrame* exit_frame = new TGGroupFrame(frmMain);
@@ -382,10 +382,10 @@ void DisplayUI::makeGui()
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "exit()");
 
     }
-    exit_frame->AddFrame(hf, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 5, 5, 5, 5));
+    exit_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
 
   }
-  frmMain->AddFrame(exit_frame, new TGLayoutHints(kLHintsExpandX | kLHintsBottom, 5, 5, 5, 5));
+  frmMain->AddFrame(exit_frame, new TGLayoutHints(kLHintsExpandX | kLHintsBottom, 0, 0, 0, 0));
 
   frmMain->MapSubwindows();
   frmMain->Resize();

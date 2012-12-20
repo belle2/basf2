@@ -99,6 +99,7 @@ EKLM::FiberAndElectronics::~FiberAndElectronics()
 
 void EKLM::FiberAndElectronics::processEntry()
 {
+  double par[5];
   for (std::vector<EKLMSimHit*> ::iterator iHit = m_vectorHits.begin();
        iHit != m_vectorHits.end(); iHit++) {
 
@@ -130,20 +131,21 @@ void EKLM::FiberAndElectronics::processEntry()
     addRandomSiPMNoise();
 
   // set up fit parameters
-  m_fitFunction->SetParameters(10, 2., 0.04, 50, m_enableConstBkg);
+  simulateADC();
+  m_FPGAStat = FPGAFit(m_ADCAmplitude, m_nTimeDigitizationSteps, par);
+  if (m_FPGAStat == c_FPGANoSignal)
+    return;
+  par[3] = par[3] / ADCRange * 2; /* FIXME: temporary (integer and real
+                                   * histogram normalizations differ). */
+  m_fitFunction->SetParameters(par[0], par[1], par[2], par[3],
+                               m_enableConstBkg);
   m_fitFunction->SetParLimits(0, 0, m_histRange);
   m_fitFunction->SetParLimits(1, 0, m_histRange);
   if (m_enableConstBkg == 0)
     m_fitFunction->FixParameter(4, 0);
 
-  simulateADC();
-  m_FPGAStat = FPGAFit(m_ADCAmplitude, m_nTimeDigitizationSteps);
-  if (m_FPGAStat == c_FPGANoSignal)
-    return;
-
   // do fit
   m_fitResultsPtr = m_digitizedAmplitude->Fit(m_fitFunction, "LSQN");
-
 
   // if save histograms if outputFilename is non-empty
   if (m_outputFilename.size() != 0) {

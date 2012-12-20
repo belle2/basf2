@@ -34,11 +34,12 @@ namespace Belle2 {
 
     /**
      * FPGA fitter.
-     * @param[in] amp     Digital amplitude.
-     * @param[in] nPoints Number of points in amplitude array.
-     * @return
+     * @param[in]  amp     Digital amplitude.
+     * @param[in]  nPoints Number of points in amplitude array.
+     * @param[out] par     Fit parameters.
+     * @return Fit status.
      */
-    enum FPGAFitStatus FPGAFit(int* amp, int nPoints);
+    enum FPGAFitStatus FPGAFit(int* amp, int nPoints, double par[5]);
 
   }
 

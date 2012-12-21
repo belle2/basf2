@@ -21,8 +21,7 @@
 #include <TMatrixD.h>
 
 // GenFit includes
-#include <GFPlanarHitPolicy.h>
-#include <GFRecoHitIfc.h>
+#include <RecoHits/GFAbsPlanarHit.h>
 
 namespace Belle2 {
   /**
@@ -48,7 +47,7 @@ namespace Belle2 {
    * }
    * @endcode
    */
-  class PXDRecoHit: public GFRecoHitIfc<GFPlanarHitPolicy> {
+  class PXDRecoHit: public GFAbsPlanarHit {
   public:
     /** Default constructor for ROOT IO. */
     PXDRecoHit();
@@ -110,7 +109,7 @@ namespace Belle2 {
     /** Projection for the hit ...
      * Overrides the method inherited from GFRecoHit.
      */
-    TMatrixD getHMatrix(const GFAbsTrackRep* stateVector);
+    const TMatrixD& getHMatrix(const GFAbsTrackRep* stateVector);
 
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
@@ -122,9 +121,9 @@ namespace Belle2 {
     /** Get pointer to the VXDSimpleDigiHit used when creating this RecoHit, can be NULL if created from something else */
     const VXDSimpleDigiHit* getSimpleDigiHit() const { return m_vxdSimpleDigiHit; }
     /** Get u coordinate.*/
-    float getU() const { return fHitCoord(0, 0); }
+    float getU() const { return fHitCoord(0); }
     /** Get v coordinate.*/
-    float getV() const { return fHitCoord(1, 0); }
+    float getV() const { return fHitCoord(1); }
 
     /** Get u coordinate variance */
     float getUVariance() const { return fHitCov(0, 0); }
@@ -155,7 +154,7 @@ namespace Belle2 {
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(PXDRecoHit, 2)
+    ClassDef(PXDRecoHit, 3)
   };
 
 } // namespace Belle2

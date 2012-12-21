@@ -20,10 +20,7 @@ int getTrackParametersAtGivenPoint(GFTrack* thisTrack, TVector3 point, TVector3&
     // if the plane is defined to be parallel to xy plane the result is the same,
     // but it's still not clear which direction should be taken (or if it is important at all)
     GFDetPlane plane(poca, dirInPoca);
-    TVector3 resultPosition;
-    TMatrixT<double> resultCovariance;
-
-    thisTrack->getPosMomCov(plane, resultPosition, momentum, resultCovariance);
+    momentum = thisTrack->getMom(plane);
   }
   return 1;
 }

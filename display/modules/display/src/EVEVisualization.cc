@@ -25,7 +25,10 @@
 #include <vxd/geometry/GeoCache.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
-#include <GFAbsRecoHit.h>
+#include <RecoHits/GFAbsRecoHit.h>
+#include <RecoHits/GFAbsPlanarHit.h>
+#include <RecoHits/GFAbsSpacepointHit.h>
+#include <RecoHits/GFAbsWireHit.h>
 #include <GFAbsTrackRep.h>
 #include <GFConstField.h>
 #include <GFDetPlane.h>
@@ -254,9 +257,9 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
   //copy original track
   boost::scoped_ptr<GFTrack> track(new GFTrack(*gftrack));
 
-  const int irep = 0;
   //copy original track rep
-  boost::scoped_ptr<GFAbsTrackRep> rep(track->getTrackRep(irep)->clone());
+  boost::scoped_ptr<GFAbsTrackRep> rep(track->getCardinalRep()->clone());
+  const unsigned int irep = track->getCardinalRepID();
 
   unsigned int numhits = track->getNumHits();
   double charge = rep->getCharge();
@@ -319,10 +322,10 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
     // get the hit infos ------------------------------------------------------------------
     try {
       if (smoothing) {
-        TMatrixT<double> state;
-        TMatrixT<double> cov;
-        TMatrixT<double> auxInfo;
-        GFTools::getSmoothedData(track.get(), irep, j, state, cov, plane, auxInfo);
+        TVectorD state;
+        TMatrixDSym cov;
+        TMatrixD auxInfo;
+        GFTools::getBiasedSmoothedData(track.get(), irep, j, state, cov, plane, auxInfo);
         rep->setData(state, plane, &cov, &auxInfo);
       } else {
         plane = hit->getDetPlane(rep.get());
@@ -336,9 +339,8 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
       } else continue;
     }
     const TVector3& track_pos = rep->getPos(plane);
-    const TVector3& plane_pos = plane.getO();
-    TMatrixT<double> hit_coords;
-    TMatrixT<double> hit_cov;
+    TVectorD hit_coords;
+    TMatrixDSym hit_cov;
     hit->getMeasurement(rep.get(), plane, rep->getState(), rep->getCov(), hit_coords, hit_cov);
     // finished getting the hit infos -----------------------------------------------------
 
@@ -346,8 +348,6 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
     const TVector3& o = plane.getO();
     const TVector3& u = plane.getU();
     const TVector3& v = plane.getV();
-
-    const std::string& hit_type = hit->getPolicyName();
 
     bool planar_hit = false;
     bool planar_pixel_hit = false;
@@ -357,27 +357,31 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
     double_t hit_v = 0;
     const float plane_size = 4.0;
     double_t hit_res_u = 0.5;
-    //double_t hit_res_v = 0.5; //not actually used
+    double_t hit_res_v = 0.5;
 
     int hit_coords_dim = hit_coords.GetNrows();
 
-    if (hit_type == "GFPlanarHitPolicy") {
+    if (dynamic_cast<GFAbsPlanarHit*>(hit) != NULL) {
       planar_hit = true;
       if (hit_coords_dim == 1) {
-        hit_u = hit_coords(0, 0);
+        hit_u = hit_coords(0);
         hit_res_u = hit_cov(0, 0);
       } else if (hit_coords_dim == 2) {
         planar_pixel_hit = true;
-        hit_u = hit_coords(0, 0);
-        hit_v = hit_coords(1, 0);
+        hit_u = hit_coords(0);
+        hit_v = hit_coords(1);
         hit_res_u = hit_cov(0, 0);
-        //hit_res_v = hit_cov(1, 1);
+        hit_res_v = hit_cov(1, 1);
       }
-    } else if (hit_type == "GFSpacepointHitPolicy") {
+    } else if (dynamic_cast<GFAbsSpacepointHit*>(hit) != NULL) {
       space_hit = true;
-    } else if (hit_type == "GFWireHitPolicy") {
+    } else if (dynamic_cast<GFAbsWireHit*>(hit) != NULL) {
       wire_hit = true;
-      hit_u = hit_coords(0, 0);
+      hit_u = hit_coords(0);
+      hit_v = v * (track_pos - o); // move the covariance tube so that the track goes through it
+      hit_res_u = hit_cov(0, 0);
+      hit_res_v = 4;
+      //GFAbsWirepointHit not used
     } else {
       B2WARNING("Hit " << j << ": Unknown policy name: skipping hit!");
       continue;
@@ -396,7 +400,11 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
 
     // draw planes if corresponding option is set -----------------------------------------
     if (drawPlanes || (drawDetectors && planar_hit)) {
-      TEveBox* box = boxCreator(plane_pos, u, v, plane_size, plane_size, 0.01);
+      TVector3 move(0, 0, 0);
+      if (wire_hit)
+        move = v * (v * (track_pos - o)); // move the plane along the wire until the track goes through it
+      TEveBox* box = boxCreator(o + move, u, v, plane_size, plane_size, 0.01);
+
       if (drawDetectors && planar_hit) {
         box->SetMainColor(kCyan);
       } else {
@@ -427,10 +435,14 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
         TGeoRotation det_rot("det_rot", (u.Theta() * 180) / TMath::Pi(), (u.Phi() * 180) / TMath::Pi(),
                              (norm.Theta() * 180) / TMath::Pi(), (norm.Phi() * 180) / TMath::Pi(),
                              (v.Theta() * 180) / TMath::Pi(), (v.Phi() * 180) / TMath::Pi()); // move the tube to the right place and rotate it correctly
-        TGeoCombiTrans det_trans(o(0), o(1), o(2), &det_rot);
+        TVector3 move = v * (v * (track_pos - o)); // move the tube along the wire until the track goes through it
+        TGeoCombiTrans det_trans(o(0) + move.X(),
+                                 o(1) + move.Y(),
+                                 o(2) + move.Z(),
+                                 &det_rot);
         det_shape->SetTransMatrix(det_trans);
         det_shape->SetMainColor(kCyan);
-        det_shape->SetMainTransparency(0);
+        det_shape->SetMainTransparency(25);
         if ((drawHits && (hit_u - pseudo_res_0 > 0)) || !drawHits) {
           if (track_lines)
             track_lines->AddElement(det_shape);
@@ -449,7 +461,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
         if (!planar_pixel_hit) {
           //currently unused in Belle2 {{{
           TEveBox* hit_box;
-          hit_box = boxCreator((plane_pos + hit_u * u), u, v, (float)(m_errorScale * std::sqrt(hit_res_u)), plane_size, 0.0105);
+          hit_box = boxCreator((o + hit_u * u), u, v, m_errorScale * std::sqrt(hit_res_u), plane_size, 0.0105);
           hit_box->SetMainColor(kYellow);
           hit_box->SetMainTransparency(0);
           if (track_lines)
@@ -488,7 +500,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
 
           // calculate the semiaxis of the error ellipse ----------------------------
           det_shape->SetShape(new TGeoEltu(pseudo_res_0, pseudo_res_1, 0.0105));
-          TVector3 pix_pos = plane_pos + hit_u * u + hit_v * v;
+          TVector3 pix_pos = o + hit_u * u + hit_v * v;
           TVector3 u_semiaxis = (pix_pos + eVec(0, 0) * u + eVec(1, 0) * v) - pix_pos;
           TVector3 v_semiaxis = (pix_pos + eVec(0, 1) * u + eVec(1, 1) * v) - pix_pos;
           TVector3 norm = u.Cross(v);
@@ -582,7 +594,10 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
         TGeoRotation det_rot("det_rot", (u.Theta() * 180) / TMath::Pi(), (u.Phi() * 180) / TMath::Pi(),
                              (norm.Theta() * 180) / TMath::Pi(), (norm.Phi() * 180) / TMath::Pi(),
                              (v.Theta() * 180) / TMath::Pi(), (v.Phi() * 180) / TMath::Pi());
-        TGeoCombiTrans det_trans(o(0), o(1), o(2), &det_rot);
+        TGeoCombiTrans det_trans(o(0) + hit_v * v.X(),
+                                 o(1) + hit_v * v.Y(),
+                                 o(2) + hit_v * v.Z(),
+                                 &det_rot);
         det_shape->SetTransMatrix(det_trans);
         // finished rotating and translating ------------------------------------------
 

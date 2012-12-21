@@ -283,10 +283,8 @@ namespace Belle2 {
 
 
     //track seeds
-    const double qOverP = trackCand->getQoverPseed();
     TVector3 track_pos = trackCand->getPosSeed();
-    TVector3 track_mom = trackCand->getDirSeed() * (1.0 / TMath::Abs(qOverP));
-    //TVector3 track_mom = trackCand->getMomSeed(); //TODO: requires newer genfit
+    TVector3 track_mom = trackCand->getMomSeed();
 
     TEveTrack* track_lines = NULL;
 
@@ -301,8 +299,8 @@ namespace Belle2 {
       for (unsigned int iHit = 0; iHit < numhits; iHit++) { // loop over all hits in the track
 
         //get hit and detector indices from candidate
-        unsigned int detId;
-        unsigned int hitId;
+        int detId;
+        int hitId;
         trackCand->getHit(iHit, detId, hitId);
 
         //get actual hit data from associated StoreArray
@@ -363,7 +361,7 @@ namespace Belle2 {
                                             label.Data(), numhits,
                                             track_mom.Pt(), track_mom.Pz()));
 
-      track_lines->SetCharge((int)(qOverP / TMath::Abs(qOverP)));
+      track_lines->SetCharge((int)trackCand->getChargeSeed());
 
 
       track_lines->AddElement(lines);

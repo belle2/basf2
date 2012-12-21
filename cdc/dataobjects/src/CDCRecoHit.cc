@@ -46,13 +46,13 @@ void CDCRecoHit::setUpdate(bool update)
 }
 
 CDCRecoHit::CDCRecoHit()
-  : GFRecoHitIfc<GFWireHitPolicy> (c_nParHitRep),
+  : GFAbsWireHit(c_nParHitRep),
     m_adcCount(0), m_charge(0), m_tdcCount(0), m_driftLength(0), m_driftLengthResolution(0), m_wireID(WireID())
 {
 }
 
 CDCRecoHit::CDCRecoHit(const CDCHit* cdcHit)
-  : GFRecoHitIfc<GFWireHitPolicy> (c_nParHitRep)
+  : GFAbsWireHit(c_nParHitRep)
 {
   if (s_adcCountTranslator == 0 || s_cdcGeometryTranslator == 0 || s_tdcCountTranslator == 0) {
     B2FATAL("Can't produce CDCRecoHits without setting of the translators.")
@@ -70,17 +70,17 @@ CDCRecoHit::CDCRecoHit(const CDCHit* cdcHit)
 
   // forward wire position
   TVector3 dummyVector3 = s_cdcGeometryTranslator->getWireForwardPosition(m_wireID);
-  fHitCoord[0][0] = dummyVector3.X();
-  fHitCoord[1][0] = dummyVector3.y();
-  fHitCoord[2][0] = dummyVector3.z();
+  fHitCoord(0) = dummyVector3.X();
+  fHitCoord(1) = dummyVector3.y();
+  fHitCoord(2) = dummyVector3.z();
   // backward wire position
   dummyVector3 = s_cdcGeometryTranslator->getWireBackwardPosition(m_wireID);
-  fHitCoord[3][0] = dummyVector3.X();
-  fHitCoord[4][0] = dummyVector3.Y();
-  fHitCoord[5][0] = dummyVector3.Z();
+  fHitCoord(3) = dummyVector3.X();
+  fHitCoord(4) = dummyVector3.Y();
+  fHitCoord(5) = dummyVector3.Z();
 
-  fHitCoord[6][0] = m_driftLength;
-  fHitCov[6][6] = m_driftLengthResolution;
+  fHitCoord(6) = m_driftLength;
+  fHitCov(6, 6) = m_driftLengthResolution;
 
   B2DEBUG(250, "CDCRecoHit assigned drift-length " << m_driftLength
           << ", drift-length resolution" << m_driftLengthResolution << ", dummyVector3"
@@ -92,19 +92,19 @@ GFAbsRecoHit* CDCRecoHit::clone()
   return new CDCRecoHit(*this);
 }
 
-TMatrixD CDCRecoHit::getHMatrix(const GFAbsTrackRep* /*stateVector*/)
+const TMatrixD& CDCRecoHit::getHMatrix(const GFAbsTrackRep* /*stateVector*/)
 {
   //don't check for specific Track Representation at the moment, as RKTrackRep is the only one we are currently using.
   return (c_HMatrix);
 }
 
-void CDCRecoHit::getMeasurement(const GFAbsTrackRep* trackRep, const GFDetPlane& plane, const TMatrixT<double>& whatever, const TMatrixT<double>& whatever2,
-                                TMatrixT<double>& m, TMatrixT<double>& V)
+void CDCRecoHit::getMeasurement(const GFAbsTrackRep* trackRep, const GFDetPlane& plane, const TVectorD& whatever, const TMatrixDSym& whatever2,
+                                TVectorD& m, TMatrixDSym& V)
 {
   if (s_update) {
     B2FATAL("The extraction of track/hit parameters for the getMeasurement function has still to be implemented. \n"
             << "Please avoid setting s_update to true for the moment.");
   } else {
-    GFRecoHitIfc<GFWireHitPolicy>::getMeasurement(trackRep, plane, whatever, whatever2, m, V);
+    GFAbsWireHit::getMeasurement(trackRep, plane, whatever, whatever2, m, V);
   }
 }

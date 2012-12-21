@@ -16,8 +16,8 @@
 #include <cdc/dataobjects/CDCGeometryTranslatorBase.h>
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
 
-#include <genfit/GFRecoHitIfc.h>
-#include <genfit/GFWireHitPolicy.h>
+#include <genfit/RecoHits/GFAbsWireHit.h>
+
 
 #include <TMatrixD.h>
 
@@ -31,7 +31,7 @@ namespace Belle2 {
    *  @}
    */
   /** This class is used to transfer CDC information to the track fit. */
-  class CDCRecoHit : public GFRecoHitIfc<GFWireHitPolicy>  {
+  class CDCRecoHit : public GFAbsWireHit  {
 
   public:
     /** Default Constructor for ROOT IO.*/
@@ -56,7 +56,7 @@ namespace Belle2 {
      *
      * This function overwrites a function that GFRecoHitIfc inherits from GFRecoHit.
      */
-    TMatrixD getHMatrix(const GFAbsTrackRep* stateVector);
+    const TMatrixD& getHMatrix(const GFAbsTrackRep* stateVector);
 
     /** Getter for WireID object. */
     WireID getWireID() const {
@@ -83,8 +83,8 @@ namespace Belle2 {
      *
      *  This method is inherited from the GFAbsRecoHitIfc.
      */
-    void getMeasurement(const GFAbsTrackRep*, const GFDetPlane& pl, const TMatrixT<double>&, const TMatrixT<double>&,
-                        TMatrixT<double>& m, TMatrixT<double>& V);
+    void getMeasurement(const GFAbsTrackRep*, const GFDetPlane& pl, const TVectorD&, const TMatrixDSym&,
+                        TVectorD& m, TMatrixDSym& V);
 
 
   private:
@@ -143,7 +143,7 @@ namespace Belle2 {
     static bool s_update; //!                               Don't write to ROOT file, as pointer is meaningless, there
 
     /** ROOT Macro.*/
-    ClassDef(CDCRecoHit, 4);
+    ClassDef(CDCRecoHit, 5);
   };
 }
 #endif

@@ -1,9 +1,10 @@
 #ifndef PYSTOREOBJ_H
 #define PYSTOREOBJ_H
 
-#include <TObject.h>
-
 #include <string>
+
+class TClass;
+class TObject;
 
 namespace Belle2 {
   /** a (simplified) python wrapper for StoreObjPtr.
@@ -29,7 +30,7 @@ namespace Belle2 {
   * \note While it is not possible to add objects/arrays to the data store, you
   *       can modify the contents of existing ones.
   */
-  class PyStoreObj : public TObject {
+  class PyStoreObj {
   public:
     /** constructor.
     * @param name Name of the entry to be accessed
@@ -81,8 +82,6 @@ namespace Belle2 {
     TObject** m_storeObjPtr; /**< Pointer to pointer to object */
     std::string m_name; /**< Name of data store entry. */
     int m_durability; /**< Durability of data store entry. */
-
-    ClassDef(PyStoreObj, 0)
   };
 }
 #endif

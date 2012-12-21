@@ -20,7 +20,7 @@
 
 namespace Belle2 {
 
-  /** Relations interface class.
+  /** Defines interface for accessing relations of objects in StoreArray.
    *
    *  A class that wants to support the relations interface and is a subclass
    *  of BASE should be derived from RelationsInterface<BASE> instead.
@@ -159,7 +159,7 @@ namespace Belle2 {
 
   private:
 
-    ClassDef(RelationsInterface, 0);
+    ClassDef(RelationsInterface, 0); /**< defines interface for accessing relations of objects in StoreArray. */
 
     /** Cache of the data store entry to which this object belongs. */
     mutable DataStore::StoreEntry* m_cacheDataStoreEntry;  //!

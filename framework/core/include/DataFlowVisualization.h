@@ -1,8 +1,8 @@
 #ifndef DATAFLOWVISUALIZATION_H
 #define DATAFLOWVISUALIZATION_H
 
-#include <framework/datastore/DataStore.h>
 #include <framework/core/Module.h>
+#include <framework/datastore/DataStore.h>
 
 namespace Belle2 {
   /** class to visualize data flow between modules. */

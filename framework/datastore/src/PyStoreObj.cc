@@ -3,11 +3,10 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 
+#include <TObject.h>
 #include <TClass.h>
 
 using namespace Belle2;
-
-ClassImp(PyStoreObj)
 
 PyStoreObj::PyStoreObj(const std::string& name, int durability):
   m_storeObjPtr(0),

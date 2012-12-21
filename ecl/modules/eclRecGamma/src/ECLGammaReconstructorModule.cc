@@ -221,9 +221,9 @@ void ECLGammaReconstructorModule::readExtrapolate()
       GFTrackCand* cand = extTrackCands[t * 5 + hypothesis];
 //    cout<<"GFTrackCand  "<<cand->getNHits()<<endl;
       for (unsigned int j = 0; j < cand->getNHits(); ++j) {
-        unsigned int detID;
-        unsigned int hitID;
-        unsigned int planeID;
+        int detID;
+        int hitID;
+        int planeID;
         cand->getHitWithPlane(j, detID, hitID, planeID);
         if ((detID != myDetID) || (planeID == 0)) continue;
         //cout<<" Ext CellId "<<planeID<<" ";

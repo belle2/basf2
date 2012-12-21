@@ -65,7 +65,7 @@ void VertexerModule::initialize()
   if (m_useBeamSpot == true) {
     if (m_beamSpotPos.size() == 3 and m_beamSpotCov.size() == 9) {
       TVector3 beamSpotPos(m_beamSpotPos[0], m_beamSpotPos[1], m_beamSpotPos[2]);
-      TMatrixD beamSpotCov(3, 3, &m_beamSpotCov[0]); //when C++2011 is used .data() should used instead
+      TMatrixDSym beamSpotCov(3, &m_beamSpotCov[0]); //when C++2011 is used .data() should used instead
       m_gfRaveVertexFactoryPtr->setBeamspot(beamSpotPos, beamSpotCov);
 //      beamSpotPos.Print();
 //      beamSpotCov.Print();

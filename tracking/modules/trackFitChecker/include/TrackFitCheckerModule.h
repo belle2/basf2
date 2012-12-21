@@ -109,7 +109,7 @@ namespace Belle2 {
     */
     void terminate();
 
-
+    static TMatrixD invertMatrix(const TMatrixD& aMatrix) ;
   protected:
 
     // little helper functions for this module

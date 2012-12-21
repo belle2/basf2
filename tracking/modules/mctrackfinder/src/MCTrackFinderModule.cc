@@ -27,6 +27,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/dataobjects/SimpleVec.h>
 #include <GFTrackCand.h>
+#include <tracking/trackCandidateHits/CDCTrackCandHit.h>
 
 #include <boost/foreach.hpp>
 #include <boost/math/special_functions/sign.hpp>
@@ -34,13 +35,13 @@
 #include <TRandom.h>
 
 #include <utility>
-#include <list>
+#include <sstream>
 #include <cmath>
 
 
 using namespace std;
 using namespace Belle2;
-
+using namespace Tracking;
 using boost::math::sign;
 
 //-----------------------------------------------------------------
@@ -70,7 +71,7 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
 
   //choose for which particles a track candidate should be created
   //this is just an attempt to find out what is the most suitable way to select particles, if you have other/better ideas, communicate it to the tracking group...
-  addParam("WhichParticles", m_whichParticles, "List of keywords to mark what properties particles must have to get a track candidate. If several properties are given all of them must be true: \"primary\" particle must come from the generator, \"PXD\" particle must have hits in PXD, \"SVD\" particle must have hits in SVD, \"CDC\" particle must have hits in CDC, \"TOP\" particle must have hits in TOP, \"ECL\" particle must have hits in ECL, \"KLM\" particle must have hits in KLM" , vector<string>(1, "primary"));
+  addParam("WhichParticles", m_whichParticles, "List of keywords to mark what properties particles must have to get a track candidate. If several properties are given all of them must be true: \"primary\" particle must come from the generator, \"PXD\", \"SVD\", \"CDC\", \"TOP\", \"ECL\" or \"KLM\" particle must have hits in the subdetector with that name. \"is:X\" where X is a PDG code: particle must have this code. \"from:X\" any of the particles's ancestors must have this (X) code" , vector<string>(1, "primary"));
   addParam("EnergyCut", m_energyCut, "Track candidates are only created for MCParticles with energy larger than this cut ", double(0.1));
   addParam("Neutrals", m_neutrals, "Set true if track candidates should be created also for neutral particles", bool(false));
 
@@ -97,9 +98,10 @@ void MCTrackFinderModule::initialize()
 
   RelationArray::registerPersistent<GFTrackCand, MCParticle>(m_gfTrackCandsColName, "");
 
-  StoreArray<SimpleVec<char> >::registerTransient("leftRightAmbiInfo");
   // build a bit mask with all properties a MCParticle should have to lead to the creation of a track candidate
   m_particleProperties = 0;
+  int aPdgCode = 0;
+  stringstream convert;
   const int nProperties = m_whichParticles.size();
   for (int i = 0; i not_eq nProperties; ++i) {
     if (m_whichParticles[i] == "primary") {
@@ -116,10 +118,22 @@ void MCTrackFinderModule::initialize()
       m_particleProperties += 32;
     } else if (m_whichParticles[i] == "KLM") {
       m_particleProperties += 64;
+    } else if (m_whichParticles[i].substr(0, 3) == "is:") {
+      string pdgCodeString = m_whichParticles[i].substr(3);
+      stringstream(pdgCodeString) >> aPdgCode;
+      B2DEBUG(100, "PDG code added to m_particlePdgCodes " << aPdgCode << " *******");
+      m_particlePdgCodes.push_back(aPdgCode);
+    } else if (m_whichParticles[i].substr(0, 5) == "from:") {
+      string pdgCodeString = m_whichParticles[i].substr(5);
+      stringstream(pdgCodeString) >> aPdgCode;
+      B2DEBUG(100, "PDG code added to m_fromPdgCodes " << aPdgCode << " *******");
+      m_fromPdgCodes.push_back(aPdgCode);
     } else {
       B2FATAL("Invalid values were given to the MCTrackFinder parameter WhichParticles");
     }
   }
+
+
 
   //transfom the smearingCov vector into a TMatrixD
   //first check if it can be transformed into a 6x6 matrix
@@ -127,7 +141,7 @@ void MCTrackFinderModule::initialize()
     B2FATAL("SmearingCov does not have exactly 36 elements. So 6x6 covariance matrix can be formed from it");
   }
   m_initialCov.ResizeTo(6, 6);
-  m_initialCov = TMatrixD(6, 6, &m_smearingCov[0]);
+  m_initialCov = TMatrixDSym(6, &m_smearingCov[0]);
   for (int i = 0; i != 6; ++i) {
     if (m_initialCov(i, i) < 0.0) {
       m_initialCov(0, 0) = -1.0; // if first element of matrix is negative this using this matrix will be switched off
@@ -217,8 +231,6 @@ void MCTrackFinderModule::event()
 
 
   //register StoreArray which will be filled by this module
-  StoreArray<SimpleVec<char> > leftRightAmbiInfo("leftRightAmbiInfo");
-  leftRightAmbiInfo.create();
   StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
   trackCandidates.create();
   RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
@@ -227,11 +239,10 @@ void MCTrackFinderModule::event()
   float forbiddenCharge = -999;
   if (m_neutrals == false) {forbiddenCharge = 0;}
 
-  // loop over MCParticles.
-  // it would be nice to optimize this, because there are actually ~1000 secondary MCParticles for each primary MCParticle
+  // loop over MCParticles. And check several user selected properties. Make a track candidate only if MCParticle has properties wanted by user options.
   for (int iPart = 0; iPart < nMcParticles; ++iPart) {
     MCParticle* aMcParticlePtr = mcParticles[iPart];
-    //set the property mask for this particle and compare it to the one gernated from user input
+    //set the property mask for this particle and compare it to the one generated from user input
     int mcParticleProperties = 0;
     if (aMcParticlePtr->hasStatus(MCParticle::c_PrimaryParticle)) {
       mcParticleProperties += 1;
@@ -254,18 +265,66 @@ void MCTrackFinderModule::event()
     if (aMcParticlePtr->hasStatus(MCParticle::c_LastSeenInKLM)) {
       mcParticleProperties += 64;
     }
-    // check all properties that the mcparticle should have in one line.
+    // check all "seen in" properties that the mcparticle should have in one line.
     if ((mcParticleProperties bitand m_particleProperties) != m_particleProperties) {
       B2DEBUG(100, "PDG: " << aMcParticlePtr->getPDG() <<  " | property mask of particle " <<  mcParticleProperties << " demanded property mask " << m_particleProperties);
       continue; //goto next mcParticle, do not make track candidate
     }
     //make links only for interesting MCParticles: energy cut and check for neutrals
     if (aMcParticlePtr->getEnergy() < m_energyCut || aMcParticlePtr->getCharge() == forbiddenCharge) {
-      B2DEBUG(100, "particle energy too low or not the right charge. mc particle will be skiped");
+      B2DEBUG(100, "particle energy too low or does not have the right charge. mc particle will be skiped");
       continue; //goto next mcParticle, do not make track candidate
     }
 
-    B2DEBUG(100, "Search a  track for the MCParticle with index: " << iPart << " (PDG: " << aMcParticlePtr->getPDG() << ")");
+    //check if particle has the pdg code the user wants to have. If user did not set any pdg code every code is fine for track candidate creation
+
+    const int nPdgCodes = m_particlePdgCodes.size();
+    if (nPdgCodes not_eq 0) {
+      const int currentPdgCode = aMcParticlePtr->getPDG();
+      int nFalsePdgCodes = 0;
+      for (int i = 0; i not_eq nPdgCodes; ++i) {
+        if (m_particlePdgCodes[i] not_eq currentPdgCode) {
+          ++nFalsePdgCodes;
+        }
+      }
+      if (nFalsePdgCodes == nPdgCodes) {
+        B2DEBUG(100, "particle does not have one of the user provided pdg codes and will therefore be skipped");
+        continue; //goto next mcParticle, do not make track candidate
+      }
+    }
+
+
+    //check if particle has an ancestor selected by the user. If user did not set any pdg code every code is fine for track candidate creation
+    //cerr << "check" << endl;
+    const int nFromPdgCodes = m_fromPdgCodes.size();
+    if (nFromPdgCodes not_eq 0) {
+      MCParticle* currentMother = aMcParticlePtr->getMother();
+      int nFalsePdgCodes = 0;
+      int nAncestor = 0;
+      while (currentMother not_eq NULL) {
+        int currentMotherPdgCode = currentMother->getPDG();
+        //cerr << "pdg code outer loop " << currentMotherPdgCode << endl;
+        for (int i = 0; i not_eq nFromPdgCodes; ++i) {
+          //cerr << "m_fromPdgCodes[i] " << m_fromPdgCodes[i] << endl;
+          if (m_fromPdgCodes[i] not_eq currentMotherPdgCode) {
+            //cerr << "waaaa" << endl;
+            ++nFalsePdgCodes;
+          }
+        }
+
+        currentMother = currentMother->getMother();
+        ++nAncestor;
+        //cerr << currentMother << " " << nAncestor << endl;
+      }
+      //cerr << "nFalsePdgCodes " << nFalsePdgCodes << " nAncestor " << nAncestor << " nFromPdgCodes " << nFromPdgCodes<< endl;
+      if (nFalsePdgCodes == (nAncestor * nFromPdgCodes)) {
+        B2DEBUG(100, "particle does not have and ancestor with one of the user provided pdg codes and will therefore be skipped");
+        continue; //goto next mcParticle, do not make track candidate
+      }
+    }
+
+
+    B2DEBUG(100, "Search a track for the MCParticle with index: " << iPart << " (PDG: " << aMcParticlePtr->getPDG() << ")");
 
     int ndf = 0; // cout the ndf of one track candidate
     // create a list containing the indices to the PXDHits that belong to one track
@@ -329,11 +388,12 @@ void MCTrackFinderModule::event()
 
     if (ndf <= m_minimalNdf) {
       ++m_notEnoughtHitsCounter;
+
       continue; //goto next mcParticle, do not make track candidate
     }
     //Now create TrackCandidate
     int counter = trackCandidates->GetLast() + 1;
-    B2DEBUG(100, "Create TrackCandidate  " << counter);
+    B2DEBUG(100, "We came pass all filter of the MCPartile and hit properties. TrackCandidate " << counter << " will be created from the MCParticle with index: " << iPart << " (PDG: " << aMcParticlePtr->getPDG() << ")");
 
     //create TrackCandidate
     new(trackCandidates->AddrAt(counter)) GFTrackCand();
@@ -345,8 +405,8 @@ void MCTrackFinderModule::event()
     // if no kind of smearing is activated the initial values (seeds) for track fit will be the simulated truth
     TVector3 momentum = momentumTrue;
     TVector3 position = positionTrue;
-    TMatrixD stateSeed(6, 1); //this will
-    TMatrixD covSeed(6, 6);
+    TVectorD stateSeed(6); //this will
+    TMatrixDSym covSeed(6);
     covSeed.Zero(); // just to be save
     covSeed(0, 0) = 1; covSeed(1, 1) = 1; covSeed(2, 2) = 2 * 2;
     covSeed(3, 3) = 0.1 * 0.1; covSeed(4, 4) = 0.1 * 0.1; covSeed(5, 5) = 0.2 * 0.2;
@@ -381,8 +441,8 @@ void MCTrackFinderModule::event()
       momentum.SetXYZ(smearedPX, smearedPY, smearedPZ);
       covSeed = m_initialCov;
     }
-    stateSeed(0, 0) = position[0]; stateSeed(1, 0) = position[1]; stateSeed(2, 0) = position[2];
-    stateSeed(3, 0) = momentum[0]; stateSeed(4, 0) = momentum[1]; stateSeed(5, 0) = momentum[2];
+    stateSeed(0) = position[0]; stateSeed(1) = position[1]; stateSeed(2) = position[2];
+    stateSeed(3) = momentum[0]; stateSeed(4) = momentum[1]; stateSeed(5) = momentum[2];
 
     //Finally set the complete track seed
     trackCandidates[counter]->set6DSeedAndPdgCode(stateSeed, pdg, covSeed);
@@ -405,7 +465,7 @@ void MCTrackFinderModule::event()
       BOOST_FOREACH(int hitID, pxdHitsIndices) {
         VxdID aVxdId = pxdTrueHits[hitID]->getSensorID();
         float time = pxdTrueHits[hitID]->getGlobalTime();
-        trackCandidates[counter]->addHit(Const::PXD, hitID, double(time), aVxdId.getID());
+        trackCandidates[counter]->addHit(Const::PXD, hitID, aVxdId.getID(), double(time));
       }
       B2DEBUG(100, "     add " << pxdHitsIndices.size() << " PXDHits");
     }
@@ -433,7 +493,7 @@ void MCTrackFinderModule::event()
           ++iterPairCluTr.first;
         }
 
-        trackCandidates[counter]->addHit(Const::PXD, hitID, double(time), aVxdId.getID());
+        trackCandidates[counter]->addHit(Const::PXD, hitID, aVxdId.getID(), double(time));
       }
       B2DEBUG(100, "     add " << pxdHitsIndices.size() << " PXDClusters");
     }
@@ -441,7 +501,7 @@ void MCTrackFinderModule::event()
       BOOST_FOREACH(int hitID, svdHitsIndices) {
         VxdID aVxdId = svdTrueHits[hitID]->getSensorID();
         float time = svdTrueHits[hitID]->getGlobalTime();
-        trackCandidates[counter]->addHit(Const::SVD, hitID, double(time), aVxdId.getID());
+        trackCandidates[counter]->addHit(Const::SVD, hitID, aVxdId.getID(), double(time));
       }
       B2DEBUG(100, "     add " << svdHitsIndices.size() << " SVDHits");
     }
@@ -466,7 +526,7 @@ void MCTrackFinderModule::event()
           }
           ++iterPairCluTr.first;
         }
-        trackCandidates[counter]->addHit(Const::SVD, hitID, double(time), aVxdId.getID());
+        trackCandidates[counter]->addHit(Const::SVD, hitID, aVxdId.getID(), double(time));
       }
       B2DEBUG(100, "     add " << svdHitsIndices.size() << " SVDClusters");
     }
@@ -491,26 +551,29 @@ void MCTrackFinderModule::event()
           }
         }
         time = aCDCSimHitPtr->getFlightTime();
-        trackCandidates[counter]->addHit(Const::CDC, hitID, time, wireId);
+        //now determine the correct sign to resolve the left right ambiguity in the fitter
         TVector3 simHitPos = aCDCSimHitPtr->getPosTrack();
         TVector3 simMom = aCDCSimHitPtr->getMomentum();
         TVector3 simHitPosOnWire = aCDCSimHitPtr->getPosWire();
-        TVector3  wireStartPos = cdcGeometry.wireBackwardPosition(WireID(wireId));
+        TVector3 wireStartPos = cdcGeometry.wireBackwardPosition(WireID(wireId));
         TVector3 wireDir = simHitPosOnWire - wireStartPos;
         TVector3 wireToSimHit = simHitPos - simHitPosOnWire;
-        leftRight.push_back(sign(wireToSimHit * (wireDir.Cross(simMom))));
+        double scalarProduct = wireToSimHit * (wireDir.Cross(simMom));
+        char lrAmbiSign = boost::math::sign(scalarProduct);
+        CDCTrackCandHit* aCdcTrackCandHit = new CDCTrackCandHit(Const::CDC, hitID, wireId, time, lrAmbiSign); //do not delete! the GFTrackCand has ownership
+        trackCandidates[counter]->addHit(aCdcTrackCandHit);
+        B2DEBUG(100, "CDC hit " << hitID << " has reft/right sign " << int(lrAmbiSign));
       }
       B2DEBUG(100, "    add " << cdcHitsIndices.size() << " CDCHits");
-      leftRightAmbiInfo.appendNew(SimpleVec<char>(leftRight)); // not sorted will not work with curling tracks
     }
 
 
 
     // now after all the hits belonging to one track are added to a track candidate
     // bring them into the right order inside the trackCand objects using the rho/time parameter
-    //trackCandidates[counter]->Print();
+    //     trackCandidates[counter]->Print();
     trackCandidates[counter]->sortHits();
-    //trackCandidates[counter]->Print();
+    //     trackCandidates[counter]->Print();
 
   }//end loop over MCParticles
 }

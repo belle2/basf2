@@ -767,10 +767,11 @@ namespace Belle {
   {
   }
 
-string
-TTrackManager::version(void) const {
+  string
+  TTrackManager::version(void) const
+  {
     return string("5.02");
-}
+  }
 
   void
   TTrackManager::dump(const string& msg, const string& pref) const
@@ -2306,11 +2307,11 @@ TTrackManager::version(void) const {
     hAtOrigin.ignoreErrorMatrix();
     hAtOrigin.pivot(ORIGIN);
     TVector3 momentum(hAtOrigin.momentum().x(),
-		      hAtOrigin.momentum().y(),
-		      hAtOrigin.momentum().z());
+                      hAtOrigin.momentum().y(),
+                      hAtOrigin.momentum().z());
     TVector3 position(hAtOrigin.x().x(),
-		      hAtOrigin.x().y(),
-		      hAtOrigin.x().z());
+                      hAtOrigin.x().y(),
+                      hAtOrigin.x().z());
     //    cout << hAtOrigin.pivot() << endl;
 
     //...Erros on helix parameters...
@@ -2350,24 +2351,23 @@ TTrackManager::version(void) const {
       for (unsigned j = 0; j < n; ++j) {
         if (df[j] < dfmin && df[j] > dfmin_pre) {
           dfmin   = df[j];
-	  sort[i] = j;
-        } 
+          sort[i] = j;
+        }
       }
       dfmin_pre = dfmin;
     }
-    
+
     for (unsigned i = 0; i < n; i++) {
       //      const Belle2::TRGCDCWireHit& h = * t.links()[i]->hit();
       const Belle2::TRGCDCWireHit& h = * t.links()[sort[i]]->hit();
       const unsigned layerId = h.wire().layerId();
-      const unsigned hitID = h.iCDCHit();
+      const int hitID = h.iCDCHit();
       //      const double driftTime = h.drift();
       const HepGeom::Point3D<double> & onTrack = t.links()[sort[i]]->positionOnTrack();
       const double rho = onTrack.mag();
-      const unsigned uniqueId = layerId * 10000 + h.wire().localId();
+      const int uniqueId = layerId * 10000 + h.wire().localId();
 
-      //      trackCandidates[counter]->addHit(Belle2::Const::CDC, hitID, driftTime, uniqueId);
-      trackCandidates[counter]->addHit(Belle2::Const::CDC, hitID, rho, uniqueId);
+      trackCandidates[counter]->addHit(Belle2::Const::CDC, hitID, uniqueId, rho);
     }
 
     return 0;

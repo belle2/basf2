@@ -8,7 +8,7 @@
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <generators/dataobjects/MCParticle.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
-
+#include <tracking/modules/trackFitChecker/TrackFitCheckerModule.h>
 
 #include <GFTrack.h>
 #include <GFException.h>
@@ -16,7 +16,8 @@
 #include <GFConstField.h>
 #include <GFFieldManager.h>
 #include <GFTools.h>
-
+#include <GFMaterialEffects.h>
+#include <GFTGeoMaterialInterface.h>
 #include <GFRaveVertexFactory.h>
 #include <GFRaveVertex.h>
 
@@ -73,6 +74,7 @@ void VertexFitCheckerModule::initialize()
     geoManager.createTGeoRepresentation();
     //pass the magnetic field to genfit
     GFFieldManager::getInstance()->init(new GFGeant4Field());
+    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
   }
   //configure the output
   m_textOutput.precision(4);
@@ -176,6 +178,7 @@ void VertexFitCheckerModule::event()
     bool skipVertex = false;
     for (int i = 0; i not_eq nTracks; ++i) {
       const GFRaveTrackParameters* const trackInfo = aGFRaveVertexPtr->getParameters(i);
+//      cout << "trackInfo " << trackInfo << endl;
       double pValueOfTrack = trackInfo->getRep()->getPVal();
       B2DEBUG(100, "p value of track " << i << " in vertex " << iVertex << " is " << pValueOfTrack);
       if (pValueOfTrack < m_trackPValueCut) { // if contributing track is bad ignore this vertex
@@ -233,7 +236,7 @@ void VertexFitCheckerModule::event()
 
     fillInt("vertexFitStatus", 0); //status 0 means all tracks rave associated with one vertex are really belong to that vertex
     const TVector3 vertexPos = aGFRaveVertexPtr->getPos();
-    const TMatrixD vertexCov = aGFRaveVertexPtr->getCov();
+    const TMatrixDSym vertexCov = aGFRaveVertexPtr->getCov();
     //cout << "fitted vertex pos, cov" << endl;
 //    vertexPos.Print();
 //    vertexCov.Print();
@@ -505,8 +508,7 @@ double VertexFitCheckerModule::calcMad(const std::vector<double>& data, const do
 // calculate a chi2 value from a residuum and it's covariance matrix R
 double VertexFitCheckerModule::calcChi2(const TMatrixT<double>& res, const TMatrixT<double>& R) const
 {
-  TMatrixT<double> invR;
-  GFTools::invertMatrix(R, invR);
+  TMatrixT<double> invR = TrackFitCheckerModule::invertMatrix(R);
   TMatrixT<double> resT(TMatrixT<double>::kTransposed, res);
   return (resT * invR * res)[0][0];
 }

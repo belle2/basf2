@@ -14,6 +14,8 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <geometry/GeometryManager.h>
 #include <geometry/bfieldmap/BFieldMap.h>
@@ -37,13 +39,14 @@
 #include <cdc/translators/IdealCDCGeometryTranslator.h>
 
 #include <tracking/dataobjects/Track.h>
+#include <tracking/trackCandidateHits/CDCTrackCandHit.h>
 
 #include <GFTrack.h>
 #include <GFTrackCand.h>
 #include <GFRecoHitProducer.h>
 #include <GFRecoHitFactory.h>
 #include <GFMaterialEffects.h>
-
+#include <GFTGeoMaterialInterface.h>
 #include <GFAbsTrackRep.h>
 #include <RKTrackRep.h>
 
@@ -66,6 +69,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
+using namespace Tracking;
 
 REG_MODULE(GenFitter)
 
@@ -132,6 +136,7 @@ void GenFitterModule::initialize()
     geoManager.createTGeoRepresentation();
     //pass the magnetic field to genfit
     GFFieldManager::getInstance()->init(new GFGeant4Field());
+    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
   }
   GFMaterialEffects::getInstance()->setMscModel("Highland");
 
@@ -172,7 +177,9 @@ void GenFitterModule::beginRun()
 
 void GenFitterModule::event()
 {
-  B2DEBUG(99, "**********   GenFitterModule  ************");
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  int eventCounter = eventMetaDataPtr->getEvent();
+  B2DEBUG(100, "**********   GenFitterModule processing event number: " << eventCounter << " ************");
 
   StoreArray < MCParticle > mcParticles(m_mcParticlesColName);
   B2DEBUG(149, "GenFitter: total Number of MCParticles: " << mcParticles.getEntries());
@@ -202,13 +209,13 @@ void GenFitterModule::event()
   StoreArray<PXDCluster> pxdClusters("");
   int nPXDClusters = pxdClusters.getEntries();
   B2DEBUG(149, "GenFitter: Number of PXDClusters: " << nPXDClusters);
-  if (nPXDClusters == 0) {B2DEBUG(100, "GenFitter2: PXDClustersCollection is empty!");}
+  if (nPXDClusters == 0) {B2DEBUG(100, "GenFitter: PXDClustersCollection is empty!");}
 
   //SVD clusters
   StoreArray<SVDCluster> svdClusters("");
   int nSVDClusters = svdClusters.getEntries();
   B2DEBUG(149, "GenFitter: Number of SVDClusters: " << nSVDClusters);
-  if (nSVDClusters == 0) {B2DEBUG(100, "GenFitter2: SVDClustersCollection is empty!");}
+  if (nSVDClusters == 0) {B2DEBUG(100, "GenFitter: SVDClustersCollection is empty!");}
 
   if (m_filterId == 0) {
     B2DEBUG(99, "Kalman filter with " << m_nIter << " iterations will be used ");
@@ -233,15 +240,16 @@ void GenFitterModule::event()
   for (int i = 0; i < trackCandidates.getEntries(); ++i) { //loop over all track candidates
     B2DEBUG(99, "#############  Fit track candidate Nr. : " << i << "  ################");
     GFTrackCand* aTrackCandPointer = trackCandidates[i];
-    GFAbsTrackRep* trackRep;  //initialize track representation
+
 
     //there is different information from mctracks and 'real' pattern recognition tracks, e.g. for PR tracks the PDG is unknown
 
     if (m_usePdgCodeFromTrackCand == true) {
       m_pdgCodes.clear(); //clear the pdg code from the last track
       m_pdgCodes.push_back(aTrackCandPointer->getPdgCode());
+      B2DEBUG(100, "PDG code from track candidate will be used and it is: " << aTrackCandPointer->getPdgCode());
       if (m_pdgCodes[0] == 0) {
-        B2FATAL("The current GFTrackCand has not valid PDG code (it is 0) AND you did not set any valid PDG Code in GenFitter module to use instead");
+        B2FATAL("The current GFTrackCand has no valid PDG code (it is 0) AND you did not set any valid PDG Code in GenFitter module to use instead");
       }
     }
 
@@ -249,33 +257,32 @@ void GenFitterModule::event()
     bool candFitted = false;   //boolean to mark if the track candidates was fitted successfully with at least one PDG hypothesis
 
     for (int iPdg = 0; iPdg != nPdg; ++iPdg) {  // loop over all pdg hypothesises
+      //make sure the track fit starts with the correct PDG code because the sign of the PDG code will also set the charge in the TrackRep
       TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(m_pdgCodes[iPdg]);
       int currentPdgCode = boost::math::sign(aTrackCandPointer->getChargeSeed()) * m_pdgCodes[iPdg];
       if (currentPdgCode == 0) {
         B2FATAL("Either the charge of the current GFTRackCand is 0 or you set 0 as a PDG code");
       }
-      if (part->Charge() > 0.0) {
-        aTrackCandPointer->setPdgCode(currentPdgCode);
-      } else { // leptons need pdg codes with the sign of the code opposite of the sign of the particle charge
-        aTrackCandPointer->setPdgCode(-1 * currentPdgCode);
+      if (part->Charge() < 0.0) {
+        currentPdgCode *= -1; //swap sign
       }
-      trackRep = new RKTrackRep(aTrackCandPointer); //give the seed helix parameters and cov and the pdg code to the track fitter
+
+      RKTrackRep* trackRep = new RKTrackRep(aTrackCandPointer, currentPdgCode); //initialize track representation and give the seed helix parameters and cov and the pdg code to the track fitter
 
       B2DEBUG(99, "Fit track with start values: ");
 
       //get fit starting values from the from the track candidate
-      TMatrixD stateSeed = aTrackCandPointer->getStateSeed();
-      TMatrixD covSeed = aTrackCandPointer->getCovSeed();
-      TVector3 momentumSeed(stateSeed[3][0], stateSeed[4][0], stateSeed[5][0]);
-      TVector3 posSeed(stateSeed[0][0], stateSeed[1][0], stateSeed[2][0]);
+      TVector3 posSeed = aTrackCandPointer->getPosSeed();
+      TVector3 momentumSeed = aTrackCandPointer->getMomSeed();
+      TMatrixDSym covSeed = aTrackCandPointer->getCovSeed();
       B2DEBUG(100, "Start values: momentum (x,y,z,abs): " << momentumSeed.x() << "  " << momentumSeed.y() << "  " << momentumSeed.z() << " " << momentumSeed.Mag());
       B2DEBUG(100, "Start values: momentum std: " << sqrt(covSeed[3][3]) << "  " << sqrt(covSeed[4][4]) << "  " << sqrt(covSeed[5][5]));
       B2DEBUG(100, "Start values: pos:   " << posSeed.x() << "  " << posSeed.y() << "  " << posSeed.z());
       B2DEBUG(100, "Start values: pos std:   " << sqrt(covSeed[0][0]) << "  " << sqrt(covSeed[1][1]) << "  " << sqrt(covSeed[2][2]));
-      B2DEBUG(100, "Start values: pdg:      " << aTrackCandPointer->getPdgCode());
+      B2DEBUG(100, "Start values: pdg:      " << currentPdgCode);
 
       GFTrack gfTrack(trackRep);  //create the track with the corresponding track representation
-      gfTrack.setSmoothing(true, true); // activate smoothing and the saving of the prediction state to avoid recalculation of prediction during smoothing
+      gfTrack.setSmoothing(true); // activate smoothing and the saving of the prediction state to avoid recalculation of prediction during smoothing
       //B2INFO("       Initial Covariance matrix: ");
       //gfTrack.getTrackRep(0)->getCov().Print();
 
@@ -317,8 +324,18 @@ void GenFitterModule::event()
       //add created hits to the track
       gfTrack.addHitVector(factoryHits);
       gfTrack.setCandidate(*aTrackCandPointer);
-
-      B2DEBUG(99, "Total Nr of Hits assigned to the Track: " << gfTrack.getNumHits());
+      const int nHitsInTrack = gfTrack.getNumHits();
+      B2DEBUG(99, "Total Nr of Hits assigned to the Track: " << nHitsInTrack);
+      //tell the CDCRecoHits how the left/right ambiguity of wire hits should be resolved (this info should come from the track finder)
+      for (int j = 0; j not_eq nHitsInTrack; ++j) {
+        CDCTrackCandHit* aTrackCandHitPtr =  dynamic_cast<CDCTrackCandHit*>(aTrackCandPointer->getHit(j));
+        if (aTrackCandHitPtr not_eq NULL) {
+          CDCRecoHit* aCdcRecoHit = static_cast<CDCRecoHit*>(gfTrack.getHit(j)); //this now has to be a CDCRecoHit because the oder of hits in GFTrack and GFTrackCand must be the same
+          char lrInfo = aTrackCandHitPtr->getLeftRightResolution();
+          B2DEBUG(100, "l/r: for hit with index " <<  j << " is " << int(lrInfo));
+          aCdcRecoHit->setLeftRightResolution(lrInfo);
+        }
+      }
 
       //Check which hits are contributing to the track
       int nCDC = 0;
@@ -326,8 +343,8 @@ void GenFitterModule::event()
       int nPXD = 0;
 
       for (unsigned int hit = 0; hit < gfTrack.getNumHits(); hit++) {
-        unsigned int detId = 0;
-        unsigned int hitId = 0;
+        int detId = 0;
+        int hitId = 0;
         aTrackCandPointer->getHit(hit, detId, hitId);
         if (detId == Const::PXD) {
           nPXD++;
@@ -452,13 +469,12 @@ void GenFitterModule::event()
               //Now create a reference plane to get momentum and vertex position
               GFDetPlane plane(poca, dirInPoca);
               TVector3 testPos(10., 10., 1.);
-              GFDetPlane testPlane(testPos, dirInPoca);
-              TMatrixT<double> testCovariance;
+              //GFDetPlane testPlane(testPos, dirInPoca);
 
               //get momentum, position and covariance matrix
               TVector3 resultPosition;
               TVector3 resultMomentum;
-              TMatrixT<double> resultCovariance;
+              TMatrixDSym resultCovariance;
               gfTrack.getPosMomCov(plane, resultPosition, resultMomentum, resultCovariance);
 
               // store position
@@ -484,7 +500,7 @@ void GenFitterModule::event()
               //Now calculate the parameters for helix parametrisation to fill the Track objects
 
               //calculate transverse momentum
-              double pt = sqrt(gfTrack.getMom(plane).x() * gfTrack.getMom(plane).x() + gfTrack.getMom(plane).y() * gfTrack.getMom(plane).y());
+              double pt = sqrt(resultMomentum.x() * resultMomentum.x() + resultMomentum.y() * resultMomentum.y());
 
               //determine angle phi for perigee parametrisation, distributed from -pi to pi
               double phi = atan2(dirInPoca.y() , dirInPoca.x());

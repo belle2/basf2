@@ -42,12 +42,13 @@
 
 #include <GFFieldManager.h>
 #include <GFConstField.h>
-
+#include <GFMaterialEffects.h>
+#include <GFTGeoMaterialInterface.h>
 #include <GFException.h>
 
 #include <TMatrixDEigen.h>
 #include <TGeoManager.h>
-
+#include <TDecompSVD.h>
 //C++ st libs
 #include <cmath>
 #include <limits>
@@ -101,6 +102,7 @@ void TrackFitCheckerModule::initialize()
     geoManager.createTGeoRepresentation();
     //pass the magnetic field to genfit
     GFFieldManager::getInstance()->init(new GFGeant4Field());
+    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
   }
 
   //set all user parameters
@@ -290,8 +292,7 @@ void TrackFitCheckerModule::event()
   if (nFittedTracks not_eq 0 and m_wAndPredPresentsTested == false) {
     if (m_testSi == true) {
       try {
-        double dafWeight = -1;
-        fittedTracks[0]->getBK(0)->getNumber("dafWeight", 0,  dafWeight);
+        fittedTracks[0]->getBK(0)->getNumber(GFBKKey_dafWeight, 0);
       } catch (GFException& e) {
         m_testDaf = false;
       }
@@ -300,8 +301,7 @@ void TrackFitCheckerModule::event()
     }
 
     try {
-      TMatrixD state;
-      fittedTracks[0]->getBK(0)->getMatrix("fSt", 0, state);
+      fittedTracks[0]->getBK(0)->getVector(GFBKKey_fSt, 0);
     } catch (GFException& e) {
       //m_layerWiseTests.havePredicitons = false;
       m_testPrediction = false;
@@ -348,6 +348,8 @@ void TrackFitCheckerModule::event()
       continue;
     }
     B2DEBUG(100, "after propagation");
+//    poca.Print();
+//    dirInPoca.Print();
 
     const double chi2tot_bu = aTrackPtr->getChiSqu(); // returns the total chi2 from the backward filter
     if (chi2tot_bu > m_totalChi2Cut) {//consider this track to be an outlier and discard it. Goto next track
@@ -358,6 +360,7 @@ void TrackFitCheckerModule::event()
     const double chi2tot_fu = aTrackPtr->getForwardChiSqu();
     const int ndf = aTrackPtr->getNDF();
     const double pValue_bu = TMath::Prob(chi2tot_bu, ndf);
+    B2DEBUG(100, "p value of fitted track " << i << " is " << pValue_bu);
     const double pValue_fu = TMath::Prob(chi2tot_fu, ndf);
     fillTrackWiseData("pValue_bu", pValue_bu);
     fillTrackWiseData("pValue_fu", pValue_fu);
@@ -365,57 +368,23 @@ void TrackFitCheckerModule::event()
     fillTrackWiseData("chi2tot_fu", chi2tot_fu);
     TVector3 vertexPos;
     TVector3 vertexMom;
-    TMatrixT<double> vertexCov(6, 6);
+    TMatrixDSym vertexCov(6);
     vector<double> zVertexPosMom(6);
     vector<double> resVertexPosMom(6);
 
     GFDetPlane planeThroughVertex(poca, dirInPoca); //get planeThroughVertex through fitted vertex position
-
-    /*
-    TMatrixD state7D;
-    TMatrixD cov7D;
-    aRKTrackRepPtr->getStateCov7D(planeThroughVertex,state7D,cov7D);
-    //state7D.Print();
-    //cov7D.Print();
-    TMatrixD trueState7D(7,1);
-    double absTrueVertexMom = trueVertexMom.Mag();
-    trueState7D[0][0] = trueVertexPos[0];
-    trueState7D[1][0] = trueVertexPos[1];
-    trueState7D[2][0] = trueVertexPos[2];
-    trueState7D[3][0] = trueVertexMom[0]/absTrueVertexMom;
-    trueState7D[4][0] = trueVertexMom[1]/absTrueVertexMom;
-    trueState7D[5][0] = trueVertexMom[2]/absTrueVertexMom;
-    trueState7D[6][0] = charge/absTrueVertexMom;
-
-    vector<double> resVertex7D(7);
-    resVertex7D[0] = (state7D[0][0] - trueState7D[0][0]);
-    resVertex7D[1] = (state7D[1][0] - trueState7D[1][0]);
-    resVertex7D[2] = (state7D[2][0] - trueState7D[2][0]);
-    resVertex7D[3] = (state7D[3][0] - trueState7D[3][0]);
-    resVertex7D[4] = (state7D[4][0] - trueState7D[4][0]);
-    resVertex7D[5] = (state7D[5][0] - trueState7D[5][0]);
-    resVertex7D[6] = (state7D[6][0] - trueState7D[6][0]);
-
-    fillTrackWiseVecData("res_vertexState", resVertex7D);
-    vector<double> zVertex7D(7);
-    zVertex7D[0] = resVertex7D[0] / sqrt(cov7D[0][0]);
-    zVertex7D[1] = resVertex7D[1] / sqrt(cov7D[1][1]);
-    zVertex7D[2] = resVertex7D[2] / sqrt(cov7D[2][2]);
-    zVertex7D[3] = resVertex7D[3] / sqrt(cov7D[3][3]);
-    zVertex7D[4] = resVertex7D[4] / sqrt(cov7D[4][4]);
-    zVertex7D[5] = resVertex7D[5] / sqrt(cov7D[5][5]);
-    zVertex7D[6] = resVertex7D[6] / sqrt(cov7D[6][6]);
-    fillTrackWiseVecData("pulls_vertexState", zVertex7D);*/
-    //vertexMom = aTrackPtr->getMom(planeThroughVertex);
+    B2DEBUG(100, "plane through vertex constructed");
     //get fitted momentum at fitted vertex
+    try {
+      aTrackPtr->getPosMomCov(planeThroughVertex, vertexPos, vertexMom, vertexCov);
+    } catch (GFException& e) {
+      B2WARNING("Extrapolation of a track in Event " << eventCounter <<  " to its true vertex position failed. Track will be ignored in statistical tests");
+      ++m_extrapFailed;
+      continue;
+    }
 
-    aTrackPtr->getPosMomCov(planeThroughVertex, vertexPos, vertexMom, vertexCov);
+    B2DEBUG(100, "pos mom cov extracted");
     if (m_exportTracksForRaveDeveloper == true) {
-//      event: id=1; run=0; tag="FromMoritz";
-//      event:simvtx: id=11; name="primary"; x=1.27551020341343246e-05; y=1.06171173683833331e-05; z=0.525282680988311768.
-//      event:track: dpxpx=4.85574456419465095e-06; dpxpy=-5.26806408107531081e-07; dpxpz=-3.23616340568937519e-07; dpypy=4.40549194315139507e-07; dpypz=3.80698379458437548e-08; dpzpz=4.03946384998145186e-07; dxpx=-1.41775832125791709e-07; dxpy=-2.54225448943143737e-07; dxpz=-1.06664920686288894e-07; dxx=7.21623982840947298e-07; dxy=3.53794392550510399e-06; dxz=1.48993797581001075e-06; dypx=-7.71493264301975362e-07; dypy=-1.47695468584119419e-06; dypz=5.32912980171120437e-08; dyy=2.0532536153150725e-05; dyz=-2.58092269541423012e-07; dzpx=-1.11413567329900935e-07; dzpy=2.2227965336001507e-08; dzpz=-1.5877358812582075e-06; dzz=2.10240638408681937e-05; id=12; name="RT"; px=1.01044154167175293; py=-0.175035446882247925; pz=-0.0737569332122802734; q=-1; simid=0; vtxid=11; x=0.000254478829447180033; y=0.00140603561885654926; z=0.530362188816070557.
-//      event:track: dpxpx=0.000880925345796613633; dpxpy=-0.000209010591474188969; dpxpz=0.000437857140465834323; dpypy=5.57304966194143575e-05; dpypz=-0.000104576936602241317; dpzpz=0.000224891812502202765; dxpx=9.19048583251024311e-08; dxpy=-1.60230516237502996e-06; dxpz=3.49415495349561031e-06; dxx=5.21887071742276229e-06; dxy=3.91917091524863482e-06; dxz=-8.706050022698458e-06; dypx=6.30952254461446898e-06; dypy=-8.43669296753385824e-06; dypz=3.13480970841542995e-06; dyy=2.18592436972156176e-05; dyz=1.94766492526136232e-06; dzpx=2.64611429747526515e-06; dzpy=-5.71897928747292469e-07; dzpz=-5.59974734131818076e-06; dzz=1.83298594773835305e-05; id=13; name="RT"; px=3.52589607238769531; py=-0.7888450026512146; pz=1.7584986686706543; q=1; simid=1; vtxid=11; x=-0.000883664761204272509; y=-0.00399610539898276329; z=0.520958960056304932.
-//      event:fill
       if (i == 0) {
         m_forRaveOut << "event:simvtx: x=" << trueVertexPos[0] << "; y=" << trueVertexPos[1] << "; z=" << trueVertexPos[2] << ".\n"; //assuming all tracks in one event comming from the same vertex
       }
@@ -633,8 +602,8 @@ void TrackFitCheckerModule::terminate()
 // calculate a chi2 value from a residuum and it's covariance matrix R
 double TrackFitCheckerModule::calcChi2(const TMatrixT<double>& res, const TMatrixT<double>& R) const
 {
-  TMatrixT<double> invR;
-  GFTools::invertMatrix(R, invR);
+  TMatrixT<double> invR = invertMatrix(R);
+
   TMatrixT<double> resT(TMatrixT<double>::kTransposed, res);
   return (resT * invR * res)[0][0];
 }
@@ -1022,8 +991,6 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
   const int trackRepId = 0;
   GFAbsTrackRep* rep = aTrackPtr->getTrackRep(trackRepId);
   m_trackData.nHits = aTrackPtr->getNumHits();
-  TMatrixT<double> state;
-  TMatrixT<double> cov;
   for (int iGFHit = 0; iGFHit not_eq m_trackData.nHits; ++iGFHit) {
     GFAbsRecoHit*  aGFAbsRecoHitPtr = aTrackPtr->getHit(iGFHit);
     //cerr << "2 iGFHit " << iGFHit << "\n";
@@ -1118,40 +1085,41 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
     GFDetPlane detPlaneOfRecoHit = aGFAbsRecoHitPtr->getDetPlane(rep);
 
     //cerr << "5";
-
-    TMatrixD m;
-    TMatrixD V;
+    TVectorD state(5);
+    TMatrixDSym cov(5);
+    TVectorD m;
+    TMatrixDSym V;
     //cerr << "bin hier vor get measurement\n";
     aGFAbsRecoHitPtr->getMeasurement(rep, detPlaneOfRecoHit, rep->getState(), rep->getCov(), m, V);
     //cerr << "und jetzt danach\n";
     m_trackData.Hs.push_back(aGFAbsRecoHitPtr->getHMatrix(rep));
-    m_trackData.ms.push_back(m);
-    m_trackData.Vs.push_back(V);
 
+    m_trackData.ms.push_back(TMatrixD(m.GetNrows(), 1, m.GetMatrixArray()));
+    m_trackData.Vs.push_back(TMatrixD(V));
 
-    aTrackPtr->getBK(trackRepId)->getMatrix("fUpSt", iGFHit, state);
-    aTrackPtr->getBK(trackRepId)->getMatrix("fUpCov", iGFHit, cov);
-    m_trackData.states_fu.push_back(state);
-    m_trackData.covs_fu.push_back(cov);
-    aTrackPtr->getBK(trackRepId)->getMatrix("bUpSt", iGFHit, state);
-    aTrackPtr->getBK(trackRepId)->getMatrix("bUpCov", iGFHit, cov);
-    m_trackData.states_bu.push_back(state);
-    m_trackData.covs_bu.push_back(cov);
+    state = aTrackPtr->getBK(trackRepId)->getVector(GFBKKey_fUpSt, iGFHit);
+    cov = aTrackPtr->getBK(trackRepId)->getSymMatrix(GFBKKey_fUpCov, iGFHit);
+    m_trackData.states_fu.push_back(TMatrixD(state.GetNrows(), 1, state.GetMatrixArray()));
+    m_trackData.covs_fu.push_back(TMatrixD(cov));
+    state = aTrackPtr->getBK(trackRepId)->getVector(GFBKKey_bUpSt, iGFHit);
+    cov = aTrackPtr->getBK(trackRepId)->getSymMatrix(GFBKKey_bUpCov, iGFHit);
+    m_trackData.states_bu.push_back(TMatrixD(state.GetNrows(), 1, state.GetMatrixArray()));
+    m_trackData.covs_bu.push_back(TMatrixD(cov));
     //cerr << "getbias\n";
     GFTools::getBiasedSmoothedData(aTrackPtr, trackRepId, iGFHit, state, cov);
     //cerr << "und jetzt danach\n";
-    m_trackData.states_sm.push_back(state);
-    m_trackData.covs_sm.push_back(cov);
+    m_trackData.states_sm.push_back(TMatrixD(state.GetNrows(), 1, state.GetMatrixArray()));
+    m_trackData.covs_sm.push_back(TMatrixD(cov));
 
     if (m_testPrediction == true) {
-      aTrackPtr->getBK(trackRepId)->getMatrix("fSt", iGFHit, state);
-      aTrackPtr->getBK(trackRepId)->getMatrix("fCov", iGFHit, cov);
-      m_trackData.states_fp.push_back(state);
-      m_trackData.covs_fp.push_back(cov);
-      aTrackPtr->getBK(trackRepId)->getMatrix("bSt", iGFHit, state);
-      aTrackPtr->getBK(trackRepId)->getMatrix("bCov", iGFHit, cov);
-      m_trackData.states_bp.push_back(state);
-      m_trackData.covs_bp.push_back(cov);
+      state = aTrackPtr->getBK(trackRepId)->getVector(GFBKKey_fSt, iGFHit);
+      cov = aTrackPtr->getBK(trackRepId)->getSymMatrix(GFBKKey_fCov, iGFHit);
+      m_trackData.states_fp.push_back(TMatrixD(state.GetNrows(), 1, state.GetMatrixArray()));
+      m_trackData.covs_fp.push_back(TMatrixD(cov));
+      state = aTrackPtr->getBK(trackRepId)->getVector(GFBKKey_bSt, iGFHit);
+      cov = aTrackPtr->getBK(trackRepId)->getSymMatrix(GFBKKey_bCov, iGFHit);
+      m_trackData.states_bp.push_back(TMatrixD(state.GetNrows(), 1, state.GetMatrixArray()));
+      m_trackData.covs_bp.push_back(TMatrixD(cov));
     } else if (m_inspectTracks > 0) {
 
     }
@@ -1384,10 +1352,8 @@ void TrackFitCheckerModule::testDaf(GFTrack* const aTrackPtr)
   vector<vector<float> > allChi2s(m_nLayers, vector<float>(5, -1.0));
   for (int iGFHit = 0; iGFHit not_eq nHits; ++iGFHit) {
     int accuVecIndex = m_trackData.accuVecIndices[iGFHit];
-
-    aTrackPtr->getBK(0)->getNumber("dafWeight", iGFHit,  dafWeight); // double check if this still works with background => more then one hit... probarbly it does work...
     //aTrackPtr->getBK(0)->getNumber("dafChi2s", iGFHit,  dafChi2);
-
+    dafWeight = aTrackPtr->getBK(0)->getNumber(GFBKKey_dafWeight, iGFHit);// double check if this still works with background => more then one hit... probarbly it does work...
     GFAbsRecoHit* aGFAbsRecoHitPtr = aTrackPtr->getHit(iGFHit);
     PXDRecoHit const*  aPxdRecoHitPtr = dynamic_cast<PXDRecoHit const* >(aGFAbsRecoHitPtr);
     SVDRecoHit2D const*  aSvdRecoHit2DPtr =  dynamic_cast<SVDRecoHit2D  const* >(aGFAbsRecoHitPtr);
@@ -1544,5 +1510,14 @@ int TrackFitCheckerModule::countOutliers(const vector<double>& dataSample, const
   return nOutliers;
 }
 
-
+TMatrixD TrackFitCheckerModule::invertMatrix(const TMatrixD& aMatrix)
+{
+  bool status = 0;
+  TDecompSVD invertAlgo(aMatrix);
+  TMatrixD inv = invertAlgo.Invert(status);
+  if (status == false) {
+    B2ERROR("Matrix inversion in TrackFitCheckerModule::invertMatrix failed");
+  }
+  return inv;
+}
 

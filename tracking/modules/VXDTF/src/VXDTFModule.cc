@@ -2458,7 +2458,7 @@ vector <GFTrackCand> VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArra
 //     trackRep->setPropDir(-1); // 1 = start moving outwards (seed has to be innermost hit), -1 start moving inwards (seed has to be outermost hit)
 
     GFTrack track(trackRep);
-    track.setSmoothing(false, false);
+    track.setSmoothing(false);
 
     GFRecoHitFactory factory;
     int numOfPxdIndices = currentTC->getPXDHitIndices().size();
@@ -2527,14 +2527,14 @@ GFTrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentTC)
 
   TVector3 posIn = currentTC->getInitialCoordinates();
   TVector3 momIn = currentTC->getInitialMomentum();
-  TMatrixD stateSeed(6, 1); //(x,y,z,px,py,pz)
-  TMatrixD covSeed(6, 6);
+  TVectorD stateSeed(6); //(x,y,z,px,py,pz)
+  TMatrixDSym covSeed(6, 6);
   int pdgCode = currentTC->getPDGCode();
   vector<int> pxdHits = currentTC->getPXDHitIndices();
   vector<int> svdHits = currentTC->getSVDHitIndices();
 
-  stateSeed(0, 0) = posIn[0]; stateSeed(1, 0) = posIn[1]; stateSeed(2, 0) = posIn[2];
-  stateSeed(3, 0) = momIn[0]; stateSeed(4, 0) = momIn[1]; stateSeed(5, 0) = momIn[2];
+  stateSeed(0) = posIn[0]; stateSeed(1) = posIn[1]; stateSeed(2) = posIn[2];
+  stateSeed(3) = momIn[0]; stateSeed(4) = momIn[1]; stateSeed(5) = momIn[2];
   covSeed.Zero();
   covSeed(0, 0) = 0.1 * 0.1; covSeed(1, 1) = 0.1 * 0.1; covSeed(2, 2) = 0.2 * 0.2;
   covSeed(3, 3) = 0.1 * 0.1; covSeed(4, 4) = 0.1 * 0.1; covSeed(5, 5) = 0.2 * 0.2;

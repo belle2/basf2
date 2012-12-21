@@ -374,20 +374,19 @@ void CDCLegendreTrackingModule::createGFTrackCandidates()
     int pdg = trackCand->getChargeSign() * (211);
 
     //The initial covariance matrix is calculated from these errors and it is important (!!) that it is not completely wrong
-    TVector3 posError;
-    posError.SetXYZ(2.0, 2.0, 2.0);
-    TVector3 momError;
-    momError.SetXYZ(0.1, 0.1, 0.5);
+    TMatrixDSym covSeed(6);
+    covSeed(0, 0) = 4; covSeed(1, 1) = 4; covSeed(2, 2) = 4;
+    covSeed(3, 3) = 0.1 * 0.1; covSeed(4, 4) = 0.1 * 0.1; covSeed(5, 5) = 0.5 * 0.5;
 
     //set the start parameters
-    gfTrackCandidates[i]->setComplTrackSeed(position, momentum, pdg,
-                                            posError, momError);
+    gfTrackCandidates[i]->setPosMomSeedAndPdgCode(position, momentum, pdg, covSeed);
+
 
     B2DEBUG(100, "Create GFTrackCandidate " << i << "  with pdg " << pdg);
     B2DEBUG(100,
-            "position seed:  (" << position.x() << ", " << position.y() << ", " << position.z() << ")   position error: (" << posError.x() << ", " << posError.y() << ", " << posError.z() << ") ");
+            "position seed:  (" << position.x() << ", " << position.y() << ", " << position.z() << ")   position variance: (" << covSeed(0, 0) << ", " << covSeed(1, 1) << ", " << covSeed(2, 2) << ") ");
     B2DEBUG(100,
-            "momentum seed:  (" << momentum.x() << ", " << momentum.y() << ", " << momentum.z() << ")   position error: (" << momError.x() << ", " << momError.y() << ", " << momError.z() << ") ");
+            "momentum seed:  (" << momentum.x() << ", " << momentum.y() << ", " << momentum.z() << ")   position variance: (" << covSeed(3, 3) << ", " << covSeed(4, 4) << ", " << covSeed(5, 5) << ") ");
 
     //find indices of the Hits
     std::vector<CDCLegendreTrackHit*> trackHitVector = trackCand->getTrackHits();

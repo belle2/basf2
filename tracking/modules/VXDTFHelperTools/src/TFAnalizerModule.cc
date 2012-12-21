@@ -399,8 +399,8 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
   map<unsigned int, vector<int>  > svdHitMap; // since svdClusters are only 1D and we can not assume, that two clusters of the same hit are found in pairs within the TC-hit-List, we have to sort them before using them
   for (int hitIndex = 0; hitIndex not_eq numOfHits; ++hitIndex) {
     B2DEBUG(100, "----importing hit " << hitIndex << " from trackCandidate...")
-    unsigned int detID = UINT_MAX; // ID of detector
-    unsigned int hitID = UINT_MAX; // ID of Hit in StoreArray
+    int detID = -1; // ID of detector
+    int hitID = -1; // ID of Hit in StoreArray
     aTC->getHit(hitIndex, detID, hitID); // sets detId and hitId for given hitIndex
     B2DEBUG(100, "----got Hitinfo. detID: " << detID << ", hitID: " << hitID)
     if (detID == Const::PXD) { // pxd
@@ -435,13 +435,13 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
   TcInfoTuple tcInfo = boost::make_tuple(pxdHitIDsOfCurrentTC, svdHitIDsOfCurrentTC, coordinates, svdTrueHits);
 
   ///get Momentum information:
-  TMatrixD stateSeed = aTC->getStateSeed();
+  TVectorD stateSeed = aTC->getStateSeed();
 //  TVector3 dirSeed = aTC->getDirSeed();
 //  double qOverP = aTC->getQoverPseed();
 //  double pOverQ = 1./qOverP;
   TVector3 momentum, momentum_t, vertex; // = pOverQ*dirSeed;
-  momentum[0] = stateSeed(3, 0); momentum[1] = stateSeed(4, 0); momentum[2] = stateSeed(5, 0);
-  vertex[0] = stateSeed(0, 0); vertex[1] = stateSeed(1, 0); vertex[2] = stateSeed(2, 0);
+  momentum[0] = stateSeed(3); momentum[1] = stateSeed(4); momentum[2] = stateSeed(5);
+  vertex[0] = stateSeed(0); vertex[1] = stateSeed(1); vertex[2] = stateSeed(2);
   double pValue = momentum.Mag();
   momentum_t = momentum;
   momentum_t.SetZ(0.);
@@ -455,8 +455,8 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
       return; /// do not store mcTrack in this case
     }
 
-    unsigned int detID = UINT_MAX; // ID of detector
-    unsigned int hitID = UINT_MAX; // ID of Hit in StoreArray
+    int detID = -1; // ID of detector
+    int hitID = -1; // ID of Hit in StoreArray
     TVector3 tempMomentum; // momentum of innermost hit
     aTC->getHit(0, detID, hitID); // 0 means innermost hit
     if (detID == Const::PXD) {  // means PXD

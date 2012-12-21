@@ -22,6 +22,7 @@
 #include <iostream>
 
 #include <TMatrixD.h>
+#include <TVectorD.h>
 #include <TVector3.h>
 
 #include <CLHEP/Units/SystemOfUnits.h>
@@ -434,18 +435,18 @@ GFTrackCand* ExtModule::addTrackCand(const GFTrack* gfTrack, int pdgCode, StoreA
       break;
     }
   }
-  TMatrixD firstState(gfTrackRep->getFirstState());
-  double charge = (firstState[0][0] > 0.0 ? 1.0 : -1.0);
+  TVectorD firstState(gfTrackRep->getFirstState());
+  double charge = (firstState[0] > 0.0 ? 1.0 : -1.0);
   GFDetPlane firstPlane(gfTrackRep->getFirstPlane());
   const TVector3 firstO = firstPlane.getO();
   const TVector3 firstU = firstPlane.getU();
   const TVector3 firstV = firstPlane.getV();
   const TVector3 firstW = firstPlane.getNormal();
-  TVector3 firstPosition = firstO + firstState[3][0] * firstU + firstState[4][0] * firstV;
-  TVector3 firstMomTilde = firstW + firstState[1][0] * firstU + firstState[2][0] * firstV;
+  TVector3 firstPosition = firstO + firstState[3] * firstU + firstState[4] * firstV;
+  TVector3 firstMomTilde = firstW + firstState[1] * firstU + firstState[2] * firstV;
   if (firstMomTilde * firstPosition < 0.0) { firstMomTilde = -firstMomTilde; }
   TVector3 firstDirection = firstMomTilde.Unit();
-  double firstMomMag = 1.0 / fabs(firstState[0][0]);
+  double firstMomMag = 1.0 / fabs(firstState[0]);
   TVector3 firstMomentum = firstMomMag * firstDirection;
   double Bz = GFFieldManager::getInstance()->getFieldVal(TVector3(0, 0, 0)).Z() * kilogauss / tesla;
   double radius = (firstMomentum.Perp() * GeV / eV) / (c_light / (m / s) * charge * Bz) * (m / cm);
@@ -463,16 +464,16 @@ GFTrackCand* ExtModule::addTrackCand(const GFTrack* gfTrack, int pdgCode, StoreA
                        -cos(pocaPhi) * firstDirection.Perp(),
                        firstDirection.Z());
   // or, approximately, ipPosition=(0,0,0) and ipDirection=(?,?,firstDirection.Z())
-  TMatrixD lastState(gfTrackRep->getLastState());
+  TVectorD lastState(gfTrackRep->getLastState());
   TMatrixD lastCov(gfTrackRep->getLastCov());
   GFDetPlane lastPlane(gfTrackRep->getLastPlane());
   const TVector3 lastO = lastPlane.getO();
   const TVector3 lastU = lastPlane.getU();
   const TVector3 lastV = lastPlane.getV();
   const TVector3 lastW = lastPlane.getNormal();
-  TVector3 lastPosition = lastO + lastState[3][0] * lastU + lastState[4][0] * lastV;
+  TVector3 lastPosition = lastO + lastState[3] * lastU + lastState[4] * lastV;
   double lastSpu = 1.0;
-  TVector3 lastMomTilde = lastW + lastState[1][0] * lastU + lastState[2][0] * lastV;
+  TVector3 lastMomTilde = lastW + lastState[1] * lastU + lastState[2] * lastV;
   if (lastMomTilde * lastPosition < 0.0) {
     lastSpu = -lastSpu;
     lastMomTilde = -lastMomTilde;
@@ -480,7 +481,7 @@ GFTrackCand* ExtModule::addTrackCand(const GFTrack* gfTrack, int pdgCode, StoreA
   double lastMomTildeMag = lastMomTilde.Mag();
   double lastMomTildePerp = lastMomTilde.Perp();
   TVector3 lastDirection = lastMomTilde.Unit();
-  double lastMomMag = 1.0 / fabs(lastState[0][0]);
+  double lastMomMag = 1.0 / fabs(lastState[0]);
   TVector3 lastMomentum = lastMomMag * lastDirection;
   double lastPperp = lastMomentum.Perp();
   double sinLambda = lastPperp / lastMomMag;
@@ -523,13 +524,13 @@ GFTrackCand* ExtModule::addTrackCand(const GFTrack* gfTrack, int pdgCode, StoreA
   // d(px,py,pz)/d(u')
   double g = lastSpu * lastMomMag / lastMomTildeMag;
   double h = lastMomMag / (lastMomTildeMag * lastMomTildeMag);
-  fromGenfitToPhasespace[3][1] = g * lastU.X() - (h * lastState[1][0]) * lastDirection.X();
-  fromGenfitToPhasespace[4][1] = g * lastU.Y() - (h * lastState[1][0]) * lastDirection.Y();
-  fromGenfitToPhasespace[5][1] = g * lastU.Z() - (h * lastState[1][0]) * lastDirection.Z();
+  fromGenfitToPhasespace[3][1] = g * lastU.X() - (h * lastState[1]) * lastDirection.X();
+  fromGenfitToPhasespace[4][1] = g * lastU.Y() - (h * lastState[1]) * lastDirection.Y();
+  fromGenfitToPhasespace[5][1] = g * lastU.Z() - (h * lastState[1]) * lastDirection.Z();
   // d(px,py,pz)/d(v')
-  fromGenfitToPhasespace[3][2] = g * lastV.X() - (h * lastState[2][0]) * lastDirection.X();
-  fromGenfitToPhasespace[4][2] = g * lastV.Y() - (h * lastState[2][0]) * lastDirection.Y();
-  fromGenfitToPhasespace[5][2] = g * lastV.Z() - (h * lastState[2][0]) * lastDirection.Z();
+  fromGenfitToPhasespace[3][2] = g * lastV.X() - (h * lastState[2]) * lastDirection.X();
+  fromGenfitToPhasespace[4][2] = g * lastV.Y() - (h * lastState[2]) * lastDirection.Y();
+  fromGenfitToPhasespace[5][2] = g * lastV.Z() - (h * lastState[2]) * lastDirection.Z();
   TMatrixD fromGenfitToPhasespaceT(fromGenfitToPhasespace);
   fromGenfitToPhasespaceT.T();
   TMatrixD lastCovPS = fromGenfitToPhasespace * (lastCov * fromGenfitToPhasespaceT);
@@ -592,7 +593,7 @@ GFTrackCand* ExtModule::addTrackCand(const GFTrack* gfTrack, int pdgCode, StoreA
   }
   int candNumber = extTrackCands->GetLast() + 1;
   GFTrackCand* cand = new(extTrackCands->AddrAt(candNumber)) GFTrackCand();
-  cand->setComplTrackSeed(lastPosition, lastMomentum, pdgCode, lastPosError, lastDirError);
+  cand->setPosMomSeedAndPdgCode(lastPosition, lastMomentum, pdgCode, TMatrixDSym(6, lastCovPS.GetMatrixArray()));
   position.setX(lastPosition.X()*cm); // in Geant4 units (mm)
   position.setY(lastPosition.Y()*cm);
   position.setZ(lastPosition.Z()*cm);
@@ -625,7 +626,7 @@ void ExtModule::addFirstPoint(const G4ErrorFreeTrajState* state, GFTrackCand* ca
   int detID(0);
   int copyID(0);
   getVolumeID(preTouch, detID, copyID);
-  cand->addHit(detID, hitNumber, m_tof, copyID);
+  cand->addHit(detID, hitNumber, copyID, m_tof);
 
 }
 
@@ -657,6 +658,6 @@ void ExtModule::addPoint(const G4ErrorFreeTrajState* state, ExtHitStatus status,
   int detID(0);
   int copyID(0);
   getVolumeID(preTouch, detID, copyID);
-  cand->addHit(detID, hitNumber, m_tof, copyID);
+  cand->addHit(detID, hitNumber, copyID, m_tof);
 
 }

@@ -213,17 +213,19 @@ void CDCTrackingModule::event()
     int pdg = cdcTrackCandidates[i]->getChargeSign() * (-13);
 
     //The initial covariance matrix is calculated from these errors and it is important (!!) that it is not completely wrong
-    TVector3 posError;
-    posError.SetXYZ(2.0, 2.0, 2.0);
-    TVector3 momError;
-    momError.SetXYZ(0.1, 0.1, 0.5);
+    TMatrixDSym covSeed(6);
+    covSeed(0, 0) = 4; covSeed(1, 1) = 4; covSeed(2, 2) = 4;
+    covSeed(3, 3) = 0.1 * 0.1; covSeed(4, 4) = 0.1 * 0.1; covSeed(5, 5) = 0.5 * 0.5;
 
     //set the start parameters
-    gfTrackCandidates[i]->setComplTrackSeed(position, momentum, pdg, posError, momError);
+    gfTrackCandidates[i]->setPosMomSeedAndPdgCode(position, momentum, pdg, covSeed);
+
 
     B2DEBUG(100, "Create GFTrackCandidate " << i << "  with pdg " << pdg);
-    B2DEBUG(100, "position seed:  (" << position.x() << ", " << position.y() << ", " << position.z() << ")   position error: (" << posError.x() << ", " << posError.y() << ", " << posError.z() << ") ");
-    B2DEBUG(100, "momentum seed:  (" << momentum.x() << ", " << momentum.y() << ", " << momentum.z() << ")   position error: (" << momError.x() << ", " << momError.y() << ", " << momError.z() << ") ");
+    B2DEBUG(100,
+            "position seed:  (" << position.x() << ", " << position.y() << ", " << position.z() << ")   position variance: (" << covSeed(0, 0) << ", " << covSeed(1, 1) << ", " << covSeed(2, 2) << ") ");
+    B2DEBUG(100,
+            "momentum seed:  (" << momentum.x() << ", " << momentum.y() << ", " << momentum.z() << ")   position variance: (" << covSeed(3, 3) << ", " << covSeed(4, 4) << ", " << covSeed(5, 5) << ") ");
 
     //find indices of the Hits
     vector <int> hitIndices;
@@ -233,7 +235,7 @@ void CDCTrackingModule::event()
 
     //GenFit needs the hits in a correct order, here the hitIndices are sorted from small r to large r
     //it may also happen that there are two hits in the same layer (same r), their order is then chosen according to the curvature (charge) of the track
-    double charge = TMath::Sign(1., gfTrackCandidates[i]->getQoverPseed());
+    double charge = TMath::Sign(1., gfTrackCandidates[i]->getChargeSeed());
     sortHits(hitIndices, "CDCTrackHits", charge);
 
     //now the correctly ordered hits can be added to the GFTrackCand

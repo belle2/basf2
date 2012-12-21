@@ -40,6 +40,7 @@
 #include <vxd/dataobjects/VXDTrueHit.h>
 #include <vxd/dataobjects/VXDSimpleDigiHit.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
+#include <tracking/trackCandidateHits/CDCTrackCandHit.h>
 //genfit stuff
 #include <GFTrack.h>
 #include <GFTrackCand.h>
@@ -52,6 +53,7 @@
 #include <GFMaterialEffects.h>
 #include <GFDetPlane.h>
 #include <GFTools.h>
+#include <GFTGeoMaterialInterface.h>
 // c++ stl stuff
 #include <cstdlib>
 #include <iomanip>
@@ -68,6 +70,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::CDC;
+using namespace Belle2::Tracking;
 
 REG_MODULE(GenFitter2)
 
@@ -108,6 +111,7 @@ void GenFitter2Module::initialize()
     geoManager.createTGeoRepresentation();
     //pass the magnetic field to genfit
     GFFieldManager::getInstance()->init(new GFGeant4Field());
+    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
   }
   // activate / deactivate material effects in genfit
   if (m_noEffects == true) {
@@ -172,7 +176,7 @@ void GenFitter2Module::event()
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   int eventCounter = eventMetaDataPtr->getEvent();
-  B2DEBUG(100, "**********   GenFitter2Module  processing event number: " << eventCounter << " ************");
+  B2DEBUG(100, "**********   GenFitter2Module processing event number: " << eventCounter << " ************");
   StoreArray<GFTrackCand> trackCandidates("");
   int nTrackCandidates = trackCandidates.getEntries();
   if (nTrackCandidates == 0) {
@@ -181,8 +185,6 @@ void GenFitter2Module::event()
 
   StoreArray<GFTrack> fittedTracks; //holds the output of this module in the form of Genfit track objects
   fittedTracks.create();
-  StoreArray<SimpleVec<char> > leftRightAmbiInfo("leftRightAmbiInfo");
-  const int nLeftRightAmbiInfo = leftRightAmbiInfo.getEntries();
 
   StoreArray<SVDTrueHit> svdTrueHits("");
   const int nSvdTrueHits = svdTrueHits.getEntries();
@@ -232,8 +234,8 @@ void GenFitter2Module::event()
       } else {
         vector<int> layerIds(nTrackCandHits);
         for (int i = 0; i not_eq nTrackCandHits; ++i) {
-          unsigned int detId = UINT_MAX;
-          unsigned int hitId = UINT_MAX;
+          int detId = -1;
+          int hitId = -1;
           aTrackCandPointer->getHit(i, detId, hitId);
           int layerId = -1;
           if (detId == Const::PXD) {
@@ -270,8 +272,8 @@ void GenFitter2Module::event()
       // class to convert global and local coordinates into each other
       //VXD::GeoCache& aGeoCach = VXD::GeoCache::getInstance();
       for (int i = 0; i not_eq nTrackCandHits; ++i) {
-        unsigned int detId = UINT_MAX;
-        unsigned int hitId = UINT_MAX;
+        int detId = -1;
+        int hitId = -1;
         aTrackCandPointer->getHit(i, detId, hitId);
         VXDTrueHit const* aVxdTrueHitPtr = NULL;
         if (detId == Const::PXD) {
@@ -300,10 +302,10 @@ void GenFitter2Module::event()
     if (filterTrack == false) { // fit the track
 
       //get fit starting values from the from the track candidate
-      TMatrixD stateSeed = aTrackCandPointer->getStateSeed();
-      TMatrixD covSeed = aTrackCandPointer->getCovSeed();
-      TVector3 momentumSeed(stateSeed[3][0], stateSeed[4][0], stateSeed[5][0]);
-      TVector3 posSeed(stateSeed[3][0], stateSeed[4][0], stateSeed[5][0]);
+      TVector3 posSeed = aTrackCandPointer->getPosSeed();
+      TVector3 momentumSeed = aTrackCandPointer->getMomSeed();
+      TMatrixDSym covSeed = aTrackCandPointer->getCovSeed();
+
       B2DEBUG(100, "Start values: momentum (x,y,z,abs): " << momentumSeed.x() << "  " << momentumSeed.y() << "  " << momentumSeed.z() << " " << momentumSeed.Mag());
       B2DEBUG(100, "Start values: momentum std: " << sqrt(covSeed[3][3]) << "  " << sqrt(covSeed[4][4]) << "  " << sqrt(covSeed[5][5]));
       B2DEBUG(100, "Start values: pos:   " << posSeed.x() << "  " << posSeed.y() << "  " << posSeed.z());
@@ -312,12 +314,12 @@ void GenFitter2Module::event()
 
       //Now create a GenFit track with this representation
       RKTrackRep* trackRep = new RKTrackRep(aTrackCandPointer);
-      trackRep->setPropDir(1); // setting the prop dir disables the automatic selection of the direction (but it still will automatically change when switching between forward and backward filter
+      trackRep->setPropDir(1); // setting the prop dir disables the automatic selection of the direction. This is necessary for curling tracks! (but it still will automatically change when switching between forward and backward filter)
       GFTrack track(trackRep); // the track now has ownership of the trackRep do not try do manually delete it
       if (m_smoothing == 1) {
-        track.setSmoothing(true, false);
+        track.setSmoothing(true); // uhm 2 times same shit??? do something about it!
       } else if (m_smoothing == 2) {
-        track.setSmoothing(true, true);
+        track.setSmoothing(true);
       }
 
 
@@ -371,39 +373,38 @@ void GenFitter2Module::event()
 
       //tell the CDCRecoHits how the left/right ambiguity of wire hits should be resolved (this info should come from the track finder)
       int nHitsInTrack = track.getNumHits();
-      if (nLeftRightAmbiInfo not_eq 0 and m_uselrAmbiInfo == true) {
-        int ambiInfoIndex = 0;
-        vector<char> lrInfo = leftRightAmbiInfo[iTrackCand]->getVector();
+      if (m_uselrAmbiInfo == true) {
         for (int i = 0; i not_eq nHitsInTrack; ++i) {
-          CDCRecoHit* aCdcRecoHit = dynamic_cast<CDCRecoHit*>(track.getHit(i));
-          if (aCdcRecoHit not_eq NULL) {
-            //cout << "l/r: for " <<  ambiInfoIndex << " is " << int(lrInfo[ambiInfoIndex]) << "\n";
-            //aCdcRecoHit->setLeftRightResolution(lrInfo[ambiInfoIndex]); //new genfit feature that is not yet in the current externals
-            ++ambiInfoIndex;
+          CDCTrackCandHit* aTrackCandHitPtr =  dynamic_cast<CDCTrackCandHit*>(aTrackCandPointer->getHit(i));
+          if (aTrackCandHitPtr not_eq NULL) {
+            CDCRecoHit* aCdcRecoHit = static_cast<CDCRecoHit*>(track.getHit(i)); //this now has to be a CDCRecoHit because the oder of hits in GFTrack and GFTrackCand must be the same
+            char lrInfo = aTrackCandHitPtr->getLeftRightResolution();
+            B2DEBUG(100, "l/r: for hit with index " <<  i << " is " << int(lrInfo));
+            aCdcRecoHit->setLeftRightResolution(lrInfo);
           }
         }
       }
 
       B2DEBUG(100, "Total Nr of Hits assigned to the Track: " << nHitsInTrack);
-      /*for ( int iHit = 0; iHit not_eq track.getNumHits(); ++iHit){
-        GFAbsRecoHit* const aGFAbsRecoHitPtr = track.getHit(iHit);
+      /*      for ( int iHit = 0; iHit not_eq track.getNumHits(); ++iHit){
+              GFAbsRecoHit* const aGFAbsRecoHitPtr = track.getHit(iHit);
 
-        PXDRecoHit const* const aPxdRecoHitPtr = dynamic_cast<PXDRecoHit const * const>(aGFAbsRecoHitPtr);
-        SVDRecoHit2D const* const aSvdRecoHitPtr =  dynamic_cast<SVDRecoHit2D const * const>(aGFAbsRecoHitPtr);
-        VXDTrueHit const*  aTrueHitPtr = NULL;
+              PXDRecoHit const* const aPxdRecoHitPtr = dynamic_cast<PXDRecoHit const * const>(aGFAbsRecoHitPtr);
+              SVDRecoHit2D const* const aSvdRecoHitPtr =  dynamic_cast<SVDRecoHit2D const * const>(aGFAbsRecoHitPtr);
+              VXDTrueHit const*  aTrueHitPtr = NULL;
 
-          if (aPxdRecoHitPtr not_eq NULL) {
-            cout << "this is a pxd hit" << endl;
-            aTrueHitPtr = static_cast<VXDTrueHit const*>(aPxdRecoHitPtr->getTrueHit());
-          } else {
-            cout << "this is a svd hit" << endl;
-            aTrueHitPtr = static_cast<VXDTrueHit const*>(aSvdRecoHitPtr->getTrueHit());
-          }
+                if (aPxdRecoHitPtr not_eq NULL) {
+                  cout << "this is a pxd hit" << endl;
+                  aTrueHitPtr = static_cast<VXDTrueHit const*>(aPxdRecoHitPtr->getTrueHit());
+                } else {
+                  cout << "this is a svd hit" << endl;
+                  aTrueHitPtr = static_cast<VXDTrueHit const*>(aSvdRecoHitPtr->getTrueHit());
+                }
 
-          //cout << "aVxdTrueHitPtr->getU() " << aTrueHitPtr->getU() << endl;
-          //cout << "aVxdTrueHitPtr->getGlobalTime() " << aTrueHitPtr->getGlobalTime()<< endl;
-          cout << "layerId " << aTrueHitPtr->getSensorID().getLayer()<< endl;
-      }*/
+                cout << "aVxdTrueHitPtr->getU() " << aTrueHitPtr->getU() << endl;
+                cout << "aVxdTrueHitPtr->getGlobalTime() " << aTrueHitPtr->getGlobalTime()<< endl;
+                cout << "layerId " << aTrueHitPtr->getSensorID().getLayerNumber()<< endl;
+            }*/
       //process track (fit them!)
       if (m_useDaf == false) {
         m_kalmanFilter.processTrack(&track);

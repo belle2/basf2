@@ -115,7 +115,7 @@ void GenFitter2Module::initialize()
   }
   // activate / deactivate material effects in genfit
   if (m_noEffects == true) {
-    GFMaterialEffects::getInstance()->setNoEffects(true); //not yet possible in current basd2 genfit version (but already possible upstream)
+    GFMaterialEffects::getInstance()->setNoEffects(true);
   } else {
     GFMaterialEffects::getInstance()->setEnergyLossBetheBloch(m_energyLossBetheBloch);
     GFMaterialEffects::getInstance()->setNoiseBetheBloch(m_noiseBetheBloch);

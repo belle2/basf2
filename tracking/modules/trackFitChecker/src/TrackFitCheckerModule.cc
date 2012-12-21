@@ -71,7 +71,7 @@ REG_MODULE(TrackFitChecker)
 TrackFitCheckerModule::TrackFitCheckerModule() : Module()
 {
   //Set module properties
-  setDescription("This module tacks GFTracks as input an calculates different statistical tests some of them using the simulated truth information");
+  setDescription("This module takes GFTracks as input an calculates different statistical tests some of them using the simulated truth information");
 
   //Parameter definition
   addParam("outputFileName", m_dataOutFileName, "A common name for all output files of this module. Suffixes to distinguish them will be added automatically", string("trackFitChecker"));

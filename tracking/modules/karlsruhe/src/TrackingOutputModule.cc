@@ -195,11 +195,11 @@ void TrackingOutputModule::event()
         int trackId = m_mcFitTracks.at(j);
         GFTrackCand candidateMC = gfTracksMC[trackId]->getCand();
 
-        output[counter]->setMCStartMomentumX(candidateMC.getDirSeed().x());
-        output[counter]->setMCStartMomentumY(candidateMC.getDirSeed().y());
-        output[counter]->setMCStartMomentumZ(candidateMC.getDirSeed().z());
-        output[counter]->setMCStartMomentum(candidateMC.getDirSeed().Mag());
-        output[counter]->setMCStartCurv(1 / sqrt(candidateMC.getDirSeed().x()*candidateMC.getDirSeed().x() + candidateMC.getDirSeed().y()*candidateMC.getDirSeed().y()));
+        output[counter]->setMCStartMomentumX(candidateMC.getMomSeed().x());
+        output[counter]->setMCStartMomentumY(candidateMC.getMomSeed().y());
+        output[counter]->setMCStartMomentumZ(candidateMC.getMomSeed().z());
+        output[counter]->setMCStartMomentum(candidateMC.getMomSeed().Mag());
+        output[counter]->setMCStartCurv(1 / sqrt(candidateMC.getMomSeed().x()*candidateMC.getMomSeed().x() + candidateMC.getMomSeed().y()*candidateMC.getMomSeed().y()));
         output[counter]->setMCStartPhi(atan2(output[counter]->getMCStartMomentumY().at(j), output[counter]->getMCStartMomentumX().at(j)));
         output[counter]->setMCStartCotTheta(output[counter]->getMCStartMomentumZ().at(j) * output[counter]->getMCStartCurv().at(j));
         output[counter]->setMCStartTheta(atan2((1 / (output[counter]->getMCStartCurv().at(j))), output[counter]->getMCStartMomentumZ().at(j)));
@@ -253,11 +253,11 @@ void TrackingOutputModule::event()
           GFTrackCand candidatePR = gfTracksPR[trackId]->getCand();
 
 
-          output[counter]->setPRStartMomentumX(candidatePR.getDirSeed().x());
-          output[counter]->setPRStartMomentumY(candidatePR.getDirSeed().y());
-          output[counter]->setPRStartMomentumZ(candidatePR.getDirSeed().z());
-          output[counter]->setPRStartMomentum(candidatePR.getDirSeed().Mag());
-          output[counter]->setPRStartCurv(1 / sqrt(candidatePR.getDirSeed().x()*candidatePR.getDirSeed().x() + candidatePR.getDirSeed().y()*candidatePR.getDirSeed().y()));
+          output[counter]->setPRStartMomentumX(candidatePR.getMomSeed().x());
+          output[counter]->setPRStartMomentumY(candidatePR.getMomSeed().y());
+          output[counter]->setPRStartMomentumZ(candidatePR.getMomSeed().z());
+          output[counter]->setPRStartMomentum(candidatePR.getMomSeed().Mag());
+          output[counter]->setPRStartCurv(1 / sqrt(candidatePR.getMomSeed().x()*candidatePR.getMomSeed().x() + candidatePR.getMomSeed().y()*candidatePR.getMomSeed().y()));
           output[counter]->setPRStartPhi(atan2(output[counter]->getPRStartMomentumY().at(j), output[counter]->getPRStartMomentumX().at(j)));
           output[counter]->setPRStartCotTheta(output[counter]->getPRStartMomentumZ().at(j) * output[counter]->getPRStartCurv().at(j));
           output[counter]->setPRStartTheta(atan2(1 / (output[counter]->getPRStartCurv().at(j)), output[counter]->getPRStartMomentumZ().at(j)));

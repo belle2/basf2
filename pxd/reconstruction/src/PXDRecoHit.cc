@@ -135,7 +135,7 @@ PXDRecoHit::PXDRecoHit(const VXDSimpleDigiHit* hit):
 
 void PXDRecoHit::setDetectorPlane()
 {
-  // Construct a finite detector plane and set in the policy class.
+  // Construct a finite detector plane and set it.
   const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
 
   // Construct vectors o, u, v
@@ -145,7 +145,6 @@ void PXDRecoHit::setDetectorPlane()
 
   //Construct the detector plane
   GFDetPlane detPlane(origin, uGlobal, vGlobal, new VXD::SensorPlane(m_sensorID, 10, 10));
-  // Set in policy
   setDetPlane(detPlane);
 }
 

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Leo Piilonen                                             *
+ * Contributors: Leo Piilonen, Moritz Nadler                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,10 +15,9 @@
 #include <TVector3.h>
 #include <TMatrixD.h>
 
-#include <GFRecoHitIfc.h>
-#include <tracking/dataobjects/ExtHitPolicy.h>
+#include <RecoHits/GFAbsRecoHit.h>
 
-class GFAbsRecoHit;
+
 
 namespace Belle2 {
 
@@ -29,7 +28,7 @@ namespace Belle2 {
    *  It contains the phasespace point and covariance matrix of an intersection between
    *  the extrapolated track and a GEANT4 volume's surface.
    */
-  class ExtRecoHit : public GFRecoHitIfc<ExtHitPolicy> {
+  class ExtRecoHit : public GFAbsRecoHit {
 
   public:
 
@@ -54,7 +53,16 @@ namespace Belle2 {
      *
      * This function overwrites a function that GFRecoHitIfc inherits from GFAbsRecoHit.
      */
-    TMatrixD getHMatrix(const GFAbsTrackRep*);
+    const TMatrixD& getHMatrix(const GFAbsTrackRep*);
+    void getMeasurement(const GFAbsTrackRep* rep,
+                        const GFDetPlane& pl,
+                        const TVectorD& statePred,
+                        const TMatrixDSym& covPred,
+                        TVectorD& m,
+                        TMatrixDSym& V) {}
+    const GFDetPlane& getDetPlane(GFAbsTrackRep* rep) {
+      return fDetPlane;
+    }
 
     ExtHitStatus getStatus() { return m_status; }
 
@@ -63,7 +71,7 @@ namespace Belle2 {
     /** Number of elements in the phasespace point
      */
     enum {HIT_DIMENSIONS = 6};
-
+    const static TMatrixD c_hMatrix;
     /** Status code for the hit
      */
     ExtHitStatus m_status;

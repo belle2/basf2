@@ -1,6 +1,8 @@
+//include first to avoid warnings
+#include <framework/core/ModuleParam.h>
+
 #include <display/modules/display/DisplayUI.h>
 
-#include <framework/core/ModuleParam.h>
 #include <framework/core/InputController.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>

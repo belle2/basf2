@@ -357,7 +357,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
     double_t hit_v = 0;
     const float plane_size = 4.0;
     double_t hit_res_u = 0.5;
-    double_t hit_res_v = 0.5;
+    //double_t hit_res_v = 0.5; //unused
 
     int hit_coords_dim = hit_coords.GetNrows();
 
@@ -371,7 +371,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
         hit_u = hit_coords(0);
         hit_v = hit_coords(1);
         hit_res_u = hit_cov(0, 0);
-        hit_res_v = hit_cov(1, 1);
+        //hit_res_v = hit_cov(1, 1);
       }
     } else if (dynamic_cast<GFAbsSpacepointHit*>(hit) != NULL) {
       space_hit = true;
@@ -380,7 +380,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
       hit_u = hit_coords(0);
       hit_v = v * (track_pos - o); // move the covariance tube so that the track goes through it
       hit_res_u = hit_cov(0, 0);
-      hit_res_v = 4;
+      //hit_res_v = 4;
       //GFAbsWirepointHit not used
     } else {
       B2WARNING("Hit " << j << ": Unknown policy name: skipping hit!");

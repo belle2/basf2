@@ -35,12 +35,12 @@ const double SVDRecoHit::c_HMatrixVContent[5] = {0, 0, 0, 0, 1};
 const TMatrixD SVDRecoHit::c_HMatrixV = TMatrixD(HIT_DIMENSIONS, 5, c_HMatrixVContent);
 
 SVDRecoHit::SVDRecoHit():
-  GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
+  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
   m_cluster(0), m_energyDep(0), m_rotationPhi(0)
 {}
 
 SVDRecoHit::SVDRecoHit(const SVDTrueHit* hit, bool uDirection, float sigma):
-  GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit),
+  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit),
   m_cluster(0), m_isU(uDirection), m_energyDep(0), m_rotationPhi(0)
 {
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
@@ -55,7 +55,7 @@ SVDRecoHit::SVDRecoHit(const SVDTrueHit* hit, bool uDirection, float sigma):
   }
 
   // Set positions
-  fHitCoord(0, 0) = (m_isU) ? gRandom->Gaus(hit->getU(), sigma) : gRandom->Gaus(hit->getV(), sigma);
+  fHitCoord(0) = (m_isU) ? gRandom->Gaus(hit->getU(), sigma) : gRandom->Gaus(hit->getV(), sigma);
   // Set the error covariance matrix
   fHitCov(0, 0) = sigma * sigma;
   // Set physical parameters
@@ -65,7 +65,7 @@ SVDRecoHit::SVDRecoHit(const SVDTrueHit* hit, bool uDirection, float sigma):
 }
 
 SVDRecoHit::SVDRecoHit(const SVDCluster* hit, float sigma):
-  GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
+  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
   m_cluster(hit), m_energyDep(0), m_rotationPhi(0)
 {
   // Set the sensor UID
@@ -79,13 +79,13 @@ SVDRecoHit::SVDRecoHit(const SVDCluster* hit, float sigma):
 
   // Set positions
   if (!isWedgeU)
-    fHitCoord(0, 0) = hit->getPosition();
+    fHitCoord(0) = hit->getPosition();
   else {
     // For u coordinate in a wedge sensor, the position line is not u = const.
     // We have to rotate the coordinate system to achieve this.
     m_rotationPhi = atan2((geometry.getBackwardWidth() - geometry.getForwardWidth()) / geometry.getWidth(0) * hit->getPosition(), geometry.getLength());
     // Set the position in the rotated coordinate frame.
-    fHitCoord(0, 0) = hit->getPosition() * cos(m_rotationPhi);
+    fHitCoord(0) = hit->getPosition() * cos(m_rotationPhi);
   }
   //If no error is given, set error to pitch/sqrt(12).
   // For u coordinate in trapezoidal sensors, use the mean pitch (at v=0).
@@ -101,7 +101,7 @@ SVDRecoHit::SVDRecoHit(const SVDCluster* hit, float sigma):
 
 void SVDRecoHit::setDetectorPlane()
 {
-  // Construct a finite detector plane and set in the policy class.
+  // Construct a finite detector plane and set it.
   const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
   bool isWedgeU = m_isU && (geometry.getBackwardWidth() > geometry.getForwardWidth());
 
@@ -122,8 +122,7 @@ void SVDRecoHit::setDetectorPlane()
   VXD::SensorPlane* finitePlane = new VXD::SensorPlane(m_sensorID, 1.0, 1.0);
   if (isWedgeU) finitePlane->setRotation(m_rotationPhi);
   GFDetPlane detPlane(origin, uGlobal, vGlobal, finitePlane);
-  // Set in policy
-  fPolicy.setDetPlane(detPlane);
+  setDetPlane(detPlane);
 }
 
 GFAbsRecoHit* SVDRecoHit::clone()
@@ -131,7 +130,7 @@ GFAbsRecoHit* SVDRecoHit::clone()
   return new SVDRecoHit(*this);
 }
 
-TMatrixD SVDRecoHit::getHMatrix(const GFAbsTrackRep*)
+const TMatrixD& SVDRecoHit::getHMatrix(const GFAbsTrackRep*)
 {
   if (m_isU == true) {
     return c_HMatrixU;

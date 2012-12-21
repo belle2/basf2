@@ -29,12 +29,12 @@ const double SVDRecoHit2D::c_HMatrixContent[10] = {0, 0, 0, 1, 0, 0, 0, 0, 0, 1}
 const TMatrixD SVDRecoHit2D::c_HMatrix = TMatrixD(HIT_DIMENSIONS, 5, c_HMatrixContent);
 
 SVDRecoHit2D::SVDRecoHit2D():
-  GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_vxdSimpleDigiHit(NULL),
+  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_vxdSimpleDigiHit(NULL),
   m_energyDep(0)//, m_energyDepError(0)
 {}
 
 SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
-  GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit), m_vxdSimpleDigiHit(NULL),
+  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit), m_vxdSimpleDigiHit(NULL),
   m_energyDep(0)//, m_energyDepError(0)
 {
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
@@ -50,8 +50,8 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
   }
 
   // Set positions
-  fHitCoord(0, 0) = gRandom->Gaus(hit->getU(), sigmaU);
-  fHitCoord(1, 0) = gRandom->Gaus(hit->getV(), sigmaV);
+  fHitCoord(0) = gRandom->Gaus(hit->getU(), sigmaU);
+  fHitCoord(1) = gRandom->Gaus(hit->getV(), sigmaV);
   // Set the error covariance matrix
   fHitCov(0, 0) = sigmaU * sigmaU;
   fHitCov(0, 1) = 0;
@@ -64,7 +64,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
 }
 
 SVDRecoHit2D::SVDRecoHit2D(const VXDSimpleDigiHit* hit):
-  GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_vxdSimpleDigiHit(hit),
+  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_vxdSimpleDigiHit(hit),
   m_energyDep(0)//, m_energyDepError(0)
 {
   // Set the sensor UID
@@ -72,8 +72,8 @@ SVDRecoHit2D::SVDRecoHit2D(const VXDSimpleDigiHit* hit):
   double sigmaU = hit->getSigU();
   double sigmaV = hit->getSigV();
   // Set positions
-  fHitCoord(0, 0) = hit->getU();
-  fHitCoord(1, 0) = hit->getV();
+  fHitCoord(0) = hit->getU();
+  fHitCoord(1) = hit->getV();
   // Set the error covariance matrix
   fHitCov(0, 0) = sigmaU * sigmaU;
   fHitCov(0, 1) = 0;
@@ -88,7 +88,7 @@ SVDRecoHit2D::SVDRecoHit2D(const VXDSimpleDigiHit* hit):
 
 void SVDRecoHit2D::setDetectorPlane()
 {
-  // Construct a finite detector plane and set in the policy class.
+  // Construct a finite detector plane and set it.
   const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
 
   // Construct vectors o, u, v
@@ -97,9 +97,8 @@ void SVDRecoHit2D::setDetectorPlane()
   TVector3 vGlobal = geometry.vectorToGlobal(TVector3(0, 1, 0));
 
   //Construct the detector plane
-  GFDetPlane detPlane(origin, uGlobal, vGlobal, new VXD::SensorPlane(m_sensorID, 1.0, 1.0));
-  // Set in policy
-  fPolicy.setDetPlane(detPlane);
+  GFDetPlane detPlane(origin, uGlobal, vGlobal, new VXD::SensorPlane(m_sensorID, 10, 10));
+  setDetPlane(detPlane);
 }
 
 GFAbsRecoHit* SVDRecoHit2D::clone()
@@ -107,7 +106,7 @@ GFAbsRecoHit* SVDRecoHit2D::clone()
   return new SVDRecoHit2D(*this);
 }
 
-TMatrixD SVDRecoHit2D::getHMatrix(const GFAbsTrackRep*)
+const TMatrixD& SVDRecoHit2D::getHMatrix(const GFAbsTrackRep*)
 {
   return c_HMatrix;
 }

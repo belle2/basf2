@@ -340,8 +340,8 @@ namespace Belle2 {
 
     void TOPReconstructorModule::getTracks(std::vector<TOPtrack> & tracks, int hypothesis)
     {
-      unsigned int myDetID = 3; // TOP
-      unsigned int NumBars = m_topgp->getNbars();
+      int myDetID = 3; // TOP
+      int NumBars = m_topgp->getNbars();
       StoreArray<GFTrack> gfTracks(m_gfTracksColName);
       StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName);
       StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName);

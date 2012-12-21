@@ -212,7 +212,7 @@ void ECLGammaReconstructorModule::readExtrapolate()
 
   if (extTrackCands) {
 
-    unsigned int myDetID = 5; // ECL in this example
+    int myDetID = 5; // ECL in this example
 //  cout<<"GFTrack  "<<gfTracks.getEntries()<<endl;
     for (int t = 0; t < gfTracks.getEntries(); ++t) {
 //GFTrack* track = gfTracks[i];

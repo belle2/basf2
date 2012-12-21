@@ -69,7 +69,7 @@ namespace Belle2 {
     static float getFlownDistanceCDC(int layerid, float theta, float phi);
 
     /** save energy loss and hit information from SVD/PXDHits to track */
-    template <class HitClass> void saveSiHits(DedxTrack* track, const HelixHelper& helix, const StoreArray<HitClass> &hits, const std::vector<unsigned int> &hit_indices) const;
+    template <class HitClass> void saveSiHits(DedxTrack* track, const HelixHelper& helix, const StoreArray<HitClass> &hits, const std::vector<int> &hit_indices) const;
 
 
     /** for all particles, save log-likelihood values into 'logl'.

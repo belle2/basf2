@@ -286,7 +286,7 @@ void DedxPIDModule::event()
       bool track_extrapolation_failed = false;
 
       //Loop over all CDC hits from this track
-      const std::vector<unsigned int>& cdc_hit_ids = gftrackcand.getHitIDs(Const::CDC);
+      const std::vector<int>& cdc_hit_ids = gftrackcand.getHitIDs(Const::CDC);
       const int num_cdc_hits = cdc_hit_ids.size();
       for (int iCDC = 0; iCDC < num_cdc_hits; iCDC++) {
         const int cdc_idx = cdc_hit_ids[iCDC];
@@ -425,10 +425,10 @@ void DedxPIDModule::event()
 
     if (m_usePXD) {
       //get indices of PXDTrueHits
-      const std::vector<unsigned int>& pxdHitIDs = gftrackcand.getHitIDs(Const::PXD);
+      const std::vector<int>& pxdHitIDs = gftrackcand.getHitIDs(Const::PXD);
 
       //and construct a list of associated PXDCluster indices
-      std::vector<unsigned int> pxdClusterIDs;
+      std::vector<int> pxdClusterIDs;
       for (unsigned int iHit = 0; iHit < pxdHitIDs.size(); iHit++) {
         typedef RelationIndex<PXDCluster, PXDTrueHit>::Element relElement_t;
         unsigned int hitID = pxdHitIDs[iHit];
@@ -443,7 +443,7 @@ void DedxPIDModule::event()
 
     if (m_useSVD) {
       //no way to access digitized SVD hits, so we'll just use the SVDTrueHits directly
-      const std::vector<unsigned int>& svdHitIDs = gftrackcand.getHitIDs(Const::SVD);
+      const std::vector<int>& svdHitIDs = gftrackcand.getHitIDs(Const::SVD);
       saveSiHits(&track, helix_at_origin, svdTrueHits, svdHitIDs);
     }
 
@@ -543,7 +543,7 @@ float DedxPIDModule::getFlownDistanceCDC(int layerid, float theta, float phi)
 
 //assume HitClass provides getU/V(), getSensorID(), getEnergyDep()
 //true for SVDRecoHit2D, PXDRecoHit, and associated TrueHits
-template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const HelixHelper& helix, const StoreArray<HitClass> &hits, const std::vector<unsigned int> &hit_indices) const
+template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const HelixHelper& helix, const StoreArray<HitClass> &hits, const std::vector<int> &hit_indices) const
 {
   const int num_hits = hit_indices.size();
   if (num_hits == 0)

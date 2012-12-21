@@ -164,11 +164,10 @@ def print_all_modules(moduleList):
     for (moduleName, sharedLib) in sorted(moduleList.iteritems()):
         try:
             current_module = register_module(moduleName)
+            table.append([moduleName, current_module.description()])
         except:
             B2ERROR('The module could not be loaded. This is most likely '
                     + 'caused by a library with missing links.')
-
-        table.append([moduleName, current_module.description()])
 
     pretty_print_table(table, [25, '*'], first_row_is_heading=False)
 

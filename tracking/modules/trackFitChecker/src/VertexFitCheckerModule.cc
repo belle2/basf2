@@ -165,7 +165,7 @@ void VertexFitCheckerModule::event()
 
     const GFRaveVertex* aGFRaveVertexPtr = vertices[iVertex];
     const double chi2 = aGFRaveVertexPtr->getChi2();
-    const int ndf = aGFRaveVertexPtr->getNdf();
+    const int ndf = int(aGFRaveVertexPtr->getNdf() + 0.5); //maybe better to look for a lib that can caculate p values from non integer NDFs
     const double pValue = TMath::Prob(chi2, ndf);
 //    cout << "chi2,ndf,p: " << chi2 << " " << ndf << " " << pValue << endl;
     if (pValue < m_vertexPValueCut) {

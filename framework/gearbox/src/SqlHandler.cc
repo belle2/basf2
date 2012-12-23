@@ -120,10 +120,10 @@ namespace Belle2 {
         //  Int_t key        = statement->GetInt(0);
         //      Int_t keyid      = statement->GetInt(1);
         Int_t type       = statement->GetInt(2);
-        char* data;
+        void* data;
         Long_t bsize = 1;
-        if (PgSqlType) data = new char[bsize];
-        Bool_t err = statement->GetBinary(3, (void *&) data, bsize);
+        if (PgSqlType) data = static_cast<void*>(new char[bsize]);
+        Bool_t err = statement->GetBinary(3, data, bsize);
         if (err == kTRUE && bsize > 0) {
           switch (type) {
             case kSQLHANDLER_TMessage: {
@@ -142,7 +142,8 @@ namespace Belle2 {
             case kSQLHANDLER_String: {
               int compressed = 0;
               if (compressed) m_stream.push(io::gzip_decompressor());
-              m_stream.push(io::array_source(data, data + strlen(data)));
+              const char* dataCharPtr = static_cast<char*>(data);
+              m_stream.push(io::array_source(dataCharPtr, dataCharPtr + strlen(dataCharPtr)));
               break;
             }
 

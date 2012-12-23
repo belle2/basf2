@@ -11,6 +11,8 @@
 
 #include <GFTrack.h>
 #include <GFFieldManager.h>
+#include <GFMaterialEffects.h>
+#include <GFTGeoMaterialInterface.h>
 
 #include "TGeoManager.h"
 #include "TEveManager.h"
@@ -55,8 +57,9 @@ void DisplayModule::initialize()
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();
 
-    //initialize magnetic field for genfit
+    //initialize some things for genfit
     GFFieldManager::getInstance()->init(new GFGeant4Field());
+    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
   }
 
   m_display = new DisplayUI(m_automatic);

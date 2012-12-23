@@ -26,10 +26,13 @@
 
 #include "GFTrack.h"
 #include "GFAbsTrackRep.h"
+#include "GFException.h"
 #include "GFFieldManager.h"
-#include "TGeoManager.h"
+#include <GFMaterialEffects.h>
+#include <GFTGeoMaterialInterface.h>
 
 #include <TFile.h>
+#include <TGeoManager.h>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TMath.h>
@@ -160,10 +163,11 @@ void DedxPIDModule::initialize()
     //convert geant4 geometry to TGeo geometry
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();
-  }
 
-  //initialize magnetic field for genfit
-  GFFieldManager::getInstance()->init(new GFGeant4Field());
+    //initialize some things for genfit
+    GFFieldManager::getInstance()->init(new GFGeant4Field());
+    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
+  }
 }
 
 
@@ -250,7 +254,7 @@ void DedxPIDModule::event()
 
       track.m_p_vec = dir_in_poca;
       track.m_p = momentum_mag;
-    } catch (...) {
+    } catch (GFException) {
       B2WARNING(m_trackID - 1 << ": Track extrapolation failed (at origin!), skipping particle");
       continue; //next particle
     }
@@ -341,7 +345,7 @@ void DedxPIDModule::event()
             if (hit_pos.Perp() > 111.14 or hit_pos.z() < -83.12 or hit_pos.z() > 158.57) {
               B2WARNING("Genfit extrapolation: Hit outside drift chamber! track_id: " << m_trackID - 1 << ", pos: " << hit_pos.x() << ", " << hit_pos.y() << ", " << hit_pos.z() << ", dist to helix: " << (hit_pos - hit_pos_helix).Mag());
             }
-          } catch (...) {
+          } catch (GFException) {
             B2WARNING(m_eventID - 1 << ":" << m_trackID - 1 << ": Track extrapolation failed (in CDC), further hits will be less accurate");
 
             //if extrapolation fails once, it's unlikely to work again

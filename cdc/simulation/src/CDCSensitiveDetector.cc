@@ -79,6 +79,9 @@ namespace Belle2 {
   //-----------------------------------------------------
   bool CDCSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   {
+    //hodebug
+    //    std::cout <<" " << std::endl;
+    //    std::cout <<"********* step in ********" << std::endl;
     // Get deposited energy
     const G4double edep = aStep->GetTotalEnergyDeposit();
 
@@ -95,11 +98,11 @@ namespace Belle2 {
 
     const G4double charge = t.GetDefinition()->GetPDGCharge();
 
-    const G4double tof = t.GetGlobalTime();
-    if (isnan(tof)) {
-      B2ERROR("SensitiveDetector: global time is nan");
-      return false;
-    }
+    //    const G4double tof = t.GetGlobalTime(); //tof at post step point
+    //    if (isnan(tof)) {
+    //      B2ERROR("SensitiveDetector: global time is nan");
+    //      return false;
+    //    }
 
     const G4int pid = t.GetDefinition()->GetPDGEncoding();
     const G4int trackID = t.GetTrackID();
@@ -111,9 +114,18 @@ namespace Belle2 {
     const G4ThreeVector& posOut = out.GetPosition();
     const G4ThreeVector momIn(in.GetMomentum().x(), in.GetMomentum().y(),
                               in.GetMomentum().z());
+    //hodebug
+    //    std::cout <<"pid   = " << pid  << std::endl;
+    //    std::cout <<"mass  = " << t.GetDefinition()->GetPDGMass() << std::endl;
+    //    std::cout <<"posIn = " << posIn << std::endl;
+    //    std::cout <<"posOut= " << posOut << std::endl;
+    //    std::cout <<"tof at post-step  = " << out.GetGlobalTime() << std::endl;
+    //    std::cout <<"stepl = " << stepLength << std::endl;
 
     // Get layer ID
     const unsigned layerId = v.GetCopyNo();
+    //hodebug
+    //    std::cout <<"layerId = " << layerId << std::endl;
     B2DEBUG(150, "LayerID in continuous counting method: " << layerId);
 
     //--------------------------------------------------------------------------
@@ -138,16 +150,42 @@ namespace Belle2 {
     TVector3 tposOut(posOut.x() / cm, posOut.y() / cm, posOut.z() / cm);
     const unsigned idIn = cdcg.cellId(layerId, tposIn);
     const unsigned idOut = cdcg.cellId(layerId, tposOut);
+    //hodebug
+    //    std::cout <<"edep= " << edep << std::endl;
+    //    std::cout <<"idIn,idOut= " << idIn <<" "<< idOut << std::endl;
 
     // Calculate drift length
     const bool magneticField = false;
     std::vector<int> wires = WireId_in_hit_order(idIn, idOut, cdcg.nWiresInLayer(layerId));
     G4double sint(0.);
     const G4double s_in_layer = stepLength / cm;
-
     G4double xint[6] = {0};
 
-    for (unsigned i = 0; i < wires.size(); i++) {
+    const G4ThreeVector momOut(out.GetMomentum().x(), out.GetMomentum().y(),
+                               out.GetMomentum().z());
+    const G4double speedIn  =  in.GetVelocity();
+    const G4double speedOut = out.GetVelocity();
+    const G4double speed    = 0.5 * (speedIn + speedOut);
+    const G4double speedInCmPerNs = speed / cm;
+
+    const unsigned int nWires = wires.size();
+    G4double tofBefore = in.GetGlobalTime();
+    G4double kinEnergyBefore = in.GetKineticEnergy();
+    G4double momBefore = momIn.mag();
+    const G4double eLoss = kinEnergyBefore - out.GetKineticEnergy(); //n.b. not always equal to edep
+    const G4double mass = t.GetDefinition()->GetPDGMass();
+    //hodebug
+    //    std::cout <<"momBefore = " << momBefore << std::endl;
+    //    std::cout <<"momIn = " << momIn.x() <<" "<<  momIn.y() <<" "<< momIn.z() << std::endl;
+    //    std::cout <<"momOut= " << momOut.x() <<" "<<  momOut.y() <<" "<< momOut.z() << std::endl;
+    //    std::cout <<"speedIn,speedOut= "<< speedIn <<" "<<speedOut << std::endl;
+    //    std::cout <<" speedInCmPerNs= " <<  speedInCmPerNs << std::endl;
+    //    std::cout <<"tofBefore= " <<  tofBefore << std::endl;
+
+
+    for (unsigned i = 0; i < nWires; ++i) {
+      //hodebug
+      //      std::cout <<"============ i,wires[i]= " << i <<" "<< wires[i] << std::endl;
       double distance = 0;
       G4ThreeVector posW(0, 0, 0);
       G4int lr(1);
@@ -160,7 +198,8 @@ namespace Belle2 {
           //line_distance = ClosestApproach(layerId, wires[i], posIn/cm, posOut/cm, hitPosition);
 
           // Cal. distance assuming helix track (still approximation)
-          G4double pos[3]; pos[0] = posIn.x(); pos[1] = posIn.y(); pos[2] = posIn.z();
+          const G4double pos[3] = {posIn.x(), posIn.y(), posIn.z()};
+
           G4double Bfield[3];
           const G4Field* field = G4TransportationManager::GetTransportationManager()->GetFieldManager()->GetDetectorField();
           field->GetFieldValue(pos, Bfield);
@@ -170,33 +209,25 @@ namespace Belle2 {
               Bfield[1] == 0. &&
               Bfield[2] != 0.) m_nonUniformField = 0;
 
-          G4double B_kG[3] = {Bfield[0] / kilogauss,
-                              Bfield[1] / kilogauss,
-                              Bfield[2] / kilogauss
-                             };
+          const G4double B_kG[3] = {Bfield[0] / kilogauss,
+                                    Bfield[1] / kilogauss,
+                                    Bfield[2] / kilogauss
+                                   };
 
-          HepPoint3D x(pos[0], pos[1], pos[2]); x *= (1. / cm);
-          HepVector3D p(in.GetMomentum().x(),
-                        in.GetMomentum().y(),
-                        in.GetMomentum().z()); p *= (1. / GeV);
+          const HepPoint3D  x(pos[0] / cm, pos[1] / cm, pos[2] / cm);
+          const HepVector3D p(momIn.x() / GeV, momIn.y() / GeV, momIn.z() / GeV);
           Helix tmp(x, p, charge);
           tmp.bFieldZ(B_kG[2]);
           tmp.ignoreErrorMatrix();
 
           // Calculate forward/backward position of current wire
           const TVector3 tfw3v = cdcg.wireForwardPosition(layerId, wires[i]);
-          G4ThreeVector fw3v(tfw3v.x(), tfw3v.y(), tfw3v.z());
           const TVector3 tbw3v = cdcg.wireBackwardPosition(layerId, wires[i]);
-          G4ThreeVector bw3v(tbw3v.x(), tbw3v.y(), tbw3v.z());
 
-          HepPoint3D fwd(fw3v.x(),
-                         fw3v.y(),
-                         fw3v.z());
-          HepPoint3D bck(bw3v.x(),
-                         bw3v.y(),
-                         bw3v.z());
+          const HepPoint3D fwd(tfw3v.x(), tfw3v.y(), tfw3v.z());
+          const HepPoint3D bck(tbw3v.x(), tbw3v.y(), tbw3v.z());
 
-          HepVector3D wire = fwd - bck;
+          const HepVector3D wire = fwd - bck;
           HepPoint3D tryp =
             (x.z() - bck.z()) / wire.z() * wire + bck;
           tmp.pivot(tryp);
@@ -205,66 +236,74 @@ namespace Belle2 {
           tryp = (tmp.x(0.).z() - bck.z()) / wire.z() * wire + bck;
           tmp.pivot(tryp);
 
-          distance = std::abs(tmp.a()[0]) * cm;
-          posW.setX(tryp.x()*cm);
-          posW.setY(tryp.y()*cm);
-          posW.setZ(tryp.z()*cm);
+          distance = std::abs(tmp.a()[0]);
+          posW.setX(tryp.x());
+          posW.setY(tryp.y());
+          posW.setZ(tryp.z());
 
           HepPoint3D onTrack = tmp.x(0.);
+          Hep3Vector pOnTrack = tmp.momentum(0.);
 
           for_Rotat(B_kG);
-          G4double xwb4(bck.x()), ywb4(bck.y()), zwb4(bck.z());
-          G4double xwf4(fwd.x()), ywf4(fwd.y()), zwf4(fwd.z());
-          G4double xp(x.x()), yp(x.y()), zp(x.z());
-          G4double px(p.x()), py(p.y()), pz(p.z());
+          const G4double xwb4(bck.x()), ywb4(bck.y()), zwb4(bck.z());
+          const G4double xwf4(fwd.x()), ywf4(fwd.y()), zwf4(fwd.z());
+          const G4double xp(onTrack.x()), yp(onTrack.y()), zp(onTrack.z());
+          const G4double px(pOnTrack.x()), py(pOnTrack.y()), pz(pOnTrack.z());
           G4double q2[3] = {0.}, q1[3] = {0.};
-          const G4int ntryMax(100);
-          G4double dist = distance / cm;
+          const G4int ntryMax(100);  //tentative; too large probably...
+          G4double dist;
           G4int ntry(999);
           HELWIR(xwb4, ywb4, zwb4, xwf4, ywf4, zwf4,
                  xp,   yp,   zp,   px,   py,   pz,
                  B_kG, charge, ntryMax, dist, q2, q1, ntry);
 
+          //hodebug
+          //    std::cout <<"ntry= " << ntry << std::endl;
+          //    std::cout << "bf distance= " << distance << std::endl;
+          //    std::cout << "onTrack    = " << onTrack  << std::endl;
+          //    std::cout << "posW       = " << posW     << std::endl;
           if (ntry <= ntryMax) {
-            distance = dist * cm;
+            distance = dist;
             onTrack.setX(q1[0]);
             onTrack.setY(q1[1]);
             onTrack.setZ(q1[2]);
-            onTrack *= cm;
             posW.setX(q2[0]);
             posW.setY(q2[1]);
             posW.setZ(q2[2]);
-            posW *= cm;
           }
+          //hodebug
+          //    std::cout << "af distance= " << distance << std::endl;
+          //    std::cout << "onTrack    = " << onTrack  << std::endl;
+          //    std::cout << "posW       = " << posW     << std::endl;
+          //    if(distance > 2.4) {
+          //      std::cout <<"toolargedriftl" << std::endl;
+          //    }
+          distance *= cm;  onTrack *= cm;  posW *= cm;
 
           G4ThreeVector posTrack(onTrack.x(), onTrack.y(), onTrack.z());
 
           lr = 1;
-          if ((tryp.cross(onTrack)).z() < 0.) lr = 0;
+          if ((posW.cross(posTrack)).z() < 0.) lr = 0;
 
           int saveIndex = -999;
-          if (wires.size() == 1) {
-            saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep, s_in_layer * cm, momIn, posW, posIn, posOut, posTrack, lr);
+          if (nWires == 1) {
+            saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, momIn, posW, posIn, posOut, posTrack, lr, speed);
           } else {
-            // Cubic approximation of the track
-            const G4int ic(3);
-            G4int cel1 = wires[i]    + 1;
-            G4int cel2 = wires[wires.size() - 1] + 1;
-            G4double s1 = t.GetTrackLength() / cm;
-            G4double s2 = (s1 + s_in_layer);
-            G4ThreeVector xin(posIn.x(), posIn.y(), posIn.z());
-            xin *= (1. / cm);
+            G4int cel1 = wires[i] + 1;
+            G4int cel2 = cel1;
+            if (i + 1 <= nWires - 1) {
+              cel2 = wires[i + 1] + 1;
+            }
+            const G4double s2 = t.GetTrackLength() / cm;  //at post-step
+            G4double s1 = (s2 - s_in_layer);  //at pre-step; varied later
             G4ThreeVector din = momIn;
             if (din.mag() != 0.) din /= momIn.mag();
 
             G4double  vent[6];
-            vent[0] = xin.x(); vent[1] = xin.y(); vent[2] = xin.z();
+            vent[0] = posIn.x() / cm; vent[1] = posIn.y() / cm; vent[2] = posIn.z() / cm;
             vent[3] = din.x(); vent[4] = din.y(); vent[5] = din.z();
 
-            G4ThreeVector xot(posOut.x(), posOut.y(), posOut.z());
-            xot *= (1. / cm);
-            G4ThreeVector dot(out.GetMomentum().x(), out.GetMomentum().y(),
-                              out.GetMomentum().z());
+            G4ThreeVector dot(momOut.x(), momOut.y(), momOut.z());
             if (dot.mag() != 0.) {
               dot /= dot.mag();
             } else {
@@ -273,37 +312,63 @@ namespace Belle2 {
             }
 
             G4double  vext[6];
-            vext[0] = xot.x(); vext[1] = xot.y(); vext[2] = xot.z();
+            vext[0] = posOut.x() / cm; vext[1] = posOut.y() / cm; vext[2] = posOut.z() / cm;
             vext[3] = dot.x(); vext[4] = dot.y(); vext[5] = dot.z();
 
             if (i > 0) {
-              for (int j = 0; j < 6; j++) vent[j] = xint[j];
+              for (int j = 0; j < 6; ++j) vent[j] = xint[j];
               s1 = sint;
             }
 
+            const G4int ic(3);  // cubic approximation of the track
             G4int    flag(0);
             G4double edep_in_cell(0.);
+            G4double eLossInCell(0.);
 
             if (cel1 != cel2) {
+              //hodebug
+              //        std::cout <<"layerId,cel1,cel2= " << layerId <<" "<< cel1 <<" "<< cel2 << std::endl;
+              //        std::cout <<"vent= " << vent[0] <<" "<< vent[1] <<" "<< vent[2] <<" "<< vent[3] <<" "<< vent[4] <<" "<< vent[5] << std::endl;
+              //        std::cout <<"vext= " << vext[0] <<" "<< vext[1] <<" "<< vext[2] <<" "<< vext[3] <<" "<< vext[4] <<" "<< vext[5] << std::endl;
+              //        std::cout <<"s1,s2,ic= " << s1 <<" "<< s2 <<" "<< ic << std::endl;
               CellBound(layerId, cel1, cel2, vent, vext, s1, s2, ic, xint, sint, flag);
+              //hodebug
+              //        std::cout <<"flag,sint= " << flag <<" "<< sint << std::endl;
+              //        std::cout <<"xint= " << xint[0] <<" "<< xint[1] <<" "<< xint[2] <<" "<< xint[3] <<" "<< xint[4] <<" "<< xint[5] << std::endl;
 
+              const G4double test = (sint - s1) / s_in_layer;
+              if (test < 0. || test > 1.) {
+                B2WARNING("CDCSensitiveDetector: Strange path length: " << "s1=" << " " << s1 << "sint=" << " " << sint << "s_in_layer=" << " " << s_in_layer);
+              }
               edep_in_cell = edep * (sint - s1) / s_in_layer;
 
               const G4ThreeVector x_In(vent[0]*cm, vent[1]*cm, vent[2]*cm);
               const G4ThreeVector x_Out(xint[0]*cm, xint[1]*cm, xint[2]*cm);
-              G4double pmag = momIn.mag();
-              const G4ThreeVector p_In(pmag * vent[3], pmag * vent[4], pmag * vent[5]);
+              const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
-              saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, posTrack, lr);
+              saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, posTrack, lr, speed);
+              tofBefore += (sint - s1) / speedInCmPerNs;
+              eLossInCell = eLoss * (sint - s1) / s_in_layer;
+              kinEnergyBefore -= eLossInCell;
+              if (kinEnergyBefore >= 0.) {
+                momBefore = sqrt(kinEnergyBefore * (kinEnergyBefore + 2.*mass));
+              } else {
+                B2WARNING("CDCSensitiveDetector: Kinetic Energy < 0.")
+                momBefore = 0.;
+              }
+
             } else {  //the particle exits
 
+              const G4double test = (s2 - sint) / s_in_layer;
+              if (test < 0. || test > 1.) {
+                B2WARNING("CDCSensitiveDetector: Strange path length: " << "s1=" << " " << s1 << "sint=" << " " << sint << "s_in_layer=" << " " << s_in_layer);
+              }
               edep_in_cell = edep * (s2 - sint) / s_in_layer;
 
               const G4ThreeVector x_In(vent[0]*cm, vent[1]*cm, vent[2]*cm);
-              G4double pmag = momIn.mag();
-              const G4ThreeVector p_In(pmag * vent[3], pmag * vent[4], pmag * vent[5]);
+              const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
-              saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, posTrack, lr);
+              saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, posTrack, lr, speed);
             }
           }
           //setSeenInDetectorFlag(aStep, MCParticle::c_SeenInCDC);
@@ -320,7 +385,7 @@ namespace Belle2 {
 
         }
       }
-    }
+    } //end of wire loop
 
     return true;
   }
@@ -344,11 +409,26 @@ namespace Belle2 {
                                    const G4ThreeVector& posIn,
                                    const G4ThreeVector& posOut,
                                    const G4ThreeVector& posTrack,
-                                   const G4int lr)
+                                   const G4int lr,
+                                   const G4double speed)
   {
 
     // Discard the hit below Edep_th
     if (edep <= m_thresholdEnergyDeposit) return 0;
+
+    //compute tof at the closest point; linear approx.
+    const G4double CorrectTof = tof + (posTrack - posIn).mag() / speed;
+    //hodebug
+    //    std::cout <<"posIn= " << posIn.x() <<"  "<<posIn.y() <<"  "<< posIn.z() << std::endl;
+    //    std::cout <<"posOut= " << posOut.x() <<"  "<<posOut.y() <<"  "<< posOut.z() << std::endl;
+    //    std::cout <<"posTrack= " << posTrack.x() <<"  "<<posTrack.y() <<"  "<< posTrack.z() << std::endl;
+    //    std::cout <<"posW= " << posW.x() <<"  "<<posW.y() <<"  "<< posW.z() << std::endl;
+    //    std::cout <<"tof       = " << tof        << std::endl;
+    //    std::cout <<"deltaTof  = " << (posTrack - posIn).mag()/speed << std::endl;
+    //    std::cout <<"CorrectTof= " << CorrectTof << std::endl;
+    //    if(CorrectTof > 95) {
+    //      std::cout <<"toolargecorrecttof" << std::endl;
+    //    }
 
     StoreArray<MCParticle> mcParticles;
     //change Later
@@ -362,8 +442,8 @@ namespace Belle2 {
     cdcArray[m_hitNumber]->setTrackId(trackID);
     cdcArray[m_hitNumber]->setPDGCode(pid);
     cdcArray[m_hitNumber]->setDriftLength(distance / cm);
-    cdcArray[m_hitNumber]->setFlightTime(tof / ns);
-    cdcArray[m_hitNumber]->setGlobalTime(tof / ns);
+    cdcArray[m_hitNumber]->setFlightTime(CorrectTof / ns);
+    cdcArray[m_hitNumber]->setGlobalTime(CorrectTof / ns);
     cdcArray[m_hitNumber]->setEnergyDep(edep / GeV);
     cdcArray[m_hitNumber]->setStepLength(stepLength / cm);
     TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
@@ -460,16 +540,21 @@ namespace Belle2 {
 
     //main
     G4int irTry = 0;
-    //Belle::Geocdc_wire_Manager &w = Belle::Geocdc_wire_Manager::get_manager();
     CDCGeometryPar& p_cdc = CDCGeometryPar::Instance();
+    G4double div   = p_cdc.nWiresInLayer(layerId);
+
+    //Check if ic1 and ic2 are ok
+    if (std::abs(ic1 - ic2) != 1) {
+      if (ic1 == 1 && ic2 == div) {
+      } else if (ic1 == div && ic2 == 1) {
+      } else {
+        B2ERROR("CDCSensitiveDetector: |ic1 - ic2| != 1 in CellBound; " << "ic1=" << ic1 << " " << "ic2=" << ic2);
+      }
+    }
+
     // Calculate forward/backward position of current wire
-    TVector3 tfw0 = p_cdc.wireForwardPosition(layerId, 0);
-    G4ThreeVector fw0(tfw0.x(), tfw0.y(), tfw0.z());
-    TVector3 tbw0 = p_cdc.wireBackwardPosition(layerId, 0);
-    G4ThreeVector bw0(tbw0.x(), tbw0.y(), tbw0.z());
-    //G4double dphi = 2.*CLHEP::pi/p_cdc.nWiresInLayer(layerId);
-    fw0 *= (1. / cm);
-    bw0 *= (1. / cm);
+    const TVector3 fw0 = p_cdc.wireForwardPosition(layerId, 0);
+    const TVector3 bw0 = p_cdc.wireBackwardPosition(layerId, 0);
 
     G4double slant;
     if (0.0 == 0.5 * (p_cdc.nShifts(layerId))) {
@@ -480,19 +565,27 @@ namespace Belle2 {
       double z1 = fw0.z();
       double z2 = bw0.z();
       slant = std::atan2(2.0 * (p_cdc.senseWireR(layerId)) * sinhdel, z1 - z2);
+      //hodebug
+      //      std::cout <<"nwires = " << p_cdc.nWiresInLayer(layerId) << std::endl;
+      //      std::cout <<"nshift = " << p_cdc.nShifts(layerId) << std::endl;
+      //      std::cout <<"delfi  = " << delfi   << std::endl;
     }
+    //hodebug
+    //    std::cout <<"layerId,slant= " << layerId <<" "<< slant << std::endl;
+    //    std::cout <<"R      = " << p_cdc.senseWireR(layerId) << std::endl;
+    //    std::cout <<"z1,z2  = " << fw0.z() <<" "<< bw0.z() << std::endl;
+    //    std::cout <<"nshifts= " << p_cdc.nShifts(layerId) << std::endl;
     G4double xwb   = (p_cdc.wireBackwardPosition(layerId, ic1 - 1)).x();
     G4double ywb   = (p_cdc.wireBackwardPosition(layerId, ic1 - 1)).y();
     G4double zwb   = (p_cdc.wireBackwardPosition(layerId, ic1 - 1)).z();
     G4double xwf   = (p_cdc.wireForwardPosition(layerId, ic1 - 1)).x();
     G4double ywf   = (p_cdc.wireForwardPosition(layerId, ic1 - 1)).y();
     G4double zwf   = (p_cdc.wireForwardPosition(layerId, ic1 - 1)).z();
-    G4double div   = p_cdc.nWiresInLayer(layerId);
 
 L100:
     //copy arrays
     G4double xx1[6], xx2[6];
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; ++i) {
       xx1[i] = venter[i];
       xx2[i] = vexit [i];
     }
@@ -567,6 +660,21 @@ L100:
         goto L100;
       }
       yadj = 0.5 * (xx1[1] + xx2[1]);
+
+      //      //adjust yadj (cell-boundary), because GIPLAN requires yadj be btw xx2[1] and xx1[1]
+      //      const G4double epsl = 1.e-3;
+      //      if( xx1[1] < xx2[1] ) {
+      //  if( 0. < xx1[1] ) yadj =
+      //    xx1[1] + epsl*(xx2[1]-xx1[1])/std::abs(xx2[1]-xx1[1]);
+      //  if( xx2[1] < 0. ) yadj =
+      //    xx2[1] + epsl*(xx1[1]-xx2[1])/std::abs(xx1[1]-xx2[1]);
+      //      }
+      //      if( xx2[1] < xx1[1] ) {
+      //  if( 0. < xx2[1] ) yadj =
+      //    xx2[1] + epsl*(xx1[1]-xx2[1])/std::abs(xx1[1]-xx2[1]);
+      //  if( xx1[1] < 0. ) yadj =
+      //    xx1[1] + epsl*(xx2[1]-xx1[1])/std::abs(xx2[1]-xx1[1]);
+      //      }
     }
 
     //get intersection using stupid GEANT tool.
@@ -583,8 +691,8 @@ L100:
       RotVec(xint[3], xint[4], xint[5], phi, theta, mode + 1);
       if (mode == 0) xint[2] += zw;
     } else {
-      //B2INFO("No intersection " << iflag <<" "<< xx1[1] <<" "<< xx2[1] <<" "<< yc << " "<< irTry <<" "<< ic1 <<" "<< ic2);
-      //B2INFO("Retry with line approximation");
+      B2WARNING("CDCSensitiveDetector: No intersection " << iflag << " " << xx1[1] << " " << xx2[1] << " " << yc << " " << irTry << " " << ic1 << " " << ic2);
+      //      B2WARNING("Retry with line approximation");
       GIPLAN(yc, xx1, xx2, s1, s2, 2, xint, sint, pzint, iflag);
       if (iflag == 1) {
         xint[1] -= yshift;
@@ -837,7 +945,7 @@ L7:
     dinter = std::abs(s2 - s1) * 0.5;
     s = 0.;
 
-    for (int i = 1; i <= maxhit; i++) {
+    for (int i = 1; i <= maxhit; ++i) {
       G4double y = shifty + b[0] + s * (b[1] + s * (b[2] + s * b[3]));
       G4double dr = (yc - y) * drctn;
       if (std::abs(dr) <  epsi)                     goto L20;
@@ -1111,8 +1219,10 @@ L10:
 
     //set initial value for fi
     if (fi4 == 0. || iflg == 1) {
-      xwm    = 0.5 * (xwb + xwf);
-      ywm    = 0.5 * (ywb + ywf);
+      //      xwm    = 0.5 * (xwb + xwf);
+      //      ywm    = 0.5 * (ywb + ywf);
+      xwm    = xxx;
+      ywm    = yyy;
       //r(cm) = alpha/cpa = alpha * pt(GeV); bfield(kG)
       G4double bfield = sqrt(B_kG[0] * B_kG[0] +
                              B_kG[1] * B_kG[1] +
@@ -1282,20 +1392,20 @@ line100:
       return;
     }
 
-    for (int i = 0; i < ndim; i++)   c[i] = 0.;
+    for (int i = 0; i < ndim; ++i)   c[i] = 0.;
     G4double tmp[3];
-    for (int i = 0; i < ndim; i++) tmp[i] = 0.;
+    for (int i = 0; i < ndim; ++i) tmp[i] = 0.;
 
     if (mode == 0) {
-      for (int i = 0; i < ndim; i++) {
-        for (int j = 0; j < ndim; j++) {
+      for (int i = 0; i < ndim; ++i) {
+        for (int j = 0; j < ndim; ++j) {
           c[i] += m[j][i] * a[j];
         }
       }
       return;
     } else if (mode == 1) {
-      for (int i = 0; i < ndim; i++) {
-        for (int j = 0; j < ndim; j++) {
+      for (int i = 0; i < ndim; ++i) {
+        for (int j = 0; j < ndim; ++j) {
           tmp[i] += m[j][i] * a[j];
         }
         c[0] += b[i] * tmp[i];
@@ -1316,7 +1426,7 @@ line100:
     int i1 = int(id1);
     if (abs(i0 - i1) * 2 < int(nWires)) {
       if (id0 < id1) {
-        for (int i = id0; i <= id1; i++)
+        for (int i = id0; i <= id1; ++i)
           list.push_back(i);
       } else {
         for (int i = id0; i >= id1; i--) {
@@ -1330,9 +1440,9 @@ line100:
         for (int i = nWires - 1; i >= id1; i--)
           list.push_back(i);
       } else {
-        for (int i = id0; i < nWires; i++)
+        for (int i = id0; i < nWires; ++i)
           list.push_back(i);
-        for (int i = 0; i <= id1; i++)
+        for (int i = 0; i <= id1; ++i)
           list.push_back(i);
       }
     }

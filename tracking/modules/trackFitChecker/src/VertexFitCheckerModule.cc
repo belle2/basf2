@@ -20,6 +20,7 @@
 #include <GFTGeoMaterialInterface.h>
 #include <GFRaveVertexFactory.h>
 #include <GFRaveVertex.h>
+#include <GFTGeoMaterialInterface.h>
 
 #include <TVector3.h>
 #include <TMatrixD.h>
@@ -28,7 +29,7 @@
 #include <iostream>
 #include <cmath>
 
-#include <Python.h>
+//#include <Python.h>
 
 
 using namespace Belle2;
@@ -75,6 +76,7 @@ void VertexFitCheckerModule::initialize()
     //pass the magnetic field to genfit
     GFFieldManager::getInstance()->init(new GFGeant4Field());
     GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
+    GFMaterialEffects::getInstance()->setMscModel("Highland");
   }
   //configure the output
   m_textOutput.precision(4);

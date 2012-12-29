@@ -19,6 +19,8 @@
 #include <geometry/GeometryManager.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
+#include <GFTGeoMaterialInterface.h>
+#include <GFMaterialEffects.h>
 //stl stuff
 #include <string>
 using std::string;
@@ -47,6 +49,8 @@ void RaveSetup::initialize(string options)
       geoManager.createTGeoRepresentation();
       //pass the magnetic field to genfit
       GFFieldManager::getInstance()->init(new GFGeant4Field());
+      GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
+      GFMaterialEffects::getInstance()->setMscModel("Highland");
     }
 
 

@@ -15,7 +15,8 @@
 #include <GFTrackCand.h>
 #include <GFConstField.h>
 #include <GFFieldManager.h>
-
+#include <GFTGeoMaterialInterface.h>
+#include <GFMaterialEffects.h>
 
 #include <GFRaveVertex.h>
 
@@ -56,6 +57,8 @@ void VertexerModule::initialize()
     geoManager.createTGeoRepresentation();
     //pass the magnetic field to genfit
     GFFieldManager::getInstance()->init(new GFGeant4Field());
+    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
+    GFMaterialEffects::getInstance()->setMscModel("Highland");
   }
   //register output datastore
   StoreArray<GFRaveVertex>::registerPersistent();// vertices;

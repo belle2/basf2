@@ -121,11 +121,11 @@ namespace Belle2 {
           throw;
         }
       }
-
+      /** Overwrite the global option in ReveSetup that tells the fitter if beam spot info should be used or not. The beam spot pos and cov must still be set in the RaveSetup class if you what to use it */
       void useBeamSpot(bool beamSpot = true) {
         if (beamSpot == true) {
           if (RaveSetup::s_instance->m_useBeamSpot == false) {
-            B2ERROR("Beam spot information cannot be used because the beam spot position and covarance was not set");
+            B2ERROR("Beam spot information cannot be used because the beam spot position and covariance was not set in RaveSetup");
             throw;
           }
           m_useBeamSpot = true;
@@ -150,7 +150,7 @@ namespace Belle2 {
         m_GFRaveVertices.clear();
         //raveTrack.clear();//and clear the other one
       }
-      /** Return the GFRaveVertex object. Holds all info on the fitted vertex. This is temorary and will be replaced with the Bell2 vertex object when ready */
+      /** Return the GFRaveVertex object. Holds all info on the fitted vertex. This is temporary and will be replaced with the Bell2 vertex object when ready */
       GFRaveVertex* getGFRaveVertex(std::vector<int>::size_type vertexId = 0) {
         if (m_GFRaveVertices.size() == 0) {
           return m_GFRaveVertices[vertexId];

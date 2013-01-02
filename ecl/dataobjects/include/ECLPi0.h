@@ -17,6 +17,12 @@
 #include <TObject.h>
 #include <TVector3.h>
 #include "CLHEP/Vector/LorentzVector.h"
+#include "CLHEP/Matrix/SymMatrix.h"
+#include <TMatrixFSym.h>
+
+using namespace CLHEP;
+
+
 
 using namespace CLHEP;
 namespace Belle2 {
@@ -65,6 +71,27 @@ namespace Belle2 {
     /*! Set Chi square after mass constraint fit
      */
     void setChi2(float Chi2) { m_Chi2 = Chi2; }
+
+    /*! Set Pi0 Error Matrix  after mass constraint fit
+     */
+    void setErrorMatrix(TMatrixFSym& errorMatrix) {
+      m_errorMatrix.ResizeTo(4, 4);
+      for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= i ; j++) {
+          m_errorMatrix[i][j] = errorMatrix[i][j];
+        }
+      }
+    }
+
+    void setErrorMatrix(const HepSymMatrix& errorMatrix) {
+      m_errorMatrix.ResizeTo(4, 4);
+      for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= i ; j++) {
+          m_errorMatrix[i][j] = errorMatrix[i][j];
+        }
+      }
+    }
+
 
     /*! Get Momentum after mass constraint fit
      * @return HepLorentzVector Momentum  after mass constraint fit
@@ -116,6 +143,11 @@ namespace Belle2 {
      */
     float getChi2() const { return m_Chi2; }
 
+    //! The method to get return TMatrixFSym  4 Momentum Error Matrix
+    /*! Get  TMatrixFSym  4 Momentum Error Matrix
+     * @return Error Matrix from particle Error propagation of 2 gammas
+     */
+    TMatrixFSym getErrorMatrix() const { return m_errorMatrix;}
 
 
   private:
@@ -128,7 +160,7 @@ namespace Belle2 {
     float m_Mass;          /**< combined Mass  (GeV) */
     float m_MassFit;       /**< MassFit (GeV) */
     float m_Chi2;          /**< Chi square of fit (GeV) */
-
+    TMatrixFSym m_errorMatrix;   /**< Error Matrix 4x4 */
 
     ClassDef(ECLPi0, 1);/**< ClassDef */
 

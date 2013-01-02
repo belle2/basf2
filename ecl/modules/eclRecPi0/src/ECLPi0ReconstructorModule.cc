@@ -111,8 +111,11 @@ void ECLPi0ReconstructorModule::event()
     m_py1 = aECLGamma1->getPy();
     m_pz1 = aECLGamma1->getPz();
 
+
+
     CLHEP::HepSymMatrix   errorGamma1(7, 0);
     readErrorMatrix(iGamma1, errorGamma1);
+
 
     /*
              cout<<"FillGamma1 ErrorMatrix ";
@@ -190,7 +193,6 @@ void ECLPi0ReconstructorModule::event()
           new(Pi0Array->AddrAt(m_Pi0Num)) ECLPi0();
           Pi0Array[m_Pi0Num]->setShowerId1(m_showerId1);
           Pi0Array[m_Pi0Num]->setShowerId2(m_showerId2);
-
           Pi0Array[m_Pi0Num]->setEnergy((float)p.e());
           Pi0Array[m_Pi0Num]->setPx((float)p.px());
           Pi0Array[m_Pi0Num]->setPy((float)p.py());
@@ -198,41 +200,8 @@ void ECLPi0ReconstructorModule::event()
           Pi0Array[m_Pi0Num]->setMass((float)lv_rec.mag());
           Pi0Array[m_Pi0Num]->setMassFit((float)p.mass());
           Pi0Array[m_Pi0Num]->setChi2((float)confLevel);
+          Pi0Array[m_Pi0Num]->setErrorMatrix(p.momentum().dpx());
 
-          /*
-                      cout<<m_nEvent <<"g1  ErrorMatrix ";
-                      for (int i = 0; i < 7; i++) {
-                        for (int j = 0; j <=i ; j++) {
-                          cout<<errorGamma1[i][j]<<" ";
-                        }
-                      }
-                     cout<<endl;
-                      cout<<m_nEvent<<"g2  ErrorMatrix ";
-                      for (int i = 0; i < 7; i++) {
-                        for (int j = 0; j <=i ; j++) {
-                          cout<<errorGamma2[i][j]<<" ";
-                        }
-                      }
-                     cout<<endl;
-
-                      cout<<m_nEvent<<"Pi0 ErrorMatrix ";
-                      for (int i = 0; i < 7; i++) {
-                        for (int j = 0; j <=i ; j++) {
-                          cout<<p.momentum().dpx()[i][j]<<" ";
-                        }
-                      }
-                     cout<<endl<<endl;
-          */
-
-          /*
-                    Pi0Array[m_Pi0Num]->setEnergy((float)m_pi0E);
-                    Pi0Array[m_Pi0Num]->setPx((float)m_pi0px);
-                    Pi0Array[m_Pi0Num]->setPy((float)m_pi0py);
-                    Pi0Array[m_Pi0Num]->setPz((float)m_pi0pz);
-                    Pi0Array[m_Pi0Num]->setMass((float)lv_rec.mag());
-                    Pi0Array[m_Pi0Num]->setMassFit((float)m_pi0mass);
-                    Pi0Array[m_Pi0Num]->setChi2((float)m_pi0chi2);
-          */
           eclPi0ToGamma.add(m_Pi0Num, iGamma1);
           eclPi0ToGamma.add(m_Pi0Num, iGamma2);
           //cout << "Event " << m_nEvent << " Pi0 from Gamma " << m_showerId1 << " " << m_showerId2 << " " << m_pi0E << " " << m_pi0mass << endl;

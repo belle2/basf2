@@ -140,11 +140,23 @@ void ECLReconstructorModule::event()
 //        cout<<endl;
 
       double energyBfCorrect = (*iShower).second.Energy();
-      double preliminaryCalibration = 0.96260 - 0.14162E-01 * pow(log10(energyBfCorrect), 1)
-                                      - 0.10549E-01 * pow(log10(energyBfCorrect), 2)
-                                      + 0.18810E-01 * pow(log10(energyBfCorrect), 3)
-                                      + 0.12897E-01 * pow(log10(energyBfCorrect), 4) ;
+      double preliminaryCalibration = 1.0;
+      if ((*iShower).second.Theta() > 0 && ((*iShower).second.Theta() / PI * 180) < 33.2) {
+        preliminaryCalibration = 0.95960 - 0.4953E-02 * pow(log10(energyBfCorrect), 1)
+                                 - 0.1463E-01 * pow(log10(energyBfCorrect), 2)
+                                 + 0.4869E-03 * pow(log10(energyBfCorrect), 3);
+      } else if (((*iShower).second.Theta() / PI * 180) < 126.1) {
+        preliminaryCalibration = 0.9650 - 0.1090E-01 * pow(log10(energyBfCorrect), 1)
+                                 - 0.6164E-02 * pow(log10(energyBfCorrect), 2)
+                                 + 0.4316E-02 * pow(log10(energyBfCorrect), 3);
+      } else if (((*iShower).second.Theta() / PI * 180) < 180) {
+        preliminaryCalibration = 0.9525 - 0.8955E-02 * pow(log10(energyBfCorrect), 1)
+                                 - 0.1297E-01 * pow(log10(energyBfCorrect), 2)
+                                 + 0.1134E-02 * pow(log10(energyBfCorrect), 3);
+      } else {
+        B2DEBUG(100, "ECLShower theta out of range " << ((*iShower).second.Theta() / PI * 180));
 
+      }
 
       StoreArray<ECLShower> eclRecShowerArray;
       if (!eclRecShowerArray) eclRecShowerArray.create();

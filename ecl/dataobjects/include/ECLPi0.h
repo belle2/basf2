@@ -72,7 +72,7 @@ namespace Belle2 {
      */
     void setChi2(float Chi2) { m_Chi2 = Chi2; }
 
-    /*! Set Pi0 Error Matrix  after mass constraint fit
+    /*! Set Pi0 Error Matrix  after mass constraint fit by TMatrixFSym class
      */
     void setErrorMatrix(TMatrixFSym& errorMatrix) {
       m_errorMatrix.ResizeTo(4, 4);
@@ -82,6 +82,8 @@ namespace Belle2 {
         }
       }
     }
+    /*! Set Pi0 Error Matrix  after mass constraint fit by HepSymMatrix class
+     */
 
     void setErrorMatrix(const HepSymMatrix& errorMatrix) {
       m_errorMatrix.ResizeTo(4, 4);

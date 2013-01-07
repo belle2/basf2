@@ -20,8 +20,14 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
+#include <framework/pcore/SeqFile.h>
+#include <framework/pcore/DataStoreStreamer.h>
+
+#include <TSystem.h>
 
 #include <framework/logging/Logger.h>
 #include <daq/hlt/HLTDefs.h>
@@ -51,28 +57,34 @@ namespace Belle2 {
     virtual void terminate();
 
     //! Put data into ring buffer for outgoing communication
-    void putData(const DataStore::EDurability& durability);
-    //! Test data (Development purpose only)
-    EHLTStatus testData(char* buffer);
+    void putData();
     //! Send terminate code to ring buffer
     void sendTerminate();
 
-    //! Compare two data set (Development purpose only)
-    bool checkData(std::string data1, char* data2);
-    //! Write a data into a file (Development purpose only)
-    void writeFile(char* data, int size);
-
   private:
     RingBuffer* m_buffer;           /**< Buffer for outgoing data */
-    MsgHandler* m_msgHandler;       /**< MsgHandler to encode data */
+
+    SeqFile* m_file;                /**< Input file handler (only for ES) */
+    std::string m_inputFileName;    /**< Input file name (only for ES) */
 
     std::string m_nodeType;         /**< Node type of this node */
     int m_eventsSent;               /**< Counter for sent events */
 
-    std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];  /**< Branch names */
-    bool m_done[DataStore::c_NDurabilityTypes];                             /**< Flag for data */
-    StoreIter* m_objectIterator[DataStore::c_NDurabilityTypes];             /**< Iterator for objects in DataStore */
-    StoreIter* m_arrayIterator[DataStore::c_NDurabilityTypes];              /**< Iterator for arrays in DataStore */
+    DataStoreStreamer* m_streamer;  /**< DataStore streamer */
+
+    //! Variables for performance check
+    struct timeval m_t0;            /**< Time stamp at the beginning */
+    struct timeval m_tEnd;          /**< Time stamp at the end */
+
+    double m_timeSerialized;        /**< Elapsed time of serialization */
+    double m_timeStore;             /**< Elapsed time of accessing DataStore */
+    double m_timeBuffer;            /**< Elapsed time of accessing ring buffer */
+    double m_timeTotal;             /**< Total elapsed time */
+    double m_timeClearing;          /**< Elapsed time of clearing memory */
+
+    double m_size;                  /**< Total size of taken events */
+    double m_size2;                 /**< Square of total size of taken events */
+    int m_nEvents;                  /**< Total number of taken events */
   };
 }
 

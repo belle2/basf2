@@ -22,12 +22,10 @@ HLTOutputModule::HLTOutputModule() : Module()
   setDescription("HLTOutput module");
   setPropertyFlags(c_Input);
 
-  std::vector<std::string> branchNames;
-  addParam("branchNames", m_branchNames[0], std::string("Names of branches to be written from event"), branchNames);
-  addParam("branchNamesRun", m_branchNames[1], std::string("Names of branches to be written from run"), branchNames);
-  addParam("branchNamesPersistent", m_branchNames[2], std::string("Names of branches to be written from persistent"), branchNames);
+  m_file = 0;
 
   addParam("nodeType", m_nodeType, std::string("Node type of the node"));
+  addParam("inputFileName", m_inputFileName, "SeqRoot file name.", std::string("SeqRootInput.root"));
 }
 
 /// @brief HLTOutputModule destructor
@@ -42,16 +40,27 @@ void HLTOutputModule::initialize()
 {
   B2INFO("Module HLTOutput initializing...");
 
-  m_buffer = new RingBuffer(boost::lexical_cast<std::string>(gDataOutBufferKey).c_str(), gBufferSize);
-  m_msgHandler = new MsgHandler(0);
+  m_eventsSent = 0;
+  m_nEvents = 0;
 
-  for (int i = 0; i < DataStore::c_NDurabilityTypes; i++) {
-    m_objectIterator[i] = DataStore::Instance().getObjectIterator(static_cast<DataStore::EDurability>(i));
-    m_arrayIterator[i] = DataStore::Instance().getArrayIterator(static_cast<DataStore::EDurability>(i));
-    m_done[i] = false;
+  gSystem->Load("libdataobjects");
+
+  m_buffer = new RingBuffer(boost::lexical_cast<std::string>(gDataOutBufferKey).c_str(), gBufferSize);
+  m_streamer = new DataStoreStreamer();
+
+  // If the node is event separator, it reads data from file
+  if (m_nodeType == "ES") {
+    StoreObjPtr<EventMetaData>::registerPersistent();
+
+    m_file = new SeqFile(m_inputFileName.c_str(), "r");
+    if (m_file->status() <= 0)
+      B2FATAL("HLTOutput : Error in opening input file : " << m_inputFileName);
   }
 
-  m_eventsSent = 0;
+  gettimeofday(&m_t0, 0);
+
+  m_size = 0.0;
+  m_size2 = 0.0;
 }
 
 /// @brief Begin a run
@@ -63,15 +72,56 @@ void HLTOutputModule::beginRun()
 /// @brief Process an event
 void HLTOutputModule::event()
 {
+  struct timeval t0;
+  struct timeval t1;
+  gettimeofday(&t0, 0);
+
   B2INFO("Module HLTOutput starts an event");
-  putData(DataStore::c_Event);
+
+  putData();
   m_eventsSent++;
-  B2INFO("[HLTOutput] " << m_eventsSent << " events sent!");
+  B2DEBUG(100, "[HLTOutput] " << m_eventsSent << " events sent!");
+
+  gettimeofday(&t1, 0);
+
+  double etime = (double)((t1.tv_sec - t0.tv_sec) * 1000000 + (t1.tv_usec - t0.tv_usec));
+  m_timeTotal += etime;
 }
 
 /// @brief End a run
 void HLTOutputModule::endRun()
 {
+  gettimeofday(&m_tEnd, 0);
+  double etime = (double)((m_tEnd.tv_sec - m_t0.tv_sec) * 1000000 + (m_tEnd.tv_usec - m_t0.tv_usec));
+
+  double flowmb = m_size / etime * 1000.0;
+  double flowmbSer = m_size / m_timeSerialized * 1000.0;
+  double flowmbStore = m_size / m_timeStore * 1000.0;
+  double flowmbTotal = m_size / m_timeTotal * 1000.0;
+  double flowmbBuffer = m_size / m_timeBuffer * 1000.0;
+  double flowmbClear = m_size / m_timeClearing * 1000.0;
+  double avesize = m_size / (double)m_nEvents;
+  double avesize2 = m_size2 / (double)m_nEvents;
+  double sigma2 = avesize2 - avesize * avesize;
+  double sigma = sqrt(sigma2);
+
+  // Need to be modified (it doesn't work for some situations)
+  std::cout << "[HLTOutput] \x1b[32mStatistics\x1b[0m" << std::endl;;
+  std::cout << "[HLTOutput] \x1b[32m\t" << m_nEvents << " events (Total size = " << m_size << " kB)\x1b[0m" << std::endl;
+  std::cout << "[HLTOutput] \x1b[32m\tFlow rate = " << flowmb << " (MB/s)\x1b[0m" << std::endl;
+  std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Total) = " << flowmbTotal << " (MB/s)   Time = " << m_timeTotal << " (ms)\x1b[0m" << std::endl;
+  if (m_nodeType == "WN") {
+    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Serialization) = " << flowmbSer << " (MB/s)   Time = " << m_timeSerialized << " (ms)\x1b[0m" << std::endl;
+    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (DataStore) = " << flowmbStore << " (MB/s)   Time = " << m_timeStore << " (ms)\x1b[0m" << std::endl;
+    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (RingBuffer) = " << flowmbBuffer << " (MB/s)   Time = " << m_timeBuffer << " (ms)\x1b[0m" << std::endl;
+  } else if (m_nodeType == "ES") {
+    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Data reading) = " << flowmbStore << " (MB/s)   Time = " << m_timeStore << " (ms)\x1b[0m" << std::endl;
+    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (RB writting) = " << flowmbSer << " (MB/s)   Time = " << m_timeSerialized << " (ms)\x1b[0m" << std::endl;
+    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Dummy DataStore) = " << flowmbBuffer << " (MB/s)   Time = " << m_timeBuffer << " (ms)\x1b[0m" << std::endl;
+  }
+  std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Clearing) = " << flowmbClear << " (MB/s)   Time = " << m_timeClearing << " (ms)\x1b[0m" << std::endl;
+  std::cout << "[HLTOutput] \x1b[32m\tEvent size = " << avesize << " +- " << sigma << " (kB)\x1b[0m" << std::endl;
+
   B2INFO("Module HLTOutput ends a run");
 }
 
@@ -79,149 +129,96 @@ void HLTOutputModule::endRun()
 void HLTOutputModule::terminate()
 {
   sendTerminate();
+  delete m_streamer;
   B2INFO("Module HLTOutput terminating...");
 }
 
 /// @brief Put an event data into ring buffer for outgoing communication
 /// @param durability Durability of the event data
-void HLTOutputModule::putData(const DataStore::EDurability& durability)
+void HLTOutputModule::putData()
 {
-  m_msgHandler->clear();
+  int size = 0;
 
-  B2INFO("\x1b[33m[HLTOutput] Withdraw objects from DataStore...\x1b[0m");
-  m_objectIterator[durability]->first();
-  int nObjects = 0;
+  struct timeval t0;
+  struct timeval t1;
+  struct timeval tn;
+  struct timeval tf;
+  struct timeval tClear;
 
-  while (!m_objectIterator[durability]->isDone()) {
-    if (m_branchNames[durability].size() == 0) {
-      B2INFO("[HLTOutput] Withdraw object " << m_objectIterator[durability]->key());
-      m_msgHandler->add(m_objectIterator[durability]->value(), m_objectIterator[durability]->key());
-      nObjects++;
-    } else {
-      for (unsigned int i = 0; i < m_branchNames[durability].size(); i++) {
-        if (m_branchNames[durability][i] == m_objectIterator[durability]->key()) {
-          B2INFO("[HLTOutput] Withdraw object " << m_objectIterator[durability]->key());
-          m_msgHandler->add(m_objectIterator[durability]->value(), m_objectIterator[durability]->key());
-          nObjects++;
-        }
+  if (m_nodeType == "ES") {
+    gettimeofday(&t0, 0);
+
+    char* buffer = new char[gDataMaxReceives];
+    size = m_file->read(buffer, gDataMaxReceives);
+    if (size > 0) {
+      EvtMessage* msg = NULL;
+
+      B2INFO("[HLTOutput] \x1b[33mNode type = ES: Reading data from " << m_inputFileName << "\x1b[0m");
+      msg = new EvtMessage(buffer);
+
+      while (m_buffer->insq((int*)msg->buffer(), msg->size() / 4 + 1) <= 0) {
+        usleep(100);
       }
+
+      m_nEvents++;
+      double dsize = (double)size / 1000.0;
+      B2INFO("ADD SIZE " << dsize);
+      m_size += dsize;
+      m_size2 += dsize * dsize;
+
+      delete msg;
+
+      // To keep event by event processing, insert dummy EventMetaData into DataStore
+      // (This information will not actually be used)
+      StoreObjPtr<EventMetaData> eventMetaDataPtr;
+      eventMetaDataPtr.create();
+      eventMetaDataPtr->setEvent(m_nEvents);
+    } else
+      delete m_file;
+
+    delete[] buffer;
+  } else {
+    gettimeofday(&t0, 0);
+
+    EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
+
+    gettimeofday(&tn, 0);
+
+    while (m_buffer->insq((int*)msg->buffer(), msg->size() / 4 + 1) <= 0) {
+      usleep(100);
     }
-    m_objectIterator[durability]->next();
+    B2INFO("[HLTOutput] Put an event into the ring buffer (size = " << msg->size() << ")");
+
+    gettimeofday(&tf, 0);
+
+    m_nEvents++;
+    size = msg->size();
+
+    delete msg;
+
+    gettimeofday(&tClear, 0);
+
+    double etime1 = (double)((t1.tv_sec - t0.tv_sec) * 1000000 + (t1.tv_usec - t0.tv_usec));
+    double etime2 = (double)((tn.tv_sec - t1.tv_sec) * 1000000 + (tn.tv_usec - t1.tv_usec));
+    double etime3 = (double)((tf.tv_sec - tn.tv_sec) * 1000000 + (tf.tv_usec - tn.tv_usec));
+    double etime4 = (double)((tClear.tv_sec - tf.tv_sec) * 1000000 + (tClear.tv_usec - tf.tv_usec));
+    m_timeStore += etime1;
+    m_timeSerialized += etime2;
+    m_timeBuffer += etime3;
+    m_timeClearing += etime4;
+
+    double dsize = (double)size / 1000.0;
+    m_size += dsize;
+    m_size2 += dsize * dsize;
   }
-
-  B2INFO("\x1b[33m[HLTOutput] Withdraw arrays from DataStore...\x1b[0m");
-  m_arrayIterator[durability]->first();
-  int nArrays = 0;
-
-  while (!m_arrayIterator[durability]->isDone()) {
-    if (m_branchNames[durability].size() == 0) {
-      B2INFO("[HLTOutput] Withdraw array " << m_arrayIterator[durability]->key());
-      m_msgHandler->add(m_arrayIterator[durability]->value(), m_arrayIterator[durability]->key());
-      nArrays++;
-    } else {
-      for (unsigned int i = 0; i < m_branchNames[durability].size(); i++) {
-        if (m_branchNames[durability][i] == m_arrayIterator[durability]->key()) {
-          B2INFO("[HLTOutput] Withdraw array " << m_arrayIterator[durability]->key());
-          m_msgHandler->add(m_arrayIterator[durability]->value(), m_arrayIterator[durability]->key());
-          nArrays++;
-        }
-      }
-    }
-    m_arrayIterator[durability]->next();
-  }
-
-  EvtMessage* msg = m_msgHandler->encode_msg(MSG_EVENT);
-  (msg->header())->reserved[0] = static_cast<int>(durability);
-  (msg->header())->reserved[1] = nObjects;
-  (msg->header())->reserved[2] = nArrays;
-  B2INFO("\x1b[33m[HLTOutput] Encoding data...size=" << msg->size() << "\x1b[0m");
-
-  std::string sendingData(msg->buffer());
-  B2INFO("\x1b[33m[HLTOutput] nObjects = " << nObjects << " / nArrays = " << nArrays << "\x1b[0m");
-
-  //writeFile(msg->buffer(), msg->size());
-  //testData (msg->buffer ());
-
-  //B2INFO("[HLTOutput] Put an event into the ring buffer");
-  while (m_buffer->insq((int*)msg->buffer(), msg->size() / 4 + 1) <= 0) {
-    usleep(100);
-  }
-}
-
-/// @brief Test a test (Development purpose only)
-/// @param buffer Data to be tested
-/// @return c_Success Data tested
-/// @return c_FuncError Something goes wrong during storing data into DataStore
-EHLTStatus HLTOutputModule::testData(char* buffer)
-{
-  std::vector<TObject*> objectList;
-  std::vector<std::string> nameList;
-
-  B2INFO("\x1b[33m[HLTOutput] Decoding data..\x1b[0m");
-  EvtMessage* msg = new EvtMessage(buffer);
-  m_msgHandler->decode_msg(msg, objectList, nameList);
-
-  B2INFO("\x1b[33m[HLTOutput] Storing data into DataStore..\x1b[0m");
-  msg->type();
-  DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
-  int nObjects = msg->header()->reserved[1];
-  int nArrays = msg->header()->reserved[2];
-
-  B2INFO("\x1b[33m[HLTOutput] nObjects = " << nObjects << " / nArrays = " << nArrays << "\x1b[0m");
-
-  B2INFO("\x1b[33m[HLTOutput] Storing objects...\x1b[0m");
-  for (int i = 0; i < nObjects; i++) {
-    if (!DataStore::Instance().storeObject(objectList[i], nameList[i]), durability)
-      return c_FuncError;
-  }
-
-  B2INFO("\x1b[33m[HLTOutput] Storing arrays...\x1b[0m");
-  for (int i = 0; i < nArrays; i++) {
-    if (!DataStore::Instance().storeArray((TClonesArray*)objectList[nObjects + i], nameList[nObjects + i]), durability)
-      return c_FuncError;
-  }
-
-  return c_Success;
+  B2INFO("What's m_size? It's " << m_size);
 }
 
 /// @brief Send terminate code to ring buffer
 void HLTOutputModule::sendTerminate()
 {
-  B2INFO("[HLTOutput] Termination code sending");
+  B2DEBUG(100, "[HLTOutput] Termination code sending");
   while (m_buffer->insq((int*)gTerminate.c_str(), gTerminate.size() / 4 + 1) <= 0) {
     usleep(100);
   }
-}
-
-/// @brief Compare two data (Development purpose only)
-/// @param data1 String-type data to be compared
-/// @param data2 char* type data to be compared
-/// @return true Two data are the same
-/// @return false Two data differ
-bool HLTOutputModule::checkData(std::string data1, char* data2)
-{
-  char* data1Transform = (char*)data1.c_str();
-
-  for (unsigned int i = 0; i < data1.size(); i++) {
-    if (data1Transform[i] != data2[i]) {
-      B2INFO("[HLTOutput] They are different at " << i);
-      return false;
-    }
-  }
-
-  B2INFO("[HLTOutput] They are the same");
-  return true;
-}
-
-/// @brief Write a data into a file (Development purpose only)
-/// @param data Data to be written
-/// @param size Size of the data
-void HLTOutputModule::writeFile(char* data, int size)
-{
-  FILE* fp;
-  fp = fopen("output", "a");
-  for (int i = 0; i < size; i++)
-    fprintf(fp, "%c", data[i]);
-  fprintf(fp, "\n");
-  fclose(fp);
 }

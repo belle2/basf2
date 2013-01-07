@@ -20,8 +20,14 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/EvtMessage.h>
+#include <framework/pcore/SeqFile.h>
 #include <framework/pcore/MsgHandler.h>
+#include <framework/pcore/DataStoreStreamer.h>
+
+#include <TSystem.h>
 
 #include <framework/logging/Logger.h>
 #include <daq/hlt/HLTDefs.h>
@@ -52,19 +58,31 @@ namespace Belle2 {
 
     //! Get data from network (incoming ring buffer, actually)
     EHLTStatus getData();
-    //! Write a data into a file (Development purpose only)
-    void writeFile(char* data, int size);
 
   private:
-    std::string m_nodeType;       /**< Node type of this node */
+    RingBuffer* m_buffer;         /**< Buffer for incoming data */
 
-    RingBuffer* m_inBuffer;       /**< Buffer for incoming data */
-    RingBuffer* m_outBuffer;      /**< Buffer for outgoing data */
+    SeqFile* m_file;                /**< Output file handler (only for EM) */
+    std::string m_outputFileName;   /**< Output file name (only for EM) */
 
-    MsgHandler* m_msgHandler;     /**< MsgHandler to decode data */
+    std::string m_nodeType;         /**< Node type of this node */
 
-    int m_eventsTaken;            /**< Counter for received data */
-    int m_nDataSources;           /**< Number of data sources */
+    DataStoreStreamer* m_streamer;  /**< DataStore streamer */
+
+    int m_nDataSources;             /**< Number of data sources */
+
+    //! Variables for performance check
+    struct timeval m_t0;            /**< Time stamp at the beginning */
+    struct timeval m_tEnd;          /**< Time stamp at the end */
+
+    double m_timeDeserialized;      /**< Elapsed time of deserialization */
+    double m_timeStore;             /**< Elapsed time of accessing DataStore */
+    double m_timeTest;              /**< Elapsed time for test purpose */
+    double m_timeInit;              /**< Elapsed time for initialization */
+
+    double m_size;                  /**< Total size of taken events */
+    double m_size2;                 /**< Square of total size of taken events */
+    int m_nEvents;                  /**< Total number of taken events */
   };
 }
 

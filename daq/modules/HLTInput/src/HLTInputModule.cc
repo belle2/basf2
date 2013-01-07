@@ -57,7 +57,7 @@ void HLTInputModule::initialize()
     // Prefetch the first event
     if (m_nodeType == "WN") {
       char* buffer = new char[gDataMaxReceives];
-      while ((size = m_inBuffer->remq((int*)buffer)) <= 0)
+      while ((size = m_buffer->remq((int*)buffer)) <= 0)
         usleep(100);
       EvtMessage* msg = new EvtMessage(buffer);
 
@@ -158,7 +158,7 @@ EHLTStatus HLTInputModule::getData()
   gettimeofday(&ti, 0);
 
   int size = 0;
-  while ((size = m_inBuffer->remq((int*)buffer)) <= 0)
+  while ((size = m_buffer->remq((int*)buffer)) <= 0)
     usleep(100);
   B2INFO("[HLTInput] Event data taken from RB!");
 
@@ -173,7 +173,7 @@ EHLTStatus HLTInputModule::getData()
       return c_TermCalled;
     } else {
       B2DEBUG(100, "\x1b[34m[HLTInput] " << m_nDataSources << " more data sources are left...\x1b[0m");
-      while ((size = m_inBuffer->remq((int*)buffer)) <= 0)
+      while ((size = m_buffer->remq((int*)buffer)) <= 0)
         usleep(100);
       termChecker = std::string(buffer);
     }

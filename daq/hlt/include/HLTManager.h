@@ -44,7 +44,7 @@ namespace Belle2 {
     ~HLTManager();
 
     //! Initialize HLTSenders for node management
-    EHLTStatus initSenders();
+    EHLTStatus initSenders(bool testFlag = false);
 
     //! Store parsed node information into the container from XMLParser
     EHLTStatus storeNodeInfo(XMLParser* xml);

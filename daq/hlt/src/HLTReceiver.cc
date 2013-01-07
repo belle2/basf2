@@ -19,11 +19,13 @@ HLTReceiver::HLTReceiver(unsigned int port, unsigned int nSources)
   m_port = port;
   m_nSources = nSources;
   m_buffer = NULL;
+  m_tempBufferSize = 0;
 }
 
 /// @brief HLTReceiver destructor
 HLTReceiver::~HLTReceiver()
 {
+  // Why did I comment out the line here? (It might make some problem..)
   //delete m_internalBuffer;
 }
 
@@ -61,90 +63,81 @@ EHLTStatus HLTReceiver::createConnection()
   return c_Success;
 }
 
-/// @brief Accepting data from assigned port
-/// @return c_Success Receiving data done
-/// @return c_InitFailed Accepting socket failed
-/// @return c_FuncError Buffer wasn't set
-/// @return c_TermCalled Termination requested
+/// @brief Listening data from source
+/// @return c_InitFailed if socket rejected
+/// @return c_Success is listening success
 EHLTStatus HLTReceiver::listening()
 {
-  if (m_buffer == NULL) {
-    B2ERROR("[HLTReceiver] Buffer wasn't set!");
-    return c_FuncError;
-  }
-  EHLTStatus status = c_Success;
-
   int newSocket = 0;
+
   if (accept(newSocket) != c_Success)
     return c_InitFailed;
 
-  while (1) {
-    int size = 0;
+  bool EOSFlag = false;
 
-    char* data = new char [gMaxReceives];
-    while ((status = receive(newSocket, data, size)) != c_FuncError) {
-      std::vector<int> givenMessageSizes;
-      char* givenMessages = new char [gBufferSize];
-      givenMessageSizes.clear();
-      memset(givenMessages, 0, sizeof(char) * gBufferSize);
+  int sizeToReceive = 0;
+  int sizeToReceiveSize = 0;
 
-      if (size > 0) {
-        std::string termChecker(data);
-        if (termChecker == gTerminate) {
-          B2INFO("\x1b[31m[HLTReceiver] Terminate tag met\x1b[0m");
-          if (m_buffer->insq((int*)gTerminate.c_str(), gTerminate.size() / 4 + 1) <= 0) {
-            usleep(100);
-          }
-          return c_TermCalled;
-        }
+  int size = 0;
+  int totalSize = 0;
 
-        int readContents = decodeSingleton(data, (int)size, givenMessages, givenMessageSizes);
+  // TCP provides the length of data but it transfers sometimes separately so it should wait for remaining
+  // data if it wasn't completely delivered
+  while (int status = receive(newSocket, (char*)&sizeToReceive, sizeof(sizeToReceive), sizeToReceiveSize)) {
+    B2DEBUG(150, "....." << sizeToReceive << " bytes to be received");
 
-        int givenMessageIndex = 0;
-        for (int i = 0; i < readContents; i++) {
-          char* givenMessage = new char [gMaxReceives];
-          memset(givenMessage, 0, sizeof(char) * gMaxReceives);
-          if (i == 0)
-            memcpy(givenMessage, givenMessages, sizeof(char) * givenMessageSizes[i]);
-          else
-            memcpy(givenMessage, givenMessages + sizeof(char) * givenMessageIndex, givenMessageSizes[i]);
+    char* data = new char [sizeToReceive];
 
-          givenMessageIndex += givenMessageSizes[i];
-          if (!strcmp(givenMessage, gTerminate.c_str())) {
-            B2INFO("\x1b[31m[HLTReceiver] Terminate tag met2\x1b[0m");
-            if (m_buffer->insq((int*)gTerminate.c_str(), gTerminate.size() / 4 + 1) <= 0) {
-              usleep(100);
-            }
-            return c_TermCalled;
-            /*
-            m_nSources--;
-            if (m_nSources == 0) {
-              B2INFO ("[HLTReceiver] All sources down. Terminating...");
-              return c_TermCalled;
-            }
-            else {
-              B2INFO ("[HLTReceiver] A source down. " << m_nSources << " more sources left.");
-              return c_Success;
-            }
-            */
-          } else {
-            while (m_buffer->insq((int*)givenMessage,
-                                  givenMessageSizes[i] / 4 + 1) <= 0) {
-              usleep(100);
-            }
-          }
-
-          delete givenMessage;
-        }
-      }
-
-      delete givenMessages;
+    receive(newSocket, data, sizeToReceive, size);
+    B2DEBUG(150, "[HLTReceiver::listening ()] \x1b[34mData taken size = " << size << "\x1b[0m");
+    totalSize += size;
+    while (m_buffer->insq((int*)data, size / 4 + 1) <= 0) {
+      usleep(100);
     }
 
-    delete data;
+    delete[] data;
   }
 
+  B2DEBUG(100, "[HLTReceiver] Data all taken!");
+
   return c_Success;
+}
+
+/// @brief Get data from source
+/// @return c_InitFailed if socket rejected
+/// @return Total received size, otherwise
+int HLTReceiver::getData()
+{
+  int newSocket = 0;
+
+  if (accept(newSocket) != c_Success)
+    return c_InitFailed;
+
+  bool EOSFlag = false;
+
+  int sizeToReceive = 0;
+  int sizeToReceiveSize = 0;
+
+  int size = 0;
+  int totalSize = 0;
+
+  // TCP provides the length of data but it transfers sometimes separately so it should wait for remaining
+  // data if it wasn't completely delivered
+  while (int status = receive(newSocket, (char*)&sizeToReceive, sizeof(sizeToReceive), sizeToReceiveSize)) {
+    B2DEBUG(100, "....." << sizeToReceive << " bytes to be received");
+
+    char* data = new char [sizeToReceive];
+
+    receive(newSocket, data, sizeToReceive, size);
+    B2DEBUG(100, "[HLTReceiver] \x1b[34mData taken size = " << size << "\x1b[0m");
+    totalSize += size;
+
+    delete[] data;
+  }
+
+  B2DEBUG(100, "[HLTReceiver] Data all taken!");
+
+  return totalSize;
 }
 
 /// @brief Set buffer for data communication with predefined buffer key
@@ -157,7 +150,7 @@ EHLTStatus HLTReceiver::setBuffer()
   return c_Success;
 }
 
-/// @brief Set buffer for data communication with a specific buffer key
+/// @brief Set buffer for data communication with a specific integer buffer key
 /// @param key Key value for the buffer
 /// @return c_Success Set buffer succeeded
 EHLTStatus HLTReceiver::setBuffer(unsigned int key)
@@ -168,11 +161,34 @@ EHLTStatus HLTReceiver::setBuffer(unsigned int key)
   return c_Success;
 }
 
+/// @brief Set buffer for data communication with a specific string buffer key
+/// @param key Key value for the buffer
+/// @return c_Success Set buffer succeeded
 EHLTStatus HLTReceiver::setBuffer(std::string key)
 {
   B2INFO("[HLTReceiver] \x1b[32mRing buffer initializing...\x1b[0m");
   m_buffer = new RingBuffer(key.c_str(), gBufferSize);
 
+  return c_Success;
+}
+
+/// @brief Set node type
+/// @param nodeType Node type
+void HLTReceiver::setMode(EHLTNodeType nodeType)
+{
+  if (nodeType == c_ManagerNode) {
+    m_tempBufferSize = gControlMaxReceives;
+  } else {
+    m_tempBufferSize = gDataMaxReceives;
+  }
+}
+
+/// @brief Set port number for data transfer
+/// @param port Port number for data transfer
+/// @return c_Success for success
+EHLTStatus HLTReceiver::setPort(int port)
+{
+  m_port = port;
   return c_Success;
 }
 
@@ -182,10 +198,12 @@ EHLTStatus HLTReceiver::setBuffer(std::string key)
 /// @param container Container for decoded data (the data can be multiple)
 /// @param sizes Container for size of decoded data
 /// @return The number of decoded data (this might be redundant)
+/// Obsolete?
 int HLTReceiver::decodeSingleton(char* data, int size, char* container, std::vector<int>& sizes)
 {
   int containerIndex = 0;
   int eos = findEOS(data, size);
+  B2DEBUG(100, "EOS position = " << eos);
 
   if (eos < 0) {
     if (size < gBufferSize - m_internalBufferWriteIndex) {
@@ -269,19 +287,4 @@ EHLTStatus HLTReceiver::flushInternalBuffer()
   m_internalBufferEntries = 0;
 
   return c_Success;
-}
-
-/// @brief Write a data into a file (development purpose only)
-/// @param file File name
-/// @param data Data to be written
-/// @param size Size of the data
-void HLTReceiver::writeFile(char* file, char* data, int size)
-{
-  FILE* fp;
-  fp = fopen(file, "a");
-  fprintf(fp, "[Start a run] ");
-  for (int i = 0; i < size; i++)
-    fprintf(fp, "%c", data[i]);
-  fprintf(fp, " [End a run]\n");
-  fclose(fp);
 }

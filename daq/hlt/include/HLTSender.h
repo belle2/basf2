@@ -12,11 +12,15 @@
 #define HLTSENDER_H
 
 #include <string>
+#include <sys/time.h>
 
 #include <boost/lexical_cast.hpp>
 
 #include <daq/hlt/HLTDefs.h>
 #include <framework/logging/Logger.h>
+
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <daq/hlt/B2Socket.h>
 #include <framework/pcore/RingBuffer.h>
@@ -39,20 +43,25 @@ namespace Belle2 {
     EHLTStatus broadcasting();
     //! Send a specific packet of data
     EHLTStatus broadcasting(std::string data);
+    //! Send serialized data
+    EHLTStatus sendData(char* data, int size);
 
     //! Set ring buffer with predefined key
     EHLTStatus setBuffer();
-    //! Set ring buffer with specific key
+    //! Set ring buffer with specific integer key
     EHLTStatus setBuffer(unsigned int key);
+    //! Set ring buffer with specific string key
     EHLTStatus setBuffer(std::string key);
+
+    //! Set node type
+    void setMode(EHLTNodeType nodeType);
+    //! Set port number for data transfer
+    EHLTStatus setPort(int port);
 
     //! Encode data to be sent to ensure the singleton of data for a string
     std::string makeSingleton(std::string data);
     //! Encode data to be sent to ensure the singleton of data for general data
     EHLTStatus makeSingleton(char* data, int size);
-
-    //! Writing a data into a file (development purpose only)
-    void writeFile(char* file, char* data, int size);
 
   protected:
     //! Initialize the HLTSender
@@ -61,6 +70,7 @@ namespace Belle2 {
   private:
     std::string m_destination;    /**< Destination to send the data */
     unsigned int m_port;          /**< Port for the connection */
+    int m_tempBufferSize;         /**< Size of temporary buffer */
 
     RingBuffer* m_buffer;         /**< Pointer to ring buffer for outgoing data */
   };

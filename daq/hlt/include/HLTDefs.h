@@ -59,10 +59,12 @@ namespace Belle2 {
     c_ChildSuccess      /**< Everything's ok from children */
   };
 
-  const int gBufferSize = 100000000 * 4;   /**< Buffer size for HLT */
+  const int gBufferSize = 250000000 * 4;   /**< Buffer size for HLT */
   const int gMaxHosts = 100;              /**< Maximum number of hosts to connect */
   const int gMaxConnections = 100;        /**< Maximum number of connection allowed */
-  const int gMaxReceives = 10000000;       /**< Maximum size of incoming data allowed */
+  const int gMaxReceives = 5000000;       /**< Maximum size of incoming data allowed */
+  const int gDataMaxReceives = 400000000 * 4;
+  const int gControlMaxReceives = 1000000;
   const int gBufferArray = 10;
 
   const std::string gEOSTag = "EOSS";      /**< End-of-stream tag for data capsulation */

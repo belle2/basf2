@@ -54,6 +54,8 @@ EHLTStatus HLTFramework::init(char* xmlFileName)
     m_hltManager->storeNodeInfo(xml);
 
     m_hltManager->initSenders();
+    // For test purpose
+    //m_hltManager->initSenders(true);
 
     if (!m_hltManager->isChild())
       m_hltManager->checkChildren();
@@ -65,13 +67,19 @@ EHLTStatus HLTFramework::init(char* xmlFileName)
     m_hltManager = NULL;
     m_hltProcess = new HLTProcess();
 
+    int externalPort = 0;
+    if (xmlFileName != NULL) {
+      externalPort = atoi(xmlFileName);
+      B2INFO("[HLTFramework] External port " << externalPort << " given!");
+    }
+
     EHLTStatus status;
 
-    if ((status = m_hltProcess->initControl()) != c_Success)
+    if ((status = m_hltProcess->initControl(externalPort)) != c_Success)
       return status;
-    if ((status = m_hltProcess->initSenders()) != c_Success)
+    if ((status = m_hltProcess->initSenders(externalPort)) != c_Success)
       return status;
-    if ((status = m_hltProcess->initReceivers()) != c_Success)
+    if ((status = m_hltProcess->initReceivers(externalPort)) != c_Success)
       return status;
     if ((status = m_hltProcess->process()) != c_Success)
       return status;

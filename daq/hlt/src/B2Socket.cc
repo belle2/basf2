@@ -53,7 +53,12 @@ EHLTStatus B2Socket::create()
   if (::setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof(on)) == -1)
     return c_InitFailed;
 
-  B2INFO("\x1b[34m[B2Socket] Socket created (m_socket=" << m_socket << ")\x1b[0m");
+  int bufferSize = 83886080;
+  ::setsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(int));
+  ::setsockopt(m_socket, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(int));
+
+
+  B2DEBUG(100, "[B2Socket] \x1b[34mSocket created (m_socket=" << m_socket << ")\x1b[0m");
 
   return c_Success;
 }
@@ -80,7 +85,7 @@ EHLTStatus B2Socket::bind(const unsigned int port)
     return c_InitFailed;
   }
 
-  B2INFO("\x1b[34m[B2Socket] Socket " << m_socket << " has been bound through "
+  B2INFO("[B2Socket] \x1b[34mSocket " << m_socket << " has been bound through "
          << port << "\x1b[0m");
 
   return c_Success;
@@ -112,9 +117,7 @@ EHLTStatus B2Socket::connect(const std::string destination, const int port)
   if (!connectReturn) {
     return c_Success;
   } else {
-    B2ERROR("\x1b[31m[B2Socket] Connection failed to "
-            << destination << " through " << port
-            << " (errno=" << errno << ")\x1b[0m");
+    B2DEBUG(100, "\x1b[31m[B2Socket] Connection failed to " << destination << " through " << port << " (errno=" << errno << ")\x1b[0m");
     return c_InitFailed;
   }
 }
@@ -144,7 +147,7 @@ EHLTStatus B2Socket::listen()
 /// @return c_InitFailed Socket is not found
 EHLTStatus B2Socket::accept(int& newSocket)
 {
-  B2INFO("\x1b[34m[B2Socket] Accepting a new socket...\x1b[0m");
+  B2DEBUG(100, "[B2Socket] \x1b[34mAccepting a new socket...\x1b[0m");
   int addressLength = sizeof(m_socketAddress);
   int status = ::accept(m_socket, (struct sockaddr*) & m_socketAddress, (socklen_t*) & addressLength);
 
@@ -153,7 +156,7 @@ EHLTStatus B2Socket::accept(int& newSocket)
     return c_InitFailed;
   } else {
     newSocket = status;
-    B2INFO("\x1b[34m[B2Socket] Accept new socket = "
+    B2INFO("[B2Socket] \x1b[34mAccept new socket = "
            << newSocket << "\x1b[0m");
     return c_Success;
   }
@@ -164,7 +167,7 @@ EHLTStatus B2Socket::accept(int& newSocket)
 /// @param size Container to record the size sent
 /// @return c_Success Data send success
 /// @return c_FuncError Data send failed
-EHLTStatus B2Socket::send(const std::string data, int& size)
+EHLTStatus B2Socket::send(const std::string data, int& sizeSent)
 {
   int status = ::send(m_socket, data.c_str(), data.size(), 0);
 
@@ -173,7 +176,7 @@ EHLTStatus B2Socket::send(const std::string data, int& size)
             << " failed (errno=" << errno << ")\x1b[0m");
     return c_FuncError;
   } else {
-    size = status;
+    sizeSent = status;
     return c_Success;
   }
 }
@@ -183,7 +186,7 @@ EHLTStatus B2Socket::send(const std::string data, int& size)
 /// @param size Container to record the size sent
 /// @return c_Success Data send success
 /// @return c_FuncError Data send failed
-EHLTStatus B2Socket::send(char* data, int size)
+EHLTStatus B2Socket::send(char* data, int size, int& sizeSent)
 {
   int status = ::send(m_socket, data, size, 0);
 
@@ -192,7 +195,7 @@ EHLTStatus B2Socket::send(char* data, int size)
             << " failed (errno=" << errno << ")\x1b[0m");
     return c_FuncError;
   } else {
-    size = status;
+    sizeSent = status;
     return c_Success;
   }
 }
@@ -203,12 +206,12 @@ EHLTStatus B2Socket::send(char* data, int size)
 /// @param size Container to record size of received data
 /// @return c_Success Receiving data success
 /// @return c_FuncError Receiving data failed
-EHLTStatus B2Socket::receive(int newSocket, std::string& data, int& size)
+EHLTStatus B2Socket::receive(int newSocket, std::string& data, int size, int& sizeRead)
 {
-  char buffer[m_maxReceives + 1];
-  memset(buffer, 0, m_maxReceives + 1);
+  char buffer[size];
+  memset(buffer, 0, size);
 
-  int status = ::recv(newSocket, buffer, m_maxReceives, 0);
+  int status = ::recv(newSocket, buffer, size, MSG_WAITALL);
 
   if (status == -1) {
     B2ERROR("\x1b[31m[B2Socket] Data receiving failed\x1b[0m");
@@ -219,7 +222,9 @@ EHLTStatus B2Socket::receive(int newSocket, std::string& data, int& size)
     std::string tempData(buffer);
 
     data = tempData;
-    size = status;
+    sizeRead = status;
+
+    B2DEBUG(100, "[B2Socket] \x1b[34mData received! (size = " << sizeRead << "\x1b[0m");
 
     return c_Success;
   }
@@ -233,11 +238,11 @@ EHLTStatus B2Socket::receive(int newSocket, std::string& data, int& size)
 /// @param size Container to record size of received data
 /// @return c_Success Receiving data success
 /// @return c_FuncError Receiving data failed
-EHLTStatus B2Socket::receive(int newSocket, char* data, int& size)
+EHLTStatus B2Socket::receive(int newSocket, char* data, int size, int& sizeRead)
 {
-  memset(data, 0, m_maxReceives);
+  memset(data, 0, size);
 
-  int status = ::recv(newSocket, data, m_maxReceives, 0);
+  int status = ::recv(newSocket, data, size, MSG_WAITALL);
 
   if (status == -1) {
     B2ERROR("\x1b[31m[B2Socket] Data receiving failed\x1b[0m");
@@ -245,7 +250,7 @@ EHLTStatus B2Socket::receive(int newSocket, char* data, int& size)
   } else if (status == 0) {
     return c_FuncError;
   } else {
-    size = status;
+    sizeRead = status;
 
     return c_Success;
   }

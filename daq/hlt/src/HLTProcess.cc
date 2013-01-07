@@ -37,18 +37,24 @@ HLTProcess::~HLTProcess()
 /// @brief Initialize the control line to manager node
 /// @return c_Success Initialization done
 /// @return c_ChildSuccess The process is child process
-EHLTStatus HLTProcess::initControl()
+EHLTStatus HLTProcess::initControl(int port)
 {
   B2INFO("[HLTProcess] \x1b[32mRing buffers initializing for control/monitor line\x1b[0m");
-  m_controlInBuffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_ControlPort)).c_str(), gBufferSize);
+  if (!port)
+    m_controlInBuffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_ControlPort)).c_str(), gBufferSize);
+  else
+    m_controlInBuffer = new RingBuffer(boost::lexical_cast<std::string>(port).c_str(), gBufferSize);
 
   pid_t pid = fork();
   if (pid == 0) {
     m_isChild = true;
 
     HLTReceiver receiver(c_ControlPort, 1);
+    if (port)
+      receiver.setPort(port);
     receiver.createConnection();
     receiver.setBuffer();
+    receiver.setMode(c_ManagerNode);
 
     receiver.listening();
 
@@ -88,7 +94,7 @@ EHLTStatus HLTProcess::initControl()
 /// @brief Initialize HLTSenders for outgoing data flow
 /// @return c_Success Initialization done
 /// @return c_ChildSuccess The process is child process
-EHLTStatus HLTProcess::initSenders()
+EHLTStatus HLTProcess::initSenders(int port)
 {
   B2INFO("[HLTProcess] \x1b[33mOutgoing ring buffer initializing...\x1b[0m");
   m_dataOutBuffer = new RingBuffer(gDataOutBufferKey.c_str(), gBufferSize);
@@ -98,16 +104,26 @@ EHLTStatus HLTProcess::initSenders()
     if (pidHLTSender == 0) {
       m_isChild = true;
 
-      int port = c_DataOutPort;
-      if (m_nodeInfo.type() == "WN") {
-        port = c_DataInPort;
-        port += m_nodeInfo.generateKey() - 1;
-      } else
-        port += m_nodeInfo.unitNo() * 100 + i;
+      if (!port) {
+        port = c_DataOutPort;
+        if (m_nodeInfo.type() == "WN") {
+          port = c_DataInPort;
+          port += m_nodeInfo.generateKey() - 1;
+        } else
+          port += m_nodeInfo.unitNo() * 100 + i;
+      } else {
+        if (m_nodeInfo.type() == "WN") {
+          port = 30000;
+        } else {
+          port = c_DataOutPort;
+          port += m_nodeInfo.unitNo() * 100 + i;
+        }
+      }
 
       HLTSender hltSender(m_nodeInfo.targetIP()[i], port);
       hltSender.createConnection();
       hltSender.setBuffer(gDataOutBufferKey);
+      hltSender.setMode(c_ProcessNode);
 
       while (1) {
         if (hltSender.broadcasting() == c_TermCalled)
@@ -129,26 +145,42 @@ EHLTStatus HLTProcess::initSenders()
 /// @brief Initialize HLTReceivers for incoming data flow
 /// @return c_Success Initialization done
 /// @return c_ChildSuccess The process is child process
-EHLTStatus HLTProcess::initReceivers()
+EHLTStatus HLTProcess::initReceivers(int port)
 {
   B2INFO("[HLTProcess] \x1b[33mIncoming ring buffer initializing...\x1b[0m");
   m_dataInBuffer = new RingBuffer(gDataInBufferKey.c_str(), gBufferSize);
+
+  bool testPort = false;
+  if (port) {
+    testPort = true;
+    B2INFO("[HLTProcess] External port " << port << " specified!");
+  }
 
   for (unsigned int i = 0; i < m_nodeInfo.sourceIP().size(); ++i) {
     pid_t pidHLTReceiver = fork();
     if (pidHLTReceiver == 0) {
       m_isChild = true;
 
-      int port = c_DataInPort;
-      if (m_nodeInfo.type() == "WN") {
-        port = c_DataOutPort;
-        port += m_nodeInfo.generateKey() - 1;
-      } else
-        port += m_nodeInfo.unitNo() * 100 + i;
+      if (!testPort) {
+        port = c_DataInPort;
+        if (m_nodeInfo.type() == "WN") {
+          port = c_DataOutPort;
+          port += m_nodeInfo.generateKey() - 1;
+        } else
+          port += m_nodeInfo.unitNo() * 100 + i;
+      } else {
+        if (m_nodeInfo.type() != "WN") {
+          port = 30000;
+        } else {
+          port = c_DataOutPort;
+          port += m_nodeInfo.generateKey() - 1;
+        }
+      }
 
       HLTReceiver hltReceiver(port, m_nodeInfo.sourceIP().size());
       hltReceiver.createConnection();
       hltReceiver.setBuffer(gDataInBufferKey);
+      hltReceiver.setMode(c_ProcessNode);
 
       hltReceiver.listening();
 
@@ -156,6 +188,9 @@ EHLTStatus HLTProcess::initReceivers()
     } else {
       m_HLTReceivers.push_back(pidHLTReceiver);
       B2INFO("\x1b[33m[HLTProcess] HLTReceiver " << pidHLTReceiver << " forked\x1b[0m");
+
+      if (testPort && i == 4)
+        return c_Success;
     }
   }
 

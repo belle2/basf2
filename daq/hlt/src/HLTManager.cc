@@ -39,7 +39,7 @@ HLTManager::~HLTManager()
 /// @brief Initialize HLTSenders
 /// @return c_Success HLTSenders initialization succeeded
 /// @return c_ChildSuccess The process is child process
-EHLTStatus HLTManager::initSenders()
+EHLTStatus HLTManager::initSenders(bool testFlag)
 {
   for (std::map<int, NodeInfo>::const_iterator i = m_nodeInfoMap.begin();
        i != m_nodeInfoMap.end(); ++i) {
@@ -53,8 +53,14 @@ EHLTStatus HLTManager::initSenders()
       nodeinfo = (*i).second;
 
       HLTSender sender(nodeinfo.selfIP(), c_ControlPort);
+      if (testFlag) {
+        NodeInfo nodeinfo((*i).second);
+        if (nodeinfo.type() == "EM")
+          sender.setPort(30001);
+      }
       sender.createConnection();
       sender.setBuffer(c_ControlPort + (*i).first);
+      sender.setMode(c_ManagerNode);
 
       std::string temp = encodeNodeInfo((*i).first);
       B2INFO("[HLTFramework] nodeinfo = " << temp.c_str());
@@ -64,7 +70,7 @@ EHLTStatus HLTManager::initSenders()
       }
 
       sender.broadcasting(temp);
-      sender.broadcasting(gTerminate);
+      //sender.broadcasting(gTerminate);
 
       return c_ChildSuccess;
     } else {

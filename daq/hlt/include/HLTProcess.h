@@ -39,11 +39,11 @@ namespace Belle2 {
     ~HLTProcess();
 
     //! Initialize the control line
-    EHLTStatus initControl();
+    EHLTStatus initControl(int port = 0);
     //! Initialize HLTSenders for data transfer
-    EHLTStatus initSenders();
+    EHLTStatus initSenders(int port = 0);
     //! Initialize HLTReceivers for data transfer
-    EHLTStatus initReceivers();
+    EHLTStatus initReceivers(int port = 0);
 
     //! Process data (This forks out basf2)
     EHLTStatus process();

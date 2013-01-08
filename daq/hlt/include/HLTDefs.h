@@ -63,7 +63,7 @@ namespace Belle2 {
   const int gMaxHosts = 100;              /**< Maximum number of hosts to connect */
   const int gMaxConnections = 100;        /**< Maximum number of connection allowed */
   const int gMaxReceives = 5000000;       /**< Maximum size of incoming data allowed */
-  const int gDataMaxReceives = 400000000 * 4;
+  const int gDataMaxReceives = 400000000;
   const int gControlMaxReceives = 1000000;
   const int gBufferArray = 10;
 

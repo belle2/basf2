@@ -25,8 +25,6 @@ HLTReceiver::HLTReceiver(unsigned int port, unsigned int nSources)
 /// @brief HLTReceiver destructor
 HLTReceiver::~HLTReceiver()
 {
-  // Why did I comment out the line here? (It might make some problem..)
-  //delete m_internalBuffer;
 }
 
 /// @brief Initialize the HLTReceiver
@@ -39,9 +37,6 @@ EHLTStatus HLTReceiver::init()
 
   if (bind(m_port) != c_Success)
     return c_InitFailed;
-
-  m_internalBuffer = (char*)malloc(sizeof(char) * gBufferSize);
-  flushInternalBuffer();
 
   return c_Success;
 }
@@ -73,8 +68,6 @@ EHLTStatus HLTReceiver::listening()
   if (accept(newSocket) != c_Success)
     return c_InitFailed;
 
-  bool EOSFlag = false;
-
   int sizeToReceive = 0;
   int sizeToReceiveSize = 0;
 
@@ -83,7 +76,7 @@ EHLTStatus HLTReceiver::listening()
 
   // TCP provides the length of data but it transfers sometimes separately so it should wait for remaining
   // data if it wasn't completely delivered
-  while (int status = receive(newSocket, (char*)&sizeToReceive, sizeof(sizeToReceive), sizeToReceiveSize)) {
+  while (receive(newSocket, (char*)&sizeToReceive, sizeof(sizeToReceive), sizeToReceiveSize)) {
     B2DEBUG(150, "....." << sizeToReceive << " bytes to be received");
 
     char* data = new char [sizeToReceive];
@@ -113,8 +106,6 @@ int HLTReceiver::getData()
   if (accept(newSocket) != c_Success)
     return c_InitFailed;
 
-  bool EOSFlag = false;
-
   int sizeToReceive = 0;
   int sizeToReceiveSize = 0;
 
@@ -123,7 +114,7 @@ int HLTReceiver::getData()
 
   // TCP provides the length of data but it transfers sometimes separately so it should wait for remaining
   // data if it wasn't completely delivered
-  while (int status = receive(newSocket, (char*)&sizeToReceive, sizeof(sizeToReceive), sizeToReceiveSize)) {
+  while (receive(newSocket, (char*)&sizeToReceive, sizeof(sizeToReceive), sizeToReceiveSize)) {
     B2DEBUG(100, "....." << sizeToReceive << " bytes to be received");
 
     char* data = new char [sizeToReceive];
@@ -192,74 +183,6 @@ EHLTStatus HLTReceiver::setPort(int port)
   return c_Success;
 }
 
-/// @brief Decode received data
-/// @param data Taken data
-/// @param size Size of the taken data
-/// @param container Container for decoded data (the data can be multiple)
-/// @param sizes Container for size of decoded data
-/// @return The number of decoded data (this might be redundant)
-/// Obsolete?
-int HLTReceiver::decodeSingleton(char* data, int size, char* container, std::vector<int>& sizes)
-{
-  int containerIndex = 0;
-  int eos = findEOS(data, size);
-  B2DEBUG(100, "EOS position = " << eos);
-
-  if (eos < 0) {
-    if (size < gBufferSize - m_internalBufferWriteIndex) {
-      memcpy(m_internalBuffer + sizeof(char) * m_internalBufferWriteIndex, data, sizeof(char) * size);
-      m_internalBufferWriteIndex += size;
-      m_internalBufferEntries++;
-
-      return 0;
-    } else {
-      B2ERROR("[HLTReceiver] Internal buffer is full!");
-      return -1;
-    }
-  } else {
-    if (m_internalBufferEntries > 0) {
-      memcpy(container, m_internalBuffer, sizeof(char) * m_internalBufferWriteIndex);
-      memcpy(container + sizeof(char) * m_internalBufferWriteIndex, data, sizeof(char) * eos);
-      sizes.push_back(m_internalBufferWriteIndex + eos);
-      containerIndex += m_internalBufferWriteIndex + eos;
-
-      flushInternalBuffer();
-
-      data = data + sizeof(char) * (eos + gEOSTag.size());
-      size = size - (eos + gEOSTag.size());
-    } else {
-      memcpy(container, data, sizeof(char) * eos);
-      sizes.push_back(eos);
-      containerIndex += eos;
-
-      data = data + sizeof(char) * (eos + gEOSTag.size());
-      size = size - (eos + gEOSTag.size());
-    }
-
-    if (size <= 0)
-      return sizes.size();
-
-    while ((eos = findEOS(data, size)) > 0) {
-      memcpy(container + sizeof(char) * containerIndex, data, sizeof(char) * eos);
-      sizes.push_back(eos);
-      containerIndex += eos;
-
-      data = data + sizeof(char) * (eos + gEOSTag.size());
-      size = size - (eos + gEOSTag.size());
-    }
-
-    if (size > 0) {
-      memcpy(m_internalBuffer, data, sizeof(char) * size);
-      m_internalBufferWriteIndex += size;
-      m_internalBufferEntries++;
-    }
-
-    return sizes.size();
-  }
-
-  return 0;
-}
-
 /// @brief Find EOS tag that indicates the end of an individual data
 /// @param data Taken data chunk
 /// @param size Size of taken data
@@ -276,15 +199,4 @@ int HLTReceiver::findEOS(char* data, int size)
   }
 
   return -1;
-}
-
-/// @brief Flush internal buffer that is supposed to contain part of data
-/// @return c_Success The internal buffer is flushed
-EHLTStatus HLTReceiver::flushInternalBuffer()
-{
-  memset(m_internalBuffer, 0, gBufferSize);
-  m_internalBufferWriteIndex = 0;
-  m_internalBufferEntries = 0;
-
-  return c_Success;
 }

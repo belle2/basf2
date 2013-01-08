@@ -54,19 +54,12 @@ namespace Belle2 {
     ///! Set port number for data transfer
     EHLTStatus setPort(int port);
 
-    //! Decode received data to ensure a singleton of data for a simple string
-    EHLTStatus decodeSingleton(std::string data, std::vector<std::string>& container);
-    //! Decode received data to ensure a singleton of data for general data
-    int decodeSingleton(char* data, int size, char* container, std::vector<int>& sizes);
-
     //! Find EOS tag from the data
     int findEOS(char* data, int size);
 
   protected:
     //! Initialize the HLTReceiver
     EHLTStatus init();
-    //! Clear the internal buffer
-    EHLTStatus flushInternalBuffer();
 
   private:
     unsigned int m_port;            /**< Port number for the connection */
@@ -74,10 +67,6 @@ namespace Belle2 {
     int m_tempBufferSize;           /**< Size of temporary buffer */
 
     RingBuffer* m_buffer;           /**< Pointer to ring buffer for incoming data */
-
-    char* m_internalBuffer;         /**< Internal buffer to collect data */
-    int m_internalBufferWriteIndex; /**< Write pointer of internal buffer */
-    int m_internalBufferEntries;    /**< Number of entries in internal buffer */
   };
 }
 

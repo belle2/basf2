@@ -107,7 +107,7 @@ void HLTOutputModule::endRun()
   std::cout << "[HLTOutput] \x1b[32m\t" << m_nEvents << " events (Total size = " << m_size << " kB)\x1b[0m" << std::endl;
   std::cout << "[HLTOutput] \x1b[32m\tTotal elapsed time  = " << etime / 1000.0 << " ms\x1b[0m" << std::endl;
   std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Overall) = " << flowmb << " (MB/s)\x1b[0m" << std::endl;
-  std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Event)   = " << flowmbEvent << " (MB/s)   Time = " << m_timeEvent << " (ms)\x1b[0m" << std::endl;
+  std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Event)   = " << flowmbEvent << " (MB/s)   Time = " << m_timeEvent / 1000.0 << " (ms)\x1b[0m" << std::endl;
   if (m_nodeType == "WN") {
     std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Serialization) = " << flowmbSer << " (MB/s)   Time = " << m_timeSerialized / 1000.0 << " (ms)\x1b[0m" << std::endl;
   } else {

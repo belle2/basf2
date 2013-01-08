@@ -99,7 +99,7 @@ void HLTInputModule::event()
   gettimeofday(&t1, 0);
 
   double etime = (double)((t1.tv_sec - t0.tv_sec) * 1000000 + (t1.tv_usec - t0.tv_usec));
-  m_timeTest += etime;
+  m_timeEvent += etime;
 }
 
 /// @brief End a run
@@ -109,24 +109,23 @@ void HLTInputModule::endRun()
   double etime = (double)((m_tEnd.tv_sec - m_t0.tv_sec) * 1000000 + (m_tEnd.tv_usec - m_t0.tv_usec));
 
   double flowmb = m_size / etime * 1000.0;
-  double flowmbInit = m_size / m_timeInit * 1000.0;
-  double flowmbTest = m_size / m_timeTest * 1000.0;
+  double flowmbEvent = m_size / m_timeEvent * 1000.0;
   double flowmbDeser = m_size / m_timeDeserialized * 1000.0;
-  double flowmbStore = m_size / m_timeStore * 1000.0;
+  double flowmbIO = m_size / m_timeIO * 1000.0;
   double avesize = m_size / (double)m_nEvents;
   double avesize2 = m_size2 / (double)m_nEvents;
   double sigma2 = avesize2 - avesize * avesize;
   double sigma = sqrt(sigma2);
 
-  // Need to be modified (it doesn't work for some situations)
   std::cout << "[HLTInput] \x1b[32mStatistics\x1b[0m" << std::endl;;
   std::cout << "[HLTInput] \x1b[32m\t" << m_nEvents << " events (Total size = " << m_size << " kB)\x1b[0m" << std::endl;
-  std::cout << "[HLTInput] \x1b[32m\tFlow rate = " << flowmb << " (MB/s)\x1b[0m" << std::endl;
-  std::cout << "[HLTInput] \x1b[32m\tFlow rate (Test) = " << flowmbTest << " (MB/s)   Time = " << m_timeTest / 1000 << " (ms)\x1b[0m" << std::endl;
-  std::cout << "[HLTInput] \x1b[32m\tFlow rate (Init) = " << flowmbInit << " (MB/s)   Time = " << m_timeInit / 1000 << " (ms)\x1b[0m" << std::endl;
+  std::cout << "[HLTOutput] \x1b[32m\tTotal elapsed time  = " << etime / 1000.0 << " ms\x1b[0m" << std::endl;
+  std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Overall) = " << flowmb << " (MB/s)\x1b[0m" << std::endl;
+  std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Event)   = " << flowmbEvent << " (MB/s)   Time = " << m_timeEvent << " (ms)\x1b[0m" << std::endl;
   if (m_nodeType == "WN") {
     std::cout << "[HLTInput] \x1b[32m\tFlow rate (Deserialization) = " << flowmbDeser << " (MB/s)   Time = " << m_timeDeserialized / 1000 << " (ms)\x1b[0m" << std::endl;
-    std::cout << "[HLTInput] \x1b[32m\tFlow rate (DataStore) = " << flowmbStore << " (MB/s)   Time = " << m_timeStore / 1000 << " (ms)\x1b[0m" << std::endl;
+  } else {
+    std::cout << "[HLTInput] \x1b[32m\tFlow rate (File writing) = " << flowmbIO << " (MB/s)   Time = " << m_timeIO / 1000 << " (ms)\x1b[0m" << std::endl;
   }
   std::cout << "[HLTInput] \x1b[32m\tEvent size = " << avesize << " +- " << sigma << " (kB)\x1b[0m" << std::endl;
 
@@ -147,22 +146,15 @@ void HLTInputModule::terminate()
 /// @return c_TermCalled Termination code received and there's no more data sources left
 EHLTStatus HLTInputModule::getData()
 {
-  struct timeval ti;
-  struct timeval tt;
   struct timeval t0;
-  struct timeval t1;
   struct timeval tn;
 
   char* buffer = new char[gDataMaxReceives + gEOSTag.size()];
-
-  gettimeofday(&ti, 0);
 
   int size = 0;
   while ((size = m_buffer->remq((int*)buffer)) <= 0)
     usleep(100);
   B2INFO("[HLTInput] Event data taken from RB!");
-
-  gettimeofday(&tt, 0);
 
   std::string termChecker(buffer);
   while (termChecker == gTerminate) {
@@ -183,11 +175,11 @@ EHLTStatus HLTInputModule::getData()
 
   EvtMessage* msg = new EvtMessage(buffer);
 
+  gettimeofday(&t0, 0);
   if (m_nodeType == "EM") {
-    gettimeofday(&t0, 0);
-    gettimeofday(&t1, 0);
-    gettimeofday(&tn, 0);
     m_file->write(msg->buffer());
+
+    gettimeofday(&tn, 0);
     B2INFO("[HLTInput] Writing event " << msg->size() << " bytes to the file");
 
     // To keep event by event processing, insert dummy EventMetaData into DataStore
@@ -198,9 +190,6 @@ EHLTStatus HLTInputModule::getData()
 
     size = msg->size();
   } else {
-    gettimeofday(&t0, 0);
-    gettimeofday(&t1, 0);
-
     m_streamer->restoreDataStore(msg);
 
     gettimeofday(&tn, 0);
@@ -208,12 +197,9 @@ EHLTStatus HLTInputModule::getData()
     size = msg->size();
   }
 
-  double etime0 = (double)((tt.tv_sec - ti.tv_sec) * 1000000 + (tt.tv_usec - ti.tv_usec));
-  double etime1 = (double)((t1.tv_sec - t0.tv_sec) * 1000000 + (t1.tv_usec - t0.tv_usec));
-  double etime2 = (double)((tn.tv_sec - t1.tv_sec) * 1000000 + (tn.tv_usec - t1.tv_usec));
-  m_timeInit += etime0;
+  double etime1 = (double)((tn.tv_sec - t0.tv_sec) * 1000000 + (tn.tv_usec - t0.tv_usec));
   m_timeDeserialized += etime1;
-  m_timeStore += etime2;
+  m_timeIO += etime1;
 
   double dsize = ((double)size - gEOSTag.size()) / 1000.0;
   m_size += dsize;

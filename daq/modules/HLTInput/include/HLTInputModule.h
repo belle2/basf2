@@ -76,9 +76,8 @@ namespace Belle2 {
     struct timeval m_tEnd;          /**< Time stamp at the end */
 
     double m_timeDeserialized;      /**< Elapsed time of deserialization */
-    double m_timeStore;             /**< Elapsed time of accessing DataStore */
-    double m_timeTest;              /**< Elapsed time for test purpose */
-    double m_timeInit;              /**< Elapsed time for initialization */
+    double m_timeIO;                /**< Elapsed time of file I/O */
+    double m_timeEvent;             /**< Total elapsed time for event processing */
 
     double m_size;                  /**< Total size of taken events */
     double m_size2;                 /**< Square of total size of taken events */

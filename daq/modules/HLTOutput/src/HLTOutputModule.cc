@@ -85,7 +85,7 @@ void HLTOutputModule::event()
   gettimeofday(&t1, 0);
 
   double etime = (double)((t1.tv_sec - t0.tv_sec) * 1000000 + (t1.tv_usec - t0.tv_usec));
-  m_timeTotal += etime;
+  m_timeEvent += etime;
 }
 
 /// @brief End a run
@@ -95,31 +95,24 @@ void HLTOutputModule::endRun()
   double etime = (double)((m_tEnd.tv_sec - m_t0.tv_sec) * 1000000 + (m_tEnd.tv_usec - m_t0.tv_usec));
 
   double flowmb = m_size / etime * 1000.0;
+  double flowmbEvent = m_size / m_timeEvent * 1000.0;
   double flowmbSer = m_size / m_timeSerialized * 1000.0;
-  double flowmbStore = m_size / m_timeStore * 1000.0;
-  double flowmbTotal = m_size / m_timeTotal * 1000.0;
-  double flowmbBuffer = m_size / m_timeBuffer * 1000.0;
-  double flowmbClear = m_size / m_timeClearing * 1000.0;
+  double flowmbIO = m_size / m_timeIO * 1000.0;
   double avesize = m_size / (double)m_nEvents;
   double avesize2 = m_size2 / (double)m_nEvents;
   double sigma2 = avesize2 - avesize * avesize;
   double sigma = sqrt(sigma2);
 
-  // Need to be modified (it doesn't work for some situations)
   std::cout << "[HLTOutput] \x1b[32mStatistics\x1b[0m" << std::endl;;
   std::cout << "[HLTOutput] \x1b[32m\t" << m_nEvents << " events (Total size = " << m_size << " kB)\x1b[0m" << std::endl;
-  std::cout << "[HLTOutput] \x1b[32m\tFlow rate = " << flowmb << " (MB/s)\x1b[0m" << std::endl;
-  std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Total) = " << flowmbTotal << " (MB/s)   Time = " << m_timeTotal << " (ms)\x1b[0m" << std::endl;
+  std::cout << "[HLTOutput] \x1b[32m\tTotal elapsed time  = " << etime / 1000.0 << " ms\x1b[0m" << std::endl;
+  std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Overall) = " << flowmb << " (MB/s)\x1b[0m" << std::endl;
+  std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Event)   = " << flowmbEvent << " (MB/s)   Time = " << m_timeEvent << " (ms)\x1b[0m" << std::endl;
   if (m_nodeType == "WN") {
-    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Serialization) = " << flowmbSer << " (MB/s)   Time = " << m_timeSerialized << " (ms)\x1b[0m" << std::endl;
-    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (DataStore) = " << flowmbStore << " (MB/s)   Time = " << m_timeStore << " (ms)\x1b[0m" << std::endl;
-    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (RingBuffer) = " << flowmbBuffer << " (MB/s)   Time = " << m_timeBuffer << " (ms)\x1b[0m" << std::endl;
-  } else if (m_nodeType == "ES") {
-    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Data reading) = " << flowmbStore << " (MB/s)   Time = " << m_timeStore << " (ms)\x1b[0m" << std::endl;
-    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (RB writting) = " << flowmbSer << " (MB/s)   Time = " << m_timeSerialized << " (ms)\x1b[0m" << std::endl;
-    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Dummy DataStore) = " << flowmbBuffer << " (MB/s)   Time = " << m_timeBuffer << " (ms)\x1b[0m" << std::endl;
+    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Serialization) = " << flowmbSer << " (MB/s)   Time = " << m_timeSerialized / 1000.0 << " (ms)\x1b[0m" << std::endl;
+  } else {
+    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (File reading)  = " << flowmbIO << " (MB/s)   Time = " << m_timeIO / 1000.0 << " (ms)\x1b[0m" << std::endl;
   }
-  std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Clearing) = " << flowmbClear << " (MB/s)   Time = " << m_timeClearing << " (ms)\x1b[0m" << std::endl;
   std::cout << "[HLTOutput] \x1b[32m\tEvent size = " << avesize << " +- " << sigma << " (kB)\x1b[0m" << std::endl;
 
   B2INFO("Module HLTOutput ends a run");
@@ -140,16 +133,16 @@ void HLTOutputModule::putData()
   int size = 0;
 
   struct timeval t0;
-  struct timeval t1;
   struct timeval tn;
-  struct timeval tf;
-  struct timeval tClear;
 
   if (m_nodeType == "ES") {
     gettimeofday(&t0, 0);
 
     char* buffer = new char[gDataMaxReceives];
     size = m_file->read(buffer, gDataMaxReceives);
+
+    gettimeofday(&tn, 0);
+
     if (size > 0) {
       EvtMessage* msg = NULL;
 
@@ -173,6 +166,7 @@ void HLTOutputModule::putData()
       StoreObjPtr<EventMetaData> eventMetaDataPtr;
       eventMetaDataPtr.create();
       eventMetaDataPtr->setEvent(m_nEvents);
+
     } else
       delete m_file;
 
@@ -189,29 +183,19 @@ void HLTOutputModule::putData()
     }
     B2INFO("[HLTOutput] Put an event into the ring buffer (size = " << msg->size() << ")");
 
-    gettimeofday(&tf, 0);
-
     m_nEvents++;
     size = msg->size();
 
     delete msg;
-
-    gettimeofday(&tClear, 0);
-
-    double etime1 = (double)((t1.tv_sec - t0.tv_sec) * 1000000 + (t1.tv_usec - t0.tv_usec));
-    double etime2 = (double)((tn.tv_sec - t1.tv_sec) * 1000000 + (tn.tv_usec - t1.tv_usec));
-    double etime3 = (double)((tf.tv_sec - tn.tv_sec) * 1000000 + (tf.tv_usec - tn.tv_usec));
-    double etime4 = (double)((tClear.tv_sec - tf.tv_sec) * 1000000 + (tClear.tv_usec - tf.tv_usec));
-    m_timeStore += etime1;
-    m_timeSerialized += etime2;
-    m_timeBuffer += etime3;
-    m_timeClearing += etime4;
-
-    double dsize = (double)size / 1000.0;
-    m_size += dsize;
-    m_size2 += dsize * dsize;
   }
-  B2INFO("What's m_size? It's " << m_size);
+
+  double etime1 = (double)((tn.tv_sec - t0.tv_sec) * 1000000 + (tn.tv_usec - t0.tv_usec));
+  m_timeSerialized += etime1;
+  m_timeIO += etime1;
+
+  double dsize = (double)size / 1000.0;
+  m_size += dsize;
+  m_size2 += dsize * dsize;
 }
 
 /// @brief Send terminate code to ring buffer

@@ -51,8 +51,8 @@
      <HitTimeThreshold desc="All hits with larger time will be dropped at SensitiveDetector level" unit="ns">1000000000</HitTimeThreshold>
     </SensitiveDetector>
      <Digitizer>
-     <TimeDigitizationStep desc="Time setp of FPGA TDC">1</TimeDigitizationStep>
-     <NTimeDigitizationSteps desc="Number of steps to to in digitization">200</NTimeDigitizationSteps>
+     <ADCSamplingTime desc="ADC sampling time, nsec">1</ADCSamplingTime>
+     <NDigitizations desc="Number of steps in digitization">200</NDigitizations>
      <NPEperMeV desc="Number of Photoelectons per 1 MeV energy deposition">200</NPEperMeV>
      <MaxTheta desc="Angle at which WLS fiber captures the light" unit="deg">26.7</MaxTheta>
      <!--- <MaxTheta desc="Angle at which WLS fiber captures the light" unit="deg">0.7</MaxTheta> -->

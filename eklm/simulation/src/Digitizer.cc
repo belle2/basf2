@@ -252,9 +252,9 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
     //***
 
     if (!fiberAndElectronicsSimulator->getFitStatus()) {
-      stripHit->setTime(fiberAndElectronicsSimulator->getFitResults(0));
-      stripHit->setNumberPhotoElectrons(fiberAndElectronicsSimulator->
-                                        getFitResults(3));
+      struct FPGAFitParams* par = fiberAndElectronicsSimulator->getFitResults();
+      stripHit->setTime(par->startTime);
+      stripHit->setNumberPhotoElectrons(par->amplitude);
     } else {
       stripHit->setTime(0.);
       stripHit->setNumberPhotoElectrons(0);

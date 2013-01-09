@@ -11,12 +11,6 @@
 #ifndef EKLMFIBERANDELECTRONICS_H
 #define EKLMFIBERANDELECTRONICS_H
 
-/* External headers. */
-#include <TTree.h>
-#include <TH1D.h>
-#include <TFitResult.h>
-#include <TF1.h>
-
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
@@ -51,48 +45,42 @@ namespace Belle2 {
       void processEntry();
 
       /**
-       * Get fit results.
-       * @return Pointer to TFitResult object.
-       */
-      TFitResultPtr getFitResultsPtr() const;
-
-      /**
        * Get fit parameter.
        * @return i'th parameter of the fit.
        */
-      double getFitResults(int i) const;
+      struct FPGAFitParams* getFitResults();
 
       /**
        * Get fit status.
        * @return Status of the fit.
        */
-      int getFitStatus() const;
+      enum FPGAFitStatus getFitStatus() const;
 
     private:
 
       /** Transformation data. */
       struct EKLM::TransformData* m_transf;
 
+      /** Analog amplitude (direct). */
+      float* m_amplitudeDirect;
+
+      /** Analog amplitude (reflected). */
+      float* m_amplitudeReflected;
+
+      /** Analog amplitude. */
+      float* m_amplitude;
+
       /** Digital amplitude. */
       int* m_ADCAmplitude;
 
-      /** Pointer to histogram with forward hits. */
-      TH1D* m_digitizedAmplitudeDirect;
-
-      /** Pointer to histogram with backward hits. */
-      TH1D* m_digitizedAmplitudeReflected;
-
-      /** Pointer to resulting histogram. */
-      TH1D* m_digitizedAmplitude;
+      /** Digital fit result. */
+      int* m_ADCFit;
 
       /** FPGA fit status. */
       enum FPGAFitStatus m_FPGAStat;
 
-      /** Pointer to fit function. */
-      TF1* m_fitFunction;
-
-      /** Pointer to fit parameters. */
-      TFitResultPtr m_fitResultsPtr;
+      /** FPGA fit results. */
+      struct FPGAFitParams m_FPGAParams;
 
       /** Pointer to vector if the SimHits. */
       std::vector<EKLMSimHit*> m_vectorHits;
@@ -120,12 +108,12 @@ namespace Belle2 {
        * @details
        * Should be accessible via XML.
        */
-      int m_nTimeDigitizationSteps;
+      int m_nDigitizations;
 
-      /** ADC digitization step. */
-      int m_timeDigitizationStep;
+      /** ADC conversion time. */
+      int m_ADCSamplingTime;
 
-      /** Stands for m_nTimeDigitizationSteps*m_timeDigitizationStep. */
+      /** Stands for m_nDigitizations*m_ADCSamplingTime. */
       double m_histRange;
 
       /** Speed pf light in fiber. */
@@ -174,11 +162,11 @@ namespace Belle2 {
       double m_firstPhotonlightSpeed;
 
       /**
-       * Convert time to the histogram (TDC).
+       * Convert time to the histogram.
        * @param times Vector of hits.
        * @param shape Histogram.
        */
-      void timesToShape(const std::vector <double> & times, TH1D* shape);
+      void timesToShape(const std::vector <double> & times, float* shape);
 
       /**
        * Calculate StripHit times (at the end of the strip),
@@ -232,13 +220,6 @@ namespace Belle2 {
       double m_min_time;
 
     };
-
-    /**
-     * Fitting function.
-     * @param[in] x   1-dimensional coordinate.
-     * @param[in] par Array of fit parameters.
-     */
-    double SignalShapeFitFunction(double* _x, double* par);
 
   }
 

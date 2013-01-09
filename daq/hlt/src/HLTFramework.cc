@@ -53,9 +53,9 @@ EHLTStatus HLTFramework::init(char* xmlFileName)
     xml->parsing();
     m_hltManager->storeNodeInfo(xml);
 
-    m_hltManager->initSenders();
+    //m_hltManager->initSenders();
     // For test purpose
-    //m_hltManager->initSenders(true);
+    m_hltManager->initSenders(true);
 
     if (!m_hltManager->isChild())
       m_hltManager->checkChildren();

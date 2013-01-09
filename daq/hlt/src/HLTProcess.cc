@@ -96,8 +96,12 @@ EHLTStatus HLTProcess::initControl(int port)
 /// @return c_ChildSuccess The process is child process
 EHLTStatus HLTProcess::initSenders(int port)
 {
-  B2INFO("[HLTProcess] \x1b[33mOutgoing ring buffer initializing...\x1b[0m");
-  m_dataOutBuffer = new RingBuffer(gDataOutBufferKey.c_str(), gBufferSize);
+  if (port && m_nodeInfo.type() == "EM") {
+    m_dataOutBuffer = NULL;
+  } else {
+    B2INFO("[HLTProcess] \x1b[33mOutgoing ring buffer initializing...\x1b[0m");
+    m_dataOutBuffer = new RingBuffer(gDataOutBufferKey.c_str(), gBufferSize);
+  }
 
   for (unsigned int i = 0; i < m_nodeInfo.targetIP().size(); ++i) {
     pid_t pidHLTSender = fork();
@@ -114,6 +118,7 @@ EHLTStatus HLTProcess::initSenders(int port)
       } else {
         if (m_nodeInfo.type() == "WN") {
           port = 30000;
+          port += m_nodeInfo.generateKey() - 1;
         } else {
           port = c_DataOutPort;
           port += m_nodeInfo.unitNo() * 100 + i;
@@ -147,13 +152,17 @@ EHLTStatus HLTProcess::initSenders(int port)
 /// @return c_ChildSuccess The process is child process
 EHLTStatus HLTProcess::initReceivers(int port)
 {
-  B2INFO("[HLTProcess] \x1b[33mIncoming ring buffer initializing...\x1b[0m");
-  m_dataInBuffer = new RingBuffer(gDataInBufferKey.c_str(), gBufferSize);
-
   bool testPort = false;
   if (port) {
     testPort = true;
     B2INFO("[HLTProcess] External port " << port << " specified!");
+  }
+
+  if (port && m_nodeInfo.type() == "ES") {
+    m_dataInBuffer = NULL;
+  } else {
+    B2INFO("[HLTProcess] \x1b[33mIncoming ring buffer initializing...\x1b[0m");
+    m_dataInBuffer = new RingBuffer(gDataInBufferKey.c_str(), gBufferSize);
   }
 
   for (unsigned int i = 0; i < m_nodeInfo.sourceIP().size(); ++i) {
@@ -171,6 +180,7 @@ EHLTStatus HLTProcess::initReceivers(int port)
       } else {
         if (m_nodeInfo.type() != "WN") {
           port = 30000;
+          port += m_nodeInfo.unitNo() * 100 + i;
         } else {
           port = c_DataOutPort;
           port += m_nodeInfo.generateKey() - 1;
@@ -188,9 +198,6 @@ EHLTStatus HLTProcess::initReceivers(int port)
     } else {
       m_HLTReceivers.push_back(pidHLTReceiver);
       B2INFO("\x1b[33m[HLTProcess] HLTReceiver " << pidHLTReceiver << " forked\x1b[0m");
-
-      if (testPort && i == 4)
-        return c_Success;
     }
   }
 
@@ -251,13 +258,25 @@ EHLTStatus HLTProcess::checkChildren()
            << status << ")\x1b[0m");
   }
 
+  int inBufferID = 0;
+  int outBufferID = 0;
+
+  if (m_dataInBuffer != NULL)
+    inBufferID = m_dataInBuffer->shmid();
+  if (m_dataOutBuffer != NULL)
+    outBufferID = m_dataOutBuffer->shmid();
+
   B2INFO("[HLTProcess] \x1b[33mTerminating basf2....(Put termination code into ring buffer "
-         << m_dataInBuffer->shmid() << " and " << m_dataOutBuffer->shmid() << ")\x1b[0m");
-  while (m_dataInBuffer->insq((int*)gTerminate.c_str(), gTerminate.size() / 4 + 1) <= 0) {
-    usleep(100);
+         << inBufferID << " and " << outBufferID << ")\x1b[0m");
+  if (m_dataInBuffer != NULL) {
+    while (m_dataInBuffer->insq((int*)gTerminate.c_str(), gTerminate.size() / 4 + 1) <= 0) {
+      usleep(100);
+    }
   }
-  while (m_dataOutBuffer->insq((int*)gTerminate.c_str(), gTerminate.size() / 4 + 1) <= 0) {
-    usleep(100);
+  if (m_dataOutBuffer != NULL) {
+    while (m_dataOutBuffer->insq((int*)gTerminate.c_str(), gTerminate.size() / 4 + 1) <= 0) {
+      usleep(100);
+    }
   }
 
   pid = waitpid(m_Process, &status, 0);

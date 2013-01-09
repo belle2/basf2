@@ -76,7 +76,7 @@ void HLTOutputModule::event()
   struct timeval t1;
   gettimeofday(&t0, 0);
 
-  B2INFO("Module HLTOutput starts an event");
+  //B2INFO("Module HLTOutput starts an event");
 
   putData();
   m_eventsSent++;
@@ -146,7 +146,7 @@ void HLTOutputModule::putData()
     if (size > 0) {
       EvtMessage* msg = NULL;
 
-      B2INFO("[HLTOutput] \x1b[33mNode type = ES: Reading data from " << m_inputFileName << "\x1b[0m");
+      //B2INFO("[HLTOutput] \x1b[33mNode type = ES: Reading data from " << m_inputFileName << "\x1b[0m");
       msg = new EvtMessage(buffer);
 
       while (m_buffer->insq((int*)msg->buffer(), msg->size() / 4 + 1) <= 0) {
@@ -154,10 +154,6 @@ void HLTOutputModule::putData()
       }
 
       m_nEvents++;
-      double dsize = (double)size / 1000.0;
-      B2INFO("ADD SIZE " << dsize);
-      m_size += dsize;
-      m_size2 += dsize * dsize;
 
       delete msg;
 

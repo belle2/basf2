@@ -79,7 +79,7 @@ void HLTInputModule::beginRun()
 /// @brief Process an event
 void HLTInputModule::event()
 {
-  B2INFO("Module HLTInput starts an event");
+  //B2INFO("Module HLTInput starts an event");
 
   // Since the first event already fetched in initialize () function only at WN,
   // the first event processing skipped to make consistent # of runs
@@ -95,7 +95,6 @@ void HLTInputModule::event()
 
   getData();
 
-  B2INFO("[HLTInput] " << m_nEvents << " events taken!");
   gettimeofday(&t1, 0);
 
   double etime = (double)((t1.tv_sec - t0.tv_sec) * 1000000 + (t1.tv_usec - t0.tv_usec));
@@ -154,7 +153,6 @@ EHLTStatus HLTInputModule::getData()
   int size = 0;
   while ((size = m_buffer->remq((int*)buffer)) <= 0)
     usleep(100);
-  B2INFO("[HLTInput] Event data taken from RB!");
 
   std::string termChecker(buffer);
   while (termChecker == gTerminate) {
@@ -180,8 +178,6 @@ EHLTStatus HLTInputModule::getData()
     m_file->write(msg->buffer());
 
     gettimeofday(&tn, 0);
-
-    B2INFO("[HLTInput] Writing event " << msg->size() << " bytes to the file");
 
     // To keep event by event processing, insert dummy EventMetaData into DataStore
     // (This information will not actually be used)

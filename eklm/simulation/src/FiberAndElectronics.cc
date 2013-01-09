@@ -256,8 +256,8 @@ void EKLM::FiberAndElectronics::simulateADC()
 {
   int i;
   for (i = 0; i < m_nTimeDigitizationSteps; i++) {
-    m_ADCAmplitude[i] = 0.5 * ADCRange *
-                        m_digitizedAmplitude->GetBinContent(i + 1);
+    m_ADCAmplitude[i] = (int)(0.5 * ADCRange *
+                              m_digitizedAmplitude->GetBinContent(i + 1));
   }
 }
 

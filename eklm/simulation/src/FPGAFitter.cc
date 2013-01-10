@@ -49,7 +49,7 @@ static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
   }
 }
 
-enum EKLM::FPGAFitStatus EKLM::FPGAFit(int* amp, int* fit, int nPoints,
+enum EKLM::FPGAFitStatus EKLM::FPGAFit(int* amp, float* fit, int nPoints,
                                        struct FPGAFitParams* par)
 {
   const int thr = 100;

@@ -63,7 +63,7 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   m_ADCAmplitude = (int*)calloc(m_nDigitizations, sizeof(int));
   if (m_ADCAmplitude == NULL)
     B2FATAL(MemErr);
-  m_ADCFit = (int*)calloc(m_nDigitizations, sizeof(int));
+  m_ADCFit = (float*)calloc(m_nDigitizations, sizeof(float));
   if (m_ADCFit == NULL)
     B2FATAL(MemErr);
 

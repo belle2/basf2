@@ -120,71 +120,8 @@ void EKLM::FiberAndElectronics::processEntry()
                                  m_digPar->ADCSamplingTime;
   m_FPGAParams.amplitude = m_FPGAParams.amplitude * 2 / ADCRange;
   m_FPGAParams.bgAmplitude = m_FPGAParams.bgAmplitude * 2 / ADCRange;
-  if (!m_digPar->debug)
-    return;
-  /*********************** DEBUG OUTPUT ***************************/
-  TH1D* histAmplitudeDirect;
-  TH1D* histAmplitudeReflected;
-  TH1D* histAmplitude;
-  TH1D* histADCAmplitude;
-  TH1D* histADCFit;
-  try {
-    histAmplitudeDirect =
-      new TH1D("histAmplitudeDirect", m_stripName.c_str(),
-               m_digPar->nDigitizations, 0, m_histRange);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  try {
-    histAmplitudeReflected =
-      new TH1D("histAmplitudeReflected", m_stripName.c_str(),
-               m_digPar->nDigitizations, 0, m_histRange);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  try {
-    histAmplitude =
-      new TH1D("histAmplitude", m_stripName.c_str(),
-               m_digPar->nDigitizations, 0, m_histRange);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  try {
-    histADCAmplitude =
-      new TH1D("histADCAmplitude", m_stripName.c_str(),
-               m_digPar->nDigitizations, 0, m_histRange);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  try {
-    histADCFit =
-      new TH1D("histADCFit", m_stripName.c_str(),
-               m_digPar->nDigitizations, 0, m_histRange);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  for (i = 0; i < m_digPar->nDigitizations; i++) {
-    histAmplitudeDirect->SetBinContent(i + 1, m_amplitudeDirect[i]);
-    histAmplitudeReflected->SetBinContent(i + 1, m_amplitudeReflected[i]);
-    histAmplitude->SetBinContent(i + 1, m_amplitude[i]);
-    histADCAmplitude->SetBinContent(i + 1, m_ADCAmplitude[i]);
-    histADCFit->SetBinContent(i + 1, m_ADCFit[i]);
-  }
-  std::string filename = m_stripName +
-                         boost::lexical_cast<std::string>(gRandom->Integer(10000000)) + ".root";
-  TFile* hfile;
-  try {
-    hfile = new TFile(filename.c_str(), "NEW");
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  hfile->Append(histAmplitudeDirect);
-  hfile->Append(histAmplitudeReflected);
-  hfile->Append(histAmplitude);
-  hfile->Append(histADCAmplitude);
-  hfile->Append(histADCFit);
-  hfile->Write();
-  hfile->Close();
+  if (m_digPar->debug)
+    debugOutput();
 }
 
 void EKLM::FiberAndElectronics::lightPropagationDistance(EKLMSimHit* sh)
@@ -284,5 +221,72 @@ struct EKLM::FPGAFitParams* EKLM::FiberAndElectronics::getFitResults() {
 enum EKLM::FPGAFitStatus EKLM::FiberAndElectronics::getFitStatus() const
 {
   return m_FPGAStat;
+}
+
+void EKLM::FiberAndElectronics::debugOutput()
+{
+  int i;
+  TH1D* histAmplitudeDirect;
+  TH1D* histAmplitudeReflected;
+  TH1D* histAmplitude;
+  TH1D* histADCAmplitude;
+  TH1D* histADCFit;
+  try {
+    histAmplitudeDirect =
+      new TH1D("histAmplitudeDirect", m_stripName.c_str(),
+               m_digPar->nDigitizations, 0, m_histRange);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  try {
+    histAmplitudeReflected =
+      new TH1D("histAmplitudeReflected", m_stripName.c_str(),
+               m_digPar->nDigitizations, 0, m_histRange);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  try {
+    histAmplitude =
+      new TH1D("histAmplitude", m_stripName.c_str(),
+               m_digPar->nDigitizations, 0, m_histRange);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  try {
+    histADCAmplitude =
+      new TH1D("histADCAmplitude", m_stripName.c_str(),
+               m_digPar->nDigitizations, 0, m_histRange);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  try {
+    histADCFit =
+      new TH1D("histADCFit", m_stripName.c_str(),
+               m_digPar->nDigitizations, 0, m_histRange);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  for (i = 0; i < m_digPar->nDigitizations; i++) {
+    histAmplitudeDirect->SetBinContent(i + 1, m_amplitudeDirect[i]);
+    histAmplitudeReflected->SetBinContent(i + 1, m_amplitudeReflected[i]);
+    histAmplitude->SetBinContent(i + 1, m_amplitude[i]);
+    histADCAmplitude->SetBinContent(i + 1, m_ADCAmplitude[i]);
+    histADCFit->SetBinContent(i + 1, m_ADCFit[i]);
+  }
+  std::string filename = m_stripName +
+                         boost::lexical_cast<std::string>(gRandom->Integer(10000000)) + ".root";
+  TFile* hfile;
+  try {
+    hfile = new TFile(filename.c_str(), "NEW");
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  hfile->Append(histAmplitudeDirect);
+  hfile->Append(histAmplitudeReflected);
+  hfile->Append(histAmplitude);
+  hfile->Append(histADCAmplitude);
+  hfile->Append(histADCFit);
+  hfile->Write();
+  hfile->Close();
 }
 

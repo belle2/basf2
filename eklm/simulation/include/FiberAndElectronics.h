@@ -157,6 +157,11 @@ namespace Belle2 {
        */
       void simulateADC();
 
+      /**
+       * Debug output (signal and fit result histograms).
+       */
+      void debugOutput();
+
       /** Minimal hit time. */
       double m_min_time;
 

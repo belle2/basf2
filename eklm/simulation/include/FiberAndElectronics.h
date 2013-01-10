@@ -103,21 +103,15 @@ namespace Belle2 {
       std::string m_stripName;
 
       /**
-       * Convert time to the histogram.
-       * @param times Vector of hits.
-       * @param shape Histogram.
-       */
-      void timesToShape(const std::vector <double> & times, float* shape);
-
-      /**
        * Calculate StripHit times (at the end of the strip),
        * @param[in] Number of photoelectrons.
        * @param[in] Time of the SimHit.
        * @param[in] If the hit is direct or reflected.
+       * @param[out] hist Histogram.
        * @return Vector of hit times.
        */
-      std::vector<double> hitTimes(int nPE, double timeShift,
-                                   bool isReflected = true);
+      void fillAmplitude(int nPE, double timeShift, bool isReflected,
+                         float* hist);
 
       /**
        * Get delay depending on the distance to the hit.
@@ -161,9 +155,6 @@ namespace Belle2 {
        * Debug output (signal and fit result histograms).
        */
       void debugOutput();
-
-      /** Minimal hit time. */
-      double m_min_time;
 
     };
 

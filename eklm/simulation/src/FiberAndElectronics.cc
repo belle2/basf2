@@ -83,11 +83,11 @@ void EKLM::FiberAndElectronics::processEntry()
 
 
     // fill histograms
-    timesToShape(hitTimes(gRandom->Poisson(nPEmean), (*iHit)->getTime(),
-                          false), m_amplitudeDirect);
+    fillAmplitude(gRandom->Poisson(nPEmean), (*iHit)->getTime(),
+                  false, m_amplitudeDirect);
     if (m_digPar->mirrorReflectiveIndex > 0)
-      timesToShape(hitTimes(gRandom->Poisson(nPEmean), (*iHit)->getTime(),
-                            true), m_amplitudeReflected);
+      fillAmplitude(gRandom->Poisson(nPEmean), (*iHit)->getTime(),
+                    true, m_amplitudeReflected);
 
   }
 
@@ -153,53 +153,34 @@ double  EKLM::FiberAndElectronics::distanceAttenuation(double dist)
   return exp(-dist / m_digPar->attenuationLength);
 }
 
-std::vector<double> EKLM::FiberAndElectronics::hitTimes(int nPE, double timeShift,
-                                                        bool isReflected)
+void EKLM::FiberAndElectronics::fillAmplitude(int nPE, double timeShift,
+                                              bool isReflected, float* hist)
 {
-  std::vector <double> hitTimesVector;
-  // start selection procedure
-  m_min_time = 100000000.;
-  for (int i = 0; i < nPE; i++) {
-    double cosTheta = gRandom->Uniform(m_digPar->minCosTheta, 1);
-    double hitDist;
+  int i;
+  int j;
+  double hitTime;
+  double deExcitationTime;
+  double cosTheta;
+  double hitDist;
+  for (i = 0; i < nPE; i++) {
+    cosTheta = gRandom->Uniform(m_digPar->minCosTheta, 1);
     if (!isReflected)
       hitDist = m_hitDist.first / cosTheta;
     else
       hitDist = m_hitDist.second / cosTheta;
-
-    // drop lightflashes which was captured by fiber
+    /* Drop lightflashes which were captured by fiber */
     if (gRandom->Uniform() > distanceAttenuation(hitDist))
       continue;
-
-    // account for mirror reflective index
+    /* Account for mirror reflective index. */
     if (isReflected)
       if (gRandom->Uniform() > m_digPar->mirrorReflectiveIndex)
         continue;
-
-
-    // Scintillator de-excitation time  && Fiber  de-excitation time
-    double deExcitationTime = gRandom->Exp(m_digPar->scintillatorDeExcitationTime)
-                              + gRandom->Exp(m_digPar->fiberDeExcitationTime);
-    double hitTime = lightPropagationTime(hitDist) + deExcitationTime +
-                     timeShift;
-    // std::cout<<"TRMPORARY BUG IN EKLMFiberAndElectronics.cc"<<std::endl;
-//       double hitTime = lightPropagationTime(hitDist) + timeShift;
-
-    hitTimesVector.push_back(hitTime);
-    if (hitTime < m_min_time)
-      m_min_time = hitTime;
+    deExcitationTime = gRandom->Exp(m_digPar->scintillatorDeExcitationTime) +
+                       gRandom->Exp(m_digPar->fiberDeExcitationTime);
+    hitTime = lightPropagationTime(hitDist) + deExcitationTime + timeShift;
+    for (j = 0; j < m_digPar->nDigitizations; j++)
+      hist[j] = hist[j] + signalShape(j * m_digPar->ADCSamplingTime - hitTime);
   }
-  return hitTimesVector;
-}
-
-void EKLM::FiberAndElectronics::timesToShape(const std::vector <double> & times,
-                                             float* shape)
-{
-  int i;
-  for (std::vector<double>::const_iterator t = times.begin();
-       t != times.end(); t++)
-    for (i = 0; i < m_digPar->nDigitizations; i++)
-      shape[i] = shape[i] + signalShape(i * m_digPar->ADCSamplingTime - *t);
 }
 
 void EKLM::FiberAndElectronics::simulateADC()

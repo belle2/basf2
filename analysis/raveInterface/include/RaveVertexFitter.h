@@ -18,8 +18,7 @@
 #include <string>
 
 //root
-#include <TMath.h>
-
+#include <Math/ProbFunc.h>
 //Genfit
 #include <GFTrack.h>
 #include <GFRaveVertex.h>
@@ -73,7 +72,7 @@ namespace Belle2 {
       /** get the p value of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
       double getPValue(std::vector<int>::size_type vertexId = 0) {
         if (m_GFRaveVertices.size() == 0) {
-          return TMath::Prob(m_GFRaveVertices[vertexId]->getChi2(), int(m_GFRaveVertices[vertexId]->getNdf() + 0.5));
+          return ROOT::Math::chisquared_cdf_c(m_GFRaveVertices[vertexId]->getChi2(), m_GFRaveVertices[vertexId]->getNdf());
         } else if (vertexId < m_GFRaveVertices.size()) {
           B2ERROR("There is no fitted Vertex. Maybe you did not call fit() or maybe the fit was not successful");
           throw;

@@ -45,10 +45,11 @@
 #include <GFMaterialEffects.h>
 #include <GFTGeoMaterialInterface.h>
 #include <GFException.h>
-
+//root stuff
 #include <TMatrixDEigen.h>
 #include <TGeoManager.h>
 #include <TDecompSVD.h>
+#include <Math/ProbFunc.h>
 //C++ st libs
 #include <cmath>
 #include <limits>
@@ -358,10 +359,10 @@ void TrackFitCheckerModule::event()
     }
     // first part: get variables describing the hole track
     const double chi2tot_fu = aTrackPtr->getForwardChiSqu();
-    const int ndf = aTrackPtr->getNDF();
-    const double pValue_bu = TMath::Prob(chi2tot_bu, ndf);
+    const double ndf = aTrackPtr->getNDF();
+    const double pValue_bu = ROOT::Math::chisquared_cdf_c(chi2tot_bu, ndf);
     B2DEBUG(100, "p value of fitted track " << i << " is " << pValue_bu);
-    const double pValue_fu = TMath::Prob(chi2tot_fu, ndf);
+    const double pValue_fu = ROOT::Math::chisquared_cdf_c(chi2tot_fu, ndf);
     fillTrackWiseData("pValue_bu", pValue_bu);
     fillTrackWiseData("pValue_fu", pValue_fu);
     fillTrackWiseData("chi2tot_bu", chi2tot_bu);

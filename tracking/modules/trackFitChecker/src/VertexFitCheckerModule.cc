@@ -9,7 +9,7 @@
 #include <generators/dataobjects/MCParticle.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 #include <tracking/modules/trackFitChecker/TrackFitCheckerModule.h>
-
+//Genfit stuff
 #include <GFTrack.h>
 #include <GFException.h>
 #include <GFTrackCand.h>
@@ -21,11 +21,13 @@
 #include <GFRaveVertexFactory.h>
 #include <GFRaveVertex.h>
 #include <GFTGeoMaterialInterface.h>
-
+//root stuff
 #include <TVector3.h>
 #include <TMatrixD.h>
 #include <TGeoManager.h>
+#include <Math/ProbFunc.h>
 
+//C++ std stuff
 #include <iostream>
 #include <cmath>
 
@@ -167,8 +169,8 @@ void VertexFitCheckerModule::event()
 
     const GFRaveVertex* aGFRaveVertexPtr = vertices[iVertex];
     const double chi2 = aGFRaveVertexPtr->getChi2();
-    const int ndf = int(aGFRaveVertexPtr->getNdf() + 0.5); //maybe better to look for a lib that can caculate p values from non integer NDFs
-    const double pValue = TMath::Prob(chi2, ndf);
+    const double ndf = aGFRaveVertexPtr->getNdf();
+    const double pValue = ROOT::Math::chisquared_cdf_c(chi2, ndf);
 //    cout << "chi2,ndf,p: " << chi2 << " " << ndf << " " << pValue << endl;
     if (pValue < m_vertexPValueCut) {
       ++m_badVertexPValueVertices;

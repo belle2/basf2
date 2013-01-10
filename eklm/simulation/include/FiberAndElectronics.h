@@ -15,6 +15,7 @@
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/geometry/TransformData.h>
+#include <eklm/simulation/Digitizer.h>
 #include <eklm/simulation/FPGAFitter.h>
 
 namespace Belle2 {
@@ -32,7 +33,8 @@ namespace Belle2 {
        * Constructor.
        */
       FiberAndElectronics(std::pair <int, std::vector<EKLMSimHit*> >,
-                          struct EKLM::TransformData* transf);
+                          struct EKLM::TransformData* transf,
+                          struct EKLM::DigitizationParams* digPar);
 
       /**
        * Destructor.
@@ -60,6 +62,12 @@ namespace Belle2 {
 
       /** Transformation data. */
       struct EKLM::TransformData* m_transf;
+
+      /** Parameters. */
+      struct EKLM::DigitizationParams* m_digPar;
+
+      /** Stands for nDigitizations*ADCSamplingTime. */
+      double m_histRange;
 
       /** Analog amplitude (direct). */
       float* m_amplitudeDirect;
@@ -93,73 +101,6 @@ namespace Belle2 {
 
       /** Name of the strip. */
       std::string m_stripName;
-
-      /**
-       * Filename prefix for files saved.
-       * Each file containes digitizedAmplitudeDirect
-       * digitizedAmplitudeReflected and digitizedAmplitude
-       * histograms as well as fitFunction with fit results.
-       * Empty string means no file should be saved.
-       */
-      std::string m_outputFilename;
-
-      /**
-       * Number of ADC digitization steps.
-       * @details
-       * Should be accessible via XML.
-       */
-      int m_nDigitizations;
-
-      /** ADC conversion time. */
-      int m_ADCSamplingTime;
-
-      /** Stands for m_nDigitizations*m_ADCSamplingTime. */
-      double m_histRange;
-
-      /** Speed pf light in fiber. */
-      double m_lightSpeed;
-
-      /** Attenuation length in fiber. */
-      double m_attenuationLength;
-
-      /** Exponent coefficient. */
-      double m_expCoefficient;
-
-      /**
-       * Minimal values of cos(Theta), (corresponds to maximal Theta)
-       * allowing light transmission through fiber.
-       * @details
-       * Should be accessible via XML.
-       */
-      double  m_minCosTheta;
-
-      /** Number of p.e. emitted in fiber per 1 MeV  --> to be tuned. */
-      double m_nPEperMeV;
-
-      /** Mirror reflective index. */
-      double m_mirrorReflectiveIndex;
-
-      /** Mean SiPM noise. */
-      double m_meanSiPMNoise;
-
-      /**
-       * If zero fix constant background fraction to zero.
-       */
-      int m_enableConstBkg;
-
-      /** Deexcitation time for scintillator (unit=ns). */
-      double m_scintillatorDeExcitationTime;
-
-
-      /** Deexcitation time for fiber (unit=ns). */
-      double m_fiberDeExcitationTime;
-
-      /**
-       * Speed of the first photoelectoron.
-       * @details
-       * Used to calculate distance from SiPm to the Hit using time delay.
-       */
-      double m_firstPhotonlightSpeed;
 
       /**
        * Convert time to the histogram.

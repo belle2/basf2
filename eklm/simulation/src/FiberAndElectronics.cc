@@ -27,43 +27,29 @@ static const char MemErr[] = "Memory allocation error.";
 
 EKLM::FiberAndElectronics::FiberAndElectronics(
   std::pair < int, std::vector<EKLMSimHit*> > entry,
-  struct EKLM::TransformData* transf)
+  struct EKLM::TransformData* transf,
+  struct EKLM::DigitizationParams* digPar)
 {
-  // get information from Gearbox
-  GearDir Digitizer = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Digitizer");
-  m_ADCSamplingTime = Digitizer.getInt("ADCSamplingTime");
-  m_nDigitizations = Digitizer.getInt("NDigitizations");
-  m_nPEperMeV = Digitizer.getDouble("NPEperMeV");
-  m_minCosTheta = cos(Digitizer.getAngle("MaxTheta"));
-  m_mirrorReflectiveIndex = Digitizer.getDouble("MirrorReflectiveIndex");
-  m_scintillatorDeExcitationTime = Digitizer.getDouble("ScintillatorDeExcitationTime");
-  m_fiberDeExcitationTime = Digitizer.getDouble("FiberDeExcitationTime");
-  m_outputFilename = Digitizer.getString("OutputFile");
-  m_firstPhotonlightSpeed = Digitizer.getDouble("FirstPhotonSpeed");
-  m_attenuationLength = Digitizer.getLength("AttenuationLength");
-  m_expCoefficient = Digitizer.getDouble("SignalShapeExpCoefficient");
-  m_meanSiPMNoise = Digitizer.getDouble("BackgroundPoissonMean");
-  m_enableConstBkg = Digitizer.getInt("EnableConstantBackgroundInTheFit");
-
+  m_digPar = digPar;
   m_stripName = "Strip" + boost::lexical_cast<std::string>(entry.first);
 
-  m_histRange = m_nDigitizations * m_ADCSamplingTime;
+  m_histRange = m_digPar->nDigitizations * m_digPar->ADCSamplingTime;
 
   /* Amplitude arrays. */
-  m_amplitudeDirect = (float*)calloc(m_nDigitizations, sizeof(float));
+  m_amplitudeDirect = (float*)calloc(m_digPar->nDigitizations, sizeof(float));
   if (m_amplitudeDirect == NULL)
     B2FATAL(MemErr);
-  m_amplitudeReflected = (float*)calloc(m_nDigitizations,
+  m_amplitudeReflected = (float*)calloc(m_digPar->nDigitizations,
                                         sizeof(float));
   if (m_amplitudeReflected == NULL)
     B2FATAL(MemErr);
-  m_amplitude = (float*)calloc(m_nDigitizations, sizeof(float));
+  m_amplitude = (float*)calloc(m_digPar->nDigitizations, sizeof(float));
   if (m_amplitude == NULL)
     B2FATAL(MemErr);
-  m_ADCAmplitude = (int*)calloc(m_nDigitizations, sizeof(int));
+  m_ADCAmplitude = (int*)calloc(m_digPar->nDigitizations, sizeof(int));
   if (m_ADCAmplitude == NULL)
     B2FATAL(MemErr);
-  m_ADCFit = (float*)calloc(m_nDigitizations, sizeof(float));
+  m_ADCFit = (float*)calloc(m_digPar->nDigitizations, sizeof(float));
   if (m_ADCFit == NULL)
     B2FATAL(MemErr);
 
@@ -93,33 +79,33 @@ void EKLM::FiberAndElectronics::processEntry()
 
 
     // Poisson mean for # of p.e.
-    double nPEmean = (*iHit)->getEDep() * m_nPEperMeV;
+    double nPEmean = (*iHit)->getEDep() * m_digPar->nPEperMeV;
 
 
     // fill histograms
     timesToShape(hitTimes(gRandom->Poisson(nPEmean), (*iHit)->getTime(),
                           false), m_amplitudeDirect);
-    if (m_mirrorReflectiveIndex > 0)
+    if (m_digPar->mirrorReflectiveIndex > 0)
       timesToShape(hitTimes(gRandom->Poisson(nPEmean), (*iHit)->getTime(),
                             true), m_amplitudeReflected);
 
   }
 
   // sum up histograms
-  for (i = 0; i < m_nDigitizations; i++) {
+  for (i = 0; i < m_digPar->nDigitizations; i++) {
     m_amplitude[i] = m_amplitudeDirect[i];
-    if (m_mirrorReflectiveIndex > 0)
+    if (m_digPar->mirrorReflectiveIndex > 0)
       m_amplitude[i] = m_amplitude[i] + m_amplitudeReflected[i];
   }
 
   /* SiPM noise and ADC. */
-  if (m_meanSiPMNoise > 0)
+  if (m_digPar->meanSiPMNoise > 0)
     addRandomSiPMNoise();
   simulateADC();
 
   /* Fit. */
-  m_FPGAParams.bgAmplitude = (double)m_enableConstBkg;
-  m_FPGAStat = FPGAFit(m_ADCAmplitude, m_ADCFit, m_nDigitizations,
+  m_FPGAParams.bgAmplitude = (double)m_digPar->enableConstBkg;
+  m_FPGAStat = FPGAFit(m_ADCAmplitude, m_ADCFit, m_digPar->nDigitizations,
                        &m_FPGAParams);
   if (m_FPGAStat != c_FPGASuccessfulFit)
     return;
@@ -128,15 +114,15 @@ void EKLM::FiberAndElectronics::processEntry()
    * FPGA fitter now uses units: time = ADC conversion time,
    *                             amplitude = amplitude * 0.5 * ADCRange.
    */
-  m_FPGAParams.startTime = m_FPGAParams.startTime * m_ADCSamplingTime;
-  m_FPGAParams.peakTime = m_FPGAParams.peakTime * m_ADCSamplingTime;
+  m_FPGAParams.startTime = m_FPGAParams.startTime * m_digPar->ADCSamplingTime;
+  m_FPGAParams.peakTime = m_FPGAParams.peakTime * m_digPar->ADCSamplingTime;
   m_FPGAParams.attenuationFreq = m_FPGAParams.attenuationFreq /
-                                 m_ADCSamplingTime;
+                                 m_digPar->ADCSamplingTime;
   m_FPGAParams.amplitude = m_FPGAParams.amplitude * 2 / ADCRange;
   m_FPGAParams.bgAmplitude = m_FPGAParams.bgAmplitude * 2 / ADCRange;
-  if (m_outputFilename.size() == 0)
+  if (!m_digPar->debug)
     return;
-  /*********************** DEBUG OUTPUT ************************** */
+  /*********************** DEBUG OUTPUT ***************************/
   TH1D* histAmplitudeDirect;
   TH1D* histAmplitudeReflected;
   TH1D* histAmplitude;
@@ -145,50 +131,46 @@ void EKLM::FiberAndElectronics::processEntry()
   try {
     histAmplitudeDirect =
       new TH1D("histAmplitudeDirect", m_stripName.c_str(),
-               m_nDigitizations, 0, m_histRange);
+               m_digPar->nDigitizations, 0, m_histRange);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
   try {
     histAmplitudeReflected =
       new TH1D("histAmplitudeReflected", m_stripName.c_str(),
-               m_nDigitizations, 0, m_histRange);
+               m_digPar->nDigitizations, 0, m_histRange);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
   try {
     histAmplitude =
       new TH1D("histAmplitude", m_stripName.c_str(),
-               m_nDigitizations, 0, m_histRange);
+               m_digPar->nDigitizations, 0, m_histRange);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
   try {
     histADCAmplitude =
       new TH1D("histADCAmplitude", m_stripName.c_str(),
-               m_nDigitizations, 0, m_histRange);
+               m_digPar->nDigitizations, 0, m_histRange);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
   try {
     histADCFit =
       new TH1D("histADCFit", m_stripName.c_str(),
-               m_nDigitizations, 0, m_histRange);
+               m_digPar->nDigitizations, 0, m_histRange);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  for (i = 0; i < m_nDigitizations; i++) {
+  for (i = 0; i < m_digPar->nDigitizations; i++) {
     histAmplitudeDirect->SetBinContent(i + 1, m_amplitudeDirect[i]);
     histAmplitudeReflected->SetBinContent(i + 1, m_amplitudeReflected[i]);
     histAmplitude->SetBinContent(i + 1, m_amplitude[i]);
     histADCAmplitude->SetBinContent(i + 1, m_ADCAmplitude[i]);
     histADCFit->SetBinContent(i + 1, m_ADCFit[i]);
   }
-  const char* info = (std::string("Histograms will be saved with ") +
-                      m_outputFilename +
-                      std::string(" prefix. To switch it off change OutputFile parameter in EKLM.xml to void")).c_str();
-  B2INFO(info);
-  std::string filename = m_outputFilename + m_stripName +
+  std::string filename = m_stripName +
                          boost::lexical_cast<std::string>(gRandom->Integer(10000000)) + ".root";
   TFile* hfile;
   try {
@@ -218,20 +200,20 @@ void EKLM::FiberAndElectronics::lightPropagationDistance(EKLMSimHit* sh)
 void EKLM::FiberAndElectronics::addRandomSiPMNoise()
 {
   int i;
-  for (i = 0; i < m_nDigitizations; i++)
-    m_amplitude[i] = m_amplitude[i] + gRandom->Poisson(m_meanSiPMNoise);
+  for (i = 0; i < m_digPar->nDigitizations; i++)
+    m_amplitude[i] = m_amplitude[i] + gRandom->Poisson(m_digPar->meanSiPMNoise);
 }
 
 double EKLM::FiberAndElectronics::signalShape(double t)
 {
   if (t > 0)
-    return exp(-m_expCoefficient * t);
+    return exp(-m_digPar->expCoefficient * t);
   return 0;
 }
 
 double  EKLM::FiberAndElectronics::distanceAttenuation(double dist)
 {
-  return exp(-dist / m_attenuationLength);
+  return exp(-dist / m_digPar->attenuationLength);
 }
 
 std::vector<double> EKLM::FiberAndElectronics::hitTimes(int nPE, double timeShift,
@@ -241,7 +223,7 @@ std::vector<double> EKLM::FiberAndElectronics::hitTimes(int nPE, double timeShif
   // start selection procedure
   m_min_time = 100000000.;
   for (int i = 0; i < nPE; i++) {
-    double cosTheta = gRandom->Uniform(m_minCosTheta, 1);
+    double cosTheta = gRandom->Uniform(m_digPar->minCosTheta, 1);
     double hitDist;
     if (!isReflected)
       hitDist = m_hitDist.first / cosTheta;
@@ -254,13 +236,13 @@ std::vector<double> EKLM::FiberAndElectronics::hitTimes(int nPE, double timeShif
 
     // account for mirror reflective index
     if (isReflected)
-      if (gRandom->Uniform() > m_mirrorReflectiveIndex)
+      if (gRandom->Uniform() > m_digPar->mirrorReflectiveIndex)
         continue;
 
 
     // Scintillator de-excitation time  && Fiber  de-excitation time
-    double deExcitationTime = gRandom->Exp(m_scintillatorDeExcitationTime)
-                              + gRandom->Exp(m_fiberDeExcitationTime);
+    double deExcitationTime = gRandom->Exp(m_digPar->scintillatorDeExcitationTime)
+                              + gRandom->Exp(m_digPar->fiberDeExcitationTime);
     double hitTime = lightPropagationTime(hitDist) + deExcitationTime +
                      timeShift;
     // std::cout<<"TRMPORARY BUG IN EKLMFiberAndElectronics.cc"<<std::endl;
@@ -279,20 +261,20 @@ void EKLM::FiberAndElectronics::timesToShape(const std::vector <double> & times,
   int i;
   for (std::vector<double>::const_iterator t = times.begin();
        t != times.end(); t++)
-    for (i = 0; i < m_nDigitizations; i++)
-      shape[i] = shape[i] + signalShape(i * m_ADCSamplingTime - *t);
+    for (i = 0; i < m_digPar->nDigitizations; i++)
+      shape[i] = shape[i] + signalShape(i * m_digPar->ADCSamplingTime - *t);
 }
 
 void EKLM::FiberAndElectronics::simulateADC()
 {
   int i;
-  for (i = 0; i < m_nDigitizations; i++)
+  for (i = 0; i < m_digPar->nDigitizations; i++)
     m_ADCAmplitude[i] = (int)(0.5 * ADCRange * m_amplitude[i]);
 }
 
 double EKLM::FiberAndElectronics::lightPropagationTime(double L)
 {
-  return L / m_firstPhotonlightSpeed;
+  return L / m_digPar->firstPhotonlightSpeed;
 }
 
 struct EKLM::FPGAFitParams* EKLM::FiberAndElectronics::getFitResults() {

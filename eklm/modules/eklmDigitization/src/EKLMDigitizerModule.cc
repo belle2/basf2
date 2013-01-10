@@ -8,9 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* System headers. */
+#include <math.h>
+
 /* Belle2 headers. */
 #include <eklm/modules/eklmDigitization/EKLMDigitizerModule.h>
-#include <eklm/simulation/Digitizer.h>
 #include <framework/core/ModuleManager.h>
 
 using namespace Belle2;
@@ -24,6 +26,9 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module()
   addParam("DiscriminatorThreshold", m_discriminatorThreshold,
            "Strip hits with npe lower this value will be marked as bad",
            double(7.));
+  addParam("Debug", m_digPar.debug,
+           "Debug mode (generates additional output files with histograms).",
+           bool(false));
 }
 
 EKLMDigitizerModule::~EKLMDigitizerModule()
@@ -37,19 +42,28 @@ void EKLMDigitizerModule::initialize()
   if (EKLM::readTransforms(&m_transf) != 0)
     B2FATAL("Cannot read transformation data file.");
   EKLM::transformsToGlobal(&m_transf);
-  B2INFO("EKLMDigitizationModule initialized");
+  /* Fill digitization parameters. */
+  m_digPar.ADCSamplingTime = 1.0;
+  m_digPar.nDigitizations = 200;
+  m_digPar.nPEperMeV = 200.0;
+  m_digPar.minCosTheta = cos(26.7 / 180.0 * M_PI);
+  m_digPar.mirrorReflectiveIndex = 0.95;
+  m_digPar.scintillatorDeExcitationTime = 3.0;
+  m_digPar.fiberDeExcitationTime = 10.0;
+  m_digPar.firstPhotonlightSpeed = 17.0;
+  m_digPar.attenuationLength = 300.0;
+  m_digPar.expCoefficient = 3.0;
+  m_digPar.meanSiPMNoise = -1;
+  m_digPar.enableConstBkg = false;
 }
 
 void EKLMDigitizerModule::beginRun()
 {
-  B2DEBUG(1, "EKLMDigitizationModule : beginRun");
 }
 
 void EKLMDigitizerModule::event()
 {
-  B2DEBUG(1, "EKLMDigitizationModule : event");
-  B2DEBUG(1, " START DIGITIZATION");
-  EKLM::Digitizer digi(&m_transf);
+  EKLM::Digitizer digi(&m_transf, &m_digPar);
   digi.readAndSortStepHits();
   digi.makeSimHits();
   digi.readAndSortSimHits();

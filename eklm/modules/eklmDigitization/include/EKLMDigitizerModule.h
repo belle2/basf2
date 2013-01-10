@@ -14,6 +14,7 @@
 /* Belle2 headers. */
 #include <framework/core/Module.h>
 #include <eklm/geometry/TransformData.h>
+#include <eklm/simulation/Digitizer.h>
 
 namespace Belle2 {
 
@@ -61,7 +62,6 @@ namespace Belle2 {
      */
     virtual void terminate();
 
-  protected:
   private:
 
     /** Strip hits with npe lower this value will be marked as bad. */
@@ -70,7 +70,12 @@ namespace Belle2 {
     /** Transformation data. */
     struct EKLM::TransformData m_transf;
 
+    /** Digitization parameters. */
+    struct EKLM::DigitizationParams m_digPar;
+
   };
-} // end namespace Belle2
+
+}
+
 #endif
 

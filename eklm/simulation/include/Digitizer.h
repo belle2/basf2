@@ -30,7 +30,66 @@ namespace Belle2 {
   namespace EKLM {
 
     /**
-     * Digitize EKLMSimHits  to get EKLM StripHits.
+     * @struct DigitizationParams.
+     * @brief Digitization parameters.
+     *
+     * @var DigitizationParams::ADCSamplingTime
+     * ADC conversion time, ns.
+     *
+     * @var DigitizationParams::nDigitizations
+     * Number of digitizations (points) in one sample.
+     *
+     * @var DigitizationParams::nPEperMeV
+     * Number of photoelectrons / 1 MeV.
+     *
+     * @var DigitizationParams::minCosTheta
+     * Cosine of maximal light capture angle (by fiber).
+     *
+     * @var DigitizationParams::mirrorReflectiveIndex
+     * Mirror reflective index.
+     *
+     * @var DigitizationParams::scintillatorDeExcitationTime
+     * Scintillator deexcitation time, ns.
+     *
+     * @var DigitizationParams::fiberDeExcitationTime
+     * Fiber deexcitation time, ns.
+     *
+     * @var DigitizationParams::firstPhotonlightSpeed
+     * Speed of light in fiber, cm/ns.
+     *
+     * @var DigitizationParams::attenuationLength
+     * Attenuation length in fiber, cm.
+     *
+     * @var DigitizationParams::expCoefficient
+     * Exponent coefficient for a single photoelectron shape.
+     *
+     * @var DigitizationParams::meanSiPMNoise
+     * Mean for SiPM backgrouns. If zero or negative no backgrounds are added.
+     *
+     * @var DigitizationParams::enableConstBkg
+     * Enable background in fitting.
+     *
+     * @var DigitizationParams::debug
+     * Debug mode (generates additional output files with histograms).
+     */
+    struct DigitizationParams {
+      double ADCSamplingTime;
+      int nDigitizations;
+      double nPEperMeV;
+      double minCosTheta;
+      double mirrorReflectiveIndex;
+      double scintillatorDeExcitationTime;
+      double fiberDeExcitationTime;
+      double firstPhotonlightSpeed;
+      double attenuationLength;
+      double expCoefficient;
+      double meanSiPMNoise;
+      bool enableConstBkg;
+      bool debug;
+    };
+
+    /**
+     * Digitize EKLMSimHits to get EKLM StripHits.
      * @details
      * Usually called by eklmDigitizerModule.
      */
@@ -41,7 +100,8 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      Digitizer(struct EKLM::TransformData* transf);
+      Digitizer(struct EKLM::TransformData* transf,
+                struct EKLM::DigitizationParams* digPar);
 
       /**
        * Destructor.
@@ -64,7 +124,7 @@ namespace Belle2 {
       void readAndSortSimHits();
 
       /**
-       * Merges hits from the same strip. Create EKLMDigits.
+       * Merge hits from the same strip. Create EKLMDigits.
        */
       void mergeSimHitsToStripHits(double);
 
@@ -72,6 +132,9 @@ namespace Belle2 {
 
       /** Transformation data. */
       struct EKLM::TransformData* m_transf;
+
+      /** Parameters. */
+      struct EKLM::DigitizationParams* m_digPar;
 
       /** Map for EKLMStepHit sorting according sensitive volumes. */
       std::map<int, std::vector<EKLMStepHit*> > m_stepHitVolumeMap;

@@ -17,6 +17,12 @@
 
 #include <TDatabasePDG.h>
 
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLGamma.h>
+#include <ecl/dataobjects/ECLPi0.h>
+#include <generators/dataobjects/MCParticle.h>
+#include <tracking/dataobjects/Track.h>
+
 using namespace Belle2;
 
 // Constructors - START
@@ -69,7 +75,7 @@ Particle::Particle(const Track* track, const unsigned index, const int pdgCode) 
   // construct 4-momentum from measured 3-momentum
   // and assigned mass hypothesis
   TLorentzVector momentum;
-  momentum.SetXYZM(track->getMomentum().Px(), track->getMomentum().Py(), track->getMomentum().Pz(), pdgMass);
+  momentum.SetVectM(track->getMomentum(), pdgMass);
   set4Vector(momentum);
 
   // fill the error matrix
@@ -158,22 +164,20 @@ Particle::Particle(const ECLGamma* gamma) :
   // set the error matrix
   resetErrorMatrix();
 
-  TMatrixFSym momErrMatrix;
-  momErrMatrix.ResizeTo(C_MOMENTUM_ERROR_MATRIX_DIMENSION, C_MOMENTUM_ERROR_MATRIX_DIMENSION);
+  TMatrixFSym momErrMatrix(C_MOMENTUM_ERROR_MATRIX_DIMENSION);
   // obtain the 4x4 momentum error matrix
   gamma->getErrorMatrix(momErrMatrix);
 
-  TMatrixFSym fullErrMatrix;
-  fullErrMatrix.ResizeTo(C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION, C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION);
+  TMatrixFSym fullErrMatrix(C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION);
   fullErrMatrix.SetSub(0, momErrMatrix);
 
   // set the (sigma_x)^2, (sigma_y)^2, (sigma_z)^2
   // to arbitrary large values
   // TODO: Obtain the values from ECL group (via xml file or something like this), but hard coded values need to be avoided!
   // TODO: check units!!!!????
-  fullErrMatrix[4][4] = 0.0001;
-  fullErrMatrix[5][5] = 0.0001;
-  fullErrMatrix[6][6] = 0.0001;
+  fullErrMatrix(4, 4) = 0.0001;
+  fullErrMatrix(5, 5) = 0.0001;
+  fullErrMatrix(6, 6) = 0.0001;
 
   // Note that all other elements are set to 0.0
   fillErrorMatrix(fullErrMatrix);
@@ -202,22 +206,20 @@ Particle::Particle(const ECLPi0* pi0) :
 
   // TODO: Uncomment once ECLPi0 provides error matrix
   /*
-  TMatrixFSym momErrMatrix;
-  momErrMatrix.ResizeTo(C_MOMENTUM_ERROR_MATRIX_DIMENSION, C_MOMENTUM_ERROR_MATRIX_DIMENSION);
+  TMatrixFSym momErrMatrix(C_MOMENTUM_ERROR_MATRIX_DIMENSION);
   // obtain the 4x4 momentum error matrix
   pi0->getErrorMatrix(momErrMatrix);
 
-  TMatrixFSym fullErrMatrix;
-  fullErrMatrix.ResizeTo(C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION, C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION);
+  TMatrixFSym fullErrMatrix(C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION);
   fullErrMatrix.SetSub(0, momErrMatrix);
 
   // set the (sigma_x)^2, (sigma_y)^2, (sigma_z)^2
   // to arbitrary large values
   // TODO: Obtain the values from ECL group (via xml file or something like this), but hard coded values need to be avoided!
   // TODO: check units!!!!????
-  fullErrMatrix[4][4] = 0.0001;
-  fullErrMatrix[5][5] = 0.0001;
-  fullErrMatrix[6][6] = 0.0001;
+  fullErrMatrix(4,4) = 0.0001;
+  fullErrMatrix(5,5) = 0.0001;
+  fullErrMatrix(6,6) = 0.0001;
 
   // Note that all other elements are set to 0.0
   fillErrorMatrix(fullErrorMatrix);
@@ -253,60 +255,17 @@ void Particle::setMomentumVertexErrorMatrix(const TMatrixFSym& m)
   // evrything is OK, so fill the matrix
   fillErrorMatrix(m);
 }
-
-void Particle::setMomentumErrorMatrix(const TMatrixFSym& m_mom)
-{
-  // the block for position and correlation between
-  // position and error is set to 0
-  resetErrorMatrix();
-
-  // check if provided Error Matrix is of dimension 4x4
-  // if not, reset the error matrix and print warning
-  if (m_mom.GetNrows() != C_MOMENTUM_ERROR_MATRIX_DIMENSION || m_mom.GetNcols() != C_MOMENTUM_ERROR_MATRIX_DIMENSION) {
-    B2WARNING("Wrong Momentum  Error Matrix dimension. It should be 4x4 symetric matrix!");
-    return;
-  }
-
-  // resize 4x4 error matrix to 7x7 error matrix
-  TMatrixFSym m_full;
-  m_full.ResizeTo(C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION, C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION);
-  m_full.SetSub(0, m_mom);
-
-  fillErrorMatrix(m_full);
-}
-
-void Particle::setVertexErrorMatrix(const TMatrixFSym& m_pos)
-{
-  // the block for momentum and correlation between
-  // position and momentum is set to 0
-  resetErrorMatrix();
-
-  // check if provided Error Matrix is of dimension 3x3
-  // if not, reset the error matrix and print warning
-  if (m_pos.GetNrows() != C_POSITION_ERROR_MATRIX_DIMENSION || m_pos.GetNcols() != C_POSITION_ERROR_MATRIX_DIMENSION) {
-    B2WARNING("Wrong Position  Error Matrix dimension. It should be 3x3 symetric matrix!");
-    return;
-  }
-
-  // resize 3x3 error matrix to 7x7 error matrix
-  TMatrixFSym m_full;
-  m_full.ResizeTo(C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION, C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION);
-  m_full.SetSub(4, m_pos);
-
-  fillErrorMatrix(m_full);
-}
 // Setters - END
 
 // Getters - START
 TMatrixFSym Particle::getMomentumVertexErrorMatrix() const
 {
-  TMatrixFSym m;
-  m.ResizeTo(C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION, C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION);
+  TMatrixFSym m(C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION);
 
   int element = 0;
   for (int irow = 0; irow < C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION; irow++) {
     for (int icol = irow; icol < C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION; icol++) {
-      m[irow][icol] = m[icol][irow] = m_momentumPositionError[element];
+      m(irow, icol) = m(icol, irow) = m_momentumPositionError[element];
       element++;
     }
   }
@@ -371,14 +330,22 @@ const std::vector<Belle2::Particle*> Particle::getDaughters() const
 {
   fixParticleList();
 
-  std::vector<Particle*> daughters;
+  std::vector<Particle*> daughters(getNDaughters());
   for (unsigned i = 0; i < getNDaughters(); i++)
-    daughters.push_back(static_cast<Particle*>(m_plist->At(m_daughterIndices[i])));
+    daughters[i] = static_cast<Particle*>(m_plist->At(m_daughterIndices[i]));
 
   return daughters;
 }
 
-void Particle::getFinalStateDaughters(std::vector<const Belle2::Particle*> &fspDaughters) const
+const std::vector<const Belle2::Particle*> Particle::getFinalStateDaughters() const
+{
+  std::vector<const Particle*> fspDaughters;
+  fillFSPDaughters(fspDaughters);
+
+  return fspDaughters;
+}
+
+void Particle::fillFSPDaughters(std::vector<const Belle2::Particle*> &fspDaughters) const
 {
   // this is FSP
   if (getNDaughters() == 0) {
@@ -388,7 +355,7 @@ void Particle::getFinalStateDaughters(std::vector<const Belle2::Particle*> &fspD
 
   // this is not FSP (go one level down)
   for (unsigned i = 0; i < getNDaughters(); i++)
-    getDaughter(i)->getFinalStateDaughters(fspDaughters);
+    getDaughter(i)->fillFSPDaughters(fspDaughters);
 }
 
 // Getters - END
@@ -421,11 +388,8 @@ void Particle::removeDaughter(const Particle* daughter)
 bool Particle::overlapsWith(const Particle* oParticle) const
 {
   // obtain vectors of daughter final state particles
-  std::vector<const Particle*> thisFSPs;
-  std::vector<const Particle*> otherFSPs;
-
-  this->getFinalStateDaughters(thisFSPs);
-  oParticle->getFinalStateDaughters(otherFSPs);
+  std::vector<const Particle*> thisFSPs  = this->getFinalStateDaughters();
+  std::vector<const Particle*> otherFSPs = oParticle->getFinalStateDaughters();
 
   // check if they share any of the FSPs
   for (unsigned tFSP = 0; tFSP < thisFSPs.size(); tFSP++)
@@ -444,12 +408,12 @@ void  Particle::resetErrorMatrix()
     m_momentumPositionError[i] = 0.0;
 }
 
-void  Particle::fillErrorMatrix(TMatrixFSym m)
+void  Particle::fillErrorMatrix(const TMatrixFSym& m)
 {
   int element = 0;
   for (int irow = 0; irow < C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION; irow++) {
     for (int icol = irow; icol < C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION; icol++) {
-      m_momentumPositionError[element] = m[irow][icol];
+      m_momentumPositionError[element] = m(irow, icol);
       element++;
     }
   }

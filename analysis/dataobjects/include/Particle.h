@@ -20,14 +20,6 @@
 
 #include <vector>
 
-#include <generators/dataobjects/MCParticle.h>
-
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLGamma.h>
-#include <ecl/dataobjects/ECLPi0.h>
-
-#include <tracking/dataobjects/Track.h>
-
 // TODO: should this go somehwere elese (Constants.h?)?
 static const int C_POSITION_ERROR_MATRIX_DIMENSION                 = 3;  //! Dimension of position error matrix
 static const int C_MOMENTUM_ERROR_MATRIX_DIMENSION                 = 4;  //! Dimension of 4-momentum error matrix
@@ -35,6 +27,13 @@ static const int C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION        = 7;  //! Dim
 static const int C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION_1D_REP = 28; //! Dimension of 1-dimensional representation of 7x7 error matrix
 
 namespace Belle2 {
+
+  // forward declarations
+  class ECLShower;
+  class ECLGamma;
+  class ECLPi0;
+  class Track;
+  class MCParticle;
 
   /** \addtogroup dataobjects
    * @{
@@ -164,20 +163,18 @@ namespace Belle2 {
     void setMomentumVertexErrorMatrix(const TMatrixFSym& m);
 
     /**
-     * Sets the 4x4 momentum error sub-matrix
-     * All other error matrix elements (for position and correlation between
-     * position and error) are set to 0
-     * @param The 4x4 momentum error matrix
+     * Set 4Vector, position at which momentum is estimated
+     * and the 7x7 error matrix at once.
+     *
+     * @param 4-momentum vector
+     * @param point (position or vertex) at which 4-momentum is estimated in (units??)
+     * @param The 7x7 momentum and vertex error matrix
      */
-    void setMomentumErrorMatrix(const TMatrixFSym& m_mom);
-
-    /**
-     * Sets the 3x3 vertex/position error sub-matrix
-     * All other error matrix elements (for momentum and correlation between
-     * position and error) are set to 0
-     * @param The 4x4 position error matrix
-     */
-    void setVertexErrorMatrix(const TMatrixFSym& m_pos);
+    void updateMomentum(const TLorentzVector& p4, const TVector3& vertex, const TMatrixFSym& m) {
+      set4Vector(p4);
+      setVertex(vertex);
+      setMomentumVertexErrorMatrix(m);
+    }
 
     /**
      * Sets PDG code of the Particle
@@ -190,7 +187,7 @@ namespace Belle2 {
      * Returns Particle's 4-momentum vector
      * @return The 4-momentum vector of the Particle
      */
-    const TLorentzVector get4Vector() const {
+    TLorentzVector get4Vector() const {
       return TLorentzVector(m_momentum_x, m_momentum_y, m_momentum_z, m_energy);
     }
 
@@ -198,7 +195,7 @@ namespace Belle2 {
      * Returns Particle's 3-momentum vector
      * @return The 3-momentum vector of the Particle
      */
-    const TVector3 getMomentum() const {
+    TVector3 getMomentum() const {
       return TVector3(m_momentum_x, m_momentum_y, m_momentum_z);
     };
 
@@ -295,7 +292,7 @@ namespace Belle2 {
      * Returns the particle type enum of the Particle
      * @return The particle type enum
      */
-    const EParticleType getParticleType() const { return m_particleType; }
+    EParticleType getParticleType() const { return m_particleType; }
 
     /**
      * Returns PDG code of the Particle
@@ -380,11 +377,11 @@ namespace Belle2 {
     const std::vector<int>& getDaughterIndices() const { return m_daughterIndices; }
 
     /**
-     * Fills a vector of pointers to Final State daughter particles
+     * Returns a vector of pointers to Final State daughter particles
      *
-     * @param Vector of pointers to particles
+     * @return Vector of pointers to final state daughter particles
      */
-    void getFinalStateDaughters(std::vector<const Belle2::Particle*> &fspDaughters) const;
+    const std::vector<const Belle2::Particle*> getFinalStateDaughters() const;
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
@@ -493,7 +490,7 @@ namespace Belle2 {
     /**
      * Converts 7x7 TMatrixFSym to 1 dimensional array holding matrix elements
      */
-    void fillErrorMatrix(TMatrixFSym m);
+    void fillErrorMatrix(const TMatrixFSym& m);
 
     /**
      * Search the DataStore for the corresponding Particle array.
@@ -502,6 +499,8 @@ namespace Belle2 {
      * particle list is not set when needed, e.g. after deserialization.
      */
     void fixParticleList() const;
+
+    void fillFSPDaughters(std::vector<const Belle2::Particle*> &fspDaughters) const;
 
     ClassDef(Particle, 1);
   };

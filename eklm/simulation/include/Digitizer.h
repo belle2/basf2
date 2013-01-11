@@ -42,8 +42,8 @@ namespace Belle2 {
      * @var DigitizationParams::nPEperMeV
      * Number of photoelectrons / 1 MeV.
      *
-     * @var DigitizationParams::maxTheta
-     * Maximal light capture angle (by fiber).
+     * @var DigitizationParams::minCosTheta
+     * Cosine of maximal light capture angle (by fiber).
      *
      * @var DigitizationParams::mirrorReflectiveIndex
      * Mirror reflective index.
@@ -76,7 +76,7 @@ namespace Belle2 {
       double ADCSamplingTime;
       int nDigitizations;
       double nPEperMeV;
-      double maxTheta;
+      double minCosTheta;
       double mirrorReflectiveIndex;
       double scintillatorDeExcitationTime;
       double fiberDeExcitationTime;

@@ -131,8 +131,7 @@ void EKLM::FiberAndElectronics::lightPropagationDistance(EKLMSimHit* sh)
   /* Convert mm to cm. */
   half_len = 0.05 * EKLM::stripLen[sh->getStrip() - 1];
   local_pos = sh->getLocalPosition()->x();
-  m_directHitDist = half_len - local_pos;
-  m_reflectedHitDist = 3.0 * half_len + local_pos;
+  m_hitDist = std::make_pair(half_len - local_pos, 3.0 * half_len + local_pos);
 }
 
 void EKLM::FiberAndElectronics::addRandomSiPMNoise()
@@ -161,14 +160,14 @@ void EKLM::FiberAndElectronics::fillAmplitude(int nPE, double timeShift,
   int j;
   double hitTime;
   double deExcitationTime;
-  double theta;
+  double cosTheta;
   double hitDist;
   for (i = 0; i < nPE; i++) {
-    theta = gRandom->Uniform(0, m_digPar->maxTheta);
+    cosTheta = gRandom->Uniform(m_digPar->minCosTheta, 1);
     if (!isReflected)
-      hitDist = m_directHitDist / cos(theta);
+      hitDist = m_hitDist.first / cosTheta;
     else
-      hitDist = m_reflectedHitDist / cos(theta);
+      hitDist = m_hitDist.second / cosTheta;
     /* Drop lightflashes which were captured by fiber */
     if (gRandom->Uniform() > distanceAttenuation(hitDist))
       continue;

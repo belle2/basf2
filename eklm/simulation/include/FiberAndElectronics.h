@@ -93,11 +93,11 @@ namespace Belle2 {
       /** Pointer to vector if the SimHits. */
       std::vector<EKLMSimHit*> m_vectorHits;
 
-      /**
-       * Distance from the hitpoint to SiPM for the (forward, backward) photons
-       * (no account for the angle).
-       */
-      std::pair<double, double> m_hitDist;
+      /** Distance from the hitpoint to SiPM for direct photons. */
+      double m_directHitDist;
+
+      /** Distance from the hitpoint to SiPM for reflected photons. */
+      double m_reflectedHitDist;
 
       /** Name of the strip. */
       std::string m_stripName;

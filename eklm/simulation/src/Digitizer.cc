@@ -249,9 +249,8 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
     stripHit->setMCTS(simHit->getTime());
     stripHit->setGeneratedNPE(fes->getGeneratedNPE());
     if (!fes->getFitStatus()) {
-      struct FPGAFitParams* par = fes->getFitResults();
-      stripHit->setTime(par->startTime);
-      stripHit->setNPE(par->amplitude);
+      stripHit->setTime(fes->getFitResults()->startTime);
+      stripHit->setNPE(fes->getNPE());
     } else {
       stripHit->setTime(0.);
       stripHit->setNPE(0);

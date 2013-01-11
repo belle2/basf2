@@ -60,8 +60,8 @@ namespace Belle2 {
      * @var DigitizationParams::attenuationLength
      * Attenuation length in fiber, cm.
      *
-     * @var DigitizationParams::expCoefficient
-     * Exponent coefficient for a single photoelectron shape.
+     * @var DigitizationParams::PEAttenuationFreq
+     * Attenuation frequency of a single photoelectron pulse, ns^-1.
      *
      * @var DigitizationParams::meanSiPMNoise
      * Mean for SiPM backgrouns. If zero or negative no backgrounds are added.
@@ -82,7 +82,7 @@ namespace Belle2 {
       double fiberDeExcitationTime;
       double firstPhotonlightSpeed;
       double attenuationLength;
-      double expCoefficient;
+      double PEAttenuationFreq;
       double meanSiPMNoise;
       bool enableConstBkg;
       bool debug;

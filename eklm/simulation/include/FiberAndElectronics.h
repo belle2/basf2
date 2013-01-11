@@ -58,6 +58,11 @@ namespace Belle2 {
       enum FPGAFitStatus getFitStatus() const;
 
       /**
+       * Get number of photoelectrons (fit result).
+       */
+      double getNPE();
+
+      /**
        * Get generated number of photoelectrons.
        */
       int getGeneratedNPE();

@@ -52,7 +52,7 @@ void EKLMDigitizerModule::initialize()
   m_digPar.fiberDeExcitationTime = 10.0;
   m_digPar.firstPhotonlightSpeed = 17.0;
   m_digPar.attenuationLength = 300.0;
-  m_digPar.expCoefficient = 3.0;
+  m_digPar.PEAttenuationFreq = 3.0;
   m_digPar.meanSiPMNoise = -1;
   m_digPar.enableConstBkg = false;
 }

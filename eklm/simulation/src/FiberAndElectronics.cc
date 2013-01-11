@@ -145,7 +145,7 @@ void EKLM::FiberAndElectronics::addRandomSiPMNoise()
 double EKLM::FiberAndElectronics::signalShape(double t)
 {
   if (t > 0)
-    return exp(-m_digPar->expCoefficient * t);
+    return exp(-m_digPar->PEAttenuationFreq * t);
   return 0;
 }
 
@@ -204,6 +204,14 @@ struct EKLM::FPGAFitParams* EKLM::FiberAndElectronics::getFitResults() {
 enum EKLM::FPGAFitStatus EKLM::FiberAndElectronics::getFitStatus() const
 {
   return m_FPGAStat;
+}
+
+double EKLM::FiberAndElectronics::getNPE()
+{
+  double intg;
+  intg = m_FPGAParams.amplitude * (0.5 * m_FPGAParams.peakTime +
+                                   1.0 / m_FPGAParams.attenuationFreq);
+  return intg * m_digPar->PEAttenuationFreq;
 }
 
 int EKLM::FiberAndElectronics::getGeneratedNPE()

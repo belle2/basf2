@@ -37,7 +37,7 @@ namespace Belle2 {
      */
     struct FPGAFitParams {
       double startTime;       /**< Start of signal. */
-      double peakTime;        /**< Peak time. */
+      double peakTime;        /**< Peak time (from startTime). */
       double attenuationFreq; /**< Attenuation frequency. */
       double amplitude;       /**< Amplitude. */
       double bgAmplitude;     /**< Background amplitude. */

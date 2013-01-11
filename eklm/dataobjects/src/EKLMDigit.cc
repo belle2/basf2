@@ -21,20 +21,30 @@ EKLMDigit::EKLMDigit(const EKLMSimHit* hit)
   : EKLMHitBase((EKLMHitBase)(*hit)),
     m_Plane(hit->getPlane()),
     m_Strip(hit->getStrip()),
-    m_NumberPhotoElectrons(-1),
+    m_NPE(-1),
     m_MCtime(hit->getTime()),
     m_volid(hit->getVolumeID())
 {
 }
 
-double EKLMDigit::getNumberPhotoElectrons() const
+double EKLMDigit::getNPE() const
 {
-  return m_NumberPhotoElectrons;
+  return m_NPE;
 }
 
-void EKLMDigit::setNumberPhotoElectrons(double npe)
+void EKLMDigit::setNPE(double npe)
 {
-  m_NumberPhotoElectrons = npe;
+  m_NPE = npe;
+}
+
+int EKLMDigit::getGeneratedNPE()
+{
+  return m_generatedNPE;
+}
+
+void EKLMDigit::setGeneratedNPE(int npe)
+{
+  m_generatedNPE = npe;
 }
 
 bool EKLMDigit::isGood() const

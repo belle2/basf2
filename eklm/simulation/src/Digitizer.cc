@@ -256,14 +256,14 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
     if (!fiberAndElectronicsSimulator->getFitStatus()) {
       struct FPGAFitParams* par = fiberAndElectronicsSimulator->getFitResults();
       stripHit->setTime(par->startTime);
-      stripHit->setNumberPhotoElectrons(par->amplitude);
+      stripHit->setNPE(par->amplitude);
     } else {
       stripHit->setTime(0.);
-      stripHit->setNumberPhotoElectrons(0);
+      stripHit->setNPE(0);
     }
     stripHit->setFitStatus(fiberAndElectronicsSimulator->getFitStatus());
 
-    if (stripHit->getNumberPhotoElectrons() > threshold)
+    if (stripHit->getNPE() > threshold)
       stripHit->isGood(true);
     else
       stripHit->isGood(false);

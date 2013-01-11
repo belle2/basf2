@@ -50,16 +50,28 @@ namespace Belle2 {
     void Print() const;
 
     /**
-     * Get number of photoelectrons.
+     * Get number of photoelectrons (fit result).
      * @return Number of photoelectrons.
      */
-    double getNumberPhotoElectrons() const;
+    double getNPE() const;
 
     /**
-     * Set the number of photo electorns.
+     * Set the number of photoelectrons (fit result).
      * @param[in] npe Number of photoelectrons.
      */
-    void setNumberPhotoElectrons(double npe);
+    void setNPE(double npe);
+
+    /**
+     * Get generated number of photoelectrons.
+     * @return Number of photoelectrons.
+     */
+    int getGeneratedNPE();
+
+    /**
+     * Set generated number of photoelectrons.
+     * @param[in] npe Number of photoelectrons.
+     */
+    void setGeneratedNPE(int npe);
 
     /**
      * Get volume identifier.
@@ -147,7 +159,10 @@ namespace Belle2 {
     bool m_good;
 
     /** Number of photo electrons. */
-    double m_NumberPhotoElectrons;
+    double m_NPE;
+
+    /** Generated number of photoelectrons (MC only). */
+    int m_generatedNPE;
 
     /** Fit status. */
     int m_fitStatus;

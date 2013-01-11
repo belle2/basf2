@@ -13,8 +13,6 @@
 
 /* External headers. */
 #include <CLHEP/Vector/ThreeVector.h>
-#include <TFitResultPtr.h>
-#include <TFitResult.h>
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitBase.h>
@@ -114,12 +112,6 @@ namespace Belle2 {
     void setStrip(int Strip);
 
     /**
-     * Get fit results.
-     * @return Fit results.
-     */
-    const TFitResult* getFitResults() const;
-
-    /**
      * Get fit status.
      * @return Fit status.
      */
@@ -130,18 +122,6 @@ namespace Belle2 {
      * @param[in] s Fit status.
      */
     void setFitStatus(int s);
-
-    /**
-     * Set fit results.
-     * @param[in] res Fit results.
-     */
-    void setFitResults(TFitResult& res);
-
-    /**
-     * Set fit results.
-     * @param[in] resPtr Fit results.
-     */
-    void setFitResults(TFitResultPtr resPtr);
 
     /**
      * Set MC time shift.
@@ -182,14 +162,12 @@ namespace Belle2 {
     /** Volume identifier. */
     int m_volid;
 
-    /** Fit results object. */
-    TFitResult m_fitResults;
-
     /** Makes objects storable. */
     ClassDef(Belle2::EKLMDigit, 1);
 
   };
 
-} // end of namespace Belle2
+}
 
-#endif //EKLMDigit_H
+#endif
+

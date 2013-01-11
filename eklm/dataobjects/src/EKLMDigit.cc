@@ -67,21 +67,6 @@ void EKLMDigit::setStrip(int strip)
   m_Strip = strip;
 }
 
-const TFitResult* EKLMDigit::getFitResults() const
-{
-  return &m_fitResults;
-}
-
-void EKLMDigit::setFitResults(TFitResult& res)
-{
-  m_fitResults = res;
-}
-
-void EKLMDigit::setFitResults(TFitResultPtr resPtr)
-{
-  m_fitResults = *resPtr;
-}
-
 void EKLMDigit::setFitStatus(int s)
 {
   m_fitStatus = s;

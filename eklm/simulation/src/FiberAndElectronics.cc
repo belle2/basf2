@@ -31,6 +31,7 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   struct EKLM::DigitizationParams* digPar)
 {
   m_digPar = digPar;
+  m_npe = 0;
   m_stripName = "Strip" + boost::lexical_cast<std::string>(entry.first);
 
   m_histRange = m_digPar->nDigitizations * m_digPar->ADCSamplingTime;
@@ -175,6 +176,7 @@ void EKLM::FiberAndElectronics::fillAmplitude(int nPE, double timeShift,
     if (isReflected)
       if (gRandom->Uniform() > m_digPar->mirrorReflectiveIndex)
         continue;
+    m_npe++;
     deExcitationTime = gRandom->Exp(m_digPar->scintillatorDeExcitationTime) +
                        gRandom->Exp(m_digPar->fiberDeExcitationTime);
     hitTime = lightPropagationTime(hitDist) + deExcitationTime + timeShift;
@@ -202,6 +204,11 @@ struct EKLM::FPGAFitParams* EKLM::FiberAndElectronics::getFitResults() {
 enum EKLM::FPGAFitStatus EKLM::FiberAndElectronics::getFitStatus() const
 {
   return m_FPGAStat;
+}
+
+int EKLM::FiberAndElectronics::getGeneratedNPE()
+{
+  return m_npe;
 }
 
 void EKLM::FiberAndElectronics::debugOutput()

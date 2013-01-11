@@ -47,8 +47,7 @@ namespace Belle2 {
       void processEntry();
 
       /**
-       * Get fit parameter.
-       * @return i'th parameter of the fit.
+       * Get fit results.
        */
       struct FPGAFitParams* getFitResults();
 
@@ -57,6 +56,11 @@ namespace Belle2 {
        * @return Status of the fit.
        */
       enum FPGAFitStatus getFitStatus() const;
+
+      /**
+       * Get generated number of photoelectrons.
+       */
+      int getGeneratedNPE();
 
     private:
 
@@ -89,6 +93,9 @@ namespace Belle2 {
 
       /** FPGA fit results. */
       struct FPGAFitParams m_FPGAParams;
+
+      /** Number of photoelectrons (generated). */
+      int m_npe;
 
       /** Pointer to vector if the SimHits. */
       std::vector<EKLMSimHit*> m_vectorHits;

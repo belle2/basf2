@@ -232,12 +232,12 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
          m_HitStripMap.begin(); it != m_HitStripMap.end(); it++) {
 
 
-    // create fiberAndElectronicsSimulator entry
-    EKLM::FiberAndElectronics* fiberAndElectronicsSimulator =
+    // create fes entry
+    EKLM::FiberAndElectronics* fes =
       new EKLM::FiberAndElectronics(*it, m_transf, m_digPar);
 
     // do all work
-    fiberAndElectronicsSimulator->processEntry();
+    fes->processEntry();
 
     EKLMSimHit* simHit = it->second.front();
 
@@ -246,22 +246,17 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
       new(m_stripHitsArray->AddrAt(m_stripHitsArray.getEntries()))
     EKLMDigit(simHit);
 
-    //***
-    //      G4Box* box1 = (G4Box*)(simHit->getVolume()->GetLogicalVolume()->GetSolid()->GetConstituentSolid(0));
     stripHit->setMCTS(simHit->getTime());
-
-
-    //***
-
-    if (!fiberAndElectronicsSimulator->getFitStatus()) {
-      struct FPGAFitParams* par = fiberAndElectronicsSimulator->getFitResults();
+    stripHit->setGeneratedNPE(fes->getGeneratedNPE());
+    if (!fes->getFitStatus()) {
+      struct FPGAFitParams* par = fes->getFitResults();
       stripHit->setTime(par->startTime);
       stripHit->setNPE(par->amplitude);
     } else {
       stripHit->setTime(0.);
       stripHit->setNPE(0);
     }
-    stripHit->setFitStatus(fiberAndElectronicsSimulator->getFitStatus());
+    stripHit->setFitStatus(fes->getFitStatus());
 
     if (stripHit->getNPE() > threshold)
       stripHit->isGood(true);
@@ -269,7 +264,7 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
       stripHit->isGood(false);
 
 
-    delete fiberAndElectronicsSimulator;
+    delete fes;
   }
   //    B2INFO( "STOP MERGING HITS");
 }

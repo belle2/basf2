@@ -45,7 +45,7 @@ void EKLMDigitizerModule::initialize()
   /* Fill digitization parameters. */
   m_digPar.ADCSamplingTime = 1.0;
   m_digPar.nDigitizations = 200;
-  m_digPar.nPEperMeV = 200.0;
+  m_digPar.nPEperMeV = 22;
   m_digPar.minCosTheta = cos(26.7 / 180.0 * M_PI);
   m_digPar.mirrorReflectiveIndex = 0.95;
   m_digPar.scintillatorDeExcitationTime = 3.0;

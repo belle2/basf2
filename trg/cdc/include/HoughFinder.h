@@ -39,7 +39,8 @@ class TRGCDCHoughFinder {
     TRGCDCHoughFinder(const std::string & name,
                       const TRGCDC &,
                       unsigned nX,
-                      unsigned nY);
+                      unsigned nY,
+		      unsigned peakMin);
 
     /// Destructor
     virtual ~TRGCDCHoughFinder();
@@ -82,6 +83,9 @@ class TRGCDCHoughFinder {
 
     /// Peak finder.
     TRGCDCPeakFinder _peakFinder;
+
+    /// Min. peak height for the peak finder.
+    const unsigned _peakMin;
 };
 
 //-----------------------------------------------------------------------------

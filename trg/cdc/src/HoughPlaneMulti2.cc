@@ -75,4 +75,23 @@ TRGCDCHoughPlaneMulti2::merge(void) {
     }
 }
 
+void
+TRGCDCHoughPlaneMulti2::mergeOuters(void) {
+    const unsigned n = _layers[0]->_n;
+    for (unsigned i = 1; i < _nLayers; i++) {
+
+        //...Use _usage here...
+        if (! _usage[i]) continue;
+        
+        for (unsigned j = 0; j < n; j++) {
+            if (! _layers[i]->_cell[j]) continue;
+            for (unsigned k = 0; k < 32; k++) {
+                if ((_layers[i]->_cell[j] >> k) & 1) {
+                    add(j * 32 + k, 1);
+                }
+            }
+        }
+    }
+}
+
 } // namespace Belle2

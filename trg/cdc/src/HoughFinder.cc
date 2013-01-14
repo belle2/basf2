@@ -56,11 +56,13 @@ TRGCDCHoughFinder::version(void) const {
 TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
                                      const TRGCDC & TRGCDC,
                                      unsigned nX,
-                                     unsigned nY)
+                                     unsigned nY,
+				     unsigned peakMin)
     : _name(name),
       _cdc(TRGCDC),
       _circleH("CircleHough"),
-      _peakFinder("PeakFinder") {
+      _peakFinder("PeakFinder"),
+      _peakMin(peakMin) {
 
     //...Make Hough planes...
     _plane[0] = new TCHPlaneMulti2("circle hough plus",
@@ -195,8 +197,10 @@ TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
 
     //...Look for peaks which have 5 hits...
     vector<unsigned> serialIds[2];
-    _peakFinder.doit(* _plane[0], 5, false, serialIds[0]);
-    _peakFinder.doit(* _plane[1], 5, false, serialIds[1]);
+
+//...Temporary 
+    _peakFinder.doit(* _plane[0], _peakMin, false, serialIds[0]);
+    _peakFinder.doit(* _plane[1], _peakMin, false, serialIds[1]);
 
     //...Peak loop...
     unsigned nCircles = 0;

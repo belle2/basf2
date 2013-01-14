@@ -101,14 +101,14 @@ class TRGCDCCell {
   public:// Geometry
 
     /// returns position in forward endplate.
-    const HepGeom::Point3D<double>  & forwardPosition(void) const;
+    const HepGeom::Point3D<double> & forwardPosition(void) const;
 
     /// returns position in backward endplate.
-    const HepGeom::Point3D<double>  & backwardPosition(void) const;
+    const HepGeom::Point3D<double> & backwardPosition(void) const;
     double * backwardPosition(double p[3]) const;
 
     /// returns middle position of a wire. z componet is 0.
-    const HepGeom::Point3D<double>  & xyPosition(void) const;
+    const HepGeom::Point3D<double> & xyPosition(void) const;
     double * xyPosition(double p[3]) const;
 
     /// returns direction vector of the wire.
@@ -122,6 +122,11 @@ class TRGCDCCell {
 
     /// returns cell size in phi.
     float cellSize(void) const;
+
+  public:// Utility functions
+
+    /// returns true this has member named a.
+    virtual bool hasMember(const std::string & a) const;
 
   public:// event by event information.
 
@@ -335,6 +340,12 @@ inline
 const TRGCDCCellHit *
 TRGCDCCell::hit(const TRGCDCCellHit * a) {
     return _hit = a;
+}
+
+inline
+bool
+TRGCDCCell::hasMember(const std::string & a) const {
+    return name() == a;
 }
 
 } // namespace Belle2

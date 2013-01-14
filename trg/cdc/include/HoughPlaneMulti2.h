@@ -92,6 +92,9 @@ class TRGCDCHoughPlaneMulti2 : public TRGCDCHoughPlane {
     /// Merge layers into one.
     void merge(void);
 
+    /// Merge outer layers into one.
+    void mergeOuters(void);
+
     /// allocate memory for patterns.
     void preparePatterns(unsigned layerId, unsigned nPatterns);
 

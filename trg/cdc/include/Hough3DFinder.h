@@ -60,10 +60,6 @@ class TRGCDCHough3DFinder {
     int m_nZ0Steps;
     double m_cotStepSize;
     double m_z0StepSize;
-    float ***m_houghMeshLayerDiff;
-    bool ***m_houghMeshLayer;
-    int **m_houghMesh;
-    float **m_houghMeshDiff;
     // For root file variables.
     std::string m_rootHough3DFilename;
     TFile* m_fileHough3D;
@@ -75,6 +71,11 @@ class TRGCDCHough3DFinder {
     TClonesArray* m_st1TSsTrackHough3D;
     TClonesArray* m_st2TSsTrackHough3D;
     TClonesArray* m_st3TSsTrackHough3D;
+    // Stores drift stereo phi values.
+    TClonesArray* m_driftSt0TSsTrackHough3D;
+    TClonesArray* m_driftSt1TSsTrackHough3D;
+    TClonesArray* m_driftSt2TSsTrackHough3D;
+    TClonesArray* m_driftSt3TSsTrackHough3D;
     // Stores 2D fit values. [pT, phi0, charge].
     TClonesArray* m_fit2DTrackHough3D;
     // Stores best z0 and cot values. [z0, cot, #votes, minDiff]

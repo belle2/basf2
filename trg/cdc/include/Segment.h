@@ -85,7 +85,6 @@ class TRGCDCSegment : public TRGCDCCell {
     /// returns phi position.
     double phiPosition(void) const;
 
-
     /// returns event time.
     const TRGCDCEventTime * EvtTime(void) const;
 
@@ -98,6 +97,9 @@ class TRGCDCSegment : public TRGCDCCell {
     /// returns \# of stereo segments.
     static unsigned
 	nStereo(const std::vector<const TRGCDCSegment *> & list);
+
+    /// returns true this has member named a.
+    virtual bool hasMember(const std::string & a) const;
 
   public:// Modifiers
 

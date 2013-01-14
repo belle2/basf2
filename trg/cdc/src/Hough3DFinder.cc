@@ -73,21 +73,6 @@ namespace Belle2 {
       m_nZ0Steps = 1001;
       m_cotStepSize = m_cotEnd/((m_nCotSteps-1)/2);
       m_z0StepSize = m_z0End/((m_nZ0Steps-1)/2);
-      // HoughMesh
-      m_houghMeshLayerDiff = new float**[m_nCotSteps];
-      m_houghMeshLayer = new bool**[m_nCotSteps];
-      m_houghMesh = new int*[m_nCotSteps];
-      m_houghMeshDiff = new float*[m_nCotSteps];
-      for(int i=0; i<m_nCotSteps; i++){
-        m_houghMeshLayerDiff[i] = new float*[m_nZ0Steps];
-        m_houghMeshLayer[i] = new bool*[m_nZ0Steps];
-        m_houghMesh[i] = new int[m_nZ0Steps];
-        m_houghMeshDiff[i] = new float[m_nZ0Steps];
-        for(int j=0; j<m_nZ0Steps; j++){
-          m_houghMeshLayerDiff[i][j] = new float[4];
-          m_houghMeshLayer[i][j] = new bool[4];
-        }
-      }
 
       // Save in root.
       m_fileHough3D = new TFile("Hough3D.root","RECREATE");
@@ -96,6 +81,10 @@ namespace Belle2 {
       m_st1TSsTrackHough3D = new TClonesArray("TVectorD");
       m_st2TSsTrackHough3D = new TClonesArray("TVectorD");
       m_st3TSsTrackHough3D = new TClonesArray("TVectorD");
+      m_driftSt0TSsTrackHough3D = new TClonesArray("TVectorD");
+      m_driftSt1TSsTrackHough3D = new TClonesArray("TVectorD");
+      m_driftSt2TSsTrackHough3D = new TClonesArray("TVectorD");
+      m_driftSt3TSsTrackHough3D = new TClonesArray("TVectorD");
       m_fit2DTrackHough3D = new TClonesArray("TVectorD");
       m_bestFitTrackHough3D = new TClonesArray("TVectorD");
       m_mcTrackHough3D = new TClonesArray("TVectorD");
@@ -126,6 +115,10 @@ namespace Belle2 {
       m_treeTrackHough3D->Branch("st1TSsTrackHough3D", &m_st1TSsTrackHough3D);
       m_treeTrackHough3D->Branch("st2TSsTrackHough3D", &m_st2TSsTrackHough3D);
       m_treeTrackHough3D->Branch("st3TSsTrackHough3D", &m_st3TSsTrackHough3D);
+      m_treeTrackHough3D->Branch("driftSt0TSsTrackHough3D", &m_driftSt0TSsTrackHough3D);
+      m_treeTrackHough3D->Branch("driftSt1TSsTrackHough3D", &m_driftSt1TSsTrackHough3D);
+      m_treeTrackHough3D->Branch("driftSt2TSsTrackHough3D", &m_driftSt2TSsTrackHough3D);
+      m_treeTrackHough3D->Branch("driftSt3TSsTrackHough3D", &m_driftSt3TSsTrackHough3D);
       m_treeTrackHough3D->Branch("fit2DTrackHough3D", &m_fit2DTrackHough3D);
       m_treeTrackHough3D->Branch("bestFitTrackHough3D", &m_bestFitTrackHough3D);
       m_treeTrackHough3D->Branch("mcTrackHough3D", &m_mcTrackHough3D);
@@ -175,7 +168,8 @@ namespace Belle2 {
       }
 
       m_Hough3DFinder = new Hough3DFinder();
-      m_Hough3DFinder->setMode(2);
+      // 1: Hough3DFinder 2: GeoFinder
+      m_Hough3DFinder->setMode(1);
       // cotStart, cotEnd, z0Start, z0End, cotSteps, z0Steps
       float tempInitVariables[] = {-3,3,-2,2,1001,1001};
       vector<float > initVariables(tempInitVariables, tempInitVariables+sizeof(tempInitVariables) / sizeof(tempInitVariables[0]) );
@@ -198,21 +192,6 @@ namespace Belle2 {
 
   TRGCDCHough3DFinder::~TRGCDCHough3DFinder(){
     m_Hough3DFinder->destruct();
-    // Deallocate HoughMesh
-    for(int i=0; i<m_nCotSteps; i++){
-      for(int j=0; j<m_nZ0Steps; j++){
-        delete [] m_houghMeshLayerDiff[i][j];
-        delete [] m_houghMeshLayer[i][j];
-      }
-      delete [] m_houghMeshLayerDiff[i];
-      delete [] m_houghMeshLayer[i];
-      delete [] m_houghMesh[i];
-      delete [] m_houghMeshDiff[i];
-    }
-    delete [] m_houghMeshLayerDiff;
-    delete [] m_houghMeshLayer;
-    delete [] m_houghMesh;
-    delete [] m_houghMeshDiff;
 
     // Deallocate root variables
     delete m_fileHough3D;
@@ -221,6 +200,10 @@ namespace Belle2 {
     delete m_st1TSsTrackHough3D;
     delete m_st2TSsTrackHough3D;
     delete m_st3TSsTrackHough3D;
+    delete m_driftSt0TSsTrackHough3D;
+    delete m_driftSt1TSsTrackHough3D;
+    delete m_driftSt2TSsTrackHough3D;
+    delete m_driftSt3TSsTrackHough3D;
     delete m_fit2DTrackHough3D;
     delete m_bestFitTrackHough3D;
     delete m_mcTrackHough3D;
@@ -291,6 +274,10 @@ namespace Belle2 {
     TClonesArray &st1TSsTrackHough3D = *m_st1TSsTrackHough3D;
     TClonesArray &st2TSsTrackHough3D = *m_st2TSsTrackHough3D;
     TClonesArray &st3TSsTrackHough3D = *m_st3TSsTrackHough3D;
+    TClonesArray &driftSt0TSsTrackHough3D = *m_driftSt0TSsTrackHough3D;
+    TClonesArray &driftSt1TSsTrackHough3D = *m_driftSt1TSsTrackHough3D;
+    TClonesArray &driftSt2TSsTrackHough3D = *m_driftSt2TSsTrackHough3D;
+    TClonesArray &driftSt3TSsTrackHough3D = *m_driftSt3TSsTrackHough3D;
     TClonesArray &fit2DTrackHough3D = *m_fit2DTrackHough3D;
     TClonesArray &bestFitTrackHough3D = *m_bestFitTrackHough3D;
     TClonesArray &mcTrackHough3D = *m_mcTrackHough3D;
@@ -324,6 +311,10 @@ namespace Belle2 {
     st1TSsTrackHough3D.Clear();
     st2TSsTrackHough3D.Clear();
     st3TSsTrackHough3D.Clear();
+    driftSt0TSsTrackHough3D.Clear();
+    driftSt1TSsTrackHough3D.Clear();
+    driftSt2TSsTrackHough3D.Clear();
+    driftSt3TSsTrackHough3D.Clear();
     fit2DTrackHough3D.Clear();
     bestFitTrackHough3D.Clear();
     mcTrackHough3D.Clear();
@@ -360,11 +351,14 @@ namespace Belle2 {
     vector<const TCSHit *> hits = _cdc.stereoSegmentHits(0);
     Int_t nHitsInLayer = (Int_t)hits.size();
     TVectorD st0TSs(nHitsInLayer);
+    TVectorD driftSt0TSs(nHitsInLayer);
     stTSs.push_back(vector<double>());
     p_stTSs.push_back(vector<const TCSHit *>());
     for(unsigned j=0; j< hits.size(); j++) {
       if(hits[j]==0) {cout<<"[0] POINTER IS ZERO"<<endl; continue;}
       st0TSs[j] = (double)hits[j]->cell().localId()/m_nWires[0]*4*m_Trg_PI;
+      driftSt0TSs[j] = hits[j]->segment().phiPosition();
+      //cout<<st0TSs[j]<<" "<<hits[j]->segment().phiPosition()<<endl;
       stTSs[0].push_back(st0TSs[j]);
       p_stTSs[0].push_back(hits[j]);
     }
@@ -372,11 +366,13 @@ namespace Belle2 {
     hits = _cdc.stereoSegmentHits(1);
     nHitsInLayer = (Int_t)hits.size();
     TVectorD st1TSs(nHitsInLayer);
+    TVectorD driftSt1TSs(nHitsInLayer);
     stTSs.push_back(vector<double>());
     p_stTSs.push_back(vector<const TCSHit *>());
     for(unsigned j=0; j< hits.size(); j++) {
       if(hits[j]==0) {cout<<"[1] POINTER IS ZERO"<<endl; continue;}
       st1TSs[j] = (double)hits[j]->cell().localId()/m_nWires[1]*4*m_Trg_PI;
+      driftSt1TSs[j] = hits[j]->segment().phiPosition();
       stTSs[1].push_back(st1TSs[j]);
       p_stTSs[1].push_back(hits[j]);
     }
@@ -384,11 +380,13 @@ namespace Belle2 {
     hits = _cdc.stereoSegmentHits(2);
     nHitsInLayer = (Int_t)hits.size();
     TVectorD st2TSs(nHitsInLayer);
+    TVectorD driftSt2TSs(nHitsInLayer);
     stTSs.push_back(vector<double>());
     p_stTSs.push_back(vector<const TCSHit *>());
     for(unsigned j=0; j< hits.size(); j++) {
       if(hits[j]==0) {cout<<"[2] POINTER IS ZERO"<<endl; continue;}
       st2TSs[j] = (double)hits[j]->cell().localId()/m_nWires[2]*4*m_Trg_PI;
+      driftSt2TSs[j] = hits[j]->segment().phiPosition();
       stTSs[2].push_back(st2TSs[j]);
       p_stTSs[2].push_back(hits[j]);
     }
@@ -396,11 +394,13 @@ namespace Belle2 {
     hits = _cdc.stereoSegmentHits(3);
     nHitsInLayer = (Int_t)hits.size();
     TVectorD st3TSs(nHitsInLayer);
+    TVectorD driftSt3TSs(nHitsInLayer);
     stTSs.push_back(vector<double>());
     p_stTSs.push_back(vector<const TCSHit *>());
     for(unsigned j=0; j< hits.size(); j++) {
       if(hits[j]==0) {cout<<"[3] POINTER IS ZERO"<<endl; continue;}
       st3TSs[j] = (double)hits[j]->cell().localId()/m_nWires[3]*4*m_Trg_PI;
+      driftSt3TSs[j] = hits[j]->segment().phiPosition();
       stTSs[3].push_back(st3TSs[j]);
       p_stTSs[3].push_back(hits[j]);
     }
@@ -577,6 +577,10 @@ namespace Belle2 {
       new(st1TSsTrackHough3D[iTrack]) TVectorD(st1TSs);
       new(st2TSsTrackHough3D[iTrack]) TVectorD(st2TSs);
       new(st3TSsTrackHough3D[iTrack]) TVectorD(st3TSs);
+      new(driftSt0TSsTrackHough3D[iTrack]) TVectorD(driftSt0TSs);
+      new(driftSt1TSsTrackHough3D[iTrack]) TVectorD(driftSt1TSs);
+      new(driftSt2TSsTrackHough3D[iTrack]) TVectorD(driftSt2TSs);
+      new(driftSt3TSsTrackHough3D[iTrack]) TVectorD(driftSt3TSs);
       // fitPt, fitPhi0, fitCharge
       TVectorD tempFit2D(3);
       tempFit2D[0] = fitPt;

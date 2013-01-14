@@ -75,6 +75,7 @@ class TRGCDC {
 			      const std::string & rootFitter3DFile = "?",
                               unsigned houghFinderMeshX = 96,
                               unsigned houghFinderMeshY = 96,
+                              unsigned houghFinderPeakMin = 5,
                               bool fLRLUT = 1,
 			      bool fevtTime = 1);
     
@@ -96,6 +97,7 @@ class TRGCDC {
 	   const std::string & rootFitter3DFile,
            unsigned houghFinderMeshX,
            unsigned houghFinderMeshY,
+           unsigned houghFinderPeakMin,
            bool fLRLUT,
 	   bool fevtTime);
 
@@ -103,7 +105,9 @@ class TRGCDC {
     virtual ~TRGCDC();
 
     /// initializes CDC geometry.
-    void initialize(unsigned houghFinderMeshX, unsigned houghFinderMeshY);
+    void initialize(unsigned houghFinderMeshX,
+		    unsigned houghFinderMeshY,
+		    unsigned houghFinderPeakMin);
 
     /// configures trigger modules for firmware simulation.
     void configure(void);
@@ -492,15 +496,37 @@ class TRGCDC {
     int m_eventNum;
 
     /// root file
-    TFile* m_file;
-    TTree* m_tree;
-    TTree* m_treeAllTracks;
-    TClonesArray* m_fitParameters;
-    TClonesArray* m_mcParameters;
-    TClonesArray* m_mcTrack4Vector;
-    TClonesArray* m_mcTrackVertexVector;
-    TClonesArray* m_mcTrackStatus;
+    TFile * m_file;
+
+    /// root tree for reconstructed 3D tracks
+    TTree * m_tree;
+
+    /// root tree for MC tracks
+    TTree * m_treeAllTracks;
+
+    /// root tree for 2D tracks
+    TTree * _tree2D;
+
+    /// 3D fit
+    TClonesArray * m_fitParameters;
+
+    /// MC
+    TClonesArray * m_mcParameters;
+
+    /// MC track
+    TClonesArray * m_mcTrack4Vector;
+
+    /// MC vertex
+    TClonesArray * m_mcTrackVertexVector;
+
+    /// MC track status
+    TClonesArray * m_mcTrackStatus;
+
+    /// Event time
     TClonesArray * m_evtTime;
+
+    /// 2D track information
+    TClonesArray * _tracks2D;
 
     friend class TRGCDCModule;
 };

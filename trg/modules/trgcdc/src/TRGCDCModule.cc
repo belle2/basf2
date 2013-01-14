@@ -48,6 +48,7 @@ TRGCDCModule::TRGCDCModule()
       _hFinderMeshX(180),
 //    _hFinderMeshY(96),
       _hFinderMeshY(24),
+      _hFinderPeakMin(5),
       _fLRLUT(1),
       _fevtTime(1),
       _cdc(0),
@@ -106,6 +107,10 @@ TRGCDCModule::TRGCDCModule()
              _hFinderMeshY,
              "Hough finder # mesh in y",
              _hFinderMeshY);
+    addParam("HoughFinderPeakMin",
+             _hFinderPeakMin,
+             "Hough finder min. peak height",
+             _hFinderPeakMin);
     addParam("Fitter3DLRLUT",
              _fLRLUT,
              "Using L/R LUT in fitter3D",
@@ -159,6 +164,9 @@ TRGCDCModule::initialize() {
 	     << endl;
 	cout << TRGDebug::tab(4) << "Hough finder Mesh Y = " << _hFinderMeshY
 	     << endl;
+	cout << TRGDebug::tab(4) << "Hough finder Min. Peak = "
+	     << _hFinderPeakMin
+	     << endl;
     }
 }
 
@@ -181,6 +189,7 @@ TRGCDCModule::beginRun() {
 				 _rootFitter3DFilename,
 				 _hFinderMeshX,
 				 _hFinderMeshY,
+				 _hFinderPeakMin,
 				 _fLRLUT,
 				 _fevtTime);
 

@@ -78,7 +78,7 @@ TRGCDCSegment::dump(const string & msg,
     cout << pre << name() << " (ptn=" << hitPattern() << ")" << endl;
     if ((msg.find("geometry") != string::npos) ||
         (msg.find("detail") != string::npos)) {
-        cout << pre << "w " << id();
+        cout << pre << "id " << id();
         cout << ",local " << localId();
         cout << ",layer " << layerId();
         cout << ",super layer " << superLayerId();
@@ -87,19 +87,19 @@ TRGCDCSegment::dump(const string & msg,
     }
     if ((msg.find("hit") != string::npos) ||
         (msg.find("detail") != string::npos)) {
-        cout << pre;
-	if (hit()) {
-	    cout << "WHit dump" << endl;
-	    hit()->dump("", pre + "    ");
-	}
-	else {
-	    cout << "no TSHit" << endl;
+	cout << pre << "Wires ";
+	for (unsigned i = 0; i < _wires.size(); i++) {
+	    cout << _wires[i]->name();
+	    if (i < _wires.size() - 1)
+		cout << ",";
+	    else
+		cout << endl;
 	}
 	if (_hits.size() == 0) {
 	    cout << pre << "no wire hit" << endl;
 	}
 	else {
-	    cout << pre;
+	    cout << pre << "WHit dump : ";
 	    for (unsigned i = 0; i < _hits.size(); i++) {
 		cout << _hits[i]->cell().name();
 		if (i < _hits.size() - 1)
@@ -107,6 +107,16 @@ TRGCDCSegment::dump(const string & msg,
 		else
 		    cout << endl;
 	    }
+	    for (unsigned i = 0; i < _hits.size(); i++) {
+		_hits[i]->dump(msg, pre + "    ");
+	    }
+	}
+	if (hit()) {
+	    cout << pre << "SHit dump" << endl;
+	    hit()->dump(msg, pre + "    ");
+	}
+	else {
+	    cout << pre << "no TSHit" << endl;
 	}
     }
 //     if (msg.find("neighbor") != string::npos ||
@@ -156,21 +166,21 @@ TCSegment::simulate(void) {
     vector<TRGSignal> signals;
     for (unsigned i = 0; i < n; i++) {
 
+	//...Store wire hit information...
+	const TCWHit * h = _wires[i]->hit();
+	if (h)
+	    _hits.push_back(h);
+
 	//...Copy signal from a wire...
         const TRGSignal & s = _wires[i]->timing();
         signals.push_back(s);
 
-	//...Widen it...
-	static const unsigned width = systemClockFE.unit(400);
-	signals.back().widen(width);
-
 	//...Change clock...
-
-	//signals.back().dump("detail", " 0 ");
-
 	signals.back().clock(systemClock);
 
-	//signals.back().dump("detail", " 1 ");
+ 	//...Widen it...
+ 	static const unsigned width = systemClock.unit(400);
+ 	signals.back().widen(width);
 
         if (s.active())
             ++nHits;
@@ -208,15 +218,16 @@ TCSegment::simulate(void) {
     if (all.nEdges())
 	_signal = all;
 
-//     l0.dump("", "       -> ");
-//     l1.dump("", "       -> ");
-//     l2.dump("", "       -> ");
-//     l3.dump("", "       -> ");
-//     l4.dump("", "       -> ");
-//     if (all.nEdges())
-//         cout << "===========" << endl;
-//     all.dump("", "    ----> ");
-    
+//     if (iwd) {
+// 	l0.dump("", "     l0-> ");
+// 	l1.dump("", "     l1-> ");
+// 	l2.dump("", "     l2-> ");
+// 	l3.dump("", "     l3-> ");
+// 	l4.dump("", "     l4-> ");
+// 	if (all.nEdges())
+// 	    cout << "===========" << endl;
+// 	all.dump("", "    ----> ");
+//     }    
 }
 
 unsigned
@@ -246,6 +257,16 @@ TRGCDCSegment::phiPosition(void) const {
 	else{phi=phi;}
 	
 	return phi;
+}
+
+bool
+TRGCDCSegment::hasMember(const std::string & a) const {
+    const unsigned n = _wires.size();
+    for (unsigned i = 0; i < n; i++) {
+	if (_wires[i]->hasMember(a))
+	    return true;
+    }
+    return false;
 }
 
 } // namespace Belle2

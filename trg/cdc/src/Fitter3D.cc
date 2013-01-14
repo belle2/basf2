@@ -521,11 +521,15 @@ namespace Belle2 {
           //...Presently nSegments should be 1...
           if (nSegments != 1) {
             if (nSegments==0){
-              ckt=0;
-              cout << name() << " !!! NO TS assigned" << endl;
-              break;
+		ckt=0;
+		if (TRGDebug::level() > 1)
+		    cout << name() << " !!! NO TS assigned" << endl;
+		break;
             }
-            else{cout<< name()<<"!!!! multiple TS assigned"<< endl;}
+            else {
+		if (TRGDebug::level() > 1)
+		    cout << name() << "!!!! multiple TS assigned" << endl;
+	    }
           }
 
           //...Access to a track segment...

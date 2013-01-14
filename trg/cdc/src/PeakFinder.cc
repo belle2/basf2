@@ -187,9 +187,18 @@ TRGCDCPeakFinder::regions(TCHPlane & hp, const unsigned threshold) const {
         (unsigned *) malloc(nCells * sizeof(unsigned));
     unsigned nActive = 0;
     for (unsigned j = 0; j < hp.nY(); j++) {
-        for (unsigned i = 0; i < hp.nX(); i++) {
-
+      //minus x direction ,  plus  -x direction
+      if ((hp.name())=="circle hough minus") 
+	  for (unsigned i = 0; i < hp.nX(); i++) {
             //...Threshold check...        
+            const unsigned n = hp.entry(i, j);
+            if (n < threshold) continue;
+            candidates[nActive] = hp.serialId(i, j);
+            ++nActive;
+	}
+      else
+          for (unsigned i = hp.nX(); i> 0 ; --i) {
+ 	    //...Threshold check...        
             const unsigned n = hp.entry(i, j);
             if (n < threshold) continue;
             candidates[nActive] = hp.serialId(i, j);
@@ -376,6 +385,7 @@ TRGCDCPeakFinder::peaks6(TCHPlaneMulti2 & hp,
                  << TRGDebug::tab(4) << "position in HP:x="
                  << hp.position(ncX, ncY).x() << ",y="
                  << hp.position(ncX, ncY).y() << endl;
+
         }
     }
 

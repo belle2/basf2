@@ -69,7 +69,7 @@ TRGCDC::name(void) const {
 
 string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.28");
+    return string("TRGCDC 5.29");
 }
 
 TRGCDC *
@@ -87,6 +87,7 @@ TRGCDC::getTRGCDC(const string& configFile,
 		  const string& rootFitter3DFile,
 		  unsigned houghFinderMeshX,
 		  unsigned houghFinderMeshY,
+		  unsigned houghFinderPeakMin,
 		  bool fLRLUT,
 		  bool fevtTime) {
     if (_cdc) {
@@ -106,6 +107,7 @@ TRGCDC::getTRGCDC(const string& configFile,
 			  rootFitter3DFile,
 			  houghFinderMeshX,
 			  houghFinderMeshY,
+			  houghFinderPeakMin,
 			  fLRLUT,
 			  fevtTime);
     }
@@ -136,6 +138,7 @@ TRGCDC::TRGCDC(const string& configFile,
 	       const string& rootFitter3DFile,
 	       unsigned houghFinderMeshX,
 	       unsigned houghFinderMeshY,
+	       unsigned houghFinderPeakMin,
 	       bool fLRLUT,
 	       bool fevtTime)
     : _debugLevel(0),
@@ -180,7 +183,7 @@ TRGCDC::TRGCDC(const string& configFile,
 	     << "           mode=0x" << hex << _simulationMode << dec << endl;
     }
 
-    initialize(houghFinderMeshX, houghFinderMeshY);
+    initialize(houghFinderMeshX, houghFinderMeshY, houghFinderPeakMin);
 
     if (TRGDebug::level()) {
 	cout << "TRGCDC ... TRGCDC created with " << _configFilename << endl;
@@ -191,7 +194,9 @@ TRGCDC::TRGCDC(const string& configFile,
 }
 
 void
-TRGCDC::initialize(unsigned houghFinderMeshX, unsigned houghFinderMeshY) {
+TRGCDC::initialize(unsigned houghFinderMeshX,
+		   unsigned houghFinderMeshY,
+		   unsigned houghFinderPeakMin) {
 
     //...CDC...
     Belle2::CDC::CDCGeometryPar & cdc2 =
@@ -446,7 +451,8 @@ TRGCDC::initialize(unsigned houghFinderMeshX, unsigned houghFinderMeshY) {
     _hFinder = new TCHFinder("HoughFinder",
                              * this,
                              houghFinderMeshX,
-                             houghFinderMeshY);
+                             houghFinderMeshY,
+			     houghFinderPeakMin);
 
     //...Hough 3D Finder...
     _h3DFinder = new TCH3DFinder(*this);
@@ -470,18 +476,26 @@ TRGCDC::initialize(unsigned houghFinderMeshX, unsigned houghFinderMeshY) {
     m_file = new TFile((char*)_rootTRGCDCFilename.c_str(), "RECREATE");
     m_tree = new TTree("m_tree", "tree");
     m_treeAllTracks = new TTree("m_treeAllTracks", "treeAllTracks");
+
     m_fitParameters = new TClonesArray("TVectorD");
     m_mcParameters = new TClonesArray("TVectorD");
     m_mcTrack4Vector = new TClonesArray("TLorentzVector");
     m_mcTrackVertexVector = new TClonesArray("TVector3");
     m_mcTrackStatus = new TClonesArray("TVectorD");
+//    m_parameters2D = new TClonesArray("TVectorD");
+
     m_tree->Branch("fitParameters", &m_fitParameters);
     m_tree->Branch("mcParameters", &m_mcParameters);
     m_treeAllTracks->Branch("mcTrack4Vector", &m_mcTrack4Vector);
     m_treeAllTracks->Branch("mcTrackVertexVector", &m_mcTrackVertexVector);
     m_treeAllTracks->Branch("mcTrackStatus", &m_mcTrackStatus);
+
     m_evtTime = new TClonesArray("TVectorD");
     m_treeAllTracks->Branch("evtTime", &m_evtTime);
+
+    _tree2D = new TTree("tree2D", "2D Tracks");
+    _tracks2D = new TClonesArray("TVectorD");
+    _tree2D->Branch("track parameters", & _tracks2D);
 }
 
 void
@@ -705,9 +719,8 @@ TRGCDC::terminate(void) {
   {
   }
 
-  void
-  TRGCDC::update(bool)
-  {
+void
+TRGCDC::update(bool) {
 
     TRGDebug::enterStage("TRGCDC update");
 
@@ -719,27 +732,27 @@ TRGCDC::terminate(void) {
 //iw StoreArray<CDCSimHit> SimHits("CDCSimHits");
     StoreArray<CDCSimHit> SimHits;
     if (! SimHits) {
-      cout << "TRGCDC !!! can not access to CDCSimHits" << endl;
-      TRGDebug::leaveStage("TRGCDC update");
-      return;
+	cout << "TRGCDC !!! can not access to CDCSimHits" << endl;
+	TRGDebug::leaveStage("TRGCDC update");
+	return;
     }
     const unsigned n = SimHits.getEntries();
 
     //...CDCHit...
     StoreArray<CDCHit> CDCHits("CDCHits");
     if (! CDCHits) {
-      cout << "TRGCDC !!! can not access to CDCHits" << endl;
-      TRGDebug::leaveStage("TRGCDC update");
-      return;
+	cout << "TRGCDC !!! can not access to CDCHits" << endl;
+	TRGDebug::leaveStage("TRGCDC update");
+	return;
     }
     const unsigned nHits = CDCHits.getEntries();
 
     //...MCParticle...
     StoreArray<MCParticle> mcParticles;
     if (! mcParticles) {
-      cout << "TRGCDC !!! can not access to MCParticles" << endl;
-      TRGDebug::leaveStage("TRGCDC update");
-      return;
+	cout << "TRGCDC !!! can not access to MCParticles" << endl;
+	TRGDebug::leaveStage("TRGCDC update");
+	return;
     }
 
     //...Relations...
@@ -750,98 +763,98 @@ TRGCDC::terminate(void) {
 
     //...Loop over CDCHits...
     for (unsigned i = 0; i < nHits; i++) {
-      const CDCHit& h = * CDCHits[i];
+	const CDCHit& h = * CDCHits[i];
 
 //      //...Check validity (skip broken channel)...
 //      if (! (h->m_stat & CellHitFindingValid)) continue;
 
-      //...Get CDCSimHit... This is expensive. Should be moved outside.
-      unsigned iSimHit = 0;
-      for (unsigned j = 0; j < nRels; j++) {
-        const unsigned k = rels[j].getToIndices().size();
-        for (unsigned l = 0; l < k; l++) {
-          if (rels[j].getToIndex(l) == i)
-            iSimHit = rels[j].getFromIndex();
-        }
+	//...Get CDCSimHit... This is expensive. Should be moved outside.
+	unsigned iSimHit = 0;
+	for (unsigned j = 0; j < nRels; j++) {
+	    const unsigned k = rels[j].getToIndices().size();
+	    for (unsigned l = 0; l < k; l++) {
+		if (rels[j].getToIndex(l) == i)
+		    iSimHit = rels[j].getFromIndex();
+	    }
 
-        if (TRGDebug::level())
-          if (k > 1)
-            cout << "TRGCDC::update !!! CDCSimHit[" << iSimHit
-                 << "] has multiple CDCHit(" << k << " hits)" << endl;
-      }
+	    if (TRGDebug::level())
+		if (k > 1)
+		    cout << "TRGCDC::update !!! CDCSimHit[" << iSimHit
+			 << "] has multiple CDCHit(" << k << " hits)" << endl;
+	}
 
-      //...Get MCParticle... This is expensive, again.
-      //   (Getting the first MCParticle only)
-      unsigned iMCPart = 0;
-      for (unsigned j = 0; j < nRelsMC; j++) {
-        const unsigned k = relsMC[j].getToIndices().size();
-        for (unsigned l = 0; l < k; l++) {
-          if (relsMC[j].getToIndex(l) == i) {
-            iMCPart = relsMC[j].getFromIndex();
-            break;
-          }
-        }
+	//...Get MCParticle... This is expensive, again.
+	//   (Getting the first MCParticle only)
+	unsigned iMCPart = 0;
+	for (unsigned j = 0; j < nRelsMC; j++) {
+	    const unsigned k = relsMC[j].getToIndices().size();
+	    for (unsigned l = 0; l < k; l++) {
+		if (relsMC[j].getToIndex(l) == i) {
+		    iMCPart = relsMC[j].getFromIndex();
+		    break;
+		}
+	    }
 
-        if (TRGDebug::level())
-          if (k > 1)
-            cout << "TRGCDC::update !!! MCParticle[" << iMCPart
-                 << "] has multiple CDCHit(" << k << " hits)" << endl;
-      }
+	    if (TRGDebug::level())
+		if (k > 1)
+		    cout << "TRGCDC::update !!! MCParticle[" << iMCPart
+			 << "] has multiple CDCHit(" << k << " hits)" << endl;
+	}
 
-      //...Wire...
-      int t_layerId;
-      if (h.getISuperLayer() == 0) t_layerId = h.getILayer();
-      else t_layerId = h.getILayer() + 6 * h.getISuperLayer() + 2;
-      const unsigned layerId = t_layerId;
-      const unsigned wireId = h.getIWire();
-      TCWire& w = * (TCWire*) wire(layerId, wireId);
+	//...Wire...
+	int t_layerId;
+	if (h.getISuperLayer() == 0) t_layerId = h.getILayer();
+	else t_layerId = h.getILayer() + 6 * h.getISuperLayer() + 2;
+	const unsigned layerId = t_layerId;
+	const unsigned wireId = h.getIWire();
+	TCWire & w = * (TCWire*) wire(layerId, wireId);
 
-      //...Drift length(micron) to drift time(ns)...
-      //   coefficient used here must be re-calculated.
-      const float driftTimeMC =
-        SimHits[iSimHit]->getDriftLength() * 10 * 1000 / 40 +
-        SimHits[iSimHit]->getFlightTime();
+	//...Drift length(micron) to drift time(ns)...
+	//   coefficient used here must be re-calculated.
+	const float driftTimeMC =
+	    SimHits[iSimHit]->getDriftLength() * 10 * 1000 / 40 +
+	    SimHits[iSimHit]->getFlightTime();
 
-      //...Trigger timing...
-      TRGTime rise = TRGTime(driftTimeMC, true, _clockFE, w.name());
-      TRGTime fall = rise;
-      fall.shift(1).reverse();
-      w._timing = TRGSignal(rise & fall);
-      w._timing.name(w.name());
+	//...Trigger timing...
+	TRGTime rise = TRGTime(driftTimeMC, true, _clockFE, w.name());
+	TRGTime fall = rise;
+	fall.shift(1).reverse();
+	w._timing = TRGSignal(rise & fall);
+	w._timing.name(w.name());
 
-      //...Simulated drift distance...
+	//...Simulated drift distance...
 #ifndef FOR_TRASAN
-      const double driftLength =
-	  _clockFE.absoluteTime(w._timing[0]->time()) * 40 / 10 / 1000;
-      const double driftLengthError = 0.15;
+	const double driftLength =
+	    _clockFE.absoluteTime(w._timing[0]->time()) * 40 / 10 / 1000;
+	const double driftLengthError = 0.15;
 #else 
-      static bool first(true);
-      if(first) {
-	  first = false;
-	  cout <<"TRGCDCWireHit is modified for Trasan." << std::endl;
-      }
-      const float driftLength = h.getTDCCount()*(40./10000.);
-      const float driftLengthError = 0.013;
+	static bool first(true);
+	if (first) {
+	    first = false;
+	    cout <<"TRGCDCWireHit is modified for Trasan." << std::endl;
+	}
+	const float driftLength = h.getTDCCount() * (40. / 10000.);
+	const float driftLengthError = 0.013;
 #endif
-      //w._timing.dump("detail", " -1 ");
+	//w._timing.dump("detail", " -1 ");
 
-      //...TCWireHit...
-      TCWHit* hit = new TCWHit(w,
-                               i,
-                               iSimHit,
-                               iMCPart,
-                               driftLength,
-			       driftLengthError,
-                               driftLength,
-                               driftLengthError,
-                               1);
-      hit->state(CellHitFindingValid | CellHitFittingValid);
+	//...TCWireHit...
+	TCWHit * hit = new TCWHit(w,
+				  i,
+				  iSimHit,
+				  iMCPart,
+				  driftLength,
+				  driftLengthError,
+				  driftLength,
+				  driftLengthError,
+				  1);
+	hit->state(CellHitFindingValid | CellHitFittingValid);
 
-      //...Store a hit...
-      ((TCWire*)(* _layers[layerId])[wireId])->hit(hit);
-      _hits.push_back(hit);
-      if (w.axial()) _axialHits.push_back(hit);
-      else           _stereoHits.push_back(hit);
+	//...Store a hit...
+	((TCWire *)(* _layers[layerId])[wireId])->hit(hit);
+	_hits.push_back(hit);
+	if (w.axial()) _axialHits.push_back(hit);
+	else           _stereoHits.push_back(hit);
     }
 
     //...Track segment... This part is moved to ::simulate().
@@ -875,7 +888,7 @@ TRGCDC::terminate(void) {
     }
 
     TRGDebug::leaveStage("TRGCDC update");
-  }
+}
 
   void
   TRGCDC::classification(void)
@@ -1307,27 +1320,31 @@ TRGCDC::simulate(void) {
     //...Store TS hits...
     const unsigned n = _tss.size();
     for (unsigned i = 0; i < n; i++) {
-	TCSegment& s = * _tss[i];
+	TCSegment & s = * _tss[i];
 	s.simulate();
 	if (s.timing().active()) {
+	    TCSHit * th = new TCSHit(s);
+	    s.hit(th);
+	    _segmentHits.push_back(th);
+	    _segmentHitsSL[s.layerId()].push_back(th);
 
-	    //...Create TCShit...
-	    unsigned j = 0;
-	    const TCWire* w = s[j];
-	    TCSHit* th = 0;
-	    while (w) {
-		const TCWHit* h = w->hit();
-		if (h) {
-		    if (! th) {
-			th = new TCSHit(s);
-			s.hit(th);
-			_segmentHits.push_back(th);
-			_segmentHitsSL[s.layerId()].push_back(th);
-		    }
-		    s._hits.push_back(h);
-		}
-		w = s[++j];
-	    }
+// 	    //...Create TCShit...
+// 	    unsigned j = 0;
+// 	    const TCWire * w = s[j];
+// 	    TCSHit * th = 0;
+// 	    while (w) {
+// 		const TCWHit * h = w->hit();
+// 		if (h) {
+// 		    if (! th) {
+// 			th = new TCSHit(s);
+// 			s.hit(th);
+// 			_segmentHits.push_back(th);
+// 			_segmentHitsSL[s.layerId()].push_back(th);
+// 		    }
+// 		    s._hits.push_back(h);
+// 		}
+// 		w = s[++j];
+// 	    }
 	}
     }
 
@@ -1374,9 +1391,6 @@ TRGCDC::simulate(void) {
     else
 	_hFinder->doit(trackList);
 
-//     if (trackList.size() == 1)
-// 	D->stop();
-
     //...Perfect position test...
     if (trackList.size()) {
 	vector<HepGeom::Point3D<double> > ppos =
@@ -1419,12 +1433,14 @@ TRGCDC::simulate(void) {
     //...End of simulation...
 
     //:::Fill root file:::
+
     //...Event Time...
     TClonesArray& evtTime = *m_evtTime;
     evtTime.Clear();
     TVectorD tempEvtTime(1);
     tempEvtTime[0] = _eventTime.back()->getT0();
     new(evtTime[0]) TVectorD(tempEvtTime);
+
     //...MCParticle...
     StoreArray<MCParticle> mcParticles;
     if (! mcParticles) {
@@ -1522,8 +1538,59 @@ TRGCDC::simulate(void) {
 	}
     } // End of loop over last layer candidates
 
+    //...2D tracks...
+#ifdef TRGCDC_DISPLAY
+    if (trackList.size() == 0) {
+	cout << "!!! No track found. Display will be stopped" << endl;
+ 	D->stop();
+    }
+#endif
+    _tracks2D->Clear();
+    for (unsigned i = 0; i < trackList.size(); i++) {
+	const TCTrack & trk = * trackList[i];
+
+	TCHelix h = trk.helix();
+	static const HepGeom::Point3D<double> Origin(0, 0, 0);
+	h.pivot(Origin);
+	const double chg = trk.charge();
+	const double pt = h.momentum().perp();
+	const double phi = h.phi0();
+	const double dr = h.dr();
+
+	const TCRelation & trkRelation = trk.relation();
+	const MCParticle & trkMC = trkRelation.mcParticle(0);
+	TCHelix hMC = TCHelix(
+	    HepGeom::Point3D<double>(trkMC.getProductionVertex().x(),
+				     trkMC.getProductionVertex().y(),
+				     trkMC.getProductionVertex().z()),
+	    CLHEP::Hep3Vector(trkMC.getMomentum().x(),
+			      trkMC.getMomentum().y(),
+			      trkMC.getMomentum().z()),
+	    trkMC.getCharge());
+	hMC.pivot(Origin);
+	const double chgMC = trkMC.getCharge();
+	const double ptMC = hMC.momentum().perp();
+	const double phiMC = hMC.phi0();
+	const double drMC = hMC.dr();
+
+	TVectorD tvd(8);
+	tvd[0] = chg;
+	tvd[1] = pt;
+	tvd[2] = phi;
+	tvd[3] = dr;
+	tvd[4] = chgMC;
+	tvd[6] = ptMC;
+	tvd[6] = phiMC;
+	tvd[7] = drMC;
+
+	new((* _tracks2D)[i]) TVectorD(tvd);
+
+	cout << "drMC = " << drMC << ", drmc2 = " << trkMC.getVertex().X()
+	     << endl;
+    }
+
     //...MC track information...
-    const unsigned localSwitch = 0;           // 0:for found MC trk only
+    const unsigned localSwitch = 1;           // 0:for found MC trk only
                                               // 1:for all MC trk
     // mcStatus[0]: statusbit, mcStatus[1]: pdg, mcStatus[2]: charge
     TVectorD mcStatus(3);
@@ -1613,6 +1680,7 @@ TRGCDC::simulate(void) {
 	m_tree->Fill();
     }
     m_treeAllTracks->Fill();
+    _tree2D->Fill();
 
     m_eventNum += 1;
     

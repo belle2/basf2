@@ -11,6 +11,41 @@
 using std::cout;
 using std::endl;
 
+int bitSize(int numberBits, int mode) {
+  int bitsize = 1;
+  if( mode == 1 ) {
+    for(int i=0; i<numberBits-1; i++) {
+      bitsize *= 2;
+    }
+      bitsize -= 1;
+  } else if ( mode == 0 ) {
+    for(int i=0; i<numberBits; i++) {
+      bitsize *= 2;
+    }
+  }
+  return bitsize;
+}
+
+
+void changeInteger(int &integer, double real, double minValue, double maxValue, int bitSize) {
+  double range = maxValue - minValue; 
+  double convert = bitSize/range;
+  //cout<<"maxValue: "<<bitSize<<" realValue: "<<(real-minValue)*convert<<endl;
+  integer = int( (real - minValue) * convert +0.5);
+}
+
+void changeReal(double &real, int integer, double minValue, double maxValue, int bitSize) {
+  double range = maxValue - minValue;
+  double convert = bitSize/range;
+  real = (integer/convert) + minValue;
+}
+
+
+void findExtreme(double &m_max, double &m_min, double value) {
+  if(value > m_max) m_max = value;
+  if(value < m_min) m_min = value;
+}
+
 int findSign(double *phi2){
   double Trg_PI=3.141592653589793; 
   int mysign;
@@ -182,7 +217,7 @@ double calS(double &rho, double &rr){
   return result;
 }
 
-void rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot){
+double rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot){
 
   double ss=0, sx=0, sxx=0, cotnum=0, z0num=0;
   double z0nump1[4], z0nump2[4];
@@ -213,6 +248,9 @@ void rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot){
     zchi2 += (zz[i]-z0-cot*arcS[i])*(zz[i]-z0-cot*arcS[i])*iezz2[i];
   }
   zchi2 /= (4-2);
+
+  return zchi2;
+
 }
 
 void findImpactPosition(TVector3 * mcPosition, TLorentzVector * mcMomentum, int charge, TVector2 & helixCenter, TVector3 & impactPosition){

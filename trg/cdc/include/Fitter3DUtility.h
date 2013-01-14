@@ -5,7 +5,15 @@
 #include "TVector3.h"
 #include "TVector2.h"
 
+int bitSize(int numberBits, int mode);
+
+void changeInteger(int &integer, double real, double minValue, double maxValue, int bitSize);
+
+void changeReal(double &real, int integer, double minValue, double maxValue, int bitSize);
+
 int findSign(double *phi2);
+
+void findExtreme(double &m_max, double &m_min, double value);
 
 void rPhiFit(double *rr, double *phi2, double *phierror, double &rho, double &myphi0);
 
@@ -19,7 +27,7 @@ double calZ(int &mysign, double &anglest, double &ztostraw, double &rr, double &
 
 double calS(double &rho, double &rr);
 
-void rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot);
+double rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot);
 
 void findImpactPosition(TVector3 * mcPosition, TLorentzVector * mcMomentum, int charge, TVector2 & helixCenter, TVector3 & impactPosition);
 

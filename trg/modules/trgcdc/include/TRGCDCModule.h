@@ -94,6 +94,9 @@ class TRGCDCModule : public Module {
     /// \# of Y mesh for the Hough finder.
     int _hFinderMeshY;
 
+    /// Min. peak height for the Hough finder.
+    int _hFinderPeakMin;
+
     /// Switch for the LR LUT in Fitter3D.
     bool _fLRLUT;
 

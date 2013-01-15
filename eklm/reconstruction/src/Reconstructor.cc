@@ -122,20 +122,18 @@ bool EKLM::Reconstructor::doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
                                         TVector3& crossPoint,
                                         double& chisq, double& time)
 {
-  /* Units are mm. */
-  double max1 = EKLM::stripLen[hit1->getStrip() - 1];
-  HepGeom::Point3D<double> p1(max1 / 2, 0., 0.);
-  // sipm coordinates in a global frame
+  /* Convert to mm. */
+  double max1 = getStripLength(hit1->getStrip()) * 10.0;
+  HepGeom::Point3D<double> p1(max1 * 0.5, 0., 0.);
   HepGeom::Transform3D* tr1 = EKLM::getStripTransform(m_transf, hit1);
   HepGeom::Point3D<double> pt1 = (*tr1) * p1;
 
-  double max2 = EKLM::stripLen[hit2->getStrip() - 1];
-  HepGeom::Point3D<double> p2(max2 / 2, 0., 0.);
+  double max2 = getStripLength(hit2->getStrip()) * 10.0;
+  HepGeom::Point3D<double> p2(max2 * 0.5, 0., 0.);
   HepGeom::Transform3D* tr2 = EKLM::getStripTransform(m_transf, hit2);
-  // sipm coordinates in a global frame
   HepGeom::Point3D<double> pt2 = (*tr2) * p2;
 
-  /* Units are cm. */
+  /* Convert to cm. */
   crossPoint.SetZ((pt1.z() + pt2.z()) / 2 * Unit::mm);
 
   double t1 = 0;

@@ -7,7 +7,7 @@
     <ESTR>
 	<Rotation desc="Rotation of the structure with respect to the Detector" unit="rad">0.0</Rotation>
 	<OffsetZ desc="The offset of the Structure in z with respect to the IP" unit="cm">47.0</OffsetZ>
-		
+
 	<EndcapKLM>
 		<Nsides desc="number of sides of Barrel KLM Vessel">8</Nsides>
 		<Phi unit="deg">-22.5</Phi>
@@ -35,11 +35,11 @@
 		<THICK_EIRON_MEAS unit="cm">4.7</THICK_EIRON_MEAS>
 		<THICK_ESLOT unit="cm">4.4</THICK_ESLOT>
 		<THICK_ESLOT_MEAS unit="cm">4.4</THICK_ESLOT_MEAS>
-		<THICK_EMOD unit="cm">4.0</THICK_EMOD>	
-		<RMIN_EMOD unit="cm">130.0</RMIN_EMOD>	
-		<RMAX_EMOD unit="cm">332.0</RMAX_EMOD>	
-		<RMIN_ESLOT unit="cm">130.0</RMIN_ESLOT>	
-		<RMAX_ESLOT unit="cm">334.0</RMAX_ESLOT>	
+		<THICK_EMOD unit="cm">4.0</THICK_EMOD>
+		<RMIN_EMOD unit="cm">130.0</RMIN_EMOD>
+		<RMAX_EMOD unit="cm">332.0</RMAX_EMOD>
+		<RMIN_ESLOT unit="cm">130.0</RMIN_ESLOT>
+		<RMAX_ESLOT unit="cm">334.0</RMAX_ESLOT>
 		<RSHIFT_ESLOT unit="cm">5.0</RSHIFT_ESLOT>
 		<RMAX_GLASS unit="cm">320.0</RMAX_GLASS>
 	</EndcapKLMSlot>
@@ -56,7 +56,7 @@
     </Digitizer>
     <Rotation desc="Rotation of the EKLM with respect to the Detector"
       unit="mrad">0.0</Rotation>
-    <EndCap>
+    <Endcap>
       <InnerR desc="Inner radius"   unit="mm">1305.0</InnerR>
       <OuterR desc="Outer radius"   unit="mm">3320.0</OuterR>
       <Length desc="Length"         unit="mm">1321.0</Length>
@@ -64,7 +64,7 @@
       <PositionY  desc="Y position" unit="mm">0</PositionY>
       <PositionZ  desc="Z position" unit="mm">2770.0</PositionZ>
       <nLayer desc="Number of layers in one endcap">14</nLayer>
-      <Layer>	
+      <Layer>
 	<InnerR desc="Inner radius"   unit="mm">1305.0</InnerR>
 	<OuterR desc="Outer radius"   unit="mm">3320.0</OuterR>
 	<Length desc="Length"         unit="mm">44.0</Length>
@@ -794,6 +794,6 @@
 	  </Plane>
  	</Sector>
       </Layer>
-    </EndCap>
+    </Endcap>
   </Content>
 </DetectorComponent>

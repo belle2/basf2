@@ -240,7 +240,7 @@ void EKLM::GeoEKLMBelleII::readXMLData()
   if (m_mode < 0 || m_mode > 2)
     B2FATAL("EKLM started with unknown geometry mode " << m_mode << ".");
   GearDir EndCap(gd);
-  EndCap.append("/EndCap");
+  EndCap.append("/Endcap");
   readPositionData(&EndcapPosition, &EndCap);
   EndcapPosition.Z = EndcapPosition.Z + EndcapPosition.length / 2.0;
   nLayer = EndCap.getInt("nLayer");

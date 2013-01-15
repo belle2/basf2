@@ -16,10 +16,11 @@ namespace Belle2 {
   namespace EKLM {
 
     /**
-     * Array of strip lengths.
-     * Units are mm.
+     * Get strip length.
+     * @param[in] strip Number of strip (numbers start from 1).
+     * @return Strip length (cm).
      */
-    extern const double stripLen[75];
+    double getStripLength(int strip);
 
   }
 

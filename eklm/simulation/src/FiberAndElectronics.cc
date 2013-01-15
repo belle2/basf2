@@ -129,8 +129,7 @@ void EKLM::FiberAndElectronics::lightPropagationDistance(EKLMSimHit* sh)
 {
   double half_len;
   double local_pos;
-  /* Convert mm to cm. */
-  half_len = 0.05 * EKLM::stripLen[sh->getStrip() - 1];
+  half_len = 0.5 * getStripLength(sh->getStrip());
   local_pos = sh->getLocalPosition()->x();
   m_hitDist = std::make_pair(half_len - local_pos, 3.0 * half_len + local_pos);
 }

@@ -10,19 +10,18 @@
 
 /* Belle2 headers. */
 #include <eklm/reconstruction/Reconstructor.h>
-#include <eklm/geometry/StripData.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 
 using namespace Belle2;
 
-EKLM::Reconstructor::Reconstructor(struct TransformData* transf)
+EKLM::Reconstructor::Reconstructor(GeometryData* geoDat)
 {
   GearDir Digitizer = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]"
                               "/Content/Digitizer");
   m_firstPhotonlightSpeed = Digitizer.getDouble("FirstPhotonSpeed");
   m_sigmaT = Digitizer.getDouble("TimeResolution");
-  m_transf = transf;
+  m_geoDat = geoDat;
 }
 
 void EKLM::Reconstructor::readStripHits()
@@ -123,14 +122,14 @@ bool EKLM::Reconstructor::doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
                                         double& chisq, double& time)
 {
   /* Convert to mm. */
-  double max1 = getStripLength(hit1->getStrip()) * 10.0;
+  double max1 = m_geoDat->getStripLength(hit1->getStrip()) * 10.0;
   HepGeom::Point3D<double> p1(max1 * 0.5, 0., 0.);
-  HepGeom::Transform3D* tr1 = EKLM::getStripTransform(m_transf, hit1);
+  HepGeom::Transform3D* tr1 = EKLM::getStripTransform(&m_geoDat->transf, hit1);
   HepGeom::Point3D<double> pt1 = (*tr1) * p1;
 
-  double max2 = getStripLength(hit2->getStrip()) * 10.0;
+  double max2 = m_geoDat->getStripLength(hit2->getStrip()) * 10.0;
   HepGeom::Point3D<double> p2(max2 * 0.5, 0., 0.);
-  HepGeom::Transform3D* tr2 = EKLM::getStripTransform(m_transf, hit2);
+  HepGeom::Transform3D* tr2 = EKLM::getStripTransform(&m_geoDat->transf, hit2);
   HepGeom::Point3D<double> pt2 = (*tr2) * p2;
 
   /* Convert to cm. */
@@ -185,7 +184,7 @@ bool EKLM::Reconstructor::doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
 bool EKLM::Reconstructor::CheckStripOrientationX(EKLMDigit* hit)
 {
   HepGeom::Transform3D tinv =
-    HepGeom::Transform3D(*(EKLM::getStripTransform(m_transf, hit))).inverse();
+    HepGeom::Transform3D(*(EKLM::getStripTransform(&m_geoDat->transf, hit))).inverse();
   return (fabs(sin(tinv.getRotation().phiX())) < 0.01);
 }
 

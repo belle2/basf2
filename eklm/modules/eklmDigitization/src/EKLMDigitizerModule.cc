@@ -39,9 +39,9 @@ void EKLMDigitizerModule::initialize()
 {
   StoreArray<EKLMSimHit>::registerPersistent();
   StoreArray<EKLMDigit>::registerPersistent();
-  if (EKLM::readTransforms(&m_transf) != 0)
-    B2FATAL("Cannot read transformation data file.");
-  EKLM::transformsToGlobal(&m_transf);
+  if (m_geoDat.read() != 0)
+    B2FATAL("Cannot read geometry data file.");
+  EKLM::transformsToGlobal(&m_geoDat.transf);
   /* Fill digitization parameters. */
   m_digPar.ADCSamplingTime = 1.0;
   m_digPar.nDigitizations = 200;
@@ -63,7 +63,7 @@ void EKLMDigitizerModule::beginRun()
 
 void EKLMDigitizerModule::event()
 {
-  EKLM::Digitizer digi(&m_transf, &m_digPar);
+  EKLM::Digitizer digi(&m_geoDat, &m_digPar);
   digi.readAndSortStepHits();
   digi.makeSimHits();
   digi.readAndSortSimHits();

@@ -11,12 +11,14 @@
 #ifndef EKLMTRANSFORMDATA_H
 #define EKLMTRANSFORMDATA_H
 
+/* System headers. */
+#include <stdio.h>
+
 /* External headers. */
 #include <CLHEP/Geometry/Transform3D.h>
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
-#include <framework/core/Environment.h>
 
 /**
  * @file
@@ -56,25 +58,22 @@ namespace Belle2 {
 
     /**
      * Write transformations to file.
+     * @param[in] f    File.
      * @param[in] dat  Transformation data.
-     * @param[in] file Name of file.
      * @return 0  Successful.
      * @return -1 Error.
      */
-    int writeTransforms(struct TransformData* dat, const char* file);
+    int writeTransforms(FILE* f, struct TransformData* dat);
 
     /**
      * Read transformations from file.
+     * @param[in]  f    File.
      * @param[out] dat  Transformation data.
      * @param[in]  file Name of file.
      * @return 0  Successful.
      * @return -1 Error.
      */
-    int readTransforms(
-      struct TransformData* dat,
-      const char* file =
-        std::string(Environment::Instance().getDataSearchPath() +
-                    "/eklm/eklm_alignment.dat").c_str());
+    int readTransforms(FILE* f, struct TransformData* dat);
 
     /**
      * Fill transformations.

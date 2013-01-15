@@ -8,9 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* System headers. */
+#include <fcntl.h>
+#include <unistd.h>
+
 /* Belle2 headers. */
 #include <framework/core/ModuleManager.h>
-#include <eklm/geometry/TransformData.h>
+#include <eklm/geometry/GeometryData.h>
 #include <eklm/modules/eklmAlignment/EKLMAlignmentModule.h>
 
 using namespace Belle2;
@@ -43,13 +47,9 @@ void EKLMAlignmentModule::event()
 
 void EKLMAlignmentModule::endRun()
 {
-  struct EKLM::TransformData dat;
-  EKLM::fillTransforms(&dat);
-  if (EKLM::writeTransforms(&dat, m_out.c_str()) != 0) {
-    B2ERROR("EKLMAlignmentModule: cannot fill output file.");
-    return;
-  }
-  B2INFO("EKLMAlignmentModule: generated data file " << m_out);
+  EKLM::GeometryData dat;
+  if (dat.save(m_out.c_str()) != 0)
+    B2ERROR("Cannot save geometry data.");
 }
 
 void EKLMAlignmentModule::terminate()

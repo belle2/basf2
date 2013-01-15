@@ -16,7 +16,6 @@
 
 /*i Belle2 headers. */
 #include <eklm/geometry/GeoEKLMBelleII.h>
-#include <eklm/geometry/StripData.h>
 #include <eklm/simulation/FiberAndElectronics.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
@@ -27,7 +26,7 @@ static const char MemErr[] = "Memory allocation error.";
 
 EKLM::FiberAndElectronics::FiberAndElectronics(
   std::pair < int, std::vector<EKLMSimHit*> > entry,
-  struct EKLM::TransformData* transf,
+  EKLM::GeometryData* geoDat,
   struct EKLM::DigitizationParams* digPar)
 {
   m_digPar = digPar;
@@ -56,7 +55,7 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
 
   // define vector of hits
   m_vectorHits = entry.second;
-  m_transf = transf;
+  m_geoDat = geoDat;
 }
 
 
@@ -129,7 +128,7 @@ void EKLM::FiberAndElectronics::lightPropagationDistance(EKLMSimHit* sh)
 {
   double half_len;
   double local_pos;
-  half_len = 0.5 * getStripLength(sh->getStrip());
+  half_len = 0.5 * m_geoDat->getStripLength(sh->getStrip());
   local_pos = sh->getLocalPosition()->x();
   m_hitDist = std::make_pair(half_len - local_pos, 3.0 * half_len + local_pos);
 }

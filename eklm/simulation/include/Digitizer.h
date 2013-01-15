@@ -19,7 +19,7 @@
 #include <CLHEP/Vector/ThreeVector.h>
 
 /* Belle2 headers. */
-#include <eklm/geometry/TransformData.h>
+#include <eklm/geometry/GeometryData.h>
 #include <eklm/dataobjects/EKLMStepHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
@@ -100,7 +100,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      Digitizer(struct EKLM::TransformData* transf,
+      Digitizer(EKLM::GeometryData* geoDat,
                 struct EKLM::DigitizationParams* digPar);
 
       /**
@@ -130,8 +130,8 @@ namespace Belle2 {
 
     private:
 
-      /** Transformation data. */
-      struct EKLM::TransformData* m_transf;
+      /** Geometry data. */
+      EKLM::GeometryData* m_geoDat;
 
       /** Parameters. */
       struct EKLM::DigitizationParams* m_digPar;

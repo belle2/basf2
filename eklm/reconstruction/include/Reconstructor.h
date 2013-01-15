@@ -17,7 +17,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMSectorHit.h>
-#include <eklm/geometry/TransformData.h>
+#include <eklm/geometry/GeometryData.h>
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
@@ -34,7 +34,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      Reconstructor(struct TransformData* transf);
+      Reconstructor(GeometryData* geoDat);
 
       /**
        * Destructor.
@@ -106,8 +106,8 @@ namespace Belle2 {
       /** Time smearing. */
       double m_sigmaT;
 
-      /** Transformation data. */
-      struct TransformData* m_transf;
+      /** Geometry data. */
+      GeometryData* m_geoDat;
 
     };
 

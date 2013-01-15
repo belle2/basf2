@@ -12,7 +12,7 @@
 #define EKLMRECONSTRUCTIONMODULE_H
 
 /* Belle2 headers. */
-#include <eklm/geometry/TransformData.h>
+#include <eklm/geometry/GeometryData.h>
 #include <framework/core/Module.h>
 
 namespace Belle2 {
@@ -65,7 +65,7 @@ namespace Belle2 {
   private:
 
     /** Transformation data. */
-    struct EKLM::TransformData m_transf;
+    struct EKLM::GeometryData m_geoDat;
 
     /** Light speed for first photon. */
     double m_firstPhotonlightSpeed;

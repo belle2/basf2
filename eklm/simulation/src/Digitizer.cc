@@ -23,10 +23,10 @@ using namespace Belle2;
 
 static const char MemErr[] = "Memory allocation error.";
 
-EKLM::Digitizer::Digitizer(struct EKLM::TransformData* transf,
+EKLM::Digitizer::Digitizer(EKLM::GeometryData* geoDat,
                            struct EKLM::DigitizationParams* digPar)
 {
-  m_transf = transf;
+  m_geoDat = geoDat;
   m_digPar = digPar;
 }
 
@@ -234,7 +234,7 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
 
     // create fes entry
     EKLM::FiberAndElectronics* fes =
-      new EKLM::FiberAndElectronics(*it, m_transf, m_digPar);
+      new EKLM::FiberAndElectronics(*it, m_geoDat, m_digPar);
 
     // do all work
     fes->processEntry();

@@ -15,20 +15,13 @@
 
 using namespace Belle2;
 
-static const char MemErr[] = "Memory allocation error.";
-
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
 REG_MODULE(EKLMReconstructor)
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
+static const char MemErr[] = "Memory allocation error.";
 
 EKLMReconstructorModule::EKLMReconstructorModule() : Module()
 {
-  setDescription("EKLM reconstruction simple module for tests");
+  setDescription("EKLM reconstruction module.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 }
 
@@ -40,26 +33,23 @@ void EKLMReconstructorModule::initialize()
 {
   StoreArray<EKLMSectorHit>::registerPersistent();
   StoreArray<EKLMHit2d>::registerPersistent();
-  if (EKLM::readTransforms(&m_transf) != 0)
-    B2FATAL("Cannot read transformation data file.");
-  EKLM::transformsToGlobal(&m_transf);
-  B2INFO("EKLMReconstructorModule initialized");
+  if (m_geoDat.read() != 0)
+    B2FATAL("Cannot read geometry data file.");
+  EKLM::transformsToGlobal(&m_geoDat.transf);
 }
 
 void EKLMReconstructorModule::beginRun()
 {
-  B2DEBUG(1, "EKLMReconstructorModule : beginRun");
 }
 
 void EKLMReconstructorModule::event()
 {
   EKLM::Reconstructor* recon;
   try {
-    recon = new EKLM::Reconstructor(&m_transf);
+    recon = new EKLM::Reconstructor(&m_geoDat);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  B2INFO("EKLMReconstructorModule::event() called")
   recon->readStripHits();
   recon->createSectorHits();
   recon->create2dHits();

@@ -33,7 +33,7 @@
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <eklm/simulation/EKLMSensitiveDetector.h>
-#include <eklm/geometry/TransformData.h>
+#include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/G4TriangularPrism.h>
 #include <eklm/geometry/GeoESTRCreator.h>
 #include <eklm/geometry/GeoEKLMTypes.h>
@@ -547,8 +547,8 @@ namespace Belle2 {
       /** Current volumes. */
       struct VolumeNumbers curvol;
 
-      /** Transformations. */
-      struct TransformData* transf;
+      /** Geometry data. */
+      GeometryData* m_geoDat;
 
       /** Number of layers. */
       int nLayer;

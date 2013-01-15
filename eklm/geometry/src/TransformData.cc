@@ -8,10 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* System headers. */
-#include <fcntl.h>
-#include <unistd.h>
-
 /* Belle2 headers. */
 #include <eklm/geometry/GeoEKLMBelleII.h>
 #include <eklm/geometry/TransformData.h>
@@ -20,15 +16,13 @@ using namespace Belle2;
 
 /**
  * Write transformation data to file.
- * @param[in] fd File descriptor.
- * @param[in] t  Transformation.
+ * @param[in] f File.
+ * @param[in] t Transformation.
  * @return 0  Successful.
  * @return -1 Error.
  */
-static int writeTransform(int fd, HepGeom::Transform3D* t)
+static int writeTransform(FILE* f, HepGeom::Transform3D* t)
 {
-  int s;
-  int ds;
   double buf[12];
   buf[0] = t->xx();
   buf[1] = t->xy();
@@ -42,40 +36,25 @@ static int writeTransform(int fd, HepGeom::Transform3D* t)
   buf[9] = t->dx();
   buf[10] = t->dy();
   buf[11] = t->dz();
-  s = sizeof(buf);
-  while (1) {
-    ds = write(fd, buf, s);
-    if (ds == -1)
-      return -1;
-    s = s - ds;
-    if (s <= 0)
-      return 0;
-  }
+  if (fwrite(buf, sizeof(buf), 1, f) != 1)
+    return -1;
+  return 0;
 }
 
 /**
  * Read transformation data from file.
- * @param[in]  fd File descriptor
+ * @param[in]  f  File.
  * @param[out] t  Transformation.
  * @return 0  Successful.
  * @return -1 Error.
  */
-static int readTransform(int fd, HepGeom::Transform3D* t)
+static int readTransform(FILE* f, HepGeom::Transform3D* t)
 {
-  int s;
-  int ds;
   double buf[12];
   CLHEP::HepRotation r;
   CLHEP::Hep3Vector v;
-  s = sizeof(buf);
-  while (1) {
-    ds = read(fd, buf, s);
-    if (ds == -1)
-      return -1;
-    s = s - ds;
-    if (s <= 0)
-      break;
-  }
+  if (fread(buf, sizeof(buf), 1, f) != 1)
+    return -1;
   r.set(CLHEP::HepRep3x3(buf[0], buf[1], buf[2], buf[3], buf[4],
                          buf[5], buf[6], buf[7], buf[8]));
   v.set(buf[9], buf[10], buf[11]);
@@ -83,31 +62,27 @@ static int readTransform(int fd, HepGeom::Transform3D* t)
   return 0;
 }
 
-int EKLM::writeTransforms(struct EKLM::TransformData* dat, const char* file)
+int EKLM::writeTransforms(FILE* f, struct EKLM::TransformData* dat)
 {
   int i1;
   int i2;
   int i3;
   int i4;
   int i5;
-  int fd;
-  fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-  if (fd == -1)
-    return -1;
   for (i1 = 0; i1 < 2; i1++) {
-    if (writeTransform(fd, &(dat->endcap[i1])) != 0)
+    if (writeTransform(f, &(dat->endcap[i1])) != 0)
       return -1;
     for (i2 = 0; i2 < 14; i2++) {
-      if (writeTransform(fd, &(dat->layer[i1][i2])) != 0)
+      if (writeTransform(f, &(dat->layer[i1][i2])) != 0)
         return -1;
       for (i3 = 0; i3 < 4; i3++) {
-        if (writeTransform(fd, &(dat->sector[i1][i2][i3])) != 0)
+        if (writeTransform(f, &(dat->sector[i1][i2][i3])) != 0)
           return -1;
         for (i4 = 0; i4 < 2; i4++) {
-          if (writeTransform(fd, &(dat->plane[i1][i2][i3][i4])) != 0)
+          if (writeTransform(f, &(dat->plane[i1][i2][i3][i4])) != 0)
             return -1;
           for (i5 = 0; i5 < 75; i5++) {
-            if (writeTransform(fd, &(dat->strip[i1][i2][i3][i4][i5])) != 0)
+            if (writeTransform(f, &(dat->strip[i1][i2][i3][i4][i5])) != 0)
               return -1;
           }
         }
@@ -117,31 +92,27 @@ int EKLM::writeTransforms(struct EKLM::TransformData* dat, const char* file)
   return 0;
 }
 
-int EKLM::readTransforms(struct EKLM::TransformData* dat, const char* file)
+int EKLM::readTransforms(FILE* f, struct EKLM::TransformData* dat)
 {
   int i1;
   int i2;
   int i3;
   int i4;
   int i5;
-  int fd;
-  fd = open(file, O_RDONLY);
-  if (fd == -1)
-    return -1;
   for (i1 = 0; i1 < 2; i1++) {
-    if (readTransform(fd, &(dat->endcap[i1])) != 0)
+    if (readTransform(f, &(dat->endcap[i1])) != 0)
       return -1;
     for (i2 = 0; i2 < 14; i2++) {
-      if (readTransform(fd, &(dat->layer[i1][i2])) != 0)
+      if (readTransform(f, &(dat->layer[i1][i2])) != 0)
         return -1;
       for (i3 = 0; i3 < 4; i3++) {
-        if (readTransform(fd, &(dat->sector[i1][i2][i3])) != 0)
+        if (readTransform(f, &(dat->sector[i1][i2][i3])) != 0)
           return -1;
         for (i4 = 0; i4 < 2; i4++) {
-          if (readTransform(fd, &(dat->plane[i1][i2][i3][i4])) != 0)
+          if (readTransform(f, &(dat->plane[i1][i2][i3][i4])) != 0)
             return -1;
           for (i5 = 0; i5 < 75; i5++) {
-            if (readTransform(fd, &(dat->strip[i1][i2][i3][i4][i5])) != 0)
+            if (readTransform(f, &(dat->strip[i1][i2][i3][i4][i5])) != 0)
               return -1;
           }
         }

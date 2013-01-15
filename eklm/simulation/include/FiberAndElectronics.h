@@ -14,7 +14,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/geometry/TransformData.h>
+#include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/Digitizer.h>
 #include <eklm/simulation/FPGAFitter.h>
 
@@ -33,7 +33,7 @@ namespace Belle2 {
        * Constructor.
        */
       FiberAndElectronics(std::pair <int, std::vector<EKLMSimHit*> >,
-                          struct EKLM::TransformData* transf,
+                          EKLM::GeometryData* geoDat,
                           struct EKLM::DigitizationParams* digPar);
 
       /**
@@ -69,8 +69,8 @@ namespace Belle2 {
 
     private:
 
-      /** Transformation data. */
-      struct EKLM::TransformData* m_transf;
+      /** Geometry data. */
+      EKLM::GeometryData* m_geoDat;
 
       /** Parameters. */
       struct EKLM::DigitizationParams* m_digPar;

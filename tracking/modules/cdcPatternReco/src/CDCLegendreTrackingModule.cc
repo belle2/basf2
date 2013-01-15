@@ -397,19 +397,7 @@ void CDCLegendreTrackingModule::createGFTrackCandidates()
 
     BOOST_FOREACH(CDCLegendreTrackHit * trackHit, trackHitVector) {
       int hitID = trackHit->getStoreIndex();
-
-      float rho = trackHit->getWirePosition().Mag(); //distance to the origin
-
-      //for the DAF algorithm within GenFit it is important to assign a planeId to each hit
-      //one can choose the layerId as the planeId, this would mean that hits from the same layer will 'compete' to be the 'best matching hit' in this layer
-      //one can also give to each hit a unique planeId, so that e.g. two correct hits in the same layer get similar weights (without 'competition')
-      //I am still not quite sure which way is the best one, this has to be tested...
-
-      //int layerId = cdcTrackHits[hitID]->getLayerId();
-      int uniqueId = trackHit->getLayerId() * 10000
-                     + trackHit->getWireId();//a value which should be unique for each hit
-
-      gfTrackCandidates[i]->addHit(Const::CDC, hitID, rho, uniqueId);
+      gfTrackCandidates[i]->addHit(Const::CDC, hitID);
     }
     ++i;
   }

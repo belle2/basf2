@@ -10,7 +10,7 @@ set_random_seed(1)
 evtmetagen = register_module('EvtMetaGen')
 evtmetagen.param('ExpList', [0])
 evtmetagen.param('RunList', [1])
-evtmetagen.param('EvtNumList', [1000])
+evtmetagen.param('EvtNumList', [10000])
 
 evtmetainfo = register_module('EvtMetaInfo')
 
@@ -26,7 +26,7 @@ param_pGun = {
     'momentumGeneration': 'uniform',
     'momentumParams': [1.0, 1.0],
     'thetaGeneration': 'fixed',
-    'thetaParams': [110., 110.],
+    'thetaParams': [90., 90.],
     'phiGeneration': 'uniform',
     'phiParams': [0, 360],
     'vertexGeneration': 'uniform',
@@ -54,6 +54,8 @@ trackfitchecker = register_module('TrackFitChecker')
 trackfitchecker.logging.log_level = LogLevel.INFO  # the reults of the statistical tests will only show up at info or debug level
 trackfitchecker.param('testSi', True)
 trackfitchecker.param('writeToTextFile', True)
+trackfitchecker.param('truthAvailable', True)
+trackfitchecker.param('robustTests', True)
 trackfitchecker.param('writeToRootFile', True)
 trackfitchecker.param('inspectTracks', False)
 trackfitchecker.param('outputFileName', 'siTracking')

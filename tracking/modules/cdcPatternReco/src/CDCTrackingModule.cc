@@ -243,18 +243,8 @@ void CDCTrackingModule::event()
     B2DEBUG(100, " Add Hits: hitId   rho    planeId")
     for (unsigned int iter = 0; iter < hitIndices.size(); ++iter) {
       int hitID = hitIndices.at(iter); //hit index
-      float rho = cdcTrackHits[hitID]->getWirePosition().Mag(); //distance to the origin
-
-      //for the DAF algorithm within GenFit it is important to assign a planeId to each hit
-      //one can choose the layerId as the planeId, this would mean that hits from the same layer will 'compete' to be the 'best matching hit' in this layer
-      //one can also give to each hit a unique planeId, so that e.g. two correct hits in the same layer get similar weights (without 'competition')
-      //I am still not quite sure which way is the best one, this has to be tested...
-
-      //int layerId = cdcTrackHits[hitID]->getLayerId();
-      int uniqueId = cdcTrackHits[hitID]->getLayerId() * 10000 + cdcTrackHits[hitID]->getWireId(); //a value which should be unique for each hit
-
-      gfTrackCandidates[i]->addHit(Const::CDC, hitID, rho, uniqueId);
-      B2DEBUG(100, "             " << hitID << "     " << rho << "  " << uniqueId);
+      gfTrackCandidates[i]->addHit(Const::CDC, hitID);
+      B2DEBUG(100, "             " << hitID);
 
     }
     hitIndices.clear();

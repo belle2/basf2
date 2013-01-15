@@ -2363,11 +2363,11 @@ namespace Belle {
       const unsigned layerId = h.wire().layerId();
       const int hitID = h.iCDCHit();
       //      const double driftTime = h.drift();
-      const HepGeom::Point3D<double> & onTrack = t.links()[sort[i]]->positionOnTrack();
-      const double rho = onTrack.mag();
-      const int uniqueId = layerId * 10000 + h.wire().localId();
+//      const HepGeom::Point3D<double> & onTrack = t.links()[sort[i]]->positionOnTrack();
+//      const double rho = onTrack.mag();
+//      const int uniqueId = layerId * 10000 + h.wire().localId();
 
-      trackCandidates[counter]->addHit(Belle2::Const::CDC, hitID, uniqueId, rho);
+      trackCandidates[counter]->addHit(Belle2::Const::CDC, hitID);
     }
 
     return 0;

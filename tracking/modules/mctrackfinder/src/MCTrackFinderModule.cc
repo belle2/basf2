@@ -463,9 +463,8 @@ void MCTrackFinderModule::event()
     //     cdc 3
     if (m_usePXDHits && m_useClusters == false) {
       BOOST_FOREACH(int hitID, pxdHitsIndices) {
-        VxdID aVxdId = pxdTrueHits[hitID]->getSensorID();
         float time = pxdTrueHits[hitID]->getGlobalTime();
-        trackCandidates[counter]->addHit(Const::PXD, hitID, aVxdId.getID(), double(time));
+        trackCandidates[counter]->addHit(Const::PXD, hitID, -1, double(time)); // -1 means the hit will not compeate with any other hit in the DAF
       }
       B2DEBUG(100, "     add " << pxdHitsIndices.size() << " PXDHits");
     }
@@ -473,8 +472,6 @@ void MCTrackFinderModule::event()
     if (m_usePXDHits && m_useClusters) {
       RelationIndex<PXDCluster, PXDTrueHit> relPxdClusterTrueHit;
       BOOST_FOREACH(int hitID, pxdHitsIndices) {
-
-        VxdID aVxdId = pxdClusters[hitID]->getSensorID();
         RelationIndex<PXDCluster, PXDTrueHit>::range_from iterPairCluTr = relPxdClusterTrueHit.getElementsFrom(pxdClusters[hitID]);
         if (iterPairCluTr.first == iterPairCluTr.second) { // there is not trueHit! trow away hit because there is no time information for sorting
           ++m_noTrueHitCounter;
@@ -493,22 +490,20 @@ void MCTrackFinderModule::event()
           ++iterPairCluTr.first;
         }
 
-        trackCandidates[counter]->addHit(Const::PXD, hitID, aVxdId.getID(), double(time));
+        trackCandidates[counter]->addHit(Const::PXD, hitID, -1, double(time));
       }
       B2DEBUG(100, "     add " << pxdHitsIndices.size() << " PXDClusters");
     }
     if (m_useSVDHits && m_useClusters == false) {
       BOOST_FOREACH(int hitID, svdHitsIndices) {
-        VxdID aVxdId = svdTrueHits[hitID]->getSensorID();
         float time = svdTrueHits[hitID]->getGlobalTime();
-        trackCandidates[counter]->addHit(Const::SVD, hitID, aVxdId.getID(), double(time));
+        trackCandidates[counter]->addHit(Const::SVD, hitID, -1, double(time));
       }
       B2DEBUG(100, "     add " << svdHitsIndices.size() << " SVDHits");
     }
     if (m_useSVDHits && m_useClusters) {
       RelationIndex<SVDCluster, SVDTrueHit> relSvdClusterTrueHit;
       BOOST_FOREACH(int hitID, svdHitsIndices) {
-        VxdID aVxdId = svdClusters[hitID]->getSensorID();
         RelationIndex<SVDCluster, SVDTrueHit>::range_from iterPairCluTr = relSvdClusterTrueHit.getElementsFrom(svdClusters[hitID]);
         if (iterPairCluTr.first == iterPairCluTr.second) { // there is not trueHit! trow away hit because there is no time information for sorting
           ++m_noTrueHitCounter;
@@ -526,7 +521,7 @@ void MCTrackFinderModule::event()
           }
           ++iterPairCluTr.first;
         }
-        trackCandidates[counter]->addHit(Const::SVD, hitID, aVxdId.getID(), double(time));
+        trackCandidates[counter]->addHit(Const::SVD, hitID, -1, double(time));
       }
       B2DEBUG(100, "     add " << svdHitsIndices.size() << " SVDClusters");
     }
@@ -537,8 +532,6 @@ void MCTrackFinderModule::event()
       float time = -1;
       vector<char> leftRight;
       BOOST_FOREACH(int hitID, cdcHitsIndices) {
-        //for the DAF algorithm within GenFit it is important to assign a planeId to each hit
-        //I am still not quite sure which way is the best one, this has to be tested...
         unsigned short wireId = cdcHits[hitID]->getID();
         //set the time as the ordering parameter rho for genfit to do this search for any CDCSimHit that corresponds to the CDCHit and take the time from there
         //be aware that this is some kind of hack because it is not garanteed by the framework that the "first" simhit belonging to a cdchit is really comming from the original particle
@@ -560,7 +553,7 @@ void MCTrackFinderModule::event()
         TVector3 wireToSimHit = simHitPos - simHitPosOnWire;
         double scalarProduct = wireToSimHit * (wireDir.Cross(simMom));
         char lrAmbiSign = boost::math::sign(scalarProduct);
-        CDCTrackCandHit* aCdcTrackCandHit = new CDCTrackCandHit(Const::CDC, hitID, wireId, time, lrAmbiSign); //do not delete! the GFTrackCand has ownership
+        CDCTrackCandHit* aCdcTrackCandHit = new CDCTrackCandHit(Const::CDC, hitID, -1, time, lrAmbiSign); //do not delete! the GFTrackCand has ownership
         trackCandidates[counter]->addHit(aCdcTrackCandHit);
         B2DEBUG(100, "CDC hit " << hitID << " has reft/right sign " << int(lrAmbiSign));
       }

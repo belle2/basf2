@@ -30,7 +30,6 @@
 #include <boost/scoped_ptr.hpp>
 
 #include <cmath>
-#include <cstdlib>
 
 
 using namespace Belle2;
@@ -500,11 +499,15 @@ void DisplayUI::automaticEvent()
 
 void DisplayUI::closeAndContinue()
 {
+  if (!gEve)
+    return;
   gEve->GetBrowser()->SendCloseMessage();
 }
 
 void DisplayUI::exit()
 {
+  if (!gEve)
+    return;
   gEve->GetBrowser()->SendCloseMessage();
 
   //stop event processing after current event

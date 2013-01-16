@@ -18,6 +18,8 @@
 #include <framework/logging/Logger.h>
 #include <TMath.h>
 
+#include <algorithm>
+
 using namespace Belle2;
 using namespace std;
 
@@ -149,6 +151,24 @@ bool Const::ParticleType::operator < (const Const::ParticleType& other) const
   return m_pdgCode < other.m_pdgCode;
 }
 
+Const::ParticleType& Const::ParticleType::operator++()
+{
+  if (!m_set) {
+    *this = invalidParticle;
+  } else {
+    m_pdgCode = m_set->at(++m_index).pdgCode();
+  }
+
+  return *this;
+}
+
+Const::ParticleType Const::ParticleType::operator++(int)
+{
+  Const::ParticleType p = *this;
+  ++(*this);
+  return p;
+}
+
 const TParticlePDG* Const::ParticleType::particlePDG() const
 {
   return EvtGenDatabasePDG::instance()->GetParticle(m_pdgCode);
@@ -169,6 +189,7 @@ const Const::ParticleType Const::pi0 = Const::ParticleType(111);
 const Const::ParticleType Const::neutron = Const::ParticleType(2112);
 const Const::ParticleType Const::Kshort = Const::ParticleType(310);
 const Const::ParticleType Const::Klong = Const::ParticleType(130);
+const Const::ParticleType Const::invalidParticle = Const::ParticleType(9900000);
 
 const double Const::electronMass = Const::electron.mass();
 const double Const::muonMass = Const::muon.mass();
@@ -179,14 +200,35 @@ const double Const::pi0Mass = Const::pi0.mass();
 const double Const::neutronMass = Const::neutron.mass();
 const double Const::K0Mass = Const::Kshort.mass();
 
+void Const::ParticleSet::add(const Const::ParticleType& p)
+{
+  if (contains(p))
+    return;
+  m_particles.push_back(Const::ParticleType(p.pdgCode(), this, m_particles.size()));
+}
+
+bool Const::ParticleSet::contains(const Const::ParticleType& p) const
+{
+  return (std::find(m_particles.begin(), m_particles.end(), p) != m_particles.end());
+}
+
 Const::ParticleSet operator + (const Const::ParticleSet& firstSet, const Const::ParticleSet& secondSet)
 {
   Const::ParticleSet result(firstSet);
-  result.insert(secondSet.begin(), secondSet.end());
+  for (Const::ParticleType pdgIter = secondSet.begin(); pdgIter != secondSet.end(); ++pdgIter) {
+    result.add(pdgIter);
+  }
   return result;
 }
 
-const Const::ParticleSet Const::chargedStable = Const::electron + Const::muon + Const::pion + Const::kaon + Const::proton;
+const Const::ParticleSet Const::chargedStable = Const::pion + Const::kaon + Const::proton + Const::electron + Const::muon;
+
+const Const::ChargedStable Const::ChargedStable::electron = Const::chargedStable.find(11);
+const Const::ChargedStable Const::ChargedStable::muon = Const::chargedStable.find(13);
+const Const::ChargedStable Const::ChargedStable::pion = Const::chargedStable.find(211);
+const Const::ChargedStable Const::ChargedStable::kaon = Const::chargedStable.find(321);
+const Const::ChargedStable Const::ChargedStable::proton = Const::chargedStable.find(2212);
+
 
 const double Const::speedOfLight   = 29.9792458;
 const double Const::kBoltzmann     = 8.617343 * 1.0e-5 * Unit::eV / Unit::K;

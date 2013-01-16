@@ -12,7 +12,7 @@
 #define CONST_H
 
 #include <TDatabasePDG.h>
-#include <set>
+#include <vector>
 
 namespace Belle2 {
 
@@ -41,8 +41,13 @@ namespace Belle2 {
      */
     static const std::vector<EDetector> detectors;
 
+    class ParticleSet;
+
     /**
      * The ParticleType class for identifying different particle types.
+     *
+     * Particle Data Group (PDG) codes are used for specifying types, for a detailed explanation and tables please refer to:
+     * https://pdg.web.cern.ch/pdg/2012/mcdata/mc_particle_id_contents.html
      */
     class ParticleType {
     public:
@@ -50,8 +55,16 @@ namespace Belle2 {
       /**
        * Constructor.
        * @param pdgCode the Particle Data Group code that identifies the particle.
+       * @param set     Pointer to set this particle belongs to (or NULL if stand-alone).
+       * @param index   Index of this particle in 'set'.
        */
-      explicit ParticleType(int pdgCode): m_pdgCode(pdgCode) {};
+      explicit ParticleType(int pdgCode, const ParticleSet* set = NULL, unsigned int index = 0): m_pdgCode(pdgCode), m_set(set), m_index(index)  {};
+
+      /** Copy constructor.
+       *
+       *  The created object will be part of the same set.
+       */
+      ParticleType(const ParticleType& other) : m_pdgCode(other.m_pdgCode), m_set(other.m_set), m_index(other.m_index) { };
 
       /**
        * Comparison operator to be usable in sets.
@@ -59,14 +72,35 @@ namespace Belle2 {
        */
       bool operator < (const ParticleType& other) const;
 
+      /** Test equality. */
+      bool operator==(const ParticleType& o) const { return m_pdgCode == o.m_pdgCode; }
+
+      /** Test inequality. */
+      bool operator!=(const ParticleType& o) const { return !((*this) == o); }
+
+      /** Prefix increment.
+       *
+       * Incrementing past the last elememnt of a set will return an invalid particle.
+       */
+      ParticleType& operator++();
+
+      /** Postfix increment.
+       *
+       * Incrementing past the last elememnt of a set will return an invalid particle.
+       */
+      ParticleType operator++(int);
+
+      /** This particle's index in the associated set. */
+      unsigned int index() const { return m_index; }
+
       /**
        * Conversion of ParticleType to ParticleSet.
        */
-      operator std::set<ParticleType>() const {return std::set<ParticleType>(this, this + 1);}
+      operator ParticleSet() const { ParticleSet s; s.add(*this); return s; }
 
       /**
-       * Accessor for root TParticlePDG object.
-       * @return The root TParticlePDG object for this type of particle.
+       * Accessor for ROOT TParticlePDG object.
+       * @return The TParticlePDG object for this type of particle.
        */
       const TParticlePDG* particlePDG() const;
 
@@ -84,6 +118,91 @@ namespace Belle2 {
 
     private:
       int m_pdgCode;  /**< PDG code of the particle **/
+      const ParticleSet* m_set; /**< set this particle belongs to, or NULL if stand-alone. */
+      unsigned int m_index;    /**< for m_set != 0, the index in the associated set. */
+    };
+
+    class ChargedStable : public ParticleType {
+    public:
+      static const ChargedStable electron;  /**< electron particle */
+      static const ChargedStable muon;      /**< muon particle */
+      static const ChargedStable pion;      /**< charged pion particle */
+      static const ChargedStable kaon;      /**< charged kaon particle */
+      static const ChargedStable proton;    /**< proton particle */
+    private:
+      ChargedStable(const ParticleType& p): ParticleType(p) { }
+    };
+
+    /** A set of ParticleType objects, with defined order.
+     *
+     * Allows easy iteration over a set of particles, e.g. to print indices and PDG codes:
+     *
+        \code
+        B2INFO("index -> PDG code");
+        const Const::ParticleSet set = Const::chargedStable;
+        for(Const::ParticleType pdgIter = set.begin(); pdgIter != set.end(); ++pdgIter) {
+          B2INFO(pdgIter.index() << " -> " << pdgIter.pdgCode());
+        }
+        \endcode
+     *
+     * ParticleSets can be created by merging ParticleType objects or other ParticleSets:
+     *
+        \code
+        Const::ParticleSet set = Const::electron + Const::muon;
+        Const::ParticleSet set2 = set + Const::photon;
+        \endcode
+     *
+     */
+    class ParticleSet {
+    public:
+      /** Emtpy constructor. */
+      ParticleSet() { };
+
+      /** Copy constructor to make sure particles belong to correct set. */
+      ParticleSet(const ParticleSet& other) {
+        for (ParticleType pdgIter = other.begin(); pdgIter != other.end(); ++pdgIter) {
+          add(pdgIter);
+        }
+      }
+
+      /** Add a copy of the given ParticleType to this set.
+       *
+       *  If the set already contains the given particle, it remains unchanged.
+       */
+      void add(const ParticleType& p);
+
+      /** Returns true if and only if the set contains 'p'. */
+      bool contains(const ParticleType& p) const;
+
+      /** Return particle at given index, or end() if out of range. */
+      const ParticleType& at(unsigned int index) const {
+        if (index < m_particles.size())
+          return m_particles[index];
+        return end();
+      }
+
+      /** Returns first particle. */
+      ParticleType begin() const {
+        if (m_particles.empty())
+          return end();
+        return m_particles[0];
+      }
+
+      /** Returns an invalid particle to check if iteration should be stopped. */
+      const ParticleType& end() const {
+        return invalidParticle;
+      }
+
+      /** Returns particle in set with given PDG code, or invalidParticle if not found. */
+      const ParticleType& find(int pdg) const {
+        for (ParticleType pdgIter = begin(); pdgIter != end(); ++pdgIter)
+          if (pdgIter.pdgCode() == pdg)
+            return m_particles[pdgIter.index()];
+
+        return invalidParticle;
+      }
+    private:
+      std::vector<ParticleType> m_particles; /**< Actual particles. */
     };
 
     static const ParticleType electron;  /**< electron particle */
@@ -96,6 +215,7 @@ namespace Belle2 {
     static const ParticleType neutron;   /**< neutron particle */
     static const ParticleType Kshort;    /**< K^0_S particle */
     static const ParticleType Klong;     /**< K^0_L particle */
+    static const ParticleType invalidParticle;     /**< Invalid particle, used internally. */
 
     static const double electronMass;    /**< electron mass */
     static const double muonMass;        /**< muon mass */
@@ -106,7 +226,6 @@ namespace Belle2 {
     static const double neutronMass;     /**< neutron mass */
     static const double K0Mass;          /**< neutral kaon mass */
 
-    typedef std::set<ParticleType> ParticleSet;  /**< typedef for sets of particles */
     static const ParticleSet chargedStable;      /**< set of charged stable particles */
 
     static const double speedOfLight; /**< [cm/ns] */

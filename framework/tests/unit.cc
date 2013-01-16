@@ -14,7 +14,7 @@ namespace Belle2 {
 
   };
 
-  /** check data store clearing */
+  /** check conversions between different units. */
   TEST_F(UnitTest, ConvertValue)
   {
     //check standard units

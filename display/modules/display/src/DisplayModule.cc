@@ -18,6 +18,8 @@
 #include "TEveManager.h"
 #include "TSystem.h"
 
+#include "GFRaveVertex.h"  // gfrave has to be added into the SConscript!
+#include "ecl/dataobjects/ECLGamma.h"
 
 using namespace Belle2;
 
@@ -226,8 +228,33 @@ void DisplayModule::event()
     }
   }
 
-
   m_visualizer->makeTracks();
+
+
+
+//Modified the displaymodule.cc by adding this section, recompile and use the GFRaveVertex.py to see the difference.
+  StoreArray<GFRaveVertex> Vertices; //This module fetches the data of "Vertices" at the StoreArray of the root file produced after the calling the the python file.
+  const int nVertices = Vertices.getEntries();  // Vertices is an object of the StoreArray class, pointing to GFRaveVertex objects in the data store.
+  for (int i = 0; i < nVertices; i++) {
+    B2INFO("Distance from center" <<  Vertices[i]->getPos().Mag());
+    m_visualizer->AddVertexEllip(*Vertices[i], TString::Format("Vertex %d", i), TString::Format("VertexCovarianceEllipsoid %d", i));
+    //.getEntries() and [] are public methods of the StoreArray class, -> is overloaded in the StoreArray or DataStore class.
+  }  // m_visualizer is a pointer defined in the DisplayModule.h, m_visualizter->...(...[i]) completes the data passing, by giving the selected
+  //objects (...[i]) directly to the arguments of the "drawing" methods of the EVEVisualization class.
+
+
+  StoreArray<ECLGamma> RecGammas;   // Fetches and passes the data of reconstructed photons(ECLGamma objects) to the related drawing method.
+  const int nRecGammas = RecGammas.getEntries();
+  for (int i = 0; i < nRecGammas; i++) {
+
+    m_visualizer->AddRecGammas(RecGammas[i], TString::Format("ECL_Gamma %d", i));  //RecGammas[i] points to each slot of ECLGamma object.
+  }
+
+
+
+
+
+  // data fetching and passing should be before the following "cleaning up".
 
   bool reshow = m_display->startDisplay();
   m_visualizer->clearEvent(); //clean up internal state of visualiser
@@ -236,7 +263,12 @@ void DisplayModule::event()
   //reprocess current event (maybe some options changed)
   if (reshow)
     event();
-}
+
+
+
+
+}  // everything should be inside of this "event()" function!
+
 
 void DisplayModule::terminate()
 {

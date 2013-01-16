@@ -29,9 +29,15 @@
 #include <TString.h>
 #include <TEveTrack.h>
 #include <TEveManager.h>
+#include <TEveCalo.h>
 
 #include <string>
 #include <vector>
+
+
+#include <GFRaveVertex.h>   // Cuz I used this class!!
+#include <ecl/dataobjects/ECLGamma.h>  // For the drawing method of visualizing reconstructed photons.
+
 
 class TEveBox;
 class TEveCaloDataVec;
@@ -130,6 +136,13 @@ namespace Belle2 {
     /** clear event data. */
     void clearEvent();
 
+
+    void AddVertexEllip(const GFRaveVertex&, const TString&, const TString&); //Add an argument which is an object of the TString class to show the "Vertex i".
+
+    void AddRecGammas(const ECLGamma*, const TString&);  // Drawing method for visualizing the reconstructed photons.
+
+
+
     // === configuration options ===
 
     /** @brief Set the display options.
@@ -174,6 +187,8 @@ namespace Belle2 {
 
 
   private:
+    TEveCalo3D* m_calo3d;  // TEveCalo3D visualizes the energy bars.
+
     /** @brief Create a box around o, orientet along u and v with widths ud, vd and depth and
      *  return a pointer to the box object.
      */

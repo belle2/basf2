@@ -75,6 +75,7 @@
 #include <exception>
 #include <iostream>
 
+#include <TGLLogicalShape.h>       // For the member function "SetIgnoreSizeForCameraInterest(kTRUE)"
 
 using namespace Belle2;
 
@@ -86,6 +87,10 @@ EVEVisualization::EVEVisualization():
   m_eclsimhitdata(0)
 {
   setErrScale();
+
+
+  TGLLogicalShape::SetIgnoreSizeForCameraInterest(kTRUE);     // Allows the visualization of the "small" error ellipsoid.
+
 
   //create new containers
   m_trackpropagator = new TEveTrackPropagator();
@@ -817,12 +822,12 @@ void EVEVisualization::makeTracks()
   m_eclsimhitdata->DataChanged(); //update limits (Empty() won't work otherwise)
   if (!m_eclsimhitdata->Empty()) {
     m_eclsimhitdata->SetAxisFromBins();
-    TEveCalo3D* calo3d = new TEveCalo3D(m_eclsimhitdata, "ECLHits");
-    calo3d->SetBarrelRadius(125.80); //inner radius of ECL barrel
-    calo3d->SetForwardEndCapPos(196.5); //inner edge of forward endcap
-    calo3d->SetBackwardEndCapPos(-102.0); //inner edge of backward endcap
-    calo3d->SetMaxValAbs(2.1);
-    gEve->AddElement(calo3d);
+    m_calo3d = new TEveCalo3D(m_eclsimhitdata, "ECLHits");                //
+    m_calo3d->SetBarrelRadius(125.80); //inner radius of ECL barrel
+    m_calo3d->SetForwardEndCapPos(196.5); //inner edge of forward endcap
+    m_calo3d->SetBackwardEndCapPos(-102.0); //inner edge of backward endcap
+    m_calo3d->SetMaxValAbs(2.1);
+    gEve->AddElement(m_calo3d);
   }
 }
 
@@ -848,3 +853,79 @@ void EVEVisualization::clearEvent()
 
   //other things are cleaned up by TEve...
 }
+
+
+
+
+void EVEVisualization::AddVertexEllip(const GFRaveVertex& VertexEllip, const TString& VertexName, const TString& EllipName)
+{
+  TVector3 v = VertexEllip.getPos();         //calls the public member function getPos() of the GFRaveVertex class to assign the position of the vertex to "v"
+  TEvePointSet* Vertices = new TEvePointSet(VertexName);   // This class names the vertices through the pointer "Vertices" from the DM.cc using the argument "VertexName".
+  Vertices-> SetNextPoint(v.x(), v.y(), v.z());  //.x() is a method of TVector3 class.
+  gEve->AddElement(Vertices);  //draw the point
+
+
+  TMatrixT<double> CovMatrix = VertexEllip.getCov();  //calls getCov to assign the covariance matrix to the object CovMatrix of the TMatrixT class, double is a template (entries data type of the matrix)
+
+  TMatrixDEigen eigen_values(CovMatrix);  //Declare the object of the T..DEigen class using constructor(matrix).  //copied from line 500 from the addTrack function: To draw the error ellipsoid!
+  TEveGeoShape* det_shape = new TEveGeoShape(EllipName);   //Names the ellipsoid in the GUI.
+  det_shape->IncDenyDestroy();
+  det_shape->SetShape(new TGeoSphere(0., 1.));   //Initially created as a sphere, then "scaled" into an ellipsoid.
+  TMatrixT<double> ev = eigen_values.GetEigenValues(); //Assigns the eigenvalues into the "ev" matrix.
+  TMatrixT<double> eVec = eigen_values.GetEigenValues();  //Assigns the eigenvalues into the "eVec" matrix.
+  TVector3 eVec1(eVec(0, 0), eVec(1, 0), eVec(2, 0));   //Define the 3 eigenvectors of the covariance matrix as objects of the TVector3 class using constructor.
+  TVector3 eVec2(eVec(0, 1), eVec(1, 1), eVec(2, 1));   //eVec(i,j) uses the method/overloaded operator ( . ) of the TMatrixT class to return the matrix entry.
+  TVector3 eVec3(eVec(0, 2), eVec(1, 2), eVec(2, 2));
+  // got everything we need -----------------------------------------------------   //Eigenvalues(semi axis) of the covariance matrix accquired!
+
+
+  TGeoRotation det_rot("det_rot", (eVec1.Theta() * 180) / TMath::Pi(), (eVec1.Phi() * 180) / TMath::Pi(),
+                       (eVec2.Theta() * 180) / TMath::Pi(), (eVec2.Phi() * 180) / TMath::Pi(),
+                       (eVec3.Theta() * 180) / TMath::Pi(), (eVec3.Phi() * 180) / TMath::Pi()); // the rotation is already clear
+
+  // set the scaled eigenvalues -------------------------------------------------
+  double pseudo_res_0 = std::sqrt(ev(0, 0));
+  double pseudo_res_1 = std::sqrt(ev(1, 1));
+  double pseudo_res_2 = std::sqrt(ev(2, 2));    //"Scaled" eigenvalues pseudo_res (lengths of the semi axis) are the sqrt of the real eigenvalues.
+
+  B2INFO("The pseudo_res_0/1/2 are " << pseudo_res_0 << "," << pseudo_res_1 << "," << pseudo_res_2); //shows the scaled eigenvalues
+
+
+
+  //No autoscaling needed here!
+
+  // rotate and translate -------------------------------------------------------
+  TGeoGenTrans det_trans(v(0), v(1), v(2), pseudo_res_0, pseudo_res_1, pseudo_res_2, &det_rot); //Puts the ellipsoid at the position of the vertex, v(0)=v.x(), operator () overloaded.
+  det_shape->SetTransMatrix(det_trans);
+  // finished rotating and translating ------------------------------------------
+
+  det_shape->SetMainColor(kYellow);   //The color of the error ellipsoid.
+  det_shape->SetMainTransparency(0);  //Zero transparency.
+
+  gEve->AddElement(det_shape);     //Draw the ellipsoid.
+}
+//See line 450 of the addTrack function.
+
+
+void EVEVisualization::AddRecGammas(const ECLGamma* RecGamma, const TString& GammaName)   // Using pointer is more convenient.
+{
+  TVector3 Momentum = RecGamma->getMomentum();
+  Momentum.SetMag(200);  // SetMag is a method of TVector3, enlarges the private data members pX,pY,pZ (factor*pX)
+
+  float Energy = RecGamma->getEnergy();
+  float pX = RecGamma->getPx();
+  float pY = RecGamma->getPy();
+  float pZ = RecGamma->getPz();
+
+  TEveLine* Gamma = new TEveLine(GammaName); // protected TString type data member of the TEvePointSet class inherited!
+  Gamma -> SetNextPoint(0, 0, 0);            // the object of TEveLine visualizes a line connecting 2 points.
+  Gamma -> SetNextPoint(Momentum.x(), Momentum.y(), Momentum.z());
+  Gamma -> SetTitle(TString::Format("ECL_Gamma_%d\n"    //SetTitle method is inherited for displaying "popups".
+                                    "Energy=%.3f\n"
+                                    "pX=%.3f, pY=%.3f, pZ=%.3f\n",
+                                    RecGamma->GetShowerId(), Energy, pX, pY, pZ)); //ShowerId already set after reconstruction!
+
+  m_calo3d -> AddElement(Gamma);
+}
+
+

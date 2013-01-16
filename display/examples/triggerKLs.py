@@ -34,7 +34,7 @@ class PyTrigger(Module):
         returnvalue = 0
         for p in mcparticles:
             if p.getPDG() == 130:
-                B2INFO("found a K_L!")
+                B2INFO('found a K_L!')
                 returnvalue = 1
                 break
         self.return_value(returnvalue)
@@ -86,7 +86,6 @@ main.add_module(kltrigger)
 emptypath = create_path()
 kltrigger.condition('<1', emptypath)
 ########################################
-
 
 cdcdigi = register_module('CDCDigitizer')
 main.add_module(cdcdigi)

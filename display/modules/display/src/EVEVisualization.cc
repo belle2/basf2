@@ -902,7 +902,7 @@ void EVEVisualization::AddVertexEllip(const GFRaveVertex& VertexEllip, const TSt
   det_shape->SetMainColor(kYellow);   //The color of the error ellipsoid.
   det_shape->SetMainTransparency(0);  //Zero transparency.
 
-  gEve->AddElement(det_shape);     //Draw the ellipsoid.
+  gEve->AddElement(det_shape);     //Draws the ellipsoid.
 }
 //See line 450 of the addTrack function.
 
@@ -910,7 +910,7 @@ void EVEVisualization::AddVertexEllip(const GFRaveVertex& VertexEllip, const TSt
 void EVEVisualization::AddRecGammas(const ECLGamma* RecGamma, const TString& GammaName)   // Using pointer is more convenient.
 {
   TVector3 Momentum = RecGamma->getMomentum();
-  Momentum.SetMag(200);  // SetMag is a method of TVector3, enlarges the private data members pX,pY,pZ (factor*pX)
+  Momentum.SetMag(200);  // SetMag is a method of TVector3, enlarges the private data members pX,pY,pZ (factor*pX).
 
   float Energy = RecGamma->getEnergy();
   float pX = RecGamma->getPx();
@@ -920,7 +920,7 @@ void EVEVisualization::AddRecGammas(const ECLGamma* RecGamma, const TString& Gam
   TEveLine* Gamma = new TEveLine(GammaName); // protected TString type data member of the TEvePointSet class inherited!
   Gamma -> SetNextPoint(0, 0, 0);            // the object of TEveLine visualizes a line connecting 2 points.
   Gamma -> SetNextPoint(Momentum.x(), Momentum.y(), Momentum.z());
-  Gamma -> SetTitle(TString::Format("ECL_Gamma_%d\n"    //SetTitle method is inherited for displaying "popups".
+  Gamma -> SetTitle(TString::Format("ECL_Gamma_%d\n"    //SetTitle method is inherited for displaying popups.
                                     "Energy=%.3f\n"
                                     "pX=%.3f, pY=%.3f, pZ=%.3f\n",
                                     RecGamma->GetShowerId(), Energy, pX, pY, pZ)); //ShowerId already set after reconstruction!

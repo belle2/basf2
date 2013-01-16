@@ -35,8 +35,8 @@
 #include <vector>
 
 
-#include <GFRaveVertex.h>   // Cuz I used this class!!
-#include <ecl/dataobjects/ECLGamma.h>  // For the drawing method of visualizing reconstructed photons.
+#include <GFRaveVertex.h>   // For the visualization of the vertices and their error matrices. 
+#include <ecl/dataobjects/ECLGamma.h>  // For the visualization of the reconstructed photons.
 
 
 class TEveBox;
@@ -136,12 +136,11 @@ namespace Belle2 {
     /** clear event data. */
     void clearEvent();
 
+    /** Add a vertex point and its covariance matrix. */
+    void AddVertexEllip(const GFRaveVertex&, const TString&, const TString&);
 
-    void AddVertexEllip(const GFRaveVertex&, const TString&, const TString&); //Add an argument which is an object of the TString class to show the "Vertex i".
-
-    void AddRecGammas(const ECLGamma*, const TString&);  // Drawing method for visualizing the reconstructed photons.
-
-
+    /** Add a reconstructed photon in the ECL. */
+    void AddRecGammas(const ECLGamma*, const TString&);
 
     // === configuration options ===
 

@@ -207,8 +207,8 @@ namespace Belle2 {
     /** Is this StoreArray's data safe to access? */
     inline operator bool() const { return isValid(); }
 
-    /** Get the number of occupied slots in the array. */
-    inline int getEntries() const { return isValid() ? ((*m_storeArray)->GetEntriesFast()) : (0);}
+    /** Get the number of objects in the array. */
+    inline int getEntries() const { return isValid() ? ((*m_storeArray)->GetEntriesFast()) : 0;}
 
     /** Access to the stored objects.
      *
@@ -267,19 +267,17 @@ namespace Belle2 {
      */
     inline T* appendNew(const T& obj) { return new(nextFreeAddress()) T(obj); }
 
-    //@{
     /** Raw access to the underlying TClonesArray.
      *
      *  \warning In most cases, you'll want to avoid direct interaction with
      *           TClonesArrays and use StoreArray functions like operator[],
      *           getEntries() or appendNew() instead.
-     *           If you must access the TClonesArray, using the getPtr()
-     *           function is recommended, as the difference between . and ->
-     *           may be lost on casual readers of the source code.
      */
-    TClonesArray& operator *() const { ensureCreated(); return **m_storeArray;}
-    ClonesArrayWrapper* operator ->() const { ensureCreated(); return static_cast<ClonesArrayWrapper*>(*m_storeArray);}
     TClonesArray* getPtr() const { ensureCreated(); return *m_storeArray;}
+    //@{
+    /** Raw access to the underlying TClonesArray (deprecated) */
+    ClonesArrayWrapper* operator ->() const __attribute__((deprecated)) { ensureCreated(); return static_cast<ClonesArrayWrapper*>(*m_storeArray);}
+    TClonesArray& operator *() const __attribute__((deprecated)) { ensureCreated(); return **m_storeArray;}
     //@}
 
   private:

@@ -39,6 +39,7 @@ class TRGCDCWireHitMC;
 		  float driftLeftError = 0,
 		  float driftRight = 0,
 		  float driftRightError = 0,
+		  int mcLRflag=1,
 		  float fudgeFacgtor = 1);
 
     /// Destructor

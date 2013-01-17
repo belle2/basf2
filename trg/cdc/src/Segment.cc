@@ -158,7 +158,7 @@ TCSegment::simulate(void) {
 
     //...System clocks...
     const TRGClock & systemClock = TRGCDC::getTRGCDC()->systemClock();
-    const TRGClock & systemClockFE = TRGCDC::getTRGCDC()->systemClockFE();
+//  const TRGClock & systemClockFE = TRGCDC::getTRGCDC()->systemClockFE();
 
     //...Get wire informtion...
     const unsigned n = _wires.size();

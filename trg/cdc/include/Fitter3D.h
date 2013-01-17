@@ -41,7 +41,9 @@ class TRGCDCFitter3D {
                    const TRGCDC &,
 		   const TRGCDCEventTime * eventTime,
                    const bool fLRLUT,
-		   const bool fevtTime);
+		   const bool fevtTime,
+		   const bool fzierror,
+		   const bool fmclr);
 
     /// Destructor
     virtual ~TRGCDCFitter3D();
@@ -108,6 +110,8 @@ class TRGCDCFitter3D {
     // Input Error
     double m_phierror[5];
     double m_zerror[4];
+    double m_zerror1[4];
+    double m_zerror2[4];
 
     // EventTime class
     const TRGCDCEventTime * const _eventTime;
@@ -170,6 +174,8 @@ class TRGCDCFitter3D {
       bool m_flagWireLRLUT;
       bool m_flagNonTSStudy;
       bool m_flagEvtTime;
+      bool m_flagzierror;
+      bool m_flagmclr;
 };
 
 //-----------------------------------------------------------------------------

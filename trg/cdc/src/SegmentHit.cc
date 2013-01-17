@@ -35,7 +35,8 @@ TRGCDCSegmentHit::TRGCDCSegmentHit(const TCSegment & w)
 	     w.center().hit()->drift(0),
 	     w.center().hit()->dDrift(0),
 	     w.center().hit()->drift(1),
-	     w.center().hit()->dDrift(1)) {
+	     w.center().hit()->dDrift(1),
+	     w.center().hit()->mcLR()) {
 }
 
 TRGCDCSegmentHit::~TRGCDCSegmentHit() {

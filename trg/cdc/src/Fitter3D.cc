@@ -111,13 +111,17 @@ namespace Belle2 {
                                  const TRGCDC & TRGCDC,
 				 const TRGCDCEventTime * eventTime,
                                  bool fLRLUT,
-				 bool fevtTime)
+				 bool fevtTime,
+				 bool fzierror,
+				 bool fmclr)
     : _name(name),
     _cdc(TRGCDC),
     _eventTime(eventTime),
     m_rootFitter3DFilename(rootFitter3DFile),
     m_flagWireLRLUT(fLRLUT),
-    m_flagEvtTime(fevtTime){
+    m_flagEvtTime(fevtTime),
+    m_flagzierror(fzierror),
+    m_flagmclr(fmclr){
 
       //...Initialization...
     }
@@ -288,6 +292,8 @@ namespace Belle2 {
     callLUT();
     m_Trg_PI = 3.141592653589793; 
     m_zerror[0] = 0.0319263; m_zerror[1] = 0.028765; m_zerror[2] = 0.0290057; m_zerror[3]=0.0396206;
+    m_zerror1[0]=0.0581; m_zerror1[1]=0.0785; m_zerror1[2]=0.0728; m_zerror1[3]=0.0767;
+    m_zerror2[0]=0.00388; m_zerror2[1]=0.00538; m_zerror2[2]=0.00650; m_zerror2[3]=0.00842;
     m_phierror[0] = 0.0085106; m_phierror[1] = 0.0039841; m_phierror[2] = 0.0025806; m_phierror[3] = 0.0019084; m_phierror[4] = 0.001514;
 
     m_fileFitter3D = new TFile((char*)m_rootFitter3DFilename.c_str(),"RECREATE");
@@ -473,6 +479,7 @@ namespace Belle2 {
       for (unsigned iInput = 0; iInput < nInput; iInput++) {
         double phi[9]={0,0,0,0,0,0,0,0,0};
         double phi_w[9]={0,0,0,0,0,0,0,0,0};
+	int lutv[9];
         int ckt=1;
 
         //...Access to a track...
@@ -521,15 +528,11 @@ namespace Belle2 {
           //...Presently nSegments should be 1...
           if (nSegments != 1) {
             if (nSegments==0){
-		ckt=0;
-		if (TRGDebug::level() > 1)
-		    cout << name() << " !!! NO TS assigned" << endl;
-		break;
+              ckt=0;
+              cout << name() << " !!! NO TS assigned" << endl;
+              break;
             }
-            else {
-		if (TRGDebug::level() > 1)
-		    cout << name() << "!!!! multiple TS assigned" << endl;
-	    }
+            else{cout<< name()<<"!!!! multiple TS assigned"<< endl;}
           }
 
           //...Access to a track segment...
@@ -544,7 +547,8 @@ namespace Belle2 {
           const TCSegment * s = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
           phi_w[i]=(double) s->localId()/ni[s->superLayerId()]*4*m_Trg_PI;
           phi[i]=s->phiPosition();
-//
+	  lutv[i]=s->LUT()->getLRLUT(s->hitPattern(),s->superLayerId());
+
 //          if( m_flagWireLRLUT == 1){
 //            ///...Using Drift time information
 //            int lutcomp=s->LUT()->getLRLUT(s->hitPattern(),s->superLayerId());
@@ -557,36 +561,37 @@ namespace Belle2 {
 //            else if(lutcomp==1){phi[i]+=dphi;}
 //            else{
 //              phi[i]=phi[i];
-//              //	nfrac--;
 //            }
+//	      lutv[i]=s->LUT()->getLRLUT(s->hitPattern(),s->superLayerId());
 //          }
+//	    else lutv[i]=2;
+	    if(m_flagmclr) lutv[i]=s->hit()->mcLR();
         } // End of superlayer loop
 
         double z0=-999, cot=-999;
+	double zchi2=0.;
         double pt=-999, myphi0=-999;
         double myphi0_w=-999;
         double pt_w=-999;
         //...Do fitting job here (or call a fitting function)...
         if(ckt){
+	  int lutv2[4]={lutv[1],lutv[3],lutv[5],lutv[7]};
           double phi2[9]={phi[0], phi[2],phi[4],phi[6],phi[8],phi[1],phi[3],phi[5],phi[7]};
           double phi2_w[9]={phi_w[0], phi_w[2],phi_w[4],phi_w[6],phi_w[8],phi_w[1],phi_w[3],phi_w[5],phi_w[7]};
           double zz[4], arcS[4];
+	  double mczz[4];
           TVectorD wStAxPhi(4);
           TVectorD stAxPhi(4);
           int qqq=0;
           double rr_conv[4];
           double iezz2[4];
+	  double iezz21[4];
+	  double iezz22[4];
           double myphiz[4];	
           double ztheta=-999,ss=0.,sx=0.;
           double rho;
           double rho_w;
 
-          //kkk++;
-          //re-ordering
-          //          cout << "tsimTS/"<<phi2[0]<<" " <<phi2[1]<<" "<<phi2[2]<<" "<<phi2[3]<<" "<<phi2[4]<<" "<<phi2[5]<<" "<<phi2[6]<<" "<<phi2[7]<<" "<<phi2[8] <<"]" << endl;
-          //	cout << "frac :" << nfrac << endl;
-
-          // Find the stereo candidates
           // Initialize the candidates
           TVectorD stTSs(100);
           for(unsigned i=0; i<100; i++){
@@ -626,6 +631,7 @@ namespace Belle2 {
                    mcTS[3*iTS] = posTrack.x();
                    mcTS[3*iTS+1] = posTrack.y();
                    mcTS[3*iTS+2] = posTrack.z();
+		   if(iTS>=5) mczz[iTS-5]=posTrack.z()/100;
                  }
                }
              } // Find 9 TS values
@@ -681,6 +687,8 @@ namespace Belle2 {
             //Change m_zerrorz to iezz2
             for(unsigned i=0;i<4;i++){
               iezz2[i]=(int)(1./m_zerror[i]/m_zerror[i]*intnum7*m_zerror[1]*m_zerror[1]+0.5);
+              iezz21[i]=(int)(1./m_zerror1[i]/m_zerror1[i]*intnum7*m_zerror1[1]*m_zerror1[1]+0.5);
+              iezz22[i]=(int)(1./m_zerror2[i]/m_zerror2[i]*intnum7*m_zerror2[1]*m_zerror2[1]+0.5);
             }
 
             //The actual start of the fitter
@@ -723,6 +731,8 @@ namespace Belle2 {
               zz[i]=zz[i]/intnum5*1.5;
               rr_conv[i]=rr_conv[i]*rr[8]/intnum6;
               iezz2[i]=iezz2[i]/m_zerror[1]/m_zerror[1]/intnum7;
+              iezz21[i]=iezz21[i]/m_zerror1[1]/m_zerror1[1]/intnum7;
+              iezz22[i]=iezz22[i]/m_zerror2[1]/m_zerror2[1]/intnum7;
               rho=rho/intnum3*16;
             }
           } else {
@@ -734,6 +744,8 @@ namespace Belle2 {
               stAxPhi[i]=calStAxPhi(mysign, anglest[i], ztostraw[i],  rr[i+5], rho, myphi0);
               rr_conv[i]=rr[i+5];
               iezz2[i] = 1/m_zerror[i]/m_zerror[i];
+              iezz21[i] = 1/m_zerror1[i]/m_zerror1[i];
+              iezz22[i] = 1/m_zerror2[i]/m_zerror2[i];
             }   
           }
 
@@ -810,7 +822,12 @@ namespace Belle2 {
               zz[i]=zz[i]*1.5/intnum5;
             }
           } else {
-            rSFit(iezz2, arcS, zz, z0, cot);
+	    if(m_flagzierror){
+	      rSFit2(iezz21,iezz22,arcS,zz,lutv2,z0,cot,zchi2);
+	    }
+	    else{
+              rSFit(iezz2, arcS, zz, z0, cot,zchi2);
+	    }
           }
 
 
@@ -822,12 +839,13 @@ namespace Belle2 {
           ztheta*=180./m_Trg_PI;
 
           // Save fit values
-          TVectorD tempFit(5);
+          TVectorD tempFit(6);
           tempFit[0]=pt;
           tempFit[1]=myphi0;
           tempFit[2]=z0;
           tempFit[3]=cot;
           tempFit[4]=mysign;
+	  tempFit[5]=zchi2;
           new(fitTrackFitter3D[iFit]) TVectorD(tempFit);
 
           // Save fit values

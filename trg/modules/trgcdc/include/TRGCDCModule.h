@@ -103,6 +103,16 @@ class TRGCDCModule : public Module {
     /// Switch for the event time in Segment.
     bool _fevtTime;
 
+    /// Switch for the zi error.
+    bool _fzierror;
+
+    /// Switch for MC L/R information
+    bool _fmclr;
+
+    /// Parameter for Hit inefficiency
+    double _inefficiency;
+
+
   private:
 
     /// A pointer to a TRGCDC;

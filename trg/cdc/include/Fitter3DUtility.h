@@ -27,7 +27,9 @@ double calZ(int &mysign, double &anglest, double &ztostraw, double &rr, double &
 
 double calS(double &rho, double &rr);
 
-double rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot);
+void rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot,double &zchi2);
+
+void rSFit2(double *iezz21, double *iezz22, double *arcS, double *zz,int *lutv,  double &z0, double &cot,double &zchi2);
 
 void findImpactPosition(TVector3 * mcPosition, TLorentzVector * mcMomentum, int charge, TVector2 & helixCenter, TVector3 & impactPosition);
 

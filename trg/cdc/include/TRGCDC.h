@@ -77,7 +77,10 @@ class TRGCDC {
                               unsigned houghFinderMeshY = 96,
                               unsigned houghFinderPeakMin = 5,
                               bool fLRLUT = 1,
-			      bool fevtTime = 1);
+			      bool fevtTime = 1,
+			      bool fzierror=1,
+			      bool fmclr=0,
+			      double inefficiency=0);
     
     /// returns TRGCDC object. TRGCDC should be created with specific
     /// configuration before calling this function.
@@ -99,7 +102,10 @@ class TRGCDC {
            unsigned houghFinderMeshY,
            unsigned houghFinderPeakMin,
            bool fLRLUT,
-	   bool fevtTime);
+	   bool fevtTime,
+	   bool fzierror,
+	   bool fmclr,
+	   double inefficiecny);
 
     /// Destructor
     virtual ~TRGCDC();
@@ -385,6 +391,15 @@ class TRGCDC {
 
     /// Switch for the event tiem in Segment.
     bool _fevtTime;
+
+    /// Switch for the zi error.
+    bool _fzierror;
+
+    /// Switch for MC L/R information.
+    bool _fmclr;
+
+    /// Hit inefficiency parameter.
+    double _inefficiency;
 
     /// Super layers.
     std::vector<std::vector<TRGCDCLayer *> *> _superLayers;

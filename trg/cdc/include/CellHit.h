@@ -81,6 +81,7 @@ class TRGCDCCellHit {
 		  float driftLeftError = 0,
 		  float driftRight = 0,
 		  float driftRightError = 0,
+		  int mcLRflag=0,
 		  float fudgeFacgtor = 1);
 
     /// Destructor
@@ -91,6 +92,9 @@ class TRGCDCCellHit {
     /// dumps debug information.
     virtual void dump(const std::string & message = std::string(""),
 		      const std::string & prefix = std::string("")) const;
+
+    /// returns mc left/right information
+    int mcLR(void) const;
 
     /// returns a pointer to a TRGCDCWire.
     virtual const TRGCDCCell & cell(void) const;
@@ -164,6 +168,8 @@ class TRGCDCCellHit {
 
   private:
 
+    int _mcLR;
+
     mutable unsigned _state;
     float _drift[2];         // 0:left, 1:right
     float _driftError[2];
@@ -220,6 +226,11 @@ class TRGCDCCellHit {
 };
 
 //-----------------------------------------------------------------------------
+
+inline
+int TRGCDCCellHit::mcLR(void) const {
+    return _mcLR;
+}
 
 inline
 const TRGCDCCell &

@@ -217,7 +217,7 @@ double calS(double &rho, double &rr){
   return result;
 }
 
-double rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot){
+void rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot, double &zchi2){
 
   double ss=0, sx=0, sxx=0, cotnum=0, z0num=0;
   double z0nump1[4], z0nump2[4];
@@ -243,15 +243,68 @@ double rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot){
   cot=cotnum;
 
   // Calculate chi2 of z0
-  double zchi2 = 0.;
+  //double zchi2 = 0.;
   for(unsigned i=0;i<4;i++){
     zchi2 += (zz[i]-z0-cot*arcS[i])*(zz[i]-z0-cot*arcS[i])*iezz2[i];
   }
   zchi2 /= (4-2);
 
-  return zchi2;
-
 }
+
+void rSFit2(double *iezz21,double *iezz22, double *arcS, double *zz, int *lutv, double &z0, double &cot,double &zchi2){
+//      cout << "rs2" << endl;
+
+  double ss=0, sx=0, sxx=0, cotnum=0, z0num=0;
+  double z0nump1[4], z0nump2[4];
+  double z0den, iz0den;
+
+  for(unsigned i=0;i<4;i++){
+    if (lutv[i]==2){
+      ss+=iezz21[i];
+      sx+=arcS[i]*iezz21[i];
+      sxx+=arcS[i]*arcS[i]*iezz21[i];
+    }
+    else{
+      ss+=iezz22[i];
+      sx+=arcS[i]*iezz22[i];
+      sxx+=arcS[i]*arcS[i]*iezz22[i];
+    }
+  }
+
+  for(unsigned i=0;i<4;i++){
+    if(lutv[i]==2){
+      cotnum+=(ss*arcS[i]-sx)*iezz21[i]*zz[i];
+      z0nump1[i]=sxx-sx*arcS[i];
+      z0nump2[i]=z0nump1[i]*iezz21[i]*zz[i];
+      z0num+=z0nump2[i];
+    }
+    else{
+      cotnum+=(ss*arcS[i]-sx)*iezz22[i]*zz[i];
+      z0nump1[i]=sxx-sx*arcS[i];
+      z0nump2[i]=z0nump1[i]*iezz22[i]*zz[i];
+      z0num+=z0nump2[i];
+    }
+  }
+  z0den=(ss*sxx)-(sx*sx);
+  iz0den=1./z0den;
+  z0num*=iz0den;
+  cotnum*=iz0den;
+  z0=z0num;
+  cot=cotnum;
+
+  // Calculate chi2 of z0
+//  double zchi2 = 0.;
+  for(unsigned i=0;i<4;i++){
+    if(lutv[i]==2){
+      zchi2 += (zz[i]-z0-cot*arcS[i])*(zz[i]-z0-cot*arcS[i])*iezz21[i];
+    }
+    else{
+      zchi2 += (zz[i]-z0-cot*arcS[i])*(zz[i]-z0-cot*arcS[i])*iezz22[i];
+    }
+  }
+  zchi2 /= (4-2);
+}
+
 
 void findImpactPosition(TVector3 * mcPosition, TLorentzVector * mcMomentum, int charge, TVector2 & helixCenter, TVector3 & impactPosition){
 

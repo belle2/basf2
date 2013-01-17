@@ -36,6 +36,7 @@ TRGCDCCellHit::TRGCDCCellHit(const TRGCDCCell & w,
 			     float driftLeftError,
 			     float driftRight,
 			     float driftRightError,
+			     int mcLRflag,
 			     float fudgeFactor)
     :  _state(0),
        _cell(w),
@@ -45,6 +46,7 @@ TRGCDCCellHit::TRGCDCCellHit(const TRGCDCCell & w,
        _iCDCSimHit(indexCDCSimHit),
        _iMCParticle(indexMCParticle) {
 //  w.hit(this); // set by TRGCDC
+    _mcLR=mcLRflag;
     _drift[0] = driftLeft;
     _drift[1] = driftRight;
     _driftError[0] = driftLeftError * fudgeFactor;

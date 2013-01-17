@@ -119,6 +119,19 @@ TRGCDCModule::TRGCDCModule()
              _fevtTime,
              "Using event time in Segment",
              _fevtTime);
+    addParam("Zierror",
+             _fzierror,
+             "Using new Zi error",
+             _fzierror);
+    addParam("MCLR",
+	     _fmclr,
+	     "Using MC L/R information",
+	     _fmclr);
+    addParam("Ineff",
+             _inefficiency,
+             "Hit inefficiency",
+             _inefficiency);
+
 
     if (TRGDebug::level())
 	cout << "TRGCDCModule ... created" << endl;
@@ -164,9 +177,9 @@ TRGCDCModule::initialize() {
 	     << endl;
 	cout << TRGDebug::tab(4) << "Hough finder Mesh Y = " << _hFinderMeshY
 	     << endl;
-	cout << TRGDebug::tab(4) << "Hough finder Min. Peak = "
-	     << _hFinderPeakMin
-	     << endl;
+        cout << TRGDebug::tab(4) << "Hough finder Min. Peak = "
+             << _hFinderPeakMin
+             << endl;
     }
 }
 
@@ -191,7 +204,10 @@ TRGCDCModule::beginRun() {
 				 _hFinderMeshY,
 				 _hFinderPeakMin,
 				 _fLRLUT,
-				 _fevtTime);
+				 _fevtTime,
+				 _fzierror,
+				 _fmclr,
+				 _inefficiency);
 
     if (TRGDebug::level())
 	cout << "TRGCDCModule ... beginRun called " << endl;

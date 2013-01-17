@@ -186,7 +186,8 @@ namespace Belle2 {
 
 
   private:
-    TEveCalo3D* m_calo3d;  // TEveCalo3D visualizes the energy bars.
+    /** Object for the energy bar visualisation. */
+    TEveCalo3D* m_calo3d;
 
     /** @brief Create a box around o, orientet along u and v with widths ud, vd and depth and
      *  return a pointer to the box object.

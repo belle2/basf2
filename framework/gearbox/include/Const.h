@@ -80,13 +80,13 @@ namespace Belle2 {
 
       /** Prefix increment.
        *
-       * Incrementing past the last elememnt of a set will return an invalid particle.
+       * Incrementing past the last element of a set will return an invalid particle.
        */
       ParticleType& operator++();
 
       /** Postfix increment.
        *
-       * Incrementing past the last elememnt of a set will return an invalid particle.
+       * Incrementing past the last element of a set will return an invalid particle.
        */
       ParticleType operator++(int);
 
@@ -120,17 +120,6 @@ namespace Belle2 {
       int m_pdgCode;  /**< PDG code of the particle **/
       const ParticleSet* m_set; /**< set this particle belongs to, or NULL if stand-alone. */
       unsigned int m_index;    /**< for m_set != 0, the index in the associated set. */
-    };
-
-    class ChargedStable : public ParticleType {
-    public:
-      static const ChargedStable electron;  /**< electron particle */
-      static const ChargedStable muon;      /**< muon particle */
-      static const ChargedStable pion;      /**< charged pion particle */
-      static const ChargedStable kaon;      /**< charged kaon particle */
-      static const ChargedStable proton;    /**< proton particle */
-    private:
-      ChargedStable(const ParticleType& p): ParticleType(p) { }
     };
 
     /** A set of ParticleType objects, with defined order.
@@ -205,6 +194,29 @@ namespace Belle2 {
       std::vector<ParticleType> m_particles; /**< Actual particles. */
     };
 
+    /** Provides a type-safe way to pass members of the chargedStable set.
+     *
+     * As the defined static members are members of this set, this also defines
+     * a fixed index from 0 to 4 for each particle.
+     *
+     * Conversion from a general ParticleType is not possible, so users have
+     * to use Const::ChargedStable::electron instead of Const::electron.
+     */
+    class ChargedStable : public ParticleType {
+    public:
+      static const ChargedStable electron;  /**< electron particle */
+      static const ChargedStable muon;      /**< muon particle */
+      static const ChargedStable pion;      /**< charged pion particle */
+      static const ChargedStable kaon;      /**< charged kaon particle */
+      static const ChargedStable proton;    /**< proton particle */
+    private:
+      /** Constructor (private to disallow conversions). */
+      ChargedStable(const ParticleType& p): ParticleType(p) { }
+    };
+
+    static const ParticleSet chargedStable; /**< set of charged stable particles */
+
+
     static const ParticleType electron;  /**< electron particle */
     static const ParticleType muon;      /**< muon particle */
     static const ParticleType pion;      /**< charged pion particle */
@@ -225,8 +237,6 @@ namespace Belle2 {
     static const double pi0Mass;         /**< neutral pion mass */
     static const double neutronMass;     /**< neutron mass */
     static const double K0Mass;          /**< neutral kaon mass */
-
-    static const ParticleSet chargedStable;      /**< set of charged stable particles */
 
     static const double speedOfLight; /**< [cm/ns] */
     static const double kBoltzmann;   /**< Boltzmann constant in GeV/K. */

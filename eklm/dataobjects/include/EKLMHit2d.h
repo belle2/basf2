@@ -3,7 +3,7 @@
  * Copyright(C) 2010  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Timofey Uglov                                            *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,7 +15,6 @@
 #include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Geometry/Point3D.h>
 #include <TObject.h>
-#include <TVector3.h>
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
@@ -66,13 +65,13 @@ namespace Belle2 {
      * Set coordinates of the crossing point.
      * @param[in] point Coordinates.
      */
-    void setCrossPoint(TVector3& point);
+    void setCrossPoint(HepGeom::Point3D<double> *point);
 
     /**
      * Get crossing point.
      * @return coordinates of the crossing point.
      */
-    TVector3 getCrossPoint()  const;
+    HepGeom::Point3D<double> getCrossPoint() const;
 
     /**
      * Set Chi^2 of the crossing point.
@@ -94,8 +93,14 @@ namespace Belle2 {
     /** Reference to the Y Strip hit. */
     EKLMDigit const* m_YStrip;  //-> {ROOT streamer directive}
 
-    /** Crossing point global coordinates. */
-    TVector3  m_crossPoint;
+    /** Crossing point global X coordinate */
+    double m_crossPointX;
+
+    /** Crossing point global Y coordinate */
+    double m_crossPointY;
+
+    /** Crossing point global Z coordinate */
+    double m_crossPointZ;
 
     /** Chi^2 of the hit. */
     double m_ChiSq;
@@ -105,6 +110,7 @@ namespace Belle2 {
 
   };
 
-} // end of namespace Belle2
+}
 
-#endif //EKLMHIT2D_H
+#endif
+

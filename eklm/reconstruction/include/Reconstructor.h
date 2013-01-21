@@ -14,6 +14,9 @@
 /* C++ headers. */
 #include <vector>
 
+/* External headers. */
+#include <CLHEP/Geometry/Point3D.h>
+
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMSectorHit.h>
@@ -90,7 +93,8 @@ namespace Belle2 {
        * @return true if strips have intersection.
        */
       bool doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
-                         TVector3& crossPoint, double& chisq, double& time);
+                         HepGeom::Point3D<double> *crossPoint,
+                         double& chisq, double& time);
 
       /**
        * Add strip hit to sector.

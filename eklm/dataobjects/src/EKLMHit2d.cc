@@ -46,14 +46,16 @@ const Belle2::EKLMDigit* EKLMHit2d::getYStripHit() const
   return m_YStrip;
 }
 
-void EKLMHit2d::setCrossPoint(TVector3& point)
+void EKLMHit2d::setCrossPoint(HepGeom::Point3D<double> *point)
 {
-  m_crossPoint = point;
+  m_crossPointX = point->x();
+  m_crossPointY = point->y();
+  m_crossPointZ = point->z();
 }
 
-TVector3 EKLMHit2d::getCrossPoint() const
+HepGeom::Point3D<double> EKLMHit2d::getCrossPoint() const
 {
-  return m_crossPoint;
+  return HepGeom::Point3D<double>(m_crossPointX, m_crossPointY, m_crossPointZ);
 }
 
 double EKLMHit2d::getChiSq() const
@@ -70,8 +72,8 @@ void EKLMHit2d::Print()
   m_XStrip->Print();
   printf("Y: ");
   m_YStrip->Print();
-  printf("Intersection: ");
-  m_crossPoint.Print();
+  printf("Intersection: X:%f Y:%f Z:%f.", m_crossPointX, m_crossPointY,
+         m_crossPointZ);
   printf("Chi squared: %f\n", m_ChiSq);
 }
 

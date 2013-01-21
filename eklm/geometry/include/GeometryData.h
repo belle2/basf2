@@ -57,6 +57,16 @@ namespace Belle2 {
        */
       double getStripLength(int strip);
 
+      /**
+       * Check if strips intersect, and find intersection point if yes.
+       * @param[in] hit1   First hit.
+       * @param[in] hit2   Second hit.
+       * @param[out] cross Crossing point.
+       * @return True if strips intersect.
+       */
+      bool intersection(EKLMDigit* hit1, EKLMDigit* hit2,
+                        HepGeom::Point3D<double> *cross);
+
       /* Transformations. */
       struct TransformData transf;
 

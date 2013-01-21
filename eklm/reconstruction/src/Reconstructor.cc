@@ -97,17 +97,17 @@ void EKLM::Reconstructor::create2dHits()
         // only Y strips
         if (CheckStripOrientationX(*itY))
           continue;
-        TVector3 crossPoint(0, 0, 0);
+        HepGeom::Point3D<double> crossPoint(0, 0, 0);
         // drop entries with non-intersected strips
         double chisq = 0;
         double time = 0;
-        if (!(doesIntersect(*itX, *itY, crossPoint, chisq, time)))
+        if (!(doesIntersect(*itX, *itY, &crossPoint, chisq, time)))
           continue;
 
         EKLMHit2d* hit2d =
           new(m_hit2dArray->AddrAt(m_hit2dArray.getEntries()))
         EKLMHit2d(*itX, *itY);
-        hit2d->setCrossPoint(crossPoint);
+        hit2d->setCrossPoint(&crossPoint);
         hit2d->setChiSq(chisq);
         hit2d->setTime(time);
         m_hit2dVector.push_back(hit2d);
@@ -118,9 +118,13 @@ void EKLM::Reconstructor::create2dHits()
 }
 
 bool EKLM::Reconstructor::doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
-                                        TVector3& crossPoint,
+                                        HepGeom::Point3D<double> *crossPoint,
                                         double& chisq, double& time)
 {
+  bool is;
+  is = m_geoDat->intersection(hit1, hit2, crossPoint);
+  if (is == false)
+    return false;
   /* Convert to mm. */
   double max1 = m_geoDat->getStripLength(hit1->getStrip()) * 10.0;
   HepGeom::Point3D<double> p1(max1 * 0.5, 0., 0.);
@@ -133,7 +137,7 @@ bool EKLM::Reconstructor::doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
   HepGeom::Point3D<double> pt2 = (*tr2) * p2;
 
   /* Convert to cm. */
-  crossPoint.SetZ((pt1.z() + pt2.z()) / 2 * Unit::mm);
+  crossPoint->setZ((pt1.z() + pt2.z()) / 2 * Unit::mm);
 
   double t1 = 0;
   double t2 = 0;
@@ -149,8 +153,8 @@ bool EKLM::Reconstructor::doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
         t2 = hit2->getTime() - fabs(pt2.y() - pt1.y()) * Unit::mm /
              m_firstPhotonlightSpeed;
 
-        crossPoint.SetX(pt2.x()*Unit::mm);
-        crossPoint.SetY(pt1.y()*Unit::mm);
+        crossPoint->setX(pt2.x()*Unit::mm);
+        crossPoint->setY(pt1.y()*Unit::mm);
         time = (t1 + t2) / 2;
         chisq = (t1 - t2) * (t1 - t2) / m_sigmaT / m_sigmaT;
         return true;
@@ -167,8 +171,8 @@ bool EKLM::Reconstructor::doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
         t2 = hit2->getTime() - fabs(pt1.x() - pt2.x()) * Unit::mm /
              m_firstPhotonlightSpeed;
 
-        crossPoint.SetX(pt1.x()*Unit::mm);
-        crossPoint.SetY(pt2.y()*Unit::mm);
+        crossPoint->setX(pt1.x()*Unit::mm);
+        crossPoint->setY(pt2.y()*Unit::mm);
 
         time = (t1 + t2) / 2;
         chisq = (t1 - t2) * (t1 - t2) / m_sigmaT / m_sigmaT;
@@ -176,7 +180,7 @@ bool EKLM::Reconstructor::doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
       }
     }
   }
-  crossPoint = TVector3(0., 0., 0.);
+  *crossPoint = HepGeom::Point3D<double>(0., 0., 0.);
   chisq = 0;
   return false; // no crossing found
 }

@@ -11,7 +11,7 @@ void example()
   TH1F* hTopLHs = new TH1F("hTopLHs", "TOP Likelihoods", 100, -200, 200);
   hTopLHs->GetXaxis()->SetTitle("TOP LL(#pi)-LL(K)");
   hTopLHs->GetYaxis()->SetTitle("tracks");
-  tree->Draw("TOPLikelihoodss.m_logL_pi-TOPLikelihoodss.m_logL_K>>hTopLHs");
+  tree->Draw("TOPLikelihoods.m_logL_pi-TOPLikelihoods.m_logL_K>>hTopLHs");
   hTopLHs->Write();
 
   // an example of a 2D histogram

@@ -26,7 +26,7 @@ param_pGun = {
     'momentumGeneration': 'uniform',
     'momentumParams': [1.0, 1.0],
     'thetaGeneration': 'fixed',
-    'thetaParams': [90., 90.],
+    'thetaParams': [110., 110.],
     'phiGeneration': 'uniform',
     'phiParams': [0, 360],
     'vertexGeneration': 'uniform',

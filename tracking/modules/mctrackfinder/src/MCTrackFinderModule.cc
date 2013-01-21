@@ -505,7 +505,7 @@ void MCTrackFinderModule::event()
       RelationIndex<SVDCluster, SVDTrueHit> relSvdClusterTrueHit;
       BOOST_FOREACH(int hitID, svdHitsIndices) {
         RelationIndex<SVDCluster, SVDTrueHit>::range_from iterPairCluTr = relSvdClusterTrueHit.getElementsFrom(svdClusters[hitID]);
-        if (iterPairCluTr.first == iterPairCluTr.second) { // there is not trueHit! trow away hit because there is no time information for sorting
+        if (iterPairCluTr.first == iterPairCluTr.second) { // there is not trueHit! throw away hit because there is no time information for sorting
           ++m_noTrueHitCounter;
           continue;
         }
@@ -530,7 +530,6 @@ void MCTrackFinderModule::event()
     if (m_useCDCHits) {
       CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
       float time = -1;
-      vector<char> leftRight;
       BOOST_FOREACH(int hitID, cdcHitsIndices) {
         unsigned short wireId = cdcHits[hitID]->getID();
         //set the time as the ordering parameter rho for genfit to do this search for any CDCSimHit that corresponds to the CDCHit and take the time from there

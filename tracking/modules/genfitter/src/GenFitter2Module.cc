@@ -337,30 +337,30 @@ void GenFitter2Module::event()
       //create RecoHitProducers for PXD, SVD and CDC and add producers to the factory with correct detector Id
       if (m_hitTypeId == 0) { // use the trueHits
         if (nPxdTrueHits not_eq 0) {
-          PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (&*pxdTrueHits);
+          PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (pxdTrueHits.getPtr());
           factory.addProducer(Const::PXD, PXDProducer);
         }
         if (nSvdTrueHits not_eq 0) {
-          SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> (&*svdTrueHits);
+          SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> (svdTrueHits.getPtr());
           factory.addProducer(Const::SVD, SVDProducer);
         }
       } else if (m_hitTypeId == 1) {
-        pxdSimpleDigiHitProducer =  new GFRecoHitProducer <VXDSimpleDigiHit, PXDRecoHit> (&*pxdSimpleDigiHits);
-        svdSimpleDigiHitProducer =  new GFRecoHitProducer <VXDSimpleDigiHit, SVDRecoHit2D> (&*svdSimpleDigiHits);
+        pxdSimpleDigiHitProducer =  new GFRecoHitProducer <VXDSimpleDigiHit, PXDRecoHit> (pxdSimpleDigiHits.getPtr());
+        svdSimpleDigiHitProducer =  new GFRecoHitProducer <VXDSimpleDigiHit, SVDRecoHit2D> (svdSimpleDigiHits.getPtr());
         factory.addProducer(Const::PXD, pxdSimpleDigiHitProducer);
         factory.addProducer(Const::SVD, svdSimpleDigiHitProducer);
       } else if (m_hitTypeId == 2) {
         if (nPXDClusters not_eq 0) {
-          pxdClusterProducer =  new GFRecoHitProducer <PXDCluster, PXDRecoHit> (&*pxdClusters);
+          pxdClusterProducer =  new GFRecoHitProducer <PXDCluster, PXDRecoHit> (pxdClusters.getPtr());
           factory.addProducer(Const::PXD, pxdClusterProducer);
         }
         if (nSVDClusters not_eq 0) {
-          svdClusterProducer =  new GFRecoHitProducer <SVDCluster, SVDRecoHit> (&*svdClusters);
+          svdClusterProducer =  new GFRecoHitProducer <SVDCluster, SVDRecoHit> (svdClusters.getPtr());
           factory.addProducer(Const::SVD, svdClusterProducer);
         }
       }
       if (nCdcHits not_eq 0) {
-        CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
+        CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (cdcHits.getPtr());
         factory.addProducer(Const::CDC, CDCProducer);
       }
 

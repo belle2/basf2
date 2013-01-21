@@ -297,25 +297,25 @@ void GenFitterModule::event()
       //create RecoHitProducers for PXD, SVD and CDC and add producers to the factory with correct detector Id
       if (m_useClusters == false) { // use the trueHits
         if (pxdTrueHits.getEntries() not_eq 0) {
-          PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (&*pxdTrueHits);
+          PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (pxdTrueHits.getPtr());
           factory.addProducer(Const::PXD, PXDProducer);
         }
         if (svdTrueHits.getEntries() not_eq 0) {
-          SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> (&*svdTrueHits);
+          SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> (svdTrueHits.getPtr());
           factory.addProducer(Const::SVD, SVDProducer);
         }
       } else {
         if (nPXDClusters not_eq 0) {
-          pxdClusterProducer =  new GFRecoHitProducer <PXDCluster, PXDRecoHit> (&*pxdClusters);
+          pxdClusterProducer =  new GFRecoHitProducer <PXDCluster, PXDRecoHit> (pxdClusters.getPtr());
           factory.addProducer(Const::PXD, pxdClusterProducer);
         }
         if (nSVDClusters not_eq 0) {
-          svdClusterProducer =  new GFRecoHitProducer <SVDCluster, SVDRecoHit> (&*svdClusters);
+          svdClusterProducer =  new GFRecoHitProducer <SVDCluster, SVDRecoHit> (svdClusters.getPtr());
           factory.addProducer(Const::SVD, svdClusterProducer);
         }
       }
       if (cdcHits.getEntries() not_eq 0) {
-        CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
+        CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (cdcHits.getPtr());
         factory.addProducer(Const::CDC, CDCProducer);
       }
 

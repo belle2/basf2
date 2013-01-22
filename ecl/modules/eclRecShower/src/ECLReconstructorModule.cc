@@ -239,8 +239,10 @@ void ECLReconstructorModule::terminate()
 
 float ECLReconstructorModule::errorE(double E)
 {
-  double sigmaE = 0.01 * E * sqrt(squ(0.066 / E) + squ(0.81) / sqrt(E) + squ(1.34)) ;
-//sigmaE / E = 0.066% / E +- 0.81% / (E)^(1/4)  +- 1.34%
+
+  double sigmaE = 0.01 * (0.047 / E + 1.105 / sqrt(sqrt(E)) + 0.8563) * E;
+//double sigmaE = 0.01 * E * sqrt(squ(0.066 / E) + squ(0.81) / sqrt(E) + squ(1.34)) ;
+//sigmaE / E = 0.066% / E +- 0.81% / (E)^(1/4)  +- 1.34%//NIM A441, 401(2000)
   return (float)sigmaE;
 
 }

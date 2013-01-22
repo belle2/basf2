@@ -161,8 +161,7 @@ void EKLM::Digitizer::makeSimHits()
 
         // create new EKLMSimHit and store all information into it
         EKLMSimHit* simHit =
-          new(m_simHitsArray->AddrAt(m_simHitsArray.getEntries()))
-        EKLMSimHit(stepHit);
+          new(m_simHitsArray.nextFreeAddress()) EKLMSimHit(stepHit);
         // insert hit to the map
         graphComponentToSimHit.insert(std::pair<int, EKLMSimHit*>(component[distance(hitMap.begin(), hitIterator)], simHit));
 
@@ -243,8 +242,7 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
 
     // create new stripHit
     EKLMDigit* stripHit =
-      new(m_stripHitsArray->AddrAt(m_stripHitsArray.getEntries()))
-    EKLMDigit(simHit);
+      new(m_stripHitsArray.nextFreeAddress()) EKLMDigit(simHit);
 
     stripHit->setMCTS(simHit->getTime());
     stripHit->setGeneratedNPE(fes->getGeneratedNPE());

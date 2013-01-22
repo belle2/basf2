@@ -161,13 +161,12 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
    * creates step hit and store in to DataStore
    */
   StoreArray<EKLMStepHit> stepHits;
-  int hitNumber = stepHits->GetLast() + 1;
   /*
    * Memory allocation is performed by stepHits->AddrAt(), if necessary.
    * If it fails, this function would not return.
    * No further check is needed.
    */
-  EKLMStepHit* hit = new(stepHits->AddrAt(hitNumber))
+  EKLMStepHit* hit = new(stepHits.nextFreeAddress())
   EKLMStepHit(momentumRoot, E, trackID, paretntTrackID);
   hit->setLocalPosition(&lposRoot);
   hit->setPosition(&gposRoot);
@@ -215,7 +214,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 
   StoreArray<MCParticle> particles;
   RelationArray particleToStepHits(particles, stepHits);
-  particleToStepHits.add(track.GetTrackID(), hitNumber);
+  particleToStepHits.add(track.GetTrackID(), stepHits.getEntries() - 1);
 
   return true;
 }

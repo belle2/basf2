@@ -51,7 +51,7 @@ void EKLM::Reconstructor::createSectorHits()
     }
     if (sectorNotFound) {
       EKLMSectorHit* newSectorHit =
-        new(sectorHitsArray->AddrAt(sectorHitsArray.getEntries()))
+        new(sectorHitsArray.nextFreeAddress())
       EKLMSectorHit((*stripIter)->getEndcap(),
                     (*stripIter)->getLayer(),
                     (*stripIter)->getSector());
@@ -105,8 +105,7 @@ void EKLM::Reconstructor::create2dHits()
           continue;
 
         EKLMHit2d* hit2d =
-          new(m_hit2dArray->AddrAt(m_hit2dArray.getEntries()))
-        EKLMHit2d(*itX, *itY);
+          new(m_hit2dArray.nextFreeAddress()) EKLMHit2d(*itX, *itY);
         hit2d->setCrossPoint(&crossPoint);
         hit2d->setChiSq(chisq);
         hit2d->setTime(time);

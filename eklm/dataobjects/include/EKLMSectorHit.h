@@ -17,7 +17,6 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitBase.h>
 #include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/dataobjects/EKLMHit2d.h>
 
 namespace Belle2 {
 
@@ -50,35 +49,39 @@ namespace Belle2 {
     void Print();
 
     /**
-     * Get pointer to the vector of pointers to the EKLMDigits included to
-     * the EKLMSectorHit.
-     * @return Pointer.
+     * Add hit.
+     * @param[in] hit Hit.
+     * @return 0    Successful.
+     * @return != 0 Hit cannot be added. It is from another sector.
      */
-    std::vector <EKLMDigit*> * getStripHitVector() ;
+    int addHit(EKLMDigit* hit);
 
     /**
-     * Get pointer to the vector of pointers to 2d hits included to the
-     * EKLMSectorHit.
-     * @return Pointer.
+     * Get number of hits.
+     * @param[in] plane  Number of plane.
+     * @return Number of hits in this plane.
      */
-    std::vector <EKLMHit2d*>* get2dHitVector() ;
+    int getHitNumber(int plane);
+
+    /**
+     * Get hit.
+     * @param[in] plane  Number of plane.
+     * @param[in] hit    Number of hit.
+     * @return Hit.
+     */
+    EKLMDigit* getHit(int plane, int hit);
 
   private:
 
-    /**
-     * Vector of pointers to the Belle2::EKLMDigits included to the
-     * EKLMSectorHit.
-     */
-    std::vector<EKLMDigit*> m_stripHitVector;
-
-    /** Vector of pointers to 2d hits included to the EKLMSectorHit. */
-    std::vector<EKLMHit2d*> m_hit2dVector;
+    /** Hits. Index is equal to (number of plane - 1). */
+    std::vector<EKLMDigit*> m_hits[2];
 
     /** Needed to make objects storable. */
     ClassDef(Belle2::EKLMSectorHit, 1);
 
   };
 
-} // end of namespace Belle2
+}
 
-#endif //EKLMSECTORHIT_H
+#endif
+

@@ -44,7 +44,7 @@ void EKLM::Reconstructor::createSectorHits()
            m_SectorHitVector.begin(); sectorIter != m_SectorHitVector.end();
          sectorIter++) {
       // since every hit could be added only once
-      if (addStripHitToSector(*sectorIter, *stripIter)) {
+      if ((*sectorIter)->addHit(*stripIter) == 0) {
         sectorNotFound = false;
         break;
       }
@@ -56,61 +56,36 @@ void EKLM::Reconstructor::createSectorHits()
                     (*stripIter)->getLayer(),
                     (*stripIter)->getSector());
 
-      addStripHitToSector(newSectorHit, *stripIter);
+      newSectorHit->addHit(*stripIter);
       m_SectorHitVector.push_back(newSectorHit);
     }
   }
 
 }
 
-bool EKLM::Reconstructor::addStripHitToSector(EKLMSectorHit* sectorHit,
-                                              EKLMDigit* stripHit)
-{
-  if (stripHit->getEndcap() == sectorHit->getEndcap() &&
-      stripHit->getLayer() == sectorHit->getLayer() &&
-      stripHit->getSector() == sectorHit->getSector()) {
-    sectorHit->getStripHitVector()->push_back(stripHit);
-    return true;
-  }
-  return false;
-
-
-}
-
 void EKLM::Reconstructor::create2dHits()
 {
-  // loop over sectors
-
-  for (std::vector<EKLMSectorHit*>::iterator sectorIter =
-         m_SectorHitVector.begin(); sectorIter != m_SectorHitVector.end();
-       sectorIter++) {
-
-    for (std::vector<EKLMDigit*>::iterator itX =
-           (*sectorIter)->getStripHitVector()->begin();
-         itX != (*sectorIter)->getStripHitVector()->end(); ++itX) {
-      // only X strips
-      if (!CheckStripOrientationX(*itX))
-        continue;
-      for (std::vector<EKLMDigit*>::iterator itY =
-             (*sectorIter)->getStripHitVector()->begin();
-           itY != (*sectorIter)->getStripHitVector()->end(); ++itY) {
-        // only Y strips
-        if (CheckStripOrientationX(*itY))
-          continue;
+  std::vector<EKLMSectorHit*>::iterator it;
+  int n1, n2;
+  int i1, i2;
+  EKLMDigit* hit1, *hit2;
+  for (it = m_SectorHitVector.begin(); it != m_SectorHitVector.end(); it++) {
+    n1 = (*it)->getHitNumber(1);
+    n2 = (*it)->getHitNumber(2);
+    for (i1 = 0; i1 < n1; i1++) {
+      hit1 = (*it)->getHit(1, i1);
+      for (i2 = 0; i2 < n2; i2++) {
+        hit2 = (*it)->getHit(2, i2);
         HepGeom::Point3D<double> crossPoint(0, 0, 0);
-        // drop entries with non-intersected strips
         double chisq = 0;
         double time = 0;
-        if (!(doesIntersect(*itX, *itY, &crossPoint, chisq, time)))
+        if (!(doesIntersect(hit1, hit2, &crossPoint, chisq, time)))
           continue;
-
         EKLMHit2d* hit2d =
-          new(m_hit2dArray.nextFreeAddress()) EKLMHit2d(*itX, *itY);
+          new(m_hit2dArray.nextFreeAddress()) EKLMHit2d(hit1, hit2);
         hit2d->setCrossPoint(&crossPoint);
         hit2d->setChiSq(chisq);
         hit2d->setTime(time);
-        m_hit2dVector.push_back(hit2d);
-        //hit2d->Print();
       }
     }
   }
@@ -131,12 +106,5 @@ bool EKLM::Reconstructor::doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
   time = (t1 + t2) / 2;
   chisq = (t1 - t2) * (t1 - t2) / m_sigmaT / m_sigmaT;
   return true;
-}
-
-bool EKLM::Reconstructor::CheckStripOrientationX(EKLMDigit* hit)
-{
-  HepGeom::Transform3D tinv =
-    HepGeom::Transform3D(*(EKLM::getStripTransform(&m_geoDat->transf, hit))).inverse();
-  return (fabs(sin(tinv.getRotation().phiX())) < 0.01);
 }
 

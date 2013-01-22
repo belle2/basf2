@@ -19,6 +19,7 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/dataobjects/EKLMSectorHit.h>
 #include <eklm/geometry/GeometryData.h>
 #include <framework/datastore/StoreArray.h>
@@ -70,16 +71,6 @@ namespace Belle2 {
       /** Vector of SectorHits. */
       std::vector <EKLMSectorHit*> m_SectorHitVector;
 
-      /** Vector of 2d hits. */
-      std::vector <EKLMHit2d*> m_hit2dVector;
-
-      /**
-       * Check strip orientation.
-       * @param[in] hit Hit.
-       * @return true if strip is along X.
-       */
-      bool CheckStripOrientationX(EKLMDigit* hit);
-
       /**
        * Check whether strips intersect.
        * @details
@@ -95,14 +86,6 @@ namespace Belle2 {
       bool doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
                          HepGeom::Point3D<double> *crossPoint,
                          double& chisq, double& time);
-
-      /**
-       * Add strip hit to sector.
-       * @param[in,out] sectorHit Sector hit.
-       * @param[in]     stripHit  Strip hit.
-       * @return true on success.
-       */
-      bool addStripHitToSector(EKLMSectorHit* sectorHit, EKLMDigit* stripHit);
 
       /** Speed of the first photon. */
       double m_firstPhotonlightSpeed;

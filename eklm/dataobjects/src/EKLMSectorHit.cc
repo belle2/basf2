@@ -24,24 +24,35 @@ EKLMSectorHit::EKLMSectorHit(int nEndcap, int nLayer, int  nSector) :
 {
 }
 
-std::vector <EKLMDigit*> * EKLMSectorHit::getStripHitVector()
+int EKLMSectorHit::addHit(EKLMDigit* hit)
 {
-  return & m_stripHitVector;
+  if (hit->getEndcap() != m_Endcap || hit->getLayer() != m_Layer ||
+      hit->getSector() != m_Sector)
+    return -1;
+  m_hits[hit->getPlane() - 1].push_back(hit);
+  return 0;
 }
 
-std::vector <EKLMHit2d*> * EKLMSectorHit::get2dHitVector()
+int EKLMSectorHit::getHitNumber(int plane)
 {
-  return  & m_hit2dVector;
+  return m_hits[plane - 1].size();
+}
+
+EKLMDigit* EKLMSectorHit::getHit(int plane, int hit)
+{
+  return m_hits[plane - 1][hit];
 }
 
 void EKLMSectorHit::Print()
 {
-  std::cout << "------------  Sector Hit  -------------- " << std::endl;
-  std::cout << "Endcap: " << getEndcap()
-            << " Layer: " << getLayer()
-            << " Sector: " << getSector() << std::endl;
-  for (std::vector<EKLMDigit*>::iterator it = m_stripHitVector.begin();
-       it != m_stripHitVector.end(); ++it)
-    (*it)->Print();
+  std::vector<EKLMDigit*>::iterator i;
+  printf("------------  Sector Hit  -------------- \n"
+         "Endcap: %d Layer: %d Sector: %d\n", m_Endcap, m_Layer, m_Sector);
+  printf("Hits from plane 1:\n");
+  for (i = m_hits[0].begin(); i != m_hits[0].end(); i++)
+    (*i)->Print();
+  printf("Hits from plane 2:\n");
+  for (i = m_hits[1].begin(); i != m_hits[1].end(); i++)
+    (*i)->Print();
 }
 

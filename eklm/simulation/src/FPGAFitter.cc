@@ -74,7 +74,7 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFit(int* amp, float* fit, int nPoints,
   }
   if (firstSig == -1)
     return c_FPGANoSignal;
-  mpar[0] = firstSig;
+  mpar[0] = firstSig > 1 ? firstSig : 1;
   mpar[1] = 2;
   mpar[2] = 2. / (lastSig - firstSig + 1);
   mpar[3] = sum / (lastSig - firstSig + 1);

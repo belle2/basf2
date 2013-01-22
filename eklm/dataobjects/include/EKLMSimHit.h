@@ -16,6 +16,7 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitBase.h>
+#include <eklm/dataobjects/EKLMHitCoord.h>
 #include <eklm/dataobjects/EKLMStepHit.h>
 
 namespace Belle2 {
@@ -23,7 +24,7 @@ namespace Belle2 {
   /**
    * Class to handle simulation hits.
    */
-  class EKLMSimHit : public EKLMHitBase  {
+  class EKLMSimHit : public EKLMHitBase, public EKLMHitCoord {
 
   public:
 

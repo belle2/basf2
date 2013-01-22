@@ -13,6 +13,7 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitBase.h>
+#include <eklm/dataobjects/EKLMHitCoord.h>
 
 namespace Belle2 {
 
@@ -22,7 +23,7 @@ namespace Belle2 {
    * to restore the hit tree and thus another type of hits.
    */
 
-  class EKLMStepHit : public EKLMHitBase {
+  class EKLMStepHit : public EKLMHitBase, public EKLMHitCoord {
   public:
 
     /**

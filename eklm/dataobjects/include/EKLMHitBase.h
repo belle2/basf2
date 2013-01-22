@@ -14,12 +14,11 @@
 /* Extrenal headers. */
 #include <CLHEP/Geometry/Point3D.h>
 #include <TObject.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 
   /**
-   * Base Hit reconstruction class.
+   * Base hit class.
    * @details
    * EKLMHitBase class is inherited from TObject to make all hits storable.
    */
@@ -40,7 +39,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~EKLMHitBase() {};
+    ~EKLMHitBase();
 
     /**
      * Get endcap number.
@@ -120,44 +119,6 @@ namespace Belle2 {
      */
     void setPDG(int PDG);
 
-    /**
-     * Get global position of the particle hit.
-     * @return Hit coordinates.
-     */
-    HepGeom::Point3D<double> getGlobalPosition();
-
-    /**
-     * Set global position of the particle hit.
-     * @param[in] gpos Hit coordinates.
-     */
-    void setGlobalPosition(HepGeom::Point3D<double> gpos);
-
-    /**
-     * Get local position of the particle hit.
-     * @return Hit coordinates.
-     */
-    HepGeom::Point3D<double> getLocalPosition();
-
-    /**
-     * Set local position of the particle hit.
-     * @param[in] lpos Hit coordinates.
-     */
-    void setLocalPosition(HepGeom::Point3D<double> lpos);
-
-    /**
-     * TODO: This function is deprecated (use the next one).
-     *       It must be removed after update of visualization.
-     * Get global position (TVector3 version, for visualization).
-     * @return Hit coordinates.
-     */
-    const TVector3* getPosition() const __attribute__((deprecated));
-
-    /**
-     * Get global position (TVector3 version, for visualization).
-     * @return Hit coordinates.
-     */
-    const TVector3 getGlobalPosition() const;
-
   protected:
 
     /** PDG code of the (leading) particle. */
@@ -168,24 +129,6 @@ namespace Belle2 {
 
     /** Energy deposition. */
     double m_EDep;
-
-    /** Global position X coordinate. */
-    double m_globalX;
-
-    /** Global position Y coordinate. */
-    double m_globalY;
-
-    /** Global position Z coordinate. */
-    double m_globalZ;
-
-    /** Local position X coordinate. */
-    double m_localX;
-
-    /** Local position Y coordinate. */
-    double m_localY;
-
-    /** Local position Z coordinate. */
-    double m_localZ;
 
     /** Number of endcap. */
     int m_Endcap;
@@ -198,13 +141,12 @@ namespace Belle2 {
 
   private:
 
-    /**
-     * Needed to make objects storable.
-     */
+    /** Needed to make objects storable. */
     ClassDef(Belle2::EKLMHitBase, 1);
 
   };
 
-} // end of namespace Belle2
+}
 
-#endif //EKLMHITBASE_H
+#endif
+

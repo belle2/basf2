@@ -12,6 +12,7 @@
 #define EKLMHITBASE_H
 
 /* Extrenal headers. */
+#include <CLHEP/Geometry/Point3D.h>
 #include <TObject.h>
 #include <TVector3.h>
 
@@ -30,12 +31,6 @@ namespace Belle2 {
      * Constructor.
      */
     EKLMHitBase();
-
-    /**
-     * Constructor.
-     */
-    EKLMHitBase(int Endcap, int Layer, int Sector, int PDG, double Time,
-                double EDep, TVector3 GlobalPosition, TVector3 LocalPosition);
 
     /**
      * Constructor with endcap, layer and sector initializations.
@@ -129,37 +124,39 @@ namespace Belle2 {
      * Get global position of the particle hit.
      * @return Hit coordinates.
      */
-    const TVector3* getPosition() const;
-
-    /**
-     * Set global position of the particle hit
-     * @param[in] position Hit coordinates.
-     */
-    void setPosition(TVector3& position);
+    HepGeom::Point3D<double> getGlobalPosition();
 
     /**
      * Set global position of the particle hit.
-     * @param[in] position Hit coordinates.
+     * @param[in] gpos Hit coordinates.
      */
-    void setPosition(const TVector3* position);
+    void setGlobalPosition(HepGeom::Point3D<double> gpos);
 
     /**
      * Get local position of the particle hit.
      * @return Hit coordinates.
      */
-    const TVector3* getLocalPosition() const;
+    HepGeom::Point3D<double> getLocalPosition();
 
     /**
      * Set local position of the particle hit.
-     * @param[in] position Hit coordinates.
+     * @param[in] lpos Hit coordinates.
      */
-    void setLocalPosition(TVector3& position);
+    void setLocalPosition(HepGeom::Point3D<double> lpos);
 
     /**
-     * Set local position of the particle hit.
-     * @param[in] position Hit coordinates.
+     * TODO: This function is deprecated (use the next one).
+     *       It must be removed after update of visualization.
+     * Get global position (TVector3 version, for visualization).
+     * @return Hit coordinates.
      */
-    void setLocalPosition(const TVector3* position);
+    const TVector3* getPosition() const __attribute__((deprecated));
+
+    /**
+     * Get global position (TVector3 version, for visualization).
+     * @return Hit coordinates.
+     */
+    const TVector3 getGlobalPosition() const;
 
   protected:
 
@@ -172,11 +169,23 @@ namespace Belle2 {
     /** Energy deposition. */
     double m_EDep;
 
-    /** Global position of the hit. */
-    TVector3 m_GlobalPosition;
+    /** Global position X coordinate. */
+    double m_globalX;
 
-    /** Local position of the hit. */
-    TVector3 m_LocalPosition;
+    /** Global position Y coordinate. */
+    double m_globalY;
+
+    /** Global position Z coordinate. */
+    double m_globalZ;
+
+    /** Local position X coordinate. */
+    double m_localX;
+
+    /** Local position Y coordinate. */
+    double m_localY;
+
+    /** Local position Z coordinate. */
+    double m_localZ;
 
     /** Number of endcap. */
     int m_Endcap;

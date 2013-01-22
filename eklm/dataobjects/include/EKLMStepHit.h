@@ -48,27 +48,6 @@ namespace Belle2 {
     );
 
     /**
-     * Full constructor.
-     */
-    EKLMStepHit(
-      const int Endcap,
-      const int Layer,
-      const int Sector,
-      const int Plane,
-      const int Strip,
-      const int PDG,
-      const double Time,
-      const double EDep,
-      const TVector3 GlobalPosition,
-      const TVector3 LocalPosition,
-      const TVector3 momentum,
-      const double E ,
-      const int  trID,
-      const int  ptrID,
-      const int volID
-    );
-
-    /**
      * Get energy of the particle.
      * @return Energy.
      */

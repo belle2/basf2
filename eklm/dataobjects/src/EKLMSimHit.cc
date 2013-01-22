@@ -91,16 +91,10 @@ void EKLMSimHit::setStrip(int strip)
   m_Strip = strip;
 }
 
-void EKLMSimHit::Save(char* filename)
+void EKLMSimHit::Print()
 {
-  std::ofstream save_hit(filename, std::fstream::app);
-  save_hit << '\n';
-  save_hit << "EKLM Hit: \n" ;
-  save_hit << "Global position: (" << m_GlobalPosition.x() << ","
-           << m_GlobalPosition.y() << "," << m_GlobalPosition.z() << ")\n";
-  save_hit << "Time: " << m_Time << '\n' ;
-  save_hit << "Energy Deposition: " <<  m_EDep << '\n' ;
-  save_hit << "PDG code: " << m_PDG << '\n';
-  save_hit.close();
+  printf("EKLM Hit:\nGlobal position: (%f, %f, %f)\nTime: %f\n"
+         "Energy Deposition: %f\nPDG code: %d\n",
+         m_globalX, m_globalY, m_globalZ, m_Time, m_EDep, m_PDG);
 }
 

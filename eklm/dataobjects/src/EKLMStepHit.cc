@@ -31,36 +31,6 @@ EKLMStepHit::EKLMStepHit(
   m_parentTrackID = ptrID;
 }
 
-
-EKLMStepHit::EKLMStepHit(
-  const int Endcap,
-  const int Layer,
-  const int Sector,
-  const int Plane,
-  const int Strip,
-  const int PDG,
-  const double Time,
-  const double EDep,
-  const TVector3 GlobalPosition,
-  const TVector3 LocalPosition,
-  const TVector3 momentum,
-  const double E ,
-  const int  trID,
-  const int  ptrID,
-  const int volID
-) :
-  EKLMHitBase(Endcap, Layer, Sector, PDG, Time, EDep, GlobalPosition,
-              LocalPosition)
-{
-  m_Plane = Plane;
-  m_Strip = Strip;
-  m_energy = E;
-  m_momentum = momentum;
-  m_trackID = trID;
-  m_parentTrackID = ptrID;
-  m_volid = volID;
-}
-
 double EKLMStepHit::getEnergy() const
 {
   return m_energy;

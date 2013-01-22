@@ -86,10 +86,9 @@ namespace Belle2 {
     void setEnergy(double e);
 
     /**
-     * Dumps hit into ASCII file.
-     * @param[in] filename Name of file.
+     * Print hit.
      */
-    void Save(char* filename);
+    void Print();
 
     /**
      * Get plane number.

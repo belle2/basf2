@@ -24,22 +24,12 @@ EKLMHitBase::EKLMHitBase()
   m_PDG = 0;
   m_Time = 0;
   m_EDep = 0;
-  m_GlobalPosition = TVector3(0., 0., 0.);
-  m_LocalPosition = TVector3(0., 0., 0.);
-}
-
-EKLMHitBase::EKLMHitBase(int Endcap, int Layer, int Sector, int PDG,
-                         double Time, double EDep,
-                         TVector3 GlobalPosition, TVector3 LocalPosition)
-{
-  m_Endcap = Endcap;
-  m_Layer = Layer;
-  m_Sector = Sector;
-  m_PDG = PDG;
-  m_Time = Time;
-  m_EDep = EDep;
-  m_GlobalPosition = GlobalPosition;
-  m_LocalPosition = LocalPosition;
+  m_globalX = 0;
+  m_globalY = 0;
+  m_globalZ = 0;
+  m_localX = 0;
+  m_localY = 0;
+  m_localZ = 0;
 }
 
 EKLMHitBase::EKLMHitBase(int Endcap, int Layer, int Sector)
@@ -50,8 +40,12 @@ EKLMHitBase::EKLMHitBase(int Endcap, int Layer, int Sector)
   m_PDG = 0;
   m_Time = 0;
   m_EDep = 0;
-  m_GlobalPosition = TVector3(0., 0., 0.);
-  m_LocalPosition = TVector3(0., 0., 0.);
+  m_globalX = 0;
+  m_globalY = 0;
+  m_globalZ = 0;
+  m_localX = 0;
+  m_localY = 0;
+  m_localZ = 0;
 }
 
 int EKLMHitBase::getEndcap() const
@@ -113,38 +107,43 @@ void EKLMHitBase::setEDep(double EDep)
 {
   m_EDep = EDep;
 }
+
 void EKLMHitBase::increaseEDep(double deltaEDep)
 {
   m_EDep += deltaEDep;
 }
 
+HepGeom::Point3D<double> EKLMHitBase::getGlobalPosition()
+{
+  return HepGeom::Point3D<double>(m_globalX, m_globalY, m_globalZ);
+}
+
+void EKLMHitBase::setGlobalPosition(HepGeom::Point3D<double> gpos)
+{
+  m_globalX = gpos.x();
+  m_globalY = gpos.y();
+  m_globalZ = gpos.z();
+}
+
+HepGeom::Point3D<double> EKLMHitBase::getLocalPosition()
+{
+  return HepGeom::Point3D<double>(m_localX, m_localY, m_localZ);
+}
+
+void EKLMHitBase::setLocalPosition(HepGeom::Point3D<double> lpos)
+{
+  m_localX = lpos.x();
+  m_localY = lpos.y();
+  m_localZ = lpos.z();
+}
+
 const TVector3* EKLMHitBase::getPosition() const
 {
-  return &m_GlobalPosition;
+  return new TVector3(m_localX, m_localY, m_localZ);
 }
 
-void EKLMHitBase::setPosition(TVector3& position)
+const TVector3 EKLMHitBase::getGlobalPosition() const
 {
-  m_GlobalPosition = position;
-}
-
-void EKLMHitBase::setPosition(const TVector3* position)
-{
-  m_GlobalPosition = *position;
-}
-
-const TVector3* EKLMHitBase::getLocalPosition() const
-{
-  return &m_LocalPosition;
-}
-
-void EKLMHitBase::setLocalPosition(TVector3& position)
-{
-  m_LocalPosition = position;
-}
-
-void EKLMHitBase::setLocalPosition(const TVector3* position)
-{
-  m_LocalPosition = *position;
+  return TVector3(m_localX, m_localY, m_localZ);
 }
 

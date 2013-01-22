@@ -180,7 +180,7 @@ void EKLM::Digitizer::makeSimHits()
           // new hit is ancestor,  modify everything
           current->second->setEDep(current->second->getEDep() +
                                    stepHit->getEDep());
-          current->second->setPosition(stepHit->getPosition());
+          current->second->setGlobalPosition(stepHit->getGlobalPosition());
           current->second->setTime(stepHit->getTime());
           current->second->setPDG(stepHit->getPDG());
           current->second->setMomentum(stepHit->getMomentum());

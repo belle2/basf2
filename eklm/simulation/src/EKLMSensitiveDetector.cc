@@ -47,6 +47,7 @@ EKLMSensitiveDetector(G4String name, enum EKLMSensitiveType type)
 //-----------------------------------------------------
 bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
+  HepGeom::Point3D<double> gpos, lpos;
   G4TouchableHandle hist = aStep->GetPreStepPoint()->
                            GetTouchableHandle();
 
@@ -97,35 +98,11 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 
 
   /**
-   * Get Hit position
+   * Hit position.
    */
-  const G4ThreeVector& gpos = 0.5 *
-                              (aStep->GetPostStepPoint()->GetPosition() +
-                               aStep->GetPreStepPoint()->GetPosition());
-
-  /**
-   * Global -> Local position
-   */
-  const G4ThreeVector& lpos = hist->GetHistory()->
-                              GetTopTransform().TransformPoint(gpos);
-
-  /**
-   * no conversion btw. G4ThreeVector and TVector3 Sad but true
-   * GEANT returns in mm!
-   * convert to standard units (cm)
-   */
-  const TVector3  gposRoot = TVector3(Unit::convertValue(gpos.x(), "mm"),
-                                      Unit::convertValue(gpos.y(), "mm"),
-                                      Unit::convertValue(gpos.z(), "mm"));
-
-  /**
-   * no conversion btw. G4ThreeVector and TVector3 Sad but true
-   * GEANT returns in mm!
-   * convert to standard units(cm)
-   */
-  const TVector3  lposRoot = TVector3(Unit::convertValue(lpos.x(), "mm"),
-                                      Unit::convertValue(lpos.y(), "mm"),
-                                      Unit::convertValue(lpos.z(), "mm"));
+  gpos = 0.5 * (aStep->GetPostStepPoint()->GetPosition() +
+                aStep->GetPreStepPoint()->GetPosition());
+  lpos = hist->GetHistory()->GetTopTransform().TransformPoint(gpos);
 
   /**
    * Get Momentum of the particle
@@ -168,8 +145,8 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
    */
   EKLMStepHit* hit = new(stepHits.nextFreeAddress())
   EKLMStepHit(momentumRoot, E, trackID, paretntTrackID);
-  hit->setLocalPosition(&lposRoot);
-  hit->setPosition(&gposRoot);
+  hit->setLocalPosition(lpos * Unit::mm);
+  hit->setGlobalPosition(gpos * Unit::mm);
   hit->setEDep(eDep);
   hit->setPDG(PDGcode);
   hit->setTime(hitTime);

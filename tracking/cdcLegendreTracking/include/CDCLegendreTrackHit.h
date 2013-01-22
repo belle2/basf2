@@ -42,40 +42,40 @@ namespace Belle2 {
     void ConformalTransformation();
 
     /** Return the index in the store array of the original CDCHit*/
-    int getStoreIndex() const {return m_storeID;}
+    inline int getStoreIndex() const {return m_storeID;}
 
     /** Returns the layerId (0 - 55). */
-    int getLayerId() const {return m_layerId;};
+    inline int getLayerId() const {return m_layerId;};
 
     /** Returns the wireId (0 - 383, depends on layer). */
-    int getWireId() const {return m_wireId;};
+    inline int getWireId() const {return m_wireId;};
 
     /** Returns the superlayerId (0-8). */
-    int getSuperlayerId() const {return m_superlayerId;};
+    inline int getSuperlayerId() const {return m_superlayerId;};
 
     /** Returns the DriftTime.*/
-    double getDriftTime() const {return m_driftTime;}
+    inline double getDriftTime() const {return m_driftTime;}
 
     /** Returns the Uncertainty of the Drift Time.*/
-    double getDeltaDriftTime() const {return m_deltaDriftTime;}
+    inline double getDeltaDriftTime() const {return m_deltaDriftTime;}
 
     /** Returns true for a Hit in an axial layer, false for a Hit in a stereo layer. */
-    bool getIsAxial() const {return m_isAxial;};
+    inline bool getIsAxial() const {return m_isAxial;};
 
     /** Returns the position of the center(!!!) of the wire. */
-    TVector3 getWirePosition() const {return m_wirePosition ;}
+    inline TVector3 getWirePosition() const {return m_wirePosition ;}
 
     /** Returns the original wire position (before the finding of the z-position.*/
-    TVector3 getOriginalWirePosition() const {return m_wirePositionOrig ;}
+    inline TVector3 getOriginalWirePosition() const {return m_wirePositionOrig ;}
 
     /** Returns the Hit position (X coordinate) in the conformal plane.*/
-    double getConformalX() const {return m_conformalX;};
+    inline double getConformalX() const {return m_conformalX;};
 
     /** Returns the Hit position (Y coordinate) in the conformal plane.*/
-    double getConformalY() const {return m_conformalY;};
+    inline double getConformalY() const {return m_conformalY;};
 
     /** Returns the drift time in the conformal plane (with r << x,y).*/
-    double getConformalDriftTime() const {return m_conformalDriftTime;};
+    inline double getConformalDriftTime() const {return m_conformalDriftTime;};
 
     /** Returns the phi angle of the center wire position.
       * From the Hit position (= center of the wire) the angle is calculated so that it goes from 0 to 2*pi.

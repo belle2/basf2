@@ -31,9 +31,6 @@ namespace Belle2 {
       charge_curler = 4 /**< Enum value curler (d < r(CDC). */
     };
 
-    /** Empty constructor. */
-    CDCLegendreTrackCandidate();
-
     /** Copy Constructor.
      * Creates a new track from a copy of another track.
      */
@@ -49,37 +46,37 @@ namespace Belle2 {
      * @param trackHitList List of Hits, which are assigned to the track
      */
     CDCLegendreTrackCandidate(double theta, double r, int charge,
-                              const std::list<CDCLegendreTrackHit*> & trackHitList);
+                              const std::vector<CDCLegendreTrackHit*> & trackHitList);
 
     /**Return vector of assigned hits.*/
-    std::vector<Belle2::CDCLegendreTrackHit*> getTrackHits() {
+    inline std::vector<Belle2::CDCLegendreTrackHit*> getTrackHits() {
       return m_TrackHits;
     }
 
     /** Return theta value of track.*/
-    double getTheta() const {
+    inline double getTheta() const {
       return m_theta;
     }
 
     /** Return r value of track.*/
-    double getR() const {
+    inline double getR() const {
       return m_r;
     }
 
     /**Return Xc value of track.*/
-    double getXc() const {
+    inline double getXc() const {
       return m_xc;
     }
 
     /**Return Yc value of track.*/
-    double getYc() const {
+    inline double getYc() const {
       return m_yc;
     }
 
     /**Return charge hypotheses of track.
      * Might also be curler or two tracks.
      */
-    int getCharge() const {
+    inline int getCharge() const {
       return m_charge;
     }
 
@@ -89,22 +86,22 @@ namespace Belle2 {
     int getChargeSign() const;
 
     /** Return number of assigned hits.*/
-    int getNHits() const {
-      return m_allHits;
+    inline int getNHits() const {
+      return (m_stereoHits + m_axialHits);
     }
 
     /** Return number of assigned axial hits.*/
-    int getNAxialHits() const {
+    inline int getNAxialHits() const {
       return m_axialHits;
     }
 
     /** Return number of assigned stereo hits.*/
-    int getNStereoHits() const {
+    inline int getNStereoHits() const {
       return m_stereoHits;
     }
 
     /** Return momentum estimation of the track.*/
-    TVector3 getMomentumEstimation() const;
+    TVector3 getMomentumEstimation(bool force_calculation = false) const;
 
     /** Setter for m_r, adopts m_xc and m_yc.*/
     void setR(double r);
@@ -141,7 +138,7 @@ namespace Belle2 {
      * Determines the charge assumption of a potential track candidate, using its curvature with respect to all hits. A voting system is used to separate single and two tracks
      */
     static int getChargeAssumption(
-      double theta, double r, const std::list<CDCLegendreTrackHit*> & trackHits);
+      double theta, double r, const std::vector<CDCLegendreTrackHit*> & trackHits);
 
     /**
      * @brief return Layer ID of the contributing axial hit with the small layer ID.
@@ -154,7 +151,15 @@ namespace Belle2 {
      */
     double getLayerWaight();
 
+    /**
+     * Checks the contributing hits and removes stereo hits, that do not fit to the rest of the track
+     */
+    void CheckStereoHits();
+
   private:
+
+    /** Empty constructor. */
+    CDCLegendreTrackCandidate() : m_charge(0) {};
 
     std::vector<CDCLegendreTrackHit*> m_TrackHits; /**< vector to store TrackCandidateHits belonging to this TrackCandidate */
 
@@ -166,7 +171,15 @@ namespace Belle2 {
 
     int m_axialHits; /**< Number of axial hits, belonging to the track*/
     int m_stereoHits; /**< Number of stereo hits, belonging to the track*/
-    int m_allHits; /**< Number of total hits, belonging to the track*/
+
+    bool m_calcedMomentum; /**< Is the momentum estimation already calculated?*/
+    TVector3 m_momEstimation; /**< Momentum estimation*/
+
+    /**
+     * Calculates the momentum estimation from parameters of the track (for x and y)
+     * and from contributing hits (for z)
+     */
+    void calculateMomentumEstimation();
 
     /**
      * @brief Delivers an estimation of the z momentum of the track

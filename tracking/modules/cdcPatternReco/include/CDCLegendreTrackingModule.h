@@ -81,8 +81,9 @@ namespace Belle2 {
     std::string m_cdcHitsColName; /**< Input digitized hits collection name (output of CDCDigitizer module) */
     std::string m_gfTrackCandsColName; /**< Output genfit track candidates collection name*/
 
-    std::list<CDCLegendreTrackHit*> m_hitList; /**< List of the hits used for track finding. This is the vector, which is used for memory management! */
-    std::list<CDCLegendreTrackCandidate*> m_trackList; /** List of track candidates. Mainly used for memory management! */
+    std::vector<CDCLegendreTrackHit*> m_AxialHitList; /**< List of the axial hits used for track finding. This is the vector, which is used for memory management! */
+    std::vector<CDCLegendreTrackHit*> m_StereoHitList; /**< List of the stereo hits used for track finding. This is the vector, which is used for memory management! */
+    std::list<CDCLegendreTrackCandidate*> m_trackList; /**< List of track candidates. Mainly used for memory management! */
 
     int m_threshold; /**< Threshold for votes in the legendre plane, parameter of the module*/
     double m_thresholdUnique; /**< Threshold of unique TrackHits for track building*/
@@ -138,7 +139,7 @@ namespace Belle2 {
      * @param track construction of std::pairs, describing the track candidate by the axial hits, belonging to it and the parameter r and theta
      * @param trackHitList list of all track hits, which are used for track finding. Hits belonging to the track candidate will be deleted from it.
      */
-    void createLegendreTrackCandidate(const std::pair<std::list<CDCLegendreTrackHit*>, std::pair<double, double> > &track, std::list<CDCLegendreTrackHit*>* trackHitList);
+    void createLegendreTrackCandidate(const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > &track, std::set<CDCLegendreTrackHit*>* trackHitList);
 
 
     /**
@@ -147,7 +148,7 @@ namespace Belle2 {
      * @param trackHitList list of al track hits, which are used for track finding. Hits belonging to the track candidate will be deleted from it.
      * This function leaves room for other operations like further quality checks or even the actual fitting of the track candidate.
      */
-    void processTrack(CDCLegendreTrackCandidate* track, std::list<CDCLegendreTrackHit*>* trackHitList);
+    void processTrack(CDCLegendreTrackCandidate* track, std::set<CDCLegendreTrackHit*>* trackHitList);
 
     /** Creates GeantFit Track Candidates from CDCLegendreTrackCandidates */
     void createGFTrackCandidates();
@@ -165,8 +166,8 @@ namespace Belle2 {
      * At each step, the remaining voting plane is divided in 2x2 squares and the voting procedure is performed in each of them, following NIM A 592 (456 - 462).
      * Only bins with more bins than the current maximum are further investigated where the current maximum is determined of the configured threshold or the number of hits of an already found track candidate.
      */
-    void MaxFastHough(std::pair<std::list<CDCLegendreTrackHit*>, std::pair<double, double> > *candidate,
-                      const std::list<CDCLegendreTrackHit*> &hits, const int level, const int theta_min,
+    void MaxFastHough(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > *candidate,
+                      const std::vector<CDCLegendreTrackHit*> &hits, const int level, const int theta_min,
                       const int theta_max, const double r_min, const double r_max, const unsigned limit);
 
     /**

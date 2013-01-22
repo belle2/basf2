@@ -157,13 +157,15 @@ void ECLReconstructorModule::event()
         B2DEBUG(100, "ECLShower theta out of range " << ((*iShower).second.Theta() / PI * 180));
 
       }
+      double sEnergy = (*iShower).second.Energy() / preliminaryCalibration;
+
 
       StoreArray<ECLShower> eclRecShowerArray;
       if (!eclRecShowerArray) eclRecShowerArray.create();
       m_hitNum = eclRecShowerArray->GetLast() + 1;
       new(eclRecShowerArray->AddrAt(m_hitNum)) ECLShower();
       eclRecShowerArray[m_hitNum]->setShowerId(nShower);
-      eclRecShowerArray[m_hitNum]->setEnergy((float)(*iShower).second.Energy() / preliminaryCalibration);
+      eclRecShowerArray[m_hitNum]->setEnergy((float) sEnergy);
       eclRecShowerArray[m_hitNum]->setTheta((float)(*iShower).second.Theta());
       eclRecShowerArray[m_hitNum]->setPhi((float)(*iShower).second.Phi());
       eclRecShowerArray[m_hitNum]->setR((float)(*iShower).second.Distance());
@@ -175,7 +177,6 @@ void ECLReconstructorModule::event()
       eclRecShowerArray[m_hitNum]->setStatus((*iShower).second.Status());
       eclRecShowerArray[m_hitNum]->setGrade((*iShower).second.Grade());
       eclRecShowerArray[m_hitNum]->setUncEnergy((float)(*iShower).second.UncEnergy());
-      double sEnergy = (*iShower).second.Energy();
       double sTheta = (*iShower).second.Theta();
 
       float ErrorMatrix[3] = {

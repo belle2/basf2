@@ -62,10 +62,13 @@ namespace Belle2 {
        * @param[in] hit1   First hit.
        * @param[in] hit2   Second hit.
        * @param[out] cross Crossing point.
+       * @param[out] l1    Distance from hit to SiPM of strip 1, mm.
+       * @param[out] l2    Distance from hit to SiPM of strip 2, mm.
        * @return True if strips intersect.
        */
       bool intersection(EKLMDigit* hit1, EKLMDigit* hit2,
-                        HepGeom::Point3D<double> *cross);
+                        HepGeom::Point3D<double> *cross,
+                        double* d1, double* d2);
 
       /* Transformations. */
       struct TransformData transf;

@@ -34,8 +34,6 @@ void EKLM::Reconstructor::readStripHits()
 
 void EKLM::Reconstructor::createSectorHits()
 {
-  StoreArray<EKLMSectorHit> sectorHitsArray;
-
   for (std::vector<EKLMDigit*>::iterator stripIter =
          m_StripHitVector.begin(); stripIter != m_StripHitVector.end();
        ++stripIter) {
@@ -51,10 +49,9 @@ void EKLM::Reconstructor::createSectorHits()
     }
     if (sectorNotFound) {
       EKLMSectorHit* newSectorHit =
-        new(sectorHitsArray.nextFreeAddress())
-      EKLMSectorHit((*stripIter)->getEndcap(),
-                    (*stripIter)->getLayer(),
-                    (*stripIter)->getSector());
+        new EKLMSectorHit((*stripIter)->getEndcap(),
+                          (*stripIter)->getLayer(),
+                          (*stripIter)->getSector());
 
       newSectorHit->addHit(*stripIter);
       m_SectorHitVector.push_back(newSectorHit);

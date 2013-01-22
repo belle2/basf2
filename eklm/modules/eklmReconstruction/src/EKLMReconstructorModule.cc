@@ -31,7 +31,6 @@ EKLMReconstructorModule::~EKLMReconstructorModule()
 
 void EKLMReconstructorModule::initialize()
 {
-  StoreArray<EKLMSectorHit>::registerPersistent();
   StoreArray<EKLMHit2d>::registerPersistent();
   if (m_geoDat.read() != 0)
     B2FATAL("Cannot read geometry data file.");

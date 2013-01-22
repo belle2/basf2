@@ -70,15 +70,15 @@ namespace Belle2 {
                         HepGeom::Point3D<double> *cross,
                         double* d1, double* d2);
 
-      /* Transformations. */
+      /** Transformations. */
       struct TransformData transf;
 
     private:
 
-      /* Strip lengths. */
+      /** Strip lengths. */
       double m_stripLen[75];
 
-      /* Intersection data. */
+      /** Intersection data. */
       bool m_isect[75 * 74 / 2];
 
     };

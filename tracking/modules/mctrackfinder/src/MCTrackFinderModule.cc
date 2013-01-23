@@ -531,7 +531,6 @@ void MCTrackFinderModule::event()
       CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
       float time = -1;
       BOOST_FOREACH(int hitID, cdcHitsIndices) {
-        unsigned short wireId = cdcHits[hitID]->getID();
         //set the time as the ordering parameter rho for genfit to do this search for any CDCSimHit that corresponds to the CDCHit and take the time from there
         //be aware that this is some kind of hack because it is not garanteed by the framework that the "first" simhit belonging to a cdchit is really comming from the original particle
         //it might also come from a secondary particle created by material effects. But the code here seems to work.
@@ -547,7 +546,7 @@ void MCTrackFinderModule::event()
         TVector3 simHitPos = aCDCSimHitPtr->getPosTrack();
         TVector3 simMom = aCDCSimHitPtr->getMomentum();
         TVector3 simHitPosOnWire = aCDCSimHitPtr->getPosWire();
-        TVector3 wireStartPos = cdcGeometry.wireBackwardPosition(WireID(wireId));
+        TVector3 wireStartPos = cdcGeometry.wireBackwardPosition(aCDCSimHitPtr->getWireID());
         TVector3 wireDir = simHitPosOnWire - wireStartPos;
         TVector3 wireToSimHit = simHitPos - simHitPosOnWire;
         double scalarProduct = wireToSimHit * (wireDir.Cross(simMom));

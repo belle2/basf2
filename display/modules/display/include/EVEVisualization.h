@@ -319,7 +319,6 @@ namespace Belle2 {
         trackCand->getHit(iHit, detId, hitId);
 
         //get actual hit data from associated StoreArray
-        TVector3 global_pos;
         if (detId == Const::PXD) {
           if (!pxdhits)
             continue;

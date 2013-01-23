@@ -39,7 +39,7 @@ namespace Belle2 {
      * Get global position of the particle hit.
      * @return Hit coordinates.
      */
-    HepGeom::Point3D<double> getGlobalPosition();
+    HepGeom::Point3D<double> getGlobalPosition() const;
 
     /**
      * Set global position of the particle hit.
@@ -51,7 +51,7 @@ namespace Belle2 {
      * Get local position of the particle hit.
      * @return Hit coordinates.
      */
-    HepGeom::Point3D<double> getLocalPosition();
+    HepGeom::Point3D<double> getLocalPosition() const;
 
     /**
      * Set local position of the particle hit.
@@ -60,18 +60,10 @@ namespace Belle2 {
     void setLocalPosition(HepGeom::Point3D<double> lpos);
 
     /**
-     * TODO: This function is deprecated (use the next one).
-     *       It must be removed after update of visualization.
      * Get global position (TVector3 version, for visualization).
      * @return Hit coordinates.
      */
-    const TVector3* getPosition() const __attribute__((deprecated));
-
-    /**
-     * Get global position (TVector3 version, for visualization).
-     * @return Hit coordinates.
-     */
-    const TVector3 getGlobalPosition() const;
+    TVector3 getPosition() const;
 
   protected:
 

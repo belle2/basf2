@@ -24,7 +24,7 @@ EKLMHitCoord::~EKLMHitCoord()
 {
 }
 
-HepGeom::Point3D<double> EKLMHitCoord::getGlobalPosition()
+HepGeom::Point3D<double> EKLMHitCoord::getGlobalPosition() const
 {
   return HepGeom::Point3D<double>(m_globalX, m_globalY, m_globalZ);
 }
@@ -36,7 +36,7 @@ void EKLMHitCoord::setGlobalPosition(HepGeom::Point3D<double> gpos)
   m_globalZ = gpos.z();
 }
 
-HepGeom::Point3D<double> EKLMHitCoord::getLocalPosition()
+HepGeom::Point3D<double> EKLMHitCoord::getLocalPosition() const
 {
   return HepGeom::Point3D<double>(m_localX, m_localY, m_localZ);
 }
@@ -48,12 +48,7 @@ void EKLMHitCoord::setLocalPosition(HepGeom::Point3D<double> lpos)
   m_localZ = lpos.z();
 }
 
-const TVector3* EKLMHitCoord::getPosition() const
-{
-  return new TVector3(m_localX, m_localY, m_localZ);
-}
-
-const TVector3 EKLMHitCoord::getGlobalPosition() const
+TVector3 EKLMHitCoord::getPosition() const
 {
   return TVector3(m_localX, m_localY, m_localZ);
 }

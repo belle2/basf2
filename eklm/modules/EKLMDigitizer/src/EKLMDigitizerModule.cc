@@ -12,7 +12,7 @@
 #include <math.h>
 
 /* Belle2 headers. */
-#include <eklm/modules/eklmDigitization/EKLMDigitizerModule.h>
+#include <eklm/modules/EKLMDigitizer/EKLMDigitizerModule.h>
 #include <framework/core/ModuleManager.h>
 
 using namespace Belle2;

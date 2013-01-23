@@ -15,7 +15,7 @@
 /* Belle2 headers. */
 #include <framework/core/ModuleManager.h>
 #include <eklm/geometry/GeometryData.h>
-#include <eklm/modules/eklmAlignment/EKLMAlignmentModule.h>
+#include <eklm/modules/EKLMAlignment/EKLMAlignmentModule.h>
 
 using namespace Belle2;
 
@@ -25,6 +25,7 @@ EKLMAlignmentModule::EKLMAlignmentModule() : Module()
 {
   setDescription("Module for generation of EKLM transformation and "
                  "alignment data.");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("OutputFile", m_out, "Output file.",
            std::string("eklm_alignment.dat"));
 }

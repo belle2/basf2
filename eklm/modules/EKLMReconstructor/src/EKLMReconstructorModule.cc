@@ -9,7 +9,7 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/modules/eklmReconstruction/EKLMReconstructorModule.h>
+#include <eklm/modules/EKLMReconstructor/EKLMReconstructorModule.h>
 #include <eklm/reconstruction/Reconstructor.h>
 #include <framework/core/ModuleManager.h>
 

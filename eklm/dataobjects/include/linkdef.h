@@ -5,13 +5,20 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+/* Base classes. */
 #pragma link C++ class Belle2::EKLMHitBase;
 #pragma link C++ class Belle2::EKLMHitCoord;
 
+/* Geant stage. */
 #pragma link C++ class Belle2::EKLMStepHit;
+
+/* Digitization stage. */
 #pragma link C++ class Belle2::EKLMSimHit;
 #pragma link C++ class Belle2::EKLMDigit;
+
+/* Reconstuction stage. */
 #pragma link C++ class Belle2::EKLMSectorHit;
 #pragma link C++ class Belle2::EKLMHit2d;
+#pragma link C++ class Belle2::EKLMK0L;
 
 #endif

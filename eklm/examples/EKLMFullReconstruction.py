@@ -77,6 +77,7 @@ trackfitchecker.param('writeToTextFile', True)
 # EKLM Modules
 eklmDigitizer = register_module('EKLMDigitizer')
 eklmReconstructor = register_module('EKLMReconstructor')
+eklmK0LReconstructor = register_module('EKLMK0LReconstructor')
 
 output = register_module('RootOutput')
 output.param('outputFileName', 'EKLMFullSim.root')
@@ -96,6 +97,7 @@ main.add_module(trackfitter)
 main.add_module(ext)
 main.add_module(eklmDigitizer)
 main.add_module(eklmReconstructor)
+main.add_module(eklmK0LReconstructor)
 main.add_module(output)
 
 process(main)

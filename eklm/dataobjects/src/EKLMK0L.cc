@@ -9,43 +9,29 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <framework/core/ModuleManager.h>
-#include <framework/datastore/StoreArray.h>
 #include <eklm/dataobjects/EKLMK0L.h>
-#include <eklm/modules/EKLMK0LReconstructor/EKLMK0LReconstructorModule.h>
 
 using namespace Belle2;
 
-REG_MODULE(EKLMK0LReconstructor)
+ClassImp(EKLMK0L);
 
-EKLMK0LReconstructorModule::EKLMK0LReconstructorModule() : Module()
-{
-  setDescription("EKLM K0L reconstruction module.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
-}
-
-EKLMK0LReconstructorModule::~EKLMK0LReconstructorModule()
+EKLMK0L::EKLMK0L()
 {
 }
 
-void EKLMK0LReconstructorModule::initialize()
-{
-  StoreArray<EKLMK0L>::registerPersistent();
-}
-
-void EKLMK0LReconstructorModule::beginRun()
+EKLMK0L::~EKLMK0L()
 {
 }
 
-void EKLMK0LReconstructorModule::event()
+void EKLMK0L::setHitPosition(HepGeom::Point3D<double> &pos)
 {
+  m_hitX = pos.x();
+  m_hitY = pos.y();
+  m_hitZ = pos.z();
 }
 
-void EKLMK0LReconstructorModule::endRun()
+HepGeom::Point3D<double> EKLMK0L::getHitPosition() const
 {
-}
-
-void EKLMK0LReconstructorModule::terminate()
-{
+  return HepGeom::Point3D<double>(m_hitX, m_hitY, m_hitZ);
 }
 

@@ -19,8 +19,6 @@
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
 #include <pxd/geometry/SensorInfo.h>
@@ -30,11 +28,14 @@
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <geometry/GeometryManager.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
 #include <tracking/gfbfield/GFGeant4Field.h>
+#include <tracking/trackCandidateHits/CDCTrackCandHit.h>
 
 #include <GFTrack.h>
 #include <GFTools.h>
@@ -60,6 +61,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace boost::accumulators;
+using namespace Tracking;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -79,7 +81,7 @@ TrackFitCheckerModule::TrackFitCheckerModule() : Module()
   addParam("totalChi2Cut", m_totalChi2Cut, "only tracks with a total χ² lower than this value will be considered", 1E300);
   addParam("testSi", m_testSi, "execute the layer wise tests for PXD/SVD", false);
   addParam("robustTests", m_robust, "activate additional robust statistical tests (median and MAD)", false);
-
+  addParam("testLRRes", m_testLRRes, "test if DAF correctly resolved the left right ambiguity in the CDC", false);
   addParam("testCdc", m_testCdc, "execute the layer wise tests for CDC", false);
   addParam("truthAvailable", m_truthAvailable, "is truth info available for every hit?", false);
   addParam("inspectTracks", m_inspectTracks, "write track parameters into a text file for further inspection. When 0 this function is switched off. 1 or 2 will enable this function but have different arrangments of data in text file. EXPERIMENTAL", 0);
@@ -172,6 +174,10 @@ void TrackFitCheckerModule::initialize()
     m_nPxdLayers = 0;
     m_nSvdLayers = 0;
   }
+  if (m_testLRRes == true) {
+    m_testCdc = false; // do not make any other tests ont he CDC data. Only test the left right resolution
+    m_nCdcLayers = 56; //should come from the xml file
+  }
   m_nSiLayers = m_nPxdLayers + m_nSvdLayers;
   m_nLayers = m_nPxdLayers + m_nSvdLayers + m_nCdcLayers;
   B2DEBUG(100, "nLayers" << m_nLayers);
@@ -191,7 +197,7 @@ void TrackFitCheckerModule::initialize()
   // pulls (z) of cartesian 7D coordinates at vertex
   //registerTrackWiseVecData("pulls_vertexState", 7);
   // residuals of cartesian 7D coordinates at vertex
-//  registerTrackWiseVecData("res_vertexState", 7);
+  //  registerTrackWiseVecData("res_vertexState", 7);
 
   // pulls (z) and chi2s for the 5 track parameters in every layer using truth info
   registerLayerWiseData("pulls_and_chi2_fp_t", vecSizeTruthTest);
@@ -213,6 +219,10 @@ void TrackFitCheckerModule::initialize()
   registerLayerWiseData("DAF_weights", 5); // at the moment only tracks 1 or 2 BG hits
   registerLayerWiseData("DAF_chi2s", 5);
   //registerLayerWiseData("DAF_weights_BG", 3);
+  if (m_testLRRes) {
+    registerLayerWiseData("LRAmbiRes", 2);
+  }
+
 
   if (m_robust == true) { //set the scaling factors for the MAD. No MAD will be calculated when this value is not there or 0
     m_madScalingFactors["pulls_vertexPosMom"] = 1.4826; //scaling factor for normal distributed variables
@@ -284,7 +294,6 @@ void TrackFitCheckerModule::event()
 
 
   //genfit stuff
-  //StoreArray<GFTrackCand> trackCandidates(""); // to create a new track rep for extrapolation only
   StoreArray<GFTrack> fittedTracks(""); // the results of the track fit
   const int nFittedTracks = fittedTracks.getEntries();
   //stringstreams for text file output of all forward tracking parameters
@@ -317,7 +326,8 @@ void TrackFitCheckerModule::event()
 
   for (int i = 0; i not_eq nFittedTracks; ++i) { // loop over all tracks in one event
     GFTrack* const aTrackPtr = fittedTracks[i];
-    const int mcParticleIndex = aTrackPtr->getCand().getMcTrackId();
+    GFTrackCand aTrackCand = aTrackPtr->getCand();
+    const int mcParticleIndex = aTrackCand.getMcTrackId();
     const double charge = aMcParticleArray[mcParticleIndex]->getCharge();
     const TVector3 trueVertexMom = aMcParticleArray[mcParticleIndex]->getMomentum();
     const TVector3 trueVertexPos = aMcParticleArray[mcParticleIndex]->getVertex();
@@ -349,8 +359,8 @@ void TrackFitCheckerModule::event()
       continue;
     }
     B2DEBUG(100, "after propagation");
-//    poca.Print();
-//    dirInPoca.Print();
+    //    poca.Print();
+    //    dirInPoca.Print();
 
     const double chi2tot_bu = aTrackPtr->getChiSqu(); // returns the total chi2 from the backward filter
     if (chi2tot_bu > m_totalChi2Cut) {//consider this track to be an outlier and discard it. Goto next track
@@ -415,14 +425,18 @@ void TrackFitCheckerModule::event()
     zVertexPosMom[5] = resVertexPosMom[5] / sqrt(vertexCov[5][5]);
     fillTrackWiseVecData("pulls_vertexPosMom", zVertexPosMom);
     B2DEBUG(100, "filled all track wise tests");
-    //cerr << "fick dich du dummes arschloch!!!!!!!!!!!" << endl;
+
     if (m_nLayers not_eq 0) { // now the layer wise tests
       //cerr << "m_nLayers: " << m_nLayers << endl;
-      extractTrackData(aTrackPtr, charge); // read all the data for the layer wise tests from GFTracks
-      B2DEBUG(100, "extractTrackData finished successfully");
+      if (m_testLRRes not_eq true) {
+        extractTrackData(aTrackPtr, charge);// read all the data for the layer wise tests from GFTracks
+        B2DEBUG(100, "extractTrackData finished successfully");
+      }
       // do the layer wise test uses only data from GFTrack object
-      if (m_testDaf == true) {
-        //testDaf(aTrackPtr);
+      if (m_testLRRes == true) {
+        testLRAmbiResolution(aTrackPtr);
+        B2DEBUG(100, "executed left right resolution tests");
+      } else if (m_testDaf == true) {
         testDaf(aTrackPtr);
         B2DEBUG(100, "executed DAF tests");
       } else {
@@ -508,7 +522,12 @@ void TrackFitCheckerModule::endRun()
         printTrackWiseVecStatistics("res_vertexState", vertexTests7DVarNames);
         printTrackWiseVecStatistics("pulls_vertexState", vertexTests7DVarNames);*/
     //looks a bit clumsy with all the if (m_testSi == true) but the hope is there will easy accessible truth info for CDCHits so a better solution is not needed because the if (m_testSi == true) are temporary anyway
-    if (m_testDaf == true) {
+
+    if (m_testLRRes == true) {
+      measVarNames[0] = "true";
+      measVarNames[1] = "cand";
+      printLRResData("LRAmbiRes", measVarNames);
+    } else if (m_testDaf == true) {
       vector<string> dafVarNames;
       dafVarNames.push_back("w_all");
       dafVarNames.push_back("w_right");
@@ -749,9 +768,9 @@ void TrackFitCheckerModule::printLayerWiseStatistics(const string& nameOfDataSam
   const int nOfLayersPlus1 = nOfLayers + 1;
   for (int l = 1; l not_eq nOfLayersPlus1; ++l) { //start at 1 to for the textoutput
     aStrStr << l << "\t\t";
-//    if( m_robust == true){
-//      aStrStr << "\t\t\t";
-//    }
+    //    if( m_robust == true){
+    //      aStrStr << "\t\t\t";
+    //    }
     if (count == true) {
       aStrStr << "\t";
     }
@@ -759,9 +778,9 @@ void TrackFitCheckerModule::printLayerWiseStatistics(const string& nameOfDataSam
   aStrStr << "\n\t";
   for (int l = 0; l not_eq nOfLayers; ++l) {
     aStrStr << "mean\tstd\t";
-//    if( m_robust == true){
-//      aStrStr << "median\tMAD std\toutlier\t";
-//    }
+    //    if( m_robust == true){
+    //      aStrStr << "median\tMAD std\toutlier\t";
+    //    }
     if (count == true) {
       aStrStr << "count\t";
     }
@@ -775,17 +794,17 @@ void TrackFitCheckerModule::printLayerWiseStatistics(const string& nameOfDataSam
       double tempStd = sqrt(variance(dataSample[l][i]));
 
       m_textOutput << fixed << "\t" << tempMean << "\t" << tempStd;
-//      if( m_robust == true){
-//        double madScalingFactor =  m_madScalingFactors[nameOfDataSample];
-//        if (madScalingFactor > 0.001) {
-//          double aMedian = median(dataSample[l][i]);
-//          double scaledMad = madScalingFactor*calcMad(m_layerWiseData[nameOfDataSample][l][i],aMedian);
-//          int nOutliers = countOutliers(m_layerWiseData[nameOfDataSample][l][i],aMedian, scaledMad, 4);
-//          m_textOutput << "\t" << aMedian << "\t" << scaledMad << "\t" << nOutliers;// << "\t" << calcMedian(m_trackWiseVecData[nameOfDataSample][i]);
-//        } else {
-//          m_textOutput << "\tno scaling => no MAD";
-//        }
-//      }
+      //      if( m_robust == true){
+      //        double madScalingFactor =  m_madScalingFactors[nameOfDataSample];
+      //        if (madScalingFactor > 0.001) {
+      //          double aMedian = median(dataSample[l][i]);
+      //          double scaledMad = madScalingFactor*calcMad(m_layerWiseData[nameOfDataSample][l][i],aMedian);
+      //          int nOutliers = countOutliers(m_layerWiseData[nameOfDataSample][l][i],aMedian, scaledMad, 4);
+      //          m_textOutput << "\t" << aMedian << "\t" << scaledMad << "\t" << nOutliers;// << "\t" << calcMedian(m_trackWiseVecData[nameOfDataSample][i]);
+      //        } else {
+      //          m_textOutput << "\tno scaling => no MAD";
+      //        }
+      //      }
 
       if (count == true) {
         m_textOutput << "\t" << boost::accumulators::count(dataSample[l][i]);
@@ -794,6 +813,40 @@ void TrackFitCheckerModule::printLayerWiseStatistics(const string& nameOfDataSam
     m_textOutput << "\n";
   }
 }
+
+void TrackFitCheckerModule::printLRResData(const string& nameOfDataSample, const vector<string>& layerWiseVarNames)
+{
+  vector<vector<StatisticsContainer> >&  dataSample = m_layerWiseDataSamples[nameOfDataSample];
+
+  int nOfLayers = dataSample.size();
+  int nOfVars = dataSample[0].size();
+  //construct the string for the text output to include the correct number of layers
+  stringstream aStrStr;
+  const int nOfLayersPlus1 = nOfLayers + 1;
+  for (int l = 1; l not_eq nOfLayersPlus1; ++l) { //start at 1 to for the textoutput
+    aStrStr << l << "\t\t";
+  }
+  aStrStr << "\n\t";
+  for (int l = 0; l not_eq nOfLayers; ++l) {
+    aStrStr << "mean\t";
+
+    aStrStr << "count\t";
+  }
+  aStrStr << "\n";
+  m_textOutput << "Information on " << nameOfDataSample << " for all layers\npara\\l\t" << aStrStr.str();
+  for (int i = 0; i not_eq nOfVars; ++i) {
+    m_textOutput << layerWiseVarNames[i];
+    for (int l = 0; l not_eq nOfLayers; ++l) {
+      double tempMean = mean(dataSample[l][i]);
+
+      m_textOutput << fixed << "\t" << tempMean;
+      m_textOutput << "\t" << boost::accumulators::count(dataSample[l][i]);
+
+    }
+    m_textOutput << "\n";
+  }
+}
+
 
 void TrackFitCheckerModule::printTrackWiseStatistics(const string& nameOfDataSample, const bool count)
 {
@@ -859,6 +912,8 @@ void TrackFitCheckerModule::printTrackWiseVecStatistics(const string& nameOfData
   }
 
 }
+
+
 
 void TrackFitCheckerModule::registerLayerWiseData(const string& nameOfDataSample, const int nVarsToTest)
 {
@@ -1079,9 +1134,9 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
       B2ERROR("An unknown type of recoHit was detected in TrackFitCheckerModule::event(). This hit will not be included in the statistical tests");
     }
 
-//    if (m_testDaf == true or(aCdcRecoHitPtr not_eq NULL and m_testCdc == false) or(aPxdRecoHitPtr not_eq NULL and m_testSi == false)or(aSvdRecoHit2DPtr not_eq NULL and m_testSi == false)) {    // skip all other stuff when daf is tested because it is not used // something is wrong with the skipping better leave it out
-//      continue;
-//    }
+    //    if (m_testDaf == true or(aCdcRecoHitPtr not_eq NULL and m_testCdc == false) or(aPxdRecoHitPtr not_eq NULL and m_testSi == false)or(aSvdRecoHit2DPtr not_eq NULL and m_testSi == false)) {    // skip all other stuff when daf is tested because it is not used // something is wrong with the skipping better leave it out
+    //      continue;
+    //    }
     //cerr << "4";
     GFDetPlane detPlaneOfRecoHit = aGFAbsRecoHitPtr->getDetPlane(rep);
 
@@ -1166,13 +1221,13 @@ void TrackFitCheckerModule::truthTests()  //
 
       //vector<double> measTrueTests(2);
       TMatrixT<double> res = m_trackData.ms[iGFHit] - m_trackData.Hs[iGFHit] * trueState;
-//      if (res.GetNrows() == 1 ){ cannot work as long as every hit is filled seperatly
-//        if ( m_trackData.Hs[iGFHit][3][0] > 0.1 ){ // u coordinate
-//          measTrueTests[0] = res[0][0];
-//        } else { // v coordinate
-//          measTrueTests[1] = res[0][0];
-//        }
-//      }
+      //      if (res.GetNrows() == 1 ){ cannot work as long as every hit is filled seperatly
+      //        if ( m_trackData.Hs[iGFHit][3][0] > 0.1 ){ // u coordinate
+      //          measTrueTests[0] = res[0][0];
+      //        } else { // v coordinate
+      //          measTrueTests[1] = res[0][0];
+      //        }
+      //      }
       vector<double> resStdVec(res.GetMatrixArray(), res.GetMatrixArray() + res.GetNrows()); //convert TMatrixD to std::vector
       fillLayerWiseData("res_meas_t", accuVecIndex, resStdVec);
       //res.Print();
@@ -1342,10 +1397,12 @@ void TrackFitCheckerModule::inspectTracks(double chi2tot_fu, double vertexAbsMom
 }
 
 
+
+
 void TrackFitCheckerModule::testDaf(GFTrack* const aTrackPtr)
 {
   //first test the weights
-  int nHits = aTrackPtr->getNumHits();
+  const int nHits = aTrackPtr->getNumHits();
   double dafWeight = -2.0;
   double dafChi2 = -2.0;
 
@@ -1356,8 +1413,9 @@ void TrackFitCheckerModule::testDaf(GFTrack* const aTrackPtr)
     //aTrackPtr->getBK(0)->getNumber("dafChi2s", iGFHit,  dafChi2);
     dafWeight = aTrackPtr->getBK(0)->getNumber(GFBKKey_dafWeight, iGFHit);// double check if this still works with background => more then one hit... probarbly it does work...
     GFAbsRecoHit* aGFAbsRecoHitPtr = aTrackPtr->getHit(iGFHit);
-    PXDRecoHit const*  aPxdRecoHitPtr = dynamic_cast<PXDRecoHit const* >(aGFAbsRecoHitPtr);
-    SVDRecoHit2D const*  aSvdRecoHit2DPtr =  dynamic_cast<SVDRecoHit2D  const* >(aGFAbsRecoHitPtr);
+    const PXDRecoHit*   aPxdRecoHitPtr = dynamic_cast<const PXDRecoHit* >(aGFAbsRecoHitPtr);
+    const SVDRecoHit2D*   aSvdRecoHit2DPtr =  dynamic_cast<const SVDRecoHit2D* >(aGFAbsRecoHitPtr);
+
     const VXDSimpleDigiHit* aVXDSimpleDigiHit = NULL;
     const VXDTrueHit* aVXDTrueHit = NULL;
 
@@ -1371,7 +1429,7 @@ void TrackFitCheckerModule::testDaf(GFTrack* const aTrackPtr)
       if (aVXDSimpleDigiHit == NULL) {
         aVXDTrueHit = static_cast<const VXDTrueHit*>(aSvdRecoHit2DPtr->getTrueHit());
       }
-    } else { //Probably a CDC hit -- not supported yet
+    } else { //
 
     }
     //XXX if (aVXDSimpleDigiHit->getTrueHit() not_eq NULL) cout << "iGFHit=" << iGFHit << " u,v="  << aVXDSimpleDigiHit->getTrueHit()->getU() << " , "<< aVXDSimpleDigiHit->getTrueHit()->getV() << endl;
@@ -1432,6 +1490,47 @@ void TrackFitCheckerModule::testDaf(GFTrack* const aTrackPtr)
       }
     }
   }
+}
+
+void TrackFitCheckerModule::testLRAmbiResolution(GFTrack* const aTrackPtr)
+{
+  const int nHits = aTrackPtr->getNumHits();
+  const GFTrackCand& aTrackCand = aTrackPtr->getCand();
+  CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
+  for (int iGFHit = 0; iGFHit not_eq nHits; ++iGFHit) {
+    B2DEBUG(100, "iGFHit " << iGFHit);
+    GFAbsRecoHit* aGFAbsRecoHitPtr = aTrackPtr->getHit(iGFHit);
+    const CDCRecoHit* aCdcRecoHit =  dynamic_cast<const CDCRecoHit* >(aGFAbsRecoHitPtr);
+    if (aCdcRecoHit not_eq NULL) {
+      const CDCHit* aCdcHit = aCdcRecoHit->getCDCHit();
+      int lrSignFromDaf = aCdcRecoHit->getLeftRightResolution();
+      RelationIndex<CDCSimHit, CDCHit> cdcSimHitToHitRel;
+      //by just tacking the first instead of inspecting all simHit I might sometimes get the wrong sign but I hope it is not too bad
+      const CDCSimHit* correspondingCdcSimHit = cdcSimHitToHitRel.getFirstElementTo(aCdcHit)->from;
+      //now determine the correct sign for the cdc hit drift length
+      TVector3 simHitPos = correspondingCdcSimHit->getPosTrack();
+      TVector3 simMom = correspondingCdcSimHit->getMomentum();
+      TVector3 simHitPosOnWire = correspondingCdcSimHit->getPosWire();
+      TVector3 wireStartPos = cdcGeometry.wireBackwardPosition(correspondingCdcSimHit->getWireID());
+      TVector3 wireDir = simHitPosOnWire - wireStartPos;
+      TVector3 wireToSimHit = simHitPos - simHitPosOnWire;
+      double scalarProduct = wireToSimHit * (wireDir.Cross(simMom));
+      int lrAmbiSign = boost::math::sign(scalarProduct);
+      vector<double> lrAmbiSigns(2, 0.0);
+      if (lrAmbiSign == lrSignFromDaf) {
+        lrAmbiSigns[0] = 1.0;
+      }
+
+      CDCTrackCandHit* aCdcTrackCandHit = static_cast<CDCTrackCandHit*>(aTrackCand.getHit(iGFHit));
+      int lrAmbiSignFromCand = aCdcTrackCandHit->getLeftRightResolution();
+      B2DEBUG(100, "l/r ambi signs simulation, GFTrack, GFTrackCand " <<  lrAmbiSign << " " << lrSignFromDaf << " " << lrAmbiSignFromCand);
+      if (lrAmbiSign == lrAmbiSignFromCand) {
+        lrAmbiSigns[1] = 1.0;
+      }
+      fillLayerWiseData("LRAmbiRes", correspondingCdcSimHit->getWireID().getICLayer(), lrAmbiSigns);
+    }
+  }
+
 }
 
 double TrackFitCheckerModule::calcMad(const std::vector<double>& data, const double& median)

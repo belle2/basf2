@@ -136,6 +136,7 @@ namespace Belle2 {
     void printTrackWiseStatistics(const std::string& nameOfDataSample, const bool count = false);
     void printTrackWiseVecStatistics(const std::string& nameOfDataSample, const std::vector<std::string>& trackWiseVarNames, const  bool count = false);
     void printLayerWiseStatistics(const std::string& nameOfDataSample,  const std::vector<std::string>& layerWiseVarNames, const bool count = true);
+    void printLRResData(const std::string& nameOfDataSample, const std::vector<std::string>& layerWiseVarNames);
 
     int m_nSiLayers; // number of Si layers. That is 6 of course.
     int m_nPxdLayers; // number of PXD layer (2) so number of SVD layers will be m_nSiLayers - m_nPxdLayers
@@ -196,9 +197,9 @@ namespace Belle2 {
     bool m_testPrediction;
     bool m_testDaf;
     bool m_truthAvailable;
+    bool m_testLRRes;
     int m_inspectTracks;
     std::string m_dataOutFileName; //common part of all names of output files
-
 
     //stuff for text file output
     std::stringstream m_textOutput;
@@ -255,6 +256,9 @@ namespace Belle2 {
     void testDaf(GFTrack* const aTrackPtr);
     //void testDafWithBG(GFTrack *const aTrackPtr);
     //void fillDafWithBGData(const std::string& nameOfDataSample, const std::vector<std::vector<float> >& allWeights);
+
+    void testLRAmbiResolution(GFTrack* const aTrackPtr);
+
     void normalTests();
 
     void truthTests();

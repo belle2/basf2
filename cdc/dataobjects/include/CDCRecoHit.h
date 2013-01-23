@@ -87,6 +87,13 @@ namespace Belle2 {
                         TVectorD& m, TMatrixDSym& V);
 
 
+    /** get the pointer to the CDCHit object that was used to create this CDCRecoHit object.
+     * Can be NULL if CDCRecoHit was not created with the CDCRecoHit(const CDCHit* cdcHit) constructor
+     */
+    const CDCHit* getCDCHit() const {
+      return m_cdcHit;
+    }
+
   private:
     //--- GENFIT Stuff ----------------------------------------------------------------------------------------------------------
     //NOTE: The endcap positions of the wire is stored in a variable inherited from GFRecoHitIfc<GFWireHitPolicy>.
@@ -142,8 +149,11 @@ namespace Belle2 {
      */
     static bool s_update; //!                               Don't write to ROOT file, as pointer is meaningless, there
 
+    /** Pointer to the CDCHit used to created this CDCRecoHit */
+    const CDCHit* m_cdcHit;
+
     /** ROOT Macro.*/
-    ClassDef(CDCRecoHit, 5);
+    ClassDef(CDCRecoHit, 6);
   };
 }
 #endif

@@ -47,12 +47,12 @@ void CDCRecoHit::setUpdate(bool update)
 
 CDCRecoHit::CDCRecoHit()
   : GFAbsWireHit(c_nParHitRep),
-    m_adcCount(0), m_charge(0), m_tdcCount(0), m_driftLength(0), m_driftLengthResolution(0), m_wireID(WireID())
+    m_adcCount(0), m_charge(0), m_tdcCount(0), m_driftLength(0), m_driftLengthResolution(0), m_wireID(WireID()), m_cdcHit(NULL)
 {
 }
 
 CDCRecoHit::CDCRecoHit(const CDCHit* cdcHit)
-  : GFAbsWireHit(c_nParHitRep)
+  : GFAbsWireHit(c_nParHitRep), m_cdcHit(cdcHit)
 {
   if (s_adcCountTranslator == 0 || s_cdcGeometryTranslator == 0 || s_tdcCountTranslator == 0) {
     B2FATAL("Can't produce CDCRecoHits without setting of the translators.")

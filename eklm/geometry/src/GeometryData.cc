@@ -123,9 +123,9 @@ bool EKLM::GeometryData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
   /* Segments intersect, set return values. */
   HepGeom::Point3D<double> s1_cg = s1_1g + v1 * t1;
   HepGeom::Point3D<double> s2_cg = s2_1g + v2 * t2;
-  *d1 = s1_2g.distance(s1_cg);
-  *d2 = s2_2g.distance(s2_cg);
-  *cross = 0.5 * (s1_cg + s2_cg);
+  *d1 = s1_2g.distance(s1_cg) * Unit::mm;
+  *d2 = s2_2g.distance(s2_cg) * Unit::mm;
+  *cross = 0.5 * (s1_cg + s2_cg) * Unit::mm;
   return true;
 }
 

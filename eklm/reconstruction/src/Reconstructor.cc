@@ -98,8 +98,8 @@ bool EKLM::Reconstructor::doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
   is = m_geoDat->intersection(hit1, hit2, crossPoint, &d1, &d2);
   if (is == false)
     return false;
-  t1 = hit1->getTime() - d1 * Unit::mm / m_firstPhotonlightSpeed;
-  t2 = hit2->getTime() - d2 * Unit::mm / m_firstPhotonlightSpeed;
+  t1 = hit1->getTime() - d1 / m_firstPhotonlightSpeed;
+  t2 = hit2->getTime() - d2 / m_firstPhotonlightSpeed;
   time = (t1 + t2) / 2;
   chisq = (t1 - t2) * (t1 - t2) / m_sigmaT / m_sigmaT;
   return true;

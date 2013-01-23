@@ -61,9 +61,9 @@ namespace Belle2 {
        * Check if strips intersect, and find intersection point if yes.
        * @param[in] hit1   First hit.
        * @param[in] hit2   Second hit.
-       * @param[out] cross Crossing point.
-       * @param[out] l1    Distance from hit to SiPM of strip 1, mm.
-       * @param[out] l2    Distance from hit to SiPM of strip 2, mm.
+       * @param[out] cross Crossing point (coordinate unit is cm).
+       * @param[out] l1    Distance from hit to SiPM of strip 1, cm.
+       * @param[out] l2    Distance from hit to SiPM of strip 2, cm.
        * @return True if strips intersect.
        */
       bool intersection(EKLMDigit* hit1, EKLMDigit* hit2,

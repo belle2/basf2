@@ -32,7 +32,8 @@ namespace Belle2 {
       void setLeftRightResolution(char leftOrRight) {
         m_leftOrRight = leftOrRight;
       }
-
+      /** clone function is needed so this object gets copied correctly inside Genfit*/
+      CDCTrackCandHit* clone() const {return new CDCTrackCandHit(*this);}
     protected:
 
       char m_leftOrRight; /**< to store how the left right ambiguity of CDC hits should be resolved*/

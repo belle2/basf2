@@ -61,10 +61,9 @@ namespace Belle2 {
      */
     virtual void terminate();
 
-  protected:
   private:
 
-    /** Transformation data. */
+    /** Geometry data. */
     struct EKLM::GeometryData m_geoDat;
 
     /** Light speed for first photon. */

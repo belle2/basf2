@@ -23,7 +23,7 @@ EKLMK0L::~EKLMK0L()
 {
 }
 
-void EKLMK0L::setHitPosition(HepGeom::Point3D<double> &pos)
+void EKLMK0L::setHitPosition(HepGeom::Point3D<double> pos)
 {
   m_hitX = pos.x();
   m_hitY = pos.y();

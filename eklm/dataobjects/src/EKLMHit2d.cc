@@ -11,7 +11,7 @@
 /* System headers. */
 #include <stdio.h>
 
-/* Belle2 headr4es. */
+/* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHit2d.h>
 
 using namespace Belle2;

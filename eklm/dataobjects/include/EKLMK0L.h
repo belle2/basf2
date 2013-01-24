@@ -38,7 +38,7 @@ namespace Belle2 {
      * Set hit position.
      * @param[in] pos Hit coordinates.
      */
-    void setHitPosition(HepGeom::Point3D<double> &pos);
+    void setHitPosition(HepGeom::Point3D<double> pos);
 
     /**
      * Get hit position.

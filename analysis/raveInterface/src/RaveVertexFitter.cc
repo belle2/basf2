@@ -27,7 +27,7 @@ using namespace analysis;
 
 
 
-RaveVertexFitter::RaveVertexFitter(): m_chi2(-1.0), m_ndf(-1.0), m_fitStatus(-1), m_useBeamSpot(false), m_raveAlgorithm("")
+RaveVertexFitter::RaveVertexFitter(): m_chi2(-1.0), m_ndf(-1), m_fitStatus(-1), m_useBeamSpot(false), m_raveAlgorithm("")
 {
   if (RaveSetup::s_instance == NULL) {
     B2FATAL("RaveSetup::initialize was not called. It has to be called before RaveSetup or RaveVertexFitter are used");

@@ -19,15 +19,18 @@
 #include <GFTrack.h>
 
 //tracking
-#include <tracking/dataobjects/Track.h>
-
+//#include <tracking/dataobjects/Track.h>
+//basf2
 #include <framework/logging/Logger.h>
 
 //root
 #include <TVector3.h>
 #include <TMatrixDSym.h>
 
-
+//rave
+#include <rave/VacuumPropagator.h>
+#include <rave/MagneticField.h>
+#include <rave/ConstantMagneticField.h>
 
 namespace Belle2 {
 
@@ -64,11 +67,13 @@ namespace Belle2 {
       void Print();
 
 
+
+
     protected:
 
       RaveSetup();
       ~RaveSetup();
-      static RaveSetup* s_instance;// = NULL??;
+      static RaveSetup* s_instance;
 
       bool m_gfRave;
       bool m_gfPropagation;
@@ -79,6 +84,9 @@ namespace Belle2 {
       bool m_useBeamSpot;
       TVector3 m_beamSpot;
       TMatrixDSym m_beamSpotCov;
+
+      rave::MagneticField* m_magneticField;
+      rave::Propagator* m_propagator;
 
 
       /* global stuff:

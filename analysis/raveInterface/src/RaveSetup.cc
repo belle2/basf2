@@ -41,7 +41,7 @@ void RaveSetup::initialize(string options)
     delete s_instance;
     s_instance = new RaveSetup();
   }
-  if (options == "GFRave") {
+  if (options == "GFRave" or options == "default") { // at the moment only the interface to GFRave works so it has to be the default
     s_instance->m_gfRave = true;
     s_instance->m_gfPropagation = true;
     if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
@@ -53,18 +53,36 @@ void RaveSetup::initialize(string options)
       GFMaterialEffects::getInstance()->setMscModel("Highland");
     }
 
-
     s_instance->m_setupComplete = true;
 
-  } else if (options == "default") {
-    // default stuff
+
+  } else if (options == "Rave") {// use Rave directly without GFRave
+    s_instance->m_gfRave = false;
+    s_instance->m_setupComplete = true;
+    s_instance->m_propagator = new rave::VacuumPropagator();
+    s_instance->m_magneticField = new rave::ConstantMagneticField(0, 0, 1.5); //TODO get magentic field from framework
+
+  } else {
+    B2FATAL("You passed the unknown option " << options <<  " to RaveSetup::initialize. Cannot continue");
   }
+
 }
 
-RaveSetup::RaveSetup(): m_gfRave(false), m_gfPropagation(false), m_raveVerbosity(0), m_setupComplete(false), m_useBeamSpot(false)
+RaveSetup::RaveSetup(): m_gfRave(false), m_gfPropagation(false), m_raveVerbosity(0), m_setupComplete(false), m_useBeamSpot(false), m_magneticField(NULL), m_propagator(NULL)
 {
 
   ;
+}
+
+RaveSetup::~RaveSetup()
+{
+  if (m_magneticField not_eq NULL) {
+    delete m_magneticField;
+  }
+
+  if (m_propagator not_eq NULL) {
+    delete m_propagator;
+  }
 }
 
 

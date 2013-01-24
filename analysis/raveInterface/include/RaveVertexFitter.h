@@ -24,6 +24,8 @@
 #include <GFRaveVertex.h>
 //tracking
 //#include <tracking/dataobjects/Track.h>
+//rave
+#include <rave/Track.h>
 
 namespace Belle2 {
 
@@ -59,23 +61,22 @@ namespace Belle2 {
       /** get the position of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
       TVector3 getPos(std::vector<int>::size_type vertexId = 0) {
         if (m_GFRaveVertices.size() == 0) {
-          return m_GFRaveVertices[vertexId]->getPos();
-        } else if (vertexId < m_GFRaveVertices.size()) {
           B2ERROR("There is no fitted Vertex. Maybe you did not call fit() or maybe the fit was not successful");
           throw;
+        } else if (vertexId < m_GFRaveVertices.size()) {
+          return m_GFRaveVertices[vertexId]->getPos();
         } else {
           B2ERROR("The Vertex id " << vertexId << " does not correspond to any fitted vertex");
           throw;
         }
       }
-
       /** get the p value of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
       double getPValue(std::vector<int>::size_type vertexId = 0) {
         if (m_GFRaveVertices.size() == 0) {
-          return ROOT::Math::chisquared_cdf_c(m_GFRaveVertices[vertexId]->getChi2(), m_GFRaveVertices[vertexId]->getNdf());
-        } else if (vertexId < m_GFRaveVertices.size()) {
           B2ERROR("There is no fitted Vertex. Maybe you did not call fit() or maybe the fit was not successful");
           throw;
+        } else if (vertexId < m_GFRaveVertices.size()) {
+          return ROOT::Math::chisquared_cdf_c(m_GFRaveVertices[vertexId]->getChi2(), m_GFRaveVertices[vertexId]->getNdf());
         } else {
           B2ERROR("The Vertex id " << vertexId << " does not correspond to any fitted vertex");
           throw;
@@ -85,10 +86,10 @@ namespace Belle2 {
       /** get the number of degrees of freedom (NDF) of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
       double getNdf(std::vector<int>::size_type vertexId = 0) {
         if (m_GFRaveVertices.size() == 0) {
-          return m_GFRaveVertices[vertexId]->getNdf();
-        } else if (vertexId < m_GFRaveVertices.size()) {
           B2ERROR("There is no fitted Vertex. Maybe you did not call fit() or maybe the fit was not successful");
           throw;
+        } else if (vertexId < m_GFRaveVertices.size()) {
+          return m_GFRaveVertices[vertexId]->getNdf();
         } else {
           B2ERROR("The Vertex id " << vertexId << " does not correspond to any fitted vertex");
           throw;
@@ -98,10 +99,10 @@ namespace Belle2 {
       /** get the χ² of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
       double getChi2(std::vector<int>::size_type vertexId = 0) {
         if (m_GFRaveVertices.size() == 0) {
-          return m_GFRaveVertices[vertexId]->getChi2();
-        } else if (vertexId < m_GFRaveVertices.size()) {
           B2ERROR("There is no fitted Vertex. Maybe you did not call fit() or maybe the fit was not successful");
           throw;
+        } else if (vertexId < m_GFRaveVertices.size()) {
+          return m_GFRaveVertices[vertexId]->getChi2();
         } else {
           B2ERROR("The Vertex id " << vertexId << " does not correspond to any fitted vertex");
           throw;
@@ -111,10 +112,10 @@ namespace Belle2 {
       /** get the covarance matrix (3x3) of the of the fitted vertex position. If Rave was also used to find different vertices the user has to provide the index of that vertex */
       TMatrixDSym getCov(std::vector<int>::size_type vertexId = 0) {
         if (m_GFRaveVertices.size() == 0) {
-          return m_GFRaveVertices[vertexId]->getCov();
-        } else if (vertexId < m_GFRaveVertices.size()) {
           B2ERROR("There is no fitted Vertex. Maybe you did not call fit() or maybe the fit was not successful");
           throw;
+        } else if (vertexId < m_GFRaveVertices.size()) {
+          return m_GFRaveVertices[vertexId]->getCov();
         } else {
           B2ERROR("The Vertex id " << vertexId << " does not correspond to any fitted vertex");
           throw;
@@ -134,7 +135,7 @@ namespace Belle2 {
       }
 
       //void setInvarantMass(int pdgCode);
-      /** Delete all information of previously added tracks. */
+      /** Delete all information of previously added tracks. And fitted resutls*/
       void clearTracks() {
         m_gfTrackReps.clear();
         int n = m_ownGfTrackReps.size();
@@ -146,16 +147,17 @@ namespace Belle2 {
         for (int i = 0; i not_eq n; ++i) {
           delete m_GFRaveVertices[i];
         }
+        //and clear the fitting results
         m_GFRaveVertices.clear();
-        //raveTrack.clear();//and clear the other one
+        m_raveTracks.clear();
       }
       /** Return the GFRaveVertex object. Holds all info on the fitted vertex. This is temporary and will be replaced with the Bell2 vertex object when ready */
       GFRaveVertex* getGFRaveVertex(std::vector<int>::size_type vertexId = 0) {
         if (m_GFRaveVertices.size() == 0) {
-          return m_GFRaveVertices[vertexId];
-        } else if (vertexId < m_GFRaveVertices.size()) {
           B2ERROR("There is no fitted Vertex. Maybe you did not call fit() or maybe the fit was not successful");
           throw;
+        } else if (vertexId < m_GFRaveVertices.size()) {
+          return m_GFRaveVertices[vertexId];
         } else {
           B2ERROR("The Vertex id " << vertexId << " does not correspond to any fitted vertex");
           throw;
@@ -164,6 +166,8 @@ namespace Belle2 {
 
 
     protected:
+
+      rave::Track GFTrackRepToRaveTrack(GFAbsTrackRep* const aGFTrackRep) const;
 
       double m_chi2;
       int m_ndf;
@@ -178,7 +182,7 @@ namespace Belle2 {
 
       std::vector < GFRaveVertex* > m_GFRaveVertices;
 
-      //std::vector<ravetracks> raveTracks;
+      std::vector<rave::Track> m_raveTracks;
 
 
       /* options per fit:

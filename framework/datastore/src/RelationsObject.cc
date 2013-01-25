@@ -10,4 +10,6 @@
 
 #include <framework/datastore/RelationsObject.h>
 
+using namespace Belle2;
+
 templateClassImp(RelationsInterface)

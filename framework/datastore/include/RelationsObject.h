@@ -133,9 +133,22 @@ namespace Belle2 {
       return static_cast<const T*>(DataStore::Instance().getRelationWith(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name).object);
     }
 
+    /** Get name of array this object is stored in, or "" if not found. */
+    std::string getArrayName() const {
+      DataStore::Instance().findStoreEntry(this, m_cacheDataStoreEntry, m_cacheArrayIndex);
+      return m_cacheDataStoreEntry ? m_cacheDataStoreEntry->name : "";
+    }
+
+
+    /** Returns this object's array index (in StoreArray), or -1 if not found. */
+    int getArrayIndex() const {
+      DataStore::Instance().findStoreEntry(this, m_cacheDataStoreEntry, m_cacheArrayIndex);
+      return m_cacheArrayIndex;
+    }
+
     /**
      * @{
-     * define versions without template arguments, to be useful within python modules.
+     * Define versions without template arguments, to be useful within python modules. From within C++, you should always use the type-safe functions above!
      */
     RelationVector<TObject> getRelationsTo(const std::string& name = "") const {
       return getRelationsTo<TObject>(name);

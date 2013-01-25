@@ -1,6 +1,7 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/ProfileInfo.h>
+#include <framework/datastore/RelationsObject.h>
 #include <gtest/gtest.h>
 #include <boost/foreach.hpp>
 #include <iostream>
@@ -17,14 +18,17 @@ namespace Belle2 {
       DataStore::Instance().setInitializeActive(true);
       StoreArray<EventMetaData>::registerPersistent();
       StoreArray<ProfileInfo>::registerPersistent();
+      StoreArray<RelationsObject>::registerPersistent();
       DataStore::Instance().setInitializeActive(false);
 
       evtData = new StoreArray<EventMetaData>;
       profileData = new StoreArray<ProfileInfo>;
+      relObjData = new StoreArray<RelationsObject>;
 
       for (int i = 0; i < 10; ++i) {
         evtData->appendNew();
         profileData->appendNew();
+        relObjData->appendNew();
       }
     }
 
@@ -37,12 +41,14 @@ namespace Belle2 {
       }
       delete evtData;
       delete profileData;
+      delete relObjData;
     }
 
     void findRelationsCheckContents();
 
     StoreArray<EventMetaData>* evtData; /**< event data array */
     StoreArray<ProfileInfo>* profileData; /**< run data array */
+    StoreArray<RelationsObject>* relObjData; /**< some objects to test RelationsInterface. */
   };
 
   /** Tests the creation of a Relation. */
@@ -436,6 +442,33 @@ namespace Belle2 {
 
     //no relations to this type
     EXPECT_EQ(DataStore::getRelationsFromObj<EventMetaData>(fromObj, "ALL").size(), 0);
+  }
+
+  /** Test adding/finding using RelationsObject/RelationsInterface. */
+  TEST_F(RelationTest, RelationsObject)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent(DataStore::relationName(relObjData->getName(), profileData->getName()));
+    DataStore::Instance().setInitializeActive(false);
+
+    (*relObjData)[0]->addRelationTo((*profileData)[0], -42.0);
+    RelationVector<ProfileInfo> rels = (*relObjData)[0]->getRelationsTo<ProfileInfo>();
+    EXPECT_TRUE(rels.size() == 1);
+    EXPECT_TRUE(rels.object(0) == (*profileData)[0]);
+    EXPECT_DOUBLE_EQ(rels.weight(0), -42.0);
+  }
+
+  /** Test getting array name/index from a RelationsObject. */
+  TEST_F(RelationTest, RelationsObjectArrayIndex)
+  {
+    EXPECT_TRUE((*relObjData)[0]->getArrayName() == relObjData->getName());
+    EXPECT_TRUE((*relObjData)[9]->getArrayName() == relObjData->getName());
+    EXPECT_TRUE((*relObjData)[0]->getArrayIndex() == 0);
+    EXPECT_TRUE((*relObjData)[9]->getArrayIndex() == 9);
+
+    RelationsObject bla;
+    EXPECT_TRUE(bla.getArrayName() == "");
+    EXPECT_TRUE(bla.getArrayIndex() == -1);
   }
 
 }  // namespace

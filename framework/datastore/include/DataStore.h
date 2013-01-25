@@ -413,6 +413,15 @@ namespace Belle2 {
       return static_cast<const T*>(DataStore::Instance().getRelationWith(object, storeEntry, index, T::Class(), name).object);
     }
 
+    /** Find an object in an array in the data store.
+     *
+     *  @param object     Pointer to the object.
+     *  @param entry      The DataStore entry that contains the object.
+     *  @param index      The index of the object in the array.
+     *  @return           True if the object was found in the data store
+     */
+    bool findStoreEntry(const TObject* object, StoreEntry*& entry, int& index);
+
     //------------------------------ Start and end procedures --------------------------------------------------
     /** Setter for m_initializeActive.
      *
@@ -468,15 +477,6 @@ namespace Belle2 {
      */
     bool checkType(const std::string& name, const StoreEntry* entry,
                    const TClass* objClass, bool array) const;
-
-    /** Find an object in an array in the data store.
-     *
-     *  @param object     Pointer to the object.
-     *  @param entry      The DataStore entry that contains the object.
-     *  @param index      The index of the object in the array.
-     *  @return           True if the object was found in the data store
-     */
-    bool findStoreEntry(const TObject* object, StoreEntry*& entry, int& index);
 
     /** Fill the vector with the names of store arrays.
      *

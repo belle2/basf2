@@ -75,7 +75,7 @@ void pEventProcessor::process(PathPtr spath)
     PathPtr& inpath = m_inpathlist[0];
     ModulePtrList inpath_modules = m_pathManager.buildModulePathList(inpath);
     ModulePtrList procinitmodules = init_modules_in_process(inpath_modules);
-    if (procinitmodules.size() > 0)
+    if (!procinitmodules.empty())
       processInitialize(procinitmodules);
     processCore(inpath, inpath_modules);
     processTerminate(inpath_modules);
@@ -93,7 +93,7 @@ void pEventProcessor::process(PathPtr spath)
         m_master = 0; //allow resetting master module
         ModulePtrList outpath_modules = m_pathManager.buildModulePathList(outpath);
         ModulePtrList procinitmodules = init_modules_in_process(outpath_modules);
-        if (procinitmodules.size() > 0)
+        if (!procinitmodules.empty())
           processInitialize(procinitmodules);
         processCore(outpath, outpath_modules);
         processTerminate(outpath_modules);
@@ -112,7 +112,7 @@ void pEventProcessor::process(PathPtr spath)
     PathPtr& mainpath = m_bodypathlist[m_bodypathlist.size() - 1];
     ModulePtrList main_modules = m_pathManager.buildModulePathList(mainpath);
     ModulePtrList procinitmodules = init_modules_in_process(main_modules);
-    if (procinitmodules.size() > 0)
+    if (!procinitmodules.empty())
       processInitialize(procinitmodules);
     processCore(mainpath, main_modules);
     processTerminate(main_modules);
@@ -183,7 +183,7 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
   }
 
   // Loop over modules on the path
-  for (iter = modlist.begin(); iter != modlist.end(); iter++) {
+  for (iter = modlist.begin(); iter != modlist.end(); ++iter) {
     ModulePtr modptr = *iter;
     Module* module = iter->get();
     // Check Module property
@@ -289,23 +289,23 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
   B2INFO("Analyze Path : outlist size = " << mainlist.size());
 
   PathPtr inpath(new Path);
-  if (inlist.size() > 0) {
+  if (!inlist.empty()) {
     inpath->putModules(inlist);
     m_inpathlist.push_back(inpath);
   }
   PathPtr bodypath(new Path);
-  if (mainlist.size() > 0) {
+  if (!mainlist.empty()) {
     bodypath->putModules(mainlist);
     m_bodypathlist.push_back(bodypath);
   }
   PathPtr outpath(new Path);
-  if (outlist.size() > 0) {
+  if (!outlist.empty()) {
     outpath->putModules(outlist);
     m_outpathlist.push_back(outpath);
   }
 
   // Set new condition path to condition module
-  if (inmod != NULL && mainlist.size() > 0) {
+  if (inmod != NULL && !mainlist.empty()) {
     inmod->setConditionPath(bodypath);
   }
 
@@ -366,7 +366,7 @@ ModulePtrList pEventProcessor::init_modules_in_main(const ModulePtrList& modlist
   ModulePtrList tmpModuleList;
   ModulePtrList::const_iterator listIter;
 
-  for (listIter = modlist.begin(); listIter != modlist.end(); listIter++) {
+  for (listIter = modlist.begin(); listIter != modlist.end(); ++listIter) {
     Module* module = listIter->get();
     ModulePtr ptr = *listIter;
     if (module->hasProperties(Module::c_InitializeInMain))
@@ -381,7 +381,7 @@ ModulePtrList pEventProcessor::init_modules_in_process(const ModulePtrList& modl
   ModulePtrList tmpModuleList;
   ModulePtrList::const_iterator listIter;
 
-  for (listIter = modlist.begin(); listIter != modlist.end(); listIter++) {
+  for (listIter = modlist.begin(); listIter != modlist.end(); ++listIter) {
     Module* module = listIter->get();
     if (!module->hasProperties(Module::c_InitializeInMain))
       tmpModuleList.push_back(*listIter);

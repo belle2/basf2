@@ -13,7 +13,6 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
-#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 
@@ -66,7 +65,7 @@ namespace Belle2 {
       cdchit.create(cdchit);
       cdchit->setCharge(5.0);
       \endcode
-   *  Note that the datastore takes the ownership of the object!
+   *  Note that the datastore takes ownership of the object!
    *
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreObjPtr">The basf2 developers</a>
    *  @sa If you want to store more than a single object of one type, use the StoreArray class.
@@ -163,7 +162,7 @@ namespace Belle2 {
       return DataStore::Instance().createObject(0, replace, m_name, m_durability, T::Class(), false);
     };
 
-    /** Add an existing object to the data store.
+    /** Add an existing object to the data store (takes ownership).
      *
      *  @param object    The object that should be put in the DataStore.
      *  @param replace   Should an existing object be replaced?
@@ -199,6 +198,5 @@ namespace Belle2 {
     T** m_storeObjPtr;
   };
 } // end namespace Belle2
-
 
 #endif

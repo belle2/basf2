@@ -112,10 +112,10 @@ namespace Belle2 {
     }
 
     /** Restrict copies */
-    RelationIndexContainer(const RelationIndexContainer&) {}
+    RelationIndexContainer(const RelationIndexContainer&);
 
     /** Restrict copies */
-    RelationIndexContainer& operator=(const RelationIndexContainer&) { return *this; }
+    RelationIndexContainer& operator=(const RelationIndexContainer&);
 
     /** Rebuild the index.
      *

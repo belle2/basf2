@@ -55,7 +55,7 @@ namespace Belle2 {
     RelationElement(index_type from, const std::vector<index_type>& to, const std::vector<weight_type>& weights):
       TObject(), m_from(from), m_to(to.begin(), to.end()), m_weights(weights.begin(), weights.end()) {
       if (to.size() != weights.size()) {
-        B2FATAL("Size of weights is different to size of indices");
+        B2FATAL("Index and weight vector sizes differ!");
       }
     }
 
@@ -67,7 +67,7 @@ namespace Belle2 {
      *  @param end     iterator pointing to the end of a sequence of
      *                 std::pair<index_type,weight_type> or compatible
      */
-    template <class InputIterator> RelationElement(index_type from, InputIterator begin, InputIterator end):
+    template <class InputIterator> RelationElement(index_type from, const InputIterator& begin, const InputIterator& end):
       TObject(), m_from(from) {
       setToIndices(begin, end);
     }
@@ -109,7 +109,7 @@ namespace Belle2 {
      *  @param end     iterator pointing to the end of a sequence of
      *                 std::pair<index_type,weight_type> or compatible
      */
-    template<class InputIterator> void setToIndices(InputIterator begin, InputIterator end) {
+    template<class InputIterator> void setToIndices(InputIterator begin, const InputIterator& end) {
       for (; begin != end; ++begin) {
         m_to.push_back(begin->first);
         m_weights.push_back(begin->second);

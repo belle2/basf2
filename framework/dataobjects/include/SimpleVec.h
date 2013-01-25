@@ -36,9 +36,7 @@ namespace Belle2 {
      *
      *  @par AVector, that will be saved internally.
      */
-    SimpleVec(const std::vector<T>& AVector) {
-      m_vector = AVector;
-    }
+    SimpleVec(const std::vector<T>& AVector) : m_vector(AVector) { }
 
     /**  Empty constructor.
      *
@@ -70,10 +68,7 @@ namespace Belle2 {
     }
 
   private:
-    /** Saved vector.
-     *
-     *  This variable actually holds the saved vector.
-     */
+    /** Saved vector.  */
     std::vector<T> m_vector;
 
     /** Needed for ROOT purposes. This Macro makes a ROOT object from SimpleVec. */

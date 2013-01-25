@@ -158,6 +158,9 @@ void EVEVisualization::setVolumeColor(const char* name, Color_t col)
 
 void EVEVisualization::addGeometry()
 {
+  if (!gGeoManager)
+    return;
+
   B2INFO("Setting up geometry for TEve...");
   //set colours by atomic mass number
   gGeoManager->DefaultColors();

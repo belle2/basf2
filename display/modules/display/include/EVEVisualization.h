@@ -301,8 +301,6 @@ namespace Belle2 {
     TVector3 track_pos = trackCand->getPosSeed();
     TVector3 track_mom = trackCand->getMomSeed();
 
-    TEveTrack* track_lines = NULL;
-
     TEveStraightLineSet* lines = new TEveStraightLineSet("RecoHits");
     lines->SetMainColor(trackCandColor);
     lines->SetMarkerColor(trackCandColor);
@@ -364,7 +362,7 @@ namespace Belle2 {
       rectrack.fP.Set(track_mom);
       rectrack.fV.Set(track_pos);
 
-      track_lines = new TEveTrack(&rectrack, m_gftrackpropagator);
+      TEveTrack* track_lines = new TEveTrack(&rectrack, m_gftrackpropagator);
       track_lines->SetName(label); //popup label set at end of function
       track_lines->SetPropagator(m_gftrackpropagator);
       track_lines->SetLineColor(trackCandColor);

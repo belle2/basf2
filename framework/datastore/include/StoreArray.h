@@ -178,6 +178,10 @@ namespace Belle2 {
 
     /** Create an empty array in the data store.
      *
+     *  \note Arrays are automatically set to an empty state at the start
+     *        of each event, so there's usually no need to call this yourself.
+     *        Can be used to empty an array, by calling it with replace=true.
+     *
      *  @param replace   Should an existing object be replaced?
      *  @return          True if the creation succeeded.
      **/

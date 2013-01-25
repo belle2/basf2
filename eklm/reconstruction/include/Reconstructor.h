@@ -72,6 +72,13 @@ namespace Belle2 {
       std::vector <EKLMSectorHit*> m_SectorHitVector;
 
       /**
+       * Check whether hit has too small time.
+       * @param[in] pos  Hit position.
+       * @param[in] time HIt time.
+       */
+      bool fastHit(HepGeom::Point3D<double> &pos, double time);
+
+      /**
        * Check whether strips intersect.
        * @details
        * Determines crossing point in the global rest frame,

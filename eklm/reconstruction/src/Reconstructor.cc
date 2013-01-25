@@ -10,6 +10,7 @@
 
 /* Belle2 headers. */
 #include <eklm/reconstruction/Reconstructor.h>
+#include <framework/gearbox/Const.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 
@@ -22,6 +23,11 @@ EKLM::Reconstructor::Reconstructor(GeometryData* geoDat)
   m_firstPhotonlightSpeed = Digitizer.getDouble("FirstPhotonSpeed");
   m_sigmaT = Digitizer.getDouble("TimeResolution");
   m_geoDat = geoDat;
+}
+
+bool EKLM::Reconstructor::fastHit(HepGeom::Point3D<double> &pos, double time)
+{
+  return time < pos.mag() / Const::speedOfLight - 2.0 * m_sigmaT;
 }
 
 void EKLM::Reconstructor::readStripHits()
@@ -77,6 +83,8 @@ void EKLM::Reconstructor::create2dHits()
         double chisq = 0;
         double time = 0;
         if (!(doesIntersect(hit1, hit2, &crossPoint, chisq, time)))
+          continue;
+        if (fastHit(crossPoint, time))
           continue;
         EKLMHit2d* hit2d =
           new(m_hit2dArray.nextFreeAddress()) EKLMHit2d(hit1, hit2);

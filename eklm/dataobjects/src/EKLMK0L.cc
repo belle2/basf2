@@ -35,3 +35,8 @@ HepGeom::Point3D<double> EKLMK0L::getHitPosition() const
   return HepGeom::Point3D<double>(m_hitX, m_hitY, m_hitZ);
 }
 
+TVector3 EKLMK0L::getPosition() const
+{
+  return TVector3(m_hitX, m_hitY, m_hitZ);
+}
+

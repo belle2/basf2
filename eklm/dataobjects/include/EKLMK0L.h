@@ -14,6 +14,7 @@
 /* External headers. */
 #include <CLHEP/Geometry/Point3D.h>
 #include <TObject.h>
+#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -45,6 +46,12 @@ namespace Belle2 {
      * @return Hit coordinates.
      */
     HepGeom::Point3D<double> getHitPosition() const;
+
+    /**
+     * Get hit position, TVector3 version.
+     * @return Hit coordinates.
+     */
+    TVector3 getPosition() const;
 
   private:
 

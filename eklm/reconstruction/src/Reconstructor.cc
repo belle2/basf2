@@ -80,7 +80,8 @@ void EKLM::Reconstructor::create2dHits()
           continue;
         EKLMHit2d* hit2d =
           new(m_hit2dArray.nextFreeAddress()) EKLMHit2d(hit1, hit2);
-        hit2d->setCrossPoint(&crossPoint);
+        hit2d->setEDep(hit1->getEDep() + hit2->getEDep());
+        hit2d->setCrossPoint(crossPoint);
         hit2d->setChiSq(chisq);
         hit2d->setTime(time);
       }

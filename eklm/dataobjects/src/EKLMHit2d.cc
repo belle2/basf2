@@ -46,11 +46,11 @@ const Belle2::EKLMDigit* EKLMHit2d::getYStripHit() const
   return m_YStrip;
 }
 
-void EKLMHit2d::setCrossPoint(HepGeom::Point3D<double> *point)
+void EKLMHit2d::setCrossPoint(HepGeom::Point3D<double> point)
 {
-  m_crossPointX = point->x();
-  m_crossPointY = point->y();
-  m_crossPointZ = point->z();
+  m_crossPointX = point.x();
+  m_crossPointY = point.y();
+  m_crossPointZ = point.z();
 }
 
 HepGeom::Point3D<double> EKLMHit2d::getCrossPoint() const

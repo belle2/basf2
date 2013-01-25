@@ -65,7 +65,7 @@ namespace Belle2 {
      * Set coordinates of the crossing point.
      * @param[in] point Coordinates.
      */
-    void setCrossPoint(HepGeom::Point3D<double> *point);
+    void setCrossPoint(HepGeom::Point3D<double> point);
 
     /**
      * Get crossing point.

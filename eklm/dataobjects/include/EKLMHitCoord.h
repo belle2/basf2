@@ -68,22 +68,22 @@ namespace Belle2 {
   protected:
 
     /** Global position X coordinate. */
-    double m_globalX;
+    float m_globalX;
 
     /** Global position Y coordinate. */
-    double m_globalY;
+    float m_globalY;
 
     /** Global position Z coordinate. */
-    double m_globalZ;
+    float m_globalZ;
 
     /** Local position X coordinate. */
-    double m_localX;
+    float m_localX;
 
     /** Local position Y coordinate. */
-    double m_localY;
+    float m_localY;
 
     /** Local position Z coordinate. */
-    double m_localZ;
+    float m_localZ;
 
   private:
 

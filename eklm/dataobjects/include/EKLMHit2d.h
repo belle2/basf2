@@ -77,13 +77,13 @@ namespace Belle2 {
      * Set Chi^2 of the crossing point.
      * @param[in] chi Chi^2.
      */
-    void setChiSq(double chi);
+    void setChiSq(float chi);
 
     /**
      * Get Chi^2 of the crossing point.
      * @return Chi^2.
      */
-    double getChiSq() const;
+    float getChiSq() const;
 
   private:
 
@@ -94,16 +94,16 @@ namespace Belle2 {
     EKLMDigit const* m_YStrip;  //-> {ROOT streamer directive}
 
     /** Crossing point global X coordinate */
-    double m_crossPointX;
+    float m_crossPointX;
 
     /** Crossing point global Y coordinate */
-    double m_crossPointY;
+    float m_crossPointY;
 
     /** Crossing point global Z coordinate */
-    double m_crossPointZ;
+    float m_crossPointZ;
 
     /** Chi^2 of the hit. */
-    double m_ChiSq;
+    float m_ChiSq;
 
     /** Needed to make Belle2::EKLMHit2d storable. */
     ClassDef(Belle2::EKLMHit2d, 1);

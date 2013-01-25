@@ -81,31 +81,31 @@ namespace Belle2 {
      * Get energy deposit.
      * @return Energy deposit.
      */
-    double getEDep() const;
+    float getEDep() const;
 
     /**
      * Set EDep.
      * @param[in] eDep Energy deposit.
      */
-    void setEDep(double eDep);
+    void setEDep(float eDep);
 
     /**
      * Increase energy deposit.
      * @param[in] eDep Energy deposit.
      */
-    void increaseEDep(double deltaEDep);
+    void increaseEDep(float deltaEDep);
 
     /**
      * Get hit time.
      * @return Hit time.
      */
-    double getTime() const;
+    float getTime() const;
 
     /**
      * Set hit time.
      * @param[in] time hit time.
      */
-    void setTime(double time);
+    void setTime(float time);
 
     /**
      * Get the lund code of the (leading) particle.
@@ -125,10 +125,10 @@ namespace Belle2 {
     int m_PDG;
 
     /** Time of the hit. */
-    double m_Time;
+    float m_Time;
 
     /** Energy deposition. */
-    double m_EDep;
+    float m_EDep;
 
     /** Number of endcap. */
     int m_Endcap;

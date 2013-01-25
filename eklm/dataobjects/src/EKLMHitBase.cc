@@ -71,27 +71,27 @@ void EKLMHitBase::setPDG(int PDG)
   m_PDG = PDG;
 }
 
-double EKLMHitBase::getTime() const
+float EKLMHitBase::getTime() const
 {
   return m_Time;
 }
 
-void EKLMHitBase::setTime(double Time)
+void EKLMHitBase::setTime(float Time)
 {
   m_Time = Time;
 }
 
-double EKLMHitBase::getEDep() const
+float EKLMHitBase::getEDep() const
 {
   return m_EDep;
 }
 
-void EKLMHitBase::setEDep(double EDep)
+void EKLMHitBase::setEDep(float EDep)
 {
   m_EDep = EDep;
 }
 
-void EKLMHitBase::increaseEDep(double deltaEDep)
+void EKLMHitBase::increaseEDep(float deltaEDep)
 {
   m_EDep += deltaEDep;
 }

@@ -78,13 +78,13 @@ namespace Belle2 {
      * Get particle energy.
      * @return Energy.
      */
-    double getEnergy() const;
+    float getEnergy() const;
 
     /**
      * Set particle energy.
      * @param[in] e Energy.
      */
-    void setEnergy(double e);
+    void setEnergy(float e);
 
     /**
      * Print hit.
@@ -117,7 +117,7 @@ namespace Belle2 {
   private:
 
     /** Particle energy. */
-    double m_energy;
+    float m_energy;
 
     /** Particle momentum. */
     TVector3 m_momentum;

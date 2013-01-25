@@ -53,13 +53,13 @@ namespace Belle2 {
      * Get number of photoelectrons (fit result).
      * @return Number of photoelectrons.
      */
-    double getNPE() const;
+    float getNPE() const;
 
     /**
      * Set the number of photoelectrons (fit result).
      * @param[in] npe Number of photoelectrons.
      */
-    void setNPE(double npe);
+    void setNPE(float npe);
 
     /**
      * Get generated number of photoelectrons.
@@ -139,13 +139,13 @@ namespace Belle2 {
      * Set MC time shift.
      * @param[in] ts Time shift.
      */
-    void setMCTS(double ts);
+    void setMCTS(float ts);
 
     /**
      * Get MC time shift.
      * @return Time shift.
      */
-    double getMCTS() const;
+    float getMCTS() const;
 
   private:
 
@@ -159,7 +159,7 @@ namespace Belle2 {
     bool m_good;
 
     /** Number of photo electrons. */
-    double m_NPE;
+    float m_NPE;
 
     /** Generated number of photoelectrons (MC only). */
     int m_generatedNPE;
@@ -167,12 +167,8 @@ namespace Belle2 {
     /** Fit status. */
     int m_fitStatus;
 
-    /** MC time. */
-    /** FIXME: This variable is unused. Delete it? */
-    double m_MCtime;
-
     /** MC time shift. */
-    double m_timeshift;
+    float m_timeshift;
 
     /** Volume identifier. */
     int m_volid;

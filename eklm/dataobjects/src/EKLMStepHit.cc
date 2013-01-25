@@ -18,7 +18,7 @@ ClassImp(EKLMStepHit);
 
 EKLMStepHit::EKLMStepHit(
   const TVector3 momentum,
-  const double E ,
+  const float E ,
   const int  trID,
   const int  ptrID
 )
@@ -31,12 +31,12 @@ EKLMStepHit::EKLMStepHit(
   m_parentTrackID = ptrID;
 }
 
-double EKLMStepHit::getEnergy() const
+float EKLMStepHit::getEnergy() const
 {
   return m_energy;
 }
 
-void EKLMStepHit::setEnergy(double E)
+void EKLMStepHit::setEnergy(float E)
 {
   m_energy = E;
 }

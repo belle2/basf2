@@ -61,12 +61,12 @@ void EKLMSimHit::setMomentum(const TVector3* p)
   m_momentum = *p;
 }
 
-double EKLMSimHit::getEnergy() const
+float EKLMSimHit::getEnergy() const
 {
   return m_energy;
 }
 
-void EKLMSimHit::setEnergy(double e)
+void EKLMSimHit::setEnergy(float e)
 {
   m_energy = e;
 }

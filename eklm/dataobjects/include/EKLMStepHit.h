@@ -43,7 +43,7 @@ namespace Belle2 {
      */
     EKLMStepHit(
       const TVector3 momentum,
-      const double E ,
+      const float E ,
       const int  trID,
       const int  ptrID
     );
@@ -52,13 +52,13 @@ namespace Belle2 {
      * Get energy of the particle.
      * @return Energy.
      */
-    double getEnergy() const;
+    float getEnergy() const;
 
     /**
      * Set energy of the particle.
      * @param[in] E Energy.
      */
-    void setEnergy(double E);
+    void setEnergy(float E);
 
     /**
      * Get momentum of the particle hit.
@@ -148,7 +148,7 @@ namespace Belle2 {
   private:
 
     /** Energy of particle. */
-    double m_energy;
+    float m_energy;
 
     /** Momentum of the hit. */
     TVector3 m_momentum;

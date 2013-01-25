@@ -22,17 +22,16 @@ EKLMDigit::EKLMDigit(const EKLMSimHit* hit)
     m_Plane(hit->getPlane()),
     m_Strip(hit->getStrip()),
     m_NPE(-1),
-    m_MCtime(hit->getTime()),
     m_volid(hit->getVolumeID())
 {
 }
 
-double EKLMDigit::getNPE() const
+float EKLMDigit::getNPE() const
 {
   return m_NPE;
 }
 
-void EKLMDigit::setNPE(double npe)
+void EKLMDigit::setNPE(float npe)
 {
   m_NPE = npe;
 }
@@ -97,12 +96,12 @@ void EKLMDigit::setVolumeID(int id)
   m_volid = id;
 }
 
-void EKLMDigit::setMCTS(double ts)
+void EKLMDigit::setMCTS(float ts)
 {
   m_timeshift = ts;
 }
 
-double EKLMDigit::getMCTS() const
+float EKLMDigit::getMCTS() const
 {
   return m_timeshift;
 }

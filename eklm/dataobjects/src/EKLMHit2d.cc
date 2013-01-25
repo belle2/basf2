@@ -58,7 +58,7 @@ HepGeom::Point3D<double> EKLMHit2d::getCrossPoint() const
   return HepGeom::Point3D<double>(m_crossPointX, m_crossPointY, m_crossPointZ);
 }
 
-double EKLMHit2d::getChiSq() const
+float EKLMHit2d::getChiSq() const
 {
   return m_ChiSq;
 }
@@ -77,7 +77,7 @@ void EKLMHit2d::Print()
   printf("Chi squared: %f\n", m_ChiSq);
 }
 
-void EKLMHit2d::setChiSq(double chisq)
+void EKLMHit2d::setChiSq(float chisq)
 {
   m_ChiSq = chisq;
 }

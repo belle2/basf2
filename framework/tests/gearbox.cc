@@ -30,12 +30,14 @@ namespace Belle2 {
     gb.open("geometry/Belle2.xml");
     queue<GearDir> nodes;
     nodes.push(GearDir());
-    while (!nodes.empty()) {
+    int iterations = 0;
+    while (!nodes.empty() and iterations < 10000) {
       GearDir node = nodes.front();
       nodes.pop();
       BOOST_FOREACH(const GearDir & child, node.getNodes("*")) {
         nodes.push(child);
       }
+      iterations++;
     }
     gb.close();
   }

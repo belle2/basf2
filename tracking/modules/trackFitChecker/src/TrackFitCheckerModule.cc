@@ -162,7 +162,8 @@ void TrackFitCheckerModule::initialize()
   }
 
   if (m_testCdc == true) {
-    m_nCdcLayers = 56; //should come from the xml file
+    CDC::CDCGeometryPar& cdcg = CDC::CDCGeometryPar::Instance();
+    m_nCdcLayers =  cdcg.nWireLayers();
   } else {
     m_nCdcLayers = 0;
   }
@@ -176,7 +177,8 @@ void TrackFitCheckerModule::initialize()
   }
   if (m_testLRRes == true) {
     m_testCdc = false; // do not make any other tests ont he CDC data. Only test the left right resolution
-    m_nCdcLayers = 56; //should come from the xml file
+    CDC::CDCGeometryPar& cdcg = CDC::CDCGeometryPar::Instance();
+    m_nCdcLayers =  cdcg.nWireLayers();
   }
   m_nSiLayers = m_nPxdLayers + m_nSvdLayers;
   m_nLayers = m_nPxdLayers + m_nSvdLayers + m_nCdcLayers;

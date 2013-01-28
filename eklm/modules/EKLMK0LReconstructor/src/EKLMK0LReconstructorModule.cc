@@ -147,46 +147,64 @@ static void merge2dClusters(std::vector<struct HitData> &hits,
 }
 
 /**
- * Associated hit finder.
- * @param[in] hit  This hit.
- * @param[in,out] hits All hits (including this).
- * @param[out] hitPos Estimated hit position.
+ * Find cluster and fill EKLMK0L.
+ * @param[in]     hit     This hit.
+ * @param[in,out] hits    All hits (including this).
  */
-static std::vector<EKLMHit2d*>
-findAssociatedHits(std::vector<struct HitData>::iterator hit,
-                   std::vector<struct HitData> &hits,
-                   HepGeom::Point3D<double> &hitPos)
+static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
+                               std::vector<struct HitData> &hits)
 {
-  std::vector<EKLMHit2d*> res;
+  float e, de;
+  std::vector<EKLMHit2d*> cluster;
+  std::vector<EKLMHit2d*>::iterator itClust;
   std::vector<struct HitData>::iterator it;
-  /**
-   * Initially fill the result with the hit in question.
-   */
-  res.push_back(hit->hit);
+  HepGeom::Point3D<double> hitPos;
+  float mt, t;
+  EKLMK0L* k0l;
+  StoreArray<EKLMK0L> k0lArray;
+  /* Initially fill the cluster with the hit in question. */
+  cluster.push_back(hit->hit);
   hitPos = hit->hit->getCrossPoint();
-  /**
-   * Collect other hits.
-   */
+  /* Collect other hits. */
   for (it = hits.begin(); it != hits.end(); it++) {
     if (it == hit)
       continue;
     if (it->stat != c_Unknown)
       continue;
-    if (it->hit->getCrossPoint().angle(hitPos) < 0.05) {
+    if (it->hit->getCrossPoint().angle(hitPos) < 0.1) {
       it->stat = c_Cluster;
-      res.push_back(it->hit);
+      cluster.push_back(it->hit);
     }
   }
-  /**
-   * If no other hits found, clear the result.
-   * Set the status of hit.
-   */
-  if (res.size() == 1) {
-    res.clear();
+  /* Get minimal time. */
+  mt = (*cluster.begin())->getTime();
+  for (itClust = cluster.begin() + 1; itClust != cluster.end(); itClust++) {
+    t = (*itClust)->getTime();
+    if (t < mt) {
+      mt = t;
+    }
+  }
+  /* Get hit position as weighed average of cluster hit positions. */
+  e = 0;
+  hitPos = HepGeom::Point3D<double>(0., 0., 0.);
+  for (itClust = cluster.begin(); itClust != cluster.end(); itClust++) {
+    if ((*itClust)->getLayer() != hit->hit->getLayer())
+      continue;
+    de = (*itClust)->getEDep();
+    e = e + de;
+    hitPos = hitPos + de * (*itClust)->getCrossPoint();
+  }
+  hitPos = hitPos / e;
+  /* Set the status of hit. */
+  if (cluster.size() == 1) {
     hit->stat = c_Isolated;
-  } else
-    hit->stat = c_Cluster;
-  return res;
+    return;
+  }
+  hit->stat = c_Cluster;
+  /* Fill EKLMK0L. */
+  k0l = new(k0lArray.nextFreeAddress()) EKLMK0L();
+  k0l->setHitPosition(hitPos);
+  k0l->setTime(mt);
 }
 
 EKLMK0LReconstructorModule::EKLMK0LReconstructorModule() : Module()
@@ -213,14 +231,9 @@ void EKLMK0LReconstructorModule::event()
   int i;
   int n;
   StoreArray<EKLMHit2d> hits2d;
-  StoreArray<EKLMK0L> k0lArray;
   struct HitData dat;
   std::vector<EKLMHit2d*> new2dHits;
-  std::vector<EKLMHit2d*> cluster;
   std::vector<EKLMHit2d*>::iterator itClust;
-  HepGeom::Point3D<double> hitPos;
-  float mt, t;
-  EKLMK0L* k0l;
   /* Hits in endcap, index is (number of endcap - 1). */
   std::vector<struct HitData> endcap[2];
   std::vector<struct HitData>::iterator it;
@@ -246,21 +259,7 @@ void EKLMK0LReconstructorModule::event()
     for (it = endcap[i].begin(); it != endcap[i].end(); it++) {
       if ((*it).stat != c_Unknown)
         continue;
-      cluster = findAssociatedHits(it, endcap[i], hitPos);
-      /* A cluster is found, write new K0L. */
-      if (!cluster.empty()) {
-        k0l = new(k0lArray.nextFreeAddress()) EKLMK0L();
-        k0l->setHitPosition(hitPos);
-        mt = (*cluster.begin())->getTime();
-        for (itClust = cluster.begin() + 1; itClust != cluster.end();
-             itClust++) {
-          t = (*itClust)->getTime();
-          if (t < mt)
-            mt = t;
-        }
-        k0l->setTime(mt);
-        cluster.clear();
-      }
+      findAssociatedHits(it, endcap[i]);
     }
     /* Free memory. */
     for (itClust = new2dHits.begin(); itClust != new2dHits.end(); itClust++)

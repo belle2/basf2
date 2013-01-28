@@ -30,6 +30,7 @@ enum HitStatus {
   c_Unknown,  /**< Hit is not processed. */
   c_Isolated, /**< Cannot find any associated hits. */
   c_Cluster,  /**< Part of a cluster. */
+  c_Merged,   /**< Merged with another hit. */
 };
 
 /**
@@ -51,6 +52,101 @@ static bool layerLessThan(struct HitData hit1, struct HitData hit2)
 }
 
 /**
+ * Merge 2d clusters (hits are in adjacent strips).
+ * @param[in,out] hits   Hits.
+ * @param[in.out] hits2d New 2d hits.
+ */
+static void merge2dClusters(std::vector<struct HitData> &hits,
+                            std::vector<EKLMHit2d*> &hits2d)
+{
+  std::vector<struct HitData>::iterator it, it2, itStart, itEnd;
+  int layerRange[15];
+  int layer, currLayer;
+  int i, j;
+  bool add;
+  int s[2];
+  int clust[2][2];
+  double e, de;
+  EKLMHit2d* hit2d;
+  /* Nothing to do. */
+  if (hits.size() <= 1)
+    return;
+  /* Fill layer ranges. */
+  currLayer = 1;
+  layerRange[0] = 0;
+  for (it = hits.begin(); it != hits.end(); it++) {
+    layer = it->hit->getLayer();
+    if (layer > currLayer) {
+      for (i = currLayer; i < layer; i++)
+        layerRange[i] = it - hits.begin();
+      currLayer = layer;
+    }
+  }
+  for (i = currLayer; i < 15; i++)
+    layerRange[i] = hits.size();
+  /* Clusterization. */
+  for (i = 0; i < 14; i++) {
+    itStart = hits.begin() + layerRange[i];
+    itEnd = hits.begin() + layerRange[i + 1];
+    /* Nothing to do. */
+    if (itEnd - itStart <= 1)
+      continue;
+    for (it = itStart; it != itEnd; it++) {
+      if (it->stat != c_Unknown)
+        continue;
+      for (j = 0; j < 2; j++) {
+        clust[j][0] = it->hit->getStrip(j + 1);
+        clust[j][1] = clust[j][0];
+      }
+      hit2d = NULL;
+      do {
+        add = false;
+        for (it2 = itStart; it2 != itEnd; it2++) {
+          if (it2 == it)
+            continue;
+          if (it->stat != c_Unknown)
+            continue;
+          for (j = 0; j < 2; j++)
+            s[j] = it2->hit->getStrip(j + 1);
+          if (s[0] > clust[0][1] + 1 || s[0] < clust[0][0] - 1 ||
+              s[1] > clust[1][1] + 1 || s[1] < clust[1][0] - 1)
+            continue;
+          if ((s[0] > clust[0][1] || s[0] < clust[0][0]) &&
+              (s[1] > clust[1][1] || s[1] < clust[1][0]))
+            continue;
+          for (j = 0; j < 2; j++) {
+            if (s[j] > clust[j][1])
+              clust[j][1] = s[j];
+            if (s[j] < clust[j][0])
+              clust[j][0] = s[j];
+          }
+          add = true;
+          it2->stat = c_Merged;
+          it->stat = c_Merged;
+          if (hit2d == NULL) {
+            hit2d = new EKLMHit2d(*(it->hit));
+            hits2d.push_back(hit2d);
+          }
+          e = hit2d->getEDep();
+          de = it2->hit->getEDep();
+          hit2d->setEDep(e + de);
+          hit2d->setTime(std::min(hit2d->getTime(), it2->hit->getTime()));
+          hit2d->setCrossPoint((hit2d->getCrossPoint() * e +
+                                it2->hit->getCrossPoint() * de) / (e + de));
+        }
+      } while (add);
+    }
+  }
+  /* Erase merged hits. */
+  for (it = hits.begin(); it != hits.end(); it++) {
+    if (it->stat == c_Merged) {
+      hits.erase(it);
+      it--;
+    }
+  }
+}
+
+/**
  * Associated hit finder.
  * @param[in] hit  This hit.
  * @param[in,out] hits All hits (including this).
@@ -61,86 +157,13 @@ findAssociatedHits(std::vector<struct HitData>::iterator hit,
                    std::vector<struct HitData> &hits,
                    HepGeom::Point3D<double> &hitPos)
 {
-  int i;
-  int s[2];
-  int layer;
-  int clust[2][2];
-  bool add;
-  double e, de;
   std::vector<EKLMHit2d*> res;
-  std::vector<EKLMHit2d*>::iterator itClust;
-  std::vector<struct HitData>::iterator it, it2, it3;
+  std::vector<struct HitData>::iterator it;
   /**
    * Initially fill the result with the hit in question.
    */
   res.push_back(hit->hit);
-  /**
-   * Find all the hits from the same layer.
-   * Hit vector is already sorted by layer.
-   */
-  layer = hit->hit->getLayer();
-  it2 = hit;
-  it3 = hit;
-  it = hit;
-  while (it != hits.begin()) {
-    it--;
-    if (it->hit->getLayer() != layer)
-      break;
-    it2 = it;
-  }
-  it = hit;
-  while (1) {
-    it++;
-    if (it == hits.end())
-      break;
-    if (it->hit->getLayer() != layer)
-      break;
-    it3 = it;
-  }
-  /**
-   * Search for a 2d cluster (hits in adjacent strips).
-   */
-  for (i = 0; i < 2; i++) {
-    clust[i][0] = hit->hit->getStrip(i + 1);
-    clust[i][1] = clust[i][0];
-  }
-  do {
-    add = false;
-    for (it = it2; it != it3; it++) {
-      if (it == hit)
-        continue;
-      if (it->stat != c_Unknown)
-        continue;
-      for (i = 0; i < 2; i++)
-        s[i] = it->hit->getStrip(i + 1);
-      if (s[0] > clust[0][1] + 1 || s[0] < clust[0][0] - 1 ||
-          s[1] > clust[1][1] + 1 || s[1] < clust[1][0] - 1)
-        continue;
-      if ((s[0] > clust[0][1] || s[0] < clust[0][0]) &&
-          (s[1] > clust[1][1] || s[1] < clust[1][0]))
-        continue;
-      for (i = 0; i < 2; i++) {
-        if (s[i] > clust[i][1])
-          clust[i][1] = s[i];
-        if (s[i] < clust[i][0])
-          clust[i][0] = s[i];
-      }
-      add = true;
-      it->stat = c_Cluster;
-      res.push_back(it->hit);
-    }
-  } while (add);
-  /**
-   * Get hit position as weighed average of cluster hit positions.
-   */
-  e = 0;
-  hitPos = HepGeom::Point3D<double>(0., 0., 0.);
-  for (itClust = res.begin(); itClust != res.end(); itClust++) {
-    de = (*itClust)->getEDep();
-    e = e + de;
-    hitPos = hitPos + de * (*itClust)->getCrossPoint();
-  }
-  hitPos = hitPos / e;
+  hitPos = hit->hit->getCrossPoint();
   /**
    * Collect other hits.
    */
@@ -192,6 +215,7 @@ void EKLMK0LReconstructorModule::event()
   StoreArray<EKLMHit2d> hits2d;
   StoreArray<EKLMK0L> k0lArray;
   struct HitData dat;
+  std::vector<EKLMHit2d*> new2dHits;
   std::vector<EKLMHit2d*> cluster;
   std::vector<EKLMHit2d*>::iterator itClust;
   HepGeom::Point3D<double> hitPos;
@@ -210,7 +234,15 @@ void EKLMK0LReconstructorModule::event()
   for (i = 0; i <= 1; i++) {
     /* Sort hits by layer. */
     sort(endcap[i].begin(), endcap[i].end(), layerLessThan);
-    /* Analyse hits. */
+    /* Merge 2d clusters. */
+    merge2dClusters(endcap[i], new2dHits);
+    for (itClust = new2dHits.begin(); itClust != new2dHits.end(); itClust++) {
+      dat.hit = *itClust;
+      endcap[i].push_back(dat);
+    }
+    /* Sort by layer again. */
+    sort(endcap[i].begin(), endcap[i].end(), layerLessThan);
+    /* Search for clusters. */
     for (it = endcap[i].begin(); it != endcap[i].end(); it++) {
       if ((*it).stat != c_Unknown)
         continue;
@@ -230,6 +262,10 @@ void EKLMK0LReconstructorModule::event()
         cluster.clear();
       }
     }
+    /* Free memory. */
+    for (itClust = new2dHits.begin(); itClust != new2dHits.end(); itClust++)
+      delete *itClust;
+    new2dHits.clear();
   }
 }
 

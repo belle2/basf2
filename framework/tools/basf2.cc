@@ -36,6 +36,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogSystem.h>
+#include <framework/core/DataFlowVisualization.h>
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
@@ -122,6 +123,7 @@ int main(int argc, char* argv[])
   libPath /=  belle2SubDir;
 
   bool runInteractiveMode = true;
+  string runModuleIOVisualization(""); //nothing done if empty
   vector<string> arguments;
   string pythonFile;
 
@@ -153,6 +155,7 @@ int main(int argc, char* argv[])
     ("output,o", prog::value<string>(), "override name of output file for (Seq)RootOutput")
     ("processes,p", prog::value<int>(), "override number of parallel processes (0 to disable parallel processing)")
     ("visualize-dataflow", "Generate data flow diagrams (dataflow.dot) for the executed steering file.")
+    ("module-io", prog::value<string>(), "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
     ;
 
     prog::options_description cmdlineOptions;
@@ -241,6 +244,10 @@ int main(int argc, char* argv[])
       Environment::Instance().setVisualizeDataFlow(true);
     }
 
+    if (varMap.count("module-io")) {
+      runModuleIOVisualization = varMap["module-io"].as<string>();
+      pythonFile = "basf2.py"; //make module maps available, visualization will happen later
+    }
 
     //Check for info option
     if (varMap.count("info")) {
@@ -252,7 +259,7 @@ int main(int argc, char* argv[])
     return 1;
   } catch (...) {
     cerr << "Exception of unknown type!" << endl;
-    runInteractiveMode = false;
+    return 1;
   }
 
   //---------------------------------------------------
@@ -290,6 +297,11 @@ int main(int argc, char* argv[])
 
       //Finish Python interpreter
       Py_Finalize();
+
+      //basf2.py was loaded, now do module I/O visualization
+      if (!runModuleIOVisualization.empty()) {
+        DataFlowVisualization::executeModuleAndCreateIOPlot(runModuleIOVisualization);
+      }
     } catch (PythonModuleNotEmbeddedError& exc) {
       B2ERROR(exc.what());
     } catch (error_already_set) {

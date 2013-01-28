@@ -193,7 +193,9 @@ void EKLMK0LReconstructorModule::event()
   StoreArray<EKLMK0L> k0lArray;
   struct HitData dat;
   std::vector<EKLMHit2d*> cluster;
+  std::vector<EKLMHit2d*>::iterator itClust;
   HepGeom::Point3D<double> hitPos;
+  float mt, t;
   EKLMK0L* k0l;
   /* Hits in endcap, index is (number of endcap - 1). */
   std::vector<struct HitData> endcap[2];
@@ -210,12 +212,21 @@ void EKLMK0LReconstructorModule::event()
     sort(endcap[i].begin(), endcap[i].end(), layerLessThan);
     /* Analyse hits. */
     for (it = endcap[i].begin(); it != endcap[i].end(); it++) {
-      if ((*it).stat == c_Unknown)
-        cluster = findAssociatedHits(it, endcap[i], hitPos);
+      if ((*it).stat != c_Unknown)
+        continue;
+      cluster = findAssociatedHits(it, endcap[i], hitPos);
       /* A cluster is found, write new K0L. */
       if (!cluster.empty()) {
         k0l = new(k0lArray.nextFreeAddress()) EKLMK0L();
         k0l->setHitPosition(hitPos);
+        mt = (*cluster.begin())->getTime();
+        for (itClust = cluster.begin() + 1; itClust != cluster.end();
+             itClust++) {
+          t = (*itClust)->getTime();
+          if (t < mt)
+            mt = t;
+        }
+        k0l->setTime(mt);
         cluster.clear();
       }
     }

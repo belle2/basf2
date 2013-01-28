@@ -53,6 +53,18 @@ namespace Belle2 {
      */
     TVector3 getPosition() const;
 
+    /**
+     * Set decay time.
+     * @param[in] time Time.
+     */
+    void setTime(float time);
+
+    /**
+     * Get time.
+     * @return Time of decay.
+     */
+    float getTime();
+
   private:
 
     /** Hit X coordinate. */
@@ -63,6 +75,9 @@ namespace Belle2 {
 
     /** Hit Z coordinate. */
     float m_hitZ;
+
+    /** Decay time. */
+    float m_time;
 
     /** Needed to make objects storable. */
     ClassDef(Belle2::EKLMK0L, 1);

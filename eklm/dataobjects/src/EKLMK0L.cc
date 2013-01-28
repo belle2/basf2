@@ -40,3 +40,13 @@ TVector3 EKLMK0L::getPosition() const
   return TVector3(m_hitX, m_hitY, m_hitZ);
 }
 
+void EKLMK0L::setTime(float time)
+{
+  m_time = time;
+}
+
+float EKLMK0L::getTime()
+{
+  return m_time;
+}
+

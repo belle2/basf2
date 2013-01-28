@@ -11,6 +11,8 @@ void EKLMK0L()
     200, -100, 100);
   TH1F* zres = new TH1F("k0l_zres", "EKLM K0L decay vertex Z resolution",
     200, -100, 100);
+  TH1F* tres = new TH1F("k0l_tres", "EKLM K0L decay time resolution",
+    200, -10., 10.);
   int n = tree->GetEntries();
   TClonesArray *k0lArray;
   TClonesArray *mcParticleArray;
@@ -29,6 +31,7 @@ void EKLMK0L()
       if (mcp->getProductionTime() > 0)
         continue;
       k0lFound = true;
+      break;
     }
     if (!k0lFound)
       continue;
@@ -65,10 +68,12 @@ void EKLMK0L()
     xres->Fill(vk.x());
     yres->Fill(vk.y());
     zres->Fill(vk.z());
+    tres->Fill(k0l->getTime() - mcp->getDecayTime());
   } 
   xres->Write();
   yres->Write();
   zres->Write();
+  tres->Write();
   delete xres;
   delete yres;
   delete zres;

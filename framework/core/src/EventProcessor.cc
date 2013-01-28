@@ -156,13 +156,10 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
   //do we want to visualize DataStore input/ouput?
   if (Environment::Instance().getVisualizeDataFlow()) {
     DataFlowVisualization v(DataStore::Instance().getModuleInfoMap(), modulePathList);
-    //generate graphs for each module
-    v.generateModulePlots("dataflow.dot");
-
     //single graph for entire steering file
-    v.generateModulePlots("dataflow_all.dot", true);
+    v.generateModulePlots("dataflow.dot", true);
 
-    B2INFO("Data flow diagrams created. You can use 'dot dataflow.dot -Tps -o dataflow.ps' to create a PostScript file from them.");
+    B2INFO("Data flow diagram created. You can use 'dot dataflow.dot -Tps -o dataflow.ps' to create a PostScript file from it.");
   }
 }
 

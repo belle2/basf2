@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
     ("input,i", prog::value<string>(), "override name of input file for (Seq)RootInput")
     ("output,o", prog::value<string>(), "override name of output file for (Seq)RootOutput")
     ("processes,p", prog::value<int>(), "override number of parallel processes (0 to disable parallel processing)")
-    ("visualize-dataflow", "Generate data flow diagrams (dataflow.dot) for the executed steering file.")
+    ("visualize-dataflow", "Generate data flow diagram (dataflow.dot) for the executed steering file.")
     ("module-io", prog::value<string>(), "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
     ;
 

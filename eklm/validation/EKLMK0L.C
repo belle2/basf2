@@ -6,13 +6,13 @@ void EKLMK0L()
   TTree* tree = (TTree*) fin->Get("tree");
   TFile* fout = new TFile("EKLMK0L.root", "recreate");
   TH1F* xres = new TH1F("k0l_xres", "EKLM K0L decay vertex X resolution",
-    200, -100, 100);
+    100, -50, 50);
   TH1F* yres = new TH1F("k0l_yres", "EKLM K0L decay vertex Y resolution",
-    200, -100, 100);
+    100, -50, 50);
   TH1F* zres = new TH1F("k0l_zres", "EKLM K0L decay vertex Z resolution",
-    200, -100, 100);
+    100, -50, 50);
   TH1F* tres = new TH1F("k0l_tres", "EKLM K0L decay time resolution",
-    200, -10., 10.);
+    100, -10., 10.);
   int n = tree->GetEntries();
   TClonesArray *k0lArray;
   TClonesArray *mcParticleArray;

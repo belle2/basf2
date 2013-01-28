@@ -20,30 +20,30 @@ ClassImp(Belle2::EKLMHit2d);
 
 EKLMHit2d::EKLMHit2d()
 {
-  m_XStrip = NULL;
-  m_YStrip = NULL;
 }
 
 
-EKLMHit2d::EKLMHit2d(EKLMDigit* xStrip, EKLMDigit* yStrip)
+EKLMHit2d::EKLMHit2d(EKLMDigit* s1, EKLMDigit* s2)
 {
-
-  m_XStrip = xStrip;
-  m_YStrip = yStrip;
-  setEndcap(xStrip->getEndcap());
-  setLayer(xStrip->getLayer());
-  setSector(xStrip->getSector());
+  m_digit[0] = s1;
+  m_digit[1] = s2;
+  setEndcap(s1->getEndcap());
+  setLayer(s1->getLayer());
+  setSector(s1->getSector());
 }
 
-
-const Belle2::EKLMDigit* EKLMHit2d::getXStripHit() const
+EKLMHit2d::~EKLMHit2d()
 {
-  return m_XStrip;
 }
 
-const Belle2::EKLMDigit* EKLMHit2d::getYStripHit() const
+EKLMDigit* EKLMHit2d::getDigit(int plane) const
 {
-  return m_YStrip;
+  return m_digit[plane - 1];
+}
+
+int EKLMHit2d::getStrip(int plane)
+{
+  return m_digit[plane - 1]->getStrip();
 }
 
 void EKLMHit2d::setCrossPoint(HepGeom::Point3D<double> point)
@@ -68,10 +68,10 @@ void EKLMHit2d::Print()
   printf("------------  Hit 2d  -------------- \n"
          "Endcap: %d Layer: %d Sector: %d\n",
          getEndcap(), getLayer(), getSector());
-  printf("X: ");
-  m_XStrip->Print();
-  printf("Y: ");
-  m_YStrip->Print();
+  printf("Plane 1: ");
+  m_digit[0]->Print();
+  printf("Plane 2: ");
+  m_digit[1]->Print();
   printf("Intersection: X:%f Y:%f Z:%f.", m_crossPointX, m_crossPointY,
          m_crossPointZ);
   printf("Chi squared: %f\n", m_ChiSq);

@@ -165,6 +165,7 @@ void EKLM::Digitizer::makeSimHits()
         // insert hit to the map
         graphComponentToSimHit.insert(std::pair<int, EKLMSimHit*>(component[distance(hitMap.begin(), hitIterator)], simHit));
 
+        simHit->setGlobalPosition(stepHit->getGlobalPosition());
         simHit->setPlane(stepHit->getPlane());
         simHit->setStrip(stepHit->getStrip());
         simHit->setMomentum(stepHit->getMomentum());
@@ -184,7 +185,8 @@ void EKLM::Digitizer::makeSimHits()
           current->second->setTime(stepHit->getTime());
           current->second->setPDG(stepHit->getPDG());
           current->second->setMomentum(stepHit->getMomentum());
-          current->second->setEnergy(stepHit->getEnergy());
+          current->second->setEnergy
+          (stepHit->getEnergy());
         }
       }
     }
@@ -245,6 +247,7 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
       new(m_stripHitsArray.nextFreeAddress()) EKLMDigit(simHit);
 
     stripHit->setMCTS(simHit->getTime());
+    stripHit->setGlobalPosition(simHit->getGlobalPosition());
     stripHit->setGeneratedNPE(fes->getGeneratedNPE());
     if (!fes->getFitStatus()) {
       stripHit->setTime(fes->getFitResults()->startTime);

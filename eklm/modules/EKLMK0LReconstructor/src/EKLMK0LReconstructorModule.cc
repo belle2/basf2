@@ -53,33 +53,116 @@ static bool layerLessThan(struct HitData hit1, struct HitData hit2)
 /**
  * Associated hit finder.
  * @param[in] hit  This hit.
- * @param[in] hits All hits (including this).
+ * @param[in,out] hits All hits (including this).
+ * @param[out] hitPos Estimated hit position.
  */
 static std::vector<EKLMHit2d*>
 findAssociatedHits(std::vector<struct HitData>::iterator hit,
-                   std::vector<struct HitData> &hits)
+                   std::vector<struct HitData> &hits,
+                   HepGeom::Point3D<double> &hitPos)
 {
-  EKLMHit2d* h, *h0;
+  int i;
+  int s[2];
+  int layer;
+  int clust[2][2];
+  bool add;
+  double e, de;
   std::vector<EKLMHit2d*> res;
-  std::vector<struct HitData>::iterator it;
-  h0 = hit->hit;
+  std::vector<EKLMHit2d*>::iterator itClust;
+  std::vector<struct HitData>::iterator it, it2, it3;
+  /**
+   * Initially fill the result with the hit in question.
+   */
+  res.push_back(hit->hit);
+  /**
+   * Find all the hits from the same layer.
+   * Hit vector is already sorted by layer.
+   */
+  layer = hit->hit->getLayer();
+  it2 = hit;
+  it3 = hit;
+  it = hit;
+  while (it != hits.begin()) {
+    it--;
+    if (it->hit->getLayer() != layer)
+      break;
+    it2 = it;
+  }
+  it = hit;
+  while (1) {
+    it++;
+    if (it == hits.end())
+      break;
+    if (it->hit->getLayer() != layer)
+      break;
+    it3 = it;
+  }
+  /**
+   * Search for a 2d cluster (hits in adjacent strips).
+   */
+  for (i = 0; i < 2; i++) {
+    clust[i][0] = hit->hit->getStrip(i + 1);
+    clust[i][1] = clust[i][0];
+  }
+  do {
+    add = false;
+    for (it = it2; it != it3; it++) {
+      if (it == hit)
+        continue;
+      if (it->stat != c_Unknown)
+        continue;
+      for (i = 0; i < 2; i++)
+        s[i] = it->hit->getStrip(i + 1);
+      if (s[0] > clust[0][1] + 1 || s[0] < clust[0][0] - 1 ||
+          s[1] > clust[1][1] + 1 || s[1] < clust[1][0] - 1)
+        continue;
+      if ((s[0] > clust[0][1] || s[0] < clust[0][0]) &&
+          (s[1] > clust[1][1] || s[1] < clust[1][0]))
+        continue;
+      for (i = 0; i < 2; i++) {
+        if (s[i] > clust[i][1])
+          clust[i][1] = s[i];
+        if (s[i] < clust[i][0])
+          clust[i][0] = s[i];
+      }
+      add = true;
+      it->stat = c_Cluster;
+      res.push_back(it->hit);
+    }
+  } while (add);
+  /**
+   * Get hit position as weighed average of cluster hit positions.
+   */
+  e = 0;
+  hitPos = HepGeom::Point3D<double>(0., 0., 0.);
+  for (itClust = res.begin(); itClust != res.end(); itClust++) {
+    de = (*itClust)->getEDep();
+    e = e + de;
+    hitPos = hitPos + de * (*itClust)->getCrossPoint();
+  }
+  hitPos = hitPos / e;
+  /**
+   * Collect other hits.
+   */
   for (it = hits.begin(); it != hits.end(); it++) {
     if (it == hit)
       continue;
     if (it->stat != c_Unknown)
       continue;
-    h = it->hit;
-    if (h->getCrossPoint().angle(h0->getCrossPoint()) < 0.05) {
-      if (it->stat == c_Unknown) {
-        res.push_back(h0);
-        it->stat = c_Cluster;
-      }
-      res.push_back(h);
-      hit->stat = c_Cluster;
+    if (it->hit->getCrossPoint().angle(hitPos) < 0.05) {
+      it->stat = c_Cluster;
+      res.push_back(it->hit);
     }
   }
-  if (hit->stat == c_Unknown)
+  /**
+   * If no other hits found, clear the result.
+   * Set the status of hit.
+   */
+  if (res.size() == 1) {
+    res.clear();
     hit->stat = c_Isolated;
+  } else
+    hit->stat = c_Cluster;
   return res;
 }
 
@@ -110,6 +193,7 @@ void EKLMK0LReconstructorModule::event()
   StoreArray<EKLMK0L> k0lArray;
   struct HitData dat;
   std::vector<EKLMHit2d*> cluster;
+  HepGeom::Point3D<double> hitPos;
   EKLMK0L* k0l;
   /* Hits in endcap, index is (number of endcap - 1). */
   std::vector<struct HitData> endcap[2];
@@ -127,11 +211,11 @@ void EKLMK0LReconstructorModule::event()
     /* Analyse hits. */
     for (it = endcap[i].begin(); it != endcap[i].end(); it++) {
       if ((*it).stat == c_Unknown)
-        cluster = findAssociatedHits(it, endcap[i]);
+        cluster = findAssociatedHits(it, endcap[i], hitPos);
       /* A cluster is found, write new K0L. */
       if (!cluster.empty()) {
         k0l = new(k0lArray.nextFreeAddress()) EKLMK0L();
-        k0l->setHitPosition((*it).hit->getCrossPoint());
+        k0l->setHitPosition(hitPos);
         cluster.clear();
       }
     }

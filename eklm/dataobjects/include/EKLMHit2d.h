@@ -35,14 +35,16 @@ namespace Belle2 {
     EKLMHit2d();
 
     /**
-     * Constructor with two strips
+     * Constructor with two strips.
+     * @param[in] s1 Strip from plane 1.
+     * @param[in] s2 Strip from plane 2.
      */
-    EKLMHit2d(EKLMDigit*, EKLMDigit*);
+    EKLMHit2d(EKLMDigit* s1, EKLMDigit* s2);
 
     /**
      * Destructor.
      */
-    ~EKLMHit2d() {};
+    ~EKLMHit2d();
 
     /**
      * Print 2d hit information.
@@ -50,16 +52,11 @@ namespace Belle2 {
     void Print();
 
     /**
-     * Get X hit.
-     * @return Pointer to the strip hit in X direction.
+     * Get EKLMDigit.
+     * @param[in[ plane plane number.
+     * @return Pointer to the hit.
      */
-    const EKLMDigit* getXStripHit() const;
-
-    /**
-     * Get Y hit.
-     * @return Pointer to the strip hit in Y direction.
-     */
-    const EKLMDigit* getYStripHit() const;
+    EKLMDigit* getDigit(int plane) const;
 
     /**
      * Set coordinates of the crossing point.
@@ -72,6 +69,12 @@ namespace Belle2 {
      * @return coordinates of the crossing point.
      */
     HepGeom::Point3D<double> getCrossPoint() const;
+
+    /**
+     * Get strip number (from EKLMDigit).
+     * @param[in] plane  Number if plane.
+     */
+    int getStrip(int plane);
 
     /**
      * Set Chi^2 of the crossing point.
@@ -87,11 +90,8 @@ namespace Belle2 {
 
   private:
 
-    /** Reference to the X Strip hit. */
-    EKLMDigit const* m_XStrip;  //-> {ROOT streamer directive}
-
-    /** Reference to the Y Strip hit. */
-    EKLMDigit const* m_YStrip;  //-> {ROOT streamer directive}
+    /** EKLMdigts used to create this hit. */
+    EKLMDigit* m_digit[2];  //! {ROOT streamer directive}
 
     /** Crossing point global X coordinate */
     float m_crossPointX;

@@ -96,16 +96,6 @@ void EKLMDigit::setVolumeID(int id)
   m_volid = id;
 }
 
-void EKLMDigit::setMCTS(float ts)
-{
-  m_timeshift = ts;
-}
-
-float EKLMDigit::getMCTS() const
-{
-  return m_timeshift;
-}
-
 void EKLMDigit::Print() const
 {
   printf("Endcap: %d Layer: %d Sector: %d Plane: %d Strip: %d # Time: %f\n",

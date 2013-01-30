@@ -12,8 +12,6 @@
 #define EKLMHIT2D_H
 
 /* External headers. */
-#include <CLHEP/Vector/ThreeVector.h>
-#include <CLHEP/Geometry/Point3D.h>
 #include <TObject.h>
 
 /* Belle2 headers. */
@@ -25,7 +23,8 @@ namespace Belle2 {
   /**
    * Class for 2d hits handling.
    */
-  class EKLMHit2d : public EKLMHitBase, public EKLMHitGlobalCoord {
+  class EKLMHit2d : public EKLMHitBase, public EKLMHitGlobalCoord,
+    public EKLMHitMCTime {
 
   public:
 

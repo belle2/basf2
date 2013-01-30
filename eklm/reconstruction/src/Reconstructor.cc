@@ -92,6 +92,7 @@ void EKLM::Reconstructor::create2dHits()
         hit2d->setGlobalPosition(crossPoint);
         hit2d->setChiSq(chisq);
         hit2d->setTime(time);
+        hit2d->setMCTime((hit1->getMCTime() + hit2->getMCTime()) / 2);
       }
     }
   }

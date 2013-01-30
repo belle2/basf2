@@ -16,6 +16,7 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitBase.h>
+#include <eklm/dataobjects/EKLMHitMCTime.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 
 namespace Belle2 {
@@ -24,7 +25,8 @@ namespace Belle2 {
    * Main reconstruction hit class. Contains information about the
    * hitted strips.
    */
-  class EKLMDigit : public EKLMHitBase, public EKLMHitCoord {
+  class EKLMDigit : public EKLMHitBase, public EKLMHitCoord,
+    public EKLMHitMCTime {
 
   public:
 
@@ -135,18 +137,6 @@ namespace Belle2 {
      */
     void setFitStatus(int s);
 
-    /**
-     * Set MC time shift.
-     * @param[in] ts Time shift.
-     */
-    void setMCTS(float ts);
-
-    /**
-     * Get MC time shift.
-     * @return Time shift.
-     */
-    float getMCTS() const;
-
   private:
 
     /** Number of plane. */
@@ -166,9 +156,6 @@ namespace Belle2 {
 
     /** Fit status. */
     int m_fitStatus;
-
-    /** MC time shift. */
-    float m_timeshift;
 
     /** Volume identifier. */
     int m_volid;

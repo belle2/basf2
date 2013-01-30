@@ -243,7 +243,7 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
     EKLMDigit* stripHit =
       new(m_stripHitsArray.nextFreeAddress()) EKLMDigit(simHit);
 
-    stripHit->setMCTS(simHit->getTime());
+    stripHit->setMCTime(simHit->getTime());
     stripHit->setGlobalPosition(simHit->getGlobalPosition());
     stripHit->setGeneratedNPE(fes->getGeneratedNPE());
     if (!fes->getFitStatus()) {

@@ -9,30 +9,35 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMHitCoord.h>
+#include <eklm/dataobjects/EKLMHitGlobalCoord.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
-ClassImp(EKLMHitCoord);
+ClassImp(EKLMHitGlobalCoord);
 
-EKLMHitCoord::EKLMHitCoord()
+EKLMHitGlobalCoord::EKLMHitGlobalCoord()
 {
 }
 
-EKLMHitCoord::~EKLMHitCoord()
+EKLMHitGlobalCoord::~EKLMHitGlobalCoord()
 {
 }
 
-HepGeom::Point3D<double> EKLMHitCoord::getLocalPosition() const
+HepGeom::Point3D<double> EKLMHitGlobalCoord::getGlobalPosition() const
 {
-  return HepGeom::Point3D<double>(m_localX, m_localY, m_localZ);
+  return HepGeom::Point3D<double>(m_globalX, m_globalY, m_globalZ);
 }
 
-void EKLMHitCoord::setLocalPosition(HepGeom::Point3D<double> lpos)
+void EKLMHitGlobalCoord::setGlobalPosition(HepGeom::Point3D<double> gpos)
 {
-  m_localX = lpos.x();
-  m_localY = lpos.y();
-  m_localZ = lpos.z();
+  m_globalX = gpos.x();
+  m_globalY = gpos.y();
+  m_globalZ = gpos.z();
+}
+
+TVector3 EKLMHitGlobalCoord::getPosition() const
+{
+  return TVector3(m_globalX, m_globalY, m_globalZ);
 }
 

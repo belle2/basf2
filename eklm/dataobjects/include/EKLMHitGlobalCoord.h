@@ -8,62 +8,66 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMHITCOORD_H
-#define EKLMHITCOORD_H
+#ifndef EKLMHITGLOBALCOORD_H
+#define EKLMHITGLOBALCOORD_H
 
 /* Extrenal headers. */
 #include <CLHEP/Geometry/Point3D.h>
 #include <TObject.h>
-
-/* Belle2 headers. */
-#include <eklm/dataobjects/EKLMHitGlobalCoord.h>
+#include <TVector3.h>
 
 namespace Belle2 {
 
   /**
    * Hit coordinates.
    */
-  class EKLMHitCoord : public EKLMHitGlobalCoord {
+  class EKLMHitGlobalCoord {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMHitCoord();
+    EKLMHitGlobalCoord();
 
     /**
      * Destructor.
      */
-    virtual ~EKLMHitCoord();
+    virtual ~EKLMHitGlobalCoord();
 
     /**
-     * Get local position of the particle hit.
+     * Get global position of the particle hit.
      * @return Hit coordinates.
      */
-    HepGeom::Point3D<double> getLocalPosition() const;
+    HepGeom::Point3D<double> getGlobalPosition() const;
 
     /**
-     * Set local position of the particle hit.
-     * @param[in] lpos Hit coordinates.
+     * Set global position of the particle hit.
+     * @param[in] gpos Hit coordinates.
      */
-    void setLocalPosition(HepGeom::Point3D<double> lpos);
+    void setGlobalPosition(HepGeom::Point3D<double> gpos);
+
+    /**
+     * Get global position (TVector3 version, for visualization).
+     * @return Hit coordinates.
+     */
+    TVector3 getPosition() const;
 
   protected:
 
-    /** Local position X coordinate. */
-    float m_localX;
+    /** Global position X coordinate. */
+    float m_globalX;
 
-    /** Local position Y coordinate. */
-    float m_localY;
+    /** Global position Y coordinate. */
+    float m_globalY;
 
-    /** Local position Z coordinate. */
-    float m_localZ;
+    /** Global position Z coordinate. */
+    float m_globalZ;
 
   private:
 
     /** Needed to make objects storable. */
-    ClassDef(Belle2::EKLMHitCoord, 1);
+    ClassDef(Belle2::EKLMHitGlobalCoord, 1);
 
   };
 

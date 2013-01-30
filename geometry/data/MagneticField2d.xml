@@ -39,23 +39,23 @@
 			    Therefore, we should turn on this field component only when we use
 			    TouschekTURTLEReader and Synchrotron radiation study, 
 			    which needs accurate propagation of beam particles.
-			    Field strength are calculated from the magnet parameters (K0,K1,SK0,SK1) 
+			    Field strength are calculated from the magnet parameters (K0,K1,SK0,SK1,ROTATE,DX,DY) 
 			    used in accelerator simulation.
-			    These parameters are provided for each 4cm slice in the beam direction.
+			    These parameters are provided for each 1cm slice in the beam direction.
 			-->
-			<Component type="Quad">
-				<MapFilenameHER>geometry/QuadFieldMapHER.dat</MapFilenameHER>
-				<MapFilenameLER>geometry/QuadFieldMapLER.dat</MapFilenameLER>
-				<MapSizeHER>116</MapSizeHER>
-				<MapSizeLER> 74</MapSizeLER>
-				<ApertFilenameHER>geometry/ApertHER.dat</ApertFilenameHER>
-				<ApertFilenameLER>geometry/ApertLER.dat</ApertFilenameLER>
-				<ApertSizeHER>22</ApertSizeHER>
-				<ApertSizeLER>26</ApertSizeLER>
- 				<CircumferenceHER unit="m">3016.369812</CircumferenceHER>
-				<CircumferenceLER unit="m">3016.36087</CircumferenceLER>
-				<BeamEnergyHER unit="GeV">7.0</BeamEnergyHER>
-				<BeamEnergyLER unit="GeV">4.0</BeamEnergyLER>
+                        <Component type="Quad">
+                                <MapFilenameHER>geometry/QuadFieldMapHER3d.dat</MapFilenameHER>
+                                <MapFilenameLER>geometry/QuadFieldMapLER3d.dat</MapFilenameLER>
+                                <MapSizeHER>734</MapSizeHER>
+                                <MapSizeLER>396</MapSizeLER>
+                                <ApertFilenameHER>geometry/ApertHER.dat</ApertFilenameHER>
+                                <ApertFilenameLER>geometry/ApertLER.dat</ApertFilenameLER>
+                                <ApertSizeHER>22</ApertSizeHER>
+                                <ApertSizeLER>26</ApertSizeLER>
+                                <CircumferenceHER unit="m">3016.31451</CircumferenceHER>
+                                <CircumferenceLER unit="m">3016.30558</CircumferenceLER>
+                                <BeamEnergyHER unit="GeV">7.0</BeamEnergyHER>
+                                <BeamEnergyLER unit="GeV">4.0</BeamEnergyLER>
 			</Component>
 		</Components>
 	</Content>

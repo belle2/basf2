@@ -48,6 +48,8 @@ namespace Belle2 {
       double SK0; // in [dimensionless]
       double SK1; // in [1/m]
       double ROTATE; // in [radian]
+      double DX;   //in [m]
+      double DY;   //in [m]
       /* Note that K parameters used in SAD is multiplied by the element length.
        * Popular definitions are:  K0,SK0[1/m] and K1,SK1[1/m^2]
        */

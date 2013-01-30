@@ -88,13 +88,13 @@ void BFieldComponentQuad::initialize()
   fieldMapFileLER.push(io::file_source(fullPathMapLER));
 
   string name;
-  double s, L, K0, K1, SK0, SK1, ROTATE;
+  double s, L, K0, K1, SK0, SK1, ROTATE, DX, DY;
 
   //Create the parameter map and read the data from the file
   B2DEBUG(10, "Loading the HER quadrupole magnetic field from file '" << m_mapFilenameHER << "' in to the memory...")
   m_mapBufferHER = new ParamPoint[m_mapSizeHER];
   for (int i = 0; i < m_mapSizeHER; ++i) {
-    fieldMapFileHER >> name >> s >> L >> K0 >> K1 >> SK0 >> SK1 >> ROTATE;
+    fieldMapFileHER >> name >> s >> L >> K0 >> K1 >> SK0 >> SK1 >> ROTATE >> DX >> DY;
     /* Save parametors in unit [m], not in unit [cm].*/
     m_mapBufferHER[i].s      = s;   // [m]
     m_mapBufferHER[i].L      = L;   // [m]
@@ -103,6 +103,8 @@ void BFieldComponentQuad::initialize()
     m_mapBufferHER[i].SK0    = SK0; // [dimensionless]
     m_mapBufferHER[i].SK1    = SK1; // [1/m]
     m_mapBufferHER[i].ROTATE = ROTATE; // [degree]
+    m_mapBufferHER[i].DX     = DX; // [m]
+    m_mapBufferHER[i].DY     = DY; // [m]
     B2DEBUG(10, "... loaded HER SAD element " << name << " at s= " << s << "[m].")
   }
   B2DEBUG(10, "... loaded " << m_mapSizeHER << " elements.")
@@ -110,7 +112,7 @@ void BFieldComponentQuad::initialize()
   B2DEBUG(10, "Loading the LER quadrupole magnetic field from file '" << m_mapFilenameLER << "' in to the memory...")
   m_mapBufferLER = new ParamPoint[m_mapSizeLER];
   for (int i = 0; i < m_mapSizeLER; ++i) {
-    fieldMapFileLER >> name >> s >> L >> K0 >> K1 >> SK0 >> SK1 >> ROTATE;
+    fieldMapFileLER >> name >> s >> L >> K0 >> K1 >> SK0 >> SK1 >> ROTATE >> DX >> DY;
     /* Save parametors in unit [m], not in unit [cm].*/
     m_mapBufferLER[i].s      = s;   // [m]
     m_mapBufferLER[i].L      = L;   // [m]
@@ -119,6 +121,8 @@ void BFieldComponentQuad::initialize()
     m_mapBufferLER[i].SK0    = SK0; // [dimensionless]
     m_mapBufferLER[i].SK1    = SK1; // [1/m]
     m_mapBufferLER[i].ROTATE = ROTATE; // [degree]
+    m_mapBufferLER[i].DX     = DX; // [m]
+    m_mapBufferLER[i].DY     = DY; // [m]
     B2DEBUG(10, "... loaded LER SAD element " << name << " at s= " << s << "[m].")
   }
   B2DEBUG(10, "... loaded " << m_mapSizeLER << " elements.")
@@ -218,7 +222,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
   if (getApertureLER(s_LER) > r_LER) LERflag = true;
 
   double X, Y, s; // [m]
-  double K0, K1, SK0, SK1, L, ROTATE;
+  double K0, K1, SK0, SK1, L, ROTATE, DX, DY;
   double p0_HER = 7.00729e+9; // [eV] //H.Nakayama: sorry, hard-coded
   double p0_LER = 4.00000e+9; // [eV] //H.Nakayama: sorry, hard-coded
   double c = 3.0e+8;// [m/s]          //H.Nakayama: sorry, hard-coded
@@ -231,9 +235,6 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
   if ((HERflag) && (LERflag)) return TVector3(0, 0, 0);
 
   int ROTATE_DIRECTION = 1; // 1: default, 0: rotate-off, -1: inversely rotate
-
-  bool OFFSETflag = false;
-  double OrbitOffsetHER = 0.0007; //H.Nakayama: sorry, hard-coded
 
   /* in case the point is inside HER*/
   if (HERflag) {
@@ -252,17 +253,20 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
         L      = m_mapBufferHER[i].L;
         ROTATE = m_mapBufferHER[i].ROTATE;
         ROTATE *= ROTATE_DIRECTION;
+        DX     = m_mapBufferHER[i].DX;
+        DY     = m_mapBufferHER[i].DY;
         foundflag = true;
         break;
       }
     }
 
-    if ((OFFSETflag) && (s >  1.18)) X += OrbitOffsetHER; //H.Nakayama: sorry, hard-coded
-    if ((OFFSETflag) && (s < -1.18)) X -= OrbitOffsetHER; //H.Nakayama: sorry, hard-coded
-
-    TVector3 p_tmp(X, Y, s); p_tmp.RotateZ(-ROTATE / 180.*M_PI);
+    TVector3 p_tmp(X - DX, Y - DY, s); p_tmp.RotateZ(-ROTATE / 180.*M_PI);
     X = p_tmp.X();
     Y = p_tmp.Y();
+
+    //TVector3 p_tmp(X, Y, s); p_tmp.RotateZ(-ROTATE / 180.*M_PI);
+    //X = p_tmp.X() - DX;
+    //Y = p_tmp.Y() - DY;
 
     if (foundflag) {
       double Bs = 0;
@@ -301,15 +305,21 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
         L      = m_mapBufferLER[i].L;
         ROTATE = m_mapBufferLER[i].ROTATE;
         ROTATE *= ROTATE_DIRECTION;
+        DX     = m_mapBufferLER[i].DX;
+        DY     = m_mapBufferLER[i].DY;
         foundflag = true;
         break;
       }
     }
-    TVector3 p_tmp(X, Y, s); p_tmp.RotateZ(-ROTATE / 180.*M_PI);
+
+    TVector3 p_tmp(X - DX, Y - DY, s); p_tmp.RotateZ(-ROTATE / 180.*M_PI);
     X = p_tmp.X();
     Y = p_tmp.Y();
+    //TVector3 p_tmp(X, Y, s); p_tmp.RotateZ(-ROTATE / 180.*M_PI);
+    //X = p_tmp.X() - DX;
+    //Y = p_tmp.Y() - DY;
 
-    //hoge
+
     if (foundflag) {
       double Bs = 0;
       double BX = (p0_LER / c / L) * (K1 * Y + SK1 * X + SK0);

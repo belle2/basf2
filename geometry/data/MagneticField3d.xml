@@ -19,7 +19,7 @@
                              If "Beamline" is turned on and return non-zero value,
                              "Radial" return zero value.
 			-->
-			<Component type="Radial">
+			<!--<Component type="Radial">
 				<NumberGridPointsR>175</NumberGridPointsR>
 				<GridPitchR unit="cm">1.0</GridPitchR>
 				<RadiusMin unit="cm">0.0</RadiusMin>
@@ -30,7 +30,7 @@
 				<ZMax unit="cm">447.0</ZMax>
 				<ZOffset unit="cm">47.0</ZOffset>
 				<MapFilename>geometry/SolenoidFieldMap.dat.gz</MapFilename>
-			</Component>
+			</Component>-->
 
 			<!-- Quadruple solenoid magnetic field map
 			    This class represents a magnetic field map from quadrupole magnets QC[1/2]*.
@@ -41,21 +41,21 @@
 			    Therefore, we should turn on this field component only when we use
 			    TouschekTURTLEReader and Synchrotron radiation study, 
 			    which needs accurate propagation of beam particles.
-			    Field strength are calculated from the magnet parameters (K0,K1,SK0,SK1) 
+			    Field strength are calculated from the magnet parameters (K0,K1,SK0,SK1,ROTATE,DX,DY) 
 			    used in accelerator simulation.
 			    These parameters are provided for each 1cm slice in the beam direction.
 			-->
 			<Component type="Quad">
 				<MapFilenameHER>geometry/QuadFieldMapHER3d.dat</MapFilenameHER>
 				<MapFilenameLER>geometry/QuadFieldMapLER3d.dat</MapFilenameLER>
-				<MapSizeHER>518</MapSizeHER>
-				<MapSizeLER>401</MapSizeLER>
+				<MapSizeHER>734</MapSizeHER>
+				<MapSizeLER>396</MapSizeLER>
 				<ApertFilenameHER>geometry/ApertHER.dat</ApertFilenameHER>
 				<ApertFilenameLER>geometry/ApertLER.dat</ApertFilenameLER>
 				<ApertSizeHER>22</ApertSizeHER>
 				<ApertSizeLER>26</ApertSizeLER>
-				<CircumferenceHER unit="m">3016.314538</CircumferenceHER>
-				<CircumferenceLER unit="m">3016.305574</CircumferenceLER>
+				<CircumferenceHER unit="m">3016.31451</CircumferenceHER>
+				<CircumferenceLER unit="m">3016.30558</CircumferenceLER>
 				<BeamEnergyHER unit="GeV">7.0</BeamEnergyHER>
 				<BeamEnergyLER unit="GeV">4.0</BeamEnergyLER>
 			</Component>
@@ -66,10 +66,9 @@
 			-->
 			<Component type="Beamline">
 				<RadiusMin unit="cm">0.0</RadiusMin>
-				<!--RadiusMax unit="cm">2.5</RadiusMax-->
 				<RadiusMax unit="cm">0.5</RadiusMax>
-				<ZMin unit="cm">-400.0</ZMin>
-				<ZMax unit="cm">400.0</ZMax>
+				<ZMin unit="cm">-399.9</ZMin>
+				<ZMax unit="cm">399.9</ZMax>
 				<BeamAngle unit="cm">0.0415</BeamAngle>
 				<MapFilenameHER>geometry/BeamlineFieldMap_r25_her.dat.gz</MapFilenameHER>
 				<MapFilenameLER>geometry/BeamlineFieldMap_r25_ler.dat.gz</MapFilenameLER>

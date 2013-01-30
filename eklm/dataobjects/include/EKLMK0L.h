@@ -14,14 +14,16 @@
 /* External headers. */
 #include <CLHEP/Geometry/Point3D.h>
 #include <TObject.h>
-#include <TVector3.h>
+
+/* Belle2 headers. */
+#include <eklm/dataobjects/EKLMHitGlobalCoord.h>
 
 namespace Belle2 {
 
   /**
    * K0L data.
    */
-  class EKLMK0L : public TObject {
+  class EKLMK0L : public TObject, public EKLMHitGlobalCoord {
 
   public:
 
@@ -34,24 +36,6 @@ namespace Belle2 {
      * Destructor.
      */
     ~EKLMK0L();
-
-    /**
-     * Set hit position.
-     * @param[in] pos Hit coordinates.
-     */
-    void setHitPosition(HepGeom::Point3D<double> pos);
-
-    /**
-     * Get hit position.
-     * @return Hit coordinates.
-     */
-    HepGeom::Point3D<double> getHitPosition() const;
-
-    /**
-     * Get hit position, TVector3 version.
-     * @return Hit coordinates.
-     */
-    TVector3 getPosition() const;
 
     /**
      * Set decay time.
@@ -78,15 +62,6 @@ namespace Belle2 {
     int getLayers();
 
   private:
-
-    /** Hit X coordinate. */
-    float m_hitX;
-
-    /** Hit Y coordinate. */
-    float m_hitY;
-
-    /** Hit Z coordinate. */
-    float m_hitZ;
 
     /** Decay time. */
     float m_time;

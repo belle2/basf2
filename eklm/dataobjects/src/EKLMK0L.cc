@@ -23,23 +23,6 @@ EKLMK0L::~EKLMK0L()
 {
 }
 
-void EKLMK0L::setHitPosition(HepGeom::Point3D<double> pos)
-{
-  m_hitX = pos.x();
-  m_hitY = pos.y();
-  m_hitZ = pos.z();
-}
-
-HepGeom::Point3D<double> EKLMK0L::getHitPosition() const
-{
-  return HepGeom::Point3D<double>(m_hitX, m_hitY, m_hitZ);
-}
-
-TVector3 EKLMK0L::getPosition() const
-{
-  return TVector3(m_hitX, m_hitY, m_hitZ);
-}
-
 void EKLMK0L::setTime(float time)
 {
   m_time = time;

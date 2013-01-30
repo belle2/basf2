@@ -214,7 +214,7 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
   hit->stat = c_Cluster;
   /* Fill EKLMK0L. */
   k0l = new(k0lArray.nextFreeAddress()) EKLMK0L();
-  k0l->setHitPosition(hitPos);
+  k0l->setGlobalPosition(hitPos);
   k0l->setTime(mt);
   k0l->setLayers(nLayers);
 }

@@ -184,17 +184,22 @@ namespace Belle2 {
       StoreArray<ECLSimHit> eclArray;
       if (!eclArray) eclArray.create();
       RelationArray eclSimHitRel(mcParticles, eclArray);
-      m_simhitNumber = eclArray->GetLast() + 1;
-      new(eclArray->AddrAt(m_simhitNumber)) ECLSimHit();
-      eclArray[m_simhitNumber]->setCellId(cellId + 1);
-      eclArray[m_simhitNumber]->setTrackId(trackID);
-      eclArray[m_simhitNumber]->setPDGCode(pid);
-      eclArray[m_simhitNumber]->setFlightTime(tof / ns);
-      eclArray[m_simhitNumber]->setEnergyDep(edep / GeV);
       TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
-      eclArray[m_simhitNumber]->setMomentum(momentum);
-      eclArray[m_simhitNumber]->setPosIn(posAve);
+      new(eclArray.nextFreeAddress()) ECLSimHit(cellId + 1, trackID, pid, tof / ns, edep / GeV, momentum, posAve);
+      /*
+            m_simhitNumber = eclArray->GetLast() + 1;
+            new(eclArray->AddrAt(m_simhitNumber)) ECLSimHit();
+            eclArray[m_simhitNumber]->setCellId(cellId + 1);
+            eclArray[m_simhitNumber]->setTrackId(trackID);
+            eclArray[m_simhitNumber]->setPDGCode(pid);
+            eclArray[m_simhitNumber]->setFlightTime(tof / ns);
+            eclArray[m_simhitNumber]->setEnergyDep(edep / GeV);
+            TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
+            eclArray[m_simhitNumber]->setMomentum(momentum);
+            eclArray[m_simhitNumber]->setPosIn(posAve);
+      */
       B2DEBUG(150, "HitNumber: " << m_simhitNumber);
+      int m_simhitNumber = eclArray.getEntries() - 1;
       eclSimHitRel.add(trackID, m_simhitNumber);
 
 
@@ -224,8 +229,6 @@ namespace Belle2 {
           TimeIndex = (int)((tof / ns) / 100);
           double E_cell = (edep / GeV);
           if (ECLHitIndex[cellId][TimeIndex] == -1) {
-            m_hitNum = eclHitArray->GetLast() + 1;
-            new(eclHitArray->AddrAt(m_hitNum)) ECLHit();
 
             ECLGeometryPar* eclp = ECLGeometryPar::Instance();
             PosCell =  eclp->GetCrystalPos(cellId);
@@ -233,6 +236,11 @@ namespace Belle2 {
             local_pos = (15. - (posAve  - PosCell) * VecCell);
             T_ave =  6.05 + 0.0749 * local_pos - 0.00112 * local_pos * local_pos + (tof / ns)  ;
 
+
+            //m_hitNum = eclHitArray->GetLast() + 1;
+            //new(eclHitArray->AddrAt(m_hitNum)) ECLHit();
+            new(eclHitArray.nextFreeAddress()) ECLHit();
+            m_hitNum = eclHitArray.getEntries() - 1;
             ECLHitIndex[cellId][TimeIndex] = m_hitNum;
             eclHitArray[m_hitNum]->setCellId(cellId + 1);
             eclHitArray[m_hitNum]->setEnergyDep(E_cell);

@@ -130,8 +130,11 @@ void ECLReconstructorModule::event()
 
         StoreArray<ECLHitAssignment> eclHaArray;
         if (!eclHaArray) eclHaArray.create();
-        m_HANum = eclHaArray->GetLast() + 1;
-        new(eclHaArray->AddrAt(m_HANum)) ECLHitAssignment();
+        //m_HANum = eclHaArray->GetLast() + 1;
+        //new(eclHaArray->AddrAt(m_HANum)) ECLHitAssignment();
+        new(eclHaArray.nextFreeAddress()) ECLHitAssignment();
+        m_HANum = eclHaArray.getEntries() - 1;
+
         eclHaArray[m_HANum]->setShowerId(nShower);
         eclHaArray[m_HANum]->setCellId(iHA->Id());
 
@@ -162,8 +165,10 @@ void ECLReconstructorModule::event()
 
       StoreArray<ECLShower> eclRecShowerArray;
       if (!eclRecShowerArray) eclRecShowerArray.create();
-      m_hitNum = eclRecShowerArray->GetLast() + 1;
-      new(eclRecShowerArray->AddrAt(m_hitNum)) ECLShower();
+      //m_hitNum = eclRecShowerArray->GetLast() + 1;
+      //new(eclRecShowerArray->AddrAt(m_hitNum)) ECLShower();
+      new(eclRecShowerArray.nextFreeAddress()) ECLShower();
+      m_hitNum = eclRecShowerArray.getEntries() - 1;
       eclRecShowerArray[m_hitNum]->setShowerId(nShower);
       eclRecShowerArray[m_hitNum]->setEnergy((float) sEnergy);
       eclRecShowerArray[m_hitNum]->setTheta((float)(*iShower).second.Theta());

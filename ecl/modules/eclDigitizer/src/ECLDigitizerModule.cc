@@ -166,15 +166,19 @@ void ECLDigitizerModule::event()
 
         StoreArray<ECLDsp> eclDspArray;
         if (!eclDspArray) eclDspArray.create();
-        m_hitNum = eclDspArray->GetLast() + 1;
-        new(eclDspArray->AddrAt(m_hitNum)) ECLDsp();
+        //m_hitNum = eclDspArray->GetLast() + 1;
+        //new(eclDspArray->AddrAt(m_hitNum)) ECLDsp();
+        new(eclDspArray.nextFreeAddress()) ECLDsp();
+        m_hitNum = eclDspArray.getEntries() - 1;
         eclDspArray[m_hitNum]->setCellId(iECLCell + 1);
         eclDspArray[m_hitNum]->setDspA(FitA);
 
         StoreArray<ECLDigit> eclDigiArray;
         if (!eclDigiArray) eclDigiArray.create();
-        m_hitNum1 = eclDigiArray->GetLast() + 1;
-        new(eclDigiArray->AddrAt(m_hitNum1)) ECLDigit();
+        //m_hitNum1 = eclDigiArray->GetLast() + 1;
+        //new(eclDigiArray->AddrAt(m_hitNum1)) ECLDigit();
+        new(eclDigiArray.nextFreeAddress()) ECLDigit();
+        m_hitNum1 = eclDigiArray.getEntries() - 1;
         eclDigiArray[m_hitNum1]->setCellId(iECLCell + 1);//iECLCell + 1= 1~8736
         eclDigiArray[m_hitNum1]->setAmp(energyFit[iECLCell]);//E (GeV) = energyFit/20000;
         eclDigiArray[m_hitNum1]->setTimeFit(tFit[iECLCell]);//t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;

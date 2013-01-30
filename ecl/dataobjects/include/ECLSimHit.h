@@ -31,7 +31,31 @@ namespace Belle2 {
   class ECLSimHit : public SimHitBase {
   public:
     /** default constructor for ROOT */
-    ECLSimHit() {;}
+    ECLSimHit(): SimHitBase() {;}
+
+
+    //! Useful Constructor
+    ECLSimHit(
+      int CellId,            /**< Cell ID */
+      int TrackId,           /**< Track ID */
+      int Pdg,               /**< Particle PDG (can be one of secondaries) */
+      float FlightTime,      /**< Flight time from IP */
+      float Edep,            /**< Deposit energy */
+      TVector3 Momentum,     /**< Momentum */
+      TVector3 Position        /**< Position */
+    ): SimHitBase() {
+      m_CellId = CellId;
+      m_TrackId = TrackId;
+      m_Pdg = Pdg;
+      m_FlightTime = FlightTime;
+      m_Edep = Edep;
+      m_Momentum = Momentum;
+      m_Position = Position;
+
+    }
+
+
+
 
     /*! Set Cell ID
      */

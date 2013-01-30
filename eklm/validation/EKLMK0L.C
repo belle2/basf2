@@ -13,6 +13,12 @@ void EKLMK0L()
     100, -50, 50);
   TH1F* tres = new TH1F("k0l_tres", "EKLM K0L decay time resolution",
     100, -10., 10.);
+  TH1F* pres = new TH1F("k0l_pres", "EKLM K0L momentum resolution",
+    100, -1., 1.);
+  TH1F* ptres = new TH1F("k0l_ptres", "EKLM K0L momentum theta resolution",
+    100, -0.2, 0.2);
+  TH1F* ppres = new TH1F("k0l_ppres", "EKLM K0L momentum phi resolution",
+    100, -0.2, 0.2);
   xres->SetXTitle("cm");
   xres->SetYTitle("Events");
   yres->SetXTitle("cm");
@@ -73,18 +79,30 @@ void EKLMK0L()
       continue;
     k0l = (Belle2::EKLMK0L*)k0lArray->AddrAt(jmax);
     vk = k0l->getPosition() - v;
+    TVector3 p = k0l->getMomentumRoot().Vect();
+    TVector3 pmc = mcp->getMomentum();
     xres->Fill(vk.x());
     yres->Fill(vk.y());
     zres->Fill(vk.z());
     tres->Fill(k0l->getTime() - mcp->getDecayTime());
+    pres->Fill(p.Mag() - pmc.Mag());
+    ptres->Fill(p.Theta() - pmc.Theta());
+    ppres->Fill(p.Phi() - pmc.Phi());
   } 
   xres->Write();
   yres->Write();
   zres->Write();
   tres->Write();
+  pres->Write();
+  ptres->Write();
+  ppres->Write();
   delete xres;
   delete yres;
   delete zres;
+  delete tres;
+  delete pres;
+  delete ptres;
+  delete ppres;
   delete fin;
   delete fout;
 }

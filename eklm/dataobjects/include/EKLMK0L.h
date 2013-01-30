@@ -17,13 +17,15 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitGlobalCoord.h>
+#include <eklm/dataobjects/EKLMHitMomentum.h>
 
 namespace Belle2 {
 
   /**
    * K0L data.
    */
-  class EKLMK0L : public TObject, public EKLMHitGlobalCoord {
+  class EKLMK0L : public TObject, public EKLMHitGlobalCoord,
+    public EKLMHitMomentum {
 
   public:
 

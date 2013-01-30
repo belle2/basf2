@@ -14,6 +14,7 @@
 /* Belle2 headers. */
 #include <framework/core/ModuleManager.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/dataobjects/EKLMK0L.h>
 #include <eklm/geometry/EKLMObjectNumbers.h>
@@ -161,7 +162,9 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
   std::vector<EKLMHit2d*>::iterator itClust;
   std::vector<struct HitData>::iterator it;
   HepGeom::Point3D<double> hitPos;
-  float mt, t;
+  CLHEP::Hep3Vector p;
+  float mt, t, m;
+  double v;
   EKLMK0L* k0l;
   StoreArray<EKLMK0L> k0lArray;
   /* Initially fill the cluster with the hit in question. */
@@ -206,6 +209,17 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
     hitPos = hitPos + de * (*itClust)->getGlobalPosition();
   }
   hitPos = hitPos / e;
+  /* Calculate momentum. */
+  m = 0.497614;
+  p.setX(hitPos.x());
+  p.setY(hitPos.y());
+  p.setZ(hitPos.z());
+  p = p / mt;
+  v = p.mag() / Const::speedOfLight;
+  if (v < 0.999999)
+    p = p.unit() * m * v / sqrt(1.0 - v * v);
+  else
+    p = CLHEP::Hep3Vector(0, 0, 0);
   /* Set the status of hit. */
   if (cluster.size() == 1) {
     hit->stat = c_Isolated;
@@ -217,6 +231,7 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
   k0l->setGlobalPosition(hitPos);
   k0l->setTime(mt);
   k0l->setLayers(nLayers);
+  k0l->setMomentum(CLHEP::HepLorentzVector(p, sqrt(p.mag2() + m * m)));
 }
 
 EKLMK0LReconstructorModule::EKLMK0LReconstructorModule() : Module()

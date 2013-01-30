@@ -65,6 +65,18 @@ namespace Belle2 {
      */
     float getTime();
 
+    /**
+     * Set number of layers with hits.
+     * @param[in] l Number of layers.
+     */
+    void setLayers(int l);
+
+    /**
+     * Get number of layers with hits.
+     * @return Number of layers.
+     */
+    int getLayers();
+
   private:
 
     /** Hit X coordinate. */
@@ -78,6 +90,9 @@ namespace Belle2 {
 
     /** Decay time. */
     float m_time;
+
+    /** Number of layers with hits. */
+    int m_layers;
 
     /** Needed to make objects storable. */
     ClassDef(Belle2::EKLMK0L, 1);

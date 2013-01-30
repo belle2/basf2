@@ -154,6 +154,8 @@ static void merge2dClusters(std::vector<struct HitData> &hits,
 static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
                                std::vector<struct HitData> &hits)
 {
+  int i;
+  int layerHits[14], nLayers;
   float e, de;
   std::vector<EKLMHit2d*> cluster;
   std::vector<EKLMHit2d*>::iterator itClust;
@@ -184,6 +186,15 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
       mt = t;
     }
   }
+  /* Get number of layers. */
+  for (i = 0; i < 14; i++)
+    layerHits[i] = 0;
+  for (itClust = cluster.begin(); itClust != cluster.end(); itClust++)
+    layerHits[(*itClust)->getLayer() - 1]++;
+  nLayers = 0;
+  for (i = 0; i < 14; i++)
+    if (layerHits[i] > 0)
+      nLayers++;
   /* Get hit position as weighed average of cluster hit positions. */
   e = 0;
   hitPos = HepGeom::Point3D<double>(0., 0., 0.);
@@ -205,6 +216,7 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
   k0l = new(k0lArray.nextFreeAddress()) EKLMK0L();
   k0l->setHitPosition(hitPos);
   k0l->setTime(mt);
+  k0l->setLayers(nLayers);
 }
 
 EKLMK0LReconstructorModule::EKLMK0LReconstructorModule() : Module()

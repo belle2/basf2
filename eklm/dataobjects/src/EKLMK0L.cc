@@ -50,3 +50,13 @@ float EKLMK0L::getTime()
   return m_time;
 }
 
+void EKLMK0L::setLayers(int l)
+{
+  m_layers = l;
+}
+
+int EKLMK0L::getLayers()
+{
+  return m_layers;
+}
+

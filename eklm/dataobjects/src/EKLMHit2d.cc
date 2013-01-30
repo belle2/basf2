@@ -46,18 +46,6 @@ int EKLMHit2d::getStrip(int plane)
   return m_digit[plane - 1]->getStrip();
 }
 
-void EKLMHit2d::setCrossPoint(HepGeom::Point3D<double> point)
-{
-  m_crossPointX = point.x();
-  m_crossPointY = point.y();
-  m_crossPointZ = point.z();
-}
-
-HepGeom::Point3D<double> EKLMHit2d::getCrossPoint() const
-{
-  return HepGeom::Point3D<double>(m_crossPointX, m_crossPointY, m_crossPointZ);
-}
-
 float EKLMHit2d::getChiSq() const
 {
   return m_ChiSq;
@@ -72,8 +60,7 @@ void EKLMHit2d::Print()
   m_digit[0]->Print();
   printf("Plane 2: ");
   m_digit[1]->Print();
-  printf("Intersection: X:%f Y:%f Z:%f.", m_crossPointX, m_crossPointY,
-         m_crossPointZ);
+  printf("Position: X:%f Y:%f Z:%f.", m_globalX, m_globalY, m_globalZ);
   printf("Chi squared: %f\n", m_ChiSq);
 }
 

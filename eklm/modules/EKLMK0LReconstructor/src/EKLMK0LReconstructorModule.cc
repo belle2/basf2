@@ -131,8 +131,8 @@ static void merge2dClusters(std::vector<struct HitData> &hits,
           de = it2->hit->getEDep();
           hit2d->setEDep(e + de);
           hit2d->setTime(std::min(hit2d->getTime(), it2->hit->getTime()));
-          hit2d->setCrossPoint((hit2d->getCrossPoint() * e +
-                                it2->hit->getCrossPoint() * de) / (e + de));
+          hit2d->setGlobalPosition((hit2d->getGlobalPosition() * e +
+                                    it2->hit->getGlobalPosition() * de) / (e + de));
         }
       } while (add);
     }
@@ -166,14 +166,14 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
   StoreArray<EKLMK0L> k0lArray;
   /* Initially fill the cluster with the hit in question. */
   cluster.push_back(hit->hit);
-  hitPos = hit->hit->getCrossPoint();
+  hitPos = hit->hit->getGlobalPosition();
   /* Collect other hits. */
   for (it = hits.begin(); it != hits.end(); it++) {
     if (it == hit)
       continue;
     if (it->stat != c_Unknown)
       continue;
-    if (it->hit->getCrossPoint().angle(hitPos) < 0.1) {
+    if (it->hit->getGlobalPosition().angle(hitPos) < 0.1) {
       it->stat = c_Cluster;
       cluster.push_back(it->hit);
     }
@@ -203,7 +203,7 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
       continue;
     de = (*itClust)->getEDep();
     e = e + de;
-    hitPos = hitPos + de * (*itClust)->getCrossPoint();
+    hitPos = hitPos + de * (*itClust)->getGlobalPosition();
   }
   hitPos = hitPos / e;
   /* Set the status of hit. */

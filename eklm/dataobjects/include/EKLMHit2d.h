@@ -25,7 +25,7 @@ namespace Belle2 {
   /**
    * Class for 2d hits handling.
    */
-  class EKLMHit2d : public EKLMHitBase  {
+  class EKLMHit2d : public EKLMHitBase, public EKLMHitGlobalCoord {
 
   public:
 
@@ -59,18 +59,6 @@ namespace Belle2 {
     EKLMDigit* getDigit(int plane) const;
 
     /**
-     * Set coordinates of the crossing point.
-     * @param[in] point Coordinates.
-     */
-    void setCrossPoint(HepGeom::Point3D<double> point);
-
-    /**
-     * Get crossing point.
-     * @return coordinates of the crossing point.
-     */
-    HepGeom::Point3D<double> getCrossPoint() const;
-
-    /**
      * Get strip number (from EKLMDigit).
      * @param[in] plane  Number if plane.
      */
@@ -92,15 +80,6 @@ namespace Belle2 {
 
     /** EKLMdigts used to create this hit. */
     EKLMDigit* m_digit[2];  //! {ROOT streamer directive}
-
-    /** Crossing point global X coordinate */
-    float m_crossPointX;
-
-    /** Crossing point global Y coordinate */
-    float m_crossPointY;
-
-    /** Crossing point global Z coordinate */
-    float m_crossPointZ;
 
     /** Chi^2 of the hit. */
     float m_ChiSq;

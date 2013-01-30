@@ -14,6 +14,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitBase.h>
 #include <eklm/dataobjects/EKLMHitCoord.h>
+#include <eklm/dataobjects/EKLMHitMomentum.h>
 
 namespace Belle2 {
 
@@ -23,54 +24,19 @@ namespace Belle2 {
    * to restore the hit tree and thus another type of hits.
    */
 
-  class EKLMStepHit : public EKLMHitBase, public EKLMHitCoord {
+  class EKLMStepHit : public EKLMHitBase, public EKLMHitCoord,
+    public EKLMHitMomentum {
   public:
 
     /**
-     * Default constructor.
+     * Constructor.
      */
-    EKLMStepHit():
-      EKLMHitBase(),
-      m_momentum(0., 0., 0.),
-      m_trackID(-1),
-      m_parentTrackID(-1),
-      m_volid(0),
-      m_Plane(0),
-      m_Strip(0) {}
+    EKLMStepHit();
 
     /**
-     * Constructor with partial information.
+     * Destructor.
      */
-    EKLMStepHit(
-      const TVector3 momentum,
-      const float E ,
-      const int  trID,
-      const int  ptrID
-    );
-
-    /**
-     * Get energy of the particle.
-     * @return Energy.
-     */
-    float getEnergy() const;
-
-    /**
-     * Set energy of the particle.
-     * @param[in] E Energy.
-     */
-    void setEnergy(float E);
-
-    /**
-     * Get momentum of the particle hit.
-     * @return Momentum.
-     */
-    const TVector3* getMomentum() const;
-
-    /**
-     * Set momentum of the particle hit.
-     * @param[in] momentum Momentum.
-     */
-    void setMomentum(TVector3& momentum) ;
+    ~EKLMStepHit();
 
     /**
      * Get track ID
@@ -120,7 +86,6 @@ namespace Belle2 {
      */
     void setVolumeID(int id);
 
-
     /**
      * Get plane number.
      * @return Plane number.
@@ -146,12 +111,6 @@ namespace Belle2 {
     void setStrip(int Strip);
 
   private:
-
-    /** Energy of particle. */
-    float m_energy;
-
-    /** Momentum of the hit. */
-    TVector3 m_momentum;
 
     /** Track ID. */
     int m_trackID;

@@ -169,7 +169,6 @@ void EKLM::Digitizer::makeSimHits()
         simHit->setPlane(stepHit->getPlane());
         simHit->setStrip(stepHit->getStrip());
         simHit->setMomentum(stepHit->getMomentum());
-        simHit->setEnergy(stepHit->getEnergy());
 
       } else { // entry already exist
         // compare hittime. The leading one has smallest time
@@ -185,8 +184,6 @@ void EKLM::Digitizer::makeSimHits()
           current->second->setTime(stepHit->getTime());
           current->second->setPDG(stepHit->getPDG());
           current->second->setMomentum(stepHit->getMomentum());
-          current->second->setEnergy
-          (stepHit->getEnergy());
         }
       }
     }

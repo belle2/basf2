@@ -91,70 +91,23 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
     return false;
   }
 
-  /**
-   * Get particle information
-   */
-  const G4int PDGcode = track.GetDefinition()->GetPDGEncoding();
-
-
-  /**
-   * Hit position.
-   */
+  /* Hit position. */
   gpos = 0.5 * (aStep->GetPostStepPoint()->GetPosition() +
                 aStep->GetPreStepPoint()->GetPosition());
   lpos = hist->GetHistory()->GetTopTransform().TransformPoint(gpos);
-
-  /**
-   * Get Momentum of the particle
-   */
-  const G4ThreeVector& momentum = track.GetMomentum();
-
-  /**
-   * Get Kinetic energy of the particle
-   */
-  const double E = track.GetKineticEnergy();
-
-  /**
-   * no conversion btw. G4ThreeVector and TVector3 Sad but true
-   */
-  const TVector3  momentumRoot = TVector3(momentum.x(), momentum.y(), momentum.z());
-
-  /**
-   * Get Kinetic energy of the particle
-   */
-  const double Ekin = track.GetKineticEnergy();
-
-  /**
-   * get  track ID
-   */
-  const int trackID = track.GetTrackID();
-
-  /**
-   * get parent track ID
-   */
-  const int paretntTrackID = track.GetParentID();
-
-  /**
-   * creates step hit and store in to DataStore
-   */
+  /* Create step hit and store in to DataStore */
   StoreArray<EKLMStepHit> stepHits;
-  /*
-   * Memory allocation is performed by stepHits->AddrAt(), if necessary.
-   * If it fails, this function would not return.
-   * No further check is needed.
-   */
-  EKLMStepHit* hit = new(stepHits.nextFreeAddress())
-  EKLMStepHit(momentumRoot, E, trackID, paretntTrackID);
+  EKLMStepHit* hit = new(stepHits.nextFreeAddress())EKLMStepHit();
+  hit->setMomentum(CLHEP::HepLorentzVector(track.GetMomentum(),
+                                           track.GetTotalEnergy()));
+  hit->setTrackID(track.GetTrackID());
+  hit->setParentTrackID(track.GetParentID());
   hit->setLocalPosition(lpos * Unit::mm);
   hit->setGlobalPosition(gpos * Unit::mm);
   hit->setEDep(eDep);
-  hit->setPDG(PDGcode);
+  hit->setPDG(track.GetDefinition()->GetPDGEncoding());
   hit->setTime(hitTime);
-  hit->setEnergy(Ekin);
-
-  /**
-   * Get information on mother volumes and store them to the hit.
-   */
+  /** Get information on mother volumes and store them to the hit. */
   switch (m_type) {
     case EKLM_SENSITIVE_STRIP:
       hit->setStrip(hist->GetVolume(2)->GetCopyNo());
@@ -188,11 +141,10 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
                                    hit->getStrip()) + 200000);
       break;
   }
-
+  /* Relation. */
   StoreArray<MCParticle> particles;
   RelationArray particleToStepHits(particles, stepHits);
   particleToStepHits.add(track.GetTrackID(), stepHits.getEntries() - 1);
-
   return true;
 }
 

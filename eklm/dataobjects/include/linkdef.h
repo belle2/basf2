@@ -9,6 +9,7 @@
 #pragma link C++ class Belle2::EKLMHitBase;
 #pragma link C++ class Belle2::EKLMHitCoord;
 #pragma link C++ class Belle2::EKLMHitGlobalCoord;
+#pragma link C++ class Belle2::EKLMHitMomentum;
 
 /* Geant stage. */
 #pragma link C++ class Belle2::EKLMStepHit;

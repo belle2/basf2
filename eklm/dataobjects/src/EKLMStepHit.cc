@@ -16,39 +16,12 @@ using namespace Belle2;
 
 ClassImp(EKLMStepHit);
 
-EKLMStepHit::EKLMStepHit(
-  const TVector3 momentum,
-  const float E ,
-  const int  trID,
-  const int  ptrID
-)
-  :
-  EKLMHitBase()
+EKLMStepHit::EKLMStepHit()
 {
-  m_energy = E;
-  m_momentum = momentum;
-  m_trackID = trID;
-  m_parentTrackID = ptrID;
 }
 
-float EKLMStepHit::getEnergy() const
+EKLMStepHit::~EKLMStepHit()
 {
-  return m_energy;
-}
-
-void EKLMStepHit::setEnergy(float E)
-{
-  m_energy = E;
-}
-
-const TVector3* EKLMStepHit::getMomentum() const
-{
-  return & m_momentum;
-}
-
-void EKLMStepHit::setMomentum(TVector3&    momentum)
-{
-  m_momentum = momentum;
 }
 
 int EKLMStepHit::getTrackID() const

@@ -17,6 +17,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitBase.h>
 #include <eklm/dataobjects/EKLMHitCoord.h>
+#include <eklm/dataobjects/EKLMHitMomentum.h>
 #include <eklm/dataobjects/EKLMStepHit.h>
 
 namespace Belle2 {
@@ -24,7 +25,8 @@ namespace Belle2 {
   /**
    * Class to handle simulation hits.
    */
-  class EKLMSimHit : public EKLMHitBase, public EKLMHitCoord {
+  class EKLMSimHit : public EKLMHitBase, public EKLMHitCoord,
+    public EKLMHitMomentum {
 
   public:
 
@@ -57,36 +59,6 @@ namespace Belle2 {
     void setVolumeID(int id);
 
     /**
-     * Get particle momentum.
-     * @return Momentum.
-     */
-    const TVector3* getMomentum() const;
-
-    /**
-     * Set particle momentum.
-     * @param[in] p Momentum.
-     */
-    void setMomentum(const TVector3& p);
-
-    /**
-     * Set particle momentum.
-     * @param[in] p Momentum.
-     */
-    void  setMomentum(const TVector3* p);
-
-    /**
-     * Get particle energy.
-     * @return Energy.
-     */
-    float getEnergy() const;
-
-    /**
-     * Set particle energy.
-     * @param[in] e Energy.
-     */
-    void setEnergy(float e);
-
-    /**
      * Print hit.
      */
     void Print();
@@ -115,12 +87,6 @@ namespace Belle2 {
     void setStrip(int Strip);
 
   private:
-
-    /** Particle energy. */
-    float m_energy;
-
-    /** Particle momentum. */
-    TVector3 m_momentum;
 
     /** Volume identifier. */
     int m_volid;

@@ -20,20 +20,17 @@ using namespace Belle2;
 
 ClassImp(Belle2::EKLMSimHit)
 
-EKLMSimHit::EKLMSimHit():
-  EKLMHitBase(),
-  m_energy(0.),
-  m_momentum(TVector3(0., 0., 0.)),
-  m_volid(0)
+EKLMSimHit::EKLMSimHit()
 {
+  setMomentum(CLHEP::HepLorentzVector(0, 0, 0, 0));
+  m_volid = 0;
 }
 
 EKLMSimHit::EKLMSimHit(const EKLMStepHit* stepHit)
-  : EKLMHitBase((EKLMHitBase)*stepHit),
-    m_energy(stepHit->getEnergy()),
-    m_momentum(*(stepHit->getMomentum())),
-    m_volid(stepHit->getVolumeID())
+  : EKLMHitBase((EKLMHitBase)*stepHit)
 {
+  setMomentum(stepHit->getMomentum());
+  setVolumeID(stepHit->getVolumeID());
 }
 
 int EKLMSimHit::getVolumeID() const
@@ -44,31 +41,6 @@ int EKLMSimHit::getVolumeID() const
 void EKLMSimHit::setVolumeID(int id)
 {
   m_volid = id;
-}
-
-const TVector3* EKLMSimHit::getMomentum() const
-{
-  return & m_momentum;
-}
-
-void EKLMSimHit::setMomentum(const TVector3& p)
-{
-  m_momentum = p;
-}
-
-void EKLMSimHit::setMomentum(const TVector3* p)
-{
-  m_momentum = *p;
-}
-
-float EKLMSimHit::getEnergy() const
-{
-  return m_energy;
-}
-
-void EKLMSimHit::setEnergy(float e)
-{
-  m_energy = e;
 }
 
 int EKLMSimHit::getPlane() const

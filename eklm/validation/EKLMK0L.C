@@ -13,6 +13,14 @@ void EKLMK0L()
     100, -50, 50);
   TH1F* tres = new TH1F("k0l_tres", "EKLM K0L decay time resolution",
     100, -10., 10.);
+  xres->SetXTitle("cm");
+  xres->SetYTitle("Events");
+  yres->SetXTitle("cm");
+  yres->SetYTitle("Events");
+  zres->SetXTitle("cm");
+  zres->SetYTitle("Events");
+  tres->SetXTitle("ns");
+  tres->SetYTitle("Events");
   int n = tree->GetEntries();
   TClonesArray *k0lArray;
   TClonesArray *mcParticleArray;

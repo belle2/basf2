@@ -69,7 +69,7 @@ double EKLM::GeometryData::getStripLength(int strip)
 
 bool EKLM::GeometryData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
                                       HepGeom::Point3D<double> *cross,
-                                      double* d1, double* d2)
+                                      double* d1, double* d2, double* sd)
 {
   /* Hits must be from the same sector, */
   if (hit1->getEndcap() != hit2->getEndcap())
@@ -126,6 +126,9 @@ bool EKLM::GeometryData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
   *d1 = s1_2g.distance(s1_cg) * Unit::mm;
   *d2 = s2_2g.distance(s2_cg) * Unit::mm;
   *cross = 0.5 * (s1_cg + s2_cg) * Unit::mm;
+  *sd = s1_cg.distance(s2_cg) * Unit::mm;
+  if (s2_cg.mag2() < s1_cg.mag2())
+    *sd = - *sd;
   return true;
 }
 

@@ -27,6 +27,12 @@ void EKLMK0L()
   zres->SetYTitle("Events");
   tres->SetXTitle("ns");
   tres->SetYTitle("Events");
+  pres->SetXTitle("GeV");
+  pres->SetYTitle("Events");
+  ptres->SetXTitle("rad");
+  ptres->SetYTitle("Events");
+  ppres->SetXTitle("rad");
+  ppres->SetYTitle("Events");
   int n = tree->GetEntries();
   TClonesArray *k0lArray;
   TClonesArray *mcParticleArray;

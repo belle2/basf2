@@ -143,7 +143,7 @@ void ECLMCMatchingModule::event()
   StoreArray<ECLDigit> eclDigiArray;
   RelationArray  eclDigiToMCPart(eclDigiArray, mcParticles);
 
-  int hitNum1 = eclDigiArray->GetEntriesFast();
+  int hitNum1 = eclDigiArray.getEntries();
   for (int ii = 0; ii < hitNum1; ii++) {
     ECLDigit* aECLDigi = eclDigiArray[ii];
     float FitEnergy    = (aECLDigi->getAmp()) / 20000.;//ADC count to GeV
@@ -181,8 +181,8 @@ void ECLMCMatchingModule::event()
   MultiMap eclShowerMap;
   eclShowerMap.clear();
 
-  const int ShowerNum = eclRecShowerArray->GetEntriesFast();
-  const int hANum = eclHitAssignmentArray->GetEntriesFast();
+  const int ShowerNum = eclRecShowerArray.getEntries();//->GetEntriesFast();
+  const int hANum = eclHitAssignmentArray.getEntries();//->GetEntriesFast();
   for (int iShower = 0; iShower < ShowerNum; iShower++) {
     ECLShower* aECLShower = eclRecShowerArray[iShower];
     double showerId = aECLShower->getShowerId();

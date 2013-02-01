@@ -96,7 +96,8 @@ void ECLReconstructorModule::event()
   cf.Clear();
 
   //cout<<"Event "<< m_nEvent<<" Total input entries of Digi Array  "<<eclDigiArray->GetEntriesFast()<<endl;
-  int hitNum = eclDigiArray->GetEntriesFast();
+  int hitNum = eclDigiArray.getEntries();
+
   TEclEnergyHit ss;
   for (int ii = 0; ii < hitNum; ii++) {
     ECLDigit* aECLDigi = eclDigiArray[ii];

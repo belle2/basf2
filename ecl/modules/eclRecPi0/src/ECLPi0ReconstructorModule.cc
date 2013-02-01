@@ -39,8 +39,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace Belle2::analysis;
-using namespace Belle2::ECL;
+using namespace ECL;
 //using namespace Belle2::analysis;
 using namespace analysis;
 //-----------------------------------------------------------------
@@ -103,7 +102,7 @@ void ECLPi0ReconstructorModule::event()
     }
   }
 
-  for (int iGamma1 = 0; iGamma1 < Gamma->GetEntriesFast() - 1; iGamma1++) {
+  for (int iGamma1 = 0; iGamma1 < Gamma.getEntries() - 1; iGamma1++) {
     ECLGamma* aECLGamma1 = Gamma[iGamma1];
     double EGamma1 =  aECLGamma1->getEnergy();
     m_showerId1 = aECLGamma1->getShowerId();
@@ -129,7 +128,7 @@ void ECLPi0ReconstructorModule::event()
     */
     CLHEP::Hep3Vector p3Gamma1(m_px1, m_py1, m_pz1);
 
-    for (int iGamma2 = iGamma1 + 1; iGamma2 < Gamma->GetEntriesFast(); iGamma2++) {
+    for (int iGamma2 = iGamma1 + 1; iGamma2 < Gamma.getEntries(); iGamma2++) {
       ECLGamma* aECLGamma2 = Gamma[iGamma2];
       double EGamma2 =  aECLGamma2->getEnergy();
       m_showerId2 = aECLGamma2->getShowerId();

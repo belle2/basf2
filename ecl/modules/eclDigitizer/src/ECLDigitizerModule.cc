@@ -107,7 +107,7 @@ void ECLDigitizerModule::event()
 
   double DeltaT = (24. - gRandom->Uniform(0, 24));
 
-  for (int ii = 0; ii <  eclArray->GetEntriesFast(); ii++) {
+  for (int ii = 0; ii <  eclArray.getEntries(); ii++) {
 
     ECLHit* aECLHit = eclArray[ii];
     // Hit geom. info
@@ -190,9 +190,10 @@ void ECLDigitizerModule::event()
 
   StoreArray<ECLTrig> eclTrigArray;
   if (!eclTrigArray) eclTrigArray.create();
-  m_hitNum2 = eclTrigArray->GetLast() + 1;
-  new(eclTrigArray->AddrAt(m_hitNum2)) ECLTrig();
-//  eclTrigArray[m_hitNum2]->setEventId(m_nEvent);
+  //m_hitNum2 = eclTrigArray->GetLast() + 1;
+  //new(eclTrigArray->AddrAt(m_hitNum2)) ECLTrig();
+  new(eclTrigArray.nextFreeAddress()) ECLTrig();
+  m_hitNum2 = eclTrigArray.getEntries() - 1;
   eclTrigArray[m_hitNum2]->setTimeTrig(DeltaT * 12. / 508.); //t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
 
 

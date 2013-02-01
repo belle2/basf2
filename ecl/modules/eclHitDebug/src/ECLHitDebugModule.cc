@@ -90,13 +90,6 @@ void ECLHitDebugModule::event()
   // Merge the hits in the same cell and save them into ECL signal map.
   //---------------------------------------------------------------------
 
-  // Get number of hits in this event
-  int nHits = eclSimArray->GetEntriesFast();
-
-  //double E_cell[8736][16] = {{0}};
-  //double Tof_ave[8736][16] = {{0}};
-
-
   int const Nbin = 80;
   int const interval = 8000 / Nbin;
   static float E_cell[8736][Nbin];
@@ -109,7 +102,7 @@ void ECLHitDebugModule::event()
   // Get instance of ecl geometry parameters
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
   // Loop over all hits of steps
-  for (int iHits = 0; iHits < nHits; iHits++) {
+  for (int iHits = 0; iHits < eclSimArray.getEntries(); iHits++) {
     // Get a hit
     ECLSimHit* aECLSimHit = eclSimArray[iHits];
 
@@ -145,8 +138,10 @@ void ECLHitDebugModule::event()
         StoreArray<ECLDebugHit> eclHitArray;
         if (!eclHitArray) eclHitArray.create();
 //        cout<<iECLCell<<" "<<E_cell[iECLCell][TimeIndex]<<" "<<Tof_ave[iECLCell][TimeIndex] + T_ave[iECLCell][TimeIndex] <<endl;
-        m_hitNum = eclHitArray->GetLast() + 1;
-        new(eclHitArray->AddrAt(m_hitNum)) ECLDebugHit();
+        //m_hitNum = eclHitArray->GetLast() + 1;
+        //new(eclHitArray->AddrAt(m_hitNum)) ECLDebugHit();
+        new(eclHitArray.nextFreeAddress()) ECLDebugHit();
+        m_hitNum = eclHitArray.getEntries() - 1;
         eclHitArray[m_hitNum]->setCellId(iECLCell + 1);
         eclHitArray[m_hitNum]->setEnergyDep(E_cell[iECLCell][TimeIndex]);
         eclHitArray[m_hitNum]->setTimeAve(Tof_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex]);

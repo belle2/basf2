@@ -102,8 +102,8 @@ void ECLGammaReconstructorModule::event()
     B2DEBUG(100, "ECLHitAssignment in empty in event " << m_nEvent);
   }
 
-  const int hitNum = eclRecShowerArray->GetEntriesFast();
-  const int hANum = eclHitAssignmentArray->GetEntriesFast();
+  const int hitNum = eclRecShowerArray.getEntries();//->GetEntriesFast();
+  const int hANum = eclHitAssignmentArray.getEntries();//->GetEntriesFast();
 
   readExtrapolate();//m_TrackCellId[i] =1 => Extrapolated cell
 

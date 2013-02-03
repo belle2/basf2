@@ -404,23 +404,23 @@ void GenFitterModule::event()
               else B2WARNING("No MCParticle contributed to this track! No GFTrack<->MCParticle relation will be created!");
 
               //Set non-helix parameters
-              tracks[trackCounter]->setFitFailed(true);
-              tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
-              tracks[trackCounter]->setNHits(gfTrack.getNumHits());
-              tracks[trackCounter]->setNCDCHits(nCDC);
-              tracks[trackCounter]->setNSVDHits(nSVD);
-              tracks[trackCounter]->setNPXDHits(nPXD);
-              tracks[trackCounter]->setMCId(aTrackCandPointer->getMcTrackId());
-              tracks[trackCounter]->setPDG(aTrackCandPointer->getPdgCode());
-              //tracks[trackCounter]->setPurity(aTrackCandPointer->getDip()); //setDip will be deleted soon. If purity is used it has to be passed differently to the Track class
-              tracks[trackCounter]->setPValue(pValue);
-              //Set helix parameters
-              tracks[trackCounter]->setD0(-999);
-              tracks[trackCounter]->setPhi(-999);
-              tracks[trackCounter]->setOmega(gfTrack.getCharge());
-              tracks[trackCounter]->setZ0(-999);
-              tracks[trackCounter]->setCotTheta(-999);
-
+              /*              tracks[trackCounter]->setFitFailed(true);
+                            tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
+                            tracks[trackCounter]->setNHits(gfTrack.getNumHits());
+                            tracks[trackCounter]->setNCDCHits(nCDC);
+                            tracks[trackCounter]->setNSVDHits(nSVD);
+                            tracks[trackCounter]->setNPXDHits(nPXD);
+                            tracks[trackCounter]->setMCId(aTrackCandPointer->getMcTrackId());
+                            tracks[trackCounter]->setPDG(aTrackCandPointer->getPdgCode());
+                            //tracks[trackCounter]->setPurity(aTrackCandPointer->getDip()); //setDip will be deleted soon. If purity is used it has to be passed differently to the Track class
+                            tracks[trackCounter]->setPValue(pValue);
+                            //Set helix parameters
+                            tracks[trackCounter]->setD0(-999);
+                            tracks[trackCounter]->setPhi(-999);
+                            tracks[trackCounter]->setOmega(gfTrack.getCharge());
+                            tracks[trackCounter]->setZ0(-999);
+                            tracks[trackCounter]->setCotTheta(-999);
+              */
             }
           } else {            //fit successful
             ++m_successfulFitCounter;
@@ -440,17 +440,18 @@ void GenFitterModule::event()
             else B2WARNING("No MCParticle contributed to this track! No GFTrack<->MCParticle relation will be created!");
 
             //Set non-helix parameters
-            tracks[trackCounter]->setFitFailed(false);
-            tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
-            tracks[trackCounter]->setNHits(gfTrack.getNumHits());
-            tracks[trackCounter]->setNCDCHits(nCDC);
-            tracks[trackCounter]->setNSVDHits(nSVD);
-            tracks[trackCounter]->setNPXDHits(nPXD);
-            tracks[trackCounter]->setMCId(aTrackCandPointer->getMcTrackId());
-            tracks[trackCounter]->setPDG(aTrackCandPointer->getPdgCode());
-            //tracks[trackCounter]->setPurity(aTrackCandPointer->getDip()); //setDip will be deleted soon. If purity is used it has to be passed differently to the Track class
-            tracks[trackCounter]->setPValue(pValue);
-            tracks[trackCounter]->setExtrapFailed(false);
+            /*            tracks[trackCounter]->setFitFailed(false);
+                        tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
+                        tracks[trackCounter]->setNHits(gfTrack.getNumHits());
+                        tracks[trackCounter]->setNCDCHits(nCDC);
+                        tracks[trackCounter]->setNSVDHits(nSVD);
+                        tracks[trackCounter]->setNPXDHits(nPXD);
+                        tracks[trackCounter]->setMCId(aTrackCandPointer->getMcTrackId());
+                        tracks[trackCounter]->setPDG(aTrackCandPointer->getPdgCode());
+                        //tracks[trackCounter]->setPurity(aTrackCandPointer->getDip()); //setDip will be deleted soon. If purity is used it has to be passed differently to the Track class
+                        tracks[trackCounter]->setPValue(pValue);
+                        tracks[trackCounter]->setExtrapFailed(false);
+                        */
 
             //To calculate the correct starting helix parameters, one has to extrapolate the track to its 'start' (here: take point of closest approach to the origin)
 
@@ -478,23 +479,23 @@ void GenFitterModule::event()
               gfTrack.getPosMomCov(plane, resultPosition, resultMomentum, resultCovariance);
 
               // store position
-              tracks[trackCounter]->setPosition(resultPosition);
+//              tracks[trackCounter]->setPosition(resultPosition);
               // store covariance matrix
-              tracks[trackCounter]->setErrorMatrix(resultCovariance);
+//              tracks[trackCounter]->setErrorMatrix(resultCovariance);
 
               //store position errors
               double xErr = sqrt(resultCovariance[0][0]);
               double yErr = sqrt(resultCovariance[1][1]);
               double zErr = sqrt(resultCovariance[2][2]);
               B2DEBUG(99, "Position standard deviation: " << xErr << "  " << yErr << "  " << zErr);
-              tracks[trackCounter]->setVertexErrors(xErr, yErr, zErr);
+//              tracks[trackCounter]->setVertexErrors(xErr, yErr, zErr);
 
               //store momentum errors
               double pxErr = sqrt(resultCovariance[3][3]);
               double pyErr = sqrt(resultCovariance[4][4]);
               double pzErr = sqrt(resultCovariance[5][5]);
               B2DEBUG(99, "Momentum standard deviation: " << pxErr << "  " << pyErr << "  " << pzErr);
-              tracks[trackCounter]->setPErrors(pxErr, pyErr, pzErr);
+//              tracks[trackCounter]->setPErrors(pxErr, pyErr, pzErr);
 
 
               //Now calculate the parameters for helix parametrisation to fill the Track objects
@@ -513,39 +514,39 @@ void GenFitterModule::event()
               double alpha = 1 / (1.5 * 0.00299792458);
 
               //Now set the helix parameters for perigee parametrization
-              tracks[trackCounter]->setD0(d0Sign * sqrt(poca.x() * poca.x() + poca.y() * poca.y()));
-              tracks[trackCounter]->setPhi(phi);
-              tracks[trackCounter]->setOmega((gfTrack.getCharge() / (pt * alpha)));
-              tracks[trackCounter]->setZ0(poca.z());
-              tracks[trackCounter]->setCotTheta(dirInPoca.z() / (sqrt(dirInPoca.x() * dirInPoca.x() + dirInPoca.y() * dirInPoca.y())));
-
+              /*              tracks[trackCounter]->setD0(d0Sign * sqrt(poca.x() * poca.x() + poca.y() * poca.y()));
+                            tracks[trackCounter]->setPhi(phi);
+                            tracks[trackCounter]->setOmega((gfTrack.getCharge() / (pt * alpha)));
+                            tracks[trackCounter]->setZ0(poca.z());
+                            tracks[trackCounter]->setCotTheta(dirInPoca.z() / (sqrt(dirInPoca.x() * dirInPoca.x() + dirInPoca.y() * dirInPoca.y())));
+              */
               //Print helix parameters
-              B2DEBUG(99, ">>>>>>> Helix Parameters <<<<<<<");
-              B2DEBUG(99, "D0: " << std::setprecision(3) << tracks[trackCounter]->getD0() << "  Phi: " << std::setprecision(3) << tracks[trackCounter]->getPhi() << "  Omega: " << std::setprecision(3) << tracks[trackCounter]->getOmega() << "  Z0: " << std::setprecision(3) << tracks[trackCounter]->getZ0() << "  CotTheta: " << std::setprecision(3) << tracks[trackCounter]->getCotTheta());
-              B2DEBUG(99, "<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
-              //Additional check
-              B2DEBUG(99, "Recalculate momentum from perigee: px: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha)) * (cos(tracks[trackCounter]->getPhi())) << "  py: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*sin(tracks[trackCounter]->getPhi()) << "  pz: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*tracks[trackCounter]->getCotTheta());
-              B2DEBUG(99, "<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
-
+              /*              B2DEBUG(99, ">>>>>>> Helix Parameters <<<<<<<");
+                            B2DEBUG(99, "D0: " << std::setprecision(3) << tracks[trackCounter]->getD0() << "  Phi: " << std::setprecision(3) << tracks[trackCounter]->getPhi() << "  Omega: " << std::setprecision(3) << tracks[trackCounter]->getOmega() << "  Z0: " << std::setprecision(3) << tracks[trackCounter]->getZ0() << "  CotTheta: " << std::setprecision(3) << tracks[trackCounter]->getCotTheta());
+                            B2DEBUG(99, "<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
+                            //Additional check
+                            B2DEBUG(99, "Recalculate momentum from perigee: px: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha)) * (cos(tracks[trackCounter]->getPhi())) << "  py: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*sin(tracks[trackCounter]->getPhi()) << "  pz: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*tracks[trackCounter]->getCotTheta());
+                            B2DEBUG(99, "<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
+              */
               if (m_createTextFile) {
                 //Additional code
                 //print helix parameter to a file
                 //useful if one like to quickly plot track trajectories
                 //-------------------------------------
-                HelixParam << tracks[trackCounter]->getD0() << " \t"
-                           << tracks[trackCounter]->getPhi() << " \t"
-                           << tracks[trackCounter]->getOmega() << " \t"
-                           << tracks[trackCounter]->getZ0() << " \t"
-                           << tracks[trackCounter]->getCotTheta() << "\t" << poca.x()
-                           << "\t" << poca.y() << "\t" << poca.z() << endl;
-                //----------------------------------------
-                //end additional code
+                /*                HelixParam << tracks[trackCounter]->getD0() << " \t"
+                                           << tracks[trackCounter]->getPhi() << " \t"
+                                           << tracks[trackCounter]->getOmega() << " \t"
+                                           << tracks[trackCounter]->getZ0() << " \t"
+                                           << tracks[trackCounter]->getCotTheta() << "\t" << poca.x()
+                                           << "\t" << poca.y() << "\t" << poca.z() << endl;
+                                //----------------------------------------
+                  */              //end additional code
               }
             }
 
             catch (...) {
               B2WARNING("Something went wrong during the extrapolation of fit results!");
-              tracks[trackCounter]->setExtrapFailed(true);
+//              tracks[trackCounter]->setExtrapFailed(true);
             }
 
           }// end else for successful fits

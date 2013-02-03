@@ -8,13 +8,13 @@ void ECLMuon()
   TFile* output = TFile::Open("ECLMuon.root", "recreate");
 
   // an example of a 1D histogram
-  TH1F* hShowers = new TH1F("hShowers", "Reconstructed Shower Energy for 1GeV Muon, the typical energy is 0.2 GeV for Muon ", 100, 0., 1.2);
+  TH1F* hShowers = new TH1F("hShowers", "Reconstructed Shower Energy for 1GeV Muon, the typical energy is 0.2 GeV", 100, 0., 1.2);
   hShowers->GetXaxis()->SetTitle("Shower Energy (GeV)");
   tree->Draw("ECLShowers.m_Energy>>hShowers");
   hShowers->Write();
 
   // an example of a 1D histogram
-  TH1F* hGammas = new TH1F("hGammas", "Fake Reconstructed Gamma should be less then 5% for 1000 Muon", 10,0,10);
+  TH1F* hGammas = new TH1F("hGammas", "Fake Reconstructed Gamma from  1000 muons should be less than 5%", 10,0,10);
   hGammas->GetXaxis()->SetTitle("Shower Id");
   tree->Draw("ECLGammas.m_ShowerId>>hGammas");
   hGammas->Write();

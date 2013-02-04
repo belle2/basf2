@@ -6,6 +6,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::Track;
+#pragma link C++ class Belle2::TrackFitResult;
 #pragma link C++ class Belle2::TrackingOutput;
 #pragma link C++ class Belle2::ExtRecoHit;
 #pragma link C++ class Belle2::VXDTFHit;

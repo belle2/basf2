@@ -82,14 +82,17 @@ namespace Belle2 {
      * @return Matrix which from convertion from Error E, Theta, Phi of ECLShower
      */
     void getErrorMatrix(TMatrixFSym& m_errorMatrix) const;
-
-
     //! The method to get return TMatrixT<float>   4 Momentum Error Matrix
     /*! Get  TMatrixT<float>   4 Momentum Error Matrix by reading ECLShower through ShowerId
      * @return Matrix which from convertion from Error E, Theta, Phi of ECLShower
     */
-    //TMatrixT<float> m_errorMatrix;
-    //TMatrixT<float>  getErrorMatrix();
+
+
+    void getErrorMatrix7x7(TMatrixFSym& m_errorMatrix) const;
+    //! The method to get return TMatrixT<float>   4 Momentum Error Matrix
+    /*! Get  TMatrixT<float>   4 Momentum and Vertex Error Matrix by reading ECLShower through ShowerId
+     * @return Matrix which from convertion from Error E, Theta, Phi of ECLShower
+    */
 
 
   private:

@@ -58,6 +58,7 @@
 #include <TGeoNode.h>
 #include <TGeoSphere.h>
 #include <TGeoTube.h>
+#include <TGLLogicalShape.h>
 #include <TParticle.h>
 #include <TMath.h>
 #include <TMatrixT.h>
@@ -75,7 +76,6 @@
 #include <exception>
 #include <iostream>
 
-#include <TGLLogicalShape.h>       // For the member function "SetIgnoreSizeForCameraInterest(kTRUE)"
 
 using namespace Belle2;
 
@@ -88,9 +88,7 @@ EVEVisualization::EVEVisualization():
 {
   setErrScale();
 
-
   TGLLogicalShape::SetIgnoreSizeForCameraInterest(kTRUE);     // Allows the visualization of the "small" error ellipsoid.
-
 
   //create new containers
   m_trackpropagator = new TEveTrackPropagator();
@@ -931,4 +929,30 @@ void EVEVisualization::AddRecGammas(const ECLGamma* RecGamma, const TString& Gam
   m_calo3d -> AddElement(Gamma);
 }
 
+void EVEVisualization::addRecoHit(const SVDCluster* hit, TEveStraightLineSet* lines)
+{
+  static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
 
+  TVector3 a, b;
+  if (hit->isUCluster()) {
+    const float u = hit->getPosition();
+    a = sensor.pointToGlobal(TVector3(sensor.getBackwardWidth() / sensor.getWidth(0) * u, -0.5 * sensor.getLength(), 0.0));
+    b = sensor.pointToGlobal(TVector3(sensor.getForwardWidth() / sensor.getWidth(0) * u, +0.5 * sensor.getLength(), 0.0));
+  } else {
+    const float v = hit->getPosition();
+    a = sensor.pointToGlobal(TVector3(-0.5 * sensor.getWidth(v), v, 0.0));
+    b = sensor.pointToGlobal(TVector3(+0.5 * sensor.getWidth(v), v, 0.0));
+  }
+
+  lines->AddLine(a.x(), a.y(), a.z(), b.x(), b.y(), b.z());
+}
+
+void EVEVisualization::addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines)
+{
+  static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
+  const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
+  const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
+
+  lines->AddLine(wire_pos_f.x(), wire_pos_f.y(), wire_pos_f.z(), wire_pos_b.x(), wire_pos_b.y(), wire_pos_b.z());
+}

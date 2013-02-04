@@ -1,9 +1,6 @@
 #ifndef EVEVISUALIZATION_H
 #define EVEVISUALIZATION_H
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Const.h>
-
 #include <generators/dataobjects/MCParticle.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <cdc/dataobjects/CDCSimHit.h>
@@ -16,10 +13,15 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMStepHit.h>
+#include <ecl/dataobjects/ECLGamma.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <vxd/geometry/GeoCache.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
+
+#include <GFRaveVertex.h>
 #include <GFTrack.h>
 #include <GFTrackCand.h>
 
@@ -35,10 +37,6 @@
 #include <vector>
 
 
-#include <GFRaveVertex.h>   // For the visualization of the vertices and their error matrices. 
-#include <ecl/dataobjects/ECLGamma.h>  // For the visualization of the reconstructed photons.
-
-
 class TEveBox;
 class TEveCaloDataVec;
 class TEveElementList;
@@ -49,7 +47,7 @@ namespace Belle2 {
 
   /** Produces visualisation for MCParticles, simhits, GFTracks, geometry and other things.
    *
-   * Basically this creates TEve objects from the given data, and adds them to the global
+   * Creates TEve objects from the given data, and adds them to the global
    * or event scene.
    *
    *  @sa DisplayModule
@@ -189,7 +187,7 @@ namespace Belle2 {
     /** Object for the energy bar visualisation. */
     TEveCalo3D* m_calo3d;
 
-    /** @brief Create a box around o, orientet along u and v with widths ud, vd and depth and
+    /** @brief Create a box around o, oriented along u and v with widths ud, vd and depth and
      *  return a pointer to the box object.
      */
     TEveBox* boxCreator(const TVector3& o, TVector3 u, TVector3 v, float ud, float vd, float depth);
@@ -214,33 +212,10 @@ namespace Belle2 {
     }
 
     /** specialisation for SVDCluster */
-    void addRecoHit(const SVDCluster* hit, TEveStraightLineSet* lines) {
-      static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-
-      const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
-
-      TVector3 a, b;
-      if (hit->isUCluster()) {
-        const float u = hit->getPosition();
-        a = sensor.pointToGlobal(TVector3(sensor.getBackwardWidth() / sensor.getWidth(0) * u, -0.5 * sensor.getLength(), 0.0));
-        b = sensor.pointToGlobal(TVector3(sensor.getForwardWidth() / sensor.getWidth(0) * u, +0.5 * sensor.getLength(), 0.0));
-      } else {
-        const float v = hit->getPosition();
-        a = sensor.pointToGlobal(TVector3(-0.5 * sensor.getWidth(v), v, 0.0));
-        b = sensor.pointToGlobal(TVector3(+0.5 * sensor.getWidth(v), v, 0.0));
-      }
-
-      lines->AddLine(a.x(), a.y(), a.z(), b.x(), b.y(), b.z());
-    }
+    void addRecoHit(const SVDCluster* hit, TEveStraightLineSet* lines);
 
     /** specialisation for CDCHit. */
-    void addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines) {
-      static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
-      const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
-      const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
-
-      lines->AddLine(wire_pos_f.x(), wire_pos_f.y(), wire_pos_f.z(), wire_pos_b.x(), wire_pos_b.y(), wire_pos_b.z());
-    }
+    void addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines);
 
     /** Rescale PXD/SVD errors with this factor to ensure visibility. */
     double m_errorScale;

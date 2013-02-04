@@ -11,8 +11,10 @@
 #ifndef CONST_H
 #define CONST_H
 
-#include <TDatabasePDG.h>
 #include <vector>
+
+class TDatabasePDG;
+class TParticlePDG;
 
 namespace Belle2 {
 
@@ -271,9 +273,16 @@ namespace Belle2 {
     /**
      * Helper class for loading the particle properties from EvtGen.
      */
-    class EvtGenDatabasePDG: public TDatabasePDG {
+    class EvtGenDatabasePDG {
     public:
       static TDatabasePDG* instance();  /**< Instance method that loads the EvtGen table. */
+    private:
+      /**
+       * @{
+       * no instances allowed.
+       */
+      EvtGenDatabasePDG();
+      /** @} */
     };
   };
 

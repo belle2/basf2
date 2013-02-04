@@ -16,7 +16,10 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+
 #include <TMath.h>
+#include <TDatabasePDG.h>
+#include <TParticlePDG.h>
 
 #include <algorithm>
 
@@ -241,10 +244,12 @@ const double Const::eMobilitySi    = 1415 * Unit::cm2 / Unit::V / Unit::s;
 
 TDatabasePDG* Const::EvtGenDatabasePDG::instance()
 {
-  if (!fgInstance) {
+  static bool instanceCreated = false;
+  if (!instanceCreated) {
     std::string fileName = std::getenv("BELLE2_EXTERNALS_DIR");
     fileName += "/share/evtgen/evt.pdl";
     TDatabasePDG::Instance()->ReadEvtGenTable(fileName.c_str());
+    instanceCreated = true;
   }
   return TDatabasePDG::Instance();
 }

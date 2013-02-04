@@ -2,12 +2,13 @@
 
 #include <display/modules/display/DisplayUI.h>
 #include <display/modules/display/EVEVisualization.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <geometry/GeometryManager.h>
 #include <vxd/geometry/GeoCache.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationIndex.h>
 
 #include <GFTrack.h>
 #include <GFFieldManager.h>
@@ -18,7 +19,7 @@
 #include "TEveManager.h"
 #include "TSystem.h"
 
-#include "GFRaveVertex.h"  // gfrave has to be added into the SConscript!
+#include "GFRaveVertex.h"
 #include "ecl/dataobjects/ECLGamma.h"
 
 using namespace Belle2;
@@ -79,6 +80,7 @@ void DisplayModule::initialize()
   m_visualizer->addGeometry();
 }
 
+
 void DisplayModule::event()
 {
   if (!gEve) {
@@ -94,27 +96,27 @@ void DisplayModule::event()
   }
 
 
-  //gather simhits
-
+  //gather MC particles
   StoreArray<MCParticle> mcparticles;
   if (m_showAllPrimaries or m_showCharged or m_showNeutrals) {
     for (int i = 0; i < mcparticles.getEntries(); i++) {
-      if ((m_showAllPrimaries and mcparticles[i]->hasStatus(MCParticle::c_PrimaryParticle))
-          or(m_showCharged and TMath::Nint(mcparticles[i]->getCharge()) != 0)
-          or(m_showNeutrals and TMath::Nint(mcparticles[i]->getCharge()) == 0)) {
-        switch (abs(mcparticles[i]->getPDG())) {
+      const MCParticle* part = mcparticles[i];
+      if ((m_showAllPrimaries and part->hasStatus(MCParticle::c_PrimaryParticle))
+          or(m_showCharged and TMath::Nint(part->getCharge()) != 0)
+          or(m_showNeutrals and TMath::Nint(part->getCharge()) == 0)) {
+        switch (abs(part->getPDG())) {
           case 11:
           case 13:
           case 22:
           case 211:
           case 321:
           case 2212:
-            m_visualizer->addMCParticle(mcparticles[i]);
+            m_visualizer->addMCParticle(part);
             break;
           default:
-            if (mcparticles[i]->hasStatus(MCParticle::c_PrimaryParticle)) {
+            if (part->hasStatus(MCParticle::c_PrimaryParticle)) {
               //only show odd things if they're primary...
-              m_visualizer->addMCParticle(mcparticles[i]);
+              m_visualizer->addMCParticle(part);
             }
             break;
         }
@@ -122,44 +124,15 @@ void DisplayModule::event()
     }
   }
 
-  StoreArray<CDCSimHit> cdcsimhits;
-  RelationIndex<MCParticle, CDCSimHit> mcpart_to_cdchits(mcparticles, cdcsimhits);
-  const int nCDCHits = cdcsimhits.getEntries();
-  for (int i = 0; i < nCDCHits; i++) {
-    const RelationIndexContainer<MCParticle, CDCSimHit>::Element* el = mcpart_to_cdchits.getFirstElementTo(cdcsimhits[i]);
-    if (!el) {
-      B2WARNING("MCParticle not found for CDCSimHit, skipping hit!");
-      continue;
-    }
+  //gather simhits
+  m_visualizer->addSimHits(StoreArray<CDCSimHit>());
+  m_visualizer->addSimHits(StoreArray<PXDSimHit>());
+  m_visualizer->addSimHits(StoreArray<SVDSimHit>());
+  m_visualizer->addSimHits(StoreArray<ECLHit>());
 
-    m_visualizer->addSimHit(cdcsimhits[i], el->from);
-  }
-
-  StoreArray<PXDSimHit> pxdsimhits;
-  RelationIndex<MCParticle, PXDSimHit> mcpart_to_pxdhits(mcparticles, pxdsimhits);
-  const int nPXDHits = pxdsimhits.getEntries();
-  for (int i = 0; i < nPXDHits; i++) {
-    const RelationIndexContainer<MCParticle, PXDSimHit>::Element* el = mcpart_to_pxdhits.getFirstElementTo(pxdsimhits[i]);
-    if (!el) {
-      B2WARNING("MCParticle not found for PXDSimHit, skipping hit!");
-      continue;
-    }
-
-    m_visualizer->addSimHit(pxdsimhits[i], el->from);
-  }
-
-  StoreArray<SVDSimHit> svdsimhits;
-  RelationIndex<MCParticle, SVDSimHit> mcpart_to_svdhits(mcparticles, svdsimhits);
-  const int nSVDHits = svdsimhits.getEntries();
-  for (int i = 0; i < nSVDHits; i++) {
-    const RelationIndexContainer<MCParticle, SVDSimHit>::Element* el = mcpart_to_svdhits.getFirstElementTo(svdsimhits[i]);
-    if (!el) {
-      B2WARNING("MCParticle not found for SVDSimHit, skipping hit!");
-      continue;
-    }
-
-    m_visualizer->addSimHit(svdsimhits[i], el->from);
-  }
+  //aw, not derived from RelationsObject/SimHitBase yet
+  //addSimHits(m_visualizer, StoreArray<BKLMSimHit>());
+  //addSimHits(m_visualizer, StoreArray<EKLMStepHit>());
 
   StoreArray<BKLMSimHit> bklmhits;
   RelationIndex<MCParticle, BKLMSimHit> mcpart_to_bklmhits(mcparticles, bklmhits);
@@ -187,18 +160,6 @@ void DisplayModule::event()
     m_visualizer->addSimHit(eklmhits[i], el->from);
   }
 
-  StoreArray<ECLHit> eclhits;
-  RelationIndex<MCParticle, ECLHit> mcpart_to_eclhits(mcparticles, eclhits);
-  const int nECLHits = eclhits.getEntries();
-  for (int i = 0; i < nECLHits; i++) {
-    const RelationIndexContainer<MCParticle, ECLHit>::Element* el = mcpart_to_eclhits.getFirstElementTo(eclhits[i]);
-    if (!el) {
-      B2WARNING("MCParticle not found for ECLHit, skipping hit!");
-      continue;
-    }
-    m_visualizer->addECLHit(eclhits[i], el->from);
-  }
-
 
   if (m_showGFTracks) {
     //gather reconstructed tracks
@@ -211,50 +172,34 @@ void DisplayModule::event()
   if (m_showGFTrackCands) {
     StoreArray<GFTrackCand> gftrackcands;
     const int nCands = gftrackcands.getEntries();
-    if (m_useClusters) {
-      //use PXDClusters, SVDClusters instead of TrueHits
-      StoreArray<PXDCluster> pxdhits;
-      StoreArray<SVDCluster> svdhits;
-      StoreArray<CDCHit> cdchits;
-      for (int i = 0; i < nCands; i++)
-        m_visualizer->addTrackCandidate<PXDCluster, SVDCluster>(gftrackcands[i], TString::Format("GFTrackCand %d", i), pxdhits, svdhits, cdchits);
-
-    } else {
-      StoreArray<PXDTrueHit> pxdhits;
-      StoreArray<SVDTrueHit> svdhits;
-      StoreArray<CDCHit> cdchits;
-      for (int i = 0; i < nCands; i++)
-        m_visualizer->addTrackCandidate<PXDTrueHit, SVDTrueHit>(gftrackcands[i], TString::Format("GFTrackCand %d", i), pxdhits, svdhits, cdchits);
+    for (int i = 0; i < nCands; i++) {
+      if (m_useClusters) {
+        m_visualizer->addTrackCandidate(gftrackcands[i], TString::Format("GFTrackCand %d", i),
+                                        StoreArray<PXDCluster>(), StoreArray<SVDCluster>(), StoreArray<CDCHit>());
+      } else {
+        m_visualizer->addTrackCandidate(gftrackcands[i], TString::Format("GFTrackCand %d", i),
+                                        StoreArray<PXDTrueHit>(), StoreArray<SVDTrueHit>(), StoreArray<CDCHit>());
+      }
     }
   }
 
   m_visualizer->makeTracks();
 
 
-
-//Modified the displaymodule.cc by adding this section, recompile and use the GFRaveVertex.py to see the difference.
-  StoreArray<GFRaveVertex> Vertices; //This module fetches the data of "Vertices" at the StoreArray of the root file produced after the calling the the python file.
-  const int nVertices = Vertices.getEntries();  // Vertices is an object of the StoreArray class, pointing to GFRaveVertex objects in the data store.
+  StoreArray<GFRaveVertex> Vertices;
+  const int nVertices = Vertices.getEntries();
   for (int i = 0; i < nVertices; i++) {
-    B2INFO("Distance from center" <<  Vertices[i]->getPos().Mag());
-    m_visualizer->AddVertexEllip(*Vertices[i], TString::Format("Vertex %d", i), TString::Format("VertexCovarianceEllipsoid %d", i));
-    //.getEntries() and [] are public methods of the StoreArray class, -> is overloaded in the StoreArray or DataStore class.
-  }  // m_visualizer is a pointer defined in the DisplayModule.h, m_visualizter->...(...[i]) completes the data passing, by giving the selected
-  //objects (...[i]) directly to the arguments of the "drawing" methods of the EVEVisualization class.
-
-
-  StoreArray<ECLGamma> RecGammas;   // Fetches and passes the data of reconstructed photons(ECLGamma objects) to the related drawing method.
-  const int nRecGammas = RecGammas.getEntries();
-  for (int i = 0; i < nRecGammas; i++) {
-
-    m_visualizer->AddRecGammas(RecGammas[i], TString::Format("ECL_Gamma %d", i));  //RecGammas[i] points to each slot of ECLGamma object.
+    //B2INFO("Distance from center" <<  Vertices[i]->getPos().Mag());
+    m_visualizer->AddVertexEllip(*(Vertices[i]), TString::Format("Vertex %d", i), TString::Format("VertexCovarianceEllipsoid %d", i));
   }
 
 
+  StoreArray<ECLGamma> RecGammas;
+  const int nRecGammas = RecGammas.getEntries();
+  for (int i = 0; i < nRecGammas; i++) {
+    m_visualizer->AddRecGammas(RecGammas[i], TString::Format("ECL_Gamma %d", i));  //RecGammas[i] points to each slot of ECLGamma object.
+  }
 
-
-
-  // data fetching and passing should be before the following "cleaning up".
 
   bool reshow = m_display->startDisplay();
   m_visualizer->clearEvent(); //clean up internal state of visualiser
@@ -263,11 +208,7 @@ void DisplayModule::event()
   //reprocess current event (maybe some options changed)
   if (reshow)
     event();
-
-
-
-
-}  // everything should be inside of this "event()" function!
+}
 
 
 void DisplayModule::terminate()

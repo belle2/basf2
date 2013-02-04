@@ -681,7 +681,7 @@ void EVEVisualization::addSimHit(const TVector3& v, const MCParticle* particle)
   simhits->SetNextPoint(v.x(), v.y(), v.z());
 }
 
-void EVEVisualization::addECLHit(const ECLHit* hit, const MCParticle* particle)
+void EVEVisualization::addSimHit(const ECLHit* hit, const MCParticle* particle)
 {
   addMCParticle(particle);
 

@@ -1,8 +1,8 @@
 #ifndef EVEVISUALIZATION_H
 #define EVEVISUALIZATION_H
 
-#include <generators/dataobjects/MCParticle.h>
 #include <geometry/bfieldmap/BFieldMap.h>
+#include <generators/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
@@ -101,6 +101,21 @@ namespace Belle2 {
     template<class PXDType, class SVDType> void addTrackCandidate(const GFTrackCand* trackCand, const TString& label,
         const StoreArray<PXDType> &pxdhits, const StoreArray<SVDType> &svdhits, const StoreArray<CDCHit> &cdchits);
 
+    /** Add all entries in the given 'hits' array (and the corresponding MCParticles) to the event scene. */
+    template <class T> void addSimHits(const StoreArray<T>& hits) {
+      const int numHits = hits.getEntries();
+      for (int i = 0; i < numHits; i++) {
+        const RelationsObject* rel = static_cast<RelationsObject*>(hits[i]);
+        const MCParticle* mcpart = rel->getRelatedFrom<MCParticle>();
+        if (!mcpart) {
+          B2WARNING("MCParticle not found for " << hits.getName() << "[" << i << "], skipping hit!");
+          continue;
+        }
+
+        addSimHit(hits[i], mcpart);
+      }
+    }
+
     /** Add a CDCSimHit. */
     void addSimHit(const CDCSimHit* hit, const MCParticle* particle);
 
@@ -120,7 +135,7 @@ namespace Belle2 {
     void addSimHit(const TVector3& v, const MCParticle* particle);
 
     /** Add a ECL hit. */
-    void addECLHit(const ECLHit* hit, const MCParticle* particle);
+    void addSimHit(const ECLHit* hit, const MCParticle* particle);
 
     /** Return MCTrack for given particle, add it if it doesn't exist yet. */
     MCTrack& addMCParticle(const MCParticle* particle);

@@ -14,7 +14,8 @@
 #include <framework/logging/LogConfig.h>
 
 #include <string>
-#include <ostream>
+#include <iosfwd>
+
 
 namespace Belle2 {
 
@@ -40,9 +41,9 @@ namespace Belle2 {
                const std::string& function, const std::string& file, unsigned int line);
 
     /**
-     * Compares two message.
+     * Compares two messages.
      *
-     * @return Returns true if the message contents are equal.
+     * @return true if the message contents are equal.
      */
     bool operator==(const LogMessage& message) const;
 
@@ -92,13 +93,11 @@ namespace Belle2 {
 
   };
 
-
 } // end namespace Belle2
 
 /**
  * Operator to print a log message.
  */
 extern std::ostream& operator<< (std::ostream& out, const Belle2::LogMessage& logMessage);
-
 
 #endif /* LOGMESSAGE_H_ */

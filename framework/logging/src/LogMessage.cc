@@ -13,6 +13,8 @@
 #include <framework/core/utilities.h>
 #include <framework/pcore/ProcHandler.h>
 
+#include <ostream>
+
 using namespace std;
 using namespace Belle2;
 

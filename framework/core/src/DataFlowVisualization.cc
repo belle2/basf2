@@ -2,6 +2,8 @@
 
 #include <framework/core/ModuleManager.h>
 
+#include <fstream>
+
 
 using namespace Belle2;
 

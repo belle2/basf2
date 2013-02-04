@@ -14,7 +14,6 @@
 #include <framework/logging/Logger.h>
 
 #include <dlfcn.h>
-#include <iostream>
 #include <fstream>
 #include <boost/regex.hpp>
 

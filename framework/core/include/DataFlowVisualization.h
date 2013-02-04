@@ -4,7 +4,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
 
-#include <fstream>
+#include <iosfwd>
 
 namespace Belle2 {
   /** class to visualize data flow between modules. */

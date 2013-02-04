@@ -1,6 +1,8 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+#include <TParticlePDG.h>
+
 #include <gtest/gtest.h>
 #include <math.h>
 
@@ -23,14 +25,14 @@ namespace Belle2 {
 
     const Const::ParticleSet set = Const::chargedStable;
     Const::ParticleType prefix = set.begin();
-    EXPECT_EQ(1, (++prefix).index());
+    EXPECT_EQ(1, (++prefix).getIndex());
     Const::ParticleType postfix = set.begin();
-    EXPECT_EQ(0, (postfix++).index());
+    EXPECT_EQ(0, (postfix++).getIndex());
 
     int size = 0;
     for (Const::ParticleType pdgIter = set.begin(); pdgIter != set.end(); ++pdgIter) {
-      int pdg = pdgIter.pdgCode();
-      unsigned int index = pdgIter.index();
+      int pdg = pdgIter.getPDGCode();
+      unsigned int index = pdgIter.getIndex();
 
       switch (index) {
         case 0:
@@ -57,11 +59,11 @@ namespace Belle2 {
 
     Const::ChargedStable c = Const::ChargedStable::proton;
     EXPECT_TRUE(Const::chargedStable.contains(c));
-    EXPECT_EQ(2, c.index());
+    EXPECT_EQ(2, c.getIndex());
     ++c;
     ++c;
-    EXPECT_EQ(4, c.index());
-    EXPECT_EQ(13, c.pdgCode());
+    EXPECT_EQ(4, c.getIndex());
+    EXPECT_EQ(13, c.getPDGCode());
   }
 
   /** Check combination of ParticleSets. */
@@ -93,13 +95,13 @@ namespace Belle2 {
   /** Check TDatabasePDG lookups. */
   TEST_F(ConstTest, TDatabasePDG)
   {
-    EXPECT_DOUBLE_EQ(Const::Klong.particlePDG()->Charge(), 0);
-    EXPECT_EQ(Const::Klong.particlePDG()->PdgCode(), 130);
+    EXPECT_DOUBLE_EQ(Const::Klong.getParticlePDG()->Charge(), 0);
+    EXPECT_EQ(Const::Klong.getParticlePDG()->PdgCode(), 130);
 
-    EXPECT_DOUBLE_EQ(Const::proton.particlePDG()->Charge(), 3);
-    EXPECT_EQ(Const::proton.particlePDG()->PdgCode(), 2212);
+    EXPECT_DOUBLE_EQ(Const::proton.getParticlePDG()->Charge(), 3);
+    EXPECT_EQ(Const::proton.getParticlePDG()->PdgCode(), 2212);
 
-    EXPECT_TRUE(Const::invalidParticle.particlePDG() == NULL);
+    EXPECT_TRUE(Const::invalidParticle.getParticlePDG() == NULL);
   }
 
 }  // namespace

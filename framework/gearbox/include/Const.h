@@ -90,31 +90,42 @@ namespace Belle2 {
        */
       ParticleType operator++(int);
 
-      /** This particle's index in the associated set. */
-      unsigned int index() const { return m_index; }
-
       /**
        * Conversion of ParticleType to ParticleSet.
        */
       operator ParticleSet() const { ParticleSet s; s.add(*this); return s; }
 
+      /** This particle's index in the associated set. */
+      unsigned int getIndex() const { return m_index; }
+
       /**
        * Accessor for ROOT TParticlePDG object.
        * @return The TParticlePDG object for this type of particle.
        */
-      const TParticlePDG* particlePDG() const;
+      const TParticlePDG* getParticlePDG() const;
 
       /**
        * PDG code.
        * @return The PDG code of the particle.
        */
-      int pdgCode() const {return m_pdgCode;};
+      int getPDGCode() const {return m_pdgCode;};
 
       /**
        * Particle mass.
        * @return The mass of the particle.
        */
-      double mass() const;
+      double getMass() const;
+
+
+      //Deprecated, remove soonish
+      /** This particle's index in the associated set. */
+      unsigned int index() const __attribute__((deprecated)) { return getIndex(); }
+
+      /**
+       * PDG code.
+       * @return The PDG code of the particle.
+       */
+      int pdgCode() const __attribute__((deprecated)) {return getPDGCode();};
 
     private:
       int m_pdgCode;  /**< PDG code of the particle **/
@@ -130,7 +141,7 @@ namespace Belle2 {
         B2INFO("index -> PDG code");
         const Const::ParticleSet set = Const::chargedStable;
         for(Const::ParticleType pdgIter = set.begin(); pdgIter != set.end(); ++pdgIter) {
-          B2INFO(pdgIter.index() << " -> " << pdgIter.pdgCode());
+          B2INFO(pdgIter.getIndex() << " -> " << pdgIter.getPDGCode());
         }
         \endcode
      *
@@ -185,8 +196,8 @@ namespace Belle2 {
       /** Returns particle in set with given PDG code, or invalidParticle if not found. */
       const ParticleType& find(int pdg) const {
         for (ParticleType pdgIter = begin(); pdgIter != end(); ++pdgIter)
-          if (pdgIter.pdgCode() == pdg)
-            return m_particles[pdgIter.index()];
+          if (pdgIter.getPDGCode() == pdg)
+            return m_particles[pdgIter.getIndex()];
 
         return invalidParticle;
       }

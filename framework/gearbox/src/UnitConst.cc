@@ -156,7 +156,7 @@ Const::ParticleType& Const::ParticleType::operator++()
   if (!m_set) {
     *this = invalidParticle;
   } else {
-    m_pdgCode = m_set->at(++m_index).pdgCode();
+    m_pdgCode = m_set->at(++m_index).getPDGCode();
   }
 
   return *this;
@@ -169,14 +169,14 @@ Const::ParticleType Const::ParticleType::operator++(int)
   return p;
 }
 
-const TParticlePDG* Const::ParticleType::particlePDG() const
+const TParticlePDG* Const::ParticleType::getParticlePDG() const
 {
   return EvtGenDatabasePDG::instance()->GetParticle(m_pdgCode);
 }
 
-double Const::ParticleType::mass() const
+double Const::ParticleType::getMass() const
 {
-  return particlePDG()->Mass();
+  return getParticlePDG()->Mass();
 }
 
 const Const::ParticleType Const::electron = Const::ParticleType(11);
@@ -191,20 +191,20 @@ const Const::ParticleType Const::Kshort = Const::ParticleType(310);
 const Const::ParticleType Const::Klong = Const::ParticleType(130);
 const Const::ParticleType Const::invalidParticle = Const::ParticleType(9900000);
 
-const double Const::electronMass = Const::electron.mass();
-const double Const::muonMass = Const::muon.mass();
-const double Const::pionMass = Const::pion.mass();
-const double Const::kaonMass = Const::kaon.mass();
-const double Const::protonMass = Const::proton.mass();
-const double Const::pi0Mass = Const::pi0.mass();
-const double Const::neutronMass = Const::neutron.mass();
-const double Const::K0Mass = Const::Kshort.mass();
+const double Const::electronMass = Const::electron.getMass();
+const double Const::muonMass = Const::muon.getMass();
+const double Const::pionMass = Const::pion.getMass();
+const double Const::kaonMass = Const::kaon.getMass();
+const double Const::protonMass = Const::proton.getMass();
+const double Const::pi0Mass = Const::pi0.getMass();
+const double Const::neutronMass = Const::neutron.getMass();
+const double Const::K0Mass = Const::Kshort.getMass();
 
 void Const::ParticleSet::add(const Const::ParticleType& p)
 {
   if (contains(p))
     return;
-  m_particles.push_back(Const::ParticleType(p.pdgCode(), this, m_particles.size()));
+  m_particles.push_back(Const::ParticleType(p.getPDGCode(), this, m_particles.size()));
 }
 
 bool Const::ParticleSet::contains(const Const::ParticleType& p) const

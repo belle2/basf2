@@ -65,13 +65,25 @@ namespace Belle2 {
       std::string name;        /**< Name of the entry. Equal to the key in the map. **/
     };
 
-    /** Stores information on inputs/outputs of a module, as obtained by require()/createEntry(); */
+    /** Stores information on inputs/outputs of a module, as obtained by require()/optionalInput()/createEntry(); */
     struct ModuleInfo {
-      std::set<std::string> inputs; /**< required input objects/arrays*/
-      std::set<std::string> inputRelations; /**< required input relations */
-      std::set<std::string> outputs;/**< output objects/arrays */
-      std::set<std::string> outputRelations;/**< ouput relations. */
+      enum EEntryType {
+        c_Input, /**< required input. */
+        c_OptionalInput, /**< optional input. */
+        c_Output, /**< registered output. */
 
+        c_NEntryTypes /**< size of this enum. */
+      };
+      std::set<std::string> entries[c_NEntryTypes]; /**< objects/arrays. */
+      std::set<std::string> relations[c_NEntryTypes]; /**< relations between them. */
+
+      /** Adds given entry/relation. */
+      void addEntry(const std::string& name, EEntryType type, bool isRelation) {
+        if (isRelation)
+          relations[type].insert(name);
+        else
+          entries[type].insert(name);
+      }
     };
 
     // Convenient typedefs.
@@ -104,7 +116,7 @@ namespace Belle2 {
 
     /** Return the storage name for an object of the given type and name. */
     template<class T> static const std::string objectName(const std::string& name) {
-      return ((name == "") ? defaultObjectName<T>() : name);
+      return ((name.empty()) ? defaultObjectName<T>() : name);
     }
 
     /** Return the default storage name for an given class name. */
@@ -119,7 +131,7 @@ namespace Belle2 {
 
     /** Return the storage name for an object of the given type and name. */
     template<class T> static const std::string arrayName(const std::string& name) {
-      return ((name == "") ? defaultArrayName<T>() : name);
+      return ((name.empty()) ? defaultArrayName<T>() : name);
     }
 
     /** Return the default storage name for a relation between the given types. */
@@ -129,7 +141,7 @@ namespace Belle2 {
 
     /** Return the storage name for a relation with given name between the given types. */
     template<class FROM, class TO> static const std::string relationName(const std::string& name) {
-      return ((name == "") ? defaultArrayName<FROM, TO>() : name);
+      return ((name.empty()) ? defaultArrayName<FROM, TO>() : name);
     }
 
     /** Return storage name for a relation between two arrays of the given names. */
@@ -159,7 +171,7 @@ namespace Belle2 {
      *
      *  If the map of requested durability already contains an object under the key name with a DIFFERENT type
      *  than the given type one, an error will be reported. <br>
-     *  @param name       Name under which you want to save the object in the DataStore.
+     *  @param name       Name under which the object is saved in the DataStore.
      *  @param durability Decide with which durability map you want to perform the requested action.
      *  @param objClass   The class of the object.
      *  @param array      Whether it is a TClonesArray or not.
@@ -170,7 +182,7 @@ namespace Belle2 {
 
     /** Produce ERROR message if no entry of the given type is registered in the DataStore.
      *
-     *  @param name       Name under which you want to save the object in the DataStore.
+     *  @param name       Name under which the object is saved in the DataStore.
      *  @param durability Decide with which durability map you want to perform the requested action.
      *  @param objClass   The class of the object.
      *  @param array      Whether it is a TClonesArray or not.
@@ -179,11 +191,24 @@ namespace Belle2 {
     bool require(const std::string& name, EDurability durability,
                  const TClass* objClass, bool array);
 
+    /** Register the given object/array as an optional input.
+     *
+     *  Mainly useful for creating diagrams of module inputs and outputs.
+     *
+     *  @param name       Name under which the object is saved in the DataStore.
+     *  @param durability Decide with which durability map you want to perform the requested action.
+     *  @param objClass   The class of the object.
+     *  @param array      Whether it is a TClonesArray or not.
+     *  @return           True if the requested object exists.
+     */
+    bool optionalInput(const std::string& name, EDurability durability,
+                       const TClass* objClass, bool array);
+
     /** Get a pointer to a pointer of an object in the DataStore.
      *
      *  If the map of requested durability already contains an object under the key name with a DIFFERENT type
      *  than the given type one, an error will be reported. <br>
-     *  @param name       Name under which you want to save the object in the DataStore.
+     *  @param name       Name under which the object is saved in the DataStore.
      *  @param durability Decide with which durability map you want to perform the requested action.
      *  @param objClass   The class of the object.
      *  @param array      Whether it is a TClonesArray or not.
@@ -455,7 +480,7 @@ namespace Belle2 {
      */
     void setModule(const std::string& name) { m_currentModule = name; }
 
-    /** return information on inputs/outputs of each module, as obtained by require()/createEntry(); */
+    /** return information on inputs/outputs of each module, as obtained by require()/optionalInput()/createEntry(); */
     const std::map<std::string, ModuleInfo>& getModuleInfoMap() const { return m_moduleInfo; }
 
 
@@ -501,7 +526,7 @@ namespace Belle2 {
     /** Stores the current module, used to fill m_moduleInfo. */
     std::string m_currentModule;
 
-    /** Stores information on inputs/outputs of each module, as obtained by require()/createEntry(); */
+    /** Stores information on inputs/outputs of each module, as obtained by require()/optionalInput()/createEntry(); */
     std::map<std::string, ModuleInfo> m_moduleInfo;
   };
 } // namespace Belle2

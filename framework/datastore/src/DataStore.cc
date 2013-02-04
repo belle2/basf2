@@ -75,10 +75,7 @@ bool DataStore::createEntry(const std::string& name, EDurability durability,
 
   //add to current module's outputs
   ModuleInfo& info = m_moduleInfo[m_currentModule];
-  if (objClass == RelationContainer::Class())
-    info.outputRelations.insert(name);
-  else
-    info.outputs.insert(name);
+  info.addEntry(name, ModuleInfo::c_Output, (objClass == RelationContainer::Class()));
 
   // Check whether the map entry already exists
   const StoreObjConstIter& it = m_storeObjMap[durability].find(name);
@@ -444,10 +441,7 @@ bool DataStore::require(const std::string& name, EDurability durability,
 {
   if (m_initializeActive) {
     ModuleInfo& info = m_moduleInfo[m_currentModule];
-    if (objClass == RelationContainer::Class())
-      info.inputRelations.insert(name);
-    else
-      info.inputs.insert(name);
+    info.addEntry(name, ModuleInfo::c_Input, (objClass == RelationContainer::Class()));
   }
 
   if (!hasEntry(name, durability, objClass, array)) {
@@ -455,4 +449,15 @@ bool DataStore::require(const std::string& name, EDurability durability,
     return false;
   }
   return true;
+}
+
+bool DataStore::optionalInput(const std::string& name, EDurability durability,
+                              const TClass* objClass, bool array)
+{
+  if (m_initializeActive) {
+    ModuleInfo& info = m_moduleInfo[m_currentModule];
+    info.addEntry(name, ModuleInfo::c_OptionalInput, (objClass == RelationContainer::Class()));
+  }
+
+  return hasEntry(name, durability, objClass, array);
 }

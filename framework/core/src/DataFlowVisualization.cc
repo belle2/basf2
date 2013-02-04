@@ -6,17 +6,21 @@
 
 
 using namespace Belle2;
+typedef DataStore::ModuleInfo MInfo;
 
-const std::string inputfillcolor = "cadetblue3";
-const std::string inputarrowcolor = "cornflowerblue";
-const std::string outputfillcolor = "orange";
-const std::string outputarrowcolor = "firebrick";
 const std::string unknownfillcolor = "gray82";
 
 DataFlowVisualization::DataFlowVisualization(const std::map<std::string, DataStore::ModuleInfo>& moduleInfo, const ModulePtrList& modules):
   m_moduleInfo(moduleInfo),
   m_modules(modules)
 {
+  m_fillcolor[MInfo::c_Input] = "cornflowerblue";
+  m_fillcolor[MInfo::c_OptionalInput] = "lightblue";
+  m_fillcolor[MInfo::c_Output] = "orange";
+
+  m_arrowcolor[MInfo::c_Input] = "cornflowerblue";
+  m_arrowcolor[MInfo::c_OptionalInput] = "lightblue";
+  m_arrowcolor[MInfo::c_Output] = "firebrick";
 }
 
 void DataFlowVisualization::generateModulePlots(const std::string& filename, bool steeringFileFlow)
@@ -47,11 +51,11 @@ void DataFlowVisualization::generateModulePlots(const std::string& filename, boo
 
     //add nodes
     for (std::set<std::string>::const_iterator it = m_allOutputs.begin(); it != m_allOutputs.end(); ++it) {
-      file << "  " << *it << " [shape=box,style=filled,fillcolor=" << outputfillcolor << "];\n";
+      file << "  " << *it << " [shape=box,style=filled,fillcolor=" << m_fillcolor[MInfo::c_Output] << "];\n";
     }
     for (std::set<std::string>::const_iterator it = m_allInputs.begin(); it != m_allInputs.end(); ++it) {
       if (m_allOutputs.count(*it) == 0)
-        file << "  " << *it << " [shape=box,style=filled,fillcolor=" << inputfillcolor << "];\n";
+        file << "  " << *it << " [shape=box,style=filled,fillcolor=" << m_fillcolor[MInfo::c_Input] << "];\n";
     }
     for (std::set<std::string>::const_iterator it = m_unknownArrays.begin(); it != m_unknownArrays.end(); ++it) {
       if (m_allOutputs.count(*it) == 0 && m_allInputs.count(*it) == 0)
@@ -71,39 +75,29 @@ void DataFlowVisualization::generateModulePlot(std::ofstream& file, const std::s
 
   std::map<std::string, DataStore::ModuleInfo>::const_iterator foundInfoIter = m_moduleInfo.find(name);
   if (foundInfoIter != m_moduleInfo.end()) {
-    const DataStore::ModuleInfo& moduleInfo = foundInfoIter->second;
-    //i=0: input, i=1: ouput
-    for (int i = 0; i < 2; i++) {
-      std::set<std::string> objects = moduleInfo.inputs;
-      std::set<std::string> relations = moduleInfo.inputRelations;
-      //colors for input
-      std::string fillcolor = inputfillcolor;
-      std::string arrowcolor = inputarrowcolor;
-      if (i == 1) {
-        objects = moduleInfo.outputs;
-        relations = moduleInfo.outputRelations;
+    const MInfo& moduleInfo = foundInfoIter->second;
+    for (int i = 0; i < MInfo::c_NEntryTypes; i++) {
+      const std::set<std::string> &entries = moduleInfo.entries[i];
+      const std::set<std::string> &relations = moduleInfo.relations[i];
+      const std::string fillcolor = m_fillcolor[i];
+      const std::string arrowcolor = m_arrowcolor[i];
 
-        //colors for output
-        fillcolor = outputfillcolor;
-        arrowcolor = outputarrowcolor;
-      }
-
-      for (std::set<std::string>::const_iterator setit = objects.begin(); setit != objects.end(); ++setit) {
+      for (std::set<std::string>::const_iterator setit = entries.begin(); setit != entries.end(); ++setit) {
         if (!steeringFileFlow)
           file << "  " << *setit << " [shape=box,style=filled,fillcolor=" << fillcolor << "];\n";
-        if (i == 0) {
-          m_allInputs.insert(*setit);
-          file << "  " << *setit << " -> " << name  << " [color=" << arrowcolor << "];\n";
-        } else {
+        if (i == MInfo::c_Output) {
           m_allOutputs.insert(*setit);
           file << "  " << name << " -> " << *setit << " [color=" << arrowcolor << "];\n";
+        } else {
+          m_allInputs.insert(*setit);
+          file << "  " << *setit << " -> " << name  << " [color=" << arrowcolor << "];\n";
         }
       }
 
       for (std::set<std::string>::const_iterator setit = relations.begin(); setit != relations.end(); ++setit) {
         const std::string& relname = *setit;
         size_t pos = relname.rfind("To");
-        if (pos != relname.find("To")) {
+        if (pos == std::string::npos or pos != relname.find("To")) {
           B2WARNING("generateModulePlot(): couldn't split relation name!");
           //Searching for parts in input/output lists might be helpful...
           continue;
@@ -113,13 +107,11 @@ void DataFlowVisualization::generateModulePlot(std::ofstream& file, const std::s
         const std::string to = relname.substr(pos + 2);
 
         //any connected arrays that are neither input nor output?
-        if (moduleInfo.outputs.count(from) == 0 && moduleInfo.inputs.count(from) == 0) {
-          m_unknownArrays.insert(from);
+        if (checkArrayUnknown(from, moduleInfo)) {
           if (!steeringFileFlow)
             file << "  " << from << " [shape=box,style=filled,fillcolor=" << unknownfillcolor << "];\n";
         }
-        if (moduleInfo.outputs.count(to) == 0 && moduleInfo.inputs.count(to) == 0) {
-          m_unknownArrays.insert(to);
+        if (checkArrayUnknown(to, moduleInfo)) {
           if (!steeringFileFlow)
             file << "  " << to << " [shape=box,style=filled,fillcolor=" << unknownfillcolor << "];\n";
         }
@@ -159,4 +151,16 @@ void DataFlowVisualization::executeModuleAndCreateIOPlot(const std::string& modu
   //clean up to avoid problems with ~TROOT
   modulePtr->terminate();
   gearboxPtr->terminate();
+}
+
+bool DataFlowVisualization::checkArrayUnknown(const std::string& name, const DataStore::ModuleInfo& info)
+{
+  for (int i = 0; i < MInfo::c_NEntryTypes; i++) {
+    if (info.entries[i].count(name) != 0)
+      return false; //found
+  }
+
+  //not found
+  m_unknownArrays.insert(name);
+  return true;
 }

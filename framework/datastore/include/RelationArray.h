@@ -134,7 +134,7 @@ namespace Belle2 {
 
 
     /** Register a relation array, that should be written to the output by default, in the data store.
-     *  This must be called in the initialzation phase.
+     *  This must be called in the initialization phase.
      *
      *  @param fromName    Name of from-array ("" for default name)
      *  @param toName      Name of to-array ("" for default name)
@@ -149,7 +149,7 @@ namespace Belle2 {
 
     }
     /** Register a relation array, that should be written to the output by default, in the data store.
-     *  This must be called in the initialzation phase.
+     *  This must be called in the initialization phase.
      *
      *  @param durability  Specifies lifetime of array in question.
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
@@ -159,7 +159,7 @@ namespace Belle2 {
       return registerPersistent<FROM, TO>("", "", durability, errorIfExisting);
     }
     /** Register a relation array, that should be written to the output by default, in the data store.
-     *  This must be called in the initialzation phase.
+     *  This must be called in the initialization phase.
      *
      *  @param name        Name under which the relation is stored.
      *  @param durability  Specifies lifetime of array in question.
@@ -172,7 +172,7 @@ namespace Belle2 {
     }
 
     /** Register a relation array, that should NOT be written to the output by default, in the data store.
-     *  This must be called in the initialzation phase.
+     *  This must be called in the initialization phase.
      *
      *  @param fromName    Name of from-array ("" for default name)
      *  @param toName      Name of to-array ("" for default name)
@@ -186,7 +186,7 @@ namespace Belle2 {
       return DataStore::Instance().createEntry(relName, durability, RelationContainer::Class(), false, true, errorIfExisting);
     }
     /** Register a relation array, that should NOT be written to the output by default, in the data store.
-     *  This must be called in the initialzation phase.
+     *  This must be called in the initialization phase.
      *
      *  @param durability  Specifies lifetime of array in question.
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
@@ -197,7 +197,7 @@ namespace Belle2 {
       return registerTransient<FROM, TO>("", "", durability, errorIfExisting);
     }
     /** Register a relation array, that should NOT be written to the output by default, in the data store.
-     *  This must be called in the initialzation phase.
+     *  This must be called in the initialization phase.
      *
      *  @param name        Name under which the relation is stored.
      *  @param durability  Specifies lifetime of array in question.
@@ -246,7 +246,7 @@ namespace Belle2 {
 
     /** Check whether the relation was registered before.
      *  It will cause an error if the relation does not exist.
-     *  This must be called in the initialzation phase.
+     *  This must be called in the initialization phase.
      *
      *  @return            True if the array exists.
      */
@@ -254,6 +254,29 @@ namespace Belle2 {
       return DataStore::Instance().require(m_name, m_durability, RelationContainer::Class(), false);
     }
 
+    /** Tell the data store about an optional input.
+     *
+     *  Mainly useful for creating diagrams of module inputs and outputs.
+     *  This must be called in the initialization phase.
+     *
+     *  @param name        Name under which the relation array is stored.
+     *  @param durability  Specifies lifetime of relation array in question.
+     *  @return            True if the object exists.
+     */
+    static bool optional(const std::string& name, DataStore::EDurability durability = DataStore::c_Event) {
+      return DataStore::Instance().optionalInput(name, durability, RelationContainer::Class(), false);
+    }
+
+    /** Tell the data store about an optional input.
+     *
+     *  Mainly useful for creating diagrams of module inputs and outputs.
+     *  This must be called in the initialization phase.
+     *
+     *  @return            True if the array exists.
+     */
+    bool isOptional() {
+      return DataStore::Instance().optionalInput(m_name, m_durability, RelationContainer::Class(), false);
+    }
     /** Create an empty relation array in the data store.
      *
      *  @param replace   Should an existing object be replaced?
@@ -458,7 +481,7 @@ namespace Belle2 {
 
     /** Attach to relation, if necessary. */
     void ensureAttached() const {
-      if (m_relations) return; //TODO: unsure about this...
+      if (m_relations) return;
 
       const_cast<RelationArray*>(this)->m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(m_name, m_durability, RelationContainer::Class(), false));
       if (m_relations && *m_relations) {

@@ -26,6 +26,9 @@ namespace Belle2 {
    *  of BASE should be derived from RelationsInterface<BASE> instead.
    *  Then it provides methods like addRelationTo or getRelationsTo for
    *  an easy handling of relations to and from objects of this class.
+   *
+   *  In most cases, BASE will be TObject and you can simply derive from RelationsObject.
+   *
    */
   template <class BASE> class RelationsInterface: public BASE {
   public:

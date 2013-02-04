@@ -102,7 +102,7 @@ namespace Belle2 {
     /** Check whether an object was registered before.
      *
      *  It will cause an error if the object does not exist.
-     *  This must be called in the initialzation phase.
+     *  This must be called in the initialization phase.
      *
      *  @param name        Name under which the object is stored.
      *  @param durability  Specifies lifetime of object in question.
@@ -111,6 +111,20 @@ namespace Belle2 {
     static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
       std::string objName = DataStore::objectName<T>(name);
       return DataStore::Instance().require(objName, durability, T::Class(), false);
+    }
+
+    /** Tell the data store about an optional input.
+     *
+     *  Mainly useful for creating diagrams of module inputs and outputs.
+     *  This must be called in the initialization phase.
+     *
+     *  @param name        Name under which the object is stored.
+     *  @param durability  Specifies lifetime of object in question.
+     *  @return            True if the object exists.
+     */
+    static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
+      std::string objName = DataStore::objectName<T>(name);
+      return DataStore::Instance().optionalInput(name, durability, T::Class(), false);
     }
 
     /** Constructor to access an object in the DataStore.
@@ -145,12 +159,23 @@ namespace Belle2 {
     /** Check whether an object was registered before.
      *
      *  It will cause an error if the object does not exist.
-     *  This must be called in the initialzation phase.
+     *  This must be called in the initialization phase.
      *
      *  @param name        Name under which the object is stored.
      */
     bool isRequired() {
       return DataStore::Instance().require(m_name, m_durability, T::Class(), false);
+    }
+
+    /** Tell the data store about an optional input.
+     *
+     *  Mainly useful for creating diagrams of module inputs and outputs.
+     *  This must be called in the initialization phase.
+     *
+     *  @return            True if the object exists.
+     */
+    bool isOptional() {
+      return DataStore::Instance().optionalInput(m_name, m_durability, T::Class(), false);
     }
 
     /** Create a default object in the data store.

@@ -235,9 +235,10 @@ namespace Belle2 {
       if (!simHits.isValid()) simHits.create();
       RelationArray relMCSimHit(mcParticles, simHits);
 
-      const int hitIndex = simHits->GetLast() + 1 ;
-      new(simHits->AddrAt(hitIndex)) SimHitClass(sensorID, pdg, theta, energy, time,
-                                                 posIn, posOut, momIn);
+      const int hitIndex = simHits.getEntries();
+      simHits.appendNew(
+        SimHitClass(sensorID, pdg, theta, energy, time, posIn, posOut, momIn)
+      );
 
       //Add relation between the MCParticle and the hit.
       //The index of the MCParticle has to be set to the TrackID and will be
@@ -321,10 +322,11 @@ namespace Belle2 {
         RelationArray relTrueSimHit(trueHits, simHits);
 
         //Create a new TrueHit
-        int hitIndex = trueHits->GetLast() + 1;
-        new(trueHits->AddrAt(hitIndex))
-        TrueHitClass(sensorID, m_trueHitPos.X(), m_trueHitPos.Y(), m_trueHitPosStart.X(), m_trueHitPosStart.Y(), m_trueHitPosEnd.X(), m_trueHitPosEnd.Y(), m_trueHitWeight, m_trueHitTime,
-                     m_trueHitMom, m_trueHitMomStart, m_trueHitMomEnd);
+        int hitIndex = trueHits.getEntries();
+        trueHits.appendNew(
+          TrueHitClass(sensorID, m_trueHitPos.X(), m_trueHitPos.Y(), m_trueHitPosStart.X(), m_trueHitPosStart.Y(), m_trueHitPosEnd.X(), m_trueHitPosEnd.Y(), m_trueHitWeight, m_trueHitTime,
+                       m_trueHitMom, m_trueHitMomStart, m_trueHitMomEnd)
+        );
         //Add Relation to MCParticle
         relMCTrueHits.add(m_trueHitTrackID, hitIndex, m_trueHitWeight);
         //Add Relation to SimHits

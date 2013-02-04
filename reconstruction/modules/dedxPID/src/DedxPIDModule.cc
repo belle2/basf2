@@ -11,7 +11,6 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Const.h>
 
-#include <tracking/dataobjects/Track.h>
 #include <generators/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>
@@ -98,7 +97,6 @@ void DedxPIDModule::initialize()
   }
 
   //required inputs
-  StoreArray<Track>::required();
   StoreArray<GFTrack>::required();
 
   //register outputs (if needed)
@@ -173,22 +171,14 @@ void DedxPIDModule::initialize()
 
 void DedxPIDModule::event()
 {
-  //go through all (GF)Tracks (both have same index)
-  //find correct MCParticle through Track::getMCId()
+  //go through all GFTracks
   //get GFTrackCand through GFTrack::getCand()
   //get hit indices through GFTrackCand::getHit(...)
   m_eventID++;
-  StoreArray<Track> tracks;
-  if (tracks.getEntries() == 0) {
-    return; //probably nothing fitted
-  }
 
   StoreArray<GFTrack> gftracks(m_gftracks_name);
-  if (tracks.getEntries() != gftracks.getEntries()) {
-    //assuming same indices for tracks and gftracks
-    //TODO replace with Tracks<->GFTracks relation when available
-    B2FATAL("Tracks and GFTracks have different lengths?");
-    return;
+  if (gftracks.getEntries() == 0) {
+    return; //probably nothing fitted
   }
 
   StoreArray<MCParticle> mcparticles;
@@ -209,27 +199,26 @@ void DedxPIDModule::event()
   RelationArray tracks_to_likelihoods(gftracks, likelihood_array);
 
   //loop over all tracks
-  for (int iGFTrack = 0; iGFTrack < tracks.getEntries(); iGFTrack++) {
-    const int iTrack = iGFTrack;
+  for (int iGFTrack = 0; iGFTrack < gftracks.getEntries(); iGFTrack++) {
     DedxTrack track; //temporary storage for track data
 
     if (num_mcparticles > 0) { //only do this if we actually know the mcparticles
       //find MCParticle corresponding to this track
-      const int mcparticle_idx = tracks[iTrack]->getMCId();
+      const MCParticle* mcpart = DataStore::Instance().getRelatedFromObj<MCParticle>(gftracks[iGFTrack]);
 
-      if (mcparticle_idx >= 0 && mcparticles[mcparticle_idx]) { //mc idx is -1 for tracks found in background noise
-        if (m_onlyPrimaryParticles && !mcparticles[mcparticle_idx]->hasStatus(MCParticle::c_PrimaryParticle))
+      if (mcpart) {
+        if (m_onlyPrimaryParticles && !mcpart->hasStatus(MCParticle::c_PrimaryParticle))
           continue; //not a primary particle, ignore
 
         //add some MC truths to DedxTrack object
-        track.m_pdg = mcparticles[mcparticle_idx]->getPDG();
-        const MCParticle* mother = mcparticles[mcparticle_idx]->getMother();
+        track.m_pdg = mcpart->getPDG();
+        const MCParticle* mother = mcpart->getMother();
         track.m_mother_pdg = mother ? mother->getPDG() : 0;
 
         //find slow pions (i.e. D* daughter pions)
         track.m_slow_pion = (TMath::Abs(track.m_pdg) == 211 and TMath::Abs(track.m_mother_pdg) == 413);
 
-        const TVector3 true_momentum = mcparticles[mcparticle_idx]->getMomentum();
+        const TVector3 true_momentum = mcpart->getMomentum();
         track.m_p_true = true_momentum.Mag();
       } else {
         B2INFO("no MCParticle found for current track!");
@@ -259,8 +248,8 @@ void DedxPIDModule::event()
       continue; //next particle
     }
 
-    track.m_chi2 = tracks[iTrack]->getChi2();
-    track.m_charge = (short)((tracks[iTrack]->getOmega() >= 0) ? 1 : -1);
+    track.m_chi2 = gftracks[iGFTrack]->getChiSqu();
+    track.m_charge = (short)((gftracks[iGFTrack]->getCharge() >= 0) ? 1 : -1);
 
     //used for PXD/SVD hits
     const HelixHelper helix_at_origin(poca, dir_in_poca, track.m_charge);

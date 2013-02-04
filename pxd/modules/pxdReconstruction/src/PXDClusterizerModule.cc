@@ -144,7 +144,7 @@ void PXDClusterizerModule::event()
   if (!storeClusters.isValid())
     storeClusters.create();
   else
-    storeClusters->Clear();
+    storeClusters.getPtr()->Clear();
 
   RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
   relClusterMCParticle.clear();
@@ -308,12 +308,12 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     posU -= 0.5 * info.getThickness() * m_tanLorentzAngle;
 
     //Store Cluster into Datastore ...
-    int clsIndex = storeClusters->GetLast() + 1;
-    new(storeClusters->AddrAt(clsIndex)) PXDCluster(
-      seed.get()->getSensorID(), posU, posV,
-      cls.getCharge(), seed.getCharge(),
-      cls.size(), sizeU, sizeV, minU, minV
-    );
+    int clsIndex = storeClusters.getEntries();
+    storeClusters.appendNew(PXDCluster(
+                              seed.get()->getSensorID(), posU, posV,
+                              cls.getCharge(), seed.getCharge(),
+                              cls.size(), sizeU, sizeV, minU, minV
+                            ));
 
     //Create Relations to this Digit
     relClusterMCParticle.add(clsIndex, mc_relations.begin(), mc_relations.end());

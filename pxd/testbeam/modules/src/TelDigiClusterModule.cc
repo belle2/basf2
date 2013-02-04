@@ -121,7 +121,7 @@ void TelDigiClusterModule::event()
   if (!storeClusters.isValid())
     storeClusters.create();
   else
-    storeClusters->Clear();
+    storeClusters.getPtr()->Clear();
 
   RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
   relClusterMCParticle.clear();
@@ -144,12 +144,12 @@ void TelDigiClusterModule::event()
     v = gRandom->Gaus(v, m_resolutionV);
 
     //Store Cluster into Datastore ...
-    int clusterID = storeClusters->GetLast() + 1;
-    new(storeClusters->AddrAt(clusterID)) TelCluster(
-      sensorID, u, v,
-      charge, charge,
-      0, 0, 0
-    );
+    int clusterID = storeClusters.getEntries();
+    storeClusters.appendNew(TelCluster(
+                              sensorID, u, v,
+                              charge, charge,
+                              0, 0, 0
+                            ));
 
     //Create Relations to this Cluster
     relClusterMCParticle.add(clusterID, particleID, charge);

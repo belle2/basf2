@@ -224,7 +224,7 @@ void PXDDigitizerModule::event()
   if (!storeDigits.isValid())
     storeDigits.create();
   else
-    storeDigits->Clear();
+    storeDigits.getPtr()->Clear();
 
   RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
   relDigitMCParticle.clear();
@@ -659,11 +659,11 @@ void PXDDigitizerModule::saveDigits()
       if (charge < charge_threshold) continue;
 
       //Add the digit to datastore
-      int digIndex = storeDigits->GetLast() + 1;
-      new(storeDigits->AddrAt(digIndex)) PXDDigit(
-        sensorID, d.u(), d.v(),
-        info.getUCellPosition(d.u()), info.getVCellPosition(d.v()), charge
-      );
+      int digIndex = storeDigits.getEntries();
+      storeDigits.appendNew(PXDDigit(
+                              sensorID, d.u(), d.v(),
+                              info.getUCellPosition(d.u()), info.getVCellPosition(d.v()), charge
+                            ));
 
       //If the digit has any relations to MCParticles, add the Relation
       if (v.particles().size() > 0) {

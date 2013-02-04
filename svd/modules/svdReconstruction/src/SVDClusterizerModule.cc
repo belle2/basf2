@@ -41,7 +41,7 @@ REG_MODULE(SVDClusterizer)
 
 SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
   m_cutSeed(5.0), m_cutAdjacent(2.5), m_cutCluster(8.0), m_sizeHeadTail(3),
-  m_minSamples(3), m_timeTolerance(30), m_shapingTimeElectrons(55),
+  c_minSamples(3), m_timeTolerance(30), m_shapingTimeElectrons(55),
   m_shapingTimeHoles(60), m_samplingTime(30), m_refTime(0.0), m_assumeSorted(false)
 {
   //Set module properties
@@ -79,8 +79,6 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
            "Minimum SN for clusters", m_cutCluster);
   addParam("HeadTailSize", m_sizeHeadTail,
            "Cluster size at which to switch to Analog head tail algorithm", m_sizeHeadTail);
-  addParam("MinSamples", m_minSamples,
-           "Minimum number of consecutive significant samples in a strip", m_minSamples);
   addParam("TimeTolerance", m_timeTolerance,
            "Maximum allowable RMS of signal times in a cluster", m_timeTolerance);
 
@@ -155,7 +153,7 @@ void SVDClusterizerModule::initialize()
   B2INFO(" -->  Neighbour cut:      " << m_cutAdjacent);
   B2INFO(" -->  Seed cut:           " << m_cutSeed);
   B2INFO(" -->  Cluster charge cut: " << m_cutCluster);
-  B2INFO(" -->  Min. samples/strip: " << m_minSamples);
+  B2INFO(" -->  Min. samples/strip: " << c_minSamples);
   B2INFO(" -->  Time tolerance:     " << m_timeTolerance);
 
   B2INFO(" TIMING: ");
@@ -195,7 +193,7 @@ void SVDClusterizerModule::event()
   if (!storeClusters.isValid())
     storeClusters.create();
   else
-    storeClusters->Clear();
+    storeClusters.getPtr()->Clear();
 
   RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
   relClusterMCParticle.clear();
@@ -333,13 +331,13 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     std::map<unsigned int, unsigned int>::const_iterator strip_count = stripCounts.begin();
     for (; strip_count != stripCounts.end(); ++strip_count)
       if (strip_count->second > maxCount) maxCount = strip_count->second;
-    if (maxCount < m_minSamples) continue;
-    // Constrain time calculation to strips with at least m_minSamples samples.
+    if (maxCount < c_minSamples) continue;
+    // Constrain time calculation to strips with at least c_minSamples samples.
     std::map<unsigned int, unsigned int>::const_iterator strip_low = stripCounts.begin();
-    while (strip_low->second < m_minSamples) strip_low++;
+    while (strip_low->second < c_minSamples) strip_low++;
     unsigned int stripLow = strip_low->first;
     std::map<unsigned int, unsigned int>::const_reverse_iterator strip_high = stripCounts.rbegin();
-    while (strip_high->second < m_minSamples) strip_high++;
+    while (strip_high->second < c_minSamples) strip_high++;
     unsigned int stripHigh = strip_high->first;
     double time = 0.0;
     double restrictedCharge = 0.0;
@@ -391,11 +389,11 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     }
 
     //Store Cluster into Datastore ...
-    int clsIndex = storeClusters->GetLast() + 1;
-    new(storeClusters->AddrAt(clsIndex)) SVDCluster(
-      seed.getDigit()->getSensorID(), isU, pos, time, timeStd,
-      seed.getCharge(), cls.getCharge(), clSize
-    );
+    int clsIndex = storeClusters.getEntries();
+    storeClusters.appendNew(SVDCluster(
+                              seed.getDigit()->getSensorID(), isU, pos, time, timeStd,
+                              seed.getCharge(), cls.getCharge(), clSize
+                            ));
 
     //Create Relations to this Digit
     relClusterMCParticle.add(clsIndex, mc_relations.begin(), mc_relations.end());

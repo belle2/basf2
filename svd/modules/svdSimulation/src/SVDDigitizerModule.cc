@@ -272,7 +272,7 @@ void SVDDigitizerModule::event()
   if (!storeDigits.isValid())
     storeDigits.create();
   else
-    storeDigits->Clear();
+    storeDigits.getPtr()->Clear();
 
   RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
   relDigitMCParticle.clear();
@@ -731,11 +731,11 @@ void SVDDigitizerModule::saveDigits(double time)
       occupied_u.insert(iStrip);
 
       // Save as a new digit
-      int digIndex = storeDigits->GetLast() + 1;
-      new(storeDigits->AddrAt(digIndex)) SVDDigit(
-        sensorID, true, iStrip, info.getUCellPosition(iStrip), sampleCharge,
-        time
-      );
+      int digIndex = storeDigits.getEntries();
+      storeDigits.appendNew(SVDDigit(
+                              sensorID, true, iStrip, info.getUCellPosition(iStrip), sampleCharge,
+                              time
+                            ));
 
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {
@@ -767,11 +767,10 @@ void SVDDigitizerModule::saveDigits(double time)
         short iStrip = gRandom->Integer(nU);
         if (occupied_u.count(iStrip) > 0) continue;
         // Add a noisy digit, no relations.
-        int digIndex = storeDigits->GetLast() + 1;
-        new(storeDigits->AddrAt(digIndex)) SVDDigit(
-          sensorID, true, iStrip, info.getUCellPosition(iStrip), addNoise(-1.0),
-          time
-        );
+        storeDigits.appendNew(SVDDigit(
+                                sensorID, true, iStrip, info.getUCellPosition(iStrip), addNoise(-1.0),
+                                time
+                              ));
         // Remember strip as occupied
         occupied_u.insert(iStrip);
       } // for ns
@@ -799,11 +798,11 @@ void SVDDigitizerModule::saveDigits(double time)
       occupied_v.insert(iStrip);
 
       // Save as a new digit
-      int digIndex = storeDigits->GetLast() + 1;
-      new(storeDigits->AddrAt(digIndex)) SVDDigit(
-        sensorID, false, iStrip, info.getVCellPosition(iStrip), sampleCharge,
-        time
-      );
+      int digIndex = storeDigits.getEntries();
+      storeDigits.appendNew(SVDDigit(
+                              sensorID, false, iStrip, info.getVCellPosition(iStrip), sampleCharge,
+                              time
+                            ));
 
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {
@@ -835,11 +834,10 @@ void SVDDigitizerModule::saveDigits(double time)
         short iStrip = gRandom->Integer(nV);
         if (occupied_v.count(iStrip) > 0) continue;
         // Add a noisy digit, no relations.
-        int digIndex = storeDigits->GetLast() + 1;
-        new(storeDigits->AddrAt(digIndex)) SVDDigit(
-          sensorID, false, iStrip, info.getVCellPosition(iStrip), addNoise(-1.0),
-          time
-        );
+        storeDigits.appendNew(SVDDigit(
+                                sensorID, false, iStrip, info.getVCellPosition(iStrip), addNoise(-1.0),
+                                time
+                              ));
         // Remember strip as occupied
         occupied_v.insert(iStrip);
       } // for ns

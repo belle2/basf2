@@ -67,6 +67,7 @@ namespace Belle2 {
 
     /** Stores information on inputs/outputs of a module, as obtained by require()/optionalInput()/createEntry(); */
     struct ModuleInfo {
+      /** Possible types of entries/relations for a module. */
       enum EEntryType {
         c_Input, /**< required input. */
         c_OptionalInput, /**< optional input. */

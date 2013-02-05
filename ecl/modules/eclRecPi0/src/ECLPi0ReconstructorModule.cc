@@ -457,8 +457,8 @@ unsigned ECLPi0ReconstructorModule::fillFitted4Vector(MassFitKFit& km, CLHEP::He
     }
   }
 
-  kmm.setVertex(km.getVertex());
-  kmm.setVertexError(km.getVertexError());
+//  kmm.setVertex(km.getVertex());
+//  kmm.setVertexError(km.getVertexError());
 
   unsigned err = kmm.doMake();
   if (err != 0)

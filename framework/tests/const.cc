@@ -5,7 +5,6 @@
 
 #include <gtest/gtest.h>
 #include <math.h>
-#include <cstddef>
 
 using namespace std;
 

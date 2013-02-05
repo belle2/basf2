@@ -12,6 +12,7 @@
 #define CONST_H
 
 #include <vector>
+#include <cstddef>
 
 class TDatabasePDG;
 class TParticlePDG;

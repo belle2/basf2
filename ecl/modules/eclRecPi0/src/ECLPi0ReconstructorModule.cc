@@ -30,18 +30,14 @@
 #include  "CLHEP/Matrix/Matrix.h"
 #include <TMatrixFSym.h>
 
-#include <analysis/utility/makeMother.h>
-#include <analysis/KFit/MassFitKFit.h>
-#include "analysis/particle/Particle.h"
-
+#include <analysis/KFit/MakeMotherKFit.h>
 
 #define PI 3.14159265358979323846
 
 using namespace std;
 using namespace Belle2;
-using namespace ECL;
-//using namespace Belle2::analysis;
-using namespace analysis;
+using namespace Belle2::analysis;
+using namespace Belle2::ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -168,8 +164,9 @@ void ECLPi0ReconstructorModule::event()
       const double mass = lv_rec.mag();
       if (fit_flag) {
 //        fit(lv_gamma1, lv_gamma2);
+        CLHEP::HepLorentzVector fittedPi0Momentum;
+        CLHEP::HepSymMatrix pi0ErrMatrix;
 
-        Belle1::Particle p;
         MassFitKFit km;
         km.setMagneticField(1.5);
         km.addTrack(lv_gamma1, xGamma1, errorGamma1, 0);
@@ -182,27 +179,25 @@ void ECLPi0ReconstructorModule::event()
         double confLevel(0);
         if (!err) {
           confLevel = km.getCHIsq();
-          makeMother(km, p);
+          fillFitted4Vector(km, fittedPi0Momentum, pi0ErrMatrix);
         } else {cout << m_nEvent << " km.doFit err " << endl;  }
 
         if (pi0_mass_min < mass && mass < pi0_mass_max) {
 
           if (!Pi0Array) Pi0Array.create();
-          //m_Pi0Num = Pi0Array->GetLast() + 1;
-          //new(Pi0Array->AddrAt(m_Pi0Num)) ECLPi0();
-
           new(Pi0Array.nextFreeAddress()) ECLPi0();
           m_Pi0Num = Pi0Array.getEntries() - 1;
           Pi0Array[m_Pi0Num]->setShowerId1(m_showerId1);
           Pi0Array[m_Pi0Num]->setShowerId2(m_showerId2);
-          Pi0Array[m_Pi0Num]->setEnergy((float)p.e());
-          Pi0Array[m_Pi0Num]->setPx((float)p.px());
-          Pi0Array[m_Pi0Num]->setPy((float)p.py());
-          Pi0Array[m_Pi0Num]->setPz((float)p.pz());
+          Pi0Array[m_Pi0Num]->setEnergy((float)fittedPi0Momentum.e());
+          Pi0Array[m_Pi0Num]->setPx((float)fittedPi0Momentum.px());
+          Pi0Array[m_Pi0Num]->setPy((float)fittedPi0Momentum.py());
+          Pi0Array[m_Pi0Num]->setPz((float)fittedPi0Momentum.pz());
+
           Pi0Array[m_Pi0Num]->setMass((float)lv_rec.mag());
-          Pi0Array[m_Pi0Num]->setMassFit((float)p.mass());
+          Pi0Array[m_Pi0Num]->setMassFit((float)fittedPi0Momentum.m());
           Pi0Array[m_Pi0Num]->setChi2((float)confLevel);
-          Pi0Array[m_Pi0Num]->setErrorMatrix(p.momentum().dpx());
+          Pi0Array[m_Pi0Num]->setErrorMatrix(pi0ErrMatrix);
 
           eclPi0ToGamma.add(m_Pi0Num, iGamma1);
           eclPi0ToGamma.add(m_Pi0Num, iGamma2);
@@ -442,6 +437,41 @@ double ECLPi0ReconstructorModule::errorPhi(CLHEP::HepLorentzVector shower)
 
 
 }
+
+/* Obtains the fitted 4-momentum (after mass constrained fit) */
+unsigned ECLPi0ReconstructorModule::fillFitted4Vector(MassFitKFit& km, CLHEP::HepLorentzVector& fitMom, CLHEP::HepSymMatrix& covMatrix)
+{
+  unsigned n = km.getTrackCount();
+
+  MakeMotherKFit kmm;
+  kmm.setMagneticField(1.5);
+
+  for (unsigned i = 0; i < n; ++i) {
+    kmm.addTrack(km.getTrackMomentum(i),
+                 km.getTrackPosition(i),
+                 km.getTrackError(i),
+                 km.getTrack(i).getCharge());
+
+    for (unsigned j = i + 1; j < n; ++j) {
+      kmm.setCorrelation(km.getCorrelation(i, j));
+    }
+  }
+
+  kmm.setVertex(km.getVertex());
+  kmm.setVertexError(km.getVertexError());
+
+  unsigned err = kmm.doMake();
+  if (err != 0)
+    return 0;
+
+  fitMom = kmm.getMotherMomentum();
+
+  covMatrix = kmm.getMotherError();
+
+  return 1;
+}
+
+
 double ECLPi0ReconstructorModule::cellR(CLHEP::HepLorentzVector shower)
 {
 

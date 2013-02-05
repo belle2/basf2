@@ -18,6 +18,7 @@
 
 #include  "CLHEP/Matrix/Matrix.h"
 #include <TMatrixFSym.h>
+#include <analysis/KFit/MassFitKFit.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -58,6 +59,9 @@ namespace Belle2 {
 
       /** read Error Matrix with Shower Id   */
       void readErrorMatrix(int GammaIndex, CLHEP::HepSymMatrix& errorGamma);
+
+      /** Fills the fitted 4-momentum (after mass constrained fit) and 7x7 covariance matrix. **/
+      unsigned fillFitted4Vector(Belle2::analysis::MassFitKFit& km, CLHEP::HepLorentzVector& fitMom, CLHEP::HepSymMatrix& covMatrix);
 
       /** mass constraint fit of  pi0      */
       void fit(CLHEP::HepLorentzVector m_shower1, CLHEP::HepLorentzVector m_shower2);

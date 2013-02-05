@@ -290,15 +290,13 @@ void RbTupleManager::MergeRootfile(TDirectory* target, TList* sourcelist)
     // note that this will just store obj in the current directory level,
     // which is not persistent until the complete directory itself is stored
     // by "target->Write()" below
-    if (obj) {
-      target->cd();
+    target->cd();
 
-      //!!if the object is a tree, it is stored in globChain...
-      if (obj->IsA()->InheritsFrom("TTree"))
-        globChain->Merge(target->GetFile(), 0, "keep");
-      else
-        obj->Write(key->GetName());
-    }
+    //!!if the object is a tree, it is stored in globChain...
+    if (obj->IsA()->InheritsFrom("TTree"))
+      globChain->Merge(target->GetFile(), 0, "keep");
+    else
+      obj->Write(key->GetName());
 
   } // while ( ( TKey *key = (TKey*)nextkey() ) )
 

@@ -51,7 +51,7 @@ namespace Belle2 {
           EXPECT_EQ(13, pdg);
           break;
         default:
-          EXPECT_EQ(false, true) << "Index >4 encountered?";
+          EXPECT_TRUE(false) << "Index >4 encountered?";
       }
       size++;
     }

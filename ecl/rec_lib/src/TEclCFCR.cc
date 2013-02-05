@@ -151,7 +151,10 @@ TEclCFCR::SearchLocalMaxima(EclGeV threshold)
 
       for (std::vector<EclNbr::Identifier>::const_iterator
            iNbr = aNbr.nearBegin(); iNbr != aNbr.nearEnd(); ++iNbr) {
-        cands.erase(*iNbr);
+
+        int cell = *iNbr;
+        cands.erase(cell);
+
         if (!!fEnergyHits.count(*iNbr))
           fNear.insert(
             std::pair<const Identifier, Identifier>(*iNbr, aCand.CellId()));
@@ -199,7 +202,8 @@ TEclCFCR::FormShowers(int startId)
         if (fNear.count(*iNbr) == 1) {
           aShower.Accumulate(*iNbr, fEnergyHits[*iNbr].Energy());
           aShower.fE3x3unf += fEnergyHits[*iNbr].Energy();
-          fFreeHits.erase(*iNbr);
+          int cell = *iNbr;
+          fFreeHits.erase(cell);
           if (fNext.count(*iNbr) > 0)
             aShower.Grade(TEclCFShower::SEPARATED);
         } else

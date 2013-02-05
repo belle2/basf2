@@ -26,7 +26,10 @@ namespace Belle2 {
   class ECLTrig : public TObject {
   public:
     /** default constructor for ROOT */
-    ECLTrig() {;}
+    ECLTrig() {
+      m_CellId = 0;    /**< Cell ID */
+      m_TimeTrig = 0; /**< Trig Time */
+    }
 
 
     /*! Set  Cell ID

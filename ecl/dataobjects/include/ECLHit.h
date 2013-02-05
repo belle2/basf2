@@ -27,7 +27,12 @@ namespace Belle2 {
   class ECLHit : public SimHitBase {
   public:
     /** default constructor for ROOT */
-    ECLHit(): SimHitBase() {;}
+    ECLHit(): SimHitBase() {
+      m_CellId = 0;    /**< Cell ID */
+      m_Edep = 0;    /**< deposited energy */
+      m_TimeAve = 0; /**< average time */
+      ;
+    }
 
     //! Useful Constructor
     ECLHit(

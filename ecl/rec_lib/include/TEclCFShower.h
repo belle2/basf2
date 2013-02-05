@@ -37,7 +37,10 @@ namespace Belle2 {
       typedef EclIdentifier Identifier;
 
       /** construct MEclCFShowerHA */
-      MEclCFShowerHA() {}
+      MEclCFShowerHA() {
+        fId = 0;
+        fFraction = 0;
+      }
       ///
       virtual ~MEclCFShowerHA() {}
       /** construct MEclCFShowerHA with MEclCFShowerHA& a */

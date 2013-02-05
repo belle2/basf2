@@ -28,7 +28,25 @@ namespace Belle2 {
   class ECLShower : public TObject {
   public:
     /** default constructor for ROOT */
-    ECLShower() {;}
+    ECLShower() {
+      m_ShowerId = 0;      /**< Shower ID */
+      m_Energy = 0;      /**< Energy (GeV) */
+      m_Theta = 0;       /**< Theta (rad) */
+      m_Phi = 0;         /**< Phi (rad) */
+      m_R = 0;           /**< R inherit from Belle */
+      m_Error[0] = 0;    /**< Error of Energy, Theta and Phi */
+      m_Error[1] = 0;    /**< Error of Energy, Theta and Phi */
+      m_Error[3] = 0;    /**< Error of Energy, Theta and Phi */
+      m_Mass = 0;        /**< Mass, inherit from Belle */
+      m_Width = 0;       /**< Width, inherit from Belle */
+      m_E9oE25 = 0;      /**< E9oE25, inherit from Belle */
+      m_E9oE25unf = 0;   /**< E9oE25unf, inherit from Belle */
+      m_NHits = 0;       /**< NHits, inherit from Belle */
+      m_Status = 0;        /**< Status, inherit from Belle */
+      m_Grade = 0;         /**< Grade, inherit from Belle */
+      m_UncEnergy = 0;   /**< UncEnergy, inherit from Belle */
+      m_Time = 0;        /**< Time, new parameter for Belle2, wait for more stude */
+    }
 
 
     /*! Set Shower ID

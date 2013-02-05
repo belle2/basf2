@@ -218,6 +218,7 @@ namespace Belle2 {
       m_sensitive = new SensitiveDetector("SensitiveDetector", (2 * 24)*eV, 10 * MeV);
       logical_ecl = 0;
       physical_ecl = 0;
+      physical_ECLBarrelCylinder = 0;
     }
 
 

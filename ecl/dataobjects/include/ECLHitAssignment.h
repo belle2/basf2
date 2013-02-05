@@ -45,7 +45,11 @@ namespace Belle2 {
     //! Empty constructor
     /*! Recommended for ROOT IO
     */
-    ECLHitAssignment() {;}
+    ECLHitAssignment() {
+      m_showerId = 0;
+      m_cellId = 0;
+      ;
+    }
 
     //! Useful Constructor
     ECLHitAssignment(

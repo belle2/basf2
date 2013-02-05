@@ -17,7 +17,6 @@
 #include <framework/logging/Logger.h>
 
 //ecl package headers
-#include <ecl/dataobjects/ECLSim.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLDigit.h>
@@ -93,14 +92,10 @@ void ECLMCMatchingModule::event()
 {
 
 
-  int HitIndex[8736][16];
-  int HitOldTrack[8736][16];
   int DigiIndex[8736];
   int DigiOldTrack[8736];
-  int ShowerOldTrack[8736];
   for (int i = 0; i < 8736; i++) {
-    DigiIndex[i] = -1; DigiOldTrack[i] = -1; ShowerOldTrack[i] = -1;
-    for (int j = 0; j < 16; j++) {  HitIndex[i][j] = -1; HitOldTrack[i][j] = -1;}
+    DigiIndex[i] = -1; DigiOldTrack[i] = -1;
   }
 
   StoreArray<MCParticle> mcParticles;

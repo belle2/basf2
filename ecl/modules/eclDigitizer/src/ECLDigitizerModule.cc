@@ -228,7 +228,6 @@ double ECLDigitizerModule::ShaperDSP(double Ti)
            + s[11] * .5 * (Sv123(tr2, s[4], s[5], s[9], s[10], s[3], s[6])
                            + Sv123(tr3, s[4], s[5], s[9], s[10], s[3], s[6])));
     double x = tr / s[4];
-    x = tr / s[4];
 
 
     svp = s[1] * (svp - s[7] * (exp(-tr / s[8]) *
@@ -334,7 +333,7 @@ double  ECLDigitizerModule::Sv123(double t, double t01, double tb1, double t02, 
   dsn1d = (dsn0 * das1 - dcs0 * dac1) / dzn0;
   dcs1d = (dcs0 * das1 + dsn0 * dac1) / dzn0;
 
-  dr = (ts - td) / td;
+  //cppcheck dr = (ts - td) / td;
 
 
 
@@ -540,7 +539,7 @@ void ECLDigitizerModule::shapeFitter(short int* id, int* f, int* f1, int* fg41, 
         B2 = B1 >> (k_b - 13);
         B5 = B1 >> (k_b - 9);
 
-        B1 = B2 >> 13;
+        //cppcheck reassigned a value before the old one has been used//  B1 = B2 >> 13;
         B2 += (A1 << 13);
         B3 = (B2 / A1);
 

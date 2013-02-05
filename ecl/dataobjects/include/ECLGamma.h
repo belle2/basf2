@@ -36,7 +36,7 @@ namespace Belle2 {
   class ECLGamma : public TObject {
   public:
     /** default constructor for ROOT */
-    ECLGamma() {;}
+    ECLGamma() { m_ShowerId = 0;}
 
     /*! Set Shower ID
      */

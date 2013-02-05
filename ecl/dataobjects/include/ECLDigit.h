@@ -26,7 +26,14 @@ namespace Belle2 {
   class ECLDigit : public TObject {
   public:
     /** default constructor for ROOT */
-    ECLDigit() {;}
+    ECLDigit() {
+      m_CellId = 0;    /**< Cell ID */
+      m_Amp = 0;       /**< Fitting Amplitude */
+      m_TimeFit = 0;   /**< Fitting Time */
+      m_Quality = 0;   /**< Fitting Quality */
+
+      ;
+    }
 
     /*! Set  Cell ID
      */

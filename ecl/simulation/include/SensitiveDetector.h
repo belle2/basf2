@@ -59,9 +59,6 @@ namespace Belle2 {
 
       //! Get cell, theta, phi Id from PhysicalVolume
       int Mapping(const G4String VolumeName);
-      int m_phiID; /**< The current phi ID in an event. Used to fill the DataStore ECL array.*/
-      int m_thetaID; /**< The current theta ID in an event. Used to fill the DataStore ECL array.*/
-      int m_cellID; /**< The current cellID in an event. Used to fill the DataStore ECL array.*/
     protected:
 
     private:
@@ -94,6 +91,9 @@ namespace Belle2 {
       double local_pos;          /** position alongthe vector of crystal axis   */
       double T_ave;              /** flight time to diode sensor  */
       int firstcall;             /** flag of first call   */
+      int m_phiID; /**< The current phi ID in an event. Used to fill the DataStore ECL array.*/
+      int m_thetaID; /**< The current theta ID in an event. Used to fill the DataStore ECL array.*/
+      int m_cellID; /**< The current cellID in an event. Used to fill the DataStore ECL array.*/
       typedef std::map< int, int>  PrimaryTrackMap; /** define a map type for Primary Track*/
       PrimaryTrackMap eclPrimaryMap; /** the map to store Primary Track*/
 

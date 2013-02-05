@@ -27,7 +27,11 @@ namespace Belle2 {
   class ECLDebugHit : public TObject {
   public:
     /** default constructor for ROOT */
-    ECLDebugHit() {;}
+    ECLDebugHit() {
+      m_cellId = 0;    /**< Cell ID */
+      m_Edep = 0;    /**< deposited energy */
+      m_TimeAve = 0; /**< average time */
+    }
 
     /*! Set  Cell ID
      */

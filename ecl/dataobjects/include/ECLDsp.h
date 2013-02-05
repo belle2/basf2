@@ -27,7 +27,11 @@ namespace Belle2 {
   class ECLDsp : public TObject {
   public:
     /** default constructor for ROOT */
-    ECLDsp() {;}
+    ECLDsp() {
+      m_CellId = 0;    /**< Cell ID */
+      for (int i = 0; i < 31; i++)m_DspA[i] = 0; /**< Dsp Array 0~31 for fit   */
+      ;
+    }
 
     /*! Set Cell ID
      */

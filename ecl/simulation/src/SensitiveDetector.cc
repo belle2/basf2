@@ -51,9 +51,30 @@ namespace Belle2 {
 
     SensitiveDetector::SensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
       Simulation::SensitiveDetectorBase(name, ECL), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
-      m_thresholdKineticEnergy(thresholdKineticEnergy), m_simhitNumber(0), m_trackID(-999), firstcall(0)
+      m_thresholdKineticEnergy(thresholdKineticEnergy)
     {
+      m_simhitNumber = 0;
+      m_hitNum = 0;
+      m_EvnetNumber = 0;
+      m_oldEvnetNumber = 0;
+      m_trackID = 0;
+      m_startTime = 0;
+      m_endTime = 0;
+      m_WightedTime = 0;
+      m_startEnergy = 0;
+      m_energyDeposit = 0;
+      m_trackLength = 0;
+      iECLCell = 0;
+      TimeIndex = 0;
+      local_pos = 0;
+      T_ave = 0;
+      firstcall = 0;
+      m_phiID = 0;
+      m_thetaID = 0;
+      m_cellID = 0;
 
+
+      for (int i = 0; i < 8736; i++) {for (int j = 0; j < 80; j++) { ECLHitIndex[i][j] = 0;}}
       StoreArray<ECLSimHit>eclSimHits;
       StoreArray<ECLHit>eclHits;
       StoreArray<MCParticle>mcParticles;
@@ -130,9 +151,8 @@ namespace Belle2 {
           ECLGeometryPar* eclp = ECLGeometryPar::Instance();
           m_cellID = eclp->ECLVolNameToCellID(v.GetName());
 
-          int saveIndex = -999;
           double dTotalEnergy = 1 / m_energyDeposit; //avoid the error  no match for 'operator/'
-          if (m_energyDeposit > 0.)saveIndex = saveSimHit(m_cellID, m_trackID, pdgCode, m_WightedTime / m_energyDeposit , m_energyDeposit, m_momentum, m_WightedPos * dTotalEnergy);
+          if (m_energyDeposit > 0.) saveSimHit(m_cellID, m_trackID, pdgCode, m_WightedTime / m_energyDeposit , m_energyDeposit, m_momentum, m_WightedPos * dTotalEnergy);
         }
 
         //Reset TrackID

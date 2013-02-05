@@ -153,22 +153,22 @@ namespace Belle2 {
      * @{
      * Define versions without template arguments, to be useful within python modules. From within C++, you should always use the type-safe functions above!
      */
-    RelationVector<TObject> getRelationsTo(const std::string& name = "") const {
+    RelationVector<TObject> getRelationsTo(const std::string& name) const {
       return getRelationsTo<TObject>(name);
     }
-    RelationVector<TObject> getRelationsFrom(const std::string& name = "") const {
+    RelationVector<TObject> getRelationsFrom(const std::string& name) const {
       return getRelationsFrom<TObject>(name);
     }
-    RelationVector<TObject> getRelationsWith(const std::string& name = "") const {
+    RelationVector<TObject> getRelationsWith(const std::string& name) const {
       return getRelationsWith<TObject>(name);
     }
-    const TObject* getRelatedTo(const std::string& name = "") const {
+    const TObject* getRelatedTo(const std::string& name) const {
       return getRelatedTo<TObject>(name);
     }
-    const TObject* getRelatedFrom(const std::string& name = "") const {
+    const TObject* getRelatedFrom(const std::string& name) const {
       return getRelatedFrom<TObject>(name);
     }
-    const TObject* getRelated(const std::string& name = "") const {
+    const TObject* getRelated(const std::string& name) const {
       return getRelated<TObject>(name);
     }
     /** @} */

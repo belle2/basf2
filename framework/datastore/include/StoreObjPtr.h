@@ -124,7 +124,7 @@ namespace Belle2 {
      */
     static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
       std::string objName = DataStore::objectName<T>(name);
-      return DataStore::Instance().optionalInput(name, durability, T::Class(), false);
+      return DataStore::Instance().optionalInput(objName, durability, T::Class(), false);
     }
 
     /** Constructor to access an object in the DataStore.

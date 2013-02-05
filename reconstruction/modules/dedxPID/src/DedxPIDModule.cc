@@ -99,6 +99,13 @@ void DedxPIDModule::initialize()
   //required inputs
   StoreArray<GFTrack>::required();
 
+  //optional inputs
+  StoreArray<MCParticle>::optional();
+  StoreArray<CDCHit>::optional();
+  StoreArray<SVDTrueHit>::optional();
+  StoreArray<PXDTrueHit>::optional();
+  StoreArray<PXDCluster>::optional();
+
   //register outputs (if needed)
   if (m_enableDebugOutput)
     StoreArray<DedxTrack>::registerPersistent();

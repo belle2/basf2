@@ -55,6 +55,19 @@ DisplayModule::~DisplayModule()
 
 void DisplayModule::initialize()
 {
+  //optional inputs
+  StoreArray<MCParticle>::optional();
+  StoreArray<CDCSimHit>::optional();
+  StoreArray<PXDSimHit>::optional();
+  StoreArray<SVDSimHit>::optional();
+  StoreArray<BKLMSimHit>::optional();
+  StoreArray<EKLMStepHit>::optional();
+  StoreArray<ECLHit>::optional();
+  StoreArray<ECLGamma>::optional();
+  StoreArray<GFTrack>::optional();
+  StoreArray<GFTrackCand>::optional();
+  StoreArray<GFRaveVertex>::optional();
+
   if (!gGeoManager) { //TGeo geometry not initialized, do it ourselves
     //convert geant4 geometry to TGeo geometry
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();

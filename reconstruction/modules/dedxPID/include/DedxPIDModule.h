@@ -33,7 +33,6 @@ namespace Belle2 {
 
   /** Extract dE/dx (and some other things) from Tracks&GFTracks and PXDClusters, SVDTrueHits (not digitized) and CDCHits.
    *
-   *
    * If a PDF file is specified using the 'PDFFile' parameter, likelihood values
    * for all particle hypotheses are calculated and saved in a DedxLikelihood object.
    *

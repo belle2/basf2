@@ -8,13 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/core/ModuleStatistics.h>
-#include <sstream>
-#include <boost/format.hpp>
 #include <boost/python.hpp>
+
+#include <framework/core/ModuleStatistics.h>
+
+#include <boost/format.hpp>
 #include <boost/foreach.hpp>
 #include <boost/bind.hpp>
 #include <boost/mpl/vector.hpp>
+
+#include <sstream>
 
 using namespace std;
 using namespace boost::python;

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <boost/python.hpp>
+#include <boost/python/def.hpp>
 
 #include <framework/core/RandomNumbers.h>
 #include <framework/logging/Logger.h>

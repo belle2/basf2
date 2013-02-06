@@ -1,7 +1,6 @@
 #ifndef PYMODULE_H
 #define PYMODULE_H
 
-#include <boost/python.hpp>
 #include <boost/python/call_method.hpp>
 
 #include <framework/core/Module.h>

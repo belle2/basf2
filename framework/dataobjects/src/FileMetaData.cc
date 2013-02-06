@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <boost/python.hpp>
+#include <boost/python/class.hpp>
 
 #include <framework/dataobjects/FileMetaData.h>
 

@@ -11,13 +11,12 @@
 #ifndef PATH_H_
 #define PATH_H_
 
-#include <boost/python.hpp>
+#include <boost/python/list.hpp>
 
 #include <framework/core/PathElement.h>
 
 #include <list>
 #include <boost/shared_ptr.hpp>
-#include <boost/python/list.hpp>
 
 
 namespace Belle2 {

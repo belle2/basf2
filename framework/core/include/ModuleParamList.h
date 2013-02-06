@@ -11,8 +11,10 @@
 #ifndef MODULEPARAMS_H_
 #define MODULEPARAMS_H_
 
-#include <boost/python.hpp>
+#include <boost/python/object.hpp>
 #include <boost/python/list.hpp>
+#include <boost/python/dict.hpp>
+#include <boost/python/extract.hpp>
 
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/core/ModuleParam.h>

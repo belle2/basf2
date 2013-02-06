@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <boost/python/register_ptr_to_python.hpp>
+#include <boost/python/class.hpp>
 
 #include <framework/core/Path.h>
 #include <framework/core/Module.h>

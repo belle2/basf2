@@ -18,7 +18,11 @@
 
 #include <framework/logging/Logger.h>
 
-#include <boost/python.hpp>
+#include <boost/python/list.hpp>
+#include <boost/python/dict.hpp>
+#include <boost/python/object.hpp>
+#include <boost/python/class.hpp>
+#include <boost/python/overloads.hpp>
 
 using namespace std;
 using namespace boost::python;

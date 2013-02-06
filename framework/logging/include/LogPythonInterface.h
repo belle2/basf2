@@ -11,7 +11,7 @@
 #ifndef LOGPYTHONINTERFACE_H_
 #define LOGPYTHONINTERFACE_H_
 
-#include <boost/python.hpp>
+#include <boost/python/dict.hpp>
 
 #include <framework/logging/LogConfig.h>
 

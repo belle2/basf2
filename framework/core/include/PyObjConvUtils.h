@@ -1,7 +1,6 @@
 #ifndef PYOBJCONVUTILS_H_
 #define PYOBJCONVUTILS_H_
 
-#include <boost/python.hpp>
 #include <boost/python/object.hpp>
 #include <boost/python/list.hpp>
 

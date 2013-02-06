@@ -11,7 +11,7 @@
 #ifndef MODULESTATISTICS_H
 #define MODULESTATISTICS_H
 
-#include <boost/python.hpp>
+#include <boost/python/list.hpp>
 #include <boost/array.hpp>
 
 #include <framework/gearbox/Unit.h>

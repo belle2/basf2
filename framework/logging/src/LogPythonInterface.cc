@@ -3,10 +3,12 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Thomas Kuhr                                            *
+ * Contributors: Martin Ritter, Thomas Kuhr                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
+#include <boost/python.hpp>
 
 #include <framework/logging/LogPythonInterface.h>
 #include <framework/logging/Logger.h>

@@ -11,15 +11,11 @@
 #ifndef MODULEPARAM_H_
 #define MODULEPARAM_H_
 
-#include <boost/python.hpp>
 #include <boost/python/list.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include <map>
 #include <string>
 #include <typeinfo>
-#include <list>
-
 
 namespace Belle2 {
 
@@ -202,18 +198,7 @@ namespace Belle2 {
     /**
      * Exposes methods of the ModuleParam class to Python.
      */
-    static void exposePythonAPI() {
-      //Python class definition
-      boost::python::class_<ModuleParamInfoPython>("ModuleParamInfo")
-      .def_readonly("name", &ModuleParamInfoPython::m_name)
-      .def_readonly("type", &ModuleParamInfoPython::m_typeName)
-      .def_readonly("default", &ModuleParamInfoPython::m_defaultValues)
-      .def_readonly("values", &ModuleParamInfoPython::m_values)
-      .def_readonly("description", &ModuleParamInfoPython::m_description)
-      .def_readonly("forceInSteering", &ModuleParamInfoPython::m_forceInSteering)
-      .def_readonly("setInSteering", &ModuleParamInfoPython::m_setInSteering)
-      ;
-    }
+    static void exposePythonAPI();
   };
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

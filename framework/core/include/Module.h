@@ -11,9 +11,7 @@
 #ifndef MODULE_H
 #define MODULE_H
 
-#include <boost/python.hpp>
 #include <boost/python/list.hpp>
-#include <boost/python/dict.hpp>
 
 #include <framework/core/PathElement.h>
 #include <framework/core/CondParser.h>
@@ -21,9 +19,18 @@
 #include <framework/logging/LogConfig.h>
 
 #include <boost/shared_ptr.hpp>
+
 #include <list>
 #include <string>
 #include <set>
+
+namespace boost {
+  namespace python {
+    class dict;
+    class object;
+  }
+}
+
 
 namespace Belle2 {
 

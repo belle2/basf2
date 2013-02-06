@@ -32,6 +32,7 @@
 #include <GFTrack.h>
 #include <GFTrackCand.h>
 #include <tracking/dataobjects/Track.h>
+#include <tracking/dataobjects/TrackFitResult.h>
 
 // ECL
 #include <ecl/dataobjects/ECLShower.h>

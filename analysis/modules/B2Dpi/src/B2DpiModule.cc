@@ -210,45 +210,21 @@ void B2DpiModule::event()
   // all charged tracks are considered as kaons/pions,
   // e.g. there is no PID information used as this point
   // to separate the two species
-  // create charged pion particles
+  // create charged pion and kaon particles
   for (int trackIndex = 0; trackIndex < nTracks; ++trackIndex) {
-    if (tracks[trackIndex]->getOmega() > 0) {
-      // cread and append Particle to StoreArray
-      Particle posP(tracks[trackIndex], trackIndex, 211);
-      particles.appendNew(posP);
+    // Charged Pions
+    Particle pion(tracks[trackIndex], trackIndex, Const::ChargedStable::pion);
+    particles.appendNew(pion);
+    //create Track <-> Particle relation
+    unsigned pionIndex = particles.getEntries() - 1;
+    particlesToTracks.add(pionIndex, trackIndex);
 
-      unsigned particleIndex = particles.getEntries() - 1;
-      //create Track <-> Particle relation
-      particlesToTracks.add(particleIndex, trackIndex);
-    } else {
-      // cread and append Particle to StoreArray
-      Particle negP(tracks[trackIndex], trackIndex, -211);
-      particles.appendNew(negP);
-
-      unsigned particleIndex = particles.getEntries() - 1;
-      //create Track <-> Particle relation
-      particlesToTracks.add(particleIndex, trackIndex);
-    }
-  }
-
-  // create charged kaon particles
-  for (int trackIndex = 0; trackIndex < nTracks; ++trackIndex) {
-    if (tracks[trackIndex]->getOmega() > 0) {
-      // cread and append Particle to StoreArray
-      Particle posP(tracks[trackIndex], trackIndex, 321);
-      particles.appendNew(posP);
-
-      unsigned particleIndex = particles.getEntries() - 1;
-      //create Track <-> Particle relation
-      particlesToTracks.add(particleIndex, trackIndex);
-    } else {
-      // cread and append Particle to StoreArray
-      Particle negP(tracks[trackIndex], trackIndex, -321);
-      particles.appendNew(negP);
-      unsigned particleIndex = particles.getEntries() - 1;
-      //create Track <-> Particle relation
-      particlesToTracks.add(particleIndex, trackIndex);
-    }
+    // Charged Kaons
+    Particle kaon(tracks[trackIndex], trackIndex, Const::ChargedStable::kaon);
+    particles.appendNew(kaon);
+    //create Track <-> Particle relation
+    unsigned kaonIndex = particles.getEntries() - 1;
+    particlesToTracks.add(kaonIndex, trackIndex);
   }
 
   std::vector<const Particle*> kp, km, pip, pim;

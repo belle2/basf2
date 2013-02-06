@@ -17,6 +17,7 @@
 #include <TVector3.h>
 #include <TLorentzVector.h>
 #include <TMatrixFSym.h>
+#include <framework/gearbox/Const.h>
 
 #include <vector>
 
@@ -98,9 +99,9 @@ namespace Belle2 {
      * Constructor from a reconstructed track (mdst object Track)
      * @param pointer to the Track object
      * @param StoreArray index of Track object
-     * @param PDG code
+     * @param Type of charged particle (do determine which Track fit hypothesis to use)
      */
-    Particle(const Track*, const unsigned index, const int pdgCode);
+    Particle(const Track*, const unsigned index, const Const::ChargedStable& chargedStable);
 
     /**
      * Constructor from a reconstructed gamma candidate (mdst object ECLGamma)
@@ -315,13 +316,6 @@ namespace Belle2 {
     float getCharge(void) const;
 
     /**
-     * Get 0-based index of the particle in the corresponding Particle StoreArray.
-     *
-     * @return The index of the Particle in the corresponding Particle StoreArray.
-     */
-    int getArrayIndex() const { fixParticleList(); return m_particleIndex;  }
-
-    /**
      * Returns index of MDST Object from corresponding StoreArray.
      * Value makes sense only for Final State Particles constructed
      * out of Track/EclShower/... . For other particle types (Composite)
@@ -403,12 +397,6 @@ namespace Belle2 {
      * will be set correctly on first access after deserialisation
      */
     TClonesArray* m_plist; //! transient pointer to particle StoreArray
-
-    /**
-     * 0-based index of the particle, will be set automatically after
-     * deserialisation if needed.
-     */
-    int m_particleIndex; //! transient 0-based index of particle
 
     int             m_pdgCode;       /**< PDG-code of the Particle */
     EParticleType   m_particleType;  /**< Particle type: Track/ECLShower/Composite/?? */

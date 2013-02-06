@@ -13,8 +13,6 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <framework/gearbox/Const.h>
-
 #include <TDatabasePDG.h>
 
 #include <ecl/dataobjects/ECLShower.h>
@@ -22,12 +20,13 @@
 #include <ecl/dataobjects/ECLPi0.h>
 #include <generators/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/Track.h>
+#include <tracking/dataobjects/TrackFitResult.h>
 
 using namespace Belle2;
 
 // Constructors - START
 Particle::Particle() :
-  m_plist(0), m_particleIndex(-1), m_pdgCode(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_plist(0), m_pdgCode(0), m_particleType(c_Undefined), m_mdstIndex(0),
   m_energy(0), m_momentum_x(0), m_momentum_y(0), m_momentum_z(0),
   m_position_x(0), m_position_y(0), m_position_z(0)
 {
@@ -35,7 +34,7 @@ Particle::Particle() :
 }
 
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
-  m_plist(0), m_particleIndex(-1), m_pdgCode(pdgCode), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_plist(0), m_pdgCode(pdgCode), m_particleType(c_Undefined), m_mdstIndex(0),
   m_position_x(0), m_position_y(0), m_position_z(0)
 {
   set4Vector(momentum);
@@ -43,7 +42,7 @@ Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
 }
 
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode, const std::vector<int> &daughterIndices) :
-  m_plist(0), m_particleIndex(-1), m_pdgCode(pdgCode), m_mdstIndex(0),
+  m_plist(0), m_pdgCode(pdgCode), m_mdstIndex(0),
   m_position_x(0), m_position_y(0), m_position_z(0)
 {
   set4Vector(momentum);
@@ -57,60 +56,71 @@ Particle::Particle(const TLorentzVector& momentum, const int pdgCode, const std:
   }
 }
 
-Particle::Particle(const Track* track, const unsigned index, const int pdgCode) :
-  m_plist(0), m_particleIndex(-1), m_pdgCode(pdgCode), m_particleType(c_Track), m_mdstIndex(index)
+Particle::Particle(const Track* track, const unsigned index, const Const::ChargedStable& chargedStable) :
+  m_plist(0), m_particleType(c_Track), m_mdstIndex(index)
 {
+  const TrackFitResult* trackFit = track->getTrackFitResult(chargedStable);
+
+  int absPDGCode = chargedStable.getPDGCode();
+  int signFlip = 1;
+  if (absPDGCode < Const::ChargedStable::muon.getPDGCode() + 1)
+    signFlip = -1;
+
+  m_pdgCode = chargedStable.getPDGCode() * signFlip * trackFit->getCharge();
+
   // set position at which the momentum is estimated (= POCA)
-  setVertex(track->getPosition());
+  setVertex(trackFit->getPosition());
 
   // set 4-momentum
 
-  // first get nominal mass from the pdgCode
+  // first get nominal mass from the m_pdgCode
   // TODO: deal with exceptions
-  if (TDatabasePDG::Instance()->GetParticle(pdgCode) == NULL)
+  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == NULL)
     B2FATAL("Unknown PDG code!");
 
-  float pdgMass = TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass() ;
+  float pdgMass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
 
   // construct 4-momentum from measured 3-momentum
   // and assigned mass hypothesis
   TLorentzVector momentum;
-  momentum.SetVectM(track->getMomentum(), pdgMass);
+  momentum.SetVectM(trackFit->getMomentum(), pdgMass);
   set4Vector(momentum);
 
   // fill the error matrix
   // m_momentumPositionError  = px, py, pz, E,  x,  y, z
   // p.getErrorMatrix row     = x,  y,  z,  px, py, pz
-  m_momentumPositionError[0]  = track->getErrorMatrix()[3][3]; // px-px
-  m_momentumPositionError[1]  = track->getErrorMatrix()[3][4]; // px-py
-  m_momentumPositionError[2]  = track->getErrorMatrix()[3][5]; // px-pz
-  m_momentumPositionError[4]  = track->getErrorMatrix()[3][0]; // px-x
-  m_momentumPositionError[5]  = track->getErrorMatrix()[3][1]; // px-y
-  m_momentumPositionError[6]  = track->getErrorMatrix()[3][2]; // px-z
-  m_momentumPositionError[7]  = track->getErrorMatrix()[4][4]; // py-py
-  m_momentumPositionError[8]  = track->getErrorMatrix()[4][5]; // py-pz
+  // TODO: set error matrix
+  /*
+  m_momentumPositionError[0]  = trackFit->getErrorMatrix()[3][3]; // px-px
+  m_momentumPositionError[1]  = trackFit->getErrorMatrix()[3][4]; // px-py
+  m_momentumPositionError[2]  = trackFit->getErrorMatrix()[3][5]; // px-pz
+  m_momentumPositionError[4]  = trackFit->getErrorMatrix()[3][0]; // px-x
+  m_momentumPositionError[5]  = trackFit->getErrorMatrix()[3][1]; // px-y
+  m_momentumPositionError[6]  = trackFit->getErrorMatrix()[3][2]; // px-z
+  m_momentumPositionError[7]  = trackFit->getErrorMatrix()[4][4]; // py-py
+  m_momentumPositionError[8]  = trackFit->getErrorMatrix()[4][5]; // py-pz
 
-  m_momentumPositionError[10] = track->getErrorMatrix()[4][0]; // py-x
-  m_momentumPositionError[11] = track->getErrorMatrix()[4][1]; // py-y
-  m_momentumPositionError[12] = track->getErrorMatrix()[4][2]; // py-z
-  m_momentumPositionError[13] = track->getErrorMatrix()[5][5]; // pz-pz
+  m_momentumPositionError[10] = trackFit->getErrorMatrix()[4][0]; // py-x
+  m_momentumPositionError[11] = trackFit->getErrorMatrix()[4][1]; // py-y
+  m_momentumPositionError[12] = trackFit->getErrorMatrix()[4][2]; // py-z
+  m_momentumPositionError[13] = trackFit->getErrorMatrix()[5][5]; // pz-pz
 
-  m_momentumPositionError[15] = track->getErrorMatrix()[5][0]; // pz-x
-  m_momentumPositionError[16] = track->getErrorMatrix()[5][1]; // pz-y
-  m_momentumPositionError[17] = track->getErrorMatrix()[5][2]; // pz-z
+  m_momentumPositionError[15] = trackFit->getErrorMatrix()[5][0]; // pz-x
+  m_momentumPositionError[16] = trackFit->getErrorMatrix()[5][1]; // pz-y
+  m_momentumPositionError[17] = trackFit->getErrorMatrix()[5][2]; // pz-z
 
   // covariance E-(x,y,z) is set to 0
   m_momentumPositionError[19] = 0.0; // E-x
   m_momentumPositionError[20] = 0.0; // E-y
   m_momentumPositionError[21] = 0.0; // E-z
 
-  m_momentumPositionError[22] = track->getErrorMatrix()[0][0]; // x-x
-  m_momentumPositionError[23] = track->getErrorMatrix()[0][1]; // x-y
-  m_momentumPositionError[24] = track->getErrorMatrix()[0][2]; // x-z
-  m_momentumPositionError[25] = track->getErrorMatrix()[1][1]; // y-y
-  m_momentumPositionError[26] = track->getErrorMatrix()[1][2]; // y-z
-  m_momentumPositionError[27] = track->getErrorMatrix()[2][2]; // z-z
-
+  m_momentumPositionError[22] = trackFit->getErrorMatrix()[0][0]; // x-x
+  m_momentumPositionError[23] = trackFit->getErrorMatrix()[0][1]; // x-y
+  m_momentumPositionError[24] = trackFit->getErrorMatrix()[0][2]; // x-z
+  m_momentumPositionError[25] = trackFit->getErrorMatrix()[1][1]; // y-y
+  m_momentumPositionError[26] = trackFit->getErrorMatrix()[1][2]; // y-z
+  m_momentumPositionError[27] = trackFit->getErrorMatrix()[2][2]; // z-z
+  */
   // covariance E-(px,py,pz)
   // E = sqrt(px*px+py*py+pz*pz+m*m)
   // therfore covariance E:px
@@ -147,7 +157,7 @@ Particle::Particle(const Track* track, const unsigned index, const int pdgCode) 
 }
 
 Particle::Particle(const ECLGamma* gamma) :
-  m_plist(0), m_particleIndex(-1), m_pdgCode(Const::photon.pdgCode()), m_particleType(c_ECLShower)
+  m_plist(0), m_pdgCode(Const::photon.getPDGCode()), m_particleType(c_ECLShower)
 {
   // position
   // TODO: Obtain the values from ECL group (via xml file or something like this), but hard coded values need to be avoided!
@@ -187,7 +197,7 @@ Particle::Particle(const ECLGamma* gamma) :
 }
 
 Particle::Particle(const ECLPi0* pi0) :
-  m_plist(0), m_particleIndex(-1), m_pdgCode(Const::pi0.pdgCode()), m_particleType(c_Composite), m_mdstIndex(0)
+  m_plist(0), m_pdgCode(Const::pi0.getPDGCode()), m_particleType(c_Composite), m_mdstIndex(0)
 {
   // position
   // TODO: Obtain the values from ECL group (via xml file or something like this), but hard coded values need to be avoided!
@@ -227,7 +237,7 @@ Particle::Particle(const ECLPi0* pi0) :
 }
 
 Particle::Particle(const MCParticle* mcParticle) :
-  m_plist(0), m_particleIndex(-1), m_particleType(c_MCParticle)
+  m_plist(0), m_particleType(c_MCParticle)
 {
   m_pdgCode      = mcParticle->getPDG();
   m_mdstIndex    = mcParticle->getIndex();
@@ -427,7 +437,7 @@ void Particle::fixParticleList() const
 
   //Search default location
   StoreArray<Particle> Particles;
-  if (Particles && Particles->IndexOf(this) >= 0) {
+  if (Particles && getArrayIndex() >= 0) {
     plist = Particles.getPtr();
   } else {
     //Search all StoreArrays which happen to store Particles
@@ -451,7 +461,6 @@ void Particle::fixParticleList() const
   for (int i = 0; i < plist->GetEntriesFast(); i++) {
     Particle& p = *(static_cast<Particle*>(plist->At(i)));
     p.m_plist         = plist;
-    p.m_particleIndex = i;
   }
 }
 

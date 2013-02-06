@@ -17,6 +17,10 @@ using namespace Belle2;
 
 ClassImp(Belle2::EKLMDigit);
 
+EKLMDigit::EKLMDigit()
+{
+}
+
 EKLMDigit::EKLMDigit(const EKLMSimHit* hit)
   : EKLMHitBase((EKLMHitBase)(*hit)),
     m_Plane(hit->getPlane()),

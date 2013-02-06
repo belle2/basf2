@@ -33,7 +33,7 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMDigit() {};
+    EKLMDigit();
 
     /**
      * Constructor from the EKLMSimHit.

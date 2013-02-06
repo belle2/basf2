@@ -41,7 +41,7 @@ namespace Belle2 {
      *  @return TrackFitResult for fit with particle hypothesis given by ParticleCode.
      *  @sa ParticleCode, TrackFitResult
      */
-    TrackFitResult* getTrackFitResult(const Const::ChargedStable& chargedStable);
+    const TrackFitResult* getTrackFitResult(const Const::ChargedStable& chargedStable) const;
 
 
   private:

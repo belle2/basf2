@@ -100,6 +100,14 @@ namespace Belle2 {
       return m_pdg;
     }
 
+    /** Return track charge (1 or -1). */
+    short getCharge() const {
+      if (getOmega() >= 0)
+        return 1;
+      else
+        return -1;
+    }
+
     /** Getter for Chi2 Probability of the track fit. */
     float getPValue() const {
       return m_pValue;

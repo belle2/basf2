@@ -23,10 +23,10 @@ Track::Track(const GFTrack& gftrack)
 }
 
 
-TrackFitResult* Track::getTrackFitResult(const Const::ChargedStable& chargedStable)
+const TrackFitResult* Track::getTrackFitResult(const Const::ChargedStable& chargedStable) const
 {
 
-  return m_trackFitResults[m_trackFitIndices[chargedStable.index()]];
+  return m_trackFitResults[m_trackFitIndices[chargedStable.getIndex()]];
 
 }
 

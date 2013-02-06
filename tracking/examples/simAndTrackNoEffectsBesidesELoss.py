@@ -36,7 +36,7 @@ param_pGun = {  # this angle is only there to prevent curlers
     }
 pGun.param(param_pGun)
 g4sim = register_module('FullSim')
-
+g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
 # in this example I am switching off the effects only for Muons because energy
 # loss for Muons is still active which means they still produce secondary
 # particles in the detector. If these particles also do not have any effects

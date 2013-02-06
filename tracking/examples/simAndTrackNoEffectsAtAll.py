@@ -42,6 +42,7 @@ param_pGun = {  # this angle is only there to prevent curlers
     }
 pGun.param(param_pGun)
 g4sim = register_module('FullSim')
+g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
 g4sim.param('UICommands', [  # "/process/inactivate     Transportation",
                              # "/process/inactivate            nKiller",
                              # "/process/inactivate G4ErrorStepLengthLimit",

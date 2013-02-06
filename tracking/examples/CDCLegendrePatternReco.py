@@ -113,6 +113,7 @@ geometry.param('Components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'
 # ---------------------------------------------------------------
 # simulation
 g4sim = register_module('FullSim')
+g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
 g4sim.logging.log_level = LogLevel.ERROR
 
 # param_g4sim = {'RegisterOptics': 1, 'PhotonFraction': 0.3,
@@ -150,10 +151,15 @@ cdctracking.param(param_cdctracking)
 mctrackfinder = register_module('MCTrackFinder')
 
 # select which detectors you would like to use
-param_mctrackfinder = {'UseCDCHits': 1, 'UseSVDHits': 1, 'UsePXDHits': 1}
-param_mctrackfinder = {'WhichParticles': ['primary'], 'EnergyCut': 0.1,
-                       'Neutrals': 0}
-mctrackfinder.param('GFTrackCandidatesColName', 'GFTrackCands')
+# select which detectors you would like to use and select which particles to use: primary particles
+param_mctrackfinder = {
+    'WhichParticles': ['primary'],
+    'EnergyCut': 0.1,
+    'Neutrals': 0,
+    'UseCDCHits': 1,
+    'UseSVDHits': 1,
+    'UsePXDHits': 1,
+    }
 mctrackfinder.param(param_mctrackfinder)
 
 mctrackfinder = register_module('MCTrackFinder')
@@ -174,7 +180,6 @@ cdcfitting = register_module('GenFitter')
 # select DAF instead of Kalman as Filter
 # set the pdg hypothesis to the simulated one, if you want to fit with different pdg hypothesises, just state them all in the PDGCodes list
 param_cdcfitting = {
-    'GFTrackCandidatesColName': 'GFTrackCands',
     'GFTracksColName': 'GFTracks',
     'TracksColName': 'Tracks',
     'PDGCodes': [211],

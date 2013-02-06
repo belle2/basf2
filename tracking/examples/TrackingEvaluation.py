@@ -84,7 +84,7 @@ pGun.param(param_pGun)
 g4sim = register_module('FullSim')
 # make simulation less noisy
 g4sim.logging.log_level = LogLevel.ERROR
-
+g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
 # digitizer
 cdcDigitizer = register_module('CDCDigitizer')
 
@@ -96,10 +96,13 @@ cdcDigitizer.param(param_cdcdigi)
 # find MCTracks
 mctrackfinder = register_module('MCTrackFinder')
 
-# select which detectors you would like to use
-param_mctrackfinder = {'UseCDCHits': 1, 'UseSVDHits': 0, 'UsePXDHits': 0}
-# select which particles to use: primary particles
-param_mctrackfinder = {'WhichParticles': ['primary']}
+# select which detectors you would like to use and select which particles to use: primary particles
+param_mctrackfinder = {
+    'UseCDCHits': 1,
+    'UseSVDHits': 0,
+    'UsePXDHits': 0,
+    'WhichParticles': ['primary'],
+    }
 mctrackfinder.param(param_mctrackfinder)
 
 # fitting of MCTracks

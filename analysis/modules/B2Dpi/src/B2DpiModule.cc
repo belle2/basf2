@@ -27,13 +27,12 @@
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 
-#include <generators/utilities/cm2LabBoost.h>
+//#include <generators/utilities/cm2LabBoost.h>
+
+#include <analysis/KFit/MakeMotherKFit.h>
 
 // utilities
-#include <analysis/particle/combination.h>
 #include <analysis/utility/physics.h>
-#include <analysis/utility/pid.h>
-#include <analysis/utility/makeMother.h>
 
 using namespace std;
 using namespace Belle2;
@@ -75,11 +74,14 @@ void B2DpiModule::initialize()
   StoreArray<GFTrack>        gfTracks(m_gfTracksColName);
   StoreArray<Track>          tracks(m_tracksColName);
 
+  StoreArray<Particle>::registerPersistent();
+  RelationArray::registerPersistent<Particle, Track>();
+
   // Initializing the output root file
   string dataFileName = m_dataOutFileName + ".root";
 
   m_rootFile = new TFile(dataFileName.c_str(), "RECREATE");
-  m_tree     = new TTree("m_tree", "B2Dpi tree");
+  m_tree     = new TTree("m_tree", "NewB2Dpi tree");
 
   m_tree->Branch("bsize",     &m_bsize,      "bsize/D");
   m_tree->Branch("dmass",     &m_md,         "dmass/D");
@@ -159,22 +161,12 @@ void B2DpiModule::event()
   m_gen_d0_vz = 0;
   m_d0_chi2 = 0;
 
+  // reconstructed Particles
+  StoreArray<Particle> particles;
+
   // Fitted tracks with GenFit
   StoreArray<Track>    tracks(m_tracksColName);
   int nTracks = tracks.getEntries();
-
-  Ptype ptype_pion_plus(211);
-  Ptype ptype_pion_minus(-211);
-  Ptype ptype_kaon_plus(321);
-  Ptype ptype_kaon_minus(-321);
-  Ptype ptype_pion_zero(111);
-  Ptype ptype_gamma(22);
-  Ptype ptype_d0(421);
-  Ptype ptype_d0b(-421);
-  Ptype ptype_phi(333);
-  Ptype ptype_ks(310);
-  Ptype ptype_bp(521);
-  Ptype ptype_bm(-521);
 
   // Array of MC particles
   StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
@@ -210,41 +202,163 @@ void B2DpiModule::event()
   }
 
 
+  // Relations
+  RelationArray particlesToTracks(particles, tracks);
+
   // Reconstruction
   // Fill final state particle (charged tracks) vectors
   // all charged tracks are considered as kaons/pions,
   // e.g. there is no PID information used as this point
   // to separate the two species
-  vector<Particle> k_p, k_m, pi_p, pi_m;
+  // create charged pion particles
+  for (int trackIndex = 0; trackIndex < nTracks; ++trackIndex) {
+    if (tracks[trackIndex]->getOmega() > 0) {
+      // cread and append Particle to StoreArray
+      Particle posP(tracks[trackIndex], trackIndex, 211);
+      particles.appendNew(posP);
 
-  for (int i = 0; i < nTracks; ++i) {
-    if (tracks[i]->getOmega() > 0) {
-      Particle tmp1(*tracks[i], ptype_kaon_plus);
-      k_p.push_back(tmp1);
-      Particle tmp2(*tracks[i], ptype_pion_plus);
-      pi_p.push_back(tmp2);
+      unsigned particleIndex = particles.getEntries() - 1;
+      //create Track <-> Particle relation
+      particlesToTracks.add(particleIndex, trackIndex);
     } else {
-      Particle tmp3(*tracks[i], ptype_kaon_minus);
-      k_m.push_back(tmp3);
-      Particle tmp4(*tracks[i], ptype_pion_minus);
-      pi_m.push_back(tmp4);
+      // cread and append Particle to StoreArray
+      Particle negP(tracks[trackIndex], trackIndex, -211);
+      particles.appendNew(negP);
+
+      unsigned particleIndex = particles.getEntries() - 1;
+      //create Track <-> Particle relation
+      particlesToTracks.add(particleIndex, trackIndex);
     }
   }
 
-  // Make D0 and D0-bar combinations (D0 ->Kpi decays)
-  // all candidates within +/- 100 MeV around the nominal
-  // D0 mass are accepted
-  std::vector<Particle> D0;
-  std::vector<Particle> D0b;
-  combination(D0,  ptype_d0,  k_m, pi_p,   0.100);
-  combination(D0b, ptype_d0b, k_p, pi_m,   0.100);
+  // create charged kaon particles
+  for (int trackIndex = 0; trackIndex < nTracks; ++trackIndex) {
+    if (tracks[trackIndex]->getOmega() > 0) {
+      // cread and append Particle to StoreArray
+      Particle posP(tracks[trackIndex], trackIndex, 321);
+      particles.appendNew(posP);
 
-  // Make B+/- combinations (both charg combinations are
-  // saved to the same vector of particles)
-  // No cut on B mesons is performed at this stage
-  std::vector<Particle> B;
-  combination(B, ptype_bp, D0,  pi_m);
-  combination(B, ptype_bm, D0b, pi_p);
+      unsigned particleIndex = particles.getEntries() - 1;
+      //create Track <-> Particle relation
+      particlesToTracks.add(particleIndex, trackIndex);
+    } else {
+      // cread and append Particle to StoreArray
+      Particle negP(tracks[trackIndex], trackIndex, -321);
+      particles.appendNew(negP);
+      unsigned particleIndex = particles.getEntries() - 1;
+      //create Track <-> Particle relation
+      particlesToTracks.add(particleIndex, trackIndex);
+    }
+  }
+
+  std::vector<const Particle*> kp, km, pip, pim;
+  for (int i = 0; i < particles.getEntries(); i++) {
+    const Particle* part = particles[i];
+    if (part->getPDGCode() == 321)
+      kp.push_back(part);
+    else if (part->getPDGCode() == -321)
+      km.push_back(part);
+    if (part->getPDGCode() == 211)
+      pip.push_back(part);
+    else if (part->getPDGCode() == -211)
+      pim.push_back(part);
+  }
+
+  // make D0 -> k- pi+
+  for (unsigned kaon = 0; kaon < km.size(); kaon++) {
+    for (unsigned pion = 0; pion < pip.size(); pion++) {
+      const Particle* K  = km[kaon];
+      const Particle* Pi = pip[pion];
+
+      // check for overlap
+      if (K->overlapsWith(Pi))
+        continue;
+
+      Particle D0(K->get4Vector() + Pi->get4Vector(), 421);
+      D0.appendDaughter(K);
+      D0.appendDaughter(Pi);
+
+      if (D0.getMass() < 1.8 || D0.getMass() > 1.9)
+        continue;
+
+      particles.appendNew(D0);
+    }
+  }
+
+  // make D0bar -> K+ pi-
+  for (unsigned kaon = 0; kaon < kp.size(); kaon++) {
+    for (unsigned pion = 0; pion < pim.size(); pion++) {
+      const Particle* K  = kp[kaon];
+      const Particle* Pi = pim[pion];
+
+      // check for overlap
+      if (K->overlapsWith(Pi))
+        continue;
+
+      Particle D0bar(K->get4Vector() + Pi->get4Vector(), -421);
+      D0bar.appendDaughter(K);
+      D0bar.appendDaughter(Pi);
+
+      if (D0bar.getMass() < 1.8 || D0bar.getMass() > 1.9)
+        continue;
+
+      particles.appendNew(D0bar);
+    }
+  }
+
+  std::vector<const Particle*> d0, d0bar;
+  for (int i = 0; i < particles.getEntries(); i++) {
+    const Particle* part = particles[i];
+    if (part->getPDGCode() == 421)
+      d0.push_back(part);
+    if (part->getPDGCode() == -421)
+      d0bar.push_back(part);
+  }
+
+
+
+  // make B- -> D0 pi-
+  for (unsigned d = 0; d < d0.size(); d++) {
+    for (unsigned pion = 0; pion < pim.size(); pion++) {
+      const Particle* D0 = d0[d];
+      const Particle* Pi = pim[pion];
+
+      // check for overlap
+      if (D0->overlapsWith(Pi))
+        continue;
+
+      Particle Bm(D0->get4Vector() + Pi->get4Vector(), -511);
+      Bm.appendDaughter(D0);
+      Bm.appendDaughter(Pi);
+
+      particles.appendNew(Bm);
+    }
+  }
+
+  // make B+ -> D0bar pi+
+  for (unsigned d = 0; d < d0bar.size(); d++) {
+    for (unsigned pion = 0; pion < pip.size(); pion++) {
+      const Particle* D0bar = d0bar[d];
+      const Particle* Pi    = pip[pion];
+
+      // check for overlap
+      if (D0bar->overlapsWith(Pi))
+        continue;
+
+      Particle Bp(D0bar->get4Vector() + Pi->get4Vector(), 511);
+      Bp.appendDaughter(D0bar);
+      Bp.appendDaughter(Pi);
+
+      particles.appendNew(Bp);
+    }
+  }
+
+  std::vector<const Particle*> B;
+  for (int i = 0; i < particles.getEntries(); i++) {
+    const Particle* part = particles[i];
+    if (abs(part->getPDGCode()) == 511)
+      B.push_back(part);
+  }
 
   // Obtain the CM boost vector and CM energy
   // (functions are implemented in utility/include/physics.h)
@@ -255,9 +369,9 @@ void B2DpiModule::event()
   for (int i = 0; i < (int) B.size(); ++i) {
 
     m_cmse = cmsE;
-    m_md   = B[i].child(0).momentum().p().mag();
+    m_md   = B[i]->getDaughter(0)->getMass();
 
-    m_b.SetPxPyPzE(B[i].px(), B[i].py(), B[i].pz(), B[i].e());
+    m_b = B[i]->get4Vector();
     m_b.Boost(boostToCMS);
 
     m_deltae = m_b.E() - cmsE;
@@ -279,20 +393,21 @@ void B2DpiModule::event()
     // calculate DeltaE and Mbc before any kinematic fitting
     // for later comparison
     m_cmse = cmsE;
-    m_md   = B[i].child(0).momentum().p().mag();
+    m_md   = B[i]->getDaughter(0)->getMass();
 
-    m_b.SetPxPyPzE(B[i].px(), B[i].py(), B[i].pz(), B[i].e());
+    m_b = B[i]->get4Vector();
     m_b.Boost(boostToCMS);
 
     m_deltae = m_b.E() - cmsE;
     m_mbc    = sqrt((cmsE * cmsE) - m_b.Vect().Mag2());
+
 
     // perform mass-constrained-vertex fit for D0 candidate
     // and save updated D0 mass, Mbc, DeltaE to ntuple
     // for comparison with the "unconstrained" values
     double confLevel(0);
 
-    doKmvFit(B[i].child(0), confLevel);
+    doKmvFit(B[i]->getDaughter(0), confLevel);
     m_d0_chi2 = confLevel;
 
     // perform vertex fit for B+ candidate
@@ -300,29 +415,29 @@ void B2DpiModule::event()
     m_bp_chi2 = confLevel;
 
     // save m(Kpi), Mbc and DeltaE after the kinematic fits
-    m_md_fit = B[i].child(0).momentum().p().mag();
+    m_md_fit = B[i]->getDaughter(0)->getMass();
 
-    m_b.SetPxPyPzE(B[i].px(), B[i].py(), B[i].pz(), B[i].e());
+    m_b = B[i]->get4Vector();
     m_b.Boost(boostToCMS);
     m_deltae_fit = m_b.E() - cmsE;
     m_mbc_fit    = sqrt((cmsE * cmsE) - m_b.Vect().Mag2());
 
     // save vertex information
-    m_d0_vx = B[i].child(0).momentum().x().x();
-    m_d0_vy = B[i].child(0).momentum().x().y();
-    m_d0_vz = B[i].child(0).momentum().x().z();
+    m_d0_vx = B[i]->getDaughter(0)->getVertex().X();
+    m_d0_vy = B[i]->getDaughter(0)->getVertex().Y();
+    m_d0_vz = B[i]->getDaughter(0)->getVertex().Z();
 
-    m_d0_evx = sqrt(B[i].child(0).momentum().dx()[0][0]);
-    m_d0_evy = sqrt(B[i].child(0).momentum().dx()[1][1]);
-    m_d0_evz = sqrt(B[i].child(0).momentum().dx()[2][2]);
+    m_d0_evx = sqrt(B[i]->getDaughter(0)->getVertexErrorMatrix()[0][0]);
+    m_d0_evy = sqrt(B[i]->getDaughter(0)->getVertexErrorMatrix()[1][1]);
+    m_d0_evz = sqrt(B[i]->getDaughter(0)->getVertexErrorMatrix()[2][2]);
 
-    m_bp_vx = B[i].momentum().x().x();
-    m_bp_vy = B[i].momentum().x().y();
-    m_bp_vz = B[i].momentum().x().z();
+    m_bp_vx = B[i]->getVertex().X();
+    m_bp_vy = B[i]->getVertex().Y();
+    m_bp_vz = B[i]->getVertex().Z();
 
-    m_bp_evx = sqrt(B[i].momentum().dx()[0][0]);
-    m_bp_evy = sqrt(B[i].momentum().dx()[1][1]);
-    m_bp_evz = sqrt(B[i].momentum().dx()[2][2]);
+    m_bp_evx = sqrt(B[i]->getVertexErrorMatrix()[0][0]);
+    m_bp_evy = sqrt(B[i]->getVertexErrorMatrix()[1][1]);
+    m_bp_evz = sqrt(B[i]->getVertexErrorMatrix()[2][2]);
 
     m_tree->Fill();
   }
@@ -331,32 +446,42 @@ void B2DpiModule::event()
 }
 
 unsigned
-B2DpiModule::doKvFit(Particle& p, double& confLevel)
+B2DpiModule::doKvFit(const Particle* p, double& confLevel)
 {
-
   VertexFitKFit kv;
   kv.setMagneticField(1.5);
 
-  kv.addTrack(p.child(0).momentum().p(),
-              p.child(0).momentum().x(),
-              p.child(0).momentum().dpx(),
-              p.child(0).pType().charge());
+  for (unsigned i = 0; i < p->getNDaughters(); i++) {
+    CLHEP::HepLorentzVector mom(p->getDaughter(i)->get4Vector().X(),
+                                p->getDaughter(i)->get4Vector().Y(),
+                                p->getDaughter(i)->get4Vector().Z(),
+                                p->getDaughter(i)->get4Vector().E());
 
-  kv.addTrack(p.child(1).momentum().p(),
-              p.child(1).momentum().x(),
-              p.child(1).momentum().dpx(),
-              p.child(1).pType().charge());
+    HepPoint3D pos(p->getDaughter(i)->getVertex().X(),
+                   p->getDaughter(i)->getVertex().Y(),
+                   p->getDaughter(i)->getVertex().Z());
+
+
+    CLHEP::HepSymMatrix covMatrix(7);
+    for (int mi = 0; mi < 7; mi++) {
+      for (int mj = 0; mj < 7; mj++) {
+        covMatrix[mi][mj] = p->getDaughter(i)->getMomentumVertexErrorMatrix()[mi][mj];
+      }
+    }
+
+    kv.addTrack(mom, pos, covMatrix, p->getDaughter(i)->getCharge());
+  }
 
   unsigned err = kv.doFit();
   if (!err) {
     confLevel = kv.getCHIsq();
+    return makeMother(kv, const_cast<Particle*>(p));
 
-    return makeMother(kv, p);
   } else
     return 0;
 }
 
-
+/*
 unsigned
 B2DpiModule::doKmFit(Particle& p, double& confLevel)
 {
@@ -385,35 +510,144 @@ B2DpiModule::doKmFit(Particle& p, double& confLevel)
     return 0;
 }
 
+*/
 
-
-unsigned
-B2DpiModule::doKmvFit(Particle& p, double& confLevel)
+unsigned B2DpiModule::doKmvFit(const Particle* p, double& confLevel)
 {
 
   MassVertexFitKFit kmv;
   kmv.setMagneticField(1.5);
 
-  kmv.addTrack(p.child(0).momentum().p(),
-               p.child(0).momentum().x(),
-               p.child(0).momentum().dpx(),
-               p.child(0).pType().charge());
+  for (unsigned i = 0; i < p->getNDaughters(); i++) {
+    CLHEP::HepLorentzVector mom(p->getDaughter(i)->get4Vector().X(),
+                                p->getDaughter(i)->get4Vector().Y(),
+                                p->getDaughter(i)->get4Vector().Z(),
+                                p->getDaughter(i)->get4Vector().E());
 
-  kmv.addTrack(p.child(1).momentum().p(),
-               p.child(1).momentum().x(),
-               p.child(1).momentum().dpx(),
-               p.child(1).pType().charge());
+    HepPoint3D pos(p->getDaughter(i)->getVertex().X(),
+                   p->getDaughter(i)->getVertex().Y(),
+                   p->getDaughter(i)->getVertex().Z());
 
-  kmv.setInvariantMass(p.pType().mass());
+
+    CLHEP::HepSymMatrix covMatrix(7);
+    for (int mi = 0; mi < 7; mi++) {
+      for (int mj = 0; mj < 7; mj++) {
+        covMatrix[mi][mj] = p->getDaughter(i)->getMomentumVertexErrorMatrix()[mi][mj];
+      }
+    }
+
+    kmv.addTrack(mom, pos, covMatrix, p->getDaughter(i)->getCharge());
+  }
+
+  kmv.setInvariantMass(p->getPDGMass());
 
   unsigned err = kmv.doFit();
   if (!err) {
-    confLevel = kmv.getCHIsq();
 
-    return makeMother(kmv, p);
+    confLevel = kmv.getCHIsq();
+    return makeMother(kmv, const_cast<Particle*>(p));
+
   } else
     return 0;
 }
+
+/* Updates the momentum and vertex of mother particle after vertex fit. */
+unsigned B2DpiModule::makeMother(VertexFitKFit& kv, Particle* mother)
+{
+
+  unsigned n = kv.getTrackCount();
+  MakeMotherKFit kmm;
+  kmm.setMagneticField(1.5);
+
+  for (unsigned i = 0; i < n; ++i) {
+    kmm.addTrack(kv.getTrackMomentum(i),
+                 kv.getTrackPosition(i),
+                 kv.getTrackError(i),
+                 kv.getTrack(i).getCharge());
+
+    for (unsigned j = i + 1; j < n; ++j) {
+      kmm.setCorrelation(kv.getCorrelation(i, j));
+    }
+  }
+
+  kmm.setVertex(kv.getVertex());
+  kmm.setVertexError(kv.getVertexError());
+
+  unsigned err = kmm.doMake();
+  if (err != 0)
+    return 0;
+
+  TLorentzVector mom(kmm.getMotherMomentum().px(),
+                     kmm.getMotherMomentum().py(),
+                     kmm.getMotherMomentum().pz(),
+                     kmm.getMotherMomentum().e());
+
+  TVector3 pos(kmm.getMotherPosition().x(),
+               kmm.getMotherPosition().y(),
+               kmm.getMotherPosition().z());
+
+  TMatrixFSym covMatrix(7);
+
+  for (int mi = 0; mi < 7; mi++) {
+    for (int mj = 0; mj < 7; mj++) {
+      covMatrix(mi, mj) = kmm.getMotherError()[mi][mj];
+    }
+  }
+
+  mother->updateMomentum(mom, pos, covMatrix);
+
+  return 1;
+}
+
+
+/* Updates the momentum and vertex of mother particle after mass constrained vertex fit. */
+unsigned B2DpiModule::makeMother(MassVertexFitKFit& km, Particle* mother)
+{
+
+  unsigned n = km.getTrackCount();
+  MakeMotherKFit kmm;
+  kmm.setMagneticField(1.5);
+
+  for (unsigned i = 0; i < n; ++i) {
+    kmm.addTrack(km.getTrackMomentum(i),
+                 km.getTrackPosition(i),
+                 km.getTrackError(i),
+                 km.getTrack(i).getCharge());
+
+    for (unsigned j = i + 1; j < n; ++j) {
+      kmm.setCorrelation(km.getCorrelation(i, j));
+    }
+  }
+
+  kmm.setVertex(km.getVertex());
+  kmm.setVertexError(km.getVertexError());
+
+  unsigned err = kmm.doMake();
+  if (err != 0)
+    return 0;
+
+  TLorentzVector mom(kmm.getMotherMomentum().px(),
+                     kmm.getMotherMomentum().py(),
+                     kmm.getMotherMomentum().pz(),
+                     kmm.getMotherMomentum().e());
+
+  TVector3 pos(kmm.getMotherPosition().x(),
+               kmm.getMotherPosition().y(),
+               kmm.getMotherPosition().z());
+
+  TMatrixFSym covMatrix(7);
+
+  for (int mi = 0; mi < 7; mi++) {
+    for (int mj = 0; mj < 7; mj++) {
+      covMatrix(mi, mj) = kmm.getMotherError()[mi][mj];
+    }
+  }
+
+  mother->updateMomentum(mom, pos, covMatrix);
+
+  return 1;
+}
+
 
 int B2DpiModule::isBtoD0PiDecay(MCParticle* part)
 {

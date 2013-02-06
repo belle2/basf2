@@ -17,7 +17,7 @@
 #include <vector>
 
 #include <generators/dataobjects/MCParticle.h>
-#include "analysis/particle/Particle.h"
+#include <analysis/dataobjects/Particle.h>
 
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
@@ -75,9 +75,12 @@ namespace Belle2 {
     virtual void event();
 
     //
-    unsigned doKvFit(Belle1::Particle& p, double& confLevel);
-    unsigned doKmFit(Belle1::Particle& p, double& confLevel);
-    unsigned doKmvFit(Belle1::Particle& p, double& confLevel);
+    unsigned doKvFit(const Particle* p, double& confLevel);
+    unsigned doKmFit(Particle& p, double& confLevel);
+    unsigned doKmvFit(const Particle* p, double& confLevel);
+
+    unsigned makeMother(MassVertexFitKFit& km, Particle* mother);
+    unsigned makeMother(VertexFitKFit& kv, Particle* mother);
 
     // Generated info Related functions
     int isBtoD0PiDecay(MCParticle* part);

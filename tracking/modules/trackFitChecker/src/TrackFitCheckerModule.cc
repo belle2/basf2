@@ -178,13 +178,13 @@ void TrackFitCheckerModule::initialize()
     m_nSvdLayers = 0;
   }
   if (m_testLRRes == true) {
-    m_testCdc = false; // do not make any other tests ont he CDC data. Only test the left right resolution
+    m_testCdc = false; // do not make any other tests on he CDC data. Only test the left right resolution
     CDC::CDCGeometryPar& cdcg = CDC::CDCGeometryPar::Instance();
     m_nCdcLayers =  cdcg.nWireLayers();
   }
   m_nSiLayers = m_nPxdLayers + m_nSvdLayers;
   m_nLayers = m_nPxdLayers + m_nSvdLayers + m_nCdcLayers;
-  B2DEBUG(100, "nLayers" << m_nLayers);
+  B2DEBUG(100, "nLayers " << m_nLayers);
 
   //make all vector of vectors have the size of the number of current layers in use
   int vecSizeMeasTest = 3;
@@ -433,6 +433,7 @@ void TrackFitCheckerModule::event()
     if (m_nLayers not_eq 0) { // now the layer wise tests
       //cerr << "m_nLayers: " << m_nLayers << endl;
       if (m_testLRRes not_eq true) {
+        //cout << "aTrackPtr->getNumHits()" << aTrackPtr->getNumHits() << endl;
         extractTrackData(aTrackPtr, charge);// read all the data for the layer wise tests from GFTracks
         B2DEBUG(100, "extractTrackData finished successfully");
       }
@@ -498,7 +499,7 @@ void TrackFitCheckerModule::endRun()
     std::map<std::string, StatisticsContainer >::iterator  trackWiseDataIter =  m_trackWiseDataSamples.begin();
     std::map<std::string, StatisticsContainer >::const_iterator trackWiseDataIterMax = m_trackWiseDataSamples.end();
     while (trackWiseDataIter not_eq trackWiseDataIterMax) {
-      printTrackWiseStatistics(trackWiseDataIter->first);
+      printTrackWiseStatistics(trackWiseDataIter->first, true);
       ++trackWiseDataIter;
     }
 
@@ -513,8 +514,8 @@ void TrackFitCheckerModule::endRun()
       measVarNames[0] = "u/d.l.";
       measVarNames[1] = "v/χ²";
     }
-    printTrackWiseVecStatistics("res_vertexPosMom", m_vertexTestsVarNames);
-    printTrackWiseVecStatistics("pulls_vertexPosMom", m_vertexTestsVarNames);
+    printTrackWiseVecStatistics("res_vertexPosMom", m_vertexTestsVarNames, true);
+    printTrackWiseVecStatistics("pulls_vertexPosMom", m_vertexTestsVarNames, true);
     /*vector<string> vertexTests7DVarNames;
     vertexTests7DVarNames.push_back("x");
     vertexTests7DVarNames.push_back("y");
@@ -772,9 +773,9 @@ void TrackFitCheckerModule::printLayerWiseStatistics(const string& nameOfDataSam
   const int nOfLayersPlus1 = nOfLayers + 1;
   for (int l = 1; l not_eq nOfLayersPlus1; ++l) { //start at 1 to for the textoutput
     aStrStr << l << "\t\t";
-    //    if( m_robust == true){
-    //      aStrStr << "\t\t\t";
-    //    }
+    if (m_robust == true) {
+      aStrStr << "\t\t\t";
+    }
     if (count == true) {
       aStrStr << "\t";
     }
@@ -782,9 +783,9 @@ void TrackFitCheckerModule::printLayerWiseStatistics(const string& nameOfDataSam
   aStrStr << "\n\t";
   for (int l = 0; l not_eq nOfLayers; ++l) {
     aStrStr << "mean\tstd\t";
-    //    if( m_robust == true){
-    //      aStrStr << "median\tMAD std\toutlier\t";
-    //    }
+    if (m_robust == true) {
+      aStrStr << "median\tMAD std\toutlier\t";
+    }
     if (count == true) {
       aStrStr << "count\t";
     }
@@ -798,17 +799,17 @@ void TrackFitCheckerModule::printLayerWiseStatistics(const string& nameOfDataSam
       double tempStd = sqrt(variance(dataSample[l][i]));
 
       m_textOutput << fixed << "\t" << tempMean << "\t" << tempStd;
-      //      if( m_robust == true){
-      //        double madScalingFactor =  m_madScalingFactors[nameOfDataSample];
-      //        if (madScalingFactor > 0.001) {
-      //          double aMedian = median(dataSample[l][i]);
-      //          double scaledMad = madScalingFactor*calcMad(m_layerWiseData[nameOfDataSample][l][i],aMedian);
-      //          int nOutliers = countOutliers(m_layerWiseData[nameOfDataSample][l][i],aMedian, scaledMad, 4);
-      //          m_textOutput << "\t" << aMedian << "\t" << scaledMad << "\t" << nOutliers;// << "\t" << calcMedian(m_trackWiseVecData[nameOfDataSample][i]);
-      //        } else {
-      //          m_textOutput << "\tno scaling => no MAD";
-      //        }
-      //      }
+      if (m_robust == true) {
+        //double madScalingFactor =  m_madScalingFactors[nameOfDataSample];
+        if (i < 5) { //
+          double aMedian = median(dataSample[l][i]);
+          double scaledMad = 1.4826 * calcMad(m_layerWiseData[nameOfDataSample][l][i], aMedian);
+          int nOutliers = countOutliers(m_layerWiseData[nameOfDataSample][l][i], aMedian, scaledMad, 4);
+          m_textOutput << "\t" << aMedian << "\t" << scaledMad << "\t" << nOutliers;// << "\t" << calcMedian(m_trackWiseVecData[nameOfDataSample][i]);
+        } else {
+          m_textOutput << "\tno\tmad\t";
+        }
+      }
 
       if (count == true) {
         m_textOutput << "\t" << boost::accumulators::count(dataSample[l][i]);
@@ -969,6 +970,7 @@ void TrackFitCheckerModule::fillLayerWiseData(const string& nameOfDataSample, co
   const int nNewData = newData.size();
   for (int i = 0; i not_eq nNewData; ++i) {
     m_layerWiseDataSamples[nameOfDataSample][accuVecIndex][i](newData[i]);
+    //cout << "filled " << nameOfDataSample << " at index " << accuVecIndex << " and variable " << i << " with data bit " << newData[i] << endl;
   }
   if (m_writeToRootFile == true and m_nLayers > 0) {
     for (int i = 0; i not_eq nNewData; ++i) {
@@ -1051,6 +1053,7 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
   const int trackRepId = 0;
   GFAbsTrackRep* rep = aTrackPtr->getTrackRep(trackRepId);
   m_trackData.nHits = aTrackPtr->getNumHits();
+  //cout << "nHits: " << aTrackPtr->getNumHits() << endl;
   for (int iGFHit = 0; iGFHit not_eq m_trackData.nHits; ++iGFHit) {
     GFAbsRecoHit*  aGFAbsRecoHitPtr = aTrackPtr->getHit(iGFHit);
     //cerr << "2 iGFHit " << iGFHit << "\n";
@@ -1203,17 +1206,19 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
 
 void TrackFitCheckerModule::truthTests()  //
 {
-
+//  cout << "TrackFitCheckerModule::truthTests" << endl;
+//  cout << "m_trackData.nHits" << m_trackData.nHits <<endl;
   for (int iGFHit = 0; iGFHit not_eq m_trackData.nHits; ++iGFHit) {
+    //cout << "for loop " << iGFHit << endl;
     int detId = m_trackData.detIds[iGFHit];
     if (detId == Const::PXD or detId == Const::SVD) {  //at the moment there is only truth info for PXD and SVD hits
       int accuVecIndex = m_trackData.accuVecIndices[iGFHit];
 
       TMatrixT<double> trueState = m_trackData.states_t[iGFHit];
-      if (trueState.GetNrows() == 0) { // this should not happen!!! If it does something went wrong. As a workaround just skip the hit (better the crashing I guess)
+      if (trueState.GetNrows() == 0) { // this should not happen!!! If it does something went wrong. As a workaround just skip the hit (better than crashing I guess)
         continue;
       }
-      //      cout << "true, m, H, V" << endl;
+      //cout << "true, m, H, V" << endl;
       //      trueState.Print();
       //      m_trackData.ms[iGFHit].Print();
       //      m_trackData.Hs[iGFHit].Print();

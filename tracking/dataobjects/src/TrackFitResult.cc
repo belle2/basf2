@@ -24,13 +24,13 @@ TrackFitResult::TrackFitResult(const GFAbsTrackRep& gfAbsTrackRep)
 
 // This class should be able to give back Helix information either in Perigee Parametrisation
 // or as starting position + momentum.
-TVector3 TrackFitResult::getPosition()
+TVector3 TrackFitResult::getPosition() const
 {
 }
 
-TVector3 TrackFitResult::getMomentum() {}
+TVector3 TrackFitResult::getMomentum() const {}
 
-TMatrixF TrackFitResult::getCovariance6() {}
+TMatrixF TrackFitResult::getCovariance6() const {}
 
 float TrackFitResult::getD0()  const {}
 float TrackFitResult::getPhi() const {}

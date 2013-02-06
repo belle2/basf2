@@ -32,9 +32,9 @@ namespace Belle2 {
 
     // This class should be able to give back Helix information either in Perigee Parametrisation
     // or as starting position + momentum.
-    TVector3 getPosition();
-    TVector3 getMomentum();
-    TMatrixF getCovariance6();
+    TVector3 getPosition() const;
+    TVector3 getMomentum() const;
+    TMatrixF getCovariance6() const;
 
     /* Is this necessary at this stage ?! or would above parametrization be just enough?
      * Internally it is definitivaly needed to reduce the space requirement, but it would be possible to
@@ -45,7 +45,7 @@ namespace Belle2 {
     float getOmega() const;
     float getZ0() const;
     float getCotTheta() const;
-    TMatrixF getCovariance5();
+    TMatrixF getCovariance5() const;
 
 
 

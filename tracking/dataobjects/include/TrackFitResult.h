@@ -135,6 +135,6 @@ namespace Belle2 {
     float m_perigeeParams [5] ;
     float m_perigeeUncertainties [15];
 
-    ClassDef(TrackFitResult, 0);
+    ClassDef(TrackFitResult, 1);
   };
 }

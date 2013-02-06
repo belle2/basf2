@@ -57,10 +57,10 @@ namespace Belle2 {
      */
     std::string m_trackFitResultsName;
 
-    StoreArray<TrackFitResult> m_trackFitResults;
+    StoreArray<TrackFitResult> m_trackFitResults; //!
 
 
     /** First version. */
-    ClassDef(Track, 0);
+    ClassDef(Track, 1);
   };
 }

@@ -36,7 +36,7 @@ namespace Belle2 {
       m_R = 0;           /**< R inherit from Belle */
       m_Error[0] = 0;    /**< Error of Energy, Theta and Phi */
       m_Error[1] = 0;    /**< Error of Energy, Theta and Phi */
-      m_Error[3] = 0;    /**< Error of Energy, Theta and Phi */
+      m_Error[2] = 0;    /**< Error of Energy, Theta and Phi */
       m_Mass = 0;        /**< Mass, inherit from Belle */
       m_Width = 0;       /**< Width, inherit from Belle */
       m_E9oE25 = 0;      /**< E9oE25, inherit from Belle */

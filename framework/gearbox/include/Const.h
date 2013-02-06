@@ -89,7 +89,7 @@ namespace Belle2 {
 
       /** Postfix increment.
        *
-       * Incrementing past the last element of a set will return an invalid particle.
+       * Incrementing past the last element of a set will yield an invalid particle.
        */
       ParticleType operator++(int);
 
@@ -119,16 +119,6 @@ namespace Belle2 {
        */
       double getMass() const;
 
-
-      //Deprecated, remove soonish
-      /** This particle's index in the associated set. */
-      unsigned int index() const __attribute__((deprecated)) { return getIndex(); }
-
-      /**
-       * PDG code.
-       * @return The PDG code of the particle.
-       */
-      int pdgCode() const __attribute__((deprecated)) {return getPDGCode();};
 
     private:
       int m_pdgCode;  /**< PDG code of the particle **/

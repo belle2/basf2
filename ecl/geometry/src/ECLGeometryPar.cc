@@ -312,9 +312,9 @@ void ECLGeometryPar::Mapping(int cid)
 
 int ECLGeometryPar::ECLVolNameToCellID(const G4String VolumeName)
 {
-  char temp1[10], temp2[10], temp3[10], temp4[30], temp5[30], temp6[10], temp7[10];
+  char temp1[100], temp2[100], temp3[100], temp4[100], temp5[100], temp6[100], temp7[100];
   int cellID = 0;
-  sscanf(VolumeName.c_str(), "%[^'_']_%[^'_']_%[^'_']_%[^'_']_%[^'_']_%[^'_']_%5s", temp1, temp2, temp3, temp4, temp5, temp6, temp7);
+  sscanf(VolumeName.c_str(), "%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%5s", temp1, temp2, temp3, temp4, temp5, temp6, temp7);
 
   int GSector = atoi(temp4) - 1;
   int iCry = atoi(temp6) - 1;
@@ -1011,9 +1011,10 @@ EclNbr::getNbr(const Identifier aCellId)
 namespace Belle2 {
   int ECLG4VolNameToCellID(const G4String VolumeName)
   {
-    char temp1[10], temp2[10], temp3[10], temp4[30], temp5[30], temp6[10], temp7[10];
+    char temp1[100], temp2[100], temp3[100], temp4[100], temp5[100], temp6[100], temp7[100];
     int cellID = 0;
-    sscanf(VolumeName.c_str(), "%[^'_']_%[^'_']_%[^'_']_%[^'_']_%[^'_']_%[^'_']_%5s", temp1, temp2, temp3, temp4, temp5, temp6, temp7);
+
+    sscanf(VolumeName.c_str(), "%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%5s", temp1, temp2, temp3, temp4, temp5, temp6, temp7);
 
     int GSector = (atoi(temp4) - 1) ;
     int iCry = atoi(temp6) - 1;

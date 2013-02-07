@@ -32,7 +32,8 @@ ROOT.gROOT.SetBatch(True)
 # get input file: newest file that matches the output name of the steering script
 filelist = glob.glob('../genfit_*StatData.root')
 filelist = filter(lambda x: not os.path.isdir(x), filelist)
-infile = max(filelist, key=lambda x: os.stat(x).st_mtime)
+filelist.sort(key=lambda f: os.path.getmtime(f))  # sort by modification date
+infile = filelist[-1]
 
 outFileName = 'TrackFitCheckerPlots_' + infile[infile.find('genfit_')
     + 7:infile.find('StatData.root')]

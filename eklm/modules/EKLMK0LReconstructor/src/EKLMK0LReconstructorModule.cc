@@ -139,11 +139,12 @@ static void merge2dClusters(std::vector<struct HitData> &hits,
     }
   }
   /* Erase merged hits. */
-  for (it = hits.begin(); it != hits.end(); it++) {
-    if (it->stat == c_Merged) {
-      hits.erase(it);
-      it--;
-    }
+  it = hits.begin();
+  while (it != hits.end()) {
+    if (it->stat == c_Merged)
+      it = hits.erase(it);
+    else
+      it++;
   }
 }
 

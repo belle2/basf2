@@ -23,10 +23,10 @@
 #include <geometry/GeometryManager.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
-#include "GFTrack.h"
-#include "GFAbsTrackRep.h"
-#include "GFException.h"
-#include "GFFieldManager.h"
+#include <GFTrack.h>
+#include <GFAbsTrackRep.h>
+#include <GFException.h>
+#include <GFFieldManager.h>
 #include <GFMaterialEffects.h>
 #include <GFTGeoMaterialInterface.h>
 
@@ -35,6 +35,8 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TMath.h>
+
+#include <boost/foreach.hpp>
 
 #include <cassert>
 #include <cmath>

@@ -28,14 +28,6 @@ namespace Belle2 {
    *
    * This module sets the random number generator seed to the
    * one that is stored in the given output file.
-
-  \correlationdiagram
-
-  FileMetaData = graph.data('FileMetaData')
-  module = graph.module('RandomSeedRestore', [FileMetaData], [])
-
-  \endcorrelationdiagram
-
    */
   class RandomSeedRestoreModule : public Module {
 

@@ -37,22 +37,6 @@ namespace Belle2 {
      * hits in the last row. By caching the last row, each pixel gets examined
      * only once and the 4 adjacent pixels are accessed in constant time.
      * @see ClusterCache
-
-       \correlationdiagram
-       MCParticle = graph.external_data('MCParticle')
-       PXDTrueHit = graph.data('PXDTrueHit')
-       PXDDigit   = graph.data('PXDDigit')
-       PXDCluster = graph.data('PXDCluster')
-
-       graph.module('PXDClusterizer', [MCParticle, PXDDigit, PXDTrueHit], [PXDCluster])
-       graph.relation(MCParticle, PXDTrueHit)
-       graph.relation(PXDDigit,   MCParticle)
-       graph.relation(PXDDigit,   PXDTrueHit)
-       graph.relation(PXDCluster, MCParticle)
-       graph.relation(PXDCluster, PXDDigit)
-       graph.relation(PXDCluster, PXDTrueHit)
-       \endcorrelationdiagram
-
      */
     class PXDClusterizerModule : public Module {
 

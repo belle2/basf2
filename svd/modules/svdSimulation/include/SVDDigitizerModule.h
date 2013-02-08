@@ -64,21 +64,6 @@ namespace Belle2 {
     /** The SVD Digitizer module.
      * This module is responsible for converting the simulated energy
      * deposition from Geant4 into real SVD detector response of single strips.
-
-       \correlationdiagram
-       MCParticle = graph.external_data('MCParticle')
-       SVDSimHit  = graph.data('SVDSimHit')
-       SVDTrueHit = graph.data('SVDTrueHit')
-       SVDDigit   = graph.data('SVDDigit')
-
-       graph.module('SVDDigitizer', [MCParticle, SVDSimHit, SVDTrueHit], [SVDDigit])
-       graph.relation(MCParticle, SVDSimHit)
-       graph.relation(MCParticle, SVDTrueHit)
-       graph.relation(SVDTrueHit, SVDSimHit)
-       graph.relation(SVDDigit,   MCParticle)
-       graph.relation(SVDDigit,   SVDTrueHit)
-       \endcorrelationdiagram
-
      */
 
     class SVDDigitizerModule : public Module {

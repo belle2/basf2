@@ -15,6 +15,7 @@
 #include <boost/foreach.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <deque>
+#include <map>
 #include <algorithm>
 #include <math.h>
 

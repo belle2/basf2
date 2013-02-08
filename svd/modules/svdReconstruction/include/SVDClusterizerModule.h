@@ -37,22 +37,6 @@ namespace Belle2 {
      * time, same as in PXD, and then using a waveform fit to determine the initial
      * time of the waveform in the time coordinate and center-of-gravity or analog
      * head-tail to determine the spatial coordinate.
-
-       \correlationdiagram
-       MCParticle = graph.external_data('MCParticle')
-       SVDTrueHit = graph.data('SVDTrueHit')
-       SVDDigit   = graph.data('SVDDigit')
-       SVDCluster = graph.data('SVDCluster')
-
-       graph.module('SVDClusterizer', [MCParticle, SVDDigit, SVDTrueHit], [SVDCluster])
-       graph.relation(MCParticle, SVDTrueHit)
-       graph.relation(SVDDigit,   MCParticle)
-       graph.relation(SVDDigit,   SVDTrueHit)
-       graph.relation(SVDCluster, MCParticle)
-       graph.relation(SVDCluster, SVDDigit)
-       graph.relation(SVDCluster, SVDTrueHit)
-       \endcorrelationdiagram
-
      */
     class SVDClusterizerModule : public Module {
 

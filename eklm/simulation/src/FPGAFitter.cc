@@ -60,6 +60,7 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFit(int* amp, float* fit, int nPoints,
   double mpar[5];
   sum = 0;
   firstSig = -1;
+  lastSig = nPoints - 1;
   /**
    * Calculate integral above threshold and simultaneously find
    * first and last point above threshold.

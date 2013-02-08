@@ -220,11 +220,12 @@ int EKLM::FiberAndElectronics::getGeneratedNPE()
 void EKLM::FiberAndElectronics::debugOutput()
 {
   int i;
-  TH1D* histAmplitudeDirect;
-  TH1D* histAmplitudeReflected;
-  TH1D* histAmplitude;
-  TH1D* histADCAmplitude;
-  TH1D* histADCFit;
+  TFile* hfile = NULL;
+  TH1D* histAmplitudeDirect = NULL;
+  TH1D* histAmplitudeReflected = NULL;
+  TH1D* histAmplitude = NULL;
+  TH1D* histADCAmplitude = NULL;
+  TH1D* histADCFit = NULL;
   try {
     histAmplitudeDirect =
       new TH1D("histAmplitudeDirect", m_stripName.c_str(),
@@ -269,7 +270,6 @@ void EKLM::FiberAndElectronics::debugOutput()
   }
   std::string filename = m_stripName +
                          boost::lexical_cast<std::string>(gRandom->Integer(10000000)) + ".root";
-  TFile* hfile;
   try {
     hfile = new TFile(filename.c_str(), "NEW");
   } catch (std::bad_alloc& ba) {

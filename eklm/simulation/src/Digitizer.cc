@@ -46,7 +46,7 @@ void EKLM::Digitizer::readAndSortStepHits()
     it = m_stepHitVolumeMap.find((stepHitsArray[i])->getVolumeID());
 
     if (it == m_stepHitVolumeMap.end()) { //  new entry
-      std::vector<EKLMStepHit*> *vectorHits;
+      std::vector<EKLMStepHit*> *vectorHits = NULL;
       try {
         vectorHits = new std::vector<EKLMStepHit*> (1, (stepHitsArray[i]));
       } catch (std::bad_alloc& ba) {
@@ -206,7 +206,7 @@ void EKLM::Digitizer::readAndSortSimHits()
     it = m_HitStripMap.find((m_simHitsArray[i])->getVolumeID());
 
     if (it == m_HitStripMap.end()) { //  new entry
-      std::vector<EKLMSimHit*> *vectorHits;
+      std::vector<EKLMSimHit*> *vectorHits = NULL;
       try {
         vectorHits = new std::vector<EKLMSimHit*> (1, (m_simHitsArray[i]));
       } catch (std::bad_alloc& ba) {

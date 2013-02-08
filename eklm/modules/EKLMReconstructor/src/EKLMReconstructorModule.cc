@@ -43,16 +43,10 @@ void EKLMReconstructorModule::beginRun()
 
 void EKLMReconstructorModule::event()
 {
-  EKLM::Reconstructor* recon;
-  try {
-    recon = new EKLM::Reconstructor(&m_geoDat);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  recon->readStripHits();
-  recon->createSectorHits();
-  recon->create2dHits();
-  delete recon;
+  EKLM::Reconstructor recon(&m_geoDat);
+  recon.readStripHits();
+  recon.createSectorHits();
+  recon.create2dHits();
 }
 
 void EKLMReconstructorModule::endRun()

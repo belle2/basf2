@@ -442,8 +442,8 @@ void EKLM::GeoEKLMBelleII::getSheetTransform(HepGeom::Transform3D* t, int n)
 
 void EKLM::GeoEKLMBelleII::createEndcapSolid()
 {
-  G4Polyhedra* op;
-  G4Tubs* tb;
+  G4Polyhedra* op = NULL;
+  G4Tubs* tb = NULL;
   try {
     op = new G4Polyhedra("Endcap_Octagonal_Prism", ESTRPar.phi, ESTRPar.dphi,
                          ESTRPar.nsides, ESTRPar.nboundary, ESTRPar.z,
@@ -478,17 +478,17 @@ void EKLM::GeoEKLMBelleII::createPlaneSolid(int n)
   HepGeom::Transform3D t4;
   HepGeom::Transform3D t5;
   char name[128];
-  G4Tubs* tb;
-  G4Box* b1;
-  G4Box* b2;
-  G4TriangularPrism* pr1;
-  G4TriangularPrism* pr2;
-  G4TriangularPrism* pr3;
-  G4IntersectionSolid* is;
-  G4SubtractionSolid* ss1;
-  G4SubtractionSolid* ss2;
-  G4SubtractionSolid* ss3;
-  G4SubtractionSolid* ss4;
+  G4Tubs* tb = NULL;
+  G4Box* b1 = NULL;
+  G4Box* b2 = NULL;
+  G4TriangularPrism* pr1 = NULL;
+  G4TriangularPrism* pr2 = NULL;
+  G4TriangularPrism* pr3 = NULL;
+  G4IntersectionSolid* is = NULL;
+  G4SubtractionSolid* ss1 = NULL;
+  G4SubtractionSolid* ss2 = NULL;
+  G4SubtractionSolid* ss3 = NULL;
+  G4SubtractionSolid* ss4 = NULL;
   /* Basic solids. */
   snprintf(name, 128, "Plane_%d_Tube", n + 1);
   try {
@@ -779,7 +779,7 @@ void EKLM::GeoEKLMBelleII::createSolids()
 
 void EKLM::GeoEKLMBelleII::createEndcap(G4LogicalVolume* mlv)
 {
-  G4LogicalVolume* logicEndcap;
+  G4LogicalVolume* logicEndcap = NULL;
   G4Transform3D* t;
   std::string Endcap_Name = "Endcap_" +
                             boost::lexical_cast<std::string>(curvol.endcap);
@@ -804,7 +804,7 @@ void EKLM::GeoEKLMBelleII::createEndcap(G4LogicalVolume* mlv)
 void EKLM::GeoEKLMBelleII::createLayer(G4LogicalVolume* mlv)
 {
   static G4Tubs* solidLayer = NULL;
-  G4LogicalVolume* logicLayer;
+  G4LogicalVolume* logicLayer = NULL;
   std::string Layer_Name = "Layer_" +
                            boost::lexical_cast<std::string>(curvol.layer) +
                            "_" + mlv->GetName();
@@ -836,7 +836,7 @@ void EKLM::GeoEKLMBelleII::createSector(G4LogicalVolume* mlv)
 {
   int i;
   static G4Tubs* solidSector = NULL;
-  G4LogicalVolume* logicSector;
+  G4LogicalVolume* logicSector = NULL;
   std::string Sector_Name = "Sector_" +
                             boost::lexical_cast<std::string>(curvol.sector) +
                             "_" + mlv->GetName();
@@ -901,12 +901,12 @@ void EKLM::GeoEKLMBelleII::createSectorCover(int iCover, G4LogicalVolume* mlv)
   double z;
   double lz;
   double ang;
-  static G4Tubs* solidCoverTube;
-  static G4Box* solidCoverBox;
-  static G4Box* box;
-  static G4IntersectionSolid* is;
+  static G4Tubs* solidCoverTube = NULL;
+  static G4Box* solidCoverBox = NULL;
+  static G4Box* box = NULL;
+  static G4IntersectionSolid* is = NULL;
   static G4SubtractionSolid* solidCover = NULL;
-  G4LogicalVolume* logicCover;
+  G4LogicalVolume* logicCover = NULL;
   G4Transform3D t1;
   G4Transform3D t2;
   G4Transform3D t;
@@ -984,7 +984,7 @@ G4Box* EKLM::GeoEKLMBelleII::createSectorSupportBoxX(G4LogicalVolume* mlv,
 {
   double x1;
   double x2;
-  G4Box* res;
+  G4Box* res = NULL;
   x1 = sqrt(SectorSupportPosition.innerR * SectorSupportPosition.innerR -
             SectorSupportPosition.Y * SectorSupportPosition.Y);
   x2 = sqrt(SectorSupportPosition.outerR * SectorSupportPosition.outerR -
@@ -1007,7 +1007,7 @@ G4Box* EKLM::GeoEKLMBelleII::createSectorSupportBoxY(G4LogicalVolume* mlv,
 {
   double y1;
   double y2;
-  G4Box* res;
+  G4Box* res = NULL;
   y1 = sqrt(SectorSupportPosition.innerR * SectorSupportPosition.innerR -
             SectorSupportPosition.X * SectorSupportPosition.X);
   y2 = SectorSupportPosition.outerR - SectorSupportSize.DeltaLY;
@@ -1049,7 +1049,7 @@ G4Box* EKLM::GeoEKLMBelleII::createSectorSupportBoxTop(G4LogicalVolume* mlv,
   double x2;
   double y2;
   double ang;
-  G4Box* res;
+  G4Box* res = NULL;
   x1 = SectorSupportPosition.X;
   y1 = SectorSupportPosition.outerR - SectorSupportSize.DeltaLY;
   x2 = SectorSupportSize.CornerX + SectorSupportPosition.X;
@@ -1076,7 +1076,7 @@ G4Tubs* EKLM::GeoEKLMBelleII::createSectorSupportInnerTube(G4LogicalVolume* mlv)
   double y1;
   double ang1;
   double ang2;
-  G4Tubs* res;
+  G4Tubs* res = NULL;
   x1 = sqrt(SectorSupportPosition.innerR * SectorSupportPosition.innerR -
             SectorSupportPosition.Y * SectorSupportPosition.Y);
   y1 = sqrt(SectorSupportPosition.innerR * SectorSupportPosition.innerR -
@@ -1105,7 +1105,7 @@ G4Tubs* EKLM::GeoEKLMBelleII::createSectorSupportOuterTube(G4LogicalVolume* mlv)
   double ang1;
   double ang2;
   double r;
-  G4Tubs* res;
+  G4Tubs* res = NULL;
   r = SectorSupportPosition.outerR - SectorSupportSize.Thickness;
   x1 = sqrt(r * r - SectorSupportPosition.Y * SectorSupportPosition.Y);
   y1 = SectorSupportPosition.Y;
@@ -1131,12 +1131,12 @@ void EKLM::GeoEKLMBelleII::createSectorSupportCorner1(G4LogicalVolume* mlv)
 {
   double lx;
   double x;
-  static G4Tubs* solidCorner1Tube;
-  static G4Box* solidCorner1Box1;
-  static G4Box* solidCorner1Box2;
-  static G4IntersectionSolid* is1;
+  static G4Tubs* solidCorner1Tube = NULL;
+  static G4Box* solidCorner1Box1 = NULL;
+  static G4Box* solidCorner1Box2 = NULL;
+  static G4IntersectionSolid* is1 = NULL;
   static G4IntersectionSolid* solidCorner1 = NULL;
-  G4LogicalVolume* logicCorner1;
+  G4LogicalVolume* logicCorner1 = NULL;
   G4Transform3D t;
   G4Transform3D t1;
   G4Transform3D t2;
@@ -1218,10 +1218,10 @@ void EKLM::GeoEKLMBelleII::createSectorSupportCorner2(G4LogicalVolume* mlv)
   static double r;
   static double x;
   static double y;
-  static G4TriangularPrism* solidCorner2Prism;
-  static G4Tubs* solidCorner2Tubs;
+  static G4TriangularPrism* solidCorner2Prism = NULL;
+  static G4Tubs* solidCorner2Tubs = NULL;
   static G4SubtractionSolid* solidCorner2 = NULL;
-  G4LogicalVolume* logicCorner2;
+  G4LogicalVolume* logicCorner2 = NULL;
   G4Transform3D t;
   G4Transform3D t1;
   std::string Corner2_Name = "Corner2_" + mlv->GetName();
@@ -1273,10 +1273,10 @@ void EKLM::GeoEKLMBelleII::createSectorSupportCorner3(G4LogicalVolume* mlv)
   static double r;
   static double x;
   static double y;
-  static G4TriangularPrism* solidCorner3Prism;
-  static G4Tubs* solidCorner3Tubs;
+  static G4TriangularPrism* solidCorner3Prism = NULL;
+  static G4Tubs* solidCorner3Tubs = NULL;
   static G4SubtractionSolid* solidCorner3 = NULL;
-  G4LogicalVolume* logicCorner3;
+  G4LogicalVolume* logicCorner3 = NULL;
   G4Transform3D t;
   G4Transform3D t1;
   std::string Corner3_Name = "Corner3_" + mlv->GetName();
@@ -1329,10 +1329,10 @@ void EKLM::GeoEKLMBelleII::createSectorSupportCorner4(G4LogicalVolume* mlv)
   static double r;
   static double x;
   static double y;
-  static G4TriangularPrism* solidCorner4Prism;
-  static G4Tubs* solidCorner4Tubs;
+  static G4TriangularPrism* solidCorner4Prism = NULL;
+  static G4Tubs* solidCorner4Tubs = NULL;
   static G4SubtractionSolid* solidCorner4 = NULL;
-  G4LogicalVolume* logicCorner4;
+  G4LogicalVolume* logicCorner4 = NULL;
   G4Transform3D t;
   G4Transform3D t1;
   std::string Corner4_Name = "Corner4_" + mlv->GetName();
@@ -1382,18 +1382,18 @@ void EKLM::GeoEKLMBelleII::createSectorSupportCorner4(G4LogicalVolume* mlv)
 
 void EKLM::GeoEKLMBelleII::createSectorSupport(G4LogicalVolume* mlv)
 {
-  static G4Box* solidBoxX;
-  static G4Box* solidBoxY;
-  static G4Box* solidBoxTop;
-  static G4Tubs* solidOuterTube;
-  static G4Tubs* solidInnerTube;
-  static G4Tubs* solidLimitationTube;
-  static G4UnionSolid* us1;
-  static G4UnionSolid* us2;
-  static G4UnionSolid* us3;
-  static G4UnionSolid* us4;
+  static G4Box* solidBoxX = NULL;
+  static G4Box* solidBoxY = NULL;
+  static G4Box* solidBoxTop = NULL;
+  static G4Tubs* solidOuterTube = NULL;
+  static G4Tubs* solidInnerTube = NULL;
+  static G4Tubs* solidLimitationTube = NULL;
+  static G4UnionSolid* us1 = NULL;
+  static G4UnionSolid* us2 = NULL;
+  static G4UnionSolid* us3 = NULL;
+  static G4UnionSolid* us4 = NULL;
   static G4IntersectionSolid* solidSectorSupport = NULL;
-  G4LogicalVolume* logicSectorSupport;
+  G4LogicalVolume* logicSectorSupport = NULL;
   G4Transform3D t;
   G4Transform3D tbx;
   G4Transform3D tby;
@@ -1473,10 +1473,10 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
   int i;
   int j;
   G4Transform3D t;
-  G4Box* solidBoardBox;
+  G4Box* solidBoardBox = NULL;
   G4SubtractionSolid** ss[2];
-  G4SubtractionSolid* prev_solid;
-  G4SubtractionSolid* res;
+  G4SubtractionSolid* prev_solid = NULL;
+  G4SubtractionSolid* res = NULL;
   try {
     solidBoardBox = new G4Box("PlateBox", 0.5 * BoardSize.length,
                               0.5 * BoardSize.height,
@@ -1523,7 +1523,7 @@ void EKLM::GeoEKLMBelleII::createPlane(G4LogicalVolume* mlv)
 {
   int i;
   int j;
-  G4LogicalVolume* logicPlane;
+  G4LogicalVolume* logicPlane = NULL;
   std::string Plane_Name = "Plane_" +
                            boost::lexical_cast<std::string>(curvol.plane) + "_" +
                            mlv->GetName();
@@ -1553,7 +1553,7 @@ void EKLM::GeoEKLMBelleII::createSectionReadoutBoard(G4LogicalVolume* mlv)
 {
   int i;
   static G4Box* solidSectionReadoutBoard = NULL;
-  G4LogicalVolume* logicSectionReadoutBoard;
+  G4LogicalVolume* logicSectionReadoutBoard = NULL;
   std::string Board_Name = "SectionReadoutBoard_" +
                            boost::lexical_cast<std::string>(curvol.board) +
                            "_Plane_" +
@@ -1590,7 +1590,7 @@ void EKLM::GeoEKLMBelleII::createSectionReadoutBoard(G4LogicalVolume* mlv)
 void EKLM::GeoEKLMBelleII::createBaseBoard(G4LogicalVolume* mlv)
 {
   static G4Box* solidBaseBoard = NULL;
-  G4LogicalVolume* logicBaseBoard;
+  G4LogicalVolume* logicBaseBoard = NULL;
   G4Transform3D t;
   std::string Board_Name = "BaseBoard_" + mlv->GetName();
   if (solidBaseBoard == NULL)
@@ -1622,7 +1622,7 @@ void EKLM::GeoEKLMBelleII::createBaseBoard(G4LogicalVolume* mlv)
 void EKLM::GeoEKLMBelleII::createStripBoard(int iBoard, G4LogicalVolume* mlv)
 {
   static G4Box* solidStripBoard = NULL;
-  G4LogicalVolume* logicStripBoard;
+  G4LogicalVolume* logicStripBoard = NULL;
   G4Transform3D t;
   std::string Board_Name = "StripBoard_" +
                            boost::lexical_cast<std::string>(iBoard) + "_" +
@@ -1660,7 +1660,7 @@ void EKLM::GeoEKLMBelleII::createSectionSupport(int iSectionSupport,
   G4Transform3D t;
   G4Transform3D t1;
   G4Transform3D t2;
-  G4LogicalVolume* logicSectionSupport;
+  G4LogicalVolume* logicSectionSupport = NULL;
   std::string SectionSupportName;
   SectionSupportName = "SectionSupport_" +
                        boost::lexical_cast<std::string>(iSectionSupport) +
@@ -1822,7 +1822,7 @@ void EKLM::GeoEKLMBelleII::createStripVolume(G4LogicalVolume* mlv)
 
 void EKLM::GeoEKLMBelleII::createStrip(G4LogicalVolume* mlv)
 {
-  G4LogicalVolume* logicStrip;
+  G4LogicalVolume* logicStrip = NULL;
   G4Transform3D t;
   std::string Strip_Name = "Strip_" + mlv->GetName();
   try {
@@ -1846,7 +1846,7 @@ void EKLM::GeoEKLMBelleII::createStrip(G4LogicalVolume* mlv)
 
 void EKLM::GeoEKLMBelleII::createStripGroove(G4LogicalVolume* mlv)
 {
-  G4LogicalVolume* logicGroove;
+  G4LogicalVolume* logicGroove = NULL;
   G4Transform3D t;
   std::string Groove_Name = "Groove_" + mlv->GetName();
   try {
@@ -1869,7 +1869,7 @@ void EKLM::GeoEKLMBelleII::createStripGroove(G4LogicalVolume* mlv)
 
 void EKLM::GeoEKLMBelleII::createStripSensitive(G4LogicalVolume* mlv)
 {
-  G4LogicalVolume* logicSensitive;
+  G4LogicalVolume* logicSensitive = NULL;
   G4Transform3D t;
   G4Transform3D t1;
   std::string Sensitive_Name = "Sensitive_" + mlv->GetName();
@@ -1894,7 +1894,7 @@ void EKLM::GeoEKLMBelleII::createStripSensitive(G4LogicalVolume* mlv)
 
 void EKLM::GeoEKLMBelleII::createSiPM(G4LogicalVolume* mlv)
 {
-  G4LogicalVolume* logicSiPM;
+  G4LogicalVolume* logicSiPM = NULL;
   G4Transform3D t;
   std::string SiPM_Name = "SiPM_" + mlv->GetName();
   try {

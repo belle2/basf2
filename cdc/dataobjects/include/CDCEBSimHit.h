@@ -86,7 +86,8 @@ namespace Belle2 {
     //! Empty constructor
     /*! Recommended for ROOT IO
     */
-    CDCEBSimHit(): m_phi(0.0), m_trackId(0), m_pdg(0), m_edep(0.0) {}
+    CDCEBSimHit(): m_layerId(0), m_phi(0.0), m_trackId(0),
+      m_pdg(0), m_edep(0.0) {}
 
     //! Useful Constructor
     CDCEBSimHit(int layerId,

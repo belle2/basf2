@@ -180,9 +180,9 @@ void CDCGeometryPar::read()
 
 }
 
+
 void CDCGeometryPar::Print() const
-{
-}
+{}
 
 const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID) const
 {

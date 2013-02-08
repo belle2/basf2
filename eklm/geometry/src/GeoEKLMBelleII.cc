@@ -1484,7 +1484,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  for (i = 0; i < nPlane; i++) {
+  for (i = 0; i < 2; i++) {
     ss[i] = (G4SubtractionSolid**)malloc(sizeof(G4SubtractionSolid*) * nBoard);
     if (ss[i] == NULL)
       B2FATAL(MemErr);
@@ -1513,8 +1513,8 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
       }
     }
   }
-  res = ss[nPlane - 1][nBoard - 1];
-  for (i = 0; i < nPlane; i++)
+  res = ss[1][nBoard - 1];
+  for (i = 0; i < 2; i++)
     free(ss[i]);
   return res;
 }

@@ -14,6 +14,7 @@
     <Tungsten>Tungsten</Tungsten>
     <CFRP>CFRP</CFRP>
     <NEMA_G10_Plate>NEMA_G10_Plate</NEMA_G10_Plate>
+    <CDCGlue>CDCGlue</CDCGlue>
 
     <MomVol>
       <ZBound id="0">
@@ -45,7 +46,7 @@
         <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">549.503</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
-        <Offset desc="wire offset in phi direction at endplate">0</Offset>
+        <Offset desc="wire offset in phi direction at endplate">0.5</Offset>
       </SLayer>
       <SLayer id="1">
         <Radius desc="Radius of wires in this layer" unit="mm">178</Radius>
@@ -53,7 +54,7 @@
         <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">582.212</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
-        <Offset desc="wire offset in phi direction at endplate">0.5</Offset>
+        <Offset desc="wire offset in phi direction at endplate">0</Offset>
       </SLayer>
       <SLayer id="2">
         <Radius desc="Radius of wires in this layer" unit="mm">188</Radius>
@@ -61,7 +62,7 @@
         <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">614.92</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
-        <Offset desc="wire offset in phi direction at endplate">0</Offset>
+        <Offset desc="wire offset in phi direction at endplate">0.5</Offset>
       </SLayer>
       <SLayer id="3">
         <Radius desc="Radius of wires in this layer" unit="mm">198</Radius>
@@ -69,7 +70,7 @@
         <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">647.629</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
-        <Offset desc="wire offset in phi direction at endplate">0.5</Offset>
+        <Offset desc="wire offset in phi direction at endplate">0</Offset>
       </SLayer>
       <SLayer id="4">
         <Radius desc="Radius of wires in this layer" unit="mm">208</Radius>
@@ -77,7 +78,7 @@
         <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">680.337</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
-        <Offset desc="wire offset in phi direction at endplate">0</Offset>
+        <Offset desc="wire offset in phi direction at endplate">0.5</Offset>
       </SLayer>
       <SLayer id="5">
         <Radius desc="Radius of wires in this layer" unit="mm">218</Radius>
@@ -85,7 +86,7 @@
         <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">713.046</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
-        <Offset desc="wire offset in phi direction at endplate">0.5</Offset>
+        <Offset desc="wire offset in phi direction at endplate">0</Offset>
       </SLayer>
       <SLayer id="6">
         <Radius desc="Radius of wires in this layer" unit="mm">228</Radius>
@@ -93,7 +94,7 @@
         <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">745.755</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
-        <Offset desc="wire offset in phi direction at endplate">0</Offset>
+        <Offset desc="wire offset in phi direction at endplate">0.5</Offset>
       </SLayer>
       <SLayer id="7">
         <Radius desc="Radius of wires in this layer" unit="mm">238</Radius>
@@ -101,7 +102,7 @@
         <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">778.463</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
-        <Offset desc="wire offset in phi direction at endplate">0.5</Offset>
+        <Offset desc="wire offset in phi direction at endplate">0</Offset>
       </SLayer>
       <SLayer id="8">
         <Radius desc="Radius of wires in this layer" unit="mm">257</Radius>
@@ -3781,11 +3782,13 @@
         <EBForwardZ desc="Forward z position of electronics board" unit="mm">-827.5</EBForwardZ>
       </ElectronicsBoard>
     </ElectronicsBoards>
+
+    <!-- Definition of the Inner Wall  -->
     <InnerWalls>
       <InnerWall id="0">
         <Name>Shield</Name>
         <InnerR desc="Inner radius" unit="mm">162.9</InnerR>
-        <OuterR desc="Outer radius" unit="mm">163</OuterR>
+        <OuterR desc="Outer radius" unit="mm">165.0</OuterR>
         <BackwardZ desc="z position at backward endplate" unit="mm">-277.985</BackwardZ>
         <ForwardZ desc="z position at forward endplate" unit="mm">536.503</ForwardZ>
       </InnerWall>

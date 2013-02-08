@@ -166,8 +166,11 @@ namespace Belle2 {
     //! Empty constructor
     /*! Recommended for ROOT IO
     */
-    CDCSimHit(): SimHitBase() {;}
 
+    CDCSimHit(): SimHitBase(),
+      m_trackId(0), m_pdg(0), m_driftLength(0.0),
+      m_flightTime(0.0), m_edep(0.0), m_stepLength(1.0),
+      m_posFlag(0), m_globalTime(0.0) {}
 
     //! Useful Constructor
     CDCSimHit(int layerId,

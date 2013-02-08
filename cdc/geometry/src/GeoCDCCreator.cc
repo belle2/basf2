@@ -82,6 +82,7 @@ namespace Belle2 {
       string Tungsten  = content.getString("Tungsten");
       string CFRP  = content.getString("CFRP");
       string NEMA_G10_Plate  = content.getString("NEMA_G10_Plate");
+      string CDC_Glue  = content.getString("CDCGlue");
 
       //TGeoRotation* geoRot = new TGeoRotation("CDCRot", 90.0, globalRotAngle, 0.0);
       //TGeoVolumeAssembly* volGrpCDC = addSubdetectorGroup("CDC", new TGeoCombiTrans(0.0, 0.0, globalOffsetZ, geoRot));
@@ -96,7 +97,6 @@ namespace Belle2 {
       double* outerWallOuterR = new double[nOuterWall];
       double* outerWallBZ     = new double[nOuterWall];
       double* outerWallFZ     = new double[nOuterWall];
-
       // Used in density calculation.
       double rmin_outerWall;
 
@@ -126,8 +126,9 @@ namespace Belle2 {
       double* innerWallBZ     = new double[nInnerWall];
       double* innerWallFZ     = new double[nInnerWall];
 
+
       // Used in density calculation.
-      double rmax_innerWall;
+      double rmax_innerWall = 0.0;
 
       for (int iInnerWall = 0; iInnerWall < nInnerWall; ++iInnerWall) {
         GearDir innerWallContent(content);
@@ -142,6 +143,8 @@ namespace Belle2 {
         innerWallFZ[innerWallID]   = innerWallContent.getLength("ForwardZ");
 
         if (innerWallContent.getString("Name") == "Shield") rmax_innerWall = innerWallContent.getLength("OuterR");
+
+        std::cout << "R_in " << rmax_innerWall << std::endl;
       }
 
       //-----------------------------------------------------------------------
@@ -169,6 +172,7 @@ namespace Belle2 {
       G4Material* medTungsten = G4Material::GetMaterial(Tungsten.c_str());
       G4Material* medCFRP = geometry::Materials::get(CFRP.c_str());
       G4Material* medNEMA_G10_Plate = geometry::Materials::get(NEMA_G10_Plate.c_str());
+      G4Material* medCDC_Glue = geometry::Materials::get(CDC_Glue.c_str());
       G4Material* medAir = geometry::Materials::get("Air");
 
 
@@ -219,35 +223,6 @@ namespace Belle2 {
         //momRmax[iBound] = motherOuterR / Unit::mm;
         momRmax[iBound] = 1140.0;
       }
-
-      /*
-      mamaZ[0] = -1450.0;
-      mamaRmin[0] = 260.0;
-      mamaRmax[0] = 1137.1;
-
-      mamaZ[1] = -956.402;
-      mamaRmin[1] = 260.0;
-      mamaRmax[1] = 1137.1;
-
-      mamaZ[2] =  -600.985;
-      mamaRmin[2] = 160.0;
-      mamaRmax[2] = 1137.1;
-
-      mamaZ[3] = 629.503;
-      mamaRmin[3] = 160.0;
-      mamaRmax[3] = 1137.1;
-
-      //mamaZ[4] = 1084.15;
-      //mamaRmin[4] = 260.0;
-      //mamaRmax[4] = 1137.1;
-      mamaZ[4] = 1655.19;
-      mamaRmin[4] = 438.0;
-      mamaRmax[4] = 1137.1;
-
-      //mamaZ[5] = 1655.19;
-      //mamaRmin[5] = 260.0;
-      //mamaRmax[5] = 1137.1;
-      */
 
       G4Polycone* solid_cdc =
         new G4Polycone("SolidCDC", 0 * deg, 360.*deg, 5, momZ, momRmin, momRmax);
@@ -335,12 +310,14 @@ namespace Belle2 {
       double* slayerZBack  = new double[nSLayer];
       double* slayerZFor   = new double[nSLayer];
 
+
       string** epName   = new string*[nSLayer];
       double** epInnerR = new double*[nSLayer];
       double** epOuterR = new double*[nSLayer];
       double** epBZ     = new double*[nSLayer];
       double** epFZ     = new double*[nSLayer];
       int* nEndplateLayer = new int[nSLayer];
+
 
       double* flayerRadius = new double[nFLayer];
       double* flayerZBack  = new double[nFLayer];
@@ -826,7 +803,27 @@ namespace Belle2 {
 
       }
 
+
+      delete [] nEndplateLayer;
+      delete [] flayerRadius;
+      delete [] flayerZBack;
+      delete [] flayerZFor;
+
+      delete [] slayerRadius;
+      delete [] slayerZBack;
+      delete [] slayerZFor;
+
+      delete [] outerWallInnerR;
+      delete [] outerWallOuterR;
+      delete [] outerWallBZ;
+      delete [] outerWallFZ;
+      delete [] innerWallInnerR;
+      delete [] innerWallOuterR;
+      delete [] innerWallBZ;
+      delete [] innerWallFZ;
+
     }
 
   }
+
 }

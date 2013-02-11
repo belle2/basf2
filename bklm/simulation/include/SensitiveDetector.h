@@ -36,8 +36,8 @@ namespace Belle2 {
 
     private:
 
-      //! Find and record matching RPC strips for each simHit
-      void convertHitToRPCStrips(BKLMSimHit*);
+      //! Find the ranges of matching RPC strips for each simulated hit
+      void convertHitToRPCStrips(const TVector3&, bool, int, int, int&, int&, int&, int&);
 
       //! Flag to say whether background study will be done or not
       bool m_DoBackgroundStudy;

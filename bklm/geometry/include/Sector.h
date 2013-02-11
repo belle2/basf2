@@ -60,7 +60,7 @@ namespace Belle2 {
       Sector();
 
       //! Constructor with explicit values (excludes list of contained modules)
-      Sector(int                frontBack,
+      Sector(bool               isForward,
              int                sector,
              int                nlayers,
              CLHEP::Hep3Vector  shift,
@@ -86,7 +86,7 @@ namespace Belle2 {
       void addModule(Module*);
 
       //! Determine if two sectors are identical
-      bool isSameSector(int frontBack, int sector) const;
+      bool isSameSector(bool isForward, int sector) const;
 
       //! Determine if two sectors are identical
       bool isSameSector(const Sector& s) const;
@@ -95,7 +95,7 @@ namespace Belle2 {
       bool isSameSector(const Module& m) const;
 
       //! Get sector's end (forward or backward)
-      int getFrontBack() const { return m_FrontBack; }
+      bool isForward() const { return m_IsForward; }
 
       //! Get sector number
       int getSector() const { return m_Sector; }
@@ -113,7 +113,7 @@ namespace Belle2 {
       const CLHEP::HepRotation& getRotation() const { return m_Rotation; }
 
       //! Get the pointer to a module within this sector
-      const Module* findModule(int module) const;
+      const Module* findModule(int layer) const;
 
       //! Transform space-point within this sector from local to global coordinates
       const CLHEP::Hep3Vector localToGlobal(const CLHEP::Hep3Vector& v) const;
@@ -150,8 +150,8 @@ namespace Belle2 {
 
     private:
 
-      //! to store the end (forward or backward) of this sector
-      int m_FrontBack;
+      //! to store the axial end (true=forward or false=backward) of this sector
+      bool m_IsForward;
 
       //! to store the sector number of this sector
       int m_Sector;

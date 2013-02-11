@@ -63,23 +63,26 @@ namespace Belle2 {
       m_OuterRadius = content.getLength("OuterRadius");
       m_HalfLength = content.getLength("HalfLength");
       m_NLayer = content.getNumberNodes("Layers/Layer");
+      if (m_NLayer > NLAYER) { // for array m_HasRPCs[]
+        B2FATAL("BKLM GeometryPar::read(): # of layers (" << m_NLayer << ") exceeds array size NLAYER (" << NLAYER << ")")
+      }
 
       m_IronNominalHeight = content.getLength("Layers/IronNominalHeight");
       m_IronActualHeight = content.getLength("Layers/IronActualHeight");
 
-      m_Gap0NominalHeight = content.getLength("Layers/Layer[1]/GapNominalHeight");
-      m_Gap0ActualHeight = m_Gap0NominalHeight + (m_IronNominalHeight - m_IronActualHeight) / 2.0;
+      m_Gap1NominalHeight = content.getLength("Layers/Layer[@layer=\"1\"]/GapNominalHeight");
+      m_Gap1ActualHeight = m_Gap1NominalHeight + (m_IronNominalHeight - m_IronActualHeight) / 2.0;
 
       m_GapNominalHeight = content.getLength("Layers/GapNominalHeight");
       m_GapActualHeight = m_GapNominalHeight + (m_IronNominalHeight - m_IronActualHeight);
 
-      m_Layer0Height = m_IronNominalHeight + m_Gap0NominalHeight;
+      m_Layer1Height = m_IronNominalHeight + m_Gap1NominalHeight;
       m_LayerHeight = m_IronNominalHeight + m_GapNominalHeight;
 
-      m_Gap0InnerRadius = content.getLength("Layers/InnerRadius");
-      m_GapInnerRadius = m_Gap0InnerRadius + m_Layer0Height - m_LayerHeight;
+      m_Gap1InnerRadius = content.getLength("Layers/InnerRadius");
+      m_GapInnerRadius = m_Gap1InnerRadius + m_Layer1Height - m_LayerHeight;
 
-      m_Gap0IronWidth = content.getLength("Layers/Layer[@layer=\"0\"]/GapIronWidth");
+      m_Gap1IronWidth = content.getLength("Layers/Layer[@layer=\"1\"]/GapIronWidth");
       m_GapIronWidth = content.getLength("Layers/GapIronWidth");
 
       m_GapLength = content.getLength("Layers/GapLength");
@@ -127,25 +130,26 @@ namespace Belle2 {
       m_BracketInset = content.getLength("BracketInset");
       m_BracketCutoutDphi = content.getAngle("BracketCutoutDphi");
 
-      double phiStripWidth[m_NLayer];
-      double phiStripLength[m_NLayer];
-      int    phiStripNumber[m_NLayer];
-      int    phiStripMin[m_NLayer];
-      int    phiStripMax[m_NLayer];
-      double zStripWidth[m_NLayer];
-      double zStripLength[m_NLayer];
-      int    zStripNumber[m_NLayer];
-      char name[40];
-      for (int layer = 0; layer < m_NLayer; ++layer) {
+      m_HasRPCs[0] = false;
+      double phiStripWidth[NLAYER + 1] = { 0.0 };
+      double phiStripLength[NLAYER + 1] = { 0.0 };
+      int    phiStripNumber[NLAYER + 1] = { 0 };
+      int    phiStripMin[NLAYER + 1] = { 0 };
+      int    phiStripMax[NLAYER + 1] = { 0 };
+      double zStripWidth[NLAYER + 1] = { 0.0 };
+      double zStripLength[NLAYER + 1] = { 0.0 };
+      int    zStripNumber[NLAYER + 1] = { 0 };
+      char name[40] = { '\0' };
+      for (int layer = 1; layer <= m_NLayer; ++layer) {
         sprintf(name, "/Layers/Layer[@layer=\"%d\"]", layer);
         GearDir layerContent(content);
         layerContent.append(name);
-        m_HasRPCs.push_back(layerContent.getInt("HasRPCs"));
+        m_HasRPCs[layer] = layerContent.getInt("HasRPCs");
         phiStripWidth[layer] = layerContent.getLength("PhiStrips/Width");
         phiStripLength[layer] = layerContent.getLength("PhiStrips/Length");
         phiStripNumber[layer] = layerContent.getInt("PhiStrips/NStrips");
-        phiStripMin[layer] = (layer == 0 ? 1 : 0);
-        phiStripMax[layer] = (layer == 0 ? phiStripNumber[layer] - 2 : phiStripNumber[layer] - 1);
+        phiStripMin[layer] = (layer == 1 ? 2 : 1);
+        phiStripMax[layer] = (layer == 1 ? phiStripNumber[layer] - 1 : phiStripNumber[layer]);
         zStripWidth[layer] = layerContent.getLength("ZStrips/Width");
         zStripLength[layer] = layerContent.getLength("ZStrips/Length");
         zStripNumber[layer] = layerContent.getInt("ZStrips/NStrips");
@@ -153,33 +157,34 @@ namespace Belle2 {
 
       Hep3Vector rSector(m_GapInnerRadius + 0.5 * m_GapNominalHeight, 0.0, 0.0);
       for (int fb = 0; fb < 2; ++fb) {
-        Hep3Vector deltaZ(0.0, 0.0, (fb == 0 ? m_ModuleElectrodeBorder : -m_ModuleElectrodeBorder));
-        for (int sector = 0; sector < m_NSector; ++sector) {
-          sprintf(name, "/Sectors/%s/Sector[@sector=\"%d\"]", (fb == 0 ? "Forward" : "Backward"), sector);
+        bool isForward = (fb == 0);
+        Hep3Vector deltaZ(0.0, 0.0, (isForward ? m_ModuleElectrodeBorder : -m_ModuleElectrodeBorder));
+        for (int sector = 1; sector <= m_NSector; ++sector) {
+          sprintf(name, "/Sectors/%s/Sector[@sector=\"%d\"]", (isForward ? "Forward" : "Backward"), sector);
           GearDir sectorContent(content);
           sectorContent.append(name);
           Hep3Vector shift(sectorContent.getLength("Shift/X"),
                            sectorContent.getLength("Shift/Y"),
                            sectorContent.getLength("Shift/Z"));
           HepRotation rotation;
-          if (fb == 1) rotation.rotateX(M_PI);
+          if (~isForward) rotation.rotateX(M_PI);
           rotation.rotateZ(sectorContent.getAngle("/Phi"));
           Hep3Vector translation(0.0, 0.0, m_OffsetZ);
           translation += rotation(rSector) + deltaZ;
-          Sector* pSector = new Sector(fb, sector, m_NLayer, shift, translation, rotation);
+          Sector* pSector = new Sector(isForward, sector, m_NLayer, shift, translation, rotation);
           m_Sectors.push_back(pSector);
-          for (int layer = 0; layer < m_NLayer; ++layer) {
-            int zStripMin = 0;
-            int zStripMax = zStripNumber[layer] - 1;
-            if ((fb == 1) && (sector == 2)) zStripMax = 33;
+          for (int layer = 1; layer <= m_NLayer; ++layer) {
+            int zStripMin = 1;
+            int zStripMax = zStripNumber[layer];
+            if ((!isForward) && (sector == 3)) zStripMax = sectorContent.getInt("ZStrips/NStrips");
             GearDir layerContent(sectorContent);
-            sprintf(name, "Layer[%d]", layer + 1);
+            sprintf(name, "/Layer[@layer=\"%d\"]", layer);
             layerContent.append(name);
-            Hep3Vector lshift(sectorContent.getLength("/Shift/X"),
-                              sectorContent.getLength("/Shift/Y"),
-                              sectorContent.getLength("/Shift/Z"));
-            double dr = (layer == 0 ? (m_GapNominalHeight - m_Gap0NominalHeight) * 0.5 : layer * m_LayerHeight);
-            pSector->addModule(new Module(fb, sector, layer, lshift, dr, pSector,
+            Hep3Vector lshift(layerContent.getLength("Shift/X"),
+                              layerContent.getLength("Shift/Y"),
+                              layerContent.getLength("Shift/Z"));
+            double dr = (layer == 1 ? (m_GapNominalHeight - m_Gap1NominalHeight) * 0.5 : (layer - 1) * m_LayerHeight);
+            pSector->addModule(new Module(isForward, sector, layer, lshift, dr, pSector,
                                           phiStripWidth[layer], phiStripLength[layer],
                                           phiStripNumber[layer], phiStripMin[layer], phiStripMax[layer],
                                           zStripWidth[layer], zStripLength[layer],
@@ -192,30 +197,29 @@ namespace Belle2 {
 
     double GeometryPar::getLayerInnerRadius(int layer) const
     {
-      if (layer == 0) {
-        return m_Gap0InnerRadius;
+      if (layer == 1) {
+        return m_Gap1InnerRadius;
       }
-      return m_GapInnerRadius - (m_IronNominalHeight - m_IronActualHeight) / 2.0 + m_LayerHeight * layer;
+      if (layer > m_NLayer) {
+        return m_OuterRadius;
+      }
+      return m_GapInnerRadius - (m_IronNominalHeight - m_IronActualHeight) / 2.0 + m_LayerHeight * (layer - 1);
     }
 
     double GeometryPar::getLayerOuterRadius(int layer) const
     {
-      int nextLyr = layer + 1;
-      if (nextLyr == m_NLayer) {
-        return m_OuterRadius;
-      }
-      return getLayerInnerRadius(nextLyr);
+      return getLayerInnerRadius(layer + 1);
     }
 
     const Hep3Vector GeometryPar::getGapHalfSize(int layer, bool flag) const
     {
       double r, ds, dx;
-      if (layer == 0) {
-        r = m_Gap0InnerRadius + m_Gap0NominalHeight;
-        ds = m_Gap0IronWidth;
-        dx = 0.5 * m_Gap0ActualHeight;
+      if (layer == 1) {
+        r = m_Gap1InnerRadius + m_Gap1NominalHeight;
+        ds = m_Gap1IronWidth;
+        dx = 0.5 * m_Gap1ActualHeight;
       } else {
-        r = m_GapInnerRadius + m_GapNominalHeight + m_LayerHeight * layer;
+        r = m_GapInnerRadius + m_GapNominalHeight + m_LayerHeight * (layer - 1);
         ds = m_GapIronWidth;
         dx = 0.5 * m_GapActualHeight;
       }
@@ -259,18 +263,18 @@ namespace Belle2 {
 
     double GeometryPar::getGapMiddleRadius(int layer) const
     {
-      if (layer == 0) {
-        return m_Gap0InnerRadius + 0.5 * m_Gap0ActualHeight;
+      if (layer == 1) {
+        return m_Gap1InnerRadius + 0.5 * m_Gap1ActualHeight;
       }
-      return m_GapInnerRadius + 0.5 * m_GapActualHeight + m_LayerHeight * layer;
+      return m_GapInnerRadius + 0.5 * m_GapActualHeight + m_LayerHeight * (layer - 1);
     }
 
     double GeometryPar::getModuleMiddleRadius(int layer) const
     {
-      if (layer == 0) {
-        return m_Gap0InnerRadius + 0.5 * m_Gap0ActualHeight;
+      if (layer == 1) {
+        return m_Gap1InnerRadius + 0.5 * m_Gap1ActualHeight;
       }
-      return m_GapInnerRadius + 0.5 * m_GapNominalHeight + m_LayerHeight * layer;
+      return m_GapInnerRadius + 0.5 * m_GapNominalHeight + m_LayerHeight * (layer - 1);
     }
 
     const Hep3Vector GeometryPar::getChimneyHalfSize(int layer) const
@@ -313,16 +317,15 @@ namespace Belle2 {
 
     bool GeometryPar::hasRPCs(int layer) const
     {
-      if (layer < 0) return true;
-      if ((unsigned int)layer >= m_HasRPCs.size()) return true;
+      if ((layer <= 0) || (layer > m_NLayer)) return true;
       return m_HasRPCs[layer];
     }
 
-    const Sector* GeometryPar::findSector(int frontBack, int sector) const
+    const Sector* GeometryPar::findSector(bool isForward, int sector) const
     {
       vector<Sector*>::const_iterator iS;
       for (iS = m_Sectors.begin(); iS != m_Sectors.end(); ++iS) {
-        if (((*iS)->getFrontBack() == frontBack) && ((*iS)->getSector() == sector)) {
+        if (((*iS)->isForward() == isForward) && ((*iS)->getSector() == sector)) {
           break;
         }
       }

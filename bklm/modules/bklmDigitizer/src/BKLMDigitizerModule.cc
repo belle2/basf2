@@ -73,7 +73,7 @@ void BKLMDigitizerModule::event()
     B2ERROR("BKLMDigitizerModule: Cannot find BKLMSimHits array");
   }
 
-  unsigned int nSimHit = simHits->GetEntriesFast();
+  unsigned int nSimHit = simHits.getEntries();
   if (nSimHit == 0) return;
 
   StoreArray<BKLMDigit> strips("BKLMDigits");
@@ -82,57 +82,34 @@ void BKLMDigitizerModule::event()
 
   unsigned int nStrip = 0;
   unsigned int s = 0;
-  BKLMDigit* strip = new BKLMDigit();
 
   vector<unsigned int> indices;
   vector<vector<unsigned int> > reverseIndices;
   for (unsigned int h = 0; h < nSimHit; ++h) {
     BKLMSimHit* simHit = simHits[h];
     indices.clear();
-    strip->setInRPC(simHit->getInRPC());
-    strip->setFrontBack(simHit->getFrontBack());
-    strip->setSector(simHit->getSector());
-    strip->setLayer(simHit->getLayer());
-    strip->setTDC(simHit->getHitTime());
-    strip->setADC(simHit->getDeltaE());
-    strip->setDirection('P');
-    for (std::vector<int>::const_iterator iS = simHit->getPhiStrips()->begin();
-         iS != simHit->getPhiStrips()->end(); ++iS) {
-      indices.push_back(*iS);
-      strip->setStrip(*iS);
-      for (s = 0; s < nStrip; ++s) {
-        if (strip->match(strips[s])) break;
+    if (simHit->getStripMin() >= 0) {
+      for (int j = simHit->getStripMin(); j <= simHit->getStripMax(); ++j) {
+        BKLMDigit strip(simHit->getStatus(), simHit->isForward(), simHit->getSector(),
+                        simHit->getLayer(), simHit->isPhiReadout(), j, simHit->getTime(), simHit->getDeltaE());
+        indices.push_back(j);
+        for (s = 0; s < nStrip; ++s) {
+          if (strip.match(strips[s])) break;
+        }
+        if (s == nStrip) {
+          new(strips.nextFreeAddress()) BKLMDigit(strip);
+          vector<unsigned int> rev;
+          reverseIndices.push_back(rev);
+          nStrip++;
+        }
+        reverseIndices[s].push_back(h);
       }
-      if (s == nStrip) {
-        new(strips->AddrAt(s)) BKLMDigit(*strip);
-        vector<unsigned int> rev;
-        reverseIndices.push_back(rev);
-        nStrip++;
-      }
-      reverseIndices[s].push_back(h);
-    }
-    strip->setDirection('Z');
-    for (std::vector<int>::const_iterator iS = simHit->getZStrips()->begin();
-         iS != simHit->getZStrips()->end(); ++iS) {
-      indices.push_back(*iS);
-      strip->setStrip(*iS);
-      for (s = 0; s < nStrip; ++s) {
-        if (strip->match(strips[s])) break;
-      }
-      if (s == nStrip) {
-        new(strips->AddrAt(s)) BKLMDigit(*strip);
-        vector<unsigned int> rev;
-        reverseIndices.push_back(rev);
-        nStrip++;
-      }
-      reverseIndices[s].push_back(h);
     }
     simHitToStrip.add(h, indices);  // 1 hit to many strips
   }
   for (s = 0; s < nStrip; ++s) {
     stripToSimHits.add(s, reverseIndices[s]); // 1 strip to many hits
   }
-  delete strip;
 
 }
 

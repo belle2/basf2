@@ -22,42 +22,42 @@ BKLMDigit::BKLMDigit() : TObject()
 }
 
 //! Constructor with initial values
-BKLMDigit::BKLMDigit(bool inRPC, int frontBack, int sector,
-                     int layer, char direction, int strip,
-                     double tdc, double adc) :
+BKLMDigit::BKLMDigit(unsigned int status, bool isForward, int sector,
+                     int layer, bool isPhiReadout, int strip,
+                     double time, double energy) :
   TObject(),
-  m_InRPC(inRPC),
-  m_FrontBack(frontBack),
+  m_Status(status),
+  m_IsForward(isForward),
   m_Sector(sector),
   m_Layer(layer),
-  m_Direction(direction),
+  m_IsPhiReadout(isPhiReadout),
   m_Strip(strip),
-  m_TDC(tdc),
-  m_ADC(adc)
+  m_Time(time),
+  m_Energy(energy)
 {
 }
 
 //! Copy constructor
 BKLMDigit::BKLMDigit(const BKLMDigit& h) :
   TObject(h),
-  m_InRPC(h.m_InRPC),
-  m_FrontBack(h.m_FrontBack),
+  m_Status(h.m_Status),
+  m_IsForward(h.m_IsForward),
   m_Sector(h.m_Sector),
   m_Layer(h.m_Layer),
-  m_Direction(h.m_Direction),
+  m_IsPhiReadout(h.m_IsPhiReadout),
   m_Strip(h.m_Strip),
-  m_TDC(h.m_TDC),
-  m_ADC(h.m_ADC)
+  m_Time(h.m_Time),
+  m_Energy(h.m_Energy)
 {
 }
 
 bool BKLMDigit::match(const BKLMDigit* s) const
 {
-  if (m_Strip     != s->getStrip()) return false;
-  if (m_Direction != s->getDirection()) return false;
-  if (m_Layer     != s->getLayer()) return false;
-  if (m_Sector    != s->getSector()) return false;
-  if (m_FrontBack != s->getFrontBack()) return false;
-  if (m_InRPC     != s->getInRPC()) return false;
+  if (m_Strip        != s->getStrip()) return false;
+  if (m_Layer        != s->getLayer()) return false;
+  if (m_Sector       != s->getSector()) return false;
+  if (m_IsForward    != s->isForward()) return false;
+  if (m_IsPhiReadout != s->isPhiReadout()) return false;
+  if (m_Status       != s->getStatus()) return false;
   return true;
 }

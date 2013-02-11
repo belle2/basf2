@@ -32,6 +32,8 @@
 #include <G4UserLimits.hh>
 #include <G4VisAttributes.hh>
 
+#define BKLM_FORWARD 1
+#define BKLM_BACKWARD 2
 using namespace std;
 using namespace CLHEP;
 
@@ -120,7 +122,7 @@ namespace Belle2 {
                             "BKLM.FrontLogical"
                            );
       frontLogical->SetVisAttributes(G4VisAttributes(false));
-      putSectorsInEnd(frontLogical, 0);
+      putSectorsInEnd(frontLogical, BKLM_FORWARD);
       new G4PVPlacement(G4TranslateZ3D(m_SectorDz),
                         frontLogical,
                         "BKLM.FrontPhysical",
@@ -135,7 +137,7 @@ namespace Belle2 {
                             "BKLM.BackLogical"
                            );
       backLogical->SetVisAttributes(G4VisAttributes(false));
-      putSectorsInEnd(backLogical, 1);
+      putSectorsInEnd(backLogical, BKLM_BACKWARD);
       G4ReflectionFactory::Instance()->Place(G4TranslateZ3D(-m_SectorDz) * G4ReflectZ3D(),
                                              "BKLM.BackPhysical",
                                              backLogical,
@@ -157,8 +159,8 @@ namespace Belle2 {
                    m_SectorDphi
                   );
       char name[40] = "";
-      for (int sector = 0; sector < m_GeoPar->getNSector(); ++sector) {
-        bool hasChimney = (fb == 1) && (sector == 2);
+      for (int sector = 1; sector <= m_GeoPar->getNSector(); ++sector) {
+        bool hasChimney = (fb == 2) && (sector == 3);
         sprintf(name, "BKLM.Sector%dLogical", sector);
         G4LogicalVolume* sectorLogical =
           new G4LogicalVolume(sectorShape,
@@ -170,7 +172,7 @@ namespace Belle2 {
         putInnerRegionInSector(sectorLogical, sector, hasChimney);
         putLayersInSector(sectorLogical, fb, sector, hasChimney);
         sprintf(name, "BKLM.Sector%dPhysical", sector);
-        new G4PVPlacement(G4RotateZ3D(m_SectorDphi * sector),
+        new G4PVPlacement(G4RotateZ3D(m_SectorDphi * (sector - 1)),
                           sectorLogical,
                           name,
                           endLogical,
@@ -242,7 +244,7 @@ namespace Belle2 {
 
     void GeoBKLMCreator::putInnerRegionInSector(G4LogicalVolume* sectorLogical, int sector, bool hasChimney)
     {
-      const double r = m_GeoPar->getLayerInnerRadius(0) * cm;
+      const double r = m_GeoPar->getLayerInnerRadius(1) * cm;
       const double z[2] = { -m_SectorDz, +m_SectorDz};
       const double rInner[2] = {0.0, 0.0};
       const double rOuter[2] = {r, r};
@@ -278,7 +280,7 @@ namespace Belle2 {
 
     void GeoBKLMCreator::putVoidInInnerRegion(G4LogicalVolume* innerIronLogical, int sector, bool hasChimney)
     {
-      const double r = m_GeoPar->getLayerInnerRadius(0) * cm - m_RibShift;
+      const double r = m_GeoPar->getLayerInnerRadius(1) * cm - m_RibShift;
       const double z[2] = { -m_SectorDz, +m_SectorDz};
       const double rInner[2] = {0.0, 0.0};
       const double rOuter[2] = {r, r};
@@ -303,9 +305,9 @@ namespace Belle2 {
                             "BKLM.InnerAirLogical"
                            );
       innerAirLogical->SetVisAttributes(G4VisAttributes(false));
-      if (sector <= m_GeoPar->getNSector() / 2) {
-        putLayer0SupportInInnerVoid(innerAirLogical, hasChimney);
-        putLayer0BracketsInInnerVoid(innerAirLogical, hasChimney);
+      if (sector <= m_GeoPar->getNSector() / 2 + 1) {
+        putLayer1SupportInInnerVoid(innerAirLogical, hasChimney);
+        putLayer1BracketsInInnerVoid(innerAirLogical, hasChimney);
       }
       new G4PVPlacement(G4TranslateX3D(m_RibShift),
                         innerAirLogical,
@@ -317,7 +319,7 @@ namespace Belle2 {
                        );
     }
 
-    void GeoBKLMCreator::putLayer0SupportInInnerVoid(G4LogicalVolume* innerAirLogical, bool hasChimney)
+    void GeoBKLMCreator::putLayer1SupportInInnerVoid(G4LogicalVolume* innerAirLogical, bool hasChimney)
     {
       const Hep3Vector size = m_GeoPar->getSupportPlateHalfSize(hasChimney) * cm;
       G4Box* supportBox =
@@ -332,7 +334,7 @@ namespace Belle2 {
                             "BKLM.SupportLogical"
                            );
       supportLogical->SetVisAttributes(G4VisAttributes(false));
-      new G4PVPlacement(G4TranslateX3D(m_GeoPar->getLayerInnerRadius(0) * cm - size.x() - m_RibShift),
+      new G4PVPlacement(G4TranslateX3D(m_GeoPar->getLayerInnerRadius(1) * cm - size.x() - m_RibShift),
                         supportLogical,
                         "BKLM.SupportPhysical",
                         innerAirLogical,
@@ -341,11 +343,11 @@ namespace Belle2 {
                         m_GeoPar->doOverlapCheck()
                        );
     }
-    void GeoBKLMCreator::putLayer0BracketsInInnerVoid(G4LogicalVolume* innerAirLogical, bool hasChimney)
+    void GeoBKLMCreator::putLayer1BracketsInInnerVoid(G4LogicalVolume* innerAirLogical, bool hasChimney)
     {
       const Hep3Vector size = m_GeoPar->getSupportPlateHalfSize(hasChimney) * cm;
       const double dz = 0.5 * m_GeoPar->getBracketLength() * cm;
-      const double r = m_GeoPar->getLayerInnerRadius(0) * cm - m_RibShift - 2.0 * size.x();
+      const double r = m_GeoPar->getLayerInnerRadius(1) * cm - m_RibShift - 2.0 * size.x();
       const double bracketShift = m_GeoPar->getBracketRibThickness() * cm / sin(0.5 * m_SectorDphi);
       const double z[2] = { -dz, +dz};
       const double rInner[2] = {0.0, 0.0};
@@ -438,7 +440,7 @@ namespace Belle2 {
       const double dz = 0.5 * m_GeoPar->getGapLength() * cm;
       const double z[2] = { -dz, +dz};
       char name[40];
-      for (int layer = 0; layer < m_GeoPar->getNLayer(); ++layer) {
+      for (int layer = 1; layer <= m_GeoPar->getNLayer(); ++layer) {
         const double ri = m_GeoPar->getLayerInnerRadius(layer) * cm;
         const double ro = m_GeoPar->getLayerOuterRadius(layer) * cm;
         const double rInner[2] = {ri, ri};
@@ -646,6 +648,7 @@ namespace Belle2 {
     void GeoBKLMCreator::putRPCModuleInGap(G4LogicalVolume* gapLogical, int fb, int sector, int layer, bool hasChimney)
     {
       char name[40];
+      char fbname = (fb == BKLM_FORWARD) ? 'F' : 'B';
       // Module is aluminum (but interior will be filled)
       sprintf(name, "BKLM.Layer%02dModuleBox", layer);
       const Hep3Vector gapHalfSize = m_GeoPar->getGapHalfSize(layer, hasChimney) * cm;
@@ -719,7 +722,7 @@ namespace Belle2 {
                                         );
       }
       gasLogical->SetVisAttributes(G4VisAttributes(true, G4Colour(1.0, 0.5, 0.0)));
-      sprintf(name, "BKLM.Gas_%d_%d_%02d_0", fb, sector, layer);
+      sprintf(name, "BKLM.Gas_%c_%d_%02d_Inner", fbname, sector, layer);
       new G4PVPlacement(G4TranslateX3D(-dxGas),
                         gasLogical,
                         name,
@@ -728,7 +731,7 @@ namespace Belle2 {
                         0,
                         m_GeoPar->doOverlapCheck()
                        );
-      sprintf(name, "BKLM.Gas_%d_%d_%02d_1", fb, sector, layer);
+      sprintf(name, "BKLM.Gas_%c_%d_%02d_Outer", fbname, sector, layer);
       new G4PVPlacement(G4TranslateX3D(dxGas),
                         gasLogical,
                         name,

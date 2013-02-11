@@ -31,7 +31,7 @@ namespace Belle2 {
       Module(void);
 
       //! Constructor with explicit values
-      Module(int               frontBack,
+      Module(bool              isForward,
              int               sector,
              int               module,
              CLHEP::Hep3Vector shift,
@@ -64,7 +64,7 @@ namespace Belle2 {
       bool operator==(const Module& m) const { return isSameModule(m); }
 
       //! Get module's end (forward or backward)
-      int getFrontBack() const { return m_FrontBack; }
+      bool isForward() const { return m_IsForward; }
 
       //! Get module's sector number
       int getSector() const { return m_Sector; }
@@ -100,18 +100,18 @@ namespace Belle2 {
       const Sector* getSectorPtr(void) const { return m_SectorPtr; }
 
       //! Determine if two modules are identical
-      bool isSameModule(int frontBack, int sector, int layer) const;
+      bool isSameModule(bool isForward, int sector, int layer) const;
 
       //! Determine if two modules are identical
       bool isSameModule(const Module& m) const;
 
       //! Get the number of strips in this module
-      int getNStrips(char direction) const {
-        return (direction == 'P' ? m_PhiStripNumber : m_ZStripNumber);
+      int getNStrips(bool isPhiReadout) const {
+        return (isPhiReadout ? m_PhiStripNumber : m_ZStripNumber);
       }
 
       //! Convert 1D strip position (0..nStrips) to local coordinate
-      double getLocalCoordinate(double stripAve, char direction) const;
+      double getLocalCoordinate(double stripAve, bool isPhiReadout) const;
 
       //! Convert 2D strip position (0..nStrips along each axis) to local coordinates
       const CLHEP::Hep3Vector getLocalPosition(double phiStripAve, double zStripAve) const;
@@ -120,7 +120,7 @@ namespace Belle2 {
       const CLHEP::HepMatrix getLocalError(int phiStripMult, int zStripMult) const;
 
       //! Get bounding rectangle of this strip's surface in local coordinates
-      const Rect getStripRectLocal(double stripAve, char direction) const;
+      const Rect getStripRectLocal(double stripAve, bool isPhiReadout) const;
 
       //! Get bounding rectangle of this module's surface in local coordinates
       const Rect getModuleRectLocal(void) const;
@@ -139,8 +139,8 @@ namespace Belle2 {
 
     private:
 
-      //! to store the end (forward or backward) of this module
-      int m_FrontBack;
+      //! to store the axial end (true=forward or false=backward) of this module
+      bool m_IsForward;
 
       //! to store the sector number of this module
       int m_Sector;

@@ -28,31 +28,31 @@ namespace Belle2 {
     BKLMSimHit();
 
     //! Constructor with initial values
-    BKLMSimHit(const TVector3, double, double, double, bool, bool, int, int, int, int);
+    BKLMSimHit(const TVector3&, double, double, double, unsigned int, bool, int, int, int, bool, int, int);
 
     //! Destructor
     virtual ~BKLMSimHit() {}
 
     //! returns position of the hit
-    TVector3 getHitPosition() const { return m_HitPosition; }
+    TVector3 getPosition() const { return m_Position; }
+
+    //! returns position of the hit (alias for EVEVisualization.cc)
+    TVector3 getHitPosition() const { return m_Position; }
 
     //! returns hit time
-    double getHitTime() const { return m_HitTime; }
+    double getTime() const { return m_Time; }
 
     //! returns energy deposition
     double getDeltaE() const { return m_DeltaE; }
 
-    //! returns energy
+    //! returns kinetic energy of throughgoing particle
     double getKE() const { return m_KE; }
 
-    //! returns flag whether hit is in RPC (true) or scintillator (false)
-    bool getInRPC() const { return m_InRPC; }
+    //! returns status word
+    unsigned int getStatus() const { return m_Status; }
 
-    //! returns flag whether particle decayed in this hit
-    bool getDecayed() const { return m_Decayed; }
-
-    //! returns end (0=forward or 1=backward) of this hit
-    int getFrontBack() const { return m_FrontBack; }
+    //! returns axial end (TRUE=forward or FALSE=backward) of this hit
+    bool isForward() const { return m_IsForward; }
 
     //! returns sector number of this hit
     int getSector() const { return m_Sector; }
@@ -63,38 +63,32 @@ namespace Belle2 {
     //! returns plane (0=inner or 1=outer) of this hit
     int getPlane() const { return m_Plane; }
 
-    //! returns pointer to the vector of phiStrips
-    const std::vector<int>* getPhiStrips() const { return &m_PhiStrips; }
+    //! returns readout-coordinate (TRUE=phi, FALSE=z) of this hit
+    bool isPhiReadout() const { return m_IsPhiReadout; }
 
-    //! returns pointer to the vector of zStrips
-    const std::vector<int>* getZStrips() const { return &m_ZStrips; }
+    //! returns lowest readout strip number of this hit
+    int getStripMin() const { return m_StripMin; }
 
-    //! append a new strip to the vector of phi strips
-    void appendPhiStrip(int strip) { m_PhiStrips.push_back(strip); }
+    //! returns highest readout strip number of this hit
+    int getStripMax() const { return m_StripMax; }
 
-    //! append a new strip to the vector of z strips
-    void appendZStrip(int strip) { m_ZStrips.push_back(strip); }
+    //! global-coordinates hit position (cm)
+    TVector3 m_Position;
 
-    //! global-frame hit position (cm)
-    TVector3 m_HitPosition;
-
-    //! global hit time (ns)
-    double m_HitTime;
+    //! global-coordinates hit time (ns)
+    double m_Time;
 
     //! energy deposition (MeV)
     double m_DeltaE;
 
-    //! kinetic energy (MeV)
+    //! kinetic energy (MeV) of throughgoing particle
     double m_KE;
 
-    //! flag to say whether the hit is in RPC (true) or scintillator (false)
-    bool m_InRPC;
+    //! status word
+    unsigned int m_Status;
 
-    //! flag to say whether the track decayed in this hit
-    bool m_Decayed;
-
-    //! barrel end (forward or backward) of the hit
-    int m_FrontBack;
+    //! axial end (TRUE=forward or FALSE=backward) of the hit
+    bool m_IsForward;
 
     //! sector number of the hit
     int m_Sector;
@@ -105,11 +99,14 @@ namespace Belle2 {
     //! inner or outer plane of the hit's module
     int m_Plane;
 
-    //! List of phi strips associated with this hit
-    std::vector<int> m_PhiStrips;
+    //! readout-coordinate (TRUE=phi, FALSE=z) of this hit
+    bool m_IsPhiReadout;
 
-    //! List of z strips associated with this hit
-    std::vector<int> m_ZStrips;
+    //! lowest readout strip number for this hit
+    int m_StripMin;
+
+    //! highest readout strip number for this hit
+    int m_StripMax;
 
     //! Needed to make the ROOT object storable
     ClassDef(BKLMSimHit, 1);

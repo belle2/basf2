@@ -27,7 +27,7 @@ namespace Belle2 {
     BKLMDigit();
 
     //! Constructor with initial values
-    BKLMDigit(bool, int, int, int, char, int, double, double);
+    BKLMDigit(unsigned int, bool, int, int, bool, int, double, double);
 
     //! Copy constructor
     BKLMDigit(const BKLMDigit&);
@@ -35,11 +35,14 @@ namespace Belle2 {
     //! Destructor
     virtual ~BKLMDigit() {}
 
-    //! returns flag whether hit is in RPC (true) or scintillator (false)
-    bool getInRPC() const { return m_InRPC; }
+    //! returns status word
+    unsigned int getStatus() const { return m_Status; }
 
-    //! returns end (0=forward or 1=backward) of this strip
-    int getFrontBack() const { return m_FrontBack; }
+    //! returns flag whether hit is in RPC (true) or scintillator (false)
+    bool isInRPC() const { return ((m_Status & 0x00000001) != 0); }
+
+    //! returns end (TRUE=forward or FALSE=backward) of this strip
+    bool isForward() const { return m_IsForward; }
 
     //! returns sector number of this strip
     int getSector() const { return m_Sector; }
@@ -47,50 +50,44 @@ namespace Belle2 {
     //! returns layer number of this strip
     int getLayer() const { return m_Layer; }
 
-    //! returns direction ('P' for phi, 'Z' for z) of this strip
-    char getDirection() const { return m_Direction; }
+    //! returns readout coordinate (TRUE=phi, FALSE=z) of this strip
+    bool isPhiReadout() const { return m_IsPhiReadout; }
 
     //! returns strip number
     int getStrip() const { return m_Strip; }
 
     //! returns hit time
-    double getTDC() const { return m_TDC; }
+    double getTime() const { return m_Time; }
 
     //! returns pulse height
-    double getADC() const { return m_ADC; }
+    double getEnergy() const { return m_Energy; }
 
     //! determines if two BKLMDigits are equal based on geometry only
     bool match(const BKLMDigit*) const;
 
-    //! sets flag whether hit is in RPC (true) or scintillator (false)
-    void setInRPC(bool inRPC) { m_InRPC = inRPC; }
+    //! sets status word (all bits)
+    void setStatus(unsigned int status) { m_Status = status; }
 
-    //! sets end (0=forward or 1=backward) of this strip
-    void setFrontBack(int frontBack) { m_FrontBack = frontBack; }
+    //! sets some status bit(s)
+    void setStatusBits(unsigned int status) { m_Status |= status; }
 
-    //! sets sector number of this strip
-    void setSector(int sector) { m_Sector = sector; }
+    //! clears status word (all bits)
+    void clearStatus(void) { m_Status = 0; }
 
-    //! sets layer number of this strip
-    void setLayer(int layer) { m_Layer = layer; }
+    //! clears some status bit(s)
+    void clearStatusBits(unsigned int status) { m_Status &= (~status); }
 
-    //! sets direction ('P' for phi, 'Z' for z) of this strip
-    void setDirection(char direction) { m_Direction = direction; }
+    //! sets time (ns)
+    void setTime(double time) { m_Time = time; }
 
-    //! sets strip number
-    void setStrip(int strip) { m_Strip = strip; }
+    //! sets energy (MeV)
+    void setEnergy(double energy) { m_Energy = energy; }
 
-    //! sets hit time
-    void setTDC(double tdc) { m_TDC = tdc; }
+    //! status word
+    unsigned int m_Status;
 
-    //! sets pulse height
-    void setADC(double adc) { m_ADC = adc; }
-
-    //! flag to say whether the hit is in RPC (true) or scintillator (false)
-    bool m_InRPC;
-
-    //! barrel end (forward or backward) of the strip
-    int m_FrontBack;
+    //! axial end (TRUE=forward or FALSE=backward) of the strip
+    bool m_IsForward;
 
     //! sector number of the strip
     int m_Sector;
@@ -98,17 +95,17 @@ namespace Belle2 {
     //! layer number of the strip
     int m_Layer;
 
-    //! direction of the strip
-    char m_Direction;
+    //! readout coordinate of the strip (TRUE=phi, FALSE=z)
+    bool m_IsPhiReadout;
 
     //! strip number
     int m_Strip;
 
     //! global hit time relative to trigger (ns)
-    double m_TDC;
+    double m_Time;
 
     //! pulse height (MeV)
-    double m_ADC;
+    double m_Energy;
 
     //! Needed to make the ROOT object storable
     ClassDef(BKLMDigit, 1)

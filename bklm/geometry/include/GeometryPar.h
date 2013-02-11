@@ -18,6 +18,11 @@
 
 #include "CLHEP/Vector/ThreeVector.h"
 
+#define NLAYER 15
+#define NSECTOR 8
+#define PLANE_INNER 1
+#define PLANE_OUTER 2
+
 namespace Belle2 {
 
   class GearDir;
@@ -103,16 +108,16 @@ namespace Belle2 {
       double getIronActualHeight(void) const { return m_IronActualHeight; }
 
       //! Get the radius of the inner tangent circle of gap 0 (innermost)
-      double getGap0InnerRadius(void) const { return m_Gap0InnerRadius; }
+      double getGap1InnerRadius(void) const { return m_Gap1InnerRadius; }
 
       //! Get the nominal height of the innermost gap
-      double getGap0NominalHeight(void) const { return m_Gap0NominalHeight; }
+      double getGap1NominalHeight(void) const { return m_Gap1NominalHeight; }
 
       //! Get the actual height of the innermost gap
-      double getGap0ActualHeight(void) const { return m_Gap0ActualHeight; }
+      double getGap1ActualHeight(void) const { return m_Gap1ActualHeight; }
 
       //! Get the width (at the outer radius) of the adjacent structural iron on either side of innermost gap
-      double getGap0IronWidth(void) const { return m_Gap0IronWidth; }
+      double getGap1IronWidth(void) const { return m_Gap1IronWidth; }
 
       //! Get the length along z of the module gap
       double getGapLength(void) const { return m_GapLength; }
@@ -231,8 +236,11 @@ namespace Belle2 {
       //! Get the angular width of the layer-0 support plate's bracket's cutout
       double getBracketCutoutDphi(void) const { return m_BracketCutoutDphi; }
 
+      //! Get the vector of sector definitions
+      const std::vector<Sector*> getSectors(void) const { return m_Sectors; };
+
       //! Get the pointer to the definition of a sector
-      const Sector* findSector(int frontBack, int sector) const;
+      const Sector* findSector(bool isForward, int sector) const;
 
       //! Print all sector and module definitions
       void printTree(void) const;
@@ -291,22 +299,22 @@ namespace Belle2 {
       double m_IronActualHeight;
 
       //! radius of the inner tangent circle of the innermost gap
-      double m_Gap0InnerRadius;
+      double m_Gap1InnerRadius;
 
       //! nominal height of the innermost gap
-      double m_Gap0NominalHeight;
+      double m_Gap1NominalHeight;
 
       //! actual height of the innermost gap
-      double m_Gap0ActualHeight;
+      double m_Gap1ActualHeight;
 
       //! height of layer 0: internal use only
-      double m_Layer0Height;
+      double m_Layer1Height;
 
       //! height of a layer: internal use only
       double m_LayerHeight;
 
       //! variable for width (at the outer radius) of the adjacent structural iron on either side of innermost gap
-      double m_Gap0IronWidth;
+      double m_Gap1IronWidth;
 
       //! length along z of each gap
       double m_GapLength;
@@ -437,8 +445,8 @@ namespace Belle2 {
       //! angular width of the innermost-module support plate's bracket's cutout
       double m_BracketCutoutDphi;
 
-      //! vector of RPC/scint flags for each layer
-      std::vector<bool> m_HasRPCs;
+      //! array of RPC/scint flags for each layer
+      bool m_HasRPCs[NLAYER + 1];
 
       //! vector of pointers to defined sectors
       std::vector<Sector*> m_Sectors;

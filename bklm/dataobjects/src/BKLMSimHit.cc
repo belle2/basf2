@@ -20,20 +20,21 @@ BKLMSimHit::BKLMSimHit()
 }
 
 //! Constructor with initial values
-BKLMSimHit::BKLMSimHit(TVector3 hitPosition, double hitTime, double deltaE,
-                       double KE, bool inRPC, bool decayed,
-                       int frontBack, int sector, int layer, int plane) :
-  m_HitPosition(hitPosition),
-  m_HitTime(hitTime),
+BKLMSimHit::BKLMSimHit(const TVector3& position, double time, double deltaE,
+                       double KE, unsigned int status,
+                       bool isForward, int sector, int layer, int plane,
+                       bool isPhiReadout, int stripMin, int stripMax) :
+  m_Position(position),
+  m_Time(time),
   m_DeltaE(deltaE),
   m_KE(KE),
-  m_InRPC(inRPC),
-  m_Decayed(decayed),
-  m_FrontBack(frontBack),
+  m_Status(status),
+  m_IsForward(isForward),
   m_Sector(sector),
   m_Layer(layer),
-  m_Plane(plane)
+  m_Plane(plane),
+  m_IsPhiReadout(isPhiReadout),
+  m_StripMin(stripMin),
+  m_StripMax(stripMax)
 {
-  m_PhiStrips.clear();
-  m_ZStrips.clear();
 }

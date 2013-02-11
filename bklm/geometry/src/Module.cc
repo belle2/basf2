@@ -25,7 +25,7 @@ namespace Belle2 {
     {
     }
 
-    Module::Module(int        frontBack,
+    Module::Module(bool       isForward,
                    int        sector,
                    int        layer,
                    Hep3Vector shift,
@@ -41,7 +41,7 @@ namespace Belle2 {
                    int        zStripNumber,
                    int        zStripMin,
                    int        zStripMax) :
-      m_FrontBack(frontBack),
+      m_IsForward(isForward),
       m_Sector(sector),
       m_Layer(layer),
       m_Shift(shift),
@@ -61,7 +61,7 @@ namespace Belle2 {
     {}
 
     Module::Module(const Module& m) :
-      m_FrontBack(m.m_FrontBack),
+      m_IsForward(m.m_IsForward),
       m_Sector(m.m_Sector),
       m_Layer(m.m_Layer),
       m_Shift(m.m_Shift),
@@ -87,7 +87,7 @@ namespace Belle2 {
     /* must be a nonstatic member function
     Module::Module& operator=( const Module& m ) {
       if ( this != &m ) {
-        m_FrontBack = m.m_FrontBack;
+        m_IsForward = m.m_IsForward;
         m_Sector = m.m_Sector;
         m_Layer = m.m_Layer;
         m_Shift = m.m_Shift;
@@ -110,29 +110,29 @@ namespace Belle2 {
 
     bool Module::operator<(const Module& m) const
     {
-      if (m_FrontBack != m.m_FrontBack) return (m_FrontBack == 0);
+      if (m_IsForward != m.m_IsForward) return (m_IsForward == 0);
       if (m_Sector    != m.m_Sector)    return (m_Sector < m.m_Sector);
       if (m_Layer     != m.m_Layer)     return (m_Layer < m.m_Layer);
       return false;
     }
 
-    bool Module::isSameModule(int frontBack, int sector, int layer) const
+    bool Module::isSameModule(bool isForward, int sector, int layer) const
     {
-      return (frontBack == m_FrontBack) &&
+      return (isForward == m_IsForward) &&
              (sector    == m_Sector) &&
              (layer     == m_Layer);
     }
 
     bool Module::isSameModule(const Module& m) const
     {
-      return (m.getFrontBack() == m_FrontBack) &&
-             (m.getSector()    == m_Sector) &&
-             (m.getLayer()     == m_Layer);
+      return (m.isForward() == m_IsForward) &&
+             (m.getSector() == m_Sector) &&
+             (m.getLayer()  == m_Layer);
     }
 
-    double Module::getLocalCoordinate(double stripAve, char direction) const
+    double Module::getLocalCoordinate(double stripAve, bool isPhiReadout) const
     {
-      if (direction == 'P') {
+      if (isPhiReadout) {
         return (stripAve + 0.5 - m_PhiStripNumber * 0.5) * m_PhiStripWidth;
       }
       return (stripAve + 0.5) * m_ZStripWidth;
@@ -142,8 +142,8 @@ namespace Belle2 {
     const Hep3Vector Module::getLocalPosition(double phiStripAve, double zStripAve) const
     {
       return Hep3Vector(m_LocalX,
-                        getLocalCoordinate(phiStripAve, 'P'),
-                        getLocalCoordinate(zStripAve, 'Z')) + m_Shift;
+                        getLocalCoordinate(phiStripAve, true),
+                        getLocalCoordinate(zStripAve, false)) + m_Shift;
     }
 
     const HepMatrix Module::getLocalError(int phiStripMultiplicity, int zStripMultiplicity) const
@@ -180,7 +180,7 @@ namespace Belle2 {
 
     }
 
-    const Rect Module::getStripRectLocal(double stripAve, char direction) const
+    const Rect Module::getStripRectLocal(double stripAve, bool isPhiReadout) const
     {
       Rect rect;
 
@@ -189,11 +189,11 @@ namespace Belle2 {
       rect.corner[2].setX(m_LocalX);
       rect.corner[3].setX(m_LocalX);
 
-      if (direction == 'P') {
-        rect.corner[0].setY(getLocalCoordinate(stripAve + 0.5, 'P'));
-        rect.corner[1].setY(getLocalCoordinate(stripAve + 0.5, 'P'));
-        rect.corner[2].setY(getLocalCoordinate(stripAve - 0.5, 'P'));
-        rect.corner[3].setY(getLocalCoordinate(stripAve - 0.5, 'P'));
+      if (isPhiReadout) {
+        rect.corner[0].setY(getLocalCoordinate(stripAve + 0.5, true));
+        rect.corner[1].setY(getLocalCoordinate(stripAve + 0.5, true));
+        rect.corner[2].setY(getLocalCoordinate(stripAve - 0.5, true));
+        rect.corner[3].setY(getLocalCoordinate(stripAve - 0.5, true));
         rect.corner[0].setZ(0.0);
         rect.corner[1].setZ(m_PhiStripLength);
         rect.corner[2].setZ(m_PhiStripLength);
@@ -203,10 +203,10 @@ namespace Belle2 {
         rect.corner[1].setY(-m_ZStripLength * 0.5);
         rect.corner[2].setY(-m_ZStripLength * 0.5);
         rect.corner[3].setY(m_ZStripLength * 0.5);
-        rect.corner[0].setZ(getLocalCoordinate(stripAve + 0.5, 'Z'));
-        rect.corner[1].setZ(getLocalCoordinate(stripAve + 0.5, 'Z'));
-        rect.corner[2].setZ(getLocalCoordinate(stripAve - 0.5, 'Z'));
-        rect.corner[3].setZ(getLocalCoordinate(stripAve - 0.5, 'Z'));
+        rect.corner[0].setZ(getLocalCoordinate(stripAve + 0.5, false));
+        rect.corner[1].setZ(getLocalCoordinate(stripAve + 0.5, false));
+        rect.corner[2].setZ(getLocalCoordinate(stripAve - 0.5, false));
+        rect.corner[3].setZ(getLocalCoordinate(stripAve - 0.5, false));
       }
 
       rect.corner[0] += m_Shift;
@@ -267,7 +267,7 @@ namespace Belle2 {
 
     void Module::printTree() const
     {
-      B2INFO("Module: BKLM-"   << (m_FrontBack == 0 ? 'F' : 'B')
+      B2INFO("Module: BKLM-"   << (m_IsForward == 0 ? 'F' : 'B')
              << "-S"   << m_Sector
              << (m_Layer < 10 ? "-L0" : "-L") << m_Layer
              << "   "  << m_Shift

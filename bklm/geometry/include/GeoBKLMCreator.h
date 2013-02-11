@@ -60,11 +60,11 @@ namespace Belle2 {
       //! Put the air void into the inner-radius region
       void putVoidInInnerRegion(G4LogicalVolume*, int, bool);
 
-      //! Put the layer-0 support plate into the inner region's air void (sectors 0..4 only)
-      void putLayer0SupportInInnerVoid(G4LogicalVolume*, bool);
+      //! Put the layer-0 support plate into the inner region's air void (sectors 1..5 only)
+      void putLayer1SupportInInnerVoid(G4LogicalVolume*, bool);
 
-      //! Put the layer-0 support plate's brackets into the inner region's air void (sectors 0..4 only)
-      void putLayer0BracketsInInnerVoid(G4LogicalVolume*, bool);
+      //! Put the layer-0 support plate's brackets into the inner region's air void (sectors 1..5 only)
+      void putLayer1BracketsInInnerVoid(G4LogicalVolume*, bool);
 
       //! Put the layers into each sector
       void putLayersInSector(G4LogicalVolume*, int, int, bool);

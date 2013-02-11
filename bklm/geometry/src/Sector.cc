@@ -25,13 +25,13 @@ namespace Belle2 {
     {
     }
 
-    Sector::Sector(int         frontBack,
+    Sector::Sector(bool        isForward,
                    int         sector,
                    int         nLayer,
                    Hep3Vector  shift,
                    Hep3Vector  translation,
                    HepRotation rotation) :
-      m_FrontBack(frontBack),
+      m_IsForward(isForward),
       m_Sector(sector),
       m_NLayer(nLayer),
       m_Shift(shift),
@@ -45,7 +45,7 @@ namespace Belle2 {
     }
 
     Sector::Sector(const Sector& s) :
-      m_FrontBack(s.m_FrontBack),
+      m_IsForward(s.m_IsForward),
       m_Sector(s.m_Sector),
       m_NLayer(s.m_NLayer),
       m_Shift(s.m_Shift),
@@ -64,7 +64,7 @@ namespace Belle2 {
     /*
     Sector::Sector& operator=( const Sector& s ) {
       if ( this != &s ) {
-        m_FrontBack = s.m_FrontBack;
+        m_IsForward = s.m_IsForward;
         m_Sector = s.m_Sector;
         m_NLayer = s.m_NLayer;
         m_Shift = s.m_Shift;
@@ -78,38 +78,40 @@ namespace Belle2 {
     }
     */
 
+    /*
     bool Sector::operator<(const Sector& s) const
     {
-      if (m_FrontBack != s.m_FrontBack) return (m_FrontBack == 0);
+      if (m_IsForward != s.m_IsForward) return (m_IsForward);
       if (m_Sector    != s.m_Sector)    return (m_Sector < s.m_Sector);
       return false;
     }
+    */
 
     void Sector::addModule(Module* m)
     {
       m_Modules.push_back(m);
     }
 
-    bool Sector::isSameSector(int frontBack, int sector) const
+    bool Sector::isSameSector(bool isForward, int sector) const
     {
-      return (frontBack == m_FrontBack) && (sector == m_Sector);
+      return (isForward == m_IsForward) && (sector == m_Sector);
     }
 
     bool Sector::isSameSector(const Sector& s) const
     {
-      return (s.m_FrontBack == m_FrontBack) && (s.m_Sector == m_Sector);
+      return (s.m_IsForward == m_IsForward) && (s.m_Sector == m_Sector);
     }
 
     bool Sector::isSameSector(const Module& m) const
     {
-      return (m.getFrontBack() == m_FrontBack) && (m.getSector() == m_Sector);
+      return (m.isForward() == m_IsForward) && (m.getSector() == m_Sector);
     }
 
-    const Module* Sector::findModule(int module) const
+    const Module* Sector::findModule(int layer) const
     {
       vector<Module*>::const_iterator iM;
       for (iM = m_Modules.begin(); iM != m_Modules.end(); ++iM) {
-        if ((*iM)->isSameModule(m_FrontBack, m_Sector, module)) {
+        if ((*iM)->isSameModule(m_IsForward, m_Sector, layer)) {
           break;
         }
       }
@@ -178,7 +180,7 @@ namespace Belle2 {
 
     void Sector::printTree() const
     {
-      B2INFO("Sector: BKLM-"   << (m_FrontBack == 0 ? 'F' : 'B')
+      B2INFO("Sector: BKLM-"   << (m_IsForward == 0 ? 'F' : 'B')
              << "-S"   << m_Sector
              << "    " << m_Shift);
       vector<Module*>::const_iterator iM;

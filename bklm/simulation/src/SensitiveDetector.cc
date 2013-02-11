@@ -15,6 +15,7 @@
 #include <bklm/geometry/Sector.h>
 #include <bklm/geometry/Module.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
+#include <bklm/dataobjects/BKLMStatus.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -58,7 +59,7 @@ namespace Belle2 {
     G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory*)
     {
 
-      // One-time initializations (constructor is called too early)
+      // Once-only initializations (constructor is called too early)
       if (m_FirstCall) {
         m_FirstCall = false;
         m_NeutronPID = G4Neutron::Definition()->GetPDGEncoding(); // =2112
@@ -70,6 +71,10 @@ namespace Belle2 {
         m_DoBackgroundStudy = simPar->getDoBackgroundStudy();
         if (!gRandom) B2FATAL("BKLM SensitiveDetector: gRandom is not initialized; please set up gRandom first");
       }
+      StoreArray<BKLMSimHit> simHits;
+      if (!simHits.isValid()) simHits.create();
+      StoreArray<MCParticle> particles;
+      RelationArray particleToSimHits(particles, simHits);
 
       // It is not necessary to detect motion from one volume to another (or track death
       // in the RPC gas volume).  Experimentation shows that most tracks pass through the
@@ -90,62 +95,65 @@ namespace Belle2 {
           ((m_DoBackgroundStudy) && (primaryPID == m_NeutronPID))) {
         double KE = 0.5 * (preStep->GetKineticEnergy() + postStep->GetKineticEnergy());
         const G4ThreeVector g4HitPos = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / cm; // GEANT4: in mm
-        const TVector3 hitPos(g4HitPos.x(), g4HitPos.y(), g4HitPos.z());
-        double hitTime = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
+        const TVector3 position(g4HitPos.x(), g4HitPos.y(), g4HitPos.z());
+        double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
         bool decayed = false;
         if (postStep->GetProcessDefinedStep() != 0) {
           decayed = (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay);
         }
         const string volumeName = preStep->GetPhysicalVolume()->GetName();  // "BKLM.***_*_*_**_*"
         if (volumeName.find("BKLM.") != 0) {
-          B2ERROR("BKLM SensitiveDetector: volume name (" << volumeName << ") is not \"BKLM.***_*_*_**_*\"");
+          B2ERROR("BKLM SensitiveDetector: volume name (" << volumeName << ") is not \"BKLM.***_*_*_**_*\"")
           return false;
         }
-        bool inRPC = (volumeName.find("BKLM.Gas") == 0);    // true in gas, false in scint
-        int frontBack = boost::lexical_cast<int>(volumeName.substr(9, 1));
+        unsigned int status = STATUS_MC;
+        if (decayed) status |= STATUS_DECAYED;
+        if (volumeName.find("BKLM.Gas") == 0) status |= STATUS_INRPC;
+        bool isForward = (volumeName.substr(9, 1) == "F");
         int sector = boost::lexical_cast<int>(volumeName.substr(11, 1));
         int layer = boost::lexical_cast<int>(volumeName.substr(13, 2));
-        int plane = boost::lexical_cast<int>(volumeName.substr(16, 1));
-        StoreArray<BKLMSimHit> simHits;
-        int hitNumber = simHits->GetLast() + 1;
-        BKLMSimHit* simHit = new(simHits->AddrAt(hitNumber))
-        BKLMSimHit(hitPos, hitTime, deltaE, KE, inRPC, decayed, frontBack, sector, layer, plane);
-        if (inRPC) {
-          convertHitToRPCStrips(simHit);
+        int plane = (volumeName.substr(16, 5) == "Inner") ? PLANE_INNER : PLANE_OUTER;
+        if ((status & (~STATUS_INRPC)) != 0) {
+          int phiStripMin = -1;
+          int phiStripMax = -1;
+          int zStripMin = -1;
+          int zStripMax = -1;
+          convertHitToRPCStrips(position, isForward, sector, layer, phiStripMin, phiStripMax, zStripMin, zStripMax);
+          if (phiStripMin >= 0) new(simHits.nextFreeAddress())
+            BKLMSimHit(position, time, deltaE, KE, status, isForward, sector, layer, plane, true, phiStripMin, phiStripMax);
+          if (zStripMin >= 0) new(simHits.nextFreeAddress())
+            BKLMSimHit(position, time, deltaE, KE, status, isForward, sector, layer, plane, false, zStripMin, zStripMax);
         } else {
           int strip = boost::lexical_cast<int>(volumeName.substr(12, 2));
-          if (plane == 0) {
-            simHit->appendPhiStrip(strip);
+          if (plane == PLANE_INNER) {
+            new(simHits.nextFreeAddress())
+            BKLMSimHit(position, time, deltaE, KE, status, isForward, sector, layer, plane, true, strip, strip);
           } else {
-            simHit->appendZStrip(strip);
+            new(simHits.nextFreeAddress())
+            BKLMSimHit(position, time, deltaE, KE, status, isForward, sector, layer, plane, false, strip, strip);
           }
         }
-        StoreArray<MCParticle> particles;
-        RelationArray particleToSimHits(particles, simHits);
-        particleToSimHits.add(track->GetTrackID(), hitNumber);
+        particleToSimHits.add(track->GetTrackID(), simHits.getEntries());
         return true;
       }
       return false;
     }
 
-    void SensitiveDetector::convertHitToRPCStrips(BKLMSimHit* simHit)
+    void SensitiveDetector::convertHitToRPCStrips(const TVector3& globalPos, bool isForward,
+                                                  int sector, int layer, int& phiStripMin, int& phiStripMax, int& zStripMin, int& zStripMax)
     {
       const GeometryPar* geoPar = GeometryPar::instance();
       const SimulationPar* simPar = SimulationPar::instance();
-      int frontBack = simHit->getFrontBack();
-      int sector = simHit->getSector();
-      int layer = simHit->getLayer();
-      const Sector* pS = geoPar->findSector(frontBack, sector);
+      const Sector* pS = geoPar->findSector(isForward, sector);
       const Module* pM = pS->findModule(layer);
-      const TVector3 globalPos = simHit->getHitPosition();
-      const CLHEP::Hep3Vector localPos = pS->globalToLocal(globalPos.X(),
-                                                           globalPos.Y(),
-                                                           globalPos.Z());
+      const CLHEP::Hep3Vector localPos = pS->globalToLocal(globalPos.X(), globalPos.Y(), globalPos.Z());
       int phiStrip = 0;
       int zStrip = 0;
       if (pM->isInActiveArea(localPos, phiStrip, zStrip)) {
-        simHit->appendPhiStrip(phiStrip);
-        simHit->appendZStrip(zStrip);
+        phiStripMin = phiStrip;
+        phiStripMax = phiStrip;
+        zStripMin = zStrip;
+        zStripMax = zStrip;
         double phiStripDiv = 0.0; // between -0.5 and +0.5 within central phiStrip
         double zStripDiv = 0.0;   // between -0.5 and +0.5 within central zStrip
         pM->getStripDivisions(localPos, phiStripDiv, zStripDiv);
@@ -158,7 +166,8 @@ namespace Belle2 {
         while (--n > 0) {
           phiStrip += nextStrip;
           if ((phiStrip >= pM->getPhiStripMin()) && (phiStrip <= pM->getPhiStripMax())) {
-            simHit->appendPhiStrip(phiStrip);
+            phiStripMin = min(phiStrip, phiStripMin);
+            phiStripMax = max(phiStrip, phiStripMax);
           }
           nextStrip = (nextStrip > 0 ? -(1 + nextStrip) : 1 - nextStrip);
         }
@@ -170,7 +179,8 @@ namespace Belle2 {
         while (--n > 0) {
           zStrip += nextStrip;
           if ((zStrip >= pM->getZStripMin()) && (zStrip <= pM->getZStripMax())) {
-            simHit->appendZStrip(zStrip);
+            zStripMin = min(zStrip, zStripMin);
+            zStripMax = max(zStrip, zStripMax);
           }
           nextStrip = (nextStrip > 0 ? -(1 + nextStrip) : 1 - nextStrip);
         }

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc                                              *
+ * Contributors: Anze Zupanc, Marko Staric                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -87,13 +87,29 @@ namespace Belle2 {
     Particle(const TLorentzVector&, const int pdgCode);
 
     /**
-     * Constructor from a 4-momentum vector, PDG code and vector of daughter indices.
+     * Constructor from a 4-momentum vector, PDG code, flavor type, mdst index
+     * and EParticleType. Used for final state particles.
      * All other private members are set to their defalt values (0).
      * @param 4-momentum vector
      * @param PDG code
+     * @param flavor type
+     * @param mdst index
+     * @param particle type
+     */
+    Particle(const TLorentzVector&, const int pdgCode, const unsigned flavorType,
+             const unsigned index, const EParticleType type);
+
+    /**
+     * Constructor from a 4-momentum vector, PDG code, decay flavor type
+     * and vector of daughter indices. Used for composite particles.
+     * All other private members are set to their defalt values (0).
+     * @param 4-momentum vector
+     * @param PDG code
+     * @param decay flavor type
      * @param vector of daughter indices
      */
-    Particle(const TLorentzVector&, const int pdgCode, const std::vector<int>&);
+    Particle(const TLorentzVector&, const int pdgCode, const unsigned flavorType,
+             const std::vector<int>&);
 
     /**
      * Constructor from a reconstructed track (mdst object Track)
@@ -101,13 +117,15 @@ namespace Belle2 {
      * @param StoreArray index of Track object
      * @param Type of charged particle (do determine which Track fit hypothesis to use)
      */
-    Particle(const Track*, const unsigned index, const Const::ChargedStable& chargedStable);
+    Particle(const Track*, const unsigned index,
+             const Const::ChargedStable& chargedStable);
 
     /**
      * Constructor from a reconstructed gamma candidate (mdst object ECLGamma)
      * @param pointer to the ECLGamma object
+     * @param mdst index
      */
-    Particle(const ECLGamma*);
+    Particle(const ECLGamma*, const unsigned index);
 
     /**
      * Constructor from a reconstructed pi0 candidate (mdst object ECLPi0)
@@ -140,10 +158,10 @@ namespace Belle2 {
      * @param 4-momentum vector
      */
     void set4Vector(const TLorentzVector& p4) {
-      m_momentum_x = p4.Px();
-      m_momentum_y = p4.Py();
-      m_momentum_z = p4.Pz();
-      m_energy     = p4.Energy();
+      m_px = p4.Px();
+      m_py = p4.Py();
+      m_pz = p4.Pz();
+      m_mass       = p4.M();
     }
 
     /**
@@ -151,9 +169,9 @@ namespace Belle2 {
      * @param point (position or vertex) at which 4-momentum is estimated in (units??)
      */
     void setVertex(const TVector3& vertex) {
-      m_position_x = vertex.X();
-      m_position_y = vertex.Y();
-      m_position_z = vertex.Z();
+      m_x = vertex.X();
+      m_y = vertex.Y();
+      m_z = vertex.Z();
     };
 
     /**
@@ -185,11 +203,20 @@ namespace Belle2 {
 
     // getters
     /**
+     * Returns Particle's energy in GeV
+     *
+     * @return The Particle's energy in GeV
+     */
+    float getEnergy() const {
+      return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz + m_mass * m_mass);
+    }
+
+    /**
      * Returns Particle's 4-momentum vector
      * @return The 4-momentum vector of the Particle
      */
     TLorentzVector get4Vector() const {
-      return TLorentzVector(m_momentum_x, m_momentum_y, m_momentum_z, m_energy);
+      return TLorentzVector(m_px, m_py, m_pz, getEnergy());
     }
 
     /**
@@ -197,7 +224,7 @@ namespace Belle2 {
      * @return The 3-momentum vector of the Particle
      */
     TVector3 getMomentum() const {
-      return TVector3(m_momentum_x, m_momentum_y, m_momentum_z);
+      return TVector3(m_px, m_py, m_pz);
     };
 
     /**
@@ -205,17 +232,8 @@ namespace Belle2 {
      * @return The total momentum in GeV
      */
     float getTotalMomentum() const {
-      return sqrt(m_momentum_x * m_momentum_x + m_momentum_y * m_momentum_y + m_momentum_z * m_momentum_z);
+      return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
     };
-
-    /**
-     * Returns Particle's energy in GeV
-     *
-     * @return The Particle's energy in GeV
-     */
-    float getEnergy() const {
-      return m_energy;
-    }
 
     /**
      * Returns Particle's x component of momentum in GeV
@@ -223,7 +241,7 @@ namespace Belle2 {
      * @return x component of mometum in GeV
      */
     float getPx() const {
-      return m_momentum_x;
+      return m_px;
     }
 
     /**
@@ -232,7 +250,7 @@ namespace Belle2 {
      * @return y component of mometum in GeV
      */
     float getPy() const {
-      return m_momentum_y;
+      return m_py;
     }
 
     /**
@@ -241,7 +259,7 @@ namespace Belle2 {
      * @return z component of mometum in GeV
      */
     float getPz() const {
-      return m_momentum_z;
+      return m_pz;
     }
 
     /**
@@ -249,8 +267,7 @@ namespace Belle2 {
      * @return Measured mass
      */
     float getMass() const {
-      float mm = m_energy * m_energy - (m_momentum_x * m_momentum_x + m_momentum_y * m_momentum_y + m_momentum_z * m_momentum_z);
-      return mm < 0.0 ? -sqrt(-mm) : sqrt(mm);
+      return m_mass;
     }
 
     /**
@@ -267,7 +284,7 @@ namespace Belle2 {
      * @return point at which 4-momentum is estimated
      */
     TVector3 getVertex() const {
-      return TVector3(m_position_x, m_position_y, m_position_z);
+      return TVector3(m_x, m_y, m_z);
     };
 
     /**
@@ -302,6 +319,12 @@ namespace Belle2 {
     int getPDGCode(void) const { return m_pdgCode; }
 
     /**
+     * Returns flavor type of Particle decay (or flavor type of FSParticle)
+     * @return flavor type (0=unflavored, 1=flavored)
+     */
+    int getFlavorType() const {return m_flavorType;}
+
+    /**
      * Returns Particle's nominal mass in GeV
      *
      * @return The nominal mass of the Particle
@@ -323,6 +346,12 @@ namespace Belle2 {
      * @return The index of the MDST Object in the corresponding StoreArray list
      */
     unsigned getMdstArrayIndex(void) const { return m_mdstIndex; }
+
+    /**
+     * Returns unique identifier for final state particles (needed in particle combiner)
+     * @return unique identifier of final state particle
+     */
+    int getMdstSource() const {return m_mdstIndex + m_particleType << 24;}
 
     // Interface for obtaining/appending daughter Particles
     /**
@@ -399,6 +428,7 @@ namespace Belle2 {
     TClonesArray* m_plist; //! transient pointer to particle StoreArray
 
     int             m_pdgCode;       /**< PDG-code of the Particle */
+    unsigned        m_flavorType;    /**< 0=unflavored, 1=flavored decay or FSParticle */
     EParticleType   m_particleType;  /**< Particle type: Track/ECLShower/Composite/?? */
     unsigned        m_mdstIndex;     /**< 0-based index of MDST Object in corresponding Store Array. Variable is used only for FSParticles. */
 
@@ -410,19 +440,19 @@ namespace Belle2 {
     /**
      * 4-momentum vector of particle
      */
-    float m_energy;         /**< energy of the particle */
-    float m_momentum_x;     /**< momentum of particle, x component */
-    float m_momentum_y;     /**< momentum of particle, y component */
-    float m_momentum_z;     /**< momentum of particle, z component */
+    float m_mass;   /**< particle mass */
+    float m_px;     /**< momentum of particle, x component */
+    float m_py;     /**< momentum of particle, y component */
+    float m_pz;     /**< momentum of particle, z component */
 
     /**
      * position or vertex of the particle
      * For particles constructed from Track: point of closest approach
      * For composite particles: reconstructed decay vertex
      */
-    float m_position_x;     /**< decay vertex (position) of particle, x component */
-    float m_position_y;     /**< decay vertex (position) of particle, y component */
-    float m_position_z;     /**< decay vertex (position) of particle, z component */
+    float m_x;     /**< decay vertex (position) of particle, x component */
+    float m_y;     /**< decay vertex (position) of particle, y component */
+    float m_z;     /**< decay vertex (position) of particle, z component */
 
     /**
      * 7x7 (symetric) error matrix of 4-momentum and vertex/position
@@ -490,7 +520,12 @@ namespace Belle2 {
 
     void fillFSPDaughters(std::vector<const Belle2::Particle*> &fspDaughters) const;
 
-    ClassDef(Particle, 1);
+    /**
+     * sets m_flavorType using m_pdgCode
+     */
+    void setFlavorType();
+
+    ClassDef(Particle, 2);
   };
 
   /** @}*/

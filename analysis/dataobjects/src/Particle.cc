@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc                                              *
+ * Contributors: Anze Zupanc, Marko Staric                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -26,29 +26,45 @@ using namespace Belle2;
 
 // Constructors - START
 Particle::Particle() :
-  m_plist(0), m_pdgCode(0), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_energy(0), m_momentum_x(0), m_momentum_y(0), m_momentum_z(0),
-  m_position_x(0), m_position_y(0), m_position_z(0)
+  m_plist(0), m_pdgCode(0), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_mass(0), m_px(0), m_py(0), m_pz(0),
+  m_x(0), m_y(0), m_z(0)
 {
   resetErrorMatrix();
 }
 
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   m_plist(0), m_pdgCode(pdgCode), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_position_x(0), m_position_y(0), m_position_z(0)
+  m_x(0), m_y(0), m_z(0)
+{
+  setFlavorType();
+  set4Vector(momentum);
+  resetErrorMatrix();
+}
+
+Particle::Particle(const TLorentzVector& momentum,
+                   const int pdgCode,
+                   const unsigned flavorType,
+                   const unsigned index,
+                   const EParticleType type) :
+  m_plist(0), m_pdgCode(pdgCode), m_flavorType(flavorType), m_particleType(type),
+  m_mdstIndex(index), m_x(0), m_y(0), m_z(0)
 {
   set4Vector(momentum);
   resetErrorMatrix();
 }
 
-Particle::Particle(const TLorentzVector& momentum, const int pdgCode, const std::vector<int> &daughterIndices) :
-  m_plist(0), m_pdgCode(pdgCode), m_mdstIndex(0),
-  m_position_x(0), m_position_y(0), m_position_z(0)
+Particle::Particle(const TLorentzVector& momentum,
+                   const int pdgCode,
+                   const unsigned flavorType,
+                   const std::vector<int> &daughterIndices) :
+  m_plist(0), m_pdgCode(pdgCode), m_flavorType(flavorType),  m_mdstIndex(0),
+  m_x(0), m_y(0), m_z(0)
 {
   set4Vector(momentum);
   resetErrorMatrix();
 
-  if (daughterIndices.size() > 0) {
+  if (!daughterIndices.empty()) {
     m_particleType    = c_Composite;
     m_daughterIndices = daughterIndices;
   } else {
@@ -56,8 +72,9 @@ Particle::Particle(const TLorentzVector& momentum, const int pdgCode, const std:
   }
 }
 
-Particle::Particle(const Track* track, const unsigned index, const Const::ChargedStable& chargedStable) :
-  m_plist(0), m_particleType(c_Track), m_mdstIndex(index)
+Particle::Particle(const Track* track, const unsigned index,
+                   const Const::ChargedStable& chargedStable) :
+  m_plist(0), m_flavorType(1), m_particleType(c_Track), m_mdstIndex(index)
 {
   const TrackFitResult* trackFit = track->getTrackFitResult(chargedStable);
 
@@ -133,43 +150,44 @@ Particle::Particle(const Track* track, const unsigned index, const Const::Charge
   //           + 2 * cov(px,pz) * dE/dpx * dE/dpz
   //           + 2 * cov(py,pz) * dE/dpy * dE/dpz
 
-  double invE = 1.0 / m_energy;
+  double invE = 1.0 / getEnergy();
 
   // cov(px,E)
-  m_momentumPositionError[3]  = invE * (m_momentumPositionError[0] * m_momentum_x
-                                        + m_momentumPositionError[1] * m_momentum_y
-                                        + m_momentumPositionError[2] * m_momentum_z);
+  m_momentumPositionError[3]  = invE * (m_momentumPositionError[0] * m_px
+                                        + m_momentumPositionError[1] * m_py
+                                        + m_momentumPositionError[2] * m_pz);
   // cov(py,E)
-  m_momentumPositionError[9]  = invE * (m_momentumPositionError[1] * m_momentum_x
-                                        + m_momentumPositionError[7] * m_momentum_y
-                                        + m_momentumPositionError[8] * m_momentum_z);
+  m_momentumPositionError[9]  = invE * (m_momentumPositionError[1] * m_px
+                                        + m_momentumPositionError[7] * m_py
+                                        + m_momentumPositionError[8] * m_pz);
   // cov(pz,E)
-  m_momentumPositionError[14] = invE * (m_momentumPositionError[2] * m_momentum_x
-                                        + m_momentumPositionError[8] * m_momentum_y
-                                        + m_momentumPositionError[13] * m_momentum_z);
+  m_momentumPositionError[14] = invE * (m_momentumPositionError[2] * m_px
+                                        + m_momentumPositionError[8] * m_py
+                                        + m_momentumPositionError[13] * m_pz);
   // cov(E,E)
-  m_momentumPositionError[18] = invE * invE * (m_momentumPositionError[0] * m_momentum_x * m_momentum_x
-                                               + m_momentumPositionError[7] * m_momentum_y * m_momentum_y
-                                               + m_momentumPositionError[13] * m_momentum_z * m_momentum_z
-                                               + 2 * m_momentumPositionError[1] * m_momentum_x * m_momentum_y
-                                               + 2 * m_momentumPositionError[2] * m_momentum_x * m_momentum_z
-                                               + 2 * m_momentumPositionError[8] * m_momentum_y * m_momentum_z);
+  m_momentumPositionError[18] = invE * invE * (m_momentumPositionError[0] * m_px * m_px
+                                               + m_momentumPositionError[7] * m_py * m_py
+                                               + m_momentumPositionError[13] * m_pz * m_pz
+                                               + 2 * m_momentumPositionError[1] * m_px * m_py
+                                               + 2 * m_momentumPositionError[2] * m_px * m_pz
+                                               + 2 * m_momentumPositionError[8] * m_py * m_pz);
 }
 
-Particle::Particle(const ECLGamma* gamma) :
-  m_plist(0), m_pdgCode(Const::photon.getPDGCode()), m_particleType(c_ECLShower)
+Particle::Particle(const ECLGamma* gamma, const unsigned index) :
+  m_plist(0), m_pdgCode(Const::photon.getPDGCode()), m_flavorType(0),
+  m_particleType(c_ECLShower), m_mdstIndex(index)
 {
   // position
   // TODO: Obtain the values from ECL group (via xml file or something like this), but hard coded values need to be avoided!
-  m_position_x = 0.0;
-  m_position_y = 0.0;
-  m_position_z = 0.0;
+  m_x = 0.0;
+  m_y = 0.0;
+  m_z = 0.0;
 
   // 4-momentum
-  m_momentum_x = gamma->getPx();
-  m_momentum_y = gamma->getPy();
-  m_momentum_z = gamma->getPz();
-  m_energy     = gamma->getEnergy();
+  m_px = gamma->getPx();
+  m_py = gamma->getPy();
+  m_pz = gamma->getPz();
+  m_mass = 0;
 
   // set the error matrix
   resetErrorMatrix();
@@ -191,25 +209,24 @@ Particle::Particle(const ECLGamma* gamma) :
 
   // Note that all other elements are set to 0.0
   fillErrorMatrix(fullErrMatrix);
-
-  // mdst index
-  m_mdstIndex = (unsigned)gamma->GetShowerId();
 }
 
+
 Particle::Particle(const ECLPi0* pi0) :
-  m_plist(0), m_pdgCode(Const::pi0.getPDGCode()), m_particleType(c_Composite), m_mdstIndex(0)
+  m_plist(0), m_pdgCode(Const::pi0.getPDGCode()), m_flavorType(0),
+  m_particleType(c_Composite), m_mdstIndex(0)
 {
   // position
-  // TODO: Obtain the values from ECL group (via xml file or something like this), but hard coded values need to be avoided!
-  m_position_x = 0.0;
-  m_position_y = 0.0;
-  m_position_z = 0.0;
+  // TODO: Obtain the values from ECL group (as used there for momentum construction)
+  m_x = 0.0;
+  m_y = 0.0;
+  m_z = 0.0;
 
   // 4-momentum
-  m_momentum_x = pi0->getPx();
-  m_momentum_y = pi0->getPy();
-  m_momentum_z = pi0->getPz();
-  m_energy     = pi0->getEnergy();
+  m_px = pi0->getPx();
+  m_py = pi0->getPy();
+  m_pz = pi0->getPz();
+  m_mass = pi0->getMassFit();
 
   // set the error matrix
   resetErrorMatrix();
@@ -241,6 +258,7 @@ Particle::Particle(const MCParticle* mcParticle) :
 {
   m_pdgCode      = mcParticle->getPDG();
   m_mdstIndex    = mcParticle->getIndex();
+  setFlavorType();
 
   // generated 4-momentum
   set4Vector(mcParticle->get4Vector());
@@ -463,6 +481,21 @@ void Particle::fixParticleList() const
     p.m_plist         = plist;
   }
 }
+
+void Particle::setFlavorType()
+{
+  m_flavorType = 1; // flavored particle
+  if (m_pdgCode < 0) return;
+  if (m_pdgCode == 22) {m_flavorType = 0; return;} // gamma
+  if (m_pdgCode == 310) {m_flavorType = 0; return;} // K_s
+  if (m_pdgCode == 130) {m_flavorType = 0; return;} // K_L
+  int nnn = m_pdgCode / 10;
+  int q3 = nnn % 10; nnn /= 10;
+  int q2 = nnn % 10; nnn /= 10;
+  int q1 = nnn % 10;
+  if (q1 == 0 && q2 == q3) m_flavorType = 0; // unflavored meson
+}
+
 
 // Private functions - END
 

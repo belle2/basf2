@@ -14,6 +14,7 @@
 /* Belle2 headers. */
 #include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/simulation/EKLMSensitiveDetector.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>

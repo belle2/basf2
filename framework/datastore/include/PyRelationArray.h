@@ -2,6 +2,7 @@
 #define PYRELATIONARRAY_H
 
 #include <framework/dataobjects/RelationContainer.h>
+#include <framework/dataobjects/RelationElement.h>
 
 #include <string>
 #include <vector>

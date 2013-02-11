@@ -1,6 +1,7 @@
 #include <framework/datastore/PyRelationArray.h>
 
 #include <framework/datastore/DataStore.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

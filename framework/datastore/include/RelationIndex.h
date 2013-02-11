@@ -10,10 +10,10 @@
 #ifndef RelationIndex_H
 #define RelationIndex_H
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndexManager.h>
 
 namespace Belle2 {
+  template <class T> class StoreArray;
 
   /** Class to ease use of relations.
    *

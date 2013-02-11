@@ -24,14 +24,6 @@
 #include <string>
 #include <set>
 
-namespace boost {
-  namespace python {
-    class dict;
-    class object;
-  }
-}
-
-
 namespace Belle2 {
 
   class Module;

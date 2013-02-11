@@ -10,14 +10,14 @@
 #ifndef RELATIONCONTAINER_H
 #define RELATIONCONTAINER_H
 
-#include <framework/dataobjects/RelationElement.h>
-
 #include <TClonesArray.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
+  class RelationElement;
+
   /** \addtogroup dataobjects
    * @{
    */
@@ -32,10 +32,7 @@ namespace Belle2 {
   public:
 
     /** Default constructor, initialize all values to sane default. */
-    RelationContainer():
-      m_elements(RelationElement::Class()),
-      m_fromName(""), m_fromDurability(-1),
-      m_toName(""), m_toDurability(-1), m_modified(true) {}
+    RelationContainer();
 
     /** Get name of the StoreArray we relate from. */
     const std::string& getFromName()       const { return m_fromName; }
@@ -67,7 +64,7 @@ namespace Belle2 {
     /** Returns true if no information was set yet. */
     bool isDefaultConstructed() const {
       return (m_fromName == "" and m_toName == ""
-              and m_elements.GetEntriesFast() == 0 and
+              and getEntries() == 0 and
               m_fromDurability == -1 and m_toDurability == -1);
     }
 
@@ -86,7 +83,7 @@ namespace Belle2 {
     const TClonesArray& elements() const { return m_elements; }
 
     /** Get reference to Relation element i. */
-    const RelationElement& elements(int i) const { return *static_cast<RelationElement*>(m_elements[i]); }
+    const RelationElement& elements(int i) const;
 
     /** Get number of elements. */
     int getEntries() const { return m_elements.GetEntriesFast(); }

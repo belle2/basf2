@@ -13,9 +13,11 @@
 #include <framework/core/utilities.h>
 #include <framework/logging/Logger.h>
 
+#include <boost/filesystem.hpp>
+#include <boost/regex.hpp>
+
 #include <dlfcn.h>
 #include <fstream>
-#include <boost/regex.hpp>
 
 using namespace Belle2;
 using namespace std;

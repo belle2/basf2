@@ -11,12 +11,14 @@
 #ifndef RELATIONARRAY_H
 #define RELATIONARRAY_H
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreAccessorBase.h>
+#include <framework/dataobjects/RelationElement.h>
 #include <framework/dataobjects/RelationContainer.h>
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
+  template <class T> class StoreArray;
 
   /** Class to create/modify relations between StoreArrays.
    *

@@ -12,7 +12,6 @@
 #define MODULEMANAGER_H_
 
 #include <boost/shared_ptr.hpp>
-#include <boost/filesystem.hpp>
 
 #include <framework/core/FrameworkExceptions.h>
 
@@ -20,6 +19,11 @@
 #include <map>
 #include <list>
 
+namespace boost {
+  namespace filesystem {
+    class directory_entry;
+  }
+}
 
 namespace Belle2 {
 

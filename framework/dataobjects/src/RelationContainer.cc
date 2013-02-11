@@ -10,7 +10,21 @@
 
 #include <framework/dataobjects/RelationContainer.h>
 
+#include <framework/dataobjects/RelationElement.h>
+
 using namespace std;
 using namespace Belle2;
 
-ClassImp(RelationContainer)
+ClassImp(RelationContainer);
+
+RelationContainer::RelationContainer():
+  m_elements(RelationElement::Class()),
+  m_fromName(""), m_fromDurability(-1),
+  m_toName(""), m_toDurability(-1), m_modified(true)
+{
+}
+
+const RelationElement& RelationContainer::elements(int i) const
+{
+  return *static_cast<RelationElement*>(m_elements[i]);
+}

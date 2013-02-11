@@ -15,7 +15,6 @@
 #ifndef __CINT__
 
 #include <boost/format.hpp>
-#include <string>
 
 namespace Belle2 {
 

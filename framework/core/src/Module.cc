@@ -10,12 +10,13 @@
 
 #include <boost/python/register_ptr_to_python.hpp>
 #include <boost/python/class.hpp>
+#include <boost/python/list.hpp>
 #include <boost/python/copy_const_reference.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <framework/core/Module.h>
 #include <framework/core/PyModule.h>
 #include <framework/core/ModuleManager.h>
+
 
 using namespace std;
 using namespace Belle2;

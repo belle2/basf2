@@ -11,7 +11,6 @@
 #define RELATIONELEMENT_H
 
 #include <TObject.h>
-#include <framework/logging/Logger.h>
 
 #include <vector>
 
@@ -52,12 +51,7 @@ namespace Belle2 {
      *  @param to      indices to point to
      *  @param weights weights of the relation
      */
-    RelationElement(index_type from, const std::vector<index_type>& to, const std::vector<weight_type>& weights):
-      TObject(), m_from(from), m_to(to.begin(), to.end()), m_weights(weights.begin(), weights.end()) {
-      if (to.size() != weights.size()) {
-        B2FATAL("Index and weight vector sizes differ!");
-      }
-    }
+    RelationElement(index_type from, const std::vector<index_type>& to, const std::vector<weight_type>& weights);
 
     /** Constructor for a 1:n relation.
      *

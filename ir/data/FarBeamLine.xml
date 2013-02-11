@@ -1575,82 +1575,75 @@
                 <Material desc="Magnet SLYTLP1 yoke">Fe</Material>
         </SLYTLP1p2>
 
-	<!-- concrete wall -->
+	<!-- concrete "mon-gata" gate-shaped shield -->
 
-	<WALL>
-                <X unit="m">2.75</X>
-                <Y unit="m">2.75</Y>
-                <Z unit="m">29</Z>
+	<GateShield>
+                <X unit="m">2.7</X>
+                <Y unit="m">2.7</Y>
+                <Z unit="m">27</Z>
 
-                <TUNX unit="m">2.0</TUNX>
-                <TUNY unit="m">2.0</TUNY>
-                <DETZ unit="m">3.66</DETZ>
-                <DETDZ unit="m">0.48</DETDZ>
+                <TUNX unit="m">1.95</TUNX>
+                <TUNY unit="m">1.95</TUNY>
+                <DETZ unit="m">3.69</DETZ>
+                <DETDZ unit="m">0.47</DETDZ>
+                <ROT unit="rad">-0.02595</ROT>
 
-                <Material desc="Concrete wall">G4_CONCRETE</Material>
-	</WALL>
+                <Material desc="gate shield">G4_CONCRETE</Material>
+	</GateShield>
 
-	<WALL2>
-                <X unit="m">3.00</X>
-                <Y unit="m">3.00</Y>
-                <Z unit="m">29</Z>
+	<!-- polyetyren neutron shield -->
 
-                <TUN2X unit="m">2.75</TUN2X>
-                <TUN2Y unit="m">2.75</TUN2Y>
-
-                <Material desc="Concrete wall">G4_CONCRETE</Material>
-	</WALL2>
-
-
-	<!-- neutron shield -->
-
-        <ShieldR>
-                <X0 unit="m">0</X0>
-                <Z0 unit="m">4.17</Z0>
-                <L unit="m">0.1</L>
-                <PHI unit="rad">0</PHI>
-
-                <R unit="cm">200.0</R>
-                <r unit="cm">50.0</r>
+        <PolyShieldR>
+                <Xp unit="m">1.80</Xp>
+                <Xm unit="m">1.95</Xm>
+                <Y unit="m">1.87</Y>
+                <Z unit="m">0.15</Z>
+                <DZ unit="m">4.25</DZ>
+                <r unit="m">0.85</r>
+                <dx unit="m">-0.145</dx>
 
                 <Material desc="Neutron shield">G4_POLYETHYLENE</Material>
-        </ShieldR>
+        </PolyShieldR>
 
-        <ShieldL>
-                <X0 unit="m">0</X0>
-                <Z0 unit="m">-3.22</Z0>
-                <L unit="m">-0.1</L>
-                <PHI unit="rad">0</PHI>
-
-                <R unit="cm">200.0</R>
-                <r unit="cm">50.0</r>
+        <PolyShieldL>
+                <Xp unit="m">2.02</Xp>
+                <Xm unit="m">1.73</Xm>
+                <Y unit="m">1.87</Y>
+                <Z unit="m">0.15</Z>
+                <DZ unit="m">-3.31</DZ>
+                <r unit="m">0.85</r>
+                <dx unit="m">0.07</dx>
 
                 <Material desc="Neutron shield">G4_POLYETHYLENE</Material>
-        </ShieldL>
+        </PolyShieldL>
 
-        <Shield2R>
-                <X0 unit="m">0</X0>
-                <Z0 unit="m">4.47</Z0>
-                <L unit="m">0.5</L>
-                <PHI unit="rad">0</PHI>
+	<!-- additional concrete shield -->
 
-                <R unit="cm">200.0</R>
-                <r unit="cm">50.0</r>
+        <ConcreteShieldR>
+                <X unit="m">1.9</X>
+                <Y unit="m">1.9</Y>
+                <Z unit="m">0.35</Z>
+                <DZ unit="m">5.26</DZ>
+                <x unit="m">0.8</x>
+                <y unit="m">1.45</y>
+                <dx unit="m">-0.1</dx>
+                <dy unit="m">-0.45</dy>
+                <ROT unit="rad">-0.02595</ROT>
+                <Material>G4_CONCRETE</Material>
+        </ConcreteShieldR>
 
-                <Material desc="Neutron shield">G4_CONCRETE</Material>
-        </Shield2R>
-
-        <Shield2L>
-                <X0 unit="m">0</X0>
-                <Z0 unit="m">-3.52</Z0>
-                <L unit="m">-0.5</L>
-                <PHI unit="rad">0</PHI>
-
-                <R unit="cm">200.0</R>
-                <r unit="cm">50.0</r>
-
-                <Material desc="Neutron shield">G4_CONCRETE</Material>
-        </Shield2L>
+        <ConcreteShieldL>
+                <X unit="m">1.9</X>
+                <Y unit="m">1.9</Y>
+                <Z unit="m">0.35</Z>
+                <DZ unit="m">-4.32</DZ>
+                <x unit="m">0.8</x>
+                <y unit="m">1.45</y>
+                <dx unit="m">0.1</dx>
+                <dy unit="m">-0.45</dy>
+                <ROT unit="rad">-0.02595</ROT>
+                <Material>G4_CONCRETE</Material>
+        </ConcreteShieldL>
 
   </Content>
 </DetectorComponent>

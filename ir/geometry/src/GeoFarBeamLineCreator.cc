@@ -4506,241 +4506,198 @@ namespace Belle2 {
       //-   concrete wall
 
       //--------------
-      //-   WALL
+      //-   GateShield (gate shield)
 
       //get parameters from .xml file
-      GearDir cWALL(content, "WALL/");
+      GearDir cGateShield(content, "GateShield/");
 
-      double WALL_X = cWALL.getLength("X") * unitFactor;
-      double WALL_Y = cWALL.getLength("Y") * unitFactor;
-      double WALL_Z = cWALL.getLength("Z") * unitFactor;
-      double TUN_X = cWALL.getLength("TUNX") * unitFactor;
-      double TUN_Y = cWALL.getLength("TUNY") * unitFactor;
-      double DET_Z = cWALL.getLength("DETZ") * unitFactor;
-      double DET_DZ = cWALL.getLength("DETDZ") * unitFactor;
+      double GateShield_X = cGateShield.getLength("X") * unitFactor;
+      double GateShield_Y = cGateShield.getLength("Y") * unitFactor;
+      double GateShield_Z = cGateShield.getLength("Z") * unitFactor;
+      double TUN_X = cGateShield.getLength("TUNX") * unitFactor;
+      double TUN_Y = cGateShield.getLength("TUNY") * unitFactor;
+      double DET_Z = cGateShield.getLength("DETZ") * unitFactor;
+      double DET_DZ = cGateShield.getLength("DETDZ") * unitFactor;
+      double ROT = cGateShield.getAngle("ROT");
 
       G4Transform3D transform_DET = G4Translate3D(0.0, 0.0, DET_DZ);
+      G4Transform3D transform_ROT = G4Translate3D(0.0, 0.0, 0.0);
+      transform_ROT = transform_ROT * G4RotateY3D(ROT / Unit::rad);
 
       //define geometry
       // wall is made from the box by excluding spaces for detector and tunnel
-      G4Box* geo_WALLxx = new G4Box("geo_WALLxx_name", WALL_X, WALL_Y, WALL_Z);
-      G4Box* geo_DET = new G4Box("geo_DET_name", WALL_X, WALL_Y, DET_Z);
-      G4Box* geo_TUN = new G4Box("geo_TUN_name", TUN_X, TUN_Y, WALL_Z);
-      G4SubtractionSolid* geo_WALLx = new G4SubtractionSolid("geo_WALLx_name", geo_WALLxx, geo_DET, transform_DET);
-      G4SubtractionSolid* geo_WALL = new G4SubtractionSolid("geo_WALL_name", geo_WALLx, geo_TUN);
+      G4Box* geo_GateShieldxx = new G4Box("geo_GateShieldxx_name", GateShield_X, GateShield_Y, GateShield_Z);
+      G4Box* geo_TUN = new G4Box("geo_TUN_name", TUN_X, TUN_Y, GateShield_Z);
+      G4SubtractionSolid* geo_GateShieldx = new G4SubtractionSolid("geo_GateShieldx_name", geo_GateShieldxx, geo_TUN);
+      G4Box* geo_DET = new G4Box("geo_DET_name", GateShield_X, GateShield_Y, DET_Z);
+      G4SubtractionSolid* geo_GateShield = new G4SubtractionSolid("geo_GateShield_name", geo_GateShieldx, geo_DET, transform_DET);
 
-      string strMat_WALL = cWALL.getString("Material");
-      G4Material* mat_WALL = Materials::get(strMat_WALL);
-      G4LogicalVolume* logi_WALL = new G4LogicalVolume(geo_WALL, mat_WALL, "logi_WALL_name");
+      string strMat_GateShield = cGateShield.getString("Material");
+      G4Material* mat_GateShield = Materials::get(strMat_GateShield);
+      G4LogicalVolume* logi_GateShield = new G4LogicalVolume(geo_GateShield, mat_GateShield, "logi_GateShield_name");
 
       //put volume
-      setColor(*logi_WALL, cWALL.getString("Color", "#CC0000"));
-      //setVisibility(*logi_WALL, false);
-      new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), logi_WALL, "phys_WALL_name", &topVolume, false, 0);
+      setColor(*logi_GateShield, cGateShield.getString("Color", "#CC0000"));
+      //setVisibility(*logi_GateShield, false);
+      new G4PVPlacement(transform_ROT, logi_GateShield, "phys_GateShield_name", &topVolume, false, 0);
+
+
+      bool radiation_study = false;
 
       //--------------
-      //-   WALL2
-
-      //get parameters from .xml file
-      GearDir cWALL2(content, "WALL2/");
-
-      double WALL2_X = cWALL2.getLength("X") * unitFactor;
-      double WALL2_Y = cWALL2.getLength("Y") * unitFactor;
-      double WALL2_Z = cWALL2.getLength("Z") * unitFactor;
-      double TUN2_X = cWALL2.getLength("TUN2X") * unitFactor;
-      double TUN2_Y = cWALL2.getLength("TUN2Y") * unitFactor;
+      //-   Tube (virtual tube for radiation level study)
 
       //define geometry
-      // wall is made from the box by excluding spaces for detector and tunnel
-      G4Box* geo_WALL2xx = new G4Box("geo_WALL2xx_name", WALL2_X, WALL2_Y, WALL2_Z);
-      G4Box* geo_TUN2 = new G4Box("geo_TUN2_name", TUN2_X, TUN2_Y, WALL2_Z);
-      G4SubtractionSolid* geo_WALL2x = new G4SubtractionSolid("geo_WALL2x_name", geo_WALL2xx, geo_DET, transform_DET);
-      G4SubtractionSolid* geo_WALL2 = new G4SubtractionSolid("geo_WALL2_name", geo_WALL2x, geo_TUN2);
-
-      string strMat_WALL2 = cWALL2.getString("Material");
-      G4Material* mat_WALL2 = Materials::get(strMat_WALL2);
-      G4LogicalVolume* logi_WALL2 = new G4LogicalVolume(geo_WALL2, mat_WALL2, "logi_WALL2_name");
+      G4Tubs* geo_Tube = new G4Tubs("geo_Tube_name", 3995 * mm, 4000 * mm, 29 * m, 0. * deg, 360.*deg);
+      G4Material* mat_Tube = Materials::get("G4_Si");
+      G4LogicalVolume* logi_Tube = new G4LogicalVolume(geo_Tube, mat_Tube, "logi_Tube_name");
 
       //put volume
-      setColor(*logi_WALL2, cWALL.getString("Color", "#CC0000"));
-      //setVisibility(*logi_WALL2, false);
-      new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), logi_WALL2, "phys_WALL2_name", &topVolume, false, 0);
+      setColor(*logi_Tube, cGateShield.getString("Color", "#CC0000"));
+      //setVisibility(*logi_Tube, false);
+      if (radiation_study) {
+        new G4PVPlacement(transform_ROT, logi_Tube, "phys_Tube_name", &topVolume, false, 0);
+      }
+
 
       //--------------
-      //-   neutron shield
+      //-   polyethyren shields
 
       //--------------
-      //-   ShieldR
+      //-   PolyShieldR
 
       //get parameters from .xml file
-      GearDir cShieldR(content, "ShieldR/");
+      GearDir cPolyShieldR(content, "PolyShieldR/");
 
-      double ShieldR_L = cShieldR.getLength("L") * unitFactor;
-      double ShieldR_R = cShieldR.getLength("R") * unitFactor;
-      //double ShieldR_X0 = cShieldR.getLength("X0") * unitFactor;
-      double ShieldR_Z0 = cShieldR.getLength("Z0") * unitFactor;
-      //double ShieldR_PHI = cShieldR.getLength("PHI");
+      double PolyShieldR_Xp = cPolyShieldR.getLength("Xp") * unitFactor;
+      double PolyShieldR_Xm = cPolyShieldR.getLength("Xm") * unitFactor;
+      double PolyShieldR_Y = cPolyShieldR.getLength("Y") * unitFactor;
+      double PolyShieldR_Z = cPolyShieldR.getLength("Z") * unitFactor;
+      double PolyShieldR_DZ = cPolyShieldR.getLength("DZ") * unitFactor;
+      double PolyShieldR_r = cPolyShieldR.getLength("r") * unitFactor;
+      double PolyShieldR_dx = cPolyShieldR.getLength("dx") * unitFactor;
 
-      double ShieldR_Z[N];
-      double ShieldR_r[N];
-      double ShieldR_r0[N];
-      ShieldR_Z[0] = 0.0 * Unit::m * unitFactor;
-      ShieldR_Z[1] = ShieldR_L;
-      ShieldR_r[0] = cShieldR.getLength("r") * unitFactor;
-      ShieldR_r[1] = cShieldR.getLength("r") * unitFactor;
-      ShieldR_r0[0] = 0.0 * Unit::m * unitFactor;
-      ShieldR_r0[1] = 0.0 * Unit::m * unitFactor;
-
-      G4Transform3D transform_ShieldR = G4Translate3D(0.0, 0.0, ShieldR_Z0);
-      G4Transform3D transform_ShieldR_inv = transform_ShieldR.inverse();
-      G4Transform3D transform_ShieldR_Hole = G4Translate3D(0.0, 0.0, ShieldR_Z0 - ShieldR_L / 2);
+      double PolyShieldR_X = (PolyShieldR_Xp + PolyShieldR_Xm) / 2;
+      G4Transform3D transform_PolyShieldR = G4Translate3D((PolyShieldR_Xp - PolyShieldR_Xm) / 2, 0.0, PolyShieldR_DZ);
+      G4Transform3D transform_PolyShieldR_Hole = G4Translate3D(PolyShieldR_dx, 0.0, 0.0);
 
       //define geometry
-      G4Box* geo_ShieldRxx = new G4Box("geo_ShieldRxx_name", ShieldR_R, ShieldR_R, fabs(ShieldR_L) / 2);
+      G4Box* geo_PolyShieldRx = new G4Box("geo_PolyShieldRx_name", PolyShieldR_X, PolyShieldR_Y, PolyShieldR_Z);
+      G4Tubs* geo_PolyShieldR_Hole = new G4Tubs("geo_PolyShieldRxx_name", 0 * mm, PolyShieldR_r, PolyShieldR_Z, 0. * deg, 360.*deg);
+      G4SubtractionSolid* geo_PolyShieldR
+        = new G4SubtractionSolid("geo_PolyShieldR_name", geo_PolyShieldRx, geo_PolyShieldR_Hole, transform_PolyShieldR_Hole);
 
-      G4Polycone* geo_ShieldR_Hole = new G4Polycone("geo_ShieldR_Hole_name", 0.0, 2 * M_PI, N, ShieldR_Z, ShieldR_r0, ShieldR_r);
-
-      G4SubtractionSolid* geo_ShieldR = new G4SubtractionSolid("geo_ShieldR_name", geo_ShieldRxx, geo_ShieldR_Hole, transform_ShieldR_inv * transform_ShieldR_Hole);
-
-
-      string strMat_ShieldR = cShieldR.getString("Material");
-      G4Material* mat_ShieldR = Materials::get(strMat_ShieldR);
-      G4LogicalVolume* logi_ShieldR = new G4LogicalVolume(geo_ShieldR, mat_ShieldR, "logi_ShieldR_name");
+      string strMat_PolyShieldR = cPolyShieldR.getString("Material");
+      G4Material* mat_PolyShieldR = Materials::get(strMat_PolyShieldR);
+      G4LogicalVolume* logi_PolyShieldR = new G4LogicalVolume(geo_PolyShieldR, mat_PolyShieldR, "logi_PolyShieldR_name");
 
       //put volume
-      setColor(*logi_ShieldR, cShieldR.getString("Color", "#0000CC"));
-      //setVisibility(*logi_ShieldL, false);
-      new G4PVPlacement(transform_ShieldR, logi_ShieldR, "phys_ShieldR_name", &topVolume, false, 0);
+      setColor(*logi_PolyShieldR, cPolyShieldR.getString("Color", "#0000CC"));
+      //setVisibility(*logi_PolyShieldL, false);
+      new G4PVPlacement(transform_PolyShieldR, logi_PolyShieldR, "phys_PolyShieldR_name", &topVolume, false, 0);
 
       //--------------
-      //-   ShieldL
+      //-   PolyShieldL
 
       //get parameters from .xml file
-      GearDir cShieldL(content, "ShieldL/");
+      GearDir cPolyShieldL(content, "PolyShieldL/");
 
-      double ShieldL_L = cShieldL.getLength("L") * unitFactor;
-      double ShieldL_R = cShieldL.getLength("R") * unitFactor;
-      //double ShieldL_X0 = cShieldL.getLength("X0") * unitFactor;
-      double ShieldL_Z0 = cShieldL.getLength("Z0") * unitFactor;
-      //double ShieldL_PHI = cShieldL.getLength("PHI");
+      double PolyShieldL_Xp = cPolyShieldL.getLength("Xp") * unitFactor;
+      double PolyShieldL_Xm = cPolyShieldL.getLength("Xm") * unitFactor;
+      double PolyShieldL_Y = cPolyShieldL.getLength("Y") * unitFactor;
+      double PolyShieldL_Z = cPolyShieldL.getLength("Z") * unitFactor;
+      double PolyShieldL_DZ = cPolyShieldL.getLength("DZ") * unitFactor;
+      double PolyShieldL_r = cPolyShieldL.getLength("r") * unitFactor;
+      double PolyShieldL_dx = cPolyShieldL.getLength("dx") * unitFactor;
 
-      double ShieldL_Z[N];
-      double ShieldL_r[N];
-      double ShieldL_r0[N];
-      ShieldL_Z[0] = 0.0 * Unit::m * unitFactor;
-      ShieldL_Z[1] = ShieldL_L;
-      ShieldL_r[0] = cShieldL.getLength("r") * unitFactor;
-      ShieldL_r[1] = cShieldL.getLength("r") * unitFactor;
-      ShieldL_r0[0] = 0.0 * Unit::m * unitFactor;
-      ShieldL_r0[1] = 0.0 * Unit::m * unitFactor;
-
-      G4Transform3D transform_ShieldL = G4Translate3D(0.0, 0.0, ShieldL_Z0);
-      G4Transform3D transform_ShieldL_inv = transform_ShieldL.inverse();
-      G4Transform3D transform_ShieldL_Hole = G4Translate3D(0.0, 0.0, ShieldL_Z0 - ShieldL_L / 2);
+      double PolyShieldL_X = (PolyShieldL_Xp + PolyShieldL_Xm) / 2;
+      G4Transform3D transform_PolyShieldL = G4Translate3D((PolyShieldL_Xp - PolyShieldL_Xm) / 2, 0.0, PolyShieldL_DZ);
+      G4Transform3D transform_PolyShieldL_Hole = G4Translate3D(PolyShieldL_dx, 0.0, 0.0);
 
       //define geometry
-      G4Box* geo_ShieldLxx = new G4Box("geo_ShieldLxx_name", ShieldL_R, ShieldL_R, fabs(ShieldL_L) / 2);
+      G4Box* geo_PolyShieldLx = new G4Box("geo_PolyShieldLx_name", PolyShieldL_X, PolyShieldL_Y, PolyShieldL_Z);
+      G4Tubs* geo_PolyShieldL_Hole = new G4Tubs("geo_PolyShieldLxx_name", 0 * mm, PolyShieldL_r, PolyShieldL_Z, 0. * deg, 360.*deg);
+      G4SubtractionSolid* geo_PolyShieldL
+        = new G4SubtractionSolid("geo_PolyShieldL_name", geo_PolyShieldLx, geo_PolyShieldL_Hole, transform_PolyShieldL_Hole);
 
-      G4Polycone* geo_ShieldL_Hole = new G4Polycone("geo_ShieldL_Hole_name", 0.0, 2 * M_PI, N, ShieldL_Z, ShieldL_r0, ShieldL_r);
-
-      G4SubtractionSolid* geo_ShieldL = new G4SubtractionSolid("geo_ShieldL_name", geo_ShieldLxx, geo_ShieldL_Hole, transform_ShieldL_inv * transform_ShieldL_Hole);
-
-
-      string strMat_ShieldL = cShieldL.getString("Material");
-      G4Material* mat_ShieldL = Materials::get(strMat_ShieldL);
-      G4LogicalVolume* logi_ShieldL = new G4LogicalVolume(geo_ShieldL, mat_ShieldL, "logi_ShieldL_name");
+      string strMat_PolyShieldL = cPolyShieldL.getString("Material");
+      G4Material* mat_PolyShieldL = Materials::get(strMat_PolyShieldL);
+      G4LogicalVolume* logi_PolyShieldL = new G4LogicalVolume(geo_PolyShieldL, mat_PolyShieldL, "logi_PolyShieldL_name");
 
       //put volume
-      setColor(*logi_ShieldL, cShieldL.getString("Color", "#0000CC"));
-      //setVisibility(*logi_ShieldL, false);
-      new G4PVPlacement(transform_ShieldL, logi_ShieldL, "phys_ShieldL_name", &topVolume, false, 0);
+      setColor(*logi_PolyShieldL, cPolyShieldL.getString("Color", "#0000CC"));
+      //setVisibility(*logi_PolyShieldL, false);
+      new G4PVPlacement(transform_PolyShieldL, logi_PolyShieldL, "phys_PolyShieldL_name", &topVolume, false, 0);
 
       //--------------
-      //-   Shield2R
-
-      //get parameters from .xml file
-      GearDir cShield2R(content, "Shield2R/");
-
-      double Shield2R_L = cShield2R.getLength("L") * unitFactor;
-      double Shield2R_R = cShield2R.getLength("R") * unitFactor;
-      //double Shield2R_X0 = cShield2R.getLength("X0") * unitFactor;
-      double Shield2R_Z0 = cShield2R.getLength("Z0") * unitFactor;
-      //double Shield2R_PHI = cShield2R.getLength("PHI");
-
-      double Shield2R_Z[N];
-      double Shield2R_r[N];
-      double Shield2R_r0[N];
-      Shield2R_Z[0] = 0.0 * Unit::m * unitFactor;
-      Shield2R_Z[1] = Shield2R_L;
-      Shield2R_r[0] = cShield2R.getLength("r") * unitFactor;
-      Shield2R_r[1] = cShield2R.getLength("r") * unitFactor;
-      Shield2R_r0[0] = 0.0 * Unit::m * unitFactor;
-      Shield2R_r0[1] = 0.0 * Unit::m * unitFactor;
-
-      G4Transform3D transform_Shield2R = G4Translate3D(0.0, 0.0, Shield2R_Z0);
-      G4Transform3D transform_Shield2R_inv = transform_Shield2R.inverse();
-      G4Transform3D transform_Shield2R_Hole = G4Translate3D(0.0, 0.0, Shield2R_Z0 - Shield2R_L / 2);
-
-      //define geometry
-      G4Box* geo_Shield2Rxx = new G4Box("geo_Shield2Rxx_name", Shield2R_R, Shield2R_R, fabs(Shield2R_L) / 2);
-
-      G4Polycone* geo_Shield2R_Hole = new G4Polycone("geo_Shield2R_Hole_name", 0.0, 2 * M_PI, N, Shield2R_Z, Shield2R_r0, Shield2R_r);
-
-      G4SubtractionSolid* geo_Shield2R = new G4SubtractionSolid("geo_Shield2R_name", geo_Shield2Rxx, geo_Shield2R_Hole, transform_Shield2R_inv * transform_Shield2R_Hole);
-
-
-      string strMat_Shield2R = cShield2R.getString("Material");
-      G4Material* mat_Shield2R = Materials::get(strMat_Shield2R);
-      G4LogicalVolume* logi_Shield2R = new G4LogicalVolume(geo_Shield2R, mat_Shield2R, "logi_Shield2R_name");
-
-      //put volume
-      setColor(*logi_Shield2R, cShield2R.getString("Color", "#0000CC"));
-      //setVisibility(*logi_Shield2L, false);
-      new G4PVPlacement(transform_Shield2R, logi_Shield2R, "phys_Shield2R_name", &topVolume, false, 0);
+      //-   concrete tunnel-end shields
 
       //--------------
-      //-   Shield2L
+      //-   ConcreteShieldR
 
       //get parameters from .xml file
-      GearDir cShield2L(content, "Shield2L/");
+      GearDir cConcreteShieldR(content, "ConcreteShieldR/");
 
-      double Shield2L_L = cShield2L.getLength("L") * unitFactor;
-      double Shield2L_R = cShield2L.getLength("R") * unitFactor;
-      //double Shield2L_X0 = cShield2L.getLength("X0") * unitFactor;
-      double Shield2L_Z0 = cShield2L.getLength("Z0") * unitFactor;
-      //double Shield2L_PHI = cShield2L.getLength("PHI");
+      double ConcreteShieldR_X = cConcreteShieldR.getLength("X") * unitFactor;
+      double ConcreteShieldR_Y = cConcreteShieldR.getLength("Y") * unitFactor;
+      double ConcreteShieldR_Z = cConcreteShieldR.getLength("Z") * unitFactor;
+      double ConcreteShieldR_DZ = cConcreteShieldR.getLength("DZ") * unitFactor;
+      double ConcreteShieldR_x = cConcreteShieldR.getLength("x") * unitFactor;
+      double ConcreteShieldR_y = cConcreteShieldR.getLength("y") * unitFactor;
+      double ConcreteShieldR_dx = cConcreteShieldR.getLength("dx") * unitFactor;
+      double ConcreteShieldR_dy = cConcreteShieldR.getLength("dy") * unitFactor;
 
-      double Shield2L_Z[N];
-      double Shield2L_r[N];
-      double Shield2L_r0[N];
-      Shield2L_Z[0] = 0.0 * Unit::m * unitFactor;
-      Shield2L_Z[1] = Shield2L_L;
-      Shield2L_r[0] = cShield2L.getLength("r") * unitFactor;
-      Shield2L_r[1] = cShield2L.getLength("r") * unitFactor;
-      Shield2L_r0[0] = 0.0 * Unit::m * unitFactor;
-      Shield2L_r0[1] = 0.0 * Unit::m * unitFactor;
+      G4Transform3D transform_ConcreteShieldR = G4Translate3D(0.0, 0.0, ConcreteShieldR_DZ);
+      transform_ConcreteShieldR = transform_ROT * transform_ConcreteShieldR;
+      G4Transform3D transform_ConcreteShieldR_Hole = G4Translate3D(ConcreteShieldR_dx, ConcreteShieldR_dy, 0.0);
 
-      G4Transform3D transform_Shield2L = G4Translate3D(0.0, 0.0, Shield2L_Z0);
-      G4Transform3D transform_Shield2L_inv = transform_Shield2L.inverse();
-      G4Transform3D transform_Shield2L_Hole = G4Translate3D(0.0, 0.0, Shield2L_Z0 - Shield2L_L / 2);
 
       //define geometry
-      G4Box* geo_Shield2Lxx = new G4Box("geo_Shield2Lxx_name", Shield2L_R, Shield2L_R, fabs(Shield2L_L) / 2);
+      G4Box* geo_ConcreteShieldRx = new G4Box("geo_ConcreteShieldRx_name", ConcreteShieldR_X, ConcreteShieldR_Y, ConcreteShieldR_Z);
+      G4Box* geo_ConcreteShieldR_Hole = new G4Box("geo_ConcreteShieldRxx_name", ConcreteShieldR_x, ConcreteShieldR_y, ConcreteShieldR_Z);
+      G4SubtractionSolid* geo_ConcreteShieldR = new G4SubtractionSolid("geo_ConcreteShieldR_name", geo_ConcreteShieldRx, geo_ConcreteShieldR_Hole, transform_ConcreteShieldR_Hole);
 
-      G4Polycone* geo_Shield2L_Hole = new G4Polycone("geo_Shield2L_Hole_name", 0.0, 2 * M_PI, N, Shield2L_Z, Shield2L_r0, Shield2L_r);
-
-      G4SubtractionSolid* geo_Shield2L = new G4SubtractionSolid("geo_Shield2L_name", geo_Shield2Lxx, geo_Shield2L_Hole, transform_Shield2L_inv * transform_Shield2L_Hole);
-
-
-      string strMat_Shield2L = cShield2L.getString("Material");
-      G4Material* mat_Shield2L = Materials::get(strMat_Shield2L);
-      G4LogicalVolume* logi_Shield2L = new G4LogicalVolume(geo_Shield2L, mat_Shield2L, "logi_Shield2L_name");
-
+      string strMat_ConcreteShieldR = cConcreteShieldR.getString("Material");
+      G4Material* mat_ConcreteShieldR = Materials::get(strMat_ConcreteShieldR);
+      G4LogicalVolume* logi_ConcreteShieldR = new G4LogicalVolume(geo_ConcreteShieldR, mat_ConcreteShieldR, "logi_ConcreteShieldR_name");
 
       //put volume
-      setColor(*logi_Shield2L, cShield2L.getString("Color", "#0000CC"));
-      //setVisibility(*logi_Shield2L, false);
-      new G4PVPlacement(transform_Shield2L, logi_Shield2L, "phys_Shield2L_name", &topVolume, false, 0);
+      setColor(*logi_ConcreteShieldR, cConcreteShieldR.getString("Color", "#0000CC"));
+      //setVisibility(*logi_ConcreteShieldR, false);
+      new G4PVPlacement(transform_ConcreteShieldR, logi_ConcreteShieldR, "phys_ConcreteShieldR_name", &topVolume, false, 0);
+
+      //--------------
+      //-   ConcreteShieldL
+
+      //get parameters from .xml file
+      GearDir cConcreteShieldL(content, "ConcreteShieldL/");
+
+      double ConcreteShieldL_X = cConcreteShieldL.getLength("X") * unitFactor;
+      double ConcreteShieldL_Y = cConcreteShieldL.getLength("Y") * unitFactor;
+      double ConcreteShieldL_Z = cConcreteShieldL.getLength("Z") * unitFactor;
+      double ConcreteShieldL_DZ = cConcreteShieldL.getLength("DZ") * unitFactor;
+      double ConcreteShieldL_x = cConcreteShieldL.getLength("x") * unitFactor;
+      double ConcreteShieldL_y = cConcreteShieldL.getLength("y") * unitFactor;
+      double ConcreteShieldL_dx = cConcreteShieldL.getLength("dx") * unitFactor;
+      double ConcreteShieldL_dy = cConcreteShieldL.getLength("dy") * unitFactor;
+
+      G4Transform3D transform_ConcreteShieldL = G4Translate3D(0.0, 0.0, ConcreteShieldL_DZ);
+      transform_ConcreteShieldL = transform_ROT * transform_ConcreteShieldL;
+      G4Transform3D transform_ConcreteShieldL_Hole = G4Translate3D(ConcreteShieldL_dx, ConcreteShieldL_dy, 0.0);
+
+      //define geometry
+      G4Box* geo_ConcreteShieldLx = new G4Box("geo_ConcreteShieldLx_name", ConcreteShieldL_X, ConcreteShieldL_Y, ConcreteShieldL_Z);
+      G4Box* geo_ConcreteShieldL_Hole = new G4Box("geo_ConcreteShieldLxx_name", ConcreteShieldL_x, ConcreteShieldL_y, ConcreteShieldL_Z);
+      G4SubtractionSolid* geo_ConcreteShieldL = new G4SubtractionSolid("geo_ConcreteShieldL_name", geo_ConcreteShieldLx, geo_ConcreteShieldL_Hole, transform_ConcreteShieldL_Hole);
+
+      string strMat_ConcreteShieldL = cConcreteShieldL.getString("Material");
+      G4Material* mat_ConcreteShieldL = Materials::get(strMat_ConcreteShieldL);
+      G4LogicalVolume* logi_ConcreteShieldL = new G4LogicalVolume(geo_ConcreteShieldL, mat_ConcreteShieldL, "logi_ConcreteShieldL_name");
+
+      //put volume
+      setColor(*logi_ConcreteShieldL, cConcreteShieldL.getString("Color", "#0000CC"));
+      //setVisibility(*logi_ConcreteShieldL, false);
+      new G4PVPlacement(transform_ConcreteShieldL, logi_ConcreteShieldL, "phys_ConcreteShieldL_name", &topVolume, false, 0);
 
 
       //---------------------------
@@ -4748,18 +4705,20 @@ namespace Belle2 {
       //---------------------------
 
       //neutron shield (poly)
-      logi_ShieldL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1));
-      logi_ShieldR->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2));
+      logi_PolyShieldL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1));
+      logi_PolyShieldR->SetSensitiveDetector(new BkgSensitiveDetector("IR", 2));
 
       //additional neutron shield (concrete)
-      logi_Shield2L->SetSensitiveDetector(new BkgSensitiveDetector("IR", 3));
-      logi_Shield2R->SetSensitiveDetector(new BkgSensitiveDetector("IR", 4));
+      logi_ConcreteShieldL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 3));
+      logi_ConcreteShieldR->SetSensitiveDetector(new BkgSensitiveDetector("IR", 4));
 
       //gate shield (concrete)
-      //logi_WALL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 5));
+      //logi_GateShield->SetSensitiveDetector(new BkgSensitiveDetector("IR", 5));
 
       //virtual material outsire gate-shield
-      logi_WALL2->SetSensitiveDetector(new BkgSensitiveDetector("IR", 6));
+      if (radiation_study) {
+        logi_Tube->SetSensitiveDetector(new BkgSensitiveDetector("IR", 6));
+      }
 
     }
   }

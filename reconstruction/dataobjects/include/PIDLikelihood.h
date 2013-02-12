@@ -92,7 +92,7 @@ namespace Belle2 {
 
   private:
     int m_flags;  /**< reconstruction flags (one bit for each detector)*/
-    float m_logl[c_NumofDet][5]; /**< log likelihoods, FIXME: replace numerical constant */
+    float m_logl[c_NumofDet][Const::ChargedStable::fixedSize]; /**< log likelihoods */
 
     /*! Set flag for a given detector
      * @param det detector enumerator

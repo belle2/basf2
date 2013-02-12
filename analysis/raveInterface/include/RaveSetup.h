@@ -17,7 +17,7 @@
 
 //Genfit
 #include <GFTrack.h>
-
+#include <GFRaveVertexFactory.h>
 //tracking
 //#include <tracking/dataobjects/Track.h>
 //basf2
@@ -31,6 +31,7 @@
 #include <rave/VacuumPropagator.h>
 #include <rave/MagneticField.h>
 #include <rave/ConstantMagneticField.h>
+#include <rave/VertexFactory.h>
 
 namespace Belle2 {
 
@@ -85,18 +86,11 @@ namespace Belle2 {
       TVector3 m_beamSpot;
       TMatrixDSym m_beamSpotCov;
 
-      rave::MagneticField* m_magneticField;
-      rave::Propagator* m_propagator;
+      rave::VertexFactory* m_raveVertexFactory;
+
+      GFRaveVertexFactory* m_GFRaveVertexFactory;
 
 
-      /* global stuff:
-
-       * GFRave yes/no
-       * magnetic field
-       * use beamspot yes/no if yes beam spot info
-       *
-
-       */
     };
 
   }

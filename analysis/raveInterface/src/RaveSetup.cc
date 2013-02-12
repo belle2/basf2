@@ -59,29 +59,28 @@ void RaveSetup::initialize(string options)
   } else if (options == "Rave") {// use Rave directly without GFRave
     s_instance->m_gfRave = false;
     s_instance->m_setupComplete = true;
-    s_instance->m_propagator = new rave::VacuumPropagator();
-    s_instance->m_magneticField = new rave::ConstantMagneticField(0, 0, 1.5); //TODO get magentic field from framework
-
+    //TODO get magentic field from framework
+    s_instance->m_raveVertexFactory = new rave::VertexFactory(rave::ConstantMagneticField(0, 0, 1.5), rave::VacuumPropagator(), "kalman", s_instance->m_raveVerbosity);
   } else {
     B2FATAL("You passed the unknown option " << options <<  " to RaveSetup::initialize. Cannot continue");
   }
 
 }
 
-RaveSetup::RaveSetup(): m_gfRave(false), m_gfPropagation(false), m_raveVerbosity(0), m_setupComplete(false), m_useBeamSpot(false), m_magneticField(NULL), m_propagator(NULL)
+RaveSetup::RaveSetup(): m_gfRave(false), m_gfPropagation(false), m_raveVerbosity(0), m_setupComplete(false), m_useBeamSpot(false),
+  m_raveVertexFactory(NULL), m_GFRaveVertexFactory(NULL)
 {
-
   ;
 }
 
 RaveSetup::~RaveSetup()
 {
-  if (m_magneticField not_eq NULL) {
-    delete m_magneticField;
+  //delete everything that could have potentially created with new in this class
+  if (m_raveVertexFactory not_eq NULL) {
+    delete m_raveVertexFactory;
   }
-
-  if (m_propagator not_eq NULL) {
-    delete m_propagator;
+  if (m_GFRaveVertexFactory not_eq NULL) {
+    delete m_GFRaveVertexFactory;
   }
 }
 

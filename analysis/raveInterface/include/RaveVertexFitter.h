@@ -11,7 +11,7 @@
 
 #ifndef RaveVertexFitter_H
 #define RaveVertexFitter_H
-//#include <analysis/particle/Particle.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/raveInterface/RaveSetup.h>
 //std
@@ -22,8 +22,6 @@
 //Genfit
 #include <GFTrack.h>
 #include <GFRaveVertex.h>
-//tracking
-//#include <tracking/dataobjects/Track.h>
 //rave
 #include <rave/Track.h>
 
@@ -55,7 +53,7 @@ namespace Belle2 {
       //void addTrack( const Track& aTrack);
 
       /** do the vertex fit with all tracks previously added with the addTrack function. The argument is a string determining the Rave fitting method. See https://rave.hepforge.org/trac/wiki/RaveMethods for the different methods
-       * The return value is the number of succefully found vertices (depending on the selected algorithm this can be more then one vertex). Return value 0 means the fit was not successful. -1 means not enough tracks were added*/
+       * The return value is the number of successfully found vertices (depending on the selected algorithm this can be more then one vertex). Return value 0 means the fit was not successful. -1 means not enough tracks were added*/
       int fit(std::string options = "default");
 
       /** get the position of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
@@ -135,6 +133,7 @@ namespace Belle2 {
       }
 
       //void setInvarantMass(int pdgCode);
+
       /** Delete all information of previously added tracks. And fitted resutls*/
       void clearTracks() {
         m_gfTrackReps.clear();
@@ -169,11 +168,7 @@ namespace Belle2 {
 
       rave::Track GFTrackRepToRaveTrack(GFAbsTrackRep* const aGFTrackRep) const;
 
-      double m_chi2;
-      int m_ndf;
-      int m_fitStatus;
-
-      bool m_useBeamSpot;
+      bool m_useBeamSpot; /**< if the beam spot shoud be used or not. Overwrites the global flag in RaveSetup */
 
       std::string m_raveAlgorithm;
 
@@ -184,12 +179,8 @@ namespace Belle2 {
 
       std::vector<rave::Track> m_raveTracks;
 
+      std::vector < rave::Vertex > m_raveVertices;
 
-      /* options per fit:
-       * rave algo and paramters
-       * use beam spot info
-
-       */
     };
   }
 

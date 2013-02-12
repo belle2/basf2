@@ -23,11 +23,11 @@ void PIDLikelihood::setLikelihoods(const TOPLikelihood* logl)
   if (logl->getFlag() != 1) return;
 
   setFlag(c_Top);
-  m_logl[c_Top][Const::electron.getIndex()] = (float) logl->getLogL_e();
-  m_logl[c_Top][Const::muon.getIndex()] = (float) logl->getLogL_mu();
-  m_logl[c_Top][Const::pion.getIndex()] = (float) logl->getLogL_pi();
-  m_logl[c_Top][Const::kaon.getIndex()] = (float) logl->getLogL_K();
-  m_logl[c_Top][Const::proton.getIndex()] = (float) logl->getLogL_p();
+  m_logl[c_Top][Const::ChargedStable::electron.getIndex()] = (float) logl->getLogL_e();
+  m_logl[c_Top][Const::ChargedStable::muon.getIndex()] = (float) logl->getLogL_mu();
+  m_logl[c_Top][Const::ChargedStable::pion.getIndex()] = (float) logl->getLogL_pi();
+  m_logl[c_Top][Const::ChargedStable::kaon.getIndex()] = (float) logl->getLogL_K();
+  m_logl[c_Top][Const::ChargedStable::proton.getIndex()] = (float) logl->getLogL_p();
 }
 
 
@@ -37,11 +37,11 @@ void PIDLikelihood::setLikelihoods(const ARICHLikelihoods* logl)
   if (logl->getFlag() != 1) return;
 
   setFlag(c_Arich);
-  m_logl[c_Arich][Const::electron.getIndex()] = (float) logl->getLogL_e();
-  m_logl[c_Arich][Const::muon.getIndex()] = (float) logl->getLogL_mu();
-  m_logl[c_Arich][Const::pion.getIndex()] = (float) logl->getLogL_pi();
-  m_logl[c_Arich][Const::kaon.getIndex()] = (float) logl->getLogL_K();
-  m_logl[c_Arich][Const::proton.getIndex()] = (float) logl->getLogL_p();
+  m_logl[c_Arich][Const::ChargedStable::electron.getIndex()] = (float) logl->getLogL_e();
+  m_logl[c_Arich][Const::ChargedStable::muon.getIndex()] = (float) logl->getLogL_mu();
+  m_logl[c_Arich][Const::ChargedStable::pion.getIndex()] = (float) logl->getLogL_pi();
+  m_logl[c_Arich][Const::ChargedStable::kaon.getIndex()] = (float) logl->getLogL_K();
+  m_logl[c_Arich][Const::ChargedStable::proton.getIndex()] = (float) logl->getLogL_p();
 }
 
 
@@ -49,11 +49,11 @@ void PIDLikelihood::setLikelihoods(const DedxLikelihood* logl)
 {
 
   setFlag(c_Dedx);
-  m_logl[c_Dedx][Const::electron.getIndex()] = logl->getLogLikelihood(Dedx::c_Electron);
-  m_logl[c_Dedx][Const::muon.getIndex()] = logl->getLogLikelihood(Dedx::c_Muon);
-  m_logl[c_Dedx][Const::pion.getIndex()] = logl->getLogLikelihood(Dedx::c_Pion);
-  m_logl[c_Dedx][Const::kaon.getIndex()] = logl->getLogLikelihood(Dedx::c_Kaon);
-  m_logl[c_Dedx][Const::proton.getIndex()] = logl->getLogLikelihood(Dedx::c_Proton);
+  m_logl[c_Dedx][Const::ChargedStable::electron.getIndex()] = logl->getLogLikelihood(Dedx::c_Electron);
+  m_logl[c_Dedx][Const::ChargedStable::muon.getIndex()] = logl->getLogLikelihood(Dedx::c_Muon);
+  m_logl[c_Dedx][Const::ChargedStable::pion.getIndex()] = logl->getLogLikelihood(Dedx::c_Pion);
+  m_logl[c_Dedx][Const::ChargedStable::kaon.getIndex()] = logl->getLogLikelihood(Dedx::c_Kaon);
+  m_logl[c_Dedx][Const::ChargedStable::proton.getIndex()] = logl->getLogLikelihood(Dedx::c_Proton);
 }
 
 

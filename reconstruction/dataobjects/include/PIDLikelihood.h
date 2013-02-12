@@ -11,7 +11,7 @@
 #ifndef PIDLIKELIHOOD_H
 #define PIDLIKELIHOOD_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 #include <framework/gearbox/Const.h>
 
@@ -31,7 +31,7 @@ namespace Belle2 {
    * includes a function to return combined likelihood probability (like Belle1 atc_pid)
    */
 
-  class PIDLikelihood : public TObject {
+  class PIDLikelihood : public RelationsObject {
 
   public:
 

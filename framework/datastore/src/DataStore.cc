@@ -220,7 +220,7 @@ void DataStore::getArrayNames(std::vector<std::string>& names, const std::string
     for (StoreObjIter iter = m_storeObjMap[c_Event].begin(); iter != m_storeObjMap[c_Event].end(); ++iter) {
       if (iter->second->ptr && iter->second->isArray) {
         TClonesArray* array = static_cast<TClonesArray*>(iter->second->ptr);
-        if (array->GetClass() == arrayClass) {
+        if (array->GetClass()->InheritsFrom(arrayClass)) {
           names.push_back(iter->second->name);
         }
       }

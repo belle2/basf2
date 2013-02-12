@@ -441,6 +441,9 @@ namespace Belle2 {
 
     /** Find an object in an array in the data store.
      *
+     *  entry/index are used to return the found array and index,
+     *  should be set to NULL and -1, or some cached values (will be checked).
+     *
      *  @param object     Pointer to the object.
      *  @param entry      The DataStore entry that contains the object.
      *  @param index      The index of the object in the array.
@@ -507,7 +510,7 @@ namespace Belle2 {
     /** Fill the vector with the names of store arrays.
      *
      *  @param names      The resulting vector of array names.
-     *  @param arrayName  A given array name, the special string "ALL" for all arrays of the given class, or an empty string for the default array name.
+     *  @param arrayName  A given array name, the special string "ALL" for all arrays deriving from the given class, or an empty string for the default array name.
      *  @param arrayClass The class of the array(s).
      */
     void getArrayNames(std::vector<std::string>& names, const std::string& arrayName, const TClass* arrayClass);

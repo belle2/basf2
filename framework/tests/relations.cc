@@ -439,9 +439,13 @@ namespace Belle2 {
     EXPECT_EQ(DataStore::getRelationsToObj<EventMetaData>(toObj).size(), 1);
     //or with 'ALL"
     EXPECT_EQ(DataStore::getRelationsToObj<EventMetaData>(toObj, "ALL").size(), 1);
+    //and using a base class
+    EXPECT_EQ(DataStore::getRelationsToObj<TObject>(toObj, "ALL").size(), 1);
 
     //no relations to this type
     EXPECT_EQ(DataStore::getRelationsFromObj<EventMetaData>(fromObj, "ALL").size(), 0);
+    //should work again
+    EXPECT_EQ(DataStore::getRelationsFromObj<TObject>(fromObj, "ALL").size(), 4);
   }
 
   /** Test adding/finding using RelationsObject/RelationsInterface. */

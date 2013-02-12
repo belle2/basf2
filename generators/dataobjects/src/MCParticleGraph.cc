@@ -234,8 +234,8 @@ void MCParticleGraph::generateList(const string& name, int options)
   }
 
   //Fill TClonesArray in correct order
-  if (options & c_clearParticles) MCParticles->Clear();
-  MCParticles->Expand(num_particles + MCParticles.getEntries());
+  if (options & c_clearParticles) MCParticles.getPtr()->Clear();
+  MCParticles.getPtr()->Expand(num_particles + MCParticles.getEntries());
   MCParticleGraph::ParticleSorter psorter(m_particles, MCParticles.getPtr(), options & c_setDecayVertex, options & c_setDecayTime);
   psorter.setStartIndex(MCParticles.getEntries());
   psorter.sort(g);

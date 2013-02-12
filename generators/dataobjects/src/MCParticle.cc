@@ -66,8 +66,9 @@ void MCParticle::fixParticleList() const
   TClonesArray* plist(0);
 
   //Search default location
+  //TODO: this could be replaced with RelationsObject::getArrayIndex()/getArrayName()
   StoreArray<MCParticle> MCParticles;
-  if (MCParticles && MCParticles->IndexOf(this) >= 0) {
+  if (MCParticles && MCParticles.getPtr()->IndexOf(this) >= 0) {
     plist = MCParticles.getPtr();
   } else {
     //Search all StoreArrays which happen to store MCParticles

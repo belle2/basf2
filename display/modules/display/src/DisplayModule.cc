@@ -203,14 +203,14 @@ void DisplayModule::event()
   const int nVertices = Vertices.getEntries();
   for (int i = 0; i < nVertices; i++) {
     //B2INFO("Distance from center" <<  Vertices[i]->getPos().Mag());
-    m_visualizer->AddVertexEllip(*(Vertices[i]), TString::Format("Vertex %d", i), TString::Format("VertexCovarianceEllipsoid %d", i));
+    m_visualizer->addVertexEllip(*(Vertices[i]), TString::Format("Vertex %d", i), TString::Format("VertexCovarianceEllipsoid %d", i));
   }
 
 
   StoreArray<ECLGamma> RecGammas;
   const int nRecGammas = RecGammas.getEntries();
   for (int i = 0; i < nRecGammas; i++) {
-    m_visualizer->AddRecGammas(RecGammas[i], TString::Format("ECL_Gamma %d", i));  //RecGammas[i] points to each slot of ECLGamma object.
+    m_visualizer->addRecGammas(RecGammas[i], TString::Format("ECL_Gamma %d", i));  //RecGammas[i] points to each slot of ECLGamma object.
   }
 
 

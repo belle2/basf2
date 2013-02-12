@@ -150,10 +150,10 @@ namespace Belle2 {
     void clearEvent();
 
     /** Add a vertex point and its covariance matrix. */
-    void AddVertexEllip(const GFRaveVertex&, const TString&, const TString&);
+    void addVertexEllip(const GFRaveVertex&, const TString&, const TString&);
 
     /** Add a reconstructed photon in the ECL. */
-    void AddRecGammas(const ECLGamma*, const TString&);
+    void addRecGammas(const ECLGamma*, const TString&);
 
     // === configuration options ===
 

@@ -85,6 +85,7 @@ namespace Belle2 {
     key_t get_srcShmKey(void);
     key_t get_outShmKey(void);
 
+    /** Returns 0 if process with PID has the given string in its executable name, 1 otherwise. */
     int isproc(int pid, char* exe);
     void display(void);
   };

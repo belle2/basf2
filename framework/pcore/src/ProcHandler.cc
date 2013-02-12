@@ -180,7 +180,7 @@ key_t ProcHandler::get_outShmKey(void)
 int ProcHandler::isproc(int pid, char* exe)
 {
   char procfile[80];
-  char null[40];
+  char pidstr[20];
   char exename[80];
   FILE* fp;
   sprintf(procfile, "/proc/%d/stat", pid);
@@ -193,7 +193,7 @@ int ProcHandler::isproc(int pid, char* exe)
   }
   if ((fp = fopen(procfile, "r")) == NULL)
     return 0;
-  fscanf(fp, "%s %s", null, exename);
+  fscanf(fp, "%19s %79s", pidstr, exename);
   fclose(fp);
   if (strstr(exename, exe) != NULL)
     return 1;
@@ -259,7 +259,7 @@ int ProcHandler::wait_processes(void)
   //  while ( m_lEvtSrv.size() > 0 || m_lEvtProc.size() > 0  ||
   //    m_lOutputSrv.size() > 0 ) {
 
-  while (m_lEvtSrv.size() > 0 || m_lEvtProc.size() > 0) {
+  while (!m_lEvtSrv.empty() || !m_lEvtProc.empty()) {
     while (1) {
       int status;
       int pid = waitpid(-1, &status, 0);

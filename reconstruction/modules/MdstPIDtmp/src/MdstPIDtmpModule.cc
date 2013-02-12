@@ -18,6 +18,9 @@
 
 // data objects:
 #include <reconstruction/dataobjects/PIDLikelihood.h>
+#include <top/dataobjects/TOPLikelihood.h>
+#include <arich/dataobjects/ARICHLikelihoods.h>
+#include <reconstruction/dataobjects/DedxLikelihood.h>
 #include <GFTrack.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
 #include <generators/dataobjects/MCParticle.h>

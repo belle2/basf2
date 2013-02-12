@@ -307,8 +307,3 @@ KFitTrack::getMomPos(const int flag) const
 
   return a;
 }
-
-#if defined(BELLE_NAMESPACE)
-} // namespace Belle2::tracking
-#endif
-

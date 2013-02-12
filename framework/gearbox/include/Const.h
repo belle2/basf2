@@ -167,6 +167,9 @@ namespace Belle2 {
       /** Returns true if and only if the set contains 'p'. */
       bool contains(const ParticleType& p) const;
 
+      /** Returns number of particles in this set. */
+      unsigned int size() const { return m_particles.size(); }
+
       /** Return particle at given index, or end() if out of range. */
       const ParticleType& at(unsigned int index) const {
         if (index < m_particles.size())

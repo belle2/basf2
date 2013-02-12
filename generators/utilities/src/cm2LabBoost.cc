@@ -1,15 +1,12 @@
 #include "TLorentzVector.h"
 #include "TLorentzRotation.h"
-#include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <generators/utilities/cm2LabBoost.h>
 
 using namespace Belle2;
 
 TLorentzRotation getBoost(double Eher, double Eler, double cross_angle, double angle)
 {
-
-// Beam parameter
-  double mEle = Unit::electronMass;
 
 // Lab frame Z axis is defined by B files
 // its positive direction close to direction of
@@ -28,10 +25,10 @@ TLorentzRotation getBoost(double Eher, double Eler, double cross_angle, double a
   double pHerY = 0.;
 
   TLorentzVector vlLer;
-  vlLer.SetXYZM(pLerX, pLerY, pLerZ, mEle);
+  vlLer.SetXYZM(pLerX, pLerY, pLerZ, Const::electronMass);
 
   TLorentzVector vlHer;
-  vlHer.SetXYZM(pHerX, pHerY, pHerZ, mEle);
+  vlHer.SetXYZM(pHerX, pHerY, pHerZ, Const::electronMass);
 
   TLorentzVector vlY4s = vlHer + vlLer;
 

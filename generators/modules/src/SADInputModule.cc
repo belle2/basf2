@@ -15,6 +15,7 @@
 #include <framework/core/utilities.h>
 
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/GearDir.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -68,11 +69,14 @@ void SADInputModule::initialize()
   m_PipePartMatrix = new TGeoHMatrix("SADTrafo");
   m_PipePartMatrix->RotateZ(m_rotateParticles);
 
+  GearDir ler("/Detector/SuperKEKB/LER/");
+  GearDir her("/Detector/SuperKEKB/HER/");
+
   switch (m_accRing) {
-    case 0 : m_PipePartMatrix->RotateY(Unit::crossingAngleLER / Unit::deg);
+    case 0 : m_PipePartMatrix->RotateY(ler.getDouble("angle") / Unit::deg);
       m_reader.initialize(m_PipePartMatrix, m_range, ReaderSAD::c_LER, m_readoutTime);
       break;
-    case 1 : m_PipePartMatrix->RotateY(Unit::crossingAngleHER / Unit::deg);
+    case 1 : m_PipePartMatrix->RotateY(her.getDouble("angle") / Unit::deg);
       m_reader.initialize(m_PipePartMatrix, m_range, ReaderSAD::c_HER,  m_readoutTime);
       break;
     default: B2FATAL("Please specify a valid number for the accRing parameter (0 = LER, 1 = HER) !")

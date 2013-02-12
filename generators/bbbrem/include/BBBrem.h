@@ -11,14 +11,11 @@
 #ifndef BBBREM_H
 #define BBBREM_H
 
-#include <framework/gearbox/Unit.h>
-#include <generators/dataobjects/MCParticleGraph.h>
-
 #include <TLorentzRotation.h>
 
-#include <string>
-
 namespace Belle2 {
+
+  class MCParticleGraph;
 
   /**
    * Generator for low scattering angle radiative Bhabha events (Beam-Beam Bremsstrahlung).

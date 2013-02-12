@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <generators/hepevt/HepevtReader.h>
 #include <generators/utilities/cm2LabBoost.h>
@@ -38,7 +39,7 @@ void HepevtReader::open(const string& filename) throw(HepEvtCouldNotOpenFileErro
 }
 
 
-int HepevtReader::getEvent(MCParticleGraph &graph, double & eventWeight) throw(HepEvtInvalidDaughterIndicesError, HepEvtEmptyEventError)
+int HepevtReader::getEvent(MCParticleGraph& graph, double& eventWeight) throw(HepEvtInvalidDaughterIndicesError, HepEvtEmptyEventError)
 {
   int eventID = -1;
   int nparticles = readEventHeader(eventID, eventWeight);
@@ -53,13 +54,13 @@ int HepevtReader::getEvent(MCParticleGraph &graph, double & eventWeight) throw(H
   }
   //Read particles from file
   for (int i = 0; i < nparticles; ++i) {
-    MCParticleGraph::GraphParticle &p = graph[first+i];
+    MCParticleGraph::GraphParticle& p = graph[first + i];
     readParticle(p);
 
     //boost particles to lab frame:
     TLorentzVector p4 = p.get4Vector();
     if (m_wrongSignPz) // this means we have to mirror Pz
-      p4.SetPz(-1.0*p4.Pz());
+      p4.SetPz(-1.0 * p4.Pz());
     p4 = m_labboost * p4;
     p.set4Vector(p4);
 
@@ -72,7 +73,7 @@ int HepevtReader::getEvent(MCParticleGraph &graph, double & eventWeight) throw(H
     if (d1 == 0) p.addStatus(MCParticle::c_StableInGenerator);
     //Add decays
     for (int index = d1; index <= d2; ++index) {
-      if (index > 0) p.decaysInto(graph[first+index-1]);
+      if (index > 0) p.decaysInto(graph[first + index - 1]);
     }
 
     //check if particle should be made virtual according to steering options:
@@ -119,7 +120,7 @@ std::string HepevtReader::getLine()
 }
 
 
-int HepevtReader::readEventHeader(int &eventID, double &eventWeight) throw(HepEvtHeaderNotValidError)
+int HepevtReader::readEventHeader(int& eventID, double& eventWeight) throw(HepEvtHeaderNotValidError)
 {
   //Get number of particles from file
   int nparticles = -1;
@@ -132,11 +133,11 @@ int HepevtReader::readEventHeader(int &eventID, double &eventWeight) throw(HepEv
   tokenizer tokens(line, sep);
   int index(0);
 
-  BOOST_FOREACH(const string &tok, tokens) {
+  BOOST_FOREACH(const string & tok, tokens) {
     ++index;
     try {
       fields.push_back(boost::lexical_cast<double>(tok));
-    } catch (boost::bad_lexical_cast &e) {
+    } catch (boost::bad_lexical_cast& e) {
       throw(HepEvtConvertFieldError() << m_lineNr << index << tok);
     }
   }
@@ -162,7 +163,7 @@ int HepevtReader::readEventHeader(int &eventID, double &eventWeight) throw(HepEv
 }
 
 
-void HepevtReader::readParticle(MCParticleGraph::GraphParticle &particle) throw(HepEvtConvertFieldError, HepEvtParticleFormatError)
+void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle) throw(HepEvtConvertFieldError, HepEvtParticleFormatError)
 {
   string line = getLine();
   vector<double> fields;
@@ -174,11 +175,11 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle &particle) throw(
   tokenizer tokens(line, sep);
   int index(0);
 
-  BOOST_FOREACH(const string &tok, tokens) {
+  BOOST_FOREACH(const string & tok, tokens) {
     ++index;
     try {
       fields.push_back(boost::lexical_cast<double>(tok));
-    } catch (boost::bad_lexical_cast &e) {
+    } catch (boost::bad_lexical_cast& e) {
       throw(HepEvtConvertFieldError() << m_lineNr << index << tok);
     }
   }
@@ -210,16 +211,16 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle &particle) throw(
       //particle.setEnergy(fields[9]);
       particle.setMass(fields[10]);
       particle.setProductionVertex(TVector3(&fields[11])*Unit::mm);
-      particle.setProductionTime(fields[14]*Unit::mm / Unit::speedOfLight);
+      particle.setProductionTime(fields[14]*Unit::mm / Const::speedOfLight);
       particle.setValidVertex(true);
       {
         //Warn if energy in Hepevt file differs from calculated energy by more than 0.1%
-        const double &E  = particle.getEnergy();
+        const double& E  = particle.getEnergy();
         double dE = fabs(fields[9] - E) / E;
         if (dE > 1e-3) {
           B2WARNING(boost::format("line %d: Energy of particle does not match with expected energy: %.6e != %.6e")
                     % m_lineNr % fields[9] % E);
-          B2WARNING(boost::format("delta E = %.2f%% -> ignoring given value") % (dE*100));
+          B2WARNING(boost::format("delta E = %.2f%% -> ignoring given value") % (dE * 100));
         }
       }
       break;

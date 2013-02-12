@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <generators/evtgen/EvtGenInterface.h>
 #include <generators/utilities/cm2LabBoost.h>
@@ -177,7 +178,7 @@ void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGrap
   EvtVector4R Evtpos = eParticle->get4Pos();
   //  B2INFO("position EVT: "<<EvtPDL::getStdHep(eParticle->getId())<<"  "<<Evtpos);
   gParticle->setProductionVertex(Evtpos.get(1)*Unit::mm, Evtpos.get(2)*Unit::mm, Evtpos.get(3)*Unit::mm);
-  gParticle->setProductionTime(Evtpos.get(0)*Unit::mm / Unit::speedOfLight);
+  gParticle->setProductionTime(Evtpos.get(0)*Unit::mm / Const::speedOfLight);
   gParticle->setValidVertex(true);
 
   gParticle->setSpinType((int)eParticle->getSpinType());

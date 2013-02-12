@@ -10,6 +10,8 @@
 
 #include <generators/bbbrem/BBBrem.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
+#include <generators/dataobjects/MCParticleGraph.h>
 
 #include <TRandom3.h>
 
@@ -38,8 +40,8 @@ void BBBrem::init(double cmsEnergy, double minPhotonEFrac, bool unweighted, doub
   B2DEBUG(100, "Minimum photon energy:     " << minPhotonEFrac << " * beam energy")
 
   //Initialize the constants (in order to be consistent with the FORTRAN source code)
-  alpha = Unit::fineStrConst;
-  rme = Unit::electronMass;   //in MeV
+  alpha = Const::fineStrConst;
+  rme = Const::electronMass;   //in MeV
 
   //Initialize the derived constants
   s     = cmsEnergy * cmsEnergy;

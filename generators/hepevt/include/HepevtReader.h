@@ -50,7 +50,7 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    HepevtReader() {}
+    HepevtReader(): m_nVirtual(0), m_wrongSignPz(false), m_lineNr(0) {}
 
     /**
      * Destructor.
@@ -73,7 +73,7 @@ namespace Belle2 {
      * @param graph Reference to the graph which should be filled with the information from the Hepevt file and the Reference to the event weight which can be filled from the file.
      * @return event numer if the event could be read and the number was provided in the file.
      */
-    int getEvent(MCParticleGraph &graph, double &weight) throw(HepEvtInvalidDaughterIndicesError, HepEvtEmptyEventError);
+    int getEvent(MCParticleGraph& graph, double& weight) throw(HepEvtInvalidDaughterIndicesError, HepEvtEmptyEventError);
 
     /**
      * Skips a given number of events.
@@ -107,13 +107,13 @@ namespace Belle2 {
      * @return The number of particles for the current event.
      * @params: References to the eventID and the eventWeight which can both be read from the file.
      */
-    int readEventHeader(int &eventID, double &eventWeight) throw(HepEvtHeaderNotValidError);
+    int readEventHeader(int& eventID, double& eventWeight) throw(HepEvtHeaderNotValidError);
 
     /**
      * Reads the information for a single particle from the Hepevt file.
      * @param particle Reference to the particle which will be filled with the information from the Hepevt file.
      */
-    void readParticle(MCParticleGraph::GraphParticle &particle) throw(HepEvtConvertFieldError, HepEvtParticleFormatError);
+    void readParticle(MCParticleGraph::GraphParticle& particle) throw(HepEvtConvertFieldError, HepEvtParticleFormatError);
   };
 
 }

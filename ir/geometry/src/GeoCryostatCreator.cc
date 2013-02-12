@@ -150,20 +150,27 @@ namespace Belle2 {
 
       double unitFactor = 10.0;
 
+
+      GearDir her("/Detector/SuperKEKB/HER/");
+      GearDir ler("/Detector/SuperKEKB/LER/");
+      double crossingAngleHER = her.getDouble("angle");
+      double crossingAngleLER = ler.getDouble("angle");
+
+
       G4Transform3D transform_HER = G4Translate3D(0., 0., 0.);
-      transform_HER = transform_HER * G4RotateY3D(Unit::crossingAngleHER / Unit::rad);
+      transform_HER = transform_HER * G4RotateY3D(crossingAngleHER);
       G4Transform3D transform_HER_inv = G4Translate3D(0., 0., 0.);
-      transform_HER_inv = transform_HER_inv * G4RotateY3D(-Unit::crossingAngleHER / Unit::rad);
+      transform_HER_inv = transform_HER_inv * G4RotateY3D(-crossingAngleHER);
 
       G4Transform3D transform_LER = G4Translate3D(0., 0., 0.);
-      transform_LER = transform_LER * G4RotateY3D(Unit::crossingAngleLER / Unit::rad);
+      transform_LER = transform_LER * G4RotateY3D(crossingAngleLER);
       G4Transform3D transform_LER_inv = G4Translate3D(0., 0., 0.);
-      transform_LER_inv = transform_LER_inv * G4RotateY3D(-Unit::crossingAngleLER / Unit::rad);
+      transform_LER_inv = transform_LER_inv * G4RotateY3D(-crossingAngleLER);
 
       G4Transform3D transform_LER2HER = G4Translate3D(0., 0., 0.);
-      transform_LER2HER = transform_LER2HER * G4RotateY3D(-Unit::crossingAngleLER / Unit::rad + Unit::crossingAngleHER / Unit::rad);
+      transform_LER2HER = transform_LER2HER * G4RotateY3D(-crossingAngleLER  + crossingAngleHER);
       G4Transform3D transform_HER2LER = G4Translate3D(0., 0., 0.);
-      transform_HER2LER = transform_HER2LER * G4RotateY3D(-Unit::crossingAngleHER / Unit::rad + Unit::crossingAngleLER / Unit::rad);
+      transform_HER2LER = transform_HER2LER * G4RotateY3D(-crossingAngleHER  + crossingAngleLER);
 
       //--------------
       //-   A1spc1 and B1spc1

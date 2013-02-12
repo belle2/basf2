@@ -216,6 +216,7 @@ namespace Belle2 {
       static const ChargedStable pion;      /**< charged pion particle */
       static const ChargedStable kaon;      /**< charged kaon particle */
       static const ChargedStable proton;    /**< proton particle */
+      static const unsigned int fixedSize = 5; /**< Number of elements (for use in array bounds etc.) */
     private:
       /** Constructor (private to disallow conversions). */
       ChargedStable(const ParticleType& p): ParticleType(p) { }

@@ -24,19 +24,18 @@
 
 using namespace Belle2;
 
-// Constructors - START
 Particle::Particle() :
-  m_plist(0), m_pdgCode(0), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_mass(0), m_px(0), m_py(0), m_pz(0),
-  m_x(0), m_y(0), m_z(0)
+  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
 {
   resetErrorMatrix();
 }
 
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
-  m_plist(0), m_pdgCode(pdgCode), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_x(0), m_y(0), m_z(0)
+  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
 {
+  m_pdgCode = pdgCode;
   setFlavorType();
   set4Vector(momentum);
   resetErrorMatrix();
@@ -47,9 +46,13 @@ Particle::Particle(const TLorentzVector& momentum,
                    const unsigned flavorType,
                    const unsigned index,
                    const EParticleType type) :
-  m_plist(0), m_pdgCode(pdgCode), m_flavorType(flavorType), m_particleType(type),
-  m_mdstIndex(index), m_x(0), m_y(0), m_z(0)
+  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
 {
+  m_pdgCode = pdgCode;
+  m_flavorType = flavorType;
+  m_mdstIndex = index;
+  m_particleType = type;
   set4Vector(momentum);
   resetErrorMatrix();
 }
@@ -58,86 +61,89 @@ Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
                    const unsigned flavorType,
                    const std::vector<int> &daughterIndices) :
-  m_plist(0), m_pdgCode(pdgCode), m_flavorType(flavorType),  m_mdstIndex(0),
-  m_x(0), m_y(0), m_z(0)
+  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
 {
+  m_pdgCode = pdgCode;
+  m_flavorType = flavorType;
   set4Vector(momentum);
   resetErrorMatrix();
 
   if (!daughterIndices.empty()) {
     m_particleType    = c_Composite;
     m_daughterIndices = daughterIndices;
-  } else {
-    m_particleType    = c_Undefined;
   }
 }
 
+
 Particle::Particle(const Track* track, const unsigned index,
                    const Const::ChargedStable& chargedStable) :
-  m_plist(0), m_flavorType(1), m_particleType(c_Track), m_mdstIndex(index)
+  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
 {
+  if (!track) return;
   const TrackFitResult* trackFit = track->getTrackFitResult(chargedStable);
+  if (!trackFit) return;
 
+  m_flavorType = 1;
+  m_particleType = c_Track;
+  m_mdstIndex = index;
+
+  // set PDG code
   int absPDGCode = chargedStable.getPDGCode();
   int signFlip = 1;
-  if (absPDGCode < Const::ChargedStable::muon.getPDGCode() + 1)
-    signFlip = -1;
-
+  if (absPDGCode < Const::ChargedStable::muon.getPDGCode() + 1) signFlip = -1;
   m_pdgCode = chargedStable.getPDGCode() * signFlip * trackFit->getCharge();
 
-  // set position at which the momentum is estimated (= POCA)
+  // set mass
+  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == NULL)
+    B2FATAL("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
+  m_mass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
+
+  // set momentum
+  m_px = trackFit->getMomentum().Px();
+  m_py = trackFit->getMomentum().Py();
+  m_pz = trackFit->getMomentum().Pz();
+
+  // set position at which the momentum is given (= POCA)
   setVertex(trackFit->getPosition());
 
-  // set 4-momentum
+  // set error matrix: TODO when available (getCovariance6() in what order is it given?)
+  resetErrorMatrix();
 
-  // first get nominal mass from the m_pdgCode
-  // TODO: deal with exceptions
-  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == NULL)
-    B2FATAL("Unknown PDG code!");
-
-  float pdgMass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
-
-  // construct 4-momentum from measured 3-momentum
-  // and assigned mass hypothesis
-  TLorentzVector momentum;
-  momentum.SetVectM(trackFit->getMomentum(), pdgMass);
-  set4Vector(momentum);
-
-  // fill the error matrix
-  // m_momentumPositionError  = px, py, pz, E,  x,  y, z
+  // m_errMatrix  = px, py, pz, E,  x,  y, z
   // p.getErrorMatrix row     = x,  y,  z,  px, py, pz
   // TODO: set error matrix
   /*
-  m_momentumPositionError[0]  = trackFit->getErrorMatrix()[3][3]; // px-px
-  m_momentumPositionError[1]  = trackFit->getErrorMatrix()[3][4]; // px-py
-  m_momentumPositionError[2]  = trackFit->getErrorMatrix()[3][5]; // px-pz
-  m_momentumPositionError[4]  = trackFit->getErrorMatrix()[3][0]; // px-x
-  m_momentumPositionError[5]  = trackFit->getErrorMatrix()[3][1]; // px-y
-  m_momentumPositionError[6]  = trackFit->getErrorMatrix()[3][2]; // px-z
-  m_momentumPositionError[7]  = trackFit->getErrorMatrix()[4][4]; // py-py
-  m_momentumPositionError[8]  = trackFit->getErrorMatrix()[4][5]; // py-pz
+  m_errMatrix[0]  = trackFit->getErrorMatrix()[3][3]; // px-px
+  m_errMatrix[1]  = trackFit->getErrorMatrix()[3][4]; // px-py
+  m_errMatrix[2]  = trackFit->getErrorMatrix()[3][5]; // px-pz
+  m_errMatrix[4]  = trackFit->getErrorMatrix()[3][0]; // px-x
+  m_errMatrix[5]  = trackFit->getErrorMatrix()[3][1]; // px-y
+  m_errMatrix[6]  = trackFit->getErrorMatrix()[3][2]; // px-z
+  m_errMatrix[7]  = trackFit->getErrorMatrix()[4][4]; // py-py
+  m_errMatrix[8]  = trackFit->getErrorMatrix()[4][5]; // py-pz
 
-  m_momentumPositionError[10] = trackFit->getErrorMatrix()[4][0]; // py-x
-  m_momentumPositionError[11] = trackFit->getErrorMatrix()[4][1]; // py-y
-  m_momentumPositionError[12] = trackFit->getErrorMatrix()[4][2]; // py-z
-  m_momentumPositionError[13] = trackFit->getErrorMatrix()[5][5]; // pz-pz
+  m_errMatrix[10] = trackFit->getErrorMatrix()[4][0]; // py-x
+  m_errMatrix[11] = trackFit->getErrorMatrix()[4][1]; // py-y
+  m_errMatrix[12] = trackFit->getErrorMatrix()[4][2]; // py-z
+  m_errMatrix[13] = trackFit->getErrorMatrix()[5][5]; // pz-pz
 
-  m_momentumPositionError[15] = trackFit->getErrorMatrix()[5][0]; // pz-x
-  m_momentumPositionError[16] = trackFit->getErrorMatrix()[5][1]; // pz-y
-  m_momentumPositionError[17] = trackFit->getErrorMatrix()[5][2]; // pz-z
+  m_errMatrix[15] = trackFit->getErrorMatrix()[5][0]; // pz-x
+  m_errMatrix[16] = trackFit->getErrorMatrix()[5][1]; // pz-y
+  m_errMatrix[17] = trackFit->getErrorMatrix()[5][2]; // pz-z
 
   // covariance E-(x,y,z) is set to 0
-  m_momentumPositionError[19] = 0.0; // E-x
-  m_momentumPositionError[20] = 0.0; // E-y
-  m_momentumPositionError[21] = 0.0; // E-z
+  m_errMatrix[19] = 0.0; // E-x
+  m_errMatrix[20] = 0.0; // E-y
+  m_errMatrix[21] = 0.0; // E-z
 
-  m_momentumPositionError[22] = trackFit->getErrorMatrix()[0][0]; // x-x
-  m_momentumPositionError[23] = trackFit->getErrorMatrix()[0][1]; // x-y
-  m_momentumPositionError[24] = trackFit->getErrorMatrix()[0][2]; // x-z
-  m_momentumPositionError[25] = trackFit->getErrorMatrix()[1][1]; // y-y
-  m_momentumPositionError[26] = trackFit->getErrorMatrix()[1][2]; // y-z
-  m_momentumPositionError[27] = trackFit->getErrorMatrix()[2][2]; // z-z
-  */
+  m_errMatrix[22] = trackFit->getErrorMatrix()[0][0]; // x-x
+  m_errMatrix[23] = trackFit->getErrorMatrix()[0][1]; // x-y
+  m_errMatrix[24] = trackFit->getErrorMatrix()[0][2]; // x-z
+  m_errMatrix[25] = trackFit->getErrorMatrix()[1][1]; // y-y
+  m_errMatrix[26] = trackFit->getErrorMatrix()[1][2]; // y-z
+  m_errMatrix[27] = trackFit->getErrorMatrix()[2][2]; // z-z
   // covariance E-(px,py,pz)
   // E = sqrt(px*px+py*py+pz*pz+m*m)
   // therfore covariance E:px
@@ -153,110 +159,99 @@ Particle::Particle(const Track* track, const unsigned index,
   double invE = 1.0 / getEnergy();
 
   // cov(px,E)
-  m_momentumPositionError[3]  = invE * (m_momentumPositionError[0] * m_px
-                                        + m_momentumPositionError[1] * m_py
-                                        + m_momentumPositionError[2] * m_pz);
+  m_errMatrix[3]  = invE * (m_errMatrix[0] * m_px
+                                        + m_errMatrix[1] * m_py
+                                        + m_errMatrix[2] * m_pz);
   // cov(py,E)
-  m_momentumPositionError[9]  = invE * (m_momentumPositionError[1] * m_px
-                                        + m_momentumPositionError[7] * m_py
-                                        + m_momentumPositionError[8] * m_pz);
+  m_errMatrix[9]  = invE * (m_errMatrix[1] * m_px
+                                        + m_errMatrix[7] * m_py
+                                        + m_errMatrix[8] * m_pz);
   // cov(pz,E)
-  m_momentumPositionError[14] = invE * (m_momentumPositionError[2] * m_px
-                                        + m_momentumPositionError[8] * m_py
-                                        + m_momentumPositionError[13] * m_pz);
+  m_errMatrix[14] = invE * (m_errMatrix[2] * m_px
+                                        + m_errMatrix[8] * m_py
+                                        + m_errMatrix[13] * m_pz);
   // cov(E,E)
-  m_momentumPositionError[18] = invE * invE * (m_momentumPositionError[0] * m_px * m_px
-                                               + m_momentumPositionError[7] * m_py * m_py
-                                               + m_momentumPositionError[13] * m_pz * m_pz
-                                               + 2 * m_momentumPositionError[1] * m_px * m_py
-                                               + 2 * m_momentumPositionError[2] * m_px * m_pz
-                                               + 2 * m_momentumPositionError[8] * m_py * m_pz);
+  m_errMatrix[18] = invE * invE * (m_errMatrix[0] * m_px * m_px
+                                               + m_errMatrix[7] * m_py * m_py
+                                               + m_errMatrix[13] * m_pz * m_pz
+                                               + 2 * m_errMatrix[1] * m_px * m_py
+                                               + 2 * m_errMatrix[2] * m_px * m_pz
+                                               + 2 * m_errMatrix[8] * m_py * m_pz);
+  */
+
 }
 
-Particle::Particle(const ECLGamma* gamma, const unsigned index) :
-  m_plist(0), m_pdgCode(Const::photon.getPDGCode()), m_flavorType(0),
-  m_particleType(c_ECLShower), m_mdstIndex(index)
-{
-  // position
-  // TODO: Obtain the values from ECL group (via xml file or something like this), but hard coded values need to be avoided!
-  m_x = 0.0;
-  m_y = 0.0;
-  m_z = 0.0;
 
-  // 4-momentum
+Particle::Particle(const ECLGamma* gamma, const unsigned index) :
+  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
+{
+  m_pdgCode = 22;
   m_px = gamma->getPx();
   m_py = gamma->getPy();
   m_pz = gamma->getPz();
-  m_mass = 0;
+  // position: TODO obtain the values that are used in the momentum construction
 
-  // set the error matrix
+  m_particleType = c_ECLShower;
+  m_mdstIndex = index;
+
   resetErrorMatrix();
 
-  TMatrixFSym momErrMatrix(C_MOMENTUM_ERROR_MATRIX_DIMENSION);
-  // obtain the 4x4 momentum error matrix
+  // set error matrix: TODO set x,y,z part correctly (with correlations)!
+
+  TMatrixFSym momErrMatrix(c_DimMomentum);
   gamma->getErrorMatrix(momErrMatrix);
 
-  TMatrixFSym fullErrMatrix(C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION);
+  TMatrixFSym fullErrMatrix(c_DimMatrix);
   fullErrMatrix.SetSub(0, momErrMatrix);
 
-  // set the (sigma_x)^2, (sigma_y)^2, (sigma_z)^2
-  // to arbitrary large values
-  // TODO: Obtain the values from ECL group (via xml file or something like this), but hard coded values need to be avoided!
-  // TODO: check units!!!!????
-  fullErrMatrix(4, 4) = 0.0001;
-  fullErrMatrix(5, 5) = 0.0001;
-  fullErrMatrix(6, 6) = 0.0001;
-
+  // set diagonals for x, y, z uncertainties to some large values
   // Note that all other elements are set to 0.0
+  fullErrMatrix(4, 4) = 1000;
+  fullErrMatrix(5, 5) = 1000;
+  fullErrMatrix(6, 6) = 1000;
+
   fillErrorMatrix(fullErrMatrix);
 }
 
 
 Particle::Particle(const ECLPi0* pi0) :
-  m_plist(0), m_pdgCode(Const::pi0.getPDGCode()), m_flavorType(0),
-  m_particleType(c_Composite), m_mdstIndex(0)
+  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
 {
-  // position
-  // TODO: Obtain the values from ECL group (as used there for momentum construction)
-  m_x = 0.0;
-  m_y = 0.0;
-  m_z = 0.0;
-
-  // 4-momentum
+  m_pdgCode = 111;
+  m_mass = pi0->getMassFit();
   m_px = pi0->getPx();
   m_py = pi0->getPy();
   m_pz = pi0->getPz();
-  m_mass = pi0->getMassFit();
+  // position: TODO obtain the values that are used for gamma momentum construction
 
-  // set the error matrix
+  m_particleType = c_Composite; // but what about daughter photons? TODO
+
   resetErrorMatrix();
 
-  // TODO: Uncomment once ECLPi0 provides error matrix
-  /*
-  TMatrixFSym momErrMatrix(C_MOMENTUM_ERROR_MATRIX_DIMENSION);
-  // obtain the 4x4 momentum error matrix
-  pi0->getErrorMatrix(momErrMatrix);
+  // set the error matrix
 
-  TMatrixFSym fullErrMatrix(C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION);
+  TMatrixFSym momErrMatrix = pi0->getErrorMatrix();
+  TMatrixFSym fullErrMatrix(c_DimMatrix);
   fullErrMatrix.SetSub(0, momErrMatrix);
 
-  // set the (sigma_x)^2, (sigma_y)^2, (sigma_z)^2
-  // to arbitrary large values
-  // TODO: Obtain the values from ECL group (via xml file or something like this), but hard coded values need to be avoided!
-  // TODO: check units!!!!????
-  fullErrMatrix(4,4) = 0.0001;
-  fullErrMatrix(5,5) = 0.0001;
-  fullErrMatrix(6,6) = 0.0001;
-
+  // set diagonals for x, y, z uncertainties to some large values
   // Note that all other elements are set to 0.0
-  fillErrorMatrix(fullErrorMatrix);
-  */
+  fullErrMatrix(4, 4) = 1000;
+  fullErrMatrix(5, 5) = 1000;
+  fullErrMatrix(6, 6) = 1000;
+
+  fillErrorMatrix(fullErrMatrix);
 }
 
+
 Particle::Particle(const MCParticle* mcParticle) :
-  m_plist(0), m_particleType(c_MCParticle)
+  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
 {
   m_pdgCode      = mcParticle->getPDG();
+  m_particleType = c_MCParticle; // what about daughters if not FS particle?
   m_mdstIndex    = mcParticle->getIndex();
   setFlavorType();
 
@@ -267,38 +262,39 @@ Particle::Particle(const MCParticle* mcParticle) :
 
   resetErrorMatrix();
 }
-// Constructors - END
 
-// Setters - START
+Particle::~Particle()
+{
+}
+
+
 void Particle::setMomentumVertexErrorMatrix(const TMatrixFSym& m)
 {
   // check if provided Error Matrix is of dimension 7x7
   // if not, reset the error matrix and print warning
-  if (m.GetNrows() != C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION || m.GetNcols() != C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION) {
+  if (m.GetNrows() != c_DimMatrix || m.GetNcols() != c_DimMatrix) {
     resetErrorMatrix();
-    B2WARNING("Wrong Momentum-Position Error Matrix dimension. It should be 7x7 symetric matrix!");
+    B2WARNING("Error Matrix is not 7x7 ");
     return;
   }
-
-  // evrything is OK, so fill the matrix
   fillErrorMatrix(m);
 }
-// Setters - END
 
-// Getters - START
+
 TMatrixFSym Particle::getMomentumVertexErrorMatrix() const
 {
-  TMatrixFSym m(C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION);
+  TMatrixFSym m(c_DimMatrix);
 
   int element = 0;
-  for (int irow = 0; irow < C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION; irow++) {
-    for (int icol = irow; icol < C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION; icol++) {
-      m(irow, icol) = m(icol, irow) = m_momentumPositionError[element];
+  for (int irow = 0; irow < c_DimMatrix; irow++) {
+    for (int icol = irow; icol < c_DimMatrix; icol++) {
+      m(irow, icol) = m(icol, irow) = m_errMatrix[element];
       element++;
     }
   }
   return m;
 }
+
 
 TMatrixFSym Particle::getMomentumErrorMatrix() const
 {
@@ -327,21 +323,19 @@ TMatrixFSym Particle::getVertexErrorMatrix() const
 float Particle::getPDGMass(void) const
 {
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == NULL) {
-    // TODO: deal with exceptions
     B2ERROR("Unknown PDG code!");
     return 0.0;
-  } else
-    return TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass();
+  }
+  return TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass();
 }
 
 float Particle::getCharge(void) const
 {
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == NULL) {
-    // TODO: deal with exceptions
     B2ERROR("Unknown PDG code!");
     return 0.0;
-  } else
-    return TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Charge() / 3.0;
+  }
+  return TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Charge() / 3.0;
 }
 
 const Particle* Particle::getDaughter(unsigned i) const
@@ -386,7 +380,6 @@ void Particle::fillFSPDaughters(std::vector<const Belle2::Particle*> &fspDaughte
     getDaughter(i)->fillFSPDaughters(fspDaughters);
 }
 
-// Getters - END
 
 void Particle::appendDaughter(const Particle* daughter)
 {
@@ -429,19 +422,19 @@ bool Particle::overlapsWith(const Particle* oParticle) const
   return false;
 }
 
-// Private functions - START
+
 void  Particle::resetErrorMatrix()
 {
-  for (int i = 0; i < C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION_1D_REP; i++)
-    m_momentumPositionError[i] = 0.0;
+  for (int i = 0; i < c_SizeMatrix; i++)
+    m_errMatrix[i] = 0.0;
 }
 
 void  Particle::fillErrorMatrix(const TMatrixFSym& m)
 {
   int element = 0;
-  for (int irow = 0; irow < C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION; irow++) {
-    for (int icol = irow; icol < C_MOMENTUM_POSITION_ERROR_MATRIX_DIMENSION; icol++) {
-      m_momentumPositionError[element] = m(irow, icol);
+  for (int irow = 0; irow < c_DimMatrix; irow++) {
+    for (int icol = irow; icol < c_DimMatrix; icol++) {
+      m_errMatrix[element] = m(irow, icol);
       element++;
     }
   }
@@ -482,6 +475,7 @@ void Particle::fixParticleList() const
   }
 }
 
+
 void Particle::setFlavorType()
 {
   m_flavorType = 1; // flavored particle
@@ -497,6 +491,5 @@ void Particle::setFlavorType()
 }
 
 
-// Private functions - END
 
 ClassImp(Particle);

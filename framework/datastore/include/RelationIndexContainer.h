@@ -183,7 +183,7 @@ namespace Belle2 {
     for (unsigned int i = 0; i < nRel; ++i) {
       const RelationElement& r = storeRel[i];
       RelationElement::index_type idxFrom = r.getFromIndex();
-      if (idxFrom >= nFrom) B2FATAL("Relation " <<  m_storeRel.first << " is inconsistent: from-index out of range");
+      if (idxFrom >= nFrom) B2FATAL("Relation " <<  m_storeRel.first << " is inconsistent: from-index (" << idxFrom << ") out of range");
       const FROM* from = storeFrom[idxFrom];
 
       //Loop over index and weight vector at once
@@ -195,7 +195,7 @@ namespace Belle2 {
       wgt_t::const_iterator itWgt = weights.begin();
       for (; itIdx != indices.end() && itWgt != weights.end(); ++itIdx, ++itWgt) {
         RelationElement::index_type idxTo = *itIdx;
-        if (idxTo >= nTo) B2FATAL("Relation " <<  m_storeRel.first << " is inconsistent: to-index out of range");
+        if (idxTo >= nTo) B2FATAL("Relation " <<  m_storeRel.first << " is inconsistent: to-index (" << idxTo << ") out of range");
         const TO* to = storeTo[idxTo];
         m_index.insert(Element(idxFrom, idxTo, from, to, *itWgt));
       }

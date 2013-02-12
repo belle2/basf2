@@ -106,7 +106,7 @@ rave::Track RaveVertexFitter::GFTrackRepToRaveTrack(GFAbsTrackRep* const aGFTrac
                              cov(3, 3), cov(4, 3), cov(5, 3),
                              cov(4, 4), cov(5, 4), cov(5, 5));
 
-  return rave::Track(id, ravestate, ravecov, aGFTrackRepPtr->getCharge(), aGFTrackRepPtr->getChiSqu(), aGFTrackRepPtr->getNDF());
+  return rave::Track(id, ravestate, ravecov, rave::Charge(aGFTrackRepPtr->getCharge() + 0.1), aGFTrackRepPtr->getChiSqu(), aGFTrackRepPtr->getNDF());
 
 }
 

@@ -58,7 +58,6 @@ void RaveVertexFitter::addTrack(GFTrack& aGFTrack)
   } else {
     m_raveTracks.push_back(GFTrackRepToRaveTrack(aGFTrackRepPtr));
   }
-
 }
 
 
@@ -70,8 +69,18 @@ void RaveVertexFitter::addTrack(GFTrack* const aGFTrackPtr)
   } else {
     m_raveTracks.push_back(GFTrackRepToRaveTrack(aGFTrackRepPtr));
   }
-
 }
+
+//void RaveVertexFitter::addTrack(const TrackFitResult* aTrackPtr)
+//{
+//  if (RaveSetup::s_instance->m_gfRave == true) {
+//    RKTrackRep* aTrackRepPtr = new RKTrackRep(aTrackPtr->getPosition(), aTrackPtr->getMomentum(), TMatrixDSym(6,aTrackPtr->getCovariance6.getMatrixArray()), aTrackPtr->getPDGCode());
+//    m_ownGfTrackReps.push_back(static_cast<GFAbsTrackRep*>(aTrackRepPtr));
+//    m_gfTrackReps.push_back(static_cast<GFAbsTrackRep*>(aTrackRepPtr));
+//  } else {
+//    m_raveTracks.push_back(TrackFitResultToRaveTrack(aTrackPtr));
+//  }
+//}
 
 void RaveVertexFitter::addTrack(GFAbsTrackRep* const aTrackRepPtr)
 {
@@ -107,6 +116,31 @@ rave::Track RaveVertexFitter::GFTrackRepToRaveTrack(GFAbsTrackRep* const aGFTrac
                              cov(4, 4), cov(5, 4), cov(5, 5));
 
   return rave::Track(id, ravestate, ravecov, rave::Charge(aGFTrackRepPtr->getCharge() + 0.1), aGFTrackRepPtr->getChiSqu(), aGFTrackRepPtr->getNDF());
+
+}
+
+rave::Track RaveVertexFitter::TrackFitResultToRaveTrack(const TrackFitResult* aTrackPtr) const
+{
+  const int id = m_raveTracks.size();
+
+  TVector3 pos = aTrackPtr->getPosition();
+  TVector3 mom = aTrackPtr->getMomentum();
+  TMatrixF cov(aTrackPtr->getCovariance6());
+
+
+  // state
+  rave::Vector6D ravestate(pos.X(), pos.Y(), pos.Z(),
+                           mom.X(), mom.Y(), mom.Z());
+
+  rave::Covariance6D ravecov(cov(0, 0), cov(1, 0), cov(2, 0),
+                             cov(1, 1), cov(2, 1), cov(2, 2),
+                             cov(3, 0), cov(4, 0), cov(5, 0),
+                             cov(3, 1), cov(4, 1), cov(5, 1),
+                             cov(3, 2), cov(4, 2), cov(5, 2),
+                             cov(3, 3), cov(4, 3), cov(5, 3),
+                             cov(4, 4), cov(5, 4), cov(5, 5));
+
+  return rave::Track(id, ravestate, ravecov, rave::Charge(aTrackPtr->getCharge()), 1, 1); //the two 1s are just dummy values. They are not used by Rave anyway
 
 }
 
@@ -172,7 +206,7 @@ void RaveVertexFitter::addTrack(const Particle& aParticle)
                                cov(0, 0), cov(0, 1), cov(0, 2),
                                cov(1, 1), cov(1, 2), cov(2, 2));
 
-    m_raveTracks.push_back(rave::Track(id, ravestate, ravecov, aParticle.getCharge(), 1, 1)); // 1 and 1 are dummy values for chi2 and ndf. the are not used for the vertex fit
+    m_raveTracks.push_back(rave::Track(id, ravestate, ravecov, rave::Charge(aParticle.getCharge() + 0.1), 1, 1)); // 1 and 1 are dummy values for chi2 and ndf. the are not used for the vertex fit
   }
 
 

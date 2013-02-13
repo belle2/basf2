@@ -39,26 +39,28 @@ namespace Belle2 {
    * Class to store reconstructed particles.
    * This class is a common representation of all particle types, e.g.:
    *  - final state particles (FS particles):
-   *    - charged kaons/pions/electrons/muons/protons reconstructed as Tracks
+   *    - charged kaons/pions/electrons/muons/protons reconstructed as Track
    *    - photons reconstructed as ECLGamma
    *    - long lived neutral kaons reconstructed in KLM
    *  - composite particles:
    *    - pre-reconstructed pi0, Kshort, Lambda
    *    - reconstructed in decays (via combinations)
+   *
    * Private members are limited to those which completely define the
    * particle and that are common to all particle types. These are:
    *  - particle mass
    *    - nominal for FS particles
-   *    - invariant for composed particles
+   *    - invariant for composite particles
    *  - momentum vector (px, py, pz)
    *  - position (x, y, z)
    *    - POCA for charged FS particles
    *    - IP for photons, Klong and pi0
-   *    - decay vertex for composed particles
+   *    - decay vertex for composite particles
    *  - 7x7 error matrix (order is: px, py, pz, E, x, y, z)
    *  - PDG code
    *  - vector of StoreArray<Particle> indices of daughter particles
-   * Additional private members are needed to make composed particles (via combinations):
+   *
+   * Additional private members are needed to make composite particles (via combinations):
    *  - mdst index of an Object from which the FS particle is created
    *  - type of the Object from which the particle is created (see EParticleType)
    *  - flavor type (unflavored/flavored) of a decay or flavor type of FS particle
@@ -69,10 +71,10 @@ namespace Belle2 {
   public:
 
     /**
-     * particle type enumerators
+     * particle type enumerators (to be completed when all Mdst dataobject are defined)
      */
-    enum EParticleType {c_Track, c_ECLShower, c_KLong, c_MCParticle,
-                        c_Composite, c_Undefined
+    enum EParticleType {c_Undefined, c_Track, c_ECLGamma, c_KLong, c_Pi0,
+                        c_MCParticle, c_Composite
                        };
 
     /**
@@ -81,6 +83,12 @@ namespace Belle2 {
     enum {c_DimPosition = 3, c_DimMomentum = 4, c_DimMatrix = 7,
           c_SizeMatrix = c_DimMatrix * (c_DimMatrix + 1) / 2
          };
+
+    /**
+     * enumerator used for error matrix handling,
+     * shows also how rows/columns are defined
+     */
+    enum {c_Px, c_Py, c_Pz, c_E, c_X, c_Y, c_Z};
 
     /**
      * Default constructor
@@ -138,14 +146,22 @@ namespace Belle2 {
     /**
      * Constructor from a reconstructed pi0 candidate (mdst object ECLPi0)
      * @param pointer to ECLPi0 object
+     * @param store array index of ECLPi0 object
      */
-    Particle(const ECLPi0*);
+    Particle(const ECLPi0*, const unsigned index);
 
     /**
      * Constructor from MC particle (mdst object MCParticle)
      * @param pointer to MCParticle object
      */
     Particle(const MCParticle*);
+
+    /**
+     * Constructor from MC particle (mdst object MCParticle)
+     * @param pointer to MCParticle object
+     * @param store array index of MCParticle object
+     */
+    Particle(const MCParticle*, const unsigned index);
 
     /**
      * Destructor
@@ -331,7 +347,7 @@ namespace Belle2 {
     float getCharge(void) const;
 
     /**
-     * Returns 0-based index of MDST store array object (0 for composed particles)
+     * Returns 0-based index of MDST store array object (0 for composite particles)
      * @return index of MDST store array object
      */
     unsigned getMdstArrayIndex(void) const { return m_mdstIndex; }
@@ -425,15 +441,16 @@ namespace Belle2 {
 
     // private methods
     /**
-     * Resets particle's 7x7 Momentum-Position Error Matrix
+     * Resets particle's 7x7 error matrix
      * All elements are set to 0.0
      */
     void resetErrorMatrix();
 
     /**
-     * Converts 7x7 TMatrixFSym to 1 dimensional array representation
+     * Stores 7x7 error matrix into private member m_errMatrix
+     * @param 7x7 error matrix
      */
-    void fillErrorMatrix(const TMatrixFSym& m);
+    void storeErrorMatrix(const TMatrixFSym& m);
 
     /**
      * Search the DataStore for the corresponding Particle array.
@@ -443,6 +460,10 @@ namespace Belle2 {
      */
     void fixParticleList() const;
 
+    /**
+     * Fill final state particle daughters into vector
+     * @param vector of daughter particles
+     */
     void fillFSPDaughters(std::vector<const Belle2::Particle*> &fspDaughters) const;
 
     /**
@@ -450,7 +471,7 @@ namespace Belle2 {
      */
     void setFlavorType();
 
-    ClassDef(Particle, 2);
+    ClassDef(Particle, 2); /**< class definition */
   };
 
   /** @}*/

@@ -101,21 +101,6 @@ namespace Belle2 {
     // magnetic field units
     static const double TinStdUnits;  /**< [Vs/m^2] */
 
-    //Various constants
-    static const double speedOfLight __attribute__((deprecated));  /**< [cm/ns] */
-    static const double kBoltzmann __attribute__((deprecated));    /**< Boltzmann constant in GeV/K. */
-    static const double ehEnergy __attribute__((deprecated));      /**< Energy needed to create an electron-hole pair in Si at std. T. */
-    static const double electronMass __attribute__((deprecated));  /**< Electron mass in MeV. */
-    static const double fineStrConst __attribute__((deprecated));  /**< The fine structure constant. */
-    static const double permSi __attribute__((deprecated));        /**< Permittivity of Silicon */
-    static const double uTherm __attribute__((deprecated));        /**< Thermal Voltage at room temperature */
-    static const double eMobilitySi __attribute__((deprecated));   /**< Electron mobility in intrinsic Silicon at room temperature */
-
-
-    //SuperKEKB and Belle II constants
-    static const double crossingAngleLER __attribute__((deprecated));  /**< The crossing angle of the LER (between LER beam and solenoid axis). */
-    static const double crossingAngleHER __attribute__((deprecated));  /**< The crossing angle of the HER (between HER beam and solenoid axis). */
-
 
     /**
      * Converts a floating point value to the standard framework unit.

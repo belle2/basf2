@@ -107,20 +107,6 @@ namespace Belle2 {
 // magnetic field units
   DEFINE_UNIT(TinStdUnits  , Unit::V* Unit::s / Unit::m2);  /**< [Vs/m^2] */
 
-//Various constants
-  const double Unit::speedOfLight   = 29.9792458;
-  const double Unit::kBoltzmann     = 8.617343 * 1.0e-5 * Unit::eV / Unit::K;
-  const double Unit::ehEnergy       = 3.65 * Unit::eV;
-  const double Unit::electronMass   = 0.510999 * MeV;
-  const double Unit::fineStrConst   = 1.0 / 137.036;
-  const double Unit::permSi         = 11.9 * 8.8542 * 1e-18 * Unit::C / Unit::V / Unit::um;
-  const double Unit::uTherm         = 0.026 * Unit::V;
-  const double Unit::eMobilitySi    = 1415 * Unit::cm2 / Unit::V / Unit::s;
-
-//SuperKEKB and Belle II constants
-  const double Unit::crossingAngleLER = -0.0415 * Unit::rad;
-  const double Unit::crossingAngleHER = 0.0415 * Unit::rad;
-
   double Unit::convertValue(double value, const std::string& unitString)
   {
     map<string, double>::const_iterator it = m_conversionFactors.find(unitString);

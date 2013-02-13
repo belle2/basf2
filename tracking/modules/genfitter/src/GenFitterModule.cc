@@ -121,7 +121,8 @@ void GenFitterModule::initialize()
 
   StoreArray<GFTrackCand>::required(m_gfTrackCandsColName);
 
-  StoreArray<Track>::registerPersistent(m_tracksColName);
+  StoreArray<Track>::registerPersistent("Tracks");
+  StoreArray<TrackFitResult>::registerPersistent("TrackFitResults");
   StoreArray < GFTrack >::registerPersistent(m_gfTracksColName);
 
 
@@ -225,8 +226,10 @@ void GenFitterModule::event()
 
 
   //StoreArrays to store the fit results
-  StoreArray < Track > tracks(m_tracksColName);
+  StoreArray < Track > tracks("Tracks");
   tracks.create();
+  StoreArray <TrackFitResult> trackFitResults("TrackFitResults");
+  trackFitResults.create();
   StoreArray < GFTrack > gfTracks(m_gfTracksColName);
   gfTracks.create();
 
@@ -236,6 +239,7 @@ void GenFitterModule::event()
 
   //counter for fitted tracks, the number of fitted tracks may differ from the number of trackCandidates if the fit fails for some of them
   int trackCounter = -1;
+  int trackFitResultCounter = 0;
 
   for (int i = 0; i < trackCandidates.getEntries(); ++i) { //loop over all track candidates
     B2DEBUG(99, "#############  Fit track candidate Nr. : " << i << "  ################");
@@ -266,6 +270,16 @@ void GenFitterModule::event()
       if (part->Charge() < 0.0) {
         currentPdgCode *= -1; //swap sign
       }
+
+      //MH: Find the particle with the correct PDG Code;
+      Const::ChargedStable const* chargedStable = &(Const::ChargedStable::pion);
+      switch (currentPdgCode) {
+        case 11: chargedStable = &(Const::ChargedStable::electron); break;
+        case 13: chargedStable = &(Const::ChargedStable::muon); break;
+        case 321: chargedStable = &(Const::ChargedStable::kaon); break;
+        case 2212: chargedStable = &(Const::ChargedStable::proton); break;
+      }
+
 
       RKTrackRep* trackRep = new RKTrackRep(aTrackCandPointer, currentPdgCode); //initialize track representation and give the seed helix parameters and cov and the pdg code to the track fitter
 
@@ -404,23 +418,24 @@ void GenFitterModule::event()
               else B2WARNING("No MCParticle contributed to this track! No GFTrack<->MCParticle relation will be created!");
 
               //Set non-helix parameters
-              /*              tracks[trackCounter]->setFitFailed(true);
-                            tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
-                            tracks[trackCounter]->setNHits(gfTrack.getNumHits());
-                            tracks[trackCounter]->setNCDCHits(nCDC);
-                            tracks[trackCounter]->setNSVDHits(nSVD);
-                            tracks[trackCounter]->setNPXDHits(nPXD);
-                            tracks[trackCounter]->setMCId(aTrackCandPointer->getMcTrackId());
-                            tracks[trackCounter]->setPDG(aTrackCandPointer->getPdgCode());
-                            //tracks[trackCounter]->setPurity(aTrackCandPointer->getDip()); //setDip will be deleted soon. If purity is used it has to be passed differently to the Track class
-                            tracks[trackCounter]->setPValue(pValue);
-                            //Set helix parameters
-                            tracks[trackCounter]->setD0(-999);
-                            tracks[trackCounter]->setPhi(-999);
-                            tracks[trackCounter]->setOmega(gfTrack.getCharge());
-                            tracks[trackCounter]->setZ0(-999);
-                            tracks[trackCounter]->setCotTheta(-999);
-              */
+              tracks[trackCounter]->setTrackFitResultIndex(*chargedStable, -999);
+              /*                            tracks[trackCounter]->setFitFailed(true);
+                                          tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
+                                          tracks[trackCounter]->setNHits(gfTrack.getNumHits());
+                                          tracks[trackCounter]->setNCDCHits(nCDC);
+                                          tracks[trackCounter]->setNSVDHits(nSVD);
+                                          tracks[trackCounter]->setNPXDHits(nPXD);
+                                          tracks[trackCounter]->setMCId(aTrackCandPointer->getMcTrackId());
+                                          tracks[trackCounter]->setPDG(aTrackCandPointer->getPdgCode());
+                                          //tracks[trackCounter]->setPurity(aTrackCandPointer->getDip()); //setDip will be deleted soon. If purity is used it has to be passed differently to the Track class
+                                          tracks[trackCounter]->setPValue(pValue);
+                                          //Set helix parameters
+                                          tracks[trackCounter]->setD0(-999);
+                                          tracks[trackCounter]->setPhi(-999);
+                                          tracks[trackCounter]->setOmega(gfTrack.getCharge());
+                                          tracks[trackCounter]->setZ0(-999);
+                                          tracks[trackCounter]->setCotTheta(-999);
+                            */
             }
           } else {            //fit successful
             ++m_successfulFitCounter;
@@ -477,6 +492,21 @@ void GenFitterModule::event()
               TVector3 resultMomentum;
               TMatrixDSym resultCovariance;
               gfTrack.getPosMomCov(plane, resultPosition, resultMomentum, resultCovariance);
+              TMatrixF newResultCovariance(6, 6);
+              for (int ii = 0; ii < 6; ii++) {
+                for (int jj = 0; jj < 6; jj++) {
+                  newResultCovariance(ii, jj) = resultCovariance(ii, jj);
+                }
+              }
+
+              //MH: this is new stuff...
+              tracks[trackCounter]->setTrackFitResultIndex(*chargedStable, trackFitResultCounter);
+              new(trackFitResults->AddrAt(trackFitResultCounter)) TrackFitResult();
+              trackFitResults[trackFitResultCounter]->setCharge(gfTrack.getCharge());
+              trackFitResults[trackFitResultCounter]->setMomentum(resultMomentum);
+              trackFitResults[trackFitResultCounter]->setPosition(resultPosition);
+              trackFitResults[trackFitResultCounter]->setCovariance6(newResultCovariance);
+              trackFitResultCounter++;
 
               // store position
 //              tracks[trackCounter]->setPosition(resultPosition);

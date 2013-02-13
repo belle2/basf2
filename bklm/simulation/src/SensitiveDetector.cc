@@ -45,6 +45,9 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector() : SensitiveDetectorBase("BKLM", KLM)
     {
       m_FirstCall = true;
+      m_NeutronPID = 0;     // dummy initializer
+      m_DoBackgroundStudy = false;  // dummy initializer
+      m_HitTimeMax = 0.0;   // dummy initializer
       StoreArray<MCParticle> particles;
       StoreArray<BKLMSimHit> simHits;
       RelationArray particleToSimHits(particles, simHits);
@@ -102,7 +105,7 @@ namespace Belle2 {
           decayed = (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay);
         }
         const string volumeName = preStep->GetPhysicalVolume()->GetName();  // "BKLM.***_*_*_**_*"
-        if (volumeName.find("BKLM.") != 0) {
+        if (volumeName.substr(0, 5) != "BKLM.") {
           B2ERROR("BKLM SensitiveDetector: volume name (" << volumeName << ") is not \"BKLM.***_*_*_**_*\"")
           return false;
         }
@@ -119,10 +122,16 @@ namespace Belle2 {
           int zStripMin = -1;
           int zStripMax = -1;
           convertHitToRPCStrips(position, isForward, sector, layer, phiStripMin, phiStripMax, zStripMin, zStripMax);
-          if (phiStripMin >= 0) new(simHits.nextFreeAddress())
+          if (phiStripMin >= 0) {
+            new(simHits.nextFreeAddress())
             BKLMSimHit(position, time, deltaE, KE, status, isForward, sector, layer, plane, true, phiStripMin, phiStripMax);
-          if (zStripMin >= 0) new(simHits.nextFreeAddress())
+            particleToSimHits.add(track->GetTrackID(), simHits.getEntries() - 1);
+          }
+          if (zStripMin >= 0) {
+            new(simHits.nextFreeAddress())
             BKLMSimHit(position, time, deltaE, KE, status, isForward, sector, layer, plane, false, zStripMin, zStripMax);
+            particleToSimHits.add(track->GetTrackID(), simHits.getEntries() - 1);
+          }
         } else {
           int strip = boost::lexical_cast<int>(volumeName.substr(12, 2));
           if (plane == PLANE_INNER) {
@@ -132,8 +141,8 @@ namespace Belle2 {
             new(simHits.nextFreeAddress())
             BKLMSimHit(position, time, deltaE, KE, status, isForward, sector, layer, plane, false, strip, strip);
           }
+          particleToSimHits.add(track->GetTrackID(), simHits.getEntries() - 1);
         }
-        particleToSimHits.add(track->GetTrackID(), simHits.getEntries());
         return true;
       }
       return false;

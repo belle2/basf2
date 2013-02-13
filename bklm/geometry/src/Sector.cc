@@ -21,8 +21,18 @@ namespace Belle2 {
 
   namespace bklm {
 
-    Sector::Sector()
+    Sector::Sector() :
+      m_IsForward(false),
+      m_Sector(0),
+      m_NLayer(0),
+      m_Shift(Hep3Vector()),
+      m_Translation(Hep3Vector()),
+      m_Rotation(HepRotation()),
+      m_RotationInverse(HepRotation()),
+      m_Normal(Hep3Vector())
     {
+      m_RotationMatrix = m_Rotation;
+      m_RotationInverseMatrix = m_RotationInverse;
     }
 
     Sector::Sector(bool        isForward,

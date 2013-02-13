@@ -21,9 +21,25 @@ namespace Belle2 {
 
   namespace bklm {
 
-    Module::Module()
-    {
-    }
+    Module::Module() :
+      m_IsForward(false),
+      m_Sector(0),
+      m_Layer(0),
+      m_Shift(Hep3Vector()),
+      m_LocalX(0.0),
+      m_ToleranceX(0.0),
+      m_SectorPtr(NULL),
+      m_PhiStripWidth(0.0),
+      m_PhiStripLength(0.0),
+      m_PhiStripNumber(0),
+      m_PhiStripMin(0),
+      m_PhiStripMax(0),
+      m_ZStripWidth(0.0),
+      m_ZStripLength(0.0),
+      m_ZStripNumber(0),
+      m_ZStripMin(0),
+      m_ZStripMax(0)
+    {}
 
     Module::Module(bool       isForward,
                    int        sector,

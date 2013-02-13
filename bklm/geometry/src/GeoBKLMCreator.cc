@@ -57,6 +57,10 @@ namespace Belle2 {
     {
       m_sensitive = new SensitiveDetector();
       m_bkgsensitive = NULL;
+      m_GeoPar = NULL;
+      m_SectorDphi = 0.0;
+      m_SectorDz = 0.0;
+      m_RibShift = 0.0;
     }
 
     GeoBKLMCreator::~GeoBKLMCreator()

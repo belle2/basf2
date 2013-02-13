@@ -14,6 +14,8 @@
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/raveInterface/RaveSetup.h>
+
+#include <tracking/dataobjects/TrackFitResult.h>
 //std
 #include <string>
 
@@ -24,6 +26,7 @@
 #include <GFRaveVertex.h>
 //rave
 #include <rave/Track.h>
+
 
 namespace Belle2 {
 
@@ -50,7 +53,7 @@ namespace Belle2 {
       /** add a track (in the format of a Belle2::Particle) to set of tracks that should be fitted to a vertex */
       void addTrack(const Particle& aParticle);
 
-      //void addTrack( const Track& aTrack);
+      void addTrack(const TrackFitResult* aTrackPtr);
 
       /** do the vertex fit with all tracks previously added with the addTrack function. The argument is a string determining the Rave fitting method. See https://rave.hepforge.org/trac/wiki/RaveMethods for the different methods
        * The return value is the number of successfully found vertices (depending on the selected algorithm this can be more then one vertex). Return value 0 means the fit was not successful. -1 means not enough tracks were added*/
@@ -134,7 +137,7 @@ namespace Belle2 {
 
       //void setInvarantMass(int pdgCode);
 
-      /** Delete all information of previously added tracks. And fitted resutls*/
+      /** Delete all information of previously added tracks and fitted results*/
       void clearTracks() {
         m_gfTrackReps.clear();
         int n = m_ownGfTrackReps.size();
@@ -167,7 +170,7 @@ namespace Belle2 {
     protected:
 
       rave::Track GFTrackRepToRaveTrack(GFAbsTrackRep* const aGFTrackRep) const;
-
+      rave::Track TrackFitResultToRaveTrack(const TrackFitResult* aTrackPtr) const;
       bool m_useBeamSpot; /**< if the beam spot shoud be used or not. Overwrites the global flag in RaveSetup */
 
       std::string m_raveAlgorithm;

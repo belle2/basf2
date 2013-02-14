@@ -75,7 +75,8 @@ void B2DpiModule::initialize()
   StoreArray<Track>          tracks(m_tracksColName);
 
   StoreArray<Particle>::registerPersistent();
-  RelationArray::registerPersistent<Particle, Track>();
+  // TODO: Why this doesn't work?
+  //RelationArray::registerPersistent<Particle, Track>();
 
   // Initializing the output root file
   string dataFileName = m_dataOutFileName + ".root";
@@ -203,7 +204,8 @@ void B2DpiModule::event()
 
 
   // Relations
-  RelationArray particlesToTracks(particles, tracks);
+  // TODO: Why this doen't work?
+  //RelationArray particlesToTracks(particles, tracks);
 
   // Reconstruction
   // Fill final state particle (charged tracks) vectors
@@ -216,15 +218,15 @@ void B2DpiModule::event()
     Particle pion(tracks[trackIndex], trackIndex, Const::ChargedStable::pion);
     particles.appendNew(pion);
     //create Track <-> Particle relation
-    unsigned pionIndex = particles.getEntries() - 1;
-    particlesToTracks.add(pionIndex, trackIndex);
+    //unsigned pionIndex = particles.getEntries() - 1;
+    //particlesToTracks.add(pionIndex, trackIndex);
 
     // Charged Kaons
     Particle kaon(tracks[trackIndex], trackIndex, Const::ChargedStable::kaon);
     particles.appendNew(kaon);
     //create Track <-> Particle relation
-    unsigned kaonIndex = particles.getEntries() - 1;
-    particlesToTracks.add(kaonIndex, trackIndex);
+    //unsigned kaonIndex = particles.getEntries() - 1;
+    //particlesToTracks.add(kaonIndex, trackIndex);
   }
 
   std::vector<const Particle*> kp, km, pip, pim;

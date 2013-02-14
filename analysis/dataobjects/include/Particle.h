@@ -19,6 +19,8 @@
 #include <TMatrixFSym.h>
 #include <framework/gearbox/Const.h>
 
+#include <tracking/dataobjects/Track.h>
+
 #include <vector>
 
 
@@ -28,7 +30,8 @@ namespace Belle2 {
   class ECLShower;
   class ECLGamma;
   class ECLPi0;
-  class Track;
+  // TODO: check with Martin
+  //class Track;
   class MCParticle;
 
   /** \addtogroup dataobjects

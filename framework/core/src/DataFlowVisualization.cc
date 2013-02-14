@@ -37,16 +37,20 @@ void DataFlowVisualization::generateModulePlots(const std::string& filename, boo
   }
 
   if (steeringFileFlow) {
+    file << "  subgraph path {\n";
+    file << "    rank=min;\n";
     //connect modules in right order...
     std::string lastModule = "";
     for (ModulePtrList::const_iterator it = m_modules.begin(); it != m_modules.end(); ++it) {
       const std::string& module = (*it)->getName();
+      file << "    " << module << "\n";
       if (!lastModule.empty()) {
-        file << "  " << lastModule << " -> " << module << " [color=black];\n";
+        file << "    " << lastModule << " -> " << module << " [color=black];\n";
       }
 
       lastModule = module;
     }
+    file << "  }\n";
 
 
     //add nodes

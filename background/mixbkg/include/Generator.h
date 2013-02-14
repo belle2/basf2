@@ -210,14 +210,14 @@ namespace Belle2 {
       RelationArray simHitToMCPartCollection(mcPartCollection, simHitArray, m_simHitRelation);
 
       //Loop over the SimHit content of the ROF and add the SimHits to the DataStore SimHit collection.
-      int simHitIndexOffset = simHitArray->GetLast() + 1; //The index offset in the global SimHit DataStoreArray
+      int simHitIndexOffset = simHitArray.getEntries(); //The index offset in the global SimHit DataStoreArray
       int nSimHits = m_readoutFrame->GetEntriesFast();
       for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
-        new(simHitArray->AddrAt(simHitIndexOffset + iSimHit)) SIMHITS(*(dynamic_cast<SIMHITS*>(m_readoutFrame->At(iSimHit))));
+        simHitArray.appendNew(SIMHITS(*(dynamic_cast<SIMHITS*>(m_readoutFrame->At(iSimHit)))));
       }
 
       //Loop over the SimHit to MCParticle relation and add the MCParticles and Relations
-      int mcPartIndexOffset = mcPartCollection->GetLast() + 1; //The index offset in the global MCParticle DataStoreArray
+      int mcPartIndexOffset = mcPartCollection.getEntries(); //The index offset in the global MCParticle DataStoreArray
       int mcIndex = mcPartIndexOffset;
       int nRel = m_mcPartRels->GetEntriesFast();
       std::vector<int> addedToCol;
@@ -245,7 +245,7 @@ namespace Belle2 {
           newParticle.setDecayVertex(currParticle.getDecayVertex());
 
           //Store the MCParticle and its relation into the appropriate collections
-          new(mcPartCollection->AddrAt(mcIndex)) MCParticle(newParticle);
+          mcPartCollection.appendNew(newParticle);
           mcIndex++;
         }
 
@@ -262,13 +262,13 @@ namespace Belle2 {
       RelationArray bkgSimHitRelCollection(mcPartCollection, bkgInfoCollection, "BackgroundMCSimHitRelation");
 
       //Add the background info to the new collection 'BkgInfo'.
-      new(bkgInfoCollection->AddrAt(bkgInfoCollection->GetLast() + 1)) BackgroundInfo(m_component, m_generator);
+      bkgInfoCollection.appendNew(BackgroundInfo(m_component, m_generator));
 
       //Add the MCParticles and a relation to the background info
       int nPart = m_mcParticles->GetEntriesFast();
       for (int iPart = 0; iPart < nPart; ++iPart) {
-        new(mcPartBkgCollection->AddrAt(mcPartBkgCollection->GetLast() + 1)) MCParticle(*(dynamic_cast<MCParticle*>(m_mcParticles->At(iPart))));
-        bkgInfoRelCollection.add(mcPartBkgCollection->GetLast(), bkgInfoCollection->GetLast());
+        mcPartBkgCollection.appendNew(MCParticle(*(dynamic_cast<MCParticle*>(m_mcParticles->At(iPart)))));
+        bkgInfoRelCollection.add(mcPartBkgCollection.getEntries() - 1, bkgInfoCollection.getEntries() - 1);
       }
 
       //Add the SimHit to MCParticle relations

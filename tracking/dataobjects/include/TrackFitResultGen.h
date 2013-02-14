@@ -14,7 +14,7 @@
 #include <cmath>
 #include <framework/gearbox/Const.h>
 #include <TMatrixF.h>
-
+#include <cmath>
 //class GFAbsTrackRep;
 
 //#include <bitset>
@@ -65,7 +65,7 @@ namespace Belle2 {
 
     /* Setter for the PDGCode. */
     void setPDGCode(const Const::ParticleType& pType) {
-      m_pdg = abs(pType.getPDGCode());
+      m_pdg = std::abs(pType.getPDGCode());
     }
 
     /** Return track charge (1 or -1). */

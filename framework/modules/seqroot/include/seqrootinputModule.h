@@ -10,31 +10,12 @@
 #define SEQROOT_INPUT_H
 
 #include <framework/core/Module.h>
-#include <framework/core/Framework.h>
-#include <framework/core/Environment.h>
 #include <framework/pcore/DataStoreStreamer.h>
 #include <framework/pcore/SeqFile.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-
-#include <TSystem.h>
-
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-
-
-#include <boost/shared_ptr.hpp>
 #include <string>
-#include <vector>
 
 #include <sys/time.h>
-
 
 #define MAXEVTSIZE 400000000*4
 

@@ -10,17 +10,14 @@
 #define PSEQROOT_OUTPUT_H
 
 #include <framework/core/Module.h>
-#include <framework/core/Framework.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/SeqFile.h>
-
 #include <framework/pcore/DataStoreStreamer.h>
 
-#include <boost/shared_ptr.hpp>
 #include <string>
-#include <vector>
 
+#include <sys/time.h>
 
 namespace Belle2 {
   /**

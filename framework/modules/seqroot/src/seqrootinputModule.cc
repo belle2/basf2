@@ -10,6 +10,17 @@
 #include <framework/modules/seqroot/seqrootinputModule.h>
 
 #include <framework/core/Environment.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+
+#include <TSystem.h>
+
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <stdio.h>
 
 using namespace std;
 using namespace Belle2;

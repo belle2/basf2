@@ -22,6 +22,8 @@
 //#include <tracking/dataobjects/Track.h>
 #include <tracking/dataobjects/TrackFitResult.h>
 
+#include <iostream>
+
 using namespace Belle2;
 
 Particle::Particle() :
@@ -224,7 +226,7 @@ Particle::Particle(const MCParticle* mcParticle) :
 
   m_pdgCode      = mcParticle->getPDG();
   m_particleType = c_MCParticle; // TODO: what about daughters if not FS particle?
-  m_mdstIndex    = mcParticle->getIndex();
+  m_mdstIndex    = mcParticle->getArrayIndex();
   setFlavorType();
 
   // generated 4-momentum
@@ -485,6 +487,61 @@ void Particle::setFlavorType()
   int q2 = nnn % 10; nnn /= 10;
   int q1 = nnn % 10;
   if (q1 == 0 && q2 == q3) m_flavorType = 0; // unflavored meson
+}
+
+
+void Particle::print() const
+{
+  std::cout << "Particle:";
+  std::cout << " PDGCode=" << m_pdgCode;
+  std::cout << " Charge=" << getCharge();
+  std::cout << " PDGMass=" << getPDGMass();
+  std::cout << " flavorType=" << m_flavorType;
+  std::cout << " particleType=" << m_particleType;
+  std::cout << std::endl;
+
+  std::cout << " mdstIndex=" << m_mdstIndex;
+  std::cout << " index=" << this->getArrayIndex();
+  std::cout << " daughterIndices: ";
+  for (unsigned i = 0; i < m_daughterIndices.size(); i++) {
+    std::cout << m_daughterIndices[i] << ", ";
+  }
+  if (m_daughterIndices.empty()) std::cout << " (none)";
+  std::cout << std::endl;
+
+  if (!m_daughterIndices.empty()) {
+    std::cout << " daughter PDGCodes: ";
+    for (unsigned i = 0; i < m_daughterIndices.size(); i++) {
+      const Particle* p = getDaughter(i);
+      if (p) {std::cout << p->getPDGCode() << ", ";}
+      else {std::cout << "?, ";}
+    }
+    std::cout << std::endl;
+  }
+
+  std::cout << " mass=" << m_mass;
+  std::cout << std::endl;
+
+  std::cout << " momentum=(";
+  std::cout << m_px << "," << m_py << "," << m_pz << ")";
+  std::cout << std::endl;
+
+  std::cout << " position=(";
+  std::cout << m_x << "," << m_y << "," << m_z << ")";
+  std::cout << std::endl;
+
+  std::cout << " error matrix:";
+  std::cout << std::endl;
+
+  TMatrixFSym errMatrix = getMomentumVertexErrorMatrix();
+  for (int i = 0; i < errMatrix.GetNrows(); i++) {
+    for (int k = 0; k < errMatrix.GetNcols(); k++) {
+      std::cout << " " << errMatrix(i, k);
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+
 }
 
 

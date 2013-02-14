@@ -46,7 +46,7 @@ namespace Belle2 {
    *    - photons reconstructed as ECLGamma
    *    - long lived neutral kaons reconstructed in KLM
    *  - composite particles:
-   *    - pre-reconstructed pi0, Kshort, Lambda
+   *    - pre-reconstructed pi0, Kshort, Lambda, ...
    *    - reconstructed in decays (via combinations)
    *
    * Private members are limited to those which completely define the
@@ -63,9 +63,10 @@ namespace Belle2 {
    *  - PDG code
    *  - vector of StoreArray<Particle> indices of daughter particles
    *
-   * Additional private members are needed to make composite particles (via combinations):
-   *  - mdst index of an Object from which the FS particle is created
-   *  - type of the Object from which the particle is created (see EParticleType)
+   * Additional private members are needed in order to make composite particles
+   * (via combinations):
+   *  - mdst index of an object from which the FS particle is created
+   *  - type of the object from which the particle is created (see EParticleType)
    *  - flavor type (unflavored/flavored) of a decay or flavor type of FS particle
    */
 
@@ -74,7 +75,7 @@ namespace Belle2 {
   public:
 
     /**
-     * particle type enumerators (to be completed when all Mdst dataobject are defined)
+     * particle type enumerators (to be completed when all Mdst dataobjects are defined)
      */
     enum EParticleType {c_Undefined, c_Track, c_ECLGamma, c_KLong, c_Pi0,
                         c_MCParticle, c_Composite
@@ -89,12 +90,12 @@ namespace Belle2 {
 
     /**
      * enumerator used for error matrix handling,
-     * shows also how rows/columns are defined
+     * shows also in which order the rows (columns) are defined
      */
     enum {c_Px, c_Py, c_Pz, c_E, c_X, c_Y, c_Z};
 
     /**
-     * Default constructor
+     * Default constructor.
      * All private members are set to 0. Particle type is set to c_Undefined.
      */
     Particle();
@@ -102,69 +103,75 @@ namespace Belle2 {
     /**
      * Constructor from a Lorentz vector and PDG code.
      * All other private members are set to their defalt values (0).
-     * @param Lorentz vector
-     * @param PDG code
+     * @param momentum Lorentz vector
+     * @param pdgCode PDG code
      */
-    Particle(const TLorentzVector&, const int pdgCode);
+    Particle(const TLorentzVector& momentum, const int pdgCode);
 
     /**
      * Constructor for final state particles.
      * All other private members are set to their defalt values (0).
-     * @param Lorentz vector
-     * @param PDG code
-     * @param flavor type
-     * @param mdst index
-     * @param particle type
+     * @param momentum Lorentz vector
+     * @param pdgCode PDG code
+     * @param flavorType flavor type
+     * @param index mdst index
+     * @param particleType particle type
      */
-    Particle(const TLorentzVector&, const int pdgCode, const unsigned flavorType,
-             const unsigned index, const EParticleType type);
+    Particle(const TLorentzVector& momentum,
+             const int pdgCode,
+             const unsigned flavorType,
+             const unsigned index,
+             const EParticleType particleType);
 
     /**
      * Constructor for composite particles.
      * All other private members are set to their defalt values (0).
-     * @param Lorentz vector
-     * @param PDG code
-     * @param decay flavor type
-     * @param vector of daughter indices
+     * @param momentum Lorentz vector
+     * @param pdgCode PDG code
+     * @param flavorType decay flavor type
+     * @param daughterIndices vector of daughter indices
      */
-    Particle(const TLorentzVector&, const int pdgCode, const unsigned flavorType,
-             const std::vector<int>&);
+    Particle(const TLorentzVector& momentum,
+             const int pdgCode,
+             const unsigned flavorType,
+             const std::vector<int>& daughterIndices);
 
     /**
      * Constructor from a reconstructed track (mdst object Track)
-     * @param pointer to Track object
-     * @param store array index of Track object
-     * @param Type of charged particle
+     * @param track pointer to Track object
+     * @param index store array index of Track object
+     * @param chargedStable Type of charged particle
      */
-    Particle(const Track*, const unsigned index,
+    Particle(const Track* track,
+             const unsigned index,
              const Const::ChargedStable& chargedStable);
 
     /**
      * Constructor from a reconstructed gamma candidate (mdst object ECLGamma)
-     * @param pointer to ECLGamma object
-     * @param store array index of ECLGamma object
+     * @param gamma pointer to ECLGamma object
+     * @param index store array index of ECLGamma object
      */
-    Particle(const ECLGamma*, const unsigned index);
+    Particle(const ECLGamma* gamma, const unsigned index);
 
     /**
      * Constructor from a reconstructed pi0 candidate (mdst object ECLPi0)
-     * @param pointer to ECLPi0 object
-     * @param store array index of ECLPi0 object
+     * @param pi0 pointer to ECLPi0 object
+     * @param index store array index of ECLPi0 object
      */
-    Particle(const ECLPi0*, const unsigned index);
+    Particle(const ECLPi0* pi0, const unsigned index);
 
     /**
      * Constructor from MC particle (mdst object MCParticle)
-     * @param pointer to MCParticle object
+     * @param MCparticle pointer to MCParticle object
      */
-    Particle(const MCParticle*);
+    Particle(const MCParticle* MCparticle);
 
     /**
      * Constructor from MC particle (mdst object MCParticle)
-     * @param pointer to MCParticle object
-     * @param store array index of MCParticle object
+     * @param MCparticle pointer to MCParticle object
+     * @param index store array index of MCParticle object
      */
-    Particle(const MCParticle*, const unsigned index);
+    Particle(const MCParticle* MCparticle, const unsigned index);
 
     /**
      * Destructor
@@ -177,13 +184,56 @@ namespace Belle2 {
 
     /**
      * Sets PDG code
-     * @param PDG code
+     * @param pdgCode PDG code
      */
-    void setPDGCode(int pdgCode) { m_pdgCode = pdgCode; }
+    void setPDGCode(int pdgCode) {
+      m_pdgCode = pdgCode;
+      setFlavorType();
+    }
+
+    /**
+     * Sets flavor type
+     * @param flavorType flavor type
+     */
+    void setFlavorType(unsigned flavorType) {
+      m_flavorType = flavorType;
+    }
+
+    /**
+     * Sets particle type
+     * @param type particle type
+     */
+    void setParticleType(EParticleType type) {
+      m_particleType = type;
+    }
+
+    /**
+     * Sets the index of Mdst object
+     * @param index Mdst index
+     */
+    void setMdstArrayIndex(unsigned index) {
+      m_mdstIndex = index;
+    }
+
+    /**
+     * Sets particle mass
+     * @param mass particle mass
+     */
+    void setMass(float mass) {
+      m_mass = mass;
+    }
+
+    /**
+     * Sets particle mass
+     * @param mass particle mass
+     */
+    void setMass(double mass) {
+      m_mass = (float) mass;
+    }
 
     /**
      * Sets Lorentz vector
-     * @param Lorentz vector
+     * @param p4 Lorentz vector
      */
     void set4Vector(const TLorentzVector& p4) {
       m_px = p4.Px();
@@ -193,8 +243,18 @@ namespace Belle2 {
     }
 
     /**
+     * Sets momentum vector
+     * @param p3 momentum vector
+     */
+    void setMomentum(const TVector3& p3) {
+      m_px = p3.Px();
+      m_py = p3.Py();
+      m_pz = p3.Pz();
+    }
+
+    /**
      * Sets position (decay vertex)
-     * @param point (position or decay vertex)
+     * @param vertex position
      */
     void setVertex(const TVector3& vertex) {
       m_x = vertex.X();
@@ -204,24 +264,95 @@ namespace Belle2 {
 
     /**
      * Sets 7x7 error matrix
-     * @param The 7x7 momentum and vertex error matrix (order: px,py,pz,E,x,y,z)
+     * @param errMatrix 7x7 momentum and vertex error matrix (order: px,py,pz,E,x,y,z)
      */
-    void setMomentumVertexErrorMatrix(const TMatrixFSym& m);
+    void setMomentumVertexErrorMatrix(const TMatrixFSym& errMatrix);
 
     /**
      * Sets Lorentz vector, position and 7x7 error matrix
-     * @param Lorentz vector
-     * @param point (position or vertex)
-     * @param 7x7 momentum and vertex error matrix (order: px,py,pz,E,x,y,z)
+     * @param p4 Lorentz vector
+     * @param vertex point (position or vertex)
+     * @param errMatrix 7x7 momentum and vertex error matrix (order: px,py,pz,E,x,y,z)
      */
-    void updateMomentum(const TLorentzVector& p4, const TVector3& vertex,
-                        const TMatrixFSym& m) {
+    void updateMomentum(const TLorentzVector& p4,
+                        const TVector3& vertex,
+                        const TMatrixFSym& errMatrix) {
       set4Vector(p4);
       setVertex(vertex);
-      setMomentumVertexErrorMatrix(m);
+      setMomentumVertexErrorMatrix(errMatrix);
     }
 
+    /**
+     * Appends index of daughter to daughters index array
+     * @param daughter pointer to the daughter particle
+     */
+    void appendDaughter(const Particle* daughter);
+
+    /**
+     * Removes index of daughter from daughters index array
+     * @param daughter pointer to the daughter particle
+     */
+    void removeDaughter(const Particle* daughter);
+
     // getters
+
+    /**
+     * Returns PDG code
+     * @return PDG code
+     */
+    int getPDGCode(void) const {
+      return m_pdgCode;
+    }
+
+    /**
+     * Returns particle charge
+     * @return particle charge in units of elementary charge
+     */
+    float getCharge(void) const;
+
+    /**
+     * Returns flavor type of the decay (for FS particles: flavor type of particle)
+     * @return flavor type (0=unflavored, 1=flavored)
+     */
+    int getFlavorType() const {
+      return m_flavorType;
+    }
+
+    /**
+     * Returns particle type as defined with enum EParticleType
+     * @return particle type
+     */
+    EParticleType getParticleType() const {
+      return m_particleType;
+    }
+
+    /**
+     * Returns 0-based index of MDST store array object (0 for composite particles)
+     * @return index of MDST store array object
+     */
+    unsigned getMdstArrayIndex(void) const {
+      return m_mdstIndex;
+    }
+
+    /**
+     * Returns invariant mass (= nominal for FS particles)
+     * @return invariant mass
+     */
+    float getMass() const {
+      return m_mass;
+    }
+
+    /**
+     * Returns mass error (not implemented yet!)
+     * @return mass error
+     */
+    float getMassError() const { return 0.0; }; // TODO
+
+    /**
+     * Returns particle nominal mass
+     * @return nominal mass
+     */
+    float getPDGMass(void) const;
 
     /**
      * Returns total energy
@@ -251,7 +382,15 @@ namespace Belle2 {
      * Returns momentum magnitude
      * @return momentum magnitude
      */
-    float getTotalMomentum() const {
+    float getMomentumMagnitude() const {
+      return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
+    };
+
+    /**
+     * Returns momentum magnitude (same as getMomentumMagnitude but with shorter name)
+     * @return momentum magnitude
+     */
+    float getP() const {
       return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
     };
 
@@ -280,26 +419,36 @@ namespace Belle2 {
     }
 
     /**
-     * Returns invariant mass (= nominal for FS particles)
-     * @return invariant mass
-     */
-    float getMass() const {
-      return m_mass;
-    }
-
-    /**
-     * Returns mass error (not implemented yet!)
-     * @return mass error
-     */
-    float getMassError() const { return 0.0; };
-
-    /**
      * Returns vertex position (POCA for charged, IP for neutral FS particles)
      * @return vertex position
      */
     TVector3 getVertex() const {
       return TVector3(m_x, m_y, m_z);
     };
+
+    /**
+     * Returns x component of vertex position
+     * @return x component of vertex position
+     */
+    float getX() const {
+      return m_x;
+    }
+
+    /**
+     * Returns y component of vertex position
+     * @return y component of vertex position
+     */
+    float getY() const {
+      return m_y;
+    }
+
+    /**
+     * Returns z component of vertex position
+     * @return z component of vertex position
+     */
+    float getZ() const {
+      return m_z;
+    }
 
     /**
      * Returns 7x7 error matrix
@@ -320,60 +469,12 @@ namespace Belle2 {
     TMatrixFSym getVertexErrorMatrix() const;
 
     /**
-     * Returns particle type as defined with enum EParticleType
-     * @return particle type
-     */
-    EParticleType getParticleType() const { return m_particleType; }
-
-    /**
-     * Returns PDG code
-     * @return PDG code
-     */
-    int getPDGCode(void) const { return m_pdgCode; }
-
-    /**
-     * Returns flavor type of the decay (for FS particles: flavor type of particle)
-     * @return flavor type (0=unflavored, 1=flavored)
-     */
-    int getFlavorType() const {return m_flavorType;}
-
-    /**
-     * Returns particle nominal mass
-     * @return nominal mass
-     */
-    float getPDGMass(void) const;
-
-    /**
-     * Returns particle charge
-     * @return particle charge in units of elementary charge
-     */
-    float getCharge(void) const;
-
-    /**
-     * Returns 0-based index of MDST store array object (0 for composite particles)
-     * @return index of MDST store array object
-     */
-    unsigned getMdstArrayIndex(void) const { return m_mdstIndex; }
-
-    /**
      * Returns unique identifier of final state particle (needed in particle combiner)
      * @return unique identifier of final state particle
      */
-    int getMdstSource() const {return m_mdstIndex + (m_particleType << 24);}
-
-    // Interface for obtaining/appending daughter Particles
-
-    /**
-     * Appends index of daughter to daughters index array
-     * @param Pointer to the daughter particle
-     */
-    void appendDaughter(const Particle* daughter);
-
-    /**
-     * Removes index of daughter from daughters index array
-     * @param Pointer to the daughter particle
-     */
-    void removeDaughter(const Particle* daughter);
+    int getMdstSource() const {
+      return m_mdstIndex + (m_particleType << 24);
+    }
 
     /**
      * Returns number of daughter particles
@@ -384,7 +485,16 @@ namespace Belle2 {
     }
 
     /**
-     * Returns a pointer to the i-th daughter particle (i is 0-based index)
+     * Retruns a vector of store array indices of daughter particles
+     * @return vector of store array indices of daughter particle
+     */
+    const std::vector<int>& getDaughterIndices() const {
+      return m_daughterIndices;
+    }
+
+    /**
+     * Returns a pointer to the i-th daughter particle
+     * @param i 0-based index of daughter particle
      * @return Pointer to i-th daughter particles
      */
     const Particle* getDaughter(unsigned i) const;
@@ -397,12 +507,6 @@ namespace Belle2 {
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
-     * Retruns a vector of store array indices of daughter particles
-     * @return vector of store array indices of daughter particle
-     */
-    const std::vector<int>& getDaughterIndices() const { return m_daughterIndices; }
-
-    /**
      * Returns a vector of pointers to Final State daughter particles
      * @return vector of pointers to final state daughter particles
      */
@@ -410,10 +514,17 @@ namespace Belle2 {
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
-     * Returns true if final state ancessors overlap
-     * @return True if overlap and false otherwise
+     * Returns true if final state ancessors of oParticle overlap
+     * @param oParticle pointer to particle
+     * @return true if overlap, otherwise false
      */
     bool overlapsWith(const Particle* oParticle) const;
+
+    /**
+     * Prints the contents of a Particle object to screen
+     */
+    void print() const;
+
 
   private:
 
@@ -444,16 +555,16 @@ namespace Belle2 {
 
     // private methods
     /**
-     * Resets particle's 7x7 error matrix
+     * Resets 7x7 error matrix
      * All elements are set to 0.0
      */
     void resetErrorMatrix();
 
     /**
      * Stores 7x7 error matrix into private member m_errMatrix
-     * @param 7x7 error matrix
+     * @param errMatrix 7x7 error matrix
      */
-    void storeErrorMatrix(const TMatrixFSym& m);
+    void storeErrorMatrix(const TMatrixFSym& errMatrix);
 
     /**
      * Search the DataStore for the corresponding Particle array.
@@ -464,10 +575,12 @@ namespace Belle2 {
     void fixParticleList() const;
 
     /**
-     * Fill final state particle daughters into vector
-     * @param vector of daughter particles
+     * Fill final state particle daughters into a vector
+     *
+     * Function is called recursively
+     * @param fspDaughters vector of daughter particles
      */
-    void fillFSPDaughters(std::vector<const Belle2::Particle*> &fspDaughters) const;
+    void fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughters) const;
 
     /**
      * sets m_flavorType using m_pdgCode

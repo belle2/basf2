@@ -35,7 +35,7 @@ namespace Belle2 {
     public:
 
       /** Constructor. */
-      MixBackground() : m_mcParticleWriteMode(-1) {};
+      MixBackground() : m_mcParticleWriteMode(-1), m_analysisMode(false) {};
 
       /** Destructor. */
       ~MixBackground();

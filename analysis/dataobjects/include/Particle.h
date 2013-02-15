@@ -114,14 +114,14 @@ namespace Belle2 {
      * @param momentum Lorentz vector
      * @param pdgCode PDG code
      * @param flavorType flavor type
-     * @param index mdst index
      * @param particleType particle type
+     * @param mdstIndex mdst index
      */
     Particle(const TLorentzVector& momentum,
              const int pdgCode,
              const unsigned flavorType,
-             const unsigned index,
-             const EParticleType particleType);
+             const EParticleType particleType,
+             const unsigned mdstIndex);
 
     /**
      * Constructor for composite particles.
@@ -137,41 +137,35 @@ namespace Belle2 {
              const std::vector<int>& daughterIndices);
 
     /**
-     * Constructor from a reconstructed track (mdst object Track)
+     * Constructor from a reconstructed track (mdst object Track);
      * @param track pointer to Track object
-     * @param index store array index of Track object
      * @param chargedStable Type of charged particle
+     * @param mdstIndex store array index of Track object
      */
     Particle(const Track* track,
-             const unsigned index,
-             const Const::ChargedStable& chargedStable);
+             const Const::ChargedStable& chargedStable,
+             const int mdstIndex);
 
     /**
      * Constructor from a reconstructed gamma candidate (mdst object ECLGamma)
      * @param gamma pointer to ECLGamma object
-     * @param index store array index of ECLGamma object
+     * @param mdstIndex store array index of ECLGamma object
      */
-    Particle(const ECLGamma* gamma, const unsigned index);
+    Particle(const ECLGamma* gamma, const int mdstIndex);
 
     /**
      * Constructor from a reconstructed pi0 candidate (mdst object ECLPi0)
      * @param pi0 pointer to ECLPi0 object
-     * @param index store array index of ECLPi0 object
+     * @param mdstIndex store array index of ECLPi0 object
      */
-    Particle(const ECLPi0* pi0, const unsigned index);
+    Particle(const ECLPi0* pi0, const int mdstIndex);
 
     /**
      * Constructor from MC particle (mdst object MCParticle)
      * @param MCparticle pointer to MCParticle object
+     * @param mdstIndex store array index of MCParticle object (optional)
      */
-    Particle(const MCParticle* MCparticle);
-
-    /**
-     * Constructor from MC particle (mdst object MCParticle)
-     * @param MCparticle pointer to MCParticle object
-     * @param index store array index of MCParticle object
-     */
-    Particle(const MCParticle* MCparticle, const unsigned index);
+    Particle(const MCParticle* MCparticle, const int mdstIndex = -1);
 
     /**
      * Destructor
@@ -183,55 +177,6 @@ namespace Belle2 {
     // setters
 
     /**
-     * Sets PDG code
-     * @param pdgCode PDG code
-     */
-    void setPDGCode(int pdgCode) {
-      m_pdgCode = pdgCode;
-      setFlavorType();
-    }
-
-    /**
-     * Sets flavor type
-     * @param flavorType flavor type
-     */
-    void setFlavorType(unsigned flavorType) {
-      m_flavorType = flavorType;
-    }
-
-    /**
-     * Sets particle type
-     * @param type particle type
-     */
-    void setParticleType(EParticleType type) {
-      m_particleType = type;
-    }
-
-    /**
-     * Sets the index of Mdst object
-     * @param index Mdst index
-     */
-    void setMdstArrayIndex(unsigned index) {
-      m_mdstIndex = index;
-    }
-
-    /**
-     * Sets particle mass
-     * @param mass particle mass
-     */
-    void setMass(float mass) {
-      m_mass = mass;
-    }
-
-    /**
-     * Sets particle mass
-     * @param mass particle mass
-     */
-    void setMass(double mass) {
-      m_mass = (float) mass;
-    }
-
-    /**
      * Sets Lorentz vector
      * @param p4 Lorentz vector
      */
@@ -240,16 +185,6 @@ namespace Belle2 {
       m_py = p4.Py();
       m_pz = p4.Pz();
       m_mass = p4.M();
-    }
-
-    /**
-     * Sets momentum vector
-     * @param p3 momentum vector
-     */
-    void setMomentum(const TVector3& p3) {
-      m_px = p3.Px();
-      m_py = p3.Py();
-      m_pz = p3.Pz();
     }
 
     /**
@@ -367,7 +302,9 @@ namespace Belle2 {
      * @return Lorentz vector
      */
     TLorentzVector get4Vector() const {
-      return TLorentzVector(m_px, m_py, m_pz, getEnergy());
+      TLorentzVector vec;
+      vec.SetXYZM(m_px, m_py, m_pz, m_mass);
+      return vec;
     }
 
     /**

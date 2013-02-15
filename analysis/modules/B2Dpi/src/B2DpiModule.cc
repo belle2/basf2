@@ -215,14 +215,14 @@ void B2DpiModule::event()
   // create charged pion and kaon particles
   for (int trackIndex = 0; trackIndex < nTracks; ++trackIndex) {
     // Charged Pions
-    Particle pion(tracks[trackIndex], trackIndex, Const::ChargedStable::pion);
+    Particle pion(tracks[trackIndex], Const::ChargedStable::pion, trackIndex);
     particles.appendNew(pion);
     //create Track <-> Particle relation
     //unsigned pionIndex = particles.getEntries() - 1;
     //particlesToTracks.add(pionIndex, trackIndex);
 
     // Charged Kaons
-    Particle kaon(tracks[trackIndex], trackIndex, Const::ChargedStable::kaon);
+    Particle kaon(tracks[trackIndex], Const::ChargedStable::kaon, trackIndex);
     particles.appendNew(kaon);
     //create Track <-> Particle relation
     //unsigned kaonIndex = particles.getEntries() - 1;

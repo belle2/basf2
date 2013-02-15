@@ -46,14 +46,14 @@ Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
 Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
                    const unsigned flavorType,
-                   const unsigned index,
-                   const EParticleType type) :
+                   const EParticleType type,
+                   const unsigned mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
 {
   m_pdgCode = pdgCode;
   m_flavorType = flavorType;
-  m_mdstIndex = index;
+  m_mdstIndex = mdstIndex;
   m_particleType = type;
   set4Vector(momentum);
   resetErrorMatrix();
@@ -78,8 +78,9 @@ Particle::Particle(const TLorentzVector& momentum,
 }
 
 
-Particle::Particle(const Track* track, const unsigned index,
-                   const Const::ChargedStable& chargedStable) :
+Particle::Particle(const Track* track,
+                   const Const::ChargedStable& chargedStable,
+                   const int mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
 {
@@ -89,7 +90,11 @@ Particle::Particle(const Track* track, const unsigned index,
 
   m_flavorType = 1;
   m_particleType = c_Track;
-  m_mdstIndex = index;
+  m_mdstIndex = mdstIndex;
+  /* TODO: class must be derived from RelationsObject to use getArrayIndex()
+    if(mdstIndex < 0) {m_mdstIndex = track->getArrayIndex();}
+    else {m_mdstIndex = mdstIndex;}
+  */
 
   // set PDG code TODO: ask Anze why this procedure is needed?
   int absPDGCode = chargedStable.getPDGCode();
@@ -162,7 +167,7 @@ Particle::Particle(const Track* track, const unsigned index,
 }
 
 
-Particle::Particle(const ECLGamma* gamma, const unsigned index) :
+Particle::Particle(const ECLGamma* gamma, const int mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
 {
@@ -175,7 +180,8 @@ Particle::Particle(const ECLGamma* gamma, const unsigned index) :
   // position: TODO obtain the values that are used in the momentum construction
 
   m_particleType = c_ECLGamma;
-  m_mdstIndex = index;
+  m_mdstIndex = mdstIndex;
+  // TODO: class must be derived from RelationsObject to use getArrayIndex()
 
   // set error matrix
   TMatrixFSym errMatrix(c_DimMatrix);
@@ -184,7 +190,7 @@ Particle::Particle(const ECLGamma* gamma, const unsigned index) :
 }
 
 
-Particle::Particle(const ECLPi0* pi0, const unsigned index) :
+Particle::Particle(const ECLPi0* pi0, const int mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
 {
@@ -198,7 +204,8 @@ Particle::Particle(const ECLPi0* pi0, const unsigned index) :
   // position: TODO obtain the values that are used for gamma momentum construction
 
   m_particleType = c_Pi0;
-  m_mdstIndex = index;
+  m_mdstIndex = mdstIndex;
+  // TODO: class must be derived from RelationsObject to use getArrayIndex()
 
   resetErrorMatrix();
 
@@ -218,7 +225,7 @@ Particle::Particle(const ECLPi0* pi0, const unsigned index) :
 }
 
 
-Particle::Particle(const MCParticle* mcParticle) :
+Particle::Particle(const MCParticle* mcParticle, const int mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
 {
@@ -226,33 +233,16 @@ Particle::Particle(const MCParticle* mcParticle) :
 
   m_pdgCode      = mcParticle->getPDG();
   m_particleType = c_MCParticle; // TODO: what about daughters if not FS particle?
-  m_mdstIndex    = mcParticle->getArrayIndex();
+  if (mdstIndex < 0) {m_mdstIndex = mcParticle->getArrayIndex();}
+  else {m_mdstIndex = mdstIndex;}
   setFlavorType();
 
-  // generated 4-momentum
-  set4Vector(mcParticle->get4Vector());
-  // generated production vertex
-  // TODO: good only for FS particles, for composite we must use decay vertex
-  setVertex(mcParticle->getVertex());
-
-  resetErrorMatrix();
-}
-
-
-Particle::Particle(const MCParticle* mcParticle, const unsigned index) :
-  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
-{
-  if (!mcParticle) return;
-
-  m_pdgCode      = mcParticle->getPDG();
-  m_particleType = c_MCParticle; // TODO: what about daughters if not FS particle?
-  m_mdstIndex    = index;
-  setFlavorType();
-
-  // generated 4-momentum
-  set4Vector(mcParticle->get4Vector());
-  // generated production vertex
+  // mass and momentum
+  m_mass = mcParticle->getMass();
+  m_px = mcParticle->getMomentum().Px();
+  m_py = mcParticle->getMomentum().Py();
+  m_pz = mcParticle->getMomentum().Pz();
+  // production vertex
   // TODO: good only for FS particles, for composite we must use decay vertex
   setVertex(mcParticle->getVertex());
 

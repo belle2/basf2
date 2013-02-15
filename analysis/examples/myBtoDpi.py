@@ -131,8 +131,6 @@ ext.param('ExtRecoHitsColName', 'ExtRecoHits')  # output from ext
 # ---------------------------------------------------------------
 # TOP - digitization
 topdigi = register_module('TOPDigitizer')
-param_digi = {'PhotonFraction': 0.3}
-topdigi.param(param_digi)
 
 # ---------------------------------------------------------------
 # TOP reconstruction

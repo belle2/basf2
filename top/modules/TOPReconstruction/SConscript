@@ -1,6 +1,7 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'top_dataobjects','generators_dataobjects','tracking_dataobjects',
-               '$ROOT_LIBS', '$GEANT4_LIBS', 'CLHEP','top']
+env['LIBS'] = ['framework', 'top_dataobjects','generators_dataobjects',
+               'tracking_dataobjects','top',
+               '$ROOT_LIBS', '$GEANT4_LIBS', 'CLHEP','gfortran']
 
 Return('env')

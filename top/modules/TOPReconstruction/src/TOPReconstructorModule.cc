@@ -59,7 +59,11 @@ namespace Belle2 {
 
     TOPReconstructorModule::TOPReconstructorModule() : Module(),
       m_debugLevel(0),
-      m_topgp(TOPGeometryPar::Instance())
+      m_topgp(TOPGeometryPar::Instance()),
+      m_R1(0),
+      m_R2(0),
+      m_Z1(0),
+      m_Z2(0)
     {
       // Set description
       setDescription("Reconstruction for TOP counter. Uses reconstructed tracks extrapolated to TOP and TOPDigits to calculate log likelihoods for e, mu, pi, K, p.");
@@ -85,6 +89,8 @@ namespace Belle2 {
                "minimal number of background photons per bar", 0.0);
       addParam("scaleN0", m_ScaleN0, "scale factor for N0", 1.0);
 
+      for (int i = 0; i < Nhyp; i++) {m_Masses[i] = 0;}
+
     }
 
     TOPReconstructorModule::~TOPReconstructorModule()
@@ -93,7 +99,7 @@ namespace Belle2 {
 
     void TOPReconstructorModule::initialize()
     {
-      // Initialize masses (PDG 2010, hard coding -> to be removed in future (?))
+      // Initialize masses (PDG 2010) TODO: remove hard coding, check Nhyp)
       m_Masses[0] = 0.510998910E-3;
       m_Masses[1] = 0.105658367;
       m_Masses[2] = 0.13957018;
@@ -239,7 +245,7 @@ namespace Belle2 {
 
       TOPvolume(m_R1, m_R2, m_Z1, m_Z2);
 
-      setBfield(-1.5);
+      setBfield(-1.5); //TODO get magnetic field from database
 
       setPMT(m_topgp->getMsizex(), m_topgp->getMsizey(),
              m_topgp->getAsizex(), m_topgp->getAsizey(),
@@ -276,7 +282,9 @@ namespace Belle2 {
 
       int id;
       double R = m_topgp->getRadius();          // innner bar surface radius
-      double MirR = m_topgp->getMirradius();    // Mirror radious
+      double MirrR = m_topgp->getMirradius();   // Mirror radius
+      double MirrXc = m_topgp->getMirposx();    // Mirror X center of curvature
+      double MirrYc = m_topgp->getMirposy();    // Mirror Y center of curvature
       double A = m_topgp->getQwidth();          // bar width
       double B = m_topgp->getQthickness();      // bar thickness
       double z1 = m_topgp->getZ1();             // backward bar position
@@ -292,13 +300,14 @@ namespace Belle2 {
 
       for (int i = 0; i < n; i++) {
         id = setQbar(A, B, z1, z2, R, 0, Phi, PMT, SphericM);
-        setMirrorRadius(id, MirR);
+        setMirrorRadius(id, MirrR);
+        setMirrorCenter(id, MirrXc, MirrYc);
         addExpansionVolume(id, Left, Prism, DzExp, B / 2, B / 2 - YsizExp);
         arrangePMT(id, Left, XsizPMT, YsizPMT);
         Phi += Dphi;
       }
 
-      TOPfinalize();
+      TOPfinalize(); //TODO: if not successfull exit with B2ERROR
     }
 
 

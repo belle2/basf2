@@ -97,12 +97,12 @@ namespace Belle2 {
       double m_Z1; /**< backward z */
       double m_Z2; /**< forward z */
 
-      //! TOP configure function
-      void TOPconfigure();
-
       //! Masses of particle hypotheses
       enum {Nhyp = 5};        /**< number of hypotheses */
       double m_Masses[Nhyp];  /**< particle masses */
+
+      //! TOP configure function
+      void TOPconfigure();
 
       //! Label tags
       enum {LgfTrack = 0, LextTrackCand, LextHit, LbarHit};

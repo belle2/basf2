@@ -11,7 +11,7 @@
 #ifndef TOPLIKELIHOOD_H
 #define TOPLIKELIHOOD_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
   /** \addtogroup dataobjects
@@ -23,7 +23,7 @@ namespace Belle2 {
    * filled in top/modules/TOPReconstruction/src/TOPReconstructorModule.cc
    */
 
-  class TOPLikelihood : public TObject {
+  class TOPLikelihood : public RelationsObject {
 
   public:
 

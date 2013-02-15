@@ -45,7 +45,34 @@ namespace Belle2 {
     //                 Implementation
     //-----------------------------------------------------------------
 
-    TOPBackgroundModule::TOPBackgroundModule() : Module()
+    TOPBackgroundModule::TOPBackgroundModule() : Module(),
+      m_rootFile(0),
+      peflux(0),
+      nflux(0),
+      rdose(0),
+      zdist(0),
+      genergy(0),
+      genergy2(0),
+      zdistg(0),
+      nflux_bar(0),
+      gflux_bar(0),
+      cflux_bar(0),
+      norigin(0),
+      gorigin(0),
+      corigin(0),
+      nprim(0),
+      gprim(0),
+      cprim(0),
+      origin_zx(0),
+      origin_zy(0),
+      prim_zx(0),
+      prim_zy(0),
+      PCBmass(0),
+      PCBarea(0),
+      yearns(0),
+      evtoJ(0),
+      mtoc(0),
+      count(0)
     {
       // Set description()
       setDescription("TOPBackground");

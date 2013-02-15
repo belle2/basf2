@@ -100,12 +100,18 @@ namespace Belle2 {
 
       //! TTS
       m_NgaussTTS = 0;
+      for (int i = 0; i < MAXPTS_TTS; i++) {
+        m_TTSfrac[i] = 0;
+        m_TTSmean[i] = 0;
+        m_TTSsigma[i] = 0;
+      }
 
       //! QE
       m_ColEffi = 0;
       m_LambdaFirst = 0;
       m_LambdaStep = 0;
       m_NpointsQE = 0;
+      for (int i = 0; i < MAXPTS_QE; i++) {m_QE[i] = 0;}
 
       //! Support structure
       m_PannelThickness = 0;
@@ -165,7 +171,7 @@ namespace Belle2 {
       m_Winthickness = detParams.getLength("Module/WindowThickness");
       m_Botthickness = detParams.getLength("Module/BottomThickness");
       m_Npadx = detParams.getInt("Module/PadXNum");
-      m_Npady = detParams.getInt("Module/PadXNum");
+      m_Npady = detParams.getInt("Module/PadYNum");
       m_dGlue = detParams.getLength("dGlue");
       m_padx = m_Asizex / (double)m_Npadx;
       m_pady = m_Asizey / (double)m_Npady;

@@ -58,8 +58,6 @@ namespace Belle2 {
                string(""));
       addParam("OutputColName", m_outColName, "Output collection name (TOPDigits)",
                string(""));
-      addParam("PhotonFraction", m_photonFraction,
-               "now not used - to be removed", 0.3);
       addParam("T0jitter", m_T0jitter, "r.m.s of T0 jitter [ns]", 25e-3);
       addParam("ELjitter", m_ELjitter, "r.m.s of electronics jitter [ns]", 50e-3);
 
@@ -157,16 +155,8 @@ namespace Belle2 {
 
     void TOPDigitizerModule::printModuleParams() const
     {
-      cout << "TOPDigi: PhotonFraction=" << m_photonFraction << endl;
       cout << "TOPDigi: T0jitter (rms)=" << m_T0jitter << endl;
       cout << "TOPDigi: ELjitter (rms)=" << m_ELjitter << endl;
-    }
-
-    bool TOPDigitizerModule::DetectorQE(double energy)
-    {
-      double rnd = gRandom->Rndm() * m_photonFraction;
-      double eff = m_topgp->QE(energy) * m_topgp->getColEffi();
-      return (rnd < eff);
     }
 
     double TOPDigitizerModule::PMT_TTS()

@@ -11,7 +11,7 @@
 #ifndef TOPBARHIT_H
 #define TOPBARHIT_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
 
 namespace Belle2 {
@@ -24,7 +24,7 @@ namespace Belle2 {
    * filled in top/simulation/src/SensitiveBar.cc
    */
 
-  class TOPBarHit : public TObject {
+  class TOPBarHit : public RelationsObject {
   public:
 
     /*! Default constructor

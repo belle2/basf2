@@ -11,7 +11,7 @@
 #ifndef TOPDIGIT_H
 #define TOPDIGIT_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
   /** \addtogroup dataobjects
@@ -23,7 +23,7 @@ namespace Belle2 {
    * filled in top/modules/TOPDigitizer/src/TOPDigiModule.cc
    */
 
-  class TOPDigit : public TObject {
+  class TOPDigit : public RelationsObject {
   public:
 
     /*! Default constructor */

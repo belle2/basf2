@@ -11,7 +11,7 @@
 #ifndef TOPSIMPHOTON_H
 #define TOPSIMPHOTON_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
 
 namespace Belle2 {
@@ -24,7 +24,7 @@ namespace Belle2 {
    * filled in top/simulation/src/SensitivePMT.cc
    */
 
-  class TOPSimPhoton : public TObject {
+  class TOPSimPhoton : public RelationsObject {
   public:
 
     /*! Default constructor

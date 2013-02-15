@@ -54,9 +54,6 @@ geometry.param('Components', [
 
 # Simulation
 simulation = register_module('FullSim')
-param_g4sim = {'RegisterOptics': 1, 'PhotonFraction': 0.3,
-               'TrackingVerbosity': 0}
-simulation.param(param_g4sim)
 
 # CDC digitizer
 cdcDigitizer = register_module('CDCDigitizer')
@@ -66,22 +63,22 @@ cdcDigitizer.param(param_cdcdigi)
 
 # MC track finder (for simplicity)
 mctrackfinder = register_module('MCTrackFinder')
-param_mctrackfinder = {'UseCDCHits': 1, 'UseSVDHits': 1, 'UsePXDHits': 1}
-# select which particles to use: primary particles
-param_mctrackfinder = {'WhichParticles': ['primary']}
+param_mctrackfinder = {  # select which particles to use: primary particles
+    'UseCDCHits': 1,
+    'UseSVDHits': 1,
+    'UsePXDHits': 1,
+    'WhichParticles': ['primary'],
+    }
 mctrackfinder.param(param_mctrackfinder)
 
 # Track fitting
 cdcfitting = register_module('GenFitter')
 param_cdcfitting = {
     'GFTrackCandidatesColName': 'GFTrackCands',
-    'TracksColName': 'Tracks',
     'GFTracksColName': 'GFTracks',
+    'TracksColName': 'Tracks',
     'StoreFailedTracks': 0,
-    'mcTracks': 1,
-    'pdg': 211,
-    'allPDG': 0,
-    'FilterId': 1,
+    'FilterId': 0,
     'NIterations': 1,
     'ProbCut': 0.001,
     }

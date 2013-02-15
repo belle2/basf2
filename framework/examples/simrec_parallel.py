@@ -174,8 +174,6 @@ param_g4sim = {'RegisterOptics': 1, 'PhotonFraction': 0.3,
 simulation.param(param_g4sim)
 # Reconstruction
 topdigi = register_module('TOPDigitizer')
-param_digi = {'PhotonFraction': 0.3}
-topdigi.param(param_digi)
 topreco = register_module('TOPReconstructor')
 
 # ARICH reconstruction module

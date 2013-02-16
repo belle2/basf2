@@ -54,13 +54,17 @@ namespace Belle2 {
      * This function overwrites a function that GFRecoHitIfc inherits from GFAbsRecoHit.
      */
     const TMatrixD& getHMatrix(const GFAbsTrackRep*);
-    void getMeasurement(const GFAbsTrackRep* rep,
-                        const GFDetPlane& pl,
-                        const TVectorD& statePred,
-                        const TMatrixDSym& covPred,
-                        TVectorD& m,
-                        TMatrixDSym& V) {}
-    const GFDetPlane& getDetPlane(GFAbsTrackRep* rep) {
+
+    // getMeasurement:  dummy here, not to be used in ext
+    void getMeasurement(const GFAbsTrackRep*,
+                        const GFDetPlane&,
+                        const TVectorD&,
+                        const TMatrixDSym&,
+                        TVectorD&,
+                        TMatrixDSym&) {}
+
+    // getDetPlane:  always returns fDetPlane in ext, regardless of track representation
+    const GFDetPlane& getDetPlane(GFAbsTrackRep*) {
       return fDetPlane;
     }
 

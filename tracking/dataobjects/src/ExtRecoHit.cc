@@ -48,7 +48,7 @@ GFAbsRecoHit* ExtRecoHit::clone()
   return (GFAbsRecoHit*) new ExtRecoHit(*this);
 }
 
-const TMatrixD& ExtRecoHit::getHMatrix(const GFAbsTrackRep* trackRep)
+const TMatrixD& ExtRecoHit::getHMatrix(const GFAbsTrackRep*)
 {
   return (c_hMatrix);
 }

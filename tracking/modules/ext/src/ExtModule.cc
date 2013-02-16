@@ -591,8 +591,7 @@ GFTrackCand* ExtModule::addTrackCand(const GFTrack* gfTrack, int pdgCode, StoreA
       covG4e[i][j] = lastCovG4e[i][j];  // in Geant4e units (GeV, cm)
     }
   }
-  int candNumber = extTrackCands->GetLast() + 1;
-  GFTrackCand* cand = new(extTrackCands->AddrAt(candNumber)) GFTrackCand();
+  GFTrackCand* cand = extTrackCands.appendNew();
   cand->setPosMomSeedAndPdgCode(lastPosition, lastMomentum, pdgCode, TMatrixDSym(6, lastCovPS.GetMatrixArray()));
   position.setX(lastPosition.X()*cm); // in Geant4 units (mm)
   position.setY(lastPosition.Y()*cm);
@@ -621,12 +620,11 @@ void ExtModule::addFirstPoint(const G4ErrorFreeTrajState* state, GFTrackCand* ca
   phasespacePoint[4][0] = stepPoint->GetMomentum().y() / GeV;
   phasespacePoint[5][0] = stepPoint->GetMomentum().z() / GeV;
   covariance = getCov(state);
-  int hitNumber = extRecoHits->GetLast() + 1;
-  new(extRecoHits->AddrAt(hitNumber)) ExtRecoHit(phasespacePoint, covariance, ENTER);
+  new(extRecoHits.nextFreeAddress()) ExtRecoHit(phasespacePoint, covariance, ENTER);
   int detID(0);
   int copyID(0);
   getVolumeID(preTouch, detID, copyID);
-  cand->addHit(detID, hitNumber, copyID, m_tof);
+  cand->addHit(detID, extRecoHits.getEntries(), copyID, m_tof);
 
 }
 
@@ -653,11 +651,10 @@ void ExtModule::addPoint(const G4ErrorFreeTrajState* state, ExtHitStatus status,
   phasespacePoint[4][0] = stepPoint->GetMomentum().y() / GeV;
   phasespacePoint[5][0] = stepPoint->GetMomentum().z() / GeV;
   covariance = getCov(state);
-  int hitNumber = extRecoHits->GetLast() + 1;
-  new(extRecoHits->AddrAt(hitNumber)) ExtRecoHit(phasespacePoint, covariance, status);
+  new(extRecoHits.nextFreeAddress()) ExtRecoHit(phasespacePoint, covariance, status);
   int detID(0);
   int copyID(0);
   getVolumeID(preTouch, detID, copyID);
-  cand->addHit(detID, hitNumber, copyID, m_tof);
+  cand->addHit(detID, extRecoHits.getEntries(), copyID, m_tof);
 
 }

@@ -15,7 +15,7 @@
 #include <bklm/geometry/Sector.h>
 #include <bklm/geometry/Module.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
-#include <bklm/dataobjects/BKLMStatus.h>
+#include <bklm/dataobjects/BKLMDigit.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>

@@ -13,6 +13,22 @@
 
 #include <TObject.h>
 
+// Definition of each bit in m_Status
+// BKLMDigit originated from MC simulation (rather than real data)
+#define STATUS_MC 0x40000000
+
+// BKLMDigit represents the decay point of a simulated particle
+#define STATUS_DECAYED 0x20000000
+
+// BKLMDigit is located in an RPC (rather than a scintillator)
+#define STATUS_INRPC 0x00000001
+
+// BKLMDigit is outside the in-time coincidence window
+#define STATUS_OUTOFTIME 0x00000002
+
+// BKLMDigit has been assigned to a track
+#define STATUS_ONTRACK 0x00000004
+
 namespace Belle2 {
 
   //! Store one BKLM strip hit as a ROOT object

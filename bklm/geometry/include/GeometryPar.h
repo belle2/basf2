@@ -90,7 +90,7 @@ namespace Belle2 {
       double getSolenoidOuterRadius(void) const { return m_SolenoidOuterRadius; }
 
       //! Get the number of sectors of the BKLM
-      const int getNSector(void) const { return m_NSector; }
+      int getNSector(void) const { return m_NSector; }
 
       //! Get the half-length along z of the BKLM
       double getHalfLength(void) const { return m_HalfLength; }
@@ -99,7 +99,7 @@ namespace Belle2 {
       double getOuterRadius(void) const { return m_OuterRadius; }
 
       //! Get the number of modules in one sector
-      const int getNLayer(void) const { return m_NLayer; }
+      int getNLayer(void) const { return m_NLayer; }
 
       //! Get the nominal height of a layer's structural iron
       double getIronNominalHeight(void) const { return m_IronNominalHeight; }

@@ -28,9 +28,6 @@ namespace Belle2 {
     //! Empty constructor for ROOT IO (needed to make the class storable)
     Muid();
 
-    //! Constructor with initial values used by Muid module
-    Muid(double, double, double, double, int, bool, int, int, int, int);
-
     //! Destructor
     virtual ~Muid() {}
 

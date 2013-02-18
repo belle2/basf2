@@ -572,7 +572,8 @@ unsigned B2DpiModule::makeMother(VertexFitKFit& kv, Particle* mother)
     }
   }
 
-  mother->updateMomentum(mom, pos, covMatrix);
+  float pvalue = 0; // MS: to be calculated from chi^2, ndf
+  mother->updateMomentum(mom, pos, covMatrix, pvalue);
 
   return 1;
 }
@@ -621,7 +622,8 @@ unsigned B2DpiModule::makeMother(MassVertexFitKFit& km, Particle* mother)
     }
   }
 
-  mother->updateMomentum(mom, pos, covMatrix);
+  float pvalue = 0; // MS: to be calculated from chi^2, ndf
+  mother->updateMomentum(mom, pos, covMatrix, pvalue);
 
   return 1;
 }

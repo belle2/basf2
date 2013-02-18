@@ -23,19 +23,22 @@
 #include <tracking/dataobjects/TrackFitResult.h>
 
 #include <iostream>
+#include <iomanip>
 
 using namespace Belle2;
 
 Particle::Particle() :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
+  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_plist(0)
 {
   resetErrorMatrix();
 }
 
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
+  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_plist(0)
 {
   m_pdgCode = pdgCode;
   setFlavorType();
@@ -49,7 +52,8 @@ Particle::Particle(const TLorentzVector& momentum,
                    const EParticleType type,
                    const unsigned mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
+  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_plist(0)
 {
   m_pdgCode = pdgCode;
   m_flavorType = flavorType;
@@ -64,7 +68,8 @@ Particle::Particle(const TLorentzVector& momentum,
                    const unsigned flavorType,
                    const std::vector<int> &daughterIndices) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
+  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_plist(0)
 {
   m_pdgCode = pdgCode;
   m_flavorType = flavorType;
@@ -82,7 +87,8 @@ Particle::Particle(const Track* track,
                    const Const::ChargedStable& chargedStable,
                    const int mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
+  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_plist(0)
 {
   if (!track) return;
   const TrackFitResult* trackFit = track->getTrackFitResult(chargedStable);
@@ -114,6 +120,9 @@ Particle::Particle(const Track* track,
 
   // set position at which the momentum is given (= POCA)
   setVertex(trackFit->getPosition());
+
+  // set Chi^2 probability
+  m_pValue = trackFit->getPValue();
 
   // set error matrix
   TMatrixF cov6 = trackFit->getCovariance6();
@@ -169,7 +178,8 @@ Particle::Particle(const Track* track,
 
 Particle::Particle(const ECLGamma* gamma, const int mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
+  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_plist(0)
 {
   if (!gamma) return;
 
@@ -192,7 +202,8 @@ Particle::Particle(const ECLGamma* gamma, const int mdstIndex) :
 
 Particle::Particle(const ECLPi0* pi0, const int mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
+  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_plist(0)
 {
   if (!pi0) return;
 
@@ -207,10 +218,11 @@ Particle::Particle(const ECLPi0* pi0, const int mdstIndex) :
   m_mdstIndex = mdstIndex;
   // TODO: class must be derived from RelationsObject to use getArrayIndex()
 
-  resetErrorMatrix();
+  // set Chi^2 probability: TODO ask ECL to provide a function
+  //  m_pValue = pi0->getPValue();
 
   // set the error matrix (TODO: ask ECL to supply 7x7 matrix as for ECLGamma!)
-
+  resetErrorMatrix();
   TMatrixFSym momErrMatrix = pi0->getErrorMatrix();
   TMatrixFSym errMatrix(c_DimMatrix);
   errMatrix.SetSub(0, momErrMatrix);
@@ -227,7 +239,8 @@ Particle::Particle(const ECLPi0* pi0, const int mdstIndex) :
 
 Particle::Particle(const MCParticle* mcParticle, const int mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0), m_plist(0)
+  m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_plist(0)
 {
   if (!mcParticle) return;
 
@@ -491,7 +504,7 @@ void Particle::print() const
   std::cout << std::endl;
 
   std::cout << " mdstIndex=" << m_mdstIndex;
-  std::cout << " index=" << this->getArrayIndex();
+  std::cout << " arrayIndex=" << this->getArrayIndex();
   std::cout << " daughterIndices: ";
   for (unsigned i = 0; i < m_daughterIndices.size(); i++) {
     std::cout << m_daughterIndices[i] << ", ";
@@ -520,17 +533,24 @@ void Particle::print() const
   std::cout << m_x << "," << m_y << "," << m_z << ")";
   std::cout << std::endl;
 
+  std::cout << " p-value of fit (if done): ";
+  std::cout << m_pValue;
+  std::cout << std::endl;
+
   std::cout << " error matrix:";
   std::cout << std::endl;
 
   TMatrixFSym errMatrix = getMomentumVertexErrorMatrix();
+  int prec = std::cout.precision();
+  std::cout << std::setprecision(4);
   for (int i = 0; i < errMatrix.GetNrows(); i++) {
     for (int k = 0; k < errMatrix.GetNcols(); k++) {
-      std::cout << " " << errMatrix(i, k);
+      std::cout << std::setw(11) << errMatrix(i, k);
     }
     std::cout << std::endl;
   }
   std::cout << std::endl;
+  std::cout << std::setprecision(prec);
 
 }
 

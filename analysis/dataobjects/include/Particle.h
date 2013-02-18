@@ -60,6 +60,7 @@ namespace Belle2 {
    *    - IP for photons, Klong and pi0
    *    - decay vertex for composite particles
    *  - 7x7 error matrix (order is: px, py, pz, E, x, y, z)
+   *  - chi^2 probability of the fit (track fit, pi0 mass-constr. fit or vertex fit)
    *  - PDG code
    *  - vector of StoreArray<Particle> indices of daughter particles
    *
@@ -204,17 +205,28 @@ namespace Belle2 {
     void setMomentumVertexErrorMatrix(const TMatrixFSym& errMatrix);
 
     /**
-     * Sets Lorentz vector, position and 7x7 error matrix
+     * Sets chi^2 probability of fit
+     * @param pValue p-value of fit
+     */
+    void setPValue(float pValue) {
+      m_pValue = pValue;
+    }
+
+    /**
+     * Sets Lorentz vector, position, 7x7 error matrix and p-value
      * @param p4 Lorentz vector
      * @param vertex point (position or vertex)
      * @param errMatrix 7x7 momentum and vertex error matrix (order: px,py,pz,E,x,y,z)
+     * @param pValue chi^2 probability of the fit
      */
     void updateMomentum(const TLorentzVector& p4,
                         const TVector3& vertex,
-                        const TMatrixFSym& errMatrix) {
+                        const TMatrixFSym& errMatrix,
+                        float pValue) {
       set4Vector(p4);
       setVertex(vertex);
       setMomentumVertexErrorMatrix(errMatrix);
+      m_pValue = pValue;
     }
 
     /**
@@ -388,6 +400,14 @@ namespace Belle2 {
     }
 
     /**
+     * Returns chi^2 probability of fit if done or -1
+     * @return p-value of fit (-1 means no fit done)
+     */
+    float getPValue() const {
+      return m_pValue;
+    }
+
+    /**
      * Returns 7x7 error matrix
      * @return 7x7 error matrix (order: px,py,pz,E,x,y,z)
      */
@@ -475,6 +495,7 @@ namespace Belle2 {
     float m_y;      /**< position component y */
     float m_z;      /**< position component z */
     float m_errMatrix[c_SizeMatrix]; /**< error matrix (1D representation) */
+    float m_pValue;   /**< chi^2 probability of the fit */
     std::vector<int> m_daughterIndices;  /**< daughter particle indices */
     unsigned m_flavorType;  /**< flavor type: 0=unflavored, 1=flavored */
     EParticleType m_particleType;  /**< particle type */
@@ -524,7 +545,7 @@ namespace Belle2 {
      */
     void setFlavorType();
 
-    ClassDef(Particle, 2); /**< class definition */
+    ClassDef(Particle, 3); /**< class definition */
   };
 
   /** @}*/

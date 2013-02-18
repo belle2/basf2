@@ -64,26 +64,26 @@ namespace Belle2 {
 
     /** Get the relations that point from this object to another store array.
      *
-     *  @tparam T      The class of objects to which the relations point.
+     *  @tparam TO     The class of objects to which the relations point.
      *  @param name    The name of the store array to which the relations point.
-     *                 If empty the default store array name for class T will be used.
-     *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *                 If empty the default store array name for class TO will be used.
+     *                 If the special name "ALL" is given all store arrays containing objects of type TO are considered.
      *  @return        A vector of relations.
      */
-    template <class T> RelationVector<T> getRelationsTo(const std::string& name = "") const {
-      return RelationVector<T>(DataStore::Instance().getRelationsFromTo(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name));
+    template <class TO> RelationVector<TO> getRelationsTo(const std::string& name = "") const {
+      return RelationVector<TO>(DataStore::Instance().getRelationsFromTo(this, m_cacheDataStoreEntry, m_cacheArrayIndex, TO::Class(), name));
     }
 
     /** Get the relations that point from another store array to this object.
      *
-     *  @tparam T      The class of objects from which the relations point.
+     *  @tparam FROM   The class of objects from which the relations point.
      *  @param name    The name of the store array from which the relations point.
-     *                 If empty the default store array name for class T will be used.
-     *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *                 If empty the default store array name for class FROM will be used.
+     *                 If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
      *  @return        A vector of relations.
      */
-    template <class T> RelationVector<T> getRelationsFrom(const std::string& name = "") const {
-      return RelationVector<T>(DataStore::Instance().getRelationsToFrom(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name));
+    template <class FROM> RelationVector<FROM> getRelationsFrom(const std::string& name = "") const {
+      return RelationVector<FROM>(DataStore::Instance().getRelationsToFrom(this, m_cacheDataStoreEntry, m_cacheArrayIndex, FROM::Class(), name));
     }
 
     /** Get the relations between this object and another store array.
@@ -102,26 +102,26 @@ namespace Belle2 {
 
     /** Get the object to which this object has a relation.
      *
-     *  @tparam T      The class of objects to which the relation points.
+     *  @tparam TO     The class of objects to which the relation points.
      *  @param name    The name of the store array to which the relation points.
-     *                 If empty the default store array name for class T will be used.
-     *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *                 If empty the default store array name for class TO will be used.
+     *                 If the special name "ALL" is given all store arrays containing objects of type TO are considered.
      *  @return        The related object or a null pointer.
      */
-    template <class T> const T* getRelatedTo(const std::string& name = "") const {
-      return static_cast<const T*>(DataStore::Instance().getRelationFromTo(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name).object);
+    template <class TO> const TO* getRelatedTo(const std::string& name = "") const {
+      return static_cast<const TO*>(DataStore::Instance().getRelationFromTo(this, m_cacheDataStoreEntry, m_cacheArrayIndex, TO::Class(), name).object);
     }
 
     /** Get the object from which this object has a relation.
      *
-     *  @tparam T      The class of objects from which the relation points.
+     *  @tparam FROM   The class of objects from which the relation points.
      *  @param name    The name of the store array from which the relation points.
-     *                 If empty the default store array name for class T will be used.
-     *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *                 If empty the default store array name for class FROM will be used.
+     *                 If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
      *  @return        The related object or a null pointer.
      */
-    template <class T> const T* getRelatedFrom(const std::string& name = "") const {
-      return static_cast<const T*>(DataStore::Instance().getRelationToFrom(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name).object);
+    template <class FROM> const FROM* getRelatedFrom(const std::string& name = "") const {
+      return static_cast<const FROM*>(DataStore::Instance().getRelationToFrom(this, m_cacheDataStoreEntry, m_cacheArrayIndex, FROM::Class(), name).object);
     }
 
     /** Get the object to or from which this object has a relation.
@@ -149,6 +149,7 @@ namespace Belle2 {
       return m_cacheArrayIndex;
     }
 
+
     /**
      * @{
      * Define versions without template arguments, to be useful within python modules. From within C++, you should always use the type-safe functions above!
@@ -175,6 +176,7 @@ namespace Belle2 {
 
   private:
 
+    //version 0 to disable streaming
     ClassDef(RelationsInterface, 0); /**< defines interface for accessing relations of objects in StoreArray. */
 
     /** Cache of the data store entry to which this object belongs. */

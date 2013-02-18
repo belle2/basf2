@@ -150,9 +150,10 @@ namespace Belle2 {
     }
 
 
+#if defined(__CINT__) || defined(R__DICTIONARY_FILENAME)
     /**
      * @{
-     * Define versions without template arguments, to be useful within python modules. From within C++, you should always use the type-safe functions above!
+     * Define versions without template arguments, only available from python modules.
      */
     RelationVector<TObject> getRelationsTo(const std::string& name) const {
       return getRelationsTo<TObject>(name);
@@ -173,6 +174,7 @@ namespace Belle2 {
       return getRelated<TObject>(name);
     }
     /** @} */
+#endif
 
   private:
 

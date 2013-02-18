@@ -86,13 +86,16 @@ namespace Belle2 {
      */
     double weight(int index) const {return m_relations[index].weight;}
 
+
+#if defined(__CINT__) || defined(R__DICTIONARY_FILENAME)
     /**
      * @{
-     * dummy functions to get ROOT to generate a checked __getitem__() that handles out-of-range errors.
+     * dummy functions to get ROOT to generate a checked __getitem__() that handles out-of-range errors (needed for PyROOT).
      */
-    void begin() { }
-    void end() { }
+    static void begin() { }
+    static void end() { }
     /** @} */
+#endif
 
   private:
     std::vector<Belle2::RelationEntry> m_relations;  /**< The vector of relation entries */

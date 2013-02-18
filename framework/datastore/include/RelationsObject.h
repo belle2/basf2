@@ -29,6 +29,28 @@ namespace Belle2 {
    *
    *  In most cases, BASE will be TObject and you can simply derive from RelationsObject.
    *
+   *  You can either retrieve a vector of relations using getRelations...(),
+      \code
+      //retrieve all CDCSimHits for given particle
+      const MCParticle* particle = particles[i];
+      RelationVector<CDCSimHit> cdcRelations = particle->getRelationsTo<CDCSimHit>();
+      for (unsigned int iHit = 0; iHit < cdcRelations.size(); iHit++) {
+        const CDCSimHit *simhit = cdcRelations[iHit];
+        //...
+      }
+      \endcode
+   *
+   *  or, for 1:1 relations, the first related object (or NULL) using getRelated...():
+   *
+      \code
+      //retrieve MCParticle (should be only one) for given simhit
+      const CDCSimHit* simhit = cdcsimhits[i];
+      const MCParticle* mcpart = simhit->getRelatedFrom<MCParticle>()
+      if (!mcpart) {
+        //nothing found, do some error handling here
+      }
+      \endcode
+   *
    */
   template <class BASE> class RelationsInterface: public BASE {
   public:
@@ -106,7 +128,7 @@ namespace Belle2 {
      *  @param name    The name of the store array to which the relation points.
      *                 If empty the default store array name for class TO will be used.
      *                 If the special name "ALL" is given all store arrays containing objects of type TO are considered.
-     *  @return        The related object or a null pointer.
+     *  @return        The first related object or a null pointer.
      */
     template <class TO> const TO* getRelatedTo(const std::string& name = "") const {
       return static_cast<const TO*>(DataStore::Instance().getRelationFromTo(this, m_cacheDataStoreEntry, m_cacheArrayIndex, TO::Class(), name).object);
@@ -118,7 +140,7 @@ namespace Belle2 {
      *  @param name    The name of the store array from which the relation points.
      *                 If empty the default store array name for class FROM will be used.
      *                 If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
-     *  @return        The related object or a null pointer.
+     *  @return        The first related object or a null pointer.
      */
     template <class FROM> const FROM* getRelatedFrom(const std::string& name = "") const {
       return static_cast<const FROM*>(DataStore::Instance().getRelationToFrom(this, m_cacheDataStoreEntry, m_cacheArrayIndex, FROM::Class(), name).object);
@@ -130,7 +152,7 @@ namespace Belle2 {
      *  @param name    The name of the store array to or from which the relation points.
      *                 If empty the default store array name for class T will be used.
      *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
-     *  @return        The related object or a null pointer.
+     *  @return        The first related object or a null pointer.
      */
     template <class T> const T* getRelated(const std::string& name = "") const {
       return static_cast<const T*>(DataStore::Instance().getRelationWith(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name).object);

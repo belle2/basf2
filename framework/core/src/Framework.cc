@@ -98,6 +98,9 @@ void Framework::process(PathPtr startPath, long maxEvent)
     } else {
       B2FATAL("process(path, maxEvent) not supported when using parallel processing.")
     }
+  } catch (std::exception& e) {
+    B2ERROR("Uncaught exception encountered: " << e.what()); //should show module name
+    throw; //and let python's global handler do the rest
   } catch (...) {
     B2ERROR("Uncaught exception encountered!"); //should show module name
     throw; //and let python's global handler do the rest

@@ -13,7 +13,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/core/Path.h>
-#include <framework/core/FrameworkExceptions.h>
 
 #include <list>
 
@@ -31,11 +30,6 @@ namespace Belle2 {
   class PathManager {
 
   public:
-
-    //Define exceptions
-    /** Exception is thrown if the path could not be created. */
-    BELLE2_DEFINE_EXCEPTION(PathNotCreatedError, "Could not create path!");
-
     /**
      * Constructor.
      */
@@ -50,11 +44,10 @@ namespace Belle2 {
      * Creates a new path and adds it to the list of available paths.
      *
      * This method creates a new path and adds it to the list.
-     * If the path could not be created, an exception of type FwExcPathNotCreated is thrown.
      *
-     * @return A reference to the newly created path.
+     * @return Shared pointer to the newly created path.
      */
-    PathPtr createPath() throw(PathNotCreatedError);
+    PathPtr createPath();
 
     /**
      * Builds a list of all modules which could be executed during the data processing.
@@ -67,7 +60,7 @@ namespace Belle2 {
      * @param startPath The path with which the search should start.
      * @return A list containing all modules which could be executed during the data processing.
      */
-    ModulePtrList buildModulePathList(PathPtr startPath) const;
+    ModulePtrList buildModulePathList(const PathPtr startPath) const;
 
 
   protected:
@@ -84,7 +77,7 @@ namespace Belle2 {
      * @param path The path whose modules should be added to the module list.
      * @param modList The list of modules.
      */
-    void fillModulePathList(PathPtr path, ModulePtrList& modList) const;
+    static void fillModulePathList(const PathPtr path, ModulePtrList& modList);
 
   };
 

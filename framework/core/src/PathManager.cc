@@ -27,19 +27,15 @@ PathManager::~PathManager()
 }
 
 
-PathPtr PathManager::createPath() throw(PathNotCreatedError)
+PathPtr PathManager::createPath()
 {
-  try {
-    PathPtr newPath(new Path());
-    m_createdPathList.push_back(newPath);
-    return newPath;
-  } catch (...) {
-    throw PathNotCreatedError();
-  }
+  PathPtr newPath(new Path());
+  m_createdPathList.push_back(newPath);
+  return newPath;
 }
 
 
-ModulePtrList PathManager::buildModulePathList(PathPtr startPath) const
+ModulePtrList PathManager::buildModulePathList(const PathPtr startPath) const
 {
   ModulePtrList tmpModuleList;
 
@@ -54,13 +50,13 @@ ModulePtrList PathManager::buildModulePathList(PathPtr startPath) const
 //                              Private methods
 //============================================================================
 
-void PathManager::fillModulePathList(PathPtr path, ModulePtrList& modList) const
+void PathManager::fillModulePathList(const PathPtr path, ModulePtrList& modList)
 {
   ModulePtrList::const_iterator moduleIter;
   const ModulePtrList& currModList = path->getModules();
 
   for (moduleIter = currModList.begin(); moduleIter != currModList.end(); ++moduleIter) {
-    Module* module = moduleIter->get();
+    const Module* module = moduleIter->get();
 
     //If module was not already added to the list, add it.
     ModulePtrList::iterator findIter = find_if(modList.begin(), modList.end(), bind2nd(ModulePtrOperatorsEq(), *moduleIter));

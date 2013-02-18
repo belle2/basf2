@@ -73,7 +73,7 @@ ModulePtr Framework::registerModule(const string& moduleName, const string& shar
 }
 
 
-PathPtr Framework::createPath() throw(PathManager::PathNotCreatedError)
+PathPtr Framework::createPath()
 {
   return m_pathManager->createPath();
 }

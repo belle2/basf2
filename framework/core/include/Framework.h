@@ -99,11 +99,10 @@ namespace Belle2 {
      * Creates a new path, adds it to the framework and returns a shared pointer.
      *
      * This method creates a new path and registers it to the framework.
-     * If the path could not be created, an exception of type PathNotCreatedError is thrown.
      *
      * @return A shared pointer of the added and registered path.
      */
-    PathPtr createPath() throw(PathManager::PathNotCreatedError);
+    PathPtr createPath();
 
     /**
      * Processes up to maxEvent events by starting with the first module in the specified path.

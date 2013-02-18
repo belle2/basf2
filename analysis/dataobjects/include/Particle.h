@@ -236,6 +236,14 @@ namespace Belle2 {
     void appendDaughter(const Particle* daughter);
 
     /**
+     * Appends index of daughter to daughters index array
+     * @param particleIndex daughter particle store array index
+     */
+    void appendDaughter(int particleIndex) {
+      m_daughterIndices.push_back(particleIndex);
+    }
+
+    /**
      * Removes index of daughter from daughters index array
      * @param daughter pointer to the daughter particle
      */

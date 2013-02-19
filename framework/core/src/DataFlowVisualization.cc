@@ -1,5 +1,7 @@
 #include <framework/core/DataFlowVisualization.h>
 
+#include <framework/core/Path.h>
+#include <framework/core/Module.h>
 #include <framework/core/ModuleManager.h>
 
 #include <fstream>
@@ -10,9 +12,8 @@ typedef DataStore::ModuleInfo MInfo;
 
 const std::string unknownfillcolor = "gray82";
 
-DataFlowVisualization::DataFlowVisualization(const std::map<std::string, DataStore::ModuleInfo>& moduleInfo, const ModulePtrList& modules):
-  m_moduleInfo(moduleInfo),
-  m_modules(modules)
+DataFlowVisualization::DataFlowVisualization(const std::map<std::string, DataStore::ModuleInfo>& moduleInfo):
+  m_moduleInfo(moduleInfo)
 {
   m_fillcolor[MInfo::c_Input] = "cornflowerblue";
   m_fillcolor[MInfo::c_OptionalInput] = "lightblue";
@@ -23,35 +24,25 @@ DataFlowVisualization::DataFlowVisualization(const std::map<std::string, DataSto
   m_arrowcolor[MInfo::c_Output] = "firebrick";
 }
 
-void DataFlowVisualization::generateModulePlots(const std::string& filename, bool steeringFileFlow)
+void DataFlowVisualization::generateModulePlots(const std::string& filename, const Path& path, bool steeringFileFlow)
 {
   std::ofstream file(filename.c_str());
-  if (steeringFileFlow)
+  if (steeringFileFlow) {
     file << "digraph allModules {\n";
+    file << "  rankdir=LR;\n"; //left -> right
+    file << "  compound=true;\n"; //allow edges to subgraphs
+  }
 
+  const ModulePtrList& moduleList = path.getModules();
   //for steering file data flow graph, we may get multiple definitions of each node
   //graphviz merges these into the last one, so we'll go through module list in reverse (all boxes should be coloured as outputs)
-  for (ModulePtrList::const_reverse_iterator it = m_modules.rbegin(); it != m_modules.rend(); ++it) {
+  for (ModulePtrList::const_reverse_iterator it = moduleList.rbegin(); it != moduleList.rend(); ++it) {
     const std::string& name = (*it)->getName();
     generateModulePlot(file, name, steeringFileFlow);
   }
 
   if (steeringFileFlow) {
-    file << "  subgraph path {\n";
-    file << "    rank=min;\n";
-    //connect modules in right order...
-    std::string lastModule = "";
-    for (ModulePtrList::const_iterator it = m_modules.begin(); it != m_modules.end(); ++it) {
-      const std::string& module = (*it)->getName();
-      file << "    " << module << "\n";
-      if (!lastModule.empty()) {
-        file << "    " << lastModule << " -> " << module << " [color=black];\n";
-      }
-
-      lastModule = module;
-    }
-    file << "  }\n";
-
+    plotPath(file, path);
 
     //add nodes
     for (std::set<std::string>::const_iterator it = m_allOutputs.begin(); it != m_allOutputs.end(); ++it) {
@@ -69,6 +60,39 @@ void DataFlowVisualization::generateModulePlots(const std::string& filename, boo
 
     file << "}\n\n";
   }
+}
+
+void DataFlowVisualization::plotPath(std::ofstream& file, const Path& path, const std::string& pathName)
+{
+  const ModulePtrList& moduleList = path.getModules();
+  //graph name must begin with cluster for fancy graphics!
+  const std::string graphname = pathName.empty() ? "clusterMain" : ("cluster" + pathName);
+  file << "  subgraph " << graphname << " {\n";
+  if (pathName.empty()) {
+    file << "    rank=min;\n";
+  } else {
+    file << "    rank=same;\n";
+  }
+  file << "    style=solid;\n";
+  file << "    color=grey;\n";
+  file << "    " << graphname  << "_inv [shape=point,style=invis];\n";
+  std::string lastModule("");
+  //connect modules in right order...
+  for (ModulePtrList::const_iterator it = moduleList.begin(); it != moduleList.end(); ++it) {
+    const std::string& module = (*it)->getName();
+    file << "    " << module << ";\n";
+    if (!lastModule.empty()) {
+      file << "    " << lastModule << " -> " << module << " [color=black];\n";
+    }
+    if ((*it)->hasCondition()) {
+      const Path* conditionPath = (*it)->getConditionPath().get();
+      plotPath(file, *conditionPath, module);
+      file << "    " << module << " -> cluster" << module << "_inv [color=grey,lhead=cluster" << module << "];\n";
+    }
+
+    lastModule = module;
+  }
+  file << "  }\n";
 }
 
 void DataFlowVisualization::generateModulePlot(std::ofstream& file, const std::string& name, bool steeringFileFlow)
@@ -146,9 +170,7 @@ void DataFlowVisualization::executeModuleAndCreateIOPlot(const std::string& modu
 
   // create plot
   const std::string filename = module + ".dot";
-  ModulePtrList moduleList;
-  moduleList.push_back(modulePtr);
-  DataFlowVisualization v(DataStore::Instance().getModuleInfoMap(), moduleList);
+  DataFlowVisualization v(DataStore::Instance().getModuleInfoMap());
   std::ofstream file(filename.c_str());
   v.generateModulePlot(file, module, false);
 

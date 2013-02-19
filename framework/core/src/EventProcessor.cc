@@ -60,6 +60,15 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
   //Initialize modules
   processInitialize(moduleList);
 
+  //do we want to visualize DataStore input/ouput?
+  if (Environment::Instance().getVisualizeDataFlow()) {
+    DataFlowVisualization v(DataStore::Instance().getModuleInfoMap());
+    //single graph for entire steering file
+    v.generateModulePlots("dataflow.dot", *startPath, true);
+
+    B2INFO("Data flow diagram created. You can use 'dot dataflow.dot -Tps -o dataflow.ps' to create a PostScript file from it.");
+  }
+
   //Don't start processing in case of no master module
   if (!m_master) {
     B2ERROR("There is no module that provides event and run numbers. You must either add the EvtMetaGen module to your path, or, if using an input module, read EventMetaData objects from file.");
@@ -152,15 +161,6 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 #ifdef HAS_CALLGRIND
   CALLGRIND_DUMP_STATS_AT("initialize");
 #endif
-
-  //do we want to visualize DataStore input/ouput?
-  if (Environment::Instance().getVisualizeDataFlow()) {
-    DataFlowVisualization v(DataStore::Instance().getModuleInfoMap(), modulePathList);
-    //single graph for entire steering file
-    v.generateModulePlots("dataflow.dot", true);
-
-    B2INFO("Data flow diagram created. You can use 'dot dataflow.dot -Tps -o dataflow.ps' to create a PostScript file from it.");
-  }
 }
 
 

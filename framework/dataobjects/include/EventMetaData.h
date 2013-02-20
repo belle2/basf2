@@ -26,12 +26,8 @@ namespace Belle2 {
   class EventMetaData : public TObject {
   public:
 
-    /** Constructor.
-     *
-     *  Initialises meta data of event with Nulls.
-     */
-    EventMetaData(unsigned long event = 0, unsigned long run = 0, unsigned long experiment = 0)
-      : m_event(event), m_run(run), m_experiment(experiment), m_parent_index(-1), m_generated_weight(1) {}
+    /** Constructor. */
+    explicit EventMetaData(unsigned long event = 0, unsigned long run = 0, unsigned long experiment = 0);
 
     /** Destructor. */
     ~EventMetaData() {}
@@ -67,11 +63,7 @@ namespace Belle2 {
      * Sets the values for the experiment, run and event to
      * values indicating the end of data.
      */
-    void setEndOfData() {
-      m_event = -1;
-      m_run = -1;
-      m_experiment = -1;
-    }
+    void setEndOfData();
 
     /** Parent Index Setter.
      *

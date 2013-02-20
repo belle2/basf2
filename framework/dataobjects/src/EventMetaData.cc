@@ -10,11 +10,26 @@
 
 #include <framework/dataobjects/EventMetaData.h>
 
-using namespace std;
+#include <climits>
+
 using namespace Belle2;
 
 ClassImp(EventMetaData)
 
+EventMetaData::EventMetaData(unsigned long event, unsigned long run, unsigned long experiment):
+  m_event(event),
+  m_run(run),
+  m_experiment(experiment),
+  m_parent_index(UINT_MAX),
+  m_generated_weight(1.0)
+{}
+
+void EventMetaData::setEndOfData()
+{
+  m_event = UINT_MAX;
+  m_run = UINT_MAX;
+  m_experiment = UINT_MAX;
+}
 
 bool EventMetaData::operator== (const EventMetaData& eventMetaData) const
 {

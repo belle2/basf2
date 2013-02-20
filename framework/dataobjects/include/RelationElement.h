@@ -13,13 +13,14 @@
 #include <TObject.h>
 
 #include <vector>
+#include <climits>
 
 namespace Belle2 {
   /** \addtogroup dataobjects
    * @{
    */
 
-  /** Class to store a single element of a Relation.
+  /** Class to store a single element of a relation.
    *
    *  Supports 1:n relations with individual weights.
    */
@@ -34,7 +35,7 @@ namespace Belle2 {
 
     /** Empty constructor for ROOT */
     RelationElement():
-      TObject(), m_from(-1), m_to(), m_weights() {}
+      TObject(), m_from(UINT_MAX), m_to(), m_weights() {}
 
     /** Constructor for a 1:1 relation.
      *
@@ -90,7 +91,7 @@ namespace Belle2 {
     /** Set index we point from. */
     void setFromIndex(index_type from) { m_from = from; }
 
-    /** Set index we point to, converts relation to 1:1 and discards all existing to indices. */
+    /** Set index we point to, converts relation to 1:1 and discards all existing to-indices. */
     void setToIndex(index_type to, weight_type weight = 1.0) {
       m_to = std::vector<index_type>(1, to);
       m_weights = std::vector<weight_type>(1, weight);
@@ -118,7 +119,7 @@ namespace Belle2 {
     /** indices we point to. */
     std::vector<index_type> m_to;
 
-    /** weights for to indices. */
+    /** weights for to-indices. */
     std::vector<weight_type> m_weights;
 
     ClassDef(RelationElement, 1); /**< Build ROOT dictionary */

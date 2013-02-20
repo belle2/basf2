@@ -18,12 +18,13 @@
 #include <framework/core/Module.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/core/Path.h>
-#include <framework/core/PathManager.h>
 
 #include <string>
 #include <list>
 
 namespace Belle2 {
+  class PathManager;
+
   /**
    * The main Framework class.
    * This class combines all subsystems of the framework.

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Martin Heck, Christian Pulvermacher                      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -153,10 +153,11 @@ void RootInputModule::initialize()
       TObject* objectPtr = 0;
       branch->SetAddress(&objectPtr);
       bool array = (static_cast<string>(branch->GetClassName()) == "TClonesArray");
-      TClass* objClass = objectPtr->IsA();
-      if (array) {
+      TClass* objClass = 0;
+      if (array)
         objClass = (static_cast<TClonesArray*>(objectPtr))->GetClass();
-      }
+      else
+        objClass = objectPtr->IsA();
       delete objectPtr;
 
       //Create a DataStore entry and connect the branch address to it

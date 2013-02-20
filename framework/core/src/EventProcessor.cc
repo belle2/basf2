@@ -116,7 +116,8 @@ static void signalHandler(int)
   const char msg[] = "Received Ctrl+C, basf2 will exit safely. (Press Ctrl+\\ (SIGQUIT) to abort immediately - this may break output files.)\n";
   const int len = sizeof(msg) / sizeof(char) - 1; //minus NULL byte
 
-  write(STDERR_FILENO, msg, len);
+  int rc = write(STDERR_FILENO, msg, len);
+  (void) rc; //ignore return value (there's nothing we can do about a failed write)
 }
 
 void EventProcessor::processInitialize(const ModulePtrList& modulePathList)

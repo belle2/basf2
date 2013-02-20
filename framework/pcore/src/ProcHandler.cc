@@ -193,7 +193,8 @@ int ProcHandler::isproc(int pid, char* exe)
   }
   if ((fp = fopen(procfile, "r")) == NULL)
     return 0;
-  fscanf(fp, "%19s %79s", pidstr, exename);
+  if (fscanf(fp, "%19s %79s", pidstr, exename) != 2)
+    return 1;
   fclose(fp);
   if (strstr(exename, exe) != NULL)
     return 1;

@@ -321,7 +321,8 @@ int main(int argc, char* argv[])
       pythonFile = (libPath2 / "basf2.py").string();
     }
     string extCommand("python -i " + pythonFile);
-    system(extCommand.c_str());
+    if (system(extCommand.c_str()) != 0)
+      return 1;
   }
 
   return 0;

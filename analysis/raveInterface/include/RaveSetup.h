@@ -80,8 +80,6 @@ namespace Belle2 {
       bool m_gfPropagation;
       int m_raveVerbosity;
 
-      bool m_setupComplete;
-
       bool m_useBeamSpot;
       TVector3 m_beamSpot;
       TMatrixDSym m_beamSpotCov;

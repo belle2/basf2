@@ -15,8 +15,6 @@
 #include <GFRaveVertexFactory.h>
 #include <RKTrackRep.h>
 
-//#include <CLHEP/Matrix/SymMatrix.h>
-
 using std::string;
 
 #include <vector>
@@ -71,16 +69,24 @@ void RaveVertexFitter::addTrack(GFTrack* const aGFTrackPtr)
   }
 }
 
-//void RaveVertexFitter::addTrack(const TrackFitResult* aTrackPtr)
-//{
-//  if (RaveSetup::s_instance->m_gfRave == true) {
-//    RKTrackRep* aTrackRepPtr = new RKTrackRep(aTrackPtr->getPosition(), aTrackPtr->getMomentum(), TMatrixDSym(6,aTrackPtr->getCovariance6.getMatrixArray()), aTrackPtr->getPDGCode());
-//    m_ownGfTrackReps.push_back(static_cast<GFAbsTrackRep*>(aTrackRepPtr));
-//    m_gfTrackReps.push_back(static_cast<GFAbsTrackRep*>(aTrackRepPtr));
-//  } else {
-//    m_raveTracks.push_back(TrackFitResultToRaveTrack(aTrackPtr));
-//  }
-//}
+void RaveVertexFitter::addTrack(const TrackFitResult* aTrackPtr)
+{
+  if (RaveSetup::s_instance->m_gfRave == true) {
+    //maybe there is a smarter way to convert TMatrixF to TMatrixDSym. If you know one feel free to change it.
+    TMatrixF cov(aTrackPtr->getCovariance6());
+    TMatrixDSym temp(6);
+    for (int i = 0; i not_eq 6; ++i) {
+      for (int j = 0; j not_eq 6; ++j) {
+        temp(i, j) = cov(i, j);
+      }
+    }
+    RKTrackRep* aTrackRepPtr = new RKTrackRep(aTrackPtr->getPosition(), aTrackPtr->getMomentum(), temp, aTrackPtr->getPDGCode());
+    m_ownGfTrackReps.push_back(static_cast<GFAbsTrackRep*>(aTrackRepPtr));
+    m_gfTrackReps.push_back(static_cast<GFAbsTrackRep*>(aTrackRepPtr));
+  } else {
+    m_raveTracks.push_back(TrackFitResultToRaveTrack(aTrackPtr));
+  }
+}
 
 void RaveVertexFitter::addTrack(GFAbsTrackRep* const aTrackRepPtr)
 {
@@ -145,10 +151,10 @@ rave::Track RaveVertexFitter::TrackFitResultToRaveTrack(const TrackFitResult* aT
 }
 
 
-void RaveVertexFitter::addTrack(const Particle& aParticle)
+void RaveVertexFitter::addTrack(const Particle* aParticlePtr)
 {
   if (RaveSetup::s_instance->m_gfRave == true) {
-    TMatrixFSym cov = aParticle.getMomentumVertexErrorMatrix();
+    TMatrixFSym cov = aParticlePtr->getMomentumVertexErrorMatrix();
 
     TMatrixDSym covRoot(6);
     covRoot(0, 0) = cov[4][4]; //x
@@ -187,16 +193,16 @@ void RaveVertexFitter::addTrack(const Particle& aParticle)
     covRoot(5, 3) = covRoot(3, 5); //px,pz
     covRoot(4, 5) = cov[1][2]; //py,pz
     covRoot(5, 4) = covRoot(4, 5); //py,pz
-    RKTrackRep* aTrackRepPtr = new RKTrackRep(aParticle.getVertex(), aParticle.getMomentum(), covRoot, aParticle.getPDGCode());
+    RKTrackRep* aTrackRepPtr = new RKTrackRep(aParticlePtr->getVertex(), aParticlePtr->getMomentum(), covRoot, aParticlePtr->getPDGCode());
     m_ownGfTrackReps.push_back(static_cast<GFAbsTrackRep*>(aTrackRepPtr));
     m_gfTrackReps.push_back(static_cast<GFAbsTrackRep*>(aTrackRepPtr));
   } else {
     const int id = m_raveTracks.size();
-    const TVector3& pos = aParticle.getVertex();
-    const TVector3& mom = aParticle.getMomentum();
+    const TVector3& pos = aParticlePtr->getVertex();
+    const TVector3& mom = aParticlePtr->getMomentum();
     rave::Vector6D ravestate(pos.X(), pos.Y(), pos.Z(), mom.X(), mom.Y(), mom.Z());
 
-    const TMatrixFSym& cov = aParticle.getMomentumVertexErrorMatrix();
+    const TMatrixFSym& cov = aParticlePtr->getMomentumVertexErrorMatrix();
 
     rave::Covariance6D ravecov(cov(4, 4), cov(4, 5), cov(4, 6),
                                cov(5, 5), cov(5, 6), cov(6, 6),
@@ -206,21 +212,20 @@ void RaveVertexFitter::addTrack(const Particle& aParticle)
                                cov(0, 0), cov(0, 1), cov(0, 2),
                                cov(1, 1), cov(1, 2), cov(2, 2));
 
-    m_raveTracks.push_back(rave::Track(id, ravestate, ravecov, rave::Charge(aParticle.getCharge() + 0.1), 1, 1)); // 1 and 1 are dummy values for chi2 and ndf. the are not used for the vertex fit
+    m_raveTracks.push_back(rave::Track(id, ravestate, ravecov, rave::Charge(aParticlePtr->getCharge() + 0.1), 1, 1)); // 1 and 1 are dummy values for chi2 and ndf. the are not used for the vertex fit
   }
-
-
 }
 
-//void RaveVertexFitter::addTrack( const Track& aTrack){
-//
-//
-//  RKTrackRep* aTrackRepPtr = new RKTrackRep();
-//  aTrackRepPtr->setPosMomCov(aTrack,aTrack,aTrack.getErrorMatrix());
-//  aTrackRepPtr->setPDG(aTrack.getPDG());
-//  m_ownGfTrackReps.push_back(static_cast<GFAbsTrackRep*>(aTrackRepPtr));
-//}
+void RaveVertexFitter::addMother(const Particle* aMotherParticlePtr)
+{
+  vector<Particle*> daughters = aMotherParticlePtr->getDaughters();
 
+  int nDaughters = daughters.size();
+  for (int i = 0; i not_eq nDaughters; ++i) {
+    addTrack(daughters[i]);
+  }
+
+}
 
 int RaveVertexFitter::fit(string options)
 {

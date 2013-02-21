@@ -53,12 +53,9 @@ void RaveSetup::initialize(string options)
       GFMaterialEffects::getInstance()->setMscModel("Highland");
     }
 
-    s_instance->m_setupComplete = true;
-
 
   } else if (options == "Rave") {// use Rave directly without GFRave
     s_instance->m_gfRave = false;
-    s_instance->m_setupComplete = true;
     //TODO get magentic field from framework
     s_instance->m_raveVertexFactory = new rave::VertexFactory(rave::ConstantMagneticField(0, 0, 1.5), rave::VacuumPropagator(), "kalman", s_instance->m_raveVerbosity);
   } else {
@@ -67,7 +64,7 @@ void RaveSetup::initialize(string options)
 
 }
 
-RaveSetup::RaveSetup(): m_gfRave(false), m_gfPropagation(false), m_raveVerbosity(0), m_setupComplete(false), m_useBeamSpot(false),
+RaveSetup::RaveSetup(): m_gfRave(false), m_gfPropagation(false), m_raveVerbosity(0), m_useBeamSpot(false),
   m_raveVertexFactory(NULL), m_GFRaveVertexFactory(NULL)
 {
   ;
@@ -87,7 +84,6 @@ RaveSetup::~RaveSetup()
 
 void RaveSetup::setBeamSpot(TVector3 beamSpot, TMatrixDSym beamSpotCov)
 {
-
   m_beamSpot = beamSpot;
   m_beamSpotCov.ResizeTo(beamSpotCov);
   m_beamSpotCov = beamSpotCov;

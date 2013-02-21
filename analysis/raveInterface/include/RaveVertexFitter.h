@@ -38,8 +38,9 @@ namespace Belle2 {
      */
     class RaveVertexFitter {
     public:
-
+      /** The default constructor checks if RaveSetup was initialized and will set the attributes of RaveVertexFitter */
       RaveVertexFitter();
+      /** Destructor */
       ~RaveVertexFitter();
 
       /** add a track (in the format of a GFTrack) to set of tracks that should be fitted to a vertex */
@@ -48,20 +49,21 @@ namespace Belle2 {
       void addTrack(GFTrack* const aGFTrackPtr);
       /** add a track (in the format of a pointer to a GFAbsTrackRep) to set of tracks that should be fitted to a vertex */
       void addTrack(GFAbsTrackRep* const aTrackRepPtr);
-
-      //      void addTrack( const Belle1::Particle& aParticle);
       /** add a track (in the format of a Belle2::Particle) to set of tracks that should be fitted to a vertex */
-      void addTrack(const Particle& aParticle);
-
+      void addTrack(const Particle* aParticlePtr);
+      /** add a track (in the format of a pointer to a Belle2::TrackFitResult) to set of tracks that should be fitted to a vertex */
       void addTrack(const TrackFitResult* aTrackPtr);
 
-      /** do the vertex fit with all tracks previously added with the addTrack function. The argument is a string determining the Rave fitting method. See https://rave.hepforge.org/trac/wiki/RaveMethods for the different methods
+      /** All daughters of the argument of this function will be used as input for the vertex fit. Writing back the result directly to the mother particle is not yet supported */
+      void addMother(const Particle* aMotherParticlePtr);
+
+      /** do the vertex fit with all tracks previously added with the addTrack or addMother function. The argument is a string determining the Rave fitting method. See https://rave.hepforge.org/trac/wiki/RaveMethods for the different methods
        * The return value is the number of successfully found vertices (depending on the selected algorithm this can be more then one vertex). Return value 0 means the fit was not successful. -1 means not enough tracks were added*/
       int fit(std::string options = "default");
 
       /** get the position of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
       TVector3 getPos(std::vector<int>::size_type vertexId = 0) {
-        if (m_GFRaveVertices.size() == 0) {
+        if (m_GFRaveVertices.empty()) {
           B2ERROR("There is no fitted Vertex. Maybe you did not call fit() or maybe the fit was not successful");
           throw;
         } else if (vertexId < m_GFRaveVertices.size()) {
@@ -73,7 +75,7 @@ namespace Belle2 {
       }
       /** get the p value of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
       double getPValue(std::vector<int>::size_type vertexId = 0) {
-        if (m_GFRaveVertices.size() == 0) {
+        if (m_GFRaveVertices.empty()) {
           B2ERROR("There is no fitted Vertex. Maybe you did not call fit() or maybe the fit was not successful");
           throw;
         } else if (vertexId < m_GFRaveVertices.size()) {
@@ -86,7 +88,7 @@ namespace Belle2 {
 
       /** get the number of degrees of freedom (NDF) of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
       double getNdf(std::vector<int>::size_type vertexId = 0) {
-        if (m_GFRaveVertices.size() == 0) {
+        if (m_GFRaveVertices.empty()) {
           B2ERROR("There is no fitted Vertex. Maybe you did not call fit() or maybe the fit was not successful");
           throw;
         } else if (vertexId < m_GFRaveVertices.size()) {
@@ -99,7 +101,7 @@ namespace Belle2 {
 
       /** get the χ² of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
       double getChi2(std::vector<int>::size_type vertexId = 0) {
-        if (m_GFRaveVertices.size() == 0) {
+        if (m_GFRaveVertices.empty()) {
           B2ERROR("There is no fitted Vertex. Maybe you did not call fit() or maybe the fit was not successful");
           throw;
         } else if (vertexId < m_GFRaveVertices.size()) {
@@ -110,9 +112,9 @@ namespace Belle2 {
         }
       }
 
-      /** get the covarance matrix (3x3) of the of the fitted vertex position. If Rave was also used to find different vertices the user has to provide the index of that vertex */
+      /** get the covariance matrix (3x3) of the of the fitted vertex position. If Rave was also used to find different vertices the user has to provide the index of that vertex */
       TMatrixDSym getCov(std::vector<int>::size_type vertexId = 0) {
-        if (m_GFRaveVertices.size() == 0) {
+        if (m_GFRaveVertices.empty()) {
           B2ERROR("There is no fitted Vertex. Maybe you did not call fit() or maybe the fit was not successful");
           throw;
         } else if (vertexId < m_GFRaveVertices.size()) {
@@ -155,7 +157,7 @@ namespace Belle2 {
       }
       /** Return the GFRaveVertex object. Holds all info on the fitted vertex. This is temporary and will be replaced with the Bell2 vertex object when ready */
       GFRaveVertex* getGFRaveVertex(std::vector<int>::size_type vertexId = 0) {
-        if (m_GFRaveVertices.size() == 0) {
+        if (m_GFRaveVertices.empty()) {
           B2ERROR("There is no fitted Vertex. Maybe you did not call fit() or maybe the fit was not successful");
           throw;
         } else if (vertexId < m_GFRaveVertices.size()) {
@@ -171,7 +173,7 @@ namespace Belle2 {
 
       rave::Track GFTrackRepToRaveTrack(GFAbsTrackRep* const aGFTrackRep) const;
       rave::Track TrackFitResultToRaveTrack(const TrackFitResult* aTrackPtr) const;
-      bool m_useBeamSpot; /**< if the beam spot shoud be used or not. Overwrites the global flag in RaveSetup */
+      bool m_useBeamSpot; /**< if the beam spot should be used or not. Overwrites the global flag in RaveSetup */
 
       std::string m_raveAlgorithm;
 

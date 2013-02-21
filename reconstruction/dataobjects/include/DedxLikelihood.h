@@ -11,10 +11,8 @@
 #ifndef DEDXLIKELIHOOD_H
 #define DEDXLIKELIHOOD_H
 
-//only used for a few constants, no linking necessary
-#include <reconstruction/modules/dedxPID/DedxConstants.h>
-
 #include <framework/datastore/RelationsObject.h>
+#include <framework/gearbox/Const.h>
 
 #include <string>
 #include <cmath>
@@ -31,25 +29,20 @@ namespace Belle2 {
   class DedxLikelihood : public RelationsObject {
   public:
     /** default constructor */
-    DedxLikelihood():
-      RelationsObject(),
-      m_p(0.0) {
+    DedxLikelihood(): RelationsObject() {
       //for all particles
-      for (int i = 0; i < Dedx::c_num_particles; i++) {
+      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
         m_logl[i] = 0.0;
       }
     }
 
-    /** actually const float (&logl)[Dedx::c_num_particles], but CINT complains. */
-    DedxLikelihood(const float* logl, float p):
-      RelationsObject(),
-      m_p(p) {
+    /** actually const float (&logl)[Const::ChargedStable::c_SetSize], but CINT complains. */
+    DedxLikelihood(const float* logl): RelationsObject() {
       //for all particles
-      for (int i = 0; i < Dedx::c_num_particles; i++) {
+      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
         m_logl[i] = logl[i];
       }
     }
-
 
     /** returns unnormalised log-likelihood value for a particle hypothesis.
      *
@@ -57,32 +50,20 @@ namespace Belle2 {
      * \f$ \mathcal{L}_m / \mathcal{L}_n \f$ of the likelihoods for two
      * particle types m and n.
      *
-     * Instead of comparing hypotheses in pairs, one can also use the probability
-     * for a certain hypothesis provided by getProbability(), which takes into
-     * account all hypotheses and their momentum distribution.
-     *
      * @param type  The desired particle hypothesis.
      */
-
-    float getLogLikelihood(Dedx::Particle type) const { return m_logl[type]; }
+    float getLogLikelihood(const Const::ChargedStable& type) const { return m_logl[type.getIndex()]; }
 
     /** returns exp(getLogLikelihood(type)) with sufficient precision. */
-    double getLikelihood(Dedx::Particle type) const { return exp((double)m_logl[type]); }
+    double getLikelihood(const Const::ChargedStable& type) const { return exp((double)m_logl[type.getIndex()]); }
 
     /** corresponding setter for m_logl. */
-    void setLogLikelihood(Dedx::Particle type, float logl) { m_logl[type] = logl; }
-
-    /** the associated track momentum at the origin*/
-    float getMomentum() const { return m_p; }
-
-    /** corresponding setter for m_p */
-    void setMomentum(float p) { m_p = p; }
+    void setLogLikelihood(const Const::ChargedStable& type, float logl) { m_logl[type.getIndex()] = logl; }
 
   private:
-    float m_logl[Dedx::c_num_particles]; /**< log likelihood for each particle, not including momentum prior */
-    float m_p; /**< track momentum used for PDF lookups */
+    float m_logl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
-    ClassDef(DedxLikelihood, 2); /**< Build ROOT dictionary */
+    ClassDef(DedxLikelihood, 3); /**< Build ROOT dictionary */
   };
   /*! @} */
 }

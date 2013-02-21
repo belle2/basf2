@@ -41,7 +41,7 @@ namespace Belle2 {
     /*! default constructor: log likelihoods and flags set to 0 */
     PIDLikelihood(): m_flags(0) {
       for (int i = 0; i < c_NumofDet; i++) {
-        for (Const::ParticleType k = Const::chargedStable.begin(); k != Const::chargedStable.end(); k++) m_logl[i][k.getIndex()] = 0.0;
+        for (Const::ParticleType k = Const::chargedStableSet.begin(); k != Const::chargedStableSet.end(); ++k) m_logl[i][k.getIndex()] = 0.0;
       }
     }
 
@@ -92,7 +92,7 @@ namespace Belle2 {
 
   private:
     int m_flags;  /**< reconstruction flags (one bit for each detector)*/
-    float m_logl[c_NumofDet][Const::ChargedStable::fixedSize]; /**< log likelihoods */
+    float m_logl[c_NumofDet][Const::ChargedStable::c_SetSize]; /**< log likelihoods */
 
     /*! Set flag for a given detector
      * @param det detector enumerator

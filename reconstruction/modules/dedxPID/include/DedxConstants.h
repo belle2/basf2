@@ -19,15 +19,6 @@ namespace Belle2 {
     /** list of trackig detectors, starting with innermost detector */
     enum Detector { c_PXD, c_SVD, c_CDC };
 
-    /** total number of particle hypotheses */
-    const int c_num_particles = 5;
-
-    /** List of particle type hypotheses. */
-    enum Particle { c_Pion, c_Kaon, c_Electron, c_Muon, c_Proton };
-
-    /** List of PDG codes corresponding to Dedx::Particle enum */
-    const int c_pdg_codes[c_num_particles] = { 211, 321, 11, 13, 2212 };
-
   }
 }
 #endif

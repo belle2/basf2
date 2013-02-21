@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 
 #include <reconstruction/modules/dedxPID/DedxConstants.h>
+#include <framework/gearbox/Const.h>
 
 #include <framework/datastore/StoreArray.h>
 
@@ -78,7 +79,7 @@ namespace Belle2 {
      * @param dedx  dE/dx value
      * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
-    void saveLogLikelihood(float(&logl)[Dedx::c_num_particles], float p, float dedx, TH2F* const* pdf) const;
+    void saveLogLikelihood(float(&logl)[Const::ChargedStable::c_SetSize], float p, float dedx, TH2F* const* pdf) const;
 
     /** should info from this detector be included in likelihood? */
     bool detectorEnabled(Dedx::Detector d) const {
@@ -91,7 +92,7 @@ namespace Belle2 {
     int m_numExtrapolations; /**< number of times GFTrackCand::extrapolate... was called after the origin */
 
     /** dedx:momentum PDFs. */
-    TH2F* m_pdfs[Dedx::c_num_detectors][Dedx::c_num_particles]; //m_pdfs[detector_type][particle_type]
+    TH2F* m_pdfs[Dedx::c_num_detectors][Const::ChargedStable::c_SetSize]; //m_pdfs[detector_type][particle_type]
 
     /** parameter for GFTrack array name. */
     std::string m_gftracks_name;

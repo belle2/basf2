@@ -128,12 +128,12 @@ void DedxPIDModule::initialize()
       double xMin, xMax, yMin, yMax;
       nBinsX = nBinsY = -1;
       xMin = xMax = yMin = yMax = 0.0;
-      for (int particle = 0; particle < c_num_particles; particle++) {
-        const int pdg_code = c_pdg_codes[particle];
-        m_pdfs[detector][particle] =
+      for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
+        const int pdg_code = Const::chargedStableSet.at(iPart).getPDGCode();
+        m_pdfs[detector][iPart] =
           dynamic_cast<TH2F*>(pdf_file->Get(TString::Format("hist_d%i_%i%s", detector, pdg_code, suffix)));
 
-        if (!m_pdfs[detector][particle]) {
+        if (!m_pdfs[detector][iPart]) {
           if (m_ignoreMissingParticles)
             continue;
           B2FATAL("Couldn't find PDF for PDG " << pdg_code << ", detector " << detector << suffix);
@@ -142,18 +142,18 @@ void DedxPIDModule::initialize()
         //check that PDFs have the same dimensions and same binning
         const double eps_factor = 1e-5;
         if (nBinsX == -1 and nBinsY == -1) {
-          nBinsX = m_pdfs[detector][particle]->GetNbinsX();
-          nBinsY = m_pdfs[detector][particle]->GetNbinsY();
-          xMin = m_pdfs[detector][particle]->GetXaxis()->GetXmin();
-          xMax = m_pdfs[detector][particle]->GetXaxis()->GetXmax();
-          yMin = m_pdfs[detector][particle]->GetYaxis()->GetXmin();
-          yMax = m_pdfs[detector][particle]->GetYaxis()->GetXmax();
-        } else if (nBinsX != m_pdfs[detector][particle]->GetNbinsX()
-                   or nBinsY != m_pdfs[detector][particle]->GetNbinsY()
-                   or fabs(xMin - m_pdfs[detector][particle]->GetXaxis()->GetXmin()) > eps_factor * xMax
-                   or fabs(xMax - m_pdfs[detector][particle]->GetXaxis()->GetXmax()) > eps_factor * xMax
-                   or fabs(yMin - m_pdfs[detector][particle]->GetYaxis()->GetXmin()) > eps_factor * yMax
-                   or fabs(yMax - m_pdfs[detector][particle]->GetYaxis()->GetXmax()) > eps_factor * yMax) {
+          nBinsX = m_pdfs[detector][iPart]->GetNbinsX();
+          nBinsY = m_pdfs[detector][iPart]->GetNbinsY();
+          xMin = m_pdfs[detector][iPart]->GetXaxis()->GetXmin();
+          xMax = m_pdfs[detector][iPart]->GetXaxis()->GetXmax();
+          yMin = m_pdfs[detector][iPart]->GetYaxis()->GetXmin();
+          yMax = m_pdfs[detector][iPart]->GetYaxis()->GetXmax();
+        } else if (nBinsX != m_pdfs[detector][iPart]->GetNbinsX()
+                   or nBinsY != m_pdfs[detector][iPart]->GetNbinsY()
+                   or fabs(xMin - m_pdfs[detector][iPart]->GetXaxis()->GetXmin()) > eps_factor * xMax
+                   or fabs(xMax - m_pdfs[detector][iPart]->GetXaxis()->GetXmax()) > eps_factor * xMax
+                   or fabs(yMin - m_pdfs[detector][iPart]->GetYaxis()->GetXmin()) > eps_factor * yMax
+                   or fabs(yMax - m_pdfs[detector][iPart]->GetYaxis()->GetXmax()) > eps_factor * yMax) {
           B2FATAL("PDF for PDG " << pdg_code << ", detector " << detector << suffix << " has binning/dimensions differing from previous PDF.")
         }
       }
@@ -475,7 +475,7 @@ void DedxPIDModule::event()
     if (!m_pdfFilename.empty()) {
       //save likelihoods
       const int dedxLikelihoodIdx = likelihood_array.getEntries();
-      new(likelihood_array.nextFreeAddress()) DedxLikelihood(track.m_logl, track.m_p);
+      new(likelihood_array.nextFreeAddress()) DedxLikelihood(track.m_logl);
       tracks_to_likelihoods.add(iGFTrack, dedxLikelihoodIdx);
     }
   } //end loop over tracks
@@ -612,24 +612,24 @@ template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const
 }
 
 
-void DedxPIDModule::saveLogLikelihood(float(&logl)[c_num_particles], float p, float dedx, TH2F* const* pdf) const
+void DedxPIDModule::saveLogLikelihood(float(&logl)[Const::ChargedStable::c_SetSize], float p, float dedx, TH2F* const* pdf) const
 {
   //all pdfs have the same dimensions
   const Int_t bin_x = pdf[0]->GetXaxis()->FindFixBin(p);
   const Int_t bin_y = pdf[0]->GetYaxis()->FindFixBin(dedx);
 
-  for (int iParticle = 0; iParticle < c_num_particles; iParticle++) {
-    if (!pdf[iParticle])
+  for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
+    if (!pdf[iPart]) //might be NULL if m_ignoreMissingParticles is set
       continue;
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise
-    if (bin_x < 1 or bin_x > pdf[iParticle]->GetNbinsX()
-        or bin_y < 1 or bin_y > pdf[iParticle]->GetNbinsY()) {
-      probability = pdf[iParticle]->GetBinContent(bin_x, bin_y);
+    if (bin_x < 1 or bin_x > pdf[iPart]->GetNbinsX()
+        or bin_y < 1 or bin_y > pdf[iPart]->GetNbinsY()) {
+      probability = pdf[iPart]->GetBinContent(bin_x, bin_y);
     } else {
       //in normal histogram range
-      probability = pdf[iParticle]->Interpolate(p, dedx);
+      probability = pdf[iPart]->Interpolate(p, dedx);
     }
 
     if (probability != probability)
@@ -639,6 +639,6 @@ void DedxPIDModule::saveLogLikelihood(float(&logl)[c_num_particles], float p, fl
     if (probability == 0.0)
       probability = m_useIndividualHits ? (1e-5) : (1e-3); //likelihoods for truncated mean are much higher
 
-    logl[iParticle] += log(probability);
+    logl[iPart] += log(probability);
   }
 }

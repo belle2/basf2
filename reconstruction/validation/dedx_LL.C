@@ -35,7 +35,7 @@ void plot(const TString &input_filename)
 
   const int show_particles = 5;
   const int num_particles = 5;
-  const int pdg_codes[] = { 211, 321, 11, 13, 2212 };
+  const int pdg_codes[] = { 211, 321, 2212, 11, 13};
   TString logl_strings[num_particles];
   for(int part = 0; part < show_particles; part++) {
     //for this particle, take its likelihood...

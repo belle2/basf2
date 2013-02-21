@@ -12,7 +12,9 @@
 #define DEDXTRACK_H
 
 #include <reconstruction/modules/dedxPID/DedxConstants.h>
+
 #include <framework/datastore/RelationsObject.h>
+#include <framework/gearbox/Const.h>
 
 #include <TVector3.h>
 
@@ -42,7 +44,7 @@ namespace Belle2 {
         m_dedx_avg[i] = m_dedx_avg_truncated[i] = m_dedx_avg_truncated_err[i] = 0.0;
 
       //for all particles
-      for (int i = 0; i < Dedx::c_num_particles; i++) {
+      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
         m_logl[i] = 0.0;
       }
     }
@@ -104,10 +106,10 @@ namespace Belle2 {
     float m_dedx_avg_truncated[Dedx::c_num_detectors]; /**< dEdX averaged for one subdetector, truncated mean */
     float m_dedx_avg_truncated_err[Dedx::c_num_detectors]; /**< standard deviation of m_dedx_avg_truncated */
 
-    //these are only filled in by DedxLikelihoodModule
-    float m_logl[Dedx::c_num_particles]; /**< log likelihood for each particle, not including momentum prior */
+    float m_logl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
-    ClassDef(DedxTrack, 3); /**< Build ROOT dictionary */
+    /** Build ROOT dictionary. */
+    ClassDef(DedxTrack, 4);
   };
 }
 #endif

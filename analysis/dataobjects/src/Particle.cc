@@ -105,7 +105,7 @@ Particle::Particle(const Track* track,
   // set PDG code TODO: ask Anze why this procedure is needed?
   int absPDGCode = chargedStable.getPDGCode();
   int signFlip = 1;
-  if (absPDGCode < Const::ChargedStable::muon.getPDGCode() + 1) signFlip = -1;
+  if (absPDGCode < Const::muon.getPDGCode() + 1) signFlip = -1;
   m_pdgCode = chargedStable.getPDGCode() * signFlip * trackFit->getCharge();
 
   // set mass

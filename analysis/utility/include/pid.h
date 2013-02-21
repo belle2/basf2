@@ -50,7 +50,7 @@ int getARICHFlag(const MCParticle* particle)
 double getTOPPID(int hyp1, int hyp2, const TOPLikelihood* logL);
 
 // returns the difference between Log likelihoods of 2 hypotheses based on dE/dx measurement
-double getDEDXPID(Dedx::Particle hyp1, Dedx::Particle hyp2, const DedxLikelihood* logL);
+double getDEDXPID(const Const::ChargedStable& hyp1, const Const::ChargedStable& hyp2, const DedxLikelihood* logL);
 
 // returns the difference between Log likelihoods of 2 hypotheses based on ARICH response
 double getARICHPID(int hyp1, int hyp2, const ARICHLikelihoods* logL);
@@ -64,7 +64,7 @@ double getTOPPID(int hyp1, int hyp2, const Track& track)
 };
 
 // returns the difference between Log likelihoods of 2 hypotheses based on dE/dx measurement
-double getDEDXPID(Dedx::Particle hyp1, Dedx::Particle hyp2, const Track& track)
+double getDEDXPID(const Const::ChargedStable& hyp1, const Const::ChargedStable& hyp2, const Track& track)
 {
   return getDEDXPID(hyp1, hyp2, getDEDXLikelihood(track));
 };

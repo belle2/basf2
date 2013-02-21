@@ -69,24 +69,24 @@ void RaveVertexFitter::addTrack(GFTrack* const aGFTrackPtr)
   }
 }
 
-void RaveVertexFitter::addTrack(const TrackFitResult* aTrackPtr)
-{
-  if (RaveSetup::s_instance->m_gfRave == true) {
-    //maybe there is a smarter way to convert TMatrixF to TMatrixDSym. If you know one feel free to change it.
-    TMatrixF cov(aTrackPtr->getCovariance6());
-    TMatrixDSym temp(6);
-    for (int i = 0; i not_eq 6; ++i) {
-      for (int j = 0; j not_eq 6; ++j) {
-        temp(i, j) = cov(i, j);
-      }
-    }
-    RKTrackRep* aTrackRepPtr = new RKTrackRep(aTrackPtr->getPosition(), aTrackPtr->getMomentum(), temp, aTrackPtr->getPDGCode());
-    m_ownGfTrackReps.push_back(static_cast<GFAbsTrackRep*>(aTrackRepPtr));
-    m_gfTrackReps.push_back(static_cast<GFAbsTrackRep*>(aTrackRepPtr));
-  } else {
-    m_raveTracks.push_back(TrackFitResultToRaveTrack(aTrackPtr));
-  }
-}
+//void RaveVertexFitter::addTrack(const TrackFitResult* aTrackPtr)
+//{
+//  if (RaveSetup::s_instance->m_gfRave == true) {
+//    //maybe there is a smarter way to convert TMatrixF to TMatrixDSym. If you know one feel free to change it.
+//    TMatrixF cov(aTrackPtr->getCovariance6());
+//    TMatrixDSym temp(6);
+//    for (int i = 0; i not_eq 6; ++i) {
+//      for (int j = 0; j not_eq 6; ++j) {
+//        temp(i, j) = cov(i, j);
+//      }
+//    }
+//    RKTrackRep* aTrackRepPtr = new RKTrackRep(aTrackPtr->getPosition(), aTrackPtr->getMomentum(), temp, aTrackPtr->getPDGCode());
+//    m_ownGfTrackReps.push_back(static_cast<GFAbsTrackRep*>(aTrackRepPtr));
+//    m_gfTrackReps.push_back(static_cast<GFAbsTrackRep*>(aTrackRepPtr));
+//  } else {
+//    m_raveTracks.push_back(TrackFitResultToRaveTrack(aTrackPtr));
+//  }
+//}
 
 void RaveVertexFitter::addTrack(GFAbsTrackRep* const aTrackRepPtr)
 {

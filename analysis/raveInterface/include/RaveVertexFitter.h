@@ -15,7 +15,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/raveInterface/RaveSetup.h>
 
-#include <tracking/dataobjects/TrackFitResult.h>
+//#include <tracking/dataobjects/TrackFitResult.h>
 //std
 #include <string>
 
@@ -51,8 +51,9 @@ namespace Belle2 {
       void addTrack(GFAbsTrackRep* const aTrackRepPtr);
       /** add a track (in the format of a Belle2::Particle) to set of tracks that should be fitted to a vertex */
       void addTrack(const Particle* aParticlePtr);
-      /** add a track (in the format of a pointer to a Belle2::TrackFitResult) to set of tracks that should be fitted to a vertex */
-      void addTrack(const TrackFitResult* aTrackPtr);
+//this is commented out unitl Trac and TrackFitResult get more stable
+      //      /** add a track (in the format of a pointer to a Belle2::TrackFitResult) to set of tracks that should be fitted to a vertex */
+//      void addTrack(const TrackFitResult* aTrackPtr);
 
       /** All daughters of the argument of this function will be used as input for the vertex fit. Writing back the result directly to the mother particle is not yet supported */
       void addMother(const Particle* aMotherParticlePtr);

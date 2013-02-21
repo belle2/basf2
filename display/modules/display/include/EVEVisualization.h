@@ -191,9 +191,6 @@ namespace Belle2 {
     /** @brief Set the scaling factor for the visualization of the errors.*/
     void setErrScale(double errScale = 1.);
 
-    /** @brief Get the error scaling factor.*/
-    double getErrScale() const;
-
     /** If true, hits created by secondary particles (e.g. delta electrons) will be assigned to the original primary particle. */
     void setAssignToPrimaries(bool on) { m_assignToPrimaries = on; }
 

@@ -116,8 +116,6 @@ void EVEVisualization::setOptions(const std::string& opts) { m_options = opts; }
 
 void EVEVisualization::setErrScale(double errScale) { m_errorScale = errScale; }
 
-double EVEVisualization::getErrScale() const { return m_errorScale; }
-
 EVEVisualization::~EVEVisualization()
 {
   if (!gEve)

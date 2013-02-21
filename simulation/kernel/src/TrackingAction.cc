@@ -65,6 +65,14 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
     currParticle.setMomentum(dpMom.x(), dpMom.y(), dpMom.z());
     currParticle.setProductionTime(track->GetGlobalTime() * Unit::ns);
     currParticle.setProductionVertex(trVtxPos.x(), trVtxPos.y(), trVtxPos.z());
+    //Get the physics process type for a secondary particle
+    if (dynamicParticle->GetPrimaryParticle() != NULL) {
+      currParticle.setSecondaryPhysicsProcess(0);
+    } else if (track->GetCreatorProcess() != NULL) {
+      currParticle.setSecondaryPhysicsProcess(track->GetCreatorProcess()->GetProcessSubType());
+    } else {
+      currParticle.setSecondaryPhysicsProcess(-1);
+    }
 
   } catch (CouldNotFindUserInfo& exc) {
     B2FATAL(exc.what())

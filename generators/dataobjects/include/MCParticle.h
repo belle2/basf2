@@ -89,7 +89,8 @@ namespace Belle2 {
       m_decayTime(0), m_decayVertex_x(0),
       m_decayVertex_y(0), m_decayVertex_z(0),
       m_mother(0),
-      m_firstDaughter(0), m_lastDaughter(0), m_spinType(c_NOTSET) {}
+      m_firstDaughter(0), m_lastDaughter(0), m_spinType(c_NOTSET),
+      m_secondaryPhysicsProcess(0) {}
 
     /**
      * Construct MCParticle from a another MCParticle and the TClonesArray it is stored in.
@@ -109,7 +110,8 @@ namespace Belle2 {
       m_decayTime(p.m_decayTime), m_decayVertex_x(p.m_decayVertex_x),
       m_decayVertex_y(p.m_decayVertex_y), m_decayVertex_z(p.m_decayVertex_z),
       m_mother(p.m_mother),
-      m_firstDaughter(p.m_firstDaughter), m_lastDaughter(p.m_lastDaughter), m_spinType(p.m_spinType) {}
+      m_firstDaughter(p.m_firstDaughter), m_lastDaughter(p.m_lastDaughter), m_spinType(p.m_spinType),
+      m_secondaryPhysicsProcess(p.m_secondaryPhysicsProcess) {}
 
     /**
      * Return PDG code of particle.
@@ -275,19 +277,32 @@ namespace Belle2 {
 
 
     /**
-     *Returns the SpinType of the particle.
-     *@return The spinType of the particle.
+     * Returns the SpinType of the particle.
+     * @return The spinType of the particle.
      */
     EspinType getSpinType() {return m_spinType;}
 
     /**
-     *Returns the SpinType of the particle as integer number.
-     *@return The spinType of the particle as integer number.
+     * Returns the SpinType of the particle as integer number.
+     * @return The spinType of the particle as integer number.
      */
     int getSpinTypeInteger() {return (int)m_spinType;}
 
     /**
-     *Check if particle is virtual
+     * Returns the physics process type of a secondary particle.
+     * @return Returns an integer indicating the physics process type of a secondary particle.
+     *                 0 if the particle is primary.
+     *                -1 if no information is found.
+     *         For the details, see the Geant4 package:
+     *         (*G4Track)->GetCreatorProcess()->GetProcessSubType()
+     *         processes/electromagnetic/utils/include/G4EmProcessSubType.hh
+     *         processes/hadronic/management/include/G4HadronicProcessType.hh
+     *         processes/decay/include/G4DecayProcessType.hh
+     */
+    int getSecondaryPhysicsProcess() {return m_secondaryPhysicsProcess;}
+
+    /**
+     * Check if particle is virtual
      *
      */
     bool isVirtual();
@@ -440,6 +455,12 @@ namespace Belle2 {
     }
 
     /**
+     * Sets the physics process type of a secondary particle.
+     * @param physics process type as an integer number for a secondary particle.
+     */
+    void setSecondaryPhysicsProcess(int physicsProcess) { m_secondaryPhysicsProcess = physicsProcess; }
+
+    /**
      * Search the DataStore for the corresponding MCParticle array.
      *
      * This function should not be needed by normal users and is called
@@ -498,6 +519,9 @@ namespace Belle2 {
     static const double c_epsilon = 10e-7;  /**< limit of precision for two doubles to be the same. */
 
     EspinType m_spinType;        /**< Spin type of the particle as provided by the generator. */
+
+    int m_secondaryPhysicsProcess;  /**< physics process type of a secondary particle */
+
     /** Class definition required for the creation of the ROOT dictionary. */
     ClassDef(MCParticle, 2);
   };

@@ -273,7 +273,7 @@ void GenFitterModule::event()
 
       //MH: Find the particle with the correct PDG Code;
       Const::ChargedStable const* chargedStable = &(Const::ChargedStable::pion);
-      switch (currentPdgCode) {
+      switch (abs(currentPdgCode)) {
         case 11: chargedStable = &(Const::ChargedStable::electron); break;
         case 13: chargedStable = &(Const::ChargedStable::muon); break;
         case 321: chargedStable = &(Const::ChargedStable::kaon); break;

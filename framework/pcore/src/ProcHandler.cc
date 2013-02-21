@@ -129,7 +129,6 @@ int ProcHandler::init_OutServer(int id)
 /// @return 1 for framework
 int ProcHandler::isFramework(void)
 {
-  // XOR-operation of all flags
   return !(m_fEvtServer || m_fEvtProc || m_fOutputSrv);
 }
 
@@ -193,10 +192,9 @@ int ProcHandler::isproc(int pid, char* exe)
   }
   if ((fp = fopen(procfile, "r")) == NULL)
     return 0;
-  if (fscanf(fp, "%19s %79s", pidstr, exename) != 2)
-    return 1;
+  int rc = fscanf(fp, "%19s %79s", pidstr, exename);
   fclose(fp);
-  if (strstr(exename, exe) != NULL)
+  if (rc != 2 || strstr(exename, exe) != NULL)
     return 1;
   return 0;
 }

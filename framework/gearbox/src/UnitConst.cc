@@ -168,11 +168,14 @@ double Const::ParticleType::getMass() const
   return getParticlePDG()->Mass();
 }
 
-const Const::ParticleType Const::electron = Const::ParticleType(11);
-const Const::ParticleType Const::muon = Const::ParticleType(13);
-const Const::ParticleType Const::pion = Const::ParticleType(211);
-const Const::ParticleType Const::kaon = Const::ParticleType(321);
-const Const::ParticleType Const::proton = Const::ParticleType(2212);
+const Const::ParticleSet Const::chargedStableSet = Const::ParticleType(211) + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(11) + Const::ParticleType(13);
+
+const Const::ChargedStable Const::electron = Const::chargedStableSet.find(11);
+const Const::ChargedStable Const::muon = Const::chargedStableSet.find(13);
+const Const::ChargedStable Const::pion = Const::chargedStableSet.find(211);
+const Const::ChargedStable Const::kaon = Const::chargedStableSet.find(321);
+const Const::ChargedStable Const::proton = Const::chargedStableSet.find(2212);
+
 const Const::ParticleType Const::photon = Const::ParticleType(22);
 const Const::ParticleType Const::pi0 = Const::ParticleType(111);
 const Const::ParticleType Const::neutron = Const::ParticleType(2112);
@@ -209,14 +212,6 @@ Const::ParticleSet operator + (const Const::ParticleSet& firstSet, const Const::
   }
   return result;
 }
-
-const Const::ParticleSet Const::chargedStable = Const::pion + Const::kaon + Const::proton + Const::electron + Const::muon;
-
-const Const::ChargedStable Const::ChargedStable::electron = Const::chargedStable.find(11);
-const Const::ChargedStable Const::ChargedStable::muon = Const::chargedStable.find(13);
-const Const::ChargedStable Const::ChargedStable::pion = Const::chargedStable.find(211);
-const Const::ChargedStable Const::ChargedStable::kaon = Const::chargedStable.find(321);
-const Const::ChargedStable Const::ChargedStable::proton = Const::chargedStable.find(2212);
 
 
 const double Const::speedOfLight   = 29.9792458;

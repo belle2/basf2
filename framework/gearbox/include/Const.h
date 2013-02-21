@@ -13,6 +13,7 @@
 
 #include <vector>
 #include <cstddef>
+#include <stdexcept>
 
 class TDatabasePDG;
 class TParticlePDG;
@@ -20,12 +21,10 @@ class TParticlePDG;
 namespace Belle2 {
 
   /**
-   * The Const class for various constants.
-   *
    * This class provides a set of constants for the framework.
    *
    * This class cannot be instantiated, use the static members directly.
-   * The implemantation can be found in UnitConst.cc
+   * The implementation can be found in UnitConst.cc
    */
   class Const {
 
@@ -61,7 +60,7 @@ namespace Belle2 {
        * @param set     Pointer to set this particle belongs to (or NULL if stand-alone).
        * @param index   Index of this particle in 'set'.
        */
-      explicit ParticleType(int pdgCode, const ParticleSet* set = NULL, unsigned int index = 0): m_pdgCode(pdgCode), m_set(set), m_index(index)  {};
+      ParticleType(int pdgCode, const ParticleSet* set = NULL, int index = -1): m_pdgCode(pdgCode), m_set(set), m_index(index)  {};
 
       /** Copy constructor.
        *
@@ -98,8 +97,11 @@ namespace Belle2 {
        */
       operator ParticleSet() const { ParticleSet s; s.add(*this); return s; }
 
-      /** This particle's index in the associated set. */
-      unsigned int getIndex() const { return m_index; }
+      /** This particle's index in the associated set.
+       *
+       * In case the particle has no set, -1 is returned.
+       */
+      int getIndex() const { return m_index; }
 
       /**
        * Accessor for ROOT TParticlePDG object.
@@ -123,7 +125,7 @@ namespace Belle2 {
     private:
       int m_pdgCode;  /**< PDG code of the particle **/
       const ParticleSet* m_set; /**< set this particle belongs to, or NULL if stand-alone. */
-      unsigned int m_index;    /**< for m_set != 0, the index in the associated set. */
+      int m_index;    /**< index in the associated set, -1 if there's no set. */
     };
 
     /** A set of ParticleType objects, with defined order.
@@ -132,8 +134,8 @@ namespace Belle2 {
      *
         \code
         B2INFO("index -> PDG code");
-        const Const::ParticleSet set = Const::chargedStable;
-        for(Const::ParticleType pdgIter = set.begin(); pdgIter != set.end(); ++pdgIter) {
+        const Const::ParticleSet set = Const::chargedStableSet;
+        for(Const::ChargedStable pdgIter = set.begin(); pdgIter != set.end(); ++pdgIter) {
           B2INFO(pdgIter.getIndex() << " -> " << pdgIter.getPDGCode());
         }
         \endcode
@@ -201,35 +203,35 @@ namespace Belle2 {
       std::vector<ParticleType> m_particles; /**< Actual particles. */
     };
 
-    /** Provides a type-safe way to pass members of the chargedStable set.
+    /** Provides a type-safe way to pass members of the chargedStableSet set.
      *
-     * As the defined static members are members of this set, this also defines
-     * a fixed index from 0 to 4 for each particle.
-     *
-     * Conversion from a general ParticleType is not possible, so users have
-     * to use Const::ChargedStable::electron instead of Const::electron.
+     * As the defined static members (Const::electron, etc. ) are members of this set,
+     * this also defines a fixed index from 0 to 4 for each particle.
      */
     class ChargedStable : public ParticleType {
     public:
-      static const ChargedStable electron;  /**< electron particle */
-      static const ChargedStable muon;      /**< muon particle */
-      static const ChargedStable pion;      /**< charged pion particle */
-      static const ChargedStable kaon;      /**< charged kaon particle */
-      static const ChargedStable proton;    /**< proton particle */
-      static const unsigned int fixedSize = 5; /**< Number of elements (for use in array bounds etc.) */
-    private:
-      /** Constructor (private to disallow conversions). */
-      ChargedStable(const ParticleType& p): ParticleType(p) { }
+      /** Constructor from the more general ParticleType.
+       *
+       * Throws a runtime_error if p is not in chargedStableSet.
+       */
+      ChargedStable(const ParticleType& p)
+        : ParticleType(chargedStableSet.find(p.getPDGCode())) {
+        if ((*this) == invalidParticle) {
+          throw std::runtime_error("Given ParticleType is not a charged stable particle!");
+        }
+      }
+      static const unsigned int c_SetSize = 5; /**< Number of elements (for use in array bounds etc.) */
     };
 
-    static const ParticleSet chargedStable; /**< set of charged stable particles */
+    static const ParticleSet chargedStableSet; /**< set of charged stable particles */
 
 
-    static const ParticleType electron;  /**< electron particle */
-    static const ParticleType muon;      /**< muon particle */
-    static const ParticleType pion;      /**< charged pion particle */
-    static const ParticleType kaon;      /**< charged kaon particle */
-    static const ParticleType proton;    /**< proton particle */
+    static const ChargedStable electron;  /**< electron particle */
+    static const ChargedStable muon;      /**< muon particle */
+    static const ChargedStable pion;      /**< charged pion particle */
+    static const ChargedStable kaon;      /**< charged kaon particle */
+    static const ChargedStable proton;    /**< proton particle */
+
     static const ParticleType photon;    /**< photon particle */
     static const ParticleType pi0;       /**< neutral pion particle */
     static const ParticleType neutron;   /**< neutron particle */
@@ -281,11 +283,11 @@ namespace Belle2 {
     };
   };
 
-  /**
-   * Combination of particle sets.
-   */
 }
 
+/**
+ * Combination of particle sets.
+ */
 Belle2::Const::ParticleSet operator + (const Belle2::Const::ParticleSet& firstSet, const Belle2::Const::ParticleSet& secondSet);
 
 #endif /* CONST_H */

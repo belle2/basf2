@@ -17,13 +17,50 @@ namespace Belle2 {
 
   };
 
+  /** Check basics. */
+  TEST_F(ConstTest, ParticleBasics)
+  {
+    //construction
+    Const::ChargedStable(Const::ParticleType(211));
+    Const::ChargedStable(Const::ParticleType(321));
+    Const::ChargedStable(Const::ParticleType(2212));
+    Const::ChargedStable(Const::ParticleType(11));
+    Const::ChargedStable(Const::ParticleType(13));
+    EXPECT_THROW(Const::ChargedStable(Const::ParticleType(22)), std::runtime_error);
+    EXPECT_THROW(Const::ChargedStable(Const::ParticleType(-211)), std::runtime_error);
+
+    const Const::ParticleSet emptyset;
+    EXPECT_FALSE(emptyset.contains(Const::Klong));
+
+    //check indices of some defined particles
+    EXPECT_EQ(0, Const::pion.getIndex());
+    EXPECT_EQ(1, Const::kaon.getIndex());
+    EXPECT_EQ(2, Const::proton.getIndex());
+    EXPECT_EQ(3, Const::electron.getIndex());
+    EXPECT_EQ(4, Const::muon.getIndex());
+
+    //and after a copy
+    Const::ChargedStable c = Const::muon;
+    EXPECT_EQ(4, c.getIndex());
+    Const::ParticleType p = Const::muon;
+    EXPECT_EQ(4, p.getIndex());
+
+    //and after construction from PDG code
+    EXPECT_EQ(4, Const::ChargedStable(13).getIndex());
+
+    //not in any set
+    EXPECT_EQ(-1, Const::invalidParticle.getIndex());
+    EXPECT_EQ(-1, Const::Klong.getIndex());
+    EXPECT_EQ(-1, Const::photon.getIndex());
+  }
+
   /** Check iteration over ParticleSets. */
   TEST_F(ConstTest, ParticleIteration)
   {
     const Const::ParticleSet emptyset;
     EXPECT_FALSE(emptyset.contains(Const::Klong));
 
-    const Const::ParticleSet set = Const::chargedStable;
+    const Const::ParticleSet set = Const::chargedStableSet;
     Const::ParticleType prefix = set.begin();
     EXPECT_EQ(1, (++prefix).getIndex());
     Const::ParticleType postfix = set.begin();
@@ -31,8 +68,10 @@ namespace Belle2 {
 
     int size = 0;
     for (Const::ParticleType pdgIter = set.begin(); pdgIter != set.end(); ++pdgIter) {
+      Const::ChargedStable c = pdgIter; //creating the restricted type should work
+
       int pdg = pdgIter.getPDGCode();
-      unsigned int index = pdgIter.getIndex();
+      unsigned int index = c.getIndex();
 
       switch (index) {
         case 0:
@@ -57,8 +96,8 @@ namespace Belle2 {
     }
     EXPECT_EQ(5, size);
 
-    Const::ChargedStable c = Const::ChargedStable::proton;
-    EXPECT_TRUE(Const::chargedStable.contains(c));
+    Const::ChargedStable c = Const::proton;
+    EXPECT_TRUE(Const::chargedStableSet.contains(c));
     EXPECT_EQ(2, c.getIndex());
     ++c;
     ++c;
@@ -70,7 +109,7 @@ namespace Belle2 {
   TEST_F(ConstTest, ParticleCombination)
   {
     //no-op
-    const Const::ParticleSet set = Const::chargedStable + Const::chargedStable;
+    const Const::ParticleSet set = Const::chargedStableSet + Const::chargedStableSet;
     int size = 0;
     for (Const::ParticleType pdgIter = set.begin(); pdgIter != set.end(); ++pdgIter) {
       size++;

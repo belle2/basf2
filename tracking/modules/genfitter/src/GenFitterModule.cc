@@ -271,13 +271,12 @@ void GenFitterModule::event()
         currentPdgCode *= -1; //swap sign
       }
 
-      //MH: Find the particle with the correct PDG Code;
-      Const::ChargedStable const* chargedStable = &(Const::ChargedStable::pion);
-      switch (abs(currentPdgCode)) {
-        case 11: chargedStable = &(Const::ChargedStable::electron); break;
-        case 13: chargedStable = &(Const::ChargedStable::muon); break;
-        case 321: chargedStable = &(Const::ChargedStable::kaon); break;
-        case 2212: chargedStable = &(Const::ChargedStable::proton); break;
+      //Find the particle with the correct PDG Code;
+      Const::ChargedStable chargedStable = Const::pion;
+      try {
+        chargedStable = Const::ChargedStable(abs(currentPdgCode));
+      } catch (...) {
+        //use pion as default
       }
 
 
@@ -418,7 +417,7 @@ void GenFitterModule::event()
               else B2WARNING("No MCParticle contributed to this track! No GFTrack<->MCParticle relation will be created!");
 
               //Set non-helix parameters
-              tracks[trackCounter]->setTrackFitResultIndex(*chargedStable, -999);
+              tracks[trackCounter]->setTrackFitResultIndex(chargedStable, -999);
               /*                            tracks[trackCounter]->setFitFailed(true);
                                           tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
                                           tracks[trackCounter]->setNHits(gfTrack.getNumHits());
@@ -500,7 +499,7 @@ void GenFitterModule::event()
               }
 
               //MH: this is new stuff...
-              tracks[trackCounter]->setTrackFitResultIndex(*chargedStable, trackFitResultCounter);
+              tracks[trackCounter]->setTrackFitResultIndex(chargedStable, trackFitResultCounter);
               new(trackFitResults->AddrAt(trackFitResultCounter)) TrackFitResult();
               trackFitResults[trackFitResultCounter]->setCharge(gfTrack.getCharge());
               trackFitResults[trackFitResultCounter]->setMomentum(resultMomentum);

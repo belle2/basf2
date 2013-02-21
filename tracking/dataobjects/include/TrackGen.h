@@ -66,8 +66,7 @@ namespace Belle2 {
      *  Currently assuming a maximum of 5 (electron, muon, pion, kaon, proton).
      *  \sa ChargedStable
      */
-//    short int m_trackFitIndices[Const::chargedStable.size()];
-    short int m_trackFitIndices[5];
+    short int m_trackFitIndices[Const::ChargedStable::c_SetSize];
 
     /** Name of array in which corresponding TrackFitResults are saved.
      */

@@ -101,7 +101,6 @@ void MCTrackFinderModule::initialize()
   // build a bit mask with all properties a MCParticle should have to lead to the creation of a track candidate
   m_particleProperties = 0;
   int aPdgCode = 0;
-  stringstream convert;
   const int nProperties = m_whichParticles.size();
   for (int i = 0; i not_eq nProperties; ++i) {
     if (m_whichParticles[i] == "primary") {

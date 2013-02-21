@@ -6,21 +6,8 @@
 #ifndef RING_BUFFER_H
 #define RING_BUFFER_H
 
-#include <iostream>
-#include <string>
-#include <errno.h>
 #include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/sem.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-
-#include <boost/format.hpp>
+#include <string>
 
 namespace Belle2 {
 
@@ -34,10 +21,10 @@ namespace Belle2 {
     int nbuf;
     int semid; /**< Semaphore ID. */
     int nattached; /**< Number of RingBuffer instances currently attached to this buffer. */
-    int redzone;
-    int readbuf;
+    int redzone; /**< Unused. */
+    int readbuf; /**< Unused. */
     int mode;
-    int msgid;
+    int msgid; /**< Unused. */
     int ninsq; /**< Count insq() calls for this buffer. */
     int nremq; /**< Count remq() calls for this buffer. */
   };
@@ -56,8 +43,8 @@ namespace Belle2 {
     /*! Function to detach and remove shared memory*/
     void cleanup(void);
 
-    /*! Append a buffer in the RingBuffer */
-    int insq(int* buf, int size);
+    /*! Append a buffer to the RingBuffer */
+    int insq(const int* buf, int size);
     /*! Pick up a buffer from the RingBuffer */
     int remq(int* buf);
     /*! Prefetch a buffer from the RingBuffer w/o removing it*/
@@ -71,8 +58,11 @@ namespace Belle2 {
     int shmid(void);
 
     // Debugging functions
+    /** Print some info on the RingBufInfo structure. */
     void dump_db(void);
+    /** Return number of insq() calls for current buffer. */
     int ninsq(void);
+    /** Return number of remq() calls for current buffer. */
     int nremq(void);
 
     /** Return number of insq() calls. */

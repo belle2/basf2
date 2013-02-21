@@ -1,10 +1,10 @@
-/// @file ring_bugger.cc
-/// @brief Ring_bugger class implementation
+/// @file RingBuffer.cc
+/// @brief RingBuffer class implementation
 /// @author Ryosuke Itoh
 /// @date Feb. 22, 2010
 
 //+
-// File : ring_buffer.cc
+// File : RingBuffer.cc
 // Description : Ring Buffer manager on shared memory
 //
 // Author : Ryosuke Itoh, IPNS, KEK
@@ -13,6 +13,19 @@
 
 #include <framework/pcore/RingBuffer.h>
 #include <framework/logging/Logger.h>
+
+#include <boost/format.hpp>
+
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/sem.h>
+#include <sys/stat.h>
+
+#include <errno.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <fcntl.h>
 
 #define REDZONE_FACTOR 0.8
 
@@ -33,7 +46,7 @@ RingBuffer::RingBuffer(int size)
   // 1. Open shared memory
   m_shmid = shmget(IPC_PRIVATE, size * 4, IPC_CREAT | 0644);
   if (m_shmid < 0) {
-    B2FATAL("RingBuffer::shmget");
+    B2FATAL("RingBuffer: shmget(" << size * 4 << ") failed. Most likely the system doesn't allow us to reserve the needed shared memory. Try 'echo 500000000 > /proc/sys/kernel/shmmax' as root to set a higher limit (500MB).");
     return;
   }
   m_shmadr = (int*) shmat(m_shmid, 0, 0);
@@ -89,42 +102,40 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
     //m_pathfd = open ( m_pathname.c_str(), O_EXCL, 0644 );
     if (m_pathfd > 0) {   // a new shared memory file created
       B2INFO("[RingBuffer] Creating a ring buffer with key " << name);
-      m_shmkey = ftok(m_pathname.c_str(), 1);
-      m_semkey = ftok(m_pathname.c_str(), 2);
       m_new = true;
     } else if (m_pathfd == -1 && errno == EEXIST) { // shm already there
       B2INFO("[RingBuffer] Attaching the ring buffer with key " << name);
-      m_shmkey = ftok(m_pathname.c_str(), 1);
-      m_semkey = ftok(m_pathname.c_str(), 2);
       m_new = false;
     } else {
       B2FATAL("RingBuffer: error to open shm file");
       return;
     }
+    m_shmkey = ftok(m_pathname.c_str(), 1);
+    m_semkey = ftok(m_pathname.c_str(), 2);
   } else { // Private
     m_file = false;
     m_new = true;
     m_shmkey = IPC_PRIVATE;
     m_semkey = IPC_PRIVATE;
-    B2INFO("[RingBUffer] Opening private ring buffer");
+    B2INFO("[RingBuffer] Opening private ring buffer");
   }
 
   // 1. Open shared memory
   m_shmid = shmget(m_shmkey, size * 4, IPC_CREAT | 0644);
   if (m_shmid < 0) {
-    B2FATAL("RingBuffer::shmget");
+    B2FATAL("RingBuffer: shmget(" << size * 4 << ") failed. Most likely the system doesn't allow us to reserve the needed shared memory. Try 'echo 500000000 > /proc/sys/kernel/shmmax' as root to set a higher limit (500MB).");
     return;
   }
   m_shmadr = (int*) shmat(m_shmid, 0, 0);
   if (m_shmadr == (int*) - 1) {
-    B2FATAL("RingBuffer::shmat");
+    B2FATAL("RingBuffer: shmat() failed");
     return;
   }
 
   // 2. Open Semaphore
   m_semid = semget(m_semkey, 1, IPC_CREAT | 0644);
   if (m_semid < 0) {
-    B2FATAL("RingBuffer::semget");
+    B2FATAL("RingBuffer: semget() failed");
     return;
   }
   //  cout << "Semaphore created" << endl;
@@ -165,26 +176,6 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
   B2INFO(boost::format("buftop = %1%, end = %2%\n") % m_buftop % (m_buftop + m_bufinfo->size));
 }
 
-/* OLD implementation
-RingBuffer::RingBuffer(int shm_id)
-{
-  m_shmid = shm_id;
-  m_shmadr = (int *) shmat(m_shmid, 0, 0);
-  if (m_shmadr == (int*) - 1) {
-    perror("RingBuffer::shmat");
-    return;
-  }
-  m_bufinfo = (struct RingBufInfo*) m_shmadr;
-  m_buftop = m_shmadr + sizeof(RingBufInfo);
-  m_semid = m_bufinfo->semid;
-  m_bufinfo->nattached++;
-
-  m_remq_counter = 0;
-  m_insq_counter = 0;
-
-}
-*/
-
 RingBuffer::~RingBuffer(void)
 {
   cleanup();
@@ -212,9 +203,7 @@ void RingBuffer::dump_db(void)
          m_bufinfo->wptr, m_bufinfo->rptr, m_bufinfo->nbuf);
 }
 
-// Func
-
-int RingBuffer::insq(int* buf, int size)
+int RingBuffer::insq(const int* buf, int size)
 {
   //  printf ( "insq: requesting : %d, nbuf = %d\n", size, m_bufinfo->nbuf );
   if (size < 0) {

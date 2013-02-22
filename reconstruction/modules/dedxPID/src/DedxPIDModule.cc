@@ -70,8 +70,8 @@ DedxPIDModule::DedxPIDModule() : Module()
 
   //Parameter definitions
   addParam("UseIndividualHits", m_useIndividualHits, "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", true);
-  addParam("RemoveLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded if UseIndividualHits is false", double(0.15));
-  addParam("RemoveHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded if UseIndividualHits is false", double(0.15));
+  addParam("RemoveLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded if UseIndividualHits is false", double(0.0));
+  addParam("RemoveHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded if UseIndividualHits is false", double(0.8));
 
   addParam("OnlyPrimaryParticles", m_onlyPrimaryParticles, "Only save data for primary particles (as determined by MC truth)", false);
   addParam("UsePXD", m_usePXD, "Use PXD hits for dE/dx calculation", false);

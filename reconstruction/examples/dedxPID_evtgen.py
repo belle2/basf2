@@ -53,8 +53,8 @@ main.add_module(genfit)
 dedx = register_module('DedxPID')
 dedx_params = {
     'UseIndividualHits': True,
-    'RemoveLowest': 0.15,
-    'RemoveHighest': 0.15,
+    'RemoveLowest': 0.0,
+    'RemoveHighest': 0.8,
     'OnlyPrimaryParticles': False,
     'UsePXD': False,
     'UseSVD': True,

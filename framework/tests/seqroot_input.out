@@ -13,7 +13,7 @@
 [INFO] (Object)  MCParticlesToARICHSimHits
 [INFO] (Array)   ARICHAeroHits             1
 [INFO] (Array)   ARICHSimHits              72
-[INFO] (Array)   MCParticles               762
+[INFO] (Array)   MCParticles               1
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------
@@ -31,7 +31,7 @@
 [INFO] (Object)  MCParticlesToARICHSimHits
 [INFO] (Array)   ARICHAeroHits             1
 [INFO] (Array)   ARICHSimHits              78
-[INFO] (Array)   MCParticles               753
+[INFO] (Array)   MCParticles               1
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------
@@ -49,7 +49,7 @@
 [INFO] (Object)  MCParticlesToARICHSimHits
 [INFO] (Array)   ARICHAeroHits             1
 [INFO] (Array)   ARICHSimHits              109
-[INFO] (Array)   MCParticles               807
+[INFO] (Array)   MCParticles               1
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------
@@ -67,7 +67,7 @@
 [INFO] (Object)  MCParticlesToARICHSimHits
 [INFO] (Array)   ARICHAeroHits             1
 [INFO] (Array)   ARICHSimHits              56
-[INFO] (Array)   MCParticles               732
+[INFO] (Array)   MCParticles               2
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------
@@ -85,7 +85,7 @@
 [INFO] (Object)  MCParticlesToARICHSimHits
 [INFO] (Array)   ARICHAeroHits             1
 [INFO] (Array)   ARICHSimHits              9
-[INFO] (Array)   MCParticles               392
+[INFO] (Array)   MCParticles               9
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------

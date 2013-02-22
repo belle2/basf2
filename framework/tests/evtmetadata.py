@@ -25,6 +25,16 @@ class EvtMetaDataTest(Module):
         self.setName('EvtMetaDataTest')
         B2INFO('event\trun\texp')
 
+    def initialize(self):
+        """reimplementation of Module::initialize()."""
+
+        B2INFO('EvtMetaDataTest::initialize()')
+
+    def beginRun(self):
+        """reimplementation of Module::beginRun()."""
+
+        B2INFO('EvtMetaDataTest::beginRun()')
+
     def event(self):
         """reimplementation of Module::event()."""
 
@@ -40,10 +50,15 @@ class EvtMetaDataTest(Module):
                 # stop event processing.
                 evtmetadata.obj().setEndOfData()
 
+    def endRun(self):
+        """reimplementation of Module::endRun()."""
+
+        B2INFO('EvtMetaDataTest::endRun()')
+
     def terminate(self):
         """reimplementation of Module::terminate()."""
 
-        B2INFO('terminating EvtMetaDataTest')
+        B2INFO('EvtMetaDataTest::terminate()')
 
 
 # Normal steering file part begins here

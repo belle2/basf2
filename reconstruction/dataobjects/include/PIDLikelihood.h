@@ -35,15 +35,8 @@ namespace Belle2 {
 
   public:
 
-    /*! detector type enumerators, FIXME: to be replaced by the constants from Const.h */
-    enum EDetector {c_Top, c_Arich, c_Dedx, c_NumofDet};
-
     /*! default constructor: log likelihoods and flags set to 0 */
-    PIDLikelihood(): m_flags(0) {
-      for (int i = 0; i < c_NumofDet; i++) {
-        for (Const::ParticleType k = Const::chargedStableSet.begin(); k != Const::chargedStableSet.end(); ++k) m_logl[i][k.getIndex()] = 0.0;
-      }
-    }
+    PIDLikelihood();
 
     /*! set TOP likelihoods and corresponding reconstruction flag
      * @param logl TOPLikelihood pointer
@@ -60,46 +53,32 @@ namespace Belle2 {
      */
     void setLikelihoods(const DedxLikelihood* logl);
 
-    /*! get reconstruction flag for a given detector
-     * @param det detector enumerator
-     * @return flag
+    /*! check whether PID information from a given set of detectors is available
+     * @param set  set of detector IDs
+     * @return     true if the given set of detectors contributed to the PID information
      */
-    bool getFlag(EDetector det) const {return (m_flags >> det & 1);}
+    bool isAvailable(Const::PIDDetectorSet set) const {return  m_detectors.contains(set);}
 
-    /*! get log likelihood for a given detector and particle
-     * @param det detector enumerator
-     * @param part particle enumerator
-     * @return log likelihood
+    /*! get log likelihood for a given detector set and particle
+     * @param set  set of detector IDs
+     * @param part particle type
+     * @return     log likelihood
      */
-    float getLogL(EDetector det, const Const::ChargedStable& part) const {return m_logl[det][part.getIndex()];}
+    float getLogL(const Const::ChargedStable& part, Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
 
-    /*! get combined likelihood probability for particle being p1 and not p2
+    /*! get combined likelihood probability for particle being p1 and not p2 assuming equal prior probablilites
      * @param p1 particle enumerator
      * @param p2 particle enumerator
+     * @param set set of detector IDs
      * @return likelihood probability P_{p1/p2} (a value btw. 0 and 1)
      */
-    double getProbability(const Const::ChargedStable& p1, const Const::ChargedStable& p2) const;
-
-    /*! get likelihood probability for particle being p1 and not p2 using single detector
-     * @param p1 particle enumerator
-     * @param p2 particle enumerator
-     * @param det detector enumerator
-     * @return likelihood probability P_{p1/p2} (a value btw. 0 and 1)
-     */
-    double getProbability(const Const::ChargedStable& p1, const Const::ChargedStable& p2, EDetector det) const {
-      return probability(m_logl[det][p1.getIndex()], m_logl[det][p2.getIndex()]);
-    }
+    double getProbability(const Const::ChargedStable& p1, const Const::ChargedStable& p2, Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
 
   private:
-    int m_flags;  /**< reconstruction flags (one bit for each detector)*/
-    float m_logl[c_NumofDet][Const::ChargedStable::c_SetSize]; /**< log likelihoods */
+    Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
+    float m_logl[8][Const::ChargedStable::c_SetSize]; /**< log likelihoods */
 
-    /*! Set flag for a given detector
-     * @param det detector enumerator
-     */
-    void setFlag(EDetector det) { m_flags = m_flags | (1 << det);}
-
-    /*! Calculate likelihood probability from log likelihood difference logl1-logl2
+    /*! Calculate likelihood probability from log likelihood difference logl1-logl2 assuming equal prior probablilites
      * @param logl1 log likelihood
      * @param logl2 log likelihood
      * @return likelihood probability (a value btw. 0 and 1)

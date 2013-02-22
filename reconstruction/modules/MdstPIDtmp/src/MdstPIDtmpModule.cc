@@ -21,6 +21,7 @@
 #include <top/dataobjects/TOPLikelihood.h>
 #include <arich/dataobjects/ARICHLikelihoods.h>
 #include <reconstruction/dataobjects/DedxLikelihood.h>
+#include <tracking/dataobjects/Track.h>
 #include <GFTrack.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
 #include <generators/dataobjects/MCParticle.h>
@@ -52,6 +53,7 @@ namespace Belle2 {
     // data store registration
     StoreArray<PIDLikelihood>::registerPersistent();
     RelationArray::registerPersistent<GFTrack, PIDLikelihood>();
+    RelationArray::registerPersistent<Track, PIDLikelihood>();
 
   }
 
@@ -85,14 +87,14 @@ namespace Belle2 {
       DataStore::addRelationFromTo(tracks[itra], pid);
 
       // reconstructed track
-      const GFTrack* track = tracks[itra];
+      const GFTrack* gfTrack = tracks[itra];
 
       // set top likelihoods
-      const TOPLikelihood* top = DataStore::getRelated<TOPLikelihood>(track);
+      const TOPLikelihood* top = DataStore::getRelated<TOPLikelihood>(gfTrack);
       if (top) pid->setLikelihoods(top);
 
       // set arich likelihoods
-      const MCParticle* part = DataStore::getRelated<MCParticle>(track);
+      const MCParticle* part = DataStore::getRelated<MCParticle>(gfTrack);
       if (part) {
         const ARICHAeroHit* aero = part->getRelated<ARICHAeroHit>();
         const ARICHLikelihoods* arich = DataStore::getRelated<ARICHLikelihoods>(aero);
@@ -100,8 +102,14 @@ namespace Belle2 {
       }
 
       // set dedx likelihoods
-      const DedxLikelihood* dedx = DataStore::getRelated<DedxLikelihood>(track);
+      const DedxLikelihood* dedx = DataStore::getRelated<DedxLikelihood>(gfTrack);
       if (dedx) pid->setLikelihoods(dedx);
+
+      // relation between mdst track and likelihoods
+      const Track* track = DataStore::getRelated<Track>(gfTrack);
+      if (track) {
+        DataStore::addRelationFromTo(track, pid);
+      }
     }
 
   }

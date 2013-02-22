@@ -27,6 +27,10 @@ def add_reconstruction(path, components=None):
         trackfitter = register_module('GenFitter')
         path.add_module(trackfitter)
 
+        # dE/dx PID
+        dEdxPID = register_module('DedxPID')
+        path.add_module(dEdxPID)
+
         # track extrapolation
         ext = register_module('Ext')
         ext.param('GFTracksColName', 'GFTracks')  # input to ext
@@ -67,5 +71,36 @@ def add_reconstruction(path, components=None):
         # K0L reconstruction
         eklm_k0l_rec = register_module('EKLMK0LReconstructor')
         path.add_module(eklm_k0l_rec)
+
+    # charged particle PID
+    if components == None or 'PXD' in components or 'SVD' in components \
+        or 'CDC' in components:
+        mdstPID = register_module('MdstPIDtmp')
+        path.add_module(mdstPID)
+
+
+def add_mdst_output(path, mc=True):
+    """
+    This function adds the mdst output modules to a path.
+    """
+
+    output = register_module('RootOutput')
+    output.param('outputFileName', 'mdst.root')
+    branches = [
+        'Tracks',
+        'TrackFitResults',
+        'PIDLikelihoods',
+        'TracksToPIDLikelihoods',
+        'ECLShowers',
+        'ECLGammas',
+        'ECLGammasToECLShowers',
+        'ECLPi0s',
+        'ECLPi0sToECLGammas',
+        'EKLMK0Ls',
+        ]
+    if mc:
+        branches += ['MCParticles', 'TracksToMCParticles']
+    output.param('branchNames', branches)
+    path.add_module(output)
 
 

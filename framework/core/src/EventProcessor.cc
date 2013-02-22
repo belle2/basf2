@@ -284,7 +284,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 #endif
 
   //End last run
-  if (currEvent > 0) {
+  if (currEvent > 0 && previousEventMetaData != endEventMetaData) {
     eventMetaDataPtr.create();
     *eventMetaDataPtr = previousEventMetaData;
     processEndRun(modulePathList);

@@ -181,6 +181,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
   //Remember the previous event meta data, and identify end of data meta data
   EventMetaData previousEventMetaData;
   EventMetaData endEventMetaData;
+  previousEventMetaData.setEndOfData(); //invalid start state
   endEventMetaData.setEndOfData();
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
 

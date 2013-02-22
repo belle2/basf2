@@ -8,10 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "framework/modules/evtmetagen/EvtMetaGenModule.h"
+#include <framework/modules/evtmetagen/EvtMetaGenModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/core/Environment.h>
 
 #include <vector>
@@ -31,8 +29,7 @@ REG_MODULE(EvtMetaGen)
 EvtMetaGenModule::EvtMetaGenModule() : Module()
 {
   //Set module properties
-  setDescription("Sets the event meta data information (exp, run, evt).");
-  setPropertyFlags(c_InitializeInProcess);
+  setDescription("Sets the event meta data information (exp, run, evt). You must use this module to tell basf2 about the number of events you want to generate, unless you have an input module that already does so.");
 
   //Parameter definition
   std::vector<int> defaultExpRunList;
@@ -40,8 +37,8 @@ EvtMetaGenModule::EvtMetaGenModule() : Module()
   std::vector<int> defaultEvtNum;
   defaultEvtNum.push_back(1);
 
-  addParam("ExpList",      m_expList,      "The list for the experiment numbers.", defaultExpRunList);
-  addParam("RunList",      m_runList,      "The list for the run numbers.",        defaultExpRunList);
+  addParam("ExpList",      m_expList,      "The list of experiment numbers.", defaultExpRunList);
+  addParam("RunList",      m_runList,      "The list of run numbers.",        defaultExpRunList);
   addParam("EvtNumList",   m_evtNumList,   "The list for the number of events which should be processed.", defaultEvtNum);
 }
 

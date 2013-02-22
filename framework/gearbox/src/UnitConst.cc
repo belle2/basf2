@@ -130,10 +130,86 @@ namespace Belle2 {
 
 /*** The implementation of the Const class defined in Const.h starts here ***/
 
-Const::EDetector detectorsArray[] = {Const::IR, Const::PXD, Const::SVD, Const::CDC,
-                                     Const::TOP, Const::ARICH, Const::ECL, Const::BKLM, Const::EKLM
-                                    };
-const std::vector<Const::EDetector> Const::detectors(detectorsArray, detectorsArray + 9);
+Const::DetectorSet operator + (const Const::DetectorSet& firstSet, const Const::DetectorSet& secondSet)
+{
+  Const::DetectorSet set(firstSet);
+  set += secondSet;
+  return set;
+}
+
+Const::DetectorSet operator - (const Const::DetectorSet& firstSet, const Const::DetectorSet& secondSet)
+{
+  Const::DetectorSet set(firstSet);
+  set -= secondSet;
+  return set;
+}
+
+Const::DetectorSet operator + (Const::EDetector firstDet, Const::EDetector secondDet)
+{
+  Const::DetectorSet set(firstDet);
+  set += secondDet;
+  return set;
+}
+
+unsigned short Const::DetectorSet::getBit(Const::EDetector det) const
+{
+  return (1 << det);
+}
+
+Const::EDetector Const::DetectorSet::getDetector(unsigned short bit) const
+{
+  switch (bit) {
+    case 0x0001: return IR;
+    case 0x0002: return PXD;
+    case 0x0004: return SVD;
+    case 0x0008: return CDC;
+    case 0x0010: return TOP;
+    case 0x0020: return ARICH;
+    case 0x0040: return ECL;
+    case 0x0080: return BKLM;
+    case 0x0100: return EKLM;
+    default: return invalidDetector;
+  }
+}
+
+int Const::DetectorSet::getIndex(EDetector det) const
+{
+  unsigned short bit = getBit(det);
+  if ((m_bits & bit) == 0) return -1;
+  int index = 0;
+  for (unsigned short setBit = 1; setBit < bit; setBit *= 2) {
+    if ((m_bits & setBit) != 0) ++index;
+  }
+  return index;
+}
+
+Const::EDetector Const::DetectorSet::operator [](int index) const
+{
+  if (index < 0) return Const::invalidDetector;
+  for (unsigned short setBit = 1; setBit < 0x200; setBit *= 2) {
+    if ((m_bits & setBit) != 0) --index;
+    if (index < 0) return getDetector(setBit);
+  }
+  return Const::invalidDetector;
+}
+
+size_t Const::DetectorSet::size() const
+{
+  int size = 0;
+  for (unsigned short setBit = 1; setBit < 0x200; setBit *= 2) {
+    if ((m_bits & setBit) != 0) ++size;
+  }
+  return size;
+}
+
+
+const Const::DetectorSet Const::TrackingDetectors::c_set = Const::PXD + Const::SVD + Const::CDC;
+
+const Const::DetectorSet Const::PIDDetectors::c_set = Const::SVD + Const::CDC + Const::TOP + Const::ARICH;
+
+Const::DetectorSet allDetectors = Const::IR + Const::PXD + Const::SVD + Const::CDC +
+                                  Const::TOP + Const::ARICH + Const::ECL + Const::BKLM + Const::EKLM;
+
 
 bool Const::ParticleType::operator < (const Const::ParticleType& other) const
 {

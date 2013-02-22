@@ -11,9 +11,9 @@
 #ifndef CONST_H
 #define CONST_H
 
-#include <vector>
 #include <cstddef>
 #include <stdexcept>
+#include <framework/core/FrameworkExceptions.h>
 
 class TDatabasePDG;
 class TParticlePDG;
@@ -33,15 +33,181 @@ namespace Belle2 {
     /**
      * The enum for identifying the detector components.
      */
-    enum EDetector {IR = 0x0001, PXD = 0x0002, SVD = 0x0004, CDC = 0x0008,
-                    TOP = 0x0010, ARICH = 0x0020, ECL = 0x0040, BKLM = 0x0080,
-                    EKLM = 0x0100
-                   };
+    enum EDetector {IR, PXD, SVD, CDC, TOP, ARICH, ECL, BKLM, EKLM, invalidDetector};
 
     /**
-     * The vector of all detectors.
+     * The DetectorSet class for sets of detector IDs.
      */
-    static const std::vector<EDetector> detectors;
+    class DetectorSet {
+    public:
+
+      /**
+       * Default constructor.
+       */
+      DetectorSet(): m_bits(0) {};
+
+      /**
+       * Copy constructor.
+       * @param set  The copied set of detector IDs.
+       */
+      DetectorSet(const DetectorSet& set): m_bits(set.m_bits) {}
+
+      /**
+       * Constructor for a set containig one detector ID.
+       * @param det  The ID of the detector.
+       */
+      DetectorSet(EDetector det): m_bits(getBit(det)) {}
+
+      /**
+       * Addition of another set to this one.
+       * @param set  The other set of detector IDs.
+       */
+      DetectorSet& operator += (const DetectorSet& set) {m_bits |= set.m_bits; return *this;}
+
+      /**
+       * Subtraction of another set from this one.
+       * @param set  The other set of detector IDs.
+       */
+      DetectorSet& operator -= (const DetectorSet& set) {m_bits &= ~set.m_bits; return *this;}
+
+      /**
+       * Equality operator.
+       * @param set  The other set of detector IDs.
+       */
+      bool operator == (const DetectorSet& set) const {return m_bits == set.m_bits;}
+
+      /**
+       * Inequality operator.
+       * @param set  The other set of detector IDs.
+       */
+      bool operator != (const DetectorSet& set) const {return m_bits != set.m_bits;}
+
+      /**
+       * Check whether this set contains another set.
+       * @param set  The other set of detector IDs.
+       */
+      bool contains(const DetectorSet& set) const {return (m_bits & set.m_bits) == set.m_bits;}
+
+      /**
+       * Getter for the index of a given detector in this set.
+       * @param det  The detector ID.
+       * @return     Index of the detector ID in this set, or -1 if the detector ID is not in this set.
+       */
+      int getIndex(EDetector det) const;
+
+      /**
+       * Accessor for a detector ID in this set.
+       * @param index  The index in the set.
+       * @return       The detector ID at the given index, or Const::invalidDetector if the index is out of range.
+       */
+      EDetector operator [](int index) const;
+
+      /**
+       * Getter for number of detector IDs in this set.
+       */
+      size_t size() const;
+
+    private:
+
+      /**
+       * Constructor.
+       * @param bits  The internal representation of the set as bit pattern.
+       */
+      DetectorSet(unsigned short bits): m_bits(bits) {};
+
+      /**
+       * Conversion of detector ID to bit pattern.
+       * @param det  The detector ID.
+       * @return     The bit pattern representing the given detector ID.
+       */
+      unsigned short getBit(EDetector det) const;
+
+      /**
+       * Conversion of bit pattern to detector ID.
+       * @param det  The bit pattern.
+       * @return     The detector ID corresponding to the given bit pattern.
+       */
+      EDetector getDetector(unsigned short bit) const;
+
+      unsigned short m_bits;  /**< The internal representation of the set as bit pattern. */
+    };
+
+    /**
+     * A class for sets of detector IDs whose content is limited to restricted set of valid detector IDs.
+     */
+    template <class ASetType> class RestrictedDetectorSet: public DetectorSet {
+    public:
+
+      /**
+       * Exception that is thrown if there is the attempt to add an invalid detector ID to a restricted set.
+       */
+      BELLE2_DEFINE_EXCEPTION(InvalidDetectorTypeError, "The given detector is not a valid element of the set!");
+
+      /**
+       * Default constructor.
+       */
+      RestrictedDetectorSet(): DetectorSet() {}
+
+      /**
+       * (Copy) constructor.
+       * @param set  The copied set of detector IDs.
+       */
+      RestrictedDetectorSet(const DetectorSet& set): DetectorSet(set) {checkSet();}
+
+      /**
+       * Constructor for a set containg one detector ID.
+       * @param det  The detector ID.
+       */
+      RestrictedDetectorSet(EDetector det): DetectorSet(det) {checkSet();}
+
+      /**
+       * Addition of another set to this one.
+       * @param set  The other set of detector IDs.
+       */
+      RestrictedDetectorSet& operator += (const DetectorSet& set) {DetectorSet::operator +=(set); checkSet(); return *this;}
+
+      /**
+       * Accessor for the set of valid detector IDs.
+       * @return  The set of valid detector IDs.
+       */
+      static DetectorSet set() {return ASetType::set();}
+    private:
+
+      /**
+       * Check of set validity. If an invalid detector ID is found an exception is thrown.
+       */
+      void checkSet() const {if (!ASetType::set().contains(*this)) throw InvalidDetectorTypeError();}
+    };
+
+
+    /**
+     * A class that defines the valid set of tracking detectors.
+     * To be used as a template argument for RestrictedDetectorSet.
+     */
+    class TrackingDetectors {
+    public:
+      static DetectorSet set() {return c_set;}  /**< Accessor function for the set of valid detectors */
+      static const DetectorSet c_set;           /**< The set of valid tracking detectors */
+    };
+    /** Typedef for set of tracking detectors. */
+    typedef RestrictedDetectorSet<TrackingDetectors> TrackingDetectorSet;
+
+    /**
+     * A class that defines the valid set of PID detectors.
+     * To be used as a template argument for RestrictedDetectorSet.
+     */
+    class PIDDetectors {
+    public:
+      static DetectorSet set() {return c_set;}  /**< Accessor function for the set of valid detectors */
+      static const DetectorSet c_set;           /**< The set of valid PID detectors */
+    };
+    /** Typedef for set of PID detectors. */
+    typedef RestrictedDetectorSet<PIDDetectors> PIDDetectorSet;
+
+    /**
+     * The set of all detectors.
+     */
+    static const DetectorSet allDetectors;
 
     class ParticleSet;
 
@@ -284,6 +450,21 @@ namespace Belle2 {
   };
 
 }
+
+/**
+ * Combination of detector sets.
+ */
+Belle2::Const::DetectorSet operator + (const Belle2::Const::DetectorSet& firstSet, const Belle2::Const::DetectorSet& secondSet);
+
+/**
+ * Subtraction of one detector sets from another one.
+ */
+Belle2::Const::DetectorSet operator - (const Belle2::Const::DetectorSet& firstSet, const Belle2::Const::DetectorSet& secondSet);
+
+/**
+ * Combination of two detector IDs to a set.
+ */
+Belle2::Const::DetectorSet operator + (Belle2::Const::EDetector firstDet, Belle2::Const::EDetector secondDet);
 
 /**
  * Combination of particle sets.

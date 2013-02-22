@@ -66,13 +66,15 @@ class EvtMetaDataTest(Module):
 # Create main path
 main = create_path()
 
-# exp 0 has only 2 events, so cannot trigger the test module,
-# exp 1 has no events and will be skipped
-# exp 2 will be stopped in event 3 by EvtMetaDataTest
+# exp 0 has only 2 events, so cannot trigger the test module
+# also tests for a problem where beginRun() wasn't called
+# exp 1 has only 2 events, so cannot trigger the test module,
+# exp 2 has no events and will be skipped
+# exp 3 will be stopped in event 3 by EvtMetaDataTest
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('ExpList', [0, 1, 2])
-evtmetagen.param('RunList', [1, 2, 3])
-evtmetagen.param('EvtNumList', [2, 0, 5])
+evtmetagen.param('ExpList', [0, 1, 2, 3])
+evtmetagen.param('RunList', [0, 1, 2, 3])
+evtmetagen.param('EvtNumList', [2, 2, 0, 5])
 
 evtmetadatatest = EvtMetaDataTest()
 

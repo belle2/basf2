@@ -64,4 +64,8 @@ def add_reconstruction(path, components=None):
         eklm_rec = register_module('EKLMReconstructor')
         path.add_module(eklm_rec)
 
+        # K0L reconstruction
+        eklm_k0l_rec = register_module('EKLMK0LReconstructor')
+        path.add_module(eklm_k0l_rec)
+
 

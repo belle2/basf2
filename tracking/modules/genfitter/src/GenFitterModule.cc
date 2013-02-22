@@ -394,7 +394,7 @@ void GenFitterModule::event()
           //B2DEBUG(99,"       Forward Chi2: "<<gfTrack.getForwardChiSqu());
           B2DEBUG(99, "       NDF of the fit: " << gfTrack.getNDF());
           //Calculate probability
-          double pValue = TMath::Prob(gfTrack.getChiSqu(), gfTrack.getNDF()); //TODO change to getPVal when next Genfit version is in externals
+          double pValue = gfTrack.getPVal();
           B2DEBUG(99, "       pValue of the fit: " << pValue);
           //B2DEBUG(99,"       Covariance matrix: ");
           //gfTrack.getTrackRep(0)->getCov().Print();

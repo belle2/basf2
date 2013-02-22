@@ -13,16 +13,16 @@
 
 /* Extrenal headers. */
 #include <CLHEP/Geometry/Point3D.h>
-#include <TObject.h>
+
+/* Belle 2 headers. */
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
   /**
    * Base hit class.
-   * @details
-   * EKLMHitBase class is inherited from TObject to make all hits storable.
    */
-  class EKLMHitBase: public TObject  {
+  class EKLMHitBase: public RelationsObject {
 
   public:
 

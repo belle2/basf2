@@ -142,10 +142,8 @@ void DisplayModule::event()
   m_visualizer->addSimHits(StoreArray<PXDSimHit>());
   m_visualizer->addSimHits(StoreArray<SVDSimHit>());
   m_visualizer->addSimHits(StoreArray<ECLHit>());
-
-  //aw, not derived from RelationsObject/SimHitBase yet
-  //addSimHits(m_visualizer, StoreArray<BKLMSimHit>());
-  //addSimHits(m_visualizer, StoreArray<EKLMStepHit>());
+  m_visualizer->addSimHits(StoreArray<EKLMStepHit>());
+  //m_visualizer->addSimHits(StoreArray<BKLMSimHit>());
 
   StoreArray<BKLMSimHit> bklmhits;
   RelationIndex<MCParticle, BKLMSimHit> mcpart_to_bklmhits(mcparticles, bklmhits);
@@ -159,20 +157,6 @@ void DisplayModule::event()
 
     m_visualizer->addSimHit(bklmhits[i], el->from);
   }
-
-  StoreArray<EKLMStepHit> eklmhits;
-  RelationIndex<MCParticle, EKLMStepHit> mcpart_to_eklmhits(mcparticles, eklmhits);
-  const int nEKLMHits = eklmhits.getEntries();
-  for (int i = 0; i < nEKLMHits; i++) {
-    const RelationIndexContainer<MCParticle, EKLMStepHit>::Element* el = mcpart_to_eklmhits.getFirstElementTo(eklmhits[i]);
-    if (!el) {
-      B2WARNING("MCParticle not found for EKLMStepHit, skipping hit!");
-      continue;
-    }
-
-    m_visualizer->addSimHit(eklmhits[i], el->from);
-  }
-
 
   if (m_showGFTracks) {
     //gather reconstructed tracks

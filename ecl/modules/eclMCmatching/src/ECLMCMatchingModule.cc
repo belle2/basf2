@@ -121,14 +121,40 @@ void ECLMCMatchingModule::event()
                << " P " << mcParticles[mcParticles[iPart]->getMother()->getArrayIndex()]->getMomentum().Mag() << endl;
     */
 
-    if (mcParticles[iPart]->getMother() == NULL) {
+    bool adhoc_StableInGeneratorFlag(mcParticles[iPart]->hasStatus(MCParticle::c_StableInGenerator));
+    if (mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle) && ! adhoc_StableInGeneratorFlag
+        && mcParticles[iPart]->getFirstDaughter() > 0) {
+      for (int daughterIndex = mcParticles[iPart]->getFirstDaughter() - 1;
+           daughterIndex < mcParticles[iPart]->getLastDaughter();
+           daughterIndex++) {
+        if (! mcParticles[daughterIndex]->hasStatus(MCParticle::c_PrimaryParticle)) {
+          adhoc_StableInGeneratorFlag = true;
+        }
+      }
+    }
+    // skip particles decayed in the generator
+    if (mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle)
+        && !adhoc_StableInGeneratorFlag) continue;
+
+    // fill primary particles as the origins
+    if (mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle)
+        && adhoc_StableInGeneratorFlag) {
 
       if (mcParticles[iPart]->getArrayIndex() == -1)
       {     eclPrimaryMap.insert(pair<int, int>(iPart, iPart));}
       else {eclPrimaryMap.insert(pair<int, int>(mcParticles[iPart]->getArrayIndex(), mcParticles[iPart]->getArrayIndex()));}
       //cout<<"mom "<<mcParticles[iPart]->getArrayIndex() <<endl;
     } else {
-      eclPrimaryMap.insert(pair<int, int>(mcParticles[iPart]->getArrayIndex(), eclPrimaryMap[mcParticles[iPart]->getMother()->getArrayIndex() ]));
+      // set primary of its mother for others
+      //assert(mcParticles[iPart]->getMother());
+      //assert(eclPrimaryMap.find(mcParticles[iPart]->getMother()->getArrayIndex())!=eclPrimaryMap.end());
+      if (eclPrimaryMap.find(mcParticles[iPart]->getMother()->getArrayIndex()) != eclPrimaryMap.end()) {
+        eclPrimaryMap.insert(pair<int, int>(mcParticles[iPart]->getArrayIndex(), eclPrimaryMap[mcParticles[iPart]->getMother()->getArrayIndex()]));
+      } else {
+        B2ERROR(boost::format("Cannot find eclPrimaryMap entry for the mother of MCParticle ID: %d")
+                % mcParticles[iPart]->getMother()->getArrayIndex());
+        eclPrimaryMap.insert(pair<int, int>(mcParticles[iPart]->getArrayIndex(), mcParticles[iPart]->getArrayIndex()));
+      }
       //cout<<"mom "<<mcParticles[iPart]->getMother()->getArrayIndex() <<" "<<mcParticles[iPart]->getArrayIndex()<<endl;
     }
   }

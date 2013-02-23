@@ -50,12 +50,6 @@ namespace Belle2 {
       m_Mass = 0;        /**< combined Mass  (GeV) */
       m_MassFit = 0;     /**< MassFit (GeV) */
       m_Chi2 = 0;        /**< Chi square of fit (GeV) */
-      m_errorMatrix.ResizeTo(4, 4);
-      for (int i = 0; i < 4; i++) {
-        for (int j = 0; j <= i ; j++) {
-          m_errorMatrix[i][j] = 0;
-        }
-      }
     }
 
 

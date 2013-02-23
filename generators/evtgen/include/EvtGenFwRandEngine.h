@@ -23,7 +23,7 @@ public:
    */
 
   virtual double random() {
-    return gRandom->Uniform(1.0);
+    return gRandom->Uniform(1.0);  /* Function random */
   }
 };
 

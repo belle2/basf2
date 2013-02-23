@@ -11,8 +11,8 @@
 #ifndef BKLMSIMHIT_H
 #define BKLMSIMHIT_H
 
-#include <TObject.h>
 #include <TVector3.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -20,7 +20,7 @@ namespace Belle2 {
   /*! Per ROOT TObject convention, all data elements are public so that
       they can be seen in a ROOT browser.
   */
-  class BKLMSimHit : public TObject {
+  class BKLMSimHit : public RelationsObject {
 
   public:
 

@@ -17,13 +17,13 @@ using namespace Belle2;
 ClassImp(BKLMHit2d)
 
 //! empty constructor
-BKLMHit2d::BKLMHit2d() : TObject()
+BKLMHit2d::BKLMHit2d() : RelationsObject()
 {
 }
 
 //! Constructor with orthogonal 1D hits
 BKLMHit2d::BKLMHit2d(const BKLMDigit* hit1, const BKLMDigit* hit2) :
-  TObject()
+  RelationsObject()
 {
   // DIVOT see common/com-klm/hit/KlmHit2D initializer
   // this is a dummy line to make use of symbols hit1 and hit2
@@ -34,7 +34,7 @@ BKLMHit2d::BKLMHit2d(const BKLMDigit* hit1, const BKLMDigit* hit2) :
 BKLMHit2d::BKLMHit2d(int status, bool isForward, int sector, int layer,
                      const double position[2], const double positionError[2],
                      double time, double energy) :
-  TObject(),
+  RelationsObject(),
   m_Status(status),
   m_IsForward(isForward),
   m_Sector(sector),
@@ -51,7 +51,7 @@ BKLMHit2d::BKLMHit2d(int status, bool isForward, int sector, int layer,
 
 //! Copy constructor
 BKLMHit2d::BKLMHit2d(const BKLMHit2d& h) :
-  TObject(h),
+  RelationsObject(h),
   m_Status(h.m_Status),
   m_IsForward(h.m_IsForward),
   m_Sector(h.m_Sector),

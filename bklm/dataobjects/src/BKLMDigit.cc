@@ -17,7 +17,7 @@ using namespace Belle2;
 ClassImp(BKLMDigit)
 
 //! empty constructor
-BKLMDigit::BKLMDigit() : TObject()
+BKLMDigit::BKLMDigit() : RelationsObject()
 {
 }
 
@@ -25,7 +25,7 @@ BKLMDigit::BKLMDigit() : TObject()
 BKLMDigit::BKLMDigit(unsigned int status, bool isForward, int sector,
                      int layer, bool isPhiReadout, int strip,
                      double time, double energy) :
-  TObject(),
+  RelationsObject(),
   m_Status(status),
   m_IsForward(isForward),
   m_Sector(sector),
@@ -39,7 +39,7 @@ BKLMDigit::BKLMDigit(unsigned int status, bool isForward, int sector,
 
 //! Copy constructor
 BKLMDigit::BKLMDigit(const BKLMDigit& h) :
-  TObject(h),
+  RelationsObject(h),
   m_Status(h.m_Status),
   m_IsForward(h.m_IsForward),
   m_Sector(h.m_Sector),

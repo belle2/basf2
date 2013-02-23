@@ -11,7 +11,7 @@
 #ifndef BKLMRAWHIT_H
 #define BKLMRAWHIT_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -20,7 +20,7 @@ namespace Belle2 {
       they can be seen in a ROOT browser.
   */
 
-  class BKLMRawHit : public TObject {
+  class BKLMRawHit : public RelationsObject {
 
   public:
 

@@ -17,14 +17,14 @@ using namespace Belle2;
 ClassImp(BKLMRawHit)
 
 //! empty constructor
-BKLMRawHit::BKLMRawHit() : TObject()
+BKLMRawHit::BKLMRawHit() : RelationsObject()
 {
 }
 
 //! Constructor with initial values
 BKLMRawHit::BKLMRawHit(unsigned int status, int crate, int slot, int channel,
                        int tdc, int adc) :
-  TObject(),
+  RelationsObject(),
   m_Status(status),
   m_Crate(crate),
   m_Slot(slot),
@@ -36,7 +36,7 @@ BKLMRawHit::BKLMRawHit(unsigned int status, int crate, int slot, int channel,
 
 //! Copy constructor
 BKLMRawHit::BKLMRawHit(const BKLMRawHit& h) :
-  TObject(h),
+  RelationsObject(h),
   m_Status(h.m_Status),
   m_Crate(h.m_Crate),
   m_Slot(h.m_Slot),

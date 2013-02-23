@@ -11,7 +11,7 @@
 #ifndef BKLMDIGIT_H
 #define BKLMDIGIT_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 // Definition of each bit in m_Status
 // BKLMDigit originated from MC simulation (rather than real data)
@@ -35,7 +35,7 @@ namespace Belle2 {
   /*! Per ROOT TObject convention, all data elements are public so that
       they can be seen in a ROOT browser.
   */
-  class BKLMDigit : public TObject {
+  class BKLMDigit : public RelationsObject {
 
   public:
 

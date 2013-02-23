@@ -75,27 +75,30 @@ namespace Belle2 {
     /** Method is called for each event. */
     virtual void event();
 
-    //
+    /** Do a vertex fit **/
     unsigned doKvFit(const Particle* p, double& confLevel);
+    /** Do a mass constrained fit **/
     unsigned doKmFit(Particle& p, double& confLevel);
+    /** Do a mass-vertex constrained fit **/
     unsigned doKmvFit(const Particle* p, double& confLevel);
-
+    /** **/
     unsigned makeMother(MassVertexFitKFit& km, Particle* mother);
+    /** **/
     unsigned makeMother(VertexFitKFit& kv, Particle* mother);
 
-    // Generated info Related functions
+    /** Generated info Related functions **/
     int isBtoD0PiDecay(MCParticle* part);
     int isD0Decay(MCParticle* part);
     void removeFSRPhoton(std::vector<MCParticle*> daughters, std::vector<MCParticle*> &daughtersWithoutFSR);
 
   protected:
-    std::string  m_mcParticlesColName;         /**< MCParticles collection name. */
-    std::string  m_gfTrackCandColName;         /**< Track Candidates collection name. */
-    std::string  m_gfTracksColName;            /**< GFTracks collection name. */
-    std::string  m_tracksColName;              /**< Tracks collection name. */
-    std::string  m_gammasColName;              /**< Gammas collection name. */
-    std::string  m_eclsColName;                /**< ECLs collection name. */
-    std::string  m_pi0sColName;                /**< pi0s collection name. */
+    std::string  m_mcParticlesColName;     /**< MCParticles collection name. */
+    std::string  m_gfTrackCandColName;     /**< Track Candidates collection name. */
+    std::string  m_gfTracksColName;        /**< GFTracks collection name. */
+    std::string  m_tracksColName;          /**< Tracks collection name. */
+    std::string  m_gammasColName;          /**< Gammas collection name. */
+    std::string  m_eclsColName;            /**< ECLs collection name. */
+    std::string  m_pi0sColName;            /**< pi0s collection name. */
 
     /** output root file name (given as Module parameter) */
     std::string m_dataOutFileName;

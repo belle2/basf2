@@ -123,13 +123,11 @@ namespace Belle2 {
           int zStripMax = -1;
           convertHitToRPCStrips(position, isForward, sector, layer, phiStripMin, phiStripMax, zStripMin, zStripMax);
           if (phiStripMin >= 0) {
-            std::cout << "BKLMSimulation:  de=" << deltaE << "  time=" << time << "  position=(" << position.x() << "," << position.y() << "," << position.z() << ")  isForward=" << isForward << "  sector=" << sector << "  layer=" << layer << "  plane=" << plane << "  phiStrips=" << phiStripMin << "-" << phiStripMax << std::endl;
             new(simHits.nextFreeAddress())
             BKLMSimHit(position, time, deltaE, KE, status, isForward, sector, layer, plane, true, phiStripMin, phiStripMax);
             particleToSimHits.add(track->GetTrackID(), simHits.getEntries() - 1);
           }
           if (zStripMin >= 0) {
-            std::cout << "BKLMSimulation:  de=" << deltaE << "  time=" << time << "  position=(" << position.x() << "," << position.y() << "," << position.z() << ")  isForward=" << isForward << "  sector=" << sector << "  layer=" << layer << "  plane=" << plane << "  zStrips=" << zStripMin << "-" << zStripMax << std::endl;
             new(simHits.nextFreeAddress())
             BKLMSimHit(position, time, deltaE, KE, status, isForward, sector, layer, plane, false, zStripMin, zStripMax);
             particleToSimHits.add(track->GetTrackID(), simHits.getEntries() - 1);

@@ -55,22 +55,24 @@ namespace Belle2 {
     }
 
     int setup(const std::string& decayFileName, const std::string& pdlFileName, const std::string& parentParticle, const std::string& userFileName = std::string(""));
+    /* Member setup for user decay  */
     int simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle);
-
+    /* MC simulation function */
     TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
 
   private:
     int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph);
+    /* Function to add particle decays */
     void updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle);
-
+    /* Function to update particle decays */
 
   protected:
-    EvtParticle* m_parent;
-    EvtStdHep   m_evtstdhep;
-    EvtGenFwRandEngine m_eng;
-    EvtGen* m_Generator;
-    EvtVector4R m_pinit;
-    EvtId m_ParentParticle;
+    EvtParticle* m_parent;      /* Variable needed for parent particle  */
+    EvtStdHep   m_evtstdhep;    /* Variable needed for STDHEP format    */
+    EvtGenFwRandEngine m_eng;   /* Variable needed for random generator */
+    EvtGen* m_Generator;        /* Variable needed for EvtGen generator */
+    EvtVector4R m_pinit;        /* Variable needed for initial momentum */
+    EvtId m_ParentParticle;     /* Variable needed for parent particle ID*/
   };
 
 }

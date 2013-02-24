@@ -7,14 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/dataobjects/TrackFitResultGen.h>
+#include <tracking/dataobjects/TrackFitResult.h>
 #include <GFAbsTrackRep.h>
 
 using namespace Belle2;
 
-ClassImp(TrackFitResultGen);
+ClassImp(TrackFitResult);
 
-TrackFitResultGen::TrackFitResultGen() : m_pdg(0), m_pValue(0), m_charge(0)
+TrackFitResult::TrackFitResult() : m_pdg(0), m_pValue(0), m_charge(0)
 {
 }
 /*
@@ -24,33 +24,33 @@ TrackFitResult::TrackFitResult(const GFAbsTrackRep& gfAbsTrackRep)
 */
 // This class should be able to give back Helix information either in Perigee Parametrisation
 // or as starting position + momentum.
-TVector3 TrackFitResultGen::getPosition() const
+TVector3 TrackFitResult::getPosition() const
 {
   return m_position;
 }
-void TrackFitResultGen::setPosition(const TVector3& position)
+void TrackFitResult::setPosition(const TVector3& position)
 {
   m_position = position;
 }
 
 
 
-TVector3 TrackFitResultGen::getMomentum() const
+TVector3 TrackFitResult::getMomentum() const
 {
   return m_momentum;
 }
 
-void TrackFitResultGen::setMomentum(const TVector3& momentum)
+void TrackFitResult::setMomentum(const TVector3& momentum)
 {
   m_momentum = momentum;
 }
 
-TMatrixF TrackFitResultGen::getCovariance6() const
+TMatrixF TrackFitResult::getCovariance6() const
 {
   return m_cov;
 }
 
-void TrackFitResultGen::setCovariance6(const TMatrixF& covariance)
+void TrackFitResult::setCovariance6(const TMatrixF& covariance)
 {
   m_cov.ResizeTo(6, 6);
   m_cov = covariance;

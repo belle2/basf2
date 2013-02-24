@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/dataobjects/TrackGen.h>
+#include <tracking/dataobjects/Track.h>
 
 using namespace Belle2;
 
-ClassImp(TrackGen);
+ClassImp(Track);

@@ -10,7 +10,7 @@
 #pragma once
 
 #include <framework/gearbox/Const.h>
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
 #include <TMatrixF.h>
 #include <cstdlib>
@@ -22,7 +22,7 @@ namespace Belle2 {
 
   /** Values of the result of a track fit with a given particle hypothesis.
    */
-  class TrackFitResult : public TObject {
+  class TrackFitResult : public RelationsObject {
   public:
     /** Constructor for I/O purpuses.
      */

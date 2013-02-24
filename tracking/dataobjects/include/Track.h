@@ -11,6 +11,7 @@
 #include <framework/gearbox/Const.h>
 #include <tracking/dataobjects/TrackFitResult.h>
 #include <framework/logging/Logger.h>
+#include <framework/datastore/RelationsObject.h>
 #include <algorithm>
 #pragma once
 
@@ -25,7 +26,7 @@ namespace Belle2 {
    *  (which is what remains of the various TrackReps, that Genfit might use during the fit).
    */
   // template <typename T>
-  class Track : public TObject {
+  class Track : public RelationsObject {
   public:
     /** Constuctor without arguments; needed for I/O.
      */

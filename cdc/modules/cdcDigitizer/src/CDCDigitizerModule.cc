@@ -56,7 +56,8 @@ CDCDigitizerModule::CDCDigitizerModule() : Module()
   //float Gauss Parameters
   addParam("Fraction",                    m_fraction,    "Fraction of first Gaussian used to smear drift length in cm",    0.5710);
   addParam("Mean1",                       m_mean1,       "Mean value of first Gaussian used to smear drift length in cm",  0.0000);
-  addParam("Resolution1",                 m_resolution1, "Resolution of first Gaussian used to smear drift length in cm",  0.0089);
+  //  addParam("Resolution1",                 m_resolution1, "Resolution of first Gaussian used to smear drift length in cm",  0.0010);
+  addParam("Resolution1",                 m_resolution1, "Resolution of first Gaussian used to smear drift length in cm",  0.0086);
   addParam("Mean2",                       m_mean2,       "Mean value of second Gaussian used to smear drift length in cm", 0.0000);
   addParam("Resolution2",                 m_resolution2, "Resolution of second Gaussian used to smear drift length in cm", 0.0188);
 

@@ -8,7 +8,6 @@
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationIndex.h>
 
 #include <GFTrack.h>
 #include <GFFieldManager.h>
@@ -143,20 +142,7 @@ void DisplayModule::event()
   m_visualizer->addSimHits(StoreArray<SVDSimHit>());
   m_visualizer->addSimHits(StoreArray<ECLHit>());
   m_visualizer->addSimHits(StoreArray<EKLMStepHit>());
-  //m_visualizer->addSimHits(StoreArray<BKLMSimHit>());
-
-  StoreArray<BKLMSimHit> bklmhits;
-  RelationIndex<MCParticle, BKLMSimHit> mcpart_to_bklmhits(mcparticles, bklmhits);
-  const int nBKLMHits = bklmhits.getEntries();
-  for (int i = 0; i < nBKLMHits; i++) {
-    const RelationIndexContainer<MCParticle, BKLMSimHit>::Element* el = mcpart_to_bklmhits.getFirstElementTo(bklmhits[i]);
-    if (!el) {
-      B2WARNING("MCParticle not found for BKLMSimHit, skipping hit!");
-      continue;
-    }
-
-    m_visualizer->addSimHit(bklmhits[i], el->from);
-  }
+  m_visualizer->addSimHits(StoreArray<BKLMSimHit>());
 
   if (m_showGFTracks) {
     //gather reconstructed tracks

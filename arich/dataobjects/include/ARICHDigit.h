@@ -12,7 +12,7 @@
 #define ARICHDIGIT_H
 
 // ROOT
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -21,7 +21,7 @@ namespace Belle2 {
   /*! This class holds the ARICH hit information after digitization (obtained from ARICHSimHit after ARICHDigitizer module). Contains only module number, channel number and global time.
   */
 
-  class ARICHDigit : public TObject {
+  class ARICHDigit : public RelationsObject {
 
   public:
 

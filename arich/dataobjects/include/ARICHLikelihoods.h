@@ -11,7 +11,7 @@
 #ifndef ARICHLIKELIHOODS_H
 #define ARICHLIKELIHOODS_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -20,7 +20,7 @@ namespace Belle2 {
    *  It is the output for reconstruction module (TOPReconstructor).
    */
 
-  class ARICHLikelihoods : public TObject {
+  class ARICHLikelihoods : public RelationsObject {
 
   public:
 

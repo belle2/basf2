@@ -11,7 +11,7 @@
 #ifndef ARICHAEROHIT_H
 #define ARICHAEROHIT_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
 
 namespace Belle2 {
@@ -21,7 +21,7 @@ namespace Belle2 {
   */
 
 
-  class ARICHAeroHit : public TObject {
+  class ARICHAeroHit : public RelationsObject {
   public:
 
     //! Empty constructor

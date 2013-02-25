@@ -11,8 +11,8 @@
 #ifndef ARICHSIMHIT_H
 #define ARICHSIMHIT_H
 
-#include <TObject.h>
 #include <TVector3.h>
+#include <generators/dataobjects/SimHitBase.h>
 
 namespace Belle2 {
 
@@ -23,7 +23,7 @@ namespace Belle2 {
     It is also the input for digitization module (ARICHDigi).
    */
 
-  class ARICHSimHit : public TObject {
+  class ARICHSimHit : public SimHitBase {
   public:
 
     //! Default constructor

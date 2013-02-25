@@ -82,7 +82,7 @@ namespace Belle2 {
       string Tungsten  = content.getString("Tungsten");
       string CFRP  = content.getString("CFRP");
       string NEMA_G10_Plate  = content.getString("NEMA_G10_Plate");
-      string CDC_Glue  = content.getString("CDCGlue");
+      //string CDC_Glue  = content.getString("CDCGlue");
 
       //TGeoRotation* geoRot = new TGeoRotation("CDCRot", 90.0, globalRotAngle, 0.0);
       //TGeoVolumeAssembly* volGrpCDC = addSubdetectorGroup("CDC", new TGeoCombiTrans(0.0, 0.0, globalOffsetZ, geoRot));
@@ -98,7 +98,7 @@ namespace Belle2 {
       double* outerWallBZ     = new double[nOuterWall];
       double* outerWallFZ     = new double[nOuterWall];
       // Used in density calculation.
-      double rmin_outerWall;
+      double rmin_outerWall = 1500.0 * mm;
 
       for (int iOuterWall = 0; iOuterWall < nOuterWall; ++iOuterWall) {
         GearDir outerWallContent(content);
@@ -172,7 +172,7 @@ namespace Belle2 {
       G4Material* medTungsten = G4Material::GetMaterial(Tungsten.c_str());
       G4Material* medCFRP = geometry::Materials::get(CFRP.c_str());
       G4Material* medNEMA_G10_Plate = geometry::Materials::get(NEMA_G10_Plate.c_str());
-      G4Material* medCDC_Glue = geometry::Materials::get(CDC_Glue.c_str());
+      //      G4Material* medCDC_Glue = geometry::Materials::get(CDC_Glue.c_str());
       G4Material* medAir = geometry::Materials::get("Air");
 
 

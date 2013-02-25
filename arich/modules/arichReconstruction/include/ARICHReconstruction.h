@@ -104,7 +104,7 @@ namespace Belle2 {
       */
       int  CherenkovPhoton(TVector3 r, TVector3 rh,
                            TVector3& rf, TVector3& dirf,
-                           double* refind, double* z, int n, int nmir);
+                           double* refind, double* z, int n);
     };
 
 

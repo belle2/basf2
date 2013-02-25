@@ -67,7 +67,7 @@ namespace Belle2 {
     {
 
       StoreArray<ARICHTrack> arichTracks;
-      unsigned int tsize = arichTracks->GetLast() + 1;
+      unsigned int tsize = arichTracks.getEntries();
 
       for (unsigned  int i = 0; i < tsize; i++) {
         ARICHTrack* track = arichTracks[i];
@@ -168,7 +168,7 @@ namespace Belle2 {
 
     int ARICHReconstruction::CherenkovPhoton(TVector3 r, TVector3 rh,
                                              TVector3& rf, TVector3& dirf,
-                                             double* refind, double* z, int n, int nmir)
+                                             double* refind, double* z, int n)
     {
       //
       // Description:
@@ -266,9 +266,9 @@ namespace Belle2 {
       const double p_mass[5] = { 0.000511, 0.10566, 0.13957, 0.49368, 0.93827};// mass of particles in GeV
 
       StoreArray<ARICHTrack> arichTracks;
-      unsigned int tsize = arichTracks->GetLast() + 1;
+      unsigned int tsize = arichTracks.getEntries();
       StoreArray<ARICHDigit> arichDigits;
-      unsigned int hsize = arichDigits->GetLast() + 1;
+      unsigned int hsize = arichDigits.getEntries();
 
       if (tsize == 0) return 0;
 
@@ -432,7 +432,7 @@ namespace Belle2 {
               // calculate fi_ch for a given track refl
               TVector3 virthitpos =  HitVirtualPosition(hitpos, mirrors[mirr]);
 
-              if (CherenkovPhoton(epoint, virthitpos, initialrf, dirf, &refind[ar], &zaero[ar], asize - ar, 0) < 0)  continue;
+              if (CherenkovPhoton(epoint, virthitpos, initialrf, dirf, &refind[ar], &zaero[ar], asize - ar) < 0)  continue;
 
               TVector3 dirch = TransformToFixed(edir) * dirf;
               double fi_cer = dirch.Phi();

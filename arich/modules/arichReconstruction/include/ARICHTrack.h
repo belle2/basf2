@@ -61,8 +61,18 @@ namespace Belle2 {
       m_originalPosition  =  r;
       m_originalDirection =  dir;
       m_originalMomentum  =  p;
+      m_reconstructedPosition = TVector3(0, 0, 0);
+      m_reconstructedDirection = TVector3(0, 0, 0);
+      m_reconstructedMomentum = -1;
+      m_PDGCharge = 0;
       m_PDGEncoding = type;
       m_G4TrackID = trackID;
+      m_identity = -1;
+      for (int i = 0; i < MAXLKH; i++) {
+        m_lkh[i]  = 0;
+        m_sfot[i] = 0;
+        m_acc[i]  = 0;
+      }
     };
 
 
@@ -144,7 +154,7 @@ namespace Belle2 {
     const TVector3& getMeanEmissionDirection() const {return m_reconstructedDirection;};
 
     //! Returns mean emission direction of Cherenkov photons from i-th aerogel (same as reconstructed track direction)
-    const TVector3& getMeanEmissionDirection(int i) const {return m_reconstructedDirection;};
+    const TVector3& getMeanEmissionDirection(int) const {return m_reconstructedDirection;};
 
     //! Returns track position at the aergel exit (exit from last layer).
     const TVector3 getAerogelExit(void) const {
@@ -158,7 +168,7 @@ namespace Belle2 {
     const TVector3 getAerogelInput(int i) const ;
 
     //! Returns track direction at point with z coordinate "zout" (assumes straight track).
-    const TVector3& getDirectionAtZ(double zout) const {
+    const TVector3& getDirectionAtZ(double) const {
       return m_originalDirection;
     }
 

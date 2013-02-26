@@ -25,8 +25,7 @@ namespace Belle2 {
     TrackFitResult myResult;
     float pValue = 0.45;
     myResult.setPValue(pValue);
-    EXPECT_LT(pValue - 1e-5, myResult.getPValue());
-    EXPECT_GT(pValue + 1e-5, myResult.getPValue());
+    EXPECT_DOUBLE_EQ(pValue, myResult.getPValue());
 
     myResult.setCharge(1);
     EXPECT_EQ(1, myResult.getCharge());
@@ -57,24 +56,18 @@ namespace Belle2 {
     //The following should be replaced with proper inspection,
     // if the TVector3 are compatible within the tolerance.
     //Position
-    EXPECT_LT(pos.Mag() - 1e-5, myResult.getPosition().Mag());
-    EXPECT_GT(pos.Mag() + 1e-5, myResult.getPosition().Mag());
+    EXPECT_DOUBLE_EQ(pos.Mag(), myResult.getPosition().Mag());
 
-    EXPECT_LT(pos.Phi() - 1e-5, myResult.getPosition().Phi());
-    EXPECT_GT(pos.Phi() + 1e-5, myResult.getPosition().Phi());
+    EXPECT_DOUBLE_EQ(pos.Phi(), myResult.getPosition().Phi());
 
-    EXPECT_LT(pos.Eta() - 1e-5, myResult.getPosition().Eta());
-    EXPECT_GT(pos.Eta() + 1e-5, myResult.getPosition().Eta());
+    EXPECT_DOUBLE_EQ(pos.Eta(), myResult.getPosition().Eta());
 
     //Momentum
-    EXPECT_LT(mom.Mag() - 1e-5, myResult.getMomentum().Mag());
-    EXPECT_GT(mom.Mag() + 1e-5, myResult.getMomentum().Mag());
+    EXPECT_DOUBLE_EQ(mom.Mag(), myResult.getMomentum().Mag());
 
-    EXPECT_LT(mom.Phi() - 1e-5, myResult.getMomentum().Phi());
-    EXPECT_GT(mom.Phi() + 1e-5, myResult.getMomentum().Phi());
+    EXPECT_DOUBLE_EQ(mom.Phi(), myResult.getMomentum().Phi());
 
-    EXPECT_LT(mom.Eta() - 1e-5, myResult.getMomentum().Eta());
-    EXPECT_GT(mom.Eta() + 1e-5, myResult.getMomentum().Eta());
+    EXPECT_DOUBLE_EQ(mom.Eta(), myResult.getMomentum().Eta());
 
     //Covariance
     //Dangerous, because expectation of bite-wise equality is unreasonable if there are internal

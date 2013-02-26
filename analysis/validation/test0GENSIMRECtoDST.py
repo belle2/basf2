@@ -47,7 +47,7 @@ output = register_module('RootOutput')
 output.param('outputFileName', '../GENSIMRECtoDST.dst.root')
 main.add_module(output)
 
-#Go!
+# Go!
 process(main)
 
 # Print call statistics

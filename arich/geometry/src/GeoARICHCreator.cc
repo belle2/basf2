@@ -74,6 +74,13 @@ namespace Belle2 {
     void GeoARICHCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
     {
 
+      if (type == 0) {
+        B2INFO("Geometry type: Full")
+      } else if (type == 1) {
+        B2INFO("Geometry type: Tracking")
+      } else if (type == 2) {
+        B2INFO("Geometry type: Display")
+      }
       string Type = content.getString("@type", "");
       if (Type == "beamtest") {
         createSimple(content, topVolume);
@@ -99,7 +106,7 @@ namespace Belle2 {
         G4Material* material = Materials::get(materialName);
         // check of material and its refractive index
         if (!material) { B2FATAL("Material '" << materialName << "', required by ARICH Envelope could not be found");}
-        if (!getAvgRINDEX(material)) B2WARNING("Materal '" << materialName << "', required by ARICH Envelope has no specified refractive index. Continuing, but no photons in ARICH will be propagated.") ;
+        if (!getAvgRINDEX(material)) B2WARNING("Material '" << materialName << "', required by ARICH Envelope has no specified refractive index. Continuing, but no photons in ARICH will be propagated.") ;
         // create and place
         envelope = new G4LogicalVolume(envelopeTube, material, "Envelope");
         setVisibility(*envelope, false);

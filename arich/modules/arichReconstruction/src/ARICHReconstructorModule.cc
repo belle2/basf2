@@ -47,20 +47,27 @@ namespace Belle2 {
 //                 Implementation
 //-----------------------------------------------------------------
 
-    ARICHReconstructorModule::ARICHReconstructorModule() : Module() , m_ana(0)
+    ARICHReconstructorModule::ARICHReconstructorModule() :
+      m_ana(0),
+      m_timeCPU(0),
+      m_nRun(0),
+      m_nEvent(0)
     {
       // Set description()
       setDescription("ARICHReconstructor");
       setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
-      std::vector<double> defMerit; defMerit.push_back(30.0); defMerit.push_back(30.0); defMerit.push_back(30.0);
+      std::vector<double> defMerit;
+      defMerit.push_back(30.0);
+      defMerit.push_back(30.0);
+      defMerit.push_back(30.0);
       // Add parameters
       addParam("InputColName", m_inColName, "Input collection name", string("AeroHitARICHArray"));
       addParam("OutputColName", m_outColName, "Output col lection name",  string("ARICHTrackArray"));
       addParam("TrackPositionResolution", m_trackPosRes, "Resolution of track position on aerogel plane", 1.0 * Unit::mm);
       addParam("TrackAngleResolution", m_trackAngRes, "Resolution of track direction angle on aerogel plane", 1.0 * Unit::mrad);
-      addParam("AerogelFigureOfMerit", m_aeroMerit, "Aerogel figure of merit", defMerit);
       addParam("BackgroundLevel", m_bkgLevel, "Background level in photon hits per m^2", 0.0);
       addParam("SinglePhotonResolution", m_singleRes, "Single photon resolution without pad", 0.03 * Unit::mm);
+      addParam("AerogelFigureOfMerit", m_aeroMerit, "Aerogel figure of merit", defMerit);
     }
 
     ARICHReconstructorModule::~ARICHReconstructorModule()

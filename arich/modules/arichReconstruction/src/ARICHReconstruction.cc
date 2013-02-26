@@ -440,7 +440,7 @@ namespace Belle2 {
 
               if (fabs(th_cer - thc[track->getIdentity()][0]) < 0.05 && ar == 0 && nfoo == nfot) nfot++;
               if (fi_cer < 0) fi_cer += 2 * M_PI;
-              double fii;
+              double fii = 0;
               if (mirr > 0) {
                 double fi_mir = _arichgp->getMirrorNormal(mirrors[mirr]).XYvector().Phi();
                 fii = 2 * fi_mir - fi_cer - M_PI;

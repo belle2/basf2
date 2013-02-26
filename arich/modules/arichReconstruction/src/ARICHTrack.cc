@@ -22,10 +22,18 @@ ARICHTrack::ARICHTrack(const ARICHAeroHit& aeroHit)
   m_originalDirection = aeroHit.getMomentum();
   m_originalMomentum =   m_originalDirection.Mag();
   m_originalDirection =  m_originalDirection.Unit();
+  m_reconstructedPosition = TVector3(0, 0, 0);
+  m_reconstructedDirection = TVector3(0, 0, 0);
+  m_reconstructedMomentum = -1.0;
+  m_PDGCharge = 0; // check if aeroHit contains this info
   m_PDGEncoding = aeroHit.getParticleID();
   m_G4TrackID = aeroHit.getTrackID();
   m_identity = Lund2Type(m_PDGEncoding);
-
+  for (int i = 0; i < MAXLKH; i++) {
+    m_lkh[i] = 0;
+    m_sfot[i] = 0;
+    m_acc[i] = 0;
+  }
 }
 
 int ARICHTrack::Lund2Type(int ipart)

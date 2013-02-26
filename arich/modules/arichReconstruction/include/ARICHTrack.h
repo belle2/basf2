@@ -40,6 +40,11 @@ namespace Belle2 {
       m_G4TrackID(-1),
       m_identity(-1) {
       /*! does nothing */
+      for (int i = 0; i < MAXLKH; i++) {
+        m_lkh[i] = 0;
+        m_sfot[i] = 0;
+        m_acc[i] = 0;
+      }
     }
 
     //! Constructor from track hit on aerogel plane */

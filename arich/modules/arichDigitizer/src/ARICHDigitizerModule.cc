@@ -44,7 +44,13 @@ namespace Belle2 {
     //                 Implementation
     //-----------------------------------------------------------------
 
-    ARICHDigitizerModule::ARICHDigitizerModule() : Module(),
+    ARICHDigitizerModule::ARICHDigitizerModule() :
+      Module(),
+      m_inColName(""),
+      m_outColName(""),
+      m_timeCPU(0),
+      m_nRun(0),
+      m_nEvent(0),
       m_arichgp(ARICHGeometryPar::Instance())
     {
       // Set description()

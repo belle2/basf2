@@ -22,9 +22,6 @@
 #include <cmath>
 #include <boost/format.hpp>
 
-using namespace std;
-using namespace boost;
-
 #define MAX_N_ALAYERS 5
 
 namespace Belle2 {

@@ -391,11 +391,11 @@ void MCTrackFinderModule::event()
       continue; //goto next mcParticle, do not make track candidate
     }
     //Now create TrackCandidate
-    int counter = trackCandidates->GetLast() + 1;
+    int counter = trackCandidates.getEntries();
     B2DEBUG(100, "We came pass all filter of the MCPartile and hit properties. TrackCandidate " << counter << " will be created from the MCParticle with index: " << iPart << " (PDG: " << aMcParticlePtr->getPDG() << ")");
 
     //create TrackCandidate
-    new(trackCandidates->AddrAt(counter)) GFTrackCand();
+    trackCandidates.appendNew();
 
     //set track parameters from MCParticle information
     TVector3 positionTrue = aMcParticlePtr->getProductionVertex();

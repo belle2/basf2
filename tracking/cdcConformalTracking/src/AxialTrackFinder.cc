@@ -557,7 +557,7 @@ void AxialTrackFinder::CollectTrackCandidates(vector<CDCSegment> & cdcAxialSegme
         } //end extension for short tracks
 
         //Finally add the candidate to the StoreArray
-        new(cdcTrackCandidates->AddrAt(counter)) CDCTrackCandidate(bestCandidate, counter);
+        new(cdcTrackCandidates.nextFreeAddress()) CDCTrackCandidate(bestCandidate, counter);
         B2INFO("Candidate " << counter << " with " << cdcTrackCandidates[counter]->getNSegments() << " Segments added to final collection ...");
 
       }

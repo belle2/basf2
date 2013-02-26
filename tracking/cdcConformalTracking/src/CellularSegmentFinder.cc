@@ -266,7 +266,7 @@ void CellularSegmentFinder::FindSegments(string CDCTrackHits, string CDCSegments
     //use oldcounter to not overwrite already created segments
     for (int i = oldcounter; i <= segmentcounter; i++) {
       B2DEBUG(149, "Create Segment Nr " << i << "  in Superlayer " << sl);
-      new(cdcSegments->AddrAt(i)) CDCSegment(sl, i);    //create Segment and put it in the StoreArray
+      new(cdcSegments.nextFreeAddress()) CDCSegment(sl, i);    //create Segment and put it in the StoreArray
 
       //assign hits to this segment
       for (int j = 0; j < nHits; j++) {

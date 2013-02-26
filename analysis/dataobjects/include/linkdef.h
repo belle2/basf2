@@ -7,5 +7,6 @@
 
 #pragma link C++ class Belle2::Particle;
 #pragma link C++ class vector<Belle2::Particle*>;
+#pragma link C++ class Belle2::ParticleList;
 
 #endif

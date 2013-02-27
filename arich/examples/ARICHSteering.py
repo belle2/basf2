@@ -98,6 +98,12 @@ simulation.param('PhotonFraction', 0.3)
 #                            '/vis/modeling/trajectories/create/drawByCharge'])
 # =============================================================================
 
+# =============================================================================
+# ARICH Reconstruction parameters
+arichRECO.logging.log_level = LogLevel.DEBUG
+arichRECO.logging.debug_level = 50
+# =============================================================================
+
 # Do the simulation
 # =============================================================================
 main = create_path()

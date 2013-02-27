@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'arich_dataobjects', 'generators_dataobjects']
+
+Return('env')
+

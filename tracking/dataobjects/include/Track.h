@@ -51,14 +51,15 @@ namespace Belle2 {
       if (m_trackFitIndices[chargedStable.getIndex()] < 0) {
         B2DEBUG(100, "Attempt to access an unset TrackFitResult");
         //ULTRA PRELIMINARY
-        short int index = 0;
+        short int index = -1; // MS: better to set to invalid value and test again after
         for (int ii = 0; ii < 5; ii++) {
-          if (m_trackFitIndices[ii] >= 0) {index = ii;}
+          if (m_trackFitIndices[ii] >= 0) {
+            index = m_trackFitIndices[ii]; // MS: bug fixed
+          }
         }
-
+        if (index < 0) return 0; // MS: just in case and to be sure not to get garbage
         StoreArray<TrackFitResult> trackFitResults(m_trackFitResultsName);
         return trackFitResults[index];
-        //return 0;
       }
       StoreArray<TrackFitResult> trackFitResults(m_trackFitResultsName);
       return trackFitResults[m_trackFitIndices[chargedStable.getIndex()]];

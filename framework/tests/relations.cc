@@ -475,4 +475,38 @@ namespace Belle2 {
     EXPECT_TRUE(bla.getArrayIndex() == -1);
   }
 
+  /** Check behaviour of duplicate relations. */
+  TEST_F(RelationTest, DuplicateRelations)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent(DataStore::relationName(evtData->getName(), relObjData->getName()));
+    RelationArray::registerPersistent(DataStore::relationName(relObjData->getName(), evtData->getName()));
+    DataStore::Instance().setInitializeActive(false);
+
+    //more than a single relation in one direction
+    DataStore::Instance().addRelationFromTo((*evtData)[0], (*relObjData)[1], 1.0);
+    DataStore::Instance().addRelationFromTo((*evtData)[0], (*relObjData)[1], 2.0);
+
+    //since the relation wasn't consolidated, these should still show up as
+    //seperate things
+    RelationVector<EventMetaData> rels1 = (*relObjData)[1]->getRelationsFrom<EventMetaData>();
+    EXPECT_EQ(2, rels1.size());
+
+
+    //add another one in opposite direction
+    DataStore::Instance().addRelationFromTo((*relObjData)[1], (*evtData)[0], 1.0);
+    RelationVector<EventMetaData> rels2 = (*relObjData)[1]->getRelationsFrom<EventMetaData>();
+    //wasn't _from_ eventmetadata, so no change
+    EXPECT_EQ(2, rels2.size());
+
+    RelationVector<EventMetaData> rels3 = (*relObjData)[1]->getRelationsWith<EventMetaData>();
+    EXPECT_EQ(3, rels3.size());
+    double sum = 0.0;
+    for (int i = 0; i < (int)rels3.size(); i++) {
+      sum += rels3.weight(i);
+    }
+    EXPECT_DOUBLE_EQ(sum, 1.0 - 1.0 - 2.0); //relations pointing _to_ relobjdata[1] have negative weight
+  }
+
+
 }  // namespace

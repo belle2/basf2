@@ -25,7 +25,7 @@ namespace Belle2 {
     TrackFitResult myResult;
     float pValue = 0.45;
     myResult.setPValue(pValue);
-    EXPECT_DOUBLE_EQ(pValue, myResult.getPValue());
+    EXPECT_FLOAT_EQ(pValue, myResult.getPValue());
 
     myResult.setCharge(1);
     EXPECT_EQ(1, myResult.getCharge());
@@ -56,18 +56,18 @@ namespace Belle2 {
     //The following should be replaced with proper inspection,
     // if the TVector3 are compatible within the tolerance.
     //Position
-    EXPECT_DOUBLE_EQ(pos.Mag(), myResult.getPosition().Mag());
+    EXPECT_FLOAT_EQ(pos.Mag(), myResult.getPosition().Mag());
 
-    EXPECT_DOUBLE_EQ(pos.Phi(), myResult.getPosition().Phi());
+    EXPECT_FLOAT_EQ(pos.Phi(), myResult.getPosition().Phi());
 
-    EXPECT_DOUBLE_EQ(pos.Eta(), myResult.getPosition().Eta());
+    EXPECT_FLOAT_EQ(pos.Eta(), myResult.getPosition().Eta());
 
     //Momentum
-    EXPECT_DOUBLE_EQ(mom.Mag(), myResult.getMomentum().Mag());
+    EXPECT_FLOAT_EQ(mom.Mag(), myResult.getMomentum().Mag());
 
-    EXPECT_DOUBLE_EQ(mom.Phi(), myResult.getMomentum().Phi());
+    EXPECT_FLOAT_EQ(mom.Phi(), myResult.getMomentum().Phi());
 
-    EXPECT_DOUBLE_EQ(mom.Eta(), myResult.getMomentum().Eta());
+    EXPECT_FLOAT_EQ(mom.Eta(), myResult.getMomentum().Eta());
 
     //Covariance
     //Dangerous, because expectation of bite-wise equality is unreasonable if there are internal

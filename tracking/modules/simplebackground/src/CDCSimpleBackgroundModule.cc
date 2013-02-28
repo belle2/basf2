@@ -29,7 +29,7 @@ CDCSimpleBackgroundModule::CDCSimpleBackgroundModule() : Module()
   setDescription("The CDCSimpleBackgroundModule generates random hits in the CDC (approximatly 1/r distribution) to emulate background. It adds digitized CDCHits to the CDCHits array.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
-  addParam("CDCHitsColName", m_cdcHitsColName, "Name of collection holding the digitized CDCHits, new CDCHits will be added to this array", string("CDCHits"));
+  addParam("CDCHitsColName", m_cdcHitsColName, "Name of collection holding the digitized CDCHits, new CDCHits will be added to this array. Empty for default name.", string(""));
   addParam("BGLevelHits", m_hits, "Percentage of wires hit by background through single hits", 2.0);
   addParam("BGLevelClusters", m_clusters, "Percentage of wires hit by background through hit clusters (up to 7 hits each) ", 0.0);
 
@@ -42,7 +42,7 @@ CDCSimpleBackgroundModule::~CDCSimpleBackgroundModule()
 void CDCSimpleBackgroundModule::initialize()
 {
   //StoreArray with digitized CDCHits
-  StoreArray <CDCHit> cdcHits(m_cdcHitsColName);
+  StoreArray<CDCHit>::registerPersistent(m_cdcHitsColName);
 }
 
 void CDCSimpleBackgroundModule::beginRun()
@@ -67,7 +67,7 @@ void CDCSimpleBackgroundModule::event()
   //srand((unsigned int) 111); //to get reproducible results
   srand((unsigned)time(0));   //to get new background in each run
 
-  int counter = cdcHits->GetLast() + 1; //counter for the additional hits
+  int counter = cdcHits.getEntries(); //counter for the additional hits
 
   //cdc geometry parameters information
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
@@ -125,7 +125,7 @@ void CDCSimpleBackgroundModule::event()
 
         B2DEBUG(100, "superlayer: " << superlayerId << "  layer: " << ilayerId << "  wire: " << wireId << "  driftTime: " << driftTime << "  charge: " << charge);
 
-        new(cdcHits->AddrAt(counter)) CDCHit(driftTime, charge, superlayerId, ilayerId, wireId);
+        new(cdcHits.nextFreeAddress()) CDCHit(driftTime, charge, superlayerId, ilayerId, wireId);
         ++counter;
       }
     } //end loop over all layers
@@ -149,38 +149,38 @@ void CDCSimpleBackgroundModule::event()
         charge = maxCharge * rand() / (RAND_MAX + 1.0);
 
         B2DEBUG(100, "superlayer: " << superlayerId << "  layer: " << ilayerId << "  wire: " << wireId << "  driftTime: " << driftTime << "  charge: " << charge);
-        int counter = cdcHits->GetLast() + 1;
+        int counter = cdcHits.getEntries();
 
-        new(cdcHits->AddrAt(counter)) CDCHit(driftTime, charge, superlayerId, ilayerId, wireId);
+        new(cdcHits.nextFreeAddress()) CDCHit(driftTime, charge, superlayerId, ilayerId, wireId);
         ++counter;
 
         //Now add some more Hits around this new hit
         //(This is a very straightforward and simple method without any claim to be reasonable and realistic, it is only some first approach to check the pattern recognition with some more complicated background than single hits)
         if (layerId < 5) {
-          new(cdcHits->AddrAt(counter)) CDCHit(driftTime, charge, superlayerId, ilayerId + 1, wireId);
+          new(cdcHits.nextFreeAddress()) CDCHit(driftTime, charge, superlayerId, ilayerId + 1, wireId);
           B2DEBUG(150, "--- add neigbour Hit: superlayer: " << cdcHits[counter]->getISuperLayer() << "  layer: " << cdcHits[counter]->getILayer() << "  wire: " << cdcHits[counter]->getIWire());
           ++counter;
-          new(cdcHits->AddrAt(counter)) CDCHit(driftTime, charge, superlayerId, ilayerId + 2, wireId);
+          new(cdcHits.nextFreeAddress()) CDCHit(driftTime, charge, superlayerId, ilayerId + 2, wireId);
           B2DEBUG(150, "--- add neigbour Hit: superlayer: " << cdcHits[counter]->getISuperLayer() << "  layer: " << cdcHits[counter]->getILayer() << "  wire: " << cdcHits[counter]->getIWire());
           ++counter;
         }
         if (layerId > 1) {
-          new(cdcHits->AddrAt(counter)) CDCHit(driftTime, charge, superlayerId, ilayerId - 1, wireId);
+          new(cdcHits.nextFreeAddress()) CDCHit(driftTime, charge, superlayerId, ilayerId - 1, wireId);
           B2DEBUG(150, "--- add neigbour Hit: superlayer: " << cdcHits[counter]->getISuperLayer() << "  layer: " << cdcHits[counter]->getILayer() << "  wire: " << cdcHits[counter]->getIWire());
           ++counter;
-          new(cdcHits->AddrAt(counter)) CDCHit(driftTime, charge, superlayerId, ilayerId - 2, wireId);
+          new(cdcHits.nextFreeAddress()) CDCHit(driftTime, charge, superlayerId, ilayerId - 2, wireId);
           B2DEBUG(150, "--- add neigbour Hit: superlayer: " << cdcHits[counter]->getISuperLayer() << "  layer: " << cdcHits[counter]->getILayer() << "  wire: " << cdcHits[counter]->getIWire());
           ++counter;
         }
 
         if (unsigned(wireId) < cdcg.nWiresInLayer(layerId) - 1) {
-          new(cdcHits->AddrAt(counter)) CDCHit(driftTime, charge, superlayerId, ilayerId, wireId + 1);
+          new(cdcHits.nextFreeAddress()) CDCHit(driftTime, charge, superlayerId, ilayerId, wireId + 1);
           B2DEBUG(150, "--- add neigbour Hit: superlayer: " << cdcHits[counter]->getISuperLayer() << "  layer: " << cdcHits[counter]->getILayer() << "  wire: " << cdcHits[counter]->getIWire());
           ++counter;
 
         }
         if (wireId > 1) {
-          new(cdcHits->AddrAt(counter)) CDCHit(driftTime, charge, superlayerId, ilayerId, wireId - 1);
+          new(cdcHits.nextFreeAddress()) CDCHit(driftTime, charge, superlayerId, ilayerId, wireId - 1);
           B2DEBUG(150, "--- add neigbour Hit: superlayer: " << cdcHits[counter]->getISuperLayer() << "  layer: " << cdcHits[counter]->getILayer() << "  wire: " << cdcHits[counter]->getIWire());
           ++counter;
         }

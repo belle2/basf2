@@ -129,11 +129,8 @@ void VXDSimpleBackgroundModule::event()
 
   //output containers
   StoreArray<VXDSimpleDigiHit> pxdSimpleDigiHits("pxdSimpleDigiHits");
-  pxdSimpleDigiHits.create();
   StoreArray<VXDSimpleDigiHit> svdSimpleDigiHits("svdSimpleDigiHits");
-  svdSimpleDigiHits.create();
   StoreArray<GFTrackCand> trackCandidates;
-  trackCandidates.create();
 
   MCParticle* aMcParticle = mcParticles[0];
 
@@ -187,10 +184,10 @@ void VXDSimpleBackgroundModule::event()
     }
 
 
-    new(trackCandidates->AddrAt(0)) GFTrackCand();
+    GFTrackCand* trackCand = trackCandidates.appendNew();
 
 
-    trackCandidates[0]->setMcTrackId(0);//Save the MCParticleID in the TrackCandidate
+    trackCand->setMcTrackId(0);//Save the MCParticleID in the TrackCandidate
     TVector3 position = aMcParticle->getProductionVertex();
     TVector3 momentum = aMcParticle->getMomentum();
 
@@ -202,7 +199,7 @@ void VXDSimpleBackgroundModule::event()
     covSeed(0, 0) = 1; covSeed(1, 1) = 1; covSeed(2, 2) = 2 * 2;
     covSeed(3, 3) = 0.1 * 0.1; covSeed(4, 4) = 0.1 * 0.1; covSeed(5, 5) = 0.2 * 0.2;
     //Finally set the complete track seed
-    trackCandidates[0]->set6DSeedAndPdgCode(stateSeed, aMcParticle->getPDG(), covSeed);
+    trackCand->set6DSeedAndPdgCode(stateSeed, aMcParticle->getPDG(), covSeed);
 
 
     double sigmaU = m_setMeasSigma;
@@ -267,11 +264,11 @@ void VXDSimpleBackgroundModule::event()
       }
       if (m_writeTruthToFile == true) dataOut << uTrue << "\t" << vTrue << "\n";
 
-      new(pxdSimpleDigiHits->AddrAt(iDigiHit)) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, static_cast<const VXDTrueHit*>(aPxdTrueHit), noOutlier);
+      new(pxdSimpleDigiHits.nextFreeAddress()) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, static_cast<const VXDTrueHit*>(aPxdTrueHit), noOutlier);
 
       float time = pxdTrueHits[i]->getGlobalTime();
       int uniqueSensorId = aVXDId.getID();
-      trackCandidates[0]->addHit(Const::PXD, iDigiHit, uniqueSensorId, double(time));
+      trackCand->addHit(Const::PXD, iDigiHit, uniqueSensorId, double(time));
       ++iDigiHit;
       if (m_backroundLayers[aVXDId.getLayerNumber() - 1] == true and gRandom->Uniform() <= m_backgroundRatio) {
         double randomAngle = -2.0;
@@ -289,8 +286,8 @@ void VXDSimpleBackgroundModule::event()
         }
         u = uTrue + randomFactor * uSemiAxis * sin(randomAngle);
         v = vTrue + randomFactor * vSemiAxis * cos(randomAngle);
-        new(pxdSimpleDigiHits->AddrAt(iDigiHit)) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, NULL, false);
-        trackCandidates[0]->addHit(Const::PXD, iDigiHit, uniqueSensorId, double(time));
+        new(pxdSimpleDigiHits.nextFreeAddress()) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, NULL, false);
+        trackCand->addHit(Const::PXD, iDigiHit, uniqueSensorId, double(time));
         ++iDigiHit;
         if (gRandom->Uniform() <= m_backgroundRatio2) {   // add a second BG hit
           randomAngle = -2.0;
@@ -308,8 +305,8 @@ void VXDSimpleBackgroundModule::event()
           }
           u = uTrue + randomFactor * uSemiAxis * sin(randomAngle);
           v = vTrue + randomFactor * vSemiAxis * cos(randomAngle);
-          new(pxdSimpleDigiHits->AddrAt(iDigiHit)) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, NULL, false);
-          trackCandidates[0]->addHit(Const::PXD, iDigiHit, uniqueSensorId, double(time));
+          new(pxdSimpleDigiHits.nextFreeAddress()) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, NULL, false);
+          trackCand->addHit(Const::PXD, iDigiHit, uniqueSensorId, double(time));
           ++iDigiHit;
         }
       }
@@ -370,10 +367,10 @@ void VXDSimpleBackgroundModule::event()
         B2DEBUG(100, "svd loop not gRandom->Uniform() < m_outlierRatio");
       }
       if (m_writeTruthToFile == true) dataOut << uTrue << "\t" << vTrue << "\n";
-      new(svdSimpleDigiHits->AddrAt(iDigiHit)) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, static_cast<const VXDTrueHit*>(aSvdTrueHit), noOutlier);
+      new(svdSimpleDigiHits.nextFreeAddress()) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, static_cast<const VXDTrueHit*>(aSvdTrueHit), noOutlier);
       float time = svdTrueHits[i]->getGlobalTime();
       int uniqueSensorId = aVXDId.getID();
-      trackCandidates[0]->addHit(Const::SVD, iDigiHit, uniqueSensorId, double(time));
+      trackCand->addHit(Const::SVD, iDigiHit, uniqueSensorId, double(time));
       ++iDigiHit;
 
       if (m_backroundLayers[aVXDId.getLayerNumber() - 1] == true and gRandom->Uniform() < m_backgroundRatio) {
@@ -392,8 +389,8 @@ void VXDSimpleBackgroundModule::event()
         }
         u = uTrue + randomFactor * uSemiAxis * sin(randomAngle);
         v = vTrue + randomFactor * vSemiAxis * cos(randomAngle);
-        new(svdSimpleDigiHits->AddrAt(iDigiHit)) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, NULL, false);
-        trackCandidates[0]->addHit(Const::SVD, iDigiHit, uniqueSensorId, double(time));
+        new(svdSimpleDigiHits.nextFreeAddress()) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, NULL, false);
+        trackCand->addHit(Const::SVD, iDigiHit, uniqueSensorId, double(time));
         ++iDigiHit;
         if (gRandom->Uniform() <= m_backgroundRatio2) {   // add a second BG hit
           randomAngle = -2.0;
@@ -411,15 +408,15 @@ void VXDSimpleBackgroundModule::event()
           }
           u = uTrue + randomFactor * uSemiAxis * sin(randomAngle);
           v = vTrue + randomFactor * vSemiAxis * cos(randomAngle);
-          new(svdSimpleDigiHits->AddrAt(iDigiHit)) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, NULL, false);
-          trackCandidates[0]->addHit(Const::SVD, iDigiHit, uniqueSensorId, double(time));
+          new(svdSimpleDigiHits.nextFreeAddress()) VXDSimpleDigiHit(aVXDId, u, v, sigmaU, sigmaV, NULL, false);
+          trackCand->addHit(Const::SVD, iDigiHit, uniqueSensorId, double(time));
           ++iDigiHit;
         }
       }
     }
 
 
-    trackCandidates[0]->sortHits();
+    trackCand->sortHits();
 
 
     if (m_writeTruthToFile == true) dataOut.close();

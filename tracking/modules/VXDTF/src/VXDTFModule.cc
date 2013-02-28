@@ -2465,12 +2465,12 @@ vector <GFTrackCand> VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArra
     int numOfSvdIndices = currentTC->getSVDHitIndices().size();
     if (numOfPxdIndices not_eq 0) {
       GFRecoHitProducer <PXDCluster, PXDRecoHit> * pxdClusterProducer;
-      pxdClusterProducer = new GFRecoHitProducer <PXDCluster, PXDRecoHit> (&*pxdClusters);
+      pxdClusterProducer = new GFRecoHitProducer <PXDCluster, PXDRecoHit> (pxdClusters.getPtr());
       factory.addProducer(Const::PXD, pxdClusterProducer);
     }
     if (numOfSvdIndices not_eq 0) {
       GFRecoHitProducer <SVDCluster, SVDRecoHit> * svdClusterProducer;
-      svdClusterProducer = new GFRecoHitProducer <SVDCluster, SVDRecoHit> (&*svdClusters);
+      svdClusterProducer = new GFRecoHitProducer <SVDCluster, SVDRecoHit> (svdClusters.getPtr());
       factory.addProducer(Const::SVD, svdClusterProducer);
     }
 

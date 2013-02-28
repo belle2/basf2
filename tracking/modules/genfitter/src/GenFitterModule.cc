@@ -99,7 +99,7 @@ GenFitterModule::GenFitterModule() :
   addParam("PDGCodes", m_pdgCodes, "List of PDG codes used to set the mass hypothesis for the fit. All your codes will be tried with every track. The sign of your codes will be ignored and the charge will always come from the GFTrackCand. If you do not set any PDG code the code will be taken from the GFTrackCand. This is the default behavior)", vector<int>(0));
   //output
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the final GFTracks (will be created by this module)", string(""));
-  addParam("TracksColName", m_tracksColName, "Name of collection holding the final Tracks (will be created by this module)", string(""));
+  addParam("TracksColName", m_tracksColName, "Name of collection holding the final Tracks (will be created by this module). NOT IMPLEMENTED!", string(""));
 
   addParam("HelixOutput", m_createTextFile, "Set true if you want to have a text file with perigee helix parameters of all tracks", bool(false));
   addParam("DAFTemperatures", m_dafTemperatures, "set the annealing scheme (temperatures) for the DAF. Length of vector will determine DAF iterations", vector<double>(1, -999.0));
@@ -121,9 +121,14 @@ void GenFitterModule::initialize()
 
   StoreArray<GFTrackCand>::required(m_gfTrackCandsColName);
 
-  StoreArray<Track>::registerPersistent("Tracks");
-  StoreArray<TrackFitResult>::registerPersistent("TrackFitResults");
+  StoreArray<Track>::registerPersistent();
+  StoreArray<TrackFitResult>::registerPersistent();
   StoreArray < GFTrack >::registerPersistent(m_gfTracksColName);
+
+  if (!m_tracksColName.empty() and m_tracksColName != "Tracks") {
+    B2ERROR("Setting a collection name with TracksColName is not implemented.");
+    //TODO: implementation might also need different name for TrackFitResults?
+  }
 
 
   RelationArray::registerPersistent<GFTrack, MCParticle>(m_gfTracksColName, m_mcParticlesColName);
@@ -178,7 +183,7 @@ void GenFitterModule::beginRun()
 
 void GenFitterModule::event()
 {
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
   int eventCounter = eventMetaDataPtr->getEvent();
   B2DEBUG(100, "**********   GenFitterModule processing event number: " << eventCounter << " ************");
 
@@ -226,9 +231,9 @@ void GenFitterModule::event()
 
 
   //StoreArrays to store the fit results
-  StoreArray < Track > tracks("Tracks");
+  StoreArray < Track > tracks;
   tracks.create();
-  StoreArray <TrackFitResult> trackFitResults("TrackFitResults");
+  StoreArray <TrackFitResult> trackFitResults;
   trackFitResults.create();
   StoreArray < GFTrack > gfTracks(m_gfTracksColName);
   gfTracks.create();
@@ -406,8 +411,8 @@ void GenFitterModule::event()
               ++trackCounter;
 
               //Create output tracks
-              new(gfTracks->AddrAt(trackCounter)) GFTrack(gfTrack);  //GFTrack can be assigned directly
-              new(tracks->AddrAt(trackCounter)) Track(); //Track is created empty, helix parameters are not available because the fit failed, but other variables may give some hint on the reason for the failure
+              gfTracks.appendNew(gfTrack);  //GFTrack can be assigned directly
+              tracks.appendNew(); //Track is created empty, helix parameters are not available because the fit failed, but other variables may give some hint on the reason for the failure
 
               //Create relation
               if (aTrackCandPointer->getMcTrackId() != -999) {
@@ -442,9 +447,8 @@ void GenFitterModule::event()
 
             candFitted = true;
             //Create output tracks
-            new(gfTracks->AddrAt(trackCounter)) GFTrack(gfTrack);  //GFTrack can be assigned directly
-
-            new(tracks->AddrAt(trackCounter)) Track();  //Track is created empty, parameters are set later on
+            gfTracks.appendNew(gfTrack);  //GFTrack can be assigned directly
+            tracks.appendNew(); //Track is created empty, parameters are set later on
 
             //Create relation
             if (aTrackCandPointer->getMcTrackId() != -999) {
@@ -500,11 +504,11 @@ void GenFitterModule::event()
 
               //MH: this is new stuff...
               tracks[trackCounter]->setTrackFitResultIndex(chargedStable, trackFitResultCounter);
-              new(trackFitResults->AddrAt(trackFitResultCounter)) TrackFitResult();
-              trackFitResults[trackFitResultCounter]->setCharge(gfTrack.getCharge());
-              trackFitResults[trackFitResultCounter]->setMomentum(resultMomentum);
-              trackFitResults[trackFitResultCounter]->setPosition(resultPosition);
-              trackFitResults[trackFitResultCounter]->setCovariance6(newResultCovariance);
+              TrackFitResult* newTrackFitResult = trackFitResults.appendNew();
+              newTrackFitResult->setCharge(gfTrack.getCharge());
+              newTrackFitResult->setMomentum(resultMomentum);
+              newTrackFitResult->setPosition(resultPosition);
+              newTrackFitResult->setCovariance6(newResultCovariance);
               trackFitResultCounter++;
 
               // store position

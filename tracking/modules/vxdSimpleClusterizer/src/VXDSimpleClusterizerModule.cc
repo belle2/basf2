@@ -184,8 +184,8 @@ void VXDSimpleClusterizerModule::event()
     v = gRandom->Gaus(vTrue, sigmaV);
 
     // Save as new 2D-PXD-cluster
-    unsigned int clusterIndex = pxdClusters->GetLast() + 1;
-    new(pxdClusters->AddrAt(clusterIndex)) PXDCluster(aVXDId, u, v, 0, 0, 1, 1, 1, 1, 1);
+    unsigned int clusterIndex = pxdClusters.getEntries();
+    new(pxdClusters.nextFreeAddress()) PXDCluster(aVXDId, u, v, 0, 0, 1, 1, 1, 1, 1);
 
     //add relations:
     relPXDClusterTrueHit.add(clusterIndex, currentTrueHit);
@@ -232,10 +232,10 @@ void VXDSimpleClusterizerModule::event()
     v = gRandom->Gaus(vTrue, sigmaV);
 
     // Save as two new 1D-SVD-clusters
-    unsigned int clusterIndex = svdClusters->GetLast() + 1;
+    unsigned int clusterIndex = svdClusters.getEntries();
     double timeStamp = svdTrueHits[currentTrueHit]->getGlobalTime();
-    new(svdClusters->AddrAt(clusterIndex)) SVDCluster(aVXDId, true, u, timeStamp, 0, 1, 1, 3); // in a typical situation 3-5 Strips are excited per Hit -> set to 3
-    new(svdClusters->AddrAt(clusterIndex + 1)) SVDCluster(aVXDId, false, v, timeStamp, 0, 1, 1, 3);
+    new(svdClusters.nextFreeAddress()) SVDCluster(aVXDId, true, u, timeStamp, 0, 1, 1, 3); // in a typical situation 3-5 Strips are excited per Hit -> set to 3
+    new(svdClusters.nextFreeAddress()) SVDCluster(aVXDId, false, v, timeStamp, 0, 1, 1, 3);
 
     // add relations
     vector<unsigned int> clusterVector;

@@ -67,12 +67,12 @@ namespace Belle2 {
     /* Function to update particle decays */
 
   protected:
-    EvtParticle* m_parent;      /* Variable needed for parent particle  */
-    EvtStdHep   m_evtstdhep;    /* Variable needed for STDHEP format    */
-    EvtGenFwRandEngine m_eng;   /* Variable needed for random generator */
-    EvtGen* m_Generator;        /* Variable needed for EvtGen generator */
-    EvtVector4R m_pinit;        /* Variable needed for initial momentum */
-    EvtId m_ParentParticle;     /* Variable needed for parent particle ID*/
+    EvtParticle* m_parent;      /**<Variable needed for parent particle.  */
+    EvtStdHep   m_evtstdhep;    /**<Variable needed for STDHEP format.    */
+    EvtGenFwRandEngine m_eng;   /**<Variable needed for random generator. */
+    EvtGen* m_Generator;        /**<Variable needed for EvtGen generator. */
+    EvtVector4R m_pinit;        /**<Variable needed for initial momentum. */
+    EvtId m_ParentParticle;     /**<Variable needed for parent particle ID. */
   };
 
 }

@@ -124,23 +124,22 @@ namespace Belle2 {
     static const double twopi = 2.0 * M_PI;         /**< 2*pi. To keep things short. */
 
     //Variable names directly taken from the FORTRAN code. Sorry.
-    double alpha;
+    double alpha;  /**< variable   */
     double rme;    /**< in MeV */
-    double s;
-    double rme2;
-    double rme2s;
-    double rls;
-    double z0;
-    double a1, a2, ac;
-    double sigapp;
-    double eb, pb, rin2pb;
-    double p1[4];
-    double p2[4];
-    double q1[4];
-    double q2[4];
-    double qk[4];
-
-    double weight;
+    double s;      /**< variable   */
+    double rme2;   /**< variable   */
+    double rme2s;  /**< variable   */
+    double rls;    /**< variable   */
+    double z0;     /**< variable   */
+    double a1, a2, ac;  /**< variable   */
+    double sigapp;      /**< variable   */
+    double eb, pb, rin2pb; /**< variable   */
+    double p1[4];  /**< variable   */
+    double p2[4];  /**< variable   */
+    double q1[4];  /**< variable   */
+    double q2[4];  /**< variable   */
+    double qk[4];  /**< variable   */
+    double weight; /**< variable   */
   };
 
 }

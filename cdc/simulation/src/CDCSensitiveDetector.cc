@@ -431,32 +431,34 @@ namespace Belle2 {
     //    }
 
     StoreArray<MCParticle> mcParticles;
-    //change Later
+
     StoreArray<CDCSimHit> cdcArray;
-    if (!cdcArray) cdcArray.create();
+    if (!cdcArray.isValid()) cdcArray.create();
     RelationArray cdcSimHitRel(mcParticles, cdcArray);
 
-    m_hitNumber = cdcArray->GetLast() + 1;
-    new(cdcArray->AddrAt(m_hitNumber)) CDCSimHit();
-    cdcArray[m_hitNumber]->setWireID(layerId, wireId);
-    cdcArray[m_hitNumber]->setTrackId(trackID);
-    cdcArray[m_hitNumber]->setPDGCode(pid);
-    cdcArray[m_hitNumber]->setDriftLength(distance / cm);
-    cdcArray[m_hitNumber]->setFlightTime(CorrectTof / ns);
-    cdcArray[m_hitNumber]->setGlobalTime(CorrectTof / ns);
-    cdcArray[m_hitNumber]->setEnergyDep(edep / GeV);
-    cdcArray[m_hitNumber]->setStepLength(stepLength / cm);
+    m_hitNumber = cdcArray.getEntries();
+
+    CDCSimHit* simHit = (CDCSimHit*) cdcArray.appendNew();
+
+    simHit->setWireID(layerId, wireId);
+    simHit->setTrackId(trackID);
+    simHit->setPDGCode(pid);
+    simHit->setDriftLength(distance / cm);
+    simHit->setFlightTime(CorrectTof / ns);
+    simHit->setGlobalTime(CorrectTof / ns);
+    simHit->setEnergyDep(edep / GeV);
+    simHit->setStepLength(stepLength / cm);
     TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
-    cdcArray[m_hitNumber]->setMomentum(momentum);
+    simHit->setMomentum(momentum);
     TVector3 posWire(posW.getX() / cm, posW.getY() / cm, posW.getZ() / cm);
-    cdcArray[m_hitNumber]->setPosWire(posWire);
+    simHit->setPosWire(posWire);
     TVector3 positionIn(posIn.getX() / cm, posIn.getY() / cm, posIn.getZ() / cm);
-    cdcArray[m_hitNumber]->setPosIn(positionIn);
+    simHit->setPosIn(positionIn);
     TVector3 positionOut(posOut.getX() / cm, posOut.getY() / cm, posOut.getZ() / cm);
-    cdcArray[m_hitNumber]->setPosOut(positionOut);
+    simHit->setPosOut(positionOut);
     TVector3 positionTrack(posTrack.getX() / cm, posTrack.getY() / cm, posTrack.getZ() / cm);
-    cdcArray[m_hitNumber]->setPosTrack(positionTrack);
-    cdcArray[m_hitNumber]->setPosFlag(lr);
+    simHit->setPosTrack(positionTrack);
+    simHit->setPosFlag(lr);
 
     B2DEBUG(150, "HitNumber: " << m_hitNumber);
     cdcSimHitRel.add(trackID, m_hitNumber);
@@ -472,16 +474,20 @@ namespace Belle2 {
                                      const G4ThreeVector& mom)
   {
     //change Later
-    StoreArray<CDCEBSimHit> cdcEBArray("");
-    m_EBhitNumber = cdcEBArray->GetLast() + 1;
-    new(cdcEBArray->AddrAt(m_EBhitNumber)) CDCEBSimHit();
-    cdcEBArray[m_EBhitNumber]->setLayerId(layerId);
-    cdcEBArray[m_EBhitNumber]->setPhi(phi);
-    cdcEBArray[m_EBhitNumber]->setTrackId(trackID);
-    cdcEBArray[m_EBhitNumber]->setPDGCode(pid);
-    cdcEBArray[m_EBhitNumber]->setEnergyDep(edep / GeV);
+    StoreArray<CDCEBSimHit> cdcEBArray;
+
+    if (!cdcEBArray.isValid()) cdcEBArray.create();
+
+    m_EBhitNumber = cdcEBArray.getEntries();
+    CDCEBSimHit* simEBHit = (CDCEBSimHit*) cdcEBArray.appendNew();
+
+    simEBHit->setLayerId(layerId);
+    simEBHit->setPhi(phi);
+    simEBHit->setTrackId(trackID);
+    simEBHit->setPDGCode(pid);
+    simEBHit->setEnergyDep(edep / GeV);
     TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
-    cdcEBArray[m_EBhitNumber]->setMomentum(momentum);
+    simEBHit->setMomentum(momentum);
 
     B2DEBUG(150, "HitNumber: " << m_EBhitNumber);
     return (m_EBhitNumber);

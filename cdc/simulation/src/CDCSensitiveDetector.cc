@@ -433,12 +433,12 @@ namespace Belle2 {
     StoreArray<MCParticle> mcParticles;
 
     StoreArray<CDCSimHit> cdcArray;
-    if (!cdcArray.isValid()) cdcArray.create();
+
     RelationArray cdcSimHitRel(mcParticles, cdcArray);
 
     m_hitNumber = cdcArray.getEntries();
 
-    CDCSimHit* simHit = (CDCSimHit*) cdcArray.appendNew();
+    CDCSimHit* simHit =  cdcArray.appendNew();
 
     simHit->setWireID(layerId, wireId);
     simHit->setTrackId(trackID);
@@ -476,10 +476,9 @@ namespace Belle2 {
     //change Later
     StoreArray<CDCEBSimHit> cdcEBArray;
 
-    if (!cdcEBArray.isValid()) cdcEBArray.create();
 
     m_EBhitNumber = cdcEBArray.getEntries();
-    CDCEBSimHit* simEBHit = (CDCEBSimHit*) cdcEBArray.appendNew();
+    CDCEBSimHit* simEBHit = cdcEBArray.appendNew();
 
     simEBHit->setLayerId(layerId);
     simEBHit->setPhi(phi);

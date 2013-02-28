@@ -16,12 +16,12 @@ using namespace Belle2;
 ClassImp(MuidHit)
 
 MuidHit::MuidHit() :
+  m_ExtTime(0.0),
+  m_HitTime(0.0),
   m_InBarrel(false),
   m_IsForward(false),
   m_Sector(0),
   m_Layer(0),
-  m_ExtTime(0.0),
-  m_HitTime(0.0),
   m_ChiSquared(0.0)
 {
   m_ExtPosition = TVector3(0.0, 0.0, 0.0);

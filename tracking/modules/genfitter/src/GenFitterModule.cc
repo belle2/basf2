@@ -534,17 +534,16 @@ void GenFitterModule::event()
               //Now calculate the parameters for helix parametrisation to fill the Track objects
 
               //calculate transverse momentum
-              double pt = sqrt(resultMomentum.x() * resultMomentum.x() + resultMomentum.y() * resultMomentum.y());
+              //double pt = sqrt(resultMomentum.x() * resultMomentum.x() + resultMomentum.y() * resultMomentum.y());
 
               //determine angle phi for perigee parametrisation, distributed from -pi to pi
-              double phi = atan2(dirInPoca.y() , dirInPoca.x());
+              //double phi = atan2(dirInPoca.y() , dirInPoca.x());
 
               //determine d0 sign for perigee parametrization
-              double d0Sign = TMath::Sign(1., poca.x() * dirInPoca.x() + poca.y() * dirInPoca.y());
+              //double d0Sign = TMath::Sign(1., poca.x() * dirInPoca.x() + poca.y() * dirInPoca.y());
 
               //coefficient to illiminate the B field and get the 'pure' curvature
-
-              double alpha = 1 / (1.5 * 0.00299792458);
+              //double alpha = 1 / (1.5 * 0.00299792458);
 
               //Now set the helix parameters for perigee parametrization
               /*              tracks[trackCounter]->setD0(d0Sign * sqrt(poca.x() * poca.x() + poca.y() * poca.y()));

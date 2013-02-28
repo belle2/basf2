@@ -103,7 +103,7 @@ void CDCMCMatchingModule::event()
 
         for (unsigned int mchit = 0; mchit < mcPartToCDCHits[k].getToIndices().size(); mchit++) { //loop over all hits to which the MCParticle points
 
-          if (cdcHitsIndexList.at(j) == mcPartToCDCHits[k].getToIndex(mchit)) {         //if the hit to which this MCParticle points is in the list
+          if (cdcHitsIndexList.at(j) == (int)mcPartToCDCHits[k].getToIndex(mchit)) {         //if the hit to which this MCParticle points is in the list
 
             addMCParticle(mcParticleContributions, mcPartToCDCHits[k].getFromIndex()); //add the index of the MCParticle to the pair vector
 

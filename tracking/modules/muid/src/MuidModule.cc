@@ -1320,7 +1320,7 @@ void MuidModule::getAddress(const G4String& topName, Address& address)
   address.inBarrel = topName.substr(4, 6) == "barrel";
   address.isRPC = (topName.substr(11, 3) == "gas");
   int i0 = (address.isRPC ? 0 : 2);
-  address.isForward = topName.substr(i0 + 15, 1).data() == "F";
+  address.isForward = topName.substr(i0 + 15, 1) == "F";
   address.sector = atoi(topName.substr(i0 + 17, 1).data());
   address.layer = atoi(topName.substr(i0 + 19, 2).data());
   address.isInnerPlane = true; // DIVOT

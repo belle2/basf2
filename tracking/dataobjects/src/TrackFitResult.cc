@@ -65,6 +65,7 @@ float TrackFitResult::getZ0() const {}
 float TrackFitResult::getCotTheta() const {}
 
 //bool TrackFitResult:: hitInSuperLayer(unsigned int iSuperLayer) const {}
+*/
 
 
 // Implementation note: Typically we will either have PXD or SVD hits,

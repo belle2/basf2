@@ -157,7 +157,7 @@ void CDCTrackHit::shiftAlongZ(const TVector3 trackDirection, const CDCTrackHit t
 
   double posX;  //position of the hit on the wire
   double posY;
-  double posZ;
+  //double posZ;
 
   double confX;  //position of the hit on the wire in the conformal plane
   double confY;
@@ -167,7 +167,7 @@ void CDCTrackHit::shiftAlongZ(const TVector3 trackDirection, const CDCTrackHit t
     //new point along the wire
     posX = forwardWirePoint.x() + parameter[i] * wireVector.x();
     posY = forwardWirePoint.y() + parameter[i] * wireVector.y();
-    posZ = forwardWirePoint.z() + parameter[i] * wireVector.z();
+    //posZ = forwardWirePoint.z() + parameter[i] * wireVector.z();
 
     confX = 2 * posX / (posX * posX + posY * posY);
     confY = 2 * posY / (posX * posX + posY * posY);

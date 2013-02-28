@@ -69,7 +69,7 @@ namespace Belle2 {
       delete m_sensitive;
     }
 
-    void GeoCryostatCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
+    void GeoCryostatCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
     {
 
       //######  L side index  ######

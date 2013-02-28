@@ -67,7 +67,7 @@ namespace Belle2 {
       m_sensitive.clear();
     }
 
-    void GeoHeavyMetalShieldCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
+    void GeoHeavyMetalShieldCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
     {
 
       //---- Box15

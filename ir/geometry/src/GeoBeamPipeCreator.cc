@@ -71,7 +71,7 @@ namespace Belle2 {
       m_sensitive.clear();
     }
 
-    void GeoBeamPipeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
+    void GeoBeamPipeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
     {
 
       //########## Index ##########
@@ -106,8 +106,8 @@ namespace Belle2 {
       double SafetyLength = cSafety.getLength("L1") / Unit::mm;
 
       double stepMax = 5.0 * Unit::mm;
-      bool flag_limitStep = true;
-
+      bool flag_limitStep = false;
+      //bool flag_limitStep = true;
 
       ////==========
       ////= IP pipe

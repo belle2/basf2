@@ -77,13 +77,9 @@ namespace Belle2 {
         B2DEBUG(100, "Volume " << g4Volume.GetName() << ": max. allowed step set to " << userLimits->GetMaxAllowedStep(track))
       }
 
-      StoreArray<MCParticle> mcParticles;
-
       StoreArray<IRSimHit> irSimHits;
-      RelationArray irSimHitRel(mcParticles, irSimHits);
-
-      int hitIndex = irSimHits->GetLast() + 1 ;
-      new(irSimHits->AddrAt(hitIndex)) IRSimHit(posInVec,
+      if (!irSimHits.isValid()) irSimHits.create();
+      new(irSimHits.nextFreeAddress()) IRSimHit(posInVec,
                                                 momInVec,
                                                 posOutVec,
                                                 momOutVec,
@@ -91,27 +87,11 @@ namespace Belle2 {
                                                 depEnergy,
                                                 Volname
                                                );
-
-      irSimHitRel.add(trackID, hitIndex);
-      /*
-              StoreArray<IRSimHit> irArray;
-              int hitIndex = irArray->GetLast() + 1 ;
-              new(irArray->AddrAt(hitIndex)) IRSimHit(posInVec,
-                                                      momInVec,
-                                                      posOutVec,
-                                                      momOutVec,
-                                                      partPDGCode,
-                                                      depEnergy,
-                                                      Volname
-                                                     );
-
-              // Add relation between the MCParticle and the hit.
-              // The index of the MCParticle has to be set to the TrackID and will be
-              // replaced later by the correct MCParticle index automatically.
-              StoreArray<Relation> mcPartRelation(getRelationCollectionName());
-              StoreArray<MCParticle> mcPartArray(DEFAULT_MCPARTICLES);
-              new(mcPartRelation->AddrAt(hitIndex)) Relation(mcPartArray, irArray, trackID, hitIndex);
-            */
+      // add relation to MCParticles
+      StoreArray<MCParticle> mcParticles;
+      RelationArray irSimHitRel(mcParticles, irSimHits);
+      int nentr = irSimHits.getEntries() - 1 ;
+      irSimHitRel.add(trackID, nentr);
 
       return true;
     }

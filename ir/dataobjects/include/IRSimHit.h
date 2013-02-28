@@ -75,12 +75,12 @@ namespace Belle2 {
 
   private:
 
-    TVector3 m_posIn;
-    TVector3 m_momIn;
-    TVector3 m_posOut;
-    TVector3 m_momOut;
-    int m_PDGcode;
-    float m_depEnergy;
+    TVector3 m_posIn;  /**< Start point of energy deposition in local coordinates. */
+    TVector3 m_momIn;  /**< Momentum of particle at start of energy deposition. */
+    TVector3 m_posOut; /**< End point of energy deposition in local coordinates. */
+    TVector3 m_momOut; /**< Momentum of particle at end of energy deposition. */
+    int m_PDGcode;     /**< PDG code of the particle producing hit. */
+    float m_depEnergy; /**< Deposited energy */
     std::string m_Volname;
 
     /** ROOT Macro.*/

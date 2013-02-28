@@ -69,7 +69,7 @@ namespace Belle2 {
       delete m_sensitive;
     }
 
-    void GeoFarBeamLineCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
+    void GeoFarBeamLineCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
     {
 
       const int N = 2;

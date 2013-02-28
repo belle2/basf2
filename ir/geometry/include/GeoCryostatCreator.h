@@ -52,7 +52,7 @@ namespace Belle2 {
     protected:
 
     private:
-
+      /** Sensitive detector. **/
       SensitiveDetector* m_sensitive;
 
 

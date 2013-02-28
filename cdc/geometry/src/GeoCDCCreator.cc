@@ -144,7 +144,6 @@ namespace Belle2 {
 
         if (innerWallContent.getString("Name") == "Shield") rmax_innerWall = innerWallContent.getLength("OuterR");
 
-        std::cout << "R_in " << rmax_innerWall << std::endl;
       }
 
       //-----------------------------------------------------------------------

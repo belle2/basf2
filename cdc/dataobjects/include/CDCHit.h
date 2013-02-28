@@ -14,8 +14,8 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <cdc/dataobjects/WireID.h>
+#include <framework/datastore/RelationsObject.h>
 
-#include <TObject.h>
 
 namespace Belle2 {
   /** @addtogroup CDC_dataobjects
@@ -32,7 +32,7 @@ namespace Belle2 {
    *  the accumulated ADC count of the charge in the hit cell,<br>
    *  and the WireID.
    */
-  class CDCHit : public TObject {
+  class CDCHit : public RelationsObject {
   public:
     /** Empty constructor for ROOT IO. */
     CDCHit() :

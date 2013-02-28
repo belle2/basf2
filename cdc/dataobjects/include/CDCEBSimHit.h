@@ -12,8 +12,8 @@
 #define CDCEBSIMHIT_H
 
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/RelationsObject.h>
 
-#include <TObject.h>
 #include <TVector3.h>
 
 namespace Belle2 {
@@ -27,7 +27,7 @@ namespace Belle2 {
    *
    *  EB stands for electronic board.
    */
-  class CDCEBSimHit : public TObject {
+  class CDCEBSimHit : public RelationsObject {
   public:
     //! The layer id of this hit.
     int m_layerId;

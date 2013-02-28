@@ -16,7 +16,7 @@
 
 #include <limits>
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -38,7 +38,7 @@ namespace Belle2 {
    *  Wire:       bits 8 - 16 (% 512)           <br>
    *  Note: These operations could as well be achieved by bit-shifting operations.
    */
-  class WireID : public TObject {
+  class WireID : public RelationsObject {
   public:
     //--- Constructors ----------------------------------------------------------------------------------------------------------
     /** Constructor taking the encoded wire number.
@@ -52,7 +52,7 @@ namespace Belle2 {
     }
 
     /** Copy constructor. */
-    WireID(const WireID& wireID) : TObject(wireID) {
+    WireID(const WireID& wireID) : RelationsObject(wireID) {
       m_eWire = wireID.m_eWire;
     }
 
@@ -76,7 +76,7 @@ namespace Belle2 {
     /** Assignment operator. */
     WireID& operator=(const WireID& wireID) {
       m_eWire = wireID.m_eWire;
-      static_cast<TObject>(*this) = wireID;
+      static_cast<RelationsObject>(*this) = wireID;
       return *this;
     }
 

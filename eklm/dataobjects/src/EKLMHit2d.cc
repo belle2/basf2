@@ -51,19 +51,6 @@ float EKLMHit2d::getChiSq() const
   return m_ChiSq;
 }
 
-void EKLMHit2d::Print()
-{
-  printf("------------  Hit 2d  -------------- \n"
-         "Endcap: %d Layer: %d Sector: %d\n",
-         getEndcap(), getLayer(), getSector());
-  printf("Plane 1: ");
-  m_digit[0]->Print();
-  printf("Plane 2: ");
-  m_digit[1]->Print();
-  printf("Position: X:%f Y:%f Z:%f.", m_globalX, m_globalY, m_globalZ);
-  printf("Chi squared: %f\n", m_ChiSq);
-}
-
 void EKLMHit2d::setChiSq(float chisq)
 {
   m_ChiSq = chisq;

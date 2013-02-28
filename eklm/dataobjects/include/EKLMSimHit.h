@@ -59,11 +59,6 @@ namespace Belle2 {
     void setVolumeID(int id);
 
     /**
-     * Print hit.
-     */
-    void Print();
-
-    /**
      * Get plane number.
      */
     int getPlane() const;

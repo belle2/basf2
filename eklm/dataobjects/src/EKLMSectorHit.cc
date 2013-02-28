@@ -43,16 +43,3 @@ EKLMDigit* EKLMSectorHit::getHit(int plane, int hit)
   return m_hits[plane - 1][hit];
 }
 
-void EKLMSectorHit::Print()
-{
-  std::vector<EKLMDigit*>::iterator i;
-  printf("------------  Sector Hit  -------------- \n"
-         "Endcap: %d Layer: %d Sector: %d\n", m_Endcap, m_Layer, m_Sector);
-  printf("Hits from plane 1:\n");
-  for (i = m_hits[0].begin(); i != m_hits[0].end(); i++)
-    (*i)->Print();
-  printf("Hits from plane 2:\n");
-  for (i = m_hits[1].begin(); i != m_hits[1].end(); i++)
-    (*i)->Print();
-}
-

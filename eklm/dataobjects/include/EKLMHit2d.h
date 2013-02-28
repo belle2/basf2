@@ -46,11 +46,6 @@ namespace Belle2 {
     ~EKLMHit2d();
 
     /**
-     * Print 2d hit information.
-     */
-    void Print();
-
-    /**
      * Get EKLMDigit.
      * @param[in[ plane plane number.
      * @return Pointer to the hit.

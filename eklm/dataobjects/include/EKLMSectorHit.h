@@ -44,11 +44,6 @@ namespace Belle2 {
     ~EKLMSectorHit() {};
 
     /**
-     * Print information about the sector hit.
-     */
-    void Print();
-
-    /**
      * Add hit.
      * @param[in] hit Hit.
      * @return 0    Successful.

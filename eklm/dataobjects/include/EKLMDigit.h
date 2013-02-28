@@ -47,11 +47,6 @@ namespace Belle2 {
     ~EKLMDigit() {};
 
     /**
-     * Print stip name and some other useful information.
-     */
-    void Print() const;
-
-    /**
      * Get number of photoelectrons (fit result).
      * @return Number of photoelectrons.
      */

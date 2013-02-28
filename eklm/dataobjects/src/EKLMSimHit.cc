@@ -63,10 +63,3 @@ void EKLMSimHit::setStrip(int strip)
   m_Strip = strip;
 }
 
-void EKLMSimHit::Print()
-{
-  printf("EKLM Hit:\nGlobal position: (%f, %f, %f)\nTime: %f\n"
-         "Energy Deposition: %f\nPDG code: %d\n",
-         m_globalX, m_globalY, m_globalZ, m_Time, m_EDep, m_PDG);
-}
-

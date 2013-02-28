@@ -100,8 +100,3 @@ void EKLMDigit::setVolumeID(int id)
   m_volid = id;
 }
 
-void EKLMDigit::Print() const
-{
-  printf("Endcap: %d Layer: %d Sector: %d Plane: %d Strip: %d # Time: %f\n",
-         getEndcap(), getLayer(), getSector(), getPlane(), getStrip(), m_Time);
-}

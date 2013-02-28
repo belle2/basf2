@@ -61,12 +61,11 @@ namespace Belle2 {
     MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */
 
     template <typename T>
-    std::vector<T> make_vector(T const& t1, T const& t2);
+    std::vector<T> make_vector(T const& t1, T const& t2);  /**< make_vector. */
 
     template <typename T>
     std::pair<T, T> vectorToPair(std::vector<T> &vec, const std::string& name = "");
-  };
-
+  }; /**< vectorToPair. */
 
   template <typename T>
   inline std::vector<T> BHWideInputModule::make_vector(T const& t1, T const& t2)

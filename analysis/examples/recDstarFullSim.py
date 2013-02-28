@@ -33,8 +33,9 @@ from basf2 import *
 #
 # Available selection variables can be listed with: basf2 -m ParticleSelector
 #
-# Selection criteria converted to a C++ style can be printed with B2INFO at
-# module initialization
+# Selection criteria converted to more usual expressions can be printed with B2INFO.
+# They are printed out when modules are initialized. To see them easily run several
+# events only.
 #
 # Note: def Events is a temporary solution; works only if run and exp numbers match
 # the ones in the file.
@@ -54,6 +55,8 @@ def Input(filename):
     roinput = register_module('RootInput')
     roinput.param('inputFileName', filename)
     main.add_module(roinput)
+    gearbox = register_module('Gearbox')
+    main.add_module(gearbox)
     progress = register_module('Progress')
     main.add_module(progress)
 

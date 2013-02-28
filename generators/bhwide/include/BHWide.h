@@ -117,7 +117,7 @@ namespace Belle2 {
     /** Set the model for the photon vacuum polarization.
      * @param photonVacPol The model for the photon vacuum polarization: Off, BHLUMI, Eidelman or Burkhardt.
      */
-    void setPhotonVacPolarization(PhotonVacPolarization photonVacPol) { m_photonVacPol = photonVacPol; }
+    void setPhotonVacPolarization(PhotonVacPolarization photonVacPol) { m_photonVacPol = photonVacPol; }  /**< photonVacPol. */
 
     /** Sets the CMS energy.
      * @param cmsEnergy The CMS energy in [GeV].

@@ -5,7 +5,7 @@ from basf2 import *
 
 # ----------------------------------------------------------------------------------
 # Example of reconstruction D*+ -> D0 pi+, D0 -> K- pi+ using full simulation and
-# reconstruction output
+# reconstruction output file
 #
 # To run this script you need first to prepare a root file output.root
 # using for example reconstruction/examples/example.py
@@ -33,22 +33,12 @@ from basf2 import *
 #
 # Available selection variables can be listed with: basf2 -m ParticleSelector
 #
-# Selection criteria converted to more usual expressions can be printed with B2INFO.
-# They are printed out when modules are initialized. To see them easily run several
-# events only.
+# Selection criteria converted to the usual expressions can be printed out by
+# processing one event at logLevel INFO: basf2 recDstarFullSim.py -n 1 -l INFO
 #
-# Note: def Events is a temporary solution; works only if run and exp numbers match
-# the ones in the file.
 # ----------------------------------------------------------------------------------
 
 # definitions below will be once in the future put into a separate file
-
-
-def Events(numlist, runlist, explist):
-    evtmetagen = register_module('EvtMetaGen')
-    evtmetagen.param({'EvtNumList': numlist, 'RunList': runlist, 'ExpList'
-                     : explist})
-    main.add_module(evtmetagen)
 
 
 def Input(filename):
@@ -125,13 +115,9 @@ def printList(list_name, full):
     main.add_module(prlist)
 
 
-set_log_level(LogLevel.ERROR)
-
 # analysis code follows
 
 main = create_path()
-
-# Events([5],[1],[1]) # uncomment this line and set logLevel.INFO to see what's going on
 
 Input('output.root')
 loadReconstructedParticles()

@@ -74,9 +74,9 @@ namespace Belle2 {
 
       const int N = 2;
 
-      double stepMax = 5.0 * Unit::mm;
+      //double stepMax = 5.0 * Unit::mm;
       //bool flag_limitStep = true;
-      bool flag_limitStep = false;
+      //bool flag_limitStep = false;
 
       double unitFactor = 10.0;
 

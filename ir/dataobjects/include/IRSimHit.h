@@ -54,22 +54,22 @@ namespace Belle2 {
     ~IRSimHit();
 
     /** The method to set.*/
-    void setposIn(TVector3 posIn);
-    void setmomIn(TVector3 momIn);
-    void setposOut(TVector3 posOut);
-    void setmomOut(TVector3 momOut);
-    void setPDGcode(int PDGcode);
-    void setdepEnergy(float depEnergy);
-    void setVolname(std::string Volname);
+    void setposIn(TVector3 posIn); /** Set position at start point*/
+    void setmomIn(TVector3 momIn); /** Set momentum at start point */
+    void setposOut(TVector3 posOut); /** Set position at end point */
+    void setmomOut(TVector3 momOut); /** Set momentum at end point */
+    void setPDGcode(int PDGcode);    /** Set PDF code */
+    void setdepEnergy(float depEnergy); /** Set deposited energy */
+    void setVolname(std::string Volname); /** Set volume name */
 
     /** The method to get.*/
-    TVector3 getposIn();
-    TVector3 getmomIn();
-    TVector3 getposOut();
-    TVector3 getmomOut();
-    int getPDGcode();
-    float getdepEnergy();
-    std::string getVolname();
+    TVector3 getposIn();  /** return position at start point*/
+    TVector3 getmomIn();  /** return momentum at start point*/
+    TVector3 getposOut(); /** return position at end point*/
+    TVector3 getmomOut(); /** return momentum at end point*/
+    int getPDGcode();     /** return PDG code */
+    float getdepEnergy(); /** return deposited energy */
+    std::string getVolname(); /** return volume name */
 
   protected:
 

@@ -18,12 +18,10 @@
 class EvtGenFwRandEngine : public EvtRandomEngine {
 public:
 
-  /**
-   * Constructor.
-   */
+  /* Constructor. */
 
   virtual double random() {
-    return gRandom->Uniform(1.0);  /* Function random */
+    return gRandom->Uniform(1.0);  /**< Function random */
   }
 };
 

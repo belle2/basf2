@@ -145,8 +145,8 @@ namespace Belle2 {
       //       +- F3wal3
 
       double stepMax = 5.0 * Unit::mm;
-      bool flag_limitStep = true;
-      //bool flag_limitStep = false;
+      //bool flag_limitStep = true;
+      bool flag_limitStep = false;
 
       double unitFactor = 10.0;
 

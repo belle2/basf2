@@ -55,7 +55,7 @@ GeoMagneticField::~GeoMagneticField()
 }
 
 
-void GeoMagneticField::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+void GeoMagneticField::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes)
 {
   //Read the magnetic field components
   GearDir components(content, "Components/Component");
@@ -121,24 +121,21 @@ void GeoMagneticField::readQuadBField(const GearDir& component)
 {
   string mapFilenameHER = component.getString("MapFilenameHER");
   string mapFilenameLER = component.getString("MapFilenameLER");
+  string mapFilenameHERleak = component.getString("MapFilenameHERleak");
   string apertFilenameHER = component.getString("ApertFilenameHER");
   string apertFilenameLER = component.getString("ApertFilenameLER");
 
   int mapSizeHER        = component.getInt("MapSizeHER");
   int mapSizeLER        = component.getInt("MapSizeLER");
+  int mapSizeHERleak    = component.getInt("MapSizeHERleak");
   int apertSizeHER      = component.getInt("ApertSizeHER");
   int apertSizeLER      = component.getInt("ApertSizeLER");
 
-  /* save beam energy in [eV] */
-  double beamEnergyHER    = component.getEnergy("BeamEnergyHER") / Unit::eV ;
-  double beamEnergyLER    = component.getEnergy("BeamEnergyLER") / Unit::eV ;
-
   BFieldComponentQuad& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentQuad>();
-  bComp.setMapFilename(mapFilenameHER, mapFilenameLER);
+  bComp.setMapFilename(mapFilenameHER, mapFilenameLER, mapFilenameHERleak);
   bComp.setApertFilename(apertFilenameHER, apertFilenameLER);
-  bComp.setMapSize(mapSizeHER, mapSizeLER);
+  bComp.setMapSize(mapSizeHER, mapSizeLER, mapSizeHERleak);
   bComp.setApertSize(apertSizeHER, apertSizeLER);
-  bComp.setBeamEnergy(beamEnergyHER, beamEnergyLER);
 }
 
 void GeoMagneticField::readBeamlineBField(const GearDir& component)

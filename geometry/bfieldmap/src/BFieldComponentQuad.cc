@@ -13,7 +13,9 @@
 #include <framework/core/Environment.h>
 #include <framework/core/utilities.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/device/file.hpp>
@@ -26,7 +28,7 @@ using namespace Belle2;
 namespace io = boost::iostreams;
 
 
-BFieldComponentQuad::BFieldComponentQuad() : m_mapFilenameHER(""), m_mapFilenameLER(""), m_apertFilenameHER(""), m_apertFilenameLER("")
+BFieldComponentQuad::BFieldComponentQuad() : m_mapFilenameHER(""), m_mapFilenameLER(""), m_mapFilenameHERleak(""), m_apertFilenameHER(""), m_apertFilenameLER("")
 {
 
 }
@@ -68,6 +70,11 @@ void BFieldComponentQuad::initialize()
     B2FATAL("The LER quadrupole magnetic field map file '" << m_mapFilenameLER << "' could not be found !")
     return;
   }
+  string fullPathMapHERleak = Environment::Instance().getDataSearchPath() + "/" + m_mapFilenameHERleak;
+  if (!FileSystem::fileExists(fullPathMapHERleak)) {
+    B2FATAL("The HERleak quadrupole magnetic field map file '" << m_mapFilenameHERleak << "' could not be found !")
+    return;
+  }
   string fullPathApertHER = Environment::Instance().getDataSearchPath() + "/" + m_apertFilenameHER;
   if (!FileSystem::fileExists(fullPathApertHER)) {
     B2FATAL("The HER aperture file '" << m_apertFilenameHER << "' could not be found !")
@@ -83,9 +90,10 @@ void BFieldComponentQuad::initialize()
   // Load the field map files
   //--------------------------------------------------------------
 
-  io::filtering_istream fieldMapFileHER, fieldMapFileLER;
+  io::filtering_istream fieldMapFileHER, fieldMapFileLER, fieldMapFileHERleak;
   fieldMapFileHER.push(io::file_source(fullPathMapHER));
   fieldMapFileLER.push(io::file_source(fullPathMapLER));
+  fieldMapFileHERleak.push(io::file_source(fullPathMapHERleak));
 
   string name;
   double s, L, K0, K1, SK0, SK1, ROTATE, DX, DY;
@@ -126,6 +134,24 @@ void BFieldComponentQuad::initialize()
     B2DEBUG(10, "... loaded LER SAD element " << name << " at s= " << s << "[m].")
   }
   B2DEBUG(10, "... loaded " << m_mapSizeLER << " elements.")
+
+  m_mapBufferHERleak = new ParamPoint[m_mapSizeHERleak];
+  for (int i = 0; i < m_mapSizeHERleak; ++i) {
+    fieldMapFileHERleak >> name >> s >> L >> K0 >> K1 >> SK0 >> SK1 >> ROTATE >> DX >> DY;
+    /* Save parametors in unit [m], not in unit [cm].*/
+    m_mapBufferHERleak[i].s      = s;   // [m]
+    m_mapBufferHERleak[i].L      = L;   // [m]
+    m_mapBufferHERleak[i].K0     = K0;  // [dimensionless]
+    m_mapBufferHERleak[i].K1     = K1;  // [1/m]
+    m_mapBufferHERleak[i].SK0    = SK0; // [dimensionless]
+    m_mapBufferHERleak[i].SK1    = SK1; // [1/m]
+    m_mapBufferHERleak[i].ROTATE = ROTATE; // [degree]
+    m_mapBufferHERleak[i].DX     = DX; // [m]
+    m_mapBufferHERleak[i].DY     = DY; // [m]
+    B2DEBUG(10, "... loaded HERleak SAD element " << name << " at s= " << s << "[m].")
+  }
+  B2DEBUG(10, "... loaded " << m_mapSizeHERleak << " elements.")
+
 
 
   //--------------------------------------------------------------
@@ -203,12 +229,19 @@ double BFieldComponentQuad::getApertureLER(double s) const
 
 TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 {
+
   //Conversion to LER/HER SAD coordinates
-  double angle_crossing = 0.0830; //H.Nakayama: sorry, hard-coded
-  double angle_HER = - angle_crossing / 2.;
-  TVector3 pHER(point.X(), point.Y(), point.Z()); pHER.RotateY(angle_HER); pHER.RotateX(M_PI);
-  double angle_LER =  angle_crossing / 2.;
-  TVector3 pLER(point.X(), point.Y(), point.Z()); pLER.RotateY(angle_LER); pLER.RotateX(M_PI);
+  GearDir her("/Detector/SuperKEKB/HER/");
+  GearDir ler("/Detector/SuperKEKB/LER/");
+  double angle_HER = her.getDouble("angle"); //  0.0415
+  double angle_LER = ler.getDouble("angle"); // -0.0415
+
+  double p0_HER = her.getDouble("energy") / Unit::eV; // 7.0e+9 [eV]
+  double p0_LER = ler.getDouble("energy") / Unit::eV; // 4.0e+9 [eV]
+  double c = Const::speedOfLight / (Unit::m / Unit::s);  // 3.0e+8 [m/s]
+
+  TVector3 pHER(point.X(), point.Y(), point.Z()); pHER.RotateY(-angle_HER); pHER.RotateX(M_PI);
+  TVector3 pLER(point.X(), point.Y(), point.Z()); pLER.RotateY(-angle_LER); pLER.RotateX(M_PI);
 
   //Check if the point lies inside HER or LER beam pipe
   bool HERflag = false;
@@ -222,10 +255,8 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
   if (getApertureLER(s_LER) > r_LER) LERflag = true;
 
   double X, Y, s; // [m]
-  double K0, K1, SK0, SK1, L, ROTATE, DX, DY;
-  double p0_HER = 7.00729e+9; // [eV] //H.Nakayama: sorry, hard-coded
-  double p0_LER = 4.00000e+9; // [eV] //H.Nakayama: sorry, hard-coded
-  double c = 3.0e+8;// [m/s]          //H.Nakayama: sorry, hard-coded
+  double K0 = 0., K1 = 0., SK0 = 0., SK1 = 0.;
+  double L = 0., ROTATE = 0., DX = 0., DY = 0.;
 
   /* in case the point is outside of both LER and HER, returns zero field*/
   if ((!HERflag) && (!LERflag)) return TVector3(0, 0, 0);
@@ -251,8 +282,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
         SK0    = m_mapBufferHER[i].SK0;
         SK1    = m_mapBufferHER[i].SK1;
         L      = m_mapBufferHER[i].L;
-        ROTATE = m_mapBufferHER[i].ROTATE;
-        ROTATE *= ROTATE_DIRECTION;
+        ROTATE = m_mapBufferHER[i].ROTATE; ROTATE *= ROTATE_DIRECTION;
         DX     = m_mapBufferHER[i].DX;
         DY     = m_mapBufferHER[i].DY;
         foundflag = true;
@@ -260,31 +290,72 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       }
     }
 
-    TVector3 p_tmp(X - DX, Y - DY, s); p_tmp.RotateZ(-ROTATE / 180.*M_PI);
+    //rotate after subtracting DX,DY
+    TVector3 p_tmp(X - DX, Y - DY, s);
+    p_tmp.RotateZ(-ROTATE / 180.*M_PI);
     X = p_tmp.X();
     Y = p_tmp.Y();
 
-    //TVector3 p_tmp(X, Y, s); p_tmp.RotateZ(-ROTATE / 180.*M_PI);
-    //X = p_tmp.X() - DX;
-    //Y = p_tmp.Y() - DY;
-
+    TVector3 B(0, 0, 0);
     if (foundflag) {
       double Bs = 0;
       double BX = (p0_HER / c / L) * (K1 * Y + SK1 * X + SK0);
       double BY = (p0_HER / c / L) * (K1 * X - SK1 * Y + K0);
-      TVector3 B(BX, BY, Bs);
+      B.SetXYZ(BX, BY, Bs);
       B.RotateZ(ROTATE / 180.*M_PI);
-      B.RotateX(-M_PI); B.RotateY(-angle_HER);
+      B.RotateX(-M_PI); B.RotateY(angle_HER);
 
       B2DEBUG(20, "HER quadrupole fields calculated at (x,y,z)=("
               << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
               << " i.e. (X,Y,s)=(" << X << "," << Y << "," << s
               << ") is (Bx,By,Bz)=(" << B.X() << "," << B.Y() << "," << B.Z() << ").")
 
-      return B;
     } else {
       return TVector3(0, 0, 0);
     }
+
+    // HER leak component
+
+    foundflag = false;
+    //H.Nakayama: this loop could be modified to binary-search
+    for (int i = 0; i < m_mapSizeHERleak; i++) {
+      if ((m_mapBufferHERleak[i].s < s) && (s < m_mapBufferHERleak[i].s + m_mapBufferHERleak[i].L)) {
+        K0     = m_mapBufferHERleak[i].K0;
+        K1     = m_mapBufferHERleak[i].K1;
+        SK0    = m_mapBufferHERleak[i].SK0;
+        SK1    = m_mapBufferHERleak[i].SK1;
+        L      = m_mapBufferHERleak[i].L;
+        ROTATE = m_mapBufferHERleak[i].ROTATE; ROTATE *= ROTATE_DIRECTION;
+        DX     = m_mapBufferHERleak[i].DX;
+        DY     = m_mapBufferHERleak[i].DY;
+        foundflag = true;
+        break;
+      }
+    }
+
+    //rotate after subtracting DX,DY
+    TVector3 p_tmp_leak(X - DX, Y - DY, s);
+    p_tmp_leak.RotateZ(-ROTATE / 180.*M_PI);
+    X = p_tmp_leak.X();
+    Y = p_tmp_leak.Y();
+
+    TVector3 Bleak(0, 0, 0);
+    if (foundflag) {
+      double Bs = 0;
+      double BX = (p0_HER / c / L) * (K1 * Y + SK1 * X + SK0);
+      double BY = (p0_HER / c / L) * (K1 * X - SK1 * Y + K0);
+      Bleak.SetXYZ(BX, BY, Bs);
+      Bleak.RotateZ(ROTATE / 180.*M_PI);
+      Bleak.RotateX(-M_PI); Bleak.RotateY(angle_HER);
+
+      B2DEBUG(20, "HER quadrupole leak fields calculated at (x,y,z)=("
+              << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
+              << " i.e. (X,Y,s)=(" << X << "," << Y << "," << s
+              << ") is (Bx,By,Bz)=(" << Bleak.X() << "," << Bleak.Y() << "," << Bleak.Z() << ").")
+    }
+
+    return B + Bleak;
+
   }
 
   /* in case the point is inside LER*/
@@ -303,8 +374,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
         SK0    = m_mapBufferLER[i].SK0;
         SK1    = m_mapBufferLER[i].SK1;
         L      = m_mapBufferLER[i].L;
-        ROTATE = m_mapBufferLER[i].ROTATE;
-        ROTATE *= ROTATE_DIRECTION;
+        ROTATE = m_mapBufferLER[i].ROTATE; ROTATE *= ROTATE_DIRECTION;
         DX     = m_mapBufferLER[i].DX;
         DY     = m_mapBufferLER[i].DY;
         foundflag = true;
@@ -312,13 +382,10 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       }
     }
 
-    TVector3 p_tmp(X - DX, Y - DY, s); p_tmp.RotateZ(-ROTATE / 180.*M_PI);
+    TVector3 p_tmp(X - DX, Y - DY, s);
+    p_tmp.RotateZ(-ROTATE / 180.*M_PI);
     X = p_tmp.X();
     Y = p_tmp.Y();
-    //TVector3 p_tmp(X, Y, s); p_tmp.RotateZ(-ROTATE / 180.*M_PI);
-    //X = p_tmp.X() - DX;
-    //Y = p_tmp.Y() - DY;
-
 
     if (foundflag) {
       double Bs = 0;
@@ -326,7 +393,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       double BY = (p0_LER / c / L) * (K1 * X - SK1 * Y + K0);
       TVector3 B(BX, BY, Bs);
       B.RotateZ(ROTATE / 180.*M_PI);
-      B.RotateX(-M_PI); B.RotateY(-angle_LER);
+      B.RotateX(-M_PI); B.RotateY(angle_LER);
 
       B2DEBUG(20, "LER quadrupole fields calculated at (x,y,z)=("
               << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
@@ -353,6 +420,9 @@ void BFieldComponentQuad::terminate()
 
   B2DEBUG(10, "De-allocating the memory for the LER quadrupole magnetic field map loaded from the file '" << m_mapFilenameLER << "'")
   delete [] m_mapBufferLER;
+
+  B2DEBUG(10, "De-allocating the memory for the HER leakage field map loaded from the file '" << m_mapFilenameHERleak << "'")
+  delete [] m_mapBufferHERleak;
 
   B2DEBUG(10, "De-allocating the memory for the HER aperture map loaded from the file '" << m_apertFilenameHER << "'")
   delete [] m_apertBufferHER;

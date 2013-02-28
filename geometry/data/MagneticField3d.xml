@@ -45,19 +45,20 @@
 			    used in accelerator simulation.
 			    These parameters are provided for each 1cm slice in the beam direction.
 			-->
+			<!-- based on sher_5753, sler_1682, irdata.class.SKEKB20121116A -->
 			<Component type="Quad">
-				<MapFilenameHER>geometry/QuadFieldMapHER3d.dat</MapFilenameHER>
-				<MapFilenameLER>geometry/QuadFieldMapLER3d.dat</MapFilenameLER>
-				<MapSizeHER>734</MapSizeHER>
+				<MapFilenameHER>geometry/QuadFieldMapHER.dat</MapFilenameHER>
+				<MapFilenameLER>geometry/QuadFieldMapLER.dat</MapFilenameLER>
+				<MapFilenameHERleak>geometry/QuadFieldMapHERleak.dat</MapFilenameHERleak>
+				<MapSizeHER>424</MapSizeHER>
 				<MapSizeLER>396</MapSizeLER>
+				<MapSizeHERleak>204</MapSizeHERleak>
 				<ApertFilenameHER>geometry/ApertHER.dat</ApertFilenameHER>
 				<ApertFilenameLER>geometry/ApertLER.dat</ApertFilenameLER>
 				<ApertSizeHER>22</ApertSizeHER>
 				<ApertSizeLER>26</ApertSizeLER>
-				<CircumferenceHER unit="m">3016.31451</CircumferenceHER>
-				<CircumferenceLER unit="m">3016.30558</CircumferenceLER>
-				<BeamEnergyHER unit="GeV">7.0</BeamEnergyHER>
-				<BeamEnergyLER unit="GeV">4.0</BeamEnergyLER>
+				<CircumferenceHER unit="m">3016.314517</CircumferenceHER>
+				<CircumferenceLER unit="m">3016.305585</CircumferenceLER>
 			</Component>
 			<!-- 3D magnetic field map near beam pipe
 			     The magnetic field map is stored as a grid in cylindrical coordinates.

@@ -52,11 +52,11 @@ namespace Belle2 {
 
     MCParticleGraph mpg;        /**< An instance of the MCParticle graph. */
     EvtGenInterface m_Ievtgen;  /**< An instance of the EvtGen Interface. */
-    std::string m_DECFileName;     /* Standard input decay file   */
-    std::string m_userDECFileName; /* Standard input user decay file   */
-    std::string m_pdlFileName;     /* Standard input pdl file  */
-    std::string m_parentParticle;  /* Standard input parent particle */
-    bool m_boost2LAB;              /* Boosted to LAB frame */
+    std::string m_DECFileName;     /**<  Standard input decay file.  */
+    std::string m_userDECFileName; /**<  Standard input user decay file. */
+    std::string m_pdlFileName;     /**<  Standard input pdl file.  */
+    std::string m_parentParticle;  /**<  Standard input parent particle. */
+    bool m_boost2LAB;              /**<  Boosted to LAB frame. */
     double m_EHER;              /**< Energy for HER [GeV]. */
     double m_ELER;              /**< Energy for LER [GeV]. */
     double m_HER_Espread;       /**< Energy spread for HER [GeV]. */

@@ -78,7 +78,6 @@ namespace Belle2 {
       }
 
       StoreArray<IRSimHit> irSimHits;
-      if (!irSimHits.isValid()) irSimHits.create();
       new(irSimHits.nextFreeAddress()) IRSimHit(posInVec,
                                                 momInVec,
                                                 posOutVec,

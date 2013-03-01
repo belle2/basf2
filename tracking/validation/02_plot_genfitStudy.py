@@ -56,7 +56,7 @@ chain.Add(infile)
 chain.GetEntry()
 if chain.GetEntriesFast() < 1:
     print 'Error: m_statDataTreePtr tree has no entries'
-    exit(1)
+    sys.exit(1)
 
 # output files
 outFile = ROOT.TFile(outFileName, 'recreate')

@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="BeamPipe" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Creator library="ir">BeamPipeCreator</Creator>
+  <Content>
+
+    <Safety>
+        <L1 unit="cm">0.1</L1>
+    </Safety>
+    <!-- ########## IP pipe ########## -->
+    <Lv1SUS>
+        <L1 unit="cm">0.3</L1>
+        <L2 unit="cm">0.9</L2>
+        <L3 unit="cm">0.25</L3>
+        <L4 unit="cm">0.65</L4>
+        <L5 unit="cm">0.35</L5>
+        <L6 unit="cm">4.03</L6>
+        <L7 unit="cm">0.07</L7>
+        <L8 unit="cm">2.45</L8>
+        <L9 unit="cm">4.65</L9>
+        <L10 unit="cm">0.07</L10>
+        <L11 unit="cm">5.78</L11>
+        <L12 unit="cm">0.35</L12>
+        <L13 unit="cm">0.65</L13>
+        <L14 unit="cm">0.25</L14>
+        <L15 unit="cm">0.9</L15>
+        <L16 unit="cm">1.2</L16>
+        <R1 unit="cm">1.16</R1>
+        <R2 unit="cm">2.5</R2>
+        <R3 unit="cm">2.25</R3>
+        <R4 unit="cm">1.6</R4>
+        <R5 unit="cm">1.25</R5>
+        <R6 unit="cm">1.2</R6>
+        <R7 unit="cm">1.25</R7>
+        <R8 unit="cm">1.6</R8>
+        <R9 unit="cm">2.25</R9>
+        <R10 unit="cm">2.5</R10>
+        <R11 unit="cm">1.45</R11>
+        <Material desc="SUS">SUS316L</Material>
+    </Lv1SUS>
+
+    <Lv2OutBe>
+        <L1 unit="cm">2.90</L1>
+        <L2 unit="cm">5.10</L2>
+        <R1 unit="cm">1.16</R1>
+        <R2 unit="cm">1.20</R2>
+        <Material>Be</Material>
+    </Lv2OutBe>
+
+    <Lv2InBe>
+        <L1 unit="cm">3.70</L1>
+        <L2 unit="cm">5.90</L2>
+        <R1 unit="cm">1.00</R1>
+        <R2 unit="cm">1.06</R2>
+        <Material>Be</Material>
+    </Lv2InBe>
+
+    <Lv2Paraf>
+        <L1 unit="cm">0.35</L1>
+        <L2 unit="cm">0.1</L2>
+        <L3 unit="cm">0.625</L3>
+        <L4 unit="cm">0.3</L4>
+        <L5 unit="cm">3.35</L5>
+        <L6 unit="cm">0.075</L6>
+        <L7 unit="cm">0.125</L7>
+        <L8 unit="cm">0.075</L8>
+        <L9 unit="cm">3.00</L9>
+        <L10 unit="cm">5.20</L10>
+        <L11 unit="cm">0.025</L11>
+        <L12 unit="cm">0.175</L12>
+        <L13 unit="cm">0.075</L13>
+        <L14 unit="cm">5.1</L14>
+        <L15 unit="cm">0.285</L15>
+        <L16 unit="cm">0.065</L16>
+        <L17 unit="cm">0.115</L17>
+        <L18 unit="cm">0.46</L18>
+        <L19 unit="cm">0.1</L19>
+        <L20 unit="cm">0.35</L20>
+        <R1 unit="cm">1.12</R1>
+        <R2 unit="cm">2.25</R2>
+        <R3 unit="cm">1.6</R3>
+        <R4 unit="cm">1.5</R4>
+        <R5 unit="cm">1.18</R5>
+        <R6 unit="cm">1.06</R6>
+        <R7 unit="cm">1.16</R7>
+        <R8 unit="cm">1.18</R8>
+        <R9 unit="cm">1.12</R9>
+        <R10 unit="cm">1.5</R10>
+        <R11 unit="cm">1.31</R11>
+        <R12 unit="cm">1.6</R12>
+        <R13 unit="cm">2.25</R13>
+        <Material>Paraffin</Material>
+    </Lv2Paraf>
+
+    <Lv2Vacuum>
+        <L1 unit="cm">9.0</L1>
+        <L2 unit="cm">10.0</L2>
+        <L3 unit="cm">5.0</L3>
+        <L4 unit="cm">15.0</L4>
+        <R1 unit="cm">1.0</R1>
+        <R2 unit="cm">1.0</R2>
+        <R3 unit="cm">0.493</R3>
+        <A1 unit="rad">0.0415</A1>
+        <A2 unit="rad">0.06914</A2>
+        <Material>Vacuum</Material>
+    </Lv2Vacuum>
+
+    <Lv3AuCoat>
+        <L1 unit="cm">3.70</L1>
+        <L2 unit="cm">5.90</L2>
+        <R1 unit="cm">0.999</R1>
+        <R2 unit="cm">1.000</R2>
+        <Material>Au</Material>
+    </Lv3AuCoat>
+
+    <!-- ########## Ta pipe Forward ########## -->
+    <Lv1TaFwd>
+        <D1 unit="cm">13.85</D1>
+        <L1 unit="cm">36.35</L1>
+        <L2 unit="cm">1.45</L2>
+        <L3 unit="cm">4.023</L3>
+        <T1 unit="cm">1.45</T1>
+        <Material>Ta</Material>
+    </Lv1TaFwd>
+
+    <Lv2VacFwd>
+        <D1 unit="cm">10.0</D1>
+        <D2 unit="cm">25.0</D2>
+        <D3 unit="cm">45.2</D3>
+        <L1 unit="cm">50.0</L1>
+        <L2 unit="cm">32.426</L2>
+        <L3 unit="cm">50.0</L3>
+        <R1 unit="cm">1.0</R1>
+        <R2 unit="cm">1.0</R2>
+        <R3 unit="cm">0.2822</R3>
+        <R4 unit="cm">1.0</R4>
+        <A1 unit="rad">0.0415</A1>
+        <A2 unit="rad">0.06914</A2>
+        <Material>Vacuum</Material>
+    </Lv2VacFwd>
+
+    <!-- ########## Ta pipe Backward ########## -->
+    <Lv1TaBwd>
+        <D1 unit="cm">9.0</D1>
+        <L1 unit="cm">41.2</L1>
+        <L2 unit="cm">4.084</L2>
+        <L3 unit="cm">1.2</L3>
+        <T1 unit="cm">1.45</T1>
+        <Material>Ta</Material>
+    </Lv1TaBwd>
+
+    <Lv2VacBwd>
+        <D1 unit="cm">9.0</D1>
+        <D2 unit="cm">25.0</D2>
+        <D3 unit="cm">45.2</D3>
+        <L1 unit="cm">50.0</L1>
+        <L2 unit="cm">33.337</L2>
+        <L3 unit="cm">10.0</L3>
+        <R1 unit="cm">1.0</R1>
+        <R2 unit="cm">1.0</R2>
+        <R3 unit="cm">0.3197</R3>
+        <R4 unit="cm">1.0</R4>
+        <A1 unit="rad">0.0415</A1>
+        <A2 unit="rad">0.06482</A2>
+        <Material>Vacuum</Material>
+    </Lv2VacBwd>
+
+    <!-- ########## Ta pipe Forward Forward ########## -->
+    <AreaTubeFwd>
+        <R1 unit="cm">12.</R1>
+        <D1 unit="cm">50.2</D1>
+        <D2 unit="cm">63.35</D2>
+    </AreaTubeFwd>
+
+    <Lv1TaLERUp>
+        <R1 unit="cm">1.5</R1>
+        <L1 unit="cm">30.0</L1>
+        <L2 unit="cm">100.0</L2>
+        <A1 unit="rad">-0.0415</A1>
+        <Material>Ta</Material>
+    </Lv1TaLERUp>
+
+    <Lv2VacLERUp>
+        <R1 unit="cm">1.0</R1>
+        <Material>Vacuum</Material>
+    </Lv2VacLERUp>
+
+    <Lv1TaHERDwn>
+        <R1 unit="cm">1.5</R1>
+        <L1 unit="cm">30.0</L1>
+        <L2 unit="cm">100.0</L2>
+        <A1 unit="rad">0.0415</A1>
+        <Material>Ta</Material>
+    </Lv1TaHERDwn>
+
+    <Lv2VacHERDwn>
+        <R1 unit="cm">1.0</R1>
+        <Material>Vacuum</Material>
+    </Lv2VacHERDwn>
+
+    <!-- ########## Ta pipe Backward Backward ########## -->
+    <AreaTubeBwd>
+        <R1 unit="cm">12</R1>
+        <D1 unit="cm">50.2</D1>
+        <D2 unit="cm">62.725</D2>
+    </AreaTubeBwd>
+
+    <Lv1TaHERUp>
+        <R1 unit="cm">1.5</R1>
+        <L1 unit="cm">30.0</L1>
+        <L2 unit="cm">100.0</L2>
+        <A1 unit="rad">0.0415</A1>
+        <Material>Ta</Material>
+    </Lv1TaHERUp>
+
+    <Lv2VacHERUp>
+        <R1 unit="cm">1.0</R1>
+        <Material>Vacuum</Material>
+    </Lv2VacHERUp>
+
+    <Lv1TaLERDwn>
+        <R1 unit="cm">1.5</R1>
+        <L1 unit="cm">30.0</L1>
+        <L2 unit="cm">100.0</L2>
+        <A1 unit="rad">-0.0415</A1>
+        <Material>Ta</Material>
+    </Lv1TaLERDwn>
+
+    <Lv2VacLERDwn>
+        <R1 unit="cm">1.0</R1>
+        <Material>Vacuum</Material>
+    </Lv2VacLERDwn>
+
+
+  </Content>
+</DetectorComponent>

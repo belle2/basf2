@@ -294,9 +294,9 @@ void GenFitterModule::event()
       TVector3 momentumSeed = aTrackCandPointer->getMomSeed();
       TMatrixDSym covSeed = aTrackCandPointer->getCovSeed();
       B2DEBUG(100, "Start values: momentum (x,y,z,abs): " << momentumSeed.x() << "  " << momentumSeed.y() << "  " << momentumSeed.z() << " " << momentumSeed.Mag());
-      B2DEBUG(100, "Start values: momentum std: " << sqrt(covSeed[3][3]) << "  " << sqrt(covSeed[4][4]) << "  " << sqrt(covSeed[5][5]));
+      B2DEBUG(100, "Start values: momentum std: " << sqrt(covSeed(3, 3)) << "  " << sqrt(covSeed(4, 4)) << "  " << sqrt(covSeed(5, 5)));
       B2DEBUG(100, "Start values: pos:   " << posSeed.x() << "  " << posSeed.y() << "  " << posSeed.z());
-      B2DEBUG(100, "Start values: pos std:   " << sqrt(covSeed[0][0]) << "  " << sqrt(covSeed[1][1]) << "  " << sqrt(covSeed[2][2]));
+      B2DEBUG(100, "Start values: pos std:   " << sqrt(covSeed(0, 0)) << "  " << sqrt(covSeed(1, 1)) << "  " << sqrt(covSeed(2, 2)));
       B2DEBUG(100, "Start values: pdg:      " << currentPdgCode);
 
       GFTrack gfTrack(trackRep);  //create the track with the corresponding track representation
@@ -517,16 +517,16 @@ void GenFitterModule::event()
 //              tracks[trackCounter]->setErrorMatrix(resultCovariance);
 
               //store position errors
-              double xErr = sqrt(resultCovariance[0][0]);
-              double yErr = sqrt(resultCovariance[1][1]);
-              double zErr = sqrt(resultCovariance[2][2]);
+              double xErr = sqrt(resultCovariance(0, 0));
+              double yErr = sqrt(resultCovariance(1, 1));
+              double zErr = sqrt(resultCovariance(2, 2));
               B2DEBUG(99, "Position standard deviation: " << xErr << "  " << yErr << "  " << zErr);
 //              tracks[trackCounter]->setVertexErrors(xErr, yErr, zErr);
 
               //store momentum errors
-              double pxErr = sqrt(resultCovariance[3][3]);
-              double pyErr = sqrt(resultCovariance[4][4]);
-              double pzErr = sqrt(resultCovariance[5][5]);
+              double pxErr = sqrt(resultCovariance(3, 3));
+              double pyErr = sqrt(resultCovariance(4, 4));
+              double pzErr = sqrt(resultCovariance(5, 5));
               B2DEBUG(99, "Momentum standard deviation: " << pxErr << "  " << pyErr << "  " << pzErr);
 //              tracks[trackCounter]->setPErrors(pxErr, pyErr, pzErr);
 

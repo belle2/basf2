@@ -505,7 +505,7 @@ void GenFitterModule::event()
               //MH: this is new stuff...
               tracks[trackCounter]->setTrackFitResultIndex(chargedStable, trackFitResultCounter);
               TrackFitResult* newTrackFitResult = trackFitResults.appendNew();
-              newTrackFitResult->setCharge(gfTrack.getCharge());
+              newTrackFitResult->setCharge((int)gfTrack.getCharge());
               newTrackFitResult->setMomentum(resultMomentum);
               newTrackFitResult->setPosition(resultPosition);
               newTrackFitResult->setCovariance6(newResultCovariance);

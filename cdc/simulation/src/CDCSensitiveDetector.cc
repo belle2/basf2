@@ -598,7 +598,8 @@ L100:
     //calculate rotation angles for phi & theta
     G4int mode;
     G4double psi, cospsi, sinpsi, phi, theta;
-    G4double xfwb, yfwb, zfwb, xfwf, yfwf, zfwf, zw;
+    G4double xfwb, yfwb, zfwb, xfwf, yfwf, zfwf;
+    G4double zw = 0.0;
 
     if (slant == 0.0) {
       mode  = 2;
@@ -1167,13 +1168,13 @@ L10:
     G4double xx[3], dxx[3], ddxx[3];
     G4double xxtdxx, dxxtdxx, xxtddxx;
 
-    G4double fst, f, fderiv, deltafi, fact, eval;
+    G4double fst = 0.0;
+    G4double f, fderiv, deltafi, fact, eval;
     G4double fist;
 
     G4double dx1, dy1, dx2, dy2, crs, dot;
 
     G4int iflg;
-
 
     //set parameters
     xwb = xwb4;  ywb = ywb4;  zwb = zwb4;

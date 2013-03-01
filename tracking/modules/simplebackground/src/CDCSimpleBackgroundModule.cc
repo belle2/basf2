@@ -43,6 +43,10 @@ void CDCSimpleBackgroundModule::initialize()
 {
   //StoreArray with digitized CDCHits
   StoreArray<CDCHit>::registerPersistent(m_cdcHitsColName);
+
+  //initialize random number generator
+  //srand((unsigned int) 111); //to get reproducible results
+  srand((unsigned int)time(0));   //to get new background in each run
 }
 
 void CDCSimpleBackgroundModule::beginRun()
@@ -62,10 +66,6 @@ void CDCSimpleBackgroundModule::event()
   int NTotalHits = NTrackHits + NBackgroundHits;
   B2DEBUG(149, "CDCSimpleBackground: Number of digitized CDCHits coming from tracks: " << NTrackHits);
   if (NTrackHits == 0) B2WARNING("CDCSimpleBackground: CDCHitsCollection is empty!");
-
-  //initialize random number generator
-  //srand((unsigned int) 111); //to get reproducible results
-  srand((unsigned)time(0));   //to get new background in each run
 
   int counter = cdcHits.getEntries(); //counter for the additional hits
 

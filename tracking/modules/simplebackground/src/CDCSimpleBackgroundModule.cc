@@ -16,6 +16,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <time.h>
+#include <climits>
 
 using namespace std;
 using namespace Belle2;
@@ -77,8 +78,8 @@ void CDCSimpleBackgroundModule::event()
   int superlayerId = -999;        //0 - 8
   int ilayerId = -999;            //layerID within a superlayer 0 - 7
   int wireId = -999;
-  double charge = -999;
-  double driftTime = -999;
+  unsigned short charge = USHRT_MAX; //aka ADC count
+  unsigned short driftTime = USHRT_MAX; //aka TDC count
 
   //CDC geometry information
   int nLayers = cdcg.nWireLayers();
@@ -89,8 +90,8 @@ void CDCSimpleBackgroundModule::event()
 
   //Information about the possible values of charge/drift time. This is the first guess!!! I have no real idea in what range these values should be (and what their units are).
   //It also not clear if background hits will have similar drift time and charge as real hits, so it is really a very rough approach...
-  double maxDriftTime = 10000;
-  double maxCharge = 100;
+  double maxDriftTime = USHRT_MAX;
+  double maxCharge = USHRT_MAX;
 
   //Check if the parameters are valid
   if (m_hits < 0) B2WARNING("The parameter BGLevelHits should lie between 0 and 100, the input parameter is negative (" << m_hits << "), no background hits will be generated");
@@ -120,8 +121,8 @@ void CDCSimpleBackgroundModule::event()
         ilayerId = (layerId - 2) % 6;
         if (superlayerId == 0) {ilayerId += 2;}    //superlayer 0 has 8 layers, all others 6
 
-        driftTime = maxDriftTime * rand() / (RAND_MAX + 1.0);    //assign some random number to driftTime and charge
-        charge = maxCharge * rand() / (RAND_MAX + 1.0);
+        driftTime = (unsigned short)(maxDriftTime * rand() / (RAND_MAX + 1.0));    //assign some random number to driftTime and charge
+        charge = (unsigned short)(maxCharge * rand() / (RAND_MAX + 1.0));
 
         B2DEBUG(100, "superlayer: " << superlayerId << "  layer: " << ilayerId << "  wire: " << wireId << "  driftTime: " << driftTime << "  charge: " << charge);
 
@@ -145,8 +146,8 @@ void CDCSimpleBackgroundModule::event()
         ilayerId = (layerId - 2) % 6;
         if (superlayerId == 0) {ilayerId += 2;}    //superlayer 0 has 8 layers, all others 6
 
-        driftTime = maxDriftTime * rand() / (RAND_MAX + 1.0);    //assign some random number to driftTime and charge
-        charge = maxCharge * rand() / (RAND_MAX + 1.0);
+        driftTime = (unsigned short)(maxDriftTime * rand() / (RAND_MAX + 1.0));    //assign some random number to driftTime and charge
+        charge = (unsigned short)(maxCharge * rand() / (RAND_MAX + 1.0));
 
         B2DEBUG(100, "superlayer: " << superlayerId << "  layer: " << ilayerId << "  wire: " << wireId << "  driftTime: " << driftTime << "  charge: " << charge);
         int counter = cdcHits.getEntries();

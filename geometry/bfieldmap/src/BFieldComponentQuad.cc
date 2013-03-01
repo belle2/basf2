@@ -169,10 +169,11 @@ void BFieldComponentQuad::initialize()
   m_apertBufferHER = new ApertPoint[m_apertSizeHER];
   for (int i = 0; i < m_apertSizeHER; ++i) {
     apertFileHER >> s >> r;
-    /* Save parametors in unit [mm], not in unit [cm].*/
+    /* s and r are in [mm] in ApertHER.dat. */
+    /* Save parametors in unit [mm], not in basf2 default unit [cm].*/
     m_apertBufferHER[i].s   = s;
     m_apertBufferHER[i].r   = r;
-    B2DEBUG(10, "... loaded HER aperture at s = " << s << "[mm].")
+    B2DEBUG(10, "... loaded HER aperture at s = " << s << "[mm], r = " << r << "[mm]")
   }
   B2DEBUG(10, "... loaded " << m_apertSizeHER << " elements.")
 
@@ -180,10 +181,11 @@ void BFieldComponentQuad::initialize()
   m_apertBufferLER = new ApertPoint[m_apertSizeLER];
   for (int i = 0; i < m_apertSizeLER; ++i) {
     apertFileLER >> s >> r;
-    /* Save parametors in unit [mm], not in unit [cm].*/
+    /* s and r are in [mm] in ApertLER.dat. */
+    /* Save parametors in unit [mm], not in basf2 default unit [cm].*/
     m_apertBufferLER[i].s   = s;
     m_apertBufferLER[i].r   = r;
-    B2DEBUG(10, "... loaded LER aperture at s = " << s << "[mm].")
+    B2DEBUG(10, "... loaded LER aperture at s = " << s << "[mm], r = " << r << "[mm]")
   }
   B2DEBUG(10, "... loaded " << m_apertSizeLER << " elements.")
 
@@ -229,6 +231,7 @@ double BFieldComponentQuad::getApertureLER(double s) const
 
 TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 {
+  //assume point is given in [cm]
 
   //Conversion to LER/HER SAD coordinates
   GearDir her("/Detector/SuperKEKB/HER/");
@@ -245,7 +248,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 
   //Check if the point lies inside HER or LER beam pipe
   bool HERflag = false;
-  double s_HER = - pHER.Z() / Unit::mm; // inverse s-direction in SAD and ApertHER.dat
+  double s_HER = pHER.Z() / Unit::mm;
   double r_HER = sqrt(pHER.X() * pHER.X() + pHER.Y() * pHER.Y()) / Unit::mm;
   if (getApertureHER(s_HER) > r_HER) HERflag = true;
 
@@ -263,7 +266,16 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 
   /* in case the point is INSIDE of both LER and HER,
      this happenes around IP where no quadrupole field exists, returns zero field*/
-  if ((HERflag) && (LERflag)) return TVector3(0, 0, 0);
+  if ((HERflag) && (LERflag)) {
+
+    B2DEBUG(20, "Return zero fields since inside both HER and LER at (x,y,z)=("
+            << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m << "),"
+            << " HER(X,Y,s)=(" << pHER.X() << "," << pHER.Y() << "," << pHER.Z()  << ")[cm], r_HER=" << r_HER << " [mm]  and "
+            << " LER(X,Y,s)=(" << pLER.X() << "," << pLER.Y() << "," << pLER.Z()  << ")[cm], r_LER=" << r_LER << " [mm] . ")
+
+    return TVector3(0, 0, 0);
+  }
+
 
   int ROTATE_DIRECTION = 1; // 1: default, 0: rotate-off, -1: inversely rotate
 
@@ -307,11 +319,8 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 
       B2DEBUG(20, "HER quadrupole fields calculated at (x,y,z)=("
               << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
-              << " i.e. (X,Y,s)=(" << X << "," << Y << "," << s
+              << ") i.e. (X,Y,s)=(" << X << "," << Y << "," << s
               << ") is (Bx,By,Bz)=(" << B.X() << "," << B.Y() << "," << B.Z() << ").")
-
-    } else {
-      return TVector3(0, 0, 0);
     }
 
     // HER leak component
@@ -350,12 +359,11 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 
       B2DEBUG(20, "HER quadrupole leak fields calculated at (x,y,z)=("
               << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
-              << " i.e. (X,Y,s)=(" << X << "," << Y << "," << s
+              << ") i.e. (X,Y,s)=(" << X << "," << Y << "," << s
               << ") is (Bx,By,Bz)=(" << Bleak.X() << "," << Bleak.Y() << "," << Bleak.Z() << ").")
     }
 
     return B + Bleak;
-
   }
 
   /* in case the point is inside LER*/
@@ -387,23 +395,22 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
     X = p_tmp.X();
     Y = p_tmp.Y();
 
+    TVector3 B(0, 0, 0);
     if (foundflag) {
       double Bs = 0;
       double BX = (p0_LER / c / L) * (K1 * Y + SK1 * X + SK0);
       double BY = (p0_LER / c / L) * (K1 * X - SK1 * Y + K0);
-      TVector3 B(BX, BY, Bs);
+      B.SetXYZ(BX, BY, Bs);
       B.RotateZ(ROTATE / 180.*M_PI);
       B.RotateX(-M_PI); B.RotateY(angle_LER);
 
       B2DEBUG(20, "LER quadrupole fields calculated at (x,y,z)=("
               << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
-              << " i.e. (X,Y,s)=(" << X << "," << Y << "," << s
+              << ") i.e. (X,Y,s)=(" << X << "," << Y << "," << s
               << ") is (Bx,By,Bz)=(" << B.X() << "," << B.Y() << "," << B.Z() << ").")
-
-      return B;
-    } else {
-      return TVector3(0, 0, 0);
     }
+
+    return B;
   }
 
   /* No chance to reach here, but put this line just in case*/

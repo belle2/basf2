@@ -34,9 +34,10 @@ namespace Belle2 {
 
   public:
 
+    /** Magnetic field data structure. */
     struct BFieldPoint {
-      double r;
-      double z;
+      double r; /**< Magnetic field in r direction. */
+      double z; /**< Magnetic field in z direction. */
     };
 
     /** The BFieldComponentRadial constructor. */

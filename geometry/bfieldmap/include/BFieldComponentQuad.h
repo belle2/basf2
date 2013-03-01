@@ -35,21 +35,23 @@ namespace Belle2 {
 
   public:
 
+    /** Aperture data structure. */
     struct ApertPoint {
-      double s; // in [mm]
-      double r; // in [mm]
+      double s; /**< s in [mm] */
+      double r; /**< r in [mm] */
     };
 
+    /** Magnetic field data structure. */
     struct ParamPoint {
-      double s;   //in [m]
-      double L;   //in [m]
-      double K0;  // in [dimensionless]
-      double K1;  // in [1/m]
-      double SK0; // in [dimensionless]
-      double SK1; // in [1/m]
-      double ROTATE; // in [radian]
-      double DX;   //in [m]
-      double DY;   //in [m]
+      double s;   /**< s in [m] */
+      double L;   /**< element length in [m] */
+      double K0;  /**< dipole component in [dimensionless] */
+      double K1;  /**< quadrupole component in [1/m] */
+      double SK0; /**< skew dipole component  in [dimensionless] */
+      double SK1; /**< skew quadrupole component in [1/m] */
+      double ROTATE; /**< rotation in [radian] */
+      double DX;   /** horizontal displacement in [m] */
+      double DY;   /** vertical displacement in [m] */
       /* Note that K parameters used in SAD is multiplied by the element length.
        * Popular definitions are:  K0,SK0[1/m] and K1,SK1[1/m^2]
        */

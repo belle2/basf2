@@ -45,6 +45,7 @@ namespace Belle2 {
       m_data = new int[n];
       for (int i = 0; i < n; ++i) m_data[i] = i;
     }
+
     ~RandomPermutation() { delete [] m_data; }
     int getNext() { // On end, must first return the last element and then -1 to terminate RootInput normally.
       if (m_finished) return -1;
@@ -63,6 +64,11 @@ namespace Belle2 {
     bool isFinished() const { return m_finished; }
 
   private:
+    //Non-copyable
+    RandomPermutation(const RandomPermutation& other):
+      m_n(other.m_n), m_data(other.m_data), m_current(other.m_current), m_finished(other.m_finished)
+    {}
+
     int m_n;              /**< Size of the array.*/
     int* m_data;          /**< Array of indices.*/
     int m_current;        /**< Current position in the array of indices.*/
@@ -274,7 +280,6 @@ namespace Belle2 {
     // SimHits and their relations to MCParticles
     //------------------------------------------------
     int nSimHits = collection.getEntries();
-    std::vector<int> mcpToSimHitMapEvent;
     if (m_mcParticleWriteMode > 0) m_mcpToSimHitMap.resize(m_mcpToSimHitMap.size() + nSimHits);
 
     int colIndex = m_readoutFrame->GetLast() + 1;

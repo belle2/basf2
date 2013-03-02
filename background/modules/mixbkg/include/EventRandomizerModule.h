@@ -48,6 +48,11 @@ namespace Belle2 {
     bool isFinished() const { return m_finished; }
 
   private:
+    //Non-copyable
+    RandomPermutation(const RandomPermutation& other):
+      m_n(other.m_n), m_data(other.m_data), m_current(other.m_current), m_finished(other.m_finished)
+    {}
+
     int m_n;              /**< Size of the array.*/
     int* m_data;          /**< Array of indices.*/
     int m_current;        /**< Current position in the array of indices.*/

@@ -26,12 +26,19 @@ namespace Belle2 {
    */
   class RandomPermutation {
   public:
+    /** Constructor.
+     * @param n size of the input sequence.
+     */
     RandomPermutation(int n) : m_n(n), m_current(n), m_finished(false) {
       m_data = new int[n];
       for (int i = 0; i < n; ++i) m_data[i] = i;
     }
+    /** Destructor. */
     ~RandomPermutation() { delete [] m_data; }
-    int getNext() { // On end, must first return the last element and then -1 to terminate RootInput normally.
+    /** Return the next index to retrieve.
+     * @return next index to retrieve, or, at the end, m_n and then -1 to terminate RootInput.
+     */
+    int getNext() {
       if (m_finished) return -1;
       if (m_current < 0) {
         m_finished = true;
@@ -45,10 +52,13 @@ namespace Belle2 {
       }
       return result;
     }
+    /** Check if the permutation has been read out.
+     * @return true if all m_n indices have been read.
+     */
     bool isFinished() const { return m_finished; }
 
   private:
-    //Non-copyable
+    /** Hide copy constructor. */
     RandomPermutation(const RandomPermutation& other):
       m_n(other.m_n), m_data(other.m_data), m_current(other.m_current), m_finished(other.m_finished)
     {}

@@ -41,13 +41,19 @@ namespace Belle2 {
    */
   class RandomPermutation {
   public:
+    /** Constructor.
+     * @param n size of the input sequence.
+     */
     RandomPermutation(int n) : m_n(n), m_current(n), m_finished(false) {
       m_data = new int[n];
       for (int i = 0; i < n; ++i) m_data[i] = i;
     }
-
+    /** Destructor. */
     ~RandomPermutation() { delete [] m_data; }
-    int getNext() { // On end, must first return the last element and then -1 to terminate RootInput normally.
+    /** Return the next index to retrieve.
+     * @return next index to retrieve, or, at the end, m_n and then -1 to terminate RootInput.
+     */
+    int getNext() {
       if (m_finished) return -1;
       if (m_current < 0) {
         m_finished = true;
@@ -61,10 +67,13 @@ namespace Belle2 {
       }
       return result;
     }
+    /** Check if the permutation has been read out.
+     * @return true if all m_n indices have been read.
+     */
     bool isFinished() const { return m_finished; }
 
   private:
-    //Non-copyable
+    /** Hide copy constructor. */
     RandomPermutation(const RandomPermutation& other):
       m_n(other.m_n), m_data(other.m_data), m_current(other.m_current), m_finished(other.m_finished)
     {}
@@ -83,9 +92,17 @@ namespace Belle2 {
    */
   class RandomTimer {
   public:
+    /** Constructor.
+     * @param tau time per event
+     * @param start start time of acceptance window.
+     * @param size size of acceptance window.
+     */
     RandomTimer(float tau, float start, float size):
       m_tau(tau), m_end(start + size), m_time(start), m_endFrame(false), m_overFlow(false)
     { m_size = static_cast<float>(size); }
+    /** Get next event time.
+     * @return time to be set for the following event.
+     */
     float getNextTime() {
       if (!m_overFlow) m_time += static_cast<float>(gRandom->Exp(m_tau));
       if (m_time > m_end) {
@@ -98,7 +115,13 @@ namespace Belle2 {
       }
       return m_time;
     }
+    /** Check for end of frame.
+     * @return end-of-frame flag.
+     */
     bool isEndOfFrame() const {return m_endFrame;}
+    /** Check for overflow flag.
+     * @return overflow flag (if acceptance window is less than time per event).
+     */
     bool isOverFlow() const {return m_overFlow; }
   private:
     double m_tau;   /**< mean time between events.*/
@@ -242,6 +265,11 @@ namespace Belle2 {
     /** Fill the ROOT readout frame tree and add the MCParticles and the relations if the MCParticle write mode is set. */
     void fillROFTree();
 
+    /** Add an MCParticle to a MCParticleGraph.
+     * @param graph Reference to the MCParticleGraph.
+     * @param mcParticle Reference to the MCParticle.
+     * @param motherIndex Index of the mother particle.
+     */
     MCParticleGraph::GraphParticle& createGraphParticle(MCParticleGraph& graph, MCParticle& mcParticle, int motherIndex);
 
     /**
@@ -254,8 +282,11 @@ namespace Belle2 {
      */
     void addParticleToEventGraph(MCParticleGraph& graph, MCParticle& mcParticle, int motherIndex, const std::vector<bool> &keepList);
 
-    /**
-     * uniqueIDList relates MCParticle index (list index) to unique ID
+    /** Add MCParticle (and its daughters) to the ROF MCParticleGraph, keeping
+     * track of their list indices.
+     * @param mcParticle reference to the MCParticle
+     * @param motherIndex index of mother particle
+     * @param uniqueIDList relates MCParticle index (list index) to unique ID
      */
     void addParticleToROFGraph(MCParticle& mcParticle, int motherIndex, std::vector<int> &uniqueIDList);
 

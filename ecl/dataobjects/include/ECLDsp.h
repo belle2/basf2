@@ -11,8 +11,7 @@
 #ifndef ECLDSP_H
 #define ECLDSP_H
 
-#include <TObject.h>
-
+#include <framework/datastore/RelationsObject.h>
 namespace Belle2 {
   /** \addtogroup dataobjects
    * @{
@@ -24,7 +23,7 @@ namespace Belle2 {
    * filled in ecl/modules/eclDigitizer/src/ECLDigitizerModule.cc
    */
 
-  class ECLDsp : public TObject {
+  class ECLDsp : public RelationsObject {
   public:
     /** default constructor for ROOT */
     ECLDsp() {

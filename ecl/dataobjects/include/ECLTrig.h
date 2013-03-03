@@ -11,7 +11,7 @@
 #ifndef ECLTRIG_H
 #define ECLTRIG_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
   /** \addtogroup dataobjects
@@ -23,7 +23,7 @@ namespace Belle2 {
    * filled in ecl/modules/eclDigitizer/src/ECLDigitizerModule.cc
    */
 
-  class ECLTrig : public TObject {
+  class ECLTrig : public RelationsObject {
   public:
     /** default constructor for ROOT */
     ECLTrig() {

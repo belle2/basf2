@@ -11,7 +11,7 @@
 #ifndef ECLDEBUGHIT_H
 #define ECLDEBUGHIT_H
 
-#include <TObject.h>
+#include  <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
   /** \addtogroup dataobjects
@@ -24,7 +24,7 @@ namespace Belle2 {
    * filled in ecl/simulation/src/SensitiveDetector.cc
    */
 
-  class ECLDebugHit : public TObject {
+  class ECLDebugHit : public RelationsObject {
   public:
     /** default constructor for ROOT */
     ECLDebugHit() {

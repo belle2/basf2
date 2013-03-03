@@ -15,11 +15,8 @@
 #include <framework/datastore/DataStore.h>
 #include "ecl/dataobjects/ECLShower.h"
 #include <math.h>
-#include "CLHEP/Matrix/Matrix.h"
-#include "CLHEP/Matrix/SymMatrix.h"
 
-
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
 #include <TMatrixFSym.h>
 
@@ -33,7 +30,7 @@ namespace Belle2 {
    * filled in ecl/modules/eclRecGamma/src/ECLGammaReconstructorModule.cc
    */
 
-  class ECLGamma : public TObject {
+  class ECLGamma : public RelationsObject {
   public:
     /** default constructor for ROOT */
     ECLGamma() { m_ShowerId = 0;}

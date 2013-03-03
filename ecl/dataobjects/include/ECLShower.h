@@ -11,7 +11,8 @@
 #ifndef ECLSHOWER_H
 #define ECLSHOWER_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
+
 #include <TVector3.h>
 #include <math.h>
 
@@ -25,7 +26,7 @@ namespace Belle2 {
    * filled in ecl/modules/eclRecShower/src/ECLReconstructorModule.cc
    */
 
-  class ECLShower : public TObject {
+  class ECLShower : public RelationsObject {
   public:
     /** default constructor for ROOT */
     ECLShower() {

@@ -12,14 +12,14 @@
 #define ECLHITASSIGNMENT_H
 
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/RelationsObject.h>
 
-#include <TObject.h>
 #include <TVector3.h>
 
 namespace Belle2 {
 
   //! Example Detector
-  class ECLHitAssignment : public TObject {
+  class ECLHitAssignment : public RelationsObject {
   public:
 
 

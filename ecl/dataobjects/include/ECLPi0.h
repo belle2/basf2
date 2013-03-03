@@ -14,17 +14,10 @@
 #include <framework/datastore/DataStore.h>
 #include "ecl/dataobjects/ECLShower.h"
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
-#include "CLHEP/Vector/LorentzVector.h"
-#include "CLHEP/Matrix/SymMatrix.h"
 #include <TMatrixFSym.h>
 
-using namespace CLHEP;
-
-
-
-using namespace CLHEP;
 namespace Belle2 {
   /** \addtogroup dataobjects
    * @{
@@ -37,7 +30,7 @@ namespace Belle2 {
    * still keep old function getmassfit not in convention to avoid compiling error 2012.11.22
    */
 
-  class ECLPi0 : public TObject {
+  class ECLPi0 : public RelationsObject {
   public:
     /** default constructor for ROOT */
     ECLPi0() {
@@ -95,25 +88,13 @@ namespace Belle2 {
     /*! Set Pi0 Error Matrix  after mass constraint fit by HepSymMatrix class
      */
 
-    void setErrorMatrix(const HepSymMatrix& errorMatrix) {
-      m_errorMatrix.ResizeTo(4, 4);
-      for (int i = 0; i < 4; i++) {
-        for (int j = 0; j <= i ; j++) {
-          m_errorMatrix[i][j] = errorMatrix[i][j];
-        }
-      }
-    }
 
 
     /*! Get Momentum after mass constraint fit
      * @return HepLorentzVector Momentum  after mass constraint fit
      */
-    HepLorentzVector get4Momentum() const {
-      HepLorentzVector  momentum;
-      momentum.setPx(m_Px);
-      momentum.setPy(m_Py);
-      momentum.setPz(m_Pz);
-      momentum.setE(m_Energy);
+    TLorentzVector get4Momentum() const {
+      TLorentzVector  momentum(m_Px, m_Py, m_Pz, m_Energy);
       return momentum;
     }
 

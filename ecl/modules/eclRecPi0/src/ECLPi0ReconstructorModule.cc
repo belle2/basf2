@@ -30,6 +30,7 @@
 #include  "CLHEP/Matrix/Matrix.h"
 #include <TMatrixFSym.h>
 
+
 #include <analysis/KFit/MakeMotherKFit.h>
 
 #define PI 3.14159265358979323846
@@ -166,6 +167,7 @@ void ECLPi0ReconstructorModule::event()
 //        fit(lv_gamma1, lv_gamma2);
         CLHEP::HepLorentzVector fittedPi0Momentum;
         CLHEP::HepSymMatrix pi0ErrMatrix;
+        TMatrixFSym Pi0ErrorTMatrix(4);
 
         MassFitKFit km;
         km.setMagneticField(1.5);
@@ -176,10 +178,16 @@ void ECLPi0ReconstructorModule::event()
         km.setInvariantMass(MASS_PI0);
 
         unsigned err = km.doFit();
-        double confLevel(0);
+        double confLevel(DBL_MAX);
         if (!err) {
           confLevel = km.getCHIsq();
           fillFitted4Vector(km, fittedPi0Momentum, pi0ErrMatrix);
+          for (int i = 0; i < 4; i++) {
+            for (int j = 0; j <= i ; j++) {
+              Pi0ErrorTMatrix[i][j] = pi0ErrMatrix[i][j];
+            }
+          }
+
         } else {cout << m_nEvent << " km.doFit err " << endl;  }
 
         if (pi0_mass_min < mass && mass < pi0_mass_max) {
@@ -197,7 +205,8 @@ void ECLPi0ReconstructorModule::event()
           Pi0Array[m_Pi0Num]->setMass((float)lv_rec.mag());
           Pi0Array[m_Pi0Num]->setMassFit((float)fittedPi0Momentum.m());
           Pi0Array[m_Pi0Num]->setChi2((float)confLevel);
-          Pi0Array[m_Pi0Num]->setErrorMatrix(pi0ErrMatrix);
+
+          Pi0Array[m_Pi0Num]->setErrorMatrix(Pi0ErrorTMatrix);
 
           eclPi0ToGamma.add(m_Pi0Num, iGamma1);
           eclPi0ToGamma.add(m_Pi0Num, iGamma2);

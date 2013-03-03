@@ -125,10 +125,10 @@ namespace Belle2 {
                                             const std::string& simHitRelation)
     {
       //Check if the generator with the name already exists. If not create the generator.
-      MapIterator mapIter = m_generators.find(component);
+      MapIterator mapIter = m_generators.find(generator);
       if (mapIter == m_generators.end()) {
         B2INFO(">> Created new background generator '" << generator << "' for '" << SIMHITS::Class_Name() << "/" << component << "'.");
-        addGenerator(component).addFile(component, generator, filename, simHitCollection, simHitRelation);
+        addGenerator(generator).addFile(component, generator, filename, simHitCollection, simHitRelation);
       } else mapIter->second->addFile(component, generator, filename, simHitCollection, simHitRelation);
     }
 

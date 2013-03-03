@@ -242,7 +242,7 @@ namespace Belle2 {
 
       // member functions
       /** get Id */
-      const Identifier Id(void) const {
+      Identifier Id(void) const {
         return fId;
       }
       /** set Id */
@@ -250,7 +250,7 @@ namespace Belle2 {
         return fId = id;
       }
       /** get Cell Id */
-      const Identifier CellId(void) const {
+      Identifier CellId(void) const {
         return fCellId;
       }
       /** set Cell Id */
@@ -261,7 +261,7 @@ namespace Belle2 {
 
 
       /** get Energy  */
-      const EclGeV Energy(void) const {
+      EclGeV Energy(void) const {
         return fEnergy;
       }
       /** set Energy  */

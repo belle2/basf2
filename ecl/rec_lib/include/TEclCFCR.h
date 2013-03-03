@@ -52,21 +52,21 @@ namespace Belle2 {
 
       // member functions
       /** get Id */
-      const Identifier Id() const {
+      Identifier Id() const {
         return fId;
       }
       /** get mass */
-      const EclGeV Mass() const {
+      EclGeV Mass() const {
         return fMass;
       }
 
       /** get Energy */
-      const EclGeV Energy() const {
+      EclGeV Energy() const {
         return
           fEnergy;
       }
       /** get Width */
-      const double Width() const {
+      double Width() const {
         return
           fWidth;
       }

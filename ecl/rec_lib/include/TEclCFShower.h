@@ -57,11 +57,11 @@ namespace Belle2 {
       /** construct MEclCFShowerHA with  fId(id), fFraction(w) */
       MEclCFShowerHA(int id, double w): fId(id), fFraction(w) {}
       /** Get fId */
-      const Identifier Id(void) const {
+      Identifier Id(void) const {
         return fId;
       }
       /** Get fFraction */
-      const double Fraction(void) const {
+      double Fraction(void) const {
         return fFraction;
       }
     private:
@@ -197,27 +197,27 @@ namespace Belle2 {
 //      void UncAttributes(void);
 
       /** currently only getters are implemented... */
-      const Identifier Id(void) const {
+      Identifier Id(void) const {
         return
           fId;
       }
       ///get fEnergy
-      const EclGeV Energy(void) const {
+      EclGeV Energy(void) const {
         return
           fEnergy;
       }
       /// correct runtime with vertex info?
-      const EclRad Theta(void) const {
+      EclRad Theta(void) const {
         return
           fTheta;
       }
       /// get fPhi
-      const EclRad Phi(void) const {
+      EclRad Phi(void) const {
         return
           fPhi;
       }
       ///get fDistance
-      const EclCM Distance(void) const {
+      EclCM Distance(void) const {
         return
           fDistance;
       }
@@ -228,35 +228,35 @@ namespace Belle2 {
       }
 
       ///get Mass
-      const EclGeV Mass(void) const {
+      EclGeV Mass(void) const {
         return
           fMass;
       }
       ///get Width
-      const EclCM  Width(void) const {
+      EclCM  Width(void) const {
         return
           fWidth;
       }
       ///get  fE3x3 / fE5x5
-      const double E9oE25(void) const {
+      double E9oE25(void) const {
         return
           fE3x3 / fE5x5;
 //      fE9oE25;
       }
       /// get E9oE25unf
-      const double E9oE25unf(void) const {
+      double E9oE25unf(void) const {
         return
           fE3x3unf / fE5x5unf;
 //      fE9oE25unf;
       }
       /// get NHits
-      const int NHits(void) const {
+      int NHits(void) const {
         return
           fHA.size();
 //      fNHits;
       }
       ///weighted #of hits
-      const double WNHits(void) const {
+      double WNHits(void) const {
         double n = 0.0;
         for (std::vector<MEclCFShowerHA>::const_iterator i = fHA.begin();
              i != fHA.end(); ++i)
@@ -264,18 +264,18 @@ namespace Belle2 {
         return n;
       }
       ///get NHitsUsed
-      const double NHitsUsed(void) const {
+      double NHitsUsed(void) const {
         return
           NHits();  // not implemented yet
 //      fNHits;
       }
       ///get Status
-      const int Status(void) const {
+      int Status(void) const {
         return
           fStatus;
       }
       /// backward compatibility
-      const EGrade Grade(void) const {
+      EGrade Grade(void) const {
         return
           fGrade;
       }
@@ -286,12 +286,12 @@ namespace Belle2 {
       }
 
       /// don't use these, if you don't know...
-      const EclGeV UncEnergy(void) const {
+      EclGeV UncEnergy(void) const {
         return
           fE5x5unf;
       }
       ///get TotEnergy
-      const EclGeV TotEnergy(void) const {
+      EclGeV TotEnergy(void) const {
         return
           fE5x5;
       }

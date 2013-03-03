@@ -12,8 +12,7 @@
 #ifndef TelSimHit_H
 #define TelSimHit_H
 
-// ROOT
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
 #include <vxd/dataobjects/VxdID.h>
 
@@ -26,10 +25,10 @@ namespace Belle2 {
     * hit classes are used to generate detector response, they contain _local_
     * information.
     */
-  class TelSimHit : public TObject {
+  class TelSimHit : public RelationsObject {
   public:
     /** default constructor for ROOT */
-    TelSimHit(): m_sensorID(0), m_pdg(0), m_theta(0), m_energyDep(0), m_globalTime(0),
+    TelSimHit(): RelationsObject(), m_sensorID(0), m_pdg(0), m_theta(0), m_energyDep(0), m_globalTime(0),
       m_posIn(0, 0, 0), m_posOut(0, 0, 0), m_momIn(0, 0, 0) {}
 
     /** Standard constructor
@@ -44,6 +43,7 @@ namespace Belle2 {
      */
     TelSimHit(unsigned short sensorID, int pdg, float theta, float energyDep, float globalTime,
               const TVector3& posIn, const TVector3& posOut, const TVector3& momIn):
+      RelationsObject(),
       m_sensorID(sensorID), m_pdg(pdg), m_theta(theta), m_energyDep(energyDep), m_globalTime(globalTime),
       m_posIn(posIn), m_posOut(posOut), m_momIn(momIn) {}
 
@@ -81,7 +81,7 @@ namespace Belle2 {
     /** Momentum of particle at start of energy deposition */
     TVector3 m_momIn;
 
-    ClassDef(TelSimHit, 1)
+    ClassDef(TelSimHit, 2)
   };
 
 } // end namespace Belle2

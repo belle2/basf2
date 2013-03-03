@@ -104,6 +104,13 @@ namespace Belle2 {
       ClusterCandidate** m_clsTop;
       /** cache of the current row */
       ClusterCandidate** m_clsCur;
+
+    private:
+      /** Hidden copy constructor. */
+      ClusterCache(const ClusterCache& other):
+        m_maxU(other.m_maxU), m_curU(other.m_curU), m_curV(other.m_curV),
+        m_clsTop(other.m_clsTop), m_clsCur(other.m_clsCur)
+      {}
     };
 
   }

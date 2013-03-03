@@ -52,13 +52,17 @@ namespace Belle2 {
        * Smearing resolution in um in V direction
        **/
       float m_resolutionV;
-      /** Name of the collection for the MCParticles */
+      /** Name of the collection of MCParticles. */
       std::string m_storeMCParticlesName;
-      /** Name of the collection for the PXDDigits */
+      /** Name of the collection of TrueHits. */
       std::string m_storeTrueHitsName;
+      /** Name of the collection of Clusters. */
       std::string m_storeClustersName;
+      /** Name of the MCParticles-to-TrueHits relation.*/
       std::string m_relMCParticleTrueHitName;
+      /** Name of the Clusters-to-MCParticles relation. */
       std::string m_relClusterMCParticleName;
+      /** Name of the Clusters-to-TrueHits relation. */
       std::string m_relClusterTrueHitName;
 
     };//end class declaration

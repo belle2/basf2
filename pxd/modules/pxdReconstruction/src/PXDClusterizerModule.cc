@@ -174,7 +174,7 @@ void PXDClusterizerModule::event()
     }
 
     //Now we loop over sensors and cluster each sensor in turn
-    for (map<VxdID, Sensor>::iterator it = sensors.begin(); it != sensors.end(); it++) {
+    for (map<VxdID, Sensor>::iterator it = sensors.begin(); it != sensors.end(); ++it) {
       m_noiseMap.setSensorID(it->first);
       BOOST_FOREACH(const PXD::Pixel & px, it->second) {
         if (!m_noiseMap(px, m_cutAdjacent)) continue;

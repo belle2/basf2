@@ -62,9 +62,10 @@ namespace Belle2 {
 //                 Implementation
 //-----------------------------------------------------------------
 
-    GeoTBCreator::GeoTBCreator()
-    {
-    }
+    GeoTBCreator::GeoTBCreator():
+      m_activeChips(false), m_seeNeutrons(false), m_onlyPrimaryTrueHits(false),
+      m_sensitiveThreshold(1.0)
+    {}
 
     GeoTBCreator::~GeoTBCreator()
     {
@@ -83,7 +84,7 @@ namespace Belle2 {
     G4LogicalVolume* GeoTBCreator::getLogicalVolume(const GearDir& content)
     {
       std::string volName = content.getString("Name");
-      std::string volShape = content.getString("Shape", "Box");
+      std::string volShape = content.getString("Shape", "Box"); // Not used, keep anyway
       std::string volColor = content.getString("Color", "#000000");
       bool volVisibility = content.getBool("Visible", true);
       double volHalfX = content.getLength("HalfX") / Unit::mm;

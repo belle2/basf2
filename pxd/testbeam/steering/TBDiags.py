@@ -24,7 +24,7 @@ class PXDHitErrors(Module):
         super(PXDHitErrors, self).__init__()
         self.setName('PXDHitErrors')
         self.file = open('PXDHitErrorOutput.txt', 'w')
-        self.vxdid_factors = (8192, 256, 32)  # For decoding VxdID's
+        self.vxdid_factors = (8192, 256, 32)
 
     def beginRun(self):
         """ Write legend """

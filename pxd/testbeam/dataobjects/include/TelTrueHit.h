@@ -13,9 +13,7 @@
 #define TelTrueHit_H
 
 #include <vxd/dataobjects/VxdID.h>
-
-// ROOT
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
 
 namespace Belle2 {
@@ -33,25 +31,10 @@ namespace Belle2 {
     * hit classes are used to generate detector response, they contain _local_
     * information.
     */
-  class TelTrueHit : public TObject {
+  class TelTrueHit : public RelationsObject {
   public:
     /** Default constructor for ROOT IO */
-    TelTrueHit(): m_sensorID(0), m_u(0), m_v(0), m_entryU(0), m_entryV(0), m_exitU(0), m_exitV(0), m_energyDep(0), m_globalTime(0) {}
-
-    /** Constructor
-     * @param sensorID SensorID of the Sensor
-     * @param u u coordinate of the hit in local coordinates
-     * @param v v coordinate of the hit in local coordinates
-     * @param momentum momentum of the particle in local coordinates
-     * @param entryMomentum momentum of the particle in local coordinates when entering silicon
-     * @param exitMomentum momentum of the particle in local coordinates when exiting silicon
-     * @param globalTime timestamp of the hit
-     */
-    TelTrueHit(
-      VxdID sensorID, float u, float v, float energyDep, float globalTime,
-      const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
-      m_sensorID(sensorID), m_u(u), m_v(v), m_energyDep(energyDep), m_globalTime(globalTime),
-      m_momentum(momentum), m_entryMomentum(entryMomentum), m_exitMomentum(exitMomentum) {}
+    TelTrueHit(): RelationsObject(), m_sensorID(0), m_u(0), m_v(0), m_entryU(0), m_entryV(0), m_exitU(0), m_exitV(0), m_energyDep(0), m_globalTime(0) {}
 
     /** Constructor
      * @param sensorID SensorID of the Sensor
@@ -69,6 +52,7 @@ namespace Belle2 {
     TelTrueHit(
       VxdID sensorID, float u, float v, float entryU, float entryV, float exitU, float exitV, float energyDep, float globalTime,
       const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
+      RelationsObject(),
       m_sensorID(sensorID), m_u(u), m_v(v), m_entryU(entryU), m_entryV(entryV), m_exitU(exitU), m_exitV(exitV), m_energyDep(energyDep), m_globalTime(globalTime),
       m_momentum(momentum), m_entryMomentum(entryMomentum), m_exitMomentum(exitMomentum) {}
 

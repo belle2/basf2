@@ -23,13 +23,12 @@ class PXDHitErrors(Module):
         super(PXDHitErrors, self).__init__()
         self.setName('PXDHitErrors')
         self.filename = ''
-        # Use basf2 <scriptname> <asciiname> to set the name of this output file
         if len(sys.argv) > 1:
             self.filename = sys.argv[2]
         if self.filename == '':
             self.filename = 'PXDHitErrorOutput.txt'
         self.file = open(self.filename, 'w')
-        self.vxdid_factors = (8192, 256, 32)  # For decoding VxdID's
+        self.vxdid_factors = (8192, 256, 32)
 
     def beginRun(self):
         """ Write legend for file columns """

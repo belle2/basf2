@@ -286,7 +286,7 @@ void ECLMCMatchingModule::event()
     StoreArray<ECLGamma> gammaArray;
     RelationArray eclPi0ToGamma(Pi0Array, gammaArray);
     if (Pi0Array) {
-      for (int iPi0 = 0; iPi0 < Pi0Array->GetEntriesFast() ; iPi0++) {
+      for (int iPi0 = 0; iPi0 < Pi0Array.getEntries() ; iPi0++) {
         ECLPi0* aECLPi0 = Pi0Array[ iPi0 ];
         cout << "Pi0Event" << m_nEvent << " Energy " << aECLPi0->getEnergy() << " Mass " << aECLPi0->getMass()
              << " MassFit " << aECLPi0->getMassFit() << " Chi2 " << aECLPi0->getChi2() << endl;
@@ -313,7 +313,7 @@ void ECLMCMatchingModule::event()
         }//for the shower to reconstruct gamma
       }//for all Pi0ToGamma relation
     }//if pi0Array exit
-  */
+   */
   m_nEvent++;
 
 }

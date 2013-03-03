@@ -49,7 +49,7 @@ namespace Belle2 {
   namespace VXD {
 
     GeoVXDCreator::GeoVXDCreator(const string& prefix) :
-      m_prefix(prefix), m_activeChips(false), m_seeNeutrons(false),
+      m_prefix(prefix), m_activeStepSize(0.0005), m_activeChips(false), m_seeNeutrons(false),
       m_onlyPrimaryTrueHits(false), m_sensitiveThreshold(1.0), m_onlyActiveMaterial(false)
     {
     }

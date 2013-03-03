@@ -67,8 +67,8 @@ namespace Belle2 {
       }
     } catch (runtime_error&) {
       //Something went wrong parsing the parts
-      throw invalid_argument("Could not parse VxdID: '" + sensor + "'");
       m_id.id = 0;
+      throw invalid_argument("Could not parse VxdID: '" + sensor + "'");
     }
     //There is stuff left we also throw an exception as we cannot warn the user
     //without the logging system

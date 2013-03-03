@@ -70,7 +70,7 @@ namespace Belle2 {
     /** Construct ID from string representing the structure */
     VxdID(const std::string& sensor) throw(std::invalid_argument);
     /** Copy constructor */
-    VxdID(const VxdID& b)                   { m_id = b.m_id; }
+    VxdID(const VxdID& b): m_id(b.m_id) {}
 
     /** Assignment operator */
     VxdID& operator=(const VxdID& b)        { m_id = b.m_id; return *this; }

@@ -334,10 +334,10 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     if (maxCount < c_minSamples) continue;
     // Constrain time calculation to strips with at least c_minSamples samples.
     std::map<unsigned int, unsigned int>::const_iterator strip_low = stripCounts.begin();
-    while (strip_low->second < c_minSamples) strip_low++;
+    while (strip_low->second < c_minSamples) ++strip_low;
     unsigned int stripLow = strip_low->first;
     std::map<unsigned int, unsigned int>::const_reverse_iterator strip_high = stripCounts.rbegin();
-    while (strip_high->second < c_minSamples) strip_high++;
+    while (strip_high->second < c_minSamples) ++strip_high;
     unsigned int stripHigh = strip_high->first;
     double time = 0.0;
     double restrictedCharge = 0.0;

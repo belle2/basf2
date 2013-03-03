@@ -87,7 +87,7 @@ int LinSignalFitter::doFit()
   signal_type::iterator it_signal = m_data.begin();
   for (int i = 0; i < nData; ++i) {
     m_predictions.insert(make_pair(it_signal->first, predictions[i]));
-    it_signal++;
+    ++it_signal;
   }
   double sigma_res = (signals - predictions).Norm2Sqr() / (nData - 2.);
   // 2f. Estimates of actual parameters

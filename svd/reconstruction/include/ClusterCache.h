@@ -105,6 +105,13 @@ namespace Belle2 {
       ClusterCandidate** m_clsTop;
       /** cache of the current strip. */
       ClusterCandidate** m_clsCur;
+
+    private:
+      /** Hide copy constructor. */
+      ClusterCache(const ClusterCache& other):
+        m_maxSamples(other.m_maxSamples), m_curTime(other.m_curTime), m_curStrip(other.m_curStrip),
+        m_clsTop(other.m_clsTop), m_clsCur(other.m_clsCur)
+      {}
     };
 
   }

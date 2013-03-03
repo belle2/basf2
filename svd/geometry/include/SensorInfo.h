@@ -38,7 +38,10 @@ namespace Belle2 {
        */
       SensorInfo(VxdID id = 0, float width = 0, float length = 0, float thickness = 0,
                  int uCells = 0, int vCells = 0, float width2 = 0):
-        VXD::SensorInfoBase(SensorInfo::SVD, id, width, length, thickness, uCells, vCells, width2, -1, 0) {}
+        VXD::SensorInfoBase(SensorInfo::SVD, id, width, length, thickness, uCells, vCells, width2, -1, 0),
+        m_depletionVoltage(0), m_biasVoltage(0), m_backplaneCapacitance(0),
+        m_interstripCapacitance(0), m_couplingCapacitance(0)
+      {}
 
       /** Change the SensorID. Useful to copy the SensorInfo from one sensor and use it for another.
        * @param id VxdID to be assigned to current sensor.

@@ -47,7 +47,8 @@ namespace Belle2 {
        * @param samplingTime Sampling time.
        */
       LinSignalFitter(double tau = 50, double samplingTime = 30):
-        m_tau(tau), m_samplingTime(samplingTime), m_hasFit(no_fit)
+        m_tau(tau), m_samplingTime(samplingTime), m_hasFit(no_fit),
+        m_initTime(0), m_initTimeSigma(0), m_charge(0), m_chargeSigma(0)
       {}
 
       /** Add a signal sample to the data.
@@ -110,15 +111,24 @@ namespace Belle2 {
 
 
     private:
-      double m_tau;           /** Waveform time constant. */
-      double m_samplingTime;  /** Sampling time (interval between samples. */
-      signal_type m_data;     /** Times and signals. */
-      signal_type m_predictions;  /** Values predicted by the fit. */
-      fit_result m_hasFit;    /** Indicates whether a fit was already calculated or succeeded.*/
-      double m_initTime;      /** Initial time estimate of the waveform.*/
-      double m_initTimeSigma; /** Initial time error estimate.*/
-      double m_charge;        /** Strip charge estimate. */
-      double m_chargeSigma;   /** Charge error estimate. */
+      /** Waveform time constant. */
+      double m_tau;
+      /** Sampling time (interval between samples. */
+      double m_samplingTime;
+      /** Times and signals. */
+      signal_type m_data;
+      /** Values predicted by the fit. */
+      signal_type m_predictions;
+      /** Indicates whether a fit was already calculated or succeeded.*/
+      fit_result m_hasFit;
+      /** Initial time estimate of the waveform.*/
+      double m_initTime;
+      /** Initial time error estimate.*/
+      double m_initTimeSigma;
+      /** Strip charge estimate. */
+      double m_charge;
+      /** Charge error estimate. */
+      double m_chargeSigma;
     };
 
   } // namespace SVD

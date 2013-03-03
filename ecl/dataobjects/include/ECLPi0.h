@@ -17,6 +17,8 @@
 #include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
 #include <TMatrixFSym.h>
+#include <TLorentzVector.h>
+
 
 namespace Belle2 {
   /** \addtogroup dataobjects

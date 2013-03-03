@@ -81,7 +81,7 @@ namespace Belle2 {
     TVector3 m_momOut; /**< Momentum of particle at end of energy deposition. */
     int m_PDGcode;     /**< PDG code of the particle producing hit. */
     float m_depEnergy; /**< Deposited energy */
-    std::string m_Volname;
+    std::string m_Volname; /**< Volume name */
 
     /** ROOT Macro.*/
     ClassDef(IRSimHit, 1);

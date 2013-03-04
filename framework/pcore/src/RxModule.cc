@@ -72,7 +72,11 @@ void RxModule::initialize()
 
   // Restore objects in DataStore
   EvtMessage* evtmsg = new EvtMessage(evtbuf);
-  m_streamer->restoreDataStore(evtmsg);
+  if (evtmsg->type() == MSG_TERMINATE) {
+    B2INFO("Rx initialization: got termination message. Exitting...");
+  } else {
+    m_streamer->restoreDataStore(evtmsg);
+  }
 
   // Delete buffers
   delete evtmsg;
@@ -107,24 +111,15 @@ void RxModule::event()
   // Restore EvtMessage
   EvtMessage* msg = new EvtMessage(evtbuf);    // Have EvtMessage by ptr cpy
   if (msg->type() == MSG_TERMINATE) {
-    B2INFO("Rx: got termination message. Exitting....");
-    delete[] evtbuf;
-    delete msg;
-    return;
-    // Flag End Of File !!!!!
-    //    return msg->type(); // EOF
+    B2INFO("Rx: got termination message. Exitting...");
+  } else {
+    m_streamer->restoreDataStore(msg);
+    B2INFO("Rx: DataStore Restored!");
   }
-
-  // Restore DataStore
-  m_streamer->restoreDataStore(msg);
 
   // Remove buffers
   delete[] evtbuf;
   delete msg;
-
-  B2INFO("Rx: DataStore Restored!!");
-
-  return;
 }
 
 void RxModule::endRun()

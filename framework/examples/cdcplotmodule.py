@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 import matplotlib.cm as colormap
 
-
 from basf2 import *
 from ROOT import Belle2
 
@@ -92,31 +91,32 @@ class CDCPlotModule(Module):
 
         mcparts = []
         for hit in simhits:
-            hitpos = hit.m_posWire  # TVector3
+            hitpos = hit.getPosWire()  # TVector3
             # get index of first related mcparticle
-            mcpart = hit.getRelationsFrom("MCParticles")[0].getArrayIndex()
-            if not mcpart in mcparts:
+            mcpart_idx = hit.getRelationsFrom("MCParticles")[0].getArrayIndex()
+            if not mcpart_idx in mcparts:
                 idx = len(mcparts)
-                mcparts.append(mcpart)
+                mcparts.append(mcpart_idx)
                 indices.append(idx)
                 trackhits_x.append([])
                 trackhits_y.append([])
             # add simhit to the list corresponding to this particle
-            idx = mcparts.index(mcpart)
+            idx = mcparts.index(mcpart_idx)
             trackhits_x[idx].append(hitpos.x())
             trackhits_y[idx].append(hitpos.y())
 
-        # plot the (x,y) list on a matplotlib figure
-        num_tracks = max(indices) + 1
-        col = [colormap.jet(1.0 * c / (num_tracks - 1)) for c in indices]
-        fig = plot(trackhits_x, trackhits_y, col)
+        if len(indices) > 0:
+            # plot the (x,y) list on a matplotlib figure
+            num_tracks = max(indices) + 1
+            col = [colormap.jet(1.0 * c / (num_tracks - 1)) for c in indices]
+            fig = plot(trackhits_x, trackhits_y, col)
 
-        filename = 'cdchits_%i.png' % (self.num_events)
-        if os.path.lexists(filename):
-            B2WARNING(filename + ' exists, overwriting ...')
-        else:
-            B2INFO('creating ' + filename + ' ...')
-        fig.savefig(filename)
+            filename = 'cdchits_%i.png' % (self.num_events)
+            if os.path.lexists(filename):
+                B2WARNING(filename + ' exists, overwriting ...')
+            else:
+                B2INFO('creating ' + filename + ' ...')
+            fig.savefig(filename)
 
         self.num_events += 1
 
@@ -132,8 +132,6 @@ main = create_path()
 
 evtmetagen = register_module('EvtMetaGen')
 
-evtmetagen.param('ExpList', [0])
-evtmetagen.param('RunList', [1])
 evtmetagen.param('EvtNumList', [5])
 
 evtmetainfo = register_module('EvtMetaInfo')

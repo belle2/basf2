@@ -20,6 +20,7 @@
 #include <top/dataobjects/TOPSimHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 
@@ -92,11 +93,13 @@ void MixBackground::addFile(const std::string& filename)
           break;
         case 5 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<ARICHSimHit>()));
           break;
-        case 6 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<ECLSimHit>()));
+        case 6 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<ECLHit>()));
           break;
         case 7 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<EKLMSimHit>()));
           break;
         case 8 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<BKLMSimHit>()));
+          break;
+        case 9 : m_detectorBackgrounds.insert(make_pair(subdetector, new DetectorBackground<ECLSimHit>()));
           break;
       }
       mapIter = m_detectorBackgrounds.find(subdetector);

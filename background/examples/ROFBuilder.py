@@ -8,8 +8,7 @@
 # This is phase one of the processing underlying the background mixing. You have
 # to produce a "catalogue" of ROFs for individual background/generator combinations.
 # The produced ROF files contain collections of background SimHits to be mixed
-# into events of simulated data by the MixBkg module - this is phase 2 of the
-# background mixing-related processing.
+# into events of simulated data by the MixBkg module.
 # The ROF file has a special format, different from that of ROOT files produced by
 # the ROOTOutput module, They are read and used by the MixBkg module, not the
 # ROOTInput module.
@@ -33,7 +32,9 @@ subdetectorCodes = {
     'ECL': 6,
     'EKLM': 7,
     'BKLM': 8,
+    'ECLsim': 9,
     }
+# ECL is a special case, use 'ECL' to produce ROFs with ECLHits, 'ECLsim' for ROFs with ECLSimHits.
 
 # *******************************************************************************
 # USER SETTINGS
@@ -53,6 +54,13 @@ outputName = '{d}/rof_{det}_{t}_{s}.root'.format(d=outputDir,
         det=subdetectorName, t=bgType, s=bgSource)
 windowStart = -150  # ns
 windowSize = 330  # ns
+
+collectionName = subdetectorName + 'SimHits'
+if subdetectorName == 'ECL':
+    collectionName = 'ECLHits'
+elif subdetectorName == 'ECLsim':
+    collectionName = 'ECLSimHits'
+
 # *******************************************************************************
 
 # Register modules
@@ -67,9 +75,8 @@ rootinput.param('treeName', 'tree')
 # ROFBulder module
 rofbuilder = register_module('ROFBuilder')
 rofbuilder.param('Subdetector', subdetectorCodes[subdetectorName])
-rofbuilder.param('SimHitCollectionName', subdetectorName + 'SimHits')
-rofbuilder.param('SimHitMCPartRelationName', 'MCParticlesTo' + subdetectorName
-                 + 'SimHits')
+rofbuilder.param('SimHitCollectionName', collectionName)
+rofbuilder.param('SimHitMCPartRelationName', 'MCParticlesTo' + collectionName)
 rofbuilder.param('TimeAwareMode', True)
 # rofbuilder.param('EventsPerReadoutFrame',0.33)
 rofbuilder.param('WindowStart', windowStart)  # ns

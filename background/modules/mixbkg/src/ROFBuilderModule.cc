@@ -19,10 +19,9 @@
 #include <top/dataobjects/TOPSimHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
-
-
 
 #include <map>
 #include <boost/foreach.hpp>
@@ -72,9 +71,10 @@ ROFBuilderModule::ROFBuilderModule() : Module()
   m_SimHitClassNames.push_back(CDCSimHit::Class_Name());
   m_SimHitClassNames.push_back(TOPSimHit::Class_Name());
   m_SimHitClassNames.push_back(ARICHSimHit::Class_Name());
-  m_SimHitClassNames.push_back(ECLSimHit::Class_Name());
+  m_SimHitClassNames.push_back(ECLHit::Class_Name());
   m_SimHitClassNames.push_back(EKLMSimHit::Class_Name());
   m_SimHitClassNames.push_back(BKLMSimHit::Class_Name());
+  m_SimHitClassNames.push_back(ECLSimHit::Class_Name());
 }
 
 
@@ -224,12 +224,13 @@ void ROFBuilderModule::event()
       break;
     case 5 : //addSimHitsToROF<ARICHSimHit>();
       break;
-    case 6 : addSimHitsToROF<ECLSimHit>();
+    case 6 : addSimHitsToROF<ECLHit>();
       break;
     case 7 : //addSimHitsToROF<EKLMSimHit>();
       break;
     case 8 : //addSimHitsToROF<BKLMSimHit>();
       break;
+    case 9 : addSimHitsToROF<ECLSimHit>();
   }
 
   m_event++;

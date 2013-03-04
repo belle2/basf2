@@ -7,11 +7,11 @@
 //-
 
 #include <framework/pcore/RxModule.h>
+#include <framework/pcore/EvtMessage.h>
 
 #include <TSystem.h>
 
-#include <stdlib.h>
-
+//400MB
 #define MAXEVTSIZE 400000000
 
 using namespace std;
@@ -43,11 +43,7 @@ RxModule::RxModule(RingBuffer* rbuf) : Module(), m_streamer(0), m_nrecv(-1)
 
 
 
-RxModule::~RxModule()
-{
-  //TODO: why isn't this cleaned up?
-  //  delete m_streamer;
-}
+RxModule::~RxModule() { }
 
 void RxModule::initialize()
 {
@@ -88,7 +84,7 @@ void RxModule::initialize()
 
 void RxModule::beginRun()
 {
-  B2INFO("beginRun called.");
+  B2DEBUG(100, "beginRun called.");
 }
 
 
@@ -105,8 +101,7 @@ void RxModule::event()
     //    printf ( "Rx : evtbuf is not available yet....\n" );
     usleep(100);
   }
-  B2INFO("Rx: got an event from RingBuffer, size=" << size <<
-         " (proc= " << (int)getpid() << ")");
+  B2DEBUG(100, "Rx: got an event from RingBuffer, size=" << size);
 
   // Restore EvtMessage
   EvtMessage* msg = new EvtMessage(evtbuf);    // Have EvtMessage by ptr cpy
@@ -114,7 +109,7 @@ void RxModule::event()
     B2INFO("Rx: got termination message. Exitting...");
   } else {
     m_streamer->restoreDataStore(msg);
-    B2INFO("Rx: DataStore Restored!");
+    B2DEBUG(100, "Rx: DataStore Restored!");
   }
 
   // Remove buffers
@@ -124,13 +119,12 @@ void RxModule::event()
 
 void RxModule::endRun()
 {
-  //fill Run data
-
-  B2INFO("endRun done.");
+  B2DEBUG(100, "endRun done.");
 }
 
 
 void RxModule::terminate()
 {
-  B2INFO("terminate called")
+  B2INFO("Rx: terminate called")
+  delete m_streamer;
 }

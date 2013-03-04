@@ -10,13 +10,9 @@
 #define RXMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/DataStoreStreamer.h>
-#include <framework/pcore/RbCtlMgr.h>
 
-#include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
 
@@ -54,9 +50,6 @@ namespace Belle2 {
 
     //! Compression Level
     int m_compressionLevel;
-
-    //! Process contrl manager
-    RbCtlMgr* m_rbctl;
 
     /** Current event number. */
     int m_nrecv;

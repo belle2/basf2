@@ -53,7 +53,7 @@ void TxModule::initialize()
 
 void TxModule::beginRun()
 {
-  B2INFO("beginRun called.");
+  B2DEBUG(100, "beginRun called.");
 }
 
 
@@ -70,18 +70,15 @@ void TxModule::event()
   }
   m_nsent++;
 
-  B2INFO("Tx: objs sent in buffer. Size = " << msg->size());
+  B2DEBUG(100, "Tx: objs sent in buffer. Size = " << msg->size());
 
   // Release EvtMessage buffer
   delete msg;
-
 }
 
 void TxModule::endRun()
 {
-  //fill Run data
-
-  B2INFO("endRun done.");
+  B2DEBUG(100, "endRun done.");
 }
 
 

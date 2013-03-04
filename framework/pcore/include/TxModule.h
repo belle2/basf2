@@ -11,7 +11,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/pcore/RingBuffer.h>
-#include <framework/pcore/RbCtlMgr.h>
 #include <framework/pcore/DataStoreStreamer.h>
 
 
@@ -50,9 +49,6 @@ namespace Belle2 {
 
     //! DataStoreStreamer
     DataStoreStreamer* m_streamer;
-
-    //! Process contrl manager
-    RbCtlMgr* m_rbctl;
 
     //! No. of sent events
     int m_nsent;

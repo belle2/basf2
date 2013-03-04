@@ -101,7 +101,7 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
                                          cl, array);
       B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
     } else {
-      B2INFO("restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " is NULL!");
+      B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " is NULL!");
     }
   }
   // Return with normal exit status

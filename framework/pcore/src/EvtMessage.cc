@@ -9,11 +9,8 @@
 
 #include <framework/pcore/EvtMessage.h>
 
-#include <iostream>
 #include <cstdlib>
 #include <string>
-
-//#include "event/Event.h"
 
 using namespace std;
 using namespace Belle2;
@@ -39,7 +36,7 @@ EvtMessage::EvtMessage(char* data)
 /// @brief Constructor of EvtMessage allocating new buffer
 /// @param msg  data
 /// @param size Length of the data (TMessage)
-EvtMessage::EvtMessage(char* sobjs, int size, RECORD_TYPE type = MSG_EVENT)
+EvtMessage::EvtMessage(const char* sobjs, int size, RECORD_TYPE type = MSG_EVENT)
 {
   m_data = new char[size + sizeof(EvtHeader)]; // Allocate new buffer
   msg(sobjs, size, type);
@@ -48,7 +45,7 @@ EvtMessage::EvtMessage(char* sobjs, int size, RECORD_TYPE type = MSG_EVENT)
 
 /// @brief Copy constructor of EvtMessage class
 /// @param evtmsg Original EvtMessage object
-EvtMessage::EvtMessage(EvtMessage& evtmsg)
+EvtMessage::EvtMessage(const EvtMessage& evtmsg)
 {
   *this = evtmsg;
 }
@@ -63,18 +60,19 @@ EvtMessage::~EvtMessage(void)
 
 /// @brief Overridden assign operator
 /// @param obj Source object
-/// @param Pointer to assigned object
-EvtMessage& EvtMessage::operator=(EvtMessage& obj)
+EvtMessage& EvtMessage::operator=(const EvtMessage& obj)
 {
   if (this != &obj) {
-    this->buffer(obj.buffer());
+    if (m_buftype == 1)
+      delete [] m_data;
+    buffer(obj.m_data); //copy m_data (m_buftype is set)
   }
 
   return *this;
 }
 
 /// @brief Get buffer
-/// @return BUffer address
+/// @return Buffer address
 
 char* EvtMessage::buffer(void)
 {

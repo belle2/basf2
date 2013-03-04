@@ -47,15 +47,15 @@ namespace Belle2 {
     EvtMessage(void);
     /*! build EvtMessage from existing buffer (does not take ownership). */
     EvtMessage(char* buf);
-    /*! build EvtMessage by allocating new message buffer */
-    EvtMessage(char* sobjs, int size, RECORD_TYPE type);
-    /*! Copy constructor */
-    EvtMessage(EvtMessage& evtmsg);
+    /*! build EvtMessage by allocating new message buffer (sobjs is copied). */
+    EvtMessage(const char* sobjs, int size, RECORD_TYPE type);
+    /*! Copy constructor (m_data is copied). */
+    EvtMessage(const EvtMessage& evtmsg);
     /*! Destructor */
     ~EvtMessage(void);
 
-    /*! Operator */
-    EvtMessage& operator=(EvtMessage& obj);
+    /*! Assignment (m_data is copied). */
+    EvtMessage& operator=(const EvtMessage& obj);
 
 
     // Access functions

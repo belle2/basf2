@@ -429,7 +429,7 @@ namespace Belle2 {
      *  @param end     iterator pointing to the end of a sequence of
      *                 std::pair<index_type,weight_type> or compatible
      */
-    template <class InputIterator> void add(index_type from, InputIterator begin, InputIterator end) {
+    template <class InputIterator> void add(index_type from, const InputIterator& begin, const InputIterator& end) {
       setModified(true);
       new(next()) RelationElement(from, begin, end);
     }

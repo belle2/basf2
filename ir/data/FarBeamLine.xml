@@ -3,6 +3,17 @@
   <Creator library="ir">FarBeamLineCreator</Creator>
   <Content>
 
+         <!--
+         Following data is defined to Geant4 coordinates (z axis = Belle Solenoid), not for GxGy coordinates.
+         Therefore we do not need to rotate all beamline gemetry.   
+          For example:
+          LLL1: PHI=  -42.40 mrad
+          LHL1: PHT=  41.60 mrad 
+
+          LHR1: PHI=  41.58 mrad
+          LLR1: PHI= -40.51 mrad
+	 -->
+
 	<!-- limits -->
 	<TubeR>
 		<Z0 unit="m">3.8215</Z0>
@@ -1575,6 +1586,12 @@
                 <Material desc="Magnet SLYTLP1 yoke">Fe</Material>
         </SLYTLP1p2>
 
+       <!--
+         Following geometry should be parallel to Gx, so we need to rotate by -8.5 mrad.
+          (except for the polyethyren shield attaching Belle-Endcap)
+        -->
+
+
 	<!-- concrete "mon-gata" gate-shaped shield -->
 
 	<GateShield>
@@ -1586,7 +1603,7 @@
                 <TUNY unit="m">1.95</TUNY>
                 <DETZ unit="m">3.69</DETZ>
                 <DETDZ unit="m">0.47</DETDZ>
-                <ROT unit="rad">-0.02595</ROT>
+                <ROT unit="rad">-0.0085</ROT>
 
                 <Material desc="gate shield">G4_CONCRETE</Material>
 	</GateShield>
@@ -1628,7 +1645,7 @@
                 <y unit="m">1.45</y>
                 <dx unit="m">-0.1</dx>
                 <dy unit="m">-0.45</dy>
-                <ROT unit="rad">-0.02595</ROT>
+                <ROT unit="rad">-0.0085</ROT>
                 <Material>G4_CONCRETE</Material>
         </ConcreteShieldR>
 
@@ -1641,7 +1658,7 @@
                 <y unit="m">1.45</y>
                 <dx unit="m">0.1</dx>
                 <dy unit="m">-0.45</dy>
-                <ROT unit="rad">-0.02595</ROT>
+                <ROT unit="rad">-0.0085</ROT>
                 <Material>G4_CONCRETE</Material>
         </ConcreteShieldL>
 

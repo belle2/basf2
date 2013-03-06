@@ -15,21 +15,10 @@
 using namespace std;
 using namespace Belle2;
 
-
-/// @brief Null constructor
-EvtMessage::EvtMessage(void)
+EvtMessage::EvtMessage(char* data):
+  m_data(data),
+  m_ownsBuffer(false)
 {
-  m_data = NULL;
-  m_buftype = 0;
-}
-
-/// @brief Constructor of EvtMessage using existing buffer
-/// @param msg Actual data
-/// @param size Length of the actual data
-EvtMessage::EvtMessage(char* data)
-{
-  m_data = data;
-  m_buftype = 0;
 }
 
 
@@ -40,7 +29,7 @@ EvtMessage::EvtMessage(const char* sobjs, int size, RECORD_TYPE type = MSG_EVENT
 {
   m_data = new char[size + sizeof(EvtHeader)]; // Allocate new buffer
   msg(sobjs, size, type);
-  m_buftype = 1;
+  m_ownsBuffer = true;
 }
 
 /// @brief Copy constructor of EvtMessage class
@@ -53,9 +42,8 @@ EvtMessage::EvtMessage(const EvtMessage& evtmsg)
 /// @brief Destructor of EvtMessage class
 EvtMessage::~EvtMessage(void)
 {
-  if (m_buftype == 1)
+  if (m_ownsBuffer)
     delete [] m_data;
-  m_buftype = 0;
 }
 
 /// @brief Overridden assign operator
@@ -63,9 +51,9 @@ EvtMessage::~EvtMessage(void)
 EvtMessage& EvtMessage::operator=(const EvtMessage& obj)
 {
   if (this != &obj) {
-    if (m_buftype == 1)
+    if (m_ownsBuffer)
       delete [] m_data;
-    buffer(obj.m_data); //copy m_data (m_buftype is set)
+    buffer(obj.m_data); //copy m_data (m_ownsBuffer is set)
   }
 
   return *this;
@@ -82,12 +70,12 @@ char* EvtMessage::buffer(void)
 // @brief Set buffer
 // @param Existing buffer address
 
-void EvtMessage::buffer(char* bufadr)
+void EvtMessage::buffer(const char* bufadr)
 {
   int size = *(int*)bufadr;
   m_data = new char[size];
   memcpy(m_data, bufadr, size);
-  m_buftype = 1;
+  m_ownsBuffer = true;
 }
 
 // @brief size

@@ -43,10 +43,8 @@ namespace Belle2 {
   class EvtMessage {
 
   public:
-    /*! Empty constructor */
-    EvtMessage(void);
     /*! build EvtMessage from existing buffer (does not take ownership). */
-    EvtMessage(char* buf);
+    EvtMessage(char* buf = NULL);
     /*! build EvtMessage by allocating new message buffer (sobjs is copied). */
     EvtMessage(const char* sobjs, int size, RECORD_TYPE type);
     /*! Copy constructor (m_data is copied). */
@@ -62,7 +60,7 @@ namespace Belle2 {
     /*! Get buffer address */
     char* buffer(void);
     /*! Set existing buffer address */
-    void  buffer(char*);
+    void  buffer(const char*);
 
     /*! Get size of message including headers*/
     int   size(void);
@@ -98,7 +96,7 @@ namespace Belle2 {
 
   private:
     char* m_data;         ///< Pointer to the internal EvtMessage buffer
-    int   m_buftype;      ///< If 1, clean up m_data in destructor
+    bool m_ownsBuffer; ///< Wether to clean up m_data in destructor
 
   };
 

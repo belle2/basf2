@@ -90,30 +90,27 @@ class CDCPlotModule(Module):
         """
         simhits = Belle2.PyStoreArray('CDCSimHits')
 
+        # list of lists of simhit positions, one list per mcpart
         trackhits_x = []
         trackhits_y = []
-        indices = []
 
         mcparts = []
         for hit in simhits:
-            hitpos = hit.getPosWire()  # TVector3
-            # get index of first related mcparticle
-            mcpart_idx = hit.getRelationsFrom("MCParticles")[0].getArrayIndex()
-            if not mcpart_idx in mcparts:
-                idx = len(mcparts)
-                mcparts.append(mcpart_idx)
-                indices.append(idx)
+            mcpart = hit.getRelatedFrom("MCParticles")
+            if not mcpart in mcparts:
+                mcparts.append(mcpart)
                 trackhits_x.append([])
                 trackhits_y.append([])
             # add simhit to the list corresponding to this particle
-            idx = mcparts.index(mcpart_idx)
+            idx = mcparts.index(mcpart)
+            hitpos = hit.getPosWire()  # TVector3
             trackhits_x[idx].append(hitpos.x())
             trackhits_y[idx].append(hitpos.y())
 
-        if len(indices) > 0:
+        npart = len(mcparts)
+        if npart > 0:
             # plot the (x,y) list on a matplotlib figure
-            num_tracks = max(indices) + 1
-            col = [colormap.jet(1.0 * c / (num_tracks - 1)) for c in indices]
+            col = [colormap.jet(1.0 * c / (npart - 1)) for c in range(npart)]
             fig = plot(trackhits_x, trackhits_y, col)
 
             filename = 'cdchits_%i.png' % (self.num_events)
@@ -136,17 +133,14 @@ class CDCPlotModule(Module):
 main = create_path()
 
 evtmetagen = register_module('EvtMetaGen')
-
 evtmetagen.param('EvtNumList', [5])
-
-evtmetainfo = register_module('EvtMetaInfo')
 
 gearbox = register_module('Gearbox')
 geo = register_module('Geometry')
 # Outer detectors are disabled for performance reasons.
 # Note that this may produce a larger number of particles reentering
 # the detector from the outside.
-geo.param('ExcludedComponents', ['TOP', 'ECL', 'BKLM', 'EKLM'])
+geo.param('ExcludedComponents', ['ARICH', 'TOP', 'ECL', 'BKLM', 'EKLM'])
 
 # particle gun to shoot particles in the detector
 pGun = register_module('ParticleGun')

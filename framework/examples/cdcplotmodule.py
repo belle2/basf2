@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import matplotlib
+#to avoid loading gtk backend in the following imports
+#(fails if no X11 display is available)
+matplotlib.use('agg')
+
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 import matplotlib.cm as colormap

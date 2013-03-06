@@ -107,10 +107,6 @@ namespace Belle2 {
       for (int i = 0; i < numHits; i++) {
         const RelationsObject* rel = static_cast<RelationsObject*>(hits[i]);
         const MCParticle* mcpart = rel->getRelatedFrom<MCParticle>();
-        if (!mcpart) {
-          B2WARNING("MCParticle not found for " << hits.getName() << "[" << i << "], skipping hit!");
-          continue;
-        }
 
         addSimHit(hits[i], mcpart);
       }
@@ -137,7 +133,10 @@ namespace Belle2 {
     /** Add a ECL hit. */
     void addSimHit(const ECLHit* hit, const MCParticle* particle);
 
-    /** Return MCTrack for given particle, add it if it doesn't exist yet. */
+    /** Return MCTrack for given particle, add it if it doesn't exist yet.
+     *
+     * If particle is NULL, a dummy MCTrack (with track=0) is created.
+     **/
     MCTrack& addMCParticle(const MCParticle* particle);
 
     /** Create visual representation of all tracks.

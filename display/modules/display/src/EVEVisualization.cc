@@ -702,6 +702,19 @@ void EVEVisualization::addSimHit(const ECLHit* hit, const MCParticle* particle)
 
 EVEVisualization::MCTrack& EVEVisualization::addMCParticle(const MCParticle* particle)
 {
+  if (!particle) {
+    if (!m_mcparticleTracks[particle].simhits) {
+      const TString pointsTitle("Unassigned SimHits");
+      m_mcparticleTracks[particle].simhits = new TEvePointSet(pointsTitle);
+      m_mcparticleTracks[particle].simhits->SetTitle(pointsTitle);
+      m_mcparticleTracks[particle].simhits->SetMarkerStyle(6);
+      m_mcparticleTracks[particle].simhits->SetMainColor(kWhite);
+      m_mcparticleTracks[particle].simhits->SetMainTransparency(50);
+      m_mcparticleTracks[particle].track = NULL;
+    }
+    return m_mcparticleTracks[particle];
+  }
+
   if (m_assignToPrimaries) {
     while (!particle->hasStatus(MCParticle::c_PrimaryParticle) and particle->getMother())
       particle = particle->getMother();
@@ -793,7 +806,10 @@ void EVEVisualization::makeTracks()
   std::map<const MCParticle*, MCTrack>::iterator it = m_mcparticleTracks.begin();
   const std::map<const MCParticle*, MCTrack>::iterator& end = m_mcparticleTracks.end();
   for (; it != end; ++it) {
-    m_tracklist->AddElement(it->second.track);
+    if (it->second.track)
+      m_tracklist->AddElement(it->second.track);
+    else //add simhits directly
+      gEve->AddElement(it->second.simhits);
   }
   gEve->AddElement(m_tracklist);
   m_tracklist->MakeTracks();

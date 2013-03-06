@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from basf2 import *
+from simulation import add_simulation
+from reconstruction import add_reconstruction
+
+main = create_path()
+
+# input
+input = register_module('RootInput')
+input.param('inputFileName', 'output.root')
+main.add_module(input)
+
+# detecor simulation
+# include or exclude detector components you need
+components = [
+    'MagneticField',
+    'BeamPipe',
+    'PXD',
+    'SVD',
+    'CDC',
+    'TOP',
+    ]
+              #              'ARICH',
+              #              'BKLM',
+              #              'ECL',
+
+# Load XML files
+gearbox = register_module('Gearbox')
+main.add_module(gearbox)
+
+# Build geometry for track fitting etc...
+geometry = register_module('Geometry')
+geometry.param('Components', components)
+main.add_module(geometry)
+
+# reconstruction
+add_reconstruction(main, components)
+# or add_reconstruction(main) to run the reconstruction of all detectors
+
+output = register_module('RootOutput')
+output.param('outputFileName', 'output_reconstructed.root')
+main.add_module(output)
+
+process(main)
+
+# Print call statistics
+print statistics

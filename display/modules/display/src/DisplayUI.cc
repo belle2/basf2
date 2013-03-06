@@ -347,7 +347,6 @@ void DisplayUI::makeGui()
     }
     automatisation_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
 
-    TGButton* b = 0;
     hf = new TGHorizontalFrame(automatisation_frame);
     {
       TGLabel* widthLabel = new TGLabel(hf, "Width (px):");
@@ -359,7 +358,7 @@ void DisplayUI::makeGui()
                                              100, 6000);
       hf->AddFrame(m_autoPictureWidth, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
 
-      b = new TGTextButton(hf, "Save PNGs");
+      TGButton* b = new TGTextButton(hf, "Save PNGs");
       hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "startAutomaticRun()");
     }

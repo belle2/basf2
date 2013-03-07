@@ -21,9 +21,16 @@ namespace Belle2 {
   class TrackingOutput : public TObject {
   public:
 
-    TrackingOutput() {
-
+    /** Constructor, that initializes everything to 0.
+     */
+    TrackingOutput():
+      m_mcMomentumX(0.), m_mcMomentumY(0.), m_mcMomentumZ(0.), m_mcMomentum(0.), m_mcCurv(0.),
+      m_mcPhi(0.), m_mcCotTheta(0.), m_mcTheta(0.), m_mcPDG(0),
+      m_mcPositionX(0.), m_mcPositionY(0.), m_mcPositionZ(0.) {
     }
+
+    /** Destructor; nothing was newed in this class.
+     */
     ~TrackingOutput() {
 
     }

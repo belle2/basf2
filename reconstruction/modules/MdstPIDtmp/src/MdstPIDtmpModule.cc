@@ -40,8 +40,8 @@ namespace Belle2 {
 
   MdstPIDtmpModule::MdstPIDtmpModule() : Module()
   {
-    setDescription("MdstPIDtmp");
-
+    setDescription("Create MDST PID format (PIDLikelihood objects) from subdetector PID info.");
+    setPropertyFlags(c_ParallelProcessingCertified);
   }
 
   MdstPIDtmpModule::~MdstPIDtmpModule()

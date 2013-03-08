@@ -33,8 +33,8 @@ namespace Belle2 {
     myResult.setCharge(-10);
     EXPECT_EQ(-1, myResult.getCharge());
 
-    myResult.setPDGCode(Const::electron);
-    EXPECT_EQ(11, myResult.getPDGCode());
+    myResult.setParticleType(Const::electron);
+    EXPECT_EQ(Const::electron, myResult.getParticleType());
   }
 
   /** Test Position/Momentum Vectors and respective error matrix input and retrieval.*/

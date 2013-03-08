@@ -81,7 +81,6 @@ class CDCPlotModule(Module):
     def __init__(self):
         """constructor."""
         super(CDCPlotModule, self).__init__()
-        self.setName('CDCPlotModule')
 
     def event(self):
         """reimplementation of Module::event().

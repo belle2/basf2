@@ -15,7 +15,6 @@ class NoopModule(Module):
     def __init__(self):
         """constructor."""
         super(NoopModule, self).__init__()
-        self.setName('NoopModule')
 
 
 # copy input file into current dir to avoid having the full path in .out file

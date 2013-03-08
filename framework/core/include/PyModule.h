@@ -33,16 +33,20 @@ namespace Belle2 {
     /** constructor */
     PyModule(PyObject* p):
       Module(),
-      m_self(p) { }
+      m_self(p) {
+      setModuleName(p->ob_type->tp_name);
+    }
 
     /** copy constructor */
     PyModule(PyObject* p, const Module& m):
       Module(m),
-      m_self(p) { }
+      m_self(p) {
+      setModuleName(p->ob_type->tp_name);
+    }
 
     /** set the module's name.
     *
-    * Use inside the python module's __init__ function
+    * Not really necessary any longer, automatically set from class name
     */
     void setName(const std::string& name) { setModuleName(name); }
 

@@ -15,7 +15,6 @@ class SelectOddEvents(Module):
         """constructor."""
 
         super(SelectOddEvents, self).__init__()
-        self.setName('SelectOddEvents')
 
     def event(self):
         """reimplementation of Module::event()."""

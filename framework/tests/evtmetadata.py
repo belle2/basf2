@@ -11,7 +11,6 @@ class NoopModule(Module):
     def __init__(self):
         """constructor."""
         super(NoopModule, self).__init__()
-        self.setName('NoopModule')
 
 
 class EvtMetaDataTest(Module):
@@ -22,7 +21,6 @@ class EvtMetaDataTest(Module):
         """constructor."""
 
         super(EvtMetaDataTest, self).__init__()
-        self.setName('EvtMetaDataTest')
         B2INFO('event\trun\texp')
 
     def initialize(self):
@@ -39,6 +37,7 @@ class EvtMetaDataTest(Module):
         """reimplementation of Module::event()."""
 
         evtmetadata = Belle2.PyStoreObj('EventMetaData')
+
         if not evtmetadata:
             B2ERROR('No EventMetaData found')
         else:

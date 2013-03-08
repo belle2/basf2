@@ -19,7 +19,6 @@ class TestModule(Module):
         """constructor."""
 
         super(TestModule, self).__init__()
-        self.setName('TestModule')
 
     def event(self):
         """reimplementation of Module::event().

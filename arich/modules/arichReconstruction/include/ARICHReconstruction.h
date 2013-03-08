@@ -57,7 +57,6 @@ namespace Belle2 {
       double m_trackAngRes; /**< track direction resolution (from tracking) */
       double m_singleRes;   /**< single photon emission angle resolution */
       std::vector<double> m_aeroMerit; /**< aerogel layer figure of merit */
-
       //! Returns 1 if vector "a" lies on "copyno"-th detector active surface of detector and 0 else.
       int InsideDetector(TVector3 a, int copyno);
       //! Returns the hit virtual position, assuming that it was reflected from mirror.

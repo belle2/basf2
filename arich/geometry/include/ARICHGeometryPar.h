@@ -48,7 +48,8 @@ namespace Belle2 {
       static ARICHGeometryPar* Instance();
       //! calculates detector parameters needed for geometry build and reconstruction.
       void Initialize(const GearDir& content);
-
+      //! calculates detector parameters needed for geometry build and reconstruction - the mirrorinfo can be in separate directory
+      void Initialize(const GearDir& content, const GearDir& mirrorinfo);
 
       //! Clears
       void clear(void);
@@ -126,7 +127,12 @@ namespace Belle2 {
       bool isInit();
       //! returns true if parametrisation is initialized with simple geometry (beamtest)
       bool isSimple();
-
+      //! initialize detector mask
+      void initDetectorMask(int nmodules);
+      //! set the channel on/off
+      void setActive(int module, int channel,  bool val);
+      //! check the activity of the channel
+      bool isActive(int module, int channel);
     private:
 
       std::string _version;       /*!< The version of geometry parameters. */
@@ -152,6 +158,8 @@ namespace Belle2 {
       double _aeroRefIndex[MAX_N_ALAYERS];  /*!< Array of aerogel refracive indices */
       double _aeroZPosition[MAX_N_ALAYERS]; /*!< Array of aerogel Z positions */
       double _aeroThickness[MAX_N_ALAYERS]; /*!< Array of aerogel thickness */
+      int  m_nPads;                         /*!< total number of pads in a sensor */
+      std::vector<uint32_t> m_DetectorMask;             /*!< Detector Mask of inactive channels */
 
       //! calculates the positions of HAPD modules, with the parameters from xml.
       void modulesPosition(const GearDir& content);

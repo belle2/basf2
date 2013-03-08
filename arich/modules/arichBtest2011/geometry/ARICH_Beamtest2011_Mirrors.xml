@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Mirrors>
+<setup id="0">
+<Mirrors>
+      <height unit="mm">400</height>
+      <width unit="mm">200</width>      
+      <thickness unit="mm">5</thickness>
+      <material>ARICH_MirrorQuartz</material>      
+     
+      <Surface>
+	<Properties>
+	  <Property name="REFLECTIVITY" unit="eV">
+	    <value energy="1.0">0.78</value> 
+	    <value energy="1.25">0.78</value> 
+	    <value energy="1.45">0.83</value> 
+	    <value energy="1.7">0.9</value> 
+	    <value energy="2.1">0.95</value>
+	    <value energy="2.7">0.96</value>
+	    <value energy="3.1">0.93</value>
+	    <value energy="3.5">0.8</value>
+	    <value energy="3.66">0.23</value>
+	    <value energy="4.1">0.31</value>
+	    <value energy="5.8">0.14</value>
+	  </Property>
+	</Properties>
+	<Type>dielectric_metal</Type>
+	<Finish>polished</Finish>
+	<Model>glisur</Model>
+      </Surface>
+    </Mirrors>
+</setup>
+
+<setup id="1">
+<Mirrors>
+      <height unit="mm">400</height>
+      <width unit="mm">200</width>      
+      <thickness unit="mm">5</thickness>
+      <material>ARICH_MirrorQuartz</material>      
+    
+     <Mirror>
+        <xPos unit="mm">110</xPos>
+        <yPos unit="mm">0</yPos>
+        <zPos unit="mm" desc="edgepoint at aerogel side">0</zPos>
+        <angle unit="deg">0</angle>
+      </Mirror>
+      <Surface>
+	<Properties>
+	  <Property name="REFLECTIVITY" unit="eV">
+	    <value energy="1.0">0.78</value> 
+	    <value energy="1.25">0.78</value> 
+	    <value energy="1.45">0.83</value> 
+	    <value energy="1.7">0.9</value> 
+	    <value energy="2.1">0.95</value>
+	    <value energy="2.7">0.96</value>
+	    <value energy="3.1">0.93</value>
+	    <value energy="3.5">0.8</value>
+	    <value energy="3.66">0.23</value>
+	    <value energy="4.1">0.31</value>
+	    <value energy="5.8">0.14</value>
+	  </Property>
+	</Properties>
+	<Type>dielectric_metal</Type>
+	<Finish>polished</Finish>
+	<Model>glisur</Model>
+      </Surface>
+    </Mirrors>
+</setup>
+
+<setup id="2">
+<Mirrors>
+      <height unit="mm">400</height>
+      <width unit="mm">200</width>      
+      <thickness unit="mm">5</thickness>
+      <material>ARICH_MirrorQuartz</material>      
+      <Mirror>
+	<xPos unit="mm">150</xPos>
+	<yPos unit="mm">196.157</yPos>
+	<zPos unit="mm" desc="edgepoint at aerogel side">0</zPos>
+	<angle unit="deg">11.25</angle>
+      </Mirror>
+       <Mirror>
+        <xPos unit="mm">150</xPos>
+        <yPos unit="mm">-196.157</yPos>
+        <zPos unit="mm" desc="edgepoint at aerogel side">0</zPos>
+        <angle unit="deg">-11.25</angle>
+      </Mirror>
+      <Surface>
+	<Properties>
+	  <Property name="REFLECTIVITY" unit="eV">
+	    <value energy="1.0">0.78</value> 
+	    <value energy="1.25">0.78</value> 
+	    <value energy="1.45">0.83</value> 
+	    <value energy="1.7">0.9</value> 
+	    <value energy="2.1">0.95</value>
+	    <value energy="2.7">0.96</value>
+	    <value energy="3.1">0.93</value>
+	    <value energy="3.5">0.8</value>
+	    <value energy="3.66">0.23</value>
+	    <value energy="4.1">0.31</value>
+	    <value energy="5.8">0.14</value>
+	  </Property>
+	</Properties>
+	<Type>dielectric_metal</Type>
+	<Finish>polished</Finish>
+	<Model>glisur</Model>
+      </Surface>
+    </Mirrors>
+</setup>
+
+<setup id="2a">
+<Mirrors>
+      <height unit="mm">400</height>
+      <width unit="mm">160</width>      
+      <thickness unit="mm">5</thickness>
+      <material>ARICH_MirrorQuartz</material>      
+      <Mirror>
+	<xPos unit="mm">150</xPos>
+	<yPos unit="mm">196.157</yPos>
+	<zPos unit="mm" desc="edgepoint at aerogel side">0</zPos>
+	<angle unit="deg">11.25</angle>
+      </Mirror>
+       <Mirror>
+        <xPos unit="mm">150</xPos>
+        <yPos unit="mm">-196.157</yPos>
+        <zPos unit="mm" desc="edgepoint at aerogel side">0</zPos>
+        <angle unit="deg">-11.25</angle>
+      </Mirror>
+      <Surface>
+	<Properties>
+	  <Property name="REFLECTIVITY" unit="eV">
+	    <value energy="1.0">0.78</value> 
+	    <value energy="1.25">0.78</value> 
+	    <value energy="1.45">0.83</value> 
+	    <value energy="1.7">0.9</value> 
+	    <value energy="2.1">0.95</value>
+	    <value energy="2.7">0.96</value>
+	    <value energy="3.1">0.93</value>
+	    <value energy="3.5">0.8</value>
+	    <value energy="3.66">0.23</value>
+	    <value energy="4.1">0.31</value>
+	    <value energy="5.8">0.14</value>
+	  </Property>
+	</Properties>
+	<Type>dielectric_metal</Type>
+	<Finish>polished</Finish>
+	<Model>glisur</Model>
+      </Surface>
+    </Mirrors>
+</setup>
+</Mirrors>

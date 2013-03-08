@@ -1,0 +1,16 @@
+24	30	16	20	tdc up y
+25	31	17	21	tdc down y
+26	28	18	22	tdc left x 
+27	29	19	23	tdc right x
+8	9	10	11	tdc anode
+-0.2397	-0.26	-0.2397	-0.2392	slope y
+-0.26	-0.2392	-0.26	0.26	slope x
+2	0	6	-3	offset y
+-2	-15	0	-6	offset x
+95	85	140	140	lower limit y
+80	90	110	125	lower limit x
+125	115	160	160	upper limit y
+110	120	130	145	upper limit x
+0	0	0	0	position x
+0	0	0	0	position y
+-40	540	1370	1910	position z

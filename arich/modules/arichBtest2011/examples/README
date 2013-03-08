@@ -1,0 +1,18 @@
+Compile the code with:
+
+scons --extra-ccflags=-DARICHDEBUG
+
+Run the basf2 analysis:
+
+basf2 arich/modules/arichBtest2011/examples/ARICHBtest2011.py -- -p /pathto/data/ -r 067 -n 20000
+
+Start the root
+root run_067.root
+
+Plot the results: 
+root [3] .x  arich/modules/arichBtest2011/examples/ARICHBtest2011.cxx()
+
+
+
+export source code to TARBALL:
+find arich \( -name .svn -o -name "*.so" -o -name "*.*~" -o -name "*.d" \)  -prune -o -print | cpio -o -H tar | gzip > arich.tar.gz

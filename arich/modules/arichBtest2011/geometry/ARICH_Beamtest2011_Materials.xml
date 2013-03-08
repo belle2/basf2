@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+  
+<Materials>
+  
+  
+  <Material name="ARICH_HAPDQuartz"> 
+    <state>Solid</state>
+    <density unit="g/cm3">2.20</density> 
+    <Components>       
+      <Element fraction="0.5326">O</Element> 
+      <Element fraction="0.4674">Si</Element> 
+    </Components>  
+      <Property name="RINDEX" unit="eV"> 
+	<value energy="1.5">1.3</value> 
+	<value energy="2.2">1.3</value> 
+	<value energy="2.9">1.3</value> 
+	<value energy="3.6">1.3</value> 
+	<value energy="4.3">1.3</value> 
+	<value energy="5">1.3</value> 
+      </Property> 
+      <Property name="ABSLENGTH" unit="eV"> 
+	<value energy="1.5">1000</value> 
+	<value energy="2.2">1000</value> 
+	<value energy="2.9">1000</value> 
+	<value energy="3.6">1000</value> 
+	<value energy="4.3">1000</value> 
+	<value energy="5">1000</value> 
+      </Property> 
+  </Material> 
+  
+  <Material name="ARICH_Ceramics"> 
+    <state>Solid</state>
+    <density unit="g/cm3">4.1</density> 
+    <Components> 
+      <Element fraction="0.47075">O</Element> 
+      <Element fraction="0.52925">Al</Element> 
+    </Components> 
+  </Material> 
+  
+  <Material name="ARICH_TileGapsFill"> 
+    <state>Solid</state>  
+    <Components> 
+      <Material fraction="1.0">Al</Material>  
+    </Components>
+  </Material> 
+  
+  <Material name="ARICH_Air"> 
+    <state>Gas</state>
+    <density unit="g/cm3">1.2e-3</density> 
+    <Components>
+      <Material fraction="1.0">Air</Material>
+    </Components>
+      <Property name="RINDEX" unit="eV"> 
+	<value energy="1.0">1.0</value> 
+	<value energy="2.0">1.0</value> 
+	<value energy="3.0">1.0</value> 
+	<value energy="4.0">1.0</value> 
+	<value energy="5.0">1.0</value> 
+      </Property> 
+  </Material> 
+  
+  <Material name="ARICH_Vacuum"> 
+    <state>Gas</state>
+    <density unit="g/cm3">1.2e-12</density>	    
+    <Components> 
+      <Element fraction="0.78">N</Element> 
+      <Element fraction="0.21">O</Element> 
+      <Element fraction="0.01">Ar</Element> 
+    </Components> 
+      <Property name="RINDEX" unit="eV"> 
+	<value energy="1.0">1.0</value> 
+	<value energy="2.0">1.0</value> 
+	<value energy="3.0">1.0</value> 
+	<value energy="4.0">1.0</value> 
+	<value energy="5.0">1.0</value> 
+      </Property> 
+  </Material>
+  
+  <Material name="ARICH_MirrorQuartz"> 
+    <state>Solid</state>
+    <density unit="g/cm3">2.20</density> 
+    <Components>       
+      <Element fraction="0.5326">O</Element> 
+      <Element fraction="0.4674">Si</Element>
+    </Components>  
+  </Material> 
+	
+  <Material name="HAPD_pcb">
+     <state>Solid</state>
+        <density unit="g/cm3">4.2</density>
+        <Components>   
+            <Element fraction="0.14">Cu</Element>
+            <Element fraction="0.02">Fe</Element>
+            <Element fraction="0.02">Sn</Element>
+            <Element fraction="0.01">Ta</Element>
+            <Element fraction="0.01">Al</Element>
+            <Element fraction="0.3">O</Element>
+            <Element fraction="0.05">H</Element>
+            <Element fraction="0.05">N</Element>
+            <Element fraction="0.3">Si</Element>
+            <Element fraction="0.05">C</Element>
+            <Element fraction="0.04">Sb</Element>
+            <Element fraction="0.01">Zn</Element>            
+        </Components>  
+    </Material>
+
+  <Material name="ARICH_Silicon">
+    <state>Solid</state>
+    <Components>
+      <Material fraction="1">Si</Material>
+    </Components>
+  </Material>
+
+
+
+</Materials>

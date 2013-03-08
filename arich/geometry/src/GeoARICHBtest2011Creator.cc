@@ -1,0 +1,629 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Luka Santelj, Rok Pestotnik                              *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#include <arich/geometry/GeoARICHBtest2011Creator.h>
+#include <arich/geometry/ARICHGeometryPar.h>
+#include <arich/geometry/ARICHBtest2011GeometryPar.h>
+
+#include <geometry/Materials.h>
+#include <geometry/CreatorFactory.h>
+#include <geometry/utilities.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
+// Framework - DataStore
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreArray.h>
+
+#include <arich/simulation/SensitiveDetector.h>
+#include <arich/simulation/SensitiveAero.h>
+
+
+
+#include <cmath>
+#include <boost/format.hpp>
+#include <boost/foreach.hpp>
+#include <boost/algorithm/string.hpp>
+
+//#include <geant4/G4LogicalVolume.hh>
+
+// Geant4
+#include <G4LogicalVolume.hh>
+#include <G4PVPlacement.hh>
+#include <G4AssemblyVolume.hh>
+#include <G4LogicalSkinSurface.hh>
+#include <G4OpticalSurface.hh>
+// Geant4 Shapes
+#include <G4Box.hh>
+#include <G4Tubs.hh>
+#include <G4Polyhedra.hh>
+#include <G4SubtractionSolid.hh>
+#include <G4Material.hh>
+
+#include <Python.h>
+
+using namespace std;
+using namespace boost;
+
+namespace Belle2 {
+
+  using namespace geometry;
+
+  namespace arich {
+
+    //-----------------------------------------------------------------
+    //                 Register the Creator
+    //-----------------------------------------------------------------
+
+    geometry::CreatorFactory<GeoARICHBtest2011Creator> GeoARICHBtestFactory("ARICHBtest2011Creator");
+
+    //-----------------------------------------------------------------
+    //                 Implementation
+    //-----------------------------------------------------------------
+
+    GeoARICHBtest2011Creator::GeoARICHBtest2011Creator()
+    {
+
+    }
+
+    GeoARICHBtest2011Creator::~GeoARICHBtest2011Creator()
+    {
+
+    }
+
+
+    void GeoARICHBtest2011Creator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
+    {
+
+      B2INFO("GeoARICHBtest2011Creator::create");
+      StoreObjPtr<EventMetaData> eventMetaDataPtr;
+
+
+      int exp = 1;
+      int run = 68;
+      PyObject* m = PyImport_AddModule("__main__");
+      if (m) {
+        PyObject* v = PyObject_GetAttrString(m, "runno");
+        if (v) {
+          run = PyInt_AsLong(v);
+          Py_DECREF(v);
+        }
+        B2INFO("GeoARICHBtest2011Creator::create runno = " << run);
+      }
+
+
+      B2INFO("eventMetaDataPtr run:" << run);
+      B2INFO("eventMetaDataPtr exp:" << exp);
+      // eventMetaDataPtr->setEndOfData();
+
+
+
+
+      string Type = content.getString("@type", "");
+
+      char nodestr[100];
+      sprintf(nodestr, "run[runno=%d]", run);
+      if (Type == "beamtest") {
+        BOOST_FOREACH(const GearDir & runparam, content.getNodes(nodestr)) {
+          m_runno       = runparam.getInt("runno", -1);
+          m_author      = runparam.getString("author", "");
+          m_neve        = runparam.getInt("neve", -1);
+          m_runtype     = runparam.getString("calibration", "pion");
+          m_hapdID      = runparam.getString("setup1", "unknown");
+          m_aerogelID   = runparam.getString("aerogel1", "unknown");
+          m_mirrorID    = runparam.getString("mirror", "unknown");
+          m_rotation    = runparam.getDouble("rotation", 0);
+          m_rx          = runparam.getDouble("positionx", 0);
+          m_ry          = runparam.getDouble("positiony", 0);
+          m_mytype      = runparam.getString("type1", "unknown");
+          m_daqqa       = runparam.getString("daqqa1", "unknown");
+          m_comment     = runparam.getString("comment1", "unknown");
+          m_datum       = runparam.getString("datum", "unknown");
+
+
+          B2INFO("runno    : " << m_runno);
+          B2INFO("author   : " << m_author);
+          B2INFO("neve     : " << m_neve);
+          B2INFO("runtype  : " << m_runtype);
+          B2INFO("hapdID   : " << m_hapdID);
+          B2INFO("aerogelID: " << m_aerogelID);
+          B2INFO("mirrorID : " << m_mirrorID);
+          B2INFO("rotation : " << m_rotation);
+          B2INFO("rx       : " << m_rx);
+          B2INFO("ry       : " << m_ry);
+          B2INFO("runtype  : " << m_mytype);
+          B2INFO("daqqa    : " << m_daqqa);
+          B2INFO("comment  : " << m_comment);
+          B2INFO("datum    : " << m_datum);
+
+
+        }
+        string aerogelname;
+        sprintf(nodestr, "setup/aerogel/row[@id=\"%s\"]", m_aerogelID.c_str());
+
+        GearDir runparam(content, nodestr);
+        B2INFO("id    : " << runparam.getString("@id", ""));
+        BOOST_FOREACH(const GearDir & aeroparam, runparam.getNodes("aerogel")) {
+          aerogelname       = aeroparam.getString(".", "");
+          string Type       = aeroparam.getString("@type", "");
+          B2INFO(Type << " aerogelname    : " << aerogelname);
+          sprintf(nodestr, "setup/aerogelinfo/row[@id=\"%s\"]", aerogelname.c_str());
+          GearDir infoparam(content, nodestr);
+
+          double agelrefind    =  infoparam.getDouble("refind", 1);
+          double ageltrlen     =  infoparam.getLength("trlen", 0);
+          double agelthickness =  infoparam.getLength("thickness", 0);
+          if (Type != string("left")) {
+            m_ageltrlen.push_back(ageltrlen);
+            m_agelrefind.push_back(agelrefind);
+            m_agelthickness.push_back(agelthickness);
+          }
+          B2INFO("refind   : " <<  agelrefind);
+          B2INFO("trlen    : " <<  ageltrlen / Unit::mm);
+          B2INFO("thickness    : " << agelthickness / Unit::mm);
+
+        }
+        int size = m_hapdID.size();
+
+        m_aerosupport = 0;
+        if (size > 0) {
+          char agelsupport = m_hapdID.at(size - 1);
+          if (agelsupport == 'a') m_aerosupport = 1;
+          if (agelsupport == 'b') m_aerosupport = 2;
+        }
+
+        if (m_aerosupport) size--;
+        sprintf(nodestr, "setup/hapd/row[@id=\"%s\"]", m_hapdID.substr(0, size).c_str());
+        B2INFO("nodestr    : " << nodestr);
+        B2INFO("aerogelsupport    : " << m_aerosupport);
+        GearDir hapdparam(content, nodestr);
+        //BOOST_FOREACH(const GearDir & runparam, content.getNodes(nodestr)) {
+        m_aerogeldx     =  hapdparam.getLength("aerogeldx", 0);
+        m_framedx       =  hapdparam.getLength("framedx", 0) * mm / Unit::mm ;
+        m_rotation1     =  hapdparam.getDouble("rotation", 0);
+        m_configuration =  hapdparam.getInt("setup", 0);
+        m_comment1      =  hapdparam.getString("comment", "");
+
+
+        B2INFO("aerogeldx  : " <<  m_aerogeldx);
+        B2INFO("framedx  : "   <<  m_framedx);
+        B2INFO("rotation  : "  <<  m_rotation1);
+        B2INFO("configuration  : "  <<  m_configuration);
+        B2INFO("comment  : "  << m_comment);
+        //}
+
+        GearDir setup(content, "setup");
+
+        createBtest2011Geometry(setup, topVolume);
+      }
+    }
+
+    double GeoARICHBtest2011Creator::getAvgRINDEX(G4Material* material)
+    {
+      G4MaterialPropertiesTable* mTable = material->GetMaterialPropertiesTable();
+      if (!mTable) return 0;
+      G4MaterialPropertyVector* mVector =  mTable->GetProperty("RINDEX");
+      if (!mVector) return 0;
+      G4bool b;
+      return mVector->GetValue(2 * Unit::eV / Unit::MeV, b);
+    }
+
+    G4LogicalVolume* GeoARICHBtest2011Creator::buildModule(GearDir Module)
+    {
+
+      // get detector module parameters
+
+      // get module materials
+      string wallMat =  Module.getString("wallMaterial");
+      string winMat =  Module.getString("windowMaterial");
+      string botMat =  Module.getString("Bottom/material");
+      G4Material* wallMaterial = Materials::get(wallMat);
+      G4Material* windowMaterial = Materials::get(winMat);
+      G4Material* bottomMaterial = Materials::get(botMat);
+      G4Material* boxFill = Materials::get("ARICH_Vacuum");
+
+      // check that module window material has specified refractive index
+      double wref = getAvgRINDEX(windowMaterial);
+      if (!wref) B2WARNING("Material '" << winMat << "', required for ARICH photon detector window as no specified refractive index. Continuing, but no photons in ARICH will be detected.");
+      ARICHGeometryPar* m_arichgp = ARICHGeometryPar::Instance();
+      m_arichgp->setWindowRefIndex(wref);
+      // get module dimensions
+      double modXsize = Module.getLength("moduleXSize") / Unit::mm;
+      double modZsize = Module.getLength("moduleZSize") / Unit::mm;
+      double wallThick = Module.getLength("moduleWallThickness") / Unit::mm;
+      double winThick = Module.getLength("windowThickness") / Unit::mm ;
+      double sensXsize = m_arichgp->getSensitiveSurfaceSize() / Unit::mm;
+      double botThick =  Module.getLength("Bottom/thickness") / Unit::mm;
+
+      // some trivial checks of overlaps
+      if (sensXsize > modXsize - 2 * wallThick) B2FATAL("ARICH photon detector module: Sensitive surface is too big. Doesn't fit into module box.");
+      if (winThick + botThick > modZsize) B2FATAL("ARICH photon detector module: window + bottom thickness larger than module thickness.");
+
+      // module master volume
+      G4Box* moduleBox = new G4Box("Box", modXsize / 2., modXsize / 2., modZsize / 2.);
+      G4LogicalVolume* lmoduleBox = new G4LogicalVolume(moduleBox, boxFill, "moduleBox");
+
+      // build and place module wall
+      G4Box* tempBox = new G4Box("tempBox", modXsize / 2. - wallThick, modXsize / 2. - wallThick, modZsize / 2. + 0.1); // Dont't care about "+0.1", needs to be there.
+      G4SubtractionSolid* moduleWall = new G4SubtractionSolid("Box-tempBox", moduleBox, tempBox);
+      G4LogicalVolume* lmoduleWall = new G4LogicalVolume(moduleWall, wallMaterial, "moduleWall");
+      setColor(*lmoduleWall, "rgb(1.0,0.0,0.0,1.0)");
+      new G4PVPlacement(G4Transform3D(), lmoduleWall, "moduleWall", lmoduleBox, false, 1);
+
+      // build module window
+      G4Box* winBox = new G4Box("winBox", modXsize / 2. - wallThick, modXsize / 2. - wallThick, winThick / 2.);
+      G4LogicalVolume* lmoduleWin = new G4LogicalVolume(winBox, windowMaterial, "moduleWindow");
+      setColor(*lmoduleWin, "rgb(0.7,0.7,0.7,1.0)");
+      G4Transform3D transform = G4Translate3D(0., 0., (-modZsize + winThick) / 2.);
+      new G4PVPlacement(transform, lmoduleWin, "moduleWindow", lmoduleBox, false, 1);
+
+      // build module bottom
+      G4Box* botBox = new G4Box("botBox", modXsize / 2. - wallThick, modXsize / 2. - wallThick, botThick / 2.);
+      G4LogicalVolume* lmoduleBot = new G4LogicalVolume(botBox, bottomMaterial, "moduleBottom");
+      // if (isBeamBkgStudy) lmoduleBot->SetSensitiveDetector(new BkgSensitiveDetector("ARICH", 1));
+      setColor(*lmoduleBot, "rgb(0.0,1.0,0.0,1.0)");
+      G4Transform3D transform1 = G4Translate3D(0., 0., (modZsize - botThick) / 2.);
+      // add surface optical properties if specified
+      Materials& materials = Materials::getInstance();
+      GearDir bottomParam(Module, "Bottom/Surface");
+      if (bottomParam) {
+        G4OpticalSurface* optSurf = materials.createOpticalSurface(bottomParam);
+        new G4LogicalSkinSurface("bottomSurface", lmoduleBot, optSurf);
+      } else B2INFO("ARICH: No optical properties are specified for detector module bottom surface.");
+      new G4PVPlacement(transform1, lmoduleBot, "moduleBottom", lmoduleBox, false, 1);
+
+      // build sensitive surface
+      G4Box* sensBox = new G4Box("sensBox", sensXsize / 2., sensXsize / 2., 0.1 * Unit::mm);
+      G4LogicalVolume* lmoduleSens = new G4LogicalVolume(sensBox, boxFill, "moduleSensitive");
+      lmoduleSens->SetSensitiveDetector(m_sensitive);
+      setColor(*lmoduleSens, "rgb(0.5,0.5,0.5,1.0)");
+      G4Transform3D transform2 = G4Translate3D(0., 0., (-modZsize + 0.1) / 2. + winThick);
+      new G4PVPlacement(transform2, lmoduleSens, "moduleSensitive", lmoduleBox, false, 1);
+
+      // module is build, return module logical volume
+      return lmoduleBox;
+    }
+
+
+    G4Material*  GeoARICHBtest2011Creator::createAerogel(const char* aeroname, double RefractiveIndex, double AerogelTransmissionLength)
+    {
+
+
+      G4double   density = (RefractiveIndex - 1) / 0.21 * g / cm3;
+      B2INFO("Creating ARICH " << aeroname << " n=" << RefractiveIndex << " density=" << density / g * cm3 << " g/cm3");
+      Materials& materials = Materials::getInstance();
+      G4Material* _aerogel = new G4Material(aeroname, density, 4);
+      _aerogel->AddElement(materials.getElement("O")  ,   0.665);
+      _aerogel->AddElement(materials.getElement("H")  ,   0.042);
+      _aerogel->AddElement(materials.getElement("Si") ,   0.292);
+      _aerogel->AddElement(materials.getElement("C")  ,   0.001);
+
+
+      const G4double AerogelAbsorbtionLength = 1000 * Unit::mm;
+
+      const G4int NBins = 40;
+      G4double MomentumBins[NBins];
+
+      G4double  AerogelRindex[NBins];
+      G4double  AerogelAbsorption[NBins];
+      G4double  AerogelRayleigh[NBins];
+
+      G4double MaxPhotonEnergy = 5 * eV;
+      G4double MinPhotonEnergy = 1.5 * eV;
+
+      for (G4int i = 0; i < NBins; i++) {
+
+        const G4double energy = float(i) / NBins * (MaxPhotonEnergy - MinPhotonEnergy) + MinPhotonEnergy;
+
+        MomentumBins[i]  =  energy;
+        AerogelRindex[i]    = RefractiveIndex;
+        AerogelAbsorption[i] = AerogelAbsorbtionLength;
+
+        const G4double Lambda0 = 400 * 1e-6 * mm;
+        const G4double Lambda  = 1240 * eV / energy * 1e-6 * mm;
+        G4double x = Lambda / Lambda0;
+        AerogelRayleigh[i]  = AerogelTransmissionLength * x * x * x * x;
+      }
+
+
+      G4MaterialPropertiesTable* AeroProperty = new G4MaterialPropertiesTable();
+      AeroProperty->AddProperty("RINDEX"   , MomentumBins, AerogelRindex    , NBins);
+      AeroProperty->AddProperty("ABSLENGTH", MomentumBins, AerogelAbsorption, NBins);
+      AeroProperty->AddProperty("RAYLEIGH" , MomentumBins, AerogelRayleigh, NBins);
+
+
+      _aerogel->SetMaterialPropertiesTable(AeroProperty);
+
+
+      return _aerogel;
+    }
+
+
+    void GeoARICHBtest2011Creator::createBtest2011Geometry(const GearDir& content, G4LogicalVolume& topWorld)
+    {
+
+      B2INFO("ARICH Btest2011 geometry will be built.")
+      ARICHGeometryPar* m_arichgp = ARICHGeometryPar::Instance();
+      ARICHBtest2011GeometryPar* m_arichbtgp = ARICHBtest2011GeometryPar::Instance();
+
+      for (unsigned int i = 0; i < m_agelrefind.size(); i++) {
+        char aeroname[255];
+        sprintf(aeroname, "Aerogel%d", i + 1);
+        createAerogel(aeroname, m_agelrefind[i],  m_ageltrlen[i]);
+      }
+
+      // experimental box
+
+      GearDir boxParams(content, "ExperimentalBox");
+      double xBox = boxParams.getLength("xSize") * mm / Unit::mm;
+      double yBox = boxParams.getLength("ySize") * mm / Unit::mm;
+      double zBox = boxParams.getLength("zSize") * mm / Unit::mm;
+
+      double xoffset = boxParams.getLength("beamcenter/x")  * mm  / Unit::mm;
+      double yoffset = boxParams.getLength("beamcenter/y")  * mm  / Unit::mm;
+      double zoffset = boxParams.getLength("beamcenter/z")  * mm  / Unit::mm - zBox / 2.;
+      G4ThreeVector roffset(xoffset, yoffset, zoffset);
+
+      string boxMat = boxParams.getString("material");
+      G4Material* boxMaterial = Materials::get(boxMat);
+      G4Box* expBox = new G4Box("ExperimentalBox", xBox / 2., yBox / 2., zBox / 2.);
+      G4LogicalVolume* topVolume = new G4LogicalVolume(expBox, boxMaterial, "ARICH.experimentalbox");
+      new G4PVPlacement(G4Transform3D(), topVolume, "ARICH.experimentalbox", &topWorld, false, 1);
+      setVisibility(*topVolume, false);
+
+      TVector3 trackingshift(content.getLength("tracking/shift/x"),
+                             content.getLength("tracking/shift/y"),
+                             content.getLength("tracking/shift/z"));
+
+      char mnodestr[256];
+      sprintf(mnodestr, "tracking/shift/run[@id=\"%d\"]", m_runno);
+      if (content.exists(mnodestr)) {
+        GearDir runtrackingshift(content, mnodestr);
+        trackingshift[0] = runtrackingshift.getLength("x");
+        trackingshift[1] = runtrackingshift.getLength("y");
+        trackingshift[2] = runtrackingshift.getLength("z");
+      }
+      m_arichbtgp->setTrackingShift(trackingshift);
+      ARICHTracking* m_mwpc = new ARICHTracking[4];
+      m_arichbtgp->setMwpc(m_mwpc);
+      BOOST_FOREACH(const GearDir & mwpc, content.getNodes("tracking/mwpc")) {
+        double x = mwpc.getLength("size/x")  * mm / Unit::mm;
+        double y = mwpc.getLength("size/y")  * mm / Unit::mm;
+        double z = mwpc.getLength("size/z")  * mm / Unit::mm;
+
+        double px = mwpc.getLength("position/x")  * mm / Unit::mm;
+        double py = mwpc.getLength("position/y")  * mm / Unit::mm;
+        double pz = mwpc.getLength("position/z")  * mm / Unit::mm;
+
+        G4Box* mwpcBox = new G4Box("MwpcBox", x / 2., y / 2., z / 2.);
+        G4LogicalVolume* mwpcVol = new G4LogicalVolume(mwpcBox, Materials::get(mwpc.getString("material"))  , "ARICH.mwpc");
+        new G4PVPlacement(G4Transform3D(G4RotationMatrix(), G4ThreeVector(px, py, pz) + roffset), mwpcVol, "ARICH.mwpc", topVolume, false, 1);
+        //setVisibility(*mwpc, true);
+
+        int id = mwpc.getInt("@id", -1);
+        B2INFO("GeoARICHBtest2011Creator:: MWPC ID=" << id);
+        if (id < 4 && id >= 0) {
+          m_mwpc[id].tdc[0]   = mwpc.getInt("tdc/y/up");
+          m_mwpc[id].tdc[1]   = mwpc.getInt("tdc/y/down");
+          m_mwpc[id].tdc[2]   = mwpc.getInt("tdc/x/left");
+          m_mwpc[id].tdc[3]   = mwpc.getInt("tdc/x/right");
+          m_mwpc[id].atdc     = mwpc.getInt("tdc/anode", 0);
+          m_mwpc[id].slp[0]   = mwpc.getDouble("slope/x");
+          m_mwpc[id].slp[1]   = mwpc.getDouble("slope/y");
+          m_mwpc[id].offset[0] = mwpc.getDouble("offset/x");
+          m_mwpc[id].offset[1] = mwpc.getDouble("offset/y");
+          m_mwpc[id].cutll[0] = mwpc.getInt("tdccut/y/min");
+          m_mwpc[id].cutll[1] = mwpc.getInt("tdccut/x/min");
+          m_mwpc[id].cutul[0] = mwpc.getInt("tdccut/y/max");
+          m_mwpc[id].cutul[1] = mwpc.getInt("tdccut/x/max");
+          m_mwpc[id].pos[0] = mwpc.getDouble("position/x");
+          m_mwpc[id].pos[1] = mwpc.getDouble("position/y");
+          m_mwpc[id].pos[2] = mwpc.getDouble("position/z");
+          // m_mwpc[id].Print();
+        }
+        /*
+        string tmp;
+        ifstream in;
+        in.open(m_geometry.c_str());
+        if (in.is_open()) {
+        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].tdc[0], &m_mwpc[1].tdc[0], &m_mwpc[2].tdc[0], &m_mwpc[3].tdc[0]) ;
+        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].tdc[1], &m_mwpc[1].tdc[1], &m_mwpc[2].tdc[1], &m_mwpc[3].tdc[1]) ;
+        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].tdc[2], &m_mwpc[1].tdc[2], &m_mwpc[2].tdc[2], &m_mwpc[3].tdc[2]) ;
+        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].tdc[3], &m_mwpc[1].tdc[3], &m_mwpc[2].tdc[3], &m_mwpc[3].tdc[3]) ;
+        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].atdc, &m_mwpc[1].atdc, &m_mwpc[2].atdc, &m_mwpc[3].atdc);
+        getline(in, tmp); sscanf(tmp.c_str(), "%f%f%f%f", &m_mwpc[0].slp[1], &m_mwpc[1].slp[1], &m_mwpc[2].slp[1], &m_mwpc[3].slp[1]) ;
+        getline(in, tmp); sscanf(tmp.c_str(), "%f%f%f%f", &m_mwpc[0].slp[0], &m_mwpc[1].slp[0], &m_mwpc[2].slp[0], &m_mwpc[3].slp[0]) ;
+        getline(in, tmp); sscanf(tmp.c_str(), "%f%f%f%f", &m_mwpc[0].offset[1], &m_mwpc[1].offset[1], &m_mwpc[2].offset[1], &m_mwpc[3].offset[1]) ;
+        getline(in, tmp); sscanf(tmp.c_str(), "%f%f%f%f", &m_mwpc[0].offset[0], &m_mwpc[1].offset[0], &m_mwpc[2].offset[0], &m_mwpc[3].offset[0]) ;
+        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].cutll[0]  , &m_mwpc[1].cutll[0]  , &m_mwpc[2].cutll[0] , &m_mwpc[3].cutll[0]);
+        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].cutll[1]  , &m_mwpc[1].cutll[1]  , &m_mwpc[2].cutll[1] , &m_mwpc[3].cutll[1]);
+        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].cutul[0]  , &m_mwpc[1].cutul[0]  , &m_mwpc[2].cutul[0] , &m_mwpc[3].cutul[0]);
+        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].cutul[1]  , &m_mwpc[1].cutul[1]  , &m_mwpc[2].cutul[1] , &m_mwpc[3].cutul[1]);
+        getline(in, tmp); sscanf(tmp.c_str(), "%f%f%f%f", &m_mwpc[0].pos[0]    , &m_mwpc[1].pos[0]    , &m_mwpc[2].pos[0]   , &m_mwpc[3].pos[0]);
+        getline(in, tmp); sscanf(tmp.c_str(), "%f%f%f%f", &m_mwpc[0].pos[1]    , &m_mwpc[1].pos[1]    , &m_mwpc[2].pos[1]   , &m_mwpc[3].pos[1]);
+        getline(in, tmp); sscanf(tmp.c_str(), "%f%f%f%f", &m_mwpc[0].pos[2]    , &m_mwpc[1].pos[2]    , &m_mwpc[2].pos[2]   , &m_mwpc[3].pos[2]);
+        in.close();
+        */
+      }
+
+      // experimental frame consisting of detector plane, aerogel and mirrors
+
+      GearDir frameParams(content, "Frame");
+      double xFrame = frameParams.getLength("xSize")  * mm / Unit::mm;
+      double yFrame = frameParams.getLength("ySize")  * mm / Unit::mm;
+      double zFrame = frameParams.getLength("zSize")  * mm / Unit::mm;
+      string envMat = frameParams.getString("material");
+
+      double px = frameParams.getLength("position/x") * mm /  Unit::mm;
+      double py = frameParams.getLength("position/y") * mm /  Unit::mm;
+      double pz = frameParams.getLength("position/z") * mm /  Unit::mm;
+
+      G4Material* envMaterial = Materials::get(envMat);
+
+
+      G4Box* envBox = new G4Box("FrameBox", xFrame / 2., yFrame / 2., zFrame / 2.);
+      G4LogicalVolume* lenvBox = new G4LogicalVolume(envBox, envMaterial, "ARICH.frame");
+      G4ThreeVector    frameOrigin0(m_framedx + px, py, pz); // rotation point of the detector frame wrt beamcenter
+      G4ThreeVector    frameOrigin = frameOrigin0 + roffset;
+      G4RotationMatrix frameRotation;
+      frameRotation.rotateY(-m_rotation1 * degree);
+      G4Transform3D frameTransformation = G4Transform3D(frameRotation, frameOrigin);
+
+      new G4PVPlacement(frameTransformation, lenvBox, "ARICH.frame", topVolume, false, 1);
+      //setVisibility(*lenvBox, false);
+
+      TVector3 rotationCenter =  TVector3(frameOrigin0.x() *  Unit::mm / mm, frameOrigin0.y() *  Unit::mm / mm,  frameOrigin0.z() *  Unit::mm / mm);
+      m_arichbtgp->setFrameRotation(m_rotation1 * degree);
+      m_arichbtgp->setRotationCenter(rotationCenter);
+
+
+      char nodestr[256];
+      B2INFO(content.getPath());
+      sprintf(nodestr, "PhotonDetector/setup[@id=\"%d\"]", m_configuration);
+      GearDir hapdcontent(content, nodestr);
+      B2INFO(hapdcontent.getPath());
+
+
+
+      char mirrornodestr[256];
+      sprintf(mirrornodestr, "Mirrors/setup[@id=\"%s\"]", m_mirrorID.c_str());
+
+      GearDir mirrorcontent(content, mirrornodestr);
+      B2INFO(mirrorcontent.getPath());
+
+      // detectors
+      m_arichgp->Initialize(hapdcontent, mirrorcontent);
+
+
+      GearDir moduleParam(hapdcontent, "Detector/Module");
+      G4LogicalVolume* detModule = buildModule(moduleParam);
+
+      double detZpos = hapdcontent.getLength("Detector/Plane/zPosition") / Unit::mm;
+      double detThick = hapdcontent.getLength("Detector/Module/moduleZSize") / Unit::mm;
+      int nModules = m_arichgp->getNMCopies();
+
+      for (int i = 1; i <= nModules; i++) {
+        G4ThreeVector origin = m_arichgp->getOriginG4(i);
+        origin.setZ(detZpos + detThick / 2. - zFrame / 2.);
+        double angle = m_arichgp->getModAngle(i);
+        G4RotationMatrix Ra;
+        Ra.rotateZ(angle);
+        G4Transform3D trans = G4Transform3D(Ra, origin);
+        new G4PVPlacement(G4Transform3D(Ra, origin), detModule, "detModule", lenvBox, false, i);
+        B2INFO(nodestr << "Module " << i << " is build ");
+      }
+      // mask hot channels
+      int npx       = m_arichgp->getDetectorXPadNumber();
+      BOOST_FOREACH(const double & ch, hapdcontent.getArray("HotChannels")) {
+        int channelID = (int) ch;
+        int moduleID  = (npx) ? channelID / (npx * npx) : 0;
+        channelID    %= (npx * npx);
+        m_arichgp->setActive(moduleID, channelID, false);
+        B2INFO("HotChannel " << ch << " : Module " << moduleID << "channelID " << channelID << " disabled");
+      }
+      // mask dead channels
+      BOOST_FOREACH(const double & ch, hapdcontent.getArray("DeadChannels")) {
+        int channelID = (int) ch;
+        int moduleID  = (npx) ? channelID / (npx * npx) : 0;
+        channelID    %= (npx * npx);
+        m_arichgp->setActive(moduleID, channelID, false);
+        B2INFO("DeadChannel " << ch << " : Module " << moduleID << "channelID " << channelID << " disabled");
+      }
+      // place aerogel tiles
+      GearDir aerogelParam(content, "Aerogel");
+      double sizeX = aerogelParam.getLength("tileXSize") * mm / Unit::mm;
+      double sizeY = aerogelParam.getLength("tileYSize") * mm / Unit::mm;
+      double posX  = aerogelParam.getLength("tileXPos")   * mm / Unit::mm;
+      double posY  = aerogelParam.getLength("tileYPos")   * mm / Unit::mm;
+      double posZ  = aerogelParam.getLength("tileZPos")   * mm / Unit::mm;
+      double posZ0 = posZ;
+      double meanrefind = 0;
+      double meantrlen  = 0;
+
+      // get parameter from python script
+      PyObject* m = PyImport_AddModule("__main__");
+      if (m) {
+        int averageagel = 0;
+        PyObject* v = PyObject_GetAttrString(m, "averageagel");
+        if (v) {
+          averageagel = PyInt_AsLong(v);
+          Py_DECREF(v);
+        }
+        B2INFO("Python averageagel = " << averageagel);
+        m_arichbtgp->setAverageAgel(averageagel > 0);
+      }
+
+      for (unsigned int ilayer = 0; ilayer < m_agelthickness.size(); ilayer++) {
+        char aeroname[100];
+        sprintf(aeroname, "Aerogel%d", ilayer + 1);
+        double sizeZ = m_agelthickness[ilayer] * mm / Unit::mm;
+        string tileMat(aeroname);
+        G4Material* tileMaterial = Materials::get(tileMat);
+        if (!m_arichbtgp->getAverageAgel()) {
+          m_arichgp->setAeroRefIndex(ilayer, m_agelrefind[ilayer]);
+          m_arichgp->setAerogelZPosition(ilayer, posZ * Unit::mm / mm);
+          m_arichgp->setAerogelThickness(ilayer, sizeZ * Unit::mm / mm);
+          m_arichgp->setAeroTransLength(ilayer, m_ageltrlen[ilayer]);
+        }
+
+        meantrlen  += sizeZ / m_ageltrlen[ilayer];
+        meanrefind += m_agelrefind[ilayer];
+        G4Box* tileBox = new G4Box("tileBox", sizeX / 2., sizeY / 2., sizeZ / 2.);
+        G4LogicalVolume* lTile = new G4LogicalVolume(tileBox, tileMaterial, "Tile", 0, m_sensitiveAero);
+        setColor(*lTile, "rgb(0.0, 1.0, 1.0,1.0)");
+        G4Transform3D trans = G4Translate3D(posX, posY, posZ + sizeZ / 2.  - zFrame / 2.);
+        new G4PVPlacement(trans, lTile, "ARICH.tile", lenvBox, false, ilayer + 1);
+        posZ += sizeZ;
+      }
+      if (m_arichbtgp->getAverageAgel() && m_agelthickness.size()) {
+        B2INFO("Average aerogel will be used in the reconstruction ");
+        m_arichgp->setAeroRefIndex(0, meanrefind / m_agelthickness.size());
+        m_arichgp->setAerogelZPosition(0, posZ0 * Unit::mm / mm);
+        m_arichgp->setAerogelThickness(0, posZ  * Unit::mm / mm);
+        if (meantrlen > 0 && posZ > 0) meantrlen = 1 / meantrlen / posZ;
+        m_arichgp->setAeroTransLength(0, meantrlen);
+      }
+
+
+      // place mirrors
+      GearDir mirrorsParam(mirrorcontent, "Mirrors");
+      double height    = mirrorsParam.getLength("height") * mm / Unit::mm;
+      double width     = mirrorsParam.getLength("width") * mm / Unit::mm;
+      double thickness = mirrorsParam.getLength("thickness") * mm / Unit::mm;
+      string mirrMat   = mirrorsParam.getString("material");
+      G4Material* mirrMaterial = Materials::get(mirrMat);
+      G4Box* mirrBox = new G4Box("mirrBox", thickness / 2., height / 2., width / 2.);
+      G4LogicalVolume* lmirror = new G4LogicalVolume(mirrBox, mirrMaterial, "mirror");
+
+      Materials& materials = Materials::getInstance();
+      GearDir surface(mirrorsParam, "Surface");
+      G4OpticalSurface* optSurf = materials.createOpticalSurface(surface);
+      new G4LogicalSkinSurface("mirrorsSurface", lmirror, optSurf);
+      int iMirror = 0;
+      BOOST_FOREACH(const GearDir & mirror, mirrorsParam.getNodes("Mirror")) {
+        double xpos = mirror.getLength("xPos") * mm / Unit::mm;
+        double ypos = mirror.getLength("yPos") * mm / Unit::mm;
+        double zpos = mirror.getLength("zPos") * mm / Unit::mm;
+        double angle = mirror.getAngle("angle") / Unit::rad;
+        G4ThreeVector origin(xpos, ypos, zpos + width / 2. - zFrame / 2.);
+        G4RotationMatrix Ra;
+        Ra.rotateZ(angle);
+        G4Transform3D trans = G4Transform3D(Ra, origin);
+        new G4PVPlacement(G4Transform3D(Ra, origin), lmirror, "ARICH.mirror", lenvBox, false, iMirror);
+        iMirror++;
+      }
+      m_arichgp->Print();
+      m_arichbtgp->Print();
+    }
+
+
+  }
+}

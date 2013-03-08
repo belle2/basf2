@@ -45,7 +45,7 @@ namespace Belle2 {
     {
     }
 
-    void ARICHGeometryPar::Initialize(const GearDir& content)
+    void ARICHGeometryPar::Initialize(const GearDir& content, const GearDir& mirrorcontent)
     {
 
       read(content);
@@ -53,16 +53,21 @@ namespace Belle2 {
       if (Type == "beamtest") {
         m_simple = true;
         modulesPositionSimple(content);
-        mirrorPositionSimple(content);
+        mirrorPositionSimple(mirrorcontent);
       } else {
         modulesPosition(content);
         mirrorPositions();
       }
       chipLocPosition();
       padPositions();
+      initDetectorMask(_fR.size());
       m_init = true;
     }
 
+    void ARICHGeometryPar::Initialize(const GearDir& content)
+    {
+      Initialize(content, content);
+    }
 
     void ARICHGeometryPar::clear(void)
     {
@@ -91,6 +96,7 @@ namespace Belle2 {
         _aeroTrLength[i] = 0; _aeroRefIndex[i] = 0;
         _aeroZPosition[i] = 0; _aeroThickness[i] = 0;
       }
+      m_nPads = 0;
     }
 
     void ARICHGeometryPar::read(const GearDir& content)
@@ -104,6 +110,7 @@ namespace Belle2 {
       _modZSize = detParams.getLength("Module/moduleZSize");
       _winThick = detParams.getLength("Module/windowThickness");
       _nPadX = detParams.getInt("Module/padXNum");
+      m_nPads = _nPadX * _nPadX;
       _padSize = detParams.getLength("Module/padSize");
       _chipGap = detParams.getLength("Module/chipGap");
       _detZpos = detParams.getLength("Plane/zPosition");
@@ -343,6 +350,37 @@ namespace Belle2 {
     void ARICHGeometryPar::setWindowRefIndex(double refInd)
     {
       _winRefInd = refInd;
+    }
+
+    void ARICHGeometryPar::initDetectorMask(int nmodules)
+    {
+      int m_DetectorMaskSize = m_nPads * nmodules / 32 + 1;
+      for (int i = 0; i < m_DetectorMaskSize; i++) {
+        m_DetectorMask.push_back(0xFFFFFFFF);
+      }
+      B2INFO("DetectorMask initialized size=" << m_nPads << " * " << nmodules << " +1 =" << m_DetectorMaskSize);
+
+    }
+
+    void ARICHGeometryPar::setActive(int module, int channel, bool active)
+    {
+      int ch  = module * m_nPads + channel;
+      int bit = ch % 32;
+      int idx = ch / 32;
+      if (idx >= m_DetectorMask.size()) {
+        B2WARNING(idx  << " Wrong detector mask size >= " << m_DetectorMask.size());
+      }
+      if (active) m_DetectorMask[idx] |= (1 << bit);
+      else        m_DetectorMask[idx] &= ~(1 << bit);
+
+    }
+
+    bool ARICHGeometryPar::isActive(int module, int channel)
+    {
+      int ch  = module * m_nPads + channel;
+      int bit = ch % 32;
+      int idx = ch / 32;
+      return    m_DetectorMask[idx] & (1 << bit);
     }
 
 

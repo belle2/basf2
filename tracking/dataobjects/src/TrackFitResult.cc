@@ -17,11 +17,7 @@ ClassImp(TrackFitResult);
 TrackFitResult::TrackFitResult() : m_pdg(0), m_pValue(0), m_charge(0)
 {
 }
-/*
-TrackFitResult::TrackFitResult(const GFAbsTrackRep& gfAbsTrackRep)
-{
-}
-*/
+
 // This class should be able to give back Helix information either in Perigee Parametrisation
 // or as starting position + momentum.
 TVector3 TrackFitResult::getPosition() const

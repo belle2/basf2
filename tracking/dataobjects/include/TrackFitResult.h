@@ -58,12 +58,12 @@ namespace Belle2 {
 
 
     /** Get back a ParticleCode of the hypothesis of the track fit. */
-    unsigned int getPDGCode() const {
-      return m_pdg;
+    Const::ParticleType getParticleType() const {
+      return Const::ParticleType(m_pdg);
     }
 
     /* Setter for the PDGCode. */
-    void setPDGCode(const Const::ParticleType& pType) {
+    void setParticleType(const Const::ParticleType& pType) {
       m_pdg = std::abs(pType.getPDGCode());
     }
 

@@ -25,18 +25,16 @@ namespace Belle2 {
    *  this is a much stripped down version containing only indices of TrackFitResults
    *  (which is what remains of the various TrackReps, that Genfit might use during the fit).
    */
-  // template <typename T>
   class Track : public RelationsObject {
   public:
     /** Constuctor without arguments; needed for I/O.
+     *
+     *  The array with the indices for the TrackFitResults is initialized with -1,
+     *  which is an invalid index.
      */
-    Track(): m_trackFitResultsName("TrackFitResults") {
-      std::fill(m_trackFitIndices, m_trackFitIndices + 5, -1);
+    Track() {
+      std::fill(m_trackFitIndices, m_trackFitIndices + Const::chargedStableSet.size(), -1);
     }
-
-    /** Construct a Track using a GFTrack.
-     */
-    //Track(const GFTrack& gfTrack);
 
     /** Destructor.
      */
@@ -44,8 +42,14 @@ namespace Belle2 {
 
     /** Access to TrackFitResults.
      *
+     *  Currently it is foreseen to have the logic, which decides, which result is returned in case
+     *  of unfitted hypotheses and failed fits in this getter function.
+     *  This decision is based on the idea to use the negative index-array values for communicating
+     *  reasons for the unavailability of the fit with the correct hypothesis.
+     *
+     *  @param chargedStable   Determines the particle for which you want to get the best available fit hypothesis.
      *  @return TrackFitResult for fit with particle hypothesis given by ParticleCode.
-     *  @sa ParticleCode, TrackFitResult
+     *  @sa TrackFitResult
      */
     const TrackFitResult* getTrackFitResult(const Const::ChargedStable& chargedStable) const {
       if (m_trackFitIndices[chargedStable.getIndex()] < 0) {
@@ -58,17 +62,19 @@ namespace Belle2 {
           }
         }
         if (index < 0) return 0; // MS: just in case and to be sure not to get garbage
-        StoreArray<TrackFitResult> trackFitResults(m_trackFitResultsName);
+        StoreArray<TrackFitResult> trackFitResults;
         return trackFitResults[index];
       }
-      StoreArray<TrackFitResult> trackFitResults(m_trackFitResultsName);
+      StoreArray<TrackFitResult> trackFitResults;
       return trackFitResults[m_trackFitIndices[chargedStable.getIndex()]];
     }
-    /*const TrackFitResult* getTrackFitResult(const T& AParticleHypothesis) const{
-      return m_trackFitResults[m_trackFitIndices[AParticleHypothesis.getIndex()]];
-    } */
 
-    /** The TrackFitResult itself should be saved separately in the DataStore. */
+    /** Set an index (for positive values) or unavailability-code (with negative values) for a specific mass hypothesis.
+     *
+     *  The TrackFitResult itself should be saved separately in the DataStore.
+     *
+     *  @param chargedStable  Determines the hypothesis for which you want to store the index or unavailability-code.
+     */
     void setTrackFitResultIndex(const Const::ChargedStable& chargedStable, short index) {
       m_trackFitIndices[chargedStable.getIndex()] = index;
     }
@@ -76,21 +82,13 @@ namespace Belle2 {
   private:
     /** Index list of the TrackFitResults associated with this Track.
      *
-     *  Experience will tell us, how many fits we really have to associate do for one Track.
-     *  Currently assuming a maximum of 5 (electron, muon, pion, kaon, proton).
      *  \sa ChargedStable
      */
-//    short int m_trackFitIndices[Const::chargedStable.size()];
+//    short int m_trackFitIndices[Const::chargedStableSet.size()]; // This non-magic number dependent declaration could be used with C++11 const expression.
     short int m_trackFitIndices[5];
 
-    /** Name of array in which corresponding TrackFitResults are saved.
+    /** Second version; doesn't store the name of the TrackFitResults, as default will be taken.
      */
-    std::string m_trackFitResultsName;
-
-//    StoreArray<TrackFitResult> m_trackFitResults; //!
-
-
-    /** First version. */
-    ClassDef(Track, 1);
+    ClassDef(Track, 2);
   };
 }

@@ -226,7 +226,7 @@ namespace Belle2 {
        * @param set     Pointer to set this particle belongs to (or NULL if stand-alone).
        * @param index   Index of this particle in 'set'.
        */
-      ParticleType(int pdgCode, const ParticleSet* set = NULL, int index = -1): m_pdgCode(pdgCode), m_set(set), m_index(index)  {};
+      explicit ParticleType(int pdgCode, const ParticleSet* set = NULL, int index = -1): m_pdgCode(pdgCode), m_set(set), m_index(index)  {};
 
       /** Copy constructor.
        *
@@ -384,6 +384,17 @@ namespace Belle2 {
         : ParticleType(chargedStableSet.find(p.getPDGCode())) {
         if ((*this) == invalidParticle) {
           throw std::runtime_error("Given ParticleType is not a charged stable particle!");
+        }
+      }
+
+      /** Constructor from PDG code
+       *
+       * Throws a runtime_error if pdg is not in chargedStableSet.
+       */
+      explicit ChargedStable(int pdg)
+        : ParticleType(chargedStableSet.find(pdg)) {
+        if ((*this) == invalidParticle) {
+          throw std::runtime_error("Given PDG code is not a charged stable particle!");
         }
       }
       static const unsigned int c_SetSize = 5; /**< Number of elements (for use in array bounds etc.) */

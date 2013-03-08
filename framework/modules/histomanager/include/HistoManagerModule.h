@@ -39,7 +39,7 @@ namespace Belle2 {
   private:
     std::string m_histfile; /**< Name of histogram output file. */
     bool        m_initmain; /**< True if initialize() was called. */
-    bool        m_initialized;
+    bool        m_tupleManagerInitialized; /**< True if RbTupleManager was initialized. */
   };
 } // Namaspace Belle2
 

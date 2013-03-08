@@ -25,7 +25,7 @@ REG_MODULE(HistoManager)
 //-----------------------------------------------------------------
 
 // Implementations
-HistoManagerModule::HistoManagerModule() : Module(), m_initmain(false), m_initialized(false)
+HistoManagerModule::HistoManagerModule() : Module(), m_initmain(false), m_tupleManagerInitialized(false)
 {
   // Module description
   setDescription("Module to manage histograms/Ntuples/TTrees");
@@ -61,37 +61,37 @@ void HistoManagerModule::initialize()
 
 void HistoManagerModule::beginRun()
 {
-  if (!m_initialized) {
+  if (!m_tupleManagerInitialized) {
     //    cout << "HistoManager:: first pass in beginRun() : proc="
     //   << ProcHandler::EvtProcID() << endl;
     RbTupleManager::Instance().begin(ProcHandler::EvtProcID());
-    m_initialized = true;
+    m_tupleManagerInitialized = true;
   }
 }
 
 void HistoManagerModule::endRun()
 {
-  if (!m_initialized) {
+  if (!m_tupleManagerInitialized) {
     //    cout << "HistoManager:: first pass in endRun(): proc="
     //   << ProcHandler::EvtProcID() << endl;
     RbTupleManager::Instance().begin(ProcHandler::EvtProcID());
-    m_initialized = true;
+    m_tupleManagerInitialized = true;
   }
 }
 
 void HistoManagerModule::event()
 {
-  if (!m_initialized) {
+  if (!m_tupleManagerInitialized) {
     //    cout << "HistoManager:: first pass in event() : proc="
     //   << ProcHandler::EvtProcID() << endl;
     RbTupleManager::Instance().begin(ProcHandler::EvtProcID());
-    m_initialized = true;
+    m_tupleManagerInitialized = true;
   }
 }
 
 void HistoManagerModule::terminate()
 {
-  if (m_initialized) {
+  if (m_tupleManagerInitialized) {
     //    cout << "HistoManager::terminating event process : PID=" << ProcHandler::EvtProcID() << endl;
     RbTupleManager::Instance().terminate();
   }

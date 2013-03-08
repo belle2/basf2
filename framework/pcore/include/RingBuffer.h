@@ -14,16 +14,16 @@ namespace Belle2 {
   /*! A structure to manage ring buffer. Placed on top of the shared memory. */
   struct RingBufInfo {
     int size; /**< ring buffer size, minus this header. */
-    int remain;
-    int wptr;
-    int prevwptr;
-    int rptr;
-    int nbuf;
+    int remain; /**< Unsure, always equal to size. */
+    int wptr; /**< Pointer for writing entries. */
+    int prevwptr; /**< Previous state of wptr (for error recovery). */
+    int rptr; /**< Pointer for reading entries. */
+    int nbuf; /**< Number of entries in ring buffer. */
     int semid; /**< Semaphore ID. */
     int nattached; /**< Number of RingBuffer instances currently attached to this buffer. */
     int redzone; /**< Unused. */
     int readbuf; /**< Unused. */
-    int mode;
+    int mode; /**< Error state? 0: Normal, 1: buffer full and wptr>rptr, others are complicated. */
     int msgid; /**< Unused. */
     int ninsq; /**< Count insq() calls for this buffer. */
     int nremq; /**< Count remq() calls for this buffer. */
@@ -78,8 +78,8 @@ namespace Belle2 {
 
   private:
     bool m_new; /**< True if we created the ring buffer ourselves (and need to clean it). */
-    bool m_file;
-    std::string m_pathname;
+    bool m_file; /**< True if m_pathfd needs to be closed. */
+    std::string m_pathname; /**< Path for identifying shared memory if named ring buffer is created. */
     int  m_pathfd; /** Associated file descriptor. */
     key_t m_shmkey; /**< SHM key, see shmget(2). */
     key_t m_semkey; /**< Semaphore key, see semget(2). */

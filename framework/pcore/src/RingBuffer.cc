@@ -27,8 +27,6 @@
 #include <string.h>
 #include <fcntl.h>
 
-#define REDZONE_FACTOR 0.8
-
 using namespace std;
 using namespace Belle2;
 

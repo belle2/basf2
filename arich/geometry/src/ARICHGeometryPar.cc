@@ -366,7 +366,7 @@ namespace Belle2 {
     {
       int ch  = module * m_nPads + channel;
       int bit = ch % 32;
-      int idx = ch / 32;
+      insigned int idx = ch / 32;
       if (idx >= m_DetectorMask.size()) {
         B2WARNING(idx  << " Wrong detector mask size >= " << m_DetectorMask.size());
       }

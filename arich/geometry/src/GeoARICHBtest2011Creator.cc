@@ -80,7 +80,7 @@ namespace Belle2 {
     }
 
 
-    void GeoARICHBtest2011Creator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
+    void GeoARICHBtest2011Creator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
     {
 
       B2INFO("GeoARICHBtest2011Creator::create");

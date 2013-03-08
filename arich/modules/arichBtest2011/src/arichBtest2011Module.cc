@@ -168,7 +168,6 @@ void arichBtest2011Module::beginRun()
   B2INFO("arichBtest2011Module::eventMetaDataPtr run:" << run);
   B2INFO("arichBtest2011Module::eventMetaDataPtr exp:" << exp);
 
-  arich::ARICHGeometryPar* _arichgp = arich::ARICHGeometryPar::Instance();
   arich::ARICHBtest2011GeometryPar* _arichbtgp = arich::ARICHBtest2011GeometryPar::Instance();
   m_mwpc = _arichbtgp->getMwpc();
 
@@ -435,7 +434,7 @@ int arichBtest2011Module::getTrack(int mask, TVector3& r, TVector3& dir)
   return retval;
 }
 
-int arichBtest2011Module::readdata(gzFile fp, int rec_id, int print)
+int arichBtest2011Module::readdata(gzFile fp, int rec_id, int)
 {
 
   unsigned int len, data[10000];

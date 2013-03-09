@@ -509,6 +509,7 @@ void GenFitterModule::event()
               newTrackFitResult->setMomentum(resultMomentum);
               newTrackFitResult->setPosition(resultPosition);
               newTrackFitResult->setCovariance6(newResultCovariance);
+              newTrackFitResult->setPValue(gfTrack.getPVal());
               trackFitResultCounter++;
 
               // store position

@@ -103,7 +103,7 @@ def add_mdst_output(path, mc=True):
         'EKLMK0Ls',
         ]
     if mc:
-        branches += ['MCParticles', 'TracksToMCParticles']
+        branches += ['MCParticles', 'MCParticlesToTracks']
     output.param('branchNames', branches)
     path.add_module(output)
 

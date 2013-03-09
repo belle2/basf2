@@ -38,6 +38,14 @@ namespace Belle2 {
     void setPosition(const TVector3& position);
     TVector3 getMomentum() const;
     void setMomentum(const TVector3& momentum);
+
+    /** Position and Momentum Covariance Matrix.
+     *
+     *  This is a copy from the GFTrack getPosMomCov matrix (implicating the order of the matrix),
+     *  however, it uses just floating point precision rather than double.
+     *  As well currently no TMatrixSym is used (which might change, but doesn't matter much due to the misconstruction of TMatrixSym).
+     *  @TODO Study if double precision matrix is needed and if TMatrixSym helps somewhere.
+     */
     TMatrixF getCovariance6() const;
     void setCovariance6(const TMatrixF& covariance);
 

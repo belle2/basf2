@@ -132,6 +132,8 @@ void GenFitterModule::initialize()
 
 
   RelationArray::registerPersistent<GFTrack, MCParticle>(m_gfTracksColName, m_mcParticlesColName);
+  RelationArray::registerPersistent<MCParticle, Track> ();
+  RelationArray::registerPersistent<GFTrack, TrackFitResult>();
 
   if (m_createTextFile) {
     HelixParam.open("HelixParam.txt");
@@ -241,6 +243,10 @@ void GenFitterModule::event()
 
   //Create a relation between the gftracks and their most probable 'mother' MC particle
   RelationArray gfTracksToMCPart(gfTracks, mcParticles);
+
+  //Relations for Tracks
+  RelationArray mcParticlesToTracks(mcParticles, tracks);
+  RelationArray gfTracksToTrackFitResults(gfTracks, trackFitResults);
 
   //counter for fitted tracks, the number of fitted tracks may differ from the number of trackCandidates if the fit fails for some of them
   int trackCounter = -1;
@@ -504,13 +510,21 @@ void GenFitterModule::event()
 
               //MH: this is new stuff...
               tracks[trackCounter]->setTrackFitResultIndex(chargedStable, trackFitResultCounter);
+              //Create relations
+              if (aTrackCandPointer->getMcTrackId() != -999) {
+                mcParticlesToTracks.add(trackCounter, aTrackCandPointer->getMcTrackId());
+              }
+
               TrackFitResult* newTrackFitResult = trackFitResults.appendNew();
               newTrackFitResult->setCharge((int)gfTrack.getCharge());
               newTrackFitResult->setMomentum(resultMomentum);
               newTrackFitResult->setPosition(resultPosition);
               newTrackFitResult->setCovariance6(newResultCovariance);
               newTrackFitResult->setPValue(gfTrack.getPVal());
+              gfTracksToTrackFitResults.add(trackCounter, trackFitResultCounter);
               trackFitResultCounter++;
+
+
 
               // store position
 //              tracks[trackCounter]->setPosition(resultPosition);

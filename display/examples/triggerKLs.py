@@ -25,7 +25,6 @@ class PyTrigger(Module):
         """constructor."""
 
         super(PyTrigger, self).__init__()
-        self.setName('PyTrigger')
 
     def event(self):
         """reimplementation of Module::event()."""
@@ -33,7 +32,7 @@ class PyTrigger(Module):
         mcparticles = Belle2.PyStoreArray('MCParticles')
         returnvalue = 0
         for p in mcparticles:
-            if p.getPDG() == 130:
+            if abs(p.getPDG()) == 130:
                 B2INFO('found a K_L!')
                 returnvalue = 1
                 break

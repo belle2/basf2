@@ -40,7 +40,6 @@ class ShowMCParticles(Module):
         """Initialize the module"""
 
         super(ShowMCParticles, self).__init__()
-        self.setName('ShowMCParticles')
 
     def event(self):
         """Fill the histograms with the values of the MCParticle collection"""

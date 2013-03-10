@@ -28,9 +28,9 @@ main.add_module(paramloader)
 main.add_module(geobuilder)
 
 ## Add hepevtreader module to path:
-#main.add_module(evtgeninput)
+# main.add_module(evtgeninput)
 ## and print parameters for hepevtreader on startup of process
-#print_params(evtgeninput)
+# print_params(evtgeninput)
 
 main.add_module(evtgeninput)
 main.add_module(mcparticleprinter)

@@ -153,6 +153,9 @@ namespace Belle2 {
      * @return The number of real particles for the given loss rate.
      */
     int calculateRealParticleNumber(double rate);
+
+    /** Calculates the transformation matrix from local SAD to global geant4 space. */
+    TGeoHMatrix SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s);
   };
 
 }

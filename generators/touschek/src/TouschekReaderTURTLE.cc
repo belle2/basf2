@@ -24,7 +24,7 @@ using namespace Belle2;
 
 
 TouschekReaderTURTLE::TouschekReaderTURTLE(TGeoHMatrix* transMatrix, int pdg): m_transMatrix(transMatrix), m_pdg(pdg),
-    m_lineNum(0)
+  m_lineNum(0)
 {
 }
 
@@ -43,7 +43,7 @@ void TouschekReaderTURTLE::open(const string& filename) throw(TouschekCouldNotOp
 }
 
 
-int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph &graph) throw(TouschekConvertFieldError)
+int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph& graph) throw(TouschekConvertFieldError)
 {
   if (m_transMatrix == NULL) {
     B2ERROR("The transformation matrix is NULL !")
@@ -69,7 +69,7 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph &graph) throw
     tokenizer tokens(currLine, sep);
 
     int index = 0;
-    BOOST_FOREACH(const string &tok, tokens) {
+    BOOST_FOREACH(const string & tok, tokens) {
       try {
         if (index >= 7) {
           B2WARNING("This Touschek file has more than 7 fields ! Only the first 7 fields were read.")
@@ -107,7 +107,7 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph &graph) throw
     totalMom2 += particleMomGeant4[2] * particleMomGeant4[2];
 
     //Add particles to MCParticle collection
-    MCParticleGraph::GraphParticle &particle = graph.addParticle();
+    MCParticleGraph::GraphParticle& particle = graph.addParticle();
     particle.setStatus(MCParticle::c_PrimaryParticle);
     particle.setPDG(m_pdg);
     particle.setMassFromPDG();

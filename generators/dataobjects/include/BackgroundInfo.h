@@ -30,8 +30,8 @@ namespace Belle2 {
      * @param component The background component (e.g. Touschek).
      * @param generator The background generator (e.g. SAD_LER)
      */
-    BackgroundInfo(const std::string &component, const std::string &generator) :
-        m_component(component), m_generator(generator) {}
+    BackgroundInfo(const std::string& component, const std::string& generator) :
+      m_component(component), m_generator(generator) {}
 
 
     /** Destructor. */

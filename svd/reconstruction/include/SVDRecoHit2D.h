@@ -60,6 +60,18 @@ namespace Belle2 {
      */
     SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU = -1, float sigmaV = -1);
 
+
+    /** Construct SVDRecoHit directly from vxdid and coordinates without using a hit object from the storearray
+     * in the constructor
+     *
+     * @param vxdid  the vxd id so the reco hit knows on which sensor the measurment took place
+     * @param u coordinate of the Hit along u
+     * @param v coordinate of the Hit along v
+     * @param sigmaU Error of the Hit along u
+     * @param sigmaV Error of the Hit along v
+     */
+    SVDRecoHit2D(const VxdID vxdid, const double u, const double v, double sigmaU = -1, double sigmaV = -1);
+
     /** Construct SVDRecoHit2D from a VXDSimpleDigiHit
      * The VXDSimpleDigiHit is used by the VXDSimpleBackground module which
      * in turn is used to created artificial background in the VXD to test the

@@ -45,7 +45,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
   //If no error is given, estimate the error by dividing the pixel size by sqrt(12)
   if (sigmaU < 0 || sigmaV < 0) {
     const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
-    sigmaU = geometry.getUPitch(hit->getU()) / sqrt(12);
+    sigmaU = geometry.getUPitch(hit->getV()) / sqrt(12);
     sigmaV = geometry.getVPitch(hit->getV()) / sqrt(12);
   }
 
@@ -70,7 +70,7 @@ SVDRecoHit2D::SVDRecoHit2D(const VxdID vxdid, const double u, const double v, do
   //If no error is given, estimate the error by dividing the pixel size by sqrt(12)
   if (sigmaU < 0 || sigmaV < 0) {
     const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
-    sigmaU = geometry.getUPitch(u) / sqrt(12);
+    sigmaU = geometry.getUPitch(v) / sqrt(12);
     sigmaV = geometry.getVPitch(v) / sqrt(12);
   }
   // Set positions

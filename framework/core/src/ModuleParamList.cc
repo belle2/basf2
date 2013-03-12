@@ -159,7 +159,7 @@ std::string ModuleParamList::getParamTypeString(const std::string& name) const
   if (mapIter != m_paramMap.end()) {
     return mapIter->second.get()->getTypeInfo();
   } else {
-    B2ERROR("Could not find the type of the parameter '" + name + "'!");
+    B2FATAL("Module parameter '" + name + "' does not exist!");
   }
   return string();
 }

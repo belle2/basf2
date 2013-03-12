@@ -280,13 +280,13 @@ namespace Belle2 {
      * Returns the SpinType of the particle.
      * @return The spinType of the particle.
      */
-    EspinType getSpinType() {return m_spinType;}
+    EspinType getSpinType() const {return m_spinType;}
 
     /**
      * Returns the SpinType of the particle as integer number.
      * @return The spinType of the particle as integer number.
      */
-    int getSpinTypeInteger() {return (int)m_spinType;}
+    int getSpinTypeInteger() const {return (int)m_spinType;}
 
     /**
      * Returns the physics process type of a secondary particle.
@@ -299,13 +299,13 @@ namespace Belle2 {
      *         processes/hadronic/management/include/G4HadronicProcessType.hh
      *         processes/decay/include/G4DecayProcessType.hh
      */
-    int getSecondaryPhysicsProcess() {return m_secondaryPhysicsProcess;}
+    int getSecondaryPhysicsProcess() const {return m_secondaryPhysicsProcess;}
 
     /**
      * Check if particle is virtual
      *
      */
-    bool isVirtual();
+    bool isVirtual() const;
 
     /**
      * Set PDG code of the particle.
@@ -527,7 +527,7 @@ namespace Belle2 {
   };
 
 
-  inline bool MCParticle::isVirtual()
+  inline bool MCParticle::isVirtual() const
   {
     bool virtuality = hasStatus(c_IsVirtual);
     if (!virtuality) {

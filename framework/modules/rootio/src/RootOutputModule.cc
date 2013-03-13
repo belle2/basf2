@@ -134,7 +134,7 @@ void RootOutputModule::initialize()
       if ((iter->second->isTransient && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName)) ||
           binary_search(m_excludeBranchNames[ii].begin(), m_excludeBranchNames[ii].end(), branchName) ||
           (!m_branchNames[ii].empty() && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName))) {
-        continue;
+        if (branchName != "EventMetaData") continue;
       }
 
       TClass* entryClass = iter->second->object->IsA();

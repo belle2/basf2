@@ -1,0 +1,23 @@
+MAKE = gmake
+
+srcdir := $(subst config/../,,@srcdir@)
+top_srcdir := $(subst config/../,,@top_srcdir@)
+VPATH := $(subst config/../,,@srcdir@)
+
+BELLE_CONFIG_DIR = @BELLE_CONFIG_DIR@
+
+SUBDIRS =
+
+PACKAGE = @PACKAGE@
+VERSION = @VERSION@
+BELLE_TOP_DIR = /belle/belle/b20090127_0910
+RELATIVE_TOP_DIR = $(srcdir)/../@RELATIVE_TOP_DIR@
+BUILD_TOP_DIR = ../@RELATIVE_TOP_DIR@
+BUILD_INCLUDE_DIR := $(shell cd $(BUILD_TOP_DIR);pwd)/include
+
+LIBRARIES = kkmc
+
+packagedir = ..
+
+include $(BELLE_CONFIG_DIR)/Makefile.common
+

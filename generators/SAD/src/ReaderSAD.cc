@@ -217,12 +217,18 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
   particlePosSADfar[1] = -m_lostY;
   particlePosSADfar[2] = 0;
 
+
+  static GearDir content = Gearbox::getInstance().getDetectorComponent("FarBeamLine");
+  if (!content)
+    B2FATAL("You need FarBeamLine.xml to run SADInput modulle. Please include FarBeamLine.xml in Belle2.xml. You also need to change length to be 30m.");
+
   TGeoHMatrix* m_transMatrix2 = new TGeoHMatrix(SADtoGeant(m_accRing, m_lostS)); //overwrite m_transMatrix given by initialize()
 
-  if (abs(m_lostS) < 400.) //4m
+  if (abs(m_lostS) < 400.) { //4m
     m_transMatrix->LocalToMaster(particlePosSAD, particlePosGeant4);
-  else
+  } else {
     m_transMatrix2->LocalToMaster(particlePosSADfar, particlePosGeant4);
+  }
 
   //Convert the momentum of the particle from local SAD space to global geant4 space.
   //Flip the sign for the y and z component to go from the accelerator to the detector coordinate system.
@@ -283,13 +289,12 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
   //static double max_s_her = 3016.3145 * Unit::m;
   //static double max_s_ler = 3016.3026 * Unit::m;
 
-  //static double unitFactor = 10.0;
+  //get parameters from .xml file
+  static GearDir content = Gearbox::getInstance().getDetectorComponent("FarBeamLine");
 
   //--------------
   //-   LHR1
 
-  //get parameters from .xml file
-  static GearDir content = Gearbox::getInstance().getDetectorComponent("FarBeamLine");
   //  static GearDir content("/Detector/DetectorComponent[@name=\"FarBeamLine\"]/Content");
   static GearDir cLHR1(content, "LHR1/");
   static double LHR1_X0 = cLHR1.getLength("X0");

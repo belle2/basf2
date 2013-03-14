@@ -42,7 +42,7 @@ evtmetagen.param({'EvtNumList': [10000000], 'RunList': [1]})
 ## Register the SADInput module and specify the location of the SAD # input
 # file. The file can be downloaded from the TWiki.
 sadinput = register_module('SADInput')
-sadinput.param('Filename', 'tree.root')
+sadinput.param('Filename', 'SADreaderInput.root')
 
 # Set the ReadMode of the SAD input module. 0 = one SAD particle per event.
 # This produces weighted events. 1 = one real particle per event. This produces
@@ -70,29 +70,33 @@ sadinput.set_log_level(LogLevel.DEBUG)
 ## Register the standard chain of modules to the framework, # which are
 # required for the simulation.
 gearbox = register_module('Gearbox')
+
 geometry = register_module('Geometry')
+
 fullsim = register_module('FullSim')
 
 ## Add additional modules according to your own needs pxddigi   =
 # register_module('PXDDigitizer') progress  = register_module('Progress')
 #
 ## Write the output to a file
-simpleoutput = register_module('RootOutput')
-simpleoutput.param('outputFileName', 'SADReaderOutput.root')
+rootoutput = register_module('RootOutput')
+rootoutput.param('outputFileName', 'SADreaderOutput.root')
+
+progress = register_module('Progress')
 
 ## Create the main path and add the required modules
 main = create_path()
 main.add_module(evtmetagen)
-main.add_module(sadinput)
 main.add_module(gearbox)
+main.add_module(sadinput)
 main.add_module(geometry)
 main.add_module(fullsim)
 
 ## Add additional modules if you like main.add_module(pxddigi)
-# main.add_module(progress)
-#
+main.add_module(progress)
+
 ## Add the output module
-main.add_module(simpleoutput)
+main.add_module(rootoutput)
 
 ## Start the event processing
 process(main)

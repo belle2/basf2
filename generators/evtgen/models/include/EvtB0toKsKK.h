@@ -14,16 +14,15 @@
 #include "EvtGenBase/EvtDecayAmp.hh"
 #include "EvtGenBase/EvtParticle.hh"
 
+//! Register Decay model EvtB0toKsKK
 class EvtB0toKsKK : public  EvtDecayAmp {
 
 public:
 
   /* Constructor. */
-
   EvtB0toKsKK() {}
 
   /* Destructor. */
-
   virtual ~EvtB0toKsKK();
 
   std::string getName();  /**< Get function Name  */
@@ -53,8 +52,8 @@ public:
   void RaiseIndex(EvtVector4R& vector);            /**< Member */
   EvtTensor4C Mmunu(const EvtVector4R& p4a, const EvtVector4R& p4b,
                     const EvtVector4R& p4c);
-  double BWBF(const double& q, const unsigned int& L);
-  double BWBF(const double& q, const double& q0,
+  double BWBF(const double& q, const unsigned int& L); /**< Meson radius  */
+  double BWBF(const double& q, const double& q0,       /**< Meson radius  */
               const unsigned int& L);
   EvtComplex BreitWigner(const double& m, const double& m0,
                          const double& Gamma0,
@@ -68,20 +67,19 @@ public:
   EvtComplex Flatte(const double& m, const double& m0);    /**< Constant Flatte */
 
   EvtComplex A_f0ks(const EvtVector4R& p4ks,   /**< Variable A_f0ks */
-                    const EvtVector4R& p4kp, const EvtVector4R& p4km);
+                    const EvtVector4R& p4kp, const EvtVector4R& p4km); /**< A_f0ks is amplitude for f0 */
   EvtComplex A_phiks(const EvtVector4R& p4ks,  /**< Variable A_phiks */
-                     const EvtVector4R& p4kp, const EvtVector4R& p4km);
+                     const EvtVector4R& p4kp, const EvtVector4R& p4km); /**< A_phiks is amplitude of phi*/
   EvtComplex A_fxks(const EvtVector4R& p4ks,   /**< Variable A_fxks */
-                    const EvtVector4R& p4kp, const EvtVector4R& p4km);
+                    const EvtVector4R& p4kp, const EvtVector4R& p4km); /**< A_fxks is amplitude for fxks */
   EvtComplex A_chic0ks(const EvtVector4R& p4ks, /**< Variable A_chic0ks */
-                       const EvtVector4R& p4kp, const EvtVector4R& p4km);
-  EvtComplex A_kknr(const EvtVector4R& p4k1, const EvtVector4R& p4k2,
-                    const double& alpha_kk);    /**< Variable  A_kknr */
+                       const EvtVector4R& p4kp, const EvtVector4R& p4km); /**< A_chic0ks is amplitude for chi0ks */
+  EvtComplex A_kknr(const EvtVector4R& p4k1, const EvtVector4R& p4k2, /**< Variable  A_kknr */
+                    const double& alpha_kk);    /**< A_kknr is amplitude for kknr */
 
 private:
 
-  /**<Variable names*/
-
+  /**<Variable names see the above information*/
   EvtComplex a_f0ks_;      /**< Variable member  a_f0ks_   */
   EvtComplex a_phiks_;     /**< Variable member  a_phiks_  */
   EvtComplex a_fxks_;      /**< Variable member  a_fxks_   */
@@ -102,7 +100,7 @@ private:
   double alpha_kskpnr;      /**< Variable member alpha_kskpnr */
   double alpha_kskmnr;      /**< Variable member alpha_kskmnr */
 
-  std::ofstream debugfile_;
+  std::ofstream debugfile_; //! end of debuging stream
 };
 
 #endif

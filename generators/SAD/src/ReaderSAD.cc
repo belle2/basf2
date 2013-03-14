@@ -220,7 +220,7 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
 
   static GearDir content = Gearbox::getInstance().getDetectorComponent("FarBeamLine");
   if (!content)
-    B2FATAL("You need FarBeamLine.xml to run SADInput modulle. Please include FarBeamLine.xml in Belle2.xml. You also need to change length to be 30m.");
+    B2FATAL("You need FarBeamLine.xml to run SADInput module. Please include FarBeamLine.xml in Belle2.xml. You also need to change 'length' in Belle2.xml to be 40m.");
 
   TGeoHMatrix* m_transMatrix2 = new TGeoHMatrix(SADtoGeant(m_accRing, m_lostS)); //overwrite m_transMatrix given by initialize()
 

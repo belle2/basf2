@@ -105,12 +105,6 @@ namespace Belle2 {
      */
     std::string m_outputFileName;
 
-    /** Name array for output tree names.
-     *
-     *  Each element of the array is steerable as separate string.
-     */
-    std::string m_treeNames[DataStore::c_NDurabilityTypes];
-
     /** Array for names of branches that should be written out.
      *
      *  Empty vectors result in all branches of the specific durability being written.

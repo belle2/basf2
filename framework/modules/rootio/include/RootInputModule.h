@@ -74,11 +74,6 @@ namespace Belle2 {
     /** Files to read from. */
     std::vector<std::string> m_inputFileNames;
 
-    /** Name array for input tree names. */
-    /** Each element of the array is steerable as separate string.
-    */
-    std::string m_treeNames[DataStore::c_NDurabilityTypes];
-
     /** Array for names of branches, that shall be written out. */
     /** Empty vector results in all branches being read.
         These vectors can be configured in the steering file.

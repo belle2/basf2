@@ -4,7 +4,7 @@
 
 using namespace Belle2;
 
-const std::string RootIOUtilities::c_SteerTreeNames[] = { "treeName", "treeNamePersistent" };
+const std::string RootIOUtilities::c_treeNames[] = { "tree", "persistent" };
 const std::string RootIOUtilities::c_SteerBranchNames[] = { "branchNames", "branchNamesPersistent" };
 const std::string RootIOUtilities::c_SteerExcludeBranchNames[] = { "excludeBranchNames", "excludeBranchNamesPersistent" };
 

@@ -24,8 +24,8 @@ namespace Belle2 {
     bool makeBranchNamesUnique(std::vector<std::string> &stringlist);
 
 
-    /** Steering parameter names for m_treeNames. */
-    extern const std::string c_SteerTreeNames[];
+    /** Names of trees. */
+    extern const std::string c_treeNames[];
 
     /** Steering parameter names for m_branchNames. */
     extern const std::string c_SteerBranchNames[];

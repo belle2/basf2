@@ -50,9 +50,6 @@ RootInputModule::RootInputModule() : Module()
   addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames instead.", string(""));
   addParam("inputFileNames", m_inputFileNames, "List of input files. You may use wildcards to specify multiple files, e.g. 'somePrefix_*.root'.", emptyvector);
 
-  addParam(c_SteerTreeNames[0], m_treeNames[0], "TTree name for event data. Empty string to disable.", string("tree"));
-  addParam(c_SteerTreeNames[1], m_treeNames[1], "TTree name for persistent data. Empty string to disable.", string(""));
-
   addParam("eventNumber", m_counterNumber[0], "Skip this number of events before starting.", 0);
 
   addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of branches to be read into event map. Empty means all branches.", emptyvector);
@@ -105,16 +102,6 @@ void RootInputModule::initialize()
   dir->cd();
 
   for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
-    if (m_treeNames[ii].empty())
-      continue;
-
-    //check for duplicate tree names
-    for (int jj = 0; jj < ii; ++jj) {
-      if (m_treeNames[ii] == m_treeNames[jj]) {
-        B2ERROR(c_SteerTreeNames[ii] << " and " << c_SteerTreeNames[jj] << " are the same: " << m_treeNames[ii]);
-      }
-    }
-
     if (makeBranchNamesUnique(m_branchNames[ii]))
       B2WARNING(c_SteerBranchNames[ii] << " has duplicate entries.");
     if (makeBranchNamesUnique(m_excludeBranchNames[ii]))
@@ -122,19 +109,19 @@ void RootInputModule::initialize()
     //m_branchNames[ii] and its exclusion list are now sorted alphabetically and unique
 
     //Get TTree
-    m_tree[ii] = new TChain(m_treeNames[ii].c_str());
+    m_tree[ii] = new TChain(c_treeNames[ii].c_str());
     for (unsigned int iFile = 0; iFile < m_inputFileNames.size(); iFile++) {
       m_tree[ii]->Add(m_inputFileNames[iFile].c_str());
       B2INFO("Added file " + m_inputFileNames[iFile]);
     }
-    B2INFO("Opened tree '" + m_treeNames[ii] + "' with " + m_tree[ii]->GetEntries() << " entries.");
+    B2INFO("Opened tree '" + c_treeNames[ii] + "' with " + m_tree[ii]->GetEntries() << " entries.");
 
     const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(ii));
 
     //Go over the branchlist and connect the branches with DataStore entries
     const TObjArray* branches = m_tree[ii]->GetListOfBranches();
     if (!branches) {
-      B2ERROR("Tree '" << m_treeNames[ii] << "' doesn't contain any branches!");
+      B2ERROR("Tree '" << c_treeNames[ii] << "' doesn't contain any branches!");
       delete m_tree[ii];
       m_tree[ii] = 0; //don't try to read from there
       continue;
@@ -146,7 +133,9 @@ void RootInputModule::initialize()
       //skip excluded branches, and branches not in m_branchNames (if it is not empty)
       if (binary_search(m_excludeBranchNames[ii].begin(), m_excludeBranchNames[ii].end(), branchName) ||
           (!m_branchNames[ii].empty() && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName))) {
-        continue;
+        //make sure FileMetaData and EventMetaData are always loaded
+        if (((branchName != "FileMetaData") || (ii == DataStore::c_Event)) &&
+            ((branchName != "EventMetaData") || (ii == DataStore::c_Persistent))) continue;
       }
 
       //Get information about the object in the branch

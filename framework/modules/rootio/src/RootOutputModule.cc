@@ -49,16 +49,12 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experiment(0), m_r
   //Initialization of some member variables
   for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
     m_tree[jj] = 0;
-    m_treeNames[jj] = "";
   }
 
   //Parameter definition
   addParam("outputFileName"  , m_outputFileName, "Name of the output file.", string("RootOutput.root"));
   addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticable effect.", 1);
   addParam("splitLevel", m_splitLevel, "Branch split level.", 99);
-
-  addParam(c_SteerTreeNames[0], m_treeNames[0], "TTree name for event data. Empty string for no output.", string("tree"));
-  addParam(c_SteerTreeNames[1], m_treeNames[1], "TTree name for peristent data. Empty string for no output.", string("persistent"));
 
   vector<string> branchNames;
   addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of branches to be written from event map. Empty means all branches. Transient objects added here will also be saved.", branchNames);
@@ -95,16 +91,6 @@ void RootOutputModule::initialize()
   m_file->SetCompressionLevel(m_compressionLevel);
 
   for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ii++) {
-    if (m_treeNames[ii].empty())
-      continue; //nothing to do
-
-    // check for duplicate treeNames
-    for (int jj = 0; jj < ii; ++jj) {
-      if (m_treeNames[ii] == m_treeNames[jj]) {
-        B2ERROR(c_SteerTreeNames[ii] << " and " << c_SteerTreeNames[jj] << " are the same: " << m_treeNames[ii]);
-      }
-    }
-
     // check for duplicate branch names
     if (makeBranchNamesUnique(m_branchNames[ii]))
       B2WARNING(c_SteerBranchNames[ii] << " has duplicate entries.");
@@ -127,14 +113,16 @@ void RootOutputModule::initialize()
     }
 
     //create the tree and branches
-    m_tree[ii] = new TTree(m_treeNames[ii].c_str(), m_treeNames[ii].c_str());
+    m_tree[ii] = new TTree(c_treeNames[ii].c_str(), c_treeNames[ii].c_str());
     for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
       const std::string& branchName = iter->first;
       //skip transient entries, excluded branches, and branches not in m_branchNames (if it is not empty)
       if ((iter->second->isTransient && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName)) ||
           binary_search(m_excludeBranchNames[ii].begin(), m_excludeBranchNames[ii].end(), branchName) ||
           (!m_branchNames[ii].empty() && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName))) {
-        if (branchName != "EventMetaData") continue;
+        //make sure FileMetaData and EventMetaData are always included in the output
+        if (((branchName != "FileMetaData") || (ii == DataStore::c_Event)) &&
+            ((branchName != "EventMetaData") || (ii == DataStore::c_Persistent))) continue;
       }
 
       TClass* entryClass = iter->second->object->IsA();
@@ -262,8 +250,8 @@ void RootOutputModule::terminate()
   m_file->cd();
   for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
     if (m_tree[ii]) {
-      B2INFO("Write TTree " << m_treeNames[ii]);
-      m_tree[ii]->Write(m_treeNames[ii].c_str(), TObject::kWriteDelete);
+      B2INFO("Write TTree " << c_treeNames[ii]);
+      m_tree[ii]->Write(c_treeNames[ii].c_str(), TObject::kWriteDelete);
     }
   }
   dir->cd();

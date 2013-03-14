@@ -57,9 +57,6 @@ printcollections = register_module('PrintCollections')
 
 input.param('inputFileNames', ['chaintest_1.root', 'chaintest_2.root'])
 
-# also load persistent tree (contains FileMetaData object)
-input.param('treeNamePersistent', 'persistent')
-
 main = create_path()
 
 # not used for anything, just checking wether the master module

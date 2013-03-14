@@ -762,7 +762,7 @@ C internals
       DOUBLE PRECISION XSEC(NPROC), XTOPO
       REAL   RVEC(5)
 C external functions
-      REAL*4 RRes_CSHADR
+      DOUBLE PRECISION RRes_CSHADR
 
 C initialise
       NP = 0

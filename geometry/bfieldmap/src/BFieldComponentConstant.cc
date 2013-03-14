@@ -32,6 +32,7 @@ TVector3 BFieldComponentConstant::calculate(const TVector3& point) const
 {
   double Bz = m_magneticField[2];
   if (maxRadius4BField > 0.0 && maxRadius4BField < point.Perp() / Unit::mm) Bz = 0.0;
+  if (point.z() < -400. || point.z() > 400.) Bz = 0.0;
 
   //  return TVector3(m_magneticField[0], m_magneticField[1], m_magneticField[2]);
   return TVector3(m_magneticField[0], m_magneticField[1], Bz);

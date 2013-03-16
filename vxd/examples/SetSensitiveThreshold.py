@@ -17,17 +17,24 @@ logging.log_level = LogLevel.WARNING
 
 class SetVXDSensitiveThreshold(Module):
 
-    """A utility module to manipulate the threshold on deposited energy in PXD and SVD SensitiveDetector."""
+    """A utility module to manipulate the threshold on deposited energy
+     in PXD and SVD SensitiveDetector.
+     """
 
     def __init__(self, threshold):
         """Initialize the module"""
 
         super(SetVXDSensitiveThreshold, self).__init__()
         self.setName('SetVXDSensitiveThreshold')
+        ## The threshold value to be set.
         self.threshold = threshold
+        ## The current pxd threshold value.
         self.old_pxd_threshold = 0.0
+        ## The current svd threshold value.
         self.old_svd_threshold = 0.0
+        ## Filesystem path to the .xml file
         self.path = 'data/{comp}/{COMP}.xml'
+        ## XML path to the threshold setting.
         self.xmlpath = 'Content/SensitiveThreshold'
 
     def set_threshold(self, component, value):
@@ -95,8 +102,8 @@ output = register_module('RootOutput')
 evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
 
 # Set parameters for particlegun
-particlegun.param({  # Generate 5 tracks
-                     # But vary the number of tracks according to Poisson distribution
+particlegun.param({  # Generate 5 tracks on average
+                     # the number of tracks is a Poisson variate
                      # Generate pi+, pi-, e+ and e-
                      # with a normal distributed transversal momentum
                      # with a center of 5 GeV and a width of 1 GeV
@@ -127,7 +134,8 @@ particlegun.param({  # Generate 5 tracks
 # Select subdetectors to be built
 geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
 
-# Set the desired SensitiveDetector threshold for the VXD. -1 eV means no threshold.
+# Set the desired SensitiveDetector threshold for the VXD.
+# -1 eV means no threshold.
 # set_thr.param('threshold',-1.0)
 
 # create processing path
@@ -150,4 +158,3 @@ process(main)
 
 # show call statistics
 print statistics
-

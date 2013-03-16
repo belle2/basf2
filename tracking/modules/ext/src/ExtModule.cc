@@ -13,6 +13,7 @@
 #include <tracking/modules/ext/ExtPhysicsList.h>
 #include <tracking/modules/ext/ExtCylSurfaceTarget.h>
 #include <tracking/dataobjects/ExtRecoHit.h>
+#include <tracking/dataobjects/ExtHit.h>
 #include <simulation/kernel/DetectorConstruction.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
@@ -63,11 +64,19 @@ REG_MODULE(Ext)
 
 ExtModule::ExtModule() : Module(), m_extMgr(NULL)    // no ExtManager yet
 {
+  m_pdgCode.clear();
+  m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("pi+")->GetPDGEncoding());
+  m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("e+")->GetPDGEncoding());
+  m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("mu+")->GetPDGEncoding());
+  m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("kaon+")->GetPDGEncoding());
+  m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("proton")->GetPDGEncoding());
   setDescription("Extrapolates tracks from CDC to outer detectors using geant4e");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  addParam("pdgCodes", m_pdgCode, "Positive-charge PDG codes for extrapolation hypotheses", m_pdgCode);
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the reconstructed tracks", string(""));
-  addParam("ExtTrackCandsColName", m_extTrackCandsColName, "Name of collection holding the list of hits from each extrapolation", string(""));
-  addParam("ExtRecoHitsColName", m_extRecoHitsColName, "Name of collection holding the RecoHits from the extrapolation", string(""));
+  addParam("ExtTrackCandsColName", m_extTrackCandsColName, "DEPRECATED Name of collection holding the list of hits from each extrapolation", string(""));
+  addParam("ExtRecoHitsColName", m_extRecoHitsColName, "DEPRECATED Name of collection holding the RecoHits from the extrapolation", string(""));
+  addParam("ExtHitsColName", m_extHitsColName, "Name of collection holding the ExtHits from the extrapolation", string(""));
   addParam("MinPt", m_minPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", 0.0);
   addParam("MinKE", m_minKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", 0.001);
   addParam("MaxStep", m_maxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity).", 0.0);
@@ -131,17 +140,34 @@ void ExtModule::initialize()
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(new
                                                              ExtCylSurfaceTarget(rMin, offsetZ - halfLength, offsetZ + halfLength));
 
-  // PDG codes for the extrapolation hypotheses
-  m_pdg[0] = G4ParticleTable::GetParticleTable()->FindParticle("pi+")->GetPDGEncoding();
-  m_pdg[1] = G4ParticleTable::GetParticleTable()->FindParticle("e+")->GetPDGEncoding();
-  m_pdg[2] = G4ParticleTable::GetParticleTable()->FindParticle("mu+")->GetPDGEncoding();
-  m_pdg[3] = G4ParticleTable::GetParticleTable()->FindParticle("kaon+")->GetPDGEncoding();
-  m_pdg[4] = G4ParticleTable::GetParticleTable()->FindParticle("proton")->GetPDGEncoding();
+  // check that the user-defined PDG codes for the extrapolation hypotheses are legal
+  for (unsigned int hypothesis = 0; hypothesis < m_pdgCode.size(); ++hypothesis) {
+    G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(abs(m_pdgCode[hypothesis]));
+    string g4eName = "g4e_" + particle->GetParticleName();
+    G4ParticleDefinition* g4eParticle = G4ParticleTable::GetParticleTable()->FindParticle(g4eName);
+    if (g4eParticle == NULL) {
+      B2FATAL("Ext: Particle " << g4eName << " is not defined in G4ParticleTable")
+    }
+    if (G4ParticleTable::GetParticleTable()->FindAntiParticle(g4eName) == NULL) {
+      B2FATAL("Ext: Antiparticle of " << g4eName << " is not defined in G4ParticleTable")
+    }
+  }
 
-  StoreArray<GFTrackCand> dummyCands(m_extTrackCandsColName);
-  StoreArray<ExtRecoHit> dummyHits(m_extRecoHitsColName);
-  StoreArray<GFTrackCand>::registerPersistent(m_extTrackCandsColName);
-  StoreArray<ExtRecoHit>::registerPersistent(m_extRecoHitsColName);
+  // new output and relation
+  StoreArray<GFTrack> gfTracks(m_gfTracksColName);
+  StoreArray<ExtHit> extHits(m_extHitsColName);
+  RelationArray gfTrackToExtHits(gfTracks, extHits);
+  StoreArray<ExtHit>::registerPersistent();
+  RelationArray::registerPersistent<GFTrack, ExtHit>();
+
+  // deprecated output
+  if ((m_extTrackCandsColName != "") || (m_extRecoHitsColName != "")) {
+    StoreArray<GFTrackCand> dummyCands(m_extTrackCandsColName);
+    StoreArray<ExtRecoHit> dummyHits(m_extRecoHitsColName);
+    StoreArray<GFTrackCand>::registerPersistent(m_extTrackCandsColName);
+    StoreArray<ExtRecoHit>::registerPersistent(m_extRecoHitsColName);
+    B2WARNING("Ext:  Storing data in <GFTrackCand> and <ExtRecoHit> is deprecated. Please use <ExtHit> instead.")
+  }
 
   return;
 
@@ -167,10 +193,12 @@ void ExtModule::event()
   // Other hypotheses: extrapolate up to but not including calorimeter
 
   StoreArray<GFTrack> gfTracks(m_gfTracksColName);
-  StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName);
-  StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName);
-  extTrackCands.getPtr()->Clear();
-  extRecoHits.getPtr()->Clear();
+  StoreArray<ExtHit> extHits(m_extHitsColName);
+  RelationArray gfTrackToExtHits(gfTracks, extHits);
+  StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName); // deprecated
+  StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName); // deprecated
+  extTrackCands.getPtr()->Clear(); // deprecated
+  extRecoHits.getPtr()->Clear(); // deprecated
 
   G4ThreeVector position;
   G4ThreeVector momentum;
@@ -181,11 +209,12 @@ void ExtModule::event()
 
     int charge = int(gfTracks[t]->getCardinalRep()->getCharge());
 
-    for (int hypothesis = 0; hypothesis < N_HYPOTHESES; hypothesis++) {
+    for (unsigned int hypothesis = 0; hypothesis < m_pdgCode.size(); hypothesis++) {
 
-      GFTrackCand* cand = addTrackCand(gfTracks[t], m_pdg[hypothesis] * charge, extTrackCands, position, momentum, covG4e);
+      int pdgCode = m_pdgCode[hypothesis] * charge;
+      GFTrackCand* cand = addTrackCand(gfTracks[t], pdgCode, extTrackCands, position, momentum, covG4e); // deprecated
       if (gfTracks[t]->getMom().Pt() <= m_minPt) continue;
-      G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(m_pdg[hypothesis] * charge);
+      G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
       string g4eName = "g4e_" + particle->GetParticleName();
       double mass = particle->GetPDGMass();
       double minP = sqrt((mass + m_minKE) * (mass + m_minKE) - mass * mass);
@@ -200,30 +229,30 @@ void ExtModule::event()
         const G4int    postStatus = step->GetPostStepPoint()->GetStepStatus();
         // First step on this track?
         if (preStatus == fUndefined) {
-          addFirstPoint(state, cand, extRecoHits);
+          createHit(state, EXT_FIRST, t, pdgCode, extHits, gfTrackToExtHits, cand, extRecoHits);
         }
         // Ignore the zero-length step by PropagateOneStep() at each boundary
         if (length > 0.0) {
           if (preStatus == fGeomBoundary) {      // first step in this volume?
-            addPoint(state, ENTER, cand, extRecoHits);
+            createHit(state, EXT_ENTER, t, pdgCode, extHits, gfTrackToExtHits, cand, extRecoHits);
           }
           m_tof += step->GetDeltaTime();
           // Last step in this volume?
           if (postStatus == fGeomBoundary) {
-            addPoint(state, EXIT, cand, extRecoHits);
+            createHit(state, EXT_EXIT, t, pdgCode, extHits, gfTrackToExtHits, cand, extRecoHits);
           }
         }
         // Post-step momentum too low?
         if (errCode || (track->GetMomentum().mag() < minP)) {
-          addPoint(state, STOP, cand, extRecoHits);
+          createHit(state, EXT_STOP, t, pdgCode, extHits, gfTrackToExtHits, cand, extRecoHits);
           break;
         }
         if (G4ErrorPropagatorData::GetErrorPropagatorData()->GetState() == G4ErrorState(G4ErrorState_TargetCloserThanBoundary)) {
-          addPoint(state, ESCAPE, cand, extRecoHits);
+          createHit(state, EXT_ESCAPE, t, pdgCode, extHits, gfTrackToExtHits, cand, extRecoHits);
           break;
         }
         if (m_extMgr->GetPropagator()->CheckIfLastStep(track)) {
-          addPoint(state, ESCAPE, cand, extRecoHits);
+          createHit(state, EXT_ESCAPE, t, pdgCode, extHits, gfTrackToExtHits, cand, extRecoHits);
           break;
         }
 
@@ -321,42 +350,44 @@ void ExtModule::registerVolumes()
 
 }
 
-// Convert the physical volume name to an integer pair that identifies it
-void ExtModule::getVolumeID(const G4TouchableHandle& touch, int& detID, int& copyID)
+// Convert the physical volume name to integer(-like) identifiers
+void ExtModule::getVolumeID(const G4TouchableHandle& touch, ExtDetectorID& detID, int& copyID)
 {
 
-  // default value is 0
+  // default values
+  detID = EXT_UNKNOWN;
   copyID = 0;
+
   G4String name = touch->GetVolume(0)->GetName();
   if (name.find("CDC") != string::npos) {
-    detID = 3;
+    detID = EXT_CDC;
     copyID = touch->GetVolume(0)->GetCopyNo();
   }
   // TOP doesn't have one envelope; it has several "PlacedTOPModule"s
   if (name == "PlacedTOPModule") {
-    detID = 3;
+    detID = EXT_TOP;
   }
   // TOP quartz bar (=sensitive) has an automatically generated PV name
   // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
   // YYY is cuttest.
   if (name.find("_cuttest_") != string::npos) {
-    detID = 3;
+    detID = EXT_TOP;
     copyID = (touch->GetHistoryDepth() >= 2) ? touch->GetVolume(2)->GetCopyNo() : 0;
   }
   // ARICH has an envelope that contains modules that each contain a moduleSensitive
   if (name == "ARICH.Envelope") {
-    detID = 4;
+    detID = EXT_ARICH;
   }
   if (name == "ARICH.DetectorModules") {
-    detID = 4;
+    detID = EXT_ARICH;
   }
   if (name == "moduleSensitive") {
-    detID = 4;
+    detID = EXT_ARICH;
     copyID = (touch->GetHistoryDepth() >= 1) ? touch->GetVolume(1)->GetCopyNo() : 0;
   }
   // ECL
   if (name == "physicalECL") {
-    detID = 5;
+    detID = EXT_ECL;
   }
   // ECL crystal (=sensitive) has an automatically generated PV name
   // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
@@ -367,7 +398,7 @@ void ExtModule::getVolumeID(const G4TouchableHandle& touch, int& detID, int& cop
   if ((name.find("_logicalEclBrCrystal_") != string::npos) ||
       (name.find("_logicalEclBwCrystal_") != string::npos) ||
       (name.find("_logicalEclFwCrystal_") != string::npos)) {
-    detID = 5;
+    detID = EXT_ECL;
     copyID = ECL::ECLGeometryPar::Instance()->ECLVolNameToCellID(name);
   }
 
@@ -603,41 +634,20 @@ GFTrackCand* ExtModule::addTrackCand(const GFTrack* gfTrack, int pdgCode, StoreA
   return cand;
 }
 
-void ExtModule::addFirstPoint(const G4ErrorFreeTrajState* state, GFTrackCand* cand, StoreArray<ExtRecoHit>& extRecoHits)
-{
-
-  G4StepPoint* stepPoint = state->GetG4Track()->GetStep()->GetPreStepPoint();
-  G4TouchableHandle preTouch = stepPoint->GetTouchableHandle();
-
-  // This starting point is typically in the CDC.
-  // Write it, even though CDC isn't on the m_enter list
-  TMatrixD phasespacePoint(6, 1);
-  TMatrixD covariance(6, 6);
-  phasespacePoint[0][0] = stepPoint->GetPosition().x() / cm;
-  phasespacePoint[1][0] = stepPoint->GetPosition().y() / cm;
-  phasespacePoint[2][0] = stepPoint->GetPosition().z() / cm;
-  phasespacePoint[3][0] = stepPoint->GetMomentum().x() / GeV;
-  phasespacePoint[4][0] = stepPoint->GetMomentum().y() / GeV;
-  phasespacePoint[5][0] = stepPoint->GetMomentum().z() / GeV;
-  covariance = getCov(state);
-  new(extRecoHits.nextFreeAddress()) ExtRecoHit(phasespacePoint, covariance, ENTER);
-  int detID(0);
-  int copyID(0);
-  getVolumeID(preTouch, detID, copyID);
-  cand->addHit(detID, extRecoHits.getEntries(), copyID, m_tof);
-
-}
-
 // write another volume-entry or volume-exit point on track
-void ExtModule::addPoint(const G4ErrorFreeTrajState* state, ExtHitStatus status, GFTrackCand* cand, StoreArray<ExtRecoHit>& extRecoHits)
+void ExtModule::createHit(const G4ErrorFreeTrajState* state, ExtHitStatus status, int trackID, int pdgCode,
+                          StoreArray<ExtHit>& extHits, RelationArray& gfTrackToExtHits,
+                          GFTrackCand* cand, StoreArray<ExtRecoHit>& extRecoHits)  // last two arguments are deprecated
 {
 
   G4StepPoint* stepPoint = state->GetG4Track()->GetStep()->GetPreStepPoint();
   G4TouchableHandle preTouch = stepPoint->GetTouchableHandle();
   G4VPhysicalVolume* preVol = preTouch->GetVolume();
-  if (status == ENTER) {
+
+  // Perhaps no hit will be stored?
+  if (status == EXT_ENTER) {
     if (find(m_enter->begin(), m_enter->end(), preVol) == m_enter->end()) { return; }
-  } else {
+  } else if (status == EXT_EXIT) {
     if (find(m_exit->begin(), m_exit->end(), preVol) == m_exit->end()) { return; }
     stepPoint = state->GetG4Track()->GetStep()->GetPostStepPoint();
   }
@@ -651,10 +661,14 @@ void ExtModule::addPoint(const G4ErrorFreeTrajState* state, ExtHitStatus status,
   phasespacePoint[4][0] = stepPoint->GetMomentum().y() / GeV;
   phasespacePoint[5][0] = stepPoint->GetMomentum().z() / GeV;
   covariance = getCov(state);
-  new(extRecoHits.nextFreeAddress()) ExtRecoHit(phasespacePoint, covariance, status);
-  int detID(0);
+  new(extRecoHits.nextFreeAddress()) ExtRecoHit(phasespacePoint, covariance, status); // deprecated
+  ExtDetectorID detID(EXT_UNKNOWN);
   int copyID(0);
   getVolumeID(preTouch, detID, copyID);
-  cand->addHit(detID, extRecoHits.getEntries(), copyID, m_tof);
+  cand->addHit(detID, extRecoHits.getEntries(), copyID, m_tof); // deprecated
+  TVector3 pos(phasespacePoint[0][0], phasespacePoint[1][0], phasespacePoint[2][0]);
+  TVector3 mom(phasespacePoint[3][0], phasespacePoint[4][0], phasespacePoint[5][0]);
+  new(extHits.nextFreeAddress()) ExtHit(pdgCode, detID, copyID, status, m_tof, pos, mom, covariance);
+  gfTrackToExtHits.add(trackID, extHits.getEntries() - 1);
 
 }

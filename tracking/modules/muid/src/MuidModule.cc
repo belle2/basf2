@@ -258,25 +258,25 @@ void MuidModule::event()
       // Ignore the zero-length step by PropagateOneStep() at each boundary
       if (length > 0.0) {
         if (preStatus == fGeomBoundary) {      // first step in this volume?
-          addPoint(state, ENTER, cand, extRecoHits);
+          addPoint(state, EXT_ENTER, cand, extRecoHits);
         }
         m_tof += step->GetDeltaTime();
         // Last step in this volume?
         if (postStatus == fGeomBoundary) {
-          addPoint(state, EXIT, cand, extRecoHits);
+          addPoint(state, EXT_EXIT, cand, extRecoHits);
         }
       }
       // Post-step momentum too low?
       if (errCode || (track->GetMomentum().mag() < minP)) {
-        addPoint(state, STOP, cand, extRecoHits);
+        addPoint(state, EXT_STOP, cand, extRecoHits);
         break;
       }
       if (G4ErrorPropagatorData::GetErrorPropagatorData()->GetState() == G4ErrorState(G4ErrorState_TargetCloserThanBoundary)) {
-        addPoint(state, ESCAPE, cand, extRecoHits);
+        addPoint(state, EXT_ESCAPE, cand, extRecoHits);
         break;
       }
       if (m_extMgr->GetPropagator()->CheckIfLastStep(track)) {
-        addPoint(state, ESCAPE, cand, extRecoHits);
+        addPoint(state, EXT_ESCAPE, cand, extRecoHits);
         break;
       }
 
@@ -676,7 +676,7 @@ void MuidModule::addFirstPoint(const G4ErrorFreeTrajState* state, GFTrackCand* c
   phasespacePoint[4][0] = stepPoint->GetMomentum().y() / GeV;
   phasespacePoint[5][0] = stepPoint->GetMomentum().z() / GeV;
   covariance = getCov(state);
-  new(extRecoHits.nextFreeAddress()) ExtRecoHit(phasespacePoint, covariance, ENTER);
+  new(extRecoHits.nextFreeAddress()) ExtRecoHit(phasespacePoint, covariance, EXT_ENTER);
   int detID = 0;
   int copyID = 0;
   getVolumeID(preTouch, detID, copyID);
@@ -863,7 +863,7 @@ void MuidModule::addPoint(G4ErrorFreeTrajState* state, ExtHitStatus status, GFTr
 
   // end of DIVOT for ENTER
 
-  if (status == ENTER) {
+  if (status == EXT_ENTER) {
     if (find(m_enter->begin(), m_enter->end(), preVol) == m_enter->end()) { return; }
   } else {
     if (find(m_exit->begin(), m_exit->end(), preVol) == m_exit->end()) { return; }

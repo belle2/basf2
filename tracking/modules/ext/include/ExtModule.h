@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
 #include <tracking/dataobjects/ExtRecoHit.h>
 
 #include <G4TouchableHandle.hh>
@@ -30,8 +31,6 @@ class GFTrack;
 class GFTrackCand;
 
 namespace Belle2 {
-
-#define N_HYPOTHESES 5
 
   class ExtManager;
 
@@ -87,11 +86,14 @@ namespace Belle2 {
     //! Name of the GFTrack collection of the reconstructed tracks to be extrapolated
     std::string m_gfTracksColName;
 
-    //! Name of the GFTrackCand collection, each holding the list of hits for a particular track and hypothesis
+    //! Name of the GFTrackCand collection, each holding the list of hits for a particular track and hypothesis (deprecated)
     std::string m_extTrackCandsColName;
 
-    //! Name of the extRecoHit collection of the extrapolation hits
+    //! Name of the extRecoHit collection of the extrapolation hits (deprecated)
     std::string m_extRecoHitsColName;
+
+    //! Name of the extHit collection of the extrapolation hits
+    std::string m_extHitsColName;
 
   private:
 
@@ -100,7 +102,7 @@ namespace Belle2 {
     void registerVolumes();
 
     //! Get the physical volume information for a geant4 physical volume
-    void getVolumeID(const G4TouchableHandle&, int&, int&);
+    void getVolumeID(const G4TouchableHandle&, ExtDetectorID&, int&);
 
     //! Convert the geant4e covariance to phasespacePoint 6x6 covariance
     TMatrixD getCov(const G4ErrorFreeTrajState*);
@@ -108,11 +110,8 @@ namespace Belle2 {
     //! Define a new track candidate for one reconstructed track and PDG hypothesis
     GFTrackCand* addTrackCand(const GFTrack*, int, StoreArray<GFTrackCand>&, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);
 
-    //! Add the first point for a new track candidate
-    void addFirstPoint(const G4ErrorFreeTrajState*, GFTrackCand*, StoreArray<ExtRecoHit>&);
-
-    //! Add another point for a new track candidate
-    void addPoint(const G4ErrorFreeTrajState*, ExtHitStatus, GFTrackCand*, StoreArray<ExtRecoHit>&);
+    //! Create another extrapolation hit for a track candidate
+    void createHit(const G4ErrorFreeTrajState*, ExtHitStatus, int, int, StoreArray<ExtHit>&, RelationArray&, GFTrackCand*, StoreArray<ExtRecoHit>&);
 
     //! Pointer to the ExtManager singleton
     ExtManager* m_extMgr;
@@ -127,7 +126,7 @@ namespace Belle2 {
     G4UserSteppingAction* m_stp;
 
     //! PDG codes for the particleID hypotheses
-    int m_pdg[N_HYPOTHESES];
+    std::vector<int> m_pdgCode;
 
     // Pointers to geant4 physical volumes whose entry/exit points will be saved
     std::vector<G4VPhysicalVolume*>* m_enter;

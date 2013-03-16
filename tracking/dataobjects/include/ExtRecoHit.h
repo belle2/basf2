@@ -17,11 +17,10 @@
 
 #include <RecoHits/GFAbsRecoHit.h>
 
-
+// for definition of ExtHitStatus
+#include <tracking/dataobjects/ExtHit.h>
 
 namespace Belle2 {
-
-  enum ExtHitStatus { ENTER, EXIT, STOP, ESCAPE };
 
   /** This class defines the extrapolation RecoHit.
    *

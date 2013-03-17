@@ -82,7 +82,7 @@ namespace Belle2 {
       string Tungsten  = content.getString("Tungsten");
       string CFRP  = content.getString("CFRP");
       string NEMA_G10_Plate  = content.getString("NEMA_G10_Plate");
-      //string CDC_Glue  = content.getString("CDCGlue");
+      //      string GLUE  = content.getString("CDCGlue");
 
       //TGeoRotation* geoRot = new TGeoRotation("CDCRot", 90.0, globalRotAngle, 0.0);
       //TGeoVolumeAssembly* volGrpCDC = addSubdetectorGroup("CDC", new TGeoCombiTrans(0.0, 0.0, globalOffsetZ, geoRot));
@@ -171,7 +171,9 @@ namespace Belle2 {
       G4Material* medTungsten = G4Material::GetMaterial(Tungsten.c_str());
       G4Material* medCFRP = geometry::Materials::get(CFRP.c_str());
       G4Material* medNEMA_G10_Plate = geometry::Materials::get(NEMA_G10_Plate.c_str());
-      //      G4Material* medCDC_Glue = geometry::Materials::get(CDC_Glue.c_str());
+
+      // To be modified.
+      G4Material* medGlue = geometry::Materials::get("Air");
       G4Material* medAir = geometry::Materials::get("Air");
 
 
@@ -266,6 +268,7 @@ namespace Belle2 {
       //-----------------------
       for (int iInnerWall = 0; iInnerWall < nInnerWall; ++iInnerWall) {
         double length = (innerWallFZ[iInnerWall] - innerWallBZ[iInnerWall]) / 2.0;
+        std::cout << "half z " << length << std::endl;
         if (strstr((innerWallName[iInnerWall]).c_str(), "MiddleWall") != NULL) {
           std::ostringstream innerWallName1;
           innerWallName1 << "solid" << (innerWallName[iInnerWall]).c_str();
@@ -278,6 +281,19 @@ namespace Belle2 {
           innerWallTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
           G4VPhysicalVolume* phyinnerWallTube;
           phyinnerWallTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + innerWallBZ[iInnerWall])*cm), innerWallTube, innerWallName3.str(), logical_cdc, false, iInnerWall);
+        } else if (strstr((innerWallName[iInnerWall]).c_str(), "MiddleGlue") != NULL) {
+          std::ostringstream innerWallName1;
+          innerWallName1 << "solid" << (innerWallName[iInnerWall]).c_str();
+          std::ostringstream innerWallName2;
+          innerWallName2 << "logical" << (innerWallName[iInnerWall]).c_str();
+          std::ostringstream innerWallName3;
+          innerWallName3 << "physical" << (innerWallName[iInnerWall]).c_str();
+          G4Tubs* innerWallTubeShape = new G4Tubs(innerWallName1.str(), innerWallInnerR[iInnerWall]*cm, innerWallOuterR[iInnerWall]*cm, length * cm, 0 * deg, 360.*deg);
+          G4LogicalVolume* innerWallTube = new G4LogicalVolume(innerWallTubeShape, medGlue, innerWallName2.str(), 0, 0, 0);
+          innerWallTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
+          G4VPhysicalVolume* phyinnerWallTube;
+          phyinnerWallTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + innerWallBZ[iInnerWall])*cm), innerWallTube, innerWallName3.str(), logical_cdc, false, iInnerWall);
+
         } else {
           std::ostringstream innerWallName1;
           innerWallName1 << "solid" << (innerWallName[iInnerWall]).c_str();

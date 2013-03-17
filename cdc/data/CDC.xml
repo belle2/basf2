@@ -3781,21 +3781,23 @@
         <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-977.5</EBBackwardZ>
         <EBForwardZ desc="Forward z position of electronics board" unit="mm">-827.5</EBForwardZ>
       </ElectronicsBoard>
-    </ElectronicsBoards>
+          </ElectronicsBoards>
 
-    <!-- Definition of the Inner Wall  -->
-    <InnerWalls>
-      <InnerWall id="0">
+      <!-- Definition of the Inner Wall  -->
+      <InnerWalls>
+      <!-- Definition of Al Wall 0.1 mm t -->
+        <InnerWall id="0">
         <Name>Shield</Name>
-        <InnerR desc="Inner radius" unit="mm">162.9</InnerR>
-        <OuterR desc="Outer radius" unit="mm">165.0</OuterR>
+        <InnerR desc="Inner radius" unit="mm">163.01</InnerR>
+        <OuterR desc="Outer radius" unit="mm">163.11</OuterR>
         <BackwardZ desc="z position at backward endplate" unit="mm">-277.985</BackwardZ>
         <ForwardZ desc="z position at forward endplate" unit="mm">536.503</ForwardZ>
       </InnerWall>
       <InnerWall id="1">
+      <!-- Definition of CFRP 0.46 mm t -->
         <Name>MiddleWall</Name>
         <InnerR desc="Inner radius" unit="mm">162.5</InnerR>
-        <OuterR desc="Outer radius" unit="mm">162.9</OuterR>
+        <OuterR desc="Outer radius" unit="mm">162.96</OuterR>
         <BackwardZ desc="z position at backward endplate" unit="mm">-277.985</BackwardZ>
         <ForwardZ desc="z position at forward endplate" unit="mm">536.503</ForwardZ>
       </InnerWall>
@@ -3826,6 +3828,14 @@
         <OuterR desc="Outer radius" unit="mm">163</OuterR>
         <BackwardZ desc="z position at backward endplate" unit="mm">536.503</BackwardZ>
         <ForwardZ desc="z position at forward endplate" unit="mm">559.503</ForwardZ>
+      </InnerWall>
+      <InnerWall id="6">
+      <!-- Definition of glue 0.05 mm t -->
+        <Name>MiddleGlue</Name>
+        <InnerR desc="Inner radius" unit="mm">162.96</InnerR>
+        <OuterR desc="Outer radius" unit="mm">163.01</OuterR>
+        <BackwardZ desc="z position at backward endplate" unit="mm">-277.985</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">536.503</ForwardZ>
       </InnerWall>
     </InnerWalls>
     <OuterWalls>

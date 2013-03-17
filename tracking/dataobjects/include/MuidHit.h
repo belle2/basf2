@@ -11,7 +11,7 @@
 #ifndef MUIDHIT_H
 #define MUIDHIT_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
 
 namespace Belle2 {
@@ -21,7 +21,7 @@ namespace Belle2 {
       they can be seen in a ROOT browser.
   */
 
-  class MuidHit : public TObject {
+  class MuidHit : public RelationsObject {
 
   public:
 
@@ -37,13 +37,13 @@ namespace Belle2 {
     //! returns position of the extrapolated point (cm) in global coordinates
     TVector3 getExtPosition() const { return m_ExtPosition; }
 
-    //! returns position of the matching 2D hit (cm) in global coordinates
+    //! returns position of the matching KLM hit (cm) in global coordinates
     TVector3 getHitPosition() const { return m_HitPosition; }
 
     //! returns time of the extrapolated point (ns)
     double getExtTime() const { return m_ExtTime; }
 
-    //! returns time of the matching 2D hit (ns)
+    //! returns time of the matching KLM hit (ns)
     double getHitTime() const { return m_HitTime; }
 
     //! returns flag to indicate if hit is in barrel (true) or endcap (false)
@@ -58,7 +58,7 @@ namespace Belle2 {
     //! returns layer number (1..15 for barrel, 1..14 for endcap)
     int getLayer() const { return m_Layer; }
 
-    //! returns chi-squared contribution for extrapolation point and 2D hit
+    //! returns chi-squared contribution for extrapolation point and KLM hit
     double getChiSquared() const { return m_ChiSquared; }
 
     //! position of the extrapolated point (cm) in global coordinates
@@ -67,10 +67,10 @@ namespace Belle2 {
     //! time of the extrapolated point (ns)
     double m_ExtTime;
 
-    //! position of the matching 2D hit (cm) in global coordinates
+    //! position of the matching KLM hit (cm) in global coordinates
     TVector3 m_HitPosition;
 
-    //! time of the matching 2D hit (ns)
+    //! time of the matching KLM hit (ns)
     double m_HitTime;
 
     //! flag to indicate if hit is in barrel (true) or endcap (false)
@@ -85,7 +85,7 @@ namespace Belle2 {
     //! layer number (1..15 for barrel, 1..14 for endcap)
     int m_Layer;
 
-    //! chi-squared contribution for extrapolation point and 2D hit
+    //! chi-squared contribution for extrapolation point and KLM hit
     double m_ChiSquared;
 
     //! Needed to make the ROOT object storable

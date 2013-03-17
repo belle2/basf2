@@ -20,6 +20,9 @@
 #include <G4ErrorTrajErr.hh>
 #include <TMatrixD.h>
 
+#include <string>
+#include <vector>
+
 class G4RunManager;
 class G4VUserPhysicsList;
 class G4UserTrackingAction;

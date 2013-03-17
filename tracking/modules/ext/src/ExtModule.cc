@@ -15,6 +15,7 @@
 #include <tracking/dataobjects/ExtRecoHit.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <simulation/kernel/DetectorConstruction.h>
+#include <simulation/kernel/MagneticField.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
 #include <cmath>
@@ -55,21 +56,17 @@
 #include <G4ErrorTrajErr.hh>
 #include <G4ErrorFreeTrajState.hh>
 #include <G4StateManager.hh>
-
+#include <G4TransportationManager.hh>
+#include <G4FieldManager.hh>
 
 using namespace std;
 using namespace Belle2;
 
 REG_MODULE(Ext)
 
-ExtModule::ExtModule() : Module(), m_extMgr(NULL)    // no ExtManager yet
+ExtModule::ExtModule() : Module(), m_extMgr(NULL)  // no ExtManager yet
 {
   m_pdgCode.clear();
-  m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("pi+")->GetPDGEncoding());
-  m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("e+")->GetPDGEncoding());
-  m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("mu+")->GetPDGEncoding());
-  m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("kaon+")->GetPDGEncoding());
-  m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("proton")->GetPDGEncoding());
   setDescription("Extrapolates tracks from CDC to outer detectors using geant4e");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("pdgCodes", m_pdgCode, "Positive-charge PDG codes for extrapolation hypotheses", m_pdgCode);
@@ -77,9 +74,9 @@ ExtModule::ExtModule() : Module(), m_extMgr(NULL)    // no ExtManager yet
   addParam("ExtTrackCandsColName", m_extTrackCandsColName, "DEPRECATED Name of collection holding the list of hits from each extrapolation", string(""));
   addParam("ExtRecoHitsColName", m_extRecoHitsColName, "DEPRECATED Name of collection holding the RecoHits from the extrapolation", string(""));
   addParam("ExtHitsColName", m_extHitsColName, "Name of collection holding the ExtHits from the extrapolation", string(""));
-  addParam("MinPt", m_minPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", 0.0);
-  addParam("MinKE", m_minKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", 0.001);
-  addParam("MaxStep", m_maxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity).", 0.0);
+  addParam("MinPt", m_minPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", double(0.0));
+  addParam("MinKE", m_minKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", double(0.002));
+  addParam("MaxStep", m_maxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity).", double(25.0));
   addParam("Cosmic", m_cosmic, "Particle source (0 = beam, 1 = cosmic ray.", 0);
 }
 
@@ -91,7 +88,7 @@ void ExtModule::initialize()
 {
 
   // Convert from GeV to GEANT4 energy units (MeV)
-  m_minKE = m_minKE / GeV;
+  m_minKE = m_minKE * GeV;
 
   // Define the list of volumes that will have their entry and/or
   // exit points stored during the extrapolation.
@@ -111,6 +108,11 @@ void ExtModule::initialize()
     G4Region* region = (*(G4RegionStore::GetInstance()))[0];
     region->SetProductionCuts(G4ProductionCutsTable::GetProductionCutsTable()->GetDefaultProductionCuts());
     m_extMgr->SetUserInitialization(new ExtPhysicsList);
+    //Create the magnetic field for the Geant4e simulation
+    Simulation::MagneticField* magneticField = new Simulation::MagneticField();
+    G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
+    fieldManager->SetDetectorField(magneticField);
+    fieldManager->CreateChordFinder(magneticField);
     m_extMgr->InitGeant4e();
   } else {
     // ext will coexist with simulation
@@ -121,13 +123,13 @@ void ExtModule::initialize()
     G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
   }
 
-  // Redefine step length (cm), magnetic field step limitation (Tesla per GeV/c), and
-  // kinetic energy loss limitation (fractional energy loss) by communicating with
+  // Redefine ext's step length, magnetic field step limitation (fraction of local curvature radius),
+  // and kinetic energy loss limitation (maximum fractional energy loss) by communicating with
   // the geant4 UI.  (Commands were defined in ExtMessenger when physics list was set up.)
-  G4double maxStep = std::min(5.0 * cm, m_maxStep);
+  G4double maxStep = std::min(10.0, m_maxStep) * cm;
   if (maxStep > 0.0) {
     char stepSize[80];
-    std::sprintf(stepSize, "/geant4e/limits/stepLength %8.2f cm", maxStep);
+    std::sprintf(stepSize, "/geant4e/limits/stepLength %8.2f mm", maxStep);
     G4UImanager::GetUIpointer()->ApplyCommand(stepSize);
   }
   G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/magField 0.001");
@@ -140,17 +142,33 @@ void ExtModule::initialize()
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(new
                                                              ExtCylSurfaceTarget(rMin, offsetZ - halfLength, offsetZ + halfLength));
 
-  // check that the user-defined PDG codes for the extrapolation hypotheses are legal
+  // Default hypotheses for extrapolation
+  if (m_pdgCode.size() == 0) {
+    m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("pi+")->GetPDGEncoding());
+    m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("e+")->GetPDGEncoding());
+    m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("mu+")->GetPDGEncoding());
+    m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("kaon+")->GetPDGEncoding());
+    m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("proton")->GetPDGEncoding());
+  }
+  // check that the (user-)defined PDG codes for the extrapolation hypotheses are legal
   for (unsigned int hypothesis = 0; hypothesis < m_pdgCode.size(); ++hypothesis) {
-    G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(abs(m_pdgCode[hypothesis]));
+    G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(m_pdgCode[hypothesis]);
+    if (particle->GetPDGCharge() == 0) {
+      B2FATAL("Module ext initialize(): Particle " << particle->GetParticleName() << " is neutral. Only charged particles can be extrapolated")
+    }
+    if (particle->GetPDGCharge() < 0) {
+      m_pdgCode[hypothesis] = -m_pdgCode[hypothesis];
+      particle = G4ParticleTable::GetParticleTable()->FindParticle(m_pdgCode[hypothesis]);
+    }
     string g4eName = "g4e_" + particle->GetParticleName();
     G4ParticleDefinition* g4eParticle = G4ParticleTable::GetParticleTable()->FindParticle(g4eName);
     if (g4eParticle == NULL) {
-      B2FATAL("Ext: Particle " << g4eName << " is not defined in G4ParticleTable")
+      B2FATAL("Module ext initialize(): Particle " << g4eName << " is not defined in G4ParticleTable")
     }
     if (G4ParticleTable::GetParticleTable()->FindAntiParticle(g4eName) == NULL) {
-      B2FATAL("Ext: Antiparticle of " << g4eName << " is not defined in G4ParticleTable")
+      B2FATAL("Module ext initialize(): Antiparticle of " << g4eName << " is not defined in G4ParticleTable")
     }
+    B2INFO("Module ext initialize(): hypotheses for " << particle->GetParticleName() << " and its antiparticle will be extrapolated")
   }
 
   // new output and relation
@@ -166,7 +184,7 @@ void ExtModule::initialize()
     StoreArray<ExtRecoHit> dummyHits(m_extRecoHitsColName);
     StoreArray<GFTrackCand>::registerPersistent(m_extTrackCandsColName);
     StoreArray<ExtRecoHit>::registerPersistent(m_extRecoHitsColName);
-    B2WARNING("Ext:  Storing data in <GFTrackCand> and <ExtRecoHit> is deprecated. Please use <ExtHit> instead.")
+    B2WARNING("Module ext initialize():  Storing data in <GFTrackCand> and <ExtRecoHit> is deprecated. Please use <ExtHit> instead.")
   }
 
   return;
@@ -295,7 +313,7 @@ void ExtModule::registerVolumes()
 
   G4PhysicalVolumeStore* pvStore = G4PhysicalVolumeStore::GetInstance();
   if (pvStore->size() == 0) {
-    B2FATAL("Module ext: No geometry defined. Please create the geometry first.")
+    B2FATAL("Module ext registerVolumes(): No geometry defined. Please create the geometry first.")
   }
 
   m_enter = new vector<G4VPhysicalVolume*>;

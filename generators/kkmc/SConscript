@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework','generators','gfortran','EvtGen']
+env['LIBS'] = ['framework','generators_dataobjects','gfortran','EvtGen']
 env['SUBLIB'] = True
 env.Append(FORTRANFLAGS = ['-g', '-I./generators/kkmc', '-fmerge-constants',  '-fno-second-underscore',  '-fno-automatic',  '-fno-f2c',  '-fPIC', '-ffixed-line-length-132'])
 Return('env')

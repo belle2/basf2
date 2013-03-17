@@ -57,8 +57,9 @@ namespace Belle2 {
       //! Pointer to the geant4e-specific energy-loss and mult-scat class
       EnergyLossForExtrapolator* m_energyLossForExtrapolator;
 
-      //! Stores step limit for this process
-      G4double m_stepLimit;
+      //! Step limit for this process (fraction of KE that could be lost in one step)
+      G4double theStepLimit;
+
     };
 
     inline G4bool ExtEnergyLoss::IsApplicable(const G4ParticleDefinition& aParticleType)
@@ -68,12 +69,12 @@ namespace Belle2 {
 
     inline G4double ExtEnergyLoss::GetStepLimit()
     {
-      return m_stepLimit;
+      return theStepLimit;
     }
 
     inline void ExtEnergyLoss::SetStepLimit(G4double val)
     {
-      m_stepLimit = val;
+      theStepLimit = val;
     }
 
   } //end namespace Simulation

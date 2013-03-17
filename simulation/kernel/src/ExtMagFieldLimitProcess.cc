@@ -25,7 +25,7 @@ using namespace Belle2::Simulation;
 ExtMagFieldLimitProcess::ExtMagFieldLimitProcess(const G4String& processName) :
   G4VErrorLimitProcess(processName)
 {
-  m_stepLimit = kInfinity; // user may change this with a geant4 UI command
+  theStepLimit = kInfinity; // user may change this with a geant4 UI command
   m_field = G4TransportationManager::GetTransportationManager()->GetFieldManager()->GetDetectorField();
 }
 
@@ -45,7 +45,7 @@ G4double ExtMagFieldLimitProcess::PostStepGetPhysicalInteractionLength(const G4T
     G4ThreeVector BVec(h1[0], h1[1], h1[2]);
     G4double pmag = aTrack.GetMomentum().mag();
     G4double BPerpMom = BVec.cross(aTrack.GetMomentum()).mag() / pmag;   // LEP
-    stepLength = m_stepLimit * pmag / BPerpMom;
+    stepLength = theStepLimit * pmag / BPerpMom;
     B2DEBUG(300, "ExtMagFieldLimitProcess::PostStepGetPhysicalInteractionLength() stepLength "
             << stepLength << " B " << BPerpMom << " BVec " << BVec << " pmag " << pmag)
   }

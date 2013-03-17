@@ -40,8 +40,6 @@ namespace Belle2 {
       //! Stores the pointer to the magnetic field class
       const G4Field* m_field;
 
-      //! Stores the step limit for this process
-      G4double m_stepLimit;
     };
 
   } //end namespace Simulation

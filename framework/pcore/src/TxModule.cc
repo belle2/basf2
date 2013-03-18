@@ -64,7 +64,7 @@ void TxModule::event()
 
   // Put the message in ring buffer
   for (;;) {
-    int stat = m_rbuf->insq((int*)msg->buffer(), (msg->size() - 1) / 4 + 1);
+    int stat = m_rbuf->insq((int*)msg->buffer(), (msg->size() - 1) / sizeof(int) + 1);
     if (stat >= 0) break;
     usleep(200);
   }

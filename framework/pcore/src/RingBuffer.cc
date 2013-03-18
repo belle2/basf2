@@ -30,7 +30,6 @@
 using namespace std;
 using namespace Belle2;
 
-// Constructor / Destructor
 
 // Constructor of Private Ringbuffer
 RingBuffer::RingBuffer(int size)
@@ -42,9 +41,9 @@ RingBuffer::RingBuffer(int size)
 
 
   // 1. Open shared memory
-  m_shmid = shmget(IPC_PRIVATE, size * 4, IPC_CREAT | 0644);
+  m_shmid = shmget(IPC_PRIVATE, size * sizeof(int), IPC_CREAT | 0644);
   if (m_shmid < 0) {
-    B2FATAL("RingBuffer: shmget(" << size * 4 << ") failed. Most likely the system doesn't allow us to reserve the needed shared memory. Try 'echo 500000000 > /proc/sys/kernel/shmmax' as root to set a higher limit (500MB).");
+    B2FATAL("RingBuffer: shmget(" << size * sizeof(int) << ") failed. Most likely the system doesn't allow us to reserve the needed shared memory. Try 'echo 500000000 > /proc/sys/kernel/shmmax' as root to set a higher limit (500MB).");
     return;
   }
   m_shmadr = (int*) shmat(m_shmid, 0, 0);
@@ -119,9 +118,9 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
   }
 
   // 1. Open shared memory
-  m_shmid = shmget(m_shmkey, size * 4, IPC_CREAT | 0644);
+  m_shmid = shmget(m_shmkey, size * sizeof(int), IPC_CREAT | 0644);
   if (m_shmid < 0) {
-    B2FATAL("RingBuffer: shmget(" << size * 4 << ") failed. Most likely the system doesn't allow us to reserve the needed shared memory. Try 'echo 500000000 > /proc/sys/kernel/shmmax' as root to set a higher limit (500MB).");
+    B2FATAL("RingBuffer: shmget(" << size * sizeof(int) << ") failed. Most likely the system doesn't allow us to reserve the needed shared memory. Try 'echo 500000000 > /proc/sys/kernel/shmmax' as root to set a higher limit (500MB).");
     return;
   }
   m_shmadr = (int*) shmat(m_shmid, 0, 0);
@@ -222,7 +221,7 @@ int RingBuffer::insq(const int* buf, int size)
     int* wptr = m_buftop + m_bufinfo->wptr;
     *wptr = size;
     *(wptr + 1) = m_bufinfo->wptr + (size + 2);
-    memcpy(wptr + 2, buf, size * 4);
+    memcpy(wptr + 2, buf, size * sizeof(int));
     m_bufinfo->prevwptr = m_bufinfo->wptr;
     m_bufinfo->wptr += (size + 2);
     m_bufinfo->nbuf++;
@@ -253,7 +252,7 @@ int RingBuffer::insq(const int* buf, int size)
       int* wptr = m_buftop + m_bufinfo->wptr;
       *wptr = size;
       *(wptr + 1) = m_bufinfo->wptr + (size + 2);
-      memcpy(wptr + 2, buf, size * 4);
+      memcpy(wptr + 2, buf, size * sizeof(int));
       m_bufinfo->prevwptr = m_bufinfo->wptr;
       m_bufinfo->wptr += (size + 2);
       m_bufinfo->nbuf++;
@@ -272,7 +271,7 @@ int RingBuffer::insq(const int* buf, int size)
         }
         m_bufinfo->mode = 1;
         int* wptr = m_buftop;
-        memcpy(wptr + 2, buf, size * 4);
+        memcpy(wptr + 2, buf, size * sizeof(int));
         *wptr = size;
         *(wptr + 1) = size + 2;
         m_bufinfo->wptr = *(wptr + 1);
@@ -311,7 +310,7 @@ int RingBuffer::insq(const int* buf, int size)
       int* wptr = m_buftop + m_bufinfo->wptr;
       *wptr = size;
       *(wptr + 1) = m_bufinfo->wptr + (size + 2);
-      memcpy(wptr + 2, buf, size * 4);
+      memcpy(wptr + 2, buf, size * sizeof(int));
       m_bufinfo->prevwptr = m_bufinfo->wptr;
       m_bufinfo->wptr += (size + 2);
       m_bufinfo->nbuf++;
@@ -351,7 +350,7 @@ int RingBuffer::remq(int* buf)
     return 0;
   }
   //  printf ( "remq : taking buf from %d(%d)\n", m_bufinfo->rptr, nw );
-  memcpy(buf, r_ptr + 2, nw * 4);
+  memcpy(buf, r_ptr + 2, nw * sizeof(int));
   m_bufinfo->rptr = *(r_ptr + 1);
   //  if ( *(r_ptr+1) < m_bufinfo->rptr )
   if (m_bufinfo->rptr == 0)
@@ -383,7 +382,7 @@ int RingBuffer::spyq(int* buf)
   }
   //  printf ( "remq : taking buf from %d(%d)\n", m_bufinfo->rptr, nw );
   // Copy buffer without modifying management parameters.
-  memcpy(buf, r_ptr + 2, nw * 4);
+  memcpy(buf, r_ptr + 2, nw * sizeof(int));
   // Exit
   sem_unlock(m_semid);
   return nw;

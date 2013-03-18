@@ -52,6 +52,8 @@ BHWideInputModule::~BHWideInputModule()
 
 void BHWideInputModule::initialize()
 {
+  StoreArray<MCParticle>::registerPersistent();
+
   //Depending on the settings, use the Belle II or Belle boost
   if (m_boostMode == 1) {
     GearDir ler("/Detector/SuperKEKB/LER/");

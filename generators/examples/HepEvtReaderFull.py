@@ -19,6 +19,7 @@ from basf2 import *
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
+# set_log_level(LogLevel.DEBUG)
 
 # to run the framework the used modules need to be registered
 hepevtreader = register_module('HepevtInput')
@@ -70,6 +71,7 @@ hepevtreader.param('wrongSignPz', True)
 # for a simple simulation job with output to a root file these additional
 # modules are needed
 evtmetagen = register_module('EvtMetaGen')
+progress = register_module('Progress')
 paramloader = register_module('Gearbox')
 geobuilder = register_module('Geometry')
 g4sim = register_module('FullSim')
@@ -88,6 +90,7 @@ simpleoutput.param('outputFileName', 'HepEvtReaderOutput.root')
 # creating the path for the processing
 main = create_path()
 main.add_module(evtmetagen)
+main.add_module(progress)
 
 # Add hepevtreader module to path:
 main.add_module(hepevtreader)

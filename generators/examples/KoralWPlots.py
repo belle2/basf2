@@ -93,12 +93,14 @@ koralw.set_log_level(LogLevel.INFO)
 
 ## Register the Progress module and the Python histogram module
 progress = register_module('Progress')
+gearbox = register_module('Gearbox')
 showMCPart = ShowMCParticles()
 
 ## Create the main path and add the modules
 main = create_path()
 main.add_module(evtmetagen)
 main.add_module(progress)
+main.add_module(gearbox)
 main.add_module(koralw)
 main.add_module(showMCPart)
 

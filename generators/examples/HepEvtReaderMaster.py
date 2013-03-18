@@ -53,7 +53,7 @@ g4sim = register_module('FullSim')
 simpleoutput = register_module('RootOutput')
 progress = register_module('Progress')
 progress.set_log_level(LogLevel.INFO)
-simpleoutput.param('outputFileName', 'HepEvtReaderMOutput.root')
+simpleoutput.param('outputFileName', 'HepEvtReaderMasterOutput.root')
 
 # creating the path for the processing
 main = create_path()
@@ -65,7 +65,7 @@ print_params(hepevtreader)
 
 # Add all other modules for simple processing to path
 main.add_module(progress)
-main.add_module(paramloader)
+#main.add_module(paramloader)
 main.add_module(geobuilder)
 main.add_module(g4sim)
 main.add_module(simpleoutput)

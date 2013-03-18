@@ -57,7 +57,8 @@ SADInputModule::SADInputModule() : Module()
 void SADInputModule::initialize()
 {
   //Register collections
-  StoreArray<MCParticle> MCParticles;
+  //StoreArray<MCParticle> MCParticles;
+  StoreArray<MCParticle>::registerPersistent();
 
   //Check parameters
   if (!FileSystem::fileExists(m_filename)) {

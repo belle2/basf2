@@ -56,6 +56,8 @@ BBBremInputModule::~BBBremInputModule()
 
 void BBBremInputModule::initialize()
 {
+  StoreArray<MCParticle>::registerPersistent();
+
   GearDir ler("/Detector/SuperKEKB/LER/");
   GearDir her("/Detector/SuperKEKB/HER/");
 

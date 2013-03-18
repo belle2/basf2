@@ -77,7 +77,7 @@ void TouschekTURTLEInputModule::initialize()
   }
 
   //Initialize MCParticle collection
-  StoreArray<MCParticle> MCParticles;
+  StoreArray<MCParticle>::registerPersistent("MCParticles");
 
   //Check parameters
   if ((m_readHER) && (!FileSystem::fileExists(m_filenameHER))) {

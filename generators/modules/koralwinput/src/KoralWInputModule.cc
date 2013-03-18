@@ -57,8 +57,9 @@ KoralWInputModule::~KoralWInputModule()
 
 void KoralWInputModule::initialize()
 {
-  m_generator.init(m_dataPath, m_userDataFile, m_seed);
+  StoreArray<MCParticle>::registerPersistent();
 
+  m_generator.init(m_dataPath, m_userDataFile, m_seed);
 
   //Depending on the settings use the Belle II or Belle boost
   if (m_boostMode == 1) {

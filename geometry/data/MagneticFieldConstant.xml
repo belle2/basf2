@@ -12,6 +12,8 @@
 				<Y>0.0</Y>
 				<Z>1.5</Z>
 				<MaxR unit="mm">0.0</MaxR>
+				<MinZ unit="mm">-4000.0</MinZ>
+				<MaxZ unit="mm">4000.0</MaxZ>
 			</Component>
 		</Components>
 	</Content>

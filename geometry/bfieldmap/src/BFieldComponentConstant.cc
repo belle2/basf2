@@ -31,18 +31,20 @@ BFieldComponentConstant::~BFieldComponentConstant()
 TVector3 BFieldComponentConstant::calculate(const TVector3& point) const
 {
   double Bz = m_magneticField[2];
-  if (maxRadius4BField > 0.0 && maxRadius4BField < point.Perp() / Unit::mm) Bz = 0.0;
-  if (point.z() < -400. || point.z() > 400.) Bz = 0.0;
+  if (maxRadius4BField > 0.0 && maxRadius4BField < point.Perp()) Bz = 0.0;
+  if (point.z() < minZ4BField  || point.z() > maxZ4BField) Bz = 0.0;
 
   //  return TVector3(m_magneticField[0], m_magneticField[1], m_magneticField[2]);
   return TVector3(m_magneticField[0], m_magneticField[1], Bz);
 }
 
 
-void BFieldComponentConstant::setMagneticFieldValues(double x, double y, double z, double rmax)
+void BFieldComponentConstant::setMagneticFieldValues(double x, double y, double z, double rmax, double zmin, double zmax)
 {
   m_magneticField[0] = x;
   m_magneticField[1] = y;
   m_magneticField[2] = z;
-  maxRadius4BField = rmax;  // unit [mm]
+  maxRadius4BField = rmax;  // unit [cm]
+  minZ4BField = zmin;       // unit [cm]
+  maxZ4BField = zmax;       // unit [cm]
 }

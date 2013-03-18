@@ -86,10 +86,12 @@ void GeoMagneticField::readConstantBField(const GearDir& component)
   double xValue = component.getDouble("X");
   double yValue = component.getDouble("Y");
   double zValue = component.getDouble("Z");
-  double RmaxValue = component.getLength("MaxR") / Unit::mm ;
+  double RmaxValue = component.getLength("MaxR"); // stored in cm
+  double ZminValue = component.getLength("MinZ"); // stored in cm
+  double ZmaxValue = component.getLength("MaxZ"); // stored in cm
 
   BFieldComponentConstant& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentConstant>();
-  bComp.setMagneticFieldValues(xValue, yValue, zValue, RmaxValue);
+  bComp.setMagneticFieldValues(xValue, yValue, zValue, RmaxValue, ZminValue, ZmaxValue);
 }
 
 

@@ -78,7 +78,7 @@
     <Material>PXD-CarbonTubes</Material>
     <count>4</count>
     <minZ unit="mm">-34.000</minZ>
-    <maxZ unit="mm"> 64.800</maxZ>
+    <maxZ unit="mm"> 64.720</maxZ>
     <innerRadius unit="mm">0.250</innerRadius>
     <outerRadius unit="mm">0.500</outerRadius>
     <rphi unit="mm">18.700</rphi>

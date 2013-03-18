@@ -19,19 +19,21 @@ class PXDHitErrors(Module):
 
         super(PXDHitErrors, self).__init__()
         self.setName('PXDHitErrors')
+        ## Input file object.
         self.file = open('PXDHitErrorOutput.txt', 'w')
+        ## Factors for decoding VXDIds
         self.vxdid_factors = (8192, 256, 32)
 
     def beginRun(self):
         """ Write legend for file columns """
 
         self.file.write('LEGEND TO COLUMNS: \n')
-        self.file.write('SensorID Layer Ladder Sensor Truehit_index Cluster_index \n'
-                        )
-        self.file.write('TrueHit: u[cm], v[cm], charge[GeV], theta_u, theta_v \n'
-                        )
-        self.file.write('Cluster: u[cm], v[cm], charge[e-], seed charge[e-], size, size_u, size_v \n'
-                        )
+        self.file.write('SensorID Layer Ladder Sensor Truehit_index ' +
+                        'Cluster_index \n')
+        self.file.write('TrueHit: u[cm], v[cm], charge[GeV], theta_u, ' +
+                        'theta_v \n')
+        self.file.write('Cluster: u[cm], v[cm], charge[e-], seed charge[e-],' +
+                        ' size, size_u, size_v \n')
         self.file.write('Digits: n_digits {u[cm] v[cm] charge[e-]} \n')
         self.file.write('\n')
 
@@ -50,7 +52,8 @@ class PXDHitErrors(Module):
         relClustersToDigits = Belle2.PyRelationArray('PXDClustersToPXDDigits')
         nDigitRelations = relClustersToDigits.getEntries()
 
-        # Start with the clusters and use the relation to get the corresponding digits and truehits.
+        # Start with the clusters and use the relation to get the corresponding
+        # digits and truehits.
         for cluster_index in range(nClusters):
             cluster = clusters[cluster_index]
             cluster_truehits = \
@@ -64,13 +67,14 @@ class PXDHitErrors(Module):
                 sensorID = truehit.getRawSensorID()
                 [layer, ladder, sensor] = self.decode(sensorID)
                 s_id = \
-                    '{sID} {layer} {ladder} {sensor} {indexTH:4d} {indexCL:4d} '.format(
+                    '{sID} {layer} {ladder} {sensor} {indexT:4d} {indexC:4d} '\
+                    .format(
                     sID=sensorID,
                     layer=layer,
                     ladder=ladder,
                     sensor=sensor,
-                    indexTH=truehit_index,
-                    indexCL=cluster_index,
+                    indexT=truehit_index,
+                    indexC=cluster_index,
                     )
                 s += s_id
                 # TrueHit information
@@ -79,20 +83,25 @@ class PXDHitErrors(Module):
                 thetaV = math.atan2(truehit.getExitV() - truehit.getEntryV(),
                                     0.0075)
                 s_th = \
-                    '{uTH:10.5f} {vTH:10.5f} {eTH:10.7f} {thetaU:6.3f} {thetaV:6.3f} '.format(uTH=truehit.getU(),
-                        vTH=truehit.getV(), eTH=truehit.getEnergyDep(),
+                    '{uTH:10.5f} {vTH:10.5f} {eTH:10.7f} '.format(
+                        uTH=truehit.getU(),
+                        vTH=truehit.getV(),
+                        eTH=truehit.getEnergyDep()) + \
+                        '{thetaU:6.3f} {thetaV:6.3f} '.format(
                         thetaU=thetaU, thetaV=thetaV)
                 s += s_th
                 # Cluster information
                 s_cl = \
-                    '{uCL:10.5f} {vCL:10.5f} {eCL:10.1f} {eSeed:10.1f} {size:5d} {sizeU:5d} {sizeV:5d} '.format(
+                    '{uCL:10.5f} {vCL:10.5f} {eCL:10.1f} {eSeed:10.1f} '\
+                    .format(
                     uCL=cluster.getU(),
                     vCL=cluster.getV(),
                     eCL=cluster.getCharge(),
-                    eSeed=cluster.getSeedCharge(),
+                    eSeed=cluster.getSeedCharge()) + \
+                    '{size:5d} {sizeU:5d} {sizeV:5d} '.format(
                     size=cluster.getSize(),
                     sizeU=cluster.getUSize(),
-                    sizeV=cluster.getVSize(),
+                    sizeV=cluster.getVSize()
                     )
                 s += s_cl
                 # We can add some digits, too.
@@ -102,8 +111,10 @@ class PXDHitErrors(Module):
                 for digit_index in digit_indices:
                     digit = digits[digit_index]
                     s_dig = \
-                        '{u:10.5f} {v:10.5f} {e:10.1f} '.format(u=digit.getUCellPosition(),
-                            v=digit.getVCellPosition(), e=digit.getCharge())
+                        '{u:10.5f} {v:10.5f} {e:10.1f} '\
+                        .format(u=digit.getUCellPosition(),
+                            v=digit.getVCellPosition(),
+                            e=digit.getCharge())
                     s += s_dig
 
                 s += '\n'
@@ -123,5 +134,3 @@ class PXDHitErrors(Module):
             vxdid = vxdid % f
 
         return result
-
-

@@ -19,19 +19,21 @@ class SVDHitErrors(Module):
 
         super(SVDHitErrors, self).__init__()
         self.setName('SVDHitErrors')
+        ## Input file object.
         self.file = open('SVDHitErrorOutput.txt', 'w')
-        self.vxdid_factors = (8192, 256, 32)  # For decoding VxdID's
+        ## Factors for decoding VXDId's
+        self.vxdid_factors = (8192, 256, 32)
 
     def beginRun(self):
         """ Write legend for file columns """
 
         self.file.write('LEGEND TO COLUMNS: \n')
-        self.file.write('SensorID Layer Ladder Sensor Truehit_index Cluster_index \n'
-                        )
-        self.file.write('TrueHit: u[cm], v[cm], time[ns], charge[GeV], theta_u, theta_v \n'
-                        )
-        self.file.write('Cluster: isU[True/False], uv[cm], time[ns], charge[e-], seed charge[e-], size \n'
-                        )
+        self.file.write('SensorID Layer Ladder Sensor Truehit_index ' +
+                        'Cluster_index \n')
+        self.file.write('TrueHit: u[cm], v[cm], time[ns], charge[GeV], ' +
+                        'theta_u, theta_v \n')
+        self.file.write('Cluster: isU[True/False], uv[cm], time[ns], ' +
+                        'charge[e-], seed charge[e-], size \n')
         self.file.write('\n')
 
     def event(self):
@@ -49,13 +51,14 @@ class SVDHitErrors(Module):
         relClustersToDigits = Belle2.PyRelationArray('SVDClustersToSVDDigits')
         nDigitRelations = relClustersToDigits.getEntries()
 
-        # Start with the clusters and use the relation to get the corresponding digits and truehits.
+        # Start with clusters and use the relation to get the corresponding
+        # digits and truehits.
         for cluster_index in range(nClusters):
             cluster = clusters[cluster_index]
             cluster_truehits = \
                 relClustersToTrueHits.getToIndices(cluster_index)
 
-            # Here we deliberately ask only for clsuters with exactly one TrueHit.
+            # Here we ask only for clusters with exactly one TrueHit.
             # We don't want combined clusters!
             if len(cluster_truehits) != 1:
                 continue
@@ -68,13 +71,14 @@ class SVDHitErrors(Module):
                 sensorID = truehit.getRawSensorID()
                 [layer, ladder, sensor] = self.decode(sensorID)
                 s_id = \
-                    '{sID} {layer} {ladder} {sensor} {indexTH:4d} {indexCL:4d} '.format(
+                    '{sID} {layer} {ladder} {sensor} {indexT:4d} {indexC:4d} '\
+                    .format(
                     sID=sensorID,
                     layer=layer,
                     ladder=ladder,
                     sensor=sensor,
-                    indexTH=truehit_index,
-                    indexCL=cluster_index,
+                    indexT=truehit_index,
+                    indexC=cluster_index
                     )
                 s += s_id
                 # TrueHit information
@@ -83,25 +87,25 @@ class SVDHitErrors(Module):
                 thetaV = math.atan2(truehit.getExitV() - truehit.getEntryV(),
                                     0.0075)
                 s_th = \
-                    '{uTH:10.5f} {vTH:10.5f} {tTH:10.2f} {eTH:10.7f} {thetaU:6.3f} {thetaV:6.3f} '.format(
+                    '{uTH:10.5f} {vTH:10.5f} {tTH:10.2f} {eTH:10.7f} '.format(
                     uTH=truehit.getU(),
                     vTH=truehit.getV(),
                     tTH=truehit.getGlobalTime(),
-                    eTH=truehit.getEnergyDep(),
+                    eTH=truehit.getEnergyDep()) + \
+                    '{thetaU:6.3f} {thetaV:6.3f} '.format(
                     thetaU=thetaU,
-                    thetaV=thetaV,
-                    )
+                    thetaV=thetaV)
                 s += s_th
                 # Cluster information
                 s_cl = \
-                    '{isU} {uvCL:10.5f} {tCL:10.2f} {eCL:10.1f} {eSeed:10.1f} {size:5d} '.format(
+                    '{isU} {uvC:10.5f} {tC:10.2f} {eC:10.1f} {eSeed:10.1f} '\
+                    .format(
                     isU=cluster.isUCluster(),
                     uvCL=cluster.getPosition(),
                     tCL=cluster.getClsTime() - 50,
                     eCL=cluster.getCharge(),
-                    eSeed=cluster.getSeedCharge(),
-                    size=cluster.getSize(),
-                    )
+                    eSeed=cluster.getSeedCharge()) + \
+                    '{size:5d} '.format(size=cluster.getSize())
                 s += s_cl
                 # NO DIGITS by now.
                 s += '\n'
@@ -121,5 +125,3 @@ class SVDHitErrors(Module):
             vxdid = vxdid % f
 
         return result
-
-

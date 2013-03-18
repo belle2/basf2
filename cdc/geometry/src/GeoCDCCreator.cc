@@ -82,7 +82,7 @@ namespace Belle2 {
       string Tungsten  = content.getString("Tungsten");
       string CFRP  = content.getString("CFRP");
       string NEMA_G10_Plate  = content.getString("NEMA_G10_Plate");
-      //      string GLUE  = content.getString("CDCGlue");
+      string CDCGlue  = content.getString("CDCGlue");
 
       //TGeoRotation* geoRot = new TGeoRotation("CDCRot", 90.0, globalRotAngle, 0.0);
       //TGeoVolumeAssembly* volGrpCDC = addSubdetectorGroup("CDC", new TGeoCombiTrans(0.0, 0.0, globalOffsetZ, geoRot));
@@ -171,9 +171,7 @@ namespace Belle2 {
       G4Material* medTungsten = G4Material::GetMaterial(Tungsten.c_str());
       G4Material* medCFRP = geometry::Materials::get(CFRP.c_str());
       G4Material* medNEMA_G10_Plate = geometry::Materials::get(NEMA_G10_Plate.c_str());
-
-      // To be modified.
-      G4Material* medGlue = geometry::Materials::get("Air");
+      G4Material* medGlue = geometry::Materials::get(CDCGlue.c_str());
       G4Material* medAir = geometry::Materials::get("Air");
 
 
@@ -268,7 +266,7 @@ namespace Belle2 {
       //-----------------------
       for (int iInnerWall = 0; iInnerWall < nInnerWall; ++iInnerWall) {
         double length = (innerWallFZ[iInnerWall] - innerWallBZ[iInnerWall]) / 2.0;
-        std::cout << "half z " << length << std::endl;
+        //        std::cout << "half z " << length << std::endl;
         if (strstr((innerWallName[iInnerWall]).c_str(), "MiddleWall") != NULL) {
           std::ostringstream innerWallName1;
           innerWallName1 << "solid" << (innerWallName[iInnerWall]).c_str();

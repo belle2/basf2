@@ -40,12 +40,14 @@
      </Components>
    </Material>
 
-    <Material name="CDCGlue">
-        <state>Solid</state>
-        <density unit="g/cm3">2.62</density>
-        <Components>   
-            <Element fraction="0.5326">O</Element> 
-            <Element fraction="0.4674">Si</Element>     
-        </Components>  
+
+   <Material name="CDCGlue">
+      <state>Solid</state>
+      <density unit="g/cm3">1.13</density>
+     <Components>
+      <Element fraction="0.4390">C</Element>
+      <Element fraction="0.0732">O</Element>
+      <Element fraction="0.4878">H</Element>
+    </Components>
    </Material>
 </Materials>

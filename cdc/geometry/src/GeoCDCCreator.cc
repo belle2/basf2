@@ -267,6 +267,7 @@ namespace Belle2 {
       for (int iInnerWall = 0; iInnerWall < nInnerWall; ++iInnerWall) {
         double length = (innerWallFZ[iInnerWall] - innerWallBZ[iInnerWall]) / 2.0;
         //        std::cout << "half z " << length << std::endl;
+        // CFRP layer 0.46 mmt
         if (strstr((innerWallName[iInnerWall]).c_str(), "MiddleWall") != NULL) {
           std::ostringstream innerWallName1;
           innerWallName1 << "solid" << (innerWallName[iInnerWall]).c_str();
@@ -279,7 +280,7 @@ namespace Belle2 {
           innerWallTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
           G4VPhysicalVolume* phyinnerWallTube;
           phyinnerWallTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + innerWallBZ[iInnerWall])*cm), innerWallTube, innerWallName3.str(), logical_cdc, false, iInnerWall);
-        } else if (strstr((innerWallName[iInnerWall]).c_str(), "MiddleGlue") != NULL) {
+        } else if (strstr((innerWallName[iInnerWall]).c_str(), "MiddleGlue") != NULL) { // Glue layer 0.005 mmt
           std::ostringstream innerWallName1;
           innerWallName1 << "solid" << (innerWallName[iInnerWall]).c_str();
           std::ostringstream innerWallName2;
@@ -292,7 +293,7 @@ namespace Belle2 {
           G4VPhysicalVolume* phyinnerWallTube;
           phyinnerWallTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + innerWallBZ[iInnerWall])*cm), innerWallTube, innerWallName3.str(), logical_cdc, false, iInnerWall);
 
-        } else {
+        } else { // Al layer 0.1 mmt
           std::ostringstream innerWallName1;
           innerWallName1 << "solid" << (innerWallName[iInnerWall]).c_str();
           std::ostringstream innerWallName2;

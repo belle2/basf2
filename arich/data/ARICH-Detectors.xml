@@ -3,56 +3,56 @@
   <xi:include href="ARICH-Hapd.xml"/>
   <Plane> 
     <zPosition desc="Z position of detector plane (beginning)" unit="mm">1860</zPosition>
-    <tubeOuterRadius desc="Outer radius of detector tube" unit="mm">1130</tubeOuterRadius>
+    <tubeOuterRadius desc="Outer radius of detector tube" unit="mm">1135</tubeOuterRadius>
     <tubeInnerRadius desc="Inner radius of detector tube" unit="mm">440</tubeInnerRadius>    
     <Rings>
       <Ring id="1">
 	<nSegments desc="number of detector segments">6</nSegments>
 	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">20</dR>
+	<dR desc="minimal distance between modules in r direction" unit="mm">96</dR>
       </Ring>
       <Ring id="2">
 	<nSegments desc="number of detector segments">6</nSegments>
 	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">1.5</dR>
+	<dR desc="minimal distance between modules in r direction" unit="mm">8.1</dR>
       </Ring>
       <Ring id="3">
 	<nSegments desc="number of detector segments">6</nSegments>
 	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">1.5</dR>
+	<dR desc="minimal distance between modules in r direction" unit="mm">9.26</dR>
       </Ring>
       <Ring id="4">
 	<nSegments desc="number of detector segments">6</nSegments>
 	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">1.5</dR>
+	<dR desc="minimal distance between modules in r direction" unit="mm">8.8</dR>
       </Ring>
       <Ring id="5">
 	<nSegments desc="number of detector segments">6</nSegments>
 	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">1.5</dR>
+	<dR desc="minimal distance between modules in r direction" unit="mm">8.28</dR>
       </Ring>
       <Ring id="6">
 	<nSegments desc="number of detector segments">6</nSegments>
 	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">1.5</dR>
+	<dR desc="minimal distance between modules in r direction" unit="mm">8.9</dR>
       </Ring>
       <Ring id="7">
 	<nSegments desc="number of detector segments">6</nSegments>
 	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">1.5</dR>
+	<dR desc="minimal distance between modules in r direction" unit="mm">8.0</dR>
       </Ring>
-      <Ring id="8">
+      <!--Ring id="8">
 	<nSegments desc="number of detector segments">6</nSegments>
 	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
 	<dR desc="minimal distance between modules in r direction" unit="mm">1.5</dR>
-      </Ring>
+      </Ring-->
     </Rings>
   </Plane>
   
   <SupportPlate>
     <material desc="Material of detectors support plate">Al</material>
     <thickness desc="The tickness of detectors support plate" unit="mm">4</thickness>
-    <outerRadius desc="Outer radius of detectors support plate" unit="mm">1130</outerRadius>
+    <outerRadius desc="Outer radius of detectors support plate" unit="mm">1135</outerRadius>
     <innerRadius desc="Inner radius of detectors support plate" unit="mm">440</innerRadius>
     <holeXSize desc="X size of the rectangular hole in support plate behind each module (for cables)" unit="mm">60</holeXSize>
     <holeYSize desc="Y size of the rectangular hole in support plate behind each module (for cables)" unit="mm">60</holeYSize>

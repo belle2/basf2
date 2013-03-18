@@ -46,46 +46,50 @@ KKGenInputModule::KKGenInputModule() : Module()
   //Set module properties
   setDescription("KKGen input");
   setPropertyFlags(c_Input);
-  //Get ENVIRONMENTs
-  string belle2_release_dir = string(std::getenv("BELLE2_RELEASE_DIR"));
-  string belle2_local_dir = string(std::getenv("BELLE2_LOCAL_DIR"));
+  try {
+    //Get ENVIRONMENTs
+    string belle2_release_dir = string(std::getenv("BELLE2_RELEASE_DIR"));
+    string belle2_local_dir = string(std::getenv("BELLE2_LOCAL_DIR"));
 
-  //Get default full filename of evt.pdl
-  string default_evtpdlfilename = string(std::getenv("BELLE2_EXTERNALS_DIR")) + string("/share/evtgen/evt.pdl");
+    //Get default full filename of evt.pdl
+    string default_evtpdlfilename = string(std::getenv("BELLE2_EXTERNALS_DIR")) + string("/share/evtgen/evt.pdl");
 
-  //Get default full filenames of KK2f setting files
-  string default_KKdefaultFileName = belle2_local_dir + string("/data/generators/kkmc/KK2f_defaults.dat");
-  string default_tauinputFileName = belle2_local_dir + string("/data/generators/kkmc/tau.input.dat");
-  string default_taudecaytableFileName = belle2_local_dir + string("/data/generators/kkmc/tau_decaytable.dat");
-  B2DEBUG(100, boost::format("Default directory for the setting files is set: %s/data/generators/kkmc") % belle2_local_dir);
+    //Get default full filenames of KK2f setting files
+    string default_KKdefaultFileName = belle2_local_dir + string("/data/generators/kkmc/KK2f_defaults.dat");
+    string default_tauinputFileName = belle2_local_dir + string("/data/generators/kkmc/tau.input.dat");
+    string default_taudecaytableFileName = belle2_local_dir + string("/data/generators/kkmc/tau_decaytable.dat");
+    B2DEBUG(100, boost::format("Default directory for the setting files is set: %s/data/generators/kkmc") % belle2_local_dir);
 
-  boost::filesystem::path fpath_b2l_kk2f(default_KKdefaultFileName);
-  if (!boost::filesystem::exists(fpath_b2l_kk2f)) {
-    B2DEBUG(100, boost::format("Default directory for the setting files is re-set: %s/data/generators/kkmc") % belle2_release_dir);
-    default_KKdefaultFileName = belle2_release_dir + string("/data/generators/kkmc/KK2f_defaults.dat");
-    default_tauinputFileName = belle2_release_dir + string("/data/generators/kkmc/tau.input.dat");
-    default_taudecaytableFileName = belle2_release_dir + string("/data/generators/kkmc/tau_decaytable.dat");
-    boost::filesystem::path fpath_b2r_kk2f(default_KKdefaultFileName);
-    if (!boost::filesystem::exists(fpath_b2r_kk2f)) {
-      B2DEBUG(100, "Default directory for the setting files is re-re-set: ./");
-      default_KKdefaultFileName = string("./KK2f_defaults.dat");
-      default_tauinputFileName = string("./tau.input.dat");
-      default_taudecaytableFileName = string("./tau_decaytable.dat");
+    boost::filesystem::path fpath_b2l_kk2f(default_KKdefaultFileName);
+    if (!boost::filesystem::exists(fpath_b2l_kk2f)) {
+      B2DEBUG(100, boost::format("Default directory for the setting files is re-set: %s/data/generators/kkmc") % belle2_release_dir);
+      default_KKdefaultFileName = belle2_release_dir + string("/data/generators/kkmc/KK2f_defaults.dat");
+      default_tauinputFileName = belle2_release_dir + string("/data/generators/kkmc/tau.input.dat");
+      default_taudecaytableFileName = belle2_release_dir + string("/data/generators/kkmc/tau_decaytable.dat");
+      boost::filesystem::path fpath_b2r_kk2f(default_KKdefaultFileName);
+      if (!boost::filesystem::exists(fpath_b2r_kk2f)) {
+        B2DEBUG(100, "Default directory for the setting files is re-re-set: ./");
+        default_KKdefaultFileName = string("./KK2f_defaults.dat");
+        default_tauinputFileName = string("./tau.input.dat");
+        default_taudecaytableFileName = string("./tau_decaytable.dat");
+      }
     }
-  }
 
-  //Parameter definition
-  addParam("KKdefaultFile", m_KKdefaultFileName, "default KKMC setting filename", default_KKdefaultFileName);
-  addParam("tauinputFile", m_tauinputFileName, "user-defined tau/mu-pairs generation setting", default_tauinputFileName);
-  addParam("taudecaytableFile", m_taudecaytableFileName, "tau-decay-table file name", default_taudecaytableFileName);
-  addParam("evtpdlfilename", m_EvtPDLFileName, "EvtPDL filename", default_evtpdlfilename);
-  addParam("boost2LAB", m_boost2LAB, "Boolean to indicate whether the particles should be boosted to LAB frame", true);
-  addParam("HER_Energy", m_EHER, "Energy for HER[GeV]", 7 * Unit::GeV);
-  addParam("LER_Energy", m_ELER, "Energy for LER[GeV]", 4 * Unit::GeV);
-  addParam("HER_Spread", m_HER_Espread, "Energy spread for HER[GeV]", 0.00513 * Unit::GeV);
-  addParam("LER_Spread", m_LER_Espread, "Energy spread for LER[GeV]", 0.002375 * Unit::GeV);
-  addParam("CrossingAngle", m_crossing_angle, "Beam pipe crossing angle[mrad]", 83 * Unit::mrad);
-  addParam("RotationAngle", m_angle, "Rotation with respect to e- beampie[mrad]", 41.5 * Unit::mrad);
+    //Parameter definition
+    addParam("KKdefaultFile", m_KKdefaultFileName, "default KKMC setting filename", default_KKdefaultFileName);
+    addParam("tauinputFile", m_tauinputFileName, "user-defined tau/mu-pairs generation setting", default_tauinputFileName);
+    addParam("taudecaytableFile", m_taudecaytableFileName, "tau-decay-table file name", default_taudecaytableFileName);
+    addParam("evtpdlfilename", m_EvtPDLFileName, "EvtPDL filename", default_evtpdlfilename);
+    addParam("boost2LAB", m_boost2LAB, "Boolean to indicate whether the particles should be boosted to LAB frame", true);
+    addParam("HER_Energy", m_EHER, "Energy for HER[GeV]", 7 * Unit::GeV);
+    addParam("LER_Energy", m_ELER, "Energy for LER[GeV]", 4 * Unit::GeV);
+    addParam("HER_Spread", m_HER_Espread, "Energy spread for HER[GeV]", 0.00513 * Unit::GeV);
+    addParam("LER_Spread", m_LER_Espread, "Energy spread for LER[GeV]", 0.002375 * Unit::GeV);
+    addParam("CrossingAngle", m_crossing_angle, "Beam pipe crossing angle[mrad]", 83 * Unit::mrad);
+    addParam("RotationAngle", m_angle, "Rotation with respect to e- beampie[mrad]", 41.5 * Unit::mrad);
+  } catch (std::logic_error) {
+    B2ERROR("Environment setup for KKGenInputModule failed (to be fixed.)");
+  }
 }
 
 

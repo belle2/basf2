@@ -62,6 +62,6 @@ namespace Belle2 {
     int m_semid; /**< Semaphore ID, protects shared m_ctlshm. */
   };
 
-} // namespace Roobasf
+}
 
 #endif

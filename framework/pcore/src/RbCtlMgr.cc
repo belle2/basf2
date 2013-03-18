@@ -18,7 +18,6 @@
 #include <errno.h>
 
 using namespace Belle2;
-using namespace std;
 
 RbCtlMgr::RbCtlMgr(void)
 {

@@ -138,11 +138,66 @@ namespace Belle2 {
      */
     float getChi2() const { return m_Chi2; }
 
+    /*! Get pValue
+     * @return pValue
+     */
+    float getPValue() const {
+
+      double par[] = {5.43555e-01, -1.62126e-01, -4.31663e-03, 4.13831e-03, 9.07563e-05, -5.37161e-05};
+      double pValue =
+        par[0] +  par[1] * log(m_Chi2) +  par[2] * log(m_Chi2) * log(m_Chi2) + par[3] * log(m_Chi2) * log(m_Chi2) * log(m_Chi2)
+        + par[4] * log(m_Chi2) * log(m_Chi2) * log(m_Chi2) * log(m_Chi2)
+        + par[5] * log(m_Chi2) * log(m_Chi2) * log(m_Chi2) * log(m_Chi2) * log(m_Chi2);
+      if (pValue > 1)pValue = 1;
+      if (pValue < 0)pValue = 0;
+
+      return pValue;
+    }
+
+
     //! The method to get return TMatrixFSym  4 Momentum Error Matrix
     /*! Get  TMatrixFSym  4 Momentum Error Matrix
      * @return Error Matrix from particle Error propagation of 2 gammas
      */
     TMatrixFSym getErrorMatrix() const { return m_errorMatrix;}
+
+    //! The method to get return TMatrixT<float>   4 Momentum Error Matrix
+    /*! Get  TMatrixT<float>   4 Momentum Error Matrix by reading ECLShower through ShowerId
+     * @return Matrix which from convertion from Error E, Theta, Phi of ECLShower
+    */
+    void getErrorMatrix(TMatrixFSym& errorMatrix) const {
+
+      for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= i ; j++) {
+          errorMatrix[i][j] = m_errorMatrix[i][j];
+          //std::cout<<m_errorMatrix[i][j]<<" ";
+        }
+      }
+    }
+
+    //! The method to get return TMatrixT<float>   4 Momentum Error Matrix
+    /*! Get  TMatrixT<float>   4 Momentum and Vertex Error Matrix by reading ECLShower through ShowerId
+     * @return Matrix which from convertion from Error E, Theta, Phi of ECLShower
+    */
+    void getErrorMatrix7x7(TMatrixFSym& errorMatrix) const {
+
+      for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= i ; j++) {
+          errorMatrix[i][j] = m_errorMatrix[i][j];
+          //std::cout<<m_errorMatrix[i][j]<<" ";
+        }
+      }
+      errorMatrix[4][4] = 1.;
+      errorMatrix[5][5] = 1.;
+      errorMatrix[6][6] = 1.;
+
+      //std::cout<<std::endl;
+    }
+
+
+
+
+
 
 
   private:

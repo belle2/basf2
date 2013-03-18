@@ -52,7 +52,7 @@ public:
   void RaiseIndex(EvtVector4R& vector);            /**< Member function RaiseIndices*/
   EvtTensor4C Mmunu(const EvtVector4R& p4a, const EvtVector4R& p4b,
                     const EvtVector4R& p4c);       /**< Function Tensor Mmunu */
-  double BWBF(const double& q, const unsigned int& L);
+  double BWBF(const double& q, const unsigned int& L); /**< Meson radius  */
   double BWBF(const double& q, const double& q0,
               const unsigned int& L);              /**< Meson radius  */
   EvtComplex BreitWigner(const double& m, const double& m0,

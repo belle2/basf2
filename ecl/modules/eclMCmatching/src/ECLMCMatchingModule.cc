@@ -288,28 +288,41 @@ void ECLMCMatchingModule::event()
     if (Pi0Array) {
       for (int iPi0 = 0; iPi0 < Pi0Array.getEntries() ; iPi0++) {
         ECLPi0* aECLPi0 = Pi0Array[ iPi0 ];
-        cout << "Pi0Event" << m_nEvent << " Energy " << aECLPi0->getEnergy() << " Mass " << aECLPi0->getMass()
-             << " MassFit " << aECLPi0->getMassFit() << " Chi2 " << aECLPi0->getChi2() << endl;
-        TMatrixFSym Pi0ErrorMatrix = aECLPi0->getErrorMatrix();
-        for (int i = 0; i < 4; i++) {
-          for (int j = 0; j <= i; j++) {
-            cout << Pi0ErrorMatrix[i][j] << " ";
+        cout << "Pi0Event" << m_nEvent<<" iIndex  "<<iPi0 << " Energy " << aECLPi0->getEnergy() << " Mass " << aECLPi0->getMass()
+             << " MassFit " << aECLPi0->getMassFit() << " Chi2 " << aECLPi0->getChi2()
+             << " getPValue " << aECLPi0->getPValue() << endl;
+        TMatrixFSym Pi0ErrorMatrix(7);
+          aECLPi0-> getErrorMatrix7x7(Pi0ErrorMatrix);
+          for (int i = 0; i < 7; i++) {
+              for (int j = 0; j <= i ; j++) {
+                cout<< Pi0ErrorMatrix[i][j]<<" ";
+              }
+                cout<<endl;
           }
-          cout << endl;
-        }
-      }//for iPi0
+
       for (int iIndex = 0; iIndex < eclPi0ToGamma.getEntries() ; iIndex++) {
+       if( (int)eclPi0ToGamma[iIndex].getFromIndex()!=iPi0 ) continue;
         for (int iHit = 0; iHit < (int)eclPi0ToGamma[iIndex].getToIndices().size(); iHit++) {
 
+          ECLPi0* aECLPi0 = Pi0Array[ eclPi0ToGamma[iIndex].getFromIndex()];
           ECLGamma* aECLGamma = gammaArray[ eclPi0ToGamma[iIndex].getToIndex(iHit) ];
-          cout << "Event" << m_nEvent << " Rec Pi0 from Gamma " <<  aECLGamma->getShowerId()
+          cout << "Event" << m_nEvent << " Rec "<<eclPi0ToGamma[iIndex].getFromIndex()<<"Pi0 Energy "<<  aECLPi0->getEnergy()
+               << " from Gamma " <<  aECLGamma->getShowerId()
                << " Energy " <<  aECLGamma->getEnergy()
                << " Px " <<  aECLGamma->getPx()
                << " Py " <<  aECLGamma->getPy()
                << " Pz " <<  aECLGamma->getPz()
                << endl;
 
-
+          TMatrixFSym GammaErrorMatrix(7);
+          aECLGamma-> getErrorMatrix7x7(GammaErrorMatrix);
+          for (int i = 0; i < 7; i++) {
+              for (int j = 0; j <= i ; j++) {
+                cout<< GammaErrorMatrix[i][j]<<" ";
+              }
+                cout<<endl;
+          }
+      }//for iPi0
         }//for the shower to reconstruct gamma
       }//for all Pi0ToGamma relation
     }//if pi0Array exit

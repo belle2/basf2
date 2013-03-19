@@ -98,7 +98,6 @@ KKGenInputModule::KKGenInputModule() : Module()
   addParam("tauinputFile", m_tauinputFileName, "user-defined tau/mu-pairs generation setting", default_tauinputFileName);
   addParam("taudecaytableFile", m_taudecaytableFileName, "tau-decay-table file name", default_taudecaytableFileName);
   addParam("evtpdlfilename", m_EvtPDLFileName, "EvtPDL filename", default_evtpdlfilename);
-  addParam("boost2LAB", m_boost2LAB, "Boolean to indicate whether the particles should be boosted to LAB frame", true);
   addParam("HER_Energy", m_EHER, "Energy for HER[GeV]", 7 * Unit::GeV);
   addParam("LER_Energy", m_ELER, "Energy for LER[GeV]", 4 * Unit::GeV);
   addParam("HER_Spread", m_HER_Espread, "Energy spread for HER[GeV]", 0.00513 * Unit::GeV);

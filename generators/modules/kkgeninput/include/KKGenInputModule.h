@@ -49,17 +49,16 @@ namespace Belle2 {
 
     MCParticleGraph mpg;        /**< An instance of the MCParticle graph. */
     KKGenInterface m_Ikkgen;  /**< An instance of the KK2f MC Interface. */
-    std::string m_KKdefaultFileName;
-    std::string m_tauinputFileName;
-    std::string m_taudecaytableFileName;
-    std::string m_EvtPDLFileName;
-    bool m_boost2LAB;
-    double m_EHER;
-    double m_ELER;
-    double m_HER_Espread;
-    double m_LER_Espread;
-    double m_crossing_angle;
-    double m_angle;
+    std::string m_KKdefaultFileName; /**<  KKMC default setting file.  */
+    std::string m_tauinputFileName; /**<  KKMC setting file for generating fermions.  */
+    std::string m_taudecaytableFileName; /**<  tau decay tables in PYTHIA6 manner.  */
+    std::string m_EvtPDLFileName; /**<  pdl file.  */
+    double m_EHER; /**< Energy for HER [GeV]. */
+    double m_ELER; /**< Energy for LER [GeV]. */
+    double m_HER_Espread; /**< Energy spread for HER [GeV]. */
+    double m_LER_Espread; /**< Energy spread for LER [GeV]. */
+    double m_crossing_angle; /**< Beam pipe crossing angle [rad]. */
+    double m_angle;  /**< Rotation with respect to e- beampie [rad]. */
 
   };
 

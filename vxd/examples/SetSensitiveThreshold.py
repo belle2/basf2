@@ -25,7 +25,6 @@ class SetVXDSensitiveThreshold(Module):
         """Initialize the module"""
 
         super(SetVXDSensitiveThreshold, self).__init__()
-        self.setName('SetVXDSensitiveThreshold')
         ## The threshold value to be set.
         self.threshold = threshold
         ## The current pxd threshold value.

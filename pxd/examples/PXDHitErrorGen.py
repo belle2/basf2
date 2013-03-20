@@ -21,7 +21,6 @@ class PXDHitErrors(Module):
         """Initialize the module"""
 
         super(PXDHitErrors, self).__init__()
-        self.setName('PXDHitErrors')
         ## Name of the input file.
         self.filename = ''
         if len(sys.argv) > 1:

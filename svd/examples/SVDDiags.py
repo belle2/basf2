@@ -20,7 +20,6 @@ class Clusters2Truehits(Module):
         """Initialize the module"""
 
         super(Clusters2Truehits, self).__init__()
-        self.setName('Clusters2Truehits')
 
     def beginRun(self):
         """ Set up the relation array. """

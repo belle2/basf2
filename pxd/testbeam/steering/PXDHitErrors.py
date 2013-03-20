@@ -18,7 +18,6 @@ class PXDHitErrors(Module):
         """Initialize the module"""
 
         super(PXDHitErrors, self).__init__()
-        self.setName('PXDHitErrors')
         ## Input file object.
         self.file = open('PXDHitErrorOutput.txt', 'w')
         ## Factors for decoding VXDIds

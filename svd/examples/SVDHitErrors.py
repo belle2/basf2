@@ -18,7 +18,6 @@ class SVDHitErrors(Module):
         """Initialize the module"""
 
         super(SVDHitErrors, self).__init__()
-        self.setName('SVDHitErrors')
         ## Input file object.
         self.file = open('SVDHitErrorOutput.txt', 'w')
         ## Factors for decoding VXDId's

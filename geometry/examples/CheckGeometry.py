@@ -8,6 +8,8 @@
 
 from basf2 import *
 
+evtmeta = register_module('EvtMetaGen')
+
 # Geometry parameter loader
 gearbox = register_module('Gearbox')
 
@@ -21,6 +23,7 @@ overlapchecker = register_module('OverlapChecker')
 main = create_path()
 
 # Add modules to main path
+main.add_module(evtmeta)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(overlapchecker)

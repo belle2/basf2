@@ -15,8 +15,10 @@
 #include <framework/datastore/RelationArray.h>
 
 #include <GFTrack.h>
-#include <GFTrackCand.h>
-#include <tracking/dataobjects/ExtRecoHit.h>
+#include <tracking/dataobjects/ExtHit.h>
+#include <framework/datastore/RelationIndex.h>
+#include <boost/foreach.hpp>
+#include <G4ParticleTable.hh>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
@@ -41,15 +43,6 @@ ECLGammaReconstructorModule::ECLGammaReconstructorModule() : Module()
   //Set module properties
   setDescription("Creates ECLGamma from ECLShower.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
-
-
-//  addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the reconstructed tracks", string(""));
-//  addParam("ExtTrackCandsColName", m_extTrackCandsColName, "Name of collection holding the list of hits from each extrapolation", string(""));
-//  addParam("ExtRecoHitsColName", m_extRecoHitsColName, "Name of collection holding the RecoHits from the extrapolation", string(""));
-
-  addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the reconstructed tracks", string("GFTracks"));
-  addParam("ExtTrackCandsColName", m_extTrackCandsColName, "Name of collection holding the list of hits from each extrapolation", string("ExtTrackCands"));
-  addParam("ExtRecoHitsColName", m_extRecoHitsColName, "Name of collection holding the RecoHits from the extrapolation", string("ExtRecoHits"));
 
   addParam("gammaEnergyCut", m_ecut, "gamma enegy threshold ", 0.02);
   addParam("gammaE9o25Cut", m_e925cut, "gamma E9o25 threshold ", 0.75);
@@ -148,28 +141,27 @@ void ECLGammaReconstructorModule::event()
       new(gammaArray.nextFreeAddress()) ECLGamma();
       m_GNum = gammaArray.getEntries() - 1;
       gammaArray[m_GNum]->setShowerId(m_showerId);
-
-
-
       eclGammaToShower.add(m_GNum, iShower);
 
       /*
-            double px = m_energy * sin(m_theta) * cos(m_phi);
-            double py = m_energy * sin(m_theta) * sin(m_phi);
-            double pz = m_energy * cos(m_theta);
+                  double px = m_energy * sin(m_theta) * cos(m_phi);
+                  double py = m_energy * sin(m_theta) * sin(m_phi);
+                  double pz = m_energy * cos(m_theta);
 
-                  cout << "EventGamma  " << m_nEvent << " Gamma " << m_showerId << " " << sqrt(px * px + py * py + pz * pz) << " m_extMatch  " << m_extMatch << endl;
-                                          cout<<"CellID ";
+            cout << "EventGamma  " << m_nEvent << " Gamma " << m_showerId <<
+                    " " << sqrt(px * px + py * py + pz * pz) << " m_extMatch  " << m_extMatch << endl;
+                                                cout<<"CellID ";
 
-                                         for (int iHA = 0; iHA < hANum; iHA++) {
+            for (int iHA = 0; iHA < hANum; iHA++) {
 
-                                           ECLHitAssignment* aECLShower = eclHitAssignmentArray[iHA];
-                                           int m_HAShowerId = aECLShower->getShowerId();
-                                           int m_HAcellId = aECLShower->getCellId();
-                                           if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
-                                         }//for HA hANum
-                                          cout<<endl;
-                               */
+              ECLHitAssignment* aECLShower = eclHitAssignmentArray[iHA];
+              int m_HAShowerId = aECLShower->getShowerId();
+              int m_HAcellId = aECLShower->getCellId();
+              if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
+            }//for HA hANum
+             cout<<endl;
+
+      */
     }//if !m_extMatch
 
 
@@ -211,35 +203,27 @@ void ECLGammaReconstructorModule::readExtrapolate()
     m_TrackCellId[i] = false ;
   }
 
-  StoreArray<GFTrack> gfTracks(m_gfTracksColName);
-  StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName);
-  StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName);
+  StoreArray<GFTrack> gfTracks;
+  StoreArray<ExtHit> extHits;
+  RelationIndex<GFTrack, ExtHit> gfTracksToExtHits(gfTracks, extHits);
 
-  if (extTrackCands) {
+  if (extHits) {
+    ExtDetectorID myDetID = EXT_ECL; // ECL in this example
+    int pdgCodePiP = G4ParticleTable::GetParticleTable()->FindParticle("pi+")->GetPDGEncoding();
+    int pdgCodePiM = G4ParticleTable::GetParticleTable()->FindParticle("pi-")->GetPDGEncoding();
 
-    int myDetID = 5; // ECL in this example
-//  cout<<"GFTrack  "<<gfTracks.getEntries()<<endl;
+    typedef RelationIndex<GFTrack, ExtHit>::Element relElement_t;
     for (int t = 0; t < gfTracks.getEntries(); ++t) {
-//GFTrack* track = gfTracks[i];
-//for ( int hypothesis = 0; hypothesis < 5; ++hypothesis ) {
-      int hypothesis = 0;
-      GFTrackCand* cand = extTrackCands[t * 5 + hypothesis];
-//    cout<<"GFTrackCand  "<<cand->getNHits()<<endl;
-      for (unsigned int j = 0; j < cand->getNHits(); ++j) {
-        int detID;
-        int hitID;
-        int planeID;
-        cand->getHitWithPlane(j, detID, hitID, planeID);
-        if ((detID != myDetID) || (planeID == 0)) continue;
-        //cout<<" Ext CellId "<<planeID<<" ";
-        m_TrackCellId[planeID] = 1;
+      BOOST_FOREACH(const relElement_t & rel, gfTracksToExtHits.getElementsFrom(gfTracks[t])) {
+        const ExtHit* extHit = rel.to;
+        if (extHit->getPdgCode() != pdgCodePiP && extHit->getPdgCode() != pdgCodePiM) continue;
+        if ((extHit->getDetectorID() != myDetID) || (extHit->getCopyID() == 0)) continue;
+        m_TrackCellId[extHit->getCopyID()] = 1;
+        //cout<<"cell ID"<<extHit->getCopyID()<<"  "<<extHit->getPdgCode() <<endl;
       }//for cands
-      //cout<<endl;
-//}//for 5 hypothesis
     }//gfTracks.getEntries()
 
   }//if extTrackCands
-
 }
 
 

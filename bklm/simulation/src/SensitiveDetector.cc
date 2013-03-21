@@ -73,6 +73,7 @@ namespace Belle2 {
         m_HitTimeMax = simPar->getHitTimeMax();
         m_DoBackgroundStudy = simPar->getDoBackgroundStudy();
         if (!gRandom) B2FATAL("BKLM SensitiveDetector: gRandom is not initialized; please set up gRandom first");
+        //std::cout << "BKLMSensitiveDetector::step() First Call  m_DoBackgroundStudy=" << m_DoBackgroundStudy << "  simPar->getDoBackgroundStudy()=" << simPar->getDoBackgroundStudy() << "  neutronPID=" << m_NeutronPID << std::endl;
       }
       StoreArray<BKLMSimHit> simHits;
       if (!simHits.isValid()) simHits.create();
@@ -92,6 +93,7 @@ namespace Belle2 {
       G4Track*     track      = step->GetTrack();
       int          primaryPID = track->GetDefinition()->GetPDGEncoding();
 
+      //std::cout << "BKLMSensitiveDetector::step()  deltaE=" << deltaE << "  charge=" << postStep->GetCharge() << "  m_DoBackgroundStudy=" << m_DoBackgroundStudy << "  primaryPID=" << primaryPID << "  neutronPID=" << m_NeutronPID << std::endl;
       // Record a step for a charged track that deposits some energy.
       // Background study: Record every neutron passage, whether it deposits energy or not.
       if (((deltaE > 0.0) && (postStep->GetCharge() != 0.0)) ||
@@ -123,17 +125,20 @@ namespace Belle2 {
           int zStripMax = -1;
           convertHitToRPCStrips(position, isForward, sector, layer, phiStripMin, phiStripMax, zStripMin, zStripMax);
           if (phiStripMin >= 0) {
+            //std::cout << "BKLMSimulation:  de=" << deltaE << "  time=" << time << "  position=(" << position.x() << "," << position.y() << "," << position.z() << ")  isForward=" << isForward << "  sector=" << sector << "  layer=" << layer << "  plane=" << plane << "  phiStrips=" << phiStripMin << "-" << phiStripMax << std::endl;
             new(simHits.nextFreeAddress())
             BKLMSimHit(position, time, deltaE, KE, status, isForward, sector, layer, plane, true, phiStripMin, phiStripMax);
             particleToSimHits.add(track->GetTrackID(), simHits.getEntries() - 1);
           }
           if (zStripMin >= 0) {
+            //std::cout << "BKLMSimulation:  de=" << deltaE << "  time=" << time << "  position=(" << position.x() << "," << position.y() << "," << position.z() << ")  isForward=" << isForward << "  sector=" << sector << "  layer=" << layer << "  plane=" << plane << "  zStrips=" << zStripMin << "-" << zStripMax << std::endl;
             new(simHits.nextFreeAddress())
             BKLMSimHit(position, time, deltaE, KE, status, isForward, sector, layer, plane, false, zStripMin, zStripMax);
             particleToSimHits.add(track->GetTrackID(), simHits.getEntries() - 1);
           }
         } else {
-          int strip = boost::lexical_cast<int>(volumeName.substr(12, 2));
+          //int strip = boost::lexical_cast<int>(volumeName.substr(12, 2));
+          int strip = 0;  // *DIVOT*
           if (plane == PLANE_INNER) {
             new(simHits.nextFreeAddress())
             BKLMSimHit(position, time, deltaE, KE, status, isForward, sector, layer, plane, true, strip, strip);

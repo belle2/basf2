@@ -32,9 +32,6 @@
 namespace Belle2 {
 
   //! Store one BKLM strip hit as a ROOT object
-  /*! Per ROOT TObject convention, all data elements are public so that
-      they can be seen in a ROOT browser.
-  */
   class BKLMDigit : public RelationsObject {
 
   public:
@@ -99,6 +96,8 @@ namespace Belle2 {
     //! sets energy (MeV)
     void setEnergy(double energy) { m_Energy = energy; }
 
+  private:
+
     //! status word
     unsigned int m_Status;
 
@@ -125,8 +124,6 @@ namespace Belle2 {
 
     //! Needed to make the ROOT object storable
     ClassDef(BKLMDigit, 1)
-
-  private:
 
   };
 

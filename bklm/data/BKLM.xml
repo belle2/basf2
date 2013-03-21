@@ -37,7 +37,7 @@
       <Layer layer="1">
         <GapNominalHeight unit="cm">4.1</GapNominalHeight>
         <GapIronWidth unit="cm">7.94</GapIronWidth>
-        <HasRPCs desc="Flag to construct layer with RPCs or scintillators">1</HasRPCs>
+        <HasRPCs desc="Flag to construct layer with RPCs or scintillators">0</HasRPCs>
         <PhiStrips>
           <NStrips>36</NStrips>
           <Width unit="cm">4.45</Width>
@@ -50,7 +50,7 @@
         </ZStrips>
       </Layer>
       <Layer layer="2">
-        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">0</HasRPCs>
         <PhiStrips>
           <NStrips>36</NStrips>
           <Width unit="cm">4.69</Width>

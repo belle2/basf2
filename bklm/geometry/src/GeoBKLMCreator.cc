@@ -773,10 +773,63 @@ namespace Belle2 {
                        );
     }
 
-    //void GeoBKLMCreator::putScintModuleInGap(G4LogicalVolume* gapLogical, int fb, int sector, int layer, bool hasChimney)
-    void GeoBKLMCreator::putScintModuleInGap(G4LogicalVolume*, int, int, int, bool)
+    void GeoBKLMCreator::putScintModuleInGap(G4LogicalVolume* gapLogical, int fb, int sector, int layer, bool hasChimney)
     {
-      // stub
+      char name[40];
+      char fbname = (fb == BKLM_FORWARD) ? 'F' : 'B';
+      // Module is aluminum (but interior will be filled)
+      sprintf(name, "BKLM.Layer%02dModuleBox", layer);
+      const Hep3Vector gapHalfSize = m_GeoPar->getGapHalfSize(layer, hasChimney) * cm;
+      const Hep3Vector moduleHalfSize = m_GeoPar->getModuleHalfSize(layer, hasChimney) * cm;
+      double dx = (m_GeoPar->getModuleMiddleRadius(layer) - m_GeoPar->getGapMiddleRadius(layer)) * cm;
+      double dz = moduleHalfSize.z() - gapHalfSize.z();
+      G4Box* moduleBox =
+        new G4Box(name,
+                  moduleHalfSize.x(), moduleHalfSize.y(), moduleHalfSize.z()
+                 );
+      sprintf(name, "BKLM.Layer%02dModuleLogical", layer);
+      G4LogicalVolume* moduleLogical =
+        new G4LogicalVolume(moduleBox,
+                            Materials::get("G4_Al"),
+                            name
+                           );
+      moduleLogical->SetVisAttributes(G4VisAttributes(false));
+      // Place polystyrene inside aluminum frame  *DIVOT*
+      sprintf(name, "BKLM.Layer%02dPolystyreneBox", layer);
+      const Hep3Vector scintHalfSize = m_GeoPar->getReadoutHalfSize(layer, hasChimney) * cm;
+      G4Box* scintBox =
+        new G4Box(name,
+                  scintHalfSize.x(), scintHalfSize.y(), scintHalfSize.z()
+                 );
+      sprintf(name, "BKLM.Layer%02dPolystyreneLogical", layer);
+      G4LogicalVolume* scintLogical =
+        new G4LogicalVolume(scintBox,
+                            Materials::get("G4_POLYSTYRENE"),
+                            name,
+                            0, // use global field manager
+                            m_sensitive, // this is the only sensitive volume in BKLM
+                            0 // no user limits
+                           );
+      scintLogical->SetVisAttributes(G4VisAttributes(true, G4Colour(1.0, 0.5, 0.0)));
+      // Place polystyrene inside module  *DIVOT*
+      sprintf(name, "BKLM.Sci_%c_%d_%02d_Inner", fbname, sector, layer);
+      new G4PVPlacement(G4TranslateZ3D(0.0),
+                        scintLogical,
+                        name,
+                        moduleLogical,
+                        false,
+                        0,
+                        m_GeoPar->doOverlapCheck()
+                       );
+      sprintf(name, "BKLM.Layer%02dModulePhysical", layer);
+      new G4PVPlacement(G4Translate3D(dx, 0.0, dz),
+                        moduleLogical,
+                        name,
+                        gapLogical,
+                        false,
+                        0,
+                        m_GeoPar->doOverlapCheck()
+                       );
     }
 
     G4Tubs* GeoBKLMCreator::solenoidCutout(void)

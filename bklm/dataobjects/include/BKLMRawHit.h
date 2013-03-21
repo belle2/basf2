@@ -16,10 +16,6 @@
 namespace Belle2 {
 
   //! Store one BKLM strip hit as a ROOT object
-  /*! Per ROOT TObject convention, all data elements are public so that
-      they can be seen in a ROOT browser.
-  */
-
   class BKLMRawHit : public RelationsObject {
 
   public:
@@ -72,6 +68,8 @@ namespace Belle2 {
     //! sets FEE time and pulse height of the hit (in hardware units)
     void setTDCADC(int tdc, int adc) { m_TDC = tdc; m_ADC = adc; }
 
+  private:
+
     //! status word
     unsigned int m_Status;
 
@@ -92,8 +90,6 @@ namespace Belle2 {
 
     //! Needed to make the ROOT object storable
     ClassDef(BKLMRawHit, 1)
-
-  private:
 
   };
 

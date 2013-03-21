@@ -18,9 +18,6 @@
 namespace Belle2 {
 
   //! Store one BKLM strip hit as a ROOT object
-  /*! Per ROOT TObject convention, all data elements are public so that
-      they can be seen in a ROOT browser.
-  */
   class BKLMHit2d : public RelationsObject {
 
   public:
@@ -88,6 +85,8 @@ namespace Belle2 {
     //! sets pulse height
     void setEnergy(double energy) { m_Energy = energy; }
 
+  private:
+
     //! status word
     int m_Status;
 
@@ -117,8 +116,6 @@ namespace Belle2 {
 
     //! Needed to make the ROOT object storable
     ClassDef(BKLMHit2d, 1)
-
-  private:
 
   };
 

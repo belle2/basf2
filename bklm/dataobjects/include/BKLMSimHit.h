@@ -17,9 +17,6 @@
 namespace Belle2 {
 
   //! Store one simulation hit as a ROOT object
-  /*! Per ROOT TObject convention, all data elements are public so that
-      they can be seen in a ROOT browser.
-  */
   class BKLMSimHit : public RelationsObject {
 
   public:
@@ -72,6 +69,8 @@ namespace Belle2 {
     //! returns highest readout strip number of this hit
     int getStripMax() const { return m_StripMax; }
 
+  private:
+
     //! global-coordinates hit position (cm)
     TVector3 m_Position;
 
@@ -110,8 +109,6 @@ namespace Belle2 {
 
     //! Needed to make the ROOT object storable
     ClassDef(BKLMSimHit, 1);
-
-  private:
 
   };
 

@@ -52,8 +52,8 @@ RootInputModule::RootInputModule() : Module()
 
   addParam("eventNumber", m_counterNumber[0], "Skip this number of events before starting.", 0);
 
-  addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of branches to be read into event map. Empty means all branches.", emptyvector);
-  addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of branches to be read into persistent map. Empty means all branches.", emptyvector);
+  addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of branches to be read into event map. Empty means all branches. (EventMetaData is always read)", emptyvector);
+  addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of branches to be read into persistent map. Empty means all branches. (FileMetaData is always read)", emptyvector);
 
   addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0], "Names of branches NOT to be read into event map. Takes precedence over branchNames.", emptyvector);
   addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of branches NOT to be read into persistent map. Takes precedence over branchNamesPersistent.", emptyvector);
@@ -112,7 +112,7 @@ void RootInputModule::initialize()
     m_tree[ii] = new TChain(c_treeNames[ii].c_str());
     for (unsigned int iFile = 0; iFile < m_inputFileNames.size(); iFile++) {
       m_tree[ii]->Add(m_inputFileNames[iFile].c_str());
-      B2INFO("Added file " + m_inputFileNames[iFile]);
+      B2INFO(c_treeNames[ii] << ": Added file " + m_inputFileNames[iFile]);
     }
     B2INFO("Opened tree '" + c_treeNames[ii] + "' with " + m_tree[ii]->GetEntries() << " entries.");
 
@@ -213,12 +213,13 @@ void RootInputModule::readTree(DataStore::EDurability durability)
 {
   if (!m_tree[durability])
     return;
-
   // Check if there are still new entries available.
+  if (m_counterNumber[durability] >= m_tree[durability]->GetEntriesFast())
+    return;
   B2DEBUG(200, "Reading file entry for durability " << durability)
-  if (m_counterNumber[durability] >= m_tree[durability]->GetEntriesFast()) return;
 
-  for (unsigned int i = 0; i < m_entries[durability].size(); i++) {
+  const unsigned int numEntries = m_entries[durability].size();
+  for (unsigned int i = 0; i < numEntries; i++) {
     //Make sure transient members of objects are reinitialised
     DataStore::StoreEntry* entry = m_entries[durability][i];
     if (!entry->isArray) {
@@ -227,7 +228,7 @@ void RootInputModule::readTree(DataStore::EDurability durability)
     }
   }
   m_tree[durability]->GetEntry(m_counterNumber[durability]);
-  for (unsigned int i = 0; i < m_entries[durability].size(); i++) {
+  for (unsigned int i = 0; i < numEntries; i++) {
     DataStore::StoreEntry* entry = m_entries[durability][i];
     entry->ptr = entry->object;
   }

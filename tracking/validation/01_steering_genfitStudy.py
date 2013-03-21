@@ -183,7 +183,6 @@ mctrackfinder.param('UseCDCHits', cdc)
 # fitting
 fitter = register_module('GenFitter')
 param_fitter = {
-    'TracksColName': 'Tracks_MCTrack',
     'StoreFailedTracks': True,
     'FilterId': FilterId,
     'NIterations': 1,

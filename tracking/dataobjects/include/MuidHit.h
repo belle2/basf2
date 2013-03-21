@@ -17,10 +17,6 @@
 namespace Belle2 {
 
   //! Store one muon-identification hit in the KLM as a ROOT object.
-  /*! Per ROOT TObject convention, all data elements are public so that
-      they can be seen in a ROOT browser.
-  */
-
   class MuidHit : public RelationsObject {
 
   public:
@@ -29,10 +25,13 @@ namespace Belle2 {
     MuidHit();
 
     //! Constructor with initial values used by Muid module
-    MuidHit(bool, bool, int, int, const TVector3&, const TVector3&, double, double, double);
+    MuidHit(int, bool, bool, int, int, const TVector3&, const TVector3&, double, double, double);
 
     //! Destructor
     virtual ~MuidHit() {}
+
+    //! returns the PDG particleID hypothesis used in this extrapolation
+    int getPdgCode() const { return m_PdgCode; }
 
     //! returns position of the extrapolated point (cm) in global coordinates
     TVector3 getExtPosition() const { return m_ExtPosition; }
@@ -60,6 +59,11 @@ namespace Belle2 {
 
     //! returns chi-squared contribution for extrapolation point and KLM hit
     double getChiSquared() const { return m_ChiSquared; }
+
+  private:
+
+    //! PDG particleID code for the hypothesis used in this extrapolation
+    int m_PdgCode;
 
     //! position of the extrapolated point (cm) in global coordinates
     TVector3 m_ExtPosition;
@@ -90,8 +94,6 @@ namespace Belle2 {
 
     //! Needed to make the ROOT object storable
     ClassDef(MuidHit, 1)
-
-  private:
 
   };
 

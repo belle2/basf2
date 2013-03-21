@@ -13,7 +13,8 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/ExtRecoHit.h>
+#include <framework/datastore/RelationArray.h>
+#include <tracking/dataobjects/ExtHit.h>
 #include <bklm/geometry/GeometryPar.h>
 #include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Matrix/SymMatrix.h>
@@ -43,8 +44,13 @@ class GFTrackCand;
 #define CROSSED 2
 #define SIDE 3
 
+#define kRange 16
+#define kRchisq 50
+
 namespace Belle2 {
 
+  class Muid;
+  class MuidHit;
   class BKLMHit2d;
   class EKLMHit2d;
 
@@ -128,20 +134,17 @@ namespace Belle2 {
     //! Name of the GFTrack collection of the reconstructed tracks to be extrapolated
     std::string m_gfTracksColName;
 
-    //! Name of the GFTrackCand collection, each holding the list of hits for a particular track and hypothesis
-    std::string m_extTrackCandsColName;
-
-    //! Name of the extRecoHit collection of the extrapolation hits
-    std::string m_extRecoHitsColName;
-
     //! Name of the muid collection of the muon identification information
-    std::string m_muidColName;
+    std::string m_muidsColName;
+
+    //! Name of the muidHit collection of the extrapolation hits
+    std::string m_muidHitsColName;
 
     //! Name of the BKLM 2D hits collection
-    std::string m_bklm2DHitsColName;
+    std::string m_bklmHitsColName;
 
     //! Name of the EKLM 2D hits collection
-    std::string m_eklm2DHitsColName;
+    std::string m_eklmHitsColName;
 
   private:
 
@@ -150,19 +153,16 @@ namespace Belle2 {
     void registerVolumes();
 
     //! Get the physical volume information for a geant4 physical volume
-    void getVolumeID(const G4TouchableHandle&, int&, int&);
+    void getVolumeID(const G4TouchableHandle&, ExtDetectorID&, int&);
 
     //! Convert the geant4e covariance to phasespacePoint 6x6 covariance
     TMatrixD getCov(const G4ErrorFreeTrajState*);
 
-    //! Define a new track candidate for one reconstructed track and PDG hypothesis
-    GFTrackCand* addTrackCand(const GFTrack*, int, StoreArray<GFTrackCand>&, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);
+    //! Get the starting phase-space point and covariance for one reconstructed track and PDG hypothesis
+    void getStartPoint(const GFTrack*, int, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);
 
-    //! Add the first point for a new track candidate
-    void addFirstPoint(const G4ErrorFreeTrajState*, GFTrackCand*, StoreArray<ExtRecoHit>&);
-
-    //! Add another point for a new track candidate
-    void addPoint(G4ErrorFreeTrajState*, ExtHitStatus, GFTrackCand*, StoreArray<ExtRecoHit>&);
+    //! Add an extrapolation point for the track
+    bool createHit(G4ErrorFreeTrajState*, int, int, StoreArray<MuidHit>&, RelationArray&, StoreArray<BKLMHit2d>&, StoreArray<EKLMHit2d>&);
 
     //! Find the intersection point of the track with the crossed BKLM plane
     void findBarrelIntersection(TVector3&, TVector3&, Point&);
@@ -170,21 +170,22 @@ namespace Belle2 {
     //! Find the intersection point of the track with the crossed EKLM plane
     void findEndcapIntersection(TVector3&, TVector3&, Point&);
 
-    //! Find the matching BKLM or EKLM 2D hit nearest the intersection point
+    //! Find the matching BKLM 2D hit nearest the intersection point
+    //! of the track with the crossed BKLM plane
+    void findMatchingBarrelHit(Point&, StoreArray<BKLMHit2d>&);
+
+    //! Find the matching EKLM 2D hit nearest the intersection point
     //! of the track with the crossed EKLM plane
-    void findMatchingHit(Point&);
+    void findMatchingEndcapHit(Point&, StoreArray<EKLMHit2d>&);
 
-    //! Nudge the track using the matching BKLM 2D hit
-    void adjustIntersectionUsingBKLMHit(Point&, BKLMHit2d*);
-
-    //! Nudge the track using the matching EKLM 2D hit
-    void adjustIntersectionUsingEKLMHit(Point&, EKLMHit2d*);
+    //! Nudge the track using the matching hit
+    void adjustIntersection(Point&, double*, TVector3&);
 
     //! Get the in-plane error covariance
     double getPlaneError(CLHEP::HepSymMatrix&, TVector3, TVector3);
 
     //! Complete muon identification after end of track extrapolation
-    void finishTrack(G4ErrorFreeTrajState*);
+    void finishTrack(Muid*);
 
     //! Convert GEANT4 physical volume name in BKLM/EKLM to an Address
     void getAddress(const G4String&, Address&);
@@ -194,6 +195,21 @@ namespace Belle2 {
 
     //! Convert phase-space covariance to GEANT4e covariance
     void fromPhasespaceToG4e(Point&, G4ErrorTrajErr&);
+
+    //! Fill PDF tables
+    void fillPDF(int);
+
+    //! Calculate spline-interpolation coefficients
+    void spline(int, double, double*, double*, double*, double*);
+
+    //! Extract PDF value
+    double getPDF(int, int, int, int, double) const;
+
+    //! Extract PDF value for range difference
+    double getPDFRange(int, int, int, int) const;
+
+    //! Extract PDF value for transverse reduced chi-squared
+    double getPDFRchisq(int, int, int, double) const;
 
     //! Pointer to the ExtManager singleton
     ExtManager* m_extMgr;
@@ -207,8 +223,8 @@ namespace Belle2 {
     //! Pointer to the simulation's SteppingAction (if any)
     G4UserSteppingAction* m_stp;
 
-    //! PDG code for the muon hypotheses
-    int m_pdg;
+    //! PDG code for the particle-ID hypotheses
+    std::vector<int> m_pdgCode;
 
     // Pointers to geant4 physical volumes whose entry/exit points will be saved
     std::vector<G4VPhysicalVolume*>* m_enter;
@@ -264,6 +280,22 @@ namespace Belle2 {
     int m_numBarrelLayerHit;
     int m_numEndcapLayerExt;
     int m_numEndcapLayerHit;
+
+    // Overflow value of reduced chi-squared
+
+    double kRchisqMax;
+
+    // Probability density arrays for range and reduced chi**2.
+    // One extra bin in chi-squared distribution for overflows.
+    // For reduced chi-squared, three extra arrays are stored for spline
+    // interpolation to eliminate binning artifacts.
+
+    double fRange[3][4][15][kRange];
+    double fRchisq[3][4][kRchisq + 1];    // reduced chi-squared values
+    double fRchisqD1[3][4][kRchisq + 1];  // first derivatives
+    double fRchisqD2[3][4][kRchisq + 1];  // second derivatives
+    double fRchisqD3[3][4][kRchisq + 1];  // third derivatives
+    double fRchisqN[3][4][15];            // non-overflow normalizations
 
   };
 

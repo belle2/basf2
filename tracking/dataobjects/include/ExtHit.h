@@ -21,9 +21,6 @@ namespace Belle2 {
   enum ExtDetectorID { EXT_UNKNOWN = -1, EXT_PXD, EXT_SVD, EXT_CDC, EXT_TOP, EXT_ARICH, EXT_ECL, EXT_BKLM, EXT_EKLM };
 
   //! Store one Ext hit as a ROOT object
-  /*! Per ROOT TObject convention, all data elements are public so that
-      they can be seen in a ROOT browser.
-  */
   class ExtHit : public RelationsObject {
 
   public:
@@ -64,6 +61,8 @@ namespace Belle2 {
     //! returns phase-space covariance (6x6, position--momentum) at this extrapolation hit
     TMatrixD getCovariance() const { return m_Covariance; }
 
+  private:
+
     //! PDG code
     int m_PdgCode;
 
@@ -90,8 +89,6 @@ namespace Belle2 {
 
     //! Needed to make the ROOT object storable
     ClassDef(ExtHit, 1)
-
-  private:
 
   };
 

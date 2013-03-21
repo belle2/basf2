@@ -17,16 +17,15 @@
 namespace Belle2 {
 
   //! Store the muon-identification information for an extrapolated track
-  /*! Per ROOT TObject convention, all data elements are public so that
-      they can be seen in a ROOT browser.
-  */
-
   class Muid : public RelationsObject {
 
   public:
 
     //! Empty constructor for ROOT IO (needed to make the class storable)
     Muid();
+
+    //! Constructor with parameter (pdgCode)
+    Muid(int);
 
     //! Destructor
     virtual ~Muid() {}
@@ -133,6 +132,11 @@ namespace Belle2 {
     //! assigns Matching-hit bit pattern
     void setHitLayerPattern(unsigned int pattern) { m_HitLayerPattern = pattern; }
 
+  private:
+
+    //! PDG particleID hypothesis used for this extrapolation (typically muon)
+    int m_pdgCode;
+
     //! Muon PDF value for this extrapolation
     double m_MuonPDFValue;
 
@@ -195,8 +199,6 @@ namespace Belle2 {
 
     //! Needed to make the ROOT object storable
     ClassDef(Muid, 1)
-
-  private:
 
   };
 

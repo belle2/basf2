@@ -140,6 +140,10 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(Const::proton.getParticlePDG()->Charge(), 3);
     EXPECT_EQ(Const::proton.getParticlePDG()->PdgCode(), 2212);
 
+    Const::ParticleType antiproton(-2212);
+    EXPECT_DOUBLE_EQ(antiproton.getParticlePDG()->Charge(), -3);
+    EXPECT_EQ(antiproton.getParticlePDG()->PdgCode(), -2212);
+
     EXPECT_TRUE(Const::invalidParticle.getParticlePDG() == NULL);
   }
 

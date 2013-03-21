@@ -104,8 +104,6 @@ cdcfitting = register_module('GenFitter')
 # simulated one, if you want to fit with different pdg hypothesises, just state them all in the PDGCodes list
 param_cdcfitting = {
     'GFTrackCandidatesColName': 'GFTrackCands_PatternReco',
-    'TracksColName': 'Tracks_PatternReco',
-    'GFTracksColName': 'GFTracks_PatternReco',
     'PDGCodes': [211],
     'FilterId': 1,
     'NIterations': 1,

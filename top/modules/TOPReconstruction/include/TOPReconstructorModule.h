@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Petric                                             *
+ * Contributors: Marko Petric, Marko Staric                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,22 +18,27 @@
 #include <GFTrack.h>
 #include <generators/dataobjects/MCParticle.h>
 #include "top/modules/TOPReconstruction/TOPtrack.h"
+#include <framework/gearbox/Const.h>
 
 
 namespace Belle2 {
   namespace TOP {
 
-    //! TOP reconstruction module.
-    /*!
-    */
+    /**
+     * TOP reconstruction module.
+     */
     class TOPReconstructorModule : public Module {
 
     public:
 
-      //! Constructor.
+      /**
+       * Constructor
+       */
       TOPReconstructorModule();
 
-      //! Destructor.
+      /**
+       * Destructor
+       */
       virtual ~TOPReconstructorModule();
 
       /**
@@ -71,50 +76,73 @@ namespace Belle2 {
       virtual void terminate();
 
       /**
-       *Prints module parameters.
+       * Prints module parameters.
        */
       void printModuleParams() const;
 
     private:
 
-      //! Module parameters
-      std::string m_gfTracksColName;      /**< GF tracks (input) */
-      std::string m_extTrackCandsColName; /**< Ext track candidates (input) */
-      std::string m_extRecoHitsColName;   /**< Ext reconstructed hits (input) */
-      std::string m_topDigitColName;      /**< Digitized data (input) */
-      std::string m_topLogLColName;       /**< TOP log likelihoods (output) */
-      std::string m_barHitColName;      /**< MC particle hit (to set relation to) */
-      int m_debugLevel; /**< debug level */
-      double m_minBkgPerQbar;  /**< minimal assumed background photons per bar */
-      double m_ScaleN0;  /**< scale factor for N0 */
+      // Enumerators
 
-      //! Geometry parameters object
-      TOPGeometryPar* m_topgp;
+      /**
+       * Label tags
+       */
+      enum {c_LTrack = 0, c_LextHit, c_LbarHit};
 
-      //! space for TOP bars including wedges
-      double m_R1; /**< inner radius */
-      double m_R2; /**< outer radius */
-      double m_Z1; /**< backward z */
-      double m_Z2; /**< forward z */
+      // Private methods
 
-      //! Masses of particle hypotheses
-      enum {Nhyp = 5};        /**< number of hypotheses */
-      double m_Masses[Nhyp];  /**< particle masses */
-
-      //! TOP configure function
+      /**
+       * Configure TOP geometry for reconstruction
+       */
       void TOPconfigure();
 
-      //! Label tags
-      enum {LgfTrack = 0, LextTrackCand, LextHit, LbarHit};
-
-      //! MC particle associated with GF track
+      /**
+       * Return MC particle associated with GFTrack
+       * @param track pointer to GFTrack
+       * @return pointer to MCParticle or NULL
+       */
       const MCParticle* getMCParticle(const GFTrack* track);
 
-      //! index of TOPBarHit of a given MC patricle or -1
+      /**
+       * Return index of TOPBarHit of a given MC patricle or -1
+       * @param particle pointer to MCParticle
+       * @return index of TOPBarHit or -1
+       */
       int getTOPBarHitIndex(const MCParticle* particle);
 
-      //! get extrapolated tracks
-      void getTracks(std::vector<TOPtrack> & tracks, int hypothesis);
+      /**
+       * Return extrapolated tracks
+       * @param tracks vector of TOPtracks to return
+       * @param chargedStable particle hypothesis used for extrapolation
+       */
+      void getTracks(std::vector<TOPtrack> & tracks, Const::ChargedStable chargedStable);
+
+      // Module parameters
+
+      std::string m_gfTracksColName;      /**< GF tracks (input) */
+      std::string m_extHitsColName;       /**< Ext reconstructed hits (input) */
+      std::string m_topDigitColName;      /**< Digitized data (input) */
+      std::string m_topLogLColName;       /**< TOP log likelihoods (output) */
+      std::string m_barHitColName;        /**< MC particle hit (to set relation to) */
+      int m_debugLevel;                   /**< debug level */
+      double m_minBkgPerQbar;       /**< minimal assumed background photons per bar */
+      double m_ScaleN0;             /**< scale factor for N0 */
+
+      // Geometry parameters
+
+      TOPGeometryPar* m_topgp;
+
+      // space for TOP bars including wedges
+
+      double m_R1;   /**< inner radius */
+      double m_R2;   /**< outer radius */
+      double m_Z1;   /**< backward z */
+      double m_Z2;   /**< forward z */
+
+      // Masses of particle hypotheses
+
+      enum {c_Nhyp = 5};        /**< number of hypotheses */
+      double m_Masses[c_Nhyp];  /**< particle masses */
 
     };
 

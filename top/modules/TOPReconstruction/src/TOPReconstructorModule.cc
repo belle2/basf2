@@ -15,12 +15,10 @@
 #include "top/modules/TOPReconstruction/TOPconfig.h"
 
 #include <framework/core/ModuleManager.h>
-#include <time.h>
 
 // Hit classes
 #include <GFTrack.h>
-#include <GFTrackCand.h>
-#include <tracking/dataobjects/ExtRecoHit.h>
+#include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPLikelihood.h>
 #include <generators/dataobjects/MCParticle.h>
@@ -35,10 +33,10 @@
 
 // framework aux
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // ROOT
-#include <TVector2.h>
 #include <TVector3.h>
 
 using namespace std;
@@ -74,10 +72,8 @@ namespace Belle2 {
       // Add parameters
       addParam("GFTracksColName", m_gfTracksColName, "GF tracks",
                string(""));
-      addParam("ExtTrackCandsColName", m_extTrackCandsColName, "Ext track candidates",
-               string("ExtTrackCands"));
-      addParam("ExtRecoHitsColName", m_extRecoHitsColName, "Ext reconstructed hits",
-               string("ExtRecoHits"));
+      addParam("ExtHitsColName", m_extHitsColName, "Extrapolated tracks",
+               string(""));
       addParam("TOPDigitColName", m_topDigitColName, "TOP digits",
                string(""));
       addParam("TOPLikelihoodColName", m_topLogLColName, "TOP likelihoods",
@@ -89,7 +85,7 @@ namespace Belle2 {
                "minimal number of background photons per bar", 0.0);
       addParam("scaleN0", m_ScaleN0, "scale factor for N0", 1.0);
 
-      for (int i = 0; i < Nhyp; i++) {m_Masses[i] = 0;}
+      for (int i = 0; i < c_Nhyp; i++) {m_Masses[i] = 0;}
 
     }
 
@@ -99,7 +95,7 @@ namespace Belle2 {
 
     void TOPReconstructorModule::initialize()
     {
-      // Initialize masses (PDG 2010) TODO: remove hard coding, check Nhyp)
+      // Initialize masses (PDG 2010) TODO: remove hard coding, check c_Nhyp)
       m_Masses[0] = 0.510998910E-3;
       m_Masses[1] = 0.105658367;
       m_Masses[2] = 0.13957018;
@@ -111,10 +107,12 @@ namespace Belle2 {
 
       // Data store registration
       StoreArray<TOPLikelihood>::registerPersistent(m_topLogLColName);
-      RelationArray::registerPersistent<GFTrack, TOPLikelihood>(m_gfTracksColName, m_topLogLColName);
-      RelationArray::registerPersistent<TOPLikelihood, ExtRecoHit>(m_topLogLColName, m_extRecoHitsColName);
-      RelationArray::registerPersistent<TOPLikelihood, GFTrackCand>(m_topLogLColName, m_extTrackCandsColName);
-      RelationArray::registerPersistent<TOPBarHit, TOPLikelihood>(m_barHitColName, m_topLogLColName);
+      RelationArray::registerPersistent<GFTrack, TOPLikelihood>
+      (m_gfTracksColName, m_topLogLColName);
+      RelationArray::registerPersistent<TOPLikelihood, ExtHit>
+      (m_topLogLColName, m_extHitsColName);
+      RelationArray::registerPersistent<TOPBarHit, TOPLikelihood>
+      (m_barHitColName, m_topLogLColName);
 
       // Configure TOP detector
       TOPconfigure();
@@ -135,8 +133,7 @@ namespace Belle2 {
       // input: reconstructed tracks
 
       StoreArray<GFTrack> gfTracks(m_gfTracksColName);
-      StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName);
-      StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName);
+      StoreArray<ExtHit> extHits(m_extHitsColName);
       StoreArray<TOPBarHit> barHits(m_barHitColName);
 
       // output: log likelihoods
@@ -148,22 +145,20 @@ namespace Belle2 {
 
       RelationArray gfTrackLogL(gfTracks, toplogL);
       gfTrackLogL.clear();
-      RelationArray LogLextHit(toplogL, extRecoHits);
+      RelationArray LogLextHit(toplogL, extHits);
       LogLextHit.clear();
-      RelationArray LogLextTrackCand(toplogL, extTrackCands);
-      LogLextTrackCand.clear();
       RelationArray barHitLogL(barHits, toplogL);
       barHitLogL.clear();
 
       // collect reconstructed tracks extrapolated to TOP
 
       std::vector<TOPtrack> tracks; // extrapolated tracks
-      getTracks(tracks, 2); // use pion hypothesis
+      getTracks(tracks, Const::pion); // use pion hypothesis
       if (tracks.empty()) return;
 
       // create reconstruction object
 
-      TOPreco reco(Nhyp, m_Masses, m_minBkgPerQbar, m_ScaleN0);
+      TOPreco reco(c_Nhyp, m_Masses, m_minBkgPerQbar, m_ScaleN0);
 
       // clear reconstruction object
 
@@ -185,23 +180,22 @@ namespace Belle2 {
         if (m_debugLevel != 0) {
           tracks[i].Dump();
           reco.DumpHit(Local);
-          reco.DumpLogL(Nhyp);
+          reco.DumpLogL(c_Nhyp);
         }
 
         // get results
-        double logl[Nhyp], expPhot[Nhyp];
+        double logl[c_Nhyp], expPhot[c_Nhyp];
         int nphot;
-        reco.GetLogL(Nhyp, logl, expPhot, nphot);
+        reco.GetLogL(c_Nhyp, logl, expPhot, nphot);
 
         // store results
         new(toplogL.nextFreeAddress()) TOPLikelihood(reco.Flag(), logl, nphot, expPhot);
 
         // make relations
         int last = toplogL.getEntries() - 1;
-        gfTrackLogL.add(tracks[i].Label(LgfTrack), last);
-        LogLextHit.add(last, tracks[i].Label(LextHit));
-        LogLextTrackCand.add(last, tracks[i].Label(LextTrackCand));
-        int ibarHit = tracks[i].Label(LbarHit);
+        gfTrackLogL.add(tracks[i].Label(c_LTrack), last);
+        LogLextHit.add(last, tracks[i].Label(c_LextHit));
+        int ibarHit = tracks[i].Label(c_LbarHit);
         if (ibarHit >= 0) barHitLogL.add(ibarHit, last);
       }
 
@@ -209,7 +203,6 @@ namespace Belle2 {
 
       gfTrackLogL.consolidate();
       LogLextHit.consolidate();
-      LogLextTrackCand.consolidate();
       barHitLogL.consolidate();
 
     }
@@ -347,56 +340,60 @@ namespace Belle2 {
     }
 
 
-    void TOPReconstructorModule::getTracks(std::vector<TOPtrack> & tracks, int hypothesis)
+    void TOPReconstructorModule::getTracks(std::vector<TOPtrack> & tracks,
+                                           Const::ChargedStable chargedStable)
     {
-      int myDetID = 3; // TOP
+      ExtDetectorID myDetID = EXT_TOP; // TOP
       int NumBars = m_topgp->getNbars();
       StoreArray<GFTrack> gfTracks(m_gfTracksColName);
-      StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName);
-      StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName);
+      StoreArray<ExtHit> extHits(m_extHitsColName);
+      RelationIndex<GFTrack, ExtHit> gfTracksToExtHits(gfTracks, extHits);
+
+      int pdgCode = abs(chargedStable.getPDGCode());
+      double mass = chargedStable.getMass();
 
       for (int itra = 0; itra < gfTracks.getEntries(); ++itra) {
         GFTrack* track = gfTracks[itra];
         int charge = (int) track->getCharge();
         const MCParticle* particle = getMCParticle(track);
-        int Lund = 0;
-        if (particle) Lund = particle->getPDG();
         int iTopTrack = getTOPBarHitIndex(particle);
-        int iTrackCand = itra * 5 + hypothesis;
-        GFTrackCand* cand = extTrackCands[iTrackCand];
-        if (! cand) continue;
-        std::vector<double> TOFs = cand->getRhos();
-        for (unsigned int j = 0; j < cand->getNHits(); ++j) {
-          int detID;
-          int hitID;
-          int planeID;
-          cand->getHitWithPlane(j, detID, hitID, planeID);
-          if (detID != myDetID) continue;
-          if (planeID == 0 || planeID > NumBars) continue;
-          ExtRecoHit* hit = extRecoHits[hitID];
-          ExtHitStatus status = hit->getStatus();
-          if (status != 0) continue;
-          TVectorD point = hit->getRawHitCoord();
-          double x = point(0);
-          double y = point(1);
-          double z = point(2);
+        int truePDGCode = 0;
+        if (particle) truePDGCode = particle->getPDG();
+
+        /*
+         * this doesn't work for GFTrack, have to use BOOST_FOREACH
+         RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
+         for(unsigned i = 0; i < extHits.size(); i++) {
+            const ExtHit* extHit = extHits[i];
+        */
+
+        typedef RelationIndex<GFTrack, ExtHit>::Element relElement_t;
+        BOOST_FOREACH(const relElement_t & rel, gfTracksToExtHits.getElementsFrom(track)) {
+          const ExtHit* extHit = rel.to;
+          if (abs(extHit->getPdgCode()) != pdgCode) continue;
+          if (extHit->getDetectorID() != myDetID) continue;
+          if (extHit->getCopyID() == 0 || extHit->getCopyID() > NumBars) continue;
+          if (extHit->getStatus() != EXT_ENTER) continue;
+          TVector3 point = extHit->getPosition();
+          double x = point.X();
+          double y = point.Y();
+          double z = point.Z();
           if (z < m_Z1 || z > m_Z2) continue;
           double r = sqrt(x * x + y * y);
           if (r < m_R1 || r > m_R2) continue;
-          double px = point(3);
-          double py = point(4);
-          double pz = point(5);
-          TOPtrack trk(x, y, z, px, py, pz, 0.0, charge, Lund);
-          double tof = TOFs.at(j);
-          trk.setTrackLength(tof, m_Masses[hypothesis]);
-          trk.setLabel(LgfTrack, itra);
-          trk.setLabel(LextTrackCand, iTrackCand);
-          trk.setLabel(LextHit, hitID);
-          trk.setLabel(LbarHit, iTopTrack);
+          TVector3 momentum = extHit->getMomentum();
+          double px = momentum.X();
+          double py = momentum.Y();
+          double pz = momentum.Z();
+          TOPtrack trk(x, y, z, px, py, pz, 0.0, charge, truePDGCode);
+          double tof = extHit->getTOF();
+          trk.setTrackLength(tof, mass);
+          trk.setLabel(c_LTrack, itra);
+          trk.setLabel(c_LextHit, extHit->getArrayIndex());
+          trk.setLabel(c_LbarHit, iTopTrack);
           tracks.push_back(trk);
         }
       }
-
     }
 
 

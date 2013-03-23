@@ -73,22 +73,11 @@ mctrackfinder.param(param_mctrackfinder)
 
 # Track fitting
 cdcfitting = register_module('GenFitter')
-param_cdcfitting = {
-    'GFTrackCandidatesColName': 'GFTrackCands',
-    'GFTracksColName': 'GFTracks',
-    'TracksColName': 'Tracks',
-    'StoreFailedTracks': 0,
-    'FilterId': 0,
-    'NIterations': 1,
-    'ProbCut': 0.001,
-    }
-cdcfitting.param(param_cdcfitting)
 
 # Track extrapolation
 ext = register_module('Ext')
-ext.param('GFTracksColName', 'GFTracks')  # input to ext
-ext.param('ExtTrackCandsColName', 'ExtTrackCands')  # output from ext
-ext.param('ExtRecoHitsColName', 'ExtRecoHits')  # output from ext
+ext.param('ExtTrackCandsColName', 'ExtTrackCands')  # output from ext (DEPRECATED)
+ext.param('ExtRecoHitsColName', 'ExtRecoHits')  # output from ext (DEPRECATED)
 
 # TOP reconstruction
 topdigi = register_module('TOPDigitizer')

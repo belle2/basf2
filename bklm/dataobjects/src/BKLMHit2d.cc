@@ -12,6 +12,8 @@
 
 #include <framework/logging/Logger.h>
 
+#include <cmath>
+
 using namespace Belle2;
 
 ClassImp(BKLMHit2d)
@@ -32,7 +34,7 @@ BKLMHit2d::BKLMHit2d(const BKLMDigit* hit1, const BKLMDigit* hit2) :
 
 //! Constructor with initial values
 BKLMHit2d::BKLMHit2d(int status, bool isForward, int sector, int layer,
-                     const double position[2], const double positionError[2],
+                     const double position[2], const double positionVariance[2],
                      double time, double energy) :
   RelationsObject(),
   m_Status(status),
@@ -44,8 +46,8 @@ BKLMHit2d::BKLMHit2d(int status, bool isForward, int sector, int layer,
 {
   m_Position[0] = position[0];
   m_Position[1] = position[1];
-  m_PositionError[0] = positionError[0];
-  m_PositionError[1] = positionError[1];
+  m_PositionVariance[0] = positionVariance[0];
+  m_PositionVariance[1] = positionVariance[1];
   // DIVOT convert m_Position to 3D global coordinates in m_GlobalPosition
 }
 
@@ -61,8 +63,8 @@ BKLMHit2d::BKLMHit2d(const BKLMHit2d& h) :
 {
   m_Position[0] = h.m_Position[0];
   m_Position[1] = h.m_Position[1];
-  m_PositionError[0] = h.m_PositionError[0];
-  m_PositionError[1] = h.m_PositionError[1];
+  m_PositionVariance[0] = h.m_PositionVariance[0];
+  m_PositionVariance[1] = h.m_PositionVariance[1];
   m_GlobalPosition = h.m_GlobalPosition;
 }
 
@@ -70,16 +72,22 @@ void BKLMHit2d::getLocalPosition(double position[2], double positionError[2]) co
 {
   position[0] = m_Position[0];
   position[1] = m_Position[1];
-  positionError[0] = m_PositionError[0];
-  positionError[1] = m_PositionError[1];
+  positionError[0] = sqrt(m_PositionVariance[0]);
+  positionError[1] = sqrt(m_PositionVariance[1]);
+}
+
+void BKLMHit2d::getLocalVariance(double positionVariance[2]) const
+{
+  positionVariance[0] = m_PositionVariance[0];
+  positionVariance[1] = m_PositionVariance[1];
 }
 
 void BKLMHit2d::setLocalPosition(const double position[2], const double positionError[2])
 {
   m_Position[0] = position[0];
   m_Position[1] = position[1];
-  m_PositionError[0] = positionError[0];
-  m_PositionError[1] = positionError[1];
+  m_PositionVariance[0] = positionError[0] * positionError[0];
+  m_PositionVariance[1] = positionError[1] * positionError[1];
   // DIVOT convert m_Position to 3D global position in m_GlobalPosition
 }
 

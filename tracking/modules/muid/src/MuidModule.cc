@@ -9,12 +9,14 @@
  **************************************************************************/
 
 #include <tracking/modules/muid/MuidModule.h>
+#include <tracking/modules/muid/MuidPar.h>
 #include <tracking/modules/ext/ExtManager.h>
 #include <tracking/modules/ext/ExtPhysicsList.h>
 #include <tracking/modules/ext/ExtCylSurfaceTarget.h>
-#include <tracking/dataobjects/ExtRecoHit.h>
+#include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/Muid.h>
 #include <tracking/dataobjects/MuidHit.h>
+#include <bklm/dataobjects/BKLMDigit.h>
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <simulation/kernel/DetectorConstruction.h>
@@ -40,7 +42,6 @@
 #include <CLHEP/Matrix/Matrix.h>
 
 #include <GFTrack.h>
-#include <GFTrackCand.h>
 #include <GFDetPlane.h>
 #include <GFFieldManager.h>
 
@@ -69,7 +70,6 @@ using namespace Belle2;
 
 #define TWOPI 6.283185482025146484375
 #define M_PI_8 0.3926990926265716552734
-#define COS_SMALL_ANGLE 0.98
 
 #define Large 10.0E10
 
@@ -159,7 +159,7 @@ void MuidModule::initialize()
   double outerRadius = bklmContent.getLength("OuterRadius") * cm;
   double nSector = bklmContent.getNumberNodes("Sectors/Forward/Sector");
   double rMax = outerRadius / cos(M_PI / nSector);
-  //std::cout << "MUID initialize: eklmLength=" << eklmLength << "  bklmHalfLength=" << bklmHalfLength << "  offsetZ=" << offsetZ << "  minZ=" << minZ << "  maxZ=" << maxZ << "  outerRadius=" << outerRadius << "  nSector=" << nSector << "  rMax=" << rMax << std::endl;
+  std::cout << "MUID initialize: eklmLength=" << eklmLength << "  bklmHalfLength=" << bklmHalfLength << "  offsetZ=" << offsetZ << "  minZ=" << minZ << "  maxZ=" << maxZ << "  outerRadius=" << outerRadius << "  nSector=" << nSector << "  rMax=" << rMax << std::endl;
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(new ExtCylSurfaceTarget(rMax, minZ, maxZ));
   m_OffsetZ = bklmContent.getLength("OffsetZ");
   m_EndcapMaxR = eklmContent.getLength("EndCap/OuterR"); // 290.0 cm --> 332.0 cm
@@ -174,6 +174,10 @@ void MuidModule::initialize()
   m_DefaultError = 15.0; // 15.0 cm DIVOT
   m_maxDistCM = 25.0; // max distance between KLM hit and extrapolation crossing
   m_maxDistSIGMA = 5.0; // ditto (in sigmas)
+  m_StripWidth = 4.0; // cm  *DIVOT*
+  m_StripPositionVariance = m_StripWidth * m_StripWidth / 12.0; // cm
+  m_ScintWidth = 4.0; // cm  *DIVOT*
+  m_ScintPositionVariance = m_ScintWidth * m_ScintWidth / 12.0; // cm
 
   // KLM geometry (for associating KLM hit with extrapolated crossing point) (cm)
 
@@ -225,9 +229,10 @@ void MuidModule::initialize()
     B2INFO("Module muid initialize(): hypotheses for " << particle->GetParticleName() << " and its antiparticle will be extrapolated")
   }
 
-  fillPDF(MUON);
-  fillPDF(PION);
-  fillPDF(KAON);
+  int expNo = 0;  // DIVOT
+  m_muonPar = new MuidPar(expNo, "muon");
+  m_pionPar = new MuidPar(expNo, "pion");
+  m_kaonPar = new MuidPar(expNo, "kaon");
 
   StoreArray<GFTrack> gfTracks(m_gfTracksColName);
   StoreArray<Muid> muids(m_muidsColName);
@@ -354,6 +359,10 @@ void MuidModule::terminate()
   }
   delete m_enter;
   delete m_exit;
+
+  delete m_muonPar;
+  delete m_pionPar;
+  delete m_kaonPar;
 
 }
 
@@ -735,7 +744,7 @@ void MuidModule::getStartPoint(const GFTrack* gfTrack, int pdgCode,
 // The track state will be modified here by the Kalman fitter.
 bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode,
                            StoreArray<MuidHit>& muidHits, RelationArray& gfTrackToMuidHits,
-                           StoreArray<BKLMHit2d>& bklmHits, StoreArray<EKLMHit2d>& eklmHits)
+                           const StoreArray<BKLMHit2d>& bklmHits, const StoreArray<EKLMHit2d>& eklmHits)
 {
 
   G4StepPoint* stepPoint = state->GetG4Track()->GetStep()->GetPreStepPoint();
@@ -820,7 +829,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
     bool crossed(false);
 
     if (m_wasInBarrel || isInBarrel) {
-      findBarrelIntersection(m_position, position, p);
+      findBarrelIntersection(p, m_position, position);
       if ((p.intersected != MISSED) &&
           ((p.address.inBarrel != m_address.inBarrel) || (p.address.isForward != m_address.isForward) || (p.address.layer != m_address.layer))) {
         crossed = true;
@@ -850,7 +859,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
 
     if (searchEndcap) {
 
-      findEndcapIntersection(m_position, position, p);
+      findEndcapIntersection(p, m_position, position);
 
       if ((p.intersected != MISSED) &&
           ((p.address.inBarrel != m_address.inBarrel) || (p.address.isForward != m_address.isForward) || (p.address.layer != m_address.layer))) {
@@ -930,7 +939,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
 
 }
 
-void MuidModule::findBarrelIntersection(TVector3& oldPos, TVector3& newPos, Point& p)
+void MuidModule::findBarrelIntersection(Point& p, const TVector3& oldPos, const TVector3& newPos)
 {
 
   int sector[2];
@@ -976,8 +985,8 @@ void MuidModule::findBarrelIntersection(TVector3& oldPos, TVector3& newPos, Poin
 
   // DIVOT should also check against m_BarrelActiveMinZ
   if (fabs(newPos.z() - m_OffsetZ) > m_BarrelActiveMaxZ) {
-    double errTrack = getPlaneError(p.covariance, (newPos - oldPos).Unit(), TVector3(0.0, 0.0, 1.0));
-    errTrack = sqrt(errTrack * errTrack + m_StripPositionError * m_StripPositionError);
+    double varTrack = getPlaneVariance(p.covariance, (newPos - oldPos).Unit(), TVector3(0.0, 0.0, 1.0));
+    double errTrack = sqrt(varTrack + m_StripPositionError * m_StripPositionError);
     errTrack = max(errTrack * m_maxDistSIGMA, m_maxDistCM);
     if (fabs(oldPos.z() - m_OffsetZ) <= m_BarrelActiveMaxZ + errTrack) {
       if ((fabs(p.position.z() - m_OffsetZ) > m_BarrelActiveMaxZ) && (p.intersected == CROSSED)) {
@@ -990,7 +999,7 @@ void MuidModule::findBarrelIntersection(TVector3& oldPos, TVector3& newPos, Poin
 
 }
 
-void MuidModule::findEndcapIntersection(TVector3& oldPos, TVector3& newPos, Point& p)
+void MuidModule::findEndcapIntersection(Point& p, const TVector3& oldPos, const TVector3& newPos)
 {
 
   double oldZ = fabs(oldPos.Z() - m_OffsetZ);
@@ -1020,8 +1029,8 @@ void MuidModule::findEndcapIntersection(TVector3& oldPos, TVector3& newPos, Poin
 
   if (oldZ < m_EndcapModuleMiddleZ[1]) {
     double phi = newPos.Phi();
-    double errTrack = getPlaneError(p.covariance, (newPos - oldPos).Unit(), TVector3(cos(phi), sin(phi), 0.0));
-    errTrack = sqrt(errTrack * errTrack + m_StripPositionError * m_StripPositionError);
+    double varTrack = getPlaneVariance(p.covariance, (newPos - oldPos).Unit(), TVector3(cos(phi), sin(phi), 0.0));
+    double errTrack = sqrt(varTrack + m_StripPositionError * m_StripPositionError);
     errTrack = max(errTrack * m_maxDistSIGMA, m_maxDistCM);
     if (newZ < m_EndcapModuleMiddleZ[1] - errTrack) {
       p.intersected = MISSED;
@@ -1030,12 +1039,11 @@ void MuidModule::findEndcapIntersection(TVector3& oldPos, TVector3& newPos, Poin
 
 }
 
-void MuidModule::findMatchingBarrelHit(Point& p, StoreArray<BKLMHit2d>& bklmHits)
+void MuidModule::findMatchingBarrelHit(Point& p, const StoreArray<BKLMHit2d>& bklmHits)
 {
 
   double diffBest = 1.0E12;
-  double localPosition[2] = {0.0, 0.0};
-  double localError[2] = {0.0, 0.0};
+  double localVariance[2] = {0.0, 0.0};
 
   p.hasMatchingHit = false;
   BKLMHit2d* hitBest = NULL;
@@ -1046,13 +1054,13 @@ void MuidModule::findMatchingBarrelHit(Point& p, StoreArray<BKLMHit2d>& bklmHits
     TVector3 diff = hit->getGlobalPosition() - p.position;
     TVector3 diffDir = diff.Unit();
     double diffMag = diff.Mag();
-    double errTrack = getPlaneError(p.covariance, p.momentum.Unit(), diffDir);
+    double varTrack = getPlaneVariance(p.covariance, p.momentum.Unit(), diffDir);
     double projectionPhi = m_BarrelSectorPhi[hit->getSector()] * diffDir;
     double projectionTheta = diffDir.z();
-    hit->getLocalPosition(localPosition, localError);
-    double varHit = max(projectionTheta * projectionTheta * localError[1] +
-                        projectionPhi * projectionPhi * localError[0], 0.0);
-    if (diffMag <= max(m_maxDistSIGMA * sqrt(errTrack * errTrack + varHit), m_maxDistCM)) {
+    hit->getLocalVariance(localVariance);
+    double varHit = projectionPhi * projectionPhi * localVariance[0] +
+                    projectionTheta * projectionTheta * localVariance[1];
+    if (diffMag <= max(sqrt(varTrack + varHit) * m_maxDistSIGMA, m_maxDistCM)) {
       p.hasMatchingHit = true;
       p.address.isForward = hit->isForward();
       p.address.sector = hit->getSector();
@@ -1064,9 +1072,9 @@ void MuidModule::findMatchingBarrelHit(Point& p, StoreArray<BKLMHit2d>& bklmHits
 
   }     // for (h)
   if (p.hasMatchingHit) {
-    hitBest->getLocalPosition(localPosition, localError);
+    hitBest->getLocalVariance(localVariance);
     TVector3 hitPos = hitBest->getGlobalPosition();
-    adjustIntersection(p, localError, hitPos);
+    adjustIntersection(p, localVariance, hitPos);
     if (p.chi2 >= 0.0) {
       m_chi2 += p.chi2;
       m_nPoint++;
@@ -1076,29 +1084,27 @@ void MuidModule::findMatchingBarrelHit(Point& p, StoreArray<BKLMHit2d>& bklmHits
 
 }
 
-void MuidModule::findMatchingEndcapHit(Point& p, StoreArray<EKLMHit2d>& eklmHits)
+void MuidModule::findMatchingEndcapHit(Point& p, const StoreArray<EKLMHit2d>& eklmHits)
 {
 
   double diffBest = 1.0E12;
-  double localPosition[2] = {0.0, 0.0};
-  double localError[2] = {0.0, 0.0};
+  double localVariance[2] = {m_ScintPositionVariance, m_ScintPositionVariance};
 
   p.hasMatchingHit = false;
   EKLMHit2d* hitBest = NULL;
   for (int h = 0; h < eklmHits.getEntries(); ++h) {
     EKLMHit2d* hit = eklmHits[h];
     if (hit->getLayer() != p.address.layer) { continue; }
-    // DIVOT no status if (hit->getStatus() & STATUS_OUTOFTIME) { continue; }
+    // DIVOT no getStatus() if (hit->getStatus() & STATUS_OUTOFTIME) { continue; }
     TVector3 diff = hit->getPosition() - p.position;
     TVector3 diffDir = diff.Unit();
     double diffMag = diff.Mag();
-    double errTrack = getPlaneError(p.covariance, p.momentum.Unit(), diffDir);
-    double projectionPhi = m_BarrelSectorPhi[hit->getSector()] * diffDir;
-    double projectionTheta = diffDir.z();
-    // DIVOT no localPosition hit->getLocalPosition(localPosition, localError);
-    double varHit = max(projectionTheta * projectionTheta * localError[1] +
-                        projectionPhi * projectionPhi * localError[0], 0.0);
-    if (diffMag <= max(m_maxDistSIGMA * sqrt(errTrack * errTrack + varHit), m_maxDistCM)) {
+    double varTrack = getPlaneVariance(p.covariance, p.momentum.Unit(), diffDir);
+    double projectionX = diffDir.x();
+    double projectionY = diffDir.y();
+    double varHit = projectionX * projectionX * localVariance[0] +
+                    projectionY * projectionY * localVariance[1];
+    if (diffMag <= max(sqrt(varTrack + varHit) * m_maxDistSIGMA, m_maxDistCM)) {
       p.hasMatchingHit = true;
       p.address.isForward = (hit->getEndcap() == 1);
       p.address.sector = hit->getSector();
@@ -1110,117 +1116,95 @@ void MuidModule::findMatchingEndcapHit(Point& p, StoreArray<EKLMHit2d>& eklmHits
 
   }     // for (h)
   if (p.hasMatchingHit) {
-    // DIVOT no localPosition hitBest->getLocalPosition(localPosition, localError);
     TVector3 hitPos = hitBest->getPosition();
-    adjustIntersection(p, localError, hitPos);
+    adjustIntersection(p, localVariance, hitPos);
     if (p.chi2 >= 0.0) {
       m_chi2 += p.chi2;
       m_nPoint++;
     }
-    // DIVOT no setStatus hitBest->setStatus(STATUS_ONTRACK);
+    // DIVOT no setStatus() hitBest->setStatus(STATUS_ONTRACK);
   }
 }
 
-void MuidModule::adjustIntersection(Point& p, double localError[2], TVector3& hitPos)
+void MuidModule::adjustIntersection(Point& p, const double localVariance[2], const TVector3& hitPos)
 {
 
   p.chi2 = -1.0;
 
   TVector3 extPos = p.position;
   TVector3 extMom = p.momentum;
-  TVector3 extDir = p.momentum.Unit();
+  TVector3 extDir = extMom.Unit();
   HepSymMatrix extCov = p.covariance;
   TVector3 diffPos = hitPos - extPos;
 
-  TVector3 nPerp;      // unit vector normal to the readout plane
-  TVector3 nTheta;     // unit vector along theta readout direction
-  TVector3 nPhi;       // unit vector along phi readout direction
+  TVector3 nA;  // unit vector normal to the readout plane
+  TVector3 nB;  // unit vector along phi- or x-readout direction (for barrel or endcap)
+  TVector3 nC;  // unit vector along z- or y-readout direction (for barrel or endcap)
   if (p.address.inBarrel) {
-    nPerp = m_BarrelSectorPerp[p.address.sector];
-    nTheta = TVector3(0.0, 0.0, 1.0);
-    nPhi = m_BarrelSectorPhi[p.address.sector];
+    nA = m_BarrelSectorPerp[p.address.sector];
+    nB = m_BarrelSectorPhi[p.address.sector];
+    nC = TVector3(0.0, 0.0, 1.0);
   } else {
-    nPerp = TVector3(0.0, 0.0, (p.address.isForward ? 1.0 : -1.0));
-    double phi = extPos.Phi();
-    nTheta.SetX(cos(phi));
-    nTheta.SetY(sin(phi));
-    nTheta.SetZ(0.0);
-    nPhi.SetX(-sin(phi));
-    nPhi.SetY(cos(phi));
-    nPhi.SetZ(0.0);
+    double out = (p.address.isForward ? 1.0 : -1.0);
+    nA = TVector3(0.0, 0.0, out);
+    nB = TVector3(out, 0.0, 0.0);
+    nC = TVector3(0.0, out, 0.0);
   }
 
-// Don't adjust the track extrapolation if the track is nearly tangent to the
-// readout plane and along one or the other of the readout strips.
-// Otherwise, construct the "track coordinate system" basis vectors:
-//   nzTCS is the same as extDir, by definition
-//   nxTCS is in the plane defined by extDir and nPhi
-//   nyTCS is nzTCS x nxTCS (right-handed frame)
+// Don't adjust the extrapolation if the track is nearly tangent to the readout plane.
 
-  if (fabs(nTheta * extDir) > COS_SMALL_ANGLE) { return; }
-  if (fabs(nPhi   * extDir) > COS_SMALL_ANGLE) { return; }
-  TVector3 nxTCS(nTheta.Cross(extDir).Unit());
-  TVector3 nyTCS(extDir.Cross(nxTCS));
+  if (fabs(extDir * nA) < 1.0E-6) { return; }
 
-// Setup the projection matrix: projection on the y-x plane of TCS.
+// Move the extrapolated coordinate to the plane of the hit.
 
-  HepMatrix projectToTCS(2, 6, 0);
-  projectToTCS(1, 1) = nyTCS.X();
-  projectToTCS(1, 2) = nyTCS.Y();
-  projectToTCS(1, 3) = nyTCS.Z();
-  projectToTCS(2, 1) = nxTCS.X();
-  projectToTCS(2, 2) = nxTCS.Y();
-  projectToTCS(2, 3) = nxTCS.Z();
-
-// Move the extrapolated coordinate to the plane of the hit RPC.
-
-  TVector3 move = extDir * ((diffPos * nPerp) / (extDir * nPerp));
+  TVector3 move = extDir * ((diffPos * nA) / (extDir * nA));
   extPos += move;
   diffPos -= move;
   p.positionAtHitPlane.SetX(extPos.X());
   p.positionAtHitPlane.SetY(extPos.Y());
   p.positionAtHitPlane.SetZ(extPos.Z());
 
-// Calculate the residuals of EXT track and KLM hit on the y-x plane of TCS.
+// Construct the "track coordinate system" (TCS) basis vectors:
+//   w is the same as extDir, by definition
+//   u is in the plane defined by extDir and nB (i.e., perp to nC)
+//   v is w x u (right-handed frame)
 
-  double nTheta_nxTCS(nTheta * nxTCS);
-  double nPhi_nxTCS(nPhi * nxTCS);
-  double nTheta_nyTCS(nTheta * nyTCS);
-  double nPhi_nyTCS(nPhi * nyTCS);
+  TVector3 w(extDir);
+  TVector3 u(nC.Cross(w).Unit());
+  TVector3 v(w.Cross(u));
 
-  double diffPos_nTheta = diffPos * nTheta;
-  double diffPos_nPhi   = diffPos * nPhi;
+// Setup the projection matrix: projection on the u-v plane of TCS.
+
+  HepMatrix projectToTCS(2, 6, 0);
+  projectToTCS(1, 1) = u.X();
+  projectToTCS(1, 2) = u.Y();
+  projectToTCS(1, 3) = u.Z();
+  projectToTCS(2, 1) = v.X();
+  projectToTCS(2, 2) = v.Y();
+  projectToTCS(2, 3) = v.Z();
+
+// Calculate the residuals of EXT track and KLM hit on the u-v plane of TCS.
+
+  double nB_u(nB * u);
+  double nC_u(nC * u);
+  double nB_v(nB * v);
+  double nC_v(nC * v);
+
+  double diffPos_nB = diffPos * nB;
+  double diffPos_nC = diffPos * nC;
 
   HepVector residual(2);
-  residual(1) = diffPos_nTheta * nTheta_nyTCS + diffPos_nPhi * nPhi_nyTCS;
-  residual(2) = diffPos_nTheta * nTheta_nxTCS + diffPos_nPhi * nPhi_nxTCS;
+  residual(1) = diffPos_nB * nB_u + diffPos_nC * nC_u;
+  residual(2) = diffPos_nB * nB_v + diffPos_nC * nC_v;
 
-// Calculate the measurement errors on the y-x plane of TCS.
-// For endcap, undo the (theta,phi) -> (x,y) transformation done in
-// common/com-klm/geom/KlmMOduleEndCap.cc for localErr() .
+// Calculate the measurement errors on the u-v plane of TCS.
 
   HepSymMatrix hitCov(2, 0);
-  if (p.address.inBarrel) {
-    hitCov(1, 1) = localError[1] * nTheta_nyTCS * nTheta_nyTCS;
-    hitCov(2, 2) = localError[0] * nPhi_nxTCS * nPhi_nxTCS;
-  } else {
-    double phi = hitPos.Phi();
-    HepMatrix rotation(2, 2, 0);
-    rotation(1, 1) =  cos(phi);
-    rotation(1, 2) =  sin(phi);
-    rotation(2, 1) = -rotation(1, 2);
-    rotation(2, 2) =  rotation(1, 1);
-    HepSymMatrix cov(2, 0);
-    cov(1, 1) = localError[0];
-    cov(1, 2) = 0.0;  // DIVOT off-diagonal term ???
-    cov(2, 2) = localError[1];
-    cov = cov.similarityT(rotation);
-    hitCov(1, 1) = cov(1, 1) * nTheta_nyTCS * nTheta_nyTCS;
-    hitCov(2, 2) = cov(2, 2) * nPhi_nxTCS * nPhi_nxTCS;
-  }
+  hitCov(1, 1) = localVariance[0] * nB_u * nB_u;
+  hitCov(2, 2) = localVariance[1] * nC_v * nC_v;
 
 // Now get the correction matrix: combined covariance of EXT and KLM hit.
-// 1st dimension = nyTCS, 2nd dimension = nxTCS.
+// 1st dimension = u, 2nd dimension = v.
 
   HepSymMatrix correction = extCov.similarity(projectToTCS) + hitCov;
 
@@ -1251,15 +1235,14 @@ void MuidModule::adjustIntersection(Point& p, double localError[2], TVector3& hi
     extMom.SetY(extPar(5));
     extMom.SetZ(extPar(6));
 
-// Project the corrected coordinate on the RPC plane along the track.
-// Adjust the magnitude of the momentum with an ad hoc deceleration factor (??).
+// Project the corrected coordinate onto the detector plane along the track.
 
     // Project the corrected extrapolation to the plane that is tangent
     // to the hit-point's plane but at the original extrapolation's position, i.e.,
     // it leaves it in the same geometrical volume as it was originally.  Also,
     // the momentum magnitude is left unchanged.
     extDir = extMom.Unit();
-    extPos += extDir * (((p.position - extPos) * nPerp) / (extDir * nPerp));
+    extPos += extDir * (((p.position - extPos) * nA) / (extDir * nA));
     extMom = p.momentum.Mag() * extDir;
 
 // Calculate the new error matrix.
@@ -1277,8 +1260,8 @@ void MuidModule::adjustIntersection(Point& p, double localError[2], TVector3& hi
     correction.invert(ierr);
 
     if (!ierr) {
-      residual(1) = (hitPos - extPos) * nyTCS;
-      residual(2) = (hitPos - extPos) * nxTCS;
+      residual(1) = (hitPos - extPos) * v;
+      residual(2) = (hitPos - extPos) * u;
       p.chi2 = correction.similarity(residual);
     }
 
@@ -1288,12 +1271,10 @@ void MuidModule::adjustIntersection(Point& p, double localError[2], TVector3& hi
 
 }
 
-double MuidModule::getPlaneError(HepSymMatrix& covariance, TVector3 nTrack, TVector3 nReadout)
+double MuidModule::getPlaneVariance(const HepSymMatrix& covariance, const TVector3& nTrack, const TVector3& nReadout)
 {
 
-  // DIVOT obsolete? if (!m_covValid) { return DEFAULT_ERROR; }
-
-  double error = 1.0E12;
+  double variance = 1.0E24;
 
   // Construct 3 TCS axes.
   // z: nz( = nTrack )
@@ -1301,12 +1282,11 @@ double MuidModule::getPlaneError(HepSymMatrix& covariance, TVector3 nTrack, TVec
   // y: nz x nx
 
   double projection = nReadout * nTrack;
-  double denom = 1.0 - projection * projection;
+  double normalizer = 1.0 - projection * projection;
 
-  if (denom > 1.0E-12) {    // Track is not parallel to the readout direction.
+  if (normalizer > 1.0E-12) {    // Track is not parallel to the readout direction.
 
-    double normalize = 1.0 / sqrt(denom);
-    TVector3 nx = (nReadout - projection * nTrack) * normalize;
+    TVector3 nx = (nReadout - projection * nTrack) * (1.0 / sqrt(normalizer));
     TVector3 ny = nTrack.Cross(nx);
 
     HepMatrix rotation(3, 3, 0);
@@ -1321,16 +1301,16 @@ double MuidModule::getPlaneError(HepSymMatrix& covariance, TVector3 nTrack, TVec
     rotation(3, 3) = nTrack.Z();
 
     HepSymMatrix positionCovariance(covariance.sub(1, 3).similarity(rotation));
-    error = sqrt(max(0.0, positionCovariance(1, 1)));    // variance along nx
+    variance = max(0.0, positionCovariance(1, 1));    // variance along nx
 
   }
 
-  return error;
+  return variance;
 
 }
 
 //------------------------------------------------------------------------------
-// finished with this track: write panther tables
+// finished with this track: compute likelihoods and fill the Muid structure
 
 void MuidModule::finishTrack(Muid* muid)
 {
@@ -1391,22 +1371,20 @@ void MuidModule::finishTrack(Muid* muid)
   double kaon  = 0.0;
   double miss  = 0.0;
   double junk  = 0.0;
-  double denom = 0.0;
   if (outcome == 0) {
     miss = 1.0;
   } else {
-    muon  = getPDF(MUON, outcome, layerExt, layerDiff, chiSquaredReduced);
-    pion  = getPDF(PION, outcome, layerExt, layerDiff, chiSquaredReduced);
-    kaon  = getPDF(KAON, outcome, layerExt, layerDiff, chiSquaredReduced);
-    denom = muon + pion + kaon;
+    muon = m_muonPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
+    pion = m_pionPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
+    kaon = m_kaonPar->getPDF(outcome, layerExt, layerDiff, chiSquaredReduced);
+    double denom = muon + 0.5 * (pion + kaon);
     if (denom < 1.0E-10) {
-      denom = 1.0;
-      muon  = pion = kaon = 0.0;
       junk  = 1.0;                    // anomaly: should never happen!!
+    } else {
+      muon /= denom;
+      pion /= denom;
+      kaon /= denom;
     }
-    muon /= denom;
-    pion /= denom;
-    kaon /= denom;
   }
 
   muid->setMuonPDFValue(muon);
@@ -1434,7 +1412,7 @@ void MuidModule::getAddress(const G4String& topName, Address& address)
 
 }
 
-void MuidModule::fromG4eToPhasespace(G4ErrorFreeTrajState* state, CLHEP::HepSymMatrix& covariance)
+void MuidModule::fromG4eToPhasespace(const G4ErrorFreeTrajState* state, CLHEP::HepSymMatrix& covariance)
 {
 
   G4ErrorFreeTrajParam param = state->GetParameters();
@@ -1493,7 +1471,7 @@ void MuidModule::fromG4eToPhasespace(G4ErrorFreeTrajState* state, CLHEP::HepSymM
 // phi = atan( py / px )
 // lambda = asin( pz / sqrt( px^2 + py^2 + pz^2 )
 
-void MuidModule::fromPhasespaceToG4e(Point& p, G4ErrorTrajErr& g4eCov)
+void MuidModule::fromPhasespaceToG4e(const Point& p, G4ErrorTrajErr& g4eCov)
 {
 
   G4ErrorSymMatrix temp(6, 0);
@@ -1539,141 +1517,5 @@ void MuidModule::fromPhasespaceToG4e(Point& p, G4ErrorTrajErr& g4eCov)
 
   g4eCov = temp.similarity(jacobian);
 
-}
-
-void MuidModule::fillPDF(int hypothesis)
-{
-
-  // STUB
-  double dx = 0.0;
-  for (int l = MUON; l <= KAON; l++) {
-    for (int k = 0; k < 4; k++) {
-      for (int i = 0; i < kRchisq; i++) {
-        // STUB
-      }
-      hypothesis++; // DIVOT to use this variable
-      spline(kRchisq, dx, &fRchisq[l][k][0], &fRchisqD1[l][k][0],
-             &fRchisqD2[l][k][0], &fRchisqD3[l][k][0]);
-    }
-  }
-}
-
-//____________________________________________________________________________
-
-void MuidModule::spline(int n, double dx, double Y[], double B[],
-                        double C[], double D[])
-{
-
-  // Generate the spline interpolation coefficients B, C, D to smooth out a
-  // binned histogram. Restrictions:  equal-size bins. more than 3 bins.
-
-  D[0] = dx;                                    // let's do it!
-  C[1] = (Y[1] - Y[0]) / dx;
-  for (int i = 1; i < n - 1; i++) {
-    D[i]   = dx;
-    B[i]   = dx * 4.0;
-    C[i + 1] = (Y[i + 1] - Y[i]) / dx;
-    C[i]   = C[i + 1] - C[i];
-  }
-  B[0]   = -dx;
-  B[n - 1] = -dx;
-  C[0]   = (C[2]   - C[1]) / 6.0;
-  C[n - 1] = -(C[n - 2] - C[n - 3]) / 6.0;
-  for (int i = 1; i < n; i++) {
-    double temp = dx / B[i - 1];
-    B[i] -= temp * dx;
-    C[i] -= temp * C[i - 1];
-  }
-  C[n - 1] /= B[n - 1];
-  for (int i = n - 2; i >= 0; i--) {
-    C[i] = (C[i] - D[i] * C[i + 1]) / B[i];
-  }
-  B[n - 1] = (Y[n - 1] - Y[n - 2]) / dx + (C[n - 2] + C[n - 1] * 2.0) * dx;
-  for (int i = 0; i < n - 1; i++) {
-    B[i] = (Y[i + 1] - Y[i]) / dx - (C[i + 1] + C[i] * 2.0) * dx;
-    D[i] = (C[i + 1] - C[i]) / dx;
-    C[i] = C[i] * 3.0;
-  }
-  C[n - 1] = C[n - 1] * 3.0;
-  D[n - 1] = D[n - 2];
-}
-
-//____________________________________________________________________________
-double MuidModule::getPDF(int hypothesis, int outcome,
-                          int lyr_ext, int lyr_dif, double chi2_red) const
-{
-
-  // hypothesis:  MUON or PION or KAON
-  // outcome:  0=??, 1=Barrel Stop, 2=Endcap Stop, 3=Barrel Exit, 4=Endcap Exit
-  // lyr_ext:  last layer that Ext track touched
-  // lyr_dif:  difference between last Ext layer and last hit layer
-  // chi2_red: reduced chi**2 of the transverse deviations of all associated
-  //           hits from the corresponding Ext track crossings
-
-  return getPDFRange(hypothesis, outcome, lyr_ext, lyr_dif) *
-         getPDFRchisq(hypothesis, outcome, lyr_ext, chi2_red);
-
-}
-
-//____________________________________________________________________________
-
-double MuidModule::getPDFRange(int hypothesis, int outcome, int lyr_ext,
-                               int lyr_dif) const
-{
-
-
-  // hypothesis:  MUON or PION or KAON
-  // outcome:  0=??, 1=Barrel Stop, 2=Endcap Stop, 3=Barrel Exit, 4=Endcap Exit
-  // lyr_ext:  last layer that Ext track touched
-  // lyr_dif:  difference between last Ext layer and last hit layer
-
-  if (outcome <=  0) { return 0.0; }
-  if (outcome >   4) { return 0.0; }
-  if (lyr_ext <   1) { return 0.0; }
-  if (lyr_ext >  15) { return 0.0; }
-  if (lyr_dif <   0) { return 0.0; }
-  if (lyr_dif >= kRange) { lyr_dif = kRange - 1; }
-
-  return fRange[hypothesis][outcome - 1][lyr_ext - 1][lyr_dif];
-
-}
-
-//____________________________________________________________________________
-
-double MuidModule::getPDFRchisq(int hypothesis, int outcome, int lyr_ext,
-                                double chi2_red) const
-{
-
-  // hypothesis:  MUON or PION or KAON
-  // outcome:  0=??, 1=Barrel Stop, 2=Endcap Stop, 3=Barrel Exit, 4=Endcap Exit
-  // lyr_ext:  last layer that Ext track touched
-  // chi2_red: reduced chi**2 of the transverse deviations of all associated
-  //           hits from the corresponding Ext track crossings
-
-  // Extract the probability density for a particular value of reduced
-  // chi-squared by spline interpolation of the binned histogram values.
-  // This avoids binning artifacts that were seen when the histogram
-  // was sampled directly.
-
-  if (outcome  <= 0) { return 0.0; }
-  if (outcome  >  4) { return 0.0; }
-  if (lyr_ext  <  1) { return 0.0; }
-  if (lyr_ext  > 15) { return 0.0; }
-  if (chi2_red <  0.0) { return 0.0; }
-
-  double pdf;
-  double area = fRchisqN[hypothesis][outcome - 1][lyr_ext - 1];
-  if (chi2_red >= kRchisqMax) {
-    pdf = area * fRchisq[hypothesis][outcome - 1][kRchisq - 1] + (1.0 - area);
-  } else {
-    int    i  = (int)(chi2_red / (kRchisqMax / kRchisq));
-    double dx = chi2_red - i * (kRchisqMax / kRchisq);
-    pdf = fRchisq[hypothesis][outcome - 1][i] +
-          dx * (fRchisqD1[hypothesis][outcome - 1][i] +
-                dx * (fRchisqD2[hypothesis][outcome - 1][i] +
-                      dx * fRchisqD3[hypothesis][outcome - 1][i]));
-    pdf = (pdf < 0.0) ? 0.0 : area * pdf;
-  }
-  return pdf;
 }
 

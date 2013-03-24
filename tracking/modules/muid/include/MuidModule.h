@@ -32,7 +32,6 @@ class G4VPhysicalVolume;
 class G4ErrorFreeTrajState;
 class G4String;
 class GFTrack;
-class GFTrackCand;
 
 #define BARREL 1
 #define ENDCAP 2
@@ -44,17 +43,13 @@ class GFTrackCand;
 #define CROSSED 2
 #define SIDE 3
 
-#define kRange 16
-#define kRchisq 50
-
 namespace Belle2 {
 
   class Muid;
   class MuidHit;
   class BKLMHit2d;
   class EKLMHit2d;
-
-  const unsigned int STATUS_INRPC   = 0x00000001;
+  class MuidPar;
 
   //! detector-element identification
   struct Address {
@@ -162,27 +157,27 @@ namespace Belle2 {
     void getStartPoint(const GFTrack*, int, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);
 
     //! Add an extrapolation point for the track
-    bool createHit(G4ErrorFreeTrajState*, int, int, StoreArray<MuidHit>&, RelationArray&, StoreArray<BKLMHit2d>&, StoreArray<EKLMHit2d>&);
+    bool createHit(G4ErrorFreeTrajState*, int, int, StoreArray<MuidHit>&, RelationArray&, const StoreArray<BKLMHit2d>&, const StoreArray<EKLMHit2d>&);
 
     //! Find the intersection point of the track with the crossed BKLM plane
-    void findBarrelIntersection(TVector3&, TVector3&, Point&);
+    void findBarrelIntersection(Point&, const TVector3&, const TVector3&);
 
     //! Find the intersection point of the track with the crossed EKLM plane
-    void findEndcapIntersection(TVector3&, TVector3&, Point&);
+    void findEndcapIntersection(Point&, const TVector3&, const TVector3&);
 
     //! Find the matching BKLM 2D hit nearest the intersection point
     //! of the track with the crossed BKLM plane
-    void findMatchingBarrelHit(Point&, StoreArray<BKLMHit2d>&);
+    void findMatchingBarrelHit(Point&, const StoreArray<BKLMHit2d>&);
 
     //! Find the matching EKLM 2D hit nearest the intersection point
     //! of the track with the crossed EKLM plane
-    void findMatchingEndcapHit(Point&, StoreArray<EKLMHit2d>&);
+    void findMatchingEndcapHit(Point&, const StoreArray<EKLMHit2d>&);
 
     //! Nudge the track using the matching hit
-    void adjustIntersection(Point&, double*, TVector3&);
+    void adjustIntersection(Point&, const double*, const TVector3&);
 
-    //! Get the in-plane error covariance
-    double getPlaneError(CLHEP::HepSymMatrix&, TVector3, TVector3);
+    //! Get the in-plane covariance
+    double getPlaneVariance(const CLHEP::HepSymMatrix&, const TVector3&, const TVector3&);
 
     //! Complete muon identification after end of track extrapolation
     void finishTrack(Muid*);
@@ -191,10 +186,10 @@ namespace Belle2 {
     void getAddress(const G4String&, Address&);
 
     //! Convert GEANT4e covariance to phase-space covariance
-    void fromG4eToPhasespace(G4ErrorFreeTrajState*, CLHEP::HepSymMatrix&);
+    void fromG4eToPhasespace(const G4ErrorFreeTrajState*, CLHEP::HepSymMatrix&);
 
     //! Convert phase-space covariance to GEANT4e covariance
-    void fromPhasespaceToG4e(Point&, G4ErrorTrajErr&);
+    void fromPhasespaceToG4e(const Point&, G4ErrorTrajErr&);
 
     //! Fill PDF tables
     void fillPDF(int);
@@ -247,6 +242,10 @@ namespace Belle2 {
     double m_DefaultError;
     double m_maxDistCM;
     double m_maxDistSIGMA;
+    double m_StripWidth;
+    double m_StripPositionVariance;
+    double m_ScintWidth;
+    double m_ScintPositionVariance;
     double m_BarrelActiveMinZ;
     double m_BarrelActiveMaxZ;
     double m_BarrelModuleMiddleRadius[NLAYER + 1];
@@ -281,21 +280,9 @@ namespace Belle2 {
     int m_numEndcapLayerExt;
     int m_numEndcapLayerHit;
 
-    // Overflow value of reduced chi-squared
-
-    double kRchisqMax;
-
-    // Probability density arrays for range and reduced chi**2.
-    // One extra bin in chi-squared distribution for overflows.
-    // For reduced chi-squared, three extra arrays are stored for spline
-    // interpolation to eliminate binning artifacts.
-
-    double fRange[3][4][15][kRange];
-    double fRchisq[3][4][kRchisq + 1];    // reduced chi-squared values
-    double fRchisqD1[3][4][kRchisq + 1];  // first derivatives
-    double fRchisqD2[3][4][kRchisq + 1];  // second derivatives
-    double fRchisqD3[3][4][kRchisq + 1];  // third derivatives
-    double fRchisqN[3][4][15];            // non-overflow normalizations
+    MuidPar* m_muonPar;
+    MuidPar* m_pionPar;
+    MuidPar* m_kaonPar;
 
   };
 

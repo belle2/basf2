@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This is the file that specifies the PDF source files for MuidPar-->
+<MuidParameters name="MuidParameters" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<Description>Names of the files that contain the PDFs for muon identification, by experiment number and particleID hypothesis</Description>
+        <Version>0</Version>
+	<Creator>MuidPar</Creator>
+	<Content>
+		<Experiment id="0">
+                        <muonPDFs>
+                                <Filename>muid_muon_e000000.dat</Filename>
+                        </muonPDFs>
+                        <pionPDFs>
+                                <Filename>muid_pion_e000000.dat</Filename>
+                        </pionPDFs>
+                        <kaonPDFs>
+                                <Filename>muid_kaon_e000000.dat</Filename>
+                        </kaonPDFs>
+		</Experiment>
+	</Content>
+</MuidParameters>

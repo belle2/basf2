@@ -12,7 +12,6 @@
 #include <tracking/modules/ext/ExtManager.h>
 #include <tracking/modules/ext/ExtPhysicsList.h>
 #include <tracking/modules/ext/ExtCylSurfaceTarget.h>
-#include <tracking/dataobjects/ExtRecoHit.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <simulation/kernel/DetectorConstruction.h>
 #include <simulation/kernel/MagneticField.h>
@@ -35,7 +34,6 @@
 #include <CLHEP/Matrix/Matrix.h>
 
 #include <GFTrack.h>
-#include <GFTrackCand.h>
 #include <GFDetPlane.h>
 #include <GFFieldManager.h>
 
@@ -71,8 +69,6 @@ ExtModule::ExtModule() : Module(), m_extMgr(NULL)  // no ExtManager yet
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("pdgCodes", m_pdgCode, "Positive-charge PDG codes for extrapolation hypotheses", m_pdgCode);
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the reconstructed tracks", string(""));
-  addParam("ExtTrackCandsColName", m_extTrackCandsColName, "DEPRECATED Name of collection holding the list of hits from each extrapolation", string(""));
-  addParam("ExtRecoHitsColName", m_extRecoHitsColName, "DEPRECATED Name of collection holding the RecoHits from the extrapolation", string(""));
   addParam("ExtHitsColName", m_extHitsColName, "Name of collection holding the ExtHits from the extrapolation", string(""));
   addParam("MinPt", m_minPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", double(0.0));
   addParam("MinKE", m_minKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", double(0.002));
@@ -171,21 +167,12 @@ void ExtModule::initialize()
     B2INFO("Module ext initialize(): hypotheses for " << particle->GetParticleName() << " and its antiparticle will be extrapolated")
   }
 
-  // new output and relation
+  // Define output and relation arrays
   StoreArray<GFTrack> gfTracks(m_gfTracksColName);
   StoreArray<ExtHit> extHits(m_extHitsColName);
   RelationArray gfTrackToExtHits(gfTracks, extHits);
   StoreArray<ExtHit>::registerPersistent();
   RelationArray::registerPersistent<GFTrack, ExtHit>();
-
-  // deprecated output
-  if ((m_extTrackCandsColName != "") || (m_extRecoHitsColName != "")) {
-    StoreArray<GFTrackCand> dummyCands(m_extTrackCandsColName);
-    StoreArray<ExtRecoHit> dummyHits(m_extRecoHitsColName);
-    StoreArray<GFTrackCand>::registerPersistent(m_extTrackCandsColName);
-    StoreArray<ExtRecoHit>::registerPersistent(m_extRecoHitsColName);
-    B2WARNING("Module ext initialize():  Storing data in <GFTrackCand> and <ExtRecoHit> is deprecated. Please use <ExtHit> instead.")
-  }
 
   return;
 
@@ -213,10 +200,6 @@ void ExtModule::event()
   StoreArray<GFTrack> gfTracks(m_gfTracksColName);
   StoreArray<ExtHit> extHits(m_extHitsColName);
   RelationArray gfTrackToExtHits(gfTracks, extHits);
-  StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName); // deprecated
-  StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName); // deprecated
-  extTrackCands.getPtr()->Clear(); // deprecated
-  extRecoHits.getPtr()->Clear(); // deprecated
 
   G4ThreeVector position;
   G4ThreeVector momentum;
@@ -230,7 +213,7 @@ void ExtModule::event()
     for (unsigned int hypothesis = 0; hypothesis < m_pdgCode.size(); hypothesis++) {
 
       int pdgCode = m_pdgCode[hypothesis] * charge;
-      GFTrackCand* cand = addTrackCand(gfTracks[t], pdgCode, extTrackCands, position, momentum, covG4e); // deprecated
+      getStartPoint(gfTracks[t], pdgCode, position, momentum, covG4e);
       if (gfTracks[t]->getMom().Pt() <= m_minPt) continue;
       G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
       string g4eName = "g4e_" + particle->GetParticleName();
@@ -247,30 +230,30 @@ void ExtModule::event()
         const G4int    postStatus = step->GetPostStepPoint()->GetStepStatus();
         // First step on this track?
         if (preStatus == fUndefined) {
-          createHit(state, EXT_FIRST, t, pdgCode, extHits, gfTrackToExtHits, cand, extRecoHits);
+          createHit(state, EXT_FIRST, t, pdgCode, extHits, gfTrackToExtHits);
         }
         // Ignore the zero-length step by PropagateOneStep() at each boundary
         if (length > 0.0) {
           if (preStatus == fGeomBoundary) {      // first step in this volume?
-            createHit(state, EXT_ENTER, t, pdgCode, extHits, gfTrackToExtHits, cand, extRecoHits);
+            createHit(state, EXT_ENTER, t, pdgCode, extHits, gfTrackToExtHits);
           }
           m_tof += step->GetDeltaTime();
           // Last step in this volume?
           if (postStatus == fGeomBoundary) {
-            createHit(state, EXT_EXIT, t, pdgCode, extHits, gfTrackToExtHits, cand, extRecoHits);
+            createHit(state, EXT_EXIT, t, pdgCode, extHits, gfTrackToExtHits);
           }
         }
         // Post-step momentum too low?
         if (errCode || (track->GetMomentum().mag() < minP)) {
-          createHit(state, EXT_STOP, t, pdgCode, extHits, gfTrackToExtHits, cand, extRecoHits);
+          createHit(state, EXT_STOP, t, pdgCode, extHits, gfTrackToExtHits);
           break;
         }
         if (G4ErrorPropagatorData::GetErrorPropagatorData()->GetState() == G4ErrorState(G4ErrorState_TargetCloserThanBoundary)) {
-          createHit(state, EXT_ESCAPE, t, pdgCode, extHits, gfTrackToExtHits, cand, extRecoHits);
+          createHit(state, EXT_ESCAPE, t, pdgCode, extHits, gfTrackToExtHits);
           break;
         }
         if (m_extMgr->GetPropagator()->CheckIfLastStep(track)) {
-          createHit(state, EXT_ESCAPE, t, pdgCode, extHits, gfTrackToExtHits, cand, extRecoHits);
+          createHit(state, EXT_ESCAPE, t, pdgCode, extHits, gfTrackToExtHits);
           break;
         }
 
@@ -473,8 +456,8 @@ TMatrixD ExtModule::getCov(const G4ErrorFreeTrajState* state)
 
 }
 
-GFTrackCand* ExtModule::addTrackCand(const GFTrack* gfTrack, int pdgCode, StoreArray<GFTrackCand>& extTrackCands,
-                                     G4ThreeVector& position, G4ThreeVector& momentum, G4ErrorTrajErr& covG4e)
+void ExtModule::getStartPoint(const GFTrack* gfTrack, int pdgCode,
+                              G4ThreeVector& position, G4ThreeVector& momentum, G4ErrorTrajErr& covG4e)
 {
 
   GFAbsTrackRep* gfTrackRep = gfTrack->getCardinalRep();
@@ -640,8 +623,6 @@ GFTrackCand* ExtModule::addTrackCand(const GFTrack* gfTrack, int pdgCode, StoreA
       covG4e[i][j] = lastCovG4e[i][j];  // in Geant4e units (GeV, cm)
     }
   }
-  GFTrackCand* cand = extTrackCands.appendNew();
-  cand->setPosMomSeedAndPdgCode(lastPosition, lastMomentum, pdgCode, TMatrixDSym(6, lastCovPS.GetMatrixArray()));
   position.setX(lastPosition.X()*cm); // in Geant4 units (mm)
   position.setY(lastPosition.Y()*cm);
   position.setZ(lastPosition.Z()*cm);
@@ -649,13 +630,12 @@ GFTrackCand* ExtModule::addTrackCand(const GFTrack* gfTrack, int pdgCode, StoreA
   momentum.setY(lastMomentum.Y()*GeV);
   momentum.setZ(lastMomentum.Z()*GeV);
 
-  return cand;
+  return;
 }
 
 // write another volume-entry or volume-exit point on track
 void ExtModule::createHit(const G4ErrorFreeTrajState* state, ExtHitStatus status, int trackID, int pdgCode,
-                          StoreArray<ExtHit>& extHits, RelationArray& gfTrackToExtHits,
-                          GFTrackCand* cand, StoreArray<ExtRecoHit>& extRecoHits)  // last two arguments are deprecated
+                          StoreArray<ExtHit>& extHits, RelationArray& gfTrackToExtHits)
 {
 
   G4StepPoint* stepPoint = state->GetG4Track()->GetStep()->GetPreStepPoint();
@@ -679,11 +659,9 @@ void ExtModule::createHit(const G4ErrorFreeTrajState* state, ExtHitStatus status
   phasespacePoint[4][0] = stepPoint->GetMomentum().y() / GeV;
   phasespacePoint[5][0] = stepPoint->GetMomentum().z() / GeV;
   covariance = getCov(state);
-  new(extRecoHits.nextFreeAddress()) ExtRecoHit(phasespacePoint, covariance, status); // deprecated
   ExtDetectorID detID(EXT_UNKNOWN);
   int copyID(0);
   getVolumeID(preTouch, detID, copyID);
-  cand->addHit(detID, extRecoHits.getEntries(), copyID, m_tof); // deprecated
   TVector3 pos(phasespacePoint[0][0], phasespacePoint[1][0], phasespacePoint[2][0]);
   TVector3 mom(phasespacePoint[3][0], phasespacePoint[4][0], phasespacePoint[5][0]);
   new(extHits.nextFreeAddress()) ExtHit(pdgCode, detID, copyID, status, m_tof, pos, mom, covariance);

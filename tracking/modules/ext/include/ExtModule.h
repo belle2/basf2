@@ -14,7 +14,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <tracking/dataobjects/ExtRecoHit.h>
+#include <tracking/dataobjects/ExtHit.h>
 
 #include <G4TouchableHandle.hh>
 #include <G4ErrorTrajErr.hh>
@@ -31,7 +31,6 @@ class G4VPhysicalVolume;
 class G4ErrorFreeTrajState;
 class G4String;
 class GFTrack;
-class GFTrackCand;
 
 namespace Belle2 {
 
@@ -89,12 +88,6 @@ namespace Belle2 {
     //! Name of the GFTrack collection of the reconstructed tracks to be extrapolated
     std::string m_gfTracksColName;
 
-    //! Name of the GFTrackCand collection, each holding the list of hits for a particular track and hypothesis (deprecated)
-    std::string m_extTrackCandsColName;
-
-    //! Name of the extRecoHit collection of the extrapolation hits (deprecated)
-    std::string m_extRecoHitsColName;
-
     //! Name of the extHit collection of the extrapolation hits
     std::string m_extHitsColName;
 
@@ -111,10 +104,10 @@ namespace Belle2 {
     TMatrixD getCov(const G4ErrorFreeTrajState*);
 
     //! Define a new track candidate for one reconstructed track and PDG hypothesis
-    GFTrackCand* addTrackCand(const GFTrack*, int, StoreArray<GFTrackCand>&, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);
+    void getStartPoint(const GFTrack*, int, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);
 
     //! Create another extrapolation hit for a track candidate
-    void createHit(const G4ErrorFreeTrajState*, ExtHitStatus, int, int, StoreArray<ExtHit>&, RelationArray&, GFTrackCand*, StoreArray<ExtRecoHit>&);
+    void createHit(const G4ErrorFreeTrajState*, ExtHitStatus, int, int, StoreArray<ExtHit>&, RelationArray&);
 
     //! Pointer to the ExtManager singleton
     ExtManager* m_extMgr;

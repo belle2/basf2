@@ -119,18 +119,18 @@ namespace Belle2 {
 
       // Module parameters
 
-      std::string m_gfTracksColName;      /**< GF tracks (input) */
-      std::string m_extHitsColName;       /**< Ext reconstructed hits (input) */
-      std::string m_topDigitColName;      /**< Digitized data (input) */
-      std::string m_topLogLColName;       /**< TOP log likelihoods (output) */
-      std::string m_barHitColName;        /**< MC particle hit (to set relation to) */
-      int m_debugLevel;                   /**< debug level */
-      double m_minBkgPerQbar;       /**< minimal assumed background photons per bar */
-      double m_ScaleN0;             /**< scale factor for N0 */
+      std::string m_gfTracksColName;  /**< GF tracks (input) */
+      std::string m_extHitsColName;   /**< Ext reconstructed hits (input) */
+      std::string m_topDigitColName;  /**< Digitized data (input) */
+      std::string m_topLogLColName;   /**< TOP log likelihoods (output) */
+      std::string m_barHitColName;    /**< MC particle hit (to set relation to) */
+      int m_debugLevel;               /**< debug level */
+      double m_minBkgPerQbar;   /**< minimal assumed background photons per bar */
+      double m_ScaleN0;         /**< scale factor for N0 */
 
       // Geometry parameters
 
-      TOPGeometryPar* m_topgp;
+      TOPGeometryPar* m_topgp;   /**< geometry parameters */
 
       // space for TOP bars including wedges
 

@@ -76,8 +76,6 @@ cdcfitting = register_module('GenFitter')
 
 # Track extrapolation
 ext = register_module('Ext')
-ext.param('ExtTrackCandsColName', 'ExtTrackCands')  # output from ext (DEPRECATED)
-ext.param('ExtRecoHitsColName', 'ExtRecoHits')  # output from ext (DEPRECATED)
 
 # TOP reconstruction
 topdigi = register_module('TOPDigitizer')

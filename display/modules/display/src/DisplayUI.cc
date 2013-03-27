@@ -97,6 +97,7 @@ void DisplayUI::updateUI()
   } else {
     m_eventLabel->SetText(TString::Format("Event: \t\t%lu\nRun: \t\t%lu\nExperiment: \t%lu", eventMetaData->getEvent(), eventMetaData->getRun(), eventMetaData->getExperiment()));
   }
+  m_eventLabel->Resize();
 }
 
 void DisplayUI::goToEvent(Long_t id)

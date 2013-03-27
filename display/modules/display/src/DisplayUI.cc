@@ -242,6 +242,7 @@ void DisplayUI::makeGui()
 
   //workaround for regression in root 5.34/03: closing display window from WM wouldn't stop event loop
   browser->Connect("CloseWindow()", "TSystem", gSystem, "ExitLoop()");
+  browser->Connect("CloseWindow()", "Belle2::DisplayUI", this, "closeAndContinue()");
 
   browser->StartEmbedding(TRootBrowser::kLeft);
 
@@ -500,14 +501,13 @@ void DisplayUI::closeAndContinue()
 {
   if (!gEve)
     return;
+  gEve->GetBrowser()->UnmapWindow();
   gEve->GetBrowser()->SendCloseMessage();
 }
 
 void DisplayUI::exit()
 {
-  if (!gEve)
-    return;
-  gEve->GetBrowser()->SendCloseMessage();
+  closeAndContinue();
 
   //stop event processing after current event
   StoreObjPtr<EventMetaData> eventMetaData;

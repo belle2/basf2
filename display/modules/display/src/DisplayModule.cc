@@ -97,7 +97,7 @@ void DisplayModule::event()
 {
   if (!gEve) {
     //window closed?
-    B2WARNING("No TEveManager found, skipping display. (hit Ctrl+C to exit)");
+    B2WARNING("Display window closed, continuing with next module. (hit Ctrl+C to exit)");
     return;
   }
 

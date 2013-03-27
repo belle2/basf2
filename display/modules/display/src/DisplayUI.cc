@@ -50,7 +50,7 @@ DisplayUI::DisplayUI(bool automatic):
   }
 
   TEveBrowser* browser = gEve->GetBrowser();
-  browser->SetWindowName("Display");
+  browser->SetWindowName("Event Display");
   browser->HideBottomTab();
   browser->StartEmbedding(TRootBrowser::kRight);
   m_viewer = new SplitGLView(gClient->GetRoot(), 800, 700);

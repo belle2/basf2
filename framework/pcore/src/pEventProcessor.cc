@@ -20,6 +20,19 @@
 using namespace std;
 using namespace Belle2;
 
+static void signalHandler(int)
+{
+  //signal handlers are called asynchronously, making many standard functions (including output) dangerous
+  //write() is, however, safe, so we'll use that to write to stderr.
+  const char msg[] = "\nProcess died with SIGSEGV (Segmentation fault).\n";
+  const int len = sizeof(msg) / sizeof(char) - 1; //minus NULL byte
+
+  int rc = write(STDERR_FILENO, msg, len);
+  (void) rc; //ignore return value (there's nothing we can do about a failed write)
+
+  abort();
+}
+
 pEventProcessor::pEventProcessor(PathManager& pathManager) : EventProcessor(pathManager),
   procHandler(new ProcHandler())
 { }
@@ -34,8 +47,6 @@ pEventProcessor::~pEventProcessor()
 void pEventProcessor::process(PathPtr spath)
 {
   if (spath->getModules().size() == 0) return;
-
-  signal(SIGSEGV, SIG_DFL);
 
   const int numProcesses = Environment::Instance().getNumberProcesses();
 
@@ -53,6 +64,11 @@ void pEventProcessor::process(PathPtr spath)
   ModulePtrList initmodules = init_modules_in_main(modulelist);
   processInitialize(initmodules);
   //  dump_modules ( "extracted : ", initmodules );
+
+  //If we crash after forking, ROOTs SIGSEGV handler could potentially use huge amounts of memory (scales with numProcesses)
+  if (signal(SIGSEGV, signalHandler) == SIG_ERR) {
+    B2FATAL("Cannot setup SIGSEGV signal handler\n");
+  }
 
   // 2. Analyze start path and split into parallel paths
   m_histoflag = false;

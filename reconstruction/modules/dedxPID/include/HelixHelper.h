@@ -15,6 +15,7 @@
 #include <Math/Functor.h>
 #include <Math/BrentMinimizer1D.h>
 
+#include <cmath>
 
 namespace Belle2 {
   /** Helper class representing a helical track

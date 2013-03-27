@@ -10,8 +10,11 @@
 #include <framework/modules/seqroot/seqrootoutputModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/core/Environment.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#include <cmath>
 #include <fcntl.h>
 
 using namespace std;

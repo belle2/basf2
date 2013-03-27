@@ -214,8 +214,7 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
         state = 1;
         if (inlist.size() > 0) {
           // Create RingBuffer
-          //          RingBuffer* rbuf = new RingBuffer((char*)"input", RBUFSIZE);
-          RingBuffer* rbuf = new RingBuffer(RBUFSIZE);
+          RingBuffer* rbuf = new RingBuffer();
           m_rbinlist.push_back(rbuf);
           // Insert Tx at the end of current path
           ModulePtr txptr(new TxModule(rbuf));
@@ -250,8 +249,7 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
         state = 2;
         if (mainlist.size() > 0 || (cstate == 1 && mainlist.size() == 0)) {
           // Create RingBuffer
-          //          RingBuffer* rbuf = new RingBuffer((char*)"output", RBUFSIZE);
-          RingBuffer* rbuf = new RingBuffer(RBUFSIZE);
+          RingBuffer* rbuf = new RingBuffer();
           m_rboutlist.push_back(rbuf);
           // Insert Tx at the end of current path
           ModulePtr txptr(new TxModule(rbuf));

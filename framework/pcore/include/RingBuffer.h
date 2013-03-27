@@ -32,8 +32,14 @@ namespace Belle2 {
   /*! Class to manage a Ring Buffer placed in an IPC shared memory */
   class RingBuffer {
   public:
-    /*! Constructor to create a new shared memory in private space */
-    RingBuffer(int size);
+    /** Standard size of buffer, in integers (~400MB). */
+    const static int c_DefaultSize = 100000000;
+
+    /** Constructor to create a new shared memory in private space.
+     *
+     * @param size Ring buffer size in integers (!)
+     */
+    RingBuffer(int size = c_DefaultSize);
     /*! Constructor to create/attach named shared memory in global space */
     RingBuffer(const char* name, unsigned int size);    // Create / Attach Ring buffer
     /*! Constructor by attaching to an existing shared memory */

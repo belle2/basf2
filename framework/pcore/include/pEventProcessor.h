@@ -16,7 +16,6 @@
 #include <framework/core/Module.h>
 #include <framework/core/Path.h>
 
-#define RBUFSIZE 100000000
 
 namespace Belle2 {
 

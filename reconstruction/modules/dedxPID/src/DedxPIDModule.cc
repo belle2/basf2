@@ -340,9 +340,6 @@ void DedxPIDModule::event()
             local_momentum = dir_in_poca;
             hit_pos_helix = poca;
             hit_pos = poca_on_wire;
-            if (hit_pos.Perp() > 111.14 or hit_pos.z() < -83.12 or hit_pos.z() > 158.57) {
-              B2WARNING("Genfit extrapolation: Hit outside drift chamber! track_id: " << m_trackID - 1 << ", pos: " << hit_pos.x() << ", " << hit_pos.y() << ", " << hit_pos.z() << ", dist to helix: " << (hit_pos - hit_pos_helix).Mag());
-            }
           } catch (GFException) {
             B2WARNING(m_eventID - 1 << ":" << m_trackID - 1 << ": Track extrapolation failed (in CDC), further hits will be less accurate");
 

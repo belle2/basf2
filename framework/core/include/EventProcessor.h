@@ -11,8 +11,8 @@
 #ifndef EVENTPROCESSOR_H_
 #define EVENTPROCESSOR_H_
 
-#include <framework/core/Module.h>
 #include <framework/core/Path.h>
+#include <framework/core/Module.h>
 
 namespace Belle2 {
 

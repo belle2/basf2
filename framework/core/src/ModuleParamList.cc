@@ -8,7 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <boost/python/object.hpp>
+#include <boost/python/list.hpp>
+#include <boost/python/extract.hpp>
+
 #include <framework/core/ModuleParamList.h>
+
+#include <framework/core/ModuleParamInfoPython.h>
+#include <framework/core/PyObjConvUtils.h>
 
 using namespace std;
 using namespace Belle2;
@@ -65,9 +72,88 @@ bool ModuleParamList::hasUnsetForcedParams() const
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //                   Python API
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-boost::python::list ModuleParamList::getParamInfoListPython() const
+template<typename T>
+void setParamObjectTemplatePython(ModuleParamList& params, const std::string& name, const boost::python::object& pyObj)
 {
-  boost::python::list returnList;
+  boost::python::extract<T> valueProxy(pyObj);
+  if (valueProxy.check()) {
+    T tmpValue = static_cast<T>(valueProxy);
+    params.setParameter(name, tmpValue);
+  } else {
+    B2ERROR("Could not set a module parameter: The python object defined by '" + name + "' could not be converted!")
+  }
+}
+
+
+template<typename T>
+void setParamListTemplatePython(ModuleParamList& params, const std::string& name, const boost::python::list& pyList)
+{
+  std::vector<T> tmpList;
+  int nList = boost::python::len(pyList);
+
+  for (int iList = 0; iList < nList; ++iList) {
+    boost::python::extract<T> checkValue(pyList[iList]);
+    if (checkValue.check()) {
+      tmpList.push_back(checkValue);
+    } else {
+      B2ERROR("Could not set a module parameter: A python object defined in the list '" + name + "' could not be converted!")
+    }
+  }
+  params.setParameter(name, tmpList);
+}
+
+
+template<typename T>
+void getParamObjectValuesTemplatePython(const ModuleParamList& params, const std::string& name, boost::python::list& outputList, bool defaultValues)
+{
+  try {
+    ModuleParam<T>& explModParam = params.getParameter<T>(name);
+    ParamTypeInfo paramInfo = params.getParamTypeInfo(name);
+
+    if (paramInfo.m_paramBasicType != ParamTypeInfo::c_SingleParam) {
+      B2ERROR("The parameter type of parameter '" + name + "' is not a single parameter value!")
+      return;
+    }
+
+    if (defaultValues) {
+      PyObjConvUtils::addSingleValueToList<T>(explModParam.getDefaultValue(), outputList);
+    } else {
+      PyObjConvUtils::addSingleValueToList<T>(explModParam.getValue(), outputList);
+    }
+  } catch (ModuleParamList::ModuleParameterNotFoundError& exc) {
+    B2ERROR(exc.what())
+  } catch (ModuleParamList::ModuleParameterTypeError& exc) {
+    B2ERROR(exc.what())
+  }
+}
+
+
+template<typename T>
+void getParamListValuesTemplatePython(const ModuleParamList& params, const std::string& name, boost::python::list& outputList, bool defaultValues)
+{
+  try {
+    ModuleParam<T>& explModParam = params.getParameter<T>(name);
+    ParamTypeInfo paramInfo = params.getParamTypeInfo(name);
+
+    if (paramInfo.m_paramBasicType != ParamTypeInfo::c_ListParam) {
+      B2ERROR("The parameter type of parameter '" + name + "' is not a list parameter value!")
+      return;
+    }
+
+    if (defaultValues) {
+      PyObjConvUtils::addSTLVectorToList<T>(explModParam.getDefaultValue(), outputList);
+    } else {
+      PyObjConvUtils::addSTLVectorToList<T>(explModParam.getValue(), outputList);
+    }
+  } catch (ModuleParamList::ModuleParameterNotFoundError& exc) {
+    B2ERROR(exc.what())
+  } catch (ModuleParamList::ModuleParameterTypeError& exc) {
+    B2ERROR(exc.what())
+  }
+}
+boost::python::list* ModuleParamList::getParamInfoListPython() const
+{
+  boost::python::list* returnList = new boost::python::list;
   map<string, ModuleParamPtr>::const_iterator mapIter;
 
   for (mapIter = m_paramMap.begin(); mapIter != m_paramMap.end(); ++mapIter) {
@@ -82,7 +168,7 @@ boost::python::list ModuleParamList::getParamInfoListPython() const
     getParamValuesPython(mapIter->first, newParamInfo.m_defaultValues, true);
     getParamValuesPython(mapIter->first, newParamInfo.m_values, false);
 
-    returnList.append(boost::python::object(newParamInfo));
+    returnList->append(boost::python::object(newParamInfo));
   }
   return returnList;
 }
@@ -99,16 +185,16 @@ void ModuleParamList::setParamObjectPython(const std::string& name, const boost:
 
   switch (paramInfo.m_paramValueType) {
     case ParamTypeInfo::c_IntegerParam:
-      setParamObjectTemplatePython<int>(name, pyObj);
+      setParamObjectTemplatePython<int>(*this, name, pyObj);
       break;
     case ParamTypeInfo::c_DoubleParam:
-      setParamObjectTemplatePython<double>(name, pyObj);
+      setParamObjectTemplatePython<double>(*this, name, pyObj);
       break;
     case ParamTypeInfo::c_StringParam:
-      setParamObjectTemplatePython<string>(name, pyObj);
+      setParamObjectTemplatePython<string>(*this, name, pyObj);
       break;
     case ParamTypeInfo::c_BoolParam:
-      setParamObjectTemplatePython<bool>(name, pyObj);
+      setParamObjectTemplatePython<bool>(*this, name, pyObj);
       break;
     default:
       B2ERROR("The parameter type of parameter '" + name + "' is not a supported single value type!")
@@ -127,16 +213,16 @@ void ModuleParamList::setParamListPython(const std::string& name, const boost::p
 
   switch (paramInfo.m_paramValueType) {
     case ParamTypeInfo::c_IntegerParam:
-      setParamListTemplatePython<int>(name, pyList);
+      setParamListTemplatePython<int>(*this, name, pyList);
       break;
     case ParamTypeInfo::c_DoubleParam:
-      setParamListTemplatePython<double>(name, pyList);
+      setParamListTemplatePython<double>(*this, name, pyList);
       break;
     case ParamTypeInfo::c_StringParam:
-      setParamListTemplatePython<string>(name, pyList);
+      setParamListTemplatePython<string>(*this, name, pyList);
       break;
     case ParamTypeInfo::c_BoolParam:
-      setParamListTemplatePython<bool>(name, pyList);
+      setParamListTemplatePython<bool>(*this, name, pyList);
       break;
     default:
       B2ERROR("The parameter type of parameter '" + name + "' is not a supported list value type!")
@@ -177,16 +263,16 @@ void ModuleParamList::getParamValuesPython(const std::string& name, boost::pytho
     case ParamTypeInfo::c_SingleParam:
       switch (paramInfo.m_paramValueType) {
         case ParamTypeInfo::c_IntegerParam:
-          getParamObjectValuesTemplatePython<int>(name, outputList, defaultValues);
+          getParamObjectValuesTemplatePython<int>(*this, name, outputList, defaultValues);
           break;
         case ParamTypeInfo::c_DoubleParam:
-          getParamObjectValuesTemplatePython<double>(name, outputList, defaultValues);
+          getParamObjectValuesTemplatePython<double>(*this, name, outputList, defaultValues);
           break;
         case ParamTypeInfo::c_StringParam:
-          getParamObjectValuesTemplatePython<string>(name, outputList, defaultValues);
+          getParamObjectValuesTemplatePython<string>(*this, name, outputList, defaultValues);
           break;
         case ParamTypeInfo::c_BoolParam:
-          getParamObjectValuesTemplatePython<bool>(name, outputList, defaultValues);
+          getParamObjectValuesTemplatePython<bool>(*this, name, outputList, defaultValues);
           break;
         default:
           B2ERROR("The parameter type of parameter '" + name + "' is not a supported parameter value type!")
@@ -195,16 +281,16 @@ void ModuleParamList::getParamValuesPython(const std::string& name, boost::pytho
     case ParamTypeInfo::c_ListParam:
       switch (paramInfo.m_paramValueType) {
         case ParamTypeInfo::c_IntegerParam:
-          getParamListValuesTemplatePython< vector<int> >(name, outputList, defaultValues);
+          getParamListValuesTemplatePython< vector<int> >(*this, name, outputList, defaultValues);
           break;
         case ParamTypeInfo::c_DoubleParam:
-          getParamListValuesTemplatePython< vector<double> >(name, outputList, defaultValues);
+          getParamListValuesTemplatePython< vector<double> >(*this, name, outputList, defaultValues);
           break;
         case ParamTypeInfo::c_StringParam:
-          getParamListValuesTemplatePython< vector<string> >(name, outputList, defaultValues);
+          getParamListValuesTemplatePython< vector<string> >(*this, name, outputList, defaultValues);
           break;
         case ParamTypeInfo::c_BoolParam:
-          getParamListValuesTemplatePython< vector<bool> >(name, outputList, defaultValues);
+          getParamListValuesTemplatePython< vector<bool> >(*this, name, outputList, defaultValues);
           break;
         default:
           B2ERROR("The parameter type of parameter '" + name + "' is not a supported parameter value type!")

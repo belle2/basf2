@@ -10,7 +10,7 @@
 
 #include <boost/python/class.hpp>
 
-#include <framework/core/ModuleParam.h>
+#include <framework/core/ModuleParamInfoPython.h>
 
 using namespace std;
 using namespace Belle2;

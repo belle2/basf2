@@ -15,9 +15,9 @@
 #include <framework/core/Module.h>
 #include <framework/core/Path.h>
 #include <framework/core/Framework.h>
-#include <framework/core/ModuleParam.h>
 #include <framework/core/ModuleStatistics.h>
 #include <framework/core/RandomNumbers.h>
+#include <framework/core/ModuleParamInfoPython.h>
 #include <framework/logging/LogPythonInterface.h>
 #include <framework/dataobjects/FileMetaData.h>
 

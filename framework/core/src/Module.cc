@@ -11,6 +11,7 @@
 #include <boost/python/register_ptr_to_python.hpp>
 #include <boost/python/class.hpp>
 #include <boost/python/list.hpp>
+#include <boost/python/dict.hpp>
 #include <boost/python/copy_const_reference.hpp>
 
 #include <framework/core/Module.h>
@@ -200,9 +201,16 @@ void Module::setParamDict(const boost::python::dict& dictionary)
 //                          Python API
 //=====================================================================
 
-boost::python::list Module::getParamInfoListPython() const
+boost::python::list* Module::getParamInfoListPython() const
 {
   return m_moduleParamList.getParamInfoListPython();
+}
+
+/** Same as above member function, but return-by-value. */
+boost::python::list _getParamInfoListPython(const Module* m)
+{
+  boost::shared_ptr<boost::python::list> p(m->getParamInfoListPython());
+  return *p.get(); //copy
 }
 
 
@@ -227,7 +235,7 @@ void Module::exposePythonAPI()
   .def("param", &Module::setParamObject)
   .def("param", &Module::setParamList)
   .def("param", &Module::setParamDict)
-  .def("available_params", &Module::getParamInfoListPython)
+  .def("available_params", &_getParamInfoListPython)
   .add_property("logging",
                 make_function(&Module::getLogConfig, return_value_policy<reference_existing_object>()),
                 &Module::setLogConfig)

@@ -11,8 +11,6 @@
 #ifndef MODULE_H
 #define MODULE_H
 
-#include <boost/python/list.hpp>
-
 #include <framework/core/PathElement.h>
 #include <framework/core/CondParser.h>
 #include <framework/core/ModuleParamList.h>
@@ -23,6 +21,14 @@
 #include <list>
 #include <string>
 #include <set>
+
+namespace boost {
+  namespace python {
+    class object;
+    class list;
+    class dict;
+  }
+}
 
 namespace Belle2 {
 
@@ -307,7 +313,7 @@ namespace Belle2 {
      * a python list of all default values and the description of the parameter.
      * @return A python list containing the parameters of this parameter list.
      */
-    boost::python::list getParamInfoListPython() const;
+    boost::python::list* getParamInfoListPython() const;
 
     /**
      * Exposes methods of the Module class to Python.

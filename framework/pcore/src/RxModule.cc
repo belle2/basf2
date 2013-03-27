@@ -11,9 +11,6 @@
 
 #include <TSystem.h>
 
-//400MB
-#define MAXEVTSIZE 400000000
-
 using namespace std;
 using namespace Belle2;
 
@@ -59,7 +56,7 @@ void RxModule::initialize()
 
   // Prefetch the first record in Ring Buffer
   int size;
-  char* evtbuf = new char[MAXEVTSIZE];
+  char* evtbuf = new char[EvtMessage::c_MaxEventSize];
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
     //    printf ( "Rx : evtbuf is not available yet....\n" );
     usleep(100);
@@ -96,7 +93,7 @@ void RxModule::event()
 
   // Get a record from ringbuf
   int size;
-  char* evtbuf = new char[MAXEVTSIZE];
+  char* evtbuf = new char[EvtMessage::c_MaxEventSize];
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
     //    printf ( "Rx : evtbuf is not available yet....\n" );
     usleep(100);

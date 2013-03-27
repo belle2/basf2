@@ -8,13 +8,11 @@
 //-
 
 #include <framework/pcore/MsgHandler.h>
+#include <framework/logging/Logger.h>
 
 #include <stdlib.h>
-//#include <iostream>
-//#include <cassert>
 
 
-#define MAX_BUFFER_SIZE 400000000
 #define MAX_OBJECT_SIZE 1000000
 
 using namespace std;
@@ -24,7 +22,7 @@ MsgHandler::MsgHandler(int complevel)
 {
   //  printf("MsgHandler : constructor called.....\n");
   B2INFO("MsgHandler : constructor called.....");
-  //m_cbuf = (char*) malloc(MAX_BUFFER_SIZE);
+  //m_cbuf = (char*) malloc(EvtMessage::c_MaxEventSize);
   m_complevel = complevel;
 }
 
@@ -98,7 +96,7 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
   //  printf ( "MsgHandler : encoding message ..... Nobjs = %d\n", m_buf.size() );
 
   int totlen = 0;
-  char* msgbuf = new char[MAXEVTMSG];
+  char* msgbuf = new char[EvtMessage::c_MaxEventSize];
   char* msgptr = msgbuf;
   int nameptr = 0;
   for (vector<TMessage*>::iterator it = m_buf.begin(); it != m_buf.end(); ++it) {

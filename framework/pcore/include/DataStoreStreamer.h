@@ -17,15 +17,10 @@ namespace Belle2 {
   /** Stream/restore DataStore objects to/from EvtMessage. */
   class DataStoreStreamer {
   public:
-
-    // Constructor
-    /** default constructor */
-    DataStoreStreamer();
-
     /** Constructor
      *  @param complevel  Compression level of streaming
      */
-    DataStoreStreamer(int complevel);
+    DataStoreStreamer(int complevel = 0);
 
     // Destructor
     /** destructor */

@@ -7,6 +7,7 @@
 //-
 
 #include <framework/pcore/DataStoreStreamer.h>
+#include <framework/logging/Logger.h>
 
 #include <TClonesArray.h>
 
@@ -20,13 +21,7 @@ DataStoreStreamer& DataStoreStreamer::Instance()
   return instance;
 }
 
-// Default Constructor
-DataStoreStreamer::DataStoreStreamer(void) : m_compressionLevel(0), m_initStatus(0)
-{
-  m_msghandler = new MsgHandler(m_compressionLevel);
-}
-
-// Constructor with compression level
+// Constructor
 DataStoreStreamer::DataStoreStreamer(int complevel) : m_compressionLevel(complevel), m_initStatus(0)
 {
   m_msghandler = new MsgHandler(m_compressionLevel);

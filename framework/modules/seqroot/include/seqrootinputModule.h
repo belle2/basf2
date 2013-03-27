@@ -17,8 +17,6 @@
 
 #include <sys/time.h>
 
-#define MAXEVTSIZE 400000000*4
-
 namespace Belle2 {
   /**
    * \addtogroup modules

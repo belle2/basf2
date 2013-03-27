@@ -10,13 +10,10 @@
 #ifndef MSGHANDLER_H
 #define MSGHANDLER_H
 
-#include <framework/logging/Logger.h>
 #include <framework/pcore/EvtMessage.h>
 
 #include <vector>
 #include "TObject.h"
-
-#define MAXEVTMSG   100000000*4         // 400Mwords
 
 namespace Belle2 {
   /*! A class to encode/decode an EvtMessage */

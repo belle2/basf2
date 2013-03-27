@@ -43,6 +43,9 @@ namespace Belle2 {
   class EvtMessage {
 
   public:
+    /** maximal EvtMessage size, in bytes (50MB). */
+    const static unsigned int c_MaxEventSize = 50000000;
+
     /*! build EvtMessage from existing buffer (does not take ownership). */
     EvtMessage(char* buf = NULL);
     /*! build EvtMessage by allocating new message buffer (sobjs is copied). */

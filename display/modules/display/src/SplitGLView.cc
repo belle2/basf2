@@ -201,9 +201,6 @@ void SplitGLView::handleMenu(Int_t id)
 {
   // Handle menu items.
 
-  static const TString rcdir(".");
-  static const TString rcfile(".everc");
-
   switch (id) {
     case kGLPerspYOZ:
       if (m_activeViewer)
@@ -325,8 +322,8 @@ void SplitGLView::setActiveViewer(TGLEmbeddedViewer* v)
     m_cameraMenu->CheckEntry(kGLOrthoDolly);
 
   if (m_activeViewer->GetOrthoXOYCamera()->GetEnableRotate() &&
-      m_activeViewer->GetOrthoXOYCamera()->GetEnableRotate() &&
-      m_activeViewer->GetOrthoXOYCamera()->GetEnableRotate())
+      m_activeViewer->GetOrthoXOZCamera()->GetEnableRotate() &&
+      m_activeViewer->GetOrthoZOYCamera()->GetEnableRotate())
     m_cameraMenu->CheckEntry(kGLOrthoRotate);
   else
     m_cameraMenu->UnCheckEntry(kGLOrthoRotate);
@@ -358,8 +355,8 @@ void SplitGLView::toggleOrthoRotate()
   Bool_t state = m_cameraMenu->IsEntryChecked(kGLOrthoRotate);
   if (m_activeViewer) {
     m_activeViewer->GetOrthoXOYCamera()->SetEnableRotate(state);
-    m_activeViewer->GetOrthoXOYCamera()->SetEnableRotate(state);
-    m_activeViewer->GetOrthoXOYCamera()->SetEnableRotate(state);
+    m_activeViewer->GetOrthoXOZCamera()->SetEnableRotate(state);
+    m_activeViewer->GetOrthoZOYCamera()->SetEnableRotate(state);
   }
 }
 
@@ -371,7 +368,7 @@ void SplitGLView::toggleOrthoDolly()
     m_cameraMenu->UnCheckEntry(kGLOrthoDolly);
   else
     m_cameraMenu->CheckEntry(kGLOrthoDolly);
-  Bool_t state = ! m_cameraMenu->IsEntryChecked(kGLOrthoDolly);
+  Bool_t state = !m_cameraMenu->IsEntryChecked(kGLOrthoDolly);
   if (m_activeViewer) {
     m_activeViewer->GetOrthoXOYCamera()->SetDollyToZoom(state);
     m_activeViewer->GetOrthoXOZCamera()->SetDollyToZoom(state);

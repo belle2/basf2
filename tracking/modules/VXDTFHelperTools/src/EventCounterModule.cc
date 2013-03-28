@@ -36,6 +36,7 @@ EventCounterModule::EventCounterModule() : Module()
 {
   //Set module properties
   setDescription("simply highlights current event");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   addParam("stepSize", m_stepSize, "e.g. 100 will highlight every 100th event", int(100));
 

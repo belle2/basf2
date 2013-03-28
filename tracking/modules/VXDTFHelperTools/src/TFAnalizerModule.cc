@@ -65,10 +65,12 @@ TFAnalizerModule::TFAnalizerModule() : Module()
 {
   //Set module properties
   setDescription("analyzes quality of cell-o-mat versus mcTrackFinder");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   addParam("fileExportMcTracks", m_PARAMFileExportMcTracks, "export mc Trackfinder tracks into file", bool(true));
   addParam("fileExportTfTracks", m_PARAMFileExportTfTracks, "export vxd Trackfinder tracks into file", bool(true));
   addParam("mcTCname", m_PARAMmcTCname, "special name for mcTF track candidates", string("mcTracks"));
+  addParam("caTCname", m_PARAMcaTCname, "special name for caTF track candidates", string(""));
   addParam("qiThreshold", m_PARAMqiThreshold, " chose value to filter TCs found by VXDTF. TCs having QIs lower than this value won't be marked as reconstructed", double(0.7));
   addParam("minNumOfHitsThreshold", m_PARAMminNumOfHitsThreshold, " defines how many hits of current TC has to be found again to be accepted as recovered, standard is 3 hits", int(3));
   addParam("printExtentialAnalysisData", m_PARAMprintExtentialAnalysisData, "set true, if you want to cout special Info to the shell", bool(false));
@@ -86,6 +88,8 @@ TFAnalizerModule::~TFAnalizerModule()
 
 void TFAnalizerModule::initialize()
 {
+  StoreArray<GFTrackCand>::required(m_PARAMmcTCname);
+  StoreArray<GFTrackCand>::required(m_PARAMcaTCname);
 //  B2WARNING("TFAnalizerModule: at the moment, no curling tracks are supported! When you feed this module with curling tracks, results can be wrong and misleading")
   B2WARNING("TFAnalizerModule: at the moment, trapezoidal sensors are not supported. using Thetas 17-50° will produce wrong results!")
   m_countReconstructedTCs = 0;
@@ -115,7 +119,7 @@ void TFAnalizerModule::event()
 
   /// import all GFTrackCands (McFinder, TFinder)
   StoreArray<GFTrackCand> mcTrackCandidates(m_PARAMmcTCname);
-  StoreArray<GFTrackCand> caTrackCandidates;
+  StoreArray<GFTrackCand> caTrackCandidates(m_PARAMcaTCname);
   StoreArray<PXDCluster> pxdClusters;
   StoreArray<SVDCluster> svdClusters;
 
@@ -142,10 +146,10 @@ void TFAnalizerModule::event()
 
 
   /// get info needed for comparison and coord-export:
-  B2DEBUG(10, "importing mcTrackCandidates...")
+  B2DEBUG(1, "importing " << numOfMcTCs << " mcTrackCandidates...")
 
   for (int i = 0; i not_eq numOfMcTCs; ++i) {
-    B2DEBUG(100, "--importing trackCandidate " << i << "...")
+    B2DEBUG(10, "--importing trackCandidate " << i << "...")
     GFTrackCand* aTC =  mcTrackCandidates[i];
     extractHits(aTC, relPXDCluster2TrueHit, relSVDCluster2TrueHit, pxdClusters, svdClusters, extraInfos, mcTcVector, true, i);    /// extractHits
     /// missing: export2File!
@@ -153,9 +157,9 @@ void TFAnalizerModule::event()
   m_mcTrackVectorCounter += mcTcVector.size();
 
 
-  B2DEBUG(10, "importing caTrackCandidates...")
+  B2DEBUG(1, "importing " << numOfCaTCs << " caTrackCandidates...")
   for (int i = 0; i not_eq numOfCaTCs; ++i) {
-    B2DEBUG(100, "--importing trackCandidate " << i << "...")
+    B2DEBUG(10, "--importing trackCandidate " << i << "...")
     GFTrackCand* aTC =  caTrackCandidates[i];
     extractHits(aTC, relPXDCluster2TrueHit, relSVDCluster2TrueHit, pxdClusters, svdClusters, extraInfos, caTcVector, false, i); /// extractHits
   }
@@ -173,7 +177,7 @@ void TFAnalizerModule::event()
   vector<int> foundIDs;
 
   if (int(caTcVector.size()) != 0) {   // ! caTcVector.empty()
-    B2DEBUG(100, " between loops: caTcVector.size():" << caTcVector.size() << ", caTcVector[0].indexNumber: " << caTcVector[0].indexNumber << ", finAssID: " << caTcVector[0].finalAssignedID << ", QI: " << caTcVector[0].qualityIndex)
+    B2DEBUG(1, " between loops: caTcVector.size():" << caTcVector.size() << ", caTcVector[0].indexNumber: " << caTcVector[0].indexNumber << ", finAssID: " << caTcVector[0].finalAssignedID << ", QI: " << caTcVector[0].qualityIndex)
   }
   BOOST_FOREACH(VXDTrackCandidate & caTC, caTcVector) {
 
@@ -218,20 +222,20 @@ void TFAnalizerModule::event()
   BOOST_FOREACH(VXDTrackCandidate & mcTC, mcTcVector) {
     bool foundFlag = false;
     BOOST_FOREACH(int iD, foundIDs) { if (iD == mcTC.indexNumber) { foundFlag = true; } }
-    m_totalRealHits += int(mcTC.coordinates.size() / 2);
+    m_totalRealHits += int(mcTC.coordinates.size() * 0.5);
     if (foundFlag == true) {
-      printMC(true, mcTC); /// printMC
-      m_totalRealHits += int(mcTC.coordinates.size() / 2);
+      if (m_PARAMprintExtentialAnalysisData == true) { printMC(true, mcTC); } /// printMC
+      m_totalRealHits += int(mcTC.coordinates.size() * 0.5);
     } else {
-      printMC(false, mcTC); /// printMC
+      if (m_PARAMprintExtentialAnalysisData == true) { printMC(false, mcTC); } /// printMC
     }
   } // print info about all found and lost mcTCs
 
   BOOST_FOREACH(VXDTrackCandidate & caTC, caTcVector) {
     if (caTC.finalAssignedID == -1 || caTC.qualityIndex < m_PARAMqiThreshold) {
-      printCA(false, caTC); /// printCA
+      if (m_PARAMprintExtentialAnalysisData == true) { printCA(false, caTC); } /// printCA
     } else {
-      printCA(true, caTC); /// printCA
+      if (m_PARAMprintExtentialAnalysisData == true) { printCA(true, caTC); } /// printCA
     }
   } // print info about all ghost and good caTCs
 
@@ -293,10 +297,10 @@ void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXD
   B2INFO("PRINTINFO: At event " << m_eventCounter <<
          ": mcType §" << tcType <<
          "§ having §" << mcTC.coordinates.size() <<
-         "§ hits with theta of §" << setprecision(2) << theta <<
+         "§ hits with theta of §" << setprecision(4) << theta <<
          "§° got pT of §" << setprecision(4) << mcTC.pTValue <<
          "§ GeV/c, assigned caTC got pT of §" << setprecision(4) << caTC.pTValue <<
-         "§ GeV/c, and probValue of §" << setprecision(5) << caTC.probValue <<
+         "§ GeV/c, and probValue of §" << setprecision(6) << caTC.probValue <<
          "§. Their residual of pT was §" << setprecision(4) << residual <<
          "§ GeV/c, their residual of angle was §" << setprecision(4) << angle <<
          "§ in grad, their residual of transverse angle was §" << setprecision(4) << transverseAngle <<
@@ -339,7 +343,7 @@ void TFAnalizerModule::printMC(bool type, VXDTrackCandidate& mcTC)
 
   B2INFO(info << ": At event " << m_eventCounter <<
          ": MC with ID " << mcTC.indexNumber << " having §" << mcTC.coordinates.size() <<
-         "§ hits with theta of §" << setprecision(2) << theta <<
+         "§ hits with theta of §" << setprecision(4) << theta <<
          "§° got pT of §" << setprecision(4) << mcTC.pTValue <<
          "§ GeV/c and vertex distance to origin: §" << setprecision(4) << distVertex2Zero <<
          "§cm, transverseDistance: §" << setprecision(4) << distTVertex2Zero <<
@@ -366,9 +370,9 @@ void TFAnalizerModule::printCA(bool type, VXDTrackCandidate& caTC)
   B2INFO(info << ": At event " << m_eventCounter <<
          ": CA with assigned ID " << caTC.finalAssignedID <<
          " having §" << caTC.coordinates.size() <<
-         "§ hits with theta of §" << setprecision(2) << theta <<
+         "§ hits with theta of §" << setprecision(4) << theta <<
          "§° got pT of §" << setprecision(4) << caTC.pTValue <<
-         "§ GeV/c, QI of §" << setprecision(3) << caTC.qualityIndex << "§ and pdg of: " << pdg) // '§' will be used to filter
+         "§ GeV/c, QI of §" << setprecision(4) << caTC.qualityIndex << "§ and pdg of: " << pdg) // '§' will be used to filter
 }
 
 
@@ -386,8 +390,9 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
   TVector3 hitLocal, hitGlobal;
   VxdID aVxdID;
   VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
-  B2DEBUG(100, "starting extractHits... isMCTC: " << isMCTC << ", index: " << index)
+  B2DEBUG(10, "starting extractHits... isMCTC: " << isMCTC << ", index: " << index)
   int numOfHits = aTC->getNHits();
+  B2DEBUG(10, " found " << numOfHits << " hits for TC " << index)
   vector<int> pxdHitIDsOfCurrentTC;
   vector<int> svdHitIDsOfCurrentTC;
   vector<TVector3> coordinates;
@@ -492,10 +497,10 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
     } else { B2FATAL("TFAnalizer - this track candidate does not have any VXD-hits, can not analyze it") }
 
     if (gotNewMomentum == true) {
-      B2DEBUG(10, "TFAnalizer event " << m_eventCounter << ": calculated new momentum")
       momentum = tempMomentum;
       pValue = momentum.Mag();
       pT = momentum.Pt();
+      B2DEBUG(10, "TFAnalizer event " << m_eventCounter << ": calculated new momentum (pT = " << pT << ")");
     }
   }
 
@@ -524,7 +529,7 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
     newTC.probValue = infoBoards[gfIndex]->getProbValue();
     newTC.survivedFit = infoBoards[gfIndex]->isFitPossible();
   }
-  B2DEBUG(20, " end of extractHits. TC isMCTC: " << isMCTC << ", PDGCode: " << pdgCode << ", finalAssignedID: " << newTC.finalAssignedID << ", indexNumber: " << newTC.indexNumber << ", pValue: " << pValue << ", pT: " << pT)
+  B2DEBUG(10, " end of extractHits. TC isMCTC: " << isMCTC << ", PDGCode: " << pdgCode << ", finalAssignedID: " << newTC.finalAssignedID << ", indexNumber: " << newTC.indexNumber << ", pValue: " << pValue << ", pT: " << pT)
   tcVector.push_back(newTC);
 }
 

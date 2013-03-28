@@ -124,6 +124,7 @@ namespace Belle2 {
     bool m_PARAMFileExportTfTracks; /**< possibly needed later (currently not in use), exports TfTracks to File */
     bool m_PARAMprintExtentialAnalysisData; /**< set true, if you want to cout special Info to the shell (where it can be stored into a file and grep-ed to find specific info) */
     std::string m_PARAMmcTCname; /**< the name of the mctrackCandidateCollection provided by the mcTrackFinder (has to be set manually there and here) */
+    std::string m_PARAMcaTCname; /**< the name of the catrackCandidateCollection provided by the caTrackFinder (has to be set manually there and here) */
     double m_PARAMqiThreshold; /**<  chose value to filter TCs found by VXDTF. TCs having QIs lower than this value won't be marked as reconstructed (value 0-1). e.g. having a TC with 4 hits, 1 foreign, 3 good ones. would meand 0.75, a qiThreshold with 0.7 would mark the track as 'reconstructed', a threshold of 0.8 would neglect the TC */
     int m_PARAMminNumOfHitsThreshold; /**< defines how many hits of current TC has to be found again to be accepted as recovered, values lower than 3 wouldn't make sense because of minimal info needed for track parameters */
     int m_countReconstructedTCs; /**< counts number of reconstructed TCs */

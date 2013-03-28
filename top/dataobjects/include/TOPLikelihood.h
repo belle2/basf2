@@ -19,7 +19,7 @@ namespace Belle2 {
    */
 
   /*! Class to store TOP log likelihoods (output of TOPReconstructor)
-   * relation from GFTracks
+   * relation from Tracks
    * filled in top/modules/TOPReconstruction/src/TOPReconstructorModule.cc
    */
 

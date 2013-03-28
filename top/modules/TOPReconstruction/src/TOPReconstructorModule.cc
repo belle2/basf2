@@ -17,7 +17,7 @@
 #include <framework/core/ModuleManager.h>
 
 // Hit classes
-#include <GFTrack.h>
+#include <tracking/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPLikelihood.h>
@@ -70,7 +70,7 @@ namespace Belle2 {
       setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
       // Add parameters
-      addParam("GFTracksColName", m_gfTracksColName, "GF tracks",
+      addParam("TracksColName", m_TracksColName, "Mdst tracks",
                string(""));
       addParam("ExtHitsColName", m_extHitsColName, "Extrapolated tracks",
                string(""));
@@ -107,8 +107,8 @@ namespace Belle2 {
 
       // Data store registration
       StoreArray<TOPLikelihood>::registerPersistent(m_topLogLColName);
-      RelationArray::registerPersistent<GFTrack, TOPLikelihood>
-      (m_gfTracksColName, m_topLogLColName);
+      RelationArray::registerPersistent<Track, TOPLikelihood>
+      (m_TracksColName, m_topLogLColName);
       RelationArray::registerPersistent<TOPLikelihood, ExtHit>
       (m_topLogLColName, m_extHitsColName);
       RelationArray::registerPersistent<TOPBarHit, TOPLikelihood>
@@ -132,7 +132,7 @@ namespace Belle2 {
 
       // input: reconstructed tracks
 
-      StoreArray<GFTrack> gfTracks(m_gfTracksColName);
+      StoreArray<Track> Tracks(m_TracksColName);
       StoreArray<ExtHit> extHits(m_extHitsColName);
       StoreArray<TOPBarHit> barHits(m_barHitColName);
 
@@ -143,8 +143,8 @@ namespace Belle2 {
 
       // output: relations
 
-      RelationArray gfTrackLogL(gfTracks, toplogL);
-      gfTrackLogL.clear();
+      RelationArray TrackLogL(Tracks, toplogL);
+      TrackLogL.clear();
       RelationArray LogLextHit(toplogL, extHits);
       LogLextHit.clear();
       RelationArray barHitLogL(barHits, toplogL);
@@ -193,7 +193,7 @@ namespace Belle2 {
 
         // make relations
         int last = toplogL.getEntries() - 1;
-        gfTrackLogL.add(tracks[i].Label(c_LTrack), last);
+        TrackLogL.add(tracks[i].Label(c_LTrack), last);
         LogLextHit.add(last, tracks[i].Label(c_LextHit));
         int ibarHit = tracks[i].Label(c_LbarHit);
         if (ibarHit >= 0) barHitLogL.add(ibarHit, last);
@@ -201,7 +201,7 @@ namespace Belle2 {
 
       // consolidate relatons
 
-      gfTrackLogL.consolidate();
+      TrackLogL.consolidate();
       LogLextHit.consolidate();
       barHitLogL.consolidate();
 
@@ -304,72 +304,29 @@ namespace Belle2 {
     }
 
 
-    const MCParticle* TOPReconstructorModule::getMCParticle(const GFTrack* track)
-    {
-      if (! track) return 0;
-
-      StoreArray<MCParticle> mcParticles;
-      StoreArray<GFTrack> gfTracks(m_gfTracksColName);
-
-      RelationArray rel(gfTracks, mcParticles);
-      if (! rel) return 0;
-
-      RelationIndex<GFTrack, MCParticle> irel(gfTracks, mcParticles);
-      if (irel.getFirstElementFrom(track)) {
-        return irel.getFirstElementFrom(track)->to;
-      }
-      return 0;
-    }
-
-
-    int TOPReconstructorModule::getTOPBarHitIndex(const MCParticle* particle)
-    {
-      if (! particle) return -1;
-
-      StoreArray<MCParticle> mcParticles;
-      StoreArray<TOPBarHit> barHits;
-
-      RelationArray rel(mcParticles, barHits);
-      if (! rel) return -1;
-
-      RelationIndex<MCParticle, TOPBarHit> irel(mcParticles, barHits);
-      if (irel.getFirstElementFrom(particle)) {
-        return irel.getFirstElementFrom(particle)->indexTo;
-      }
-      return -1;
-    }
-
-
     void TOPReconstructorModule::getTracks(std::vector<TOPtrack> & tracks,
                                            Const::ChargedStable chargedStable)
     {
       ExtDetectorID myDetID = EXT_TOP; // TOP
       int NumBars = m_topgp->getNbars();
-      StoreArray<GFTrack> gfTracks(m_gfTracksColName);
-      StoreArray<ExtHit> extHits(m_extHitsColName);
-      RelationIndex<GFTrack, ExtHit> gfTracksToExtHits(gfTracks, extHits);
-
       int pdgCode = abs(chargedStable.getPDGCode());
       double mass = chargedStable.getMass();
 
-      for (int itra = 0; itra < gfTracks.getEntries(); ++itra) {
-        GFTrack* track = gfTracks[itra];
-        int charge = (int) track->getCharge();
-        const MCParticle* particle = getMCParticle(track);
-        int iTopTrack = getTOPBarHitIndex(particle);
+      StoreArray<Track> Tracks(m_TracksColName);
+
+      for (int itra = 0; itra < Tracks.getEntries(); ++itra) {
+        const Track* track = Tracks[itra];
+        int charge = track->getTrackFitResult(chargedStable)->getCharge();
+        const MCParticle* particle = DataStore::getRelated<MCParticle>(track);
+        const TOPBarHit* barHit = DataStore::getRelated<TOPBarHit>(particle);
+        int iBarHit = -1;
+        if (barHit) iBarHit = barHit->getArrayIndex();
         int truePDGCode = 0;
         if (particle) truePDGCode = particle->getPDG();
 
-        /*
-         * this doesn't work for GFTrack, have to use BOOST_FOREACH
-         RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
-         for(unsigned i = 0; i < extHits.size(); i++) {
-            const ExtHit* extHit = extHits[i];
-        */
-
-        typedef RelationIndex<GFTrack, ExtHit>::Element relElement_t;
-        BOOST_FOREACH(const relElement_t & rel, gfTracksToExtHits.getElementsFrom(track)) {
-          const ExtHit* extHit = rel.to;
+        RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);
+        for (unsigned i = 0; i < extHits.size(); i++) {
+          const ExtHit* extHit = extHits[i];
           if (abs(extHit->getPdgCode()) != pdgCode) continue;
           if (extHit->getDetectorID() != myDetID) continue;
           if (extHit->getCopyID() == 0 || extHit->getCopyID() > NumBars) continue;
@@ -390,7 +347,7 @@ namespace Belle2 {
           trk.setTrackLength(tof, mass);
           trk.setLabel(c_LTrack, itra);
           trk.setLabel(c_LextHit, extHit->getArrayIndex());
-          trk.setLabel(c_LbarHit, iTopTrack);
+          trk.setLabel(c_LbarHit, iBarHit);
           tracks.push_back(trk);
         }
       }

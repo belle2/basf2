@@ -15,8 +15,6 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <string>
 
-#include <GFTrack.h>
-#include <generators/dataobjects/MCParticle.h>
 #include "top/modules/TOPReconstruction/TOPtrack.h"
 #include <framework/gearbox/Const.h>
 
@@ -97,20 +95,6 @@ namespace Belle2 {
       void TOPconfigure();
 
       /**
-       * Return MC particle associated with GFTrack
-       * @param track pointer to GFTrack
-       * @return pointer to MCParticle or NULL
-       */
-      const MCParticle* getMCParticle(const GFTrack* track);
-
-      /**
-       * Return index of TOPBarHit of a given MC patricle or -1
-       * @param particle pointer to MCParticle
-       * @return index of TOPBarHit or -1
-       */
-      int getTOPBarHitIndex(const MCParticle* particle);
-
-      /**
        * Return extrapolated tracks
        * @param tracks vector of TOPtracks to return
        * @param chargedStable particle hypothesis used for extrapolation
@@ -119,7 +103,7 @@ namespace Belle2 {
 
       // Module parameters
 
-      std::string m_gfTracksColName;  /**< GF tracks (input) */
+      std::string m_TracksColName;    /**< reconstructed tracks (input) */
       std::string m_extHitsColName;   /**< Ext reconstructed hits (input) */
       std::string m_topDigitColName;  /**< Digitized data (input) */
       std::string m_topLogLColName;   /**< TOP log likelihoods (output) */

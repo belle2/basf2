@@ -14,7 +14,9 @@
 #include <ecl/dataobjects/ECLGamma.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <GFTrack.h>
+//#include <GFTrack.h>
+#include <tracking/dataobjects/Track.h>
+
 #include <tracking/dataobjects/ExtHit.h>
 #include <framework/datastore/RelationIndex.h>
 #include <boost/foreach.hpp>
@@ -203,25 +205,25 @@ void ECLGammaReconstructorModule::readExtrapolate()
     m_TrackCellId[i] = false ;
   }
 
-  StoreArray<GFTrack> gfTracks;
+  StoreArray<Track> Tracks;
   StoreArray<ExtHit> extHits;
-  RelationIndex<GFTrack, ExtHit> gfTracksToExtHits(gfTracks, extHits);
+  RelationIndex<Track, ExtHit> TracksToExtHits(Tracks, extHits);
 
   if (extHits) {
     ExtDetectorID myDetID = EXT_ECL; // ECL in this example
     int pdgCodePiP = G4ParticleTable::GetParticleTable()->FindParticle("pi+")->GetPDGEncoding();
     int pdgCodePiM = G4ParticleTable::GetParticleTable()->FindParticle("pi-")->GetPDGEncoding();
 
-    typedef RelationIndex<GFTrack, ExtHit>::Element relElement_t;
-    for (int t = 0; t < gfTracks.getEntries(); ++t) {
-      BOOST_FOREACH(const relElement_t & rel, gfTracksToExtHits.getElementsFrom(gfTracks[t])) {
+    typedef RelationIndex<Track, ExtHit>::Element relElement_t;
+    for (int t = 0; t < Tracks.getEntries(); ++t) {
+      BOOST_FOREACH(const relElement_t & rel, TracksToExtHits.getElementsFrom(Tracks[t])) {
         const ExtHit* extHit = rel.to;
         if (extHit->getPdgCode() != pdgCodePiP && extHit->getPdgCode() != pdgCodePiM) continue;
         if ((extHit->getDetectorID() != myDetID) || (extHit->getCopyID() == 0)) continue;
         m_TrackCellId[extHit->getCopyID()] = 1;
         //cout<<"cell ID"<<extHit->getCopyID()<<"  "<<extHit->getPdgCode() <<endl;
       }//for cands
-    }//gfTracks.getEntries()
+    }//Tracks.getEntries()
 
   }//if extTrackCands
 }

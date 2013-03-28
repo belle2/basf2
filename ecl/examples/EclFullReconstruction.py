@@ -64,9 +64,6 @@ param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
 cdcDigitizer.param(param_cdcdigi)
 
 ext = register_module('Ext')
-ext.param('GFTracksColName', 'GFTracks')
-ext.param('ExtTrackCandsColName', 'ExtTrackCands')
-ext.param('ExtRecoHitsColName', 'ExtRecoHits')
 
 genfit = register_module('GenFitter')
 mctrackfinder = register_module('MCTrackFinder')

@@ -372,10 +372,10 @@ void GenFitter2Module::event()
       track.setCandidate(*aTrackCandPointer);
 
       //tell the CDCRecoHits how the left/right ambiguity of wire hits should be resolved (this info should come from the track finder)
-      int nHitsInTrack = track.getNumHits();
+      const int nHitsInTrack = track.getNumHits();
       if (m_uselrAmbiInfo == true) {
         for (int i = 0; i not_eq nHitsInTrack; ++i) {
-          CDCTrackCandHit* aTrackCandHitPtr =  dynamic_cast<CDCTrackCandHit*>(aTrackCandPointer->getHit(i));
+          CDCTrackCandHit* aTrackCandHitPtr = dynamic_cast<CDCTrackCandHit*>(aTrackCandPointer->getHit(i));
           if (aTrackCandHitPtr not_eq NULL) {
             CDCRecoHit* aCdcRecoHit = static_cast<CDCRecoHit*>(track.getHit(i)); //this now has to be a CDCRecoHit because the oder of hits in GFTrack and GFTrackCand must be the same
             char lrInfo = aTrackCandHitPtr->getLeftRightResolution();

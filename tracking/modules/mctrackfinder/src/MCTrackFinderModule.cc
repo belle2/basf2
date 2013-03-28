@@ -463,7 +463,7 @@ void MCTrackFinderModule::event()
     if (m_usePXDHits && m_useClusters == false) {
       BOOST_FOREACH(int hitID, pxdHitsIndices) {
         float time = pxdTrueHits[hitID]->getGlobalTime();
-        trackCandidates[counter]->addHit(Const::PXD, hitID, -1, double(time)); // -1 means the hit will not compeate with any other hit in the DAF
+        trackCandidates[counter]->addHit(Const::PXD, hitID, -1, double(time)); // -1 means the hit will not compete with any other hit in the DAF
       }
       B2DEBUG(100, "     add " << pxdHitsIndices.size() << " PXDHits");
     }

@@ -135,7 +135,7 @@ namespace Belle2 {
 
     void printTrackWiseStatistics(const std::string& nameOfDataSample, const bool count = false);
     void printTrackWiseVecStatistics(const std::string& nameOfDataSample, const std::vector<std::string>& trackWiseVarNames, const  bool count = false);
-    void printLayerWiseStatistics(const std::string& nameOfDataSample,  const std::vector<std::string>& layerWiseVarNames, const bool count = true);
+    void printLayerWiseStatistics(const std::string& nameOfDataSample,  const std::vector<std::string>& layerWiseVarNames, int madVars, const bool count = true);
     void printLRResData(const std::string& nameOfDataSample, const std::vector<std::string>& layerWiseVarNames);
 
     int m_nSiLayers; // number of Si layers. That is 6 of course.
@@ -173,7 +173,8 @@ namespace Belle2 {
     std::map<std::string, double > m_madScalingFactors; //scaling factor the mad to make it compariable to the standard deviation
     double calcMedian(std::vector<double> data);
     //void calcMedianAndMad(std::vector<double> data, double& median, double& mad);
-    //void trunctatedMeanAndStd(std::vector<double> data, bool symmetric, double& mean, double& std);
+    int trunctatedMeanAndStd(std::vector<double> data, const double cutRatio, const bool symmetric, double& mean, double& std);
+    std::map<std::string, double > m_trunctationRatios; //holds the ratio how many of the data of a named sample should be cut away in the trunctatedMeanAndStd function
     int countOutliers(const std::vector<double>& dataSample, const double mean, const double sigma, const double widthScaling);
 
     // this maps will hold the names of the test data variables that have more then one component like the residuals of the origin position and momentum

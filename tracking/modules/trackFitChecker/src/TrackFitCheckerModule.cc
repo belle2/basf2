@@ -197,7 +197,8 @@ void TrackFitCheckerModule::initialize()
   registerTrackWiseVecData("pulls_vertexPosMom", vecDataSize);
   // residuals of Cartesian coordinates at vertex
   registerTrackWiseVecData("res_vertexPosMom", vecDataSize);
-
+  // direclty the vertex coordinates
+  registerTrackWiseVecData("vertexPosMom", vecDataSize);
   // pulls (z) of cartesian 7D coordinates at vertex
   //registerTrackWiseVecData("pulls_vertexState", 7);
   // residuals of cartesian 7D coordinates at vertex
@@ -232,12 +233,26 @@ void TrackFitCheckerModule::initialize()
     m_madScalingFactors["pulls_vertexPosMom"] = 1.4826; //scaling factor for normal distributed variables
     m_madScalingFactors["absMomVertex"] = 1.4826;
     m_madScalingFactors["res_vertexPosMom"] = 1.4826;
-    m_madScalingFactors["pulls_vertexPosMom"] = 1.4826;
+    m_madScalingFactors["vertexPosMom"] = 1.4826;
     m_madScalingFactors["res_curvVertex"] = 1.4826;
     m_madScalingFactors["relRes_curvVertex"] = 1.4826;
     m_madScalingFactors["relRes_p_T"] = 1.4826;
     m_madScalingFactors["pValue_bu"] = 4.0 / 3.0;  //scaling factor for uniform distributed variables
     m_madScalingFactors["pValue_fu"] = 4.0 / 3.0;
+
+    m_trunctationRatios["pulls_vertexPosMom"] = 0.02; //scaling factor for normal distributed variables
+    m_trunctationRatios["absMomVertex"] = 0.02;
+    m_trunctationRatios["res_vertexPosMom"] = 0.02;
+    m_trunctationRatios["vertexPosMom"] = 0.02;
+    m_trunctationRatios["res_curvVertex"] = 0.02;
+    m_trunctationRatios["relRes_curvVertex"] = 0.02;
+    m_trunctationRatios["relRes_p_T"] = 0.02;
+    m_trunctationRatios["pValue_bu"] = 0.02;
+    m_trunctationRatios["pValue_fu"] = 0.02;
+
+    m_trunctationRatios["chi2tot_bu"] = 0.02;
+    m_trunctationRatios["chi2tot_fu"] = 0.02;
+
   }
 
 
@@ -386,6 +401,7 @@ void TrackFitCheckerModule::event()
     TMatrixDSym vertexCov(6);
     vector<double> zVertexPosMom(6);
     vector<double> resVertexPosMom(6);
+    vector<double> vertexPosMom(6);
 
     GFDetPlane planeThroughVertex(poca, dirInPoca); //get planeThroughVertex through fitted vertex position
     B2DEBUG(100, "plane through vertex constructed");
@@ -428,6 +444,13 @@ void TrackFitCheckerModule::event()
     zVertexPosMom[4] = resVertexPosMom[4] / sqrt(vertexCov[4][4]);
     zVertexPosMom[5] = resVertexPosMom[5] / sqrt(vertexCov[5][5]);
     fillTrackWiseVecData("pulls_vertexPosMom", zVertexPosMom);
+    vertexPosMom[0] = vertexPos[0];
+    vertexPosMom[1] = vertexPos[1];
+    vertexPosMom[2] = vertexPos[2];
+    vertexPosMom[3] = vertexMom[0];
+    vertexPosMom[4] = vertexMom[1];
+    vertexPosMom[5] = vertexMom[2];
+    fillTrackWiseVecData("vertexPosMom", vertexPosMom);
     B2DEBUG(100, "filled all track wise tests");
 
     if (m_nLayers not_eq 0) { // now the layer wise tests
@@ -514,8 +537,10 @@ void TrackFitCheckerModule::endRun()
       measVarNames[0] = "u/d.l.";
       measVarNames[1] = "v/χ²";
     }
+    printTrackWiseVecStatistics("vertexPosMom", m_vertexTestsVarNames, true);
     printTrackWiseVecStatistics("res_vertexPosMom", m_vertexTestsVarNames, true);
     printTrackWiseVecStatistics("pulls_vertexPosMom", m_vertexTestsVarNames, true);
+
     /*vector<string> vertexTests7DVarNames;
     vertexTests7DVarNames.push_back("x");
     vertexTests7DVarNames.push_back("y");
@@ -539,43 +564,43 @@ void TrackFitCheckerModule::endRun()
       dafVarNames.push_back("w_wrong");
       dafVarNames.push_back("w_bg1");
       dafVarNames.push_back("w_bg2");
-      printLayerWiseStatistics("DAF_weights", dafVarNames);
+      printLayerWiseStatistics("DAF_weights", dafVarNames, 0);
       dafVarNames[0] = "c_all";
       dafVarNames[1] = "c_right";
       dafVarNames[2] = "c_wrong";
       dafVarNames[3] = "c_bg1";
       dafVarNames[4] = "c_bg2";
-      printLayerWiseStatistics("DAF_chi2s", dafVarNames);
+      printLayerWiseStatistics("DAF_chi2s", dafVarNames, 0);
     } else {
       if (m_nLayers > 0) {
         if (m_truthAvailable == true) {
-          printLayerWiseStatistics("pulls_and_chi2_meas_t", measVarNames);
-          printLayerWiseStatistics("res_meas_t", measVarNames);
+          printLayerWiseStatistics("pulls_and_chi2_meas_t", measVarNames, 2);
+          printLayerWiseStatistics("res_meas_t", measVarNames, 0);
         }
         if (m_testPrediction == true) {
           if (m_truthAvailable == true) {
-            printLayerWiseStatistics("pulls_and_chi2_fp_t", m_layerWiseTruthTestsVarNames);
+            printLayerWiseStatistics("pulls_and_chi2_fp_t", m_layerWiseTruthTestsVarNames, 5);
           }
-          printLayerWiseStatistics("pulls_and_chi2_fp", measVarNames);
+          printLayerWiseStatistics("pulls_and_chi2_fp", measVarNames, 2);
         }
         if (m_truthAvailable == true) {
-          printLayerWiseStatistics("pulls_and_chi2_fu_t", m_layerWiseTruthTestsVarNames);
+          printLayerWiseStatistics("pulls_and_chi2_fu_t", m_layerWiseTruthTestsVarNames, 5);
         }
-        printLayerWiseStatistics("pulls_and_chi2_fu", measVarNames);
+        printLayerWiseStatistics("pulls_and_chi2_fu", measVarNames, 2);
         if (m_testPrediction == true) {
           if (m_truthAvailable == true) {
-            printLayerWiseStatistics("pulls_and_chi2_bp_t", m_layerWiseTruthTestsVarNames);
+            printLayerWiseStatistics("pulls_and_chi2_bp_t", m_layerWiseTruthTestsVarNames, 5);
           }
-          printLayerWiseStatistics("pulls_and_chi2_bp", measVarNames);
+          printLayerWiseStatistics("pulls_and_chi2_bp", measVarNames, 2);
         }
         if (m_truthAvailable == true) {
-          printLayerWiseStatistics("pulls_and_chi2_bu_t", m_layerWiseTruthTestsVarNames);
+          printLayerWiseStatistics("pulls_and_chi2_bu_t", m_layerWiseTruthTestsVarNames, 5);
         }
-        printLayerWiseStatistics("pulls_and_chi2_bu", measVarNames);
+        printLayerWiseStatistics("pulls_and_chi2_bu", measVarNames, 2);
         if (m_truthAvailable == true) {
-          printLayerWiseStatistics("pulls_and_chi2_sm_t", m_layerWiseTruthTestsVarNames);
+          printLayerWiseStatistics("pulls_and_chi2_sm_t", m_layerWiseTruthTestsVarNames, 5);
         }
-        printLayerWiseStatistics("pulls_and_chi2_sm", measVarNames);
+        printLayerWiseStatistics("pulls_and_chi2_sm", measVarNames, 2);
       }
     }
     //write out the test results
@@ -762,7 +787,7 @@ bool TrackFitCheckerModule::isSymmetric(const TMatrixT<double>& aMatrix) const
   return true;
 }
 
-void TrackFitCheckerModule::printLayerWiseStatistics(const string& nameOfDataSample, const vector<string>& layerWiseVarNames, const bool count)
+void TrackFitCheckerModule::printLayerWiseStatistics(const string& nameOfDataSample, const vector<string>& layerWiseVarNames, int madVars, const bool count)
 {
   vector<vector<StatisticsContainer> >&  dataSample = m_layerWiseDataSamples[nameOfDataSample];
 
@@ -784,7 +809,7 @@ void TrackFitCheckerModule::printLayerWiseStatistics(const string& nameOfDataSam
   for (int l = 0; l not_eq nOfLayers; ++l) {
     aStrStr << "mean\tstd\t";
     if (m_robust == true) {
-      aStrStr << "median\tMAD std\toutlier\t";
+      aStrStr << "trm/med\ttrσ/MAD\t#outCAT\t";
     }
     if (count == true) {
       aStrStr << "count\t";
@@ -797,18 +822,27 @@ void TrackFitCheckerModule::printLayerWiseStatistics(const string& nameOfDataSam
     for (int l = 0; l not_eq nOfLayers; ++l) {
       double tempMean = mean(dataSample[l][i]);
       double tempStd = sqrt(variance(dataSample[l][i]));
-
+      vector<double>& data = m_layerWiseData[nameOfDataSample][l][i];
       m_textOutput << fixed << "\t" << tempMean << "\t" << tempStd;
       if (m_robust == true) {
-        //double madScalingFactor =  m_madScalingFactors[nameOfDataSample];
-        if (i < 5) { //
-          double aMedian = median(dataSample[l][i]);
-          double scaledMad = 1.4826 * calcMad(m_layerWiseData[nameOfDataSample][l][i], aMedian);
-          int nOutliers = countOutliers(m_layerWiseData[nameOfDataSample][l][i], aMedian, scaledMad, 4);
-          m_textOutput << "\t" << aMedian << "\t" << scaledMad << "\t" << nOutliers;// << "\t" << calcMedian(m_trackWiseVecData[nameOfDataSample][i]);
+        if (data.empty() == false) {
+          if (i < madVars) { //
+            double aMedian = median(dataSample[l][i]);
+            double scaledMad = 1.4826 * calcMad(data, aMedian);
+            int nOutliers = countOutliers(data, aMedian, scaledMad, 4);
+            m_textOutput << "\t" << aMedian << "\t" << scaledMad << "\t" << nOutliers;
+          } else {
+            double mean = 0;
+            double std = 0;
+            int nCutAwayTracks = trunctatedMeanAndStd(data, 0.02, false, mean, std);
+            m_textOutput << "\t" << mean << "\t" << std << "\t" << nCutAwayTracks;
+
+          }
         } else {
-          m_textOutput << "\tno\tmad\t";
+          m_textOutput << "\t" << "no" << "\t" << "data" << "\t" << " ";
         }
+        //double madScalingFactor =  m_madScalingFactors[nameOfDataSample];
+
       }
 
       if (count == true) {
@@ -859,7 +893,7 @@ void TrackFitCheckerModule::printTrackWiseStatistics(const string& nameOfDataSam
 
   m_textOutput << "Information on " << nameOfDataSample << "\nmean\tstd";
   if (m_robust == true) {
-    m_textOutput << "\tmedian\tMAD std\toutlier";
+    m_textOutput << "\tmedian\tMAD std\toutlier\ttr mean\ttr std\tignored";
   }
   if (count == true) {
     m_textOutput << "\tcount";
@@ -869,14 +903,27 @@ void TrackFitCheckerModule::printTrackWiseStatistics(const string& nameOfDataSam
 
   if (m_robust == true) {
     double madScalingFactor =  m_madScalingFactors[nameOfDataSample];
-    if (madScalingFactor > 0.001) {
+    vector<double>& data = m_trackWiseData[nameOfDataSample];
+    if (madScalingFactor > 1E-100) {
       double aMedian = median(dataSample);
-      double scaledMad = madScalingFactor * calcMad(m_trackWiseData[nameOfDataSample], aMedian);
-      int nOutliers = countOutliers(m_trackWiseData[nameOfDataSample], aMedian, scaledMad, 4);
+      double scaledMad = madScalingFactor * calcMad(data, aMedian);
+      int nOutliers = countOutliers(data, aMedian, scaledMad, 4);
       m_textOutput << "\t" << aMedian << "\t" << scaledMad << "\t" << nOutliers; // << "\t" << calcMedian(m_trackWiseData[nameOfDataSample]);
     } else {
-      m_textOutput << "\tcannot compute MAD std";
+      m_textOutput << "\tno scaling for MAD";
     }
+    double trunctationRatio = m_trunctationRatios[nameOfDataSample];
+    if (trunctationRatio > 1E-100) {
+      double mean = 0;
+      double std = 0;
+      int nCutAwayTracks = trunctatedMeanAndStd(data, trunctationRatio, true, mean, std);
+      m_textOutput << "\t" << mean << "\t" << std << "\t" << nCutAwayTracks;
+
+    } else {
+      m_textOutput << "\tno cut away ratio given";
+    }
+  } else if (count == true) {
+    m_textOutput << "\t\t\t\t\t\t";
   }
   if (count == true) {
     m_textOutput << "\t" << boost::accumulators::count(dataSample);
@@ -891,24 +938,38 @@ void TrackFitCheckerModule::printTrackWiseVecStatistics(const string& nameOfData
   const int nOfVars = dataSample.size();
   m_textOutput << "Information on " << nameOfDataSample << "\n\tmean\tstd";
   if (m_robust == true) {
-    m_textOutput << "\tmedian\tMAD std\toutlier";
+    m_textOutput << "\tmedian\tMAD std\toutlier\ttr mean\ttr std\tignored";
   }
   if (count == true) {
     m_textOutput << "\tcount";
   }
   m_textOutput << "\n";
+  double madScalingFactor =  m_madScalingFactors[nameOfDataSample];
+  double trunctationRatio = m_trunctationRatios[nameOfDataSample];
   for (int i = 0; i not_eq nOfVars; ++i) {
     m_textOutput << fixed << varNames[i] << "\t" << mean(dataSample[i]) << "\t" << sqrt(variance(dataSample[i]));
     if (m_robust == true) {
-      double madScalingFactor =  m_madScalingFactors[nameOfDataSample];
-      if (madScalingFactor > 0.001) {
+
+      vector<double>& data = m_trackWiseVecData[nameOfDataSample][i];
+      if (madScalingFactor > 1E-100) {
         double aMedian = median(dataSample[i]);
-        double scaledMad = madScalingFactor * calcMad(m_trackWiseVecData[nameOfDataSample][i], aMedian);
-        int nOutliers = countOutliers(m_trackWiseVecData[nameOfDataSample][i], aMedian, scaledMad, 4);
-        m_textOutput << "\t" << aMedian << "\t" << scaledMad << "\t" << nOutliers; //<< "\t" << calcMedian(m_trackWiseVecData[nameOfDataSample][i]);
+        double scaledMad = madScalingFactor * calcMad(data, aMedian);
+        int nOutliers = countOutliers(data, aMedian, scaledMad, 4);
+        m_textOutput << "\t" << aMedian << "\t" << scaledMad << "\t" << nOutliers; //<< "\t" << calcMedian(data);
       } else {
-        m_textOutput << "\tno scaling/MAD";
+        m_textOutput << "\tno scaling for MAD";
       }
+      if (trunctationRatio > 1E-100) {
+        double mean = 0;
+        double std = 0;
+        int nCutAwayTracks = trunctatedMeanAndStd(data, trunctationRatio, true, mean, std);
+        m_textOutput << "\t" << mean << "\t" << std << "\t" << nCutAwayTracks;
+
+      } else {
+        m_textOutput << "\tno cut away ratio given";
+      }
+    } else if (count == true) {
+      m_textOutput << "\t\t\t\t\t\t";
     }
     if (count == true) {
       m_textOutput << "\t" << boost::accumulators::count(dataSample[i]);
@@ -1568,38 +1629,42 @@ double TrackFitCheckerModule::calcMedian(std::vector<double> data)
 
 
 
-//void TrackFitCheckerModule::trunctatedMeanAndStd(std::vector<double> data, bool symmetric, double& mean, double& std){
-//  const int n = data.size();
-//  double ratio = 0.001; // relative amount of data that gets truncated away
-//
-//  if (symmetric == true){ // cut will be applied to both sides of the sorted smaple
-//    int cut = int(ratio*n/2.0 + 0.5);
-//    int truncN = n - cut -cut;
-//    sort(data.begin(), data.end());
-//    double sum = std::accumulate(data.begin()+cut, data.end()-cut, 0.0);
-//    mean = sum / truncN;
-//    std = 0;
-//    for ( int i = cut; i not_eq n-cut; ++i){
-//      double diff = data[i] - mean;
-//      std += diff*diff;
-//    }
-//    std = 1.0/(truncN-1) * std;
-//
-//  } else { // cut will only be applied to the side with the larger values of the sorted sample
-//    int cut = int(ratio*n + 0.5);
-//    int truncN = n -cut;
-//    sort(data.begin(), data.end());
-//    double sum = std::accumulate(data.begin(), data.end()-cut, 0.0);
-//    mean = sum / truncN;
-//    std = 0;
-//    for ( int i = 0; i not_eq n-cut; ++i){
-//      double diff = data[i] - mean;
-//      std += diff*diff;
-//    }
-//    std = 1.0/(truncN-1) * std;
-//
-//  }
-//}
+int TrackFitCheckerModule::trunctatedMeanAndStd(std::vector<double> data, const double cutRatio, const bool symmetric, double& mean, double& std)
+{
+
+  const int n = data.size();
+  double truncN = -1;
+  if ((n* cutRatio < 2 and symmetric == true) or(n* cutRatio < 1 and symmetric == false)) {
+    return 0;
+  }
+  sort(data.begin(), data.end());
+  std = 0;
+  int i = 0;
+  int iMax = 0;
+  double sum = 0;
+
+  if (symmetric == true) { // cut will be applied to both sides of the sorted sample
+    int cut = int(cutRatio * n / 2.0 + 0.5);
+    truncN = n - cut - cut;
+    i = cut;
+    iMax = n - cut;
+    sum = std::accumulate(data.begin() + cut, data.end() - cut, 0.0);
+  } else { // cut will only be applied to the side with the larger values of the sorted sample
+    int cut = int(cutRatio * n + 0.5);
+    truncN = n - cut;
+    i = 0;
+    iMax = n - cut;
+    sum = std::accumulate(data.begin(), data.end() - cut, 0.0);
+  }
+  mean = sum / truncN;
+  while (i not_eq iMax) {
+    double diff = data[i] - mean;
+    std += diff * diff;
+    ++i;
+  }
+  std = sqrt(1.0 / (truncN - 1) * std);
+  return n - truncN;
+}
 
 int TrackFitCheckerModule::countOutliers(const vector<double>& dataSample, const double mean, const double sigma, const double widthScaling)
 {

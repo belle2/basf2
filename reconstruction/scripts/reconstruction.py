@@ -33,7 +33,8 @@ def add_reconstruction(path, components=None):
 
         # track extrapolation
         ext = register_module('Ext')
-        ext.param('GFTracksColName', 'GFTracks')  # input to ext
+        ext.param('TracksColName', 'Tracks')  # input to ext
+        ext.param('ExtHitsColName', 'ExtHits')  # output from ext
         path.add_module(ext)
 
     # TOP reconstruction

@@ -13,6 +13,8 @@
 #include <tracking/modules/ext/ExtPhysicsList.h>
 #include <tracking/modules/ext/ExtCylSurfaceTarget.h>
 #include <tracking/dataobjects/ExtHit.h>
+#include <tracking/dataobjects/Track.h>
+#include <tracking/dataobjects/TrackFitResult.h>
 #include <simulation/kernel/DetectorConstruction.h>
 #include <simulation/kernel/MagneticField.h>
 #include <ecl/geometry/ECLGeometryPar.h>
@@ -68,7 +70,7 @@ ExtModule::ExtModule() : Module(), m_extMgr(NULL)  // no ExtManager yet
   setDescription("Extrapolates tracks from CDC to outer detectors using geant4e");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("pdgCodes", m_pdgCode, "Positive-charge PDG codes for extrapolation hypotheses", m_pdgCode);
-  addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the reconstructed tracks", string(""));
+  addParam("TracksColName", m_TracksColName, "Name of collection holding the reconstructed tracks", string(""));
   addParam("ExtHitsColName", m_extHitsColName, "Name of collection holding the ExtHits from the extrapolation", string(""));
   addParam("MinPt", m_minPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", double(0.0));
   addParam("MinKE", m_minKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", double(0.002));
@@ -138,41 +140,40 @@ void ExtModule::initialize()
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(new
                                                              ExtCylSurfaceTarget(rMin, offsetZ - halfLength, offsetZ + halfLength));
 
-  // Default hypotheses for extrapolation
-  if (m_pdgCode.size() == 0) {
-    m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("pi+")->GetPDGEncoding());
-    m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("e+")->GetPDGEncoding());
-    m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("mu+")->GetPDGEncoding());
-    m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("kaon+")->GetPDGEncoding());
-    m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("proton")->GetPDGEncoding());
-  }
-  // check that the (user-)defined PDG codes for the extrapolation hypotheses are legal
-  for (unsigned int hypothesis = 0; hypothesis < m_pdgCode.size(); ++hypothesis) {
-    G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(m_pdgCode[hypothesis]);
-    if (particle->GetPDGCharge() == 0) {
-      B2FATAL("Module ext initialize(): Particle " << particle->GetParticleName() << " is neutral. Only charged particles can be extrapolated")
+  // Hypotheses for extrapolation
+  if (m_pdgCode.empty()) {
+    m_chargedStable.push_back(Const::pion);
+    m_chargedStable.push_back(Const::electron);
+    m_chargedStable.push_back(Const::muon);
+    m_chargedStable.push_back(Const::kaon);
+    m_chargedStable.push_back(Const::proton);
+  } else { // user defined
+    std::vector<Const::ChargedStable> stack;
+    stack.push_back(Const::pion);
+    stack.push_back(Const::electron);
+    stack.push_back(Const::muon);
+    stack.push_back(Const::kaon);
+    stack.push_back(Const::proton);
+    for (unsigned i = 0; i < m_pdgCode.size(); ++i) {
+      for (unsigned k = 0; k < stack.size(); ++k) {
+        if (abs(m_pdgCode[i]) == stack[k].getPDGCode()) {
+          m_chargedStable.push_back(stack[k]);
+          stack.erase(stack.begin() + k);
+          --k;
+        }
+      }
     }
-    if (particle->GetPDGCharge() < 0) {
-      m_pdgCode[hypothesis] = -m_pdgCode[hypothesis];
-      particle = G4ParticleTable::GetParticleTable()->FindParticle(m_pdgCode[hypothesis]);
+    if (m_chargedStable.empty()) B2ERROR("Ext initialize(): no valid PDG codes for extrapolation")
     }
-    string g4eName = "g4e_" + particle->GetParticleName();
-    G4ParticleDefinition* g4eParticle = G4ParticleTable::GetParticleTable()->FindParticle(g4eName);
-    if (g4eParticle == NULL) {
-      B2FATAL("Module ext initialize(): Particle " << g4eName << " is not defined in G4ParticleTable")
-    }
-    if (G4ParticleTable::GetParticleTable()->FindAntiParticle(g4eName) == NULL) {
-      B2FATAL("Module ext initialize(): Antiparticle of " << g4eName << " is not defined in G4ParticleTable")
-    }
-    B2INFO("Module ext initialize(): hypotheses for " << particle->GetParticleName() << " and its antiparticle will be extrapolated")
+
+  for (unsigned i = 0; i < m_chargedStable.size(); ++i) {
+    B2INFO("Module ext initialize(): hypothesis for PDG code "
+           << m_chargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated");
   }
 
-  // Define output and relation arrays
-  StoreArray<GFTrack> gfTracks(m_gfTracksColName);
-  StoreArray<ExtHit> extHits(m_extHitsColName);
-  RelationArray gfTrackToExtHits(gfTracks, extHits);
+  // Register output and relation arrays
   StoreArray<ExtHit>::registerPersistent();
-  RelationArray::registerPersistent<GFTrack, ExtHit>();
+  RelationArray::registerPersistent<Track, ExtHit>();
 
   return;
 
@@ -197,24 +198,41 @@ void ExtModule::event()
   // Pion hypothesis:  extrapolate until calorimeter exit
   // Other hypotheses: extrapolate up to but not including calorimeter
 
-  StoreArray<GFTrack> gfTracks(m_gfTracksColName);
+  StoreArray<Track> Tracks(m_TracksColName);
   StoreArray<ExtHit> extHits(m_extHitsColName);
-  RelationArray gfTrackToExtHits(gfTracks, extHits);
+  RelationArray TrackToExtHits(Tracks, extHits);
 
   G4ThreeVector position;
   G4ThreeVector momentum;
   G4ErrorTrajErr covG4e(5, 0);
 
-  int nTracks = gfTracks.getEntries();
+  int nTracks = Tracks.getEntries();
   for (int t = 0; t < nTracks; ++t) {
 
-    int charge = int(gfTracks[t]->getCardinalRep()->getCharge());
+    for (unsigned int hypothesis = 0; hypothesis < m_chargedStable.size(); hypothesis++) {
 
-    for (unsigned int hypothesis = 0; hypothesis < m_pdgCode.size(); hypothesis++) {
+      Const::ChargedStable chargedStable = m_chargedStable[hypothesis];
 
-      int pdgCode = m_pdgCode[hypothesis] * charge;
-      getStartPoint(gfTracks[t], pdgCode, position, momentum, covG4e);
-      if (gfTracks[t]->getMom().Pt() <= m_minPt) continue;
+      const TrackFitResult* trackFit = Tracks[t]->getTrackFitResult(chargedStable);
+      if (!trackFit) {
+        B2ERROR("Ext::event(): no valid TrackFitResult for PDGcode " <<
+                chargedStable.getPDGCode() << ": extrapolation not possible")
+        continue;
+      }
+
+      const GFTrack* gfTrack = DataStore::getRelated<GFTrack>(trackFit);
+      if (!gfTrack) {
+        B2ERROR("Ext::event(): no relation of TrackFitResult with GFTrack for PDGcode " <<
+                chargedStable.getPDGCode() << ": extrapolation not possible")
+        continue;
+      }
+
+      int charge = int(gfTrack->getCardinalRep()->getCharge());
+      int pdgCode = chargedStable.getPDGCode() * charge;
+      if (chargedStable == Const::electron || chargedStable == Const::muon) pdgCode = -pdgCode;
+
+      getStartPoint(gfTrack, pdgCode, position, momentum, covG4e);
+      if (gfTrack->getMom().Pt() <= m_minPt) continue;
       G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
       string g4eName = "g4e_" + particle->GetParticleName();
       double mass = particle->GetPDGMass();
@@ -230,30 +248,30 @@ void ExtModule::event()
         const G4int    postStatus = step->GetPostStepPoint()->GetStepStatus();
         // First step on this track?
         if (preStatus == fUndefined) {
-          createHit(state, EXT_FIRST, t, pdgCode, extHits, gfTrackToExtHits);
+          createHit(state, EXT_FIRST, t, pdgCode, extHits, TrackToExtHits);
         }
         // Ignore the zero-length step by PropagateOneStep() at each boundary
         if (length > 0.0) {
           if (preStatus == fGeomBoundary) {      // first step in this volume?
-            createHit(state, EXT_ENTER, t, pdgCode, extHits, gfTrackToExtHits);
+            createHit(state, EXT_ENTER, t, pdgCode, extHits, TrackToExtHits);
           }
           m_tof += step->GetDeltaTime();
           // Last step in this volume?
           if (postStatus == fGeomBoundary) {
-            createHit(state, EXT_EXIT, t, pdgCode, extHits, gfTrackToExtHits);
+            createHit(state, EXT_EXIT, t, pdgCode, extHits, TrackToExtHits);
           }
         }
         // Post-step momentum too low?
         if (errCode || (track->GetMomentum().mag() < minP)) {
-          createHit(state, EXT_STOP, t, pdgCode, extHits, gfTrackToExtHits);
+          createHit(state, EXT_STOP, t, pdgCode, extHits, TrackToExtHits);
           break;
         }
         if (G4ErrorPropagatorData::GetErrorPropagatorData()->GetState() == G4ErrorState(G4ErrorState_TargetCloserThanBoundary)) {
-          createHit(state, EXT_ESCAPE, t, pdgCode, extHits, gfTrackToExtHits);
+          createHit(state, EXT_ESCAPE, t, pdgCode, extHits, TrackToExtHits);
           break;
         }
         if (m_extMgr->GetPropagator()->CheckIfLastStep(track)) {
-          createHit(state, EXT_ESCAPE, t, pdgCode, extHits, gfTrackToExtHits);
+          createHit(state, EXT_ESCAPE, t, pdgCode, extHits, TrackToExtHits);
           break;
         }
 
@@ -635,7 +653,7 @@ void ExtModule::getStartPoint(const GFTrack* gfTrack, int pdgCode,
 
 // write another volume-entry or volume-exit point on track
 void ExtModule::createHit(const G4ErrorFreeTrajState* state, ExtHitStatus status, int trackID, int pdgCode,
-                          StoreArray<ExtHit>& extHits, RelationArray& gfTrackToExtHits)
+                          StoreArray<ExtHit>& extHits, RelationArray& TrackToExtHits)
 {
 
   G4StepPoint* stepPoint = state->GetG4Track()->GetStep()->GetPreStepPoint();
@@ -665,6 +683,6 @@ void ExtModule::createHit(const G4ErrorFreeTrajState* state, ExtHitStatus status
   TVector3 pos(phasespacePoint[0][0], phasespacePoint[1][0], phasespacePoint[2][0]);
   TVector3 mom(phasespacePoint[3][0], phasespacePoint[4][0], phasespacePoint[5][0]);
   new(extHits.nextFreeAddress()) ExtHit(pdgCode, detID, copyID, status, m_tof, pos, mom, covariance);
-  gfTrackToExtHits.add(trackID, extHits.getEntries() - 1);
+  TrackToExtHits.add(trackID, extHits.getEntries() - 1);
 
 }

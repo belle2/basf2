@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <tracking/dataobjects/ExtHit.h>
+#include <framework/gearbox/Const.h>
 
 #include <G4TouchableHandle.hh>
 #include <G4ErrorTrajErr.hh>
@@ -85,8 +86,8 @@ namespace Belle2 {
     //! Flag for source (0 = beam, 1 = cosmic ray)
     int    m_cosmic;
 
-    //! Name of the GFTrack collection of the reconstructed tracks to be extrapolated
-    std::string m_gfTracksColName;
+    //! Name of the Track collection of the reconstructed tracks to be extrapolated
+    std::string m_TracksColName;
 
     //! Name of the extHit collection of the extrapolation hits
     std::string m_extHitsColName;
@@ -123,6 +124,9 @@ namespace Belle2 {
 
     //! PDG codes for the particleID hypotheses
     std::vector<int> m_pdgCode;
+
+    //!  ChargedStable hypotheses
+    std::vector<Const::ChargedStable> m_chargedStable;
 
     // Pointers to geant4 physical volumes whose entry/exit points will be saved
     std::vector<G4VPhysicalVolume*>* m_enter;

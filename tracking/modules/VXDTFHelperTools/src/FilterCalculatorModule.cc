@@ -155,10 +155,11 @@ void FilterCalculatorModule::initialize()
 
   m_trackletMomentumCounter.resize(numCuts, 0);
 
-  BOOST_FOREACH(double ptCutoff, m_PARAMpTcuts) {
+  for (int i = 0; i < int(m_PARAMpTcuts.size());) {
     MapOfSectors* secMap = new MapOfSectors;
     secMap->clear();
     m_sectorMaps.push_back(secMap);
+    ++i;
   }
 
   m_sectorMap.clear();

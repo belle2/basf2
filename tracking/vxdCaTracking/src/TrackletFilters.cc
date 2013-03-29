@@ -134,6 +134,7 @@ double TrackletFilters::circleFit(double& clapPhi, double& clapR)
   double rootTerm = sqrt(1. - 4.*delta * kappa);
   double rho = 2.*kappa / (rootTerm); // rho = 1/curvature in X-Y-plane = radius of fitting circle, used for pT-calculation
   double dist = 2.*delta / (1 + rootTerm);
+  clapR = dist; // WARNING currently not sure whether this is indeed right...
   double chi2 = m_numHits * (1 + rho * dist) * (1 + rho * dist) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2);
   return chi2;
 }

@@ -1525,7 +1525,8 @@ void VXDTFModule::event()
     m_TESTERkalmanSkipped++;
   }
   if (m_PARAMcalcQIType == "kalman" and allowKalman == true) {
-    calcQIbyKalman(m_tcVector, aPxdClusterArray, aSvdClusterArray, clustersOfEvent); /// calcQIbyKalman
+//     calcQIbyKalman(m_tcVector, aPxdClusterArray, aSvdClusterArray, clustersOfEvent); /// calcQIbyKalman // old version, backup 13-03-29
+    calcQIbyKalman(m_tcVector, aPxdClusterArray); /// calcQIbyKalman
   } else if (m_PARAMcalcQIType == "trackLength") {
     calcQIbyLength(m_tcVector, m_passSetupVector);                              /// calcQIbyLength
   } else { // if (m_PARAMcalcQIType == "circleFit") { // and if totalOverlaps > 500
@@ -3181,7 +3182,8 @@ void VXDTFModule::calcQIbyLength(TCsOfEvent& tcVector, PassSetupVector& passSetu
 
 
 
-void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& pxdClusters, StoreArray<SVDCluster>& svdClusters, vector<ClusterInfo>& clusters)
+// void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& pxdClusters, StoreArray<SVDCluster>& svdClusters, vector<ClusterInfo>& clusters) //old version, keeping as backup (13-03-29)
+void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& pxdClusters)
 {
   /// produce GFTrackCands for each currently living TC and calculate real kalman-QI's
   GFKalman kalmanFilter;
@@ -3278,7 +3280,7 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
 void VXDTFModule::calcQIbyCircleFit(TCsOfEvent& tcVector)
 {
   /// setting quality indices and smear result if chosen
-  double chi2 = 0., chi22 = 0.;
+  double chi2 = 0.;
   int tcCtr = 0;
   vector<TVector3> currentHits;
   boostNsec duration;

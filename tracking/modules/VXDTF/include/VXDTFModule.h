@@ -374,9 +374,11 @@ namespace Belle2 {
 
     /** calculate real kalman-QI's for each currently living TC */
     void calcQIbyKalman(TCsOfEvent& tcVector,
-                        StoreArray<PXDCluster>& pxdClusters,
-                        StoreArray<SVDCluster>& svdClusters,
-                        std::vector<ClusterInfo>& clusters); // ->auslagern!
+                        StoreArray<PXDCluster>& pxdClusters); // ->auslagern!
+//    void calcQIbyKalman(TCsOfEvent& tcVector,
+//                         StoreArray<PXDCluster>& pxdClusters,
+//                         StoreArray<SVDCluster>& svdClusters,
+//                         std::vector<ClusterInfo>& clusters); // old version, backup 13-03-29
 
 
     /** because of geometrical reasons and the multipass-support, it is a rather common situation that the same track will be recovered twice or more.

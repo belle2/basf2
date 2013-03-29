@@ -512,7 +512,7 @@ void GenFitterModule::event()
               tracks[trackCounter]->setTrackFitResultIndex(chargedStable, trackFitResultCounter);
               //Create relations
               if (aTrackCandPointer->getMcTrackId() != -999) {
-                mcParticlesToTracks.add(trackCounter, aTrackCandPointer->getMcTrackId());
+                mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
               }
 
               TrackFitResult* newTrackFitResult = trackFitResults.appendNew();

@@ -756,7 +756,7 @@ void VXDTFModule::beginRun()
     B2INFO("importing sectors, using " << chosenSetup << " > " << sectorList.getNumberNodes("aSector") << " sectors found");
 
     if (sectorList.getNumberNodes("aSector") == 0) {
-      B2FATAL("Failed to import sector map " << chosenSetup << "! No track finding possible...")
+      B2FATAL("Failed to import sector map " << chosenSetup << "! No track finding possible. Please check ../tracking/data/VXDTFinxex.xml whether your chosen sector maps are uncommented and recompile if you change entries...")
     }
     double cutoffMinValue, cutoffMaxValue;
     string aSectorName, aFriendName, aFilterName;

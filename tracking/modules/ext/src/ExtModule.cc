@@ -334,7 +334,7 @@ void ExtModule::registerVolumes()
       m_enter->push_back(*iVol);
       m_exit->push_back(*iVol);
     }
-    if ((name == "ARICH.Envelope") || (name == "ARICH.DetectorModules")) {
+    if (name == "ARICH.AerogelSupportPlate") {
       m_enter->push_back(*iVol);
       m_exit->push_back(*iVol);
     }
@@ -394,11 +394,9 @@ void ExtModule::getVolumeID(const G4TouchableHandle& touch, ExtDetectorID& detID
     copyID = (touch->GetHistoryDepth() >= 2) ? touch->GetVolume(2)->GetCopyNo() : 0;
   }
   // ARICH has an envelope that contains modules that each contain a moduleSensitive
-  if (name == "ARICH.Envelope") {
+  if (name == "ARICH.AerogelSupportPlate") {
     detID = EXT_ARICH;
-  }
-  if (name == "ARICH.DetectorModules") {
-    detID = EXT_ARICH;
+    copyID = 12345;
   }
   if (name == "moduleSensitive") {
     detID = EXT_ARICH;

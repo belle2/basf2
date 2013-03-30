@@ -229,7 +229,7 @@ void TrackFitCheckerModule::initialize()
   }
 
 
-  if (m_robust == true) { //set the scaling factors for the MAD. No MAD will be calculated when this value is not there or 0
+  if (m_robust == true) { //set the scaling factors for the MAD. No MAD will be calculated when this value is not there or 0 or negative
     m_madScalingFactors["pulls_vertexPosMom"] = 1.4826; //scaling factor for normal distributed variables
     m_madScalingFactors["absMomVertex"] = 1.4826;
     m_madScalingFactors["res_vertexPosMom"] = 1.4826;
@@ -239,7 +239,7 @@ void TrackFitCheckerModule::initialize()
     m_madScalingFactors["relRes_p_T"] = 1.4826;
     m_madScalingFactors["pValue_bu"] = 4.0 / 3.0;  //scaling factor for uniform distributed variables
     m_madScalingFactors["pValue_fu"] = 4.0 / 3.0;
-
+    //set the cut away ratio for the truncated mean and std. No truncated mean and std will be calculated when this value is not set or 0 or negative
     m_trunctationRatios["pulls_vertexPosMom"] = 0.02; //scaling factor for normal distributed variables
     m_trunctationRatios["absMomVertex"] = 0.02;
     m_trunctationRatios["res_vertexPosMom"] = 0.02;
@@ -1634,9 +1634,9 @@ int TrackFitCheckerModule::trunctatedMeanAndStd(std::vector<double> data, const 
 
   const int n = data.size();
   double truncN = -1;
-  if ((n* cutRatio < 2 and symmetric == true) or(n* cutRatio < 1 and symmetric == false)) {
-    return 0;
-  }
+//  if ((n* cutRatio < 2 and symmetric == true) or(n* cutRatio < 1 and symmetric == false)) {
+//    return 0;
+//  }
   sort(data.begin(), data.end());
   std = 0;
   int i = 0;

@@ -74,7 +74,7 @@ namespace Belle2 {
 
   private:
     int m_event_id; /**< event this track was found in */
-    int m_track_id; /**< track ID (starts at 0 for each event) */
+    int m_track_id; /**< equal to GFTrack id. */
     int m_pdg; /**< PDG code (MC truth) */
     bool m_slow_pion; /**< does this particle belong to a slow pion (MC truth) */
     TVector3 m_p_vec; /**< momentum */

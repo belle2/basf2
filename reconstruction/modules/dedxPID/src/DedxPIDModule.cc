@@ -91,7 +91,8 @@ DedxPIDModule::~DedxPIDModule() { }
 
 void DedxPIDModule::initialize()
 {
-  m_trackID = m_eventID = 0;
+  m_eventID = -1;
+  m_trackID = 0;
   m_numExtrapolations = 0;
 
   if (!m_enableDebugOutput and m_pdfFilename.empty()) {
@@ -230,7 +231,7 @@ void DedxPIDModule::event()
         const TVector3 true_momentum = mcpart->getMomentum();
         track.m_p_true = true_momentum.Mag();
       } else {
-        B2INFO("no MCParticle found for current track!");
+        B2INFO("No MCParticle found for current track!");
       }
     }
 
@@ -253,7 +254,7 @@ void DedxPIDModule::event()
       track.m_p_vec = dir_in_poca;
       track.m_p = momentum_mag;
     } catch (GFException) {
-      B2WARNING(m_trackID - 1 << ": Track extrapolation failed (at origin!), skipping particle");
+      B2ERROR("Event " << m_eventID << ", gftrack: " << iGFTrack << ": GFTrack extrapolation failed (at origin!), skipping particle");
       continue; //next particle
     }
 
@@ -298,7 +299,6 @@ void DedxPIDModule::event()
         const int superlayer = cdcHits[cdc_idx]->getISuperLayer();
         const int current_layer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer); //this is essentially the layer ID you'd get from a CDCRecoHit
         const int wire = cdcHits[cdc_idx]->getIWire();
-        //B2INFO(m_trackID-1 << ": cdc layer: " << layer);
 
         static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
         const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(current_layer, wire);
@@ -314,9 +314,10 @@ void DedxPIDModule::event()
 
         //get actual hit coordinates by taking z from the helix and x/y from wire (with stereo angle correction)
         double where = (hit_pos_helix.z() - wire_pos_f.z()) / (wire_pos_b.z() - wire_pos_f.z());
-        if (where < 0.0 or where > 1.0) {
-          B2WARNING("helix extrapolation: Hit outside drift chamber! track_id: " << m_trackID - 1 << ", where: " << where);
-          where = (where < 0.0) ? 0.0 : 1.0;
+        const double tolerance = 0.1; //some deviation is ok
+        if (where < 0.0 - tolerance or where > 1.0 + tolerance) {
+          B2WARNING("Event " << m_eventID << ", gftrack: " << iGFTrack << ": helix extrapolation: Hit outside drift chamber! where: " << where);
+          where = (where < 0.0 - tolerance) ? 0.0 - tolerance : 1.0 + tolerance;
         }
         TVector3 hit_pos = wire_pos_f + where * (wire_pos_b - wire_pos_f);
 
@@ -341,7 +342,7 @@ void DedxPIDModule::event()
             hit_pos_helix = poca;
             hit_pos = poca_on_wire;
           } catch (GFException) {
-            B2WARNING(m_eventID - 1 << ":" << m_trackID - 1 << ": Track extrapolation failed (in CDC), further hits will be less accurate");
+            B2WARNING("Event " << m_eventID << ", gftrack: " << iGFTrack << ": GFTrack extrapolation failed (in CDC), further hits will be less accurate");
 
             //if extrapolation fails once, it's unlikely to work again
             track_extrapolation_failed = true;
@@ -464,8 +465,8 @@ void DedxPIDModule::event()
 
     //save this track's data to StoreArray
     if (m_enableDebugOutput) {
-      track.m_event_id = m_eventID - 1;
-      track.m_track_id = m_trackID - 1;
+      track.m_event_id = m_eventID;
+      track.m_track_id = iGFTrack;
 
       dedx_array.appendNew(track);
     }
@@ -483,7 +484,7 @@ void DedxPIDModule::event()
 
 void DedxPIDModule::terminate()
 {
-  B2INFO("DedxPIDModule exiting after processing " << m_trackID << " tracks in " << m_eventID << " events.");
+  B2INFO("DedxPIDModule exiting after processing " << m_trackID << " tracks in " << m_eventID + 1 << " events.");
   B2INFO("reevaluated helix " << m_numExtrapolations << " times.");
 }
 

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <reconstruction/modules/MdstPIDtmp/MdstPIDtmpModule.h>
+#include <reconstruction/modules/MdstPID/MdstPIDModule.h>
 #include <framework/core/ModuleManager.h>
 
 // framework - DataStore
@@ -36,44 +36,43 @@ using namespace std;
 
 namespace Belle2 {
 
-  REG_MODULE(MdstPIDtmp)
+  REG_MODULE(MdstPID)
 
-  MdstPIDtmpModule::MdstPIDtmpModule() : Module()
+  MdstPIDModule::MdstPIDModule() : Module()
   {
     setDescription("Create MDST PID format (PIDLikelihood objects) from subdetector PID info.");
     setPropertyFlags(c_ParallelProcessingCertified);
   }
 
-  MdstPIDtmpModule::~MdstPIDtmpModule()
+  MdstPIDModule::~MdstPIDModule()
   {
   }
 
-  void MdstPIDtmpModule::initialize()
+  void MdstPIDModule::initialize()
   {
     // data store registration
     StoreArray<PIDLikelihood>::registerPersistent();
-    RelationArray::registerPersistent<GFTrack, PIDLikelihood>();
     RelationArray::registerPersistent<Track, PIDLikelihood>();
 
   }
 
 
-  void MdstPIDtmpModule::beginRun()
+  void MdstPIDModule::beginRun()
   {
   }
 
-  void MdstPIDtmpModule::endRun()
+  void MdstPIDModule::endRun()
   {
   }
 
-  void MdstPIDtmpModule::terminate()
+  void MdstPIDModule::terminate()
   {
   }
 
-  void MdstPIDtmpModule::event()
+  void MdstPIDModule::event()
   {
     // reconstructed tracks
-    StoreArray<GFTrack> tracks;
+    StoreArray<Track> tracks;
 
     // output
     StoreArray<PIDLikelihood> pidLikelihoods;
@@ -82,40 +81,37 @@ namespace Belle2 {
     // loop over reconstructed tracks and collect likelihoods
     for (int itra = 0; itra < tracks.getEntries(); ++itra) {
 
+      // reconstructed track
+      const Track* track = tracks[itra];
+
       // append new and set relation
       PIDLikelihood* pid = pidLikelihoods.appendNew();
-      DataStore::addRelationFromTo(tracks[itra], pid);
-
-      // reconstructed track
-      const GFTrack* gfTrack = tracks[itra];
+      DataStore::addRelationFromTo(track, pid);
 
       // set top likelihoods
-      const TOPLikelihood* top = DataStore::getRelated<TOPLikelihood>(gfTrack);
+      const TOPLikelihood* top = DataStore::getRelated<TOPLikelihood>(track);
       if (top) pid->setLikelihoods(top);
 
-      // set arich likelihoods
-      const MCParticle* part = DataStore::getRelated<MCParticle>(gfTrack);
+      // set arich likelihoods (using MC tracks, to be replaced...)
+      const MCParticle* part = DataStore::getRelated<MCParticle>(track);
       if (part) {
         const ARICHAeroHit* aero = part->getRelated<ARICHAeroHit>();
         const ARICHLikelihoods* arich = DataStore::getRelated<ARICHLikelihoods>(aero);
         if (arich) pid->setLikelihoods(arich);
       }
 
-      // set dedx likelihoods
+      // set dedx likelihoods (temporary solution: using pion fit result)
+      const TrackFitResult* trackFit = track->getTrackFitResult(Const::pion);
+      const GFTrack* gfTrack = DataStore::getRelated<GFTrack>(trackFit);
       const DedxLikelihood* dedx = DataStore::getRelated<DedxLikelihood>(gfTrack);
       if (dedx) pid->setLikelihoods(dedx);
 
-      // relation between mdst track and likelihoods
-      const Track* track = DataStore::getRelated<Track>(gfTrack);
-      if (track) {
-        DataStore::addRelationFromTo(track, pid);
-      }
     }
 
   }
 
 
-  void MdstPIDtmpModule::printModuleParams() const
+  void MdstPIDModule::printModuleParams() const
   {
   }
 

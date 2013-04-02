@@ -76,7 +76,7 @@ def add_reconstruction(path, components=None):
     # charged particle PID
     if components == None or 'PXD' in components or 'SVD' in components \
         or 'CDC' in components:
-        mdstPID = register_module('MdstPIDtmp')
+        mdstPID = register_module('MdstPID')
         path.add_module(mdstPID)
 
 

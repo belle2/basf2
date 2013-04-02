@@ -268,7 +268,7 @@ namespace Belle2 {
   template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const GFTrackCand* trackCand, const TString& label,
       const StoreArray<PXDType> &pxdhits, const StoreArray<SVDType> &svdhits, const StoreArray<CDCHit> &cdchits)
   {
-    const Color_t trackCandColor = kBlue + 1;
+    const Color_t trackCandColor = kAzure - 2;
 
     // parse the option string ------------------------------------------------------------------------
     bool drawHits = false;
@@ -291,7 +291,7 @@ namespace Belle2 {
     lines->SetMainColor(trackCandColor);
     lines->SetMarkerColor(trackCandColor);
     lines->SetMarkerStyle(6);
-    lines->SetMainTransparency(50);
+    lines->SetMainTransparency(60);
 
     const unsigned int numhits = trackCand->getNHits();
     if (drawHits) {

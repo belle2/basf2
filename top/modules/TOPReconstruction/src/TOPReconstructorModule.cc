@@ -316,7 +316,12 @@ namespace Belle2 {
 
       for (int itra = 0; itra < Tracks.getEntries(); ++itra) {
         const Track* track = Tracks[itra];
-        int charge = track->getTrackFitResult(chargedStable)->getCharge();
+        const TrackFitResult* fitResult = track->getTrackFitResult(chargedStable);
+        if (!fitResult) {
+          B2ERROR("No TrackFitResult for " << chargedStable.getPDGCode());
+          continue;
+        }
+        int charge = fitResult->getCharge();
         const MCParticle* particle = DataStore::getRelated<MCParticle>(track);
         const TOPBarHit* barHit = DataStore::getRelated<TOPBarHit>(particle);
         int iBarHit = -1;

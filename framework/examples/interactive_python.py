@@ -18,10 +18,19 @@ from ROOT import Belle2
 
 
 class MinModule(Module):
+    """
+    Example module to drop into ipython and create some objcets to look at.
+    """
     def __init__(self):
-        super(MinModule, self).__init__()  # call constructor of base class
+        """
+        call constructor of base class, required.
+        """
+        super(MinModule, self).__init__()
 
     def event(self):
+        """
+        reimplement Module::event()
+        """
         evtmetadata = Belle2.PyStoreObj("EventMetaData")
         particles = Belle2.PyStoreArray("MCParticles")
         B2INFO(80 * '=')

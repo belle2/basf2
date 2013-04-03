@@ -23,8 +23,6 @@
 #include <reconstruction/dataobjects/DedxLikelihood.h>
 #include <tracking/dataobjects/Track.h>
 #include <GFTrack.h>
-#include <arich/dataobjects/ARICHAeroHit.h>
-#include <generators/dataobjects/MCParticle.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -71,7 +69,7 @@ namespace Belle2 {
 
   void MdstPIDModule::event()
   {
-    // reconstructed tracks
+    // input: reconstructed tracks
     StoreArray<Track> tracks;
 
     // output
@@ -92,13 +90,9 @@ namespace Belle2 {
       const TOPLikelihood* top = DataStore::getRelated<TOPLikelihood>(track);
       if (top) pid->setLikelihoods(top);
 
-      // set arich likelihoods (using MC tracks, to be replaced...)
-      const MCParticle* part = DataStore::getRelated<MCParticle>(track);
-      if (part) {
-        const ARICHAeroHit* aero = part->getRelated<ARICHAeroHit>();
-        const ARICHLikelihoods* arich = DataStore::getRelated<ARICHLikelihoods>(aero);
-        if (arich) pid->setLikelihoods(arich);
-      }
+      // set arich likelihoods
+      const ARICHLikelihoods* arich = DataStore::getRelated<ARICHLikelihoods>(track);
+      if (arich) pid->setLikelihoods(arich);
 
       // set dedx likelihoods (temporary solution: using pion fit result)
       const TrackFitResult* trackFit = track->getTrackFitResult(Const::pion);

@@ -123,7 +123,6 @@ const TVector3 ARICHTrack::getPositionAtZ(double zout) const
 }
 
 
-ClassImp(ARICHTrack);
 
 //} // namespace arich
 //} // namespace Belle2

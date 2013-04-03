@@ -228,8 +228,6 @@ namespace Belle2 {
 
 
 
-    ClassDef(ARICHTrack, 1); /**< the class title */
-
   };
 } // namespace Belle2
 

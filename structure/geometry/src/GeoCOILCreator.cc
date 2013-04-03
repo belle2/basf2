@@ -62,7 +62,7 @@ namespace Belle2 {
 
     }
 
-    void GeoCOILCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+    void GeoCOILCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
     {
 
       // --- Collect global parameters

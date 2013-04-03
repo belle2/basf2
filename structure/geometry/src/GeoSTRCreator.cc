@@ -63,7 +63,7 @@ namespace Belle2 {
 
     }
 
-    void GeoSTRCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+    void GeoSTRCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
     {
 
       // --- Collect global parameters

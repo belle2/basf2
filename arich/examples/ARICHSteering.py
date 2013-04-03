@@ -6,9 +6,11 @@
 # This is an example steering file to run ARICH part of Belle2 simulation.
 # It uses ParicleGun module to generate tracks,
 # (see "generators/example/ParticleGunFull.py" for detailed usage)
-# builds ARICH geometry, performs geant4 simulation, does ARICH reconstruction
-# and stores output (for each track a value of likelihood for different
-# particle hypotheses, etc.) in an output root file.
+# needs reconstructed tracks(Tracks) extrapolated to ARICH (ExtHits).
+# The module builds geometry, performs geant4 simulation, does ARICH
+# reconstruction and stores output (for each track a value of likelihood
+# for different particle hypotheses) in an output root file
+# defined in RootOutput options below.
 #
 ##############################################################################
 
@@ -31,7 +33,13 @@ geometry = register_module('Geometry')
 particlegun = register_module('ParticleGun')
 # Run simulation
 simulation = register_module('FullSim')
-# Track extrapolation - needed for relation arrays, not in path
+# CDC digitizer
+cdcDigitizer = register_module('CDCDigitizer')
+# MC track finder (for simplicity)
+mctrackfinder = register_module('MCTrackFinder')
+# Track fitting
+cdcfitting = register_module('GenFitter')
+# Track extrapolation
 ext = register_module('Ext')
 # ARICH digitization module
 arichDIGI = register_module('ARICHDigitizer')
@@ -42,7 +50,7 @@ output = register_module('RootOutput')
 
 # EvtMetaGen parameters
 # Set the number of events to be processed (10 event)
-evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
+evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
 # ============================================================================
 
 # Set output filename
@@ -74,7 +82,14 @@ print_params(particlegun)
 # ============================================================================
 # Geometry parameters
 # Select subdetectors to be built
-geometry.param('Components', ['ARICH'])
+geometry.param('Components', [
+    'MagneticField',
+    'BeamPipe',
+    'PXD',
+    'SVD',
+    'CDC',
+    'ARICH',
+    ])
 # If you comment this out all subdetectors will be built. If you want to
 # include just some of them do for example ['ARICH','TOP','CDC'].
 # ============================================================================
@@ -100,11 +115,30 @@ simulation.param('PhotonFraction', 0.3)
 #                            '/vis/modeling/trajectories/create/drawByCharge'])
 # =============================================================================
 
+# CDC parameters
+# use one gaussian with resolution of 0.01 in the digitizer
+# (to simplify the fitting)
+param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
+cdcDigitizer.param(param_cdcdigi)
+
+# MCFinder parameters
+param_mctrackfinder = {  # select which particles to use: primary particles
+    'UseCDCHits': 1,
+    'UseSVDHits': 1,
+    'UsePXDHits': 1,
+    'WhichParticles': ['primary'],
+    }
+mctrackfinder.param(param_mctrackfinder)
+
+# GenFitter parameters
+
+# Extrapolation module parameters
+
 # =============================================================================
 # ARICH Reconstruction parameters
 arichRECO.logging.log_level = LogLevel.DEBUG
-arichRECO.logging.debug_level = 100
-arichRECO.param('InputTrackType', 1)
+arichRECO.logging.debug_level = 50
+arichRECO.param('InputTrackType', 0)
 # =============================================================================
 
 # Do the simulation
@@ -116,6 +150,10 @@ main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(particlegun)
 main.add_module(simulation)
+main.add_module(cdcDigitizer)
+main.add_module(mctrackfinder)
+main.add_module(cdcfitting)
+main.add_module(ext)
 main.add_module(arichDIGI)
 main.add_module(arichRECO)
 main.add_module(output)

@@ -355,7 +355,7 @@ EvtVector4R EvtB0toKsKK::umu(const EvtVector4R& p4a, const EvtVector4R& p4b,
 }
 
 EvtVector4R EvtB0toKsKK::Smu(const EvtVector4R& p4a, const EvtVector4R& p4b,
-                             const EvtVector4R& p4c)
+                             const EvtVector4R& /*p4c*/)
 {
   const double ma = p4a.mass();
   const double mb = p4b.mass();
@@ -623,7 +623,7 @@ EvtComplex EvtB0toKsKK::Flatte(const double& m, const double& m0)
   return Flatte;
 }
 
-EvtComplex EvtB0toKsKK::A_f0ks(const EvtVector4R& p4ks,
+EvtComplex EvtB0toKsKK::A_f0ks(const EvtVector4R& /*p4ks*/,
                                const EvtVector4R& p4kp,
                                const EvtVector4R& p4km)
 {
@@ -752,7 +752,7 @@ EvtComplex EvtB0toKsKK::A_phiks(const EvtVector4R& p4ks,
   return A_phiks;
 }
 
-EvtComplex EvtB0toKsKK::A_fxks(const EvtVector4R& p4ks,
+EvtComplex EvtB0toKsKK::A_fxks(const EvtVector4R& /*p4ks*/,
                                const EvtVector4R& p4kp,
                                const EvtVector4R& p4km)
 {
@@ -782,7 +782,7 @@ EvtComplex EvtB0toKsKK::A_fxks(const EvtVector4R& p4ks,
   return A_fxks;
 }
 
-EvtComplex EvtB0toKsKK::A_chic0ks(const EvtVector4R& p4ks,
+EvtComplex EvtB0toKsKK::A_chic0ks(const EvtVector4R& /*p4ks*/,
                                   const EvtVector4R& p4kp,
                                   const EvtVector4R& p4km)
 {

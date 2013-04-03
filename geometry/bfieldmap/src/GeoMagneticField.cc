@@ -55,7 +55,7 @@ GeoMagneticField::~GeoMagneticField()
 }
 
 
-void GeoMagneticField::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes)
+void GeoMagneticField::create(const GearDir& content, G4LogicalVolume& /*topVolume*/, geometry::GeometryTypes)
 {
   //Read the magnetic field components
   GearDir components(content, "Components/Component");

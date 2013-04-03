@@ -208,7 +208,7 @@ namespace Belle2 {
 
       double innerZ;
       double innerX;
-      double outerZ;
+      double outerZ(0);
       double outerX;
       //We go through both lists until both are empty
       while (!(innerPoints.empty() && outerPoints.empty())) {

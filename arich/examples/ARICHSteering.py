@@ -31,6 +31,8 @@ geometry = register_module('Geometry')
 particlegun = register_module('ParticleGun')
 # Run simulation
 simulation = register_module('FullSim')
+# Track extrapolation - needed for relation arrays, not in path
+ext = register_module('Ext')
 # ARICH digitization module
 arichDIGI = register_module('ARICHDigitizer')
 # ARICH reconstruction module
@@ -101,7 +103,8 @@ simulation.param('PhotonFraction', 0.3)
 # =============================================================================
 # ARICH Reconstruction parameters
 arichRECO.logging.log_level = LogLevel.DEBUG
-arichRECO.logging.debug_level = 50
+arichRECO.logging.debug_level = 100
+arichRECO.param('InputTrackType', 1)
 # =============================================================================
 
 # Do the simulation

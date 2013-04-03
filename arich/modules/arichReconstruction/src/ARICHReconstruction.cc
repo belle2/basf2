@@ -12,7 +12,7 @@
 #include "arich/modules/arichReconstruction/Utility.h"
 #include "arich/geometry/ARICHGeometryPar.h"
 #include "arich/dataobjects/ARICHDigit.h"
-#include "arich/modules/arichReconstruction/ARICHTrack.h"
+#include <arich/modules/arichReconstruction/ARICHTrack.h>
 
 // DataStore
 #include <framework/datastore/DataStore.h>
@@ -71,14 +71,14 @@ namespace Belle2 {
     }
 
 
-    int ARICHReconstruction::ReconstructParticles()
+    int ARICHReconstruction::ReconstructParticles(std::vector<ARICHTrack>& arichTracks)
     {
 
-      StoreArray<ARICHTrack> arichTracks;
-      unsigned int tsize = arichTracks.getEntries();
+      //StoreArray<ARICHTrack> arichTracks;
+      unsigned int tsize = arichTracks.size();
 
       for (unsigned  int i = 0; i < tsize; i++) {
-        ARICHTrack* track = arichTracks[i];
+        ARICHTrack* track = &arichTracks[i];
         double thc = gRandom->Gaus(0, m_trackAngRes);
         double fic = gRandom->Uniform(2 * M_PI);
         TVector3 dirf = setThetaPhi(thc, fic);  // particle system
@@ -268,14 +268,14 @@ namespace Belle2 {
     }
 
 
-    int ARICHReconstruction::Likelihood2()
+    int ARICHReconstruction::Likelihood2(std::vector<ARICHTrack>& arichTracks)
     {
       static int ncount = 0;
       ncount++;
       const double p_mass[5] = { 0.000511, 0.10566, 0.13957, 0.49368, 0.93827};// mass of particles in GeV
 
-      StoreArray<ARICHTrack> arichTracks;
-      unsigned int tsize = arichTracks.getEntries();
+      //StoreArray<ARICHTrack> arichTracks;
+      unsigned int tsize = arichTracks.size();
       StoreArray<ARICHDigit> arichDigits;
       unsigned int hsize = arichDigits.getEntries();
 
@@ -329,7 +329,7 @@ namespace Belle2 {
       // loop over all tracks
       for (unsigned  int i = 0; i < tsize; i++) {
 
-        ARICHTrack* track =  arichTracks[i];
+        ARICHTrack* track =  &arichTracks[i];
         int nfot = 0;
         double padArea = pad_size / Unit::m * pad_size / Unit::m;
         int padNum = _arichgp->getDetectorXPadNumber() * _arichgp->getDetectorXPadNumber();

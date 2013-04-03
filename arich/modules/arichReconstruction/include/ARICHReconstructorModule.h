@@ -15,6 +15,8 @@
 
 #include <arich/modules/arichReconstruction/ARICHReconstruction.h>
 
+#include <framework/gearbox/Const.h>
+
 #include <string>
 
 namespace Belle2 {
@@ -76,8 +78,12 @@ namespace Belle2 {
       void printModuleParams() const;
 
     private:
+      /** Input collections */
+      std::string m_MCColName;         /**< Input collection name */
+      std::string m_TracksColName;     /**< MDST tracks */
+      std::string m_extHitsColName;    /**< Extrapolated tracks */
 
-      std::string m_inColName;         /**< Input collection name */
+      /** Output collection */
       std::string m_outColName;        /**< Output collection name */
 
       /** Other members.*/
@@ -90,6 +96,15 @@ namespace Belle2 {
       double m_bkgLevel;               /**< Photon background level. */
       double m_singleRes;              /**< Resolution of single photon emission angle. */
       std::vector<double> m_aeroMerit; /**< Vector of aerogel layer figures of merit. */
+      int m_inputTrackType;            /**< Input tracks from the tracking (0) or from MCParticles>AeroHits (1). */
+
+      //! Function fills the internal vector ARICHTracks from ext module
+      /*
+        \param arichTracks
+        \param hypothesis
+       */
+      void getTracks(std::vector<ARICHTrack> &, Const::ChargedStable);
+
     };
 
   } // arich namespace

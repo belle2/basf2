@@ -19,16 +19,36 @@ ARICHTrack::ARICHTrack(const ARICHAeroHit& aeroHit)
 {
 
   m_originalPosition = aeroHit.getPosition();
-  m_originalDirection = aeroHit.getMomentum();
-  m_originalMomentum =   m_originalDirection.Mag();
-  m_originalDirection =  m_originalDirection.Unit();
+  m_originalDirection = aeroHit.getMomentum().Unit();
+  m_originalMomentum =  aeroHit.getMomentum().Mag();
   m_reconstructedPosition = TVector3(0, 0, 0);
   m_reconstructedDirection = TVector3(0, 0, 0);
   m_reconstructedMomentum = -1.0;
   m_PDGCharge = 0; // check if aeroHit contains this info
   m_PDGEncoding = aeroHit.getParticleID();
-  m_G4TrackID = aeroHit.getTrackID();
+  m_trackID = aeroHit.getTrackID();
+  m_extHitID = -1;
   m_identity = Lund2Type(m_PDGEncoding);
+  for (int i = 0; i < MAXLKH; i++) {
+    m_lkh[i] = 0;
+    m_sfot[i] = 0;
+    m_acc[i] = 0;
+  }
+}
+
+ARICHTrack::ARICHTrack(const ExtHit* extHit, int charge, int trackID) :
+  m_originalPosition(0, 0, 0),
+  m_originalDirection(0, 0, 0),
+  m_originalMomentum(-1),
+  m_reconstructedPosition(extHit->getPosition()),
+  m_reconstructedDirection(extHit->getMomentum().Unit()),
+  m_reconstructedMomentum(extHit->getMomentum().Mag()),
+  m_PDGCharge(charge),
+  m_PDGEncoding(extHit->getPdgCode()),
+  m_trackID(trackID),
+  m_extHitID(extHit->getArrayIndex()),
+  m_identity(Lund2Type(m_PDGEncoding))
+{
   for (int i = 0; i < MAXLKH; i++) {
     m_lkh[i] = 0;
     m_sfot[i] = 0;

@@ -12,6 +12,7 @@
 #define ARICHRECONSTRUCTION_H
 
 #include <arich/geometry/ARICHGeometryPar.h>
+#include <arich/modules/arichReconstruction/ARICHTrack.h>
 
 #include <TVector3.h>
 #include <cmath>
@@ -34,10 +35,10 @@ namespace Belle2 {
       ~ARICHReconstruction() {};
 
       //! Smeares track parameters ("simulate" the uncertainties of tracking).
-      int ReconstructParticles();
+      int ReconstructParticles(std::vector<ARICHTrack>&);
 
       //! Computes the value of identity likelihood function for different particle hypotheses.
-      int Likelihood2();
+      int Likelihood2(std::vector<ARICHTrack>&);
       //! Sets detector background level (photon hits / m^2)
       void setBackgroundLevel(double nbkg);
       //! Sets track position resolution (from tracking)

@@ -14,6 +14,7 @@
 
 
 #include <arich/dataobjects/ARICHAeroHit.h>
+#include <tracking/dataobjects/ExtHit.h>
 #include <TObject.h>
 
 #define MAXLKH 5
@@ -37,7 +38,8 @@ namespace Belle2 {
       m_reconstructedMomentum(0),
       m_PDGCharge(0),
       m_PDGEncoding(-1),
-      m_G4TrackID(-1),
+      m_trackID(-1),
+      m_extHitID(-1),
       m_identity(-1) {
       /*! does nothing */
       for (int i = 0; i < MAXLKH; i++) {
@@ -62,17 +64,18 @@ namespace Belle2 {
       \param trackID geant4 track id
      */
 
-    ARICHTrack(TVector3 r, TVector3 dir, double p, int type, int trackID) {
-      m_originalPosition  =  r;
-      m_originalDirection =  dir;
-      m_originalMomentum  =  p;
-      m_reconstructedPosition = TVector3(0, 0, 0);
-      m_reconstructedDirection = TVector3(0, 0, 0);
-      m_reconstructedMomentum = -1;
-      m_PDGCharge = 0;
-      m_PDGEncoding = type;
-      m_G4TrackID = trackID;
-      m_identity = -1;
+    ARICHTrack(TVector3 r, TVector3 dir, double p, int type, int trackID) :
+      m_originalPosition(r),
+      m_originalDirection(dir),
+      m_originalMomentum(p),
+      m_reconstructedPosition(TVector3(0, 0, 0)),
+      m_reconstructedDirection(TVector3(0, 0, 0)),
+      m_reconstructedMomentum(-1),
+      m_PDGCharge(0),
+      m_PDGEncoding(type),
+      m_trackID(trackID),
+      m_extHitID(-1),
+      m_identity(-1) {
       for (int i = 0; i < MAXLKH; i++) {
         m_lkh[i]  = 0;
         m_sfot[i] = 0;
@@ -80,6 +83,13 @@ namespace Belle2 {
       }
     };
 
+    //! Constructor from hit in 'ext' module */
+    /*!
+      \param extHit track hit on aerogel aluminium support plate
+      \param charge charge of the particle
+      \param trackID number of track in event
+    */
+    ARICHTrack(const ExtHit* extHit, int charge, int trackID);
 
     //! destructor
     ~ARICHTrack() {
@@ -110,8 +120,11 @@ namespace Belle2 {
     //! returns PDG id number of particle
     int  getPDGEncoding() const { return m_PDGEncoding;};
 
-    //! returns track id from geant4 simulation
-    int  getG4TrackID() const {return m_G4TrackID;};
+    //! returns track id
+    int  getTrackID() const {return m_trackID;};
+
+    //! returns track id from ext
+    int getHitID() const {return m_extHitID;};
 
     //! return particle index (0 electron, 1 muon, 2 pion, 3 kaon, 4 proton, -1 else)
     int getIdentity() const {return m_identity;};
@@ -195,9 +208,17 @@ namespace Belle2 {
     double   m_reconstructedMomentum;     /**< Reconstructed momentum. */
 
     double m_PDGCharge;                   /**< particle charge */
-    int  m_PDGEncoding;                   /**< particle PDG id number */
-    int  m_G4TrackID;                     /**< track ID from geant4 simulation */
-    int m_identity;                       /**< particle index (0 electron, 1 muon, 2 pion, 3 kaon, 4 proton, -1 else). */
+    int    m_PDGEncoding;                 /**< particle PDG id number */
+    int    m_trackID;                     /**< track identification number in GFTrack */
+    int    m_extHitID;                    /**< track identification number in ext */
+    int    m_identity;                    /**< particle index (0 electron, 1 muon, 2 pion, 3 kaon, 4 proton, -1 else). */
+
+
+
+    double  m_lkh[MAXLKH];  /**< Value of likelihood function for different particle hypotheses. */
+    double  m_sfot[MAXLKH]; /**< Number of expected detected photons for different particle hypotheses.  */
+    double  m_acc[MAXLKH];  /**< Geometrical acceptance of expected cherenkov ring for different particle hypotheses. */
+
 
     //! converts PDG particle code to particle index
     /*
@@ -205,9 +226,7 @@ namespace Belle2 {
      */
     int Lund2Type(int ipart);
 
-    double  m_lkh[MAXLKH];  /**< Value of likelihood function for different particle hypotheses. */
-    double  m_sfot[MAXLKH]; /**< Number of expected detected photons for different particle hypotheses.  */
-    double  m_acc[MAXLKH];  /**< Geometrical acceptance of expected cherenkov ring for different particle hypotheses. */
+
 
     ClassDef(ARICHTrack, 1); /**< the class title */
 

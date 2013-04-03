@@ -38,7 +38,7 @@ struct pydat2_type {
   int KCHG[4][500];  /**< particle information such as spin, charge... */
   double PMAS[4][500]; /**< particle information such as mass, width... */
   double PARF[2000]; /**< parametrization of dd-uu-ss flavor mixing. */
-  double VCKM[4][4]; /** squared CKM matrix elements. */
+  double VCKM[4][4]; /**< squared CKM matrix elements. */
 }; /**< /PYDAT2/ common block of PYTHIA6. */
 
 extern hepevt_type hepevt_;

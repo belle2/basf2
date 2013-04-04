@@ -161,8 +161,8 @@
       EMIN=XQE_E(1)
       EMAX=XQE_E(NT_XQE)
       XQE_MAXSEP=1./E_STEP
-      PRINT*,'PMT max(CE*QE):',QEMAX,' CE: ',CE
-      PRINT*,'Emin, Emax (eV): ',EMI,EMA
+c      PRINT*,'PMT max(CE*QE):',QEMAX,' CE: ',CE
+c      PRINT*,'Emin, Emax (eV): ',EMI,EMA
       PRINT*
       QE_INIT=.TRUE.
 

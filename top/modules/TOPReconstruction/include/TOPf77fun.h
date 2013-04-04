@@ -23,7 +23,7 @@ extern "C" {
   void arrange_pmt_(int*, int*, float*, float*, float*, float*);
   void set_rmi_(int*, float*);
   void set_xyc_(int*, float*, float*);
-  void top_geo_finalize_(int*);
+  int top_geo_finalize_(int*);
   float phase_index_(float*);
   float group_index_(float*);
   float abspt_leng_(float*);

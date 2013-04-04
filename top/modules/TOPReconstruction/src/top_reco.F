@@ -17,30 +17,24 @@
       INTEGER MAXCH, ITRA, K, I
       REAL HLX(10)
       LOGICAL OK
-      LOGICAL START /.TRUE./
-
-      IF(START) THEN
-         START=.FALSE.
-         IF(.NOT.TOP_INI) STOP '*** TOP not initialized ***'
-         MAXCH=PMT_NX*PMT_NY*NMA_PMT ! max # od Q-bar channels
-         IF(MAXCH.GT.NUM_CHA) THEN
-            PRINT*,'*** Error (top_reco): MAXCH>NUM_CHA, MAXCH=',MAXCH
-            PRINT*,'--> Increase parameter value ',
-     &           'srcF77/TOP_PIK.fi::NUM_CHA, clean object files, ',
-     &           'and recompile!'
-            STOP
-         ENDIF
-      ENDIF
 
       CALL CLEAR_PULLS
       DO ITRA=1,N_RTRA
-         I_RTRA=ITRA
          DO K=1,NHYP
             RTRA_PLKH(K,ITRA)=0.
             RTRA_SFOT(K,ITRA)=0.
          ENDDO
          RTRA_NFOT(ITRA)=0
          RTRA_FLAG(ITRA)=0
+      ENDDO
+
+      IF(.NOT.TOP_INI) THEN
+         PRINT*,'ERROR *** TOP not initialized ***'
+         RETURN
+      ENDIF
+
+      DO ITRA=1,N_RTRA
+         I_RTRA=ITRA
          CALL TRESHOLD_TEST(RTRA_P(ITRA),NHYP,RTRA_MASS,OK)
          IF(.NOT.OK) CYCLE
          PMOM=RTRA_P(ITRA)

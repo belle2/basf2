@@ -224,10 +224,11 @@ namespace Belle2 {
 
     /*! finalize TOP configuration (must be called last)
      * @param Dump print configuration to std output
+     * @return true if successfull
      */
-    inline void TOPfinalize(int Dump = 1)
+    inline bool TOPfinalize(int Dump = 1)
     {
-      top_geo_finalize_(&Dump);
+      return top_geo_finalize_(&Dump);
     }
 
   } // top namespace

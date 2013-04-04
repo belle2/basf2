@@ -35,6 +35,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <geometry/bfieldmap/BFieldMap.h>
 
 // ROOT
 #include <TVector3.h>
@@ -95,12 +96,12 @@ namespace Belle2 {
 
     void TOPReconstructorModule::initialize()
     {
-      // Initialize masses (PDG 2010) TODO: remove hard coding, check c_Nhyp)
-      m_Masses[0] = 0.510998910E-3;
-      m_Masses[1] = 0.105658367;
-      m_Masses[2] = 0.13957018;
-      m_Masses[3] = 0.493677;
-      m_Masses[4] = 0.938272013;
+      // Initialize masses
+      m_Masses[0] = Const::electron.getMass();
+      m_Masses[1] = Const::muon.getMass();
+      m_Masses[2] = Const::pion.getMass();
+      m_Masses[3] = Const::kaon.getMass();
+      m_Masses[4] = Const::proton.getMass();
 
       // Print module parameters
       printModuleParams();
@@ -238,7 +239,10 @@ namespace Belle2 {
 
       TOPvolume(m_R1, m_R2, m_Z1, m_Z2);
 
-      setBfield(-1.5); //TODO get magnetic field from database
+      // get magnetic field at TOP
+      TVector3 point(0, m_topgp->getRadius(), 0);
+      TVector3 Bfield = BFieldMap::Instance().getBField(point);
+      setBfield(-Bfield.Z());
 
       setPMT(m_topgp->getMsizex(), m_topgp->getMsizey(),
              m_topgp->getAsizex(), m_topgp->getAsizey(),
@@ -300,7 +304,8 @@ namespace Belle2 {
         Phi += Dphi;
       }
 
-      TOPfinalize(); //TODO: if not successfull exit with B2ERROR
+      bool ok = TOPfinalize(m_debugLevel);
+      if (!ok) B2ERROR("TOP configuration failed");
     }
 
 

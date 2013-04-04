@@ -279,7 +279,7 @@ c--   returns module ID or -1 (=failure)
       END
 
 
-      SUBROUTINE TOP_GEO_FINALIZE(FLAG)
+      LOGICAL FUNCTION TOP_GEO_FINALIZE(FLAG)
 
       IMPLICIT NONE
       INTEGER FLAG
@@ -288,7 +288,8 @@ c--   returns module ID or -1 (=failure)
 #include "TOP_QEFF.fi"
 #include "TOP_TDC.fi"
 #include "TOP_PAR.fi"
-      INTEGER I
+#include "TOP_PIK.fi"
+      INTEGER I, MAXCH
 
       NMA_PMT=0
       DO I=0,NUM_MOD-1
@@ -305,14 +306,25 @@ c--   returns module ID or -1 (=failure)
       DO I=0,NUM_MOD-1
          TOP_INI=TOP_INI.AND.N_PMT(0,I)+N_PMT(1,I).GT.0
       ENDDO
+
+      MAXCH=PMT_NX*PMT_NY*NMA_PMT ! max # of Q-bar channels
+      TOP_INI=TOP_INI.AND.MAXCH.LE.NUM_CHA
+      
+      IF(MAXCH.GT.NUM_CHA) THEN
+         PRINT*,'*** Error (top_reco): MAXCH>NUM_CHA, MAXCH=',MAXCH
+         PRINT*,'--> Increase parameter value ',
+     &        'TOP_PIK.fi::NUM_CHA and recompile!'
+      ENDIF
+
       IF(TOP_INI) THEN
          IF(FLAG.NE.0) CALL TOP_GEO_DUMP
          PRINT*,'TOP configured with ',NUM_MOD,' Q-bars.'
          PRINT*
       ELSE
          PRINT*,'**** TOP configuration failed.'
-         STOP
       ENDIF
+
+      TOP_GEO_FINALIZE=TOP_INI
 
       END
 

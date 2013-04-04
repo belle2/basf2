@@ -17,7 +17,6 @@
 #include <float.h>
 #include <string>
 #include "trg/trg/Board.h"
-#include "trg/trg/Link.h"
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCMerger TRGCDCMerger

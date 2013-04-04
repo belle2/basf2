@@ -1,6 +1,7 @@
 Import('env')
 #env['TOOLS_LIBS']['TRGCDCConfig'] = ['trg', 'framework', 'cdc']
 env['TOOLS_LIBS']['TRGCDCConfig'] = ['trg']
+env['TOOLS_LIBS']['TRGCDCInterfaceBuilder'] = ['trg']
 env['TOOLS_LIBS']['TRGCDCFrontEndImplementation'] = ['trg']
 env['TOOLS_LIBS']['TRGCDCTRGPackerTB'] = ['trg']
 env['TOOLS_LIBS']['TRGCDCTSStreamReader'] = ['Core', 'trg', 'framework']

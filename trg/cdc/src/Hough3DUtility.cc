@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #endif
 
 
@@ -13,6 +14,7 @@ using namespace std;
 Hough3DFinder::Hough3DFinder(void){
   m_mode = 2;
   m_Trg_PI = 3.141592653589793;
+  m_inputFileName = "GeoFinder.input";
 }
 
 Hough3DFinder::Hough3DFinder(int mode){
@@ -34,9 +36,21 @@ int Hough3DFinder::getMode(void){
 void Hough3DFinder::initialize(TVectorD &geometryVariables, vector<float > &initVariables){
 
   m_findRhoMax = -9999;
+  m_findRhoIntMax = -9999;
   m_findPhi0Max = -9999;
+  m_findPhi0IntMax = -9999;
+  m_findArcCosMax = -9999;
+  m_findArcCosIntMax = -9999;
+  m_findPhiZMax = -9999;
+  m_findPhiZIntMax = -9999;
   m_findRhoMin = 9999;
+  m_findRhoIntMin = 9999;
   m_findPhi0Min = 9999;
+  m_findPhi0IntMin = 9999;
+  m_findArcCosMin = 9999;
+  m_findArcCosIntMin = 9999;
+  m_findPhiZMin = 9999;
+  m_findPhiZIntMin = 9999;
 
   for(int iLayer=0; iLayer<4; iLayer++){
     m_bestTS[iLayer] = 999;
@@ -169,38 +183,116 @@ void Hough3DFinder::initVersion2(vector<float > & initVariables){
 
 void Hough3DFinder::initVersion3(vector<float > & initVariables){
   if(1==2) cout<<initVariables.size()<<endl; // Removes warning when compiling
-   
-  //// Get input variables.
-  //string inName;
-  //string inMin;
-  //string inMax;
-  //string inNBit;
-  //inputFile.open("./GeoFinder.input");
-  //if( inputFile ) {
-  //  cout<<"Open File"<<endl;
-  //  while( !inputFile.eof() ) {
-  //    inputFile >> inName >> inMin >> inMax >> inNBit;
-  //    if(inName == "rho") {
-  //      //cout<<inName<<" "<<inMin<<" "<<inMax<<" "<<inNBit<<endl;
-  //      m_rhoMin = atof( inMin.c_str() );
-  //      m_rhoMax = atof( inMax.c_str() );
-  //      m_rhoBit = atoi( inNBit.c_str() );
-  //    }
-  //    if(inName == "phi0") {
-  //      m_phi0Min = atof( inMin.c_str() );
-  //      m_phi0Max = atof( inMax.c_str() );
-  //      m_phi0Bit = atoi( inNBit.c_str() );
-  //    }
-  //  }
-  //  inputFile.close();
-  //} else {
+
+  // Get input variables.
+  string inName;
+  string inMin;
+  string inMax;
+  string inNBit;
+  ifstream inputFile;
+
+  inputFile.open(m_inputFileName.c_str());
+  if( inputFile ) {
+    m_LUT = 1;
+    cout<<"Open File: "<< m_inputFileName <<endl;
+    while( !inputFile.eof() ) {
+      inputFile >> inName >> inMin >> inMax >> inNBit;
+      if(inName == "rho") {
+        //cout<<inName<<" "<<inMin<<" "<<inMax<<" "<<inNBit<<endl;
+        m_rhoMin = atof( inMin.c_str() );
+        m_rhoMax = atof( inMax.c_str() );
+        m_rhoBit = atoi( inNBit.c_str() );
+      }
+      if(inName == "phi0") {
+        m_phi0Min = atof( inMin.c_str() );
+        m_phi0Max = atof( inMax.c_str() );
+        m_phi0Bit = atoi( inNBit.c_str() );
+      }
+      if(inName == "stAxWireFactor") {
+        m_stAxWireFactor = atoi( inNBit.c_str() );
+      }
+    }
+  } else {
+    cout<<"Could not open input file for GeoFinder."<<endl;
+    cout<<"Using default values for input."<<endl;
     m_rhoMin = 0;
     m_rhoMax = 7.5;
     m_rhoBit = 15;
     m_phi0Min = 0;
     m_phi0Max = 6.3;
     m_phi0Bit = 15;
-  //}
+    m_stAxWireFactor = 20;
+    m_LUT = 0;
+  }
+  inputFile.close();
+
+  // Set LUT information
+  if(m_LUT) {
+    // Make arccos LUT
+    int rho_bitSize = bitSize(m_rhoBit,0);
+    string first,second;
+    ifstream inFileLUT;
+    int iLUT;
+    m_arcCosLUT = new int*[4];
+    for(int iLayer=0; iLayer<4; iLayer++) {
+      m_arcCosLUT[iLayer] = new int[rho_bitSize];
+      iLUT = 0;
+      ostringstream strILayer;
+      strILayer << iLayer + 1;
+      string fileName = "data/trg/GeoFinder.FPGA.ArcCosLayer" + strILayer.str() + ".coe";
+      inFileLUT.open(fileName.c_str());
+      if(inFileLUT.is_open() != 1) cout<<"Error in opening " + fileName<<endl;
+      while(1) {
+        if( iLUT == rho_bitSize + 1 ) break;
+        inFileLUT >> first >> second;
+        istringstream isecond(second);
+        if( iLUT != 0 ) {
+          isecond >> m_arcCosLUT[iLayer][iLUT -1];
+        }
+        iLUT++;
+      }
+      inFileLUT.close();
+      //// Print LUT info
+      //for(int iLayer=0; iLayer<4; iLayer++){
+      //  for(int iLUT=0; iLUT<rho_bitSize; iLUT++){
+      //    cout<<"LUT[<<iLayer<<"][<<iLUT<<"]: "<<m_arcCosLUT[iLUT]<<endl;
+      //  }
+      //}
+    }
+    // Make wireSpaceConversion LUT
+    int PI2_INT = int(m_Trg_PI * 2 * bitSize(m_phi0Bit,0)/(m_phi0Max - m_phi0Min));
+    m_wireConvertLUT = new int*[4];
+    for(int iLayer=0; iLayer<4; iLayer++) {
+      // Include PI2_INT. PI2_INT is smaller than PI2.
+      m_wireConvertLUT[iLayer] = new int[PI2_INT+1];
+      iLUT = 0;
+      ostringstream strILayer;
+      strILayer << iLayer + 1;
+      string fileName = "data/trg/GeoFinder.FPGA.WireConvertLayer" + strILayer.str() + ".coe";
+      inFileLUT.open(fileName.c_str());
+      if(inFileLUT.is_open() != 1) cout<<"Error in opening " + fileName<<endl;
+      while(1) {
+        // Include PI2_INT. PI2_INT is smaller than PI2.
+        if( iLUT == PI2_INT + 2 ) break;
+        inFileLUT >> first >> second;
+        istringstream isecond(second);
+        if( iLUT != 0 ) {
+          isecond >> m_wireConvertLUT[iLayer][iLUT -1];
+        }
+        iLUT++;
+      }
+      inFileLUT.close();
+      //// Print LUT info
+      //for(int iLayer=0; iLayer<4; iLayer++){
+      //  for(int iLUT=0; iLUT<PI2_INT; iLUT++){
+      //    cout<<"LUT[<<iLayer<<"][<<iLUT<<"]: "<<m_arcCosLUT[iLUT]<<endl;
+      //  }
+      //}
+    }
+
+  } // End if if m_LUT flag
+
+
 
   // Make hitMap
   m_hitMap = new bool*[4];
@@ -210,6 +302,7 @@ void Hough3DFinder::initVersion3(vector<float > & initVariables){
       m_hitMap[i][j] = 0;
     }
   }
+
 
   // index values of candidates.
   m_geoCandidatesIndex = new vector<vector<int > >;
@@ -224,44 +317,7 @@ void Hough3DFinder::initVersion3(vector<float > & initVariables){
 }
 
 void Hough3DFinder::setInputFileName( string inputFileName ) {
-
-  // Get input variables.
-  string inName;
-  string inMin;
-  string inMax;
-  string inNBit;
-  ifstream inputFile;
-
-  inputFile.open(inputFileName.c_str());
-  if( inputFile ) {
-    cout<<"Open File: "<< inputFileName <<endl;
-    while( !inputFile.eof() ) {
-      inputFile >> inName >> inMin >> inMax >> inNBit;
-      if(inName == "rho") {
-        //cout<<inName<<" "<<inMin<<" "<<inMax<<" "<<inNBit<<endl;
-        m_rhoMin = atof( inMin.c_str() );
-        m_rhoMax = atof( inMax.c_str() );
-        m_rhoBit = atoi( inNBit.c_str() );
-      }
-      if(inName == "phi0") {
-        m_phi0Min = atof( inMin.c_str() );
-        m_phi0Max = atof( inMax.c_str() );
-        m_phi0Bit = atoi( inNBit.c_str() );
-      }
-    }
-  } else {
-    cout<<"Could not open input file for GeoFinder."<<endl;
-    cout<<"Using default values for input."<<endl;
-    m_rhoMin = 0;
-    m_rhoMax = 7.5;
-    m_rhoBit = 15;
-    m_phi0Min = 0;
-    m_phi0Max = 6.3;
-    m_phi0Bit = 15;
- 
-  }
-  inputFile.close();
-
+  m_inputFileName = inputFileName;
 }
 
 void Hough3DFinder::destVersion1(){
@@ -297,6 +353,12 @@ void Hough3DFinder::destVersion3(){
     delete [] m_hitMap[i];
   }
   delete [] m_hitMap;
+  if(m_LUT) {
+    for(int i=0; i<4; i++){
+      delete [] m_arcCosLUT[i];
+    }
+    delete [] m_arcCosLUT;
+  }
 
 }
 
@@ -643,8 +705,8 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
 
   //// Print hitMap
   //for(int iLayer=0; iLayer<4; iLayer++) {
-  //  cout<<"["<<iLayer<<"]";
-  //  for(int iTS=0; iTS<m_nWires[iLayer]/2; iTS++) {
+  //  cout<<"["<<iLayer<<"]["<<m_nWires[iLayer]/2<<"]";
+  //  for(int iTS=m_nWires[iLayer]/2-1; iTS>=0; iTS--) {
   //    cout<<m_hitMap[iLayer][iTS];
   //  }
   //  cout<<endl;
@@ -665,11 +727,13 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
   findExtreme(m_findPhi0Max, m_findPhi0Min, fitPhi0);
   changeInteger(rho_int, rho, m_rhoMin, m_rhoMax, rho_bitSize);
   changeInteger(fitPhi0_int, fitPhi0, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
+  findExtreme(m_findRhoIntMax, m_findRhoIntMin, rho_int);
+  findExtreme(m_findPhi0IntMax, m_findPhi0IntMin, fitPhi0_int);
   m_FPGAInput.push_back(rho_int);
   m_FPGAInput.push_back(fitPhi0_int);
   changeReal(fitPhi0, fitPhi0_int, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
   changeReal(rho, rho_int, m_rhoMin, m_rhoMax, rho_bitSize);
-
+  m_FPGAInput.push_back(charge);
 
   // Select TS candidate range variables
   double stCand[4][10];
@@ -677,8 +741,10 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
   double stCandIndex[4][10];
   double stAxPhi[4];
   int stAxWire[4];
+  int stAxWire_int[4];
   int indexTS;
   double acos_real, myphiz;
+  int stCandHitMap[4][10];
 
   // Initalize stCand
   for( int i=0; i<4; i++ ) {
@@ -686,6 +752,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
       stCand[i][j] = 9999;
       stCandDiff[i][j] = 9999;
       stCandIndex[i][j] = 9999;
+      stCandHitMap[i][j] = 0;
     }
     //cout<<"nWires: "<<m_nWires[i]/2<<" ";
   }
@@ -703,7 +770,11 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
     // For integer space
     findExtreme(m_findArcCosMax, m_findArcCosMin, acos_real);
     changeInteger(arcCos_int, acos_real, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
+    findExtreme(m_findArcCosIntMax, m_findArcCosIntMin, arcCos_int);
     m_FPGAOutput.push_back(arcCos_int);
+    if(arcCos_int != m_arcCosLUT[iLayer][rho_int]) {
+      cout<<"Error with arcCos LUT: "<<rho_int<<" "<<arcCos_int<<" "<<m_arcCosLUT[iLayer][rho_int]<<endl;
+    }
 
     if(charge==1){
       // Actual function
@@ -719,6 +790,8 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
     changeReal(myphiz, myphiz_int, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
     // Find extreme value
     findExtreme(m_findPhiZMax, m_findPhiZMin, myphiz);
+    findExtreme(m_findPhiZIntMax, m_findPhiZIntMin, myphiz_int);
+    m_FPGAOutput.push_back(myphiz_int);
 
     // Actual function
     //if(myphiz>2*m_Trg_PI) myphiz-=2*m_Trg_PI;
@@ -738,7 +811,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
 
     // Choose stAxWire depending on layer
 
-    // Change to wire space
+    // Change to wire space using fake LUT
     // This is done in real space. Result is in integer space.
     if( iLayer%2 == 0 ) {
       // Round down
@@ -747,10 +820,38 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
       // Round up
       stAxWire[iLayer] = int(stAxPhi[iLayer]/2/m_Trg_PI*m_nWires[iLayer]/2 + 1);
     }
+    // Change to wire space by multiply division method.
+    stAxWire_int[iLayer] = myphiz_int * int(m_nWires[iLayer]/2/2/m_Trg_PI/fitPhi0_bitSize*(m_phi0Max-m_phi0Min)*pow(2.0,m_stAxWireFactor));
+    if( iLayer%2 == 0 ) {
+      stAxWire_int[iLayer] = stAxWire_int[iLayer] >> m_stAxWireFactor;
+    } else {
+      stAxWire_int[iLayer] = (stAxWire_int[iLayer] >> m_stAxWireFactor) + 1;
+    }
+    //cout<<"Conversion Factor["<<iLayer<<"]: "<<int(m_nWires[iLayer]/2/2/m_Trg_PI/fitPhi0_bitSize*(m_phi0Max-m_phi0Min)*pow(2.0,m_stAxWireFactor))<<" "<<m_nWires[iLayer]/2<<endl;
+    //// Check if something is different with multiply division method.
+    //if(stAxWire[iLayer] != stAxWire_int[iLayer]) {
+    //  cout<<"Layer["<<iLayer<<"]: "<<myphiz_int<<" "<<stAxPhi[iLayer]<<" "<<stAxPhi[iLayer]*m_nWires[iLayer]/2/2/m_Trg_PI<<" "<<stAxWire[iLayer]<<endl;
+    //  //cout<<"Layer["<<iLayer<<"]: "<<myphiz_int<<" "<<stAxPhi[iLayer]<<" "<<myphiz_int * int(m_nWires[iLayer]/2/2/m_Trg_PI/fitPhi0_bitSize*(m_phi0Max-m_phi0Min)*pow(2.0,m_stAxWireFactor))<<" "<<myphiz_int * int(m_nWires[iLayer]/2/2/m_Trg_PI/fitPhi0_bitSize*(m_phi0Max-m_phi0Min)*pow(2.0,m_stAxWireFactor)) / pow(2.0,m_stAxWireFactor)<<endl;
+    //  cout<<"Layer["<<iLayer<<"]: "<<myphiz_int<<" "<<stAxPhi[iLayer]<<" "<<myphiz_int * int(m_nWires[iLayer]/2/2/m_Trg_PI/fitPhi0_bitSize*(m_phi0Max-m_phi0Min)*pow(2.0,m_stAxWireFactor)) / pow(2.0,m_stAxWireFactor)<<" "<<stAxWire_int[iLayer]<<endl;
+    //}
+    stAxWire[iLayer] = stAxWire_int[iLayer];
+
+
+    m_FPGAOutput.push_back(stAxWire[iLayer]);
+
+    //cout<<stAxPhi[iLayer]<<" "<<stAxWire[iLayer]<<endl;
+    //cout<<m_nWires[iLayer]/2/2/m_Trg_PI/81.2698412698<<endl;
 
     // If index is at edgeIndex move to 0.
     if(stAxWire[iLayer] == m_nWires[iLayer]/2) stAxWire[iLayer] = 0;
     indexTS = stAxWire[iLayer];
+
+    //// Check if something is different with LUT method.
+    //if(stAxWire[iLayer] != m_wireConvertLUT[iLayer][myphiz_int]) {
+    //  cout<<"Error with wireConvert LUT: "<<myphiz_int<<" "<<stAxWire[iLayer]<<" "<<m_wireConvertLUT[iLayer][myphiz_int]<<endl;
+    //}
+
+
 
     //cout<<"StAxWire["<<iLayer<<"]: "<<stAxWire[iLayer]<<endl;
     // Save stAxPhi
@@ -775,6 +876,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
         (*m_geoCandidatesDiffStWires)[iLayer].push_back(diffPhi/2/m_Trg_PI*m_nWires[iLayer]/2);
 
         // Save indexTS
+        stCandHitMap[iLayer][iTS] = 1;
 
       }
       
@@ -800,6 +902,25 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
     } // Select TS using stAxWire between 10 wires
 
   } // Layer loop
+
+  //// Print stCandHitMap
+  //for(unsigned iLayer=0; iLayer<4; iLayer++){
+  //  cout<<"stCandHitMap["<<iLayer<<"]: ";
+  //  for(int iTS=9; iTS>=0; iTS--){
+  //    cout<<stCandHitMap[iLayer][iTS];
+  //  }
+  //  cout<<endl;
+  //}
+  
+  // Save stCandHitMap in FPGAOutput
+  for(unsigned iLayer=0; iLayer<4; iLayer++){
+    int stCandHitMapInt=0;
+    for(int iTS=0; iTS<10; iTS++) {
+      stCandHitMapInt+=int(stCandHitMap[iLayer][iTS]*pow(10.,iTS));
+    }
+    m_FPGAOutput.push_back(stCandHitMapInt);
+  }
+
 
   // Find and save index of TS. For vector.
   for(unsigned iLayer=0; iLayer<4; iLayer++) {
@@ -1019,6 +1140,18 @@ void Hough3DFinder::getValues(const string& input, vector<double> &result ){
     result.push_back(m_findArcCosMin);
     result.push_back(m_findPhiZMax);
     result.push_back(m_findPhiZMin);
+    result.push_back(m_findRhoIntMax);
+    result.push_back(m_findRhoIntMin);
+    result.push_back(m_findPhi0IntMax);
+    result.push_back(m_findPhi0IntMin);
+    result.push_back(m_findArcCosIntMax);
+    result.push_back(m_findArcCosIntMin);
+    result.push_back(m_findPhiZIntMax);
+    result.push_back(m_findPhiZIntMin);
+    //// Print All values
+    //for(unsigned i=0; i<result.size(); i++) {
+    //  cout<<result[i]<<endl;
+    //}
   }
 
   if(input=="FPGAInput") {
@@ -1030,6 +1163,30 @@ void Hough3DFinder::getValues(const string& input, vector<double> &result ){
   if(input=="FPGAOutput") {
     for(unsigned iOutput=0; iOutput<m_FPGAOutput.size(); iOutput++){
       result.push_back(m_FPGAOutput[iOutput]);
+    }
+  }
+
+  if(input=="hitmapLayer1") {
+    for(unsigned iOutput=0; iOutput<unsigned(m_nWires[0]/2); iOutput++){
+      result.push_back(m_hitMap[0][iOutput]);
+    }
+  }
+
+  if(input=="hitmapLayer2") {
+    for(unsigned iOutput=0; iOutput<unsigned(m_nWires[1]/2); iOutput++){
+      result.push_back(m_hitMap[1][iOutput]);
+    }
+  }
+
+  if(input=="hitmapLayer3") {
+    for(unsigned iOutput=0; iOutput<unsigned(m_nWires[2]/2); iOutput++){
+      result.push_back(m_hitMap[2][iOutput]);
+    }
+  }
+
+  if(input=="hitmapLayer4") {
+    for(unsigned iOutput=0; iOutput<unsigned(m_nWires[3]/2); iOutput++){
+      result.push_back(m_hitMap[3][iOutput]);
     }
   }
 

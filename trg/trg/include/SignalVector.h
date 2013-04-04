@@ -26,7 +26,7 @@ class TRGSignal;
 
 /// A class to represent a bundle of digitized signals. Given
 /// TRGSignal should exist while this object alive.
-class TRGSignalVector : public std::vector<const TRGSignalVector *> {
+class TRGSignalVector : public std::vector<const TRGSignal *> {
 
   public:
 
@@ -64,7 +64,7 @@ class TRGSignalVector : public std::vector<const TRGSignalVector *> {
   public:// Operators
 
     /// returns new TRGSignalVector.
-    TRGSignalVector operator+(const TRGSignalVector &) const;
+//    TRGSignalVector operator+(const TRGSignalVector &) const;
 
     /// appends TRGSignal.
     TRGSignalVector & operator+=(const TRGSignal &);

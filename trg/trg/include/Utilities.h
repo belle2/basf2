@@ -27,7 +27,7 @@ class TRGUtilities {
 
   public: // Utility functions
 
-    /// converts int to string.
+    /// converts int to string. (Use boost::lexical_cast)
     static std::string itostring(int i);
 
     /// converts double to string.

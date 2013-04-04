@@ -27,8 +27,6 @@
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/SegmentHit.h"
 #include "trg/trg/Utilities.h"
-#include "trg/trg/Link.h"
-
 
 using namespace std;
 

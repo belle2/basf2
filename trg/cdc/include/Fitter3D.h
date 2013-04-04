@@ -136,7 +136,7 @@ class TRGCDCFitter3D {
       // st1_x, st1_y, st1_z, st2_x, st2_y, st2_z, st3_x, st3_y, st3_z, st4_x, st4_y, st4_z
       TClonesArray* m_mcTSTrackFitter3D;
       // Stores fit values
-      // pT, phi0, z0, theta, charge
+      // pT, phi0, z0, theta, charge, zhi2
       TClonesArray* m_fitTrackFitter3D;
       // wire (pT, phi0), charge
       TClonesArray* m_wFit2DTrackFitter3D;

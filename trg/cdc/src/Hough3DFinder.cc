@@ -168,8 +168,12 @@ namespace Belle2 {
       }
 
       m_Hough3DFinder = new Hough3DFinder();
-      // 1: Hough3DFinder 2: GeoFinder
-      m_Hough3DFinder->setMode(1);
+      // 1: Hough3DFinder 2: GeoFinder 3: VHDL GeoFinder
+      m_Hough3DFinder->setMode(2);
+      // Set input file name for VHDL GeoFinder.
+      m_Hough3DFinder->setInputFileName("GeoFinder.input");
+      // For VHDL GEoFinder
+      //m_Hough3DFinder->setInputFileName("GeoFinder.input");
       // cotStart, cotEnd, z0Start, z0End, cotSteps, z0Steps
       float tempInitVariables[] = {-3,3,-2,2,1001,1001};
       vector<float > initVariables(tempInitVariables, tempInitVariables+sizeof(tempInitVariables) / sizeof(tempInitVariables[0]) );

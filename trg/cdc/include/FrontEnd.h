@@ -18,7 +18,7 @@
 #include <string>
 #include "trg/trg/Board.h"
 #include "trg/trg/SignalVector.h"
-#include "trg/trg/Link.h"
+// #include "trg/trg/OptLink.h"
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCFrontEnd TRGCDCFrontEnd

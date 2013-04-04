@@ -69,21 +69,30 @@ class Hough3DFinder {
     double m_bestTS[4];
     // Version3 (GeoFinder Integer space)
     std::string m_inputFileName;
-    // [rho, phi0]
+    // [rho, phi0, sign]
     std::vector<double> m_FPGAInput;
     // [arcCos0, arcCos1, arcCos2, arcCos3, 
     //  bestTSIndex0, bestTSIndex1, bestTSIndex2, bestTSIndex3]
     std::vector<double> m_FPGAOutput;
     // Find min and max values
     double m_findRhoMax, m_findRhoMin;
+    double m_findRhoIntMax, m_findRhoIntMin;
     double m_findPhi0Max, m_findPhi0Min;
+    double m_findPhi0IntMax, m_findPhi0IntMin;
     double m_findArcCosMax, m_findArcCosMin;
+    double m_findArcCosIntMax, m_findArcCosIntMin;
     double m_findPhiZMax, m_findPhiZMin;
+    double m_findPhiZIntMax, m_findPhiZIntMin;
     // Integer space
     double m_rhoMax, m_rhoMin;
     int m_rhoBit;
     double m_phi0Max, m_phi0Min;
     int m_phi0Bit;
+    int m_stAxWireFactor;
+    // FPGA LUTs
+    bool m_LUT;
+    int** m_arcCosLUT;
+    int** m_wireConvertLUT;
 
 };
 

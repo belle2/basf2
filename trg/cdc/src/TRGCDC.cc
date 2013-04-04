@@ -69,7 +69,7 @@ TRGCDC::name(void) const {
 
 string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.30");
+    return string("TRGCDC 5.31");
 }
 
 TRGCDC *
@@ -514,10 +514,16 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
 
 void
 TRGCDC::terminate(void) {
-    _fitter3D->terminate();
-    _h3DFinder->terminate();
-    m_file->Write();
-    m_file->Close();
+    if(_fitter3D) {
+      _fitter3D->terminate();
+    }
+    if(_h3DFinder) {
+      _h3DFinder->terminate();
+    }
+    if(m_file) {
+      m_file->Write();
+      m_file->Close();
+    }
 }
 
   void
@@ -1603,8 +1609,8 @@ TRGCDC::simulate(void) {
 
         new((* _tracks2D)[i]) TVectorD(tvd);
 
-        cout << "drMC = " << drMC << ", drmc2 = " << trkMC.getVertex().X()
-             << endl;
+        //cout << "drMC = " << drMC << ", drmc2 = " << trkMC.getVertex().X()
+        //     << endl;
     }
 
     //...MC track information...
@@ -1682,12 +1688,12 @@ TRGCDC::simulate(void) {
 		TLorentzVector(mcParticles[i]->get4Vector());
 	    new(mcTrackVertexVector[iStoredPart])
 		TVector3(mcParticles[i]->getVertex());
-	    cout << "ID: " << mcParticles[i]->getIndex()
-		 << " Status: " << mcParticles[i]->getStatus()
-		 << " PDG: " << mcParticles[i]->getPDG()
-		 << " Charge: " << mcParticles[i]->getCharge()
-		 << " pT: " << mcParticles[i]->get4Vector().Pt()
-		 << endl;
+	  //  cout << "ID: " << mcParticles[i]->getIndex()
+		// << " Status: " << mcParticles[i]->getStatus()
+		// << " PDG: " << mcParticles[i]->getPDG()
+		// << " Charge: " << mcParticles[i]->getCharge()
+		// << " pT: " << mcParticles[i]->get4Vector().Pt()
+		// << endl;
 	    iStoredPart += 1;
 	}
     }

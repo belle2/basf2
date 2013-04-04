@@ -29,7 +29,6 @@
 #include "cdc/geometry/CDCGeometryPar.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/Signal.h"
-#include "trg/trg/Link.h"
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"

@@ -29,7 +29,7 @@ TRGSignalVector::TRGSignalVector(const string & name) : _name(name) {
 }
 
 TRGSignalVector::TRGSignalVector(const TRGSignalVector & t) :
-    std::vector<const TRGSignalVector *>(),
+    std::vector<const TRGSignal *>(),
     _name("CopyOf" + t._name) {
 }
 
@@ -52,13 +52,13 @@ TRGSignalVector::dump(const string & msg,
 	    _signals[i]->dump(msg, "    " + pre);
 }
 
-TRGSignalVector
-TRGSignalVector::operator+(const TRGSignalVector & left) const {
-    TRGSignalVector t;
-    t.push_back(this);
-    t.push_back(& left);
-    return t;
-}
+// TRGSignalVector
+// TRGSignalVector::operator+(const TRGSignalVector & left) const {
+//     TRGSignalVector t;
+//     t.push_back(this);
+//     t.push_back(& left);
+//     return t;
+// }
 
 TRGSignalVector &
 TRGSignalVector::operator+=(const TRGSignal & left) {

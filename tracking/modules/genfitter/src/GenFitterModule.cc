@@ -517,6 +517,7 @@ void GenFitterModule::event()
 
               TrackFitResult* newTrackFitResult = trackFitResults.appendNew();
               newTrackFitResult->setCharge((int)gfTrack.getCharge());
+              newTrackFitResult->setParticleType(chargedStable);
               newTrackFitResult->setMomentum(resultMomentum);
               newTrackFitResult->setPosition(resultPosition);
               newTrackFitResult->setCovariance6(newResultCovariance);

@@ -28,7 +28,7 @@ namespace Belle2 {
     /** Constructor.
      *
      *  @param obj  The object that is pointed to be the relation.
-     *  @param e    The weight of the relation.
+     *  @param w    The weight of the relation.
      */
     RelationEntry(TObject* obj, double w = 1): object(obj), weight(w) {}
 

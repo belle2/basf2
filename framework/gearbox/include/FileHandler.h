@@ -23,7 +23,7 @@ namespace Belle2 {
     class FileContext: public InputContext {
     public:
       /** Open the given filename.
-       * @param absolute filename name of the file
+       * @param filename absolute filename name of the file
        * @param compressed if true, decompress the file on the fly
        */
       FileContext(const std::string& filename, bool compressed);

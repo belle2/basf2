@@ -126,7 +126,7 @@ namespace Belle2 {
 
       /**
        * Conversion of bit pattern to detector ID.
-       * @param det  The bit pattern.
+       * @param bit  The bit pattern.
        * @return     The detector ID corresponding to the given bit pattern.
        */
       EDetector getDetector(unsigned short bit) const;

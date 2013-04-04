@@ -222,6 +222,7 @@ namespace Belle2 {
      *
      *  A matching map entry must already exist. Otherwise an error will be generated.
      *  @param object     Pointer to the object that should be stored. If 0, a new default object is created.
+     *  @param replace    If an object already exists, it will be replaced if this is true. If false, an error will be printed.
      *  @param name       Name under which you want to save the object in the DataStore.
      *  @param durability Decide with which durability map you want to perform the requested action.
      *  @param objClass   The class of the object.

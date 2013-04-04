@@ -1,4 +1,4 @@
-/// @file prochandler.h
+/// @file ProcHandler.h
 /// @brief Process handler class definition
 /// @author Soohyung Lee
 /// @date Jul 14 2008
@@ -8,9 +8,6 @@
 
 #include <vector>
 #include <sys/types.h>
-
-//#include "shm.h"
-//#include "evtprocess.h" // DEPRECATED
 
 namespace Belle2 {
 

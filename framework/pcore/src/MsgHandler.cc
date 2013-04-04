@@ -21,15 +21,12 @@ using namespace Belle2;
 MsgHandler::MsgHandler(int complevel)
 {
   //  printf("MsgHandler : constructor called.....\n");
-  B2INFO("MsgHandler : constructor called.....");
-  //m_cbuf = (char*) malloc(EvtMessage::c_MaxEventSize);
   m_complevel = complevel;
 }
 
 MsgHandler::~MsgHandler(void)
 {
   //  printf("MsgHandler : destructor called.....\n");
-  //free(m_cbuf);
 }
 
 void MsgHandler::clear(void)

@@ -206,7 +206,7 @@ namespace Belle2 {
      * Calls according to the parameter type a specialized version of the template method getParamDefaultValuesTemplate().
      *
      * @param name The unique name of the parameter.
-     * @param Reference to the output list containing the parameter default values. For single value parameter, the list only consists of one element.
+     * @param outputList Reference to the output list containing the parameter default values. For single value parameter, the list only consists of one element.
      * @param defaultValues If true returns a list of default values otherwise a list of the parameter values.
      */
     void getParamValuesPython(const std::string& name, boost::python::list& outputList, bool defaultValues = false) const;

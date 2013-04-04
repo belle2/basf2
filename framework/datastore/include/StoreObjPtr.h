@@ -161,7 +161,7 @@ namespace Belle2 {
      *  It will cause an error if the object does not exist.
      *  This must be called in the initialization phase.
      *
-     *  @param name        Name under which the object is stored.
+     *  @return            True if the object exists.
      */
     bool isRequired() {
       return DataStore::Instance().require(m_name, m_durability, T::Class(), false);

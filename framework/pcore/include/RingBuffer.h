@@ -1,4 +1,4 @@
-/// @file ring_bugger.h
+/// @file RingBuffer.h
 /// @brief Ring buffer definition
 /// @author Ryosuke Itoh
 /// @date Feb 22 2010

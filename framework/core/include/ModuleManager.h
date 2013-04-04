@@ -153,7 +153,7 @@ namespace Belle2 {
     /**
      * Adds the module names defined in the map file to the list of known module names.
      *
-     * @param mapFilename The filename (path+name) of the map file which should be parsed for module names.
+     * @param mapPath The filename (path+name) of the map file which should be parsed for module names.
      */
     void fillModuleNameLibMap(boost::filesystem::directory_entry& mapPath);
 

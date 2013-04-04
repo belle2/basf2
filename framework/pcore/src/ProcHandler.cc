@@ -1,4 +1,4 @@
-/// @file prochandler.cc
+/// @file ProcHandler.cc
 /// @brief Process handler class implementation
 /// @author Soohyung Lee
 /// @date Jul 14 2008
@@ -17,19 +17,12 @@
 #include <errno.h>
 #include <string.h>
 
-//#include "shm.h"
 
 using namespace std;
 using namespace Belle2;
 
 /// Set static process ID number
 int ProcHandler::m_fEvtProcID = -1;
-
-/// @brief Constructor of ProcHandler class
-/// @param srcshm Source shared memory information
-/// @param outshm Output shared memory information
-/// @param nEvtProc The number of event processes
-/// @param nOutputSrv The number of output servers
 
 ProcHandler::ProcHandler(void)
   : m_nEvtSrv(0), m_nEvtProc(0), m_nOutputSrv(0),

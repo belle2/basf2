@@ -70,7 +70,7 @@ namespace Belle2 {
      * if the parameter is empty or does not exist, the defaultvalue will be
      * returned.
      * @param path path of the parameter to get
-     * @param defaultvalue value to return if the path es empty or does not exist
+     * @param defaultValue value to return if the path es empty or does not exist
      * @return value of the parameter
      */
     std::string getString(const std::string& path, const std::string& defaultValue) const {

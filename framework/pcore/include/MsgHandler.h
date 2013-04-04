@@ -38,8 +38,6 @@ namespace Belle2 {
     std::vector<TMessage*> m_buf; /**< list of messages already added. */
     std::vector<std::string> m_name; /**< names of objects stored in m_buf. */
     int m_complevel; /**< compression level, from 0 (none) to 9 (highest). */
-    //char* m_cbuf; //TODO remove?
-
 
   };
 

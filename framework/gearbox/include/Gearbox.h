@@ -62,7 +62,7 @@ namespace Belle2 {
     /**
      * Open connection to backend and parse tree
      * @param name Name of the tree to parse
-     * @param maximum cache size in entries
+     * @param cachSize maximum cache size in entries
      */
     void open(const std::string& name = "Belle2.xml", size_t cachSize = DefaultCacheSize);
 

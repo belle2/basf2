@@ -61,6 +61,11 @@ namespace Belle2 {
       DetectorSet(EDetector det): m_bits(getBit(det)) {}
 
       /**
+       * Destructor.
+       */
+      virtual ~DetectorSet() {};
+
+      /**
        * Addition of another set to this one.
        * @param set  The other set of detector IDs.
        */

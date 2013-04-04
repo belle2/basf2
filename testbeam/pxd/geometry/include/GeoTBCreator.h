@@ -12,7 +12,7 @@
 #define GEOTBCREATOR_H_
 
 #include <pxd/simulation/SensitiveDetector.h>
-#include <testbeam/pxd/simulation/SensitiveDetector.h>
+#include <testbeam/vxd/simulation/SensitiveDetector.h>
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>

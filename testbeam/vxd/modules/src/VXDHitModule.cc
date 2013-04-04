@@ -23,8 +23,7 @@
 
 #include <boost/foreach.hpp>
 #include <cmath>
-#include <svd/geometry/GeoSVDCreator.h>
-#include <../framework/datastore/include/RelationArray.h>
+#include <framework/datastore/RelationArray.h>
 
 
 using namespace std;

@@ -11,13 +11,6 @@
 #define VXDHITMODULE_H
 
 #include <framework/core/Module.h>
-//#include <pxd/geometry/SensorInfo.h>
-//#include <framework/dataobjects/RelationElement.h>
-//#include <TRandom.h>
-//#include <string>
-//#include <set>
-//#include <vector>
-//#include <boost/array.hpp>
 
 #include <TFile.h>
 #include <TH1D.h>

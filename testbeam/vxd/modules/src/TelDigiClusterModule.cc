@@ -20,9 +20,9 @@
 #include <framework/datastore/RelationIndex.h>
 
 #include <generators/dataobjects/MCParticle.h>
-#include <testbeam/pxd/dataobjects/TelSimHit.h>
-#include <testbeam/pxd/dataobjects/TelTrueHit.h>
-#include <testbeam/pxd/dataobjects/TelCluster.h>
+#include <testbeam/vxd/dataobjects/TelSimHit.h>
+#include <testbeam/vxd/dataobjects/TelTrueHit.h>
+#include <testbeam/vxd/dataobjects/TelCluster.h>
 #include <boost/foreach.hpp>
 #include <cmath>
 

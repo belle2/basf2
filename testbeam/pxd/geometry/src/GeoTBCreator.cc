@@ -12,7 +12,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
-#include <testbeam/pxd/geometry/SensorInfo.h>
+#include <testbeam/vxd/geometry/SensorInfo.h>
 
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>

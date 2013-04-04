@@ -52,7 +52,7 @@
 				<MapFilenameHERleak>geometry/QuadFieldMapHERleak.dat</MapFilenameHERleak>
 				<MapSizeHER>424</MapSizeHER>
 				<MapSizeLER>396</MapSizeLER>
-				<MapSizeHERleak>204</MapSizeHERleak>
+				<MapSizeHERleak>203</MapSizeHERleak>
 				<ApertFilenameHER>geometry/ApertHER.dat</ApertFilenameHER>
 				<ApertFilenameLER>geometry/ApertLER.dat</ApertFilenameLER>
 				<ApertSizeHER>22</ApertSizeHER>

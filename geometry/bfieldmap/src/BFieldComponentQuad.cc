@@ -302,14 +302,14 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       }
     }
 
-    //rotate after subtracting DX,DY
-    TVector3 p_tmp(X - DX, Y - DY, s);
-    p_tmp.RotateZ(-ROTATE / 180.*M_PI);
-    X = p_tmp.X();
-    Y = p_tmp.Y();
-
     TVector3 B(0, 0, 0);
     if (foundflag) {
+      //rotate after subtracting DX,DY
+      TVector3 p_tmp(X - DX, Y - DY, s);
+      p_tmp.RotateZ(-ROTATE / 180.*M_PI);
+      X = p_tmp.X();
+      Y = p_tmp.Y();
+
       double Bs = 0;
       double BX = (p0_HER / c / L) * (K1 * Y + SK1 * X + SK0);
       double BY = (p0_HER / c / L) * (K1 * X - SK1 * Y + K0);
@@ -323,8 +323,13 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
               << ") is (Bx,By,Bz)=(" << B.X() << "," << B.Y() << "," << B.Z() << ").")
     }
 
+    //=====================
     // HER leak component
+    //=====================
 
+    X = pHER.X() / Unit::m; // in [m]
+    Y = pHER.Y() / Unit::m; // in [m]
+    s = pHER.Z() / Unit::m; // in [m]
     foundflag = false;
     //H.Nakayama: this loop could be modified to binary-search
     for (int i = 0; i < m_mapSizeHERleak; i++) {
@@ -342,17 +347,22 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       }
     }
 
-    //rotate after subtracting DX,DY
-    TVector3 p_tmp_leak(X - DX, Y - DY, s);
-    p_tmp_leak.RotateZ(-ROTATE / 180.*M_PI);
-    X = p_tmp_leak.X();
-    Y = p_tmp_leak.Y();
 
     TVector3 Bleak(0, 0, 0);
     if (foundflag) {
+      //rotate after subtracting DX,DY
+      TVector3 p_tmp_leak(X - DX, Y - DY, s);
+      p_tmp_leak.RotateZ(-ROTATE / 180.*M_PI);
+      X = p_tmp_leak.X();
+      Y = p_tmp_leak.Y();
+
       double Bs = 0;
       double BX = (p0_HER / c / L) * (K1 * Y + SK1 * X + SK0);
       double BY = (p0_HER / c / L) * (K1 * X - SK1 * Y + K0);
+
+      //scale leak field
+      //BX*=0.9; BY*=0.9;
+
       Bleak.SetXYZ(BX, BY, Bs);
       Bleak.RotateZ(ROTATE / 180.*M_PI);
       Bleak.RotateX(-M_PI); Bleak.RotateY(angle_HER);
@@ -363,7 +373,11 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
               << ") is (Bx,By,Bz)=(" << Bleak.X() << "," << Bleak.Y() << "," << Bleak.Z() << ").")
     }
 
-    return B + Bleak;
+    double scale_leak = 1;
+    //double scale_leak = 0.9;
+    //double scale_leak = 0;
+
+    return B + Bleak * scale_leak;
   }
 
   /* in case the point is inside LER*/
@@ -390,13 +404,14 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       }
     }
 
-    TVector3 p_tmp(X - DX, Y - DY, s);
-    p_tmp.RotateZ(-ROTATE / 180.*M_PI);
-    X = p_tmp.X();
-    Y = p_tmp.Y();
 
     TVector3 B(0, 0, 0);
     if (foundflag) {
+      TVector3 p_tmp(X - DX, Y - DY, s);
+      p_tmp.RotateZ(-ROTATE / 180.*M_PI);
+      X = p_tmp.X();
+      Y = p_tmp.Y();
+
       double Bs = 0;
       double BX = (p0_LER / c / L) * (K1 * Y + SK1 * X + SK0);
       double BY = (p0_LER / c / L) * (K1 * X - SK1 * Y + K0);

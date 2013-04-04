@@ -182,7 +182,7 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
   double mapSizeRPhi;
 
   //added by nakayama to avoid segV
-  if (TMath::Abs(point0.z()) > 390.) return TVector3(0., 0., 0.);
+  if (TMath::Abs(point0.z()) > 399.) return TVector3(0., 0., 0.);
 
   if (isher == 1) {
     mapBuffer = m_mapBuffer_her;
@@ -371,38 +371,40 @@ TVector3 BFieldComponentBeamline::calculate(const TVector3& point) const
 void BFieldComponentBeamline::terminate()
 {
 
-  /*
+
   //================================
   //check beam line magnetic field
   //================================
 
   //HER
-  for (double s=-400;s<400;s+=0.1){
-    TVector3 pher(0,0,s);
+  for (double s = -400; s < 400; s += 0.1) {
+    TVector3 pher(0, 0, s);
     pher.RotateY(0.0415); pher.RotateX(M_PI);
-    //TVector3 dx(((s<0) ? -0.0007 : 0.0007), 0, 0);
+    TVector3 dx(((s < 0) ? -0.0007 : 0.0007), 0, 0);
+    //TVector3 Bher = calculate(pher+dx);
     TVector3 Bher = calculate(pher);
     Bher.RotateX(-M_PI); Bher.RotateY(-0.0415);
     double SK0 = Bher.X() / (7.0e+9 / 3.0e+8 / 0.01);
     double K0 = Bher.Y() / (7.0e+9 / 3.0e+8 / 0.01);
-    B2DEBUG("SolCheckHER s= %f [m], K0= %f ,SK0= %f\n", s/100., K0, SK0);
-    pher.Delete();Bher.Delete();
+    printf("SolCheckHER s= %f [m], K0= %10.8f ,SK0= %10.8f, Bz= %f\n", s / 100., K0, SK0, Bher.Z());
+    pher.Delete(); Bher.Delete();
   }
 
   //LER
-  for (double s=-400;s<400;s+=0.1){
-    TVector3 pler(0,0,s);
+  for (double s = -400; s < 400; s += 0.1) {
+    TVector3 pler(0, 0, s);
     pler.RotateY(-0.0415); pler.RotateX(M_PI);
-    //TVector3 dy(0, ((s<0) ? 0.001 : 0.0015), 0);
+    TVector3 dy(0, ((s < 0) ? 0.001 : 0.0015), 0);
+    //TVector3 Bler = calculate(pler+dy);
     TVector3 Bler = calculate(pler);
     Bler.RotateX(-M_PI); Bler.RotateY(0.0415);
     double SK0 = Bler.X() / (4.0e+9 / 3.0e+8 / 0.01);
     double K0 = Bler.Y() / (4.0e+9 / 3.0e+8 / 0.01);
-    B2DEBUG("SolCheckLER s= %f [m], K0= %f ,SK0= %f\n", s/100., K0, SK0);
-    pler.Delete();Bler.Delete();
+    printf("SolCheckLER s= %f [m], K0= %10.8f ,SK0= %10.8f, Bz= %f\n", s / 100., K0, SK0, Bler.Z());
+    pler.Delete(); Bler.Delete();
   }
 
-  */
+
 
   B2DEBUG(10, "De-allocating the memory for the beamline magnetic field map loaded from the file"
           << "'" << m_mapFilename_her << "'"

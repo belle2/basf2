@@ -94,10 +94,8 @@ namespace Belle2 {
       const ARICHLikelihoods* arich = DataStore::getRelated<ARICHLikelihoods>(track);
       if (arich) pid->setLikelihoods(arich);
 
-      // set dedx likelihoods (temporary solution: using pion fit result)
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::pion);
-      const GFTrack* gfTrack = DataStore::getRelated<GFTrack>(trackFit);
-      const DedxLikelihood* dedx = DataStore::getRelated<DedxLikelihood>(gfTrack);
+      // set dedx likelihoods
+      const DedxLikelihood* dedx = track->getRelatedTo<DedxLikelihood>();
       if (dedx) pid->setLikelihoods(dedx);
 
     }

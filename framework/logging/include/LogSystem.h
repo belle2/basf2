@@ -141,6 +141,12 @@ namespace Belle2 {
      */
     LogConfig::ELogLevel getCurrentLogLevel() const;
 
+    /**
+     * Print error/warning summary at end of execution.
+     *
+     */
+    void printErrorSummary();
+
 
   private:
 

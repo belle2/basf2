@@ -12,6 +12,7 @@
 #include <framework/logging/LogMessage.h>
 #include <framework/logging/LogConnectionBase.h>
 #include <framework/logging/LogConnectionIOStream.h>
+#include <framework/logging/Logger.h>
 
 #include <unistd.h>
 #include <stdio.h>
@@ -100,6 +101,7 @@ bool LogSystem::sendMessage(LogMessage message)
   }
 
   if (logLevel >= m_logConfig.getAbortLevel()) {
+    printErrorSummary();
     abort();
   }
 
@@ -164,6 +166,20 @@ LogSystem::LogSystem() :
   addLogConnection(new LogConnectionIOStream(std::cout, useColor));
 }
 
+void LogSystem::printErrorSummary()
+{
+  int numLogWarn = getMessageCounter(LogConfig::c_Warning);
+  int numLogError = getMessageCounter(LogConfig::c_Error);
+  LogConfig oldConfig = m_logConfig;
+  // only show level & message
+  m_logConfig.setLogInfo(LogConfig::c_Warning, LogConfig::c_Level | LogConfig::c_Message);
+  m_logConfig.setLogInfo(LogConfig::c_Error, LogConfig::c_Level | LogConfig::c_Message);
+  if (numLogWarn)
+    B2WARNING(numLogWarn << " warnings occured.");
+  if (numLogError)
+    B2ERROR(numLogError << " errors occured.");
+  m_logConfig = oldConfig;
+}
 
 LogSystem::~LogSystem()
 {

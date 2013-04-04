@@ -127,6 +127,7 @@ namespace Belle2 {
 
 }
 
+ClassImp(Const::DetectorSet)
 
 /*** The implementation of the Const class defined in Const.h starts here ***/
 

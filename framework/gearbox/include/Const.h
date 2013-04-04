@@ -15,6 +15,8 @@
 #include <stdexcept>
 #include <framework/core/FrameworkExceptions.h>
 
+#include <TObject.h>
+
 class TDatabasePDG;
 class TParticlePDG;
 
@@ -38,25 +40,25 @@ namespace Belle2 {
     /**
      * The DetectorSet class for sets of detector IDs.
      */
-    class DetectorSet {
+    class DetectorSet : public TObject {
     public:
 
       /**
        * Default constructor.
        */
-      DetectorSet(): m_bits(0) {};
+      DetectorSet(): TObject(), m_bits(0) {};
 
       /**
        * Copy constructor.
        * @param set  The copied set of detector IDs.
        */
-      DetectorSet(const DetectorSet& set): m_bits(set.m_bits) {}
+      DetectorSet(const DetectorSet& set): TObject(), m_bits(set.m_bits) {}
 
       /**
        * Constructor for a set containig one detector ID.
        * @param det  The ID of the detector.
        */
-      DetectorSet(EDetector det): m_bits(getBit(det)) {}
+      DetectorSet(EDetector det): TObject(), m_bits(getBit(det)) {}
 
       /**
        * Addition of another set to this one.
@@ -113,7 +115,7 @@ namespace Belle2 {
        * Constructor.
        * @param bits  The internal representation of the set as bit pattern.
        */
-      DetectorSet(unsigned short bits): m_bits(bits) {};
+      DetectorSet(unsigned short bits): TObject(), m_bits(bits) {};
 
       /**
        * Conversion of detector ID to bit pattern.
@@ -130,6 +132,8 @@ namespace Belle2 {
       EDetector getDetector(unsigned short bit) const;
 
       unsigned short m_bits;  /**< The internal representation of the set as bit pattern. */
+
+      ClassDef(DetectorSet, 1) /**< A set of Detector IDs. */
     };
 
     /**

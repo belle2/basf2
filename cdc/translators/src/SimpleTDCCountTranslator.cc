@@ -49,5 +49,5 @@ float SimpleTDCCountTranslator::getDriftLengthResolution(float,
                                                          bool,
                                                          float, float)
 {
-  return 1e-4; // 100um **2 in cm**2
+  return 0.000169; // 130um **2 in cm**2
 }

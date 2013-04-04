@@ -37,8 +37,9 @@ void plot(const TString &input_filename)
   const int num_detectors = 3;
   const double dedx_cutoff[] = { 2.5e7, 0.003, 150.0 };
   for(int idet = 1; idet < num_detectors; idet++) { //PXD not in input file, anyway
+    //important: only show curves for the correct hypothesis (i.e. matching MC truth)
     tree->Project(TString::Format("dedx_p_%d", idet), TString::Format("m_dedx_avg_truncated[][%d]:m_p", idet),
-        TString::Format("m_p < 3 && m_dedx_avg_truncated[][%d] < %f ", idet, dedx_cutoff[idet]));
+        TString::Format("abs(m_pdg) == m_pdg_hyp && m_p < 3 && m_dedx_avg_truncated[][%d] < %f ", idet, dedx_cutoff[idet]));
     TH1* hist = (TH1*)output_file->Get(TString::Format("dedx_p_%d", idet));
     hist->SetTitle(TString::Format("dE/dx curve for detector %d; p [GeV]; dE/dx", idet));
     hist->Write();

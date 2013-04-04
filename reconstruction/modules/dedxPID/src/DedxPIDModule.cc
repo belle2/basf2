@@ -11,6 +11,8 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Const.h>
 
+#include <tracking/dataobjects/Track.h>
+#include <tracking/dataobjects/TrackFitResult.h>
 #include <generators/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>
@@ -37,6 +39,8 @@
 #include <TMath.h>
 
 #include <boost/foreach.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 #include <cassert>
 #include <cmath>
@@ -66,7 +70,6 @@ DedxPIDModule::DedxPIDModule() : Module()
 
   //Set module properties
   setDescription("Extract dE/dx (and some other things) from Tracks&GFTrackCandidates and PXDClusters, SVDTrueHits (not digitized) and CDCHits.");
-  addParam("GFTracksColName", m_gftracks_name, "Name for GFTracks array. Leave empty for default ('GFTracks')", std::string(""));
 
   //Parameter definitions
   addParam("UseIndividualHits", m_useIndividualHits, "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", true);
@@ -101,6 +104,8 @@ void DedxPIDModule::initialize()
 
   //required inputs
   StoreArray<GFTrack>::required();
+  StoreArray<Track>::required();
+  StoreArray<TrackFitResult>::required();
 
   //optional inputs
   StoreArray<MCParticle>::optional();
@@ -115,7 +120,7 @@ void DedxPIDModule::initialize()
 
   if (!m_pdfFilename.empty()) {
     StoreArray<DedxLikelihood>::registerPersistent();
-    RelationArray::registerPersistent<GFTrack, DedxLikelihood>();
+    RelationArray::registerPersistent<Track, DedxLikelihood>();
 
     //load pdfs
     TFile* pdf_file = new TFile(m_pdfFilename.c_str(), "READ");
@@ -181,16 +186,16 @@ void DedxPIDModule::initialize()
 
 void DedxPIDModule::event()
 {
-  //go through all GFTracks
-  //get GFTrackCand through GFTrack::getCand()
-  //get hit indices through GFTrackCand::getHit(...)
+  //go through Tracks
+  //for each fitresult, get gftrack and do extrapolations, save corresponding dE/dx and likelihood values
+  //  !check if i've already done extrapolations for the given result (i.e. I got less than 5 fits)
+  //   get GFTrackCand through GFTrack::getCand()
+  //   get hit indices through GFTrackCand::getHit(...)
+  //   create one DedxTrack per fitresult/gftrack
+  //create one DedkLikelihood per Track (plus rel)
   m_eventID++;
 
-  StoreArray<GFTrack> gftracks(m_gftracks_name);
-  if (gftracks.getEntries() == 0) {
-    return; //probably nothing fitted
-  }
-
+  StoreArray<Track> tracks;
   StoreArray<MCParticle> mcparticles;
   const int num_mcparticles = mcparticles.getEntries();
 
@@ -199,286 +204,309 @@ void DedxPIDModule::event()
   StoreArray<PXDTrueHit> pxdTrueHits;
   StoreArray<PXDCluster> pxdClusters; //no 1:1 correspondence with PXDTrueHits & PXDRecoHits!
 
-  RelationIndex<PXDCluster, PXDTrueHit> *pxdClustersToTrueHitsIndex = 0;
+  boost::shared_ptr<RelationIndex<PXDCluster, PXDTrueHit> > pxdClustersToTrueHitsIndex;
   if (m_usePXD)
-    pxdClustersToTrueHitsIndex = new RelationIndex<PXDCluster, PXDTrueHit> (pxdClusters, pxdTrueHits);
+    pxdClustersToTrueHitsIndex = boost::make_shared<RelationIndex<PXDCluster, PXDTrueHit> >(pxdClusters, pxdTrueHits);
 
   //outputs
   StoreArray<DedxLikelihood> likelihood_array;
   StoreArray<DedxTrack> dedx_array;
-  RelationArray tracks_to_likelihoods(gftracks, likelihood_array);
 
   //loop over all tracks
-  for (int iGFTrack = 0; iGFTrack < gftracks.getEntries(); iGFTrack++) {
-    DedxTrack track; //temporary storage for track data
-
-    if (num_mcparticles > 0) { //only do this if we actually know the mcparticles
-      //find MCParticle corresponding to this track
-      const MCParticle* mcpart = DataStore::Instance().getRelatedFromObj<MCParticle>(gftracks[iGFTrack]);
-
-      if (mcpart) {
-        if (m_onlyPrimaryParticles && !mcpart->hasStatus(MCParticle::c_PrimaryParticle))
-          continue; //not a primary particle, ignore
-
-        //add some MC truths to DedxTrack object
-        track.m_pdg = mcpart->getPDG();
-        const MCParticle* mother = mcpart->getMother();
-        track.m_mother_pdg = mother ? mother->getPDG() : 0;
-
-        //find slow pions (i.e. D* daughter pions)
-        track.m_slow_pion = (TMath::Abs(track.m_pdg) == 211 and TMath::Abs(track.m_mother_pdg) == 413);
-
-        const TVector3 true_momentum = mcpart->getMomentum();
-        track.m_p_true = true_momentum.Mag();
-      } else {
-        B2INFO("No MCParticle found for current track!");
-      }
-    }
-
+  for (int iTrack = 0; iTrack < tracks.getEntries(); iTrack++) {
+    const Track* track = tracks[iTrack];
     m_trackID++;
+    bool skipTrack = false; //don't try to save likelihood values for this track
 
-    GFAbsTrackRep* trackrep = gftracks[iGFTrack]->getCardinalRep();
+    //temporary storage for dE/dx data
+    boost::shared_ptr<DedxTrack> dedxTracks[Const::ChargedStable::c_SetSize];
+    //loop over fit results
+    for (Const::ChargedStable pdgIter = Const::chargedStableSet.begin(); pdgIter != Const::chargedStableSet.end(); ++pdgIter) {
+      const TrackFitResult* fitResult = track->getTrackFitResult(pdgIter);
+      if (!fitResult) {
+        B2ERROR("No TrackFitResult for PDG " << pdgIter.getPDGCode() << ", skipping this Track.");
+        skipTrack = true;
+        break;
+      }
 
-    //get momentum (at origin) from fitted track
-    TVector3 poca, dir_in_poca;
-    try {
-      trackrep->extrapolateToPoint(TVector3(0, 0, 0), poca, dir_in_poca);
+      //index of the actual fit result (might differ from the requested pdgIter)
+      int hypIdx = Const::ChargedStable(fitResult->getParticleType()).getIndex();
+      //do we have dE/dx data for this hypothesis?
+      if (dedxTracks[hypIdx]) {
+        //reuse existing data
+        dedxTracks[pdgIter.getIndex()] = dedxTracks[hypIdx];
+        continue; //and skip to next fit result
+      }
 
-      //Now choose a correct reference plane to get the momentum
-      const GFDetPlane plane(poca, dir_in_poca);
+      //no data, create new container
+      boost::shared_ptr<DedxTrack> dedxTrack = boost::make_shared<DedxTrack>();
+      dedxTracks[hypIdx] = dedxTrack;
+      dedxTracks[pdgIter.getIndex()] = dedxTrack;
 
-      //getMom returns wrong direction, only use magnitude
-      const double momentum_mag = trackrep->getMom(plane).Mag();
-      dir_in_poca.SetMag(momentum_mag);
+      //for each unique fitResult, calculate dE/dx values using associated GFTrack
+      if (m_enableDebugOutput) {
+        if (num_mcparticles != 0) {
+          //find MCParticle corresponding to this track
+          const MCParticle* mcpart = track->getRelatedFrom<MCParticle>();
 
-      track.m_p_vec = dir_in_poca;
-      track.m_p = momentum_mag;
-    } catch (GFException) {
-      B2ERROR("Event " << m_eventID << ", gftrack: " << iGFTrack << ": GFTrack extrapolation failed (at origin!), skipping particle");
-      continue; //next particle
-    }
-
-    track.m_chi2 = gftracks[iGFTrack]->getChiSqu();
-    track.m_charge = (short)((gftracks[iGFTrack]->getCharge() >= 0) ? 1 : -1);
-
-    //used for PXD/SVD hits
-    const HelixHelper helix_at_origin(poca, dir_in_poca, track.m_charge);
-
-    //sort hits in the order they were created
-    //this is required if I want to use the helix path length
-    const_cast<GFTrackCand& >(gftracks[iGFTrack]->getCand()).sortHits();
-    const GFTrackCand& gftrackcand = gftracks[iGFTrack]->getCand();
-    const int num_hits = gftrackcand.getNHits();
-    if (num_hits == 0) {
-      B2WARNING("Track has no associated hits, skipping");
-      continue;
-    }
-
-    if (m_useCDC) {
-      int num_hits_in_current_layer = 0;
-      float layer_charge = 0.0; //total charge in current layer
-      float phi_sum = 0.0; //sum of phi from CDC hits, for averaging
-      TVector3 last_hit_pos;
-      float direct_distance = 0; //sum of distances between wires
-#ifdef USE_HELIX_PATH_LENGTH
-      float last_path_length = 0; //sum of distances between wires
-#endif
-
-
-      HelixHelper cdchelix = helix_at_origin;
-      bool track_extrapolation_failed = false;
-
-      //Loop over all CDC hits from this track
-      const std::vector<int>& cdc_hit_ids = gftrackcand.getHitIDs(Const::CDC);
-      const int num_cdc_hits = cdc_hit_ids.size();
-      for (int iCDC = 0; iCDC < num_cdc_hits; iCDC++) {
-        const int cdc_idx = cdc_hit_ids[iCDC];
-
-        //add data
-        const int layer = cdcHits[cdc_idx]->getILayer();
-        const int superlayer = cdcHits[cdc_idx]->getISuperLayer();
-        const int current_layer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer); //this is essentially the layer ID you'd get from a CDCRecoHit
-        const int wire = cdcHits[cdc_idx]->getIWire();
-
-        static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-        const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(current_layer, wire);
-        const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(current_layer, wire);
-
-        const double path_length = cdchelix.pathLengthToLine(wire_pos_f, wire_pos_b);
-        TVector3 hit_pos_helix = cdchelix.position(path_length);
-        TVector3 local_momentum = cdchelix.momentum(path_length);
-#ifdef USE_HELIX_PATH_LENGTH
-        if (last_path_length == 0.0)
-          last_path_length = path_length;
-#endif
-
-        //get actual hit coordinates by taking z from the helix and x/y from wire (with stereo angle correction)
-        double where = (hit_pos_helix.z() - wire_pos_f.z()) / (wire_pos_b.z() - wire_pos_f.z());
-        const double tolerance = 0.1; //some deviation is ok
-        if (where < 0.0 - tolerance or where > 1.0 + tolerance) {
-          B2WARNING("Event " << m_eventID << ", gftrack: " << iGFTrack << ": helix extrapolation: Hit outside drift chamber! where: " << where);
-          where = (where < 0.0 - tolerance) ? 0.0 - tolerance : 1.0 + tolerance;
-        }
-        TVector3 hit_pos = wire_pos_f + where * (wire_pos_b - wire_pos_f);
-
-        //was the helix position close enough to the hit?
-        const bool helix_accurate = (hit_pos - hit_pos_helix).Perp() <= m_trackDistanceThreshhold;
-
-        if (!track_extrapolation_failed && !helix_accurate) {
-          TVector3 poca_on_wire;
-          try {
-            trackrep->extrapolateToLine(wire_pos_f, wire_pos_b,
-                                        poca, dir_in_poca, poca_on_wire);
-
-            //Now choose a correct reference plane to get the momentum
-            GFDetPlane plane(poca, dir_in_poca);
-
-            //update cdchelix
-            const double momentum_mag = trackrep->getMom(plane).Mag();
-            dir_in_poca.SetMag(momentum_mag);
-            cdchelix = HelixHelper(poca, dir_in_poca, track.m_charge);
-
-            local_momentum = dir_in_poca;
-            hit_pos_helix = poca;
-            hit_pos = poca_on_wire;
-          } catch (GFException) {
-            B2WARNING("Event " << m_eventID << ", gftrack: " << iGFTrack << ": GFTrack extrapolation failed (in CDC), further hits will be less accurate");
-
-            //if extrapolation fails once, it's unlikely to work again
-            track_extrapolation_failed = true;
-          }
-          m_numExtrapolations++;
-        }
-
-        const float phi = hit_pos.Phi() - local_momentum.Phi();
-
-        const float hit_charge = cdcHits[cdc_idx]->getADCCount();
-
-        if (m_enableDebugOutput)
-          track.addHit(hit_pos, current_layer, wire, (hit_pos - hit_pos_helix).Perp(), hit_charge, track_extrapolation_failed, cdcHits[cdc_idx]->getTDCCount());
-
-        num_hits_in_current_layer++;
-        layer_charge += hit_charge;
-        phi_sum += phi;
-        direct_distance += (hit_pos - last_hit_pos).Mag();
-        last_hit_pos = hit_pos;
-
-
-        const bool last_hit = (iCDC + 1 >= num_cdc_hits);
-        bool last_hit_in_current_layer = last_hit;
-        if (!last_hit) {
-          //peek at next hit
-          const int next_cdc_idx = cdc_hit_ids[iCDC + 1];
-          const int next_layer = cdcHits[next_cdc_idx]->getILayer();
-          const int next_superlayer = cdcHits[next_cdc_idx]->getISuperLayer();
-          const int next_layer_full = (next_superlayer == 0) ? next_layer : (8 + (next_superlayer - 1) * 6 + next_layer);
-          last_hit_in_current_layer = (next_layer_full != current_layer);
-        }
-        if (last_hit_in_current_layer) {
-          //calculate a dE/dx value using all hits in this layer
-          const float phi_average = phi_sum / num_hits_in_current_layer;
-
-#ifdef USE_HELIX_PATH_LENGTH
-          float total_distance = path_length - last_path_length;
-          if (!helix_accurate or total_distance == 0.0) { //path length identical to last layer??
-            B2INFO("Path length zero, using simple geometrical correction");
-            total_distance = getFlownDistanceCDC(current_layer, track.m_p_vec.Theta(), phi_average);
-            total_distance = TMath::Min(direct_distance, total_distance); //total_distance diverges for phi ~ 0
-          }
-#else
-          float total_distance = getFlownDistanceCDC(current_layer, track.m_p_vec.Theta(), phi_average);
-          total_distance = TMath::Min(direct_distance, total_distance); //total_distance diverges for phi ~ 0
-#endif
-
-          const float layer_dedx = layer_charge / total_distance;
-
-          if (layer_dedx > 0) {
-            //store data, if there's energy loss in last layer
-            track.m_dedx_avg[c_CDC] += layer_dedx;
-            track.addDedx(current_layer, total_distance, layer_dedx);
-            if (!m_pdfFilename.empty() and m_useIndividualHits and detectorEnabled(c_CDC)) {
-              saveLogLikelihood(track.m_logl, track.m_p, layer_dedx, m_pdfs[c_CDC]);
+          if (mcpart) {
+            if (m_onlyPrimaryParticles && !mcpart->hasStatus(MCParticle::c_PrimaryParticle)) {
+              skipTrack = true;
+              break; //not a primary particle, ignore
             }
+
+            //add some MC truths to DedxTrack object
+            dedxTrack->m_pdg = mcpart->getPDG();
+            const MCParticle* mother = mcpart->getMother();
+            dedxTrack->m_mother_pdg = mother ? mother->getPDG() : 0;
+
+            //find slow pions (i.e. D* daughter pions)
+            dedxTrack->m_slow_pion = (TMath::Abs(dedxTrack->m_pdg) == 211 and TMath::Abs(dedxTrack->m_mother_pdg) == 413);
+
+            const TVector3 true_momentum = mcpart->getMomentum();
+            dedxTrack->m_p_true = true_momentum.Mag();
+          } else {
+            B2WARNING("No MCParticle found for current track!");
+          }
+        }
+      }
+
+      const GFTrack* gftrack = fitResult->getRelatedFrom<GFTrack>();
+      GFAbsTrackRep* trackrep = gftrack->getCardinalRep();
+
+      //get momentum (at origin) from fit result
+      const TVector3& poca = fitResult->getPosition();
+      const TVector3& poca_momentum = fitResult->getMomentum();
+
+      dedxTrack->m_pdg_hyp = fitResult->getParticleType().getPDGCode();
+      dedxTrack->m_chi2 = gftrack->getChiSqu();
+      dedxTrack->m_charge = (short)((gftrack->getCharge() >= 0) ? 1 : -1);
+      dedxTrack->m_p_vec = poca_momentum;
+      dedxTrack->m_p = poca_momentum.Mag();
+
+      //used for PXD/SVD hits
+      const HelixHelper helix_at_origin(poca, poca_momentum, dedxTrack->m_charge);
+
+      //sort hits in the order they were created
+      //this is required if I want to use the helix path length
+      const GFTrackCand& gftrackcand = gftrack->getCand();
+      const_cast<GFTrackCand& >(gftrackcand).sortHits();
+      const int num_hits = gftrackcand.getNHits();
+      if (num_hits == 0) {
+        B2WARNING("Track has no associated hits, skipping");
+        continue;
+      }
+
+      if (m_useCDC) {
+        int num_hits_in_current_layer = 0;
+        float layer_charge = 0.0; //total charge in current layer
+        float phi_sum = 0.0; //sum of phi from CDC hits, for averaging
+        TVector3 last_hit_pos;
+        float direct_distance = 0; //sum of distances between wires
+#ifdef USE_HELIX_PATH_LENGTH
+        float last_path_length = 0; //sum of distances between wires
+#endif
+
+
+        HelixHelper cdchelix = helix_at_origin;
+        bool track_extrapolation_failed = false;
+
+        //Loop over all CDC hits from this track
+        const std::vector<int>& cdc_hit_ids = gftrackcand.getHitIDs(Const::CDC);
+        const int num_cdc_hits = cdc_hit_ids.size();
+        for (int iCDC = 0; iCDC < num_cdc_hits; iCDC++) {
+          const int cdc_idx = cdc_hit_ids[iCDC];
+
+          //add data
+          const int layer = cdcHits[cdc_idx]->getILayer();
+          const int superlayer = cdcHits[cdc_idx]->getISuperLayer();
+          const int current_layer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer); //this is essentially the layer ID you'd get from a CDCRecoHit
+          const int wire = cdcHits[cdc_idx]->getIWire();
+
+          static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+          const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(current_layer, wire);
+          const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(current_layer, wire);
+
+          const double path_length = cdchelix.pathLengthToLine(wire_pos_f, wire_pos_b);
+          TVector3 hit_pos_helix = cdchelix.position(path_length);
+          TVector3 local_momentum = cdchelix.momentum(path_length);
+#ifdef USE_HELIX_PATH_LENGTH
+          if (last_path_length == 0.0)
+            last_path_length = path_length;
+#endif
+
+          //get actual hit coordinates by taking z from the helix and x/y from wire (with stereo angle correction)
+          double where = (hit_pos_helix.z() - wire_pos_f.z()) / (wire_pos_b.z() - wire_pos_f.z());
+          const double tolerance = 0.1; //some deviation is ok
+          if (where < 0.0 - tolerance or where > 1.0 + tolerance) {
+            B2WARNING("Event " << m_eventID << ", Track: " << iTrack << ": helix extrapolation: Hit outside drift chamber! where: " << where);
+            where = (where < 0.0 - tolerance) ? 0.0 - tolerance : 1.0 + tolerance;
+          }
+          TVector3 hit_pos = wire_pos_f + where * (wire_pos_b - wire_pos_f);
+
+          //was the helix position close enough to the hit?
+          const bool helix_accurate = (hit_pos - hit_pos_helix).Perp() <= m_trackDistanceThreshhold;
+
+          if (!track_extrapolation_failed && !helix_accurate) {
+            TVector3 poca, dir_in_poca, poca_on_wire;
+            try {
+              trackrep->extrapolateToLine(wire_pos_f, wire_pos_b,
+                                          poca, dir_in_poca, poca_on_wire);
+
+              //Now choose a correct reference plane to get the momentum
+              GFDetPlane plane(poca, dir_in_poca);
+
+              //update cdchelix
+              const double momentum_mag = trackrep->getMom(plane).Mag();
+              dir_in_poca.SetMag(momentum_mag);
+              cdchelix = HelixHelper(poca, dir_in_poca, dedxTrack->m_charge);
+
+              local_momentum = dir_in_poca;
+              hit_pos_helix = poca;
+              hit_pos = poca_on_wire;
+            } catch (GFException) {
+              B2WARNING("Event " << m_eventID << ", Track: " << iTrack << ": GFTrack extrapolation failed (in CDC), further hits will be less accurate");
+
+              //if extrapolation fails once, it's unlikely to work again
+              track_extrapolation_failed = true;
+            }
+            m_numExtrapolations++;
           }
 
-          //reset layer variables
-          num_hits_in_current_layer = 0;
-          layer_charge = 0.0; //total charge in current layer
-          phi_sum = 0.0; //sum of phi from CDC hits, for averaging
-          direct_distance = 0.0;
+          const float phi = hit_pos.Phi() - local_momentum.Phi();
+
+          const float hit_charge = cdcHits[cdc_idx]->getADCCount();
+
+          if (m_enableDebugOutput)
+            dedxTrack->addHit(hit_pos, current_layer, wire, (hit_pos - hit_pos_helix).Perp(), hit_charge, track_extrapolation_failed, cdcHits[cdc_idx]->getTDCCount());
+
+          num_hits_in_current_layer++;
+          layer_charge += hit_charge;
+          phi_sum += phi;
+          direct_distance += (hit_pos - last_hit_pos).Mag();
+          last_hit_pos = hit_pos;
+
+
+          const bool last_hit = (iCDC + 1 >= num_cdc_hits);
+          bool last_hit_in_current_layer = last_hit;
+          if (!last_hit) {
+            //peek at next hit
+            const int next_cdc_idx = cdc_hit_ids[iCDC + 1];
+            const int next_layer = cdcHits[next_cdc_idx]->getILayer();
+            const int next_superlayer = cdcHits[next_cdc_idx]->getISuperLayer();
+            const int next_layer_full = (next_superlayer == 0) ? next_layer : (8 + (next_superlayer - 1) * 6 + next_layer);
+            last_hit_in_current_layer = (next_layer_full != current_layer);
+          }
+          if (last_hit_in_current_layer) {
+            //calculate a dE/dx value using all hits in this layer
+            const float phi_average = phi_sum / num_hits_in_current_layer;
+
 #ifdef USE_HELIX_PATH_LENGTH
-          last_path_length = path_length;
+            float total_distance = path_length - last_path_length;
+            if (!helix_accurate or total_distance == 0.0) { //path length identical to last layer??
+              B2INFO("Path length zero, using simple geometrical correction");
+              total_distance = getFlownDistanceCDC(current_layer, dedxTrack->m_p_vec.Theta(), phi_average);
+              total_distance = TMath::Min(direct_distance, total_distance); //total_distance diverges for phi ~ 0
+            }
+#else
+            float total_distance = getFlownDistanceCDC(current_layer, dedxTrack->m_p_vec.Theta(), phi_average);
+            total_distance = TMath::Min(direct_distance, total_distance); //total_distance diverges for phi ~ 0
 #endif
+
+            const float layer_dedx = layer_charge / total_distance;
+
+            if (layer_dedx > 0) {
+              //store data, if there's energy loss in last layer
+              dedxTrack->m_dedx_avg[c_CDC] += layer_dedx;
+              dedxTrack->addDedx(current_layer, total_distance, layer_dedx);
+              if (!m_pdfFilename.empty() and m_useIndividualHits) {
+                saveLogLikelihood(dedxTrack->m_logl, dedxTrack->m_p, layer_dedx, m_pdfs[c_CDC]);
+              }
+            }
+
+            //reset layer variables
+            num_hits_in_current_layer = 0;
+            layer_charge = 0.0; //total charge in current layer
+            phi_sum = 0.0; //sum of phi from CDC hits, for averaging
+            direct_distance = 0.0;
+#ifdef USE_HELIX_PATH_LENGTH
+            last_path_length = path_length;
+#endif
+          }
+        }
+        //all cdc hits for this track read
+
+        if (!m_useIndividualHits or m_enableDebugOutput) {
+          //track.dedx only contains CDC hits right now
+          calculateMeans(
+            &(dedxTrack->m_dedx_avg[c_CDC]),
+            &(dedxTrack->m_dedx_avg_truncated[c_CDC]),
+            &(dedxTrack->m_dedx_avg_truncated_err[c_CDC]),
+            dedxTrack->dedx);
         }
       }
-      //all cdc hits for this track read
 
-      if (!m_useIndividualHits or m_enableDebugOutput) {
-        //track.dedx only contains CDC hits right now
-        calculateMeans(
-          &(track.m_dedx_avg[c_CDC]),
-          &(track.m_dedx_avg_truncated[c_CDC]),
-          &(track.m_dedx_avg_truncated_err[c_CDC]),
-          track.dedx);
+      if (m_usePXD) {
+        //get indices of PXDTrueHits
+        const std::vector<int>& pxdHitIDs = gftrackcand.getHitIDs(Const::PXD);
+        const int nPxdHits = pxdHitIDs.size();
+
+        //and construct a list of associated PXDCluster indices
+        std::vector<int> pxdClusterIDs;
+        for (int iHit = 0; iHit < nPxdHits; iHit++) {
+          typedef RelationIndex<PXDCluster, PXDTrueHit>::Element relElement_t;
+          unsigned int hitID = pxdHitIDs[iHit];
+          //get all relations that point to hitID
+          BOOST_FOREACH(const relElement_t & rel, pxdClustersToTrueHitsIndex->getElementsTo(pxdTrueHits[hitID])) {
+            pxdClusterIDs.push_back(rel.indexFrom);
+          }
+        }
+        sort(pxdClusterIDs.begin(), pxdClusterIDs.end());
+        saveSiHits(dedxTrack.get(), helix_at_origin, pxdClusters, pxdClusterIDs);
       }
-    }
 
-    if (m_usePXD) {
-      //get indices of PXDTrueHits
-      const std::vector<int>& pxdHitIDs = gftrackcand.getHitIDs(Const::PXD);
+      if (m_useSVD) {
+        //no way to access digitized SVD hits, so we'll just use the SVDTrueHits directly
+        const std::vector<int>& svdHitIDs = gftrackcand.getHitIDs(Const::SVD);
+        saveSiHits(dedxTrack.get(), helix_at_origin, svdTrueHits, svdHitIDs);
+      }
 
-      //and construct a list of associated PXDCluster indices
-      std::vector<int> pxdClusterIDs;
-      for (unsigned int iHit = 0; iHit < pxdHitIDs.size(); iHit++) {
-        typedef RelationIndex<PXDCluster, PXDTrueHit>::Element relElement_t;
-        unsigned int hitID = pxdHitIDs[iHit];
-        //get all relations that point to hitID
-        BOOST_FOREACH(const relElement_t & rel, pxdClustersToTrueHitsIndex->getElementsTo(pxdTrueHits[hitID])) {
-          pxdClusterIDs.push_back(rel.indexFrom);
+
+      if (dedxTrack->dedx.empty()) {
+        B2WARNING("Found track with no hits, ignoring.");
+        continue;
+      }
+
+      if (!m_useIndividualHits) {
+        //calculate likelihoods for truncated mean
+        for (int detector = 0; detector < c_num_detectors; detector++) {
+          if (!detectorEnabled(static_cast<Detector>(detector)))
+            continue; //unwanted detector
+
+          saveLogLikelihood(dedxTrack->m_logl, dedxTrack->m_p, dedxTrack->m_dedx_avg_truncated[detector], m_pdfs[detector]);
         }
       }
-      sort(pxdClusterIDs.begin(), pxdClusterIDs.end());
-      saveSiHits(&track, helix_at_origin, pxdClusters, pxdClusterIDs);
-    }
 
-    if (m_useSVD) {
-      //no way to access digitized SVD hits, so we'll just use the SVDTrueHits directly
-      const std::vector<int>& svdHitIDs = gftrackcand.getHitIDs(Const::SVD);
-      saveSiHits(&track, helix_at_origin, svdTrueHits, svdHitIDs);
-    }
+      //save this track's data to StoreArray
+      if (m_enableDebugOutput) {
+        dedxTrack->m_event_id = m_eventID;
+        dedxTrack->m_track_id = iTrack;
 
-
-    if (track.dedx.empty()) {
-      B2WARNING("Found track with no hits, ignoring.");
-      continue;
-    }
-
-    if (!m_useIndividualHits) {
-      //calculate likelihoods for truncated mean
-      for (int detector = 0; detector < c_num_detectors; detector++) {
-        if (!detectorEnabled(static_cast<Detector>(detector)))
-          continue; //unwanted detector
-
-        saveLogLikelihood(track.m_logl, track.m_p, track.m_dedx_avg_truncated[detector], m_pdfs[detector]);
+        dedx_array.appendNew(*dedxTrack);
       }
-    }
+    } //end loop over fit hypotheses
 
-    //save this track's data to StoreArray
-    if (m_enableDebugOutput) {
-      track.m_event_id = m_eventID;
-      track.m_track_id = iGFTrack;
-
-      dedx_array.appendNew(track);
-    }
-    if (!m_pdfFilename.empty()) {
-      //save likelihoods
-      const int dedxLikelihoodIdx = likelihood_array.getEntries();
-      new(likelihood_array.nextFreeAddress()) DedxLikelihood(track.m_logl);
-      tracks_to_likelihoods.add(iGFTrack, dedxLikelihoodIdx);
+    //create one DedxLikelihood per Track
+    if (!skipTrack and !m_pdfFilename.empty()) {
+      float logl[Const::ChargedStable::c_SetSize];
+      for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
+        //fill log-likelihood from track with appropriate fit hypothesis
+        logl[iPart] = dedxTracks[iPart]->m_logl[iPart];
+      }
+      DedxLikelihood* likelihoodObj = new(likelihood_array.nextFreeAddress()) DedxLikelihood(logl);
+      track->addRelationTo(likelihoodObj);
     }
   } //end loop over tracks
-
-  delete pxdClustersToTrueHitsIndex;
 }
 
 
@@ -591,7 +619,7 @@ template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const
       silicon_dedx.push_back(dedx);
       track->m_dedx_avg[current_detector] += dedx;
       track->addDedx(layer, total_distance, dedx);
-      if (!m_pdfFilename.empty() and m_useIndividualHits and detectorEnabled(static_cast<Detector>(current_detector))) {
+      if (!m_pdfFilename.empty() and m_useIndividualHits) {
         saveLogLikelihood(track->m_logl, track->m_p, dedx, m_pdfs[current_detector]);
       }
     } else {

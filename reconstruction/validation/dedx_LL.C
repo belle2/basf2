@@ -52,7 +52,7 @@ void plot(const TString &input_filename)
 
     //now create histograms with this (unweighted) probability
     tree->Project(TString::Format("%d_prob", pdg_codes[part]), logl_strings[part].Data(),
-        TString::Format("abs(m_pdg) == %d", pdg_codes[part]));
+        TString::Format("abs(m_pdg) == %d && abs(m_pdg) == m_pdg_hyp", pdg_codes[part]));
     TH1* hist = (TH1*)output_file->Get(TString::Format("%d_prob", pdg_codes[part]));
     hist->SetTitle(TString::Format("Unweighted output prob. for true %d", pdg_codes[part]));
     hist->Write();

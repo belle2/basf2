@@ -74,8 +74,9 @@ namespace Belle2 {
 
   private:
     int m_event_id; /**< event this track was found in */
-    int m_track_id; /**< equal to GFTrack id. */
+    int m_track_id; /**< equal to Track id. */
     int m_pdg; /**< PDG code (MC truth) */
+    int m_pdg_hyp; /**< PDG code (fit hypothesis, >0) */
     bool m_slow_pion; /**< does this particle belong to a slow pion (MC truth) */
     TVector3 m_p_vec; /**< momentum */
     float m_p; /**< total momentum at point of closest approach to origin */
@@ -109,7 +110,7 @@ namespace Belle2 {
     float m_logl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
     /** Build ROOT dictionary. */
-    ClassDef(DedxTrack, 4);
+    ClassDef(DedxTrack, 5);
   };
 }
 #endif

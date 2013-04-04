@@ -50,7 +50,7 @@ output = register_module('RootOutput')
 
 # EvtMetaGen parameters
 # Set the number of events to be processed (10 event)
-evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
+evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
 # ============================================================================
 
 # Set output filename

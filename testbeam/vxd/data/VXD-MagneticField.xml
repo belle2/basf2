@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="MagneticField" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<Description>The magnetic field description for PCMAG Superconducting magnet
+		for common PXD/SVD beam test at DESY Oct 2013</Description>
+	<Version>0</Version>
+        <Creator>GeoMagneticField</Creator>
+	<Content>
+		<!-- The components of the PCMAG magnetic field -->		
+		<Components>
+			<!-- Radial solenoid magnetic field map
+			     The magnetic field map is stored as a grid in cylindrical coordinates.
+			     It is defined by a minimum radius and a maximum radius, a minimum z and
+			     a maximum z value, a pitch size in both, r and z, and the number of grid
+			     points. The ZOffset is used to account for the fact that the acceleration
+			     group defines 0 to be in the center of the detector, while the detector
+			     group defines the IP to be the center. This offset will shift the values
+                             from the magnetic field map file to fit inside the region given by the
+                             ZMin and ZMax values. The filename points to the zip file containing the
+                             magnetic field map.
+			-->
+			<Component type="Radial">
+				<NumberGridPointsR>601</NumberGridPointsR>
+				<GridPitchR unit="mm">1.0</GridPitchR>
+				<RadiusMin unit="mm">0.0</RadiusMin>
+				<RadiusMax unit="mm">600.0</RadiusMax>
+				<NumberGridPointsZ>1602</NumberGridPointsZ>
+				<GridPitchZ unit="mm">1.0</GridPitchZ>
+				<ZMin unit="mm">-800.0</ZMin>
+				<ZMax unit="mm">800.0</ZMax>
+				<ZOffset unit="cm">0.0</ZOffset>
+				<MapFilename>testbeam/PCMagFieldMap.dat.gz</MapFilename>
+			</Component>
+		</Components>
+	</Content>
+</DetectorComponent>

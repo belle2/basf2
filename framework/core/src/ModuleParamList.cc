@@ -80,7 +80,7 @@ void setParamObjectTemplatePython(ModuleParamList& params, const std::string& na
     T tmpValue = static_cast<T>(valueProxy);
     params.setParameter(name, tmpValue);
   } else {
-    B2ERROR("Could not set a module parameter: The python object defined by '" + name + "' could not be converted!")
+    B2ERROR("Could not set a module parameter: The python object defined by '" + name + "' could not be converted from '" << pyObj.ptr()->ob_type->tp_name << "'! (expected '" << params.getParamTypeInfo(name).m_readableName << "')")
   }
 }
 
@@ -96,7 +96,9 @@ void setParamListTemplatePython(ModuleParamList& params, const std::string& name
     if (checkValue.check()) {
       tmpList.push_back(checkValue);
     } else {
-      B2ERROR("Could not set a module parameter: A python object defined in the list '" + name + "' could not be converted!")
+      const boost::python::object pyObj = pyList[iList];
+      B2ERROR("Could not set a module parameter: A python object defined in the list '" << name << "' could not be converted from '" << pyObj.ptr()->ob_type->tp_name << "'! (expected '" << params.getParamTypeInfo(name).m_readableName << "')")
+
     }
   }
   params.setParameter(name, tmpList);

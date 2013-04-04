@@ -113,6 +113,7 @@ geosaver = register_module('ExportGeometry')
 geosaver.param('Filename', 'Belle2Geo.root')
 
 arichrec = register_module('ARICHReconstructor')
+arichrec.param('InputTrackType', 1)
 
 main = create_path()
 main.add_module(evtmetagen)

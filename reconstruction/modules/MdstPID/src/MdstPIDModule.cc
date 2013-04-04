@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <reconstruction/modules/MdstPID/MdstPIDModule.h>
-#include <framework/core/ModuleManager.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -22,7 +21,6 @@
 #include <arich/dataobjects/ARICHLikelihoods.h>
 #include <reconstruction/dataobjects/DedxLikelihood.h>
 #include <tracking/dataobjects/Track.h>
-#include <GFTrack.h>
 
 // framework aux
 #include <framework/logging/Logger.h>

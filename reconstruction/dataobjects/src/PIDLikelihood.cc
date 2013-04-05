@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Thomas Kuhr                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,16 +11,23 @@
 #include <reconstruction/dataobjects/PIDLikelihood.h>
 
 #include <top/dataobjects/TOPLikelihood.h>
-#include <arich/dataobjects/ARICHLikelihoods.h>
+#include <arich/dataobjects/ARICHLikelihood.h>
 #include <reconstruction/dataobjects/DedxLikelihood.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
 
 PIDLikelihood::PIDLikelihood()
 {
-  for (unsigned short i = 0; i < Const::PIDDetectors::set().size(); i++) {
-    for (unsigned int k = 0; k < Const::chargedStableSet.size(); ++k) {
+  //  for (unsigned short i = 0; i < Const::PIDDetectors::set().size(); i++) {
+  //    for (unsigned int k = 0; k < Const::chargedStableSet.size(); ++k) {
+
+  if (Const::PIDDetectors::set().size() > c_PIDDetectorSetSize)
+    B2FATAL("PIDLikelihood::m_logl[][] first dimension too small");
+
+  for (unsigned short i = 0; i < c_PIDDetectorSetSize; i++) {
+    for (unsigned int k = 0; k < Const::ChargedStable::c_SetSize; k++) {
       m_logl[i][k] = 0.0;
     }
   }
@@ -41,7 +48,7 @@ void PIDLikelihood::setLikelihoods(const TOPLikelihood* logl)
 }
 
 
-void PIDLikelihood::setLikelihoods(const ARICHLikelihoods* logl)
+void PIDLikelihood::setLikelihoods(const ARICHLikelihood* logl)
 {
 
   if (logl->getFlag() != 1) return;

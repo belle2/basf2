@@ -18,7 +18,7 @@
 // data objects:
 #include <reconstruction/dataobjects/PIDLikelihood.h>
 #include <top/dataobjects/TOPLikelihood.h>
-#include <arich/dataobjects/ARICHLikelihoods.h>
+#include <arich/dataobjects/ARICHLikelihood.h>
 #include <reconstruction/dataobjects/DedxLikelihood.h>
 #include <tracking/dataobjects/Track.h>
 
@@ -89,7 +89,7 @@ namespace Belle2 {
       if (top) pid->setLikelihoods(top);
 
       // set arich likelihoods
-      const ARICHLikelihoods* arich = DataStore::getRelated<ARICHLikelihoods>(track);
+      const ARICHLikelihood* arich = DataStore::getRelated<ARICHLikelihood>(track);
       if (arich) pid->setLikelihoods(arich);
 
       // set dedx likelihoods

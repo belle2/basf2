@@ -19,7 +19,7 @@
 namespace Belle2 {
 
   class TOPLikelihood;
-  class ARICHLikelihoods;
+  class ARICHLikelihood;
   class DedxLikelihood;
 
   /** \addtogroup dataobjects
@@ -44,9 +44,9 @@ namespace Belle2 {
     void setLikelihoods(const TOPLikelihood* logl);
 
     /*! set ARICH likelihoods and corresponding reconstruction flag
-     * @param logl ARICHLikelihoods pointer
+     * @param logl ARICHLikelihood pointer
      */
-    void setLikelihoods(const ARICHLikelihoods* logl);
+    void setLikelihoods(const ARICHLikelihood* logl);
 
     /*! set Dedx likelihoods and corresponding reconstruction flag
      * @param logl DedxLikelihood pointer
@@ -75,8 +75,11 @@ namespace Belle2 {
     double getProbability(const Const::ChargedStable& p1, const Const::ChargedStable& p2, Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
 
   private:
+
+    enum {c_PIDDetectorSetSize = 4}; /**< temporary solution for the size */
+
     Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
-    float m_logl[4][Const::ChargedStable::c_SetSize]; /**< log likelihoods, FIXME: replace hard coded value */
+    float m_logl[c_PIDDetectorSetSize][Const::ChargedStable::c_SetSize]; /**< log likelihoods, FIXME: replace hard coded value */
 
     /*! Calculate likelihood probability from log likelihood difference logl1-logl2 assuming equal prior probablilites
      * @param logl1 log likelihood

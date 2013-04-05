@@ -164,13 +164,14 @@ namespace Belle2 {
 
     for (int i = 0; i < Gammas.getEntries(); i++) {
       const ECLGamma* gamma = Gammas[i];
+      const MCParticle* mcParticle = DataStore::getRelated<MCParticle>(gamma);
       Particle particle(gamma, i);
       if (particle.getParticleType() == Particle::c_ECLGamma) { // should always hold but...
-        Particles.appendNew(particle);
+        Particle* newPart = Particles.appendNew(particle);
+        DataStore::addRelationFromTo(newPart, mcParticle);
         int lastIndex = Particles.getEntries() - 1;
         int showerId = gamma->getShowerId();
         gammaShowerId.push_back(make_pair(lastIndex, showerId));
-        // TODO: make relation to MCParticle
       }
     }
 
@@ -178,6 +179,7 @@ namespace Belle2 {
 
     for (int i = 0; i < Pi0s.getEntries(); i++) {
       const ECLPi0* pi0 = Pi0s[i];
+      const MCParticle* mcParticle = DataStore::getRelated<MCParticle>(pi0);
       Particle particle(pi0, i);
       if (particle.getParticleType() == Particle::c_Pi0) { // should always hold but...
         int showerId1 = pi0->getShowerId1();
@@ -188,8 +190,8 @@ namespace Belle2 {
             particle.appendDaughter(gammaShowerId[k].first);
           }
         }
-        Particles.appendNew(particle);
-        // TODO: make relation to MCParticle
+        Particle* newPart = Particles.appendNew(particle);
+        DataStore::addRelationFromTo(newPart, mcParticle);
       }
     }
 

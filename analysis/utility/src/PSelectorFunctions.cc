@@ -12,8 +12,13 @@
 #include <analysis/utility/PSelectorFunctions.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
+// framework - DataStore
+#include <framework/datastore/DataStore.h>
+
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
+#include <generators/dataobjects/MCParticle.h>
+#include <reconstruction/dataobjects/PIDLikelihood.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -219,40 +224,41 @@ namespace Belle2 {
       return vec.E() - T.getCMSEnergy() / 2;
     }
 
-    // PID (when available) ---------------------------------------------
+    // PID ---------------------------------------------
 
     double particleElectronId(const Particle* part)
     {
       if (!part) return 0;
-      // odvisno od tipa...
-      return 0.5;
+      return 0.5; //TODO when eId availabe
     }
 
     double particleMuonId(const Particle* part)
     {
       if (!part) return 0;
-      // odvisno od tipa...
-      return 0.5;
+      return 0.5; //TODO when muId availabe
     }
 
     double particlePionId(const Particle* part)
     {
       if (!part) return 0;
-      // odvisno od tipa...
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (pid) return pid->getProbability(Const::pion, Const::kaon);
       return 0.5;
     }
 
     double particleKaonId(const Particle* part)
     {
       if (!part) return 0;
-      // odvisno od tipa...
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (pid) return pid->getProbability(Const::kaon, Const::pion);
       return 0.5;
     }
 
     double particleProtonId(const Particle* part)
     {
       if (!part) return 0;
-      // odvisno od tipa...
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      if (pid) return pid->getProbability(Const::proton, Const::pion);
       return 0.5;
     }
 
@@ -261,7 +267,7 @@ namespace Belle2 {
     double particlePvalue(const Particle* part)
     {
       if (!part) return 0;
-      return part->getPValue(); // mogoce raje abs vrednost?
+      return part->getPValue();
     }
 
     double particleNchilds(const Particle* part)

@@ -20,8 +20,8 @@ using namespace Belle2;
 PIDLikelihood::PIDLikelihood()
 {
   for (unsigned short i = 0; i < Const::PIDDetectors::set().size(); i++) {
-    for (Const::ParticleType k = Const::chargedStableSet.begin(); k != Const::chargedStableSet.end(); ++k) {
-      m_logl[i][k.getIndex()] = 0.0;
+    for (unsigned int k = 0; k < Const::chargedStableSet.size(); ++k) {
+      m_logl[i][k] = 0.0;
     }
   }
 }

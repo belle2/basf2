@@ -76,7 +76,7 @@ namespace Belle2 {
 
   private:
     Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
-    float m_logl[8][Const::ChargedStable::c_SetSize]; /**< log likelihoods */
+    float m_logl[4][Const::ChargedStable::c_SetSize]; /**< log likelihoods, FIXME: replace hard coded value */
 
     /*! Calculate likelihood probability from log likelihood difference logl1-logl2 assuming equal prior probablilites
      * @param logl1 log likelihood

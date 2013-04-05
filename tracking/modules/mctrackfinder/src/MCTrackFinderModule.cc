@@ -328,21 +328,23 @@ void MCTrackFinderModule::event()
     int ndf = 0; // cout the ndf of one track candidate
     // create a list containing the indices to the PXDHits that belong to one track
     vector<int> pxdHitsIndices;
-    if (m_useClusters == false) {
-      for (int i = 0; i < nMcPartToPXDHits; ++i) {
-        if (mcPartToPXDTrueHits[i].getFromIndex() == unsigned(iPart)) {
-          for (unsigned int j = 0; j < mcPartToPXDTrueHits[i].getToIndices().size(); j++) {
-            pxdHitsIndices.push_back(mcPartToPXDTrueHits[i].getToIndex(j));
-            ndf += 2;
+    if (m_usePXDHits == true) {
+      if (m_useClusters == false) {
+        for (int i = 0; i < nMcPartToPXDHits; ++i) {
+          if (mcPartToPXDTrueHits[i].getFromIndex() == unsigned(iPart)) {
+            for (unsigned int j = 0; j < mcPartToPXDTrueHits[i].getToIndices().size(); j++) {
+              pxdHitsIndices.push_back(mcPartToPXDTrueHits[i].getToIndex(j));
+              ndf += 2;
+            }
           }
         }
-      }
-    } else {
-      for (int i = 0; i < nPxdClusterToMCPart; ++i) {
-        for (unsigned int j = 0; j < pxdClusterToMCParticle[i].getToIndices().size(); j++) {
-          if (pxdClusterToMCParticle[i].getToIndex(j) == unsigned(iPart)) {
-            pxdHitsIndices.push_back(pxdClusterToMCParticle[i].getFromIndex());
-            ndf += 2;
+      } else {
+        for (int i = 0; i < nPxdClusterToMCPart; ++i) {
+          for (unsigned int j = 0; j < pxdClusterToMCParticle[i].getToIndices().size(); j++) {
+            if (pxdClusterToMCParticle[i].getToIndex(j) == unsigned(iPart)) {
+              pxdHitsIndices.push_back(pxdClusterToMCParticle[i].getFromIndex());
+              ndf += 2;
+            }
           }
         }
       }
@@ -350,33 +352,38 @@ void MCTrackFinderModule::event()
 
     // create a list containing the indices to the SVDHits that belong to one track
     vector<int> svdHitsIndices;
-    if (m_useClusters == false) {
-      for (int i = 0; i < nMcPartToSVDHits; ++i) {
-        if (mcPartToSVDTrueHits[i].getFromIndex() == unsigned(iPart)) {
-          for (unsigned int j = 0; j < mcPartToSVDTrueHits[i].getToIndices().size(); j++) {
-            svdHitsIndices.push_back(mcPartToSVDTrueHits[i].getToIndex(j));
-            ndf += 2;
+    if (m_useSVDHits == true) {
+      if (m_useClusters == false) {
+        for (int i = 0; i < nMcPartToSVDHits; ++i) {
+          if (mcPartToSVDTrueHits[i].getFromIndex() == unsigned(iPart)) {
+            for (unsigned int j = 0; j < mcPartToSVDTrueHits[i].getToIndices().size(); j++) {
+              svdHitsIndices.push_back(mcPartToSVDTrueHits[i].getToIndex(j));
+              ndf += 2;
+            }
           }
         }
-      }
-    } else {
-      for (int i = 0; i < nSvdClusterToMCPart; ++i) {
-        for (unsigned int j = 0; j < svdClusterToMCParticle[i].getToIndices().size(); j++) {
-          if (svdClusterToMCParticle[i].getToIndex(j) == unsigned(iPart)) {
-            svdHitsIndices.push_back(svdClusterToMCParticle[i].getFromIndex());
-            ndf += 1;
+      } else {
+        for (int i = 0; i < nSvdClusterToMCPart; ++i) {
+          for (unsigned int j = 0; j < svdClusterToMCParticle[i].getToIndices().size(); j++) {
+            if (svdClusterToMCParticle[i].getToIndex(j) == unsigned(iPart)) {
+              svdHitsIndices.push_back(svdClusterToMCParticle[i].getFromIndex());
+              ndf += 1;
+            }
           }
         }
       }
     }
 
+
     // create a list containing the indices to the CDCHits that belong to one track
     vector<int> cdcHitsIndices;
-    for (int i = 0; i < nMcPartToCDCHits; ++i) {
-      if (mcPartToCDCHits[i].getFromIndex() == unsigned(iPart)) {
-        for (unsigned int j = 0; j < mcPartToCDCHits[i].getToIndices().size(); j++) {
-          cdcHitsIndices.push_back(mcPartToCDCHits[i].getToIndex(j));
-          ndf += 1;
+    if (m_useCDCHits == true) {
+      for (int i = 0; i < nMcPartToCDCHits; ++i) {
+        if (mcPartToCDCHits[i].getFromIndex() == unsigned(iPart)) {
+          for (unsigned int j = 0; j < mcPartToCDCHits[i].getToIndices().size(); j++) {
+            cdcHitsIndices.push_back(mcPartToCDCHits[i].getToIndex(j));
+            ndf += 1;
+          }
         }
       }
     }
@@ -470,6 +477,7 @@ void MCTrackFinderModule::event()
 
     if (m_usePXDHits && m_useClusters) {
       RelationIndex<PXDCluster, PXDTrueHit> relPxdClusterTrueHit;
+      unsigned int hitCounter = 0;
       BOOST_FOREACH(int hitID, pxdHitsIndices) {
         RelationIndex<PXDCluster, PXDTrueHit>::range_from iterPairCluTr = relPxdClusterTrueHit.getElementsFrom(pxdClusters[hitID]);
         if (iterPairCluTr.first == iterPairCluTr.second) { // there is not trueHit! trow away hit because there is no time information for sorting
@@ -490,8 +498,9 @@ void MCTrackFinderModule::event()
         }
 
         trackCandidates[counter]->addHit(Const::PXD, hitID, -1, double(time));
+        ++hitCounter;
       }
-      B2DEBUG(100, "     add " << pxdHitsIndices.size() << " PXDClusters");
+      B2DEBUG(100, "     add " << hitCounter << " PXDClusters. " << pxdHitsIndices.size() - hitCounter << " PXDClusters were not added because they do not have a corresponding PXDTrueHit");
     }
     if (m_useSVDHits && m_useClusters == false) {
       BOOST_FOREACH(int hitID, svdHitsIndices) {
@@ -502,6 +511,7 @@ void MCTrackFinderModule::event()
     }
     if (m_useSVDHits && m_useClusters) {
       RelationIndex<SVDCluster, SVDTrueHit> relSvdClusterTrueHit;
+      unsigned int hitCounter = 0;
       BOOST_FOREACH(int hitID, svdHitsIndices) {
         RelationIndex<SVDCluster, SVDTrueHit>::range_from iterPairCluTr = relSvdClusterTrueHit.getElementsFrom(svdClusters[hitID]);
         if (iterPairCluTr.first == iterPairCluTr.second) { // there is not trueHit! throw away hit because there is no time information for sorting
@@ -521,8 +531,9 @@ void MCTrackFinderModule::event()
           ++iterPairCluTr.first;
         }
         trackCandidates[counter]->addHit(Const::SVD, hitID, -1, double(time));
+        ++hitCounter;
       }
-      B2DEBUG(100, "     add " << svdHitsIndices.size() << " SVDClusters");
+      B2DEBUG(100, "     add " << hitCounter << " SVDClusters. " << svdHitsIndices.size() - hitCounter << " SVDClusters were not added because they do not have a corresponding SVDTrueHit");
     }
 
 

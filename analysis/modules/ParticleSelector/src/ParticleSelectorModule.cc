@@ -34,6 +34,8 @@ using namespace std;
 
 namespace Belle2 {
 
+  bool ParticleSelectorModule::m_printVariables(true);
+
   //-----------------------------------------------------------------
   //                 Register module
   //-----------------------------------------------------------------
@@ -64,6 +66,15 @@ namespace Belle2 {
 
   void ParticleSelectorModule::initialize()
   {
+
+    if (m_printVariables) {
+      cout << "--------------------------------------------------------\n";
+      cout << "Modular analysis: list of available selection variables:\n";
+      cout << "--------------------------------------------------------\n";
+      m_pSelector.listVariables();
+      cout << "--------------------------------------------------------\n";
+      m_printVariables = false;
+    }
 
     if (m_pdg != 0) {
       StoreObjPtr<ParticleList>::registerTransient(m_listName);

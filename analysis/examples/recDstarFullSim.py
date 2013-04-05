@@ -31,7 +31,7 @@ from basf2 import *
 # applyCuts('D*+',['dM.1 +-0.1 +-(0.15:0.25)','dQ +-0.001'])
 # meaning: (abs(dM.1) <= 0.1 or 0.15 <= abs(dM.1) <= 0.25) and abs(dQ) <= 0.001
 #
-# Available selection variables can be listed with: basf2 -m ParticleSelector
+# Available selection variables are printed at the beginning of execution
 #
 # Selection criteria converted to the usual expressions can be printed out by
 # processing one event at logLevel INFO: basf2 recDstarFullSim.py -n 1 -l INFO

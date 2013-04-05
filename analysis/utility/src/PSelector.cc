@@ -87,15 +87,6 @@ namespace Belle2 {
     addFunction("flavor", "flavor type of decay (0=unflavored, 1=flavored)",
                 particleFlavorType);
 
-
-    cout << "--------------------------------------------------------\n";
-    //    cout<<"PSelector initialized with "<< m_functionList.size()
-    //  << " selection variables:" <<endl;
-    cout << "Modular analysis: list of available selection variables:\n";
-    cout << "--------------------------------------------------------\n";
-    listVariables();
-    cout << "--------------------------------------------------------\n";
-
   }
 
   void PSelector::addFunction(std::string varName, std::string varDescription,

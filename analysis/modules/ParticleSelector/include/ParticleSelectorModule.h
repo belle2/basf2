@@ -73,6 +73,7 @@ namespace Belle2 {
     std::string m_listName;                /**< particle list name */
     std::vector<std::string> m_selection;  /**< selection criteria */
     PSelector m_pSelector;                 /**< particle selector */
+    static bool m_printVariables;   /**< print available selection variables */
 
   };
 

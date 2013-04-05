@@ -139,7 +139,7 @@ namespace Belle2 {
                                             Const::proton
                                            };
 
-    // load reconstaructed tracks as e, mu, pi, K, p
+    // load reconstructed tracks as e, mu, pi, K, p
 
     for (int i = 0; i < Tracks.getEntries(); i++) {
       const Track* track = Tracks[i];

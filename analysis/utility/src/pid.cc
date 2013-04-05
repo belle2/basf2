@@ -88,14 +88,14 @@ const TOPLikelihood* getTOPLikelihood(const MCParticle* particle)
 }
 
 
-const ARICHLikelihoods* getARICHLikelihoods(const MCParticle* particle)
+const ARICHLikelihood* getARICHLikelihood(const MCParticle* particle)
 {
-  StoreArray<ARICHLikelihoods> arichLikelihoods;
+  StoreArray<ARICHLikelihood> arichLikelihoods;
   StoreArray<ARICHAeroHit> arichAeroHits;
   StoreArray<MCParticle> mcParticles;
 
   RelationIndex<MCParticle, ARICHAeroHit> arichAeroHitRel(mcParticles, arichAeroHits);
-  RelationIndex<ARICHAeroHit, ARICHLikelihoods> relAeroToLikelihood(arichAeroHits, arichLikelihoods);
+  RelationIndex<ARICHAeroHit, ARICHLikelihood> relAeroToLikelihood(arichAeroHits, arichLikelihoods);
 
   if (!(arichAeroHitRel && relAeroToLikelihood))
     return 0;
@@ -149,7 +149,7 @@ double getTOPPID(int hyp1, int hyp2, const TOPLikelihood* logL)
   return 0;
 }
 
-double getARICHPID(int hyp1, int hyp2, const ARICHLikelihoods* logL)
+double getARICHPID(int hyp1, int hyp2, const ARICHLikelihood* logL)
 {
   double logl1 = 0.;
   double logl2 = 0.;

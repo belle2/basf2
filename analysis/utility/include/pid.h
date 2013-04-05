@@ -9,7 +9,7 @@
 
 // PID Likelihoods
 #include <top/dataobjects/TOPLikelihood.h>
-#include <arich/dataobjects/ARICHLikelihoods.h>
+#include <arich/dataobjects/ARICHLikelihood.h>
 #include <reconstruction/dataobjects/DedxLikelihood.h>
 
 using namespace Belle2;
@@ -24,7 +24,7 @@ const DedxLikelihood* getDEDXLikelihood(const Track& track);
 const TOPLikelihood* getTOPLikelihood(const MCParticle* particle);
 
 // returns the pointer to ARICHLikelihood for given MCParticle
-const ARICHLikelihoods* getARICHLikelihoods(const MCParticle* particle);
+const ARICHLikelihood* getARICHLikelihood(const MCParticle* particle);
 
 
 // returns the TOP flag
@@ -39,8 +39,8 @@ int getTOPFlag(const Track& track)
 // returns the ARICH flag
 int getARICHFlag(const MCParticle* particle)
 {
-  if (getARICHLikelihoods(particle))
-    return getARICHLikelihoods(particle)->getFlag();
+  if (getARICHLikelihood(particle))
+    return getARICHLikelihood(particle)->getFlag();
 
   return -2;
 }
@@ -53,7 +53,7 @@ double getTOPPID(int hyp1, int hyp2, const TOPLikelihood* logL);
 double getDEDXPID(const Const::ChargedStable& hyp1, const Const::ChargedStable& hyp2, const DedxLikelihood* logL);
 
 // returns the difference between Log likelihoods of 2 hypotheses based on ARICH response
-double getARICHPID(int hyp1, int hyp2, const ARICHLikelihoods* logL);
+double getARICHPID(int hyp1, int hyp2, const ARICHLikelihood* logL);
 
 
 
@@ -79,7 +79,7 @@ double getTOPPID(int hyp1, int hyp2, const MCParticle* particle)
 // returns the difference between Log likelihoods of 2 hypotheses for given MCParticle based on ARICH response
 double getARICHPID(int hyp1, int hyp2, const MCParticle* particle)
 {
-  return getARICHPID(hyp1, hyp2, getARICHLikelihoods(particle));
+  return getARICHPID(hyp1, hyp2, getARICHLikelihood(particle));
 };
 
 

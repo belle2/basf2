@@ -27,6 +27,7 @@
 // dataobjects
 #include <generators/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/Track.h>
+#include <reconstruction/dataobjects/PIDLikelihood.h>
 #include <ecl/dataobjects/ECLGamma.h>
 #include <ecl/dataobjects/ECLPi0.h>
 #include <analysis/dataobjects/Particle.h>
@@ -66,6 +67,8 @@ namespace Belle2 {
   void ParticleLoaderModule::initialize()
   {
     StoreArray<Particle>::registerPersistent();
+    RelationArray::registerPersistent<Particle, PIDLikelihood>();
+    RelationArray::registerPersistent<Particle, MCParticle>();
   }
 
   void ParticleLoaderModule::beginRun()
@@ -127,7 +130,7 @@ namespace Belle2 {
 
   void ParticleLoaderModule::loadFromReconstruction()
   {
-    StoreArray<Track> Tracks("Tracks"); // name should be given (reason typedef?)
+    StoreArray<Track> Tracks;
     StoreArray<ECLGamma> Gammas;
     StoreArray<ECLPi0> Pi0s;
     StoreArray<Particle> Particles;
@@ -143,11 +146,14 @@ namespace Belle2 {
 
     for (int i = 0; i < Tracks.getEntries(); i++) {
       const Track* track = Tracks[i];
+      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(track);
+      const MCParticle* mcParticle = DataStore::getRelated<MCParticle>(track);
       for (int k = 0; k < 5; k++) {
         Particle particle(track, charged[k], i);
         if (particle.getParticleType() == Particle::c_Track) { // should always hold but...
-          Particles.appendNew(particle);
-          // TODO: make relation to PIDLikelihood and MCParticle
+          Particle* newPart = Particles.appendNew(particle);
+          DataStore::addRelationFromTo(newPart, pid);
+          DataStore::addRelationFromTo(newPart, mcParticle);
         }
       }
     }

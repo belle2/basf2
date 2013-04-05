@@ -17,7 +17,7 @@
 #include <tracking/dataobjects/ExtHit.h>
 #include <generators/dataobjects/MCParticle.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
-#include <arich/dataobjects/ARICHLikelihoods.h>
+#include <arich/dataobjects/ARICHLikelihood.h>
 #include <arich/modules/arichReconstruction/ARICHTrack.h>
 
 
@@ -100,10 +100,10 @@ namespace Belle2 {
       // CPU time start
       m_timeCPU = clock() * Unit::us;
 
-      StoreArray<ARICHLikelihoods>::registerPersistent(m_outColName);
-      RelationArray::registerPersistent<ARICHAeroHit, ARICHLikelihoods>(m_MCColName, m_outColName);
-      RelationArray::registerPersistent<Track, ARICHLikelihoods>(m_TracksColName, m_outColName);
-      RelationArray::registerPersistent<ExtHit, ARICHLikelihoods>(m_extHitsColName, m_outColName);
+      StoreArray<ARICHLikelihood>::registerPersistent(m_outColName);
+      RelationArray::registerPersistent<ARICHAeroHit, ARICHLikelihood>(m_MCColName, m_outColName);
+      RelationArray::registerPersistent<Track, ARICHLikelihood>(m_TracksColName, m_outColName);
+      RelationArray::registerPersistent<ExtHit, ARICHLikelihood>(m_extHitsColName, m_outColName);
     }
 
     void ARICHReconstructorModule::beginRun()
@@ -123,7 +123,7 @@ namespace Belle2 {
         StoreArray<ExtHit> extHits(m_extHitsColName);
 
         // Output - likelihoods
-        StoreArray<ARICHLikelihoods> arichLikelihoods(m_outColName);
+        StoreArray<ARICHLikelihood> arichLikelihoods(m_outColName);
         if (!arichLikelihoods.isValid()) arichLikelihoods.create();
 
         // Output - relations
@@ -148,7 +148,7 @@ namespace Belle2 {
           track->getLikelihood(like);
           track->getExpectedNOfPhotons(exp_phot);
 
-          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihoods(1, like, 1, exp_phot);
+          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, like, 1, exp_phot);
 
           int last = arichLikelihoods.getEntries() - 1;
           trackToArich.add(track->getTrackID(), last);
@@ -162,7 +162,7 @@ namespace Belle2 {
         StoreArray<ARICHAeroHit> arichAeroHits(m_MCColName);
 
         // Output: ARICH likelihoods
-        StoreArray<ARICHLikelihoods> arichLikelihoods(m_outColName);
+        StoreArray<ARICHLikelihood> arichLikelihoods(m_outColName);
         arichLikelihoods.create();
 
         // Output: AeroHits to ARICH likelihoods relations
@@ -191,7 +191,7 @@ namespace Belle2 {
           double exp_phot[5];
           track->getLikelihood(like);
           track->getExpectedNOfPhotons(exp_phot);
-          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihoods(1, like, 1, exp_phot);
+          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, like, 1, exp_phot);
           relAeroToLikelihood.add(iTrack, iTrack);
         } // for iTrack
       }

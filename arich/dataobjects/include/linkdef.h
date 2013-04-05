@@ -9,5 +9,6 @@
 #pragma link C++ class Belle2::ARICHAeroHit;
 #pragma link C++ class Belle2::ARICHDigit;
 #pragma link C++ class Belle2::ARICHLikelihoods;
+#pragma link C++ class Belle2::ARICHLikelihood;
 
 #endif

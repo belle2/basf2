@@ -87,11 +87,6 @@ g4sim.logging.log_level = LogLevel.ERROR
 # digitizer
 cdcDigitizer = register_module('CDCDigitizer')
 
-# use one gaussian with resolution of 0.01 in the digitizer (to simplify the
-# fitting)
-param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
-cdcDigitizer.param(param_cdcdigi)
-
 # pattern recognition
 cdctracking = register_module('CDCTracking')
 

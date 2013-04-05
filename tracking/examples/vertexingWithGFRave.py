@@ -38,9 +38,11 @@ param_pGun = {
 pGun.param(param_pGun)
 g4sim = register_module('FullSim')
 g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
+
+# digitizer
 cdcDigitizer = register_module('CDCDigitizer')
-param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
-cdcDigitizer.param(param_cdcdigi)
+
+# find MC tracks
 mctrackfinder = register_module('MCTrackFinder')
 param_mctrackfinder = {
     'UseCDCHits': 1,

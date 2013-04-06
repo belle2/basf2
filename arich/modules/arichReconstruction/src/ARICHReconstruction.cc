@@ -43,7 +43,7 @@ namespace Belle2 {
 
 
     ARICHReconstruction::ARICHReconstruction():
-      _arichgp(ARICHGeometryPar::Instance()), m_bkgLevel(0), m_trackPosRes(0),
+      m_arichGeoParameters(ARICHGeometryPar::Instance()), m_bkgLevel(0), m_trackPosRes(0),
       m_trackAngRes(0), m_singleRes(0), m_aeroMerit(0)
     {
 #ifdef ARICHDEBUG
@@ -57,13 +57,13 @@ namespace Belle2 {
     int ARICHReconstruction::InsideDetector(TVector3 a, int copyno)
     {
       if (copyno == -1) return 0;
-      TVector3 origin = _arichgp->getOrigin(copyno);
+      TVector3 origin = m_arichGeoParameters->getOrigin(copyno);
       TVector2 origin2(origin.X(), origin.Y());
       TVector2 a2(a.X(), a.Y());
-      double phi = _arichgp->getModAngle(copyno);
+      double phi = m_arichGeoParameters->getModAngle(copyno);
       TVector2 diff = a2 - origin2;
       diff = diff.Rotate(-phi);
-      const double size = _arichgp->getSensitiveSurfaceSize();
+      const double size = m_arichGeoParameters->getSensitiveSurfaceSize();
       if (fabs(diff.X()) < size / 2. && fabs(diff.Y()) < size / 2.) {
         return 1;
       }
@@ -112,10 +112,10 @@ namespace Belle2 {
 
       double rmir = 0; double angmir = 0; int section[2] = {0, 0}; double dangle = 0;
       double trkangle = 0;
-      int nmir = _arichgp->getNMirrors();
+      int nmir = m_arichGeoParameters->getNMirrors();
       if (nmir > 0) {
-        rmir = _arichgp->getMirrorPoint(0).XYvector().Mod();
-        angmir = _arichgp->getMirrorsStartAngle();
+        rmir = m_arichGeoParameters->getMirrorPoint(0).XYvector().Mod();
+        angmir = m_arichGeoParameters->getMirrorsStartAngle();
         dangle = 2 * M_PI / nmir;
         trkangle = r.XYvector().Phi() - angmir;
         if (trkangle < 0) trkangle += 2 * M_PI;
@@ -142,15 +142,15 @@ namespace Belle2 {
         if (angle < 0) angle += 2 * M_PI;
         double dangle = 2 * M_PI / nmir;
         section[0] = int(angle / dangle);
-        if (r.Mag() > (r - 2 * _arichgp->getMirrorPoint(section[0])).Mag()) {
+        if (r.Mag() > (r - 2 * m_arichGeoParameters->getMirrorPoint(section[0])).Mag()) {
           refl = true;
           for (int k = 0; k < 2; k++) {
-            TVector3 mirpoint = _arichgp->getMirrorPoint(section[k]);
-            TVector3 mirnorm = _arichgp->getMirrorNormal(section[k]);
+            TVector3 mirpoint = m_arichGeoParameters->getMirrorPoint(section[k]);
+            TVector3 mirnorm = m_arichGeoParameters->getMirrorNormal(section[k]);
             double s = dirf * mirnorm;
             double s1 = (mirpoint - r0) * mirnorm;
             r = r0 + s1 / s * dirf;
-            if (r.Z() < _arichgp->getMirrorsZPosition()) return TVector3();
+            if (r.Z() < m_arichGeoParameters->getMirrorsZPosition()) return TVector3();
             if (fabs(r.XYvector().DeltaPhi(mirnorm.XYvector())) > double(M_PI / nmir)) { r = r0; continue;}
             dirf = dirf - 2 * (dirf * mirnorm) * mirnorm;
             path = (z[a] - r.z()) / dirf.z();
@@ -168,8 +168,8 @@ namespace Belle2 {
     {
 
       if (mirrorID == -1) return hitpos;
-      TVector3 mirpoint = _arichgp->getMirrorPoint(mirrorID);
-      TVector3 mirnorm = _arichgp->getMirrorNormal(mirrorID);
+      TVector3 mirpoint = m_arichGeoParameters->getMirrorPoint(mirrorID);
+      TVector3 mirnorm = m_arichGeoParameters->getMirrorNormal(mirrorID);
       return hitpos - 2 * ((hitpos - mirpoint) * mirnorm) * mirnorm;
     }
 
@@ -197,8 +197,8 @@ namespace Belle2 {
       // dirf photon direction in aerogel
       static TVector3 norm(0, 0, 1); // detector plane normal vector
 
-      double dwin    = _arichgp->getDetectorWindowThickness();
-      double refind0 = _arichgp->getDetectorWindowRefIndex();
+      double dwin    = m_arichGeoParameters->getDetectorWindowThickness();
+      double refind0 = m_arichGeoParameters->getDetectorWindowRefIndex();
 
       // iteration is stoped when the difference of photon positions on first aerogel exit
       // between two iterations is smaller than this value.
@@ -281,7 +281,7 @@ namespace Belle2 {
 
       if (tsize == 0) return 0;
 
-      unsigned int asize = _arichgp->getNumberOfAerogelRadiators();
+      unsigned int asize = m_arichGeoParameters->getNumberOfAerogelRadiators();
       const int maxhyp(5);
       double  esigi[maxhyp];
 
@@ -305,24 +305,24 @@ namespace Belle2 {
 
       if (first) {
 
-        pad_size = _arichgp->getDetectorPadSize();
-        nMirSeg = _arichgp->getNMirrors();
-        angmir  = _arichgp->getMirrorsStartAngle();
+        pad_size = m_arichGeoParameters->getDetectorPadSize();
+        nMirSeg = m_arichGeoParameters->getNMirrors();
+        angmir  = m_arichGeoParameters->getMirrorsStartAngle();
         thickness[asize] = 0;
         for (unsigned int i = 0; i < asize; i++) {
-          refind[i] = _arichgp->getAerogelRefIndex(i) ;
+          refind[i] = m_arichGeoParameters->getAerogelRefIndex(i) ;
           anorm[i] = TVector3(0, 0, 1);
-          thickness[i] = _arichgp->getAerogelThickness(i);
-          zaero[i] = _arichgp->getAerogelZPosition(i) + thickness[i];
-          trlen[i] = _arichgp->getAerogelTransmissionLength(i) ; // aerogel transmission length;
+          thickness[i] = m_arichGeoParameters->getAerogelThickness(i);
+          zaero[i] = m_arichGeoParameters->getAerogelZPosition(i) + thickness[i];
+          trlen[i] = m_arichGeoParameters->getAerogelTransmissionLength(i) ; // aerogel transmission length;
           // measured FOM
           n0[i] = m_aeroMerit[i] / (0.1516 * trlen[i] * (1 - exp(-thickness[i] / trlen[i])));
           thickness[asize]   += thickness[i];
         }
         refind[asize  ]   = 1.0;
-        refind[asize + 1]   = _arichgp->getDetectorWindowRefIndex();
-        zaero[asize  ] = _arichgp->getDetectorZPosition();
-        zaero[asize + 1] = zaero[asize] + _arichgp->getDetectorWindowThickness();
+        refind[asize + 1]   = m_arichGeoParameters->getDetectorWindowRefIndex();
+        zaero[asize  ] = m_arichGeoParameters->getDetectorZPosition();
+        zaero[asize + 1] = zaero[asize] + m_arichGeoParameters->getDetectorWindowThickness();
         first = 0;
       }
 
@@ -332,7 +332,7 @@ namespace Belle2 {
         ARICHTrack* track =  &arichTracks[i];
         int nfot = 0;
         double padArea = pad_size / Unit::m * pad_size / Unit::m;
-        int padNum = _arichgp->getDetectorXPadNumber() * _arichgp->getDetectorXPadNumber();
+        int padNum = m_arichGeoParameters->getDetectorXPadNumber() * m_arichGeoParameters->getDetectorXPadNumber();
 
         // loop over all particle hypotheses
         for (int hyp = 0; hyp < maxhyp; hyp++) {
@@ -358,13 +358,13 @@ namespace Belle2 {
               TVector3 adirf = setThetaPhi(thc[hyp][a], fi); // particle system
               adirf =  TransformFromFixed(edir) * adirf;  // global system
 
-              if (!_arichgp->isSimple()) {
+              if (!m_arichGeoParameters->isSimple()) {
                 TVector3 dposition = FastTracking(adirf, epoint, &refind[a], &zaero[a], asize - a);
-                int copyno =  _arichgp->getCopyNo(dposition);
+                int copyno =  m_arichGeoParameters->getCopyNo(dposition);
                 if (InsideDetector(dposition, copyno)) acceptance[hyp][a] += 1;
               } else {
                 TVector3 dposition = FastTrackingSimple(adirf, epoint, &refind[a], &zaero[a], asize - a);
-                for (int i = 1; i <= _arichgp->getNMCopies(); i++) {
+                for (int i = 1; i <= m_arichGeoParameters->getNMCopies(); i++) {
                   if (InsideDetector(dposition, i)) {
                     acceptance[hyp][a] += 1;
                     break;
@@ -391,7 +391,7 @@ namespace Belle2 {
 
           for (unsigned int a = 0; a < asize; a++) nsig[hyp][asize] += nsig[hyp][a];
 
-          nbgr[hyp] = m_bkgLevel * padArea * padNum * _arichgp->getNMCopies();
+          nbgr[hyp] = m_bkgLevel * padArea * padNum * m_arichGeoParameters->getNMCopies();
 
         }  // for (int hyp=0;hyp < maxhyp; hyp++ )
         //#####################################################
@@ -404,7 +404,7 @@ namespace Belle2 {
         mirrors[0] = -1; // for no reflection
         int refl = 1;
 
-        if (_arichgp->isSimple()) {refl += nMirSeg; mirrors[1] = 0; mirrors[2] = 1;} else {
+        if (m_arichGeoParameters->isSimple()) {refl += nMirSeg; mirrors[1] = 0; mirrors[2] = 1;} else {
           // only if particle track on detector is at radius larger than 850mm (for now hardcoded)
           // possible reflections are taken into account.
           if (track_at_detector.XYvector().Mod() > 85) {
@@ -424,7 +424,7 @@ namespace Belle2 {
           int chID = h->getChannelID();
           int modID = h->getModuleID();
 
-          TVector3 hitpos = _arichgp->getChannelCenterGlob(modID, chID);
+          TVector3 hitpos = m_arichGeoParameters->getChannelCenterGlob(modID, chID);
           for (int hyp = 0; hyp < maxhyp; hyp++) esigi[hyp] = 0;
           int nfoo = nfot;
           // loop over all arogel layers
@@ -456,7 +456,7 @@ namespace Belle2 {
               if (fi_cer < 0) fi_cer += 2 * M_PI;
               double fii = 0;
               if (mirr > 0) {
-                double fi_mir = _arichgp->getMirrorNormal(mirrors[mirr]).XYvector().Phi();
+                double fi_mir = m_arichGeoParameters->getMirrorNormal(mirrors[mirr]).XYvector().Phi();
                 fii = 2 * fi_mir - fi_cer - M_PI;
               }
               // loop over all particle hypotheses
@@ -470,7 +470,7 @@ namespace Belle2 {
                 TVector3  trackAtAerogelExit = edir * (thickness[ar] / edir.z());
                 TVector3  dtrackphoton = photonAtAerogelExit - trackAtAerogelExit;
                 TVector3 detector_position;
-                if (!_arichgp->isSimple()) {
+                if (!m_arichGeoParameters->isSimple()) {
                   detector_position = FastTracking(dirf1, epoint, &refind[ar], &zaero[ar], asize - ar);
                 } else {
                   detector_position = FastTrackingSimple(dirf1, epoint, &refind[ar], &zaero[ar], asize - ar);
@@ -482,8 +482,8 @@ namespace Belle2 {
                 double   detector_sigma    = m_singleRes * path / meanr.z();
 
                 // calculate pad orientation and distance relative to that photon
-                TVector3 modorigin = _arichgp->getOrigin(modID);
-                double modphi =  _arichgp->getModAngle(modID);
+                TVector3 modorigin = m_arichGeoParameters->getOrigin(modID);
+                double modphi =  m_arichGeoParameters->getModAngle(modID);
 
                 double      pad_fi = fii - modphi;
 
@@ -580,7 +580,7 @@ namespace Belle2 {
       //  z[n-1] .. 2nd aerogel exit
       //  z[n-1] .. 2nd aerogel exit
 
-      int nmir = _arichgp->getNMirrors();
+      int nmir = m_arichGeoParameters->getNMirrors();
       double path = 0;
       double rind = 0;
       bool reflok = false; bool refl = false;
@@ -597,15 +597,15 @@ namespace Belle2 {
         // check for possible reflections
         if (a != n) continue;
         for (int k = 0; k < nmir; k++) {
-          TVector3 mirpoint = _arichgp->getMirrorPoint(k);
-          TVector3 mirnorm = _arichgp->getMirrorNormal(k);
+          TVector3 mirpoint = m_arichGeoParameters->getMirrorPoint(k);
+          TVector3 mirnorm = m_arichGeoParameters->getMirrorNormal(k);
           TVector2 dr = rxy - mirpoint.XYvector();
           if (dr.X()*mirnorm.X() + dr.Y()*mirnorm.Y() > 0) {
             refl = true;
             double s = dirf * mirnorm;
             double s1 = (mirpoint - r0) * mirnorm;
             r = r0 + s1 / s * dirf;
-            if (r.Z() < _arichgp->getMirrorsZPosition()) return TVector3();
+            if (r.Z() < m_arichGeoParameters->getMirrorsZPosition()) return TVector3();
             if ((r.XYvector() - mirpoint.XYvector()).Mod() > 20) { r = r0; continue;}
             dirf = dirf - 2 * (dirf * mirnorm) * mirnorm;
             path = (z[a] - r.z()) / dirf.z();

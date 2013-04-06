@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj                                             *
+ * Contributors: Luka Santelj, Dino Tahirovic                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -21,11 +21,11 @@
 
 namespace Belle2 {
   namespace arich {
-    /**
-     * This module calculates the values of particles identity likelihood function
+    /** This module calculates the values of particles identity likelihood function
      *
      * It reads the tracks and hits information from datastore, for each
-     * track it creates ARICHTrack, calculates values of likelihood function
+     * track it creates internal vector ARICHTrack, calculates
+     * values of likelihood function
      * for different particle hypotheses and stores them in datastore.
      */
 
@@ -78,15 +78,15 @@ namespace Belle2 {
       void printModuleParams() const;
 
     private:
-      /** Input collections */
+      // Input collections
       std::string m_MCColName;         /**< Input collection name */
       std::string m_TracksColName;     /**< MDST tracks */
       std::string m_extHitsColName;    /**< Extrapolated tracks */
 
-      /** Output collection */
-      std::string m_outColName;        /**< Output collection name */
+      // Output collection
+      std::string m_outColName;        /**< Output likelihoods */
 
-      /** Other members.*/
+      // Other members.
       ARICHReconstruction* m_ana;      /**< Class with reconstruction tools */
       double m_timeCPU;                /**< CPU time.     */
       int    m_nRun;                   /**< Run number.   */
@@ -99,11 +99,11 @@ namespace Belle2 {
       int m_inputTrackType;            /**< Input tracks from the tracking (0) or from MCParticles>AeroHits (1). */
 
       //! Function fills the internal vector ARICHTracks from ext module
-      /*
-        \param arichTracks
-        \param hypothesis
+      /*!
+        \param tracks Internal ARICH vector reference.
+        \param hypothesis The hypothesis for the particle.
        */
-      void getTracks(std::vector<ARICHTrack> &, Const::ChargedStable);
+      void getTracks(std::vector<ARICHTrack> & tracks, Const::ChargedStable hypothesis);
 
     };
 

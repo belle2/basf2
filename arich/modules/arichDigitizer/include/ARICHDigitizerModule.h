@@ -76,15 +76,16 @@ namespace Belle2 {
 
     private:
 
-      std::string m_inColName;         /**< Input collection name */
-      std::string m_outColName;        /**< Output collection name */
+      std::string m_inColName;         /**< Input collection name from simulation */
+      std::string m_outColName;        /**< Output collection name: digitized photons hits */
 
       /* Other members.*/
       double m_timeCPU;                /**< CPU time.     */
       int    m_nRun;                   /**< Run number.   */
       int    m_nEvent;                 /**< Event number. */
 
-      ARICHGeometryPar* m_arichgp;
+      ARICHGeometryPar* m_arichgp;    /**< Geometry parameters of ARICH. */
+
       //! Returns q.e. of detector at given photon energy
       /*!
       \param energy energy at which q.e. is returned

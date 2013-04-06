@@ -15,8 +15,13 @@
 
 namespace Belle2 {
 
+  /** \addtogroup dataobjects
+   *@ {
+   */
 
-  /*! This is a class to store ARICH likelihoods in the datastore.
+
+  /** This is a class to store ARICH likelihoods in the datastore.
+   *
    *  It is the output of reconstruction module (ARICHReconstructor).
    */
 

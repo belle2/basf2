@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj, Rok Pestotnik                              *
+ * Contributors: Luka Santelj, Rok Pestotnik, Dino Tahirovic              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -21,14 +21,21 @@
 
 namespace Belle2 {
 
-  //!  This is class for aRICH track.
-  /*!  This track class holds track parameters and track related routines needed by reconstruction. After reconstruction, values of likelihood function for different particle hypotheses associated with track are written. This should be changed with more general track class eventually.
-   */
+
   class ARICHGeometryPar;
+
+  /**  This is class for ARICH track.
+   *
+   *   This is internal ARICH track class. It holds track parameters and
+   *   track related functions needed by reconstruction.
+   *   After reconstruction, it sets values of likelihood function
+   *   and number of the expected photons for
+   *   different particle hypotheses, associated with each track.
+   */
   class ARICHTrack : public TObject {
   public:
 
-    //! Default constructor for ROOT IO. */
+    //! Empty constructor for ROOT IO
     ARICHTrack():
       m_originalPosition(0, 0, 0),
       m_originalDirection(0, 0, 0),
@@ -49,13 +56,13 @@ namespace Belle2 {
       }
     }
 
-    //! Constructor from track hit on aerogel plane */
+    //! Constructor from simulation hit on aerogel plane
     /*!
       \param aeroHit track hit on aerogel plane (ARICHAeroHit)
     */
     ARICHTrack(const ARICHAeroHit& aeroHit);
 
-    //! Useful constructor */
+    //! Useful constructor
     /*!
       \param r vector of track position on aerogel plane
       \param dir vector of track direction on aerogel plane
@@ -63,7 +70,6 @@ namespace Belle2 {
       \param type PDG id of particle
       \param trackID geant4 track id
      */
-
     ARICHTrack(TVector3 r, TVector3 dir, double p, int type, int trackID) :
       m_originalPosition(r),
       m_originalDirection(dir),
@@ -83,7 +89,7 @@ namespace Belle2 {
       }
     };
 
-    //! Constructor from hit in 'ext' module */
+    //! Constructor from hit in 'ext' module
     /*!
       \param extHit track hit on aerogel aluminium support plate
       \param charge charge of the particle
@@ -202,7 +208,7 @@ namespace Belle2 {
     TVector3 m_originalDirection;         /**< Original direction on aerogel plane. */
     double   m_originalMomentum;          /**< Original momentum on aerogel plane. */
 
-    // track parameter from tracking (for now just "smeared" parameters from simulation)
+    // track parameter from tracking
     TVector3 m_reconstructedPosition;     /**< Reconstructed position.  */
     TVector3 m_reconstructedDirection;    /**< Reconstructed direction. */
     double   m_reconstructedMomentum;     /**< Reconstructed momentum. */
@@ -221,7 +227,7 @@ namespace Belle2 {
 
 
     //! converts PDG particle code to particle index
-    /*
+    /*!
       \param PDG particle code
      */
     int Lund2Type(int ipart);

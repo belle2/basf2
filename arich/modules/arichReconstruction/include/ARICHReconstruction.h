@@ -52,7 +52,7 @@ namespace Belle2 {
 
     private:
 
-      ARICHGeometryPar* _arichgp; /**< holding the parameters of detector */
+      ARICHGeometryPar* m_arichGeoParameters; /**< holding the parameters of detector */
       double m_bkgLevel; /**< detector photon background level */
       double m_trackPosRes; /**< track position resolution (from tracking) */
       double m_trackAngRes; /**< track direction resolution (from tracking) */

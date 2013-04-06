@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj                                             *
+ * Contributors: Luka Santelj, Dino Tahirovic                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -221,18 +221,18 @@ namespace Belle2 {
     }
 
     void ARICHReconstructorModule::getTracks(std::vector<ARICHTrack> & tracks,
-                                             Const::ChargedStable chargedStable)
+                                             Const::ChargedStable hypothesis)
     {
       ExtDetectorID myDetID = EXT_ARICH; // arich
-      int pdgCode = abs(chargedStable.getPDGCode());
+      int pdgCode = abs(hypothesis.getPDGCode());
 
       StoreArray<Track> Tracks(m_TracksColName);
 
       for (int itra = 0; itra < Tracks.getEntries(); ++itra) {
         const Track* track = Tracks[itra];
-        const TrackFitResult* fitResult = track->getTrackFitResult(chargedStable);
+        const TrackFitResult* fitResult = track->getTrackFitResult(hypothesis);
         if (!fitResult) {
-          B2ERROR("No TrackFitResult for " << chargedStable.getPDGCode());
+          B2ERROR("No TrackFitResult for " << hypothesis.getPDGCode());
           continue;
         }
         int charge = fitResult->getCharge();

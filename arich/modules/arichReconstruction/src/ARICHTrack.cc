@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj, Rok Pestotnik                              *
+ * Contributors: Luka Santelj, Rok Pestotnik, Dino Tahirovic              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

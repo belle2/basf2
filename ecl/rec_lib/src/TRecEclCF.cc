@@ -117,10 +117,17 @@ TRecEclCF::Accumulate(const TEclEnergyHit& ahit)
     int cid = ahit.CellId();
 //        ECLGeometryPar geom;
     ECLGeometryPar* geom = ECLGeometryPar::Instance();
-    geom->Mapping(cid);
-    int ith = geom->GetThetaID();
-    if (ahit.Energy() > fParameters.fgEthX3[ith] / 1000.)
-      fEnergyHits[ahit.CellId()] = ahit;
+
+
+    if (cid < 0 || cid > 8735) {
+      cout << "TEclEnergyHit Accumulate candidate " << cid << ". Out of range: 0~8735  " << endl;
+    } else {
+      geom->Mapping(cid);
+      int ith = geom->GetThetaID();
+      if (ahit.Energy() > fParameters.fgEthX3[ith] / 1000.) {
+        fEnergyHits[ahit.CellId()] = ahit;
+      }
+    }
   }
 }
 // helper

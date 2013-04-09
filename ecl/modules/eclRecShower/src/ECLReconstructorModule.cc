@@ -105,6 +105,10 @@ void ECLReconstructorModule::event()
 
     int cId          = (aECLDigi->getCellId() - 1);
     if (FitEnergy < 0.) {continue;}
+    if (cId < 0 || cId > 8735) {
+      B2WARNING("ECL Digi  " << cId << ". Out of range: 0~8735  ");
+      continue;
+    }
 
     cf.Accumulate(m_nEvent, FitEnergy, cId);
   }

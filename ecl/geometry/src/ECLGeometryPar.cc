@@ -167,7 +167,7 @@ int ECLGeometryPar::GetCellID(int ThetaId, int PhiId)
     mPar_cellID = 7776 + backRing[ThetaId - 59] * 16 + PhiId;
   } else if (ThetaId > 12 && ThetaId < 59) {
     mPar_cellID = 1152 + 144 * (ThetaId - 13)  + PhiId;
-  } else     B2ERROR("ECL ECLGeometryPar::CellID int ThetaId " << ThetaId << " int PhiId " << PhiId << ". Out of range.");
+  } else     B2WARNING("ECL ECLGeometryPar::CellID int ThetaId " << ThetaId << " int PhiId " << PhiId << ". Out of range.");
 
   mPar_thetaID = ThetaId;
   mPar_phiID =  PhiId ;
@@ -181,7 +181,7 @@ void ECLGeometryPar::Mapping(int cid)
 
   mPar_cellID = cid;
   if (cid < 0) {
-    B2ERROR("ECL ECLGeometryPar Mapping  " << cid << ". Out of range.");
+    B2WARNING("ECL ECLGeometryPar Mapping  " << cid << ". Out of range.");
   } else if (cid < 3 * 16) { //Forkward start
     mPar_thetaID = 0;
     mPar_phiID = cid;
@@ -303,7 +303,7 @@ void ECLGeometryPar::Mapping(int cid)
     mPar_phiIndex = mPar_phiID % 4 + 128;
     mPar_thetaIndex = mPar_phiID / 4;
   } else {
-    B2ERROR("ECL ECLGeometryPar Mapping  " << cid << ". Out of range.");
+    B2WARNING("ECL ECLGeometryPar Mapping  " << cid << ". Out of range.");
   }
 //      cout<<"cid "<<cid<<" mPar_thetaID "<<mPar_thetaID<<" mPar_phiID "<<mPar_phiID<<" mPar_phiIndex "<<mPar_phiIndex<<" mPar_thetaIndex "<<mPar_thetaIndex<<endl;
 
@@ -320,7 +320,7 @@ int ECLGeometryPar::ECLVolNameToCellID(const G4String VolumeName)
   int iCry = atoi(temp6) - 1;
 
   if (VolumeName.c_str() == 0) {
-    B2ERROR("ECL simulation cellId; Sector  " << GSector << ". Out of range.");
+    B2WARNING("ECL simulation cellId; Sector  " << GSector << ". Out of range.");
     return -1;
   } else if (string(VolumeName.c_str()).find("Fw") != string::npos) {
 
@@ -539,7 +539,7 @@ int EclNbr::GetCellID(int ThetaId, int PhiId)
     mNbr_cellID = 7776 + backRing[ThetaId - 59] * 16 + PhiId;
   } else if (ThetaId > 12 && ThetaId < 59) {
     mNbr_cellID = 1152 + 144 * (ThetaId - 13)  + PhiId;
-  } else     B2ERROR("ECL ECLGeometryNbr::CellID int ThetaId " << ThetaId << " int PhiId " << PhiId << ". Out of range.");
+  } else     B2WARNING("ECL ECLGeometryNbr::CellID int ThetaId " << ThetaId << " int PhiId " << PhiId << ". Out of range.");
 
   mNbr_thetaID = ThetaId;
   mNbr_phiID =  PhiId ;
@@ -552,7 +552,7 @@ void EclNbr::Mapping(int cid)
 
   mNbr_cellID = cid;
   if (cid < 0) {
-    B2ERROR("ECL ECLGeometryNbr Mapping  " << cid << ". Out of range.");
+    B2WARNING("ECL ECLGeometryNbr Mapping  " << cid << ". Out of range.");
   } else if (cid < 3 * 16) { //Forkward start
     mNbr_thetaID = 0;
     mNbr_phiID = cid;
@@ -626,9 +626,10 @@ void EclNbr::Mapping(int cid)
     mNbr_thetaID = 68;
     mNbr_phiID =   cid - 7776 - 56 * 16 ;
   } else {
-    B2ERROR("ECL ECLGeometryNbr Mapping  " << cid << ". Out of range.");
+    B2WARNING("ECL ECLGeometryNbr Mapping  " << cid << ". Out of range.");
   }
 }
+
 EclNbr
 EclNbr::getNbr(const Identifier aCellId)
 {
@@ -1020,7 +1021,7 @@ namespace Belle2 {
     int iCry = atoi(temp6) - 1;
 
     if (VolumeName.c_str() == 0) {
-      B2ERROR("ECL simulation cellId; Sector  " << GSector << ". Out of range.");
+      B2WARNING("ECL simulation cellId; Sector  " << GSector << ". Out of range.");
       return -1;
     } else if (string(VolumeName.c_str()).find("Fw") != string::npos) {
 

@@ -130,6 +130,11 @@ TEclCFCR::SearchLocalMaxima(EclGeV threshold)
     cands.erase(cands.begin());
 
     bool found = true;
+    int cid = aCand.CellId();
+    if (cid < 0 || cid > 8735) {
+      cout << "SearchLocalMaxima candidate " << cid << ". Out of range: 0~8735  " << endl;
+      continue;
+    }
 
     const EclNbr& aNbr(tmpNbr.getNbr(aCand.CellId()));
     for (std::vector<EclNbr::Identifier>::const_iterator

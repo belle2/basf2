@@ -216,8 +216,10 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
   } else {
     if (hepevt_.isthep[index - 1] == 3 || hepevt_.isthep[index - 1] == 2)
       gParticle->setStatus(MCParticleGraph::GraphParticle::c_PrimaryParticle);
-    if (hepevt_.isthep[index - 1] == 1)
-      gParticle->setStatus(MCParticleGraph::GraphParticle::c_StableInGenerator);
+    if (hepevt_.isthep[index - 1] == 1) {
+      gParticle->setStatus(MCParticleGraph::GraphParticle::c_PrimaryParticle);
+      gParticle->addStatus(MCParticleGraph::GraphParticle::c_StableInGenerator);
+    }
   }
   return;
 }

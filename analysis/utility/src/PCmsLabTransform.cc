@@ -75,7 +75,7 @@ void PCmsLabTransform::update(double Eher, double Eler, double cross_angle, doub
   // obtain the backward transformation
   m_cms2lab = m_lab2cms.Inverse();
 
-  m_cmsEnergy = (m_cms2lab * m_boost).E();
+  m_cmsEnergy = m_boost.M();
 
   B2INFO("PCmsLabTransform: " << Eher << " " << Eler << " " << cross_angle << " " << angle);
 

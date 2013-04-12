@@ -208,8 +208,8 @@ const Const::DetectorSet Const::TrackingDetectors::c_set = Const::PXD + Const::S
 
 const Const::DetectorSet Const::PIDDetectors::c_set = Const::SVD + Const::CDC + Const::TOP + Const::ARICH;
 
-Const::DetectorSet allDetectors = Const::IR + Const::PXD + Const::SVD + Const::CDC +
-                                  Const::TOP + Const::ARICH + Const::ECL + Const::BKLM + Const::EKLM;
+const Const::DetectorSet Const::allDetectors = Const::IR + Const::PXD + Const::SVD + Const::CDC +
+                                               Const::TOP + Const::ARICH + Const::ECL + Const::BKLM + Const::EKLM;
 
 
 bool Const::ParticleType::operator < (const Const::ParticleType& other) const

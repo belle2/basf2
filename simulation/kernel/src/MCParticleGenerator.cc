@@ -66,15 +66,13 @@ void MCParticleGenerator::addParticle(MCParticle& mcParticle, G4Event* event, G4
 
   //Check if the particle should be added to Geant4
   //Only add the particle if its pdg value is known to Geant4 and it is not flagged as virtual.
-  bool addToG4 = true;
+  bool addToG4 = !mcParticle.isVirtual();
 
   G4ParticleDefinition* pdef = G4ParticleTable::GetParticleTable()->FindParticle(mcParticle.getPDG());
   if (pdef == NULL) {
-    B2WARNING("PDG code " << mcParticle.getPDG() << " unknown to Geant4. Particle will be skipped.")
+    if (addToG4) B2WARNING("PDG code " << mcParticle.getPDG() << " unknown to Geant4. Particle will be skipped.");
     addToG4 = false;
   }
-
-  addToG4 = addToG4 && (!mcParticle.isVirtual());
 
   //Add the particle to the MCParticle graph
   MCParticleGraph::GraphParticle& graphParticle = m_mcParticleGraph.addParticle();

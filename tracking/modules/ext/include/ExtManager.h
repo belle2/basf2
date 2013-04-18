@@ -37,8 +37,6 @@ class G4Track;
 
 namespace Belle2 {
 
-  class ExtNavigator;
-
   /** It is the main interface for the user to define the setup and start the propagation.
    *  Initializes GEANT4 for the propagation. **/
   class ExtManager {
@@ -67,7 +65,8 @@ namespace Belle2 {
     G4bool InitFieldForBackwards();
 
     //! Propagate a track to completion
-    G4int Propagate(G4ErrorTrajState* currentTS, const G4ErrorTarget* target, G4ErrorMode mode = G4ErrorMode_PropForwards);
+    G4int Propagate(G4ErrorTrajState* currentTS, const G4ErrorTarget* target,
+                    G4ErrorMode mode = G4ErrorMode_PropForwards);
 
     //! Propagate a track by one step
     G4int PropagateOneStep(G4ErrorTrajState* currentTS,
@@ -109,9 +108,6 @@ namespace Belle2 {
     //! Get the propagator
     inline G4ErrorPropagator* GetPropagator() const;
 
-    //! Get the navigator
-    inline ExtNavigator* GetNavigator() const;
-
   private:
 
     //! constructor is hidden: user calls ExtManager::GetManager() instead
@@ -119,9 +115,6 @@ namespace Belle2 {
 
     //! Create a RunManager helper
     void StartHelper();
-
-    //! create an ExtNavigator
-    void StartNavigator();
 
   private:
 
@@ -134,19 +127,11 @@ namespace Belle2 {
     //! Stores pointer to the propagator
     G4ErrorPropagator* m_propagator;
 
-    //! Stores pointer to the navigator
-    ExtNavigator* m_navigator;
-
-    //! Stores pointer to the backward-propagation EquationOfMotion
-    G4Mag_UsualEqRhs* m_equationOfMotion;
-
   };
 
   inline G4ErrorRunManagerHelper* ExtManager::GetHelper() const { return m_helper; }
 
   inline G4ErrorPropagator* ExtManager::GetPropagator() const { return m_propagator; }
-
-  inline ExtNavigator* ExtManager::GetNavigator() const { return m_navigator; }
 
 } // end of namespace Belle2
 

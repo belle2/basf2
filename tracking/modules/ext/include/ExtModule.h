@@ -135,6 +135,11 @@ namespace Belle2 {
     // Time of flight (ns) along the track from the interaction point
     double m_tof;
 
+    // Boundaries of virtual "target" cylinder
+    double m_ZMin;
+    double m_ZMax;
+    double m_RMaxSq;
+
   };
 
 } // end of namespace Belle2

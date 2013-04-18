@@ -10,30 +10,10 @@
  **************************************************************************/
 
 #include <tracking/modules/ext/ExtManager.h>
-#include <tracking/modules/ext/ExtNavigator.h>
-#include <G4MagIntegratorStepper.hh>
-#include <G4Mag_UsualEqRhs.hh>
-#include <G4Mag_EqRhs.hh>
-#include <G4MagIntegratorDriver.hh>
-#include <G4ClassicalRK4.hh>
-#include <G4ExactHelixStepper.hh>
-#include <G4HelixExplicitEuler.hh>
 #include <G4EventManager.hh>
 #include <G4ErrorRunManagerHelper.hh>
 #include <G4ErrorPropagator.hh>
-#include <G4ErrorMag_UsualEqRhs.hh>
-#include <G4VParticleChange.hh>
-#include <G4ParticleChangeForMSC.hh>
-#include <G4ParticleChange.hh>
-#include <G4Track.hh>
-#include <G4TransportationManager.hh>
-#include <G4GeometryManager.hh>
 #include <G4StateManager.hh>
-#include <G4ChordFinder.hh>
-#include <G4EquationOfMotion.hh>
-#include <G4FieldManager.hh>
-#include <G4PropagatorInField.hh>
-#include <G4VParticleChange.hh>
 
 #include <framework/logging/Logger.h>
 
@@ -52,17 +32,12 @@ ExtManager* ExtManager::GetManager()
 ExtManager::ExtManager()
 {
   m_propagator = NULL;
-  m_equationOfMotion = NULL;
   StartHelper();
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetState(G4ErrorState_PreInit);
-  m_navigator = NULL;
-  StartNavigator(); //navigator has to be initialized at the beginning !?!?!
 }
 
 ExtManager::~ExtManager()
 {
-  if (m_equationOfMotion) delete m_equationOfMotion;
-  if (m_navigator) delete m_navigator;
   if (m_propagator) delete m_propagator;
   if (m_helper) delete m_helper;
   if (m_manager) delete m_manager;
@@ -76,30 +51,6 @@ void ExtManager::StartHelper()
   }
   B2DEBUG(200, "Module ext: ExtManager::StartHelper() done")
 
-}
-
-void ExtManager::StartNavigator()
-{
-  // Replace G4Navigator with ExtNavigator, which is an extension of G4Navigator that
-  // examines the geant4e "target" surface also when computing distance to boundary
-  // (but only if geant4e is actively propagating a track!)
-  if (m_navigator == NULL) {
-    G4TransportationManager* transportationManager = G4TransportationManager::GetTransportationManager();
-    G4Navigator* g4navi = transportationManager->GetNavigatorForTracking();
-    G4VPhysicalVolume* world = g4navi->GetWorldVolume();
-    G4int verbosity = g4navi->GetVerboseLevel();
-
-    delete g4navi;
-    m_navigator = new ExtNavigator;
-    if (world != 0) {
-      m_navigator->SetWorldVolume(world);
-    }
-    m_navigator->SetVerboseLevel(verbosity);
-    transportationManager->SetNavigatorForTracking((G4Navigator*)m_navigator);
-    transportationManager->GetPropagatorInField()->GetIntersectionLocator()->SetNavigatorFor((G4Navigator*)m_navigator);
-    G4EventManager::GetEventManager()->GetTrackingManager()->GetSteppingManager()->SetNavigator((G4Navigator*)m_navigator);
-  }
-  B2INFO("Module ext: ExtManager::StartNavigator(): initial state is " << PrintExtState())
 }
 
 void ExtManager::InitGeant4e()

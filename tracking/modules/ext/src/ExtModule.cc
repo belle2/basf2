@@ -52,7 +52,6 @@
 #include <G4RegionStore.hh>
 #include <G4ErrorPropagatorData.hh>
 #include <G4ErrorPropagator.hh>
-#include <G4ErrorTrackLengthTarget.hh>
 #include <G4ErrorTrajErr.hh>
 #include <G4ErrorFreeTrajState.hh>
 #include <G4StateManager.hh>
@@ -135,10 +134,12 @@ void ExtModule::initialize()
 
   GearDir strContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
   double offsetZ = strContent.getLength("OffsetZ") * cm;
-  double rMin = strContent.getLength("Cryostat/Rmin") * cm;
+  double rMax = strContent.getLength("Cryostat/Rmin") * cm;
   double halfLength = strContent.getLength("Cryostat/HalfLength") * cm;
-  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(new
-                                                             ExtCylSurfaceTarget(rMin, offsetZ - halfLength, offsetZ + halfLength));
+  m_RMaxSq = rMax * rMax;
+  m_ZMin = offsetZ - halfLength;
+  m_ZMax = offsetZ + halfLength;
+  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(new ExtCylSurfaceTarget(rMax, m_ZMin, m_ZMax));
 
   // Hypotheses for extrapolation
   if (m_pdgCode.empty()) {
@@ -266,11 +267,9 @@ void ExtModule::event()
           createHit(state, EXT_STOP, t, pdgCode, extHits, TrackToExtHits);
           break;
         }
-        if (G4ErrorPropagatorData::GetErrorPropagatorData()->GetState() == G4ErrorState(G4ErrorState_TargetCloserThanBoundary)) {
-          createHit(state, EXT_ESCAPE, t, pdgCode, extHits, TrackToExtHits);
-          break;
-        }
-        if (m_extMgr->GetPropagator()->CheckIfLastStep(track)) {
+        double z = track->GetPosition().z();
+        double rSq = track->GetPosition().perp2();
+        if ((z < m_ZMin) || (z > m_ZMax) || (rSq > m_RMaxSq)) {
           createHit(state, EXT_ESCAPE, t, pdgCode, extHits, TrackToExtHits);
           break;
         }

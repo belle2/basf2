@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EXTMAGFIELDLIMITPROCESS_H_
-#define EXTMAGFIELDLIMITPROCESS_H_
+#ifndef EXTSTEPLENGTHLIMITPROCESS_H_
+#define EXTSTEPLENGTHLIMITPROCESS_H_
 
 #include <globals.hh>
 #include "G4VDiscreteProcess.hh"
@@ -22,15 +22,15 @@ namespace Belle2 {
   namespace Simulation {
 
     //! Defines the physics process that avoids hit invocation in sensitive volumes
-    class ExtMagFieldLimitProcess: public G4VDiscreteProcess {
+    class ExtStepLengthLimitProcess: public G4VDiscreteProcess {
 
     public:
 
       //! constructor
-      ExtMagFieldLimitProcess(const G4String& processName = "ExtMagFieldLimitProcess");
+      ExtStepLengthLimitProcess(const G4String& processName = "ExtStepLengthLimitProcess");
 
       //! destructor
-      ~ExtMagFieldLimitProcess();
+      ~ExtStepLengthLimitProcess();
 
       //! Do nothing special after the particle has stepped
       G4VParticleChange* PostStepDoIt(const G4Track&, const G4Step&);
@@ -49,9 +49,6 @@ namespace Belle2 {
 
     private:
 
-      //! Stores the pointer to the magnetic field class
-      const G4Field* m_field;
-
       //! Pointer to a reusable G4ParticleChange object
       G4ParticleChange* m_particleChange;
 
@@ -66,4 +63,4 @@ namespace Belle2 {
 
 } //end Belle2 namespace
 
-#endif /* EXTMAGFIELDLIMITPROCESS_H_ */
+#endif /* EXTSTEPLENGTHLIMITPROCESS_H_ */

@@ -9,10 +9,10 @@
  **************************************************************************/
 
 #include <simulation/kernel/ExtMessenger.h>
+#include <simulation/kernel/ExtStepLengthLimitProcess.h>
 #include <simulation/kernel/ExtMagFieldLimitProcess.h>
 #include <simulation/kernel/ExtEnergyLoss.h>
 #include <globals.hh>
-#include <G4ErrorStepLengthLimitProcess.hh>
 #include <G4UIdirectory.hh>
 #include <G4UIcmdWithADoubleAndUnit.hh>
 #include <G4UIcmdWithADouble.hh>
@@ -23,7 +23,7 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::Simulation;
 
-ExtMessenger::ExtMessenger(G4ErrorStepLengthLimitProcess* lAct, ExtMagFieldLimitProcess* mAct, ExtEnergyLoss* eAct) :
+ExtMessenger::ExtMessenger(ExtStepLengthLimitProcess* lAct, ExtMagFieldLimitProcess* mAct, ExtEnergyLoss* eAct) :
   m_stepLengthAction(lAct),
   m_magFieldAction(mAct),
   m_energyLossAction(eAct)

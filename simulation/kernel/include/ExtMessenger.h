@@ -18,12 +18,12 @@ class G4UIdirectory;
 class G4UIcmdWithAString;
 class G4UIcmdWithADoubleAndUnit;
 class G4UIcmdWithADouble;
-class G4ErrorStepLengthLimitProcess;
 
 namespace Belle2 {
 
   namespace Simulation {
 
+    class ExtStepLengthLimitProcess;
     class ExtMagFieldLimitProcess;
     class ExtEnergyLoss;
 
@@ -36,7 +36,7 @@ namespace Belle2 {
     public:
 
       //! constructor
-      ExtMessenger(G4ErrorStepLengthLimitProcess*,
+      ExtMessenger(ExtStepLengthLimitProcess*,
                    ExtMagFieldLimitProcess*,
                    ExtEnergyLoss*);
 
@@ -49,7 +49,7 @@ namespace Belle2 {
     private:
 
       //! Process that limits the geant4e step length
-      G4ErrorStepLengthLimitProcess* m_stepLengthAction;
+      ExtStepLengthLimitProcess* m_stepLengthAction;
 
       //! Process that limits the geant4e step length in magnetic field
       ExtMagFieldLimitProcess* m_magFieldAction;

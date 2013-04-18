@@ -16,7 +16,7 @@
 #include <G4ComptonScattering.hh>
 #include <G4GammaConversion.hh>
 #include <G4PhotoElectricEffect.hh>
-#include <G4ErrorStepLengthLimitProcess.hh>
+#include <simulation/kernel/ExtStepLengthLimitProcess.h>
 #include <simulation/kernel/ExtMagFieldLimitProcess.h>
 #include <simulation/kernel/ExtEnergyLoss.h>
 #include <simulation/kernel/ExtNoHits.h>
@@ -151,7 +151,7 @@ void ExtPhysicsConstructor::ConstructProcess()
 {
   // Define the limited set of processes that will be suffered by the
   // geant4e-specific particles
-  G4ErrorStepLengthLimitProcess* stepLengthLimitProcess = new G4ErrorStepLengthLimitProcess;
+  ExtStepLengthLimitProcess* stepLengthLimitProcess = new ExtStepLengthLimitProcess;
   ExtMagFieldLimitProcess* magFieldLimitProcess = new ExtMagFieldLimitProcess;
   ExtEnergyLoss* eLossProcess = new ExtEnergyLoss;
   ExtNoHits* noHitsProcess = new ExtNoHits;

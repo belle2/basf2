@@ -44,12 +44,6 @@ namespace Belle2 {
       setModuleName(p->ob_type->tp_name);
     }
 
-    /** set the module's name.
-    *
-    * Not really necessary any longer, automatically set from class name
-    */
-    void setName(const std::string& name) { setModuleName(name); }
-
 
     /* reimplement all virtual functions of base class and call the corresponding method in the python class
     *  note that all methods must be registered in Module::exposePythonAPI()

@@ -56,6 +56,7 @@
 #include <G4ErrorFreeTrajState.hh>
 #include <G4StateManager.hh>
 #include <G4TransportationManager.hh>
+#include <G4VPhysicalVolume.hh>
 #include <G4FieldManager.hh>
 
 using namespace std;
@@ -123,12 +124,10 @@ void ExtModule::initialize()
   // Redefine ext's step length, magnetic field step limitation (fraction of local curvature radius),
   // and kinetic energy loss limitation (maximum fractional energy loss) by communicating with
   // the geant4 UI.  (Commands were defined in ExtMessenger when physics list was set up.)
-  G4double maxStep = std::min(10.0, m_maxStep) * cm;
-  if (maxStep > 0.0) {
-    char stepSize[80];
-    std::sprintf(stepSize, "/geant4e/limits/stepLength %8.2f mm", maxStep);
-    G4UImanager::GetUIpointer()->ApplyCommand(stepSize);
-  }
+  G4double maxStep = ((m_maxStep == 0.0) ? 10.0 : std::min(10.0, m_maxStep)) * cm;
+  char stepSize[80];
+  std::sprintf(stepSize, "/geant4e/limits/stepLength %8.2f mm", maxStep);
+  G4UImanager::GetUIpointer()->ApplyCommand(stepSize);
   G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/magField 0.001");
   G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/energyLoss 0.05");
 
@@ -136,10 +135,8 @@ void ExtModule::initialize()
   double offsetZ = strContent.getLength("OffsetZ") * cm;
   double rMax = strContent.getLength("Cryostat/Rmin") * cm;
   double halfLength = strContent.getLength("Cryostat/HalfLength") * cm;
-  m_RMaxSq = rMax * rMax;
-  m_ZMin = offsetZ - halfLength;
-  m_ZMax = offsetZ + halfLength;
-  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(new ExtCylSurfaceTarget(rMax, m_ZMin, m_ZMax));
+  m_target = new ExtCylSurfaceTarget(rMax, offsetZ - halfLength, offsetZ + halfLength);
+  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_target);
 
   // Hypotheses for extrapolation
   if (m_pdgCode.empty()) {
@@ -234,6 +231,7 @@ void ExtModule::event()
 
       getStartPoint(gfTrack, pdgCode, position, momentum, covG4e);
       if (gfTrack->getMom().Pt() <= m_minPt) continue;
+      if (m_target->GetDistanceFromPoint(position) < 0.0) continue;
       G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
       string g4eName = "g4e_" + particle->GetParticleName();
       double mass = particle->GetPDGMass();
@@ -267,9 +265,7 @@ void ExtModule::event()
           createHit(state, EXT_STOP, t, pdgCode, extHits, TrackToExtHits);
           break;
         }
-        double z = track->GetPosition().z();
-        double rSq = track->GetPosition().perp2();
-        if ((z < m_ZMin) || (z > m_ZMax) || (rSq > m_RMaxSq)) {
+        if (m_target->GetDistanceFromPoint(track->GetPosition()) < 0.0) {
           createHit(state, EXT_ESCAPE, t, pdgCode, extHits, TrackToExtHits);
           break;
         }
@@ -302,6 +298,7 @@ void ExtModule::terminate()
     m_runMgr->SetUserAction(m_trk);
     m_runMgr->SetUserAction(m_stp);
   }
+  delete m_target;
   delete m_enter;
   delete m_exit;
 

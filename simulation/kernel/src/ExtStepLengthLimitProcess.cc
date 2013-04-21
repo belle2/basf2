@@ -10,11 +10,11 @@
  **************************************************************************/
 
 #include <simulation/kernel/ExtStepLengthLimitProcess.h>
-#include <G4TransportationManager.hh>
-#include <G4FieldManager.hh>
-#include <G4Field.hh>
+//#include <G4ThreeVector.hh>
+//#include <G4TransportationManager.hh>
+//#include <G4FieldManager.hh>
+//#include <G4Field.hh>
 #include <G4Track.hh>
-#include <G4ForceCondition.hh>
 
 #include <framework/logging/Logger.h>
 
@@ -26,30 +26,17 @@ ExtStepLengthLimitProcess::ExtStepLengthLimitProcess(const G4String& processName
   G4VDiscreteProcess(processName)
 {
   m_stepLimit = kInfinity; // user may change this with a geant4 UI command
-  m_particleChange = new G4ParticleChange;
 }
 
 ExtStepLengthLimitProcess::~ExtStepLengthLimitProcess()
 {
-  delete m_particleChange;
-}
-
-G4double ExtStepLengthLimitProcess::GetMeanFreePath(const G4Track&, G4double, G4ForceCondition*)
-{
-  return kInfinity;
-}
-
-
-G4double ExtStepLengthLimitProcess::PostStepGetPhysicalInteractionLength(const G4Track&, G4double, G4ForceCondition* condition)
-{
-  *condition = NotForced;
-  return m_stepLimit;
 }
 
 // This method in G4VErrorLimitProcess has a memory leak so avoid inheriting from that class
 G4VParticleChange* ExtStepLengthLimitProcess::PostStepDoIt(const G4Track& track, const G4Step&)
 {
-  m_particleChange->Initialize(track);
-  return m_particleChange;
+  aParticleChange.Initialize(track);
+  aParticleChange.ProposeSteppingControl(AvoidHitInvocation);
+  return &aParticleChange;
 }
 

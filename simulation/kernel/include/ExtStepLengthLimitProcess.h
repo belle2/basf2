@@ -32,13 +32,13 @@ namespace Belle2 {
       //! destructor
       ~ExtStepLengthLimitProcess();
 
-      //! Do nothing special after the particle has stepped
+      //! See if the particle has left the geant4e "target" volume
       G4VParticleChange* PostStepDoIt(const G4Track&, const G4Step&);
 
       //! Returns the step length after each step
       G4double PostStepGetPhysicalInteractionLength(const G4Track&, G4double, G4ForceCondition*);
 
-      //! Returns the mean free path (always infinity!) after each step
+      //! Returns the mean free path for this process
       G4double GetMeanFreePath(const G4Track&, G4double, G4ForceCondition*);
 
       //! Returns the step limit
@@ -47,17 +47,24 @@ namespace Belle2 {
       //! Sets the step limit
       void SetStepLimit(G4double val) { m_stepLimit = val; }
 
-    private:
-
-      //! Pointer to a reusable G4ParticleChange object
-      G4ParticleChange* m_particleChange;
-
     protected:
 
       //! Stores the step limit
       G4double m_stepLimit;
 
     };
+
+    inline G4double ExtStepLengthLimitProcess::PostStepGetPhysicalInteractionLength(const G4Track&, G4double, G4ForceCondition* condition)
+    {
+      *condition = Forced; // PostStepDoIt() must be called after each step
+      return kInfinity;
+    }
+
+    inline G4double ExtStepLengthLimitProcess::GetMeanFreePath(const G4Track&, G4double, G4ForceCondition*)
+    {
+      return kInfinity;
+    }
+
 
   } //end namespace Simulation
 

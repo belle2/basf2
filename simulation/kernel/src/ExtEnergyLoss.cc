@@ -25,7 +25,7 @@ ExtEnergyLoss::ExtEnergyLoss(const G4String& processName, G4ProcessType type)
   if (m_energyLossForExtrapolator == NULL) {
     m_energyLossForExtrapolator = new EnergyLossForExtrapolator;
   }
-  theStepLimit = 1.0;  // fraction of kinetic energy that could be lost in one step
+  m_StepLimit = 1.0;  // fraction of kinetic energy that could be lost in one step
 }
 
 ExtEnergyLoss::~ExtEnergyLoss()
@@ -101,7 +101,7 @@ G4double ExtEnergyLoss::GetContinuousStepLimit(const G4Track& aTrack,
                                                G4double&)
 {
   G4double step = DBL_MAX;
-  if (theStepLimit != 1.0) {
+  if (m_StepLimit != 1.0) {
     G4double kinEnergyStart = aTrack.GetKineticEnergy();
     G4double kinEnergyLoss = kinEnergyStart;
     const G4Material* aMaterial = aTrack.GetMaterial();
@@ -116,10 +116,10 @@ G4double ExtEnergyLoss::GetContinuousStepLimit(const G4Track& aTrack,
     }
     B2DEBUG(300, "ExtEnergyLoss::GetContinuousStepLimit() currentMinimumStep " << currentMinimumStep
             << "  kinEnergyLoss " << kinEnergyLoss << " kinEnergyStart " << kinEnergyStart)
-    if (kinEnergyLoss / kinEnergyStart > theStepLimit) {
-      step = theStepLimit / (kinEnergyLoss / kinEnergyStart)  * currentMinimumStep;
+    if (kinEnergyLoss / kinEnergyStart > m_StepLimit) {
+      step = m_StepLimit / (kinEnergyLoss / kinEnergyStart)  * currentMinimumStep;
       B2DEBUG(300, "ExtEnergyLoss::GetContinuousStepLimit() limiting Step " << step
-              << " energy loss fraction " << kinEnergyLoss / kinEnergyStart << " > " << theStepLimit)
+              << " energy loss fraction " << kinEnergyLoss / kinEnergyStart << " > " << m_StepLimit)
     }
   }
 

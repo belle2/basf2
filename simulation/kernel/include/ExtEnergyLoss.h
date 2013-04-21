@@ -58,7 +58,7 @@ namespace Belle2 {
       EnergyLossForExtrapolator* m_energyLossForExtrapolator;
 
       //! Step limit for this process (fraction of KE that could be lost in one step)
-      G4double theStepLimit;
+      G4double m_StepLimit;
 
     };
 
@@ -69,12 +69,12 @@ namespace Belle2 {
 
     inline G4double ExtEnergyLoss::GetStepLimit()
     {
-      return theStepLimit;
+      return m_StepLimit;
     }
 
     inline void ExtEnergyLoss::SetStepLimit(G4double val)
     {
-      theStepLimit = val;
+      m_StepLimit = val;
     }
 
   } //end namespace Simulation

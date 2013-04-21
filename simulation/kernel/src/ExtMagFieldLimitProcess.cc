@@ -27,12 +27,10 @@ ExtMagFieldLimitProcess::ExtMagFieldLimitProcess(const G4String& processName) :
 {
   m_stepLimit = kInfinity; // user may change this with a geant4 UI command
   m_field = G4TransportationManager::GetTransportationManager()->GetFieldManager()->GetDetectorField();
-  m_particleChange = new G4ParticleChange;
 }
 
 ExtMagFieldLimitProcess::~ExtMagFieldLimitProcess()
 {
-  delete m_particleChange;
 }
 
 G4double ExtMagFieldLimitProcess::GetMeanFreePath(const G4Track&, G4double, G4ForceCondition*)
@@ -53,18 +51,19 @@ G4double ExtMagFieldLimitProcess::PostStepGetPhysicalInteractionLength(const G4T
     G4ThreeVector BVec(h1[0], h1[1], h1[2]);
     G4double pmag = aTrack.GetMomentum().mag();
     G4double BPerpMom = BVec.cross(aTrack.GetMomentum()).mag() / pmag;   // LEP
-    stepLength = m_stepLimit * pmag / BPerpMom;
+    if (BPerpMom != 0.0) {
+      stepLength = m_stepLimit * pmag / BPerpMom;
+    }
     B2DEBUG(300, "ExtMagFieldLimitProcess::PostStepGetPhysicalInteractionLength() stepLength "
             << stepLength << " B " << BPerpMom << " BVec " << BVec << " pmag " << pmag)
   }
-
   return stepLength;
 }
 
-// This method in G4VErrorLimitProcess has a memory leak so avoid inheriting from that class
+// This method in G4VErrorLimitProcess has a memory leak so avoid inheriting from that class.
 G4VParticleChange* ExtMagFieldLimitProcess::PostStepDoIt(const G4Track& track, const G4Step&)
 {
-  m_particleChange->Initialize(track);
-  return m_particleChange;
+  aParticleChange.Initialize(track);
+  return &aParticleChange;
 }
 

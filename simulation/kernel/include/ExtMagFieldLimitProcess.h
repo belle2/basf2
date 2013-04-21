@@ -47,15 +47,10 @@ namespace Belle2 {
       //! Sets the step limit
       void SetStepLimit(G4double val) { m_stepLimit = val; }
 
-    private:
+    protected:
 
       //! Stores the pointer to the magnetic field class
       const G4Field* m_field;
-
-      //! Pointer to a reusable G4ParticleChange object
-      G4ParticleChange* m_particleChange;
-
-    protected:
 
       //! Stores the step limit
       G4double m_stepLimit;

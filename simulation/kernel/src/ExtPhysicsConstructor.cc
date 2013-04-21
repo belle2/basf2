@@ -19,7 +19,6 @@
 #include <simulation/kernel/ExtStepLengthLimitProcess.h>
 #include <simulation/kernel/ExtMagFieldLimitProcess.h>
 #include <simulation/kernel/ExtEnergyLoss.h>
-#include <simulation/kernel/ExtNoHits.h>
 #include <simulation/kernel/ExtMessenger.h>
 
 using namespace std;
@@ -154,7 +153,6 @@ void ExtPhysicsConstructor::ConstructProcess()
   ExtStepLengthLimitProcess* stepLengthLimitProcess = new ExtStepLengthLimitProcess;
   ExtMagFieldLimitProcess* magFieldLimitProcess = new ExtMagFieldLimitProcess;
   ExtEnergyLoss* eLossProcess = new ExtEnergyLoss;
-  ExtNoHits* noHitsProcess = new ExtNoHits;
   new ExtMessenger(stepLengthLimitProcess, magFieldLimitProcess, eLossProcess);
   G4ParticleTable* theParticleTable = G4ParticleTable::GetParticleTable();
   G4ParticleTable::G4PTblDicIterator* theParticleIterator = theParticleTable->GetIterator();
@@ -173,7 +171,6 @@ void ExtPhysicsConstructor::ConstructProcess()
         pmanager->AddDiscreteProcess(stepLengthLimitProcess, 2);
         pmanager->AddDiscreteProcess(magFieldLimitProcess, 3);
       }
-      pmanager->AddDiscreteProcess(noHitsProcess);
     }
   }
 }

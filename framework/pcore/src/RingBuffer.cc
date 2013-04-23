@@ -320,7 +320,7 @@ int RingBuffer::remq(int* buf)
   return nw;
 }
 
-int RingBuffer::spyq(int* buf)
+int RingBuffer::spyq(int* buf) const
 {
   SemaphoreLocker locker(m_semid);
   if (m_bufinfo->nbuf <= 0) {
@@ -342,27 +342,27 @@ int RingBuffer::spyq(int* buf)
   return nw;
 }
 
-int RingBuffer::numq()
+int RingBuffer::numq() const
 {
   return m_bufinfo->nbuf;
 }
 
-int RingBuffer::ninsq()
+int RingBuffer::ninsq() const
 {
   return m_bufinfo->ninsq;
 }
 
-int RingBuffer::nremq()
+int RingBuffer::nremq() const
 {
   return m_bufinfo->nremq;
 }
 
-int RingBuffer::insq_counter()
+int RingBuffer::insq_counter() const
 {
   return m_insq_counter;
 }
 
-int RingBuffer::remq_counter()
+int RingBuffer::remq_counter() const
 {
   return m_remq_counter;
 }
@@ -382,7 +382,7 @@ int RingBuffer::clear()
   return 0;
 }
 
-int RingBuffer::shmid()
+int RingBuffer::shmid() const
 {
   return m_shmid;
 }

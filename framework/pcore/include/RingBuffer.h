@@ -54,27 +54,27 @@ namespace Belle2 {
     /*! Pick up a buffer from the RingBuffer */
     int remq(int* buf);
     /*! Prefetch a buffer from the RingBuffer w/o removing it*/
-    int spyq(int* buf);
+    int spyq(int* buf) const;
     /*! Returns number of buffers in the RingBuffer */
-    int numq();
+    int numq() const;
     /*! Clear the RingBuffer */
     int clear();
 
     /*! Return ID of the shared memory */
-    int shmid();
+    int shmid() const;
 
     // Debugging functions
     /** Print some info on the RingBufInfo structure. */
     void dump_db();
     /** Return number of insq() calls for current buffer. */
-    int ninsq();
+    int ninsq() const;
     /** Return number of remq() calls for current buffer. */
-    int nremq();
+    int nremq() const;
 
     /** Return number of insq() calls. */
-    int insq_counter();
+    int insq_counter() const;
     /** Return number of remq() calls. */
-    int remq_counter();
+    int remq_counter() const;
 
   private:
     /** Convenience class to lock a semaphore on construction, and unlock on destruction. */

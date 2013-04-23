@@ -61,7 +61,7 @@ void plot(const TString &input_filename)
   output_file->Close();
 }
 
-void dedx_LL()
+void dedx2_LR()
 {
   gROOT->SetStyle("Plain");
 

@@ -47,7 +47,7 @@ void plot(const TString &input_filename)
   output_file->Close();
 }
 
-void dedx_curves()
+void dedx1_curves()
 {
   gROOT->SetStyle("Plain");
 

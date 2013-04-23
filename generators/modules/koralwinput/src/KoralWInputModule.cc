@@ -11,7 +11,7 @@
 #include <generators/modules/koralwinput/KoralWInputModule.h>
 #include <generators/utilities/cm2LabBoost.h>
 
-#include <framework/core/Environment.h>
+#include <framework/core/utilities.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -42,9 +42,9 @@ KoralWInputModule::KoralWInputModule() : Module()
   //Parameter definition
   addParam("BoostMode", m_boostMode, "The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle)", 0);
   addParam("DataPath",  m_dataPath, "The path to the KoralW input data files.",
-           Environment::Instance().getDataSearchPath() + "/generators/koralw");
+           FileSystem::findFile("/data/generators/koralw"));
   addParam("UserDataFile",  m_userDataFile, "The filename of the user KoralW input data file.",
-           Environment::Instance().getDataSearchPath() + "/generators/koralw/KoralW_ee.data");
+           FileSystem::findFile("/data/generators/koralw/KoralW_ee.data"));
   addParam("RandomSeed", m_seed, "The random seed of the generator.", 1227);
 }
 

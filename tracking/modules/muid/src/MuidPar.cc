@@ -13,7 +13,6 @@
 #include <fstream>
 #include <exception>
 
-#include <framework/core/Environment.h>
 #include <framework/core/utilities.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
@@ -51,7 +50,7 @@ namespace Belle2 {
       B2ERROR("muid::MuidPar::fillPDFs(): required XML content " << name << " not found")
       return;
     }
-    string pathname = Environment::Instance().getDataSearchPath() + "/" + content.getString("Filename");
+    string pathname = FileSystem::findFile("/data/" + content.getString("Filename"));
     if (!FileSystem::fileExists(pathname)) {
       B2ERROR("muid::MuidPar::fillPDFs(): pathname " << pathname << " does not exist")
       return;

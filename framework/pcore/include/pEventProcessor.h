@@ -73,7 +73,7 @@ namespace Belle2 {
     /** output modules with multi-process support */
     ModulePtrList m_output_list;
     /** handler to fork and manage processes. */
-    ProcHandler* procHandler;
+    ProcHandler* m_procHandler;
 
     /** list of input paths (contains one path. why a list?) */
     std::vector<PathPtr> m_inpathlist;
@@ -88,8 +88,8 @@ namespace Belle2 {
     std::vector<RingBuffer*> m_rboutlist;
 
     /** HistoManagerModule found? */
-    bool m_histoflag;
-    /** Pointer to HistoManagerModule, if m_histoflag is set */
+    bool m_histoManagerFound;
+    /** Pointer to HistoManagerModule, if m_histoManagerFound is set */
     ModulePtr m_histoman;
 
   };

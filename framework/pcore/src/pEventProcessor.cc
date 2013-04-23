@@ -34,13 +34,13 @@ static void signalHandler(int)
 }
 
 pEventProcessor::pEventProcessor(PathManager& pathManager) : EventProcessor(pathManager),
-  procHandler(new ProcHandler())
+  m_procHandler(new ProcHandler())
 { }
 
 
 pEventProcessor::~pEventProcessor()
 {
-  delete procHandler;
+  delete m_procHandler;
 }
 
 
@@ -71,7 +71,7 @@ void pEventProcessor::process(PathPtr spath)
   }
 
   // 2. Analyze start path and split into parallel paths
-  m_histoflag = false;
+  m_histoManagerFound = false;
   analyze_path(spath);
   B2INFO("process : inlistpath size = " << m_inpathlist.size());
   B2INFO("process : bodypathlist size = " << m_bodypathlist.size());
@@ -86,8 +86,8 @@ void pEventProcessor::process(PathPtr spath)
   }
 
   // 3. Fork  input path
-  procHandler->init_EvtServer();
-  if (procHandler->isEvtServer()) {   // In event server process
+  m_procHandler->init_EvtServer();
+  if (m_procHandler->isEvtServer()) {   // In event server process
     PathPtr& inpath = m_inpathlist[0];
     ModulePtrList inpath_modules = m_pathManager.buildModulePathList(inpath);
     ModulePtrList procinitmodules = init_modules_in_process(inpath_modules);
@@ -104,8 +104,8 @@ void pEventProcessor::process(PathPtr spath)
   for (std::vector<PathPtr>::iterator it = m_outpathlist.begin(); it != m_outpathlist.end(); ++it) {
     PathPtr& outpath = *it;
     if ((outpath->getModules()).size() > 0) {
-      procHandler->init_OutServer(nout);
-      if (procHandler->isOutputSrv()) {   // In output server process
+      m_procHandler->init_OutServer(nout);
+      if (m_procHandler->isOutputSrv()) {   // In output server process
         m_master = 0; //allow resetting master module
         ModulePtrList outpath_modules = m_pathManager.buildModulePathList(outpath);
         ModulePtrList procinitmodules = init_modules_in_process(outpath_modules);
@@ -122,8 +122,8 @@ void pEventProcessor::process(PathPtr spath)
 
   // 5. Fork out main path
   fflush(stdout);
-  procHandler->init_EvtProc(numProcesses);
-  if (procHandler->isEvtProc()) {
+  m_procHandler->init_EvtProc(numProcesses);
+  if (m_procHandler->isEvtProc()) {
     m_master = 0; //allow resetting master module
     PathPtr& mainpath = m_bodypathlist[m_bodypathlist.size() - 1];
     ModulePtrList main_modules = m_pathManager.buildModulePathList(mainpath);
@@ -137,11 +137,11 @@ void pEventProcessor::process(PathPtr spath)
   }
 
   // 6. Framework process
-  if (procHandler->isFramework()) {
+  if (m_procHandler->isFramework()) {
     // 6.0 Build End of data message
     EvtMessage* term = new EvtMessage(NULL, 0, MSG_TERMINATE);
     // 6.1 Wait for input path to terminate
-    procHandler->wait_event_server();
+    m_procHandler->wait_event_server();
     // 6.2 Send termination to event processes
     for (int i = 0; i < numProcesses; i++) {
       for (std::vector<RingBuffer*>::iterator it = m_rbinlist.begin();
@@ -154,7 +154,7 @@ void pEventProcessor::process(PathPtr spath)
       }
     }
     // 6.3 Wait for event processes to terminate
-    procHandler->wait_event_processes();
+    m_procHandler->wait_event_processes();
     // 6.4 Send termination to output servers
     for (std::vector<RingBuffer*>::iterator it = m_rboutlist.begin();
          it != m_rboutlist.end(); ++it) {
@@ -164,7 +164,7 @@ void pEventProcessor::process(PathPtr spath)
         usleep(200);
       }
     }
-    procHandler->wait_output_server();
+    m_procHandler->wait_output_server();
     B2INFO("All processes completed");
 
     // 6.5 Remove all ring buffers
@@ -208,7 +208,7 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
       if ( iter == modlist.begin() &&
       module->hasProperties ( Module::c_HistogramManager ) ) {
       if ( module->hasProperties ( Module::c_HistogramManager ) ) {
-      m_histoflag = true;
+      m_histoManagerFound = true;
       m_histoman = *iter;  // Register histomanager module if exists
       }
       */
@@ -222,7 +222,7 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
         }
         if (module->hasProperties(Module::c_HistogramManager)) {
           // Initialize histogram manager if found in the path
-          m_histoflag = true;
+          m_histoManagerFound = true;
           m_histoman = *iter;
           module->initialize();
         }
@@ -239,7 +239,7 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
           ModulePtr rxptr(new RxModule(rbuf));
           mainlist.push_back(rxptr);
           B2DEBUG(0, "Analyze Path : state=0->1, Tx and Rx are inserted");
-          if (m_histoflag) {
+          if (m_histoManagerFound) {
             mainlist.push_back(m_histoman);
             B2DEBUG(0, "Analyze Path : state=0->1, HistoMan is inserted");
           }
@@ -274,7 +274,7 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
           ModulePtr rxptr(new RxModule(rbuf));
           outlist.push_back(rxptr);
           B2DEBUG(0, "Analyze Path : state=1->2, Tx and Rx are inserted");
-          if (m_histoflag) {
+          if (m_histoManagerFound) {
             outlist.push_back(m_histoman);
             B2DEBUG(0, "Analyze Path : state=1->2, HistoMan is inserted");
           }

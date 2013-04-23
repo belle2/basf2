@@ -295,6 +295,7 @@ void DisplayUI::makeGui()
     TGHorizontalFrame* hf = new TGHorizontalFrame(event_frame);
     {
       m_prevButton = new TGPictureButton(hf, gClient->GetPicture(icondir + "GoBack.gif"));
+      m_prevButton->SetToolTipText("Go to previous event");
       hf->AddFrame(m_prevButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       m_prevButton->Connect("Clicked()", "Belle2::DisplayUI", this, "prev()");
 
@@ -316,6 +317,7 @@ void DisplayUI::makeGui()
       }
 
       m_nextButton = new TGPictureButton(hf, gClient->GetPicture(icondir + "GoForward.gif"));
+      m_nextButton->SetToolTipText("Go to next event");
       hf->AddFrame(m_nextButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       m_nextButton->Connect("Clicked()", "Belle2::DisplayUI", this, "next()");
     }
@@ -342,13 +344,15 @@ void DisplayUI::makeGui()
 
       m_playPauseButton = new TGPictureButton(hf, gClient->GetPicture(icondir + "ed_execute.png"));
       m_playPauseButton->SetEnabled(file or async);
+      m_playPauseButton->SetToolTipText("Advance automatically to next event after the given delay. For AsyncDisplay, new data is shown without delay.");
       hf->AddFrame(m_playPauseButton, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 5, 5, 5));
       m_playPauseButton->Connect("Clicked()", "Belle2::DisplayUI", this, "togglePlayPause()");
     }
     event_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
 
-    TGButton* jumpToEventButton = new TGTextButton(event_frame, "Jump to event/run/exp");
+    TGButton* jumpToEventButton = new TGTextButton(event_frame, "Jump to event/run/exp...");
     jumpToEventButton->SetEnabled(InputController::canControlInput());
+    jumpToEventButton->SetToolTipText("Find a given entry identified by an event / run / experiment triplet in the current file");
     event_frame->AddFrame(jumpToEventButton, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 5, 5, 5));
     jumpToEventButton->Connect("Clicked()", "Belle2::DisplayUI", this, "showJumpToEventDialog()");
 
@@ -364,6 +368,7 @@ void DisplayUI::makeGui()
     TGHorizontalFrame* hf = new TGHorizontalFrame(viewer_frame);
     {
       b = new TGTextButton(hf, "Dark/light colors");
+      b->SetToolTipText("Toggle background color");
       hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 5, 5, 5));
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "toggleColorScheme()");
     }
@@ -371,12 +376,14 @@ void DisplayUI::makeGui()
 
     hf = new TGHorizontalFrame(viewer_frame);
     {
-      b = new TGTextButton(hf, "Save Picture");
-      hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
+      b = new TGTextButton(hf, "Save As...");
+      b->SetToolTipText("Save a bitmap graphic");
+      hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 0, 5, 5));
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "savePicture()");
 
-      b = new TGTextButton(hf, "Save Hi-Res Picture");
-      hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
+      b = new TGTextButton(hf, "Save As (High-Res)... ");
+      b->SetToolTipText("Save a bitmap graphic with user-specified size");
+      hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 5, 5, 5));
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "saveHiResPicture()");
 
     }
@@ -423,6 +430,7 @@ void DisplayUI::makeGui()
       hf->AddFrame(m_autoPictureWidth, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
 
       TGButton* b = new TGTextButton(hf, "Save PNGs");
+      b->SetToolTipText("Save bitmap graphics for all further events. Cannot be aborted. (EXPERIMENTAL)");
       hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "startAutomaticRun()");
     }
@@ -438,10 +446,12 @@ void DisplayUI::makeGui()
     TGHorizontalFrame* hf = new TGHorizontalFrame(exit_frame);
     {
       TGButton* b = new TGTextButton(hf, "Continue without display");
+      b->SetToolTipText("Close the display but continue producing/reading events.");
       hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "closeAndContinue()");
 
       b = new TGTextButton(hf, "Exit");
+      b->SetToolTipText("Close the display and stop basf2 after this event.");
       hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "exit()");
 

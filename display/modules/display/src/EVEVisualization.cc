@@ -20,7 +20,7 @@
 #include <display/modules/display/EVEVisualization.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/core/Environment.h>
+#include <framework/core/utilities.h>
 #include <geometry/GeometryManager.h>
 #include <vxd/geometry/GeoCache.h>
 #include <ecl/geometry/ECLGeometryPar.h>
@@ -220,7 +220,7 @@ void EVEVisualization::addGeometry()
 
   B2INFO("Loading geometry projections...");
 
-  const std::string extractPath = Environment::Instance().getDataSearchPath() + std::string("/display/geometry_extract.root");
+  const std::string extractPath = FileSystem::findFile("/data/display/geometry_extract.root");
   TFile* f = TFile::Open(extractPath.c_str(), "READ");
   TEveGeoShapeExtract* gse = dynamic_cast<TEveGeoShapeExtract*>(f->Get("Extract"));
   TEveGeoShape* gs = TEveGeoShape::ImportShapeExtract(gse, 0);

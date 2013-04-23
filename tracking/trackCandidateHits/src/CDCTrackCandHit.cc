@@ -13,4 +13,4 @@
 using namespace Belle2;
 using namespace Tracking;
 
-//ClassImp(CDCTrackCandHit)
+ClassImp(CDCTrackCandHit)

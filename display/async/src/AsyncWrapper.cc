@@ -69,8 +69,8 @@ void AsyncWrapper::initialize()
 {
   B2INFO("Initializing AsyncWrapper...");
 
-  m_procHandler = new ProcHandler();
-  m_ringBuffer = new RingBuffer();
+  const int bufferSizeInts = 8000000; //~32M, within Ubuntu's shmmax limit
+  m_ringBuffer = new RingBuffer(bufferSizeInts);
   m_rx = new RxModule(m_ringBuffer);
   m_tx = new TxModule(m_ringBuffer);
   m_tx->setBlockingInsert(!m_discardOldEvents); //actually decouple this process

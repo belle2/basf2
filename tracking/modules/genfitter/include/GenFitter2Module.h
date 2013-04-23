@@ -93,6 +93,7 @@ namespace Belle2 {
     std::vector<double> m_dafTemperatures;
     int m_smoothing;
     bool m_uselrAmbiInfo;
+    bool m_resolveWireHitAmbi;
 
 
   };

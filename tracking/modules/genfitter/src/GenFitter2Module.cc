@@ -96,6 +96,7 @@ GenFitter2Module::GenFitter2Module() :
   addParam("smoothing", m_smoothing, "select smoothing type in Kalman filter: 0 = non; 1 = normal; 2 = fast", 2);
   addParam("dafTemperatures", m_dafTemperatures, "set the annealing scheme (temperatures) for the DAF. Length of vector will determine DAF iterations", vector<double>(1, -999.0));
   addParam("leftRightAmbiInfo", m_uselrAmbiInfo, "set true if the information to resolve the left right ambiguity from a track finder should be used", false);
+  addParam("resolveWireHitAmbi", m_resolveWireHitAmbi, "if true daf will resolve the left right ambiguity of wire hits of false colset to prediction will be chosen", true);
 }
 
 GenFitter2Module::~GenFitter2Module()
@@ -104,8 +105,17 @@ GenFitter2Module::~GenFitter2Module()
 
 void GenFitter2Module::initialize()
 {
-
+  //what should be present for this modul:
   StoreArray<GFTrackCand>::required();
+  // at least on of the following has to be present:
+  StoreArray<PXDTrueHit>::optional();
+  StoreArray<SVDTrueHit>::optional();
+  StoreArray<CDCHit>::optional();
+  StoreArray<PXDCluster>::optional();
+  StoreArray<SVDCluster>::optional();
+  StoreArray<VXDSimpleDigiHit>::optional("pxdSimpleDigiHits");
+  StoreArray<VXDSimpleDigiHit>::optional("svdSimpleDigiHits");
+
   if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();
@@ -145,6 +155,7 @@ void GenFitter2Module::initialize()
     m_daf.setBetas(81, 8, 4, 1, 1, 1);
     B2ERROR("You either set 0 DAF temperatures or more than 10. This is not supported. The default scheme (81,8,4,1,1,1) was selected instead.");
   }
+  //m_daf.resolveWireHitAmbi(m_resolveWireHitAmbi);
 
   //interpred the hittype option
   if (m_hitType == "TrueHit") {
@@ -220,10 +231,14 @@ void GenFitter2Module::event()
   if (nSVDClusters == 0) {B2DEBUG(100, "GenFitter2: SVDClustersCollection is empty!");}
 
   for (int iTrackCand = 0; iTrackCand not_eq nTrackCandidates; ++iTrackCand) {
-
     GFTrackCand* aTrackCandPointer = trackCandidates[iTrackCand];
     const int nTrackCandHits = aTrackCandPointer->getNHits();
-    B2DEBUG(100, "nTrackCandHits " << nTrackCandHits);
+    B2DEBUG(100, "processing track candidates with index: " << iTrackCand << " and " << nTrackCandHits << " hits");
+
+    std::set<int> uDetIds = aTrackCandPointer->getUniqueDetIDs();
+    B2DEBUG(100, "Does TC have PXD hits? " << uDetIds.count(1) << " Does TC have SVD hits? " << uDetIds.count(2) << " Does TC have CDC hits? " << uDetIds.count(3));
+
+
     // if option is set ignore every track that does not have exactly 1 hit in every Si layer
     bool filterTrack = false;
     if (m_nLayerWithHit > 0) {
@@ -339,10 +354,12 @@ void GenFitter2Module::event()
         if (nPxdTrueHits not_eq 0) {
           PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (pxdTrueHits.getPtr());
           factory.addProducer(Const::PXD, PXDProducer);
+          B2DEBUG(100, "added PXDTrueHits");
         }
         if (nSvdTrueHits not_eq 0) {
           SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> (svdTrueHits.getPtr());
           factory.addProducer(Const::SVD, SVDProducer);
+          B2DEBUG(100, "added SVDTrueHits");
         }
       } else if (m_hitTypeId == 1) {
         pxdSimpleDigiHitProducer =  new GFRecoHitProducer <VXDSimpleDigiHit, PXDRecoHit> (pxdSimpleDigiHits.getPtr());
@@ -379,7 +396,7 @@ void GenFitter2Module::event()
           if (aTrackCandHitPtr not_eq NULL) {
             CDCRecoHit* aCdcRecoHit = static_cast<CDCRecoHit*>(track.getHit(i)); //this now has to be a CDCRecoHit because the oder of hits in GFTrack and GFTrackCand must be the same
             char lrInfo = aTrackCandHitPtr->getLeftRightResolution();
-            B2DEBUG(100, "l/r: for hit with index " <<  i << " is " << int(lrInfo));
+            B2DEBUG(101, "l/r: for hit with index " <<  i << " is " << int(lrInfo));
             aCdcRecoHit->setLeftRightResolution(lrInfo);
           }
         }

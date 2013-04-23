@@ -190,7 +190,6 @@ void RingBuffer::cleanup(void)
       unlink(m_pathname.c_str());
     }
   }
-
 }
 
 void RingBuffer::dump_db(void)

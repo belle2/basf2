@@ -36,8 +36,9 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    // Data members
   private:
+    /** Gets data from m_rbuf and puts it into the data store. */
+    void readEvent();
 
     //! RingBuffer ID
     RingBuffer* m_rbuf;

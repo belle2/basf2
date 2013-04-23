@@ -43,56 +43,8 @@ RxModule::RxModule(RingBuffer* rbuf) : Module(), m_streamer(0), m_nrecv(-1)
 
 RxModule::~RxModule() { }
 
-void RxModule::initialize()
+void RxModule::readEvent()
 {
-  gSystem->Load("libdataobjects");
-
-  // Initialize DataStoreStreamer
-  m_streamer = new DataStoreStreamer(m_compressionLevel);
-
-
-  // Read the first event in RingBuffer and restore in DataStore.
-  // This is necessary to create object tables before TTree initialization
-  // if used together with TTree based output (RootOutput module).
-
-  // Prefetch the first record in Ring Buffer
-  int size;
-  char* evtbuf = new char[EvtMessage::c_MaxEventSize];
-  while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
-    //    printf ( "Rx : evtbuf is not available yet....\n" );
-    usleep(100);
-  }
-  B2INFO("Rx initialization: got an event from RingBuffer, size=" << size);
-
-  // Restore objects in DataStore
-  EvtMessage* evtmsg = new EvtMessage(evtbuf);
-  if (evtmsg->type() == MSG_TERMINATE) {
-    B2INFO("Rx initialization: got termination message. Exitting...");
-  } else {
-    m_streamer->restoreDataStore(evtmsg);
-  }
-
-  // Delete buffers
-  delete evtmsg;
-  delete[] evtbuf;
-
-  m_nrecv = -1;
-}
-
-
-void RxModule::beginRun()
-{
-  B2DEBUG(100, "beginRun called.");
-}
-
-
-void RxModule::event()
-{
-  m_nrecv++;
-  // First event is already loaded in initialize()
-  if (m_nrecv == 0) return;
-
-  // Get a record from ringbuf
   int size;
   char* evtbuf = new char[EvtMessage::c_MaxEventSize];
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
@@ -101,25 +53,43 @@ void RxModule::event()
   }
   B2DEBUG(100, "Rx: got an event from RingBuffer, size=" << size);
 
-  // Restore EvtMessage
-  EvtMessage* msg = new EvtMessage(evtbuf);    // Have EvtMessage by ptr cpy
-  if (msg->type() == MSG_TERMINATE) {
+  // Restore objects in DataStore
+  EvtMessage evtmsg(evtbuf);
+  if (evtmsg.type() == MSG_TERMINATE) {
     B2INFO("Rx: got termination message. Exitting...");
   } else {
-    m_streamer->restoreDataStore(msg);
-    B2DEBUG(100, "Rx: DataStore Restored!");
+    m_streamer->restoreDataStore(&evtmsg);
   }
 
-  // Remove buffers
   delete[] evtbuf;
-  delete msg;
 }
 
-void RxModule::endRun()
+void RxModule::initialize()
 {
-  B2DEBUG(100, "endRun done.");
+  gSystem->Load("libdataobjects");
+
+  // Initialize DataStoreStreamer
+  m_streamer = new DataStoreStreamer(m_compressionLevel);
+
+  // Read the first event in RingBuffer and restore in DataStore.
+  // This is necessary to create object tables before TTree initialization
+  // if used together with TTree based output (RootOutput module).
+  readEvent();
 }
 
+void RxModule::beginRun() { }
+
+void RxModule::event()
+{
+  m_nrecv++;
+  // First event is already loaded in initialize()
+  if (m_nrecv == 0) return;
+
+  // Get a record from ringbuf
+  readEvent();
+}
+
+void RxModule::endRun() { }
 
 void RxModule::terminate()
 {

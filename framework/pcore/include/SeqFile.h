@@ -22,7 +22,7 @@ namespace Belle2 {
     /*! Destructor */
     ~SeqFile();
     /*! Returns status after constructor call. If success, fd is returned. If not, -1 */
-    int status(void);
+    int status();
 
     /*! Write a record to a file.  First word of the record should contain number of words.*/
     int write(char* buf);

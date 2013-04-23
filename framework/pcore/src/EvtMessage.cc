@@ -49,7 +49,7 @@ EvtMessage::EvtMessage(const EvtMessage& evtmsg)
 }
 
 /// @brief Destructor of EvtMessage class
-EvtMessage::~EvtMessage(void)
+EvtMessage::~EvtMessage()
 {
   if (m_ownsBuffer)
     delete [] m_data;
@@ -71,7 +71,7 @@ EvtMessage& EvtMessage::operator=(const EvtMessage& obj)
 /// @brief Get buffer
 /// @return Buffer address
 
-char* EvtMessage::buffer(void)
+char* EvtMessage::buffer()
 {
   return m_data;
 }
@@ -92,7 +92,7 @@ void EvtMessage::buffer(const char* bufadr)
 
 // @brief size
 // @return record size
-int EvtMessage::size(void)
+int EvtMessage::size()
 {
   return (((EvtHeader*)m_data)->size);
 }
@@ -106,13 +106,13 @@ int EvtMessage::paddedSize()
 
 // @brief msgsize
 // @return message size
-int EvtMessage::msg_size(void)
+int EvtMessage::msg_size()
 {
   return (((EvtHeader*)m_data)->size - sizeof(EvtHeader));
 }
 
 // Record type
-RECORD_TYPE EvtMessage::type(void)
+RECORD_TYPE EvtMessage::type()
 {
   return (((EvtHeader*)m_data)->rectype);
 }
@@ -123,7 +123,7 @@ void EvtMessage::type(RECORD_TYPE type)
 }
 
 // Source of this record
-int EvtMessage::src(void)
+int EvtMessage::src()
 {
   return (((EvtHeader*)m_data)->src);
 }
@@ -134,7 +134,7 @@ void EvtMessage::src(int src)
 }
 
 // Destination of this record
-int EvtMessage::dest(void)
+int EvtMessage::dest()
 {
   return (((EvtHeader*)m_data)->dest);
 }
@@ -145,7 +145,7 @@ void EvtMessage::dest(int dest)
 }
 
 // Time stamp
-struct timeval EvtMessage::time(void) {
+struct timeval EvtMessage::time() {
   return (((EvtHeader*)m_data)->timestamp);
 }
 
@@ -155,13 +155,13 @@ void EvtMessage::time(struct timeval& tbuf)
 }
 
 // Event Header
-EvtHeader* EvtMessage::header(void)
+EvtHeader* EvtMessage::header()
 {
   return ((EvtHeader*)m_data);
 }
 
 // Message body
-char* EvtMessage::msg(void)
+char* EvtMessage::msg()
 {
   return (m_data + sizeof(EvtHeader));
 }

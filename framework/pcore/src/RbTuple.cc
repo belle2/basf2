@@ -40,7 +40,7 @@ RbTupleManager::~RbTupleManager()
 }
 
 // Access to Singleton
-RbTupleManager& RbTupleManager::Instance(void)
+RbTupleManager& RbTupleManager::Instance()
 {
   if (!m_instance) {
     m_instance = new RbTupleManager;
@@ -124,7 +124,7 @@ int RbTupleManager::terminate()
 }
 
 // Functions called from main process
-int RbTupleManager::hadd(void)
+int RbTupleManager::hadd()
 {
   // No need to call this function when nprocess=0
   if (m_nproc == 0) {

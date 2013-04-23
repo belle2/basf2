@@ -29,7 +29,7 @@ namespace Belle2 {
   public:
 
     /*! Access to singleton */
-    static RbTupleManager& Instance(void);
+    static RbTupleManager& Instance();
 
     /*! Global initialization */
     void init(int nprocess, const char* filename);
@@ -43,18 +43,18 @@ namespace Belle2 {
     int begin(int pid);
 
     /*! Function called by HistoManager module at the end */
-    int terminate(void);
+    int terminate();
 
     // Functions to collect histograms from event processing on the fly
     //  int collect ();
 
     /*! Functions to add up all histogram files */
-    int hadd(void);
+    int hadd();
 
   private:
     // Constructor and destructor are private for singleton access
-    RbTupleManager(void);
-    ~RbTupleManager(void);
+    RbTupleManager();
+    ~RbTupleManager();
 
 
     /** Merge given list of root files, code from 'hadd' tool. */

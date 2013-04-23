@@ -22,10 +22,10 @@ namespace Belle2 {
     /*! Constructor */
     MsgHandler(int complevel);
     /*! Destructor */
-    virtual ~MsgHandler(void);
+    virtual ~MsgHandler();
 
     /*! Clear object list */
-    virtual void clear(void);
+    virtual void clear();
     /*! Add an object to be streamed */
     virtual bool add(const TObject*, const std::string& name);
 

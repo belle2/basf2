@@ -44,7 +44,7 @@ SeqFile::~SeqFile()
   printf("Seq File %d closed\n", m_nfile);
 }
 
-int SeqFile::status(void)
+int SeqFile::status()
 {
   return m_fd;
 }

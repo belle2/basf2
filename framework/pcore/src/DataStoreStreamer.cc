@@ -28,7 +28,7 @@ DataStoreStreamer::DataStoreStreamer(int complevel) : m_compressionLevel(complev
 }
 
 // Destructor
-DataStoreStreamer::~DataStoreStreamer(void)
+DataStoreStreamer::~DataStoreStreamer()
 {
   delete m_msghandler;
 }

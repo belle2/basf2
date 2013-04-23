@@ -53,7 +53,7 @@ namespace Belle2 {
     /*! Copy constructor (m_data is copied). */
     EvtMessage(const EvtMessage& evtmsg);
     /*! Destructor */
-    ~EvtMessage(void);
+    ~EvtMessage();
 
     /*! Assignment (m_data is copied). */
     EvtMessage& operator=(const EvtMessage& obj);
@@ -66,44 +66,44 @@ namespace Belle2 {
      * least sizeof(int) * paddedSize() bytes. Bytes exceeding size() are
      * zeroed.
      */
-    char* buffer(void);
+    char* buffer();
     /*! Set existing buffer address */
     void  buffer(const char*);
 
     /*! Get size of message including headers*/
-    int   size(void);
+    int   size();
     /** Same as size(), but as size of an integer array.
      *
      * Use this for passing EvtMessage to RingBuffer::insq().
      */
     int   paddedSize();
     /*! Get size of message body */
-    int   msg_size(void);
+    int   msg_size();
 
     /*! Get record type */
-    RECORD_TYPE type(void);
+    RECORD_TYPE type();
     /*! Set record type */
     void type(RECORD_TYPE);
 
     /*! Get time stamp */
-    struct timeval time(void);
+    struct timeval time();
     /*! Set time stamp */
     void time(struct timeval& time);
 
     /*! Get source IP of message */
-    int   src(void);
+    int   src();
     /*! Set source IP of message */
     void  src(int src);
 
     /*! Get destination IP of message */
-    int   dest(void);
+    int   dest();
     /*! Set destination IP of message */
     void  dest(int dest);
 
     /*! Get pointer to EvtHeader */
-    EvtHeader* header(void);
+    EvtHeader* header();
     /*! Get pointer to message body */
-    char* msg(void);
+    char* msg();
     /*! Copy message into newly allocated buffer */
     void msg(const char* msg, int size, RECORD_TYPE type);
 

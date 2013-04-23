@@ -22,21 +22,21 @@ namespace Belle2 {
   class RbCtlMgr {
   public:
     /*! Default constructor creating a new shared memory */
-    RbCtlMgr(void);
+    RbCtlMgr();
     /*! Constructor attaching to an existing shared memory */
     RbCtlMgr(int shmid);
     /*! Destructor to detatch shared memory */
-    ~RbCtlMgr(void);
+    ~RbCtlMgr();
     /*! Function to detach and remove shared memory */
-    void terminate(void);
+    void terminate();
 
     // Synchronization functions (not used right now)
     /*! Set number of processes to be synchronized */
     void sync_set(int nprocess);
     /*! Wait for the synchronization */
-    void sync_wait(void);
+    void sync_wait();
     /*! Tell mother process that this process is ready to be synchronized */
-    void sync_done(void);
+    void sync_done();
 
     // Communication flags
     /*! Set flag id to val in shared memory */
@@ -46,15 +46,15 @@ namespace Belle2 {
 
     // Shared memory related function
     /*! Get address of shared memory */
-    RbCtlShm* ctlshm(void);
+    RbCtlShm* ctlshm();
     /*! Get ID of shared memory */
-    int shmid(void);
+    int shmid();
 
   private:
     /** Lock semaphore protecting m_ctlshm. */
-    int sem_lock(void);
+    int sem_lock();
     /** Unlock semaphore protecting m_ctlshm. */
-    int sem_unlock(void);
+    int sem_unlock();
 
   private:
     int m_shmid; /**< ID of shared memory segment. (See shmget(2)) */

@@ -24,12 +24,12 @@ MsgHandler::MsgHandler(int complevel)
   m_complevel = complevel;
 }
 
-MsgHandler::~MsgHandler(void)
+MsgHandler::~MsgHandler()
 {
   //  printf("MsgHandler : destructor called.....\n");
 }
 
-void MsgHandler::clear(void)
+void MsgHandler::clear()
 {
   m_buf.clear();
 }

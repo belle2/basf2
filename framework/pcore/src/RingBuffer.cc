@@ -159,12 +159,12 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
   B2INFO(boost::format("buftop = %1%, end = %2%\n") % m_buftop % (m_buftop + m_bufinfo->size));
 }
 
-RingBuffer::~RingBuffer(void)
+RingBuffer::~RingBuffer()
 {
   cleanup();
 }
 
-void RingBuffer::cleanup(void)
+void RingBuffer::cleanup()
 {
   shmdt((char*)m_shmadr);
   B2INFO("RingBuffer: Cleaning up IPC");
@@ -178,7 +178,7 @@ void RingBuffer::cleanup(void)
   }
 }
 
-void RingBuffer::dump_db(void)
+void RingBuffer::dump_db()
 {
   printf("bufsize=%d, remain=%d, wptr=%d, rptr=%d, nbuf=%d\n",
          m_bufinfo->size, m_bufinfo->remain,
@@ -342,32 +342,32 @@ int RingBuffer::spyq(int* buf)
   return nw;
 }
 
-int RingBuffer::numq(void)
+int RingBuffer::numq()
 {
   return m_bufinfo->nbuf;
 }
 
-int RingBuffer::ninsq(void)
+int RingBuffer::ninsq()
 {
   return m_bufinfo->ninsq;
 }
 
-int RingBuffer::nremq(void)
+int RingBuffer::nremq()
 {
   return m_bufinfo->nremq;
 }
 
-int RingBuffer::insq_counter(void)
+int RingBuffer::insq_counter()
 {
   return m_insq_counter;
 }
 
-int RingBuffer::remq_counter(void)
+int RingBuffer::remq_counter()
 {
   return m_remq_counter;
 }
 
-int RingBuffer::clear(void)
+int RingBuffer::clear()
 {
   SemaphoreLocker locker(m_semid);
   //  m_bufinfo->size = m_shmsize - sizeof ( struct RingBufInfo );
@@ -382,7 +382,7 @@ int RingBuffer::clear(void)
   return 0;
 }
 
-int RingBuffer::shmid(void)
+int RingBuffer::shmid()
 {
   return m_shmid;
 }

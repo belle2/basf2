@@ -36,37 +36,37 @@ namespace Belle2 {
 
   public:
     /*! Constructor */
-    ProcHandler(void);
+    ProcHandler();
     /*! Destructor */
-    ~ProcHandler(void);
+    ~ProcHandler();
 
     /*! Fork and initialize an event_server process */
-    int init_EvtServer(void);
+    int init_EvtServer();
     /*! Fork and initialize an event process */
     int init_EvtProc(int nproc);
     /*! Fork and initialize an output_server process */
     int init_OutServer(int id);
 
     /*! Wait until all forked processes are completed */
-    int wait_processes(void);
+    int wait_processes();
     /*! Wait until event server process is completed */
-    int wait_event_server(void);
+    int wait_event_server();
     /*! Wait until all event processes are completed */
-    int wait_event_processes(void);
+    int wait_event_processes();
     /*! Wait until output servers are completed */
-    int wait_output_server(void);
+    int wait_output_server();
 
     /*! remove the pid from the process list */
     int remove_pid(pid_t pid);
 
     /*! Return 1 if the process is mother */
-    int isFramework(void);
+    int isFramework();
     /*! Return 1 if the process is an event_server */
-    int isEvtServer(void);
+    int isEvtServer();
     /*! Return 1 if the process is an event process */
-    int isEvtProc(void);
+    int isEvtProc();
     /*! Return 1 if the process is an output_server */
-    int isOutputSrv(void);
+    int isOutputSrv();
 
     /** Return ID of the current process.
      *
@@ -76,15 +76,15 @@ namespace Belle2 {
      *  >=10000 input path
      *  >=20000 output path
      */
-    static int EvtProcID(void);
+    static int EvtProcID();
 
     // Obsolete functions
-    key_t get_srcShmKey(void);
-    key_t get_outShmKey(void);
+    key_t get_srcShmKey();
+    key_t get_outShmKey();
 
     /** Returns 0 if process with PID has the given string in its executable name, 1 otherwise. */
     int isproc(int pid, char* exe);
-    void display(void);
+    void display();
   };
 }
 

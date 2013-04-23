@@ -24,7 +24,7 @@ using namespace Belle2;
 /// Set static process ID number
 int ProcHandler::m_fEvtProcID = -1;
 
-ProcHandler::ProcHandler(void)
+ProcHandler::ProcHandler()
   : m_nEvtSrv(0), m_nEvtProc(0), m_nOutputSrv(0),
     m_fEvtServer(0), m_fEvtProc(0), m_fOutputSrv(0)
 {
@@ -35,13 +35,13 @@ ProcHandler::ProcHandler(void)
 
 /// @brief Destructor of ProcHandler class
 
-ProcHandler::~ProcHandler(void)
+ProcHandler::~ProcHandler()
 {
 }
 
 /// @brief Initialize an event server
 
-int ProcHandler::init_EvtServer(void)
+int ProcHandler::init_EvtServer()
 {
   fflush(stdout);
   fflush(stderr);
@@ -120,7 +120,7 @@ int ProcHandler::init_OutServer(int id)
 /// @brief Check whether this process is framework or not
 /// @return 0 for non-framework
 /// @return 1 for framework
-int ProcHandler::isFramework(void)
+int ProcHandler::isFramework()
 {
   return !(m_fEvtServer || m_fEvtProc || m_fOutputSrv);
 }
@@ -128,7 +128,7 @@ int ProcHandler::isFramework(void)
 /// @brief Check whether this process is event server or not
 /// @return 0 for non-event server
 /// @return 1 for event server
-int ProcHandler::isEvtServer(void)
+int ProcHandler::isEvtServer()
 {
   return m_fEvtServer;
 }
@@ -136,7 +136,7 @@ int ProcHandler::isEvtServer(void)
 /// @brief Check whether this process is event process or not
 /// @return 0 for non-event process
 /// @return 1 for event process
-int ProcHandler::isEvtProc(void)
+int ProcHandler::isEvtProc()
 {
   return m_fEvtProc;
 }
@@ -144,27 +144,27 @@ int ProcHandler::isEvtProc(void)
 /// @brief Check whether this process is output server or not
 /// @return 0 for non-output server
 /// @return 1 for output server
-int ProcHandler::isOutputSrv(void)
+int ProcHandler::isOutputSrv()
 {
   return m_fOutputSrv;
 }
 
 /// @brief Returns ID number of event process
-int ProcHandler::EvtProcID(void)
+int ProcHandler::EvtProcID()
 {
   return m_fEvtProcID;
 }
 
 /// @brief Get the key of the source shared memory
 /// @return Key value of the source shared memory
-key_t ProcHandler::get_srcShmKey(void)
+key_t ProcHandler::get_srcShmKey()
 {
   return m_kSrcShm;
 }
 
 /// @brief Get the key of the output shared memory
 /// @return Key value of the output shared memory
-key_t ProcHandler::get_outShmKey(void)
+key_t ProcHandler::get_outShmKey()
 {
   return m_kOutShm;
 }
@@ -193,7 +193,7 @@ int ProcHandler::isproc(int pid, char* exe)
 }
 
 /// @brief Display the status of child processes
-void ProcHandler::display(void)
+void ProcHandler::display()
 {
   char procStr[] = "basf2";
 
@@ -240,7 +240,7 @@ void ProcHandler::display(void)
 }
 
 // @brief Wait for all the forked processes completed
-int ProcHandler::wait_processes(void)
+int ProcHandler::wait_processes()
 {
   // wait for any process exit
   //  printf ( "... wait processes called from %d\n", getpid() );
@@ -305,7 +305,7 @@ int ProcHandler::remove_pid(pid_t pid)
   return -1;
 }
 
-int ProcHandler::wait_event_server(void)
+int ProcHandler::wait_event_server()
 {
   unsigned int id = 0;
   while (id  < m_lEvtSrv.size()) {
@@ -329,7 +329,7 @@ int ProcHandler::wait_event_server(void)
   return 0;
 }
 
-int ProcHandler::wait_event_processes(void)
+int ProcHandler::wait_event_processes()
 {
   unsigned int id = 0;
   while (id  < m_lEvtProc.size()) {
@@ -356,7 +356,7 @@ int ProcHandler::wait_event_processes(void)
 
 
 
-int ProcHandler::wait_output_server(void)
+int ProcHandler::wait_output_server()
 {
   unsigned int id = 0;
   while (id < m_lOutputSrv.size()) {

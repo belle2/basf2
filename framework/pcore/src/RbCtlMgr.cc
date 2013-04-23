@@ -19,7 +19,7 @@
 
 using namespace Belle2;
 
-RbCtlMgr::RbCtlMgr(void)
+RbCtlMgr::RbCtlMgr()
 {
   m_shmid = shmget(IPC_PRIVATE, sizeof(RbCtlShm), IPC_CREAT | 0666);
   if (m_shmid < 0) {
@@ -43,13 +43,13 @@ RbCtlMgr::RbCtlMgr(int shmid):
   m_ctlshm = (RbCtlShm*) shmat(m_shmid, 0, 0);
 }
 
-RbCtlMgr::~RbCtlMgr(void)
+RbCtlMgr::~RbCtlMgr()
 {
   shmdt((const void*)m_ctlshm);
 }
 
 
-void RbCtlMgr::terminate(void)
+void RbCtlMgr::terminate()
 {
   shmdt((const void*)m_ctlshm);
   shmctl(m_shmid, IPC_RMID, NULL);
@@ -57,12 +57,12 @@ void RbCtlMgr::terminate(void)
 
 }
 
-RbCtlShm* RbCtlMgr::ctlshm(void)
+RbCtlShm* RbCtlMgr::ctlshm()
 {
   return m_ctlshm;
 }
 
-int RbCtlMgr::shmid(void)
+int RbCtlMgr::shmid()
 {
   return m_shmid;
 }
@@ -75,7 +75,7 @@ void RbCtlMgr::sync_set(int nprocess)
   //  printf ( "RbCtlMgr: n_sync set to %d\n", m_ctlshm->n_sync );
 }
 
-void RbCtlMgr::sync_done(void)
+void RbCtlMgr::sync_done()
 {
   sem_lock();
   if (m_ctlshm->n_sync > 0) m_ctlshm->n_sync--;
@@ -83,7 +83,7 @@ void RbCtlMgr::sync_done(void)
   //  printf ( "RbCtlMgr: n_sync decreased to %d\n", m_ctlshm->n_sync );
 }
 
-void RbCtlMgr::sync_wait(void)
+void RbCtlMgr::sync_wait()
 {
   int count = 0;
   int nsync;
@@ -114,7 +114,7 @@ int RbCtlMgr::get_flag(int id)
 }
 
 
-int RbCtlMgr::sem_lock(void)
+int RbCtlMgr::sem_lock()
 {
   struct sembuf sb;
   sb.sem_num = 0;
@@ -128,7 +128,7 @@ int RbCtlMgr::sem_lock(void)
   return 0;
 }
 
-int RbCtlMgr::sem_unlock(void)
+int RbCtlMgr::sem_unlock()
 {
   struct sembuf sb;
   sb.sem_num = 0;

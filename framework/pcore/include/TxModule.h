@@ -11,10 +11,10 @@
 
 #include <framework/core/Module.h>
 #include <framework/pcore/RingBuffer.h>
-#include <framework/pcore/DataStoreStreamer.h>
 
 
 namespace Belle2 {
+  class DataStoreStreamer;
 
   /** Module for encoding data store contents into a RingBuffer. */
   class TxModule : public Module {
@@ -38,7 +38,13 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    // Data members
+    /** Wether to block until we can insert data into the ring buffer in event().
+     *
+     * If this is turned off, some previous data will be removed until enough
+     * space is available.
+     */
+    void setBlockingInsert(bool block) { m_blockingInsert = block; }
+
   private:
 
     //!Compression parameter
@@ -52,6 +58,9 @@ namespace Belle2 {
 
     //! No. of sent events
     int m_nsent;
+
+    /** Wether to block until we can insert data into the ring buffer in event(). */
+    bool m_blockingInsert;
 
   };
 

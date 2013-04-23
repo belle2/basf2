@@ -11,13 +11,10 @@
 
 #include <framework/core/Module.h>
 #include <framework/pcore/RingBuffer.h>
-#include <framework/pcore/DataStoreStreamer.h>
-
-#include <string>
-#include <vector>
 
 
 namespace Belle2 {
+  class DataStoreStreamer;
 
   /** Module to decode data store contents from RingBuffer. */
   class RxModule : public Module {

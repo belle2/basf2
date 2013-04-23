@@ -9,6 +9,7 @@
 #include <framework/pcore/TxModule.h>
 
 #include <framework/pcore/EvtMessage.h>
+#include <framework/pcore/DataStoreStreamer.h>
 
 #include <stdlib.h>
 
@@ -24,7 +25,7 @@ REG_MODULE(Tx)
 //                 Implementation
 //-----------------------------------------------------------------
 
-TxModule::TxModule(RingBuffer* rbuf) : Module(), m_streamer(0)
+TxModule::TxModule(RingBuffer* rbuf) : Module(), m_streamer(0), m_blockingInsert(true)
 {
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
@@ -66,6 +67,10 @@ void TxModule::event()
   for (;;) {
     int stat = m_rbuf->insq((int*)msg->buffer(), (msg->size() - 1) / sizeof(int) + 1);
     if (stat >= 0) break;
+    if (!m_blockingInsert) {
+      B2WARNING("Ring buffer seems full, removing some previous data.");
+      m_rbuf->remq(NULL);
+    }
     usleep(200);
   }
   m_nsent++;

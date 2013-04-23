@@ -9,6 +9,7 @@
 #include <framework/pcore/pEventProcessor.h>
 #include <framework/core/Environment.h>
 #include <framework/core/PathManager.h>
+#include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>

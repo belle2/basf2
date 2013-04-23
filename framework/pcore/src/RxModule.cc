@@ -8,6 +8,7 @@
 
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/EvtMessage.h>
+#include <framework/pcore/DataStoreStreamer.h>
 
 #include <TSystem.h>
 

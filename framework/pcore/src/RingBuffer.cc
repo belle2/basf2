@@ -350,7 +350,8 @@ int RingBuffer::remq(int* buf)
     return 0;
   }
   //  printf ( "remq : taking buf from %d(%d)\n", m_bufinfo->rptr, nw );
-  memcpy(buf, r_ptr + 2, nw * sizeof(int));
+  if (buf)
+    memcpy(buf, r_ptr + 2, nw * sizeof(int));
   m_bufinfo->rptr = *(r_ptr + 1);
   //  if ( *(r_ptr+1) < m_bufinfo->rptr )
   if (m_bufinfo->rptr == 0)

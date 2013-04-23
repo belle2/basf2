@@ -172,7 +172,7 @@ void MCTrackCandCombinerModule::event()
       GFTrackCand* aTC = cdcCands[iTC];
       vector<int> hitIDsFromTC = aTC->getHitIDs(Const::CDC);
       const int nHitIDs = hitIDsFromTC.size();
-      const int nNeededHits = m_hitsRatio * nHitIDs;
+      const int nNeededHits = int(m_hitsRatio * double(nHitIDs));
       vector<CDCHit*> hitsFromTC;
       for (int i = 0; i not_eq nHitIDs; ++i) {
         hitsFromTC.push_back(cdcHits[hitIDsFromTC[i]]);
@@ -203,7 +203,7 @@ void MCTrackCandCombinerModule::event()
       vector<int> svdHitIDsFromTC = aTC->getHitIDs(Const::SVD);
       const int nSvdHitsFromTC = svdHitIDsFromTC.size();
       const int nHitIDsFromTC = nPxdHitsFromTC + nSvdHitsFromTC;
-      const int nNeededHits = m_hitsRatio * nHitIDsFromTC;
+      const int nNeededHits = int(m_hitsRatio * double(nHitIDsFromTC));
       vector<PXDCluster*> pxdHitsFromTC;
       for (int i = 0; i not_eq nPxdHitsFromTC; ++i) {
         pxdHitsFromTC.push_back(pxdClusters[pxdHitIDsFromTC[i]]);

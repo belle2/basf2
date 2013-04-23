@@ -77,10 +77,25 @@ namespace Belle2 {
     int remq_counter(void);
 
   private:
-    /** Lock the given semaphore. */
-    int sem_lock(int);
-    /** Unlock the given semaphore. */
-    int sem_unlock(int);
+    /** Convenience class to lock a semaphore on construction, and unlock on destruction. */
+    class SemaphoreLocker {
+    public:
+      /** Lock the given semaphore. */
+      SemaphoreLocker(int semId): m_id(semId) { lock(); }
+      /** Unlock. */
+      ~SemaphoreLocker() { unlock(); }
+
+      /** Create a new semaphore and initialize it. Returns the semaphore id or dies with an error. */
+      static int create();
+
+      /** Lock the semaphore. */
+      void lock();
+      /** Unlock the semaphore. */
+      void unlock();
+
+    private:
+      int m_id; /**< semaphore id, see semget(2). */
+    };
 
     /** Does the actual memcpy into RingBuffer. */
     void insq_intern(const int* buf, int size);

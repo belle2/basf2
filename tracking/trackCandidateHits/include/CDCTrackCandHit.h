@@ -21,7 +21,7 @@ namespace Belle2 {
      * by the GenFitter module and given to Genfit*/
     class CDCTrackCandHit : public GFTrackCandHit {
     public:
-      /** Constructor. First 4 arguments are identical GFTrackCandHit's constructor. 5th argument tells who to resolve the */
+      /** Constructor. First 4 arguments are identical GFTrackCandHit's constructor. 5th argument tells how to resolve the ambiguity*/
       CDCTrackCandHit(int detId = -1, int hitId = -1, int planeId = -1, double rho =  0., char leftOrRight = 0):
         GFTrackCandHit(detId, hitId, planeId, rho), m_leftOrRight(leftOrRight) {
 

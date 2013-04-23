@@ -266,7 +266,7 @@ void MCTrackFinderModule::event()
     }
     // check all "seen in" properties that the mcparticle should have in one line.
     if ((mcParticleProperties bitand m_particleProperties) != m_particleProperties) {
-      B2DEBUG(100, "PDG: " << aMcParticlePtr->getPDG() <<  " | property mask of particle " <<  mcParticleProperties << " demanded property mask " << m_particleProperties);
+      B2DEBUG(101, "PDG: " << aMcParticlePtr->getPDG() <<  " | property mask of particle " <<  mcParticleProperties << " demanded property mask " << m_particleProperties);
       continue; //goto next mcParticle, do not make track candidate
     }
     //make links only for interesting MCParticles: energy cut and check for neutrals
@@ -563,7 +563,7 @@ void MCTrackFinderModule::event()
         char lrAmbiSign = boost::math::sign(scalarProduct);
         CDCTrackCandHit* aCdcTrackCandHit = new CDCTrackCandHit(Const::CDC, hitID, -1, time, lrAmbiSign); //do not delete! the GFTrackCand has ownership
         trackCandidates[counter]->addHit(aCdcTrackCandHit);
-        B2DEBUG(100, "CDC hit " << hitID << " has reft/right sign " << int(lrAmbiSign));
+        B2DEBUG(101, "CDC hit " << hitID << " has reft/right sign " << int(lrAmbiSign));
       }
       B2DEBUG(100, "    add " << cdcHitsIndices.size() << " CDCHits");
     }

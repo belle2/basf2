@@ -190,6 +190,18 @@ namespace Belle2 {
 
 
     /**
+     * A class that defines the valid set of VXD detectors.
+     * To be used as a template argument for RestrictedDetectorSet.
+     */
+    class VXDDetectors {
+    public:
+      static DetectorSet set() {return c_set;}  /**< Accessor function for the set of valid detectors */
+      static const DetectorSet c_set;           /**< The set of valid tracking detectors */
+    };
+    /** Typedef for set of VXD detectors. */
+    typedef RestrictedDetectorSet<VXDDetectors> VXDDetectorSet;
+
+    /**
      * A class that defines the valid set of tracking detectors.
      * To be used as a template argument for RestrictedDetectorSet.
      */

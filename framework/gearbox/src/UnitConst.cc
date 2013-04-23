@@ -204,6 +204,8 @@ size_t Const::DetectorSet::size() const
 }
 
 
+const Const::DetectorSet Const::VXDDetectors::c_set = Const::PXD + Const::SVD;
+
 const Const::DetectorSet Const::TrackingDetectors::c_set = Const::PXD + Const::SVD + Const::CDC;
 
 const Const::DetectorSet Const::PIDDetectors::c_set = Const::SVD + Const::CDC + Const::TOP + Const::ARICH;

@@ -41,7 +41,7 @@ void AsyncWrapper::initialize()
   B2INFO("Initializing AsyncWrapper...");
 
   m_procHandler = new ProcHandler();
-  m_ringBuffer = new RingBuffer(10000000); //TODO: replace with some constant
+  m_ringBuffer = new RingBuffer();
   m_rx = new RxModule(m_ringBuffer);
   m_tx = new TxModule(m_ringBuffer);
   m_tx->setBlockingInsert(false); //actually decouple this process

@@ -139,6 +139,10 @@ void pEventProcessor::process(PathPtr spath)
 
   // 6. Framework process
   if (m_procHandler->isFramework()) {
+    //ignore SIGINT for main process, so children have time to clean up
+    if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
+      B2FATAL("Cannot ignore SIGINT signal handler for main process\n");
+    }
     // 6.0 Build End of data message
     EvtMessage term(NULL, 0, MSG_TERMINATE);
     // 6.1 Wait for input path to terminate

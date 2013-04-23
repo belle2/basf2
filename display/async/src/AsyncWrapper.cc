@@ -20,6 +20,9 @@
 #include <framework/pcore/TxModule.h>
 #include <framework/logging/LogSystem.h>
 
+#include <signal.h>
+#include <unistd.h>
+
 #include <cstdlib>
 #include <iostream>
 
@@ -42,6 +45,13 @@ bool AsyncWrapper::newEventAvailable()
   return (size != 0);
 
 }
+
+void AsyncWrapper::stopMainProcess()
+{
+  if (s_isAsync)
+    kill(getppid(), SIGINT);
+}
+
 
 AsyncWrapper::AsyncWrapper(Module* wrapMe): Module(), m_wrappedModule(wrapMe), m_procHandler(0), m_ringBuffer(0), m_rx(0), m_tx(0)
 {

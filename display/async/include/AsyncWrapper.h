@@ -50,6 +50,9 @@ namespace Belle2 {
     /** check wether another event is available in the RingBuffer. */
     static bool newEventAvailable();
 
+    /** send a SIGINT to the main process from asynchronous process. */
+    static void stopMainProcess();
+
 
   private:
     /** The wrapped module. */

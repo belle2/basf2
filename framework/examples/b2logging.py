@@ -53,7 +53,7 @@ logging.add_console(True)
 B2DEBUG(100, 'Debug Message')
 B2INFO('Info Message')
 B2WARNING('Warning Message')
-B2ERROR('Error Message')
+#B2ERROR('Error Message')
 
 # Repeated messages (provided they originate from the same line) can be
 # filtered. Note that this is not the default, you can enable this using
@@ -71,11 +71,24 @@ B2INFO('Some other message')
 for (level, num) in logging.log_stats.items():
     print 'Messages for level %8s: %2d' % (level.name, num)
 
+evtmetagen = register_module('EvtMetaGen')
 # configure logging for the EvtMetaGen module:
 # loglevel ERROR and info for ERROR message is file name and line number
-evtmetagen = register_module('EvtMetaGen')
 evtmetagen.logging.log_level = LogLevel.ERROR
 evtmetagen.logging.set_info(LogLevel.ERROR, LogInfo.FILE | LogInfo.LINE)
 # or alternatively:
 evtmetagen.set_log_level(LogLevel.ERROR)
 evtmetagen.set_log_info(LogLevel.ERROR, LogInfo.FILE | LogInfo.LINE)
+
+# add time stamp to all INFO messages
+currentInfo = logging.get_info(LogLevel.INFO)
+logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
+
+# run some events to see time stamp
+set_log_level(LogLevel.INFO)
+main = create_path()
+main.add_module(evtmetagen)
+evtmetagen.param('EvtNumList', [30])
+evtmetainfo = register_module('EvtMetaInfo')
+main.add_module(evtmetainfo)
+process(main)

@@ -14,25 +14,36 @@
 
 using namespace std;
 using namespace Belle2;
+using boost::math::isnan;
 
 
 double TwoHitFilters::calcNormedDist3D()
 {
   double normedVal = (m_x2 + m_y2) / (m_x2 + m_y2 + m_z2);
-  if ((boost::math::isnan)(normedVal) == true) {
-    return 0;
-  } else {
-    return normedVal;
-  }
+  return filterNan(normedVal);
+//   if ((boost::math::isnan)(normedVal) == true) {
+//     return 0;
+//   } else {
+//     return normedVal;
+//   }
 } // return unit: none
 
 
 double TwoHitFilters::calcSlopeRZ()
 {
   double slope = (m_x2 + m_y2) / m_dz;
-  if ((boost::math::isnan)(slope) == true) {
-    return 0;
-  } else {
-    return slope;
-  }
+  return filterNan(slope);
+//   if ((boost::math::isnan)(slope) == true) {
+//     return 0;
+//   } else {
+//     return slope;
+//   }
 } // return unit: cm  (cm^2/cm = cm)
+
+
+double TwoHitFilters::filterNan(double value)
+{
+  if ((boost::math::isnan)(value) == true) return 0;
+  return value;
+
+}

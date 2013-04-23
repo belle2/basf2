@@ -21,9 +21,12 @@ bool NbFinderFilters::checkAngle3D(std::string nameAngle3D)
   if (pCutoff != NULL) {
     double aResult = ThreeHitFilters::calcAngle3D();
     if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {
+      m_angle3DCtr.first++;
       return true;
-    } else { return false; }
-  } else { return false; }
+    }
+  }
+  m_angle3DCtr.second++;
+  return false;
 }
 
 
@@ -33,9 +36,12 @@ bool NbFinderFilters::checkAngleXY(std::string nameAngleXY)
   if (pCutoff != NULL) {
     double aResult = ThreeHitFilters::calcAngleXY();
     if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {
+      m_angleXYCtr.first++;
       return true;
-    } else { return false; }
-  } else { return false; }
+    }
+  }
+  m_angleXYCtr.second++;
+  return false;
 }
 
 
@@ -45,9 +51,12 @@ bool NbFinderFilters::checkAngleRZ(std::string nameAngleRZ)
   if (pCutoff != NULL) {
     double aResult = ThreeHitFilters::calcAngleRZ();
     if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {
+      m_angleRZCtr.first++;
       return true;
-    } else { return false; }
-  } else { return false; }
+    }
+  }
+  m_angleRZCtr.second++;
+  return false;
 }
 
 
@@ -57,9 +66,12 @@ bool NbFinderFilters::checkCircleDist2IP(std::string nameCircleDist2IP)
   if (pCutoff != NULL) {
     double aResult = ThreeHitFilters::calcCircleDist2IP();
     if (aResult < pCutoff->getMaxValue()) {
+      m_circleDist2IPCtr.first++;
       return true;
-    } else { return false; }
-  } else { return false; }
+    }
+  }
+  m_circleDist2IPCtr.second++;
+  return false;
 }
 
 
@@ -69,9 +81,12 @@ bool NbFinderFilters::checkDeltaSlopeRZ(std::string nameDeltaSlopeRZ)
   if (pCutoff != NULL) {
     double aResult = ThreeHitFilters::calcDeltaSlopeRZ();
     if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {
+      m_deltaSlopeRZCtr.first++;
       return true;
-    } else { return false; }
-  } else { return false; }
+    }
+  }
+  m_deltaSlopeRZCtr.second++;
+  return false;
 }
 
 
@@ -81,9 +96,12 @@ bool NbFinderFilters::checkPt(std::string namePt)
   if (pCutoff != NULL) {
     double aResult = ThreeHitFilters::calcPt();
     if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {
+      m_pTCtr.first++;
       return true;
-    } else { return false; }
-  } else { return false; }
+    }
+  }
+  m_pTCtr.second++;
+  return false;
 }
 
 
@@ -93,18 +111,18 @@ bool NbFinderFilters::checkHelixFit(std::string nameHelixFit)
   if (pCutoff != NULL) {
     double aResult = this->calcHelixFit();
     if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {
+      m_helixFitCtr.first++;
       return true;
-    } else { return false; }
-  } else { return false; }
+    }
+  }
+  m_helixFitCtr.second++;
+  return false;
 }
 
 
 pair <double, double> NbFinderFilters::getCutoffs(string aFilter)
 {
-  pair <double, double> pair;
   Cutoff* pCutoff = m_thisSector->getCutoff(aFilter, m_friendID);
-  if (pCutoff != NULL) {
-    pair = make_pair(pCutoff->getMinValue(), pCutoff->getMaxValue());
-    return pair;;
-  } else { return make_pair(0., 0.); }
+  if (pCutoff != NULL) return make_pair(pCutoff->getMinValue(), pCutoff->getMaxValue());
+  return make_pair(0., 0.);
 }

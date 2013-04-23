@@ -90,8 +90,11 @@ void TFAnalizerModule::initialize()
 {
   StoreArray<GFTrackCand>::required(m_PARAMmcTCname);
   StoreArray<GFTrackCand>::required(m_PARAMcaTCname);
+  StoreArray<PXDCluster>::required();
+  StoreArray<SVDCluster>::required();
+  StoreArray<PXDTrueHit>::required();
+  StoreArray<SVDTrueHit>::required();
 //  B2WARNING("TFAnalizerModule: at the moment, no curling tracks are supported! When you feed this module with curling tracks, results can be wrong and misleading")
-  B2WARNING("TFAnalizerModule: at the moment, trapezoidal sensors are not supported. using Thetas 17-50° will produce wrong results!")
   m_countReconstructedTCs = 0;
   m_eventCounter = 0;
   m_mcTrackCounter = 0;
@@ -182,7 +185,7 @@ void TFAnalizerModule::event()
   BOOST_FOREACH(VXDTrackCandidate & caTC, caTcVector) {
 
     B2DEBUG(10, " caTC " << caTC.indexNumber << ": has got the following assigned mc trackCandidates: (best value: mcTCID: " << caTC.finalAssignedID << ", QI: " << caTC.qualityIndex << ")")
-    BOOST_FOREACH(CompatibilityIndex thisEntry, caTC.compatiblePartners) {
+    BOOST_FOREACH(CompatibilityIndex & thisEntry, caTC.compatiblePartners) {
       B2DEBUG(10, "	Partner: " << boost::get<0>(thisEntry) << ", shares " << boost::get<1>(thisEntry) << " hits, thisTC has got " << boost::get<2>(thisEntry) << " dirty hits, " << boost::get<3>(thisEntry) << " hits are only in partner and they have a qualityRelation of " << boost::get<4>(thisEntry))
     }
     B2DEBUG(10, "-------------------------------------------------------------------------------")
@@ -393,6 +396,10 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
   B2DEBUG(10, "starting extractHits... isMCTC: " << isMCTC << ", index: " << index)
   int numOfHits = aTC->getNHits();
   B2DEBUG(10, " found " << numOfHits << " hits for TC " << index)
+  if (int(aTC->getNHits()) == 0) {
+    B2ERROR("TFAnalizerModule::extractHits - event " << m_eventCounter << ": GfTrackcand with isMCTC " << isMCTC << " has no hits, neglecting tc...:")
+    return;
+  }
   vector<int> pxdHitIDsOfCurrentTC;
   vector<int> svdHitIDsOfCurrentTC;
   vector<TVector3> coordinates;
@@ -453,6 +460,7 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
   double pT = momentum_t.Mag();
   int pdgCode = aTC->getPdgCode();
   bool gotNewMomentum = false;
+  B2DEBUG(10, " tc no " << index << " with isMCTC " << isMCTC << " has got initial pValue " << pValue << ", pdgCode " << pdgCode << " and " << int(aTC->getNHits()) << " hits")
 
   if (isMCTC == true) {   // want momentum vector of innermost hit, not of primary vertex
 

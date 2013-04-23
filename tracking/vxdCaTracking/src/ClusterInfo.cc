@@ -8,7 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+// #include "../include/VXDTFTrackCandidate.h"
 #include "../include/ClusterInfo.h"
+
 #include <boost/foreach.hpp>
 
 using namespace std;

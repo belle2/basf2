@@ -44,9 +44,9 @@ namespace Belle2 {
     /** Constructor.
     //      * @param hitPos Hit coordinates (global).
     //      * @param passIndex index number of pass containing hit. (the VXDTF module supports several passes per event searching for different characteristics independently)
-    //      * @param clusterIndexU index number of SVDCluster containing U position.
-    //      * @param clusterIndexV index number of SVDCluster containing V position.
-    //      * @param clusterIndexUV index number of PXDCluster containing U and V position.
+    //      * @param clusterIndexU index number of intermediate class storing index of SVDCluster containing U position.
+    //      * @param clusterIndexV index number of intermediate class storing index of SVDCluster containing V position.
+    //      * @param clusterIndexUV index number of intermediate class storing index of PXDCluster containing U and V position.
     //      * @param detectorType defining whether hit lies on PXD, SVD or IP.
     //      * @param papaSector address of Sector containing hit.
     //      * @param VxdID ID of sensor containing parent clusterHit(s)
@@ -83,9 +83,9 @@ namespace Belle2 {
     TVector3 m_hit; /**< global hit position */
 
     int m_passIndex; /**< index number of pass containing VXDTFhit */
-    int m_clusterIndexU; /**< index number of SVDClusterU */
-    int m_clusterIndexV; /**< index number of SVDClusterV */
-    int m_clusterIndexUV; /**< index number of PXDCluster */
+    int m_clusterIndexU; /**< index number of intermediate class storing index of SVDClusterU */
+    int m_clusterIndexV; /**< index number of intermediate class storing index of SVDClusterV */
+    int m_clusterIndexUV; /**< index number of intermediate class storing index of PXDCluster */
     int m_detectorType; /**< knows wheter hit is in PXD or SVD PXD = 0, SVD = 1, IP = -1 */
 
     std::string m_papaSector; /**< name of sector containing hit */ // convert to int? is that faster? (needed very often)

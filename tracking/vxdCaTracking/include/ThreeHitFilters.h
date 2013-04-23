@@ -112,7 +112,7 @@ namespace Belle2 {
     /** calculates an estimation of circleCenter position, result is written into the 4th input-parameter */
     void calcCircleCenter(TVector3& a, TVector3& b, TVector3& c, TVector3& circleCenter);
 
-    /** calculates calculates the sign of the curvature of given 3-hit-tracklet */
+    /** calculates calculates the sign of the curvature of given 3-hit-tracklet. a positive value represents a left-oriented curvature, a negative value means having a right-oriented curvature. first vector should be outer hit, second = center hit, third is inner hit*/
     int calcSign(TVector3& a, TVector3& b, TVector3& c);
 
   protected:

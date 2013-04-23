@@ -10,6 +10,7 @@
 
 #include "../include/VXDTFTrackCandidate.h"
 #include <math.h>
+#include <framework/gearbox/Const.h>
 
 #include <boost/foreach.hpp>
 
@@ -90,7 +91,7 @@ vector<int> VXDTFTrackCandidate::getSVDHitIndices()
 {
   m_svdHitIndices.clear();
   BOOST_FOREACH(VXDTFHit * aHit, m_attachedHits) {
-    if (aHit->getDetectorType() == 1) { /* SVD */
+    if (aHit->getDetectorType() == Const::SVD) { /* SVD */
       m_svdHitIndices.push_back(aHit->getClusterIndexU());
       m_svdHitIndices.push_back(aHit->getClusterIndexV());
     }
@@ -102,7 +103,7 @@ vector<int> VXDTFTrackCandidate::getPXDHitIndices()
 {
   m_pxdHitIndices.clear();
   BOOST_FOREACH(VXDTFHit * aHit, m_attachedHits) {
-    if (aHit->getDetectorType() == 0) { /* PXD */
+    if (aHit->getDetectorType() == Const::PXD) { /* PXD */
       m_pxdHitIndices.push_back(aHit->getClusterIndexUV());
     }
   }
@@ -113,7 +114,7 @@ list<int> VXDTFTrackCandidate::getHopfieldHitIndices()
 {
   list<int> indices;
   BOOST_FOREACH(VXDTFHit * aHit, m_attachedHits) {
-    if (aHit->getDetectorType() == 0) { /*PXD */
+    if (aHit->getDetectorType() == Const::PXD) { /*PXD */
       indices.push_back(aHit->getClusterIndexUV());
     } else { /* SVD */
       indices.push_back(aHit->getClusterIndexU());
@@ -176,7 +177,7 @@ void VXDTFTrackCandidate::removeVirtualHit()   /// removing virtual hit/segment 
   int virtualIndex = -1; // contains the index number of the virtual hit/segment (currently only one hit/segment per TC supported)
   int numOfEntries = m_attachedHits.size();
   for (int thisHit = 0 ; thisHit < numOfEntries; ++thisHit) {
-    if (m_attachedHits[thisHit]->getDetectorType() == -1) {
+    if (m_attachedHits[thisHit]->getDetectorType() == Const::IR) {
       virtualIndex = thisHit;
       break; // since there are no curling tracks supported so far, only one virtual hit per TC is possible
     }
@@ -193,8 +194,8 @@ void VXDTFTrackCandidate::removeVirtualHit()   /// removing virtual hit/segment 
   virtualIndex = -1;
   numOfEntries = m_attachedCells.size();
   for (int thisSeg = 0 ; thisSeg < numOfEntries; ++thisSeg) {
-    if (m_attachedCells[thisSeg]->getInnerHit()->getDetectorType() == -1 or
-        m_attachedCells[thisSeg]->getOuterHit()->getDetectorType() == -1) {
+    if (m_attachedCells[thisSeg]->getInnerHit()->getDetectorType() == Const::IR or
+        m_attachedCells[thisSeg]->getOuterHit()->getDetectorType() == Const::IR) {
       virtualIndex = thisSeg;
       break; // since there are no curling tracks supported so far, only one virtual segment per TC is possible
     }

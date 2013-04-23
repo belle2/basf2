@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include "../include/VXDTFHit.h"
-
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -33,9 +33,9 @@ bool VXDTFHit::operator==(const VXDTFHit& b) const
   B2FATAL("somebody is using the '=='-operator of VXDTFHit, although it does no valid comparison!");
   if (getVxdID() != b.getVxdID()) { return false; }   /// ensures that hits are from the same sensor
 
-  if (this->getDetectorType() == 0) {   // PXD
+  if (this->getDetectorType() == Const::PXD) {   // PXD
     return getClusterIndexUV() == b.getClusterIndexUV();
-  } else if (this->getDetectorType() == 1) {   // SVD
+  } else if (this->getDetectorType() == Const::SVD) {   // SVD
     return (getClusterIndexU() == b.getClusterIndexU() or getClusterIndexV() == b.getClusterIndexV());  // returns True if one of the cases are True
   }
   return getTimeStamp() == b.getTimeStamp();

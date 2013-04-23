@@ -61,7 +61,7 @@ namespace Belle2 {
     double m_probValue; /**< probability-value calculated by kalman fit (probability that his TC is real track) */
     int m_assignedGFTC; /**< index number of assigned GFTrackCand for unique identification */
 
-    ClassDef(VXDTFInfoBoard, 0)
+    ClassDef(VXDTFInfoBoard, 1)
   };
 
   /** @}*/

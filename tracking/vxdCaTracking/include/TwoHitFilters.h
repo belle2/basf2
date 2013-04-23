@@ -78,6 +78,9 @@ namespace Belle2 {
     /** calculates the normed distance between the hits (3D), return unit: none */
     double calcNormedDist3D(); // return unit: none
 
+    /** nice little nanChecker returns 0 if value was nan, else returns value itself */
+    double filterNan(double value);
+
   protected:
 
     TVector3 m_hitA; /**< outer hit (position relevant for useful filter calculation) used for the filter calculation */

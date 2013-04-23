@@ -21,9 +21,12 @@ bool TcFourHitFilters::checkDeltapT(string nameDeltapT)
   if (pCutoff != NULL) {
     double aResult = FourHitFilters::deltapT();
     if (/*aResult > pCutoff->getMinValue() &&*/ aResult < pCutoff->getMaxValue()) {
+      m_deltaPtCtr.first++;
       return true;
-    } else { return false; }
-  } else { return false; }
+    }
+  }
+  m_deltaPtCtr.second++;
+  return false;
 }
 
 
@@ -33,18 +36,18 @@ bool TcFourHitFilters::checkDeltaDistCircleCenter(string nameDeltaDistCircleCent
   if (pCutoff != NULL) {
     double aResult = FourHitFilters::deltaDistCircleCenter();
     if (aResult < pCutoff->getMaxValue()) {
+      m_deltaDistCircleCenterCtr.first++;
       return true;
-    } else { return false; }
-  } else { return false; }
+    }
+  }
+  m_deltaDistCircleCenterCtr.second++;
+  return false;
 }
 
 
 pair <double, double> TcFourHitFilters::getCutoffs(string aFilter)
 {
-  pair <double, double> pair;
   Cutoff* pCutoff = m_thisSector->getCutoff(aFilter, m_friendID);
-  if (pCutoff != NULL) {
-    pair = make_pair(pCutoff->getMinValue(), pCutoff->getMaxValue());
-    return pair;;
-  } else { return make_pair(0., 0.); }
+  if (pCutoff != NULL) return make_pair(pCutoff->getMinValue(), pCutoff->getMaxValue());
+  return make_pair(0., 0.);
 }

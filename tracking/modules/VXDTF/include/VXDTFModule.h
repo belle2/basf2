@@ -374,7 +374,8 @@ namespace Belle2 {
 
     /** calculate real kalman-QI's for each currently living TC */
     void calcQIbyKalman(TCsOfEvent& tcVector,
-                        StoreArray<PXDCluster>& pxdClusters); // ->auslagern!
+                        StoreArray<PXDCluster>& pxdClusters,
+                        std::vector<ClusterInfo>& clusters); // ->auslagern!
 //    void calcQIbyKalman(TCsOfEvent& tcVector,
 //                         StoreArray<PXDCluster>& pxdClusters,
 //                         StoreArray<SVDCluster>& svdClusters,
@@ -415,7 +416,7 @@ namespace Belle2 {
     bool m_PARAMDebugMode; /**< some code will only be executed if this mode is enabled */
     std::vector<std::string> m_PARAMsectorSetup; /**< lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) accepts 'std', 'low', 'high' and 'personal', please note that the chosen setup has to exist as a xml-file in ../tracking/data/friendList_XXX.xml. If you can not create your own xml files using e.g. the filterCalculatorModule, use params for  'tuneCutoffXXX' or 'setupWeigh' instead. multipass supported by setting setups in a row */
 
-    std::vector<int> m_PARAMdetectorType; /**< defines which detector type has to be exported. VXD: -1, PXD: 0, SVD: 1 */
+    std::vector<std::string> m_PARAMdetectorType; /**< defines which detector type has to be exported. VXD, PXD, SVD */
     std::vector<int> m_PARAMhighestAllowedLayer; /**< set value below 6 if you want to exclude outer layers (standard is 6) */
     std::vector<int> m_PARAMminLayer; /**< determines lowest layer considered by track candidate collector */
     std::vector<int> m_PARAMminState; /**< determines lowest state of cells considered by track candidate collector */

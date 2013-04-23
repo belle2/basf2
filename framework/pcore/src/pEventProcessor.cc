@@ -140,7 +140,7 @@ void pEventProcessor::process(PathPtr spath)
   // 6. Framework process
   if (m_procHandler->isFramework()) {
     // 6.0 Build End of data message
-    EvtMessage* term = new EvtMessage(NULL, 0, MSG_TERMINATE);
+    EvtMessage term(NULL, 0, MSG_TERMINATE);
     // 6.1 Wait for input path to terminate
     m_procHandler->wait_event_server();
     // 6.2 Send termination to event processes
@@ -148,8 +148,8 @@ void pEventProcessor::process(PathPtr spath)
       for (std::vector<RingBuffer*>::iterator it = m_rbinlist.begin();
            it != m_rbinlist.end(); ++it) {
         RingBuffer* rbuf = *it;
-        while (rbuf->insq((int*)term->buffer(),
-                          (term->size() - 1) / sizeof(int) + 1) < 0) {
+        while (rbuf->insq((int*)term.buffer(),
+                          (term.size() - 1) / sizeof(int) + 1) < 0) {
           usleep(200);
         }
       }
@@ -160,8 +160,8 @@ void pEventProcessor::process(PathPtr spath)
     for (std::vector<RingBuffer*>::iterator it = m_rboutlist.begin();
          it != m_rboutlist.end(); ++it) {
       RingBuffer* rbuf = *it;
-      while (rbuf->insq((int*)term->buffer(),
-                        (term->size() - 1) / sizeof(int) + 1) < 0) {
+      while (rbuf->insq((int*)term.buffer(),
+                        (term.size() - 1) / sizeof(int) + 1) < 0) {
         usleep(200);
       }
     }
@@ -176,13 +176,12 @@ void pEventProcessor::process(PathPtr spath)
          it != m_rboutlist.end(); ++it)
       delete *it;
 
-    delete term;
     B2INFO("process: completed");
   }
 }
 
 
-void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
+void pEventProcessor::analyze_path(const PathPtr& path, Module* inmod, int cstate)
 {
 
   const ModulePtrList& modlist = path->getModules();

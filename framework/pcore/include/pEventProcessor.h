@@ -47,7 +47,7 @@ namespace Belle2 {
 
   private:
     /*! Analyze given path */
-    void analyze_path(PathPtr& path, Module* mod = NULL, int cstate = 0);
+    void analyze_path(const PathPtr& path, Module* mod = NULL, int cstate = 0);
 
     /*! Dump module names in the path */
     void dump_path(const std::string, PathPtr);

@@ -1,5 +1,5 @@
 /*
- * pEventPrxocessor.cc
+ * pEventProcessor.cc
  *
  *  Created on: Oct 26, 2010
  *      Author: R.Itoh, IPNS, KEK
@@ -74,9 +74,9 @@ void pEventProcessor::process(PathPtr spath)
   // 2. Analyze start path and split into parallel paths
   m_histoManagerFound = false;
   analyze_path(spath);
-  B2INFO("process : inlistpath size = " << m_inpathlist.size());
-  B2INFO("process : bodypathlist size = " << m_bodypathlist.size());
-  B2INFO("process : outpathlist size = " << m_outpathlist.size());
+  B2DEBUG(100, "process : inlistpath size = " << m_inpathlist.size());
+  B2DEBUG(100, "process : bodypathlist size = " << m_bodypathlist.size());
+  B2DEBUG(100, "process : outpathlist size = " << m_outpathlist.size());
 
   dump_path("Input Path ", m_inpathlist[0]);
   for (unsigned int i = 0; i < m_bodypathlist.size(); i++) {
@@ -300,9 +300,9 @@ void pEventProcessor::analyze_path(const PathPtr& path, Module* inmod, int cstat
       }
     }
   }
-  B2INFO("Analyze Path : mainlist size = " << mainlist.size());
-  B2INFO("Analyze Path : inlist size = " << mainlist.size());
-  B2INFO("Analyze Path : outlist size = " << mainlist.size());
+  B2DEBUG(100, "Analyze Path : mainlist size = " << mainlist.size());
+  B2DEBUG(100, "Analyze Path : inlist size = " << mainlist.size());
+  B2DEBUG(100, "Analyze Path : outlist size = " << mainlist.size());
 
   PathPtr inpath(new Path);
   if (!inlist.empty()) {
@@ -333,13 +333,13 @@ void pEventProcessor::dump_path(const std::string title, PathPtr path)
   const ModulePtrList& modlist = path->getModules();
   ModulePtrList::const_iterator it;
   std::ostringstream strbuf;
-  strbuf << title << "(" << to_hex(path) << ") : ";
+  strbuf << title << "(" << path.get() << ") : ";
   for (it = modlist.begin(); it != modlist.end(); ++it) {
-    Module* module = it->get();
+    const Module* module = it->get();
     strbuf << module->getName();
     if (module->hasCondition()) {
       PathPtr condpath = module->getConditionPath();
-      strbuf << "[->" << to_hex(condpath) << "] ";
+      strbuf << "[->" << condpath.get() << "] ";
     }
     if (*it != modlist.back())
       strbuf << " -> ";
@@ -353,28 +353,16 @@ void pEventProcessor::dump_modules(const std::string title, const ModulePtrList 
   std::ostringstream strbuf;
   strbuf << title << " : ";
   for (it = modlist.begin(); it != modlist.end(); ++it) {
-    Module* module = it->get();
+    const Module* module = it->get();
     strbuf << module->getName();
     if (module->hasCondition()) {
       PathPtr condpath = module->getConditionPath();
-      strbuf << "[->" << to_hex(condpath) << "] ";
+      strbuf << "[->" << condpath.get() << "] ";
     }
     if (*it != modlist.back())
       strbuf << " -> ";
   }
   B2INFO(strbuf.str());
-}
-
-std::string pEventProcessor::to_hex(PathPtr& path)
-{
-  ostringstream os;
-  os.flags(ios_base::hex);
-  os.width(8);
-  os.fill('0');
-  os << path;
-  //  void* adrs = (void*) path;
-  //  os << (unsigned int)adrs;
-  return os.str();
 }
 
 ModulePtrList pEventProcessor::init_modules_in_main(const ModulePtrList& modlist)

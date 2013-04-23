@@ -55,9 +55,6 @@ namespace Belle2 {
     /*! Dump module names in the ModulePtrList */
     void dump_modules(const std::string, const ModulePtrList);
 
-    /*! Get hexadecimal expression of PathPtr address */
-    std::string to_hex(PathPtr& path);
-
     /*! Extract modules to be initialized in main process */
     ModulePtrList init_modules_in_main(const ModulePtrList& modlist);
 

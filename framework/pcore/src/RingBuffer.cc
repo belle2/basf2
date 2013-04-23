@@ -14,8 +14,6 @@
 #include <framework/pcore/RingBuffer.h>
 #include <framework/logging/Logger.h>
 
-#include <boost/format.hpp>
-
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/sem.h>
@@ -26,6 +24,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
+#include <cstdlib>
 
 using namespace std;
 using namespace Belle2;
@@ -74,9 +73,8 @@ RingBuffer::RingBuffer(int size)
   m_remq_counter = 0;
   m_insq_counter = 0;
 
-  //  cout << "RingBuffer initialization done" << endl;
   B2INFO("RingBuffer initialization done");
-  B2INFO(boost::format("buftop = %1%, end = %2%\n") % m_buftop % (m_buftop + m_bufinfo->size));
+  B2DEBUG(100, "buftop = " << m_buftop << ", end = " << (m_buftop + m_bufinfo->size));
 }
 
 // Constructor of Global Ringbuffer with name
@@ -154,9 +152,8 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
   m_remq_counter = 0;
   m_insq_counter = 0;
 
-  //  cout << "RingBuffer initialization done" << endl;
   B2INFO("RingBuffer initialization done with shm=" << m_shmid);
-  B2INFO(boost::format("buftop = %1%, end = %2%\n") % m_buftop % (m_buftop + m_bufinfo->size));
+  B2DEBUG(100, "buftop = " << m_buftop << ", end = " << (m_buftop + m_bufinfo->size));
 }
 
 RingBuffer::~RingBuffer()

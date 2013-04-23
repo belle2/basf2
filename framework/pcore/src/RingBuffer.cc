@@ -26,6 +26,8 @@
 #include <fcntl.h>
 #include <cstdlib>
 
+#include <fstream>
+
 using namespace std;
 using namespace Belle2;
 
@@ -37,44 +39,11 @@ RingBuffer::RingBuffer(int size)
   m_new = true;
   m_pathname = "";
   m_shmkey = IPC_PRIVATE;
+  m_semkey = IPC_PRIVATE;
 
-
-  // Open shared memory
-  m_shmid = shmget(IPC_PRIVATE, size * sizeof(int), IPC_CREAT | 0644);
-  if (m_shmid < 0) {
-    B2FATAL("RingBuffer: shmget(" << size * sizeof(int) << ") failed. Most likely the system doesn't allow us to reserve the needed shared memory. Try 'echo 500000000 > /proc/sys/kernel/shmmax' as root to set a higher limit (500MB).");
-    return;
-  }
-  m_shmadr = (int*) shmat(m_shmid, 0, 0);
-  if (m_shmadr == (int*) - 1) {
-    B2FATAL("RingBuffer::shmat");
-    return;
-  }
-  //  cout << "Shared Memory created" << endl;
-
-  m_semid = SemaphoreLocker::create();
-
-  // Initialize control parameters
-  m_shmsize = size;
-  m_bufinfo = (struct RingBufInfo*) m_shmadr;
-  m_buftop = m_shmadr + sizeof(struct RingBufInfo);
-  m_bufinfo->size = m_shmsize - sizeof(struct RingBufInfo);
-  m_bufinfo->remain = m_bufinfo->size;
-  m_bufinfo->wptr = 0;
-  m_bufinfo->prevwptr = 0;
-  m_bufinfo->rptr = 0;
-  m_bufinfo->nbuf = 0;
-  m_bufinfo->semid = m_semid;
-  m_bufinfo->nattached = 1;
-  m_bufinfo->mode = 0;
-  m_bufinfo->ninsq = 0;
-  m_bufinfo->nremq = 0;
-
-  m_remq_counter = 0;
-  m_insq_counter = 0;
+  openSHM(size);
 
   B2INFO("RingBuffer initialization done");
-  B2DEBUG(100, "buftop = " << m_buftop << ", end = " << (m_buftop + m_bufinfo->size));
 }
 
 // Constructor of Global Ringbuffer with name
@@ -108,27 +77,53 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
     B2INFO("[RingBuffer] Opening private ring buffer");
   }
 
+  openSHM(size);
+
+  B2INFO("RingBuffer initialization done with shm=" << m_shmid);
+}
+
+RingBuffer::~RingBuffer()
+{
+  cleanup();
+}
+
+void RingBuffer::openSHM(int size)
+{
   // 1. Open shared memory
-  m_shmid = shmget(m_shmkey, size * sizeof(int), IPC_CREAT | 0644);
+  unsigned int sizeBytes = size * sizeof(int);
+  m_shmid = shmget(m_shmkey, sizeBytes, IPC_CREAT | 0644);
   if (m_shmid < 0) {
-    B2FATAL("RingBuffer: shmget(" << size * sizeof(int) << ") failed. Most likely the system doesn't allow us to reserve the needed shared memory. Try 'echo 500000000 > /proc/sys/kernel/shmmax' as root to set a higher limit (500MB).");
-    return;
+    unsigned int maxSizeBytes = size;
+    ifstream shmax("/proc/sys/kernel/shmmax");
+    if (shmax.good())
+      shmax >> maxSizeBytes;
+    shmax.close();
+
+    const unsigned int oldSizeBytes = sizeBytes;
+    size = maxSizeBytes / sizeof(int);
+    sizeBytes = size * sizeof(int);
+    B2WARNING("RingBuffer: shmget(" << oldSizeBytes << ") failed, limiting to system maximum: " << sizeBytes);
+    m_shmid = shmget(IPC_PRIVATE, sizeBytes, IPC_CREAT | 0644);
+    if (m_shmid < 0) {
+      B2FATAL("RingBuffer: shmget(" << size * sizeof(int) << ") failed. Most likely the system doesn't allow us to reserve the needed shared memory. Try 'echo 500000000 > /proc/sys/kernel/shmmax' as root to set a higher limit (500MB).");
+      return;
+    }
   }
   m_shmadr = (int*) shmat(m_shmid, 0, 0);
   if (m_shmadr == (int*) - 1) {
-    B2FATAL("RingBuffer: shmat() failed");
+    B2FATAL("RingBuffer::shmat() failed");
     return;
   }
 
   // 2. Open Semaphore
-  m_semid = SemaphoreLocker::create();
+  m_semid = SemaphoreLocker::create(m_semkey);
   SemaphoreLocker locker(m_semid); //prevent simultaneous initialization
 
   // 3. Initialize control parameters
   m_shmsize = size;
+  m_bufinfo = (struct RingBufInfo*) m_shmadr;
+  m_buftop = m_shmadr + sizeof(struct RingBufInfo);
   if (m_new) {
-    m_bufinfo = (struct RingBufInfo*) m_shmadr;
-    m_buftop = m_shmadr + sizeof(struct RingBufInfo);
     m_bufinfo->size = m_shmsize - sizeof(struct RingBufInfo);
     m_bufinfo->remain = m_bufinfo->size;
     m_bufinfo->wptr = 0;
@@ -141,8 +136,6 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
     m_bufinfo->ninsq = 0;
     m_bufinfo->nremq = 0;
   } else {
-    m_bufinfo = (struct RingBufInfo*) m_shmadr;
-    m_buftop = m_shmadr + sizeof(struct RingBufInfo);
     m_bufinfo->nattached++;
 
     B2INFO("[RingBuffer] check entries = " << m_bufinfo->nbuf);
@@ -152,13 +145,7 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
   m_remq_counter = 0;
   m_insq_counter = 0;
 
-  B2INFO("RingBuffer initialization done with shm=" << m_shmid);
   B2DEBUG(100, "buftop = " << m_buftop << ", end = " << (m_buftop + m_bufinfo->size));
-}
-
-RingBuffer::~RingBuffer()
-{
-  cleanup();
 }
 
 void RingBuffer::cleanup()
@@ -385,9 +372,9 @@ int RingBuffer::shmid() const
 }
 
 
-int RingBuffer::SemaphoreLocker::create()
+int RingBuffer::SemaphoreLocker::create(key_t semkey)
 {
-  int semid = semget(IPC_PRIVATE, 1, IPC_CREAT | 0644);
+  int semid = semget(semkey, 1, IPC_CREAT | 0644);
   if (semid < 0) {
     B2FATAL("Couldn't create semaphore with semget()!");
   }

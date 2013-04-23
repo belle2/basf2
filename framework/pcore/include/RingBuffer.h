@@ -46,6 +46,8 @@ namespace Belle2 {
     //    RingBuffer(int shmid);              // Attach Ring Buffer
     /*! Destructor */
     ~RingBuffer();
+    /** open shared memory */
+    void openSHM(int size);
     /*! Function to detach and remove shared memory*/
     void cleanup();
 
@@ -86,7 +88,7 @@ namespace Belle2 {
       ~SemaphoreLocker() { unlock(); }
 
       /** Create a new semaphore and initialize it. Returns the semaphore id or dies with an error. */
-      static int create();
+      static int create(key_t semkey);
 
       /** Lock the semaphore. */
       void lock();

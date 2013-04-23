@@ -1670,7 +1670,7 @@ int TrackFitCheckerModule::trunctatedMeanAndStd(std::vector<double> data, const 
 {
 
   const int n = data.size();
-  double truncN = -1;
+  int truncN = -1;
 //  if ((n* cutRatio < 2 and symmetric == true) or(n* cutRatio < 1 and symmetric == false)) {
 //    return 0;
 //  }

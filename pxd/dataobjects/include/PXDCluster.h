@@ -11,7 +11,7 @@
 #ifndef PXDCLUSTER_H
 #define PXDCLUSTER_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 #include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
@@ -22,7 +22,7 @@ namespace Belle2 {
   /** The PXD Cluster class
     * This class stores all information about reconstructed PXD clusters
     */
-  class PXDCluster: public TObject {
+  class PXDCluster: public RelationsObject {
   public:
 
     /** Default constructor for the ROOT IO. */

@@ -11,7 +11,7 @@
 #ifndef SVDCLUSTER_H
 #define SVDCLUSTER_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 #include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
@@ -22,7 +22,7 @@ namespace Belle2 {
   /** The SVD Cluster class
    * This class stores all information about reconstructed SVD clusters.
    */
-  class SVDCluster: public TObject {
+  class SVDCluster: public RelationsObject {
   public:
 
     /** Default constructor for the ROOT IO. */

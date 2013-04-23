@@ -155,6 +155,7 @@ void TrackFitCheckerModule::initialize()
     registerTrackWiseData("res_curvVertex");
     registerTrackWiseData("relRes_curvVertex");
     registerTrackWiseData("relRes_p_T");
+    registerTrackWiseData("res_r");
     registerTVector3("trueVertexPos");
     registerTVector3("trueVertexMom");
     registerInt("genfitStatusFlag");
@@ -199,6 +200,8 @@ void TrackFitCheckerModule::initialize()
   registerTrackWiseVecData("res_vertexPosMom", vecDataSize);
   // direclty the vertex coordinates
   registerTrackWiseVecData("vertexPosMom", vecDataSize);
+  registerTrackWiseVecData("resVertexRZPtP", 6);
+  registerTrackWiseVecData("pullsVertexRZPtP", 5);
   // pulls (z) of cartesian 7D coordinates at vertex
   //registerTrackWiseVecData("pulls_vertexState", 7);
   // residuals of cartesian 7D coordinates at vertex
@@ -237,6 +240,9 @@ void TrackFitCheckerModule::initialize()
     m_madScalingFactors["res_curvVertex"] = 1.4826;
     m_madScalingFactors["relRes_curvVertex"] = 1.4826;
     m_madScalingFactors["relRes_p_T"] = 1.4826;
+    m_madScalingFactors["resVertexRZPtP"] = 1.4826;
+    m_madScalingFactors["pullsVertexRZPtP"] = 1.4826;
+    m_madScalingFactors["res_r"] = 1.4826;
     m_madScalingFactors["pValue_bu"] = 4.0 / 3.0;  //scaling factor for uniform distributed variables
     m_madScalingFactors["pValue_fu"] = 4.0 / 3.0;
     //set the cut away ratio for the truncated mean and std. No truncated mean and std will be calculated when this value is not set or 0 or negative
@@ -249,7 +255,9 @@ void TrackFitCheckerModule::initialize()
     m_trunctationRatios["relRes_p_T"] = 0.02;
     m_trunctationRatios["pValue_bu"] = 0.02;
     m_trunctationRatios["pValue_fu"] = 0.02;
-
+    m_trunctationRatios["resVertexRZPtP"] = 0.02;
+    m_trunctationRatios["pullsVertexRZPtP"] = 0.02;
+    m_trunctationRatios["res_r"] = 0.02;
     m_trunctationRatios["chi2tot_bu"] = 0.02;
     m_trunctationRatios["chi2tot_fu"] = 0.02;
 
@@ -305,12 +313,6 @@ void TrackFitCheckerModule::event()
   B2DEBUG(100, "**********   TrackFitCheckerModule  processing event number: " << eventCounter << " ************");
   //simulated truth information
   StoreArray<MCParticle> aMcParticleArray;
-  StoreArray<PXDTrueHit> aPxdTrueHitArray;
-  StoreArray<SVDTrueHit> aSvdTrueHitArray;
-  //StoreArray<CDCTrueSimHit> aCdcTrueHitArray(""); //maybe one day this will be there :-)
-
-
-
 
   //genfit stuff
   StoreArray<GFTrack> fittedTracks(""); // the results of the track fit
@@ -402,12 +404,17 @@ void TrackFitCheckerModule::event()
     vector<double> zVertexPosMom(6);
     vector<double> resVertexPosMom(6);
     vector<double> vertexPosMom(6);
+    vector<double> resVertexRZPtP(6); // x,y,z,p_T,abs(p),p_T/p_T,t
+    vector<double> pullsVertexRZPtP(5); // x,y,z,p_T,abs(p)
 
     GFDetPlane planeThroughVertex(poca, dirInPoca); //get planeThroughVertex through fitted vertex position
+    TVectorD local5DState;
+    TMatrixDSym local5DCov;
     B2DEBUG(100, "plane through vertex constructed");
     //get fitted momentum at fitted vertex
     try {
       aTrackPtr->getPosMomCov(planeThroughVertex, vertexPos, vertexMom, vertexCov);
+      aRKTrackRepPtr->extrapolate(planeThroughVertex, local5DState, local5DCov);
     } catch (GFException& e) {
       B2WARNING("Extrapolation of a track in Event " << eventCounter <<  " to its true vertex position failed. Track will be ignored in statistical tests");
       ++m_extrapFailed;
@@ -428,7 +435,8 @@ void TrackFitCheckerModule::event()
     double relRes_curvatureAtVertex = res_curvatureAtVertex * trueVertexMom.Pt();
     fillTrackWiseData("relRes_curvVertex", relRes_curvatureAtVertex);
     double relRes_p_T = (vertexMom.Pt() - trueVertexMom.Pt()) / trueVertexMom.Pt();
-
+    double pullVertexAbsMom = (charge / local5DState(0) - trueVertexMom.Mag()) / (fabs(charge) / local5DState(0) / local5DState(0) * sqrt(local5DCov(0, 0)));
+    fillTrackWiseData("pullVertexAbsMom", pullVertexAbsMom);
     fillTrackWiseData("relRes_p_T", relRes_p_T);
     resVertexPosMom[0] = (vertexPos[0] - trueVertexPos[0]);
     resVertexPosMom[1] = (vertexPos[1] - trueVertexPos[1]);
@@ -437,12 +445,12 @@ void TrackFitCheckerModule::event()
     resVertexPosMom[4] = (vertexMom[1] - trueVertexMom[1]);
     resVertexPosMom[5] = (vertexMom[2] - trueVertexMom[2]);
     fillTrackWiseVecData("res_vertexPosMom", resVertexPosMom);
-    zVertexPosMom[0] = resVertexPosMom[0] / sqrt(vertexCov[0][0]);
-    zVertexPosMom[1] = resVertexPosMom[1] / sqrt(vertexCov[1][1]);
-    zVertexPosMom[2] = resVertexPosMom[2] / sqrt(vertexCov[2][2]);
-    zVertexPosMom[3] = resVertexPosMom[3] / sqrt(vertexCov[3][3]);
-    zVertexPosMom[4] = resVertexPosMom[4] / sqrt(vertexCov[4][4]);
-    zVertexPosMom[5] = resVertexPosMom[5] / sqrt(vertexCov[5][5]);
+    zVertexPosMom[0] = resVertexPosMom[0] / sqrt(vertexCov(0, 0));
+    zVertexPosMom[1] = resVertexPosMom[1] / sqrt(vertexCov(1, 1));
+    zVertexPosMom[2] = resVertexPosMom[2] / sqrt(vertexCov(2, 2));
+    zVertexPosMom[3] = resVertexPosMom[3] / sqrt(vertexCov(3, 3));
+    zVertexPosMom[4] = resVertexPosMom[4] / sqrt(vertexCov(4, 4));
+    zVertexPosMom[5] = resVertexPosMom[5] / sqrt(vertexCov(5, 5));
     fillTrackWiseVecData("pulls_vertexPosMom", zVertexPosMom);
     vertexPosMom[0] = vertexPos[0];
     vertexPosMom[1] = vertexPos[1];
@@ -451,6 +459,22 @@ void TrackFitCheckerModule::event()
     vertexPosMom[4] = vertexMom[1];
     vertexPosMom[5] = vertexMom[2];
     fillTrackWiseVecData("vertexPosMom", vertexPosMom);
+    double res_r = sqrt(vertexPos[0] * vertexPos[0] + vertexPos[1] * vertexPos[1]) - sqrt(trueVertexPos[0] * trueVertexPos[0] + trueVertexPos[1] * trueVertexPos[1]);
+    fillTrackWiseData("res_r", res_r);
+    resVertexRZPtP[0] = resVertexPosMom[0]; //
+    resVertexRZPtP[1] = resVertexPosMom[1];
+    resVertexRZPtP[2] = resVertexPosMom[2];
+    resVertexRZPtP[3] = sqrt(vertexMom[0] * vertexMom[0] + vertexMom[1] * vertexMom[1]) - trueVertexMom.Pt();
+    resVertexRZPtP[4] = charge / local5DState(0) - trueVertexMom.Mag();
+    resVertexRZPtP[5] = resVertexRZPtP[2] / trueVertexMom.Pt();
+    fillTrackWiseVecData("resVertexRZPtP", resVertexRZPtP);
+
+    pullsVertexRZPtP[0] = resVertexRZPtP[0] / sqrt(vertexCov(0, 0));
+    pullsVertexRZPtP[1] = resVertexRZPtP[1] / sqrt(vertexCov(1, 1));
+    pullsVertexRZPtP[2] = resVertexRZPtP[2] / sqrt(vertexCov(2, 2));
+    pullsVertexRZPtP[3] = resVertexRZPtP[3] / sqrt((vertexMom[0] * vertexMom[0] * vertexCov(3, 3) + vertexMom[1] * vertexMom[1] * vertexCov(4, 4) + 2 * vertexMom[0] * vertexMom[1] * vertexCov(3, 4)) / (vertexMom[0] * vertexMom[0] + vertexMom[1] * vertexMom[1]));
+    pullsVertexRZPtP[4] = resVertexRZPtP[4] / (fabs(charge) / local5DState(0) / local5DState(0) * sqrt(local5DCov(0, 0)));
+    fillTrackWiseVecData("pullsVertexRZPtP", pullsVertexRZPtP);
     B2DEBUG(100, "filled all track wise tests");
 
     if (m_nLayers not_eq 0) { // now the layer wise tests
@@ -540,7 +564,15 @@ void TrackFitCheckerModule::endRun()
     printTrackWiseVecStatistics("vertexPosMom", m_vertexTestsVarNames, true);
     printTrackWiseVecStatistics("res_vertexPosMom", m_vertexTestsVarNames, true);
     printTrackWiseVecStatistics("pulls_vertexPosMom", m_vertexTestsVarNames, true);
-
+    vector<string> rzptpNames;
+    rzptpNames.push_back("x");
+    rzptpNames.push_back("y");
+    rzptpNames.push_back("z");
+    rzptpNames.push_back("p_T");
+    rzptpNames.push_back("|p|");
+    rzptpNames.push_back("p_T/p_T");
+    printTrackWiseVecStatistics("resVertexRZPtP", rzptpNames, true);
+    printTrackWiseVecStatistics("pullsVertexRZPtP", rzptpNames, true);
     /*vector<string> vertexTests7DVarNames;
     vertexTests7DVarNames.push_back("x");
     vertexTests7DVarNames.push_back("y");
@@ -916,7 +948,11 @@ void TrackFitCheckerModule::printTrackWiseStatistics(const string& nameOfDataSam
     if (trunctationRatio > 1E-100) {
       double mean = 0;
       double std = 0;
-      int nCutAwayTracks = trunctatedMeanAndStd(data, trunctationRatio, true, mean, std);
+      bool symetricDistribution = true;
+      if (nameOfDataSample == "res_r") {
+        symetricDistribution = false;
+      }
+      int nCutAwayTracks = trunctatedMeanAndStd(data, trunctationRatio, symetricDistribution, mean, std);
       m_textOutput << "\t" << mean << "\t" << std << "\t" << nCutAwayTracks;
 
     } else {
@@ -962,6 +998,7 @@ void TrackFitCheckerModule::printTrackWiseVecStatistics(const string& nameOfData
       if (trunctationRatio > 1E-100) {
         double mean = 0;
         double std = 0;
+
         int nCutAwayTracks = trunctatedMeanAndStd(data, trunctationRatio, true, mean, std);
         m_textOutput << "\t" << mean << "\t" << std << "\t" << nCutAwayTracks;
 

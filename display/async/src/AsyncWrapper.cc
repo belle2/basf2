@@ -14,6 +14,7 @@
 #include <framework/core/InputController.h>
 #include <framework/core/EventProcessor.h>
 #include <framework/core/PathManager.h>
+#include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>
@@ -32,19 +33,6 @@ AsyncWrapper::AsyncWrapper(Module* wrapMe): Module(), m_wrappedModule(wrapMe), m
 
 AsyncWrapper::~AsyncWrapper()
 {
-  if (m_procHandler) {
-    if (!m_procHandler->isEvtProc()) {
-      //can't use basf2 logging in destructor
-      std::cout << "\nWaiting for asynchronous process...\n";
-      EvtMessage term(NULL, 0, MSG_TERMINATE);
-      while (m_ringBuffer->insq((int*)term.buffer(), (term.size() - 1) / sizeof(int) + 1) < 0) {
-        usleep(200);
-      }
-      m_procHandler->wait_event_processes();
-      std::cout << "Done, cleaning up...\n";
-      delete m_ringBuffer;
-    }
-  }
   delete m_wrappedModule;
 }
 
@@ -93,5 +81,18 @@ void AsyncWrapper::terminate()
 {
   if (!m_procHandler->isEvtProc()) {
     m_tx->terminate();
+
+    //can't use basf2 logging in destructor
+    std::cout << "\nWaiting for asynchronous process...\n";
+    EvtMessage term(NULL, 0, MSG_TERMINATE);
+    while (m_ringBuffer->insq((int*)term.buffer(), (term.size() - 1) / sizeof(int) + 1) < 0) {
+      usleep(200);
+    }
+    m_procHandler->wait_event_processes();
+    std::cout << "Done, cleaning up...\n";
+    delete m_tx;
+    delete m_rx;
+    delete m_ringBuffer;
+    delete m_procHandler;
   }
 }

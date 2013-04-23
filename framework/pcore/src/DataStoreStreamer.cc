@@ -9,6 +9,9 @@
 #include <framework/pcore/DataStoreStreamer.h>
 #include <framework/logging/Logger.h>
 
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+
 #include <TClonesArray.h>
 
 using namespace std;
@@ -68,41 +71,48 @@ EvtMessage* DataStoreStreamer::streamDataStore(DataStore::EDurability durability
 // Restore DataStore
 int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
 {
-  // Clear Message Handler
-  m_msghandler->clear();
+  if (msg->type() == MSG_TERMINATE) {
+    B2INFO("Got termination message. Exitting...");
+    //msg doesn't really contain data, set EventMetaData to something equivalent
+    StoreObjPtr<EventMetaData> eventMetaData;
+    if (m_initStatus == 0)
+      eventMetaData.registerAsPersistent();
+    eventMetaData.create();
+    eventMetaData->setEndOfData();
+  } else {
+    // Clear Message Handler
+    m_msghandler->clear();
 
-  // List of objects to be restored
-  vector<TObject*> objlist;
-  vector<string> namelist;
+    // List of objects to be restored
+    vector<TObject*> objlist;
+    vector<string> namelist;
 
-  // Decode EvtMessage
-  m_msghandler->decode_msg(msg, objlist, namelist);
-  DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
-  int nobjs = (msg->header())->reserved[1];
-  int narrays = (msg->header())->reserved[2];
+    // Decode EvtMessage
+    m_msghandler->decode_msg(msg, objlist, namelist);
+    DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
+    int nobjs = (msg->header())->reserved[1];
+    int narrays = (msg->header())->reserved[2];
 
-  // Restore objects in DataStore
-  for (int i = 0; i < nobjs + narrays; i++) {
-    bool array = (dynamic_cast<TClonesArray*>(objlist.at(i)) != 0);
-    if (objlist.at(i) != NULL) {
-      const TClass* cl = objlist.at(i)->IsA();
-      if (array)
-        cl = static_cast<TClonesArray*>(objlist.at(i))->GetClass();
-      if (m_initStatus == 0) {
-        DataStore::Instance().createEntry(namelist.at(i), durability, cl, array, false, false);
+    // Restore objects in DataStore
+    for (int i = 0; i < nobjs + narrays; i++) {
+      bool array = (dynamic_cast<TClonesArray*>(objlist.at(i)) != 0);
+      if (objlist.at(i) != NULL) {
+        const TClass* cl = objlist.at(i)->IsA();
+        if (array)
+          cl = static_cast<TClonesArray*>(objlist.at(i))->GetClass();
+        if (m_initStatus == 0) {
+          DataStore::Instance().createEntry(namelist.at(i), durability, cl, array, false, false);
+        }
+        DataStore::Instance().createObject(objlist.at(i), true,
+                                           namelist.at(i), durability,
+                                           cl, array);
+        B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
+      } else {
+        B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " is NULL!");
       }
-      DataStore::Instance().createObject(objlist.at(i), true,
-                                         namelist.at(i), durability,
-                                         cl, array);
-      B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
-    } else {
-      B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " is NULL!");
     }
   }
   // Return with normal exit status
   if (m_initStatus == 0) m_initStatus = 1;
   return 0;
 }
-
-
-

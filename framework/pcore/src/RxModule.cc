@@ -55,11 +55,7 @@ void RxModule::readEvent()
 
   // Restore objects in DataStore
   EvtMessage evtmsg(evtbuf);
-  if (evtmsg.type() == MSG_TERMINATE) {
-    B2INFO("Rx: got termination message. Exitting...");
-  } else {
-    m_streamer->restoreDataStore(&evtmsg);
-  }
+  m_streamer->restoreDataStore(&evtmsg);
 
   delete[] evtbuf;
 }

@@ -60,13 +60,23 @@ namespace Belle2 {
 
 
     // Access functions
-    /*! Get buffer address */
+    /*! Get buffer address
+     *
+     * If you own the EvtMessage object, the memory is guaranteed to be at
+     * least sizeof(int) * paddedSize() bytes. Bytes exceeding size() are
+     * zeroed.
+     */
     char* buffer(void);
     /*! Set existing buffer address */
     void  buffer(const char*);
 
     /*! Get size of message including headers*/
     int   size(void);
+    /** Same as size(), but as size of an integer array.
+     *
+     * Use this for passing EvtMessage to RingBuffer::insq().
+     */
+    int   paddedSize();
     /*! Get size of message body */
     int   msg_size(void);
 

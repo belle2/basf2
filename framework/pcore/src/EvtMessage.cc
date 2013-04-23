@@ -15,20 +15,29 @@
 using namespace std;
 using namespace Belle2;
 
+/** Returns smallest value >= bytes that is divisible by sizeof(int). */
+int roundToNearestInt(int bytes)
+{
+  return sizeof(int) * ((bytes + sizeof(int) - 1) / sizeof(int));
+}
+
 EvtMessage::EvtMessage(char* data):
   m_data(data),
   m_ownsBuffer(false)
 {
 }
 
-
 /// @brief Constructor of EvtMessage allocating new buffer
 /// @param msg  data
 /// @param size Length of the data (TMessage)
 EvtMessage::EvtMessage(const char* sobjs, int size, RECORD_TYPE type = MSG_EVENT)
 {
-  m_data = new char[size + sizeof(EvtHeader)]; // Allocate new buffer
+  int fullsize = size + sizeof(EvtHeader);
+  int bufsize = roundToNearestInt(fullsize);
+  m_data = new char[bufsize]; // Allocate new buffer
   msg(sobjs, size, type);
+  for (int i = bufsize - fullsize; i > 0; i--)
+    m_data[bufsize - i] = '\0'; //zero extra bytes
   m_ownsBuffer = true;
 }
 
@@ -73,8 +82,11 @@ char* EvtMessage::buffer(void)
 void EvtMessage::buffer(const char* bufadr)
 {
   int size = *(int*)bufadr;
-  m_data = new char[size];
+  int bufsize = roundToNearestInt(size);
+  m_data = new char[bufsize];
   memcpy(m_data, bufadr, size);
+  for (int i = bufsize - size; i > 0; i--)
+    m_data[bufsize - i] = '\0'; //zero extra bytes
   m_ownsBuffer = true;
 }
 
@@ -83,6 +95,13 @@ void EvtMessage::buffer(const char* bufadr)
 int EvtMessage::size(void)
 {
   return (((EvtHeader*)m_data)->size);
+}
+
+int EvtMessage::paddedSize()
+{
+  const int sizeBytes = size();
+  //round up to next int boundary
+  return roundToNearestInt(sizeBytes) / sizeof(int);
 }
 
 // @brief msgsize

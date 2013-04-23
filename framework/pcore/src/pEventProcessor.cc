@@ -148,8 +148,7 @@ void pEventProcessor::process(PathPtr spath)
       for (std::vector<RingBuffer*>::iterator it = m_rbinlist.begin();
            it != m_rbinlist.end(); ++it) {
         RingBuffer* rbuf = *it;
-        while (rbuf->insq((int*)term.buffer(),
-                          (term.size() - 1) / sizeof(int) + 1) < 0) {
+        while (rbuf->insq((int*)term.buffer(), term.paddedSize()) < 0) {
           usleep(200);
         }
       }
@@ -160,8 +159,7 @@ void pEventProcessor::process(PathPtr spath)
     for (std::vector<RingBuffer*>::iterator it = m_rboutlist.begin();
          it != m_rboutlist.end(); ++it) {
       RingBuffer* rbuf = *it;
-      while (rbuf->insq((int*)term.buffer(),
-                        (term.size() - 1) / sizeof(int) + 1) < 0) {
+      while (rbuf->insq((int*)term.buffer(), term.paddedSize()) < 0) {
         usleep(200);
       }
     }

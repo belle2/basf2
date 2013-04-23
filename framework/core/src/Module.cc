@@ -155,7 +155,7 @@ void Module::setParamObject(const std::string& name, const boost::python::object
 }
 
 
-void Module::setParamList(const std::string& name, const boost::python::list& pyList)
+void Module::setParamListPython(const std::string& name, const boost::python::list& pyList)
 {
   LogSystem& logSystem = LogSystem::Instance();
   logSystem.setModuleLogConfig(&(getLogConfig()), getName());
@@ -184,7 +184,7 @@ void Module::setParamDict(const boost::python::dict& dictionary)
       boost::python::extract<boost::python::list> listProxy(currValue);
 
       if (listProxy.check()) {
-        setParamList(keyProxy, listProxy);
+        setParamListPython(keyProxy, listProxy);
       } else {
         setParamObject(keyProxy, currValue);
       }
@@ -232,7 +232,7 @@ void Module::exposePythonAPI()
   .def("condition", setConditionString)
   .def("condition", setConditionBool)
   .def("param", &Module::setParamObject)
-  .def("param", &Module::setParamList)
+  .def("param", &Module::setParamListPython)
   .def("param", &Module::setParamDict)
   .def("available_params", &_getParamInfoListPython)
   .add_property("logging",

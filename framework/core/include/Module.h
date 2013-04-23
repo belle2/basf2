@@ -301,6 +301,9 @@ namespace Belle2 {
      */
     bool hasUnsetForcedParams() const;
 
+    /** Return module param list. */
+    const ModuleParamList& getParamList() const { return m_moduleParamList; }
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //                   Python API
@@ -403,6 +406,9 @@ namespace Belle2 {
      */
     void setModuleName(const std::string& name) { m_name = name; };
 
+    /** Replace existing parameter list. */
+    void setParamList(const ModuleParamList& params) { m_moduleParamList = params; }
+
 
   private:
     /** no submodules. */
@@ -452,7 +458,7 @@ namespace Belle2 {
      * @param name The unique name of the parameter.
      * @param pyList The list which should be converted to a std::vector and stored as the parameter value.
      */
-    void setParamList(const std::string& name, const boost::python::list& pyList);
+    void setParamListPython(const std::string& name, const boost::python::list& pyList);
 
     /**
      * Implements a method for reading the parameter values from a boost::python dictionary.

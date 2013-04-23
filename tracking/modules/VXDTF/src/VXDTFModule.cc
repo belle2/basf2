@@ -1561,8 +1561,8 @@ void VXDTFModule::event()
       cleanEvent(currentPass, centerSector);
     }
     return;
-  } else if (totalOverlaps > 500) {  /// WARNING: hardcoded value!
-    B2ERROR("VXDTF event " << m_eventCounter << ": total number of overlapping TCs is " << totalOverlaps << " and therefore KF is too slow, will use simple QI calculation which produces worse results")
+  } else if (totalOverlaps > 500 && m_PARAMcalcQIType == "kalman") {  /// WARNING: hardcoded value!
+    B2INFO("VXDTF event " << m_eventCounter << ": total number of overlapping TCs is " << totalOverlaps << " and therefore KF is too slow, will use simple QI calculation which produces worse results")
     allowKalman = false;
     m_TESTERkalmanSkipped++;
   }

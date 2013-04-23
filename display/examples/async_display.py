@@ -6,8 +6,6 @@
 # event data is buffered in shared memory, previous events may be overwritten
 # once the buffer is full.
 
-import os
-import random
 from basf2 import *
 
 # register necessary modules
@@ -23,10 +21,11 @@ evtmetainfo = register_module('EvtMetaInfo')
 # create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
-geometry.param('ExcludedComponents', ['ECL'])
 
-pgun = register_module('ParticleGun')
+# EvtGen to provide generic BB events
+evtgeninput = register_module('EvtGenInput')
 
+evtgeninput.param('boost2LAB', True)
 
 # simulation
 g4sim = register_module('FullSim')
@@ -42,7 +41,7 @@ main.add_module(evtmetainfo)
 
 main.add_module(gearbox)
 main.add_module(geometry)
-main.add_module(pgun)
+main.add_module(evtgeninput)
 main.add_module(g4sim)
 
 cdcdigi = register_module('CDCDigitizer')

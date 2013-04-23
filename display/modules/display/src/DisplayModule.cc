@@ -5,11 +5,13 @@
 #include <geometry/GeometryManager.h>
 #include <vxd/geometry/GeoCache.h>
 #include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/dataobjects/ECLGamma.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <framework/datastore/StoreArray.h>
 
 #include <GFTrack.h>
+#include <GFRaveVertex.h>
 #include <GFFieldManager.h>
 #include <GFMaterialEffects.h>
 #include <GFTGeoMaterialInterface.h>
@@ -17,9 +19,6 @@
 #include "TGeoManager.h"
 #include "TEveManager.h"
 #include "TSystem.h"
-
-#include "GFRaveVertex.h"
-#include "ecl/dataobjects/ECLGamma.h"
 
 using namespace Belle2;
 

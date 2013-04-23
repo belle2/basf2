@@ -10,9 +10,11 @@
 class TEveBox;
 class TEveElementList;
 class TGButton;
+class TGPictureButton;
 class TGLabel;
 class TGNumberEntry;
 class TGTextEntry;
+class TTimer;
 
 namespace Belle2 {
   //forward declaration needed because CINT balks at inclusion of python headers in ModuleParam...
@@ -54,6 +56,12 @@ namespace Belle2 {
     /** go to the event given by m_eventNumberWidget. */
     void goToEventWidget();
 
+    /** m_autoAdvanceDelay was changed, update m_timer if enabled. */
+    void autoAdvanceDelayChanged();
+
+    /** Handle Play/Pause button clicks. */
+    void togglePlayPause();
+
     /** Show a dialog to to enter exp, run, event numbers. */
     void showJumpToEventDialog();
 
@@ -91,6 +99,9 @@ namespace Belle2 {
 
     /** return viewer class. */
     SplitGLView* getViewer() { return m_viewer; }
+
+    /** Check if new events are available. */
+    void pollNewEvents();
 
     /** Close window and continue execution. */
     void closeAndContinue();
@@ -133,6 +144,12 @@ namespace Belle2 {
     /** Event switcher with numeric entry. */
     TGNumberEntry* m_eventNumberWidget;
 
+    /** Delay for automatic advance, in seconds. */
+    TGNumberEntry* m_autoAdvanceDelay;
+
+    /** Play / Pause button. */
+    TGPictureButton* m_playPauseButton;
+
     /** show event/run/exp number for current event. */
     TGLabel* m_eventLabel;
 
@@ -145,9 +162,11 @@ namespace Belle2 {
     /** List of event data, including projections. */
     TEveElementList* m_eventData;
 
-
     /** pointer to viewer class. */
     SplitGLView* m_viewer;
+
+    /** Polling/auto-advance timer. */
+    TTimer* m_timer;
 
 
     /** Dictionary needed for signal/slot mechanism (0 to disable I/O). */

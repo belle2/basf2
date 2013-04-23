@@ -1,12 +1,11 @@
-//include first to avoid warnings
-#include <framework/core/ModuleParam.h>
-
 #include <display/modules/display/DisplayUI.h>
 
+#include <framework/core/ModuleParam.h>
 #include <framework/core/InputController.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
+#include <display/async/AsyncWrapper.h>
 #include <display/modules/display/SplitGLView.h>
 
 #include <TApplication.h>
@@ -26,7 +25,6 @@
 #include <TROOT.h>
 #include <TSystem.h>
 
-
 #include <boost/scoped_ptr.hpp>
 
 #include <cmath>
@@ -39,7 +37,8 @@ DisplayUI::DisplayUI(bool automatic):
   m_guiInitialized(false),
   m_automatic(automatic),
   m_prevButton(0),
-  m_nextButton(0)
+  m_nextButton(0),
+  m_timer(0)
 {
   if ((!gApplication) || (gApplication && gApplication->TestBit(TApplication::kDefaultApplication))) {
     new TApplication("ROOT_application", 0, 0);
@@ -60,7 +59,10 @@ DisplayUI::DisplayUI(bool automatic):
 }
 
 
-DisplayUI::~DisplayUI() { }
+DisplayUI::~DisplayUI()
+{
+  delete m_timer;
+}
 
 void DisplayUI::addParameter(const std::string& label, ModuleParam<bool> &param)
 {
@@ -90,6 +92,10 @@ void DisplayUI::updateUI()
   m_nextButton->SetEnabled((m_currentEntry + 1 < numEntries) or !InputController::canControlInput());
   if (m_currentEntry != m_eventNumberWidget->GetIntNumber())
     m_eventNumberWidget->SetIntNumber(m_currentEntry);
+  if (m_timer and InputController::canControlInput() and !m_nextButton->IsEnabled()) {
+    //reached last file entry in play mode, stop
+    togglePlayPause();
+  }
   StoreObjPtr<EventMetaData> eventMetaData;
   m_eventLabel->SetTextColor(gROOT->GetColor(kBlack));
   if (!eventMetaData) {
@@ -147,13 +153,43 @@ void DisplayUI::goToEventWidget()
   goToEvent(m_eventNumberWidget->GetIntNumber());
 }
 
+void DisplayUI::autoAdvanceDelayChanged()
+{
+  if (m_timer) {
+    m_timer->Stop();
+    m_timer->Start((int)(1000.0 * m_autoAdvanceDelay->GetNumber()));
+  }
+}
+
+void DisplayUI::togglePlayPause()
+{
+  const TString icondir(Form("%s/icons/", gSystem->Getenv("ROOTSYS")));
+  if (m_timer) {
+    //pause
+    delete m_timer;
+    m_timer = 0;
+    m_playPauseButton->SetPicture(gClient->GetPicture(icondir + "ed_execute.png"));
+  } else {
+    //play
+    m_timer = new TTimer();
+    int pollIntervalMs = 100;
+    if (AsyncWrapper::isAsync()) {
+      m_timer->Connect("Timeout()", "Belle2::DisplayUI", this, "pollNewEvents()");
+    } else if (InputController::canControlInput()) {
+      m_timer->Connect("Timeout()", "Belle2::DisplayUI", this, "next()");
+      pollIntervalMs = (int)(1000.0 * m_autoAdvanceDelay->GetNumber());
+    }
+    m_timer->Start(pollIntervalMs);
+    m_playPauseButton->SetPicture(gClient->GetPicture(icondir + "ed_interrupt.png"));
+  }
+}
+
 void DisplayUI::showJumpToEventDialog()
 {
   StoreObjPtr<EventMetaData> eventMetaData;
   if (!eventMetaData)
     return; //this should not actually happen.
 
-  //m_eventLabel->SetText(TString::Format("Event: \t\t%lu\nRun: \t\t%lu\nExperiment: \t%lu", eventMetaData->getEvent(), eventMetaData->getRun(), eventMetaData->getExperiment()));
   char returnString[256];
   new TGInputDialog(gEve->GetBrowser()->GetClient()->GetDefaultRoot(), gEve->GetBrowser(),
                     "Jump to event '#evt/#run/#exp':",
@@ -251,13 +287,13 @@ void DisplayUI::makeGui()
   frmMain->SetWindowName("Event Control main frame");
   frmMain->SetCleanup(kDeepCleanup);
 
+  const TString icondir(Form("%s/icons/", gSystem->Getenv("ROOTSYS")));
+
   TGGroupFrame* event_frame = new TGGroupFrame(frmMain);
   event_frame->SetTitle("Event");
   {
     TGHorizontalFrame* hf = new TGHorizontalFrame(event_frame);
     {
-      TString icondir(Form("%s/icons/", gSystem->Getenv("ROOTSYS")));
-
       m_prevButton = new TGPictureButton(hf, gClient->GetPicture(icondir + "GoBack.gif"));
       hf->AddFrame(m_prevButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       m_prevButton->Connect("Clicked()", "Belle2::DisplayUI", this, "prev()");
@@ -282,6 +318,32 @@ void DisplayUI::makeGui()
       m_nextButton = new TGPictureButton(hf, gClient->GetPicture(icondir + "GoForward.gif"));
       hf->AddFrame(m_nextButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       m_nextButton->Connect("Clicked()", "Belle2::DisplayUI", this, "next()");
+    }
+    event_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
+
+    hf = new TGHorizontalFrame(event_frame);
+    {
+      const bool file = InputController::canControlInput();
+      const bool async = AsyncWrapper::isAsync();
+
+      TGLabel* delayLabel = new TGLabel(hf, "Delay (s):");
+      hf->AddFrame(delayLabel, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
+
+      const double valueSeconds = 3.5;
+      m_autoAdvanceDelay = new TGNumberEntry(hf, valueSeconds, 3, 999, TGNumberFormat::kNESRealOne,
+                                             TGNumberFormat::kNEAPositive,
+                                             TGNumberFormat::kNELLimitMin,
+                                             0.1); //minimum
+      m_autoAdvanceDelay->SetState(file);
+      hf->AddFrame(m_autoAdvanceDelay, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
+      //note: parameter of ValueSet signal is _not_ the number just set.
+      m_autoAdvanceDelay->Connect("ValueSet(Long_t)", "Belle2::DisplayUI", this, "autoAdvanceDelayChanged()");
+      m_autoAdvanceDelay->GetNumberEntry()->Connect("ReturnPressed()", "Belle2::DisplayUI", this, "autoAdvanceDelayChanged()");
+
+      m_playPauseButton = new TGPictureButton(hf, gClient->GetPicture(icondir + "ed_execute.png"));
+      m_playPauseButton->SetEnabled(file or async);
+      hf->AddFrame(m_playPauseButton, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 5, 5, 5));
+      m_playPauseButton->Connect("Clicked()", "Belle2::DisplayUI", this, "togglePlayPause()");
     }
     event_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
 
@@ -496,6 +558,18 @@ void DisplayUI::automaticEvent()
   }
 
   i++;
+}
+
+void DisplayUI::pollNewEvents()
+{
+  if (!AsyncWrapper::isAsync())
+    return;
+
+  bool gotNewEvent = AsyncWrapper::newEventAvailable();
+  if (gotNewEvent) {
+    B2INFO("loading next event...");
+    next();
+  }
 }
 
 void DisplayUI::closeAndContinue()

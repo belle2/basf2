@@ -11,7 +11,6 @@
 #include <framework/core/Path.h>
 #include <display/async/AsyncWrapper.h>
 
-#include <framework/core/InputController.h>
 #include <framework/core/EventProcessor.h>
 #include <framework/core/PathManager.h>
 #include <framework/pcore/EvtMessage.h>
@@ -24,8 +23,25 @@
 #include <cstdlib>
 #include <iostream>
 
-
 using namespace Belle2;
+
+bool AsyncWrapper::s_isAsync = false;
+RingBuffer* AsyncWrapper::s_currentRingBuffer = NULL;
+
+bool AsyncWrapper::newEventAvailable()
+{
+  if (!s_isAsync) {
+    B2ERROR("AsyncWrapper::newEventAvailable() used in synchronous thread??");
+    return true;
+  }
+
+  char* evtbuf = new char[EvtMessage::c_MaxEventSize];
+  int size = s_currentRingBuffer->spyq((int*)evtbuf);
+  delete[] evtbuf;
+
+  return (size != 0);
+
+}
 
 AsyncWrapper::AsyncWrapper(Module* wrapMe): Module(), m_wrappedModule(wrapMe), m_procHandler(0), m_ringBuffer(0), m_rx(0), m_tx(0)
 {
@@ -53,6 +69,10 @@ void AsyncWrapper::initialize()
   m_procHandler->init_EvtProc(1);
   if (m_procHandler->isEvtProc()) {
     //forked thread:
+    //allow access to async parts
+    s_isAsync = true;
+    s_currentRingBuffer = m_ringBuffer;
+
     PathManager pathMgr;
     PathPtr path = pathMgr.createPath();
     path->addModule(ModulePtr(m_rx));
@@ -62,11 +82,6 @@ void AsyncWrapper::initialize()
 
     EventProcessor eventProc(pathMgr);
     eventProc.process(path);
-
-    /*
-    InputController::setNumEntries(m_ringBuffer->numq());
-    InputController::setCanControlInput(true); //TODO this is a lie
-    */
     B2INFO("Asynchronous process done!");
     exit(0);
   } else {

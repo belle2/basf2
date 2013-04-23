@@ -44,6 +44,12 @@ namespace Belle2 {
     /** Call this from terminate().  */
     void terminate();
 
+    /** returns true if the current process is on the receiving (async) side of an AsyncWrapper. */
+    static bool isAsync() { return s_isAsync; }
+
+    /** check wether another event is available in the RingBuffer. */
+    static bool newEventAvailable();
+
 
   private:
     /** The wrapped module. */
@@ -63,6 +69,12 @@ namespace Belle2 {
 
     /** Discard old events when buffer is full. If false, the main process will wait until there is enough space in the buffer. (i.e. synchronous operation) */
     bool m_discardOldEvents;
+
+    /** true if the current process is on the receiving (async) side of an AsyncWrapper. */
+    static bool s_isAsync;
+
+    /** if s_isAsync is true, this contains the corresponding RingBuffer, see newEventAvailable(). */
+    static RingBuffer* s_currentRingBuffer;
   };
 }
 #endif

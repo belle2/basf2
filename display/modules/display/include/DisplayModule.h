@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Pulvermacher                                   *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #ifndef DISPLAYMODULE_H
 #define DISPLAYMODULE_H
 
@@ -21,7 +31,6 @@ namespace Belle2 {
    * which is responsible for creating visualisations using the TEve classes.
    *
    * The viewers, projections and interactive elements are controlled by DisplayUI.
-   *
    *
    * Please send suggestions and patches to <cpulvermacher@ekp.uni-karlsruhe.de>
    */

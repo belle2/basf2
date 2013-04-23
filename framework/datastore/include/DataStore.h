@@ -345,33 +345,33 @@ namespace Belle2 {
     /** Get the relations from an object to other objects in a store array.
      *
      *  @sa RelationsInterface::getRelationsTo
-     *  @param object         Pointer to the object from which the relations point.
-     *  @tparam T             Class of the objects to which the relations point.
+     *  @param fromObject     Pointer to the object from which the relations point.
+     *  @tparam TO            Class of the objects to which the relations point.
      *  @param toName         The name of the store array to which the relations point.
      *                        If empty the default store array name for toClass will be used.
-     *                        If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *                        If the special name "ALL" is given all store arrays containing objects of type TO are considered.
      *  @return               Vector of relation entry objects.
      */
-    template <class T> static RelationVector<T> getRelationsFromObj(const TObject* object, const std::string& toName = "") {
+    template <class TO> static RelationVector<TO> getRelationsFromObj(const TObject* fromObject, const std::string& toName = "") {
       StoreEntry* storeEntry = 0;
       int index = -1;
-      return RelationVector<T>(Instance().getRelationsFromTo(object, storeEntry, index, T::Class(), toName));
+      return RelationVector<TO>(Instance().getRelationsFromTo(fromObject, storeEntry, index, TO::Class(), toName));
     }
 
     /** Get the relations to an object from other objects in a store array.
      *
      *  @sa RelationsInterface::getRelationsFrom
-     *  @param object         Pointer to the object to which the relations point.
-     *  @tparam T             Class of the objects from which the relations point.
+     *  @param toObject       Pointer to the object to which the relations point.
+     *  @tparam FROM          Class of the objects from which the relations point.
      *  @param fromName       The name of the store array from which the relations point.
      *                        If empty the default store array name for fromClass will be used.
-     *                        If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *                        If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
      *  @return               Vector of relation entry objects.
      */
-    template <class T> static RelationVector<T> getRelationsToObj(const TObject* object, const std::string& fromName = "") {
+    template <class FROM> static RelationVector<FROM> getRelationsToObj(const TObject* toObject, const std::string& fromName = "") {
       StoreEntry* storeEntry = 0;
       int index = -1;
-      return RelationVector<T>(Instance().getRelationsToFrom(object, storeEntry, index, T::Class(), fromName));
+      return RelationVector<FROM>(Instance().getRelationsToFrom(toObject, storeEntry, index, FROM::Class(), fromName));
     }
 
     /** Get the relations between an object and other objects in a store array.
@@ -394,34 +394,34 @@ namespace Belle2 {
 
     /** Get the object to which another object has a relation.
      *
-     *  @param object  Pointer to the object from which the relation points.
-     *  @tparam T      The class of objects to which the relation points.
-     *  @param name    The name of the store array to which the relation points.
-     *                 If empty the default store array name for class T will be used.
-     *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *  @param fromObject  Pointer to the object from which the relation points.
+     *  @tparam TO     The class of objects to which the relation points.
+     *  @param toName  The name of the store array to which the relation points.
+     *                 If empty the default store array name for class TO will be used.
+     *                 If the special name "ALL" is given all store arrays containing objects of type TO are considered.
      *  @return        The related object or a null pointer.
      */
-    template <class T> static const T* getRelatedFromObj(const TObject* object, const std::string& name = "") {
-      if (!object) return 0;
+    template <class TO> static const TO* getRelatedFromObj(const TObject* fromObject, const std::string& toName = "") {
+      if (!fromObject) return 0;
       StoreEntry* storeEntry = 0;
       int index = -1;
-      return static_cast<const T*>(DataStore::Instance().getRelationFromTo(object, storeEntry, index, T::Class(), name).object);
+      return static_cast<const TO*>(DataStore::Instance().getRelationFromTo(fromObject, storeEntry, index, TO::Class(), toName).object);
     }
 
     /** Get the object from which another object has a relation.
      *
-     *  @param object  Pointer to the object to which the relation points.
-     *  @tparam T      The class of objects from which the relation points.
-     *  @param name    The name of the store array from which the relation points.
-     *                 If empty the default store array name for class T will be used.
-     *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
-     *  @return        The related object or a null pointer.
+     *  @param toObject Pointer to the object to which the relation points.
+     *  @tparam FROM    The class of objects from which the relation points.
+     *  @param fromName The name of the store array from which the relation points.
+     *                  If empty the default store array name for class FROM will be used.
+     *                  If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
+     *  @return         The related object or a null pointer.
      */
-    template <class T> static const T* getRelatedToObj(const TObject* object, const std::string& name = "") {
-      if (!object) return 0;
+    template <class FROM> static const FROM* getRelatedToObj(const TObject* toObject, const std::string& fromName = "") {
+      if (!toObject) return 0;
       StoreEntry* storeEntry = 0;
       int index = -1;
-      return static_cast<const T*>(DataStore::Instance().getRelationToFrom(object, storeEntry, index, T::Class(), name).object);
+      return static_cast<const FROM*>(DataStore::Instance().getRelationToFrom(toObject, storeEntry, index, FROM::Class(), fromName).object);
     }
 
     /** Get the object to or from which another object has a relation.

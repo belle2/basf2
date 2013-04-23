@@ -37,6 +37,19 @@ namespace Belle2 {
      *                 to lib<library>.so
      */
     bool loadLibrary(std::string library, bool fullname = true);
+
+    /**
+     * Search for given file in local or central release directory and return
+     * absolute path if found.
+     *
+     * @param path path to file/directory, assuming it's installed locally
+     *             (e.g. /data/geometry/Belle2.xml). Leading slash is not
+     *             strictly required.
+     * @return absolute path to file in local directory, if it exists,
+     *         otherwise abs. path to file in central release directory,
+     *         or empty if file wasn't found.
+     */
+    std::string findFile(const std::string& path);
   }
 
   /** General utility functions */

@@ -10,9 +10,10 @@
 
 #include <framework/gearbox/FileHandler.h>
 #include <framework/gearbox/Gearbox.h>
-#include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
+#include <framework/core/utilities.h>
 
+#include <boost/filesystem.hpp>
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
@@ -31,8 +32,7 @@ namespace Belle2 {
 
     FileHandler::FileHandler(const std::string& uri): InputHandler(uri), m_path(uri)
     {
-      if (m_path.empty()) m_path = Environment::Instance().getDataSearchPath();
-      m_path = fs::absolute(m_path, fs::initial_path<fs::path>()).native();
+      if (m_path.empty()) m_path = "/data/";
       B2DEBUG(300, "Created FileHandler for directory " << m_path);
     }
 
@@ -40,9 +40,12 @@ namespace Belle2 {
     {
       fs::path basedir(m_path);
       fs::path filename = basedir / path;
-      if (fs::exists(filename)) return new FileContext(filename.string(), false);
+      std::string fullpath = FileSystem::findFile(filename.string());
+      if (!fullpath.empty()) return new FileContext(fullpath, false);
+
       filename = basedir / (path + ".gz");
-      if (fs::exists(filename)) return new FileContext(filename.string(), true);
+      fullpath = FileSystem::findFile(filename.string());
+      if (!fullpath.empty()) return new FileContext(fullpath, true);
       return 0;
     }
 

@@ -13,7 +13,6 @@
 
 #include <framework/gearbox/InputHandler.h>
 #include <boost/iostreams/filtering_stream.hpp>
-#include <boost/filesystem.hpp>
 
 
 namespace Belle2 {

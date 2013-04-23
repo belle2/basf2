@@ -3,11 +3,11 @@
 #include <framework/logging/LogSystem.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/core/utilities.h>
+
 #include <gtest/gtest.h>
-#include <iostream>
 #include <string>
 #include <queue>
-#include <cstdlib>
 
 #include <boost/foreach.hpp>
 
@@ -23,9 +23,7 @@ namespace Belle2 {
 
     Gearbox& gb = Gearbox::getInstance();
     vector<string> backends;
-    //Environment::getDataSearchPath useless here since it gets set only in basf2
-    string local_dir(getenv("BELLE2_LOCAL_DIR"));
-    backends.push_back("file:" + local_dir + "/data");
+    backends.push_back("file:");
     gb.setBackends(backends);
     gb.open("geometry/Belle2.xml");
     queue<GearDir> nodes;
@@ -56,8 +54,7 @@ namespace Belle2 {
 
     Gearbox& gb = Gearbox::getInstance();
     vector<string> backends;
-    string local_dir(getenv("BELLE2_LOCAL_DIR"));
-    backends.push_back("sqlite:" + local_dir + "/framework/tests/gearbox.sqlite");
+    backends.push_back("sqlite:" + FileSystem::findFile("/framework/tests/gearbox.sqlite"));
     gb.setBackends(backends);
     gb.open("Belle2.xml");
     EXPECT_EQ(3, gb.getNumberNodes("/detector/*"));

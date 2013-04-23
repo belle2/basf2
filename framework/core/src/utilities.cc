@@ -16,6 +16,7 @@
 #include <sys/time.h>
 #include <dlfcn.h>
 #include <sstream>
+#include <cstdlib>
 
 using namespace std;
 namespace fs = boost::filesystem;
@@ -60,6 +61,24 @@ namespace Belle2 {
       }
 
       return true;
+    }
+
+    std::string findFile(const string& path)
+    {
+      //environment doesn't change, so only done once
+      static const char* localdir = getenv("BELLE2_LOCAL_DIR");
+      static const char* reldir = getenv("BELLE2_RELEASE_DIR");
+
+      //check in local directory
+      string fullpath;
+      if (localdir and fileExists(fullpath = (fs::path(localdir) / path).string()))
+        return fullpath;
+      //check in central release directory
+      else if (reldir and fileExists(fullpath = (fs::path(reldir) / path).string()))
+        return fullpath;
+      //nothing found
+      else
+        return string("");
     }
   }
 

@@ -35,7 +35,7 @@ namespace Belle2 {
    *
    * "file:data/"
    *
-   * will look for xml files in the data directory and
+   * will look for xml files in the data directory (local or central release) and
    *
    * "sqlite:data/belle2.sqlite"
    *
@@ -44,12 +44,12 @@ namespace Belle2 {
    *
    * "string:<Detector>..</Detector>"
    *
-   * can be used to feed a custom xml document to the gearbox
+   * can be used to feed a custom xml document to the gearbox.
    *
    * Currently defined backends are file, string and sqlite:
    *
    * - file: will use normal file access to read the xml files.
-   *   Empty path (just 'file:') will use Environment::getDataSearchPath()
+   *   Empty path (just 'file:') will use data/
    * - string: will treat everything after the : as the data, no xincludes are
    *   supported with this backend
    * - sqlite: will look for the xml files in the sqlite database specified

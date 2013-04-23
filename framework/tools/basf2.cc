@@ -37,6 +37,7 @@
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogSystem.h>
 #include <framework/core/DataFlowVisualization.h>
+#include <framework/core/utilities.h>
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
@@ -92,34 +93,23 @@ int main(int argc, char* argv[])
     B2FATAL("Cannot remove SIGPIPE signal handler");
   }
 
-  //Check for the Belle2 environment variable
-  char* belle2LocalDir = getenv("BELLE2_LOCAL_DIR");
-  char* belle2ReleaseDir = getenv("BELLE2_RELEASE_DIR");
+  //Check for Belle2 environment variables
+  const char* belle2LocalDir = getenv("BELLE2_LOCAL_DIR");
+  const char* belle2ReleaseDir = getenv("BELLE2_RELEASE_DIR");
   if (!belle2LocalDir && !belle2ReleaseDir) {
     B2ERROR("The basf2 environment is not set up. Please execute the 'setuprel' script first.")
     return 1;
   }
 
-  char* belle2SubDir = getenv("BELLE2_SUBDIR");
+  //also set when just sourcing setup_belle2.sh (which is why we also check for local/release dir)
+  const char* belle2SubDir = getenv("BELLE2_SUBDIR");
   if (!belle2SubDir) {
     B2ERROR("The environment variable BELLE2_SUBDIR is not set. Please execute the 'setuprel' script first.")
     return 1;
   }
 
   //Get the lib path
-  boost::filesystem::path libPath = "";
-  boost::filesystem::path libPath2 = "";
-  if (belle2LocalDir) {
-    libPath = belle2LocalDir;
-    if (belle2ReleaseDir) {
-      libPath2 = belle2ReleaseDir;
-      libPath2 /= "lib";
-      libPath2 /=  belle2SubDir;
-    }
-  } else {
-    libPath = belle2ReleaseDir;
-  }
-  libPath /= "lib";
+  boost::filesystem::path libPath = "lib";
   libPath /=  belle2SubDir;
 
   bool runInteractiveMode = true;
@@ -268,13 +258,9 @@ int main(int argc, char* argv[])
   if (!pythonFile.empty()) {
     runInteractiveMode = false;
 
-    //Get the lib path
+    //Search in local or central lib/ if this isn't a direct path
     if (!boost::filesystem::exists(pythonFile)) {
-      if (boost::filesystem::exists(libPath / pythonFile)) {
-        pythonFile = (libPath / pythonFile).string();
-      } else {
-        pythonFile = (libPath2 / pythonFile).string();
-      }
+      pythonFile = FileSystem::findFile((libPath / pythonFile).string());
     }
 
     try {
@@ -316,10 +302,7 @@ int main(int argc, char* argv[])
   //  Python interpreter in interactive mode.
   //---------------------------------------------------
   if (runInteractiveMode) {
-    pythonFile = (libPath / "basf2.py").string();
-    if (!boost::filesystem::exists(pythonFile)) {
-      pythonFile = (libPath2 / "basf2.py").string();
-    }
+    pythonFile = FileSystem::findFile((libPath / "basf2.py").string());
     string extCommand("python -i " + pythonFile);
     if (system(extCommand.c_str()) != 0)
       return 1;

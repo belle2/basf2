@@ -2317,20 +2317,19 @@ namespace Belle {
     //...Erros on helix parameters...
     //   I don't know the meaning of these errors.
     //   So copied from MCTrckFinderModule.
-    TVector3 posError;
-    posError.SetXYZ(1.0, 1.0, 2.0);
-    TVector3 momError;
-    momError.SetXYZ(0.1, 0.1, 0.2);
+    TMatrixDSym seedCov(6);
+    seedCov(0, 0) = 1;
+    seedCov(1, 1) = 1;
+    seedCov(2, 2) = 4;
+    seedCov(3, 3) = 0.01;
+    seedCov(4, 4) = 0.01;
+    seedCov(5, 5) = 0.04;
 
     //...Let's assume this as pion...
     int pdg = 211 * int(t.charge());
 
     //...Copy info...
-    trackCandidates[counter]->setComplTrackSeed(position,
-                                                momentum,
-                                                pdg,
-                                                posError,
-                                                momError);
+    trackCandidates[counter]->setPosMomSeedAndPdgCode(position, momentum, pdg, seedCov);
 
     //...No MC info now...
     // trackCandidates[counter]->setMcTrackId(iPart);

@@ -60,6 +60,9 @@ namespace Belle2 {
 
     /** transmitting module. */
     TxModule* m_tx;
+
+    /** Discard old events when buffer is full. If false, the main process will wait until there is enough space in the buffer. (i.e. synchronous operation) */
+    bool m_discardOldEvents;
   };
 }
 #endif

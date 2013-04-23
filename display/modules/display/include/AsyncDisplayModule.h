@@ -20,7 +20,7 @@ namespace Belle2 {
   public:
     /** constructor. */
     AsyncDisplayModule(): AsyncWrapper(new DisplayModule()) {
-      setDescription("Starts the Display module asynchronously (with buffered input)");
+      setDescription("Starts the Display module asynchronously (with buffered input). Note that the buffer is limited in size and not all events can be passed to the display once it is full. (Configurable using 'DiscardOldEvents' param).");
     }
     ~AsyncDisplayModule() { } //< dtor
   };

@@ -64,6 +64,8 @@ main.add_module(genfit)
 
 # default parameters
 display = register_module('AsyncDisplay')
+# make some room in the buffer when full
+display.param('DiscardOldEvents', True)
 main.add_module(display)
 
 process(main)

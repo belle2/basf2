@@ -19,6 +19,7 @@
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/TxModule.h>
+#include <framework/logging/LogSystem.h>
 
 #include <cstdlib>
 #include <iostream>
@@ -29,6 +30,8 @@ using namespace Belle2;
 AsyncWrapper::AsyncWrapper(Module* wrapMe): Module(), m_wrappedModule(wrapMe), m_procHandler(0), m_ringBuffer(0), m_rx(0), m_tx(0)
 {
   setParamList(wrapMe->getParamList()); //inherit parameters from wrapped module
+
+  addParam("DiscardOldEvents", m_discardOldEvents, "Discard old events when buffer is full. If false, the main process will wait until there is enough space in the buffer. (i.e. synchronous operation)", true);
 }
 
 AsyncWrapper::~AsyncWrapper()
@@ -44,7 +47,7 @@ void AsyncWrapper::initialize()
   m_ringBuffer = new RingBuffer();
   m_rx = new RxModule(m_ringBuffer);
   m_tx = new TxModule(m_ringBuffer);
-  m_tx->setBlockingInsert(false); //actually decouple this process
+  m_tx->setBlockingInsert(!m_discardOldEvents); //actually decouple this process
 
   //fork out one extra process
   m_procHandler->init_EvtProc(1);
@@ -54,6 +57,8 @@ void AsyncWrapper::initialize()
     PathPtr path = pathMgr.createPath();
     path->addModule(ModulePtr(m_rx));
     path->addModule(ModulePtr(m_wrappedModule));
+
+    //LogSystem::Instance().resetMessageCounter(); //for testing parallel processing
 
     EventProcessor eventProc(pathMgr);
     eventProc.process(path);

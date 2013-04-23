@@ -10,7 +10,6 @@
 
 #include <geometry/bfieldmap/BFieldComponentBeamline.h>
 
-#include <framework/core/Environment.h>
 #include <framework/core/utilities.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -88,7 +87,7 @@ void BFieldComponentBeamline::initialize_beamline(int isher)
   }
 
 
-  string fullPath = Environment::Instance().getDataSearchPath() + "/" + mapFilename;
+  string fullPath = FileSystem::findFile("/data/" + mapFilename);
 
   if (!FileSystem::fileExists(fullPath)) {
     B2ERROR("The beamline magnetic field map file '" << mapFilename << "' could not be found !")
@@ -132,7 +131,7 @@ void BFieldComponentBeamline::initialize_beamline(int isher)
   }
 
   //map for interpolation
-  fullPath = Environment::Instance().getDataSearchPath() + "/" + interFilename;
+  fullPath = FileSystem::findFile("/data/" + interFilename);
 
   if (!FileSystem::fileExists(fullPath)) {
     B2ERROR("The beamline interpolation map file '" << interFilename << "' could not be found !")

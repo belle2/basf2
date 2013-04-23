@@ -10,7 +10,6 @@
 
 #include <geometry/bfieldmap/BFieldComponentQuad.h>
 
-#include <framework/core/Environment.h>
 #include <framework/core/utilities.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
@@ -60,27 +59,27 @@ void BFieldComponentQuad::initialize()
   }
 
   // check if input files exsits
-  string fullPathMapHER = Environment::Instance().getDataSearchPath() + "/" + m_mapFilenameHER;
+  string fullPathMapHER = FileSystem::findFile("/data/" + m_mapFilenameHER);
   if (!FileSystem::fileExists(fullPathMapHER)) {
     B2FATAL("The HER quadrupole magnetic field map file '" << m_mapFilenameHER << "' could not be found !")
     return;
   }
-  string fullPathMapLER = Environment::Instance().getDataSearchPath() + "/" + m_mapFilenameLER;
+  string fullPathMapLER = FileSystem::findFile("/data/" + m_mapFilenameLER);
   if (!FileSystem::fileExists(fullPathMapLER)) {
     B2FATAL("The LER quadrupole magnetic field map file '" << m_mapFilenameLER << "' could not be found !")
     return;
   }
-  string fullPathMapHERleak = Environment::Instance().getDataSearchPath() + "/" + m_mapFilenameHERleak;
+  string fullPathMapHERleak = FileSystem::findFile("/data/" + m_mapFilenameHERleak);
   if (!FileSystem::fileExists(fullPathMapHERleak)) {
     B2FATAL("The HERleak quadrupole magnetic field map file '" << m_mapFilenameHERleak << "' could not be found !")
     return;
   }
-  string fullPathApertHER = Environment::Instance().getDataSearchPath() + "/" + m_apertFilenameHER;
+  string fullPathApertHER = FileSystem::findFile("/data/" + m_apertFilenameHER);
   if (!FileSystem::fileExists(fullPathApertHER)) {
     B2FATAL("The HER aperture file '" << m_apertFilenameHER << "' could not be found !")
     return;
   }
-  string fullPathApertLER = Environment::Instance().getDataSearchPath() + "/" + m_apertFilenameLER;
+  string fullPathApertLER = FileSystem::findFile("/data/" + m_apertFilenameLER);
   if (!FileSystem::fileExists(fullPathApertLER)) {
     B2FATAL("The LER aperture file '" << m_apertFilenameLER << "' could not be found !")
     return;

@@ -11,7 +11,6 @@
 #include <geometry/bfieldmap/BFieldComponentRadial.h>
 #include <geometry/bfieldmap/BFieldComponentBeamline.h>
 
-#include <framework/core/Environment.h>
 #include <framework/core/utilities.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -45,7 +44,7 @@ void BFieldComponentRadial::initialize()
     return;
   }
 
-  string fullPath = Environment::Instance().getDataSearchPath() + "/" + m_mapFilename;
+  string fullPath = FileSystem::findFile("/data/" + m_mapFilename);
 
   if (!FileSystem::fileExists(fullPath)) {
     B2ERROR("The radial magnetic field map file '" << m_mapFilename << "' could not be found !")

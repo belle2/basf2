@@ -119,7 +119,7 @@ void SVDRecoHit::setDetectorPlane()
   TVector3 vGlobal = geometry.vectorToGlobal(vLocal);
 
   //Construct the detector plane
-  VXD::SensorPlane* finitePlane = new VXD::SensorPlane(m_sensorID, 1.0, 1.0);
+  VXD::SensorPlane* finitePlane = new VXD::SensorPlane(m_sensorID, 20.0, 20.0);
   if (isWedgeU) finitePlane->setRotation(m_rotationPhi);
   GFDetPlane detPlane(origin, uGlobal, vGlobal, finitePlane);
   setDetPlane(detPlane);

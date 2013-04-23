@@ -119,7 +119,7 @@ void SVDRecoHit2D::setDetectorPlane()
   TVector3 vGlobal = geometry.vectorToGlobal(TVector3(0, 1, 0));
 
   //Construct the detector plane
-  GFDetPlane detPlane(origin, uGlobal, vGlobal, new VXD::SensorPlane(m_sensorID, 10, 10));
+  GFDetPlane detPlane(origin, uGlobal, vGlobal, new VXD::SensorPlane(m_sensorID, 20, 20));
   setDetPlane(detPlane);
 }
 

@@ -46,6 +46,7 @@ namespace Belle2 {
     /**
      * Sets the path which points to the data directory of the framework.
      *
+     * TODO remove after getDataSearchPath() is gone.
      * @param dataPath Path in which the data files for the framework are located.
      */
     void setDataSearchPath(const std::string& dataPath) { m_dataSearchPath = dataPath; };
@@ -60,9 +61,12 @@ namespace Belle2 {
     /**
      * Returns the path which points to the data directory of the framework.
      *
+     * @note Use FileSystem::findFile() to get a full path of a file instead of relying on it existing in the one
+     *       directory returned by this function. (which might be  your local data dir, but the file might only exist in the central release dir)
+     *
      * @return data search path, without trailing slash
      */
-    const std::string& getDataSearchPath() const { return m_dataSearchPath; };
+    const std::string& getDataSearchPath() const __attribute__((deprecated)) { return m_dataSearchPath; };
 
     /**
      * Returns the path which points to the externals directory of the framework.

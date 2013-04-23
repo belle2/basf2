@@ -200,6 +200,19 @@ void RingBuffer::dump_db(void)
          m_bufinfo->wptr, m_bufinfo->rptr, m_bufinfo->nbuf);
 }
 
+void RingBuffer::insq_intern(const int* buf, int size)
+{
+  int* const wptr = m_buftop + m_bufinfo->wptr;
+  *wptr = size;
+  *(wptr + 1) = m_bufinfo->wptr + (size + 2);
+  memcpy(wptr + 2, buf, size * sizeof(int));
+  m_bufinfo->prevwptr = m_bufinfo->wptr;
+  m_bufinfo->wptr += (size + 2);
+  m_bufinfo->nbuf++;
+  m_bufinfo->ninsq++;
+  m_insq_counter++;
+}
+
 int RingBuffer::insq(const int* buf, int size)
 {
   //  printf ( "insq: requesting : %d, nbuf = %d\n", size, m_bufinfo->nbuf );
@@ -218,17 +231,9 @@ int RingBuffer::insq(const int* buf, int size)
       return -1;
     }
     m_bufinfo->mode = 0;
-    int* wptr = m_buftop + m_bufinfo->wptr;
-    *wptr = size;
-    *(wptr + 1) = m_bufinfo->wptr + (size + 2);
-    memcpy(wptr + 2, buf, size * sizeof(int));
-    m_bufinfo->prevwptr = m_bufinfo->wptr;
-    m_bufinfo->wptr += (size + 2);
-    m_bufinfo->nbuf++;
+    insq_intern(buf, size);
     //    printf ( "insq: nbuf = 0; prev=%d, new=%d\n",
     //       m_bufinfo->prevwptr, m_bufinfo->wptr );
-    m_bufinfo->ninsq++;
-    m_insq_counter++;
     sem_unlock(m_semid);
     return size;
   } else if (m_bufinfo->wptr > m_bufinfo->rptr) {
@@ -249,17 +254,9 @@ int RingBuffer::insq(const int* buf, int size)
     }
     m_bufinfo->mode = 0;
     if (size + 2 < m_bufinfo->size - m_bufinfo->wptr) { // normal case
-      int* wptr = m_buftop + m_bufinfo->wptr;
-      *wptr = size;
-      *(wptr + 1) = m_bufinfo->wptr + (size + 2);
-      memcpy(wptr + 2, buf, size * sizeof(int));
-      m_bufinfo->prevwptr = m_bufinfo->wptr;
-      m_bufinfo->wptr += (size + 2);
-      m_bufinfo->nbuf++;
+      insq_intern(buf, size);
       //      printf ( "insq: wptr>rptr and enough size; prev=%d, new=%d\n",
       //         m_bufinfo->prevwptr, m_bufinfo->wptr );
-      m_bufinfo->ninsq++;
-      m_insq_counter++;
       sem_unlock(m_semid);
       return size;
     } else {
@@ -270,24 +267,20 @@ int RingBuffer::insq(const int* buf, int size)
           return -1;
         }
         m_bufinfo->mode = 1;
-        int* wptr = m_buftop;
-        memcpy(wptr + 2, buf, size * sizeof(int));
-        *wptr = size;
-        *(wptr + 1) = size + 2;
-        m_bufinfo->wptr = *(wptr + 1);
-        int* prevptr = m_buftop + m_bufinfo->prevwptr;
-        *(prevptr + 1) = 0;
-        m_bufinfo->prevwptr = 0;
-        if (m_bufinfo->nbuf == 0) {
+
+        m_bufinfo->wptr = 0;
+        int* prevwptr = m_buftop + m_bufinfo->prevwptr;
+        insq_intern(buf, size);
+        m_bufinfo->wptr = *(m_buftop + 1);
+        *(prevwptr + 1) = 0;
+
+        if (m_bufinfo->nbuf == 1) { //i.e. was 0 before insq_intern()
           //    printf ( "===> rptr reset......\n" );
           m_bufinfo->mode = 4;
           m_bufinfo->rptr = 0;
         }
-        m_bufinfo->nbuf++;
         //  printf ( "insq: no more space, space below rptr; prev=%d, new=%d\n",
         //         m_bufinfo->prevwptr, m_bufinfo->wptr );
-        m_bufinfo->ninsq++;
-        m_insq_counter++;
         sem_unlock(m_semid);
         return size;
       } else {
@@ -307,20 +300,12 @@ int RingBuffer::insq(const int* buf, int size)
         return (-1);
       }
       m_bufinfo->mode = 2;
-      int* wptr = m_buftop + m_bufinfo->wptr;
-      *wptr = size;
-      *(wptr + 1) = m_bufinfo->wptr + (size + 2);
-      memcpy(wptr + 2, buf, size * sizeof(int));
-      m_bufinfo->prevwptr = m_bufinfo->wptr;
-      m_bufinfo->wptr += (size + 2);
-      m_bufinfo->nbuf++;
+      insq_intern(buf, size);
       //      printf ( "insq: wptr<rptr and enough space below rptr; curr=%d, next=%d, rptr=%d\n", m_bufinfo->prevwptr, m_bufinfo->wptr, m_bufinfo->rptr );
       if (m_bufinfo->wptr > m_bufinfo->rptr) {
         printf("next pointer will exceed rptr.....\n");
         m_bufinfo->mode = 3;
       }
-      m_bufinfo->ninsq++;
-      m_insq_counter++;
       sem_unlock(m_semid);
       return size;
     } else {

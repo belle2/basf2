@@ -66,7 +66,7 @@ mctrackfinder.logging.debug_level = 101
 param_mctrackfinder = {
     'UseCDCHits': 0,
     'UseSVDHits': 1,
-    'UsePXDHits': 0,
+    'UsePXDHits': 1,
     'MinimalNDF': 6,
     'UseClusters': 1,
     'WhichParticles': ['PXD', 'SVD'],

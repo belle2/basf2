@@ -31,31 +31,29 @@ namespace Belle2 {
 
     /** Empty constructor. For initialisation only, an object generated this way is useless unless resetValues is called at least once */
     NbFinderFilters():
-      ThreeHitFilters() {
-      m_friendID = "";
-      m_thisSector = NULL;
-      m_angle3DCtr = std::make_pair(0, 0);
-      m_angleXYCtr = std::make_pair(0, 0);
-      m_angleRZCtr = std::make_pair(0, 0);
-      m_circleDist2IPCtr = std::make_pair(0, 0);
-      m_deltaSlopeRZCtr = std::make_pair(0, 0);
-      m_pTCtr = std::make_pair(0, 0);
-      m_helixFitCtr = std::make_pair(0, 0);
-    }
+      ThreeHitFilters(),
+      m_thisSector(NULL),
+      m_friendID(""),
+      m_angle3DCtr(std::make_pair(0, 0)),
+      m_angleXYCtr(std::make_pair(0, 0)),
+      m_angleRZCtr(std::make_pair(0, 0)),
+      m_circleDist2IPCtr(std::make_pair(0, 0)),
+      m_deltaSlopeRZCtr(std::make_pair(0, 0)),
+      m_pTCtr(std::make_pair(0, 0)),
+      m_helixFitCtr(std::make_pair(0, 0)) {}
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use ThreeHitFilters when no sectormap is available */
     NbFinderFilters(TVector3 outerHit, TVector3 centerHit, TVector3 innerHit, VXDSector* thisSector, std::string friendID):
       ThreeHitFilters(outerHit, centerHit, innerHit),  // calls constructor of base class. Needed since base class does not use standard constructor, therefore we have to carry the hits manually into the base class
       m_thisSector(thisSector),
-      m_friendID(friendID) {
-      m_angle3DCtr = std::make_pair(0, 0);
-      m_angleXYCtr = std::make_pair(0, 0);
-      m_angleRZCtr = std::make_pair(0, 0);
-      m_circleDist2IPCtr = std::make_pair(0, 0);
-      m_deltaSlopeRZCtr = std::make_pair(0, 0);
-      m_pTCtr = std::make_pair(0, 0);
-      m_helixFitCtr = std::make_pair(0, 0);
-    }
+      m_friendID(friendID),
+      m_angle3DCtr(std::make_pair(0, 0)),
+      m_angleXYCtr(std::make_pair(0, 0)),
+      m_angleRZCtr(std::make_pair(0, 0)),
+      m_circleDist2IPCtr(std::make_pair(0, 0)),
+      m_deltaSlopeRZCtr(std::make_pair(0, 0)),
+      m_pTCtr(std::make_pair(0, 0)),
+      m_helixFitCtr(std::make_pair(0, 0)) {}
 
 
     /** Destructor. */

@@ -30,21 +30,19 @@ namespace Belle2 {
 
     /** Empty constructor. For initialisation only, an object generated this way is useless unless resetValues is called at least once */
     TcFourHitFilters():
-      FourHitFilters() {
-      m_friendID = "";
-      m_thisSector = NULL;
-      m_deltaPtCtr = std::make_pair(0, 0);
-      m_deltaDistCircleCenterCtr = std::make_pair(0, 0);
-    }
+      FourHitFilters(),
+      m_thisSector(NULL),
+      m_friendID(""),
+      m_deltaPtCtr(std::make_pair(0, 0)),
+      m_deltaDistCircleCenterCtr(std::make_pair(0, 0)) {}
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use ThreeHitFilters when no sectormap is available */
     TcFourHitFilters(TVector3& outer, TVector3& outerCenter, TVector3& innerCenter, TVector3& inner, VXDSector* thisSector, std::string friendID):
       FourHitFilters(outer, outerCenter, innerCenter, inner),  // calls constructor of base class. Needed since base class does not use standard constructor, therefore we have to carry the hits manually into the base class
       m_thisSector(thisSector),
-      m_friendID(friendID) {
-      m_deltaPtCtr = std::make_pair(0, 0);
-      m_deltaDistCircleCenterCtr = std::make_pair(0, 0);
-    }
+      m_friendID(friendID),
+      m_deltaPtCtr(std::make_pair(0, 0)),
+      m_deltaDistCircleCenterCtr(std::make_pair(0, 0)) {}
 
 
     /** Destructor. */

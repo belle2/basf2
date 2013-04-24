@@ -1065,7 +1065,6 @@ void VXDTFModule::event()
     clustersOfEvent.push_back(newCluster);
     B2DEBUG(100, " SVDcluster " << i << " in position " << i + numOfPxdClusters << " stores real Cluster " << clustersOfEvent[i + numOfPxdClusters].getIndex())
   } // the position in the vector is NOT the index it has stored (except if there are no PXDClusters)
-  int nClusterInfos = clustersOfEvent.size();
 
   // preparing storearray for trackCandidates and fitted tracks
   StoreArray<GFTrackCand> finalTrackCandidates(m_PARAMgfTrackCandsColName);
@@ -1080,7 +1079,7 @@ void VXDTFModule::event()
   m_TESTERtimeConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
   thisInfoPackage.sectionConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
 
-  B2DEBUG(1, "VXDTF event " << m_eventCounter << ": size of arrays, PXDCluster: " << numOfPxdClusters << ", SVDCLuster: " << numOfSvdClusters << ", clustersOfEvent: " << nClusterInfos);
+  B2DEBUG(1, "VXDTF event " << m_eventCounter << ": size of arrays, PXDCluster: " << numOfPxdClusters << ", SVDCLuster: " << numOfSvdClusters << ", clustersOfEvent: " << clustersOfEvent.size());
 
   TVector3 hitGlobal, hitLocal, transformedHitLocal, localSensorSize;
   double vSize, uSizeAtHit, uCoord, vCoord;
@@ -1238,7 +1237,7 @@ void VXDTFModule::event()
 
       float timeStampU = uClusterPtr->getClsTime();
       float timeStampV = vClusterPtr->getClsTime();
-//      cerr << " clusterIndexU, clusterIndexV, numOfPxdClusters, nClusterInfos: " <<  clusterIndexU<<", "<<clusterIndexV<<", "<<numOfPxdClusters<<", "<<nClusterInfos << " - infoClusterU/infoClusterV store indices " << clustersOfEvent[numOfPxdClusters +clusterIndexU].getIndex() <<", "<< clustersOfEvent[numOfPxdClusters+clusterIndexV].getIndex() << endl;
+//      cerr << " clusterIndexU, clusterIndexV, numOfPxdClusters, nClusterInfos: " <<  clusterIndexU<<", "<<clusterIndexV<<", "<<numOfPxdClusters<<", "<<clustersOfEvent.size() << " - infoClusterU/infoClusterV store indices " << clustersOfEvent[numOfPxdClusters +clusterIndexU].getIndex() <<", "<< clustersOfEvent[numOfPxdClusters+clusterIndexV].getIndex() << endl;
       B2DEBUG(100, " svdClusterCombi has clusterIndexU/clusterIndexV: " << clusterIndexU << "/" << clusterIndexV << " with collected charge u/v: " << uClusterPtr->getCharge() << "/" << vClusterPtr->getCharge() << " and their infoClasses are at u/v: " << clusterIndexU + numOfPxdClusters << "/" << clusterIndexV + numOfPxdClusters << " with collected charge u/v: " << aSvdClusterArray[ clustersOfEvent[numOfPxdClusters + clusterIndexU].getIndex() ]->getCharge() << "/" << aSvdClusterArray[ clustersOfEvent[numOfPxdClusters + clusterIndexV].getIndex() ]->getCharge())
 
       aVxdID = uClusterPtr->getSensorID();
@@ -1322,8 +1321,7 @@ void VXDTFModule::event()
         secMapIter->second->addHit(pTFHit);
         currentPass->sectorSequence.push_back(activatedSector);
 
-        int numPassHits = currentPass->hitVector.size();
-        B2DEBUG(150, "size of sectorSequence: " << currentPass->sectorSequence.size() << "size of hitVector: " << numPassHits);
+        B2DEBUG(150, "size of sectorSequence: " << currentPass->sectorSequence.size() << "size of hitVector: " << currentPass->hitVector.size());
         passNumber++;
       }
     }
@@ -1490,7 +1488,7 @@ void VXDTFModule::event()
     isOB = aCluster.isOverbooked();
     if (isOB == true) { countOverbookedClusters++; }
   } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
-  B2DEBUG(1, "after checking overlaps: there are " << countOverbookedClusters << " clusters of " << nClusterInfos << " marked as 'overbooked'...")
+  B2DEBUG(1, "after checking overlaps: there are " << countOverbookedClusters << " clusters of " << clustersOfEvent.size() << " marked as 'overbooked'...")
 
   int countCurrentTCs = 0;
   BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
@@ -1624,7 +1622,7 @@ void VXDTFModule::event()
     isOB = aCluster.isOverbooked();
     if (isOB == true) { countOverbookedClusters++; }
   } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
-  B2DEBUG(1, "after checking overlaps again: there are " << countOverbookedClusters << " clusters of " << nClusterInfos << " marked as 'overbooked'...")
+  B2DEBUG(1, "after checking overlaps again: there are " << countOverbookedClusters << " clusters of " << clustersOfEvent.size() << " marked as 'overbooked'...")
   /** testing purposes - end */
 
 
@@ -1672,7 +1670,7 @@ void VXDTFModule::event()
     isOB = aCluster.isOverbooked();
     if (isOB == true) { countOverbookedClusters++; }
   } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
-  B2DEBUG(1, "after doing Hopfield again: there are " << countOverbookedClusters << " clusters of " << nClusterInfos << " marked as 'overbooked'...")
+  B2DEBUG(1, "after doing Hopfield again: there are " << countOverbookedClusters << " clusters of " << clustersOfEvent.size() << " marked as 'overbooked'...")
 
 
 
@@ -1734,18 +1732,17 @@ void VXDTFModule::event()
     finalTrackCandidates.appendNew(gfTC);
   }
   int nTotalIndices = totalIndices.size();
+  vector<int>::iterator newEndOfVector;
   std::sort(totalIndices.begin(), totalIndices.end());
-  std::unique(totalIndices.begin(), totalIndices.end());
+  newEndOfVector = std::unique(totalIndices.begin(), totalIndices.end()); /// WARNING: std:unique does delete double entries but does NOT resize the vector! This means that for every removed element, at the end of the vector remains one random value stored
+  totalIndices.resize(std::distance(totalIndices.begin(), newEndOfVector));
   int nReducedIndices = totalIndices.size();
 
   int tcPos = 0, numOfFinalTCs = 0;
   BOOST_FOREACH(VXDTFTrackCandidate * currentTC, m_tcVector) {
     if (currentTC->getCondition() == false) { tcPos++; continue; }
     TVector3 momentum = currentTC->getInitialMomentum();
-    double momValue = momentum.Mag();
-    momentum.SetZ(0.);
-    double pTValue = momentum.Mag();
-    B2DEBUG(20, "event " << m_eventCounter << ": TC " << tcPos << " has got condition = true, means its a final TC (TC-output). Its total Momentum is" << momValue << ", its transverse momentum is: " << pTValue)
+    B2DEBUG(20, "event " << m_eventCounter << ": TC " << tcPos << " has got condition = true, means its a final TC (TC-output). Its total Momentum is" << momentum.Mag() << ", its transverse momentum is: " << momentum.Perp())
     numOfFinalTCs++;
     tcPos++;
   }
@@ -1778,10 +1775,16 @@ void VXDTFModule::event()
 
 void VXDTFModule::endRun()
 {
+  vector<string>::iterator newEndOfVector;
+  std::vector<EventInfoPackage>::iterator newEndOfAnothterVector;
+
+  /// WARNING: std:unique does delete double entries but does NOT resize the vector! This means that for every removed element, at the end of the vector remains one random value stored
   std::sort(m_TESTERbadSensors.begin(), m_TESTERbadSensors.end());
-  std::unique(m_TESTERbadSensors.begin(), m_TESTERbadSensors.end());
+  newEndOfVector = std::unique(m_TESTERbadSensors.begin(), m_TESTERbadSensors.end());
+  m_TESTERbadSensors.resize(std::distance(m_TESTERbadSensors.begin(), newEndOfVector));
   std::sort(m_TESTERlogEvents.begin(), m_TESTERlogEvents.end());
-  std::unique(m_TESTERlogEvents.begin(), m_TESTERlogEvents.end());
+  newEndOfAnothterVector = std::unique(m_TESTERlogEvents.begin(), m_TESTERlogEvents.end());
+  m_TESTERlogEvents.resize(std::distance(m_TESTERlogEvents.begin(), newEndOfAnothterVector));
   std::reverse(m_TESTERlogEvents.begin(), m_TESTERlogEvents.end());
 
   B2INFO(" ############### VXDTF endRun ############### ")
@@ -1909,8 +1912,8 @@ void VXDTFModule::findTCs(TCsOfEvent& tcList,  VXDTFTrackCandidate* currentTC, s
     findTCs(tcList, currentTC, maxLayer);
 
   } else { // nbSize > 1
-    nbIter++; // iterator points to the second entry of the list of neighbours!
-    for (; nbIter != neighbours.end(); nbIter++) {
+    ++nbIter; // iterator points to the second entry of the list of neighbours!
+    for (; nbIter != neighbours.end(); ++nbIter) {
       VXDSegmentCell* pNextSeg =  *nbIter;
       VXDTFTrackCandidate* pTCCopy = new VXDTFTrackCandidate(currentTC);   // make a clone of old TC
       pTCCopy->addSegments(pNextSeg);
@@ -2209,7 +2212,7 @@ bool VXDTFModule::compareSecSequence(pair<string, MapOfSectors::iterator>& lhs, 
 /// searches for segments in given pass and returns number of discarded segments
 int VXDTFModule::segFinder(CurrentPassData* currentPass)
 {
-  string currentLayerID, friendLayerID, currentScope, currentSecID, currentFriendID, oldFriendID, ownSecName, friendSecName;
+  string /*currentLayerID, friendLayerID, currentScope, ownSecName, friendSecName,*/ currentFriendID, oldFriendID;
   TVector3 currentCoords, friendCoords, currentVector, tempVector;
   bool accepted = false; // recycled return value of the filters
   int simpleSegmentQI; // better than segmentApproved, but still digital (only min and max cutoff values), but could be weighed by order of relevance
@@ -2221,9 +2224,8 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
   for (secSequenceIter = currentPass->sectorSequence.begin(); secSequenceIter != currentPass->sectorSequence.end(); ++secSequenceIter) {
     B2DEBUG(1000, "SectorSequence is called " << secSequenceIter->first);
     mainSecIter = secSequenceIter->second;
-    currentLayerID = mainSecIter->second->getSecID()[0];
-    currentSecID = mainSecIter->second->getSecID();
-    B2DEBUG(1000, " checking " << currentSecID)
+//     currentLayerID = mainSecIter->second->getSecID()[0];
+    B2DEBUG(1000, " checking " << mainSecIter->second->getSecID())
     vector<string> hisFriends = mainSecIter->second->getFriends(); // loading friends of sector
     int nFriends = hisFriends.size();
 
@@ -2262,7 +2264,7 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
         currentFriendID = allFriendHits[friendHit]->getSectorName();
         if (currentFriendID != oldFriendID) {
           currentFriendSecIter = currentPass->sectorMap.find(currentFriendID);
-          friendLayerID = currentFriendID[0];
+//           friendLayerID = currentFriendID[0];
         }
         //         currentScope = str(format("L%1%L%2%") % friendLayerID % currentLayerID);
 
@@ -2722,7 +2724,7 @@ int VXDTFModule::cellularAutomaton(CurrentPassData* currentPass)
 {
   int activeCells = 1;
   int caRound = 0;
-  int goodNeighbours, countedSegments, segState;
+  int goodNeighbours, countedSegments;
 
   while (activeCells != 0) {
     activeCells = 0;
@@ -2780,8 +2782,7 @@ int VXDTFModule::cellularAutomaton(CurrentPassData* currentPass)
   //  int segState;
   countedSegments = 0;
   BOOST_FOREACH(VXDSegmentCell * currentSeg, currentPass->activeCellList) {
-    segState = currentSeg->getState();
-    B2DEBUG(150, "Post CA - Current state of cell: " << segState);
+    B2DEBUG(150, "Post CA - Current state of cell: " << currentSeg->getState());
     if (currentSeg->getInnerNeighbours().size() == 0 && currentSeg->getOuterNeighbours().size() == 0) { continue; }
     countedSegments++;
   }
@@ -2812,12 +2813,8 @@ void VXDTFModule::tcCollector(CurrentPassData* currentPass)
     B2DEBUG(100, "sector " << sectorOfSequIter->second->getSecID() << " has got " << nSegmentsInSector << " segments in its area");
 
     for (int thisSegmentInSector = 0; thisSegmentInSector < nSegmentsInSector; thisSegmentInSector++) {
-      if (segmentsOfSector[thisSegmentInSector]->isSeed() == false || segmentsOfSector[thisSegmentInSector]->getState() < tccMinState) {
-        if (segmentsOfSector[thisSegmentInSector]->isSeed() == false) {
-          B2DEBUG(100, "current segment is no seed!");
-        } else { B2DEBUG(100, "current segment has no sufficent cellstate..."); }
-        continue;
-      }
+      if (segmentsOfSector[thisSegmentInSector]->isSeed() == false) { B2DEBUG(100, "current segment is no seed!"); continue; }
+      if (segmentsOfSector[thisSegmentInSector]->getState() < tccMinState) { B2DEBUG(100, "current segment has no sufficent cellstate..."); continue; }
 
       VXDTFTrackCandidate* pTC = new VXDTFTrackCandidate();
       pTC->addSegments(segmentsOfSector[thisSegmentInSector]);
@@ -3182,7 +3179,6 @@ void VXDTFModule::calcInitialValues4TCs(TCsOfEvent& tcVector) /// TODO: use vxdC
 
     pVector = pTVector;
     pVector.SetZ(pZ);
-    double pValue = pVector.Mag();
 
     // the sign of curvature determines the charge of the particle, negative sign for curvature means positively charged particle. The signFactor is needed since the sign of PDG-codes are not defined by their charge but by being a particle or an antiparticle
 
@@ -3198,7 +3194,7 @@ void VXDTFModule::calcInitialValues4TCs(TCsOfEvent& tcVector) /// TODO: use vxdC
       aTC->setInitialValue(hitA, pVector, pdGCode);
     }
 
-    B2DEBUG(10, " TC has got momentum of " << pValue << "GeV and estimated pdgCode " << pdGCode);
+    B2DEBUG(10, " TC has got momentum of " << pVector.Mag() << "GeV and estimated pdgCode " << pdGCode);
 
 //    if ( pValue < 0.02 ) {
 //      aTC->setCondition(false);
@@ -3271,9 +3267,6 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
 //    track.Print();
     track.setSmoothing(false);
 
-    int numOfPxdIndices = currentTC->getPXDHitIndices().size();
-    int numOfSvdIndices = currentTC->getSVDHitIndices().size();
-
     BOOST_FOREACH(VXDTFHit * tfHit, currentTC->getHits()) {
       if (tfHit->getDetectorType() == Const::PXD) {
         PXDRecoHit* newRecoHit = new PXDRecoHit(pxdClusters[clusters[tfHit->getClusterIndexUV()].getIndex()]);
@@ -3287,8 +3280,7 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
       }
     }
 
-    const int nHitsInTrack = track.getNumHits();
-    B2DEBUG(50, "VXDTFModule::calcQIbyKalman, numOfPxdIndices : " << numOfPxdIndices << ", numOfSvdIndices : " << numOfSvdIndices << ", nHitsInTrack: " << nHitsInTrack)
+    B2DEBUG(50, "VXDTFModule::calcQIbyKalman, numOfPxdIndices : " << currentTC->getPXDHitIndices().size() << ", numOfSvdIndices : " << currentTC->getSVDHitIndices().size() << ", nHitsInTrack: " << track.getNumHits())
 
     if (m_KFBackwardFilter == true) {
       kalmanFilter.setNumIterations(0);
@@ -3317,7 +3309,7 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
 
     if (trackRep->getStatusFlag() == 0) { // 0 means, it was successfull
       double pVal = track.getCardinalRep()->getPVal();
-      B2DEBUG(10, "calcQI4TC succeeded: calculated kalmanQI: " << track.getChiSqu() << ", forward-QI: " << track.getForwardChiSqu() << " with NDF: " << track.getNDF() << ", p-value: " << pVal << ", numOfHits: " <<  numOfPxdIndices + numOfSvdIndices)
+      B2DEBUG(10, "calcQI4TC succeeded: calculated kalmanQI: " << track.getChiSqu() << ", forward-QI: " << track.getForwardChiSqu() << " with NDF: " << track.getNDF() << ", p-value: " << pVal << ", numOfHits: " <<  currentTC->getPXDHitIndices().size() + currentTC->getSVDHitIndices().size())
       if (pVal < 0.000001 and m_PARAMqiSmear == true) {
         currentTC->setTrackQuality(m_littleHelperBox.smearNormalizedGauss(pVal));
       } else {
@@ -3487,8 +3479,7 @@ int VXDTFModule::cleanOverlappingSet(TCsOfEvent& tcVector)
         newOverlappingTCs.push_back(aTC);
       }
     }
-    int cleanedTCs = tcVector.size() - newOverlappingTCs.size() - killedTCs;
-    B2DEBUG(10, "within funcCleanOverlappingSet: tcVector.size(): " << tcVector.size() << ", newOverlappingTCs.size(): " << newOverlappingTCs.size() << " and " << cleanedTCs << " former overlapping TCs are now clean")
+    B2DEBUG(10, "within funcCleanOverlappingSet: tcVector.size(): " << tcVector.size() << ", newOverlappingTCs.size(): " << newOverlappingTCs.size() << " and " << (tcVector.size() - newOverlappingTCs.size() - killedTCs) << " former overlapping TCs are now clean")
     tcVector = newOverlappingTCs;
     m_TESTERfilteredOverlapsQICtr++;
   } else { m_TESTERNotFilteredOverlapsQI++; B2DEBUG(10, "VXDTFModule event " << m_eventCounter << ": no TC is subset of other TC")}

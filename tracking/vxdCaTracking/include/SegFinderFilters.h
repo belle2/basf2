@@ -29,27 +29,26 @@ namespace Belle2 {
     typedef std::pair <int, int> SuccessAndFailCounter; // first entry is for number of times when filter approved valuse, second one is for number of times when filter neglected values
 
     /** Empty constructor. For initialisation only, an object generated this way is useless unless resetValues is called at least once */
-    SegFinderFilters(): TwoHitFilters() {
-      m_friendID = "";
-      m_thisSector = NULL;
-      m_dist3DCtr = std::make_pair(0, 0);
-      m_distXYCtr = std::make_pair(0, 0);
-      m_distZCtr = std::make_pair(0, 0);
-      m_normDist3DCtr = std::make_pair(0, 0);
-      m_slopeRZCtr = std::make_pair(0, 0);
-    }
+    SegFinderFilters():
+      TwoHitFilters(),
+      m_thisSector(NULL),
+      m_friendID(""),
+      m_dist3DCtr(std::make_pair(0, 0)),
+      m_distXYCtr(std::make_pair(0, 0)),
+      m_distZCtr(std::make_pair(0, 0)),
+      m_normDist3DCtr(std::make_pair(0, 0)),
+      m_slopeRZCtr(std::make_pair(0, 0)) {}
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use TwoHitFilters when no sectormap is available */
     SegFinderFilters(TVector3 outerHit, TVector3 innerHit, VXDSector* thisSector, std::string friendID):
       TwoHitFilters(outerHit, innerHit), // calls constructor of base class. Needed since base class does not use standard constructor, therefore we have to carry the hits manually into the base class
       m_thisSector(thisSector),
-      m_friendID(friendID) {
-      m_dist3DCtr = std::make_pair(0, 0);
-      m_distXYCtr = std::make_pair(0, 0);
-      m_distZCtr = std::make_pair(0, 0);
-      m_normDist3DCtr = std::make_pair(0, 0);
-      m_slopeRZCtr = std::make_pair(0, 0);
-    }
+      m_friendID(friendID),
+      m_dist3DCtr(std::make_pair(0, 0)),
+      m_distXYCtr(std::make_pair(0, 0)),
+      m_distZCtr(std::make_pair(0, 0)),
+      m_normDist3DCtr(std::make_pair(0, 0)),
+      m_slopeRZCtr(std::make_pair(0, 0)) {}
 
 
     /** Destructor. */

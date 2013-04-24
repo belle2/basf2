@@ -134,7 +134,9 @@ namespace Belle2 {
     typedef std::map<std::string, Sector> MapOfSectors;
 
     VXDTrack(int particleNumber):
-      m_index(particleNumber) {}
+      m_index(particleNumber),
+      m_pT(0.),
+      m_secMap(NULL) {}
 
     VXDTrack(int particleNumber, double pT, MapOfSectors* secMapPtr):
       m_index(particleNumber),
@@ -248,11 +250,11 @@ namespace Belle2 {
     /** constructor */
     Sector(float v1, float v2, float u1v1, float u1v2, float u2v1, float u2v2, std::string myName):
       m_usageCounter(1),
-      m_secName(myName) {
-      m_edgeO = std::make_pair(u1v1, v1);
-      m_edgeU = std::make_pair(u2v1, v1);
-      m_edgeV = std::make_pair(u1v2, v2);
-      m_edgeUV = std::make_pair(u2v2, v2);
+      m_secName(myName),
+      m_edgeO(std::make_pair(u1v1, v1)),
+      m_edgeU(std::make_pair(u2v1, v1)),
+      m_edgeV(std::make_pair(u1v2, v2)),
+      m_edgeUV(std::make_pair(u2v2, v2)) {
       m_friendMap.clear();
     }
 
@@ -293,12 +295,12 @@ namespace Belle2 {
     std::pair<float, float> getEdgeUV() { return m_edgeUV; }
 
   protected:
+    std::string m_secName; /**< name of sector  */
     std::pair<float, float> m_edgeO; /**< local coordinates of edge defined as origin within this module */
     std::pair<float, float> m_edgeU; /**< local coordinates of edge lying in U-direction compared to edgeO */
     std::pair<float, float> m_edgeV; /**< local coordinates of edge lying in V-direction compared to edgeO */
     std::pair<float, float> m_edgeUV; /**< local coordinates of diagonally lied edge compared to edgeO */
     int m_usageCounter; /**< counts number of times current sector is used */
-    std::string m_secName; /**< name of sector  */
     std::map<std::string, FMSectorFriends> m_friendMap; /**< map of friends attached to thisSector */
   };
 

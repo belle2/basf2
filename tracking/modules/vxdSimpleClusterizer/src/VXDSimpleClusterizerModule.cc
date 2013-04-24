@@ -100,9 +100,8 @@ void VXDSimpleClusterizerModule::beginRun()
 void VXDSimpleClusterizerModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-  int eventCounter = eventMetaDataPtr->getEvent();
 
-  B2DEBUG(1, "*******  VXDSimpleClusterizerModule processing event number: " << eventCounter << " *******");
+  B2DEBUG(1, "*******  VXDSimpleClusterizerModule processing event number: " << eventMetaDataPtr->getEvent() << " *******");
   //all the input containers. First: MCParticles
   StoreArray<MCParticle> mcParticles("");
   int nMcParticles = mcParticles.getEntries();

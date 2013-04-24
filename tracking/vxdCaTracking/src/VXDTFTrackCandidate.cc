@@ -169,7 +169,7 @@ void VXDTFTrackCandidate::setCondition(bool newCondition)
 }
 
 
-void VXDTFTrackCandidate::setNeuronValue(float aValue) { m_neuronValue = aValue; }
+void VXDTFTrackCandidate::setNeuronValue(double aValue) { m_neuronValue = aValue; }
 
 void VXDTFTrackCandidate::removeVirtualHit()   /// removing virtual hit/segment from TC after collecting the whole TC. This is done after the TCC and the TCC filter since the TCC needs the information provided by the virtual hit/segment.
 {

@@ -28,7 +28,10 @@ namespace Belle2 {
   public:
 
     /** Default constructor for the ROOT IO. */
-    VXDTFInfoBoard() { m_indexNumbers.clear(); /*m_fitSuccessful = false; m_probValue = 0; m_assignedGFTC = -1;*/ }
+    VXDTFInfoBoard():
+      m_fitSuccessful(false),
+      m_probValue(0),
+      m_assignedGFTC(-1) { m_indexNumbers.clear(); }
 
     /** getter - getIndex returns vector of indices assigned to InfoBoard, currently not used */
     const std::vector<int> getIndex() const { return m_indexNumbers; }

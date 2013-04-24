@@ -27,6 +27,7 @@ namespace Belle2 {
     ThreeHitFilters():
       m_circleCenterCalculated(false),
       m_radiusCalculated(false),
+      m_radius(0.),
       m_x2(0.),
       m_y2(0.),
       m_z2(0.) {
@@ -41,6 +42,7 @@ namespace Belle2 {
     ThreeHitFilters(TVector3 outerHit, TVector3 centerHit, TVector3 innerHit):
       m_circleCenterCalculated(false),
       m_radiusCalculated(false),
+      m_radius(0.),
       m_hitA(outerHit),
       m_hitB(centerHit),
       m_hitC(innerHit),
@@ -59,6 +61,7 @@ namespace Belle2 {
     void resetValues(TVector3 outerHit, TVector3 centerHit, TVector3 innerHit) {
       m_radiusCalculated = false;
       m_circleCenterCalculated = false;
+      m_radius = 0.;
       m_hitA = outerHit;
       m_hitB = centerHit;
       m_hitC = innerHit;

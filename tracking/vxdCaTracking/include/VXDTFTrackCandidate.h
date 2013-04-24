@@ -31,7 +31,15 @@ namespace Belle2 {
   class VXDTFTrackCandidate {
   public:
     /** Default constructor. */
-    VXDTFTrackCandidate() { m_overlapping = false; m_alive = true; m_qualityIndex = 1.0; }
+    VXDTFTrackCandidate():
+      m_overlapping(false),
+      m_alive(true),
+      m_qualityIndex(1.0),
+      m_qqq(1.0),
+      m_neuronValue(0.0),
+      m_pdgCode(0),
+      m_passIndex(-1),
+      m_fitSucceeded(false) {}
 
     /**copy constructor**/
     VXDTFTrackCandidate(VXDTFTrackCandidate*& other);
@@ -50,7 +58,7 @@ namespace Belle2 {
     bool getCondition() const { return m_alive; } /**< returns flag whether TC is still "alive" (part of the set of TCs which are probably real tracks based on the knowledge of the TF at the point of calling that function) */
     double getTrackQuality() { return m_qualityIndex; } /**< returns quality index of TC, has to be between 0 (bad) and 1 (perfect) */
     double getQQQ() { return m_qqq; } /**< returns aditional quality index */
-    float getNeuronValue() const { return m_neuronValue; } /**< returns state of neuron during hopfield network */
+    double getNeuronValue() const { return m_neuronValue; } /**< returns state of neuron during hopfield network */
     TVector3 getInitialCoordinates() const { return m_initialHit; } /**< returns initial coordinates needed for export as GFTrackCand */
     TVector3 getInitialMomentum() const { return m_initialMomentum; } /**< returns initial momentum needed for export as GFTrackCand */
     int getPDGCode() const { return m_pdgCode; } /**< returns estimated PDGCode (its always a pion, but charge changes depending of the sign of the curvature of the track) needed for export as GFTrackCandid */
@@ -69,7 +77,7 @@ namespace Belle2 {
     void setTrackQuality(double newVal); /**< set estimated quality of TC */
     void setQQQ(double qqqScore, double maxScore); /**< set estimated extended quality of TC (a potential minimal replacement for kalman filter, interesting for online-use) */
     void setCondition(bool newCondition); /**< set condition. If true, TC is part of set of final TCs which are exported for further use */
-    void setNeuronValue(float aValue);  /**< set neuron value, needed by the hopfield network */
+    void setNeuronValue(double aValue);  /**< set neuron value, needed by the hopfield network */
     void removeVirtualHit(); /**< removes virtual hit which is needed for most filtering steps */
     void setInitialValue(TVector3 aHit, TVector3 pVector, int pdg); /**< set initial values for TC, needed by GFTrackCand */
     void setPassIndex(int anIndex); /**< sets pass index number containing current TC */
@@ -89,7 +97,7 @@ namespace Belle2 {
     bool m_alive; /**< only tcs which are alive can leave the TF as final TCs */
     double m_qualityIndex;  /**< e.g. Chi²-Value */
     double m_qqq;  /**< QQQ = quasi quality indicator */
-    float m_neuronValue;  /**< QI for hopfield network */
+    double m_neuronValue;  /**< QI for hopfield network */
     int m_pdgCode;  /**< estimated PDGCode of TC */
     int m_passIndex;  /**< TF supports several passes per event, this value is needed for some passSpecific parameters. */
     bool m_fitSucceeded; /**< returns true if kalman fit was possible and returned a result itself */

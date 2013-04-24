@@ -26,6 +26,8 @@ namespace Belle2 {
 
     /** Empty constructor. For initialisation only, an object generated this way is useless unless resetValues(a, b) is called at least once */
     FourHitFilters():
+      m_radiusABC(0.),
+      m_radiusBCD(0.),
       m_circleCalculated(false) {}
 
     /** Constructor. expects 4 hits in TVector3 format, first parameter is outer hit, second is outerCenter hit, third is innercenter hit, last one is the innermost hit */
@@ -34,7 +36,9 @@ namespace Belle2 {
       m_hitB(outerCenter),
       m_hitC(innerCenter),
       m_hitD(inner),
-      m_circleCalculated(false) { }
+      m_radiusABC(0.),
+      m_radiusBCD(0.),
+      m_circleCalculated(false) {}
 
 
     /** Destructor. */
@@ -46,6 +50,8 @@ namespace Belle2 {
       m_hitB = outerCenter;
       m_hitC = innerCenter;
       m_hitD = inner;
+      m_radiusABC = 0.;
+      m_radiusBCD = 0.;
       m_circleCalculated = false;
     }
 

@@ -257,7 +257,7 @@ void FilterCalculatorModule::event()
   vector<VXDTrack> tracksOfEvent;
   vector<VXDTrack> trackletsOfEvent; // tracks cut into bite-sized pieces for the filtering part
 
-  int trackThreshold = 0;
+  int trackThreshold;
   if (m_PARAMuseEvtgen == true) {
     trackThreshold = numOfMcParticles;
   } else { trackThreshold = m_PARAMtracksPerEvent; }
@@ -294,8 +294,8 @@ void FilterCalculatorModule::event()
       } else { break; }
     }
     if (chosenSecMap == -1) {
-      continue;
       B2WARNING("FilterCalculatorModule - event " << m_eventCounter << ": invalid choice of sectorMap, please check parameter pTcuts in steering file")
+      continue;
     }
 
 //    ++m_trackletMomentumCounter[chosenSecMap];
@@ -359,7 +359,7 @@ void FilterCalculatorModule::event()
         int aLayerID = aVxdID.getLayerNumber();
         B2DEBUG(10, "local pxd hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ") @layer: " << aLayerID);
         unsigned int aSecID = 0;
-        string aSectorName, oldSectorName;
+        string aSectorName;
 
         // searching for sector:
         for (int j = 0; j != int(m_PARAMsectorConfigU.size() - 1); ++j) {
@@ -525,9 +525,8 @@ void FilterCalculatorModule::event()
     list<VXDHit> thisTrack = newTrack.getTrack();
     if (thisTrack.size() > 30) { B2WARNING("event: " << m_eventCounter << " beware, tracklength is " << thisTrack.size()) }
     if (int (thisTrack.size()) > m_numOfLayers * 2) { m_longTrackCounter++; }
-    for (list<VXDHit>::iterator it = thisTrack.begin() ; it != thisTrack.end(); it++) {
-      string currentSector = it->getSectorID();
-      B2DEBUG(10, "track has a hit in the following sector: " << currentSector)
+    for (list<VXDHit>::iterator it = thisTrack.begin() ; it != thisTrack.end(); ++it) {
+      B2DEBUG(10, "track has a hit in the following sector: " << it->getSectorID())
     }
     int thisUniID, friendUniID;
     list<VXDHit>::reverse_iterator riter, oldRiter;
@@ -551,10 +550,8 @@ void FilterCalculatorModule::event()
               if (thisUniID != friendUniID) {
                 newTracklet.addHit(*riter);
               } else {
-                double dist = (oldRiter->getHitPosition() - riter->getHitPosition()).Mag();
-                float dTime = oldRiter->getTimeStamp() - riter->getTimeStamp();
                 string thisSecName = riter->getSectorID();
-                B2WARNING("at event " << m_eventCounter << ": track " << newTrack.getParticleID() << " with momentum of " << newTrack.getPt() << "GeV/c has got two trueHits with same direction of flight, distance of " << dist << " of each other and deltatimestamp " << dTime << " in the same sensor :" << thisSecName << ". Hit discarded!")
+                B2WARNING("at event " << m_eventCounter << ": track " << newTrack.getParticleID() << " with momentum of " << newTrack.getPt() << "GeV/c has got two trueHits with same direction of flight, distance of " << (oldRiter->getHitPosition() - riter->getHitPosition()).Mag() << " of each other and deltatimestamp " << (oldRiter->getTimeStamp() - riter->getTimeStamp()) << " in the same sensor :" << thisSecName << ". Hit discarded!")
                 thisSecMap->find(thisSecName)->second.decreaseCounter();
                 m_badHitsCounter++;
               }
@@ -808,12 +805,11 @@ void FilterCalculatorModule::event()
         currentSector = it2HitsFilter->getSectorID();
         friendSector = iter->getSectorID();
         thisSectorPos = thisSecMap->find(currentSector);
-        string testString = "_";
+
         if (typeid(string).name() != typeid(friendSector).name()) {
           B2WARNING("FilterCalculator event " << m_eventCounter << ": type of friendSector is no string, aborting tracklet...")
           continue;
         }
-//        if ( friendSector.at(2) != testString ) { continue; } // filters bad Sector names
 
         hitGlobal = it2HitsFilter->getHitPosition();
         motherHitGlobal = iter->getHitPosition();

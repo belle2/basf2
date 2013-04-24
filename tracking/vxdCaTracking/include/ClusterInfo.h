@@ -30,7 +30,9 @@ namespace Belle2 {
   public:
 
     /** Empty constructor. */
-    ClusterInfo() {}
+    ClusterInfo():
+      m_clusterIndex(-1),
+      m_isPXD(false) {}
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use ThreeHitFilters when no sectormap is available */
     ClusterInfo(int clusterIndex, bool isPXD):

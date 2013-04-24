@@ -213,7 +213,7 @@ namespace Belle2 {
     CLHEP::HepSymMatrix covMatrix = kmm.getMotherError();
     TMatrixFSym errMatrix(7);
     for (int i = 0; i < 7; i++) {
-      for (int j = i; j < 7; j++) {
+      for (int j = 0; j < 7; j++) {
         errMatrix[i][j] = covMatrix[i][j];
       }
     }

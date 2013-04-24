@@ -78,14 +78,14 @@ namespace Belle2 {
 
 
     /** Returns a vector with indices of Tracks, to which this Hit may belong. */
-    std::vector<int> getTrackIndices() const { return m_TrackIndices; }
+    const std::vector<int>  & getTrackIndices() const { return m_TrackIndices; }
 
     /** Searches for the best position (z coordinate) of a stereo hit and overwrites the position coordinates with new values.
      *  This method searches for a given track (direction and one 'starting' hit) and this (stereo) hit for the z-coordinate of this hit, which fits best to the given track.
      *  For this the wire length is parametrised and for each point the 'fitting' of this new position is checked by calculating the shortest (perpendicular) distance between this hit and the track.
      *  After the optimal wire position is found, the coordinates (member variables) are overwritten according to it (!).
      */
-    void shiftAlongZ(const TVector3 trackDirection, const CDCTrackHit trackHit);
+    void shiftAlongZ(TVector3& trackDirection, CDCTrackHit& trackHit);
 
     /** Sets a temporary cell state for the cellular automaton. */
     void setTempCellState(const int tempCellState);
@@ -100,13 +100,13 @@ namespace Belle2 {
     void setSegmentId(const int segmentId);
 
     /** Adds several Ids of segments to which this hit may belong. */
-    void setSegmentIds(const std::vector<int> segmentIds);
+    void setSegmentIds(const std::vector<int>& segmentIds);
 
     /** Clears/Erases all stored segment Ids. */
     void clearSegmentIds();
 
     /** Returns the vectors with Ids of segments to which this hit may belong. */
-    std::vector<int>getSegmentIds() const {return m_segmentIds;};
+    const std::vector<int> & getSegmentIds() const {return m_segmentIds;};
 
 
 

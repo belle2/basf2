@@ -28,25 +28,25 @@ namespace Belle2 {
     ~StereoFinder();
 
     /** Returns the distance between the centers of the outermost track segment and the other segment in the normal plane. */
-    static double SimpleDistance(CDCTrackCandidate track, CDCSegment segment);
+    static double SimpleDistance(CDCTrackCandidate& track, CDCSegment& segment);
 
     /** Returns the shortest distance between the track and the segment in the conformal plane.
      * ShortestDistance - method from AxialTrackFinder ist called.
      * The returned distance is very small if the segment belong to the track.
      */
-    static double ShortestDistance(CDCTrackCandidate track, CDCSegment segment);
+    static double ShortestDistance(CDCTrackCandidate& track, CDCSegment& segment);
 
     /** This method calculates the 'wire distance' between a track and a segment.
      *  The difference between the WireIds of the outermost hit in the track and the outermost hit in the segment is calculated.
      */
-    static int WireIdDifference(CDCTrackCandidate track, CDCSegment segment);
+    static int WireIdDifference(CDCTrackCandidate& track, CDCSegment& segment);
 
 
     /**Function to check if there are more than one segment from one superlayer in this track candidate.
      * With the given track candidate and the index of a segment, it is checked if there are other segments with the same superlayer in this track candidate.
      * Returns false is the given segment is the only one. Returns true if there is more than one.
      */
-    static bool OvercrowdedSuperlayer(CDCTrackCandidate track, int SLId);
+    static bool OvercrowdedSuperlayer(CDCTrackCandidate& track, int SLId);
 
     /** Method to check if there are more than one segment per superlayer and remove the wrong ones.
      *  Superlayer with more the one segment are considered and the competing segments are compared to each other.
@@ -72,7 +72,7 @@ namespace Belle2 {
      * Fourth parameter: cut an the 'shortest' distance between the track and the segment in the conformal plane.
      * Fifth parameter: superlayer to be searched.
      */
-    static void FindStereoSegments(CDCTrackCandidate startTrack, std::vector<CDCSegment> & cdcStereoSegments, double SimpleDistanceCut, double ShortDistanceCut, int SLId);
+    static void FindStereoSegments(CDCTrackCandidate& startTrack, std::vector<CDCSegment> & cdcStereoSegments, double SimpleDistanceCut, double ShortDistanceCut, int SLId);
 
 
     /**Main method to append the stereo segments to the track candidates.
@@ -82,7 +82,7 @@ namespace Belle2 {
      * After the 'best matching' coordinates are found, the segments have to pass another more strict cut to be assigned to the track candidate.
      * At the end the superlayers are checked to have only one segment, the best one is selected and the others are removed.
      */
-    static void AppendStereoSegments(std::vector<CDCSegment> & cdcStereoSegments, std::string CDCTrackCandidates);
+    static void AppendStereoSegments(std::vector<CDCSegment> & cdcStereoSegments, std::vector<CDCTrackCandidate> & CDCTrackCandidates);
 
   private:
 

@@ -12,6 +12,7 @@
 #define CDCTRACKINGMODULE_H
 
 #include <framework/core/Module.h>
+#include <tracking/cdcConformalTracking/CDCTrackHit.h>
 #include <fstream>
 
 #include <boost/tuple/tuple.hpp>
@@ -76,38 +77,27 @@ namespace Belle2 {
 
     /** This method sorts hit indices to bring them in a correct order, which is needed for the fitting
      *  First parameter is a vector with the hit indices, this vector is charged within the function.
-     *  Second parameter is the name of the CDCTrackHits array. In this way the sort funtion can get all necessary information about the hits.
+     *  Second parameter is the name of the CDCTrackHits array. In this way the sort function can get all necessary information about the hits.
      *  Third parameter is the estimated charge of the track, which is needed for hits from the same layer to be ordered correctly.
      */
-    static void sortHits(std::vector<int> & hitIndices, std::string CDCTrackHits, double charge);
+    static void sortHits(std::vector<int> & hitIndices, const std::vector<CDCTrackHit>& cdcTrackHits, double charge);
 
     /** This method is a comparison function used in the sortHits() function.
      *  This method is there to compare 4-tuples with <hitId, rho, wireId, charge>.
      *  It this way also hits from the same layer can be ordered.
      */
-    static bool tupleComp(boost::tuple<int, double, int, double> tuple1, boost::tuple<int, double, int, double> tuple2);
+    static bool tupleComp(const boost::tuple<int, double, int, double>& tuple1, const boost::tuple<int, double, int, double>& tuple2);
 
   protected:
 
 
   private:
 
-    std::string m_cdcSimHitsColName;              /**< Input simulated hits collection name (should already be created by the CDCSensitiveDetector module) */
+
     std::string m_cdcHitsColName;                 /**< Input digitized hits collection name (output of CDCDigitizer module) */
-    std::string m_cdcTrackCandsColName;           /**< Output tracks collection name*/
     std::string m_gfTrackCandsColName;            /**< Output genfit track candidates collection name*/
 
-    int m_nTracks;                                /**< Counter for the number of found tracks*/
-
-    bool m_textFileOutput;                          /**< Boolean to create output text files with hit coordinates (needed for development purposes, wont be needed later on)*/
-
-    std::ofstream SimHitsfile;                      /**< Simple text file to write out the coordinates of the simulated hits*/
-    std::ofstream Hitsfile;                         /**< Simple text file to write out the coordinates of the digitized hits*/
-    std::ofstream ConfHitsfile;                     /**< Simple text file to write out the coordinates of the digitized hits in the conformal plane*/
-    std::ofstream Tracksfile;                       /**< Simple text file to write out the coordinates of the digitized hits ordered by their belonging to a track candidate*/
-    std::ofstream ConfTracksfile;                   /**< Simple text file to write out the coordinates of the digitized hits in the conformal plane ordered by their belonging to a track candidate*/
-
-
+    int m_nTracks;                                /**< Counter for the number of found tracks per run*/
 
   };
 } // end namespace Belle2

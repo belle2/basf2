@@ -25,6 +25,13 @@ ClassImp(CDCSegment)
 
 CDCSegment::CDCSegment()
 {
+  m_superlayerId = 0;
+  m_Id = 0;
+  m_isAxial = 0;
+  m_nHits = 0;
+  m_direction.SetX(0);
+  m_direction.SetY(0);
+  m_direction.SetZ(0);
 }
 
 CDCSegment::~CDCSegment()
@@ -73,7 +80,6 @@ void CDCSegment::setTrackCandId(const int trackId)
 
 void CDCSegment::setTrackCandId(const vector<int> trackId)
 {
-
   for (unsigned int i = 0; i < trackId.size(); i++) {
     setTrackCandId(trackId.at(i));
   }

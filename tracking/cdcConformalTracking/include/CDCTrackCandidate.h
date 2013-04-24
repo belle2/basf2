@@ -52,6 +52,8 @@ namespace Belle2 {
     /** Sets the transverse momentum of the TrackCandidate. */
     void setPt(const double momentum);
 
+    void setId(const int Id);
+
     /** Sets and updates some member variables of the TrackCandidate.
      * This method is executed every time a new Segment is added to the TrackCandidate.
      * All member variables dependent on this are updated (number of Segments/Hits, direction, inner and outermost Segment).
@@ -80,7 +82,7 @@ namespace Belle2 {
     /** Returns the direction of the TrackCandidate in the conformal plane.
      * This direction is the sum of segment`s directions.
      */
-    TVector3 getDirection() const {return m_direction;};
+    TVector3& getDirection() {return m_direction;};
 
     /** Returns a vector with all segments in the TrackCandidate. */
     std::vector<Belle2::CDCSegment> & getSegments() {return m_Segments;};
@@ -89,16 +91,16 @@ namespace Belle2 {
     std::vector<Belle2::CDCTrackHit> & getTrackHits() {return m_TrackHits;};
 
     /** Returns the innermost axial hit (closest to the origin) of the TrackCandidate. */
-    CDCTrackHit getInnerMostHit() const {return m_innerMostHit;};
+    CDCTrackHit& getInnerMostHit() {return m_innerMostHit;};
 
     /** Returns the outermost axial hit (farthest from the origin) of the TrackCandidate. */
-    CDCTrackHit getOuterMostHit() const {return m_outerMostHit;};
+    CDCTrackHit& getOuterMostHit() {return m_outerMostHit;};
 
     /** Returns the innermost axial segment (closest to the origin) of the TrackCandidate. */
-    CDCSegment getInnerMostSegment() const {return m_innerMostSegment;};
+    CDCSegment& getInnerMostSegment() {return m_innerMostSegment;};
 
     /** Returns the outermost axial segment (farthest to the origin) of the TrackCandidate. */
-    CDCSegment getOuterMostSegment() const {return m_outerMostSegment;};
+    CDCSegment& getOuterMostSegment() {return m_outerMostSegment;};
 
     /** Returns a Chi2 value of the TrackCandidate calculated from a linear fit in the conformal plane. */
     double getChiSquare() const {return m_chi2;};
@@ -107,7 +109,7 @@ namespace Belle2 {
     double getPt() const {return m_pt;}
 
     /** Returns the momentum vector of the TrackCandidate. */
-    TVector3 getMomentum() const {return m_momentum;}
+    const TVector3& getMomentum() const {return m_momentum;}
 
     /** Returns the estimated charge of the track . */
     int getChargeSign() const { return m_chargeSign; }

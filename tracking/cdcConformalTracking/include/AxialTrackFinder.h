@@ -27,38 +27,39 @@ namespace Belle2 {
     ~AxialTrackFinder();
 
     /** Returns the shortest distance between the first point and the straight line in the given direction through this point and the other point.
-     * Performs some simple geometrical calculations.
+     * Performs some simple geometric calculations.
      * A perpendicular (to the given direction) line through the second point is formed, then the intersection point between this line and a line build through the first point and his direction is calculated.
      * The distance between the second point and this intersection point is returned.
      */
-    static double ShortestDistance(TVector3 firstPoint, TVector3 firstDirection, TVector3 secondPoint);
+    static double ShortestDistance(TVector3& firstPoint, TVector3& firstDirection, TVector3& secondPoint);
 
     /** Returns the shortest distance between one point of one segment and the straight line build through the outer most point of the other segment and his direction in the conformal plane.
      * Performs some simple geometrical calculations (see ShortestDistance(TVector3 firstPoint, TVector3 firstDirection, TVector3 secondPoint))in the conformal plane (where segments and tracks are assumed to form straight lines).
      * This returned distance is very small for segments belonging to the same track.
      */
-    static double ShortestDistance(CDCSegment segment1, CDCSegment segment2);
+    static double ShortestDistance(CDCSegment& segment1, CDCSegment& segment2);
 
     /** Returns the distance between the centers of both segments in the normal plane.  */
-    static double SimpleDistance(CDCSegment segment1, CDCSegment segment2);
+    static double SimpleDistance(CDCSegment& segment1, CDCSegment& segment2);
 
     /** Returns a fraction of segments already used to reconstruct another track.
      * First parameter is a track which segments will be checked.
      * Second parameter is a vector with Id's of already used segments.
      */
-    static float UsedSegmentsFraction(CDCTrackCandidate track, std::vector<int> & UsedSegmentId);
+    static float UsedSegmentsFraction(CDCTrackCandidate& track, std::vector<int> & UsedSegmentId);
 
     /** Returns a fraction of hits already used to reconstruct another track.
      * First parameter is a track which hits will be checked.
      * Second parameter is a vector with Id's of already used hits.
      */
-    static float UsedHitsFraction(CDCTrackCandidate track, std::vector<int> & UsedTrackHitId);
+    static float UsedHitsFraction(CDCTrackCandidate& track, std::vector<int> & UsedTrackHitId);
 
     /** Returns the track candidate with the smallest chi2 from the given track candidate vector.
      *  One 'real' track may have multiple track candidates which differ by some wrongly assigned hits/segments.
      *  If the tracks are 'too similar', the one with the lowest chi2 (from the linear fit in the conformal plane) is selected.
      */
-    static CDCTrackCandidate EvaluateBestCandidate(std::vector <CDCTrackCandidate> candidates);
+    static int EvaluateBestCandidate(const std::vector <CDCTrackCandidate> & candidates, const std::vector <int> & indices);
+
 
     /** Searchs for track candidates from given segments and within the given cuts.
      * First parameter: vector with axial Segments.
@@ -91,7 +92,7 @@ namespace Belle2 {
      * Only candidates with enough unused segments can be added to the final array. (The search starts with the longest candidates).
      * An additional step is performed for 'short' (2 or 3 segments) candidates to find out if they can be combined to one 'long' (4 or 5 segments) candidate.
      */
-    static void CollectTrackCandidates(std::vector<CDCSegment> & cdcAxialSegments, std::string CDCTrackCandidates);
+    static void CollectTrackCandidates(std::vector<CDCSegment> & cdcAxialSegments, std::vector<CDCTrackCandidate>& CDCTrackCandidates);
 
 
   private:

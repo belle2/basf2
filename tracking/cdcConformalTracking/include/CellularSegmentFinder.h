@@ -32,21 +32,21 @@ namespace Belle2 {
      *  It was originally used as criteria for the hits to be neighbours, but the method was replaced by a more fast and simple WireIdDifference method.
      *  It may however be still useful for some checks.
      */
-    static double SimpleDistance(CDCTrackHit hit1, CDCTrackHit hit2);
+    static double SimpleDistance(const CDCTrackHit& hit1, const CDCTrackHit& hit2);
 
     /** This method calculates the 'wire distance' between two hits.
      *  The difference between the WireIds of both hits is calculated.
      *  To get the right number even if the difference is 'crossing' the 0 WireId, CDCGeometryParameters are called to get the total wire number per layer and to correct the difference.
      */
-    static int WireIdDifference(CDCTrackHit hit1, CDCTrackHit hit2);
+    static int WireIdDifference(const CDCTrackHit& hit1, const CDCTrackHit& hit2);
 
     /** This method evaluates CA-states of the hits.
      *  First parameter: reference (!) to the hit vector.
      *  Second parameter: starting outermost layer.
-     *  Third parameter: number of layer int the given superlayer (usually 6, in the innermost 8)
+     *  Third parameter: number of layer in the given superlayer (usually 6, in the innermost 8)
      *  This method is executed for each superlayer. The states of all hits in this superlayer are evaluated.
      */
-    static void EvaluateStates(std::vector<CDCTrackHit> & cdcHits, int startLayer, int nLayers);
+    static void EvaluateStates(std::vector<CDCTrackHit> & cdcHits, const int startLayer, const int nLayers);
 
     /** This method checks for hit neighbours in the same layer.
      *  Per default only 'single hit chain' is constructed. There are however often two hits in one layer.
@@ -54,7 +54,7 @@ namespace Belle2 {
      *  If such a neighbour hit is found, it is checked if the drift times of the two hits are 'compatible' (their sum should be approximately the distance between the wires).
      *  If such a neighbour hit is found, this hit get the same segment ids assigned as the given hit.
      */
-    static void  CheckLayerNeighbours(CDCTrackHit aHit, std::vector<CDCTrackHit> & cdcHits);
+    static void  CheckLayerNeighbours(const CDCTrackHit& aHit, std::vector<CDCTrackHit> & cdcHits);
 
     /** This is the main method of the CellularSegmentFinder.
       * First parameter: name of the StoreArray with CDCTrackHits (input)
@@ -66,7 +66,7 @@ namespace Belle2 {
       * An additional method is executed each time a neighbouring hit is found: it is checked if there is a close neighbour in the same layer (WireIdDifference == 1) and this hit get also the same segment Id.
       * In the last step all the segments are finally created and added to the StoreArray (and all hits get assigned accordingly to their segment Ids, the same hit can be used by different segments)
       */
-    static void FindSegments(std::string CDCTrackHits, std::string CDCSegments);
+    static void FindSegments(std::vector<CDCTrackHit> & cdcHits, std::vector<CDCSegment> & Segments);
 
   private:
 

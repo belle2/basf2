@@ -11,6 +11,7 @@
 #include "../include/CDCTrackCandidate.h"
 #include "tracking/cdcConformalTracking/AxialTrackFinder.h"
 #include <cmath>
+#include<list>
 
 using namespace std;
 using namespace Belle2;
@@ -19,6 +20,18 @@ ClassImp(CDCTrackCandidate)
 
 CDCTrackCandidate::CDCTrackCandidate()
 {
+  m_Id = 0;
+  m_nSegments = 0;
+  m_nHits = 0;
+  m_direction.SetX(0);
+  m_direction.SetY(0);
+  m_direction.SetZ(0);
+  m_chi2 = 0;
+  m_pt = 0;
+  m_momentum.SetX(0);
+  m_momentum.SetY(0);
+  m_momentum.SetZ(0);
+  m_chargeSign = 0;
 }
 
 CDCTrackCandidate::CDCTrackCandidate(const int Id)
@@ -79,14 +92,26 @@ void CDCTrackCandidate::addSegment(CDCSegment& aSegment)
 
 void CDCTrackCandidate::removeSegment(const int Id)
 {
+  list <CDCSegment> segmentList;
 
   for (int i = 0; i < m_nSegments; i++) {
-    if (m_Segments.at(i).getId() == Id) {
-      m_Segments.erase(m_Segments.begin() + i);
-      //B2INFO("Remove segment from candidate!");
-      update();
-    }
+    segmentList.push_back(m_Segments.at(i));
   }
+
+  list<CDCSegment>::iterator it = segmentList.begin();
+  bool doneSeg = false;
+  while (it != segmentList.end() && doneSeg == false) {
+    if ((*it).getId() == Id) {
+      segmentList.erase(it);
+      doneSeg = true;
+    } else ++it;
+  }
+
+  m_Segments.clear();
+  for (list<CDCSegment>::iterator it = segmentList.begin(); it != segmentList.end(); ++it) {
+    m_Segments.push_back(*it);
+  }
+  update();
 }
 
 void CDCTrackCandidate::setChiSquare(const double chi2)
@@ -99,18 +124,25 @@ void CDCTrackCandidate::setPt(const double momentum)
   m_pt = momentum;
 }
 
+void CDCTrackCandidate::setId(const int Id)
+{
+  m_Id = Id;
+}
+
 
 void CDCTrackCandidate::update()
 {
   m_nSegments = m_Segments.size();
   m_nHits = m_TrackHits.size();
-
+  //int nHits = 0;
   //Calculate the direction from the directions of axial segments
   for (int i = 0; i < m_nSegments; i++) {
     if (m_Segments.at(i).getIsAxial() == true) {
       m_direction = m_direction + m_Segments.at(i).getDirection();
     }
+    //nHits = nHits+ m_Segments.at(i).getNHits();
   }
+  //m_nHits = nHits;
   //double norm = m_direction.Mag();
   //m_direction.SetX( m_direction.x()/norm);
   //m_direction.SetY( m_direction.y()/norm);
@@ -190,8 +222,6 @@ void CDCTrackCandidate::estimateMomentum()
     }
   }
 
-  //B2INFO("First stereo segment in SL "<<minStereoSL);
-  //B2INFO("Second stereo segment in SL "<<secondMinStereoSL);
 
   //coordinates of the innermost stereo hit
   double x_stIn = m_Segments.at(minStereoIndex).getInnerMostHit().getWirePosition().x();
@@ -203,13 +233,6 @@ void CDCTrackCandidate::estimateMomentum()
   double y_stOut = m_Segments.at(minStereoIndex).getOuterMostHit().getWirePosition().y();
   double z_stOut = m_Segments.at(minStereoIndex).getOuterMostHit().getWirePosition().z();
 
-  //B2INFO("Z direction of the innermost stereo hit "<<z_stIn/(sqrt(x_stIn*x_stIn+y_stIn*y_stIn+z_stIn*z_stIn)));
-  //B2INFO("Z direction of the outermost hit in the innermost stereo segment "<<z_stOut/(sqrt(x_stOut*x_stOut+y_stOut*y_stOut+z_stOut*z_stOut)));
-
-  //B2INFO("Coordinates of the innermost axial hit: "<<m_Segments.at(minAxialIndex).getInnerMostHit().getWirePosition().x()<<"  "<<m_Segments.at(minAxialIndex).getInnerMostHit().getWirePosition().y()<<"  "<<m_Segments.at(minAxialIndex).getInnerMostHit().getWirePosition().z());
-  //B2INFO("Coordinates of the outermost hit in the innermost axial segment: "<<m_Segments.at(minAxialIndex).getOuterMostHit().getWirePosition().x()<<"  "<<m_Segments.at(minAxialIndex).getOuterMostHit().getWirePosition().y()<<"  "<<m_Segments.at(minAxialIndex).getOuterMostHit().getWirePosition().z());
-
-
   //coordinates of the innermost hit in the second innermost stereo segment
   double x_st2In = m_Segments.at(secondMinStereoIndex).getInnerMostHit().getWirePosition().x();
   double y_st2In = m_Segments.at(secondMinStereoIndex).getInnerMostHit().getWirePosition().y();
@@ -219,9 +242,6 @@ void CDCTrackCandidate::estimateMomentum()
   double x_st2Out = m_Segments.at(minStereoIndex).getOuterMostHit().getWirePosition().x();
   double y_st2Out = m_Segments.at(minStereoIndex).getOuterMostHit().getWirePosition().y();
   double z_st2Out = m_Segments.at(minStereoIndex).getOuterMostHit().getWirePosition().z();
-
-  //B2INFO("Z direction of the innermost hit in the second innermost stereo segment "<<z_st2In/(sqrt(x_st2In*x_st2In+y_st2In*y_st2In+z_st2In*z_st2In)));
-  //B2INFO("Z direction of the outermost hit in the second innermost stereo segment "<<z_st2Out/(sqrt(x_st2Out*x_st2Out+y_st2Out*y_st2Out+z_st2Out*z_st2Out)));
 
   //Px and Py are estimated from the innermost of the innermost axial segment
   //the absolute values are weighted with the pt estimated from the whole track in the AxialTrackFinder
@@ -239,26 +259,23 @@ void CDCTrackCandidate::estimateMomentum()
   double tempz;
   double tempx;
   double tempy;
-  //double znorm;
+  double znorm;
   double norm;
 
   if (m_chargeSign >= 0) {
     tempz = (z_st2In + z_st2Out) / 2;
     tempx = (x_st2In + x_st2Out) / 2;
     tempy = (y_st2In + y_st2Out) / 2;
-    //znorm = sqrt(tempx * tempx + tempy * tempy);
+    znorm = sqrt(tempx * tempx + tempy * tempy);
     norm = sqrt(tempx * tempx + tempy * tempy + tempz * tempz);
-    //B2INFO("Tempz/norm: "<<tempz/norm);
-    //momentumZ = tempz/znorm * m_pt;
     momentumZ = tempz / norm;
   } else {
     tempz = (z_stIn + z_stOut) / 2;
     tempx = (x_stIn + x_stOut) / 2;
     tempy = (y_stIn + y_stOut) / 2;
-    //znorm = sqrt(tempx * tempx + tempy * tempy);
+    znorm = sqrt(tempx * tempx + tempy * tempy);
     norm = sqrt(tempx * tempx + tempy * tempy + tempz * tempz);
-    //B2INFO("Tempz/norm: "<<tempz/norm);
-    //momentumZ = tempz/znorm * m_pt;
+
     momentumZ = tempz / norm;
   }
 
@@ -266,8 +283,7 @@ void CDCTrackCandidate::estimateMomentum()
   m_momentum.SetY(momentumY);
   m_momentum.SetZ(momentumZ);
 
-
-//B2INFO("Estimated momentum: "<<momentumX<<"  "<<momentumY<<"  "<<momentumZ);
+  B2DEBUG(150, "Estimated momentum: " << momentumX << "  " << momentumY << "  " << momentumZ);
 
 
 }
@@ -276,5 +292,4 @@ void CDCTrackCandidate::setChargeSign(const int sign)
 {
   m_chargeSign = sign;
 }
-
 

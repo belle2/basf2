@@ -63,7 +63,7 @@ namespace Belle2 {
     bool getIsAxial() const {return m_isAxial;};
 
     /** Return a vector with Ids of track candidates to which this segment may belong.  */
-    std::vector<int>getTrackCandId() const {return m_trackCandId;};
+    const std::vector<int> & getTrackCandId() const {return m_trackCandId;};
 
     /** Returns a vector with TrackHits objects in the Segment.
      * This vector contains all Hits which build this Segment.
@@ -73,13 +73,13 @@ namespace Belle2 {
     /** Returns the direction of the segment.
      * The direction is calculated as a TVector3 of the innermost hit position relatively to the outermost hit position of the segment in the conformal plane.
      */
-    TVector3 getDirection() const {return m_direction;};
+    TVector3 getDirection() {return m_direction;};
 
     /** Returns the innermost hit (the one closest to the origin) of the segment. */
-    CDCTrackHit getInnerMostHit() const {return m_innerMostHit;};
+    CDCTrackHit& getInnerMostHit() {return m_innerMostHit;};
 
     /** Returns the outermost hit (the one farthest from the origin) of the segment. */
-    CDCTrackHit getOuterMostHit() const {return m_outerMostHit;};
+    CDCTrackHit& getOuterMostHit() {return m_outerMostHit;};
 
     /** Returns the range of wires of the segment.
      *  The difference between the lowest and the highest wire Id in the segment is calculated.

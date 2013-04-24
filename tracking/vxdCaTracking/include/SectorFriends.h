@@ -27,6 +27,7 @@ namespace Belle2 {
    * is needed by the VXDSegmentCell-class. Carries information about the compatibility of two sectors and the cutoffs relevant for them as well */
   class SectorFriends {
   public:
+    /** constructor */
     SectorFriends(std::string myName, std::string secName):
       m_friendName(myName),
       m_sectorName(secName) { }

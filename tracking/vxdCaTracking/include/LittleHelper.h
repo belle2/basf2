@@ -75,8 +75,8 @@ namespace Belle2 {
     /** safety check whether incoming values make sense for smearing */
     bool checkSanity(double low, double high, double mean, double sigma);
 
-    double m_meanValue; /** delivers preset for a mean value to be smeared */
-    double m_sigmaValue; /** delivers preset for a sigma value to determine the degree of smearing */
+    double m_meanValue; /**< delivers preset for a mean value to be smeared */
+    double m_sigmaValue; /**< delivers preset for a sigma value to determine the degree of smearing */
   }; //end class LittleHelper
 } //end namespace Belle2
 

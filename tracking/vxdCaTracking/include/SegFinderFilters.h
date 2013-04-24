@@ -26,7 +26,7 @@ namespace Belle2 {
   /** bundles filter methods using 2 hits (using TwhoHitFilter-class). and compares with entries of sector min and max */
   class SegFinderFilters : public TwoHitFilters {
   public:
-    typedef std::pair <int, int> SuccessAndFailCounter; // first entry is for number of times when filter approved valuse, second one is for number of times when filter neglected values
+    typedef std::pair <int, int> SuccessAndFailCounter; /**<  first entry is for number of times when filter approved valuse, second one is for number of times when filter neglected values */
 
     /** Empty constructor. For initialisation only, an object generated this way is useless unless resetValues is called at least once */
     SegFinderFilters():

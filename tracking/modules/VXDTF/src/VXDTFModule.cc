@@ -1140,11 +1140,8 @@ void VXDTFModule::event()
       }
 
       B2DEBUG(50, " PXDCluster: with posOfHit in StoreArray: " << iPart << " is found again within secID " << aSectorName << " using sectorSetup " << currentPass->sectorSetup);
-//         ClusterInfo aClusterUV(iPart);
-//         int numClusters = clustersOfEvent.size();
-//         clustersOfEvent.push_back(aClusterUV);
+
       VXDTFHit* pTFHit = new VXDTFHit(hitGlobal, passNumber, 0, 0, iPart, Const::PXD, aSectorName, aVxdID, 0.0); // no timeInfo for PXDHits
-//        VXDTFHit* pTFHit = new VXDTFHit(hitGlobal, passNumber, 0, 0, numClusters, Const::PXD, aSectorName, aVxdID, 0.0); // no timeInfo for PXDHits
 
       currentPass->hitVector.push_back(pTFHit);
       secMapIter->second->addHit(pTFHit);
@@ -1237,7 +1234,7 @@ void VXDTFModule::event()
 
       float timeStampU = uClusterPtr->getClsTime();
       float timeStampV = vClusterPtr->getClsTime();
-//      cerr << " clusterIndexU, clusterIndexV, numOfPxdClusters, nClusterInfos: " <<  clusterIndexU<<", "<<clusterIndexV<<", "<<numOfPxdClusters<<", "<<clustersOfEvent.size() << " - infoClusterU/infoClusterV store indices " << clustersOfEvent[numOfPxdClusters +clusterIndexU].getIndex() <<", "<< clustersOfEvent[numOfPxdClusters+clusterIndexV].getIndex() << endl;
+
       B2DEBUG(100, " svdClusterCombi has clusterIndexU/clusterIndexV: " << clusterIndexU << "/" << clusterIndexV << " with collected charge u/v: " << uClusterPtr->getCharge() << "/" << vClusterPtr->getCharge() << " and their infoClasses are at u/v: " << clusterIndexU + numOfPxdClusters << "/" << clusterIndexV + numOfPxdClusters << " with collected charge u/v: " << aSvdClusterArray[ clustersOfEvent[numOfPxdClusters + clusterIndexU].getIndex() ]->getCharge() << "/" << aSvdClusterArray[ clustersOfEvent[numOfPxdClusters + clusterIndexV].getIndex() ]->getCharge())
 
       aVxdID = uClusterPtr->getSensorID();
@@ -1307,14 +1304,9 @@ void VXDTFModule::event()
           m_TESTERbadSensors.push_back(aSectorName);
           continue;
         }
-//         int numClusters = clustersOfEvent.size();
-//         ClusterInfo aClusterU(clusterIndexU);
-//         ClusterInfo aClusterV(clusterIndexV);
-//         clustersOfEvent.push_back(aClusterU);
-//         clustersOfEvent.push_back(aClusterV);
 
         B2DEBUG(50, "A SVDCluster is found again within secID " << aSectorName << " using sectorSetup " << currentPass->sectorSetup);
-//         VXDTFHit* pTFHit = new VXDTFHit(hitGlobal, passNumber, numClusters, numClusters+1, 0, Const::SVD, aSectorName, aVxdID,  0.5 * (timeStampU + timeStampV));
+
         VXDTFHit* pTFHit = new VXDTFHit(hitGlobal, passNumber, clusterIndexU + numOfPxdClusters, clusterIndexV + numOfPxdClusters, 0, Const::SVD, aSectorName, aVxdID,  0.5 * (timeStampU + timeStampV));
 
         currentPass->hitVector.push_back(pTFHit);
@@ -1345,12 +1337,6 @@ void VXDTFModule::event()
     thisInfoPackage.numSVDHits += numPassHits;
     B2DEBUG(50, "Pass " << passNumber << ": sectorSequence has got " << currentPass->sectorSequence.size() << " entries before applying unique & sort");
 
-//    currentPass->sectorSequence.sort(compareSecSequence);
-//    typedef pair<string,MapOfSectors::iterator> aPair;
-//    B2WARNING("looping through activated sectors, before sorting: ")
-//    BOOST_FOREACH(aPair thisPair, currentPass->sectorSequence) {
-//      B2WARNING("sectorName: " << thisPair.first)
-//    }
     currentPass->sectorSequence.sort(compareSecSequence);
     currentPass->sectorSequence.unique();
     currentPass->sectorSequence.reverse();
@@ -1688,8 +1674,6 @@ void VXDTFModule::event()
   BOOST_FOREACH(VXDTFTrackCandidate * currentTC, m_tcVector) {
     if (currentTC->getCondition() == false) { continue; }
 
-
-
     vector<int> pxdHits = currentTC->getPXDHitIndices();
     stringstream printIndices, infoIndices;
     infoIndices << "PXD: ";
@@ -1710,10 +1694,8 @@ void VXDTFModule::event()
     B2DEBUG(10, "before startint generateGFTrackCand: generated GFTC with following hits: " << printIndices.str());
     B2DEBUG(10, "before startint generateGFTrackCand: generated GFTC with following intermediate clusters: " << infoIndices.str());
 
-
     tempIndices = currentTC->getSVDHitIndices();
     totalIndices.insert(totalIndices.end(), tempIndices.begin(), tempIndices.end());
-
 
     GFTrackCand gfTC = generateGFTrackCand(currentTC, clustersOfEvent);                          /// generateGFTrackCand
 
@@ -1761,7 +1743,7 @@ void VXDTFModule::event()
   m_TESTERtimeConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
   thisInfoPackage.sectionConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
   thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-//  B2WARNING("event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count());
+  B2DEBUG(1, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count());
   m_TESTERlogEvents.push_back(thisInfoPackage);
 }
 
@@ -1793,7 +1775,6 @@ void VXDTFModule::endRun()
   string infoStuff;
   BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
     infoStuff + ", secUConfig: ";
-    // std::string str = boost::lexical_cast<std::string>(dbl)
     BOOST_FOREACH(double limit, currentPass->secConfigU) { infoStuff + boost::lexical_cast<string>(limit) + " "; }
     infoStuff + ", secVConfig: ";
     BOOST_FOREACH(double limit, currentPass->secConfigV) { infoStuff + boost::lexical_cast<string>(limit) + " "; }
@@ -1821,7 +1802,6 @@ void VXDTFModule::endRun()
     }
   }
   B2INFO(printOccupancy);
-//  string printTime;
 
   stringstream printTime;
   printTime << "hitSorting took " << (m_TESTERtimeConsumption.hitSorting.count() * 0.001) << " microseconds\n";
@@ -1952,16 +1932,13 @@ int VXDTFModule::calcQQQscore(std::vector<std::pair<std::string, double> > quant
       currentQuantile = quantiles[i].second;
       if (i >= int(quantiles.size())) { B2ERROR("VXDTFModule-CalcQQQScore: wrong index count!")}
     } while (currentValue > currentQuantile);
-//      std::cout << " score " << currentValue << " liegt zwischen " << quantiles[i-1].second << " und " << quantiles[i].second << std::endl;
-//      double marker = double(i);
-    // < double(numOfQuantiles-1)/2.0 {
+
     int center = (numOfQuantiles + 1) / 2;
     if (i < center) {
       score = i;
     } else if (i > center) {
       score = center - (i - (center - 1));
     } else { score = center; }
-//      std::cout << " score ist: " << score << " und i ist: " << i << std::endl;
   }
   return score;
 }
@@ -2132,7 +2109,6 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
       currentHits = tcVector[i]->getHits();
       for (int j = 0; j < int(currentHits.size()); ++j) { allHits.push_back(currentHits[j]); }
     }
-//    if (m_eventCounter > 215 ) { B2WARNING("NN event "<<m_eventCounter<<": "<<i<< " -  new value: "<<xMatrix(0,i)<<", condition: "<<condi) }
   }
   if (survivorCtr == 0) {
     m_TESTERbadHopfieldCtr++;
@@ -2185,7 +2161,6 @@ pair<string, VXDTFModule::MapOfSectors::iterator> VXDTFModule::searchSector4Hit(
 
           if (secMapIter == m_sectorMap.end()) {
             aSectorName = (boost::format("-%1%1_%2%_%3%") % aLayerID % aVxdID.getLadderNumber() % aVxdID.getSensorNumber()).str();
-            /*aSectorName = "";*/ // if there is still no sector found, then the hit doesn't lie in defined area.
           }
         }
       }
@@ -2212,11 +2187,10 @@ bool VXDTFModule::compareSecSequence(pair<string, MapOfSectors::iterator>& lhs, 
 /// searches for segments in given pass and returns number of discarded segments
 int VXDTFModule::segFinder(CurrentPassData* currentPass)
 {
-  string /*currentLayerID, friendLayerID, currentScope, ownSecName, friendSecName,*/ currentFriendID, oldFriendID;
+  string currentFriendID, oldFriendID;
   TVector3 currentCoords, friendCoords, currentVector, tempVector;
   bool accepted = false; // recycled return value of the filters
-  int simpleSegmentQI; // better than segmentApproved, but still digital (only min and max cutoff values), but could be weighed by order of relevance
-//   int scoreQQQ;  //best would be quasi analogue quality indicator QAQI
+  int simpleSegmentQI; // considers only min and max cutoff values, but could be weighed by order of relevance
   int discardedSegmentsCounter = 0;
   OperationSequenceOfActivatedSectors::const_iterator secSequenceIter;
   MapOfSectors::iterator mainSecIter;
@@ -2224,7 +2198,6 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
   for (secSequenceIter = currentPass->sectorSequence.begin(); secSequenceIter != currentPass->sectorSequence.end(); ++secSequenceIter) {
     B2DEBUG(1000, "SectorSequence is called " << secSequenceIter->first);
     mainSecIter = secSequenceIter->second;
-//     currentLayerID = mainSecIter->second->getSecID()[0];
     B2DEBUG(1000, " checking " << mainSecIter->second->getSecID())
     vector<string> hisFriends = mainSecIter->second->getFriends(); // loading friends of sector
     int nFriends = hisFriends.size();
@@ -2259,14 +2232,11 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
       B2DEBUG(50, "Sector " << mainSecIter->first << " has got " << numOfFriendHits << " hits lying among his friends! ");
       for (int friendHit = 0; friendHit < numOfFriendHits; ++friendHit) {
         simpleSegmentQI = 0;
-//         scoreQQQ = 0;
 
         currentFriendID = allFriendHits[friendHit]->getSectorName();
         if (currentFriendID != oldFriendID) {
           currentFriendSecIter = currentPass->sectorMap.find(currentFriendID);
-//           friendLayerID = currentFriendID[0];
         }
-        //         currentScope = str(format("L%1%L%2%") % friendLayerID % currentLayerID);
 
         friendCoords = allFriendHits[friendHit]->getHitCoordinates();
         m_twoHitFilterBox.resetValues(currentCoords, friendCoords, mainSecIter->second, currentFriendID);
@@ -2766,9 +2736,9 @@ int VXDTFModule::cellularAutomaton(CurrentPassData* currentPass)
 
     if (caRound > 30) { /// WARNING: hardcoded value
       B2ERROR("event " << m_eventCounter << ": VXDTF-CA: more than 30 ca rounds! " << activeCells << " living cells remaining");
-      string currentSectors, space = " "; // stringstream currentSectors;
+      string currentSectors, space = " ";
       BOOST_FOREACH(SectorNameAndPointerPair & key, currentPass->sectorSequence) {
-        currentSectors += key.first; // currentSectors + key.first
+        currentSectors += key.first;
         currentSectors += space;
       }
       B2ERROR("event " << m_eventCounter << ": VXDTF-CA: activated sectors: " << currentSectors)
@@ -2779,7 +2749,6 @@ int VXDTFModule::cellularAutomaton(CurrentPassData* currentPass)
   }
 
   //segmentOutPut:
-  //  int segState;
   countedSegments = 0;
   BOOST_FOREACH(VXDSegmentCell * currentSeg, currentPass->activeCellList) {
     B2DEBUG(150, "Post CA - Current state of cell: " << currentSeg->getState());
@@ -3017,71 +2986,6 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<C
 
 
 
-// double VXDTFModule::circleFit(vector<VXDTFHit*> hits, double& chi2)
-// {
-//   TVector3 hitPos;
-//   double meanX = 0, meanY = 0, meanX2 = 0, meanY2 = 0, meanR2 = 0, meanR4 = 0, meanXR2 = 0, meanYR2 = 0, meanXY = 0; //mean values
-//   double numHits = hits.size();
-//   double r2 = 0, x = 0, y = 0, x2 = 0, y2 = 0, divisor = 1. / numHits; // coords and divisor which is the same for all of them
-//   double covXX = 0, covXY = 0, covYY = 0, covXR2 = 0, covYR2 = 0, covR2R2 = 0; // covariances
-//   double q1 = 0, q2 = 0; // helping variables, to make the code more readable
-//   // looping over all hits and do the division afterwards
-//   BOOST_FOREACH(VXDTFHit * hit, hits) {
-//     hitPos = hit->getHitCoordinates();
-//     x = hitPos.X();
-//     y = hitPos.Y();
-//     x2 = x * x;
-//     y2 = y * y;
-//     r2 = x2 + y2;
-//     meanX += x;
-//     meanY += y;
-//     meanXY += x * y;
-//     meanX2 += x2;
-//     meanY2 += y2;
-//     meanXR2 += x * r2;
-//     meanYR2 += y * r2;
-//     meanR2 += r2;
-//     meanR4 += r2 * r2;
-//   }
-//   meanX *= divisor;
-//   meanY *= divisor;
-//   meanXY *= divisor;
-//   meanY2 *= divisor;
-//   meanX2 *= divisor;
-//   meanXR2 *= divisor;
-//   meanYR2 *= divisor;
-//   meanR2 *= divisor;
-//   meanR4 *= divisor;
-//
-//   covXX = meanX2 - meanX * meanX;
-//   covXY = meanXY - meanX * meanY;
-//   covYY = meanY2 - meanY * meanY;
-//   covXR2 = meanXR2 - meanX * meanR2;
-//   covYR2 = meanYR2 - meanY * meanR2;
-//   covR2R2 = meanR4 - meanR2 * meanR2;
-//
-//   q1 = covR2R2 * covXY - covXR2 * covYR2;
-//   q2 = covR2R2 * (covXX - covYY) - covXR2 * covXR2 + covYR2 * covYR2;
-//   double phi = 0.5 * atan(2. * q1 / q2); // physical meaning: direction of flight at point of closest approach to origin (not relevant here, since we need the direction of flight at a completely different location)
-//   B2DEBUG(50, " calculated direction of propagation at point of closest approach to origin (phi): " << phi)
-//   double sinPhi = sin(phi);
-//   double cosPhi = cos(phi);
-//   double kappa = (sinPhi * covXR2 - cosPhi * covYR2) / covR2R2;
-//   double delta = -kappa * meanR2 + sinPhi * meanX - cosPhi * meanY;
-//   double rootTerm = sqrt(1. - 4.*delta * kappa);
-//   double rho = 2.*kappa / (rootTerm); // rho = 1/curvature in X-Y-plane = radius of fitting circle, used for pT-calculation
-//   if (chi2 > 0) {
-//     double dist = 2.*delta / (1 + rootTerm);
-//     chi2 = numHits * (1 + rho * dist) * (1 + rho * dist) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2);
-//   } else {
-//    if (m_PARAMqiSmear == true) {
-//
-//         chi2 = m_littleHelperBox. smearPositiveGauss(0.);
-//       }
-//  }
-//   return rho;
-// }
-
 
 
 void VXDTFModule::calcInitialValues4TCs(TCsOfEvent& tcVector) /// TODO: use vxdCaTracking-classes to reduce code errors
@@ -3165,7 +3069,7 @@ void VXDTFModule::calcInitialValues4TCs(TCsOfEvent& tcVector) /// TODO: use vxdC
 //     radiusInCm = circleFit(currentHits,chi2);
 
     pT = 0.45 * radiusInCm * 0.01; // pT[GeV/c] = 0.3*B[T]*r[m] = 0.45*r[cm]/100 = 0.45*r*0.01 length of pT
-//     B2INFO("event: "<<m_eventCounter<<": calculated pT: " << pT);
+    B2DEBUG(150, "event: " << m_eventCounter << ": calculated pT: " << pT);
     pZ = pT / tan(theta);
     preFactor = pT / radiusInCm;
     pTVector = preFactor * radialVector.Orthogonal() ;
@@ -3214,7 +3118,6 @@ void VXDTFModule::calcQIbyLength(TCsOfEvent& tcVector, PassSetupVector& passSetu
   BOOST_FOREACH(VXDTFTrackCandidate * currentTC, tcVector) {
     if (currentTC->getCondition() == false) { continue; }
     rngValue = gRandom->Gaus(m_PARAMsmearMean, m_PARAMsmearSigma);
-//     setupWeigh = passSetups[currentTC->getPassIndex()]->setupWeigh;
     int currentPassIndex = currentTC->getPassIndex();
     B2DEBUG(100, " passIndex of currentTC: " << currentTC->getPassIndex())
     if (currentPassIndex < 0 or currentPassIndex > m_numOfSectorSetups - 1) { currentPassIndex = 0; }
@@ -3243,7 +3146,6 @@ void VXDTFModule::calcQIbyLength(TCsOfEvent& tcVector, PassSetupVector& passSetu
 
 
 
-// void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& pxdClusters, StoreArray<SVDCluster>& svdClusters, vector<ClusterInfo>& clusters) //old version, keeping as backup (13-03-29)
 void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& pxdClusters, vector<ClusterInfo>& clusters)
 {
   /// produce GFTrackCands for each currently living TC and calculate real kalman-QI's
@@ -3253,18 +3155,14 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
   BOOST_FOREACH(VXDTFTrackCandidate * currentTC, tcVector) {
     if (currentTC->getCondition() == false) { continue; }
 
-//    B2DEBUG(50, "VXDTFModule::calcQIbyKalman, printing GFTrackCand, RKTrackRep, GFTrack")
-
     TVector3 momErrors(0.01, 0.01, 0.04); // rather generic values for a rough start
 
     TVector3 posErrors(1, 1, 1);
 
     RKTrackRep* trackRep = new RKTrackRep(currentTC->getInitialCoordinates(), currentTC->getInitialMomentum(), posErrors, momErrors, currentTC->getPDGCode());
-//     trackRep->setPropDir(-1); // 1 = start moving outwards (seed has to be innermost hit), -1 start moving inwards (seed has to be outermost hit)
 
-//    trackRep->Print();
     GFTrack track(trackRep);
-//    track.Print();
+
     track.setSmoothing(false);
 
     BOOST_FOREACH(VXDTFHit * tfHit, currentTC->getHits()) {
@@ -3356,7 +3254,6 @@ void VXDTFModule::calcQIbyCircleFit(TCsOfEvent& tcVector)
         currentTC->setTrackQuality(m_littleHelperBox.smearNormalizedGauss(0.));
       } else {
         currentTC->setTrackQuality(0);
-//        currentTC->setFitSucceeded(false);
       }
       continue;
     }
@@ -3417,8 +3314,6 @@ GFTrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentTC, vec
   covSeed(0, 0) = 0.1 * 0.1; covSeed(1, 1) = 0.1 * 0.1; covSeed(2, 2) = 0.2 * 0.2;
   covSeed(3, 3) = 0.1 * 0.1; covSeed(4, 4) = 0.1 * 0.1; covSeed(5, 5) = 0.2 * 0.2;
   B2DEBUG(10, "generating GFTrackCandidate: posIn.Mag(): " << posIn.Mag() << ", momIn.Mag(): " << momIn.Mag() << ", pdgCode: " << pdgCode);
-
-//  newGFTrackCand.setComplTrackSeed(posIn, momIn, pdgCode, TVector3(0.1, 0.1, 0.1), TVector3(0.1, 0.1, 0.2)); /// old method
 
   newGFTrackCand.set6DSeedAndPdgCode(stateSeed, pdgCode, covSeed);
 
@@ -3539,8 +3434,6 @@ string VXDTFModule::EventInfoPackage::Print()
   output << ", cleanOverlap: " << sectionConsumption.cleanOverlap.count();
   output << ", nn: " << sectionConsumption.neuronalStuff.count();
   output << ", other: " << sectionConsumption.intermediateStuff.count() << endl;
-
-//  output.precision(6);
 
   output << " results: " << endl;
   output << "nPXDCluster: " << numPXDCluster << ", nSVDCluster: " << numSVDCluster << ", nSVDHits(x-Passes): " << numSVDHits << endl;

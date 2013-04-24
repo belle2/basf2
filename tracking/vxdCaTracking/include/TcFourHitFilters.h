@@ -26,7 +26,7 @@ namespace Belle2 {
   /** bundles filter methods using 4 hits (using FourHitFilters-class). and compares with entries of sector min and max */
   class TcFourHitFilters : public FourHitFilters {
   public:
-    typedef std::pair <int, int> SuccessAndFailCounter; // first entry is for number of times when filter approved valuse, second one is for number of times when filter neglected values
+    typedef std::pair <int, int> SuccessAndFailCounter; /**<  first entry is for number of times when filter approved valuse, second one is for number of times when filter neglected values */
 
     /** Empty constructor. For initialisation only, an object generated this way is useless unless resetValues is called at least once */
     TcFourHitFilters():
@@ -74,8 +74,8 @@ namespace Belle2 {
 
   protected:
 
-    VXDSector* m_thisSector; /** contains cutoffs for all filters available in this sector, together with the friendID the return values are unique */
-    std::string m_friendID; /** is a key used for determine the currently needed filterSet */
+    VXDSector* m_thisSector; /**< contains cutoffs for all filters available in this sector, together with the friendID the return values are unique */
+    std::string m_friendID; /**< is a key used for determine the currently needed filterSet */
     SuccessAndFailCounter m_deltaPtCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltapT */
     SuccessAndFailCounter m_deltaDistCircleCenterCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltaDistCircleCenter */
   }; //end class TcFourHitFilters

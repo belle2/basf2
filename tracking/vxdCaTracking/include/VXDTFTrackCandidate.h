@@ -64,7 +64,7 @@ namespace Belle2 {
     int getPDGCode() const { return m_pdgCode; } /**< returns estimated PDGCode (its always a pion, but charge changes depending of the sign of the curvature of the track) needed for export as GFTrackCandid */
     int getPassIndex() { return m_passIndex; } /**< TCs are passDependent and are merged at the end of the TF-process to be filtered there */
     bool getFitSucceeded() { return m_fitSucceeded; } /**< returns true if kalman fit was possible and returned a result itself */
-    int size() { return m_attachedHits.size(); }
+    int size() { return m_attachedHits.size(); } /**< returns number of attached hits */
 
     /** setter **/
     void addSVDClusterIndex(int anIndex); /**< add index number of SVDCluster attached to current TC */

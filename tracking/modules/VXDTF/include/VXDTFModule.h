@@ -87,20 +87,20 @@ namespace Belle2 {
 //    typedef std::map<std::string, VXDSector*> MapOfSectors;
 //    typedef std::map<std::string, Cutoff*> CutoffMap;
 //     typedef std::map<std::string, CutoffMap*> MapOfCutoffTypes;
-    typedef boost::unordered_map<std::string, VXDSector*> MapOfSectors;
-    typedef std::pair<std::string, VXDSector* > secMapEntry;
-    typedef boost::unordered_map<std::string, Cutoff*> CutoffMap;
-    typedef boost::unordered_map<std::string, CutoffMap*> MapOfCutoffTypes;
-    typedef std::vector<VXDTFHit*> HitsOfEvent;
+    typedef boost::unordered_map<std::string, VXDSector*> MapOfSectors; /**< stores whole sectorMap used for storing cutoffs */
+    typedef std::pair<std::string, VXDSector* > secMapEntry; /**< represents an entry of the MapOfSectors */
+    typedef boost::unordered_map<std::string, Cutoff*> CutoffMap; /**< Is a map storing cutoffs  */
+    typedef boost::unordered_map<std::string, CutoffMap*> MapOfCutoffTypes; /**< represents an entry of the CutoffMap */
+    typedef std::vector<VXDTFHit*> HitsOfEvent; /**< contains all hits of event */
     typedef std::list<VXDSegmentCell*> ActiveSegmentsOfEvent; /**< is list since random deleting processes are needed */
     typedef std::vector<VXDSegmentCell*> TotalSegmentsOfEvent; /**< is vector since no entries are deleted and random access is needed  */
     typedef std::pair<std::string, MapOfSectors::iterator> SectorNameAndPointerPair; /**< why string? we are storing the name of the sector to be able to sort them! */
     typedef std::list<SectorNameAndPointerPair> OperationSequenceOfActivatedSectors; /**< contains all active sectors, can be sorted by name (first entry) */
-    typedef std::vector<VXDTFTrackCandidate*> TCsOfEvent;
-    typedef std::vector<CurrentPassData*> PassSetupVector;
+    typedef std::vector<VXDTFTrackCandidate*> TCsOfEvent; /**< contains all track candidates of event */
+    typedef std::vector<CurrentPassData*> PassSetupVector; /**< contains all passes used for track reconstruction */
     typedef std::pair<bool, double> Filter; /**< defines whether current filter is allowed (.first) and whether the cutoffvalues shall be tuned (.second).  */
-    typedef boost::chrono::high_resolution_clock boostClock; // high_resolution_clock, process_cpu_clock
-    typedef boost::chrono::microseconds boostNsec; // microseconds, milliseconds
+    typedef boost::chrono::high_resolution_clock boostClock; /**< used for measuring time comsumption */ // high_resolution_clock, process_cpu_clock
+    typedef boost::chrono::microseconds boostNsec; /**< defines time resolution (currently mictroseconds) */ // microseconds, milliseconds
 //    typedef boost::chrono::duration_cast durationCast;
 //    typedef std::chrono::high_resolution_clock boostClock;
 //    typedef std::chrono::nanoseconds boostNsec;

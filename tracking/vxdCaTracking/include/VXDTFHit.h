@@ -89,7 +89,7 @@ namespace Belle2 {
     int m_detectorType; /**< knows wheter hit is in PXD or SVD PXD = 0, SVD = 1, IP = -1 */
 
     std::string m_papaSector; /**< name of sector containing hit */ // convert to int? is that faster? (needed very often)
-    VxdID m_VxdID; /** VxdID of sensor containing hit */
+    VxdID m_VxdID; /**< VxdID of sensor containing hit */
     float m_timeStamp; /**< only filled when available (SVD), else 0  */
 
     std::vector<int> m_attachedInnerCells; /**< contains links to segments/cells using this hit as outer end  */

@@ -55,7 +55,7 @@ namespace Belle2 {
 
     std::vector<TVector3> m_hits; /**< stores hits using TVector3 format in a vector */
     int m_numHits; /**< stores number of hits for some speed optimizations */
-    ThreeHitFilters m_3hitFilterBox;
+    ThreeHitFilters m_3hitFilterBox; /**< instance of ThreeHitFilters-class used for some internal calculations */
 
   }; //end class TrackletFilters
 } //end namespace Belle2

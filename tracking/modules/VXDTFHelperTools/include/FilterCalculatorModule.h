@@ -43,6 +43,7 @@ namespace Belle2 {
   /** internal datastore for Hits */
   class VXDHit {
   public:
+    /** Constructor of class VXDHit*/
     VXDHit(short int hitType, std::string fullSecID, int aUniID, TVector3 hit, TVector3 mom, int pdg):
       m_type(hitType),
       m_secID(fullSecID),
@@ -51,8 +52,12 @@ namespace Belle2 {
       m_pxdHit(NULL),
       m_svdHit(NULL),
       m_pdg(pdg) { checkDirectionOfFlight(hit, mom); }
+
+    /** Operator '<' overloaded using hit-time-information for comparison */
     bool operator<(const VXDHit& b) const { return this->getTimeStamp() < b.getTimeStamp(); }
+    /** Operator '==' overloaded using hit-time-information for comparison */
     bool operator==(const VXDHit& b) const { return this->getTimeStamp() == b.getTimeStamp(); }
+    /** Operator '>' overloaded using hit-time-information for comparison */
     bool operator>(const VXDHit& b) const { return this->getTimeStamp() > b.getTimeStamp(); }
 
     /** returns type of VXDHit */
@@ -131,13 +136,15 @@ namespace Belle2 {
   /** internal datastore for tracks */
   class VXDTrack {
   public:
-    typedef std::map<std::string, Sector> MapOfSectors;
+    typedef std::map<std::string, Sector> MapOfSectors; /**< stores whole sectorMap used for storing cutoffs */
 
+    /** Constructor of class VXDTrack, when having only the particleNumber*/
     VXDTrack(int particleNumber):
       m_index(particleNumber),
       m_pT(0.),
       m_secMap(NULL) {}
 
+    /** Constructor of class VXDTrack*/
     VXDTrack(int particleNumber, double pT, MapOfSectors* secMapPtr):
       m_index(particleNumber),
       m_pT(pT),
@@ -167,19 +174,21 @@ namespace Belle2 {
     /** get Pt of track */
     double getPt() { return m_pT; }
 
+    /** get pointer to sectorMap relevant for track */
     MapOfSectors* getSecMap() { return m_secMap; }
 
   protected:
     std::list<VXDHit> m_hitList; /**< contains hits attached to track */
     int m_index; /**< stores index number of track */
     double m_pT; /**< stores transverse momentum value for track classification */
-    MapOfSectors* m_secMap;
+    MapOfSectors* m_secMap; /**< pointer to sectorMap relevant for track */
   };
 
 
   /** internal datastore for hitinformation */
   class HitFilter {
   public:
+    /** Constructor of class HitFilter*/
     HitFilter(std::string myName):
       m_filterName(myName) {}
 
@@ -191,6 +200,8 @@ namespace Belle2 {
 
     /** returns list of values */
     std::list<double> getValues() { return m_valuePack; }
+
+    /** writes values in File */
     void exportValues(std::string aFileName) {
       m_fileName = aFileName;
       m_valuePack.sort();
@@ -215,6 +226,7 @@ namespace Belle2 {
   /** info about compatible sectors to main sector */
   class FMSectorFriends {
   public:
+    /** Constructor of class FMSectorFriends*/
     FMSectorFriends(std::string myName):
       m_friendName(myName) {}
 
@@ -295,12 +307,12 @@ namespace Belle2 {
     std::pair<float, float> getEdgeUV() { return m_edgeUV; }
 
   protected:
+    int m_usageCounter; /**< counts number of times current sector is used */
     std::string m_secName; /**< name of sector  */
     std::pair<float, float> m_edgeO; /**< local coordinates of edge defined as origin within this module */
     std::pair<float, float> m_edgeU; /**< local coordinates of edge lying in U-direction compared to edgeO */
     std::pair<float, float> m_edgeV; /**< local coordinates of edge lying in V-direction compared to edgeO */
     std::pair<float, float> m_edgeUV; /**< local coordinates of diagonally lied edge compared to edgeO */
-    int m_usageCounter; /**< counts number of times current sector is used */
     std::map<std::string, FMSectorFriends> m_friendMap; /**< map of friends attached to thisSector */
   };
 
@@ -310,8 +322,8 @@ namespace Belle2 {
 
 
   public:
-    typedef std::map<std::string, Sector> MapOfSectors;
-    typedef std::pair<std::string, Sector> SecMapEntry;
+    typedef std::map<std::string, Sector> MapOfSectors;  /**< stores whole sectorMap used for storing cutoffs */
+    typedef std::pair<std::string, Sector> SecMapEntry; /**< represents an entry of the MapOfSectors */
 
     FilterCalculatorModule();
 

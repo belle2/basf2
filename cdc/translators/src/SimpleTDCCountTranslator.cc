@@ -44,10 +44,16 @@ float SimpleTDCCountTranslator::getDriftLength(unsigned short tdcCount,
   return (driftTime * 4e-3);
 }
 
+/** this function returns the variance that is used as the CDC measurment resolution in track fitting
+if the default resolution of the CDC Digitizer is changed this value has to be changed, too!
+this variance is calculated by sigam_cdcHit^2 + sigma_translationError^2
+sigma_translationError is an additional (non-gaussian) smearing is introduced due to driftlength to TDC conversio  and
+can be (partially) corrected by adding sigma_translationError^2 = (40/sqrt(12) µm)^2 to sigam_cdcHit^2
+see Ozaki's mail: [belle2_tracking:0515] */
 float SimpleTDCCountTranslator::getDriftLengthResolution(float,
                                                          const WireID& ,
                                                          bool,
                                                          float, float)
 {
-  return 0.000169; // 130um **2 in cm**2
+  return 0.000169 + 1.3333333E-6; // (130 µm)^2 in cm^2 + (40/sqrt(12) µm)^2 also in cm
 }

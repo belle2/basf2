@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <testbeam/vxd/geometry/GeoTBCreator.h>
+#include <testbeam/vxd/geometry/GeoVXDTBCreator.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
@@ -64,7 +64,7 @@ namespace Belle2 {
 //TODO: no namespace decided yet
 
   /** Register the creator */
-  geometry::CreatorFactory<GeoTBCreator> GeoTBFactory("TBCreator");
+  geometry::CreatorFactory<GeoTBCreator> GeoTBFactory("VXDTBCreator");
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -76,22 +76,22 @@ namespace Belle2 {
 
   GeoTBCreator::~GeoTBCreator()
   {
-    /*
-         //Delete all sensitive detectors
-         BOOST_FOREACH(PXD::SensitiveDetector * sensitive, m_sensitivePXD) {
-           delete sensitive;
-         }
-         m_sensitivePXD.clear();
 
-         BOOST_FOREACH(SVD::SensitiveDetector * sensitive, m_sensitiveSVD) {
-           delete sensitive;
-         }
-         m_sensitiveSVD.clear();
+    //Delete all sensitive detectors
+    BOOST_FOREACH(PXD::SensitiveDetector * sensitive, m_sensitivePXD) {
+      delete sensitive;
+    }
+    m_sensitivePXD.clear();
 
-         BOOST_FOREACH(TB::SensitiveDetector * sensitive, m_sensitiveTB) {
-           delete sensitive;
-         }
-         m_sensitiveTB.clear();*/
+    BOOST_FOREACH(SVD::SensitiveDetector * sensitive, m_sensitiveSVD) {
+      delete sensitive;
+    }
+    m_sensitiveSVD.clear();
+
+    BOOST_FOREACH(TB::SensitiveDetector * sensitive, m_sensitiveTB) {
+      delete sensitive;
+    }
+    m_sensitiveTB.clear();
   }
 
   G4LogicalVolume* GeoTBCreator::getLogicalVolume(const GearDir& content)
@@ -171,8 +171,8 @@ namespace Belle2 {
 
   void GeoTBCreator::setVolumeActive(const GearDir& content, G4LogicalVolume* volume, const GearDir& parentContent)
   {
-    cout << "Active";
-    // get size of the volume from parent node GearDir (these are hals-sizes - multiply by 2)
+    B2INFO("GeoVXDTBCreator: Setting active volume...")
+    // get size of the volume from parent node GearDir (these are half-sizes - multiply by 2)
     double aWidth = 2.0 * parentContent.getLength("HalfX") ;// Unit::mm/10.0;
     double aLength = 2.0 * parentContent.getLength("HalfY") ;// Unit::mm/10.0;
     double aHeight = 2.0 * parentContent.getLength("HalfZ") ;// Unit::mm/10.0;
@@ -206,7 +206,7 @@ namespace Belle2 {
 
       PXD::SensorInfo* newInfo = new PXD::SensorInfo(sensorInfo);
       PXD::SensitiveDetector* sensitive = new PXD::SensitiveDetector(newInfo, m_seeNeutrons, m_onlyPrimaryTrueHits, m_sensitiveThreshold);
-      //m_sensitivePXD.push_back(sensitive);
+      m_sensitivePXD.push_back(sensitive);
 
       volume->SetSensitiveDetector(sensitive);
     }
@@ -226,7 +226,7 @@ namespace Belle2 {
 
       SVD::SensorInfo* newInfo = new SVD::SensorInfo(sensorInfo);
       VXD::SensitiveDetector<SVDSimHit, SVDTrueHit>* sensitive = new VXD::SensitiveDetector<SVDSimHit, SVDTrueHit>(newInfo, m_seeNeutrons, m_onlyPrimaryTrueHits, m_sensitiveThreshold);
-      //m_sensitiveSVD.push_back(sensitive);
+      m_sensitiveSVD.push_back(sensitive);
 
       volume->SetSensitiveDetector(sensitive);
     }
@@ -235,7 +235,7 @@ namespace Belle2 {
 
       TB::SensorInfo* newInfo = new TB::SensorInfo(sensorInfo);
       TB::SensitiveDetector* sensitive = new TB::SensitiveDetector(newInfo, m_seeNeutrons, m_onlyPrimaryTrueHits, m_sensitiveThreshold);
-      // m_sensitiveTB.push_back(sensitive);
+      m_sensitiveTB.push_back(sensitive);
 
       volume->SetSensitiveDetector(sensitive);
     }
@@ -276,8 +276,8 @@ namespace Belle2 {
       if (activePar != 0) {
         // if Active node is found, read its params and make it active
         setVolumeActive(activePar, g4vol, volume);
-        // only in case we create PXD/SVD type sensor, let the GeoCache to search it through
-        //if (activePar.getString("DetectorType") != "TEL") VXD::GeoCache::getInstance().findVolumes(g4PhysVol);
+        // only in case we create PXD/SVD/TEL type sensor, let the GeoCache to search it through
+        VXD::GeoCache::getInstance().findVolumes(g4PhysVol);
       }
       // check child Volume tags and read them recursively
       GearDir childVolumes(volume, "Volume");

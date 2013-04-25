@@ -28,7 +28,7 @@
 				<ZMin unit="mm">-800.0</ZMin>
 				<ZMax unit="mm">800.0</ZMax>
 				<ZOffset unit="cm">0.0</ZOffset>
-				<MapFilename>testbeam/PCMagFieldMap.dat.gz</MapFilename>
+				<MapFilename>testbeam/vxd/PCMagFieldMap.dat.gz</MapFilename>
 			</Component>
 		</Components>
 	</Content>

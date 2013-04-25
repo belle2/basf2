@@ -45,7 +45,9 @@ namespace Belle2 {
   class VXDHit : public VXDTrueHit {
 
   public:
-    VXDHit(): VXDTrueHit() {}
+    VXDHit(): VXDTrueHit(), m_fromPrimary(false), m_pdg(0), m_numPrimary(0),
+      m_numParticles(0), m_particleMomentum(0.0)
+    {}
 
     /** Constructor
      * @param sensorID SensorID of the Sensor
@@ -56,7 +58,9 @@ namespace Belle2 {
      */
     VXDHit(VxdID sensorID, float u, float v, float energyDep, float globalTime,
            const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
-      VXDTrueHit(sensorID, u, v, energyDep, globalTime, momentum, entryMomentum, exitMomentum)
+      VXDTrueHit(sensorID, u, v, energyDep, globalTime, momentum, entryMomentum, exitMomentum),
+      m_fromPrimary(false), m_pdg(0), m_numPrimary(0), m_numParticles(0),
+      m_particleMomentum(0.0)
     {}
     /** Constructor
      * @param sensorID SensorID of the Sensor
@@ -74,7 +78,9 @@ namespace Belle2 {
     VXDHit(
       VxdID sensorID, float u, float v, float entryU, float entryV, float exitU, float exitV, float energyDep, float globalTime,
       const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
-      VXDTrueHit(sensorID, u, v, entryU, entryV, exitU, exitV, energyDep, globalTime, momentum, entryMomentum, exitMomentum)
+      VXDTrueHit(sensorID, u, v, entryU, entryV, exitU, exitV, energyDep, globalTime, momentum, entryMomentum, exitMomentum),
+      m_fromPrimary(false), m_pdg(0), m_numPrimary(0), m_numParticles(0),
+      m_particleMomentum(0.0)
     {}
 
     /** Returns true from hits with relation to primary particle*/

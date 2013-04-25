@@ -20,7 +20,7 @@ input.param('inputFileName', 'TBSimulationOutput.root')
 
 # create geometry
 gearbox = register_module('Gearbox')
-gearbox.param('Filename', 'testbeam/VXD.xml')
+gearbox.param('Filename', 'testbeam/vxd/VXD.xml')
 
 geometry = register_module('Geometry')
 # Since Geometry is only required for track extrapolation in inner detectors,

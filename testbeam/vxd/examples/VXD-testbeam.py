@@ -33,7 +33,7 @@ particlegun.param('independentVertices', True)
 
 # Create Event information
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'EvtNumList': [10000], 'RunList': [1]})
+evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
 
 # Show progress of processing
 progress = register_module('Progress')
@@ -41,7 +41,7 @@ progress = register_module('Progress')
 # Load parameters from xml
 gearbox = register_module('Gearbox')
 # This file contains the VXD beam test geometry including the magnetic field
-gearbox.param('Filename', 'testbeam/VXD.xml')
+gearbox.param('Filename', 'testbeam/vxd/VXD.xml')
 
 # Create geometry
 geometry = register_module('Geometry')
@@ -55,7 +55,12 @@ simulation.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
                  '/vis/scene/add/axes 0 0 0 100 mm',
                  '/vis/scene/add/trajectories smooth',
                  '/vis/modeling/trajectories/create/drawByCharge'])
-
+# PXD/SVD digitizer
+PXDDigi = register_module('PXDDigitizer')
+SVDDigi = register_module('SVDDigitizer')
+# PXD/SVD clusterizer
+PXDClust = register_module('PXDClusterizer')
+SVDClust = register_module('SVDClusterizer')
 # Save output of simulation
 output = register_module('RootOutput')
 output.param('outputFileName', 'TBSimulationOutput.root')
@@ -81,6 +86,10 @@ main.add_module(geometry)
 main.add_module(particlegun)
 main.add_module(simulation)
 main.add_module(trueinfo)
+main.add_module(PXDDigi)
+main.add_module(SVDDigi)
+main.add_module(PXDClust)
+main.add_module(SVDClust)
 main.add_module(output)
 main.add_module(geosaver)
 

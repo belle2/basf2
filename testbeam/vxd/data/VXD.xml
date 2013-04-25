@@ -19,7 +19,7 @@
 	
 	<!-- Subdedectors -->
 	<DetectorComponent name="TB" xmlns:xi="http://www.w3.org/2001/XInclude">
-		<Creator library="testbeam">TBCreator</Creator>
+		<Creator library="testbeam">VXDTBCreator</Creator>
 		<Content>
 			<!-- If this is true, TrueHits will only be created for primary particles, Secondaries produced by Geant4 will not create TrueHits -->
 			<OnlyPrimaryTrueHits>false</OnlyPrimaryTrueHits>
@@ -63,11 +63,11 @@
 						<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='PXD_module']/*)" />
 						<Volume>
 							<Name>PXD_sensor_2</Name>
-							<AlignComponent>1.1.2</AlignComponent>
+							<AlignComponent>2.1.2</AlignComponent>
 							<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='PXD_sensor']/*)" />
 							
 							<Active>
-								<SensorID>2</SensorID><Ladder>1</Ladder><Layer>1</Layer>
+								<SensorID>2</SensorID><Ladder>1</Ladder><Layer>2</Layer>
 								<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='PXD_active']/*)" />			  
 							</Active>
 						</Volume>
@@ -79,11 +79,11 @@
 						<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='SVD_module']/*)" />
 						<Volume>
 							<Name>SVD_sensor_1</Name>
-							<AlignComponent>1.1.3</AlignComponent>
+							<AlignComponent>3.1.3</AlignComponent>
 							<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='SVD_sensor']/*)" />
 							
 							<Active>
-								<SensorID>3</SensorID><Ladder>1</Ladder><Layer>1</Layer>
+								<SensorID>3</SensorID><Ladder>1</Ladder><Layer>3</Layer>
 								<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='SVD_active']/*)" />			  
 							</Active>
 						</Volume>
@@ -95,11 +95,11 @@
 						<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='SVD_module']/*)" />
 						<Volume>
 							<Name>SVD_sensor_2</Name>
-							<AlignComponent>1.1.4</AlignComponent>
+							<AlignComponent>4.1.4</AlignComponent>
 							<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='SVD_sensor']/*)" />
 							
 							<Active>
-								<SensorID>4</SensorID><Ladder>1</Ladder><Layer>1</Layer>
+								<SensorID>4</SensorID><Ladder>1</Ladder><Layer>4</Layer>
 								<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='SVD_active']/*)" />			  
 							</Active>
 						</Volume>
@@ -111,11 +111,11 @@
 						<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='SVD_module']/*)" />
 						<Volume>
 							<Name>SVD_sensor_3</Name>
-							<AlignComponent>1.1.5</AlignComponent>
+							<AlignComponent>5.1.5</AlignComponent>
 							<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='SVD_sensor']/*)" />
 							
 							<Active>
-								<SensorID>5</SensorID><Ladder>1</Ladder><Layer>1</Layer>
+								<SensorID>5</SensorID><Ladder>1</Ladder><Layer>5</Layer>
 								<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='SVD_active']/*)" />			  
 							</Active>
 						</Volume>
@@ -127,11 +127,11 @@
 						<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='SVD_module']/*)" />
 						<Volume>
 							<Name>SVD_sensor_4</Name>
-							<AlignComponent>1.1.6</AlignComponent>
+							<AlignComponent>6.1.6</AlignComponent>
 							<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='SVD_sensor']/*)" />
 							
 							<Active>
-								<SensorID>6</SensorID><Ladder>1</Ladder><Layer>1</Layer>
+								<SensorID>6</SensorID><Ladder>1</Ladder><Layer>6</Layer>
 								<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='SVD_active']/*)" />			  
 							</Active>
 						</Volume>

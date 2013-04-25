@@ -41,7 +41,7 @@ progress = register_module('Progress')
 # Load parameters from xml
 gearbox = register_module('Gearbox')
 # This file contains the VXD beam test geometry including the magnetic field
-gearbox.param('Filename', 'testbeam/VXDBeamProfile.xml')
+gearbox.param('Filename', 'testbeam/vxd/VXDBeamProfile.xml')
 
 # Create geometry
 geometry = register_module('Geometry')

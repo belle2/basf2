@@ -12,6 +12,7 @@
 #define GEOTBCREATOR_H_
 
 #include <pxd/simulation/SensitiveDetector.h>
+#include <svd/simulation/SensitiveDetector.h>
 #include <testbeam/vxd/simulation/SensitiveDetector.h>
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
@@ -92,6 +93,8 @@ namespace Belle2 {
 
       /** List of all created PXD sensitive detector instances */
       std::vector<PXD::SensitiveDetector*> m_sensitivePXD;
+      /** List of all created SVD sensitive detector instances */
+      std::vector<SVD::SensitiveDetector*> m_sensitiveSVD;
       /** List of all created telescope sensitive detector instances */
       std::vector<TB::SensitiveDetector*> m_sensitiveTB;
 

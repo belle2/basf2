@@ -70,9 +70,13 @@ class PXDHitErrors(Module):
                 sensorID = truehit.getRawSensorID()
                 [layer, ladder, sensor] = self.decode(sensorID)
                 s_id = \
-                    '{sID} {layer} {ladder} {sensor} {iTH:4d} {iCL:4d} '\
-                    .format(sID=sensorID, layer=layer, ladder=ladder,
-                        sensor=sensor, iTH=truehit_index, iCL=cluster_index
+                    '{sID} {layer} {ladder} {sensor} {iTH:4d} {iCL:4d} '.format(
+                    sID=sensorID,
+                    layer=layer,
+                    ladder=ladder,
+                    sensor=sensor,
+                    iTH=truehit_index,
+                    iCL=cluster_index,
                     )
                 s += s_id
                 # TrueHit information
@@ -81,23 +85,18 @@ class PXDHitErrors(Module):
                 thetaV = math.atan2(truehit.getExitV() - truehit.getEntryV(),
                                     0.0075)
                 s_th = \
-                    '{uTH:10.5f} {vTH:10.5f} {eTH:10.7f} '.format(
-                        uTH=truehit.getU(), vTH=truehit.getV(),
-                        eTH=truehit.getEnergyDep()
-                    ) + \
-                    '{thetaU:6.3f} {thetaV:6.3f} '.format(thetaU=thetaU,
+                    '{uTH:10.5f} {vTH:10.5f} {eTH:10.7f} '.format(uTH=truehit.getU(),
+                        vTH=truehit.getV(), eTH=truehit.getEnergyDep()) \
+                    + '{thetaU:6.3f} {thetaV:6.3f} '.format(thetaU=thetaU,
                         thetaV=thetaV)
                 s += s_th
                 # Cluster information
                 s_cl = \
-                    '{uCL:10.5f} {vCL:10.5f} {eCL:10.1f} {eSeed:10.1f} '\
-                    .format(uCL=cluster.getU(), vCL=cluster.getV(),
-                        eCL=cluster.getCharge(), eSeed=cluster.getSeedCharge()
-                    ) + \
-                    '{size:5d} {sizeU:5d} {sizeV:5d} '.format(
-                        size=cluster.getSize(), sizeU=cluster.getUSize(),
-                        sizeV=cluster.getVSize()
-                    )
+                    '{uCL:10.5f} {vCL:10.5f} {eCL:10.1f} {eSeed:10.1f} '.format(uCL=cluster.getU(),
+                        vCL=cluster.getV(), eCL=cluster.getCharge(),
+                        eSeed=cluster.getSeedCharge()) \
+                    + '{size:5d} {sizeU:5d} {sizeV:5d} '.format(size=cluster.getSize(),
+                        sizeU=cluster.getUSize(), sizeV=cluster.getVSize())
                 s += s_cl
                 # We can add some digits, too.
                 digit_indices = relClustersToDigits.getToIndices(cluster_index)
@@ -106,11 +105,8 @@ class PXDHitErrors(Module):
                 for digit_index in digit_indices:
                     digit = digits[digit_index]
                     s_dig = \
-                        '{u:10.5f} {v:10.5f} {e:10.1f} '.format(
-                            u=digit.getUCellPosition(),
-                            v=digit.getVCellPosition(),
-                            e=digit.getCharge()
-                        )
+                        '{u:10.5f} {v:10.5f} {e:10.1f} '.format(u=digit.getUCellPosition(),
+                            v=digit.getVCellPosition(), e=digit.getCharge())
                     s += s_dig
 
                 s += '\n'

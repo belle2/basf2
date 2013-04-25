@@ -212,11 +212,11 @@ namespace Belle2 {
       //G4Tubs* solid_cdc = new G4Tubs("SolidCDC", motherInnerR*cm, motherOuterR*cm, motherLength*cm / 2.0, 0*deg, 360.*deg);
       //replace Tube with Polycone
 
-      double momZ[5];
-      double momRmin[5];
-      double momRmax[5];
+      double momZ[7];
+      double momRmin[7];
+      double momRmax[7];
 
-      for (int iBound = 0 ; iBound < 5 ; iBound++) {
+      for (int iBound = 0 ; iBound < 7 ; iBound++) {
         momZ[iBound] = cdcgp.momZ(iBound);
         momRmin[iBound] = cdcgp.momRmin(iBound);
         //momRmax[iBound] = motherOuterR / Unit::mm;
@@ -224,7 +224,7 @@ namespace Belle2 {
       }
 
       G4Polycone* solid_cdc =
-        new G4Polycone("SolidCDC", 0 * deg, 360.*deg, 5, momZ, momRmin, momRmax);
+        new G4Polycone("SolidCDC", 0 * deg, 360.*deg, 7, momZ, momRmin, momRmax);
 
       logical_cdc = new G4LogicalVolume(solid_cdc, medAir, "logicalCDC", 0, 0, 0);
       physical_cdc = new G4PVPlacement(0, G4ThreeVector(0., 0., globalOffsetZ * cm), logical_cdc, "physicalCDC", &topVolume, false, 0);

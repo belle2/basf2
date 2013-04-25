@@ -341,8 +341,8 @@ namespace Belle2 {
       double m_motherOuterR;  /*!< The outer radius of cdc mother volume. */
       double m_motherLength;  /*!< The length of cdc mother volume. */
 
-      double m_momZ[5];
-      double m_momRmin[5];
+      double m_momZ[7];
+      double m_momRmin[7];
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
     };

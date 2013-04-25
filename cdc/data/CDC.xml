@@ -22,18 +22,26 @@
 	<Rmin unit="mm">260.0</Rmin>
       </ZBound>
       <ZBound id="1">
-        <Z unit="mm">-956.402</Z>
+        <Z unit="mm">-800.0</Z>
 	<Rmin unit="mm">260.0</Rmin>
       </ZBound>
       <ZBound id="2">
-        <Z unit="mm">-600.985</Z>
-	<Rmin unit="mm">160.0</Rmin>
+        <Z unit="mm">-675</Z>
+	<Rmin unit="mm">230.0</Rmin>
       </ZBound>
       <ZBound id="3">
+        <Z unit="mm">-550</Z>
+	<Rmin unit="mm">230.0</Rmin>
+      </ZBound>
+      <ZBound id="4">
+        <Z unit="mm">-450</Z>
+	<Rmin unit="mm">160.0</Rmin>
+      </ZBound>
+      <ZBound id="5">
         <Z unit="mm">629.503</Z>
 	<Rmin unit="mm">160.0</Rmin>
       </ZBound>
-      <ZBound id="4">
+      <ZBound id="6">
         <Z unit="mm">1655.19</Z>
 	<Rmin unit="mm">438.0</Rmin>
       </ZBound>

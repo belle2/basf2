@@ -48,7 +48,7 @@ void CDCGeometryPar::clear()
   m_motherOuterR = 0.;
   m_motherLength = 0.;
   // T.Hara added to define the CDC mother volume (temporal)
-  for (unsigned i = 0; i < 5; i++) {
+  for (unsigned i = 0; i < 7; i++) {
     m_momZ[i] = 0.;
     m_momRmin[i] = 0.;
   }

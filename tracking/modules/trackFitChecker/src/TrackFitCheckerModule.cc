@@ -80,7 +80,7 @@ TrackFitCheckerModule::TrackFitCheckerModule() : Module()
 
   //Parameter definition
   addParam("outputFileName", m_dataOutFileName, "A common name for all output files of this module. Suffixes to distinguish them will be added automatically", string("trackFitChecker"));
-  addParam("totalChi2Cut", m_totalChi2Cut, "only tracks with a total χ² lower than this value will be considered", 1E300);
+  addParam("p-valueCut", m_pvalueCut, "only tracks with a p-value larger than this value will be considered", -1.0);
   addParam("testSi", m_testSi, "execute the layer wise tests for PXD/SVD", false);
   addParam("robustTests", m_robust, "activate additional robust statistical tests (median and MAD)", false);
   addParam("testLRRes", m_testLRRes, "test if DAF correctly resolved the left right ambiguity in the CDC", false);
@@ -156,6 +156,7 @@ void TrackFitCheckerModule::initialize()
     registerTrackWiseData("relRes_curvVertex");
     registerTrackWiseData("relRes_p_T");
     registerTrackWiseData("res_r");
+    registerTrackWiseData("pullVertexAbsMom");
     registerTVector3("trueVertexPos");
     registerTVector3("trueVertexMom");
     registerInt("genfitStatusFlag");
@@ -243,6 +244,7 @@ void TrackFitCheckerModule::initialize()
     m_madScalingFactors["resVertexRZPtP"] = 1.4826;
     m_madScalingFactors["pullsVertexRZPtP"] = 1.4826;
     m_madScalingFactors["res_r"] = 1.4826;
+    m_madScalingFactors["pullVertexAbsMom"] = 1.4826;
     m_madScalingFactors["pValue_bu"] = 4.0 / 3.0;  //scaling factor for uniform distributed variables
     m_madScalingFactors["pValue_fu"] = 4.0 / 3.0;
     //set the cut away ratio for the truncated mean and std. No truncated mean and std will be calculated when this value is not set or 0 or negative
@@ -384,14 +386,15 @@ void TrackFitCheckerModule::event()
     //    dirInPoca.Print();
 
     const double chi2tot_bu = aTrackPtr->getChiSqu(); // returns the total chi2 from the backward filter
-    if (chi2tot_bu > m_totalChi2Cut) {//consider this track to be an outlier and discard it. Goto next track
+    const double chi2tot_fu = aTrackPtr->getForwardChiSqu();
+    const double ndf = aTrackPtr->getNDF();
+    const double pValue_bu = ROOT::Math::chisquared_cdf_c(chi2tot_bu, ndf);
+    if (pValue_bu < m_pvalueCut) {//consider this track to be an outlier and discard it. Goto next track
       ++m_nCutawayTracks;
       continue;
     }
     // first part: get variables describing the hole track
-    const double chi2tot_fu = aTrackPtr->getForwardChiSqu();
-    const double ndf = aTrackPtr->getNDF();
-    const double pValue_bu = ROOT::Math::chisquared_cdf_c(chi2tot_bu, ndf);
+
     B2DEBUG(100, "p value of fitted track " << i << " is " << pValue_bu);
     const double pValue_fu = ROOT::Math::chisquared_cdf_c(chi2tot_fu, ndf);
     fillTrackWiseData("pValue_bu", pValue_bu);
@@ -473,7 +476,7 @@ void TrackFitCheckerModule::event()
     pullsVertexRZPtP[1] = resVertexRZPtP[1] / sqrt(vertexCov(1, 1));
     pullsVertexRZPtP[2] = resVertexRZPtP[2] / sqrt(vertexCov(2, 2));
     pullsVertexRZPtP[3] = resVertexRZPtP[3] / sqrt((vertexMom[0] * vertexMom[0] * vertexCov(3, 3) + vertexMom[1] * vertexMom[1] * vertexCov(4, 4) + 2 * vertexMom[0] * vertexMom[1] * vertexCov(3, 4)) / (vertexMom[0] * vertexMom[0] + vertexMom[1] * vertexMom[1]));
-    pullsVertexRZPtP[4] = resVertexRZPtP[4] / (fabs(charge) / local5DState(0) / local5DState(0) * sqrt(local5DCov(0, 0)));
+    pullsVertexRZPtP[4] = pullVertexAbsMom;
     fillTrackWiseVecData("pullsVertexRZPtP", pullsVertexRZPtP);
     B2DEBUG(100, "filled all track wise tests");
 

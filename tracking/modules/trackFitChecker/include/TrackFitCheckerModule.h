@@ -181,7 +181,7 @@ namespace Belle2 {
     std::map<std::string, std::vector<std::string>* > namesOfTestVars;
 
     int m_processedTracks;
-    double m_totalChi2Cut;
+    double m_pvalueCut;
     int m_nCutawayTracks;
     int m_extrapFailed; //counter for the number of tracks that cannot be extrapolated to thier true vertex position by Genfit
     // counters holding the number of the covariance matrices (R) of the resuduals that have negative diagonal elements

@@ -182,6 +182,7 @@ namespace Belle2 {
 
     int m_processedTracks;
     double m_pvalueCut;
+    bool m_fillOnlyInRootFile;
     double m_trunctationRatio;
     int m_nCutawayTracks;
     int m_extrapFailed; //counter for the number of tracks that cannot be extrapolated to thier true vertex position by Genfit

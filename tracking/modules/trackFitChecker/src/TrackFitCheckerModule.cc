@@ -636,7 +636,7 @@ void TrackFitCheckerModule::endRun()
     if (m_writeToFile == true) {
       ofstream testOutputToFile((m_dataOutFileName + "StatTests.txt").c_str());
       testOutputToFile << m_textOutput.str();
-      testOutputToFile << "\nNumber of track excluded because of p-value cut: " << m_nCutawayTracks << "\n";
+      testOutputToFile << "Number of track excluded because of p-value cut: " << m_nCutawayTracks << "\n";
       testOutputToFile.close();
     }
 
@@ -1106,14 +1106,13 @@ void TrackFitCheckerModule::fillTrackWiseVecData(const string& nameOfDataSample,
 
 void TrackFitCheckerModule::fillTrackWiseData(const string& nameOfDataSample, const double newData)
 {
-
-  m_trackWiseDataSamples[nameOfDataSample](newData);
   if (m_writeToRootFile == true) {
     m_trackWiseDataForRoot[nameOfDataSample] = float(newData);
   }
   if (m_fillOnlyInRootFile == true) {
     return;
   }
+  m_trackWiseDataSamples[nameOfDataSample](newData);
   if (m_robust == true) {
     m_trackWiseData[nameOfDataSample].push_back(newData);
   }

@@ -90,6 +90,7 @@ TrackFitCheckerModule::TrackFitCheckerModule() : Module()
   addParam("writeToRootFile", m_writeToRootFile, "Set to True if you want the data from the statistical tests written into a root file", false);
   addParam("writeToTextFile", m_writeToFile, "Set to True if you want the results of the statistical tests written out in a normal text file", false);
   addParam("exportTracksForRaveDeveloper", m_exportTracksForRaveDeveloper, "Writes tracks into text file in a format used by rave developers", false);
+  addParam("trunctationRatio", m_trunctationRatio, "Ratio of the data sample that will be cut away before in the trunctated", 0.01);
 }
 
 
@@ -248,20 +249,20 @@ void TrackFitCheckerModule::initialize()
     m_madScalingFactors["pValue_bu"] = 4.0 / 3.0;  //scaling factor for uniform distributed variables
     m_madScalingFactors["pValue_fu"] = 4.0 / 3.0;
     //set the cut away ratio for the truncated mean and std. No truncated mean and std will be calculated when this value is not set or 0 or negative
-    m_trunctationRatios["pulls_vertexPosMom"] = 0.02; //scaling factor for normal distributed variables
-    m_trunctationRatios["absMomVertex"] = 0.02;
-    m_trunctationRatios["res_vertexPosMom"] = 0.02;
-    m_trunctationRatios["vertexPosMom"] = 0.02;
-    m_trunctationRatios["res_curvVertex"] = 0.02;
-    m_trunctationRatios["relRes_curvVertex"] = 0.02;
-    m_trunctationRatios["relRes_p_T"] = 0.02;
-    m_trunctationRatios["pValue_bu"] = 0.02;
-    m_trunctationRatios["pValue_fu"] = 0.02;
-    m_trunctationRatios["resVertexRZPtP"] = 0.02;
-    m_trunctationRatios["pullsVertexRZPtP"] = 0.02;
-    m_trunctationRatios["res_r"] = 0.02;
-    m_trunctationRatios["chi2tot_bu"] = 0.02;
-    m_trunctationRatios["chi2tot_fu"] = 0.02;
+    m_trunctationRatios["pulls_vertexPosMom"] = m_trunctationRatio; //scaling factor for normal distributed variables
+    m_trunctationRatios["absMomVertex"] = m_trunctationRatio;
+    m_trunctationRatios["res_vertexPosMom"] = m_trunctationRatio;
+    m_trunctationRatios["vertexPosMom"] = m_trunctationRatio;
+    m_trunctationRatios["res_curvVertex"] = m_trunctationRatio;
+    m_trunctationRatios["relRes_curvVertex"] = m_trunctationRatio;
+    m_trunctationRatios["relRes_p_T"] = m_trunctationRatio;
+    m_trunctationRatios["pValue_bu"] = m_trunctationRatio;
+    m_trunctationRatios["pValue_fu"] = m_trunctationRatio;
+    m_trunctationRatios["resVertexRZPtP"] = m_trunctationRatio;
+    m_trunctationRatios["pullsVertexRZPtP"] = m_trunctationRatio;
+    m_trunctationRatios["res_r"] = m_trunctationRatio;
+    m_trunctationRatios["chi2tot_bu"] = m_trunctationRatio;
+    m_trunctationRatios["chi2tot_fu"] = m_trunctationRatio;
 
   }
 
@@ -869,7 +870,7 @@ void TrackFitCheckerModule::printLayerWiseStatistics(const string& nameOfDataSam
           } else {
             double mean = 0;
             double std = 0;
-            int nCutAwayTracks = trunctatedMeanAndStd(data, 0.02, false, mean, std);
+            int nCutAwayTracks = trunctatedMeanAndStd(data, m_trunctationRatio, false, mean, std);
             m_textOutput << "\t" << mean << "\t" << std << "\t" << nCutAwayTracks;
 
           }

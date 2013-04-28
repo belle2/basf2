@@ -9,6 +9,7 @@
 **************************************************************************/
 
 #include <analysis/modules/NtupleMaker/NtupleDeltaEMbcTool.h>
+#include <analysis/utility/PSelectorFunctions.h>
 #include <cmath>
 #include <TBranch.h>
 #include <TLorentzVector.h>
@@ -35,14 +36,9 @@ void NtupleDeltaEMbcTool::eval(const Particle* particle)
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   if (selparticles.empty()) return;
 
-  TVector3 v3_boost2cms = getCMSBoostVector();
-  float fBeamEnergy = getCMSEnergy() / 2.0;
+  m_fDeltaE = analysis::particleDeltaE(selparticles[0]);
+  m_fMbc    = analysis::particleMbc(selparticles[0]);
 
-  TLorentzVector lv_b(selparticles[0]->get4Vector());
-  lv_b.Boost(v3_boost2cms);
-
-  m_fDeltaE = lv_b.E() - fBeamEnergy;
-  m_fMbc    = sqrt((fBeamEnergy * fBeamEnergy) - lv_b.Vect().Mag2());
 }
 
 

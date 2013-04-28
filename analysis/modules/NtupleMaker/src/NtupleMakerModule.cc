@@ -12,6 +12,12 @@
 #include <analysis/modules/NtupleMaker/NtupleKinematicsTool.h>
 #include <analysis/modules/NtupleMaker/NtupleEventMetaDataTool.h>
 #include <analysis/modules/NtupleMaker/NtupleDeltaEMbcTool.h>
+#include <analysis/modules/NtupleMaker/NtupleMCTruthTool.h>
+#include <analysis/modules/NtupleMaker/NtupleMCHeirarchyTool.h>
+#include <analysis/modules/NtupleMaker/NtupleMCKinematicsTool.h>
+#include <analysis/modules/NtupleMaker/NtuplePIDTool.h>
+#include <analysis/modules/NtupleMaker/NtupleTrackTool.h>
+#include <analysis/modules/NtupleMaker/NtupleRecoStatsTool.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/replace.hpp>
@@ -78,6 +84,18 @@ void NtupleMakerModule::initialize()
       m_tools.push_back(new NtupleEventMetaDataTool(m_tree, m_decaydescriptors.back()));
     } else if (m_strTools[iTool].compare("NtupleDeltaEMbcTool") == 0) {
       m_tools.push_back(new NtupleDeltaEMbcTool(m_tree, m_decaydescriptors.back()));
+    } else if (m_strTools[iTool].compare("NtupleMCTruthTool") == 0) {
+      m_tools.push_back(new NtupleMCTruthTool(m_tree, m_decaydescriptors.back()));
+    } else if (m_strTools[iTool].compare("NtupleMCHeirarchyTool") == 0) {
+      m_tools.push_back(new NtupleMCHeirarchyTool(m_tree, m_decaydescriptors.back()));
+    } else if (m_strTools[iTool].compare("NtupleMCKinematicsTool") == 0) {
+      m_tools.push_back(new NtupleMCKinematicsTool(m_tree, m_decaydescriptors.back()));
+    } else if (m_strTools[iTool].compare("NtuplePIDTool") == 0) {
+      m_tools.push_back(new NtuplePIDTool(m_tree, m_decaydescriptors.back()));
+    } else if (m_strTools[iTool].compare("NtupleTrackTool") == 0) {
+      m_tools.push_back(new NtupleTrackTool(m_tree, m_decaydescriptors.back()));
+    } else if (m_strTools[iTool].compare("NtupleRecoStatsTool") == 0) {
+      m_tools.push_back(new NtupleRecoStatsTool(m_tree, m_decaydescriptors.back()));
     } else {
       B2WARNING("The specified NtupleTool is not available!");
     }

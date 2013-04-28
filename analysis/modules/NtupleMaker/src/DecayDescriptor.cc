@@ -53,7 +53,7 @@ DecayDescriptor::DecayDescriptor(const DecayDescriptor& other) :
 void DecayDescriptor::append(const DecayDescriptor& daughter)
 {
   if (m_isFixed) {
-    printf("DecayDescriptor::append - This DecayDescriptor is already used as daughter of another DecayDescritor!\n");
+    printf("DecayDescriptor::append - This DecayDescriptor is already used as a daughter of another DecayDescritor!\n");
     return;
   }
   m_daughters.push_back(daughter);

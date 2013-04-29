@@ -8,9 +8,8 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <analysis/modules/NtupleMaker/NtupleKinematicsTool.h>
+#include <analysis/NtupleTools/NtupleKinematicsTool.h>
 #include <TBranch.h>
-
 void NtupleKinematicsTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
@@ -37,6 +36,7 @@ void NtupleKinematicsTool::eval(const Particle* particle)
     printf("NtupleKinematicsTool::eval - ERROR, no Particle found!\n");
     return;
   }
+
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {

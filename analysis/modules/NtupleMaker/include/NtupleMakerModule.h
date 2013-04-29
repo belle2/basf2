@@ -10,9 +10,8 @@
 
 #ifndef NTUPLEDUMPERMODULE_H
 #define NTUPLEDUMPERMODULE_H
-#include <analysis/modules/NtupleMaker/NtupleFlatTool.h>
-#include <analysis/modules/NtupleMaker/DecayDescriptor.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <analysis/NtupleTools/NtupleFlatTool.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -22,7 +21,6 @@
 #include <TTree.h>
 #include <TFile.h>
 
-using namespace std;
 using namespace Belle2;
 
 
@@ -39,25 +37,25 @@ namespace Belle2 {
   class NtupleMakerModule : public Module {
   private:
     /** Name of ROOT file for output. */
-    string m_strFileName;
+    std::string m_strFileName;
     /** ROOT file for output. */
     static TFile* m_file;
     /** Number of TTrees which are not yet written to TFile. */
     static int m_nTrees;
     /** Name of the TTree. */
-    string m_strTreeName;
+    std::string m_strTreeName;
     /** Comment about the content of the TTree */
-    string m_strComment;
+    std::string m_strComment;
     /** The ROOT TTree for output. */
     TTree* m_tree;
     /** Parameter provided by basf2 script: ntuple tool, decay string, ntuple tool, decay string.... */
-    vector<string> m_strTools;
+    std::vector<std::string> m_strTools;
     /** Output Tools */
     boost::ptr_vector<NtupleFlatTool> m_tools;
     /** List of the DecayDescriptor objects corresponding to the m_tools. */
-    vector<DecayDescriptor> m_decaydescriptors;
+    std::vector<DecayDescriptor> m_decaydescriptors;
     /** Name of particle list with reconstructed particles. */
-    string m_strListName;
+    std::string m_strListName;
   public:
     /** Constructor. */
     NtupleMakerModule();

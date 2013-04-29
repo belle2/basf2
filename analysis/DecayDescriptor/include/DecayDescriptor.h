@@ -16,8 +16,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <boost/ptr_container/ptr_vector.hpp>
 
-using namespace std;
-
 namespace Belle2 {
 
   /** The DecayDescriptor stores information about
@@ -31,13 +29,19 @@ namespace Belle2 {
   class DecayDescriptor {
   private:
     /** Direct daughters of the decaying particle. */
-    vector<DecayDescriptor> m_daughters;
-    /** Human readable name of the decaying particle. */
-    string m_strName;
+    std::vector<DecayDescriptor> m_daughters;
+    /** evt.pdl name of the decaying particle. */
+    std::string m_strName;
+    /** Tag of this particle to distinguish e.g. different decay channels or selection criteria. */
+    std::string m_strTag;
     /** PDG code of the decaying particle. */
     int m_iPDGCode;
     /** Is this DecayDescriptor selected? */
     bool m_isSelected;
+    /** Also consider charge conjugated mode? */
+    bool m_isWithCC;
+    /** Is this decay inclusive? */
+    bool m_isInclusive;
     /** If this DecayDescriptor is attached as daughter
     of another DecayDescriptor, then it cannot be changed anymore! */
     bool m_isFixed;
@@ -54,31 +58,39 @@ namespace Belle2 {
     DecayDescriptor();
     /** Copy ctor. */
     DecayDescriptor(const DecayDescriptor& other);
-    /** Ctor from human readable particle name and PDG code of the decaying particle */
-    DecayDescriptor(string strName, int iPDGCode);
+    /** Ctor from evt.pdl particle name. */
+    DecayDescriptor(std::string strName);
     /** Return the human readable name m_strName. */
-    string getName() {
+    std::string getName() {
       return m_strName;
     };
+    /** Return the name from getName() without + - * or anti- */
+    std::string getNameSimple();
     /** Append a daughter to this particle. If the daughter decays further, then
     these decays have to be specified first because this sets daugher.m_isFixed = true. */
     void append(const DecayDescriptor& daughter);
     /** Initialise daughters from given string. */
-    bool init(const string strDecayString);
+    bool init(const std::string strDecayString);
     /** Select this DecayDescriptor. */
     void select(bool isSelected = true) {
       m_isSelected = isSelected;
     }
     /** Get a vector of pointers with selected daughters in the decay tree. */
-    vector<const Particle*> getSelectionParticles(const Particle* particle);
+    std::vector<const Particle*> getSelectionParticles(const Particle* particle);
     /** Return list of human readable names of selected particles.
-    Example for the case that all particles are selected in B -> D (D -> K pi) pi:
-    ["B", "D", "D_K", "D_pi", "pi"] */
-    vector<string> getSelectionNames();
+    Example for the case that all particles are selected in B+ -> (anti-D0 -> K^- pi^+) pi^+:
+    ["B", "D0", "D0_K", "D_pi", "pi"] */
+    std::vector<std::string> getSelectionNames();
     /** Return PDG code.*/
-    int getPDGCode() const {
-      return m_iPDGCode;
-    }
+    int getPDGCode() const {return m_iPDGCode;}
+    /** return number of direct daughters. */
+    int getNDaughters() const {return m_daughters.size();}
+    /** return i-th daughter (0 based index). */
+    const DecayDescriptor& getDaughter(int i) const {return (i < getNDaughters()) ? m_daughters[i] : DecayDescriptor::m_NULL;}
+    /** Also consider charge conjugated mode? */
+    bool isWithCC() const {return m_isWithCC;}
+    /** Is the decay inclusive? */
+    bool isInclusive() const {return m_isInclusive;}
   };
 
 }

@@ -8,7 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <analysis/modules/NtupleMaker/NtupleTrackTool.h>
+#include <analysis/NtupleTools/NtupleTrackTool.h>
 #include <analysis/utility/PSelectorFunctions.h>
 #include <TBranch.h>
 

@@ -8,7 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <analysis/modules/NtupleMaker/NtupleMCKinematicsTool.h>
+#include <analysis/NtupleTools/NtupleMCKinematicsTool.h>
 #include <generators/dataobjects/MCParticle.h>
 #include <TBranch.h>
 

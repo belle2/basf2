@@ -8,35 +8,35 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEFLATTOOL_H
-#define NTUPLEFLATTOOL_H
+#ifndef NTUPLEEVENTMETADATATOOL_H
+#define NTUPLEEVENTMETADATATOOL_H
+#include <boost/function.hpp>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/modules/NtupleMaker/DecayDescriptor.h>
-#include <TTree.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <analysis/NtupleTools/NtupleFlatTool.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 using namespace std;
 using namespace Belle2;
 
 namespace Belle2 {
-  /** Interface for tools to create flat n-tuples. */
-  class NtupleFlatTool {
-  protected:
-    /** Pointer to the TTree (owned by NtupleOutModule) */
-    TTree* m_tree;
-    /** DecayDescriptor for this tree. */
-    DecayDescriptor m_decaydescriptor;
+  /** Tool for NtupleMaker to write exp_no, run_no, evt_no to flat ntuple. */
+  class NtupleEventMetaDataTool : public NtupleFlatTool {
+  private:
+    /** Experiment number. */
+    int m_iExperiment;
+    /** Run number. */
+    int m_iRun;
+    /** Event number. */
+    int m_iEvent;
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    virtual void setupTree() = 0;
+    void setupTree();
   public:
     /** Constructor. */
-    NtupleFlatTool(TTree* tree, DecayDescriptor& decaydescriptor);
-    /** Destructor. */
-    virtual ~NtupleFlatTool() {}
-    /** Calculate branch variables from provided Particle. */
-    virtual void eval(const Particle* p) = 0;
+    NtupleEventMetaDataTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
+    /** Set branch variables to properties of the provided Particle. */
+    void eval(const Particle* p);
   };
-
 } // namepspace Belle2
 
-#endif // NTUPLEFLATTOOL_H
-
+#endif // NTUPLEEVENTMETADATATOOL_H

@@ -8,11 +8,11 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <analysis/modules/NtupleMaker/NtupleMCHeirarchyTool.h>
+#include <analysis/NtupleTools/NtupleMCHierarchyTool.h>
 #include <generators/dataobjects/MCParticle.h>
 #include <TBranch.h>
 
-void NtupleMCHeirarchyTool::setupTree()
+void NtupleMCHierarchyTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   int nDecayProducts = strNames.size();
@@ -26,10 +26,10 @@ void NtupleMCHeirarchyTool::setupTree()
   }
 }
 
-void NtupleMCHeirarchyTool::eval(const Particle* particle)
+void NtupleMCHierarchyTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleMCHeirarchyTool::eval - ERROR, no Particle found!\n");
+    printf("NtupleMCHierarchyTool::eval - ERROR, no Particle found!\n");
     return;
   }
 
@@ -46,7 +46,7 @@ void NtupleMCHeirarchyTool::eval(const Particle* particle)
       m_iGDMotherID[iProduct] = 0;
       m_iGDGDMotherID[iProduct] = 0;
 
-      printf("NtupleMCHeirarchyTool::eval - WARNING no truth match found for this reco particle!\n");
+      printf("NtupleMCHierarchyTool::eval - WARNING no truth match found for this reco particle!\n");
     } else {
       const MCParticle* mcparticleMother = mcparticle->getMother();
 

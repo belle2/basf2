@@ -105,7 +105,6 @@ combinerB.param('ListName', 'B')
 combinerB.param('InputListNames', ['D0', 'pi'])
 main.add_module(combinerB)
 
-# ----> NtupleMaker module
 ntuple1 = register_module('NtupleMaker')
 # output root file name (the suffix .root will be added automaticaly)
 ntuple1.param('strFileName', 'test.root')
@@ -115,18 +114,10 @@ ntuple1.param('strTreeName', 'test1')
 ntuple1.param('strListName', 'B')
 # Specifiy output tools
 # decay descriptor strings ignored (parser for  not yet implemented)
-ntuple1.param('strTools', ['NtupleEventMetaDataTool', 'B',
-              'NtupleKinematicsTool', 'B -> D(->^K ^pi) ^pi'])  # exp_no, run_no, evt_no
-                                                                # Kinematics
-
+ntuple1.param('strTools', ['EventMetaData', 'B-', 'Kinematics',
+              'B+ -> (anti-D0 -> ^K- ^pi+) ^pi+'])
 main.add_module(ntuple1)
 
-ntuple2 = register_module('NtupleMaker')
-ntuple2.param('strTreeName', 'test2')
-ntuple2.param('strListName', 'D0')
-ntuple2.param('strTools', ['NtupleEventMetaDataTool', 'D',
-              'NtupleKinematicsTool', '^D -> ^K ^pi'])
-main.add_module(ntuple2)
 # ----> start processing of modules
 process(main)
 

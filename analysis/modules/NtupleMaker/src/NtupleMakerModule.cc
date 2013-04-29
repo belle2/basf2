@@ -9,15 +9,7 @@
 **************************************************************************/
 
 #include <analysis/modules/NtupleMaker/NtupleMakerModule.h>
-#include <analysis/modules/NtupleMaker/NtupleKinematicsTool.h>
-#include <analysis/modules/NtupleMaker/NtupleEventMetaDataTool.h>
-#include <analysis/modules/NtupleMaker/NtupleDeltaEMbcTool.h>
-#include <analysis/modules/NtupleMaker/NtupleMCTruthTool.h>
-#include <analysis/modules/NtupleMaker/NtupleMCHeirarchyTool.h>
-#include <analysis/modules/NtupleMaker/NtupleMCKinematicsTool.h>
-#include <analysis/modules/NtupleMaker/NtuplePIDTool.h>
-#include <analysis/modules/NtupleMaker/NtupleTrackTool.h>
-#include <analysis/modules/NtupleMaker/NtupleRecoStatsTool.h>
+#include <analysis/NtupleTools/NtupleToolList.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/replace.hpp>
@@ -50,7 +42,7 @@ NtupleMakerModule::NtupleMakerModule() : Module()
 void NtupleMakerModule::initialize()
 {
   // Initializing the output root file
-  if (!m_file) m_file = new TFile(m_strFileName.c_str(), "NEW");
+  if (!m_file) m_file = new TFile(m_strFileName.c_str(), "RECREATE");
   if (!m_file->IsOpen()) {
     B2WARNING("Could not create file " << m_strFileName);
     return;
@@ -78,27 +70,8 @@ void NtupleMakerModule::initialize()
     m_decaydescriptors.push_back(desc);
 
     // select ntuple tools to be used
-    if (m_strTools[iTool].compare("NtupleKinematicsTool") == 0) {
-      m_tools.push_back(new NtupleKinematicsTool(m_tree, m_decaydescriptors.back()));
-    } else if (m_strTools[iTool].compare("NtupleEventMetaDataTool") == 0) {
-      m_tools.push_back(new NtupleEventMetaDataTool(m_tree, m_decaydescriptors.back()));
-    } else if (m_strTools[iTool].compare("NtupleDeltaEMbcTool") == 0) {
-      m_tools.push_back(new NtupleDeltaEMbcTool(m_tree, m_decaydescriptors.back()));
-    } else if (m_strTools[iTool].compare("NtupleMCTruthTool") == 0) {
-      m_tools.push_back(new NtupleMCTruthTool(m_tree, m_decaydescriptors.back()));
-    } else if (m_strTools[iTool].compare("NtupleMCHeirarchyTool") == 0) {
-      m_tools.push_back(new NtupleMCHeirarchyTool(m_tree, m_decaydescriptors.back()));
-    } else if (m_strTools[iTool].compare("NtupleMCKinematicsTool") == 0) {
-      m_tools.push_back(new NtupleMCKinematicsTool(m_tree, m_decaydescriptors.back()));
-    } else if (m_strTools[iTool].compare("NtuplePIDTool") == 0) {
-      m_tools.push_back(new NtuplePIDTool(m_tree, m_decaydescriptors.back()));
-    } else if (m_strTools[iTool].compare("NtupleTrackTool") == 0) {
-      m_tools.push_back(new NtupleTrackTool(m_tree, m_decaydescriptors.back()));
-    } else if (m_strTools[iTool].compare("NtupleRecoStatsTool") == 0) {
-      m_tools.push_back(new NtupleRecoStatsTool(m_tree, m_decaydescriptors.back()));
-    } else {
-      B2WARNING("The specified NtupleTool is not available!");
-    }
+    NtupleFlatTool* ntool = NtupleToolList::create(m_strTools[iTool], m_tree, m_decaydescriptors.back());
+    if (ntool) m_tools.push_back(ntool);
   }
 }
 
@@ -116,18 +89,20 @@ void NtupleMakerModule::event()
     int nTools = m_tools.size();
     for (int iTool = 0; iTool < nTools; ++iTool) {
       m_tools[iTool].eval(b);
-    }        m_tree->Fill();
+    }
+    m_tree->Fill();
   }
 }
 
 void NtupleMakerModule::terminate()
 {
   B2INFO("Terminate TTree " << m_strTreeName);
-  B2INFO("Unsaved Trees: " << m_nTrees);
   m_file->cd();
   m_tree->Write();
   m_nTrees--;
+  B2INFO("Remaining unsaved Trees: " << m_nTrees);
   if (m_nTrees == 0) {
+    B2INFO("Close file " << m_strFileName);
     m_file->Close();
     m_file = NULL;
   }

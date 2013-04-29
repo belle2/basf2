@@ -8,7 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <analysis/modules/NtupleMaker/NtupleFlatTool.h>
+#include <analysis/NtupleTools/NtupleFlatTool.h>
 
 using namespace Belle2;
 NtupleFlatTool::NtupleFlatTool(TTree* tree, DecayDescriptor& decaydescriptor)

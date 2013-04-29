@@ -8,7 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <analysis/modules/NtupleMaker/NtuplePIDTool.h>
+#include <analysis/NtupleTools/NtuplePIDTool.h>
 #include <analysis/utility/PSelectorFunctions.h>
 #include <framework/gearbox/Const.h>
 #include <TBranch.h>

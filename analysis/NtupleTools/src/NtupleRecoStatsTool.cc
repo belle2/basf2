@@ -8,7 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <analysis/modules/NtupleMaker/NtupleRecoStatsTool.h>
+#include <analysis/NtupleTools/NtupleRecoStatsTool.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <TBranch.h>
 #include <tracking/dataobjects/Track.h>

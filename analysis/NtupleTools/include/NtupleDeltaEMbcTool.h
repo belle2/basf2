@@ -8,35 +8,36 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEEVENTMETADATATOOL_H
-#define NTUPLEEVENTMETADATATOOL_H
-#include <boost/function.hpp>
+#ifndef NTUPLEDELTAEMBCTOOL_H
+#define NTUPLEDELTAEMBCTOOL_H
+#include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <analysis/modules/NtupleMaker/NtupleFlatTool.h>
-#include <analysis/modules/NtupleMaker/DecayDescriptor.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <TTree.h>
+#include <string>
+#include <utility>
 
 using namespace std;
 using namespace Belle2;
 
 namespace Belle2 {
-  /** Tool for NtupleMaker to write exp_no, run_no, evt_no to flat ntuple. */
-  class NtupleEventMetaDataTool : public NtupleFlatTool {
+
+  /** Writes DeltaE and M_bc of B candidate to flat ntuple. */
+  class NtupleDeltaEMbcTool : public NtupleFlatTool {
   private:
-    /** Experiment number. */
-    int m_iExperiment;
-    /** Run number. */
-    int m_iRun;
-    /** Event number. */
-    int m_iEvent;
+    /** Delta E. */
+    float m_fDeltaE;
+    /** beam constraint mass. */
+    float m_fMbc;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:
     /** Constructor. */
-    NtupleEventMetaDataTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
+    NtupleDeltaEMbcTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };
+
 } // namepspace Belle2
 
-#endif // NTUPLEEVENTMETADATATOOL_H
+#endif // NTUPLEDELTAEMBCTOOL_H

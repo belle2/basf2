@@ -10,9 +10,9 @@
 
 #ifndef NTUPLEPIDTOOL_H
 #define NTUPLEPIDTOOL_H
-#include <analysis/modules/NtupleMaker/NtupleFlatTool.h>
+#include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/modules/NtupleMaker/DecayDescriptor.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <TTree.h>
 #include <string>
 #include <utility>

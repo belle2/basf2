@@ -1,0 +1,27 @@
+#include <analysis/NtupleTools/NtupleToolList.h>
+#include <analysis/NtupleTools/NtupleKinematicsTool.h>
+#include <analysis/NtupleTools/NtupleEventMetaDataTool.h>
+#include <analysis/NtupleTools/NtupleDeltaEMbcTool.h>
+#include <analysis/NtupleTools/NtupleMCTruthTool.h>
+#include <analysis/NtupleTools/NtupleMCHierarchyTool.h>
+#include <analysis/NtupleTools/NtupleMCKinematicsTool.h>
+#include <analysis/NtupleTools/NtuplePIDTool.h>
+#include <analysis/NtupleTools/NtupleTrackTool.h>
+#include <analysis/NtupleTools/NtupleRecoStatsTool.h>
+
+using namespace Belle2;
+using namespace std;
+
+NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescriptor& d)
+{
+  if (strName.compare("Kinematics") == 0) return new NtupleKinematicsTool(tree, d);
+  else if (strName.compare("EventMetaData") == 0) return new NtupleEventMetaDataTool(tree, d);
+  else if (strName.compare("DeltaEMbc") == 0) return new NtupleDeltaEMbcTool(tree, d);
+  else if (strName.compare("MCTruth") == 0) return new NtupleMCTruthTool(tree, d);
+  else if (strName.compare("MCHierarchy") == 0) return new NtupleMCHierarchyTool(tree, d);
+  else if (strName.compare("MCKinematics") == 0) return new NtupleMCKinematicsTool(tree, d);
+  else if (strName.compare("PID") == 0) return new NtuplePIDTool(tree, d);
+  else if (strName.compare("NtupleRecoStatsTool") == 0) return new NtupleRecoStatsTool(tree, d);
+  B2WARNING("The specified NtupleTool is not available!");
+  return NULL;
+}

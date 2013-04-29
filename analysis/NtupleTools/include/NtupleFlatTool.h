@@ -8,36 +8,35 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEDELTAEMBCTOOL_H
-#define NTUPLEDELTAEMBCTOOL_H
-#include <analysis/modules/NtupleMaker/NtupleFlatTool.h>
+#ifndef NTUPLEFLATTOOL_H
+#define NTUPLEFLATTOOL_H
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/modules/NtupleMaker/DecayDescriptor.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <TTree.h>
-#include <string>
-#include <utility>
 
 using namespace std;
 using namespace Belle2;
 
 namespace Belle2 {
-
-  /** Writes DeltaE and M_bc of B candidate to flat ntuple. */
-  class NtupleDeltaEMbcTool : public NtupleFlatTool {
-  private:
-    /** Delta E. */
-    float m_fDeltaE;
-    /** beam constraint mass. */
-    float m_fMbc;
+  /** Interface for tools to create flat n-tuples. */
+  class NtupleFlatTool {
+  protected:
+    /** Pointer to the TTree (owned by NtupleOutModule) */
+    TTree* m_tree;
+    /** DecayDescriptor for this tree. */
+    DecayDescriptor m_decaydescriptor;
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    virtual void setupTree() = 0;
   public:
     /** Constructor. */
-    NtupleDeltaEMbcTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
-    /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    NtupleFlatTool(TTree* tree, DecayDescriptor& decaydescriptor);
+    /** Destructor. */
+    virtual ~NtupleFlatTool() {}
+    /** Calculate branch variables from provided Particle. */
+    virtual void eval(const Particle* p) = 0;
   };
 
 } // namepspace Belle2
 
-#endif // NTUPLEDELTAEMBCTOOL_H
+#endif // NTUPLEFLATTOOL_H
+

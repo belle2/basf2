@@ -10,9 +10,9 @@
 
 #ifndef NTUPLEMCHEIRARCHYTOOL_H
 #define NTUPLEMCHEIRARCHYTOOL_H
-#include <analysis/modules/NtupleMaker/NtupleFlatTool.h>
+#include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/modules/NtupleMaker/DecayDescriptor.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <TTree.h>
 #include <string>
 #include <utility>
@@ -24,7 +24,7 @@ namespace Belle2 {
 
   /** NtupleTool to write the  mother, grandmother, and greatgrandmother truth ID for a given reconstructed particle
   to a flat ntuple. */
-  class NtupleMCHeirarchyTool : public NtupleFlatTool {
+  class NtupleMCHierarchyTool : public NtupleFlatTool {
   private:
     /** Mother ID. */
     int* m_iMotherID;
@@ -37,7 +37,7 @@ namespace Belle2 {
     void setupTree();
   public:
     /** Constuctor. */
-    NtupleMCHeirarchyTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
+    NtupleMCHierarchyTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };

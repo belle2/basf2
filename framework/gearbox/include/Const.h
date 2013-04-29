@@ -459,9 +459,9 @@ namespace Belle2 {
      * @{
      * no Const instances allowed.
      */
-    Const();
-    Const(const Const&);
-    Const& operator=(const Const&);
+    Const() { };
+    Const(const Const&) { };
+    Const& operator=(const Const&) { return *this; };
     ~Const() {};
     /** @} */
 

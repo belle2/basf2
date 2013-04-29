@@ -259,21 +259,21 @@ void CDCTrackCandidate::estimateMomentum()
   double tempz;
   double tempx;
   double tempy;
-  double znorm;
+  //double znorm;
   double norm;
 
   if (m_chargeSign >= 0) {
     tempz = (z_st2In + z_st2Out) / 2;
     tempx = (x_st2In + x_st2Out) / 2;
     tempy = (y_st2In + y_st2Out) / 2;
-    znorm = sqrt(tempx * tempx + tempy * tempy);
+    //znorm = sqrt(tempx * tempx + tempy * tempy);
     norm = sqrt(tempx * tempx + tempy * tempy + tempz * tempz);
     momentumZ = tempz / norm;
   } else {
     tempz = (z_stIn + z_stOut) / 2;
     tempx = (x_stIn + x_stOut) / 2;
     tempy = (y_stIn + y_stOut) / 2;
-    znorm = sqrt(tempx * tempx + tempy * tempy);
+    //znorm = sqrt(tempx * tempx + tempy * tempy);
     norm = sqrt(tempx * tempx + tempy * tempy + tempz * tempz);
 
     momentumZ = tempz / norm;

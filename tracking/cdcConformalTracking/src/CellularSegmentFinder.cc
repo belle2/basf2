@@ -51,7 +51,7 @@ int CellularSegmentFinder::WireIdDifference(const CDCTrackHit& hit1, const CDCTr
 
 
   //calculate wireId difference
-  int wireIdDifference = abs(hit1.getWireId() - hit2.getWireId());
+  unsigned int wireIdDifference = abs(hit1.getWireId() - hit2.getWireId());
 
   //for the case that the wireIdDifference is 'crossing 0' (e.g. first WireId 1 and second WireId 300, the difference is not 159), some modification is needed
   if (wireIdDifference > cdcg.nWiresInLayer(hit1.getLayerId()) / 2) {

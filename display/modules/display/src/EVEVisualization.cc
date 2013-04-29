@@ -79,7 +79,7 @@
 
 using namespace Belle2;
 
-const double MIN_P_CUT = 0.01;
+const double MIN_P_CUT = 0.00;
 
 EVEVisualization::EVEVisualization():
   m_assignToPrimaries(false),

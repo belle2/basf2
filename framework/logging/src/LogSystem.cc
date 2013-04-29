@@ -18,6 +18,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <iostream>
+#include <algorithm>
+
 using namespace Belle2;
 using namespace std;
 
@@ -99,6 +102,9 @@ bool LogSystem::sendMessage(LogMessage message)
   if (messageSent) {
     incMessageCounter(logLevel);
   }
+  if (m_printErrorSummary && logLevel >= LogConfig::c_Warning) {
+    m_errorLog.push_back(message);
+  }
 
   if (logLevel >= m_logConfig.getAbortLevel()) {
     printErrorSummary();
@@ -139,7 +145,8 @@ LogConfig::ELogLevel LogSystem::getCurrentLogLevel() const
 
 LogSystem::LogSystem() :
   m_logConfig(LogConfig::c_Info, 100),
-  m_moduleLogConfig(0)
+  m_moduleLogConfig(0),
+  m_printErrorSummary(true) //TODO
 {
   unsigned int logInfo = LogConfig::c_Level + LogConfig::c_Message;
   unsigned int warnLogInfo = LogConfig::c_Level + LogConfig::c_Message + LogConfig::c_Module;
@@ -164,20 +171,48 @@ LogSystem::LogSystem() :
                           termName == "cygwin");
 
   addLogConnection(new LogConnectionIOStream(std::cout, useColor));
+
+  m_errorLog.reserve(50);
 }
 
 void LogSystem::printErrorSummary()
 {
   int numLogWarn = getMessageCounter(LogConfig::c_Warning);
   int numLogError = getMessageCounter(LogConfig::c_Error);
-  LogConfig oldConfig = m_logConfig;
+  if (m_errorLog.empty())
+    return; //nothing to do
+
+  const LogConfig oldConfig = m_logConfig;
+  m_logConfig.setAbortLevel(LogConfig::c_Default); //prevent calling printErrorSummary() again when printing
+
   // only show level & message
   m_logConfig.setLogInfo(LogConfig::c_Warning, LogConfig::c_Level | LogConfig::c_Message);
   m_logConfig.setLogInfo(LogConfig::c_Error, LogConfig::c_Level | LogConfig::c_Message);
-  if (numLogWarn)
-    B2WARNING(numLogWarn << " warnings occured.");
-  if (numLogError)
-    B2ERROR(numLogError << " errors occured.");
+  m_logConfig.setLogLevel(LogConfig::c_Info);
+
+  B2INFO("================================================================================");
+  B2INFO("Error summary: " << numLogError << " errors and " << numLogWarn << " warnings occurred.");
+
+  std::vector<LogMessage> errorLog = m_errorLog;
+  m_errorLog.clear();
+  //log in chronological order, with repetitions removed
+  std::vector<LogMessage> uniqueLog;
+  for (unsigned int i = 0; i < errorLog.size(); i++) {
+    const LogMessage& msg = errorLog[i];
+    if (find(uniqueLog.begin(), uniqueLog.end(), msg) == uniqueLog.end())
+      uniqueLog.push_back(msg);
+  }
+
+  for (unsigned int i = 0; i < uniqueLog.size(); i++) {
+    sendMessage(uniqueLog[i]);
+
+    int count = std::count(errorLog.begin(), errorLog.end(), uniqueLog[i]);
+    if (count != 1) {
+      B2INFO(" (last message occurred " << count << " times in total)");
+    }
+  }
+  B2INFO("================================================================================\n");
+
   m_logConfig = oldConfig;
 }
 
@@ -185,7 +220,6 @@ LogSystem::~LogSystem()
 {
   resetLogConnections();
 }
-
 
 void LogSystem::incMessageCounter(LogConfig::ELogLevel logLevel)
 {

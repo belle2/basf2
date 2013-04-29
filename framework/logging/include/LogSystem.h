@@ -155,6 +155,8 @@ namespace Belle2 {
     LogConfig* m_moduleLogConfig;                         /**< The current module log system configuration. */
     std::string m_moduleName;                             /**< The current module name. */
     std::map<std::string, LogConfig> m_packageLogConfigs; /**< Stores the log configuration objects for packages. */
+    bool m_printErrorSummary;                             /**< Wether to re-print errors-warnings encountered during execution at the end. */
+    std::vector<LogMessage> m_errorLog;                   /**< Save errors/warnings for summary. */
 
     int m_messageCounter[LogConfig::c_Default]; /**< Counts the number of messages sent per message level. */
 

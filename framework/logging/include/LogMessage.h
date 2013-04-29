@@ -43,9 +43,12 @@ namespace Belle2 {
     /**
      * Compares two messages.
      *
-     * @return true if the message contents are equal.
+     * @return true if the message contents (including module, .cc line etc.) are equal.
      */
     bool operator==(const LogMessage& message) const;
+
+    /** Check for inequality. */
+    bool operator!=(const LogMessage& message) const { return !(*this == message); }
 
     /**
      * Returns the log level of the message.

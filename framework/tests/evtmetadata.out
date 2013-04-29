@@ -19,4 +19,8 @@
 [WARNING] Event processing stopped by non-master module EvtMetaDataTest  { module: -global- }
 [INFO] EvtMetaDataTest::endRun()
 [INFO] EvtMetaDataTest::terminate()
-[WARNING] 1 warnings occured.
+[INFO] ================================================================================
+[INFO] Error summary: 0 errors and 1 warnings occurred.
+[WARNING] Event processing stopped by non-master module EvtMetaDataTest
+[INFO] ================================================================================
+

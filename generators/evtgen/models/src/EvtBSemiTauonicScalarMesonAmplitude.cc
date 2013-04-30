@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <cstdio>
+
 #include "EvtGenBase/EvtParticle.hh"
 #include "EvtGenBase/EvtPDL.hh"
 #include "EvtGenBase/EvtReport.hh"
@@ -30,9 +32,9 @@ void EvtBSemiTauonicScalarMesonAmplitude::CalcAmp(EvtParticle* p,
   static EvtId EM = EvtPDL::getId("e-");
   static EvtId MUM = EvtPDL::getId("mu-");
   static EvtId TAUM = EvtPDL::getId("tau-");
-  static EvtId EP = EvtPDL::getId("e+");
-  static EvtId MUP = EvtPDL::getId("mu+");
-  static EvtId TAUP = EvtPDL::getId("tau+");
+//  static EvtId EP = EvtPDL::getId("e+");
+//  static EvtId MUP = EvtPDL::getId("mu+");
+//  static EvtId TAUP = EvtPDL::getId("tau+");
 
   // calculate w and costau
 

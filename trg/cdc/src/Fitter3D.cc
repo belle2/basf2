@@ -29,6 +29,7 @@
 #include "cdc/geometry/CDCGeometryPar.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/Signal.h"
+#include "trg/trg/Link.h"
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
@@ -618,7 +619,7 @@ namespace Belle2 {
           int tSLayerId[9] = {2,16,28,40,52,10,22,34,46};
           double driftTS[9] = {999,999,999,999,999,999,999,999,999};
           TVectorD mcTS(27);
-          for( int iHits = 0; iHits < SimHits->GetEntriesFast(); iHits++){
+          for( int iHits = 0; iHits < SimHits.getEntries(); iHits++){
              CDCSimHit* aCDCSimHit = SimHits[iHits];
              TVector3 posTrack = aCDCSimHit->getPosTrack();
              int hitLayerId = aCDCSimHit->getWireID().getICLayer(); 

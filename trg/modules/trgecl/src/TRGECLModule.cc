@@ -3,10 +3,10 @@
 //---------------------------------------------------------------
 // Filename : TRGECLModule.cc
 // Section  : TRG ECL
-// Owner    : Yuuji Unno
-// Email    : yunno@post.kek.jp
+// Owner    : InSu Lee / Yuuji Unno
+// Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
 //---------------------------------------------------------------
-// Description : A trigger module for ECL
+// Description : A trigger module for TRG ECL
 //---------------------------------------------------------------
 // 1.00 : 2010/11/18 : First version
 //---------------------------------------------------------------
@@ -25,10 +25,8 @@
 //trg package headers
 #include "trg/trg/Debug.h"
 #include "trg/modules/trgecl/TRGECLModule.h"
-//#include "trg/ecl/TRGECLHit.h"
-//#include "trg/ecl/TRGECLTCHit.h"
-//#include <ecl/hitecl/ECLSimHit.h>
-//#include <ecl/geoecl/ECLGeometryPar.h>
+#include "trg/dataobjects/ecl/TRGECLDigi.h"
+#include "trg/dataobjects/ecl/TRGECLDigi0.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -97,6 +95,8 @@ namespace Belle2 {
     m_nEvent = 0 ;
     m_hitNum = 0;
     m_hitTCNum = 0;
+    StoreArray<TRGECLDigi>::registerPersistent();
+    StoreArray<TRGECLDigi0>::registerPersistent();
   }
 //
 //
@@ -108,7 +108,7 @@ namespace Belle2 {
     if (TRGDebug::level()) {
       std::cout << "TRGECLModule ... beginRun called " << std::endl;
     }
-    _ecl = TRGECL::getTRGECL();
+    _ecl = TrgEcl::getTrgEcl();
 
   }
 //
@@ -130,7 +130,6 @@ namespace Belle2 {
     //
     //
     //
-
     m_nEvent++;
     //
     //

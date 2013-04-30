@@ -13,16 +13,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/dataobjects/VXDTrueHit.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-
-
-
-
-// ROOT
-#include <TObject.h>
 #include <TVector3.h>
-#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
   /** \addtogroup dataobjects
@@ -30,17 +21,12 @@ namespace Belle2 {
     */
 
   /**
-    * Class VXDTrueHit - Position where are particle traversed the detector plane.
+    * Class VXDHit - Modified TrueHit type for testbeam studies.
     *
-    * This class is meant as helper for tracking optimization. It stores
-    * information about particle traversal in condensed form: The local
-    * coordinates where the particle traversed the detector plane as well as
-    * the momenta when the particle entered the silicon, traversed the detector
-    * plane and exited the silicon.
-    *
-    * This class holds particle hit data from geant4 simulation. As the simulated
-    * hit classes are used to generate detector response, they contain _local_
-    * information.
+    * Along with information of VXDTrueHit, this class stores data about
+    * whether the hit was created by a primary particle, the PDG code of the
+    * primary (if applicable), number of related primaries, number of related
+    * particles, and momentum of the generating particle.
     */
   class VXDHit : public VXDTrueHit {
 
@@ -83,47 +69,47 @@ namespace Belle2 {
       m_particleMomentum(0.0)
     {}
 
-    /** Returns true from hits with relation to primary particle*/
+    /** Returns true for hits with relation to primary particle*/
     bool getFromPrimary() const { return m_fromPrimary; }
 
-    /** Set whether this hit has relation to primary particle*/
+    /** Set whether this hit has relation to a primary particle */
     void setFromPrimary(int isFromPrimary) { m_fromPrimary = isFromPrimary; }
 
-    /** Returns true from hits with relation to primary particle*/
+    /** Get number of relations to primary particles */
     int getNumPrimary() const { return m_numPrimary; }
 
     /** Set whether this hit has relation to primary particle*/
     void setNumPrimary(int numPrimary) { m_numPrimary = numPrimary; }
 
-    /** Returns true from hits with relation to primary particle*/
+    /** Returns true for hits with relation to a primary particle */
     int getNumParticles() const { return m_numParticles; }
 
-    /** Set whether this hit has relation to primary particle*/
+    /** Set whether this hit has relation to a primary particle */
     void setNumParticles(int numParticles) { m_numParticles = numParticles; }
 
-    /** Returns true from hits with relation to primary particle*/
+    /** Returns true from hits with relation to a primary particle */
     int getPdg() const { return m_pdg; }
 
-    /** Set whether this hit has relation to primary particle*/
+    /** Set whether this hit has relation to primary particle */
     void setPdg(int pdg) { m_pdg = pdg; }
 
-    /** Returns true from hits with relation to primary particle*/
+    /** Returns true from hits with relation to primary particle */
     double getParticleMomentum() const { return m_particleMomentum; }
 
-    /** Set whether this hit has relation to primary particle*/
+    /** Set whether this hit has relation to a primary particle */
     void setParticleMomentum(double momentum) { m_particleMomentum = momentum; }
 
 
 
   protected:
 
-    bool m_fromPrimary;           /**< True for hits with relation to primary particle */
-    int m_pdg;           /**< pdg of first related particle */
+    bool m_fromPrimary;         /**< True for hits with relation to primary particle */
+    int m_pdg;                  /**< pdg of first related particle */
     int m_numPrimary;           /**< # of related primaries */
-    int m_numParticles;           /**< # of related particles */
-    double m_particleMomentum;           /**< # momentum of related particle */
+    int m_numParticles;         /**< # of related particles */
+    double m_particleMomentum;  /**< momentum of related particle */
 
-    ClassDef(VXDHit, 1)
+    ClassDef(VXDHit, 2)
   };
 
   /** @}*/

@@ -8,27 +8,20 @@
  **************************************************************************/
 
 #include <testbeam/vxd/modules/VXDHitModule.h>
-#include <vxd/geometry/GeoCache.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <testbeam/vxd/dataobjects/VXDHit.h>
-
 #include <generators/dataobjects/MCParticle.h>
-
-#include <boost/foreach.hpp>
-#include <cmath>
 #include <framework/datastore/RelationArray.h>
 
 
 using namespace std;
 using namespace Belle2;
-using namespace Belle2::VXD;
+using namespace Belle2::TB;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -43,10 +36,6 @@ VXDHitModule::VXDHitModule() : Module()
 {
   //Set module properties
   setDescription("Module to analyze PXD+SVD TrueHits and primary particles");
-
-  addParam("MCParticles", m_MCParticles,
-           "MCParticle collection name", string(""));
-
 }
 
 void VXDHitModule::initialize()
@@ -62,7 +51,6 @@ void VXDHitModule::beginRun()
 void VXDHitModule::event()
 {
   StoreArray<MCParticle> particles;
-  //const int nParticles = particles.getEntries();
 
   StoreArray<PXDTrueHit> pxdhits;
   StoreArray<SVDTrueHit> svdhits;
@@ -84,7 +72,6 @@ void VXDHitModule::event()
     pMomentum = double(mcs[0]->getMomentum().Mag());
     for (unsigned int j = 0; j < mcs.size(); j++) {
       if (mcs[j]->getStatus() & MCParticle::c_PrimaryParticle) {
-        //B2ERROR("PXDTrueHit "<<i<<" is from primary particle");
         isFromPrimary = true;
         nPrimary++;
       }
@@ -124,7 +111,6 @@ void VXDHitModule::event()
     pMomentum = double(mcs[0]->getMomentum().Mag());
     for (unsigned int j = 0; j < mcs.size(); j++) {
       if (mcs[j]->getStatus() & MCParticle::c_PrimaryParticle) {
-        //B2ERROR("SVDTrueHit "<<i<<" is from primary particle");
         isFromPrimary = true;
         nPrimary++;
 
@@ -152,11 +138,7 @@ void VXDHitModule::event()
     hit->setNumParticles(mcs.size());
     hit->setNumPrimary(nPrimary);
   }
-
-
 }
-
-
 
 
 void VXDHitModule::terminate()

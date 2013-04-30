@@ -12,19 +12,22 @@
 #define TEL_SENSORINFO_H
 
 #include <vxd/geometry/SensorInfoBase.h>
-#include <algorithm>
 
 namespace Belle2 {
-  /** Namespace to encapsulate code needed for simulation and reconstruction of the PXD testbeam */
+  /** Namespace to encapsulate code needed for simulation and reconstruction of VXD testbeams */
   namespace TB {
-    /** Specific implementation of SensorInfo for telescope ensors which provides additional specific information.
+    /** Specific implementation of SensorInfo for telescope sensors which provides additional specific information.
      * This implementation is mostly meant for EuTel MAPS sensors.
      */
     class SensorInfo: public VXD::SensorInfoBase {
     public:
       /** Constructor which automatically sets the SensorType */
-      SensorInfo(VxdID id = 0, float width = 0, float length = 0, float thickness = 0, int uCells = 0, int vCells = 0, float splitLength = 0, int vCells2 = 0):
-        VXD::SensorInfoBase(SensorInfo::TEL, id, width, length, thickness, uCells, vCells, 0, splitLength, vCells2) {}
+      SensorInfo(VxdID id = 0, float width = 0, float length = 0, float thickness = 0,
+                 int uCells = 0, int vCells = 0, float splitLength = 0, int vCells2 = 0):
+        VXD::SensorInfoBase(SensorInfo::TEL, id, width, length, thickness,
+                            uCells, vCells, 0, splitLength, vCells2),
+        m_integrationStart(0), m_integrationEnd(0)
+      {}
       /** Change the SensorID, useful to copy the SensorInfo from one sensor and use it for another */
       void setID(VxdID id) { m_id = id; }
 
@@ -40,12 +43,12 @@ namespace Belle2 {
       double getIntegrationEnd() const { return m_integrationEnd; }
 
     protected:
-      /** The start of the integration window, the timeframe the telescope is sensitive */
+      /** The start of the integration window, the time frame the telescope is sensitive */
       double m_integrationStart;
-      /** The end of the integration window, the timeframe the telescope is sensitive */
+      /** The end of the integration window, the time frame the telescope is sensitive */
       double m_integrationEnd;
     };
 
-  }
+  } // TB namespace
 } //Belle2 namespace
 #endif

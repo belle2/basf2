@@ -34,7 +34,7 @@ evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
 progress = register_module('Progress')
 # Load parameters from xml
 gearbox = register_module('Gearbox')
-gearbox.param('Filename', 'pxd/testbeam/TB09-Geometry.xml')
+gearbox.param('Filename', 'testbeam/pxd/TB09-Geometry.xml')
 
 # Create geometry
 geometry = register_module('Geometry')

@@ -25,8 +25,8 @@
 #include <TH2D.h>
 
 namespace Belle2 {
-  /** Namespace to encapsulate code needed for simulation and reconstruction of the PXD */
-  namespace PXD {
+  /** Namespace to encapsulate code needed for simulation and reconstruction of VXD testbeams */
+  namespace TB {
 
     /** The Telescope Digitizer/Clusterizer module. */
     class TelDigiClusterModule : public Module {
@@ -52,17 +52,21 @@ namespace Belle2 {
        * Smearing resolution in um in V direction
        **/
       float m_resolutionV;
-      /** Name of the collection for the MCParticles */
+      /** Name of MCParticles collection */
       std::string m_storeMCParticlesName;
-      /** Name of the collection for the PXDDigits */
+      /** Name of the TrueHits collection */
       std::string m_storeTrueHitsName;
+      /** name of the Clusters collection */
       std::string m_storeClustersName;
+      /** Name of the MCParticle-TrueHit relation */
       std::string m_relMCParticleTrueHitName;
+      /** Name of the Clusters-MCParticles relation */
       std::string m_relClusterMCParticleName;
+      /** Name of the Clusters-TrueHits relation */
       std::string m_relClusterTrueHitName;
 
     };//end class declaration
-  } // end namespace PXD
+  } // end namespace TB
 } // end namespace Belle2
 
 #endif // TBDigiClusterModule_H

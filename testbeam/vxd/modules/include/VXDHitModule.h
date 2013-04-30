@@ -12,15 +12,11 @@
 
 #include <framework/core/Module.h>
 
-#include <TFile.h>
-#include <TH1D.h>
-#include <TH2D.h>
-
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstruction of the VXD */
-  namespace VXD {
+  namespace TB {
 
-    /** The Telescope Digitizer/Clusterizer module. */
+    /** VXDHitModule: A module to summarize testbeam simulation. */
     class VXDHitModule : public Module {
     public:
       /** Constructor.  */
@@ -36,13 +32,10 @@ namespace Belle2 {
       virtual void terminate();
 
     protected:
-
-      /** Name of the DataStore collection for the MCParticles */
-      std::string m_MCParticles;
-
+      // No data members.
 
     };//end class declaration
-  } // end namespace VXD
+  } // end namespace TB
 } // end namespace Belle2
 
-#endif // TBDigiClusterModule_H
+#endif // VXDHITMODULE_H

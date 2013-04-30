@@ -31,7 +31,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace Belle2::PXD;
+using namespace Belle2::TB;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -66,7 +66,7 @@ void TelDigiClusterModule::initialize()
   RelationArray::registerPersistent<TelCluster, MCParticle>(m_storeClustersName, m_storeMCParticlesName);
   RelationArray::registerPersistent<TelCluster, TelTrueHit>(m_storeClustersName, m_storeTrueHitsName);
 
-  //Set names in case default was used
+  //Set names of relation arrays
   m_relMCParticleTrueHitName = DataStore::relationName(
                                  DataStore::arrayName<MCParticle>(m_storeMCParticlesName),
                                  DataStore::arrayName<TelTrueHit>(m_storeTrueHitsName)

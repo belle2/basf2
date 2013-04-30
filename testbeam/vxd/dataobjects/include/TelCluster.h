@@ -11,7 +11,7 @@
 #ifndef TELCLUSTER_H
 #define TELCLUSTER_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 #include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
@@ -19,11 +19,12 @@ namespace Belle2 {
   /** The TB Cluster class
    * This class stores all information about reconstructed TB clusters
    */
-  class TelCluster: public TObject {
+  class TelCluster: public RelationsObject {
   public:
 
     /** Default constructor for the ROOT IO. */
     TelCluster():
+      RelationsObject(),
       m_sensorID(0), m_uPosition(0), m_vPosition(0),
       m_clsCharge(0), m_seedCharge(0),
       m_clsSize(0), m_uSize(0), m_vSize(0) {}
@@ -38,7 +39,10 @@ namespace Belle2 {
      * @param uSize number of pixel columns contributing to the cluster.
      * @param vSize number of pixel rows contributing to the cluster.
      */
-    TelCluster(VxdID sensorID, float uPosition, float vPosition, float clsCharge, float seedCharge, unsigned short clsSize, unsigned short uSize, unsigned short vSize):
+    TelCluster(VxdID sensorID, float uPosition, float vPosition, float clsCharge,
+               float seedCharge, unsigned short clsSize,
+               unsigned short uSize, unsigned short vSize):
+      RelationsObject(),
       m_sensorID(sensorID), m_uPosition(uPosition), m_vPosition(vPosition),
       m_clsCharge(clsCharge), m_seedCharge(seedCharge),
       m_clsSize(clsSize), m_uSize(uSize), m_vSize(vSize) {}
@@ -93,7 +97,7 @@ namespace Belle2 {
     unsigned short m_uSize;    /**< Cluster size in pixel columns */
     unsigned short m_vSize;    /**< Cluster size in pixel rows  */
 
-    ClassDef(TelCluster, 1)
+    ClassDef(TelCluster, 2)
 
   };
 } //Belle2 namespace

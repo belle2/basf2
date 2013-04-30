@@ -3,7 +3,7 @@ Import('env')
 env['LIBS'] = ['framework',
                '$ROOT_LIBS','EvtGen','pythia8','PhotosCxxInterface.a', 'gfortran', 'HepMC',
                'TauolaCxxInterface', 'TauolaFortran', 'lhapdfdummy', 'hepmcinterface',
-               'PhotosFortran', 'EvtGenExternal', 'MathMore',
+               'PhotosFortran', 'EvtGenExternal',
                'generators_dataobjects']
 
 

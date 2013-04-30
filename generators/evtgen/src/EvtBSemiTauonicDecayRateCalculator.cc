@@ -19,9 +19,10 @@
 #include "TF2.h"
 #include "Math/WrappedTF1.h"
 #include "Math/WrappedMultiTF1.h"
-#include "Math/GSLIntegrator.h"
+//#include "Math/GSLIntegrator.h" // USABLE ON KEKCC BUT NOT ON BUILDBOT
+#include "Math/GaussIntegrator.h"
 #include "Math/AdaptiveIntegratorMultiDim.h"
-#include "Math/GSLMCIntegrator.h"
+//#include "Math/GSLMCIntegrator.h"
 
 namespace Belle2 {
 
@@ -46,7 +47,8 @@ namespace Belle2 {
     f1.SetParameter(2, Dhel);
     f1.SetParameter(3, w);
     ROOT::Math::WrappedTF1 wf1(f1);
-    ROOT::Math::GSLIntegrator ig;
+//    ROOT::Math::GSLIntegrator ig;
+    ROOT::Math::GaussIntegrator ig;
     ig.SetFunction(wf1);
     return ig.Integral(-1, 1);
   }
@@ -62,7 +64,8 @@ namespace Belle2 {
     f1.SetParameter(2, Dhel);
     f1.SetParameter(3, costau);
     ROOT::Math::WrappedTF1 wf1(f1);
-    ROOT::Math::GSLIntegrator ig;
+//    ROOT::Math::GSLIntegrator ig;
+    ROOT::Math::GaussIntegrator ig;
     ig.SetFunction(wf1);
     return ig.Integral(BSTD.wmin(), BSTD.wmax(mtau, Dhel));
   }

@@ -1,6 +1,7 @@
 #include "generators/evtgen/EvtBSemiTauonicDecayRateCalculator.h"
 #include "generators/evtgen/models/EvtBSemiTauonicHelicityAmplitudeCalculator.h"
 
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 

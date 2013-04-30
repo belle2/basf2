@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
     // dGam/dw
     std::cout << "Calculating dGam/dw ..." << std::endl;
     std::ofstream ofile1("dstar.w.dat");
-    ofile1 << "# w dgamlm dgamrm dgaml0 dgamr0 dgamlp dgamrp tot" << std::endl;
+    ofile1 << "# w dgamlm dgamrm dgaml0 dgamr0 dgamlp dgamrp total" << std::endl;
     for (double w = wmin + dw / 2.;
          w < wmax; w += dw) {
       double tot(0);
@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
     std::cout << "Calculating dGam/dcostau ..." << std::endl;
     double dcostau = (1 - (-1)) / 100.;
     std::ofstream ofilecostau1("dstar.costau.dat");
-    ofilecostau1 << "# costau dgamlm dgamrm dgaml0 dgamr0 dgamlp dgamrp tot" << std::endl;
+    ofilecostau1 << "# costau dgamlm dgamrm dgaml0 dgamr0 dgamlp dgamrp total" << std::endl;
     for (double costau = -1 + dcostau / 2.;
          costau < 1; costau += dcostau) {
       double tot(0);
@@ -168,7 +168,7 @@ int main(int argc, char* argv[])
     }
 
     std::ofstream ofilecostau2("d.costau.dat");
-    ofilecostau2 << "# costau dgaml dgamr tot" << std::endl;
+    ofilecostau2 << "# costau dgaml dgamr total" << std::endl;
     for (double costau = -1 + dcostau / 2.;
          costau < 1; costau += dcostau) {
       double tot(0);
@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
     dw = (wmax - wmin) / 20.;
     dcostau = (1 - (-1)) / 20.;
     std::ofstream ofile2d1("dstar.2d.dat");
-    ofile2d1 << "# w costau dgamlm dgamrm dgaml0 dgamr0 dgamlp dgamrp tot" << std::endl;
+    ofile2d1 << "# w costau dgamlm dgamrm dgaml0 dgamr0 dgamlp dgamrp total" << std::endl;
     for (double w = wmin + dw / 2.; w < wmax; w += dw) {
       for (double costau = -1 + dcostau / 2.; costau < 1; costau += dcostau) {
         double tot(0);
@@ -212,7 +212,7 @@ int main(int argc, char* argv[])
     dw = (wmax - wmin) / 20.;
     dcostau = (1 - (-1)) / 20.;
     std::ofstream ofile2d2("d.2d.dat");
-    ofile2d2 << "# w costau dgaml dgamr tot" << std::endl;
+    ofile2d2 << "# w costau dgaml dgamr total" << std::endl;
     for (double w = wmin + dw / 2.; w < wmax; w += dw) {
       for (double costau = -1 + dcostau / 2.; costau < 1; costau += dcostau) {
         double tot(0);

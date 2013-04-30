@@ -107,7 +107,7 @@ bool DecayDescriptor::init(const string strDecayString)
   // plus any additional particles
   rule<> _INCLUSIVE = *space_p >> strlit<>("...") >> *space_p;
   // select the following particle
-  rule<> _SELECTOR = *space_p >> chlit<>('^');
+  rule<> _SELECTOR = chlit<>('^');
 
   // forbidden character sequences for particle and tag names
   rule<> _RESERVED = _SELECTOR | chlit<>('(') | chlit<char>(')') | chlit<>('{') | chlit<>('}') | space_p | _ARROW | _CHCONJ | _INCLUSIVE;
@@ -115,22 +115,21 @@ bool DecayDescriptor::init(const string strDecayString)
   rule<> _NAME = +(anychar_p - _RESERVED);
   rule<> _TAG = chlit<>('{') >> _NAME >> chlit<>('}') >> *space_p;
   // particle on the left side (save properties)
-  rule<> _LPARTICLE = *_SELECTOR[assign_a(m_isSelected, true)] >> _NAME[assign_a(m_strName)] >> *_TAG[assign_a(m_strTag)];
+  rule<> _LPARTICLE = *space_p >> *_SELECTOR[assign_a(m_isSelected, true)] >> _NAME[assign_a(m_strName)] >> *_TAG[assign_a(m_strTag)];
   // particle on the right side (will be evaluated by daughter decay descriptor)
-  rule<> _RPARTICLE = *_SELECTOR >> _NAME >> *_TAG;
+  rule<> _RPARTICLE = *space_p >> *_SELECTOR >> _NAME >> *_TAG;
+
   // everything that can be on the right side
-  rule<> _DAUGHTER = _RPARTICLE |
-                     (*space_p >> chlit<>('(') >> _RPARTICLE >> *_CHCONJ >> _ARROW >> +_RPARTICLE >> *_INCLUSIVE >> chlit<>(')') >> *space_p);
+  //rule<> _DAUGHTER = _RPARTICLE | (*space_p >> chlit<>('(') >> _RPARTICLE >> *_CHCONJ >> _ARROW >> +_RPARTICLE >> *_INCLUSIVE >> chlit<>(')') >> *space_p);
+  rule<> _DAUGHTER = _RPARTICLE | (*space_p >> chlit<>('(') >> _RPARTICLE >> _ARROW >> +_RPARTICLE >> *_INCLUSIVE >> chlit<>(')') >> *space_p);
 
   rule<> _RIGHT = +_DAUGHTER[push_back_a(strDaughters)] >> *_INCLUSIVE[assign_a(m_isInclusive, true)];
 
-  rule<> _DECAYBASIC = _LPARTICLE >> *_CHCONJ[assign_a(m_isWithCC, true)] >> _ARROW >> _RIGHT;
-  rule<> _DECAY = _DECAYBASIC |
-                  (*space_p >> chlit<char>('(') >> _DECAYBASIC >> chlit<char>(')') >> *space_p) |
-                  _LPARTICLE;
+  //rule<> _DECAYBASIC = _LPARTICLE >> *_CHCONJ[assign_a(m_isWithCC, true)] >> _ARROW >> _RIGHT;
+  rule<> _DECAYBASIC = _LPARTICLE >> _ARROW >> _RIGHT;
+  rule<> _DECAY = _DECAYBASIC | (*space_p >> chlit<char>('(') >> _DECAYBASIC >> chlit<char>(')') >> *space_p) | _LPARTICLE;
 
   bool isParseOK = parse(strDecayString.c_str(), _DECAY).full;
-
 
   if (!isParseOK) {
     B2WARNING("Could not parse decay descriptor string! Stopped @ " << parse(strDecayString.c_str(), _DECAY).stop);

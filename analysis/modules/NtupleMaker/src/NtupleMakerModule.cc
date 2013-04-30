@@ -16,6 +16,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <cmath>
 #include <algorithm>
+#include <TParameter.h>
 using namespace std;
 using namespace Belle2;
 using namespace boost::algorithm;
@@ -59,8 +60,6 @@ void NtupleMakerModule::initialize()
   m_tree = new TTree(m_strTreeName.c_str(), m_strComment.c_str());
   m_nTrees++;
 
-  if (m_strListName.empty()) B2ERROR("No name of list with reconstructed particles provided.");
-
   int nTools = m_strTools.size();
   for (int iTool =  0; iTool < (nTools - 1); iTool = iTool + 2) {
     // Create decay descriptors with selected particles from string
@@ -73,20 +72,49 @@ void NtupleMakerModule::initialize()
     NtupleFlatTool* ntool = NtupleToolList::create(m_strTools[iTool], m_tree, m_decaydescriptors.back());
     if (ntool) m_tools.push_back(ntool);
   }
+
+  // book two variables in the data store to save the number of
+  //  candidates per event and the current candidate index
+  StoreObjPtr< TParameter<Int_t> >::registerTransient(m_strTreeName + "_nCands");
+  StoreObjPtr< TParameter<Int_t> >::registerTransient(m_strTreeName + "_iCand");
 }
 
 void NtupleMakerModule::event()
 {
-  StoreObjPtr<ParticleList> particlelist(m_strListName);
-  if (!particlelist) {
-    B2ERROR("ParticleList " << m_strListName << " not found");
+  // number of NtupleTools
+  int nTools = m_tools.size();
+
+  // Number of candidates in this event?
+  StoreObjPtr< TParameter<int> > nCands(m_strTreeName + "_nCands");
+  nCands.create();
+  nCands->SetVal(-1);
+  // candidate index?
+  StoreObjPtr< TParameter<int> > iCand(m_strTreeName + "_iCand");
+  iCand.create();
+  iCand->SetVal(-1);
+
+  // If no particle list name is specified, just call every
+  // ntuple Tool with a NULL pointer for the particle argument
+  // (useful if you want to save event information for every event)
+  if (m_strListName.empty()) {
+    for (int iTool = 0; iTool < nTools; ++iTool)
+      m_tools[iTool].eval(NULL);
+    m_tree->Fill();
     return;
   }
 
+  StoreObjPtr<ParticleList> particlelist(m_strListName);
+  if (!particlelist) {
+    B2WARNING("ParticleList " << m_strListName << " not found");
+    B2WARNING("Event not written to the ntuple!");
+    return;
+  }
+
+  nCands->SetVal(particlelist->getListSize());
   for (unsigned i = 0; i < particlelist->getListSize(); i++) {
+    iCand->SetVal(i);
     const Particle* b = particlelist->getParticle(i);
     // loop over all NtupleTools and fill the tree
-    int nTools = m_tools.size();
     for (int iTool = 0; iTool < nTools; ++iTool) {
       m_tools[iTool].eval(b);
     }

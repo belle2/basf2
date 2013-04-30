@@ -29,6 +29,10 @@ namespace Belle2 {
     int m_iRun;
     /** Event number. */
     int m_iEvent;
+    /** Number of candidates for this event. */
+    int m_nCands;
+    /** Index of the current candidate. */
+    int m_iCand;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:

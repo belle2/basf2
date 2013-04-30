@@ -12,6 +12,8 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <TBranch.h>
+#include <TParameter.h>
+#include <string>
 
 void NtupleEventMetaDataTool::setupTree()
 {
@@ -21,6 +23,8 @@ void NtupleEventMetaDataTool::setupTree()
   m_tree->Branch("exp_no", &m_iExperiment, "exp_no/I");
   m_tree->Branch("run_no", &m_iRun, "run_no/I");
   m_tree->Branch("evt_no", &m_iEvent, "evt_no/I");
+  m_tree->Branch("nCands", &m_nCands, "nCands/I");
+  m_tree->Branch("iCand", &m_iCand, "iCand/I");
 }
 
 void NtupleEventMetaDataTool::eval(const  Particle*)
@@ -35,4 +39,9 @@ void NtupleEventMetaDataTool::eval(const  Particle*)
     m_iRun = -1;
     m_iEvent = -1;
   }
+  string strTreeName(m_tree->GetName());
+  StoreObjPtr< TParameter<int> > nCands(strTreeName + "_nCands");
+  m_nCands = nCands->GetVal();
+  StoreObjPtr< TParameter<int> > iCand(strTreeName + "_iCand");
+  m_iCand = iCand->GetVal();
 }

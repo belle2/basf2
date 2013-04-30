@@ -115,7 +115,7 @@ ntuple1.param('strListName', 'B')
 # Specifiy output tools
 # decay descriptor strings ignored (parser for  not yet implemented)
 ntuple1.param('strTools', ['EventMetaData', 'B-', 'Kinematics',
-              'B+ -> (anti-D0 -> ^K- ^pi+) ^pi+'])
+              'B- -> (anti-D0 -> ^K+ ^pi-) ^pi-'])
 main.add_module(ntuple1)
 
 # ----> start processing of modules

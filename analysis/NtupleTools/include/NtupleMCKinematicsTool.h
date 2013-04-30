@@ -27,17 +27,11 @@ namespace Belle2 {
   class NtupleMCKinematicsTool : public NtupleFlatTool {
   private:
     /** Total momentum. */
-    float* m_fP;
-    /** Momentum in lab system (x component). */
-    float* m_fPx;
-    /** Momentum in lab system (y component). */
-    float* m_fPy;
-    /** Momentum in lab system (z component). */
-    float* m_fPz;
-    /** Energy in lab system. */
-    float* m_fE;
+    float* m_fTruthP;
+    /** 4-Momentum in lab system. */
+    float** m_fTruthP4;
     /** Mass. */
-    float* m_fM;
+    float* m_fTruthM;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:

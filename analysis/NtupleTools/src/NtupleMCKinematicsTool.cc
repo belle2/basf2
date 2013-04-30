@@ -16,17 +16,14 @@ void NtupleMCKinematicsTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   int nDecayProducts = strNames.size();
-  m_fP = new float[nDecayProducts];
-  m_fPx = new float[nDecayProducts];
-  m_fPy = new float[nDecayProducts];
-  m_fPz = new float[nDecayProducts];
-  m_fE = new float[nDecayProducts];
+  m_fTruthP = new float[nDecayProducts];
+  m_fTruthP4 = new float*[nDecayProducts];
+  m_fTruthM = new float[nDecayProducts];
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_tree->Branch((strNames[iProduct] + "_TruthP").c_str(), &m_fP[iProduct], (strNames[iProduct] + "_TruthP/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_TruthPx").c_str(), &m_fPx[iProduct], (strNames[iProduct] + "_TruthPx/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_TruthPy").c_str(), &m_fPy[iProduct], (strNames[iProduct] + "_TruthPy/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_TruthPz").c_str(), &m_fPz[iProduct], (strNames[iProduct] + "_TruthPz/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_TruthE").c_str(), &m_fE[iProduct], (strNames[iProduct] + "_TruthE/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_TruthP").c_str(), &m_fTruthP[iProduct], (strNames[iProduct] + "_TruthP/F").c_str());
+    m_fTruthP4[iProduct] = new float[4];
+    m_tree->Branch((strNames[iProduct] + "_TruthP4").c_str(), &m_fTruthP4[iProduct][0], (strNames[iProduct] + "_TruthP4/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_TruthM").c_str(), &m_fTruthM[iProduct], (strNames[iProduct] + "_TruthM/F").c_str());
   }
 }
 
@@ -45,12 +42,12 @@ void NtupleMCKinematicsTool::eval(const Particle* particle)
       printf("NtupleMCKinematicsTool::eval - WARNING no truth match found for this reco particle!\n");
     } else {
       const TLorentzVector mcparticle_4vec = mcparticle->get4Vector();
-      m_fP[iProduct]  = mcparticle_4vec.P();
-      m_fPx[iProduct] = mcparticle_4vec.Px();
-      m_fPy[iProduct] = mcparticle_4vec.Py();
-      m_fPz[iProduct] = mcparticle_4vec.Pz();
-      m_fE[iProduct]  = mcparticle_4vec.Energy();
-
+      m_fTruthP[iProduct]  = mcparticle_4vec.P();
+      m_fTruthP4[iProduct][0] = mcparticle_4vec.Px();
+      m_fTruthP4[iProduct][1] = mcparticle_4vec.Py();
+      m_fTruthP4[iProduct][2] = mcparticle_4vec.Pz();
+      m_fTruthP4[iProduct][3]  = mcparticle_4vec.Energy();
+      m_fTruthM[iProduct]  = mcparticle_4vec.M();
     }
   }
 }

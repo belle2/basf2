@@ -80,7 +80,7 @@ namespace Belle2 {
     bool m_useCDCHits;                                          /**< Boolean to select if CDCHits should be used*/
 
     bool m_useClusters;                                         /**< Boolean to select if PXD and SVD Clusters should be used instead of default TrueHits. */
-
+    bool m_enforceTrueHit;                                      /**< If set true only cluster hits that have a relation to a TrueHit will be included in the track candidate */
     std::vector<std::string> m_whichParticles;                  /**< List of keywords to mark what properties particles must have to get a track candidate . */
     int m_particleProperties;                                   /**< Internal encoding of m_whichParticles to avoid string comparisons */
     double m_energyCut;                                         /**< Create track candidates only for MCParticles with energy above this cut*/
@@ -91,7 +91,7 @@ namespace Belle2 {
     TMatrixDSym m_initialCov;                                      /**< The std::vector m_smearingCov will be translated into this TMatrixD*/
     int m_notEnoughtHitsCounter;                                /**< will hold number of tracks that do not have enough hits to form a track candidate (total NDF less than 5)*/
     int m_noTrueHitCounter;                                     /**< will hold number of cluster hits that do not have a corresponding true hit*/
-
+    int m_nTrackCands;                                          /**< will hold the total number of created track candidates*/
     std::string m_gfTrackCandsColName;                          /**< TrackCandidates collection name */
     int m_minimalNdf;                                           /**< Minimum number of hits per track to allow track candidate creation*/
     std::vector<int> m_fromPdgCodes;                            /**< if size() is not 0, only for particles having an ancestor (mother or mother of mother etc) with PDG codes same as in this vector a track candidate be created*/

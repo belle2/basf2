@@ -24,17 +24,15 @@ namespace Belle2 {
   class NtupleRecoStatsTool : public NtupleFlatTool {
   private:
     /** N ECL gammas */
-    int m_iNPhotons;
-    /** N ECL showers */
-    int m_iNShowers;
+    int m_iPhotons;
     /** N ECL pi0s */
-    int m_iNPi0s;
+    int m_iPi0s;
     /** N Tracks*/
-    int m_iNTracks;
+    int m_iTracks;
     /** N MCParticles*/
-    int m_iNMCParticles;
+    int m_iMCParticles;
     /** N Particles*/
-    int m_iNParticles;
+    int m_iParticles;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:

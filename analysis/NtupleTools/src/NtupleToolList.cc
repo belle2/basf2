@@ -8,6 +8,8 @@
 #include <analysis/NtupleTools/NtuplePIDTool.h>
 #include <analysis/NtupleTools/NtupleTrackTool.h>
 #include <analysis/NtupleTools/NtupleRecoStatsTool.h>
+#include <analysis/NtupleTools/NtupleDetectorStatsRecTool.h>
+#include <analysis/NtupleTools/NtupleDetectorStatsSimTool.h>
 
 using namespace Belle2;
 using namespace std;
@@ -21,7 +23,9 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strName.compare("MCHierarchy") == 0) return new NtupleMCHierarchyTool(tree, d);
   else if (strName.compare("MCKinematics") == 0) return new NtupleMCKinematicsTool(tree, d);
   else if (strName.compare("PID") == 0) return new NtuplePIDTool(tree, d);
-  else if (strName.compare("NtupleRecoStatsTool") == 0) return new NtupleRecoStatsTool(tree, d);
+  else if (strName.compare("RecoStats") == 0) return new NtupleRecoStatsTool(tree, d);
+  else if (strName.compare("DetectorStatsRec") == 0) return new NtupleDetectorStatsRecTool(tree, d);
+  else if (strName.compare("DetectorStatsSim") == 0) return new NtupleDetectorStatsSimTool(tree, d);
   B2WARNING("The specified NtupleTool is not available!");
   return NULL;
 }

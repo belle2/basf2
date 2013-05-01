@@ -18,9 +18,11 @@ void NtupleTrackTool::setupTree()
   int nDecayProducts = strNames.size();
   m_fdr = new float[nDecayProducts];
   m_fdz = new float[nDecayProducts];
+  m_fTrPval = new float[nDecayProducts];
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     m_tree->Branch((strNames[iProduct] + "_dr").c_str(), &m_fdr[iProduct], (strNames[iProduct] + "_dr/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_dz").c_str(), &m_fdz[iProduct], (strNames[iProduct] + "_dz/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_TrPval").c_str(), &m_fTrPval[iProduct], (strNames[iProduct] + "_TrPval/F").c_str());
   }
 }
 
@@ -35,5 +37,6 @@ void NtupleTrackTool::eval(const Particle* particle)
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     m_fdr[iProduct] = analysis::particleDRho(selparticles[iProduct]);
     m_fdz[iProduct] = analysis::particleDZ(selparticles[iProduct]);
+    m_fTrPval[iProduct] = selparticles[iProduct]->getPValue();
   }
 }

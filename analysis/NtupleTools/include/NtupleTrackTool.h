@@ -30,6 +30,8 @@ namespace Belle2 {
     float* m_fdr;
     /** z distance with respect to IP. */
     float* m_fdz;
+    /** Track fit Pvalue. */
+    float* m_fTrPval;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:

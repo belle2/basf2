@@ -75,6 +75,7 @@ class ShowMCParticles(Module):
 
 evtmetagen = register_module('EvtMetaGen')
 evtmetagen.param({'EvtNumList': [10000], 'RunList': [1]})
+paramloader = register_module('Gearbox')
 
 ## Register the BHWideInput module
 bhwide = register_module('BHWideInput')
@@ -100,6 +101,7 @@ showMCPart = ShowMCParticles()
 ## Create the main path and add the modules
 main = create_path()
 main.add_module(evtmetagen)
+main.add_module(paramloader)
 main.add_module(progress)
 main.add_module(bhwide)
 main.add_module(showMCPart)

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVTBSTDCALCDECAYRATE_H_INCLUDED
-#define EVTBSTDCALCDECAYRATE_H_INCLUDED
+#ifndef EVTBSEMITAUONICDECAYRATECALCULATOR_H_INCLUDED
+#define EVTBSEMITAUONICDECAYRATECALCULATOR_H_INCLUDED
 
 class EvtBSemiTauonicHelicityAmplitudeCalculator;
 

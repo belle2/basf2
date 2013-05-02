@@ -16,6 +16,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <boost/ptr_container/ptr_vector.hpp>
 
+
 namespace Belle2 {
 
   /** The DecayDescriptor stores information about
@@ -58,8 +59,6 @@ namespace Belle2 {
     DecayDescriptor();
     /** Copy ctor. */
     DecayDescriptor(const DecayDescriptor& other);
-    /** Ctor from evt.pdl particle name. */
-    DecayDescriptor(std::string strName);
     /** Return the human readable name m_strName. */
     std::string getName() {
       return m_strName;

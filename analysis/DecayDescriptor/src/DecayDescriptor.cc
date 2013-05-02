@@ -14,9 +14,7 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/spirit/include/classic.hpp>
-//#include <boost/bind.hpp>
-//#include <functional>
-#include <TParticlePDG.h>
+#include <framework/core/Environment.h>
 #include <evtgen/EvtGenBase/EvtPDL.hh>
 
 using namespace std;
@@ -31,18 +29,6 @@ DecayDescriptor::DecayDescriptor() :
   m_strName(""),
   m_strTag("default"),
   m_iPDGCode(0),
-  m_isSelected(false),
-  m_isWithCC(false),
-  m_isInclusive(false),
-  m_isFixed(false)
-{
-}
-
-DecayDescriptor::DecayDescriptor(string strName) :
-  m_daughters(),
-  m_strName(strName),
-  m_strTag("default"),
-  m_iPDGCode(EvtPDL::getLundKC(EvtPDL::getId(m_strName))),
   m_isSelected(false),
   m_isWithCC(false),
   m_isInclusive(false),
@@ -136,6 +122,11 @@ bool DecayDescriptor::init(const string strDecayString)
     return false;
   }
 
+  if (EvtPDL::entries() == 0) {
+    string strEvtPDL = Environment::Instance().getExternalsPath() + "/share/evtgen/evt.pdl";
+    EvtPDL evtpdl;
+    evtpdl.read(strEvtPDL.c_str());
+  }
   m_iPDGCode = EvtPDL::getLundKC(EvtPDL::getId(m_strName));
   B2INFO(m_strName << "   ------>   " << m_iPDGCode << " " << m_strTag << " SEL = " << m_isSelected << " CC = " << m_isWithCC << " INCL = " << m_isInclusive);
 

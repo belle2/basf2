@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Koji Hara                                                *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include "generators/evtgen/EvtBSemiTauonicDecayRateCalculator.h"
 #include "generators/evtgen/models/EvtBSemiTauonicHelicityAmplitudeCalculator.h"
 
@@ -11,12 +21,12 @@ using namespace Belle2;
 
 void usage()
 {
-  std::cout << "Usage: [-h] EvtBSTDCalcR m_B m_D* m_D m_tau m_lep rho1^2 rhoA1^2 R1(1) R2(1) aS1 aR3 m_b m_c" << std::endl;
+  std::cout << "Usage: BSTD_calc_R_2HDM_Type2 [-h] [-m m_H+] m_B m_D* m_D m_tau m_lep rho1^2 rhoA1^2 R1(1) R2(1) aS1 aR3 m_b m_c" << std::endl;
   std::cout << "Calculate R(D), R(D*), polarizations of tau and D* " << std::endl;
   std::cout << "as a function of tan(beta)/m_H+ for 2HDM Type2 using the BSTD model." << std::endl;
   std::cout << "CS2 term is neglected unless m_H+ value for CS2 term is specified by -m option." << std::endl;
   std::cout << std::endl;
-  std::cout << "The results are written in " << std::endl;
+  std::cout << "The results are written to " << std::endl;
   std::cout << "dstar.r_pol.dat, d.r_pol.dat " << std::endl;
   std::cout << "in the ASCII text format." << std::endl;
   std::cout << std::endl;

@@ -210,16 +210,13 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
 
   gParticle->setSpinType(getPythiaSpinType(hepevt_.idhep[index - 1]));
 
+  gParticle->setStatus(MCParticleGraph::GraphParticle::c_PrimaryParticle);
+
   // Z or W should be virtual
   if (hepevt_.idhep[index - 1] == 23 || hepevt_.idhep[index - 1] == 24) {
-    gParticle->setStatus(MCParticleGraph::GraphParticle::c_IsVirtual);
-  } else {
-    if (hepevt_.isthep[index - 1] == 3 || hepevt_.isthep[index - 1] == 2)
-      gParticle->setStatus(MCParticleGraph::GraphParticle::c_PrimaryParticle);
-    if (hepevt_.isthep[index - 1] == 1) {
-      gParticle->setStatus(MCParticleGraph::GraphParticle::c_PrimaryParticle);
-      gParticle->addStatus(MCParticleGraph::GraphParticle::c_StableInGenerator);
-    }
+    gParticle->addStatus(MCParticleGraph::GraphParticle::c_IsVirtual);
+  } else if (hepevt_.isthep[index - 1] == 1) {
+    gParticle->addStatus(MCParticleGraph::GraphParticle::c_StableInGenerator);
   }
   return;
 }

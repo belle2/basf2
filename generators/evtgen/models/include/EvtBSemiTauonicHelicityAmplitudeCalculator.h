@@ -49,8 +49,8 @@ public:
    *@param parentMass mass of the parent (B) meson.
    *@param DMass mass of the scalar type daughter (D) meson.
    *@param DstarMass mass of the vector type daughter (D*) meson.
-   *@param bottomMass mass of the bottom quark mass (MSbar mass)
-   *@param charmMass mass of the charm quark mass (MSbar mass? or running mass?)
+   *@param bottomMass mass of the bottom quark mass
+   *@param charmMass mass of the charm quark mass (running mass at the energy of bottom quark mass)
    * The constructor initializes the parameters of the decay.
    * The recommended values of AS1 and AR3 by authors of PRD87,034028 are 1+/-1.
    */

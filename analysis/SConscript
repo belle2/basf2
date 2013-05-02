@@ -1,6 +1,39 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'geometry', 'analysis_dataobjects', 'generators_dataobjects', 'arich_dataobjects', 'top_dataobjects',
-               'tracking_dataobjects', 'tracking', 'reconstruction_dataobjects','genfitRK', 'gfrave', '$ROOT_LIBS', 'EG', 'CLHEP']
+env['LIBS'] = [
+	    'framework', 
+	    'geometry', 
+	    'analysis_dataobjects', 
+	    'arich_dataobjects', 
+       	    'bklm_dataobjects',
+	    'cdc_dataobjects',
+       	    'ecl_dataobjects',
+       	    'eklm_dataobjects',
+	    'generators_dataobjects', 
+       	    'pxd_dataobjects',
+	    'reconstruction_dataobjects',
+      	    'svd_dataobjects',
+	    'top_dataobjects',
+	    'tracking_dataobjects', 
+      	    'vxd_dataobjects',
+	    'tracking', 
+	    'genfitRK', 
+	    'gfrave', 
+	    '$ROOT_LIBS', 
+	    'EG', 
+	    'CLHEP', 
+	    'EvtGen',
+            'pythia8',
+	    'PhotosCxxInterface.a',
+	    'gfortran',
+	    'HepMC',
+	    'TauolaCxxInterface', 
+	    'TauolaFortran', 
+	    'lhapdfdummy', 
+	    'hepmcinterface',
+	    'PhotosFortran', 
+	    'EvtGenExternal', 
+	    'Geom',
+            ]
 Return('env')
 

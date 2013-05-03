@@ -54,6 +54,7 @@ string DecayDescriptor::getNameSimple()
   erase_all(strNameSimple, "anti-");
   erase_all(strNameSimple, "+");
   erase_all(strNameSimple, "-");
+  erase_all(strNameSimple, "/");
   replace_all(strNameSimple, "*", "ST");
   return strNameSimple;
 }

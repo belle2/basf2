@@ -66,6 +66,9 @@ namespace Belle2 {
     /** If true, all primary MCParticles will be shown, regardless of wether hits are produced. */
     bool m_showAllPrimaries;
 
+    /** If true, secondary MCParticles (and hits created by them) will not be shown. */
+    bool m_hideSecondaries;
+
     /** If true, all charged primary and secondary MCParticles will be shown, regardless of wether hits are produced. */
     bool m_showCharged;
 

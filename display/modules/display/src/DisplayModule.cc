@@ -31,6 +31,7 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("Options", m_options, "Drawing options for GFTracks, a combination of ADHMPST. See EVEVisualization::setOptions or the display.py example for an explanation.", std::string("AMHT"));
   addParam("AssignHitsToPrimaries", m_assignToPrimaries, "If true, hits created by secondary particles (e.g. delta electrons) will be assigned to the original primary particle.", true);
   addParam("ShowAllPrimaries", m_showAllPrimaries, "If true, all primary MCParticles will be shown, regardless of wether hits are produced.", false);
+  addParam("HideSecondaries", m_hideSecondaries, "If true, secondary MCParticles (and hits created by them) will not be shown.", false);
   addParam("ShowCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled AssignHitsToPrimaries). May be slow.", false);
   addParam("ShowNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled AssignHitsToPrimaries). May be slow.", false);
   addParam("ShowGFTracks", m_showGFTracks, "If true, fitted GFTracks will be shown in the display.", true);
@@ -82,6 +83,7 @@ void DisplayModule::initialize()
   m_display->addParameter("Show all primaries", getParam<bool>("ShowAllPrimaries"));
   m_display->addParameter("Show all charged particles", getParam<bool>("ShowCharged"));
   m_display->addParameter("Show all neutral particles", getParam<bool>("ShowNeutrals"));
+  m_display->addParameter("Hide secondaries", getParam<bool>("HideSecondaries"));
   m_display->addParameter("Show GFTracks", getParam<bool>("ShowGFTracks"));
   m_display->addParameter("Show GFTrackCandidates", getParam<bool>("ShowGFTrackCands"));
 
@@ -106,6 +108,7 @@ void DisplayModule::event()
     B2WARNING("AssignHitsToPrimaries and ShowCharged/ShowNeutrals can not be used together!");
   }
 
+  m_visualizer->setHideSecondaries(m_hideSecondaries);
 
   //gather MC particles
   StoreArray<MCParticle> mcparticles;

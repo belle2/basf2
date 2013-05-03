@@ -675,8 +675,10 @@ void EVEVisualization::addSimHit(const EKLMStepHit* hit, const MCParticle* parti
 }
 void EVEVisualization::addSimHit(const TVector3& v, const MCParticle* particle)
 {
-  TEvePointSet* simhits = addMCParticle(particle).simhits;
-  simhits->SetNextPoint(v.x(), v.y(), v.z());
+  MCTrack* track = addMCParticle(particle);
+  if (!track)
+    return; //hide hits from this particle
+  track->simhits->SetNextPoint(v.x(), v.y(), v.z());
 }
 
 void EVEVisualization::addSimHit(const ECLHit* hit, const MCParticle* particle)
@@ -700,7 +702,7 @@ void EVEVisualization::addSimHit(const ECLHit* hit, const MCParticle* particle)
   m_eclsimhitdata->FillSlice(0, hit->getEnergyDep());
 }
 
-EVEVisualization::MCTrack& EVEVisualization::addMCParticle(const MCParticle* particle)
+EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* particle)
 {
   if (!particle) {
     if (!m_mcparticleTracks[particle].simhits) {
@@ -712,9 +714,12 @@ EVEVisualization::MCTrack& EVEVisualization::addMCParticle(const MCParticle* par
       m_mcparticleTracks[particle].simhits->SetMainTransparency(50);
       m_mcparticleTracks[particle].track = NULL;
     }
-    return m_mcparticleTracks[particle];
+    return &m_mcparticleTracks[particle];
   }
 
+  if (m_hideSecondaries and !particle->hasStatus(MCParticle::c_PrimaryParticle)) {
+    return NULL;
+  }
   if (m_assignToPrimaries) {
     while (!particle->hasStatus(MCParticle::c_PrimaryParticle) and particle->getMother())
       particle = particle->getMother();
@@ -798,7 +803,7 @@ EVEVisualization::MCTrack& EVEVisualization::addMCParticle(const MCParticle* par
     m_mcparticleTracks[particle].simhits->SetMainTransparency(50);
     m_mcparticleTracks[particle].track->AddElement(m_mcparticleTracks[particle].simhits);
   }
-  return m_mcparticleTracks[particle];
+  return &m_mcparticleTracks[particle];
 }
 
 void EVEVisualization::makeTracks()

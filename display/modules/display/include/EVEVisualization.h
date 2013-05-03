@@ -135,9 +135,10 @@ namespace Belle2 {
 
     /** Return MCTrack for given particle, add it if it doesn't exist yet.
      *
-     * If particle is NULL, a dummy MCTrack (with track=0) is created.
+     * If particle is NULL, a dummy MCTrack (with track=0) is created which can accept otherwise unassigned hits.
+     * Returns NULL if this particle and its hits shouldn't be shown.
      **/
-    MCTrack& addMCParticle(const MCParticle* particle);
+    MCTrack* addMCParticle(const MCParticle* particle);
 
     /** Create visual representation of all tracks.
      *
@@ -193,6 +194,8 @@ namespace Belle2 {
     /** If true, hits created by secondary particles (e.g. delta electrons) will be assigned to the original primary particle. */
     void setAssignToPrimaries(bool on) { m_assignToPrimaries = on; }
 
+    /** If true, secondary MCParticles (and hits created by them) will not be shown. */
+    void setHideSecondaries(bool on) { m_hideSecondaries = on; }
 
   private:
     /** Object for the energy bar visualisation. */
@@ -239,6 +242,9 @@ namespace Belle2 {
 
     /** If true, hits created by secondary particles (e.g. delta electrons) will be assigned to the original primary particle. */
     bool m_assignToPrimaries;
+
+    /** If true, secondary MCParticles (and hits created by them) will not be shown. */
+    bool m_hideSecondaries;
 
     /** map MCParticles to MCTrack (so hits can be added to the correct track). */
     std::map<const MCParticle*, MCTrack> m_mcparticleTracks;

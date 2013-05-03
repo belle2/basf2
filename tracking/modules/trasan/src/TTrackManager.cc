@@ -2288,10 +2288,10 @@ namespace Belle {
   {
 
     //...Get # for new candidate...
-    const int counter = trackCandidates->GetLast() + 1;
+    const int counter = trackCandidates.getEntries();
 
     //...New storage...
-    new(trackCandidates->AddrAt(counter)) GFTrackCand();
+    trackCandidates.appendNew();
 
     //...Helix parameters... Need to check pivot position
     //    TVector3 momentum(t.helix().momentum().x(),

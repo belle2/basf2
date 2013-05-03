@@ -16,16 +16,7 @@
 
 #include <TClonesArray.h>
 
-#include <utility>
-
 namespace Belle2 {
-  /** A wrapper class to hide unwanted TClonesArray members when using StoreArray::operator->. */
-  class ClonesArrayWrapper : public TClonesArray {
-  private:
-    /** hide TClonesArray::GetEntries() */
-    Int_t GetEntries() const { return 0; }
-  };
-
   /** Accessor to arrays stored in the data store.
    *
    *  StoreArrays (like StoreObjPtrs) are uniquely identified by their name
@@ -302,11 +293,6 @@ namespace Belle2 {
      *           getEntries() or appendNew() instead.
      */
     TClonesArray* getPtr() const { ensureCreated(); return *m_storeArray;}
-    //@{
-    /** Raw access to the underlying TClonesArray (deprecated) */
-    ClonesArrayWrapper* operator ->() const __attribute__((deprecated)) { ensureCreated(); return static_cast<ClonesArrayWrapper*>(*m_storeArray);}
-    TClonesArray& operator *() const __attribute__((deprecated)) { ensureCreated(); return **m_storeArray;}
-    //@}
 
   private:
     /** Ensure that this object is attached. */

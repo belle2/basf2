@@ -52,7 +52,7 @@ namespace Belle2 {
     //      * @param VxdID ID of sensor containing parent clusterHit(s)
     //      * @param timeStamp time of birth (only set when SVD hit, else 0).
     //      */
-    VXDTFHit(TVector3 hitPos, int passIndex, int clusterIndexU, int clusterIndexV, int clusterIndexUV, int detectorType, std::string papaSector, VxdID aVxdID, float timeStamp);
+    VXDTFHit(TVector3 hitPos, int passIndex, int clusterIndexU, int clusterIndexV, int clusterIndexUV, int detectorType, unsigned int papaSector, VxdID aVxdID, float timeStamp);
 
     bool operator==(const VXDTFHit& b) const; /**< overloaded '=='-operator for sorting algorithms */
     bool operator<(const VXDTFHit& b) const; /**< overloaded '<'-operator for sorting algorithms */
@@ -68,7 +68,8 @@ namespace Belle2 {
     int getClusterIndexV() const { return m_clusterIndexV; } /**< only set for SVDHits */
     int getClusterIndexUV() const { return m_clusterIndexUV; } /**< only set for PXDHits */
     int getDetectorType() const { return m_detectorType; } /**< returns detectorType IP=-1,PXD=0,SVD=1 */
-    std::string getSectorName() { return m_papaSector; } /**< returns name of sectors containing current hit (sectors are passDependent) */
+    unsigned int getSectorName() { return m_papaSector; } /**< returns name of sectors containing current hit (sectors are passDependent), in speed optimized int */
+    std::string getSectorString(); /**< returns name of sectors containing current hit (sectors are passDependent), in human readable string */
     const VxdID getVxdID() const { return m_VxdID; } /**< returns VxdID of sensor carrying current sector */
     float getTimeStamp() const { return m_timeStamp; } /**< set for SVDHits, for PXDHits it's 0 */
 
@@ -88,7 +89,7 @@ namespace Belle2 {
     int m_clusterIndexUV; /**< index number of intermediate class storing index of PXDCluster */
     int m_detectorType; /**< knows wheter hit is in PXD or SVD PXD = 0, SVD = 1, IP = -1 */
 
-    std::string m_papaSector; /**< name of sector containing hit */ // convert to int? is that faster? (needed very often)
+    unsigned int m_papaSector; /**< name of sector containing hit */ // convert to int? is that faster? (needed very often)
     VxdID m_VxdID; /**< VxdID of sensor containing hit */
     float m_timeStamp; /**< only filled when available (SVD), else 0  */
 

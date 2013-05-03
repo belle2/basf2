@@ -14,7 +14,6 @@
 
 #include "TObject.h"
 #include <TVector3.h>
-#include <string>
 #include "FourHitFilters.h"
 #include "VXDSector.h"
 #include <utility>
@@ -32,12 +31,12 @@ namespace Belle2 {
     TcFourHitFilters():
       FourHitFilters(),
       m_thisSector(NULL),
-      m_friendID(""),
+      m_friendID(0),
       m_deltaPtCtr(std::make_pair(0, 0)),
       m_deltaDistCircleCenterCtr(std::make_pair(0, 0)) {}
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use ThreeHitFilters when no sectormap is available */
-    TcFourHitFilters(TVector3& outer, TVector3& outerCenter, TVector3& innerCenter, TVector3& inner, VXDSector* thisSector, std::string friendID):
+    TcFourHitFilters(TVector3& outer, TVector3& outerCenter, TVector3& innerCenter, TVector3& inner, VXDSector* thisSector, unsigned int friendID):
       FourHitFilters(outer, outerCenter, innerCenter, inner),  // calls constructor of base class. Needed since base class does not use standard constructor, therefore we have to carry the hits manually into the base class
       m_thisSector(thisSector),
       m_friendID(friendID),
@@ -49,33 +48,33 @@ namespace Belle2 {
     ~TcFourHitFilters() {}
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(TVector3& outer, TVector3& outerCenter, TVector3& innerCenter, TVector3& inner, VXDSector* thisSector, std::string friendID) {
+    void resetValues(TVector3& outer, TVector3& outerCenter, TVector3& innerCenter, TVector3& inner, VXDSector* thisSector, unsigned int friendID) {
       FourHitFilters::resetValues(outer, outerCenter, innerCenter, inner); // resetValues of baseClass
       m_thisSector = thisSector;
       m_friendID = friendID;
     }
 
     /** simply check whether dpt-value is accepted by the given cutoffs (dpt= difference in transverse momentum of 2 subsets of the hits) */
-    bool checkDeltapT(std::string nameDeltapT);
+    bool checkDeltapT(int nameDeltapT);
     /** calc and return dpt-value directly (dpt= difference in transverse momentum of 2 subsets of the hits) */
     double deltapT() { return FourHitFilters::deltapT(); }
     /** returns number of accepted (.first) and neglected (.second) filter tests using deltapT */
     SuccessAndFailCounter getAcceptanceRateDeltapT() { return m_deltaPtCtr; }
 
     /** simply check whether ddist2IP-value is by the given cutoffs (ddist2IP= difference in magnitude of the points of closest approach of two circles calculated using 2 subsets of the hits) */
-    bool checkDeltaDistCircleCenter(std::string nameDeltaDistCircleCenter);
+    bool checkDeltaDistCircleCenter(int nameDeltaDistCircleCenter);
     /** calc and return ddist2IP-value directly (ddist2IP= difference in magnitude of the points of closest approach of two circles calculated using 2 subsets of the hits) */
     double deltaDistCircleCenter() { return FourHitFilters::deltaDistCircleCenter(); }
     /** returns number of accepted (.first) and neglected (.second) filter tests using deltaDistCircleCenter */
     SuccessAndFailCounter getAcceptanceRateDeltaDistCircleCenter() { return m_deltaDistCircleCenterCtr; }
 
     /** returns cutoff-values of given filter */
-    std::pair <double, double> getCutoffs(std::string aFilter);
+    std::pair <double, double> getCutoffs(int aFilter);
 
   protected:
 
     VXDSector* m_thisSector; /**< contains cutoffs for all filters available in this sector, together with the friendID the return values are unique */
-    std::string m_friendID; /**< is a key used for determine the currently needed filterSet */
+    unsigned int m_friendID; /**< is a key used for determine the currently needed filterSet */
     SuccessAndFailCounter m_deltaPtCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltapT */
     SuccessAndFailCounter m_deltaDistCircleCenterCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltaDistCircleCenter */
   }; //end class TcFourHitFilters

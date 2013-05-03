@@ -15,7 +15,6 @@
 #include "tracking/vxdCaTracking/TwoHitFilters.h"
 #include "tracking/vxdCaTracking/ThreeHitFilters.h"
 #include "tracking/vxdCaTracking/FourHitFilters.h"
-#include "tracking/vxdCaTracking/GlobalNames.h"
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <framework/gearbox/Const.h>
@@ -399,7 +398,6 @@ namespace Belle2 {
     TwoHitFilters m_twoHitFilterBox; /**< includes all filters using 2 hits */
     ThreeHitFilters m_threeHitFilterBox; /**< includes all filters using 3 hits */
     FourHitFilters m_fourHitFilterBox; /**< includes all filters using 4 hits */
-    GlobalNames m_filterNameBox;  /**< carries all names of the filters */
 
 //    float m_percentageOfFMSectorFriends;
     double m_totalLocalCoordValue; /**< for testing purposes, adds value of each local coordinate occured in the process */

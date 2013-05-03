@@ -12,12 +12,10 @@
 #ifndef SECTORFRIENDS_H
 #define SECTORFRIENDS_H
 
-#include <map>
 #include <vector>
 #include <algorithm>
-#include <string>
 
-
+#include "FilterID.h"
 #include "Cutoff.h"
 
 namespace Belle2 {
@@ -28,22 +26,22 @@ namespace Belle2 {
   class SectorFriends {
   public:
     /** constructor */
-    SectorFriends(std::string myName, std::string secName):
-      m_friendName(myName),
-      m_sectorName(secName) { }
+    SectorFriends(unsigned int myName, unsigned int secName);
+//       m_friendName(myName),
+//       m_sectorName(secName);
 
     /** setters */
-    void addValuePair(std::string cutOffType, std::pair<double, double> values); /**< adds a pair of cutoffs of defined type */
+    void addValuePair(int aFilter, std::pair<double, double> values); /**< adds a pair of cutoffs of defined type */
 
     /** getters */
-    std::pair<double, double> exportFilters(std::string cutOffType); /**< exports filters stored in member map */
-    Cutoff* getCutOff(std::string cutOffType); /**< returns chosen type of cutoff */
-    const std::vector<std::string> getSupportedCutoffs(); /**< returns list of cutoffs supported by current sector-friend-combination */
+    std::pair<double, double> exportFilters(int aFilter); /**< exports filters stored in member */
+    Cutoff* getCutOff(int aFilter); /**< returns chosen type of cutoff */
+    void getSupportedCutoffs(std::vector<int>& supportedCutoffs); /**< returns list of cutoffs supported by current sector-friend-combination */
 
   protected:
-    std::map<std::string, Belle2::Cutoff*> m_filterMap; /**< a map carrying all cutoffs stored in current sector-friend-combination */
-    std::string m_friendName; /**< the name of the sector representing this friend */
-    std::string m_sectorName; /**< the name of the sector having this friend */
+    std::vector<Cutoff*> m_filters; /**< a vector carrying all cutoffs stored in current sector-friend-combination */
+    unsigned int m_friendName; /**< the name of the sector representing this friend. Info is encoded as an int, if you want to have human readable values, you have to convert it using FullSecId */
+    unsigned int m_sectorName; /**< the name of the sector having this friend. Info is encoded as an int, if you want to have human readable values, you have to convert it using FullSecId */
   };
 
 } //Belle2 namespace

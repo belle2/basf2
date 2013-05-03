@@ -29,7 +29,7 @@
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
-
+#include "tracking/vxdCaTracking/FilterID.h"
 //genfit
 
 #include <GFTrack.h>
@@ -255,6 +255,9 @@ VXDTFModule::VXDTFModule() : Module()
 
 
   addParam("highOccupancyThreshold", m_PARAMhighOccupancyThreshold, "if there are more hit-combinations at a sensor than chosen threshhold, a special high-occupancy-mode will be used to filter more hits", int(17));
+  addParam("killBecauseOfOverlappsThreshold", m_PARAMkillBecauseOfOverlappsThreshold, "if there are more TCs overlapping than chosen threshold value, event kalman gets replaced by circleFit. If there are 10 times more than threshold value of TCs, the complete event gets aborted", int(500));
+  addParam("killEventBecauseOfSegmentsThreshold", m_PARAMkillEventBecauseOfSegmentsThreshold, "if there are more segments than threshold value, the complete event gets aborted", int(5000));
+
   addParam("tccMinLayer", m_PARAMminLayer, "determines lowest layer considered by track candidate collector", minLayer);
   addParam("tccMinState", m_PARAMminState, "determines lowest state of cells considered by track candidate collector", minState);
   addParam("omega", m_PARAMomega, "tuning parameter for the hopfield network", double(0.5));
@@ -785,20 +788,23 @@ void VXDTFModule::beginRun()
     }
     double cutoffMinValue, cutoffMaxValue;
     string aSectorName, aFriendName, aFilterName;
+
     pair<double, double> cutoff;
     BOOST_FOREACH(const GearDir & aSector, sectorList.getNodes("aSector")) {
 
       aSectorName = aSector.getString("sectorOfInterest");
+      FullSecID secID = FullSecID(aSectorName); // same as aSectorName but info stored in an int
 
       GearDir friendList(aSector, "friendList/");
 
-      B2DEBUG(1000, " > > importing sector: " << aSectorName << " including " << friendList.getNumberNodes("aFriend") << " friends. ");
+      B2DEBUG(150, " > > importing sector: " << aSectorName << " (named " << secID.getFullSecID() << " as an int) including " << friendList.getNumberNodes("aFriend") << " friends. ");
       totalFriendCounter += friendList.getNumberNodes("aFriend");
-      VXDSector* pSector = new VXDSector(aSectorName);
+      VXDSector* pSector = new VXDSector(secID.getFullSecID());
 
       BOOST_FOREACH(const GearDir & aFriend, friendList.getNodes("aFriend")) {
 
         aFriendName = aFriend.getString("FriendOfInterest");
+        FullSecID friendID = FullSecID(aFriendName); // same as aFriendName but info stored in an int
 
         GearDir filterList(aFriend, "filterList/");
 
@@ -808,140 +814,142 @@ void VXDTFModule::beginRun()
           GearDir quantiles(aFilter, "quantiles/");
           cutoffMinValue = 0., cutoffMaxValue = 0.;
           string min = "Min", max = "Max";
+          int filterID = FilterID().getFilterType(aFilterName);
+          if (filterID == FilterID::numFilters) { B2FATAL("Filter in XML-File does not exist! check FilterID-class!")}
           // now, for each filter will be checked, whether it shall be stored or not and whether the cutoffs shall be modified:
-          if (aFilterName == m_filterNameBox.nameDistance3D && newPass->distance3D.first == true) {   // first: activateDistance3D, second: tuneDistance3D
+          if (aFilterName == FilterID::nameDistance3D && newPass->distance3D.first == true) {   // first: activateDistance3D, second: tuneDistance3D
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->distance3D.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->distance3D.second);
 
-          } else if (aFilterName == m_filterNameBox.nameDistanceXY &&  newPass->distanceXY.first == true) {
+          } else if (aFilterName == FilterID::nameDistanceXY &&  newPass->distanceXY.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->distanceXY.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->distanceXY.second);
 
-          } else if (aFilterName == m_filterNameBox.nameDistanceZ &&  newPass->distanceZ.first == true) {
+          } else if (aFilterName == FilterID::nameDistanceZ &&  newPass->distanceZ.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->distanceZ.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->distanceZ.second);
 
-          } else if (aFilterName == m_filterNameBox.nameSlopeRZ &&  newPass->slopeRZ.first == true) {
+          } else if (aFilterName == FilterID::nameSlopeRZ &&  newPass->slopeRZ.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->slopeRZ.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->slopeRZ.second);
 
-          } else if (aFilterName == m_filterNameBox.nameNormedDistance3D &&  newPass->normedDistance3D.first == true) {
+          } else if (aFilterName == FilterID::nameNormedDistance3D &&  newPass->normedDistance3D.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->normedDistance3D.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->normedDistance3D.second);
 
-          } else if (aFilterName == m_filterNameBox.nameAngles3D &&  newPass->angles3D.first == true) {
+          } else if (aFilterName == FilterID::nameAngles3D &&  newPass->angles3D.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->angles3D.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->angles3D.second);
 
-          } else if (aFilterName == m_filterNameBox.nameAnglesXY &&  newPass->anglesXY.first == true) {
+          } else if (aFilterName == FilterID::nameAnglesXY &&  newPass->anglesXY.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->anglesXY.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->anglesXY.second);
 
-          } else if (aFilterName == m_filterNameBox.nameAnglesRZ &&  newPass->anglesRZ.first == true) {
+          } else if (aFilterName == FilterID::nameAnglesRZ &&  newPass->anglesRZ.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->anglesRZ.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->anglesRZ.second);
 
-          } else if (aFilterName == m_filterNameBox.namePT &&  newPass->pT.first == true) {
+          } else if (aFilterName == FilterID::namePT &&  newPass->pT.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->pT.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->pT.second);
 
-          } else if (aFilterName == m_filterNameBox.nameHelixFit &&  newPass->helixFit.first == true) {
+          } else if (aFilterName == FilterID::nameHelixFit &&  newPass->helixFit.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->helixFit.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->helixFit.second);
 
-          } else if (aFilterName == m_filterNameBox.nameDistance2IP &&  newPass->distance2IP.first == true) {
+          } else if (aFilterName == FilterID::nameDistance2IP &&  newPass->distance2IP.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->distance2IP.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->distance2IP.second);
 
-          } else if (aFilterName == m_filterNameBox.nameDeltaSlopeRZ &&  newPass->deltaSlopeRZ.first == true) {
+          } else if (aFilterName == FilterID::nameDeltaSlopeRZ &&  newPass->deltaSlopeRZ.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->deltaSlopeRZ.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->deltaSlopeRZ.second);
 
-          } else if (aFilterName == m_filterNameBox.nameDeltapT &&  newPass->deltaPt.first == true) {
+          } else if (aFilterName == FilterID::nameDeltapT &&  newPass->deltaPt.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->deltaPt.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->deltaPt.second);
 
-          } else if (aFilterName == m_filterNameBox.nameDeltaDistance2IP &&  newPass->deltaDistance2IP.first == true) {
+          } else if (aFilterName == FilterID::nameDeltaDistance2IP &&  newPass->deltaDistance2IP.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->deltaDistance2IP.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->deltaDistance2IP.second);
 
-          } else if (aFilterName == m_filterNameBox.nameAnglesHighOccupancy3D &&  newPass->anglesHighOccupancy3D.first == true) {
+          } else if (aFilterName == FilterID::nameAnglesHighOccupancy3D &&  newPass->anglesHighOccupancy3D.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->anglesHighOccupancy3D.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->anglesHighOccupancy3D.second);
 
-          } else if (aFilterName == m_filterNameBox.nameAnglesHighOccupancyXY &&  newPass->anglesHighOccupancyXY.first == true) {
+          } else if (aFilterName == FilterID::nameAnglesHighOccupancyXY &&  newPass->anglesHighOccupancyXY.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->anglesHighOccupancyXY.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->anglesHighOccupancyXY.second);
 
-          } else if (aFilterName == m_filterNameBox.nameAnglesHighOccupancyRZ &&  newPass->anglesHighOccupancyRZ.first == true) {
+          } else if (aFilterName == FilterID::nameAnglesHighOccupancyRZ &&  newPass->anglesHighOccupancyRZ.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->anglesHighOccupancyRZ.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->anglesHighOccupancyRZ.second);
 
-          } else if (aFilterName == m_filterNameBox.namePTHighOccupancy &&  newPass->pTHighOccupancy.first == true) {
+          } else if (aFilterName == FilterID::namePTHighOccupancy &&  newPass->pTHighOccupancy.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->pTHighOccupancy.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->pTHighOccupancy.second);
 
-          } else if (aFilterName == m_filterNameBox.nameHelixHighOccupancyFit &&  newPass->helixHighOccupancyFit.first == true) {
+          } else if (aFilterName == FilterID::nameHelixHighOccupancyFit &&  newPass->helixHighOccupancyFit.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->helixHighOccupancyFit.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->helixHighOccupancyFit.second);
 
-          } else if (aFilterName == m_filterNameBox.nameDistanceHighOccupancy2IP &&  newPass->distanceHighOccupancy2IP.first == true) {
+          } else if (aFilterName == FilterID::nameDistanceHighOccupancy2IP &&  newPass->distanceHighOccupancy2IP.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->distanceHighOccupancy2IP.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->distanceHighOccupancy2IP.second);
 
-          } else if (aFilterName == m_filterNameBox.nameDeltaSlopeHighOccupancyRZ &&  newPass->deltaSlopeHighOccupancyRZ.first == true) {
+          } else if (aFilterName == FilterID::nameDeltaSlopeHighOccupancyRZ &&  newPass->deltaSlopeHighOccupancyRZ.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->deltaSlopeHighOccupancyRZ.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->deltaSlopeHighOccupancyRZ.second);
 
-          } else if (aFilterName == m_filterNameBox.nameDeltapTHighOccupancy &&  newPass->deltaPtHighOccupancy.first == true) {
+          } else if (aFilterName == FilterID::nameDeltapTHighOccupancy &&  newPass->deltaPtHighOccupancy.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->deltaPtHighOccupancy.second);
             cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->deltaPtHighOccupancy.second);
 
-          } else if (aFilterName == m_filterNameBox.nameDeltaDistanceHighOccupancy2IP &&  newPass->deltaDistanceHighOccupancy2IP.first == true) {
+          } else if (aFilterName == FilterID::nameDeltaDistanceHighOccupancy2IP &&  newPass->deltaDistanceHighOccupancy2IP.first == true) {
             cutoffMinValue = getXMLValue(quantiles, min, aFilterName);
             cutoffMaxValue = getXMLValue(quantiles, max, aFilterName);
             cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->deltaDistanceHighOccupancy2IP.second);
@@ -949,19 +957,20 @@ void VXDTFModule::beginRun()
           }
 
           cutoff = make_pair(cutoffMinValue, cutoffMaxValue);
-          pSector->addCutoff(aFilterName, aFriendName, cutoff);
+          pSector->addCutoff(filterID, friendID.getFullSecID(), cutoff);
           /*      tempQuantile = make_pair("q0.01", cutoffMinValue);
            p Cutoff->addQuantile(tempQuantile);*/
         }
       }
-      newPass->sectorMap.insert(make_pair(aSectorName, pSector)); /// TODO: add only if there is at least one cutoff added (implement by autocount within pSector->addCutoff and additional .size()- memberfunction)
+      newPass->sectorMap.insert(make_pair(secID.getFullSecID(), pSector)); /// TODO: add only if there is at least one cutoff added (implement by autocount within pSector->addCutoff and additional .size()- memberfunction)
     }
 
     //generating virtual sector (represents the region of the primary vertex)
     string centerSector = "00_00_0";
-    VXDSector* pCenterSector = new VXDSector(centerSector);
-    newPass->sectorMap.insert(make_pair(centerSector, pCenterSector));
-    B2DEBUG(100, "Pass" << i << ": adding virtual centerSector with " << newPass->sectorMap.find(centerSector)->second->getFriends().size() << " friends.");
+    unsigned int centerSecID = FullSecID().getFullSecID(); // automatically produces secID of centerSector
+    VXDSector* pCenterSector = new VXDSector(centerSecID);
+    newPass->sectorMap.insert(make_pair(centerSecID, pCenterSector));
+    B2DEBUG(100, "Pass" << i << ": adding virtual centerSector with " << newPass->sectorMap.find(centerSecID)->second->getFriends().size() << " friends.");
 
     B2INFO("Pass" << i << ": there are " << newPass->sectorMap.size() << " sectors in map and a total number of " << totalFriendCounter << " friends");
 
@@ -1031,7 +1040,8 @@ void VXDTFModule::event()
 
 //   generating virtual Hit at position (0, 0, 0) - needed for virtual segment.
   TVector3 centerPosition; //(0., 0., 0.); // !!!
-  string centerSector = "00_00_0";
+//   string centerSector = "00_00_0";
+  unsigned int centerSector = FullSecID().getFullSecID(); // automatically produces secID of centerSector
   VxdID centerVxdID = VxdID(0, 0, 0); // dummy VxdID for virtual IP
   int passNumber = 0;
   BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
@@ -1084,6 +1094,7 @@ void VXDTFModule::event()
   TVector3 hitGlobal, hitLocal, transformedHitLocal, localSensorSize;
   double vSize, uSizeAtHit, uCoord, vCoord;
   string aSectorName;
+  unsigned int aSecID;
   VxdID aVxdID;
   boostClock::time_point timeStamp = boostClock::now();
   int badSectorRangeCtr = 0, aLayerID;
@@ -1117,31 +1128,27 @@ void VXDTFModule::event()
       if (aLayerID > currentPass->highestAllowedLayer) { continue; }   // skip particle if True
       if (currentPass->detectorType not_eq Const::PXD && currentPass->detectorType not_eq Const::IR) { continue; }  // PXD is included in 0 & -1
 
-      pair<string, MapOfSectors::iterator> activatedSector = searchSector4Hit(aVxdID,
-                                                             transformedHitLocal,
-                                                             localSensorSize,
-                                                             currentPass->sectorMap,
-                                                             currentPass->secConfigU,
-                                                             currentPass->secConfigV);
-      aSectorName = activatedSector.first;
+      SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID,
+                                                                  transformedHitLocal,
+                                                                  localSensorSize,
+                                                                  currentPass->sectorMap,
+                                                                  currentPass->secConfigU,
+                                                                  currentPass->secConfigV);
+//       aSectorName = FullSecID(activatedSector.first).getFullSecString();
+      aSecID = activatedSector.first;
       MapOfSectors::iterator secMapIter =  activatedSector.second;
 
-      if (aSectorName.size() > 0) {
-        testString = aSectorName.at(0);
-      } else {
-        testString = checkString4badHits;
-      }
-
-      if (testString == checkString4badHits) {
-        B2DEBUG(10, "VXDTF - event " << m_eventCounter << ": pxdhit out of sector range (setup " << currentPass->sectorSetup << ", type  " << currentPass->chosenDetectorType << "). (" << aSectorName << " does not exist) Discarding hit...");
+      if (aSecID == numeric_limits<unsigned int>::max()) {
+        B2DEBUG(10, "VXDTF - event " << m_eventCounter << ": pxdhit out of sector range (setup " << currentPass->sectorSetup << ", type  " << currentPass->chosenDetectorType << "). (" << FullSecID(activatedSector.first).getFullSecString() << " does not exist) Discarding hit...");
         badSectorRangeCtr++;
-        m_TESTERbadSensors.push_back(aSectorName);
+        m_TESTERbadSensors.push_back(FullSecID(activatedSector.first).getFullSecString());
         continue;
       }
 
-      B2DEBUG(50, " PXDCluster: with posOfHit in StoreArray: " << iPart << " is found again within secID " << aSectorName << " using sectorSetup " << currentPass->sectorSetup);
+      B2DEBUG(50, " PXDCluster: with posOfHit in StoreArray: " << iPart << " is found again within secID " << aSecID << " using sectorSetup " << currentPass->sectorSetup);
+      B2DEBUG(150, " PXDCluster: with posOfHit in StoreArray: " << iPart << " is found again within secID " << FullSecID(activatedSector.first).getFullSecString() << " using sectorSetup " << currentPass->sectorSetup);
 
-      VXDTFHit* pTFHit = new VXDTFHit(hitGlobal, passNumber, 0, 0, iPart, Const::PXD, aSectorName, aVxdID, 0.0); // no timeInfo for PXDHits
+      VXDTFHit* pTFHit = new VXDTFHit(hitGlobal, passNumber, 0, 0, iPart, Const::PXD, aSecID, aVxdID, 0.0); // no timeInfo for PXDHits
 
       currentPass->hitVector.push_back(pTFHit);
       secMapIter->second->addHit(pTFHit);
@@ -1154,7 +1161,7 @@ void VXDTFModule::event()
 
   int numOfClusterCombis = 0;
   if (m_usePXDorSVDorVXDhits not_eq 0) {   /// means: is true when at least one pass wants SVD hits
-    map<int, SensorStruct > activatedSensors;
+    map<int, SensorStruct > activatedSensors; // first: vxdID, second SensorStruct having some extra info
     typedef pair<int, SensorStruct > mapEntry;
     vector<ClusterHit> clusterHitList;
 
@@ -1186,15 +1193,15 @@ void VXDTFModule::event()
     BOOST_FOREACH(mapEntry aSensor, activatedSensors) {
       int numUclusters = aSensor.second.uClusters.size();
       int numVclusters = aSensor.second.vClusters.size();
-      B2DEBUG(100, " sensor " << aSensor.first << " has got " << numUclusters << " uClusters and " << numVclusters << " vClusters")
+      B2DEBUG(100, " sensor " << FullSecID(aSensor.first).getFullSecString() << " has got " << numUclusters << " uClusters and " << numVclusters << " vClusters")
       if (numUclusters == 0 || numVclusters == 0) {
         m_TESTERbadSectorRangeCounterForClusters++;
-        B2INFO("at event: " << m_eventCounter << " sensor " << aSensor.first << " at layer " << aSensor.second.layerID << " has got " << numUclusters << "/" << numVclusters << " u/vclusters!")
+        B2DEBUG(1, "at event: " << m_eventCounter << " sensor " << FullSecID(aSensor.first).getFullSecString() << " at layer " << aSensor.second.layerID << " has got " << numUclusters << "/" << numVclusters << " u/vclusters!")
       }
       if (numUclusters != numVclusters) {
         m_TESTERclustersPersSectorNotMatching++;
         if (m_PARAMDebugMode == true) {
-          B2INFO("at event: " << m_eventCounter << " at sensor " << aSensor.first << " at layer " << aSensor.second.layerID << " number of clusters do not match: Has got " << numUclusters << "/" << numVclusters << " u/vclusters!")
+          B2DEBUG(1, "at event: " << m_eventCounter << " at sensor " << FullSecID(aSensor.first).getFullSecString() << " at layer " << aSensor.second.layerID << " number of clusters do not match: Has got " << numUclusters << "/" << numVclusters << " u/vclusters!")
         }
       }
 
@@ -1283,31 +1290,27 @@ void VXDTFModule::event()
         if (aLayerID > currentPass->highestAllowedLayer) { continue; }   // skip particle if True
         if (currentPass->detectorType == Const::PXD) { continue; }   // SVD is included in 1 & -1, but not in 0
 
-        pair<string, MapOfSectors::iterator> activatedSector = searchSector4Hit(aVxdID,
-                                                               transformedHitLocal,
-                                                               localSensorSize,
-                                                               currentPass->sectorMap,
-                                                               currentPass->secConfigU,
-                                                               currentPass->secConfigV);
-        aSectorName = activatedSector.first;
+        SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID,
+                                                                    transformedHitLocal,
+                                                                    localSensorSize,
+                                                                    currentPass->sectorMap,
+                                                                    currentPass->secConfigU,
+                                                                    currentPass->secConfigV);
+        aSecID = activatedSector.first;
+//         aSectorName = FullSecID(activatedSector.first).getFullSecString();
         MapOfSectors::iterator secMapIter =  activatedSector.second;
 
-        if (aSectorName.size() > 0) {
-          testString = aSectorName.at(0);
-        } else {
-          testString = checkString4badHits;
-        }
-
-        if (testString == checkString4badHits)  {
-          B2DEBUG(10, "VXDTF - event " << m_eventCounter << ": svdhit out of sector range(setup " << currentPass->sectorSetup << ", type  " << currentPass->chosenDetectorType << "). (" << aSectorName << " does not exist) Discarding hit...");
+        if (aSecID == numeric_limits<unsigned int>::max())  {
+          B2DEBUG(10, "VXDTF - event " << m_eventCounter << ": svdhit out of sector range(setup " << currentPass->sectorSetup << ", type  " << currentPass->chosenDetectorType << "). (" << FullSecID(activatedSector.first).getFullSecString() << " does not exist) Discarding hit...");
           badSectorRangeCtr++;
-          m_TESTERbadSensors.push_back(aSectorName);
+          m_TESTERbadSensors.push_back(FullSecID(activatedSector.first).getFullSecString());
           continue;
         }
 
-        B2DEBUG(50, "A SVDCluster is found again within secID " << aSectorName << " using sectorSetup " << currentPass->sectorSetup);
+        B2DEBUG(50, "A SVDCluster is found again within secID " << aSecID << " using sectorSetup " << currentPass->sectorSetup);
+        B2DEBUG(150, "A SVDCluster is found again within secID " << FullSecID(activatedSector.first).getFullSecString() << " using sectorSetup " << currentPass->sectorSetup);
 
-        VXDTFHit* pTFHit = new VXDTFHit(hitGlobal, passNumber, clusterIndexU + numOfPxdClusters, clusterIndexV + numOfPxdClusters, 0, Const::SVD, aSectorName, aVxdID,  0.5 * (timeStampU + timeStampV));
+        VXDTFHit* pTFHit = new VXDTFHit(hitGlobal, passNumber, clusterIndexU + numOfPxdClusters, clusterIndexV + numOfPxdClusters, 0, Const::SVD, aSecID, aVxdID,  0.5 * (timeStampU + timeStampV));
 
         currentPass->hitVector.push_back(pTFHit);
         secMapIter->second->addHit(pTFHit);
@@ -1387,7 +1390,7 @@ void VXDTFModule::event()
   /** Section 5 - end **/
 
 
-  if (totalActiveCells > 5000) {
+  if (totalActiveCells > m_PARAMkillEventBecauseOfSegmentsThreshold) {
     B2ERROR("event " << m_eventCounter << ": total number of activated segments: " << totalActiveCells << ", termitating event!");
     m_TESTERbrokenEventsCtr++;
 
@@ -1536,7 +1539,7 @@ void VXDTFModule::event()
   /// since KF is rather slow, Kf will not be used when there are many overlapping TCs. In this case, the simplified QI-calculator will be used.
   bool allowKalman = false;
   if (m_PARAMcalcQIType == "kalman") { allowKalman = true; }
-  if (totalOverlaps > 5000) {  /// WARNING: hardcoded value!
+  if (totalOverlaps > m_PARAMkillBecauseOfOverlappsThreshold * 10) { /// WARNING: hardcoded value!
     B2ERROR("event " << m_eventCounter << ": total number of overlapping track candidates: " << totalOverlaps << ", termitating event!");
     m_TESTERbrokenEventsCtr++;
 
@@ -1545,7 +1548,7 @@ void VXDTFModule::event()
       cleanEvent(currentPass, centerSector);
     }
     return;
-  } else if (totalOverlaps > 500 && m_PARAMcalcQIType == "kalman") {  /// WARNING: hardcoded value!
+  } else if (totalOverlaps > m_PARAMkillBecauseOfOverlappsThreshold && m_PARAMcalcQIType == "kalman") {
     B2INFO("VXDTF event " << m_eventCounter << ": total number of overlapping TCs is " << totalOverlaps << " and therefore KF is too slow, will use simple QI calculation which produces worse results")
     allowKalman = false;
     m_TESTERkalmanSkipped++;
@@ -1638,7 +1641,7 @@ void VXDTFModule::event()
   B2DEBUG(1, "after Hopfield: size of tcVector: " << m_tcVector.size() << ", tcVectorOverlapped: " << m_tcVectorOverlapped.size() << " testTCVector: " << testTCs)
   if (testTCs != 0) {
     m_TESTERHopfieldLetsOverbookedTCsAliveCtr++;
-    B2WARNING("event " << m_eventCounter << ": after Hopfield there are still some overlapping TCs! restarting hopfield...")
+    B2DEBUG(1, "event " << m_eventCounter << ": after Hopfield there are still some overlapping TCs (" << testTCs << ")! restarting hopfield...")
     /// checking overlapping TCs for best subset, if there are more than 2 different TC's
     if (testTCs > 2) {
       hopfield(testTCVector, m_PARAMomega);                             /// hopfield
@@ -1691,12 +1694,13 @@ void VXDTFModule::event()
       printIndices << clusterIndex << " ";
       infoIndices << index << " ";
     }
-    B2DEBUG(10, "before startint generateGFTrackCand: generated GFTC with following hits: " << printIndices.str());
-    B2DEBUG(10, "before startint generateGFTrackCand: generated GFTC with following intermediate clusters: " << infoIndices.str());
+    B2DEBUG(10, "before starting generateGFTrackCand: generated GFTC with following hits: " << printIndices.str());
+    B2DEBUG(10, "before starting generateGFTrackCand: generated GFTC with following intermediate clusters: " << infoIndices.str());
 
     tempIndices = currentTC->getSVDHitIndices();
     totalIndices.insert(totalIndices.end(), tempIndices.begin(), tempIndices.end());
 
+    B2DEBUG(10, "before starting generateGFTrackCand: tempIndices: " << tempIndices.size() << ", totalIndices: " << totalIndices.size());
     GFTrackCand gfTC = generateGFTrackCand(currentTC, clustersOfEvent);                          /// generateGFTrackCand
 
     if (m_TESTERexpandedTestingRoutines == true) {
@@ -1873,10 +1877,10 @@ void VXDTFModule::delFalseFriends(CurrentPassData* currentPass, TVector3 primary
 
 /** ***** findTCs ***** **/
 ///Recursive CoreFunction of the Track Candidate Collector, stores every possible way starting at a Seed (VXDSegmentCell)
-void VXDTFModule::findTCs(TCsOfEvent& tcList,  VXDTFTrackCandidate* currentTC, std::string maxLayer)
+void VXDTFModule::findTCs(TCsOfEvent& tcList,  VXDTFTrackCandidate* currentTC, short int maxLayer)
 {
   VXDSegmentCell* pLastSeg = currentTC->getSegments().back(); // get last entry in segList of TC
-  if (pLastSeg->getOuterHit()->getSectorName()[0] != maxLayer) { pLastSeg->setSeed(false); }
+  if (FullSecID(pLastSeg->getOuterHit()->getSectorName()).getLayerID() != maxLayer) { pLastSeg->setSeed(false); }
 
   const std::list<VXDSegmentCell*>& neighbours = pLastSeg->getAllInnerNeighbours();
   std::list<VXDSegmentCell*>::const_iterator nbIter = neighbours.begin();
@@ -2032,15 +2036,16 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
   }
 
   stringstream printOut;
-  printOut << " weight matrix W: " << endl << endl;
-  for (int aussen = 0; aussen < numOfTCs; aussen++) {
-    for (int innen = 0; innen < numOfTCs; innen++) {
-      printOut << W(aussen, innen) << "\t";
+  if (m_PARAMDebugMode == true) {
+    printOut << " weight matrix W: " << endl << endl;
+    for (int aussen = 0; aussen < numOfTCs; aussen++) {
+      for (int innen = 0; innen < numOfTCs; innen++) {
+        printOut << W(aussen, innen) << "\t";
+      }
+      printOut << endl;
     }
     printOut << endl;
   }
-  printOut << endl;
-
   B2DEBUG(100, printOut);
 
   vector<int> sequenceVector(numOfTCs);
@@ -2120,14 +2125,14 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
   int sizeOld = allHits.size();
   allHits.sort(); allHits.unique();
   int sizeNew = allHits.size();
-  if (sizeOld != sizeNew) { B2WARNING("NN event " << m_eventCounter << ": illegal result! Overlapping TCs accepted!")}
+  if (sizeOld != sizeNew) { B2DEBUG(1, "NN event " << m_eventCounter << ": illegal result! Overlapping TCs (with " << sizeOld - sizeNew << " overlapping hits) accepted!")}
 }
 
 
 
 /** ***** searchSector4Hit ***** **/
 /// searches for sectors fitting current hit coordinates, returns blank string if nothing could be found
-pair<string, VXDTFModule::MapOfSectors::iterator> VXDTFModule::searchSector4Hit(VxdID aVxdID,
+VXDTFModule::SectorNameAndPointerPair VXDTFModule::searchSector4Hit(VxdID aVxdID,
     TVector3 localHit,
     TVector3 sensorSize,
     VXDTFModule::MapOfSectors& m_sectorMap,
@@ -2135,50 +2140,51 @@ pair<string, VXDTFModule::MapOfSectors::iterator> VXDTFModule::searchSector4Hit(
     vector<double>& vConfig)
 {
   VXDTFModule::MapOfSectors::iterator secMapIter = m_sectorMap.begin();
-  int aUniID = aVxdID.getID();
-  int aLayerID = aVxdID.getLayerNumber();
+//   int aUniID = aVxdID.getID();
+//   int aLayerID = aVxdID.getLayerNumber();
   int aSecID;
-  string aSectorName = "";
+  unsigned int aFullSecID = numeric_limits<unsigned int>::max();
 
   for (int j = 0; j != int(uConfig.size() - 1); ++j) {
     B2DEBUG(1000, "uCuts(j)*uSize: " << uConfig[j]*sensorSize[0] << " uCuts(j+1)*uSize: " << uConfig[j + 1]*sensorSize[0]);
 
-    if (localHit[0] >= (uConfig[j]*sensorSize[0] * 2) && localHit[0] <= (uConfig[j + 1]*sensorSize[0] * 2)) {
+    if (localHit[0] >= (uConfig[j]*sensorSize[0] * 2.) && localHit[0] <= (uConfig[j + 1]*sensorSize[0] * 2.)) {
       for (int k = 0; k != int(vConfig.size() - 1); ++k) {
         B2DEBUG(1000, " vCuts(k)*vSize: " << vConfig[k]*sensorSize[1] << " vCuts(k+1)*vSize: " << vConfig[k + 1]*sensorSize[1]);
 
-        if (localHit[1] >= (vConfig[k]*sensorSize[1] * 2) && localHit[1] <= (vConfig[k + 1]*sensorSize[1] * 2)) {
+        if (localHit[1] >= (vConfig[k]*sensorSize[1] * 2.) && localHit[1] <= (vConfig[k + 1]*sensorSize[1] * 2.)) {
           aSecID = k + 1 + j * (vConfig.size() - 1);
 
-          aSectorName = (boost::format("%1%0_%2%_%3%") % aLayerID % aUniID % aSecID).str();
-
-          secMapIter = m_sectorMap.find(aSectorName);
+          aFullSecID = FullSecID(aVxdID, false, aSecID).getFullSecID();
+          secMapIter = m_sectorMap.find(aFullSecID);
 
           if (secMapIter == m_sectorMap.end()) {
-            aSectorName = (boost::format("%1%1_%2%_%3%") % aLayerID % aUniID % aSecID).str();
-            secMapIter = m_sectorMap.find(aSectorName);
+            aFullSecID = FullSecID(aVxdID, true, aSecID).getFullSecID();
+            secMapIter = m_sectorMap.find(aFullSecID);
           }
 
           if (secMapIter == m_sectorMap.end()) {
-            aSectorName = (boost::format("-%1%1_%2%_%3%") % aLayerID % aVxdID.getLadderNumber() % aVxdID.getSensorNumber()).str();
+            aFullSecID = numeric_limits<unsigned int>::max();
           }
         }
       }
     }
   } //sector-searching loop
-  pair<string, VXDTFModule::MapOfSectors::iterator> result;
-  result = make_pair(aSectorName, secMapIter);
+  SectorNameAndPointerPair result;
+  result = make_pair(aFullSecID, secMapIter);
   return result;
 }
 
 
 
-bool VXDTFModule::compareSecSequence(pair<string, MapOfSectors::iterator>& lhs, pair<string, MapOfSectors::iterator>& rhs)
+bool VXDTFModule::compareSecSequence(VXDTFModule::SectorNameAndPointerPair& lhs, VXDTFModule::SectorNameAndPointerPair& rhs)
 {
-  int compareValue = lhs.first.compare(rhs.first); // if lhs.first < rhs.first -> compareValue = -1;
-  if (compareValue < 0) {
-    return true;
-  } else { return false; }
+  if (lhs.first < rhs.first) return true;
+  return false;
+//   int compareValue = lhs.first.compare(rhs.first); // if lhs.first < rhs.first -> compareValue = -1;
+//   if (compareValue < 0) {
+//     return true;
+//   } else { return false; }
 }
 
 
@@ -2187,7 +2193,7 @@ bool VXDTFModule::compareSecSequence(pair<string, MapOfSectors::iterator>& lhs, 
 /// searches for segments in given pass and returns number of discarded segments
 int VXDTFModule::segFinder(CurrentPassData* currentPass)
 {
-  string currentFriendID, oldFriendID;
+  unsigned int currentFriendID, oldFriendID;
   TVector3 currentCoords, friendCoords, currentVector, tempVector;
   bool accepted = false; // recycled return value of the filters
   int simpleSegmentQI; // considers only min and max cutoff values, but could be weighed by order of relevance
@@ -2196,15 +2202,15 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
   MapOfSectors::iterator mainSecIter;
   MapOfSectors::iterator currentFriendSecIter;
   for (secSequenceIter = currentPass->sectorSequence.begin(); secSequenceIter != currentPass->sectorSequence.end(); ++secSequenceIter) {
-    B2DEBUG(1000, "SectorSequence is called " << secSequenceIter->first);
+    B2DEBUG(200, "SectorSequence is called " << secSequenceIter->first);
     mainSecIter = secSequenceIter->second;
-    B2DEBUG(1000, " checking " << mainSecIter->second->getSecID())
-    vector<string> hisFriends = mainSecIter->second->getFriends(); // loading friends of sector
+    B2DEBUG(200, " checking " << mainSecIter->second->getSecID())
+    const vector<unsigned int> hisFriends = mainSecIter->second->getFriends(); // loading friends of sector
     int nFriends = hisFriends.size();
 
     vector<VXDTFHit*> allFriendHits;
     for (int i = 0; i < nFriends; ++i) {
-      string thisFriendSector = hisFriends[i];
+      int thisFriendSector = hisFriends[i];
       B2DEBUG(1000, " > friendSector is called: " << thisFriendSector);
       currentFriendSecIter = currentPass->sectorMap.find(thisFriendSector);
       if (currentFriendSecIter == currentPass->sectorMap.end()) {
@@ -2227,9 +2233,9 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
 
       int numOfFriendHits = allFriendHits.size();
       if (numOfFriendHits == 0 && ownHits[currentHit]->getNumberOfSegments() == 0) {
-        B2DEBUG(10, "event " << m_eventCounter << ": current Hit has no friendHits although layer is " << mainSecIter->second->getSecID()[0] << " and secID: " << ownHits[currentHit]->getSectorName())
+        B2DEBUG(10, "event " << m_eventCounter << ": current Hit has no friendHits although layer is " << FullSecID(mainSecIter->second->getSecID()).getLayerID() << " and secID: " << FullSecID(ownHits[currentHit]->getSectorName()).getFullSecString())
       }
-      B2DEBUG(50, "Sector " << mainSecIter->first << " has got " << numOfFriendHits << " hits lying among his friends! ");
+      B2DEBUG(50, "Sector " << FullSecID(mainSecIter->first).getFullSecString() << " has got " << numOfFriendHits << " hits lying among his friends! ");
       for (int friendHit = 0; friendHit < numOfFriendHits; ++friendHit) {
         simpleSegmentQI = 0;
 
@@ -2242,70 +2248,70 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
         m_twoHitFilterBox.resetValues(currentCoords, friendCoords, mainSecIter->second, currentFriendID);
 
         if (currentPass->distance3D.first == true) { // min & max!
-          accepted = m_twoHitFilterBox.checkDist3D(m_filterNameBox.nameDistance3D);
+          accepted = m_twoHitFilterBox.checkDist3D(FilterID::distance3D);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " dist3d: segment approved!")
           } else {
             B2DEBUG(150, " dist3d: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_twoHitFilterBox.getCutoffs(m_filterNameBox.nameDistance3D);
+              pair <double, double> cutoffs = m_twoHitFilterBox.getCutoffs(FilterID::distance3D);
               B2WARNING("dist3D - minCutoff: " << cutoffs.first << ", calcValue: " << m_twoHitFilterBox.calcDist3D() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " dist3d is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->distanceXY.first == true) { // min & max!
-          accepted = m_twoHitFilterBox.checkDistXY(m_filterNameBox.nameDistanceXY);
+          accepted = m_twoHitFilterBox.checkDistXY(FilterID::distanceXY);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " distxy: segment approved!")
           } else {
             B2DEBUG(150, " distxy: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_twoHitFilterBox.getCutoffs(m_filterNameBox.nameDistanceXY);
+              pair <double, double> cutoffs = m_twoHitFilterBox.getCutoffs(FilterID::distanceXY);
               B2WARNING("distxy - minCutoff: " << cutoffs.first << ", calcValue: " << m_twoHitFilterBox.calcDistXY() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " distxy is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->distanceZ.first == true) { // min & max!
-          accepted = m_twoHitFilterBox.checkDistZ(m_filterNameBox.nameDistanceZ);
+          accepted = m_twoHitFilterBox.checkDistZ(FilterID::distanceZ);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " distz: segment approved!")
           } else {
             B2DEBUG(150, " distz: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_twoHitFilterBox.getCutoffs(m_filterNameBox.nameDistanceZ);
+              pair <double, double> cutoffs = m_twoHitFilterBox.getCutoffs(FilterID::distanceZ);
               B2WARNING("distz - minCutoff: " << cutoffs.first << ", calcValue: " << m_twoHitFilterBox.calcDistZ() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " distz is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->normedDistance3D.first == true) { // max only
-          accepted = m_twoHitFilterBox.checkNormedDist3D(m_filterNameBox.nameNormedDistance3D);
+          accepted = m_twoHitFilterBox.checkNormedDist3D(FilterID::normedDistance3D);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " normeddist3d: segment approved!")
           } else {
             B2DEBUG(150, " normeddist3d: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_twoHitFilterBox.getCutoffs(m_filterNameBox.nameNormedDistance3D);
+              pair <double, double> cutoffs = m_twoHitFilterBox.getCutoffs(FilterID::normedDistance3D);
               B2WARNING("normeddist3d - minCutoff: " << cutoffs.first << ", calcValue: " << m_twoHitFilterBox.calcNormedDist3D() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " normeddist3d is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->slopeRZ.first == true) { // min & max!
-          accepted = m_twoHitFilterBox.checkSlopeRZ(m_filterNameBox.nameSlopeRZ);
+          accepted = m_twoHitFilterBox.checkSlopeRZ(FilterID::slopeRZ);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " slopeRZ: segment approved!")
           } else {
             B2DEBUG(150, " slopeRZ: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_twoHitFilterBox.getCutoffs(m_filterNameBox.nameSlopeRZ);
+              pair <double, double> cutoffs = m_twoHitFilterBox.getCutoffs(FilterID::slopeRZ);
               B2WARNING("slopeRZ - minCutoff: " << cutoffs.first << ", calcValue: " << m_twoHitFilterBox.calcSlopeRZ() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
@@ -2361,98 +2367,98 @@ bool VXDTFModule::SegFinderHighOccupancy(CurrentPassData* currentPass, NbFinderF
   bool accepted;
 
   if (currentPass->anglesHighOccupancy3D.first == true) { // min & max!
-    accepted = threeHitFilterBox.checkAngle3D(m_filterNameBox.nameAnglesHighOccupancy3D);
+    accepted = threeHitFilterBox.checkAngle3D(FilterID::anglesHighOccupancy3D);
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " anglesHighOccupancy3D: segment approved!")
     } else {
       B2DEBUG(150, " anglesHighOccupancy3D: segment discarded!")
       if (m_PARAMDebugMode == true) {
-        pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(m_filterNameBox.nameAnglesHighOccupancy3D);
+        pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::anglesHighOccupancy3D);
         B2WARNING("anglesHighOccupancy3D - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcAngle3D() << ", maxCutoff: " << cutoffs.second)
       }
     } // else segment not approved
   } else { B2DEBUG(175, " anglesHighOccupancy3D is not activated for pass: " << currentPass->sectorSetup << "!") }
 
   if (currentPass->anglesHighOccupancyXY.first == true) { // min & max!
-    accepted = threeHitFilterBox.checkAngleXY(m_filterNameBox.nameAnglesHighOccupancyXY);
+    accepted = threeHitFilterBox.checkAngleXY(FilterID::anglesHighOccupancyXY);
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " anglesHighOccupancyxy: segment approved!")
     } else {
       B2DEBUG(150, " anglesHighOccupancyxy: segment discarded!")
       if (m_PARAMDebugMode == true) {
-        pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(m_filterNameBox.nameAnglesHighOccupancyXY);
+        pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::anglesHighOccupancyXY);
         B2WARNING("anglesHighOccupancyxy - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcAngleXY() << ", maxCutoff: " << cutoffs.second)
       }
     } // else segment not approved
   } else { B2DEBUG(175, " anglesHighOccupancyxy is not activated for pass: " << currentPass->sectorSetup << "!") }
 
   if (currentPass->anglesHighOccupancyRZ.first == true) { // min & max!
-    accepted = threeHitFilterBox.checkAngleRZ(m_filterNameBox.nameAnglesHighOccupancyRZ);
+    accepted = threeHitFilterBox.checkAngleRZ(FilterID::anglesHighOccupancyRZ);
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " anglesHighOccupancyRZ: segment approved!")
     } else {
       B2DEBUG(150, " anglesHighOccupancyRZ: segment discarded!")
       if (m_PARAMDebugMode == true) {
-        pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(m_filterNameBox.nameAnglesHighOccupancyRZ);
+        pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::anglesHighOccupancyRZ);
         B2WARNING("anglesHighOccupancyRZ - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcAngleRZ() << ", maxCutoff: " << cutoffs.second)
       }
     } // else segment not approved
   } else { B2DEBUG(175, " anglesHighOccupancyRZ is not activated for pass: " << currentPass->sectorSetup << "!") }
 
   if (currentPass->distanceHighOccupancy2IP.first == true) { // max only
-    accepted = threeHitFilterBox.checkCircleDist2IP(m_filterNameBox.nameDistanceHighOccupancy2IP);
+    accepted = threeHitFilterBox.checkCircleDist2IP(FilterID::distanceHighOccupancy2IP);
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " distanceHighOccupancy2IP: segment approved!")
     } else {
       B2DEBUG(150, " distanceHighOccupancy2IP: segment discarded!")
       if (m_PARAMDebugMode == true) {
-        pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(m_filterNameBox.nameDistanceHighOccupancy2IP);
+        pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::distanceHighOccupancy2IP);
         B2WARNING("distanceHighOccupancy2IP - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcCircleDist2IP() << ", maxCutoff: " << cutoffs.second)
       }
     } // else segment not approved
   } else { B2DEBUG(175, " distanceHighOccupancy2IP is not activated for pass: " << currentPass->sectorSetup << "!") }
 
   if (currentPass->deltaSlopeHighOccupancyRZ.first == true) { // min & max!
-    accepted = threeHitFilterBox.checkDeltaSlopeRZ(m_filterNameBox.nameDeltaSlopeHighOccupancyRZ);
+    accepted = threeHitFilterBox.checkDeltaSlopeRZ(FilterID::deltaSlopeHighOccupancyRZ);
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " deltaSlopeHighOccupancyRZ: segment approved!")
     } else {
       B2DEBUG(150, " deltaSlopeHighOccupancyRZ: segment discarded!")
       if (m_PARAMDebugMode == true) {
-        pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(m_filterNameBox.nameDeltaSlopeHighOccupancyRZ);
+        pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::deltaSlopeHighOccupancyRZ);
         B2WARNING("deltaSlopeHighOccupancyRZ - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcDeltaSlopeRZ() << ", maxCutoff: " << cutoffs.second)
       }
     } // else segment not approved
   } else { B2DEBUG(175, " deltaSlopeHighOccupancyRZ is not activated for pass: " << currentPass->sectorSetup << "!") }
 
   if (currentPass->pTHighOccupancy.first == true) { // min & max!
-    accepted = threeHitFilterBox.checkPt(m_filterNameBox.namePTHighOccupancy);
+    accepted = threeHitFilterBox.checkPt(FilterID::pTHighOccupancy);
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " pTHighOccupancy: segment approved!")
     } else {
       B2DEBUG(150, " pTHighOccupancy: segment discarded!")
       if (m_PARAMDebugMode == true) {
-        pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(m_filterNameBox.namePTHighOccupancy);
+        pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::pTHighOccupancy);
         B2WARNING("pTHighOccupancy - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcPt() << ", maxCutoff: " << cutoffs.second)
       }
     } // else segment not approved
   } else { B2DEBUG(175, " pTHighOccupancy is not activated for pass: " << currentPass->sectorSetup << "!") }
 
   if (currentPass->helixHighOccupancyFit.first == true) { // min & max!
-    accepted = threeHitFilterBox.checkHelixFit(m_filterNameBox.nameHelixHighOccupancyFit);
+    accepted = threeHitFilterBox.checkHelixFit(FilterID::helixHighOccupancyFit);
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " helixHighOccupancyFit: segment approved!")
     } else {
       B2DEBUG(150, " helixHighOccupancyFit: segment discarded!")
       if (m_PARAMDebugMode == true) {
-        pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(m_filterNameBox.nameHelixHighOccupancyFit);
+        pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::helixHighOccupancyFit);
         B2WARNING("helixHighOccupancyFit - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcHelixFit() << ", maxCutoff: " << cutoffs.second)
       }
     } // else segment not approved
@@ -2472,7 +2478,7 @@ int VXDTFModule::neighbourFinder(CurrentPassData* currentPass)
 {
   bool accepted = false; // recycled return value of the filters
   int NFdiscardedSegmentsCounter = 0;
-  string  centerLayerID, currentFriendID; // not needed: outerLayerID, innerLayerID
+  unsigned int currentFriendID; // not needed: outerLayerID, innerLayerID
   TVector3 outerCoords, outerCenterCoords, centerCoords, innerCenterCoords, innerCoords, outerVector, centerVector, innerVector, outerTempVector;
   TVector3 innerTempVector, cpA/*central point of innerSegment*/, cpB/*central point of mediumSegment*/, nA/*normal vector of segment a*/, nB/*normal vector of segment b*/, intersectionAB;
   int simpleSegmentQI; // better than segmentApproved, but still digital (only min and max cutoff values), but could be weighed by order of relevance
@@ -2490,8 +2496,7 @@ int VXDTFModule::neighbourFinder(CurrentPassData* currentPass)
       outerCoords = outerSegments[thisOuterSegment]->getOuterHit()->getHitCoordinates();
       centerCoords = outerSegments[thisOuterSegment]->getInnerHit()->getHitCoordinates();
       currentFriendID = outerSegments[thisOuterSegment]->getInnerHit()->getSectorName();
-      centerLayerID = currentFriendID[0];
-      centerLayerIDNumber = boost::lexical_cast<int>(centerLayerID);
+      centerLayerIDNumber = FullSecID(currentFriendID).getLayerID();// for seed-check
 
       const vector<int>& innerSegments = outerSegments[thisOuterSegment]->getInnerHit()->getAttachedInnerCell();
       int nInnerSegments = innerSegments.size();
@@ -2504,98 +2509,98 @@ int VXDTFModule::neighbourFinder(CurrentPassData* currentPass)
         m_threeHitFilterBox.resetValues(outerCoords, centerCoords, innerCoords, mainSecIter->second, currentFriendID);
 
         if (currentPass->angles3D.first == true) { // min & max!
-          accepted = m_threeHitFilterBox.checkAngle3D(m_filterNameBox.nameAngles3D);
+          accepted = m_threeHitFilterBox.checkAngle3D(FilterID::angles3D);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " angles3D: segment approved!")
           } else {
             B2DEBUG(150, " angles3D: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(m_filterNameBox.nameAngles3D);
+              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(FilterID::angles3D);
               B2WARNING("angles3D - minCutoff: " << cutoffs.first << ", calcValue: " << m_threeHitFilterBox.calcAngle3D() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " angles3D is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->anglesXY.first == true) { // min & max!
-          accepted = m_threeHitFilterBox.checkAngleXY(m_filterNameBox.nameAnglesXY);
+          accepted = m_threeHitFilterBox.checkAngleXY(FilterID::anglesXY);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " anglesXY: segment approved!")
           } else {
             B2DEBUG(150, " anglesXY: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(m_filterNameBox.nameAnglesXY);
+              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(FilterID::anglesXY);
               B2WARNING("anglesXY - minCutoff: " << cutoffs.first << ", calcValue: " << m_threeHitFilterBox.calcAngleXY() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " anglesXY is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->anglesRZ.first == true) { // min & max!
-          accepted = m_threeHitFilterBox.checkAngleRZ(m_filterNameBox.nameAnglesRZ);
+          accepted = m_threeHitFilterBox.checkAngleRZ(FilterID::anglesRZ);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " anglesRZ: segment approved!")
           } else {
             B2DEBUG(150, " anglesRZ: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(m_filterNameBox.nameAnglesRZ);
+              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(FilterID::anglesRZ);
               B2WARNING("anglesRZ - minCutoff: " << cutoffs.first << ", calcValue: " << m_threeHitFilterBox.calcAngleRZ() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " anglesRZ is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->distance2IP.first == true) { // max only
-          accepted = m_threeHitFilterBox.checkCircleDist2IP(m_filterNameBox.nameDistance2IP);
+          accepted = m_threeHitFilterBox.checkCircleDist2IP(FilterID::distance2IP);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " distance2IP: segment approved!")
           } else {
             B2DEBUG(150, " distance2IP: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(m_filterNameBox.nameDistance2IP);
+              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(FilterID::distance2IP);
               B2WARNING("distance2IP - minCutoff: " << cutoffs.first << ", calcValue: " << m_threeHitFilterBox.calcCircleDist2IP() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " distance2IP is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->deltaSlopeRZ.first == true) { // min & max!
-          accepted = m_threeHitFilterBox.checkDeltaSlopeRZ(m_filterNameBox.nameDeltaSlopeRZ);
+          accepted = m_threeHitFilterBox.checkDeltaSlopeRZ(FilterID::deltaSlopeRZ);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " deltaSlopeRZ: segment approved!")
           } else {
             B2DEBUG(150, " deltaSlopeRZ: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(m_filterNameBox.nameDeltaSlopeRZ);
+              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(FilterID::deltaSlopeRZ);
               B2WARNING("deltaSlopeRZ - minCutoff: " << cutoffs.first << ", calcValue: " << m_threeHitFilterBox.calcDeltaSlopeRZ() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " deltaSlopeRZ is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->pT.first == true) { // min & max!
-          accepted = m_threeHitFilterBox.checkPt(m_filterNameBox.namePT);
+          accepted = m_threeHitFilterBox.checkPt(FilterID::pT);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " pT: segment approved!")
           } else {
             B2DEBUG(150, " pT: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(m_filterNameBox.namePT);
+              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(FilterID::pT);
               B2WARNING("pT - minCutoff: " << cutoffs.first << ", calcValue: " << m_threeHitFilterBox.calcPt() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " pT is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->helixFit.first == true) { // min & max!
-          accepted = m_threeHitFilterBox.checkHelixFit(m_filterNameBox.nameHelixFit);
+          accepted = m_threeHitFilterBox.checkHelixFit(FilterID::helixFit);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " helixFit: segment approved!")
           } else {
             B2DEBUG(150, " helixFit: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(m_filterNameBox.nameHelixFit);
+              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(FilterID::helixFit);
               B2WARNING("helixFit - minCutoff: " << cutoffs.first << ", calcValue: " << m_threeHitFilterBox.calcHelixFit() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
@@ -2655,28 +2660,28 @@ bool VXDTFModule::NbFinderHighOccupancy(CurrentPassData* currentPass, TcFourHitF
   bool accepted;
 
   if (currentPass->deltaDistanceHighOccupancy2IP.first == true) { // max only
-    accepted = fourHitFilterBox.checkDeltaDistCircleCenter(m_filterNameBox.nameDeltaDistanceHighOccupancy2IP);
+    accepted = fourHitFilterBox.checkDeltaDistCircleCenter(FilterID::distanceHighOccupancy2IP);
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " deltaDistanceHighOccupancy2IP: segment approved!")
     } else {
       B2DEBUG(150, " deltaDistanceHighOccupancy2IP: segment discarded!")
       if (m_PARAMDebugMode == true) {
-        pair <double, double> cutoffs = fourHitFilterBox.getCutoffs(m_filterNameBox.nameDeltaDistanceHighOccupancy2IP);
+        pair <double, double> cutoffs = fourHitFilterBox.getCutoffs(FilterID::distanceHighOccupancy2IP);
         B2WARNING("deltaDistanceHighOccupancy2IP - minCutoff: " << cutoffs.first << ", calcValue: " << fourHitFilterBox.deltaDistCircleCenter() << ", maxCutoff: " << cutoffs.second)
       }
     } // else segment not approved
   } else { B2DEBUG(175, " deltaDistanceHighOccupancy2IP is not activated for pass: " << currentPass->sectorSetup << "!") }
 
   if (currentPass->pTHighOccupancy.first == true) { // min & max!
-    accepted = fourHitFilterBox.checkDeltapT(m_filterNameBox.nameDeltapTHighOccupancy);
+    accepted = fourHitFilterBox.checkDeltapT(FilterID::deltapTHighOccupancy);
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " deltaPtHighOccupancy: segment approved!")
     } else {
       B2DEBUG(150, " deltaPtHighOccupancy: segment discarded!")
       if (m_PARAMDebugMode == true) {
-        pair <double, double> cutoffs = fourHitFilterBox.getCutoffs(m_filterNameBox.nameDeltapTHighOccupancy);
+        pair <double, double> cutoffs = fourHitFilterBox.getCutoffs(FilterID::deltapTHighOccupancy);
         B2WARNING("deltaPtHighOccupancy - minCutoff: " << cutoffs.first << ", calcValue: " << fourHitFilterBox.deltapT() << ", maxCutoff: " << cutoffs.second)
       }
     } // else segment not approved
@@ -2765,7 +2770,7 @@ int VXDTFModule::cellularAutomaton(CurrentPassData* currentPass)
 /// uses attribute "state" to find rows of compatible neighbours. State indicates length of row. This allows fast Track candidate collection
 void VXDTFModule::tcCollector(CurrentPassData* currentPass)
 {
-  int mayorLayerID, nSegmentsInSector;
+  short int mayorLayerID, nSegmentsInSector;
   int findTCsCounter = 0;
   int tccMinState = currentPass->minState;
   OperationSequenceOfActivatedSectors::iterator secSequenceIter;
@@ -2773,7 +2778,7 @@ void VXDTFModule::tcCollector(CurrentPassData* currentPass)
     B2DEBUG(100, "TCC - entering sector " << (*secSequenceIter).first);
     MapOfSectors::const_iterator sectorOfSequIter = (*secSequenceIter).second;
 
-    mayorLayerID = lexical_cast<int>(sectorOfSequIter->second->getSecID()[0]);
+    mayorLayerID = FullSecID(sectorOfSequIter->second->getSecID()).getLayerID();
     if (mayorLayerID < currentPass->minLayer) { continue; }
 
     vector<VXDSegmentCell*> segmentsOfSector = sectorOfSequIter->second->getInnerSegmentCells(); // loading segments of sector
@@ -2790,7 +2795,7 @@ void VXDTFModule::tcCollector(CurrentPassData* currentPass)
       pTC->addHits(segmentsOfSector[thisSegmentInSector]->getOuterHit());
       pTC->addHits(segmentsOfSector[thisSegmentInSector]->getInnerHit());
 
-      findTCs(currentPass->tcVector, pTC, boost::lexical_cast<string>(currentPass->highestAllowedLayer));
+      findTCs(currentPass->tcVector, pTC, currentPass->highestAllowedLayer);
       findTCsCounter++;
     }
   }
@@ -2838,13 +2843,19 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<C
 
     vector<TVector3> currentHitPositions;
     stringstream secNameOutput;
-    secNameOutput << endl << " tc " << tcCtr << " got " << numOfCurrentHits << " hits and the following secIDs: ";
+    if (m_PARAMDebugMode == true) {
+      secNameOutput << endl << " tc " << tcCtr << " got " << numOfCurrentHits << " hits and the following secIDs: ";
+    }
     BOOST_FOREACH(VXDTFHit * currentHit, currentHits) {
       currentHitPositions.push_back(currentHit->getHitCoordinates());
-      string aSecName = currentHit->getSectorName();
-      secNameOutput << aSecName << " ";
+      if (m_PARAMDebugMode == true) {
+        string aSecName = FullSecID(currentHit->getSectorName()).getFullSecString();
+        secNameOutput << aSecName << " ";
+      }
     } // used for output
-    B2DEBUG(20, " " << secNameOutput.str() << " and " <<  numOfCurrentHits << " hits");
+    if (m_PARAMDebugMode == true) {
+      B2DEBUG(20, " " << secNameOutput.str() << " and " <<  numOfCurrentHits << " hits");
+    }
 
     // feeding trackletFilterbox with hits:
     m_trackletFilterBox.resetValues(currentHitPositions);
@@ -2880,20 +2891,20 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<C
       hitA = currentHits[a]->getHitCoordinates();
       VXDSector* thisSector = currentPass->sectorMap.find(currentHits[a]->getSectorName())->second;
       hitB = currentHits[b]->getHitCoordinates();
-      string friendID = currentHits[b]->getSectorName();
+      unsigned int friendID = currentHits[b]->getSectorName();
       hitC = currentHits[c]->getHitCoordinates();
       hitD = currentHits[d]->getHitCoordinates();
 
       m_fourHitFilterBox.resetValues(hitA, hitB, hitC, hitD, thisSector, friendID);
 
       if (currentPass->deltaPt.first == true) {
-        accepted = m_fourHitFilterBox.checkDeltapT(m_filterNameBox.nameDeltapT);
+        accepted = m_fourHitFilterBox.checkDeltapT(FilterID::deltapT);
         if (accepted == false) {
           B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by deltaPt! ");
           m_TESTERtriggeredDpT++;
           (*currentTC)->setCondition(false);
           if (m_PARAMDebugMode == true) {
-            pair <double, double> cutoffs = m_fourHitFilterBox.getCutoffs(m_filterNameBox.nameDeltapT);
+            pair <double, double> cutoffs = m_fourHitFilterBox.getCutoffs(FilterID::deltapT);
             B2WARNING("deltaPt - minCutoff: " << cutoffs.first << ", calcValue: " << m_fourHitFilterBox.deltapT() << ", maxCutoff: " << cutoffs.second)
           }
           abortTC = true;
@@ -2902,13 +2913,13 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<C
         B2DEBUG(20, " TCC filter deltaPt approved TC " << tcCtr);
       }
       if (currentPass->deltaDistance2IP.first == true) {
-        accepted = m_fourHitFilterBox.checkDeltaDistCircleCenter(m_filterNameBox.nameDeltaDistance2IP);
+        accepted = m_fourHitFilterBox.checkDeltaDistCircleCenter(FilterID::deltaDistance2IP);
         if (accepted == false) {
           B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by deltaDistance2IP! ");
           m_TESTERtriggeredDD2IP++;
           (*currentTC)->setCondition(false);
           if (m_PARAMDebugMode == true) {
-            pair <double, double> cutoffs = m_fourHitFilterBox.getCutoffs(m_filterNameBox.nameDeltaDistance2IP);
+            pair <double, double> cutoffs = m_fourHitFilterBox.getCutoffs(FilterID::deltaDistance2IP);
             B2WARNING("deltaDistance2IP - minCutoff: " << cutoffs.first << ", calcValue: " << m_fourHitFilterBox.deltaDistCircleCenter() << ", maxCutoff: " << cutoffs.second)
           }
           abortTC = true;
@@ -2965,7 +2976,7 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<C
     stringstream secNameOutput;
     secNameOutput << endl << "after filtering virtual entries: tc " << numTC << " got " << numOfHits << " hits and the following secIDs: ";
     BOOST_FOREACH(VXDTFHit * currentHit, currentHits) { // now we are informing each cluster which TC is using it
-      string aSecName = currentHit->getSectorName();
+      unsigned int aSecName = currentHit->getSectorName();
       secNameOutput << aSecName << " ";
       if (currentHit->getDetectorType() == Const::PXD) {   // PXD
         clustersOfEvent[currentHit->getClusterIndexUV()].addTrackCandidate(currentTC);
@@ -3383,12 +3394,11 @@ int VXDTFModule::cleanOverlappingSet(TCsOfEvent& tcVector)
 
 
 /** cleaning part **/
-void VXDTFModule::cleanEvent(CurrentPassData* currentPass, string centerSector)
+void VXDTFModule::cleanEvent(CurrentPassData* currentPass, unsigned int centerSector)
 {
 
   // sectors stay alive, therefore only reset!
-  typedef pair<string, MapOfSectors::iterator> secEntry;
-  BOOST_FOREACH(secEntry & aSector, currentPass->sectorSequence) {
+  BOOST_FOREACH(SectorNameAndPointerPair & aSector, currentPass->sectorSequence) {
     aSector.second->second->resetSector();
   }
   currentPass->sectorMap.find(centerSector)->second->resetSector(); // doing the same for the virtual sector which is not in the operation sequence

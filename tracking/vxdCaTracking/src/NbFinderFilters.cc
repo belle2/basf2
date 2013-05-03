@@ -15,7 +15,7 @@ using namespace std;
 using namespace Belle2;
 
 
-bool NbFinderFilters::checkAngle3D(std::string nameAngle3D)
+bool NbFinderFilters::checkAngle3D(int nameAngle3D)
 {
   Cutoff* pCutoff = m_thisSector->getCutoff(nameAngle3D, m_friendID);
   if (pCutoff != NULL) {
@@ -30,7 +30,7 @@ bool NbFinderFilters::checkAngle3D(std::string nameAngle3D)
 }
 
 
-bool NbFinderFilters::checkAngleXY(std::string nameAngleXY)
+bool NbFinderFilters::checkAngleXY(int nameAngleXY)
 {
   Cutoff* pCutoff = m_thisSector->getCutoff(nameAngleXY, m_friendID);
   if (pCutoff != NULL) {
@@ -45,7 +45,7 @@ bool NbFinderFilters::checkAngleXY(std::string nameAngleXY)
 }
 
 
-bool NbFinderFilters::checkAngleRZ(std::string nameAngleRZ)
+bool NbFinderFilters::checkAngleRZ(int nameAngleRZ)
 {
   Cutoff* pCutoff = m_thisSector->getCutoff(nameAngleRZ, m_friendID);
   if (pCutoff != NULL) {
@@ -60,7 +60,7 @@ bool NbFinderFilters::checkAngleRZ(std::string nameAngleRZ)
 }
 
 
-bool NbFinderFilters::checkCircleDist2IP(std::string nameCircleDist2IP)
+bool NbFinderFilters::checkCircleDist2IP(int nameCircleDist2IP)
 {
   Cutoff* pCutoff = m_thisSector->getCutoff(nameCircleDist2IP, m_friendID);
   if (pCutoff != NULL) {
@@ -75,7 +75,7 @@ bool NbFinderFilters::checkCircleDist2IP(std::string nameCircleDist2IP)
 }
 
 
-bool NbFinderFilters::checkDeltaSlopeRZ(std::string nameDeltaSlopeRZ)
+bool NbFinderFilters::checkDeltaSlopeRZ(int nameDeltaSlopeRZ)
 {
   Cutoff* pCutoff = m_thisSector->getCutoff(nameDeltaSlopeRZ, m_friendID);
   if (pCutoff != NULL) {
@@ -90,7 +90,7 @@ bool NbFinderFilters::checkDeltaSlopeRZ(std::string nameDeltaSlopeRZ)
 }
 
 
-bool NbFinderFilters::checkPt(std::string namePt)
+bool NbFinderFilters::checkPt(int namePt)
 {
   Cutoff* pCutoff = m_thisSector->getCutoff(namePt, m_friendID);
   if (pCutoff != NULL) {
@@ -105,7 +105,7 @@ bool NbFinderFilters::checkPt(std::string namePt)
 }
 
 
-bool NbFinderFilters::checkHelixFit(std::string nameHelixFit)
+bool NbFinderFilters::checkHelixFit(int nameHelixFit)
 {
   Cutoff* pCutoff = m_thisSector->getCutoff(nameHelixFit, m_friendID);
   if (pCutoff != NULL) {
@@ -120,7 +120,7 @@ bool NbFinderFilters::checkHelixFit(std::string nameHelixFit)
 }
 
 
-pair <double, double> NbFinderFilters::getCutoffs(string aFilter)
+pair <double, double> NbFinderFilters::getCutoffs(int aFilter)
 {
   Cutoff* pCutoff = m_thisSector->getCutoff(aFilter, m_friendID);
   if (pCutoff != NULL) return make_pair(pCutoff->getMinValue(), pCutoff->getMaxValue());

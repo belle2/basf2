@@ -15,7 +15,7 @@ using namespace std;
 using namespace Belle2;
 
 
-bool TcFourHitFilters::checkDeltapT(string nameDeltapT)
+bool TcFourHitFilters::checkDeltapT(int nameDeltapT)
 {
   Cutoff* pCutoff = m_thisSector->getCutoff(nameDeltapT, m_friendID);
   if (pCutoff != NULL) {
@@ -30,7 +30,7 @@ bool TcFourHitFilters::checkDeltapT(string nameDeltapT)
 }
 
 
-bool TcFourHitFilters::checkDeltaDistCircleCenter(string nameDeltaDistCircleCenter)
+bool TcFourHitFilters::checkDeltaDistCircleCenter(int nameDeltaDistCircleCenter)
 {
   Cutoff* pCutoff = m_thisSector->getCutoff(nameDeltaDistCircleCenter, m_friendID);
   if (pCutoff != NULL) {
@@ -45,7 +45,7 @@ bool TcFourHitFilters::checkDeltaDistCircleCenter(string nameDeltaDistCircleCent
 }
 
 
-pair <double, double> TcFourHitFilters::getCutoffs(string aFilter)
+pair <double, double> TcFourHitFilters::getCutoffs(int aFilter)
 {
   Cutoff* pCutoff = m_thisSector->getCutoff(aFilter, m_friendID);
   if (pCutoff != NULL) return make_pair(pCutoff->getMinValue(), pCutoff->getMaxValue());

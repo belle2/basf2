@@ -31,12 +31,12 @@ namespace Belle2 {
    **/
   class VXDSector { /// depends of VXTFHit, SectorFriends, Cutoff
   public:
-    typedef std::map<std::string, SectorFriends> FriendMap; //key is Name of friedSector
+    typedef std::map<unsigned int, SectorFriends> FriendMap; //key is Name of friedSector
 //     typedef std::map<std::string, Cutoff*> ScopeMap; // key is scope of cutoff
 //     typedef std::map<std::string, ScopeMap*> CutoffTypeMap; // key is type of cutoff
 
     /** constructor */
-    VXDSector(std::string secID): m_sectorID(secID) { m_friends.clear(); } // default values
+    VXDSector(unsigned int secID): m_sectorID(secID) { m_friends.clear(); } // default values
 
     bool operator<(const VXDSector& b)  const { return getSecID() < b.getSecID(); } /**< overloaded '<'-operator for sorting algorithms */
     bool operator==(const VXDSector& b) const { return getSecID() == b.getSecID(); } /**< overloaded '=='-operator for sorting algorithms */
@@ -45,10 +45,10 @@ namespace Belle2 {
     void addHit(VXDTFHit* newSpacePoint);
 
     /** setter - addFriend adds friends to current sector. Friends are compatible sectors defined by the currently loaded sectorMap */
-    void addFriend(std::string newSector);
+    void addFriend(int newSector);
 
     /** setter - addCutoff adds a pair of Min and Max-values to current sector. Values depends on sectorMap and can be identified by cutoffType and friendName */
-    void addCutoff(std::string cutOffType, std::string friendName, std::pair<double, double> values);
+    void addCutoff(int cutOffType, unsigned int friendName, std::pair<double, double> values);
 
     /** setter - addInnerSegmentCell adds a VXDSegmentCell to member vector carrying inner Cells. 'inner' means, that these Cells are connected with sectors of inner layers. */
     void addInnerSegmentCell(VXDSegmentCell* newSegment);
@@ -57,33 +57,33 @@ namespace Belle2 {
     void addOuterSegmentCell(VXDSegmentCell* newSegment);
 
     /** getter - getSecID returns the ID of the sector (for definition of secID, see m_sectorID). */
-    const std::string getSecID() const { return m_sectorID; }
+    unsigned int getSecID() const { return m_sectorID; }
 
     /** getter - returns vector of Hits lying at current sector */
     const std::vector<VXDTFHit*>& getHits() const { return m_hits; }
 
     /** getter - returns vector of addresses of friends stored in friendMap */
-    const std::vector<std::string>& getFriends() const { return m_friends; } // TODO long term: replace by vector of iterators for that map (faster)
+    const std::vector<unsigned int>& getFriends() const { return m_friends; } // TODO long term: replace by vector of iterators for that map (faster)
 
     /** getter - get vector of inner segmentCells */
-    const std::vector<VXDSegmentCell*>& getInnerSegmentCells() { return m_innerSegmentCells; }
+    const std::vector<VXDSegmentCell*>& getInnerSegmentCells() const { return m_innerSegmentCells; }
 
     /** getter - get vector of outer segmentCells */
     const std::vector<VXDSegmentCell*>& getOuterSegmentCells() { return m_outerSegmentCells; }
 
     /** getter - returns vector of Filter-Cutoff-types currently stored in the sector */
-    const std::vector<std::string> getSupportedCutoffs(std::string aFriend);
+    const std::vector<int> getSupportedCutoffs(unsigned int aFriend);
 
     /** getter - return the cutoff. To get it, you have to know which friendSector and which CutoffType you want to have */
-    Cutoff* getCutoff(std::string cutOffType, std::string aFriend);
+    Cutoff* getCutoff(int cutOffType, unsigned int aFriend);
 
     /** resetSector allows to delete all event-wise information (e.g. hits and segmentCells), but keeps longterm information like friends and cutoffs */
     void resetSector();
 
   protected:
-    std::string m_sectorID; /**< secID allows identification of sector. Current definition AB_C_D, A: layerNumber(1-6), B: subLayerNumber(0,1)-defines whether sector has friends on same layer (=1) or not (=0), C:uniID, D: sectorID on sensor (0-X) */
+    unsigned int m_sectorID; /**< secID allows identification of sector. Current definition ABCD, A: layerNumber(1-6), B: subLayerNumber(0,1)-defines whether sector has friends on same layer (=1) or not (=0), C:uniID, D: sectorID on sensor (0-X), whole info stored in an int, can be converted to human readable code by using FullSecID-class */
 
-    std::vector<std::string> m_friends; /**< vector of addresses of compatible sectors (where neighbouring hits can be retrieved) */
+    std::vector<unsigned int> m_friends; /**< vector of addresses of compatible sectors (where neighbouring hits can be retrieved) */
     std::vector<VXDTFHit*> m_hits; /**< vector of hits lying on current sector area */
     std::vector<VXDSegmentCell*> m_innerSegmentCells; /**< vector of VXDSegmentCells connected to this sector pointing toward the IP */
     std::vector<VXDSegmentCell*> m_outerSegmentCells; /**< vector of VXDSegmentCells connected to this sector pointing away from the IP */

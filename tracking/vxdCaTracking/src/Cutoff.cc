@@ -12,5 +12,3 @@
 
 using namespace std;
 using namespace Belle2;
-
-void Cutoff::addQuantile(std::pair<std::string, double> newQuantile) { m_quantiles.push_back(newQuantile); }

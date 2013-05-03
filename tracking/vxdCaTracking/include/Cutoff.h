@@ -26,28 +26,29 @@ namespace Belle2 {
   class Cutoff {
   public:
     /** constructor **/
-    Cutoff(std::string type, std::pair<double, double> values):
+    Cutoff(int type, std::pair<double, double> values):
       m_type(type),
       m_min(values.first),
       m_max(values.second) {}
 
     /** getter **/
-    const std::string getType() { return m_type; } /**< returns type of cutoff */
+    int getType() { return m_type; } /**< returns type of cutoff */
+    const std::string getTypeString(); /// TODO
     double getMinValue() { return m_min; } /**< returns minValue of cutoff */
     double getMaxValue() { return m_max; } /**< returns maxValue of cutoff */
-    const std::vector< std::pair<std::string, double> > getQuantiles() { return m_quantiles; } /**< returns quantiles (extended version of min- and max-value, currently not used ) */
+//     const std::vector< std::pair<std::string, double> > getQuantiles() { return m_quantiles; } /**< returns quantiles (extended version of min- and max-value, currently not used ) */
 
     /** setter **/
     void addValuePair(double minValue, double maxValue) { m_min = minValue; m_max = maxValue; } /**< add a pair of <min, max> */
-    void addQuantile(std::pair<std::string, double> newQuantile); /**< add a quantile (currently not used) */
+//     void addQuantile(std::pair<std::string, double> newQuantile); /**< add a quantile (currently not used) */
 
   protected:
-    std::string m_type; /**< defines type of cutoff */
+    int m_type; /**< defines type of cutoff, can be converted to human readable value using Converter-Class (used by getTypeString-member-function) */
 
     double m_min; /**< min value */
     double m_max; /**< max value */
 
-    std::vector<std::pair<std::string, double> > m_quantiles; /**< extended version of only min and maxValue (quantiles) */
+//     std::vector<std::pair<std::string, double> > m_quantiles; /**< extended version of only min and maxValue (quantiles) */
   };
 
 

@@ -15,7 +15,6 @@
 
 #include "TObject.h"
 #include <TVector3.h>
-#include <string>
 #include <utility>
 #include "ThreeHitFilters.h"
 #include "VXDSector.h"
@@ -33,7 +32,7 @@ namespace Belle2 {
     NbFinderFilters():
       ThreeHitFilters(),
       m_thisSector(NULL),
-      m_friendID(""),
+      m_friendID(0),
       m_angle3DCtr(std::make_pair(0, 0)),
       m_angleXYCtr(std::make_pair(0, 0)),
       m_angleRZCtr(std::make_pair(0, 0)),
@@ -43,7 +42,7 @@ namespace Belle2 {
       m_helixFitCtr(std::make_pair(0, 0)) {}
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use ThreeHitFilters when no sectormap is available */
-    NbFinderFilters(TVector3 outerHit, TVector3 centerHit, TVector3 innerHit, VXDSector* thisSector, std::string friendID):
+    NbFinderFilters(TVector3 outerHit, TVector3 centerHit, TVector3 innerHit, VXDSector* thisSector, unsigned int friendID):
       ThreeHitFilters(outerHit, centerHit, innerHit),  // calls constructor of base class. Needed since base class does not use standard constructor, therefore we have to carry the hits manually into the base class
       m_thisSector(thisSector),
       m_friendID(friendID),
@@ -60,14 +59,14 @@ namespace Belle2 {
     ~NbFinderFilters() {}
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(TVector3 outerHit, TVector3 centerHit, TVector3 innerHit, VXDSector* thisSector, std::string friendID) {
+    void resetValues(TVector3 outerHit, TVector3 centerHit, TVector3 innerHit, VXDSector* thisSector, unsigned int friendID) {
       ThreeHitFilters::resetValues(outerHit, centerHit, innerHit); // resetValues of baseClass
       m_thisSector = thisSector;
       m_friendID = friendID;
     }
 
     /** simply checks whether angle3D-value is accepted by the given cutoffs */
-    bool checkAngle3D(std::string nameAngle3D);
+    bool checkAngle3D(int nameAngle3D);
     /** calculates the angle between the hits/vectors (3D), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngle3D instead) */
     double calcAngle3D() { return ThreeHitFilters::calcAngle3D(); }
     /** calculates the angle between the hits/vectors (3D), returning unit: angle in radians */
@@ -76,7 +75,7 @@ namespace Belle2 {
     SuccessAndFailCounter getAcceptanceRateAngle3D() { return m_angle3DCtr; }
 
     /** simply checks whether angleXY-value is accepted by the given cutoffs */
-    bool checkAngleXY(std::string nameAngleXY);
+    bool checkAngleXY(int nameAngleXY);
     /** calculates the angle between the hits/vectors (XY), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngleXY instead) */
     double calcAngleXY() { return ThreeHitFilters::calcAngleXY(); }
     /** calculates the angle between the hits/vectors (XY), returning unit: angle in radians */
@@ -85,7 +84,7 @@ namespace Belle2 {
     SuccessAndFailCounter getAcceptanceRateAngleXY() { return m_angleXYCtr; }
 
     /** simply checks whether angleRZ-value is accepted by the given cutoffs */
-    bool checkAngleRZ(std::string nameAngleRZ);
+    bool checkAngleRZ(int nameAngleRZ);
     /** calculates the angle between the hits/vectors (RZ), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngleRZ instead) */
     double calcAngleRZ() { return ThreeHitFilters::calcAngleRZ(); }
     /** calculates the angle between the hits/vectors (RZ), returning unit: angle in radians */
@@ -94,41 +93,41 @@ namespace Belle2 {
     SuccessAndFailCounter getAcceptanceRateAngleRZ() { return m_angleRZCtr; }
 
     /** simply checks whether angleRZ-value is accepted by the given cutoffs */
-    bool checkCircleDist2IP(std::string nameCircleDist2IP);
+    bool checkCircleDist2IP(int nameCircleDist2IP);
     /** calculates the distance of the point of closest approach of circle to the IP, returning unit: cm */
     double calcCircleDist2IP() { return ThreeHitFilters::calcCircleDist2IP(); }
     /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
     SuccessAndFailCounter getAcceptanceRateCircleDist2IP() { return m_circleDist2IPCtr; }
 
     /** simply checks whether the difference of the slope in RZ-value is accepted by the given cutoffs */
-    bool checkDeltaSlopeRZ(std::string nameDeltaSlopeRZ);
+    bool checkDeltaSlopeRZ(int nameDeltaSlopeRZ);
     /** calculates deviations in the slope of the inner segment and the outer segment, returning unit: none */
     double calcDeltaSlopeRZ() { return ThreeHitFilters::calcDeltaSlopeRZ(); }
     /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
     SuccessAndFailCounter getAcceptanceRateDeltaSlopeRZ() { return m_deltaSlopeRZCtr; }
 
     /** simply checks whether pT-value is accepted by the given cutoffs */
-    bool checkPt(std::string namePt);
+    bool checkPt(int namePt);
     /** calculates the estimation of the transverse momentum of the 3-hit-tracklet, returning unit: GeV/c */
     double calcPt() { return ThreeHitFilters::calcPt(); }
     /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
     SuccessAndFailCounter getAcceptanceRatePt() { return m_pTCtr; }
 
     /** simply checks whether helixparameter-value is accepted by the given cutoffs */
-    bool checkHelixFit(std::string nameHelixFit);
+    bool checkHelixFit(int nameHelixFit);
     /** calculates the helixparameter describing the deviation in z per unit angle, returning unit: none */
     double calcHelixFit() { return ThreeHitFilters::calcHelixFit(); }
     /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
     SuccessAndFailCounter getAcceptanceRateHelixFit() { return m_helixFitCtr; }
 
     /** returns cutoff-values of given filter */
-    std::pair <double, double> getCutoffs(std::string aFilter); // one method to read them all...
+    std::pair <double, double> getCutoffs(int aFilter); // one method to read them all...
 
 
   protected:
 
     VXDSector* m_thisSector; /**< contains cutoffs for all filters available in this sector, together with the friendID the return values are unique */
-    std::string m_friendID; /**< is a key used for determine the currently needed filterSet */
+    unsigned int m_friendID; /**< is a key used for determine the currently needed filterSet */
     SuccessAndFailCounter m_angle3DCtr; /**< counts number of successful (.first) and neglected (.second) tests for angle3D */
     SuccessAndFailCounter m_angleXYCtr; /**< counts number of successful (.first) and neglected (.second) tests for angleXY */
     SuccessAndFailCounter m_angleRZCtr; /**< counts number of successful (.first) and neglected (.second) tests for angleRZ */

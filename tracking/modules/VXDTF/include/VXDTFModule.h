@@ -30,8 +30,8 @@
 #include "tracking/vxdCaTracking/TcFourHitFilters.h"
 #include "tracking/vxdCaTracking/TrackletFilters.h"
 #include "tracking/vxdCaTracking/ClusterInfo.h"
-#include "tracking/vxdCaTracking/GlobalNames.h"
 #include "tracking/vxdCaTracking/LittleHelper.h"
+#include "tracking/vxdCaTracking/FullSecID.h"
 
 
 //C++ base / C++ stl:
@@ -87,14 +87,14 @@ namespace Belle2 {
 //    typedef std::map<std::string, VXDSector*> MapOfSectors;
 //    typedef std::map<std::string, Cutoff*> CutoffMap;
 //     typedef std::map<std::string, CutoffMap*> MapOfCutoffTypes;
-    typedef boost::unordered_map<std::string, VXDSector*> MapOfSectors; /**< stores whole sectorMap used for storing cutoffs */
-    typedef std::pair<std::string, VXDSector* > secMapEntry; /**< represents an entry of the MapOfSectors */
-    typedef boost::unordered_map<std::string, Cutoff*> CutoffMap; /**< Is a map storing cutoffs  */
-    typedef boost::unordered_map<std::string, CutoffMap*> MapOfCutoffTypes; /**< represents an entry of the CutoffMap */
+    typedef boost::unordered_map<unsigned int, VXDSector*> MapOfSectors; /**< stores whole sectorMap used for storing cutoffs */
+    typedef std::pair<unsigned int, VXDSector* > secMapEntry; /**< represents an entry of the MapOfSectors */
+    typedef boost::unordered_map<int, Cutoff*> CutoffMap; /**< Is a map storing cutoffs  */
+    typedef boost::unordered_map<int, CutoffMap*> MapOfCutoffTypes; /**< represents an entry of the CutoffMap */
     typedef std::vector<VXDTFHit*> HitsOfEvent; /**< contains all hits of event */
     typedef std::list<VXDSegmentCell*> ActiveSegmentsOfEvent; /**< is list since random deleting processes are needed */
     typedef std::vector<VXDSegmentCell*> TotalSegmentsOfEvent; /**< is vector since no entries are deleted and random access is needed  */
-    typedef std::pair<std::string, MapOfSectors::iterator> SectorNameAndPointerPair; /**< why string? we are storing the name of the sector to be able to sort them! */
+    typedef std::pair<unsigned int, MapOfSectors::iterator> SectorNameAndPointerPair; /**< we are storing the name of the sector (which is encoded into an int) to be able to sort them! */
     typedef std::list<SectorNameAndPointerPair> OperationSequenceOfActivatedSectors; /**< contains all active sectors, can be sorted by name (first entry) */
     typedef std::vector<VXDTFTrackCandidate*> TCsOfEvent; /**< contains all track candidates of event */
     typedef std::vector<CurrentPassData*> PassSetupVector; /**< contains all passes used for track reconstruction */
@@ -112,7 +112,7 @@ namespace Belle2 {
     struct SensorStruct {
       std::vector<std::pair<int, Belle2::SVDCluster*> > uClusters; /**< .first is arrayIndex in StoreArray, .second is pointer to the Cluster itself */
       std::vector<std::pair<int, Belle2::SVDCluster*> > vClusters; /**< same as uClusters, but for vClusters  */
-      int layerID;
+      int layerID; /**< layer ID of the Cluster */
     };
 
 
@@ -201,7 +201,7 @@ namespace Belle2 {
       std::string chosenDetectorType; /**< same as detectorType, but fully written ('SVD','PXD' or 'VXD'), needed during xml and for logging messages */
       int detectorType; /**< PXD = 0 , SVD = 1, VXD = -1 */
       double setupWeigh; /**< defines importance of current Pass. most important Passes stay at value 0.0, less important ones can be set between 0.0 and 100.0 (percent of QI-decrease). This affects the outcome of the neuronal network */
-      int highestAllowedLayer; /**< needed for e.g. hitfinding. This value excludes Layernumbers higher than set value. (interesting for low momentum tracks)  */
+      short int highestAllowedLayer; /**< needed for e.g. hitfinding. This value excludes Layernumbers higher than set value. (interesting for low momentum tracks)  */
       int numTotalLayers;  /**< needed e.g. for neuronal network. This value allows calculation of maximum track length (noncurling), carries implicit information about detectorType, while 'highestAllowedLayer' does not know whether its a SVD or VXD setup */
       int minLayer; /**< lowest layer considered for TCC */
       int minState; /**< lowest state considered for seeds during TCC */
@@ -292,7 +292,7 @@ namespace Belle2 {
     /** Recursive CoreFunction of the Track Candidate Collector, stores every possible way starting at a Seed (VXDSegmentCell) */
     void findTCs(TCsOfEvent& tcList,
                  VXDTFTrackCandidate* currentTC,
-                 std::string maxLayer);
+                 short int maxLayer);
 
 
     /** Neuronal network filtering overlapping Track Candidates by searching best subset of TC's */
@@ -313,16 +313,16 @@ namespace Belle2 {
 
 
     /** searches for sectors fitting current hit coordinates, returns blank string if nothing could be found */
-    std::pair<std::string, MapOfSectors::iterator> searchSector4Hit(VxdID aVxdID,
-        TVector3 localHit,
-        TVector3 sensorSize,
-        VXDTFModule::MapOfSectors& m_sectorMap,
-        std::vector<double>& uConfig,
-        std::vector<double>& vConfig); // -> TODO: generally usefull for VXD-related modules
+    VXDTFModule::SectorNameAndPointerPair searchSector4Hit(VxdID aVxdID,
+                                                           TVector3 localHit,
+                                                           TVector3 sensorSize,
+                                                           VXDTFModule::MapOfSectors& m_sectorMap,
+                                                           std::vector<double>& uConfig,
+                                                           std::vector<double>& vConfig); // -> TODO: generally usefull for VXD-related modules
 
 
     /** needed for sorting sectorSequence and compares strings... */
-    static bool compareSecSequence(std::pair<std::string, MapOfSectors::iterator>& lhs, std::pair<std::string, MapOfSectors::iterator>& rhs); // -> TODO: dirty little helper
+    static bool compareSecSequence(SectorNameAndPointerPair& lhs, SectorNameAndPointerPair& rhs); // -> TODO: dirty little helper
 
 
     /** searches for segments in given pass and returns number of discarded segments */
@@ -398,7 +398,7 @@ namespace Belle2 {
 
 
     /** reset all reused containers and delete others which are existing only for one event. */
-    void cleanEvent(CurrentPassData* currentPass, std::string centerSector);
+    void cleanEvent(CurrentPassData* currentPass, unsigned int centerSector);
 
     /** for streching the limits of the cutoff values for finetuning */
     double addExtraGain(double prefix, double cutOff, double generalTune, double specialTune); // -> TODO: dirty little helper
@@ -490,13 +490,13 @@ namespace Belle2 {
     NbFinderFilters m_threeHitFilterBox; /**< contains all the three hit filters needed by the nbFinder */
     TcFourHitFilters m_fourHitFilterBox; /**< contains all the four hit filters needed by the post-ca-Filter */
     TrackletFilters m_trackletFilterBox; /**< contains all the four-or-more hit filters needed by the post-ca-Filter */
-    LittleHelper m_littleHelperBox; /** bundles small but often used functions for smearing and others.  */
+    LittleHelper m_littleHelperBox; /**< bundles small but often used functions for smearing and others.  */
 
     int m_chargeSignFactor; /**< particle dependent. for leptons it is 1, for other particles it's -1... */
 
     int m_usePXDorSVDorVXDhits; /**< when having more than one pass per event, sector maps using PXD, SVD or VXD can be set independently. To produce TFHits only when needed, this value is set to -1,0 or 1 */
 
-    std::vector<std::string> m_PARAMmultiPassSectorSetup; /**< */// controls usage of one or several passes for TF per event (allows differnt pT's or curling track support)
+    std::vector<std::string> m_PARAMmultiPassSectorSetup; /**< controls usage of one or several passes for TF per event (allows differnt pT's or curling track support) */
     double m_PARAMtuneCutoffs; /**< for rapid changes of cutoffs (no personal xml files needed), reduces/enlarges the range of the cutoffs in percent (lower and upper values are changed by this value). Only valid in range -50% < x < +1000% */
 
     int m_eventCounter; /**< knows current event number */
@@ -509,6 +509,8 @@ namespace Belle2 {
     bool m_KFBackwardFilter; /**< determines whether the kalman filter moves inwards or backwards, bool means inwards */
     bool m_highOccupancyCase; /**< is determined by a userdefined threshold. If there are more hits in the event than threshold value, high occupancy filters are activated (segFinder and nbFinder only) */
     int m_PARAMhighOccupancyThreshold; /**< If there are more hits in a sensor than threshold value, high occupancy filters are activated (segFinder and nbFinder only) */
+    int m_PARAMkillBecauseOfOverlappsThreshold; /**< if there are more TCs overlapping than threshold value, event kalman gets replaced by circleFit. If there are 10 times more than threshold value of TCs, the complete event gets aborted */
+    int m_PARAMkillEventBecauseOfSegmentsThreshold; /**< if there are more segments than threshold value, the complete event gets aborted */
 
     double m_PARAMomega; /**< tuning parameter for hopfield network */
     double m_tcThreshold;   /**< defines threshold for hopfield network. neurons having values below threshold are discarded */
@@ -523,8 +525,6 @@ namespace Belle2 {
 
     std::string m_PARAMcalcQIType; /**< allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit' */
     std::string m_PARAMgfTrackCandsColName;                          /**< TrackCandidates collection name */
-
-    GlobalNames m_filterNameBox; /**< carries string name of all filters needed */
 
     /// the following variables are nimimal testing routines within the TF
     int m_TESTERtriggeredZigZagXY;/**< counts how many times zigZagXY filter found bad TCs */

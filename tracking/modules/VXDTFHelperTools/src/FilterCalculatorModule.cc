@@ -21,6 +21,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include "tracking/vxdCaTracking/FilterID.h"
 
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
@@ -655,7 +656,7 @@ void FilterCalculatorModule::event()
               deltapT = m_fourHitFilterBox.deltapT();
               if (isnan(deltapT) == false) {
                 B2DEBUG(100, "4-hit-filter in event " << m_eventCounter << ": calculated deltapT-Value: " << deltapT << " gets stored ")
-                thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameDeltapT, deltapT);
+                thisSectorPos->second.addValue(friendSector, FilterID::nameDeltapT, deltapT);
               } else {
                 m_badFilterValueCtr++; B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltapT-Value: " << deltapT << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
                 hitG.Print(); moHitG.Print(); graMoHitG.Print(); greGraMoHitG.Print();
@@ -666,7 +667,7 @@ void FilterCalculatorModule::event()
               deltaDistCircleCenter =  m_fourHitFilterBox.deltaDistCircleCenter();
               if (isnan(deltaDistCircleCenter) == false) {
                 B2DEBUG(100, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenter-Value: " << deltaDistCircleCenter << " gets stored ")
-                thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameDeltaDistance2IP, deltaDistCircleCenter);
+                thisSectorPos->second.addValue(friendSector, FilterID::nameDeltaDistance2IP, deltaDistCircleCenter);
               } else {
                 m_badFilterValueCtr++; B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenter-Value: " << deltaDistCircleCenter << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
                 hitG.Print(); moHitG.Print(); graMoHitG.Print(); greGraMoHitG.Print();
@@ -690,7 +691,7 @@ void FilterCalculatorModule::event()
             deltapT = m_fourHitFilterBox.deltapT();
             if (isnan(deltapT) == false) {
               B2DEBUG(100, "4-hit-filter in event " << m_eventCounter << ": calculated deltapTHighOccupancy-Value: " << deltapT << " gets stored ")
-              thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameDeltapTHighOccupancy, deltapT);
+              thisSectorPos->second.addValue(friendSector, FilterID::nameDeltapTHighOccupancy, deltapT);
             } else {
               m_badFilterValueCtr++; B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltapTHighOccupancy-Value: " << deltapT << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print(); origin.Print();
@@ -700,7 +701,7 @@ void FilterCalculatorModule::event()
             deltaDistCircleCenter =  m_fourHitFilterBox.deltaDistCircleCenter();
             if (isnan(deltaDistCircleCenter) == false) {
               B2DEBUG(100, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenterHighOccupancy-Value: " << deltaDistCircleCenter << " gets stored ")
-              thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameDeltaDistanceHighOccupancy2IP, deltaDistCircleCenter);
+              thisSectorPos->second.addValue(friendSector, FilterID::nameDeltaDistanceHighOccupancy2IP, deltaDistCircleCenter);
             } else {
               m_badFilterValueCtr++; B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenterHighOccupancy-Value: " << deltaDistCircleCenter << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print(); origin.Print();
@@ -714,7 +715,7 @@ void FilterCalculatorModule::event()
             dist2IP = m_threeHitFilterBox.calcCircleDist2IP();
             if (isnan(dist2IP) == false) {
               B2DEBUG(100, "3-hit-filter in event " << m_eventCounter << ": calculated dist2IP-Value: " << dist2IP << " gets stored ")
-              thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameDistance2IP, dist2IP);
+              thisSectorPos->second.addValue(friendSector, FilterID::nameDistance2IP, dist2IP);
             } else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated dist2IP-Value: " << dist2IP << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print(); origin.Print();
@@ -726,7 +727,7 @@ void FilterCalculatorModule::event()
             pT = m_threeHitFilterBox.calcPt();
             if (isnan(pT) == false) {
               B2DEBUG(100, "3-hit-filter in event " << m_eventCounter << ": calculated pT-Value: " << pT << " gets stored ")
-              thisSectorPos->second.addValue(friendSector, m_filterNameBox.namePT, pT);
+              thisSectorPos->second.addValue(friendSector, FilterID::namePT, pT);
             } else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated pT-Value: " << pT << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
@@ -743,7 +744,7 @@ void FilterCalculatorModule::event()
             deltaSlopeRZ = m_threeHitFilterBox.calcDeltaSlopeRZ();
             if (isnan(deltaSlopeRZ) == false) {
               B2DEBUG(100, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeRZ-Value: " << deltaSlopeRZ << " gets stored ")
-              thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameDeltaSlopeRZ, deltaSlopeRZ);
+              thisSectorPos->second.addValue(friendSector, FilterID::nameDeltaSlopeRZ, deltaSlopeRZ);
             } else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeRZ-Value: " << deltaSlopeRZ << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
@@ -755,7 +756,7 @@ void FilterCalculatorModule::event()
             angles3D = m_threeHitFilterBox.calcAngle3D();
             if (isnan(angles3D) == false) {
               B2DEBUG(100, "3-hit-filter in event " << m_eventCounter << ": calculated angles3D-Value: " << angles3D << " gets stored ")
-              thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameAngles3D, angles3D);
+              thisSectorPos->second.addValue(friendSector, FilterID::nameAngles3D, angles3D);
             } else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated angles3D-Value: " << angles3D << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
@@ -767,7 +768,7 @@ void FilterCalculatorModule::event()
             anglesXY = m_threeHitFilterBox.calcAngleXY();
             if (isnan(anglesXY) == false) {
               B2DEBUG(100, "3-hit-filter in event " << m_eventCounter << ": calculated anglesXY-Value: " << anglesXY << " gets stored ")
-              thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameAnglesXY, anglesXY);
+              thisSectorPos->second.addValue(friendSector, FilterID::nameAnglesXY, anglesXY);
             }  else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated anglesXY-Value: " << anglesXY << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
@@ -779,7 +780,7 @@ void FilterCalculatorModule::event()
             anglesRZ = m_threeHitFilterBox.calcAngleRZ();
             if (isnan(anglesRZ) == false) {
               B2DEBUG(100, "3-hit-filter in event " << m_eventCounter << ": calculated anglesRZ-Value: " << anglesRZ << " gets stored ")
-              thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameAnglesRZ, anglesRZ);
+              thisSectorPos->second.addValue(friendSector, FilterID::nameAnglesRZ, anglesRZ);
             } else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated anglesRZ-Value: " << anglesRZ << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
@@ -791,7 +792,7 @@ void FilterCalculatorModule::event()
             helixFit = m_threeHitFilterBox.calcHelixFit();
             if (isnan(helixFit) == false) {
               B2DEBUG(100, "3-hit-filter in event " << m_eventCounter << ": calculated helixFit-Value: " << helixFit << " gets stored ")
-              thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameHelixFit, helixFit);
+              thisSectorPos->second.addValue(friendSector, FilterID::nameHelixFit, helixFit);
             } else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated helixFit-Value: " << helixFit << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
@@ -820,7 +821,7 @@ void FilterCalculatorModule::event()
           dist2IP = m_threeHitFilterBox.calcCircleDist2IP();
           if (isnan(dist2IP) == false) {
             B2DEBUG(100, "3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-Value: " << dist2IP << " gets stored ")
-            thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameDistanceHighOccupancy2IP, dist2IP);
+            thisSectorPos->second.addValue(friendSector, FilterID::nameDistanceHighOccupancy2IP, dist2IP);
           } else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-Value: " << dist2IP << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
             hitGlobal.Print(); motherHitGlobal.Print(); origin.Print();
@@ -830,7 +831,7 @@ void FilterCalculatorModule::event()
           pT = m_threeHitFilterBox.calcPt();
           if (isnan(pT) == false) {
             B2DEBUG(100, "3-hit-filter in event " << m_eventCounter << ": calculated pTHighOccupancy-Value: " << pT << " gets stored ")
-            thisSectorPos->second.addValue(friendSector, m_filterNameBox.namePTHighOccupancy, pT);
+            thisSectorPos->second.addValue(friendSector, FilterID::namePTHighOccupancy, pT);
           } else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated pTHighOccupancy-Value: " << pT << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
             hitGlobal.Print(); motherHitGlobal.Print(); origin.Print();
@@ -840,7 +841,7 @@ void FilterCalculatorModule::event()
           deltaSlopeRZ = m_threeHitFilterBox.calcDeltaSlopeRZ();
           if (isnan(deltaSlopeRZ) == false) {
             B2DEBUG(100, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeHighOccupancyRZ-Value: " << deltaSlopeRZ << " gets stored ")
-            thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameDeltaSlopeHighOccupancyRZ, deltaSlopeRZ);
+            thisSectorPos->second.addValue(friendSector, FilterID::nameDeltaSlopeHighOccupancyRZ, deltaSlopeRZ);
           } else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeHighOccupancyRZ-Value: " << deltaSlopeRZ << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
             hitGlobal.Print(); motherHitGlobal.Print(); origin.Print();
@@ -850,7 +851,7 @@ void FilterCalculatorModule::event()
           angles3D = m_threeHitFilterBox.calcAngle3D();
           if (isnan(angles3D) == false) {
             B2DEBUG(100, "3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancy3D-Value: " << angles3D << " gets stored ")
-            thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameAnglesHighOccupancy3D, angles3D);
+            thisSectorPos->second.addValue(friendSector, FilterID::nameAnglesHighOccupancy3D, angles3D);
           } else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancy3D-Value: " << angles3D << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
             hitGlobal.Print(); motherHitGlobal.Print(); origin.Print();
@@ -860,7 +861,7 @@ void FilterCalculatorModule::event()
           anglesXY = m_threeHitFilterBox.calcAngleXY();
           if (isnan(anglesXY) == false) {
             B2DEBUG(100, "3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancyXY-Value: " << anglesXY << " gets stored ")
-            thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameAnglesHighOccupancyXY, anglesXY);
+            thisSectorPos->second.addValue(friendSector, FilterID::nameAnglesHighOccupancyXY, anglesXY);
           }  else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancyXY-Value: " << anglesXY << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
             hitGlobal.Print(); motherHitGlobal.Print(); origin.Print();
@@ -870,7 +871,7 @@ void FilterCalculatorModule::event()
           anglesRZ = m_threeHitFilterBox.calcAngleRZ();
           if (isnan(anglesRZ) == false) {
             B2DEBUG(100, "3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancyRZ-Value: " << anglesRZ << " gets stored ")
-            thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameAnglesHighOccupancyRZ, anglesRZ);
+            thisSectorPos->second.addValue(friendSector, FilterID::nameAnglesHighOccupancyRZ, anglesRZ);
           } else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancyRZ-Value: " << anglesRZ << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
             hitGlobal.Print(); motherHitGlobal.Print(); origin.Print();
@@ -880,7 +881,7 @@ void FilterCalculatorModule::event()
           helixFit = m_threeHitFilterBox.calcHelixFit();
           if (isnan(helixFit) == false) {
             B2DEBUG(100, "3-hit-filter in event " << m_eventCounter << ": calculated helixHighOccupancyFit-Value: " << helixFit << " gets stored ")
-            thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameHelixHighOccupancyFit, helixFit);
+            thisSectorPos->second.addValue(friendSector, FilterID::nameHelixHighOccupancyFit, helixFit);
           } else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated helixHighOccupancyFit-Value: " << helixFit << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
             hitGlobal.Print(); motherHitGlobal.Print(); origin.Print();
@@ -894,7 +895,7 @@ void FilterCalculatorModule::event()
           distanceXY = m_twoHitFilterBox.calcDistXY();
           if (isnan(distanceXY) == false) {
             B2DEBUG(100, "2-hit-filter in event " << m_eventCounter << ": calculated distanceXY-Value: " << distanceXY << " gets stored ")
-            thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameDistanceXY, distanceXY);
+            thisSectorPos->second.addValue(friendSector, FilterID::nameDistanceXY, distanceXY);
           } else {
             m_badFilterValueCtr++; B2WARNING("2-hit-filter in event " << m_eventCounter << ": calculated distanceXY-Value: " << distanceXY << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
             hitGlobal.Print(); motherHitGlobal.Print();
@@ -905,7 +906,7 @@ void FilterCalculatorModule::event()
           distanceZ = m_twoHitFilterBox.calcDistZ();
           if (isnan(distanceZ) == false) {
             B2DEBUG(100, "2-hit-filter in event " << m_eventCounter << ": calculated distanceZ-Value: " << distanceZ << " gets stored ")
-            thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameDistanceZ, distanceZ);
+            thisSectorPos->second.addValue(friendSector, FilterID::nameDistanceZ, distanceZ);
           } else {
             m_badFilterValueCtr++; B2WARNING("2-hit-filter in event " << m_eventCounter << ": calculated distanceZ-Value: " << distanceZ << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
             hitGlobal.Print(); motherHitGlobal.Print();
@@ -916,7 +917,7 @@ void FilterCalculatorModule::event()
           distance3D = m_twoHitFilterBox.calcDist3D();
           if (isnan(distance3D) == false) {
             B2DEBUG(100, "2-hit-filter in event " << m_eventCounter << ": calculated distance3D-Value: " << distance3D << " gets stored ")
-            thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameDistance3D, distance3D);
+            thisSectorPos->second.addValue(friendSector, FilterID::nameDistance3D, distance3D);
           } else {
             m_badFilterValueCtr++; B2WARNING("2-hit-filter in event " << m_eventCounter << ": calculated distance3D-Value: " << distance3D << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
             hitGlobal.Print(); motherHitGlobal.Print();
@@ -927,7 +928,7 @@ void FilterCalculatorModule::event()
           normedDistance3D = m_twoHitFilterBox.calcNormedDist3D();
           if (isnan(normedDistance3D) == false) {
             B2DEBUG(100, "2-hit-filter in event " << m_eventCounter << ": calculated normedDistance3D-Value: " << normedDistance3D << " gets stored ")
-            thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameNormedDistance3D, normedDistance3D);
+            thisSectorPos->second.addValue(friendSector, FilterID::nameNormedDistance3D, normedDistance3D);
           } else {
             m_badFilterValueCtr++; B2WARNING("2-hit-filter in event " << m_eventCounter << ": calculated normedDistance3D-Value: " << normedDistance3D << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
             hitGlobal.Print(); motherHitGlobal.Print();
@@ -938,7 +939,7 @@ void FilterCalculatorModule::event()
           slopeRZ = m_twoHitFilterBox.calcSlopeRZ();
           if (isnan(slopeRZ) == false) {
             B2DEBUG(100, "2-hit-filter in event " << m_eventCounter << ": calculated slopeRZ-Value: " << slopeRZ << " gets stored ")
-            thisSectorPos->second.addValue(friendSector, m_filterNameBox.nameSlopeRZ, slopeRZ);
+            thisSectorPos->second.addValue(friendSector, FilterID::nameSlopeRZ, slopeRZ);
           } else {
             m_badFilterValueCtr++; B2WARNING("2-hit-filter in event " << m_eventCounter << ": calculated slopeRZ-Value: " << slopeRZ << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
             hitGlobal.Print(); motherHitGlobal.Print();

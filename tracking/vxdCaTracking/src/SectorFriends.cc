@@ -9,6 +9,7 @@
 **************************************************************************/
 
 #include "../include/SectorFriends.h"
+#include "../include/FullSecID.h"
 #include <iostream>
 #include <boost/foreach.hpp>
 #include <framework/logging/Logger.h>
@@ -16,44 +17,46 @@
 using namespace std;
 using namespace Belle2;
 
-void SectorFriends::addValuePair(string cutOffType, pair<double, double> values)
+SectorFriends::SectorFriends(unsigned int myName, unsigned int secName):
+  m_friendName(myName),
+  m_sectorName(secName)
 {
-  map<string, Cutoff*>::iterator mapIter = m_filterMap.find(cutOffType);
-  if (mapIter == m_filterMap.end()) {
-    Cutoff* aCutOffPtr =  new Cutoff(cutOffType, values);
-    m_filterMap.insert(std::make_pair(cutOffType, aCutOffPtr));
+  m_filters.assign(FilterID::numFilters, NULL);
+}
+
+void SectorFriends::addValuePair(int aFilter, pair<double, double> values)
+{
+  if (m_filters[aFilter] != NULL) {
+    m_filters[aFilter]->addValuePair(values.first, values.second);
   } else {
-    m_filterMap.find(cutOffType)->second->addValuePair(values.first, values.second);
+    Cutoff* aCutOffPtr =  new Cutoff(aFilter, values);
+    m_filters[aFilter] = aCutOffPtr;
   }
 }
 
-pair<double, double> SectorFriends::exportFilters(std::string cutOffType)
+pair<double, double> SectorFriends::exportFilters(int aFilter)
 {
-  pair<double, double> cutOffs;
-  cutOffs = make_pair(m_filterMap.find(cutOffType)->second->getMinValue(), m_filterMap.find(cutOffType)->second->getMaxValue());
-  return cutOffs;
+  return make_pair(m_filters[aFilter]->getMinValue(), m_filters[aFilter]->getMaxValue());
 }
 
-Cutoff* SectorFriends::getCutOff(string cutOffType)
+Cutoff* SectorFriends::getCutOff(int aFilter)
 {
-  map<string, Cutoff*>::iterator mapIter = m_filterMap.find(cutOffType);
-  if (mapIter != m_filterMap.end()) {
-    Cutoff* aPtr = m_filterMap.find(cutOffType)->second;
-    return aPtr;
+  if (m_filters[aFilter] != NULL) {
+    return m_filters[aFilter];
   } else {
-    B2DEBUG(50, " cutoffType " << cutOffType << " does not exist within Friend " << m_friendName << " of " << m_sectorName << "!");
+    B2DEBUG(50, " cutoffType  (int/string) " << aFilter << "/" << FilterID().getFilterString(aFilter) << " does not exist within Friend (int/string) " << m_friendName << "/" << FullSecID(m_friendName).getFullSecString() << " of " << m_sectorName << "/" << FullSecID(m_sectorName).getFullSecString() << "!");
     return NULL;
   }
 }
 
-const vector<string> SectorFriends::getSupportedCutoffs()
+void SectorFriends::getSupportedCutoffs(std::vector<int>& supportedCutoffs)
 {
-  vector<string> cutoffs;
-  pair<string, Cutoff*> mapEntry;
-  BOOST_FOREACH(mapEntry, m_filterMap) {
-    B2DEBUG(1000, " current Mapentry.first: " << mapEntry.first);
-    cutoffs.push_back(mapEntry.first);
+//  for (FilterID::filterTypes filter = FilterID::angles3D; filter < FilterID::numFilters; ++filter)
+  for (int filter = FilterID::angles3D; filter < FilterID::numFilters; ++filter) {
+    if (m_filters[filter] != NULL) {
+      B2DEBUG(1000, " current filter/cutoffType: " << FilterID().getFilterString(filter));
+      supportedCutoffs.push_back(filter);
+    }
   }
-  B2DEBUG(500, "Friend " << m_friendName << " of " << m_sectorName << ": after boost loop is size of cutOffs: " << cutoffs.size());
-  return cutoffs;
+  B2DEBUG(500, "Friend " << m_friendName << "/" << FullSecID(m_friendName).getFullSecString() << " of " << m_sectorName << "/" << FullSecID(m_sectorName).getFullSecString() << ": after boost loop is size of cutOffs: " << supportedCutoffs.size());
 }

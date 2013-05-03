@@ -19,8 +19,6 @@
 
 namespace Belle2 {
 
-  /** forward declaration */
-//  class VXDTFTrackCandidate;
 
   /** allows pass-independent overbooking check used by the VXDTFModule.
    * since especially 1D-SVD-Clusters are combined to 2D-Hits and the possibility to use several passes in the VXDTF, it is usefull to store

@@ -15,7 +15,6 @@
 
 #include <list>
 #include <map>
-#include <string>
 #ifndef __CINT__
 #include <boost/unordered_map.hpp>
 #endif
@@ -41,7 +40,7 @@ namespace Belle2 {
   public:
 //    using boost::unordered_map;
 #ifndef __CINT__
-    typedef boost::unordered_map<std::string, VXDSector*> MapOfSectors; /**< stores whole sectorMap used for storing cutoffs */
+    typedef boost::unordered_map<unsigned int, VXDSector*> MapOfSectors; /**< stores whole sectorMap used for storing cutoffs */
 #endif
 
     /** Default constructor for the ROOT IO. */

@@ -13,6 +13,7 @@
 #include "../include/SectorFriends.h"
 #include "../include/VXDTFHit.h"
 #include "../include/VXDSegmentCell.h"
+#include "../include/FullSecID.h"
 
 #include <framework/logging/Logger.h>
 
@@ -20,16 +21,21 @@ using namespace std;
 using namespace Belle2;
 
 
+// VXDSector::VXDSector(unsigned int secID) {
+//  FullSecID aSecInt = FullSecID(secID);
+//  m_sectorID = aSecInt;
+// }
+
 void VXDSector::addHit(VXDTFHit* newSpacePoint) { m_hits.push_back(newSpacePoint); }
 
-void VXDSector::addFriend(string newSector)
+void VXDSector::addFriend(int newSector)
 {
   m_friends.push_back(newSector);
   SectorFriends aFriend = SectorFriends(newSector, m_sectorID);
   m_friendMap.insert(make_pair(newSector, aFriend));
 } // should be called only at the beginning of a new run
 
-void VXDSector::addCutoff(string cutOffType, string friendName, pair<double, double> values)
+void VXDSector::addCutoff(int cutOffType, unsigned int friendName, pair<double, double> values)
 {
   FriendMap::iterator mapIter = m_friendMap.find(friendName);
   if (mapIter == m_friendMap.end()) {
@@ -46,18 +52,20 @@ void VXDSector::addInnerSegmentCell(VXDSegmentCell* newSegment) { m_innerSegment
 void VXDSector::addOuterSegmentCell(VXDSegmentCell* newSegment) { m_outerSegmentCells.push_back(newSegment); }
 
 /** getter **/
-const vector<string> VXDSector::getSupportedCutoffs(string aFriend)
+const vector<int> VXDSector::getSupportedCutoffs(unsigned int aFriend)
 {
   FriendMap::iterator mapIter;
   mapIter = m_friendMap.find(aFriend);
   if (mapIter == m_friendMap.end()) {
-    B2FATAL("VXDSector::getSupportedCudoffs - friend " << aFriend << " not found!"); // includes a total break, therefore no return needed
+    FullSecID aFullSecID = FullSecID(aFriend);
+    B2FATAL("VXDSector::getSupportedCudoffs - friend int/string" << aFriend << "/" << aFullSecID.getFullSecString() << " not found!"); // includes a total break, therefore no return needed
   }
-  vector<string> cutoffs = mapIter->second.getSupportedCutoffs();
-  return cutoffs;
+  vector<int> supportedCutoffs;
+  mapIter->second.getSupportedCutoffs(supportedCutoffs);
+  return supportedCutoffs;
 }
 
-Cutoff* VXDSector::getCutoff(string cutOffType, string aFriend)
+Cutoff* VXDSector::getCutoff(int cutOffType, unsigned int aFriend)
 {
   FriendMap::iterator mapIter;
   mapIter = m_friendMap.find(aFriend);

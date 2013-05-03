@@ -1827,7 +1827,7 @@ void VXDTFModule::endRun()
   int median = numLoggedEvents / 2;
   int q10 = numLoggedEvents / 10;
   int q90 = 9 * q10;
-  B2INFO(" there were " << numLoggedEvents << " events recorded by the eventLogger, listing slowest, fastest, median q0.1 and q0.9 event:")
+  B2INFO(" there were " << numLoggedEvents << " events recorded by the eventLogger, listing slowest, fastest, median q0.1 and q0.9 event:" << endl)
   int meanTimeConsumption = 0;
   BOOST_FOREACH(EventInfoPackage & infoPackage, m_TESTERlogEvents) {
     meanTimeConsumption += infoPackage.totalTime.count();
@@ -2194,6 +2194,7 @@ bool VXDTFModule::compareSecSequence(VXDTFModule::SectorNameAndPointerPair& lhs,
 int VXDTFModule::segFinder(CurrentPassData* currentPass)
 {
   unsigned int currentFriendID, oldFriendID;
+  oldFriendID = numeric_limits<unsigned int>::max();
   TVector3 currentCoords, friendCoords, currentVector, tempVector;
   bool accepted = false; // recycled return value of the filters
   int simpleSegmentQI; // considers only min and max cutoff values, but could be weighed by order of relevance
@@ -3430,7 +3431,7 @@ void VXDTFModule::cleanEvent(CurrentPassData* currentPass, unsigned int centerSe
 string VXDTFModule::EventInfoPackage::Print()
 {
   stringstream output;
-  output << " timeConsumption of event " << evtNumber << " in ns: " << endl;
+  output << " timeConsumption of event " << evtNumber << " in microseconds: " << endl;
 
   output << "total: " << totalTime.count();
   output << ", hitsorting: " << sectionConsumption.hitSorting.count();

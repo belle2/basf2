@@ -51,6 +51,8 @@ namespace Belle2 {
     int m_ndfTooSmallCounter; /**< counter for the events that have too little information (number of degrees of freedom (ndf)) to reconstruct at least one vertex */
     int m_fittedVertices; /**< counts the number of vertices rave was able to fit */
     std::string m_gfTracksColName; /**< Name of collection of GFTracks used for input */
+    int m_extrapFailed;
+    bool m_extrapolateToIR;
   };
 }
 

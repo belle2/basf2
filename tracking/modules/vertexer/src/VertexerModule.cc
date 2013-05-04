@@ -46,6 +46,7 @@ VertexerModule::VertexerModule() : Module()
   addParam("beamSpotPosition", m_beamSpotPos, "the position of the beam spot", vector<double>(0));
   addParam("beamSpotCovariance", m_beamSpotCov, "the covariance matrix of the beam spot position", vector<double>(0));
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection of GFTracks used for input", string(""));
+  addParam("extrapolateToInterActionRegion", m_extrapolateToIR, "if true extrapolate the GFTracks to the interaction point before giving them to the vertex fit", false);
 }
 
 
@@ -85,6 +86,7 @@ void VertexerModule::beginRun()
 {
   m_ndfTooSmallCounter = 0;
   m_fittedVertices = 0;
+  m_extrapFailed = 0;
 }
 
 void VertexerModule::event()
@@ -113,9 +115,29 @@ void VertexerModule::event()
 
   B2DEBUG(100, " will feed  " << nGfTracks << " tracks to GFRave");
 
+
   //get all tracks of one event
   vector<GFTrack*> tracksForRave(nGfTracks);
   for (int i = 0; i not_eq nGfTracks; ++i) {
+    if (m_extrapolateToIR == true) {
+      try {
+        TVector3 pos(0., 0., 0.); //origin assume the interaction point is (0,0,0)
+        TVector3 poca(0., 0., 0.); //point of closest approach
+        TVector3 dirInPoca(0., 0., 0.); //direction of the track at the point of closest approach
+
+        gfTracks[i]->getCardinalRep()->extrapolateToPoint(pos, poca, dirInPoca);
+        GFDetPlane plane(poca, dirInPoca);
+        TVector3 resultPosition;
+        TVector3 resultMomentum;
+        TMatrixDSym resultCovariance;
+        gfTracks[i]->getPosMomCov(plane, resultPosition, resultMomentum, resultCovariance);
+        gfTracks[i]->getCardinalRep()->setPosMomCov(resultPosition, resultMomentum, resultCovariance);
+
+      } catch (...) {
+        ++m_extrapFailed;
+      }
+
+    }
     tracksForRave[i] =  gfTracks[i];
 
   }
@@ -139,6 +161,9 @@ void VertexerModule::endRun()
 {
   if (m_ndfTooSmallCounter not_eq 0) {
     B2WARNING(m_ndfTooSmallCounter << " events had too little information to reconstruct at least one vertex");
+  }
+  if (m_extrapFailed not_eq 0) {
+    B2WARNING(m_extrapFailed << "tracks could not be extrapolated to the interaction region");
   }
   B2INFO(m_fittedVertices << " vertices were fitted by Rave in this Run");
 }

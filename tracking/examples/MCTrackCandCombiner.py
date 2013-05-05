@@ -46,8 +46,8 @@ param_trackfinderVXD = {  # Supports 'SVD' and 'VXD' so far
     }
 trackfinderVXD.param(param_trackfinderVXD)
 
-# any of the CDC track finder using trasan is just an example the other track finder will also work
-trackfinderCDC = register_module('Trasan')
+# any of the CDC track finder will work. Using CDCLegendreTracking is just an example the other track finder will also work
+trackfinderCDC = register_module('CDCLegendreTracking')
 param_trackfinderCDC = {'GFTrackCandidatesColName': 'cdccands'}
 trackfinderCDC.param(param_trackfinderCDC)
 trackfinderCDC.logging.log_level = LogLevel.WARNING

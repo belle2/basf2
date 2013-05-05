@@ -81,6 +81,9 @@ namespace Belle2 {
     std::map<std::string, double > m_madScalingFactors; //scaling factor the mad to make it compariable to the standard deviation
     double calcMad(const std::vector<double>& data, const double& median);
     int countOutliers(const std::vector<double>& dataSample, const double mean, const double sigma, const double widthScaling);
+    std::map<std::string, double > m_trunctationRatios; //holds the ratio how many of the data of a named sample should be cut away in the trunctatedMeanAndStd function
+    double m_trunctationRatio;
+    int trunctatedMeanAndStd(std::vector<double> data, const double cutRatio, const bool symmetric, double& mean, double& std);
     //double calcMedian(std::vector<double> data);
 
     std::string m_dataOutFileName; //common part of all names of output files

@@ -30,7 +30,7 @@
 //C++ std stuff
 #include <iostream>
 #include <cmath>
-
+#include <numeric>
 //#include <Python.h>
 
 
@@ -43,6 +43,7 @@ using std::cout;
 using std::endl;
 using std::sqrt;
 using std::abs;
+using std::fixed;
 
 using boost::accumulators::mean;
 using boost::accumulators::median;
@@ -62,6 +63,7 @@ VertexFitCheckerModule::VertexFitCheckerModule() : Module()
   addParam("outputFileName", m_dataOutFileName, "A common name for all output files of this module. Suffixes to distinguish them will be added automatically", string("vertexFitChecker"));
   addParam("trackPValueCut", m_trackPValueCut, "if one track in a vertex has a p value lower than pValueCut, the vertex will be excluded from the statistical tests", -1.0);
   addParam("vertexPValueCut", m_vertexPValueCut, "if a vertex has a p value lower than vertexPValueCut, the vertex will be excluded from the statistical tests", -1.0);
+  addParam("trunctationRatio", m_trunctationRatio, "Ratio of the data sample that will be cut away before in the trunctated", 0.01);
 
 }
 
@@ -102,6 +104,9 @@ void VertexFitCheckerModule::initialize()
     m_madScalingFactors["res_vertexPos"] = 1.4826; //scaling factor for normal distribute variables
     m_madScalingFactors["pullsAndChi2_vertexPos"] = 1.4826;
     m_madScalingFactors["res_MCVertexPos"] = 1.4826;
+    m_trunctationRatios["res_vertexPos"] = m_trunctationRatio; //scaling factor for normal distribute variables
+    m_trunctationRatios["pullsAndChi2_vertexPos"] = m_trunctationRatio;
+    m_trunctationRatios["res_MCVertexPos"] = m_trunctationRatio;
   }
 
   m_processedVertices = 0;
@@ -306,7 +311,7 @@ void VertexFitCheckerModule::terminate()
     std::map<std::string, StatisticsContainer >::iterator  iter =  m_vertexWiseDataSamples.begin();
     std::map<std::string, StatisticsContainer >::const_iterator iterMax = m_vertexWiseDataSamples.end();
     while (iter not_eq iterMax) {
-      printVertexWiseStatistics(iter->first);
+      printVertexWiseStatistics(iter->first, true);
       ++iter;
     }
     //now the vertexWiseVecData
@@ -316,9 +321,9 @@ void VertexFitCheckerModule::terminate()
     varNames[2] = "z";
     vector<string> varNamesWithChi2 = varNames;
     varNamesWithChi2.push_back("chi2");
-    printVertexWiseVecStatistics("res_vertexPos", varNames);
-    printVertexWiseVecStatistics("pullsAndChi2_vertexPos", varNamesWithChi2);
-    printVertexWiseVecStatistics("res_MCVertexPos", varNames);
+    printVertexWiseVecStatistics("res_vertexPos", varNames, true);
+    printVertexWiseVecStatistics("pullsAndChi2_vertexPos", varNamesWithChi2, true);
+    printVertexWiseVecStatistics("res_MCVertexPos", varNames, true);
     //write out the test results
     B2INFO("\n" << m_textOutput.str());
     if (m_writeToFile == true) {
@@ -397,24 +402,39 @@ void VertexFitCheckerModule::printVertexWiseVecStatistics(const string& nameOfDa
   const int nOfVars = dataSample.size();
   m_textOutput << "Information on " << nameOfDataSample << "\n\tmean\tstd";
   if (m_robust == true) {
-    m_textOutput << "\tmedian\tMAD std\toutlier";
+    m_textOutput << "\tmedian\tMAD std\toutlier\ttr mean\ttr std\tignored";
   }
   if (count == true) {
     m_textOutput << "\tcount";
   }
   m_textOutput << "\n";
+  double madScalingFactor =  m_madScalingFactors[nameOfDataSample];
+  double trunctationRatio = m_trunctationRatios[nameOfDataSample];
   for (int i = 0; i not_eq nOfVars; ++i) {
-    m_textOutput << std::fixed << varNames[i] << "\t" << mean(dataSample[i]) << "\t" << sqrt(variance(dataSample[i]));
+    m_textOutput << fixed << varNames[i] << "\t" << mean(dataSample[i]) << "\t" << sqrt(variance(dataSample[i]));
     if (m_robust == true) {
-      double madScalingFactor =  m_madScalingFactors[nameOfDataSample];
-      if (madScalingFactor > 0.001) {
+
+      vector<double>& data = m_vertexWiseVecData[nameOfDataSample][i];
+      if (madScalingFactor > 1E-100) {
         double aMedian = median(dataSample[i]);
-        double scaledMad = madScalingFactor * calcMad(m_vertexWiseVecData[nameOfDataSample][i], aMedian);
-        int nOutliers = countOutliers(m_vertexWiseVecData[nameOfDataSample][i], aMedian, scaledMad, 4);
-        m_textOutput << "\t" << aMedian << "\t" << scaledMad << "\t" << nOutliers; //<< "\t" << calcMedian(m_vertexWiseVecData[nameOfDataSample][i]);
+        double scaledMad = madScalingFactor * calcMad(data, aMedian);
+        int nOutliers = countOutliers(data, aMedian, scaledMad, 4);
+        m_textOutput << "\t" << aMedian << "\t" << scaledMad << "\t" << nOutliers; //<< "\t" << calcMedian(data);
       } else {
-        m_textOutput << "\tno scaling/MAD";
+        m_textOutput << "\tno scaling for MAD";
       }
+      if (trunctationRatio > 1E-100) {
+        double mean = 0;
+        double std = 0;
+
+        int nCutAwayTracks = trunctatedMeanAndStd(data, trunctationRatio, true, mean, std);
+        m_textOutput << "\t" << mean << "\t" << std << "\t" << nCutAwayTracks;
+
+      } else {
+        m_textOutput << "\tno cut away ratio given";
+      }
+    } else if (count == true) {
+      m_textOutput << "\t\t\t\t\t\t";
     }
     if (count == true) {
       m_textOutput << "\t" << boost::accumulators::count(dataSample[i]);
@@ -515,4 +535,41 @@ double VertexFitCheckerModule::calcChi2(const TMatrixT<double>& res, const TMatr
   TMatrixT<double> invR = TrackFitCheckerModule::invertMatrix(R);
   TMatrixT<double> resT(TMatrixT<double>::kTransposed, res);
   return (resT * invR * res)[0][0];
+}
+
+int VertexFitCheckerModule::trunctatedMeanAndStd(std::vector<double> data, const double cutRatio, const bool symmetric, double& mean, double& std)
+{
+
+  const int n = data.size();
+  int truncN = -1;
+  //  if ((n* cutRatio < 2 and symmetric == true) or(n* cutRatio < 1 and symmetric == false)) {
+  //    return 0;
+  //  }
+  sort(data.begin(), data.end());
+  std = 0;
+  int i = 0;
+  int iMax = 0;
+  double sum = 0;
+
+  if (symmetric == true) { // cut will be applied to both sides of the sorted sample
+    int cut = int(cutRatio * n / 2.0 + 0.5);
+    truncN = n - cut - cut;
+    i = cut;
+    iMax = n - cut;
+    sum = std::accumulate(data.begin() + cut, data.end() - cut, 0.0);
+  } else { // cut will only be applied to the side with the larger values of the sorted sample
+    int cut = int(cutRatio * n + 0.5);
+    truncN = n - cut;
+    i = 0;
+    iMax = n - cut;
+    sum = std::accumulate(data.begin(), data.end() - cut, 0.0);
+  }
+  mean = sum / truncN;
+  while (i not_eq iMax) {
+    double diff = data[i] - mean;
+    std += diff * diff;
+    ++i;
+  }
+  std = sqrt(1.0 / (truncN - 1) * std);
+  return n - truncN;
 }

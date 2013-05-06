@@ -2874,8 +2874,10 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<C
     }
 
     if (currentPass->circleFit.first == true) {
-      double closestApproachPhi, closestApproachR;
-      double chi2 = m_trackletFilterBox.circleFit(closestApproachPhi, closestApproachR);
+      double closestApproachPhi, closestApproachR, estimatedRadius;
+      double chi2 = m_trackletFilterBox.circleFit(closestApproachPhi, closestApproachR, estimatedRadius);
+      (*currentTC)->setEstRadius(estimatedRadius);
+      B2DEBUG(100, "TCC Filter: estimated closestApproachPhi, closestApproachR, estimatedRadius: " << closestApproachPhi << ", " << closestApproachR << ", " << estimatedRadius)
       if (chi2 > currentPass->circleFit.second) {  // means chi2 is bad
         B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by circleFit! ");
         m_TESTERtriggeredCircleFit++; tcCtr++;
@@ -3073,10 +3075,11 @@ void VXDTFModule::calcInitialValues4TCs(TCsOfEvent& tcVector) /// TODO: use vxdC
     } else {
       radialVector = (intersection - hitA);
     }
-    /// following line needed for method A-C:
-    radiusInCm = radialVector.Mag(); // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
 
-    /// method D: using circleFit
+    double radiusInCm = aTC->getEstRadius();
+    if (radiusInCm  < 0.1) { // if it is not set, value stays at zero, therefore small check should be enough
+      radiusInCm = radialVector.Mag(); // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
+    }
 //       double chi2 = -1; // means, no chi2 will be calculated
 //     radiusInCm = circleFit(currentHits,chi2);
 
@@ -3446,7 +3449,7 @@ string VXDTFModule::EventInfoPackage::Print()
   output << ", nn: " << sectionConsumption.neuronalStuff.count();
   output << ", other: " << sectionConsumption.intermediateStuff.count() << endl;
 
-  output << " results: " << endl;
+  output << " results: ";
   output << "nPXDCluster: " << numPXDCluster << ", nSVDCluster: " << numSVDCluster << ", nSVDHits(x-Passes): " << numSVDHits << endl;
   output << "sfActivated: " << segFinderActivated << ", discarded: " << segFinderDiscarded << ", nfActivated: " << nbFinderActivated << ", discarded: " << nbFinderDiscarded << endl;
   output << "tccApproved: " << tccApprovedTCs << ", nTCsAfterTCC: " << numTCsAfterTCC << ", nTCsPostTCfilter: " << numTCsAfterTCCfilter << ", nTCsKilledOverlap: " << numTCsKilledByCleanOverlap << ", nTCsFinal: " << numTCsfinal << endl;

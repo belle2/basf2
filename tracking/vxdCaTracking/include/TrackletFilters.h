@@ -49,7 +49,7 @@ namespace Belle2 {
     double circleFit();
 
     /** using paper "Effective circle fitting for particle trajectories" from V. Karimäki (Nucl.Instr.and Meth. in Physics Research, A305 (1991), Elsevier) to calculate chi2-value of a circle including these hits. Return value is chi2, input parameters are the future r-phi-coordinates of clap (closest approach of fitted circle to origin), which will be calculated during process */
-    double circleFit(double& clapPhi, double& clapR);  //
+    double circleFit(double& clapPhi, double& clapR, double& radius);  //
 
   protected:
 

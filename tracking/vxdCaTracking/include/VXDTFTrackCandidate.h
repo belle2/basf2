@@ -37,6 +37,7 @@ namespace Belle2 {
       m_qualityIndex(1.0),
       m_qqq(1.0),
       m_neuronValue(0.0),
+      m_estRadius(0.),
       m_pdgCode(0),
       m_passIndex(-1),
       m_fitSucceeded(false) {}
@@ -59,6 +60,7 @@ namespace Belle2 {
     double getTrackQuality() { return m_qualityIndex; } /**< returns quality index of TC, has to be between 0 (bad) and 1 (perfect) */
     double getQQQ() { return m_qqq; } /**< returns aditional quality index */
     double getNeuronValue() const { return m_neuronValue; } /**< returns state of neuron during hopfield network */
+    double getEstRadius() { return m_estRadius; } /**< returns the estimated radius of the track circle in the x-y-plane */
     TVector3 getInitialCoordinates() const { return m_initialHit; } /**< returns initial coordinates needed for export as GFTrackCand */
     TVector3 getInitialMomentum() const { return m_initialMomentum; } /**< returns initial momentum needed for export as GFTrackCand */
     int getPDGCode() const { return m_pdgCode; } /**< returns estimated PDGCode (its always a pion, but charge changes depending of the sign of the curvature of the track) needed for export as GFTrackCandid */
@@ -78,6 +80,7 @@ namespace Belle2 {
     void setQQQ(double qqqScore, double maxScore); /**< set estimated extended quality of TC (a potential minimal replacement for kalman filter, interesting for online-use) */
     void setCondition(bool newCondition); /**< set condition. If true, TC is part of set of final TCs which are exported for further use */
     void setNeuronValue(double aValue);  /**< set neuron value, needed by the hopfield network */
+    void setEstRadius(double radius) { if (radius < 0) radius *= -1.; m_estRadius = radius; }  /**< sets the estimated radius of the track circle in the x-y-plane */
     void removeVirtualHit(); /**< removes virtual hit which is needed for most filtering steps */
     void setInitialValue(TVector3 aHit, TVector3 pVector, int pdg); /**< set initial values for TC, needed by GFTrackCand */
     void setPassIndex(int anIndex); /**< sets pass index number containing current TC */
@@ -98,6 +101,7 @@ namespace Belle2 {
     double m_qualityIndex;  /**< e.g. Chi²-Value */
     double m_qqq;  /**< QQQ = quasi quality indicator */
     double m_neuronValue;  /**< QI for hopfield network */
+    double m_estRadius; /**< calculated by circleFit or another technique estimating the radius of the track circle in the x-y-plane */
     int m_pdgCode;  /**< estimated PDGCode of TC */
     int m_passIndex;  /**< TF supports several passes per event, this value is needed for some passSpecific parameters. */
     bool m_fitSucceeded; /**< returns true if kalman fit was possible and returned a result itself */

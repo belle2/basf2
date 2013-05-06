@@ -33,7 +33,7 @@ namespace Belle2 {
     }
 
     /** Constructor. needs the first parameter is outer hit, second is inner hit. Parameters in TVector3-format*/
-    TwoHitFilters(TVector3 outerHit, TVector3 innerHit):
+    TwoHitFilters(TVector3& outerHit, TVector3& innerHit):
       m_hitA(outerHit),
       m_hitB(innerHit),
       m_dz(outerHit[2] - innerHit[2]) {
@@ -50,7 +50,7 @@ namespace Belle2 {
     ~TwoHitFilters() {}
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(TVector3 outerHit, TVector3 innerHit) {
+    void resetValues(TVector3& outerHit, TVector3& innerHit) {
       m_hitA = outerHit;
       m_hitB = innerHit;
       m_dz = m_hitA[2] - m_hitB[2];

@@ -81,13 +81,13 @@ bool TrackletFilters::ziggZaggRZ()
 
 
 // clap = closest approach of fitted circle to origin
-double TrackletFilters::circleFit(double& clapPhi, double& clapR)
+double TrackletFilters::circleFit(double& clapPhi, double& clapR, double& radius)
 {
   double meanX = 0, meanY = 0, meanX2 = 0, meanY2 = 0, meanR2 = 0, meanR4 = 0, meanXR2 = 0, meanYR2 = 0, meanXY = 0; //mean values
   double r2 = 0, x = 0, y = 0, x2 = 0, y2 = 0, divisor = 1. / m_numHits; // coords and divisor which is the same for all of them
 
   // looping over all hits and do the division afterwards
-  BOOST_FOREACH(TVector3 hit, m_hits) {
+  BOOST_FOREACH(TVector3 & hit, m_hits) {
     x = hit.X();
     y = hit.Y();
     x2 = x * x;
@@ -125,17 +125,17 @@ double TrackletFilters::circleFit(double& clapPhi, double& clapR)
   double q1 = covR2R2 * covXY - covXR2 * covYR2;
   double q2 = covR2R2 * (covXX - covYY) - covXR2 * covXR2 + covYR2 * covYR2;
 
-  clapPhi = 0.5 * atan(2. * q1 / q2); // physical meaning: phi value of the point of closest approach of the fitted circle to the origin
+  clapPhi = 0.5 * atan2(2. * q1 , q2); // physical meaning: phi value of the point of closest approach of the fitted circle to the origin
 
   double sinPhi = sin(clapPhi);
   double cosPhi = cos(clapPhi);
   double kappa = (sinPhi * covXR2 - cosPhi * covYR2) / covR2R2;
   double delta = -kappa * meanR2 + sinPhi * meanX - cosPhi * meanY;
   double rootTerm = sqrt(1. - 4.*delta * kappa);
-  double rho = 2.*kappa / (rootTerm); // rho = 1/curvature in X-Y-plane = radius of fitting circle, used for pT-calculation
-  double dist = 2.*delta / (1 + rootTerm);
-  clapR = dist; // WARNING currently not sure whether this is indeed right...
-  double chi2 = m_numHits * (1 + rho * dist) * (1 + rho * dist) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2);
+  double rho = 2.*kappa / (rootTerm); // rho = curvature in X-Y-plane = 1/radius of fitting circle, used for pT-calculation
+  double dist = 2.*delta / (1. + rootTerm);
+  clapR = dist, radius = 1. / rho;
+  double chi2 = m_numHits * (1. + rho * dist) * (1. + rho * dist) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2);
   return chi2;
 }
 
@@ -143,6 +143,6 @@ double TrackletFilters::circleFit(double& clapPhi, double& clapR)
 // if you do not want to have the coordinates of the point of closest approach, use this one
 double TrackletFilters::circleFit()
 {
-  double phiValue, rValue;
-  return circleFit(phiValue, rValue);
+  double phiValue, rValue, radius;
+  return circleFit(phiValue, rValue, radius);
 }

@@ -39,7 +39,7 @@ namespace Belle2 {
     }
 
     /** Constructor. needs the first parameter is outer hit, second is center hit, third is inner hit. Parameters in TVector3-format*/
-    ThreeHitFilters(TVector3 outerHit, TVector3 centerHit, TVector3 innerHit):
+    ThreeHitFilters(TVector3& outerHit, TVector3& centerHit, TVector3& innerHit):
       m_circleCenterCalculated(false),
       m_radiusCalculated(false),
       m_radius(0.),
@@ -58,7 +58,7 @@ namespace Belle2 {
     ~ThreeHitFilters() {}
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(TVector3 outerHit, TVector3 centerHit, TVector3 innerHit) {
+    void resetValues(TVector3& outerHit, TVector3& centerHit, TVector3& innerHit) {
       m_radiusCalculated = false;
       m_circleCenterCalculated = false;
       m_radius = 0.;

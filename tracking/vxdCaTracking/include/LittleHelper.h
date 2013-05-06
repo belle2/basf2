@@ -22,7 +22,7 @@ namespace Belle2 {
   class LittleHelper {
   public:
 
-    /** Empty constructor. For initialisation only, an object generated this way is useless unless reset() is called at least once */
+    /** Empty constructor. For initialisation only, an object generated this way can be misleading (since mean and sigma are set automatically), therefore reset() should be called at least once in this case */
     LittleHelper():
       m_meanValue(0.),
       m_sigmaValue(1.) {}

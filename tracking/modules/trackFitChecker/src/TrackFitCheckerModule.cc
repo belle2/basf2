@@ -326,9 +326,11 @@ void TrackFitCheckerModule::event()
   if (nFittedTracks not_eq 0 and m_wAndPredPresentsTested == false) {
     if (m_testSi == true) {
       try {
-        fittedTracks[0]->getBK(0)->getNumber(GFBKKey_dafWeight, 0);
+        fittedTracks[0]->getBK(0)->getVector(GFBKKey_dafWeight, 0);
       } catch (GFException& e) {
+        std::cerr << e.what() << std::endl;
         m_testDaf = false;
+        B2DEBUG(100, "tried to detect the DAF. Result DAF is not used");
       }
     } else {
       m_testDaf = false;
@@ -533,7 +535,7 @@ void TrackFitCheckerModule::endRun()
   if (m_notPosDefCounter not_eq 0) {
     B2WARNING(m_notPosDefCounter << " covs had eigenvalues <= 0 ");
   }
-  if (m_processedTracks <= 1) {
+  if (m_processedTracks - m_nCutawayTracks <= 1) {
     B2WARNING("Only " << m_processedTracks << " track(s) were processed. Statistics cannot be computed.");
   } else {
     m_textOutput << "Number of processed tracks: " << m_processedTracks << "\n";
@@ -1526,7 +1528,7 @@ void TrackFitCheckerModule::testDaf(GFTrack* const aTrackPtr)
   for (int iGFHit = 0; iGFHit not_eq nHits; ++iGFHit) {
     int accuVecIndex = m_trackData.accuVecIndices[iGFHit];
     //aTrackPtr->getBK(0)->getNumber("dafChi2s", iGFHit,  dafChi2);
-    dafWeight = aTrackPtr->getBK(0)->getNumber(GFBKKey_dafWeight, iGFHit);// double check if this still works with background => more then one hit... probarbly it does work...
+    dafWeight = (aTrackPtr->getBK(0)->getVector(GFBKKey_dafWeight, iGFHit))(0);// double check if this still works with background => more then one hit... probarbly it does work...
     GFAbsRecoHit* aGFAbsRecoHitPtr = aTrackPtr->getHit(iGFHit);
     const PXDRecoHit*   aPxdRecoHitPtr = dynamic_cast<const PXDRecoHit* >(aGFAbsRecoHitPtr);
     const SVDRecoHit2D*   aSvdRecoHit2DPtr =  dynamic_cast<const SVDRecoHit2D* >(aGFAbsRecoHitPtr);

@@ -30,6 +30,7 @@
 #include <reconstruction/dataobjects/PIDLikelihood.h>
 #include <ecl/dataobjects/ECLGamma.h>
 #include <ecl/dataobjects/ECLPi0.h>
+#include <ecl/dataobjects/ECLShower.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
@@ -164,7 +165,8 @@ namespace Belle2 {
 
     for (int i = 0; i < Gammas.getEntries(); i++) {
       const ECLGamma* gamma = Gammas[i];
-      const MCParticle* mcParticle = DataStore::getRelated<MCParticle>(gamma);
+      const ECLShower* eclshower   = DataStore::getRelated<ECLShower>(gamma);
+      const MCParticle* mcParticle = DataStore::getRelated<MCParticle>(eclshower);
       Particle particle(gamma, i);
       if (particle.getParticleType() == Particle::c_ECLGamma) { // should always hold but...
         Particle* newPart = Particles.appendNew(particle);

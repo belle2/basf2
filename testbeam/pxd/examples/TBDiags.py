@@ -23,9 +23,9 @@ class PXDHitErrors(Module):
         """Initialize the module"""
 
         super(PXDHitErrors, self).__init__()
-        # # Output file object
+        ## Output file object
         self.file = open('PXDHitErrorOutput.txt', 'w')
-        # # Factors for decoding of VxdId's
+        ## Factors for decoding of VxdId's
         self.vxdid_factors = (8192, 256, 32)
 
     def beginRun(self):

@@ -10,7 +10,7 @@ set_log_level(LogLevel.ERROR)
 particlegun = register_module('ParticleGun')
 
 # number of primaries per event
-particlegun.param('nTracks', 1)
+particlegun.param('nTracks', 10)
 
 # DESY electrons:
 particlegun.param('pdgCodes', [11])
@@ -18,7 +18,7 @@ particlegun.param('pdgCodes', [11])
 # At DESY we can 6 GeV/c(+-5%) electron beam.
 # Beam divergence 2mrad not covered yet (we need some starting point location)
 particlegun.param('momentumGeneration', 'fixed')
-particlegun.param('momentumParams', [6.0, 0.0])
+particlegun.param('momentumParams', [2.0, 0.0])
 # momentum direction
 particlegun.param('thetaGeneration', 'fixed')
 particlegun.param('thetaParams', [90.0, 0.0])
@@ -33,7 +33,7 @@ particlegun.param('independentVertices', True)
 
 # Create Event information
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
+evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
 
 # Show progress of processing
 progress = register_module('Progress')
@@ -45,7 +45,7 @@ gearbox.param('Filename', 'testbeam/vxd/VXD.xml')
 
 # Create geometry
 geometry = register_module('Geometry')
-
+geometry.param('Components', ['MagneticField', 'TB'])
 # Run simulation
 simulation = register_module('FullSim')
 
@@ -69,7 +69,7 @@ output.param('outputFileName', 'TBSimulationOutput.root')
 geosaver = register_module('ExportGeometry')
 geosaver.param('Filename', 'TBGeometry.root')
 
-trueinfo = register_module('VXDHit')
+#trueinfo = register_module('VXDHit')
 
 # Save output of simulation
 inputm = register_module('RootInput')
@@ -85,7 +85,7 @@ main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(particlegun)
 main.add_module(simulation)
-main.add_module(trueinfo)
+#main.add_module(trueinfo)
 main.add_module(PXDDigi)
 main.add_module(SVDDigi)
 main.add_module(PXDClust)

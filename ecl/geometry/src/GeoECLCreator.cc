@@ -40,6 +40,9 @@
 #include <G4AssemblyVolume.hh>
 #include <G4Transform3D.hh>
 #include <G4VisAttributes.hh>
+// add include subtraction /////
+#include <G4SubtractionSolid.hh>
+////////////////////////////////
 
 #include <iostream>
 
@@ -212,13 +215,19 @@ namespace Belle2 {
     const double k_l2r1(k_l2r3 - 11.8 * cm);
     const double k_l2ang(9.0 * cm / ((k_l2r1 + k_l2r3) / 2.0));
 
+    // add foil thickness //
+    const double foilthickness = 0.0100 * cm; // crystal wrapping foil 100 um
+    const double thinfoilthickness = foilthickness * 0.8; // thin crystal wrapping foil 80 um
+    const double brthetafinthickness = 0.0500 * cm; // barrel theta fin 500 um
+    const double brphifinthickness = 0.0500 * cm; // barrel phi fin 500 um
+    const double avoidov = 1 + 1E-6; // foil inside is a little bit lager than crystal to avoid overlap
+    ///////////////////////
 
     GeoECLCreator::GeoECLCreator(): isBeamBkgStudy(0)
     {
       m_sensitive = new SensitiveDetector("SensitiveDetector", (2 * 24)*eV, 10 * MeV);
       logical_ecl = 0;
       physical_ecl = 0;
-      physical_ECLBarrelCylinder = 0;
     }
 
 
@@ -239,6 +248,16 @@ namespace Belle2 {
       G4Material* medAir = geometry::Materials::get("Air");
       string Si  = content.getString("Si");
       G4Material* medSi = geometry::Materials::get(Si.c_str());
+      // add AlTeflon //////////////////////////////
+      string AlTeflon  = content.getString("AlTeflon");
+      G4Material* medAlTeflon = geometry::Materials::get(AlTeflon.c_str());
+      string AlTeflon_thin  = content.getString("AlTeflon_thin");
+      G4Material* medAlTeflon_thin = geometry::Materials::get(AlTeflon_thin.c_str());
+      //////////////////////////////////////////////
+      // add AlTeflon //////////////////////////////
+      string Al  = content.getString("Al");
+      G4Material* medAl = geometry::Materials::get(Al.c_str());
+      //////////////////////////////////////////////
 
 //      double eclWorld_I[6] = {452, 452, 1250, 1250, 395, 395};//unit:mm
 //      double eclWorld_O[6] = {1640, 1640, 1640, 1640, 1640, 1640};//unit:mm
@@ -319,90 +338,281 @@ namespace Belle2 {
       double k_perpC;
       double k_phiC;
       double k_zC;
+      double k_phi_init; // add correction
       double zsign = 1.;
+
+      // add barrel fin parameters and previous crystal parameters/////////
+      double brfink_BLL;
+      double brfink_Ba;
+      double brfink_Bb;
+      double brfink_BA;
+      double brfink_Bh;
+      double brfink_z_TILTED;
+      double brfink_phi_TILTED;
+      double brfink_perpC;
+      double brfink_phiC;
+      double brfink_zC;
+      double brfink_phi_init; // add correction
+
+
+      double  prevk_Ba;
+      double  prevk_BA;
+      double  prevk_Bh;
+      double  prevk_BH;
+      double  prevk_z_TILTED;
+      double  prevk_phi_TILTED;
+      double  prevk_perpC;
+      double  prevk_phiC;
+      double  prevk_zC;
+      double  prevk_phi_init;
+      //////////////////////////////////////////////////////////////////////
 
 
       G4AssemblyVolume* assemblyBrCrystals = new G4AssemblyVolume();
       G4AssemblyVolume* assemblyBrDiodes = new G4AssemblyVolume();
+      // add assembly barrel foil ///////////////////////////////////
+      G4AssemblyVolume* assemblyBrFoils = new G4AssemblyVolume();
+      ////////////////////////////////////////////////////////
+      // add assembly barrel fin ///////////////////////////////////
+      G4AssemblyVolume* assemblyBrFins = new G4AssemblyVolume(); // theta
+      G4AssemblyVolume* assemblyBrPhiFins = new G4AssemblyVolume(); // phi
+      ////////////////////////////////////////////////////////
+
       int nBarrelCrystal = content.getNumberNodes("BarrelCrystals/BarrelCrystal");
 
-      for (int iBrCry = 1 ; iBrCry <= nBarrelCrystal ; ++iBrCry) {//46=29+17
+      for (int iBrCry = 1 ; iBrCry <= nBarrelCrystal ; ++iBrCry) {{//46=29+17
 
-        GearDir layerContent(content);
-        layerContent.append((format("/BarrelCrystals/BarrelCrystal[%1%]/") % (iBrCry)).str());
-
-
-        k_BLL = layerContent.getLength("K_BLL") * cm;
-        k_Ba = layerContent.getLength("K_Ba")   * cm;
-        k_Bb = layerContent.getLength("K_Bb")   * cm;
-        k_Bh = layerContent.getLength("K_Bh")   * cm;
-        k_BA = layerContent.getLength("K_BA")   * cm;
-        k_BH = layerContent.getLength("K_BH")   * cm;
-        k_z_TILTED = layerContent.getAngle("K_z_TILTED") ;
-        k_phi_TILTED = layerContent.getAngle("K_phi_TILTED") ;
-        k_perpC = layerContent.getLength("K_perpC") * cm ;
-        k_phiC = layerContent.getAngle("K_phiC") ;
-        k_zC = layerContent.getLength("K_zC")    * cm;
-
-        double cDx1 = k_Ba / 2;
-        double cDx2 = k_Bb / 2;
-        double cDy1 = k_Bh / 2;
-        double cDx3 = k_BA / 2;
-        double cDx4 = (k_BA + (k_Bb - k_Ba) * k_BH / k_Bh) / 2 ; //Bb / 2 * k_BA / k_Ba;
-        double cDy2 = k_BH / 2;
-        double cDz = k_BLL / 2;
-        if (iBrCry >= 30) {zsign = -1;}
-        G4Transform3D r00 = G4RotateZ3D(90.*zsign * deg);
-        G4Transform3D tilt_z = G4RotateY3D(k_z_TILTED);
-        G4Transform3D tilt_phi = G4RotateZ3D(k_phi_TILTED);
-        G4Transform3D position = G4Translate3D(k_perpC, 0, k_zC);  // Move over to the left...
-        G4Transform3D pos_phi = G4RotateZ3D(k_phiC);
-        G4Transform3D Tr = pos_phi * position * tilt_phi * tilt_z * r00;
-
-        /*
-                    double vtx[15];
-                    vtx[0] = cDx1; vtx[1] = cDy1;//G4Point3D tmp0( cDx1, cDy1,-cDz);
-                    vtx[2] = cDx2; vtx[3] = -cDy1;//G4Point3D tmp1( cDx2,-cDy1,-cDz);
-                    vtx[4] = -cDx2; vtx[5] = -cDy1;//G4Point3D tmp2(-cDx2,-cDy1,-cDz);
-                    vtx[6] = -cDx1; vtx[7] = cDy1;//G4Point3D tmp3(-cDx1, cDy1,-cDz);
-                    vtx[8] = cDx3; vtx[9] = cDy2;//G4Point3D tmp4( cDx3, cDy2, cDz);
-                    vtx[10] = cDx4; vtx[11] = -cDy2;//G4Point3D tmp5( cDx4,-cDy2, cDz);
-                    vtx[12] = -cDx4; vtx[13] = -cDy2;//G4Point3D tmp6(-cDx4,-cDy2, cDz);
-                    vtx[14] = -cDx3; vtx[15] = cDy2;//G4Point3D tmp7(-cDx3, cDy2, cDz);
-        */
-        G4Trap* BrCrysralShape = new G4Trap((format("solidEclBrCrystal_%1%") % iBrCry).str().c_str(),
-                                            cDz , 0 , 0, cDy1, cDx2, cDx1, 0, cDy2 , cDx4, cDx3, 0);
-        G4LogicalVolume* BrCrysral = new G4LogicalVolume(BrCrysralShape, medCsI, (format("logicalEclBrCrystal_%1%") % iBrCry).str().c_str(), 0, 0, 0);
-        BrCrysral->SetSensitiveDetector(m_sensitive);
-        assemblyBrCrystals->AddPlacedVolume(BrCrysral, Tr);
-
-        G4Transform3D DiodePosition = G4Translate3D(0, 0, (k_BLL + DiodeHeight) / 2 + 0.1);  // Move over to the left...
-        G4Transform3D TrD = pos_phi * position * tilt_phi * tilt_z * r00 * DiodePosition ;
-
-        if (isBeamBkgStudy) {
-          for (int iSector = 0; iSector < 72; ++iSector) {//total 72 for Bareel Diode
-            G4Transform3D SectorRot = G4RotateZ3D(360.*iSector / 72 * deg);
-            G4Transform3D SectorRRot = G4RotateZ3D((360.*iSector / 72 - 2.494688) * deg);
-            G4Transform3D BrR = SectorRot * TrD;
-            G4Transform3D BrRR = SectorRRot * TrD;
-            int DiodeId = (iBrCry - 1) * 144 + iSector * 2 + 1152;
-            G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBrDiode_%1%") % DiodeId).str().c_str(), 0, 0, 0);
-            Sensor->SetSensitiveDetector(new BkgSensitiveDetector("ECL", DiodeId));
-            assemblyBrDiodes->AddPlacedVolume(Sensor, BrR);
+          GearDir layerContent(content);
+          layerContent.append((format("/BarrelCrystals/BarrelCrystal[%1%]/") % (iBrCry)).str());
 
 
-            int DiodeId1 = (iBrCry - 1) * 144 + iSector * 2 - 1 + 1152;
-            if (iSector == 0)DiodeId1 = (iBrCry) * 144 + iSector * 2 - 1 + 1152;
-            G4LogicalVolume* Sensor1 = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBrDiode_%1%") % DiodeId1).str().c_str(), 0, 0, 0);
-            Sensor1->SetSensitiveDetector(new BkgSensitiveDetector("ECL", DiodeId1));
-            assemblyBrDiodes->AddPlacedVolume(Sensor1, BrRR);
+          k_BLL = layerContent.getLength("K_BLL") * cm;
+          k_Ba = layerContent.getLength("K_Ba")   * cm;
+          k_Bb = layerContent.getLength("K_Bb")   * cm;
+          k_Bh = layerContent.getLength("K_Bh")   * cm;
+          k_BA = layerContent.getLength("K_BA")   * cm;
+          k_BH = layerContent.getLength("K_BH")   * cm;
+          k_z_TILTED = layerContent.getAngle("K_z_TILTED") ;
+          k_phi_TILTED = layerContent.getAngle("K_phi_TILTED") ;
+          k_perpC = layerContent.getLength("K_perpC") * cm ;
+          k_phiC = layerContent.getAngle("K_phiC") ;
+          k_zC = layerContent.getLength("K_zC") * cm;
+          k_phi_init = layerContent.getAngle("K_phi_init") ; // add correction
+
+
+          double cDx1 = k_Ba / 2;
+          double cDx2 = k_Bb / 2;
+          double cDy1 = k_Bh / 2;
+          double cDx3 = k_BA / 2;
+          double cDy2 = k_BH / 2;
+          double cDz = k_BLL / 2;
+          double cDx4 = (cDx3 * cDy1 + (cDx2 - cDx1) * cDy2) / cDy1; // replaced by coplanarity
+
+          /*// add barrel foil dimensions ////////////////////////
+          double brfratio = 1 + foilthickness / cDx4;
+          double brfoilcDx1 = cDx1 * brfratio;
+          double brfoilcDx2 = cDx2 * brfratio;
+          double brfoilcDy1 = cDy1 * brfratio;
+          double brfoilcDx3 = cDx3 * brfratio;
+          double brfoilcDy2 = cDy2 * brfratio;
+          double brfoilcDx4 = cDx4 * brfratio;
+          *////////////////////////////////////////////////
+
+          // add barrel foil dimensions ////////////////////////
+          double brfoilcDz = cDz + foilthickness;
+          double brfoilcDx1 = cDx1 + foilthickness / tan(atan(cDy1 / (cDx2 - cDx1)) / 2.);
+          double brfoilcDx2 = cDx2 + foilthickness / tan(atan(cDy1 / (cDx2 - cDx1)) / 2.);
+          double brfoilcDy1 = cDy1 + foilthickness;
+          double brfoilcDx3 = cDx3 + foilthickness / tan(atan(cDy2 / (cDx4 - cDx3)) / 2.);
+          double brfoilcDy2 = cDy2 + foilthickness;
+          double brfoilcDx4 = brfoilcDx3 + (brfoilcDx2 - brfoilcDx1) * brfoilcDy2 / brfoilcDy1;
+          ///////////////////////////////////////////////
+
+          if (iBrCry >= 30) {zsign = -1;}
+          G4Transform3D r00 = G4RotateZ3D(90.*zsign * deg);
+          G4Transform3D phi_init = G4RotateZ3D(k_phi_init);
+          G4Transform3D tilt_z = G4RotateY3D(k_z_TILTED);
+          G4Transform3D tilt_phi = G4RotateZ3D(k_phi_TILTED);
+          G4Transform3D position = G4Translate3D(k_perpC, 0, k_zC);  // Move over to the left...
+          G4Transform3D pos_phi = G4RotateZ3D(k_phiC);
+          G4Transform3D Tr = pos_phi * position * tilt_phi * tilt_z * r00 * phi_init;
+
+          /*
+                      double vtx[15];
+                      vtx[0] = cDx1; vtx[1] = cDy1; G4Point3D tmp3( cDx1, cDy1,-cDz);
+                      vtx[2] = cDx2; vtx[3] = -cDy1; G4Point3D tmp2( cDx2,-cDy1,-cDz);
+                      vtx[4] = -cDx2; vtx[5] = -cDy1; G4Point3D tmp1(-cDx2,-cDy1,-cDz);
+                      vtx[6] = -cDx1; vtx[7] = cDy1; G4Point3D tmp0(-cDx1, cDy1,-cDz);
+                      vtx[8] = cDx3; vtx[9] = cDy2; G4Point3D tmp7( cDx3, cDy2, cDz);
+                      vtx[10] = cDx4; vtx[11] = -cDy2; G4Point3D tmp6( cDx4,-cDy2, cDz);
+                      vtx[12] = -cDx4; vtx[13] = -cDy2; G4Point3D tmp5(-cDx4,-cDy2, cDz);
+                      vtx[14] = -cDx3; vtx[15] = cDy2; G4Point3D tmp4(-cDx3, cDy2, cDz);
+          */
+
+          G4Trap* BrCrysralShape = new G4Trap((format("solidEclBrCrystal_%1%") % iBrCry).str().c_str(),
+                                              cDz , 0 , 0, cDy1, cDx2, cDx1, 0, cDy2 , cDx4, cDx3, 0);
+          G4LogicalVolume* BrCrysral = new G4LogicalVolume(BrCrysralShape, medCsI, (format("logicalEclBrCrystal_%1%") % iBrCry).str().c_str(), 0, 0, 0);
+          BrCrysral->SetSensitiveDetector(m_sensitive);
+          assemblyBrCrystals->AddPlacedVolume(BrCrysral, Tr);
+
+
+          //  add barrel foil /////////////////////////////////////////////
+
+          G4Trap* BrFoilout = new G4Trap((format("BrFoilout_%1%") % iBrCry).str().c_str(),
+                                         brfoilcDz , 0 , 0, brfoilcDy1, brfoilcDx2, brfoilcDx1, 0,
+                                         brfoilcDy2, brfoilcDx4, brfoilcDx3, 0);
+
+          G4SubtractionSolid* BrFoilShape = new G4SubtractionSolid((format("BrFoil_%1%") % iBrCry).str().c_str(), BrFoilout, BrCrysralShape);
+
+          G4LogicalVolume* BrFoil = new G4LogicalVolume(BrFoilShape, medAlTeflon, (format("logicalBrFoil_%1%") % iBrCry).str().c_str(), 0, 0, 0);
+          //BrFoil->SetSensitiveDetector(m_sensitive);
+          assemblyBrFoils->AddPlacedVolume(BrFoil, Tr);
+
+          /////////////////////////////////////////////////////////////////////////
+
+
+          // add barrel theta fin //////////////////////////////////////////////////////////////////////////
+
+          double smalldev = 0.01;
+
+          if (iBrCry % 4 == 1) { // store the parameters of crystals before the fin (previous)
+            prevk_Ba = k_Ba;
+            prevk_BA = k_BA;
+            prevk_Bh = k_Bh;
+            prevk_BH = k_BH;
+            prevk_z_TILTED = k_z_TILTED;
+            prevk_phi_TILTED = k_phi_TILTED;
+            prevk_perpC = k_perpC;
+            prevk_phiC = k_phiC;
+            prevk_zC = k_zC;
+            prevk_phi_init = k_phi_init;
+          }
+
+          if (iBrCry % 4 == 2 && (iBrCry != 2 && iBrCry != 46)) { // barrel fin between every  4 crystals (iBrCry%4==2 means after the fin)
+
+            if (iBrCry < 29) { // choose the lower one
+              brfink_Ba = k_Ba * (1 - smalldev);
+              brfink_Bb = k_Ba * (1 - smalldev);
+              brfink_BA = k_BA * (1 - smalldev); // / sin((prevk_z_TILTED + k_z_TILTED) / 2);
+            } else {
+              brfink_Ba = prevk_Ba * (1 - smalldev);
+              brfink_Bb = prevk_Ba * (1 - smalldev);
+              brfink_BA = prevk_BA * (1 - smalldev); // / sin((prevk_z_TILTED + k_z_TILTED) / 2);
+            }
+
+
+            brfink_Bh = brthetafinthickness;
+            brfink_z_TILTED = ((prevk_z_TILTED + atan((prevk_BH - prevk_Bh) / k_BLL / 2)) + (k_z_TILTED - atan((k_BH - k_Bh) / k_BLL / 2))) / 2; // average angle of 2 crystal sides
+            //cout << (prevk_z_TILTED + atan((prevk_BH-prevk_Bh)/k_BLL/2)) << " " << (k_z_TILTED - atan((k_BH-k_Bh)/k_BLL/2)) << endl;
+            brfink_BLL = k_BLL / sin(brfink_z_TILTED)   - smalldev * fabs(prevk_zC + k_zC); // projected length in r-direction of barrel fins are the same (30 cm)
+            brfink_phi_TILTED = (prevk_phi_TILTED + k_phi_TILTED) / 2; // average
+            brfink_perpC = (prevk_perpC + k_perpC + (brfink_BLL - k_BLL - smalldev * fabs(prevk_zC + k_zC)) * sin(brfink_z_TILTED)) / 2; // average and move more for fin longer than crystal
+            brfink_phiC = (prevk_phiC + k_phiC) / 2; // average
+            brfink_zC = (prevk_zC + k_zC  - (prevk_BH - prevk_Bh) / 2 / sin(prevk_z_TILTED) + (k_BH - k_Bh) / 2 / sin(k_z_TILTED) + (brfink_BLL - k_BLL - smalldev * fabs(prevk_zC + k_zC)) * cos(brfink_z_TILTED)) / 2; // average and move more for fin longer than crystal
+            brfink_phi_init = (prevk_phi_init + k_phi_init) / 2; // average
+
+
+            double brfincDx1 = brfink_Ba / 2;
+            double brfincDx2 = brfink_Bb / 2;
+            double brfincDy = brfink_Bh / 2;
+            double brfincDx3 = brfink_BA / 2;
+            double brfincDz = brfink_BLL / 2;
+            double brfincDx4 = brfincDx3 + (brfincDx2 - brfincDx1); // coplanarity
+
+
+            if (iBrCry >= 30) {zsign = -1;}
+            G4Transform3D r00 = G4RotateZ3D(90.*zsign * deg);
+            G4Transform3D phi_init = G4RotateZ3D(brfink_phi_init);
+            G4Transform3D tilt_z = G4RotateY3D(brfink_z_TILTED);
+            G4Transform3D tilt_phi = G4RotateZ3D(brfink_phi_TILTED);
+            G4Transform3D position = G4Translate3D(brfink_perpC, 0, brfink_zC);  // Move over to the left...
+            G4Transform3D pos_phi = G4RotateZ3D(brfink_phiC);
+            G4Transform3D Tr = pos_phi * position * tilt_phi * tilt_z * r00 * phi_init;
+
+            G4Trap* BrFinShape = new G4Trap((format("solidEclBrFin_%1%") % iBrCry).str().c_str(),
+                                            brfincDz , 0 , 0, brfincDy, brfincDx2, brfincDx1, 0, brfincDy , brfincDx4, brfincDx3, 0);
+            G4LogicalVolume* BrFin = new G4LogicalVolume(BrFinShape, medAl, (format("logicalEclBrFin_%1%") % iBrCry).str().c_str(), 0, 0, 0);
+            //BrFin->SetSensitiveDetector(m_sensitive);
+            assemblyBrFins->AddPlacedVolume(BrFin, Tr);
+
+          } // end if
+          /////////////////////////////////////////////////////////////////////////////////////
+
+
+          G4Transform3D DiodePosition = G4Translate3D(0, 0, (k_BLL + DiodeHeight) / 2 + 0.1);  // Move over to the left...
+          G4Transform3D TrD = pos_phi * position * tilt_phi * tilt_z * r00 * DiodePosition ;
+
+          if (isBeamBkgStudy) {
+            for (int iSector = 0; iSector < 72; ++iSector) {//total 72 for Bareel Diode
+              G4Transform3D SectorRot = G4RotateZ3D(360.*iSector / 72 * deg);
+              G4Transform3D SectorRRot = G4RotateZ3D((360.*iSector / 72 - 2.488555) * deg); // replace the 2.494688
+              G4Transform3D BrR = SectorRot * TrD;
+              G4Transform3D BrRR = SectorRRot * TrD;
+              int DiodeId = (iBrCry - 1) * 144 + iSector * 2 + 1152;
+              G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBrDiode_%1%") % DiodeId).str().c_str(), 0, 0, 0);
+              Sensor->SetSensitiveDetector(new BkgSensitiveDetector("ECL", DiodeId));
+              assemblyBrDiodes->AddPlacedVolume(Sensor, BrR);
+
+
+              int DiodeId1 = (iBrCry - 1) * 144 + iSector * 2 - 1 + 1152;
+              if (iSector == 0)DiodeId1 = (iBrCry) * 144 + iSector * 2 - 1 + 1152;
+              G4LogicalVolume* Sensor1 = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBrDiode_%1%") % DiodeId1).str().c_str(), 0, 0, 0);
+              Sensor1->SetSensitiveDetector(new BkgSensitiveDetector("ECL", DiodeId1));
+              assemblyBrDiodes->AddPlacedVolume(Sensor1, BrRR);
 //         cout<<(format("logicalEclBrDiode_%1%") % DiodeId1).str().c_str()<<endl;
 //         cout<<(format("logicalEclBrDiode_%1%") % DiodeId).str().c_str()<<endl;
-          }//iSector
+            }//iSector
+          }
+
+
         }
-
-
       }//iBrCry
+
+
+      // add barrel phi fin ///////////////////////////////////////////////////////////////////////////////
+
+      double brforwangle = 32.20 * deg; //32.987 * deg;
+      double brbackangle = 51.28 * deg; //52.902 * deg;
+
+      double brphifina = 298.34 * cm / 2; // shorter base
+      double brphifinL = 30. * cm / 2; // height
+
+      double f_xForw = brphifinL / tan(brforwangle);
+      double f_xBack = brphifinL / tan(brbackangle);
+      double f_dx = (f_xForw - f_xBack) / 2;
+
+      double brphifinA = brphifina + f_xBack + f_xForw ;
+      double brphifinh = brphifinthickness / 2; // thickness
+      double brphifintheta = atan(f_dx / brphifinL);
+
+      //double brphifin_centercrysphi_TIL = 1.112094 * deg;
+      //double brphifin_centercrysperpC = 140.7115 * cm;
+      //double brphifin_centercrysphiC = 1.382185 * deg;
+      double brphifin_shorterbaseleft = 100.08 * cm;
+
+      G4Transform3D r00 = G4RotateY3D(-90. * deg);
+      G4Transform3D tilt_z = G4RotateY3D(0.);
+      G4Transform3D central = G4Translate3D(0, 0, (brphifina - brphifin_shorterbaseleft + f_dx));
+      G4Transform3D tilt_psi = G4RotateX3D(0E-6 * deg);
+      G4Transform3D tilt_phi = G4RotateZ3D((3.7579644 - 0E-3) * deg);
+      //G4Transform3D tilt_psi = G4Rotate3D(-0.3E-3*deg, G4Point3D(0, 0, 0), G4Point3D(cos(brphifin_centercrysphi_TIL), sin(brphifin_centercrysphi_TIL), 0) );
+      //G4Transform3D position = G4Translate3D(brphifin_centercrysperpC, 0, 0);
+      G4Transform3D cposition = G4Translate3D(140.594699 * cm, 6.478866 * cm, 0);
+      //G4Transform3D pos_phi = G4RotateZ3D(brphifin_centercrysphiC + (2.5114444*deg/2) );
+      //G4Transform3D Tr =  cposition * tilt_phi * tilt_psi * central * tilt_z * r00;
+      G4Transform3D Tr =  cposition * tilt_phi * tilt_psi * central * tilt_z * r00;
+
+      G4Trap* BrPhiFinShape = new G4Trap(format("solidEclBrPhiFin").str().c_str(),
+                                         brphifinL, brphifintheta, 180. * deg,
+                                         brphifinh, brphifinA, brphifinA, 0.,
+                                         brphifinh, brphifina, brphifina, 0.);
+      G4LogicalVolume* BrPhiFin = new G4LogicalVolume(BrPhiFinShape, medAl, format("logicalEclBrPhiFin").str().c_str(), 0, 0, 0);
+      //BrPhiFin->SetSensitiveDetector(m_sensitive);
+      assemblyBrPhiFins->AddPlacedVolume(BrPhiFin, Tr);
+
+
+
+      /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
       double h1, h2, bl1, bl2, tl1, tl2, alpha1, alpha2, Rphi1, Rphi2, Rtheta, Pr, Ptheta, Pphi, halflength;
@@ -415,6 +625,10 @@ namespace Belle2 {
 
       G4AssemblyVolume* assemblyFwCrystals = new G4AssemblyVolume();
       G4AssemblyVolume* assemblyFwDiodes = new G4AssemblyVolume();
+      // add assembly forward foil ///////////////////////////////
+      G4AssemblyVolume* assemblyFwFoils = new G4AssemblyVolume();
+      ///////////////////////////////////////////////////////////
+
       for (int iCry = 1 ; iCry <= 72 ; ++iCry) {
         GearDir counter(content);
         counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
@@ -434,10 +648,28 @@ namespace Belle2 {
         Ptheta = counter.getAngle("K_Ptheta") ;
         Pphi = counter.getAngle("K_Pphi") ;
         halflength = 15.0 * cm;
+
+        double fwfoilthickness;
+        if (1 <= iCry && iCry <= 6) {
+          fwfoilthickness = thinfoilthickness;
+        } else {
+          fwfoilthickness = foilthickness;
+        }
+
+        // add forward foil dimensions ////////////////////////////
+        double fwfoilh1 = counter.getLength("K_h1") * cm + fwfoilthickness;
+        double fwfoilh2 = counter.getLength("K_h2") * cm + fwfoilthickness;
+        double fwfoilbl1 = counter.getLength("K_bl1") * cm + fwfoilthickness / tan(atan(h1 / (bl1 - tl1)) / 2.);
+        double fwfoiltl1 = counter.getLength("K_tl1") * cm + fwfoilthickness / tan(atan(h1 / (bl1 - tl1)) / 2.);
+        double fwfoiltl2 = counter.getLength("K_tl2") * cm + fwfoilthickness / tan(atan(h2 / (bl2 - tl2)) / 2.);
+        double fwfoilbl2 = fwfoiltl2 + (fwfoilbl1 - fwfoiltl1) * fwfoilh2 / fwfoilh1;
+        double fwfoilhalflength = halflength + fwfoilthickness;
+        ///////////////////////////////////////////////////////////
+
+
         G4Transform3D m1 = G4RotateZ3D(Rphi1);
         G4Transform3D m2 = G4RotateY3D(Rtheta);
         G4Transform3D m3 = G4RotateZ3D(Rphi2);
-
         G4Transform3D position =
           G4Translate3D(Pr * sin(Ptheta) * cos(Pphi),
                         Pr * sin(Ptheta) * sin(Pphi),
@@ -451,6 +683,29 @@ namespace Belle2 {
         FwCrysral->SetSensitiveDetector(m_sensitive);
 
         assemblyFwCrystals->AddPlacedVolume(FwCrysral, Tr);
+
+        /////////////////  add forward foil ///////////////////////////////////////
+
+        G4Trap* FwFoilout = new G4Trap((format("FwFoilout_%1%") % iCry).str().c_str(),
+                                       fwfoilhalflength , 0 , 0, fwfoilh1,  fwfoilbl1,
+                                       fwfoiltl1, alpha1 , fwfoilh2, fwfoilbl2,
+                                       fwfoiltl2, alpha2);
+
+        G4Trap* FwFoilin = new G4Trap((format("solidEclFwCrystal_%1%") % iCry).str().c_str(),
+                                      halflength * avoidov , 0 , 0, h1 * avoidov , bl1 * avoidov, tl1 * avoidov , alpha1 , h2 * avoidov   , bl2 * avoidov, tl2 * avoidov, alpha2);
+        G4SubtractionSolid* FwFoilShape = new G4SubtractionSolid((format("FwFoil_%1%") % iCry).str().c_str(), FwFoilout, FwFoilin);
+
+        if (1 <= iCry && iCry <= 6) {
+          G4LogicalVolume* FwFoil = new G4LogicalVolume(FwFoilShape, medAlTeflon_thin, (format("logicalFwFoil_%1%") % iCry).str().c_str(), 0, 0, 0);
+          //FwFoil->SetSensitiveDetector(m_sensitive);
+          assemblyFwFoils->AddPlacedVolume(FwFoil, Tr);
+        } else {
+          G4LogicalVolume* FwFoil = new G4LogicalVolume(FwFoilShape, medAlTeflon, (format("logicalFwFoil_%1%") % iCry).str().c_str(), 0, 0, 0);
+          //FwFoil->SetSensitiveDetector(m_sensitive);
+          assemblyFwFoils->AddPlacedVolume(FwFoil, Tr);
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////
 
 
         G4Transform3D DiodePosition = G4Translate3D(0, 0, halflength + (DiodeHeight) / 2 + 0.1); // Move over to the left...
@@ -477,6 +732,10 @@ namespace Belle2 {
       iPhi = 0;
       G4AssemblyVolume* assemblyBwCrystals = new G4AssemblyVolume();
       G4AssemblyVolume* assemblyBwDiodes = new G4AssemblyVolume();
+      // add assembly backward foil ///////////////////////////////
+      G4AssemblyVolume* assemblyBwFoils = new G4AssemblyVolume();
+      ///////////////////////////////////////////////////////////
+
       for (int iCry = 73 ; iCry <= 132 ; ++iCry) {
         GearDir counter(content);
         counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
@@ -496,13 +755,27 @@ namespace Belle2 {
         Ptheta = counter.getAngle("K_Ptheta") ;
         Pphi = counter.getAngle("K_Pphi") ;
         halflength = 15.0 * cm;
+
+        double bwfoilthickness;
+        if ((iCry == 110 || iCry == 113 || iCry == 116 || iCry == 119) || (121 <= iCry && iCry <= 128)) {
+          bwfoilthickness = thinfoilthickness;
+        } else {
+          bwfoilthickness = foilthickness;
+        }
+
+        // add backward foil dimensions ////////////////////////////
+        double bwfoilh1 = counter.getLength("K_h1") * cm + bwfoilthickness;
+        double bwfoilh2 = counter.getLength("K_h2") * cm + bwfoilthickness;
+        double bwfoilbl1 = counter.getLength("K_bl1") * cm + bwfoilthickness / tan(atan(h1 / (bl1 - tl1)) / 2.);
+        double bwfoiltl1 = counter.getLength("K_tl1") * cm + bwfoilthickness / tan(atan(h1 / (bl1 - tl1)) / 2.);
+        double bwfoiltl2 = counter.getLength("K_tl2") * cm + bwfoilthickness / tan(atan(h2 / (bl2 - tl2)) / 2.);
+        double bwfoilbl2 = bwfoiltl2 + (bwfoilbl1 - bwfoiltl1) * bwfoilh2 / bwfoilh1;
+        double bwfoilhalflength = halflength + bwfoilthickness;
+        ///////////////////////////////////////////////////////////
+
         G4Transform3D m1 = G4RotateZ3D(Rphi1);
         G4Transform3D m2 = G4RotateY3D(Rtheta);
         G4Transform3D m3 = G4RotateZ3D(Rphi2);
-
-
-
-
         G4Transform3D position =
           G4Translate3D(Pr * sin(Ptheta) * cos(Pphi),
                         Pr * sin(Ptheta) * sin(Pphi),
@@ -513,6 +786,30 @@ namespace Belle2 {
         G4LogicalVolume* BwCrysral = new G4LogicalVolume(BwCrysralShape, medCsI, (format("logicalEclBwCrystal_%1%") % iCry).str().c_str(), 0, 0, 0);
         BwCrysral->SetSensitiveDetector(m_sensitive);
         assemblyBwCrystals->AddPlacedVolume(BwCrysral, Tr);
+
+        /////////////////  add backward foil ///////////////////////////////////////
+
+        G4Trap* BwFoilout = new G4Trap((format("BwFoilout_%1%") % iCry).str().c_str(),
+                                       bwfoilhalflength , 0 , 0, bwfoilh1,  bwfoilbl1,
+                                       bwfoiltl1, alpha1 , bwfoilh2, bwfoilbl2,
+                                       bwfoiltl2, alpha2);
+
+        G4Trap* BwFoilin = new G4Trap((format("solidEclBwCrystal_%1%") % iCry).str().c_str(),
+                                      halflength * avoidov , 0 , 0, h1 * avoidov , bl1 * avoidov, tl1 * avoidov , alpha1 , h2 * avoidov   , bl2 * avoidov, tl2 * avoidov, alpha2);
+        G4SubtractionSolid* BwFoilShape = new G4SubtractionSolid((format("BwFoil_%1%") % iCry).str().c_str(), BwFoilout, BwFoilin);
+
+        if ((iCry == 110 || iCry == 113 || iCry == 116 || iCry == 119) || (121 <= iCry && iCry <= 128)) {
+          G4LogicalVolume* BwFoil = new G4LogicalVolume(BwFoilShape, medAlTeflon_thin, (format("logicalBwFoil_%1%") % iCry).str().c_str(), 0, 0, 0);
+          //BwFoil->SetSensitiveDetector(m_sensitive);
+          assemblyBwFoils->AddPlacedVolume(BwFoil, Tr);
+        } else {
+          G4LogicalVolume* BwFoil = new G4LogicalVolume(BwFoilShape, medAlTeflon, (format("logicalBwFoil_%1%") % iCry).str().c_str(), 0, 0, 0);
+          //BwFoil->SetSensitiveDetector(m_sensitive);
+          assemblyBwFoils->AddPlacedVolume(BwFoil, Tr);
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////
+
 
         G4Transform3D DiodePosition = G4Translate3D(0, 0, halflength + (DiodeHeight) / 2 + 0.1); // Move over to the left...
         G4Transform3D TrD =  position * m3 * m2 * m1 * DiodePosition ;
@@ -538,19 +835,25 @@ namespace Belle2 {
       for (int iSector = 0; iSector < 16; ++iSector) {//total 16
         G4Transform3D BrR = G4RotateZ3D(360.*iSector / 16 * deg);
         assemblyFwCrystals->MakeImprint(logical_ecl, BrR);
+        assemblyFwFoils->MakeImprint(logical_ecl, BrR);  // foil
       }//16 sectior
 
       for (int iSector = 0; iSector < 72; ++iSector) {//total 72
         G4Transform3D BrR = G4RotateZ3D(360.*iSector / 72 * deg);
-        G4Transform3D BrRR = G4RotateZ3D((360.*iSector / 72 - 2.494688) * deg);
-
+        G4Transform3D BrRR = G4RotateZ3D((360.*iSector / 72 - 2.488555) * deg); // replace 2.494688
         assemblyBrCrystals->MakeImprint(logical_ecl, BrRR);
         assemblyBrCrystals->MakeImprint(logical_ecl, BrR);
+        assemblyBrFoils->MakeImprint(logical_ecl, BrRR);  // foil
+        assemblyBrFoils->MakeImprint(logical_ecl, BrR);  // foil
+        assemblyBrFins->MakeImprint(logical_ecl, BrRR);  // fin
+        assemblyBrFins->MakeImprint(logical_ecl, BrR);  // fin
+        assemblyBrPhiFins->MakeImprint(logical_ecl, BrR);  // phi fin
       }//iSector
 
       for (int iSector = 0; iSector < 16; ++iSector) {//total 16
         G4Transform3D BrR = G4RotateZ3D(360.*iSector / 16 * deg);
         assemblyBwCrystals->MakeImprint(logical_ecl, BrR);
+        assemblyBwFoils->MakeImprint(logical_ecl, BrR);  // foil
       }//16 sectior
       if (isBeamBkgStudy) {
         assemblyFwDiodes->MakeImprint(logical_ecl, Global_offset);
@@ -559,7 +862,7 @@ namespace Belle2 {
       }
 
 
-      bool isFastSimulation = false;
+      bool isFastSimulation = 1; //false;
       if (!isFastSimulation) {
         double BarrelCylinderWZ[6]    = {k_c2z1, k_c2z2, k_c2z2, k_c1z2, k_c1z2, k_c1z3};
         double BarrelCylinderWRin[6]  = {k_c2r1, k_c2r1, k_c2r1, k_c1r1, k_c1r1, k_c1r1};

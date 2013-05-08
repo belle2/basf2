@@ -105,10 +105,6 @@ void ECLReconstructorModule::event()
 
     int cId          = (aECLDigi->getCellId() - 1);
     if (FitEnergy < 0.) {continue;}
-    if (cId < 0 || cId > 8735) {
-      B2WARNING("ECL Digi  " << cId << ". Out of range: 0~8735  ");
-      continue;
-    }
 
     cf.Accumulate(m_nEvent, FitEnergy, cId);
   }
@@ -150,17 +146,17 @@ void ECLReconstructorModule::event()
       double energyBfCorrect = (*iShower).second.Energy();
       double preliminaryCalibration = 1.0;
       if ((*iShower).second.Theta() > 0 && ((*iShower).second.Theta() / PI * 180) < 33.2) {
-        preliminaryCalibration = 0.95960 - 0.4953E-02 * pow(log10(energyBfCorrect), 1)
-                                 - 0.1463E-01 * pow(log10(energyBfCorrect), 2)
-                                 + 0.4869E-03 * pow(log10(energyBfCorrect), 3);
+        preliminaryCalibration = 0.9567 - 0.002283 * pow(log10(energyBfCorrect), 1)
+                                 - 0.002234 * pow(log10(energyBfCorrect), 2)
+                                 + 0.0002416 * pow(log10(energyBfCorrect), 3);
       } else if (((*iShower).second.Theta() / PI * 180) < 126.1) {
-        preliminaryCalibration = 0.9650 - 0.1090E-01 * pow(log10(energyBfCorrect), 1)
-                                 - 0.6164E-02 * pow(log10(energyBfCorrect), 2)
-                                 + 0.4316E-02 * pow(log10(energyBfCorrect), 3);
+        preliminaryCalibration = 0.9585 - 0.003795 * pow(log10(energyBfCorrect), 1)
+                                 - 0.001399 * pow(log10(energyBfCorrect), 2)
+                                 + 0.0002194 * pow(log10(energyBfCorrect), 3);
       } else if (((*iShower).second.Theta() / PI * 180) < 180) {
-        preliminaryCalibration = 0.9525 - 0.8955E-02 * pow(log10(energyBfCorrect), 1)
-                                 - 0.1297E-01 * pow(log10(energyBfCorrect), 2)
-                                 + 0.1134E-02 * pow(log10(energyBfCorrect), 3);
+        preliminaryCalibration = 0.9494 - 0.003313 * pow(log10(energyBfCorrect), 1)
+                                 - 0.002253 * pow(log10(energyBfCorrect), 2)
+                                 + 0.0001431 * pow(log10(energyBfCorrect), 3);
       } else {
         B2DEBUG(100, "ECLShower theta out of range " << ((*iShower).second.Theta() / PI * 180));
 

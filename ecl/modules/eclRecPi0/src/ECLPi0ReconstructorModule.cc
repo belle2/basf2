@@ -253,7 +253,7 @@ void ECLPi0ReconstructorModule::readErrorMatrix(int GammaIndex, CLHEP::HepSymMat
 }
 
 
-
+/* Belle code
 void ECLPi0ReconstructorModule::fit(CLHEP::HepLorentzVector m_shower1, CLHEP::HepLorentzVector m_shower2)
 {
 
@@ -383,7 +383,7 @@ void ECLPi0ReconstructorModule::fit(CLHEP::HepLorentzVector m_shower1, CLHEP::He
   m_pi0chi2 = (chi2 > FLT_MAX) ? FLT_MAX : chi2;
 
 }
-
+*/
 double ECLPi0ReconstructorModule::errorE(CLHEP::HepLorentzVector shower)
 {
   double E = shower.e();

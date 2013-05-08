@@ -63,8 +63,8 @@ namespace Belle2 {
       /** Fills the fitted 4-momentum (after mass constrained fit) and 7x7 covariance matrix. **/
       unsigned fillFitted4Vector(Belle2::analysis::MassFitKFit& km, CLHEP::HepLorentzVector& fitMom, CLHEP::HepSymMatrix& covMatrix);
 
-      /** mass constraint fit of  pi0      */
-      void fit(CLHEP::HepLorentzVector m_shower1, CLHEP::HepLorentzVector m_shower2);
+      ///** mass constraint fit of  pi0      */
+      //void fit(CLHEP::HepLorentzVector m_shower1, CLHEP::HepLorentzVector m_shower2);
       /** calculate error of Energy      */
       double errorE(CLHEP::HepLorentzVector m_shower);
       /** calculate error of Theta      */

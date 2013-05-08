@@ -342,17 +342,17 @@ namespace Belle2 {
       double zsign = 1.;
 
       // add barrel fin parameters and previous crystal parameters/////////
-      double brfink_BLL;
-      double brfink_Ba;
-      double brfink_Bb;
-      double brfink_BA;
-      double brfink_Bh;
-      double brfink_z_TILTED;
-      double brfink_phi_TILTED;
-      double brfink_perpC;
-      double brfink_phiC;
-      double brfink_zC;
-      double brfink_phi_init; // add correction
+      double brfink_BLL = 30 * cm;
+      double brfink_Ba = 5.387 * cm;
+      double brfink_Bb = 5.5868 * cm;
+      double brfink_BA = 6.0997 * cm;
+      double brfink_Bh = 5.4504 * cm;
+      double brfink_z_TILTED = 33.667039 * deg;
+      double brfink_phi_TILTED = 1.149806 * deg;
+      double brfink_perpC = 136.08246 * cm;
+      double brfink_phiC = 1.344548 * cm;
+      double brfink_zC = 210.1509 * cm;
+      double brfink_phi_init = 0.0094779 * deg; // add correction
 
 
       double  prevk_Ba;

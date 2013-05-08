@@ -11,7 +11,7 @@ main = create_path()
 
 # specify number of events to be generated
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [1000])
+evtmetagen.param('EvtNumList', [10])
 evtmetagen.param('RunList', [1])
 evtmetagen.param('ExpList', [1])
 main.add_module(evtmetagen)

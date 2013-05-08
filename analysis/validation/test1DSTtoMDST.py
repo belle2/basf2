@@ -16,7 +16,7 @@ main = create_path()
 # --------------------------------------------------------------
 # set_log_level(LogLevel.ERROR)
 input = register_module('RootInput')
-input.param('inputFileName', '../GENSIMRECtoDST.dst.root')
+input.param('inputFileName', '../GenericB_GENSIMRECtoDST.dst.root')
 main.add_module(input)
 
 # ---------------------------------------------------------------

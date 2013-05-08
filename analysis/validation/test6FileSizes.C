@@ -1,7 +1,7 @@
 void test6FileSizes(){
 
  // open the file with simulated and reconstructed EvtGen particles
-  TFile* input = TFile::Open("../GENSIMRECtoDST.dst.root");
+  TFile* input = TFile::Open("../GenericB_GENSIMRECtoDST.dst.root");
   TTree* meta = (TTree*) input->Get("tree");
   
   TH1F* hEvents = new TH1F("hEvents", "number of processed events", 1, 0, 1);

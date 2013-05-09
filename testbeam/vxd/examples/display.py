@@ -31,8 +31,7 @@ particlegun.param('nTracks', 1)
 
 # DESY electrons:
 particlegun.param('pdgCodes', [-11])
-# momentum magnitude 2 GeV/c or something above or around.
-# At DESY we can 6 GeV/c(+-5%) electron beam.
+# momentum magnitude 2 - 6 GeV/c
 # Beam divergence 2mrad not covered yet (we need some starting point location)
 particlegun.param('momentumGeneration', 'fixed')
 particlegun.param('momentumParams', [2.0, 0.0])
@@ -43,7 +42,6 @@ particlegun.param('phiGeneration', 'fixed')
 particlegun.param('phiParams', [0.0, 0.0])
 # gun displacement
 particlegun.param('vertexGeneration', 'fixed')
-# Set xVertexParams to [-30.0,0.0] to move the gun inside the magnet
 particlegun.param('xVertexParams', [-90.0, 0.0])
 particlegun.param('yVertexParams', [1.0, 0.0])
 particlegun.param('zVertexParams', [0.0, 0.0])
@@ -69,7 +67,6 @@ PXDDIGI.param('ElectronicEffects', True)
 
 PXDCLUST = register_module('PXDClusterizer')
 
-
 mctrackfinder = register_module('MCTrackFinder')
 mctrackfinder.logging.log_level = LogLevel.WARNING
 param_mctrackfinder = {
@@ -80,7 +77,6 @@ param_mctrackfinder = {
     'UseClusters': True,
     }
 mctrackfinder.param(param_mctrackfinder)
-
 # mctrackfinder.logging.log_level = LogLevel.DEBUG
 
 trackfitter = register_module('GenFitter')
@@ -122,6 +118,12 @@ display.param('ShowGFTracks', True)
 
 # save events non-interactively (without showing window)?
 display.param('Automatic', False)
+
+# Use clusters to display tracks
+display.param('UseClusters', True)
+
+# Display the testbeam geometry rather than Belle II extract
+display.param('FullGeometry', True)
 
 # Create paths
 main = create_path()

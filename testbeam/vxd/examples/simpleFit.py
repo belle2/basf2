@@ -34,8 +34,7 @@ particlegun.param('nTracks', 1)
 
 # DESY electrons:
 particlegun.param('pdgCodes', [-11])
-# momentum magnitude 2 GeV/c or something above or around.
-# At DESY we can 6 GeV/c(+-5%) electron beam.
+# momentum magnitude 2 - 6 GeV/c
 # Beam divergence 2mrad not covered yet (we need some starting point location)
 particlegun.param('momentumGeneration', 'fixed')
 particlegun.param('momentumParams', [2.0, 0.0])
@@ -96,7 +95,7 @@ trackfitchecker.logging.log_level = LogLevel.INFO
 trackfitchecker.param('truthAvailable', True)
 # trackfitchecker.param('testSi', True)
 trackfitchecker.param('robustTests', True)
-trackfitchecker.param('writeToTextFile', True)
+trackfitchecker.param('writeToRootFile', True)
 
 # Save output of simulation
 output = register_module('RootOutput')
@@ -118,6 +117,7 @@ main.add_module(SVDCLUST)
 main.add_module(mctrackfinder)
 main.add_module(trackfitter)
 main.add_module(trackfitchecker)
+main.add_module(output)
 
 # Process events
 process(main)

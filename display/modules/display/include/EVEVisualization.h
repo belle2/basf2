@@ -72,6 +72,7 @@ namespace Belle2 {
 
         v.Set(BFieldMap::Instance().getBField(TVector3(x, y, z)));
         v.fZ *= -1; //Eve has inverted B field convention
+        v.fZ -= 1e-6; //field must not be zero!
 
         return v;
       }

@@ -94,7 +94,17 @@ EVEVisualization::EVEVisualization():
   m_trackpropagator = new TEveTrackPropagator();
   m_trackpropagator->IncDenyDestroy();
   m_trackpropagator->SetMagFieldObj(&m_bfield, false);
-  m_trackpropagator->SetMaxR(380); //don't draw tracks outside detector
+
+  //find a point that is inside the top node
+  TGeoVolume* top_node = gGeoManager->GetTopNode()->GetVolume();
+  double p[3] = { 380.0, 0.0, 0.0 }; //ok for normal Belle II geometry
+  while (!top_node->Contains(p)) {
+    p[0] *= 0.8;
+  }
+  m_trackpropagator->SetMaxR(p[0]); //don't draw tracks outside detector
+
+  //TODO is this actually needed?
+  m_trackpropagator->SetMaxStep(1.0); //make sure to reeval magnetic field often enough
 
   m_tracklist = new TEveTrackList(m_trackpropagator);
   m_tracklist->IncDenyDestroy();

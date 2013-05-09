@@ -1,19 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# This steering file will simulate several testbeam events, reconstruct
-# and fit tracks, and display each event.
+# This steering file will simulate testbeam events, fit tracks and
+# show tracking statistics
 import os
 from basf2 import *
 from subprocess import call
 
 set_log_level(LogLevel.ERROR)
+set_random_seed(3)
 
 evtmetagen = register_module('EvtMetaGen')
 evtmetagen.param('ExpList', [0])
 evtmetagen.param('RunList', [1])
-evtmetagen.param('EvtNumList', [100])
-evtmetainfo = register_module('EvtMetaInfo')
+evtmetagen.param('EvtNumList', [1000])
+
+# Show progress of processing
+progress = register_module('Progress')
 
 gearbox = register_module('Gearbox')
 # use simple testbeam geometry
@@ -86,48 +89,24 @@ mctrackfinder.param(param_mctrackfinder)
 trackfitter = register_module('GenFitter')
 trackfitter.logging.log_level = LogLevel.WARNING
 trackfitter.param('UseClusters', True)
+trackfitchecker = register_module('TrackFitChecker')
+# the results only show up at info or debug level
+trackfitchecker.logging.log_level = LogLevel.INFO
+# trackfitchecker.param('inspectTracks', True)
+trackfitchecker.param('truthAvailable', True)
+# trackfitchecker.param('testSi', True)
+trackfitchecker.param('robustTests', True)
+trackfitchecker.param('writeToTextFile', True)
 
-display = register_module('Display')
-
-# The Options parameter is a combination of:
-# A autoscale PXD/SVD errors - use when hits are too small to be seen
-# D draw detectors - draw simple detector representation (with different size)
-#   for each hit
-# H draw track hits
-# M draw track markers - intersections of track with detector planes
-#   (use with T)
-# P draw detector planes
-# S scale manually - spacepoint hits are drawn as spheres and scaled with
-#   errors
-# T draw track (straight line between detector planes)
-#
-# Note that you can always turn off an individual detector component or track
-# interactively by removing its checkmark in the 'Eve' tab.
-#
-# This option only makes sense when ShowGFTracks is true
-display.param('Options', 'AHTM')  # default
-
-# should hits always be assigned to a particle with c_PrimaryParticle flag?
-# with this option off, many tracking hits will be assigned to secondary e-
-display.param('AssignHitsToPrimaries', 0)
-
-# show all primary MCParticles?
-display.param('ShowAllPrimaries', True)
-
-# show all charged MCParticles? (SLOW)
-display.param('ShowCharged', False)
-
-# show tracks?
-display.param('ShowGFTracks', True)
-
-# save events non-interactively (without showing window)?
-display.param('Automatic', False)
+# Save output of simulation
+output = register_module('RootOutput')
+output.param('outputFileName', 'TBSimulationOutput.root')
 
 # Create paths
 main = create_path()
 # Add modules to paths
 main.add_module(evtmetagen)
-main.add_module(evtmetainfo)
+main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(particlegun)
@@ -138,7 +117,7 @@ main.add_module(SVDDIGI)
 main.add_module(SVDCLUST)
 main.add_module(mctrackfinder)
 main.add_module(trackfitter)
-main.add_module(display)
+main.add_module(trackfitchecker)
 
 # Process events
 process(main)

@@ -37,8 +37,6 @@
 					<AlignComponent>SupportBox</AlignComponent>
 					<xi:include href="VXD-Snippets.xml" xpointer="xpointer(//Snippet[@name='SupportBox']/*)" />
 					
-					
-					
 					<Volume>
 						<Name>PXD_module_1</Name>
 						<!--DX unit="mm">14.0</DX-->

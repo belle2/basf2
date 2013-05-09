@@ -174,8 +174,7 @@
 			<Theta unit="deg">0</Theta>
 			<Phi unit="deg">0</Phi>
 			<Psi unit="deg">0</Psi>
-                     <InnerRadius unit="mm">585.0</InnerRadius>
-			<!--OuterRadius unit="mm">590.0</OuterRadius-->
+      <InnerRadius unit="mm">585.0</InnerRadius>
 			<OuterRadius unit="mm">590.0</OuterRadius>
 			<Hz unit="cm">80</Hz>
 		</Volume>				
@@ -260,8 +259,7 @@
 			<OuterRadius unit="mm">543.8</OuterRadius>
 			<Hz unit="cm">78</Hz>
 		</Volume>					
-		
-		
+	
 	</Snippet>	
 	
 </Snippets>

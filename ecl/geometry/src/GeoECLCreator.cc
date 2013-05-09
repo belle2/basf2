@@ -228,6 +228,7 @@ namespace Belle2 {
       m_sensitive = new SensitiveDetector("SensitiveDetector", (2 * 24)*eV, 10 * MeV);
       logical_ecl = 0;
       physical_ecl = 0;
+      physical_ECLBarrelCylinder = 0;
     }
 
 
@@ -355,16 +356,16 @@ namespace Belle2 {
       double brfink_phi_init = 0.0094779 * deg; // add correction
 
 
-      double  prevk_Ba;
-      double  prevk_BA;
-      double  prevk_Bh;
-      double  prevk_BH;
-      double  prevk_z_TILTED;
-      double  prevk_phi_TILTED;
-      double  prevk_perpC;
-      double  prevk_phiC;
-      double  prevk_zC;
-      double  prevk_phi_init;
+      double  prevk_Ba = 5.387 * cm;
+      double  prevk_BA =  6.0997 * cm;
+      double  prevk_Bh =  5.4504 * cm;
+      double  prevk_BH = 6.0997 * cm;;
+      double  prevk_z_TILTED =  33.667039 * deg;
+      double  prevk_phi_TILTED = 1.149806 * deg;
+      double  prevk_perpC = 136.08246 * cm;
+      double  prevk_phiC = 1.344548 * cm;
+      double  prevk_zC = 210.1509 * cm; ;
+      double  prevk_phi_init =  0.0094779 * deg ;
       //////////////////////////////////////////////////////////////////////
 
 

@@ -2343,6 +2343,7 @@ namespace Belle {
       df[i] = fabs(t.links()[i]->dPhi());
     }
     unsigned sort[n];
+    for (unsigned i = 0; i < n; ++i) sort[i] = 9999;
     float dfmin;
     float dfmin_pre = -1.e10;
     for (unsigned i = 0; i < n; ++i) {
@@ -2359,6 +2360,10 @@ namespace Belle {
     for (unsigned i = 0; i < n; i++) {
       //      const Belle2::TRGCDCWireHit& h = * t.links()[i]->hit();
       const Belle2::TRGCDCWireHit& h = * t.links()[sort[i]]->hit();
+      if (sort[i] == 9999) {
+        std::cerr << "Trasan: sorting error in copyTrack." << std::endl;
+        continue;
+      }
       const unsigned layerId = h.wire().layerId();
       const int hitID = h.iCDCHit();
       //      const double driftTime = h.drift();

@@ -198,6 +198,9 @@ namespace Belle2 {
     /** If true, secondary MCParticles (and hits created by them) will not be shown. */
     void setHideSecondaries(bool on) { m_hideSecondaries = on; }
 
+    /** Show full geometry instead of simplified shapes. */
+    void showFullGeo(bool on) { m_fullgeo = on; }
+
   private:
     /** Object for the energy bar visualisation. */
     TEveCalo3D* m_calo3d;
@@ -240,6 +243,9 @@ namespace Belle2 {
      * @sa setOptions
      */
     std::string m_options;
+
+    /** Show full geometry instead of simplified shapes. */
+    bool m_fullgeo;
 
     /** If true, hits created by secondary particles (e.g. delta electrons) will be assigned to the original primary particle. */
     bool m_assignToPrimaries;

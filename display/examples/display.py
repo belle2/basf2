@@ -75,6 +75,9 @@ display.param('UseClusters', True)
 # save events non-interactively (without showing window)?
 display.param('Automatic', False)
 
+# change to True to show the full TGeo geometry instead of simplified extract
+display.param('FullGeometry', False)
+
 main.add_module(display)
 
 process(main)

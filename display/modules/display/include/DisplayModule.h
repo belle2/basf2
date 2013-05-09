@@ -87,6 +87,9 @@ namespace Belle2 {
     /** Non-interactively save visualisations for each event. */
     bool m_automatic;
 
+    /** Show full geometry instead of simplified shapes. */
+    bool m_fullgeo;
+
     /** pointer to actual display */
     DisplayUI* m_display;
 

@@ -82,6 +82,7 @@ using namespace Belle2;
 const double MIN_P_CUT = 0.00;
 
 EVEVisualization::EVEVisualization():
+  m_fullgeo(false),
   m_assignToPrimaries(false),
   m_trackcandlist(0),
   m_eclsimhitdata(0)
@@ -225,7 +226,7 @@ void EVEVisualization::addGeometry()
   gEve->AddGlobalElement(eve_top_node);
 
   //don't show full geo unless turned on by user
-  eve_top_node->SetRnrSelfChildren(false, false);
+  eve_top_node->SetRnrSelfChildren(m_fullgeo, m_fullgeo);
 
 
   B2INFO("Loading geometry projections...");
@@ -242,6 +243,8 @@ void EVEVisualization::addGeometry()
   //I want to show full geo in unprojected view,
   //but I still need to add the extract to the geometry scene...
   gEve->AddGlobalElement(gs);
+
+  gs->SetRnrSelfChildren(false, !m_fullgeo);
 }
 
 void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)

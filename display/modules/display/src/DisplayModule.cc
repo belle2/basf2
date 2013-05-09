@@ -38,6 +38,7 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("ShowGFTrackCands", m_showGFTrackCands, "If true, track candidates (GFTrackCands array) will be shown in the display.", false);
   addParam("UseClusters", m_useClusters, "Use PXD/SVD clusters for GFTrackCands visualisation", false);
   addParam("Automatic", m_automatic, "Non-interactively save visualisations for each event.", false);
+  addParam("FullGeometry", m_fullgeo, "Show full geometry instead of simplified shapes. Further details can be enabled by changing the VisLevel option for Eve -> Scenes -> Geometry Scene -> Top_1.", false);
 
   //make sure dictionaries for PXD/SVDrecohits are loaded
   //needs to be done here to have dictionaries available during RootInput::initialize()
@@ -90,6 +91,7 @@ void DisplayModule::initialize()
 
   m_visualizer = new EVEVisualization();
   m_visualizer->setOptions(m_options);
+  m_visualizer->showFullGeo(m_fullgeo);
   m_visualizer->addGeometry();
 }
 

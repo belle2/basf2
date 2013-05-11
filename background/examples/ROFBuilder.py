@@ -26,7 +26,7 @@ set_log_level(LogLevel.ERROR)
 subdetectorCodes = {
     'PXD': 1,
     'SVD': 2,
-    'C3DC': 3,
+    'CDC': 3,
     'TOP': 4,
     'ARICH': 5,
     'ECL': 6,
@@ -69,7 +69,6 @@ elif subdetectorName == 'ECLsim':
 rootinput = register_module('RootInput')
 # CHANGE THIS TO POINT TO THE APPROPRIATE FILE(S) ON YOUR FILESYSTEM!!!
 rootinput.param('inputFileName', inputName)
-rootinput.param('treeName', 'tree')
 # rootinput.set_log_level(LogLevel.INFO)
 
 # ROFBulder module

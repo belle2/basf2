@@ -99,10 +99,10 @@ PXDRecoHit::PXDRecoHit(const PXDCluster* hit):
   fHitCoord(0) = hit->getU();
   fHitCoord(1) = hit->getV();
   // Set the error covariance matrix
-  fHitCov(0, 0) = sigmaU * sigmaU;
+  fHitCov(0, 0) = 0.5 * sigmaU * sigmaU;
   fHitCov(0, 1) = 0;
   fHitCov(1, 0) = 0;
-  fHitCov(1, 1) = sigmaV * sigmaV;
+  fHitCov(1, 1) = 0.5 * sigmaV * sigmaV;
   // Set physical parameters
   m_energyDep = hit->getCharge() * Const::ehEnergy;
   //m_energyDepError = 0;

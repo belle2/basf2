@@ -92,7 +92,7 @@ SVDRecoHit::SVDRecoHit(const SVDCluster* hit, float sigma):
   if (sigma < 0)
     sigma = (m_isU) ? geometry.getUPitch(0) / sqrt(12) : geometry.getVPitch() / sqrt(12);
   // Set the error covariance matrix
-  fHitCov(0, 0) = sigma * sigma;
+  fHitCov(0, 0) = 0.5 * sigma * sigma; //very rough empiric correction until the sofisticated error estimations are there
   // Set physical parameters
   m_energyDep = hit->getCharge();
   // Setup geometry information

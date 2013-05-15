@@ -13,7 +13,7 @@
 
 /* Belle2 headers. */
 #include <eklm/geometry/TransformData.h>
-#include <framework/core/Environment.h>
+#include <framework/core/utilities.h>
 
 /**
  * @file
@@ -47,8 +47,7 @@ namespace Belle2 {
        */
       int read(
         const char* file =
-          std::string(Environment::Instance().getDataSearchPath() +
-                      "/eklm/eklm_alignment.dat").c_str());
+          FileSystem::findFile("/data/eklm/eklm_alignment.dat").c_str());
 
       /**
        * Get strip length.

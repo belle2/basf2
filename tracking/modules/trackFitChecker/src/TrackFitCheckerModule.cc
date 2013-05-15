@@ -109,6 +109,7 @@ void TrackFitCheckerModule::initialize()
     //pass the magnetic field to genfit
     GFFieldManager::getInstance()->init(new GFGeant4Field());
     GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
+    GFMaterialEffects::getInstance()->setMscModel("Highland"); // this line assumes the input tracks were fitted with this model. Otherwise there can be inconsistencies.
   }
 
   //set all user parameters
@@ -357,15 +358,18 @@ void TrackFitCheckerModule::event()
     const double charge = aMcParticleArray[mcParticleIndex]->getCharge();
     const TVector3 trueVertexMom = aMcParticleArray[mcParticleIndex]->getMomentum();
     const TVector3 trueVertexPos = aMcParticleArray[mcParticleIndex]->getVertex();
-
+//    cerr << "trueVertexPos" << endl; trueVertexPos.Print();
     //write the mcparticle info to the root output
     fillTVector3("trueVertexPos", trueVertexPos);
     fillTVector3("trueVertexMom", trueVertexMom);
-    RKTrackRep* aRKTrackRepPtr = static_cast<RKTrackRep*>(aTrackPtr->getCardinalRep());
-
+    RKTrackRep* aRKTrackRepPtr = dynamic_cast<RKTrackRep*>(aTrackPtr->getCardinalRep());
+    if (aRKTrackRepPtr == NULL) {
+      B2FATAL("Only the RKTrackRep can be used by TrackFitChecker")
+    }
     const int genfitStatusFlag = aRKTrackRepPtr->getStatusFlag();
     fillInt("genfitStatusFlag", genfitStatusFlag);
-
+//    cerr << "first state cov" << endl;
+    //aRKTrackRepPtr->getFirstState().Print(); aRKTrackRepPtr->getFirstCov().Print();
     if (genfitStatusFlag not_eq 0) {
       // we have a track that was not fitted successfully no tests can be done. Goto next track
       if (m_writeToRootFile == true) {
@@ -384,11 +388,17 @@ void TrackFitCheckerModule::event()
     try {
       B2DEBUG(100, "before propagation");
       aRKTrackRepPtr->extrapolateToPoint(trueVertexPos, poca, dirInPoca);
+//      cerr << "poca etc" << endl;
+//      poca.Print(); dirInPoca.Print();
       GFDetPlane planeThroughVertex(poca, dirInPoca); //get planeThroughVertex through fitted vertex position
+//      cerr << "detplane" << endl;
+//      planeThroughVertex.Print();
       B2DEBUG(100, "plane through vertex constructed");
       aTrackPtr->getPosMomCov(planeThroughVertex, vertexPos, vertexMom, vertexCov);
+//      vertexCov.Print();
       B2DEBUG(100, "pos mom cov extracted");
       aRKTrackRepPtr->extrapolate(planeThroughVertex, local5DState, local5DCov);
+//      local5DCov.Print();
     } catch (GFException& e) {
       B2WARNING("Extrapolation of a track in Event " << eventCounter <<  " to his true vertex position failed. Track will be ignored in statistical tests");
       ++m_extrapFailed;
@@ -521,7 +531,7 @@ void TrackFitCheckerModule::endRun()
   B2INFO("Now following the endRun Output from the trackFitChecker module");
 
   if (m_nCutawayTracks not_eq 0) {
-    B2WARNING(m_nCutawayTracks << " tracks where cut out because of too large total χ²");
+    B2WARNING(m_nCutawayTracks << " tracks where cut out because of too small p-value");
   }
   if (m_extrapFailed not_eq 0) {
     B2WARNING(m_extrapFailed << " tracks could not be extrapolated to their true vertex position.");
@@ -1523,7 +1533,7 @@ void TrackFitCheckerModule::testDaf(GFTrack* const aTrackPtr)
   double dafWeight = -2.0;
   double dafChi2 = -2.0;
 
-  vector<vector<float> > allWeights(m_nLayers, vector<float>(5, -1.0)); //it is importent that the content is initalized to -1
+  vector<vector<float> > allWeights(m_nLayers, vector<float>(5, -1.0)); //it is important that the content is initalized to -1
   vector<vector<float> > allChi2s(m_nLayers, vector<float>(5, -1.0));
   for (int iGFHit = 0; iGFHit not_eq nHits; ++iGFHit) {
     int accuVecIndex = m_trackData.accuVecIndices[iGFHit];

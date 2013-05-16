@@ -44,29 +44,11 @@ namespace Belle2 {
     const std::list<std::string>& getModuleSearchPaths() const;
 
     /**
-     * Sets the path which points to the data directory of the framework.
-     *
-     * TODO remove after getDataSearchPath() is gone.
-     * @param dataPath Path in which the data files for the framework are located.
-     */
-    void setDataSearchPath(const std::string& dataPath) { m_dataSearchPath = dataPath; };
-
-    /**
      * Sets the path which points to the externals directory of the framework.
      *
      * @param externalsPath Path in which the externals of the framework are located.
      */
     void setExternalsPath(const std::string& externalsPath) { m_externalsPath = externalsPath; };
-
-    /**
-     * Returns the path which points to the data directory of the framework.
-     *
-     * @note Use FileSystem::findFile() to get a full path of a file instead of relying on it existing in the one
-     *       directory returned by this function. (which might be  your local data dir, but the file might only exist in the central release dir)
-     *
-     * @return data search path, without trailing slash
-     */
-    const std::string& getDataSearchPath() const __attribute__((deprecated)) { return m_dataSearchPath; };
 
     /**
      * Returns the path which points to the externals directory of the framework.
@@ -142,7 +124,6 @@ namespace Belle2 {
 
   private:
 
-    std::string m_dataSearchPath; /**< The path in which the data files, such as geometry files, are stored. */
     std::string m_externalsPath;  /**< The path in which the externals are located. */
     int m_numberProcesses;        /**< The number of processes that should be used for the parallel processing. */
     std::string m_steering;       /**< The content of the steering file. */

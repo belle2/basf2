@@ -50,12 +50,6 @@ void Framework::addModuleSearchPath(const string& path)
 }
 
 
-void Framework::setDataSearchPath(const std::string& path)
-{
-  Environment::Instance().setDataSearchPath(path);
-}
-
-
 void Framework::setExternalsPath(const std::string& path)
 {
   Environment::Instance().setExternalsPath(path);
@@ -173,7 +167,6 @@ void Framework::exposePythonAPI()
   //Expose framework class
   class_<Framework>("Framework")
   .def("add_module_search_path", &Framework::addModuleSearchPath)
-  .def("set_data_search_path", &Framework::setDataSearchPath)
   .def("set_externals_path", &Framework::setExternalsPath)
   .def("list_module_search_paths", &Framework::getModuleSearchPathsPython)
   .def("list_available_modules", &Framework::getAvailableModulesPython)

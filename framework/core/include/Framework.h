@@ -54,13 +54,6 @@ namespace Belle2 {
     void addModuleSearchPath(const std::string& path);
 
     /**
-     * Sets the path in which the data for the framework, such as geometry information, is located.
-     *
-     * @param path The path in which the data for the framework is located.
-    */
-    void setDataSearchPath(const std::string& path);
-
-    /**
      * Sets the path in which the externals of the framework are located.
      *
      * @param path The path in which the externals of the framework are located.

@@ -68,14 +68,6 @@ if envarReleaseDir:
 for moddir in basf2moddir:
     fw.add_module_search_path(moddir)
 
-# Sets the data path in which the data files for the framework are located
-if envarLocalDir:
-    basf2datadir = os.path.join(envarLocalDir, 'data')
-else:
-    basf2datadir = os.path.join(envarReleaseDir, 'data')
-
-fw.set_data_search_path(basf2datadir)
-
 # Sets the path in which the externals of the framework are located
 fw.set_externals_path(envarExtDir)
 

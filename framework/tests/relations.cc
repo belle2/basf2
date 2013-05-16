@@ -48,10 +48,10 @@ namespace Belle2 {
   TEST_F(RelationTest, RelationCreate)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent(DataStore::relationName(evtData.getName(), profileData.getName()));
+    RelationArray relation(evtData, profileData);
+    relation.registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
-    RelationArray relation(evtData, profileData);
     EXPECT_FALSE(relation); //creation only happens on write access or explicitly
     relation.create();
     EXPECT_TRUE(relation);
@@ -63,13 +63,13 @@ namespace Belle2 {
     EXPECT_FALSE(RelationArray::required(DataStore::relationName(evtData.getName(), profileData.getName())));
 
     DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent(DataStore::relationName(evtData.getName(), profileData.getName()));
+    RelationArray relation(evtData, profileData);
+    relation.registerAsPersistent();
     StoreArray<EventMetaData>::registerPersistent("OwnName");
-    RelationArray::registerPersistent(DataStore::relationName("OwnName", profileData.getName()));
+    RelationArray::registerPersistent("OwnName", profileData.getName());
     DataStore::Instance().setInitializeActive(false);
 
     EXPECT_FALSE(RelationArray(DataStore::relationName(evtData.getName(), profileData.getName())));
-    RelationArray relation(evtData, profileData);
     relation.create();
     EXPECT_TRUE(RelationArray(evtData, profileData, "", DataStore::c_Event));
     string name = relation.getName();
@@ -89,10 +89,10 @@ namespace Belle2 {
   TEST_F(RelationTest, RelationWrongDeathTest)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent("test");
+    RelationArray relation1(evtData, profileData, "test");
+    relation1.registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
-    RelationArray relation1(evtData, profileData, "test");
     relation1.create();
     EXPECT_FATAL(RelationArray(profileData, evtData, "test").isValid());
     EXPECT_FATAL(RelationArray(profileData, evtData, "test").add(0, 0, 1.0));
@@ -109,13 +109,13 @@ namespace Belle2 {
   TEST_F(RelationTest, RelationDefaultConstructed)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent("somethingnew");
+    RelationArray array(evtData, profileData, "somethingnew");
+    array.registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
     RelationContainer* rel = new RelationContainer(); //default constructed object, as written to file
     ASSERT_TRUE(DataStore::Instance().createObject(rel, false, "somethingnew", DataStore::c_Event, RelationContainer::Class(), false));
 
-    RelationArray array(evtData, profileData, "somethingnew");
     EXPECT_FALSE(array.isValid());
 
     //shouldn't die here
@@ -126,10 +126,10 @@ namespace Belle2 {
   TEST_F(RelationTest, RelationConsolidate)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent(DataStore::relationName(evtData.getName(), profileData.getName()));
+    RelationArray relation(evtData, profileData);
+    relation.registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
-    RelationArray relation(evtData, profileData);
     relation.add(0, 0, 1.0);
     relation.add(0, 1, 2.0);
     relation.add(0, 1, 3.0);
@@ -155,10 +155,10 @@ namespace Belle2 {
   TEST_F(RelationTest, BuildIndex)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent(DataStore::relationName(evtData.getName(), profileData.getName()));
+    RelationArray relation(evtData, profileData);
+    relation.registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
-    RelationArray relation(evtData, profileData);
     relation.add(0, 0, 1.0);
     relation.add(0, 1, 2.0);
     relation.add(0, 2, 3.0);
@@ -232,10 +232,10 @@ namespace Belle2 {
   TEST_F(RelationTest, InconsistentIndexDeathTest)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent(DataStore::relationName(evtData.getName(), profileData.getName()));
+    RelationArray relation(evtData, profileData);
+    relation.registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
-    RelationArray relation(evtData, profileData);
     relation.add(0, 10, 1.0);
     typedef RelationIndex<EventMetaData, ProfileInfo> rel_t;
     EXPECT_FATAL(rel_t relIndex);
@@ -249,7 +249,8 @@ namespace Belle2 {
   TEST_F(RelationTest, EmptyIndex)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent(DataStore::relationName(evtData.getName(), profileData.getName()));
+    RelationArray relation(evtData, profileData);
+    relation.registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
     RelationIndex<EventMetaData, ProfileInfo> index;
@@ -263,20 +264,20 @@ namespace Belle2 {
   TEST_F(RelationTest, WrongRelationIndexDeathTest)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent("test");
-    RelationArray::registerPersistent(DataStore::relationName(evtData.getName(), profileData.getName()));
+    RelationArray relation(profileData, evtData, "test");
+    relation.registerAsPersistent();
+    RelationArray(evtData, profileData).registerAsPersistent();
     StoreArray<EventMetaData>::registerPersistent("evts");
-    RelationArray::registerPersistent("test2");
+    RelationArray relation2(evtData, profileData, "test2");
+    relation2.registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
-    RelationArray relation(profileData, evtData, "test");
     relation.create();
     typedef RelationIndex<EventMetaData, ProfileInfo> rel_t;
     EXPECT_FATAL(rel_t(evtData, profileData, "test"));
     EXPECT_FATAL(rel_t("test"));
 
     StoreArray<EventMetaData> eventData("evts");
-    RelationArray relation2(evtData, profileData, "test2");
     relation2.create();
     EXPECT_FATAL(rel_t(eventData, profileData, "test2"));
 
@@ -318,7 +319,8 @@ namespace Belle2 {
   TEST_F(RelationTest, FindRelations)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent(DataStore::relationName(evtData.getName(), profileData.getName()));
+    RelationArray relation(evtData, profileData);
+    relation.registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
     //check non-existing relations (registered)
@@ -335,7 +337,6 @@ namespace Belle2 {
     RelationVector<ProfileInfo> fromRels2 = DataStore::getRelationsToObj<ProfileInfo>(toObj);
     EXPECT_EQ(fromRels2.size(), 0u);
 
-    RelationArray relation(evtData, profileData);
     relation.add(0, 0, 1.0);
     relation.add(0, 1, 2.0);
     relation.add(0, 2, -3.0);
@@ -352,7 +353,8 @@ namespace Belle2 {
   TEST_F(RelationTest, AddRelations)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent(DataStore::relationName(evtData.getName(), profileData.getName()));
+    RelationArray relation(evtData, profileData);
+    relation.registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
     DataStore::Instance().addRelationFromTo((evtData)[0], (profileData)[0], 1.0);
@@ -366,7 +368,8 @@ namespace Belle2 {
   TEST_F(RelationTest, GetRelationsWith)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent(DataStore::relationName(evtData.getName(), profileData.getName()));
+    RelationArray relation(evtData, profileData);
+    relation.registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
     DataStore::Instance().addRelationFromTo((evtData)[0], (profileData)[0], 1.0);
@@ -394,8 +397,10 @@ namespace Belle2 {
 
     DataStore::Instance().setInitializeActive(true);
     profileData2.registerAsPersistent();
-    RelationArray::registerPersistent(DataStore::relationName(evtData.getName(), profileData.getName()));
-    RelationArray::registerPersistent(DataStore::relationName(evtData.getName(), profileData2.getName()));
+    RelationArray relation(evtData, profileData);
+    relation.registerAsPersistent();
+    RelationArray relation2(evtData, profileData2);
+    relation2.registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
     DataStore::Instance().addRelationFromTo((evtData)[0], (profileData)[0], 1.0);
@@ -445,7 +450,7 @@ namespace Belle2 {
   TEST_F(RelationTest, RelationsObject)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent(DataStore::relationName(relObjData.getName(), profileData.getName()));
+    RelationArray(relObjData, profileData).registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
     (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
@@ -472,8 +477,8 @@ namespace Belle2 {
   TEST_F(RelationTest, DuplicateRelations)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent(DataStore::relationName(evtData.getName(), relObjData.getName()));
-    RelationArray::registerPersistent(DataStore::relationName(relObjData.getName(), evtData.getName()));
+    RelationArray(evtData, relObjData).registerAsPersistent();
+    RelationArray(relObjData, evtData).registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
     //more than a single relation in one direction

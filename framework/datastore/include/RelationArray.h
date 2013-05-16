@@ -160,17 +160,20 @@ namespace Belle2 {
     template<class FROM, class TO> static bool registerPersistent(DataStore::EDurability durability = DataStore::c_Event, bool errorIfExisting = false) {
       return registerPersistent<FROM, TO>("", "", durability, errorIfExisting);
     }
+
     /** Register a relation array, that should be written to the output by default, in the data store.
      *  This must be called in the initialization phase.
      *
-     *  @param name        Name under which the relation is stored.
+     *  @param fromName    Name of from-array
+     *  @param toName      Name of to-array
      *  @param durability  Specifies lifetime of array in question.
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
      *  @return            True if the registration succeeded.
      */
-    static bool registerPersistent(const std::string& name, DataStore::EDurability durability = DataStore::c_Event,
-                                   bool errorIfExisting = false) {
-      return DataStore::Instance().createEntry(name, durability, RelationContainer::Class(), false, false, errorIfExisting);
+    static bool registerPersistent(const std::string& fromName, const std::string& toName,
+                                   DataStore::EDurability durability = DataStore::c_Event, bool errorIfExisting = false) {
+      const std::string& relName = DataStore::relationName(fromName, toName);
+      return DataStore::Instance().createEntry(relName, durability, RelationContainer::Class(), false, false, errorIfExisting);
     }
 
     /** Register a relation array, that should NOT be written to the output by default, in the data store.
@@ -201,14 +204,16 @@ namespace Belle2 {
     /** Register a relation array, that should NOT be written to the output by default, in the data store.
      *  This must be called in the initialization phase.
      *
-     *  @param name        Name under which the relation is stored.
+     *  @param fromName    Name of from-array
+     *  @param toName      Name of to-array
      *  @param durability  Specifies lifetime of array in question.
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
      *  @return            True if the registration succeeded.
      */
-    static bool registerTransient(const std::string& name, DataStore::EDurability durability = DataStore::c_Event,
-                                  bool errorIfExisting = false) {
-      return DataStore::Instance().createEntry(name, durability, RelationContainer::Class(), false, true, errorIfExisting);
+    static bool registerTransient(const std::string& fromName, const std::string& toName,
+                                  DataStore::EDurability durability = DataStore::c_Event, bool errorIfExisting = false) {
+      const std::string& relName = DataStore::relationName(fromName, toName);
+      return DataStore::Instance().createEntry(relName, durability, RelationContainer::Class(), false, true, errorIfExisting);
     }
 
     /** Register the relation in the data store and include it in the output by default.

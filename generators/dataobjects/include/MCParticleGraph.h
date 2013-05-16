@@ -131,6 +131,13 @@ namespace Belle2 {
       void setIgnore(bool ignore = true) { m_ignore = ignore; }
 
       /**
+       * Get the ignore flag.
+       *
+       * @return whether the ignore flag is set
+       */
+      bool getIgnore() const { return m_ignore; }
+
+      /**
        * Set the track ID for the particle.
        *
        * The track ID is used to build the relationship between MCParticles and created Hits.
@@ -143,7 +150,7 @@ namespace Belle2 {
        *
        * @return The ID of the Geant4 track which created this particle.
        */
-      int getTrackID() { return m_trackID; }
+      int getTrackID() const { return m_trackID; }
 
 
     private:
@@ -231,7 +238,7 @@ namespace Belle2 {
      * Return the number of particles in the graph.
      * @return The number of particles in the graph.
      */
-    size_t size() { return m_particles.size(); }
+    size_t size() const { return m_particles.size(); }
 
     /**
      * Generates the MCParticle list and stores it in the StoreArray with the given name.

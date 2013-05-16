@@ -26,7 +26,7 @@ svddigi = register_module('SVDDigitizer')
 svdclust = register_module('SVDClusterizer')
 
 # Specify number of events to generate
-evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
+evtmetagen.param({'EvtNumList': [1000], 'RunList': [1]})
 
 # Set parameters for particlegun
 particlegun.param({
@@ -34,7 +34,7 @@ particlegun.param({
     'varyNTracks': True,
     'pdgCodes': [211, -211, 11, -11],
     'momentumGeneration': 'normal',
-    'momentumParams': [5, 0.2],
+    'momentumParams': [2, 0.2],
     'phiGeneration': 'uniform',
     'phiParams': [0, 360],
     'thetaGeneration': 'normal',
@@ -51,6 +51,8 @@ geometry.param('Components', ['SVD'])
 
 # svddigi.param('statisticsFilename', 'digi.root')
 svddigi.param('ElectronicEffects', True)
+svdclust.param('TanLorentz_holes', 0.0)
+svdclust.param('TanLorentz_electrons', 0.0)
 
 # create processing path
 main = create_path()
@@ -69,4 +71,3 @@ process(main)
 
 # show call statistics
 print statistics
-

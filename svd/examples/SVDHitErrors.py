@@ -18,22 +18,26 @@ class SVDHitErrors(Module):
         """Initialize the module"""
 
         super(SVDHitErrors, self).__init__()
-        ## Input file object.
+        # # Input file object.
         self.file = open('SVDHitErrorOutput.txt', 'w')
-        ## Factors for decoding VXDId's
+        # # Factors for decoding VXDId's
         self.vxdid_factors = (8192, 256, 32)
+        # # File to save histograms
+        self.fHisto = ROOT.TFile('SVDPulls.root', 'RECREATE')
+        # # Histogram for u pulls
+        self.h_pull_u = ROOT.TH1F('h_pull_u', 'Pulls in u', 150, -10, 5)
+        # # Histogram for v pulls
+        self.h_pull_v = ROOT.TH1F('h_pull_v', 'Pulls in v', 100, -5, 5)
 
     def beginRun(self):
         """ Write legend for file columns """
 
-        self.file.write('LEGEND TO COLUMNS: \n')
         self.file.write('SensorID Layer Ladder Sensor Truehit_index ' +
-                        'Cluster_index \n')
-        self.file.write('TrueHit: u[cm], v[cm], time[ns], charge[GeV], ' +
-                        'theta_u, theta_v \n')
-        self.file.write('Cluster: isU[True/False], uv[cm], time[ns], ' +
-                        'charge[e-], seed charge[e-], size \n')
-        self.file.write('\n')
+                        'Cluster_index ')
+        self.file.write('truehit_u truehit_v truehit_time_ns charge_GeV ' +
+                        'theta_u theta_v ')
+        self.file.write('cluster_isU cluster_pos cluster_error cluster_time '\
+                        + 'cluster_charge_e seed_charge_e cluster_size\n')
 
     def event(self):
         """Find clusters with a truehit and print some stats."""
@@ -69,6 +73,9 @@ class SVDHitErrors(Module):
                 # Sesnor identification
                 sensorID = truehit.getRawSensorID()
                 [layer, ladder, sensor] = self.decode(sensorID)
+                if (sensor == 1) and (layer != 3):
+                    continue
+
                 s_id = \
                     '{sID} {layer} {ladder} {sensor} {indexT:4d} {indexC:4d} '\
                     .format(
@@ -96,24 +103,50 @@ class SVDHitErrors(Module):
                     thetaV=thetaV)
                 s += s_th
                 # Cluster information
+                cluster_pull = 0.0
+                if cluster.isUCluster():
+                    cluster_pull = (cluster.getPosition() - truehit.getU())\
+                        / cluster.getPositionSigma()
+                else:
+                    cluster_pull = (cluster.getPosition() - truehit.getV())\
+                        / cluster.getPositionSigma()
                 s_cl = \
-                    '{isU} {uvC:10.5f} {tC:10.2f} {eC:10.1f} {eSeed:10.1f} '\
+                    '{isU} {uvC:10.5f} {uvCErr:10.5f} {tC:10.2f} {eC:10.1f} '\
                     .format(
                     isU=cluster.isUCluster(),
-                    uvCL=cluster.getPosition(),
-                    tCL=cluster.getClsTime() - 50,
-                    eCL=cluster.getCharge(),
-                    eSeed=cluster.getSeedCharge()) + \
-                    '{size:5d} '.format(size=cluster.getSize())
+                    uvC=cluster.getPosition(),
+                    uvCErr=cluster.getPositionSigma(),
+                    tC=cluster.getClsTime() - 50,
+                    eC=cluster.getCharge()
+                    ) + \
+                    '{eSeed:10.1f} {size:5d} {pull:10.3f}'.format(
+                        eSeed=cluster.getSeedCharge(),
+                        size=cluster.getSize(),
+                        pull=cluster_pull)
                 s += s_cl
                 # NO DIGITS by now.
                 s += '\n'
                 self.file.write(s)
+                if (cluster.getSize() == 2):
+                    if cluster.isUCluster():
+                        self.h_pull_u.Fill(
+                            (cluster.getPosition() - truehit.getU())\
+                            / cluster.getPositionSigma())
+                    else:
+                        self.h_pull_v.Fill(
+                                (cluster.getPosition() - truehit.getV())\
+                                / cluster.getPositionSigma())
 
     def terminate(self):
         """ Close the output file."""
 
         self.file.close()
+        # Save histograms to file
+        self.fHisto.cd()
+        self.h_pull_u.Write()
+        self.h_pull_v.Write()
+        self.fHisto.Flush()
+        self.fHisto.Close()
 
     def decode(self, vxdid):
         """ Utility to decode sensor IDs """

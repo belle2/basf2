@@ -13,6 +13,7 @@
 
 from basf2 import *
 
+
 # show warnings during processing
 set_log_level(LogLevel.WARNING)
 
@@ -69,7 +70,7 @@ geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
 SVDDIGI.param('PoissonSmearing', True)
 SVDDIGI.param('ElectronicEffects', True)
 SVDDIGI.param('statisticsFilename', 'SVDTestDiags.root')
-SVDDIGI.param('storeWaveforms', True)
+SVDDIGI.param('storeWaveforms', False)
 
 # ============================================================================
 # Do the simulation

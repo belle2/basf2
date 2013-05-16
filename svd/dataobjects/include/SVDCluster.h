@@ -27,7 +27,7 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     SVDCluster():
-      m_sensorID(0), m_isU(true), m_position(0), m_clsTime(0), m_clsTimeSigma(1),
+      m_sensorID(0), m_isU(true), m_position(0), m_positionSigma(1), m_clsTime(0), m_clsTimeSigma(1),
       m_clsCharge(0), m_seedCharge(0), m_clsSize(0)
     {}
 
@@ -41,9 +41,10 @@ namespace Belle2 {
      * @param seedCharge The charge of the seed strip in electrons.
      * @param clsSize The size of the cluster in the corresponding strip pitch units.
      */
-    SVDCluster(VxdID sensorID, bool isU, float position, double clsTime,
-               double clsTimeSigma, float seedCharge, float clsCharge, unsigned short clsSize):
-      m_sensorID(sensorID), m_isU(isU), m_position(position), m_clsTime(clsTime),
+    SVDCluster(VxdID sensorID, bool isU, float position, float positionSigma,
+               double clsTime, double clsTimeSigma, float seedCharge, float clsCharge,
+               unsigned short clsSize):
+      m_sensorID(sensorID), m_isU(isU), m_position(position), m_positionSigma(positionSigma), m_clsTime(clsTime),
       m_clsTimeSigma(clsTimeSigma), m_clsCharge(clsCharge),
       m_seedCharge(seedCharge), m_clsSize(clsSize)
     {}
@@ -61,11 +62,15 @@ namespace Belle2 {
      */
     bool isUCluster() const { return m_isU; }
 
-
-    /** Get the coordinate of seed strip.
-     * @return absolute coordinate of the seed strip.
+    /** Get the coordinate of reconstructed hit.
+     * @return coordinate of the reconstructed hit.
      */
     float getPosition() const { return m_position; }
+
+    /** Get the error of the reconstructed hit coordinate.
+     * @return error of the reconstructed hit coordinate.
+     */
+    float getPositionSigma() const { return m_positionSigma; }
 
     /** Get average of waveform maximum times of cluster strip signals.
      * @return average waveform maximum times.
@@ -95,7 +100,8 @@ namespace Belle2 {
   protected:
     unsigned short m_sensorID; /**< Compressed sensor identifier.*/
     bool m_isU;                /**< True if clusters of u-strips, otherwise false. */
-    float m_position;          /**< Absolute seed strip position in r-phi or z. */
+    float m_position;          /**< Reconstructed hit position in r-phi or z. */
+    float m_positionSigma;     /**< Standard deviation of hit position in r-phi or z.*/
     double m_clsTime;          /**< Average waveform maximum time. */
     double m_clsTimeSigma;     /**< Standard deviation of waveform maximum times.*/
     float m_clsCharge;         /**< Deposited charge in electrons. */
@@ -103,7 +109,7 @@ namespace Belle2 {
     unsigned short m_clsSize;  /**< Cluster size in pixels */
 
 
-    ClassDef(SVDCluster, 1)
+    ClassDef(SVDCluster, 2)
 
   };
 

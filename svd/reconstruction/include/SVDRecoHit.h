@@ -60,11 +60,9 @@ namespace Belle2 {
     SVDRecoHit(const SVDTrueHit* hit, bool uDirection, float sigma = -1);
 
     /** Construct SVDRecoHit from a SVD cluster
-      * FIXME: Error handling not yet defined. For now the errors have to
-      * be supplied on construction
       *
-      * @param hit    SVDCluster to use as base
-      * @param sigma  Error of the hit position
+      * @param hit    SVDCluster to use as base.
+      * FIXME: Parameter sigma is no longer used and will be removed.
       */
     SVDRecoHit(const SVDCluster* hit, float sigma = -1);
 
@@ -125,7 +123,7 @@ namespace Belle2 {
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(SVDRecoHit, 2)
+    ClassDef(SVDRecoHit, 3)
   };
 
 } // namespace Belle2

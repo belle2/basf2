@@ -297,30 +297,49 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     //Check for noise cuts
     if (!(cls.size() > 0 && m_noiseMap(cls.getCharge(), m_cutCluster) && m_noiseMap(cls.getSeed(), m_cutSeed))) continue;
 
-    const Sample& seed = cls.getSeed();
+    const Sample& clusterSeed = cls.getSeed();
+    double clusterCharge = cls.getCharge();
 
     const std::map<unsigned int, float> stripCharges = cls.getStripCharges();
     unsigned int maxStrip = stripCharges.rbegin()->first;
     double maxStripCharge = stripCharges.rbegin()->second;
     unsigned int minStrip = stripCharges.begin()->first;
     double minStripCharge = stripCharges.begin()->second;
-    int clSize = stripCharges.size();
-    double pos = 0.0;
-    if (clSize < m_sizeHeadTail) { // COG
+    int clusterSize = stripCharges.size();
+    double clusterPosition = 0.0;
+    double clusterPositionError = 0.0;
+    if (clusterSize < m_sizeHeadTail) { // COG, size = 1 or 2
       std::map<unsigned int, float>::const_iterator strip_charge = stripCharges.begin();
       for (; strip_charge != stripCharges.end(); ++strip_charge) {
         double stripPos = isU ? info.getUCellPosition(strip_charge->first)
                           : info.getVCellPosition(strip_charge->first);
-        pos += stripPos * strip_charge->second;
+        clusterPosition += stripPos * strip_charge->second;
       }
-      pos /= cls.getCharge();
+      clusterPosition /= clusterCharge;
+      // Compute position error
+      if (clusterSize == 1) {
+        // Add a strip charge equal to the zero-suppression threshold to compute the error
+        double phantomCharge = m_cutAdjacent * m_elNoise;
+        clusterPositionError = pitch * phantomCharge / (clusterCharge + phantomCharge);
+      } else {
+        double a = (clusterSize == 2) ? 1.414 : (clusterSize - 1);
+        double sn = clusterCharge / m_elNoise;
+        clusterPositionError = a * pitch / sn;
+      }
     } else { // Head-tail
-      double centreCharge = (cls.getCharge() - minStripCharge - maxStripCharge) / (clSize - 2);
+      double centreCharge = (clusterCharge - minStripCharge - maxStripCharge) / (clusterSize - 2);
       minStripCharge = (minStripCharge < centreCharge) ? minStripCharge : centreCharge;
       maxStripCharge = (maxStripCharge < centreCharge) ? maxStripCharge : centreCharge;
       double minPos = isU ? info.getUCellPosition(minStrip) : info.getVCellPosition(minStrip);
       double maxPos = isU ? info.getUCellPosition(maxStrip) : info.getVCellPosition(maxStrip);
-      pos = 0.5 * (minPos + maxPos + (maxStripCharge - minStripCharge) / centreCharge * pitch);
+      clusterPosition = 0.5 * (minPos + maxPos + (maxStripCharge - minStripCharge) / centreCharge * pitch);
+      double sn = centreCharge / m_cutAdjacent / m_elNoise;
+      // Rough estimates of Landau noise
+      double landauHead = minStripCharge / centreCharge;
+      double landauTail = maxStripCharge / centreCharge;
+      clusterPositionError = 0.5 * pitch * sqrt(2.0 / sn / sn +
+                                                0.5 * landauHead * landauHead +
+                                                0.5 * landauTail * landauTail);
     }
 
     // Estimate time - this is currently very crude
@@ -339,31 +358,31 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     std::map<unsigned int, unsigned int>::const_reverse_iterator strip_high = stripCounts.rbegin();
     while (strip_high->second < c_minSamples) ++strip_high;
     unsigned int stripHigh = strip_high->first;
-    double time = 0.0;
+    double clusterTime = 0.0;
     double restrictedCharge = 0.0;
     for (unsigned int strip = stripLow; strip <= stripHigh; ++strip) {
       double charge = stripCharges.find(strip)->second; // safe
-      time += m_samplingTime * charge * stripMaxima.find(strip)->second;
+      clusterTime += m_samplingTime * charge * stripMaxima.find(strip)->second;
       restrictedCharge += charge;
     }
-    time /= restrictedCharge;
-    double timeStd = 0.0;
+    clusterTime /= restrictedCharge;
+    double clusterTiimeStd = 0.0;
     for (unsigned int strip = stripLow; strip <= stripHigh; ++strip) {
       double charge = stripCharges.find(strip)->second; // safe
-      double diff = m_samplingTime * stripMaxima.find(strip)->second - time;
-      timeStd += charge * diff * diff;
+      double diff = m_samplingTime * stripMaxima.find(strip)->second - clusterTime;
+      clusterTiimeStd += charge * diff * diff;
     }
-    timeStd = sqrt(timeStd / restrictedCharge / (stripHigh - stripLow));
-    time += m_refTime;
+    clusterTiimeStd = sqrt(clusterTiimeStd / restrictedCharge / (stripHigh - stripLow));
+    clusterTime += m_refTime;
     // discard if not within acceptance
-    if (m_applyWindow && ((time < m_triggerTime) || (time > m_triggerTime + m_acceptance)))
+    if (m_applyWindow && ((clusterTime < m_triggerTime) || (clusterTime > m_triggerTime + m_acceptance)))
       continue;
 
     //Lorentz shift correction FIXME: get from Bfield
     if (isU)
-      pos -= 0.5 * info.getThickness() * m_tanLorentzAngle_holes;
+      clusterPosition -= 0.5 * info.getThickness() * m_tanLorentzAngle_holes;
     else
-      pos -= 0.5 * info.getThickness() * m_tanLorentzAngle_electrons;
+      clusterPosition -= 0.5 * info.getThickness() * m_tanLorentzAngle_electrons;
 
 
     map<int, float> mc_relations;
@@ -391,8 +410,8 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     //Store Cluster into Datastore ...
     int clsIndex = storeClusters.getEntries();
     storeClusters.appendNew(SVDCluster(
-                              seed.getDigit()->getSensorID(), isU, pos, time, timeStd,
-                              seed.getCharge(), cls.getCharge(), clSize
+                              clusterSeed.getDigit()->getSensorID(), isU, clusterPosition, clusterPositionError, clusterTime, clusterTiimeStd,
+                              clusterSeed.getCharge(), clusterCharge, clusterSize
                             ));
 
     //Create Relations to this Digit

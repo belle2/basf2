@@ -43,6 +43,7 @@ SVDRecoHit::SVDRecoHit(const SVDTrueHit* hit, bool uDirection, float sigma):
   GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit),
   m_cluster(0), m_isU(uDirection), m_energyDep(0), m_rotationPhi(0)
 {
+  // Smear the coordinate when constructing from a TrueHit.
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
 
   // Set the sensor UID
@@ -87,12 +88,8 @@ SVDRecoHit::SVDRecoHit(const SVDCluster* hit, float sigma):
     // Set the position in the rotated coordinate frame.
     fHitCoord(0) = hit->getPosition() * cos(m_rotationPhi);
   }
-  //If no error is given, set error to pitch/sqrt(12).
-  // For u coordinate in trapezoidal sensors, use the mean pitch (at v=0).
-  if (sigma < 0)
-    sigma = (m_isU) ? geometry.getUPitch(0) / sqrt(12) : geometry.getVPitch() / sqrt(12);
-  // Set the error covariance matrix
-  fHitCov(0, 0) = 0.5 * sigma * sigma; //very rough empiric correction until the sofisticated error estimations are there
+  // Set the error covariance matrix (this does not scale with position)
+  fHitCov(0, 0) = hit->getPositionSigma() * hit->getPositionSigma();
   // Set physical parameters
   m_energyDep = hit->getCharge();
   // Setup geometry information

@@ -162,6 +162,7 @@ int main(int argc, char* argv[])
 
     //Check for help option
     if (varMap.count("help")) {
+      cout << "Usage: " << argv[0] << " [OPTIONS] [STEERING_FILE] [-- [STEERING_FILE_OPTIONS]]\n";
       cout << cmdlineOptions << endl;
       return 1;
     }

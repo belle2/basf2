@@ -29,14 +29,13 @@ class PyTrigger(Module):
     def event(self):
         """reimplementation of Module::event()."""
 
+        self.return_value(0)
         mcparticles = Belle2.PyStoreArray('MCParticles')
-        returnvalue = 0
         for p in mcparticles:
             if abs(p.getPDG()) == 130:
                 B2INFO('found a K_L!')
-                returnvalue = 1
+                self.return_value(1)
                 break
-        self.return_value(returnvalue)
 
 
 # register necessary modules

@@ -104,7 +104,7 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
 
 def register_module(name, shared_lib_path=None):
     """
-    This function registers a new module
+    Register the module 'name' and return it (e.g. for adding to a path)
 
     name: The name of the module type
     shared_lib_path: An optional path to a shared library from which the
@@ -119,24 +119,22 @@ def register_module(name, shared_lib_path=None):
 
 def create_path():
     """
-    This function creates a new path
+    Creates a new path and returns it
     """
 
     return fw.create_path()
 
 
-def process(path, max_event=0, run_number=None):
+def process(path, max_event=0):
     """
     This function processes the events
 
     path: The path with which the processing starts
-    max_event:  The max_event number of events which will be processed
-    run_number: The run number
+    max_event:  The maximal number of events which will be processed,
+                0 for no limit
     """
 
-    if run_number is not None:
-        fw.process(path, max_event, run_number)
-    elif max_event != 0:
+    if max_event != 0:
         fw.process(path, max_event)
     else:
         fw.process(path)

@@ -31,10 +31,29 @@ namespace Belle2 {
       m_clsCharge(0), m_seedCharge(0), m_clsSize(0)
     {}
 
+    /** OLD STYLE Constructor, just for backward compatibility. Will be removed soon!!!!!!
+     * @param sensorID Sensor compact ID.
+     * @param isU True if u strips, otherwise false.
+     * @param position Seed strip coordinate.
+     * @param clsTime The average of waveform maxima times of strips in the cluster.
+     * @param clsTimeSigma The standard deviation of waveform maxima times.
+     * @param clsCharge The cluster charge in electrons.
+     * @param seedCharge The charge of the seed strip in electrons.
+     * @param clsSize The size of the cluster in the corresponding strip pitch units.
+     */
+    SVDCluster(VxdID sensorID, bool isU, float position,
+               double clsTime, double clsTimeSigma, float seedCharge, float clsCharge,
+               unsigned short clsSize):
+      m_sensorID(sensorID), m_isU(isU), m_position(position), m_positionSigma(0), m_clsTime(clsTime),
+      m_clsTimeSigma(clsTimeSigma), m_clsCharge(clsCharge),
+      m_seedCharge(seedCharge), m_clsSize(clsSize)
+    {}
+
     /** Constructor.
      * @param sensorID Sensor compact ID.
      * @param isU True if u strips, otherwise false.
      * @param position Seed strip coordinate.
+     * @param positionSigma Error in strip coordinate.
      * @param clsTime The average of waveform maxima times of strips in the cluster.
      * @param clsTimeSigma The standard deviation of waveform maxima times.
      * @param clsCharge The cluster charge in electrons.

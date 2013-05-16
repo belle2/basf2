@@ -274,8 +274,8 @@ namespace Belle2 {
 
     /** Get the relations between an object and other objects in a store array.
      *
-     *  Relations in both directions are returned. The direction is encoded in the sign
-     *  of the weight. Relations that point to the object have a negative weight.
+     *  Relations in both directions are returned.
+     *
      *  @param object         Pointer to the object from or to which the relations point.
      *  @param entry          Data store entry that contains the object. Used for caching. Will be set if 0.
      *  @param index          Index in TClonesArray that contains the object. Used for caching. Will be set if < 0.
@@ -315,8 +315,8 @@ namespace Belle2 {
 
     /** Get the first relation between an object and another object in a store array.
      *
-     *  Relations in both directions are considered. The direction is encoded in the sign
-     *  of the weight. Relations that point to the object have a negative weight.
+     *  Relations in both directions are considered.
+     *
      *  @param object         Pointer to the object from or to which the relation points.
      *  @param entry          Data store entry that contains the object. Used for caching. Will be set if 0.
      *  @param index          Index in TClonesArray that contains the object. Used for caching. Will be set if < 0.
@@ -376,8 +376,8 @@ namespace Belle2 {
 
     /** Get the relations between an object and other objects in a store array.
      *
-     *  Relations in both directions are returned. The direction is encoded in the sign
-     *  of the weight. Relations that point to the object have a negative weight.
+     *  Relations in both directions are returned.
+     *
      *  @sa RelationsInterface::getRelationsWith
      *  @param object         Pointer to the object from or to which the relations point.
      *  @tparam T             Class of the objects to or from which the relations point.

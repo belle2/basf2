@@ -302,7 +302,7 @@ namespace Belle2 {
     //this is assuming stable order, correct?
     EXPECT_DOUBLE_EQ(toRels.weight(0), 1.0);
     EXPECT_DOUBLE_EQ(toRels.weight(1), 2.0);
-    EXPECT_DOUBLE_EQ(toRels.weight(2), 3.0);
+    EXPECT_DOUBLE_EQ(toRels.weight(2), -3.0);
 
     EXPECT_TRUE(toRels.object(0) == (*profileData)[0]);
     EXPECT_TRUE(toRels.object(1) == (*profileData)[1]);
@@ -311,7 +311,7 @@ namespace Belle2 {
     const ProfileInfo* toObj = (*profileData)[2];
     RelationVector<EventMetaData> fromRels = DataStore::getRelationsToObj<EventMetaData>(toObj);
     EXPECT_EQ(fromRels.size(), 1u);
-    EXPECT_DOUBLE_EQ(fromRels.weight(0), 3.0);
+    EXPECT_DOUBLE_EQ(fromRels.weight(0), -3.0);
     EXPECT_TRUE(fromRels.object(0) == fromObj);
     EXPECT_TRUE(fromRels[0] == fromObj);
 
@@ -345,7 +345,7 @@ namespace Belle2 {
     RelationArray relation(*evtData, *profileData);
     relation.add(0, 0, 1.0);
     relation.add(0, 1, 2.0);
-    relation.add(0, 2, 3.0);
+    relation.add(0, 2, -3.0);
 
     findRelationsCheckContents();
 
@@ -364,7 +364,7 @@ namespace Belle2 {
 
     DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[0], 1.0);
     DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[1], 2.0);
-    DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[2], 3.0);
+    DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[2], -3.0);
 
     findRelationsCheckContents();
   }
@@ -390,7 +390,7 @@ namespace Belle2 {
 
     RelationVector<EventMetaData> eventRels = DataStore::Instance().getRelationsWithObj<EventMetaData>((*profileData)[0]);
     EXPECT_EQ(eventRels.size(), 1u);
-    EXPECT_EQ(eventRels.weight(0), -1.0); //points to given object, negative weight
+    EXPECT_EQ(eventRels.weight(0), 1.0); //points to given object, same weight
   }
 
   /** Test searching all "ALL" storearrays for objects. */
@@ -407,7 +407,7 @@ namespace Belle2 {
 
     DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[0], 1.0);
     DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[1], 2.0);
-    DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[2], 3.0);
+    DataStore::Instance().addRelationFromTo((*evtData)[0], (*profileData)[2], -3.0);
 
     //add one object (plus relation) to the other array
     profileData2.appendNew();
@@ -425,7 +425,7 @@ namespace Belle2 {
     for (int i = 0; i < (int)toRels.size(); i++) {
       sum += toRels.weight(i);
     }
-    EXPECT_DOUBLE_EQ(sum, 42.0 + 1 + 2 + 3);
+    EXPECT_DOUBLE_EQ(sum, 42.0 + 1 + 2 - 3);
 
     //finding with default TO name
     EXPECT_EQ(DataStore::getRelationsFromObj<ProfileInfo>(fromObj, profileData->getName()).size(), 3u);
@@ -505,7 +505,7 @@ namespace Belle2 {
     for (int i = 0; i < (int)rels3.size(); i++) {
       sum += rels3.weight(i);
     }
-    EXPECT_DOUBLE_EQ(sum, 1.0 - 1.0 - 2.0); //relations pointing _to_ relobjdata[1] have negative weight
+    EXPECT_DOUBLE_EQ(sum, 1.0 + 1.0 + 2.0);
   }
 
 

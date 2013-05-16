@@ -340,10 +340,7 @@ std::vector<RelationEntry> DataStore::getRelationsWith(const TObject* object, Da
 {
   std::vector<RelationEntry> result = getRelationsFromTo(object, entry, index, withClass, name);
 
-  std::vector<RelationEntry> fromResult = getRelationsToFrom(object, entry, index, withClass, name);
-  for (unsigned int i = 0; i < fromResult.size(); i++) {
-    fromResult[i].weight = -fromResult[i].weight;
-  }
+  const std::vector<RelationEntry>& fromResult = getRelationsToFrom(object, entry, index, withClass, name);
 
   result.insert(result.end(), fromResult.begin(), fromResult.end());
   return result;

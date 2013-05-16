@@ -110,8 +110,8 @@ namespace Belle2 {
 
     /** Get the relations between this object and another store array.
      *
-     *  Relations in both directions are returned. The direction is encoded in the sign
-     *  of the weight. Relations that point to this object have a negative weight.
+     *  Relations in both directions are returned.
+     *
      *  @tparam T      The class of objects to or from which the relations point.
      *  @param name    The name of the store array to or from which the relations point.
      *                 If empty the default store array name for class T will be used.

@@ -4,6 +4,8 @@ usage in the steering file
 """
 
 from ROOT import TDatabasePDG
+
+## the particle database (filled from evt.pdl by framework)
 database = TDatabasePDG.Instance()
 
 

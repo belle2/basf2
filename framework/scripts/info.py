@@ -60,5 +60,4 @@ print 'Kernel version:      ', os.uname()[2]
 print 'Operating system:    ', os.uname()[3]
 print ''
 print 'basf2 modules directory:', ':'.join(basf2moddir)
-print 'basf2 data    directory:', basf2datadir
 print '-------------------------------------------------'

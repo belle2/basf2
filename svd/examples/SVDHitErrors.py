@@ -18,15 +18,15 @@ class SVDHitErrors(Module):
         """Initialize the module"""
 
         super(SVDHitErrors, self).__init__()
-        # # Input file object.
+        ## Input file object.
         self.file = open('SVDHitErrorOutput.txt', 'w')
-        # # Factors for decoding VXDId's
+        ## Factors for decoding VXDId's
         self.vxdid_factors = (8192, 256, 32)
-        # # File to save histograms
+        ## File to save histograms
         self.fHisto = ROOT.TFile('SVDPulls.root', 'RECREATE')
-        # # Histogram for u pulls
+        ## Histogram for u pulls
         self.h_pull_u = ROOT.TH1F('h_pull_u', 'Pulls in u', 150, -10, 5)
-        # # Histogram for v pulls
+        ## Histogram for v pulls
         self.h_pull_v = ROOT.TH1F('h_pull_v', 'Pulls in v', 100, -5, 5)
 
     def beginRun(self):

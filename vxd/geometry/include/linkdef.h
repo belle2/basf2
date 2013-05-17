@@ -6,5 +6,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::VXD::SensorPlane;
+#pragma link C++ class Belle2::VXD::GeoCache;
+#pragma link C++ class Belle2::VXD::SensorInfoBase;
 
 #endif

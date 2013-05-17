@@ -12,6 +12,7 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/simulation/SensitiveDetectorBase.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
 
 #include <stack>
 #include <memory>
@@ -24,6 +25,20 @@ using namespace std;
 
 namespace Belle2 {
   namespace VXD {
+    void GeoCache::clear()
+    {
+      m_pxdLayers.clear();
+      m_svdLayers.clear();
+      m_ladders.clear();
+      m_sensors.clear();
+      m_sensorInfo.clear();
+    }
+    const SensorInfoBase& GeoCache::getSensorInfo(VxdID id) const
+    {
+      SensorInfoMap::const_iterator info = m_sensorInfo.find(id);
+      if (info == m_sensorInfo.end()) B2FATAL("VXD Sensor " << id << " does not exist.");
+      return *(info->second);
+    }
 
     void GeoCache::findVolumes(G4VPhysicalVolume* envelope)
     {

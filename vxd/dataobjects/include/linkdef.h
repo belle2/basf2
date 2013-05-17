@@ -7,4 +7,5 @@
 
 #pragma link C++ class Belle2::VXDTrueHit;
 #pragma link C++ class Belle2::VXDSimpleDigiHit;
+#pragma link C++ class Belle2::VxdID;
 #endif

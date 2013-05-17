@@ -11,13 +11,14 @@
 #ifndef VXD_GEOCACHE_H
 #define VXD_GEOCACHE_H
 
-#include <framework/logging/Logger.h>
-
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <set>
 #include <map>
+
+#ifndef __CINT__
 #include <boost/unordered_map.hpp>
+#endif
 
 class G4VPhysicalVolume;
 
@@ -35,13 +36,7 @@ namespace Belle2 {
 
 
       /** Clean up internal structures */
-      void clear() {
-        m_pxdLayers.clear();
-        m_svdLayers.clear();
-        m_ladders.clear();
-        m_sensors.clear();
-        m_sensorInfo.clear();
-      }
+      void clear();
 
       /** Search a given Geometry for Sensors.
        * This method will search a given Physical Volume and add all
@@ -63,30 +58,28 @@ namespace Belle2 {
        * @param sensortype Wether to only return the layer IDs for PXD, SVD or all VXD layers (default)
        * @return a set containing all existing Layers with the requested type
        */
-      const std::set<VxdID>  getLayers(SensorInfoBase::SensorType sensortype = SensorInfoBase::VXD);
+      const std::set<Belle2::VxdID>  getLayers(SensorInfoBase::SensorType sensortype = SensorInfoBase::VXD);
       /** Return a set of all ladder IDs belonging to a given layer */
-      const std::set<VxdID>& getLadders(VxdID layer) const;
+      const std::set<Belle2::VxdID>& getLadders(Belle2::VxdID layer) const;
       /** Return a set of all sensor IDs belonging to a given ladder */
-      const std::set<VxdID>& getSensors(VxdID ladder) const;
+      const std::set<Belle2::VxdID>& getSensors(Belle2::VxdID ladder) const;
 
       /** Return a referecne to the SensorInfo of a given SensorID */
-      const SensorInfoBase& getSensorInfo(VxdID id) const {
-        SensorInfoMap::const_iterator info = m_sensorInfo.find(id);
-        if (info == m_sensorInfo.end()) B2FATAL("VXD Sensor " << id << " does not exist.");
-        return *(info->second);
-      }
+      const SensorInfoBase& getSensorInfo(Belle2::VxdID id) const;
 
       /** Return a reference to the SensorInfo of a given SensorID.
        * This function is a shorthand for GeoCache::getInstance().getSensorInfo
        */
-      static const SensorInfoBase& get(VxdID id) { return getInstance().getSensorInfo(id); }
+      static const SensorInfoBase& get(Belle2::VxdID id) { return getInstance().getSensorInfo(id); }
       /** Return a reference to the singleton instance */
       static GeoCache& getInstance();
     private:
+#ifndef __CINT__
       /** Hash map to store pointers to all existing SensorInfos with constant lookup complexity */
-      typedef boost::unordered_map<VxdID, SensorInfoBase*> SensorInfoMap;
+      typedef boost::unordered_map<Belle2::VxdID, SensorInfoBase*> SensorInfoMap;
+#endif
       /** Map to store a set of unique VxdIDs belonging to one VxdID. Like ladders belong to layers, etc. */
-      typedef std::map<VxdID, std::set<VxdID> > SensorHierachy;
+      typedef std::map<Belle2::VxdID, std::set<Belle2::VxdID> > SensorHierachy;
 
       /** Singleton class, hidden constructor */
       GeoCache() {};
@@ -96,15 +89,18 @@ namespace Belle2 {
       GeoCache& operator=(const GeoCache&);
 
       /** Set of all PXD layer IDs */
-      std::set<VxdID> m_pxdLayers;
+      std::set<Belle2::VxdID> m_pxdLayers;
       /** Set of all SVD layer IDs */
-      std::set<VxdID> m_svdLayers;
+      std::set<Belle2::VxdID> m_svdLayers;
       /** Map of all Ladder IDs belonging to a given Layer ID */
       SensorHierachy m_ladders;
       /** Map of all Sensor IDs belonging to a given Ladder ID */
       SensorHierachy m_sensors;
+
+#ifndef __CINT__
       /** Map to find the SensorInfo for a given Sensor ID */
       SensorInfoMap m_sensorInfo;
+#endif
     };
   }
 } //Belle2 namespace

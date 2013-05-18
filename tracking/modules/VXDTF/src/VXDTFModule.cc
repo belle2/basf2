@@ -3076,7 +3076,7 @@ void VXDTFModule::calcInitialValues4TCs(TCsOfEvent& tcVector) /// TODO: use vxdC
       radialVector = (intersection - hitA);
     }
 
-    double radiusInCm = aTC->getEstRadius();
+    radiusInCm = aTC->getEstRadius();
     if (radiusInCm  < 0.1) { // if it is not set, value stays at zero, therefore small check should be enough
       radiusInCm = radialVector.Mag(); // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
     }

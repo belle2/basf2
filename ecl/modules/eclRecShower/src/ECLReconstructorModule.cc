@@ -144,23 +144,7 @@ void ECLReconstructorModule::event()
 //        cout<<endl;
 
       double energyBfCorrect = (*iShower).second.Energy();
-      double preliminaryCalibration = 1.0;
-      if ((*iShower).second.Theta() > 0 && ((*iShower).second.Theta() / PI * 180) < 33.2) {
-        preliminaryCalibration = 0.9567 - 0.002283 * pow(log10(energyBfCorrect), 1)
-                                 - 0.002234 * pow(log10(energyBfCorrect), 2)
-                                 + 0.0002416 * pow(log10(energyBfCorrect), 3);
-      } else if (((*iShower).second.Theta() / PI * 180) < 126.1) {
-        preliminaryCalibration = 0.9585 - 0.003795 * pow(log10(energyBfCorrect), 1)
-                                 - 0.001399 * pow(log10(energyBfCorrect), 2)
-                                 + 0.0002194 * pow(log10(energyBfCorrect), 3);
-      } else if (((*iShower).second.Theta() / PI * 180) < 180) {
-        preliminaryCalibration = 0.9494 - 0.003313 * pow(log10(energyBfCorrect), 1)
-                                 - 0.002253 * pow(log10(energyBfCorrect), 2)
-                                 + 0.0001431 * pow(log10(energyBfCorrect), 3);
-      } else {
-        B2DEBUG(100, "ECLShower theta out of range " << ((*iShower).second.Theta() / PI * 180));
-
-      }
+      double preliminaryCalibration = correctionFactor(energyBfCorrect, (*iShower).second.Theta()) ;
       double sEnergy = (*iShower).second.Energy() / preliminaryCalibration;
 
 
@@ -304,4 +288,77 @@ float ECLReconstructorModule::errorPhi(double Energy, double Theta)
 
 
 
+double ECLReconstructorModule::correctionFactor(double Energy, double Theta)
+{
+
+  int  eCorrId = -1;
+  if (Theta > 0 && (Theta / PI * 180) < 32.2) {
+    eCorrId = 0;
+  } else if ((Theta / PI * 180) >= 32.2 && (Theta / PI * 180) < 35.0) {
+    eCorrId = 1;
+  } else if ((Theta / PI * 180) >= 35.0 && (Theta / PI * 180) < 37.5) {
+    eCorrId = 2;
+  } else if ((Theta / PI * 180) >= 37.5 && (Theta / PI * 180) < 40.0) {
+    eCorrId = 3;
+  } else if ((Theta / PI * 180) >= 40.0 && (Theta / PI * 180) < 42.5) {
+    eCorrId = 4;
+  } else if ((Theta / PI * 180) >= 42.5 && (Theta / PI * 180) < 45.0) {
+    eCorrId = 5;
+  } else if ((Theta / PI * 180) >= 45.0 && (Theta / PI * 180) < 55.0) {
+    eCorrId = 6;
+  } else if ((Theta / PI * 180) >= 55.0 && (Theta / PI * 180) < 65.0) {
+    eCorrId = 7;
+  } else if ((Theta / PI * 180) >= 65.0 && (Theta / PI * 180) < 75.0) {
+    eCorrId = 8;
+  } else if ((Theta / PI * 180) >= 75.0 && (Theta / PI * 180) < 85.0) {
+    eCorrId = 9;
+  } else if ((Theta / PI * 180) >= 85.0 && (Theta / PI * 180) < 95.0) {
+    eCorrId = 10;
+  } else if ((Theta / PI * 180) >= 95.0 && (Theta / PI * 180) < 105.0) {
+    eCorrId = 11;
+  } else if ((Theta / PI * 180) >= 105.0 && (Theta / PI * 180) < 115.0) {
+    eCorrId = 12;
+  } else if ((Theta / PI * 180) >= 115.0 && (Theta / PI * 180) < 128.7) {
+    eCorrId = 13;
+  } else if ((Theta / PI * 180) >= 128.7 && (Theta / PI * 180) <= 180) {
+    eCorrId = 14;
+
+  } else {
+    B2ERROR("ECLShower theta out of range " << (Theta / PI * 180));
+
+  }
+
+
+
+
+  double energyCorrectPolynomial[15][4] = {
+    {9.56670E-01, -2.28268E-03, -2.23364E-03, 2.41601E-04},
+    {9.39221E-01, -6.01211E-03, -1.01388E-03, 2.21742E-04},
+    {9.47695E-01, -4.00680E-03, -6.62361E-04, 3.51879E-04},
+    {9.46688E-01, -2.83932E-03, -6.50563E-04, 2.73304E-04},
+    {9.51124E-01, -3.64272E-03, -1.03425E-03, 2.14907E-04},
+    {9.53309E-01, -2.62172E-03, -8.97187E-04, 3.51823E-04},
+    {9.53309E-01, -2.62172E-03, -8.97187E-04, 3.51823E-04},
+    {9.58557E-01, -2.44004E-03, -1.49555E-03, 1.41088E-04},
+    {9.60535E-01, -2.77543E-03, -1.44099E-03, 2.44692E-04},
+    {9.61075E-01, -3.09389E-03, -1.45289E-03, 2.16016E-04},
+    {9.60538E-01, -3.35572E-03, -1.36629E-03, 2.30296E-04},
+    {9.61748E-01, -4.30415E-03, -1.05225E-03, 3.59288E-04},
+    {9.61925E-01, -4.44564E-03, -1.13480E-03, 2.55418E-04},
+    {9.58142E-01, -4.75945E-03, -6.66410E-04, 4.77996E-04},
+    {9.49364E-01, -3.31338E-03, -2.25274E-03, 1.43136E-04}
+  };
+
+
+
+
+  double  preliminaryCalibration = energyCorrectPolynomial[eCorrId][0]
+                                   + energyCorrectPolynomial[eCorrId][1] * pow(log(Energy), 1)
+                                   + energyCorrectPolynomial[eCorrId][2] * pow(log(Energy), 2)
+                                   + energyCorrectPolynomial[eCorrId][3] * pow(log(Energy), 3);
+
+
+  return preliminaryCalibration;
+
+}
 

@@ -17,26 +17,6 @@
 
 namespace Belle2 {
   namespace ECL {
-    /**
-     *
-     * The detailed description of the ECLGammaReconstructor module
-
-      \correlationdiagram
-
-      MCParticle = graph.external_data('MCParticle')
-      CDCHit = graph.external_data('CDCHit')
-      CDCTrackHit = graph.data('CDCTrackHit')
-      CDCTrackCandidate = graph.data('CDCTrackCandidate')
-
-      graph.module('CDCTracking', [MCParticle, CDCHit], [CDCTrackHit, CDCTrackCandidate])
-
-      graph.relation(CDCTrackHit, CDCHit)
-      graph.relation(CDCTrackCandidate, CDCTrackHit)
-      graph.relation(CDCTrackCandidate, MCParticle)
-
-      \endcorrelationdiagram
-
-     */
     class ECLReconstructorModule : public Module {
 
     public:
@@ -68,19 +48,6 @@ namespace Belle2 {
       /** Stopping of CPU clock.*/
       virtual void terminate();
 
-      /** function of sruare */
-      double squ(double x) { return x * x; }
-
-      /**calculate error of Energy with Energy  */
-      float errorE(double E);
-
-      /**calculate error of Theta with Energy and Theta  */
-      float errorTheta(double Energy, double Theta);
-
-      /**calculate error of Phi with Energy and Theta  */
-      float errorPhi(double Energy, double Theta);
-
-
     protected:
 
 
@@ -98,6 +65,21 @@ namespace Belle2 {
       int    m_hitNum;
       /**  ECLHitAssignment. index */
       int    m_HANum;
+      /** function of sruare */
+      double squ(double x) { return x * x; }
+
+      /**calculate error of Energy with Energy  */
+      float errorE(double E);
+
+      /**calculate error of Theta with Energy and Theta  */
+      float errorTheta(double Energy, double Theta);
+
+      /**calculate error of Phi with Energy and Theta  */
+      float errorPhi(double Energy, double Theta);
+
+      /**calculate correction factor of energy depending on Energy and Theta  */
+      double correctionFactor(double Energy, double Theta);
+
 
 
 

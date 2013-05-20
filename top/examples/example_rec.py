@@ -2,14 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-from simulation import add_simulation
 from reconstruction import add_reconstruction
 
 main = create_path()
 
 # input
 input = register_module('RootInput')
-input.param('inputFileName', 'output.root')
+input.param('inputFileName', 'B2Kpi_gen.root')
 main.add_module(input)
 
 # detecor simulation
@@ -20,11 +19,7 @@ components = [
     'PXD',
     'SVD',
     'CDC',
-    'TOP',
-    ]
-              #              'ARICH',
-              #              'BKLM',
-              #              'ECL',
+    'TOP']
 
 # Load XML files
 gearbox = register_module('Gearbox')
@@ -40,7 +35,7 @@ add_reconstruction(main, components)
 # or add_reconstruction(main) to run the reconstruction of all detectors
 
 output = register_module('RootOutput')
-output.param('outputFileName', 'output_reconstructed.root')
+output.param('outputFileName', 'B2Kpi_rec.root')
 main.add_module(output)
 
 process(main)

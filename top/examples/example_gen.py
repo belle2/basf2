@@ -3,7 +3,6 @@
 
 from basf2 import *
 from simulation import add_simulation
-from reconstruction import add_reconstruction
 
 main = create_path()
 
@@ -17,27 +16,15 @@ main.add_module(evtmetagen)
 # generate BBbar events
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.param('boost2LAB', True)
-evtgeninput.param('userDECFile', 'B2Kpi.dec')
+evtgeninput.param('userDECFile', 'top/examples/B2Kpi.dec')
 main.add_module(evtgeninput)
 
 # detecor simulation
-components = [
-    'MagneticField',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-    'TOP',
-    'ARICH',
-    'BKLM',
-    'ECL',
-    ]
-add_simulation(main, components)
-# or add_simulation(main) to simulate all detectors
+add_simulation(main)
 
 # output
 output = register_module('RootOutput')
-output.param('outputFileName', 'output.root')
+output.param('outputFileName', 'B2Kpi_gen.root')
 main.add_module(output)
 
 process(main)

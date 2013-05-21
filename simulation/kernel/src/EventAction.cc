@@ -59,8 +59,8 @@ void EventAction::EndOfEventAction(const G4Event*)
   RelationArray::ReplaceVec<> indexReplacement(indices);
 
   //Update all registered MCParticle Relations and replace the TrackID by the final MCParticle id
-  std::map<std::string, RelationArray::EConsolidationAction> relations = SensitiveDetectorBase::getMCParticleRelations();
-  for (std::map<std::string, RelationArray::EConsolidationAction>::iterator it = relations.begin(); it != relations.end(); ++it) {
+  const std::map<std::string, RelationArray::EConsolidationAction>& relations = SensitiveDetectorBase::getMCParticleRelations();
+  for (std::map<std::string, RelationArray::EConsolidationAction>::const_iterator it = relations.begin(); it != relations.end(); ++it) {
     RelationArray mcPartRelation(it->first);
     if (mcPartRelation) mcPartRelation.consolidate(indexReplacement, RelationArray::Identity(), it->second);
   }

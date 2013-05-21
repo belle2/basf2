@@ -51,7 +51,7 @@ namespace Belle2 {
       virtual ~SensitiveDetectorBase() {}
 
       /** Return a list of all registered Relations with MCParticles. */
-      static const std::map<std::string, RelationArray::EConsolidationAction> getMCParticleRelations() { return m_mcRelations; }
+      static const std::map<std::string, RelationArray::EConsolidationAction>& getMCParticleRelations() { return s_mcRelations; }
       /** Enable/Disable all Sensitive Detectors.
        * By default, all sensitive detectors won't create hits to make it
        * possible to use the Geant4 Navigator for non-simulation purposes. Only
@@ -59,7 +59,7 @@ namespace Belle2 {
        * hits
        * @param active bool to indicate wether hits should be recorded
        */
-      static void setActive(bool active) { m_active = active; }
+      static void setActive(bool active) { s_active = active; }
     protected:
       /** Register an relation involving MCParticles.
        * All Relations which point from an MCParticle to something have to be
@@ -92,16 +92,16 @@ namespace Belle2 {
        */
       virtual bool ProcessHits(G4Step* aStep, G4TouchableHistory* aROhist);
       /** Static set holding all relations which have to be updated at the end of the Event */
-      static std::map<std::string, RelationArray::EConsolidationAction> m_mcRelations;
+      static std::map<std::string, RelationArray::EConsolidationAction> s_mcRelations;
       /** Static bool which indicates wether recording of hits is enabled */
-      static bool m_active;
+      static bool s_active;
       /** Subdetector the class belongs to */
       DetectorComponent m_subdetector;
     };
 
     inline bool SensitiveDetectorBase::ProcessHits(G4Step* aStep, G4TouchableHistory* aROhist)
     {
-      if (!m_active) return false;
+      if (!s_active) return false;
       bool result = step(aStep, aROhist);
       if (result && m_subdetector) TrackInfo::getInfo(*aStep->GetTrack()).addStatus(m_subdetector);
       return result;

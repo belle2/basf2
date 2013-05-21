@@ -104,7 +104,12 @@ namespace Belle2 {
     GFKalman m_kalmanFilter;                         /**< The Genfit Kalman filter object */
     GFDaf m_daf;                                     /**< The Genfit Deterministic Annealing filter (DAF) object */
     std::vector<double> m_dafTemperatures;           /**< holds the annealing scheme for the DAF. The number of vector elements is the number of DAF iterations */
-
+    bool m_energyLossBetheBloch;
+    bool m_noiseBetheBloch;
+    bool m_noiseCoulomb;
+    bool m_energyLossBrems;
+    bool m_noiseBrems;
+    bool m_noEffects;
   }; /** @} @} */
 } // end namespace Belle2
 

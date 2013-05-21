@@ -208,7 +208,8 @@ namespace Belle2 {
     std::stringstream m_textOutput;
     std::ofstream m_dataOut;
 
-
+//    bool m_spMode;
+//    std::ofstream m_piStuffOut;
 
     bool m_wAndPredPresentsTested;
     //stuff for the text output for rave developers
@@ -269,6 +270,8 @@ namespace Belle2 {
     void inspectTracks(double chi2tot_fu, double vertexAbsMom);
 
   };
+
+
 }
 
 #endif /* TrackFitCheckerModule_H_ */

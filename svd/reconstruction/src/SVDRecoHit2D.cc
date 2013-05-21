@@ -29,12 +29,12 @@ const double SVDRecoHit2D::c_HMatrixContent[10] = {0, 0, 0, 1, 0, 0, 0, 0, 0, 1}
 const TMatrixD SVDRecoHit2D::c_HMatrix = TMatrixD(HIT_DIMENSIONS, 5, c_HMatrixContent);
 
 SVDRecoHit2D::SVDRecoHit2D():
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_vxdSimpleDigiHit(NULL),
+  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
   m_energyDep(0)//, m_energyDepError(0)
 {}
 
 SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit), m_vxdSimpleDigiHit(NULL),
+  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit),
   m_energyDep(0)//, m_energyDepError(0)
 {
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
@@ -64,7 +64,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
 }
 
 SVDRecoHit2D::SVDRecoHit2D(const VxdID vxdid, const double u, const double v, double sigmaU, double sigmaV):
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(vxdid.getID()), m_trueHit(NULL), m_vxdSimpleDigiHit(NULL),
+  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(vxdid.getID()), m_trueHit(NULL),
   m_energyDep(0)//, m_energyDepError(0)
 {
   //If no error is given, estimate the error by dividing the pixel size by sqrt(12)
@@ -81,29 +81,6 @@ SVDRecoHit2D::SVDRecoHit2D(const VxdID vxdid, const double u, const double v, do
   fHitCov(0, 1) = 0;
   fHitCov(1, 0) = 0;
   fHitCov(1, 1) = sigmaV * sigmaV;
-  // Setup geometry information
-  setDetectorPlane();
-}
-
-SVDRecoHit2D::SVDRecoHit2D(const VXDSimpleDigiHit* hit):
-  GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_vxdSimpleDigiHit(hit),
-  m_energyDep(0)//, m_energyDepError(0)
-{
-  // Set the sensor UID
-  m_sensorID = hit->getSensorID();
-  double sigmaU = hit->getSigU();
-  double sigmaV = hit->getSigV();
-  // Set positions
-  fHitCoord(0) = hit->getU();
-  fHitCoord(1) = hit->getV();
-  // Set the error covariance matrix
-  fHitCov(0, 0) = sigmaU * sigmaU;
-  fHitCov(0, 1) = 0;
-  fHitCov(1, 0) = 0;
-  fHitCov(1, 1) = sigmaV * sigmaV;
-  // Set physical parameters
-  //m_energyDep = hit->getCharge() * Const::ehEnergy;
-  //m_energyDepError = 0;
   // Setup geometry information
   setDetectorPlane();
 }

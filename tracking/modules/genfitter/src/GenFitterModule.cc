@@ -103,6 +103,12 @@ GenFitterModule::GenFitterModule() :
 
   addParam("HelixOutput", m_createTextFile, "Set true if you want to have a text file with perigee helix parameters of all tracks", bool(false));
   addParam("DAFTemperatures", m_dafTemperatures, "set the annealing scheme (temperatures) for the DAF. Length of vector will determine DAF iterations", vector<double>(1, -999.0));
+  addParam("energyLossBetheBloch", m_energyLossBetheBloch, "activate the material effect: EnergyLossBetheBloch", true);
+  addParam("noiseBetheBloch", m_noiseBetheBloch, "activate the material effect: NoiseBetheBloch", true);
+  addParam("noiseCoulomb", m_noiseCoulomb, "activate the material effect: NoiseCoulomb", true);
+  addParam("energyLossBrems", m_energyLossBrems, "activate the material effect: EnergyLossBrems", true);
+  addParam("noiseBrems", m_noiseBrems, "activate the material effect: NoiseBrems", true);
+  addParam("noEffects", m_noEffects, "switch off all material effects in Genfit. This overwrites all individual material effects switches", false);
 
 }
 
@@ -145,6 +151,16 @@ void GenFitterModule::initialize()
     //pass the magnetic field to genfit
     GFFieldManager::getInstance()->init(new GFGeant4Field());
     GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
+  }
+  // activate / deactivate material effects in genfit
+  if (m_noEffects == true) {
+    GFMaterialEffects::getInstance()->setNoEffects(true);
+  } else {
+    GFMaterialEffects::getInstance()->setEnergyLossBetheBloch(m_energyLossBetheBloch);
+    GFMaterialEffects::getInstance()->setNoiseBetheBloch(m_noiseBetheBloch);
+    GFMaterialEffects::getInstance()->setNoiseCoulomb(m_noiseCoulomb);
+    GFMaterialEffects::getInstance()->setEnergyLossBrems(m_energyLossBrems);
+    GFMaterialEffects::getInstance()->setNoiseBrems(m_noiseBrems);
   }
   GFMaterialEffects::getInstance()->setMscModel("Highland");
 

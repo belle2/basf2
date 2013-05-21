@@ -91,6 +91,7 @@ TrackFitCheckerModule::TrackFitCheckerModule() : Module()
   addParam("writeToTextFile", m_writeToFile, "Set to True if you want the results of the statistical tests written out in a normal text file", false);
   addParam("exportTracksForRaveDeveloper", m_exportTracksForRaveDeveloper, "Writes tracks into text file in a format used by rave developers", false);
   addParam("trunctationRatio", m_trunctationRatio, "Ratio of the data sample that will be cut away before in the trunctated", 0.01);
+//  addParam("slowPiMode", m_spMode, "for the analysis of pions from D star decays", false);
 }
 
 
@@ -295,6 +296,10 @@ void TrackFitCheckerModule::initialize()
   if (m_exportTracksForRaveDeveloper == true) {
     m_forRaveOut.open((m_dataOutFileName + "ForRaveDev.txt").c_str());
   }
+//  if( m_spMode == true){
+//  m_piStuffOut.open("slowPiScatter.txt", std::ios::app);
+//  m_piStuffOut << "#p_true/MeV\tp_reco/MeV" << "\n";
+//  }
 }
 
 
@@ -372,6 +377,10 @@ void TrackFitCheckerModule::event()
     //aRKTrackRepPtr->getFirstState().Print(); aRKTrackRepPtr->getFirstCov().Print();
     if (genfitStatusFlag not_eq 0) {
       // we have a track that was not fitted successfully no tests can be done. Goto next track
+//      if( m_spMode == true){
+//        m_piStuffOut << trueVertexMom.Mag()*1000.0<< "\t" << -20 << "\n";
+//      }
+
       if (m_writeToRootFile == true) {
         m_statDataTreePtr->Fill(); // attention! this fill here means that all branches in the root tree besides trueVertexPos, trueVertexMom and genfitStatusFlag will have the value of the previous track. Keep this in mind when analyzing the tree afterwards
       }
@@ -440,6 +449,9 @@ void TrackFitCheckerModule::event()
       m_forRaveOut << "event:track: dpxpx=" << vertexCov[3][3] << "; dpxpy=" << vertexCov[3][4] << "; dpxpz=" << vertexCov[3][5] << "; dpypy=" << vertexCov[4][4] << "; dpypz=" << vertexCov[4][5] << "; dpzpz=" << vertexCov[5][5] << "; dxpx=" << vertexCov[0][3] << "; dxpy=" << vertexCov[0][4] << "; dxpz=" << vertexCov[0][5] << "; dxx=" << vertexCov[0][0] << "; dxy=" << vertexCov[0][1] << "; dxz=" << vertexCov[0][2] << "; dypx=" << vertexCov[1][3] << "; dypy=" << vertexCov[1][4] << "; dypz=" << vertexCov[1][5] << "; dyy=" << vertexCov[1][1] << "; dyz=" << vertexCov[1][2] << "; dzpx=" << vertexCov[2][3] << "; dzpy=" << vertexCov[2][4] << "; dzpz=" << vertexCov[2][5] << "; dzz=" << vertexCov[2][2] << "; px=" << vertexMom[0] << "; py=" << vertexMom[1] << "; pz=" << vertexMom[2] << "; q=" << charge << "; x=" << vertexPos[0] << "; y=" << vertexPos[1] << "; z=" << vertexPos[2] << ".\n";
     }
     double vertexAbsMom = vertexMom.Mag();
+//    if( m_spMode == true){
+//      m_piStuffOut << trueVertexMom.Mag()*1000.0 << "\t"<< vertexAbsMom*1000.0 << "\n";
+//    }
     fillTrackWiseData("absMomVertex", vertexAbsMom);
     double res_curvatureAtVertex =  1.0 / vertexMom.Pt() - 1.0 / trueVertexMom.Pt();
     fillTrackWiseData("res_curvVertex", res_curvatureAtVertex);
@@ -523,6 +535,10 @@ void TrackFitCheckerModule::event()
   if (m_exportTracksForRaveDeveloper == true) {
     m_forRaveOut << "event:fill\n";
   }
+
+//  if( m_spMode == true){
+//    m_piStuffOut << flush;
+//  }
 }
 
 void TrackFitCheckerModule::endRun()
@@ -687,6 +703,9 @@ void TrackFitCheckerModule::terminate()
   if (m_exportTracksForRaveDeveloper == true) {
     m_forRaveOut.close();
   }
+//  if( m_spMode == true){
+//    m_piStuffOut.close();
+//  }
 
 }
 
@@ -1187,11 +1206,7 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
       m_trackData.detIds.push_back(Const::PXD);
       if (m_truthAvailable == true) {
         aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(aPxdRecoHitPtr->getTrueHit()); // first check if there is a pointer directly to the true hit
-        if (aVxdTrueHitPtr == NULL) {
-          if (aPxdRecoHitPtr->getSimpleDigiHit() not_eq NULL) { //then check if there is a simple digiHit with a pointer to a trueHit
-            aVxdTrueHitPtr = aPxdRecoHitPtr->getSimpleDigiHit()->getTrueHit();
-          }
-        }
+
         if (aVxdTrueHitPtr == NULL) { //then check if there is a cluster which has a relation to a trueHit
           RelationIndex<PXDCluster, PXDTrueHit> relPxdClusterTrueHit;
 
@@ -1220,11 +1235,6 @@ void TrackFitCheckerModule::extractTrackData(GFTrack* const aTrackPtr, const dou
       m_trackData.detIds.push_back(Const::SVD);
       if (m_truthAvailable == true) {
         aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(aSvdRecoHit2DPtr->getTrueHit());
-        if (aVxdTrueHitPtr == NULL) {
-          if (aSvdRecoHit2DPtr->getSimpleDigiHit() not_eq NULL) {
-            aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(aSvdRecoHit2DPtr->getSimpleDigiHit()->getTrueHit());
-          }
-        }
       }
     } else if (aSvdRecoHitPtr not_eq NULL) {
       //cerr << "aSvdRecoHitPtr";
@@ -1528,95 +1538,95 @@ void TrackFitCheckerModule::inspectTracks(double chi2tot_fu, double vertexAbsMom
 
 void TrackFitCheckerModule::testDaf(GFTrack* const aTrackPtr)
 {
-  //first test the weights
-  const int nHits = aTrackPtr->getNumHits();
-  double dafWeight = -2.0;
-  double dafChi2 = -2.0;
-
-  vector<vector<float> > allWeights(m_nLayers, vector<float>(5, -1.0)); //it is important that the content is initalized to -1
-  vector<vector<float> > allChi2s(m_nLayers, vector<float>(5, -1.0));
-  for (int iGFHit = 0; iGFHit not_eq nHits; ++iGFHit) {
-    int accuVecIndex = m_trackData.accuVecIndices[iGFHit];
-    //aTrackPtr->getBK(0)->getNumber("dafChi2s", iGFHit,  dafChi2);
-    dafWeight = (aTrackPtr->getBK(0)->getVector(GFBKKey_dafWeight, iGFHit))(0);// double check if this still works with background => more then one hit... probarbly it does work...
-    GFAbsRecoHit* aGFAbsRecoHitPtr = aTrackPtr->getHit(iGFHit);
-    const PXDRecoHit*   aPxdRecoHitPtr = dynamic_cast<const PXDRecoHit* >(aGFAbsRecoHitPtr);
-    const SVDRecoHit2D*   aSvdRecoHit2DPtr =  dynamic_cast<const SVDRecoHit2D* >(aGFAbsRecoHitPtr);
-
-    const VXDSimpleDigiHit* aVXDSimpleDigiHit = NULL;
-    const VXDTrueHit* aVXDTrueHit = NULL;
-
-    if (aPxdRecoHitPtr not_eq NULL) {
-      aVXDSimpleDigiHit = aPxdRecoHitPtr->getSimpleDigiHit();
-      if (aVXDSimpleDigiHit == NULL) {
-        aVXDTrueHit = static_cast<const VXDTrueHit*>(aPxdRecoHitPtr->getTrueHit());
-      }
-    } else if (aSvdRecoHit2DPtr not_eq NULL) {
-      aVXDSimpleDigiHit = aSvdRecoHit2DPtr->getSimpleDigiHit();
-      if (aVXDSimpleDigiHit == NULL) {
-        aVXDTrueHit = static_cast<const VXDTrueHit*>(aSvdRecoHit2DPtr->getTrueHit());
-      }
-    } else { //
-
-    }
-    //XXX if (aVXDSimpleDigiHit->getTrueHit() not_eq NULL) cout << "iGFHit=" << iGFHit << " u,v="  << aVXDSimpleDigiHit->getTrueHit()->getU() << " , "<< aVXDSimpleDigiHit->getTrueHit()->getV() << endl;
-
-    //allWeights[accuVecIndex][0] = dafWeight; // first all weights in go into one histogram
-    //allChi2s[accuVecIndex][0] = dafChi2;
-    if (aVXDSimpleDigiHit not_eq NULL) { // at the moment only VXDSimpleDigiHit are support so skip if there is no VXDSimpleDigiHit
-
-      if (aVXDSimpleDigiHit->getTrueHit() not_eq NULL and aVXDSimpleDigiHit->isVarianceCorrect() == true) { //no background hit, no outlier hit
-        allWeights[accuVecIndex][1] = dafWeight;
-        allChi2s[accuVecIndex][1] = dafChi2;
-      }
-      if (aVXDSimpleDigiHit->getTrueHit() not_eq NULL and aVXDSimpleDigiHit->isVarianceCorrect() == false) { //no background hit, but measurement outlier hit
-        allWeights[accuVecIndex][2] = dafWeight;
-        allChi2s[accuVecIndex][2] = dafChi2;
-      }
-      if (aVXDSimpleDigiHit->getTrueHit() == NULL) {
-        if (allWeights[accuVecIndex][3] < 0.0) {
-          allWeights[accuVecIndex][3] = dafWeight;// first background hit
-          allChi2s[accuVecIndex][3] = dafChi2;
-        } else {
-          allWeights[accuVecIndex][4] = dafWeight;
-          allChi2s[accuVecIndex][4] = dafChi2;
-        }
-      }
-    } else if (aVXDTrueHit not_eq NULL) { // not really useful at the moment... just to make sure nothing crashes when somebody fits trueHits with the daf
-      //no background hit, no outlier hit
-      allWeights[accuVecIndex][1] = dafWeight;
-      allChi2s[accuVecIndex][1] = dafChi2;
-
-    }
-
-  }
-
-  for (int l = 0; l not_eq m_nLayers; ++l) {
-    for (int i = 1; i not_eq 5; ++i) { // index starts at 1
-      if (allWeights[l][i] >= 0.0) {
-        m_layerWiseDataSamples["DAF_weights"][l][i](allWeights[l][i]);
-        m_layerWiseDataSamples["DAF_weights"][l][0](allWeights[l][i]);
-        m_layerWiseDataSamples["DAF_chi2s"][l][i](allChi2s[l][i]);
-        m_layerWiseDataSamples["DAF_chi2s"][l][0](allChi2s[l][i]);
-      }
-    }
-  }
-
-  if (m_writeToRootFile == true) {
-    for (int l = 0; l not_eq m_nLayers; ++l) {
-      for (int i = 1; i not_eq 5; ++i) {// index starts at 1
-        (*m_layerWiseDataForRoot["DAF_weights"])[l][i] = allWeights[l][i];
-        (*m_layerWiseDataForRoot["DAF_chi2s"])[l][i] = allChi2s[l][i];
-      }
-    }
-  }
-  if (m_robust == true) {
-    for (int l = 0; l not_eq m_nLayers; ++l) {
-      for (int i = 1; i not_eq 5; ++i) {// index starts at 1
-        m_layerWiseData["DAF_weights"][l][i].push_back(allWeights[l][i]);
-      }
-    }
-  }
+//  //first test the weights
+//  const int nHits = aTrackPtr->getNumHits();
+//  double dafWeight = -2.0;
+//  double dafChi2 = -2.0;
+//
+//  vector<vector<float> > allWeights(m_nLayers, vector<float>(5, -1.0)); //it is important that the content is initalized to -1
+//  vector<vector<float> > allChi2s(m_nLayers, vector<float>(5, -1.0));
+//  for (int iGFHit = 0; iGFHit not_eq nHits; ++iGFHit) {
+//    int accuVecIndex = m_trackData.accuVecIndices[iGFHit];
+//    //aTrackPtr->getBK(0)->getNumber("dafChi2s", iGFHit,  dafChi2);
+//    dafWeight = (aTrackPtr->getBK(0)->getVector(GFBKKey_dafWeight, iGFHit))(0);// double check if this still works with background => more then one hit... probarbly it does work...
+//    GFAbsRecoHit* aGFAbsRecoHitPtr = aTrackPtr->getHit(iGFHit);
+//    const PXDRecoHit*   aPxdRecoHitPtr = dynamic_cast<const PXDRecoHit* >(aGFAbsRecoHitPtr);
+//    const SVDRecoHit2D*   aSvdRecoHit2DPtr =  dynamic_cast<const SVDRecoHit2D* >(aGFAbsRecoHitPtr);
+//
+//    const VXDSimpleDigiHit* aVXDSimpleDigiHit = NULL;
+//    const VXDTrueHit* aVXDTrueHit = NULL;
+//
+//    if (aPxdRecoHitPtr not_eq NULL) {
+//      aVXDSimpleDigiHit = aPxdRecoHitPtr->getSimpleDigiHit();
+//      if (aVXDSimpleDigiHit == NULL) {
+//        aVXDTrueHit = static_cast<const VXDTrueHit*>(aPxdRecoHitPtr->getTrueHit());
+//      }
+//    } else if (aSvdRecoHit2DPtr not_eq NULL) {
+//      aVXDSimpleDigiHit = aSvdRecoHit2DPtr->getSimpleDigiHit();
+//      if (aVXDSimpleDigiHit == NULL) {
+//        aVXDTrueHit = static_cast<const VXDTrueHit*>(aSvdRecoHit2DPtr->getTrueHit());
+//      }
+//    } else { //
+//
+//    }
+//    //XXX if (aVXDSimpleDigiHit->getTrueHit() not_eq NULL) cout << "iGFHit=" << iGFHit << " u,v="  << aVXDSimpleDigiHit->getTrueHit()->getU() << " , "<< aVXDSimpleDigiHit->getTrueHit()->getV() << endl;
+//
+//    //allWeights[accuVecIndex][0] = dafWeight; // first all weights in go into one histogram
+//    //allChi2s[accuVecIndex][0] = dafChi2;
+//    if (aVXDSimpleDigiHit not_eq NULL) { // at the moment only VXDSimpleDigiHit are support so skip if there is no VXDSimpleDigiHit
+//
+//      if (aVXDSimpleDigiHit->getTrueHit() not_eq NULL and aVXDSimpleDigiHit->isVarianceCorrect() == true) { //no background hit, no outlier hit
+//        allWeights[accuVecIndex][1] = dafWeight;
+//        allChi2s[accuVecIndex][1] = dafChi2;
+//      }
+//      if (aVXDSimpleDigiHit->getTrueHit() not_eq NULL and aVXDSimpleDigiHit->isVarianceCorrect() == false) { //no background hit, but measurement outlier hit
+//        allWeights[accuVecIndex][2] = dafWeight;
+//        allChi2s[accuVecIndex][2] = dafChi2;
+//      }
+//      if (aVXDSimpleDigiHit->getTrueHit() == NULL) {
+//        if (allWeights[accuVecIndex][3] < 0.0) {
+//          allWeights[accuVecIndex][3] = dafWeight;// first background hit
+//          allChi2s[accuVecIndex][3] = dafChi2;
+//        } else {
+//          allWeights[accuVecIndex][4] = dafWeight;
+//          allChi2s[accuVecIndex][4] = dafChi2;
+//        }
+//      }
+//    } else if (aVXDTrueHit not_eq NULL) { // not really useful at the moment... just to make sure nothing crashes when somebody fits trueHits with the daf
+//      //no background hit, no outlier hit
+//      allWeights[accuVecIndex][1] = dafWeight;
+//      allChi2s[accuVecIndex][1] = dafChi2;
+//
+//    }
+//
+//  }
+//
+//  for (int l = 0; l not_eq m_nLayers; ++l) {
+//    for (int i = 1; i not_eq 5; ++i) { // index starts at 1
+//      if (allWeights[l][i] >= 0.0) {
+//        m_layerWiseDataSamples["DAF_weights"][l][i](allWeights[l][i]);
+//        m_layerWiseDataSamples["DAF_weights"][l][0](allWeights[l][i]);
+//        m_layerWiseDataSamples["DAF_chi2s"][l][i](allChi2s[l][i]);
+//        m_layerWiseDataSamples["DAF_chi2s"][l][0](allChi2s[l][i]);
+//      }
+//    }
+//  }
+//
+//  if (m_writeToRootFile == true) {
+//    for (int l = 0; l not_eq m_nLayers; ++l) {
+//      for (int i = 1; i not_eq 5; ++i) {// index starts at 1
+//        (*m_layerWiseDataForRoot["DAF_weights"])[l][i] = allWeights[l][i];
+//        (*m_layerWiseDataForRoot["DAF_chi2s"])[l][i] = allChi2s[l][i];
+//      }
+//    }
+//  }
+//  if (m_robust == true) {
+//    for (int l = 0; l not_eq m_nLayers; ++l) {
+//      for (int i = 1; i not_eq 5; ++i) {// index starts at 1
+//        m_layerWiseData["DAF_weights"][l][i].push_back(allWeights[l][i]);
+//      }
+//    }
+//  }
 }
 
 void TrackFitCheckerModule::testLRAmbiResolution(GFTrack* const aTrackPtr)

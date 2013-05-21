@@ -13,7 +13,6 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <vxd/dataobjects/VXDSimpleDigiHit.h>
 
 // ROOT includes
 #include <TMatrixD.h>
@@ -72,15 +71,6 @@ namespace Belle2 {
      */
     SVDRecoHit2D(const VxdID vxdid, const double u, const double v, double sigmaU = -1, double sigmaV = -1);
 
-    /** Construct SVDRecoHit2D from a VXDSimpleDigiHit
-     * The VXDSimpleDigiHit is used by the VXDSimpleBackground module which
-     * in turn is used to created artificial background in the VXD to test the
-     * correctness and performance of tracking algorithms
-     *
-     * @param hit    VXDSimpleDigiHit to use as base
-     */
-    SVDRecoHit2D(const VXDSimpleDigiHit* hit);
-
     /** Destructor. */
     virtual ~SVDRecoHit2D() {}
 
@@ -99,8 +89,7 @@ namespace Belle2 {
 
     /** Get pointer to the TrueHit used when creating this RecoHit, can be NULL if created from something else */
     const SVDTrueHit* getTrueHit() const { return m_trueHit; }
-    /** Get pointer to the VXDSimpleDigiHit used when creating this RecoHit, can be NULL if created from something else */
-    const VXDSimpleDigiHit* getSimpleDigiHit() const { return m_vxdSimpleDigiHit; }
+
     /** Get u coordinate.*/
     float getU() const { return fHitCoord(0); }
     /** Get v coordinate.*/
@@ -127,7 +116,6 @@ namespace Belle2 {
 
     unsigned short m_sensorID; /**< Unique sensor identifier.*/
     const SVDTrueHit* m_trueHit; /**< Pointer to the Truehit used to generate this hit */
-    const VXDSimpleDigiHit* m_vxdSimpleDigiHit; /**< Pointer to the VXDSimpleDigiHit used when creating this object */
 
     float m_energyDep; /**< deposited energy.*/
     //float m_energyDepError; /**< error in dep. energy.*/

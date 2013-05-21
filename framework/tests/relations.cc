@@ -122,35 +122,6 @@ namespace Belle2 {
     RelationIndex<EventMetaData, ProfileInfo> index(evtData, profileData, "somethingnew");
   }
 
-  /** Check consolidation of RelationElements. */
-  TEST_F(RelationTest, RelationConsolidate)
-  {
-    DataStore::Instance().setInitializeActive(true);
-    RelationArray relation(evtData, profileData);
-    relation.registerAsPersistent();
-    DataStore::Instance().setInitializeActive(false);
-
-    relation.add(0, 0, 1.0);
-    relation.add(0, 1, 2.0);
-    relation.add(0, 1, 3.0);
-    relation.add(1, 0, 1.0);
-    ASSERT_EQ(relation.getEntries(), 4);
-    relation.consolidate();
-    ASSERT_EQ(relation.getEntries(), 2);
-    EXPECT_EQ(relation[0].getWeight(0), 1.0);
-    EXPECT_EQ(relation[0].getWeight(1), 5.0);
-    EXPECT_EQ(relation[1].getWeight(0), 1.0);
-
-    std::map<unsigned int, unsigned int> replace;
-    replace[0] = 1;
-    RelationArray::ReplaceMap<> replaceMap(replace);
-    relation.consolidate(replaceMap, replaceMap);
-    ASSERT_EQ(relation.getEntries(), 1);
-    EXPECT_EQ(relation[0].getWeight(0), 7.0);
-    EXPECT_EQ(relation[0].getFromIndex(), 1u);
-    EXPECT_EQ(relation[0].getToIndex(), 1u);
-  }
-
   /** Check creation of an index. */
   TEST_F(RelationTest, BuildIndex)
   {

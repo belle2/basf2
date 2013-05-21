@@ -50,12 +50,12 @@ void EventAction::EndOfEventAction(const G4Event*)
   m_mcParticleGraph.generateList(m_mcCollectionName, MCParticleGraph::c_clearParticles);
 
   //Build a TrackID to MCParticle index list
-  vector<unsigned int> indices;
+  vector<std::pair<unsigned int, bool> > indices;
   indices.resize(m_mcParticleGraph.size() + 1);
   for (unsigned int iParticle = 0; iParticle < m_mcParticleGraph.size(); ++iParticle) {
     MCParticleGraph::GraphParticle& currParticle = m_mcParticleGraph[iParticle];
     //assert(currParticle.getTrackID()<indices.size());
-    indices[currParticle.getTrackID()] = currParticle.getIndex() - 1;
+    indices[currParticle.getTrackID()] = std::make_pair(currParticle.getIndex() - 1, currParticle.getIgnore());
   }
   RelationArray::ReplaceVec<> indexReplacement(indices);
 

@@ -77,34 +77,50 @@ namespace Belle2 {
     /** Typedef to simplify use of correct weight_type */
     typedef RelationElement::weight_type weight_type;
 
+    /** Modification actions for the consolidate member.
+     * Determines what is to be done with elements where the original
+     * element was re-attributed and not just reordered
+     */
+    enum EConsolidationAction {
+      c_doNothing, /**< Do nothing, just treat it as reordering */
+      c_negativeWeight, /**< Flip the sign of the weight to become negative if the original element got re-attributed */
+      c_zeroWeight, /**< Set the weight of the relation to 0 if the original element got re-attributed */
+      c_deleteElement /**< Delete the whole relation element if the original element got re-attributed */
+    };
+
+    /** Typedef declaring the return value of any consolidation mapping.
+     * It contains the new index of the element and a bool which is true if the
+     * old element has been re-attributed and false if there was just an reordering.
+     */
+    typedef std::pair<index_type, bool> consolidation_type;
+
     /** Struct for identity transformation on indices.
      *
      * @see consolidate
      */
     struct Identity {
       /** Take old index and return the new index */
-      index_type operator()(index_type old) const { return old; }
+      consolidation_type operator()(index_type old) const { return std::make_pair(old, false); }
     };
-
 
     /** Struct to replace indices based on a map-like container.
      *
      *  Will keep old index if no replacement can be found
      *  @see consolidate
      */
-    template < class MapType = std::map<index_type, index_type> > class ReplaceMap {
+    template < class MapType = std::map<index_type, consolidation_type> > class ReplaceMap {
     public:
 
       /** Set reference to used replacement map */
       ReplaceMap(MapType& replace): m_replace(replace) {}
 
       /** Take old index and return the new index */
-      index_type operator()(index_type old) const {
+      consolidation_type operator()(index_type old) const {
         typename MapType::const_iterator iter = m_replace.find(old);
         if (iter != m_replace.end()) {
           return iter->second;
         }
-        return old;
+        return std::make_pair(old, false);
       }
 
     private:
@@ -119,14 +135,14 @@ namespace Belle2 {
      *  No range check is performed so make sure all indices are mapped
      *  @see consolidate
      */
-    template < class VecType = std::vector<index_type> > class ReplaceVec {
+    template < class VecType = std::vector<consolidation_type> > class ReplaceVec {
     public:
 
       /** Set reference to used replacement vector */
       ReplaceVec(VecType& replace): m_replace(replace) {}
 
       /** Take old index and return the new index */
-      index_type operator()(index_type old) const { return m_replace[old];  }
+      consolidation_type operator()(index_type old) const { return m_replace[old];  }
 
     private:
 
@@ -455,15 +471,31 @@ namespace Belle2 {
      *  relation, mainly useful in the simulation to replace the Geant4
      *  TrackID with the index of the MCParticle at the end of the event
      *
-     *  @see   Identity, ReplaceMap, ReplaceVec
-     *  @param replaceFrom Function object containing replacements for
-     *                     the from indices
-     *  @param replaceTo   Function object containing replacements for
-     *                     the to indices
+     *  The Function objects should return a new (index,bool) pair for every
+     *  index in the old relation. The returned index will be used as the new
+     *  index in the relation and the bool pair indicates whether the original
+     *  element got re-attributed or if it is just an index reordering. If it
+     *  the original element got re-attributed the behaviour depends on the
+     *  value of action, see EConsolidationAction
+     *
+     *  Warning: If action is set to c_negativeWeight and there is more
+     *  than one element having the same from->to index pair after
+     *  transformation the behaviour is undefined as the two elements get
+     *  merged. It could happen that a negative and a positive weight get
+     *  summed up, leaving the weight rather meaningless
+     *
+     *  @see   Identity, ReplaceMap, ReplaceVec, EConsolidationAction
+     *  @param replaceFrom  Function object containing replacements for the from
+     *  indices
+     *  @param replaceTo Function object containing replacements for
+     *  the to indices
+     *  @param action Action to be performed when the old
+     *  element got removed
      */
-    template<class FunctionFrom, class FunctionTo> void consolidate(
-      const FunctionFrom& replaceFrom = FunctionFrom(),
-      const FunctionTo& replaceTo = FunctionTo());
+    template<class FunctionFrom, class FunctionTo> void consolidate(const
+        FunctionFrom& replaceFrom = FunctionFrom(), const FunctionTo&
+        replaceTo = FunctionTo(), EConsolidationAction action =
+          c_doNothing);
 
   private:
 
@@ -529,7 +561,7 @@ namespace Belle2 {
   };
 
   template<class FunctionFrom, class FunctionTo>
-  void RelationArray::consolidate(const FunctionFrom& replaceFrom, const FunctionTo& replaceTo)
+  void RelationArray::consolidate(const FunctionFrom& replaceFrom, const FunctionTo& replaceTo, EConsolidationAction action)
   {
     if (!isValid()) {
       B2ERROR("Cannot consolidate an invalid relation (" << m_name << ")");
@@ -548,20 +580,39 @@ namespace Belle2 {
     for (unsigned int i = 0; i < nElements; ++i) {
       RelationElement& element = *static_cast<RelationElement*>(elements[i]);
       //Replace from index
-      index_type from = replaceFrom(element.getFromIndex());
+      consolidation_type from = replaceFrom(element.getFromIndex());
+
+      //Ignore whole element if original element got deleted
+      if (action == c_deleteElement && from.second) continue;
 
       //Check if the fromIndex is the same as the last one and reuse
       //iterator if possible
-      if (from != lastFromIndex || lastFromIter == buffer.end()) {
-        lastFromIter = buffer.insert(make_pair(from, element_t())).first;
-        lastFromIndex = from;
+      if (from.first != lastFromIndex || lastFromIter == buffer.end()) {
+        lastFromIter = buffer.insert(make_pair(from.first, element_t())).first;
+        lastFromIndex = from.first;
       }
       //Loop over all elements of this relationelement and add them to the map
       size_t size = element.getSize();
       for (size_t j = 0; j < size; ++j) {
         //Replace to Index
-        index_type to = replaceTo(element.getToIndex(j));
-        lastFromIter->second[to] += element.getWeight(j);
+        consolidation_type to = replaceTo(element.getToIndex(j));
+        //Ignore whole element if original element got deleted
+        if (action == c_deleteElement && to.second) continue;
+        double weight = element.getWeight(j);
+        //Original from or to element got deleted. Do whatever is specified by action
+        //Warning: if there is more than one element pointing to the same
+        //from->to element after transformation the negative weight option is
+        //not safe as we sum a positive and a negative weight when
+        //consolidating.
+        if (from.second || to.second) {
+          if (action == c_zeroWeight) {
+            weight = 0;
+          } else if (action == c_negativeWeight && weight > 0) {
+            weight = -weight;
+          }
+        }
+        //add the weight to the new from->to index pair
+        lastFromIter->second[to.first] += weight;
       }
     }
     //Clear the existing relation

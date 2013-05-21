@@ -92,11 +92,12 @@ void RootInputModule::initialize()
   for (unsigned int iFile = 0; iFile < m_inputFileNames.size(); iFile++) {
     //If file name uses wildcarding, we can't check the files here
     if (!TString(m_inputFileNames[iFile].c_str()).Contains("*")) {
-      TFile f(m_inputFileNames[iFile].c_str(), "READ");
-      if (!f.IsOpen()) {
+      TFile* f = TFile::Open(m_inputFileNames[iFile].c_str(), "READ");
+      if (!f || !f->IsOpen()) {
         B2FATAL("Couldn't open input file " + m_inputFileNames[iFile]);
         return;
       }
+      delete f;
     }
   }
   dir->cd();

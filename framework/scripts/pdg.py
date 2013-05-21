@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 Small wrapper module to ease access to pdg codes for particle gun or similar
 usage in the steering file

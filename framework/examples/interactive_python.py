@@ -1,18 +1,6 @@
 from basf2 import *
 
-try:
-    import IPython
-    makeInteractive = IPython.embed
-except:  # older ipython ver
-    try:
-        from IPython.Shell import IPShellEmbed
-        makeInteractive = IPShellEmbed()
-    except:  # no ipython at all
-        B2FATAL("This example requires ipython."
-        " For a portable, if limited, solution use:"
-        "\nimport code"
-        "\ncode.interact(local=locals())\n")
-
+import interactive
 
 from ROOT import Belle2
 
@@ -40,7 +28,7 @@ class MinModule(Module):
         "\n  help(particles[0])"
         "\nTo continue non-interactively, press Ctrl+D.")
         B2INFO(80 * '=')
-        makeInteractive()
+        interactive.embed()
 
 
 main = create_path()

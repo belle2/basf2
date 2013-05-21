@@ -8,18 +8,19 @@ from basf2 import *
 # Get the list of available modules
 avModList = fw.list_available_modules()
 
-# If exactly one argument is given, print the specified module.
-# Otherwise print all modules.
 if len(sys.argv) == 2:
-    if sys.argv[1] in avModList:
+    # If exactly one argument is given, print the specified module.
+    modName = sys.argv[1]
+    if modName in avModList:
         try:
-            current_module = register_module(sys.argv[1])
-            print_params(current_module, False, avModList[sys.argv[1]])
+            current_module = register_module(modName)
+            print_params(current_module, False, avModList[modName])
         except:
-            B2ERROR('The module could not be loaded. This is most likely '
+            B2FATAL('The module could not be loaded. This is most likely '
                     + 'caused by a library with missing links.')
     else:
-        B2ERROR('Print module information: A module with the name "'
-                + sys.argv[1] + '" does not exist!')
+        B2FATAL('Print module information: A module with the name "'
+                + modName + '" does not exist!')
 else:
+    # Otherwise print all modules.
     print_all_modules(avModList)

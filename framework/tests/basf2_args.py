@@ -16,3 +16,7 @@ if ret != 0:
 ret = os.system('basf2 -m RootOutput')
 if ret != 0:
     sys.exit(1)
+
+ret = os.system('basf2 -m NonExistingModule')
+if ret == 0:  # exact return code of system() not defined, just unsuccesful
+    sys.exit(1)

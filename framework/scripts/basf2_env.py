@@ -36,21 +36,18 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 envarReleaseDir = os.environ.get('BELLE2_RELEASE_DIR', None)
 envarLocalDir = os.environ.get('BELLE2_LOCAL_DIR', None)
 if not envarReleaseDir and not envarLocalDir:
-    print """The basf2 environment is not set up.
-             Please execute the 'setuprel' script first."""
-    Exit(1)
+    B2FATAL("The basf2 environment is not set up. \
+             Please execute the 'setuprel' script first.")
 
 envarSubDir = os.environ.get('BELLE2_SUBDIR', None)
 if envarSubDir is None:
-    print """The environment variable BELLE2_SUBDIR is not set.
-             Please execute the 'setuprel' script first."""
-    Exit(1)
+    B2FATAL("The environment variable BELLE2_SUBDIR is not set. \
+             Please execute the 'setuprel' script first.")
 
 envarExtDir = os.environ.get('BELLE2_EXTERNALS_DIR', None)
 if envarExtDir is None:
-    print """The environment variable BELLE2_EXTERNALS_DIR is not set.
-             Please execute the 'setuprel' script first."""
-    Exit(1)
+    B2FATAL("The environment variable BELLE2_EXTERNALS_DIR is not set. \
+             Please execute the 'setuprel' script first.""")
 
 # -----------------------------------------------
 #       Create default framework object

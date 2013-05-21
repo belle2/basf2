@@ -17,7 +17,7 @@
 #include <G4VSensitiveDetector.hh>
 #include <G4Step.hh>
 
-#include <set>
+#include <map>
 #include <string>
 
 
@@ -51,7 +51,7 @@ namespace Belle2 {
       virtual ~SensitiveDetectorBase() {}
 
       /** Return a list of all registered Relations with MCParticles. */
-      static const std::set<std::string> getMCParticleRelations() { return m_mcRelations; }
+      static const std::map<std::string, RelationArray::EConsolidationAction> getMCParticleRelations() { return m_mcRelations; }
       /** Enable/Disable all Sensitive Detectors.
        * By default, all sensitive detectors won't create hits to make it
        * possible to use the Geant4 Navigator for non-simulation purposes. Only
@@ -68,11 +68,12 @@ namespace Belle2 {
        * the TrackID should be used as index of the MCParticle
        * @param name Name of the relation to register
        */
-      void registerMCParticleRelation(const std::string& name) { m_mcRelations.insert(name); }
+      void registerMCParticleRelation(const std::string& name, RelationArray::EConsolidationAction ignoreAction = RelationArray::c_doNothing);
+
       /** Overload to make it easer to register MCParticle relations
        * @param relation RelationArray to register
        */
-      void registerMCParticleRelation(const RelationArray& relation) { m_mcRelations.insert(relation.getName()); }
+      void registerMCParticleRelation(const RelationArray& relation, RelationArray::EConsolidationAction ignoreAction = RelationArray::c_doNothing) { registerMCParticleRelation(relation.getName(), ignoreAction); }
 
       /** Process a Geant4 step in any of the sensitive volumes attached to this sensitive detector.
        * This is the main function to be implemented by subclasses. The
@@ -91,7 +92,7 @@ namespace Belle2 {
        */
       virtual bool ProcessHits(G4Step* aStep, G4TouchableHistory* aROhist);
       /** Static set holding all relations which have to be updated at the end of the Event */
-      static std::set<std::string> m_mcRelations;
+      static std::map<std::string, RelationArray::EConsolidationAction> m_mcRelations;
       /** Static bool which indicates wether recording of hits is enabled */
       static bool m_active;
       /** Subdetector the class belongs to */

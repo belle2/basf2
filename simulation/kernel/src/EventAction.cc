@@ -14,7 +14,6 @@
 #include <generators/dataobjects/MCParticleGraph.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
-#include <boost/foreach.hpp>
 #include <list>
 #include <string>
 
@@ -60,10 +59,9 @@ void EventAction::EndOfEventAction(const G4Event*)
   RelationArray::ReplaceVec<> indexReplacement(indices);
 
   //Update all registered MCParticle Relations and replace the TrackID by the final MCParticle id
-  BOOST_FOREACH(const string & relName, SensitiveDetectorBase::getMCParticleRelations()) {
-    if (!relName.empty()) {
-      RelationArray mcPartRelation(relName);
-      if (mcPartRelation) mcPartRelation.consolidate(indexReplacement, RelationArray::Identity());
-    }
+  std::map<std::string, RelationArray::EConsolidationAction> relations = SensitiveDetectorBase::getMCParticleRelations();
+  for (std::map<std::string, RelationArray::EConsolidationAction>::iterator it = relations.begin(); it != relations.end(); ++it) {
+    RelationArray mcPartRelation(it->first);
+    if (mcPartRelation) mcPartRelation.consolidate(indexReplacement, RelationArray::Identity(), it->second);
   }
 }

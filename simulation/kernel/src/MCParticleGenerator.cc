@@ -90,8 +90,6 @@ void MCParticleGenerator::addParticle(MCParticle& mcParticle, G4Event* event, G4
   graphParticle.setFirstDaughter(mcParticle.getFirstDaughter());
   graphParticle.setLastDaughter(mcParticle.getLastDaughter());
   if (motherIndex > 0) graphParticle.comesFrom(m_mcParticleGraph[motherIndex - 1]); //Add decay
-  //Do not store the generator info in the MCParticles block unless Geant4 creates a track in the detector.
-  graphParticle.setIgnore();
 
   //Create a new Geant4 Primary particle and store the link to the GraphMCParticle object as user info.
   G4PrimaryParticle* newPart = NULL;
@@ -114,6 +112,10 @@ void MCParticleGenerator::addParticle(MCParticle& mcParticle, G4Event* event, G4
 
     if (lastG4Mother != NULL) lastG4Mother->SetDaughter(newPart);
     g4Mother = newPart;
+
+    //Do not store the generator info in the MCParticles block unless Geant4 creates a track in the detector.
+    graphParticle.setIgnore();
+
   } else {
     B2DEBUG(100, "The particle " << mcParticle.getIndex() << " (PDG " << mcParticle.getPDG() << ") was not added to Geant4")
   }

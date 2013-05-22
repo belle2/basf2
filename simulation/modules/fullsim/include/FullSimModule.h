@@ -98,7 +98,7 @@ namespace Belle2 {
     bool m_EnableVisualization;            /**< If set to true the Geant4 visualization support is enabled. */
     bool m_storeOpticalPhotons; /**< controls storing of optical photons in MCParticles */
     bool m_storeSecondaries; /**< contorls storing of low energy Geant secondaries in MCParticles */
-    double m_energyCut; /**< kinetic energy cut for low energy Geant secondaries */
+    //double m_energyCut; /**< kinetic energy cut for low energy Geant secondaries */
 
   private:
 

@@ -64,7 +64,7 @@ namespace Belle2 {
 
       /**
        * Set ignore flag for low energy Geant-produced secondary particles
-       * if set to true, secondaries below KineticEnergyCut will not be stored in MCParticles collection
+       * if set to true, secondaries (below KineticEnergyCut: this option is removed) will not be stored in MCParticles collection
        * @param ignore flag
        */
       void setIgnoreSecondaries(bool ignore = true) {m_IgnoreSecondaries = ignore;}
@@ -73,7 +73,7 @@ namespace Belle2 {
        * Set kinetic energy cut for secondaries
        * @param cut_MeV kinetic energy in MeV
        */
-      void setKineticEnergyCut(double cut_MeV) {m_EnergyCut = cut_MeV;}
+      //void setKineticEnergyCut(double cut_MeV) {m_EnergyCut = cut_MeV;}
 
 
     protected:
@@ -81,7 +81,7 @@ namespace Belle2 {
       MCParticleGraph& m_mcParticleGraph; /**< Reference to the MCParticle graph which is updated by the tracking action. */
       bool m_IgnoreOpticalPhotons; /**< do not store optical photons in MCParticles */
       bool m_IgnoreSecondaries; /**< do not store low energy secondaries in MCParticles */
-      double m_EnergyCut; /**< kinetic energy cut for secondaries [MeV] */
+      //double m_EnergyCut; /**< kinetic energy cut for secondaries [MeV] */
 
     };
 

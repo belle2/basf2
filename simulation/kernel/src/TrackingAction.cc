@@ -17,11 +17,13 @@
 #include <G4Track.hh>
 #include <G4ParticleDefinition.hh>
 #include <G4ParticleTypes.hh>
+#include <G4DecayProcessType.hh>
 
 using namespace Belle2;
 using namespace Belle2::Simulation;
 
-TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph): G4UserTrackingAction(), m_mcParticleGraph(mcParticleGraph), m_IgnoreOpticalPhotons(false), m_IgnoreSecondaries(false), m_EnergyCut(0.0)
+//TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph): G4UserTrackingAction(), m_mcParticleGraph(mcParticleGraph), m_IgnoreOpticalPhotons(false), m_IgnoreSecondaries(false), m_EnergyCut(0.0)
+TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph): G4UserTrackingAction(), m_mcParticleGraph(mcParticleGraph), m_IgnoreOpticalPhotons(false), m_IgnoreSecondaries(false)
 {
 
 }
@@ -65,11 +67,15 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
     currParticle.setMomentum(dpMom.x(), dpMom.y(), dpMom.z());
     currParticle.setProductionTime(track->GetGlobalTime() * Unit::ns);
     currParticle.setProductionVertex(trVtxPos.x(), trVtxPos.y(), trVtxPos.z());
-    //Get the physics process type for a secondary particle
-    if (dynamicParticle->GetPrimaryParticle() != NULL) {
+    //Primary or secondary particle?
+    if (dynamicParticle->GetPrimaryParticle() != NULL) {  //Primary
       currParticle.setSecondaryPhysicsProcess(0);
-    } else if (track->GetCreatorProcess() != NULL) {
-      currParticle.setSecondaryPhysicsProcess(track->GetCreatorProcess()->GetProcessSubType());
+      currParticle.setIgnore(false);  //Store the generator info in the MCParticles block.
+    } else if (track->GetCreatorProcess() != NULL) {  //Secondary
+      const int& processSubType = track->GetCreatorProcess()->GetProcessSubType();
+      currParticle.setSecondaryPhysicsProcess(processSubType);
+      if (processSubType >= static_cast<int>(DECAY) && processSubType <= static_cast<int>(DECAY_External))  //Decay-in-flight
+        currParticle.setIgnore(false);  //Store the generator info in the MCParticles block.
     } else {
       currParticle.setSecondaryPhysicsProcess(-1);
     }
@@ -110,7 +116,9 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
             daughterInfo->setFraction(currInfo->getFraction());
           }
         } else {
-          if (m_IgnoreSecondaries && daughterTrack->GetKineticEnergy() < m_EnergyCut)
+          //Do not store the generator info in the MCParticles block
+          //if (m_IgnoreSecondaries && daughterTrack->GetKineticEnergy() < m_EnergyCut)
+          if (m_IgnoreSecondaries)
             daughterParticle.setIgnore();
         }
 

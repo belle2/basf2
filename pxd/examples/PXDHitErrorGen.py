@@ -1,148 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# -*- coding: utf-8 -*-
-
-import sys
-import math
 from basf2 import *
+from PXDHitErrorsTTree import PXDHitErrorsTTree
 logging.log_level = LogLevel.WARNING
-
-# Some ROOT tools
-import ROOT
-from ROOT import Belle2
-
-
-class PXDHitErrors(Module):
-
-    """A simple module to check the reconstruction of PXDTrueHits."""
-
-    def __init__(self):
-        """Initialize the module"""
-
-        super(PXDHitErrors, self).__init__()
-        ## Name of the input file.
-        self.filename = ''
-        if len(sys.argv) > 1:
-            self.filename = sys.argv[2]
-        if self.filename == '':
-            self.filename = 'PXDHitErrorOutput.txt'
-        ## The input file object.
-        self.file = open(self.filename, 'w')
-        ## Factors for vxdid conversion.
-        self.vxdid_factors = (8192, 256, 32)
-
-    def beginRun(self):
-        """ Write legend for file columns """
-
-        self.file.write('LEGEND TO COLUMNS: \n')
-        self.file.write('SensorID Layer Ladder Sensor Truehit_index '
-                        + 'Cluster_index \n')
-        self.file.write('TrueHit: u[cm], v[cm], charge[GeV], theta_u, '
-                        + 'theta_v \n')
-        self.file.write('Cluster: u[cm], v[cm], charge[e-], seed charge[e-], '
-                        + 'size, size_u, size_v \n')
-        self.file.write('Digits: n_digits {u[cm] v[cm] charge[e-]} \n')
-        self.file.write('\n')
-
-    def event(self):
-        """Find clusters with a truehit and print some stats."""
-
-        truehits = Belle2.PyStoreArray('PXDTrueHits')
-        nTruehits = truehits.getEntries()
-        clusters = Belle2.PyStoreArray('PXDClusters')
-        nClusters = clusters.getEntries()
-        digits = Belle2.PyStoreArray('PXDDigits')
-        nDigits = digits.getEntries()
-        relClustersToTrueHits = \
-            Belle2.PyRelationArray('PXDClustersToPXDTrueHits')
-        nClusterRelations = relClustersToTrueHits.getEntries()
-        relClustersToDigits = Belle2.PyRelationArray('PXDClustersToPXDDigits')
-        nDigitRelations = relClustersToDigits.getEntries()
-
-        # Start with clusters and use the relation to get digits and truehits.
-        for cluster_index in range(nClusters):
-            cluster = clusters[cluster_index]
-            cluster_truehits = \
-                relClustersToTrueHits.getToIndices(cluster_index)
-            # FIXME: There is a problem with clusters with more than 1 TrueHit.
-            # Skipping for now.
-            if len(cluster_truehits) > 1:
-                continue
-
-            for truehit_index in cluster_truehits:
-                truehit = truehits[truehit_index]
-                # Now let's store some data
-                s = ''
-                # Sesnor identification
-                sensorID = truehit.getRawSensorID()
-                [layer, ladder, sensor] = self.decode(sensorID)
-                s_id = \
-                    '{sID} {layer} {ladder} {sensor} {indexT:4d} {indexC:4d} '\
-                    .format(
-                    sID=sensorID,
-                    layer=layer,
-                    ladder=ladder,
-                    sensor=sensor,
-                    indexT=truehit_index,
-                    indexC=cluster_index,
-                    )
-                s += s_id
-                # TrueHit information
-                thetaU = math.atan2(truehit.getExitU() - truehit.getEntryU(),
-                                    0.0075)
-                thetaV = math.atan2(truehit.getExitV() - truehit.getEntryV(),
-                                    0.0075)
-                s_th = \
-                    '{uT:10.5f} {vT:10.5f} {eT:10.7f} {thU:6.3f} {thV:6.3f} '\
-                    .format(uTH=truehit.getU(), vT=truehit.getV(),
-                    eT=truehit.getEnergyDep(), thU=thetaU, thV=thetaV)
-                s += s_th
-                # Cluster information
-                s_cl = \
-                    '{uC:10.5f} {vC:10.5f} {eC:10.1f} {eSeed:10.1f} '.format(
-                    uC=cluster.getU(),
-                    vC=cluster.getV(),
-                    eC=cluster.getCharge(),
-                    eSeed=cluster.getSeedCharge()
-                    ) + \
-                    '{size:5d} {sizeU:5d} {sizeV:5d} '.format(
-                    size=cluster.getSize(),
-                    sizeU=cluster.getUSize(),
-                    sizeV=cluster.getVSize(),
-                    )
-                s += s_cl
-                # We can add some digits, too.
-                digit_indices = relClustersToDigits.getToIndices(cluster_index)
-                s_dig0 = '{nDigits:4d} '.format(nDigits=len(digit_indices))
-                s += s_dig0
-                for digit_index in digit_indices:
-                    digit = digits[digit_index]
-                    s_dig = \
-                        '{u:10.5f} {v:10.5f} {e:10.1f} '\
-                        .format(u=digit.getUCellPosition(),
-                            v=digit.getVCellPosition(),
-                            e=digit.getCharge())
-                    s += s_dig
-
-                s += '\n'
-                self.file.write(s)
-
-    def terminate(self):
-        """ Close the output file."""
-
-        self.file.close()
-
-    def decode(self, vxdid):
-        """ Utility to decode sensor IDs """
-
-        result = []
-        for f in self.vxdid_factors:
-            result.append(vxdid / f)
-            vxdid = vxdid % f
-
-        return result
-
 
 # Particle gun module
 particlegun = register_module('ParticleGun')
@@ -163,10 +24,10 @@ pxdclust = register_module('PXDClusterizer')
 # RootOutput
 output = register_module('RootOutput')
 
-analyze = PXDHitErrors()
+analyze = PXDHitErrorsTTree()
 
 # Specify number of events to generate
-evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
+evtmetagen.param({'EvtNumList': [10000], 'RunList': [1]})
 
 # Set parameters for particlegun
 particlegun.param({  # Generate 5 tracks (on average)
@@ -182,20 +43,20 @@ particlegun.param({  # Generate 5 tracks (on average)
                      # around the origin with a sigma of 2cm in the xy plane
                      # and no deviation in z
                      # all tracks sharing the same vertex per event
-    'nTracks': 10,
-    'varyNTracks': True,
+    'nTracks': 1,
+    'varyNTracks': False,
     'pdgCodes': [211, -211, 11, -11],
     'momentumGeneration': 'normal',
-    'momentumParams': [5, 0.2],
+    'momentumParams': [2, 0.2],
     'phiGeneration': 'uniform',
-    'phiParams': [-5, 5],
+    'phiParams': [0, 360],
     'thetaGeneration': 'uniformCosinus',
-    'thetaParams': [0.05, 0.2],
+    'thetaParams': [30, 150],
     'vertexGeneration': 'normal',
-    'xVertexParams': [1.5, 0.01],
-    'yVertexParams': [0, 0.1],
-    'zVertexParams': [-10, 0.1],
-    'independentVertices': True,
+    'xVertexParams': [0.0, 0.5],
+    'yVertexParams': [0.0, 0.5],
+    'zVertexParams': [0.0, 0.5],
+    'independentVertices': False,
     })
 
 # Select subdetectors to be built
@@ -204,6 +65,8 @@ geometry.param('Components', ['PXD'])
 pxddigi.param('statisticsFilename', 'digi.root')
 pxddigi.param('ElectronicEffects', True)
 pxddigi.param('SimpleDriftModel', False)
+
+pxdclust.param('TanLorentz', 0.0)
 
 # create processing path
 main = create_path()

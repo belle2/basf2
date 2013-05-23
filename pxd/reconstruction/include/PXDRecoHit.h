@@ -65,9 +65,8 @@ namespace Belle2 {
      */
     PXDRecoHit(const PXDTrueHit* hit, float sigmaU = -1, float sigmaV = -1);
 
-    /** Construct PXDRecoHit from a PXD cluster
-     * FIXME: Error handling not yet defined. For now the errors have to
-     * be supplied on construction
+    /** Construct PXDRecoHit from a PXD cluster.
+     * For users that want to supply their own errors on construction
      *
      * @param hit    PXDCluster to use as base
      * @param sigmaU Error of the Hit along u

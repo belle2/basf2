@@ -92,17 +92,14 @@ PXDRecoHit::PXDRecoHit(const PXDCluster* hit):
 {
   // Set the sensor UID
   m_sensorID = hit->getSensorID();
-  const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
-  double sigmaU = geometry.getUPitch(hit->getV()) / sqrt(12);
-  double sigmaV = geometry.getVPitch(hit->getV()) / sqrt(12);
   // Set positions
   fHitCoord(0) = hit->getU();
   fHitCoord(1) = hit->getV();
   // Set the error covariance matrix
-  fHitCov(0, 0) = 0.5 * sigmaU * sigmaU; //the 0.5 factor is a rough approximation of the measurment error of the PXDClusterHits. A better solution should follow
-  fHitCov(0, 1) = 0;
-  fHitCov(1, 0) = 0;
-  fHitCov(1, 1) = 0.5 * sigmaV * sigmaV;
+  fHitCov(0, 0) = hit->getUSigma() * hit->getUSigma();
+  fHitCov(0, 1) = hit->getRho() * hit->getUSigma() * hit->getVSigma();
+  fHitCov(1, 0) = hit->getRho() * hit->getUSigma() * hit->getVSigma();
+  fHitCov(1, 1) = hit->getUSigma() * hit->getUSigma();
   // Set physical parameters
   m_energyDep = hit->getCharge() * Const::ehEnergy;
   //m_energyDepError = 0;

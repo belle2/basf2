@@ -25,6 +25,8 @@
 #include <vxd/geometry/GeoCache.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
+#include <svd/reconstruction/SVDRecoHit.h>
+
 #include <RecoHits/GFAbsRecoHit.h>
 #include <RecoHits/GFAbsPlanarHit.h>
 #include <RecoHits/GFAbsSpacepointHit.h>
@@ -421,6 +423,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
       if (wire_hit)
         move = v * (v * (track_pos - o)); // move the plane along the wire until the track goes through it
       TEveBox* box = boxCreator(o + move, u, v, plane_size, plane_size, 0.01);
+      box->SetName("Detector Plane");
 
       if (drawDetectors && planar_hit) {
         box->SetMainColor(kCyan);
@@ -476,19 +479,33 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
       // draw planar hits, with distinction between strip and pixel hits ----------------
       if (planar_hit) {
         if (!planar_pixel_hit) {
-          //currently unused in Belle2 {{{
-          TEveBox* hit_box;
-          hit_box = boxCreator((o + hit_u * u), u, v, m_errorScale * std::sqrt(hit_res_u), plane_size, 0.0105);
+          //strip hit
+          static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+          const SVDRecoHit* recoHit = static_cast<SVDRecoHit*>(hit);
+          const VXD::SensorInfoBase& sensor = geo.get(recoHit->getSensorID());
+          double du, dv;
+          TVector3 a = o; //defines position of sensor plane
+          if (recoHit->isU()) {
+            du = std::sqrt(hit_res_u);
+            dv = sensor.getLength();
+            a += hit_u * u;
+          } else {
+            du = sensor.getWidth();
+            dv = std::sqrt(hit_res_u);
+            a += hit_u * v;
+          }
+          double depth = sensor.getThickness();
+          TEveBox* hit_box = boxCreator(a, u, v, du, dv, depth);
+          hit_box->SetName(TString::Format("SVDRecoHit %u", j));
           hit_box->SetMainColor(kYellow);
           hit_box->SetMainTransparency(0);
           if (track_lines)
             track_lines->AddElement(hit_box);
           else
             gEve->AddElement(hit_box);
-          //}}}
         } else {
           // calculate eigenvalues to draw error-ellipse ----------------------------
-          TEveGeoShape* det_shape = new TEveGeoShape("planar hit");
+          TEveGeoShape* det_shape = new TEveGeoShape("planar pixel hit");
           det_shape->IncDenyDestroy();
           TMatrixDEigen eigen_values(hit_cov);
           TMatrixT<double> ev = eigen_values.GetEigenValues();
@@ -539,6 +556,7 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
             gEve->AddElement(det_shape);
         }
       } else if (space_hit) {
+        B2WARNING("Space hit used (shouldn't happen in basf2)");
         //currently unused in Belle2 {{{
         // get eigenvalues of covariance to know how to draw the ellipsoid ------------
         TMatrixDEigen eigen_values(hit->getRawHitCov());

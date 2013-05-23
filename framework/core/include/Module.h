@@ -61,6 +61,10 @@ namespace Belle2 {
    * a special return value if an error occurs, and divert the execution into a
    * path containing RootOutput if it is found; saving only the data producing/
    * produced by the error.
+   *
+   * The 'Module Development' section in the manual provides detailed information
+   * on how to create modules, setting parameters, or using return values/conditions:
+   * https://belle2.cc.kek.jp/~twiki/bin/view/Computing/Basf2manual#Module_Development
    */
   class Module : public PathElement {
 
@@ -79,8 +83,8 @@ namespace Belle2 {
     /**
      * Constructor.
      *
-     * Create and allocate memory for variables here. Add the module parameters in this method.
-     * You should also set a description using setDescription() here.
+     * In the constructor of your derived class, you can create and allocate memory for variables.
+     * Add the module parameters in this method. You should also set a description using setDescription() here.
      *
      * Please avoid producing output in the constructor, as it would show up in
      * the module list (basf2 -m).
@@ -203,12 +207,14 @@ namespace Belle2 {
     /**
      * Sets the condition of the module.
      *
+     * See https://belle2.cc.kek.jp/~twiki/bin/view/Computing/ModCondTut or CondParser::parseCondition() for a description of the syntax.
+     *
      * Please be careful: Avoid creating cyclic paths, e.g. by linking a condition
      * to a path which is processed before the path where this module is
      * located in.
      *
      * @param expression The expression of the condition.
-     * @param path       Shared pointer to the Path, which will be executed if the condition is evaluated to true.
+     * @param path       Shared pointer to the Path which will be executed if the condition is evaluated to true.
      */
     void setCondition(const std::string& expression, boost::shared_ptr<Path> path);
 
@@ -221,7 +227,7 @@ namespace Belle2 {
      *
      * @param expression Parsed condition operator
      * @param value      Parsed condition value
-     * @param path       Shared pointer to the Path, which will be executed if the condition is evaluated to true.
+     * @param path       Shared pointer to the Path which will be executed if the condition is evaluated to true.
      */
     void setCondition(const Belle2::CondParser::EConditionOperators expression, int value, boost::shared_ptr<Path> path) {
       m_conditionOperator = expression;
@@ -245,7 +251,7 @@ namespace Belle2 {
      *
      * It is equivalent to the setCondition() method, using the expression "<1".
      * This method is meant to be used together with the setReturnValue(bool value) method.
-     * @param path Shared pointer to the Path, which will be executed if the condition is evaluated to true.
+     * @param path Shared pointer to the Path which will be executed if the return value is _false_.
      */
     void setCondition(boost::shared_ptr<Path> path);
 

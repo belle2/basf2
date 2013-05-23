@@ -73,7 +73,9 @@ print main
 
 # when the module returns false/0 (odd events), we jump to Progress instead:
 # [] -> evtmetagen -> [SelectOddEvents -> [Progress -> []]]
-module_with_condition.condition('<1', subsubpath)
+module_with_condition.condition(subsubpath)
+# this is equivalent to:
+# module_with_condition.condition('<1', subsubpath)
 
 process(main)
 

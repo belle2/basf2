@@ -245,7 +245,10 @@ bool DataStore::addRelation(const TObject* fromObject, DataStore::StoreEntry*& f
   // get the relations from -> to
   const string& relationsName = relationName(fromEntry->name, toEntry->name);
   const StoreObjConstIter& it = m_storeObjMap[c_Event].find(relationsName);
-  if (it == m_storeObjMap[c_Event].end()) return false;
+  if (it == m_storeObjMap[c_Event].end()) {
+    B2ERROR("No relation '" << relationsName << "' found. Please register it (using RelationArray::registerPersistent()) before trying to add relations.");
+    return false;
+  }
   StoreEntry* entry = it->second;
 
   // auto create relations if needed

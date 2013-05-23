@@ -28,7 +28,7 @@
 using namespace std;
 using namespace Belle2;
 
-RbTupleManager* RbTupleManager::m_instance = 0;
+RbTupleManager* RbTupleManager::s_instance = 0;
 
 // Constructor and Destructor
 RbTupleManager::RbTupleManager()
@@ -42,10 +42,10 @@ RbTupleManager::~RbTupleManager()
 // Access to Singleton
 RbTupleManager& RbTupleManager::Instance()
 {
-  if (!m_instance) {
-    m_instance = new RbTupleManager;
+  if (!s_instance) {
+    s_instance = new RbTupleManager;
   }
-  return *m_instance;
+  return *s_instance;
 }
 
 // Global initialization

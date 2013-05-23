@@ -61,7 +61,7 @@ namespace Belle2 {
     void MergeRootfile(TDirectory*, TList*);
 
   private:
-    static RbTupleManager* m_instance; /**< singleton instance. */
+    static RbTupleManager* s_instance; /**< singleton instance. */
 
     std::vector<Module*> m_histdefs; /**< registered HistoModules. */
     int m_nproc; /**< Number of parallel processes. */

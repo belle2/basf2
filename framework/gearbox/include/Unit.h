@@ -112,10 +112,10 @@ namespace Belle2 {
     static double convertValue(double value, const std::string& unitString);
 
   protected:
-    /** registers the name and value of a conversion in m_conversionFactors. */
+    /** registers the name and value of a conversion in s_conversionFactors. */
     static double registerConversion(const std::string& name, double value);
     /** Map to be able to convert between units using string representations of the unit name */
-    static std::map<std::string, double> m_conversionFactors;
+    static std::map<std::string, double> s_conversionFactors;
 
   private:
     /**

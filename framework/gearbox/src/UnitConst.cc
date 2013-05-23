@@ -30,7 +30,7 @@ using namespace std;
 
 namespace Belle2 {
 
-  map<string, double> Unit::m_conversionFactors;
+  map<string, double> Unit::s_conversionFactors;
 
   /** Define a new Unit given a name for the conversion table */
 #define DEFINE_UNIT_NAME(var,value,name) const double Unit::var = Unit::registerConversion(name,value)
@@ -109,8 +109,8 @@ namespace Belle2 {
 
   double Unit::convertValue(double value, const std::string& unitString)
   {
-    map<string, double>::const_iterator it = m_conversionFactors.find(unitString);
-    if (it == m_conversionFactors.end()) {
+    map<string, double>::const_iterator it = s_conversionFactors.find(unitString);
+    if (it == s_conversionFactors.end()) {
       B2ERROR("Could not find conversion factor for unit " << unitString << ", assuming 1.0");
       return value;
     }
@@ -119,7 +119,7 @@ namespace Belle2 {
 
   double Unit::registerConversion(const string& name, double value)
   {
-    if (!m_conversionFactors.insert(make_pair(name, value)).second) {
+    if (!s_conversionFactors.insert(make_pair(name, value)).second) {
       B2ERROR("Conversion factor for unit " << name << " already exists, ignoring");
     }
     return value;

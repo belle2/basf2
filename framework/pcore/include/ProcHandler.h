@@ -28,7 +28,7 @@ namespace Belle2 {
     int m_fEvtProc;         ///< flag for event process (1:evtproc)
     int m_fOutputSrv;       ///< flag for output server (1:outputsrv)
     int m_fEvtServerID;     ///< ID of event server
-    static int m_fEvtProcID;       ///< ID of event process
+    static int s_fEvtProcID;       ///< ID of event process
     int m_fOutputSrvID;     ///< ID of output server
 
     key_t m_kSrcShm;        ///< key value for source shared memory

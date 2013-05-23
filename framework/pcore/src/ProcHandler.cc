@@ -22,7 +22,7 @@ using namespace std;
 using namespace Belle2;
 
 /// Set static process ID number
-int ProcHandler::m_fEvtProcID = -1;
+int ProcHandler::s_fEvtProcID = -1;
 
 ProcHandler::ProcHandler()
   : m_nEvtSrv(0), m_nEvtProc(0), m_nOutputSrv(0),
@@ -56,8 +56,8 @@ int ProcHandler::init_EvtServer()
     exit(-99);
   } else {
     m_fEvtServer = 1; // I'm event server
-    //    m_fEvtProcID = -10;
-    m_fEvtProcID = 10000;
+    //    s_fEvtProcID = -10;
+    s_fEvtProcID = 10000;
     //die when parent dies
     prctl(PR_SET_PDEATHSIG, SIGHUP);
   }
@@ -83,7 +83,7 @@ int ProcHandler::init_EvtProc(int nproc)
         exit(-99);
       } else { // Event Process
         m_fEvtProc = 1;    // I'm event process
-        m_fEvtProcID = i;
+        s_fEvtProcID = i;
         //die when parent dies
         prctl(PR_SET_PDEATHSIG, SIGHUP);
       }
@@ -108,8 +108,8 @@ int ProcHandler::init_OutServer(int id)
   } else {
     m_fOutputSrv = 1; // I'm output server
     m_fOutputSrvID = id;
-    //    m_fEvtProcID = -20;
-    m_fEvtProcID = 20000 + id;
+    //    s_fEvtProcID = -20;
+    s_fEvtProcID = 20000 + id;
     //die when parent dies
     prctl(PR_SET_PDEATHSIG, SIGHUP);
   }
@@ -152,7 +152,7 @@ int ProcHandler::isOutputSrv()
 /// @brief Returns ID number of event process
 int ProcHandler::EvtProcID()
 {
-  return m_fEvtProcID;
+  return s_fEvtProcID;
 }
 
 /// @brief Get the key of the source shared memory

@@ -103,6 +103,12 @@ bool DataStore::createEntry(const std::string& name, EDurability durability,
     return true;
   }
 
+  // check reserved names
+  if (array and name == "ALL") {
+    B2ERROR("Creating an array with the reserved name 'ALL' is not allowed!");
+    return false;
+  }
+
   // Add the DataStore entry
   StoreEntry* entry = new StoreEntry;
   m_storeObjMap[durability][name] = entry;

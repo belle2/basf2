@@ -26,11 +26,21 @@ namespace Belle2 {
   * as long as the data objects are derived from RelationsObject. A full example
   * for accessing simhits and some related objects can be found in framework/examples/cdcplotmodule.py
   *
+  * Example:
+  *
+  * \code{.py}
+     from ROOT import Belle2
+     simhits = Belle2.PyStoreArray('PXDSimHits')
+     for hit in simhits:
+         part = hit.getRelatedFrom('MCParticles')
+         print "Edep: ", str(hit.getEnergyDep())
+         print "Particle: ", str(part.getPDG())
+    \endcode
+  *
   * You can check the runtime type information of the returned objects by
   * using Python's built-in type() function.
   *
-  * \note While it is not possible to add objects/arrays to the data store, you
-  *       can modify the contents of existing ones.
+  * \sa PyStoreObj
   */
   class PyStoreArray {
   public:
@@ -42,32 +52,27 @@ namespace Belle2 {
 
     ~PyStoreArray() { }
 
-    /** Does this PyStoreArray contain a valid datastore array?
-     *
-     * Accessing the array's data is UNSAFE if this returns false.
-     */
+    /** Does this PyStoreArray contain a valid datastore array?  */
     operator bool() const { return m_storeArray; }
 
     /** returns object at index i, or null pointer if out of range */
-    TObject* operator [](int i) const {return (*m_storeArray)[i];}
+    TObject* operator [](int i) const { return (m_storeArray and i < getEntries()) ? ((*m_storeArray)[i]) : NULL;}
 
     /** returns number of entries for current event. */
-    int getEntries() const { return m_storeArray->GetEntriesFast(); }
+    int getEntries() const { return m_storeArray ? (m_storeArray->GetEntriesFast()) : 0;}
 
     /** Allow iteration using for in Python.
-     *
-     * That is, this should work:
-     *
-     * \code
-        simhits = Belle2.PyStoreArray('PXDSimHits')
-        for hit in simhits:
-            print "Edep: ", str(hit.getEnergyDep())
-       \endcode
      **/
     TIter __iter__() const {
       //will create empty iterator if NULL pointer
       return TIter(m_storeArray);
     }
+
+    /** Construct a new object of the array's type at the end of the array.
+     *
+     * @returns the created object, to be modified by the user
+     */
+    TObject* appendNew();
 
   private:
     TClonesArray* m_storeArray; /**< Pointer to array */

@@ -30,6 +30,7 @@ namespace Belle2 {
   * Inside a Python module's event() function, you can access data store
   * objects like this:
   * \code{.py}
+    from ROOT import Belle2
     evtmetadata = Belle2.PyStoreObj('EventMetaData')
     if not evtmetadata:
       B2ERROR("No EventMetaData found")
@@ -37,8 +38,7 @@ namespace Belle2 {
       event = evtmetadata.obj().getEvent()
     \endcode
   *
-  * \note While it is not possible to add objects/arrays to the data store, you
-  *       can modify the contents of existing ones.
+  * \sa PyStoreArray
   */
   class PyStoreObj {
   public:
@@ -82,8 +82,8 @@ namespace Belle2 {
      */
     operator bool() const { return m_storeObjPtr && *m_storeObjPtr; }
 
-    /** Returns the attached data store object. */
-    TObject* obj() const { return *m_storeObjPtr; }
+    /** Returns the attached data store object, or NULL if no valid object exists. */
+    TObject* obj() const { return (m_storeObjPtr ? (*m_storeObjPtr) : NULL); }
 
   private:
     /** Return TClass for given name; or NULL if not found. */

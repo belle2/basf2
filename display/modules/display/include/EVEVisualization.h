@@ -163,12 +163,6 @@ namespace Belle2 {
      * The option string lets you steer the way the events are displayed. The following
      * options are available:\n
      * \n
-     * 'A': Autoscale errors. The representation of hits are scaled with the error found in
-     *      their covariance matrix. This can lead to hits not being displayed beause the
-     *      errors are too small. Autoscaling ensures that the errors are scaled up
-     *      sufficiently to ensure all hits are displayed. However, this can lead to unwanted
-     *      results if there are only a few hits with very small errors, as all hits are scaled
-     *      by the same factor to ensure consistency.\n\n
      * 'D': Draw detectors. This causes a simple representation for all detectors to be drawn. For
      *      planar detectors, this is a plane with the same position and orientation of the real
      *      detector plane, but with different size. For wires, this is a tube whose diameter

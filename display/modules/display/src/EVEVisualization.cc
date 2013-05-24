@@ -178,7 +178,7 @@ void EVEVisualization::addGeometry()
   TObjArray* volumes = gGeoManager->GetListOfVolumes();
   for (int i = 0; i < volumes->GetEntriesFast(); i++) {
     TGeoVolume* volume = static_cast<TGeoVolume*>(volumes->At(i));
-    volume->SetTransparency(70);
+    volume->SetTransparency(70); //0: opaque, 100: fully transparent
   }
 
   /*
@@ -252,7 +252,6 @@ void EVEVisualization::addGeometry()
 void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
 {
   // parse the option string ------------------------------------------------------------------------
-  bool drawAutoScale = false;
   bool drawDetectors = false;
   bool drawHits = false;
   bool drawScaleMan = false;
@@ -262,7 +261,6 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
 
   if (m_options != "") {
     for (size_t i = 0; i < m_options.length(); i++) {
-      if (m_options.at(i) == 'A') drawAutoScale = true;
       if (m_options.at(i) == 'D') drawDetectors = true;
       if (m_options.at(i) == 'H') drawHits = true;
       if (m_options.at(i) == 'M') drawMarkers = true;
@@ -514,24 +512,6 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
           double pseudo_res_1 = m_errorScale * std::sqrt(ev(1, 1));
           // finished calcluating, got the values -----------------------------------
 
-          // do autoscaling if necessary --------------------------------------------
-          if (drawAutoScale) {
-            double min_cov = std::min(pseudo_res_0, pseudo_res_1);
-            if (min_cov < 1e-5) {
-              std::cout << "Hit " << j << ": Invalid covariance matrix (Eigenvalue < 1e-5), autoscaling not possible!" << std::endl;
-            } else {
-              if (min_cov < 0.049) {
-                double cor = 0.05 / min_cov;
-                std::cout << "Hit " << j << ": Pixel covariance too small, rescaling by " << cor;
-                m_errorScale *= cor;
-                pseudo_res_0 *= cor;
-                pseudo_res_1 *= cor;
-                std::cout << " to " << m_errorScale << std::endl;
-              }
-            }
-          }
-          // finished autoscaling ---------------------------------------------------
-
           // calculate the semiaxis of the error ellipse ----------------------------
           det_shape->SetShape(new TGeoEltu(pseudo_res_0, pseudo_res_1, 0.0105));
           TVector3 pix_pos = o + hit_u * u + hit_v * v;
@@ -585,25 +565,6 @@ void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)
           pseudo_res_2 = m_errorScale * 0.5;
         }
         // finished scaling -----------------------------------------------------------
-
-        // autoscale if necessary -----------------------------------------------------
-        if (drawAutoScale) {
-          double min_cov = std::min(pseudo_res_0, std::min(pseudo_res_1, pseudo_res_2));
-          if (min_cov < 1e-5) {
-            std::cout << "Hit " << j << ": Invalid covariance matrix (Eigenvalue < 1e-5), autoscaling not possible!" << std::endl;
-          } else {
-            if (min_cov <= 0.149) {
-              double cor = 0.15 / min_cov;
-              std::cout << "Hit " << j << ": Space hit covariance too small, rescaling by " << cor;
-              m_errorScale *= cor;
-              pseudo_res_0 *= cor;
-              pseudo_res_1 *= cor;
-              pseudo_res_2 *= cor;
-              std::cout << " to " << m_errorScale << std::endl;
-            }
-          }
-        }
-        // finished autoscaling -------------------------------------------------------
 
         // rotate and translate -------------------------------------------------------
         TGeoGenTrans det_trans(o(0), o(1), o(2), 1 / (pseudo_res_0), 1 / (pseudo_res_1), 1 / (pseudo_res_2), &det_rot);

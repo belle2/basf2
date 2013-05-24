@@ -32,7 +32,6 @@ main.add_module(geometry)
 display = register_module('Display')
 
 # The Options parameter is a combination of:
-# A autoscale PXD/SVD errors - use when hits are too small to be seen
 # D draw detectors - draw simple detector representation (with different size)
 #   for each hit
 # H draw track hits
@@ -47,7 +46,7 @@ display = register_module('Display')
 # interactively by removing its checkmark in the 'Eve' tab.
 #
 # This option only makes sense when ShowGFTracks/ShowGFTrackCands is used
-display.param('Options', 'AHTM')  # default
+display.param('Options', 'HTM')  # default
 
 # should hits always be assigned to a particle with c_PrimaryParticle flag?
 # with this option off, many tracking hits will be assigned to secondary e-

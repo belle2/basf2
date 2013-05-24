@@ -43,7 +43,6 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   //make sure dictionaries for PXD/SVDrecohits are loaded
   //needs to be done here to have dictionaries available during RootInput::initialize()
   gSystem->Load("libpxd");
-  gSystem->Load("libsvd");
   gSystem->Load("libgenfitRK");
 }
 

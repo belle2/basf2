@@ -104,12 +104,12 @@ namespace Belle2 {
     GFKalman m_kalmanFilter;                         /**< The Genfit Kalman filter object */
     GFDaf m_daf;                                     /**< The Genfit Deterministic Annealing filter (DAF) object */
     std::vector<double> m_dafTemperatures;           /**< holds the annealing scheme for the DAF. The number of vector elements is the number of DAF iterations */
-    bool m_energyLossBetheBloch;
-    bool m_noiseBetheBloch;
-    bool m_noiseCoulomb;
-    bool m_energyLossBrems;
-    bool m_noiseBrems;
-    bool m_noEffects;
+    bool m_energyLossBetheBloch;                     /**< Determines if calculation of energy loss is on/off in Genfit */
+    bool m_noiseBetheBloch;                          /**< Determines if calculation of energy loss variance is on/off in Genfit */
+    bool m_noiseCoulomb;                             /**< Determines if calculation of multiple scattering covariance matrix on/off in Genfit */
+    bool m_energyLossBrems;                          /**< Determines if calculation of bremsstrahlung energy loss is on/off in Genfit */
+    bool m_noiseBrems;                               /**< Determines if calculation of bremsstrahlung energy loss variance is on/off in Genfit */
+    bool m_noEffects;                                /**< switch on/off ALL material effects in Genfit. "true" overwrites "true" flags for the individual effects.*/
   }; /** @} @} */
 } // end namespace Belle2
 

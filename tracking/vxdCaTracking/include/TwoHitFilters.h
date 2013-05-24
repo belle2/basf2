@@ -64,10 +64,10 @@ namespace Belle2 {
     }
 
     /** calculates the distance between the hits (3D), returning unit: cm^2 for speed optimization */
-    double calcDist3D() { return m_x2 + m_y2 + m_z2; } // return unit: cm^2
+    double calcDist3D() { return (m_x2 + m_y2 + m_z2); } // return unit: cm^2
 
     /** calculates the distance between the hits (XY), returning unit: cm^2 for speed optimization */
-    double calcDistXY() { return m_x2 + m_y2; } // return unit: cm^2
+    double calcDistXY() { return (m_x2 + m_y2); } // return unit: cm^2
 
     /** calculates the distance between the hits (Z only), returning unit: cm */
     double calcDistZ() { return m_dz; } // return unit: cm

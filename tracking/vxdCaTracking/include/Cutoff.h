@@ -33,7 +33,7 @@ namespace Belle2 {
 
     /** getter **/
     int getType() { return m_type; } /**< returns type of cutoff */
-    const std::string getTypeString(); /// TODO
+//     const std::string getTypeString(); /**< returns type of cutoff formatted in a string */
     double getMinValue() { return m_min; } /**< returns minValue of cutoff */
     double getMaxValue() { return m_max; } /**< returns maxValue of cutoff */
 //     const std::vector< std::pair<std::string, double> > getQuantiles() { return m_quantiles; } /**< returns quantiles (extended version of min- and max-value, currently not used ) */

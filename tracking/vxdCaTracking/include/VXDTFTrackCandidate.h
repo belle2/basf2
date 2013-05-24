@@ -48,7 +48,7 @@ namespace Belle2 {
     /** getter **/
     std::vector<Belle2::VXDSegmentCell*> getSegments(); /**< returns segments forming current TC */
     std::vector<Belle2::VXDTFHit*> getHits(); /**< returns hits forming current TC */
-    std::vector<TVector3> getHitCoordinates(); /**< returns hits forming current TC */
+    std::vector<TVector3*> getHitCoordinates(); /**< returns hits forming current TC */
     std::vector<int> getSVDHitIndices(); /**< returns indices of svdClusters forming current TC */
     std::vector<int> getPXDHitIndices(); /**< returns indices of pxdClusters forming current TC */
 //     std::list<int> getHopfieldHitIndices() { return m_hopfieldHitIndices; } /**< returns slightly adapted indices for hopfield use only (no real indices, but only unique ones...) */

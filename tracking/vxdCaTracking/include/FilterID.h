@@ -54,7 +54,7 @@ namespace Belle2 {
       deltaDistanceHighOccupancy2IP, /**< string name of filter dd2IP high occupancy */
 
       numFilters /**< knows number of filters existing. If a member returns this value, the input-value was wrong */
-    };
+    }; /**< filterTyoes contains enums assigning unique values for each filter type allowing fast filter type recognition */
 
     const static std::string nameAngles3D;/**< string name of filter a3D */
     const static std::string nameAnglesRZ; /**< string name of filter aRZ */

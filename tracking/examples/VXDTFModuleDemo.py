@@ -55,6 +55,7 @@ param_vxdtf = {
     'cleanOverlappingSet': True,
     'useHopfield': True,
     'TESTERexpandedTestingRoutines': True,
+    'qiSmear': False,
     }
 vxdtf.param(param_vxdtf)
 

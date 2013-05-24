@@ -12,7 +12,7 @@
 #define VXDTFHIT_H
 
 #include <TVector3.h>
-
+#include "SharedFunctions.h"
 #include <vxd/dataobjects/VxdID.h>
 
 
@@ -42,7 +42,7 @@ namespace Belle2 {
       m_timeStamp(0) { m_attachedTrackCandidates = 0;/* m_attachedCells = 0;*/ }
 
     /** Constructor.
-    //      * @param hitPos Hit coordinates (global).
+    //      * @param hitPos contains Hit coordinates (global) and position errors (global).
     //      * @param passIndex index number of pass containing hit. (the VXDTF module supports several passes per event searching for different characteristics independently)
     //      * @param clusterIndexU index number of intermediate class storing index of SVDCluster containing U position.
     //      * @param clusterIndexV index number of intermediate class storing index of SVDCluster containing V position.
@@ -52,13 +52,14 @@ namespace Belle2 {
     //      * @param VxdID ID of sensor containing parent clusterHit(s)
     //      * @param timeStamp time of birth (only set when SVD hit, else 0).
     //      */
-    VXDTFHit(TVector3 hitPos, int passIndex, int clusterIndexU, int clusterIndexV, int clusterIndexUV, int detectorType, unsigned int papaSector, VxdID aVxdID, float timeStamp);
+    VXDTFHit(Tracking::PositionInfo hitPos, int passIndex, int clusterIndexU, int clusterIndexV, int clusterIndexUV, int detectorType, unsigned int papaSector, VxdID aVxdID, float timeStamp);
 
     bool operator==(const VXDTFHit& b) const; /**< overloaded '=='-operator for sorting algorithms */
     bool operator<(const VXDTFHit& b) const; /**< overloaded '<'-operator for sorting algorithms */
     bool operator>(const VXDTFHit& b) const; /**< overloaded '>'-operator for sorting algorithms */
 
-    TVector3 getHitCoordinates() const; /**< returns global hit coordinates */
+    TVector3* getHitCoordinates(); /**< returns global hit coordinates */
+    Tracking::PositionInfo* getPositionInfo(); /**< returns global hit coordinates and errors for x and y coordinates */
     const std::vector<int>& getAttachedInnerCell() const; /**< returns all inner Cells attached to hit */
     const std::vector<int>& getAttachedOuterCell() const; /**< returns all outer Cells attached to hit */
     int getNumberOfSegments(); /**< returns number of segments connected to this hit (hits without attached segments are ignored during TF process) */
@@ -81,7 +82,7 @@ namespace Belle2 {
 
 
   protected:
-    TVector3 m_hit; /**< global hit position */
+    Tracking::PositionInfo m_hit; /**< global hit position and x and y errors of hit (global)*/
 
     int m_passIndex; /**< index number of pass containing VXDTFhit */
     int m_clusterIndexU; /**< index number of intermediate class storing index of SVDClusterU */

@@ -358,7 +358,7 @@ namespace Belle2 {
 
 
     /** represents a step between the fast but weak calcQIbyLength and the mighty but slow calcQIbyKalman. Only useful for Tracks having at least 4 hits (3-hit-tracks will be set with smearValue) */
-    void calcQIbyCircleFit(TCsOfEvent& tcVector);
+//     void calcQIbyCircleFit(TCsOfEvent& tcVector);
 
 
     /** name is program, needed for GFTrackCand export */
@@ -494,9 +494,11 @@ namespace Belle2 {
 
     int m_chargeSignFactor; /**< particle dependent. for leptons it is 1, for other particles it's -1... */
 
+    std::vector< std::vector< std::pair<double, double> > > m_globalizedErrorContainer; /**< stores error of u coordinates of each ladder in the vxd converted to x and y global coordinates. These values are needed by the circleFitter. How to access: container[layerID][ladderID].first = sigmaX, container[layerID][ladderID].second = sigmaY */
+    std::vector< std::pair<double, double> > m_errorContainer; /**< stores error of u and v coordinates of each layer in the vxd. These values are needed by the circleFitter. How to access: container[layerID].first = sigmaU, container[layerID].second = sigmaV */
     int m_usePXDorSVDorVXDhits; /**< when having more than one pass per event, sector maps using PXD, SVD or VXD can be set independently. To produce TFHits only when needed, this value is set to -1,0 or 1 */
 
-    std::vector<std::string> m_PARAMmultiPassSectorSetup; /**< controls usage of one or several passes for TF per event (allows differnt pT's or curling track support) */
+//     std::vector<std::string> m_PARAMmultiPassSectorSetup; /**< controls usage of one or several passes for TF per event (allows differnt pT's or curling track support) */
     double m_PARAMtuneCutoffs; /**< for rapid changes of cutoffs (no personal xml files needed), reduces/enlarges the range of the cutoffs in percent (lower and upper values are changed by this value). Only valid in range -50% < x < +1000% */
 
     int m_eventCounter; /**< knows current event number */
@@ -524,6 +526,7 @@ namespace Belle2 {
     bool m_TESTERexpandedTestingRoutines; /**< set true if you want to export expanded infos of TCs for further analysis */
 
     std::string m_PARAMcalcQIType; /**< allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit' */
+    int m_calcQiType; /**< is set by m_PARAMcalcQIType and defines which qi type shall be calculated */
     std::string m_PARAMgfTrackCandsColName;                          /**< TrackCandidates collection name */
 
     /// the following variables are nimimal testing routines within the TF

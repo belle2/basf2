@@ -38,9 +38,9 @@ vector<Belle2::VXDSegmentCell*> VXDTFTrackCandidate::getSegments() { return m_at
 
 vector<Belle2::VXDTFHit*> VXDTFTrackCandidate::getHits() { return m_attachedHits; }
 
-vector<TVector3> VXDTFTrackCandidate::getHitCoordinates()
+vector<TVector3*> VXDTFTrackCandidate::getHitCoordinates()
 {
-  vector<TVector3> coordinates;
+  vector<TVector3*> coordinates;
   BOOST_FOREACH(VXDTFHit * hit, m_attachedHits) {
     coordinates.push_back(hit->getHitCoordinates());
   }

@@ -30,7 +30,7 @@ double ThreeHitFilters::calcAngle3D()
 
 double ThreeHitFilters::fullAngle3D()
 {
-  double angle = acos(m_vecAB.Dot(m_vecBC) / m_vecAB.Mag() * m_vecBC.Mag()); // 0-pi
+  double angle = acos(m_vecAB.Dot(m_vecBC) / (m_vecAB.Mag() * m_vecBC.Mag())); // 0-pi
   angle = (angle * (180. / M_PI));
   return m_twoHitFilter.filterNan(angle);
 } // return unit: ° (0 - 180°)

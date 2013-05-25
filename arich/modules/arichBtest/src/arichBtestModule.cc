@@ -75,12 +75,10 @@ REG_MODULE(arichBtest)
 arichBtestModule::arichBtestModule() : Module()
 {
   //Set module properties
-  setDescription("Print something");
+  setDescription("Module for the ARICH Beamtest data analysis. It creates track form the MWPC hits and reads the HAPD hits");
 
   //Parameter definition
   addParam("outputFileName", m_outFile, "Output Root Filename", string("output.root"));
-
-
   vector<string> defaultList;
   addParam("runList", m_runList, "Data Filenames.", defaultList);
   vector<int> defaultMask;
@@ -508,6 +506,7 @@ void arichBtestModule::event()
 
   } while (m_end &&  m_runCurrent != m_runList.end());
   if (m_events % 1000 == 0)  {
+    time_t m_time;
     time(&m_time);
     B2INFO("neve= [" << m_events << "] in " << (double)(m_time - m_timestart) / 60. << " min (" << int(m_time - m_timestart) << "s) from " << *m_runCurrent);
 

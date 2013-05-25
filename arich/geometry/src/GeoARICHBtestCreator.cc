@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <sstream>
 #include <cmath>
+#include <string.h>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
@@ -88,9 +89,9 @@ namespace Belle2 {
 
       int exp = 1;
       int run = 68;
-      PyObject* m = PyImport_AddModule("__main__");
+      PyObject* m = PyImport_AddModule(strdup("__main__"));
       if (m) {
-        PyObject* v = PyObject_GetAttrString(m, "runno");
+        PyObject* v = PyObject_GetAttrString(m, strdup("runno"));
         if (v) {
           run = PyInt_AsLong(v);
           Py_DECREF(v);
@@ -541,10 +542,10 @@ namespace Belle2 {
       double meantrlen  = 0;
 
       // get parameter from python script
-      PyObject* m = PyImport_AddModule("__main__");
+      PyObject* m = PyImport_AddModule(strdup("__main__"));
       if (m) {
         int averageagel = 0;
-        PyObject* v = PyObject_GetAttrString(m, "averageagel");
+        PyObject* v = PyObject_GetAttrString(m, strdup("averageagel"));
         if (v) {
           averageagel = PyInt_AsLong(v);
           Py_DECREF(v);

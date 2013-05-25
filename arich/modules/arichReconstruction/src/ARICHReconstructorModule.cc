@@ -238,9 +238,6 @@ namespace Belle2 {
           continue;
         }
         int charge = fitResult->getCharge();
-        const MCParticle* particle = DataStore::getRelated<MCParticle>(track);
-        int truePDGCode = 0;
-        if (particle) truePDGCode = particle->getPDG();
 
         RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);
         for (unsigned i = 0; i < extHits.size(); i++) {

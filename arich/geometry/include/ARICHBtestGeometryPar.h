@@ -28,19 +28,39 @@
 
 
 namespace Belle2 {
+  //!  Beamtest ARICH Geometry Tracking Class
+  /*! Contains the parameters of the 4 MWPCs used for tracking
+  */
   class ARICHTracking {
   public:
+    //! Default Constructor
     ARICHTracking() {};
+    //! Default Constructor
     ~ARICHTracking() {};
-    int tdc[4], atdc;
-    float slp[2], offset[2];
-    int cutll[2], cutul[2];
+    //! TDC of the 4 cathode signals
+    int tdc[4];
+    //! TDC of the anode signal
+    int atdc;
+    //! Calibration constants of the MWPC (\delta x= slope \delta t + offset) - slopes for x an y direction
+    float slp[2];
+    //! Calibration constants of the MWPC - offsets for x an y direction
+    float offset[2];
+    //! Cuts on the tdc sums - lower levels
+    int cutll[2];
+    //! Cuts on the tdc sums - upper levels
+    int cutul[2];
+    //! MWPC chamber position
     float pos[3];
 
+    //! TDC difference
     int diff[2];
+    //! TDC sum
     int sum[2];
+    //! Status of the position determination
     int status[2];
+    //! Reconstructed position of the hit
     double reco[3];
+    //!  Debug printouts
     void Print() {
       printf("----------------------------------------------------------------\n");
       for (int i = 0; i < 4; i++) printf("tdc%d= %d\t", i, tdc[i]); printf("\n");
@@ -54,7 +74,7 @@ namespace Belle2 {
   };
 
   namespace arich {
-    //! The Class for ARICH Geometry Parameters
+    //! The Class for ARICH Beamtest Geometry Parameters
     /*! This class provides ARICH gemetry paramters for simulation, reconstruction and so on.
       These parameters are gotten from gearbox.
     */
@@ -91,29 +111,50 @@ namespace Belle2 {
       void read(const GearDir& content);
 
 
+      //! Set the tracking shift
       void setTrackingShift(TVector3&);
+      //! Get the tracking shift
       TVector3 getTrackingShift();
+      //! Set the rotation center of the Aerogel RICH frame
       void setRotationCenter(TVector3&);
+      //! Get the rotation center of the Aerogel RICH frame
       TVector3 getRotationCenter();
+
+      //! Set the rotation angle of the Aerogel RICH frame
       void setFrameRotation(double);
+      //! Get the rotation matrix of the Aerogel RICH frame
       TRotation getFrameRotation();
+      //! Set the flag for the reconstruction by using the average aerogel refractive index
       void setAverageAgel(bool);
+      //! Get the flag for the reconstruction by using the average aerogel refractive index
       bool getAverageAgel();
+      //! Set the pointer of the tracking MWPCs
       void setMwpc(ARICHTracking* m_mwpc);
+      //! Get the pointer of the tracking MWPCs
       ARICHTracking* getMwpc();
-      //! gets geometry parameters from gearbox.
+      //! Get the position of the HAPD channel
       std::pair<double, double> GetHapdChannelPosition(int);
+      //! Get the mapping of the electronic channel to the HAPD module nr and the channel number
       std::pair<int, int> GetHapdElectronicMap(int);
+      //! Set the position of the HAPD channel
       int AddHapdChannelPositionPair(double , double);
+      //! Set the mapping of the electronic channel to the HAPD module nr and the channel number
       int AddHapdElectronicMapPair(int, int);
 
     private:
+      //! Pointer to the tracking chambers
       ARICHTracking* m_mwpc;
-      TVector3 m_trackingShift;
-      TVector3 m_rotationCenter;
-      TRotation   m_frameRotation;
-      bool      m_averageAgel;
+      //! Tracking shift
+      TVector3       m_trackingShift;
+      //! rotation center of the Aerogel RICH frame
+      TVector3       m_rotationCenter;
+      //! rotation matrix of the Aerogel RICH frame
+      TRotation      m_frameRotation;
+      //! flag for the reconstruction by using the average aerogel refractive index
+      bool           m_averageAgel;
+      //! the position of the HAPD channels
       std::vector < std::pair<double, double> > m_hapdmap;
+      //! mapping of the electronic channel to the HAPD module nr and the channel number
       std::vector < std::pair<int, int> > m_hapdeid;
 
       int m_nPads;                           /*!< Number of detector module pads */

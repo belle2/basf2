@@ -75,34 +75,40 @@ namespace Belle2 {
   protected:
 
 
-
+    //! Skip the data part of the record
     int skipdata(gzFile fp);
+    //! Read the MWPC information from the data buffer
     void readmwpc(unsigned int* dbuf, unsigned int len);
+    //! Read the HAPD hits from the data buffer
     int readhapd(unsigned int len, unsigned int* data);
+    //! Read the data from the file (can be compressed)
     int readdata(gzFile fp, int rec_id, int print);
+    //! file desriptor of the data file
     gzFile m_fp;
+    //! EOF flag
     int m_end;
+    //! number of events
     int m_events;
+    //! pointer to the root file
     TFile* m_file;
-    /** Loops recursively over the MCParticle list and prints information about each particle.
-     * @param mc Reference to the MCParticle whose information should be printed and whose daughters should be visited.
-     * @param level The current level of the recursive call of the method.
-     */
-    //void printTree(const MCParticle& mc, int level = 0);
+
     std::vector<std::string> m_runList; /**< The filenames of the runs */
-    std::vector<int> m_eveList; /**< The eventnumbers for each of the runs */
+    std::vector<int> m_eveList;         /**< The eventnumbers for each of the runs */
+    //! current run
     std::vector<std::string>::iterator  m_runCurrent;
+    //! output file name
     std::string m_outFile;
-    std::string m_geometry;
+    //! Bit mask of the MWPC tracking chambers used for the track creation
     std::vector<int> m_MwpcTrackMask;
-    time_t m_time;
+    //! time of the first processed event
     time_t m_timestart;
+    //! Pointer to the tracking chambers
     ARICHTracking* m_mwpc;
+    //! raw MWPC TDC buffer
     int m_tdc[32];
+    //! Beamtest Track reconstruction
     int getTrack(int mask, TVector3& r, TVector3& dir);
-    //std::vector<bool> m_seen;   /**< Tag the particles which were already visited using their index. */
-    //bool m_onlyPrimaries;       /**< Print only primary particles. */
-    //int m_maxLevel;             /**< Show only up to specified depth level. */
+
   };
 
 } // end namespace Belle2

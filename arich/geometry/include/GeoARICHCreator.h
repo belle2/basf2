@@ -45,16 +45,25 @@ namespace Belle2 {
 
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
+      //! build the HAPD modules
       G4LogicalVolume* buildModule(GearDir Module);
+      //! build PCB of the modules
       G4LogicalVolume* buildModulePCB(GearDir Module);
+      //! build the support plate of the module s
       G4LogicalVolume* buildModuleSupportPlate(GearDir Support);
+      //! build mirrors
       G4LogicalVolume* buildMirrors(GearDir Mirrors);
+      //! get average refractive index of the material
       double getAvgRINDEX(G4Material* material);
+      //! creates simple geometry
       void createSimple(const GearDir& content, G4LogicalVolume& topVolume);
 
     protected:
+      //! pointer to sensitive detector
       SensitiveDetector* m_sensitive;
+      //! pointer to sensitive aerogel - used instead of tracking
       SensitiveAero* m_sensitiveAero;
+      //! flag the beam background study
       int isBeamBkgStudy;
     };
 

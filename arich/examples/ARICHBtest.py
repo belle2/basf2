@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 #
-# Usage: basf2 arich/modules/arichBtest2011/examples/ARICHBtest2011.py -- -r 102 -n 10000
+# Usage:
+# basf2 arich/modules/arichBtest2011/examples/ARICHBtest2011.py --
+#       -r 102 -n 10000
 #
 from basf2 import *
 from optparse import OptionParser
@@ -16,8 +18,8 @@ parser = OptionParser()
 parser.add_option('-r', '--run', dest='runno', default='068',
                   help='analyse runno')
 parser.add_option('-p', '--path', dest='path',
-                  default='/afs/f9.ijs.si/home/rok/aerorich/tests/11/ana/bdata/bt11'
-                  , help='datapath')
+          default='/afs/f9.ijs.si/home/rok/aerorich/tests/11/ana/bdata/bt11',
+          help='datapath')
 
 parser.add_option('-y', '--year', dest='year', default='2011',
                   help='beam test year')
@@ -64,14 +66,15 @@ runno = int(options.runno)  # needed for geoarich module
 
 print 'TrackMask:' + options.mask
 
-averageagel = int(options.avgagel)  # this variable is called from GeoARICHBtest2011Creator
+# this variable is called from GeoARICHBtest2011Creator
+averageagel = int(options.avgagel)
 
 set_log_level(LogLevel.INFO)
 
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [int(options.neve)])  # we want to process 10 events
-evtmetagen.param('RunList', [int(options.runno)])  # from run number 1
-evtmetagen.param('ExpList', [1])  # and experiment number 1
+evtmetagen.param('EvtNumList', [int(options.neve)])
+evtmetagen.param('RunList', [int(options.runno)])
+evtmetagen.param('ExpList', [1])
 
 # Load XML parameters
 paramloader = register_module('Gearbox')
@@ -79,12 +82,17 @@ paramloader = register_module('Gearbox')
 xmlgeometry = 'file://%s/arich/modules/arichBtest/data/%s/arichBtest%s.xml' \
     % (os.getcwd(), options.year, options.year)
 paramloader.param('Filename', xmlgeometry)
+print xmlgeometry
 # paramloader.param('Backends', ['sql:'])
-# paramloader.param('Filename','mysql://basf2:belle2@f9lab02.ijs.si:3306/b2config');
-# paramloader.param('Filename','pgsql://basf2:belle2@f9lab02.ijs.si:5432/b2config');
+# paramloader.param('Filename',
+#             'mysql://basf2:belle2@f9lab02.ijs.si:3306/b2config');
+# paramloader.param('Filename',
+#             'pgsql://basf2:belle2@f9lab02.ijs.si:5432/b2config');
 # paramloader.param('Filename', 'oracle://basf2:belle2@/f9lab02')
-# paramloader.param('Filename','file:///afs/f9.ijs.si/home/rok/public_html/basf2/public/Belle2.xml');
-# paramloader.param('Filename','file:///net/f9pc137/data0/belle2/rok/local/basf2/test/Belle2-merged.xml');
+# paramloader.param('Filename',
+#        'file:///afs/f9.ijs.si/home/rok/public_html/basf2/public/Belle2.xml');
+# paramloader.param('Filename',
+#   'file:///net/f9pc137/data0/belle2/rok/local/basf2/test/Belle2-merged.xml');
 # Create Geometry
 geobuilder = register_module('Geometry')
 geobuilder.param('Components', ['ARICHBtest'])
@@ -100,13 +108,15 @@ g4sim = register_module('FullSim')
 # This line is necessary if you want to simulate Cerenkov photons!
 # By default optical processes are not registered.
 g4sim.param('RegisterOptics', 1)
-# To speed up the simulation you can propagate only a selected fraction of photons.
+# To speed up the simulation you can propagate
+# only a selected fraction of photons.
 # By default all photons are propagated.
 g4sim.param('PhotonFraction', 0.3)
 # Set up the visualization
 g4sim.param('EnableVisualization', True)
 # Here you can select visualization driver and visualization commands.
-# This creates VRML file, change VRML2FILE to HepRepFile to create HepRep file.
+# This creates VRML file,
+# change VRML2FILE to HepRepFile to create HepRep file.
 g4sim.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
             '/vis/scene/add/axes 0 0 0 100 mm'])
 

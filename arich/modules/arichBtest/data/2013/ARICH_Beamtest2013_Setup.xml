@@ -18,72 +18,66 @@
       <position desc="position of the rotation point"><x  unit="mm">53</x><y  unit="mm"   desc="-180+203">23</y><z  unit="mm">210</z></position>
 </Frame>
   
-
 <aerogel>
-<row id="1a"><aerogel type="upstream">PDR20-3a</aerogel></row>
-<row id="1b"><aerogel type="upstream">BTR9-7</aerogel></row>
-<row id="1c"><aerogel type="upstream">BTR3-2a</aerogel></row>
-<row id="1d"><aerogel type="upstream">HTP11-9</aerogel></row>
-<row id="1e"><aerogel type="upstream">BTR8-5</aerogel></row>
-<row id="1f"><aerogel type="upstream">HTP11-5</aerogel></row>
-<row id="1g"><aerogel type="upstream">HTP12-25</aerogel></row>
-<row id="1h"><aerogel type="upstream">PDR21-1b</aerogel></row>
-<row id="1i"><aerogel type="upstream">PDR19-4b</aerogel></row>
-<row id="1k"><aerogel type="upstream">PDR21-5b</aerogel></row>
-<row id="1m"><aerogel type="upstream">PDR11-4a</aerogel></row>
-<row id="2a"><aerogel type="upstream">PDR20-3a</aerogel><aerogel type="downstream">PDR11-4a</aerogel></row>
-<row id="2b"><aerogel type="upstream">BTR3-2a</aerogel><aerogel type="downstream">PDR11-4a</aerogel></row>
-<row id="2c"><aerogel type="upstream">BTR3-2a</aerogel><aerogel type="downstream">PDR21-5b</aerogel></row>
-<row id="2d"><aerogel type="upstream">HTP11-9</aerogel><aerogel type="downstream">BTR8-5</aerogel></row>
-<row id="2e"><aerogel type="upstream">HTP11-5</aerogel><aerogel type="downstream">HTP12-25</aerogel></row>
-<row id="2f"><aerogel type="upstream">PDR21-1b</aerogel><aerogel type="downstream">PDR19-4b</aerogel></row>
-<row id="2g"><aerogel type="right">PDR21-1b</aerogel><aerogel type="left">PDR19-4b</aerogel></row>
+ 	<row id="PDR20-3a(U), N/A(D)">			<aerogel type="upstream">PDR20-3a</aerogel></row>
+ 	<row id="PDR11-4a(U), N/A(D)">			<aerogel type="upstream">PDR11-4a</aerogel></row>
+ 	<row id="BTR3-2a(U), N/A(D)">				<aerogel type="upstream">BTR3-2a</aerogel></row>
+ 	<row id="BTR13-5(U), N/A(D)">				<aerogel type="upstream">BTR13-5</aerogel></row>
+ 	<row id="BTR16-21(U), N/A(D)">			<aerogel type="upstream">BTR16-21</aerogel></row>
+ 	<row id="REM2-3(U), N/A(D)">				<aerogel type="upstream">REM2-3</aerogel></row>
+ 	<row id="REM2-17(U), N/A(D)">				<aerogel type="upstream">REM2-17</aerogel></row>
+ 	<row id="REM2-4(U), N/A(D)">				<aerogel type="upstream">REM2-4</aerogel></row>
+ 	<row id="REM2-11(U), N/A(D)">				<aerogel type="upstream">REM5-11</aerogel></row>
+ 	<row id="REM5-5(U), N/A(D)"> 				<aerogel type="upstream">REM5-5</aerogel></row>
+ 	<row id="HTP12-9(U), N/A(D)">				<aerogel type="upstream">HTP12-9</aerogel></row>
+ 	<row id="REM5-21(U), N/A(D)">	      <aerogel type="upstream">REM5-21</aerogel></row>
+ 	<row id="PDR20-3a(U), PDR11-4a(D)"> <aerogel type="upstream">PDR20-3a</aerogel><aerogel type="downstream">PDR11-4a</aerogel></row>
+ 	<row id="BTR3-2a(U), PDR11-4a(D)">  <aerogel type="upstream">BTR3-2a</aerogel> <aerogel type="downstream">PDR11-4a</aerogel></row>
+ 	<row id="REM2-3(U), REM2-17(D)">    <aerogel type="upstream">REM2-3</aerogel>  <aerogel type="downstream">REM2-17</aerogel></row>
+ 	<row id="REM5-11(U), REM5-21(D)">   <aerogel type="upstream">REM5-11</aerogel> <aerogel type="downstream">REM5-21</aerogel></row>
+ 	<row id="REM2-4(U), REM13-5(D)">    <aerogel type="upstream">REM2-4</aerogel>	 <aerogel type="downstream">BTR13-5</aerogel></row>
+ 	<row id="REM5-11(U), BTR13-5(D)">   <aerogel type="upstream">REM5-11</aerogel> <aerogel type="downstream">BTR13-5</aerogel></row>
+ 	<row id="REM5-5(U), BTR13-5(D)">    <aerogel type="upstream">REM5-5</aerogel>  <aerogel type="downstream">BTR13-5</aerogel></row>
+ 	<row id="REM12-9(U), BTR13-5(D)">	  <aerogel type="upstream">REM12-9</aerogel> <aerogel type="downstream">BTR13-5</aerogel></row>
+ 	<row id="REM2-4(U), BTR16-21(D)">	 	<aerogel type="upstream">REM2-4</aerogel>  <aerogel type="downstream">BTR16-21</aerogel></row>
+ 	<row id="REM5-11(U), BTR16-21(D)">	<aerogel type="upstream">REM5-11</aerogel> <aerogel type="downstream">BTR16-21</aerogel></row>
+ 	<row id="REM5-5(U), BTR16-21(D)">	 	<aerogel type="upstream">REM5-5</aerogel>  <aerogel type="downstream">BTR16-21</aerogel></row>
+ 	<row id="REM12-9(U), BTR16-21(D)">	<aerogel type="upstream">REM12-9</aerogel> <aerogel type="downstream">BTR16-21</aerogel></row>
 </aerogel>
 
-
-
 <aerogelinfo>
-<row id="PDR20-3a"><refind>1.0542</refind> <trlen unit="mm">48</trlen><thickness  unit="mm">20.0</thickness></row>
-<row id="PDR11-4a"><refind>1.0649</refind> <trlen unit="mm">55</trlen><thickness  unit="mm">19.9</thickness></row>
-<row id="BTR3-2a"><refind>1.0500</refind> <trlen unit="mm">43</trlen><thickness  unit="mm">19.8</thickness></row>
-<row id="PDR11-4a"><refind>1.0649</refind> <trlen unit="mm">55</trlen><thickness  unit="mm">19.9</thickness></row>
-<row id="PDR21-1b"><refind>1.0463</refind> <trlen unit="mm">44</trlen><thickness  unit="mm">20.4</thickness></row>
-<row id="PDR19-4b"><refind>1.0564</refind> <trlen unit="mm">37</trlen><thickness  unit="mm">20.6</thickness></row>
-<row id="BTR3-2a"><refind>1.0500</refind> <trlen unit="mm">43</trlen><thickness  unit="mm">19.8</thickness></row>
-<row id="PDR21-5b"><refind>1.0607</refind> <trlen unit="mm">30</trlen><thickness  unit="mm">20.6</thickness></row>
-<row id="HTP11-9"><refind>1.0510</refind> <trlen unit="mm">40</trlen><thickness  unit="mm">20.1</thickness></row>
-<row id="BTR8-5"><refind>1.0653</refind> <trlen unit="mm">49</trlen><thickness  unit="mm">20.5</thickness></row>
-<row id="BTR9-7"><refind>1.0516</refind> <trlen unit="mm">40</trlen><thickness  unit="mm">19.9</thickness></row>
-<row id="HTP11-5"><refind>1.0449</refind> <trlen unit="mm">43</trlen><thickness  unit="mm">20.0</thickness></row>
-<row id="HTP12-25"><refind>1.0545</refind> <trlen unit="mm">32</trlen><thickness  unit="mm">20.2</thickness></row>
+	<row id="PDR20-3a"><refind>1.0548</refind> <trlen unit="mm">40</trlen><thickness  unit="mm">20.0</thickness></row>
+	<row id="PDR11-4a"><refind>1.0653</refind> <trlen unit="mm">45</trlen><thickness  unit="mm">19.9</thickness></row>
+	<row id="BTR3-2a"><refind>1.0515</refind> <trlen unit="mm">40</trlen><thickness  unit="mm">19.8</thickness></row>
+	<row id="BTR13-5"><refind>1.0592</refind> <trlen unit="mm">59</trlen><thickness  unit="mm">20.3</thickness></row>
+	<row id="BTR16-21"><refind>1.0597</refind> <trlen unit="mm">58</trlen><thickness  unit="mm">19.9</thickness></row>
+	<row id="REM2-3"><refind>1.0464</refind> <trlen unit="mm">42</trlen><thickness  unit="mm">20.2</thickness></row>
+	<row id="REM2-17"><refind>1.0548</refind> <trlen unit="mm">34</trlen><thickness  unit="mm">19.9</thickness></row>
+	<row id="REM2-4"><refind>1.0463</refind> <trlen unit="mm">45</trlen><thickness  unit="mm">20.2</thickness></row>
+	<row id="REM5-11"><refind>1.0457</refind> <trlen unit="mm">48</trlen><thickness  unit="mm">20.3</thickness></row>
+	<row id="REM5-5"><refind>1.0467</refind> <trlen unit="mm">47</trlen><thickness  unit="mm">20.3</thickness></row>
+	<row id="HTP12-9"><refind>1.0496</refind> <trlen unit="mm">38</trlen><thickness  unit="mm">20.3</thickness></row>
+	<row id="REM5-21"><refind>1.0539</refind> <trlen unit="mm">38</trlen><thickness  unit="mm">20.4</thickness></row>
 </aerogelinfo>
 
-
-
-<hapd>
-<row id="1"><comment>labeled sept11</comment><setup>1</setup></row>		
-<row id="2"><comment>labeled sept14</comment><aerogeldx unit="mm">0</aerogeldx><setup>1</setup></row>		
-<row id="3"><comment>Sept15	move of aerogel - 20mm to the left of the beam regarding setup 2</comment><aerogeldx unit="mm">20</aerogeldx><setup>1</setup></row>	
-<row id="4"><comment>Sept15	move of aerogel - 40mm to the left of the beam regarding setup 2</comment><aerogeldx unit="mm">40</aerogeldx><setup>1</setup></row>	
-<row id="5"><comment>Sept15	move of aerogel - 50mm to the left of the beam regarding setup 2</comment><aerogeldx unit="mm">50</aerogeldx><setup>1</setup></row>	
-<row id="6"><comment>Sept15	move of aerogel - 70mm to the left of the beam regarding setup 2</comment><aerogeldx unit="mm">70</aerogeldx><setup>1</setup></row>	
-<row id="7"><comment>Sept15	move of aerogel - 60mm to the left of the beam regarding setup 2</comment><aerogeldx unit="mm">60</aerogeldx><setup>1</setup></row>	
-<row id="8"><comment>Sept15	move of aerogel - 100 mm to the left of the beam regarding setup2</comment><aerogeldx unit="mm">100</aerogeldx><setup>1</setup></row>	
-<row id="9"><comment>Sept16	rotating the system. sketch available from hapdSketch9 in main wikiPage. distance left edge of the box - lower board 390 mm.</comment><framedx unit="mm">-185</framedx><origframedx unit="mm">390</origframedx><rotation unit="degree">35</rotation><setup>1</setup></row>		
-<row id="10"><comment>Sept16	distance left edge of box - lower board 295 mm.	rot = 35 degrees</comment><framedx unit="mm">295</framedx><rotation unit="degree">35</rotation><setup>1</setup></row>
-<row id="11"><comment>Sept16	distance left edge of box - lower board 260 mm.	rot = 35 degrees</comment><framedx unit="mm">260</framedx><rotation unit="degree">35</rotation><setup>1</setup></row>
-<row id="12"><comment>Sept16	distance left edge of box - lower board 330 mm.	rot = 35 degrees</comment><framedx unit="mm">330</framedx><rotation unit="degree">35</rotation><setup>1</setup></row>
-<row id="13"><comment>Sept16	distance left edge of box - lower board 350 mm	rot = 35 degrees</comment><framedx unit="mm">350</framedx><rotation unit="degree">35</rotation><setup>1</setup></row>
-<row id="14"><comment>Sept17	distance left edge of box - lower board 310 mm	rot = 20 degrees</comment><framedx unit="mm">310</framedx><rotation unit="degree">20</rotation><setup>1</setup></row>
-<row id="15"><comment>Sept17	distance left edge of box - lower board 290 mm	rot = 20 degrees</comment><framedx unit="mm">290</framedx><rotation unit="degree">20</rotation><setup>1</setup></row>
-<row id="16"><comment>Sept17	distance left edge of box - lower board 280 mm	rot = 0 degrees</comment><framedx unit="mm">280</framedx><rotation unit="degree">0</rotation><setup>1</setup></row>
-<row id="17"><comment>Sept17	distance left edge of box - lower board 320 mm	rot = 0 degrees</comment><framedx unit="mm">320</framedx><rotation unit="degree">0</rotation><setup>1</setup></row>
-<row id="18"><comment>Sept17	distance left edge of box - lower board 365 mm.	rot = 0 degrees</comment><framedx unit="mm">365</framedx><rotation unit="degree">0</rotation><setup>1</setup></row>
-<row id="19"><comment>Sept17	distance left edge of box - lower board 365 mm.	rot = 30 deg</comment><framedx unit="mm">365</framedx><rotation unit="degree">30</rotation><setup>1</setup></row>
-<row id="20"><comment>Sept18	distance left edge of box - lower board 365 mm. hapd #1 removed.	rot = 0 degrees</comment><framedx unit="mm">365</framedx><setup>2</setup></row>
-<row id="21"><comment>Sept8	distance left edge of box - lower board 365 mm. hapd #1 removed. middle up: SP118. middle down: KA0003.	rot = 0 degrees.</comment><framedx unit="mm">365</framedx><setup>3</setup></row>
+<hapd desc="HAPDSetup in run log, setup of the HAPD and the frame.">
+	<row id="1"> <comment>DAQ test</comment>
+		<aerogeldx unit="mm">0</aerogeldx> <framedx unit="mm">0</framedx> <rotation unit="degree">0</rotation> <setup>1</setup></row>		
+	<row id="2"> <comment>First hits, 21/05/2013, central HAPD dead</comment>
+		<aerogeldx unit="mm">0</aerogeldx> <setup>2</setup></row>		
+	<row id="3"> <comment>21-23/05/2013 New central HAPD</comment>
+		<aerogeldx unit="mm">0</aerogeldx> <setup>3</setup></row>
+	<row id="3a"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">4.0</aerogeldx> <setup>3</setup></row>
+	<row id="3b"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">6.0</aerogeldx> <aerogeldy unit="mm">2.0</aerogeldy> <setup>3</setup> </row>
+	<row id="3c"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">0</aerogeldx> <aerogeldy unit="mm">-5.0</aerogeldy> <setup>3</setup> </row>
+	<row id="3d"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">4.5</aerogeldx> <aerogeldy unit="mm">0.0</aerogeldy> <setup>3</setup> </row>
+	<row id="4"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">0</aerogeldx> <aerogeldy unit="mm">0</aerogeldy> 		<setup>4</setup> </row>
 </hapd>
-
 
 
 

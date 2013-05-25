@@ -8,35 +8,11 @@
  
  
 
- 
- 
+  
 <run>
-<author>Eva</author>
-<runno>003</runno>
-<neve>13193</neve>
-<calibration></calibration>
-<setup1>1</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Threshold scan</type1>
-<daqqa1>junk</daqqa1>
-<comment1>Check for the daq.</comment1>
-<aerogel2>0</aerogel2>
-<type2>Threshold scan</type2>
-<daqqa2>ok</daqqa2>
-<comment2>Junk also for runs 4-10.</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110913155630</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>011</runno>
-<neve>11721</neve>
+<author>rok</author>
+<runno>0</runno>
+<neve>0</neve>
 <calibration></calibration>
 <setup1></setup1>
 <aerogel1></aerogel1>
@@ -45,2933 +21,1562 @@
 <positionx>0</positionx>
 <positiony>0</positiony>
 <comment1> </comment1>
-<setup2>test</setup2>
-<aerogel2></aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
 <comment><![CDATA[]]></comment>
-<datum>20110914120434</datum>
+<datum>20130520191726</datum>
 </run>
 
-<run>
-<author>Eva</author>
-<runno>012</runno>
-<neve>1020</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> </comment1>
-<setup2>1</setup2>
-<aerogel2>0</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum></datum>
-</run>
 
 <run>
-<author>Eva</author>
-<runno>013</runno>
-<neve>809</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> aerogel in mcp box!</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum></datum>
-</run>
-
-<run>
-<slika src="public/fig_20110914121640." alt="public/th_20110914121640." ></slika>
-<author>Eva</author>
-<runno>024</runno>
-<neve>20524</neve>
-<calibration>*</calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>other</type1>
-<daqqa1>junk</daqqa1>
-<comment1>Flat cable from the MW2, MW3 was not connected.</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>other</type2>
-<comment2></comment2>
-<comment><![CDATA[]]></comment>
-<datum>20110914121640</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>025</runno>
-<neve>31635</neve>
-<calibration>*</calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>other</type1>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>other</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914123002</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>027</runno>
-<neve>132291</neve>
-<calibration>*</calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914134817</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>028</runno>
-<neve>11900</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<daqqa1>junk</daqqa1>
-<comment1>beam on only in the middle of the run</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<daqqa2>junk</daqqa2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914135707</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>029</runno>
-<neve>29909</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1></comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914141946</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>030</runno>
-<neve>234008</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> junk. daq bug. </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> junk. daq bug. </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914141946</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>031</runno>
-<neve>297534</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914152226</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>032</runno>
-<neve>33263</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1>daq test:changing trigger delay (9)</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914160812</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>033</runno>
-<neve>33235</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 11</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914160902</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>034</runno>
-<neve>30368</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 13</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914160936</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>035</runno>
-<neve>28560</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 7</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914162450</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>036</runno>
-<neve>32756</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 5</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914162750</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>037</runno>
-<neve>29589</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 3</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914164730</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>038</runno>
-<neve>31028</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 6</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914164812</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>039</runno>
-<neve>31423</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 8 </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914164846</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>040</runno>
-<neve>31059</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 4</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914165047</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>041</runno>
-<neve>32291</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 6</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914165131</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>042</runno>
-<neve>35342</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 8</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914183049</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>043</runno>
+<author>S. Iwata</author>
+<runno>1</runno>
 <neve>0</neve>
 <calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1>junk, beam went off. HVs down and up again. </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914183228</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>044</runno>
-<neve>45236</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 7</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914183318</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>045</runno>
-<neve>33782</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 9</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914183636</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>046</runno>
-<neve>37146</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 5</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914183723</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>047</runno>
-<neve>13798</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 6. stopped because beam went down.</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914183830</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>048</runno>
-<neve>33433</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 4</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914184004</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>049</runno>
-<neve>34712</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 3</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914184036</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>050</runno>
-<neve>22266</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 7, hd: 20</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914184036</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>051</runno>
-<neve>34767</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 7, hd: 20. th hapd: 250mV, th mcp: -250mV</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914184036</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>052</runno>
-<neve>32236</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 7, hd: 20. th hapd: 200mV, th mcp: -200mV. 3sigma. </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914184036</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>053</runno>
-<neve>31105</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1a</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<comment1> trgDel: 7, hd: 20. th hapd: 200mV, th mcp: -200mV. 5sigma. </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110914184036</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>054</runno>
-<neve>601305</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>2a</aerogel1>
+<setup1></setup1>
+<aerogel1></aerogel1>
 <mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
 <comment1> </comment1>
-<type1>Aerogel study</type1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
 <comment><![CDATA[]]></comment>
-<datum>20110914201022</datum>
+<datum>20130520212902</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>055</runno>
-<neve>404941</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>2b</aerogel1>
+<author>S.Iwata</author>
+<runno>2</runno>
+<neve>0</neve>
+<calibration>test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
 <mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
-<type1>Aerogel study</type1>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> This run is DAQ test.</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130520213302</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>3</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
 <comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
 <comment><![CDATA[]]></comment>
-<datum>20110914221104</datum>
+<datum>20130520221906</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>056</runno>
-<neve>10457</neve>
-<calibration>*</calibration>
-<setup1>2</setup1>
-<aerogel1>2b</aerogel1>
+<author>S.Iwata</author>
+<runno>4</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
 <mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
-<type1>Aerogel study</type1>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
 <comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
 <comment><![CDATA[]]></comment>
-<datum>20110914222204</datum>
+<datum>20130520221938</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>057</runno>
-<neve>403493</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>2c</aerogel1>
+<author>S.Iwata</author>
+<runno>5</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
 <mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
-<type1>Aerogel study</type1>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
 <comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
 <comment><![CDATA[]]></comment>
-<datum>20110914222310</datum>
+<datum>20130520222000</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>058</runno>
-<neve>411716</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1c</aerogel1>
+<author>S.Iwata</author>
+<runno>6</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
 <mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
-<type1>Aerogel study</type1>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
 <comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
 <comment><![CDATA[]]></comment>
-<datum>20110915090610</datum>
+<datum>20130520222022</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>059</runno>
-<neve>209478</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>2d</aerogel1>
+<author>S.Iwata</author>
+<runno>7</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
 <mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915090610</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>060</runno>
-<neve>160555</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1d</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915090910</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>061</runno>
-<neve>908379</neve>
-<calibration>*</calibration>
-<setup1>2</setup1>
-<aerogel1>2d</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915091010</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>062</runno>
-<neve>204859</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1e</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915091010</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>063</runno>
-<neve>3966</neve>
-<calibration></calibration>
-<setup1>3</setup1>
-<aerogel1>1e</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> junk</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> junk</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915104510</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>064</runno>
-<neve>200491</neve>
-<calibration></calibration>
-<setup1>3</setup1>
-<aerogel1>1e</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915104510</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>065</runno>
-<neve>204522</neve>
-<calibration></calibration>
-<setup1>4</setup1>
-<aerogel1>1e</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915104910</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>066</runno>
-<neve>203513</neve>
-<calibration></calibration>
-<setup1>5</setup1>
-<aerogel1>1e</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915104910</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>067</runno>
-<neve>203161</neve>
-<calibration></calibration>
-<setup1>6</setup1>
-<aerogel1>1e</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915104910</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>068</runno>
-<neve>119028</neve>
-<calibration>*</calibration>
-<setup1>2</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915104910</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>069</runno>
-<neve>201294</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915104910</datum>
-</run>
-
-
-
-<run>
-<author>Eva</author>
-<runno>070</runno>
-<neve>203688</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1f</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915104910</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>071</runno>
-<neve>200904</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1g</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915152847</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>072</runno>
-<neve>205618</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>2f</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915152847</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>073</runno>
-<neve></neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1h</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1>Junk. </comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2>Junk. </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915152847</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>074</runno>
-<neve>207020</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1h</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915152847</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>075</runno>
-<neve>201475</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1i</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915152847</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>076</runno>
-<neve>640049</neve>
-<calibration></calibration>
-<setup1>2a</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> </comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> </comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915152847</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>077</runno>
-<neve></neve>
-<calibration></calibration>
-<setup1>2a</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
-<comment1> junk</comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2> junk</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110915152847</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>078</runno>
-<neve>413071</neve>
-<calibration></calibration>
-<setup1>2b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel study</type1>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
 <comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2></comment2>
-<pictext></pictext>
 <comment><![CDATA[]]></comment>
-<datum>20110915152847</datum>
+<datum>20130520222045</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>079</runno>
-<neve>102438</neve>
+<author>S.Iwata</author>
+<runno>8</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130520232321</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>9</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114426</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>10</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<comment1>date is 20, may 2013 </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114540</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>11</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> No beam data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114633</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>12</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> no bema data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114701</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>13</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> no beam data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114741</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>14</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> no beam data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114821</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>15</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> no beam data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114855</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>16</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> no beam data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114952</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>17</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> no beam data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521115022</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>18</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> no beam data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521115103</datum>
+</run>
+
+
+<run>
+<author>Iwata</author>
+<runno>19</runno>
+<neve>582562</neve>
+<calibration>testing settings</calibration>
+<setup1>2</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521145424</datum>
+</run>
+
+
+<run>
+<author>Iwata</author>
+<runno>20</runno>
+<neve>66045</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521173059</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>21</runno>
+<neve>12303</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> hdcycle:20, trgdelay:8</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521174111</datum>
+</run>
+
+
+<run>
+<author>Iwata</author>
+<runno>22</runno>
+<neve>51619</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521181848</datum>
+</run>
+
+
+<run>
+<author>Iwata</author>
+<runno>24</runno>
+<neve>0</neve>
+<calibration>30383</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>same</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<comment1>rerun after resetting HAPD4 threshold to 170mV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521183110</datum>
+</run>
+
+
+<run>
+<author>Iwata</author>
+<runno>23</runno>
+<neve>30383</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<comment1>delay 6</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521183255</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>25</runno>
+<neve>57824</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> hdcycle:20, trgdelay:7
+new parameter for HAPD4 is loaded</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521220103</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>26</runno>
+<neve>331081</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>hdcycle:20, trgdelay:7
+threshold voltage for HAPD4 set to 90 mV (others are not change, 200 mV)</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521220343</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>27</runno>
+<neve>32575</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> hdcycle:10, trgdelay:7</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093104</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>28</runno>
+<neve>31003</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>hdcycle:10, trgdelay10</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093143</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>29</runno>
+<neve>31664</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> hdcycle:10, trgdelay:8</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093237</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>30</runno>
+<neve>33960</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> hdcycle:10, trgdelay:6</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093335</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>31</runno>
+<neve>30531</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> hdcycle:10, trgdelay:5</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093441</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>32</runno>
+<neve>35064</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>hdcycle:5, trgdelay:5</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093544</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>33</runno>
+<neve>30329</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>hdcycle:5, trgdelay:6</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093621</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>34</runno>
+<neve>30385</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> hdcycle:5, trgdelay:7</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093658</datum>
+</run>
+
+
+<run>
+<comment><![CDATA[]]></comment>
+<datum>20130522134639</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>35</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522172002</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>36</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522172042</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>37</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522172056</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>38</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522172112</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>39</runno>
+<neve>0</neve>
+<calibration>scintillator rating test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1>it was used to measure beam rate by trigger scintillators.</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522172433</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>40</runno>
+<neve>128515</neve>
+<calibration>electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>offset calibrated</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522181340</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>41</runno>
+<neve>198067</neve>
+<calibration>electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>offset calibrated</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522181454</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>42</runno>
+<neve>34563</neve>
+<calibration>electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>changed 
+shaping time: shortest
+hdcycle 10
+trgdelay 6</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522181634</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>43</runno>
+<neve>27123</neve>
+<calibration>electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>changed shaping time: shortest 
+hdcycle 20
+trgdelay 7</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522181749</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>44</runno>
+<neve>12044</neve>
+<calibration>electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>changed shaping time: shortest 
+hdcycle 30
+trgdelay 7</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522181844</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>45</runno>
+<neve>12553</neve>
+<calibration>electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>beam momentum 5.4 GeV
+changed shaping time: shortest 
+hdcycle 10 
+trgdelay 6</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522182152</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>46</runno>
+<neve>472232</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>REM5-5(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522182502</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>47</runno>
+<neve>592580</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>BTR13-5(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522182605</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>48</runno>
+<neve>670586</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>BTR16-21(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522182650</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>49</runno>
+<neve>549672</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>REM2-3(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522184700</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>50</runno>
+<neve>0</neve>
 <calibration></calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522190510</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>51</runno>
+<neve>557977</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>REM2-17(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522195722</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>52</runno>
+<neve>559336</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>REM5-11(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522204104</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>53</runno>
+<neve>2074070</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>REM2-3(U), REM2-17(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522233619</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>54</runno>
+<neve>605081</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523001317</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>55</runno>
+<neve>26777</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>HTP12-9(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>junk</daqqa1>
+<comment1>HAPD#4 is not working
+(others are normal data)</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162222</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>56</runno>
+<neve>36844</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>HTP12-9(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>junk</daqqa1>
+<comment1>HAPD#4 is not working
+(others are normal)</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162354</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>57</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162420</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>58</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162436</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>59</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162452</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>60</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162515</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>61</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162541</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>62</runno>
+<neve>0</neve>
+<calibration></calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1>forgot loading parameters to SA-board</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162631</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>63</runno>
+<neve>905374</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>HTP12-9(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>SA-board offset was re-calibrated (basic-04)</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162847</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>64</runno>
+<neve>380514</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3a</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>loaded new parameters for SA-board
+
+aerogel holder position is moved to x=+4.5 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523163048</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>65</runno>
+<neve>378336</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3a</setup1>
+<aerogel1>REM2-3(U), REM2-17(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+4.5 cm
+y=+-0</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523183558</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>66</runno>
+<neve>373570</neve>
+<calibration>Aerogel study</calibration>
 <setup1>3b</setup1>
-<aerogel1>2e</aerogel1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
 <mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
 <type1>Aerogel study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2></comment2>
-<pictext></pictext>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+6.0 cm
+y=+2.0 cm</comment1>
 <comment><![CDATA[]]></comment>
-<datum>20110915152847</datum>
+<datum>20130523184404</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>080</runno>
-<neve>102830</neve>
-<calibration></calibration>
-<setup1>4b</setup1>
-<aerogel1>2e</aerogel1>
+<author>S.Iwata</author>
+<runno>67</runno>
+<neve>412756</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3c</setup1>
+<aerogel1>REM2-3(U), REM2-17(D)</aerogel1>
 <mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
 <type1>Aerogel study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2></comment2>
-<pictext></pictext>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+-0 cm
+y=-5.0 cm</comment1>
 <comment><![CDATA[]]></comment>
-<datum>20110915152847</datum>
+<datum>20130523184614</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>081</runno>
-<neve>101397</neve>
-<calibration></calibration>
-<setup1>7b</setup1>
-<aerogel1>2e</aerogel1>
+<author>S.Iwata</author>
+<runno>68</runno>
+<neve>455232</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3c</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
 <mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
 <type1>Aerogel study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2></comment2>
-<pictext></pictext>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+-0 cm
+y=-5.0 cm</comment1>
 <comment><![CDATA[]]></comment>
-<datum>20110915152847</datum>
+<datum>20130523193714</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>082</runno>
-<neve>108952</neve>
-<calibration></calibration>
-<setup1>6b</setup1>
-<aerogel1>2e</aerogel1>
+<author>S.Iwata</author>
+<runno>69</runno>
+<neve>399481</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3c</setup1>
+<aerogel1>BTR16-21(U), N/A(D)</aerogel1>
 <mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
 <type1>Aerogel study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2></comment2>
-<pictext></pictext>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=0 cm
+y=-5.0 cm</comment1>
 <comment><![CDATA[]]></comment>
-<datum>20110915152847</datum>
+<datum>20130523210222</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>083</runno>
-<neve>107736</neve>
-<calibration></calibration>
-<setup1>8b</setup1>
-<aerogel1>2e</aerogel1>
+<author>S.Iwata</author>
+<runno>70</runno>
+<neve>375076</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3c</setup1>
+<aerogel1>BTR13-5(U), N/A(D)</aerogel1>
 <mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
 <type1>Aerogel study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2></comment2>
-<pictext></pictext>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+y=-5.0 cm
+x=0 cm</comment1>
 <comment><![CDATA[]]></comment>
-<datum>20110915152847</datum>
+<datum>20130523231841</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>084</runno>
-<neve>1808770</neve>
-<calibration>*</calibration>
-<setup1>2b</setup1>
-<aerogel1>2e</aerogel1>
+<author>S.Iwata</author>
+<runno>71</runno>
+<neve>1202168</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3c</setup1>
+<aerogel1>REM5-11(U), BTR13-5(D)</aerogel1>
 <mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
 <type1>Aerogel study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Aerogel study</type2>
-<comment2></comment2>
-<pictext></pictext>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=0 cm
+y=-5.0 cm</comment1>
 <comment><![CDATA[]]></comment>
-<datum>20110915152847</datum>
+<datum>20130523231953</datum>
 </run>
 
-<run>
-<author>Eva</author>
-<runno>085</runno>
-<neve>201163</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>0</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1></type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
-</run>
 
 <run>
-<author>Eva</author>
-<runno>086</runno>
-<neve></neve>
-<calibration>*</calibration>
-<setup1>2</setup1>
-<aerogel1>0</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1></type1>
-<comment1>Junk.</comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2>Junk.</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>087</runno>
-<neve>75587</neve>
-<calibration>*</calibration>
-<setup1>2</setup1>
-<aerogel1>0</aerogel1>
-<mirror>0</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1></type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>088</runno>
-<neve>204477</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1k</aerogel1>
+<author>S.Iwata</author>
+<runno>72</runno>
+<neve>431858</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3d</setup1>
+<aerogel1>REM5-11(U), BTR13-5(D)</aerogel1>
 <mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
 <type1>Aerogel study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+4.5 cm
+0 cm
+(same as previous run)</comment1>
 <comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
+<datum>20130524001046</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>089</runno>
-<neve>202381</neve>
-<calibration></calibration>
-<setup1>2</setup1>
-<aerogel1>1m</aerogel1>
+<author>S.Iwata</author>
+<runno>73</runno>
+<neve>488013</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3b</setup1>
+<aerogel1>REM2-3(U), REM2-17(D)</aerogel1>
 <mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
 <type1>Aerogel study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+6.0 cm
+y=+2.0 cm
+distance between the surface of up stream side of aerogel and the HAPD window = 19.9 cm</comment1>
 <comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
+<datum>20130524002554</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>090</runno>
-<neve>241907</neve>
-<calibration>*</calibration>
-<setup1>2</setup1>
-<aerogel1>1m</aerogel1>
+<author>S.Iwata</author>
+<runno>74</runno>
+<neve>389875</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3d</setup1>
+<aerogel1>BTR13-5(U), N/A(D)</aerogel1>
 <mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
 <type1>Aerogel study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+4.5 cm
+y=0 cm</comment1>
 <comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
+<datum>20130524102445</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>091</runno>
-<neve></neve>
-<calibration></calibration>
-<setup1>9</setup1>
-<aerogel1>2a</aerogel1>
+<author>S.Iwata</author>
+<runno>75</runno>
+<neve>372216</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3b</setup1>
+<aerogel1>REM5-11(U), BTR13-5(D)</aerogel1>
 <mirror>0</mirror>
-<rotation>35</rotation>
+<rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
 <type1>Aerogel study</type1>
-<comment1>Junk.</comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2>Junk.</comment2>
-<pictext></pictext>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+6.0 cm
+y=+2.0 cm
+d=</comment1>
 <comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
+<datum>20130524115616</datum>
 </run>
 
 
 <run>
-<author>Eva</author>
-<runno>092</runno>
-<neve></neve>
-<calibration></calibration>
-<setup1>9</setup1>
-<aerogel1>2a</aerogel1>
+<author>S.Iwata</author>
+<runno>76</runno>
+<neve>418610</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3b</setup1>
+<aerogel1>BTR13-5(U), N/A(D)</aerogel1>
 <mirror>0</mirror>
-<rotation>35</rotation>
+<rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
 <type1>Aerogel study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+6.0 cm
+y=+2.0 cm
+d=20.0 cm</comment1>
 <comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
+<datum>20130524132705</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>093</runno>
-<neve>208390</neve>
-<calibration></calibration>
-<setup1>9</setup1>
-<aerogel1>2e</aerogel1>
+<author>S.Iwata</author>
+<runno>77</runno>
+<neve>445826</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3d</setup1>
+<aerogel1>REM5-5(U), N/A(D)</aerogel1>
 <mirror>0</mirror>
-<rotation>35</rotation>
+<rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
 <type1>Aerogel study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+4.5cm
+y=0 cm
+d=20.0 cm</comment1>
 <comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
+<datum>20130524133420</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>094</runno>
-<neve>207930</neve>
-<calibration></calibration>
-<setup1>9</setup1>
-<aerogel1>0</aerogel1>
+<author>S.Iwata</author>
+<runno>78</runno>
+<neve>697465</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3d</setup1>
+<aerogel1>REM5-5(U), BTR16-21(D)</aerogel1>
 <mirror>0</mirror>
-<rotation>35</rotation>
+<rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
 <type1>Aerogel study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+4.5 cm
+y=0 cm
+d=20.0 cm</comment1>
 <comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
+<datum>20130524135949</datum>
 </run>
 
-<run>
-<author>Eva</author>
-<runno>095</runno>
-<neve>212933</neve>
-<calibration></calibration>
-<setup1>9b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>35</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Mirror study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
-</run>
 
 <run>
-<author>Eva</author>
-<runno>096</runno>
-<neve>222539</neve>
-<calibration></calibration>
-<setup1>10b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>35</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Mirror study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>097</runno>
-<neve>206788</neve>
-<calibration></calibration>
-<setup1>10b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>1</mirror>
-<rotation>35</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Mirror study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>098</runno>
-<neve>203095</neve>
-<calibration></calibration>
-<setup1>11b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>1</mirror>
-<rotation>35</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Mirror study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>099</runno>
-<neve>202611</neve>
-<calibration></calibration>
-<setup1>12b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>1</mirror>
-<rotation>35</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Mirror study</type1>
-<comment1></comment1>
-<setup2>3</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>100</runno>
-<neve>201276</neve>
-<calibration></calibration>
-<setup1>12b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>35</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Mirror study</type1>
-<comment1></comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>101</runno>
-<neve>204907</neve>
-<calibration></calibration>
-<setup1>11b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>35</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Mirror study</type1>
-<comment1></comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110916152847</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>102</runno>
-<neve>1638597</neve>
-<calibration>*</calibration>
-<setup1>13b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>1</mirror>
-<rotation>35</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Mirror study</type1>
-<comment1></comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917095500</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>103</runno>
-<neve>216539</neve>
-<calibration></calibration>
-<setup1>14b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>1</mirror>
-<rotation>20</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Mirror study</type1>
-<comment1></comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917095900</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>104</runno>
-<neve>201405</neve>
-<calibration></calibration>
-<setup1>15b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>1</mirror>
-<rotation>20</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Mirror study</type1>
-<comment1></comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917102100</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>105</runno>
-<neve>202471</neve>
-<calibration></calibration>
-<setup1>16b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>1</mirror>
+<author>S.Iwata</author>
+<runno>79</runno>
+<neve>321884</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
-<type1>Mirror study</type1>
-<comment1></comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
 <comment><![CDATA[]]></comment>
-<datum>20110917110000</datum>
+<datum>20130524161722</datum>
 </run>
 
+
 <run>
-<author>Eva</author>
-<runno>106</runno>
-<neve>202471</neve>
-<calibration></calibration>
-<setup1>17b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>1</mirror>
+<author>S.Iwata</author>
+<runno>80</runno>
+<neve>330744</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
 <rotation>0</rotation>
 <positionx>0</positionx>
 <positiony>0</positiony>
-<type1>Mirror study</type1>
-<comment1>Junk.</comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2>Junk.</comment2>
-<pictext></pictext>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias scan +10 V from Run79</comment1>
 <comment><![CDATA[]]></comment>
-<datum>20110917111000</datum>
+<datum>20130524175007</datum>
 </run>
 
-
-<run>
-<author>Eva</author>
-<runno>107</runno>
-<neve>202052</neve>
-<calibration></calibration>
-<setup1>17b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>1</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Mirror study</type1>
-<comment1></comment1>
-<setup2>2</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917111000</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>108</runno>
-<neve>203837</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Mirror study</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917115000</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>109</runno>
-<neve>146132</neve>
-<calibration>*</calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Mirror study</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917134000</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>110</runno>
-<neve>50228</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>MCP HV scan</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917140000</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>111</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>MCP HV scan</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917140600</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>112</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>MCP HV scan</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917141200</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>113</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>MCP HV scan</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917141800</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>114</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>MCP HV scan</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917142400</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>115</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>MCP HV scan</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917143000</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>116</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>MCP HV scan</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917143600</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>117</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>MCP HV scan</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917144200</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>118</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>MCP HV scan</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917144800</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>119</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>MCP HV scan</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917145400</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>120</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>MCP HV scan</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917150000</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>121</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Daq parameter testing.</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Details in DetectorLog file.</type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917150600</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>122</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Daq parameter testing.</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Details in DetectorLog file.</type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917151200</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>123</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Daq parameter testing.</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Details in DetectorLog file.</type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917151800</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>124</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Daq parameter testing.</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Details in DetectorLog file.</type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917152400</datum>
-</run>
-
-
-<run>
-<author>Eva</author>
-<runno>125</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Daq parameter testing.</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Details in DetectorLog file.</type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917153000</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>126</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Daq parameter testing.</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Details in DetectorLog file.</type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917153600</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>127</runno>
-<neve>50000</neve>
-<calibration></calibration>
-<setup1>18b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Daq parameter testing.</type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>1b</aerogel2>
-<type2>Details in DetectorLog file.</type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917154200</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>128</runno>
-<neve>412696</neve>
-<calibration></calibration>
-<setup1>18</setup1>
-<aerogel1>2g</aerogel1>
-<mirror>2</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Aerogel boundary test.</type1>
-<comment1></comment1>
-<setup2>5</setup2>
-<aerogel2>1b</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917173000</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>129</runno>
-<neve>209785</neve>
-<calibration></calibration>
-<setup1>19</setup1>
-<aerogel1>2g</aerogel1>
-<mirror>2a</mirror>
-<rotation>30</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1></type1>
-<comment1></comment1>
-<setup2>4</setup2>
-<aerogel2>2a</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917183000</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>130</runno>
-<neve>202148</neve>
-<calibration></calibration>
-<setup1>19</setup1>
-<aerogel1>2g</aerogel1>
-<mirror>2a</mirror>
-<rotation>30</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1></type1>
-<comment1></comment1>
-<setup2>4b</setup2>
-<aerogel2>2e</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917190000</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>131</runno>
-<neve>2201454</neve>
-<calibration>*</calibration>
-<setup1>19</setup1>
-<aerogel1>2g</aerogel1>
-<mirror>2a</mirror>
-<rotation>30</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1></type1>
-<comment1></comment1>
-<setup2>4b</setup2>
-<aerogel2>2e</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110917190000</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>132</runno>
-<neve></neve>
-<calibration></calibration>
-<setup1>20</setup1>
-<aerogel1>2a</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Junk. Daq problems.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918095000</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>133</runno>
-<neve></neve>
-<calibration></calibration>
-<setup1>20</setup1>
-<aerogel1>2a</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Junk. Daq problems.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918095100</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>134</runno>
-<neve>100733</neve>
-<calibration></calibration>
-<setup1>20</setup1>
-<aerogel1>2a</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1></type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918095000</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>135</runno>
-<neve>99262</neve>
-<calibration></calibration>
-<setup1>20b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1></type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918093900</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>136</runno>
-<neve>31382</neve>
-<calibration>*</calibration>
-<setup1>20b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1></type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103500</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>137</runno>
-<neve>53876</neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2>Details in DetectorLog file.</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103500</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>138</runno>
-<neve>53908</neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2>Details in DetectorLog file.</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103500</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>139</runno>
-<neve>56106</neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2>Details in DetectorLog file.</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103500</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>140</runno>
-<neve>51111</neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2>Details in DetectorLog file.</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103500</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>141</runno>
-<neve>57608</neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2>Details in DetectorLog file.</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103500</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>142</runno>
-<neve>43983</neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2>Details in DetectorLog file.</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103500</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>143</runno>
-<neve>166030</neve>
-<calibration>*</calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2>Details in DetectorLog file.</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103500</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>144</runno>
-<neve></neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2>Junk.</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103500</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>145</runno>
-<neve>55440</neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2>Details in DetectorLog file.</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103500</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>146</runno>
-<neve>59824</neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2>Junk.</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103500</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>147</runno>
-<neve>53547</neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103510</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>147</runno>
-<neve>53547</neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103510</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>148</runno>
-<neve>56497</neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103520</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>149</runno>
-<neve>100968</neve>
-<calibration>*</calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103530</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>150</runno>
-<neve>59648</neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>0</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103540</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>151</runno>
-<neve>50170</neve>
-<calibration>*</calibration>
-<setup1>21b</setup1>
-<aerogel1>0</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103550</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>152</runno>
-<neve>54204</neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103600</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>153</runno>
-<neve>68123</neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103610</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>154</runno>
-<neve>56001</neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2></comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103620</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>155</runno>
-<neve></neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2>Junk.</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103630</datum>
-</run>
-
-<run>
-<author>Eva</author>
-<runno>156</runno>
-<neve></neve>
-<calibration></calibration>
-<setup1>21b</setup1>
-<aerogel1>2e</aerogel1>
-<mirror>2a</mirror>
-<rotation>0</rotation>
-<positionx>0</positionx>
-<positiony>0</positiony>
-<type1>Hapd scan.</type1>
-<comment1></comment1>
-<setup2>6</setup2>
-<aerogel2>0</aerogel2>
-<type2></type2>
-<comment2>Junk.</comment2>
-<pictext></pictext>
-<comment><![CDATA[]]></comment>
-<datum>20110918103640</datum>
-</run>
 
 </Content>
 </DetectorComponent>

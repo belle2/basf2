@@ -20,6 +20,12 @@
 
 namespace Belle2 {
 
+  /** @addtogroup CDC_dataobjects
+   *  @ingroup dataobjects
+   *  @{
+   *  TrackFitResult
+   *  @}
+   */
   /** Values of the result of a track fit with a given particle hypothesis.
    */
   class TrackFitResult : public RelationsObject {

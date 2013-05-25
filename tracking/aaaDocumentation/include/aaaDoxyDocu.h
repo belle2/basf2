@@ -6,13 +6,12 @@
  *  @ingroup dataobjects
  *  @{
  *  Dataobjects maintained by the tracking group.
- *
- *  @todo test, if this todo ends up in the description.
  *  @}
  */
 
 
 /** @defgroup tracking_modules
+ *  @todo test, if this todo ends up in the description.
  *  @ingroup modules
  *  @{
  *  basf2 Modules maintained by the tracking group.

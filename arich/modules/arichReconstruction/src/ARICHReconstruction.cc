@@ -25,12 +25,8 @@
 #include <vector>
 #include <TRotation.h>
 #include <TRandom3.h>
-#ifdef ARICHDEBUG
-#warning "ARICHDEBUG is on"
-#include <TNtuple.h>
-TNtuple* m_hitstuple;
-TNtuple* m_tracktuple;
-#endif
+
+
 using namespace std;
 using namespace boost;
 
@@ -42,15 +38,16 @@ namespace Belle2 {
 
 
 
-    ARICHReconstruction::ARICHReconstruction():
+    ARICHReconstruction::ARICHReconstruction(int debug):
       m_arichGeoParameters(ARICHGeometryPar::Instance()), m_bkgLevel(0), m_trackPosRes(0),
       m_trackAngRes(0), m_singleRes(0), m_aeroMerit(0)
     {
-#ifdef ARICHDEBUG
+      m_Debug = debug;
       B2INFO("ARICHReconstruction::ARICHReconstruction()");
-      m_hitstuple = new TNtuple("hits", "Btest 2011 Cherenkov angle", "n:agel:mir:thc:fic:x:y:z:tx:ty:tz:sx:sy");
-      m_tracktuple = new TNtuple("tracks", "Btest 2011 tracks", "id:p:nexp:acc:ndet:le:lmu:lpi:lk:lp");
-#endif
+      if (m_Debug) {
+        m_hitstuple = new TNtuple("hits", "Btest Cherenkov angle", "n:agel:mir:thc:fic:x:y:z:tx:ty:tz:sx:sy");
+        m_tracktuple = new TNtuple("tracks", "Btest tracks", "id:p:nexp:acc:ndet:le:lmu:lpi:lk:lp");
+      }
     }
 
 
@@ -446,12 +443,10 @@ namespace Belle2 {
               TVector3 dirch = TransformToFixed(edir) * dirf;
               double fi_cer = dirch.Phi();
               double th_cer = dirch.Theta();
-#ifdef ARICHDEBUG
-              //
-              // Beamtest
-              m_hitstuple->Fill(ncount, ar, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), hitpos.z(), epoint.x(), epoint.y(), epoint.z() , edir.x(), edir.y());
-              //
-#endif
+
+
+              if (m_Debug) m_hitstuple->Fill(ncount, ar, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), hitpos.z(), epoint.x(), epoint.y(), epoint.z() , edir.x(), edir.y());
+
               if (fabs(th_cer - thc[track->getIdentity()][0]) < 0.05 && ar == 0 && nfoo == nfot) nfot++;
               if (fi_cer < 0) fi_cer += 2 * M_PI;
               double fii = 0;
@@ -536,11 +531,12 @@ namespace Belle2 {
         track->setExpectedNOfPhotons(0, nfot);
         track->setLikelihood(maxhyp, lkh);
         //**************************************
-#ifdef ARICHDEBUG
-        int id = track->getIdentity();
-        if (id < 0) id = 0;
-        m_tracktuple->Fill(id, track->getReconstructedMomentum(), nsig[2][asize], acceptance[2][0], nfot, lkh[0], lkh[1], lkh[2], lkh[3], lkh[4]);
-#endif
+
+        if (m_Debug) {
+          int id = track->getIdentity();
+          if (id < 0) id = 0;
+          m_tracktuple->Fill(id, track->getReconstructedMomentum(), nsig[2][asize], acceptance[2][0], nfot, lkh[0], lkh[1], lkh[2], lkh[3], lkh[4]);
+        }
 
       } // for (unsigned  int i=0; i< tsize; i++){
 

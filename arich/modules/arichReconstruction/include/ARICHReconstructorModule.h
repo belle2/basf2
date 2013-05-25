@@ -97,6 +97,7 @@ namespace Belle2 {
       double m_singleRes;              /**< Resolution of single photon emission angle. */
       std::vector<double> m_aeroMerit; /**< Vector of aerogel layer figures of merit. */
       int m_inputTrackType;            /**< Input tracks from the tracking (0) or from MCParticles>AeroHits (1). */
+      int    m_Debug;                  /**< Debug Level For ARICH   */
 
       //! Function fills the internal vector ARICHTracks from ext module
       /*!

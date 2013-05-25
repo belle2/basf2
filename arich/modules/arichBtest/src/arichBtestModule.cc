@@ -7,7 +7,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <arich/modules/arichBtest2011/arichBtest2011Module.h>
+#include <arich/modules/arichBtest/arichBtestModule.h>
 
 //include <boost/format.hpp>
 //include <boost/foreach.hpp>
@@ -30,14 +30,14 @@
 #include <arich/dataobjects/ARICHDigit.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
 #include "arich/geometry/ARICHGeometryPar.h"
-#include "arich/geometry/ARICHBtest2011GeometryPar.h"
+#include "arich/geometry/ARICHBtestGeometryPar.h"
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <arich/geometry/ARICHGeometryPar.h>
-#include "arich/modules/arichBtest2011/arichBtest2011Data.h"
+#include "arich/modules/arichBtest/arichBtestData.h"
 
 #include <TH1F.h>
 #include <TH2F.h>
@@ -65,14 +65,14 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(arichBtest2011)
+REG_MODULE(arichBtest)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
 
-arichBtest2011Module::arichBtest2011Module() : Module()
+arichBtestModule::arichBtestModule() : Module()
 {
   //Set module properties
   setDescription("Print something");
@@ -83,8 +83,6 @@ arichBtest2011Module::arichBtest2011Module() : Module()
 
   vector<string> defaultList;
   addParam("runList", m_runList, "Data Filenames.", defaultList);
-  //addParam("onlyPrimaries", m_onlyPrimaries, "Show only primary particles", true);
-  //addParam("EvtNumList", m_EvtNumList, "number of events to process", -1);
   vector<int> defaultMask;
   addParam("mwpcTrackMask", m_MwpcTrackMask, "Create track from MWPC layers", defaultMask);
   m_fp = NULL;
@@ -101,9 +99,10 @@ TH2F* mwpc_xy[4];
 TH2F* mwpc_residualsz[4][2];
 TGraph* m_hapdmap;
 TGraph* m_el2pos;
-void arichBtest2011Module::initialize()
+
+void arichBtestModule::initialize()
 {
-  B2INFO("arichBtest2011Module::initialize()");
+  B2INFO("arichBtestModule::initialize()");
   StoreArray<ARICHAeroHit>::registerPersistent();
   StoreArray<ARICHDigit>::registerPersistent();
 
@@ -136,8 +135,8 @@ void arichBtest2011Module::initialize()
     sprintf(name, "mwpc%d_", i);
     mwpc_xy[i] = new TH2F(strcat(name, "xy"), name, 120, -30, 30, 120, -30, 30);
   }
-  m_hapdmap = new TGraph("arich/modules/arichBtest2011/geometry/hapd.map");
-  m_el2pos = new TGraph("arich/modules/arichBtest2011/geometry/hapdchmap_v0.dat");
+  m_hapdmap = new TGraph("arich/modules/arichBtest/geometry/hapd.map");
+  m_el2pos = new TGraph("arich/modules/arichBtest/geometry/hapdchmap_v0.dat");
 
   /*
    arich::ARICHGeometryPar* _arichgp = arich::ARICHGeometryPar::Instance();
@@ -155,20 +154,20 @@ void arichBtest2011Module::initialize()
   time(&m_timestart);
 }
 
-void arichBtest2011Module::beginRun()
+void arichBtestModule::beginRun()
 {
 
-  B2INFO("arichBtest2011Module::beginRun()");
+  B2INFO("arichBtestModule::beginRun()");
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
   int exp = eventMetaDataPtr->getExperiment();
   int run = eventMetaDataPtr->getRun();
 
 
-  B2INFO("arichBtest2011Module::eventMetaDataPtr run:" << run);
-  B2INFO("arichBtest2011Module::eventMetaDataPtr exp:" << exp);
+  B2INFO("arichBtestModule::eventMetaDataPtr run:" << run);
+  B2INFO("arichBtestModule::eventMetaDataPtr exp:" << exp);
 
-  arich::ARICHBtest2011GeometryPar* _arichbtgp = arich::ARICHBtest2011GeometryPar::Instance();
+  arich::ARICHBtestGeometryPar* _arichbtgp = arich::ARICHBtestGeometryPar::Instance();
   m_mwpc = _arichbtgp->getMwpc();
 
   static int first = 1;
@@ -180,31 +179,6 @@ void arichBtest2011Module::beginRun()
     m_mwpc[1].Print();
     m_mwpc[2].Print();
     m_mwpc[3].Print();
-
-    /*
-    xmlTextReaderPtr reader = xmlNewTextReaderFilename(m_geometry.c_str());
-    if(!reader) {
-      B2ERROR(" xmlTextReaderPtr:");
-      exit(0);
-    }
-    B2INFO("reading Btest Geometry");
-    // Reading the values of nodes in the XML file
-    while (xmlTextReaderRead(reader) == 1) {
-    const xmlChar *name;
-    name = xmlTextReaderConstName(reader);
-    printf("%s: ",name);
-    if(xmlTextReaderHasValue (reader)) {
-      const xmlChar *value;
-      value = xmlTextReaderConstValue (reader);
-      printf("%s\n", value);
-    }
-    }
-
-    //Closing an XML file
-    xmlTextReaderClose(reader);
-
-    */
-
 
   }
   m_end = 1;
@@ -226,7 +200,7 @@ void arichBtest2011Module::beginRun()
   m_events = 0;
 }
 
-int arichBtest2011Module::skipdata(gzFile fp)
+int arichBtestModule::skipdata(gzFile fp)
 {
   unsigned int u;
   gzread(fp, &u, sizeof(unsigned int));
@@ -234,7 +208,7 @@ int arichBtest2011Module::skipdata(gzFile fp)
   return u + 1;
 }
 
-void arichBtest2011Module::readmwpc(unsigned int* dbuf, unsigned int len)
+void arichBtestModule::readmwpc(unsigned int* dbuf, unsigned int len)
 {
 
   const int print1290 = 0;
@@ -305,10 +279,11 @@ void arichBtest2011Module::readmwpc(unsigned int* dbuf, unsigned int len)
 
 }
 
-int arichBtest2011Module::readhapd(unsigned int len, unsigned int* data)
+int arichBtestModule::readhapd(unsigned int len, unsigned int* data)
 {
 
   arich::ARICHGeometryPar* _arichgp = arich::ARICHGeometryPar::Instance();
+  arich::ARICHBtestGeometryPar* _arichbtgp = arich::ARICHBtestGeometryPar::Instance();
   //-----------------------------------------------------
 
   int bmask = 0xF;
@@ -330,8 +305,8 @@ int arichBtest2011Module::readhapd(unsigned int len, unsigned int* data)
             double globalTime = 0;
 
             double rposx = 0, rposy = 0;
-            m_el2pos->GetPoint(module * 144 + channelID, rposx, rposy);
-            int channel = (int)rposy;
+            pair<int, int> eposhapd(_arichbtgp->GetHapdElectronicMap(module * 144 + channelID));
+            int channel = eposhapd.second;
 
 
             ARICHDigit* newHit = arichDigits.appendNew();
@@ -341,10 +316,8 @@ int arichBtest2011Module::readhapd(unsigned int len, unsigned int* data)
 
 
             TVector3 rechit = _arichgp->getChannelCenterGlob(module + 1, channel);
-
-            double xpos = 0, ypos = 0;
-            m_hapdmap->GetPoint(module * 144 + channelID, xpos, ypos);
-            m_tuple ->Fill(-xpos, ypos, rechit.x(), rechit.y(), module, channelID, rposx, rposy);
+            pair<double, double> poshapd(_arichbtgp->GetHapdChannelPosition(module * 144 + channelID));
+            m_tuple ->Fill(-poshapd.first, poshapd.second, rechit.x(), rechit.y(), module, channelID, rposx, rposy);
           }
         }
       }
@@ -355,7 +328,7 @@ int arichBtest2011Module::readhapd(unsigned int len, unsigned int* data)
 }
 
 
-int arichBtest2011Module::getTrack(int mask, TVector3& r, TVector3& dir)
+int arichBtestModule::getTrack(int mask, TVector3& r, TVector3& dir)
 {
   int retval = 0;
   //const int trgch = 13;
@@ -434,7 +407,7 @@ int arichBtest2011Module::getTrack(int mask, TVector3& r, TVector3& dir)
   return retval;
 }
 
-int arichBtest2011Module::readdata(gzFile fp, int rec_id, int)
+int arichBtestModule::readdata(gzFile fp, int rec_id, int)
 {
 
   unsigned int len, data[10000];
@@ -459,7 +432,7 @@ int arichBtest2011Module::readdata(gzFile fp, int rec_id, int)
       int particleId = 0;// geant4
       dir *= 120 * Unit::GeV;
       r *= Unit::mm / mm;
-      static arich::ARICHBtest2011GeometryPar* _arichbtgp = arich::ARICHBtest2011GeometryPar::Instance();
+      static arich::ARICHBtestGeometryPar* _arichbtgp = arich::ARICHBtestGeometryPar::Instance();
       static TVector3 dr =  _arichbtgp->getTrackingShift();
 
       r += dr;
@@ -505,7 +478,7 @@ int arichBtest2011Module::readdata(gzFile fp, int rec_id, int)
 
 
 
-void arichBtest2011Module::event()
+void arichBtestModule::event()
 {
 
 
@@ -596,9 +569,9 @@ void arichBtest2011Module::event()
   if (gzeof(m_fp)) m_end = 1;
 }
 
-void arichBtest2011Module::endRun()
+void arichBtestModule::endRun()
 {
-  B2INFO(" arichBtest2011Module: End Run !!!");
+  B2INFO(" arichBtestModule: End Run !!!");
 
   m_file->Write();
   m_file->Close();
@@ -609,7 +582,7 @@ void arichBtest2011Module::endRun()
   }
 }
 
-void arichBtest2011Module::terminate()
+void arichBtestModule::terminate()
 {
   int i = 0;
   BOOST_FOREACH(const string & fname, m_runList) {

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PhotonDetector xmlns:xi="http://www.w3.org/2001/XInclude" >
+
+
+<setup type="beamtest" id="1">
+<nmodules>6</nmodules>
+<HotChannels>140	142	162	781 </HotChannels>
+<DeadChannels></DeadChannels>
+<Detector>
+      <xi:include href="ARICH-Hapd.xml"/>
+      <Plane>
+      <zPosition unit="mm">200</zPosition>
+      <xPosition unit="mm">0</xPosition>
+      <yPosition unit="mm">203</yPosition>
+      <Modules>
+        <Module>
+          <xPos unit="mm">97.7</xPos>
+          <yPos unit="mm">48.89</yPos>
+          <angle unit="deg">3.75</angle>
+        </Module>
+        <Module>
+          <xPos unit="mm">97.7</xPos>
+          <yPos unit="mm">-42.89</yPos>
+          <angle unit="deg">-3.75</angle>
+        </Module>
+         <Module>
+          <xPos unit="mm">20.56</xPos>
+          <yPos unit="mm">26.32</yPos>
+          <angle unit="deg">2.144</angle>
+        </Module>
+        <Module>
+          <xPos unit="mm">17.08</xPos>
+          <yPos unit="mm">-66.8</yPos>
+          <angle unit="deg">-6.43</angle>
+        </Module>
+        <Module>
+	  <xPos unit="mm">-57.2</xPos>
+	  <yPos unit="mm">3.0</yPos>
+	  <angle unit="deg">0.0</angle> 
+	</Module>	
+         
+         
+	<Module>
+	  <xPos unit="mm">-65.48</xPos>
+	  <yPos unit="mm">-91.69</yPos>
+	  <angle unit="deg">-10.0</angle> 
+	</Module>              
+      </Modules>
+	</Plane>
+    </Detector>
+</setup>
+
+<setup type="beamtest" id="2">
+<nmodules>5</nmodules>
+<HotChannels>140	142	162	781 </HotChannels>
+<DeadChannels></DeadChannels>
+<Detector>
+      <xi:include href="ARICH-Hapd.xml"/>
+      <Plane>
+      <zPosition unit="mm">200</zPosition>
+      <xPosition unit="mm">0</xPosition>
+      <yPosition unit="mm">203</yPosition>
+      <Modules>
+      
+        <Module>
+          <xPos unit="mm">97.7</xPos>
+          <yPos unit="mm">-42.89</yPos>
+          <angle unit="deg">-3.75</angle>
+        </Module>
+         <Module>
+          <xPos unit="mm">20.56</xPos>
+          <yPos unit="mm">26.32</yPos>
+          <angle unit="deg">2.144</angle>
+        </Module>
+        <Module>
+          <xPos unit="mm">17.08</xPos>
+          <yPos unit="mm">-66.8</yPos>
+          <angle unit="deg">-6.43</angle>
+        </Module>
+        <Module>
+	  <xPos unit="mm">-57.2</xPos>
+	  <yPos unit="mm">3.0</yPos>
+	  <angle unit="deg">0.0</angle> 
+	</Module>	
+         
+         
+	<Module>
+	  <xPos unit="mm">-65.48</xPos>
+	  <yPos unit="mm">-91.69</yPos>
+	  <angle unit="deg">-10.0</angle> 
+	</Module>              
+      </Modules>
+	</Plane>
+    </Detector>
+
+</setup>
+ 
+<setup type="beamtest" id="3">
+<nmodules>5</nmodules>
+<HotChannels>140	142	162	781 </HotChannels>
+<DeadChannels></DeadChannels>
+<Detector>
+      <xi:include href="ARICH-Hapd.xml"/>
+      <Plane>
+      <zPosition unit="mm">200</zPosition>
+      <xPosition unit="mm">0</xPosition>
+      <yPosition unit="mm">203</yPosition>
+      <Modules>
+        <Module>
+          <xPos unit="mm">97.7</xPos>
+          <yPos unit="mm">-42.89</yPos>
+          <angle unit="deg">-3.75</angle>
+        </Module>
+         <Module>
+          <xPos unit="mm">20.56</xPos>
+          <yPos unit="mm">26.32</yPos>
+          <angle unit="deg">2.144</angle>
+        </Module>
+        <Module>
+          <xPos unit="mm">17.08</xPos>
+          <yPos unit="mm">-66.8</yPos>
+          <angle unit="deg">-6.43</angle>
+        </Module>
+        <Module>
+	  <xPos unit="mm">-57.2</xPos>
+	  <yPos unit="mm">3.0</yPos>
+	  <angle unit="deg">0.0</angle> 
+	</Module>	
+         
+         
+	<Module>
+	  <xPos unit="mm">-65.48</xPos>
+	  <yPos unit="mm">-91.69</yPos>
+	  <angle unit="deg">-10.0</angle> 
+	</Module>              
+     
+        
+      </Modules>
+	</Plane>
+    </Detector>
+</setup>
+
+</PhotonDetector>

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOARICHBTEST2011CREATOR_H
-#define GEOARICHBTEST2011CREATOR_H
+#ifndef GEOARICHBTESTCREATOR_H
+#define GEOARICHBTESTCREATOR_H
 
 
 #include <geometry/CreatorBase.h>
@@ -29,15 +29,15 @@ namespace Belle2 {
 
 
     /** The creator for the PXD geometry of the Belle II detector.   */
-    class GeoARICHBtest2011Creator : public geometry::CreatorBase {
+    class GeoARICHBtestCreator : public geometry::CreatorBase {
 
     public:
 
       /** Constructor of the GeoPXDCreator class. */
-      GeoARICHBtest2011Creator();
+      GeoARICHBtestCreator();
 
       /** The destructor of the GeoPXDCreator class. */
-      virtual ~GeoARICHBtest2011Creator();
+      virtual ~GeoARICHBtestCreator();
 
       /**
        * Creates the ROOT Objects for the ARICH Beamtest 2011 geometry.
@@ -49,7 +49,7 @@ namespace Belle2 {
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
     protected:
-      void createBtest2011Geometry(const GearDir& content, G4LogicalVolume& topVolume);
+      void createBtestGeometry(const GearDir& content, G4LogicalVolume& topVolume);
 
       G4LogicalVolume* buildModule(GearDir Module);
       double getAvgRINDEX(G4Material* material);
@@ -86,4 +86,4 @@ namespace Belle2 {
   }
 }
 
-#endif /* GEOARICHBTEST2011CREATOR_H */
+#endif /* GEOARICHBTESTCREATOR_H */

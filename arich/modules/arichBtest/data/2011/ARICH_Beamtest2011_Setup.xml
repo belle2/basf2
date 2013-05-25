@@ -103,6 +103,7 @@
 <!-- ++++++++++++++++++++++++++++++++  -->
 
 <xi:include href="ARICH_Beamtest2011_Tracking.xml"/>
-
+<xi:include href="ARICH_Beamtest2011_HapdElectronicChannelMap.xml"/>
+<xi:include href="ARICH_Beamtest2011_HapdPositions.xml"/>
 </setup>
 

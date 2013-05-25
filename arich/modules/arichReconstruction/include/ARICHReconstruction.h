@@ -15,6 +15,7 @@
 #include <arich/modules/arichReconstruction/ARICHTrack.h>
 
 #include <TVector3.h>
+#include <TNtuple.h>
 #include <cmath>
 #include <boost/format.hpp>
 
@@ -29,7 +30,7 @@ namespace Belle2 {
     public:
 
       //! Constructor
-      ARICHReconstruction();
+      ARICHReconstruction(int);
 
       //! Destructor
       ~ARICHReconstruction() {};
@@ -52,7 +53,12 @@ namespace Belle2 {
 
     private:
 
+
+
       ARICHGeometryPar* m_arichGeoParameters; /**< holding the parameters of detector */
+      TNtuple* m_hitstuple;  /**< debug output hit-track pairs */
+      TNtuple* m_tracktuple; /**< debug output tracks */
+      double m_Debug; /**< debug level */
       double m_bkgLevel; /**< detector photon background level */
       double m_trackPosRes; /**< track position resolution (from tracking) */
       double m_trackAngRes; /**< track direction resolution (from tracking) */

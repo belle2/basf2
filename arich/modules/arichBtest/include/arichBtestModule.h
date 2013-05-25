@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ARICHBTEST2011MODULE_H
-#define ARCIHBTEST2011MODULE_H
+#ifndef ARICHBTESTMODULE_H
+#define ARCIHBTESTMODULE_H
 
 #include <zlib.h>
 
@@ -31,7 +31,7 @@ namespace Belle2 {
    * Prints something
    * as tree using the B2INFO message to the logging system.
    */
-  class arichBtest2011Module : public Module {
+  class arichBtestModule : public Module {
 
   public:
 
@@ -39,10 +39,10 @@ namespace Belle2 {
      * Constructor.
      * Sets the module parameters.
      */
-    arichBtest2011Module();
+    arichBtestModule();
 
     /** Destructor. */
-    virtual ~arichBtest2011Module() {}
+    virtual ~arichBtestModule() {}
 
     //! Initialize the Module
     /*! Function is called only once at the beginning of your job at the beginning of the corresponding module.
@@ -107,4 +107,4 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // ARICHBTEST2011MODULE_H
+#endif // ARICHBTESTMODULE_H

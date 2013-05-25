@@ -56,7 +56,8 @@ namespace Belle2 {
       m_ana(0),
       m_timeCPU(0),
       m_nRun(0),
-      m_nEvent(0)
+      m_nEvent(0),
+      m_Debug(0)
     {
       // Set description()
       setDescription("ARICHReconstructor");
@@ -66,6 +67,7 @@ namespace Belle2 {
       defMerit.push_back(30.0);
       defMerit.push_back(30.0);
       // Add parameters
+      addParam("Debug", m_Debug, "Debug Level for ARICH", 0);
       addParam("InputColName", m_MCColName, "Input from MC", string(""));
       addParam("TracksColName", m_TracksColName, "Mdst tracks", string(""));
       addParam("ExtHitsColName", m_extHitsColName, "Extrapolated tracks", string(""));
@@ -88,7 +90,7 @@ namespace Belle2 {
       // Initialize variables
       m_nRun    = 0 ;
       m_nEvent  = 0 ;
-      m_ana = new ARICHReconstruction();
+      m_ana = new ARICHReconstruction(m_Debug);
       m_ana->setBackgroundLevel(m_bkgLevel);
       m_ana->setTrackPositionResolution(m_trackPosRes);
       m_ana->setTrackAngleResolution(m_trackAngRes);

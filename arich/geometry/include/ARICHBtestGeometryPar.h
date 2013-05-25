@@ -8,9 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ARICHBTEST2011GEOMETRYPAR_H
-#define ARICHBTEST2011GEOMETRYPAR_H
+#ifndef ARICHBTESTGEOMETRYPAR_H
+#define ARICHBTESTGEOMETRYPAR_H
 
+#include <utility>
 #include <vector>
 #include <string>
 #include <map>
@@ -18,6 +19,8 @@
 #include "TRotation.h"
 #include "TVector3.h"
 #include "TVector2.h"
+
+
 #include <G4ThreeVector.hh>
 #include <G4MaterialPropertyVector.hh>
 #include <cmath>
@@ -57,21 +60,21 @@ namespace Belle2 {
     */
 
 
-    class ARICHBtest2011GeometryPar {
+    class ARICHBtestGeometryPar {
 
     public:
 
       //! Constructor
-      ARICHBtest2011GeometryPar();
+      ARICHBtestGeometryPar();
 
       //! Destructor
-      virtual ~ARICHBtest2011GeometryPar();
+      virtual ~ARICHBtestGeometryPar();
 
-      //! Static method to get a reference to the ARICHBtest2011GeometryPar instance.
+      //! Static method to get a reference to the ARICHBtestGeometryPar instance.
       /*!
       \return A reference to an instance of this class.
       */
-      static ARICHBtest2011GeometryPar* Instance();
+      static ARICHBtestGeometryPar* Instance();
       //! calculates detector parameters needed for geometry build and reconstruction.
       void Initialize(const GearDir& content);
       //! calculates detector parameters needed for geometry build and reconstruction.
@@ -98,13 +101,20 @@ namespace Belle2 {
       bool getAverageAgel();
       void setMwpc(ARICHTracking* m_mwpc);
       ARICHTracking* getMwpc();
+      //! gets geometry parameters from gearbox.
+      std::pair<double, double> GetHapdChannelPosition(int);
+      std::pair<int, int> GetHapdElectronicMap(int);
+      int AddHapdChannelPositionPair(double , double);
+      int AddHapdElectronicMapPair(int, int);
+
     private:
       ARICHTracking* m_mwpc;
       TVector3 m_trackingShift;
       TVector3 m_rotationCenter;
       TRotation   m_frameRotation;
       bool      m_averageAgel;
-
+      std::vector < std::pair<double, double> > m_hapdmap;
+      std::vector < std::pair<int, int> > m_hapdeid;
 
       int m_nPads;                           /*!< Number of detector module pads */
 
@@ -113,7 +123,7 @@ namespace Belle2 {
 
 
 
-      static ARICHBtest2011GeometryPar* p_B4ARICHBtest2011GeometryParDB; /*!< Pointer that saves the instance of this class. */
+      static ARICHBtestGeometryPar* p_B4ARICHBtestGeometryParDB; /*!< Pointer that saves the instance of this class. */
 
       // vectors holding information on HAPDs and chips and pads positions.
 

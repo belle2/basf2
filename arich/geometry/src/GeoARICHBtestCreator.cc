@@ -7,27 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <arich/geometry/GeoARICHBtest2011Creator.h>
-#include <arich/geometry/ARICHGeometryPar.h>
-#include <arich/geometry/ARICHBtest2011GeometryPar.h>
-
-#include <geometry/Materials.h>
-#include <geometry/CreatorFactory.h>
-#include <geometry/utilities.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
-// Framework - DataStore
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreArray.h>
-
-#include <arich/simulation/SensitiveDetector.h>
-#include <arich/simulation/SensitiveAero.h>
-
-
-
+#include <sstream>
 #include <cmath>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
@@ -50,6 +30,25 @@
 
 #include <Python.h>
 
+#include <arich/geometry/GeoARICHBtestCreator.h>
+#include <arich/geometry/ARICHGeometryPar.h>
+#include <arich/geometry/ARICHBtestGeometryPar.h>
+
+#include <geometry/Materials.h>
+#include <geometry/CreatorFactory.h>
+#include <geometry/utilities.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
+// Framework - DataStore
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreArray.h>
+
+#include <arich/simulation/SensitiveDetector.h>
+#include <arich/simulation/SensitiveAero.h>
+
 using namespace std;
 using namespace boost;
 
@@ -63,27 +62,27 @@ namespace Belle2 {
     //                 Register the Creator
     //-----------------------------------------------------------------
 
-    geometry::CreatorFactory<GeoARICHBtest2011Creator> GeoARICHBtestFactory("ARICHBtest2011Creator");
+    geometry::CreatorFactory<GeoARICHBtestCreator> GeoARICHBtestFactory("ARICHBtestCreator");
 
     //-----------------------------------------------------------------
     //                 Implementation
     //-----------------------------------------------------------------
 
-    GeoARICHBtest2011Creator::GeoARICHBtest2011Creator()
+    GeoARICHBtestCreator::GeoARICHBtestCreator()
     {
 
     }
 
-    GeoARICHBtest2011Creator::~GeoARICHBtest2011Creator()
+    GeoARICHBtestCreator::~GeoARICHBtestCreator()
     {
 
     }
 
 
-    void GeoARICHBtest2011Creator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
+    void GeoARICHBtestCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
     {
 
-      B2INFO("GeoARICHBtest2011Creator::create");
+      B2INFO("GeoARICHBtestCreator::create");
       StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
 
@@ -96,7 +95,7 @@ namespace Belle2 {
           run = PyInt_AsLong(v);
           Py_DECREF(v);
         }
-        B2INFO("GeoARICHBtest2011Creator::create runno = " << run);
+        B2INFO("GeoARICHBtestCreator::create runno = " << run);
       }
 
 
@@ -202,11 +201,11 @@ namespace Belle2 {
 
         GearDir setup(content, "setup");
 
-        createBtest2011Geometry(setup, topVolume);
+        createBtestGeometry(setup, topVolume);
       }
     }
 
-    double GeoARICHBtest2011Creator::getAvgRINDEX(G4Material* material)
+    double GeoARICHBtestCreator::getAvgRINDEX(G4Material* material)
     {
       G4MaterialPropertiesTable* mTable = material->GetMaterialPropertiesTable();
       if (!mTable) return 0;
@@ -216,7 +215,7 @@ namespace Belle2 {
       return mVector->GetValue(2 * Unit::eV / Unit::MeV, b);
     }
 
-    G4LogicalVolume* GeoARICHBtest2011Creator::buildModule(GearDir Module)
+    G4LogicalVolume* GeoARICHBtestCreator::buildModule(GearDir Module)
     {
 
       // get detector module parameters
@@ -293,7 +292,7 @@ namespace Belle2 {
     }
 
 
-    G4Material*  GeoARICHBtest2011Creator::createAerogel(const char* aeroname, double RefractiveIndex, double AerogelTransmissionLength)
+    G4Material*  GeoARICHBtestCreator::createAerogel(const char* aeroname, double RefractiveIndex, double AerogelTransmissionLength)
     {
 
 
@@ -347,12 +346,12 @@ namespace Belle2 {
     }
 
 
-    void GeoARICHBtest2011Creator::createBtest2011Geometry(const GearDir& content, G4LogicalVolume& topWorld)
+    void GeoARICHBtestCreator::createBtestGeometry(const GearDir& content, G4LogicalVolume& topWorld)
     {
 
-      B2INFO("ARICH Btest2011 geometry will be built.")
+      B2INFO("ARICH Btest geometry will be built.")
       ARICHGeometryPar* m_arichgp = ARICHGeometryPar::Instance();
-      ARICHBtest2011GeometryPar* m_arichbtgp = ARICHBtest2011GeometryPar::Instance();
+      ARICHBtestGeometryPar* m_arichbtgp = ARICHBtestGeometryPar::Instance();
 
       for (unsigned int i = 0; i < m_agelrefind.size(); i++) {
         char aeroname[255];
@@ -409,7 +408,7 @@ namespace Belle2 {
         //setVisibility(*mwpc, true);
 
         int id = mwpc.getInt("@id", -1);
-        B2INFO("GeoARICHBtest2011Creator:: MWPC ID=" << id);
+        B2INFO("GeoARICHBtestCreator:: MWPC ID=" << id);
         if (id < 4 && id >= 0) {
           m_mwpc[id].tdc[0]   = mwpc.getInt("tdc/y/up");
           m_mwpc[id].tdc[1]   = mwpc.getInt("tdc/y/down");
@@ -429,31 +428,24 @@ namespace Belle2 {
           m_mwpc[id].pos[2] = mwpc.getDouble("position/z");
           // m_mwpc[id].Print();
         }
-        /*
-        string tmp;
-        ifstream in;
-        in.open(m_geometry.c_str());
-        if (in.is_open()) {
-        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].tdc[0], &m_mwpc[1].tdc[0], &m_mwpc[2].tdc[0], &m_mwpc[3].tdc[0]) ;
-        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].tdc[1], &m_mwpc[1].tdc[1], &m_mwpc[2].tdc[1], &m_mwpc[3].tdc[1]) ;
-        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].tdc[2], &m_mwpc[1].tdc[2], &m_mwpc[2].tdc[2], &m_mwpc[3].tdc[2]) ;
-        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].tdc[3], &m_mwpc[1].tdc[3], &m_mwpc[2].tdc[3], &m_mwpc[3].tdc[3]) ;
-        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].atdc, &m_mwpc[1].atdc, &m_mwpc[2].atdc, &m_mwpc[3].atdc);
-        getline(in, tmp); sscanf(tmp.c_str(), "%f%f%f%f", &m_mwpc[0].slp[1], &m_mwpc[1].slp[1], &m_mwpc[2].slp[1], &m_mwpc[3].slp[1]) ;
-        getline(in, tmp); sscanf(tmp.c_str(), "%f%f%f%f", &m_mwpc[0].slp[0], &m_mwpc[1].slp[0], &m_mwpc[2].slp[0], &m_mwpc[3].slp[0]) ;
-        getline(in, tmp); sscanf(tmp.c_str(), "%f%f%f%f", &m_mwpc[0].offset[1], &m_mwpc[1].offset[1], &m_mwpc[2].offset[1], &m_mwpc[3].offset[1]) ;
-        getline(in, tmp); sscanf(tmp.c_str(), "%f%f%f%f", &m_mwpc[0].offset[0], &m_mwpc[1].offset[0], &m_mwpc[2].offset[0], &m_mwpc[3].offset[0]) ;
-        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].cutll[0]  , &m_mwpc[1].cutll[0]  , &m_mwpc[2].cutll[0] , &m_mwpc[3].cutll[0]);
-        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].cutll[1]  , &m_mwpc[1].cutll[1]  , &m_mwpc[2].cutll[1] , &m_mwpc[3].cutll[1]);
-        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].cutul[0]  , &m_mwpc[1].cutul[0]  , &m_mwpc[2].cutul[0] , &m_mwpc[3].cutul[0]);
-        getline(in, tmp); sscanf(tmp.c_str(), "%d%d%d%d", &m_mwpc[0].cutul[1]  , &m_mwpc[1].cutul[1]  , &m_mwpc[2].cutul[1] , &m_mwpc[3].cutul[1]);
-        getline(in, tmp); sscanf(tmp.c_str(), "%f%f%f%f", &m_mwpc[0].pos[0]    , &m_mwpc[1].pos[0]    , &m_mwpc[2].pos[0]   , &m_mwpc[3].pos[0]);
-        getline(in, tmp); sscanf(tmp.c_str(), "%f%f%f%f", &m_mwpc[0].pos[1]    , &m_mwpc[1].pos[1]    , &m_mwpc[2].pos[1]   , &m_mwpc[3].pos[1]);
-        getline(in, tmp); sscanf(tmp.c_str(), "%f%f%f%f", &m_mwpc[0].pos[2]    , &m_mwpc[1].pos[2]    , &m_mwpc[2].pos[2]   , &m_mwpc[3].pos[2]);
-        in.close();
-        */
-      }
 
+      }
+      // physical position of the hapd channels
+
+      istringstream mapstream;
+      double mx, my;
+      mapstream.str(content.getString("hapdmap"));
+      while (mapstream >> mx >> my) {
+        m_arichbtgp->AddHapdChannelPositionPair(mx, my);
+      }
+      mapstream.clear();
+
+      // mapping of the electronic channels
+      int ipx, ipy;
+      mapstream.str(content.getString("hapdchmap"));
+      while (mapstream >> ipx >> ipy) {
+        m_arichbtgp->AddHapdElectronicMapPair(ipx, ipy);
+      }
       // experimental frame consisting of detector plane, aerogel and mirrors
 
       GearDir frameParams(content, "Frame");

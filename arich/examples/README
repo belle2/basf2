@@ -1,0 +1,16 @@
+
+
+Beamtest Analysis:
+
+basf2 examples/ARICHBtest.py -- -p /pathto/data/ -y 2011 -r 067 -n 20000
+
+Start the root
+root run_067.root
+
+Plot the results: 
+root [3] .x  examples/ARICHBtest.cxx()
+
+
+
+export source code to TARBALL:
+find arich \( -name .svn -o -name "*.so" -o -name "*.*~" -o -name "*.d" \)  -prune -o -print | cpio -o -H tar | gzip > arich.tar.gz

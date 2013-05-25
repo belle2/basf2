@@ -19,6 +19,9 @@ parser.add_option('-p', '--path', dest='path',
                   default='/afs/f9.ijs.si/home/rok/aerorich/tests/11/ana/bdata/bt11'
                   , help='datapath')
 
+parser.add_option('-y', '--year', dest='year', default='2011',
+                  help='beam test year')
+
 parser.add_option('-t', '--track-mask', dest='mask', default='0x5',
                   help='track mask 4 bits')
 
@@ -73,9 +76,8 @@ evtmetagen.param('ExpList', [1])  # and experiment number 1
 # Load XML parameters
 paramloader = register_module('Gearbox')
 
-xmlgeometry = \
-    'file://%s/arich/modules/arichBtest2011/geometry/arichBtest2011.xml' \
-    % os.getcwd()
+xmlgeometry = 'file://%s/arich/modules/arichBtest/data/%s/arichBtest%s.xml' \
+    % (os.getcwd(), options.year, options.year)
 paramloader.param('Filename', xmlgeometry)
 # paramloader.param('Backends', ['sql:'])
 # paramloader.param('Filename','mysql://basf2:belle2@f9lab02.ijs.si:3306/b2config');
@@ -85,11 +87,11 @@ paramloader.param('Filename', xmlgeometry)
 # paramloader.param('Filename','file:///net/f9pc137/data0/belle2/rok/local/basf2/test/Belle2-merged.xml');
 # Create Geometry
 geobuilder = register_module('Geometry')
-geobuilder.param('Components', ['ARICHBtest2011'])
+geobuilder.param('Components', ['ARICHBtest'])
 
-btest = register_module('arichBtest2011')
+btest = register_module('arichBtest')
 btest.param('mwpcTrackMask', [mask])
-# btest.param('Filename', 'arich/modules/arichBtest2011/geometry/track.dat')
+# btest.param('Filename', 'arich/modules/arichBtest/data/2011/track.dat')
 btest.param('runList', [fname])
 btest.param('outputFileName', outroot)
 
@@ -114,6 +116,7 @@ geosaver.param('Filename', 'Belle2Geo.root')
 
 arichrec = register_module('ARICHReconstructor')
 arichrec.param('InputTrackType', 1)
+arichrec.param('Debug', 1)
 
 main = create_path()
 main.add_module(evtmetagen)

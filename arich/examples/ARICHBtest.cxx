@@ -15,13 +15,13 @@
 struct info { float ncount,ar, mirr, thc, fic,x,y,tx,ty,sx,sy;};
 info var;
 
-int ARICHBtest2011(int agel=0, int mir=0){
+int ARICHBtest(int agel=0, int mir=0){
 
 char mtxt[128];
             
 TCanvas *c= new TCanvas("c","c",210*3.5,297*3.5);
 TPaveText *pt = new TPaveText(0,0.95,1,1);
-pt->AddText( "ARICH Beamtest 2011 @ CERN SPS");
+pt->AddText( "ARICH Beamtest");
 pt->Draw();
 c->cd();
 TVirtualPad *main  = new TPad("man","Main", 0,0,1,0.95,10,1);
@@ -191,7 +191,7 @@ pdf->ReplaceAll(".root",".pdf");
 c->Print( pdf->Data()  );
 pdf->Prepend("acroread ");
 //gSystem->Exec(pdf->Data());
-//ARICHBtest2011tracking( );
+//ARICHBtesttracking( );
 return 0;
 }
 
@@ -291,7 +291,7 @@ pt1->Draw();
 
 
 
-int ARICHBtest2011tracking( ){
+int ARICHBtesttracking( ){
   
   TCanvas *c= new TCanvas("c","c",1000,1000);
   c->Divide(4,4);

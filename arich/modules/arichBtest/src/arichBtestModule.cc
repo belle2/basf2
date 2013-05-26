@@ -84,6 +84,7 @@ arichBtestModule::arichBtestModule() : Module()
   vector<int> defaultMask;
   addParam("mwpcTrackMask", m_MwpcTrackMask, "Create track from MWPC layers", defaultMask);
   m_fp = NULL;
+  addParam("beamMomentum", m_beamMomentum, "Momentum of the beam [GeV]", 0.0);
 }
 
 TNtuple* m_tuple;
@@ -398,6 +399,7 @@ int arichBtestModule::getTrack(int mask, TVector3& r, TVector3& dir)
         TVector3 rext = r + dir * l;
         mwpc_residualsz[i][0]->Fill(w->reco[0] - rext.y(), axis->GetBinCenter(k + 1));
         mwpc_residualsz[i][1]->Fill(w->reco[1] - rext.x(), axis->GetBinCenter(k + 1));
+
       }
     }
   }
@@ -428,7 +430,7 @@ int arichBtestModule::readdata(gzFile fp, int rec_id, int)
 
       int trackId    = 1;
       int particleId = 0;// geant4
-      dir *= 120 * Unit::GeV;
+      dir *= m_beamMomentum * Unit::GeV;
       r *= Unit::mm / mm;
       static arich::ARICHBtestGeometryPar* _arichbtgp = arich::ARICHBtestGeometryPar::Instance();
       static TVector3 dr =  _arichbtgp->getTrackingShift();
@@ -450,7 +452,7 @@ int arichBtestModule::readdata(gzFile fp, int rec_id, int)
       //----------------------------------------
       r[1]  = -r.y();
       dir[1] = -dir.y();
-      // B2INFO("-----------> " <<  rc.x() <<  " " << rc.y() << " " <<   rc.z()<< "::::" << rrel.x() <<  " " << rrel.y() << " " <<   rrel.z()  << " ----> R "<<   r.x() <<  " " << r.y() << " " <<   r.z() << " ----> S "<<   dir.x() <<  " " << dir.y() << " " <<   dir.z()   );
+      B2DEBUG(50, "-----------> " <<  rc.x() <<  " " << rc.y() << " " <<   rc.z() << "::::" << rrel.x() <<  " " << rrel.y() << " " <<   rrel.z()  << " ----> R " <<   r.x() <<  " " << r.y() << " " <<   r.z() << " ----> S " <<   dir.x() <<  " " << dir.y() << " " <<   dir.z());
 
       // Add new ARIHCAeroHit to datastore
       ARICHAeroHit* newAeroHit = arichAeroHits.appendNew();

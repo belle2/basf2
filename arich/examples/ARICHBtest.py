@@ -18,8 +18,8 @@ parser = OptionParser()
 parser.add_option('-r', '--run', dest='runno', default='068',
                   help='analyse runno')
 parser.add_option('-p', '--path', dest='path',
-          default='/afs/f9.ijs.si/home/rok/aerorich/tests/11/ana/bdata/bt11',
-          help='datapath')
+                  default='/afs/f9.ijs.si/home/rok/aerorich/tests/11/ana/bdata/bt11'
+                  , help='datapath')
 
 parser.add_option('-y', '--year', dest='year', default='2011',
                   help='beam test year')
@@ -102,6 +102,11 @@ btest.param('mwpcTrackMask', [mask])
 # btest.param('Filename', 'arich/modules/arichBtest/data/2011/track.dat')
 btest.param('runList', [fname])
 btest.param('outputFileName', outroot)
+momentum = 120.0
+if options.year == '2013':
+    momentum = 3.0
+    print 'Momentum ' + str(momentum)
+btest.param('beamMomentum', momentum)
 
 # Simulation module
 g4sim = register_module('FullSim')
@@ -126,11 +131,15 @@ geosaver.param('Filename', 'Belle2Geo.root')
 
 arichrec = register_module('ARICHReconstructor')
 arichrec.param('InputTrackType', 1)
-arichrec.param('Debug', 1)
+arichrec.param('Debug', 3)
+
+profile = register_module('Profile')
+profile.param('outputFileName', 'profileusage.ps')
 
 main = create_path()
 main.add_module(evtmetagen)
 main.add_module(paramloader)
+# main.add_module(profile)
 main.add_module(geobuilder)
 main.add_module(btest)
 main.add_module(arichrec)

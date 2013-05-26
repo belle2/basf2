@@ -109,6 +109,10 @@ namespace Belle2 {
     //! Beamtest Track reconstruction
     int getTrack(int mask, TVector3& r, TVector3& dir);
 
+  private:
+
+    //! Momentum of the particles in the beam [GeV].
+    double m_beamMomentum;
   };
 
 } // end namespace Belle2

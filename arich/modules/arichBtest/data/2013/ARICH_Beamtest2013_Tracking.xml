@@ -51,7 +51,7 @@
 </tdccut>
 <material>HAPD_pcb</material>
 <size><x  unit="mm">200</x><y  unit="mm">75</y><z  unit="mm">2</z></size>
-<position><x  unit="mm" >4</x><y  unit="mm">-1</y><z  unit="mm">-28</z></position>
+<position><x  unit="mm" >1</x><y  unit="mm">-4</y><z  unit="mm">-28</z></position>
 </mwpc>
 <!-- ++++++++++++++++++++++++++++++++  -->
 <mwpc id="2">
@@ -94,7 +94,7 @@
 </tdccut>
 <material>HAPD_pcb</material>
 <size><x  unit="mm">200</x><y  unit="mm">75</y><z  unit="mm">2</z></size>
-<position><x  unit="mm">6</x><y  unit="mm">0</y><z  unit="mm">645</z></position>
+<position><x  unit="mm">6</x><y  unit="mm">2</y><z  unit="mm">645</z></position>
 </mwpc>
 
 </tracking>

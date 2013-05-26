@@ -13,7 +13,7 @@ namespace Belle2 {
   TEST_F(BitPatternCDCTest, settersNGetters)
   {
     // Test proper initialization. ---------------------------------------------------------
-    long initValue = 66560; // python >>> 2 ** 16 + 2 ** 10
+    unsigned long initValue = 66560; // python >>> 2 ** 16 + 2 ** 10
     HitPatternCDC myPattern(initValue);
     EXPECT_EQ(2,  myPattern.getNHits());
 

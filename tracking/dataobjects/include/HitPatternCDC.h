@@ -14,12 +14,20 @@
 
 namespace Belle2 {
   /** @addtogroup Tracking_dataobjects
-   *  @ingroup dataobjects
+   *  @ingroup Dataobjects
    *  @{
    *  Track
    *  @}
    */
   /** Hit pattern of CDC hits within a track and efficient getters.
+   *
+   *  The pattern is stored using a std::bitset. This allows to use some stuff from the
+   *  STL, which most likely is very efficiently programmed rather than implementing the
+   *  stuff oneself with integer types.
+   *  For each layer there is one bit. In addition there is a bit for the superLayers 2-8,
+   *  which can be set to indicate, that at least one of the layers has two hits for the track.
+   *  This is the idea at the moment. Perhaps we will later decide to switch this to some
+   *  better description of the outermost super-layer...
    */
   class HitPatternCDC {
   public:
@@ -29,7 +37,7 @@ namespace Belle2 {
 
     /** Initialize the pattern with some long int.
      */
-    HitPatternCDC(const long& initValue) : m_pattern(initValue)
+    HitPatternCDC(const unsigned long& initValue) : m_pattern(initValue)
     {}
 
     /** Get the Total Number of CDC hits in the fit.
@@ -42,23 +50,34 @@ namespace Belle2 {
      *
      *  This function may throw an out-of-range exception.
      */
-    void setLayer(short layer) {
+    void setLayer(unsigned short layer) {
       m_pattern.set(layer);
     }
 
     /** Getter for single wire.
      */
-    bool getLayer(short layer) {
+    bool getLayer(unsigned short layer) {
       return m_pattern[layer];
     }
 
     /** Getter for Super-Layer match.
      */
-    bool getSLayer(short sLayer);
+    bool getSLayer(unsigned short sLayer) {
+      return ((m_pattern & s_sLayerMasks[sLayer]).any());
+    }
+
+    /** Getter for the approximate number of hits in one super-layer.
+     *
+     *  In case of multiple layers with two or more hits or
+     *  any layers with more than two hits leads to under-counting.
+     */
+    unsigned short getNSLayer(unsigned short sLayer) {
+      return static_cast<unsigned short>((m_pattern & s_sLayerMasks[sLayer]).count());
+    }
 
   private:
-    std::bitset<56> m_pattern;
-//    static const std::bitset<56> s_sLayerMasks[];
+    std::bitset<64> m_pattern;                     /**<  Saves the actual pattern.*/
+    static const std::bitset<64> s_sLayerMasks[9]; /**<  Masks to zero out all bits from other layers.*/
 
   };
 }

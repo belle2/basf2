@@ -104,7 +104,7 @@ void CDCTrackCandidate::removeSegment(const int Id)
     if ((*it).getId() == Id) {
       segmentList.erase(it);
       doneSeg = true;
-    } else ++it;
+    } else {++it;}
   }
 
   m_Segments.clear();

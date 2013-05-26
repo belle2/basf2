@@ -106,10 +106,6 @@ void StereoFinder::StereoFitCandidates(CDCTrackCandidate& candidate)
     zmean = zmean / nHits;
 
     //parameters for the linear regression
-    double r0 = 0; //x axis section
-    double z0 = 0; //y axis section
-    double gradient = 0; //gradient of the line
-
     double rdiff2 = 0; //(r-rmean)^2
     double totaldiff = 0; //(r-rmean)*(z-zmean)
 
@@ -118,9 +114,9 @@ void StereoFinder::StereoFitCandidates(CDCTrackCandidate& candidate)
       totaldiff = totaldiff + (r[i] - rmean) * (z[i] - zmean);
     }
 
-    gradient = totaldiff / rdiff2;
-    z0 = zmean - gradient * zmean;
-    r0 = -z0 / gradient;
+    double gradient = totaldiff / rdiff2;//gradient of the line
+    double z0 = zmean - gradient * zmean; //y axis section
+    //double r0 = -z0 / gradient; //x axis section  // atm. this isn't used anywhere.
 
     bool refit = true;
 

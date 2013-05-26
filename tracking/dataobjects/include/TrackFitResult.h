@@ -20,8 +20,8 @@
 
 namespace Belle2 {
 
-  /** @addtogroup CDC_dataobjects
-   *  @ingroup dataobjects
+  /** @addtogroup Tracking_dataobjects
+   *  @ingroup Dataobjects
    *  @{
    *  TrackFitResult
    *  @}

@@ -20,7 +20,7 @@ class GFTrack;
 namespace Belle2 {
 
   /** @addtogroup Tracking_dataobjects
-   *  @ingroup dataobjects
+   *  @ingroup Dataobjects
    *  @{ Track
    *  @}
    */

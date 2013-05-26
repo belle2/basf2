@@ -224,32 +224,32 @@ void arichBtestModule::readmwpc(unsigned int* dbuf, unsigned int len)
     int rid = (dbuf[i] >> 27) & 0x1F;
     switch (rid) {
       case 0x18:   // Filler
-        if (print1290) printf("Filler  0x%08x %d.data\n", dbuf[i], i);
+        if (print1290) printf("Filler  0x%08x %u.data\n", dbuf[i], i);
         break;
       case 0x8:   // Global Header
-        if (print1290) printf("Global Header  0x%08x %d.data\n", dbuf[i], i);
+        if (print1290) printf("Global Header  0x%08x %u.data\n", dbuf[i], i);
         break;
       case 0x10:  // Global Trailer --- Last word of data
         nhits = ((dbuf[i] >> 5) & 0xFFFF); //Word Count = bit 31...21< Word Count: 20 ... 5 > 4...0
-        if (print1290) printf("Global Trailer  0x%08x %d.data  STATUS=0x%03x nhits=%d\n", dbuf[i], i, (dbuf[i] >> 24) & 0x7, nhits);
+        if (print1290) printf("Global Trailer  0x%08x %u.data  STATUS=0x%03x nhits=%d\n", dbuf[i], i, (dbuf[i] >> 24) & 0x7, nhits);
 
         if (nhits != len) {
           if (print1290) printf("V1290 nhits!=len %d %d\n", nhits, len);
         };
         break;
       case 0x11:  // Global Trigger TimeTag
-        if (print1290) printf("Global Trigger TimeTag  0x%08x %d.data\n", dbuf[i], i);
+        if (print1290) printf("Global Trigger TimeTag  0x%08x %u.data\n", dbuf[i], i);
         break;
       case 0x1:   // TDC header
-        if (print1290) printf("TDC header  0x%08x %d.data evid=%d wc=%d\n", dbuf[i], i, (dbuf[i] >> 12) & 0xFFF, dbuf[i] & 0xFFF);
+        if (print1290) printf("TDC header  0x%08x %u.data evid=%d wc=%d\n", dbuf[i], i, (dbuf[i] >> 12) & 0xFFF, dbuf[i] & 0xFFF);
 
         break;
       case 0x3:   // TDC trailer
-        if (print1290) printf("TDC trailer  0x%08x %d.data\n", dbuf[i], i);
+        if (print1290) printf("TDC trailer  0x%08x %u.data\n", dbuf[i], i);
 
         break;
       case 0x4:   // TDC Error
-        if (print1290) printf("TDC Error  0x%08x %d.data ERR=0x%x\n", dbuf[i], i, dbuf[i] & 0x3FFF);
+        if (print1290) printf("TDC Error  0x%08x %u.data ERR=0x%x\n", dbuf[i], i, dbuf[i] & 0x3FFF);
 
         break;
       case 0x0  :   // TDC data

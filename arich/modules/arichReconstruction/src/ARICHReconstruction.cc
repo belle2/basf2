@@ -446,7 +446,7 @@ namespace Belle2 {
 
 
               if (m_Debug) m_hitstuple->Fill(ncount, ar, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), hitpos.z(), epoint.x(), epoint.y(), epoint.z() , edir.x(), edir.y());
-
+              if (m_Debug > 2) continue;
               if (fabs(th_cer - thc[track->getIdentity()][0]) < 0.05 && ar == 0 && nfoo == nfot) nfot++;
               if (fi_cer < 0) fi_cer += 2 * M_PI;
               double fii = 0;
@@ -454,6 +454,7 @@ namespace Belle2 {
                 double fi_mir = m_arichGeoParameters->getMirrorNormal(mirrors[mirr]).XYvector().Phi();
                 fii = 2 * fi_mir - fi_cer - M_PI;
               }
+
               // loop over all particle hypotheses
               for (int hyp = 0; hyp < maxhyp; hyp++) {
 

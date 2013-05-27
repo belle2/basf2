@@ -428,24 +428,75 @@ namespace Belle2 {
       TClonesArray &eventTrackIDTrackFitter3D = *m_eventTrackIDTrackFitter3D;
 
 
-      //...TS study (loop over all TS's)...
+      //...TS study (loop over all TS's)(for L/R LUT)...
       if(m_flagNonTSStudy == 1){
-	StoreArray<CDCHit> CDCHits("CDCHits");
-	RelationArray rels(SimHits,CDCHits);
         const TRGCDC & cdc = * TRGCDC::getTRGCDC();
         for(unsigned i=0;i<cdc.nSegmentLayers();i++){
 	  const Belle2::TRGCDCLayer * l=cdc.segmentLayer(i);
 	  const unsigned nWires=l->nCells();
 	  if(!nWires) continue;
-	  for(unsigned j=0;i<nWires;j++){
+	  for(unsigned j=0;j<nWires;j++){
 	    const TCSegment & t=(TCSegment &)*(*l)[j];
-	    unsigned ptn=t.hitPattern();
-	    const std::vector<const TCWire*> &wires = t.wires();
-	    for(unsigned k=0;k<wires.size();k++){
-	      unsigned ind=wires[k]->hit()->iCDCHit();
-	      int simind=rels[ind].getFromIndex();
-	      CDCSimHit &h=*SimHits[simind];
-	      cout << "TSflag: " <<h.getWireID().getICLayer()<< " " << ptn << " " <<h.getPosFlag() << endl;
+	    unsigned int ptn=t.hitPattern();
+  	    const std::vector<const TCWire*> &wires = t.wires();
+	    int nfl=0;
+	    int segsize=wires.size();
+	    if(segsize==15){
+		if(ptn/1024){
+		     ptn=ptn%1024;
+		     nfl++;
+		}
+		if(ptn/64){
+		    ptn=ptn%64;
+		    nfl++;
+		}
+		if (ptn/8){
+		    ptn=ptn%8;
+		    nfl++;
+		}
+		if (ptn/2){
+		    ptn=ptn%2;
+		    nfl++;
+		}
+		if(ptn) nfl++;
+	    }
+	    else{
+		if(ptn/256){
+		    ptn=ptn%256;
+		    nfl++;
+		}
+		if(ptn/64){
+		    ptn=ptn%64;
+		    nfl++;
+		}
+		if (ptn/32){
+		    ptn=ptn%32;
+		    nfl++;
+		}
+		if (ptn/8){
+		    ptn=ptn%8;
+		    nfl++;
+		}
+		if(ptn) nfl++;
+	    }
+
+	    if(nfl>=4){
+	        for(int k=0;k<segsize;k++){
+	    	    const TCWHit* wh = wires[k]->hit();
+	    	    if(!wh) continue;
+	    	    unsigned ind=wh->iCDCSimHit();
+	            CDCSimHit &h=*SimHits[ind];
+	    	    if(segsize==15){
+	    	        if((k==0)||(k==1)||(k==2)){
+	                     cout << "TSflag: " <<h.getWireID().getICLayer()<< " " <<h.getWireID().getIWire()<< " " << t.hitPattern() << " " <<h.getPosFlag() << endl;
+	    	        }
+	    	    }
+	    	    else{
+	    	        if((k==5)||(k==6)||(k==7)){
+	                     cout << "TSflag: " <<h.getWireID().getICLayer()<< " " <<h.getWireID().getIWire()<< " " << t.hitPattern() << " " <<h.getPosFlag() << endl;
+	    	        }
+	    	    }
+	        }
 	    }
 	  }
 	}
@@ -546,26 +597,25 @@ namespace Belle2 {
           //...using LRLUT to determine Left/Right(assume drift() will return drift distance)
           const TCSegment * s = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
           phi_w[i]=(double) s->localId()/ni[s->superLayerId()]*4*m_Trg_PI;
-          phi[i]=s->phiPosition();
-	  lutv[i]=s->LUT()->getLRLUT(s->hitPattern(),s->superLayerId());
+          phi[i]=(double) s->localId()/ni[s->superLayerId()]*4*m_Trg_PI;
+          //phi[i]=s->phiPosition();
+          lutv[i]=s->LUT()->getLRLUT(s->hitPattern(),s->superLayerId());
 
-//          if( m_flagWireLRLUT == 1){
-//            ///...Using Drift time information
-//            int lutcomp=s->LUT()->getLRLUT(s->hitPattern(),s->superLayerId());
-//            float dphi=s->hit()->drift()*10;
-//	          if(m_flagEvtTime==1){
-//	    	      dphi-=evtTime;
-//	          }
-//            dphi=atan(dphi/rro[s->superLayerId()]/1000);
-//            if(lutcomp==0){phi[i]-=dphi;}
-//            else if(lutcomp==1){phi[i]+=dphi;}
-//            else{
-//              phi[i]=phi[i];
-//            }
-//	      lutv[i]=s->LUT()->getLRLUT(s->hitPattern(),s->superLayerId());
-//          }
-//	    else lutv[i]=2;
-	    if(m_flagmclr) lutv[i]=s->hit()->mcLR();
+          if( m_flagWireLRLUT){
+            ///...Using Drift time information
+            float dphi=s->hit()->drift()*10;
+	          if(m_flagEvtTime==1){
+	    	      dphi-=evtTime;
+	          }
+            dphi=atan(dphi/rro[s->superLayerId()]/1000);
+            if(lutv[i]==0){phi[i]-=dphi;}
+            else if(lutv[i]==1){phi[i]+=dphi;}
+            else{
+              phi[i]=phi[i];
+            }
+          }
+	  //else lutv[i]=2;
+	  if(m_flagmclr) lutv[i]=s->hit()->mcLR();
         } // End of superlayer loop
 
         double z0=-999, cot=-999;
@@ -619,7 +669,7 @@ namespace Belle2 {
           int tSLayerId[9] = {2,16,28,40,52,10,22,34,46};
           double driftTS[9] = {999,999,999,999,999,999,999,999,999};
           TVectorD mcTS(27);
-          for( int iHits = 0; iHits < SimHits.getEntries(); iHits++){
+          for( int iHits = 0; iHits < SimHits->GetEntriesFast(); iHits++){
              CDCSimHit* aCDCSimHit = SimHits[iHits];
              TVector3 posTrack = aCDCSimHit->getPosTrack();
              int hitLayerId = aCDCSimHit->getWireID().getICLayer(); 
@@ -823,7 +873,7 @@ namespace Belle2 {
             }
           } else {
 	    if(m_flagzierror){
-	      rSFit2(iezz21,iezz22,arcS,zz,lutv2,z0,cot,zchi2);
+	      rSFit2(iezz21,iezz22,arcS, zz,lutv2,z0,cot,zchi2);
 	    }
 	    else{
               rSFit(iezz2, arcS, zz, z0, cot,zchi2);
@@ -839,13 +889,21 @@ namespace Belle2 {
           ztheta*=180./m_Trg_PI;
 
           // Save fit values
-          TVectorD tempFit(6);
+          TVectorD tempFit(14);
           tempFit[0]=pt;
           tempFit[1]=myphi0;
           tempFit[2]=z0;
           tempFit[3]=cot;
           tempFit[4]=mysign;
 	  tempFit[5]=zchi2;
+	  tempFit[6]=zz[0];
+	  tempFit[7]=zz[1];
+	  tempFit[8]=zz[2];
+	  tempFit[9]=zz[3];
+	  tempFit[10]=lutv2[0];
+	  tempFit[11]=lutv2[1];
+	  tempFit[12]=lutv2[2];
+	  tempFit[13]=lutv2[3];
           new(fitTrackFitter3D[iFit]) TVectorD(tempFit);
 
           // Save fit values
@@ -855,12 +913,16 @@ namespace Belle2 {
           tempWFit[2]=mysign;
           new(wFit2DTrackFitter3D[iFit]) TVectorD(tempWFit);
 
-          TVectorD tempMC(5);
+          TVectorD tempMC(9);
           tempMC[0] = mcPt;
           tempMC[1] = mcPhi0;
           tempMC[2] = mcZ0;
           tempMC[3] = mcCot;
           tempMC[4] = mcCharge;
+          tempMC[5] = mczz[0];
+          tempMC[6] = mczz[1];
+          tempMC[7] = mczz[2];
+          tempMC[8] = mczz[3];
           new(mcTrackFitter3D[iFit]) TVectorD(tempMC);
 
           // Save mc information

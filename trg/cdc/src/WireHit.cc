@@ -35,7 +35,7 @@ TRGCDCWireHit::TRGCDCWireHit(const TRGCDCWire & w,
 			     float driftRightError,
 			     int mcLRflag,
 			     float fudgeFactor)
-    : TCCHit((TRGCDCCell &) w,
+    : 	     TCCHit((TRGCDCCell &) w,
 	     indexCDCHit,
 	     indexCDCSimHit,
 	     indexMCParticle,
@@ -44,7 +44,8 @@ TRGCDCWireHit::TRGCDCWireHit(const TRGCDCWire & w,
 	     driftRight,
 	     driftRightError,
 	     mcLRflag,
-	     fudgeFactor) {
+	     fudgeFactor), 
+	     _iCDCSimHit(indexCDCSimHit){
 }
 
 TRGCDCWireHit::~TRGCDCWireHit() {

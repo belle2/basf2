@@ -65,6 +65,9 @@ class TRGCDCWireHitMC;
     /// This will be removed.
     const TRGCDCWireHitMC * mc(TRGCDCWireHitMC *);
 
+    ///  return index of CDCSimHit
+    unsigned iCDCSimHit(void) const;
+
   public:// Static utility functions
 
     /// Sort function. This will be removed.
@@ -78,6 +81,9 @@ class TRGCDCWireHitMC;
 
     /// This will be removed.
     const TRGCDCWireHitMC * _mc;
+
+    /// index of CDCSimHit
+    unsigned _iCDCSimHit;
 
 };
 
@@ -93,6 +99,12 @@ inline
 const TRGCDCWireHitMC *
 TRGCDCWireHit::mc(TRGCDCWireHitMC * a) {
     return _mc = a;
+}
+
+inline 
+unsigned 
+TRGCDCWireHit::iCDCSimHit(void) const{
+	return _iCDCSimHit;
 }
 
 } // namespace Belle2

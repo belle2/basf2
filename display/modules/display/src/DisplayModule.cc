@@ -28,17 +28,17 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
 {
   setDescription("Interactive visualisation of MCParticles, GFTracks and various SimHits (plus geometry).");
 
-  addParam("Options", m_options, "Drawing options for GFTracks, a combination of DHMPST. See EVEVisualization::setOptions or the display.py example for an explanation.", std::string("MHT"));
-  addParam("AssignHitsToPrimaries", m_assignToPrimaries, "If true, hits created by secondary particles (e.g. delta electrons) will be assigned to the original primary particle.", true);
-  addParam("ShowAllPrimaries", m_showAllPrimaries, "If true, all primary MCParticles will be shown, regardless of wether hits are produced.", false);
-  addParam("HideSecondaries", m_hideSecondaries, "If true, secondary MCParticles (and hits created by them) will not be shown.", false);
-  addParam("ShowCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled AssignHitsToPrimaries). May be slow.", false);
-  addParam("ShowNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled AssignHitsToPrimaries). May be slow.", false);
-  addParam("ShowGFTracks", m_showGFTracks, "If true, fitted GFTracks will be shown in the display.", true);
-  addParam("ShowGFTrackCands", m_showGFTrackCands, "If true, track candidates (GFTrackCands array) will be shown in the display.", false);
-  addParam("UseClusters", m_useClusters, "Use PXD/SVD clusters for GFTrackCands visualisation", false);
-  addParam("Automatic", m_automatic, "Non-interactively save visualisations for each event.", false);
-  addParam("FullGeometry", m_fullgeo, "Show full geometry instead of simplified shapes. Further details can be enabled by changing the VisLevel option for Eve -> Scenes -> Geometry Scene -> Top_1.", false);
+  addParam("options", m_options, "Drawing options for GFTracks, a combination of DHMPST. See EVEVisualization::setOptions or the display.py example for an explanation.", std::string("MHT"));
+  addParam("assignHitsToPrimaries", m_assignToPrimaries, "If true, hits created by secondary particles (e.g. delta electrons) will be assigned to the original primary particle.", true);
+  addParam("showAllPrimaries", m_showAllPrimaries, "If true, all primary MCParticles will be shown, regardless of wether hits are produced.", false);
+  addParam("hideSecondaries", m_hideSecondaries, "If true, secondary MCParticles (and hits created by them) will not be shown.", false);
+  addParam("showCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled AssignHitsToPrimaries). May be slow.", false);
+  addParam("showNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled AssignHitsToPrimaries). May be slow.", false);
+  addParam("showGFTracks", m_showGFTracks, "If true, fitted GFTracks will be shown in the display.", true);
+  addParam("showGFTrackCands", m_showGFTrackCands, "If true, track candidates (GFTrackCands array) will be shown in the display.", false);
+  addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for GFTrackCands visualisation", false);
+  addParam("automatic", m_automatic, "Non-interactively save visualisations for each event.", false);
+  addParam("fullGeometry", m_fullGeometry, "Show full geometry instead of simplified shapes. Further details can be enabled by changing the VisLevel option for Eve -> Scenes -> Geometry Scene -> Top_1.", false);
 
   //make sure dictionaries for PXD/SVDrecohits are loaded
   //needs to be done here to have dictionaries available during RootInput::initialize()
@@ -79,18 +79,18 @@ void DisplayModule::initialize()
 
   m_display = new DisplayUI(m_automatic);
   //pass some parameters to DisplayUI to be able to change them at run time
-  m_display->addParameter("Assign hits to primary particles", getParam<bool>("AssignHitsToPrimaries"));
-  m_display->addParameter("Show all primaries", getParam<bool>("ShowAllPrimaries"));
-  m_display->addParameter("Show all charged particles", getParam<bool>("ShowCharged"));
-  m_display->addParameter("Show all neutral particles", getParam<bool>("ShowNeutrals"));
-  m_display->addParameter("Hide secondaries", getParam<bool>("HideSecondaries"));
-  m_display->addParameter("Show GFTracks", getParam<bool>("ShowGFTracks"));
-  m_display->addParameter("Show GFTrackCandidates", getParam<bool>("ShowGFTrackCands"));
+  m_display->addParameter("Assign hits to primary particles", getParam<bool>("assignHitsToPrimaries"));
+  m_display->addParameter("Show all primaries", getParam<bool>("showAllPrimaries"));
+  m_display->addParameter("Show all charged particles", getParam<bool>("showCharged"));
+  m_display->addParameter("Show all neutral particles", getParam<bool>("showNeutrals"));
+  m_display->addParameter("Hide secondaries", getParam<bool>("hideSecondaries"));
+  m_display->addParameter("Show GFTracks", getParam<bool>("showGFTracks"));
+  m_display->addParameter("Show GFTrackCandidates", getParam<bool>("showGFTrackCands"));
 
 
   m_visualizer = new EVEVisualization();
   m_visualizer->setOptions(m_options);
-  m_visualizer->showFullGeo(m_fullgeo);
+  m_visualizer->showFullGeo(m_fullGeometry);
   m_visualizer->addGeometry();
 }
 

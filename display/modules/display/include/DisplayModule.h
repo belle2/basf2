@@ -88,7 +88,7 @@ namespace Belle2 {
     bool m_automatic;
 
     /** Show full geometry instead of simplified shapes. */
-    bool m_fullgeo;
+    bool m_fullGeometry;
 
     /** pointer to actual display */
     DisplayUI* m_display;

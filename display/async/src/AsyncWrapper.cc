@@ -57,7 +57,7 @@ AsyncWrapper::AsyncWrapper(Module* wrapMe): Module(), m_wrappedModule(wrapMe), m
 {
   setParamList(wrapMe->getParamList()); //inherit parameters from wrapped module
 
-  addParam("DiscardOldEvents", m_discardOldEvents, "Discard old events when buffer is full. If false, the main process will wait until there is enough space in the buffer. (i.e. synchronous operation)", true);
+  addParam("discardOldEvents", m_discardOldEvents, "Discard old events when buffer is full. If false, the main process will wait until there is enough space in the buffer. (i.e. synchronous operation)", true);
 }
 
 AsyncWrapper::~AsyncWrapper()
@@ -69,6 +69,7 @@ void AsyncWrapper::initialize()
 {
   B2INFO("Initializing AsyncWrapper...");
 
+  m_procHandler = new ProcHandler();
   const int bufferSizeInts = 8000000; //~32M, within Ubuntu's shmmax limit
   m_ringBuffer = new RingBuffer(bufferSizeInts);
   m_rx = new RxModule(m_ringBuffer);

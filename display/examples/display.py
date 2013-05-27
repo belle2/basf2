@@ -46,36 +46,36 @@ display = register_module('Display')
 # interactively by removing its checkmark in the 'Eve' tab.
 #
 # This option only makes sense when ShowGFTracks/ShowGFTrackCands is used
-display.param('Options', 'HTM')  # default
+display.param('options', 'HTM')  # default
 
 # should hits always be assigned to a particle with c_PrimaryParticle flag?
 # with this option off, many tracking hits will be assigned to secondary e-
-display.param('AssignHitsToPrimaries', 1)
+display.param('assignHitsToPrimaries', 1)
 
 # show all primary MCParticles?
-display.param('ShowAllPrimaries', True)
+display.param('showAllPrimaries', True)
 
 # show all charged MCParticles? (SLOW)
-# display.param('ShowCharged', True)
+# display.param('showCharged', True)
 
 # show all neutral MCParticles? (SLOW)
-# display.param('ShowNeutrals', True)
+# display.param('showNeutrals', True)
 
 # show tracks?
-display.param('ShowGFTracks', True)
+display.param('showGFTracks', True)
 
 # show track candidates?
 # You most likely don't want this unless you are a tracking developer
-display.param('ShowGFTrackCands', False)
+display.param('showGFTrackCands', False)
 # If ShowGFTrackCands is true, you can set this option to switch between
 # PXD/SVDClusters and PXD/SVDTrueHits
-display.param('UseClusters', True)
+display.param('useClusters', True)
 
 # save events non-interactively (without showing window)?
-display.param('Automatic', False)
+display.param('automatic', False)
 
 # change to True to show the full TGeo geometry instead of simplified extract
-display.param('FullGeometry', False)
+display.param('fullGeometry', False)
 
 main.add_module(display)
 

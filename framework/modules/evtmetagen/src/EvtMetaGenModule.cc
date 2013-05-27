@@ -37,9 +37,9 @@ EvtMetaGenModule::EvtMetaGenModule() : Module()
   std::vector<int> defaultEvtNum;
   defaultEvtNum.push_back(1);
 
-  addParam("ExpList",      m_expList,      "The list of experiment numbers.", defaultExpRunList);
-  addParam("RunList",      m_runList,      "The list of run numbers.",        defaultExpRunList);
-  addParam("EvtNumList",   m_evtNumList,   "The list for the number of events which should be processed.", defaultEvtNum);
+  addParam("expList",      m_expList,      "List of experiment numbers.", defaultExpRunList);
+  addParam("runList",      m_runList,      "List of run numbers.",        defaultExpRunList);
+  addParam("evtNumList",   m_evtNumList,   "List of the number of events which should be processed.", defaultEvtNum);
 }
 
 

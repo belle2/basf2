@@ -132,7 +132,7 @@ class CDCPlotModule(Module):
 main = create_path()
 
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [5])
+evtmetagen.param('evtNumList', [5])
 
 gearbox = register_module('Gearbox')
 geo = register_module('Geometry')

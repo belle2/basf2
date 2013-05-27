@@ -33,7 +33,7 @@ RandomSeedRestoreModule::RandomSeedRestoreModule() : Module()
   setDescription("Restores the random number generator seed from a file.");
 
   // Parameter definition
-  addParam("FileName", m_fileName, "ROOT file that contains the random number seed. Any file saved using the RootOutput module should contain a seed, even if none was set explicitly.");
+  addParam("fileName", m_fileName, "ROOT file that contains the random number seed. Any file saved using the RootOutput module should contain a seed, even if none was set explicitly.");
 }
 
 
@@ -72,5 +72,3 @@ void RandomSeedRestoreModule::initialize()
   // Clean up
   delete file;
 }
-
-

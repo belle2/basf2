@@ -22,8 +22,8 @@ from basf2 import *
 # EvtMetaGen - generate event meta data
 evtmetagen = register_module('EvtMetaGen')
 
-evtruninfo = {'ExpList': [71, 71, 73, 73, 73], 'RunList': [3, 4, 10, 20, 30],
-              'EvtNumList': [4, 6, 2, 5, 3]}
+evtruninfo = {'expList': [71, 71, 73, 73, 73], 'runList': [3, 4, 10, 20, 30],
+              'evtNumList': [4, 6, 2, 5, 3]}
 evtmetagen.param(evtruninfo)
 
 # EvtMetaInfo - show event meta info

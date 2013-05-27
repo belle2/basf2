@@ -71,9 +71,9 @@ main = create_path()
 # exp 2 has no events and will be skipped
 # exp 3 will be stopped in event 3 by EvtMetaDataTest
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('ExpList', [0, 1, 2, 3])
-evtmetagen.param('RunList', [0, 1, 2, 3])
-evtmetagen.param('EvtNumList', [2, 2, 0, 5])
+evtmetagen.param('expList', [0, 1, 2, 3])
+evtmetagen.param('runList', [0, 1, 2, 3])
+evtmetagen.param('evtNumList', [2, 2, 0, 5])
 
 evtmetadatatest = EvtMetaDataTest()
 

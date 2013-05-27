@@ -34,7 +34,7 @@ class MinModule(Module):
 main = create_path()
 
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [2])
+evtmetagen.param('evtNumList', [2])
 main.add_module(evtmetagen)
 
 pGun = register_module('ParticleGun')

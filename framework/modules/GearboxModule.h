@@ -79,7 +79,7 @@ namespace Belle2 {
 
   private:
     std::vector<std::string> m_backends;   /**< The backend specifier. */
-    std::string m_filename;  /**< The toplevel filename for the parameters */
+    std::string m_fileName;  /**< The toplevel filename for the parameters */
 
   };
 }

@@ -34,9 +34,9 @@ GearboxModule::GearboxModule() : Module()
   m_backends.push_back("file:");
 
   //Parameter definition
-  addParam("Backends",  m_backends, "The backends to use when looking for xml data. A backend can also contain a search path after ':'. (If none is given, '/data' will be used.)",
+  addParam("backends",  m_backends, "The backends to use when looking for xml data. A backend can also contain a search path after ':'. (If none is given, '/data' will be used.)",
            m_backends);
-  addParam("Filename", m_filename, "The filename of the main xml file",
+  addParam("fileName", m_fileName, "The filename of the main xml file",
            string("geometry/Belle2.xml"));
 }
 
@@ -47,7 +47,7 @@ void GearboxModule::initialize()
 
   Gearbox& gearbox = Gearbox::getInstance();
   gearbox.setBackends(m_backends);
-  gearbox.open(m_filename);
+  gearbox.open(m_fileName);
 }
 
 void GearboxModule::beginRun()
@@ -58,5 +58,5 @@ void GearboxModule::beginRun()
 
   Gearbox& gearbox = Gearbox::getInstance();
   gearbox.close();
-  gearbox.open(m_filename);
+  gearbox.open(m_fileName);
 }

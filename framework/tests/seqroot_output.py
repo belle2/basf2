@@ -151,7 +151,7 @@ particlegun.param('independentVertices', False)
 
 # Create Event information
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [10])
+evtmetagen.param('evtNumList', [10])
 # Show progress of processing
 progress = register_module('Progress')
 # Load parameters
@@ -170,7 +170,7 @@ simulation.logging.log_level = LogLevel.ERROR  # ignore some warnings
 
 # Setting the option for all non particle gun modules:
 # want to process 100 MC events
-evtmetagen.param({'EvtNumList': [5], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [5], 'runList': [1]})
 
 # Set output filename
 output = register_module('SeqRootOutput')

@@ -145,7 +145,7 @@ param_g4sim = {'RegisterOptics': 1, 'PhotonFraction': 0.3,
                'TrackingVerbosity': 0}
 simulation.param(param_g4sim)
 
-evtmetagen.param({'EvtNumList': [5], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [5], 'runList': [1]})
 
 # Set output filename
 output = register_module('RootOutput')

@@ -36,9 +36,9 @@ class SelectOddEvents(Module):
 # register necessary modules
 evtmetagen = register_module('EvtMetaGen')
 # generate three events
-evtmetagen.param('ExpList', [0, 1])
-evtmetagen.param('RunList', [1, 2])
-evtmetagen.param('EvtNumList', [2, 1])
+evtmetagen.param('expList', [0, 1])
+evtmetagen.param('runList', [1, 2])
+evtmetagen.param('evtNumList', [2, 1])
 
 evtmetainfo = register_module('EvtMetaInfo')
 progress = register_module('Progress')

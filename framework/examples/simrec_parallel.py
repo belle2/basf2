@@ -23,9 +23,8 @@ particlegun.param('nTracks', 5)
 
 evtmetagen = register_module('EvtMetaGen')
 
-# Setting the option for all non particle gun modules:
 # want to process 100 MC events
-evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
+evtmetagen.param('evtNumList', [100])
 
 # Set output filename
 output = register_module('RootOutput')

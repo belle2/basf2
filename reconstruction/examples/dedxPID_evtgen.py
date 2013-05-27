@@ -52,19 +52,18 @@ genfit = register_module('GenFitter')
 main.add_module(genfit)
 dedx = register_module('DedxPID')
 dedx_params = {
-    'UseIndividualHits': True,
-    'RemoveLowest': 0.0,
-    'RemoveHighest': 0.8,
-    'OnlyPrimaryParticles': False,
-    'UsePXD': False,
-    'UseSVD': True,
-    'UseCDC': True,
-    'TrackDistanceThreshold': 4.0,
-    'EnableDebugOutput': True,
-    'PDFFile': os.path.join(basf2datadir,
-                            'reconstruction/dedxPID_PDFs_r3701_235k_events_upper_80perc_trunc.root'
-                            ),
-    'IgnoreMissingParticles': False,
+    'useIndividualHits': True,
+    'removeLowest': 0.0,
+    'removeHighest': 0.8,
+    'onlyPrimaryParticles': False,
+    'usePXD': False,
+    'useSVD': True,
+    'useCDC': True,
+    'trackDistanceThreshold': 4.0,
+    'enableDebugOutput': True,
+    'pdfFile': '/data/reconstruction/'
+               'dedxPID_PDFs_r3701_235k_events_upper_80perc_trunc.root',
+    'ignoreMissingParticles': False,
     }
 dedx.param(dedx_params)
 main.add_module(dedx)

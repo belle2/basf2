@@ -113,7 +113,7 @@ namespace Belle2 {
     bool m_useCDC; /**< use CDC hits for likelihood */
 
     //parameters: PDF configuration
-    std::string m_pdfFilename; /**< file containing the PDFs required for constructing a likelihood. */
+    std::string m_pdfFile; /**< file containing the PDFs required for constructing a likelihood. */
     bool m_ignoreMissingParticles; /**< Ignore particles for which no PDFs are found. */
 
   };

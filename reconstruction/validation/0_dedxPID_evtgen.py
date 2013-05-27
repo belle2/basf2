@@ -15,16 +15,16 @@ input.param('inputFileName', '../EvtGenSimRec.root')
 
 dedx = register_module('DedxPID')
 dedx_params = {  # use default PDF file
-    'UseIndividualHits': True,
-    'RemoveLowest': 0.15,
-    'RemoveHighest': 0.15,
-    'OnlyPrimaryParticles': False,
-    'UsePXD': False,
-    'UseSVD': True,
-    'UseCDC': True,
-    'TrackDistanceThreshold': 4.0,
-    'EnableDebugOutput': True,
-    'IgnoreMissingParticles': False,
+    'useIndividualHits': True,
+    'removeLowest': 0.15,
+    'removeHighest': 0.15,
+    'onlyPrimaryParticles': False,
+    'usePXD': False,
+    'useSVD': True,
+    'useCDC': True,
+    'trackDistanceThreshold': 4.0,
+    'enableDebugOutput': True,
+    'ignoreMissingParticles': False,
     }
 dedx.param(dedx_params)
 

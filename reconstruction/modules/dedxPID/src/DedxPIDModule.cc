@@ -72,20 +72,20 @@ DedxPIDModule::DedxPIDModule() : Module()
   setDescription("Extract dE/dx (and some other things) from Tracks&GFTrackCandidates and PXDClusters, SVDTrueHits (not digitized) and CDCHits.");
 
   //Parameter definitions
-  addParam("UseIndividualHits", m_useIndividualHits, "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", true);
-  addParam("RemoveLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded if UseIndividualHits is false", double(0.0));
-  addParam("RemoveHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded if UseIndividualHits is false", double(0.8));
+  addParam("useIndividualHits", m_useIndividualHits, "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", true);
+  addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded if UseIndividualHits is false", double(0.0));
+  addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded if UseIndividualHits is false", double(0.8));
 
-  addParam("OnlyPrimaryParticles", m_onlyPrimaryParticles, "Only save data for primary particles (as determined by MC truth)", false);
-  addParam("UsePXD", m_usePXD, "Use PXD hits for dE/dx calculation", false);
-  addParam("UseSVD", m_useSVD, "Use SVD hits for dE/dx calculation", true);
-  addParam("UseCDC", m_useCDC, "Use CDC hits for dE/dx calculation", true);
+  addParam("onlyPrimaryParticles", m_onlyPrimaryParticles, "Only save data for primary particles (as determined by MC truth)", false);
+  addParam("usePXD", m_usePXD, "Use PXD hits for dE/dx calculation", false);
+  addParam("useSVD", m_useSVD, "Use SVD hits for dE/dx calculation", true);
+  addParam("useCDC", m_useCDC, "Use CDC hits for dE/dx calculation", true);
 
-  addParam("TrackDistanceThreshold", m_trackDistanceThreshhold, "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
-  addParam("EnableDebugOutput", m_enableDebugOutput, "Wether to save information on tracks and associated hits and dE/dx values in DedxTrack objects.", false);
+  addParam("trackDistanceThreshold", m_trackDistanceThreshhold, "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
+  addParam("enableDebugOutput", m_enableDebugOutput, "Wether to save information on tracks and associated hits and dE/dx values in DedxTrack objects.", false);
 
-  addParam("PDFFile", m_pdfFilename, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", FileSystem::findFile("/data/reconstruction/dedxPID_PDFs_r3701_235k_events_upper_80perc_trunc.root"));
-  addParam("IgnoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
+  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", std::string("/data/reconstruction/dedxPID_PDFs_r3701_235k_events_upper_80perc_trunc.root"));
+  addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 }
 
 
@@ -98,7 +98,8 @@ void DedxPIDModule::initialize()
   m_trackID = 0;
   m_numExtrapolations = 0;
 
-  if (!m_enableDebugOutput and m_pdfFilename.empty()) {
+  m_pdfFile = FileSystem::findFile(m_pdfFile);
+  if (!m_enableDebugOutput and m_pdfFile.empty()) {
     B2ERROR("No PDFFile given and debug output disabled. DedxPID module will produce no output!");
   }
 
@@ -118,14 +119,14 @@ void DedxPIDModule::initialize()
   if (m_enableDebugOutput)
     StoreArray<DedxTrack>::registerPersistent();
 
-  if (!m_pdfFilename.empty()) {
+  if (!m_pdfFile.empty()) {
     StoreArray<DedxLikelihood>::registerPersistent();
     RelationArray::registerPersistent<Track, DedxLikelihood>();
 
     //load pdfs
-    TFile* pdf_file = new TFile(m_pdfFilename.c_str(), "READ");
+    TFile* pdf_file = new TFile(m_pdfFile.c_str(), "READ");
     if (!pdf_file->IsOpen())
-      B2FATAL("Couldn't open pdf file: " << m_pdfFilename);
+      B2FATAL("Couldn't open pdf file: " << m_pdfFile);
 
     //load dedx:momentum PDFs
     const char* suffix = (!m_useIndividualHits) ? "_trunc" : "";
@@ -403,7 +404,7 @@ void DedxPIDModule::event()
             //store data, if there's energy loss in last layer
             dedxTrack->m_dedx_avg[c_CDC] += layer_dedx;
             dedxTrack->addDedx(current_layer, total_distance, layer_dedx);
-            if (!m_pdfFilename.empty() and m_useIndividualHits) {
+            if (!m_pdfFile.empty() and m_useIndividualHits) {
               saveLogLikelihood(dedxTrack->m_logl, dedxTrack->m_p, layer_dedx, m_pdfs[c_CDC]);
             }
           }
@@ -480,7 +481,7 @@ void DedxPIDModule::event()
     }
 
     //save DedxLikelihood
-    if (!m_pdfFilename.empty()) {
+    if (!m_pdfFile.empty()) {
       DedxLikelihood* likelihoodObj = new(likelihood_array.nextFreeAddress()) DedxLikelihood(dedxTrack->m_logl);
       track->addRelationTo(likelihoodObj);
     }
@@ -597,7 +598,7 @@ template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const
       silicon_dedx.push_back(dedx);
       track->m_dedx_avg[current_detector] += dedx;
       track->addDedx(layer, total_distance, dedx);
-      if (!m_pdfFilename.empty() and m_useIndividualHits) {
+      if (!m_pdfFile.empty() and m_useIndividualHits) {
         saveLogLikelihood(track->m_logl, track->m_p, dedx, m_pdfs[current_detector]);
       }
     } else {

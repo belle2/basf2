@@ -24,9 +24,12 @@
 
 namespace boost {
   namespace python {
-    class object;
     class list;
     class dict;
+    namespace api {
+      class object;
+    }
+    using api::object;
   }
 }
 

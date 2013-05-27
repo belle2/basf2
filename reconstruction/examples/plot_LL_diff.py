@@ -64,6 +64,21 @@ class MinModule(Module):
                 event = Belle2.PyStoreObj("EventMetaData").obj().getEvent()
                 print "event: %d, track: %d" % (event, track.getArrayIndex())
 
+    def terminate(self):
+        """
+        Draw histograms on canvas and save image.
+        """
+        c1 = TCanvas("c", "c", 800, 600)
+        c1.Divide(2, 2)
+        c1.Show()
+        for i in range(4):
+            c1.cd(i + 1)
+            hist[i].Draw("colz")
+        #c1.Draw()
+
+        c1.SaveAs("ll_diff.png")
+        print "Output plots saved in ll_diff.png"
+
 
 main = create_path()
 
@@ -85,15 +100,3 @@ add_reconstruction(main)
 main.add_module(MinModule())
 
 process(main)
-
-## draw histograms on this canvas
-c1 = TCanvas("c", "c", 800, 600)
-c1.Divide(2, 2)
-c1.Show()
-for i in range(4):
-    c1.cd(i + 1)
-    hist[i].Draw("colz")
-#c1.Draw()
-
-c1.SaveAs("ll_diff.png")
-print "Output plots saved in ll_diff.png"

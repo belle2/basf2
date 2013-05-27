@@ -99,7 +99,7 @@ PXDRecoHit::PXDRecoHit(const PXDCluster* hit):
   fHitCov(0, 0) = hit->getUSigma() * hit->getUSigma();
   fHitCov(0, 1) = hit->getRho() * hit->getUSigma() * hit->getVSigma();
   fHitCov(1, 0) = hit->getRho() * hit->getUSigma() * hit->getVSigma();
-  fHitCov(1, 1) = hit->getUSigma() * hit->getUSigma();
+  fHitCov(1, 1) = hit->getVSigma() * hit->getVSigma();
   // Set physical parameters
   m_energyDep = hit->getCharge() * Const::ehEnergy;
   //m_energyDepError = 0;

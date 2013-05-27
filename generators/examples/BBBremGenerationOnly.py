@@ -16,9 +16,9 @@ set_log_level(LogLevel.INFO)
 main = create_path()
 
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [10000])  # we want to process 10 events
-evtmetagen.param('RunList', [1])  # from run number 1
-evtmetagen.param('ExpList', [1])  # and experiment number 1
+evtmetagen.param('evtNumList', [10000])  # we want to process 10 events
+evtmetagen.param('runList', [1])  # from run number 1
+evtmetagen.param('expList', [1])  # and experiment number 1
 
 ## Register the BBBremInput module
 bbbrem = register_module('BBBremInput')

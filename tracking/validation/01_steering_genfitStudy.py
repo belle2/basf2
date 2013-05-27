@@ -191,7 +191,7 @@ fitter.param(param_fitter)
 # ---------------------------------------------------------------
 # Setting the option for all non particle gun modules:
 # want to process 100 MC events
-evtmetagen.param({'EvtNumList': [nOfEvents], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [nOfEvents], 'runList': [1]})
 
 trackfitchecker = register_module('TrackFitChecker')
 # trackfitchecker.logging.log_level = LogLevel.INFO  # the reults of the statistical tests will only show up at info or debug level

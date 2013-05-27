@@ -30,8 +30,8 @@ pguninput = register_module('PGunInput')
 
 g4sim = register_module('FullSim')
 
-evtmetagen.param('EvtNumList', [1])
-evtmetagen.param('RunList', [1])
+evtmetagen.param('evtNumList', [1])
+evtmetagen.param('runList', [1])
 
 g4sim.param('EnableVisualization', True)
 g4sim.param('UICommands', ['/vis/open DAWNFILE', '/vis/drawVolume',

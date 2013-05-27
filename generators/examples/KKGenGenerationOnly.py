@@ -10,9 +10,9 @@ kkgeninput = register_module('KKGenInput')
 # kkgeninput.param('taudecaytableFile','./tau_decaytable.dat')
 
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [10])  # we want to process 100 events
-evtmetagen.param('RunList', [1])  # from run number 1
-evtmetagen.param('ExpList', [1])  # and experiment number 1
+evtmetagen.param('evtNumList', [10])  # we want to process 100 events
+evtmetagen.param('runList', [1])  # from run number 1
+evtmetagen.param('expList', [1])  # and experiment number 1
 mcparticleprinter = register_module('PrintTauTauMCParticles')
 mcparticleprinter.logging.log_level = LogLevel.INFO
 mcparticleprinter.param('onlyPrimaries', False)

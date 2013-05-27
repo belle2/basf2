@@ -28,7 +28,7 @@ g4sim = register_module('FullSim')
 #
 # ...EvtMetaGen...
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [10], 'runList': [1]})
 
 # ...GeoBuilder...
 geobuilder = register_module('Geometry')

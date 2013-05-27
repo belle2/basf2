@@ -8,9 +8,9 @@ set_log_level(LogLevel.ERROR)
 set_random_seed(1)
 # register the modules and set there options
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('ExpList', [0])
-evtmetagen.param('RunList', [1])
-evtmetagen.param('EvtNumList', [10000])
+evtmetagen.param('expList', [0])
+evtmetagen.param('runList', [1])
+evtmetagen.param('evtNumList', [10000])
 
 evtmetainfo = register_module('EvtMetaInfo')
 

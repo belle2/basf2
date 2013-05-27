@@ -78,9 +78,9 @@ g4sim = register_module('FullSim')
 simpleoutput = register_module('RootOutput')
 
 # Setting the option for all non-hepevt reader modules:
-evtmetagen.param('EvtNumList', [100])  # we want to process 100 events
-evtmetagen.param('RunList', [1])  # from run number 1
-evtmetagen.param('ExpList', [1])  # and experiment number 1
+evtmetagen.param('evtNumList', [100])  # we want to process 100 events
+evtmetagen.param('runList', [1])  # from run number 1
+evtmetagen.param('expList', [1])  # and experiment number 1
 
 # paramloader.param('InputFileXML', os.path.join(basf2datadir,
 # 'simulation/Belle2.xml'))

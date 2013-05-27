@@ -11,9 +11,9 @@ main = create_path()
 
 # specify number of events to be generated
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [1000])
-evtmetagen.param('RunList', [1])
-evtmetagen.param('ExpList', [1])
+evtmetagen.param('evtNumList', [1000])
+evtmetagen.param('runList', [1])
+evtmetagen.param('expList', [1])
 main.add_module(evtmetagen)
 
 # generate BBbar events

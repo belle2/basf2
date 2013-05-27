@@ -10,9 +10,9 @@ set_random_seed(3)
 
 # register the modules and set there options
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('ExpList', [0])
-evtmetagen.param('RunList', [1])
-evtmetagen.param('EvtNumList', [100])
+evtmetagen.param('expList', [0])
+evtmetagen.param('runList', [1])
+evtmetagen.param('evtNumList', [100])
 evtmetainfo = register_module('EvtMetaInfo')
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')

@@ -16,9 +16,9 @@ simpleoutput = register_module('RootOutput')
 mcparticleprinter = register_module('PrintMCParticles')
 
 # Setting the option for all non-hepevt reader modules:
-evtmetagen.param('EvtNumList', [3])  # we want to process 100 events
-evtmetagen.param('RunList', [1])  # from run number 1
-evtmetagen.param('ExpList', [1])  # and experiment number 1
+evtmetagen.param('evtNumList', [3])  # we want to process 100 events
+evtmetagen.param('runList', [1])  # from run number 1
+evtmetagen.param('expList', [1])  # and experiment number 1
 simpleoutput.param('outputFileName', 'EvtGenOutput.root')
 mcparticleprinter.set_log_level(0)
 

@@ -12,9 +12,9 @@ from basf2 import *
 evtmetagen = register_module('EvtMetaGen')
 
 # generate one event
-evtmetagen.param('ExpList', [0])
-evtmetagen.param('RunList', [1])
-evtmetagen.param('EvtNumList', [5000])
+evtmetagen.param('expList', [0])
+evtmetagen.param('runList', [1])
+evtmetagen.param('evtNumList', [5000])
 
 evtmetainfo = register_module('EvtMetaInfo')
 

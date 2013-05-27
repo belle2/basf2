@@ -12,7 +12,7 @@ def Events(
     ):
 
     evtmetagen = register_module('EvtMetaGen')
-    evtmetagen.param({'EvtNumList': numlist, 'RunList': runlist, 'ExpList'
+    evtmetagen.param({'evtNumList': numlist, 'runList': runlist, 'expList'
                      : explist})
     path.add_module(evtmetagen)
     progress = register_module('Progress')

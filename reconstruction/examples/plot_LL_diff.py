@@ -84,7 +84,7 @@ main = create_path()
 
 
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [20])
+evtmetagen.param('evtNumList', [20])
 main.add_module(evtmetagen)
 
 evtgeninput = register_module('EvtGenInput')

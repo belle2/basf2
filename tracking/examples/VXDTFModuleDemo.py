@@ -20,9 +20,9 @@ set_log_level(LogLevel.ERROR)
 set_random_seed(rSeed)
 
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('ExpList', [0])
-evtmetagen.param('RunList', [1])
-evtmetagen.param('EvtNumList', [numEvents])
+evtmetagen.param('expList', [0])
+evtmetagen.param('runList', [1])
+evtmetagen.param('evtNumList', [numEvents])
 
 evtmetainfo = register_module('EvtMetaInfo')
 

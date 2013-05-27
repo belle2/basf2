@@ -66,7 +66,7 @@ particlegun = register_module('ParticleGun')
 showMCPart = ShowMCParticles()
 
 # Specify number of events to generate
-evtmetagen.param({'EvtNumList': [10000], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [10000], 'runList': [1]})
 
 # Set parameters for particlegun
 particlegun.param({  # Generate 5 tracks But vary the number of tracks

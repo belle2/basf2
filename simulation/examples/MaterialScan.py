@@ -12,7 +12,7 @@ geometry = register_module('Geometry')
 simulation = register_module('FullSim')
 
 # Create one Event in one Run
-evtmetagen.param({'RunList': [1], 'EvtNumList': [1]})
+evtmetagen.param({'runList': [1], 'evtNumList': [1]})
 
 # Restrict Geometry to certain components, in this case only PXD and SVD
 geometry.param('Components', ['PXD', 'SVD'])

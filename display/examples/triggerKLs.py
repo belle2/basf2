@@ -42,9 +42,9 @@ class PyTrigger(Module):
 evtmetagen = register_module('EvtMetaGen')
 
 # generate one event
-evtmetagen.param('ExpList', [0])
-evtmetagen.param('RunList', [1])
-evtmetagen.param('EvtNumList', [20])
+evtmetagen.param('expList', [0])
+evtmetagen.param('runList', [1])
+evtmetagen.param('evtNumList', [20])
 
 evtmetainfo = register_module('EvtMetaInfo')
 

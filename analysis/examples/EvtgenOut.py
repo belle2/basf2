@@ -6,9 +6,9 @@ set_log_level(LogLevel.ERROR)
 
 # Events
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [1000])  # we want to process 1000 events
-evtmetagen.param('RunList', [1])  # from run number 1
-evtmetagen.param('ExpList', [1])  # and experiment number 1
+evtmetagen.param('evtNumList', [1000])  # we want to process 1000 events
+evtmetagen.param('runList', [1])  # from run number 1
+evtmetagen.param('expList', [1])  # and experiment number 1
 
 # Generator
 evtgeninput = register_module('EvtGenInput')

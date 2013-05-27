@@ -37,7 +37,7 @@ set_log_level(LogLevel.ERROR)
 ## Register the event meta generator and set the number of events to a very #
 # high number which exceeds the number of events in the input file.
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'EvtNumList': [10000000], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [10000000], 'runList': [1]})
 
 ## Register the SADInput module and specify the location of the SAD # input
 # file. The file can be downloaded from the TWiki.

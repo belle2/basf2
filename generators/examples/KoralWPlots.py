@@ -75,7 +75,7 @@ class ShowMCParticles(Module):
 
 
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [100], 'runList': [1]})
 
 ## Register the BHWideInput module
 koralw = register_module('KoralWInput')

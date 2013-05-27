@@ -31,9 +31,9 @@ evtgeninput.param('userDECFile', os.environ['BELLE2_LOCAL_DIR']
 
 # specify number of events to be generated in job
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [nOfEvents])  # process nOfEvents events
-evtmetagen.param('RunList', [1])  # from run number 1
-evtmetagen.param('ExpList', [1])  # and experiment number 1
+evtmetagen.param('evtNumList', [nOfEvents])  # process nOfEvents events
+evtmetagen.param('runList', [1])  # from run number 1
+evtmetagen.param('expList', [1])  # and experiment number 1
 
 # ---------------------------------------------------------------
 # Show progress of processing

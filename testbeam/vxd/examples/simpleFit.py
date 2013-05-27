@@ -11,16 +11,16 @@ set_log_level(LogLevel.ERROR)
 set_random_seed(3)
 
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('ExpList', [0])
-evtmetagen.param('RunList', [1])
-evtmetagen.param('EvtNumList', [1000])
+evtmetagen.param('expList', [0])
+evtmetagen.param('runList', [1])
+evtmetagen.param('evtNumList', [1000])
 
 # Show progress of processing
 progress = register_module('Progress')
 
 gearbox = register_module('Gearbox')
 # use simple testbeam geometry
-gearbox.param('Filename', 'testbeam/vxd/VXD.xml')
+gearbox.param('fileName', 'testbeam/vxd/VXD.xml')
 
 geometry = register_module('Geometry')
 # only the tracking detectors will be simulated. Makes this example much faster

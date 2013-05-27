@@ -86,7 +86,7 @@ printHits = PrintPXDHits()
 printHits.set_log_level(LogLevel.INFO)
 
 # Specify number of events to generate
-evtmetagen.param({'EvtNumList': [5], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [5], 'runList': [1]})
 
 # Set parameters for particlegun
 particlegun.param({  # Generate 5 tracks on average

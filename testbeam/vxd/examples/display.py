@@ -10,14 +10,14 @@ from subprocess import call
 set_log_level(LogLevel.ERROR)
 
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('ExpList', [0])
-evtmetagen.param('RunList', [1])
-evtmetagen.param('EvtNumList', [100])
+evtmetagen.param('expList', [0])
+evtmetagen.param('runList', [1])
+evtmetagen.param('evtNumList', [100])
 evtmetainfo = register_module('EvtMetaInfo')
 
 gearbox = register_module('Gearbox')
 # use simple testbeam geometry
-gearbox.param('Filename', 'testbeam/vxd/VXD.xml')
+gearbox.param('fileName', 'testbeam/vxd/VXD.xml')
 
 geometry = register_module('Geometry')
 # only the tracking detectors will be simulated. Makes this example much faster
@@ -86,7 +86,6 @@ trackfitter.param('UseClusters', True)
 display = register_module('Display')
 
 # The Options parameter is a combination of:
-# A autoscale PXD/SVD errors - use when hits are too small to be seen
 # D draw detectors - draw simple detector representation (with different size)
 #   for each hit
 # H draw track hits
@@ -101,29 +100,29 @@ display = register_module('Display')
 # interactively by removing its checkmark in the 'Eve' tab.
 #
 # This option only makes sense when ShowGFTracks is true
-display.param('Options', 'AHTM')  # default
+display.param('options', 'HTM')  # default
 
 # should hits always be assigned to a particle with c_PrimaryParticle flag?
 # with this option off, many tracking hits will be assigned to secondary e-
-display.param('AssignHitsToPrimaries', 0)
+display.param('assignHitsToPrimaries', 0)
 
 # show all primary MCParticles?
-display.param('ShowAllPrimaries', True)
+display.param('showAllPrimaries', True)
 
 # show all charged MCParticles? (SLOW)
-display.param('ShowCharged', False)
+display.param('showCharged', False)
 
 # show tracks?
-display.param('ShowGFTracks', True)
+display.param('showGFTracks', True)
 
 # save events non-interactively (without showing window)?
-display.param('Automatic', False)
+display.param('automatic', False)
 
 # Use clusters to display tracks
-display.param('UseClusters', True)
+display.param('useClusters', True)
 
 # Display the testbeam geometry rather than Belle II extract
-display.param('FullGeometry', True)
+display.param('fullGeometry', True)
 
 # Create paths
 main = create_path()

@@ -98,7 +98,7 @@ svdclust = register_module('SVDClusterizer')
 output = register_module('RootOutput')
 
 # Specify number of events to generate
-evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [10], 'runList': [1]})
 
 # Set parameters for particlegun
 particlegun.param({  # Generate 5 tracks on average

@@ -28,7 +28,7 @@ output = register_module('RootOutput')
 output.param('outputFileName', 'HitErrorGenOutput.root')
 
 # Specify number of events to generate
-evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [10], 'runList': [1]})
 
 # Set parameters for particlegun
 particlegun.param({  # Generate 5 tracks on average
@@ -63,7 +63,7 @@ particlegun.param({  # Generate 5 tracks on average
 # Select subdetectors to be built
 # geometry.param('Components', ['PXD'])
 
-gearbox.param('Filename', 'testbeam/pxd/SimpleDEPFETModule_Belle2.xml')
+gearbox.param('fileName', 'testbeam/pxd/SimpleDEPFETModule_Belle2.xml')
 
 # pxddigi.param('statisticsFilename', 'digi.root')
 pxddigi.param('ElectronicEffects', True)

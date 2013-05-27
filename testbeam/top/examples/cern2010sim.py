@@ -106,7 +106,7 @@ outfile = 'TOPbeamtest05.root'
 
 # Number of events to generate
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'EvtNumList': nevents, 'RunList': [1]})
+evtmetagen.param({'evtNumList': nevents, 'runList': [1]})
 
 # particle gun
 particlegun = register_module('ParticleGun')
@@ -118,7 +118,7 @@ progress = register_module('Progress')
 
 # Gearbox
 gearbox = register_module('Gearbox')
-gearbox.param('Filename', 'testbeam/top/cern2010/TOP.xml')
+gearbox.param('fileName', 'testbeam/top/cern2010/TOP.xml')
 
 # Geometry
 geometry = register_module('Geometry')

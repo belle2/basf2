@@ -26,7 +26,7 @@ svddigi = register_module('SVDDigitizer')
 svdclust = register_module('SVDClusterizer')
 
 # Specify number of events to generate
-evtmetagen.param({'EvtNumList': [1000], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [1000], 'runList': [1]})
 
 # Set parameters for particlegun
 particlegun.param({

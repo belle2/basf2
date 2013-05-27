@@ -33,7 +33,7 @@ particlegun.param('independentVertices', True)
 
 # Create Event information
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [100], 'runList': [1]})
 
 # Show progress of processing
 progress = register_module('Progress')
@@ -41,7 +41,7 @@ progress = register_module('Progress')
 # Load parameters from xml
 gearbox = register_module('Gearbox')
 # This file contains the VXD beam test geometry including the magnetic field
-gearbox.param('Filename', 'testbeam/vxd/VXD.xml')
+gearbox.param('fileName', 'testbeam/vxd/VXD.xml')
 
 # Create geometry
 geometry = register_module('Geometry')

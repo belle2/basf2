@@ -163,13 +163,13 @@ particlegun.param('independentVertices', True)
 
 # Create Event information
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [100], 'runList': [1]})
 
 # Show progress of processing
 progress = register_module('Progress')
 # Load parameters from xml - load the geometry file which uses 50x50 um matrix
 gearbox = register_module('Gearbox')
-gearbox.param('Filename', 'pxd/testbeam/TBBelle2-Geometry.xml')
+gearbox.param('fileName', 'pxd/testbeam/TBBelle2-Geometry.xml')
 
 # Create geometry
 geometry = register_module('Geometry')

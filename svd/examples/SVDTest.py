@@ -57,7 +57,7 @@ particlegun.param('nTracks', 1)
 print_params(particlegun)
 
 # Set the number of events to be processed (100 events)
-evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [100], 'runList': [1]})
 
 # Set output filename
 output.param('outputFileName', 'SVDTestOutput.root')

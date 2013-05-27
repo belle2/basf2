@@ -29,13 +29,13 @@ particlegun.param('independentVertices', True)
 
 # Create Event information
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [10], 'runList': [1]})
 
 # Show progress of processing
 progress = register_module('Progress')
 # Load parameters from xml
 gearbox = register_module('Gearbox')
-gearbox.param('Filename', 'testbeam/TB2012.xml')
+gearbox.param('fileName', 'testbeam/TB2012.xml')
 
 # Create geometry
 geometry = register_module('Geometry')

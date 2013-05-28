@@ -737,6 +737,20 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     mctrack.fIndex = particle->getIndex() - 1;
     m_mcparticleTracks[particle].track = new TEveTrack(&mctrack, m_trackpropagator);
 
+    //add daughter vertices - improves track rendering as lost momentum is taken into account
+    for (int iDaughter = particle->getFirstDaughter(); iDaughter <= particle->getLastDaughter(); iDaughter++) {
+      if (iDaughter == 0)
+        continue; //no actual daughter
+
+      const MCParticle* daughter = StoreArray<MCParticle>()[iDaughter - 1];
+
+      TEvePathMarkD refMark(TEvePathMarkD::kDaughter);
+      refMark.fV.Set(daughter->getProductionVertex());
+      refMark.fP.Set(daughter->getMomentum());
+      refMark.fTime = daughter->getProductionTime();
+      m_mcparticleTracks[particle].track->AddPathMark(refMark);
+    }
+
     //neutrals and very short-lived particles should stop somewhere
     //(can result in wrong shapes for particles stopped in the detector, so not used there)
     if (TMath::Nint(particle->getCharge()) == 0 or !particle->hasStatus(MCParticle::c_StoppedInDetector)) {

@@ -345,7 +345,7 @@ TVector3 RaveVertexFitter::getPos(VecSize vertexId) const
 //  }
 }
 
-double RaveVertexFitter::getWeight(int trackId, VecSize vertexId)const
+double RaveVertexFitter::getWeight(unsigned int trackId, VecSize vertexId)const
 {
   isVertexIdValid(vertexId);
 //  if (m_gfRave == true) {

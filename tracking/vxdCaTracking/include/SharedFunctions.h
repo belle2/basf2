@@ -31,6 +31,8 @@ namespace Belle2 {
       */
     std::vector< std::pair<double, double> > getHitErrors();
 
+    template<typename T_type1> void expandRootBranch(const T_type1& variable, const std::string& branchName, const std::string& treeName, const std::string& rootFileName); /**< can be used for exporting data into a branch of a rootFile */
+
     struct PositionInfo {
       TVector3 hitPosition; /**< contains global hitPosition */
       double sigmaX; /**< error in x-direction of hitPosition in global coordinates */

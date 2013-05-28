@@ -57,6 +57,7 @@ param_vxdtf = {
     'TESTERexpandedTestingRoutines': True,
     'qiSmear': False,
     }
+    # 'writeToRoot': True,
 vxdtf.param(param_vxdtf)
 
 mctrackfinder = register_module('MCTrackFinder')
@@ -85,9 +86,9 @@ analyzer.logging.debug_level = 11
 param_analyzer = {'printExtentialAnalysisData': False}  # set true if PRINTINFO is wanted
 analyzer.param(param_analyzer)
 
-display = register_module('Display')
-param_Display = {'ShowGFTrackCands': 1, 'UseClusters': 1}
-display.param(param_Display)
+# display = register_module('Display')
+# param_Display = {'showGFTrackCands': 1, 'UseClusters': 1}
+# display.param(param_Display)
 
 # Create paths
 main = create_path()

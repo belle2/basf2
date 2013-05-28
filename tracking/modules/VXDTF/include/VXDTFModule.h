@@ -32,6 +32,7 @@
 #include "tracking/vxdCaTracking/ClusterInfo.h"
 #include "tracking/vxdCaTracking/LittleHelper.h"
 #include "tracking/vxdCaTracking/FullSecID.h"
+#include "tracking/vxdCaTracking/SharedFunctions.h"
 
 
 //C++ base / C++ stl:
@@ -47,6 +48,8 @@
 //root:
 #include <TVector3.h>
 #include <TRandom.h>
+#include <TTree.h>
+#include <TFile.h>
 
 //boost:
 #include <boost/lambda/lambda.hpp>
@@ -406,6 +409,11 @@ namespace Belle2 {
     /** safe way of importing cutoff values from the xml-file */
     double getXMLValue(GearDir& quantiles, std::string& valueType, std::string& filterType); // -> TODO: dirty little helper
 
+    /** general Function to write data into a root file*/
+    void writeToRootFile(double variable);
+
+//    /** general Function to write data into a root file*/
+//    void VXDTFModule::writeToRootFile(const Tracking::T_type1& variable, const std::string& branchName, const std::string &treeName);
     /** random generator function */
 //    ptrdiff_t rngWrapper(ptrdiff_t i);
   protected:
@@ -524,6 +532,11 @@ namespace Belle2 {
     double m_PARAMsmearSigma; /**< bigger values deliver broader distribution*/
     bool m_PARAMstoreBrokenQI;/**< if true, TC survives QI-calculation-process even if fit was not possible */
     bool m_TESTERexpandedTestingRoutines; /**< set true if you want to export expanded infos of TCs for further analysis */
+    bool m_PARAMwriteToRoot; /**< if true, a rootFile named by m_PARAMrootFileName will be filled with info */
+    std::string m_PARAMrootFileName; /**< name of rootFile which will be filled if m_PARAMwriteToRoot is set to true */
+    TFile* m_rootFilePtr; /**< pointer at root file used for p-value-output */
+    TTree* m_treePtr; /**< pointer at root tree used for p-value-output */
+    double m_rootPvalues; /**< used for storing pValues in a root file */
 
     std::string m_PARAMcalcQIType; /**< allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit' */
     int m_calcQiType; /**< is set by m_PARAMcalcQIType and defines which qi type shall be calculated */

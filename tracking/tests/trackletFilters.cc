@@ -106,7 +106,7 @@ namespace Belle2 {
     EXPECT_EQ(f3h.calcSign(l, g, f), f3h.calcSign(g, f, a));
 
     TrackletFilters aFilter = TrackletFilters();
-    double clapPhi = 0, clapR = 0, chi2 = 0, estimatedRadius = 0;
+    double clapPhi = 0, clapR = 0, chi2, estimatedRadius = 0;
 
     aFilter.resetValues(&maxiStuff);
     EXPECT_FALSE(aFilter.ziggZaggXY());

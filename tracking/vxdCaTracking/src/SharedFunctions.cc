@@ -56,7 +56,6 @@ vector< pair<double, double> > Tracking::getHitErrors()
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
   set< VxdID > layers = aGeometry.getLayers(); // SensorInfoBase::SensorType sensortype=SensorInfoBase::VXD
   BOOST_FOREACH(VxdID layer, layers) { // only one sensor of each layer is enough. taking first sensor of first ladder of each layer
-    vector< pair<double, double> > layerErrors;
     const set<VxdID>& ladders = aGeometry.getLadders(layer);
     VxdID ladder = *ladders.begin();
     const set<VxdID>& sensors = aGeometry.getSensors(ladder);

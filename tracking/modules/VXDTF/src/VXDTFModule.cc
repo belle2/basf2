@@ -30,7 +30,6 @@
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include "tracking/vxdCaTracking/FilterID.h"
-#include "tracking/vxdCaTracking/SharedFunctions.h"
 
 //genfit
 
@@ -280,6 +279,8 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("storeBrokenQI", m_PARAMstoreBrokenQI, "if true, TC survives QI-calculation-process even if fit was not possible", bool(true));
   addParam("KFBackwardFilter", m_KFBackwardFilter, "determines whether the kalman filter moves inwards or backwards, 'True' means inwards", bool(false));
   addParam("TESTERexpandedTestingRoutines", m_TESTERexpandedTestingRoutines, "set true if you want to export expanded infos of TCs for further analysis (setting to false means that the DataObject called 'VXDTFInfoBoard' will not be stored)", bool(false));
+  addParam("writeToRoot", m_PARAMwriteToRoot, "set true if you want to export the p-values of the fitters in a root file named by parameter 'rootFileName'", bool(false));
+  addParam("rootFileName", m_PARAMrootFileName, "fileName used for p-value export. Will be ignored if parameter 'writeToRoot' is false (standard)", string("VXDTFoutput"));
 
 
   /// temporarily disabled (maybe used later)
@@ -366,6 +367,16 @@ void VXDTFModule::initialize()
   } else {
     B2ERROR("VXDTFModule::initialize: chosen qiType " << m_PARAMcalcQIType << " is unknown, setting standard to circleFit...")
     m_calcQiType = 2;
+  }
+
+  if (m_PARAMwriteToRoot == true) {
+    m_PARAMrootFileName += ".root";
+    m_rootFilePtr = new TFile(m_PARAMrootFileName.c_str(), "RECREATE");
+    m_treePtr = new TTree("m_treePtr", "aTree");
+    m_treePtr->Branch("pValues", &m_rootPvalues);
+  } else {
+    m_rootFilePtr = NULL;
+    m_treePtr = NULL;
   }
 }
 
@@ -1872,6 +1883,12 @@ void VXDTFModule::endRun()
 
 void VXDTFModule::terminate()
 {
+  if (m_treePtr != NULL) {
+    m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
+    m_treePtr->Write();
+    m_rootFilePtr->Close();
+  }
+
   BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
     BOOST_FOREACH(secMapEntry aSector, currentPass->sectorMap) {
       delete aSector.second;
@@ -2917,6 +2934,7 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<C
       if (m_calcQiType == 2) {
         if (chi2 < 0) { chi2 = 0; }
         double probability = TMath::Prob(chi2, numOfCurrentHits - 3);
+        writeToRootFile(probability);
         if (m_PARAMqiSmear == true) { probability = m_littleHelperBox.smearNormalizedGauss(probability); }
         (*currentTC)->setTrackQuality(probability);
         (*currentTC)->setFitSucceeded(true);
@@ -3474,4 +3492,13 @@ double VXDTFModule::getXMLValue(GearDir& quantiles, string& valueType, string& f
     aValue = 0;
   }
   return aValue;
+}
+
+
+void VXDTFModule::writeToRootFile(double pValue)
+{
+  if (m_PARAMwriteToRoot == true) {
+    m_rootPvalues = pValue;
+    m_treePtr->Fill();
+  }
 }

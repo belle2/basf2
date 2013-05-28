@@ -32,6 +32,7 @@
 #include <rave/MagneticField.h>
 #include <rave/ConstantMagneticField.h>
 #include <rave/VertexFactory.h>
+#include <rave/KinematicTreeFactory.h>
 
 namespace Belle2 {
 
@@ -45,6 +46,7 @@ namespace Belle2 {
 
     public:
       friend class RaveVertexFitter;
+//      friend class RaveKinematicVertexFitter;
       /** get the pointer to the instance to get/set any of options stored in RaveSetup*/
       static RaveSetup* getInstance() {
         if (s_instance == NULL) {
@@ -53,22 +55,12 @@ namespace Belle2 {
         return s_instance;
       }
       /** Set everything up so everything needed for vertex fitting is there. Must be called before RaveVertexFitter can be used*/
-      static void initialize(std::string options = "default");
+      static void initialize(int verbosity = 1);
       /** The beam spot position and covarance is known you can set it here so that and a vertex in the beam spot should be fitted you can set it here */
       void setBeamSpot(TVector3 beamSpot, TMatrixDSym beamSpotCov);
-      /** Select the propagation method used during vertex fitting.  True selects Genfit propation (can handle inhomogenoios mangetic field and material) false selects Rave's vacuum propagator*/
-      void setGFPropagation(bool setGFProp = true) {
-        m_gfPropagation = setGFProp;
-      }
-      /** Sets the verbosity level of the Rave Vertex fitter library. Will be passed to Rave when an actual vertex fit is executed  */
-      void setRaveVerbosity(int verbosity) {
-        m_raveVerbosity = verbosity;
-      }
+
       /** Print() writes all RaveSetup member variables to the terminal  */
-      void Print();
-
-
-
+      static void Print();
 
     protected:
 
@@ -76,17 +68,17 @@ namespace Belle2 {
       ~RaveSetup();
       static RaveSetup* s_instance;
 
-      bool m_gfRave;
-      bool m_gfPropagation;
-      int m_raveVerbosity;
-
       bool m_useBeamSpot;
       TVector3 m_beamSpot;
       TMatrixDSym m_beamSpotCov;
 
       rave::VertexFactory* m_raveVertexFactory;
 
-      GFRaveVertexFactory* m_GFRaveVertexFactory;
+//      GFRaveVertexFactory* m_GFRaveVertexFactory;
+
+//      rave::KinematicTreeFactory* m_raveKinematicTreeFactory;
+
+
 
 
     };

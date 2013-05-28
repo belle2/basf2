@@ -74,7 +74,7 @@ void analysisValidationModule::initialize()
   StoreArray<ECLGamma>       gammas(m_ECLgammasColName);
   StoreArray<ECLShower>      showers;
 
-  RaveSetup::initialize("GFRave");
+  RaveSetup::initialize(2);
   StoreArray<Particle>::registerPersistent(m_ParticlesColName);
   RelationArray::registerPersistent<Particle, Track>(m_ParticlesColName, m_tracksColName);
   RelationArray::registerPersistent<Particle, ECLGamma>();

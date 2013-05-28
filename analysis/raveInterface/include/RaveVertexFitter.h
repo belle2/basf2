@@ -83,7 +83,7 @@ namespace Belle2 {
       TMatrixDSym getCov(VecSize vertexId = 0) const;
 
       /** get the weight Rave assigned to a specific input track. The trackId is determined by the order of the addTrack calls. So the first track added with addTrack has trackId = 0, the next has 1 etc */
-      double getWeight(unsigned int trackId, VecSize vertexId = 0) const;
+      double getWeight(int trackId, VecSize vertexId = 0) const;
 
       /** get the ids of the tracks Rave associated with a specific vertex. The trackId is determined by the order of the addTrack calls. So the first track added with addTrack has trackId = 0, the next has 1 etc */
       std::vector<int> getTrackIdsForOneVertex(VecSize vertexId = 0) const;

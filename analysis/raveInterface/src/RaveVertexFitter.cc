@@ -345,7 +345,7 @@ TVector3 RaveVertexFitter::getPos(VecSize vertexId) const
 //  }
 }
 
-double RaveVertexFitter::getWeight(unsigned int trackId, VecSize vertexId)const
+double RaveVertexFitter::getWeight(int trackId, VecSize vertexId)const
 {
   isVertexIdValid(vertexId);
 //  if (m_gfRave == true) {
@@ -353,7 +353,7 @@ double RaveVertexFitter::getWeight(unsigned int trackId, VecSize vertexId)const
 //  } else {
 
   const std::vector < std::pair < float, rave::Track > > & weightedTracks = m_raveVertices[vertexId].weightedTracks();
-  for (int i = 0; i not_eq weightedTracks.size(); ++i) {
+  for (unsigned int i = 0; i not_eq weightedTracks.size(); ++i) {
     if (weightedTracks[i].second.id() == trackId) {
 //          std::cerr << "returing weight for track with x coord: " <<weightedTracks[i].second.state().x() << std::endl;
       return weightedTracks[i].first;

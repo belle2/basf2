@@ -26,12 +26,13 @@ namespace Belle2 {
    *   alignment subdivisions of one sensor.
    *
    * Internal use of a union gets rid of all the bit shifting which would be
-   * neccessary to represent the id as one unsigned short and get all the
+   * neccessary to represent the id as one baseType and get all the
    * components out of it. Disadvantage is that it is not guaranteed to be
    * portable, but neither is bit shifting
    */
   class VxdID {
   public:
+    typedef unsigned short baseType;
     enum {
       /** Number of bits available to represent a layer */
       LayerBits   = 3,
@@ -57,11 +58,11 @@ namespace Belle2 {
     };
 
     /** Constructor using the unique id */
-    VxdID(unsigned short id = 0) {
+    VxdID(baseType id = 0) {
       m_id.id = id;
     }
     /** Constructor using layer, ladder and sensor ids */
-    VxdID(unsigned short layer, unsigned short ladder, unsigned short sensor, unsigned short segment = 0) {
+    VxdID(baseType layer, baseType ladder, baseType sensor, baseType segment = 0) {
       m_id.parts.layer   = layer;
       m_id.parts.ladder  = ladder;
       m_id.parts.sensor  = sensor;
@@ -74,10 +75,10 @@ namespace Belle2 {
 
     /** Assignment operator */
     VxdID& operator=(const VxdID& b)        { m_id = b.m_id; return *this; }
-    /** Assignment from unsigned short */
-    VxdID& operator=(unsigned short id)     { m_id.id = id; return *this; }
-    /** Convert to unsigned short */
-    operator unsigned short() const         { return getID(); }
+    /** Assignment from baseType */
+    VxdID& operator=(baseType id)     { m_id.id = id; return *this; }
+    /** Convert to baseType */
+    operator baseType() const         { return getID(); }
     /** Convert to string */
     operator std::string() const;
     /** Check for equality */
@@ -86,41 +87,41 @@ namespace Belle2 {
     bool operator<(const VxdID& b) const    { return getID() < b.getID(); }
 
     /** Get the unique id */
-    unsigned short getID() const            { return m_id.id; }
+    baseType getID() const            { return m_id.id; }
     /** Get the layer id */
-    unsigned short getLayerNumber() const         { return m_id.parts.layer; }
+    baseType getLayerNumber() const         { return m_id.parts.layer; }
     /** Get the ladder id */
-    unsigned short getLadderNumber() const        { return m_id.parts.ladder; }
+    baseType getLadderNumber() const        { return m_id.parts.ladder; }
     /** Get the sensor id */
-    unsigned short getSensorNumber() const        { return m_id.parts.sensor; }
+    baseType getSensorNumber() const        { return m_id.parts.sensor; }
     /** Get the sensor segment */
-    unsigned short getSegmentNumber() const       { return m_id.parts.segment; }
+    baseType getSegmentNumber() const       { return m_id.parts.segment; }
 
     /** Set the unique id */
-    void setID(unsigned short id)           { m_id.id = id; }
+    void setID(baseType id)           { m_id.id = id; }
     /** Set the layer id */
-    void setLayerNumber(unsigned short layer)     { m_id.parts.layer  = layer;  }
+    void setLayerNumber(baseType layer)     { m_id.parts.layer  = layer;  }
     /** Set the ladder id */
-    void setLadderNumber(unsigned short ladder)   { m_id.parts.ladder = ladder; }
+    void setLadderNumber(baseType ladder)   { m_id.parts.ladder = ladder; }
     /** Set the sensor id */
-    void setSensorNumber(unsigned short sensor)   { m_id.parts.sensor = sensor; }
+    void setSensorNumber(baseType sensor)   { m_id.parts.sensor = sensor; }
     /** Set the sensor segment */
-    void setSegmentNumber(unsigned short segment) { m_id.parts.segment = segment; }
+    void setSegmentNumber(baseType segment) { m_id.parts.segment = segment; }
 
   private:
 
     union {
       /** Unique id */
-unsigned id: Bits;
+baseType id: Bits;
       struct {
         /** Segment id */
-unsigned segment: SegmentBits;
+baseType segment: SegmentBits;
         /** Sensor id */
-unsigned sensor: SensorBits;
+baseType sensor: SensorBits;
         /** Ladder id */
-unsigned ladder: LadderBits;
+baseType ladder: LadderBits;
         /** Layer id */
-unsigned layer: LayerBits;
+baseType layer: LayerBits;
       } parts /**< Struct to contain all id components */;
     } m_id; /**< Union to store the ID and all components in one go. */
   };

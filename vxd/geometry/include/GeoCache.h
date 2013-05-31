@@ -76,7 +76,7 @@ namespace Belle2 {
     private:
 #ifndef __CINT__
       /** Hash map to store pointers to all existing SensorInfos with constant lookup complexity */
-      typedef boost::unordered_map<Belle2::VxdID, SensorInfoBase*> SensorInfoMap;
+      typedef boost::unordered_map<VxdID::baseType, SensorInfoBase*> SensorInfoMap;
 #endif
       /** Map to store a set of unique VxdIDs belonging to one VxdID. Like ladders belong to layers, etc. */
       typedef std::map<Belle2::VxdID, std::set<Belle2::VxdID> > SensorHierachy;

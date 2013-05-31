@@ -104,24 +104,26 @@ void ECLMCMatchingModule::event()
   int nMcParticles = mcParticles.getEntries();
   for (int iPart = 0; iPart < nMcParticles; ++iPart) {
     /*
-        if (mcParticles[iPart]->getMother() == NULL)
-          cout << "Event " << m_nEvent << " primary track ID " << mcParticles[iPart]->getArrayIndex()
-               << " pdg " << mcParticles[iPart]->getPDG()
-               << " p " << mcParticles[iPart]->getMomentum().Mag()
-               << " theta " << mcParticles[iPart]->getMomentum().Theta() * 180 / M_PI
-               << " phi " <<   mcParticles[iPart]->getMomentum().Phi() * 180 / M_PI
-               << " vertex R & Z " << mcParticles[iPart]->getProductionVertex().Perp() << " " << mcParticles[iPart]->getProductionVertex().z() << endl;
-        else
-          cout << "Event " << m_nEvent << "Track " << mcParticles[iPart]->getArrayIndex()
-               << " PDG " << mcParticles[iPart]->getPDG()
-               << " P " << mcParticles[iPart]->getMomentum().Mag()
-               << " vx " << mcParticles[iPart]->getProductionVertex().Perp() << " " << mcParticles[iPart]->getProductionVertex().z()
-               << " Mother " << mcParticles[iPart]->getMother()->getArrayIndex()
-               << " PDG " << mcParticles[mcParticles[iPart]->getMother()->getArrayIndex()]->getPDG()
-               << " P " << mcParticles[mcParticles[iPart]->getMother()->getArrayIndex()]->getMomentum().Mag() << endl;
+            if (mcParticles[iPart]->getMother() == NULL)
+              cout << "Event " << m_nEvent << " primary track ID " << mcParticles[iPart]->getArrayIndex()
+                   << " pdg " << mcParticles[iPart]->getPDG()
+                   << " p " << mcParticles[iPart]->getMomentum().Mag()
+                   << " theta " << mcParticles[iPart]->getMomentum().Theta() * 180 / M_PI
+                   << " phi " <<   mcParticles[iPart]->getMomentum().Phi() * 180 / M_PI
+                   << " vertex R & Z " << mcParticles[iPart]->getProductionVertex().Perp() << " " << mcParticles[iPart]->getProductionVertex().z() << endl;
+            else
+              cout << "Event " << m_nEvent << "Track " << mcParticles[iPart]->getArrayIndex()
+                   << " PDG " << mcParticles[iPart]->getPDG()
+                   << " P " << mcParticles[iPart]->getMomentum().Mag()
+                   << " vx " << mcParticles[iPart]->getProductionVertex().Perp() << " " << mcParticles[iPart]->getProductionVertex().z()
+                   << " Mother " << mcParticles[iPart]->getMother()->getArrayIndex()
+                   << " PDG " << mcParticles[mcParticles[iPart]->getMother()->getArrayIndex()]->getPDG()
+                   << " P " << mcParticles[mcParticles[iPart]->getMother()->getArrayIndex()]->getMomentum().Mag() << endl;
     */
 
     bool adhoc_StableInGeneratorFlag(mcParticles[iPart]->hasStatus(MCParticle::c_StableInGenerator));
+
+
     if (mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle) && ! adhoc_StableInGeneratorFlag
         && mcParticles[iPart]->getFirstDaughter() > 0) {
       for (int daughterIndex = mcParticles[iPart]->getFirstDaughter() - 1;
@@ -132,9 +134,17 @@ void ECLMCMatchingModule::event()
         }
       }
     }
+
+
+
+
+//    cout<<"mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle) "<<mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle)<<endl;
+//    cout<<"adhoc_StableInGeneratorFlag "<<adhoc_StableInGeneratorFlag<<endl;
+
     // skip particles decayed in the generator
     if (mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle)
         && !adhoc_StableInGeneratorFlag) continue;
+
 
     // fill primary particles as the origins
     if (mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle)
@@ -143,7 +153,14 @@ void ECLMCMatchingModule::event()
       if (mcParticles[iPart]->getArrayIndex() == -1)
       {     eclPrimaryMap.insert(pair<int, int>(iPart, iPart));}
       else {eclPrimaryMap.insert(pair<int, int>(mcParticles[iPart]->getArrayIndex(), mcParticles[iPart]->getArrayIndex()));}
-      //cout<<"mom "<<mcParticles[iPart]->getArrayIndex() <<endl;
+//      cout<<"mom "<<mcParticles[iPart]->getArrayIndex() <<endl;
+    } else if (mcParticles[iPart]->getMother() == NULL) { //Beam BG from ROF files treated as primary particles
+
+      if (mcParticles[iPart]->getArrayIndex() == -1)
+      {     eclPrimaryMap.insert(pair<int, int>(iPart, iPart));}
+      else {eclPrimaryMap.insert(pair<int, int>(mcParticles[iPart]->getArrayIndex(), mcParticles[iPart]->getArrayIndex()));}
+//      cout<<"mom "<<mcParticles[iPart]->getArrayIndex() <<endl;
+
     } else {
       // set primary of its mother for others
       //assert(mcParticles[iPart]->getMother());
@@ -155,9 +172,13 @@ void ECLMCMatchingModule::event()
                 % mcParticles[iPart]->getMother()->getArrayIndex());
         eclPrimaryMap.insert(pair<int, int>(mcParticles[iPart]->getArrayIndex(), mcParticles[iPart]->getArrayIndex()));
       }
-      //cout<<"mom "<<mcParticles[iPart]->getMother()->getArrayIndex() <<" "<<mcParticles[iPart]->getArrayIndex()<<endl;
+//      cout<<"mom "<<mcParticles[iPart]->getMother()->getArrayIndex() <<" "<<mcParticles[iPart]->getArrayIndex()<<endl;
     }
+
+
   }
+
+
 
   StoreArray<ECLHit> eclHitArray;
   RelationArray eclHitRel(mcParticles, eclHitArray);

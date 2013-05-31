@@ -222,7 +222,7 @@ void ROFBuilderModule::event()
       break;
     case 4 : addSimHitsToROF<TOPSimHit>();
       break;
-    case 5 : //addSimHitsToROF<ARICHSimHit>();
+    case 5 : addSimHitsToROF<ARICHSimHit>();
       break;
     case 6 : addSimHitsToROF<ECLHit>();
       break;

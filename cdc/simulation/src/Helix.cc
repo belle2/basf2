@@ -907,8 +907,9 @@ Helix::checkValid(void)
   }
   if (!m_helixValid) {
     if (m_a[0] != 0.0 || m_a[1] != 0.0 || m_a[2] != 0.0 ||
-        m_a[3] != 0.0 || m_a[4] != 0.0)
+        m_a[3] != 0.0 || m_a[4] != 0.0) {
       DEBUG_PRINT;
+    }
   }
 
 }
@@ -916,8 +917,8 @@ Helix::checkValid(void)
 void Helix::debugHelix(void) const
 {
   if (!m_helixValid) {
-    if (ms_check_range)DEBUG_PRINT;
-    if (ms_throw_exception) throw invalidhelix;
+    if (ms_check_range) {DEBUG_PRINT;}
+    if (ms_throw_exception) { throw invalidhelix;}
   }
 }
 

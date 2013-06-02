@@ -285,9 +285,10 @@ namespace Belle2 {
           lr = 1;
           if ((posW.cross(posTrack)).z() < 0.) lr = 0;
 
-          int saveIndex = -999;
+          //          int saveIndex = -999;
           if (nWires == 1) {
-            saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, momIn, posW, posIn, posOut, posTrack, lr, speed);
+            //            saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, momIn, posW, posIn, posOut, posTrack, lr, speed);
+            saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, momIn, posW, posIn, posOut, posTrack, lr, speed);
           } else {
             G4int cel1 = wires[i] + 1;
             G4int cel2 = cel1;
@@ -346,7 +347,8 @@ namespace Belle2 {
               const G4ThreeVector x_Out(xint[0]*cm, xint[1]*cm, xint[2]*cm);
               const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
-              saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, posTrack, lr, speed);
+              //              saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, posTrack, lr, speed);
+              saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, posTrack, lr, speed);
               tofBefore += (sint - s1) / speedInCmPerNs;
               eLossInCell = eLoss * (sint - s1) / s_in_layer;
               kinEnergyBefore -= eLossInCell;
@@ -368,7 +370,8 @@ namespace Belle2 {
               const G4ThreeVector x_In(vent[0]*cm, vent[1]*cm, vent[2]*cm);
               const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
-              saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, posTrack, lr, speed);
+              //              saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, posTrack, lr, speed);
+              saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, posTrack, lr, speed);
             }
           }
           //setSeenInDetectorFlag(aStep, MCParticle::c_SeenInCDC);
@@ -1158,7 +1161,9 @@ L10:
 
     G4double dr, fi0, cpa, dz, tanl;
     G4double x0, y0, z0;
-    G4double xc, yc, r, chrg;
+    // "chrg" removed by M. U. June, 2nd, 2013
+    //    G4double xc, yc, r, chrg;
+    G4double xc, yc, r;
     G4double xwm, ywm;
     G4double sinfi0, cosfi0, sinfi0fi, cosfi0fi;
 
@@ -1168,11 +1173,13 @@ L10:
     G4double xx[3], dxx[3], ddxx[3];
     G4double xxtdxx, dxxtdxx, xxtddxx;
 
+
     G4double fst = 0.0;
     G4double f, fderiv, deltafi, fact, eval;
-    G4double fist;
-
+    // Commented by M. U. June, 2nd, 2013
+    //    G4double fist;
     G4double dx1, dy1, dx2, dy2, crs, dot;
+
 
     G4int iflg;
 
@@ -1237,7 +1244,8 @@ L10:
       r      = alpha / cpa;
       cosfi0 = cos(fi0);
       sinfi0 = sin(fi0);
-      chrg   = 1.; if (r < 0.) chrg = -1.;
+      // Commented by M. U. June, 2nd, 2013
+      //      chrg   = 1.; if (r < 0.) chrg = -1.;
       xc  = x0 + (dr + r) * cosfi0;
       yc  = y0 + (dr + r) * sinfi0;
       dx1 = x0 - xc;
@@ -1327,8 +1335,8 @@ line1:
     Mvopr(ndim,  xx, tt, ddxx, tmp, 1);
     xxtddxx = tmp[0];
     fderiv = cx * ddxx[0] + cy * ddxx[1] + cz * ddxx[2] + dxxtdxx + xxtddxx;
-
-    fist    = fi;
+    // Commented by M. U. June, 2nd, 2013
+    //    fist    = fi;
     deltafi = f / fderiv;
     fi     -= fact * deltafi;
     fst     = f;

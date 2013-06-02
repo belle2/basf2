@@ -110,9 +110,10 @@ void CDCGeometryPar::read()
   double angle = coverParams.getLength("Cover[2]/Angle");
   double thick = coverParams.getLength("Cover[2]/Thickness");
   double zpos = coverParams.getLength("Cover[2]/PosZ");
-  double length1;
-  if (angle != 0) length1 = fabs(zpos - (R2 - R1) / tan(angle));
-  else length1 = fabs(zpos);
+  //  Commented by M. U. June 2nd, 2013
+  //  double length1;
+  //  if (angle != 0) length1 = fabs(zpos - (R2 - R1) / tan(angle));
+  //  else length1 = fabs(zpos);
   R1 = coverParams.getLength("Cover[4]/InnerR1");
   R2 = coverParams.getLength("Cover[4]/InnerR2");
   angle = coverParams.getLength("Cover[4]/Angle");

@@ -202,7 +202,7 @@ void ECLMCMatchingModule::event()
     map<int, int>::iterator iter = eclPrimaryMap.find(eclHitRel[index].getFromIndex());
     if (iter != eclPrimaryMap.end()) {
       PrimaryIndex = iter->second;
-    } else cout << "Event " << m_nEvent << "CantFind Track in eclPrimaryMap " << eclHitRel[index].getFromIndex() << endl;
+    } //else cout << "Event " << m_nEvent << "CantFind Track in eclPrimaryMap " << eclHitRel[index].getFromIndex() << endl;
 
     for (int hit = 0; hit < (int)eclHitRel[index].getToIndices().size(); hit++) {
       ECLHit* aECLHit = eclHitArray[eclHitRel[index].getToIndex(hit)];

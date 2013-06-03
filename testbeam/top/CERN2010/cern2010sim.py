@@ -118,7 +118,7 @@ progress = register_module('Progress')
 
 # Gearbox
 gearbox = register_module('Gearbox')
-gearbox.param('fileName', 'testbeam/top/cern2010/TOP.xml')
+gearbox.param('fileName', 'testbeam/top/CERN2010/TOP.xml')
 
 # Geometry
 geometry = register_module('Geometry')
@@ -129,11 +129,11 @@ simulation = register_module('FullSim')
 
 # TOP digitization
 TOPdigi = register_module('TOPDigitizer')
-TOPdigi.param('ELjitter', 0)
-TOPdigi.param('T0jitter', 21.5e-3)
+TOPdigi.param('electronicJitter', 0)
+TOPdigi.param('timeZeroJitter', 21.5e-3)
 
 # Output
-output = register_module('RootOutput')
+output = register_module('TOPCern2010Output')
 output.param('outputFileName', outfile)
 
 # suppress messages and warnings during processing:

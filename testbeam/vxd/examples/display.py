@@ -47,7 +47,6 @@ particlegun.param('yVertexParams', [1.0, 0.0])
 particlegun.param('zVertexParams', [0.0, 0.0])
 particlegun.param('independentVertices', True)
 
-
 g4sim = register_module('FullSim')
 # this is needed for the MCTrackFinder to work correctly
 g4sim.param('StoreAllSecondaries', True)

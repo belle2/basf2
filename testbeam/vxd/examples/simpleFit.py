@@ -51,7 +51,6 @@ particlegun.param('yVertexParams', [1.0, 0.0])
 particlegun.param('zVertexParams', [0.0, 0.0])
 particlegun.param('independentVertices', True)
 
-
 g4sim = register_module('FullSim')
 # this is needed for the MCTrackFinder to work correctly
 g4sim.param('StoreAllSecondaries', True)
@@ -70,7 +69,6 @@ PXDDIGI.param('PoissonSmearing', True)
 PXDDIGI.param('ElectronicEffects', True)
 
 PXDCLUST = register_module('PXDClusterizer')
-
 
 mctrackfinder = register_module('MCTrackFinder')
 mctrackfinder.logging.log_level = LogLevel.WARNING

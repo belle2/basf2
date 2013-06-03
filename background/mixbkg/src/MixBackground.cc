@@ -67,7 +67,7 @@ void MixBackground::addFile(const std::string& filename)
   TChainElement* chEl = 0;
   int index = 0;
   while ((chEl = (TChainElement*)next())) {
-    TFile file(chEl->GetTitle());
+    TFile* file = TFile::Open(chEl->GetTitle());
     chain.GetEntry(index);
 
     //Check if all files have the same MCParticleWriteMode to ensure consistency.

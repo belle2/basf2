@@ -69,10 +69,20 @@ namespace Belle2 {
     //                 Implementation
     //-----------------------------------------------------------------
 
-    GeoARICHBtestCreator::GeoARICHBtestCreator()
-    {
-
-    }
+    GeoARICHBtestCreator::GeoARICHBtestCreator():
+      m_sensitive(new SensitiveDetector),
+      m_sensitiveAero(new SensitiveAero),
+      m_runno(0),
+      m_neve(0),
+      m_rotation(0),
+      m_rx(0),
+      m_ry(0),
+      m_aerosupport(0),
+      m_aerogeldx(0),
+      m_framedx(0),
+      m_rotation1(0),
+      m_configuration(0)
+    {};
 
     GeoARICHBtestCreator::~GeoARICHBtestCreator()
     {

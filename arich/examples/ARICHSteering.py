@@ -50,7 +50,7 @@ output = register_module('RootOutput')
 
 # EvtMetaGen parameters
 # Set the number of events to be processed (10 event)
-evtmetagen.param({'evtNumList': [10000], 'runList': [1]})
+evtmetagen.param({'evtNumList': [10], 'runList': [1]})
 # ============================================================================
 
 # Set output filename
@@ -138,7 +138,7 @@ mctrackfinder.param(param_mctrackfinder)
 # ARICH Reconstruction parameters
 arichRECO.logging.log_level = LogLevel.DEBUG
 arichRECO.logging.debug_level = 50
-arichRECO.param('InputTrackType', 0)
+arichRECO.param('inputTrackType', 0)
 # =============================================================================
 
 # Do the simulation

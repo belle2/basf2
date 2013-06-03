@@ -79,8 +79,8 @@ namespace Belle2 {
 
     private:
       // Input collections
-      std::string m_MCColName;         /**< Input collection name */
-      std::string m_TracksColName;     /**< MDST tracks */
+      std::string m_mcColName;         /**< Input collection name */
+      std::string m_tracksColName;     /**< MDST tracks */
       std::string m_extHitsColName;    /**< Extrapolated tracks */
 
       // Output collection
@@ -91,13 +91,13 @@ namespace Belle2 {
       double m_timeCPU;                /**< CPU time.     */
       int    m_nRun;                   /**< Run number.   */
       int    m_nEvent;                 /**< Event number. */
-      double m_trackPosRes;            /**< Track position resolution from tracking. */
-      double m_trackAngRes;            /**< Track direction resolution from tracking. */
-      double m_bkgLevel;               /**< Photon background level. */
-      double m_singleRes;              /**< Resolution of single photon emission angle. */
-      std::vector<double> m_aeroMerit; /**< Vector of aerogel layer figures of merit. */
+      double m_trackPositionResolution;/**< Track position resolution from tracking. */
+      double m_trackAngleResolution;   /**< Track direction resolution from tracking. */
+      double m_backgroundLevel;        /**< Photon background level. */
+      double m_singleResolution;       /**< Resolution of single photon emission angle. */
+      std::vector<double> m_aerogelMerit; /**< Vector of aerogel layer figures of merit. */
       int m_inputTrackType;            /**< Input tracks from the tracking (0) or from MCParticles>AeroHits (1). */
-      int    m_Debug;                  /**< Debug Level For ARICH   */
+      int    m_debug;                  /**< Debug Level For ARICH, >2 means beamtest*/
 
       //! Function fills the internal vector ARICHTracks from ext module
       /*!

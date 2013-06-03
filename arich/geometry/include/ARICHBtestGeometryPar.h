@@ -34,7 +34,23 @@ namespace Belle2 {
   class ARICHTracking {
   public:
     //! Default Constructor
-    ARICHTracking() {};
+    ARICHTracking():
+      atdc(0) {
+      for (int i = 0; i < 4; i++) tdc[i] = 0;
+      for (int i = 0; i < 2; i++) {
+        slp[i] = 0;
+        offset[i] = 0;
+        cutll[i] = 0;
+        cutul[i] = 0;
+        diff[i] = 0;
+        sum[i] = 0;
+        status[i] = 0;
+      }
+      for (int i = 0; i < 3; i++) {
+        pos[i] = 0;
+        reco[i] = 0;
+      }
+    };
     //! Default Constructor
     ~ARICHTracking() {};
     //! TDC of the 4 cathode signals

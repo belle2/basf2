@@ -72,16 +72,16 @@ averageagel = int(options.avgagel)
 set_log_level(LogLevel.INFO)
 
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [int(options.neve)])
-evtmetagen.param('RunList', [int(options.runno)])
-evtmetagen.param('ExpList', [1])
+evtmetagen.param('evtNumList', [int(options.neve)])
+evtmetagen.param('runList', [int(options.runno)])
+evtmetagen.param('expList', [1])
 
 # Load XML parameters
 paramloader = register_module('Gearbox')
 
 xmlgeometry = 'file://%s/arich/modules/arichBtest/data/%s/arichBtest%s.xml' \
     % (os.getcwd(), options.year, options.year)
-paramloader.param('Filename', xmlgeometry)
+paramloader.param('fileName', xmlgeometry)
 print xmlgeometry
 # paramloader.param('Backends', ['sql:'])
 # paramloader.param('Filename',
@@ -130,8 +130,8 @@ geosaver = register_module('ExportGeometry')
 geosaver.param('Filename', 'Belle2Geo.root')
 
 arichrec = register_module('ARICHReconstructor')
-arichrec.param('InputTrackType', 1)
-arichrec.param('Debug', 3)
+arichrec.param('inputTrackType', 1)
+arichrec.param('debug', 3)
 
 profile = register_module('Profile')
 profile.param('outputFileName', 'profileusage.ps')

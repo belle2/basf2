@@ -93,12 +93,13 @@ namespace Belle2 {
 
     //! Constructor from hit in 'ext' module
     /*!
-      \param extHit track hit on aerogel aluminium support plate
-      \param charge charge of the particle
+      \param extHit track hit on aerogel aluminum support plate
+      \param charge charge of the reconstructed, fitted particle
+      \param pdgCode In case of simulation; PDG code of the MC generated particle.
       \param trackID number of track in event
       \param aeroHitIndex Used to create relation from ARICHAeroHit(simulation) to ARICHLikelihood.
     */
-    ARICHTrack(const ExtHit* extHit, int charge, int trackID, int aeroHitIndex);
+    ARICHTrack(const ExtHit* extHit, int charge, int pdgCode, int trackID, int aeroHitIndex);
 
     //! destructor
     ~ARICHTrack() {

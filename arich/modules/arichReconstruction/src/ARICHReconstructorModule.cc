@@ -57,7 +57,7 @@ namespace Belle2 {
       m_timeCPU(0),
       m_nRun(0),
       m_nEvent(0),
-      m_Debug(0)
+      m_debug(0)
     {
       // Set description()
       setDescription("ARICHReconstructor");
@@ -67,17 +67,17 @@ namespace Belle2 {
       defMerit.push_back(30.0);
       defMerit.push_back(30.0);
       // Add parameters
-      addParam("Debug", m_Debug, "Debug Level for ARICH", 0);
-      addParam("InputColName", m_MCColName, "Input from MC", string(""));
-      addParam("TracksColName", m_TracksColName, "Mdst tracks", string(""));
-      addParam("ExtHitsColName", m_extHitsColName, "Extrapolated tracks", string(""));
-      addParam("OutputColName", m_outColName, "Output: ARICH Likelihoods",  string(""));
-      addParam("TrackPositionResolution", m_trackPosRes, "Resolution of track position on aerogel plane", 1.0 * Unit::mm);
-      addParam("TrackAngleResolution", m_trackAngRes, "Resolution of track direction angle on aerogel plane", 1.0 * Unit::mrad);
-      addParam("BackgroundLevel", m_bkgLevel, "Background level in photon hits per m^2", 0.0);
-      addParam("SinglePhotonResolution", m_singleRes, "Single photon resolution without pad", 0.03 * Unit::mm);
-      addParam("AerogelFigureOfMerit", m_aeroMerit, "Aerogel figure of merit", defMerit);
-      addParam("InputTrackType", m_inputTrackType, "Input tracks from the tracking (0) or from simulation (1)", 0);
+      addParam("debug", m_debug, "Debug level for ARICH", 0);
+      addParam("MCColName", m_mcColName, "Input from MC", string(""));
+      addParam("tracksColName", m_tracksColName, "Mdst tracks", string(""));
+      addParam("extHitsColName", m_extHitsColName, "Extrapolated tracks", string(""));
+      addParam("outColName", m_outColName, "Output: ARICH Likelihoods",  string(""));
+      addParam("trackPositionResolution", m_trackPositionResolution, "Resolution of track position on aerogel plane", 1.0 * Unit::mm);
+      addParam("trackAngleResolution", m_trackAngleResolution, "Resolution of track direction angle on aerogel plane", 1.0 * Unit::mrad);
+      addParam("backgroundLevel", m_backgroundLevel, "Background level in photon hits per m^2", 0.0);
+      addParam("singleResolution", m_singleResolution, "Single photon resolution without pad", 0.03 * Unit::mm);
+      addParam("aerogelMerit", m_aerogelMerit, "Aerogel figure of merit", defMerit);
+      addParam("inputTrackType", m_inputTrackType, "Input tracks from the tracking (0) or from simulation (1)", 0);
     }
 
     ARICHReconstructorModule::~ARICHReconstructorModule()
@@ -90,12 +90,12 @@ namespace Belle2 {
       // Initialize variables
       m_nRun    = 0 ;
       m_nEvent  = 0 ;
-      m_ana = new ARICHReconstruction(m_Debug);
-      m_ana->setBackgroundLevel(m_bkgLevel);
-      m_ana->setTrackPositionResolution(m_trackPosRes);
-      m_ana->setTrackAngleResolution(m_trackAngRes);
-      m_ana->setSinglePhotonResolution(m_singleRes);
-      m_ana->setAerogelFigureOfMerit(m_aeroMerit);
+      m_ana = new ARICHReconstruction(m_debug);
+      m_ana->setBackgroundLevel(m_backgroundLevel);
+      m_ana->setTrackPositionResolution(m_trackPositionResolution);
+      m_ana->setTrackAngleResolution(m_trackAngleResolution);
+      m_ana->setSinglePhotonResolution(m_singleResolution);
+      m_ana->setAerogelFigureOfMerit(m_aerogelMerit);
       // Print set parameters
       printModuleParams();
 
@@ -103,8 +103,8 @@ namespace Belle2 {
       m_timeCPU = clock() * Unit::us;
 
       StoreArray<ARICHLikelihood>::registerPersistent(m_outColName);
-      RelationArray::registerPersistent<ARICHAeroHit, ARICHLikelihood>(m_MCColName, m_outColName);
-      RelationArray::registerPersistent<Track, ARICHLikelihood>(m_TracksColName, m_outColName);
+      RelationArray::registerPersistent<ARICHAeroHit, ARICHLikelihood>(m_mcColName, m_outColName);
+      RelationArray::registerPersistent<Track, ARICHLikelihood>(m_tracksColName, m_outColName);
       RelationArray::registerPersistent<ExtHit, ARICHLikelihood>(m_extHitsColName, m_outColName);
     }
 
@@ -121,9 +121,9 @@ namespace Belle2 {
         B2DEBUG(100, "New part of ARICHReconstructorModule::event");
 
         // Input: reconstructed tracks
-        StoreArray<Track> mdstTracks(m_TracksColName);
+        StoreArray<Track> mdstTracks(m_tracksColName);
         StoreArray<ExtHit> extHits(m_extHitsColName);
-        StoreArray<ARICHAeroHit> arichAeroHits(m_MCColName);
+        StoreArray<ARICHAeroHit> arichAeroHits(m_mcColName);
 
         // Output - likelihoods
         StoreArray<ARICHLikelihood> arichLikelihoods(m_outColName);
@@ -173,7 +173,7 @@ namespace Belle2 {
         // Get the collection of ARICHSimHits from the DataStore.
         //------------------------------------------------------
 
-        StoreArray<ARICHAeroHit> arichAeroHits(m_MCColName);
+        StoreArray<ARICHAeroHit> arichAeroHits(m_mcColName);
 
         // Output: ARICH likelihoods
         StoreArray<ARICHLikelihood> arichLikelihoods(m_outColName);
@@ -240,7 +240,7 @@ namespace Belle2 {
       ExtDetectorID myDetID = EXT_ARICH; // arich
       int pdgCode = abs(hypothesis.getPDGCode());
 
-      StoreArray<Track> Tracks(m_TracksColName);
+      StoreArray<Track> Tracks(m_tracksColName);
 
       for (int itra = 0; itra < Tracks.getEntries(); ++itra) {
         const Track* track = Tracks[itra];
@@ -266,7 +266,7 @@ namespace Belle2 {
           if (extHit->getCopyID() != 12345) continue; // aerogel Al support plate
           if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
           B2DEBUG(100, "getTracks: z = " << extHit->getPosition().Z());
-          ARICHTrack trk(extHit, charge, (int)itra, aeroHitIndex);
+          ARICHTrack trk(extHit, charge, truePDGCode, (int)itra, aeroHitIndex);
           tracks.push_back(trk);
         }
       }

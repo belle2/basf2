@@ -36,7 +36,15 @@ namespace Belle2 {
       return p_B4ARICHBtestGeometryParDB;
     }
 
-    ARICHBtestGeometryPar::ARICHBtestGeometryPar()
+    ARICHBtestGeometryPar::ARICHBtestGeometryPar():
+      m_mwpc(new ARICHTracking),
+      m_trackingShift(TVector3()),
+      m_rotationCenter(TVector3()),
+      m_frameRotation(TRotation()),
+      m_averageAgel(0),
+      m_nPads(0),
+      m_init(0),
+      m_simple(0)
     {
       clear();
     }

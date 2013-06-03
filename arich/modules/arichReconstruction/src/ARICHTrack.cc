@@ -37,7 +37,7 @@ ARICHTrack::ARICHTrack(const ARICHAeroHit& aeroHit)
   }
 }
 
-ARICHTrack::ARICHTrack(const ExtHit* extHit, int charge, int trackID, int aeroHitIndex) :
+ARICHTrack::ARICHTrack(const ExtHit* extHit, int charge, int pdgCode, int trackID, int aeroHitIndex) :
   m_originalPosition(0, 0, 0),
   m_originalDirection(0, 0, 0),
   m_originalMomentum(-1),
@@ -45,7 +45,7 @@ ARICHTrack::ARICHTrack(const ExtHit* extHit, int charge, int trackID, int aeroHi
   m_reconstructedDirection(extHit->getMomentum().Unit()),
   m_reconstructedMomentum(extHit->getMomentum().Mag()),
   m_PDGCharge(charge),
-  m_PDGEncoding(extHit->getPdgCode()),
+  m_PDGEncoding(pdgCode),
   m_trackID(trackID),
   m_extHitID(extHit->getArrayIndex()),
   m_identity(Lund2Type(m_PDGEncoding)),

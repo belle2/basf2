@@ -51,7 +51,7 @@ SmearPrimaryVertexModule::SmearPrimaryVertexModule() : Module()
   addParam("sigma_pvz", m_sigma_ip_z, "Apply spread (standard deviation) of Primary Vertex in z (cm)", 0.6000);
 
   addParam("angle_pv_yz", m_new_angle_ip_yz, "Angle of rotation of Primary Vertex Profile wrt. x-axis (yz-plane) in (rad)", 0.000);
-  addParam("angle_pv_zx", m_new_angle_ip_zx, "Angle of rotation of Primary Vertex Profile wrt. y-axis (zx-plane) in (rad)", 0.011);
+  addParam("angle_pv_zx", m_new_angle_ip_zx, "Angle of rotation of Primary Vertex Profile wrt. y-axis (zx-plane) in (rad)", 0.000);
   addParam("angle_pv_xy", m_new_angle_ip_xy, "Angle of rotation of Primary Vertex Profile wrt. z-axis (xy-plane) in (rad)", 0.000);
 }
 

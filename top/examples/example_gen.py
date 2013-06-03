@@ -8,9 +8,9 @@ main = create_path()
 
 # specify number of events to be generated in job
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [10])  # we want to process 10 events
-evtmetagen.param('RunList', [1])  # from run number 1
-evtmetagen.param('ExpList', [1])  # and experiment number 1
+evtmetagen.param('evtNumList', [10])  # we want to process 10 events
+evtmetagen.param('runList', [1])  # from run number 1
+evtmetagen.param('expList', [1])  # and experiment number 1
 main.add_module(evtmetagen)
 
 # generate BBbar events

@@ -71,20 +71,15 @@ namespace Belle2 {
       setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
       // Add parameters
-      addParam("TracksColName", m_TracksColName, "Mdst tracks",
-               string(""));
-      addParam("ExtHitsColName", m_extHitsColName, "Extrapolated tracks",
-               string(""));
-      addParam("TOPDigitColName", m_topDigitColName, "TOP digits",
-               string(""));
-      addParam("TOPLikelihoodColName", m_topLogLColName, "TOP likelihoods",
-               string(""));
-      addParam("TOPBarHitColName", m_barHitColName, "MCParticle hits at bars",
-               string(""));
-      addParam("DebugLevel", m_debugLevel, "Debug level", 0);
-      addParam("minBkgPerBar", m_minBkgPerQbar,
-               "minimal number of background photons per bar", 0.0);
-      addParam("scaleN0", m_ScaleN0, "scale factor for N0", 1.0);
+      addParam("inputTracks", m_inputTracks, "Mdst tracks", string(""));
+      addParam("inputExtHits", m_inputExtHits, "Extrapolated tracks", string(""));
+      addParam("inputDigits", m_inputDigits, "TOP digits", string(""));
+      addParam("inputBarHits", m_inputBarHits, "MCParticle hits at bars", string(""));
+      addParam("outputLikelihoods", m_outputLikelihoods, "TOP likelihoods", string(""));
+      addParam("debugLevel", m_debugLevel, "Debug level", 0);
+      addParam("minBkgPerBar", m_minBkgPerBar,
+               "Minimal number of background photons per bar", 0.0);
+      addParam("scaleN0", m_scaleN0, "Scale factor for N0", 1.0);
 
       for (int i = 0; i < c_Nhyp; i++) {m_Masses[i] = 0;}
 
@@ -107,13 +102,13 @@ namespace Belle2 {
       printModuleParams();
 
       // Data store registration
-      StoreArray<TOPLikelihood>::registerPersistent(m_topLogLColName);
+      StoreArray<TOPLikelihood>::registerPersistent(m_outputLikelihoods);
       RelationArray::registerPersistent<Track, TOPLikelihood>
-      (m_TracksColName, m_topLogLColName);
+      (m_inputTracks, m_outputLikelihoods);
       RelationArray::registerPersistent<TOPLikelihood, ExtHit>
-      (m_topLogLColName, m_extHitsColName);
+      (m_outputLikelihoods, m_inputExtHits);
       RelationArray::registerPersistent<TOPBarHit, TOPLikelihood>
-      (m_barHitColName, m_topLogLColName);
+      (m_inputBarHits, m_outputLikelihoods);
 
       // Configure TOP detector
       TOPconfigure();
@@ -129,17 +124,17 @@ namespace Belle2 {
     {
       // input: digitized photons
 
-      StoreArray<TOPDigit> topDigits(m_topDigitColName);
+      StoreArray<TOPDigit> topDigits(m_inputDigits);
 
       // input: reconstructed tracks
 
-      StoreArray<Track> Tracks(m_TracksColName);
-      StoreArray<ExtHit> extHits(m_extHitsColName);
-      StoreArray<TOPBarHit> barHits(m_barHitColName);
+      StoreArray<Track> Tracks(m_inputTracks);
+      StoreArray<ExtHit> extHits(m_inputExtHits);
+      StoreArray<TOPBarHit> barHits(m_inputBarHits);
 
       // output: log likelihoods
 
-      StoreArray<TOPLikelihood> toplogL(m_topLogLColName);
+      StoreArray<TOPLikelihood> toplogL(m_outputLikelihoods);
       toplogL.create();
 
       // output: relations
@@ -159,7 +154,7 @@ namespace Belle2 {
 
       // create reconstruction object
 
-      TOPreco reco(c_Nhyp, m_Masses, m_minBkgPerQbar, m_ScaleN0);
+      TOPreco reco(c_Nhyp, m_Masses, m_minBkgPerBar, m_scaleN0);
 
       // clear reconstruction object
 
@@ -317,7 +312,7 @@ namespace Belle2 {
       int pdgCode = abs(chargedStable.getPDGCode());
       double mass = chargedStable.getMass();
 
-      StoreArray<Track> Tracks(m_TracksColName);
+      StoreArray<Track> Tracks(m_inputTracks);
 
       for (int itra = 0; itra < Tracks.getEntries(); ++itra) {
         const Track* track = Tracks[itra];

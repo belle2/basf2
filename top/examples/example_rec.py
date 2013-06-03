@@ -19,7 +19,8 @@ components = [
     'PXD',
     'SVD',
     'CDC',
-    'TOP']
+    'TOP',
+    ]
 
 # Load XML files
 gearbox = register_module('Gearbox')

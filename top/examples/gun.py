@@ -15,7 +15,7 @@ set_log_level(LogLevel.ERROR)
 
 # Event information, set the number of events to generate
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
+evtmetagen.param({'evtNumList': [10], 'runList': [1]})
 
 # particle gun: multiple tracks
 particlegun = register_module('ParticleGun')
@@ -80,7 +80,7 @@ ext = register_module('Ext')
 # TOP reconstruction
 topdigi = register_module('TOPDigitizer')
 topreco = register_module('TOPReconstructor')
-topreco.param('DebugLevel', 1)  # remove this line or set to 0 to suppress printout
+topreco.param('debugLevel', 1)  # remove this line or set to 0 to suppress printout
 
 # Output
 output = register_module('RootOutput')

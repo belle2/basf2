@@ -71,10 +71,10 @@ namespace Belle2 {
 
     private:
 
-      std::string m_inColName;    /**< Input collection name */
-      std::string m_outColName;   /**< Output collection name */
-      double m_T0jitter;          /**< r.m.s of T0 jitter */
-      double m_ELjitter;          /**< r.m.s of electronics jitter */
+      std::string m_inputSimHits;    /**< Input collection name */
+      std::string m_outputDigits;    /**< Output collection name */
+      double m_timeZeroJitter;       /**< r.m.s of T0 jitter */
+      double m_electronicJitter;     /**< r.m.s of electronic jitter */
 
       //! Geometry parameters reading object
       TOPGeometryPar* m_topgp;

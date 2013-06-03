@@ -54,12 +54,13 @@ namespace Belle2 {
       setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
       // Add parameters
-      addParam("InputColName", m_inColName, "Input collection name (TOPSimHits)",
+      addParam("inputSimHits", m_inputSimHits, "Input collection name (TOPSimHits)",
                string(""));
-      addParam("OutputColName", m_outColName, "Output collection name (TOPDigits)",
+      addParam("outputDigits", m_outputDigits, "Output collection name (TOPDigits)",
                string(""));
-      addParam("T0jitter", m_T0jitter, "r.m.s of T0 jitter [ns]", 25e-3);
-      addParam("ELjitter", m_ELjitter, "r.m.s of electronics jitter [ns]", 50e-3);
+      addParam("timeZeroJitter", m_timeZeroJitter, "r.m.s of T0 jitter [ns]", 25e-3);
+      addParam("electronicJitter", m_electronicJitter,
+               "r.m.s of electronic jitter [ns]", 50e-3);
 
     }
 
@@ -70,14 +71,14 @@ namespace Belle2 {
     void TOPDigitizerModule::initialize()
     {
       // data store registration
-      StoreArray<TOPDigit>::registerPersistent(m_outColName);
-      RelationArray::registerPersistent<TOPSimHit, TOPDigit>(m_inColName, m_outColName);
+      StoreArray<TOPDigit>::registerPersistent(m_outputDigits);
+      RelationArray::registerPersistent<TOPSimHit, TOPDigit>(m_inputSimHits, m_outputDigits);
 
       // print parameters
       printModuleParams();
 
       // store electronics jitter to make it known for reconstruction
-      m_topgp->setELjitter(m_ELjitter);
+      m_topgp->setELjitter(m_electronicJitter);
     }
 
     void TOPDigitizerModule::beginRun()
@@ -89,10 +90,10 @@ namespace Belle2 {
     {
 
       // input: simulated hits
-      StoreArray<TOPSimHit> topSimHits(m_inColName);
+      StoreArray<TOPSimHit> topSimHits(m_inputSimHits);
 
       // output: digitized hits
-      StoreArray<TOPDigit> topDigits(m_outColName);
+      StoreArray<TOPDigit> topDigits(m_outputDigits);
       topDigits.create();
 
       RelationArray relSimHitToDigit(topSimHits, topDigits);
@@ -101,7 +102,7 @@ namespace Belle2 {
       m_topgp->setBasfUnits();
 
       // simulate interaction time relative to RF clock
-      double t_beam = gRandom->Gaus(0., m_T0jitter);
+      double t_beam = gRandom->Gaus(0., m_timeZeroJitter);
 
       // TDC
       int NTDC = m_topgp->getTDCbits();
@@ -122,7 +123,7 @@ namespace Belle2 {
 
         // add T0 jitter, TTS and electronic jitter to photon time
         double tts = PMT_TTS();
-        double tel = gRandom->Gaus(0., m_ELjitter);
+        double tel = gRandom->Gaus(0., m_electronicJitter);
         double time = t_beam + aSimHit->getTime() + tts + tel;
 
         // convert to TDC digits
@@ -155,8 +156,8 @@ namespace Belle2 {
 
     void TOPDigitizerModule::printModuleParams() const
     {
-      cout << "TOPDigi: T0jitter (rms)=" << m_T0jitter << endl;
-      cout << "TOPDigi: ELjitter (rms)=" << m_ELjitter << endl;
+      B2INFO("TOPDigitizer: T0 jitter (rms) = " << m_timeZeroJitter);
+      B2INFO("TOPDigitizer: electronic jitter (rms) = " << m_electronicJitter);
     }
 
     double TOPDigitizerModule::PMT_TTS()

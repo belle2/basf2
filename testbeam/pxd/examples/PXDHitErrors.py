@@ -19,9 +19,9 @@ class PXDHitErrors(Module):
 
         super(PXDHitErrors, self).__init__()
         self.setName('PXDHitErrors')
-        # # Name of output file
+        ## Name of output file
         self.file = open('PXDHitErrorOutput.txt', 'w')
-        # # Factors to decode VXDids
+        ## Factors to decode VXDids
         self.vxdid_factors = (8192, 256, 32)  # For decoding VxdID's
 
     def beginRun(self):
@@ -32,7 +32,7 @@ class PXDHitErrors(Module):
         self.file.write('Cluster_index \n')
         self.file.write('TrueHit: u[cm], v[cm], charge[GeV], ')
         self.file.write(' theta_u, theta_v \n')
-        self.file.write('Cluster: u[cm], v[cm], charge[e-], seed charge[e-], ')
+        self.file.write('Cluster: u[cm], v[cm], charge[e-], seed_charge[e-], ')
         self.file.write('size, size_u, size_v \n')
         self.file.write('Digits: n_digits {u[cm] v[cm] charge[e-]} \n')
         self.file.write('\n')
@@ -66,13 +66,9 @@ class PXDHitErrors(Module):
                 sensorID = truehit.getRawSensorID()
                 [layer, ladder, sensor] = self.decode(sensorID)
                 s_id = \
-                    '{sID} {layer} {ladder} {sensor} {iTH:4d} {iCL:4d} '.format(
-                    sID=sensorID,
-                    layer=layer,
-                    ladder=ladder,
-                    sensor=sensor,
-                    iTH=truehit_index,
-                    iCL=cluster_index,
+                    '{sID} {layer} {ladder} {sensor} {iTH:4d} {iCL:4d} '\
+                    .format(sID=sensorID, layer=layer, ladder=ladder,
+                    sensor=sensor, iTH=truehit_index, iCL=cluster_index,
                     )
                 s += s_id
                 # TrueHit information
@@ -81,17 +77,21 @@ class PXDHitErrors(Module):
                 thetaV = math.atan2(truehit.getExitV() - truehit.getEntryV(),
                                     0.0075)
                 s_th = \
-                    '{uTH:10.5f} {vTH:10.5f} {eTH:10.7f} '.format(uTH=truehit.getU(),
-                        vTH=truehit.getV(), eTH=truehit.getEnergyDep(),
+                    '{uTH:10.5f} {vTH:10.5f} {eTH:10.7f} '.format(
+                        uTH=truehit.getU(), vTH=truehit.getV(),
+                        eTH=truehit.getEnergyDep(),
                         thetaU=thetaU, thetaV=thetaV)
                 s += s_th
                 # Cluster information
                 s_cl = \
-                    '{uCL:10.5f} {vCL:10.5f} {eCL:10.1f} {eSeed:10.1f} '.format(uCL=cluster.getU(),
-                        vCL=cluster.getV(), eCL=cluster.getCharge(),
-                        eSeed=cluster.getSeedCharge()) \
-                    + '{size:5d} {sizeU:5d} {sizeV:5d} '.format(size=cluster.getSize(),
-                        sizeU=cluster.getUSize(), sizeV=cluster.getVSize())
+                    '{uCL:10.5f} {vCL:10.5f} {eCL:10.1f} {eSeed:10.1f} '\
+                    .format(uCL=cluster.getU(), vCL=cluster.getV(),
+                            eCL=cluster.getCharge(),
+                            eSeed=cluster.getSeedCharge()) \
+                    + '{size:5d} {sizeU:5d} {sizeV:5d} '.format(
+                            size=cluster.getSize(),
+                            sizeU=cluster.getUSize(),
+                            sizeV=cluster.getVSize())
                 s += s_cl
                 # We can add some digits, too.
                 digit_indices = relClustersToDigits.getToIndices(cluster_index)
@@ -100,7 +100,8 @@ class PXDHitErrors(Module):
                 for digit_index in digit_indices:
                     digit = digits[digit_index]
                     s_dig = \
-                        '{u:10.5f} {v:10.5f} {e:10.1f} '.format(u=digit.getUCellPosition(),
+                        '{u:10.5f} {v:10.5f} {e:10.1f} '.format(
+                            u=digit.getUCellPosition(),
                             v=digit.getVCellPosition(), e=digit.getCharge())
                     s += s_dig
 
@@ -121,5 +122,3 @@ class PXDHitErrors(Module):
             vxdid = vxdid % f
 
         return result
-
-

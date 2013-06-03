@@ -29,6 +29,7 @@ ARICHTrack::ARICHTrack(const ARICHAeroHit& aeroHit)
   m_trackID = aeroHit.getTrackID();
   m_extHitID = -1;
   m_identity = Lund2Type(m_PDGEncoding);
+  m_aeroIndex = -1;
   for (int i = 0; i < MAXLKH; i++) {
     m_lkh[i] = 0;
     m_sfot[i] = 0;
@@ -36,7 +37,7 @@ ARICHTrack::ARICHTrack(const ARICHAeroHit& aeroHit)
   }
 }
 
-ARICHTrack::ARICHTrack(const ExtHit* extHit, int charge, int trackID) :
+ARICHTrack::ARICHTrack(const ExtHit* extHit, int charge, int trackID, int aeroHitIndex) :
   m_originalPosition(0, 0, 0),
   m_originalDirection(0, 0, 0),
   m_originalMomentum(-1),
@@ -47,7 +48,8 @@ ARICHTrack::ARICHTrack(const ExtHit* extHit, int charge, int trackID) :
   m_PDGEncoding(extHit->getPdgCode()),
   m_trackID(trackID),
   m_extHitID(extHit->getArrayIndex()),
-  m_identity(Lund2Type(m_PDGEncoding))
+  m_identity(Lund2Type(m_PDGEncoding)),
+  m_aeroIndex(aeroHitIndex)
 {
   for (int i = 0; i < MAXLKH; i++) {
     m_lkh[i] = 0;

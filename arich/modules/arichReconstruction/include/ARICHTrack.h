@@ -47,7 +47,8 @@ namespace Belle2 {
       m_PDGEncoding(-1),
       m_trackID(-1),
       m_extHitID(-1),
-      m_identity(-1) {
+      m_identity(-1),
+      m_aeroIndex(-1) {
       /*! does nothing */
       for (int i = 0; i < MAXLKH; i++) {
         m_lkh[i] = 0;
@@ -81,7 +82,8 @@ namespace Belle2 {
       m_PDGEncoding(type),
       m_trackID(trackID),
       m_extHitID(-1),
-      m_identity(-1) {
+      m_identity(-1),
+      m_aeroIndex(-1) {
       for (int i = 0; i < MAXLKH; i++) {
         m_lkh[i]  = 0;
         m_sfot[i] = 0;
@@ -94,8 +96,9 @@ namespace Belle2 {
       \param extHit track hit on aerogel aluminium support plate
       \param charge charge of the particle
       \param trackID number of track in event
+      \param aeroHitIndex Used to create relation from ARICHAeroHit(simulation) to ARICHLikelihood.
     */
-    ARICHTrack(const ExtHit* extHit, int charge, int trackID);
+    ARICHTrack(const ExtHit* extHit, int charge, int trackID, int aeroHitIndex);
 
     //! destructor
     ~ARICHTrack() {
@@ -134,6 +137,9 @@ namespace Belle2 {
 
     //! return particle index (0 electron, 1 muon, 2 pion, 3 kaon, 4 proton, -1 else)
     int getIdentity() const {return m_identity;};
+
+    //! returns aerogel hit (MC simulation) index
+    int getAeroIndex() const {return m_aeroIndex;};
 
     //! returns value of likelihood function for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     double getLikelihood(int i) const {return m_lkh[i]; };
@@ -218,6 +224,7 @@ namespace Belle2 {
     int    m_trackID;                     /**< track identification number in GFTrack */
     int    m_extHitID;                    /**< track identification number in ext */
     int    m_identity;                    /**< particle index (0 electron, 1 muon, 2 pion, 3 kaon, 4 proton, -1 else). */
+    int    m_aeroIndex;                   /**< Relation index needed to create relation from ARICHAeroHit(MC simulation) to ARICHLikelihood. */
 
 
 

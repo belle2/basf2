@@ -123,6 +123,7 @@ namespace Belle2 {
         // Input: reconstructed tracks
         StoreArray<Track> mdstTracks(m_TracksColName);
         StoreArray<ExtHit> extHits(m_extHitsColName);
+        StoreArray<ARICHAeroHit> arichAeroHits(m_MCColName);
 
         // Output - likelihoods
         StoreArray<ARICHLikelihood> arichLikelihoods(m_outColName);
@@ -133,6 +134,8 @@ namespace Belle2 {
         trackToArich.clear();
         RelationArray extToArich(extHits, arichLikelihoods);
         extToArich.clear();
+        RelationArray aeroHitToArich(arichAeroHits, arichLikelihoods);
+        aeroHitToArich.clear();
 
         std::vector<ARICHTrack> arichTracks;
         getTracks(arichTracks, Const::pion); // pion hypothesis
@@ -152,10 +155,19 @@ namespace Belle2 {
 
           new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, like, 1, exp_phot);
 
+          // Add relations
           int last = arichLikelihoods.getEntries() - 1;
           trackToArich.add(track->getTrackID(), last);
           extToArich.add(track->getHitID(), last);
+          int aeroIndex = track->getAeroIndex();
+          if (aeroIndex >= 0) aeroHitToArich.add(aeroIndex, last);
+
         }
+
+        trackToArich.consolidate();
+        extToArich.consolidate();
+        aeroHitToArich.consolidate();
+
       } else if (m_inputTrackType == 1) {
         //------------------------------------------------------
         // Get the collection of ARICHSimHits from the DataStore.
@@ -168,8 +180,8 @@ namespace Belle2 {
         arichLikelihoods.create();
 
         // Output: AeroHits to ARICH likelihoods relations
-        RelationArray  relAeroToLikelihood(arichAeroHits, arichLikelihoods);
-        relAeroToLikelihood.clear();
+        RelationArray  aeroHitToArich(arichAeroHits, arichLikelihoods);
+        aeroHitToArich.clear();
 
         std::vector<ARICHTrack> arichTracks;
 
@@ -194,7 +206,7 @@ namespace Belle2 {
           track->getLikelihood(like);
           track->getExpectedNOfPhotons(exp_phot);
           new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, like, 1, exp_phot);
-          relAeroToLikelihood.add(iTrack, iTrack);
+          aeroHitToArich.add(iTrack, iTrack);
         } // for iTrack
       }
 
@@ -238,16 +250,23 @@ namespace Belle2 {
           continue;
         }
         int charge = fitResult->getCharge();
+        const MCParticle* particle = DataStore::getRelated<MCParticle>(track);
+        const ARICHAeroHit* aeroHit = DataStore::getRelated<ARICHAeroHit>(particle);
+        int aeroHitIndex = -1;
+        if (aeroHit) aeroHitIndex = aeroHit->getArrayIndex();
+        int truePDGCode = 0;
+        if (particle) truePDGCode = particle->getPDG();
 
         RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);
+
         for (unsigned i = 0; i < extHits.size(); i++) {
           const ExtHit* extHit = extHits[i];
           if (abs(extHit->getPdgCode()) != pdgCode) continue;
           if (extHit->getDetectorID() != myDetID) continue;
-          if (extHit->getCopyID() != 12345) continue;
-          if (extHit->getStatus() != EXT_EXIT) continue;
+          if (extHit->getCopyID() != 12345) continue; // aerogel Al support plate
+          if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
           B2DEBUG(100, "getTracks: z = " << extHit->getPosition().Z());
-          ARICHTrack trk(extHit, charge, (int)itra);
+          ARICHTrack trk(extHit, charge, (int)itra, aeroHitIndex);
           tracks.push_back(trk);
         }
       }

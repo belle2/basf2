@@ -244,8 +244,9 @@ namespace Belle2 {
           G4Tubs* outerWallTubeShape = new G4Tubs(outerWallName1.str(), outerWallInnerR[iOuterWall]*cm, outerWallOuterR[iOuterWall]*cm, length * cm, 0 * deg, 360.*deg);
           G4LogicalVolume* outerWallTube = new G4LogicalVolume(outerWallTubeShape, medCFRP, outerWallName2.str(), 0, 0, 0);
           outerWallTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
-          G4VPhysicalVolume* phyouterWallTube;
-          phyouterWallTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + outerWallBZ[iOuterWall])*cm), outerWallTube, outerWallName3.str(), logical_cdc, false, iOuterWall);
+          // Commented by M. U. June 3rd, 2013
+          //G4VPhysicalVolume* phyouterWallTube;
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + outerWallBZ[iOuterWall])*cm), outerWallTube, outerWallName3.str(), logical_cdc, false, iOuterWall);
         } else {
           std::ostringstream outerWallName1;
           outerWallName1 << "solid" << (outerWallName[iOuterWall]).c_str();
@@ -256,8 +257,9 @@ namespace Belle2 {
           G4Tubs* outerWallTubeShape = new G4Tubs(outerWallName1.str(), outerWallInnerR[iOuterWall]*cm, outerWallOuterR[iOuterWall]*cm, length * cm, 0 * deg, 360.*deg);
           G4LogicalVolume* outerWallTube = new G4LogicalVolume(outerWallTubeShape, medAluminum, outerWallName2.str(), 0, 0, 0);
           outerWallTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
-          G4VPhysicalVolume* phyouterWallTube;
-          phyouterWallTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + outerWallBZ[iOuterWall])*cm), outerWallTube, outerWallName3.str(), logical_cdc, false, iOuterWall);
+          // Commented by M. U. June 3rd, 2013
+          //          G4VPhysicalVolume* phyouterWallTube;
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + outerWallBZ[iOuterWall])*cm), outerWallTube, outerWallName3.str(), logical_cdc, false, iOuterWall);
         }
       }
 
@@ -278,8 +280,9 @@ namespace Belle2 {
           G4Tubs* innerWallTubeShape = new G4Tubs(innerWallName1.str(), innerWallInnerR[iInnerWall]*cm, innerWallOuterR[iInnerWall]*cm, length * cm, 0 * deg, 360.*deg);
           G4LogicalVolume* innerWallTube = new G4LogicalVolume(innerWallTubeShape, medCFRP, innerWallName2.str(), 0, 0, 0);
           innerWallTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
-          G4VPhysicalVolume* phyinnerWallTube;
-          phyinnerWallTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + innerWallBZ[iInnerWall])*cm), innerWallTube, innerWallName3.str(), logical_cdc, false, iInnerWall);
+          // Commented by M. U. June 3rd, 2013
+          //          G4VPhysicalVolume* phyinnerWallTube;
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + innerWallBZ[iInnerWall])*cm), innerWallTube, innerWallName3.str(), logical_cdc, false, iInnerWall);
         } else if (strstr((innerWallName[iInnerWall]).c_str(), "MiddleGlue") != NULL) { // Glue layer 0.005 mmt
           std::ostringstream innerWallName1;
           innerWallName1 << "solid" << (innerWallName[iInnerWall]).c_str();
@@ -290,8 +293,9 @@ namespace Belle2 {
           G4Tubs* innerWallTubeShape = new G4Tubs(innerWallName1.str(), innerWallInnerR[iInnerWall]*cm, innerWallOuterR[iInnerWall]*cm, length * cm, 0 * deg, 360.*deg);
           G4LogicalVolume* innerWallTube = new G4LogicalVolume(innerWallTubeShape, medGlue, innerWallName2.str(), 0, 0, 0);
           innerWallTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
-          G4VPhysicalVolume* phyinnerWallTube;
-          phyinnerWallTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + innerWallBZ[iInnerWall])*cm), innerWallTube, innerWallName3.str(), logical_cdc, false, iInnerWall);
+          // Commented by M. U. June 3rd, 2013
+          // G4VPhysicalVolume* phyinnerWallTube;
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + innerWallBZ[iInnerWall])*cm), innerWallTube, innerWallName3.str(), logical_cdc, false, iInnerWall);
 
         } else { // Al layer 0.1 mmt
           std::ostringstream innerWallName1;
@@ -303,8 +307,9 @@ namespace Belle2 {
           G4Tubs* innerWallTubeShape = new G4Tubs(innerWallName1.str(), innerWallInnerR[iInnerWall]*cm, innerWallOuterR[iInnerWall]*cm, length * cm, 0 * deg, 360.*deg);
           G4LogicalVolume* innerWallTube = new G4LogicalVolume(innerWallTubeShape, medAluminum, innerWallName2.str(), 0, 0, 0);
           innerWallTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
-          G4VPhysicalVolume* phyinnerWallTube;
-          phyinnerWallTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + innerWallBZ[iInnerWall])*cm), innerWallTube, innerWallName3.str(), logical_cdc, false, iInnerWall);
+          // Commented by M. U. June 3rd, 2013
+          //          G4VPhysicalVolume* phyinnerWallTube;
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + innerWallBZ[iInnerWall])*cm), innerWallTube, innerWallName3.str(), logical_cdc, false, iInnerWall);
         }
       }
 
@@ -550,15 +555,17 @@ namespace Belle2 {
           // Build a tube with metarial cdcMed for area 1
           G4Tubs* leftTubeShape = new G4Tubs((format("solidCDCLayer_%1%_leftTube") % iSLayer).str().c_str(), rmin_sensitive_left * cm, rmax_sensitive_left * cm, length_feedthrough * cm / 2.0, 0 * deg, 360.*deg);
           G4LogicalVolume* leftTube = new G4LogicalVolume(leftTubeShape, cdcMed, (format("logicalCDCLayer_%1%_leftTube") % iSLayer).str().c_str(), 0, 0, 0);
-          G4VPhysicalVolume* phyleftTube;
-          phyleftTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zback_sensitive_left + length_feedthrough / 2.0)*cm), leftTube, (format("physicalCDCLayer_%1%_leftTube") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
+          // Commented by M. U. June 3rd, 2013
+          //          G4VPhysicalVolume* phyleftTube;
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zback_sensitive_left + length_feedthrough / 2.0)*cm), leftTube, (format("physicalCDCLayer_%1%_leftTube") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
 
           // Build left sensitive tube (area 2)
           G4Tubs* leftSensitiveTubeShape = new G4Tubs((format("solidSD_CDCLayer_%1%_left") % iSLayer).str().c_str(), rmin_sensitive_left * cm, rmax_sensitive_left * cm, (zfor_sensitive_left - zback_sensitive_left - length_feedthrough)*cm / 2.0, 0 * deg, 360.*deg);
           G4LogicalVolume* leftSensitiveTube = new G4LogicalVolume(leftSensitiveTubeShape, cdcMed, (format("logicalSD_CDCLayer_%1%_left") % iSLayer).str().c_str(), 0, 0, 0);
           leftSensitiveTube->SetSensitiveDetector(m_sensitive);
-          G4VPhysicalVolume* phyleftSensitiveTube;
-          phyleftSensitiveTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_left + zback_sensitive_left + length_feedthrough)*cm / 2.0), leftSensitiveTube, (format("physicalSD_CDCLayer_%1%_left") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
+          // Commented by M. U. June 3rd, 2013
+          //          G4VPhysicalVolume* phyleftSensitiveTube;
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_left + zback_sensitive_left + length_feedthrough)*cm / 2.0), leftSensitiveTube, (format("physicalSD_CDCLayer_%1%_left") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
         } else {
           //==========================================================
           //    zback_sensitive_left
@@ -577,14 +584,16 @@ namespace Belle2 {
           // Build a tube with metarial cdcMed for area 1
           G4Tubs* leftTubeShape = new G4Tubs((format("solidCDCLayer_%1%_leftTube") % iSLayer).str().c_str(), rmin_sensitive_left * cm, rmax_sensitive_left * cm, (zfor_sensitive_left - zback_sensitive_left)*cm / 2.0, 0 * deg, 360.*deg);
           G4LogicalVolume* leftTube = new G4LogicalVolume(leftTubeShape, cdcMed, (format("logicalCDCLayer_%1%_leftTube") % iSLayer).str().c_str(), 0, 0, 0);
-          G4VPhysicalVolume* phyleftTube;
-          phyleftTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_left + zback_sensitive_left)*cm / 2.0), leftTube, (format("physicalCDCLayer_%1%_leftTube") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
+          // Commented by M. U. June 3rd, 2013
+          //          G4VPhysicalVolume* phyleftTube;
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_left + zback_sensitive_left)*cm / 2.0), leftTube, (format("physicalCDCLayer_%1%_leftTube") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
 
           // Build a tube with metarial cdcMed for area 2
           G4Tubs* leftMidTubeShape = new G4Tubs((format("solidCDCLayer_%1%_leftMidTube") % iSLayer).str().c_str(), rmin_sensitive_middle * cm, rmax_sensitive_middle * cm, (length_feedthrough - zfor_sensitive_left + zback_sensitive_left)*cm / 2.0, 0 * deg, 360.*deg);
           G4LogicalVolume* leftMidTube = new G4LogicalVolume(leftMidTubeShape, cdcMed, (format("logicalCDCLayer_%1%_leftMidTube") % iSLayer).str().c_str(), 0, 0, 0);
-          G4VPhysicalVolume* phyleftMidTube;
-          phyleftMidTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length_feedthrough + zfor_sensitive_left + zback_sensitive_left)*cm / 2.0), leftMidTube, (format("physicalCDCLayer_%1%_leftMidTube") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
+          // Commented by M. U. June 3rd, 2013
+          //          G4VPhysicalVolume* phyleftMidTube;
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length_feedthrough + zfor_sensitive_left + zback_sensitive_left)*cm / 2.0), leftMidTube, (format("physicalCDCLayer_%1%_leftMidTube") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
 
           // Reset zback_sensitive_middle
           zback_sensitive_middle = length_feedthrough + zback_sensitive_left;
@@ -609,15 +618,17 @@ namespace Belle2 {
           // Build a tube with metarial cdcMed for area 1
           G4Tubs* rightTubeShape = new G4Tubs((format("solidCDCLayer_%1%_rightTube") % iSLayer).str().c_str(), rmin_sensitive_right * cm, rmax_sensitive_right * cm, length_feedthrough * cm / 2.0, 0 * deg, 360.*deg);
           G4LogicalVolume* rightTube = new G4LogicalVolume(rightTubeShape, cdcMed, (format("logicalCDCLayer_%1%_rightTube") % iSLayer).str().c_str(), 0, 0, 0);
-          G4VPhysicalVolume* phyrightTube;
-          phyrightTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_right - length_feedthrough / 2.0)*cm), rightTube, (format("physicalCDCLayer_%1%_rightTube") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
+          // Commented by M. U. June 3rd, 2013
+          //          G4VPhysicalVolume* phyrightTube;
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_right - length_feedthrough / 2.0)*cm), rightTube, (format("physicalCDCLayer_%1%_rightTube") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
 
           // Build right sensitive tube (area 2)
           G4Tubs* rightSensitiveTubeShape = new G4Tubs((format("solidSD_CDCLayer_%1%_right") % iSLayer).str().c_str(), rmin_sensitive_right * cm, rmax_sensitive_right * cm, (zfor_sensitive_right - zback_sensitive_right - length_feedthrough)*cm / 2.0, 0 * deg, 360.*deg);
           G4LogicalVolume* rightSensitiveTube = new G4LogicalVolume(rightSensitiveTubeShape, cdcMed, (format("logicalSD_CDCLayer_%1%_right") % iSLayer).str().c_str(), 0, 0, 0);
           rightSensitiveTube->SetSensitiveDetector(m_sensitive);
-          G4VPhysicalVolume* phyrightSensitiveTube;
-          phyrightSensitiveTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_right + zback_sensitive_right - length_feedthrough)*cm / 2.0), rightSensitiveTube, (format("physicalSD_CDCLayer_%1%_right") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
+          // Commented by M. U. June 3rd, 2013
+          //          G4VPhysicalVolume* phyrightSensitiveTube;
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_right + zback_sensitive_right - length_feedthrough)*cm / 2.0), rightSensitiveTube, (format("physicalSD_CDCLayer_%1%_right") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
         } else {
           //==========================================================
           //              zfor_sensitive_right
@@ -636,14 +647,16 @@ namespace Belle2 {
           // Build a tube with metarial cdcMed for area 1
           G4Tubs* rightTubeShape = new G4Tubs((format("solidCDCLayer_%1%_rightTube") % iSLayer).str().c_str(), rmin_sensitive_right * cm, rmax_sensitive_right * cm, (zfor_sensitive_right - zback_sensitive_right)*cm / 2.0, 0 * deg, 360.*deg);
           G4LogicalVolume* rightTube = new G4LogicalVolume(rightTubeShape, cdcMed, (format("logicalCDCLayer_%1%_rightTube") % iSLayer).str().c_str(), 0, 0, 0);
-          G4VPhysicalVolume* phyrightTube;
-          phyrightTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_right + zback_sensitive_right)*cm / 2.0), rightTube, (format("physicalCDCLayer_%1%_rightTube") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
+          // Commented by M. U. June 3rd, 2013
+          //          G4VPhysicalVolume* phyrightTube;
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_right + zback_sensitive_right)*cm / 2.0), rightTube, (format("physicalCDCLayer_%1%_rightTube") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
 
           // Build a tube with metarial cdcMed for area 2
           G4Tubs* rightMidTubeShape = new G4Tubs((format("solidCDCLayer_%1%_rightMidTube") % iSLayer).str().c_str(), rmin_sensitive_middle * cm, rmax_sensitive_middle * cm, (length_feedthrough - zfor_sensitive_right + zback_sensitive_right)*cm / 2.0, 0 * deg, 360.*deg);
           G4LogicalVolume* rightMidTube = new G4LogicalVolume(rightMidTubeShape, cdcMed, (format("logicalCDCLayer_%1%_rightMidTube") % iSLayer).str().c_str(), 0, 0, 0);
-          G4VPhysicalVolume* phyrightMidTube;
-          phyrightMidTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zback_sensitive_right - length_feedthrough + zfor_sensitive_right)*cm / 2.0), rightMidTube, (format("physicalCDCLayer_%1%_rightMidTube") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
+          // Commented by M. U. June 3rd, 2013
+          //          G4VPhysicalVolume* phyrightMidTube;
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zback_sensitive_right - length_feedthrough + zfor_sensitive_right)*cm / 2.0), rightMidTube, (format("physicalCDCLayer_%1%_rightMidTube") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
 
           // Reset zback_sensitive_middle
           zfor_sensitive_middle = zfor_sensitive_right - length_feedthrough;
@@ -653,8 +666,9 @@ namespace Belle2 {
         G4Tubs* middleSensitiveTubeShape = new G4Tubs((format("solidSD_CDCLayer_%1%_middle") % iSLayer).str().c_str(), rmin_sensitive_middle * cm, rmax_sensitive_middle * cm, (zfor_sensitive_middle - zback_sensitive_middle)*cm / 2.0, 0 * deg, 360.*deg);
         G4LogicalVolume* middleSensitiveTube = new G4LogicalVolume(middleSensitiveTubeShape, cdcMed, (format("logicalSD_CDCLayer_%1%_middle") % iSLayer).str().c_str(), 0, 0, 0);
         middleSensitiveTube->SetSensitiveDetector(m_sensitive);
-        G4VPhysicalVolume* phymiddleSensitiveTube;
-        phymiddleSensitiveTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_middle + zback_sensitive_middle)*cm / 2.0), middleSensitiveTube, (format("physicalSD_CDCLayer_%1%_middle") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
+        // Commented by M. U. June 3rd, 2013
+        //        G4VPhysicalVolume* phymiddleSensitiveTube;
+        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_middle + zback_sensitive_middle)*cm / 2.0), middleSensitiveTube, (format("physicalSD_CDCLayer_%1%_middle") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
 
         // Endplates
         for (int iEPLayer = 0; iEPLayer < nEPLayer; ++iEPLayer) {
@@ -668,10 +682,11 @@ namespace Belle2 {
           G4Tubs* endplateTubeShape = new G4Tubs(endplateName.str().c_str(), epInnerR[iSLayer][iEPLayer]*cm, epOuterR[iSLayer][iEPLayer]*cm, length_endplate * cm, 0 * deg, 360.*deg);
           G4LogicalVolume* endplateTube = new G4LogicalVolume(endplateTubeShape, medAluminum, endplateName1.str().c_str(), 0, 0);
           endplateTube->SetVisAttributes(G4VisAttributes(G4Colour(1., 1., 0.)));
-          G4VPhysicalVolume* phyendplateTube;
+          // Commented by M. U. June 3rd, 2013
+          //          G4VPhysicalVolume* phyendplateTube;
 
           if (iSLayer != 55 || (iEPLayer != 2 && iEPLayer != 5))
-            phyendplateTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (epFZ[iSLayer][iEPLayer] + epBZ[iSLayer][iEPLayer])*cm / 2.0), endplateTube, endplateName2.str().c_str(), logical_cdc, false, iSLayer);
+            new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (epFZ[iSLayer][iEPLayer] + epBZ[iSLayer][iEPLayer])*cm / 2.0), endplateTube, endplateName2.str().c_str(), logical_cdc, false, iSLayer);
         }
       }
 
@@ -697,8 +712,9 @@ namespace Belle2 {
         //ebTube->SetSensitiveDetector(m_sensitive);
         ebTube->SetSensitiveDetector(new BkgSensitiveDetector("CDC", iEB));
         ebTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
-        G4VPhysicalVolume* phyebTube;
-        phyebTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (ebFZ + ebBZ)*cm / 2.0), ebTube, (format("physicalSD_ElectronicsBoard_Layer%1%") % ebID).str().c_str(), logical_cdc, false, ebID);
+        // Commented by M. U. June 3rd, 2013
+        //        G4VPhysicalVolume* phyebTube;
+        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (ebFZ + ebBZ)*cm / 2.0), ebTube, (format("physicalSD_ElectronicsBoard_Layer%1%") % ebID).str().c_str(), logical_cdc, false, ebID);
       }
 
       //--------------------------------------
@@ -730,8 +746,9 @@ namespace Belle2 {
             G4Tubs* coverTubeShape = new G4Tubs((format("solidBackwardCover%1%") % coverID).str().c_str(), 28.8 * cm, rmax1 * cm, coverThick * cm / 2.0, 0.*deg, 360.*deg);
             G4LogicalVolume* coverTube = new G4LogicalVolume(coverTubeShape, medAluminum, (format("logicalBackwardCover%1%") % coverID).str().c_str(), 0, 0, 0);
             coverTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 1.)));
-            G4VPhysicalVolume* phycoverTube;
-            phycoverTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, coverPosZ * cm - coverThick * cm / 2.0), coverTube, (format("physicalBackwardCover%1%") % coverID).str().c_str(), logical_cdc, false, coverID);
+            // Commented by M. U. June 3rd, 2013
+            //            G4VPhysicalVolume* phycoverTube;
+            new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, coverPosZ * cm - coverThick * cm / 2.0), coverTube, (format("physicalBackwardCover%1%") % coverID).str().c_str(), logical_cdc, false, coverID);
           }
         } else {
           double rmin1 = coverInnerR1;
@@ -743,8 +760,9 @@ namespace Belle2 {
           G4Cons* coverConeShape = new G4Cons((format("solidForwardCover%1%") % coverID).str().c_str(), rmin1 * cm, rmax1 * cm, rmin2 * cm, rmax2 * cm, coverLength * cm / 2.0, 0.*deg, 360.*deg);
           G4LogicalVolume* coverCone = new G4LogicalVolume(coverConeShape, medAluminum, (format("logicalForwardCover%1%") % coverID).str().c_str(), 0, 0, 0);
           coverCone->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 1.)));
-          G4VPhysicalVolume* phycoverCone;
-          phycoverCone = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (coverPosZ + coverLength / 2.0)*cm), coverCone, (format("physicalForwardCover%1%") % coverID).str().c_str(), logical_cdc, false, coverID);
+          // Commented by M. U. June 3rd, 2013
+          //          G4VPhysicalVolume* phycoverCone;
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (coverPosZ + coverLength / 2.0)*cm), coverCone, (format("physicalForwardCover%1%") % coverID).str().c_str(), logical_cdc, false, coverID);
         }
       }
 
@@ -782,38 +800,44 @@ namespace Belle2 {
         G4Tubs* bgShieldTubeShape_0 = new G4Tubs("solid_B4C_0", (20.25 + 8.5) * cm, (20.25 + 8.5 + 30.0) * cm, 3.0 * cm / 2.0, 0 * deg, 360.*deg);
         G4LogicalVolume* bgShieldTube_0 = new G4LogicalVolume(bgShieldTubeShape_0, B4C, "logical_B4C_0", 0, 0, 0);
         bgShieldTube_0->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
-        G4VPhysicalVolume* physbgShieldTube_0;
-        physbgShieldTube_0 = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (-98.5 + 1.5)*cm), bgShieldTube_0, "physical_B4C_0", logical_cdc, false, 0);
+        // Commented by M. U. June 3rd, 2013
+        //        G4VPhysicalVolume* physbgShieldTube_0;
+        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (-98.5 + 1.5)*cm), bgShieldTube_0, "physical_B4C_0", logical_cdc, false, 0);
 
         G4Tubs* bgShieldTubeShape_1 = new G4Tubs("solid_B4C_1", (20.25 + 8.5) * cm, (20.25 + 8.5 + 15.0) * cm, 5.0 * cm / 2.0, 0 * deg, 360.*deg);
         G4LogicalVolume* bgShieldTube_1 = new G4LogicalVolume(bgShieldTubeShape_1, B4C, "logical_B4C_1", 0, 0, 0);
         bgShieldTube_1->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
-        G4VPhysicalVolume* physbgShieldTube_1;
-        physbgShieldTube_1 = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (-98.5 + 3.0 + 2.5)*cm), bgShieldTube_1, "physical_B4C_1", logical_cdc, false, 0);
+        // Commented by M. U. June 3rd, 2013
+        //        G4VPhysicalVolume* physbgShieldTube_1;
+        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (-98.5 + 3.0 + 2.5)*cm), bgShieldTube_1, "physical_B4C_1", logical_cdc, false, 0);
 
         G4Tubs* bgShieldTubeShape_2 = new G4Tubs("solid_B4C_2", (20.25 + 8.5) * cm, (20.25 + 8.5 + 3.0) * cm, 10.5 * cm / 2.0, 0 * deg, 360.*deg);
         G4LogicalVolume* bgShieldTube_2 = new G4LogicalVolume(bgShieldTubeShape_2, B4C, "logical_B4C_2", 0, 0, 0);
         bgShieldTube_2->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
-        G4VPhysicalVolume* physbgShieldTube_2;
-        physbgShieldTube_2 = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -85.25 * cm), bgShieldTube_2, "physical_B4C_2", logical_cdc, false, 0);
+        // Commented by M. U. June 3rd, 2013
+        //        G4VPhysicalVolume* physbgShieldTube_2;
+        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -85.25 * cm), bgShieldTube_2, "physical_B4C_2", logical_cdc, false, 0);
 
         G4Tubs* bgShieldTubeShape_3 = new G4Tubs("solid_B4C_3", (20.25 + 4.5) * cm, (20.25 + 4.5 + 3.0) * cm, 11.5 * cm / 2.0, 0 * deg, 360.*deg);
         G4LogicalVolume* bgShieldTube_3 = new G4LogicalVolume(bgShieldTubeShape_3, B4C, "logical_B4C_3", 0, 0, 0);
         bgShieldTube_3->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
-        G4VPhysicalVolume* physbgShieldTube_3;
-        physbgShieldTube_3 = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -61.250 * cm), bgShieldTube_3, "physical_B4C_3", logical_cdc, false, 0);
+        // Commented by M. U. June 3rd, 2013
+        // G4VPhysicalVolume* physbgShieldTube_3;
+        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -61.250 * cm), bgShieldTube_3, "physical_B4C_3", logical_cdc, false, 0);
 
         G4Cons* bgShieldConeShape_4 = new G4Cons("solid_B4C_4", (20.25 + 8.5) * cm, (20.25 + 8.5 + 3.0) * cm, (20.25 + 4.5)* cm, (20.25 + 4.5 + 3.0) * cm,  13.0 * cm / 2.0, 0.*deg, 360.*deg);
         G4LogicalVolume* bgShieldCone_4 = new G4LogicalVolume(bgShieldConeShape_4, B4C, "logical_B4c_4", 0, 0, 0);
         bgShieldCone_4->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
-        G4VPhysicalVolume* physbgShieldCone_4;
-        physbgShieldCone_4 = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -73.5 * cm), bgShieldCone_4, "physicalbgShield_1%", logical_cdc, false, 0);
+        // Commented by M. U. June 3rd, 2013
+        //        G4VPhysicalVolume* physbgShieldCone_4;
+        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -73.5 * cm), bgShieldCone_4, "physicalbgShield_1%", logical_cdc, false, 0);
 
         G4Cons* bgShieldConeShape_5 = new G4Cons("solid_B4C_5", (20.25 + 4.5) * cm, (20.25 + 4.5 + 3.0) * cm, (20.25 - 8.0 + 4.5)* cm, (20.25 - 8.0 + 4.5 + 3.0) * cm,  15.0 * cm / 2.0, 0.*deg, 360.*deg);
         G4LogicalVolume* bgShieldCone_5 = new G4LogicalVolume(bgShieldConeShape_5, B4C, "logical_B4c_5", 0, 0, 0);
         bgShieldCone_5->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
-        G4VPhysicalVolume* physbgShieldCone_5;
-        physbgShieldCone_5 = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -48.0 * cm), bgShieldCone_5, "physicalbgShield_1%", logical_cdc, false, 0);
+        // Commented by M. U. June 3rd, 2013
+        //        G4VPhysicalVolume* physbgShieldCone_5;
+        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -48.0 * cm), bgShieldCone_5, "physicalbgShield_1%", logical_cdc, false, 0);
 
       }
 

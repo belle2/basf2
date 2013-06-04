@@ -304,9 +304,9 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     posV /= cls.getCharge();
     const int sizeU = maxU - minU + 1;
     const int sizeV = maxV - minV + 1;
-    // Calculate shape correlation coefficient
+    // Calculate shape correlation coefficient: only for non-trivial shapes
     double uError(0), vError(0), rho(0);
-    if ((sizeU > 1) && (sizeV > 0)) {
+    if ((sizeU > 1) && (sizeV > 1)) {
       double posUU(0), posVV(0), posUV(0);
       BOOST_FOREACH(const PXD::Pixel & px, cls.pixels()) {
         double du = info.getUCellPosition(px.getU()) - posU;

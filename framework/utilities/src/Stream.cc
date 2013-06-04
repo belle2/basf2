@@ -7,7 +7,7 @@ using namespace Belle2;
 
 std::string Stream::serialize(const TObject* obj)
 {
-  //blame ROOT developers for that
+  //TODO: root 5.34/8 should fix that
   TObject* nonConstObj = const_cast<TObject*>(obj);
   const TString& xmlString = TBufferXML::ConvertToXML(nonConstObj);
   return std::string(xmlString.Data());

@@ -51,6 +51,7 @@ namespace Belle2 {
 
     /** dereference. */
     ValueType& operator*() const { return *((*m_array)[m_index]); }
+    /** dereference. */
     ValueType* operator->() const { return (*m_array)[m_index]; }
 
   private:

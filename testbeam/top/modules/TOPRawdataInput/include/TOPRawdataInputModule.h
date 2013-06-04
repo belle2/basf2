@@ -79,20 +79,20 @@ namespace Belle2 {
     /**
      * Read data record.
      * Return status:
-     *  - 0 on success (next data record can be tried to read)
+     *  - 0 on success (event can be further processed)
      *  - negative value for EOF or for corrupted file (file has to be closed)
-     *  - positive value for non-event or corrupted record (next data record can be tried to read)
+     *  - positive value for non-event or corrupted record (try with next data record)
      * @return error status
      */
     int readDataRecord();
 
     std::string m_inputFileName; /**< input file name (raw data) */
     std::vector<std::string> m_inputFileNames; /**< list of input file names (raw data) */
-    unsigned int m_listIndex; /**< current index of input file name list element */
+    unsigned int m_listIndex;  /**< current index of input file name list element */
     unsigned long m_evtNumber; /**< current event number */
     unsigned long m_runNumber; /**< current run number */
     unsigned long m_expNumber; /**< current experiment number */
-    unsigned m_wordsRead; /** number of words read from file */
+    unsigned m_wordsRead;      /**< number of words read from file */
 
   };
 

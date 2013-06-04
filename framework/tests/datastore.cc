@@ -249,4 +249,50 @@ namespace Belle2 {
     EXPECT_FALSE(StoreArray<EventMetaData>::required("blah"));
   }
 
+  /** Test iteration. */
+  TEST_F(DataStoreTest, StoreArrayIteration)
+  {
+    const StoreArray<EventMetaData> evtData;
+    //array syntax
+    for (int i = 0; i < evtData.getEntries(); i++) {
+      EXPECT_TRUE(evtData[i] != NULL);
+    }
+
+    //const_iterator
+    int i = 0;
+    BOOST_FOREACH(const EventMetaData & emd, evtData) {
+      EXPECT_TRUE(&emd == evtData[i]);
+      i++;
+    }
+    EXPECT_EQ(i, evtData.getEntries());
+
+
+    //iterator
+    StoreArray<EventMetaData> evtDataNonConst;
+    i = 0;
+    BOOST_FOREACH(EventMetaData & emd, evtDataNonConst) {
+      EXPECT_TRUE(&emd == evtData[i]);
+      i++;
+    }
+    EXPECT_EQ(i, evtData.getEntries());
+
+    i = 0;
+    for (StoreArray<EventMetaData>::iterator it = evtDataNonConst.begin(); it != evtDataNonConst.end(); ++it) {
+      EXPECT_TRUE(&(*it) == evtData[i]);
+      EXPECT_EQ(it->getEvent(), 10 + i);
+      i++;
+    }
+    EXPECT_EQ(i, evtData.getEntries());
+
+    /*
+        //range-based for
+        i = 0;
+        for (EventMetaData& emd : evtDataNonConst) {
+          EXPECT_TRUE(&emd == evtData[i]);
+          i++;
+        }
+        EXPECT_EQ(i, evtData.getEntries());
+        */
+  }
+
 }  // namespace

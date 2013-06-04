@@ -31,7 +31,7 @@ main.add_module(geometry)
 
 display = register_module('Display')
 
-# The Options parameter is a combination of:
+# The options parameter is a combination of:
 # D draw detectors - draw simple detector representation (with different size)
 #   for each hit
 # H draw track hits
@@ -45,12 +45,11 @@ display = register_module('Display')
 # Note that you can always turn off an individual detector component or track
 # interactively by removing its checkmark in the 'Eve' tab.
 #
-# This option only makes sense when ShowGFTracks/ShowGFTrackCands is used
+# This option only makes sense when showGFTracks/showGFTrackCands is used
 display.param('options', 'HTM')  # default
 
 # should hits always be assigned to a particle with c_PrimaryParticle flag?
-# with this option off, many tracking hits will be assigned to secondary e-
-display.param('assignHitsToPrimaries', 1)
+display.param('assignHitsToPrimaries', False)
 
 # show all primary MCParticles?
 display.param('showAllPrimaries', True)
@@ -67,7 +66,7 @@ display.param('showGFTracks', True)
 # show track candidates?
 # You most likely don't want this unless you are a tracking developer
 display.param('showGFTrackCands', False)
-# If ShowGFTrackCands is true, you can set this option to switch between
+# If showGFTrackCands is true, you can set this option to switch between
 # PXD/SVDClusters and PXD/SVDTrueHits
 display.param('useClusters', True)
 

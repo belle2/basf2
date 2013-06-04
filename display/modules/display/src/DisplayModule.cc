@@ -26,21 +26,21 @@ REG_MODULE(Display)
 
 DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
 {
-  setDescription("Interactive visualisation of MCParticles, GFTracks and various SimHits (plus geometry).");
+  setDescription("Interactive visualisation of MCParticles, GFTracks and various SimHits (plus geometry). See https://belle2.cc.kek.jp/~twiki/bin/view/Computing/EventDisplay for detailed documentation.");
 
   addParam("options", m_options, "Drawing options for GFTracks, a combination of DHMPST. See EVEVisualization::setOptions or the display.py example for an explanation.", std::string("MHT"));
-  addParam("assignHitsToPrimaries", m_assignToPrimaries, "If true, hits created by secondary particles (e.g. delta electrons) will be assigned to the original primary particle.", true);
+  addParam("assignHitsToPrimaries", m_assignToPrimaries, "If true, hits created by secondary particles (after scattering, decay-in-flight, ...) will be assigned to the original primary particle.", false);
   addParam("showAllPrimaries", m_showAllPrimaries, "If true, all primary MCParticles will be shown, regardless of wether hits are produced.", false);
   addParam("hideSecondaries", m_hideSecondaries, "If true, secondary MCParticles (and hits created by them) will not be shown.", false);
-  addParam("showCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled AssignHitsToPrimaries). May be slow.", false);
-  addParam("showNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled AssignHitsToPrimaries). May be slow.", false);
+  addParam("showCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
+  addParam("showNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
   addParam("showGFTracks", m_showGFTracks, "If true, fitted GFTracks will be shown in the display.", true);
   addParam("showGFTrackCands", m_showGFTrackCands, "If true, track candidates (GFTrackCands array) will be shown in the display.", false);
   addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for GFTrackCands visualisation", false);
   addParam("automatic", m_automatic, "Non-interactively save visualisations for each event.", false);
   addParam("fullGeometry", m_fullGeometry, "Show full geometry instead of simplified shapes. Further details can be enabled by changing the VisLevel option for Eve -> Scenes -> Geometry Scene -> Top_1.", false);
 
-  //make sure dictionaries for PXD/SVDrecohits are loaded
+  //make sure dictionaries for PXDrecohits and RKTrackRep are loaded
   //needs to be done here to have dictionaries available during RootInput::initialize()
   gSystem->Load("libpxd");
   gSystem->Load("libgenfitRK");

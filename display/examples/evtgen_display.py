@@ -3,7 +3,6 @@
 
 # example steering file to generate B \bar B events and show the result,
 # including fitted tracks.
-# Creates all data that can be visualised right now.
 
 import os
 import random

@@ -3,6 +3,7 @@
   <BarMaterial>TOPSiO2</BarMaterial>
   <Nbar desc="Number of quartz bars">1</Nbar>
   <Radius desc="Distance from quartz bar to IP (inner radius)" unit="cm">119.0</Radius>
+  <Phi0 desc="azimuthal angle of first bar" unit="deg">0.0</Phi0>
   <QWidth desc="Bar width" unit="mm">400</QWidth>
   <QThickness desc="Bar thickness" unit="mm">20</QThickness>
   <QZBackward desc="Backward edge of the quartz bar" unit="cm">0.0</QZBackward>

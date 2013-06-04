@@ -18,7 +18,8 @@ namespace Belle2 {
    * @{
    */
 
-  /*! Class to store TOP digitized hits (output of TOPDigi)
+  /**
+   * Class to store TOP digitized hits (output of TOPDigi)
    * relation to TOPSimHit
    * filled in top/modules/TOPDigitizer/src/TOPDigiModule.cc
    */
@@ -26,47 +27,78 @@ namespace Belle2 {
   class TOPDigit : public RelationsObject {
   public:
 
-    /*! Default constructor */
-
+    /**
+     * Default constructor
+     */
     TOPDigit():
       m_barID(0),
       m_channelID(0),
-      m_TDC(0) {
+      m_TDC(0),
+      m_ADC(0),
+      m_hardChannelID(0) {
     }
 
-    /*!  Full constructor
+    /** Almost full constructor
      * @param barID     bar ID
      * @param channelID channel ID
      * @param TDC       digitized detection time
      */
-
     TOPDigit(int barID, int channelID, int TDC):
       m_barID(barID),
       m_channelID(channelID),
-      m_TDC(TDC) {
+      m_TDC(TDC),
+      m_ADC(0),
+      m_hardChannelID(0) {
     }
 
-    /*! Get bar ID
+    /** Full constructor
+     * @param barID     bar ID
+     * @param channelID software channel ID
+     * @param TDC       digitized detection time
+     * @param ADC       digitized pulse height or integrated charge
+     * @param hardChID  hardware channel ID
+     */
+    TOPDigit(int barID, int channelID, int TDC, int ADC, unsigned hardChID):
+      m_barID(barID),
+      m_channelID(channelID),
+      m_TDC(TDC),
+      m_ADC(ADC),
+      m_hardChannelID(hardChID) {
+    }
+
+    /** Get bar ID
      * @return bar ID
      */
     int getBarID() const { return m_barID; }
 
-    /*! Get channel ID
-     * @return channel ID
+    /** Get channel ID
+     * @return software channel ID
      */
     int getChannelID() const { return m_channelID; }
 
-    /*! Get digitized time
+    /** Get digitized time
      * @return digitized time
      */
     int getTDC() const { return m_TDC; }
 
-  private:
-    int m_barID;             /**< Bar ID */
-    int m_channelID;         /**< Channel ID */
-    int m_TDC;               /**< digitized time */
+    /** Get digitized pulse height or integrated charge
+     * @return digitized pulse height or integrated charge
+     */
+    int getADC() const { return m_ADC; }
 
-    ClassDef(TOPDigit, 1); /**< ClassDef */
+    /** Get hardware channel ID
+     * @return hardware channel ID
+     */
+    int getHardChannelID() const { return m_hardChannelID; }
+
+  private:
+    int m_barID;               /**< bar ID (1-based) */
+    int m_channelID;           /**< software channel ID (1-based) */
+    int m_TDC;                 /**< digitized time */
+    int m_ADC;                 /**< digitized pulse height or charge (to be decided) */
+    unsigned m_hardChannelID;  /**< hardware channel ID (0-based) */
+
+    ClassDef(TOPDigit, 2); /**< ClassDef */
 
   };
 

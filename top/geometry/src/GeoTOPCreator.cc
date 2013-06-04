@@ -98,12 +98,13 @@ namespace Belle2 {
       G4LogicalVolume* module = buildTOPModule(content, moduleID);
 
       G4double Radius = m_topgp->getRadius() + m_topgp->getQthickness() / 2.0;
+      G4double phi0 = m_topgp->getPhi0();
       G4int Nbars = m_topgp->getNbars();
 
       //! position the segment
       for (G4int i = 0; i < Nbars; i++) {
 
-        G4double phi = i * 2 * M_PI / ((double)Nbars);
+        G4double phi = i * 2 * M_PI / ((double)Nbars) + phi0;
 
         G4RotationMatrix rot(M_PI / 2.0, M_PI / 2.0, -phi);
         G4ThreeVector trans(Radius * cos(phi), Radius * sin(phi), 0);

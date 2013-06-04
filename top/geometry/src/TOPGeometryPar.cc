@@ -56,6 +56,7 @@ namespace Belle2 {
       //! Bars
       m_Nbars = 0;
       m_Radius = 0;
+      m_phi0 = 0;
       m_Qwidth = 0;
       m_Qthickness = 0;
       m_Bposition = 0;
@@ -141,6 +142,7 @@ namespace Belle2 {
       GearDir barParams(content, "Bars");
       m_Nbars = barParams.getInt("Nbar");
       m_Radius = barParams.getLength("Radius");
+      m_phi0 = barParams.getAngle("Phi0");
       m_Qwidth = barParams.getLength("QWidth");
       m_Qthickness = barParams.getLength("QThickness");
       m_Bposition = barParams.getLength("QZBackward");

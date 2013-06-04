@@ -90,6 +90,11 @@ namespace Belle2 {
        */
       double getRadius() const {return m_Radius / m_unit;}
 
+      /** Get azimuthal angle of the first bar
+       * @return azimuthal angle (radians)
+       */
+      double getPhi0() const {return m_phi0;}
+
       /** Get the width of the quartz bar
        *@return width of quartz bar
        */
@@ -400,6 +405,7 @@ namespace Belle2 {
 
       int m_Nbars;          /**< number of bars */
       double m_Radius;      /**< distance to inner surface */
+      double m_phi0;        /**< azimuthal angle of first bar */
       double m_Qwidth;      /**< bar width */
       double m_Qthickness;  /**< bar thickness */
       double m_Bposition;   /**< bar backward position */

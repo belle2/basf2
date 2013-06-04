@@ -270,7 +270,7 @@ namespace Belle2 {
 
       int n = m_topgp->getNbars();           // number of bars in phi
       double Dphi = 2 * M_PI / n;
-      double Phi = - 0.5 * M_PI;
+      double Phi = m_topgp->getPhi0() - 0.5 * M_PI;
 
       int id;
       double R = m_topgp->getRadius();          // innner bar surface radius

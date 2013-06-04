@@ -123,12 +123,16 @@ void DisplayUI::goToEvent(Long_t id)
 
   if (numEntries > 0 && InputController::canControlInput()) {
     B2DEBUG(100, "Switching to event " << id);
-    m_eventLabel->SetTextColor(gROOT->GetColor(kRed + 1));
-    m_eventLabel->SetText(" \nLoading...\n ");
     InputController::setNextEntry(id);
   } else {
     m_currentEntry++;
   }
+  m_eventLabel->SetTextColor(gROOT->GetColor(kRed + 1));
+  m_eventLabel->SetText(" \nLoading...\n ");
+  if (m_timer)
+    m_timer->Stop(); //apparently timer only deactivates after processing event, so do it manually
+  //process remaining events to ensure redraw (only needed if called from Timeout())
+  gSystem->ProcessEvents();
 
   B2DEBUG(100, "exiting event loop now.");
   //exit event loop to allow basf2 to go to next event

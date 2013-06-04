@@ -11,13 +11,14 @@
 #ifndef BKLMSIMHIT_H
 #define BKLMSIMHIT_H
 
+#include <generators/dataobjects/SimHitBase.h>
 #include <TVector3.h>
 #include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
   //! Store one simulation hit as a ROOT object
-  class BKLMSimHit : public RelationsObject {
+  class BKLMSimHit : public SimHitBase {
 
   public:
 

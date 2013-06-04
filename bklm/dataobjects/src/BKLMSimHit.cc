@@ -15,7 +15,20 @@ using namespace Belle2;
 ClassImp(BKLMSimHit)
 
 //! empty constructor for ROOT
-BKLMSimHit::BKLMSimHit()
+BKLMSimHit::BKLMSimHit() :
+  SimHitBase(),
+  m_Position(TVector3(0.0, 0.0, 0.0)),
+  m_Time(0.0),
+  m_DeltaE(0.0),
+  m_KE(0.0),
+  m_Status(0),
+  m_IsForward(false),
+  m_Sector(0),
+  m_Layer(0),
+  m_Plane(0),
+  m_IsPhiReadout(false),
+  m_StripMin(0),
+  m_StripMax(0)
 {
 }
 
@@ -24,6 +37,7 @@ BKLMSimHit::BKLMSimHit(const TVector3& position, double time, double deltaE,
                        double KE, unsigned int status,
                        bool isForward, int sector, int layer, int plane,
                        bool isPhiReadout, int stripMin, int stripMax) :
+  SimHitBase(),
   m_Position(position),
   m_Time(time),
   m_DeltaE(deltaE),

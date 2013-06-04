@@ -100,7 +100,10 @@ namespace Belle2 {
     /** return viewer class. */
     SplitGLView* getViewer() { return m_viewer; }
 
-    /** Check if new events are available. */
+    /** Check if new events are available, and go to next event.
+     *
+     * Only useful for AsyncDisplay.
+     */
     void pollNewEvents();
 
     /** Close window and continue execution. */

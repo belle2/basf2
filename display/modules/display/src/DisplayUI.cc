@@ -172,14 +172,9 @@ void DisplayUI::togglePlayPause()
   } else {
     //play
     m_timer = new TTimer();
-    int pollIntervalMs = 100;
-    if (AsyncWrapper::isAsync()) {
-      m_timer->Connect("Timeout()", "Belle2::DisplayUI", this, "pollNewEvents()");
-    } else if (InputController::canControlInput()) {
-      m_timer->Connect("Timeout()", "Belle2::DisplayUI", this, "next()");
-      pollIntervalMs = (int)(1000.0 * m_autoAdvanceDelay->GetNumber());
-    }
-    m_timer->Start(pollIntervalMs);
+    const int pollIntervalMs = (int)(1000.0 * m_autoAdvanceDelay->GetNumber());
+    m_timer->Connect("Timeout()", "Belle2::DisplayUI", this, "next()");
+    m_timer->Start(pollIntervalMs, true); //single-shot, will be restarted after event is loaded
     m_playPauseButton->SetPicture(gClient->GetPicture(icondir + "ed_interrupt.png"));
   }
 }
@@ -239,8 +234,7 @@ bool DisplayUI::startDisplay()
   if (!m_guiInitialized) {
     makeGui();
 
-    //import the geometry in the projection managers (only needs to be done once
-    B2INFO("Creating projections ...");
+    //import the geometry in the projection managers (only needs to be done once)
     TEveScene* gs = gEve->GetGlobalScene();
     TEveProjectionManager* rphiManager = getViewer()->getRPhiMgr();
     if (rphiManager) {
@@ -259,6 +253,10 @@ bool DisplayUI::startDisplay()
 
   if (!m_automatic) {
     gEve->Redraw3D(false); //do not reset camera when redrawing
+
+    //restart auto-advance timer after loading event (interval already set)
+    if (m_timer)
+      m_timer->Start(-1, true);
 
     //make display interactive
     gApplication->Run(true); //return from Run()
@@ -284,7 +282,7 @@ void DisplayUI::makeGui()
   browser->StartEmbedding(TRootBrowser::kLeft);
 
   TGMainFrame* frmMain = new TGMainFrame(gClient->GetRoot(), 240, 600);
-  frmMain->SetWindowName("Event Control main frame");
+  frmMain->SetWindowName("Event control main frame");
   frmMain->SetCleanup(kDeepCleanup);
 
   const TString icondir(Form("%s/icons/", gSystem->Getenv("ROOTSYS")));
@@ -325,26 +323,26 @@ void DisplayUI::makeGui()
 
     hf = new TGHorizontalFrame(event_frame);
     {
-      const bool file = InputController::canControlInput();
+      //const bool file = InputController::canControlInput();
       const bool async = AsyncWrapper::isAsync();
 
       TGLabel* delayLabel = new TGLabel(hf, "Delay (s):");
       hf->AddFrame(delayLabel, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
 
-      const double valueSeconds = 3.5;
+      const double valueSeconds = async ? 0.5 : 3.5;
       m_autoAdvanceDelay = new TGNumberEntry(hf, valueSeconds, 3, 999, TGNumberFormat::kNESRealOne,
                                              TGNumberFormat::kNEAPositive,
                                              TGNumberFormat::kNELLimitMin,
                                              0.1); //minimum
-      m_autoAdvanceDelay->SetState(file);
+      //m_autoAdvanceDelay->SetState(file or async);
       hf->AddFrame(m_autoAdvanceDelay, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 5, 5, 5));
       //note: parameter of ValueSet signal is _not_ the number just set.
       m_autoAdvanceDelay->Connect("ValueSet(Long_t)", "Belle2::DisplayUI", this, "autoAdvanceDelayChanged()");
       m_autoAdvanceDelay->GetNumberEntry()->Connect("ReturnPressed()", "Belle2::DisplayUI", this, "autoAdvanceDelayChanged()");
 
       m_playPauseButton = new TGPictureButton(hf, gClient->GetPicture(icondir + "ed_execute.png"));
-      m_playPauseButton->SetEnabled(file or async);
-      m_playPauseButton->SetToolTipText("Advance automatically to next event after the given delay. For AsyncDisplay, new data is shown without delay.");
+      //m_playPauseButton->SetEnabled(file or async);
+      m_playPauseButton->SetToolTipText("Advance automatically to next event after the given delay.");
       hf->AddFrame(m_playPauseButton, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 5, 5, 5, 5));
       m_playPauseButton->Connect("Clicked()", "Belle2::DisplayUI", this, "togglePlayPause()");
     }

@@ -24,7 +24,6 @@
 #include <unistd.h>
 
 #include <cstdlib>
-#include <iostream>
 
 using namespace Belle2;
 
@@ -113,14 +112,13 @@ void AsyncWrapper::terminate()
   if (!m_procHandler->isEvtProc()) {
     m_tx->terminate();
 
-    //can't use basf2 logging in destructor
-    std::cout << "\nWaiting for asynchronous process...\n";
+    B2INFO("Waiting for asynchronous process...");
     EvtMessage term(NULL, 0, MSG_TERMINATE);
     while (m_ringBuffer->insq((int*)term.buffer(), (term.size() - 1) / sizeof(int) + 1) < 0) {
       usleep(200);
     }
     m_procHandler->wait_event_processes();
-    std::cout << "Done, cleaning up...\n";
+    B2INFO("Done, cleaning up...");
     delete m_tx;
     delete m_rx;
     delete m_ringBuffer;

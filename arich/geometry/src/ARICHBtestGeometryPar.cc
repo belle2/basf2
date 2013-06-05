@@ -140,9 +140,6 @@ namespace Belle2 {
 
     void ARICHBtestGeometryPar::clear(void)
     {
-
-
-
       m_init = false;
       m_simple = false;
       m_trackingShift = TVector3();
@@ -151,7 +148,6 @@ namespace Belle2 {
 
 
     }
-
 
     void ARICHBtestGeometryPar::Print(void) const
     {

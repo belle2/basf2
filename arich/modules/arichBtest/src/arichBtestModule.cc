@@ -157,14 +157,10 @@ void arichBtestModule::beginRun()
 {
 
   B2INFO("arichBtestModule::beginRun()");
+
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
-
-  int exp = eventMetaDataPtr->getExperiment();
-  int run = eventMetaDataPtr->getRun();
-
-
-  B2INFO("arichBtestModule::eventMetaDataPtr run:" << run);
-  B2INFO("arichBtestModule::eventMetaDataPtr exp:" << exp);
+  B2INFO("arichBtestModule::eventMetaDataPtr run:" << eventMetaDataPtr->getRun());
+  B2INFO("arichBtestModule::eventMetaDataPtr exp:" << eventMetaDataPtr->getExperiment());
 
   arich::ARICHBtestGeometryPar* _arichbtgp = arich::ARICHBtestGeometryPar::Instance();
   m_mwpc = _arichbtgp->getMwpc();
@@ -173,7 +169,6 @@ void arichBtestModule::beginRun()
   if (first) {
     m_runCurrent = m_runList.begin();
     first = 0;
-
     m_mwpc[0].Print();
     m_mwpc[1].Print();
     m_mwpc[2].Print();
@@ -232,10 +227,10 @@ void arichBtestModule::readmwpc(unsigned int* dbuf, unsigned int len)
         break;
       case 0x10:  // Global Trailer --- Last word of data
         nhits = ((dbuf[i] >> 5) & 0xFFFF); //Word Count = bit 31...21< Word Count: 20 ... 5 > 4...0
-        if (print1290) printf("Global Trailer  0x%08x %u.data  STATUS=0x%03x nhits=%d\n", dbuf[i], i, (dbuf[i] >> 24) & 0x7, nhits);
+        if (print1290) printf("Global Trailer  0x%08x %u.data  STATUS=0x%03x nhits=%u\n", dbuf[i], i, (dbuf[i] >> 24) & 0x7, nhits);
 
         if (nhits != len) {
-          if (print1290) printf("V1290 nhits!=len %d %d\n", nhits, len);
+          if (print1290) printf("V1290 nhits!=len %u %d\n", nhits, len);
         };
         break;
       case 0x11:  // Global Trigger TimeTag
@@ -262,14 +257,14 @@ void arichBtestModule::readmwpc(unsigned int* dbuf, unsigned int len)
           //if (tdcch>15) gV1290[tdcch]->Fill(tdcl/40);
           //if (tdcch>15) if (tdcl< trg[tdcch-16] && tdcl>16000 && tdcl<20000 ) trg[tdcch-16]=tdcl;
           if (print1290)
-            printf("V1290 0x%08x %d. [ch=%2d] edge=%d data=%d \n", dbuf[i], i, tdcch, edge, tdcl);
+            printf("V1290 0x%08x %u. [ch=%2u] edge=%u data=%u \n", dbuf[i], i, tdcch, edge, tdcl);
           m_tdc[tdcch] = tdcl / 40;
         }
 
         break;
 
       default:
-        if (print1290) printf("Unknown  0x%08x %d.data\n", dbuf[i], i);
+        if (print1290) printf("Unknown  0x%08x %u.data\n", dbuf[i], i);
 
         break;
 
@@ -590,8 +585,8 @@ void arichBtestModule::terminate()
     B2INFO(m_eveList[i++] << " events processed from file " << fname);
   }
   for (int i = 0; i < 4; i++) {
-    ARICHTracking* w = &m_mwpc[i];
-    B2INFO(i << " a1=" << w->tdc[0] << " a2="  << w->tdc[1] << " a3=" << w->tdc[2] << " a2="  << w->tdc[3] << " A=" << w->atdc);
+    //ARICHTracking* w = &m_mwpc[i];
+    B2INFO(i << " a1=" << m_mwpc[i].tdc[0] << " a2="  << m_mwpc[i].tdc[1] << " a3=" << m_mwpc[i].tdc[2] << " a2="  << m_mwpc[i].tdc[3] << " A=" << m_mwpc[i].atdc);
   }
 
 }

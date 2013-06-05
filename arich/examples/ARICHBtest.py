@@ -3,7 +3,7 @@
 
 #
 # Usage:
-# basf2 arich/modules/arichBtest2011/examples/ARICHBtest2011.py --
+# basf2 arich/examples/ARICHBtest2011.py --
 #       -r 102 -n 10000
 #
 from basf2 import *
@@ -11,6 +11,8 @@ from optparse import OptionParser
 import os
 import os.path
 import sys
+
+set_log_level(LogLevel.INFO)
 
 outroot = 'arichbtest.root'
 
@@ -69,8 +71,6 @@ print 'TrackMask:' + options.mask
 # this variable is called from GeoARICHBtest2011Creator
 averageagel = int(options.avgagel)
 
-set_log_level(LogLevel.INFO)
-
 evtmetagen = register_module('EvtMetaGen')
 evtmetagen.param('evtNumList', [int(options.neve)])
 evtmetagen.param('runList', [int(options.runno)])
@@ -83,6 +83,8 @@ xmlgeometry = 'file://%s/arich/modules/arichBtest/data/%s/arichBtest%s.xml' \
     % (os.getcwd(), options.year, options.year)
 paramloader.param('fileName', xmlgeometry)
 print xmlgeometry
+paramloader.param('fileName', xmlgeometry)
+
 # paramloader.param('Backends', ['sql:'])
 # paramloader.param('Filename',
 #             'mysql://basf2:belle2@f9lab02.ijs.si:3306/b2config');
@@ -105,7 +107,7 @@ btest.param('outputFileName', outroot)
 momentum = 120.0
 if options.year == '2013':
     momentum = 3.0
-    print 'Momentum ' + str(momentum)
+print 'Beam momentum ' + str(momentum)
 btest.param('beamMomentum', momentum)
 
 # Simulation module

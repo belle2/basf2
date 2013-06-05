@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<DetectorComponent name="ARICHBtest2011" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <Creator library="arich">ARICHBtest2011Creator</Creator>
+<DetectorComponent name="ARICHBtest" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Creator library="arich">ARICHBtestCreator</Creator>
   <Content type="beamtest">
  <xi:include href="ARICH_Beamtest2011_Materials.xml"/>
  <xi:include href="ARICH_Beamtest2011_Setup.xml"/>

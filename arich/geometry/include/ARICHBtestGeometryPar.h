@@ -51,7 +51,7 @@ namespace Belle2 {
         reco[i] = 0;
       }
     };
-    //! Default Constructor
+    //! Default destructor
     ~ARICHTracking() {};
     //! TDC of the 4 cathode signals
     int tdc[4];

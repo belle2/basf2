@@ -362,6 +362,7 @@ namespace Belle2 {
 
       B2INFO("ARICH Btest geometry will be built.")
       ARICHGeometryPar* m_arichgp = ARICHGeometryPar::Instance();
+
       ARICHBtestGeometryPar* m_arichbtgp = ARICHBtestGeometryPar::Instance();
 
       for (unsigned int i = 0; i < m_agelrefind.size(); i++) {

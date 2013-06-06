@@ -69,7 +69,7 @@ TRGCDC::name(void) const {
 
 string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.32");
+    return string("TRGCDC 5.33");
 }
 
 TRGCDC *
@@ -1175,6 +1175,7 @@ TRGCDC::terminate(void) {
     return TRGCDC_UNDEFINED;
   }
 
+#ifndef FOR_TRASAN
   unsigned
   TRGCDC::axialStereoSuperLayerId(unsigned ,
                                   unsigned) const
@@ -1184,6 +1185,42 @@ TRGCDC::terminate(void) {
          << endl;
     return TRGCDC_UNDEFINED;
   }
+#else
+  unsigned
+  TRGCDC::axialStereoSuperLayerId(unsigned aors,
+				  unsigned i) const
+  {
+    unsigned is = 99;
+    //    cout << "aors,i= " << aors <<" "<< i << std::endl;
+    if       (aors == 0) { //axial
+      if       ( i <=  7) {
+	is = 0;
+      } else if( i <= 13) {
+	is = 1;
+      } else if( i <= 19) {
+	is = 2;
+      } else if( i <= 25) {
+	is = 3;
+      } else if( i <= 31) {
+	is = 4;
+      }      
+
+    } else if(aors == 1) { //stereo
+      if       ( i <=  5) {
+	is = 0;
+      } else if( i <= 11) {
+	is = 1;
+      } else if( i <= 17) {
+	is = 2;
+      } else if( i <= 23) {
+	is = 3;
+      }      
+    }
+
+    assert(is != 99);
+    return is;
+  }
+#endif
 
 // void
 // TRGCDC::driftDistance(TLink & l,

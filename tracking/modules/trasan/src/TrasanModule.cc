@@ -37,6 +37,21 @@ namespace Belle2 {
              "Name of collection holding the GFTrackCandidates (output)",
              string(""));
 
+    //ho
+    //...Hough Finder...
+    addParam("doHoughFinder", _tra.b_doHoughFinder,
+	     "Hough Finder switch", 1);
+    addParam("doHoughFinderCurlSearch", _tra.b_doHoughFinderCurlSearch,
+	     "Hough Finder curl search switch", 1);
+    //...Conformal finder...
+    //    addParam("doConformalFinder", _tra.b_doConformalFinder,
+    //		    "Conformal Finder switch", 0);
+    //...CurlFinder...
+    addParam("doCurlFinder", _tra.b_doCurlFinder,
+	     "Curl Finder switch", 0);
+
+    addParam("helixFitterNtrialMax", _tra.b_helixFitterNtrialMax,
+	     "helix fitter max. # iterations", 20);
 #ifdef TRASAN_DEBUG
     cout << "TrasanModule ... created" << endl;
 #endif

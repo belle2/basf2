@@ -922,7 +922,8 @@ namespace Belle {
 
 std::string
 Trasan::version(void) const {
-    return "5.02";
+  //ho    return "5.02";
+    return "5.12";
 }
 
 //...Definitions...
@@ -956,7 +957,8 @@ Trasan::version(void) const {
       b_doPerfectFinder(0),
       b_perfectFitting(0),
 
-      b_conformalFinder(1),
+      //ho      b_conformalFinder(1),
+      b_conformalFinder(0),
       b_doConformalFinder(1),
       b_doConformalFastFinder(1),
       b_doConformalSlowFinder(1),
@@ -1002,7 +1004,8 @@ Trasan::version(void) const {
       b_test(0),
 
   /* For Curl Finder --> */
-      b_doCurlFinder(1),
+      //ho      b_doCurlFinder(1),
+      b_doCurlFinder(0),
       min_segment(5),
       min_salvage(10),
       bad_distance_for_salvage(1.0),
@@ -1037,8 +1040,10 @@ Trasan::version(void) const {
       z_diff_for_last_attend(1.5),
       svd_reconstruction(0),
       min_svd_electrons(20000.),
-      on_correction(1),
-      output_2dtracks(1),
+      //ho      on_correction(1),
+      //ho      output_2dtracks(1),
+      on_correction(0),
+      output_2dtracks(0),
       curl_version(2),
   /* <-- For Curl Finder */
 
@@ -2546,8 +2551,7 @@ start:
     }
 
     //...Curl finder...
-//cnv    if (b_doCurlFinder) {
-    if (0) {
+    if (b_doCurlFinder) {
       if ((! b_doSalvage) && (b_conformalFinder == 0)) {
         _trackManager.maskCurlHits(axialHits,
                                    stereoHits,

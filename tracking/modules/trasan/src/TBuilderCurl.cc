@@ -337,12 +337,16 @@ TWindow szc("szc");
 namespace Belle {
 
   bool TBuilderCurl::ms_smallcell(false);
-  bool TBuilderCurl::ms_superb(false);
+  //ho  bool TBuilderCurl::ms_superb(false);
+  bool TBuilderCurl::ms_superb(true);
 
   TBuilderCurl::TBuilderCurl(const std::string& name)
     : TBuilder0(name),
       _fitter("TBuilderCurl Fitter")
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::TBuilderCurl" << std::endl;
+#endif
 #if 0
     if (m_param.ON_CORRECTION) {
       _fitter.sag(true);
@@ -355,6 +359,9 @@ namespace Belle {
 
   TBuilderCurl::~TBuilderCurl()
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::~TBuilderCurl" << std::endl;
+#endif
     if (m_param.SVD_RECONSTRUCTION) {
       //delete m_svdFinder;
 //cnv    delete m_svdAssociator;
@@ -364,6 +371,9 @@ namespace Belle {
   void
   TBuilderCurl::setParam(const TCurlFinderParameter& p)
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::setParam" << std::endl;
+#endif
     m_param.Z_CUT = p.Z_CUT;
     m_param.Z_DIFF_FOR_LAST_ATTEND = p.Z_DIFF_FOR_LAST_ATTEND;
     m_param.SELECTOR_MAX_SIGMA = p.SELECTOR_MAX_SIGMA;
@@ -394,6 +404,9 @@ namespace Belle {
   void
   TBuilderCurl::resetTHelixFit(THelixFitter* fit) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::resetHelixFit" << std::endl;
+#endif
     fit->fit2D(false);
     fit->sag(false);
     fit->propagation(false);
@@ -410,6 +423,9 @@ namespace Belle {
                             double& dZ,
                             double& tanL) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::buildStereo 0" << std::endl;
+#endif
     if (!(m_param.SVD_RECONSTRUCTION))return false;
 
 // #if 0
@@ -457,6 +473,9 @@ namespace Belle {
   TTrack*
   TBuilderCurl::buildStereo(TTrack&, const AList<TLink> &) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::buildStereo 1" << std::endl;
+#endif
     return NULL;
   }
 
@@ -465,6 +484,9 @@ namespace Belle {
                             const AList<TLink> & stereoList,
                             const AList<TLink> & allStereoList) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::buildStereo 2" << std::endl;
+#endif
 #ifdef TRASAN_DEBUG_DETAIL
     const std::string stage = "BuildCurlStereo";
     EnterStage(stage);
@@ -928,6 +950,9 @@ namespace Belle {
   void
   TBuilderCurl::setArcZ(TTrack& track, AList<TLink> &list) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::setArcZ 0" << std::endl;
+#endif
     if (track.nLinks() < 4) {
       track.stereoHitForCurl(list);
       return;
@@ -937,6 +962,11 @@ namespace Belle {
     AList<TLink> slayer[5];
     for (unsigned i = 0, size = track.nLinks(); i < size; ++i) {
       unsigned id = (track.links())[i]->wire()->superLayerId();
+      //ho
+      if( id<0 || id>8 ) {
+	std::cout << "invalid id=" << id <<" in TBuilderCurl::setArcZ" << std::endl;	
+	exit(-1);
+      }
       if (id == 0)alayer[0].append((track.links())[i]);
       else if (id ==  2)alayer[1].append((track.links())[i]);
       else if (id ==  4)alayer[2].append((track.links())[i]);
@@ -1077,6 +1107,9 @@ namespace Belle {
   TBuilderCurl::appendPoints(AList<TLink> &list, AList<TLink> &line,
                              double a, double b, TTrack&, double z_cut) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::appendPoints" << std::endl;
+#endif
     unsigned size = list.length();
     if (size == 0)return 0;
     unsigned counter(0);
@@ -1105,6 +1138,9 @@ namespace Belle {
             double& m_a, double& m_b, double& chi2, double& nhits,
             int ipC = 0)
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::doLineFit" << std::endl;
+#endif
     m_a = m_b = nhits = 0.;
     chi2 = 1.e+10;
     unsigned n = points.length();
@@ -1160,6 +1196,9 @@ namespace Belle {
                         AList<TLink> &goodLine, AList<Point3D> &goodPosition,
                         int& overCounter) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::fitLine" << std::endl;
+#endif
 // #if 0
 //   // OLD
 //   unsigned size = tmpLine.length();
@@ -1203,6 +1242,9 @@ namespace Belle {
   unsigned
   TBuilderCurl::check(const TTrack& track) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::check" << std::endl;
+#endif
     unsigned nAhits(0), nShits(0);
     for (unsigned i = 0, size = track.nLinks(); i < size; ++i) {
       if (!(track.links()[i]->hit()->state() & CellHitFittingValid))continue;
@@ -1222,6 +1264,9 @@ namespace Belle {
 // checkBorder(AList<TLink> &layer0,
 //      AList<TLink> &layer1,
 //      AList<TLink> &layer2){
+#if defined(HO_DEBUG)
+  //  std::cout << " TBuilderCurl::checkBorder 0" << std::endl;
+#endif
 //   const TRGCDC &cdc = *TRGCDC::getTRGCDC();
 
 //   AList<TLink> list = layer0;
@@ -1259,6 +1304,9 @@ namespace Belle {
 //      AList<TLink> &layer1,
 //      AList<TLink> &layer2,
 //      AList<TLink> &layer3){
+#if defined(HO_DEBUG)
+  //  std::cout << " TBuilderCurl::checkBorder 1" << std::endl;
+#endif
 //   const TRGCDC &cdc = *TRGCDC::getTRGCDC();
 
 //   AList<TLink> list = layer0;
@@ -1294,6 +1342,9 @@ namespace Belle {
   int
   TBuilderCurl::offsetBorder(TLink* l)
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::offsetBorder" << std::endl;
+#endif
     const Belle2::TRGCDC& cdc = *Belle2::TRGCDC::getTRGCDC();
 
     int layerId = l->hit()->wire().layerId();
@@ -1314,6 +1365,9 @@ namespace Belle {
   void
   TBuilderCurl::makeList(AList<TLink> &layer, AList<TLink> &list, double q, int border, int checkB, TLink* layer0)
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::makeList" << std::endl;
+#endif
     int n = layer.length();
     if (checkB == 0) {
       for (int i = 0; i < n; ++i) {
@@ -1344,13 +1398,17 @@ namespace Belle {
   int
   TBuilderCurl::sortByLocalId(AList<TLink> &list) const
   {
-    const Belle2::TRGCDC& cdc = *Belle2::TRGCDC::getTRGCDC();
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::sortByLocalId" << std::endl;
+#endif
+  //ho    const Belle2::TRGCDC& cdc = *Belle2::TRGCDC::getTRGCDC();
 
     int size = list.length();
     if (size <= 1)return 0;
     int layerId = list[0]->hit()->wire().layerId();
     int maxLocalId;
     if (ms_superb) {
+      const Belle2::TRGCDC& cdc = *Belle2::TRGCDC::getTRGCDC();
       const Belle2::TRGCDCLayer& l = *cdc.layer(layerId);
       maxLocalId = l.nCells() - 1;
     } else {
@@ -1397,6 +1455,9 @@ namespace Belle {
   TTrack*
   TBuilderCurl::buildStereoMC(TTrack&, const AList<TLink> &) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::buildStereoMC" << std::endl;
+#endif
 #if DEBUG_CURL_MC
     AList<TLink> list = stereoList;
 
@@ -1499,6 +1560,9 @@ namespace Belle {
   TBuilderCurl::plotArcZ(AList<TLink> &tmpLine,
                          double a, double b, const int flag) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::plotArcZ" << std::endl;
+#endif
     //#if 1
     if (a == 9999. || b == 9999.) {
       a = 0.;
@@ -1608,6 +1672,9 @@ namespace Belle {
   unsigned
   TBuilderCurl::findMaxLocalId(unsigned superLayerId)
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::findMaxLocalId" << std::endl;
+#endif
     const Belle2::TRGCDC& cdc = *Belle2::TRGCDC::getTRGCDC();
 //  const AList<Belle2::TRGCDCLayer> &sl=*cdc.superLayer(superLayerId);
     const std::vector<Belle2::TRGCDCLayer*> & sl = * cdc.superLayer(superLayerId);
@@ -1631,6 +1698,9 @@ namespace Belle {
                             int lr,
                             const AList<TLink> &allStereoList)
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::isIsolation" << std::endl;
+#endif
     unsigned findId;
     if (lr == 1) { // R : ox, Dose a wire exist at "x"?
       findId = maxLocalId;
@@ -1657,111 +1727,117 @@ namespace Belle {
                             const AList<TLink> &hitsOnLayer,
                             const AList<TLink> &allStereoList)
   {
-//cnv  //...finds "two" seq. and isolated hits.
-//   //...and then sets LR for selected hits.
-//   if(hitsOnLayer.length() == 0 ||
-//      hitsOnLayer.length() > 3)return;
-//   twoOnLayer.removeAll();
-//   if(hitsOnLayer.length() == 1){
-//     if(hitsOnLayer[0]->wire()->superLayerId() == 1)return;
-//     unsigned maxLocalId = findMaxLocalId(hitsOnLayer[0]->wire()->superLayerId());
-//     unsigned R = isIsolation(hitsOnLayer[0]->wire()->localId(),
-//           maxLocalId,
-//           hitsOnLayer[0]->wire()->layerId(),1,allStereoList);
-//     unsigned L = isIsolation(hitsOnLayer[0]->wire()->localId(),
-//           maxLocalId,
-//           hitsOnLayer[0]->wire()->layerId(),-1,allStereoList);
-//     if(R == 1 && L == 0){
-//       unsigned nextLocalId = hitsOnLayer[0]->wire()->localIdForPlus()+1;
-//       L = isIsolation(nextLocalId,
-//          maxLocalId,
-//          hitsOnLayer[0]->wire()->layerId(),-1,allStereoList);
-//       if(L == 1){ // xuox
-//  hitsOnLayer[0]->leftRight(1); // R
-//  hitsOnLayer[0]->position(hitsOnLayer[0]->arcZ(1));
-//  twoOnLayer.append(hitsOnLayer[0]);
-//       }
-//     }else if(R == 0 && L == 1){
-//       unsigned nextLocalId = hitsOnLayer[0]->wire()->localIdForMinus()+1;
-//       R = isIsolation(nextLocalId,
-//          maxLocalId,
-//          hitsOnLayer[0]->wire()->layerId(),1,allStereoList);
-//       if(R == 1){ // xoux
-//  hitsOnLayer[0]->leftRight(0); // L
-//  hitsOnLayer[0]->position(hitsOnLayer[0]->arcZ(0));
-//  twoOnLayer.append(hitsOnLayer[0]);
-//       }
-//     }
-//   }
-//   if(hitsOnLayer.length() == 2){
-//     if(hitsOnLayer[0]->wire()->localIdForPlus()+1 ==
-//        (int) hitsOnLayer[1]->wire()->localId()){
-//       unsigned maxLocalId = findMaxLocalId(hitsOnLayer[0]->wire()->superLayerId());
-//       unsigned R = isIsolation(hitsOnLayer[0]->wire()->localId(),
-//             maxLocalId,
-//             hitsOnLayer[0]->wire()->layerId(),1,allStereoList);
-//       unsigned L = isIsolation(hitsOnLayer[1]->wire()->localId(),
-//             maxLocalId,
-//             hitsOnLayer[1]->wire()->layerId(),-1,allStereoList);
-//       if(R == 1 && L == 1){ // xoox
-//  hitsOnLayer[0]->leftRight(1); // R
-//  hitsOnLayer[0]->position(hitsOnLayer[0]->arcZ(1));
-//  hitsOnLayer[1]->leftRight(0); // L
-//  hitsOnLayer[1]->position(hitsOnLayer[1]->arcZ(0));
-//  twoOnLayer.append(hitsOnLayer[0]);
-//  twoOnLayer.append(hitsOnLayer[1]);
-//       }
-//     }
-//   }
-//   if(hitsOnLayer.length() == 3){
-//     if(hitsOnLayer[0]->wire()->localIdForPlus()+1 ==
-//        (int) hitsOnLayer[1]->wire()->localId() &&
-//        hitsOnLayer[1]->wire()->localIdForPlus()+1 !=
-//        (int) hitsOnLayer[2]->wire()->localId()){
-//       unsigned maxLocalId = findMaxLocalId(hitsOnLayer[0]->wire()->superLayerId());
-//       unsigned R = isIsolation(hitsOnLayer[0]->wire()->localId(),
-//             maxLocalId,
-//             hitsOnLayer[0]->wire()->layerId(),1,allStereoList);
-//       unsigned L = isIsolation(hitsOnLayer[1]->wire()->localId(),
-//             maxLocalId,
-//             hitsOnLayer[1]->wire()->layerId(),-1,allStereoList);
-//       if(R == 1 && L == 1){ // oxoox
-//  hitsOnLayer[0]->leftRight(1); // R
-//  hitsOnLayer[0]->position(hitsOnLayer[0]->arcZ(1));
-//  hitsOnLayer[1]->leftRight(0); // L
-//  hitsOnLayer[1]->position(hitsOnLayer[1]->arcZ(0));
-//  twoOnLayer.append(hitsOnLayer[0]);
-//  twoOnLayer.append(hitsOnLayer[1]);
-//       }
-//     }else if(hitsOnLayer[0]->wire()->localIdForPlus()+1 !=
-//       (int) hitsOnLayer[1]->wire()->localId() &&
-//       hitsOnLayer[1]->wire()->localIdForPlus()+1 ==
-//       (int) hitsOnLayer[2]->wire()->localId()){
-//       unsigned maxLocalId = findMaxLocalId(hitsOnLayer[1]->wire()->superLayerId());
-//       unsigned R = isIsolation(hitsOnLayer[1]->wire()->localId(),
-//             maxLocalId,
-//             hitsOnLayer[1]->wire()->layerId(),1,allStereoList);
-//       unsigned L = isIsolation(hitsOnLayer[2]->wire()->localId(),
-//             maxLocalId,
-//             hitsOnLayer[2]->wire()->layerId(),-1,allStereoList);
-//       if(R == 1 && L == 1){ // xooxo
-//  hitsOnLayer[1]->leftRight(1); // R
-//  hitsOnLayer[1]->position(hitsOnLayer[1]->arcZ(1));
-//  hitsOnLayer[2]->leftRight(0); // L
-//  hitsOnLayer[2]->position(hitsOnLayer[2]->arcZ(0));
-//  twoOnLayer.append(hitsOnLayer[1]);
-//  twoOnLayer.append(hitsOnLayer[2]);
-//       }
-//     }
-//   }
-//   /* if(twoOnLayer.length() != 0){
-//     std::cout << "TWO " << twoOnLayer.length() << std::endl;
-//     } */
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::findTwoHits" << std::endl;
+#endif
+  //...finds "two" seq. and isolated hits.
+  //...and then sets LR for selected hits.
+  if(hitsOnLayer.length() == 0 ||
+     hitsOnLayer.length() > 3)return;
+  twoOnLayer.removeAll();
+  if(hitsOnLayer.length() == 1){
+    if(hitsOnLayer[0]->wire()->superLayerId() == 1)return;
+    unsigned maxLocalId = findMaxLocalId(hitsOnLayer[0]->wire()->superLayerId());
+    unsigned R = isIsolation(hitsOnLayer[0]->wire()->localId(),
+			     maxLocalId,
+			     hitsOnLayer[0]->wire()->layerId(),1,allStereoList);
+    unsigned L = isIsolation(hitsOnLayer[0]->wire()->localId(),
+			     maxLocalId,
+			     hitsOnLayer[0]->wire()->layerId(),-1,allStereoList);
+    if(R == 1 && L == 0){
+      unsigned nextLocalId = hitsOnLayer[0]->wire()->localIdForPlus()+1;
+      L = isIsolation(nextLocalId,
+		      maxLocalId,
+		      hitsOnLayer[0]->wire()->layerId(),-1,allStereoList);
+      if(L == 1){ // xuox
+	hitsOnLayer[0]->leftRight(1); // R
+	hitsOnLayer[0]->position(hitsOnLayer[0]->arcZ(1));
+	twoOnLayer.append(hitsOnLayer[0]);
+      }
+    }else if(R == 0 && L == 1){
+      unsigned nextLocalId = hitsOnLayer[0]->wire()->localIdForMinus()+1;
+      R = isIsolation(nextLocalId,
+		      maxLocalId,
+		      hitsOnLayer[0]->wire()->layerId(),1,allStereoList);
+      if(R == 1){ // xoux
+	hitsOnLayer[0]->leftRight(0); // L
+	hitsOnLayer[0]->position(hitsOnLayer[0]->arcZ(0));
+	twoOnLayer.append(hitsOnLayer[0]);
+      }
+    }
+  }
+  if(hitsOnLayer.length() == 2){
+    if(hitsOnLayer[0]->wire()->localIdForPlus()+1 ==
+       (int) hitsOnLayer[1]->wire()->localId()){
+      unsigned maxLocalId = findMaxLocalId(hitsOnLayer[0]->wire()->superLayerId());
+      unsigned R = isIsolation(hitsOnLayer[0]->wire()->localId(),
+			       maxLocalId,
+			       hitsOnLayer[0]->wire()->layerId(),1,allStereoList);
+      unsigned L = isIsolation(hitsOnLayer[1]->wire()->localId(),
+			       maxLocalId,
+			       hitsOnLayer[1]->wire()->layerId(),-1,allStereoList);
+      if(R == 1 && L == 1){ // xoox
+	hitsOnLayer[0]->leftRight(1); // R
+	hitsOnLayer[0]->position(hitsOnLayer[0]->arcZ(1));
+	hitsOnLayer[1]->leftRight(0); // L
+	hitsOnLayer[1]->position(hitsOnLayer[1]->arcZ(0));
+	twoOnLayer.append(hitsOnLayer[0]);
+	twoOnLayer.append(hitsOnLayer[1]);
+      }
+    }
+  }
+  if(hitsOnLayer.length() == 3){
+    if(hitsOnLayer[0]->wire()->localIdForPlus()+1 ==
+       (int) hitsOnLayer[1]->wire()->localId() &&
+       hitsOnLayer[1]->wire()->localIdForPlus()+1 !=
+       (int) hitsOnLayer[2]->wire()->localId()){
+      unsigned maxLocalId = findMaxLocalId(hitsOnLayer[0]->wire()->superLayerId());
+      unsigned R = isIsolation(hitsOnLayer[0]->wire()->localId(),
+			       maxLocalId,
+			       hitsOnLayer[0]->wire()->layerId(),1,allStereoList);
+      unsigned L = isIsolation(hitsOnLayer[1]->wire()->localId(),
+			       maxLocalId,
+			       hitsOnLayer[1]->wire()->layerId(),-1,allStereoList);
+      if(R == 1 && L == 1){ // oxoox
+	hitsOnLayer[0]->leftRight(1); // R
+	hitsOnLayer[0]->position(hitsOnLayer[0]->arcZ(1));
+	hitsOnLayer[1]->leftRight(0); // L
+	hitsOnLayer[1]->position(hitsOnLayer[1]->arcZ(0));
+	twoOnLayer.append(hitsOnLayer[0]);
+	twoOnLayer.append(hitsOnLayer[1]);
+      }
+    }else if(hitsOnLayer[0]->wire()->localIdForPlus()+1 !=
+	     (int) hitsOnLayer[1]->wire()->localId() &&
+	     hitsOnLayer[1]->wire()->localIdForPlus()+1 ==
+	     (int) hitsOnLayer[2]->wire()->localId()){
+      unsigned maxLocalId = findMaxLocalId(hitsOnLayer[1]->wire()->superLayerId());
+      unsigned R = isIsolation(hitsOnLayer[1]->wire()->localId(),
+			       maxLocalId,
+			       hitsOnLayer[1]->wire()->layerId(),1,allStereoList);
+      unsigned L = isIsolation(hitsOnLayer[2]->wire()->localId(),
+			       maxLocalId,
+			       hitsOnLayer[2]->wire()->layerId(),-1,allStereoList);
+      if(R == 1 && L == 1){ // xooxo
+	hitsOnLayer[1]->leftRight(1); // R
+	hitsOnLayer[1]->position(hitsOnLayer[1]->arcZ(1));
+	hitsOnLayer[2]->leftRight(0); // L
+	hitsOnLayer[2]->position(hitsOnLayer[2]->arcZ(0));
+	twoOnLayer.append(hitsOnLayer[1]);
+	twoOnLayer.append(hitsOnLayer[2]);
+      }
+    }
+  }
+  /* if(twoOnLayer.length() != 0){
+     std::cout << "TWO " << twoOnLayer.length() << std::endl;
+     } */
   }
 
   void
   TBuilderCurl::setLR(AList<TLink> &hitsOnLayer, unsigned LR)
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::setLR" << std::endl;
+#endif
     // LR = 0 : L
     //    = 1 : R
     for (unsigned i = 0; i < (unsigned) hitsOnLayer.length(); ++i) {
@@ -1778,6 +1854,9 @@ namespace Belle {
   bool
   TBuilderCurl::moveLR(AList<TLink> &hitsOnLayer)
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::moveLR 0" << std::endl;
+#endif
     unsigned nHits = hitsOnLayer.length();
     if (nHits == 0)return false;
     // ex) LLLL --> LLLR --> LLRR --> LRRR --> RRRR
@@ -1796,6 +1875,9 @@ namespace Belle {
   TBuilderCurl::selectGoodWires(const AList<TLink> &allWires,
                                 AList<TLink> &goodWires)
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::selectGoodWires" << std::endl;
+#endif
     goodWires.removeAll();
     for (int i = 0; i < allWires.length(); ++i) {
       if (allWires[i]->position().x() != -999.) {
@@ -1810,6 +1892,9 @@ namespace Belle {
                          AList<TLink> &goodLine, AList<Point3D> &goodPosition,
                          int& overCounter) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::fitLine2" << std::endl;
+#endif
     AList<TLink> goodWires;
     selectGoodWires(tmpLine, goodWires);
     if (goodWires.length() >= 3)
@@ -1820,6 +1905,9 @@ namespace Belle {
   TBuilderCurl::calVirtualCircle(const TLink& hit, const TTrack& track, const int LR,
                                  HepGeom::Point3D<double>  &center, double& radius)
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::calVirtualCircle" << std::endl;
+#endif
     if (abs(LR) != 1)return;
     double Q = track.charge();
     int isOuter = 1;
@@ -1840,6 +1928,9 @@ namespace Belle {
                        const AList<TLink> &hitsOnLayerOrg,
                        const TTrack& track)
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::moveLR 1" << std::endl;
+#endif
     AList<TLink> hitsOnLayer = hitsOnLayerOrg;
     hitsOnLayer.remove(hits);
     if (hitsOnLayer.length() == 0)return;
@@ -1869,7 +1960,8 @@ namespace Belle {
     double Q = track.charge();
     for (int i = 0; i < hitsOnLayer.length(); ++i) {
       int isOuter = 1;
-      if ((hitsOnLayer[i]->wire()->xyPosition() - center).mag() - radius < 0.)isOuter = -1;
+      //ho      if ((hitsOnLayer[i]->wire()->xyPosition() - center).mag() - radius < 0.)isOuter = -1;
+      if ((hitsOnLayer[i]->wire()->xyPosition() - center).perp() - radius < 0.)isOuter = -1;
       if (Q > 0. && isOuter == 1) {
         hitsOnLayer[i]->position(hitsOnLayer[i]->arcZ(0)); // L
         hitsOnLayer[i]->leftRight(0); // L
@@ -1892,6 +1984,9 @@ namespace Belle {
                          double& min_chi2, double& good_a, double& good_b,
                          AList<Point3D> &goodPosition) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::makeLine" << std::endl;
+#endif
     if (list.length() == 0)return;
     const Belle2::TRGCDC& cdc = *Belle2::TRGCDC::getTRGCDC();
     const unsigned nstereolayers = cdc.nStereoLayers();
@@ -1998,7 +2093,8 @@ namespace Belle {
             for (int j = 0; j < fixedWires[sl].length(); ++j) {
               if (i != j) {
                 int tmpIsOuter = 1;
-                if ((fixedWires[sl][j]->wire()->xyPosition() - center).mag() - radius < 0.)tmpIsOuter = -1;
+		//ho                if ((fixedWires[sl][j]->wire()->xyPosition() - center).mag() - radius < 0.)tmpIsOuter = -1;
+                if ((fixedWires[sl][j]->wire()->xyPosition() - center).perp() - radius < 0.)tmpIsOuter = -1;
                 if (Q > 0. && tmpIsOuter == 1 && fixedWires[sl][j]->leftRight() == 0)++nCorrectLR;
                 else if (Q > 0. && tmpIsOuter == -1 && fixedWires[sl][j]->leftRight() == 1)++nCorrectLR;
                 else if (Q < 0. && tmpIsOuter ==  1 && fixedWires[sl][j]->leftRight() == 1)++nCorrectLR;
@@ -2014,7 +2110,8 @@ namespace Belle {
           }
           for (int i = 0; i < nonFixedWires[sl].length(); ++i) {
             int isOuter = 1;
-            if ((nonFixedWires[sl][i]->wire()->xyPosition() - bestC).mag() - bestR < 0.)isOuter = -1;
+	    //ho            if ((nonFixedWires[sl][i]->wire()->xyPosition() - bestC).mag() - bestR < 0.)isOuter = -1;
+            if ((nonFixedWires[sl][i]->wire()->xyPosition() - bestC).perp() - bestR < 0.)isOuter = -1;
             if (Q > 0. && isOuter == 1) {
               nonFixedWires[sl][i]->position(nonFixedWires[sl][i]->arcZ(0)); // L
               nonFixedWires[sl][i]->leftRight(0); // L
@@ -2189,6 +2286,9 @@ kokohe:;
   TBuilderCurl::fitWDD(double& xc, double& yc, double& r,
                        AList<TLink> &list) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::fitWDD" << std::endl;
+#endif
     if (list.length() <= 3)return false;
     Lpav circle;
     // CDC
@@ -2230,6 +2330,9 @@ kokohe:;
   TBuilderCurl::stereoHit(double& xc, double& yc, double& r, double& q,
                           AList<TLink> & list) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::stereoHit" << std::endl;
+#endif
     if (list.length() == 0)return -1;
 
     HepGeom::Point3D<double> center(xc, yc, 0.);
@@ -2489,6 +2592,9 @@ kokohe:;
                         AList<TLink> &alayer0, AList<TLink> &alayer1,
                         unsigned) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::setArcZ 1" << std::endl;
+#endif
     AList<TLink> tmp = alayer0;
     tmp.append(alayer1);
     double xc, yc, r;
@@ -2504,6 +2610,9 @@ kokohe:;
                         AList<TLink> &alayer2,
                         unsigned) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::setArcZ 2" << std::endl;
+#endif
     AList<TLink> tmp = alayer0;
     tmp.append(alayer1);
     tmp.append(alayer2);
@@ -2520,6 +2629,9 @@ kokohe:;
                         AList<TLink> &alayer2, AList<TLink> &alayer3,
                         unsigned) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::setArcZ 3" << std::endl;
+#endif
     AList<TLink> tmp = alayer0;
     tmp.append(alayer1);
     tmp.append(alayer2);
@@ -2538,6 +2650,9 @@ kokohe:;
                         AList<TLink> &alayer4,
                         unsigned) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::setArcZ 4" << std::endl;
+#endif
     AList<TLink> tmp = alayer0;
     tmp.append(alayer1);
     tmp.append(alayer2);
@@ -2557,6 +2672,9 @@ kokohe:;
                         AList<TLink> &alayer4, AList<TLink> &alayer5,
                         unsigned) const
   {
+#if defined(HO_DEBUG)
+  std::cout << " TBuilderCurl::setArcZ 5" << std::endl;
+#endif
     AList<TLink> tmp = alayer0;
     tmp.append(alayer1);
     tmp.append(alayer2);
@@ -2577,4 +2695,3 @@ kokohe:;
 // End === Stereo Finder For Curl Tracks : by jtanaka ===
 
 } // namespace Belle
-

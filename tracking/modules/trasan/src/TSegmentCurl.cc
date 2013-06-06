@@ -13,12 +13,16 @@ namespace Belle {
 #define inline
 
   bool TSegmentCurl::ms_smallcell(false);
-  bool TSegmentCurl::ms_superb(false);
+  //ho  bool TSegmentCurl::ms_superb(false);
+  bool TSegmentCurl::ms_superb(true);
 
   TSegmentCurl::TSegmentCurl(const unsigned superLayerId,
                              const unsigned max)
     : m_flagOfUpdate(true), m_MaxLocalLayerId(max), m_superLayerId(superLayerId)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::TSegmentCurl 0" << std::endl;
+#endif
     m_list.removeAll();
 //   m_seqOfLayer = new unsigned [max+1];
 //   m_sizeOfLayer = new unsigned [max+1];
@@ -37,6 +41,9 @@ namespace Belle {
       m_maxSeq(s.m_maxSeq), m_layerIdOfMaxSeq(s.m_layerIdOfMaxSeq), m_numOfSeqOneLayer(s.m_numOfSeqOneLayer),
       m_numOfLargeSeqLayer(s.m_numOfLargeSeqLayer)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::TSegmentCurl 1" << std::endl;
+#endif
 
 //   m_seqOfLayer = new unsigned [m_MaxLocalLayerId+1];
 //   m_sizeOfLayer = new unsigned [m_MaxLocalLayerId+1];
@@ -60,6 +67,9 @@ namespace Belle {
       m_maxSeq(s->m_maxSeq), m_layerIdOfMaxSeq(s->m_layerIdOfMaxSeq), m_numOfSeqOneLayer(s->m_numOfSeqOneLayer),
       m_numOfLargeSeqLayer(s->m_numOfLargeSeqLayer)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::TSegmentCurl 2" << std::endl;
+#endif
 //   m_seqOfLayer = new unsigned [m_MaxLocalLayerId+1];
 //   m_sizeOfLayer = new unsigned [m_MaxLocalLayerId+1];
 //   m_layer = new AList<TLink> [m_MaxLocalLayerId+1];
@@ -79,6 +89,9 @@ namespace Belle {
 
   TSegmentCurl::~TSegmentCurl(void)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::~TSegmentCurl" << std::endl;
+#endif
     m_list.removeAll();
 //   for(unsigned i=0;i<=m_MaxLocalLayerId;++i){
 //     m_layer[i].removeAll();
@@ -94,6 +107,9 @@ namespace Belle {
   const unsigned
   TSegmentCurl::maxLocalLayerId(void) const
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::maxLocalLayerId" << std::endl;
+#endif
     return m_MaxLocalLayerId;
   }
 
@@ -102,6 +118,9 @@ namespace Belle {
   const unsigned
   TSegmentCurl::superLayerId(void) const
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::superLayerId" << std::endl;
+#endif
     return m_superLayerId;
   }
 
@@ -110,6 +129,9 @@ namespace Belle {
   const unsigned
   TSegmentCurl::seqOfLayer(const unsigned i)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::seqOfLayer" << std::endl;
+#endif
     if (m_flagOfUpdate)update();
     return m_li[i].m_seqOfLayer;
   }
@@ -119,6 +141,9 @@ namespace Belle {
   const unsigned
   TSegmentCurl::sizeOfLayer(const unsigned i)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::sizeOfLayer" << std::endl;
+#endif
     if (m_flagOfUpdate)update();
     return m_li[i].m_sizeOfLayer;
   }
@@ -146,6 +171,9 @@ namespace Belle {
   void
   TSegmentCurl::append(TLink& e)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::append 0" << std::endl;
+#endif
     m_flagOfUpdate = true;
     m_li[e.hit()->wire().localLayerId()].m_layer.append(e);
     m_list.append(e);
@@ -156,6 +184,9 @@ namespace Belle {
   void
   TSegmentCurl::append(TLink* e)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::append 1" << std::endl;
+#endif
     m_flagOfUpdate = true;
     m_li[e->hit()->wire().localLayerId()].m_layer.append(e);
     m_list.append(e);
@@ -166,6 +197,9 @@ namespace Belle {
   void
   TSegmentCurl::append(AList<TLink> &e)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::append 2" << std::endl;
+#endif
     m_flagOfUpdate = true;
     for (unsigned i = 0; i < (unsigned) e.length(); ++i)
       m_li[e[i]->hit()->wire().localLayerId()].m_layer.append(e[i]);
@@ -177,6 +211,9 @@ namespace Belle {
   void
   TSegmentCurl::remove(TLink& e)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::remove 0" << std::endl;
+#endif
     m_flagOfUpdate = true;
     m_li[e.hit()->wire().localLayerId()].m_layer.remove(e);
     m_list.remove(e);
@@ -187,6 +224,9 @@ namespace Belle {
   void
   TSegmentCurl::remove(TLink* e)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::remove 1" << std::endl;
+#endif
     m_flagOfUpdate = true;
     m_li[e->hit()->wire().localLayerId()].m_layer.remove(e);
     m_list.remove(e);
@@ -197,6 +237,9 @@ namespace Belle {
   void
   TSegmentCurl::remove(AList<TLink> &e)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::remove 2" << std::endl;
+#endif
     m_flagOfUpdate = true;
     //  dump();
     for (unsigned i = 0; i < (unsigned) e.length(); ++i) {
@@ -213,6 +256,9 @@ namespace Belle {
   void
   TSegmentCurl::removeAll(void)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::removeAll" << std::endl;
+#endif
     m_flagOfUpdate = true;
     m_list.removeAll();
     for (unsigned i = 0; i <= m_MaxLocalLayerId; ++i) {
@@ -225,6 +271,9 @@ namespace Belle {
   const unsigned
   TSegmentCurl::maxSeq(void) const
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::maxSeq" << std::endl;
+#endif
     // I try to use non-const member.
     // If this method is bad, other methods are necessary.
     TSegmentCurl* const localThis = const_cast<TSegmentCurl * const>(this);
@@ -237,6 +286,9 @@ namespace Belle {
   const unsigned
   TSegmentCurl::layerIdOfMaxSeq(void)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::LayerIdOfMaxSeq" << std::endl;
+#endif
     if (m_flagOfUpdate)update();
     return m_layerIdOfMaxSeq;
   }
@@ -246,6 +298,9 @@ namespace Belle {
   const unsigned
   TSegmentCurl::numOfSeqOneLayer(void)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::numOfSeqOneLayer" << std::endl;
+#endif
     if (m_flagOfUpdate)update();
     return m_numOfSeqOneLayer;
   }
@@ -255,6 +310,9 @@ namespace Belle {
   const unsigned
   TSegmentCurl::numOfLargeSeqLayer(void)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::numOfLargeSeqLayer" << std::endl;
+#endif
     if (m_flagOfUpdate)update();
     return m_numOfLargeSeqLayer;
   }
@@ -263,6 +321,9 @@ namespace Belle {
   void
   TSegmentCurl::update(void)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::update" << std::endl;
+#endif
     if (m_list.length() == 0) {
       m_flagOfUpdate = false;
       return;
@@ -290,6 +351,9 @@ namespace Belle {
   TSegmentCurl&
   TSegmentCurl::operator=(const TSegmentCurl& s)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::operator=" << std::endl;
+#endif
     if (this == &s)return *this;
 
     m_flagOfUpdate = s.m_flagOfUpdate;
@@ -329,6 +393,9 @@ namespace Belle {
   int
   sortByWireSerialNumber(const TLink** a, const TLink** b)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::sortByWireSerialNumber 0" << std::endl;
+#endif
     if ((*a)->hit()->wire().id() < (*b)->hit()->wire().id()) {
       return 1;
     } else if ((*a)->hit()->wire().id() == (*b)->hit()->wire().id()) {
@@ -341,6 +408,9 @@ namespace Belle {
   extern "C" int
   sortByWireSerialNumber(const void* av, const void* bv)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::sortByWireSerialNumber 1" << std::endl;
+#endif
     const TLink** a((const TLink**)av);
     const TLink** b((const TLink**)bv);
     if ((*a)->hit()->wire().id() < (*b)->hit()->wire().id()) {
@@ -356,71 +426,78 @@ namespace Belle {
   void
   TSegmentCurl::calcuSeq(unsigned i)
   {
-//cnv  //...exception
-//   if(i > m_MaxLocalLayerId){
-//     m_li[i].m_seqOfLayer = 0;
-//     return;
-//   }
-//   unsigned size = m_li[i].m_layer.length();
-//   if(size < 1){
-//     m_li[i].m_seqOfLayer = 0;
-//     return;
-//   }
-//   if(size == 1){
-//     m_li[i].m_seqOfLayer = 1;
-//     return;
-//   }
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::calcuSeq" << std::endl;
+#endif
+//ho
+  //...exception
+  if(i > m_MaxLocalLayerId){
+    m_li[i].m_seqOfLayer = 0;
+    return;
+  }
+  unsigned size = m_li[i].m_layer.length();
+  if(size < 1){
+    m_li[i].m_seqOfLayer = 0;
+    return;
+  }
+  if(size == 1){
+    m_li[i].m_seqOfLayer = 1;
+    return;
+  }
 
-//   //...initialize
-//   m_li[i].m_layer.sort(sortByWireSerialNumber);
-//   unsigned seq = 1;
-//   unsigned maxSeq = 0;
+  //...initialize
+  m_li[i].m_layer.sort(sortByWireSerialNumber);
+  unsigned seq = 1;
+  unsigned maxSeq = 0;
 
-//   //...calculation
-//   if(m_li[i].m_layer[0]->hit()->wire().localId() == static_cast<unsigned>(wires(m_superLayerId)-1) &&
-//      m_li[i].m_layer[size-1]->hit()->wire().localId() == 0){
-//     for(unsigned j=0;j<size-1;++j){
-//       if(m_li[i].m_layer[j]->hit()->wire().localIdForMinus()-1 ==
-//   (int) m_li[i].m_layer[j+1]->hit()->wire().localId()){
-//  ++seq;
-//       }else{
-//  break;
-//       }
-//       if(j == size-2)goto loop;
-//     }
-//     ++seq;
-//     for(unsigned j=size-1;j>0;--j){
-//       if(m_li[i].m_layer[j]->hit()->wire().localIdForPlus()+1 ==
-//   (int) m_li[i].m_layer[j-1]->hit()->wire().localId()){
-//  ++seq;
-//       }else{
-//  break;
-//       }
-//     }
-//      loop:
-//     if(seq > maxSeq)maxSeq = seq;
-//   }
-//   seq = 1;
-//   for(unsigned j=0;j<size-1;++j){
-//     if(m_li[i].m_layer[j]->hit()->wire().localIdForMinus()-1 ==
-//        (int) m_li[i].m_layer[j+1]->hit()->wire().localId()){
-//       ++seq;
-//     }else{
-//       if(seq > maxSeq)maxSeq = seq;
-//       seq = 1;
-//     }
-//   }
-//   if(seq > maxSeq)maxSeq = seq;
+  //...calculation
+  if(m_li[i].m_layer[0]->hit()->wire().localId() == static_cast<unsigned>(wires(m_superLayerId)-1) &&
+     m_li[i].m_layer[size-1]->hit()->wire().localId() == 0){
+    for(unsigned j=0;j<size-1;++j){
+      if(m_li[i].m_layer[j]->hit()->wire().localIdForMinus()-1 ==
+	 (int) m_li[i].m_layer[j+1]->hit()->wire().localId()){
+	++seq;
+      }else{
+	break;
+      }
+      if(j == size-2)goto loop;
+    }
+    ++seq;
+    for(unsigned j=size-1;j>0;--j){
+      if(m_li[i].m_layer[j]->hit()->wire().localIdForPlus()+1 ==
+	 (int) m_li[i].m_layer[j-1]->hit()->wire().localId()){
+	++seq;
+      }else{
+	break;
+      }
+    }
+  loop:
+    if(seq > maxSeq)maxSeq = seq;
+  }
+  seq = 1;
+  for(unsigned j=0;j<size-1;++j){
+    if(m_li[i].m_layer[j]->hit()->wire().localIdForMinus()-1 ==
+       (int) m_li[i].m_layer[j+1]->hit()->wire().localId()){
+      ++seq;
+    }else{
+      if(seq > maxSeq)maxSeq = seq;
+      seq = 1;
+    }
+  }
+  if(seq > maxSeq)maxSeq = seq;
 
-//   //...set and return
-//   m_li[i].m_seqOfLayer = maxSeq;
-//   return;
+  //...set and return
+  m_li[i].m_seqOfLayer = maxSeq;
+  return;
   }
 
 
   unsigned
   TSegmentCurl::wires(const unsigned superLayerId) const
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::wires" << std::endl;
+#endif
 //cnv
 
 //   const TRGCDC &cdc = *TRGCDC::getTRGCDC();
@@ -443,8 +520,21 @@ namespace Belle {
 //   if(superLayerId ==  9)return 256;
 //   if(superLayerId == 10)return 288;
 //   }
+//ho
+  // input   - super layer id#(0-8)
+  // output  - # of wires in a layer
+  if(superLayerId ==  0)return 160;
+  if(superLayerId ==  1)return 160;
+  if(superLayerId ==  2)return 192;
+  if(superLayerId ==  3)return 224;
+  if(superLayerId ==  4)return 256;
+  if(superLayerId ==  5)return 288;
+  if(superLayerId ==  6)return 320;
+  if(superLayerId ==  7)return 352;
+  if(superLayerId ==  8)return 384;
 
-//   std::cout << "Error in the SegmentCurl(wires)." << std::endl;
+
+  std::cout << "Error in the SegmentCurl(wires)." << std::endl;
 
 
     return 0;
@@ -454,6 +544,9 @@ namespace Belle {
   void
   TSegmentCurl::dump(void)
   {
+#if defined(HO_DEBUG)
+  std::cout << "  TSegmentCurl::dump" << std::endl;
+#endif
 #ifdef TRASAN_DEBUG_DETAIL
     // std::cout.form(" Hep  idhep mother mcPX
     // mcPY  mcPZ  mcE   mcMass\n");

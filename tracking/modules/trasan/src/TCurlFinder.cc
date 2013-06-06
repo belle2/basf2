@@ -270,10 +270,14 @@ namespace Belle {
 
 //cnv  static int debugMcFlag = 1;
   bool TCurlFinder::ms_smallcell(false);
-  bool TCurlFinder::ms_superb(false);
+  //ho  bool TCurlFinder::ms_superb(false);
+  bool TCurlFinder::ms_superb(true);
 
   void TCurlFinderParameter::now(void) const
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::now" << std::endl;
+#endif
     std::cout << std::endl;
     std::cout << "===== CURLFINDER PARAMETERS =====" << std::endl;
     std::cout << "ALHPA : " << ALPHA_SAME_WITH_HELIX << std::endl
@@ -315,7 +319,7 @@ namespace Belle {
               << "RANGE_FOR_STEREO_SECOND : " << RANGE_FOR_STEREO_SECOND << std::endl
               << "RANGE_FOR_STEREO_THIRD  : " << RANGE_FOR_STEREO_THIRD << std::endl
               << "RANGE_FOR_STEREO_FORTH  : " << RANGE_FOR_STEREO_FORTH << std::endl
-              << "RANGE_FOR_STEREO_FIFTH  : " << RANGE_FOR_STEREO_FIFTH << std::endl
+      //ho              << "RANGE_FOR_STEREO_FIFTH  : " << RANGE_FOR_STEREO_FIFTH << std::endl
               << std::endl
               << "SVD_RECONSTRUCTION   : " << SVD_RECONSTRUCTION  << std::endl
               << "   MIN_SVD_ELECTRONS : " << MIN_SVD_ELECTRONS   << std::endl
@@ -355,6 +359,9 @@ namespace Belle {
     , _cWindow("curl window")
 #endif
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::TCurlFinder 0" << std::endl;
+#endif
     // *****NOTE*****
     // Do not use this!!!!!
     // Because parameters can not be set correctly.
@@ -416,6 +423,9 @@ namespace Belle {
     , _cWindow("curl window")
 #endif
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::TCurlFinder 1" << std::endl;
+#endif
     //...Set Parameter
     m_param.MIN_SEGMENT = min_segment;
     m_param.MIN_SALVAGE = min_salvage;
@@ -465,6 +475,9 @@ namespace Belle {
 
   TCurlFinder::~TCurlFinder(void)
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::~TCurlFinder" << std::endl;
+#endif
     if (m_unusedAxialHitsOnEachLayer != NULL) delete [] m_unusedAxialHitsOnEachLayer;
     if (m_unusedStereoHitsOnEachLayer != NULL) delete [] m_unusedStereoHitsOnEachLayer;
     if (m_unusedAxialHitsOnEachSuperLayer != NULL) delete [] m_unusedAxialHitsOnEachSuperLayer;
@@ -477,12 +490,18 @@ namespace Belle {
   std::string
   TCurlFinder::name(void) const
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::name" << std::endl;
+#endif
     return std::string("Curling Track Finder");
   }
 
   std::string
   TCurlFinder::version(void) const
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::version" << std::endl;
+#endif
     return std::string("3.24");
   }
 
@@ -493,6 +512,9 @@ namespace Belle {
   int
   sortBySequentialLength(const TSegmentCurl** a, const TSegmentCurl** b)
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::sortBySequentialLength 0" << std::endl;
+#endif
     if ((*a)->maxSeq() < (*b)->maxSeq()) {
       return 1;
     } else if ((*a)->maxSeq() == (*b)->maxSeq()) {
@@ -505,6 +527,9 @@ namespace Belle {
   extern "C" int
   sortBySequentialLength(const void* av, const void* bv)
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::sortBySequentialLength 1" << std::endl;
+#endif
     const TSegmentCurl** a((const TSegmentCurl**)av);
     const TSegmentCurl** b((const TSegmentCurl**)bv);
     if ((*a)->maxSeq() < (*b)->maxSeq()) {
@@ -521,6 +546,9 @@ namespace Belle {
   int
   sortByArcLength(const TLink** a, const TLink** b)
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::sortByArcLength 0" << std::endl;
+#endif
     if ((*a)->position().x() > (*b)->position().x()) {
       return 1;
     } else if ((*a)->position().x() == (*b)->position().x()) {
@@ -533,6 +561,9 @@ namespace Belle {
   int
   sortByArcLength(const void* av, const void* bv)
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::sortByArcLength 1" << std::endl;
+#endif
     const TLink** a((const TLink**)av);
     const TLink** b((const TLink**)bv);
     if ((*a)->position().x() > (*b)->position().x()) {
@@ -550,20 +581,28 @@ namespace Belle {
   double
   TCurlFinder::distance(const double x, const double y) const
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::distance 0" << std::endl;
+#endif
     return sqrt(x * x + y * y);
   }
 
   unsigned
   TCurlFinder::offset(const unsigned layerId) const
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::offset" << std::endl;
+#endif
 //cnv
 
-//   const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
-//   const Belle2::TRGCDCLayer &l=*cdc.layer(layerId);
-//   //  if(ms_superb) {
-//     if(l.offset()==0.0) return 0;
-//     return 1;
-//     //  }
+  const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
+  const Belle2::TRGCDCLayer &l=*cdc.layer(layerId);
+  if(ms_superb) {
+    std::cerr << "NOT COV. YET!" << std::endl;
+    std::cout <<"layerId,offset=" << layerId <<" "<< l.offset() << std::endl;
+    if(l.offset()==0.0) return 0;
+    return 1;
+  }
 //     // old way
 // #if 0
 //   // input   - layer id#(0-49)
@@ -587,6 +626,9 @@ namespace Belle {
   unsigned
   TCurlFinder::layerId(const double& R) const
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::layerId" << std::endl;
+#endif
     // R is radius for CDC but is 2*radius for track
     double r = R * 10.; // cm -> mm
 //cnv  const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
@@ -619,7 +661,7 @@ namespace Belle {
 //     if (ir<0 || ir>=rtol.size()) return nl;
 //     return rtol[ir];
 //   }
-    // old way
+/*    // old way
     if (r < 83.0 || r > 874.)return 50;
     if (r <=  93.0)return  0; if (r <= 103.25)return 1; if (r <= 113.5)return  2;
     if (r <= 136.0)return  3; if (r <= 152.0)return  4; if (r <= 169.0)return  5;
@@ -639,18 +681,84 @@ namespace Belle {
     if (r <= 808.0)return 45; if (r <= 824.0)return 46; if (r <= 840.0)return 47;
     if (r <= 856.0)return 48; if (r <= 874.0)return 49;
     return 99;
+*/
+//ho
+    if (r < 163.0 || r > 1130.0) return 56;
+    if (r <=  173.0) return  0; 
+    if (r <=  183.0) return  1; 
+    if (r <=  193.0) return  2;
+    if (r <=  203.0) return  3; 
+    if (r <=  213.0) return  4; 
+    if (r <=  223.0) return  5;
+    if (r <=  233.0) return  6; 
+    if (r <=  243.0) return  7; 
+    if (r <=  266.1) return  8;
+    if (r <=  284.3) return  9; 
+    if (r <=  302.5) return 10; 
+    if (r <=  320.7) return 11;
+    if (r <=  338.9) return 12; 
+    if (r <=  356.6) return 13; 
+    if (r <=  374.3) return 14;
+    if (r <=  392.5) return 15; 
+    if (r <=  410.7) return 16; 
+    if (r <=  428.9) return 17;
+    if (r <=  447.1) return 18; 
+    if (r <=  466.3) return 19; 
+    if (r <=  485.5) return 20;
+    if (r <=  503.7) return 21; 
+    if (r <=  521.9) return 22; 
+    if (r <=  540.1) return 23;
+    if (r <=  558.3) return 24; 
+    if (r <=  575.5) return 25; 
+    if (r <=  592.7) return 26;
+    if (r <=  610.9) return 27; 
+    if (r <=  629.1) return 28; 
+    if (r <=  647.3) return 29;
+    if (r <=  665.5) return 30; 
+    if (r <=  684.7) return 31; 
+    if (r <=  703.9) return 32;
+    if (r <=  722.1) return 33; 
+    if (r <=  740.3) return 34; 
+    if (r <=  758.5) return 35;
+    if (r <=  776.7) return 36; 
+    if (r <=  793.9) return 37; 
+    if (r <=  811.1) return 38;
+    if (r <=  829.3) return 39; 
+    if (r <=  847.5) return 40; 
+    if (r <=  865.7) return 41;
+    if (r <=  883.9) return 42; 
+    if (r <=  903.1) return 43; 
+    if (r <=  922.3) return 44;
+    if (r <=  940.5) return 45; 
+    if (r <=  958.7) return 46; 
+    if (r <=  976.9) return 47;
+    if (r <=  995.1) return 48; 
+    if (r <= 1012.3) return 49;
+    if (r <= 1029.5) return 50;
+    if (r <= 1047.7) return 51;
+    if (r <= 1065.9) return 52;
+    if (r <= 1084.1) return 53;
+    if (r <= 1102.3) return 54;
+    if (r <= 1130.0) return 55;
+    return 99;
   }
 
   unsigned
   TCurlFinder::maxLocalLayerId(const unsigned superLayerId) const
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::maxlocalLayerId" << std::endl;
+#endif
 //cnv
 
-//   const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
+//  const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
 //   const AList<Belle2::TRGCDCLayer> &sl=*cdc.superLayer(superLayerId);
-// //   if(ms_superb) {
-// //     return sl.length()-1;
-// //   }
+//  const std::vector<Belle2::TRGCDCLayer*> &sl=*cdc.superLayer(superLayerId);
+//  if(ms_superb) {
+//    std::cout <<"superLayerId,retval="<< superLayerId <<" "<< sl.size()-1 << std::endl;
+//    //    return sl.length()-1;
+//    return sl.size()-1;
+//  }
 //   // input   - superlayer id#(0-10)
 //   // output  - max# id of locallayer in its superlayer.
 //   if(superLayerId == 1 || superLayerId == 3)return 2;
@@ -660,15 +768,34 @@ namespace Belle {
 //      superLayerId == 8 || superLayerId == 10)return 4;
 //   if(superLayerId == 0 || superLayerId ==  2)return 5;
 
-//   std::cout << "Error in the CurlFinder(maxLocalLayerId). superLayerId = "
-//        << superLayerId  << std::endl;
-//   return 0;
-    return 0;
+//ho
+// input   - superlayer id#(0-8)
+// output  - #layers in the superlayer -1
+  unsigned maxL;
+  if       (superLayerId == 0) {
+    maxL = 7;
+  } else if(superLayerId <= 8) {
+    maxL = 5; 
+  } else {
+    std::cout <<"superLayerId= "<< superLayerId << std::endl;
+    exit(-1);
   }
-
+  //  std::cout <<"superLayerId,retval="<< superLayerId <<" "<< maxL << std::endl;
+  return maxL;
+  //ho
+  
+  //   std::cout << "Error in the CurlFinder(maxLocalLayerId). superLayerId = "
+  //        << superLayerId  << std::endl;
+  //   return 0;
+  //ho    return 0;
+  }
+  
   int
   TCurlFinder::nextSuperAxialLayerId(const unsigned superLayerId, const int in) const
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::nextSuperAxialLayerId" << std::endl;
+#endif
 
 //cnv
 //   // This function is to find next axial superlayer!
@@ -700,59 +827,50 @@ namespace Belle {
 // //     }
 // //   }
 
-//   if(superLayerId > 10) {
-//     std::cout << "Error in the CurlFinder(nextSuperAxialLayerId)." << std::endl;
-//     return -1;
-//   }
+//ho
+  if(superLayerId > 8) {
+    std::cout <<"Error in the CurlFinder(nextSuperAxialLayerId)." << std::endl;
+    return -1;
+  }
 
-//   if(in == 0){
-//     if(superLayerId == 0 || superLayerId ==  2 ||
-//        superLayerId == 4 || superLayerId ==  6 ||
-//        superLayerId == 8 || superLayerId == 10){
-//       return superLayerId;
-//     }else{
-//       //return superLayerId - 1;
-//       return -1;
-//     }
-//   }
-//   // almost case --> inner type
-//   if((superLayerId == 1 || superLayerId == 2) && in == 1)return 0;
-//   if(superLayerId == 3 || superLayerId == 4){
-//     if(in == 1)return 2; if(in == 2)return 0;
-//   }
-//   if(superLayerId == 5 || superLayerId == 6){
-//     if(in == 1)return 4; if(in == 2)return 2;
-//     if(in == 3)return 0;
-//   }
-//   if(superLayerId == 7 || superLayerId == 8){
-//     if(in == 1)return 6; if(in == 2)return 4;
-//     if(in == 3)return 2; if(in == 4)return 0;
-//   }
-//   if(superLayerId ==  9 || superLayerId == 10){
-//     if(in == 1)return 8; if(in == 2)return 6;
-//     if(in == 3)return 4; if(in == 4)return 2;
-//     if(in == 5)return 0;
-//   }
-//   // rare case --> outer type
-//   if(superLayerId == 0 || superLayerId == 1){
-//     if(in == -1)return  2; if(in == -2)return 4;
-//     if(in == -3)return  6; if(in == -4)return 8;
-//     if(in == -5)return 10;
-//   }
-//   if(superLayerId == 2 || superLayerId == 3){
-//     if(in == -1)return 4; if(in == -2)return 6;
-//     if(in == -3)return 8; if(in == -4)return 10;
-//   }
-//   if(superLayerId == 4 || superLayerId == 5){
-//     if(in == -1)return  6; if(in == -2)return 8;
-//     if(in == -3)return 10;
-//   }
-//   if(superLayerId == 6 || superLayerId == 7){
-//     if(in == -1)return 8; if(in == -2)return 10;
-//   }
-//   if(superLayerId == 8 || superLayerId == 9){
-//     if(in == -1)return 10;
-//   }
+  if(in == 0){
+    if(superLayerId == 0 || superLayerId ==  2 ||
+       superLayerId == 4 || superLayerId ==  6 ||
+       superLayerId == 8){
+      return superLayerId;
+    }else{
+      //return superLayerId - 1;
+      return -1;
+    }
+  }
+  // almost case --> inner type
+  if((superLayerId == 1 || superLayerId == 2) && in == 1)return 0;
+  if(superLayerId == 3 || superLayerId == 4){
+    if(in == 1)return 2; if(in == 2)return 0;
+  }
+  if(superLayerId == 5 || superLayerId == 6){
+    if(in == 1)return 4; if(in == 2)return 2;
+    if(in == 3)return 0;
+  }
+  if(superLayerId == 7 || superLayerId == 8){
+    if(in == 1)return 6; if(in == 2)return 4;
+    if(in == 3)return 2; if(in == 4)return 0;
+  }
+  // rare case --> outer type
+  if(superLayerId == 0 || superLayerId == 1){
+    if(in == -1)return  2; if(in == -2)return 4;
+    if(in == -3)return  6; if(in == -4)return 8;
+  }
+  if(superLayerId == 2 || superLayerId == 3){
+    if(in == -1)return 4; if(in == -2)return 6;
+    if(in == -3)return 8; 
+  }
+  if(superLayerId == 4 || superLayerId == 5){
+    if(in == -1)return  6; if(in == -2)return 8;
+  }
+  if(superLayerId == 6 || superLayerId == 7){
+    if(in == -1)return 8;
+  }
 
     return -1;
   }
@@ -760,6 +878,10 @@ namespace Belle {
   int
   TCurlFinder::nextSuperStereoLayerId(const unsigned superLayerId, const int in) const
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::nextSuperStereoLayerId" << std::endl;
+#endif
+  std::cerr << "NOT CNV. YET!" << std::endl;
 
 //cnv
 //   // This function is to find next stereo superlayer!
@@ -854,9 +976,12 @@ namespace Belle {
   unsigned
   TCurlFinder::nAxialHits(const double& r) const
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::nAxialHits" << std::endl;
+#endif
     // r is radius for CDC but is 2*radius for track
     const double eps = 0.2;
-    if (r < 8.8 - eps)        return 0;
+    /*    if (r < 8.8 - eps)        return 0;
     else if (r < 9.8 - eps)   return 1;
     else if (r < 10.85 - eps) return 2;
     else if (r < 12.8 - eps)  return 3;
@@ -889,6 +1014,41 @@ namespace Belle {
     else if (r < 84.8 - eps)  return 30;
     else if (r < 86.3 - eps)  return 31;
     else return 32;
+    */
+    //ho
+    if      (r < 16.80 - eps)  return   0;
+    else if (r < 17.80 - eps)  return   1;
+    else if (r < 18.80 - eps)  return   2;
+    else if (r < 19.80 - eps)  return   3;
+    else if (r < 20.80 - eps)  return   4;
+    else if (r < 21.80 - eps)  return   5;
+    else if (r < 22.80 - eps)  return   6;
+    else if (r < 23.80 - eps)  return   7;
+    else if (r < 36.52 - eps)  return   8;
+    else if (r < 38.34 - eps)  return   9;
+    else if (r < 40.16 - eps)  return  10;
+    else if (r < 41.98 - eps)  return  11;
+    else if (r < 43.80 - eps)  return  12;
+    else if (r < 45.57 - eps)  return  13;
+    else if (r < 58.41 - eps)  return  14;
+    else if (r < 60.18 - eps)  return  15;
+    else if (r < 62.00 - eps)  return  16;
+    else if (r < 63.82 - eps)  return  17;
+    else if (r < 65.64 - eps)  return  18;
+    else if (r < 67.41 - eps)  return  19;
+    else if (r < 80.25 - eps)  return  20;
+    else if (r < 82.02 - eps)  return  21;
+    else if (r < 83.84 - eps)  return  22;
+    else if (r < 85.66 - eps)  return  23;
+    else if (r < 87.48 - eps)  return  24;
+    else if (r < 89.25 - eps)  return  25;
+    else if (r <102.09 - eps)  return  26;
+    else if (r <103.86 - eps)  return  27;
+    else if (r <105.68 - eps)  return  28;
+    else if (r <107.50 - eps)  return  29;
+    else if (r <109.32 - eps)  return  30;
+    else if (r <111.14 - eps)  return  31;
+    else return 32;
   }
 
 //
@@ -899,6 +1059,9 @@ namespace Belle {
                         const AList<TSegmentCurl> &originalList,
                         const AList<TLink> &removeList)
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::makeList 0" << std::endl;
+#endif
     // This is to make "madeList" from "originalList",
     // but remove "removeList" from this "madeList", that is,
     // madeList = originalList - removeList.
@@ -913,6 +1076,9 @@ namespace Belle {
                         const AList<TLink> &originalList,
                         const AList<TLink> &removeList)
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::makeList 1" << std::endl;
+#endif
     // This is to make "madeList" from "originalList",
     // but remove "removeList" from this "madeList", that is,
     // madeList = originalList - removeList.
@@ -924,40 +1090,43 @@ namespace Belle {
   void
   TCurlFinder::clear(void)
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::clear" << std::endl;
+#endif
 //cnv
 // //  const Belle2::TRGCDC *pcdc = Belle2::TRGCDC::getTRGCDC0();
-//   const Belle2::TRGCDC *pcdc = Belle2::TRGCDC::getTRGCDC();
-//   if(NULL==pcdc) return;
-//   const Belle2::TRGCDC &cdc = *pcdc;
-//   // This is to clear this Class(TCurlFinder) in Trasan.cc .
-//   // Private members are cleaned.
-//   HepAListDeleteAll(m_allAxialHitsOriginal);
-//   HepAListDeleteAll(m_allStereoHitsOriginal);
-//   HepAListDeleteAll(m_segmentList);
-//   HepAListDeleteAll(m_allCircles);
-//   HepAListDeleteAll(m_allTracks);
+  const Belle2::TRGCDC *pcdc = Belle2::TRGCDC::getTRGCDC();
+  if(NULL==pcdc) return;
+  const Belle2::TRGCDC &cdc = *pcdc;
+  // This is to clear this Class(TCurlFinder) in Trasan.cc .
+  // Private members are cleaned.
+  HepAListDeleteAll(m_allAxialHitsOriginal);
+  HepAListDeleteAll(m_allStereoHitsOriginal);
+  HepAListDeleteAll(m_segmentList);
+  HepAListDeleteAll(m_allCircles);
+  HepAListDeleteAll(m_allTracks);
 
-//   m_unusedAxialHitsOriginal.removeAll();
-//   m_unusedStereoHitsOriginal.removeAll();
-//   m_unusedAxialHits.removeAll();
-//   m_unusedStereoHits.removeAll();
-//   m_removedHits.removeAll();
-//   m_circles.removeAll();
-//   m_tracks.removeAll();
-//   m_2dTracks.removeAll();
-//   if(m_unusedAxialHitsOnEachLayer!=NULL) {
-//     for(int i=0;i<cdc.nAxialLayers();++i)
-//       m_unusedAxialHitsOnEachLayer[i].removeAll();
-//     for(int i=0;i<cdc.nStereoLayers();++i)
-//       m_unusedStereoHitsOnEachLayer[i].removeAll();
-//     for(int i=0;i<cdc.nAxialSuperLayers();++i)
-//       m_unusedAxialHitsOnEachSuperLayer[i].removeAll();
-//     for(int i=0;i<cdc.nStereoSuperLayers();++i)
-//       m_unusedStereoHitsOnEachSuperLayer[i].removeAll();
-//   }
-//   m_hitsOnInnerSuperLayer.removeAll();
+  m_unusedAxialHitsOriginal.removeAll();
+  m_unusedStereoHitsOriginal.removeAll();
+  m_unusedAxialHits.removeAll();
+  m_unusedStereoHits.removeAll();
+  m_removedHits.removeAll();
+  m_circles.removeAll();
+  m_tracks.removeAll();
+  m_2dTracks.removeAll();
+  if(m_unusedAxialHitsOnEachLayer!=NULL) {
+    for(int i=0;i<cdc.nAxialLayers();++i)
+      m_unusedAxialHitsOnEachLayer[i].removeAll();
+    for(int i=0;i<cdc.nStereoLayers();++i)
+      m_unusedStereoHitsOnEachLayer[i].removeAll();
+    for(int i=0;i<cdc.nAxialSuperLayers();++i)
+      m_unusedAxialHitsOnEachSuperLayer[i].removeAll();
+    for(int i=0;i<cdc.nStereoSuperLayers();++i)
+      m_unusedStereoHitsOnEachSuperLayer[i].removeAll();
   }
-
+  m_hitsOnInnerSuperLayer.removeAll();
+  }
+  
 //
 // ... doit .. Section ... This is a main section.
 //
@@ -967,6 +1136,9 @@ namespace Belle {
                     AList<TTrack> & tracks,
                     AList<TTrack> & tracks2D)
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::doit" << std::endl;
+#endif
 
     //...For debug...
     if (debugLevel() > 1)
@@ -1046,6 +1218,9 @@ namespace Belle {
     //...#3
     makeCurlTracks(tracks, tracks2D);
 //#else
+#if defined(HO_DEBUG)
+    std::cout <<"makeWithMC called" << std::endl;
+#endif
 //cnv    makeWithMC(axialHits, stereoHits, tracks);
 //#endif
 
@@ -1087,6 +1262,9 @@ namespace Belle {
   TCurlFinder::makeWireHitsListsSegments(const CAList<Belle2::TRGCDCWireHit> &axialList,
                                          const CAList<Belle2::TRGCDCWireHit> &stereoList)
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::makeWireHitsListsSegments" << std::endl;
+#endif  
     const Belle2::TRGCDC& cdc = *Belle2::TRGCDC::getTRGCDC();
     // A sub main function ... called by "doit".
     // #0 makes lists.
@@ -1150,9 +1328,10 @@ namespace Belle {
     }
 
     //...For small cell (iw)...
-    bool newcdc = false;
-    if (Belle2::TRGCDC::getTRGCDC()->versionCDC() == "small cell")
-      newcdc = true;
+    bool newcdc = true;
+    //ho    bool newcdc = false;
+    //    if (Belle2::TRGCDC::getTRGCDC()->versionCDC() == "small cell")
+    //ho      newcdc = true;
 
     //...sets pointers to neighboring hit wires of each TLink
     if ((newcdc) && (m_param.CURL_VERSION != 0)) {
@@ -1184,6 +1363,9 @@ namespace Belle {
   void
   TCurlFinder::linkNeighboringWires(AList<TLink> *list, const unsigned num, bool stereo)
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::linkNeighboringWires" << std::endl;
+#endif
 //  const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
 
 //cnv
@@ -1326,6 +1508,9 @@ namespace Belle {
   TCurlFinder::linkNeighboringWiresSmallCell(AList<TLink> *list,
                                              const unsigned num, bool stereo)
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::linkNeighboringWiresSmallCell" << std::endl;
+#endif
 #ifdef TRASAN_DEBUG_DETAIL
     const std::string stage = "LinkNeighborsSmallCell";
     EnterStage(stage);
@@ -1368,6 +1553,9 @@ namespace Belle {
   void
   TCurlFinder::setNeighboringWires(TLink* list, const TLink* next)
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::setNeighboringWires" << std::endl;
+#endif
     // ...sets a neighboring wire of "list".
     // Its candidate is "next".
     for (int i = 0; i < 7; ++i) {
@@ -1381,6 +1569,9 @@ namespace Belle {
   void
   TCurlFinder::createSuperLayer(void)
   {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::createSuperLayer" << std::endl;
+#endif
     const Belle2::TRGCDC& cdc = *Belle2::TRGCDC::getTRGCDC();
     //  if(ms_superb) {
     for (int i = 0; i < (int) cdc.nAxialLayers(); ++i) {
@@ -1437,6 +1628,9 @@ namespace Belle {
 void
 TCurlFinder::createSegments(AList<TLink> &list)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::createSegments" << std::endl;
+#endif
   // ...makes segments from AList<TLink> &list
   // These segments are add to _segmentList.(# of segments >= MIN_SEGMENT)
 
@@ -1483,8 +1677,24 @@ void
 TCurlFinder::searchSegment(TLink* seed, AList<TLink> &list,
                            AList<TLink> &seedStock, TSegmentCurl* segment)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::searchSegment" << std::endl;
+  //  std::cout << "seed->wire()->id()= " << seed->wire()->id() << std::endl;
+#endif
+      //ho
+      /*
+	for (int i = 0; i < 7; ++i) {
+	if (seed->neighbor(i)) {
+	std::cout <<"i,neighbor,-wireid,-superLid= " << i <<" "<< seed->neighbor(i)->wire()->id() <<" "<< seed->neighbor(i)->wire()->superLayerId() << std::endl;
+	}
+	}
+      */
+
   for (int i = 0; i < 7; ++i) {
     if (seed->neighbor(i)) {
+#if defined(HO_DEBUG)
+      std::cout << "i,seed->neighbor(i)->wire()->id()= " << i <<" "<< seed->neighbor(i)->wire()->id() << std::endl;
+#endif
       if (!findLink(seed->neighbor(i), list))continue;
       segment->append(seed->neighbor(i));
       seedStock.append(seed->neighbor(i));
@@ -1498,6 +1708,9 @@ TCurlFinder::searchSegment(TLink* seed, AList<TLink> &list,
 TLink*
 TCurlFinder::findLink(const TLink* seed, const AList<TLink> &list)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::findLink" << std::endl;
+#endif
   // This is to search "TLink *seed" in "AList<TLink> &list".
   // Return is when found, the "TLink *list[i]"
   // when not found, NULL.
@@ -1516,6 +1729,9 @@ TCurlFinder::findLink(const TLink* seed, const AList<TLink> &list)
 int
 TCurlFinder::checkSortSegments(void)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::checkSortSegments" << std::endl;
+#endif
   // A sub main function ...called by "doit".
 #if TRASAN_DEBUG_DETAIL
   std::cout << Tab() << "... checking and sorting segments..." << std::endl;
@@ -1539,6 +1755,9 @@ TCurlFinder::checkSortSegments(void)
 void
 TCurlFinder::checkExceptionalSegmentsType03(void)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::checkExceptionalSegmentsType03" << std::endl;
+#endif
   int max = m_param.MAX_FULLWIRE;
   int nMinWires;
   if (max == 7)nMinWires = 21;
@@ -1549,9 +1768,18 @@ TCurlFinder::checkExceptionalSegmentsType03(void)
   else if (max == 2)nMinWires = 12;
   else if (max == 1)nMinWires = 10;
   else if (max == 0)nMinWires = 7;
+#if defined(HO_DEBUG)
+  std::cout <<"nMinWires= " << nMinWires << std::endl;
+#endif
 
   AList<TSegmentCurl> removeList;
+#if defined(HO_DEBUG)
+  std::cout <<"length= " << m_segmentList.length() << std::endl;
+#endif
   for (unsigned i = 0, length = m_segmentList.length(); i < length; ++i) {
+#if defined(HO_DEBUG)
+    std::cout <<"i,size= " << i <<" "<< m_segmentList[i]->size() << std::endl;      
+#endif
     if ((int) m_segmentList[i]->size() >= nMinWires) {
       unsigned nWires = m_segmentList[i]->size();
       unsigned n6Wires = 0;
@@ -1579,6 +1807,9 @@ TCurlFinder::checkExceptionalSegmentsType03(void)
 void
 TCurlFinder::checkExceptionalSegmentsType02(void)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::checkExceptionalSegmentsType02" << std::endl;
+#endif
   int max  = 10;
   int hmax = 5;
   AList<TSegmentCurl> removeList;
@@ -1625,6 +1856,9 @@ TCurlFinder::checkExceptionalSegmentsType02(void)
 void
 TCurlFinder::checkExceptionalSegmentsType01(void)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::checkExceptionalSegmentsType01" << std::endl;
+#endif
   for (unsigned i = 0, length = m_segmentList.length(); i < length; ++i) {
     if (m_segmentList[i]->maxLocalLayerId() != m_segmentList[i]->layerIdOfMaxSeq() &&
         m_segmentList[i]->maxSeq() >= m_param.MIN_SEQUENCE) {
@@ -1675,6 +1909,9 @@ void
 TCurlFinder::makeCurlTracks(AList<TTrack> &tracks,
                             AList<TTrack> &tracks2D)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::makeCurlTracks" << std::endl;
+#endif
 #ifdef TRASAN_DEBUG
   const std::string stage = "MakeCurl";
   EnterStage(stage);
@@ -2161,6 +2398,9 @@ TCurlFinder::makeCurlTracks(AList<TTrack> &tracks,
 void
 TCurlFinder::check2DTracks(void)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::check2DTracks" << std::endl;
+#endif
   if (m_2dTracks.length() == 0)return;
   AList<TLink> allWires_3Dtrks;
   for (int i = 0; i < m_tracks.length(); ++i) {
@@ -2192,6 +2432,9 @@ TCurlFinder::check2DTracks(void)
 void
 TCurlFinder::checkRelation(AList<TTrack> &list)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::checkRelation" << std::endl;
+#endif
   unsigned nT = list.length();
 
   //...~(Tagir)...
@@ -2218,6 +2461,9 @@ TCurlFinder::checkRelation(AList<TTrack> &list)
 TCircle*
 TCurlFinder::dividing2DTrack(TCircle* circle)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::dividing2DTrack" << std::endl;
+#endif
 #ifdef TRASAN_DEBUG_DETAIL
   const std::string stage = "DivideCircle";
   EnterStage(stage);
@@ -2277,6 +2523,9 @@ TCurlFinder::dividing2DTrack(TCircle* circle)
 void
 TCurlFinder::assignTracks(void)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::assignTracks" << std::endl;
+#endif
   // 3D trks
   for (int i = 0, size = m_tracks.length(); i < size; ++i) {
     m_tracks[i]->assign(CellHitCurlFinder);
@@ -2294,6 +2543,9 @@ TCurlFinder::assignTracks(void)
 extern "C" int
 TCurlFinder_doubleCompare(const void* i, const void* j)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::doubleCompare" << std::endl;
+#endif
   if (*(static_cast<const double*>(i)) > *(static_cast<const double*>(j)))return 1;
   if (*(static_cast<const double*>(i)) < * (static_cast<const double*>(j)))return -1;
   return 0;
@@ -2302,6 +2554,9 @@ TCurlFinder_doubleCompare(const void* i, const void* j)
 int
 TCurlFinder::trace2DTrack(TCircle* circle)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::trace2DTrack" << std::endl;
+#endif
   // 0 is bad, 1 is good
   unsigned nSize = circle->links().length();
   if (nSize == 0)return 0;
@@ -2354,6 +2609,9 @@ TCurlFinder::trace2DTrack(TCircle* circle)
 bool
 TCurlFinder::check2DCircle(TCircle* circle)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::check2DCircle" << std::endl;
+#endif
   unsigned nA(nAxialHits(fabs(circle->radius()) * 2.0));
 
   unsigned nMA = static_cast<unsigned>(floor(m_param.RATIO_USED_WIRE * static_cast<double>(nA)));
@@ -2377,6 +2635,9 @@ TCurlFinder::check2DCircle(TCircle* circle)
 bool
 TCurlFinder::check3DTrack(TTrack* track)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::check3DTrack" << std::endl;
+#endif
   trace3DTrack(track);
   unsigned nA = 0, nS = 0;
   for (unsigned i = 0, size = track->nLinks(); i < size; ++i) {
@@ -2396,6 +2657,9 @@ TCurlFinder::check3DTrack(TTrack* track)
 int
 TCurlFinder::trace3DTrack(TTrack* track)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::trace3DTrack" << std::endl;
+#endif
   // 0 is bad, 1 is good
   unsigned nSize = track->links().length();
   if (nSize == 0) {
@@ -2459,85 +2723,96 @@ void
 TCurlFinder::mask3DTrack(TTrack* track,
                          AList<TLink> &maskList)
 {
-//cnv  double r(fabs(track->helix().radius()));
-//   const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
-// //   double cx(track->helix().center().x());
-// //   double cy(track->helix().center().y());
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::mask3DTrack" << std::endl;
+#endif
+  double r(fabs(track->helix().radius()));
+  const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
+  //   double cx(track->helix().center().x());
+  //   double cy(track->helix().center().y());
 
-//   AList<TLink> list(m_unusedAxialHits);
-//   list.append(m_unusedStereoHits);
-//   list.remove(track->links());
-//   list.sort(TLink::sortByWireId);
+  AList<TLink> list(m_unusedAxialHits);
+  list.append(m_unusedStereoHits);
+  list.remove(track->links());
+  list.sort(TLink::sortByWireId);
 
-//   AList<TLink> removeList;
-//   for(unsigned i=0,size=list.length();i<size;++i){
-//     double d = distance(*track, *(list[i]));
-//     if(d < m_param.MASK_DISTANCE){
-//       HepGeom::Point3D<double> tmp(d, 0., 0.);
-//       list[i]->position(tmp);
-//       removeList.append(list[i]);
-//     }
-//   }
+  AList<TLink> removeList;
+  for(unsigned i=0,size=list.length();i<size;++i){
+    double d = distance(*track, *(list[i]));
+    if(d < m_param.MASK_DISTANCE){
+      HepGeom::Point3D<double> tmp(d, 0., 0.);
+      list[i]->position(tmp);
+      removeList.append(list[i]);
+    }
+  }
 
-//   int pLayerId1 = static_cast<int>(layerId(2.*r));
-// //   if(ms_superb) {
-// //     if(pLayerId1!=cdc.nLayers()) pLayerId1 -= 1;
-// //   } else
-//  {
-//     if(pLayerId1 != 50)pLayerId1 -= 1;//hard coding parameter
-//   }
+  int pLayerId1 = static_cast<int>(layerId(2.*r));
+  if(ms_superb) {
+    if(pLayerId1!=cdc.nLayers()) pLayerId1 -= 1;
+  } else
+  {
+    if(pLayerId1 != 50)pLayerId1 -= 1;//hard coding parameter
+  }
 
-//   int pLayerId2 = pLayerId1+2;      //hard coding parameter
+  int pLayerId2 = pLayerId1+2;      //hard coding parameter
 
-//   AList<TLink> preCand, cand;
-//   while(removeList.length()){
-//     preCand.removeAll();
-//     preCand.append(removeList[0]);
-//     if(removeList.length() >= 2){
-//       for(unsigned j=1,size=removeList.length();j<size;++j){
-//  if(removeList[0]->wire()->layerId() == removeList[j]->wire()->layerId()){
-//    for(unsigned k=0,num=preCand.length();k<num;++k){
-//      if(preCand[k]->wire()->localIdForPlus()+1 == (int) removeList[j]->wire()->localId()){
-//        preCand.append(removeList[j]);
-//        break;
-//      }
-//    }
-//  }
-//       }
-// #if 1
-//       // new
-//       if((int) preCand[0]->wire()->layerId() >= pLayerId1 &&
-//   (int) preCand[0]->wire()->layerId() <= pLayerId2){
-//  cand.append(preCand);
-//       }else if(preCand.length() == 2){//hard coding parameter
-//  cand.append(preCand);
-//       }else if(preCand.length() == 1){
-//  cand.append(preCand[0]);
-//       }
-// #else
-//       if(preCand.length() == 1){
-//  if(preCand[0]->position().x() < MASK_DISTANCE)cand.append(preCand[0]);
-//       }else{
-//  if(preCand[0]->wire()->layerId() >= pLayerId1 &&
-//     preCand[0]->wire()->layerId() <= pLayerId2){
-//    cand.append(preCand);
-//  }else if(preCand.length() == 2){//hard coding parameter
-//    cand.append(preCand);
-//  }
-//       }
-// #endif
-//     }else{
-//       cand.append(removeList[0]);
-//     }
-//     removeList.remove(removeList[0]);
-//     removeList.remove(cand);
-//   }
-//   maskList.append(cand);
+  AList<TLink> preCand, cand;
+  while(removeList.length()){
+    preCand.removeAll();
+    preCand.append(removeList[0]);
+    if(removeList.length() >= 2){
+      for(unsigned j=1,size=removeList.length();j<size;++j){
+	if(removeList[0]->wire()->layerId() == removeList[j]->wire()->layerId()){
+	  for(unsigned k=0,num=preCand.length();k<num;++k){
+	    if(preCand[k]->wire()->localIdForPlus()+1 == (int) removeList[j]->wire()->localId()){
+	      preCand.append(removeList[j]);
+	      break;
+	    }
+	  }
+	}
+      }
+#if 1
+#if defined(HO_DEBUG)
+      std::cout << "#if 1 executed" << std::endl;
+#endif 
+      // new
+      if((int) preCand[0]->wire()->layerId() >= pLayerId1 &&
+	 (int) preCand[0]->wire()->layerId() <= pLayerId2){
+	cand.append(preCand);
+      }else if(preCand.length() == 2){//hard coding parameter
+	cand.append(preCand);
+      }else if(preCand.length() == 1){
+	cand.append(preCand[0]);
+      }
+#else
+#if defined(HO_DEBUG)
+      std::cout << "#else executed" << std::endl;
+#endif 
+      if(preCand.length() == 1){
+	if(preCand[0]->position().x() < MASK_DISTANCE)cand.append(preCand[0]);
+      }else{
+	if(preCand[0]->wire()->layerId() >= pLayerId1 &&     preCand[0]->wire()->layerId() <= pLayerId2){
+	  cand.append(preCand);
+	}else if(preCand.length() == 2){//hard coding parameter
+	  cand.append(preCand);
+	}
+      }
+#endif
+    }else{
+      cand.append(removeList[0]);
+    }
+    removeList.remove(removeList[0]);
+    removeList.remove(cand);
+  }
+  maskList.append(cand);
 }
 
 TTrack*
 TCurlFinder::merge3DTrack(TTrack* track, AList<TTrack> &confTracks)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::merge3DTrack" << std::endl;
+#endif
   if (!m_param.MERGE_EXE)return track;
 
   AList<TTrack> tracks(confTracks);
@@ -2688,6 +2963,9 @@ TCurlFinder::merge3DTrack(TTrack* track, AList<TTrack> &confTracks)
 void
 TCurlFinder::salvage3DTrack(TTrack* track, bool half)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::salvage3DTrack" << std::endl;
+#endif
 #ifdef TRASAN_DEBUG_DETAIL
   const std::string stage = "Salvage3D";
   EnterStage(stage);
@@ -2752,14 +3030,23 @@ TCurlFinder::salvage3DTrack(TTrack* track, bool half)
 double
 TCurlFinder::distance(const TTrack& track, const TLink& link) const
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::distance 1" << std::endl;
+#endif
   if (link.wire()->axial()) {
     //...axial
+#if defined(HO_DEBUG)
+    std::cout << "TCurlFinder::distance 1 axial" << std::endl;
+#endif
     double d = distance(track.helix().center().x() - link.xyPosition().x(),
                         track.helix().center().y() - link.xyPosition().y());
     double diff = fabs(d - fabs(track.helix().radius()));
     return fabs(link.hit()->drift() - diff);
   }
   //...stereo
+#if defined(HO_DEBUG)
+    std::cout << "TCurlFinder::distance 1 stereo" << std::endl;
+#endif
   HepGeom::Point3D<double> xc(track.helix().center());
   HepGeom::Point3D<double> xw(link.xyPosition());
   HepGeom::Point3D<double> xt(track.helix().x());
@@ -2842,6 +3129,9 @@ TCurlFinder::make2DTrack(const AList<TLink> &seed,
                          const AList<TSegmentCurl> &segmentList,
                          const unsigned ip)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::make2DTrack" << std::endl;
+#endif
   if (seed.length() < 3)return NULL;
 
 #ifdef TRASAN_WINDOW
@@ -2885,6 +3175,10 @@ nextStep:
   std::cout << "(TCurlFinder)  2D: SearchPath = " << searchPath
             << " Search SelfSuperlayer = " << (int)(searchZero)
             << " Change Direction of Search = " << (int)(changeDirection) << std::endl;
+#endif
+#if defined(HO_DEBUG)
+  std::cout << "preAxialCand.length() = " << preAxialCand.length() << std::endl;
+  std::cout << "preStereoCand.length()= " << preStereoCand.length() << std::endl;
 #endif
   if (preAxialCand.length() == 0 && preStereoCand.length() == 0) {
     if (circle->links().length() >= 3) {
@@ -2991,6 +3285,9 @@ nextStep:
   }
 
 salvage:
+#if defined(HO_DEBUG)
+  std::cout <<"salvage" << std::endl;
+#endif 
   cand.removeAll();
   searchHits(cand, m_unusedAxialHits,  circle, m_param.RANGE_FOR_AXIAL_LAST2D_SEARCH);
   if (m_param.STEREO_2DFIND) {
@@ -3027,8 +3324,14 @@ TCurlFinder::searchAxialCand(AList<TLink> &cand,
                              const unsigned superLayerID,
                              const double searchError)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::searchAxialCand" << std::endl;
+#endif
   cand.removeAll();
   int innerSuperLayerId = nextSuperAxialLayerId(superLayerID, depth);
+#if defined(HO_DEBUG)
+  std::cout <<"depth,innerSuperLayerId in searchAxialCand= " << depth <<" "<< innerSuperLayerId << std::endl;
+#endif
   if (innerSuperLayerId < 0)return;
   for (unsigned i = 0, size = preCand.length(); i < size; ++i) {
     if (preCand[i]->hit()->wire().superLayerId() ==
@@ -3073,6 +3376,9 @@ TCurlFinder::searchStereoCand(AList<TLink> &cand,
                               const unsigned superLayerID,
                               const double searchError)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::searchStereoCand" << std::endl;
+#endif
   cand.removeAll();
   int innerSuperLayerId = nextSuperStereoLayerId(superLayerID, depth);
   if (innerSuperLayerId < 0 || innerSuperLayerId > (int) m_param.SUPERLAYER_FOR_STEREO_SEARCH)return;
@@ -3088,6 +3394,9 @@ unsigned
 TCurlFinder::searchHits(const TLink* link, const TCircle* circle,
                         const double searchError) const
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::searchHits 0" << std::endl;
+#endif
   // ...checks whether "link" can be added to circle.
   // ..."searchError" is length for checking.
   // ...returns 0 = error
@@ -3108,6 +3417,9 @@ TCurlFinder::searchHits(AList<TLink> &cand,
                         const TCircle* circle,
                         const double searchError) const
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::searchHits 1" << std::endl;
+#endif
   unsigned numBefore = cand.length();
   for (unsigned i = 0, size = preCand.length(); i < size; ++i) {
     if (searchHits(preCand[i], circle, searchError)) {
@@ -3137,6 +3449,9 @@ unsigned
 TCurlFinder::checkAppendHits(const AList<TLink> &link,
                              AList<TLink> &cand) const
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::checkAppendHits" << std::endl;
+#endif
   if (cand.length() == 0)return 0;
   AList<TLink> tmp;
   for (unsigned i = 0, size1 = cand.length(), size2 = link.length(); i < size1; ++i) {
@@ -3155,6 +3470,9 @@ TCurlFinder::checkAppendHits(const AList<TLink> &link,
 void
 TCurlFinder::removeStereo(TCircle& c) const
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::removeStereo" << std::endl;
+#endif
   AList<TLink> stereoList;
   for (int i = 0; i < c.links().length(); ++i) {
     if (c.links()[i]->wire()->stereo()) {
@@ -3169,6 +3487,9 @@ TCurlFinder::fitWDD(TCircle& c,
                     double& chi2,
                     int& ndf) const
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::fitWDD" << std::endl;
+#endif
   if (c.links().length() <= 3)return false;
   Lpav circle;
   // CDC
@@ -3264,6 +3585,9 @@ TCurlFinder::fitWDD(TCircle& c,
 TTrack*
 TCurlFinder::make3DTrack(const TCircle* circle, AList<TSegmentCurl> &)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::make3DTrack 0" << std::endl;
+#endif
   if (TTrack* track = make3DTrack(circle)) {
     m_tracks.append(track);
 #if 0
@@ -3283,6 +3607,9 @@ TCurlFinder::make3DTrack(const TCircle* circle, AList<TSegmentCurl> &)
 TTrack*
 TCurlFinder::make3DTrack(const TCircle* circle)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::make3DTrack 1" << std::endl;
+#endif
 #ifdef TRASAN_DEBUG_DETAIL
   const std::string stage = "Make3D";
   EnterStage(stage);
@@ -3362,6 +3689,9 @@ TCurlFinder::make3DTrack(const TCircle* circle)
 TLink*
 findIsolatedCloseHits(TLink* link)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::findIsolatedCloseHits" << std::endl;
+#endif
   int nNeighbor = 0;
   int nIsolated = 0;
   TLink* isolatedLink[2] = {NULL, NULL};
@@ -3418,6 +3748,10 @@ void
 TCurlFinder::findCloseHits(AList<TLink> &links,
                            TTrack& track, AList<TLink> &list)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::findCloseHits" << std::endl;
+  //  std::cout << "links.length= " << links.length() << std::endl;
+#endif
   // ...finds candidates in the "links".
   // ...Candidates mean |"track" - wire(from "links" elements)| < dRcut
   // ...returns these candidates("list").
@@ -3427,7 +3761,7 @@ TCurlFinder::findCloseHits(AList<TLink> &links,
                       0., m_param.RANGE_FOR_STEREO_FORTH,
                       0., m_param.RANGE_FOR_STEREO_FIFTH,
                       0.
-                     };
+  };  
 #if defined(BELLE_DEBUG)
   try {
 #endif
@@ -3437,7 +3771,8 @@ TCurlFinder::findCloseHits(AList<TLink> &links,
     double x = track.helix().center().x();
     double y = track.helix().center().y();
     for (unsigned i = 0, size = links.length(); i < size; ++i) {
-      if (fabs((links[i]->wire()->xyPosition() - track.helix().center()).mag() - r) <
+      //ho      if (fabs((links[i]->wire()->xyPosition() - track.helix().center()).mag() - r) <
+      if (fabs((links[i]->wire()->xyPosition() - track.helix().center()).perp() - r) <
           dRcut[links[i]->wire()->superLayerId()]) {
         if (q * (x * links[i]->wire()->xyPosition().y() - y * links[i]->wire()->xyPosition().x()) > 0.) {
           list.remove(links[i]);
@@ -3472,6 +3807,9 @@ TCurlFinder::makeWithMC(const AList<Belle2::TRGCDCWireHit> & axialHits,
                         const AList<Belle2::TRGCDCWireHit> & stereoHits,
                         AList<TTrack> & tracks)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::makeWithMC" << std::endl;
+#endif
 #define MAX_INDEX_MAKEMC 100
 #if TRASAN_DEBUG_DETAIL
   std::cout << "(TCurlFinder)Now making tracks using MC info..." << std::endl;
@@ -3605,6 +3943,9 @@ TCurlFinder::makeWithMC(const AList<Belle2::TRGCDCWireHit> & axialHits,
 void
 TCurlFinder::makeCdcFrame(void)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::makeCdcFrame" << std::endl;
+#endif
   //#if 1
   double X = 0.;
   double Y = 0.;
@@ -3646,6 +3987,9 @@ TCurlFinder::makeCdcFrame(void)
 void
 TCurlFinder::plotSegment(const AList<TLink>& list, const int flag)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::plotSegment" << std::endl;
+#endif
   if (!m_debugCdcFrame) {
     makeCdcFrame();
     m_debugCdcFrame = true;
@@ -3689,6 +4033,9 @@ TCurlFinder::plotSegment(const AList<TLink>& list, const int flag)
 void
 TCurlFinder::plotCircle(const TCircle& circle, const int flag)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::plotCircle" << std::endl;
+#endif
   //#if 1
   if (!m_debugCdcFrame) {
     makeCdcFrame();
@@ -3773,6 +4120,9 @@ TCurlFinder::plotCircle(const TCircle& circle, const int flag)
 void
 TCurlFinder::plotTrack(const TTrack& track, const int flag)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::plotTrack" << std::endl;
+#endif
   if (!m_debugCdcFrame) {
     makeCdcFrame();
     m_debugCdcFrame = true;
@@ -3858,6 +4208,9 @@ TCurlFinder::plotTrack(const TTrack& track, const int flag)
 void
 TCurlFinder::writeSegment(const AList<TLink>& list, const int type)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::writeSegment" << std::endl;
+#endif
   if (!m_debugCdcFrame) {
     makeCdcFrame();
     m_debugCdcFrame = true;
@@ -3885,6 +4238,9 @@ TCurlFinder::writeSegment(const AList<TLink>& list, const int type)
 void
 TCurlFinder::dumpType1(TTrack* track)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::dumpType1" << std::endl;
+#endif
   for (int j = 0; j < (int) track->nLinks(); ++j) {
     std::cout << "Used Wire Info...";
     if (track->links()[j]->hit()->wire().axial()) {
@@ -3923,6 +4279,9 @@ TCurlFinder::dumpType1(TTrack* track)
 void
 TCurlFinder::dumpType2(TTrack* track)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::dumpType2" << std::endl;
+#endif
   unsigned size = track->nLinks();
   if (size == 0)return;
 
@@ -3970,6 +4329,9 @@ TCurlFinder::dumpType2(TTrack* track)
 // --> TSegmentUtil.h
 sortBySvdRLA(const Datsvd_hit** a, const Datsvd_hit** b)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::sortBySvdRLA" << std::endl;
+#endif
   if ((*a)->rla() < (*b)->rla()) {
     return -1;
   } else if ((*a)->rla() == (*b)->rla()) {
@@ -3982,6 +4344,9 @@ sortBySvdRLA(const Datsvd_hit** a, const Datsvd_hit** b)
 Gen_hepevt*
 cluster2hep(Recsvd_cluster* clus)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::cluster2hep" << std::endl;
+#endif
   AList<Datsvd_hit> m_datsvd_hit;
   Datsvd_hit_Manager& svdHitMgr = Datsvd_hit_Manager::get_manager();
   for (Datsvd_hit_Manager::iterator
@@ -4111,6 +4476,9 @@ cluster2hep(Recsvd_cluster* clus)
 void
 TCurlFinder::debugCheckSegments1(void)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::debugCheckSegments1" << std::endl;
+#endif
   // Slow Checker(CPU time increases!!)
   // Neighboring wires should be included in the same segement.
   std::cout << "(TCurlFinder)checking consistency of segement..." << std::endl;
@@ -4192,6 +4560,9 @@ void
 TCurlFinder::debugCheckSegments(const double localId, const double layerId,
                                 const double localId2, const double layerId2)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::debugCheckSegments" << std::endl;
+#endif
   unsigned nSeg = m_segmentList.length();
   unsigned nFound = 0;
   for (unsigned i = 0; i < nSeg; ++i) {
@@ -4216,6 +4587,9 @@ TCurlFinder::debugCheckSegments(const double localId, const double layerId,
 void
 TCurlFinder::debugCheckSegments0(void)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::debugcheckSegments0" << std::endl;
+#endif
   unsigned nSeg = m_segmentList.length();
   unsigned nWire = 0;
   for (unsigned i = 0; i < nSeg; ++i)nWire += m_segmentList[i]->list().length();
@@ -4235,6 +4609,9 @@ TCurlFinder::debugCheckSegments0(void)
 void
 TCurlFinder::debugCheckSegments2(void)
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::checkSegments2" << std::endl;
+#endif
 
 #define DEBUG_TMP_N_CURL 50
 
@@ -4284,6 +4661,9 @@ TCurlFinder::debugCheckSegments2(void)
 void
 TCurlFinder::displayStatus(const std::string& m) const
 {
+#if defined(HO_DEBUG)
+  std::cout << "TCurlFinder::displayStatus" << std::endl;
+#endif
   _cWindow.clear();
   _cWindow.text(m);
   for (unsigned i = 0; i < 32; i++)

@@ -3,11 +3,15 @@
 
 <!-- ++++++++++++++++++++++++++++++++  -->
 <shift>
-<x  unit="mm" >+19</x>
-<y  unit="mm" >+21</y>
-<z  unit="mm" >0</z>
+  <x  unit="mm" >+17.1</x>
+  <y  unit="mm" >+20.9</y>
+  <z  unit="mm" >0</z>
 
-
+  <run id="145">
+    <x unit="mm">60</x>
+    <y unit="mm">21</y>
+    <z unit="mm">0</z>
+  </run>
 </shift>
 
 <mwpc id="0">

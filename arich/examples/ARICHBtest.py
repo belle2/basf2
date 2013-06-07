@@ -20,8 +20,8 @@ parser = OptionParser()
 parser.add_option('-r', '--run', dest='runno', default='068',
                   help='analyse runno')
 parser.add_option('-p', '--path', dest='path',
-                  default='/afs/f9.ijs.si/home/rok/aerorich/tests/11/ana/bdata/bt11'
-                  , help='datapath')
+                  default='/afs/f9.ijs.si/data/belle/data/beamtests/2011/run',
+                  help='datapath')
 
 parser.add_option('-y', '--year', dest='year', default='2011',
                   help='beam test year')

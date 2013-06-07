@@ -62,21 +62,115 @@
 
 <hapd desc="HAPDSetup in run log, setup of the HAPD and the frame.">
 	<row id="1"> <comment>DAQ test</comment>
-		<aerogeldx unit="mm">0</aerogeldx> <framedx unit="mm">0</framedx> <rotation unit="degree">0</rotation> <setup>1</setup></row>		
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<framedx unit="mm">0</framedx> 
+		<rotation unit="degree">0</rotation> 
+		<setup>1</setup>
+	</row>		
 	<row id="2"> <comment>First hits, 21/05/2013, central HAPD dead</comment>
-		<aerogeldx unit="mm">0</aerogeldx> <setup>2</setup></row>		
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<setup>2</setup>
+	</row>		
 	<row id="3"> <comment>21-23/05/2013 New central HAPD</comment>
-		<aerogeldx unit="mm">0</aerogeldx> <setup>3</setup></row>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<setup>3</setup>
+	</row>
 	<row id="3a"> <comment>Aerogel moved</comment>
-		<aerogeldx unit="mm">4.0</aerogeldx> <setup>3</setup></row>
+		<aerogeldx unit="mm">4.0</aerogeldx> 
+		<setup>3</setup>
+	</row>
 	<row id="3b"> <comment>Aerogel moved</comment>
-		<aerogeldx unit="mm">6.0</aerogeldx> <aerogeldy unit="mm">2.0</aerogeldy> <setup>3</setup> </row>
+		<aerogeldx unit="mm">6.0</aerogeldx> 
+		<aerogeldy unit="mm">2.0</aerogeldy> 
+		<setup>3</setup> 
+	</row>
 	<row id="3c"> <comment>Aerogel moved</comment>
-		<aerogeldx unit="mm">0</aerogeldx> <aerogeldy unit="mm">-5.0</aerogeldy> <setup>3</setup> </row>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<aerogeldy unit="mm">-5.0</aerogeldy> 
+		<setup>3</setup> 
+	</row>
 	<row id="3d"> <comment>Aerogel moved</comment>
-		<aerogeldx unit="mm">4.5</aerogeldx> <aerogeldy unit="mm">0.0</aerogeldy> <setup>3</setup> </row>
-	<row id="4"> <comment>Aerogel moved</comment>
-		<aerogeldx unit="mm">0</aerogeldx> <aerogeldy unit="mm">0</aerogeldy> 		<setup>4</setup> </row>
+		<aerogeldx unit="mm">4.5</aerogeldx> 
+		<aerogeldy unit="mm">0.0</aerogeldy> 
+		<setup>3</setup> 
+	</row>
+	<row id="4"> <comment>Irradiation test, positions: as initial</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<setup>4</setup> 
+	</row>
+	<row id="5"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<setup>5</setup> 
+	</row>
+	<row id="6"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<setup>6</setup> 
+	</row>
+	<row id="7"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<setup>7</setup> 
+	</row>
+	<row id="8"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<setup>8</setup> 
+	</row>
+	<row id="9"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy>
+		<rotation unit="degree">30</rotation> 		
+		<setup>9</setup> 
+	</row>
+	<row id="9a"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">-20</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy>
+		<setup>9</setup>
+		<framedx unit="mm">20</framedx>
+		<rotation unit="degree">30</rotation>
+	</row>
+	<row id="9b"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">-40</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy>
+		<setup>9</setup>
+		<framedx>40</framedx>
+		<rotation unit="degree">30</rotation>
+		</row>
+	<row id="9c"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">-58</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy>
+		<framedx>58</framedx>
+		<rotation unit="degree">30</rotation> 		
+		<setup>9</setup> 
+		</row>
+	<row id="9d"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">-60</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy>
+		<framedx>60</framedx>
+		<rotation unit="degree">30</rotation>
+		<setup>9</setup> 
+		</row>
+	<row id="9e"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">-78</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<framedx>78</framedx>
+		<rotation unit="degree">30</rotation>
+		<setup>9</setup> </row>
+	<row id="9f"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">-100</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<framedx>100</framedx>
+		<rotation unit="degree">30</rotation>
+		<setup>9</setup> </row>
+	<row id="9g"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">-120</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<framedx>120</framedx>
+		<rotation unit="degree">30</rotation>
+		<setup>9</setup> </row>
 </hapd>
 
 

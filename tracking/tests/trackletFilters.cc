@@ -106,12 +106,12 @@ namespace Belle2 {
     EXPECT_EQ(f3h.calcSign(l, g, f), f3h.calcSign(g, f, a));
 
     TrackletFilters aFilter = TrackletFilters();
-    double clapPhi = 0, clapR = 0, chi2, estimatedRadius = 0;
+    double clapPhi = 0, clapR = 0, estimatedRadius = 0;
 
     aFilter.resetValues(&maxiStuff);
     EXPECT_FALSE(aFilter.ziggZaggXY());
     EXPECT_FALSE(aFilter.ziggZaggRZ());
-    chi2 = aFilter.circleFit(clapPhi, clapR, estimatedRadius);
+    double chi2 = aFilter.circleFit(clapPhi, clapR, estimatedRadius);
 //     B2WARNING("after maxi-test, chi2 is " << chi2 << ", clapPhi,clapR,estimatedRadius is: " << clapPhi << "," << clapR << "," << estimatedRadius)
 
     aFilter.resetValues(&miniStuff);

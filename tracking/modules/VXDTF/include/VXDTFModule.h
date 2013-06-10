@@ -303,6 +303,21 @@ namespace Belle2 {
                   double omega);
 
 
+    /** search for nonOverlapping trackCandidates using Greedy algorithm (start with TC of highest QI, remove all TCs incompatible with current TC, if there are still TCs there, repeat step until no incompatible TCs are there any more) */
+    void greedy(TCsOfEvent& tcVector);
+
+
+    /** used by VXDTFModule::greedy, recursive function which takes tc with highest QI and kills all its rivals. After that, TC gets removed and process is repeated with shrinking list of TCs until no TCs alive has got rivals alive */
+    void greedyRecursive(std::list< std::pair<double, Belle2::VXDTFTrackCandidate*> >& overlappingTCs,
+                         double& totalSurvivingQI,
+                         int& countSurvivors,
+                         int& countKills);
+
+
+    /** for the easy situation of 2 overlapping TCs we dont need comlex algorithms for finding the best subset of clean TCs... */
+    void tcDuel(TCsOfEvent& tcVector);
+
+
     /** calculates integer score for current filter (all filters combined deliver the QQQ (normed to 0-1)), works for filterTypes having both: min- and max-value */
     int calcQQQscore(std::vector<std::pair<std::string, double> > quantiles,
                      double currentValue,
@@ -410,7 +425,7 @@ namespace Belle2 {
     double getXMLValue(GearDir& quantiles, std::string& valueType, std::string& filterType); // -> TODO: dirty little helper
 
     /** general Function to write data into a root file*/
-    void writeToRootFile(double variable);
+    void writeToRootFile(double pValue, double chi2, int ndf);
 
 //    /** general Function to write data into a root file*/
 //    void VXDTFModule::writeToRootFile(const Tracking::T_type1& variable, const std::string& branchName, const std::string &treeName);
@@ -520,23 +535,33 @@ namespace Belle2 {
     bool m_highOccupancyCase; /**< is determined by a userdefined threshold. If there are more hits in the event than threshold value, high occupancy filters are activated (segFinder and nbFinder only) */
     int m_PARAMhighOccupancyThreshold; /**< If there are more hits in a sensor than threshold value, high occupancy filters are activated (segFinder and nbFinder only) */
     int m_PARAMkillBecauseOfOverlappsThreshold; /**< if there are more TCs overlapping than threshold value, event kalman gets replaced by circleFit. If there are 10 times more than threshold value of TCs, the complete event gets aborted */
-    int m_PARAMkillEventBecauseOfSegmentsThreshold; /**< if there are more segments than threshold value, the complete event gets aborted */
+    int m_PARAMkillEventForHighOccupancyThreshold; /**< if there are more segments than threshold value, the complete event gets aborted */
 
     double m_PARAMomega; /**< tuning parameter for hopfield network */
     double m_tcThreshold;   /**< defines threshold for hopfield network. neurons having values below threshold are discarded */
 
     bool m_PARAMqiSmear; /**<  allows to smear QIs via qqq-Interface, needed when having more than one TC with the same QI */
     bool m_PARAMcleanOverlappingSet; /**< when true, TCs which are found more than once (possible because of multipass) will get filtered */
-    bool m_PARAMuseHopfield; /**< allows to deactivate hopfield, so overlapping TCs are exported */
+    bool m_PARAMuseHopfield;
+    std::string m_PARAMfilterOverlappingTCs; /**< defines which technique shall be used for filtering overlapping TCs, currently supported: 'hopfield', 'greedy', 'none' */
+    int m_filterOverlappingTCs; /**< is set by m_PARAMfilterOverlappingTCs and defines which technique shall be used for filtering overlapping TCs */
     double m_PARAMsmearMean; /**< allows to introduce a bias for QI (e.g. surpressing all values, ...)*/
     double m_PARAMsmearSigma; /**< bigger values deliver broader distribution*/
     bool m_PARAMstoreBrokenQI;/**< if true, TC survives QI-calculation-process even if fit was not possible */
     bool m_TESTERexpandedTestingRoutines; /**< set true if you want to export expanded infos of TCs for further analysis */
     bool m_PARAMwriteToRoot; /**< if true, a rootFile named by m_PARAMrootFileName will be filled with info */
-    std::string m_PARAMrootFileName; /**< name of rootFile which will be filled if m_PARAMwriteToRoot is set to true */
+    std::vector<std::string> m_PARAMrootFileName; /**< only two entries accepted, first one is the root filename, second one is 'RECREATE' or 'UPDATE' which is the write mode for the root file, parameter is used only if 'writeToRoot' = true */
+
     TFile* m_rootFilePtr; /**< pointer at root file used for p-value-output */
-    TTree* m_treePtr; /**< pointer at root tree used for p-value-output */
+    TTree* m_treeTrackWisePtr; /**< pointer at root tree used for information stored once per track (e.g. p-value-output) */
+    TTree* m_treeEventWisePtr; /**< pointer at root tree used for information stored once per event */
+    long long int m_rootTimeConsumption; /**< used for storing duration of event in a root file */
     double m_rootPvalues; /**< used for storing pValues in a root file */
+    double m_rootChi2; /**< used for storing chi2values in a root file */
+    int m_rootNdf; /**< used for storing numbers of degrees of freedom in a root file */
+    std::vector<double>  m_rootVecPvalues; /**< used for storing grouped pValues in a root file */
+    std::vector<double> m_rootVecChi2; /**< used for storing grouped chi2values in a root file */
+    std::vector<int> m_rootVecNdf; /**< used for storing grouped numbers of degrees of freedom in a root file */
 
     std::string m_PARAMcalcQIType; /**< allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit' */
     int m_calcQiType; /**< is set by m_PARAMcalcQIType and defines which qi type shall be calculated */

@@ -43,7 +43,7 @@ g4sim.param('StoreAllSecondaries', True)
 
 vxdtf = register_module('VXDTF')
 vxdtf.logging.log_level = LogLevel.INFO
-vxdtf.logging.debug_level = 11
+vxdtf.logging.debug_level = 1
 # detectorType: Supports 'SVD' and 'VXD' so far
 # calcQIType:  Supports 'kalman', 'circleFit' or 'trackLength'
 param_vxdtf = {
@@ -57,7 +57,6 @@ param_vxdtf = {
     'TESTERexpandedTestingRoutines': True,
     'qiSmear': False,
     }
-    # 'writeToRoot': True,
 vxdtf.param(param_vxdtf)
 
 mctrackfinder = register_module('MCTrackFinder')
@@ -65,7 +64,7 @@ mctrackfinder.logging.log_level = LogLevel.INFO
 mctrackfinder.logging.debug_level = 101
 
 # select which detectors you would like to use
-param_mctrackfinder = {
+param_mctrackfinder = {  # 'PXD', 'SVD',
     'UseCDCHits': 0,
     'UseSVDHits': 1,
     'UsePXDHits': 1,
@@ -87,7 +86,7 @@ param_analyzer = {'printExtentialAnalysisData': False}  # set true if PRINTINFO 
 analyzer.param(param_analyzer)
 
 # display = register_module('Display')
-# param_Display = {'showGFTrackCands': 1, 'UseClusters': 1}
+# param_Display = {'showGFTrackCands': 1, 'useClusters': 1, 'fullGeometry': 1}
 # display.param(param_Display)
 
 # Create paths

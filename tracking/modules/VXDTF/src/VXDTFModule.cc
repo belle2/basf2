@@ -135,7 +135,7 @@ VXDTFModule::VXDTFModule() : Module()
   activateHelixFit.push_back(true);
   activateDistance2IP.push_back(true);
   activateZigZagXY.push_back(true);
-  activateZigZagRZ.push_back(true);
+  activateZigZagRZ.push_back(false);
   activateDeltaPt.push_back(true);
   activateDeltaDistance2IP.push_back(true);
   activateCircleFit.push_back(true);
@@ -165,7 +165,7 @@ VXDTFModule::VXDTFModule() : Module()
   tuneZigZagRZ.push_back(0);
   tuneDeltaPt.push_back(0);
   tuneDeltaDistance2IP.push_back(0);
-  tuneCircleFit.push_back(50); // chi2-threshold
+  tuneCircleFit.push_back(0.001); // chi2-threshold
   tuneAngles3DHioC.push_back(0);
   tuneAnglesXYHioC.push_back(0);
   tuneAnglesRZHioC.push_back(0);
@@ -175,6 +175,10 @@ VXDTFModule::VXDTFModule() : Module()
   tuneHelixFitHioC.push_back(0);
   tuneDeltaPtHioC.push_back(0);
   tuneDeltaDistance2IPHioC.push_back(0);
+
+  vector<string> rootFileNameVals;
+  rootFileNameVals.push_back(string("VXDTFoutput"));
+  rootFileNameVals.push_back("RECREATE");
 
   //Set module properties
   setDescription(" trackfinder for the SVD using cellular automaton techniques, kalman filter (genfit) and a hopfield network as well.");
@@ -253,12 +257,12 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("tuneZigZagRZ", m_PARAMtuneZigZagRZ, " currently not in use, only here for symmetrical reasons", tuneZigZagRZ);
   addParam("tuneDeltaPt", m_PARAMtuneDeltaPt, " tune for each setup individually, in %", tuneDeltaPt);
   addParam("tuneDeltaDistance2IP", m_PARAMtuneDeltaDistance2IP, " tune for each setup individually, in %", tuneDeltaDistance2IP);
-  addParam("tuneCircleFit", m_PARAMtuneCircleFit, " set threshold for each setup individually", tuneCircleFit);
+  addParam("tuneCircleFit", m_PARAMtuneCircleFit, " threshold for pValues calculated by the circleFiter for each tc. If pValue is lower than threshold, tc gets discarded", tuneCircleFit);
 
 
   addParam("highOccupancyThreshold", m_PARAMhighOccupancyThreshold, "if there are more hit-combinations at a sensor than chosen threshhold, a special high-occupancy-mode will be used to filter more hits", int(17));
   addParam("killBecauseOfOverlappsThreshold", m_PARAMkillBecauseOfOverlappsThreshold, "if there are more TCs overlapping than chosen threshold value, event kalman gets replaced by circleFit. If there are 10 times more than threshold value of TCs, the complete event gets aborted", int(500));
-  addParam("killEventBecauseOfSegmentsThreshold", m_PARAMkillEventBecauseOfSegmentsThreshold, "if there are more segments than threshold value, the complete event gets aborted", int(5000));
+  addParam("killEventForHighOccupancyThreshold", m_PARAMkillEventForHighOccupancyThreshold, "if there are more segments than threshold value, the complete event gets aborted", int(5000));
 
   addParam("tccMinLayer", m_PARAMminLayer, "determines lowest layer considered by track candidate collector", minLayer);
   addParam("tccMinState", m_PARAMminState, "determines lowest state of cells considered by track candidate collector", minState);
@@ -276,11 +280,12 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("smearSigma", m_PARAMsmearSigma, " when qiSmear = True, degree of perturbation can be set here", double(0.0001));
 
   addParam("calcQIType", m_PARAMcalcQIType, "allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit'", string("circleFit"));
+  addParam("filterOverlappingTCs", m_PARAMfilterOverlappingTCs, "allows you to chose the which technique shall be used for filtering overlapping TCs, currently supported: 'hopfield', 'greedy', 'none'", string("greedy"));
   addParam("storeBrokenQI", m_PARAMstoreBrokenQI, "if true, TC survives QI-calculation-process even if fit was not possible", bool(true));
   addParam("KFBackwardFilter", m_KFBackwardFilter, "determines whether the kalman filter moves inwards or backwards, 'True' means inwards", bool(false));
   addParam("TESTERexpandedTestingRoutines", m_TESTERexpandedTestingRoutines, "set true if you want to export expanded infos of TCs for further analysis (setting to false means that the DataObject called 'VXDTFInfoBoard' will not be stored)", bool(false));
   addParam("writeToRoot", m_PARAMwriteToRoot, "set true if you want to export the p-values of the fitters in a root file named by parameter 'rootFileName'", bool(false));
-  addParam("rootFileName", m_PARAMrootFileName, "fileName used for p-value export. Will be ignored if parameter 'writeToRoot' is false (standard)", string("VXDTFoutput"));
+  addParam("rootFileName", m_PARAMrootFileName, "fileName used for p-value export. Will be ignored if parameter 'writeToRoot' is false (standard)", rootFileNameVals);
 
 
   /// temporarily disabled (maybe used later)
@@ -359,24 +364,45 @@ void VXDTFModule::initialize()
   m_TESTERkalmanSkipped = 0;
 
   if (m_PARAMcalcQIType == "trackLength") {
+    B2INFO("VXDTFModule::initialize: chosen calcQIType is '" << m_PARAMcalcQIType << "'")
     m_calcQiType = 0;
   } else if (m_PARAMcalcQIType == "kalman") {
+    B2INFO("VXDTFModule::initialize: chosen calcQIType is '" << m_PARAMcalcQIType << "'")
     m_calcQiType = 1;
   } else if (m_PARAMcalcQIType == "circleFit") {
+    B2INFO("VXDTFModule::initialize: chosen calcQIType is '" << m_PARAMcalcQIType << "'")
     m_calcQiType = 2;
   } else {
-    B2ERROR("VXDTFModule::initialize: chosen qiType " << m_PARAMcalcQIType << " is unknown, setting standard to circleFit...")
+    B2WARNING("VXDTFModule::initialize: chosen qiType '" << m_PARAMcalcQIType << "' is unknown, setting standard to circleFit...")
     m_calcQiType = 2;
   }
 
+  if (m_PARAMfilterOverlappingTCs == "hopfield") {
+    B2INFO("VXDTFModule::initialize: chosen technique to filter overlapping TCs is 'hopfield'")
+    m_filterOverlappingTCs = 2;
+  } else if (m_PARAMfilterOverlappingTCs == "greedy") {
+    B2INFO("VXDTFModule::initialize: chosen technique to filter overlapping TCs is 'greedy'")
+    m_filterOverlappingTCs = 1;
+  } else if (m_PARAMfilterOverlappingTCs == "none") {
+    B2INFO("VXDTFModule::initialize: chosen technique to filter overlapping TCs is 'none'")
+    m_filterOverlappingTCs = 0;
+  } else {
+    B2WARNING("VXDTFModule::initialize: chosen technique to filter overlapping TCs '" << m_PARAMfilterOverlappingTCs << "' is unknown, setting standard to greedy...")
+    m_filterOverlappingTCs = 1;
+  }
+
   if (m_PARAMwriteToRoot == true) {
-    m_PARAMrootFileName += ".root";
-    m_rootFilePtr = new TFile(m_PARAMrootFileName.c_str(), "RECREATE");
-    m_treePtr = new TTree("m_treePtr", "aTree");
-    m_treePtr->Branch("pValues", &m_rootPvalues);
+    m_PARAMrootFileName[0] += ".root";
+    m_rootFilePtr = new TFile(m_PARAMrootFileName[0].c_str(), m_PARAMrootFileName[1].c_str()); // alternative: UPDATE
+    m_treeTrackWisePtr = new TTree("m_treeTrackWisePtr", "aTrackWiseTree");
+    m_treeEventWisePtr = new TTree("m_treeEventWisePtr", "anEventWiseTree");
+    m_treeEventWisePtr->Branch("duration", &m_rootTimeConsumption);
+    m_treeTrackWisePtr->Branch("pValues", &m_rootPvalues);
+    m_treeTrackWisePtr->Branch("chi2Values", &m_rootChi2);
+    m_treeTrackWisePtr->Branch("ndfValues", &m_rootNdf);
   } else {
     m_rootFilePtr = NULL;
-    m_treePtr = NULL;
+    m_treeTrackWisePtr = NULL;
   }
 }
 
@@ -808,7 +834,7 @@ void VXDTFModule::beginRun()
     B2INFO("importing sectors, using " << chosenSetup << " > " << sectorList.getNumberNodes("aSector") << " sectors found");
 
     if (sectorList.getNumberNodes("aSector") == 0) {
-      B2FATAL("Failed to import sector map " << chosenSetup << "! No track finding possible. Please check ../tracking/data/VXDTFinxex.xml whether your chosen sector maps are uncommented and recompile if you change entries...")
+      B2FATAL("Failed to import sector map " << chosenSetup << "! No track finding possible. Please check ../tracking/data/VXDTFindex.xml whether your chosen sector maps are uncommented and recompile if you change entries...")
     }
     double cutoffMinValue, cutoffMaxValue;
     string aSectorName, aFriendName, aFilterName;
@@ -1143,7 +1169,7 @@ void VXDTFModule::event()
     aLayerID = aVxdID.getLayerNumber();
     VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
     hitInfo.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
-    hitInfo.sigmaX = m_errorContainer[aLayerID].first;
+    hitInfo.sigmaX = m_errorContainer.at(aLayerID - 1).first;
 //    hitInfo.sigmaV = m_globalizedErrorContainer[aLayerID][aVxdID.getLadderNumber()].second;
 
     // local(0,0,0) is the _center_ of the sensorplane, not at the edge!
@@ -1291,7 +1317,8 @@ void VXDTFModule::event()
       hitLocal.SetZ(0.);
 
       hitInfo.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
-      hitInfo.sigmaX = m_errorContainer[aLayerID].first;
+      B2DEBUG(100, " VXDTF-event SVD hits: m_errorContainer.size(): " << m_errorContainer.size() << ", layerID-1: " << aLayerID - 1)
+      hitInfo.sigmaX = m_errorContainer.at(aLayerID - 1).first;
 //      hitInfo.sigmaY = m_globalizedErrorContainer[aLayerID][aVxdID.getLadderNumber()].second;
 
       // local(0,0,0) is the center of the sensorplane
@@ -1427,8 +1454,8 @@ void VXDTFModule::event()
   /** Section 5 - end **/
 
 
-  if (totalActiveCells > m_PARAMkillEventBecauseOfSegmentsThreshold) {
-    B2ERROR("event " << m_eventCounter << ": total number of activated segments: " << totalActiveCells << ", termitating event!");
+  if (totalActiveCells > m_PARAMkillEventForHighOccupancyThreshold) {
+    B2ERROR("event " << m_eventCounter << ": total number of activated segments: " << totalActiveCells << ", terminating event!");
     m_TESTERbrokenEventsCtr++;
 
     /** cleaning part **/
@@ -1468,10 +1495,12 @@ void VXDTFModule::event()
   /** Section 7 - Track Candidate Collector (TCC) **/
   passNumber = 0;
   timeStamp = boostClock::now();
+  int totalTCs = 0;
   BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
     delFalseFriends(currentPass, centerPosition);
     tcCollector(currentPass);                                     /// tcCollector
     int survivingTCs = currentPass->tcVector.size();
+    totalTCs += survivingTCs;
     B2DEBUG(1, "pass " << passNumber << ": track candidate collector generated " << survivingTCs << " TCs");
     thisInfoPackage.numTCsAfterTCC += survivingTCs;
     passNumber++;
@@ -1479,6 +1508,16 @@ void VXDTFModule::event()
   stopTimer = boostClock::now();
   m_TESTERtimeConsumption.tcc += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
   thisInfoPackage.sectionConsumption.tcc += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+  if (totalTCs > m_PARAMkillEventForHighOccupancyThreshold / 3) {
+    B2ERROR("event " << m_eventCounter << ": total number of tcs after tcc: " << totalTCs << ", terminating event!");
+    m_TESTERbrokenEventsCtr++;
+
+    /** cleaning part **/
+    BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
+      cleanEvent(currentPass, centerSector);
+    }
+    return;
+  }
   /** Section 7 - end **/
 
 
@@ -1576,7 +1615,7 @@ void VXDTFModule::event()
   /// since KF is rather slow, Kf will not be used when there are many overlapping TCs. In this case, the simplified QI-calculator will be used.
   bool allowKalman = false;
   if (m_calcQiType == 1) { allowKalman = true; }
-  if (totalOverlaps > m_PARAMkillBecauseOfOverlappsThreshold * 10) {
+  if (totalOverlaps > m_PARAMkillEventForHighOccupancyThreshold / 4) {
     B2ERROR("event " << m_eventCounter << ": total number of overlapping track candidates: " << totalOverlaps << ", termitating event!");
     m_TESTERbrokenEventsCtr++;
 
@@ -1585,7 +1624,7 @@ void VXDTFModule::event()
       cleanEvent(currentPass, centerSector);
     }
     return;
-  } else if (totalOverlaps > m_PARAMkillBecauseOfOverlappsThreshold && m_calcQiType == 1) {
+  } else if (totalOverlaps > m_PARAMkillEventForHighOccupancyThreshold / 10 && m_calcQiType == 1) {
     B2INFO("VXDTF event " << m_eventCounter << ": total number of overlapping TCs is " << totalOverlaps << " and therefore KF is too slow, will use simple QI calculation which produces worse results")
     allowKalman = false;
     m_TESTERkalmanSkipped++;
@@ -1655,40 +1694,64 @@ void VXDTFModule::event()
 
   /** Section 12 - Hopfield */
   timeStamp = boostClock::now();
-  if (m_PARAMuseHopfield == true) {
-    /// checking overlapping TCs for best subset, if there are more than 2 different TC's
-    if (totalOverlaps > 2) {
-      hopfield(m_tcVectorOverlapped, m_PARAMomega);                             /// hopfield
-    } else if (totalOverlaps == 2) {
-      // for that easy situation we dont need the neuronal network, especially when the nn does sometimes chose the wrong one...
-      if (m_tcVectorOverlapped[0]->getTrackQuality() > m_tcVectorOverlapped[1]->getTrackQuality()) {
-        m_tcVectorOverlapped[1]->setCondition(false);
-      } else { m_tcVectorOverlapped[0]->setCondition(false); }
-    } else { B2DEBUG(10, " less than 2 overlapping Track Candidates found, no need for neuronal network") }
-  }
 
-  testTCVector.clear();
-  BOOST_FOREACH(VXDTFTrackCandidate * currentTC, m_tcVector) {
-    if (currentTC->getCondition() == false) { continue; }
-    if (currentTC->checkOverlappingState() == true) {
-      testTCVector.push_back(currentTC);
-    }
-  }
-  int testTCs = testTCVector.size();
-  B2DEBUG(1, "after Hopfield: size of tcVector: " << m_tcVector.size() << ", tcVectorOverlapped: " << m_tcVectorOverlapped.size() << " testTCVector: " << testTCs)
-  if (testTCs != 0) {
-    m_TESTERHopfieldLetsOverbookedTCsAliveCtr++;
-    B2DEBUG(1, "event " << m_eventCounter << ": after Hopfield there are still some overlapping TCs (" << testTCs << ")! restarting hopfield...")
-    /// checking overlapping TCs for best subset, if there are more than 2 different TC's
-    if (testTCs > 2) {
-      hopfield(testTCVector, m_PARAMomega);                             /// hopfield
-    } else if (testTCs == 2) {
-      // for that easy situation we dont need the neuronal network, especially when the nn does sometimes chose the wrong one...
-      if (testTCVector[0]->getTrackQuality() > testTCVector[1]->getTrackQuality()) {
-        testTCVector[1]->setCondition(false);
-      } else { testTCVector[0]->setCondition(false); }
-    } else { B2ERROR(" less 1 overlapping Track Candidate found after Hopfield, should not be possible!") }
-  }
+  if (totalOverlaps > 2) { // checking overlapping TCs for best subset, if there are more than 2 different TC's
+    if (m_filterOverlappingTCs == 2) {   /// use Hopfield neuronal network
+
+      hopfield(m_tcVectorOverlapped, m_PARAMomega);                             /// hopfield
+
+      BOOST_FOREACH(VXDTFTrackCandidate * currentTC, m_tcVector) {
+        if (currentTC->getCondition() == false) continue;
+        if (currentTC->checkOverlappingState() == true) testTCVector.push_back(currentTC);
+
+        int testTCs = testTCVector.size();
+
+        B2DEBUG(1, "after Hopfield: size of tcVector: " << m_tcVector.size() << ", tcVectorOverlapped: " << m_tcVectorOverlapped.size() << " testTCVector: " << testTCs)
+
+        int countHopfieldReruns = 0;
+        while (testTCs != 0 and countHopfieldReruns > 5) {
+          m_TESTERHopfieldLetsOverbookedTCsAliveCtr++;
+          B2DEBUG(1, "event " << m_eventCounter << ": after Hopfield there are still some overlapping TCs (" << testTCs << ")! restarting hopfield...")
+          /// checking overlapping TCs for best subset, if there are more than 2 different TC's
+          if (testTCs > 2) {
+            hopfield(testTCVector, m_PARAMomega);                                       /// hopfield
+          } else if (testTCs == 2) {
+            tcDuel(testTCVector);                                               /// tcDuel
+          } else { B2ERROR(" only 1 overlapping Track Candidate found after Hopfield, should not be possible!") }
+
+          testTCVector.clear();
+          BOOST_FOREACH(VXDTFTrackCandidate * currentTC, m_tcVector) {
+            if (currentTC->getCondition() == false) continue;
+            if (currentTC->checkOverlappingState() == true) testTCVector.push_back(currentTC);
+          }
+
+          testTCs = testTCVector.size();
+          ++countHopfieldReruns;
+        }
+        if (countHopfieldReruns > 5) {
+          isOB = false;
+          countOverbookedClusters = 0;
+          /// each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
+          BOOST_FOREACH(ClusterInfo & aCluster, clustersOfEvent) {
+            isOB = aCluster.isOverbooked();
+            if (isOB == true) { countOverbookedClusters++; }
+          } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
+          B2FATAL("VXDTFModule, event " << m_eventCounter << ": Hopfield repeated " << countHopfieldReruns << " times, number of overlapping TCs is still " << testTCs << ", recheck of overlapped clusters resulted in " << countOverbookedClusters << " overbooked clusters")
+        }
+      }
+    } else if (m_filterOverlappingTCs == 1) {   /// use Greedy algorithm
+
+      greedy(m_tcVectorOverlapped);                                               /// greedy
+
+    } else { /* do nothing -> accept overlapping TCs */ }
+  } else if (totalOverlaps == 2) {
+
+    tcDuel(m_tcVectorOverlapped);                                                 /// tcDuel
+
+  } else { B2DEBUG(10, " less than 2 overlapping Track Candidates found, no need for neuronal network") }
+
+
+
   isOB = false;
   countOverbookedClusters = 0;
   /// each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
@@ -1780,7 +1843,12 @@ void VXDTFModule::event()
   BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
     cleanEvent(currentPass, centerSector);
   }
+
   stopTimer = boostClock::now();
+  if (m_PARAMwriteToRoot == true) {
+    m_rootTimeConsumption = (stopTimer - timeStamp).count();
+    m_treeEventWisePtr->Fill();
+  }
   m_TESTERtimeConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
   thisInfoPackage.sectionConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
   thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
@@ -1833,8 +1901,8 @@ void VXDTFModule::endRun()
 
   B2INFO("VXDTF, after " << m_eventCounter + 1 << " events, ZigZagXY triggered " << m_TESTERtriggeredZigZagXY << " times, ZigZagRZ triggered " << m_TESTERtriggeredZigZagRZ << " times, and dpT triggered " << m_TESTERtriggeredDpT << " times, TCC approved " << m_TESTERapprovedByTCC << " TCs, "  << m_TESTERbadHopfieldCtr << "/" << m_TESTERHopfieldLetsOverbookedTCsAliveCtr << " times, the Hopfield network had no survivors/accepted ovrelapping TCs!")
   B2INFO("VXDTF, total number of TCs after TCC: " << m_TESTERcountTotalTCsAfterTCC << ", after TCC-filter: " << m_TESTERcountTotalTCsAfterTCCFilter << ", final: " << m_TESTERcountTotalTCsFinal)
-  B2INFO("VXDTF, numOfTimes calcInitialValues4TCs filtered TCs: " << m_TESTERfilteredBadSeedTCs << ", cleanOverlappingSet got activated:" << m_TESTERcleanOverlappingSetStartedCtr << ", cleanOverlappingSet killed numTCs: " << m_TESTERfilteredOverlapsQI << ", cleanOverlappingSet did/didn't filter TCs: " << m_TESTERfilteredOverlapsQICtr << "/" << m_TESTERNotFilteredOverlapsQI << ", QIfilterMode: " << m_PARAMcalcQIType)
-  B2INFO("VXDTF, numOfTimes, where a kalman fit was possible: " << m_TESTERgoodFitsCtr << ", where it failed: " << m_TESTERbadFitsCtr << ", where the TF had to be terminated: " << m_TESTERbrokenEventsCtr << ", and " << m_TESTERbrokenCaRound << " CA rounds aborted, " << m_TESTERkalmanSkipped << " kalmanSkipped because of high occupancy, " << m_TESTERhighOccupancyCtr << "when highOccupancyMode was activated")
+  B2INFO("VXDTF, numOfTimes calcInitialValues4TCs filtered TCs: " << m_TESTERfilteredBadSeedTCs << ", cleanOverlappingSet got activated:" << m_TESTERcleanOverlappingSetStartedCtr << ", cleanOverlappingSet killed numTCs: " << m_TESTERfilteredOverlapsQI << ", cleanOverlappingSet did/didn't filter TCs: " << m_TESTERfilteredOverlapsQICtr << "/" << m_TESTERNotFilteredOverlapsQI << ", QIfilterMode: " << m_PARAMcalcQIType << ", filterOverlappingTCs: " << m_PARAMfilterOverlappingTCs)
+  B2INFO("VXDTF, numOfTimes, where a kalman fit was possible: " << m_TESTERgoodFitsCtr << ", where it failed: " << m_TESTERbadFitsCtr << ", where the TF had to be terminated (highOccupancy/kalman): " << m_TESTERbrokenEventsCtr << ", and " << m_TESTERbrokenCaRound << " CA rounds aborted, " << m_TESTERkalmanSkipped << " kalmanSkipped because of high occupancy, " << m_TESTERhighOccupancyCtr << "when highOccupancyMode was activated")
 
   string printOccupancy;
   for (int numOfHitsMinus1 = 0; numOfHitsMinus1 < int(m_TESTERSVDOccupancy.size()); ++ numOfHitsMinus1) {
@@ -1862,19 +1930,29 @@ void VXDTFModule::endRun()
   B2INFO(" ##### VXDTF extra analysis ##### ")
   int numLoggedEvents = m_TESTERlogEvents.size();
   int median = numLoggedEvents / 2;
+  int q1 = numLoggedEvents / 100;
+  int q25 = numLoggedEvents / 4;
+  int q75 = median + q25;
   int q10 = numLoggedEvents / 10;
   int q90 = 9 * q10;
+  int q99 = 99 * q1;
   B2INFO(" there were " << numLoggedEvents << " events recorded by the eventLogger, listing slowest, fastest, median q0.1 and q0.9 event:" << endl)
   int meanTimeConsumption = 0;
-  BOOST_FOREACH(EventInfoPackage & infoPackage, m_TESTERlogEvents) {
-    meanTimeConsumption += infoPackage.totalTime.count();
+  if (numLoggedEvents != 0) {
+    BOOST_FOREACH(EventInfoPackage & infoPackage, m_TESTERlogEvents) {
+      meanTimeConsumption += infoPackage.totalTime.count();
+    }
+    B2INFO("slowest event: " << m_TESTERlogEvents[0].Print());
+    B2INFO("q1 event: " << m_TESTERlogEvents[q1].Print());
+    B2INFO("q10 event: " << m_TESTERlogEvents[q10].Print());
+    B2INFO("q25 event: " << m_TESTERlogEvents[q25].Print());
+    B2INFO("median event: " << m_TESTERlogEvents[median].Print());
+    B2INFO("q75 event: " << m_TESTERlogEvents[q75].Print());
+    B2INFO("q90 event: " << m_TESTERlogEvents[q90].Print());
+    B2INFO("q99 event: " << m_TESTERlogEvents[q99].Print());
+    B2INFO("fastest event: " << m_TESTERlogEvents[numLoggedEvents - 1].Print());
+    B2INFO("manually calculated mean: " << meanTimeConsumption / numLoggedEvents << ", and median: " << m_TESTERlogEvents[median].totalTime.count() << " of time consumption per event");
   }
-  B2INFO("slowest event: " << m_TESTERlogEvents[0].Print());
-  B2INFO("q10 event: " << m_TESTERlogEvents[q10].Print());
-  B2INFO("median event: " << m_TESTERlogEvents[median].Print());
-  B2INFO("q90 event: " << m_TESTERlogEvents[q90].Print());
-  B2INFO("fastest event: " << m_TESTERlogEvents[numLoggedEvents - 1].Print());
-  B2INFO("manually calculated mean: " << meanTimeConsumption / numLoggedEvents << ", and median: " << m_TESTERlogEvents[median].totalTime.count() << " of time consumption per event");
 
   B2INFO(" ############### VXDTF endRun - end ############### ")
 }
@@ -1883,9 +1961,10 @@ void VXDTFModule::endRun()
 
 void VXDTFModule::terminate()
 {
-  if (m_treePtr != NULL) {
+  if (m_treeTrackWisePtr != NULL and m_treeEventWisePtr != NULL) {
     m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
-    m_treePtr->Write();
+    m_treeTrackWisePtr->Write();
+    m_treeEventWisePtr->Write();
     m_rootFilePtr->Close();
   }
 
@@ -1930,6 +2009,7 @@ void VXDTFModule::findTCs(TCsOfEvent& tcList,  VXDTFTrackCandidate* currentTC, s
   int nbSize = neighbours.size();
 
   if (nbSize == 0)  { // currentTC is complete
+    currentTC->setTrackNumber(tcList.size());
     tcList.push_back(currentTC);
   } else if (nbSize == 1) {
     VXDSegmentCell* pNextSeg =  *nbIter;
@@ -2036,7 +2116,7 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
   double compatibleValue = (1.0 - omega) / double(numOfTCs - 1);
   for (int itrk = 0; itrk < numOfTCs; itrk++) {
 
-    list<int>  hitsItrk = tcVector[itrk]->getHopfieldHitIndices();
+    list<int> hitsItrk = tcVector[itrk]->getHopfieldHitIndices();
     int numOfHitsItrk = hitsItrk.size();
 
     for (int jtrk = itrk + 1; jtrk < numOfTCs; jtrk++) {
@@ -2078,8 +2158,8 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
     return; // leaving hopfield after chosing the last man standing
   }
 
-  stringstream printOut;
   if (m_PARAMDebugMode == true) {
+    stringstream printOut;
     printOut << " weight matrix W: " << endl << endl;
     for (int aussen = 0; aussen < numOfTCs; aussen++) {
       for (int innen = 0; innen < numOfTCs; innen++) {
@@ -2087,9 +2167,8 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
       }
       printOut << endl;
     }
-    printOut << endl;
+    B2DEBUG(100, printOut << endl);
   }
-  B2DEBUG(100, printOut);
 
   vector<int> sequenceVector(numOfTCs);
   double rNum;
@@ -2169,6 +2248,97 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
   allHits.sort(); allHits.unique();
   int sizeNew = allHits.size();
   if (sizeOld != sizeNew) { B2DEBUG(1, "NN event " << m_eventCounter << ": illegal result! Overlapping TCs (with " << sizeOld - sizeNew << " overlapping hits) accepted!")}
+}
+
+/** ***** greedy ***** **/
+/// search for nonOverlapping trackCandidates using Greedy algorithm (start with TC of highest QI, remove all TCs incompatible with current TC, if there are still TCs there, repeat step until no incompatible TCs are there any more)
+void VXDTFModule::greedy(TCsOfEvent& tcVector)
+{
+
+//  vector< unsigned int> killVector;
+//  vector< unsigned int> survivorVector;
+  list< pair< double, VXDTFTrackCandidate*> > overlappingTCs;
+
+  int countTCsAliveAtStart = 0, countSurvivors = 0, countKills = 0;
+  double totalSurvivingQI = 0, totalQI = 0;
+  BOOST_FOREACH(VXDTFTrackCandidate * tc, tcVector) { // store tcs in list of current overlapping TCs
+    ++countTCsAliveAtStart;
+    if (tc->getCondition() == false) continue;
+
+    double qi = tc->getTrackQuality();
+    totalQI += qi;
+
+    if (int(tc->getBookingRivals().size()) == 0) { // tc is clean and therefore automatically accepted
+//      survivorVector.push_back(tc);
+      totalSurvivingQI += qi;
+      countSurvivors++;
+      continue;
+    }
+
+    overlappingTCs.push_back(make_pair(qi, tc));
+  }
+
+  overlappingTCs.sort();
+  overlappingTCs.reverse();
+
+  greedyRecursive(overlappingTCs, totalSurvivingQI, countSurvivors, countKills);
+
+  B2DEBUG(1, "VXDTFModule::greedy: total number of TCs: " << tcVector.size() << ", TCs alive at begin of greedy algoritm: " << countTCsAliveAtStart << ", TCs survived: " << countSurvivors << ", TCs killed: " << countKills)
+}
+
+
+/** ***** greedyRecursive ***** **/
+/// used by VXDTFModule::greedy, recursive function which takes tc with highest QI and kills all its rivals. After that, TC gets removed and process is repeated with shrinking list of TCs until no TCs alive has got rivals alive
+void VXDTFModule::greedyRecursive(std::list< std::pair<double, Belle2::VXDTFTrackCandidate*> >& overlappingTCs,
+                                  double& totalSurvivingQI,
+                                  int& countSurvivors,
+                                  int& countKills)
+{
+  if (overlappingTCs.empty() == true) return;
+
+  list< pair<double, VXDTFTrackCandidate*> >::iterator tcEntry = overlappingTCs.begin();
+
+  while (tcEntry->second->getCondition() == false) {
+    tcEntry = overlappingTCs.erase(tcEntry);
+    if (tcEntry == overlappingTCs.end()) return;
+  }
+
+  double qi = tcEntry->first;
+
+  BOOST_FOREACH(VXDTFTrackCandidate * rival, tcEntry->second->getBookingRivals()) {
+    if (rival->getCondition() == false) continue;
+
+    countKills++;
+
+    if (qi > rival->getTrackQuality()) {
+      rival->setCondition(false);
+    } else {
+      tcEntry->second->setCondition(false);
+      break;
+    }
+  }
+
+  if (tcEntry->second->getCondition() == true) {
+    countSurvivors++;
+    totalSurvivingQI += qi;
+  }
+
+  overlappingTCs.pop_front();
+
+  greedyRecursive(overlappingTCs, totalSurvivingQI, countSurvivors, countKills);
+
+  return;
+}
+
+
+/** ***** tcDuel ***** **/
+/// for that easy situation we dont need the neuronal network or other algorithms for finding the best subset...
+void VXDTFModule::tcDuel(TCsOfEvent& tcVector)
+{
+  if (tcVector[0]->getTrackQuality() > tcVector[1]->getTrackQuality()) {
+    tcVector[1]->setCondition(false);
+  } else { tcVector[0]->setCondition(false); }
+  B2DEBUG(10, "2 overlapping Track Candidates found, tcDuel chose the last TC standing on its own")
 }
 
 
@@ -2853,6 +3023,7 @@ void VXDTFModule::tcCollector(CurrentPassData* currentPass)
 
 
 
+
 /** ***** Track Candidate Filter (tcFilter) ***** **/
 int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<ClusterInfo>& clustersOfEvent)
 {
@@ -2924,17 +3095,20 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<C
       double closestApproachPhi, closestApproachR, estimatedRadius;
       double chi2 = m_trackletFilterBox.circleFit(closestApproachPhi, closestApproachR, estimatedRadius);
       (*currentTC)->setEstRadius(estimatedRadius);
-      B2DEBUG(100, "TCC Filter at tc " << tcCtr << ": estimated closestApproachPhi, closestApproachR, estimatedRadius: " << closestApproachPhi << ", " << closestApproachR << ", " << estimatedRadius << " got fitted with chi2 of " << chi2 << " and probability of " << TMath::Prob(chi2, numOfCurrentHits - 3) << " with ndf: " << numOfCurrentHits - 3)
-      if (chi2 > currentPass->circleFit.second) {  // means chi2 is bad
+      if (chi2 < 0) { chi2 = 0; }
+      double probability = TMath::Prob(chi2, numOfCurrentHits - 3 + 1);
+      // why is there numOfHits - 3 + 1? Answer: each hit is one additional degree of freedom (since only the measurement of the u-coordinate of the sensors can be used) but 3 parameters are measured, therefore 3 has to be substracted from the number of hits to get the ndf. The additional degree of freedom (+1) is there, since the origin is used as another hit for the circlefitter but has two degrees of freedom instead of one for the normal hits. therefore +1 has to be added again.
+      B2DEBUG(100, "TCC Filter at tc " << tcCtr << ": estimated closestApproachPhi, closestApproachR, estimatedRadius: " << closestApproachPhi << ", " << closestApproachR << ", " << estimatedRadius << " got fitted with chi2 of " << chi2 << " and probability of " << probability << " with ndf: " << numOfCurrentHits - 3 + 1)
+      if (probability < currentPass->circleFit.second) {  // means tc is bad
         B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by circleFit! ");
         m_TESTERtriggeredCircleFit++; tcCtr++;
         (*currentTC)->setCondition(false);
         continue;
       }
       if (m_calcQiType == 2) {
-        if (chi2 < 0) { chi2 = 0; }
-        double probability = TMath::Prob(chi2, numOfCurrentHits - 3);
-        writeToRootFile(probability);
+//         if (chi2 < 0) { chi2 = 0; }
+//         double probability = TMath::Prob(chi2, numOfCurrentHits - 3);
+        writeToRootFile(probability, chi2, numOfCurrentHits - 3 + 1);
         if (m_PARAMqiSmear == true) { probability = m_littleHelperBox.smearNormalizedGauss(probability); }
         (*currentTC)->setTrackQuality(probability);
         (*currentTC)->setFitSucceeded(true);
@@ -3136,7 +3310,7 @@ void VXDTFModule::calcInitialValues4TCs(TCsOfEvent& tcVector) /// TODO: use vxdC
     }
 
     radiusInCm = aTC->getEstRadius();
-    if (radiusInCm  < 0.1) { // if it is not set, value stays at zero, therefore small check should be enough
+    if (radiusInCm  < 0.1 || radiusInCm > 100000.) { // if it is not set, value stays at zero, therefore small check should be enough
       radiusInCm = radialVector.Mag(); // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
     }
 //       double chi2 = -1; // means, no chi2 will be calculated
@@ -3233,6 +3407,7 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
 
     TVector3 posErrors(1, 1, 1);
 
+//    currentTC->getInitialMomentum().Print();
     RKTrackRep* trackRep = new RKTrackRep(currentTC->getInitialCoordinates(), currentTC->getInitialMomentum(), posErrors, momErrors, currentTC->getPDGCode());
 
     GFTrack track(trackRep);
@@ -3495,10 +3670,12 @@ double VXDTFModule::getXMLValue(GearDir& quantiles, string& valueType, string& f
 }
 
 
-void VXDTFModule::writeToRootFile(double pValue)
+void VXDTFModule::writeToRootFile(double pValue, double chi2, int ndf)
 {
   if (m_PARAMwriteToRoot == true) {
     m_rootPvalues = pValue;
-    m_treePtr->Fill();
+    m_rootChi2 = chi2;
+    m_rootNdf = ndf;
+    m_treeTrackWisePtr->Fill();
   }
 }

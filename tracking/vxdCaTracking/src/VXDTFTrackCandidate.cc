@@ -11,7 +11,7 @@
 #include "../include/VXDTFTrackCandidate.h"
 #include <math.h>
 #include <framework/gearbox/Const.h>
-
+#include <framework/logging/Logger.h>
 #include <boost/foreach.hpp>
 
 
@@ -63,7 +63,7 @@ bool VXDTFTrackCandidate::checkOverlappingState()
 {
   int rivalsAlive = 0;
   BOOST_FOREACH(VXDTFTrackCandidate * rival, m_bookingRivals) {
-    if (rival->getCondition() == false) { continue; }
+    if (rival->getCondition() == false) continue;
     rivalsAlive++;
   }
   if (rivalsAlive != 0) { m_overlapping = true; return true; } else { m_overlapping = false; return false; }
@@ -210,8 +210,14 @@ void VXDTFTrackCandidate::removeVirtualHit()   /// removing virtual hit/segment 
   }
 }
 
-void VXDTFTrackCandidate::setInitialValue(TVector3 aHit, TVector3 pVector, int pdg) { m_initialHit = aHit; m_initialMomentum = pVector; m_pdgCode = pdg; }
+void VXDTFTrackCandidate::setInitialValue(TVector3 aHit, TVector3 pVector, int pdg) { m_initialHit = aHit; m_initialMomentum = pVector; m_pdgCode = pdg; m_initialValuesSet = true; }
 
 void VXDTFTrackCandidate::setPassIndex(int anIndex) { m_passIndex = anIndex; }
 
 void VXDTFTrackCandidate::setFitSucceeded(bool yesNo) { m_fitSucceeded = yesNo; }
+
+TVector3 VXDTFTrackCandidate::getInitialMomentum()
+{
+  if (m_initialValuesSet == false) { B2FATAL(" getInitialMomentum executed although no values set yet - arborting..."); }
+  return m_initialMomentum;
+}

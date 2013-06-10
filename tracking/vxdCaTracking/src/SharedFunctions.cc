@@ -13,6 +13,7 @@
 #include <vxd/geometry/GeoCache.h> // for getGlobalizedHiterrors
 #include <vxd/geometry/SensorInfoBase.h> // for getGlobalizedHiterrors
 #include <vxd/dataobjects/VxdID.h> // for getGlobalizedHiterrors
+#include <framework/logging/Logger.h> // for B2WARNING
 
 using namespace std;
 using namespace Belle2;
@@ -45,6 +46,8 @@ vector< vector< pair<double, double> > > Tracking::getGlobalizedHitErrors()
     errorContainer.push_back(layerErrors);
   }
 
+  B2DEBUG(1, " Tracking::getGlobalizedHitErrors, " << errorContainer.size() << " layers stored...")
+
   return errorContainer;
 }
 
@@ -67,5 +70,6 @@ vector< pair<double, double> > Tracking::getHitErrors()
     errorContainer.push_back(make_pair(sigmaU, sigmaV));
   }
 
+  B2DEBUG(1, " Tracking::getHitErrors, " << errorContainer.size() << " layers stored...")
   return errorContainer;
 }

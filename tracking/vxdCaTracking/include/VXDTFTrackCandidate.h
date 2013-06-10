@@ -40,7 +40,8 @@ namespace Belle2 {
       m_estRadius(0.),
       m_pdgCode(0),
       m_passIndex(-1),
-      m_fitSucceeded(false) {}
+      m_fitSucceeded(false),
+      m_initialValuesSet(false) {}
 
     /**copy constructor**/
     VXDTFTrackCandidate(VXDTFTrackCandidate*& other);
@@ -56,17 +57,19 @@ namespace Belle2 {
     std::vector<Belle2::VXDTFTrackCandidate*> getBookingRivals() { return m_bookingRivals; } /**< returns all TCs sharing hits with current one */
     bool getOverlappingState(); /**< returns flag whether TC is sharing hits with other TCs or not (no manual check) */
     bool checkOverlappingState(); /**< returns flag whether TC is sharing hits with other TCs or not, after manual check, whether its rivals are still alive */
+    unsigned int getTrakNumber() { return m_trackNumber; } /** returns position of TC in vector containing all TCs of current event */
     bool getCondition() const { return m_alive; } /**< returns flag whether TC is still "alive" (part of the set of TCs which are probably real tracks based on the knowledge of the TF at the point of calling that function) */
     double getTrackQuality() { return m_qualityIndex; } /**< returns quality index of TC, has to be between 0 (bad) and 1 (perfect) */
     double getQQQ() { return m_qqq; } /**< returns aditional quality index */
     double getNeuronValue() const { return m_neuronValue; } /**< returns state of neuron during hopfield network */
     double getEstRadius() { return m_estRadius; } /**< returns the estimated radius of the track circle in the x-y-plane */
     TVector3 getInitialCoordinates() const { return m_initialHit; } /**< returns initial coordinates needed for export as GFTrackCand */
-    TVector3 getInitialMomentum() const { return m_initialMomentum; } /**< returns initial momentum needed for export as GFTrackCand */
+    TVector3 getInitialMomentum(); /**< returns initial momentum needed for export as GFTrackCand */
     int getPDGCode() const { return m_pdgCode; } /**< returns estimated PDGCode (its always a pion, but charge changes depending of the sign of the curvature of the track) needed for export as GFTrackCandid */
     int getPassIndex() { return m_passIndex; } /**< TCs are passDependent and are merged at the end of the TF-process to be filtered there */
     bool getFitSucceeded() { return m_fitSucceeded; } /**< returns true if kalman fit was possible and returned a result itself */
     int size() { return m_attachedHits.size(); } /**< returns number of attached hits */
+
 
     /** setter **/
     void addSVDClusterIndex(int anIndex); /**< add index number of SVDCluster attached to current TC */
@@ -76,6 +79,7 @@ namespace Belle2 {
     void addSegments(VXDSegmentCell* pCell); /**< add segment attached to current TC */
     void addHits(VXDTFHit* pHit); /**< add hit attached to current TC */
     void setOverlappingState(bool newState); /**< set whether current TC is overlapped or not */
+    void setTrackNumber(unsigned int newNumber) { m_trackNumber = newNumber; } /**< tells the TC which position in the tcList it has got. Allows some faster overlap-procedures */
     void setTrackQuality(double newVal); /**< set estimated quality of TC */
     void setQQQ(double qqqScore, double maxScore); /**< set estimated extended quality of TC (a potential minimal replacement for kalman filter, interesting for online-use) */
     void setCondition(bool newCondition); /**< set condition. If true, TC is part of set of final TCs which are exported for further use */
@@ -105,9 +109,12 @@ namespace Belle2 {
     int m_pdgCode;  /**< estimated PDGCode of TC */
     int m_passIndex;  /**< TF supports several passes per event, this value is needed for some passSpecific parameters. */
     bool m_fitSucceeded; /**< returns true if kalman fit was possible and returned a result itself */
+    unsigned int m_trackNumber; /**< position of the TC in the vector storing all TCs of event */
 
     TVector3 m_initialHit;  /**< coordinates of initial hit of TC */
     TVector3 m_initialMomentum;  /**< momentum of initial hit of TC */
+
+    bool m_initialValuesSet; /**< if false, no initial values for position and momentum are calculated yet */
 
   };
 

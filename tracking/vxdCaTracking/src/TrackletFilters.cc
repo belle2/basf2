@@ -15,6 +15,7 @@
 #include <list>
 #include <iostream>
 #include <framework/logging/Logger.h>
+#include <stdio.h>
 
 using namespace std;
 using namespace Belle2;
@@ -96,6 +97,7 @@ double TrackletFilters::circleFit(double& clapPhi, double& clapR, double& radius
   // looping over all hits and do the division afterwards
   BOOST_FOREACH(PositionInfo * hit, *m_hits) {
     weight = 1. / ((hit->sigmaX) * (hit->sigmaX));
+    B2DEBUG(100, " current hitSigma: " << hit->sigmaX << ", weight: " << weight)
     sumWeights += weight;
     if (hit->sigmaX < stopper) B2FATAL("TrackletFilters::circleFit, chosen sigma is too small (is/threshold: " << hit->sigmaX << "/" << stopper << ")")
       x = hit->hitPosition.X();

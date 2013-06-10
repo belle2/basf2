@@ -35,9 +35,10 @@
 #include <functional>
 
 
+
 //stl-stuff
 #include <map>
-#include <algorithm>
+#include <list>
 #include <utility>
 
 //root-stuff
@@ -63,6 +64,10 @@ REG_MODULE(TFAnalizer)
 
 TFAnalizerModule::TFAnalizerModule() : Module()
 {
+  vector<string> rootFileNameVals;
+  rootFileNameVals.push_back("TFAnalizerResults");
+  rootFileNameVals.push_back("RECREATE");
+
   //Set module properties
   setDescription("analyzes quality of cell-o-mat versus mcTrackFinder");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
@@ -77,6 +82,8 @@ TFAnalizerModule::TFAnalizerModule() : Module()
 
   addParam("minTMomentumFilter", m_PARAMminTMomentumFilter, "to narrow down the relevant mcTracks, this minFilter can be set to filter tracks having lower transverse momentum than this threshold. Relevant for checking efficiency of TFs with certain transverse momentum ranges", double(0.));
   addParam("maxTMomentumFilter", m_PARAMmaxTMomentumFilter, "to narrow down the relevant mcTracks, this maxFilter can be set to filter tracks having higher transverse momentum than this threshold. Relevant for checking efficiency of TFs with certain transverse momentum ranges", double(5.));
+  addParam("writeToRoot", m_PARAMwriteToRoot, " if true, analysis data is stored to root file with file name chosen by 'rootFileName'", bool(false));
+  addParam("rootFileName", m_PARAMrootFileName, " only two entries accepted, first one is the root filename, second one is 'RECREATE' or 'UPDATE' which is the write mode for the root file, parameter is used only if 'writeToRoot'=true  ", rootFileNameVals);
 
 }
 
@@ -100,9 +107,48 @@ void TFAnalizerModule::initialize()
   m_mcTrackCounter = 0;
   m_caTrackCounter = 0;
   m_countedPerfectRecoveries = 0;
+  m_countedCleanRecoveries = 0;
+  m_countedDoubleEntries = 0;
   m_mcTrackVectorCounter = 0;
   m_wrongChargeSignCounter = 0;
   m_totalRealHits = 0;
+
+  if (m_PARAMwriteToRoot == true) {
+    if ((m_PARAMrootFileName.size()) != 2) {
+      string output;
+      BOOST_FOREACH(string entry, m_PARAMrootFileName) {
+        output += "'" + entry + "' ";
+      }
+      B2FATAL("TFAnalizer::initialize: rootFileName is set wrong, although parameter 'writeToRoot' is enabled! Actual entries are: " << output)
+    }
+    m_PARAMrootFileName[0] += ".root";
+    m_rootFilePtr = new TFile(m_PARAMrootFileName[0].c_str(), m_PARAMrootFileName[1].c_str()); // alternative: UPDATE
+    m_treePtr = new TTree("m_treePtr", "aTree");
+
+    m_treePtr->Branch("TotalMCMomValues", &m_rootTotalMCMomValues);
+    m_treePtr->Branch("TotalCAMomValues", &m_rootTotalCAMomValues);
+    m_treePtr->Branch("CleanCAMomValues", &m_rootCleanCAMomValues);
+    m_treePtr->Branch("CompleteCAMomValues", &m_rootCompleteCAMomValues);
+    m_treePtr->Branch("TotalMomValues", &m_rootTotalMomValues);
+
+    m_treePtr->Branch("TotalMCpTValues", &m_rootTotalMCpTValues);
+    m_treePtr->Branch("TotalCApTValues", &m_rootTotalCApTValues);
+    m_treePtr->Branch("CleanCApTValues", &m_rootCleanCApTValues);
+    m_treePtr->Branch("CompleteCApTValues", &m_rootCompleteCApTValues);
+    m_treePtr->Branch("TotalpTValues", &m_rootTotalpTValues);
+
+    m_treePtr->Branch("TotalMCThetaValues", &m_rootTotalMCThetaValues);
+    m_treePtr->Branch("TotalCAThetaValues", &m_rootTotalCAThetaValues);
+    m_treePtr->Branch("CleanCAThetaValues", &m_rootCleanCAThetaValues);
+    m_treePtr->Branch("CompleteCAThetaValues", &m_rootCompleteCAThetaValues);
+    m_treePtr->Branch("TotalThetaValues", &m_rootTotalThetaValues);
+
+    m_treePtr->Branch("MCreconstructedTrackLength", &m_rootMCreconstructedTrackLength);
+    m_treePtr->Branch("CAreconstructedTrackLength", &m_rootCAreconstructedTrackLength);
+  } else {
+    m_rootFilePtr = NULL;
+    m_treePtr = NULL;
+  }
 }
 
 
@@ -114,11 +160,13 @@ void TFAnalizerModule::beginRun()
 
 void TFAnalizerModule::event()
 {
+
+
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   m_eventCounter = eventMetaDataPtr->getEvent();
   B2DEBUG(1, "################## entering TFAnalizer - event " << m_eventCounter << " ######################");
 
-
+  RootVariables rootVariables; // storing all root related infos
 
   /// import all GFTrackCands (McFinder, TFinder)
   StoreArray<GFTrackCand> mcTrackCandidates(m_PARAMmcTCname);
@@ -177,7 +225,7 @@ void TFAnalizerModule::event()
     }
   } // determine compatibility matrix
 
-  vector<int> foundIDs;
+  list<foundIDentry> foundIDs; // .first: id of mcTC assigned, .second: qi of tc, the higher, the better
 
   if (int(caTcVector.size()) != 0) {   // ! caTcVector.empty()
     B2DEBUG(1, " between loops: caTcVector.size():" << caTcVector.size() << ", caTcVector[0].indexNumber: " << caTcVector[0].indexNumber << ", finAssID: " << caTcVector[0].finalAssignedID << ", QI: " << caTcVector[0].qualityIndex)
@@ -191,48 +239,53 @@ void TFAnalizerModule::event()
     B2DEBUG(10, "-------------------------------------------------------------------------------")
     if (caTC.finalAssignedID == -1) {  continue; }  // in this case, absolutely no hit of caTC is of any mcTC
     if (caTC.numOfCorrectlyAssignedHits < m_PARAMminNumOfHitsThreshold) {
-      if (m_PARAMprintExtentialAnalysisData == true) { printInfo(0, mcTcVector[caTC.finalAssignedID], caTC); }
+      printInfo(0, mcTcVector[caTC.finalAssignedID], caTC, rootVariables);
       continue;
     }
 
     int totalHits = caTC.numOfCorrectlyAssignedHits + caTC.numOfBadAssignedHits;
     double trackQuality = double(caTC.numOfCorrectlyAssignedHits) / double(totalHits);
     if (trackQuality < m_PARAMqiThreshold) {
-      if (m_PARAMprintExtentialAnalysisData == true) { printInfo(0, mcTcVector[caTC.finalAssignedID], caTC); }
+      printInfo(0, mcTcVector[caTC.finalAssignedID], caTC, rootVariables);
       continue;
     }
 
 
-    bool doubleCountFlag = false;
-    BOOST_FOREACH(int iD, foundIDs) { if (iD == caTC.finalAssignedID) { doubleCountFlag = true; } }
-    if (doubleCountFlag == true) { continue; }  // no output here since it has been recovered several times, we simply take the first caTC (which is not necessarily the best one, but at least recovered)
+    typedef pair <int, double> idEntry;
+    BOOST_FOREACH(foundIDentry iD, foundIDs) { if (iD.first == caTC.finalAssignedID && iD.second > trackQuality) { m_countedDoubleEntries++; continue; } }// no output here since it has been recovered several times, we take the best caTC
 
-    foundIDs.push_back(caTC.finalAssignedID);
-    if (caTC.qualityIndex > 0.99) {
-      if (m_PARAMprintExtentialAnalysisData == true) { printInfo(2, mcTcVector[caTC.finalAssignedID], caTC); }
+    foundIDs.push_back(make_pair(caTC.finalAssignedID, trackQuality));
+    if (caTC.qualityIndex > 0.99) { // harder method: caTC.qualityIndex which means totally reconstructed
+      printInfo(2, mcTcVector[caTC.finalAssignedID], caTC, rootVariables);
       m_countedPerfectRecoveries++;
+    } else if (trackQuality > 0.99) { // no foreign hits but not all hits reconstructed
+      printInfo(3, mcTcVector[caTC.finalAssignedID], caTC, rootVariables);
+      m_countedCleanRecoveries++;
     } else {
-      if (m_PARAMprintExtentialAnalysisData == true) { printInfo(1, mcTcVector[caTC.finalAssignedID], caTC); }
+      printInfo(1, mcTcVector[caTC.finalAssignedID], caTC, rootVariables);
     }
   }
 
-  vector<int>::iterator newEndOfVector;
-  /// WARNING: std:unique does delete double entries but does NOT resize the vector! This means that for every removed element, at the end of the vector remains one random value stored
-  std::sort(foundIDs.begin(), foundIDs.end());
-  newEndOfVector = std::unique(foundIDs.begin(), foundIDs.end());
-  foundIDs.resize(std::distance(foundIDs.begin(), newEndOfVector));
+  foundIDs.sort(isFirstValueBigger);
+  foundIDs.unique(isFirstValueTheSame);
+  /// old version using a vector:
+//   vector<int>::iterator newEndOfVector;
+//   /// WARNING: std:unique does delete double entries but does NOT resize the vector! This means that for every removed element, at the end of the vector remains one random value stored
+//   std::sort(foundIDs.begin(), foundIDs.end());
+//   newEndOfVector = std::unique(foundIDs.begin(), foundIDs.end());
+//   foundIDs.resize(std::distance(foundIDs.begin(), newEndOfVector));
   int numOfFoundIDs = foundIDs.size();
   m_countReconstructedTCs += numOfFoundIDs;
 
   BOOST_FOREACH(VXDTrackCandidate & mcTC, mcTcVector) {
     bool foundFlag = false;
-    BOOST_FOREACH(int iD, foundIDs) { if (iD == mcTC.indexNumber) { foundFlag = true; } }
+    BOOST_FOREACH(foundIDentry iD, foundIDs) { if (iD.first == mcTC.indexNumber) { foundFlag = true; } }
     m_totalRealHits += int(mcTC.coordinates.size() * 0.5);
     if (foundFlag == true) {
-      if (m_PARAMprintExtentialAnalysisData == true) { printMC(true, mcTC); } /// printMC
+      if (m_PARAMprintExtentialAnalysisData == true or m_PARAMwriteToRoot == true) { printMC(true, mcTC, rootVariables); }  /// printMC
       m_totalRealHits += int(mcTC.coordinates.size() * 0.5);
     } else {
-      if (m_PARAMprintExtentialAnalysisData == true) { printMC(false, mcTC); } /// printMC
+      if (m_PARAMprintExtentialAnalysisData == true or m_PARAMwriteToRoot == true) { printMC(false, mcTC, rootVariables); }  /// printMC
     }
   } // print info about all found and lost mcTCs
 
@@ -246,19 +299,45 @@ void TFAnalizerModule::event()
 
 
   B2DEBUG(1, "Event " << m_eventCounter << ": There are " << int(mcTcVector.size()) << " mcTCs, ")
-  BOOST_FOREACH(int ID, foundIDs) {
-    B2DEBUG(1, " - ID " << ID << " recovered")
+  BOOST_FOREACH(foundIDentry ID, foundIDs) {
+    B2DEBUG(1, " - ID " << ID.first << " recovered")
   }
   B2DEBUG(1, " the tested TrackFinder found " << numOfFoundIDs << " IDs within " << int(caTcVector.size()) << " TCs and lost " << int(mcTcVector.size() - foundIDs.size()))
 
+  if (m_PARAMwriteToRoot == true) {
+    m_rootTotalMCMomValues = rootVariables.totalMCMomValues;
+    m_rootTotalCAMomValues = rootVariables.totalCAMomValues;
+    m_rootCleanCAMomValues = rootVariables.cleanCAMomValues;
+    m_rootCompleteCAMomValues = rootVariables.completeCAMomValues;
+    m_rootTotalMomValues = rootVariables.totalMomValues;
+
+    m_rootTotalMCpTValues = rootVariables.totalMCpTValues;
+    m_rootTotalCApTValues = rootVariables.totalCApTValues;
+    m_rootCleanCApTValues = rootVariables.cleanCApTValues;
+    m_rootCompleteCApTValues = rootVariables.completeCApTValues;
+    m_rootTotalpTValues = rootVariables.totalpTValues;
+
+    m_rootTotalMCThetaValues = rootVariables.totalMCThetaValues;
+    m_rootTotalCAThetaValues = rootVariables.totalCAThetaValues;
+    m_rootCleanCAThetaValues = rootVariables.cleanCAThetaValues;
+    m_rootCompleteCAThetaValues = rootVariables.completeCAThetaValues;
+    m_rootTotalThetaValues = rootVariables.totalThetaValues;
+
+    m_rootMCreconstructedTrackLength = rootVariables.mCreconstructedTrackLength;
+    m_rootCAreconstructedTrackLength = rootVariables.cAreconstructedTrackLength;
+
+    m_treePtr->Fill();
+  }
 }
 
 
 void TFAnalizerModule::endRun()
 {
+  B2INFO("TFAnalizerModule-explanation: \n perfect recovery means: all hits of mc-TC found again and clean TC. \n clean recovery means: no foreign hits within TC. \n ghost means: QI was below threshold or mcTC was found more than once (e.g. because of curlers) \n found more than once means: that there was more than one TC which was assigned to the same mcTC but each of them were good enough for themselves to be classified as reconstructed")
 
   B2INFO("TFAnalizerModule: After " << m_eventCounter + 1 << " events there was a total number of " << m_mcTrackCounter << " mcTrackCandidates and " << m_totalRealHits << " realHits. Of these TCs, " << m_mcTrackVectorCounter << " mcTrackCandidates where used for analysis because of cutoffs.")
-  B2INFO("TFAnalizerModule: There were " << m_caTrackCounter << " caTrackCandidates, the VXDTF found (total/ideal)" << m_countReconstructedTCs << "/" << m_countedPerfectRecoveries << " TCs -> efficiency(total/ideal/ghost): " << double(100 * m_countReconstructedTCs) / double(m_mcTrackVectorCounter) << "%/" << double(100 * m_countedPerfectRecoveries) / double(m_mcTrackVectorCounter) << "/%" << double(100 * (m_caTrackCounter - m_countReconstructedTCs)) / double(m_countReconstructedTCs) << "%, number of times where charge was guessed wrong: " << m_wrongChargeSignCounter)
+  B2INFO("TFAnalizerModule: There were " << m_caTrackCounter << " caTrackCandidates, number of times where charge was guessed wrong: " << m_wrongChargeSignCounter << ", number of caTCs which produced a double entry: " << m_countedDoubleEntries)
+  B2INFO("the VXDTF found (total/perfect/clean/ghost)" << m_countReconstructedTCs << "/" << m_countedPerfectRecoveries << "/" << m_countedCleanRecoveries << "/" << (m_caTrackCounter - m_countReconstructedTCs) << " TCs -> efficiency(total/perfect/clean/ghost): " << double(100 * m_countReconstructedTCs) / double(m_mcTrackVectorCounter) << "%/" << double(100 * m_countedPerfectRecoveries) / double(m_mcTrackVectorCounter) << "%/" << double(100 * m_countedCleanRecoveries) / double(m_mcTrackVectorCounter) << "/%" << double(100 * (m_caTrackCounter - m_countReconstructedTCs)) / double(m_countReconstructedTCs) << "%")
 
 
 }
@@ -267,22 +346,30 @@ void TFAnalizerModule::endRun()
 void TFAnalizerModule::terminate()
 {
 
+  if (m_treePtr != NULL) {
+    m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
+    m_treePtr->Write();
+    m_rootFilePtr->Close();
+  }
 }
 
 
-
-
-
-void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXDTrackCandidate& caTC)
+bool TFAnalizerModule::isFirstValueBigger(TFAnalizerModule::foundIDentry& lhs, TFAnalizerModule::foundIDentry& rhs)
 {
-  string tcType = "unknown tcType";
-  if (recoveryState == 0) {   // not recovered
-    tcType = "LostMCTC";
-  } else if (recoveryState == 1) {   // contaminated TC
-    tcType = "ContaminatedMCTC";
-  } else if (recoveryState == 2) {
-    tcType = "PerfectMCTC";
-  }
+  if (lhs.first < rhs.first) return true;
+  return false;
+} // WARNING TODO this function is used by several modules, please create a generalized version for them in a shared container
+
+
+bool TFAnalizerModule::isFirstValueTheSame(TFAnalizerModule::foundIDentry& lhs, TFAnalizerModule::foundIDentry& rhs)
+{
+  if (lhs.first == rhs.first) return true;
+  return false;
+} // WARNING TODO this function is used by several modules, please create a generalized version for them in a shared container
+
+
+void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXDTrackCandidate& caTC, RootVariables& rootVariables)
+{
 
   TVector3 zDir(0., 0., 1.); // vector parallel to z-axis
   TVector3 caDirection = caTC.direction;
@@ -294,19 +381,52 @@ void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXD
   mcDirection.SetZ(0.);
   double transverseAngle = caDirection.Angle(mcDirection) * 180.*TMath::InvPi();
 
-  B2INFO("PRINTINFO: At event " << m_eventCounter <<
-         ": mcType §" << tcType <<
-         "§ having §" << mcTC.coordinates.size() <<
-         "§ hits with theta of §" << setprecision(4) << theta <<
-         "§° got pT of §" << setprecision(4) << mcTC.pTValue <<
-         "§ GeV/c, assigned caTC got pT of §" << setprecision(4) << caTC.pTValue <<
-         "§ GeV/c, and probValue of §" << setprecision(6) << caTC.probValue <<
-         "§. Their residual of pT was §" << setprecision(4) << mcTC.pTValue - caTC.pTValue << /*difference of estimated and real transverseMomentum */
-         "§ GeV/c, their residual of angle was §" << setprecision(4) << angle <<
-         "§ in grad, their residual of transverse angle was §" << setprecision(4) << transverseAngle <<
-         "§ with PDGCode of mcTC: §" << mcTC.pdgCode <<
-         "§ and PDGCode of caTC: §" << caTC.pdgCode <<
-         "§") // '§' will be used to filter
+
+  string tcType = "unknown tcType";
+  if (recoveryState == 0) {   // not recovered
+    tcType = "LostMCTC";
+  } else if (recoveryState == 1) {   // contaminated TC
+    tcType = "ContaminatedMCTC";
+  } else if (recoveryState == 2) {
+    tcType = "PerfectMCTC";
+    if (m_PARAMwriteToRoot == true) {
+      rootVariables.completeCAMomValues.push_back(mcTC.pValue); /// why are there values of the mcTC stored? we want to know the real data, not the guesses of the reconstructed data. Guesses of the reconstructed data will be stored in resiudals
+      rootVariables.completeCApTValues.push_back(mcTC.pTValue);
+      rootVariables.completeCAThetaValues.push_back(theta);
+    }
+  } else if (recoveryState == 3) {
+    tcType = "CleanMCTC";
+    if (m_PARAMwriteToRoot == true) {
+      rootVariables.cleanCAMomValues.push_back(mcTC.pValue);
+      rootVariables.cleanCApTValues.push_back(mcTC.pTValue);
+      rootVariables.cleanCAThetaValues.push_back(theta);
+    }
+  } else {
+    recoveryState = -1; // means still unknown
+  }
+
+  if (recoveryState > 0 and m_PARAMwriteToRoot == true) { // store caValues only if track has been sufficiently good reconstructed
+    rootVariables.totalCAMomValues.push_back(mcTC.pValue);
+    rootVariables.totalCApTValues.push_back(mcTC.pTValue);
+    rootVariables.totalCAThetaValues.push_back(theta);
+    rootVariables.cAreconstructedTrackLength.push_back(caTC.coordinates.size());
+  }
+
+  if (m_PARAMprintExtentialAnalysisData == true) {
+    B2INFO("PRINTINFO: At event " << m_eventCounter <<
+           ": mcType §" << tcType <<
+           "§ having §" << mcTC.coordinates.size() <<
+           "§ hits with theta of §" << setprecision(4) << theta <<
+           "§° got pT of §" << setprecision(4) << mcTC.pTValue <<
+           "§ GeV/c, assigned caTC got pT of §" << setprecision(4) << caTC.pTValue <<
+           "§ GeV/c, and probValue of §" << setprecision(6) << caTC.probValue <<
+           "§. Their residual of pT was §" << setprecision(4) << mcTC.pTValue - caTC.pTValue << /*difference of estimated and real transverseMomentum */
+           "§ GeV/c, their residual of angle was §" << setprecision(4) << angle <<
+           "§ in grad, their residual of transverse angle was §" << setprecision(4) << transverseAngle <<
+           "§ with PDGCode of mcTC: §" << mcTC.pdgCode <<
+           "§ and PDGCode of caTC: §" << caTC.pdgCode <<
+           "§") // '§' will be used to filter
+  }
   if (mcTC.pdgCode == 13 or mcTC.pdgCode == -13) {   // muons
     if (caTC.pdgCode == 13 or caTC.pdgCode == -13) {
       if (sign(caTC.pdgCode) not_eq sign(mcTC.pdgCode)) { m_wrongChargeSignCounter++; }
@@ -325,22 +445,34 @@ void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXD
 }
 
 
-void TFAnalizerModule::printMC(bool type, VXDTrackCandidate& mcTC)
+void TFAnalizerModule::printMC(bool type, VXDTrackCandidate& mcTC, RootVariables& rootVariables)
 {
   string info;
   if (type == true) { info = "FOUNDINFO"; } else { info = "LOSTINFO"; }
 
   TVector3 zDir(0., 0., 1.); // vector parallel to z-axis
+  TVector3 mcDirection = mcTC.direction;
+  double theta = mcDirection.Angle(zDir) * 180.*TMath::InvPi();
 
-  B2INFO(info << ": At event " << m_eventCounter <<
-         ": MC with ID " << mcTC.indexNumber << " having §" << mcTC.coordinates.size() <<
-         "§ hits with theta of §" << setprecision(4) <<  mcTC.direction.Angle(zDir) * 180.*TMath::InvPi() <<
-         "§° got pT of §" << setprecision(4) << mcTC.pTValue <<
-         "§ GeV/c and vertex distance to origin: §" << setprecision(4) << mcTC.vertex.Mag() <<
-         "§cm, transverseDistance: §" << setprecision(4) << mcTC.vertex.Perp() <<
-         "§cm, zDistance: §" << setprecision(4) << mcTC.vertex.Z() <<
-         "§, and pdg of: §" << setprecision(4) << mcTC.pdgCode <<
-         "§") // '§' will be used to filter
+  // store mcValues in any case...
+  if (m_PARAMwriteToRoot == true) {
+    rootVariables.totalMCMomValues.push_back(mcTC.pValue);
+    rootVariables.totalMCpTValues.push_back(mcTC.pTValue);
+    rootVariables.totalMCThetaValues.push_back(theta);
+    rootVariables.mCreconstructedTrackLength.push_back(mcTC.coordinates.size());
+  }
+
+  if (m_PARAMprintExtentialAnalysisData == true) {
+    B2INFO(info << ": At event " << m_eventCounter <<
+           ": MC with ID " << mcTC.indexNumber << " having §" << mcTC.coordinates.size() <<
+           "§ hits with theta of §" << setprecision(4) <<  theta <<
+           "§° got pT of §" << setprecision(4) << mcTC.pTValue <<
+           "§ GeV/c and vertex distance to origin: §" << setprecision(4) << mcTC.vertex.Mag() <<
+           "§cm, transverseDistance: §" << setprecision(4) << mcTC.vertex.Perp() <<
+           "§cm, zDistance: §" << setprecision(4) << mcTC.vertex.Z() <<
+           "§, and pdg of: §" << setprecision(4) << mcTC.pdgCode <<
+           "§") // '§' will be used to filter
+  }
 }
 
 
@@ -542,6 +674,7 @@ void TFAnalizerModule::checkCompatibility(VXDTrackCandidate& mcTC, VXDTrackCandi
    *
    * beide den jeweiligen anderen Indexwert zuweisen, falls kompatibel.
    */
+
   BOOST_FOREACH(int indexValueMC, mcTC.pxdClusterIDs) {    /// PXDHits
     int trueCtr = 0, falseCtr = 0;
     BOOST_FOREACH(int indexValueCA, caTC.pxdClusterIDs) {
@@ -550,7 +683,7 @@ void TFAnalizerModule::checkCompatibility(VXDTrackCandidate& mcTC, VXDTrackCandi
       } else { falseCtr++; }
     }
     if (trueCtr != 0) { goodHitsInCaTC++; }
-  } // check good hits for mcTC (PXD)
+  } // check good hits for mcTC (PXD) counts each hit of the mctc which was found again in the catc
   B2DEBUG(10, "--after check good hits for mcTC(PXD), value is: " << goodHitsInCaTC)
 
   BOOST_FOREACH(const SVDTrueHit * aTrueHitmc, mcTC.svdTrueHits) {   /// SVDHits
@@ -561,7 +694,7 @@ void TFAnalizerModule::checkCompatibility(VXDTrackCandidate& mcTC, VXDTrackCandi
       } else { falseCtr++; }
     }
     if (trueCtr != 0) { goodHitsInCaTC++; }
-  } // check good hits for mcTC (SVD)
+  } // check good hits for mcTC (SVD) counts each hit of the mctc which was found again in the catc
   B2DEBUG(10, "--after check good hits for mcTC(SVD), value is: " << goodHitsInCaTC)
 
   BOOST_FOREACH(int indexValueCA, caTC.pxdClusterIDs) {
@@ -572,7 +705,7 @@ void TFAnalizerModule::checkCompatibility(VXDTrackCandidate& mcTC, VXDTrackCandi
       } else { falseCtr++; }
     }
     if (trueCtr == 0) { badHitsInCaTC++; }
-  } // check bad hits for caTC (PXD)
+  } // check bad hits for caTC (PXD) counts each hit of the catc which was NOT found in the mctc
   B2DEBUG(10, "--after check bad hits for caTC (PXD), value is: " << badHitsInCaTC)
 
   BOOST_FOREACH(const SVDTrueHit * aTrueHitca, caTC.svdTrueHits) {   /// SVDHits
@@ -583,7 +716,7 @@ void TFAnalizerModule::checkCompatibility(VXDTrackCandidate& mcTC, VXDTrackCandi
       } else { falseCtr++; }
     }
     if (trueCtr == 0) { badHitsInCaTC++; }
-  } // check bad hits for caTC (SVD)
+  } // check bad hits for caTC (SVD) counts each hit of the catc which was NOT found in the mctc
 
   B2DEBUG(10, "--after check bad hits for caTC (SVD), value is: " << badHitsInCaTC)
   int totalMCHits = mcTC.pxdClusterIDs.size() + mcTC.svdTrueHits.size();

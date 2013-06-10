@@ -26,9 +26,12 @@
 
 //stl-stuff
 #include <string>
+#include <algorithm>
 
 //root-stuff
 #include <TVector3.h>
+#include <TTree.h>
+#include <TFile.h>
 
 //boost stuff
 #include "boost/tuple/tuple.hpp" // a generalized version of pair
@@ -53,6 +56,30 @@ namespace Belle2 {
   class TFAnalizerModule : public Module {
 
   public:
+
+    typedef std::pair<int, double> foundIDentry; /**< .first: id of mcTC assigned, .second: qi of tc, the higher, the better */
+
+    /** internal datastore for root export */
+    struct RootVariables  {
+      std::vector<double> totalMCMomValues; /**< used to store all momentum values of tracks reconstructed by the MCTF */
+      std::vector<double> totalCAMomValues; /**< used to store all momentum values of tracks reconstructed by the CATF */
+      std::vector<double> cleanCAMomValues; /**< used to store all momentum values of clean tracks reconstructed by the CATF */
+      std::vector<double> completeCAMomValues; /**< used to store all momentum values of full tracks reconstructed by the CATF */
+      std::vector<double> totalMomValues; /**< used to store all momentum values of tracks existing no matter they produced hits or not */
+      std::vector<double> totalMCpTValues; /**< used to store all pT values of tracks reconstructed by the MCTF */
+      std::vector<double> totalCApTValues; /**< used to store all pT values of tracks reconstructed by the CATF */
+      std::vector<double> cleanCApTValues; /**< used to store all pT values of clean tracks reconstructed by the CATF */
+      std::vector<double> completeCApTValues; /**< used to store all pT values of full tracks reconstructed by the CATF */
+      std::vector<double> totalpTValues; /**< used to store all pT values of tracks existing no matter they produced hits or not */
+      std::vector<double> totalMCThetaValues; /**< used to store all theta values of tracks reconstructed by the MCTF */
+      std::vector<double> totalCAThetaValues; /**< used to store all theta values of tracks reconstructed by the CATF */
+      std::vector<double> cleanCAThetaValues; /**< used to store all theta values of clean tracks reconstructed by the CATF */
+      std::vector<double> completeCAThetaValues; /**< used to store all theta values of full tracks reconstructed by the CATF */
+      std::vector<double> totalThetaValues; /**< used to store all theta values of tracks existing no matter they produced hits or not */
+      std::vector<int> mCreconstructedTrackLength; /**< used to store all track length values of tracks reconstructed by the MCTF */
+      std::vector<int> cAreconstructedTrackLength; /**< used to store all track length values of tracks reconstructed by the CATF */
+    };
+
 
     /** internal datastore for TCs. Used by caTCs and mcTCs */
     struct VXDTrackCandidate {
@@ -96,6 +123,14 @@ namespace Belle2 {
 
     virtual void terminate();
 
+    /** compares entries of a list which stores pair of values (which one is bigger?) */
+    static bool isFirstValueBigger(foundIDentry& lhs, foundIDentry& rhs);
+
+    /** compares entries of a list which stores pair of values (are both the same?)*/
+    static bool isFirstValueTheSame(foundIDentry& lhs, foundIDentry& rhs);
+
+
+
     /** extracts hits from GFTrackCand. Working with both TC-types (mc (monte carlo) or ca (cellular automaton)) */
     void extractHits(GFTrackCand* aTC,
                      RelationIndex<PXDCluster, PXDTrueHit>& relationPXD,
@@ -111,12 +146,12 @@ namespace Belle2 {
     void checkCompatibility(VXDTrackCandidate& mcTC, VXDTrackCandidate& caTC);
 
     /** prints info to console of compatible mcTC and caTC */
-    void printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXDTrackCandidate& caTC);  // used for exporting information
+    void printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXDTrackCandidate& caTC, RootVariables& rootVariables);  // used for exporting information
 
-    /** used for exporting info to console about mcTC (should not be used for caTCs, use printCA instead). This function is somewhat redundant to voud PrintInfo, but allows better structure of output  */
-    void printMC(bool info, VXDTrackCandidate& mcTC);
+    /** used for exporting info to console about mcTC (should not be used for caTCs, use printCA instead). This function is somewhat redundant to void PrintInfo, but allows better structure of output  */
+    void printMC(bool info, VXDTrackCandidate& mcTC, RootVariables& rootVariables);
 
-    /** used for exporting info to console about caTC (should not be used for mcTCs, use printMC instead). This function is somewhat redundant to voud PrintInfo, but allows better structure of output  */
+    /** used for exporting info to console about caTC (should not be used for mcTCs, use printMC instead). This function is somewhat redundant to void PrintInfo, but allows better structure of output  */
     void printCA(bool type, VXDTrackCandidate& caTC);
 
   protected:
@@ -132,12 +167,37 @@ namespace Belle2 {
     int m_mcTrackCounter; /**< counts number of tracks reconstructed by the mcTrackFinder */
     int m_totalRealHits; /**< total number of hits (clusters/2) attached to mcTCs (therefore total number of real hits) */
     int m_caTrackCounter; /**< counts number of tracks reconstructed by the CATF */
-    int m_countedPerfectRecoveries; /**< counts number of tracks, where no foreign hits were attached ('clean'), does NOT mean that all reconstructable hits had been found by CATF! */
+    int m_countedPerfectRecoveries; /**< counts number of tracks, where no foreign hits were attached ('clean') AND all hits of the mcTC were reconstructed */
+    int m_countedCleanRecoveries; /**< counts number of tracks, where no foreign hits were attached ('clean'), does NOT mean that all reconstructable hits had been found by CATF! */
+    int m_countedDoubleEntries; /** if a TC was found more than once with good (contaminated or clean ones) caTCs, it will be counted to find out how many of the ghost tcs are in fact good tcs but not combined to one tc */
     int m_wrongChargeSignCounter; /**< counts number of times, where assigned caTC guessed wrong sign of charge */
     std::string m_PARAMprintData; /**< depending on what value you set it, it will print data like momentum residuals or any other interesting info during endrun... (currently not in use)*/
     int m_mcTrackVectorCounter; /**< another counter of mcTCs, consideres size of datastores containing mcTCs */
     double m_PARAMminTMomentumFilter; /**< to narrow down the relevant mcTracks, this minFilter can be set to filter tracks having lower transverse momentum than this threshold. Relevant for checking efficiency of TFs with certain transverse momentum ranges */
     double m_PARAMmaxTMomentumFilter; /**< to narrow down the relevant mcTracks, this maxFilter can be set to filter tracks having higher transverse momentum than this threshold. Relevant for checking efficiency of TFs with certain transverse momentum ranges */
+
+    // rootStuff:
+    bool m_PARAMwriteToRoot; /**< if true, analysis data is stored to root file with file name chosen by 'rootFileName' */
+    std::vector<std::string> m_PARAMrootFileName; /**< only two entries accepted, first one is the root filename, second one is 'RECREATE' or 'UPDATE' which is the write mode for the root file, parameter is used only if 'writeToRoot' = true */
+    TFile* m_rootFilePtr; /**< pointer at root file used for p-value-output */
+    TTree* m_treePtr; /**< pointer at root tree used for p-value-output */
+    std::vector<double> m_rootTotalMCMomValues; /**< used to store all momentum values of tracks reconstructed by the MCTF */
+    std::vector<double> m_rootTotalCAMomValues; /**< used to store all momentum values of tracks reconstructed by the CATF */
+    std::vector<double> m_rootCleanCAMomValues; /**< used to store all momentum values of clean tracks reconstructed by the CATF */
+    std::vector<double> m_rootCompleteCAMomValues; /**< used to store all momentum values of full tracks reconstructed by the CATF */
+    std::vector<double> m_rootTotalMomValues; /**< used to store all momentum values of tracks existing no matter they produced hits or not */
+    std::vector<double> m_rootTotalMCpTValues; /**< used to store all pT values of tracks reconstructed by the MCTF */
+    std::vector<double> m_rootTotalCApTValues; /**< used to store all pT values of tracks reconstructed by the CATF */
+    std::vector<double> m_rootCleanCApTValues; /**< used to store all pT values of clean tracks reconstructed by the CATF */
+    std::vector<double> m_rootCompleteCApTValues; /**< used to store all pT values of full tracks reconstructed by the CATF */
+    std::vector<double> m_rootTotalpTValues; /**< used to store all pT values of tracks existing no matter they produced hits or not */
+    std::vector<double> m_rootTotalMCThetaValues; /**< used to store all theta values of tracks reconstructed by the MCTF */
+    std::vector<double> m_rootTotalCAThetaValues; /**< used to store all theta values of tracks reconstructed by the CATF */
+    std::vector<double> m_rootCleanCAThetaValues; /**< used to store all theta values of clean tracks reconstructed by the CATF */
+    std::vector<double> m_rootCompleteCAThetaValues; /**< used to store all theta values of full tracks reconstructed by the CATF */
+    std::vector<double> m_rootTotalThetaValues; /**< used to store all theta values of tracks existing no matter they produced hits or not */
+    std::vector<int> m_rootMCreconstructedTrackLength; /**< used to store all track length values of tracks reconstructed by the MCTF */
+    std::vector<int> m_rootCAreconstructedTrackLength; /**< used to store all track length values of tracks reconstructed by the CATF */
 
   private:
 

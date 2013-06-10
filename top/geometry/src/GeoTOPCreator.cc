@@ -341,8 +341,9 @@ namespace Belle2 {
 
       /*!  Read parameters  */
 
-      //! get width of the quartz bar
+      //! get width of the quartz bar with wedge
       G4double Qwidth = m_topgp->getQwidth();
+      if (m_topgp->getWwidth() > Qwidth) Qwidth = m_topgp->getWwidth();
       //! get thickness of the quartz bar
       G4double Qthickness = m_topgp->getQthickness();
       //! get Backward position of qurtz bar

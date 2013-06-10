@@ -244,8 +244,12 @@ namespace Belle2 {
       m_LowerGap = supParams.getLength("lowerGap");
       m_UpperGap = supParams.getLength("upperGap");
       m_SideGap = supParams.getLength("sideGap");
-      m_ZForward = supParams.getLength("ZForward");
-      m_ZBackward = supParams.getLength("ZBackward");
+      double forwardGap = supParams.getLength("forwardGap");
+      m_ZForward = m_Bposition + m_Length1 + m_Gwidth2 + m_Length2 +
+                   m_Gwidth3 + m_Length3 +
+                   m_Mirthickness + forwardGap +  m_PannelThickness;
+      double backGap = supParams.getLength("backGap");
+      m_ZBackward = m_Bposition - m_Gwidth1 - m_Wwidth - backGap - m_PannelThickness;
 
       //! store alignment directory
 

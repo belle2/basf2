@@ -19,10 +19,8 @@ geometry = register_module('Geometry')
 # Simulation
 g4sim = register_module('FullSim')
 
-# one event
-evtmetagen.param('ExpList', [0])
-evtmetagen.param('RunList', [1])
-evtmetagen.param('EvtNumList', [1000])
+# Set the number of events to be processed (1000 events)
+evtmetagen.param({'evtNumList': [1000], 'runList': [1]})
 
 import random
 intseed = random.randint(1, 10000000)

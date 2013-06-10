@@ -46,12 +46,14 @@ vxdtf.logging.log_level = LogLevel.INFO
 vxdtf.logging.debug_level = 1
 # detectorType: Supports 'SVD' and 'VXD' so far
 # calcQIType:  Supports 'kalman', 'circleFit' or 'trackLength'
+# filterOverlappingTCs: Supports 'hopfield' (good but slow), 'greedy' (faster but worse results), 'none' (no overlapping tc-removal)
 param_vxdtf = {
     'tccMinState': [2],
     'tccMinLayer': [3],
     'detectorType': ['VXD'],
     'sectorSetup': secSetup,
     'calcQIType': 'circleFit',
+    'filterOverlappingTCs': 'hopfield',
     'cleanOverlappingSet': True,
     'useHopfield': True,
     'TESTERexpandedTestingRoutines': True,

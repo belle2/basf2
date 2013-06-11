@@ -86,6 +86,7 @@ int SocketIO::get(int sock, char* data, int len)
 {
   int gcount;
   int br = read_data(sock, (char*)&gcount, 4);
+  if (br <= 0) return br;
   gcount = ntohl(gcount);
   if (gcount > len) {
     printf("buffer too small : %d(%d)", gcount, len);

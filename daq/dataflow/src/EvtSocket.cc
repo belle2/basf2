@@ -50,13 +50,19 @@ int EvtSocketSend::recv_buffer(char* buf)
   return stat;
 }
 
+SocketSend* EvtSocketSend::sock(void)
+{
+  return m_sock;
+}
+
 // EvtSocketRecv
 
-EvtSocketRecv::EvtSocketRecv(int port)
+EvtSocketRecv::EvtSocketRecv(int port, bool accept_at_init)
 {
   m_sock = new SocketRecv((u_short)port);
   m_recbuf = new char[MAXEVTSIZE];
-  m_sock->accept();
+  if (accept_at_init)
+    m_sock->accept();
 }
 
 EvtSocketRecv::~EvtSocketRecv()
@@ -88,4 +94,9 @@ int EvtSocketRecv::recv_buffer(char* buf)
 {
   int stat = m_sock->get(buf, MAXEVTSIZE);
   return stat;
+}
+
+SocketRecv* EvtSocketRecv::sock(void)
+{
+  return m_sock;
 }

@@ -32,6 +32,8 @@ public:
   int send_buffer(int size, char* buf);
   int recv_buffer(char* buf);
 
+  SocketSend* sock(void);
+
 private:
   SocketSend* m_sock;
   char* m_recbuf;
@@ -39,7 +41,7 @@ private:
 
 class EvtSocketRecv {
 public:
-  EvtSocketRecv(int port);
+  EvtSocketRecv(int port, bool accept_at_init = true);
   ~EvtSocketRecv();
 
   int status();
@@ -49,6 +51,8 @@ public:
 
   int send_buffer(int size, char* buf);
   int recv_buffer(char* buf);
+
+  SocketRecv* sock(void);
 
 private:
   SocketRecv* m_sock;

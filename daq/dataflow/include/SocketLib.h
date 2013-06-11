@@ -8,6 +8,21 @@
 // Date : 18 - Aug - 2000
 //-
 
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <errno.h>
+#include <sys/time.h>
+#include <signal.h>
+#include <sys/ipc.h>
+
 #include <string>
 
 #define D2_SOCKBUF_SIZE  8000000

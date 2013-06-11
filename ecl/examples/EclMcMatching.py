@@ -45,18 +45,36 @@ param_pGun = {
 pGun.param(param_pGun)
 
 # Mix some background to simulation data
-rofdir = '/gpfs/fs02/belle2/users/BGFile/MCprod_2013Summer/RBB_LER/'
+rofdir1 = '/gpfs/fs02/belle2/users/BGFile/MCprod_2013Summer/RBB_HER/'
+bgmixer1 = register_module('MixBkg')
+bgmixer1.param('BackgroundFiles', [rofdir1 + 'ECLROFnoMC_RBB_HER_1ms_*'])
+bgmixer1.set_log_level(LogLevel.INFO)
+
+rofdir2 = '/gpfs/fs02/belle2/users/BGFile/MCprod_2013Summer/RBB_LER/'
+bgmixer2 = register_module('MixBkg')
+bgmixer2.param('BackgroundFiles', [rofdir2 + 'ECLROFnoMC_RBB_LER_1ms_*'])
+bgmixer2.set_log_level(LogLevel.INFO)
+
+rofdir3 = '/gpfs/fs02/belle2/users/BGFile/MCprod_2013Summer/Coulomb_HER/'
+bgmixer3 = register_module('MixBkg')
+bgmixer3.param('BackgroundFiles', [rofdir3 + 'ECLROFnoMC_Coulomb_HER_1ms_*'])
+bgmixer3.set_log_level(LogLevel.INFO)
+
+rofdir4 = '/gpfs/fs02/belle2/users/BGFile/MCprod_2013Summer/Coulomb_LER/'
+bgmixer4 = register_module('MixBkg')
+bgmixer4.param('BackgroundFiles', [rofdir4 + 'ECLROFnoMC_Coulomb_LER_1ms_*'])
+bgmixer4.set_log_level(LogLevel.INFO)
+
+rofdir5 = '/gpfs/fs02/belle2/users/BGFile/MCprod_2013Summer/Touschek_HER/'
+bgmixer5 = register_module('MixBkg')
+bgmixer5.param('BackgroundFiles', [rofdir5 + 'ECLROFnoMC_Touschek_HER_1ms_*'])
+bgmixer5.set_log_level(LogLevel.INFO)
+
+rofdir6 = '/gpfs/fs02/belle2/users/BGFile/MCprod_2013Summer/Touschek_LER/'
 bgmixer6 = register_module('MixBkg')
-# bgmixer1.param('BackgroundFiles',[rofdir+'PXDROF_RBB_LER_1ms_0x.root'])
-# bgmixer2.param('BackgroundFiles',[rofdir+'SVDROF_RBB_LER_1ms_0x.root'])
-# bgmixer3.param('BackgroundFiles',[rofdir+'CDCROF_RBB_LER_1ms_0x.root'])
-# bgmixer4.param('BackgroundFiles',[rofdir+'TOPROF_RBB_LER_1ms_0x.root'])
-# bgmixer5.param('BackgroundFiles',[rofdir+'ARICHROF_RBB_LER_1ms_0x.root'])
-bgmixer6.param('BackgroundFiles', [rofdir + 'ECLROF_RBB_LER_1ms_0x.root'])
-# bgmixer7.param('BackgroundFiles',[rofdir+'EKLMROF_RBB_LER_1ms_0x.root'])
-# bgmixer8.param('BackgroundFiles',[rofdir+'BKLMROF_RBB_LER_1ms_0x.root'])
-# bgmixer9.param('BackgroundFiles',[rofdir+'ECLsimROF_RBB_LER_1ms_0x.root'])
+bgmixer6.param('BackgroundFiles', [rofdir6 + 'ECLROFnoMC_Touschek_LER_1ms_*'])
 bgmixer6.set_log_level(LogLevel.INFO)
+
 
 eclDigi = register_module('ECLDigitizer')
 eclRecShower = register_module('ECLReconstructor')
@@ -72,6 +90,11 @@ main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pGun)
 main.add_module(g4sim)
+main.add_module(bgmixer1)
+main.add_module(bgmixer2)
+main.add_module(bgmixer3)
+main.add_module(bgmixer4)
+main.add_module(bgmixer5)
 main.add_module(bgmixer6)
 main.add_module(eclDigi)
 main.add_module(eclRecShower)

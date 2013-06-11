@@ -341,42 +341,24 @@ namespace Belle2 {
 
       /*!  Read parameters  */
 
-      //! get width of the quartz bar with wedge
       G4double Qwidth = m_topgp->getQwidth();
       if (m_topgp->getWwidth() > Qwidth) Qwidth = m_topgp->getWwidth();
-      //! get thickness of the quartz bar
       G4double Qthickness = m_topgp->getQthickness();
-      //! get Backward position of qurtz bar
       G4double Z1 = m_topgp->getZ1();
-      //! get length wedge segment
       G4double WLength = m_topgp->getWLength();
-      //! get wedge extension down
       G4double Wextdown = m_topgp->getWextdown();
-      //! Get thickness of the QBB pannel
       G4double PannelThickness = m_topgp->getPannelThickness();
-      //! Get thickness of the sinde plate
       G4double PlateThickness = m_topgp->getPlateThickness();
-      //! Get size of air gap between quartz and support at inner radious
       G4double LowerGap = m_topgp->getLowerGap();
-      //! Get size of air gap between quartz and support at outer radious
       G4double UpperGap = m_topgp->getUpperGap();
-      //! Get size of air gap between quartz and support (side plate)
       G4double SideGap = m_topgp->getSideGap();
-      //! Get forward possition of support
       G4double ZForward = m_topgp->getZForward();
-      //! Get backward possition of support
       G4double ZBackward = m_topgp->getZBackward();
-      //! get module side X
       G4double dx = m_topgp->getMsizex();
-      //! get module side Y
       G4double dy = m_topgp->getMsizey();
-      //! get gap between PMTs in x direction
       G4double Xgap = m_topgp->getXgap();
-      //! get gap between PMTs in x direction
       G4double Ygap = m_topgp->getYgap();
-      //! get number of PMTs in one row
       G4int  Npmtx = m_topgp->getNpmtx();
-      //! get number of PMTs in one column
       G4int Npmty = m_topgp->getNpmty();
 
       //! size of the whole stack

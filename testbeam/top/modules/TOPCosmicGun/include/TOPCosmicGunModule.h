@@ -17,7 +17,7 @@
 namespace Belle2 {
 
   /**
-   *
+   * A simple cosmic ray generator for CRT.
    */
   class TOPCosmicGunModule : public Module {
 

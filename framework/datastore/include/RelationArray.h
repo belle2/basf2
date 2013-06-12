@@ -25,6 +25,8 @@ namespace Belle2 {
    *  Relations connect objects stored in two StoreArrays with each other,
    *  with the possibility of n:n connections and individual weights.
    *
+   *  \note In almost all cases, you'll want to create/find relations using RelationsObject instead.
+   *
    *  RelationArray is suitable for adding and modifying relations, see the
    *  documentation of RelationIndex for a more convenient way of finding and
    *  accessing relations.

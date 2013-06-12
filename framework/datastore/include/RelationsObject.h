@@ -15,7 +15,6 @@
 
 #include <TObject.h>
 
-#include <vector>
 #include <string>
 
 namespace Belle2 {
@@ -24,11 +23,14 @@ namespace Belle2 {
    *
    *  A class that wants to support the relations interface and is a subclass
    *  of BASE should be derived from RelationsInterface<BASE> instead.
-   *  Then it provides methods like addRelationTo or getRelationsTo for
-   *  an easy handling of relations to and from objects of this class.
-   *
    *  In most cases, BASE will be TObject and you can simply derive from RelationsObject.
    *
+   *  Your class then provides methods like addRelationTo or getRelationsTo for
+   *  an easy handling of relations to and from objects of this class.
+   *  Retrieving relations this way is handled using auto-generated indices, and so should
+   *  not introduce a large overhead.
+   *
+   *  <h1>Retrieving relations</h1>
    *  You can either retrieve a vector of relations using getRelations...(),
       \code
       //retrieve all CDCSimHits for given particle
@@ -51,6 +53,19 @@ namespace Belle2 {
       }
       \endcode
    *
+   *  <h1>Adding relations</h1>
+   *  Creating new relations is also fairly straightforward:
+   *
+      \code
+      //given an MCParticle* particle:
+      particle->addRelationTo(someOtherObject)
+      \endcode
+
+   *  Note that you'll have to register the relation in your module's initialize() function:
+   *
+      \code
+      RelationArray::registerPersistent<MCParticle, SomeOtherClass>();
+      \endcode
    */
   template <class BASE> class RelationsInterface: public BASE {
   public:
@@ -80,7 +95,7 @@ namespace Belle2 {
      *  @param weight  The weight of the relation.
      *  @return        Flag whether the creation of the relation succeeded.
      */
-    bool addRelationTo(const TObject* object, double weight = 1) const {
+    bool addRelationTo(const TObject* object, double weight = 1.0) const {
       return DataStore::Instance().addRelation(this, m_cacheDataStoreEntry, m_cacheArrayIndex, object, weight);
     }
 
@@ -186,15 +201,9 @@ namespace Belle2 {
     RelationVector<TObject> getRelationsWith(const std::string& name) const {
       return getRelationsWith<TObject>(name);
     }
-    const TObject* getRelatedTo(const std::string& name) const {
-      return getRelatedTo<TObject>(name);
-    }
-    const TObject* getRelatedFrom(const std::string& name) const {
-      return getRelatedFrom<TObject>(name);
-    }
-    const TObject* getRelated(const std::string& name) const {
-      return getRelated<TObject>(name);
-    }
+    const TObject* getRelatedTo(const std::string& name) const { return getRelatedTo<TObject>(name); }
+    const TObject* getRelatedFrom(const std::string& name) const { return getRelatedFrom<TObject>(name); }
+    const TObject* getRelated(const std::string& name) const { return getRelated<TObject>(name); }
     /** @} */
 #endif
 

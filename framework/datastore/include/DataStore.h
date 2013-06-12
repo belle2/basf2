@@ -32,7 +32,7 @@ namespace Belle2 {
    *  Currently you can chose between lifetimes of event and persistent.
    *  basf2 deletes the objects from the store according to the durability map in which the objects are stored.
    *
-   *  @sa EDurability StoreObjPtr StoreArray RelationArray
+   *  @sa EDurability StoreObjPtr StoreArray RelationsObject
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=DataStore">The basf2 developers</a>
    */
   class DataStore {
@@ -252,9 +252,9 @@ namespace Belle2 {
      *  @param fromEntry      Data store entry that contains the fromObject. Used for caching. Will be set if 0.
      *  @param fromIndex      Index in TClonesArray that contains the fromObject. Used for caching. Will be set if < 0.
      *  @param toClass        Class of the objects to which the relations point.
-     *  @param toName         The name of the store array to which the relations point.
-     *                        If empty the default store array name for toClass will be used.
-     *                        If the special name "ALL" is given all store arrays containing objects of type toClass are considered.
+     *  @param toName         The name of the StoreArrays to which the relations point.
+     *                        If empty the default StoreArray name for toClass will be used.
+     *                        If the special name "ALL" is given all StoreArrays containing objects of type toClass are considered.
      *  @return               Vector of relation entry objects.
      */
     std::vector<RelationEntry> getRelationsFromTo(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TClass* toClass, const std::string& toName);
@@ -444,6 +444,9 @@ namespace Belle2 {
      *
      *  entry/index are used to return the found array and index,
      *  should be set to NULL and -1, or some cached values (will be checked).
+     *
+     *  Given non-NULL entry and index>=0, this function returns immediately if the object is
+     *  found at the given position.
      *
      *  @param object     Pointer to the object.
      *  @param entry      The DataStore entry that contains the object.

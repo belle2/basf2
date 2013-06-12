@@ -8,6 +8,10 @@
 #include <string>
 #include <vector>
 
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <unistd.h>
+
 #include "daq/rfarm/event/Rb2Sock.h"
 
 using namespace Belle2;
@@ -21,7 +25,11 @@ int main(int argc, char** argv)
     exit(-1);
   }
 
-  Rb2Sock rs(string(argv[1]), string(argv[2]), atoi(argv[3]));
+  string a1(argv[1]);
+  string a2(argv[2]);
+  int a3 = atoi(argv[3]);
+
+  Rb2Sock rs(a1, a2, a3);
 
   for (;;) {
     int stat = rs.SendEvent();

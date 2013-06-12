@@ -1,0 +1,86 @@
+//+
+// File : HistoServer.cc
+// Description : Fetch EvtSocket and receive histograms periodically
+//
+// Author : Ryosuke Itoh, IPNS, KEK
+// Date : 18 - Dec - 2012
+//-
+#include <daq/dqm/HistoServer.h>
+
+using namespace Belle2;
+using namespace std;
+
+// Constructor / Destructor
+HistoServer::HistoServer(int port)
+{
+  m_port = port;
+  m_force_exit = 0;
+}
+
+HistoServer::~HistoServer()
+{
+  delete m_sock;
+}
+
+// Initialize socket
+
+int HistoServer:: init()
+{
+  m_sock = new EvtSocketRecv(m_port, false);
+  m_man = new EvtSocketManager(m_sock);
+  m_mapfile = TMapFile::Create("DqmHisto", "RECREATE", MAPFILESIZE);
+  m_hman = new HistoManager(m_mapfile);
+
+}
+// Server function to collect histograms
+
+int HistoServer::server()
+{
+  SocketIO sio;
+  MsgHandler msghdl(0);
+  char* buffer = new char[MAXBUFSIZE];
+  //  vector<int> recvsock;
+  int loop_counter = 0;
+  while (m_force_exit == 0) {
+    int exam_stat = m_man->examine();
+    if (exam_stat == 0) {
+      printf("Initial connection request detected!\n");
+      //      int fd = recvsock[;
+    } else if (exam_stat == 1) { //
+      //      printf ( "Histo data ready on socket\n" );
+      vector<int>& recvsock = m_man->connected_socket_list();
+      for (vector<int>::iterator it = recvsock.begin();
+           it != recvsock.end(); ++it) {
+        int fd = *it;
+        if (m_man->connected(fd)) {
+          int is = sio.get(fd, buffer, MAXBUFSIZE);
+          if (is <= 0) {
+            printf("HistoServer: fd %d disconnected\n", fd);
+            m_man->remove(fd);
+            break;
+          }
+          //    printf ( "EvtMessage received : size = %d\n", is );
+
+          EvtMessage* hmsg = new EvtMessage(buffer);
+          vector<TObject*> objlist;
+          vector<string> strlist;
+          int ds = msghdl.decode_msg(hmsg, objlist, strlist);
+          int nobjs = (hmsg->header())->reserved[1];
+          int narys = (hmsg->header())->reserved[2];
+          for (int i = 0; i < nobjs; i++) {
+            //      printf ( "Object : %s received\n", (strlist.at(i)).c_str() );
+            m_hman->update(strlist.at(i), fd, (TH1*)objlist.at(i));
+          }
+        }
+      }
+    }
+    usleep(1000);
+    loop_counter++;
+    if (loop_counter % 1000 == 0) {
+      //      printf ( "HistoServer: merging histograms\n" );
+      m_hman->merge();
+    }
+  }
+}
+
+

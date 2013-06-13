@@ -307,7 +307,10 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     // Calculate shape correlation coefficient: only for non-trivial shapes
     double uError(0), vError(0), rho(0);
     if ((sizeU > 1) && (sizeV > 1)) {
-      double posUU(0), posVV(0), posUV(0);
+      // Add in-pixel position noise to smear the correlation
+      double posUU = cls.getCharge() * info.getUPitch() * info.getUPitch() / 12.0;
+      double posVV = cls.getCharge() * info.getVPitch() * info.getVPitch() / 12.0;
+      double posUV(0);
       BOOST_FOREACH(const PXD::Pixel & px, cls.pixels()) {
         double du = info.getUCellPosition(px.getU()) - posU;
         double dv = info.getVCellPosition(px.getV()) - posV;

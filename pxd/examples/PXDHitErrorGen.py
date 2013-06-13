@@ -62,7 +62,7 @@ particlegun.param({  # Generate 5 tracks (on average)
 # Select subdetectors to be built
 geometry.param('Components', ['PXD'])
 
-pxddigi.param('statisticsFilename', 'digi.root')
+# pxddigi.param('statisticsFilename', 'digi.root')
 pxddigi.param('ElectronicEffects', True)
 pxddigi.param('SimpleDriftModel', False)
 
@@ -79,7 +79,7 @@ main.add_module(simulation)
 main.add_module(pxddigi)
 main.add_module(pxdclust)
 main.add_module(analyze)
-main.add_module(output)
+# main.add_module(output)
 
 # generate events
 process(main)

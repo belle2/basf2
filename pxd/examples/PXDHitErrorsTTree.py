@@ -54,11 +54,11 @@ class PXDHitErrorsTTree(Module):
         """Initialize the module"""
 
         super(PXDHitErrorsTTree, self).__init__()
-        ## Output ROOT file.
+        # # Output ROOT file.
         self.file = ROOT.TFile('PXDHitErrorOutput.root', 'recreate')
-        ## TTree for output data
+        # # TTree for output data
         self.tree = ROOT.TTree('tree', 'Event data of PXD simulation')
-        ## Instance of EventData class
+        # # Instance of EventData class
         self.data = EventData()
         # Declare tree branches
         for key in EventData.__dict__.keys():
@@ -69,48 +69,37 @@ class PXDHitErrorsTTree(Module):
                 self.tree.Branch(key, AddressOf(self.data, key),
                                  key + formstring)
 
-        ## Factors for decoding VXDId's
-        self.vxdid_factors = (8192, 256, 32)
-
     def beginRun(self):
         """ Does nothing """
 
     def event(self):
         """Find clusters with a truehit and print some stats."""
 
-        truehits = Belle2.PyStoreArray('PXDTrueHits')
-        nTruehits = truehits.getEntries()
         clusters = Belle2.PyStoreArray('PXDClusters')
-        nClusters = clusters.getEntries()
-        digits = Belle2.PyStoreArray('PXDDigits')
-        nDigits = digits.getEntries()
-        relClustersToTrueHits = \
-            Belle2.PyRelationArray('PXDClustersToPXDTrueHits')
-        nClusterRelations = relClustersToTrueHits.getEntries()
-        relClustersToDigits = Belle2.PyRelationArray('PXDClustersToPXDDigits')
-        nDigitRelations = relClustersToDigits.getEntries()
 
         # Start with clusters and use the relation to get the corresponding
         # digits and truehits.
-        for cluster_index in range(nClusters):
-            cluster = clusters[cluster_index]
-            cluster_truehits = \
-                relClustersToTrueHits.getToIndices(cluster_index)
+        for cluster in clusters:
+            cluster_truehits = cluster.getRelationsTo("PXDTrueHits")
 
             # Here we ask only for clusters with exactly one TrueHit.
-            # We don't want combined clusters!
             if len(cluster_truehits) != 1:
                 continue
 
-            for truehit_index in cluster_truehits:
-                truehit = truehits[truehit_index]
+            for truehit in cluster_truehits:
                 # Now let's store some data
                 # Sesnor identification
-                self.data.vxd_id = truehit.getRawSensorID()
-                [self.data.layer, self.data.ladder, self.data.sensor] = \
-                    self.decode(self.data.vxd_id)
-                self.data.truehit_index = truehit_index
-                self.data.cluster_index = cluster_index
+                vxd_id = truehit.getSensorID()
+                self.data.vxd_id = vxd_id.getID()
+                self.data.layer = vxd_id.getLayerNumber()
+                self.data.ladder = vxd_id.getLadderNumber()
+                self.data.sensor = vxd_id.getSensorNumber()
+                self.data.truehit_index = truehit.getArrayIndex()
+                self.data.cluster_index = cluster.getArrayIndex()
+
+                # Get sensor geometry information
+                sensor_info = Belle2.VXD.GeoCache.get(vxd_id)
+                thickness = sensor_info.getThickness()
 
                 # TrueHit information
                 self.data.truehit_u = truehit.getU()
@@ -119,10 +108,10 @@ class PXDHitErrorsTTree(Module):
                 self.data.truehit_charge = truehit.getEnergyDep()
                 self.data.theta_u = \
                     math.atan2(truehit.getExitU() - truehit.getEntryU(), \
-                    0.0075)
+                    thickness)
                 self.data.theta_v = \
                     math.atan2(truehit.getExitV() - truehit.getEntryV(), \
-                    0.0075)
+                    thickness)
                 # Cluster information
                 self.data.cluster_u = cluster.getU()
                 self.data.cluster_v = cluster.getV()
@@ -147,13 +136,3 @@ class PXDHitErrorsTTree(Module):
         self.file.cd()
         self.file.Write()
         self.file.Close()
-
-    def decode(self, vxdid):
-        """ Utility to decode sensor IDs """
-
-        result = []
-        for f in self.vxdid_factors:
-            result.append(vxdid / f)
-            vxdid = vxdid % f
-
-        return result

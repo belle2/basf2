@@ -87,6 +87,9 @@ namespace Belle2 {
       /** Shaper-DSP Output  Map */
       double ShaperDSP(double Ti);
 
+      /** read Shaper array */
+      void DspSamplingArray(int* n, double* t, double* dt, double* ft, double* ff);
+
       /** Shaper-DSP Output  basic */
       double  Sv123(double t, double t01, double tb1, double t02, double tb2, double td1, double ts1);
 
@@ -121,6 +124,8 @@ namespace Belle2 {
       /**quality 2 bits              */
       int m_lq ;
 
+      /** array of shape function looking up table      */
+      double m_ft[1250] ;
       /** array of shaper dsp settings           */
       short int m_id[16][16];
       /** array of function tabulation                 */

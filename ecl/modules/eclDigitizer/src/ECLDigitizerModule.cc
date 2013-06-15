@@ -101,7 +101,6 @@ void ECLDigitizerModule::event()
   double HitEnergy[8736][31] = {{0}};
   double E_tmp[8736] = {0};
   double test_A[31] = {0};
-  double test_B[31] = {0};
 //  double AdcPedestal=3000.;
   double AdcNoise[8736][31] = {{0}};
   double genNoise[8736][31] = {{0}};

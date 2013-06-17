@@ -5,9 +5,16 @@ from basf2 import *
 
 # LEPS beam test 2013-june using 2.1 GeV/c e+ beam
 
-# beam definition for cosTheta=0.0 runs
+# Belle coordinate frame is used: bar along z-axis, perpendicular to x-axis at x=120cm
+# beam fired from x=0
+#
+#   x = z(LEPS)+120 cm
+#   y = -y(LEPS)
+#   z = x(LEPS)
+#
+# beam definition for experiment 2 (cosTheta=0.0)
 
-beam00 = {
+beam02 = {
     'pdgCodes': [-11],
     'nTracks': 1,
     'varyNTracks': False,
@@ -20,10 +27,28 @@ beam00 = {
     'vertexGeneration': 'normal',
     'xVertexParams': [0, 0],
     'yVertexParams': [-0.4, 0.5],
-    'zVertexParams': [122.8, 0.5],
+    'zVertexParams': [122.84, 0.5],
     }
 
-# beam definition for cosTheta=0.4 runs (tentatively)
+# beam definition for experiment 3 (cosTheta=0.43)
+
+beam03 = {
+    'pdgCodes': [-11],
+    'nTracks': 1,
+    'varyNTracks': False,
+    'momentumGeneration': 'normal',
+    'momentumParams': [2.12, 0.21],
+    'thetaGeneration': 'normal',
+    'thetaParams': [64.5849, 0],
+    'phiGeneration': 'normal',
+    'phiParams': [0, 0],
+    'vertexGeneration': 'normal',
+    'xVertexParams': [0, 0],
+    'yVertexParams': [0, 0.5],
+    'zVertexParams': [55.52, 0.5],
+    }
+
+# beam definition for experiment 4 (cosTheta=0.36)
 
 beam04 = {
     'pdgCodes': [-11],
@@ -32,16 +57,16 @@ beam04 = {
     'momentumGeneration': 'normal',
     'momentumParams': [2.12, 0.21],
     'thetaGeneration': 'normal',
-    'thetaParams': [66.4, 0],
+    'thetaParams': [69.1649, 0],
     'phiGeneration': 'normal',
     'phiParams': [0, 0],
     'vertexGeneration': 'normal',
     'xVertexParams': [0, 0],
-    'yVertexParams': [-0.4, 0.5],
-    'zVertexParams': [122.8, 0.5],
+    'yVertexParams': [-19.9, 0.5],
+    'zVertexParams': [65.73, 0.5],
     }
 
-# specify here beam setup, number of events to simulate and output file
+# specify here the beam setup, number of events to simulate and output file
 # -------------------------------------------------------------------------
 beam = beam04
 nevents = [100]

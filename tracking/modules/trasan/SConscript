@@ -1,9 +1,9 @@
 Import('env')
 
-env['CONTINUE'] = False
+#2013/06/17 env['CONTINUE'] = False
 
 env['LIBS'] = ['framework', 'trg']
-#env.Append(CPPDEFINES = {'FOR_TRASAN':None})
+env.Append(CPPDEFINES = {'FOR_TRASAN':None})
 #env.Append(CPPDEFINES = {'TRASAN_WINDOW_GTK':None,
 #	                 'TRASAN_WINDOW_GTK_HOUGH':None,
 #			 'TRASAN_DEBUG':None,

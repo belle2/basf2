@@ -2365,7 +2365,7 @@ namespace Belle {
       }
       const Belle2::TRGCDCWireHit& h = * t.links()[sort[i]]->hit();
 
-      const unsigned layerId = h.wire().layerId();
+//iw      const unsigned layerId = h.wire().layerId();
       const int hitID = h.iCDCHit();
       //      const double driftTime = h.drift();
 //      const HepGeom::Point3D<double> & onTrack = t.links()[sort[i]]->positionOnTrack();
@@ -2429,11 +2429,11 @@ namespace Belle {
     }
   }
 
-  void
-  TTrackManager::treatCurler(rectrk& trk1,
-                             reccdc_trk_add& cdc1,
-                             unsigned flag) const
-  {
+void
+TTrackManager::treatCurler(rectrk &, reccdc_trk_add &, unsigned) const {
+// TTrackManager::treatCurler(rectrk& trk1,
+// 			   reccdc_trk_add& cdc1,
+// 			   unsigned flag) const {
 //cnv //...Originally coded by j.tanaka...
 
 //     //...Check inputs...
@@ -2780,9 +2780,9 @@ namespace Belle {
     memcpy(s1, swapRegion, RECTRK_ACTUAL_SIZE);
   }
 
-  void
-  TTrackManager::tagReccdc(unsigned* id0, unsigned nTrk) const
-  {
+void
+TTrackManager::tagReccdc(unsigned *, unsigned) const {
+//cnv TTrackManager::tagReccdc(unsigned* id0, unsigned nTrk) const {
 //cnv     unsigned * id;
 //     if (NULL == (id = (unsigned *) malloc(nTrk * sizeof(unsigned)))) {
 //       perror("$Id: TTrackManager.cc 10700 2008-11-06 08:47:27Z hitoshi $:id:malloc");
@@ -2862,7 +2862,7 @@ namespace Belle {
 // #endif
 
 //     free(id);
-  }
+}
 
   void
   TTrackManager::setCurlerFlags(void)
@@ -3220,9 +3220,9 @@ namespace Belle {
 //      }
   }
 
-  void
-  TTrackManager::tagRectrk(unsigned* id0, unsigned nTrk) const
-  {
+void
+TTrackManager::tagRectrk(unsigned *, unsigned) const {
+//cnv  TTrackManager::tagRectrk(unsigned* id0, unsigned nTrk) const {
 //cnv    unsigned * id;
 //     if (NULL == ( id = (unsigned *) malloc(nTrk * sizeof(unsigned)))) {
 //       perror("$Id: TTrackManager.cc 10700 2008-11-06 08:47:27Z hitoshi $:id:malloc");
@@ -3257,7 +3257,7 @@ namespace Belle {
 //     }
 
 //     free(id);
-  }
+}
 
 // jtanaka 000925 -->
 #define TRASAN_REPLACE_TABLE 1

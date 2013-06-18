@@ -90,13 +90,13 @@ namespace Belle {
     _layers[id]->registerPattern(0);
   }
 
-  inline
-  unsigned
-  THoughPlaneMulti::nActiveCellsInPattern(unsigned id) const
-  {
+inline
+unsigned
+THoughPlaneMulti::nActiveCellsInPattern(unsigned) const {
+//THoughPlaneMulti::nActiveCellsInPattern(unsigned id) const
 //    return _layers[id]->nActiveCellsInPattern();
     return 0;
-  }
+}
 
   inline
   void

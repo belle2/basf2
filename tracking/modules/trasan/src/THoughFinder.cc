@@ -430,10 +430,11 @@ namespace Belle {
 #endif
   }
 
-  TTrack*
-  THoughFinder::build2D(const TCircle& circle,
-                        const AList<TLink> & aLinks) const
-  {
+TTrack *
+THoughFinder::build2D(const TCircle &,
+		      const AList<TLink> & aLinks) const {
+//THoughFinder::build2D(const TCircle& circle,
+//		      const AList<TLink> & aLinks) const {
 #ifdef TRASAN_DEBUG
     const std::string stage = "build2D";
     EnterStage(stage);
@@ -449,12 +450,13 @@ namespace Belle {
     Window.append(_axial, leda_grey2);
     Window.append(aLinks, leda_pink);
     if (t) {
-      Window.append(circle);
-      Window.append(* t, leda_green);
-      Window.text(Stage() + ":2D track is made");
-    } else {
-      Window.append(circle, leda_red);
-      Window.text(Stage() + ":failed to make 2D trk");
+	Window.append(circle);
+	Window.append(* t, leda_green);
+	Window.text(Stage() + ":2D track is made");
+    }
+    else {
+	Window.append(circle, leda_red);
+	Window.text(Stage() + ":failed to make 2D trk");
     }
     Window.wait();
 #endif
@@ -463,7 +465,7 @@ namespace Belle {
 #endif
 
     return t;
-  }
+}
 
   TTrack*
   THoughFinder::build3D(TTrack& t, const AList<TLink> & sLinks) const
@@ -598,14 +600,13 @@ namespace Belle {
       return -1;
   }
 
-  TTrack*
-  THoughFinder::build0(const TPoint2D& point,
-//        THoughPlane * planes[2][2],
-                       THoughPlane* planes[2],
-                       float charge,
-                       unsigned pt,
-                       unsigned threshold)
-  {
+TTrack *
+THoughFinder::build0(const TPoint2D & point,
+//                   THoughPlane * planes[2][2],
+		     THoughPlane **,
+		     float charge,
+		     unsigned,
+		     unsigned) {
 #ifdef TRASAN_DEBUG
     const std::string stage = "build0";
     EnterStage(stage);
@@ -837,13 +838,12 @@ namespace Belle {
     return s;
   }
 
-  TTrack*
-  THoughFinder::build1(const TPoint2D& point,
-                       THoughPlane* planes[2][2],
-                       float charge,
-                       unsigned pt,
-                       unsigned threshold)
-  {
+TTrack *
+THoughFinder::build1(const TPoint2D & point,
+//		     THoughPlane * planes[2][2],
+		     float charge,
+		     unsigned,
+		     unsigned) {
 #ifdef TRASAN_DEBUG
     const std::string stage = "build1";
     EnterStage(stage);
@@ -1081,13 +1081,12 @@ namespace Belle {
     return s;
   }
 
-  TTrack*
-  THoughFinder::build3(const TPoint2D& point,
-                       THoughPlane* planes[2],
-                       float charge,
-                       unsigned pt,
-                       unsigned threshold)
-  {
+TTrack *
+THoughFinder::build3(const TPoint2D & point,
+//		     THoughPlane *,
+		     float charge,
+		     unsigned,
+		     unsigned) {
 #ifdef TRASAN_DEBUG
     const std::string stage = "build3";
     EnterStage(stage);
@@ -1335,13 +1334,12 @@ namespace Belle {
     return s;
   }
 
-  TTrack*
-  THoughFinder::buildCurl(const TPoint2D& point,
-                          const THoughPlane& plane,
-                          float charge,
-                          unsigned threshold,
-                          AList<TLink> & hits)
-  {
+TTrack *
+THoughFinder::buildCurl(const TPoint2D & point,
+			const THoughPlane &,
+			float charge,
+			unsigned,
+			AList<TLink> & hits) {
 #ifdef TRASAN_DEBUG
     const std::string stage = "buildCurl";
     EnterStage(stage);
@@ -1953,9 +1951,10 @@ namespace Belle {
 
           //...Build a track...
           unsigned threshold2 = threshold / 2;
-          TTrack* s = build1(* list[i], planes0, charge, pt, threshold2);
-//    if (! s) s = localSearch2(* list[i], charge);
-//    TTrack * s = localSearch2(* list[i], charge);
+          TTrack* s = build1(* list[i], charge, pt, threshold2);
+//        TTrack* s = build1(* list[i], planes0, charge, pt, threshold2);
+//        if (! s) s = localSearch2(* list[i], charge);
+//        TTrack * s = localSearch2(* list[i], charge);
           if (! s) {
             continue;
           }
@@ -2032,20 +2031,19 @@ namespace Belle {
     return 0;
   }
 
-  int
-  THoughFinder::doit0(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-                      const CAList<Belle2::TRGCDCWireHit> & stereoHits,
-                      AList<TTrack> & tracks,
-                      AList<TTrack> & tracks2D)
-  {
+int
+THoughFinder::doit0(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+		    const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+		    AList<TTrack> & tracks,
+		    AList<TTrack> & tracks2D) {
 
     //...For debug...
     if (debugLevel() > 1) {
-      std::cout << name() << " ... processing"
-                << " axial=" << axialHits.length()
-                << ",stereo=" << stereoHits.length()
-                << ",tracks=" << tracks.length()
-                << std::endl;
+	std::cout << name() << " ... processing"
+		  << " axial=" << axialHits.length()
+		  << ",stereo=" << stereoHits.length()
+		  << ",tracks=" << tracks.length()
+		  << std::endl;
     }
 
 #ifdef TRASAN_DEBUG
@@ -2059,13 +2057,12 @@ namespace Belle {
 #ifdef TRASAN_WINDOW_GTK_HOUGH
     TWindowGTKConformal& w = Trasan::getTrasan()->w();
     w.clear();
-//  w.skip(false);
     w.stage("Hough Finder : good hit selection");
     w.information("gray:all hits, green:selected");
     w.append(axialHits, Gdk::Color("gray"));
     w.append(stereoHits, Gdk::Color("gray"));
     w.append(_all, Gdk::Color("green"));
-    w.run();
+//  w.run();
 #endif
 
     //...Main loop...
@@ -2073,79 +2070,80 @@ namespace Belle {
     bool finished = (nAxials < _minThreshold);
     while (! finished) {
 
-      for (unsigned pt = 0; pt < 1; pt++) {
+	for (unsigned pt = 0; pt < 1; pt++) {
 
-        _planeHP2->clear();
-        _planeHM2->clear();
-        houghTransformation2(_axial, *_planeHP2);
-        houghTransformation2(_axial, *_planeHM2);
+	    _planeHP2->clear();
+	    _planeHM2->clear();
+	    houghTransformation2(_axial, *_planeHP2);
+	    houghTransformation2(_axial, *_planeHM2);
 
-        //...Determine threshold...
-        const unsigned maxEntry = unsigned(
-                                    std::max(_planes2[0]->maxEntry(),
-                                             _planes2[1]->maxEntry()));
-        unsigned threshold = unsigned(float(maxEntry) * _threshold);
+	    //...Determine threshold...
+	    const unsigned maxEntry = unsigned(
+		std::max(_planes2[0]->maxEntry(),
+			 _planes2[1]->maxEntry()));
+	    unsigned threshold = unsigned(float(maxEntry) * _threshold);
 
 #ifdef TRASAN_DEBUG_DETAIL
 //      _planes2[0]->dump("merged", Tab());
 //      _planes2[1]->dump("merged", Tab());
-        std::cout << Tab() << "threshold=" << threshold
-                  << ",peakThreshold=" << _minThreshold << std::endl;
+	    std::cout << Tab() << "threshold=" << threshold
+		      << ",peakThreshold=" << _minThreshold << std::endl;
 #endif
-        if (threshold < _minThreshold) continue;
+	    if (threshold < _minThreshold) continue;
 
-        //...Peak finding...
-        _planes2[0]->clearRegion();
-        _planes2[1]->clearRegion();
-        AList<TPoint2D> listP = _peakFinder.peaks5(* _planes2[0],
-                                                   threshold);
-        AList<TPoint2D> listM = _peakFinder.peaks5(* _planes2[1],
-                                                   threshold);
-        AList<TPoint2D> list;
-        list.append(listP);
-        list.append(listM);
+	    //...Peak finding...
+	    _planes2[0]->clearRegion();
+	    _planes2[1]->clearRegion();
+	    AList<TPoint2D> listP = _peakFinder.peaks5(* _planes2[0],
+						       threshold);
+	    AList<TPoint2D> listM = _peakFinder.peaks5(* _planes2[1],
+						       threshold);
+	    AList<TPoint2D> list;
+	    list.append(listP);
+	    list.append(listM);
 
-        //...Sort peaks by R...
-        list.sort(SortByY);
+	    //...Sort peaks by R...
+	    list.sort(SortByY);
 
 #ifdef TRASAN_DEBUG_DETAIL
-        std::cout << Tab() << "#peaks=" << list.length() << ":plus peaks="
-                  << listP.length() << ",minus peaks=" << listM.length()
-                  << std::endl;
+	    std::cout << Tab() << "#peaks=" << list.length() << ":plus peaks="
+		      << listP.length() << ",minus peaks=" << listM.length()
+		      << std::endl;
 #endif
 
-        //...Track building...
-        unsigned lastAxialN = _axial.length();
-        const unsigned n = list.length();
-        for (unsigned i = 0; i < n; i++) {
+	    //...Track building...
+	    unsigned lastAxialN = _axial.length();
+	    const unsigned n = list.length();
+	    for (unsigned i = 0; i < n; i++) {
 
 #ifdef TRASAN_DEBUG_DETAIL
-          std::cout << Tab() << "peak loop " << i << "/" << n << std::endl;
-          _planes2[0]->dump("region", Tab());
+		std::cout << Tab() << "peak loop " << i << "/" << n
+			  << std::endl;
+		_planes2[0]->dump("region", Tab());
 //    _planes2[0]->dump("merged", Tab());
-          _planes2[1]->dump("region", Tab());
+		_planes2[1]->dump("region", Tab());
 //    _planes2[1]->dump("merged", Tab());
 #endif
 
 //...tset...
-          if (i) {
-            unsigned axialN = _axial.length();
-            if (axialN != lastAxialN) {
-              _planeHP2->clearCells();
-              _planeHM2->clearCells();
-              houghTransformation2(_axial, *_planeHP2);
-              houghTransformation2(_axial, *_planeHM2);
-              lastAxialN = axialN;
-            }
-          }
+		if (i) {
+		    unsigned axialN = _axial.length();
+		    if (axialN != lastAxialN) {
+			_planeHP2->clearCells();
+			_planeHM2->clearCells();
+			houghTransformation2(_axial, *_planeHP2);
+			houghTransformation2(_axial, *_planeHM2);
+			lastAxialN = axialN;
+		    }
+		}
 //...test end...
 
-          //...Track charge...
-          float charge = 0;
-          if (listP.hasMember(list[i]))
-            charge = +1;
-          else
-            charge = -1;
+		//...Track charge...
+		float charge = 0;
+		if (listP.hasMember(list[i]))
+		    charge = +1;
+		else
+		    charge = -1;
 
 //        static unsigned nDump = 0;
 //        const std::string mess = "#dump" + itostring(nDump);
@@ -2153,97 +2151,99 @@ namespace Belle {
 //        _planeHM2.dump(mess);
 //        ++nDump;
 
-          //...Check threshold again...
-          if (charge > 0) {
-            const int maxEntry = (* _planes2[0]).maxEntryInRegion(
-                                   (* _planes2[0]).serialID(* list[i]));
-            if (maxEntry < (int) threshold) {
+		//...Check threshold again...
+		if (charge > 0) {
+		    const int maxEntry = (* _planes2[0]).maxEntryInRegion(
+			(* _planes2[0]).serialID(* list[i]));
+		    if (maxEntry < (int) threshold) {
 #ifdef TRASAN_DEBUG_DETAIL
-              std::cout << Tab() << "peak loop " << i << ":pt="
-                        << pt << ",charge=" << charge << " skipped"
-                        << std::endl;
-              std::cout << Tab() << "    maxEntryInRegion="
-                        << maxEntry << ",threshold=" << threshold
-                        << std::endl;
+			std::cout << Tab() << "peak loop " << i << ":pt="
+				  << pt << ",charge=" << charge << " skipped"
+				  << std::endl;
+			std::cout << Tab() << "    maxEntryInRegion="
+				  << maxEntry << ",threshold=" << threshold
+				  << std::endl;
 #endif
-              continue;
-            }
+			continue;
+		    }
 #ifdef TRASAN_DEBUG_DETAIL
-            std::cout << Tab() << "peak loop " << i << ":pt="
-                      << pt << ",charge=" << charge << " accepted"
-                      << std::endl;
-            std::cout << Tab() << "    maxEntryInRegion="
-                      << maxEntry << ",threshold=" << threshold
-                      << std::endl;
+		    std::cout << Tab() << "peak loop " << i << ":pt="
+			      << pt << ",charge=" << charge << " accepted"
+			      << std::endl;
+		    std::cout << Tab() << "    maxEntryInRegion="
+			      << maxEntry << ",threshold=" << threshold
+			      << std::endl;
 #endif
-          } else {
-            const int maxEntry = (* _planes2[1]).maxEntryInRegion(
-                                   (* _planes2[1]).serialID(* list[i]));
-            if (maxEntry < (int) threshold) {
+		} else {
+		    const int maxEntry = (* _planes2[1]).maxEntryInRegion(
+			(* _planes2[1]).serialID(* list[i]));
+		    if (maxEntry < (int) threshold) {
 #ifdef TRASAN_DEBUG_DETAIL
-              std::cout << Tab() << "peak loop " << i << ":pt="
-                        << pt << ",charge=" << charge << " skipped"
-                        << std::endl;
-              std::cout << Tab() << "    maxEntryInRegion="
-                        << maxEntry << ",threshold=" << threshold
-                        << std::endl;
+			std::cout << Tab() << "peak loop " << i << ":pt="
+				  << pt << ",charge=" << charge << " skipped"
+				  << std::endl;
+			std::cout << Tab() << "    maxEntryInRegion="
+				  << maxEntry << ",threshold=" << threshold
+				  << std::endl;
 #endif
-              continue;
-            }
+			continue;
+		    }
 #ifdef TRASAN_DEBUG_DETAIL
-            std::cout << Tab() << "peak loop " << i << ":pt="
-                      << pt << ",charge=" << charge << " accepted"
-                      << std::endl;
-            std::cout << Tab() << "    maxEntryInRegion="
-                      << maxEntry << ",threshold=" << threshold
-                      << std::endl;
+		    std::cout << Tab() << "peak loop " << i << ":pt="
+			      << pt << ",charge=" << charge << " accepted"
+			      << std::endl;
+		    std::cout << Tab() << "    maxEntryInRegion="
+			      << maxEntry << ",threshold=" << threshold
+			      << std::endl;
 #endif
-          }
+		}
 
 #ifdef TRASAN_WINDOW_GTK_HOUGH
-          TWindowGTKHough& hp = Trasan::getTrasan()->hp();
-          TWindowGTKHough& hm = Trasan::getTrasan()->hm();
-          hp.stage("Trasan Hough: Tracking not started yet");
-          hm.stage("Trasan Hough: Tracking not started yet");
-          hp.clear();
-          hm.clear();
-          hp.append(_planes2[0]);
-          hm.append(_planes2[1]);
+		TWindowGTKHough& hp = Trasan::getTrasan()->hp();
+		TWindowGTKHough& hm = Trasan::getTrasan()->hm();
+		hp.stage("Trasan Hough: Tracking not started yet");
+		hm.stage("Trasan Hough: Tracking not started yet");
+		hp.clear();
+		hm.clear();
+		hp.append(_planes2[0]);
+		hm.append(_planes2[1]);
 //    hm.append(& _tmp);
-          hp.show();
-          hm.show();
-          hp.run();
+		hp.show();
+		hm.show();
+//debug		hp.run();
 #endif
 
 #ifdef TRASAN_DEBUG_DETAIL
-          std::cout << Tab() << "pt=" << pt << ",charge=" << charge
-                    << std::endl;
+		std::cout << Tab() << "pt=" << pt << ",charge=" << charge
+			  << std::endl;
 #endif
 
-          //...Build a track...
-          unsigned threshold2 = threshold / 2;
-          TTrack* s = build0(* list[i],
-                             _planes02,
-                             charge,
-                             pt,
-                             threshold2);
-          if (! s) {
+		//...Build a track...
+		unsigned threshold2 = threshold / 2;
+		TTrack* s = build0(* list[i],
+				   _planes02,
+				   charge,
+				   pt,
+				   threshold2);
+		if (! s) {
 #ifdef TRASAN_DEBUG_DETAIL
-            std::cout << Tab() << "3D failure (bad quality)" << std::endl;
+		    std::cout << Tab() << "3D failure (bad quality)"
+			      << std::endl;
 #endif
-            continue;
-          }
-          s->finder(TrackHoughFinder);
-          if (s->quality() & TrackQuality2D) {
-            tracks2D.append(s);
-            s->name("HoughTrack2D_" + itostring(tracks2D.length()));
-          } else {
-            tracks.append(s);
-            s->name("HoughTrack_" + itostring(tracks.length()));
-          }
+		    continue;
+		}
+		s->finder(TrackHoughFinder);
+		if (s->quality() & TrackQuality2D) {
+		    tracks2D.append(s);
+		    s->name("HoughTrack2D_" + itostring(tracks2D.length()));
+		}
+		else {
+		    tracks.append(s);
+		    s->name("HoughTrack_" + itostring(tracks.length()));
+		}
 
-          //...Remove from the Hough plane (outer only)...
-          _axial.remove(s->links());
+		//...Remove from the Hough plane (outer only)...
+		_axial.remove(s->links());
 
 //...test...
 //      AList<TLink> axial = TLink::axialHits(s->links());
@@ -2254,37 +2254,37 @@ namespace Belle {
 //    std::cout << "#outerHits      removing " << axial.length() << std::endl;
 
 #ifdef TRASAN_DEBUG_DETAIL
-          std::cout << Tab() << "track made:" << s->name()
-                    << std::endl;
+		std::cout << Tab() << "track made:" << s->name()
+			  << std::endl;
 #endif
-        }
+	    }
 
-        if (list.length()) HepAListDeleteAll(list);
-      }
+	    if (list.length()) HepAListDeleteAll(list);
+	}
 
-      //...Finished ?...
+	//...Finished ?...
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << Tab() << "loop end check:nAxials=" << nAxials
-                << ",_axial.length=" << _axial.length() << std::endl;
+	std::cout << Tab() << "loop end check:nAxials=" << nAxials
+		  << ",_axial.length=" << _axial.length() << std::endl;
 #endif
 
-      if (nAxials == (unsigned) _axial.length())
-        finished = true;
-      else
-        nAxials = _axial.length();
+	if (nAxials == (unsigned) _axial.length())
+	    finished = true;
+	else
+	    nAxials = _axial.length();
     }
 
     //...Curl search...
     if (_doCurlSearch)
-      curlSearch(tracks, tracks2D);
+	curlSearch(tracks, tracks2D);
 
     //...For debug...
     if (debugLevel() > 1) {
-      std::cout << name() << " ... processed"
-                << " axial=" << axialHits.length()
-                << ",stereo=" << stereoHits.length()
-                << ",tracks=" << tracks.length()
-                << std::endl;
+	std::cout << name() << " ... processed"
+		  << " axial=" << axialHits.length()
+		  << ",stereo=" << stereoHits.length()
+		  << ",tracks=" << tracks.length()
+		  << std::endl;
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
@@ -2296,7 +2296,7 @@ namespace Belle {
 #endif
 
     return 0;
-  }
+}
 
   int
   THoughFinder::curlSearch(AList<TTrack> & tracks,
@@ -2392,7 +2392,7 @@ namespace Belle {
           hc.clear();
           hc.append(& pln);
           hc.show();
-          hc.run();
+//debug          hc.run();
 #endif
 
           //...Track charge loop...
@@ -3386,7 +3386,7 @@ THoughFinder::doit3(const CAList<Belle2::TRGCDCWireHit> & axialHits,
         //...Build a track...
         unsigned threshold2 = threshold / 2;
         TTrack* s = build3(* list[i],
-                           _planes02,
+//                         _planes02,
                            charge,
                            pt,
                            threshold2);

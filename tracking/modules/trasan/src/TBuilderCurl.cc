@@ -418,13 +418,11 @@ namespace Belle {
 //...............Main Part.....................
 //.............................................
 
-  bool
-  TBuilderCurl::buildStereo(TTrack& track,
-                            double& dZ,
-                            double& tanL) const
-  {
+bool
+TBuilderCurl::buildStereo(TTrack & track, double &, double &) const {
+
 #if defined(HO_DEBUG)
-  std::cout << " TBuilderCurl::buildStereo 0" << std::endl;
+    std::cout << " TBuilderCurl::buildStereo 0" << std::endl;
 #endif
     if (!(m_param.SVD_RECONSTRUCTION))return false;
 
@@ -468,7 +466,7 @@ namespace Belle {
 // #endif
 
     return false;
-  }
+}
 
   TTrack*
   TBuilderCurl::buildStereo(TTrack&, const AList<TLink> &) const
@@ -963,7 +961,8 @@ namespace Belle {
     for (unsigned i = 0, size = track.nLinks(); i < size; ++i) {
       unsigned id = (track.links())[i]->wire()->superLayerId();
       //ho
-      if( id<0 || id>8 ) {
+//iw      if( id<0 || id>8 ) {
+      if (id>8 ) {
 	std::cout << "invalid id=" << id <<" in TBuilderCurl::setArcZ" << std::endl;	
 	exit(-1);
       }

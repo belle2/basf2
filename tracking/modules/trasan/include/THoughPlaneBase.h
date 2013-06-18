@@ -403,12 +403,12 @@ namespace Belle {
     vote(rx, ry, 0, hough, weight);
   }
 
-  inline
-  void
-  THoughPlaneBase::vote(float xOffset, int weight)
-  {
-// do nothing
-  }
+inline
+void
+//THoughPlaneBase::vote(float xOffset, int weight)
+    THoughPlaneBase::vote(float, int) {
+        // do nothing
+    }
 
 } // namespace Belle
 

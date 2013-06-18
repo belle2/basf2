@@ -957,8 +957,7 @@ Trasan::version(void) const {
       b_doPerfectFinder(0),
       b_perfectFitting(0),
 
-      //ho      b_conformalFinder(1),
-      b_conformalFinder(0),
+      b_conformalFinder(1),
       b_doConformalFinder(1),
       b_doConformalFastFinder(1),
       b_doConformalSlowFinder(1),
@@ -1540,30 +1539,20 @@ Trasan::initialize() {
 //         << " evt " << r.m_EvtNo << std::endl;
 //     }
 
-#ifdef TRASAN_WINDOW
-    static TWindow w("trasan");
-    w.skipAllWindow(false);
-    w.clear();
-    w.append(allHits);
-    w.append(_trackManager.tracks(), leda_green);
-    w.append(_trackManager.tracks2D(), leda_red);
-    w.wait();
-#endif
 #ifdef TRASAN_WINDOW_GTK
     AList<TLink> tmp;
     for (unsigned i = 0; i < (unsigned) _trackManager.tracks().length(); i++)
       tmp.append(_trackManager.tracks()[i]->links());
     w.endOfEvent();
     w.clear();
-    w.stage("Trasan : all tracking finished");
+    w.stage("Trasan : all finders finished");
     w.information("blue:reconstructed, red:reconstructed(2D), pink:not used");
     w.append(allHits, Gdk::Color("lightpink"));
 //  w.append(axialHits, Gdk::Color("lightpink"));
     w.append(tmp, Gdk::Color("blue"));
     w.append(_trackManager.tracks(), Gdk::Color("blue"));
     w.append(_trackManager.tracks2D(), Gdk::Color("red"));
-    w.skipEvent(true);
-    w.skip(false);
+//  w.skipEvent(true);
     w.run();
 
 //     Glib::RefPtr<Gtk::PrintOperation> op = Gtk::PrintOperation::create();
@@ -1634,71 +1623,6 @@ Trasan::initialize() {
       for (unsigned i = 0; i < nTrk; i++)
         allTracks[i]->_mc->dump("", "    ");
     }
-  }
-
-  void
-  Trasan::cathode(float window)
-  {
-//cnv
-//    // ... Clustering...
-//     _clustFinder->doit(_cdccat->striphits());
-
-
-//    //    const AList<TTrack> & allTracks = _trackManager.allTracks();
-//     const AList<TTrack> & tracks = _trackManager.tracks();
-
-//    // ... Cluster Matching with Track, Relations...
-//     unsigned i = 0;
-//     while (TTrack * t = tracks[i++]){
-//         t->findCatHit(i);
-//         t->relationClusterWithWire();
-//  t->relationClusterWithLayer(b_cathodeSystematics);
-//     }
-
-//    //... set status and estimate error ...
-//     _clustFinder->doit2();
-
-//     if(b_doClustFinder == 1 && b_cathodeSystematics){
-// //         unsigned i0 = 0;
-// //         while (TTrack * t = tracks[i0++]){
-
-// //           unsigned i1 = 0;
-// //           while(TRGCDCCatHit *cathit = t->catHits()[i1++]){
-
-// //             unsigned i2 = 0;
-// //             while(TRGCDCClust *clust = cathit->candclust()[i2++]){
-// //     if( clust->stat() == 1 ){
-// //               clust->zcalc( atan(t->helix().tanl()));
-// //               clust->esterz( atan(t->helix().tanl()));
-// //     }
-// //             }
-// //           }
-// //         }
-//     }
-
-//     if (b_debugLevel > 1) _clustFinder->dump2();
-
-//     //.... 3D fitting with cathode...
-//     if(b_doClustFinder > 1) {
-//       if( ! b_cathodeCosmic ){
-//        i = 0;
-//         while (TTrack * t = tracks[i++])
-//           t->fitWithCathode(window,b_cathodeSystematics);
-//       }else{
-//  TCosmicFitter catfitter( "cathode cosmic fitter" );
-//  i=0;
-//  float t0Offset(0.);
-//  while( TTrack * t = tracks[i++]){
-//    catfitter.fitWithCathode( *t , t0Offset,
-//            window, b_cathodeSystematics );
-//  }
-//       }
-//     }
-
-//     //... output to panther table...
-//      _clustFinder->saveClustTables();
-//     if (b_debugLevel > 1 ) _clustFinder->dumpClustTables();
-
   }
 
   void
@@ -2530,8 +2454,7 @@ start:
     }
 
     //...Conformal finder...
-//cnv  if (b_doConformalFinder) {
-    if (0) {
+    if (b_doConformalFinder) {
 
       CAList<Belle2::TRGCDCWireHit> unusedAxial;
       CAList<Belle2::TRGCDCWireHit> unusedStereo;

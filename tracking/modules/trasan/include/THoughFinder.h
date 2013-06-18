@@ -179,7 +179,7 @@ namespace Belle {
                    unsigned pt,
                    unsigned threshold);
     TTrack* build1(const TPoint2D& point,
-                   THoughPlane* planes[2][2],
+//                 THoughPlane* planes[2][2],
                    float charge,
                    unsigned pt,
                    unsigned threshold);
@@ -189,7 +189,7 @@ namespace Belle {
                       unsigned threshold,
                       AList<TLink> & hits);
     TTrack* build3(const TPoint2D& point,
-                   THoughPlane* planes[2],
+//                 THoughPlane* planes[2],
                    float charge,
                    unsigned pt,
                    unsigned threshold);

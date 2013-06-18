@@ -875,9 +875,11 @@ namespace Belle {
     return -1;
   }
 
-  int
-  TCurlFinder::nextSuperStereoLayerId(const unsigned superLayerId, const int in) const
-  {
+int
+TCurlFinder::nextSuperStereoLayerId(const unsigned,
+				    const int) const {
+//TCurlFinder::nextSuperStereoLayerId(const unsigned superLayerId,
+//				    const int in) const {
 #if defined(HO_DEBUG)
   std::cout << "TCurlFinder::nextSuperStereoLayerId" << std::endl;
 #endif
@@ -1115,13 +1117,13 @@ namespace Belle {
   m_tracks.removeAll();
   m_2dTracks.removeAll();
   if(m_unusedAxialHitsOnEachLayer!=NULL) {
-    for(int i=0;i<cdc.nAxialLayers();++i)
+    for(unsigned i=0;i<cdc.nAxialLayers();++i)
       m_unusedAxialHitsOnEachLayer[i].removeAll();
-    for(int i=0;i<cdc.nStereoLayers();++i)
+    for(unsigned i=0;i<cdc.nStereoLayers();++i)
       m_unusedStereoHitsOnEachLayer[i].removeAll();
-    for(int i=0;i<cdc.nAxialSuperLayers();++i)
+    for(unsigned i=0;i<cdc.nAxialSuperLayers();++i)
       m_unusedAxialHitsOnEachSuperLayer[i].removeAll();
-    for(int i=0;i<cdc.nStereoSuperLayers();++i)
+    for(unsigned i=0;i<cdc.nStereoSuperLayers();++i)
       m_unusedStereoHitsOnEachSuperLayer[i].removeAll();
   }
   m_hitsOnInnerSuperLayer.removeAll();
@@ -1360,8 +1362,9 @@ namespace Belle {
 #endif
   }
 
-  void
-  TCurlFinder::linkNeighboringWires(AList<TLink> *list, const unsigned num, bool stereo)
+void
+TCurlFinder::linkNeighboringWires(AList<TLink> *, const unsigned, bool)
+  //  TCurlFinder::linkNeighboringWires(AList<TLink> *list, const unsigned num, bool stereo)
   {
 #if defined(HO_DEBUG)
   std::cout << "TCurlFinder::linkNeighboringWires" << std::endl;
@@ -1504,10 +1507,13 @@ namespace Belle {
 // #endif
   }
 
-  void
-  TCurlFinder::linkNeighboringWiresSmallCell(AList<TLink> *list,
-                                             const unsigned num, bool stereo)
-  {
+void
+TCurlFinder::linkNeighboringWiresSmallCell(AList<TLink> *list,
+					   const unsigned num,
+					   bool) {
+// TCurlFinder::linkNeighboringWiresSmallCell(AList<TLink> *list,
+//                                            const unsigned num, bool stereo)
+
 #if defined(HO_DEBUG)
   std::cout << "TCurlFinder::linkNeighboringWiresSmallCell" << std::endl;
 #endif

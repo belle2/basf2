@@ -43,9 +43,11 @@ namespace Belle2 {
 	     "Hough Finder switch", 1);
     addParam("doHoughFinderCurlSearch", _tra.b_doHoughFinderCurlSearch,
 	     "Hough Finder curl search switch", 1);
+
     //...Conformal finder...
-    //    addParam("doConformalFinder", _tra.b_doConformalFinder,
-    //		    "Conformal Finder switch", 0);
+    addParam("doConformalFinder", _tra.b_doConformalFinder,
+	     "Conformal Finder switch", 1);
+
     //...CurlFinder...
     addParam("doCurlFinder", _tra.b_doCurlFinder,
 	     "Curl Finder switch", 0);

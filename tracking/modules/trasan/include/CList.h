@@ -48,20 +48,23 @@
 
 namespace Belle {
 
-  template <class T>
-  class  HepCList : public HepAListBase {
+template <class T>
+class  HepCList : public HepAListBase {
 
-  public:
+public:
 
+    /// Constructs a list with no objects.
     inline HepCList();
-    // Constructs a list with no objects.
 
+    /// Copy constructor
     inline HepCList(const HepCList<T> &);
-    // copy constructor
 
+    /// Constructor with AList
     inline HepCList(const HepAList<T> &);
+
+    /// Constructor with CAList
     inline HepCList(const HepConstAList<T> &);
-    // copy from an AList
+
 
     inline ~HepCList();
     // Destroys the list. All objects are destroyed.
@@ -165,11 +168,11 @@ namespace Belle {
     removeAll();
   }
 
-  template <class T>
-  inline HepCList<T>::HepCList(const HepCList<T> & l)
-  {
+template <class T>
+inline
+HepCList<T>::HepCList(const HepCList<T> & l) : HepAListBase() {
     append(l);
-  }
+}
 
   template <class T>
   inline HepCList<T>::HepCList(const HepAList<T> & l)

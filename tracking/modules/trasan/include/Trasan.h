@@ -357,9 +357,6 @@ namespace Belle {
     void selectUnusedHits(const CAList<Belle2::TRGCDCWireHit> & hits,
                           CAList<Belle2::TRGCDCWireHit> & unusedHits) const;
 
-    /// Cathode
-    void cathode(float);
-
     /// standard main loop.
     void main0(const CAList<Belle2::TRGCDCWireHit> & axialHits,
                const CAList<Belle2::TRGCDCWireHit> & stereoHits,

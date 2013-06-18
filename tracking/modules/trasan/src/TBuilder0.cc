@@ -906,7 +906,7 @@ discard:
 #endif
 
     //...For all stereo super layers...
-    for (unsigned isl = 0; isl < 5; isl++) {
+    for (unsigned isl = 0; isl < 4; isl++) {
       AList<TLink> tmpLine;
       AList<TLink> goodLine;
 
@@ -1109,8 +1109,11 @@ discard:
 
         //...Initialize
         // unsigned ily1 = firstStlayer(isl);
-        unsigned ily1 = (* Belle2::TRGCDC::getTRGCDC("1.0")->superLayer(isl * 2 + 1))[0]
-                        ->axialStereoLayerId();
+//d        unsigned ily1 = (* Belle2::TRGCDC::getTRGCDC("1.0")->superLayer(isl * 2 + 1))[0]
+//d                        ->axialStereoLayerId();
+        unsigned ily1 =
+	    (* Belle2::TRGCDC::getTRGCDC()->superLayer(isl * 2 + 1))[0]
+	    ->axialStereoLayerId();
 //      unsigned ily1 = TRGCDC::getTRGCDC("1.0")->superLayer(isl * 2 + 1)
 //    ->first()->axialStereoLayerId();
         unsigned ily2 = ily1 + 1;

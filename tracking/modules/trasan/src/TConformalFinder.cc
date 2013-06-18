@@ -1484,19 +1484,20 @@ namespace Belle {
     //...Termination...
     tracks = _3DTracks;
     tracks2D = _2DTracks;
-    ++_s->_nEvents;
-    unsigned n3 = _3DTracks.length();
-    for (unsigned i = 0; i < n3; i++)
-      if (_3DTracks[i]->finder() & TrackFastFinder)
-        ++_s->_nTracksFast3D;
-      else if (_3DTracks[i]->finder() & TrackSlowFinder)
-        ++_s->_nTracksSlow3D;
-    unsigned n2 = _2DTracks.length();
-    for (unsigned i = 0; i < n2; i++)
-      if (_2DTracks[i]->finder() & TrackFastFinder)
-        ++_s->_nTracksFast2D;
-      else if (_2DTracks[i]->finder() & TrackSlowFinder)
-        ++_s->_nTracksSlow2D;
+//cnv
+    // ++_s->_nEvents;
+    // unsigned n3 = _3DTracks.length();
+    // for (unsigned i = 0; i < n3; i++)
+    //   if (_3DTracks[i]->finder() & TrackFastFinder)
+    //     ++_s->_nTracksFast3D;
+    //   else if (_3DTracks[i]->finder() & TrackSlowFinder)
+    //     ++_s->_nTracksSlow3D;
+    // unsigned n2 = _2DTracks.length();
+    // for (unsigned i = 0; i < n2; i++)
+    //   if (_2DTracks[i]->finder() & TrackFastFinder)
+    //     ++_s->_nTracksFast2D;
+    //   else if (_2DTracks[i]->finder() & TrackSlowFinder)
+    //     ++_s->_nTracksSlow2D;
 
     if (debugLevel() > 1) {
       std::cout << name() << " ... # 3D tracks = " << _3DTracks.length()
@@ -1518,10 +1519,9 @@ namespace Belle {
     return 0;
   }
 
-  void
-
-  TConformalFinder::fastFinding3D(unsigned level)
-  {
+void
+TConformalFinder::fastFinding3D(unsigned) {
+//cnv TConformalFinder::fastFinding3D(unsigned level) {
 
 #ifdef TRASAN_DEBUG_DETAIL
     const std::string stage = "ConformalFastFinding3D level"
@@ -1534,92 +1534,93 @@ namespace Belle {
     AList<TSegment> bads;
     unsigned n = _2DTracks.length();
     for (unsigned i = 0; i < n; i++) {
-      const TTrack& t = * _2DTracks[i];
+	const TTrack& t = * _2DTracks[i];
 
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << "==> fast 3D building : " << t.name() << std::endl;
-      t.dump("hits sort flag", "    2D track hits=");
+	std::cout << "==> fast 3D building : " << t.name() << std::endl;
+	t.dump("hits sort flag", "    2D track hits=");
 #endif
-      AList<TSegment> segments = stereoSegments(t);
-      AList<TSegment> badSegments;
-      if (_stereoMode == 2)
-        badSegments = stereoSegmentsFromBadHits(t);
+	AList<TSegment> segments = stereoSegments(t);
+	AList<TSegment> badSegments;
+	if (_stereoMode == 2)
+	    badSegments = stereoSegmentsFromBadHits(t);
 
 #ifdef TRASAN_WINDOW
-      displayStatus("Conf::fast3D ... seed");
-      _rphiWindow.append(segments, leda_blue);
-      _rphiWindow.append(badSegments, leda_red);
-      _rphiWindow.oneShot(t, leda_green);
+	displayStatus("Conf::fast3D ... seed");
+	_rphiWindow.append(segments, leda_blue);
+	_rphiWindow.append(badSegments, leda_red);
+	_rphiWindow.oneShot(t, leda_green);
 #endif
 
-      //...Save a 2D track...
-      TTrack* s = NULL;
-      if (_stereoMode)
-        s = _builder.buildStereoNew(t, segments, badSegments);
-      else
-        s = _builder.buildStereo(t, segments);
-      HepAListDeleteAll(badSegments);
+	//...Save a 2D track...
+	TTrack* s = NULL;
+	if (_stereoMode)
+	    s = _builder.buildStereoNew(t, segments, badSegments);
+	else
+	    s = _builder.buildStereo(t, segments);
+	HepAListDeleteAll(badSegments);
 
-      if (! s) {
+	if (! s) {
 #ifdef TRASAN_DEBUG_DETAIL
-        std::cout << "... 3D failure" << std::endl;
+	    std::cout << "... 3D failure" << std::endl;
 #endif
 #ifdef TRASAN_WINDOW
-        displayStatus("Conf::fastd3D ... 3D failed");
-        _rphiWindow.append(segments, leda_blue);
-        _rphiWindow.oneShot(t, leda_red);
+	    displayStatus("Conf::fastd3D ... 3D failed");
+	    _rphiWindow.append(segments, leda_blue);
+	    _rphiWindow.oneShot(t, leda_red);
 #endif
-        continue;
-      }
+	    continue;
+	}
 
-      //...Quality check...
-      if (! TTrackManager::goodTrack(* s)) {
+	//...Quality check...
+	if (! TTrackManager::goodTrack(* s)) {
 #ifdef TRASAN_DEBUG_DETAIL
-        std::cout << "... 3D failure (bad quality)" << std::endl;
+	    std::cout << "... 3D failure (bad quality)" << std::endl;
 #endif
 #ifdef TRASAN_WINDOW
-        displayStatus("Conf::fastd3D ... 3D failed (bad quality)");
-        _rphiWindow.append(segments, leda_blue);
-        _rphiWindow.oneShot(* s, leda_red);
+	    displayStatus("Conf::fastd3D ... 3D failed (bad quality)");
+	    _rphiWindow.append(segments, leda_blue);
+	    _rphiWindow.oneShot(* s, leda_red);
 #endif
-        if (s->finder() & TrackFastFinder)
-          ++_s->_nTracksFast2DBadQuality;
-        else if (s->finder() & TrackSlowFinder)
-          ++_s->_nTracksSlow2DBadQuality;
 
-        deleteTrack(* s);
-        continue;
-      }
+//cnv        if (s->finder() & TrackFastFinder)
+        //   ++_s->_nTracksFast2DBadQuality;
+        // else if (s->finder() & TrackSlowFinder)
+        //   ++_s->_nTracksSlow2DBadQuality;
 
-      //...New name...
-      s->name(t.name() + "-3D");
+	    deleteTrack(* s);
+	    continue;
+	}
+
+	//...New name...
+	s->name(t.name() + "-3D");
 
 #ifdef TRASAN_WINDOW
-      displayStatus("Conf::fastd3D ... 3D ok");
-      _rphiWindow.append(segments, leda_blue);
-      _rphiWindow.oneShot(* s, leda_green);
+	displayStatus("Conf::fastd3D ... 3D ok");
+	_rphiWindow.append(segments, leda_blue);
+	_rphiWindow.oneShot(* s, leda_green);
 #endif
 
-      //...Salvage by segments...
-      salvage(* s, 3, bads);
-      tracks3D.append(s);
-      touched.append(_2DTracks[i]);
-      s->assign(CellHitConformalFinder);
-      s->quality(0);
+	//...Salvage by segments...
+	salvage(* s, 3, bads);
+	tracks3D.append(s);
+	touched.append(_2DTracks[i]);
+	s->assign(CellHitConformalFinder);
+	s->quality(0);
 
-      //...Segment...
-      static AList<TTrack> tmp;
-      tmp.removeAll();
-      tmp.append(s);
-      removeUsedSegments(tmp);
+	//...Segment...
+	static AList<TTrack> tmp;
+	tmp.removeAll();
+	tmp.append(s);
+	removeUsedSegments(tmp);
 
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << "... 3D finished : " << s->name() << std::endl;
-      s->dump("detail", "    ");
+	std::cout << "... 3D finished : " << s->name() << std::endl;
+	s->dump("detail", "    ");
 #endif
 #ifdef TRASAN_WINDOW
-      displayStatus("Conf::fastd3D ... finished");
-      _rphiWindow.oneShot(* s, leda_green);
+	displayStatus("Conf::fastd3D ... finished");
+	_rphiWindow.oneShot(* s, leda_green);
 #endif
     }
 
@@ -1628,14 +1629,14 @@ namespace Belle {
     _2DTracks.remove(tracks3D);
     _2DTracks.remove(touched);
     for (unsigned i = 0; i < (unsigned) touched.length(); i++) {
-      deleteTrack(* touched[i]);
-      // saved[i]->fit();
+	deleteTrack(* touched[i]);
+	// saved[i]->fit();
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
     LeaveStage(stage);
 #endif
-  }
+}
 
 #ifdef TRASAN_WINDOW
   void
@@ -1794,10 +1795,10 @@ namespace Belle {
     return true;
   }
 
-  void
+void
+TConformalFinder::fastFinding2D(unsigned) {
+//cnv  TConformalFinder::fastFinding2D(unsigned level) {
 
-  TConformalFinder::fastFinding2D(unsigned level)
-  {
     // no_superlyr
     const Belle2::TRGCDC& cdc(*Belle2::TRGCDC::getTRGCDC());
 //cnv  unsigned nSuperLayers = cdc.nSuperLayers();
@@ -1814,105 +1815,105 @@ namespace Belle {
     unsigned seedLayer = 6;
     while ((seedLayer--) > 2) {
 
-      //...Seed loop...
-      AList<TTrack> trackCandidates;
-      unsigned n = segments[seedLayer].length();
-      for (unsigned i = 0; i < n; i++) {
-        TSegment& seed = * segments[seedLayer][i];
-        std::string name = "f" + itostring(nTrial + idBase);
+	//...Seed loop...
+	AList<TTrack> trackCandidates;
+	unsigned n = segments[seedLayer].length();
+	for (unsigned i = 0; i < n; i++) {
+	    TSegment& seed = * segments[seedLayer][i];
+	    std::string name = "f" + itostring(nTrial + idBase);
 
 #ifdef TRASAN_DEBUG_DETAIL
-        std::cout << Tab() << "super layer " << seedLayer << "," << i
-                  << std::endl;
-        seed.dump("link", Tab());
+	    std::cout << Tab() << "super layer " << seedLayer << "," << i
+		      << std::endl;
+	    seed.dump("link", Tab());
 #endif
 
-        //...Check uniqueness...
-        AList<TSegment> seeds;
-        if (NUniqueLinks(seed) > 1) {
-          seeds = UniqueLinks(seed);
-        } else if (NMajorLinks(seed) > 1) {
-          seeds = MajorLinks(seed);
-        } else {
-          continue;
-        }
-        seeds.append(seed);
+	    //...Check uniqueness...
+	    AList<TSegment> seeds;
+	    if (NUniqueLinks(seed) > 1) {
+		seeds = UniqueLinks(seed);
+	    } else if (NMajorLinks(seed) > 1) {
+		seeds = MajorLinks(seed);
+	    } else {
+		continue;
+	    }
+	    seeds.append(seed);
 
-        //...Refine...
-refine:
+	    //...Refine...
+	refine:
 
 #ifdef TRASAN_WINDOW
-        displayStatus("Conf::fast2D ... seed segments");
-        _rphiWindow.oneShot(seeds, leda_green);
+	    displayStatus("Conf::fast2D ... seed segments");
+	    _rphiWindow.oneShot(seeds, leda_green);
 #endif
 #ifdef TRASAN_DEBUG_DETAIL
-        std::cout << Tab() << "seed layer = " << seedLayer << "," << name
-                  << std::endl;
+	    std::cout << Tab() << "seed layer = " << seedLayer << "," << name
+		      << std::endl;
 #endif
 
-        //...Try to build a track...
-        TTrack* t = _builder.buildRphi(seeds);
-        ++nTrial;
+	    //...Try to build a track...
+	    TTrack* t = _builder.buildRphi(seeds);
+	    ++nTrial;
 
-        //...Track check...
-        if (! t) continue;
-        t->name(name);
-        bool ok = quality2D(* t, 0);
-        if (! ok) {
-          deleteTrack(* t);
-          continue;
-        }
+	    //...Track check...
+	    if (! t) continue;
+	    t->name(name);
+	    bool ok = quality2D(* t, 0);
+	    if (! ok) {
+		deleteTrack(* t);
+		continue;
+	    }
 
-        //...Bad segment rejection...
-        AList<TSegment> bads = removeBadSegments(* t);
-        if (bads.length()) {
-          ok = quality2D(* t, 1);
-          if (! ok) {
-            seeds = refineSegments(* t);
-            if ((unsigned) seeds.length() >= _minNSegments) {
-              deleteTrack(* t);
-              goto refine;
-            }
-            deleteTrack(* t);
-            continue;
-          }
-        }
+	    //...Bad segment rejection...
+	    AList<TSegment> bads = removeBadSegments(* t);
+	    if (bads.length()) {
+		ok = quality2D(* t, 1);
+		if (! ok) {
+		    seeds = refineSegments(* t);
+		    if ((unsigned) seeds.length() >= _minNSegments) {
+			deleteTrack(* t);
+			goto refine;
+		    }
+		    deleteTrack(* t);
+		    continue;
+		}
+	    }
 
-        //...Salvage by segments...
-        salvage(* t, 1, bads);
-        refineLinks(* t, 3);
-        ok = quality2D(* t, 2);
-        if (! ok) {
-          deleteTrack(* t);
-          continue;
-        }
+	    //...Salvage by segments...
+	    salvage(* t, 1, bads);
+	    refineLinks(* t, 3);
+	    ok = quality2D(* t, 2);
+	    if (! ok) {
+		deleteTrack(* t);
+		continue;
+	    }
 
-        //...Append segments...
-        if (TLink::nSuperLayers(t->links()) < cdc.nAxialSuperLayers()) {
-          t = expand(* t);
-        }
+	    //...Append segments...
+	    if (TLink::nSuperLayers(t->links()) < cdc.nAxialSuperLayers()) {
+		t = expand(* t);
+	    }
 
 #ifdef TRASAN_DEBUG_DETAIL
-        std::cout << Tab() << "2D finished:" << t->name() << std::endl;
-        t->dump("hits sort flag pull", Tab(+1));
+	    std::cout << Tab() << "2D finished:" << t->name() << std::endl;
+	    t->dump("hits sort flag pull", Tab(+1));
 #endif
 #ifdef TRASAN_WINDOW
-        displayStatus("Conf::fast2D ... finished");
-        _rphiWindow.oneShot(* t, leda_green);
+	    displayStatus("Conf::fast2D ... finished");
+	    _rphiWindow.oneShot(* t, leda_green);
 #endif
 
-        t->finder(TrackFastFinder);
-        t->quality(TrackQuality2D);
-        t->fitting(TrackFitGlobal);
-        trackCandidates.append(t);
-      }
+	    t->finder(TrackFastFinder);
+	    t->quality(TrackQuality2D);
+	    t->fitting(TrackFitGlobal);
+	    trackCandidates.append(t);
+	}
 
-      //...Resolve multi-track candidates...
-      resolveSegments(trackCandidates);
+	//...Resolve multi-track candidates...
+	resolveSegments(trackCandidates);
 
-      //...Remove used segments...
-      removeUsedSegments(trackCandidates);
-      _2DTracks.append(trackCandidates);
+	//...Remove used segments...
+	removeUsedSegments(trackCandidates);
+	_2DTracks.append(trackCandidates);
     }
 
     resolveHits(_2DTracks);
@@ -1920,7 +1921,7 @@ refine:
 #ifdef TRASAN_DEBUG_DETAIL
     LeaveStage(stage);
 #endif
-  }
+}
 
   const Belle2::TRGCDCWire*
   TConformalFinder::conformal2Wire(const HepGeom::Point3D<double> & p)
@@ -2501,10 +2502,9 @@ refine:
     return outList;
   }
 
-  void
-
-  TConformalFinder::slowFinding2D(unsigned level)
-  {
+void
+TConformalFinder::slowFinding2D(unsigned) {
+// TConformalFinder::slowFinding2D(unsigned level) {
 #ifdef TRASAN_DEBUG_DETAIL
     const std::string stage = "ConformalSlowFinding2D level"
                               + itostring(level);

@@ -309,7 +309,8 @@ namespace Belle {
   }
 
   int
-  TCosmicFitter::fit(TTrackBase& b, float t0Offset) const
+  TCosmicFitter::fit(TTrackBase& b, float) const
+  //  TCosmicFitter::fit(TTrackBase& b, float t0Offset) const
   {
 
 #ifdef TRASAN_DEBUG_DETAIL
@@ -619,8 +620,10 @@ namespace Belle {
 
 // addition by matsu ( 1999/07/05 )
   int
-  TCosmicFitter::fitWithCathode(TTrackBase& b, float t0Offset,
-                                float windowSize , int SysCorr)
+  TCosmicFitter::fitWithCathode(TTrackBase& b, float,
+                                float, int)
+  // TCosmicFitter::fitWithCathode(TTrackBase& b, float t0Offset,
+  //                                float windowSize , int SysCorr)
   {
 
 #ifdef TRASAN_DEBUG_DETAIL

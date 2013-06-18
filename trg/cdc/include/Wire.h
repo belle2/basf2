@@ -161,7 +161,8 @@ TRGCDCWire::adjacent(const TRGCDCWire & w) const {
 
 #ifdef FOR_TRASAN
 inline 
-int TRGCDCWire::localIdForPlus(void) const {
+int
+TRGCDCWire::localIdForPlus(void) const {
   //
   // used in curl finder
   //
@@ -169,14 +170,18 @@ int TRGCDCWire::localIdForPlus(void) const {
   //
   //ho  const TCDCLayer &l = *layer();
   //ho  const int nw = l.nWires();
-  const TRGCDCLayer &l = this->layer();
-  const int nw = l.nCells();
-  if(localId()+1==nw) return -1;
-  else return localId();
+
+    const TRGCDCLayer & l = this->layer();
+    const unsigned nw = l.nCells();
+    if (localId() + 1 == nw)
+	return -1;
+    else
+	return localId();
 }
  
-inline 
-int TRGCDCWire::localIdForMinus(void) const {
+inline
+int
+TRGCDCWire::localIdForMinus(void) const {
   //
   // used in curl finder
   //
@@ -184,10 +189,13 @@ int TRGCDCWire::localIdForMinus(void) const {
   //
   //ho  const TRGCDCLayer &l = *layer();
   //ho const int nw = l.nWires();
+
   const TRGCDCLayer &l = this->layer();
-  const int nw = l.nCells();
-  if(0==localId()) return nw;
-  else return localId();
+  const unsigned nw = l.nCells();
+  if (0 == localId())
+      return nw;
+  else
+      return localId();
 }
 #endif
 

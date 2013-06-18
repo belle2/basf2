@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Petric                                             *
+ * Contributors: Marko Petric, Marko Staric                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -75,6 +75,8 @@ namespace Belle2 {
       std::string m_outputDigits;    /**< Output collection name */
       double m_timeZeroJitter;       /**< r.m.s of T0 jitter */
       double m_electronicJitter;     /**< r.m.s of electronic jitter */
+      double m_electronicEfficiency; /**< electronic efficiency */
+      double m_darkNoise;            /**< uniform dark noise (hits per bar) */
 
       //! Geometry parameters reading object
       TOPGeometryPar* m_topgp;

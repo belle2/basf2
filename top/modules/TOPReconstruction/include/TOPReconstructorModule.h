@@ -111,6 +111,12 @@ namespace Belle2 {
       int m_debugLevel;         /**< debug level */
       double m_minBkgPerBar;    /**< minimal assumed background photons per bar */
       double m_scaleN0;         /**< scale factor for N0 */
+      double m_sigmaRphi;    /**< track smearing in Rphi (r.m.s) */
+      double m_sigmaZ;       /**< track smearing in Z (r.m.s) */
+      double m_sigmaTheta;   /**< track smearing in Theta (r.m.s) */
+      double m_sigmaPhi;     /**< track smearing in Phi (r.m.s) */
+
+      bool m_smearTrack;     /**< set to true, if at least one sigma > 0 */
 
       // Geometry parameters
 

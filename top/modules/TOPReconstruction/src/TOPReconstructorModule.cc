@@ -57,7 +57,7 @@ namespace Belle2 {
     //-----------------------------------------------------------------
 
     TOPReconstructorModule::TOPReconstructorModule() : Module(),
-      m_debugLevel(0),
+      m_smearTrack(false),
       m_topgp(TOPGeometryPar::Instance()),
       m_R1(0),
       m_R2(0),
@@ -80,6 +80,11 @@ namespace Belle2 {
       addParam("minBkgPerBar", m_minBkgPerBar,
                "Minimal number of background photons per bar", 0.0);
       addParam("scaleN0", m_scaleN0, "Scale factor for N0", 1.0);
+      addParam("sigmaRphi", m_sigmaRphi , "track smearing sigma in Rphi [cm]", 0.0);
+      addParam("sigmaZ", m_sigmaZ , "track smearing sigma in Z [cm]", 0.0);
+      addParam("sigmaTheta", m_sigmaTheta , "track smearing sigma in Theta [radians]",
+               0.0);
+      addParam("sigmaPhi", m_sigmaPhi , "track smearing sigma in Phi [radians]", 0.0);
 
       for (int i = 0; i < c_Nhyp; i++) {m_Masses[i] = 0;}
 
@@ -98,8 +103,8 @@ namespace Belle2 {
       m_Masses[3] = Const::kaon.getMass();
       m_Masses[4] = Const::proton.getMass();
 
-      // Print module parameters
-      printModuleParams();
+      m_smearTrack = m_sigmaRphi > 0 || m_sigmaZ > 0 || m_sigmaTheta > 0 ||
+                     m_sigmaPhi > 0;
 
       // Data store registration
       StoreArray<TOPLikelihood>::registerPersistent(m_outputLikelihoods);
@@ -151,6 +156,14 @@ namespace Belle2 {
       std::vector<TOPtrack> tracks; // extrapolated tracks
       getTracks(tracks, Const::pion); // use pion hypothesis
       if (tracks.empty()) return;
+
+      // optional track smearing (needed for some MC studies)
+      if (m_smearTrack) {
+        for (unsigned int i = 0; i < tracks.size(); i++) {
+          tracks[i].smear(m_sigmaRphi, m_sigmaZ, m_sigmaTheta, m_sigmaPhi);
+        }
+        B2INFO("TOPReconstructor: additional smearing of track parameters done");
+      }
 
       // create reconstruction object
 
@@ -263,7 +276,7 @@ namespace Belle2 {
           QE[i] = m_topgp->getQE(i);
           Wavelength[i] = m_topgp->getLambdaFirst() + m_topgp->getLambdaStep() * i;
         }
-        setQE(Wavelength, QE, size, m_topgp->getColEffi());
+        setQE(Wavelength, QE, size, m_topgp->getColEffi() * m_topgp->getELefficiency());
       }
 
       setTDC(m_topgp->getTDCbits(), m_topgp->getTDCbitwidth());

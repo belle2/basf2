@@ -46,8 +46,8 @@ namespace Belle2 {
       /**< Destructor */
       virtual ~TOPGeometryPar();
 
-      /** Static method to get a reference to the TOPGeometryPar instance.
-       * @return A reference to an instance of this class.
+      /** Static method to obtain a pointer to the TOPGeometryPar instance.
+       * @return pointer to the instance of this class.
        */
       static TOPGeometryPar* Instance();
 
@@ -73,10 +73,15 @@ namespace Belle2 {
       /** to return values in Gean units */
       void setGeanUnits() {m_unit = Unit::mm;}
 
-      /** Set electronics jitter
-       * @param jitter rms of electronics jitter in ns
+      /** Set electronic jitter
+       * @param jitter rms of electronic jitter in ns
        */
       void setELjitter(double jitter) {m_ELjitter = jitter;}
+
+      /** Set electronic efficiency
+       * @param effi efficiency
+       */
+      void setELefficiency(double effi) {m_ELefficiency = effi;}
 
       //! Selectors
 
@@ -140,17 +145,17 @@ namespace Belle2 {
        */
       double getWextdown() const {return m_Wextdown / m_unit; }
 
-      /** get width of glue between wedge and bar segment 1
+      /** Get width of glue between wedge and bar segment 1
        * @return width of the glue joint 1
        */
       double getGwidth1() const {return m_Gwidth1 / m_unit; }
 
-      /** get width of glue between bar segment 1 and 2
+      /** Get width of glue between bar segment 1 and 2
        * @return width of the glue joint 2
        */
       double getGwidth2() const {return m_Gwidth2 / m_unit; }
 
-      /** get width of glue between bar segment 2 and segment 3
+      /** Get width of glue between bar segment 2 and segment 3
        * @return width of the glue joint 3
        */
       double getGwidth3() const {return m_Gwidth3 / m_unit; }
@@ -257,10 +262,15 @@ namespace Belle2 {
        */
       double getTDCbitwidth() const {return m_TDCwidth; }
 
-      /** Get electronics jitter
-       * @return rms of electronics jitter in ns
+      /** Get electronic jitter
+       * @return rms of electronic jitter in ns
        */
       double getELjitter() const {return m_ELjitter; }
+
+      /** Get electronic efficiency
+       * @return efficiency
+       */
+      double getELefficiency() const {return m_ELefficiency; }
 
       /** Get number of Gaussian terms for TTS distribution
        * @return number of Gaussian terms
@@ -448,7 +458,8 @@ namespace Belle2 {
       double m_TDCwidth;          /**< width of a bit in [ns] */
 
       //! electronics jitter
-      double m_ELjitter;          /**< rms of electronics jitter*/
+      double m_ELjitter;          /**< rms of electronic jitter */
+      double m_ELefficiency;      /**< electronic efficiency */
 
       //! time transition spread (TTS) defined as a sum of Gaussian terms
 

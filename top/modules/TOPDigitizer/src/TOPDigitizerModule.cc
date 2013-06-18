@@ -61,6 +61,10 @@ namespace Belle2 {
       addParam("timeZeroJitter", m_timeZeroJitter, "r.m.s of T0 jitter [ns]", 25e-3);
       addParam("electronicJitter", m_electronicJitter,
                "r.m.s of electronic jitter [ns]", 50e-3);
+      addParam("electronicEfficiency", m_electronicEfficiency,
+               "electronic efficiency", 1.0);
+      addParam("darkNoise", m_darkNoise,
+               "uniformly distributed dark noise (hits per bar)", 0.0);
 
     }
 
@@ -74,11 +78,9 @@ namespace Belle2 {
       StoreArray<TOPDigit>::registerPersistent(m_outputDigits);
       RelationArray::registerPersistent<TOPSimHit, TOPDigit>(m_inputSimHits, m_outputDigits);
 
-      // print parameters
-      printModuleParams();
-
-      // store electronics jitter to make it known for reconstruction
+      // store electronics jitter and efficiency to make it known for reconstruction
       m_topgp->setELjitter(m_electronicJitter);
+      m_topgp->setELefficiency(m_electronicEfficiency);
     }
 
     void TOPDigitizerModule::beginRun()
@@ -112,6 +114,11 @@ namespace Belle2 {
 
       int nHits = topSimHits.getEntries();
       for (int iHit = 0; iHit < nHits; iHit++) {
+
+        // simulate electronic efficiency
+        if (gRandom->Rndm() > m_electronicEfficiency) continue;
+
+        // take simulated hit
         TOPSimHit* aSimHit = topSimHits[iHit];
 
         // Do spatial digitization
@@ -128,7 +135,7 @@ namespace Belle2 {
 
         // convert to TDC digits
         if (time < 0) continue;
-        if (time > Tmax) time = Tmax;
+        if (time > Tmax) continue;
         int TDC = int(time / TDCwidth);
         if (TDC > maxTDC) TDC = maxTDC;
 
@@ -139,6 +146,22 @@ namespace Belle2 {
         int iDigit = topDigits.getEntries() - 1;
         relSimHitToDigit.add(iHit, iDigit);
 
+      }
+
+      // add randomly distributed electronic noise
+      if (m_darkNoise <= 0) return;
+
+      int Nbars = m_topgp->getNbars();
+      int Nchannels = m_topgp->getNpmtx() * m_topgp->getNpmty() *
+                      m_topgp->getNpadx() * m_topgp->getNpady();
+
+      for (int barID = 1; barID < Nbars + 1; barID++) {
+        int NoiseHits = gRandom->Poisson(m_darkNoise);
+        for (int i = 0; i < NoiseHits; i++) {
+          int channelID = int(gRandom->Rndm() * Nchannels) + 1;
+          int TDC = int(gRandom->Rndm() * maxTDC);
+          new(topDigits.nextFreeAddress()) TOPDigit(barID, channelID, TDC);
+        }
       }
 
     }
@@ -156,8 +179,6 @@ namespace Belle2 {
 
     void TOPDigitizerModule::printModuleParams() const
     {
-      B2INFO("TOPDigitizer: T0 jitter (rms) = " << m_timeZeroJitter);
-      B2INFO("TOPDigitizer: electronic jitter (rms) = " << m_electronicJitter);
     }
 
     double TOPDigitizerModule::PMT_TTS()

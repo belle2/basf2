@@ -141,7 +141,7 @@ void ECLDigitizerModule::event()
 
       for (int T_clock = 0; T_clock < 31; T_clock++) {
         AdcNoise[T_clock] = 0;
-        for (int iCal = 0; iCal < 31; iCal++) {
+        for (int iCal = 0; iCal < T_clock; iCal++) {
           AdcNoise[T_clock] = m_vmat[T_clock][iCal] * genNoise[iCal] + AdcNoise[T_clock];
         }
       }

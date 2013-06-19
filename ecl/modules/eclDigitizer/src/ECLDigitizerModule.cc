@@ -107,7 +107,7 @@ void ECLDigitizerModule::event()
 
   double dt = .02; //delta t for interpolation
   int n = 1250;//provide a shape array for interpolation
-  double DeltaT = (24. - gRandom->Uniform(0, 24));
+  double DeltaT =  gRandom->Uniform(0, 24);
 
   for (int ii = 0; ii <  eclArray.getEntries(); ii++) {
 
@@ -121,10 +121,9 @@ void ECLDigitizerModule::event()
 
     for (int T_clock = 0; T_clock < 31; T_clock++) {
       double timeInt =  DeltaT * 12. / 508.; //us
-      sampleTime = (24. * 12. / 508.)  * (T_clock - 15) - hitTimeAve - timeInt ;
+      sampleTime = (24. * 12. / 508.)  * (T_clock - 15) - hitTimeAve - timeInt + 0.32 ;//There is some time shift~0.32 us that is found Alex 2013.06.19.
       //test_A[T_clock] = ShaperDSP(sampleTime);
       DspSamplingArray(&n, &sampleTime, &dt, m_ft, &test_A[T_clock]);//interpolation from shape array n=1250; dt =20ns
-
       HitEnergy[hitCellId][T_clock] = test_A[T_clock]  * hitE  +  HitEnergy[hitCellId][T_clock];
     }//for T_clock 31 clock
 
@@ -150,7 +149,8 @@ void ECLDigitizerModule::event()
       }//for T_clock 31 clock
 
       m_n16 = 16;
-      m_ttrig = int(DeltaT) / 2 + 13;
+      m_ttrig = int(DeltaT) ;
+      if (m_ttrig < 0)m_ttrig = 0;
       if (m_ttrig > 23)m_ttrig = 23;
 
       shapeFitter(&(m_id[0][0]), &(m_f[0][0]), &(m_f1[0][0]), &(m_fg41[0][0]), &(m_fg43[0][0]), &(m_fg31[0][0]), &(m_fg32[0][0]), &(m_fg33[0][0]), &(FitA[0]), &m_ttrig,  &m_n16, &m_ch, &m_lar, &m_ltr, &m_lq);
@@ -460,7 +460,9 @@ void ECLDigitizerModule::shapeFitter(short int* id, int* f, int* f1, int* fg41, 
   if (*ttrig < 0) {cout << "*Ttrig  Warning" << *ttrig << endl; *ttrig = 0;}
 
 
-  it0 = 96 + ((12 - *ttrig) << 3);
+//  it0 = 96 + ((12 - *ttrig) << 3);Alex kuzmin modify 2013.06.18
+  it0 = 144 - ((*ttrig) << 2);
+
 
   it_h = 191;
   it_l = 0;

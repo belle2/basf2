@@ -102,6 +102,7 @@ void ECLReconstructorModule::event()
   for (int ii = 0; ii < hitNum; ii++) {
     ECLDigit* aECLDigi = eclDigiArray[ii];
     float FitEnergy    = (aECLDigi->getAmp()) / 20000.;//ADC count to GeV
+    //float FitTime      =  (1520 - aECLDigi->getTimeFit())*24.*12/508/(3072/2) ;//in us
 
     int cId          = (aECLDigi->getCellId() - 1);
     if (FitEnergy < 0.) {continue;}

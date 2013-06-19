@@ -54,9 +54,8 @@ void MixBkgModule::initialize()
   }
 
   //Add the background ROF Root files to the background mixing library
-  for (vector<string>::iterator listIter = m_fileNames.begin(); listIter != m_fileNames.end(); ++listIter) {
+  for (vector<string>::iterator listIter = m_fileNames.begin(); listIter != m_fileNames.end(); ++listIter)
     m_mixBackground.addFile(*listIter);
-  }
 
   B2INFO("============================================================")
   B2INFO("       SimHit Class       |    #ROF max    |    #ROF min    ")

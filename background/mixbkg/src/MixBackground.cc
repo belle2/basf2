@@ -62,13 +62,13 @@ void MixBackground::addFile(const std::string& filename)
   chain.Add(filename.c_str());
 
   //Loop over the files and add them into the correct section
-  TObjArray* fileElements = chain.GetListOfFiles();
-  TIter next(fileElements);
-  TChainElement* chEl = 0;
-  int index = 0;
-  while ((chEl = (TChainElement*)next())) {
-    TFile* file = TFile::Open(chEl->GetTitle());
-    chain.GetEntry(index);
+  int iTree = -1;
+  for (int iEntry = 0; iEntry < chain.GetEntries(); ++iEntry) {
+    chain.GetEntry(iEntry);
+    if (chain.GetTreeNumber() == iTree) continue;
+    // New file, and this is its first entry
+    iTree = chain.GetTreeNumber();
+    string currentFileName(chain.GetCurrentFile()->GetName());
 
     //Check if all files have the same MCParticleWriteMode to ensure consistency.
     if (m_mcParticleWriteMode < 0) {
@@ -107,9 +107,8 @@ void MixBackground::addFile(const std::string& filename)
     }
 
     //Add the background ROF Root file to the subdetector
-    mapIter->second->addFile(*bkgComponent, *bkgGenerator, chEl->GetTitle(), *bkgSimHitCollection, *bkgSimHitRelation);
+    mapIter->second->addFile(*bkgComponent, *bkgGenerator, currentFileName, *bkgSimHitCollection, *bkgSimHitRelation);
 
-    index++;
   }
 
   delete bkgComponent;

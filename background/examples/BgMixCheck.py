@@ -105,17 +105,17 @@ def decodeBg(tag):
         elif tag == bg_codes['bg_twoPhoton']:
             return ('TwoPhoton', 'BDK')
         elif tag == bg_codes['bg_Touschek_LER']:
-            return ('Touschek', 'SAD_LER')
+            return ('Touschek', 'LER')
         elif tag == bg_codes['bg_Touschek_HER']:
-            return ('Touschek', 'SAD_HER')
+            return ('Touschek', 'HER')
         elif tag == bg_codes['bg_RBB_LER']:
-            return ('RBB', 'BBBREMS_LER')
+            return ('RBB', 'LER')
         elif tag == bg_codes['bg_RBB_HER']:
-            return ('RBB', 'BBBREMS_HER')
+            return ('RBB', 'HER')
         elif tag == bg_codes['bg_Coulomb_LER']:
-            return ('Coulomb', 'SAD_LER')
+            return ('Coulomb', 'LER')
         elif tag == bg_codes['bg_Coulomb_HER']:
-            return ('Coulomb', 'SAD_HER')
+            return ('Coulomb', 'HER')
         else:
             raise Exception(tag)
     except Exception, badBgTag:
@@ -142,7 +142,11 @@ for file_name in sys.argv[1:n_files]:
     for record in ctree:
         detector = subdetectorNames[record.Subdetector]
         component = str(record.Component)
-        generator = str(record.Generator)
+        # generator may be whatever, but hopefully contains HER/LER
+        if str(record.Generator).upper().find('LER') > -1:
+            generator = 'LER'
+        else:
+            generator = 'HER'
     print file_name + ':' + '\tDetector: ' + str(detector) + '\tComponent: ' \
         + str(component) + '\tGenerator: ' + str(generator)
     # Add this beauty to the background structure

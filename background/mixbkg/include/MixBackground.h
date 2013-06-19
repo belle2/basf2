@@ -50,7 +50,7 @@ namespace Belle2 {
        * Adds a new ROF Root file to the background mixing library.
        * The file content is read and the file is automatically loaded into the correct Component/Generator section.
        * @param filename The filename of the ROF Root file. Follows the same rules as explained in the TChain.Add() method.
-       * */
+       */
       void addFile(const std::string& filename);
 
       /**

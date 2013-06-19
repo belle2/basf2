@@ -118,6 +118,8 @@ void ECLDigitizerModule::event()
     double hitTimeAve       =  aECLHit->getTimeAve()   / Unit::us;
     double sampleTime ;
 
+
+    if (hitTimeAve > 8.5) { continue;}
     E_tmp[hitCellId] = hitE + E_tmp[hitCellId];//for summation deposit energy; do fit if this summation > 0.1 MeV
 
     for (int T_clock = 0; T_clock < 31; T_clock++) {

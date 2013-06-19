@@ -846,7 +846,7 @@ TRGCDC::terminate(void) {
       w._timing.name(w.name());
 
       //...Simulated drift distance...
-#ifndef FOR_TRASAN
+#if 0
       const double driftLength =
 	  _clockFE.absoluteTime(w._timing[0]->time()) * 40 / 10 / 1000;
       const double driftLengthError = 0.15;

@@ -77,13 +77,11 @@ class TRGCDCWire : public TRGCDCCell {
     /// returns true if a given wire is adjacent.
     bool adjacent(const TRGCDCWire &) const;
 
-#ifdef FOR_TRASAN
     /// returns localId but if maxLocalId, return -1.
     int localIdForPlus(void) const;
 
     /// returns localId but if 0, return maxLocalId + 1.
     int localIdForMinus(void) const;
-#endif
 
     /// returns name.
     std::string name(void) const;
@@ -159,7 +157,6 @@ TRGCDCWire::adjacent(const TRGCDCWire & w) const {
     return false;
 }
 
-#ifdef FOR_TRASAN
 inline 
 int
 TRGCDCWire::localIdForPlus(void) const {
@@ -197,7 +194,6 @@ TRGCDCWire::localIdForMinus(void) const {
   else
       return localId();
 }
-#endif
 
 inline
 const TRGSignal &

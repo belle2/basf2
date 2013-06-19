@@ -62,7 +62,7 @@ namespace Belle {
 
   public: // Static functions
 //    static void initializeGTK(void);
-    void run(void);
+    void run(bool forceToRun = false);
 
   public: // Others
     /// Set and pack drawing area.

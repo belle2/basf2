@@ -1520,8 +1520,7 @@ namespace Belle {
   }
 
 void
-TConformalFinder::fastFinding3D(unsigned) {
-//cnv TConformalFinder::fastFinding3D(unsigned level) {
+TConformalFinder::fastFinding3D(unsigned level) {
 
 #ifdef TRASAN_DEBUG_DETAIL
     const std::string stage = "ConformalFastFinding3D level"
@@ -1796,8 +1795,7 @@ TConformalFinder::fastFinding3D(unsigned) {
   }
 
 void
-TConformalFinder::fastFinding2D(unsigned) {
-//cnv  TConformalFinder::fastFinding2D(unsigned level) {
+TConformalFinder::fastFinding2D(unsigned level) {
 
     // no_superlyr
     const Belle2::TRGCDC& cdc(*Belle2::TRGCDC::getTRGCDC());
@@ -2503,8 +2501,8 @@ TConformalFinder::fastFinding2D(unsigned) {
   }
 
 void
-TConformalFinder::slowFinding2D(unsigned) {
-// TConformalFinder::slowFinding2D(unsigned level) {
+TConformalFinder::slowFinding2D(unsigned level) {
+
 #ifdef TRASAN_DEBUG_DETAIL
     const std::string stage = "ConformalSlowFinding2D level"
                               + itostring(level);

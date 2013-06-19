@@ -150,17 +150,19 @@ namespace Belle {
 //     GtkMain = main_instance.instance();
 // }
 
-  void
-  TWindowGTK::run(void)
-  {
+void
+TWindowGTK::run(bool forceToRun) {
     int argc = 0;
     char** argv = 0;
     Gtk::Main main_instance(argc, argv);
     show();
-    if (((! _skip) && (! _skipEvent)) ||
+
+    if (forceToRun)
+	Gtk::Main::run();
+    else if (((! _skip) && (! _skipEvent)) ||
         (_endOfEventFlag && _endOfEvent))
-      Gtk::Main::run();
-  }
+	Gtk::Main::run();
+}
 
   void
   TWindowGTK::pack(Gtk::DrawingArea& w)

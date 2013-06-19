@@ -12,8 +12,6 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-
-
 #ifdef TRASAN_WINDOW_GTK
 
 #include <iostream>
@@ -120,6 +118,8 @@ namespace Belle {
   TWindowHoughDrawingArea::draw(void)
   {
     if (! _hp) return;
+
+    std::cout << "HP name=" << _hp->name() << std::endl;
 
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     _gc->set_line_attributes(1,

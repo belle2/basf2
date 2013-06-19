@@ -187,7 +187,7 @@ int RbTupleManager::hadd()
 
 // Body of root file merger grabbed from "hadd"
 
-void RbTupleManager::MergeRootfile(TDirectory* target, TList* sourcelist)
+void RbTupleManager::MergeRootfile(TDirectory* /* target */ , TList* /* sourcelist */)
 {
 }
 

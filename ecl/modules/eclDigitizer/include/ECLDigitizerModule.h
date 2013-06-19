@@ -145,7 +145,7 @@ namespace Belle2 {
       /**input array to fit          */
       int FitA[31];
       /** array for calculation of random noise for FitA[31]      */
-      double m_vmat[31][31];
+      float m_vmat[31][31];
 
     };
   }//ECL

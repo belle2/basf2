@@ -101,9 +101,10 @@ void ECLDigitizerModule::event()
   double HitEnergy[8736][31] = {{0}};
   double E_tmp[8736] = {0};
   double test_A[31] = {0};
-//  double AdcPedestal=3000.;
-  double AdcNoise[8736][31] = {{0}};
-  double genNoise[8736][31] = {{0}};
+  float AdcNoise[31];
+  float genNoise[31];
+
+
 
   double dt = .02; //delta t for interpolation
   int n = 1250;//provide a shape array for interpolation
@@ -135,18 +136,20 @@ void ECLDigitizerModule::event()
     if (E_tmp[iECLCell] > 0.0001) {
       //Noise generation
       for (int iCal = 0; iCal < 31; iCal++) {
-        genNoise[iECLCell][iCal] =  gRandom->Gaus(0, 1);
+        genNoise[iCal] =  gRandom->Gaus(0, 1);
       }
 
       for (int T_clock = 0; T_clock < 31; T_clock++) {
+        AdcNoise[T_clock] = 0;
         for (int iCal = 0; iCal < 31; iCal++) {
-          AdcNoise[iECLCell][T_clock] = m_vmat[T_clock][iCal] * genNoise[iECLCell][iCal] + AdcNoise[iECLCell][T_clock];
+          AdcNoise[T_clock] = m_vmat[T_clock][iCal] * genNoise[iCal] + AdcNoise[T_clock];
         }
       }
 
       for (int  T_clock = 0; T_clock < 31; T_clock++) {
-        FitA[T_clock] = (int)(HitEnergy[iECLCell][T_clock] * 20000 + 3000 + AdcNoise[iECLCell][T_clock] * 20) ;
-      }//for T_clock 31 clock
+        FitA[T_clock] = (int)(HitEnergy[iECLCell][T_clock] * 20000 + 3000 + AdcNoise[T_clock] * 20) ;
+
+      }
 
       m_n16 = 16;
       m_ttrig = int(DeltaT) ;
@@ -1904,7 +1907,7 @@ void ECLDigitizerModule::readDSPDB()
 
   for (int i = 0; i < 31 ; i++) {
     for (int j = 0; j < 31 ; j++) {
-      m_vmat[i][j] = par_vmat[i][j];
+      m_vmat[i][j] = (float) par_vmat[i][j];
     }
   }
 

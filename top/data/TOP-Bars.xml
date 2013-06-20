@@ -13,6 +13,7 @@
   <QWedgeLength dest="Length of the wedge" unit="mm">100</QWedgeLength>
   <QWedgeWidth desc="Width of the wedge" unit="mm">454</QWedgeWidth>
   <QWedgeDown dest="Wedge extension downward" unit="mm">31</QWedgeDown>
+  <QWedgeFlat desc="Wedge flat portion at exit" unit="mm">0</QWedgeFlat>
     
   <Glue>
     <GlueMaterial>TOPGlue</GlueMaterial>

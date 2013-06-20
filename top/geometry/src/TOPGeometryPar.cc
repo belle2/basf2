@@ -66,6 +66,7 @@ namespace Belle2 {
       m_WLength = 0;
       m_Wwidth = 0;
       m_Wextdown = 0;
+      m_Wflat = 0;
       m_Gwidth1 = 0;
       m_Gwidth2 = 0;
       m_Gwidth3 = 0;
@@ -153,6 +154,7 @@ namespace Belle2 {
       m_WLength = barParams.getLength("QWedgeLength");
       m_Wwidth = barParams.getLength("QWedgeWidth");
       m_Wextdown = barParams.getLength("QWedgeDown");
+      m_Wflat = barParams.getLength("QWedgeFlat");
       m_Gwidth1 = barParams.getLength("Glue/Thicknes1");
       m_Gwidth2 = barParams.getLength("Glue/Thicknes2");
       m_Gwidth3 = barParams.getLength("Glue/Thicknes3");

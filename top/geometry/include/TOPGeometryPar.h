@@ -145,6 +145,11 @@ namespace Belle2 {
        */
       double getWextdown() const {return m_Wextdown / m_unit; }
 
+      /** Get length of the wedge flat part at exit window
+       * @return length of the flat part
+       */
+      double getWflat() const {return m_Wflat / m_unit; }
+
       /** Get width of glue between wedge and bar segment 1
        * @return width of the glue joint 1
        */
@@ -425,6 +430,7 @@ namespace Belle2 {
       double m_WLength;     /**< wedge length */
       double m_Wwidth;      /**< wedge width */
       double m_Wextdown;    /**< wedge extension down */
+      double m_Wflat;       /**< length of flat portion of wedge at exit window */
       double m_Gwidth1;     /**< glue thickness between wedge and segment 1 */
       double m_Gwidth2;     /**< glue thickness between segments 1 and 2 */
       double m_Gwidth3;     /**< glue thickness between segment 3 and mirror */

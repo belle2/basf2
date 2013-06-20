@@ -122,42 +122,25 @@ namespace Belle2 {
 
       /*!  Read parameters  */
 
-      //! get width of the quartz bar
       G4double Qwidth = m_topgp->getQwidth();
-      //! get thickness of the quartz bar
       G4double Qthickness = m_topgp->getQthickness();
-      //! get Backward position of qurtz bar
       G4double Bposition = m_topgp->getBposition();
-      //! get length of first quartz bar segment which at one side is positioned at Bposition
       G4double Length1 = m_topgp->getLength1();
-      //! get length of second quartz bar segment which at one side is positioned at Bposition+Length1
       G4double Length2 = m_topgp->getLength2();
-      //! get length segment to which the mirror is attached
       G4double Length3 = m_topgp->getLength3();
-      //! get length wedge segment
       G4double WLength = m_topgp->getWLength();
-      //! get width wedge segment
       G4double Wwidth = m_topgp->getWwidth();
-      //! get wedge extension down
       G4double Wextdown = m_topgp->getWextdown();
-      //! get width of glue between wedge and segment 1
+      G4double Wflat = m_topgp->getWflat();
       G4double Gwidth1 = m_topgp->getGwidth1();
-      //! get width of glue between segment 1 segmen 2
       G4double Gwidth2 = m_topgp->getGwidth2();
-      //! get width of glue between segment 3 and mirror segment
       G4double Gwidth3 = m_topgp->getGwidth3();
 
-
-      //! dispacement along quartz width for mirror axis
       G4double Mirposx = m_topgp->getMirposx();
-      //! dispacement along quartz whickness for mirror axis
       G4double Mirposy = m_topgp->getMirposy();
-      //! get mirror layer thickness
       G4double Mirthickness = m_topgp->getMirthickness();
-      //! get radius of spherical mirror
       G4double Mirradius = m_topgp->getMirradius();
 
-      //! Get thickness of glue between PMTs and quartz
       G4double dGlue = m_topgp->getdGlue();
 
 
@@ -261,12 +244,18 @@ namespace Belle2 {
 
       std::vector<G4TwoVector> polygon;
 
-      polygon.push_back(G4TwoVector(-length / 2.0, Qthickness / 2.0));
-      polygon.push_back(G4TwoVector(-length / 2.0, -Qthickness / 2.0));
-      polygon.push_back(G4TwoVector(-length / 2.0 - Gwidth1, -Qthickness / 2.0));
-      polygon.push_back(G4TwoVector(-length / 2.0 - Gwidth1 - WLength, -Qthickness / 2.0 - Wextdown));
-      polygon.push_back(G4TwoVector(-length / 2.0 - Gwidth1 - WLength - dGlue, -Qthickness / 2.0 - Wextdown));
-      polygon.push_back(G4TwoVector(-length / 2.0 - Gwidth1 - WLength - dGlue, Qthickness / 2.0));
+      polygon.push_back(G4TwoVector(-length / 2.0,
+                                    Qthickness / 2.0));
+      polygon.push_back(G4TwoVector(-length / 2.0,
+                                    -Qthickness / 2.0));
+      polygon.push_back(G4TwoVector(-length / 2.0 - Gwidth1,
+                                    -Qthickness / 2.0));
+      polygon.push_back(G4TwoVector(-length / 2.0 - Gwidth1 - WLength + Wflat,
+                                    -Qthickness / 2.0 - Wextdown));
+      polygon.push_back(G4TwoVector(-length / 2.0 - Gwidth1 - WLength - dGlue,
+                                    -Qthickness / 2.0 - Wextdown));
+      polygon.push_back(G4TwoVector(-length / 2.0 - Gwidth1 - WLength - dGlue,
+                                    Qthickness / 2.0));
 
       G4ExtrudedSolid* wedge = new  G4ExtrudedSolid("wedge", polygon, Wwidth / 2.0, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0), 1.0);
 
@@ -307,7 +296,7 @@ namespace Belle2 {
 
       new G4PVPlacement(tglue4, gbox4, "TOP.gbox4", qwedge, false, 1);
 
-      /*! Putt all segment into the Assembly volume */
+      /*! Put all segment into the Assembly volume */
 
       G4RotationMatrix* rotasem = new G4RotationMatrix(0, 0, 0);
       G4ThreeVector trnsasem(length / 2.0 + Bposition, 0, 0);
@@ -347,6 +336,7 @@ namespace Belle2 {
       G4double Z1 = m_topgp->getZ1();
       G4double WLength = m_topgp->getWLength();
       G4double Wextdown = m_topgp->getWextdown();
+      G4double Wflat = m_topgp->getWflat();
       G4double PannelThickness = m_topgp->getPannelThickness();
       G4double PlateThickness = m_topgp->getPlateThickness();
       G4double LowerGap = m_topgp->getLowerGap();
@@ -388,27 +378,39 @@ namespace Belle2 {
 
       /*!  Build wedge  */
 
-      //! Build the ourter wall
+      //! Build the outer wall
       std::vector<G4TwoVector> polygon;
 
-      polygon.push_back(G4TwoVector(ZBackward, upside + UpperGap + PannelThickness));
-      polygon.push_back(G4TwoVector(ZForward, upside + UpperGap + PannelThickness));
-      polygon.push_back(G4TwoVector(ZForward, -Qthickness / 2.0 - LowerGap - PannelThickness));
-      polygon.push_back(G4TwoVector(Z1, -Qthickness / 2.0 - LowerGap - PannelThickness));
-      polygon.push_back(G4TwoVector(Z1 - WLength, downside - LowerGap - PlateThickness));
-      polygon.push_back(G4TwoVector(ZBackward, downside - LowerGap - PlateThickness));
+      polygon.push_back(G4TwoVector(ZBackward,
+                                    upside + UpperGap + PannelThickness));
+      polygon.push_back(G4TwoVector(ZForward,
+                                    upside + UpperGap + PannelThickness));
+      polygon.push_back(G4TwoVector(ZForward,
+                                    -Qthickness / 2.0 - LowerGap - PannelThickness));
+      polygon.push_back(G4TwoVector(Z1,
+                                    -Qthickness / 2.0 - LowerGap - PannelThickness));
+      polygon.push_back(G4TwoVector(Z1 - WLength + Wflat,
+                                    downside - LowerGap - PlateThickness));
+      polygon.push_back(G4TwoVector(ZBackward,
+                                    downside - LowerGap - PlateThickness));
 
       G4ExtrudedSolid* supportShape = new  G4ExtrudedSolid("support", polygon, side + SideGap + PlateThickness, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0), 1.0);
 
       //! Build inside air
       std::vector<G4TwoVector> polygon2;
 
-      polygon2.push_back(G4TwoVector(ZBackward + PlateThickness, upside + UpperGap));
-      polygon2.push_back(G4TwoVector(ZForward - PlateThickness, upside + UpperGap));
-      polygon2.push_back(G4TwoVector(ZForward - PlateThickness, -Qthickness / 2.0 - LowerGap));
-      polygon2.push_back(G4TwoVector(Z1, -Qthickness / 2.0 - LowerGap));
-      polygon2.push_back(G4TwoVector(Z1 - WLength, downside - LowerGap));
-      polygon2.push_back(G4TwoVector(ZBackward + PlateThickness, downside - LowerGap));
+      polygon2.push_back(G4TwoVector(ZBackward + PlateThickness,
+                                     upside + UpperGap));
+      polygon2.push_back(G4TwoVector(ZForward - PlateThickness,
+                                     upside + UpperGap));
+      polygon2.push_back(G4TwoVector(ZForward - PlateThickness,
+                                     -Qthickness / 2.0 - LowerGap));
+      polygon2.push_back(G4TwoVector(Z1,
+                                     -Qthickness / 2.0 - LowerGap));
+      polygon2.push_back(G4TwoVector(Z1 - WLength + Wflat,
+                                     downside - LowerGap));
+      polygon2.push_back(G4TwoVector(ZBackward + PlateThickness,
+                                     downside - LowerGap));
 
       G4ExtrudedSolid* airShape = new  G4ExtrudedSolid("air", polygon2, side + SideGap, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0), 1.0);
 

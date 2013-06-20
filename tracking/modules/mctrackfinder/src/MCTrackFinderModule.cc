@@ -67,7 +67,11 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   addParam("UseSVDHits", m_useSVDHits, "Set true if SVDHits or SVDClusters should be used", bool(true));
   addParam("UseCDCHits", m_useCDCHits, "Set true if CDCHits should be used", bool(true));
 
-  addParam("MinimalNDF", m_minimalNdf, "Set the smallest number of degrees of freedom all (NDF) the hits in one track have to accumulate to allow creation of a track candidate", 5);
+  addParam("MinPXDHits", m_minPXDHits, "Minimum number of PXD hits needed to allow the created of a track candidate", 0);
+  addParam("MinSVDHits", m_minSVDHits, "Minimum number of SVD hits needed to allow the created of a track candidate", 0);
+  addParam("MinCDCAxialHits", m_minCDCAxialHits, "Minimum number of CDC hits form an axial wire needed to allow the created of a track candidate", 0);
+  addParam("MinCDCStereoHits", m_minCDCStereoHits, "Minimum number of CDC hits form a stereo wire needed to allow the created of a track candidate", 0);
+  addParam("MinimalNDF", m_minimalNdf, "Minimum number of total hits needed to allow the created of a track candidate. It is called NDF (number of degrees of freedom) because it counts the dimensionality. 2D hits are counted as 2", 5);
 
   //choose for which particles a track candidate should be created
   //this is just an attempt to find out what is the most suitable way to select particles, if you have other/better ideas, communicate it to the tracking group...
@@ -352,7 +356,10 @@ void MCTrackFinderModule::event()
         }
       }
     }
-
+    if (pxdHitsIndices.size() < m_minPXDHits) {
+      ++m_notEnoughtHitsCounter;
+      continue; //goto next mcParticle, do not make track candidate
+    }
     // create a list containing the indices to the SVDHits that belong to one track
     vector<int> svdHitsIndices;
     if (m_useSVDHits == true) {
@@ -376,28 +383,42 @@ void MCTrackFinderModule::event()
         }
       }
     }
-
+    if (svdHitsIndices.size() < m_minSVDHits) {
+      ++m_notEnoughtHitsCounter;
+      continue; //goto next mcParticle, do not make track candidate
+    }
 
     // create a list containing the indices to the CDCHits that belong to one track
+    int nAxialHits = 0;
+    int nStereoHits = 0;
     vector<int> cdcHitsIndices;
     if (m_useCDCHits == true) {
       for (int i = 0; i < nMcPartToCDCHits; ++i) {
         if (mcPartToCDCHits[i].getFromIndex() == unsigned(iPart)) {
           for (unsigned int j = 0; j < mcPartToCDCHits[i].getToIndices().size(); j++) {
-            cdcHitsIndices.push_back(mcPartToCDCHits[i].getToIndex(j));
+            int cdcHitIndex = mcPartToCDCHits[i].getToIndex(j);
+            cdcHitsIndices.push_back(cdcHitIndex);
             ndf += 1;
+            int superLayerId = cdcHits[cdcHitIndex]->getISuperLayer();
+            if (superLayerId == 0 || superLayerId == 2  || superLayerId == 4) { //here it is hardcoded what superlayer has axial wires and what has stereo wires. Maybe it would be better if the WireId would know this
+              ++nAxialHits;
+            } else {
+              ++nStereoHits;
+            }
           }
         }
       }
     }
-
-    if (m_initialCov(0, 0) > 0.0) { //using a use set initial cov and corresponding smearing of inital state adds information
+    if (nAxialHits < m_minCDCAxialHits || nStereoHits < m_minCDCStereoHits) {
+      ++m_notEnoughtHitsCounter;
+      continue; //goto next mcParticle, do not make track candidate
+    }
+    if (m_initialCov(0, 0) > 0.0) { //using a user set initial cov and corresponding smearing of inital state adds information
       ndf += 5;
     }
 
     if (ndf <= m_minimalNdf) {
       ++m_notEnoughtHitsCounter;
-
       continue; //goto next mcParticle, do not make track candidate
     }
     //Now create TrackCandidate

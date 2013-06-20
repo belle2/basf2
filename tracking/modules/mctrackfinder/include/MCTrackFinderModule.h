@@ -88,12 +88,16 @@ namespace Belle2 {
 
     double m_smearing;                                          /**< Smearing of MCMomentum and MCVertex in %. This adds a relative error to the initial values without changing the default large initial covariance matrix using for fitting*/
     std::vector<double> m_smearingCov;                          /**< Covariance matrix used to smear the true pos and mom before passed to track candidate. This matrix will also passed to Genfit as the initial covarance matrix. If any diagonal value is negative this feature will not be used. OFF DIAGNOLA ELEMENTS DO NOT HAVE AN EFFECT AT THE MOMENT */
-    TMatrixDSym m_initialCov;                                      /**< The std::vector m_smearingCov will be translated into this TMatrixD*/
+    TMatrixDSym m_initialCov;                                   /**< The std::vector m_smearingCov will be translated into this TMatrixD*/
     int m_notEnoughtHitsCounter;                                /**< will hold number of tracks that do not have enough hits to form a track candidate (total NDF less than 5)*/
     int m_noTrueHitCounter;                                     /**< will hold number of cluster hits that do not have a corresponding true hit*/
     int m_nTrackCands;                                          /**< will hold the total number of created track candidates*/
     std::string m_gfTrackCandsColName;                          /**< TrackCandidates collection name */
-    int m_minimalNdf;                                           /**< Minimum number of hits per track to allow track candidate creation*/
+    int m_minPXDHits;                                           /**< Minimum number of PXD hits per track to allow track candidate creation*/
+    int m_minSVDHits;                                           /**< Minimum number of SVD hits per track to allow track candidate creation*/
+    int m_minCDCAxialHits;                                      /**< Minimum number of CDC hits from axial wires per track to allow track candidate creation*/
+    int m_minCDCStereoHits;                                     /**< Minimum number of CDC hits from stereo wires per track to allow track candidate creation*/
+    int m_minimalNdf;                                           /**< Minimum number of total hits per track to allow track candidate creation. 2D hits are counted as 2*/
     std::vector<int> m_fromPdgCodes;                            /**< if size() is not 0, only for particles having an ancestor (mother or mother of mother etc) with PDG codes same as in this vector a track candidate be created*/
     std::vector<int> m_particlePdgCodes;                        /**< if size() is not 0, only for particles with PDG codes same as in this vector a track candidate will be created*/
   };

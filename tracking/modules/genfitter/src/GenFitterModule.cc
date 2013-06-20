@@ -462,6 +462,10 @@ void GenFitterModule::event()
                                           tracks[trackCounter]->setZ0(-999);
                                           tracks[trackCounter]->setCotTheta(-999);
                             */
+              //Create relations
+              if (aTrackCandPointer->getMcTrackId() != -999) {
+                mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
+              } else B2WARNING("No MCParticle contributed to theis track! No MCParticle<->Track relation will be created!");
             }
           } else {            //fit successful
             ++m_successfulFitCounter;

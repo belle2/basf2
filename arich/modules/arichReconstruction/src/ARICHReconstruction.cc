@@ -33,14 +33,13 @@ using namespace boost;
 namespace Belle2 {
   namespace arich {
 
-#define MAXAERO 5 // maximal number of aerogel layers
-#define NHYP 5 // number of particle hypotheses
-
-
-
     ARICHReconstruction::ARICHReconstruction(int debug):
-      m_arichGeoParameters(ARICHGeometryPar::Instance()), m_bkgLevel(0), m_trackPosRes(0),
-      m_trackAngRes(0), m_singleRes(0), m_aeroMerit(0)
+      m_arichGeoParameters(ARICHGeometryPar::Instance()),
+      m_bkgLevel(0),
+      m_trackPosRes(0),
+      m_trackAngRes(0),
+      m_singleRes(0),
+      m_aeroMerit(0)
     {
       m_Debug = debug;
       B2INFO("ARICHReconstruction::ARICHReconstruction()");
@@ -271,7 +270,6 @@ namespace Belle2 {
       ncount++;
       const double p_mass[5] = { 0.000511, 0.10566, 0.13957, 0.49368, 0.93827};// mass of particles in GeV
 
-      //StoreArray<ARICHTrack> arichTracks;
       unsigned int tsize = arichTracks.size();
       StoreArray<ARICHDigit> arichDigits;
       unsigned int hsize = arichDigits.getEntries();
@@ -279,26 +277,25 @@ namespace Belle2 {
       if (tsize == 0) return 0;
 
       unsigned int asize = m_arichGeoParameters->getNumberOfAerogelRadiators();
-      const int maxhyp(5);
-      double  esigi[maxhyp];
+      double  esigi[c_noOfHypotheses];
 
-      static double  refind[MAXAERO];
-      static double  zaero[MAXAERO];
-      static double  thickness[MAXAERO];
-      static double  trlen[MAXAERO];
-      static double  n0[MAXAERO];
-      static TVector3 anorm[MAXAERO];
+      static double  refind[c_noOfAerogels];
+      static double  zaero[c_noOfAerogels];
+      static double  thickness[c_noOfAerogels];
+      static double  trlen[c_noOfAerogels];
+      static double  n0[c_noOfAerogels];
+      static TVector3 anorm[c_noOfAerogels];
       static double pad_size;
       static double angmir;
       static int nMirSeg;
       static int first = 1;
 
-      double  lrad[MAXAERO];
-      double  acceptance[NHYP][MAXAERO];
-      double  lkh[NHYP];
-      double  nbgr[NHYP];
-      double  nsig[MAXAERO][NHYP];
-      double  thc[NHYP][MAXAERO];
+      double  lrad[c_noOfAerogels];
+      double  acceptance[c_noOfHypotheses][c_noOfAerogels];
+      double  lkh[c_noOfHypotheses];
+      double  nbgr[c_noOfHypotheses];
+      double  nsig[c_noOfAerogels][c_noOfHypotheses];
+      double  thc[c_noOfHypotheses][c_noOfAerogels];
 
       if (first) {
 
@@ -332,7 +329,7 @@ namespace Belle2 {
         int padNum = m_arichGeoParameters->getDetectorXPadNumber() * m_arichGeoParameters->getDetectorXPadNumber();
 
         // loop over all particle hypotheses
-        for (int hyp = 0; hyp < maxhyp; hyp++) {
+        for (int hyp = 0; hyp < c_noOfHypotheses; hyp++) {
           lkh[hyp] = 0;
 
           // loop over aerogel layers
@@ -390,7 +387,7 @@ namespace Belle2 {
 
           nbgr[hyp] = m_bkgLevel * padArea * padNum * m_arichGeoParameters->getNMCopies();
 
-        }  // for (int hyp=0;hyp < maxhyp; hyp++ )
+        }  // for (int hyp=0;hyp < c_noOfHypotheses; hyp++ )
         //#####################################################
 
         double ebgri = m_bkgLevel * padArea;
@@ -422,7 +419,7 @@ namespace Belle2 {
           int modID = h->getModuleID();
 
           TVector3 hitpos = m_arichGeoParameters->getChannelCenterGlob(modID, chID);
-          for (int hyp = 0; hyp < maxhyp; hyp++) esigi[hyp] = 0;
+          for (int hyp = 0; hyp < c_noOfHypotheses; hyp++) esigi[hyp] = 0;
           int nfoo = nfot;
           // loop over all arogel layers
           for (unsigned int ar = 0; ar < asize; ar++) {
@@ -456,7 +453,7 @@ namespace Belle2 {
               }
 
               // loop over all particle hypotheses
-              for (int hyp = 0; hyp < maxhyp; hyp++) {
+              for (int hyp = 0; hyp < c_noOfHypotheses; hyp++) {
 
                 // track a photon from the mean emission point to the detector surface
                 TVector3  dirf1 = setThetaPhi(thc[hyp][ar], fi_cer);  // particle system
@@ -495,7 +492,7 @@ namespace Belle2 {
                   esigi[hyp] += normalizacija * integral;
                 }// if (dr>0 && thc[hyp][ar])
 
-              }// for (int hyp=0;hyp< maxhyp; hyp++ )
+              }// for (int hyp=0;hyp< c_noOfHypotheses; hyp++ )
 
             }// for (int mirr = 0; mirr < refl; mirr++)
 
@@ -505,7 +502,7 @@ namespace Belle2 {
           // LIKELIHOOD construction
           //*******************************************
 
-          for (int hyp = 0; hyp < maxhyp; hyp++) {
+          for (int hyp = 0; hyp < c_noOfHypotheses; hyp++) {
             double expected = esigi[hyp] + ebgri;
             if (expected > 1e-13)    lkh[hyp] += expected + log(1 - exp(-expected));
             else {
@@ -522,7 +519,7 @@ namespace Belle2 {
         //*******************************************
 
 
-        for (int hyp = 0; hyp < maxhyp; hyp++) {
+        for (int hyp = 0; hyp < c_noOfHypotheses; hyp++) {
           lkh[hyp] -= (nsig[hyp][asize] + nbgr[hyp]);
         }
 
@@ -530,7 +527,7 @@ namespace Belle2 {
         // store LikeliHOOD info
         //******************************************
         track->setExpectedNOfPhotons(0, nfot);
-        track->setLikelihood(maxhyp, lkh);
+        track->setLikelihood(lkh);
         //**************************************
 
         if (m_Debug) {

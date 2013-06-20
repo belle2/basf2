@@ -95,6 +95,7 @@ namespace Belle2 {
       //! datum of the runlog
       std::string m_datum;
 
+      //! Type of aerogel support - not used at the moment
       int m_aerosupport;
       //! shift of the aerogel center
       double m_aerogeldx;

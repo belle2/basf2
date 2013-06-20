@@ -19,8 +19,6 @@
 #include <cmath>
 #include <boost/format.hpp>
 
-#define MAX_N_ALAYERS 5
-
 namespace Belle2 {
   namespace arich {
     //! This Class contains methods needed to obtain the value of identity likelihood function for different particle hypotheses.
@@ -53,7 +51,8 @@ namespace Belle2 {
 
     private:
 
-
+      static const int c_noOfHypotheses = 5; /**< Number of hypotheses to loop over */
+      static const int c_noOfAerogels = 5; /**< Maximal number of aerogel layers to loop over */
 
       ARICHGeometryPar* m_arichGeoParameters; /**< holding the parameters of detector */
       TNtuple* m_hitstuple;  /**< debug output hit-track pairs */

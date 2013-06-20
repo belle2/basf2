@@ -30,7 +30,7 @@ ARICHTrack::ARICHTrack(const ARICHAeroHit& aeroHit)
   m_extHitID = -1;
   m_identity = Lund2Type(m_PDGEncoding);
   m_aeroIndex = -1;
-  for (int i = 0; i < MAXLKH; i++) {
+  for (int i = 0; i < c_noOfHypotheses; i++) {
     m_lkh[i] = 0;
     m_sfot[i] = 0;
     m_acc[i] = 0;
@@ -51,7 +51,7 @@ ARICHTrack::ARICHTrack(const ExtHit* extHit, int charge, int pdgCode, int trackI
   m_identity(Lund2Type(m_PDGEncoding)),
   m_aeroIndex(aeroHitIndex)
 {
-  for (int i = 0; i < MAXLKH; i++) {
+  for (int i = 0; i < c_noOfHypotheses; i++) {
     m_lkh[i] = 0;
     m_sfot[i] = 0;
     m_acc[i] = 0;

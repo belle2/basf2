@@ -17,7 +17,7 @@
 from basf2 import *
 
 # suppress messages and warnings during processing DEBUG, INFO, WARNING, ERROR
-set_log_level(LogLevel.INFO)
+set_log_level(LogLevel.WARNING)
 
 # to run the framework the used modules need to be registered
 
@@ -50,7 +50,7 @@ output = register_module('RootOutput')
 
 # EvtMetaGen parameters
 # Set the number of events to be processed (10 event)
-evtmetagen.param({'evtNumList': [10], 'runList': [1]})
+evtmetagen.param({'evtNumList': [1000], 'runList': [1]})
 # ============================================================================
 
 # Set output filename

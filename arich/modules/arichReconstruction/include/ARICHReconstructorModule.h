@@ -12,10 +12,9 @@
 #define ARICHRECONSTRUCTORMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/gearbox/Const.h>
 
 #include <arich/modules/arichReconstruction/ARICHReconstruction.h>
-
-#include <framework/gearbox/Const.h>
 
 #include <string>
 
@@ -32,7 +31,6 @@ namespace Belle2 {
     class ARICHReconstructorModule : public Module {
 
     public:
-
 
       /*! Constructor.*/
       ARICHReconstructorModule();
@@ -78,6 +76,7 @@ namespace Belle2 {
       void printModuleParams() const;
 
     private:
+
       // Input collections
       std::string m_mcColName;         /**< Input collection name */
       std::string m_tracksColName;     /**< MDST tracks */

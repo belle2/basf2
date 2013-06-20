@@ -17,10 +17,7 @@
 #include <tracking/dataobjects/ExtHit.h>
 #include <TObject.h>
 
-#define MAXLKH 5
-
 namespace Belle2 {
-
 
   class ARICHGeometryPar;
 
@@ -34,6 +31,8 @@ namespace Belle2 {
    */
   class ARICHTrack : public TObject {
   public:
+
+
 
     //! Empty constructor for ROOT IO
     ARICHTrack():
@@ -50,7 +49,7 @@ namespace Belle2 {
       m_identity(-1),
       m_aeroIndex(-1) {
       /*! does nothing */
-      for (int i = 0; i < MAXLKH; i++) {
+      for (int i = 0; i < c_noOfHypotheses; i++) {
         m_lkh[i] = 0;
         m_sfot[i] = 0;
         m_acc[i] = 0;
@@ -84,7 +83,7 @@ namespace Belle2 {
       m_extHitID(-1),
       m_identity(-1),
       m_aeroIndex(-1) {
-      for (int i = 0; i < MAXLKH; i++) {
+      for (int i = 0; i < c_noOfHypotheses; i++) {
         m_lkh[i]  = 0;
         m_sfot[i] = 0;
         m_acc[i]  = 0;
@@ -145,11 +144,13 @@ namespace Belle2 {
     //! returns value of likelihood function for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     double getLikelihood(int i) const {return m_lkh[i]; };
 
+    //! calculates likelihoods for 5 hypotheses
     void getLikelihood(double like[]) {like[0] = m_lkh[0]; like[1] = m_lkh[1]; like[2] = m_lkh[2]; like[3] = m_lkh[3]; like[4] = m_lkh[4];};
 
     //! returns expected number of detected photons for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     double getExpectedNOfPhotons(int i) const {return m_sfot[i]; };
 
+    //! calculates the expected no. of photons. at the moment, impelemnted for true particle (MC->getPDGCode)
     void getExpectedNOfPhotons(double nphot[]) {nphot[0] = m_sfot[0]; nphot[1] = m_sfot[1]; nphot[2] = m_sfot[2]; nphot[3] = m_sfot[3]; nphot[4] = m_sfot[4]; };
 
     //! returns geometrical acceptance of emitted Cherenkov photos by particle "i"(here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
@@ -159,7 +160,7 @@ namespace Belle2 {
     void setLikelihood(int i, double val) {m_lkh[i] = val; };
 
     //!  sets value of likelihood function for all particle hypotheses. "imax" is number of particle hypotheses, "val" is array of hypotheses values (val[0] electron, 1 muon, 2 pion, 3 kaon, 4 proton)
-    void setLikelihood(int imax, double* val) {for (int i = 0; i < imax; i++) m_lkh[i] = val[i];};
+    void setLikelihood(double* val) {for (int i = 0; i < c_noOfHypotheses; i++) m_lkh[i] = val[i];};
 
     //! sets expected number of detected photons for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     void setExpectedNOfPhotons(int i, double val) {m_sfot[i] = val; };
@@ -210,6 +211,8 @@ namespace Belle2 {
 
   private:
 
+    static const int c_noOfHypotheses = 5; /**< Number of hypothesis to loop over. */
+
     // track parameter from geant4 simulation
     TVector3 m_originalPosition;          /**< Original position on aerogel plane. */
     TVector3 m_originalDirection;         /**< Original direction on aerogel plane. */
@@ -229,9 +232,9 @@ namespace Belle2 {
 
 
 
-    double  m_lkh[MAXLKH];  /**< Value of likelihood function for different particle hypotheses. */
-    double  m_sfot[MAXLKH]; /**< Number of expected detected photons for different particle hypotheses.  */
-    double  m_acc[MAXLKH];  /**< Geometrical acceptance of expected cherenkov ring for different particle hypotheses. */
+    double  m_lkh[c_noOfHypotheses];  /**< Value of likelihood function for different particle hypotheses. */
+    double  m_sfot[c_noOfHypotheses]; /**< Number of expected detected photons for different particle hypotheses.  */
+    double  m_acc[c_noOfHypotheses];  /**< Geometrical acceptance of expected cherenkov ring for different particle hypotheses. */
 
 
     //! converts PDG particle code to particle index

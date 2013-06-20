@@ -356,7 +356,7 @@ void MCTrackFinderModule::event()
         }
       }
     }
-    if (pxdHitsIndices.size() < m_minPXDHits) {
+    if (pxdHitsIndices.size() < unsigned(m_minPXDHits)) {
       ++m_notEnoughtHitsCounter;
       continue; //goto next mcParticle, do not make track candidate
     }
@@ -383,7 +383,7 @@ void MCTrackFinderModule::event()
         }
       }
     }
-    if (svdHitsIndices.size() < m_minSVDHits) {
+    if (svdHitsIndices.size() < unsigned(m_minSVDHits)) {
       ++m_notEnoughtHitsCounter;
       continue; //goto next mcParticle, do not make track candidate
     }
@@ -417,7 +417,7 @@ void MCTrackFinderModule::event()
       ndf += 5;
     }
 
-    if (ndf <= m_minimalNdf) {
+    if (ndf < m_minimalNdf) {
       ++m_notEnoughtHitsCounter;
       continue; //goto next mcParticle, do not make track candidate
     }

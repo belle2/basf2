@@ -74,19 +74,32 @@ namespace Belle2 {
     }
 
     /** calculates the angle between the hits/vectors (3D), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngle3D instead) */
-    double calcAngle3D();
+    double calcAngle3D() {
+      double angle = ((m_x2 + m_y2 + m_z2) / (m_vecAB.Mag2() * m_vecBC.Mag2())); // fullCalc would be acos(m_vecAB.Dot(m_vecBC) / m_vecAB.Mag()*m_vecBC.Mag())
+      return m_twoHitFilter.filterNan(angle);
+    } // return unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngle3D instead)
+
 
     /** calculates the angle between the hits/vectors (3D), returning unit: angle in radians */
     double fullAngle3D();
 
     /** calculates the angle between the hits/vectors (XY), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngleXY instead) */
-    double calcAngleXY();
+    double calcAngleXY() {
+      double angle = ((m_x2 + m_y2) / (m_vecAB.Perp2() * m_vecBC.Perp2())); // fullAngle:
+      return m_twoHitFilter.filterNan(angle);
+    } // return unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngleXY instead)
+
 
     /** calculates the angle between the hits/vectors (XY), returning unit: angle in radians */
     double fullAngleXY();
 
     /** calculates the angle between the hits/vectors (RZ), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngleRZ instead) */
-    double calcAngleRZ();
+    double calcAngleRZ() {
+      TVector3 rzVecAB(m_vecAB.Perp(), m_vecAB[2], 0.);
+      TVector3 rzVecBC(m_vecBC.Perp(), m_vecBC[2], 0.);
+      return calcAngle2D(rzVecAB, rzVecBC);
+    } // return unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngleRZ instead)
+
 
     /** calculates the angle between the hits/vectors (RZ), returning unit: angle in radians */
     double fullAngleRZ();
@@ -95,25 +108,65 @@ namespace Belle2 {
     double calcCircleDist2IP();
 
     /** calculates the estimation of the transverse momentum of the 3-hit-tracklet, returning unit: GeV/c */
-    double calcPt();
+    double calcPt() {
+      if (m_circleCenterCalculated == false) {
+        calcCircleCenter(m_hitA, m_hitB, m_hitC, m_centerABC);
+        m_circleCenterCalculated = true;
+      }
+      if (m_radiusCalculated == false) {
+        m_radius = calcRadius(m_hitA, m_hitB, m_hitC, m_centerABC);
+        m_radiusCalculated = true;
+      }
+      return (0.00449565 * m_radius); // pT[GeV/c] = 0.299710*B[T]*r[m] = 0.449565*r[cm]/100 = 0.00449565*r[cm]
+    } // return unit: GeV/c
 
     /** calculates deviations in the slope of the inner segment and the outer segment, returning unit: none */
-    double calcDeltaSlopeRZ(); // return unit: none
+    double calcDeltaSlopeRZ() {
+      m_twoHitFilter.resetValues(m_hitA, m_hitB);
+      double slopeAB = m_twoHitFilter.calcSlopeRZ();
+      m_twoHitFilter.resetValues(m_hitB, m_hitC);
+      double slopeBC = m_twoHitFilter.calcSlopeRZ();
+
+      return m_twoHitFilter.filterNan(slopeBC / slopeAB); // value should be near 1
+    } // return unit: none
 
     /** calculates the helixparameter describing the deviation in z per unit angle, returning unit: none */
-    double calcHelixFit();
+    double calcHelixFit() {
+      if (m_circleCenterCalculated == false) { calcCircleCenter(m_hitA, m_hitB, m_hitC, m_centerABC); }
+      TVector3 points2hitA = m_hitA - m_centerABC;
+      TVector3 points2hitB = m_hitB - m_centerABC;
+      TVector3 points2hitC = m_hitC - m_centerABC;
+      double alfaAB = calcAngle2D(points2hitA, points2hitB);
+      double alfaBC = calcAngle2D(points2hitB, points2hitC);
+      // real calculation: ratio is (m_vecij[2] = deltaZ): alfaAB/deltaZab : alfaBC/deltaZbc, the following equation saves two times '/'
+      return m_twoHitFilter.filterNan((alfaAB * m_vecBC[2]) / (alfaBC * m_vecAB[2]));
+    } // return unit: none
 
     /** calculates the angle between the hits/vectors (2D), generalized, returning unit: none. used by calcAngleRZ and calcHelixFit (angleXY could use it too, but this one profits from other optimizations instead) */
-    double calcAngle2D(TVector3& vecA, TVector3& vecB);
+    double calcAngle2D(TVector3& vecA, TVector3& vecB) {
+      double angle = ((vecA[0] * vecB[0] + vecA[1] * vecB[1]) / (vecA.Perp2() * vecB.Perp2()));
+      return m_twoHitFilter.filterNan(angle);
+    }
 
     /** calculates the angle between the hits/vectors (2D), generalized, returning unit: angle in radians */
     double fullAngle2D(TVector3& vecA, TVector3& vecB);
 
     /** calculates an estimation of the radius of given hits and existing estimation of circleCenter, returning unit: radius in [cm] (positive value)*/
-    double calcRadius(TVector3& a, TVector3& b, TVector3& c, TVector3& circleCenter); // = radius used by calcPt() and calcCircleDist2IP()
+    double calcRadius(TVector3& a, TVector3& b, TVector3& c, TVector3& circleCenter); // used by calcPt() and calcCircleDist2IP()
 
     /** calculates an estimation of circleCenter position, result is written into the 4th input-parameter */
-    void calcCircleCenter(TVector3& a, TVector3& b, TVector3& c, TVector3& circleCenter);
+    void calcCircleCenter(TVector3& a, TVector3& b, TVector3& c, TVector3& circleCenter) {
+      TVector3 b2c = b - c;
+      TVector3 a2b = a - b;
+      TVector3 cAB = 0.5 * a2b + b; //([kx ky]  -[jx jy])/2 + [jx jy] = central point of outer segment (k-j)/2+j
+      TVector3 cBC = 0.5 * b2c + c; // = central point of inner segment (l-k)/2+k
+      TVector3 nAB(-a2b(1), a2b(0), 0.); //normal vector of m_vecAB
+      TVector3 nBC(-b2c(1), b2c(0), 0.); //normal vector of m_vecBC
+      double muVal = (((cAB(1) - cBC(1)) / nBC(1)) + (((cBC(0) - cAB(0)) / nAB(0)) * nAB(1) / nBC(1))) / (1. - ((nBC(0) / nAB(0)) * (nAB(1) / nBC(1))));
+      circleCenter.SetX(cBC(0) + muVal * nBC(0)); // x-coord of intersection point
+      circleCenter.SetY(cBC(1) + muVal * nBC(1)); // y-coord of intersection point
+      circleCenter.SetZ(0.);
+    }
 
     /** calculates calculates the sign of the curvature of given 3-hit-tracklet. a positive value represents a left-oriented curvature, a negative value means having a right-oriented curvature. first vector should be outer hit, second = center hit, third is inner hit*/
     int calcSign(TVector3& a, TVector3& b, TVector3& c);

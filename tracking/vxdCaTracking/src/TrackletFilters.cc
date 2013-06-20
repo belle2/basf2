@@ -23,21 +23,6 @@ using namespace Belle2::Tracking;
 
 /// TODO: evtly do a 'nan'-check for return values
 
-TrackletFilters::TrackletFilters(vector<PositionInfo*>* hits):
-  m_hits(hits)
-{
-  m_numHits = m_hits->size();
-}
-
-
-
-void TrackletFilters::resetValues(vector<PositionInfo*>* hits)
-{
-  m_hits = hits;
-  m_numHits = hits->size();
-}
-
-
 
 bool TrackletFilters::ziggZaggXY()
 {
@@ -150,12 +135,4 @@ double TrackletFilters::circleFit(double& clapPhi, double& clapR, double& radius
   radius = 1. / rho;
   double chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2);
   return chi2;
-}
-
-
-// if you do not want to have the coordinates of the point of closest approach, use this one
-double TrackletFilters::circleFit()
-{
-  double phiValue, rValue, radius;
-  return circleFit(phiValue, rValue, radius);
 }

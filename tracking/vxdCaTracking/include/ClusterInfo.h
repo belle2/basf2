@@ -56,7 +56,9 @@ namespace Belle2 {
 
   protected:
     /** internal shortcut for comparing 2 track candidates */
-    bool isSameTC(const VXDTFTrackCandidate* a1, const VXDTFTrackCandidate* a2);
+    bool isSameTC(const VXDTFTrackCandidate* a1, const VXDTFTrackCandidate* a2) {
+      if (a1 == a2) { return true; } else { return false; }
+    }
 
     std::vector<VXDTFTrackCandidate*> m_attachedTCs; /**< contains pointers to all attached TCs added with addTrackCandidate-memberfunction */
     int m_clusterIndex; /**< real index number of Cluster */

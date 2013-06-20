@@ -160,60 +160,6 @@ FilterID::filterTypes FilterID::getFilterType(int filterInt)
   return numFilters;
 }
 
-std::string FilterID::getFilterString(FilterID::filterTypes filterType)
-{
-  return nameVector[filterType];
-//  switch (filterType) {
-//    case angles3D:
-//      return GlobalNames::nameAngles3D;
-//    case anglesRZ:
-//      return GlobalNames::nameAnglesRZ;
-//    case anglesXY:
-//      return GlobalNames::nameAnglesXY;
-//    case distance3D:
-//      return GlobalNames::nameDistance3D;
-//    case distanceXY:
-//      return GlobalNames::nameDistanceXY;
-//    case distanceZ:
-//      return GlobalNames::nameDistanceZ;
-//    case helixFit:
-//      return GlobalNames::nameHelixFit;
-//    case slopeRZ:
-//      return GlobalNames::nameSlopeRZ;
-//    case deltaSlopeRZ:
-//      return GlobalNames::nameDeltaSlopeRZ;
-//    case pT:
-//      return GlobalNames::namePT;
-//    case deltapT:
-//      return GlobalNames::nameDeltapT;
-//    case normedDistance3D:
-//      return GlobalNames::nameNormedDistance3D;
-//    case distance2IP:
-//      return GlobalNames::nameDistance2IP;
-//    case deltaDistance2IP:
-//      return GlobalNames::nameDeltaDistance2IP;
-//    case anglesHighOccupancy3D:
-//      return GlobalNames::nameAnglesHighOccupancy3D;
-//    case anglesHighOccupancyXY:
-//      return GlobalNames::nameAnglesHighOccupancyXY;
-//    case anglesHighOccupancyRZ:
-//      return GlobalNames::nameAnglesHighOccupancyRZ;
-//    case distanceHighOccupancy2IP:
-//      return GlobalNames::nameDistanceHighOccupancy2IP;
-//    case deltaSlopeHighOccupancyRZ:
-//      return GlobalNames::nameDeltaSlopeHighOccupancyRZ;
-//    case pTHighOccupancy:
-//      return GlobalNames::namePTHighOccupancy;
-//    case helixHighOccupancyFit:
-//      return GlobalNames::nameHelixHighOccupancyFit;
-//    case deltapTHighOccupancy:
-//      return GlobalNames::nameDeltapTHighOccupancy;
-//    case deltaDistanceHighOccupancy2IP:
-//      return GlobalNames::nameDeltaDistanceHighOccupancy2IP;
-//    default:
-//      return "";
-//  }
-}
 
 std::string FilterID::getFilterString(int filterType)
 {

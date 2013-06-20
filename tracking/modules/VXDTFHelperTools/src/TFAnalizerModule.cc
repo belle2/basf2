@@ -167,6 +167,7 @@ void TFAnalizerModule::event()
   B2DEBUG(1, "################## entering TFAnalizer - event " << m_eventCounter << " ######################");
 
   RootVariables rootVariables; // storing all root related infos
+  m_forRootCountFoundIDs.clear(); // reset foundIDs-counter
 
   /// import all GFTrackCands (McFinder, TFinder)
   StoreArray<GFTrackCand> mcTrackCandidates(m_PARAMmcTCname);
@@ -406,10 +407,15 @@ void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXD
   }
 
   if (recoveryState > 0 and m_PARAMwriteToRoot == true) { // store caValues only if track has been sufficiently good reconstructed
-    rootVariables.totalCAMomValues.push_back(mcTC.pValue);
-    rootVariables.totalCApTValues.push_back(mcTC.pTValue);
-    rootVariables.totalCAThetaValues.push_back(theta);
-    rootVariables.cAreconstructedTrackLength.push_back(caTC.coordinates.size());
+
+    if (std::find(m_forRootCountFoundIDs.begin(), m_forRootCountFoundIDs.end(), caTC.finalAssignedID) == m_forRootCountFoundIDs.end() and             caTC.finalAssignedID != -1) {
+      m_forRootCountFoundIDs.push_back(caTC.finalAssignedID);
+
+      rootVariables.totalCAMomValues.push_back(mcTC.pValue);
+      rootVariables.totalCApTValues.push_back(mcTC.pTValue);
+      rootVariables.totalCAThetaValues.push_back(theta);
+      rootVariables.cAreconstructedTrackLength.push_back(caTC.coordinates.size());
+    }
   }
 
   if (m_PARAMprintExtentialAnalysisData == true) {

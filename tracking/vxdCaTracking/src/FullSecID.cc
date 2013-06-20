@@ -84,47 +84,6 @@ FullSecID::FullSecID(VxdID vxdID, bool subLayerID, unsigned int sectorNumber):
 }
 
 
-short int FullSecID::getLayerID()
-{
-//  cerr << "getLayerID: " << (m_fullSecID >> LayerBitShift) << endl;
-  return m_fullSecID >> LayerBitShift;
-}
-
-
-bool FullSecID::getSubLayerID()
-{
-//  cerr << "getSubLayerID: " << ( (m_fullSecID bitand SubLayerMask) >> SubLayerBitShift) << endl;
-  return (m_fullSecID bitand SubLayerMask) >> SubLayerBitShift;
-}
-
-
-VxdID FullSecID::getVxdID()
-{
-//  cerr << "getVxdID: " << (VxdID((m_fullSecID bitand VxdIDMask) >> VxdIDBitShift)) << endl;
-  return VxdID((m_fullSecID bitand VxdIDMask) >> VxdIDBitShift);
-}
-
-
-unsigned short int FullSecID::getUniID()
-{
-//  cerr << "getUniID: " << ((m_fullSecID bitand VxdIDMask) >> VxdIDBitShift) << endl;
-  return (m_fullSecID bitand VxdIDMask) >> VxdIDBitShift;
-}
-
-
-short int FullSecID::getSecID()
-{
-//  cerr << "getSecID: " << (m_fullSecID bitand SectorMask) << endl;
-  return (m_fullSecID bitand SectorMask);
-}
-
-
-int FullSecID::getFullSecID()
-{
-//  cerr << "getFullSecID: " << m_fullSecID << endl;
-  return m_fullSecID;
-}
-
 std::string FullSecID::getFullSecString()
 {
 //  stringstream aSecIDString;

@@ -18,17 +18,6 @@ using namespace Belle2;
 using namespace Belle2::Tracking;
 
 
-VXDTFHit::VXDTFHit(PositionInfo hitPos, int passIndex, int clusterIndexU, int clusterIndexV, int clusterIndexUV, int detectorType, unsigned int papaSector, VxdID aVxdID, float timeStamp):
-  m_hit(hitPos),
-  m_passIndex(passIndex),
-  m_clusterIndexU(clusterIndexU), // SVD only
-  m_clusterIndexV(clusterIndexV), // SVD only
-  m_clusterIndexUV(clusterIndexUV),
-  m_detectorType(detectorType),
-  m_papaSector(papaSector),
-  m_VxdID(aVxdID),
-  m_timeStamp(timeStamp) { m_attachedTrackCandidates = 0; /*m_attachedCells = 0;*/ }
-
 /** operator overload **/
 bool VXDTFHit::operator==(const VXDTFHit& b) const
 {
@@ -56,19 +45,4 @@ bool VXDTFHit::operator>(const VXDTFHit& b) const
 }
 
 
-/** getter **/
-TVector3* VXDTFHit::getHitCoordinates() {return &(m_hit.hitPosition); } /// get global position of Hit
-PositionInfo* VXDTFHit::getPositionInfo() {return &m_hit; }
-const std::vector<int>& VXDTFHit::getAttachedInnerCell() const  { return m_attachedInnerCells; }
-const std::vector<int>& VXDTFHit::getAttachedOuterCell() const  { return m_attachedOuterCells; } /// not used so far
-int VXDTFHit::getNumberOfSegments() { return int(m_attachedInnerCells.size() + m_attachedOuterCells.size()); }
-std::string VXDTFHit::getSectorString()
-{
-  FullSecID fullSecID = FullSecID(m_papaSector);
-  return fullSecID.getFullSecString();
-}
-
-
-/** setter **/
-void VXDTFHit::addInnerCell(int newCell) { m_attachedInnerCells.push_back(newCell); }
-void VXDTFHit::addOuterCell(int newCell) { m_attachedOuterCells.push_back(newCell); }
+std::string VXDTFHit::getSectorString() { return FullSecID(m_papaSector).getFullSecString(); }

@@ -47,15 +47,15 @@ namespace Belle2 {
     VXDTFTrackCandidate(VXDTFTrackCandidate*& other);
 
     /** getter **/
-    std::vector<Belle2::VXDSegmentCell*> getSegments(); /**< returns segments forming current TC */
-    std::vector<Belle2::VXDTFHit*> getHits(); /**< returns hits forming current TC */
+    std::vector<Belle2::VXDSegmentCell*> getSegments() { return m_attachedCells; } /**< returns segments forming current TC */
+    std::vector<Belle2::VXDTFHit*> getHits() { return m_attachedHits; } /**< returns hits forming current TC */
     std::vector<TVector3*> getHitCoordinates(); /**< returns hits forming current TC */
     std::vector<int> getSVDHitIndices(); /**< returns indices of svdClusters forming current TC */
     std::vector<int> getPXDHitIndices(); /**< returns indices of pxdClusters forming current TC */
 //     std::list<int> getHopfieldHitIndices() { return m_hopfieldHitIndices; } /**< returns slightly adapted indices for hopfield use only (no real indices, but only unique ones...) */
     std::list<int> getHopfieldHitIndices(); /**< returns slightly adapted indices for hopfield use only (no real indices, but only unique ones...) */
     std::vector<Belle2::VXDTFTrackCandidate*> getBookingRivals() { return m_bookingRivals; } /**< returns all TCs sharing hits with current one */
-    bool getOverlappingState(); /**< returns flag whether TC is sharing hits with other TCs or not (no manual check) */
+    bool getOverlappingState() { return m_overlapping; } /**< returns flag whether TC is sharing hits with other TCs or not (no manual check) */
     bool checkOverlappingState(); /**< returns flag whether TC is sharing hits with other TCs or not, after manual check, whether its rivals are still alive */
     unsigned int getTrakNumber() { return m_trackNumber; } /** returns position of TC in vector containing all TCs of current event */
     bool getCondition() const { return m_alive; } /**< returns flag whether TC is still "alive" (part of the set of TCs which are probably real tracks based on the knowledge of the TF at the point of calling that function) */
@@ -72,23 +72,27 @@ namespace Belle2 {
 
 
     /** setter **/
-    void addSVDClusterIndex(int anIndex); /**< add index number of SVDCluster attached to current TC */
-    void addPXDClusterIndex(int anIndex); /**< add index number of PXDCluster attached to current TC */
+    void addSVDClusterIndex(int anIndex) { m_svdHitIndices.push_back(anIndex); } /**< add index number of SVDCluster attached to current TC */
+    void addPXDClusterIndex(int anIndex) { m_pxdHitIndices.push_back(anIndex); } /**< add index number of PXDCluster attached to current TC */
     void addBookingRival(VXDTFTrackCandidate* aTC); /**< adds a TC sharing hits with current one */
-    void addHopfieldClusterIndex(int anIndex); /**< add index number of Cluster attached to current TC (SVD and PXD), index is unique but does not point to real clusters */
-    void addSegments(VXDSegmentCell* pCell); /**< add segment attached to current TC */
-    void addHits(VXDTFHit* pHit); /**< add hit attached to current TC */
-    void setOverlappingState(bool newState); /**< set whether current TC is overlapped or not */
+    void addHopfieldClusterIndex(int anIndex) { m_hopfieldHitIndices.push_back(anIndex); } /**< add index number of Cluster attached to current TC (SVD and PXD), index is unique but does not point to real clusters */
+    void addSegments(VXDSegmentCell* pCell) { m_attachedCells.push_back(pCell); } /**< add segment attached to current TC */
+    void addHits(VXDTFHit* pHit) {
+      pHit->addTrackCandidate();
+      m_attachedHits.push_back(pHit);
+    } /**< add hit attached to current TC */
+
+    void setOverlappingState(bool newState) { m_overlapping = newState; } /**< set whether current TC is overlapped or not */
     void setTrackNumber(unsigned int newNumber) { m_trackNumber = newNumber; } /**< tells the TC which position in the tcList it has got. Allows some faster overlap-procedures */
-    void setTrackQuality(double newVal); /**< set estimated quality of TC */
-    void setQQQ(double qqqScore, double maxScore); /**< set estimated extended quality of TC (a potential minimal replacement for kalman filter, interesting for online-use) */
+    void setTrackQuality(double newVal) { m_qualityIndex = newVal; } /**< set estimated quality of TC */
+    void setQQQ(double qqqScore, double maxScore) { m_qqq = sqrt(qqqScore / maxScore); } /**< set estimated extended quality of TC (a potential minimal replacement for kalman filter, interesting for online-use) */
     void setCondition(bool newCondition); /**< set condition. If true, TC is part of set of final TCs which are exported for further use */
-    void setNeuronValue(double aValue);  /**< set neuron value, needed by the hopfield network */
+    void setNeuronValue(double aValue) { m_neuronValue = aValue; }  /**< set neuron value, needed by the hopfield network */
     void setEstRadius(double radius) { if (radius < 0) radius *= -1.; m_estRadius = radius; }  /**< sets the estimated radius of the track circle in the x-y-plane */
     void removeVirtualHit(); /**< removes virtual hit which is needed for most filtering steps */
-    void setInitialValue(TVector3 aHit, TVector3 pVector, int pdg); /**< set initial values for TC, needed by GFTrackCand */
-    void setPassIndex(int anIndex); /**< sets pass index number containing current TC */
-    void setFitSucceeded(bool yesNo); /**< set true, if kalman fit was possible, else: false */
+    void setInitialValue(TVector3 aHit, TVector3 pVector, int pdg) { m_initialHit = aHit; m_initialMomentum = pVector; m_pdgCode = pdg; m_initialValuesSet = true; } /**< set initial values for TC, needed by GFTrackCand */
+    void setPassIndex(int anIndex) { m_passIndex = anIndex; } /**< sets pass index number containing current TC */
+    void setFitSucceeded(bool yesNo) { m_fitSucceeded = yesNo; } /**< set true, if kalman fit was possible, else: false */
     void clearRivals() { m_bookingRivals.clear(); } /**< deletes entries of the rivals vector */
 
 

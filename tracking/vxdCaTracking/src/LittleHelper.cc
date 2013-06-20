@@ -16,12 +16,6 @@
 using namespace std;
 using namespace Belle2;
 
-void LittleHelper::resetValues(double mean, double sigma)
-{
-  m_meanValue = mean;
-  m_sigmaValue = sigma;
-}
-
 
 bool LittleHelper::checkSanity(double low, double high, double mean, double sigma)
 {
@@ -45,23 +39,7 @@ double LittleHelper::smearValueGauss(double low, double high, double mean, doubl
   }
   return rngValue;
 }
-double LittleHelper::smearValueGauss(double low, double high) { return smearValueGauss(low, high, m_meanValue, m_sigmaValue); }
 
-
-
-double LittleHelper::smearPositiveGauss(double high, double mean, double sigma)
-{
-  return smearValueGauss(0, high, mean, sigma);
-}
-double LittleHelper::smearPositiveGauss(double high) {  return smearValueGauss(0, high, m_meanValue, m_sigmaValue); }
-
-
-double LittleHelper::smearNormalizedGauss(double mean, double sigma)
-{
-  return smearValueGauss(0, 1, mean, sigma);
-}
-double LittleHelper::smearNormalizedGauss(double mean) { return smearValueGauss(0, 1, mean, m_sigmaValue); }
-double LittleHelper::smearNormalizedGauss() { return smearValueGauss(0, 1, m_meanValue, m_sigmaValue); }
 
 
 double LittleHelper::smearValueUniform(double low, double high, double mean, double sigma)
@@ -75,18 +53,3 @@ double LittleHelper::smearValueUniform(double low, double high, double mean, dou
   }
   return rngValue;
 }
-double LittleHelper::smearValueUniform(double low, double high) { return smearValueUniform(low, high, m_meanValue, m_sigmaValue); }
-
-
-double LittleHelper::smearPositiveUniform(double high, double mean, double sigma)
-{
-  return smearValueUniform(0, high, mean, sigma);
-}
-double LittleHelper::smearPositiveUniform(double high) { return smearValueUniform(0, high, m_meanValue, m_sigmaValue); }
-
-
-double LittleHelper::smearNormalizedUniform(double mean, double sigma)
-{
-  return smearValueUniform(0, 1, mean, sigma);
-}
-double LittleHelper::smearNormalizedUniform() { return smearValueUniform(0, 1, m_meanValue, m_sigmaValue);  }

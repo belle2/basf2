@@ -99,7 +99,7 @@ namespace Belle2 {
     filterTypes getFilterType(int filterInt);
 
     /** converts existing enum value into suitable string with name of filter type. */
-    std::string getFilterString(filterTypes filterType);
+    std::string getFilterString(filterTypes filterType) { return nameVector[filterType]; }
 
     /** converts int value into suitable string with name of filter type (if int value is equal to values of enum). */
     std::string getFilterString(int filterType);

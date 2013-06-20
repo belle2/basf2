@@ -33,14 +33,3 @@ double FourHitFilters::deltaDistCircleCenter()   // instead of comparing both di
   return (abs(m_centerABC.Perp() - m_centerBCD.Perp())); // distance between both guesses of the intersection point
 } // return unit: cm
 
-
-
-void FourHitFilters::calcCircle()
-{
-  m_threeHitFilter.calcCircleCenter(m_hitA, m_hitB, m_hitC, m_centerABC);
-  m_radiusABC = m_threeHitFilter.calcRadius(m_hitA, m_hitB, m_hitC, m_centerABC);
-  m_threeHitFilter.calcCircleCenter(m_hitB, m_hitC, m_hitD, m_centerBCD);
-  m_radiusBCD = m_threeHitFilter.calcRadius(m_hitB, m_hitC, m_hitD, m_centerBCD);
-
-  m_circleCalculated = true;
-}

@@ -542,7 +542,7 @@ namespace Belle2 {
 
     bool m_PARAMqiSmear; /**<  allows to smear QIs via qqq-Interface, needed when having more than one TC with the same QI */
     bool m_PARAMcleanOverlappingSet; /**< when true, TCs which are found more than once (possible because of multipass) will get filtered */
-    bool m_PARAMuseHopfield;
+//     bool m_PARAMuseHopfield;
     std::string m_PARAMfilterOverlappingTCs; /**< defines which technique shall be used for filtering overlapping TCs, currently supported: 'hopfield', 'greedy', 'none' */
     int m_filterOverlappingTCs; /**< is set by m_PARAMfilterOverlappingTCs and defines which technique shall be used for filtering overlapping TCs */
     double m_PARAMsmearMean; /**< allows to introduce a bias for QI (e.g. surpressing all values, ...)*/

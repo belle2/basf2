@@ -57,29 +57,38 @@ namespace Belle2 {
     //      * @param pInnerSector pointer to sector in which the inner hit lies.
     //      */
 #ifndef __CINT__
-    VXDSegmentCell(VXDTFHit* pOuterHit, VXDTFHit* pInnerHit, MapOfSectors::iterator pOuterSector, MapOfSectors::iterator pInnerSector);
+    VXDSegmentCell(VXDTFHit* pOuterHit, VXDTFHit* pInnerHit, MapOfSectors::iterator pOuterSector, MapOfSectors::iterator pInnerSector):
+      m_pOuterHit(pOuterHit),
+      m_pInnerHit(pInnerHit),
+      m_pOuterSector(pOuterSector),
+      m_pInnerSector(pInnerSector) { m_state = 0; m_activated = true; m_seed = true; m_stateUpgrade = false; }
 #endif
 
     int getState() const { return m_state; } /**< returns state of Cell (CA-feature) */
     bool isSeed() const { return m_seed; } /**< returns whether Cell is allowed to be a seed for TCs */
     bool isActivated() const { return m_activated; } /**< returns activationState (CA-feature) */
     bool isUpgradeAllowed() const { return m_stateUpgrade; } /**< returns info whether stateIncrease is allowed or not (CA-feature) */
-    VXDTFHit* getInnerHit() const; /**< returns inner hit of current Cell */
-    VXDTFHit* getOuterHit() const; /**< returns outer hit of current Cell */
+    VXDTFHit* getInnerHit() const { return m_pInnerHit; } /**< returns inner hit of current Cell */
+    VXDTFHit* getOuterHit() const { return m_pOuterHit; } /**< returns outer hit of current Cell */
 
-    std::list<Belle2::VXDSegmentCell*>& getInnerNeighbours(); /**< returns list of inner Neighbours (CA-feature and needed by TC-Collector), does deliver different results depending on when you call that function */
-    const std::list<Belle2::VXDSegmentCell*>& getAllInnerNeighbours() const; /**< returns list of all inner neighbours (does not change during event) */
-    std::list<Belle2::VXDSegmentCell*>& getOuterNeighbours(); /**< returns list of outer Neighbours */
-    std::list<Belle2::VXDSegmentCell*>::iterator eraseInnerNeighbour(std::list<VXDSegmentCell*>::iterator it); /**< incompatible neighbours get kicked when new information about the situation recommends that step */
+    std::list<Belle2::VXDSegmentCell*>& getInnerNeighbours() { return m_innerNeighbours; } /**< returns list of inner Neighbours (CA-feature and needed by TC-Collector), does deliver different results depending on when you call that function */
+    const std::list<Belle2::VXDSegmentCell*>& getAllInnerNeighbours() const { return m_allInnerNeighbours; } /**< returns list of all inner neighbours (does not change during event) */
+    std::list<Belle2::VXDSegmentCell*>& getOuterNeighbours() { return m_outerNeighbours; } /**< returns list of outer Neighbours */
+
+    /** incompatible neighbours get kicked when new information about the situation recommends that step */
+    std::list<Belle2::VXDSegmentCell*>::iterator eraseInnerNeighbour(std::list<VXDSegmentCell*>::iterator it) {
+      it = m_innerNeighbours.erase(it);
+      return it;
+    } //items.erase(i++);  or  i = items.erase(i);
 
     void kickFalseFriends(TVector3 primaryVertex); /**<  checks state of inner neighbours and removes incompatible and virtual ones */
-    void copyNeighbourList(); /**<   makes a copy of m_innerNeighbours (to be used before CA!) */
+    void copyNeighbourList() { m_allInnerNeighbours = m_innerNeighbours; } /**<   makes a copy of m_innerNeighbours (to be used before CA!) */
     void increaseState() { m_state++; } /**< increases state during CA update step */
     void allowStateUpgrade(bool upgrade) { m_stateUpgrade = upgrade; } /**< sets flag whether Cell is allowed to increase state during update step within CA */
     void setSeed(bool seedValue) { m_seed = seedValue; } /**< sets flag whether Cell is allowed to be the seed of a new track candidate or not */
     void setActivationState(bool activationState) { m_activated = activationState; } /**< sets flag whether Cell is active (takes part during current CA iteration) or inactive (does not take part, it is 'dead') */
-    void addInnerNeighbour(VXDSegmentCell* aSegment); /**< adds an inner neighbour-cell */
-    void addOuterNeighbour(VXDSegmentCell* aSegment); /**< adds an outer neighbour-cell */
+    void addInnerNeighbour(VXDSegmentCell* aSegment) { m_innerNeighbours.push_back(aSegment); } /**< adds an inner neighbour-cell */
+    void addOuterNeighbour(VXDSegmentCell* aSegment) { m_outerNeighbours.push_back(aSegment); } /**< adds an outer neighbour-cell */
 
   protected:
     VXDTFHit* m_pOuterHit; /**< pointer to hit forming the outer end of the SegmentCell. */

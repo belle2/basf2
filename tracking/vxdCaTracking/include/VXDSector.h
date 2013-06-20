@@ -51,10 +51,10 @@ namespace Belle2 {
     void addCutoff(int cutOffType, unsigned int friendName, std::pair<double, double> values);
 
     /** setter - addInnerSegmentCell adds a VXDSegmentCell to member vector carrying inner Cells. 'inner' means, that these Cells are connected with sectors of inner layers. */
-    void addInnerSegmentCell(VXDSegmentCell* newSegment);
+    void addInnerSegmentCell(VXDSegmentCell* newSegment) { m_innerSegmentCells.push_back(newSegment); }
 
     /** setter - addOuterSegmentCell adds a VXDSegmentCell to member vector carrying inner Cells. 'outer' means, that these Cells are connected with sectors of outer layers. */
-    void addOuterSegmentCell(VXDSegmentCell* newSegment);
+    void addOuterSegmentCell(VXDSegmentCell* newSegment) { m_outerSegmentCells.push_back(newSegment); }
 
     /** getter - getSecID returns the ID of the sector (for definition of secID, see m_sectorID). */
     unsigned int getSecID() const { return m_sectorID; }
@@ -78,7 +78,7 @@ namespace Belle2 {
     Cutoff* getCutoff(int cutOffType, unsigned int aFriend);
 
     /** resetSector allows to delete all event-wise information (e.g. hits and segmentCells), but keeps longterm information like friends and cutoffs */
-    void resetSector();
+    void resetSector() { m_hits.clear(); m_innerSegmentCells.clear(); m_outerSegmentCells.clear(); } // should be called at the end of each event.
 
   protected:
     unsigned int m_sectorID; /**< secID allows identification of sector. Current definition ABCD, A: layerNumber(1-6), B: subLayerNumber(0,1)-defines whether sector has friends on same layer (=1) or not (=0), C:uniID, D: sectorID on sensor (0-X), whole info stored in an int, can be converted to human readable code by using FullSecID-class */

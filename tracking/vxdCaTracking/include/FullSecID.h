@@ -75,22 +75,22 @@ namespace Belle2 {
     ~FullSecID() {}
 
     /** returns LayerID compatible with basf2 standards. */
-    short int getLayerID();
+    short int getLayerID() { return m_fullSecID >> LayerBitShift; }
 
     /** returns SubLayerID which tells you whether it is useful to search for compatible sectors in the same layer as well. */
-    bool getSubLayerID();
+    bool getSubLayerID() { return (m_fullSecID bitand SubLayerMask) >> SubLayerBitShift; }
 
     /** returns VxdID of sensor. */
-    VxdID getVxdID();
+    VxdID getVxdID() { return VxdID((m_fullSecID bitand VxdIDMask) >> VxdIDBitShift); }
 
     /** returns uniID of sensor (basically the same as VxdID (can simply converted to vxdID(uniID)) but a trifle faster when only the short int value storing the VxdID information is wanted). */
-    unsigned short int getUniID();
+    unsigned short int getUniID() { return (m_fullSecID bitand VxdIDMask) >> VxdIDBitShift; }
 
     /** returns SecID of current FullSecID (only unique for each sensor). */
-    short int getSecID();
+    short int getSecID() { return (m_fullSecID bitand SectorMask); }
 
     /** returns the FullSecID coded as integer for further use (can be reconverted to FullSecID by using FullSecID(value)) */
-    int getFullSecID();
+    int getFullSecID() { return m_fullSecID; }
 
     /** returns the FullSecID coded as string compatible to secIDs stored in the xml-sectormaps */
     std::string getFullSecString();

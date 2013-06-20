@@ -55,7 +55,6 @@ param_vxdtf = {
     'calcQIType': 'circleFit',
     'filterOverlappingTCs': 'hopfield',
     'cleanOverlappingSet': True,
-    'useHopfield': True,
     'TESTERexpandedTestingRoutines': True,
     'qiSmear': False,
     }

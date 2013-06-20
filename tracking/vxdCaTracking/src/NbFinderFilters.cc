@@ -119,10 +119,3 @@ bool NbFinderFilters::checkHelixFit(int nameHelixFit)
   return false;
 }
 
-
-pair <double, double> NbFinderFilters::getCutoffs(int aFilter)
-{
-  Cutoff* pCutoff = m_thisSector->getCutoff(aFilter, m_friendID);
-  if (pCutoff != NULL) return make_pair(pCutoff->getMinValue(), pCutoff->getMaxValue());
-  return make_pair(0., 0.);
-}

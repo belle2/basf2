@@ -73,10 +73,16 @@ namespace Belle2 {
     double calcDistZ() { return m_dz; } // return unit: cm
 
     /** calculates the slope of the hits in RZ, return unit: cm (cm^2/cm = cm) */
-    double calcSlopeRZ(); // return unit: cm (cm^2/cm = cm)
+    double calcSlopeRZ() {
+      double slope = (m_x2 + m_y2) / m_dz;
+      return filterNan(slope);
+    } // return unit: cm  (cm^2/cm = cm)
 
     /** calculates the normed distance between the hits (3D), return unit: none */
-    double calcNormedDist3D(); // return unit: none
+    double calcNormedDist3D() {
+      double normedVal = (m_x2 + m_y2) / (m_x2 + m_y2 + m_z2);
+      return filterNan(normedVal);
+    } // return unit: none
 
     /** nice little nanChecker returns 0 if value was nan, else returns value itself */
     double filterNan(double value);

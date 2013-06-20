@@ -17,10 +17,6 @@ using namespace std;
 using namespace Belle2;
 
 
-bool ClusterInfo::isSameTC(const VXDTFTrackCandidate* a1, const VXDTFTrackCandidate* a2)
-{
-  if (a1 == a2) { return true; } else { return false; }
-}
 
 void ClusterInfo::addTrackCandidate(VXDTFTrackCandidate* aTC)
 {
@@ -31,15 +27,6 @@ void ClusterInfo::addTrackCandidate(VXDTFTrackCandidate* aTC)
   if (ctr == 0) { m_attachedTCs.push_back(aTC); }
 }
 
-// void ClusterInfo::deleteTrackCandidate ( VXDTFTrackCandidate& aTC ) {
-//  int ctr = 0;
-//  BOOST_FOREACH (VXDTFTrackCandidate& anotherTC, m_attachedTCs) {
-//    if ( isSameTC(aTC, anotherTC) == true ) {
-//
-//    }
-//  }
-//  if ( ctr != 0 ) { m_attachedTCs.push_back(aTC); }
-// }
 
 bool ClusterInfo::isOverbooked()
 {

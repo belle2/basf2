@@ -19,7 +19,8 @@ using namespace std;
 using namespace Belle2;
 
 
-VXDTFTrackCandidate::VXDTFTrackCandidate(VXDTFTrackCandidate*& other) :
+
+VXDTFTrackCandidate::VXDTFTrackCandidate(VXDTFTrackCandidate*& other):
   m_attachedHits((*other).m_attachedHits),
   m_attachedCells((*other).m_attachedCells),
   m_svdHitIndices((*other).m_svdHitIndices),
@@ -33,11 +34,8 @@ VXDTFTrackCandidate::VXDTFTrackCandidate(VXDTFTrackCandidate*& other) :
   /*m_neuronValue = 0; m_overlapping = false; m_alive = true; m_qualityIndex = 1.0;*/
 }
 
+
 /** getter **/
-vector<Belle2::VXDSegmentCell*> VXDTFTrackCandidate::getSegments() { return m_attachedCells; }
-
-vector<Belle2::VXDTFHit*> VXDTFTrackCandidate::getHits() { return m_attachedHits; }
-
 vector<TVector3*> VXDTFTrackCandidate::getHitCoordinates()
 {
   vector<TVector3*> coordinates;
@@ -45,18 +43,6 @@ vector<TVector3*> VXDTFTrackCandidate::getHitCoordinates()
     coordinates.push_back(hit->getHitCoordinates());
   }
   return coordinates;
-}
-
-bool VXDTFTrackCandidate::getOverlappingState()
-{
-  return m_overlapping;
-///   int currentNumber = 1;
-///   BOOST_FOREACH(VXDTFHit * aHit, m_attachedHits) {
-///     if ( currentNumber != aHit->getNumberOfTrackCandidates() ) {
-///       return true;
-///     }
-///   }
-///   return false;
 }
 
 bool VXDTFTrackCandidate::checkOverlappingState()
@@ -71,9 +57,6 @@ bool VXDTFTrackCandidate::checkOverlappingState()
 
 
 /** setter **/
-void VXDTFTrackCandidate::addSVDClusterIndex(int anIndex) { m_svdHitIndices.push_back(anIndex); }
-void VXDTFTrackCandidate::addPXDClusterIndex(int anIndex) { m_pxdHitIndices.push_back(anIndex); }
-
 void VXDTFTrackCandidate::addBookingRival(VXDTFTrackCandidate* aTC)
 {
   int ctr = 0;
@@ -85,7 +68,6 @@ void VXDTFTrackCandidate::addBookingRival(VXDTFTrackCandidate* aTC)
 
 }
 
-void VXDTFTrackCandidate::addHopfieldClusterIndex(int anIndex) { m_hopfieldHitIndices.push_back(anIndex); }
 
 vector<int> VXDTFTrackCandidate::getSVDHitIndices()
 {
@@ -125,34 +107,6 @@ list<int> VXDTFTrackCandidate::getHopfieldHitIndices()
 }
 
 
-void VXDTFTrackCandidate::addSegments(Belle2::VXDSegmentCell* pCell) { m_attachedCells.push_back(pCell); }
-
-// void VXDTFTrackCandidate::addSegments(std::vector<VXDSegmentCell*> vCells) { /// TODO: check whether this memberfunction is still needed
-//  int num = vCells.size();
-//  for (int i = 0; i < num; i++) {
-//    m_attachedCells.push_back(vCells[i]);
-//  }
-// }
-void VXDTFTrackCandidate::addHits(VXDTFHit* pHit)
-{
-  pHit->addTrackCandidate();
-  m_attachedHits.push_back(pHit);
-}
-// void VXDTFTrackCandidate::addHits(std::vector<VXDTFHit*> vHits) { /// TODO: check whether this memberfunction is still needed
-//  int num = vHits.size();
-//  for (int i = 0; i < num; i++) {
-//    m_attachedHits.push_back(vHits[i]);
-//  }
-// }
-
-void VXDTFTrackCandidate::setOverlappingState(bool newState) { m_overlapping = newState; }
-
-void VXDTFTrackCandidate::setTrackQuality(double newVal) { m_qualityIndex = newVal; }
-
-void VXDTFTrackCandidate::setQQQ(double qqqScore, double maxScore)
-{
-  m_qqq = sqrt(qqqScore / maxScore);
-}
 
 void VXDTFTrackCandidate::setCondition(bool newCondition)
 {
@@ -168,8 +122,6 @@ void VXDTFTrackCandidate::setCondition(bool newCondition)
   m_alive = newCondition;
 }
 
-
-void VXDTFTrackCandidate::setNeuronValue(double aValue) { m_neuronValue = aValue; }
 
 void VXDTFTrackCandidate::removeVirtualHit()   /// removing virtual hit/segment from TC after collecting the whole TC. This is done after the TCC and the TCC filter since the TCC needs the information provided by the virtual hit/segment.
 {
@@ -210,11 +162,6 @@ void VXDTFTrackCandidate::removeVirtualHit()   /// removing virtual hit/segment 
   }
 }
 
-void VXDTFTrackCandidate::setInitialValue(TVector3 aHit, TVector3 pVector, int pdg) { m_initialHit = aHit; m_initialMomentum = pVector; m_pdgCode = pdg; m_initialValuesSet = true; }
-
-void VXDTFTrackCandidate::setPassIndex(int anIndex) { m_passIndex = anIndex; }
-
-void VXDTFTrackCandidate::setFitSucceeded(bool yesNo) { m_fitSucceeded = yesNo; }
 
 TVector3 VXDTFTrackCandidate::getInitialMomentum()
 {

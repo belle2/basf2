@@ -101,8 +101,9 @@ void ECLMCMatchingModule::event()
   StoreArray<MCParticle> mcParticles;
   PrimaryTrackMap eclPrimaryMap;
   eclPrimaryMap.clear();
-  //for (int iPart = 0; iPart < mcParticles.getEntries() ; ++iPart) {
-  for (int iPart = 0; iPart < 1000 ; ++iPart) {//skip some mcParticles from ROF to speed up
+  int nParticles = mcParticles.getEntries();
+  if (nParticles > 1000)nParticles = 1000; //skip many mcParticles from ROF to speed up
+  for (int iPart = 0; iPart < nParticles ; ++iPart) {
     if (mcParticles[iPart]->getMother() == NULL
         && !mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle)
         && !mcParticles[iPart]->hasStatus(MCParticle::c_StableInGenerator)) continue;

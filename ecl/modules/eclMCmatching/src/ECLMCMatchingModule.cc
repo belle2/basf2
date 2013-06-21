@@ -101,10 +101,13 @@ void ECLMCMatchingModule::event()
   StoreArray<MCParticle> mcParticles;
   PrimaryTrackMap eclPrimaryMap;
   eclPrimaryMap.clear();
+  //for (int iPart = 0; iPart < mcParticles.getEntries() ; ++iPart) {
+  for (int iPart = 0; iPart < 1000 ; ++iPart) {//skip some mcParticles from ROF to speed up
+    if (mcParticles[iPart]->getMother() == NULL
+        && !mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle)
+        && !mcParticles[iPart]->hasStatus(MCParticle::c_StableInGenerator)) continue;
 
-  for (int iPart = 0; iPart < mcParticles.getEntries() ; ++iPart) {
     bool adhoc_StableInGeneratorFlag(mcParticles[iPart]->hasStatus(MCParticle::c_StableInGenerator));
-
     if (mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle)
         && adhoc_StableInGeneratorFlag) {
       if (mcParticles[iPart]->getArrayIndex() == -1)
@@ -113,11 +116,14 @@ void ECLMCMatchingModule::event()
     } else {
       if (mcParticles[iPart]->getMother() == NULL) continue;
       if (eclPrimaryMap.find(mcParticles[iPart]->getMother()->getArrayIndex()) != eclPrimaryMap.end()) {
-        eclPrimaryMap.insert(pair<int, int>(mcParticles[iPart]->getArrayIndex(), eclPrimaryMap[mcParticles[iPart]->getMother()->getArrayIndex()]));
-      }
-    }
+        eclPrimaryMap.insert(
+          pair<int, int>(mcParticles[iPart]->getArrayIndex(), eclPrimaryMap[mcParticles[iPart]->getMother()->getArrayIndex()]));
+      }//if mother of mcParticles is stored.
+    }//if c_StableInGenerator and c_PrimaryParticle
 
-  }
+  }//for mcParticles
+
+
   StoreArray<ECLHit> eclHitArray;
   RelationArray eclHitRel(mcParticles, eclHitArray);
   StoreArray<ECLDigit> eclDigiArray;
@@ -156,7 +162,6 @@ void ECLMCMatchingModule::event()
   StoreArray<ECLShower> eclRecShowerArray;
   StoreArray<ECLHitAssignment> eclHitAssignmentArray;
   RelationArray  eclShowerToMCPart(eclRecShowerArray, mcParticles);
-
 
   PrimaryTrackMap eclMCParticleContributionMap;//the cell could be below to several
   eclMCParticleContributionMap.clear();
@@ -197,7 +202,6 @@ void ECLMCMatchingModule::event()
     eclShowerToMCPart.add(showerId, PrimaryIndex);
 
   }//ShowerNum
-
 
   /*
     StoreArray<ECLGamma> gammaArray;

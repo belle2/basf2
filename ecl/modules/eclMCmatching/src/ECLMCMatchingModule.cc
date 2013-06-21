@@ -230,10 +230,10 @@ void ECLMCMatchingModule::event()
     eclShowerToMCPart.add(showerId, PrimaryIndex);
     //           cout << "Event" << m_nEvent  << " RecShower" << showerId
     //                << " Energy " <<  aECLShower->getEnergy()
-        << " theta " <<  aECLShower->getTheta() * 180 / M_PI << " phi " <<  aECLShower->getPhi() * 180 / M_PI
-        << " mom" << PrimaryIndex
-        << " PDG " << mcParticles[PrimaryIndex]->getPDG()
-        << endl;
+    //    << " theta " <<  aECLShower->getTheta() * 180 / M_PI << " phi " <<  aECLShower->getPhi() * 180 / M_PI
+    //    << " mom" << PrimaryIndex
+    //    << " PDG " << mcParticles[PrimaryIndex]->getPDG()
+    //    << endl;
 
   }//ShowerNum
 

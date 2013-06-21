@@ -118,11 +118,6 @@ void ECLReconstructorModule::event()
 
 
     for (EclCFShowerMap::const_iterator iShower = iCR->Showers().begin(); iShower != iCR->Showers().end(); ++iShower) {
-      ///
-      /// Shower Attributes
-      ///
-//      cout << "shower  " << nShower << "shower Energy: " << (*iShower).second.Energy() << " Theta " << (*iShower).second.Theta() / PI * 180 << " Phi " << (*iShower).second.Phi() / PI * 180 << " " <<  (float)(*iShower).second.E9oE25()<< endl;
-
       TEclCFShower iSh = (*iShower).second;
       std::vector<MEclCFShowerHA> HAs = iSh.HitAssignment();
       for (std::vector<MEclCFShowerHA>::iterator iHA = HAs.begin();

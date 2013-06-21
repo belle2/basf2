@@ -103,31 +103,8 @@ void ECLMCMatchingModule::event()
   eclPrimaryMap.clear();
 
   for (int iPart = 0; iPart < mcParticles.getEntries() ; ++iPart) {
-    /*
-                      if (mcParticles[iPart]->getMother() == NULL)
-                        cout << "Event " << m_nEvent << " primary track ID " << mcParticles[iPart]->getArrayIndex()
-                             << " pdg " << mcParticles[iPart]->getPDG()
-                             << " p " << mcParticles[iPart]->getMomentum().Mag()
-                             << " theta " << mcParticles[iPart]->getMomentum().Theta() * 180 / M_PI
-                             << " phi " <<   mcParticles[iPart]->getMomentum().Phi() * 180 / M_PI
-                             << " vtx " << mcParticles[iPart]->getProductionVertex().Perp() << " " << mcParticles[iPart]->getProductionVertex().z()
-                             << " Stable "<<mcParticles[iPart]->hasStatus(MCParticle::c_StableInGenerator)
-                             << " Primary " <<mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle) << endl;
-                      else
-                        cout << "Event " << m_nEvent << "Track " << mcParticles[iPart]->getArrayIndex()
-                             << " PDG " << mcParticles[iPart]->getPDG()
-                             << " P " << mcParticles[iPart]->getMomentum().Mag()
-                             << " vtx " << mcParticles[iPart]->getProductionVertex().Perp() << " " << mcParticles[iPart]->getProductionVertex().z()
-                             << " Mother " << mcParticles[iPart]->getMother()->getArrayIndex()
-                             << " PDG " << mcParticles[mcParticles[iPart]->getMother()->getArrayIndex()]->getPDG()
-                             << " P " << mcParticles[mcParticles[iPart]->getMother()->getArrayIndex()]->getMomentum().Mag()
-                             << " Stable "<<mcParticles[iPart]->hasStatus(MCParticle::c_StableInGenerator)
-                             << " Primary " <<mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle) << endl;
-    */
     bool adhoc_StableInGeneratorFlag(mcParticles[iPart]->hasStatus(MCParticle::c_StableInGenerator));
 
-
-    // fill primary particles as the origins
     if (mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle)
         && adhoc_StableInGeneratorFlag) {
       if (mcParticles[iPart]->getArrayIndex() == -1)
@@ -156,7 +133,6 @@ void ECLMCMatchingModule::event()
 
   for (int index = 0; index < eclHitRel.getEntries(); index++) {
 
-    //MCParticle* aMCParticle = mcParticles[eclHitRel[index].getFromIndex()];
     int PrimaryIndex = -1;
     map<int, int>::iterator iter = eclPrimaryMap.find(eclHitRel[index].getFromIndex());
 
@@ -219,59 +195,9 @@ void ECLMCMatchingModule::event()
     eclMCParticleContributionMap.clear();
     if (PrimaryIndex == -1)continue;
     eclShowerToMCPart.add(showerId, PrimaryIndex);
-    //cout << "Event" << m_nEvent  << " RecShower" << showerId
-    //     << " Energy " <<  aECLShower->getEnergy()
-    //     << " theta " <<  aECLShower->getTheta() * 180 / M_PI << " phi " <<  aECLShower->getPhi() * 180 / M_PI
-    //     << " Primary " << PrimaryIndex
-    //     << " PDG " << mcParticles[PrimaryIndex]->getPDG()
-    //     << endl;
 
   }//ShowerNum
 
-  /*
-    MultiMap ShowerOldTrackMap;
-    ShowerOldTrackMap.clear();
-
-    //cout<<"Total showers in Event "<<m_nEvent<<" : "<< ShowerNum<<endl;
-    for (int index = 0; index < eclDigiToMCPart.getEntries(); index++) {
-      ECLDigit* aECLDigi = eclDigiArray[eclDigiToMCPart[index].getFromIndex()];
-      int cId          = (aECLDigi->getCellId() - 1);
-      for (int iMCpart = 0; iMCpart < (int)eclDigiToMCPart[index].getToIndices().size(); iMCpart++) {
-
-        int ShowerIndex = -1;
-        MultiMap::size_type entries = eclShowerMap.count(cId);
-        MultiMap::iterator iter = eclShowerMap.find(cId);
-        for (MultiMap::size_type cnt = 0; cnt != entries; ++cnt) {
-
-          ShowerIndex =  iter++->second ;
-          bool OldRel = 0;
-          MultiMap::size_type OldTrackEntries = ShowerOldTrackMap.count(ShowerIndex);
-          MultiMap::iterator OldTrackIter = ShowerOldTrackMap.find(ShowerIndex);
-          for (MultiMap::size_type iOldTrack = 0; iOldTrack != OldTrackEntries ; ++iOldTrack) {
-            if (OldTrackIter++->second == (int) eclDigiToMCPart[index].getToIndex(iMCpart)) {
-              OldRel = 1;
-            }
-          }
-
-
-
-          if (ShowerIndex != -1 && OldRel == 0) {
-            eclShowerToMCPart.add(ShowerIndex, eclDigiToMCPart[index].getToIndex(iMCpart));
-            ECLShower* aECLShower = eclRecShowerArray[ShowerIndex];
-                       cout << "Event" << m_nEvent  << " RecShower" << ShowerIndex
-                            << " Energy " <<  aECLShower->getEnergy()
-                            << " theta " <<  aECLShower->getTheta() * 180 / M_PI << " phi " <<  aECLShower->getPhi() * 180 / M_PI
-                            << " mom" << eclDigiToMCPart[index].getToIndex(iMCpart)
-                            << " PDG " << mcParticles[eclDigiToMCPart[index].getToIndex(iMCpart)]->getPDG()
-                            << endl;
-            ShowerOldTrackMap.insert(pair<int, int>(ShowerIndex, eclDigiToMCPart[index].getToIndex(iMCpart)));
-
-          }//ShowerIndex != -1
-        }//loop for eclShowerMap(cell,shower)
-      }//for iMCpart
-    }//for index
-
-  */
 
   /*
     StoreArray<ECLGamma> gammaArray;

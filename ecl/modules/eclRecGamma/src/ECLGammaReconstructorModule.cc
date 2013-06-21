@@ -100,7 +100,6 @@ void ECLGammaReconstructorModule::event()
 
   readExtrapolate();//m_TrackCellId[i] =1 => Extrapolated cell
 
-  //cout<<"Event "<< m_nEvent<<" Total input number of Shower Array "<<hitNum<<endl;
   for (int iShower = 0; iShower < eclRecShowerArray.getEntries(); iShower++) {
     ECLShower* aECLShower = eclRecShowerArray[iShower];
     m_showerId = aECLShower->GetShowerId();
@@ -112,7 +111,6 @@ void ECLGammaReconstructorModule::event()
     m_width  = aECLShower->GetWidth();
     m_nhit      = aECLShower->GetNHits();
     m_quality   = aECLShower->GetStatus();
-//    cout<<m_showerId<<" "<<m_energy<<" "<<m_Theta<<" "<<m_phi<<endl;;
     if (m_quality != 0)continue;
     if (!goodGamma(m_Theta, m_energy, m_nhit, m_e9oe25, m_width, m_ecut, m_e925cut, m_widcut, m_nhcut))continue;
 
@@ -133,32 +131,11 @@ void ECLGammaReconstructorModule::event()
     }//for HA hANum
 
     if (!m_extMatch) { //no match to track => assign as gamma
-
       if (!gammaArray) gammaArray.create();
-
       new(gammaArray.nextFreeAddress()) ECLGamma();
       m_GNum = gammaArray.getEntries() - 1;
       gammaArray[m_GNum]->setShowerId(m_showerId);
       eclGammaToShower.add(m_GNum, iShower);
-
-      /*
-                  double px = m_energy * sin(m_theta) * cos(m_phi);
-                  double py = m_energy * sin(m_theta) * sin(m_phi);
-                  double pz = m_energy * cos(m_theta);
-
-            cout << "EventGamma  " << m_nEvent << " Gamma " << m_showerId <<
-                    " " << sqrt(px * px + py * py + pz * pz) << " m_extMatch  " << m_extMatch << endl;
-                                                cout<<"CellID ";
-
-            for (int iHA = 0; iHA < hANum; iHA++) {
-              ECLHitAssignment* aECLShower = eclHitAssignmentArray[iHA];
-              int m_HAShowerId = aECLShower->getShowerId();
-              int m_HAcellId = aECLShower->getCellId();
-              if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
-            }//for HA hANum
-             cout<<endl;
-
-      */
     }//if !m_extMatch
 
 

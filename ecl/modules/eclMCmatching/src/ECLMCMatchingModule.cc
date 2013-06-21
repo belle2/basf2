@@ -138,6 +138,7 @@ void ECLMCMatchingModule::event()
     DigiIndex[cId] = ii;
   }
 
+
   for (int index = 0; index < eclHitRel.getEntries(); index++) {
 
     int PrimaryIndex = -1;
@@ -166,6 +167,7 @@ void ECLMCMatchingModule::event()
 
   PrimaryTrackMap eclMCParticleContributionMap;//the cell could be below to several
   eclMCParticleContributionMap.clear();
+
 
   for (int iShower = 0; iShower < eclRecShowerArray.getEntries(); iShower++) {
     ECLShower* aECLShower = eclRecShowerArray[iShower];
@@ -199,9 +201,36 @@ void ECLMCMatchingModule::event()
     }
 
     eclMCParticleContributionMap.clear();
-    if (PrimaryIndex == -1)continue;
-    eclShowerToMCPart.add(showerId, PrimaryIndex);
 
+    if (PrimaryIndex == -1) {//Shower is not due to primary particles whcih is supposed due to BeamBG particles
+      /*//need more BeamBG  sample to test if CPU time consuming is acceptable
+
+      double MaxEnergy = 0;
+      for (int iHA = 0; iHA <  eclHitAssignmentArray.getEntries(); iHA++) {
+        ECLHitAssignment* aECLHitAssignment = eclHitAssignmentArray[iHA];
+        int m_HAShowerId = aECLHitAssignment->getShowerId();
+        int m_HAcellId = aECLHitAssignment->getCellId() - 1 ;
+        if (m_HAShowerId != showerId)continue;
+        if (m_HAShowerId > showerId)break;
+
+        for (int iMCPart = 0; iMCPart < eclHitRel.getEntries(); iMCPart++) {
+          for (int hit = 0; hit < (int)eclHitRel[iMCPart].getToIndices().size(); hit++) {
+            ECLHit* aECLHit = eclHitArray[eclHitRel[iMCPart].getToIndex(hit)];
+            int hitCellId         = aECLHit->getCellId() - 1;
+            double hitE         =  aECLHit->getEnergyDep() / Unit::GeV;
+            if (hitCellId==m_HAcellId  &&hitE> MaxEnergy ) {
+              MaxEnergy=hitE;
+              PrimaryIndex =eclHitRel[iMCPart].getFromIndex();
+
+            }
+          }//for  hit
+        }//for iMCPart
+      }//for HA hANum
+      eclShowerToMCPart.add(showerId, PrimaryIndex);
+      *///need more BeamBG  sample to test if CPU time consuming is acceptable
+    } else {
+      eclShowerToMCPart.add(showerId, PrimaryIndex);
+    }
   }//ShowerNum
 
   /*

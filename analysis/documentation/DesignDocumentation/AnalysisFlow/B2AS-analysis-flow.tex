@@ -1,0 +1,25 @@
+\subsection{Data flow}
+\secwriter{P. Urquijo}
+
+\subsection{Modular analysis approach}
+\secwriter{P. Urquijo, A. Zupanc}
+
+A typical analysis can be separated into well defined analysis actions. For example, in a measurement of time-dependent $CP$ violation
+in $B^0\to \phi K^0_S$ decays we need to execute the following actions:
+\begin{itemize}
+\item create list of charged kaon candidates
+\item create list of $\phi$ candidates by making combinations of two oppositely charged kaons
+\item create list of $K^0_S$ candidates
+\item create list of $B^0$ candidates by making combinations of $\phi$ and $K^0_S$ candidates
+\item calculate continuum suppression variables
+\item determine the flavor of $B^0$ candidates
+\item determine the decay vertex of $B^0$ candidates
+\item determine the decay vertex of the other $B$ meson in the event
+\item write out all relevant info to ntuple for offline analysis
+\end{itemize}
+A measurement of time-dependent $CP$ violation in $B^0$ decays to a different final state, e.g. $J/\psi K^0_S$, $D^+D^-$ or 
+$K^{\ast0}\gamma$, would consist of conceptually identical analysis actions. The only difference is in the intermediate and final state
+particles. Therefore, commonly used analysis tools need to be prepared in order to enable efficient and accurate data analysis. 
+
+Plans is to develop for each analysis action an analysis module so that the whole analysis sequence given above can be executed
+within a python script.

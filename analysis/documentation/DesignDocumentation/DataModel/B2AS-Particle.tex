@@ -1,0 +1,112 @@
+\newpage
+\subsection{\particle}
+\secwriter{A. Zupanc}
+
+\paragraph{General overview}
+
+This class is a common representation of all particle types, e.g.:
+\begin{itemize}
+ \item final state particles (FS particles)
+ \begin{itemize}
+  \item charged kaons, pions, electrons, muons, and protons reconstructed as {\tt Track}
+  \item photons reconstructed as {\tt ECLGamma}
+  \item long lived neutral kaons reconstructed in KLM
+ \end{itemize}
+ \item composite particles
+ \begin{itemize}
+  \item neutral pion pre-reconstructed as {\tt ECLPi0} neutral pionpi0, Kshort, Lambda, ...
+  \item vee particles (short lived neutral kaon, $\lambda$ baryon, converted photon) pre-reconstructed as {\tt MdstVee}\footnote{Note: 
+  {\tt MdstVee} or equivalent data-object does not exist yet.}
+ \item particles reconstructed by the user (via combinations)
+ \end{itemize}
+\end{itemize}
+
+Private members are limited to those which completely define the particle and that are common to all particle types. Information which
+exists and is unique only to a specific type of particles should not be saved inside the \particle class. Such information should be 
+saved inside a specialy designed data object which can be created and filled with some analysis module. This data object can be
+related to the \particle objects of a specific type using BASF2 \relation. An example of such additional information and corresponding
+data object are particle identification likelihoods which are stored in \pidLikelihood class. 
+
+Private members are divided into persistent and transient data members. The former are those which can't be (easily) reproduced and therefore need
+to be saved to \mudst while the latter can be easily reproduced (recalculated) on-demand.
+
+\subsubsection{Data members}
+
+\paragraph{Persistent members} 
+\begin{itemize}
+ \item {\color{blue}energy} \hfill{float}
+ \item {\color{blue}momentum vector} \hfill{$3\times$float}
+ \begin{itemize}
+  \item the point in which the momentum vector is estimated is given in the position/decay vertex data member
+ \end{itemize}
+ \item {\color{blue}position/decay vertex} \hfill{$3\times$float}
+ \begin{itemize}
+  \item in the case of charged FS particles this is point-of-closest-approach (POCA), which is coppied from the \track data object.
+  \item in the case of neutrals ($\gamma$, $\pi^0$, or $K^0_L$) this is the point of origin which is assumed during the 
+  reconstruction of these particles (e.g. point $(0,0,0)$ or IP). This point is  coppied from the corresponding \mdst data object. 
+  \item in the case of composite particles this is the decay vertex determined by some vertexing module and until then this point is (0,0,0)
+ \end{itemize}
+ \item {\color{blue}$7\times7$ error matrix} \hfill{$28\times$float}
+ \begin{itemize}
+  \item order of elements in the error matrix is: $p_x, p_y, p_z, E, x, y, z$
+  \item in the case of (pre-reconstructed) FS particles the error matrix is filled in \particle constructor
+  \item in the case of composite particles the error matrix is filled when a kinematic fit is performed (until then is empty)
+  \item internally the error matrix is saved as one dimensional array with 28 elements
+ \end{itemize}
+ \item {\color{blue}$\chi^2$ probability of the fit} \hfill{float}
+ \begin{itemize}
+  \item in case of charged FS particles a $\chi^2$ value of the track fit is stored and in case of all composite particles the 
+  $\chi^2$ value of the kinematic fit is stored (e.g. mass-constrained, vertex, mass-constrained vertex fit)
+  \item variable is initialized to -1
+  \begin{itemize}
+   \item $\chi^2<0$ indicates that the error matrix is not valid
+   \item $\chi^2\geq 0$ indicates that the error matrix is valid
+  \end{itemize}
+ \end{itemize}
+ \item {\color{blue}number of degrees of freedom of the fit} \hfill{int}
+ \begin{itemize}
+  \item same as above
+ \end{itemize}
+ \item {\color{blue} PDG code} \hfill{int}
+ \begin{itemize}
+  \item identification code of a particle
+ \end{itemize}
+ \item {\color{blue} vecotor of {\tt StoreArray$\langle$Particle$\rangle$} indices of daughter particles} \hfill{vector$\langle$int$\rangle$}
+ \begin{itemize}
+  \item As it will be discussed later all \particle objects are stored inside the same StoreArray$\langle$Particle$\rangle$. This vector
+  thus holds indicies of daughter particles within this StoreArray$\langle$Particle$\rangle$.
+ \end{itemize}
+ \item {\color{blue} mdst index of an object from which the FS particle is created} \hfill{int}
+ \begin{itemize}
+  \item only filled for (pre-reconstructed) particles
+  \item needed in order to check for overlaps when performing combinations
+ \end{itemize}
+ \item {\color{blue} type of the object from which the particle is created } \hfill{int}
+ \begin{itemize}
+  \item see {\tt EParticleType} enum
+  \item motivation is the same as above
+ \end{itemize}
+ \item {\color{blue}flavor type} \hfill{int}
+ \begin{itemize}
+  \item in order to support automatic reconstruction of charged conjugated decays
+ \end{itemize}
+\end{itemize}
+
+\paragraph{Transient members}
+
+\begin{itemize}
+ \item {\color{blue} pointer to the {\tt StoreArray$\langle$Particle$\rangle$}}\hfill{\tt TClonesArray$\ast$}
+ \begin{itemize}
+  \item  {\tt StoreArray$\langle$Particle$\rangle$} in which this \particle object is saved
+ \end{itemize}
+\end{itemize}
+
+\subsubsection{Constructors}
+
+% \paragraph{Constructors from \mdst dataobjects}
+% \begin{itemize}
+%  \item {\color{blue}\tt Particle(const Track*, const Const::ChargedStable\&, const int)}
+% \end{itemize}
+
+
+\subsubsection{Member functions}

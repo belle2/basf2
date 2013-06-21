@@ -1,0 +1,106 @@
+\documentclass[a4paper,11pt]{article}
+\pdfoutput=1
+
+\usepackage{jheppub} % for details on the use of the package, please
+                     % see the JHEP-author-manual
+
+\usepackage{hyperref}
+\usepackage{fancyvrb,color}
+\usepackage{colortbl}
+\usepackage{xspace}
+\usepackage[T1]{fontenc} % if needed
+
+
+\subheader{
+Draft-Version-0.1 (Latex run \today)\\
+}
+
+\title{\boldmath Belle 2 Analysis Software Design Documentation}
+
+% if you make contribution to this document please add your name and affiliation to the list
+\author[a]{C.~Oswald}
+\author[b]{C.~Pulvermacher}
+\author[c]{M.~Stari\v{c}}
+\author[a]{P.~Urquijo}
+\author[b]{A.~Zupanc}
+\affiliation[a]{University of Bonn, Bonn, Germany}
+\affiliation[b]{Karlsruhe Insitute Of Technology, Karlsruhe, Germany}
+\affiliation[c]{Jo\v{z}ef Stefan Institute, Ljubljana, Slovenia}
+
+\abstract{
+We summarize the Belle 2 analysis sofware design decisions and discuss usecases.
+}
+
+\input{B2AS-definitions}
+
+\begin{document} 
+\maketitle
+\flushbottom
+
+\paragraph{What is software design document?}
+
+{\it A software design document is a written description of a software product, that a software designer 
+writes in order to give a software development team an overall guidance of the architecture of the software 
+project. An software design document usually accompanies an architecture diagram with pointers to detailed 
+feature specifications of smaller pieces of the design. Practically, a design document is required to coordinate 
+a large team under a single vision. A design document needs to be a stable reference, outlining all parts of 
+the software and how they will work. The document is commanded to give a fairly complete description, while 
+maintaining a high-level view of the software.} (copied from wikipedia)
+
+\section{BASF2 overview}
+\input{BASF2/B2AS-BASF2.tex}
+
+\section{Introduction to analysis software}
+\input{AnalysisFlow/B2AS-analysis-flow}
+
+\section{Data model}
+
+General guidelines:
+\begin{itemize}
+ \item follow coding conventions given in \cite{basf2:coding:convention}
+ \item public data members are forbidden
+ \item avoid {\tt TObject}-derived data members (e.g. {\tt sizeof(TVector3)=40, 3*sizeof(double)=24}). Accessors can still return 
+  convenient objects like TVector3. 
+ \item clearly indicate what are {\it transient} and {\it persistent} data members
+\end{itemize}
+    
+\input{DataModel/B2AS-Particle}
+\input{DataModel/B2AS-ParticleList}
+\input{DataModel/B2AS-MCParticle}
+\input{DataModel/B2AS-Vertex}
+\input{DataModel/B2AS-PIDLikelihood}
+
+\newpage
+\section{General purpuse analysis modules}
+
+General guidlines:
+\begin{itemize}
+ \item analysis module performs single well defined analysis action. Grouping of several analysis actions within one 
+ module does not follow modular programming paradigm and should be avoided.
+ \item clearly state what is the required input and what is the output of a module
+ \item clearly state what kind of impact has on existing objects in data store
+ \item clearly define the module parameters, define their default and specify valid (range of) values
+\end{itemize}
+
+
+\input{AnalysisModules/B2AS-ParticleLoader}
+\input{AnalysisModules/B2AS-ParticleSelector}
+\input{AnalysisModules/B2AS-ParticleCombiner}
+\input{AnalysisModules/B2AS-ParticleVertexFitter}
+\input{AnalysisModules/B2AS-NtupleMaker}
+
+\section{Analysis specific analysis modules}
+
+\section{Utility modules}
+\input{UtilityModules/B2AS-PLMerger.tex}
+
+\section{Utility functions}
+
+\section{Utility tools}
+\input{UtilityTools/B2AS-NtupleTools.tex}
+
+% BIBLIOGRAPHY
+\input{B2AS-Bibliography}
+
+\end{document}
+

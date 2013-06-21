@@ -89,17 +89,15 @@ void ECLReconstructorModule::event()
     return;
   }
 
-//  int checkflag = 0;
   cout.unsetf(ios::scientific);
   cout.precision(6);
   TRecEclCF& cf = TRecEclCF::Instance();
   cf.Clear();
 
   //cout<<"Event "<< m_nEvent<<" Total input entries of Digi Array  "<<eclDigiArray->GetEntriesFast()<<endl;
-  int hitNum = eclDigiArray.getEntries();
 
   TEclEnergyHit ss;
-  for (int ii = 0; ii < hitNum; ii++) {
+  for (int ii = 0; ii < eclDigiArray.getEntries(); ii++) {
     ECLDigit* aECLDigi = eclDigiArray[ii];
     float FitEnergy    = (aECLDigi->getAmp()) / 20000.;//ADC count to GeV
     //float FitTime      =  (1520 - aECLDigi->getTimeFit())*24.*12/508/(3072/2) ;//in us
@@ -132,17 +130,12 @@ void ECLReconstructorModule::event()
 
         StoreArray<ECLHitAssignment> eclHaArray;
         if (!eclHaArray) eclHaArray.create();
-        //m_HANum = eclHaArray->GetLast() + 1;
-        //new(eclHaArray->AddrAt(m_HANum)) ECLHitAssignment();
         new(eclHaArray.nextFreeAddress()) ECLHitAssignment();
         m_HANum = eclHaArray.getEntries() - 1;
 
         eclHaArray[m_HANum]->setShowerId(nShower);
-        eclHaArray[m_HANum]->setCellId(iHA->Id());
-
-//        cout<<iHA->Id()<<" ";
+        eclHaArray[m_HANum]->setCellId(iHA->Id() + 1);
       }
-//        cout<<endl;
 
       double energyBfCorrect = (*iShower).second.Energy();
       double preliminaryCalibration = correctionFactor(energyBfCorrect, (*iShower).second.Theta()) ;
@@ -151,8 +144,6 @@ void ECLReconstructorModule::event()
 
       StoreArray<ECLShower> eclRecShowerArray;
       if (!eclRecShowerArray) eclRecShowerArray.create();
-      //m_hitNum = eclRecShowerArray->GetLast() + 1;
-      //new(eclRecShowerArray->AddrAt(m_hitNum)) ECLShower();
       new(eclRecShowerArray.nextFreeAddress()) ECLShower();
       m_hitNum = eclRecShowerArray.getEntries() - 1;
       eclRecShowerArray[m_hitNum]->setShowerId(nShower);
@@ -178,41 +169,10 @@ void ECLReconstructorModule::event()
       eclRecShowerArray[m_hitNum]->setError(ErrorMatrix);
 
       nShower++;
-//      if (((*iShower).second.Energy() > 0.05 && (*iShower).second.Energy() < 0.2)) {
-//        checkflag = 1;
-//      }
-
-
 
     }//EclCFShowerMap
   }//vector<TEclCFCR>
 
-  /*
-    if (checkflag) {
-      for (std::vector<TEclCFCR>::const_iterator iCR = cf.CRs().begin();
-           iCR != cf.CRs().end(); ++iCR) {
-        for (EclCFShowerMap::const_iterator iShower = iCR->Showers().begin(); iShower != iCR->Showers().end(); ++iShower) {
-          cout << "Event " << get_ID << " SHOWER " << (*iShower).second.Energy() << " " << (*iShower).second.Theta() / PI * 180 << " " << (*iShower).second.Phi() / PI * 180 << " NHits " << (*iShower).second.NHits() << endl;
-        }
-        for (EclEnergyHitMap::const_iterator iSeed = iCR->Seeds().begin(); iSeed != iCR->Seeds().end(); ++iSeed) {
-          TEclEnergyHit iSe = (*iSeed).second;
-  //         cout<<"Seed "<<iSe.CellId()<<" "<<iSe.Energy()<<endl;
-        }
-
-      }//vector<TEclCFCR>
-      for (int ia = 0; ia < hitNum; ia++) {
-        ECLDigit* aECLDigi = eclDigiArray[ia];
-        float FitEnergy    = (aECLDigi->getAmp()) / 20000;//ADC count to GeV
-        int cId          =  aECLDigi->getCellId();
-        ECLGeometryPar* eclp = ECLGeometryPar::Instance();
-        TVector3 PosCell =  eclp->GetCrystalPos(cId);
-        eclp->Mapping(cId);
-        cout << "HitHA " << cId << " " << eclp->GetThetaID() << " " << eclp-> GetPhiID() << " " << FitEnergy << " "
-             << PosCell.Theta() / PI * 180 << " " << PosCell.Phi() / PI * 180 << endl;
-      }
-    }
-
-  */
   //cout<<"Event "<< m_nEvent<<" Total output number of Shower Array "<<++m_hitNum<<endl;
   m_nEvent++;
 }

@@ -97,13 +97,11 @@ void ECLGammaReconstructorModule::event()
     B2DEBUG(100, "ECLHitAssignment in empty in event " << m_nEvent);
   }
 
-  const int hitNum = eclRecShowerArray.getEntries();//->GetEntriesFast();
-  const int hANum = eclHitAssignmentArray.getEntries();//->GetEntriesFast();
 
   readExtrapolate();//m_TrackCellId[i] =1 => Extrapolated cell
 
   //cout<<"Event "<< m_nEvent<<" Total input number of Shower Array "<<hitNum<<endl;
-  for (int iShower = 0; iShower < hitNum; iShower++) {
+  for (int iShower = 0; iShower < eclRecShowerArray.getEntries(); iShower++) {
     ECLShower* aECLShower = eclRecShowerArray[iShower];
     m_showerId = aECLShower->GetShowerId();
     m_energy = aECLShower->GetEnergy();
@@ -120,11 +118,11 @@ void ECLGammaReconstructorModule::event()
 
     m_extMatch = false;
 
-    for (int iHA = 0; iHA < hANum; iHA++) {
+    for (int iHA = 0; iHA < eclHitAssignmentArray.getEntries(); iHA++) {
 
       ECLHitAssignment* aECLHitAssignment = eclHitAssignmentArray[iHA];
       int m_HAShowerId = aECLHitAssignment->getShowerId();
-      int m_HAcellId = aECLHitAssignment->getCellId();
+      int m_HAcellId = aECLHitAssignment->getCellId() - 1;
 
       if (m_HAShowerId != m_showerId)continue;
       if (m_HAShowerId > m_showerId)break;
@@ -137,8 +135,6 @@ void ECLGammaReconstructorModule::event()
     if (!m_extMatch) { //no match to track => assign as gamma
 
       if (!gammaArray) gammaArray.create();
-      //m_GNum = gammaArray->GetLast() + 1;
-      //new(gammaArray->AddrAt(m_GNum)) ECLGamma();
 
       new(gammaArray.nextFreeAddress()) ECLGamma();
       m_GNum = gammaArray.getEntries() - 1;
@@ -155,7 +151,6 @@ void ECLGammaReconstructorModule::event()
                                                 cout<<"CellID ";
 
             for (int iHA = 0; iHA < hANum; iHA++) {
-
               ECLHitAssignment* aECLShower = eclHitAssignmentArray[iHA];
               int m_HAShowerId = aECLShower->getShowerId();
               int m_HAcellId = aECLShower->getCellId();

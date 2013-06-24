@@ -29,6 +29,7 @@
 #include "tracking/modules/trasan/TRobustLineFitter.h"
 #ifdef TRASAN_DEBUG
 #include "tracking/modules/trasan/TDebugUtilities.h"
+#include "tracking/modules/trasan/Strings.h" 
 #endif
 #ifdef TRASAN_WINDOW
 #include "tracking/modules/trasan/TWindow.h"

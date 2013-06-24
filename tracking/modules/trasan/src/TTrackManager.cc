@@ -2305,7 +2305,7 @@ namespace Belle {
 
     THelix hAtOrigin = t.helix();
     hAtOrigin.ignoreErrorMatrix();
-    hAtOrigin.pivot(ORIGIN);
+//  hAtOrigin.pivot(ORIGIN);
     TVector3 momentum(hAtOrigin.momentum().x(),
                       hAtOrigin.momentum().y(),
                       hAtOrigin.momentum().z());

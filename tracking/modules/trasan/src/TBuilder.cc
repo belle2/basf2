@@ -1150,7 +1150,7 @@ namespace Belle {
     AList<TLink> tb;
     AList<TLink> tbBest;
     if (best) {
-      for (unsigned i = 0; i < cores.length(); i++) {
+	for (unsigned i = 0; i < unsigned(cores.length()); i++) {
         for (unsigned j = 0; j < 2; j++) {
           TLink* a = new TLink(* cores[i]);
           a->leftRight(j);

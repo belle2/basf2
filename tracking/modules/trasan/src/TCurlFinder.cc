@@ -36,7 +36,7 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 
 
@@ -259,7 +259,7 @@ struct reccdc_timing {
 //cnv #include "trg/cdc/WireHitMC.h"
 // #include "tracking/modules/trasan/TTrackHEP.h"
 #include <set>
-// #include <algorithm>
+#include <algorithm>
 // #include "tables/belletdf.h"
 #endif
 

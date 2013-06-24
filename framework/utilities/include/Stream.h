@@ -32,7 +32,7 @@ namespace Belle2 {
     /** Escape given XML string as CDATA sequence.
      *
      * This format is suitable for storing in an XML file, wrap it in a tag
-     * and use Gearbox::getInstance().getObject(".../MyTag") to retrieve the
+     * and use Gearbox::getInstance().getTObject(".../MyTag") to retrieve the
      * object again.
      *
      * */

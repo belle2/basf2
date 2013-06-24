@@ -40,8 +40,13 @@
 #include <G4AssemblyVolume.hh>
 #include <G4Transform3D.hh>
 #include <G4VisAttributes.hh>
+
 // add include subtraction /////
+#include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4UnionSolid.hh>
+
+#include <G4VisAttributes.hh>
 ////////////////////////////////
 
 #include <iostream>
@@ -218,6 +223,7 @@ namespace Belle2 {
     // add foil thickness //
     const double foilthickness = 0.0100 * cm; // crystal wrapping foil 100 um
     const double thinfoilthickness = foilthickness * 0.8; // thin crystal wrapping foil 80 um
+    const double thinpentafoilthickness = foilthickness * 0.2; // pentagon crystal foil
     const double brthetafinthickness = 0.0500 * cm; // barrel theta fin 500 um
     const double brphifinthickness = 0.0500 * cm; // barrel phi fin 500 um
     const double avoidov = 1 + 1E-6; // foil inside is a little bit lager than crystal to avoid overlap
@@ -254,6 +260,8 @@ namespace Belle2 {
       G4Material* medAlTeflon = geometry::Materials::get(AlTeflon.c_str());
       string AlTeflon_thin  = content.getString("AlTeflon_thin");
       G4Material* medAlTeflon_thin = geometry::Materials::get(AlTeflon_thin.c_str());
+      string AlTeflon_thinpenta  = content.getString("AlTeflon_thinpenta");
+      G4Material* medAlTeflon_thinpenta = geometry::Materials::get(AlTeflon_thinpenta.c_str());
       //////////////////////////////////////////////
       // add AlTeflon //////////////////////////////
       string Al  = content.getString("Al");
@@ -375,8 +383,8 @@ namespace Belle2 {
       G4AssemblyVolume* assemblyBrFoils = new G4AssemblyVolume();
       ////////////////////////////////////////////////////////
       // add assembly barrel fin ///////////////////////////////////
-      G4AssemblyVolume* assemblyBrFins = new G4AssemblyVolume(); // theta
-      G4AssemblyVolume* assemblyBrPhiFins = new G4AssemblyVolume(); // phi
+      G4AssemblyVolume* assemblyBrFins = new G4AssemblyVolume(); // fins in different theta
+      G4AssemblyVolume* assemblyBrPhiFins = new G4AssemblyVolume(); // big fins in different phi with same theta range
       ////////////////////////////////////////////////////////
 
       int nBarrelCrystal = content.getNumberNodes("BarrelCrystals/BarrelCrystal");
@@ -419,12 +427,14 @@ namespace Belle2 {
           double brfoilcDx4 = cDx4 * brfratio;
           *////////////////////////////////////////////////
 
-          // add barrel foil dimensions ////////////////////////
+          // add barrel foil dimensions a///////////////////////
+          double brtrapangle1 = atan(2 * cDy1 / (cDx2 - cDx1)); // the smaller angle of the trap
+          double brtrapangle2 = atan(2 * cDy2 / (cDx4 - cDx3));
           double brfoilcDz = cDz + foilthickness;
-          double brfoilcDx1 = cDx1 + foilthickness / tan(atan(cDy1 / (cDx2 - cDx1)) / 2.);
-          double brfoilcDx2 = cDx2 + foilthickness / tan(atan(cDy1 / (cDx2 - cDx1)) / 2.);
+          double brfoilcDx1 = cDx1 + foilthickness * tan(brtrapangle1 / 2);
+          double brfoilcDx2 = cDx2 + foilthickness / tan(brtrapangle1 / 2);
           double brfoilcDy1 = cDy1 + foilthickness;
-          double brfoilcDx3 = cDx3 + foilthickness / tan(atan(cDy2 / (cDx4 - cDx3)) / 2.);
+          double brfoilcDx3 = cDx3 + foilthickness * tan(brtrapangle2 / 2);
           double brfoilcDy2 = cDy2 + foilthickness;
           double brfoilcDx4 = brfoilcDx3 + (brfoilcDx2 - brfoilcDx1) * brfoilcDy2 / brfoilcDy1;
           ///////////////////////////////////////////////
@@ -505,7 +515,7 @@ namespace Belle2 {
             brfink_Bh = brthetafinthickness;
             brfink_z_TILTED = ((prevk_z_TILTED + atan((prevk_BH - prevk_Bh) / k_BLL / 2)) + (k_z_TILTED - atan((k_BH - k_Bh) / k_BLL / 2))) / 2; // average angle of 2 crystal sides
             //cout << (prevk_z_TILTED + atan((prevk_BH-prevk_Bh)/k_BLL/2)) << " " << (k_z_TILTED - atan((k_BH-k_Bh)/k_BLL/2)) << endl;
-            brfink_BLL = k_BLL / sin(brfink_z_TILTED)   - smalldev * fabs(prevk_zC + k_zC); // projected length in r-direction of barrel fins are the same (30 cm)
+            brfink_BLL = k_BLL; // (30 cm)
             brfink_phi_TILTED = (prevk_phi_TILTED + k_phi_TILTED) / 2; // average
             brfink_perpC = (prevk_perpC + k_perpC + (brfink_BLL - k_BLL - smalldev * fabs(prevk_zC + k_zC)) * sin(brfink_z_TILTED)) / 2; // average and move more for fin longer than crystal
             brfink_phiC = (prevk_phiC + k_phiC) / 2; // average
@@ -536,7 +546,7 @@ namespace Belle2 {
             //BrFin->SetSensitiveDetector(m_sensitive);
             assemblyBrFins->AddPlacedVolume(BrFin, Tr);
 
-          } // end if
+          } // end if barrel fin between every  4 crystals
           /////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -576,7 +586,7 @@ namespace Belle2 {
       double brbackangle = 51.28 * deg; //52.902 * deg;
 
       double brphifina = 298.34 * cm / 2; // shorter base
-      double brphifinL = 30. * cm / 2; // height
+      double brphifinL = 32. * cm / 2; // height
 
       double f_xForw = brphifinL / tan(brforwangle);
       double f_xBack = brphifinL / tan(brbackangle);
@@ -590,15 +600,19 @@ namespace Belle2 {
       //double brphifin_centercrysperpC = 140.7115 * cm;
       //double brphifin_centercrysphiC = 1.382185 * deg;
       double brphifin_shorterbaseleft = 100.08 * cm;
+      double cposix = 140.594699 * cm;
+      double cposiy = 6.478866 * cm;
+      double brphitiltphi = 3.7579644 * deg;
+      double brphirmoveout = 1.01 * cm;
 
       G4Transform3D r00 = G4RotateY3D(-90. * deg);
       G4Transform3D tilt_z = G4RotateY3D(0.);
       G4Transform3D central = G4Translate3D(0, 0, (brphifina - brphifin_shorterbaseleft + f_dx));
       G4Transform3D tilt_psi = G4RotateX3D(0E-6 * deg);
-      G4Transform3D tilt_phi = G4RotateZ3D((3.7579644 - 0E-3) * deg);
+      G4Transform3D tilt_phi = G4RotateZ3D(brphitiltphi);
       //G4Transform3D tilt_psi = G4Rotate3D(-0.3E-3*deg, G4Point3D(0, 0, 0), G4Point3D(cos(brphifin_centercrysphi_TIL), sin(brphifin_centercrysphi_TIL), 0) );
       //G4Transform3D position = G4Translate3D(brphifin_centercrysperpC, 0, 0);
-      G4Transform3D cposition = G4Translate3D(140.594699 * cm, 6.478866 * cm, 0);
+      G4Transform3D cposition = G4Translate3D(cposix + brphirmoveout * cos(brphitiltphi), cposiy + brphirmoveout * sin(brphitiltphi), 0);
       //G4Transform3D pos_phi = G4RotateZ3D(brphifin_centercrysphiC + (2.5114444*deg/2) );
       //G4Transform3D Tr =  cposition * tilt_phi * tilt_psi * central * tilt_z * r00;
       G4Transform3D Tr =  cposition * tilt_phi * tilt_psi * central * tilt_z * r00;
@@ -651,18 +665,22 @@ namespace Belle2 {
         halflength = 15.0 * cm;
 
         double fwfoilthickness;
-        if (1 <= iCry && iCry <= 6) {
+        if (iCry == 5) {
+          fwfoilthickness = thinpentafoilthickness;
+        } else if (1 <= iCry && iCry <= 6) {
           fwfoilthickness = thinfoilthickness;
         } else {
           fwfoilthickness = foilthickness;
         }
 
         // add forward foil dimensions ////////////////////////////
-        double fwfoilh1 = counter.getLength("K_h1") * cm + fwfoilthickness;
-        double fwfoilh2 = counter.getLength("K_h2") * cm + fwfoilthickness;
-        double fwfoilbl1 = counter.getLength("K_bl1") * cm + fwfoilthickness / tan(atan(h1 / (bl1 - tl1)) / 2.);
-        double fwfoiltl1 = counter.getLength("K_tl1") * cm + fwfoilthickness / tan(atan(h1 / (bl1 - tl1)) / 2.);
-        double fwfoiltl2 = counter.getLength("K_tl2") * cm + fwfoilthickness / tan(atan(h2 / (bl2 - tl2)) / 2.);
+        double fwtrapangle1 = atan(2 * h1 / (bl1 - tl1)); // the smaller angle of the trap
+        double fwtrapangle2 = atan(2 * h2 / (bl2 - tl2));
+        double fwfoilh1 = h1 + fwfoilthickness;
+        double fwfoilh2 = h2 + fwfoilthickness;
+        double fwfoiltl1 = tl1 + fwfoilthickness * tan(fwtrapangle1 / 2);
+        double fwfoilbl1 = bl1 + fwfoilthickness / tan(fwtrapangle1 / 2);
+        double fwfoiltl2 = tl2 + fwfoilthickness * tan(fwtrapangle2 / 2);
         double fwfoilbl2 = fwfoiltl2 + (fwfoilbl1 - fwfoiltl1) * fwfoilh2 / fwfoilh1;
         double fwfoilhalflength = halflength + fwfoilthickness;
         ///////////////////////////////////////////////////////////
@@ -677,35 +695,93 @@ namespace Belle2 {
                         Pr * cos(Ptheta));  // Move over to the left...
 
 
-        G4Transform3D Tr = position * m3 * m2 * m1;
-        G4Trap* FwCrysralShape = new G4Trap((format("solidEclFwCrystal_%1%") % iCry).str().c_str(),
-                                            halflength , 0 , 0, h1 ,   bl1, tl1 , alpha1 , h2   , bl2, tl2, alpha2);
-        G4LogicalVolume* FwCrysral = new G4LogicalVolume(FwCrysralShape, medCsI, (format("logicalEclFwCrystal_%1%") % iCry).str().c_str(), 0, 0, 0);
-        FwCrysral->SetSensitiveDetector(m_sensitive);
+        if (iCry == 5) { // Pentagon!!
 
-        assemblyFwCrystals->AddPlacedVolume(FwCrysral, Tr);
+          double smalls = 1E-6 * cm; // small size (near zero) of the tip
+          double trih1 = 0.166375 * cm; // from Belle I code
+          double tritl1 = smalls;
+          double trih2 = (bl2 - smalls) * trih1 / (bl1 - tritl1);
+          double tribl1 = bl1;
+          double tribl2 = bl2;
+          double tritl2 = tribl2 - (tribl1 - tritl1) * trih2 / trih1;
+          double tritheta =  - (atan((h2 - h1) / halflength / 2) + atan((trih2 - trih1) / halflength / 2)); //z-incline of tri
 
-        /////////////////  add forward foil ///////////////////////////////////////
+          G4Transform3D Tr = position * m3 * m2 * m1;
 
-        G4Trap* FwFoilout = new G4Trap((format("FwFoilout_%1%") % iCry).str().c_str(),
-                                       fwfoilhalflength , 0 , 0, fwfoilh1,  fwfoilbl1,
-                                       fwfoiltl1, alpha1 , fwfoilh2, fwfoilbl2,
-                                       fwfoiltl2, alpha2);
+          G4Trap* FwCrysralShapeTrap = new G4Trap((format("solidEclFwCrystalTrap_%1%") % iCry).str().c_str(), halflength , 0 , 0, h1 , bl1, tl1 , alpha1 , h2 , bl2, tl2, alpha2);
+          G4Trap* FwCrysralShapeTrigon = new G4Trap((format("solidEclFwCrystalTrigon_%1%") % iCry).str().c_str(), halflength , tritheta, 90.*deg , trih1 , tritl1, tribl1 , alpha1 , trih2 , tritl2, tribl2, alpha2);
+          G4Transform3D trigonposition = G4Translate3D(0 , -(h1 + h2 + trih1 + trih2 - smalls) / 2 , 0); // move trigon
+          G4UnionSolid* FwCrystalShape = new G4UnionSolid((format("solidEclFwCrystal_%1%") % iCry).str().c_str(), FwCrysralShapeTrap, FwCrysralShapeTrigon, trigonposition);
+          G4LogicalVolume* FwCrystal = new G4LogicalVolume(FwCrystalShape, medCsI, (format("logicalEclFwCrystal_%1%") % iCry).str().c_str(), 0, 0, 0);
+          FwCrystal->SetSensitiveDetector(m_sensitive);
 
-        G4Trap* FwFoilin = new G4Trap((format("solidEclFwCrystal_%1%") % iCry).str().c_str(),
-                                      halflength * avoidov , 0 , 0, h1 * avoidov , bl1 * avoidov, tl1 * avoidov , alpha1 , h2 * avoidov   , bl2 * avoidov, tl2 * avoidov, alpha2);
-        G4SubtractionSolid* FwFoilShape = new G4SubtractionSolid((format("FwFoil_%1%") % iCry).str().c_str(), FwFoilout, FwFoilin);
+          assemblyFwCrystals->AddPlacedVolume(FwCrystal, Tr);
 
-        if (1 <= iCry && iCry <= 6) {
-          G4LogicalVolume* FwFoil = new G4LogicalVolume(FwFoilShape, medAlTeflon_thin, (format("logicalFwFoil_%1%") % iCry).str().c_str(), 0, 0, 0);
-          //FwFoil->SetSensitiveDetector(m_sensitive);
+          /////////////////  add forward foil -- pentagon //////////////////////
+
+          double triangle1 = atan(2 * trih1 / (tribl1 - tritl1)); // the smaller angle of the trigon
+          double triangle2 = atan(2 * trih2 / (tribl2 - tritl2));
+          double trifoilh1 = trih1 + fwfoilthickness / cos(triangle1);
+          double trifoiltl1 = smalls;
+          double trifoilbl1 = tribl1 * (trifoilh1 / trih1);
+          double trifoilh2 = trih2 + fwfoilthickness / cos(triangle2);
+          double trifoilbl2 = tribl2 * (trifoilh2 / trih2);
+          double trifoiltl2 = trifoilbl2 - (trifoilbl1 - trifoiltl1) * trifoilh2 / trifoilh1;
+          double trifoilq = fwfoilthickness * ((1 / sin(triangle1) - 1 / sin(fwtrapangle1)) / (1 / tan(triangle1) + 1 / tan(fwtrapangle1)) + (1 / sin(triangle2) - 1 / sin(fwtrapangle2)) / (1 / tan(triangle2) + 1 / tan(fwtrapangle2))) / 2; // The distance between unfoiled trap bl to segment of foiled pentagon (position of cut plane)
+          double cutboxangle = atan((h2 - h1) / halflength / 2); //
+
+          G4Trap* FwFoilouttrap = new G4Trap((format("FwFoilouttrap_%1%") % iCry).str().c_str(), fwfoilhalflength , 0 , 0, fwfoilh1,  fwfoilbl1, fwfoiltl1, alpha1 , fwfoilh2, fwfoilbl2, fwfoiltl2, alpha2);
+          G4Box* CutBox = new G4Box("CutBox", 15.*cm, 2.*cm, 50.*cm); // to cut off foil in the attaching side
+          G4Transform3D cutboardtr1 = G4Translate3D(0, -(2.*cm / cos(cutboxangle)) - (h1 + h2) / 2 + trifoilq, 0) * G4RotateY3D(-cutboxangle);
+          G4SubtractionSolid* FwFoilouttrapcut = new G4SubtractionSolid((format(" FwFoilouttrapcut_%1%") % iCry).str().c_str(), FwFoilouttrap, CutBox, cutboardtr1);
+          G4Trap* FwFoilouttrigon = new G4Trap((format("FwFoilouttrigon_%1%") % iCry).str().c_str(), halflength , tritheta, 90.*deg , trifoilh1 , trifoiltl1, trifoilbl1 , alpha1 , trifoilh2 , trifoiltl2, trifoilbl2, alpha2);
+
+          G4Transform3D cutboardtr2 = G4Translate3D(0, (2.*cm / cos(cutboxangle)) + (trih1 + trih2) / 2 - trifoilq, 0) * G4RotateY3D(-cutboxangle);
+          G4SubtractionSolid* FwFoilouttrigoncut = new G4SubtractionSolid((format(" FwFoilouttrigoncut_%1%") % iCry).str().c_str(), FwFoilouttrigon, CutBox, cutboardtr2);
+          G4UnionSolid* FwFoiloutpenta = new G4UnionSolid((format("FwFoiloutpenta_%1%") % iCry).str().c_str(), FwFoilouttrapcut, FwFoilouttrigoncut, trigonposition);
+
+          G4Trap* FwFoilintrap = new G4Trap((format("FwFoilintrap_%1%") % iCry).str().c_str(), halflength * avoidov , 0 , 0, h1 * avoidov , bl1 * avoidov, tl1 * avoidov , alpha1 , h2 * avoidov , bl2 * avoidov, tl2 * avoidov, alpha2);
+          G4Trap* FwFoilintrigon = new G4Trap((format("FwFoilintrigon_%1%") % iCry).str().c_str(), halflength * avoidov , tritheta, 90.*deg , trih1 * avoidov , tritl1 * avoidov, tribl1 * avoidov , alpha1 , trih2 * avoidov , tritl2 * avoidov, tribl2 * avoidov, alpha2);
+          G4UnionSolid* FwFoilinpenta = new G4UnionSolid((format("FwFoilinpenta_%1%") % iCry).str().c_str(), FwFoilintrap, FwFoilintrigon, trigonposition);
+
+          G4SubtractionSolid* FwFoilShape = new G4SubtractionSolid((format("FwFoil_%1%") % iCry).str().c_str(), FwFoiloutpenta, FwFoilinpenta);
+
+          G4LogicalVolume* FwFoil = new G4LogicalVolume(FwFoilShape, medAlTeflon_thinpenta, (format("logicalFwFoil_%1%") % iCry).str().c_str(), 0, 0, 0);
           assemblyFwFoils->AddPlacedVolume(FwFoil, Tr);
-        } else {
-          G4LogicalVolume* FwFoil = new G4LogicalVolume(FwFoilShape, medAlTeflon, (format("logicalFwFoil_%1%") % iCry).str().c_str(), 0, 0, 0);
-          //FwFoil->SetSensitiveDetector(m_sensitive);
-          assemblyFwFoils->AddPlacedVolume(FwFoil, Tr);
-        }
 
+        } // End of Pentagon
+        else { // Trapezoids
+
+          G4Transform3D Tr = position * m3 * m2 * m1;
+          G4Trap* FwCrysralShape = new G4Trap((format("solidEclFwCrystal_%1%") % iCry).str().c_str(),
+                                              halflength , 0 , 0, h1 ,   bl1, tl1 , alpha1 , h2   , bl2, tl2, alpha2);
+          G4LogicalVolume* FwCrysral = new G4LogicalVolume(FwCrysralShape, medCsI, (format("logicalEclFwCrystal_%1%") % iCry).str().c_str(), 0, 0, 0);
+          FwCrysral->SetSensitiveDetector(m_sensitive);
+
+          assemblyFwCrystals->AddPlacedVolume(FwCrysral, Tr);
+
+          /////////////////  add forward foil ///////////////////////////////////////
+
+          G4Trap* FwFoilout = new G4Trap((format("FwFoilout_%1%") % iCry).str().c_str(),
+                                         fwfoilhalflength , 0 , 0, fwfoilh1,  fwfoilbl1,
+                                         fwfoiltl1, alpha1 , fwfoilh2, fwfoilbl2,
+                                         fwfoiltl2, alpha2);
+
+          G4Trap* FwFoilin = new G4Trap((format("solidEclFwCrystal_%1%") % iCry).str().c_str(),
+                                        halflength * avoidov , 0 , 0, h1 * avoidov , bl1 * avoidov, tl1 * avoidov , alpha1 , h2 * avoidov   , bl2 * avoidov, tl2 * avoidov, alpha2);
+          G4SubtractionSolid* FwFoilShape = new G4SubtractionSolid((format("FwFoil_%1%") % iCry).str().c_str(), FwFoilout, FwFoilin);
+
+          if (1 <= iCry && iCry <= 6) { // but not pentagon
+            G4LogicalVolume* FwFoil = new G4LogicalVolume(FwFoilShape, medAlTeflon_thin, (format("logicalFwFoil_%1%") % iCry).str().c_str(), 0, 0, 0);
+            //FwFoil->SetSensitiveDetector(m_sensitive);
+            assemblyFwFoils->AddPlacedVolume(FwFoil, Tr);
+          } else {
+            G4LogicalVolume* FwFoil = new G4LogicalVolume(FwFoilShape, medAlTeflon, (format("logicalFwFoil_%1%") % iCry).str().c_str(), 0, 0, 0);
+            //FwFoil->SetSensitiveDetector(m_sensitive);
+            assemblyFwFoils->AddPlacedVolume(FwFoil, Tr);
+          }
+
+        } // End of Trapezoids
         //////////////////////////////////////////////////////////////////////////////////
 
 
@@ -765,11 +841,13 @@ namespace Belle2 {
         }
 
         // add backward foil dimensions ////////////////////////////
-        double bwfoilh1 = counter.getLength("K_h1") * cm + bwfoilthickness;
-        double bwfoilh2 = counter.getLength("K_h2") * cm + bwfoilthickness;
-        double bwfoilbl1 = counter.getLength("K_bl1") * cm + bwfoilthickness / tan(atan(h1 / (bl1 - tl1)) / 2.);
-        double bwfoiltl1 = counter.getLength("K_tl1") * cm + bwfoilthickness / tan(atan(h1 / (bl1 - tl1)) / 2.);
-        double bwfoiltl2 = counter.getLength("K_tl2") * cm + bwfoilthickness / tan(atan(h2 / (bl2 - tl2)) / 2.);
+        double bwtrapangle1 = atan(2 * h1 / (bl1 - tl1)); // the smaller angle of the trap
+        double bwtrapangle2 = atan(2 * h2 / (bl2 - tl2));
+        double bwfoilh1 = h1 + bwfoilthickness;
+        double bwfoilh2 = h2 + bwfoilthickness;
+        double bwfoiltl1 = tl1 + bwfoilthickness * tan(bwtrapangle1 / 2);
+        double bwfoilbl1 = bl1 + bwfoilthickness / tan(bwtrapangle1 / 2);
+        double bwfoiltl2 = tl2 + bwfoilthickness * tan(bwtrapangle2 / 2);
         double bwfoilbl2 = bwfoiltl2 + (bwfoilbl1 - bwfoiltl1) * bwfoilh2 / bwfoilh1;
         double bwfoilhalflength = halflength + bwfoilthickness;
         ///////////////////////////////////////////////////////////
@@ -838,7 +916,6 @@ namespace Belle2 {
         assemblyFwCrystals->MakeImprint(logical_ecl, BrR);
         assemblyFwFoils->MakeImprint(logical_ecl, BrR);  // foil
       }//16 sectior
-
       for (int iSector = 0; iSector < 72; ++iSector) {//total 72
         G4Transform3D BrR = G4RotateZ3D(360.*iSector / 72 * deg);
         G4Transform3D BrRR = G4RotateZ3D((360.*iSector / 72 - 2.488555) * deg); // replace 2.494688
@@ -861,7 +938,6 @@ namespace Belle2 {
         assemblyBrDiodes->MakeImprint(logical_ecl, Global_offset);
         assemblyBwDiodes->MakeImprint(logical_ecl, Global_offset);
       }
-
 
       bool isFastSimulation = 1; //false;
       if (!isFastSimulation) {

@@ -8,6 +8,8 @@
          <Al>Al</Al>
          <AlTeflon>AlTeflon</AlTeflon>
          <AlTeflon_thin>AlTeflon_thin</AlTeflon_thin>
+         <AlTeflon_thinpenta>AlTeflon_thinpenta</AlTeflon_thinpenta>
+
 	 <k_fin_thickness unit="cm">0.05</k_fin_thickness>
          <k_wrap_thickness unit="cm">0.025</k_wrap_thickness>
          <k_barrel_Nblock>72</k_barrel_Nblock>

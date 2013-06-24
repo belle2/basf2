@@ -13,6 +13,12 @@
         <Element fraction="1.0">Si</Element>
      </Components>
   </Material>
+  <Material name="Al">
+     <density unit="g/cm3">2.700</density>
+     <Components>
+        <Element fraction="1.0">Al</Element>
+     </Components>
+  </Material>
   <Material name="AlTeflon">
     <density unit="g/cm3">2.256</density>
     <Components>
@@ -21,14 +27,16 @@
        <Element fraction="0.6589">F</Element>
     </Components>
   </Material>
-  <Material name="Al">
-     <density unit="g/cm3">2.700</density>
-     <Components>
-        <Element fraction="1.0">Al</Element>
-     </Components>
-  </Material>
   <Material name="AlTeflon_thin">
-    <density unit="g/cm3">3.375</density>
+    <density unit="g/cm3">2.820</density>
+    <Components>
+       <Element fraction="0.1330">Al</Element>
+       <Element fraction="0.2081">C</Element>
+       <Element fraction="0.6589">F</Element>
+    </Components>
+  </Material>
+  <Material name="AlTeflon_thinpenta">
+    <density unit="g/cm3">11.28</density>
     <Components>
        <Element fraction="0.1330">Al</Element>
        <Element fraction="0.2081">C</Element>

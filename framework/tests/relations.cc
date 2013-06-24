@@ -424,11 +424,16 @@ namespace Belle2 {
     RelationArray(relObjData, profileData).registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
-    (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
+    bool ret = (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
+    EXPECT_TRUE(ret);
+
     RelationVector<ProfileInfo> rels = (relObjData)[0]->getRelationsTo<ProfileInfo>();
     EXPECT_TRUE(rels.size() == 1);
     EXPECT_TRUE(rels.object(0) == (profileData)[0]);
     EXPECT_DOUBLE_EQ(rels.weight(0), -42.0);
+
+    //should be safe
+    EXPECT_FALSE((relObjData)[0]->addRelationTo(NULL));
   }
 
   /** Test getting array name/index from a RelationsObject. */

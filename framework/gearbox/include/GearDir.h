@@ -91,6 +91,19 @@ namespace Belle2 {
     virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path = "") const throw(gearbox::PathEmptyError) {
       return Gearbox::getInstance().getStringWithUnit(ensurePath(m_path) + path);
     }
+
+    /**
+     * Get the parameter path as a TObject
+     * @exception gearbox::PathEmptyError if path is empty or does not exist
+     * @exception gearbox::TObjectConversionError if the value could not be deserialized
+     * @param path Path of the parameter to get
+     * @return pointer to object, owned and managed by gearbox. Object will
+     *         be deleted once it is no longer valid (e.g. after the current
+     *         run if it belongs to this run)
+     */
+    virtual const TObject* getTObject(const std::string& path) const throw(gearbox::PathEmptyError, gearbox::TObjectConversionError) {
+      return Gearbox::getInstance().getTObject(ensurePath(m_path) + path);
+    }
   };
 
 }

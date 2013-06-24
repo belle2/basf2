@@ -1,6 +1,7 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/Stream.h>
 
 #include <libxml/parser.h>
 #include <libxml/xinclude.h>
@@ -9,6 +10,8 @@
 #include <cstring>
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
+
+#include <TObject.h>
 
 using namespace std;
 
@@ -139,6 +142,13 @@ namespace Belle2 {
     if (m_xmlDocument) xmlFreeDoc(m_xmlDocument);
     m_xpathContext = 0;
     m_xmlDocument = 0;
+
+    typedef std::pair<std::string, TObject*> EntryType;
+    BOOST_FOREACH(EntryType entry, m_ownedObjects) {
+      delete entry.second;
+    }
+    m_ownedObjects.clear();
+
     m_parameterCache.clear();
   }
 
@@ -188,6 +198,24 @@ namespace Belle2 {
     xmlXPathFreeObject(result);
     return value;
   }
+
+  const TObject* Gearbox::getTObject(const std::string& path) const throw(gearbox::PathEmptyError, gearbox::TObjectConversionError)
+  {
+    //do we already have an object for this path?
+    std::map<std::string, TObject*>::const_iterator it = m_ownedObjects.find(path);
+    if (it != m_ownedObjects.end())
+      return it->second;
+
+    string value = getString(path);
+    TObject* object = Stream::deserialize(value);
+    if (!object)
+      throw gearbox::TObjectConversionError() << path;
+
+    m_ownedObjects[path] = object;
+
+    return object;
+  }
+
 
   GearDir Gearbox::getDetectorComponent(const string& component)
   {

@@ -3,6 +3,8 @@
 #include <TObject.h>
 #include <TBufferXML.h>
 
+#include <boost/algorithm/string/replace.hpp>
+
 using namespace Belle2;
 
 std::string Stream::serialize(const TObject* obj)
@@ -13,7 +15,15 @@ std::string Stream::serialize(const TObject* obj)
   return std::string(xmlString.Data());
 }
 
-boost::shared_ptr<TObject> Stream::deserialize(const std::string& data)
+std::string Stream::escapeXML(const std::string& xmlString)
 {
-  return boost::shared_ptr<TObject>(TBufferXML::ConvertFromXML(data.c_str()));
+  //avoid nesting CDATA sections...
+  std::string newString(xmlString);
+  boost::replace_all(newString, "]]>", "]]]]><![CDATA[>");
+  return "<![CDATA[" + newString + "]]>";
+}
+
+TObject* Stream::deserialize(const std::string& data)
+{
+  return TBufferXML::ConvertFromXML(data.c_str());
 }

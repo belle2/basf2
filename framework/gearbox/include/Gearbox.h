@@ -17,6 +17,8 @@
 #include <framework/gearbox/InputHandler.h>
 #include <framework/core/MRUCache.h>
 
+#include <map>
+
 namespace Belle2 {
   namespace gearbox {
     void* openXmlUri(const char*);
@@ -125,6 +127,17 @@ namespace Belle2 {
     }
 
     /**
+     * Get the parameter path as a TObject
+     * @exception gearbox::PathEmptyError if path is empty or does not exist
+     * @exception gearbox::TObjectConversionError if the value could not be deserialized
+     * @param path Path of the parameter to get
+     * @return pointer to object, owned and managed by gearbox. Object will
+     *         be deleted once it is no longer valid (e.g. after the current
+     *         run if it belongs to this run)
+     */
+    virtual const TObject* getTObject(const std::string& path) const throw(gearbox::PathEmptyError, gearbox::TObjectConversionError);
+
+    /**
      * Return GearDir representing a given DetectorComponent
      *
      * @param component Name of the DetectorComponent (e.g. IR, PXD)
@@ -161,6 +174,8 @@ namespace Belle2 {
     xmlXPathContextPtr m_xpathContext;
     /** Cache for already queried paths */
     mutable MRUCache<std::string, PathValue> m_parameterCache;
+    /** Map of queried objects (path -> TObject*). Objects will be removed once they are no longer valid. */
+    mutable std::map<std::string, TObject*> m_ownedObjects;
 
     /** List of input handlers which will be used to find resources. */
     std::vector<gearbox::InputHandler*> m_handlers;

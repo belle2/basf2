@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<A>
+  <Description>An XML file containing a serialized TObject</Description>
+  <RelationContainer>
+<![CDATA[<Object class="Belle2__RelationContainer">
+  <Version v="1"/>
+  <Version v="1"/>
+  <UInt_t v="0"/>
+  <UInt_t v="50331648"/>
+  <Version v="4"/>
+  <Version v="1"/>
+  <UInt_t v="0"/>
+  <UInt_t v="50331648"/>
+  <UChar_t v="24"/>
+  <CharStar v="Belle2::RelationElements"/>
+  <UChar_t v="25"/>
+  <CharStar v="Belle2::RelationElement;1"/>
+  <Int_t v="1"/>
+  <Int_t v="0"/>
+  <Char_t v="1"/>
+  <Object class="Belle2__RelationElement">
+    <Version v="1"/>
+    <Version v="1"/>
+    <UInt_t v="0"/>
+    <UInt_t v="50331648"/>
+    <UInt_t v="0"/>
+    <Int_t v="1"/>
+    <UInt_t v="1"/>
+    <Int_t v="1"/>
+    <Float_t v="4.200000e+01"/>
+  </Object>
+  <UChar_t v="1"/>
+  <CharStar v="a"/>
+  <Int_t v="0"/>
+  <UChar_t v="1"/>
+  <CharStar v="b"/>
+  <Int_t v="0"/>
+</Object>
+]]>
+  </RelationContainer>
+</A>

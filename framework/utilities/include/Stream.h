@@ -9,15 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <boost/shared_ptr.hpp>
-
 #include <string>
 
 class TObject;
 
 namespace Belle2 {
-  typedef boost::shared_ptr<TObject> TObjectPtr; /**< TObject shared_ptr. */
-
   /** Define XML (de)serialization methods for TObject.
    *
    *  Legibility of output depends on the dictionary, enabling schema evolution with '+'
@@ -27,13 +23,25 @@ namespace Belle2 {
    */
   namespace Stream {
     /** Convert given TObject into an XML string.
+     *
+     *  Note that the returned string cannot be embedded into a normal XML file
+     *  that can be used with Gearbox. Please pass it through escapeXML() first.
      */
     std::string serialize(const TObject* obj);
 
+    /** Escape given XML string as CDATA sequence.
+     *
+     * This format is suitable for storing in an XML file, wrap it in a tag
+     * and use Gearbox::getInstance().getObject(".../MyTag") to retrieve the
+     * object again.
+     *
+     * */
+    std::string escapeXML(const std::string& xmlString);
+
     /** Convert given serialized XML string back into TObject.
      *
-     *  Returns a boost::shared_ptr<TObject> to the deserialized object, might be NULL if conversion was impossible.
+     *  Returns a pointer to the deserialized object, might be NULL if conversion was impossible. User is responsible for deletion.
      */
-    TObjectPtr deserialize(const std::string& data);
+    TObject* deserialize(const std::string& data);
   }
 }

@@ -15,6 +15,8 @@
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/gearbox/Unit.h>
 
+class TObject;
+
 namespace Belle2 {
 
   class GearDir;
@@ -24,6 +26,8 @@ namespace Belle2 {
     BELLE2_DEFINE_EXCEPTION(PathEmptyError, "Path '%1%' does not exist or is empty");
     /** Exception to be thrown in case of an conversion error */
     BELLE2_DEFINE_EXCEPTION(ConversionError, "Path '%1%': Could not convert '%2%' to numerical value");
+    /** getTObject() couldn't deserialize data. */
+    BELLE2_DEFINE_EXCEPTION(TObjectConversionError, "Path '%1%': Could not convert to TObject!");
 
     /** common interface for Gearbox and GearDir. */
     class Interface {
@@ -94,6 +98,17 @@ namespace Belle2 {
        * @return value of the parameter
        */
       std::string getString(const std::string& path, const std::string& defaultValue) const;
+
+      /**
+       * Get the parameter path as a TObject
+       * @exception gearbox::PathEmptyError if path is empty or does not exist
+       * @exception gearbox::TObjectConversionError if the value could not be deserialized
+       * @param path Path of the parameter to get
+       * @return pointer to object, owned and managed by gearbox. Object will
+       *         be deleted once it is no longer valid (e.g. after the current
+       *         run if it belongs to this run)
+       */
+      virtual const TObject* getTObject(const std::string& path) const throw(PathEmptyError, TObjectConversionError) = 0;
 
       /**
        * Get the parameter path as a double.

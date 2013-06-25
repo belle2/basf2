@@ -52,7 +52,7 @@ namespace Belle2 {
     const RelationContainer* relCont2 = dynamic_cast<const RelationContainer*>(obj);
     EXPECT_TRUE(relCont2 != NULL);
     EXPECT_EQ(relCont2->getEntries(), 1);
-    EXPECT_EQ(relCont2->elements(0).getToIndex(0), 1);
+    EXPECT_EQ(relCont2->elements(0).getToIndex(0), 1u);
     EXPECT_DOUBLE_EQ(relCont2->elements(0).getWeight(0), 42.0);
 
     //creating file for next test..
@@ -77,7 +77,7 @@ namespace Belle2 {
     const RelationContainer* relCont2 = dynamic_cast<const RelationContainer*>(gb.getTObject("/A/RelationContainer"));
     EXPECT_TRUE(relCont2 != NULL);
     EXPECT_EQ(relCont2->getEntries(), 1);
-    EXPECT_EQ(relCont2->elements(0).getToIndex(0), 1);
+    EXPECT_EQ(relCont2->elements(0).getToIndex(0), 1u);
     EXPECT_DOUBLE_EQ(relCont2->elements(0).getWeight(0), 42.0);
 
     //Access from GearDir should work
@@ -85,7 +85,7 @@ namespace Belle2 {
     relCont2 = dynamic_cast<const RelationContainer*>(detector.getTObject("RelationContainer"));
     EXPECT_TRUE(relCont2 != NULL);
     EXPECT_EQ(relCont2->getEntries(), 1);
-    EXPECT_EQ(relCont2->elements(0).getToIndex(0), 1);
+    EXPECT_EQ(relCont2->elements(0).getToIndex(0), 1u);
     EXPECT_DOUBLE_EQ(relCont2->elements(0).getWeight(0), 42.0);
 
     //not an object, should throw error

@@ -120,7 +120,7 @@ namespace Belle2 {
     static bool isSymmetric(const TMatrixT<double>& aMatrix);
     static bool hasMatrixNegDiagElement(const TMatrixT<double>& aMatrix);
 
-    // functions for dataflow inside module
+    // functions for dataflow inside module, registerXX fillXX and printXX all work on the same maps whose entries are accessed by the nameOfDataSample-string which acts as a key
     void registerTrackWiseData(const std::string& nameOfDataSample);
     void registerTrackWiseVecData(const std::string& nameOfDataSample, const int nVarsToTest);
     void registerLayerWiseData(const std::string& nameOfDataSample, const int nVarsToTest);
@@ -133,6 +133,7 @@ namespace Belle2 {
     void fillTVector3(const std::string& nameOfDataSample, const TVector3& newData);
     void fillInt(const std::string& nameOfDataSample, const int newData);
 
+    // for text- or console-output, nameOfDataSample is fileName,therefore only internally set within code
     void printTrackWiseStatistics(const std::string& nameOfDataSample, const bool count = false);
     void printTrackWiseVecStatistics(const std::string& nameOfDataSample, const std::vector<std::string>& trackWiseVarNames, const  bool count = false);
     void printLayerWiseStatistics(const std::string& nameOfDataSample,  const std::vector<std::string>& layerWiseVarNames, int madVars, const bool count = true);

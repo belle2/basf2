@@ -2218,7 +2218,6 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
 
   B2DEBUG(1, "Hopfield network - found subset of TCs within " << nNcounter << " iterations... with c=" << c);
   list<VXDTFHit*> allHits;
-  vector<VXDTFHit*> currentHits;
   int survivorCtr = 0;
   for (int i = 0; i < numOfTCs; i++) {
     B2DEBUG(10, "tc " << i << " - got final neuron value: " << xMatrix(0, i) << " while having " << int((tcVector[i]->getHits()).size()) << " hits and quality indicator " << tcVector[i]->getTrackQuality())
@@ -2233,7 +2232,7 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
 
     bool condi = tcVector[i]->getCondition();
     if (condi == true) {
-      currentHits = tcVector[i]->getHits();
+      const vector<VXDTFHit*>& currentHits = tcVector[i]->getHits();
       for (int j = 0; j < int(currentHits.size()); ++j) { allHits.push_back(currentHits[j]); }
     }
   }
@@ -2434,13 +2433,13 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
         m_badFriendCounter++;
         continue;
       } else {
-        vector<VXDTFHit*> friendHits = currentFriendSecIter->second->getHits();
+        const vector<VXDTFHit*>& friendHits = currentFriendSecIter->second->getHits();
         allFriendHits.insert(allFriendHits.end(), friendHits.begin(), friendHits.end());
       }
     } // iterating through friendsectors and importing their containing hits
 
     currentFriendSecIter = currentPass->sectorMap.begin(); // reset after first usage
-    vector<VXDTFHit*> ownHits = mainSecIter->second->getHits(); // loading own hits of sector
+    const vector<VXDTFHit*>& ownHits = mainSecIter->second->getHits(); // loading own hits of sector
 
     int numOfCurrentHits = ownHits.size();
     for (int currentHit = 0; currentHit < numOfCurrentHits; currentHit++) {
@@ -3036,7 +3035,7 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<C
   int tcCtr = 0;
   B2DEBUG(10, "TC-filter: pass " << passNumber << " has got " << currentPass->tcVector.size() << " tcs")
   for (currentTC = currentPass->tcVector.begin(); currentTC != currentPass->tcVector.end(); ++currentTC) { // need iterators for later use
-    vector<VXDTFHit*> currentHits = (*currentTC)->getHits(); /// IMPORTANT: currentHits[0] is outermost hit!
+    const vector<VXDTFHit*>& currentHits = (*currentTC)->getHits(); /// IMPORTANT: currentHits[0] is outermost hit!
     int numOfCurrentHits = currentHits.size();
 
     if (numOfCurrentHits == 3) {  /// in this case, dPt and zigzag filtering does not make sense
@@ -3171,7 +3170,7 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<C
 
     if (currentPass->zigzagRZ.first == true and numOfCurrentHits > 4) {
       // in this case we have still got enough hits for this test after removing virtual hit
-      vector<VXDTFHit*> currentHits = (*currentTC)->getHits();
+      const vector<VXDTFHit*>& currentHits = (*currentTC)->getHits();
 
       vector<PositionInfo*> currentHitPositions;
       BOOST_FOREACH(VXDTFHit * currentHit, currentHits) {
@@ -3206,7 +3205,7 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<C
 
   int numTC = 0;
   BOOST_FOREACH(VXDTFTrackCandidate * currentTC, currentPass->tcVector) {
-    vector<VXDTFHit*> currentHits = currentTC->getHits();
+    const vector<VXDTFHit*>& currentHits = currentTC->getHits();
     int numOfHits = currentHits.size();
     stringstream secNameOutput;
     secNameOutput << endl << "after filtering virtual entries: tc " << numTC << " got " << numOfHits << " hits and the following secIDs: ";
@@ -3236,7 +3235,6 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<C
 
 void VXDTFModule::calcInitialValues4TCs(TCsOfEvent& tcVector) /// TODO: use vxdCaTracking-classes to reduce code errors
 {
-  vector<VXDTFHit*> currentHits;
   TVector3* hitA, *hitB, *hitC;
   TVector3 hitA_T, hitB_T, hitC_T; // those with _T are the hits of the transverlal plane
   TVector3 intersection, radialVector, pTVector, pVector; //coords of center of projected circle of trajectory & vector pointing from center to innermost hit
@@ -3246,7 +3244,7 @@ void VXDTFModule::calcInitialValues4TCs(TCsOfEvent& tcVector) /// TODO: use vxdC
   BOOST_FOREACH(VXDTFTrackCandidate * aTC, tcVector) {
 
     if (aTC->getCondition() == false) { continue; }
-    currentHits = aTC->getHits();
+    const vector<VXDTFHit*>& currentHits = aTC->getHits();
     numOfCurrentHits = currentHits.size();
 
 /// method A: 3 neighbouring inner hits:

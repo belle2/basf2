@@ -185,7 +185,7 @@ class TRGCDC {
 
     /// returns \# of wire layers in a super layer. 0 will be returned
     /// if 'superLayerId' is invalid.
-    unsigned nLocalLayer(unsigned superLayerId) const;
+    unsigned nLocalLayers(unsigned superLayerId) const;
 
     /// return \# of wires.
     unsigned nWires(void) const;
@@ -562,7 +562,7 @@ TRGCDC::debugLevel(int a) const {
 
 inline
 unsigned
-TRGCDC::nLocalLayer(unsigned superLayerId) const {
+TRGCDC::nLocalLayers(unsigned superLayerId) const {
     std::vector<TRGCDCLayer *> * superLayer = _superLayers[superLayerId];
     if (! superLayer) return 0;
     return superLayer->size();

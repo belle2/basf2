@@ -120,6 +120,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
   ModuleStatistics& stats = ModuleStatistics::getInstance();
   stats.startGlobal();
   DataStore::Instance().setInitializeActive(true);
+  const StoreObjPtr<EventMetaData> eventMetaData;
 
   for (listIter = modulePathList.begin(); listIter != modulePathList.end(); ++listIter) {
     Module* module = listIter->get();
@@ -142,7 +143,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
     logSystem.setModuleLogConfig(NULL);
 
     //Check whether this is the master module
-    if (!m_master && DataStore::Instance().hasEntry(DataStore::objectName<EventMetaData>(""), DataStore::c_Event, EventMetaData::Class(), false)) {
+    if (!m_master && DataStore::Instance().hasEntry(eventMetaData)) {
       B2DEBUG(100, "Found master module " << module->getName());
       m_master = module;
     }

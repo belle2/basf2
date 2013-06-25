@@ -171,7 +171,7 @@ namespace Belle2 {
      */
     static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
       std::string arrayName = DataStore::arrayName<T>(name);
-      return DataStore::Instance().require(arrayName, durability, T::Class(), true);
+      return DataStore::Instance().require(StoreAccessorBase(arrayName, durability, T::Class(), true));
     }
 
     /** Tell the data store about an optional input.
@@ -185,7 +185,7 @@ namespace Belle2 {
      */
     static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
       std::string arrayName = DataStore::arrayName<T>(name);
-      return DataStore::Instance().optionalInput(arrayName, durability, T::Class(), true);
+      return DataStore::Instance().optionalInput(StoreAccessorBase(arrayName, durability, T::Class(), true));
     }
 
     /** Constructor to access an array in the DataStore.
@@ -207,7 +207,7 @@ namespace Belle2 {
      *  @return          True if the creation succeeded.
      **/
     bool create(bool replace = false) {
-      return DataStore::Instance().createObject(0, replace, m_name, m_durability, T::Class(), true);
+      return DataStore::Instance().createObject(0, replace, *this);
     };
 
     /** Add an existing array to the data store.
@@ -217,7 +217,7 @@ namespace Belle2 {
      *  @return          True if the creation succeeded.
      **/
     bool assign(TObject* object, bool replace = false) {
-      return DataStore::Instance().createObject(object, replace, m_name, m_durability, T::Class(), true);
+      return DataStore::Instance().createObject(object, replace, *this);
     };
 
     /** Check whether the array was created.
@@ -314,7 +314,7 @@ namespace Belle2 {
     /** Ensure that this object is attached. */
     inline void ensureAttached() const {
       if (!m_storeArray) {
-        const_cast<StoreArray*>(this)->m_storeArray = reinterpret_cast<TClonesArray**>(DataStore::Instance().getObject(m_name, m_durability, T::Class(), true));
+        const_cast<StoreArray*>(this)->m_storeArray = reinterpret_cast<TClonesArray**>(DataStore::Instance().getObject(*this));
       }
     }
     /** Ensure that the array has been created.

@@ -110,7 +110,7 @@ namespace Belle2 {
      */
     static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
       std::string objName = DataStore::objectName<T>(name);
-      return DataStore::Instance().require(objName, durability, T::Class(), false);
+      return DataStore::Instance().require(StoreAccessorBase(objName, durability, T::Class(), false));
     }
 
     /** Tell the data store about an optional input.
@@ -124,7 +124,7 @@ namespace Belle2 {
      */
     static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
       std::string objName = DataStore::objectName<T>(name);
-      return DataStore::Instance().optionalInput(objName, durability, T::Class(), false);
+      return DataStore::Instance().optionalInput(StoreAccessorBase(objName, durability, T::Class(), false));
     }
 
     /** Constructor to access an object in the DataStore.
@@ -142,7 +142,7 @@ namespace Belle2 {
      *  @return          True if the creation succeeded.
      **/
     bool create(bool replace = false) {
-      return DataStore::Instance().createObject(0, replace, m_name, m_durability, T::Class(), false);
+      return DataStore::Instance().createObject(0, replace, *this);
     };
 
     /** Add an existing object to the data store (takes ownership).
@@ -152,7 +152,7 @@ namespace Belle2 {
      *  @return          True if the creation succeeded.
      **/
     bool assign(TObject* object, bool replace = false) {
-      return DataStore::Instance().createObject(object, replace, m_name, m_durability, T::Class(), false);
+      return DataStore::Instance().createObject(object, replace, *this);
     };
 
     /** Check whether the object was created.
@@ -174,7 +174,7 @@ namespace Belle2 {
     /** Ensure that this object is attached. */
     inline void ensureAttached() const {
       if (!m_storeObjPtr) {
-        const_cast<StoreObjPtr*>(this)->m_storeObjPtr = reinterpret_cast<T**>(DataStore::Instance().getObject(m_name, m_durability, T::Class(), false));
+        const_cast<StoreObjPtr*>(this)->m_storeObjPtr = reinterpret_cast<T**>(DataStore::Instance().getObject(*this));
       }
     }
     /** Store of actual pointer. */

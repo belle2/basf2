@@ -104,8 +104,7 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
           DataStore::Instance().createEntry(namelist.at(i), durability, cl, array, false, false);
         }
         DataStore::Instance().createObject(objlist.at(i), true,
-                                           namelist.at(i), durability,
-                                           cl, array);
+                                           StoreAccessorBase(namelist.at(i), durability, cl, array));
         B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
       } else {
         B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " is NULL!");

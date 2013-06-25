@@ -114,7 +114,7 @@ namespace Belle2 {
     DataStore::Instance().setInitializeActive(false);
 
     RelationContainer* rel = new RelationContainer(); //default constructed object, as written to file
-    ASSERT_TRUE(DataStore::Instance().createObject(rel, false, "somethingnew", DataStore::c_Event, RelationContainer::Class(), false));
+    ASSERT_TRUE(DataStore::Instance().createObject(rel, false, array));
 
     EXPECT_FALSE(array.isValid());
 

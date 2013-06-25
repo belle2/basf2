@@ -72,7 +72,7 @@ namespace Belle2 {
      *  @return            True if the object/array exists.
      */
     bool isRequired() {
-      return DataStore::Instance().require(m_name, m_durability, getClass(), isArray());
+      return DataStore::Instance().require(*this);
     }
 
     /** Tell the DataStore about an optional input.
@@ -83,7 +83,7 @@ namespace Belle2 {
      *  @return            True if the object/array exists.
      */
     bool isOptional() {
-      return DataStore::Instance().optionalInput(m_name, m_durability, getClass(), isArray());
+      return DataStore::Instance().optionalInput(*this);
     }
 
     /** Return name under which the object is saved in the DataStore. */

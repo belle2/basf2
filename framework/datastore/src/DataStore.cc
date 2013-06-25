@@ -13,6 +13,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/RelationContainer.h>
 #include <framework/datastore/RelationIndex.h>
+#include <framework/datastore/StoreAccessorBase.h>
 
 #include <TClonesArray.h>
 #include <TClass.h>
@@ -42,23 +43,22 @@ DataStore::~DataStore()
 }
 
 
-bool DataStore::checkType(const std::string& name, const StoreEntry* entry,
-                          const TClass* objClass, bool array) const
+bool DataStore::checkType(const StoreEntry& entry, const StoreAccessorBase& accessor) const
 {
   // Check whether the existing entry and the requested object are both arrays or both single objects
-  const char* entryType = (entry->isArray) ? "array" : "object";
-  if (entry->isArray != array) {
-    B2FATAL("Existing entry '" << name << "' is an " << entryType << " and the requested one an " << ((array) ? "array" : "object"));
+  const char* entryType = (entry.isArray) ? "array" : "object";
+  if (entry.isArray != accessor.isArray()) {
+    B2FATAL("Existing entry '" << entry.name << "' is an " << entryType << " and the requested one an " << ((accessor.isArray()) ? "array" : "object"));
     return false;
   }
 
   // Check whether the existing entry has the same type
-  TClass* entryClass = entry->object->IsA();
-  if (entry->isArray) {
-    entryClass = static_cast<TClonesArray*>(entry->object)->GetClass();
+  TClass* entryClass = entry.object->IsA();
+  if (entry.isArray) {
+    entryClass = static_cast<TClonesArray*>(entry.object)->GetClass();
   }
-  if (!entryClass->InheritsFrom(objClass)) {
-    B2FATAL("Existing " << entryType << " '" << name << "' of type " << entryClass->GetName() << " doesn't match requested type " << objClass->GetName());
+  if (!entryClass->InheritsFrom(accessor.getClass())) {
+    B2FATAL("Existing " << entryType << " '" << entry.name << "' of type " << entryClass->GetName() << " doesn't match requested type " << accessor.getClass()->GetName());
     return false;
   }
 
@@ -91,7 +91,7 @@ bool DataStore::createEntry(const std::string& name, EDurability durability,
     }
 
     // Check whether the types match
-    if (!checkType(name, entry, objClass, array)) return false;
+    if (!checkType(*entry, StoreAccessorBase(name, durability, objClass, array))) return false;
 
     // Check whether the persistency type matches
     if (entry->isTransient != transient) {
@@ -126,40 +126,37 @@ bool DataStore::createEntry(const std::string& name, EDurability durability,
 }
 
 
-bool DataStore::hasEntry(const std::string& name, EDurability durability,
-                         const TClass* objClass, bool array)
+bool DataStore::hasEntry(const StoreAccessorBase& accessor)
 {
-  const StoreObjConstIter& it = m_storeObjMap[durability].find(name);
+  const StoreObjConstIter& it = m_storeObjMap[accessor.getDurability()].find(accessor.getName());
 
-  if (it != m_storeObjMap[durability].end()) {
-    return checkType(name, it->second, objClass, array);
+  if (it != m_storeObjMap[accessor.getDurability()].end()) {
+    return checkType(*(it->second), accessor);
   } else {
     return false;
   }
 }
 
 
-TObject** DataStore::getObject(const std::string& name, EDurability durability,
-                               const TClass* objClass, bool array)
+TObject** DataStore::getObject(const StoreAccessorBase& accessor)
 {
-  if (!hasEntry(name, durability, objClass, array)) {
+  if (!hasEntry(accessor)) {
     return 0;
   }
-  return &(m_storeObjMap[durability][name]->ptr);
+  return &(m_storeObjMap[accessor.getDurability()][accessor.getName()]->ptr);
 }
 
 
-bool DataStore::createObject(TObject* object, bool replace, const std::string& name, EDurability durability,
-                             const TClass* objClass, bool array)
+bool DataStore::createObject(TObject* object, bool replace, const StoreAccessorBase& accessor)
 {
-  if (!hasEntry(name, durability, objClass, array)) {
-    B2ERROR("No entry with name " << name << " and durability " << durability << " exists in the DataStore.");
+  if (!hasEntry(accessor)) {
+    B2ERROR("No entry with name " << accessor.getName() << " and durability " << accessor.getDurability() << " exists in the DataStore.");
     return false;
   }
 
-  StoreEntry* entry = m_storeObjMap[durability][name];
+  StoreEntry* entry = m_storeObjMap[accessor.getDurability()][accessor.getName()];
   if (entry->ptr && !replace) {
-    B2ERROR("An object with name " << name << " and durability " << durability << " was already created in the DataStore.");
+    B2ERROR("An object with name " << accessor.getName() << " and durability " << accessor.getDurability() << " was already created in the DataStore.");
     return false;
   }
 
@@ -167,11 +164,11 @@ bool DataStore::createObject(TObject* object, bool replace, const std::string& n
     delete entry->object;
     entry->object = object;
   } else {
-    if (array) {
+    if (accessor.isArray()) {
       static_cast<TClonesArray*>(entry->object)->Delete();
     } else {
       delete entry->object;
-      entry->object = static_cast<TObject*>(objClass->New());
+      entry->object = static_cast<TObject*>(accessor.getClass()->New());
 //      entry->object->Clear();
     }
   }
@@ -444,28 +441,26 @@ void DataStore::reset(EDurability durability)
   m_storeObjMap[durability].clear();
 }
 
-bool DataStore::require(const std::string& name, EDurability durability,
-                        const TClass* objClass, bool array)
+bool DataStore::require(const StoreAccessorBase& accessor)
 {
   if (m_initializeActive) {
     ModuleInfo& info = m_moduleInfo[m_currentModule];
-    info.addEntry(name, ModuleInfo::c_Input, (objClass == RelationContainer::Class()));
+    info.addEntry(accessor.getName(), ModuleInfo::c_Input, (accessor.getClass() == RelationContainer::Class()));
   }
 
-  if (!hasEntry(name, durability, objClass, array)) {
-    B2ERROR("The required DataStore entry with name " << name << " and durability " << durability << " does not exist. Maybe you forgot the module that creates it?");
+  if (!hasEntry(accessor)) {
+    B2ERROR("The required DataStore entry with name " << accessor.getName() << " and durability " << accessor.getDurability() << " does not exist. Maybe you forgot the module that creates it?");
     return false;
   }
   return true;
 }
 
-bool DataStore::optionalInput(const std::string& name, EDurability durability,
-                              const TClass* objClass, bool array)
+bool DataStore::optionalInput(const StoreAccessorBase& accessor)
 {
   if (m_initializeActive) {
     ModuleInfo& info = m_moduleInfo[m_currentModule];
-    info.addEntry(name, ModuleInfo::c_OptionalInput, (objClass == RelationContainer::Class()));
+    info.addEntry(accessor.getName(), ModuleInfo::c_OptionalInput, (accessor.getClass() == RelationContainer::Class()));
   }
 
-  return hasEntry(name, durability, objClass, array);
+  return hasEntry(accessor);
 }

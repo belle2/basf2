@@ -246,7 +246,7 @@ namespace Belle2 {
      *  @return            True if the object exists.
      */
     static bool required(const std::string& name, DataStore::EDurability durability = DataStore::c_Event) {
-      return DataStore::Instance().require(name, durability, RelationContainer::Class(), false);
+      return DataStore::Instance().require(StoreAccessorBase(name, durability, RelationContainer::Class(), false));
     }
 
     /** Tell the data store about an optional input.
@@ -259,7 +259,7 @@ namespace Belle2 {
      *  @return            True if the object exists.
      */
     static bool optional(const std::string& name, DataStore::EDurability durability = DataStore::c_Event) {
-      return DataStore::Instance().optionalInput(name, durability, RelationContainer::Class(), false);
+      return DataStore::Instance().optionalInput(StoreAccessorBase(name, durability, RelationContainer::Class(), false));
     }
 
     /** Create an empty relation array in the data store.
@@ -268,8 +268,8 @@ namespace Belle2 {
      *  @return          True if the creation succeeded.
      **/
     bool create(bool replace = false) {
-      bool result = DataStore::Instance().createObject(0, replace, m_name, m_durability, RelationContainer::Class(), false);
-      m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(m_name, m_durability, RelationContainer::Class(), false));
+      bool result = DataStore::Instance().createObject(0, replace, *this);
+      m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(*this));
       if (result) {
         (*m_relations)->setFromName(m_accessorFrom.first);
         (*m_relations)->setFromDurability(m_accessorFrom.second);
@@ -484,7 +484,7 @@ namespace Belle2 {
     void ensureAttached() const {
       if (m_relations) return;
 
-      const_cast<RelationArray*>(this)->m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(m_name, m_durability, RelationContainer::Class(), false));
+      const_cast<RelationArray*>(this)->m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(*this));
       if (m_relations && *m_relations) {
         if (isValid() && (*m_relations)->isDefaultConstructed()) {
           //no relation found, mark as invalid

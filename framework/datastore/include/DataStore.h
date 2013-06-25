@@ -21,11 +21,12 @@ class TObject;
 class TClass;
 
 namespace Belle2 {
+  class StoreAccessorBase;
   /** In the store you can park objects, that have to be accessed by various modules.
    *
    *  The store saves objects together with names and some flags in maps.
-   *  Normal users should try to access the store via StoreAccessor classes like the
-   *  StoreObjPtr or the StoreArray. <br>
+   *  Normal users should try to access the store via StoreAccessorBase-derived classes like
+   *  StoreObjPtr or StoreArray. <br>
    *  Currently the store supports either the storage of single objects (that inherit from TObject)
    *  or TClonesArrays which can store a large number of objects of the same type.
    *  Besides that, you have to chose the durability of the things you want to store. <br>
@@ -172,65 +173,46 @@ namespace Belle2 {
      *
      *  If the map of requested durability already contains an object under the key name with a DIFFERENT type
      *  than the given type one, an error will be reported. <br>
-     *  @param name       Name under which the object is saved in the DataStore.
-     *  @param durability Decide with which durability map you want to perform the requested action.
-     *  @param objClass   The class of the object.
-     *  @param array      Whether it is a TClonesArray or not.
+     *
+     *  @param accessor   Encapsulates name, durability, and type
      *  @return           True if the requested object exists.
      */
-    bool hasEntry(const std::string& name, EDurability durability,
-                  const TClass* objClass, bool array);
+    bool hasEntry(const StoreAccessorBase& accessor);
 
     /** Produce ERROR message if no entry of the given type is registered in the DataStore.
      *
-     *  @param name       Name under which the object is saved in the DataStore.
-     *  @param durability Decide with which durability map you want to perform the requested action.
-     *  @param objClass   The class of the object.
-     *  @param array      Whether it is a TClonesArray or not.
+     *  @param accessor   Encapsulates name, durability, and type
      *  @return           True if the requested object exists.
      */
-    bool require(const std::string& name, EDurability durability,
-                 const TClass* objClass, bool array);
+    bool require(const StoreAccessorBase& accessor);
 
     /** Register the given object/array as an optional input.
      *
      *  Mainly useful for creating diagrams of module inputs and outputs.
      *
-     *  @param name       Name under which the object is saved in the DataStore.
-     *  @param durability Decide with which durability map you want to perform the requested action.
-     *  @param objClass   The class of the object.
-     *  @param array      Whether it is a TClonesArray or not.
+     *  @param accessor   Encapsulates name, durability, and type
      *  @return           True if the requested object exists.
      */
-    bool optionalInput(const std::string& name, EDurability durability,
-                       const TClass* objClass, bool array);
+    bool optionalInput(const StoreAccessorBase& accessor);
 
     /** Get a pointer to a pointer of an object in the DataStore.
      *
      *  If the map of requested durability already contains an object under the key name with a DIFFERENT type
      *  than the given type one, an error will be reported. <br>
-     *  @param name       Name under which the object is saved in the DataStore.
-     *  @param durability Decide with which durability map you want to perform the requested action.
-     *  @param objClass   The class of the object.
-     *  @param array      Whether it is a TClonesArray or not.
+     *  @param accessor   Encapsulates name, durability, and type
      *  @return           Pointer to pointer to object, NULL if none exists
      */
-    TObject** getObject(const std::string& name, EDurability durability,
-                        const TClass* objClass, bool array);
+    TObject** getObject(const StoreAccessorBase& accessor);
 
     /** Create a new object in the DataStore or add an existing one.
      *
      *  A matching map entry must already exist. Otherwise an error will be generated.
      *  @param object     Pointer to the object that should be stored. If 0, a new default object is created.
      *  @param replace    If an object already exists, it will be replaced if this is true. If false, an error will be printed.
-     *  @param name       Name under which you want to save the object in the DataStore.
-     *  @param durability Decide with which durability map you want to perform the requested action.
-     *  @param objClass   The class of the object.
-     *  @param array      Whether it is a TClonesArray or not.
+     *  @param accessor   Encapsulates name, durability, and type
      *  @return           Wether the object was successfully inserted/created
      */
-    bool createObject(TObject* object, bool replace, const std::string& name, EDurability durability,
-                      const TClass* objClass, bool array);
+    bool createObject(TObject* object, bool replace, const StoreAccessorBase& accessor);
 
     /** Get a reference to the object/array map. */
     const StoreObjMap& getStoreObjectMap(EDurability durability) { return m_storeObjMap[durability]; }
@@ -502,14 +484,13 @@ namespace Belle2 {
 
     /** Check whether the given entry and the requested class match.
      *
-     *  @param name       Name of the DataStore map entry.
+     *  Name and durability are not checked.
+     *
      *  @param entry      The existing DataStore entry.
-     *  @param objClass   The class of the object.
-     *  @param array      Whether it is a TClonesArray or not.
+     *  @param accessor   Encapsulates name, durability, and type
      *  @return           True if both types match.
      */
-    bool checkType(const std::string& name, const StoreEntry* entry,
-                   const TClass* objClass, bool array) const;
+    bool checkType(const StoreEntry& entry, const StoreAccessorBase& accessor) const;
 
     /** Fill the vector with the names of store arrays.
      *

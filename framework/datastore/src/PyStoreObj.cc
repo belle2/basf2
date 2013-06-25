@@ -1,6 +1,7 @@
 #include <framework/datastore/PyStoreObj.h>
 
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreAccessorBase.h>
 #include <framework/logging/Logger.h>
 
 #include <TObject.h>
@@ -35,7 +36,7 @@ bool PyStoreObj::create(bool replace)
   if (!cl)
     return false;
 
-  return DataStore::Instance().createObject(0, replace, m_name, DataStore::EDurability(m_durability), cl, false);
+  return DataStore::Instance().createObject(0, replace, StoreAccessorBase(m_name, DataStore::EDurability(m_durability), cl, false));
 };
 
 bool PyStoreObj::registerAsPersistent(bool errorIfExisting)

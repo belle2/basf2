@@ -358,9 +358,8 @@ namespace Belle {
     return list;
   }
 
-  AList<TSegment>
-  THistogram::segments(void) const
-  {
+AList<TSegment>
+THistogram::segments(void) const {
 
 #ifdef TRASAN_DEBUG_DETAIL
     const std::string stage = "THistogram::segments";
@@ -370,42 +369,46 @@ namespace Belle {
     //...Obtain raw clusters...
     AList<TSegment> list = clusters();
     unsigned n = list.length();
-    if (n == 0) return list;
+    if (n == 0) {
+#ifdef TRASAN_DEBUG_DETAIL
+	LeaveStage(stage);
+#endif
+	return list;
+    }
 
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << Tab() << "THistogram::segments ... #segments=" << n
+    std::cout << Tab() << "THistogram::segments ... #raw segments=" << n
               << std::endl;
 #endif
 
     //...Examine each cluster...
     AList<TSegment> splitted;
     for (unsigned i = 0; i < n; i++) {
-      TSegment* c = list[i];
+	TSegment* c = list[i];
 
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << Tab() << "Base segment:";
-      c->dump("breif");
-//  c->dump("detail", "    ");
+	std::cout << Tab() << "Base segment:";
+	c->dump("breif");
 #endif
 
-      AList<TSegment> newClusters = c->split();
-      if (newClusters.length() == 0) {
+	AList<TSegment> newClusters = c->split();
+	if (newClusters.length() == 0) {
 #ifdef TRASAN_DEBUG_DETAIL
-        std::cout << Tab() << "    ... Solving dual hits" << std::endl;
+	    std::cout << Tab() << "    ... Solving dual hits" << std::endl;
 #endif
-        c->solveDualHits();
-        continue;
-      }
+	    c->solveDualHits();
+	    continue;
+	}
 
-      list.append(newClusters);
-      splitted.append(c);
+	list.append(newClusters);
+	splitted.append(c);
 #ifdef TRASAN_DEBUG_DETAIL
-      c->dump("breif", "    ");
-      std::cout << Tab() << "    ... splitted as" << std::endl;
-      for (unsigned j = 0; j < (unsigned) newClusters.length(); j++) {
-        std::cout << "    " << j << " : ";
-        newClusters[j]->dump("breif", Tab());
-      }
+	c->dump("breif", "    ");
+	std::cout << Tab() << "    ... splitted as" << std::endl;
+	for (unsigned j = 0; j < (unsigned) newClusters.length(); j++) {
+	    std::cout << "    " << j << " : ";
+	    newClusters[j]->dump("breif", Tab());
+	}
 #endif
     }
     list.remove(splitted);

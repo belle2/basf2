@@ -920,7 +920,7 @@ ORIGIN = Point3D(0., 0., 0.);
 
 std::string
 Trasan::version(void) const {
-    return "5.15";
+    return "5.16";
 }
 
 //...Definitions...
@@ -944,6 +944,7 @@ Trasan::Trasan()
       b_nT0ResetMax(1),
       b_doMCAnalysis(0),
       b_mode(1),
+      b_nEventsToSkip(0),
       b_helixFitterChisqMax(0.),
       b_helixFitterNtrialMax(20),
 
@@ -1044,11 +1045,6 @@ Trasan::Trasan()
       _doPMCurlFinder(0),
       min_svd_electrons_in_pmc(20000.),
       b_doSvdAssociator(0),
-
-      b_doClustFinder(0),
-      b_cathodeWindow(0.6),
-      b_cathodeSystematics(0),
-      b_cathodeCosmic(0), // added by matsu ( 1999/07/05 )
 
       b_doHoughFinder(1),
       b_doHoughFinderCurlSearch(1),
@@ -1375,6 +1371,12 @@ Trasan::event() {
 //cnv    static clock_t time_total = 0;
 
     ++_nEvents;
+    if (int(_nEvents) < b_nEventsToSkip) {
+	if (b_debugLevel) {
+	    std::cout << "Trasan ... skipping ev# " << _nEvents << std::endl;
+	}
+	return;
+    }
     if (b_debugLevel) {
 	time_start = clock();
 	std::cout << "Trasan ... processing ev# " << _nEvents << std::endl;
@@ -1541,7 +1543,7 @@ Trasan::event() {
     w.append(_trackManager.tracks2D(), Gdk::Color("red"));
 //  w.skipEvent(true);
 //  w.run(true);
-    w.run();
+    w.run(true);
 
 //     Glib::RefPtr<Gtk::PrintOperation> op = Gtk::PrintOperation::create();
 //     op->set_export_filename("test.pdf");
@@ -2397,7 +2399,7 @@ start:
     if (b_conformalFinder != 0) _trackManager.setCurlerFlags();
 
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "Track list after merge and mask" << std::endl;
+    std::cout << "main0 : Track list after merge and mask" << std::endl;
     _trackManager.dump("eventSummary helix", Tab(+1));
 #endif
 
@@ -2410,7 +2412,7 @@ start:
 	_trackManager.salvageAssociateHits(allHits, b_associateSigma);
 
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "Track list after salvage" << std::endl;
+    std::cout << "main0 : Track list after salvage" << std::endl;
     _trackManager.dump("eventSummary helix", Tab(+1));
 #endif
 }
@@ -2477,7 +2479,7 @@ Trasan::main1(const CAList<Belle2::TRGCDCWireHit> & axialHits,
     if (b_conformalFinder != 0) _trackManager.setCurlerFlags();
 
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "Track list after merge and mask" << std::endl;
+    std::cout << "main1 : Track list after merge and mask" << std::endl;
     _trackManager.dump("eventSummary helix", Tab(+1));
 #endif
 
@@ -2490,7 +2492,7 @@ Trasan::main1(const CAList<Belle2::TRGCDCWireHit> & axialHits,
 	_trackManager.salvageAssociateHits(allHits, b_associateSigma);
 
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "Track list after salvage" << std::endl;
+    std::cout << "main1 : Track list after salvage" << std::endl;
     _trackManager.dump("eventSummary helix", Tab(+1));
 #endif
 }

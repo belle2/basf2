@@ -2915,10 +2915,9 @@ TTrackManager::tagReccdc(unsigned *, unsigned) const {
 #endif
   }
 
-  void
-  TTrackManager::salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> & hits,
-                                      float maxSigma2)
-  {
+void
+TTrackManager::salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> & hits,
+				    float maxSigma2) {
 #ifdef TRASAN_DEBUG_DETAIL
     const string stage = "TRKMGR::salvage";
     EnterStage(stage);
@@ -2929,112 +2928,112 @@ TTrackManager::tagReccdc(unsigned *, unsigned) const {
     unsigned nTracks = _tracks.length();
     if (nTracks == 0) {
 #ifdef TRASAN_DEBUG_DETAIL
-      LeaveStage(stage);
+	LeaveStage(stage);
 #endif
-      return;
+	return;
     }
     unsigned nHits = hits.length();
     if (nHits == 0) {
 #ifdef TRASAN_DEBUG_DETAIL
-      LeaveStage(stage);
+	LeaveStage(stage);
 #endif
-      return;
+	return;
     }
 
     static const TPoint2D o(0., 0.);
 
     //...Hit loop...
     for (unsigned i = 0; i < nHits; i++) {
-      const Belle2::TRGCDCWireHit& h = * hits[i];
+	const Belle2::TRGCDCWireHit& h = * hits[i];
 
-      //...Already used ?...
-      if (h.state() & CellHitUsed) continue;
+	//...Already used ?...
+	if (h.state() & CellHitUsed) continue;
 #ifdef TRASAN_DEBUG_DETAIL
-      cout << Tab() << "checking " << h.wire().name() << endl;;
+	cout << Tab() << "checking " << h.wire().name() << endl;;
 #endif
 
-      //...Track loop...
-      AList<TLink> toBeDeleted;
-      TLink* best = NULL;
-      TTrack* bestTrack = NULL;
-      for (unsigned j = 0; j < nTracks; j++) {
-        TTrack& t = * _tracks[j];
+	//...Track loop...
+	AList<TLink> toBeDeleted;
+	TLink* best = NULL;
+	TTrack* bestTrack = NULL;
+	for (unsigned j = 0; j < nTracks; j++) {
+	    TTrack& t = * _tracks[j];
 
 #ifdef TRASAN_DEBUG_DETAIL
-        t.dump("", Tab(+1) + t.name());
+	    t.dump("", Tab(+1) + t.name());
 #endif
 
-        //...Pre-selection...
-        TPoint2D c = t.center();
-        TPoint2D co = - c;
-        TPoint2D x = h.wire().xyPosition();
+	    //...Pre-selection...
+	    TPoint2D c = t.center();
+	    TPoint2D co = - c;
+	    TPoint2D x = h.wire().xyPosition();
 
 #ifdef TRASAN_DEBUG_DETAIL
-        cout << Tab(+2) << "c= " << co.cross(x - c) * t.charge()
-             << ",d=" << fabs((x - c).mag() - fabs(t.radius()))
-             << endl;
+	    cout << Tab(+2) << "c= " << co.cross(x - c) * t.charge()
+		 << ",d=" << fabs((x - c).mag() - fabs(t.radius()))
+		 << endl;
 #endif
 
-        if (co.cross(x - c) * t.charge() > 0.)
-          continue;
-        if (fabs((x - c).mag() - fabs(t.radius())) > 5.)
-          continue;
+	    if (co.cross(x - c) * t.charge() > 0.)
+		continue;
+	    if (fabs((x - c).mag() - fabs(t.radius())) > 5.)
+		continue;
 
-        //...Try to append this hit...
-        TLink& link = * new TLink(0, & h);
-        int err = t.approach(link);
-        if (err < 0) {
+	    //...Try to append this hit...
+	    TLink& link = * new TLink(0, & h);
+	    int err = t.approach(link);
+	    if (err < 0) {
 #ifdef TRASAN_DEBUG_DETAIL
-          cout << ":" << t.name() << " approach failure";
+		cout << ":" << t.name() << " approach failure";
 #endif
-          toBeDeleted.append(link);
-          continue;
-        }
+		toBeDeleted.append(link);
+		continue;
+	    }
 
-        //...Calculate sigma...
-        float distance = link.distance();
-        float diff = fabs(distance - link.hit()->drift());
-        float sigma = diff / link.hit()->dDrift();
-        link.pull(sigma * sigma);
+	    //...Calculate sigma...
+	    float distance = link.distance();
+	    float diff = fabs(distance - link.hit()->drift());
+	    float sigma = diff / link.hit()->dDrift();
+	    link.pull(sigma * sigma);
 
 #ifdef TRASAN_DEBUG_DETAIL
-        cout << Tab(+2) << "pull=" << link.pull() << endl;
+	    cout << Tab(+2) << "pull=" << link.pull() << endl;
 #endif
-        if (link.pull() > maxSigma2) {
-          toBeDeleted.append(link);
-          continue;
-        }
+	    if (link.pull() > maxSigma2) {
+		toBeDeleted.append(link);
+		continue;
+	    }
 
-        if (best) {
-          if (best->pull() > link.pull()) {
-            toBeDeleted.append(best);
-            best = & link;
-            bestTrack = & t;
-          } else {
-            toBeDeleted.append(link);
-          }
-        } else {
-          best = & link;
-          bestTrack = & t;
-        }
-      }
+	    if (best) {
+		if (best->pull() > link.pull()) {
+		    toBeDeleted.append(best);
+		    best = & link;
+		    bestTrack = & t;
+		} else {
+		    toBeDeleted.append(link);
+		}
+	    } else {
+		best = & link;
+		bestTrack = & t;
+	    }
+	}
 
-      if (best) {
-        bestTrack->append(* best);
-        best->hit()->state(best->hit()->state() | CellHitInvalidForFit);
-        _associateHits.append(best);
+	if (best) {
+	    bestTrack->append(* best);
+	    best->hit()->state(best->hit()->state() | CellHitInvalidForFit);
+	    _associateHits.append(best);
 #ifdef TRASAN_DEBUG_DETAIL
-        cout << Tab(+1) << best->hit()->wire().name()
-             << "->" << bestTrack->name() << endl;
+	    cout << Tab(+1) << best->hit()->wire().name()
+		 << "->" << bestTrack->name() << endl;
 #endif
-      }
-      HepAListDeleteAll(toBeDeleted);
+	}
+	HepAListDeleteAll(toBeDeleted);
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
     LeaveStage(stage);
 #endif
-  }
+}
 
   void
   TTrackManager::maskBadHits(const AList<TTrack> & tracks, float maxSigma2)
@@ -3352,9 +3351,8 @@ TTrackManager::tagRectrk(unsigned *, unsigned) const {
   }
 #endif
 
-  void
-  TTrackManager::addSvd(const int mcFlag) const
-  {
+void
+TTrackManager::addSvd(const int) const {
 //cnv  TSvdAssociator svdA(-20000.,20000.);
 //   svdA.fillClusters();
 
@@ -3581,7 +3579,7 @@ TTrackManager::tagRectrk(unsigned *, unsigned) const {
 //     }
 //   }
 // #endif
-  }
+}
 // <-- jtanaka 000925
 
   bool
@@ -3720,9 +3718,8 @@ TTrackManager::tagRectrk(unsigned *, unsigned) const {
     }
   }
 
-  void
-  TTrackManager::mergeTracks(int level, float threshold)
-  {
+void
+TTrackManager::mergeTracks(int level, float threshold) {
 #ifdef TRASAN_DEBUG
     const string stage = "merging";
     EnterStage(stage);
@@ -3730,162 +3727,167 @@ TTrackManager::tagRectrk(unsigned *, unsigned) const {
 
     AList<TTrack> toBeRemoved;
     const unsigned n = _tracksAll.length();
-    if (n < 2) return;
+    if (n < 2) {
+#ifdef TRASAN_DEBUG
+	LeaveStage(stage);
+#endif
+	return;
+    }
     for (unsigned i = 0; i < n - 1; i++) {
-      TTrack& t0 = * _tracksAll[i];
-      if (toBeRemoved.hasMember(t0))
-        continue;
-      if (! t0.nCores())
-        continue;
-      for (unsigned j = i + 1; j < n; j++) {
-        TTrack& t1 = * _tracksAll[j];
-        if (toBeRemoved.hasMember(t1))
-          continue;
-        if (! t1.nCores())
-          continue;
+	TTrack& t0 = * _tracksAll[i];
+	if (toBeRemoved.hasMember(t0))
+	    continue;
+	if (! t0.nCores())
+	    continue;
+	for (unsigned j = i + 1; j < n; j++) {
+	    TTrack& t1 = * _tracksAll[j];
+	    if (toBeRemoved.hasMember(t1))
+		continue;
+	    if (! t1.nCores())
+		continue;
 
-        //...Check charge...
-        if (t0.charge() != t1.charge())
-          continue;
+	    //...Check charge...
+	    if (t0.charge() != t1.charge())
+		continue;
 
-        //...Calculate a kind of distance...
+	    //...Calculate a kind of distance...
 //      float d = TTrack::distance(t0, t1);
-        float d = TTrack::distanceB(t0, t1);
+	    float d = TTrack::distanceB(t0, t1);
 
 #ifdef TRASAN_DEBUG_DETAIL
-        cout << Tab() << "distance=" << d << ":" << t0.name() << " <-> "
-             << t1.name() << endl;
+	    cout << Tab() << "distance=" << d << ":" << t0.name() << " <-> "
+		 << t1.name() << endl;
 #endif
 
-        if (d > threshold) {
+	    if (d > threshold) {
 #ifdef TRASAN_DEBUG_DETAIL
-          cout << Tab() << "They are not identical : no merge"
-               << endl;
+		cout << Tab() << "They are not identical : no merge"
+		     << endl;
 #endif
 #ifdef TRASAN_WINDOW_GTK_HOUGH
-          TWindowGTKConformal& w = Trasan::getTrasan()->w();
-          w.endOfEvent();
-          w.clear();
-          w.stage("Track Manager : merging tracks");
-          w.information("gray:all hits, green:candidates to be built");
-          AList<TTrack> tl0;
-          tl0.append((TTrack&) t0);
-          tl0.append((TTrack&) t1);
-          w.append(tl0, Gdk::Color("green"));
+		TWindowGTKConformal& w = Trasan::getTrasan()->w();
+		w.endOfEvent();
+		w.clear();
+		w.stage("Track Manager : merging tracks");
+		w.information("gray:all hits, green:candidates to be built");
+		AList<TTrack> tl0;
+		tl0.append((TTrack&) t0);
+		tl0.append((TTrack&) t1);
+		w.append(tl0, Gdk::Color("green"));
 //    w.run();
 #endif
-          continue;
-        }
+		continue;
+	    }
 
-        //...Merge tracks...
-        TTrack* x0 = 0;
-        TTrack* x1 = 0;
-        const unsigned ns0 = TLink::nStereoHits(t0.cores());
-        const unsigned ns1 = TLink::nStereoHits(t1.cores());
-        const unsigned n0 = t0.nCores();
-        const unsigned n1 = t1.nCores();
-        if (ns0 && (ns1 == 0)) {
-          x0 = & t0;
-          x1 = & t1;
-        } else if (ns1 && (ns0 == 0)) {
-          x0 = & t1;
-          x1 = & t0;
-        } else if (n0 > n1) {
-          x0 = & t0;
-          x1 = & t1;
-        } else if (n0 < n1) {
-          x0 = & t1;
-          x1 = & t0;
-        } else if (n0 == n1) {
+	    //...Merge tracks...
+	    TTrack* x0 = 0;
+	    TTrack* x1 = 0;
+	    const unsigned ns0 = TLink::nStereoHits(t0.cores());
+	    const unsigned ns1 = TLink::nStereoHits(t1.cores());
+	    const unsigned n0 = t0.nCores();
+	    const unsigned n1 = t1.nCores();
+	    if (ns0 && (ns1 == 0)) {
+		x0 = & t0;
+		x1 = & t1;
+	    } else if (ns1 && (ns0 == 0)) {
+		x0 = & t1;
+		x1 = & t0;
+	    } else if (n0 > n1) {
+		x0 = & t0;
+		x1 = & t1;
+	    } else if (n0 < n1) {
+		x0 = & t1;
+		x1 = & t0;
+	    } else if (n0 == n1) {
 //    const float p0 = t0.chi2() / float(t0.ndf());
 //    const float p1 = t1.chi2() / float(t1.ndf());
-          const float p0 = t0.chi2();
-          const float p1 = t1.chi2();
-          if (p0 < p1) {
-            x0 = & t0;
-            x1 = & t1;
-          } else {
-            x0 = & t1;
-            x1 = & t0;
-          }
-        } else {
-          continue;
-        }
+		const float p0 = t0.chi2();
+		const float p1 = t1.chi2();
+		if (p0 < p1) {
+		    x0 = & t0;
+		    x1 = & t1;
+		} else {
+		    x0 = & t1;
+		    x1 = & t0;
+		}
+	    } else {
+		continue;
+	    }
 
 #ifdef TRASAN_DEBUG
-        x0->dump("track breif", Tab() + "x0  ");
-        x1->dump("track breif", Tab() + "x1  ");
+	    x0->dump("track breif", Tab() + "x0  ");
+	    x1->dump("track breif", Tab() + "x1  ");
 #endif
 #ifdef TRASAN_WINDOW_GTK_HOUGH
-        TTrack tmp0(* x0);
-        TTrack tmp1(* x1);
+	    TTrack tmp0(* x0);
+	    TTrack tmp1(* x1);
 #endif
 
-        AList<TLink> links = x1->links();
-        x0->append(links);
-        x1->remove(links);
-        x0->assign(CellHitTrackManager);
-        x0->finder(TrackTrackManager);
-        toBeRemoved.append(x1);
-        //...Refine...
-        //      cout <<"REFIT "<< level <<endl;
-        if (level == 2) {
-          x0->fit();
-        } else if (level == 3) {
-          AList<TLink> bad;
-          x0->fit();
-          x0->refine(bad, 30. * 100.);
-          x0->fit();
-        } else if (level == 4) {
-          AList<TLink> bad;
-          x0->fit();
-          x0->refine(bad, 30. * 100.);
-          x0->fit();
-          x0->refine(bad, 30. * 10.);
-          x0->fit();
-        } else if (level == 5) {
-          AList<TLink> bad;
-          x0->fit();
-          x0->refine(bad, 30. * 100.);
-          x0->fit();
-          x0->refine(bad, 30. * 10.);
-          x0->fit();
-          x0->refine(bad, 30);
-          x0->fit();
-        }
+	    AList<TLink> links = x1->links();
+	    x0->append(links);
+	    x1->remove(links);
+	    x0->assign(CellHitTrackManager);
+	    x0->finder(TrackTrackManager);
+	    toBeRemoved.append(x1);
+	    //...Refine...
+	    //      cout <<"REFIT "<< level <<endl;
+	    if (level == 2) {
+		x0->fit();
+	    } else if (level == 3) {
+		AList<TLink> bad;
+		x0->fit();
+		x0->refine(bad, 30. * 100.);
+		x0->fit();
+	    } else if (level == 4) {
+		AList<TLink> bad;
+		x0->fit();
+		x0->refine(bad, 30. * 100.);
+		x0->fit();
+		x0->refine(bad, 30. * 10.);
+		x0->fit();
+	    } else if (level == 5) {
+		AList<TLink> bad;
+		x0->fit();
+		x0->refine(bad, 30. * 100.);
+		x0->fit();
+		x0->refine(bad, 30. * 10.);
+		x0->fit();
+		x0->refine(bad, 30);
+		x0->fit();
+	    }
 
 #ifdef TRASAN_DEBUG
-        x0->dump("detail sort", Tab() + "x0  ");
+	    x0->dump("detail sort", Tab() + "x0  ");
 #endif
 #ifdef TRASAN_WINDOW_GTK_HOUGH
-        TWindowGTKConformal& w = Trasan::getTrasan()->w();
-        w.endOfEvent();
-        w.clear();
-        w.stage("Track Manager : merging tracks");
-        w.information("gray:all hits, green:candidates to be built");
-        AList<TTrack> tl0;
-        tl0.append((TTrack&) tmp0);
-        AList<TTrack> tl1;
-        tl1.append(tmp1);
-        w.append(tl0, Gdk::Color("green"));
-        w.append(tl1, Gdk::Color("red"));
-        w.run();
+	    TWindowGTKConformal& w = Trasan::getTrasan()->w();
+	    w.endOfEvent();
+	    w.clear();
+	    w.stage("Track Manager : merging tracks");
+	    w.information("gray:all hits, green:candidates to be built");
+	    AList<TTrack> tl0;
+	    tl0.append((TTrack&) tmp0);
+	    AList<TTrack> tl1;
+	    tl1.append(tmp1);
+	    w.append(tl0, Gdk::Color("green"));
+	    w.append(tl1, Gdk::Color("red"));
+	    w.run();
 #endif
 
-      }
+	}
     }
 
     for (unsigned i = 0; i < (unsigned) toBeRemoved.length(); i++) {
-      _tracksAll.remove(* toBeRemoved[i]);
-      _tracks.remove(* toBeRemoved[i]);
-      _tracks2D.remove(* toBeRemoved[i]);
-      _tracksFinal.remove(* toBeRemoved[i]);
-      delete toBeRemoved[i];
+	_tracksAll.remove(* toBeRemoved[i]);
+	_tracks.remove(* toBeRemoved[i]);
+	_tracks2D.remove(* toBeRemoved[i]);
+	_tracksFinal.remove(* toBeRemoved[i]);
+	delete toBeRemoved[i];
     }
 
 #ifdef TRASAN_DEBUG
     LeaveStage(stage);
 #endif
-  }
+}
 
 } // namespace Belle

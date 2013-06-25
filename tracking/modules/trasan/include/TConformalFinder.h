@@ -351,7 +351,6 @@ namespace Belle {
     const unsigned _perfectSegmentFinding;
     const bool _useSmallCells;
     const float _maxSigma2;
-    const unsigned _minNLinksForSegment;
     const unsigned _minNCoreLinks;
     const unsigned _minNSegments;
     const unsigned _salvageLoadWidth;
@@ -363,7 +362,8 @@ namespace Belle {
     bool _T0ResetDone;
     const unsigned _segmentSeparation;
     const unsigned _minNLinksForSegmentInRefine;
-    const unsigned _maxNLinksForSegment;
+    unsigned _minNLinksForSegment[9];
+    unsigned _maxNLinksForSegment[9];
     const unsigned _maxWidthForSegment;
     const float _minUsedFractionSlow2D;
     const unsigned _appendLoad;

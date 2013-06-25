@@ -93,14 +93,13 @@ namespace Belle {
     return true;
   }
 
-  bool
-  TWindowHoughDrawingArea::on_button_press_event(GdkEventButton* e)
-  {
+bool
+TWindowHoughDrawingArea::on_button_press_event(GdkEventButton *) {
 //     _x = xR(e->x);
 //     _y = yR(- e->y);
     on_expose_event((GdkEventExpose*) NULL);
     return true;
-  }
+}
 
   void
   TWindowHoughDrawingArea::resetPosition(void)

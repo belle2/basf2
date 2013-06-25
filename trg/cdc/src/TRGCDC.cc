@@ -526,19 +526,18 @@ TRGCDC::terminate(void) {
     }
 }
 
-  void
-  TRGCDC::dump(const string& msg) const
-  {
+void
+TRGCDC::dump(const string& msg) const {
     if (msg.find("name")    != string::npos ||
         msg.find("version") != string::npos ||
         msg.find("detail")  != string::npos ||
         msg == "") {
-      cout << name() << "(CDC version=" << versionCDC() << ", "
-           << version() << ") ";
+	cout << name() << "(CDC version=" << versionCDC() << ", "
+	     << version() << ") ";
     }
     if (msg.find("detail") != string::npos ||
         msg.find("state") != string::npos) {
-      cout << "Debug Level=" << _debugLevel;
+	cout << "Debug Level=" << _debugLevel;
     }
     cout << endl;
 
@@ -546,123 +545,121 @@ TRGCDC::terminate(void) {
 
     if (msg == "" || msg.find("geometry") != string::npos) {
 
-      //...Get information..."
-      unsigned nLayer = _layers.size();
-      cout << "    version    : " << version() << endl;
-      cout << "    cdc version: " << versionCDC() << endl;
-      cout << "    # of wires : " << _wires.size() << endl;
-      cout << "    # of layers: " << nLayer << endl;
-      cout << "    super layer information" << endl;
-      cout << "        # of super layers() = "
-           << nSuperLayers() << endl;
-      cout << "        # of Axial super layers = "
-           << nAxialSuperLayers() << endl;
-      cout << "        # of Stereo super layers = "
-           << nStereoSuperLayers() << endl;
+	//...Get information..."
+	unsigned nLayer = _layers.size();
+	cout << "    version    : " << version() << endl;
+	cout << "    cdc version: " << versionCDC() << endl;
+	cout << "    # of wires : " << _wires.size() << endl;
+	cout << "    # of layers: " << nLayer << endl;
+	cout << "    super layer information" << endl;
+	cout << "        # of super layers() = "
+	     << nSuperLayers() << endl;
+	cout << "        # of Axial super layers = "
+	     << nAxialSuperLayers() << endl;
+	cout << "        # of Stereo super layers = "
+	     << nStereoSuperLayers() << endl;
 
-      if (msg.find("superLayers") != string::npos) {
-        cout << "        super layer detail" << endl;
-        cout << "            id #layers (stereo type)" << endl;
-        for (unsigned i = 0; i < nSuperLayers(); ++i) {
-          const unsigned n = _superLayers[i]->size();
-          cout << "            " << i << "  " << n << " (";
-          for (unsigned j = 0; j < n; j++) {
-            cout << (* _superLayers[i])[0]->stereoType();
-          }
-          cout << ")" << endl;
-        }
-      }
+	if (msg.find("superLayers") != string::npos) {
+	    cout << "        super layer detail" << endl;
+	    cout << "            id #layers (stereo type)" << endl;
+	    for (unsigned i = 0; i < nSuperLayers(); ++i) {
+		const unsigned n = _superLayers[i]->size();
+		cout << "            " << i << "  " << n << " (";
+		for (unsigned j = 0; j < n; j++) {
+		    cout << (* _superLayers[i])[0]->stereoType();
+		}
+		cout << ")" << endl;
+	    }
+	}
 
-      cout << "    layer information" << endl;
-      cout << "        # of Axial layers = "
-           << nAxialLayers() << endl;
-      cout << "        # of Stereo layers = "
-           << nStereoLayers() << endl;
+	cout << "    layer information" << endl;
+	cout << "        # of Axial layers = "
+	     << nAxialLayers() << endl;
+	cout << "        # of Stereo layers = "
+	     << nStereoLayers() << endl;
 
-      if (msg.find("layers") != string::npos) {
-        cout << "        layer detail" << endl;
-        cout << "            id type sId #wires lId asId assId"
-             << endl;
-        for (unsigned int i = 0; i < nLayers(); ++i) {
-          const TRGCDCLayer& l = * _layers[i];
-          cout << "            " << i
-               << " " << l.stereoType()
-               << " " << l.superLayerId()
-               << " " << l.nCells()
-               << " " << l.localLayerId()
-               << " " << l.axialStereoLayerId()
-               << " " << l.axialStereoSuperLayerId()
-               << endl;
-        }
-      }
+	if (msg.find("layers") != string::npos) {
+	    cout << "        layer detail" << endl;
+	    cout << "            id type sId #wires lId asId assId"
+		 << endl;
+	    for (unsigned int i = 0; i < nLayers(); ++i) {
+		const TRGCDCLayer& l = * _layers[i];
+		cout << "            " << i
+		     << " " << l.stereoType()
+		     << " " << l.superLayerId()
+		     << " " << l.nCells()
+		     << " " << l.localLayerId()
+		     << " " << l.axialStereoLayerId()
+		     << " " << l.axialStereoSuperLayerId()
+		     << endl;
+	    }
+	}
 
-      if (msg.find("wires") != string::npos) {
-        cout << "    wire information" << endl;
-        for (unsigned i = 0; i < nWires(); i++)
-          (_wires[i])->dump("neighbor", tab);
-      }
+	if (msg.find("wires") != string::npos) {
+	    cout << "    wire information" << endl;
+	    for (unsigned i = 0; i < nWires(); i++)
+		(_wires[i])->dump("neighbor", tab);
+	}
 
-      return;
+	return;
     }
     if (msg.find("hits") != string::npos) {
-      cout << "    hits : " << _hits.size() << endl;
-      for (unsigned i = 0; i < (unsigned) _hits.size(); i++)
-        _hits[i]->dump("mc drift", tab);
+	cout << "    hits : " << _hits.size() << endl;
+	for (unsigned i = 0; i < (unsigned) _hits.size(); i++)
+	    _hits[i]->dump("mc drift", tab);
     }
     if (msg.find("axialHits") != string::npos) {
-      cout << "    hits : " << _axialHits.size() << endl;
-      for (unsigned i = 0; i < (unsigned) _axialHits.size(); i++)
-        _axialHits[i]->dump("mc drift", tab);
+	cout << "    hits : " << _axialHits.size() << endl;
+	for (unsigned i = 0; i < (unsigned) _axialHits.size(); i++)
+	    _axialHits[i]->dump("mc drift", tab);
     }
     if (msg.find("stereoHits") != string::npos) {
-      cout << "    hits : " << _stereoHits.size() << endl;
-      for (unsigned i = 0; i < (unsigned) _stereoHits.size(); i++)
-        _stereoHits[i]->dump("mc drift", tab);
+	cout << "    hits : " << _stereoHits.size() << endl;
+	for (unsigned i = 0; i < (unsigned) _stereoHits.size(); i++)
+	    _stereoHits[i]->dump("mc drift", tab);
     }
     if (msg.find("trgWireHits") != string::npos) {
-      const string dumpOption = "trigger detail";
-      cout << "    wire hits" << endl;
-      for (unsigned i = 0; i < nWires(); i++) {
-        const TCWire& w = * wire(i);
-        if (w.timing().active())
-          w.dump(dumpOption, TRGDebug::tab(4));
-      }
+	const string dumpOption = "trigger detail";
+	cout << "    wire hits" << endl;
+	for (unsigned i = 0; i < nWires(); i++) {
+	    const TCWire& w = * wire(i);
+	    if (w.timing().active())
+		w.dump(dumpOption, TRGDebug::tab(4));
+	}
     }
     if (msg.find("trgWireCentralHits") != string::npos) {
-      const string dumpOption = "trigger detail";
-      cout << "    wire hits" << endl;
-      for (unsigned i = 0; i < nSegments(); i++) {
-        const TCSegment& s = segment(i);
-        if (s.wires()[5]->timing().active())
-          s.wires()[5]->dump(dumpOption, TRGDebug::tab(4));
-      }
+	const string dumpOption = "trigger detail";
+	cout << "    wire hits" << endl;
+	for (unsigned i = 0; i < nSegments(); i++) {
+	    const TCSegment& s = segment(i);
+	    if (s.wires()[5]->timing().active())
+		s.wires()[5]->dump(dumpOption, TRGDebug::tab(4));
+	}
     }
     if (msg.find("trgTSHits") != string::npos) {
-      const string dumpOption = "trigger detail";
-      cout << "    TS hits" << endl;
-      for (unsigned i = 0; i < nSegments(); i++) {
-        const TCSegment& s = segment(i);
-        if (s.timing().active())
-          s.dump(dumpOption, TRGDebug::tab(4));
-      }
+	const string dumpOption = "trigger detail";
+	cout << "    TS hits" << endl;
+	for (unsigned i = 0; i < nSegments(); i++) {
+	    const TCSegment& s = segment(i);
+	    if (s.timing().active())
+		s.dump(dumpOption, TRGDebug::tab(4));
+	}
     }
-  }
+}
 
-  const TCWire*
-  TRGCDC::wire(unsigned id) const
-  {
+const TCWire *
+TRGCDC::wire(unsigned id) const {
     if (id < nWires())
-      return _wires[id];
+	return _wires[id];
     return 0;
-  }
+}
 
-  const TCWire*
-  TRGCDC::wire(unsigned layerId, int localId) const
-  {
+const TCWire *
+TRGCDC::wire(unsigned layerId, int localId) const {
     if (layerId < nLayers())
-      return (TCWire*) & _layers[layerId]->cell(localId);
+	return (TCWire*) & _layers[layerId]->cell(localId);
     return 0;
-  }
+}
 
 // const TCWire *
 // TRGCDC::wire(const HepGeom::Point3D<double> & p) const {
@@ -671,9 +668,8 @@ TRGCDC::terminate(void) {
 //     return wire(r, phi);
 // }
 
-  const TCWire*
-  TRGCDC::wire(float , float) const
-  {
+const TCWire *
+TRGCDC::wire(float , float) const {
 
     //...Not implemented yet...
     return _wires[0];
@@ -699,9 +695,8 @@ TRGCDC::terminate(void) {
 // }
   }
 
-  void
-  TRGCDC::clear(void)
-  {
+void
+TRGCDC::clear(void) {
     TCWHit::removeAll();
     TCSHit::removeAll();
     TCLink::removeAll();
@@ -709,19 +704,19 @@ TRGCDC::terminate(void) {
 //     for (unsigned i = 0; i < _hits.size(); i++)
 //         delete _hits[i];
     for (unsigned i = 0; i < _hitsMC.size(); i++)
-      delete _hitsMC[i];
+	delete _hitsMC[i];
 //     for (unsigned i = 0; i < _badHits.size(); i++)
 //         delete _badHits[i];
 //     for (unsigned i = 0; i < _segmentHits.size(); i++)
 //         delete _segmentHits[i];
 
     for(unsigned i = 0; i < _wires.size(); i++){
-      TCWire* w = _wires[i];
-      w->clear();
+	TCWire* w = _wires[i];
+	w->clear();
     }
     for(unsigned i = 0; i< _tss.size(); i++){
-      TCSegment* s = _tss[i];
-      s->clear();
+	TCSegment* s = _tss[i];
+	s->clear();
     }
     _hitWires.clear();
     _hits.clear();
@@ -731,17 +726,15 @@ TRGCDC::terminate(void) {
     _hitsMC.clear();
     _segmentHits.clear();
     for (unsigned i = 0; i < 9; i++)
-      _segmentHitsSL[i].clear();
-  }
+	_segmentHitsSL[i].clear();
+}
 
-  void
-  TRGCDC::fastClear(void)
-  {
-  }
+void
+TRGCDC::fastClear(void) {
+}
 
-  void
-  TRGCDC::update(bool)
-  {
+void
+TRGCDC::update(bool) {
 
     TRGDebug::enterStage("TRGCDC update");
 
@@ -753,27 +746,27 @@ TRGCDC::terminate(void) {
 //iw StoreArray<CDCSimHit> SimHits("CDCSimHits");
     StoreArray<CDCSimHit> SimHits;
     if (! SimHits) {
-      cout << "TRGCDC !!! can not access to CDCSimHits" << endl;
-      TRGDebug::leaveStage("TRGCDC update");
-      return;
+	cout << "TRGCDC !!! can not access to CDCSimHits" << endl;
+	TRGDebug::leaveStage("TRGCDC update");
+	return;
     }
     const unsigned n = SimHits.getEntries();
 
     //...CDCHit...
     StoreArray<CDCHit> CDCHits("CDCHits");
     if (! CDCHits) {
-      cout << "TRGCDC !!! can not access to CDCHits" << endl;
-      TRGDebug::leaveStage("TRGCDC update");
-      return;
+	cout << "TRGCDC !!! can not access to CDCHits" << endl;
+	TRGDebug::leaveStage("TRGCDC update");
+	return;
     }
     const unsigned nHits = CDCHits.getEntries();
 
     //...MCParticle...
     StoreArray<MCParticle> mcParticles;
     if (! mcParticles) {
-      cout << "TRGCDC !!! can not access to MCParticles" << endl;
-      TRGDebug::leaveStage("TRGCDC update");
-      return;
+	cout << "TRGCDC !!! can not access to MCParticles" << endl;
+	TRGDebug::leaveStage("TRGCDC update");
+	return;
     }
 
     //...Relations...
@@ -784,104 +777,104 @@ TRGCDC::terminate(void) {
 
     //...Loop over CDCHits...
     for (unsigned i = 0; i < nHits; i++) {
-      const CDCHit& h = * CDCHits[i];
-      double tmp=rand()/(double(RAND_MAX));
-      if(tmp<_inefficiency) continue;
-      else{
+	const CDCHit& h = * CDCHits[i];
+	double tmp=rand()/(double(RAND_MAX));
+	if(tmp<_inefficiency) continue;
+	else{
 //      //...Check validity (skip broken channel)...
 //      if (! (h->m_stat & CellHitFindingValid)) continue;
 
-      //...Get CDCSimHit... This is expensive. Should be moved outside.
-      unsigned iSimHit = 0;
-      for (unsigned j = 0; j < nRels; j++) {
-        const unsigned k = rels[j].getToIndices().size();
-        for (unsigned l = 0; l < k; l++) {
-          if (rels[j].getToIndex(l) == i)
-            iSimHit = rels[j].getFromIndex();
-        }
+	    //...Get CDCSimHit... This is expensive. Should be moved outside.
+	    unsigned iSimHit = 0;
+	    for (unsigned j = 0; j < nRels; j++) {
+		const unsigned k = rels[j].getToIndices().size();
+		for (unsigned l = 0; l < k; l++) {
+		    if (rels[j].getToIndex(l) == i)
+			iSimHit = rels[j].getFromIndex();
+		}
 
-        if (TRGDebug::level())
-          if (k > 1)
-            cout << "TRGCDC::update !!! CDCSimHit[" << iSimHit
-                 << "] has multiple CDCHit(" << k << " hits)" << endl;
-      }
+		if (TRGDebug::level())
+		    if (k > 1)
+			cout << "TRGCDC::update !!! CDCSimHit[" << iSimHit
+			     << "] has multiple CDCHit(" << k << " hits)" << endl;
+	    }
 
-      //...Get MCParticle... This is expensive, again.
-      //   (Getting the first MCParticle only)
-      unsigned iMCPart = 0;
-      for (unsigned j = 0; j < nRelsMC; j++) {
-        const unsigned k = relsMC[j].getToIndices().size();
-        for (unsigned l = 0; l < k; l++) {
-          if (relsMC[j].getToIndex(l) == i) {
-            iMCPart = relsMC[j].getFromIndex();
-            break;
-          }
-        }
+	    //...Get MCParticle... This is expensive, again.
+	    //   (Getting the first MCParticle only)
+	    unsigned iMCPart = 0;
+	    for (unsigned j = 0; j < nRelsMC; j++) {
+		const unsigned k = relsMC[j].getToIndices().size();
+		for (unsigned l = 0; l < k; l++) {
+		    if (relsMC[j].getToIndex(l) == i) {
+			iMCPart = relsMC[j].getFromIndex();
+			break;
+		    }
+		}
 
-        if (TRGDebug::level())
-          if (k > 1)
-            cout << "TRGCDC::update !!! MCParticle[" << iMCPart
-                 << "] has multiple CDCHit(" << k << " hits)" << endl;
-      }
+		if (TRGDebug::level())
+		    if (k > 1)
+			cout << "TRGCDC::update !!! MCParticle[" << iMCPart
+			     << "] has multiple CDCHit(" << k << " hits)" << endl;
+	    }
 
-      //...Wire...
-      int t_layerId;
-      if (h.getISuperLayer() == 0) t_layerId = h.getILayer();
-      else t_layerId = h.getILayer() + 6 * h.getISuperLayer() + 2;
-      const unsigned layerId = t_layerId;
-      const unsigned wireId = h.getIWire();
-      TCWire& w = * (TCWire*) wire(layerId, wireId);
+	    //...Wire...
+	    int t_layerId;
+	    if (h.getISuperLayer() == 0) t_layerId = h.getILayer();
+	    else t_layerId = h.getILayer() + 6 * h.getISuperLayer() + 2;
+	    const unsigned layerId = t_layerId;
+	    const unsigned wireId = h.getIWire();
+	    TCWire& w = * (TCWire*) wire(layerId, wireId);
 
-      //...Drift length(micron) to drift time(ns)...
-      //   coefficient used here must be re-calculated.
-      const float driftTimeMC =
-        SimHits[iSimHit]->getDriftLength() * 10 * 1000 / 40 +
-        SimHits[iSimHit]->getFlightTime();
+	    //...Drift length(micron) to drift time(ns)...
+	    //   coefficient used here must be re-calculated.
+	    const float driftTimeMC =
+		SimHits[iSimHit]->getDriftLength() * 10 * 1000 / 40 +
+		SimHits[iSimHit]->getFlightTime();
 
-      //...Trigger timing...
-      TRGTime rise = TRGTime(driftTimeMC, true, _clockFE, w.name());
-      TRGTime fall = rise;
-      fall.shift(1).reverse();
-      w._timing = TRGSignal(rise & fall);
-      w._timing.name(w.name());
+	    //...Trigger timing...
+	    TRGTime rise = TRGTime(driftTimeMC, true, _clockFE, w.name());
+	    TRGTime fall = rise;
+	    fall.shift(1).reverse();
+	    w._timing = TRGSignal(rise & fall);
+	    w._timing.name(w.name());
 
-      //...Simulated drift distance...
+	    //...Simulated drift distance...
 #if 0
-      const double driftLength =
-	  _clockFE.absoluteTime(w._timing[0]->time()) * 40 / 10 / 1000;
-      const double driftLengthError = 0.15;
+	    const double driftLength =
+		_clockFE.absoluteTime(w._timing[0]->time()) * 40 / 10 / 1000;
+	    const double driftLengthError = 0.15;
 #else 
-      static bool first(true);
-      if(first) {
-	  first = false;
-	  cout <<"TRGCDCWireHit is modified for Trasan." << std::endl;
-      }
-      const float driftLength = h.getTDCCount()*(40./10000.);
-      const float driftLengthError = 0.013;
+	    static bool first(true);
+	    if(first) {
+		first = false;
+		cout <<"TRGCDCWireHit is modified for Trasan." << std::endl;
+	    }
+	    const float driftLength = h.getTDCCount()*(40./10000.);
+	    const float driftLengthError = 0.013;
 #endif
-      //w._timing.dump("detail", " -1 ");
+	    //w._timing.dump("detail", " -1 ");
 
-      const int LRflag = SimHits[iSimHit]->getPosFlag();
+	    const int LRflag = SimHits[iSimHit]->getPosFlag();
 
-      //...TCWireHit...
-      TCWHit* hit = new TCWHit(w,
-                               i,
-                               iSimHit,
-                               iMCPart,
-                               driftLength,
-			       driftLengthError,
-                               driftLength,
-                               driftLengthError,
-			       LRflag,
-                               1);
-      hit->state(CellHitFindingValid | CellHitFittingValid);
+	    //...TCWireHit...
+	    TCWHit* hit = new TCWHit(w,
+				     i,
+				     iSimHit,
+				     iMCPart,
+				     driftLength,
+				     driftLengthError,
+				     driftLength,
+				     driftLengthError,
+				     LRflag,
+				     1);
+	    hit->state(CellHitFindingValid | CellHitFittingValid);
 
-      //...Store a hit...
-      ((TCWire*)(* _layers[layerId])[wireId])->hit(hit);
-      _hits.push_back(hit);
-      if (w.axial()) _axialHits.push_back(hit);
-      else           _stereoHits.push_back(hit);
-      }
+	    //...Store a hit...
+	    ((TCWire*)(* _layers[layerId])[wireId])->hit(hit);
+	    _hits.push_back(hit);
+	    if (w.axial()) _axialHits.push_back(hit);
+	    else           _stereoHits.push_back(hit);
+	}
     }
 
     //...Track segment... This part is moved to ::simulate().
@@ -915,82 +908,80 @@ TRGCDC::terminate(void) {
     }
 
     TRGDebug::leaveStage("TRGCDC update");
-  }
+}
 
-  void
-  TRGCDC::classification(void)
-  {
+void
+TRGCDC::classification(void) {
     unsigned n = _hits.size();
 
     for (unsigned i = 0; i < n; i++) {
-      TCWHit* h = _hits[i];
-      const TCWire& w = h->wire();
-      unsigned state = h->state();
+	TCWHit* h = _hits[i];
+	const TCWire& w = h->wire();
+	unsigned state = h->state();
 
-      //...Cache pointers to a neighbor...
-      const TCWire* neighbor[7];
-      for (unsigned j = 0; j < 7; j++) neighbor[j] = w.neighbor(j);
+	//...Cache pointers to a neighbor...
+	const TCWire* neighbor[7];
+	for (unsigned j = 0; j < 7; j++) neighbor[j] = w.neighbor(j);
 
-      //...Decide hit pattern...
-      unsigned pattern = 0;
-      for (unsigned j = 0; j < 7; j++) {
-        if (neighbor[j])
-          if (neighbor[j]->hit())
-            pattern += (1 << j);
-      }
-      state |= (pattern << CellHitNeighborHit);
+	//...Decide hit pattern...
+	unsigned pattern = 0;
+	for (unsigned j = 0; j < 7; j++) {
+	    if (neighbor[j])
+		if (neighbor[j]->hit())
+		    pattern += (1 << j);
+	}
+	state |= (pattern << CellHitNeighborHit);
 
-      //...Check isolation...
-      const TCWHit* hr1 = neighbor[2]->hit();
-      const TCWHit* hl1 = neighbor[3]->hit();
-      if ((hr1 == 0) && (hl1 == 0)) {
-        state |= CellHitIsolated;
-      } else {
-        const TCWHit* hr2 = neighbor[2]->neighbor(2)->hit();
-        const TCWHit* hl2 = neighbor[3]->neighbor(3)->hit();
-        if ((hr2 == 0) && (hr1 != 0) && (hl1 == 0) ||
-            (hl2 == 0) && (hl1 != 0) && (hr1 == 0))
-          state |= CellHitIsolated;
-      }
+	//...Check isolation...
+	const TCWHit* hr1 = neighbor[2]->hit();
+	const TCWHit* hl1 = neighbor[3]->hit();
+	if ((hr1 == 0) && (hl1 == 0)) {
+	    state |= CellHitIsolated;
+	} else {
+	    const TCWHit* hr2 = neighbor[2]->neighbor(2)->hit();
+	    const TCWHit* hl2 = neighbor[3]->neighbor(3)->hit();
+	    if ((hr2 == 0) && (hr1 != 0) && (hl1 == 0) ||
+		(hl2 == 0) && (hl1 != 0) && (hr1 == 0))
+		state |= CellHitIsolated;
+	}
 
-      //...Check continuation...
+	//...Check continuation...
 //        unsigned superLayer = w.superLayerId();
-      bool previous = false;
-      bool next = false;
-      if (neighbor[0] == 0) previous = true;
-      else {
-        if ((neighbor[0]->hit()) || neighbor[1]->hit())
-          previous = true;
+	bool previous = false;
+	bool next = false;
+	if (neighbor[0] == 0) previous = true;
+	else {
+	    if ((neighbor[0]->hit()) || neighbor[1]->hit())
+		previous = true;
 //             if (m_smallcell && w.layerId() == 3)
 //                 if (neighbor[6]->hit())
 //                     previous = true;
-      }
-      if (neighbor[5] == 0) next = true;
-      else {
-        if ((neighbor[4]->hit()) || neighbor[5]->hit())
-          next = true;
-      }
-      // if (previous && next) state |= CellHitContinuous;
-      if (previous || next) state |= CellHitContinuous;
+	}
+	if (neighbor[5] == 0) next = true;
+	else {
+	    if ((neighbor[4]->hit()) || neighbor[5]->hit())
+		next = true;
+	}
+	// if (previous && next) state |= CellHitContinuous;
+	if (previous || next) state |= CellHitContinuous;
 
-      //...Solve LR locally...
-      if ((pattern == 34) || (pattern == 42) ||
-          (pattern == 40) || (pattern == 10) ||
-          (pattern == 35) || (pattern == 50))
-        state |= CellHitPatternRight;
-      else if ((pattern == 17) || (pattern == 21) ||
-               (pattern == 20) || (pattern ==  5) ||
-               (pattern == 19) || (pattern == 49))
-        state |= CellHitPatternLeft;
+	//...Solve LR locally...
+	if ((pattern == 34) || (pattern == 42) ||
+	    (pattern == 40) || (pattern == 10) ||
+	    (pattern == 35) || (pattern == 50))
+	    state |= CellHitPatternRight;
+	else if ((pattern == 17) || (pattern == 21) ||
+		 (pattern == 20) || (pattern ==  5) ||
+		 (pattern == 19) || (pattern == 49))
+	    state |= CellHitPatternLeft;
 
-      //...Store it...
-      h->state(state);
+	//...Store it...
+	h->state(state);
     }
-  }
+}
 
-  vector<const TCWHit*>
-  TRGCDC::axialHits(void) const
-  {
+vector<const TCWHit*>
+TRGCDC::axialHits(void) const {
     vector<const TCWHit*> t;
     t.assign(_axialHits.begin(), _axialHits.end());
     return t;
@@ -999,11 +990,10 @@ TRGCDC::terminate(void) {
 //     else if (mask == CellHitFindingValid) return _axialHits;
 //     cout << "TRGCDC::axialHits !!! unsupported mask given" << endl;
 //  return _axialHits;
-  }
+}
 
-  vector<const TCWHit*>
-  TRGCDC::stereoHits(void) const
-  {
+vector<const TCWHit*>
+TRGCDC::stereoHits(void) const {
     vector<const TCWHit*> t;
     t.assign(_stereoHits.begin(), _stereoHits.end());
     return t;
@@ -1014,9 +1004,8 @@ TRGCDC::terminate(void) {
 //     return _stereoHits;
   }
 
-  vector<const TCWHit*>
-  TRGCDC::hits(void) const
-  {
+vector<const TCWHit*>
+TRGCDC::hits(void) const {
     vector<const TCWHit*> t;
     t.assign(_hits.begin(), _hits.end());
     return t;
@@ -1025,7 +1014,7 @@ TRGCDC::terminate(void) {
 //     else if (mask == CellHitFindingValid) return _hits;
 //     cout << "TRGCDC::hits !!! unsupported mask given" << endl;
 //     return _hits;
-  }
+}
 
 // vector<const TCWHit *>
 // TRGCDC::badHits(void) const {
@@ -1060,31 +1049,28 @@ TRGCDC::terminate(void) {
 // //     return _badHits;
 // }
 
-  vector<const TCWHitMC*>
-  TRGCDC::hitsMC(void) const
-  {
+vector<const TCWHitMC*>
+TRGCDC::hitsMC(void) const {
     vector<const TCWHitMC*> t;
     t.assign(_hitsMC.begin(), _hitsMC.end());
     return t;
-  }
+}
 
-  string
-  TRGCDC::wireName(unsigned wireId) const
-  {
+string
+TRGCDC::wireName(unsigned wireId) const {
     string as = "-";
     const TCWire* const w = wire(wireId);
     if (w) {
-      if (w->stereo())
-        as = "=";
+	if (w->stereo())
+	    as = "=";
     } else {
-      return "invalid_wire(" + TRGUtil::itostring(wireId) + ")";
+	return "invalid_wire(" + TRGUtil::itostring(wireId) + ")";
     }
     return TRGUtil::itostring(layerId(wireId)) + as + TRGUtil::itostring(localId(wireId));
-  }
+}
 
-  unsigned
-  TRGCDC::localId(unsigned id) const
-  {
+unsigned
+TRGCDC::localId(unsigned id) const {
     cout << "TRGCDC::localId !!! this function is not tested yet"
          << endl;
     unsigned iLayer = 0;
@@ -1092,135 +1078,117 @@ TRGCDC::terminate(void) {
     unsigned nWLast = 0;
     bool nextLayer = true;
     while (nextLayer) {
-      nWLast = nW;
-      nW += layer(iLayer++)->nCells();
-      if (id < (nW - 1))
-        return id - nWLast;
-      if (nW >= nWires())
-        nextLayer = false;
+	nWLast = nW;
+	nW += layer(iLayer++)->nCells();
+	if (id < (nW - 1))
+	    return id - nWLast;
+	if (nW >= nWires())
+	    nextLayer = false;
     }
     cout << "TRGCDC::localId !!! no such a wire (id=" << id << endl;
     return TRGCDC_UNDEFINED;
-  }
+}
 
-  unsigned
-  TRGCDC::layerId(unsigned id) const
-  {
+unsigned
+TRGCDC::layerId(unsigned id) const {
     cout << "TRGCDC::layerId !!! this function is not tested yet"
          << endl;
     unsigned iLayer = 0;
     unsigned nW = 0;
     bool nextLayer = true;
     while (nextLayer) {
-      nW += layer(iLayer++)->nCells();
-      if (id < (nW - 1))
-        return iLayer - 1;
-      if (nW >= nWires())
-        nextLayer = false;
+	nW += layer(iLayer++)->nCells();
+	if (id < (nW - 1))
+	    return iLayer - 1;
+	if (nW >= nWires())
+	    nextLayer = false;
     }
     cout << "TRGCDC::layerId !!! no such a wire (id=" << id << endl;
     return TRGCDC_UNDEFINED;
-  }
+}
 
-  unsigned
-  TRGCDC::layerId(unsigned , unsigned) const
-  {
+unsigned
+TRGCDC::layerId(unsigned , unsigned) const {
     cout << "TRGCDC::layerId !!! this function is not implemented yet"
          << endl;
     return TRGCDC_UNDEFINED;
-  }
+}
 
-  unsigned
-  TRGCDC::superLayerId(unsigned id) const
-  {
+unsigned
+TRGCDC::superLayerId(unsigned id) const {
     unsigned iLayer = 0;
     unsigned nW = 0;
     bool nextLayer = true;
     while (nextLayer) {
-      const vector<TRGCDCLayer*> & sl = * superLayer(iLayer);
-      const unsigned nLayers = sl.size();
-      for (unsigned i = 0; i < nLayers; i++)
-        nW += sl[i]->nCells();
+	const vector<TRGCDCLayer*> & sl = * superLayer(iLayer);
+	const unsigned nLayers = sl.size();
+	for (unsigned i = 0; i < nLayers; i++)
+	    nW += sl[i]->nCells();
 
-      if (id < (nW - 1))
-        return iLayer;
-      if (nW >= nWires())
-        nextLayer = false;
+	if (id < (nW - 1))
+	    return iLayer;
+	if (nW >= nWires())
+	    nextLayer = false;
     }
     cout << "TRGCDC::superLayerId !!! no such a wire (id=" << id
          << endl;
     return TRGCDC_UNDEFINED;
-  }
+}
 
-  unsigned
-  TRGCDC::localLayerId(unsigned id) const
-  {
+unsigned
+TRGCDC::localLayerId(unsigned id) const {
     unsigned iLayer = 0;
     unsigned nW = 0;
     bool nextLayer = true;
     while (nextLayer) {
-      const vector<TRGCDCLayer*> & sl = * superLayer(iLayer);
-      const unsigned nLayers = sl.size();
-      for (unsigned i = 0; i < nLayers; i++) {
-        nW += sl[i]->nCells();
-        if (id < (nW - 1))
-          return i;
-      }
+	const vector<TRGCDCLayer*> & sl = * superLayer(iLayer);
+	const unsigned nLayers = sl.size();
+	for (unsigned i = 0; i < nLayers; i++) {
+	    nW += sl[i]->nCells();
+	    if (id < (nW - 1))
+		return i;
+	}
 
-      if (nW >= nWires())
-        nextLayer = false;
+	if (nW >= nWires())
+	    nextLayer = false;
     }
     cout << "TRGCDC::localLayerId !!! no such a wire (id=" << id
          << endl;
     return TRGCDC_UNDEFINED;
-  }
+}
 
-#ifndef FOR_TRASAN
-  unsigned
-  TRGCDC::axialStereoSuperLayerId(unsigned ,
-                                  unsigned) const
-  {
-    cout << "TRGCDC::axialStereoSuperLayerId !!! "
-         << "this function is not implemented yet"
-         << endl;
-    return TRGCDC_UNDEFINED;
-  }
-#else
-  unsigned
-  TRGCDC::axialStereoSuperLayerId(unsigned aors,
-				  unsigned i) const
-  {
+unsigned
+TRGCDC::axialStereoSuperLayerId(unsigned aors, unsigned i) const {
     unsigned is = 99;
     //    cout << "aors,i= " << aors <<" "<< i << std::endl;
     if       (aors == 0) { //axial
-      if       ( i <=  7) {
-	is = 0;
-      } else if( i <= 13) {
-	is = 1;
-      } else if( i <= 19) {
-	is = 2;
-      } else if( i <= 25) {
-	is = 3;
-      } else if( i <= 31) {
-	is = 4;
-      }      
+	if       ( i <=  7) {
+	    is = 0;
+	} else if( i <= 13) {
+	    is = 1;
+	} else if( i <= 19) {
+	    is = 2;
+	} else if( i <= 25) {
+	    is = 3;
+	} else if( i <= 31) {
+	    is = 4;
+	}      
 
     } else if(aors == 1) { //stereo
-      if       ( i <=  5) {
-	is = 0;
-      } else if( i <= 11) {
-	is = 1;
-      } else if( i <= 17) {
-	is = 2;
-      } else if( i <= 23) {
-	is = 3;
-      }      
+	if       ( i <=  5) {
+	    is = 0;
+	} else if( i <= 11) {
+	    is = 1;
+	} else if( i <= 17) {
+	    is = 2;
+	} else if( i <= 23) {
+	    is = 3;
+	}      
     }
 
     assert(is != 99);
     return is;
-  }
-#endif
+}
 
 // void
 // TRGCDC::driftDistance(TLink & l,
@@ -1328,8 +1296,7 @@ TRGCDC::terminate(void) {
 //     }
 // }
 
-  TRGCDC::~TRGCDC()
-  {
+TRGCDC::~TRGCDC() {
     clear();
 
     delete [] _width;
@@ -1337,25 +1304,24 @@ TRGCDC::terminate(void) {
     delete [] _r2;
 
     if (_hFinder)
-      delete _hFinder;
+	delete _hFinder;
     if (_h3DFinder)
-      delete _h3DFinder;
+	delete _h3DFinder;
     if (_fitter3D)
-      delete _fitter3D;
+	delete _fitter3D;
 
     for (unsigned i = 0; i < _luts.size(); i++)
-      delete _luts[i];
+	delete _luts[i];
 
 #ifdef TRGCDC_DISPLAY
     if (D)
-      delete D;
+	delete D;
     cout << "TRGCDC ... rphi displays deleted" << endl;
 #endif
-  }
+}
 
-  bool
-  TRGCDC::neighbor(const TCWire& w0, const TCWire& w1) const
-  {
+bool
+TRGCDC::neighbor(const TCWire& w0, const TCWire& w1) const {
     const int lyr0 = w0.layerId();
     const int lyr1 = w1.layerId();
     const int lyr = lyr0 - lyr1;
@@ -1364,13 +1330,13 @@ TRGCDC::terminate(void) {
     if (w0.superLayerId() != w1.superLayerId()) return false;
 
     for (unsigned i = 0; i < 7; i++) {
-      if (w0.neighbor(i)) {
-        if (w0.neighbor(i)->id() == w1.id())
-          return true;
-      }
+	if (w0.neighbor(i)) {
+	    if (w0.neighbor(i)->id() == w1.id())
+		return true;
+	}
     }
     return false;
-  }
+}
 
 void
 TRGCDC::simulate(void) {
@@ -1780,16 +1746,15 @@ TRGCDC::simulate(void) {
     return;
 }
 
-  void
-  TRGCDC::configure(void)
-  {
+void
+TRGCDC::configure(void) {
 
     //...Open configuration file...
     ifstream infile(_configFilename.c_str(), ios::in);
     if (infile.fail()) {
-      cout << "TRGCDC !!! can not open file" << endl
-           << "    " << _configFilename << endl;
-      return;
+	cout << "TRGCDC !!! can not open file" << endl
+	     << "    " << _configFilename << endl;
+	return;
     }
 
     //...Read configuration data...
@@ -1798,91 +1763,91 @@ TRGCDC::simulate(void) {
     string cdcVersion = "";
     string configVersion = "";
     while (! infile.eof()) {
-      infile.getline(b, 800);
-      const string l(b);
-      string cdr = l;
+	infile.getline(b, 800);
+	const string l(b);
+	string cdr = l;
 
-      bool skip = false;
-      unsigned wid = 0;
-      unsigned lid = 0;
-      unsigned fid = 0;
-      unsigned mid = 0;
-      unsigned tid = 0;
-      for (unsigned i = 0; i < 5; i++) {
-        const string car = TRGUtil::carstring(cdr);
-        cdr = TRGUtil::cdrstring(cdr);
+	bool skip = false;
+	unsigned wid = 0;
+	unsigned lid = 0;
+	unsigned fid = 0;
+	unsigned mid = 0;
+	unsigned tid = 0;
+	for (unsigned i = 0; i < 5; i++) {
+	    const string car = TRGUtil::carstring(cdr);
+	    cdr = TRGUtil::cdrstring(cdr);
 
-        if (car == "#") {
-          skip = true;
-          break;
-        } else if (car == "CDC") {
-          if (l.find("CDC Wire Config Version") != string::npos)
-            cdcVersion = l;
-          else if (l.find("CDC TRG Config Version") != string::npos)
-            configVersion = l;
-          skip = true;
-          break;
-        }
+	    if (car == "#") {
+		skip = true;
+		break;
+	    } else if (car == "CDC") {
+		if (l.find("CDC Wire Config Version") != string::npos)
+		    cdcVersion = l;
+		else if (l.find("CDC TRG Config Version") != string::npos)
+		    configVersion = l;
+		skip = true;
+		break;
+	    }
 
-        if (i == 0) {
-          wid = atoi(car.c_str());
-        } else if (i == 1) {
-          lid = atoi(car.c_str());
-        } else if (i == 2) {
-          fid = atoi(car.c_str());
-        } else if (i == 3) {
-          mid = atoi(car.c_str());
-        } else if (i == 4) {
-          tid = atoi(car.c_str());
-        }
-      }
+	    if (i == 0) {
+		wid = atoi(car.c_str());
+	    } else if (i == 1) {
+		lid = atoi(car.c_str());
+	    } else if (i == 2) {
+		fid = atoi(car.c_str());
+	    } else if (i == 3) {
+		mid = atoi(car.c_str());
+	    } else if (i == 4) {
+		tid = atoi(car.c_str());
+	    }
+	}
 
-      if (skip)
-        continue;
-      if (lines != wid)
-        continue;
+	if (skip)
+	    continue;
+	if (lines != wid)
+	    continue;
 
-      //...Make a front-end board if necessary...
-      TCFrontEnd* f = 0;
-      if (fid < _fronts.size())
-        f = _fronts[fid];
-      if (! f) {
-        const string name = "CDCFrontEnd_" + TRGUtil::itostring(fid);
-        f = new TCFrontEnd(name, _clock);
-        _fronts.push_back(f);
-      }
-      f->push_back(_wires[wid]);
+	//...Make a front-end board if necessary...
+	TCFrontEnd* f = 0;
+	if (fid < _fronts.size())
+	    f = _fronts[fid];
+	if (! f) {
+	    const string name = "CDCFrontEnd_" + TRGUtil::itostring(fid);
+	    f = new TCFrontEnd(name, _clock);
+	    _fronts.push_back(f);
+	}
+	f->push_back(_wires[wid]);
 
-      //...Make a merger board if necessary...
-      TCMerger* m = 0;
-      if (mid != 99999) {
-        if (mid < _mergers.size())
-          m = _mergers[mid];
-        if (! m) {
-          const string name = "CDCMerger_" + TRGUtil::itostring(mid);
-          m = new TCMerger(name, _clock);
-          _mergers.push_back(m);
-        }
-        m->push_back(f);
+	//...Make a merger board if necessary...
+	TCMerger* m = 0;
+	if (mid != 99999) {
+	    if (mid < _mergers.size())
+		m = _mergers[mid];
+	    if (! m) {
+		const string name = "CDCMerger_" + TRGUtil::itostring(mid);
+		m = new TCMerger(name, _clock);
+		_mergers.push_back(m);
+	    }
+	    m->push_back(f);
 //            cout << "  f added" << endl;
-      }
+	}
 
-      ++lines;
+	++lines;
     }
     infile.close();
 
     //...Make a link in each front-end...
     const unsigned nFronts = _fronts.size();
     for (unsigned i = 0; i < nFronts; i++) {
-      TCFrontEnd& f = * _fronts[i];
-      TRGLink* fl = new TRGLink(f.name(), f.clock());
-      f.append(fl);
-      const unsigned nWires = f.size();
-      for (unsigned j = 0; j < nWires; j++) {
-        fl->append(& f[j]->timing());
-      }
-      if (TRGDebug::level() > 1)
-        f.dump("detail");
+	TCFrontEnd& f = * _fronts[i];
+	TRGLink* fl = new TRGLink(f.name(), f.clock());
+	f.append(fl);
+	const unsigned nWires = f.size();
+	for (unsigned j = 0; j < nWires; j++) {
+	    fl->append(& f[j]->timing());
+	}
+	if (TRGDebug::level() > 1)
+	    f.dump("detail");
     }
 
     //...Make a link for mergers
@@ -1895,88 +1860,86 @@ TRGCDC::simulate(void) {
 //     f.append(fl);
 
     infile.close();
-  }
+}
 
-  const TRGCDCSegment&
-  TRGCDC::segment(unsigned lid, unsigned id) const
-  {
+const TRGCDCSegment&
+TRGCDC::segment(unsigned lid, unsigned id) const {
     return * (const TRGCDCSegment*)(* _tsLayers[lid])[id];
-  }
+}
 
-  void
-  TRGCDC::perfect3DFinder(vector<TCTrack*> trackList) const
-  {
+void
+TRGCDC::perfect3DFinder(vector<TCTrack*> trackList) const {
 
     TRGDebug::enterStage("Perfect 3D Finder");
     if (TRGDebug::level())
-      cout << TRGDebug::tab() << "givenTrk#=" << trackList.size() << endl;
+	cout << TRGDebug::tab() << "givenTrk#=" << trackList.size() << endl;
 
     //...Track loop....
     for (unsigned j = 0; j < trackList.size(); j++) {
 
-      //...G4 trackID...
-      TCTrack* trk = trackList[j];
-      unsigned id = trackList[j]->relation().contributor(0);
-      vector<const TCSHit*> tsList[9];
+	//...G4 trackID...
+	TCTrack* trk = trackList[j];
+	unsigned id = trackList[j]->relation().contributor(0);
+	vector<const TCSHit*> tsList[9];
 
-      //...Segment loop...
-      const vector<const TCSHit*> hits = segmentHits();
-      for (unsigned i = 0; i < hits.size(); i++) {
-        const TCSHit& ts = * hits[i];
-        if (ts.segment().axial()) continue;
-        if (! ts.timing().active()) continue;
-        const TCWHit* wh = ts.segment().center().hit();
-        if (! wh) continue;
-        const unsigned trackId = wh->iMCParticle();
+	//...Segment loop...
+	const vector<const TCSHit*> hits = segmentHits();
+	for (unsigned i = 0; i < hits.size(); i++) {
+	    const TCSHit& ts = * hits[i];
+	    if (ts.segment().axial()) continue;
+	    if (! ts.timing().active()) continue;
+	    const TCWHit* wh = ts.segment().center().hit();
+	    if (! wh) continue;
+	    const unsigned trackId = wh->iMCParticle();
 
-        if (id == trackId)
-          tsList[wh->wire().superLayerId()].push_back(& ts);
-      }
+	    if (id == trackId)
+		tsList[wh->wire().superLayerId()].push_back(& ts);
+	}
 
-      if (TRGDebug::level()) {
-        cout << TRGDebug::tab() << "trk#" << j << endl;
-        for (unsigned k = 0; k < 9; k++) {
-          if (k % 2) {
-            cout << TRGDebug::tab(4) << "superlayer " << k << ":";
-            for (unsigned l = 0; l < tsList[k].size(); l++) {
-              if (l)
-                cout << ",";
-              cout << tsList[k][l]->cell().name();
-            }
-            cout << endl;
-          }
-        }
-      }
+	if (TRGDebug::level()) {
+	    cout << TRGDebug::tab() << "trk#" << j << endl;
+	    for (unsigned k = 0; k < 9; k++) {
+		if (k % 2) {
+		    cout << TRGDebug::tab(4) << "superlayer " << k << ":";
+		    for (unsigned l = 0; l < tsList[k].size(); l++) {
+			if (l)
+			    cout << ",";
+			cout << tsList[k][l]->cell().name();
+		    }
+		    cout << endl;
+		}
+	    }
+	}
 
-      //...Select best one in each super layer...
-      for (unsigned i = 0; i < 9; i++) {
-        const TCSHit* best = 0;
-        if (tsList[i].size() == 0) {
-          continue;
-        } else if (tsList[i].size() == 1) {
-          best = tsList[i][0];
-        } else {
-          int timeMin = 99999;
-          for (unsigned k = 0; k < tsList[i].size(); k++) {
-            const TRGSignal& timing = tsList[i][k]->timing();
-            const TRGTime& t = * timing[0];
-            if (t.time() < timeMin) {
-              timeMin = t.time();
-              best = tsList[i][k];
-            }
-          }
-        }
-        //trk->append(new TCLink(0,
-        //                       best,
-        //                       best->cell().xyPosition()));
-      }
+	//...Select best one in each super layer...
+	for (unsigned i = 0; i < 9; i++) {
+	    const TCSHit* best = 0;
+	    if (tsList[i].size() == 0) {
+		continue;
+	    } else if (tsList[i].size() == 1) {
+		best = tsList[i][0];
+	    } else {
+		int timeMin = 99999;
+		for (unsigned k = 0; k < tsList[i].size(); k++) {
+		    const TRGSignal& timing = tsList[i][k]->timing();
+		    const TRGTime& t = * timing[0];
+		    if (t.time() < timeMin) {
+			timeMin = t.time();
+			best = tsList[i][k];
+		    }
+		}
+	    }
+	    //trk->append(new TCLink(0,
+	    //                       best,
+	    //                       best->cell().xyPosition()));
+	}
 
-      if (TRGDebug::level())
-        trk->dump("", "> ");
+	if (TRGDebug::level())
+	    trk->dump("", "> ");
 
     }
 
     TRGDebug::leaveStage("Perfect 3D Finder");
-  }
+}
 
 } // namespace Belle2

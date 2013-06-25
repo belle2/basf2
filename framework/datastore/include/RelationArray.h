@@ -234,26 +234,6 @@ namespace Belle2 {
       return DataStore::Instance().createEntry(relName, durability, RelationContainer::Class(), false, true, errorIfExisting);
     }
 
-    /** Register the relation in the data store and include it in the output by default.
-     *  This must be called in the initialization phase.
-     *
-     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    bool registerAsPersistent(bool errorIfExisting = false) {
-      return DataStore::Instance().createEntry(m_name, m_durability, RelationContainer::Class(), false, false, errorIfExisting);
-    }
-
-    /** Register the relation in the data store, but do not include it in the output by default.
-     *  This must be called in the initialization phase.
-     *
-     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    bool registerAsTransient(bool errorIfExisting = false) {
-      return DataStore::Instance().createEntry(m_name, m_durability, RelationContainer::Class(), false, true, errorIfExisting);
-    }
-
     /** Check whether a relation array was registered before.
      *
      *  It will cause an error if the object does not exist.
@@ -269,16 +249,6 @@ namespace Belle2 {
       return DataStore::Instance().require(name, durability, RelationContainer::Class(), false);
     }
 
-    /** Check whether the relation was registered before.
-     *  It will cause an error if the relation does not exist.
-     *  This must be called in the initialization phase.
-     *
-     *  @return            True if the array exists.
-     */
-    bool isRequired() {
-      return DataStore::Instance().require(m_name, m_durability, RelationContainer::Class(), false);
-    }
-
     /** Tell the data store about an optional input.
      *
      *  Mainly useful for creating diagrams of module inputs and outputs.
@@ -292,16 +262,6 @@ namespace Belle2 {
       return DataStore::Instance().optionalInput(name, durability, RelationContainer::Class(), false);
     }
 
-    /** Tell the data store about an optional input.
-     *
-     *  Mainly useful for creating diagrams of module inputs and outputs.
-     *  This must be called in the initialization phase.
-     *
-     *  @return            True if the array exists.
-     */
-    bool isOptional() {
-      return DataStore::Instance().optionalInput(m_name, m_durability, RelationContainer::Class(), false);
-    }
     /** Create an empty relation array in the data store.
      *
      *  @param replace   Should an existing object be replaced?
@@ -333,7 +293,7 @@ namespace Belle2 {
      */
     template <class FROM, class TO> RelationArray(const StoreArray<FROM>& from, const StoreArray<TO>& to, const std::string& name = "",
                                                   DataStore::EDurability durability = DataStore::c_Event):
-      StoreAccessorBase((name == "") ? DataStore::relationName(from.getName(), to.getName()) : name, durability),
+      StoreAccessorBase((name == "") ? DataStore::relationName(from.getName(), to.getName()) : name, durability, RelationContainer::Class(), false),
       m_accessorFrom(from.getAccessorParams()),
       m_accessorTo(to.getAccessorParams()),
       m_relations(0) {
@@ -351,7 +311,7 @@ namespace Belle2 {
      *  @param durability Durability of the (existing) Relation
      */
     explicit RelationArray(const std::string& name, DataStore::EDurability durability = DataStore::c_Event):
-      StoreAccessorBase(name, durability),
+      StoreAccessorBase(name, durability, RelationContainer::Class(), false),
       m_relations(0) {
       if (name == "") {
         B2FATAL("Cannot guess relation name, please supply correct name");
@@ -367,7 +327,7 @@ namespace Belle2 {
      *  @param params     AccessorParams for the (existing) Relation
      */
     explicit RelationArray(const AccessorParams& params):
-      StoreAccessorBase(params.first, params.second),
+      StoreAccessorBase(params.first, params.second, RelationContainer::Class(), false),
       m_relations(0) {
       if (params.first == "") {
         B2FATAL("Cannot guess relation name, please supply correct name");

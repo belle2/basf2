@@ -87,7 +87,7 @@ namespace Belle2 {
 
   private:
     /** Return TClass for given name; or NULL if not found. */
-    TClass* getClass(const std::string& name);
+    static TClass* getClass(const std::string& name);
 
     TObject** m_storeObjPtr; /**< Pointer to pointer to object */
     std::string m_name; /**< Name of data store entry. */

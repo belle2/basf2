@@ -195,48 +195,7 @@ namespace Belle2 {
      *  @param durability Decides durability map used for getting the accessed array.
      */
     explicit StoreArray(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event):
-      StoreAccessorBase(DataStore::arrayName<T>(name), durability), m_storeArray(0) {}
-
-    /** Register the array in the data store and include it in the output by default.
-     *  This must be called in the initialization phase.
-     *
-     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    bool registerAsPersistent(bool errorIfExisting = false) {
-      return DataStore::Instance().createEntry(m_name, m_durability, T::Class(), true, false, errorIfExisting);
-    }
-
-    /** Register the array in the data store and do not include it in the output by default.
-     *  This must be called in the initialization phase.
-     *
-     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    bool registerAsTransient(bool errorIfExisting = false) {
-      return DataStore::Instance().createEntry(m_name, m_durability, T::Class(), true, true, errorIfExisting);
-    }
-
-    /** Check whether an array was registered before.
-     *  It will cause an error if the array does not exist.
-     *  This must be called in the initialization phase.
-     *
-     *  @return            True if the array exists.
-     */
-    bool isRequired() {
-      return DataStore::Instance().require(m_name, m_durability, T::Class(), true);
-    }
-
-    /** Tell the data store about an optional input.
-     *
-     *  Mainly useful for creating diagrams of module inputs and outputs.
-     *  This must be called in the initialization phase.
-     *
-     *  @return            True if the array exists.
-     */
-    bool isOptional() {
-      return DataStore::Instance().optionalInput(m_name, m_durability, T::Class(), true);
-    }
+      StoreAccessorBase(DataStore::arrayName<T>(name), durability, T::Class(), true), m_storeArray(0) {}
 
     /** Create an empty array in the data store.
      *

@@ -101,12 +101,16 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> evtPtr;
     EXPECT_EQ(evtPtr.getDurability(), DataStore::c_Event);
     EXPECT_TRUE(evtPtr.getName() == "EventMetaData");
+    EXPECT_FALSE(evtPtr.isArray());
+    EXPECT_TRUE(evtPtr.getClass() == EventMetaData::Class());
 
     StoreArray<EventMetaData> evtData;
     StoreArray<EventMetaData> evtData2("EventMetaDatas");
     StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
     StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Persistent);
     EXPECT_TRUE(evtData.getName() == "EventMetaDatas");
+    EXPECT_TRUE(evtData.isArray());
+    EXPECT_TRUE(evtData.getClass() == EventMetaData::Class());
     EXPECT_EQ(evtData.getDurability(), DataStore::c_Event);
     EXPECT_TRUE(evtData == evtData2);
     EXPECT_FALSE(evtData != evtData2);

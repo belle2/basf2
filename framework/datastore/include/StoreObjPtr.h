@@ -134,49 +134,7 @@ namespace Belle2 {
      *  @param durability Decides durability map used for getting the accessed object.
      */
     explicit StoreObjPtr(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event):
-      StoreAccessorBase(DataStore::objectName<T>(name), durability), m_storeObjPtr(0) {}
-
-    /** Register the object in the data store and include it in the output by default.
-     *  This must be called in the initialization phase.
-     *
-     *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    bool registerAsPersistent(bool errorIfExisting = false) {
-      return DataStore::Instance().createEntry(m_name, m_durability, T::Class(), false, false, errorIfExisting);
-    }
-
-    /** Register the object in the data store and do not include it in the output by default.
-     *  This must be called in the initialization phase.
-     *
-     *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    bool registerAsTransient(bool errorIfExisting = false) {
-      return DataStore::Instance().createEntry(m_name, m_durability, T::Class(), false, true, errorIfExisting);
-    }
-
-    /** Check whether an object was registered before.
-     *
-     *  It will cause an error if the object does not exist.
-     *  This must be called in the initialization phase.
-     *
-     *  @return            True if the object exists.
-     */
-    bool isRequired() {
-      return DataStore::Instance().require(m_name, m_durability, T::Class(), false);
-    }
-
-    /** Tell the data store about an optional input.
-     *
-     *  Mainly useful for creating diagrams of module inputs and outputs.
-     *  This must be called in the initialization phase.
-     *
-     *  @return            True if the object exists.
-     */
-    bool isOptional() {
-      return DataStore::Instance().optionalInput(m_name, m_durability, T::Class(), false);
-    }
+      StoreAccessorBase(DataStore::objectName<T>(name), durability, T::Class(), false), m_storeObjPtr(0) {}
 
     /** Create a default object in the data store.
      *

@@ -35,7 +35,7 @@
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/count.hpp>
-#include <boost/accumulators/statistics/tail.hpp>
+//#include <boost/accumulators/statistics/tail.hpp>
 #include <boost/accumulators/statistics/median.hpp>
 //genfit stuff
 #include <GFTrack.h>
@@ -113,12 +113,12 @@ namespace Belle2 {
   protected:
 
     // little helper functions for this module
-    double calcChi2(const TMatrixT<double>& res, const TMatrixT<double>& R) const;
-    std::vector<double> calcZs(const TMatrixT<double>& res, const TMatrixT<double>& R) const;
-    std::vector<double> calcTestsWithTruthInfo(const TMatrixT<double>& state, const TMatrixT<double>& cov, const TMatrixT<double>& trueState) const;
+    static double calcChi2(const TMatrixT<double>& res, const TMatrixT<double>& R);
+    static std::vector<double> calcPulls(const TMatrixT<double>& res, const TMatrixT<double>& R);
+    static std::vector<double> calcTestsWithTruthInfo(const TMatrixT<double>& state, const TMatrixT<double>& cov, const TMatrixT<double>& trueState);
     void isMatrixCov(const TMatrixT<double>& cov);
-    bool isSymmetric(const TMatrixT<double>& aMatrix) const;
-    bool hasMatrixNegDiagElement(const TMatrixT<double>& aMatrix) const;
+    static bool isSymmetric(const TMatrixT<double>& aMatrix);
+    static bool hasMatrixNegDiagElement(const TMatrixT<double>& aMatrix);
 
     // functions for dataflow inside module
     void registerTrackWiseData(const std::string& nameOfDataSample);
@@ -169,13 +169,13 @@ namespace Belle2 {
 
 
     /** function to calculated the MAD or Median absolute deviation for given data sample. One has also provide the median of the sample (because boost has already median calculation implemented so I did not implement it myself) */
-    double calcMad(const std::vector<double>& data, const double& median);
+    static double calcMad(const std::vector<double>& data, const double& median);
     std::map<std::string, double > m_madScalingFactors; //scaling factor the mad to make it compariable to the standard deviation
-    double calcMedian(std::vector<double> data);
+    static double calcMedian(std::vector<double> data);
     //void calcMedianAndMad(std::vector<double> data, double& median, double& mad);
-    int trunctatedMeanAndStd(std::vector<double> data, const double cutRatio, const bool symmetric, double& mean, double& std);
+    static int trunctatedMeanAndStd(std::vector<double> data, const double cutRatio, const bool symmetric, double& mean, double& std);
     std::map<std::string, double > m_trunctationRatios; //holds the ratio how many of the data of a named sample should be cut away in the trunctatedMeanAndStd function
-    int countOutliers(const std::vector<double>& dataSample, const double mean, const double sigma, const double widthScaling);
+    static int countOutliers(const std::vector<double>& dataSample, const double mean, const double sigma, const double widthScaling);
 
     // this maps will hold the names of the test data variables that have more then one component like the residuals of the origin position and momentum
     std::map<std::string, std::vector<std::string>* > namesOfTestVars;

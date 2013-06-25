@@ -295,4 +295,44 @@ namespace Belle2 {
         */
   }
 
+  /** test registerPersistent(), optional() */
+  TEST_F(DataStoreTest, DataStoreRegistration)
+  {
+    StoreObjPtr<EventMetaData> evtPtr("abc123");
+    StoreArray<EventMetaData>  evtArray("abc123array");
+
+    //verify that they aren't registered right now
+    EXPECT_FALSE(evtPtr.isOptional());
+    EXPECT_FALSE(evtArray.isOptional());
+    EXPECT_FALSE(evtPtr.isRequired());
+    EXPECT_FALSE(evtArray.isRequired());
+    EXPECT_FALSE(StoreObjPtr<EventMetaData>::optional(evtPtr.getName()));
+    EXPECT_FALSE(StoreArray<EventMetaData>::optional(evtArray.getName()));
+    EXPECT_FALSE(StoreObjPtr<EventMetaData>::required(evtPtr.getName()));
+    EXPECT_FALSE(StoreArray<EventMetaData>::required(evtArray.getName()));
+
+    DataStore::Instance().setInitializeActive(true);
+    EXPECT_TRUE(evtPtr.registerAsPersistent());
+    EXPECT_TRUE(evtArray.registerAsTransient());
+
+    //already registered, ok by default
+    EXPECT_TRUE(evtPtr.registerAsPersistent());
+    EXPECT_TRUE(evtArray.registerAsTransient());
+
+    //test errorIfExisting
+    EXPECT_FALSE(evtPtr.registerAsPersistent(true));
+    EXPECT_FALSE(evtArray.registerAsTransient(true));
+    DataStore::Instance().setInitializeActive(false);
+
+    //now they should be available:
+    EXPECT_TRUE(evtPtr.isOptional());
+    EXPECT_TRUE(evtArray.isOptional());
+    EXPECT_TRUE(evtPtr.isRequired());
+    EXPECT_TRUE(evtArray.isRequired());
+    EXPECT_TRUE(StoreObjPtr<EventMetaData>::optional(evtPtr.getName()));
+    EXPECT_TRUE(StoreArray<EventMetaData>::optional(evtArray.getName()));
+    EXPECT_TRUE(StoreObjPtr<EventMetaData>::required(evtPtr.getName()));
+    EXPECT_TRUE(StoreArray<EventMetaData>::required(evtArray.getName()));
+  }
+
 }  // namespace

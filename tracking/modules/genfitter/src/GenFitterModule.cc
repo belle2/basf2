@@ -466,7 +466,7 @@ void GenFitterModule::event()
               //Create relations
               if (aTrackCandPointer->getMcTrackId() != -999) {
                 mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
-              } else B2WARNING("No MCParticle contributed to theis track! No MCParticle<->Track relation will be created!");
+              } else B2WARNING("No MCParticle contributed to this track! No MCParticle<->Track relation will be created!");
             }
           } else {            //fit successful
             ++m_successfulFitCounter;
@@ -615,6 +615,10 @@ void GenFitterModule::event()
 
             catch (...) {
               B2WARNING("Something went wrong during the extrapolation of fit results!");
+              //Create relations
+              if (aTrackCandPointer->getMcTrackId() != -999) {
+                mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
+              } else B2WARNING("No MCParticle contributed to this track! No MCParticle<->Track relation will be created!");
 //              tracks[trackCounter]->setExtrapFailed(true);
             }
 

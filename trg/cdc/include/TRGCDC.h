@@ -66,6 +66,7 @@ class TRGCDC {
     /// returns TRGCDC object with specific configuration.
     static TRGCDC * getTRGCDC(const std::string & configFile,
 			      unsigned simulationMode = 0,
+			      unsigned fastSimulationMode = 0,
 			      unsigned firmwareSimulationMode = 0,
                               bool perfect2DFinder = false,
                               bool perfect3DFinder = false,
@@ -91,6 +92,7 @@ class TRGCDC {
     /// Constructor
     TRGCDC(const std::string & configFile,
 	   unsigned simulationMode,
+	   unsigned fastSimulationMode,
 	   unsigned firmwareSimulationMode,
 	   bool perfect2DFinder,
 	   bool perfect3DFinder,
@@ -331,6 +333,9 @@ class TRGCDC {
     /// returns the system clock of the front-end
     const TRGClock & systemClockFE(void) const;
 
+    /// returns the data clock.
+    const TRGClock & dataClock(void) const;
+
     /// returns the system offset in MC.
     double systemOffsetMC(void) const;
 
@@ -364,6 +369,9 @@ class TRGCDC {
 
     /// Simulation mode.
     unsigned _simulationMode;
+
+    /// Fast simulation mode.
+    unsigned _fastSimulationMode;
 
     /// Firmware simulation mode.
     unsigned _firmwareSimulationMode;
@@ -472,6 +480,9 @@ class TRGCDC {
 
     /// CDC FE trigger system clock.
     const TRGClock _clockFE;
+
+    /// CDC trigger data clock.
+    const TRGClock _clockD;
 
     /// Timing offset of CDC trigger.
     const double _offset;
@@ -692,6 +703,12 @@ inline
 const TRGClock &
 TRGCDC::systemClockFE(void) const {
     return _clockFE;
+}
+
+inline
+const TRGClock &
+TRGCDC::dataClock(void) const {
+    return _clockD;
 }
 
 inline

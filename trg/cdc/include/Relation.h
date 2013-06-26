@@ -20,11 +20,13 @@
 #define TCRelation TRGCDCRelation
 #endif
 
+#include "trg/cdc/TrackBase.h"
+
 namespace Belle2 {
 
 //class G4Track;
 class MCParticle;
-class TRGCDCTrackBase;
+//class TRGCDCTrackBase;
 
 /// A class to represent a wire in CDC.
 class TRGCDCRelation {
@@ -58,6 +60,9 @@ class TRGCDCRelation {
 
     /// returns purity for 3D for trkID particle which should be from 2D.
     float purity3D(unsigned trkID) const;
+
+    /// returns efficiency of TS for 3D
+    float efficiency3D(unsigned trkID, std::map<unsigned, unsigned> & numTSsParticle ) const;
 
     /// Dumps debug information.
     void dump(const std::string & message = std::string(""),

@@ -69,7 +69,7 @@ TRGCDC::name(void) const {
 
 string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.33");
+    return string("TRGCDC 5.34");
 }
 
 TRGCDC *
@@ -78,6 +78,7 @@ TRGCDC::_cdc = 0;
 TRGCDC*
 TRGCDC::getTRGCDC(const string& configFile,
 		  unsigned simulationMode,
+		  unsigned fastSimulationMode,
 		  unsigned firmwareSimulationMode,
 		  bool perfect2DFinder,
 		  bool perfect3DFinder,
@@ -101,6 +102,7 @@ TRGCDC::getTRGCDC(const string& configFile,
     if (configFile != "good-bye") {
 	_cdc = new TRGCDC(configFile,
 			  simulationMode,
+			  fastSimulationMode,
 			  firmwareSimulationMode,
 			  perfect2DFinder,
 			  perfect3DFinder,
@@ -135,6 +137,7 @@ TRGCDC::getTRGCDC(void) {
 
 TRGCDC::TRGCDC(const string& configFile,
 	       unsigned simulationMode,
+	       unsigned fastSimulationMode,
 	       unsigned firmwareSimulationMode,
 	       bool perfect2DFinder,
 	       bool perfect3DFinder,
@@ -153,6 +156,7 @@ TRGCDC::TRGCDC(const string& configFile,
     : _debugLevel(0),
       _configFilename(configFile),
       _simulationMode(simulationMode),
+      _fastSimulationMode(fastSimulationMode),
       _firmwareSimulationMode(firmwareSimulationMode),
       _perfect2DFinder(perfect2DFinder),
       _perfect3DFinder(perfect3DFinder),
@@ -169,8 +173,9 @@ TRGCDC::TRGCDC(const string& configFile,
       _width(0),
       _r(0),
       _r2(0),
-      _clock("CDCTrigge system clock", Belle2_GDL::GDLSystemClock, 1),
-      _clockFE("CDCFETrigge system clock", Belle2_GDL::GDLSystemClock, 8),
+      _clock("CDCTrigger system clock", Belle2_GDL::GDLSystemClock, 1),
+      _clockFE("CDCFETrigger system clock", Belle2_GDL::GDLSystemClock, 8),
+      _clockD("CDCTrigger data clock", Belle2_GDL::GDLSystemClock, 1, 4),
       _offset(5.3),
       _pFinder(0),
       _hFinder(0),
@@ -202,6 +207,7 @@ TRGCDC::TRGCDC(const string& configFile,
 	Belle2_GDL::GDLSystemClock.dump();
 	_clock.dump();
 	_clockFE.dump();
+	_clockD.dump();
     }
 }
 
@@ -777,103 +783,97 @@ TRGCDC::update(bool) {
 
     //...Loop over CDCHits...
     for (unsigned i = 0; i < nHits; i++) {
-	const CDCHit& h = * CDCHits[i];
-	double tmp=rand()/(double(RAND_MAX));
-	if(tmp<_inefficiency) continue;
-	else{
+	const CDCHit & h = * CDCHits[i];
+	double tmp = rand() / (double(RAND_MAX));
+	if (tmp < _inefficiency)
+	    continue;
+
 //      //...Check validity (skip broken channel)...
 //      if (! (h->m_stat & CellHitFindingValid)) continue;
 
-	    //...Get CDCSimHit... This is expensive. Should be moved outside.
-	    unsigned iSimHit = 0;
-	    for (unsigned j = 0; j < nRels; j++) {
-		const unsigned k = rels[j].getToIndices().size();
-		for (unsigned l = 0; l < k; l++) {
-		    if (rels[j].getToIndex(l) == i)
-			iSimHit = rels[j].getFromIndex();
+	//...Get CDCSimHit... This is expensive. Should be moved outside.
+	unsigned iSimHit = 0;
+	for (unsigned j = 0; j < nRels; j++) {
+	    const unsigned k = rels[j].getToIndices().size();
+	    for (unsigned l = 0; l < k; l++) {
+		if (rels[j].getToIndex(l) == i)
+		    iSimHit = rels[j].getFromIndex();
+	    }
+
+	    if (TRGDebug::level())
+		if (k > 1)
+		    cout << "TRGCDC::update !!! CDCSimHit[" << iSimHit
+			 << "] has multiple CDCHit(" << k << " hits)" << endl;
+	}
+
+	//...Get MCParticle... This is expensive, again.
+	//   (Getting the first MCParticle only)
+	unsigned iMCPart = 0;
+	for (unsigned j = 0; j < nRelsMC; j++) {
+	    const unsigned k = relsMC[j].getToIndices().size();
+	    for (unsigned l = 0; l < k; l++) {
+		if (relsMC[j].getToIndex(l) == i) {
+		    iMCPart = relsMC[j].getFromIndex();
+		    break;
 		}
-
-		if (TRGDebug::level())
-		    if (k > 1)
-			cout << "TRGCDC::update !!! CDCSimHit[" << iSimHit
-			     << "] has multiple CDCHit(" << k << " hits)" << endl;
 	    }
 
-	    //...Get MCParticle... This is expensive, again.
-	    //   (Getting the first MCParticle only)
-	    unsigned iMCPart = 0;
-	    for (unsigned j = 0; j < nRelsMC; j++) {
-		const unsigned k = relsMC[j].getToIndices().size();
-		for (unsigned l = 0; l < k; l++) {
-		    if (relsMC[j].getToIndex(l) == i) {
-			iMCPart = relsMC[j].getFromIndex();
-			break;
-		    }
-		}
+	    if (TRGDebug::level())
+		if (k > 1)
+		    cout << "TRGCDC::update !!! MCParticle[" << iMCPart
+			 << "] has multiple CDCHit(" << k << " hits)" << endl;
+	}
 
-		if (TRGDebug::level())
-		    if (k > 1)
-			cout << "TRGCDC::update !!! MCParticle[" << iMCPart
-			     << "] has multiple CDCHit(" << k << " hits)" << endl;
-	    }
+	//...Wire...
+	int t_layerId;
+	if (h.getISuperLayer() == 0) t_layerId = h.getILayer();
+	else t_layerId = h.getILayer() + 6 * h.getISuperLayer() + 2;
+	const unsigned layerId = t_layerId;
+	const unsigned wireId = h.getIWire();
+	TCWire& w = * (TCWire*) wire(layerId, wireId);
 
-	    //...Wire...
-	    int t_layerId;
-	    if (h.getISuperLayer() == 0) t_layerId = h.getILayer();
-	    else t_layerId = h.getILayer() + 6 * h.getISuperLayer() + 2;
-	    const unsigned layerId = t_layerId;
-	    const unsigned wireId = h.getIWire();
-	    TCWire& w = * (TCWire*) wire(layerId, wireId);
+	//...TDC count...
+	const int tdcCount = h.getTDCCount();
 
-	    //...Drift length(micron) to drift time(ns)...
-	    //   coefficient used here must be re-calculated.
-	    const float driftTimeMC =
-		SimHits[iSimHit]->getDriftLength() * 10 * 1000 / 40 +
-		SimHits[iSimHit]->getFlightTime();
+	//...Drift length from TDC...
+	const float driftLength = tdcCount * (40. / 10000.);
+	const float driftLengthError = 0.013;
 
-	    //...Trigger timing...
-	    TRGTime rise = TRGTime(driftTimeMC, true, _clockFE, w.name());
-	    TRGTime fall = rise;
-	    fall.shift(1).reverse();
-	    w._timing = TRGSignal(rise & fall);
-	    w._timing.name(w.name());
+	//...Trigger timing...
+	TRGTime rise = TRGTime(tdcCount, true, _clockFE, w.name());
+	TRGTime fall = rise;
+	fall.shift(1).reverse();
+	w._timing = TRGSignal(rise & fall);
+	w._timing.name(w.name());
+	
+	//...Left/right...
+	const int LRflag = SimHits[iSimHit]->getPosFlag();
 
-	    //...Simulated drift distance...
-#if 0
-	    const double driftLength =
-		_clockFE.absoluteTime(w._timing[0]->time()) * 40 / 10 / 1000;
-	    const double driftLengthError = 0.15;
-#else 
-	    static bool first(true);
-	    if(first) {
-		first = false;
-		cout <<"TRGCDCWireHit is modified for Trasan." << std::endl;
-	    }
-	    const float driftLength = h.getTDCCount()*(40./10000.);
-	    const float driftLengthError = 0.013;
-#endif
-	    //w._timing.dump("detail", " -1 ");
+	//...TCWireHit...
+	TCWHit * hit = new TCWHit(w,
+				  i,
+				  iSimHit,
+				  iMCPart,
+				  driftLength,
+				  driftLengthError,
+				  driftLength,
+				  driftLengthError,
+				  LRflag,
+				  1);
+	hit->state(CellHitFindingValid | CellHitFittingValid);
 
-	    const int LRflag = SimHits[iSimHit]->getPosFlag();
-
-	    //...TCWireHit...
-	    TCWHit* hit = new TCWHit(w,
-				     i,
-				     iSimHit,
-				     iMCPart,
-				     driftLength,
-				     driftLengthError,
-				     driftLength,
-				     driftLengthError,
-				     LRflag,
-				     1);
-	    hit->state(CellHitFindingValid | CellHitFittingValid);
-
-	    //...Store a hit...
-	    ((TCWire*)(* _layers[layerId])[wireId])->hit(hit);
-	    _hits.push_back(hit);
-	    if (w.axial()) _axialHits.push_back(hit);
-	    else           _stereoHits.push_back(hit);
+	//...Store a hit...
+	((TCWire *)(* _layers[layerId])[wireId])->hit(hit);
+	_hits.push_back(hit);
+	if (w.axial()) _axialHits.push_back(hit);
+	else           _stereoHits.push_back(hit);
+	
+	//...Debug...
+	if (TRGDebug::level() > 2) {
+	    std::cout << TRGDebug::tab() << w.name() << std::endl;
+	    w._timing.dump("", TRGDebug::tab(1));
+	    std::cout << TRGDebug::tab(1) << "CDCHit TDC count="
+		      << h.getTDCCount() << std::endl;
 	}
     }
 
@@ -883,10 +883,13 @@ TRGCDC::update(bool) {
 //  _hits.sort(TCWHit::sortByWireId);
     classification();
 
-    if (TRGDebug::level()) {
+    if (TRGDebug::level() > 2) {
 	StoreArray<CDCSimHit> simHits("CDCSimHits");
-	cout << TRGDebug::tab() << "#CDCSimHit=" << n << ",#CDCHit=" << nHits
-	     << endl;
+
+	if (TRGDebug::level()) {
+	    cout << TRGDebug::tab() << "#CDCSimHit=" << n << ",#CDCHit="
+		 << nHits << endl;
+	}
 
 	_clock.dump("detail", TRGDebug::tab());
 	_clockFE.dump("detail", TRGDebug::tab());
@@ -1347,11 +1350,15 @@ TRGCDC::simulate(void) {
 
     TRGDebug::enterStage("TRGCDC simulation");
 
+    //...Options...
+    const bool trackSegmentSimulationOnly = _fastSimulationMode & 1;
+    const bool trackSegmentClockSimulation = _fastSimulationMode & 2;
+
     //...Store TS hits...
     const unsigned n = _tss.size();
     for (unsigned i = 0; i < n; i++) {
 	TCSegment& s = * _tss[i];
-	s.simulate();
+	s.simulate(trackSegmentClockSimulation);
 	if (s.timing().active()) {
             TCSHit * th = new TCSHit(s);
             s.hit(th);
@@ -1409,7 +1416,7 @@ TRGCDC::simulate(void) {
 	}
     }
 
-    if (_simulationMode == 1) {
+    if (trackSegmentSimulationOnly) {
 	TRGDebug::leaveStage("TRGCDC simulation");
 	return;
     }
@@ -1491,9 +1498,11 @@ TRGCDC::simulate(void) {
 	const TCTrack& aTrack = *trackList3D[i];
 	if (aTrack.fitted()) {
 	    double fitPt = aTrack.pt();
-	    double fitPhi0; 
-	    if (aTrack.charge() > 0) fitPhi0 = aTrack.p().phi() - M_PI / 2;
-	    if (aTrack.charge() < 0) fitPhi0 = aTrack.p().phi() + M_PI / 2;
+	    double fitPhi0 = aTrack.helix().phi0();
+      if(aTrack.charge()<0) {
+        fitPhi0 -= M_PI;
+        if (fitPhi0 < 0) fitPhi0 += 2 * M_PI;
+      }
 	    double fitZ0 = aTrack.helix().dz();
 	    double fitCot = aTrack.helix().tanl();
 	    // pT, phi0, z0, cot

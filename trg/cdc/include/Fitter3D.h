@@ -140,6 +140,8 @@ class TRGCDCFitter3D {
       TClonesArray* m_fitTrackFitter3D;
       // wire (pT, phi0), charge
       TClonesArray* m_wFit2DTrackFitter3D;
+      // 2D fit values from 2D fitter (pT, phi0, r0)
+      TClonesArray* m_fit2DTrackFitter3D;
       // Stores s and z hit values
       // s1, s2, s3, s4, z1, z2, z3, z4
       TClonesArray* m_szTrackFitter3D;

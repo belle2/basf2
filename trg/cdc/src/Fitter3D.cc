@@ -303,6 +303,7 @@ namespace Belle2 {
     m_mcTSTrackFitter3D = new TClonesArray("TVectorD");
     m_fitTrackFitter3D = new TClonesArray("TVectorD");
     m_wFit2DTrackFitter3D = new TClonesArray("TVectorD");
+    m_fit2DTrackFitter3D = new TClonesArray("TVectorD");
     m_szTrackFitter3D = new TClonesArray("TVectorD");
     m_wStAxPhiTrackFitter3D = new TClonesArray("TVectorD");
     m_stAxPhiTrackFitter3D = new TClonesArray("TVectorD");
@@ -319,6 +320,7 @@ namespace Belle2 {
     m_treeTrackFitter3D->Branch("mcTSTrackFitter3D", &m_mcTSTrackFitter3D);
     m_treeTrackFitter3D->Branch("fitTrackFitter3D", &m_fitTrackFitter3D);
     m_treeTrackFitter3D->Branch("wFit2DTrackFitter3D", &m_wFit2DTrackFitter3D);
+    m_treeTrackFitter3D->Branch("fit2DTrackFitter3D", &m_fit2DTrackFitter3D);
     m_treeTrackFitter3D->Branch("szTrackFitter3D", &m_szTrackFitter3D);
     m_treeTrackFitter3D->Branch("wStAxPhiTrackFitter3D", &m_wStAxPhiTrackFitter3D);
     m_treeTrackFitter3D->Branch("stAxPhiTrackFitter3D", &m_stAxPhiTrackFitter3D);
@@ -415,6 +417,7 @@ namespace Belle2 {
       TClonesArray &mcTSTrackFitter3D = *m_mcTSTrackFitter3D;
       TClonesArray &fitTrackFitter3D = *m_fitTrackFitter3D;
       TClonesArray &wFit2DTrackFitter3D = *m_wFit2DTrackFitter3D;
+      TClonesArray &fit2DTrackFitter3D = *m_fit2DTrackFitter3D;
       TClonesArray &szTrackFitter3D = *m_szTrackFitter3D;
       TClonesArray &wStAxPhiTrackFitter3D = *m_wStAxPhiTrackFitter3D;
       TClonesArray &stAxPhiTrackFitter3D = *m_stAxPhiTrackFitter3D;
@@ -509,6 +512,7 @@ namespace Belle2 {
       mcTSTrackFitter3D.Clear();
       fitTrackFitter3D.Clear();
       wFit2DTrackFitter3D.Clear();
+      fit2DTrackFitter3D.Clear();
       szTrackFitter3D.Clear();
       wStAxPhiTrackFitter3D.Clear();
       stAxPhiTrackFitter3D.Clear();
@@ -669,7 +673,6 @@ namespace Belle2 {
           int tSLayerId[9] = {2,16,28,40,52,10,22,34,46};
           double driftTS[9] = {999,999,999,999,999,999,999,999,999};
           TVectorD mcTS(27);
-//        for( int iHits = 0; iHits < SimHits->GetEntriesFast(); iHits++){
           for( int iHits = 0; iHits < SimHits.getEntries(); iHits++){
              CDCSimHit* aCDCSimHit = SimHits[iHits];
              TVector3 posTrack = aCDCSimHit->getPosTrack();
@@ -945,6 +948,25 @@ namespace Belle2 {
           //          cout << "tsimpt/"  << pt <<"]"<<endl;
           //          cout << "tsimth/"  << ztheta <<"]"<<endl;
           //          cout << "tsimpi/" << myphi0*180/m_Trg_PI*3.2/intnum3 << "]" << endl;
+
+          // Save 2D fit values from 2D fitter
+          double pt2D;
+          double phi02D;
+          phi02D = aTrack.helix().phi0();
+          pt2D = aTrack.helix().curv()*0.01*0.3*1.5;
+          if(aTrack.charge()<0) {
+            phi02D -= m_Trg_PI;
+            if (phi02D < 0) phi02D += 2 * m_Trg_PI;
+            pt2D = pt2D * -1;
+          }
+          TVectorD tempFit2D(3);
+          tempFit2D[0] = pt2D;
+          tempFit2D[1] = phi02D;
+          tempFit2D[2] = aTrack.helix().dr()*0.01;
+          new(fit2DTrackFitter3D[iFit]) TVectorD(tempFit2D);
+
+          //cout<<"3D: "<<pt<<" "<<myphi0<<endl;
+          //cout<<"[2D] pt: "<<aTrack.pt()<<" phi0: "<<phi02D<<" dr: "<<aTrack.helix().dr()<<endl;
 
           iFit += 1;
 

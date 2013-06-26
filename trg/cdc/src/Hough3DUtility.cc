@@ -127,7 +127,7 @@ void Hough3DFinder::runFinder(std::vector<double> &trackVariables, vector<vector
     case 2:
       runFinderVersion2(trackVariables, stTSs);
       break;
-    // FPGA Geo Finder
+    // FPGA Geo Finder (For LUT generator. Doesn't use LUTs)
     case 3:
       runFinderVersion3(trackVariables, stTSs);
       break;
@@ -647,28 +647,6 @@ void Hough3DFinder::runFinderVersion2(vector<double> &trackVariables, vector<vec
 }
 
 void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vector<double> > &stTSs){
-
-  //// For version2 results. Move version 2 results to temp.
-  //vector<vector<int> > tempIndex;
-  //vector<vector<double> > tempPhi;
-  //vector<vector<double> > tempDiffStWires;
-  //double tempBestTS[4];
-  //double tempBestTSIndex[4];
-  //for(int iLayer=0; iLayer<4; iLayer++ ) {
-  //  tempIndex.push_back(vector<int> () );
-  //  tempPhi.push_back(vector<double> () );
-  //  tempDiffStWires.push_back(vector<double> () );
-  //  int nCandidates = (*m_geoCandidatesIndex)[iLayer].size();
-  //  for(int iTS = 0; iTS<nCandidates; iTS++) {
-  //    tempIndex[iLayer].push_back( (*m_geoCandidatesIndex)[iLayer][iTS] );
-  //    tempPhi[iLayer].push_back( (*m_geoCandidatesPhi)[iLayer][iTS] );
-  //    tempDiffStWires[iLayer].push_back( (*m_geoCandidatesDiffStWires)[iLayer][iTS] );
-  //  }
-  //  tempBestTS[iLayer] = m_bestTS[iLayer];
-  //  m_bestTS[iLayer] = 999;
-  //  tempBestTSIndex[iLayer] = m_bestTSIndex[iLayer];
-  //  m_bestTSIndex[iLayer] = 999;
-  //}
 
   // Clear m_geoCandidatesIndex
   for(int iLayer=0; iLayer<4; iLayer++) {

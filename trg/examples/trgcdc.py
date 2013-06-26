@@ -59,12 +59,13 @@ geobuilder.param('Components', ['MagneticField', 'CDC'])
 cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/TRGCDCConfig_0_20101111_1051.dat"))
 cdctrg.param('InnerTSLUTDataFile', os.path.join(basf2datadir,"trg/LRLUT.coe"))
 cdctrg.param('OuterTSLUTDataFile', os.path.join(basf2datadir,"trg/LRLUT.coe"))
-#cdctrg.param('DebugLevel',2)
-cdctrg.param('CurlBackStop',1)
+cdctrg.param('DebugLevel', 10)
+cdctrg.param('CurlBackStop', 1)
+cdctrg.param('SimulationMode', 3)
+cdctrg.param('FastSimulationMode', 2)
 cdctrg.param('2DFinderPerfect',1)
 #cdctrg.param('HoughFinderMeshX',180)
 #cdctrg.param('HoughFinderMeshY',24)
-#cdctrg.param('SimulationMode',11)
 #cdctrg.param('SimulationMode',0x11)
 #cdctrg.param('RootTRGCDCFile', 'TRGCDC.root')
 #cdctrg.param('RootFitter3DFile', 'Fitter3D.root')
@@ -84,6 +85,8 @@ param_cdcdigi = {'Fraction': 1,
                  'Resolution2': 0.,
                  'Threshold': -10.0}
 cdcdigitizer.param(param_cdcdigi)
+cdcdigitizer.param('AddInWirePropagationDelay', True)
+cdcdigitizer.param('AddTimeOfFlight', True)
 
 # For B Bbar events.
 evtgeninput = register_module('EvtGenInput')

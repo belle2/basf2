@@ -62,10 +62,14 @@ TRGClock::TRGClock(const string & name,
       _multi(multiplicationFactor),
       _div(divisionFactor),
       _offset(source._offset),
-      _frequency(source._frequency * double(multiplicationFactor)),
-      _cycle(source._cycle / double(multiplicationFactor)),
-      _min(source._min * int(multiplicationFactor)),
-      _max(source._max * int(multiplicationFactor)) {
+      _frequency(source._frequency *
+		 double(multiplicationFactor) /
+		 double(divisionFactor)),
+      _cycle(source._cycle /
+	     double(multiplicationFactor) *
+	     double(divisionFactor)),
+      _min(source._min * int(multiplicationFactor) / int(divisionFactor)),
+      _max(source._max * int(multiplicationFactor) / int(divisionFactor)) {
 }
 
 TRGClock::~TRGClock() {

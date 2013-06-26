@@ -107,10 +107,18 @@ class TRGCDCSegment : public TRGCDCCell {
     void clear(void);
 
     /// simulates TF hit using wire information.
-    void simulate(void);
+    void simulate(bool clockSimulation = false);
 
     /// sets a pointer to a TRGCDCSegmentHit.
     const TRGCDCSegmentHit * hit(const TRGCDCSegmentHit *);
+
+  public:
+
+    /// simulates time-indegrated TF hit 
+    void simulateWithoutClock(void);
+
+    /// simulates TF hit time-dependently
+    void simulateWithClock(void);
 
   private:
 

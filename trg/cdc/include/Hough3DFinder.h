@@ -96,7 +96,7 @@ class TRGCDCHough3DFinder {
     TClonesArray* m_mcSt1TSsTrackHough3D;
     TClonesArray* m_mcSt2TSsTrackHough3D;
     TClonesArray* m_mcSt3TSsTrackHough3D;
-    // Stores performance values. [purity, Track #]
+    // Stores performance values. [purity, Efficiency, Track #]
     TClonesArray* m_performanceTrackHough3D;
     // Stores deltaWireDiff
     TClonesArray* m_deltaWireDiffTrackHough3D;

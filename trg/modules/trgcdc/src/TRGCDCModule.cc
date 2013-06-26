@@ -40,7 +40,8 @@ TRGCDCModule::TRGCDCModule()
       _rootTRGCDCFilename("undefined"),
       _rootFitter3DFilename("undefined"),
       _curlBackStop(0),
-      _simulationMode(0),
+      _simulationMode(1),
+      _fastSimulationMode(0),
       _firmwareSimulationMode(0),
       _perfect2DFinder(false),
       _perfect3DFinder(false),
@@ -51,6 +52,7 @@ TRGCDCModule::TRGCDCModule()
       _hFinderPeakMin(5),
       _fLRLUT(1),
       _fevtTime(1),
+      _wireHitInefficiency(0.),
       _cdc(0),
       _sa(0) {
 
@@ -85,8 +87,12 @@ TRGCDCModule::TRGCDCModule()
              _curlBackStop);
     addParam("SimulationMode",
 	     _simulationMode,
-	     "TRGCDC simulation mode",
+	     "TRGCDC simulation switch",
 	     _simulationMode);
+    addParam("FastSimulationMode",
+	     _fastSimulationMode,
+	     "TRGCDC fast simulation mode",
+	     _fastSimulationMode);
     addParam("FirmwareSimulationMode",
 	     _firmwareSimulationMode,
 	     "TRGCDC firmware simulation mode",
@@ -127,10 +133,10 @@ TRGCDCModule::TRGCDCModule()
 	     _fmclr,
 	     "Using MC L/R information",
 	     _fmclr);
-    addParam("Ineff",
-             _inefficiency,
-             "Hit inefficiency",
-             _inefficiency);
+    addParam("wireHitInefficiency",
+             _wireHitInefficiency,
+             "wire hit inefficiency",
+             _wireHitInefficiency);
 
 
     if (TRGDebug::level())
@@ -193,6 +199,7 @@ TRGCDCModule::beginRun() {
     if ((cfn != _configFilename) || (_cdc == 0))
 	_cdc = TRGCDC::getTRGCDC(_configFilename,
 				 _simulationMode,
+				 _fastSimulationMode,
 				 _firmwareSimulationMode,
 				 _perfect2DFinder,
 				 _perfect3DFinder,
@@ -207,15 +214,14 @@ TRGCDCModule::beginRun() {
 				 _fevtTime,
 				 _fzierror,
 				 _fmclr,
-				 _inefficiency);
+				 _wireHitInefficiency);
 
     if (TRGDebug::level())
 	cout << "TRGCDCModule ... beginRun called " << endl;
 }
 
-  void
-  TRGCDCModule::event()
-  {
+void
+TRGCDCModule::event() {
 
     if (TRGDebug::level()) {
 //      _cdc->dump("geometry superLayers layers wires detail");
@@ -225,7 +231,7 @@ TRGCDCModule::beginRun() {
     //...CDC trigger simulation...
     _cdc->update(true);
     _cdc->simulate();
-  }
+}
 
   void
   TRGCDCModule::endRun()

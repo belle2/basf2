@@ -252,6 +252,13 @@ namespace Belle2 {
   }
 
   void TRGCDCHough3DFinder::doit(vector<TCTrack *> & trackList){
+
+    // Assign track ID's.
+    for(unsigned iTrack=0; iTrack<trackList.size(); iTrack++){
+      TCTrack& aTrack = *trackList[iTrack];
+      aTrack.setTrackID(iTrack+1);
+    }
+
     int m_version=1;
     if(m_version==0) doitPerfectly(trackList);
     if(m_version==1) doitFind(trackList);
@@ -260,14 +267,6 @@ namespace Belle2 {
   void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
     TRGDebug::enterStage("3D finder");
     //cout<<"[JB] Event: "<<m_eventNum<<endl;
-
-    // Assign track ID's.
-    for(unsigned iTrack=0; iTrack<trackList.size(); iTrack++){
-
-      TCTrack& aTrack = *trackList[iTrack];
-      aTrack.setTrackID(iTrack+1);
-
-    }
 
     // Call storage array.
     StoreArray<CDCSimHit> SimHits("CDCSimHits");
@@ -408,6 +407,35 @@ namespace Belle2 {
       stTSs[3].push_back(st3TSs[j]);
       p_stTSs[3].push_back(hits[j]);
     }
+
+    // Find number of TS(only one for each layer) for each mc particle.
+    // numberTSsForParticle[0] = MCID, numberTSsForParticle[1] = # Superlayer hits
+    map<unsigned, unsigned> numberTSsForParticle;
+    vector<unsigned> mcParticleList;
+    for(unsigned iLayer=0; iLayer<4; iLayer++) {
+      // Find what mc particles there are in a layer
+      mcParticleList.clear();
+      for(unsigned iTS = 0; iTS < p_stTSs[iLayer].size(); iTS++) {
+        unsigned iMCParticle = p_stTSs[iLayer][iTS]->iMCParticle();
+        if ( find(mcParticleList.begin(), mcParticleList.end(), iMCParticle) == mcParticleList.end() ) {
+          mcParticleList.push_back(iMCParticle);
+        }
+      }
+      // Loop over mcParticleList and add to numberTSsForParticle
+      for( unsigned iMCPart = 0; iMCPart < mcParticleList.size(); iMCPart++ ) {
+        map<unsigned, unsigned>::iterator it = numberTSsForParticle.find(mcParticleList[iMCPart]);
+        if ( it != numberTSsForParticle.end() ) ++it->second;
+        else numberTSsForParticle[mcParticleList[iMCPart]] = 1;
+      }
+    }
+
+    //// Print result of numberTSsForParticle
+    //map<unsigned, unsigned>::const_iterator it = numberTSsForParticle.begin();
+    //while ( it != numberTSsForParticle.end() ) {
+    //  cout << "IDParticle: "<<it->first << ", #: " << it->second << endl;
+    //  ++it;
+    //}
+
 
     // Loop over all the tracks.
     unsigned nTracks=trackList.size();
@@ -621,13 +649,14 @@ namespace Belle2 {
       // best phi values [st0, st1, st2, st3, st4]
       TVectorD tempBestTSs(4,bestTS);
       new(bestTSsTrackHough3D[iTrack]) TVectorD(tempBestTSs);
-      // performance values [purity, Track#]
-      TVectorD tempPerformanceTrack(2);
+      // performance values [purity, efficiency, Track#]
+      TVectorD tempPerformanceTrack(3);
       const TCRelation& trackRelation3D = aTrack.relation3D();
       //cout<<"[Before] purity3D:   "<<trackRelation3D.purity(0)<<endl;
       //cout<<"[After] purity3D:    "<<trackRelation3D.purity3D(aTrack.relation2D().contributor(0))<<endl;
       tempPerformanceTrack[0] = trackRelation3D.purity3D(aTrack.relation2D().contributor(0));
-      tempPerformanceTrack[1] = iTrack;
+      tempPerformanceTrack[1] = trackRelation3D.efficiency3D(aTrack.relation2D().contributor(0), numberTSsForParticle);
+      tempPerformanceTrack[2] = iTrack;
       new(performanceTrackHough3D[iTrack]) TVectorD(tempPerformanceTrack);
 
       // Find one mc stereo track segment per layer.

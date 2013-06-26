@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include "trg/trg/Utilities.h"
+#include "trg/trg/Debug.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
@@ -154,11 +155,37 @@ TRGCDCSegment::name(void) const {
 }
 
 void
-TCSegment::simulate(void) {
+TCSegment::simulate(bool clockSimulation) {
+
+    //...Get wire informtion for speed-up...
+    const unsigned n = _wires.size();
+    unsigned nHits = 0;
+    vector<TRGSignal> signals;
+    for (unsigned i = 0; i < n; i++) {
+
+	//...Copy signal from a wire...
+        const TRGSignal & s = _wires[i]->timing();
+        if (s.active())
+            ++nHits;
+    }
+
+    //..No wire hit case...
+    if (nHits == 0)
+	return;
+
+    if (clockSimulation)
+	simulateWithClock();
+    else
+	simulateWithoutClock();
+}
+
+void
+TCSegment::simulateWithoutClock(void) {
+
+    TRGDebug::enterStage("TS sim");
 
     //...System clocks...
     const TRGClock & systemClock = TRGCDC::getTRGCDC()->systemClock();
-//  const TRGClock & systemClockFE = TRGCDC::getTRGCDC()->systemClockFE();
 
     //...Get wire informtion...
     const unsigned n = _wires.size();
@@ -187,8 +214,10 @@ TCSegment::simulate(void) {
     }
 
     //...Check number of hit wires...
-    if (nHits < 4)
+    if (nHits < 4) {
+	TRGDebug::leaveStage("TS sim");
         return;
+    }
 
     //...Signal simulation...
     TRGSignal l0, l1, l2, l3, l4;
@@ -228,6 +257,66 @@ TCSegment::simulate(void) {
 // 	    cout << "===========" << endl;
 // 	all.dump("", "    ----> ");
 //     }    
+
+    TRGDebug::leaveStage("TS sim");
+}
+
+void
+TCSegment::simulateWithClock(void) {
+    
+    TRGDebug::enterStage("TS sim w/clock");
+
+    //...System clocks...
+//  const TRGClock & systemClock = TRGCDC::getTRGCDC()->systemClock();
+    const TRGClock & dataClock = TRGCDC::getTRGCDC()->dataClock();
+
+    //...Get wire informtion...
+    const unsigned n = _wires.size();
+    unsigned nHits = 0;
+    vector<TRGSignal> signals;
+    for (unsigned i = 0; i < n; i++) {
+
+	//...Copy signal from a wire...
+	TRGSignal s = _wires[i]->timing();
+
+	if (TRGDebug::level() > 2) {
+	    s.dump("", TRGDebug::tab());
+	}
+
+	//...Change clock... (from FE clock to data clock)
+	s.clock(dataClock);
+
+ 	//...Widen it...
+ 	static const unsigned width = dataClock.unit(20); // 20 is OK?
+ 	s.widen(width);
+
+	if (TRGDebug::level() > 2) {
+	    s.dump("", TRGDebug::tab());
+	}
+
+        signals.push_back(s);
+
+        if (s.active())
+            ++nHits;
+    }
+
+
+
+//     if (all.nEdges())
+// 	_signal = all;
+
+//     if (iwd) {
+// 	l0.dump("", "     l0-> ");
+// 	l1.dump("", "     l1-> ");
+// 	l2.dump("", "     l2-> ");
+// 	l3.dump("", "     l3-> ");
+// 	l4.dump("", "     l4-> ");
+// 	if (all.nEdges())
+// 	    cout << "===========" << endl;
+// 	all.dump("", "    ----> ");
+//     }    
+
+    TRGDebug::leaveStage("TS sim w/clock");
 }
 
 unsigned

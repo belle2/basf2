@@ -76,10 +76,13 @@ class TRGCDCModule : public Module {
     /// Curl back stop parameter. 0:do nothing, 1:stop curling. Default is 0.
     int _curlBackStop;
 
-    /// Mode for TRGCDC simulation. 0:do everything, 1:stop after the track segment simulation. Default is 0.
+    /// Mode for TRGCDC simulation. 0th bit : fast simulation switch, 1st bit : firmware simulation switch.
     int _simulationMode;
 
-    /// Switch to simulate firmwares. 0:do nothing, 1:do everything
+    /// Switch for the fast simulation. 0:do everything, 1:stop after the track segment simulation. Default is 0.
+    int _fastSimulationMode;
+
+    /// Switch for the firmware simulation. 0:do nothing, 1:do everything
     int _firmwareSimulationMode;
 
     /// Switch to activate perfect 2D finder.
@@ -110,8 +113,7 @@ class TRGCDCModule : public Module {
     bool _fmclr;
 
     /// Parameter for Hit inefficiency
-    double _inefficiency;
-
+    double _wireHitInefficiency;
 
   private:
 

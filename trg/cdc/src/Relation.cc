@@ -116,6 +116,32 @@ TRGCDCRelation::purity3D(unsigned trkID) const {
     return float(na) / float(n);
 }
 
+float
+TRGCDCRelation::efficiency3D(unsigned trkID, std::map<unsigned, unsigned> & numTSsParticle) const {
+  
+  // # of found TSs/ # of true TSs
+  unsigned nFoundTS = 0;
+  unsigned nTrueTS = 0;
+
+  // Find number of found TSs. One for each layer.
+  for ( unsigned iStereoSuperLayer = 0; iStereoSuperLayer < 4; iStereoSuperLayer++ ) {
+    if ( ((this->track()).links(2*iStereoSuperLayer+1)).size() > 0 ) nFoundTS += 1;
+  }
+
+  // Find number of true TSs.
+  map<unsigned, unsigned>::iterator itTSF = numTSsParticle.find(trkID);
+  if ( itTSF != numTSsParticle.end() ) nTrueTS = itTSF->second;
+  else {
+    cout<<"[Error] TRGCDCRelation::efficiency3D. No mc stereo TSs for track."<<endl;
+    return -1;
+  }
+
+  //cout<<"[JB] Found TS: "<< nFoundTS <<" nTrue TS: " << nTrueTS << endl;
+
+  return float(nFoundTS)/ float(nTrueTS);
+  
+}
+
 void
 TRGCDCRelation::dump(const std::string & ,
 		     const std::string & prefix) const {

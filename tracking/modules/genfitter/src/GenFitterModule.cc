@@ -109,7 +109,7 @@ GenFitterModule::GenFitterModule() :
   addParam("energyLossBrems", m_energyLossBrems, "activate the material effect: EnergyLossBrems", true);
   addParam("noiseBrems", m_noiseBrems, "activate the material effect: NoiseBrems", true);
   addParam("noEffects", m_noEffects, "switch off all material effects in Genfit. This overwrites all individual material effects switches", false);
-
+  addParam("resolveWireHitAmbi", m_resolveWireHitAmbi, "If true, DAF will resolve the left right ambiguity of wire hits. If false, closest to prediction will be chosen", false);
 }
 
 GenFitterModule::~GenFitterModule()
@@ -178,6 +178,7 @@ void GenFitterModule::initialize()
   //set parameters for the fitter algorithm objects
   m_kalmanFilter.setNumIterations(m_nIter);
   m_daf.setProbCut(m_probCut);
+  m_daf.resolveWireHitAmbi(m_resolveWireHitAmbi);
   int nDafTemps = m_dafTemperatures.size();
   if (nDafTemps == 1 && m_dafTemperatures[0] < 0.0) { // user did not set an annealing scheme. Set the default one.
     m_daf.setBetas(81, 8, 4, 1, 1, 1);

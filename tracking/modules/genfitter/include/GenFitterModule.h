@@ -110,6 +110,7 @@ namespace Belle2 {
     bool m_energyLossBrems;                          /**< Determines if calculation of bremsstrahlung energy loss is on/off in Genfit */
     bool m_noiseBrems;                               /**< Determines if calculation of bremsstrahlung energy loss variance is on/off in Genfit */
     bool m_noEffects;                                /**< switch on/off ALL material effects in Genfit. "true" overwrites "true" flags for the individual effects.*/
+    bool m_resolveWireHitAmbi;                       /**< Determines if DAF should resolve left/right ambiguity of wire hits or else if just possibility closet to prediction is taken */
   }; /** @} @} */
 } // end namespace Belle2
 

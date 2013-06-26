@@ -30,9 +30,9 @@
 
 namespace Belle {
 
-  TWindowConformalDrawingArea::TWindowConformalDrawingArea(int size,
-                                                           double innerR,
-                                                           double outerR)
+TWindowConformalDrawingArea::TWindowConformalDrawingArea(int size,
+							 double innerR,
+							 double outerR)
     : _scale(double(size) / outerR / 2),
       _axial(true),
       _stereo(false),
@@ -40,8 +40,7 @@ namespace Belle {
       _x(0),
       _y(0),
       _innerR(innerR),
-      _outerR(outerR)
-  {
+      _outerR(outerR) {
     _blue = Gdk::Color("blue");
     _red = Gdk::Color("red");
     _green = Gdk::Color("green");
@@ -65,7 +64,7 @@ namespace Belle {
     _pl = create_pango_layout(wn);
 
     add_events(Gdk::EXPOSURE_MASK | Gdk::BUTTON_PRESS_MASK);
-  }
+}
 
   TWindowConformalDrawingArea::~TWindowConformalDrawingArea()
   {
@@ -81,20 +80,15 @@ namespace Belle {
     _window->clear();
   }
 
-  bool
-  TWindowConformalDrawingArea::on_expose_event(GdkEventExpose*)
-  {
+bool
+TWindowConformalDrawingArea::on_expose_event(GdkEventExpose*) {
     Glib::RefPtr<Gdk::Window> window = get_window();
     window->get_geometry(_winx, _winy, _winw, _winh, _wind);
     window->clear();
-
-// std::cout << "_x,_y,_scale=" << _x << "," << _y << "," << _scale
-//        << std::endl;
-
     drawCDC();
     draw();
     return true;
-  }
+}
 
   bool
   TWindowConformalDrawingArea::on_button_press_event(GdkEventButton* e)

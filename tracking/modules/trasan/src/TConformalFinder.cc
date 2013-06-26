@@ -575,7 +575,7 @@ extern const HepGeom::Point3D<double>  ORIGIN;
 
 std::string
 TConformalFinder::version(void) const {
-    return "5.16";
+    return "5.17";
 }
 
 TConformalFinder::TConformalFinder(unsigned fastFinder,

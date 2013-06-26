@@ -163,21 +163,23 @@ namespace Belle {
     return ts;
   }
 
-  TTrack*
-  TBuilderConformal::buildStereoNew(const TTrack& t,
-                                    AList<TSegment> & segments,
-                                    AList<TSegment> & badSegments) const
-  {
+TTrack *
+TBuilderConformal::buildStereoNew(const TTrack & t,
+				  AList<TSegment> & segments,
+				  AList<TSegment> & badSegments) const {
 
+#ifdef TRASAN_DEBUG
+    const std::string stage = "buildStereoNew";
+    EnterStage(stage);
+#endif
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "... building stereo by segments(new) : # of segments = ";
-    std::cout << segments.length() << std::endl;
+    std::cout << Tab()
+	      << "building stereo by segments(new) : # of segments = "
+	      << segments.length() << std::endl;
     for (unsigned i = 0; i < (unsigned) segments.length(); i++)
-      segments[i]->dump("hits sort flag", "    ");
+	segments[i]->dump("hits sort flag", Tab(1));
 #endif
-#ifdef TRASAN_WINDOW
-    sz2.clear();
-#endif
+
     TTrack* bestCandidate = NULL;
     AList< AList<TLink> > poorSeeds;
     bool ok = initializeForStereo(t, segments, badSegments);
@@ -187,199 +189,227 @@ namespace Belle {
     //...Main loop...
     while (--nSuperLayers) {
 
-      //...Initial line search...
-      AList<TLine> initialLines = searchInitialLines(nSuperLayers);
-#ifdef TRASAN_WINDOW
-      sz2.clear();
-      sz2.skip(false);
-      sz2.mode(2);
-      sz2.appendSz(t, segments, leda_black);
-      AList<TSegment> tmps = segments;
-      std::string s = "# of segments = " + itostring(int(segments.length()));
-      sz2.appendSz(t, _allLinks, leda_black);
-      sz2.append(_forLine, leda_brown);
-      s = "nSprLyr=" + itostring(int(nSuperLayers)) +
-          ", # of initial lines = " + itostring(int(initialLines.length()));
-      for (unsigned i = 0; i < (unsigned) initialLines.length(); i++)
-        sz2.append(* initialLines[i], leda_red);
-      sz2.text(s);
-      sz2.wait();
-#endif
-      if (initialLines.length() == 0) continue;
-
-      //...Line loop...
-      bool found = false;
-      unsigned nInitialLines = initialLines.length();
-      for (unsigned i = 0; i < nInitialLines; i++) {
-
-        //...Linear fit...
-        const TLine& line = * initialLines[i];
-        TLine newLine = searchLine(line);
-
-        //...Skip if this is a seed of the poor result...
-        if (poorSeeds.length()) {
-          bool poorCase = false;
-          for (unsigned j = 0; j < (unsigned) poorSeeds.length(); j++) {
-            if (poorSeeds[j]->length() == newLine.links().length()) {
-              AList<TLink> tmp = * poorSeeds[j];
-              tmp.remove(newLine.links());
-              if (tmp.length() == 0) {
 #ifdef TRASAN_DEBUG_DETAIL
-                std::cout << "    ... This is a poor seed :"
-                          << " skipped"
-                          << " : # of poor seeds = "
-                          << poorSeeds.length() << std::endl;
+	std::cout << Tab()
+		  << "nSuperLayers=" << nSuperLayers << std::endl;
 #endif
-                poorCase = true;
-                break;
-              }
-            }
-          }
-          if (poorCase) continue;
-        }
 
-        //...Is this a good line...
-        if (! stereoQuality(newLine.links()))
-          continue;
-
-        //...3D fit...
-        TTrack* t3d = new TTrack(t);
-        t3d = build(* t3d, newLine);
-        if (t3d == NULL) continue;
-
-        //...Check quality...
-        unsigned quality = stereoQuality(t3d->links());
-
-        //...Best case...
-        if (quality == 2) {
+	//...Initial line search...
+	AList<TLine> initialLines = searchInitialLines(nSuperLayers);
 #ifdef TRASAN_WINDOW
-          sz2.text("stereo finished");
-          sz2.oneShot(* t3d, leda_blue);
+	sz2.clear();
+	sz2.skip(false);
+	sz2.mode(2);
+	sz2.appendSz(t, segments, leda_black);
+	AList<TSegment> tmps = segments;
+	std::string s = "# of segments = " + itostring(int(segments.length()));
+	sz2.appendSz(t, _allLinks, leda_black);
+	sz2.append(_forLine, leda_brown);
+	s = "nSprLyr=" + itostring(int(nSuperLayers)) +
+	    ", # of initial lines = " + itostring(int(initialLines.length()));
+	for (unsigned i = 0; i < (unsigned) initialLines.length(); i++)
+	    sz2.append(* initialLines[i], leda_red);
+	sz2.text(s);
+	sz2.wait();
 #endif
-          if (bestCandidate) delete bestCandidate;
-          bestCandidate = t3d;
-          found = true;
-          break;
-        }
+	if (initialLines.length() == 0) continue;
 
-        //...Poor case...
-        AList<TLink> * tmp = new AList<TLink>();
-        tmp->append(newLine.links());
-        poorSeeds.append(tmp);
-        if (quality == 0) {
-#ifdef TRASAN_WINDOW
-          sz2.text("this candidate discarded");
-          sz2.oneShot(* t3d, leda_black);
-#endif
-          delete t3d;
-          continue;
-        }
+	//...Line loop...
+	bool found = false;
+	unsigned nInitialLines = initialLines.length();
+	for (unsigned i = 0; i < nInitialLines; i++) {
 
-        //...Not enough...
-        if (bestCandidate) {
-          if (bestCandidate->cores().length() <
-              t3d->cores().length()) {
-#ifdef TRASAN_WINDOW
-            sz2.text("new candidate");
-            sz2.append(* bestCandidate, leda_brown);
-            sz2.oneShot(* t3d, leda_green);
-            sz2.remove(* bestCandidate);
+#ifdef TRASAN_DEBUG_DETAIL
+	    std::cout << Tab() << "Line loop " << i << std::endl;
 #endif
-            delete bestCandidate;
-            bestCandidate = t3d;
-          } else {
-#ifdef TRASAN_WINDOW
-            sz2.text("this candidate discarded");
-            sz2.oneShot(* t3d, leda_black);
-#endif
-            delete t3d;
-          }
-        } else {
-          bestCandidate = t3d;
-#ifdef TRASAN_WINDOW
-          sz2.text("new candidate");
-          sz2.oneShot(* bestCandidate, leda_green);
-          sz2.remove(* t3d);
-#endif
-        }
-      }
 
-      //...Termination of a loop...
-      HepAListDeleteAll(initialLines);
-      if (found) break;
+	    //...Linear fit...
+	    const TLine & line = * initialLines[i];
+	    TLine newLine = searchLine(line);
+
+	    //...Skip if this is a seed of the poor result...
+	    if (poorSeeds.length()) {
+		bool poorCase = false;
+		for (unsigned j = 0; j < (unsigned) poorSeeds.length(); j++) {
+		    if (poorSeeds[j]->length() == newLine.links().length()) {
+			AList<TLink> tmp = * poorSeeds[j];
+			tmp.remove(newLine.links());
+			if (tmp.length() == 0) {
+#ifdef TRASAN_DEBUG_DETAIL
+			    std::cout << Tab() << "This is a poor seed :"
+				      << " skipped"
+				      << " : # of poor seeds = "
+				      << poorSeeds.length() << std::endl;
+#endif
+			    poorCase = true;
+			    break;
+			}
+		    }
+		}
+		if (poorCase) continue;
+	    }
+#ifdef TRASAN_DEBUG_DETAIL
+	    std::cout << Tab() << "a line found" << std::endl;
+#endif
+
+	    //...Is this a good line...
+	    if (! stereoQuality(newLine.links()))
+		continue;
+
+	    //...3D fit...
+	    TTrack* t3d = new TTrack(t);
+	    t3d = build(* t3d, newLine);
+	    if (t3d == NULL) continue;
+
+	    //...Check quality...
+	    unsigned quality = stereoQuality(t3d->links());
+
+	    //...Best case...
+	    if (quality == 2) {
+#ifdef TRASAN_DEBUG_DETAIL
+		std::cout << Tab() << "stereo finished" << std::endl;
+#endif
+#ifdef TRASAN_WINDOW
+		sz2.text("stereo finished");
+		sz2.oneShot(* t3d, leda_blue);
+#endif
+		if (bestCandidate) delete bestCandidate;
+		bestCandidate = t3d;
+		found = true;
+		break;
+	    }
+
+	    //...Poor case...
+	    AList<TLink> * tmp = new AList<TLink>();
+	    tmp->append(newLine.links());
+	    poorSeeds.append(tmp);
+	    if (quality == 0) {
+#ifdef TRASAN_DEBUG_DETAIL
+		std::cout << Tab() << "this candidate discarded" << std::endl;
+#endif
+#ifdef TRASAN_WINDOW
+		sz2.text("this candidate discarded");
+		sz2.oneShot(* t3d, leda_black);
+#endif
+		delete t3d;
+		continue;
+	    }
+
+	    //...Not enough...
+	    if (bestCandidate) {
+		if (bestCandidate->cores().length() <
+		    t3d->cores().length()) {
+#ifdef TRASAN_DEBUG_DETAIL
+		    std::cout << Tab() << "new candidate" << std::endl;
+#endif
+#ifdef TRASAN_WINDOW
+		    sz2.text("new candidate");
+		    sz2.append(* bestCandidate, leda_brown);
+		    sz2.oneShot(* t3d, leda_green);
+		    sz2.remove(* bestCandidate);
+#endif
+		    delete bestCandidate;
+		    bestCandidate = t3d;
+		}
+		else {
+#ifdef TRASAN_DEBUG_DETAIL
+		std::cout << Tab() << "this candidate discarded" << std::endl;
+#endif
+#ifdef TRASAN_WINDOW
+		    sz2.text("this candidate discarded");
+		    sz2.oneShot(* t3d, leda_black);
+#endif
+		    delete t3d;
+		}
+	    }
+	    else {
+		bestCandidate = t3d;
+#ifdef TRASAN_DEBUG_DETAIL
+		std::cout << Tab() << "new candidate" << std::endl;
+#endif
+#ifdef TRASAN_WINDOW
+		sz2.text("new candidate");
+		sz2.oneShot(* bestCandidate, leda_green);
+		sz2.remove(* t3d);
+#endif
+	    }
+	}
+
+	//...Termination of a loop...
+	HepAListDeleteAll(initialLines);
+	if (found) break;
     }
 
 endOfBuilding:
     _allLinks.removeAll();
     for (unsigned i = 0; i < 5; i++)
-      HepAListDeleteAll(_links[i]);
+	HepAListDeleteAll(_links[i]);
     HepAListDeleteAll(_forLine);
 
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "    ... # of poor seeds = " << poorSeeds.length() << std::endl;
-#endif
-#ifdef TRASAN_WINDOW
-    if (bestCandidate == NULL) {
-      sz2.text("3D failed");
-      sz2.wait();
-    }
+    std::cout << "    ... # of poor seeds = " << poorSeeds.length()
+	      << std::endl;
 #endif
 
     //...Check used segments...
     if (bestCandidate) {
-      AList<TLink> usedLinks = TLink::stereoHits(bestCandidate->links());
-      for (unsigned i = 0; i < (unsigned) segments.length(); i++) {
-        TSegment& segment = * segments[i];
-        AList<TLink> used = Links(segment, * bestCandidate);
-        if (used.length()) {
-          bestCandidate->segments().append(segment);
-          segment.tracks().append(bestCandidate);
-        }
-      }
+	AList<TLink> usedLinks = TLink::stereoHits(bestCandidate->links());
+	for (unsigned i = 0; i < (unsigned) segments.length(); i++) {
+	    TSegment& segment = * segments[i];
+	    AList<TLink> used = Links(segment, * bestCandidate);
+	    if (used.length()) {
+		bestCandidate->segments().append(segment);
+		segment.tracks().append(bestCandidate);
+	    }
+	}
     }
 
     if (poorSeeds.length())
-      HepAListDeleteAll(poorSeeds);
+	HepAListDeleteAll(poorSeeds);
 
 #ifdef TRASA_DEBUG_DETAIL
     if (bestCandidate == NULL)
-      std::cout << "... building stereo(new) failed" << std::endl;
+	std::cout << "... building stereo(new) failed" << std::endl;
     else
-      std::cout << "... building stereo(new) ok" << std::endl;
+	std::cout << "... building stereo(new) ok" << std::endl;
+#endif
+#ifdef TRASAN_DEBUG
+    LeaveStage(stage);
 #endif
     return bestCandidate;
-  }
+}
 
-  bool
-  TBuilderConformal::initializeForStereo(const TTrack& t,
-                                         const AList<TSegment> & segments,
-                                         const AList<TSegment> & badSegments) const
-  {
+bool
+TBuilderConformal::initializeForStereo(const TTrack & t,
+				       const AList<TSegment> & segments,
+				       const AList<TSegment> & badSegments)
+    const {
+
     _nSuperLayers = 0;
     for (unsigned i = 0; i < 6; i++)
-      _nHits[i] = 0;
+	_nHits[i] = 0;
 
     //...sz position of segments...
     unsigned nSegments = segments.length();
     for (unsigned i = 0; i < nSegments; i++) {
-      TLink& l = * new TLink();
-      int err = t.szPosition(* segments[i], l);
+	TLink& l = * new TLink();
+	int err = t.szPosition(* segments[i], l);
 
-      //...Remove if sz can not be calculcated...
-      if (err) {
-        delete & l;
-        continue;
-      }
-      _links[l.wire()->superLayerId() / 2].append(l);
-//? _allLinks.append(segments[i]->links());
-      _allLinks.append(segments[i]->cores());
+	//...Remove if sz can not be calculcated...
+	if (err) {
+	    delete & l;
+	    continue;
+	}
+	_links[l.wire()->superLayerId() / 2].append(l);
+//?     _allLinks.append(segments[i]->links());
+	_allLinks.append(segments[i]->cores());
     }
 
     //...Count a number of super layers...
     for (unsigned i = 0; i < 5; i++) {
-      if (_links[i].length() > 0) {
-        ++_nSuperLayers;
-      }
+	if (_links[i].length() > 0) {
+	    ++_nSuperLayers;
+	}
 //      else {
 //          _allLinks.append(badSegments[i]->links());
 //  #ifdef TRASAN_DEBUG_DETAIL
@@ -394,86 +424,97 @@ endOfBuilding:
 
     //...Append bad links also...
     if (badSegments.length()) {
-      for (unsigned i = 0; i < 5; i++) {
-        if (badSegments[i]->links().length()) {
-          _allLinks.append(badSegments[i]->links());
+	for (unsigned i = 0; i < 5; i++) {
+	    if (badSegments[i]->links().length()) {
+		_allLinks.append(badSegments[i]->links());
 #ifdef TRASAN_DEBUG_DETAIL
-          std::cout << "    ... bad links added for stereo super layer "
-                    << i * 2 + 1 << std::endl;
-          badSegments[i]->dump("hits sort flag", "        ");
+		std::cout << Tab() << "bad links added for stereo super layer "
+			  << i * 2 + 1 << std::endl;
+		badSegments[i]->dump("hits sort flag", Tab(1));
 #endif
-        }
-      }
+	    }
+	}
     }
 
     //...sz position of links...
     unsigned nCores = _allLinks.length();
     if (nCores < minNCores()) {
 #ifdef TRASAN_DEBUG_DETAIL
-      std::cout << "    ... initializeForStereo : # of cores(=" << nCores
-                << ") is less then " << minNCores() << std::endl;
+	std::cout << Tab() << "initializeForStereo : # of cores(=" << nCores
+		  << ") is less then " << minNCores() << std::endl;
 #endif
-      return false;
+	return false;
     }
     for (unsigned i = 0; i < nCores; i++) {
-      TLink& link = * _allLinks[i];
-      for (unsigned i = 0; i < 2; i++) {
-        TLink& tt = * new TLink(link);
-        tt.leftRight(i);
-        int err = t.szPosition(tt);
-        if (err) {
-          delete & tt;
-          continue;
-        }
-        tt.link(& link);
-        _forLine.append(tt);
-      }
+	TLink& link = * _allLinks[i];
+	for (unsigned i = 0; i < 2; i++) {
+	    TLink& tt = * new TLink(link);
+	    tt.leftRight(i);
+	    int err = t.szPosition(tt);
+	    if (err) {
+		delete & tt;
+		continue;
+	    }
+	    tt.link(& link);
+	    _forLine.append(tt);
+	}
     }
 
     //...Count # of axial hits...
     unsigned nA = t.cores().length();
     for (unsigned i = 0; i < nA; i++)
-      ++_nHits[t.cores()[i]->wire()->superLayerId() / 2];
+	++_nHits[t.cores()[i]->wire()->superLayerId() / 2];
 
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "    ... initializeForStereo : axial super layer usage = ";
+    std::cout << Tab() << "initializeForStereo : axial super layer usage = ";
     for (unsigned i = 0; i < 6; i++)
-      std::cout << _nHits[i] << ",";
+	std::cout << _nHits[i] << ",";
     std::cout << std::endl
-              << "                            : # of stereo super layers="
+              << Tab() << "# of stereo super layers="
               << _nSuperLayers << std::endl;
 #endif
-
     return true;
-  }
+}
 
-  AList<TLine>
-  TBuilderConformal::searchInitialLines(unsigned nSuperLayerMax) const
-  {
+AList<TLine>
+TBuilderConformal::searchInitialLines(unsigned nSuperLayerMax) const {
+
+#ifdef TRASAN_DEBUG
+    const std::string stage = "searchInitialLines";
+    EnterStage(stage);
+#endif
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "    ... searchInitialLines : # of segments in sl : ";
+    std::cout << Tab() << "searchInitialLines : # of segments in sl : ";
     for (unsigned i = 0; i < 5; i++)
-      std::cout << _links[i].length() << ",";
+	std::cout << _links[i].length() << ",";
     std::cout << std::endl
-              << "                           : max # of super layers="
-              << nSuperLayerMax << std::endl;
+              << Tab() << "max # of super layers=" << nSuperLayerMax
+	      << std::endl;
 #endif
 
     AList<TLine> lines;
     if (nSuperLayerMax > 4)
-      lines.append(searchLines5());
+	lines.append(searchLines5());
     else if (nSuperLayerMax > 3)
-      lines.append(searchLines4());
+	lines.append(searchLines4());
     else if (nSuperLayerMax > 2)
-      lines.append(searchLines3());
+	lines.append(searchLines3());
     else if (nSuperLayerMax > 1)
-      lines.append(searchLines2());
-//      else
-//    lines.append(searchLines1());
+	lines.append(searchLines2());
+    else
+	lines.append(searchLines1());
 
     lines.sort(SortByB);
+
+#ifdef TRASAN_DEBUG_DETAIL
+    std::cout << Tab() << "#lines found=" << lines.length() << std::endl;
+#endif
+#ifdef TRASAN_DEBUG
+    LeaveStage(stage);
+#endif
+
     return lines;
-  }
+}
 
   AList<TLine>
   TBuilderConformal::searchLines5(void) const
@@ -808,49 +849,47 @@ endOfBuilding:
     return line0;
   }
 
-  unsigned
-  TBuilderConformal::stereoQuality(const AList<TLink> & links) const
-  {
+unsigned
+TBuilderConformal::stereoQuality(const AList<TLink> & links) const {
     unsigned n[5] = {0, 0, 0, 0, 0};
 
     //...Check superlayers...
     unsigned nLinks = links.length();
     for (unsigned i = 0; i < nLinks; i++) {
-      const TLink& l = * links[i];
-      if (l.wire()->axial()) continue;
-      ++n[l.wire()->superLayerId() / 2];
+	const TLink & l = * links[i];
+	if (l.wire()->axial()) continue;
+	++n[l.wire()->superLayerId() / 2];
     }
 
     unsigned nTotal = 0;
     unsigned nMissing = 0;
     for (unsigned i = 0; i < 5; i++) {
-      if (_links[i].length() > 0) {
-        if ((_nHits[i] > 1) && (_nHits[i + 1] > 1))
-          if (n[i] < 2)
-            ++nMissing;
-      }
-      if (n[i] > 1) ++nTotal;
+	if (_links[i].length() > 0) {
+	    if ((_nHits[i] > 1) && (_nHits[i + 1] > 1))
+		if (n[i] < 2)
+		    ++nMissing;
+	}
+	if (n[i] > 1) ++nTotal;
     }
 
     unsigned toBeReturn = 0;
     if (nMissing <= 1) toBeReturn = 2;
     else if (nMissing == 2) toBeReturn  = 1;
-    if (nTotal < 2) toBeReturn = 0;
+//2013/06/26    if (nTotal < 2) toBeReturn = 0;
+    if (nTotal < 1) toBeReturn = 0;
 
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "    ... stereoQuality : axial ";
+    std::cout << Tab() << "stereoQuality : axial ";
     for (unsigned i = 0; i < 6; i++)
-      std::cout << _nHits[i] << ",";
-    std::cout << std::endl
-              << "                      : stereo ";
+	std::cout << _nHits[i] << ", stereo ";
     for (unsigned i = 0; i < 5; i++)
-      std::cout << n[i] << ",";
-    std::cout << " : total " << nTotal << " super layers, "
-              << " : quality=" << toBeReturn << std::endl;
+	std::cout << n[i] << ",";
+    std::cout << " : total " << nTotal << " stereo super layers" << std::endl;
+    std::cout << Tab() << "quality=" << toBeReturn << std::endl;
 #endif
 
     return toBeReturn;
-  }
+}
 
   void
   TBuilderConformal::salvage(TTrack& t, AList<TSegment> & list) const

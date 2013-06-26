@@ -920,7 +920,7 @@ ORIGIN = Point3D(0., 0., 0.);
 
 std::string
 Trasan::version(void) const {
-    return "5.16";
+    return "5.17";
 }
 
 //...Definitions...

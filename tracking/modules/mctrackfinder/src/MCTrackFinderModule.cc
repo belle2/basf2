@@ -71,7 +71,7 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   addParam("MinSVDHits", m_minSVDHits, "Minimum number of SVD hits needed to allow the created of a track candidate", 0);
   addParam("MinCDCAxialHits", m_minCDCAxialHits, "Minimum number of CDC hits form an axial wire needed to allow the created of a track candidate", 0);
   addParam("MinCDCStereoHits", m_minCDCStereoHits, "Minimum number of CDC hits form a stereo wire needed to allow the created of a track candidate", 0);
-  addParam("MinimalNDF", m_minimalNdf, "Minimum number of total hits needed to allow the created of a track candidate. It is called NDF (number of degrees of freedom) because it counts the dimensionality. 2D hits are counted as 2", 5);
+  addParam("MinimalNDF", m_minimalNdf, "Minimum number of total hits needed to allow the creation of a track candidate. It is called NDF (number of degrees of freedom) because it counts the dimensionality. 2D hits are counted as 2", 5);
 
   //choose for which particles a track candidate should be created
   //this is just an attempt to find out what is the most suitable way to select particles, if you have other/better ideas, communicate it to the tracking group...

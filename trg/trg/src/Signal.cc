@@ -21,23 +21,31 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGSignal::TRGSignal() :
-    _history(),
-    _name("no signal") {
+TRGSignal::TRGSignal(const TRGClock & c) :
+    _name("no signal"),
+    _clock(& c),
+    _history() {
 }
 
-TRGSignal::TRGSignal(const string & name) :
-    _history(),
-    _name(name) {
+TRGSignal::TRGSignal(const string & name, const TRGClock & c) :
+    _name(name),
+    _clock(& c),
+    _history() {
 }
 
 TRGSignal::TRGSignal(const TRGSignal & t) :
-    _history(t._history),
-    _name(t._name) {
+//  _history(t._history),
+    _name(t._name),
+    _clock(t._clock) {
+    const unsigned n = t._history.size();
+    for (unsigned i = 0; i < n; i++) {
+	_history.push_back(t._history[i]);
+    }
 }
 
 TRGSignal::TRGSignal(const TRGTime & t) :
-    _name(t.name()) {
+    _name(t.name()),
+    _clock(& t.clock()) {
 
     //...Check edge...
     if (t.edge()) {
@@ -72,32 +80,11 @@ TRGSignal::dump(const string & msg,
         cout << pre << _name;
     }
 
+    cout << ":#signal=" << _history.size();
+
     if (msg.find("clock") != string::npos ||
         msg.find("detail") != string::npos) {
-
-        //...Clock check...
-        bool singleClock = true;
-        const TRGClock * clk0 = 0;
-        if (_history.size()) {
-            clk0 = & _history[0].clock();
-            for (unsigned i = 1; i < _history.size(); i++) {
-                const TRGClock * clk = & _history[i].clock();
-                if (clk != clk0)
-                    singleClock = false;
-            }
-        }
-
-        if (first)
-            cout << pre;
-        first = false;
-
-        if (! singleClock)
-            cout << ":there are multiple clock source";
-        else if (singleClock && clk0)
-            cout << ":clock=" << clk0->name();
-        else
-            cout << ":no clock assigned";
-
+	cout << ":clock=" << _clock->name();
         cout << endl;
     }
 
@@ -243,6 +230,15 @@ TRGSignal::widen(unsigned width) {
     }
 
     return * this;
+}
+
+std::vector<int>
+TRGSignal::stateChanges(void) const {
+    std::vector<int> list;
+    const unsigned n = _history.size();
+    for (unsigned i = 0; i < n; i++)
+	list.push_back(_history[i].time());
+    return list;
 }
 
 } // namespace Belle2

@@ -41,6 +41,7 @@ class TRGCDCSegment : public TRGCDCCell {
 		  const TRGCDCLayer & layer,
 		  const TRGCDCWire & w,
 		  const TRGCDCLUT * lut,
+		  const TRGClock & clock,
 		  const TRGCDCEventTime * eventTime,
 		  const std::vector<const TRGCDCWire *> & wires);
 

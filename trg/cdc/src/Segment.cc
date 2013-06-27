@@ -17,6 +17,8 @@
 #include <iostream>
 #include "trg/trg/Utilities.h"
 #include "trg/trg/Debug.h"
+#include "trg/trg/SignalVector.h"
+#include "trg/trg/State.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
@@ -42,6 +44,7 @@ TRGCDCSegment::TRGCDCSegment(unsigned id,
 			     const TCLayer & layer,
 			     const TCWire & w,
 			     const TCLUT * lut,
+			     const TRGClock & clock,
 			     const TRGCDCEventTime * eventTime,
 			     const std::vector<const TCWire *> & cells)
     : TCCell(id,
@@ -51,7 +54,7 @@ TRGCDCSegment::TRGCDCSegment(unsigned id,
 	     w.backwardPosition()),
       _lut(lut),
       _wires(cells),
-      _signal(std::string("TS_") + TRGUtil::itostring(id)),
+      _signal(std::string("TS_") + TRGUtil::itostring(id), clock),
       _eventTime(eventTime) {
 }
 
@@ -267,54 +270,51 @@ TCSegment::simulateWithClock(void) {
     TRGDebug::enterStage("TS sim w/clock");
 
     //...System clocks...
-//  const TRGClock & systemClock = TRGCDC::getTRGCDC()->systemClock();
     const TRGClock & dataClock = TRGCDC::getTRGCDC()->dataClock();
 
     //...Get wire informtion...
     const unsigned n = _wires.size();
     unsigned nHits = 0;
-    vector<TRGSignal> signals;
+    TRGSignalVector signals;
     for (unsigned i = 0; i < n; i++) {
 
 	//...Copy signal from a wire...
 	TRGSignal s = _wires[i]->timing();
 
-	if (TRGDebug::level() > 2) {
-	    s.dump("", TRGDebug::tab());
-	}
+// 	if (TRGDebug::level() > 2) {
+// 	    s.dump("detail", TRGDebug::tab() + "wire TDC ");
+// 	}
 
 	//...Change clock... (from FE clock to data clock)
 	s.clock(dataClock);
 
  	//...Widen it...
- 	static const unsigned width = dataClock.unit(20); // 20 is OK?
+ 	static const unsigned width = dataClock.unit(400);
  	s.widen(width);
 
-	if (TRGDebug::level() > 2) {
-	    s.dump("", TRGDebug::tab());
-	}
+// 	if (TRGDebug::level() > 2) {
+// 	    s.dump("detail", TRGDebug::tab() + "data CLK ");
+// 	}
 
-        signals.push_back(s);
+        signals += s;
 
         if (s.active())
             ++nHits;
     }
 
+//  signals.dump("detail", TRGDebug::tab() + "TS wire dump:");
 
+    //...Check state changes...
+    vector<int> clocks = signals.stateChanges();
+    const unsigned nStates = clocks.size();
+    for (unsigned i = 0; i < nStates; i++) {
+	const TRGState state = signals.state(clocks[i]);
+//	state.dump("dump of state:", TRGDebug::tab());
+	cout << TRGDebug::tab() << i << ":c=" << clocks[i] << ":" << state
+	     << endl;
 
-//     if (all.nEdges())
-// 	_signal = all;
-
-//     if (iwd) {
-// 	l0.dump("", "     l0-> ");
-// 	l1.dump("", "     l1-> ");
-// 	l2.dump("", "     l2-> ");
-// 	l3.dump("", "     l3-> ");
-// 	l4.dump("", "     l4-> ");
-// 	if (all.nEdges())
-// 	    cout << "===========" << endl;
-// 	all.dump("", "    ----> ");
-//     }    
+	_lut->getLRLUT(state.pattern(), superLayerId());
+    }
 
     TRGDebug::leaveStage("TS sim w/clock");
 }

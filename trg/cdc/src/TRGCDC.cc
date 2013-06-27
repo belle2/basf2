@@ -69,7 +69,7 @@ TRGCDC::name(void) const {
 
 string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.34");
+    return string("TRGCDC 5.35");
 }
 
 TRGCDC *
@@ -419,6 +419,7 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
 						  * layer,
 						  w,
 						  _luts.back(),
+						  _clockD,
 						  _eventTime.back(),
 						  cells);
 	    

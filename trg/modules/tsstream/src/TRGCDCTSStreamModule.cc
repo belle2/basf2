@@ -158,7 +158,7 @@ TRGCDCTSStreamModule::event() {
 	    //...Wire loop...
 	    for (unsigned i = 0; i < _wires[l].size(); i++) {
 		const TRGSignal & s = _wires[l][i]->timing();
-		bool hit = s.active(c);
+		bool hit = s.state(c);
 		stream.append(hit);
 	    }
 

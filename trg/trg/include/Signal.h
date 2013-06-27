@@ -15,6 +15,7 @@
 #define TRGSignal_FLAG_
 
 #include <vector>
+#include "trg/trg/Clock.h"
 #include "trg/trg/Time.h"
 
 namespace Belle2 {
@@ -26,11 +27,12 @@ class TRGSignal {
 
   public:
 
-    /// Default constructor.
-    TRGSignal();
+    /// Constructor.
+    TRGSignal(const TRGClock & = Belle2_GDL::GDLSystemClock);
 
     /// Constructor with name.
-    TRGSignal(const std::string & name);
+    TRGSignal(const std::string & name,
+	      const TRGClock & = Belle2_GDL::GDLSystemClock);
 
     /// Copy constructor.
     TRGSignal(const TRGSignal &);
@@ -56,7 +58,10 @@ class TRGSignal {
     bool active(void) const;
 
     /// returns true if signal is active in given clock position.
-    bool active(int clockPosition) const;
+    bool state(int clockPosition) const;
+
+    /// returns a list of clock position of state change.
+    std::vector<int> stateChanges(void) const;
 
     /// dumps contents. "message" is to select information to
     /// dump. "pre" will be printed in head of each line.
@@ -116,11 +121,14 @@ class TRGSignal {
 
   private:
 
-    /// Timing history.
-    std::vector<TRGTime> _history;
-
     /// Name.
     std::string _name;
+
+    /// Clock.
+    const TRGClock * _clock;
+
+    /// Timing history.
+    std::vector<TRGTime> _history;
 };
 
 //-----------------------------------------------------------------------------
@@ -189,7 +197,7 @@ TRGSignal::active(void) const {
 
 inline
 bool
-TRGSignal::active(int a) const {
+TRGSignal::state(int a) const {
     if (_history.size()) {
 	bool last = false;
 	for (unsigned i = 0; i < _history.size(); i++) {
@@ -212,19 +220,18 @@ TRGSignal::operator[](unsigned i) const {
 inline
 const TRGClock &
 TRGSignal::clock(void) const {
-
-    //...Assuming clock is same for all TRGTime.
-    return _history[0].clock();
+    return * _clock;
 }
 
 inline
 const TRGClock &
 TRGSignal::clock(const TRGClock & c) {
+    _clock = & c;
 
     for (unsigned i = 0; i < _history.size(); i++)
 	_history[i].clock(c);
-	
-    return _history[0].clock();
+
+    return * _clock;
 }
 
 } // namespace Belle2

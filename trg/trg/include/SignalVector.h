@@ -23,10 +23,11 @@
 namespace Belle2 {
 
 class TRGSignal;
+class TRGState;
 
 /// A class to represent a bundle of digitized signals. Given
 /// TRGSignal should exist while this object alive.
-class TRGSignalVector : public std::vector<const TRGSignal *> {
+class TRGSignalVector : public std::vector<TRGSignal> {
 
   public:
 
@@ -56,6 +57,12 @@ class TRGSignalVector : public std::vector<const TRGSignal *> {
     /// returns true if there is a signal.
     bool active(void) const;
 
+    /// returns a list of clock position of state change.
+    std::vector<int> stateChanges(void) const;
+
+    /// returns state at given clock position.
+    TRGState state(int clockPosition) const;
+
     /// dumps contents. "message" is to select information to
     /// dump. "pre" will be printed in head of each line.
     void dump(const std::string & message = "",
@@ -74,8 +81,8 @@ class TRGSignalVector : public std::vector<const TRGSignal *> {
     /// Name.
     std::string _name;
 
-    /// TRGSignals.
-    std::vector<const TRGSignal *> _signals;
+/*     /// TRGSignals. */
+/*     std::vector<const TRGSignal *> _signals; */
 };
 
 //-----------------------------------------------------------------------------

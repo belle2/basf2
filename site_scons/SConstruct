@@ -102,6 +102,17 @@ elif option == 'intel':
     global_env['AR'] = 'xiar'
     global_env['LD'] = 'xild'
     global_env.Append(CCFLAGS = ['-wd383,981,1419'])
+elif option == 'clang':
+    clang_dir = None
+    for dir in os.environ.get('PATH', '').split(os.pathsep):
+        if os.path.isfile(os.path.join(dir, 'clang')):
+            clang_dir = dir
+            break
+    if not clang_dir:
+        print 'clang compiler not found.'
+        Exit(1)
+    global_env['CC'] = 'clang'
+    global_env['CXX'] = 'clang++'
 else:
     print 'Aborted because of unknown build option:', option
     Exit(1)

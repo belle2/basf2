@@ -71,7 +71,7 @@ are included in principle to make analyses user friendly, faster, ...
    \item $\chi^2\geq 0$ indicates that the error matrix is valid
   \end{itemize}
  \end{itemize}
- \item {\color{blue}number of degrees of freedom of the fit} \hfill{int}
+ \item {\color{blue}number of degrees of freedom of the fit} \hfill{unsigned}
  \begin{itemize}
   \item same as above
  \end{itemize}
@@ -165,33 +165,35 @@ The table given below provides list of available getters and setters for private
  \includegraphics[width=0.9\textwidth]{DataModel/figs/particleGetterSetter.png}
 \end{center}
 The getters for kinematic quantities return momentum, position and error matrix as {\tt TLorentzVector, TVector3}, and {\tt TMatrixFSym}, 
-respectively. Special care needs to be taken when it comes to setters for these kinematic quantities, since it can lead to inconsistent 
+respectively. In addition, a function that returns the position (or decay vertex) as the \vertex object is provided.
+
+Special care needs to be taken when it comes to setters for these kinematic quantities, since it can lead to inconsistent 
 state, if they are allowed to be modified individually. The momentum and position (decay vertex)
 can be correlated and can be thus modified only at once and should not be allowed to be modified individually. 
 This means that are no standard setters for these three quantities, like {\tt setMomentum(TLorentzVector), setVertex(TVector3)}, and 
 {\tt setErrorMatrix(TMatrixFSym)}, but instead only single public function is provided which enables updating of kinematic quantities
 and $\chi^2$ and number of degrees of freedom members:
 \begin{itemize}
- \item {\bluett updateMomentum(TLorentzVector, TVector3, TMatrixFSym, int, int)}
+ \item {\bluett updateMomentum(TLorentzVector, TVector3, TMatrixFSym, float, unsiged)}
 \end{itemize}
 
 \paragraph{Additional accessors to other frequently used kinematic quantities}
 
 \begin{itemize}
-  \item {\bluett getP()/getMomentumMagnitude()} -- magnitude of momentum in LAB
-  \item {\bluett getPx()/getPy()/getPz()} -- $x/y/z$ component of momentum in LAB
-  \item {\bluett getMass()} -- invariant mass
-  \item {\bluett getMassError()} -- estimated invariant mass uncertainty
-  \item {\bluett getX()/getY()/getZ()} -- $x/y/z$ component of position (decay vertex)
-  \item {\bluett getMomentumErrorMatrix()}  -- $4\times4$ momentum error submatrix
-  \item {\bluett getVertexErrorMatrix()}  -- $3\times3$ momentum error sub-matrix
-  \item {\bluett getMassBeforeKinematicFit()} -- returns the invariant mass before any kinematic fit is performed (with or without mass constraint)
+  \item {\bluett float getP()/getMomentumMagnitude()} -- magnitude of momentum in LAB
+  \item {\bluett float getPx()/getPy()/getPz()} -- $x/y/z$ component of momentum in LAB
+  \item {\bluett float getMass()} -- invariant mass
+  \item {\bluett float getMassError()} -- estimated invariant mass uncertainty
+  \item {\bluett float getX()/getY()/getZ()} -- $x/y/z$ component of position (decay vertex)
+  \item {\bluett TMatrixFSym getMomentumErrorMatrix()}  -- $4\times4$ momentum error submatrix
+  \item {\bluett TMatrixFSym getVertexErrorMatrix()}  -- $3\times3$ momentum error sub-matrix
+  \item {\bluett float getMassBeforeKinematicFit()} -- returns the invariant mass before any kinematic fit is performed (with or without mass constraint)
   \begin{itemize}
    \item a transient transient data member can be added (set in the constructor for composite \particle)
    \item or (re-)calculated on demand from original 4-momenta of FS particles (which are never overwritten)
    \item {\bf this should be utility function, since it is needed only during writing out to Ntuple}
   \end{itemize}
-  \item {\bluett getCharge()} -- returns the reconstructed charge 
+  \item {\bluett float getCharge()} -- returns the reconstructed charge 
   \begin{itemize}
    \item determined by summing over the charges of daughter particles
    \item if \particle has no daughter particles then the nominal charge based on its PDG code is returned

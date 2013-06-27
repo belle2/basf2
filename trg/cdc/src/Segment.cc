@@ -266,8 +266,9 @@ TCSegment::simulateWithoutClock(void) {
 
 void
 TCSegment::simulateWithClock(void) {
-    
-    TRGDebug::enterStage("TS sim w/clock");
+
+    const string stage = "TS sim w/clock" + name();
+    TRGDebug::enterStage(stage);
 
     //...System clocks...
     const TRGClock & dataClock = TRGCDC::getTRGCDC()->dataClock();
@@ -316,7 +317,7 @@ TCSegment::simulateWithClock(void) {
 	_lut->getLRLUT(state.pattern(), superLayerId());
     }
 
-    TRGDebug::leaveStage("TS sim w/clock");
+    TRGDebug::leaveStage(stage);
 }
 
 unsigned

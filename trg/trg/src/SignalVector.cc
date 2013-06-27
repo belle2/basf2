@@ -11,8 +11,9 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-// #include <algorithm>
-// #include <functional>
+#include <string>
+#include <cstring>
+#include <algorithm>
 #include <iostream>
 #include "trg/trg/Clock.h"
 #include "trg/trg/Signal.h"

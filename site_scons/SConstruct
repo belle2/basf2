@@ -132,6 +132,11 @@ if (not global_env.GetOption('clean')) and (not global_env.GetOption('help')):
     if not config.configure(global_env):
         Exit(1)
 
+# remove C++11 flag for cint
+global_env['CINTFLAGS'] = global_env['CCFLAGS'][:]
+if '--std=c++11' in global_env['CINTFLAGS']:
+    global_env['CINTFLAGS'].remove('--std=c++11')
+
 # loop over directory entries and filter out package directories
 exclude_dirs = ['build', 'include', 'lib', 'bin', 'modules', 'data']
 local_packages = []

@@ -37,7 +37,7 @@ def linkdef_emitter(target, source, env):
 
 # define builder for root dictionaries
 rootcint = \
-    Builder(action='rootcint -f $TARGET -c -p $CCFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES'
+    Builder(action='rootcint -f $TARGET -c -p $CINTFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES'
             , emitter=linkdef_emitter, source_scanner=CScanner())
 rootcint.action.cmdstr = '${ROOTCINTCOMSTR}'
 

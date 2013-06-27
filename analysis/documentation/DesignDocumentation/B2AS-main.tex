@@ -24,11 +24,11 @@ Draft-Version-0.1 (Latex run \today)\\
 \author[a]{P.~Urquijo}
 \author[b]{A.~Zupanc}
 \affiliation[a]{University of Bonn, Bonn, Germany}
-\affiliation[b]{Karlsruhe Insitute Of Technology, Karlsruhe, Germany}
+\affiliation[b]{Karlsruhe Institute Of Technology, Karlsruhe, Germany}
 \affiliation[c]{Jo\v{z}ef Stefan Institute, Ljubljana, Slovenia}
 
 \abstract{
-We summarize the Belle 2 analysis sofware design decisions and discuss usecases.
+We summarize the Belle 2 analysis software design decisions and discuss use cases.
 }
 
 \input{B2AS-definitions}
@@ -71,9 +71,9 @@ General guidelines:
 \input{DataModel/B2AS-PIDLikelihood}
 
 \newpage
-\section{General purpuse analysis modules}
+\section{General purpose analysis modules}
 
-General guidlines:
+General guidelines:
 \begin{itemize}
  \item analysis module performs single well defined analysis action. Grouping of several analysis actions within one 
  module does not follow modular programming paradigm and should be avoided.
@@ -87,6 +87,7 @@ General guidlines:
 \input{AnalysisModules/B2AS-ParticleSelector}
 \input{AnalysisModules/B2AS-ParticleCombiner}
 \input{AnalysisModules/B2AS-ParticleVertexFitter}
+\input{AnalysisModules/B2AS-DecayChainVertexFitter}
 \input{AnalysisModules/B2AS-NtupleMaker}
 
 \section{Analysis specific analysis modules}
@@ -97,6 +98,7 @@ General guidlines:
 \section{Utility functions}
 
 \section{Utility tools}
+\input{UtilityTools/B2AS-DecayDescriptor.tex}
 \input{UtilityTools/B2AS-NtupleTools.tex}
 
 \section{Overview of analysis software designs of other HEP experiments}

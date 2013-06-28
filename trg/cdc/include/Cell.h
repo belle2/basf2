@@ -96,7 +96,7 @@ class TRGCDCCell {
 		      const std::string & prefix = std::string("")) const;
 
     /// returns trigger output. Null will returned if no signal.
-    virtual const TRGSignal & timing(void) const = 0;
+    virtual const TRGSignal & signal(void) const = 0;
 
   public:// Geometry
 

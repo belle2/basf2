@@ -15,6 +15,7 @@
 #define TRGCDC_SHORT_NAMES
 
 #include "trg/trg/Utilities.h"
+#include "trg/trg/Debug.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Wire.h"
@@ -120,13 +121,38 @@ TRGCDCFrontEnd::implementationPort(const TRGCDCFrontEnd::boardType & ,
 void
 TRGCDCFrontEnd::push_back(const TRGCDCWire * a) {
     std::vector<const TRGCDCWire *>::push_back(a);
-    _input += a->timing();
 }
 
 void
 TRGCDCFrontEnd::dump(const string & message, const string & pre) const {
     TRGBoard::dump(message, pre);
     _input.dump(message, pre + "    ");
+}
+
+void
+TRGCDCFrontEnd::simulate(void) {
+
+    //...Clear input...
+    _input.clear();
+
+    //...Input from wires...
+    const unsigned nWires = size();
+    for (unsigned i = 0; i < nWires; i++) {
+
+	//...This may be too expensive. There must be a class to hold pointers.
+	_input += (* this)[i]->signal();
+    }
+
+    //...Skip if no signal...
+    if (! _input.active())
+	return;
+
+    //...Prepare hit pattern...
+    TRGSignalVector pattern = _input;
+    pattern.name(name() + "@dataClock");
+
+    _input.dump("detail", TRGDebug::tab());
+    pattern.dump("detail", TRGDebug::tab());
 }
 
 } // namespace Belle2

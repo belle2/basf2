@@ -48,13 +48,18 @@ class TRGCDCFrontEnd
     /// Destructor
     virtual ~TRGCDCFrontEnd();
 
-  public:// Selectors.
+  public:// Selectors
 
     /// returns version.
     static std::string version(void);
 
     /// returns type.
     boardType type(void) const;
+
+  public:// Modifiers
+
+    /// simulates firmware.
+    void simulate(void);
 
   public:// VHDL utilities
 

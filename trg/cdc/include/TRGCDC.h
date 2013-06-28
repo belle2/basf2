@@ -353,6 +353,12 @@ class TRGCDC {
     /// updates TRGCDC information for MC.
     void updateMC(void);
 
+    /// Fast simulation
+    void fastSimulation(void);
+
+    /// Firmware simulation
+    void firmwareSimulation(void);
+
   private:
 
     /// CDC trigger singleton.

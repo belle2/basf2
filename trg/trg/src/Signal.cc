@@ -73,27 +73,18 @@ void
 TRGSignal::dump(const string & msg,
                 const string & pre) const {
 
-    bool first = true;
-
-    if (msg.find("detail") != string::npos) {
-        first = false;
-        cout << pre << _name;
-    }
-
-    cout << ":#signal=" << _history.size();
+    cout << pre << _name << ":#signal=" << _history.size();
 
     if (msg.find("clock") != string::npos ||
         msg.find("detail") != string::npos) {
 	cout << ":clock=" << _clock->name();
-        cout << endl;
     }
 
+    cout << endl;
+
     if (_history.size()) {
-        string tab = pre;
-        if (! first)
-            tab += "    ";
         for (unsigned i = 0; i < _history.size(); i++)
-            _history[i].dump(msg, tab);
+            _history[i].dump(msg, pre + "    ");
     }
 }
 

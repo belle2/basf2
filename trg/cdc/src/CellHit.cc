@@ -85,7 +85,7 @@ TRGCDCCellHit::dump(const std::string & msg,
         cout << ",mcpart=" << iMCParticle();
 	cout << ",flightTime=" << simHit()->getFlightTime();
 	cout << ",driftLength=" << simHit()->getDriftLength() << endl;
-	_cell.timing().dump("detail", pre + "    ");
+	_cell.signal().dump("detail", pre + "    ");
     }
     std::cout << std::endl;
 }

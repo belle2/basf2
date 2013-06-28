@@ -167,7 +167,7 @@ TCSegment::simulate(bool clockSimulation) {
     for (unsigned i = 0; i < n; i++) {
 
 	//...Copy signal from a wire...
-        const TRGSignal & s = _wires[i]->timing();
+        const TRGSignal & s = _wires[i]->signal();
         if (s.active())
             ++nHits;
     }
@@ -202,7 +202,7 @@ TCSegment::simulateWithoutClock(void) {
 	    _hits.push_back(h);
 
 	//...Copy signal from a wire...
-        const TRGSignal & s = _wires[i]->timing();
+        const TRGSignal & s = _wires[i]->signal();
         signals.push_back(s);
 
 	//...Change clock...
@@ -280,7 +280,7 @@ TCSegment::simulateWithClock(void) {
     for (unsigned i = 0; i < n; i++) {
 
 	//...Copy signal from a wire...
-	TRGSignal s = _wires[i]->timing();
+	TRGSignal s = _wires[i]->signal();
 
 // 	if (TRGDebug::level() > 2) {
 // 	    s.dump("detail", TRGDebug::tab() + "wire TDC ");
@@ -324,7 +324,7 @@ unsigned
 TRGCDCSegment::hitPattern(void) const {
     unsigned ptn = 0;
     for (unsigned i = 0; i < _wires.size(); i++) {
-        const TRGSignal & s = _wires[i]->timing();
+        const TRGSignal & s = _wires[i]->signal();
         if (s.active())
 	    ptn |= (1 << i);
     }

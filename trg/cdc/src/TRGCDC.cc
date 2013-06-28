@@ -174,7 +174,7 @@ TRGCDC::TRGCDC(const string & configFile,
       _r(0),
       _r2(0),
       _clock("CDCTrigger system clock", Belle2_GDL::GDLSystemClock, 1),
-      _clockFE("CDCFETrigger system clock", Belle2_GDL::GDLSystemClock, 8),
+      _clockFE("CDCFE TDC clock", Belle2_GDL::GDLSystemClock, 8),
       _clockD("CDCTrigger data clock", Belle2_GDL::GDLSystemClock, 1, 4),
       _offset(5.3),
       _pFinder(0),
@@ -312,7 +312,7 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
 	    const P3D bp = P3D(cdc2.wireBackwardPosition(i, j).x(),
 			       cdc2.wireBackwardPosition(i, j).y(),
 			       cdc2.wireBackwardPosition(i, j).z());
-	    TCWire * tw = new TCWire(nWires++, j, * layer, fp, bp);
+	    TCWire * tw = new TCWire(nWires++, j, * layer, fp, bp, _clockFE);
 	    _wires.push_back(tw);
 	    layer->push_back(tw);
 	}
@@ -630,7 +630,7 @@ TRGCDC::dump(const string & msg) const {
 	cout << "    wire hits" << endl;
 	for (unsigned i = 0; i < nWires(); i++) {
 	    const TCWire & w = * wire(i);
-	    if (w.timing().active())
+	    if (w.signal().active())
 		w.dump(dumpOption, TRGDebug::tab(4));
 	}
     }
@@ -639,7 +639,7 @@ TRGCDC::dump(const string & msg) const {
 	cout << "    wire hits" << endl;
 	for (unsigned i = 0; i < nSegments(); i++) {
 	    const TCSegment & s = segment(i);
-	    if (s.wires()[5]->timing().active())
+	    if (s.wires()[5]->signal().active())
 		s.wires()[5]->dump(dumpOption, TRGDebug::tab(4));
 	}
     }
@@ -648,7 +648,7 @@ TRGCDC::dump(const string & msg) const {
 	cout << "    TS hits" << endl;
 	for (unsigned i = 0; i < nSegments(); i++) {
 	    const TCSegment & s = segment(i);
-	    if (s.timing().active())
+	    if (s.signal().active())
 		s.dump(dumpOption, TRGDebug::tab(4));
 	}
     }
@@ -750,7 +750,6 @@ TRGCDC::update(bool) {
     clear();
 
     //...CDCSimHit...
-//iw StoreArray<CDCSimHit> SimHits("CDCSimHits");
     StoreArray<CDCSimHit> SimHits;
     if (! SimHits) {
 	cout << "TRGCDC !!! can not access to CDCSimHits" << endl;
@@ -844,8 +843,8 @@ TRGCDC::update(bool) {
 	TRGTime rise = TRGTime(tdcCount, true, _clockFE, w.name());
 	TRGTime fall = rise;
 	fall.shift(1).reverse();
-	w._timing = TRGSignal(rise & fall);
-	w._timing.name(w.name());
+	w._signal = TRGSignal(rise & fall);
+	w._signal.name(w.name());
 	
 	//...Left/right...
 	const int LRflag = SimHits[iSimHit]->getPosFlag();
@@ -871,9 +870,8 @@ TRGCDC::update(bool) {
 	
 	//...Debug...
 	if (TRGDebug::level() > 2) {
-	    std::cout << TRGDebug::tab() << w.name() << std::endl;
-	    w._timing.dump("", TRGDebug::tab(1));
-	    std::cout << TRGDebug::tab(1) << "CDCHit TDC count="
+	    w._signal.dump("", TRGDebug::tab());
+	    std::cout << TRGDebug::tab(4) << "CDCHit TDC count="
 		      << h.getTDCCount() << std::endl;
 	}
     }
@@ -984,9 +982,9 @@ TRGCDC::classification(void) {
     }
 }
 
-vector<const TCWHit*>
+vector<const TCWHit *>
 TRGCDC::axialHits(void) const {
-    vector<const TCWHit*> t;
+    vector<const TCWHit *> t;
     t.assign(_axialHits.begin(), _axialHits.end());
     return t;
 
@@ -996,9 +994,9 @@ TRGCDC::axialHits(void) const {
 //  return _axialHits;
 }
 
-vector<const TCWHit*>
+vector<const TCWHit *>
 TRGCDC::stereoHits(void) const {
-    vector<const TCWHit*> t;
+    vector<const TCWHit *> t;
     t.assign(_stereoHits.begin(), _stereoHits.end());
     return t;
 
@@ -1008,9 +1006,9 @@ TRGCDC::stereoHits(void) const {
 //     return _stereoHits;
   }
 
-vector<const TCWHit*>
+vector<const TCWHit *>
 TRGCDC::hits(void) const {
-    vector<const TCWHit*> t;
+    vector<const TCWHit *> t;
     t.assign(_hits.begin(), _hits.end());
     return t;
 
@@ -1344,6 +1342,16 @@ TRGCDC::neighbor(const TCWire & w0, const TCWire & w1) const {
 
 void
 TRGCDC::simulate(void) {
+    const bool fast = (_simulationMode & 1);
+    const bool firm = (_simulationMode & 2);
+    if (fast)
+	fastSimulation();
+    if (firm)
+	firmwareSimulation();
+}
+
+void
+TRGCDC::fastSimulation(void) {
 
 #ifdef TRGCDC_DISPLAY
     D->beginningOfEvent();
@@ -1360,7 +1368,7 @@ TRGCDC::simulate(void) {
     for (unsigned i = 0; i < n; i++) {
 	TCSegment & s = * _tss[i];
 	s.simulate(trackSegmentClockSimulation);
-	if (s.timing().active()) {
+	if (s.signal().active()) {
             TCSHit * th = new TCSHit(s);
             s.hit(th);
             _segmentHits.push_back(th);
@@ -1393,7 +1401,7 @@ TRGCDC::simulate(void) {
 	    dumpOption = "detail";
 	for (unsigned i = 0; i < nSegments(); i++) {
 	    const TCSegment & s = segment(i);
-	    if (s.timing().active())
+	    if (s.signal().active())
 		s.dump(dumpOption, TRGDebug::tab(4));
 	}
 
@@ -1757,6 +1765,18 @@ TRGCDC::simulate(void) {
 }
 
 void
+TRGCDC::firmwareSimulation(void) {
+
+    //...Wire level simulation is in update().
+
+    //...Front ends...
+    const unsigned nFronts = _fronts.size();
+    for (unsigned i = 0; i < nFronts; i++) {
+	_fronts[i]->simulate();
+    }
+}
+
+void
 TRGCDC::configure(void) {
 
     //...Open configuration file...
@@ -1823,7 +1843,7 @@ TRGCDC::configure(void) {
 	    f = _fronts[fid];
 	if (! f) {
 	    const string name = "CDCFrontEnd_" + TRGUtil::itostring(fid);
-	    f = new TCFrontEnd(name, _clock);
+	    f = new TCFrontEnd(name, _clockD);
 	    _fronts.push_back(f);
 	}
 	f->push_back(_wires[wid]);
@@ -1854,9 +1874,9 @@ TRGCDC::configure(void) {
 	f.append(fl);
 	const unsigned nWires = f.size();
 	for (unsigned j = 0; j < nWires; j++) {
-	    fl->append(& f[j]->timing());
+	    fl->append(& f[j]->signal());
 	}
-	if (TRGDebug::level() > 1)
+	if (TRGDebug::level() > 2)
 	    f.dump("detail");
     }
 
@@ -1865,7 +1885,7 @@ TRGCDC::configure(void) {
 //     _links.push_back(fl);
 //     for (unsigned j = 0; j < 3; j++)
 //         for (unsigned i = 0; i < 16; i++)
-//             fl->append(& (* _layers[j])[i]->timing());
+//             fl->append(& (* _layers[j])[i]->signal());
 //     TCFrontEnd f("CDCFrontEnd_0", _clock);
 //     f.append(fl);
 
@@ -1897,7 +1917,7 @@ TRGCDC::perfect3DFinder(vector<TCTrack*> trackList) const {
 	for (unsigned i = 0; i < hits.size(); i++) {
 	    const TCSHit & ts = * hits[i];
 	    if (ts.segment().axial()) continue;
-	    if (! ts.timing().active()) continue;
+	    if (! ts.signal().active()) continue;
 	    const TCWHit * wh = ts.segment().center().hit();
 	    if (! wh) continue;
 	    const unsigned trackId = wh->iMCParticle();
@@ -1931,8 +1951,8 @@ TRGCDC::perfect3DFinder(vector<TCTrack*> trackList) const {
 	    } else {
 		int timeMin = 99999;
 		for (unsigned k = 0; k < tsList[i].size(); k++) {
-		    const TRGSignal & timing = tsList[i][k]->timing();
-		    const TRGTime & t = * timing[0];
+		    const TRGSignal & signal = tsList[i][k]->signal();
+		    const TRGTime & t = * signal[0];
 		    if (t.time() < timeMin) {
 			timeMin = t.time();
 			best = tsList[i][k];

@@ -86,12 +86,12 @@ TRGCDCPerfectFinder::doitPerfectlySingleTrack(
             const TCSegment & s = (TCSegment &) * (* l)[j];
 
             //...Select hit TS only...
-            const TRGSignal & timing = s.timing();
-            if (! timing.active())
+            const TRGSignal & signal = s.signal();
+            if (! signal.active())
                 continue;
 
             //...Select TS with the shortest drift time.
-            const TRGTime & t = * timing[0];
+            const TRGTime & t = * signal[0];
             if (t.time() < timeMin) {
                 timeMin = t.time();
                 best = & s;
@@ -152,7 +152,7 @@ TRGCDCPerfectFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
     const vector<const TCSHit *> hits = _cdc.segmentHits();
     for (unsigned i = 0; i < hits.size(); i++) {
 	const TCSHit & ts = * hits[i];
-	if (! ts.timing().active()) continue;
+	if (! ts.signal().active()) continue;
 	if (ts.segment().stereo()) continue;
 	const TCWHit * wh = ts.segment().center().hit();
 	if (! wh) continue;
@@ -213,7 +213,7 @@ TRGCDCPerfectFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
  	    TCLink * best = 0;
 	    int timeMin = 99999;
  	    for (unsigned j = 0; j < layers[i].size(); j++) {
- 		const TRGTime & t = * (layers[i][j]->cell()->timing())[0];
+ 		const TRGTime & t = * (layers[i][j]->cell()->signal())[0];
  		if (t.time() < timeMin) {
  		    timeMin = t.time();
  		    best = layers[i][j];

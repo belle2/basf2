@@ -51,11 +51,8 @@ class TRGCDCWire : public TRGCDCCell {
 	       unsigned localId,
 	       const TRGCDCLayer &,
 	       const HepGeom::Point3D<double> & forwardPosition,
-	       const HepGeom::Point3D<double> & backwardPosition);
-
-//     /// Constructor with a track segment.
-//     TRGCDCWire(const TRGCDCTrackSegment * segment,
-// 	       const TRGCDCWire * wire);
+	       const HepGeom::Point3D<double> & backwardPosition,
+	       const TRGClock & clock);
 
     /// Destructor
     virtual ~TRGCDCWire();
@@ -104,7 +101,7 @@ class TRGCDCWire : public TRGCDCCell {
   public:// TRG
 
     /// returns an input to the trigger. This is sync'ed to 1GHz clock.
-    const TRGSignal & timing(void) const;
+    const TRGSignal & signal(void) const;
 
   private:
 
@@ -113,7 +110,7 @@ class TRGCDCWire : public TRGCDCCell {
     std::vector<const TRGCDCWireHitMC *> _mcHits;
 
     /// Trigger output.
-    mutable TRGSignal _timing;
+    mutable TRGSignal _signal;
 
     /// Complete access from TRGCDC.
     friend class TRGCDC;
@@ -197,8 +194,8 @@ TRGCDCWire::localIdForMinus(void) const {
 
 inline
 const TRGSignal &
-TRGCDCWire::timing(void) const {
-    return _timing;
+TRGCDCWire::signal(void) const {
+    return _signal;
 }
 
 } // namespace Belle2

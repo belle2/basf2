@@ -80,9 +80,6 @@ class TRGSignalVector : public std::vector<TRGSignal> {
 
     /// Name.
     std::string _name;
-
-/*     /// TRGSignals. */
-/*     std::vector<const TRGSignal *> _signals; */
 };
 
 //-----------------------------------------------------------------------------

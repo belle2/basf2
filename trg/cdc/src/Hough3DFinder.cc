@@ -824,7 +824,7 @@ namespace Belle2 {
     for (unsigned i = 0; i < hits.size(); i++) {
       const TCSHit& ts = * hits[i];
       if (ts.segment().axial()) continue;
-      if (! ts.timing().active()) continue;
+      if (! ts.signal().active()) continue;
       const TCWHit* wh = ts.segment().center().hit();
       if (! wh) continue;
       const unsigned trackId = wh->iMCParticle();
@@ -865,7 +865,7 @@ namespace Belle2 {
       } else {
         int timeMin = 99999;
         for (unsigned k = 0; k < tsList[i].size(); k++) {
-          const TRGSignal& timing = tsList[i][k]->timing();
+          const TRGSignal& timing = tsList[i][k]->signal();
           const TRGTime& t = * timing[0];
           if (t.time() < timeMin) {
             timeMin = t.time();

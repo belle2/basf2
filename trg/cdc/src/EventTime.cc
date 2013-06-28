@@ -48,12 +48,12 @@ namespace Belle2{
 	    for(unsigned j=0;j<nWires;j++){
 	      const TCSegment &s = (TCSegment &)*(*l)[j];
 	      const vector<const TCWire *> &wires = s.wires();
-	      const TRGSignal & timing=s.timing();
+	      const TRGSignal & timing=s.signal();
 	      if(timing.active()){
 	      for(unsigned k=0;k<wires.size();k++){
 		if(wires[k]->hit()){
 //		  double dl=wires[k]->hit()->drift()*10*1000/40;
-		  double dt= wires[k]->timing()[0]->time();
+		  double dt= wires[k]->signal()[0]->time();
 //		  cout << dt << endl;
 		  if(tmin>dt) tmin=dt;
 		}

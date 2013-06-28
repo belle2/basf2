@@ -303,9 +303,9 @@ TRGCDCHoughFinder::selectBestHits(const vector<TCLink *> & links) const {
 	}
 
 	TCLink * best = layers[i][0];
-	int timeMin = (layers[i][0]->cell()->timing())[0]->time();
+	int timeMin = (layers[i][0]->cell()->signal())[0]->time();
 	for (unsigned j = 1; j < layers[i].size(); j++) {
-	    const TRGTime & t = * (layers[i][j]->cell()->timing())[0];
+	    const TRGTime & t = * (layers[i][j]->cell()->signal())[0];
 	    if (t.time() < timeMin) {
 		timeMin = t.time();
 		best = layers[i][j];

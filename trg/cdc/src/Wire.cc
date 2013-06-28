@@ -33,11 +33,12 @@ TRGCDCWire::TRGCDCWire(unsigned id,
                        unsigned localId,
                        const TCLayer & l,
                        const P3D & fp,
-                       const P3D & bp)
+                       const P3D & bp,
+		       const TRGClock & clock)
     : TCCell(id, localId, l, fp, bp),
       _mcHits(),
-      _timing() {
-    _timing.name(name() + string("to"));
+      _signal(clock) {
+    _signal.name(name());
 }
 
 TRGCDCWire::~TRGCDCWire() {
@@ -59,7 +60,7 @@ TRGCDCWire::dump(const string & msg, const string & pre) const {
     }
     if (msg.find("trigger") != string::npos ||
         msg.find("detail") != string::npos) {
-	timing().dump(msg, pre + "    ");
+	signal().dump(msg, pre + "    ");
     }    
 }
   
@@ -369,7 +370,7 @@ TRGCDCWire::clear(void) {
         delete _mcHits[i];
     _mcHits.clear();
 
-    _timing.clear();
+    _signal.clear();
 }
 
 string

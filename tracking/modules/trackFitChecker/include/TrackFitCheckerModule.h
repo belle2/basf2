@@ -49,7 +49,7 @@
 namespace Belle2 {
 
   /*!
-      This module calculates the residuals, pulls and chi^2 for a sample of tracks both track wise and layer wise tests are used. If available truth info from simulation in form of "TrueHits" is used.
+      This module performs a wide variety of statistical tests on the GFTrack objects created by Genfit via the GenFitter module. It is intended for tracking developers.
   */
 
   class TrackFitCheckerModule : public Module {
@@ -108,16 +108,20 @@ namespace Belle2 {
         This method has to be implemented by subclasses.
     */
     void terminate();
-
+    /** Returns the inverted matrix of aMatrix */
     static TMatrixD invertMatrix(const TMatrixD& aMatrix) ;
   protected:
 
     // little helper functions for this module
+    /** Calculates the χ² value from a residum (res) and the covariance matrix of this residuum (R) with χ² = res^T*R^{-1}*res */
     static double calcChi2(const TMatrixT<double>& res, const TMatrixT<double>& R);
+    /** Calculates the pull values from a residuum (res) and the covariance matrix of this residuum (R) with pull_i = res_i / sqrt(R(i,i)) */
     static std::vector<double> calcPulls(const TMatrixT<double>& res, const TMatrixT<double>& R);
+    /** Calculates different pull and  χ² values from a estimated track state vector defined at some point (normally a detector hit), its covariance matrix and the true state at that point */
     static std::vector<double> calcTestsWithTruthInfo(const TMatrixT<double>& state, const TMatrixT<double>& cov, const TMatrixT<double>& trueState);
-    void isMatrixCov(const TMatrixT<double>& cov);
-    static bool isSymmetric(const TMatrixT<double>& aMatrix);
+//    void isMatrixCov(const TMatrixT<double>& cov);
+//    static bool isSymmetric(const TMatrixT<double>& aMatrix);
+    /** Simply tests if any diagonal element of aMatrix is negative*/
     static bool hasMatrixNegDiagElement(const TMatrixT<double>& aMatrix);
 
     // functions for dataflow inside module, registerXX fillXX and printXX all work on the same maps whose entries are accessed by the nameOfDataSample-string which acts as a key
@@ -139,11 +143,12 @@ namespace Belle2 {
     void printLayerWiseStatistics(const std::string& nameOfDataSample,  const std::vector<std::string>& layerWiseVarNames, int madVars, const bool count = true);
     void printLRResData(const std::string& nameOfDataSample, const std::vector<std::string>& layerWiseVarNames);
 
-    int m_nSiLayers; // number of Si layers. That is 6 of course.
-    int m_nPxdLayers; // number of PXD layer (2) so number of SVD layers will be m_nSiLayers - m_nPxdLayers
-    int m_nSvdLayers;
-    int m_nCdcLayers;
-    int m_nLayers;
+    //When no layer wise test are done the layer numbers are set to 0 in this module
+    int m_nSiLayers; /**< number of Si layers.  m_nSiLayers = m_nPxdLayers + m_nSvdLayers */
+    int m_nPxdLayers; /**< number of PXD layer, 2 normally */
+    int m_nSvdLayers; /**< number of SVD layer, 4 normally */
+    int m_nCdcLayers; /**< number of CDC layer, 56 normally */
+    int m_nLayers; /**< m_nLayers = m_nPxdLayers + m_nSvdLayers + m_nCdcLayers */
 
     std::vector<std::string> m_layerWiseTruthTestsVarNames;
     std::vector<std::string> m_vertexTestsVarNames;
@@ -162,48 +167,51 @@ namespace Belle2 {
     std::map<std::string, TVector3* > m_TVector3ForRoot; //this one is to store the mcparticle truth info for position and momentum
     std::map<std::string, int > m_intForRoot; //this one is to store some auxiliary (like if track was fitted successful) info about the tracks into the root file
 
-//    // now the data itself also in c++ vectors so this module can use custom implemented estimators instead just the one provided by root and
-    bool m_robust;
+    // now the data itself also in c++ vectors so this module can use custom implemented estimators instead just the one provided by root and
+    bool m_robust; /**< if this flag is true the robust tests (= median and MAD and truncated mean and std) will be executed */
     std::map<std::string, std::vector<double > > m_trackWiseData;
     std::map<std::string, std::vector<std::vector<double> > > m_trackWiseVecData;
     std::map<std::string, std::vector<std::vector< std::vector <double> > > > m_layerWiseData;
 
 
-    /** function to calculated the MAD or Median absolute deviation for given data sample. One has also provide the median of the sample (because boost has already median calculation implemented so I did not implement it myself) */
+    /** function to calculated the MAD or "median absolute deviation" for given data sample (data). One has also provide the median of the sample */
     static double calcMad(const std::vector<double>& data, const double& median);
-    std::map<std::string, double > m_madScalingFactors; //scaling factor the mad to make it compariable to the standard deviation
+    std::map<std::string, double > m_madScalingFactors; /**< scaling factors for the MAD to make it comparable to the standard deviation. If a key does not exist, no MAD will be calculated for the data sample using that key*/
+    /** returns the median of the data sample "data" */
     static double calcMedian(std::vector<double> data);
     //void calcMedianAndMad(std::vector<double> data, double& median, double& mad);
-    static int trunctatedMeanAndStd(std::vector<double> data, const double cutRatio, const bool symmetric, double& mean, double& std);
-    std::map<std::string, double > m_trunctationRatios; //holds the ratio how many of the data of a named sample should be cut away in the trunctatedMeanAndStd function
+    /** calculates the truncated mean and standard deviation of the data sample "data". cutRatio is the truncation ratio. If symmetric is true the smallest and largest values will be ignored. If false only the largest values. The return value is the number of data point that were truncated */
+    static int truncatedMeanAndStd(std::vector<double> data, const double cutRatio, const bool symmetric, double& mean, double& std);
+    std::map<std::string, double > m_truncationRatios; /**<holds the ratio how many of the data of a named sample (name = key) should be cut away in the trunctatedMeanAndStd function. If a key does not exist, trunctatedMeanAndStd will not be calculated for the data sample using that key */
+    /** returns the number of outliers in dataSample. An outlier is defined as being widthScaling*sigma away from mean */
     static int countOutliers(const std::vector<double>& dataSample, const double mean, const double sigma, const double widthScaling);
 
     // this maps will hold the names of the test data variables that have more then one component like the residuals of the origin position and momentum
-    std::map<std::string, std::vector<std::string>* > namesOfTestVars;
+    //std::map<std::string, std::vector<std::string>* > namesOfTestVars;
 
-    int m_processedTracks;
-    double m_pvalueCut;
+    int m_processedTracks; /**< holds number of tracks used in the tests */
+    double m_pvalueCut; /**< tracks with p-value smaller than m_pvalueCut will not be used in the tests */
     bool m_fillOnlyInRootFile;
-    double m_trunctationRatio;
-    int m_nCutawayTracks;
-    int m_extrapFailed; //counter for the number of tracks that cannot be extrapolated to thier true vertex position by Genfit
+    double m_truncationRatio; /**< the truncation ratio passed to truncatedMeanAndStd in the print functions */
+    int m_nCutawayTracks; /**< holds the number of tracks with p-value larger than m_pvalueCut */
+    int m_extrapFailed; /**< holds the number of tracks that cannot be extrapolated to their true vertex position by Genfit */
     // counters holding the number of the covariance matrices (R) of the resuduals that have negative diagonal elements
-    int m_badR_fCounter;
-    int m_badR_bCounter;
-    int m_badR_smCounter;
-    bool m_testSi;
-    bool m_testCdc;
-    int m_unSymmetricCounter;
-    int m_notPosDefCounter;
-    int m_nDigits;
+    int m_badR_fCounter; /**< holds the number of times the covariance matrix of the forward updated residual had negative diagonal elements */
+    int m_badR_bCounter; /**< holds the number of times the covariance matrix of the backward updated residual had negative diagonal elements */
+    int m_badR_smCounter; /**< holds the number of times the covariance matrix of the smoothed residual had negative diagonal elements */
+    bool m_testSi; /**< flag determines if the layer wise tests for PXD and SVD hits should be executed */
+    bool m_testCdc; /**< flag determines if the layer wise tests for CDC hits should be executed */
+//    int m_unSymmetricCounter;
+//    int m_notPosDefCounter;
+//    int m_nDigits;
     // module input parameters
-    bool m_useTruthInfo;
-    bool m_testPrediction;
-    bool m_testDaf;
-    bool m_truthAvailable;
-    bool m_testLRRes;
-    int m_inspectTracks;
-    std::string m_dataOutFileName; //common part of all names of output files
+    //bool m_useTruthInfo;
+    bool m_testPrediction; /**< flag determines if the layer wise tests will also the predicted states in addition to the updated states are tested */
+//    bool m_testDaf;
+    bool m_truthAvailable; /**< flag determines if the layer wise tests will also the truth info for every hit (from the TrueHit objects) */
+    bool m_testLRRes; /**< flag determines if the resolution of the left right ambiguity of CDC hits is tested */
+//    int m_inspectTracks;
+    std::string m_dataOutFileName; /**< this string will be added as a prefix to all output files of this module */
 
     //stuff for text file output
     std::stringstream m_textOutput;
@@ -212,22 +220,21 @@ namespace Belle2 {
 //    bool m_spMode;
 //    std::ofstream m_piStuffOut;
 
-    bool m_wAndPredPresentsTested;
+    bool m_wAndPredPresentsTested; /**< this flag is set true after it was checked if predictied states and/or DAF wights are present */
     //stuff for the text output for rave developers
     bool m_exportTracksForRaveDeveloper;
     std::ofstream m_forRaveOut;
 
+    bool m_writeToFile; /**< If true a text file with the results of all statistical tests will be created */
     //stuff for root output
-    bool m_writeToFile;
-    bool m_writeToRootFile;
+    bool m_writeToRootFile; /**< If true a root file where all the data extracted form the tested tracks will be saved */
+    TTree* m_statDataTreePtr; /**< TTree for this module's own ROOT output */
+    TFile* m_rootFilePtr; /**< TFile for this module's own ROOT output */
 
-    TTree* m_statDataTreePtr;
-    TFile* m_rootFilePtr;
-
-    //hold all the data needed for the layer wise tests of one track
+    /** struct to store data needed by normalTests() and truthTests() for one track. */
     struct TrackData {
 
-      int nHits; //number of hits in GFTrack object
+      int nHits; /**<number of hits in GFTrack object */
 
       //stuff for the normal layer wise tests:
 
@@ -254,13 +261,11 @@ namespace Belle2 {
       std::vector<TMatrixD> covs_bp;
 
     };
-    TrackData m_trackData;
-
+    TrackData m_trackData; /**< holds data needed by normalTests() and truthTests() for one track. */
+    /** Reads all data from aTrackPtr that are needed for the layer wise tests. The extracted data of one track will be written into m_trackData*/
     void extractTrackData(GFTrack* const aTrackPtr, const double charge);
 
-    void testDaf(GFTrack* const aTrackPtr);
-    //void testDafWithBG(GFTrack *const aTrackPtr);
-    //void fillDafWithBGData(const std::string& nameOfDataSample, const std::vector<std::vector<float> >& allWeights);
+//    void testDaf(GFTrack* const aTrackPtr); // implemtation of testDaf currently broken
 
     void testLRAmbiResolution(GFTrack* const aTrackPtr);
 
@@ -268,7 +273,7 @@ namespace Belle2 {
 
     void truthTests();
 
-    void inspectTracks(double chi2tot_fu, double vertexAbsMom);
+    //void inspectTracks(double chi2tot_fu, double vertexAbsMom);
 
   };
 

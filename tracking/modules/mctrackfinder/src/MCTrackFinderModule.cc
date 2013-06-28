@@ -400,7 +400,7 @@ void MCTrackFinderModule::event()
             cdcHitsIndices.push_back(cdcHitIndex);
             ndf += 1;
             int superLayerId = cdcHits[cdcHitIndex]->getISuperLayer();
-            if (superLayerId == 0 || superLayerId == 2  || superLayerId == 4) { //here it is hardcoded what superlayer has axial wires and what has stereo wires. Maybe it would be better if the WireId would know this
+            if (superLayerId % 2 == 0) { //here it is hardcoded what superlayer has axial wires and what has stereo wires. Maybe it would be better if the WireId would know this
               ++nAxialHits;
             } else {
               ++nStereoHits;

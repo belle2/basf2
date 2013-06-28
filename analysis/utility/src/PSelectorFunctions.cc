@@ -242,24 +242,37 @@ namespace Belle2 {
     {
       if (!part) return 0;
       const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
-      if (pid) return pid->getProbability(Const::pion, Const::kaon);
-      return 0.5;
+      if (!pid) return 0.5;
+
+      // temporary: use dEdx only below 2.5 GeV/c
+      Const::PIDDetectorSet set = Const::TOP + Const::ARICH;
+      if (part->getP() < 2.5) set += Const::CDC;
+      return pid->getProbability(Const::pion, Const::kaon, set);
+
     }
 
     double particleKaonId(const Particle* part)
     {
       if (!part) return 0;
       const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
-      if (pid) return pid->getProbability(Const::kaon, Const::pion);
-      return 0.5;
+      if (!pid) return 0.5;
+
+      // temporary: use dEdx only below 2.5 GeV/c
+      Const::PIDDetectorSet set = Const::TOP + Const::ARICH;
+      if (part->getP() < 2.5) set += Const::CDC;
+      return pid->getProbability(Const::kaon, Const::pion, set);
     }
 
     double particleProtonId(const Particle* part)
     {
       if (!part) return 0;
       const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
-      if (pid) return pid->getProbability(Const::proton, Const::pion);
-      return 0.5;
+      if (!pid) return 0.5;
+
+      // temporary: use dEdx only below 2.5 GeV/c
+      Const::PIDDetectorSet set = Const::TOP + Const::ARICH;
+      if (part->getP() < 2.5) set += Const::CDC;
+      return pid->getProbability(Const::proton, Const::pion, set);
     }
 
     // other ------------------------------------------------------------

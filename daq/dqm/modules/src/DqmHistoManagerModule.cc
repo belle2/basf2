@@ -135,6 +135,34 @@ void DqmHistoManagerModule::terminate()
 {
   if (m_initialized) {
     //    cout << "DqmHistoManager::terminating event process : PID=" << ProcHandler::EvtProcID() << endl;
+    m_msg->clear();
+    TList* keylist = gDirectory->GetList();
+    //    keylist->ls();
+
+    TIter nextkey(keylist);
+    TKey* key = 0;
+    TKey* oldkey = 0;
+    int nobjs = 0;
+    while ((key = (TKey*)nextkey())) {
+      if (oldkey && !strcmp(oldkey->GetName(), key->GetName())) continue;
+      //      TObject* obj = key->ReadObj();
+      TObject* obj = gDirectory->FindObject(key->GetName());
+      if (obj->IsA()->InheritsFrom("TH1")) {
+        TH1* h1 = (TH1*) obj;
+        //  printf ( "Key = %s, entry = %f\n", key->GetName(), h1->GetEntries() );
+        m_msg->add(h1, h1->GetName());
+        nobjs++;
+      }
+    }
+    EvtMessage* msg = m_msg->encode_msg(MSG_EVENT);
+    (msg->header())->reserved[0] = 0;
+    (msg->header())->reserved[1] = nobjs;
+    (msg->header())->reserved[2] = 0;
+
+    m_sock->send(msg);
+
+    delete(msg);
+
     RbTupleManager::Instance().terminate();
     delete m_sock;
     delete m_msg;

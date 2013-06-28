@@ -516,7 +516,7 @@ namespace Belle2 {
     int m_mother;               /**< 1-based index of the mother particle */
     int m_firstDaughter;       /**< 1-based index of first daughter particle in collection, 0 if no daughters */
     int m_lastDaughter;        /**< 1-based index of last daughter particle in collection, 0 if no daughters */
-    static const double c_epsilon = 10e-7;  /**< limit of precision for two doubles to be the same. */
+    static const double c_epsilon;  /**< limit of precision for two doubles to be the same. */
 
     EspinType m_spinType;        /**< Spin type of the particle as provided by the generator. */
 

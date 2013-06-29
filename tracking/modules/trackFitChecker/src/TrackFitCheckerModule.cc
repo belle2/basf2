@@ -1676,6 +1676,9 @@ double TrackFitCheckerModule::calcMad(const std::vector<double>& data, const dou
 {
   // calculates median absolute deviation
   const int n = data.size();
+  if (n == 1) {
+    return 0;
+  }
   vector<double> absRes(n);
 
   for (int i = 0; i not_eq n; ++i) {

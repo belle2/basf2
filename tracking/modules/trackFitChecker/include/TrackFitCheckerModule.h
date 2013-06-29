@@ -143,7 +143,7 @@ namespace Belle2 {
     void printLayerWiseStatistics(const std::string& nameOfDataSample,  const std::vector<std::string>& layerWiseVarNames, int madVars, const bool count = true);
     void printLRResData(const std::string& nameOfDataSample, const std::vector<std::string>& layerWiseVarNames);
 
-    //When no layer wise test are done the layer numbers are set to 0 in this module
+    //When no layer wise tests are done, the layer numbers are set to 0 in this module.
     int m_nSiLayers; /**< number of Si layers.  m_nSiLayers = m_nPxdLayers + m_nSvdLayers */
     int m_nPxdLayers; /**< number of PXD layer, 2 normally */
     int m_nSvdLayers; /**< number of SVD layer, 4 normally */
@@ -174,7 +174,7 @@ namespace Belle2 {
     std::map<std::string, std::vector<std::vector< std::vector <double> > > > m_layerWiseData;
 
 
-    /** function to calculated the MAD or "median absolute deviation" for given data sample (data). One has also provide the median of the sample */
+    /** function to calculated the MAD or "median absolute deviation" for given data sample (data). One also has to provide the median of the sample */
     static double calcMad(const std::vector<double>& data, const double& median);
     std::map<std::string, double > m_madScalingFactors; /**< scaling factors for the MAD to make it comparable to the standard deviation. If a key does not exist, no MAD will be calculated for the data sample using that key*/
     /** returns the median of the data sample "data" */
@@ -238,39 +238,39 @@ namespace Belle2 {
 
       //stuff for the normal layer wise tests:
 
-      std::vector<int> accuVecIndices;
-      std::vector<int> detIds;
+      std::vector<int> accuVecIndices; /**< layer indices of hits shifted to start at 0 no matter what detectors are active (any combination of PXD SVD CDC) */
+      std::vector<int> detIds; /**< detector ids of hits */
 
-      std::vector<TMatrixD> ms;
-      std::vector<TMatrixD> Hs;
-      std::vector<TMatrixD> Vs;
-      std::vector<TMatrixD> states_fu;
-      std::vector<TMatrixD> covs_fu;
-      std::vector<TMatrixD> states_bu;
-      std::vector<TMatrixD> covs_bu;
-      std::vector<TMatrixD> states_sm;
-      std::vector<TMatrixD> covs_sm;
+      std::vector<TMatrixD> ms; /**< Measurements from RecoHits */
+      std::vector<TMatrixD> Hs; /**< H matrix from RecoHitts (H maps the 5D state onto the measurement */
+      std::vector<TMatrixD> Vs; /**< covariance matrices of measurement errors from RecoHits */
+      std::vector<TMatrixD> states_fu; /**< 5D forward updated state at hit positions */
+      std::vector<TMatrixD> covs_fu; /**< 5x5 forward updated covariance matrices at hit positions */
+      std::vector<TMatrixD> states_bu; /**< 5D backward updated state at hit positions */
+      std::vector<TMatrixD> covs_bu; /**< 5x5 backward updated covariance matrices at hit positions */
+      std::vector<TMatrixD> states_sm; /**< 5D smoothed state at hit positions */
+      std::vector<TMatrixD> covs_sm; /**< 5x5 smoothed covariance matrices at hit positions */
 
       //aditional stuff for the tests that need truth info
-      std::vector<TMatrixD> states_t;
+      std::vector<TMatrixD> states_t; /**< 5D true state at hit positions. Extracted form TrueHit. Only needed by truthTests not by normalTests*/
 
       //aditional stuff for the tests that need predicted state
-      std::vector<TMatrixD> states_fp;
-      std::vector<TMatrixD> covs_fp;
-      std::vector<TMatrixD> states_bp;
-      std::vector<TMatrixD> covs_bp;
+      std::vector<TMatrixD> states_fp; /**< 5D forward predicted state at hit positions */
+      std::vector<TMatrixD> covs_fp; /**< 5x5 forward predicted covariance matrices at hit positions */
+      std::vector<TMatrixD> states_bp; /**< 5D backward predicted state at hit positions */
+      std::vector<TMatrixD> covs_bp; /**< 5x5 backward predicted covariance matrices at hit positions */
 
     };
     TrackData m_trackData; /**< holds data needed by normalTests() and truthTests() for one track. */
     /** Reads all data from aTrackPtr that are needed for the layer wise tests. The extracted data of one track will be written into m_trackData*/
     void extractTrackData(GFTrack* const aTrackPtr, const double charge);
 
-//    void testDaf(GFTrack* const aTrackPtr); // implemtation of testDaf currently broken
-
+//    void testDaf(GFTrack* const aTrackPtr); // implementation of testDaf currently broken
+    /** Checks if the left/right ambiguity of all CDC hits in aTrackPtr was resolved correct or not during the track fit */
     void testLRAmbiResolution(GFTrack* const aTrackPtr);
-
+    /** Calculates pulls and χ² of the residuals res = m -H*state for all hits. So it does _not_ need the true track state (TrueHits). Reads in the data from m_trackData that was prepared by extractTrackData*/
     void normalTests();
-
+    /** Calculates pulls and χ² of the residuals res = state - state_true for all hits. So it needs the true track state (TrueHits). Reads in the data from m_trackData that was prepared by extractTrackData*/
     void truthTests();
 
     //void inspectTracks(double chi2tot_fu, double vertexAbsMom);

@@ -52,6 +52,8 @@ global_env = Environment(ENV = os.environ,
                          EXTINCDIR = os.path.join('$EXTDIR', 'include'),
                          EXTLIBDIR = os.path.join('$EXTDIR', 'lib', extsubdir),
                          EXTBINDIR = os.path.join('$EXTDIR', 'bin', extsubdir),
+                         LINK='g++',
+                         SHLINK='g++',
                          CCFLAGS = ['-Wall', '-I$EXTINCDIR', '-I' + sysconfig.get_python_inc()],
                          CPPDEFINES = {'_PACKAGE_': '\\"$PACKAGE\\"'},
                          CPPPATH = ['include'],
@@ -101,6 +103,8 @@ elif option == 'intel':
     global_env['FC'] = 'ifort'
     global_env['AR'] = 'xiar'
     global_env['LD'] = 'xild'
+    global_env['LINK'] = 'icpc'
+    global_env['SHLINK'] = 'icpc'
     global_env.Append(CCFLAGS = ['-wd383,981,1419'])
 elif option == 'clang':
     clang_dir = None

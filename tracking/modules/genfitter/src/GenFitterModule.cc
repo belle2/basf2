@@ -428,7 +428,7 @@ void GenFitterModule::event()
           //gfTrack.getTrackRep(0)->getCov().Print();
 
           if (genfitStatusFlag != 0) {    //if fit failed
-            B2WARNING("Genfit returned an error (with status flag " << genfitStatusFlag << ") during the fit!");
+            B2WARNING("Genfit returned an error (with status flag " << genfitStatusFlag << ") during the fit of a track in event " << eventCounter);
             ++m_failedFitCounter;
             if (m_storeFailed == true) {
               ++trackCounter;

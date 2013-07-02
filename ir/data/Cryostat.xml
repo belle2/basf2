@@ -967,8 +967,8 @@
 		<R6 unit="cm">25.80</R6>
 		<R7 unit="cm">35.00</R7>
 		<R8 unit="cm">35.00</R8>
-		<R9 unit="cm">39.00</R9>
-		<R10 unit="cm">39.0</R10>
+		<R9 unit="cm">34.70</R9>
+		<R10 unit="cm">34.7</R10>
 		<R11 unit="cm">56.0</R11>
 		<R12 unit="cm">56.0</R12>
 		<R13 unit="cm">64.0</R13>
@@ -2605,7 +2605,7 @@
 	</E4mag3p5>
 
         <F1wal1>
-		<N desc="Number of planes">14</N>
+		<N desc="Number of planes">13</N>
 
 		<Z0 unit="cm">-62.73</Z0>
 		<Z1 unit="cm">-73.17</Z1>
@@ -2613,14 +2613,13 @@
 		<Z3 unit="cm">-76.30</Z3>
 		<Z4 unit="cm">-89.73</Z4>
 		<Z5 unit="cm">-136.65</Z5>
-		<Z6 unit="cm">-218.43</Z6>
-		<Z7 unit="cm">-240.25</Z7>
+		<Z6 unit="cm">-208.4</Z6>
+		<Z7 unit="cm">-208.4</Z7>
 		<Z8 unit="cm">-240.25</Z8>
 		<Z9 unit="cm">-248.25</Z9>
-		<Z10 unit="cm">-248.25</Z10>
+		<Z10 unit="cm">-322.10</Z10>
 		<Z11 unit="cm">-322.10</Z11>
-		<Z12 unit="cm">-322.10</Z12>
-		<Z13 unit="cm">-336.10</Z13>
+		<Z12 unit="cm">-336.10</Z12>
 
 		<R0 unit="cm">13.55</R0>
 		<R1 unit="cm">17.35</R1>
@@ -2629,19 +2628,18 @@
 		<R4 unit="cm">20.25</R4>
 		<R5 unit="cm">25.00</R5>
 		<R6 unit="cm">25.00</R6>
-		<R7 unit="cm">42.08</R7>
-		<R8 unit="cm">46.00</R8>
-		<R9 unit="cm">46.00</R9>
+		<R7 unit="cm">34.00</R7>
+		<R8 unit="cm">34.00</R8>
+		<R9 unit="cm">41.00</R9>
 		<R10 unit="cm">41.00</R10>
-		<R11 unit="cm">41.00</R11>
+		<R11 unit="cm">42.55</R11>
 		<R12 unit="cm">42.55</R12>
-		<R13 unit="cm">42.55</R13>
 
 		<Material desc="Vacuum vessel">SUS316L</Material>
         </F1wal1>
 
         <F2spc1>
-		<N desc="Number of planes">9</N>
+		<N desc="Number of planes">11</N>
 
 		<Z0 unit="cm">-64.23</Z0>
 		<Z1 unit="cm">-72.19</Z1>
@@ -2649,9 +2647,11 @@
 		<Z3 unit="cm">-77.80</Z3>
 		<Z4 unit="cm">-89.80</Z4>
 		<Z5 unit="cm">-136.72</Z5>
-		<Z6 unit="cm">-223.00</Z6>
-		<Z7 unit="cm">-240.25</Z7>
-		<Z8 unit="cm">-336.10</Z8>
+		<Z6 unit="cm">-210.90</Z6>
+		<Z7 unit="cm">-210.90</Z7>
+		<Z8 unit="cm">-240.25</Z8>
+		<Z9 unit="cm">-248.25</Z9>
+		<Z10 unit="cm">-336.10</Z10>
 
 		<R0 unit="cm">12.95</R0>
 		<R1 unit="cm">15.85</R1>
@@ -2660,8 +2660,10 @@
 		<R4 unit="cm">18.75</R4>
 		<R5 unit="cm">23.45</R5>
 		<R6 unit="cm">23.45</R6>
-		<R7 unit="cm">37.00</R7>
-		<R8 unit="cm">37.00</R8>
+		<R7 unit="cm">31.50</R7>
+		<R8 unit="cm">31.50</R8>
+		<R9 unit="cm">37.00</R9>
+		<R10 unit="cm">37.00</R10>
 
 		<Material desc="Vacuum space">Vacuum</Material>
         </F2spc1>
@@ -2781,7 +2783,7 @@
         <F7lyr1>
 		<N desc="Number of planes">16</N>
 
-		<Z0 unit="cm">-84.47</Z0>
+		<Z0 unit="cm">-84.85</Z0>
 		<Z1 unit="cm">-87.77</Z1>
 		<Z2 unit="cm">-91.04</Z2>
 		<Z3 unit="cm">-91.04</Z3>
@@ -2798,7 +2800,7 @@
 		<Z14 unit="cm">-131.96</Z14>
 		<Z15 unit="cm">-157.50</Z15>
 
-		<R0 unit="cm">11.00</R0>
+		<R0 unit="cm">11.56</R0>
 		<R1 unit="cm">14.93</R1>
 		<R2 unit="cm">15.26</R2>
 		<R3 unit="cm">15.26</R3>
@@ -2815,9 +2817,9 @@
 		<R14 unit="cm">19.40</R14>
 		<R15 unit="cm">19.40</R15>
 
-		<r0 unit="cm">11.0</r0>
-		<r1 unit="cm">11.0</r1>
-		<r2 unit="cm">11.0</r2>
+		<r0 unit="cm">11.56</r0>
+		<r1 unit="cm">11.56</r1>
+		<r2 unit="cm">11.56</r2>
 		<r3 unit="cm">12.3</r3>
 		<r4 unit="cm">12.3</r4>
 		<r5 unit="cm">13.6</r5>
@@ -2901,7 +2903,7 @@
 		<R29 unit="cm">15.3</R29>
 
 		<r0 unit="cm">10.27</r0>
-		<r1 unit="cm">10.5</r1>
+		<r1 unit="cm">10.51</r1>
 		<r2 unit="cm">10.6</r2>
 		<r3 unit="cm">10.6</r3>
 		<r4 unit="cm">10.7</r4>

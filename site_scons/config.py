@@ -80,9 +80,10 @@ def configure_belle2(conf):
         return False
 
     # local Belle II release setup
-    if not conf.CheckEnvVar('BELLE2_LOCAL_DIR', 'local release setup'):
-        print 'local release is not set up.'
-        print '-> Execute "setuprel" in your local release directory.'
+    if not conf.CheckEnvVar('BELLE2_ANALYSIS_DIR', 'analysis setup') \
+        and not conf.CheckEnvVar('BELLE2_LOCAL_DIR', 'local release setup'):
+        print 'analysis or local release is not set up.'
+        print '-> Execute "setupana" or "setuprel" in your local analysis or release directory, respectively.'
         return False
 
     return True

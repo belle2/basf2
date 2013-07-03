@@ -48,11 +48,16 @@ def process_dir(
     ):
 
     # determine library name
-    lib_name = dir_name.replace(os.sep, '_')
+    if dir_name == '.':
+        lib_name = parent_env['PACKAGE']
+    else:
+        lib_name = dir_name.replace(os.sep, '_')
 
     # get list of header and linkdef files
-    header_files = get_files(os.path.join(dir_name, '*.h'), release_dir) \
-        + get_files(os.path.join(dir_name, 'include', '*.h'), release_dir)
+    header_files = get_files(os.path.join(dir_name, '*.h'), release_dir)
+    if dir_name != '.':
+        header_files += get_files(os.path.join(dir_name, 'include', '*.h'),
+                                  release_dir)
     linkdef_files = []
     for header_file in header_files:
         if str(header_file).lower().endswith('linkdef.h'):
@@ -153,6 +158,15 @@ def process_dir(
             'examples',
             'modules',
             ]:
+            if dir_name == '.' and entry in [
+                'build',
+                'include',
+                'lib',
+                'bin',
+                'modules',
+                'data',
+                ]:
+                continue
             process_dir(env, os.path.join(dir_name, entry), is_module_dir,
                         release_dir)
 
@@ -162,6 +176,10 @@ def process_dir(
     is_python_module_dir = env.Dictionary().get('PYTHON_MODULE', False) == True
     is_dataobjects_dir = dir_name == os.path.join(env['PACKAGE'], 'dataobjects'
             ) and env['PACKAGE'] != 'framework'
+    if dir_name == './dataobjects':
+        is_dataobjects_dir = True
+        is_module_dir = False
+        lib_name = parent_env['PACKAGE']
 
     # check whether we have to create a new library
     if is_package_dir or is_sublib_dir or is_python_module_dir \
@@ -185,7 +203,7 @@ def process_dir(
             lib_dir_name = env['LIBDIR']
             if is_module_dir:
                 lib_dir_name = env['MODDIR']
-                if os.path.basename(dir_name) != 'modules':
+                if os.path.basename(dir_name) != 'modules' and dir_name != '.':
                     lib_name = os.path.basename(dir_name)
 
             # update list of dataobject libraries

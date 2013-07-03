@@ -30,7 +30,7 @@ DecayDescriptor::DecayDescriptor() :
   m_strTag("default"),
   m_iPDGCode(0),
   m_isSelected(false),
-  m_isWithCC(false),
+  m_isIgnorePhotons(false),
   m_isInclusive(false),
   m_isFixed(false)
 {
@@ -42,7 +42,7 @@ DecayDescriptor::DecayDescriptor(const DecayDescriptor& other) :
   m_strTag(other.m_strTag),
   m_iPDGCode(other.m_iPDGCode),
   m_isSelected(other.m_isSelected),
-  m_isWithCC(other.m_isWithCC),
+  m_isIgnorePhotons(other.m_isIgnorePhotons),
   m_isInclusive(other.m_isInclusive),
   m_isFixed(other.m_isFixed)
 {
@@ -79,8 +79,6 @@ bool DecayDescriptor::init(const string strDecayString)
   string strTag;
   vector<string> strDaughters;
 
-  // include charge conjugated decay
-  rule<> _CHCONJ = strlit<>("CC");
   // exact match of decay
   rule<> _ARROW_EXACT = *space_p >> strlit<>("->")  >> *space_p;
   // intermediate resonances ignored
@@ -97,7 +95,7 @@ bool DecayDescriptor::init(const string strDecayString)
   rule<> _SELECTOR = chlit<>('^');
 
   // forbidden character sequences for particle and tag names
-  rule<> _RESERVED = _SELECTOR | chlit<>('(') | chlit<char>(')') | chlit<>('{') | chlit<>('}') | space_p | _ARROW | _CHCONJ | _INCLUSIVE;
+  rule<> _RESERVED = _SELECTOR | chlit<>('(') | chlit<char>(')') | chlit<>('{') | chlit<>('}') | space_p | _ARROW | _INCLUSIVE;
   // name of particle or tag
   rule<> _NAME = +(anychar_p - _RESERVED);
   rule<> _TAG = chlit<>('{') >> _NAME >> chlit<>('}') >> *space_p;
@@ -107,13 +105,15 @@ bool DecayDescriptor::init(const string strDecayString)
   rule<> _RPARTICLE = *space_p >> *_SELECTOR >> _NAME >> *_TAG;
 
   // everything that can be on the right side
-  //rule<> _DAUGHTER = _RPARTICLE | (*space_p >> chlit<>('(') >> _RPARTICLE >> *_CHCONJ >> _ARROW >> +_RPARTICLE >> *_INCLUSIVE >> chlit<>(')') >> *space_p);
   rule<> _DAUGHTER = _RPARTICLE | (*space_p >> chlit<>('(') >> _RPARTICLE >> _ARROW >> +_RPARTICLE >> *_INCLUSIVE >> chlit<>(')') >> *space_p);
 
   rule<> _RIGHT = +_DAUGHTER[push_back_a(strDaughters)] >> *_INCLUSIVE[assign_a(m_isInclusive, true)];
 
-  //rule<> _DECAYBASIC = _LPARTICLE >> *_CHCONJ[assign_a(m_isWithCC, true)] >> _ARROW >> _RIGHT;
-  rule<> _DECAYBASIC = _LPARTICLE >> _ARROW >> _RIGHT;
+  rule<> _DECAYBASIC = _LPARTICLE >> (
+                         _ARROW_EXACT[assign_a(m_isIgnorePhotons, false)] |
+                         _ARROW_NORES[assign_a(m_isIgnorePhotons, false)] |
+                         _ARROW_IGGAM[assign_a(m_isIgnorePhotons, true)] |
+                         _ARROW_NORES_IGGAM[assign_a(m_isIgnorePhotons, true)]) >> _RIGHT;
   rule<> _DECAY = _DECAYBASIC | (*space_p >> chlit<char>('(') >> _DECAYBASIC >> chlit<char>(')') >> *space_p) | _LPARTICLE;
 
   bool isParseOK = parse(strDecayString.c_str(), _DECAY).full;
@@ -129,7 +129,7 @@ bool DecayDescriptor::init(const string strDecayString)
     evtpdl.read(strEvtPDL.c_str());
   }
   m_iPDGCode = EvtPDL::getLundKC(EvtPDL::getId(m_strName));
-  B2INFO(m_strName << "   ------>   " << m_iPDGCode << " " << m_strTag << " SEL = " << m_isSelected << " CC = " << m_isWithCC << " INCL = " << m_isInclusive);
+  B2INFO(m_strName << "   ------>   " << m_iPDGCode << " " << m_strTag << " SEL = " << m_isSelected << " IgnPhoton = " << m_isIgnorePhotons << " INCL = " << m_isInclusive);
 
   for (unsigned int i = 0; i < strDaughters.size(); i++) B2INFO(strDaughters[i]);
   for (vector<string>::iterator i = strDaughters.begin(); i != strDaughters.end(); ++i) {

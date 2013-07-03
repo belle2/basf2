@@ -39,8 +39,8 @@ namespace Belle2 {
     int m_iPDGCode;
     /** Is this DecayDescriptor selected? */
     bool m_isSelected;
-    /** Also consider charge conjugated mode? */
-    bool m_isWithCC;
+    /** Ignore radiated photons? */
+    bool m_isIgnorePhotons;
     /** Is this decay inclusive? */
     bool m_isInclusive;
     /** If this DecayDescriptor is attached as daughter
@@ -87,7 +87,7 @@ namespace Belle2 {
     /** return i-th daughter (0 based index). */
     const DecayDescriptor& getDaughter(int i) const {return (i < getNDaughters()) ? m_daughters[i] : DecayDescriptor::m_NULL;}
     /** Also consider charge conjugated mode? */
-    bool isWithCC() const {return m_isWithCC;}
+    bool isIgnorePhotons() const {return m_isIgnorePhotons;}
     /** Is the decay inclusive? */
     bool isInclusive() const {return m_isInclusive;}
   };

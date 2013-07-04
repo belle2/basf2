@@ -7,10 +7,12 @@
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
+
 #include <analysis/modules/MCDecayFinder/MCDecayFinderModule.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <generators/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/RelationArray.h>
+#include <generators/dataobjects/MCParticle.h>
 #include <string>
 
 using namespace std;
@@ -31,12 +33,16 @@ MCDecayFinderModule::MCDecayFinderModule() : Module()
 void MCDecayFinderModule::initialize()
 {
   B2WARNING("This is an untested prototype. Do not uses for any production purposes.")
+
   if (m_strDecay.empty()) B2ERROR("No decay descritor string provided.");
   m_decaydescriptor.init(m_strDecay);
   if (m_strListName.empty()) B2ERROR("No name of output particle list provided.");
 
-  // register output particle list
+  // Register output particle list
   StoreObjPtr<ParticleList>::registerTransient(m_strListName);
+
+  // Register RelationArray between output Particles and generated (input) MCParticles
+  RelationArray::registerPersistent<Particle, MCParticle>();
 }
 
 void MCDecayFinderModule::event()
@@ -180,10 +186,17 @@ int MCDecayFinderModule::write(DecayTree<MCParticle>* decay)
   StoreArray<Particle> particles;
   // Input MCParticle array
   StoreArray<MCParticle> mcparticles;
+  // Relation between particles and MCParticles
+  RelationArray particle2mcparticle(particles, mcparticles);
+
   // Create new Particle in particles array
   new(particles.nextFreeAddress()) Particle(decay->getObj());
-  // Now save also daughters of this MCParticle and set the daughter relation
+
+  // set relation between the created Particle and the MCParticle
   int iIndex = particles.getEntries() - 1;
+  particle2mcparticle.add(iIndex, decay->getObj()->getArrayIndex());
+
+  // Now save also daughters of this MCParticle and set the daughter relation
   vector< DecayTree<MCParticle>* > daughters = decay->getDaughters();
   int nDaughers = daughters.size();
   for (int i = 0; i < nDaughers; ++i) {

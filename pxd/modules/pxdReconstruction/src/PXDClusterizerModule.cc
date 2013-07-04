@@ -351,8 +351,8 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
                                          minVCharge * info.getVPitch(minVPos)) / centreCharge);
       double snHead = centreCharge / m_cutAdjacent / m_elNoise / info.getVPitch(minVPos);
       double snTail = centreCharge / m_cutAdjacent / m_elNoise / info.getVPitch(maxVPos);
-      double landauHead = minUCharge / centreCharge * info.getVPitch(minVPos);
-      double landauTail = maxUCharge / centreCharge * info.getVPitch(maxVPos);
+      double landauHead = minVCharge / centreCharge * info.getVPitch(minVPos);
+      double landauTail = maxVCharge / centreCharge * info.getVPitch(maxVPos);
       vError = 0.5 * sqrt(1.0 / snHead / snHead + 1.0 / snTail / snTail +
                           0.5 * landauHead * landauHead + 0.5 * landauTail * landauTail);
     } else if (sizeV <= 2) { // Add a phantom charge to second strip

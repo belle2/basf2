@@ -42,6 +42,7 @@ namespace Belle2 {
         m_pdgCode(0),
         m_passIndex(-1),
         m_fitSucceeded(false),
+        m_trackNumber(-1),
         m_initialValuesSet(false) {}
 
       /**copy constructor**/
@@ -58,7 +59,7 @@ namespace Belle2 {
       std::vector<VXDTFTrackCandidate*> getBookingRivals() { return m_bookingRivals; } /**< returns all TCs sharing hits with current one */
       bool getOverlappingState() { return m_overlapping; } /**< returns flag whether TC is sharing hits with other TCs or not (no manual check) */
       bool checkOverlappingState(); /**< returns flag whether TC is sharing hits with other TCs or not, after manual check, whether its rivals are still alive */
-      unsigned int getTrakNumber() { return m_trackNumber; } /** returns position of TC in vector containing all TCs of current event */
+      unsigned int getTrakNumber() { return m_trackNumber; } /**< returns position of TC in vector containing all TCs of current event */
       bool getCondition() const { return m_alive; } /**< returns flag whether TC is still "alive" (part of the set of TCs which are probably real tracks based on the knowledge of the TF at the point of calling that function) */
       double getTrackQuality() { return m_qualityIndex; } /**< returns quality index of TC, has to be between 0 (bad) and 1 (perfect) */
       double getQQQ() { return m_qqq; } /**< returns aditional quality index */

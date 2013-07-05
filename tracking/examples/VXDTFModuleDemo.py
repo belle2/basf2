@@ -42,7 +42,7 @@ g4sim = register_module('FullSim')
 g4sim.param('StoreAllSecondaries', True)
 
 vxdtf = register_module('VXDTF')
-vxdtf.logging.log_level = LogLevel.DEBUG
+vxdtf.logging.log_level = LogLevel.INFO
 vxdtf.logging.debug_level = 11
 # detectorType: Supports 'SVD' and 'VXD' so far
 # calcQIType:  Supports 'kalman', 'circleFit' or 'trackLength'

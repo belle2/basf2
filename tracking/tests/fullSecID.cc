@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 
 using namespace std;
+using namespace Belle2::Tracking;
 
 namespace Belle2 {
 #define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");

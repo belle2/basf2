@@ -11,6 +11,7 @@
 #include "../include/VXDTFHit.h"
 #include "../include/FullSecID.h"
 #include <framework/gearbox/Const.h>
+#include "../include/ClusterInfo.h"
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -19,7 +20,7 @@ using namespace Belle2::Tracking;
 
 
 /** operator overload **/
-bool VXDTFHit::operator==(const VXDTFHit& b) const
+bool Belle2::Tracking::VXDTFHit::operator==(const VXDTFHit& b) const
 {
   B2FATAL("somebody is using the '=='-operator of VXDTFHit, although it does no valid comparison!");
   if (getVxdID() != b.getVxdID()) { return false; }   /// ensures that hits are from the same sensor
@@ -46,3 +47,36 @@ bool VXDTFHit::operator>(const VXDTFHit& b) const
 
 
 std::string VXDTFHit::getSectorString() { return FullSecID(m_papaSector).getFullSecString(); }
+
+
+int VXDTFHit::getClusterIndexU() const
+{
+  if (m_clusterIndexU != NULL) { return m_clusterIndexU->getOwnIndex(); }
+  return -1;
+} /**< returns index position of clusterInfo in container, only set for SVDHits */
+
+ClusterInfo* VXDTFHit::getClusterInfoU() { return m_clusterIndexU; } /**< returns pointer to ClusterInfo U, is NULL if value is not set */
+
+int VXDTFHit::getClusterIndexV() const
+{
+  if (m_clusterIndexV != NULL) { return m_clusterIndexV->getOwnIndex(); }
+  return -1;
+} /**< returns index position of clusterInfo in container,  only set for SVDHits */
+
+ClusterInfo* VXDTFHit::getClusterInfoV() { return m_clusterIndexV; } /**< returns pointer to ClusterInfo V, is NULL if value is not set */
+
+int VXDTFHit::getClusterIndexUV() const
+{
+  if (m_clusterIndexUV != NULL) { return m_clusterIndexUV->getOwnIndex(); }
+  return -1;
+} /**< returns index position of clusterInfo in container,  only set for PXDHits */
+
+ClusterInfo* VXDTFHit::getClusterInfoUV() { return m_clusterIndexUV; }
+
+bool VXDTFHit::isReserved()
+{
+  if (m_clusterIndexU != NULL) { if (m_clusterIndexU->isReserved() == true) { return true; } }
+  if (m_clusterIndexV != NULL) { if (m_clusterIndexV->isReserved() == true) { return true; } }
+  if (m_clusterIndexUV != NULL) { if (m_clusterIndexUV->isReserved() == true) { return true; } }
+  return false;
+}

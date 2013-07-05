@@ -14,6 +14,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace Belle2::Tracking;
 
 const string FilterID::nameAngles3D = "angles3D";
 const string FilterID::nameAnglesRZ = "anglesRZ";

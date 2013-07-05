@@ -42,8 +42,8 @@ g4sim = register_module('FullSim')
 g4sim.param('StoreAllSecondaries', True)
 
 vxdtf = register_module('VXDTF')
-vxdtf.logging.log_level = LogLevel.INFO
-vxdtf.logging.debug_level = 1
+vxdtf.logging.log_level = LogLevel.DEBUG
+vxdtf.logging.debug_level = 11
 # detectorType: Supports 'SVD' and 'VXD' so far
 # calcQIType:  Supports 'kalman', 'circleFit' or 'trackLength'
 # filterOverlappingTCs: Supports 'hopfield' (good but slow), 'greedy' (faster but worse results), 'none' (no overlapping tc-removal)

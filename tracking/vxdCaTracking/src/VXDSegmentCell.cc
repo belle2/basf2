@@ -12,13 +12,13 @@
 
 using namespace std;
 using namespace Belle2;
-// using namespace Tracking;
+using namespace Belle2::Tracking;
 
 
 
 void VXDSegmentCell::kickFalseFriends(TVector3 primaryVertex)
 {
-  std::list<Belle2::VXDSegmentCell*>::iterator nbIter = m_innerNeighbours.begin();
+  std::list<VXDSegmentCell*>::iterator nbIter = m_innerNeighbours.begin();
   TVector3* innerHit;
   while (nbIter != m_innerNeighbours.end()) {
     VXDSegmentCell* pNextSeg = *nbIter;

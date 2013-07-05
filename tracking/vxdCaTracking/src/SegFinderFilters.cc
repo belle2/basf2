@@ -13,6 +13,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace Belle2::Tracking;
 
 bool SegFinderFilters::checkDist3D(int nameDist3D)
 {

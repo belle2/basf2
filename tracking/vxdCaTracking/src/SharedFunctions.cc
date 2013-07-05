@@ -17,7 +17,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace Tracking;
+using namespace Belle2::Tracking;
 
 vector< vector< pair<double, double> > > Tracking::getGlobalizedHitErrors()
 {

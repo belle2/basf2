@@ -16,6 +16,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace Belle2::Tracking;
 
 SectorFriends::SectorFriends(unsigned int myName, unsigned int secName):
   m_friendName(myName),

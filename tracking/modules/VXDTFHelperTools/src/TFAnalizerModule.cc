@@ -50,6 +50,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace Belle2::Tracking;
 using boost::tuple;
 using boost::math::sign;
 
@@ -65,7 +66,7 @@ REG_MODULE(TFAnalizer)
 TFAnalizerModule::TFAnalizerModule() : Module()
 {
   vector<string> rootFileNameVals;
-  rootFileNameVals.push_back("TFAnalizerResults");
+  rootFileNameVals.push_back("FilterCalculatorResults");
   rootFileNameVals.push_back("RECREATE");
 
   //Set module properties
@@ -76,6 +77,7 @@ TFAnalizerModule::TFAnalizerModule() : Module()
   addParam("fileExportTfTracks", m_PARAMFileExportTfTracks, "export vxd Trackfinder tracks into file", bool(true));
   addParam("mcTCname", m_PARAMmcTCname, "special name for mcTF track candidates", string("mcTracks"));
   addParam("caTCname", m_PARAMcaTCname, "special name for caTF track candidates", string(""));
+  addParam("acceptedTCname", m_PARAMacceptedTCname, "special name for accepted/successfully reconstructed track candidates", string("acceptedVXDTFTracks"));
   addParam("qiThreshold", m_PARAMqiThreshold, " chose value to filter TCs found by VXDTF. TCs having QIs lower than this value won't be marked as reconstructed", double(0.7));
   addParam("minNumOfHitsThreshold", m_PARAMminNumOfHitsThreshold, " defines how many hits of current TC has to be found again to be accepted as recovered, standard is 3 hits", int(3));
   addParam("printExtentialAnalysisData", m_PARAMprintExtentialAnalysisData, "set true, if you want to cout special Info to the shell", bool(false));
@@ -97,12 +99,14 @@ void TFAnalizerModule::initialize()
 {
   StoreArray<GFTrackCand>::required(m_PARAMmcTCname);
   StoreArray<GFTrackCand>::required(m_PARAMcaTCname);
+  StoreArray<GFTrackCand>::registerPersistent(m_PARAMacceptedTCname);
   StoreArray<PXDCluster>::required();
   StoreArray<SVDCluster>::required();
   StoreArray<PXDTrueHit>::required();
   StoreArray<SVDTrueHit>::required();
 //  B2WARNING("TFAnalizerModule: at the moment, no curling tracks are supported! When you feed this module with curling tracks, results can be wrong and misleading")
   m_countReconstructedTCs = 0;
+  m_countAcceptedGFTCs = 0;
   m_eventCounter = 0;
   m_mcTrackCounter = 0;
   m_caTrackCounter = 0;
@@ -172,6 +176,10 @@ void TFAnalizerModule::event()
   /// import all GFTrackCands (McFinder, TFinder)
   StoreArray<GFTrackCand> mcTrackCandidates(m_PARAMmcTCname);
   StoreArray<GFTrackCand> caTrackCandidates(m_PARAMcaTCname);
+  // preparing storearray for trackCandidates and fitted tracks
+  StoreArray<GFTrackCand> acceptedTrackCandidates(m_PARAMacceptedTCname);
+  acceptedTrackCandidates.create();
+
   StoreArray<PXDCluster> pxdClusters;
   StoreArray<SVDCluster> svdClusters;
 
@@ -238,11 +246,16 @@ void TFAnalizerModule::event()
       B2DEBUG(10, "	Partner: " << boost::get<0>(thisEntry) << ", shares " << boost::get<1>(thisEntry) << " hits, thisTC has got " << boost::get<2>(thisEntry) << " dirty hits, " << boost::get<3>(thisEntry) << " hits are only in partner and they have a qualityRelation of " << boost::get<4>(thisEntry))
     }
     B2DEBUG(10, "-------------------------------------------------------------------------------")
-    if (caTC.finalAssignedID == -1) {  continue; }  // in this case, absolutely no hit of caTC is of any mcTC
+    if (caTC.finalAssignedID == -1) {  caTrackCandidates[caTC.indexNumber]->setMcTrackId(-1); continue; }  // in this case, absolutely no hit of caTC is of any mcTC
     if (caTC.numOfCorrectlyAssignedHits < m_PARAMminNumOfHitsThreshold) {
+      caTrackCandidates[caTC.indexNumber]->setMcTrackId(-1);
       printInfo(0, mcTcVector[caTC.finalAssignedID], caTC, rootVariables);
       continue;
     }
+
+    // adding MCiD-information to GFTrackCand (needed for trackFitChecker) and storing correctly recognized TC into new storearray:
+    caTrackCandidates[caTC.indexNumber]->setMcTrackId(mcTrackCandidates[mcTcVector[caTC.finalAssignedID].indexNumber]->getMcTrackId());
+    acceptedTrackCandidates.appendNew(*caTrackCandidates[caTC.indexNumber]);
 
     int totalHits = caTC.numOfCorrectlyAssignedHits + caTC.numOfBadAssignedHits;
     double trackQuality = double(caTC.numOfCorrectlyAssignedHits) / double(totalHits);
@@ -304,6 +317,9 @@ void TFAnalizerModule::event()
     B2DEBUG(1, " - ID " << ID.first << " recovered")
   }
   B2DEBUG(1, " the tested TrackFinder found " << numOfFoundIDs << " IDs within " << int(caTcVector.size()) << " TCs and lost " << int(mcTcVector.size() - foundIDs.size()))
+  int acceptedTCs = acceptedTrackCandidates.getEntries();
+  m_countAcceptedGFTCs += acceptedTCs;
+  B2DEBUG(1, " of " << numOfCaTCs << " TCs produced by the tested TrackFinder, " << acceptedTCs << " were recognized safely and stored into the container of accepted TCs")
 
   if (m_PARAMwriteToRoot == true) {
     m_rootTotalMCMomValues = rootVariables.totalMCMomValues;
@@ -337,7 +353,7 @@ void TFAnalizerModule::endRun()
   B2INFO("TFAnalizerModule-explanation: \n perfect recovery means: all hits of mc-TC found again and clean TC. \n clean recovery means: no foreign hits within TC. \n ghost means: QI was below threshold or mcTC was found more than once (e.g. because of curlers) \n found more than once means: that there was more than one TC which was assigned to the same mcTC but each of them were good enough for themselves to be classified as reconstructed")
 
   B2INFO("TFAnalizerModule: After " << m_eventCounter + 1 << " events there was a total number of " << m_mcTrackCounter << " mcTrackCandidates and " << m_totalRealHits << " realHits. Of these TCs, " << m_mcTrackVectorCounter << " mcTrackCandidates where used for analysis because of cutoffs.")
-  B2INFO("TFAnalizerModule: There were " << m_caTrackCounter << " caTrackCandidates, number of times where charge was guessed wrong: " << m_wrongChargeSignCounter << ", number of caTCs which produced a double entry: " << m_countedDoubleEntries)
+  B2INFO("TFAnalizerModule: There were " << m_caTrackCounter << " caTrackCandidates, of those " << m_countAcceptedGFTCs << " were stored in acceptedTCcontainer for further use, number of times where charge was guessed wrong: " << m_wrongChargeSignCounter << ", number of caTCs which produced a double entry: " << m_countedDoubleEntries)
   B2INFO("the VXDTF found (total/perfect/clean/ghost)" << m_countReconstructedTCs << "/" << m_countedPerfectRecoveries << "/" << m_countedCleanRecoveries << "/" << (m_caTrackCounter - m_countReconstructedTCs) << " TCs -> efficiency(total/perfect/clean/ghost): " << double(100 * m_countReconstructedTCs) / double(m_mcTrackVectorCounter) << "%/" << double(100 * m_countedPerfectRecoveries) / double(m_mcTrackVectorCounter) << "%/" << double(100 * m_countedCleanRecoveries) / double(m_mcTrackVectorCounter) << "/%" << double(100 * (m_caTrackCounter - m_countReconstructedTCs)) / double(m_countReconstructedTCs) << "%")
 
 

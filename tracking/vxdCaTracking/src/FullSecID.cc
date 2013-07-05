@@ -21,6 +21,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace Belle2::Tracking;
 
 const int FullSecID::LayerBits = 4;
 const int FullSecID::SubLayerBits = 1;

@@ -13,6 +13,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace Belle2::Tracking;
 
 
 bool NbFinderFilters::checkAngle3D(int nameAngle3D)

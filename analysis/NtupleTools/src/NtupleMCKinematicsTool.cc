@@ -22,7 +22,7 @@ void NtupleMCKinematicsTool::setupTree()
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     m_tree->Branch((strNames[iProduct] + "_TruthP").c_str(), &m_fTruthP[iProduct], (strNames[iProduct] + "_TruthP/F").c_str());
     m_fTruthP4[iProduct] = new float[4];
-    m_tree->Branch((strNames[iProduct] + "_TruthP4").c_str(), &m_fTruthP4[iProduct][0], (strNames[iProduct] + "_TruthP4/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_TruthP4").c_str(), &m_fTruthP4[iProduct][0], (strNames[iProduct] + "_TruthP4[4]/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_TruthM").c_str(), &m_fTruthM[iProduct], (strNames[iProduct] + "_TruthM/F").c_str());
   }
 }
@@ -46,8 +46,8 @@ void NtupleMCKinematicsTool::eval(const Particle* particle)
       m_fTruthP4[iProduct][0] = mcparticle_4vec.Px();
       m_fTruthP4[iProduct][1] = mcparticle_4vec.Py();
       m_fTruthP4[iProduct][2] = mcparticle_4vec.Pz();
-      m_fTruthP4[iProduct][3]  = mcparticle_4vec.Energy();
-      m_fTruthM[iProduct]  = mcparticle_4vec.M();
+      m_fTruthP4[iProduct][3]  = mcparticle->getEnergy();
+      m_fTruthM[iProduct]  = mcparticle->getMass();
     }
   }
 }

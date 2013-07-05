@@ -143,4 +143,9 @@
 			</Volumes>
 		</Content>
 	</DetectorComponent>
+	
+	<Tracking>
+		<xi:include href="VXDTFindexTB.xml"/>
+  </Tracking>
+
 </Detector>

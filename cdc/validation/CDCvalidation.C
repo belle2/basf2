@@ -1,14 +1,15 @@
 //
-//  CDCvalidation.C   ver. 0.1
-//                     30 May 2013
+//  CDCvalidation021.c 
+//    ROOT macro for validation      ver. 0.21
+//                      28 June 2013
 //                     Hiroki Kanda (Tohoku Univ.)
 //                     kanda@m.tains.tohoku.ac.jp
 //
 //    Usage: Batch mode 
-//           root -b CDCvalidation.C+O
+//           root -b CDCvalidation.c+O
 //                                  ~~ compilation for faster execution
 //           Interactive mode
-//           root [1] .L CDCvalidation.C+0
+//           root [1] .L CDCvalidation.c+0
 //           root [2] CDCvalidation()
 //
 //    The input root file, output root file, output drawing files
@@ -19,6 +20,12 @@
 //    after its execution. If you do not want to exit from root and
 //    reuse histograms independently, use FillHisto().
 //
+//  History of update
+//  30 May 2013    ver. 0.1   Release version (but still under construction)
+//  25 Jun 2013    ver. 0.2   TGraph -> TH1D 
+//                            histograms per super layer (saved in another root file)
+//  28 Jun 2013    ver. 0.21  Bug fix
+//
 
 
 #include "string.h"
@@ -26,8 +33,8 @@
 #include "TROOT.h"
 #include "TStyle.h"
 #include "TFile.h"
-#include "TTree.h"
 #include "TGraph.h"
+#include "TTree.h"
 #include "TF1.h"
 #include "TH1D.h"
 #include "TH2D.h"
@@ -41,9 +48,10 @@
 
 
 // Definitions of files
-const string cInRoot = "../EvtGenOutput.root";  // input root file
-const string cOutRoot = "test.root";            // output root file (histograms)
-const string cOutDraw = "test.pdf";             // output drawing file
+const string cInRoot = "EvtGenOutput.root";  // input root file
+const string cOutRootAll = "CDCvalidatationAll.root";      // output root file (all histograms)
+const string cOutRootSL  = "CDCvalidation.root";       // output root file (super layer histograms)
+const string cOutDraw = "CDCvaidation.pdf";             // output drawing file
                                                 //  filetype: ps or pdf 
 const string cOutDrawInit = cOutDraw+"(";
 const string cOutDrawFinal = cOutDraw+")";
@@ -100,13 +108,18 @@ TH1D *hHitPattern[MAXLAYER];
 TH1D *hTDC[MAXLAYER];
 TH1D *hADC[MAXLAYER], *hADCfit[MAXLAYER];
 TH2D *hADCTDC[MAXLAYER];
+TH1D *hHitPatternSL[MAXSUPERLAYER];
+TH1D *hTDCSL[MAXSUPERLAYER];
+TH1D *hADCSL[MAXLAYER];
+TH2D *hADCTDCSL[MAXLAYER];
 
-// Graphs 
+// Landau fitting results
 Double_t meanADC[MAXLAYER], sigmaADC[MAXLAYER], Layer[MAXLAYER];
-TGraph *gmeanADC, *gsigmaADC;
+TH1D *hmeanADC, *hsigmaADC;
 
 // Canvases
 TCanvas *cv[MAXSUPERLAYER];
+TCanvas *cvSL;
 TCanvas *cvsummary;
 
 
@@ -440,7 +453,9 @@ void FillADCTDC(Int_t iLayer)
 
 void FillHisto()
 {
-  for(Int_t iLayer = 0; iLayer < MAXLAYER; iLayer++){
+  Int_t iLayer=0;
+
+  for(iLayer = 0; iLayer < MAXLAYER; iLayer++){
     printf("\n\n *****  Currently filling %d  *****\n", iLayer);
     FillHitPattern(iLayer);
     FillTDC(iLayer);
@@ -452,16 +467,70 @@ void FillHisto()
     }
     FillADCTDC(iLayer);
   }
-  gmeanADC = new TGraph(MAXLAYER, Layer, meanADC);
-  gmeanADC->SetTitle("Mean of Landau peak");
-  gmeanADC->GetXaxis()->SetTitle("Layer");
-  gmeanADC->GetYaxis()->SetTitle("ADC count");
-  gmeanADC->SetMarkerStyle(20);
-  gsigmaADC = new TGraph(MAXLAYER, Layer, sigmaADC);
-  gsigmaADC->SetTitle("Sigma of Landau peak");
-  gsigmaADC->GetXaxis()->SetTitle("Layer");
-  gsigmaADC->GetYaxis()->SetTitle("ADC count");
-  gsigmaADC->SetMarkerStyle(20);
+
+  iLayer = 0;
+  for(Int_t iSL=0; iSL<MAXSUPERLAYER; iSL++){
+    Char_t Name[100], Title[100];
+
+    sprintf(Name, "hHitPatternSL%02d", iSL);
+    sprintf(Title, "Hit Pattern (Super Layer %2d)", iSL);
+    hHitPatternSL[iSL] = (TH1D*) hHitPattern[iLayer]->Clone();
+    hHitPatternSL[iSL]->SetName(Name);
+    hHitPatternSL[iSL]->SetTitle(Title);
+    hHitPatternSL[iSL]->SetAxisRange(0, RangeADC);
+    hHitPatternSL[iSL]->GetXaxis()->SetTitle("Cell");
+    hHitPatternSL[iSL]->GetYaxis()->SetTitle("Entries");
+
+    sprintf(Name, "hADCSL%02d", iSL);
+    sprintf(Title, "ADC (Super Layer %2d)", iSL);
+    hADCSL[iSL] = (TH1D*) hADC[iLayer]->Clone();
+    hADCSL[iSL]->SetName(Name);
+    hADCSL[iSL]->SetTitle(Title);
+    hADCSL[iSL]->SetAxisRange(0, RangeADC);
+    hADCSL[iSL]->GetXaxis()->SetTitle("ADC count");
+    hADCSL[iSL]->GetYaxis()->SetTitle("Entries");
+
+    sprintf(Name, "hTDCSL%02d", iSL);
+    sprintf(Title, "TDC (Super Layer %2d)", iSL);
+    hTDCSL[iSL] = (TH1D*) hTDC[iLayer]->Clone();
+    hTDCSL[iSL]->SetName(Name);
+    hTDCSL[iSL]->SetTitle(Title);
+    hTDCSL[iSL]->GetXaxis()->SetTitle("TDC count");
+    hTDCSL[iSL]->GetYaxis()->SetTitle("Entries");
+
+    sprintf(Name, "hADCTDCSL%02d", iSL);
+    sprintf(Title, "ADC-TDC (Super Layer %2d)", iSL);
+    hADCTDCSL[iSL] = (TH2D*) hADCTDC[iLayer]->Clone();
+    hADCTDCSL[iSL]->SetName(Name);
+    hADCTDCSL[iSL]->SetTitle(Title);
+    hADCTDCSL[iSL]->GetXaxis()->SetTitle("ADC count");
+    hADCTDCSL[iSL]->GetYaxis()->SetTitle("TDC count");
+
+    iLayer++;
+    Int_t MaxLL = MaxLocalLayer[iSL];
+    for(Int_t iLL=1; iLL < MaxLL; iLL ++){
+      hHitPatternSL[iSL]->Add(hHitPattern[iLayer]);
+      hADCSL[iSL]->Add(hADC[iLayer]);
+      hTDCSL[iSL]->Add(hTDC[iLayer]);
+      hADCTDCSL[iSL]->Add(hADCTDC[iLayer]);
+      iLayer++;
+    }
+  }
+
+  hmeanADC = new TH1D("hmeanADC", "Mean of Landau peak", MAXLAYER, -0.5, MAXLAYER-0.5);
+  hsigmaADC =new TH1D("hsigmaADC", "Sigma of Landau peak", MAXLAYER, -0.5, MAXLAYER-0.5);
+  
+  for(iLayer = 0; iLayer < MAXLAYER; iLayer++){
+    hmeanADC->Fill(Layer[iLayer], meanADC[iLayer]);
+    hsigmaADC->Fill(Layer[iLayer], sigmaADC[iLayer]);
+  }
+
+  hmeanADC->GetXaxis()->SetTitle("Layer");
+  hmeanADC->GetYaxis()->SetTitle("Mean (ADC count)");
+
+  hsigmaADC->GetXaxis()->SetTitle("Layer");
+  hsigmaADC->GetYaxis()->SetTitle("Sigma (ADC count)");
+
   return;
 }
 
@@ -507,12 +576,33 @@ void PlotHisto()
     }
   }
 
-  cvsummary = new TCanvas("csummary", "Summary of Fitting", 700, 800);
+  cvSL = new TCanvas("cvSL", "Histograms per Super Layer", 800, 1000);
+  cvSL->Divide(4, MAXSUPERLAYER);
+  for(Int_t iSL=0; iSL<MAXSUPERLAYER; iSL++){
+    Int_t cid = iSL*4+1;
+    cvSL->cd(cid);
+    hHitPatternSL[iSL]->Draw();
+    cid = iSL*4+2;
+    cvSL->cd(cid);
+    hTDCSL[iSL]->Draw();
+    cid = iSL*4+3;
+    cvSL->cd(cid);
+    hADCSL[iSL]->Draw();
+    cid = iSL*4+4;
+    cvSL->cd(cid);
+    hADCTDCSL[iSL]->Draw("col");
+  }
+  
+
+  cvsummary = new TCanvas("cvsummary", "Summary of Fitting", 700, 800);
   cvsummary->Divide(1,2);
   cvsummary->cd(1);
-  gmeanADC->Draw("AP");
-  Double_t ymax = gmeanADC->GetYaxis()->GetXmax();
-  Double_t ymin =  gmeanADC->GetYaxis()->GetXmin();
+  hmeanADC->Draw("P");
+  hmeanADC->SetStats(0);
+  hmeanADC->SetMarkerStyle(20);
+  Double_t ymax = hmeanADC->GetMaximum();
+  Double_t ymin = 0;
+  hmeanADC->SetMinimum(0);
   Double_t xborder;
   Int_t iborder = 0;
   for(Int_t iSL =0; iSL<MAXSUPERLAYER ; iSL++){
@@ -522,9 +612,12 @@ void PlotHisto()
     lborder_mean[iSL]->Draw();
   }
   cvsummary->cd(2);
-  gsigmaADC->Draw("AP");
-  ymax = gsigmaADC->GetYaxis()->GetXmax();
-  ymin =  gsigmaADC->GetYaxis()->GetXmin();
+  hsigmaADC->Draw("P");
+  hsigmaADC->SetStats(0);
+  hsigmaADC->SetMarkerStyle(20);
+  ymax = hsigmaADC->GetMaximum();
+  hsigmaADC->SetMinimum(0);
+  ymin = 0;
   iborder = 0;
   for(Int_t iSL =0; iSL<MAXSUPERLAYER ; iSL++){
     iborder += MaxLocalLayer[iSL];
@@ -554,6 +647,8 @@ void PrintHisto()
     cv[iSL]->SaveAs(cOutDraw.c_str());
   }
 
+  cvSL->SaveAs(cOutDraw.c_str());
+
   cvsummary->SaveAs(cOutDrawFinal.c_str());
 
   return;
@@ -563,7 +658,7 @@ void PrintHisto()
 void WriteHisto()
 {
 
-  TFile *flOutRoot = new TFile(cOutRoot.c_str(), "recreate");
+  TFile *flOutRoot = new TFile(cOutRootAll.c_str(), "recreate");
 
   for(Int_t iLayer = 0; iLayer<MAXLAYER; iLayer++){
     hHitPattern[iLayer]->Write();
@@ -573,11 +668,26 @@ void WriteHisto()
     hADCTDC[iLayer]->Write();
   }
 
-  gmeanADC->Write();
-  gsigmaADC->Write();
+  hmeanADC->Write();
+  hsigmaADC->Write();
 
   flOutRoot->Close();
-  
+
+
+  TFile *flOutRootSL = new TFile(cOutRootSL.c_str(), "recreate");
+
+  for(Int_t iSL = 0; iSL<MAXSUPERLAYER; iSL++){
+    hHitPatternSL[iSL]->Write();
+    hTDCSL[iSL]->Write();
+    hADCSL[iSL]->Write();
+    hADCTDCSL[iSL]->Write();
+  }
+
+  hmeanADC->Write();
+  hsigmaADC->Write();
+
+  flOutRootSL->Close();
+
   return;
 }
 

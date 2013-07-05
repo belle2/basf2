@@ -21,7 +21,7 @@ namespace Belle2 {
      *
      *  @return true, if duplicates are found
      */
-    bool makeBranchNamesUnique(std::vector<std::string> &stringlist);
+    bool makeBranchNamesUnique(std::vector<std::string>& stringlist);
 
 
     /** Names of trees. */

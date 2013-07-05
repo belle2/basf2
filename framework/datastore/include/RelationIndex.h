@@ -124,7 +124,7 @@ namespace Belle2 {
      *                    the given types
      *  @param durability Durabiliy of the relation
      */
-    RelationIndex(const StoreArray<FROM> &from, const StoreArray<TO> &to, const std::string& name = "",
+    RelationIndex(const StoreArray<FROM>& from, const StoreArray<TO>& to, const std::string& name = "",
                   DataStore::EDurability durability = DataStore::c_Event):
       m_index(RelationIndexManager::Instance().get<FROM, TO>(RelationArray(from, to, name, durability))),
       m_from(m_index.index().template get<0>()),
@@ -234,7 +234,7 @@ namespace Belle2 {
     size_t size() const { return m_index.index().size(); }
   protected:
     /** Reference to the IndexContainer. */
-    const RelationIndexContainer<FROM, TO> &m_index;
+    const RelationIndexContainer<FROM, TO>& m_index;
 
     /** Reference to the from index. */
     const index_from& m_from;

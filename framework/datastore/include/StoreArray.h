@@ -29,7 +29,7 @@ namespace Belle2 {
   class StoreArrayIterator : public std::iterator<std::input_iterator_tag, ValueType> {
   public:
     /** Constructor. */
-    explicit StoreArrayIterator(const StoreArray<ArrayType> *array, int index):
+    explicit StoreArrayIterator(const StoreArray<ArrayType>* array, int index):
       m_array(array),
       m_index(index)
     {}

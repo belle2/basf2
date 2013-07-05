@@ -57,9 +57,9 @@ namespace Belle2 {
   DEFINE_UNIT(fm  , Unit::m  * 1e-15); /**< [femtometers] */
 
 // area units
-  DEFINE_UNIT(m2  , Unit::m* Unit::m);       /**< [square meters] */
-  DEFINE_UNIT(cm2 , Unit::cm* Unit::cm);     /**< [square centimeters] */
-  DEFINE_UNIT(mm2 , Unit::mm* Unit::mm);     /**< [square millimeters] */
+  DEFINE_UNIT(m2  , Unit::m * Unit::m);      /**< [square meters] */
+  DEFINE_UNIT(cm2 , Unit::cm * Unit::cm);    /**< [square centimeters] */
+  DEFINE_UNIT(mm2 , Unit::mm * Unit::mm);    /**< [square millimeters] */
 
   DEFINE_UNIT(b   , Unit::m2 * 1e-28); /**< [barn] */
   DEFINE_UNIT(mb  , Unit::b  * 1e-3);  /**< [millibarn] */
@@ -70,9 +70,9 @@ namespace Belle2 {
   DEFINE_UNIT(ab  , Unit::b  * 1e-18); /**< [attobarn] */
 
 // volume units
-  DEFINE_UNIT(m3  , Unit::m* Unit::m* Unit::m);      /**< [cubic meters] */
-  DEFINE_UNIT(cm3 , Unit::cm* Unit::cm* Unit::cm);   /**< [cubic centimeters] */
-  DEFINE_UNIT(mm3 , Unit::mm* Unit::mm* Unit::mm);   /**< [cubic millimeters] */
+  DEFINE_UNIT(m3  , Unit::m * Unit::m * Unit::m);    /**< [cubic meters] */
+  DEFINE_UNIT(cm3 , Unit::cm * Unit::cm * Unit::cm); /**< [cubic centimeters] */
+  DEFINE_UNIT(mm3 , Unit::mm * Unit::mm * Unit::mm); /**< [cubic millimeters] */
 
 // time units
   DEFINE_UNIT(s   , Unit::ns * 1e9);   /**< [second] */
@@ -105,7 +105,7 @@ namespace Belle2 {
   DEFINE_UNIT_NAME(kg_mm3  , Unit::kg_cm3 / Unit::mm3, "kg/mm3"); /**< [kg/mm^3] */
 
 // magnetic field units
-  DEFINE_UNIT(TinStdUnits  , Unit::V* Unit::s / Unit::m2);  /**< [Vs/m^2] */
+  DEFINE_UNIT(TinStdUnits  , Unit::V * Unit::s / Unit::m2); /**< [Vs/m^2] */
 
   double Unit::convertValue(double value, const std::string& unitString)
   {

@@ -122,7 +122,7 @@ ModulePtr ModuleManager::registerModule(const string& moduleName, const std::str
     ModulePtr currModulePtr = moduleIter->second->createModule();
     m_createdModulesList.push_back(currModulePtr);
     return currModulePtr;
-  } else throw(ModuleNotCreatedError() << moduleName);
+  } else throw (ModuleNotCreatedError() << moduleName);
 }
 
 

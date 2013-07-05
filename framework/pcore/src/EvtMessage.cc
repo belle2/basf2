@@ -145,7 +145,8 @@ void EvtMessage::dest(int dest)
 }
 
 // Time stamp
-struct timeval EvtMessage::time() {
+struct timeval EvtMessage::time()
+{
   return (((EvtHeader*)m_data)->timestamp);
 }
 

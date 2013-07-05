@@ -137,7 +137,7 @@ namespace Belle2 {
         try {
           numValue = boost::lexical_cast<double>(tok);
         } catch (boost::bad_lexical_cast&) {
-          throw(ConversionError() << path << value.first);
+          throw (ConversionError() << path << value.first);
         }
         if (!value.second.empty()) {
           numValue = Unit::convertValue(numValue, value.second);
@@ -147,7 +147,7 @@ namespace Belle2 {
       return result;
     }
 
-    vector<double> Interface::getArray(const string& path, const vector<double> &defaultValue) const throw(ConversionError)
+    vector<double> Interface::getArray(const string& path, const vector<double>& defaultValue) const throw(ConversionError)
     {
       try {
         return getArray(path);

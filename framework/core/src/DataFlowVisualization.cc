@@ -117,8 +117,8 @@ void DataFlowVisualization::generateModulePlot(std::ofstream& file, const std::s
   if (foundInfoIter != m_moduleInfo.end()) {
     const MInfo& moduleInfo = foundInfoIter->second;
     for (int i = 0; i < MInfo::c_NEntryTypes; i++) {
-      const std::set<std::string> &entries = moduleInfo.entries[i];
-      const std::set<std::string> &relations = moduleInfo.relations[i];
+      const std::set<std::string>& entries = moduleInfo.entries[i];
+      const std::set<std::string>& relations = moduleInfo.relations[i];
       const std::string fillcolor = m_fillcolor[i];
       const std::string arrowcolor = m_arrowcolor[i];
 

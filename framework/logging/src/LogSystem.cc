@@ -163,7 +163,7 @@ LogSystem::LogSystem() :
   //enable color for TTYs with color support (list taken from gtest)
   const bool isTTY = isatty(fileno(stdout));
   const string termName = getenv("TERM") ? getenv("TERM") : "";
-  const bool useColor = isTTY and(
+  const bool useColor = isTTY and (
                           termName == "xterm" or
                           termName == "xterm-color" or
                           termName == "xterm-256color" or

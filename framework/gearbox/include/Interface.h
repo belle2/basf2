@@ -239,7 +239,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      std::vector<double> getArray(const std::string& path, const std::vector<double> &defaultValue) const throw(ConversionError);
+      std::vector<double> getArray(const std::string& path, const std::vector<double>& defaultValue) const throw(ConversionError);
 
 
       /**

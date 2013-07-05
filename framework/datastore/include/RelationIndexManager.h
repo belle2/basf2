@@ -38,14 +38,14 @@ namespace Belle2 {
      *  @param relation Relation to build an index for
      *  @returns A RelationIndexContainer
      */
-    template<class FROM, class TO> const RelationIndexContainer<FROM, TO> &get(const RelationArray& relation) {
+    template<class FROM, class TO> const RelationIndexContainer<FROM, TO>& get(const RelationArray& relation) {
       //do some type checking...
       relation.isValid();
 
       const std::string& name = relation.getName();
       DataStore::EDurability durability = relation.getDurability();
       RelationMap& relations =  m_cache[durability];
-      RelationIndexContainer<FROM, TO> *indexContainer(0);
+      RelationIndexContainer<FROM, TO>* indexContainer(0);
       RelationMap::iterator it = relations.find(name);
       if (it != relations.end()) {
         indexContainer = dynamic_cast< RelationIndexContainer<FROM, TO>* >(it->second);

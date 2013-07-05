@@ -308,8 +308,8 @@ namespace Belle2 {
       if (moduleParam->getTypeInfo() == typeid(T).name()) {
         ModuleParam<T>* explModParam = static_cast< ModuleParam<T>* >(moduleParam.get());
         return *explModParam;
-      } else throw(ModuleParameterTypeError() << name << moduleParam->getTypeInfo() << typeid(T).name());
-    } else throw(ModuleParameterNotFoundError() << name);
+      } else throw (ModuleParameterTypeError() << name << moduleParam->getTypeInfo() << typeid(T).name());
+    } else throw (ModuleParameterNotFoundError() << name);
   }
 
 } //end of Belle2 namespace

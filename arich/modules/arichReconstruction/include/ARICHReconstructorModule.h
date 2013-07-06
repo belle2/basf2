@@ -103,7 +103,7 @@ namespace Belle2 {
         \param tracks Internal ARICH vector reference.
         \param hypothesis The hypothesis for the particle.
        */
-      void getTracks(std::vector<ARICHTrack> & tracks, Const::ChargedStable hypothesis);
+      void getTracks(std::vector<ARICHTrack>& tracks, Const::ChargedStable hypothesis);
 
     };
 

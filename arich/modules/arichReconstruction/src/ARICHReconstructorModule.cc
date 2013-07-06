@@ -77,7 +77,7 @@ namespace Belle2 {
       addParam("backgroundLevel", m_backgroundLevel, "Background level in photon hits per m^2", 0.0);
       addParam("singleResolution", m_singleResolution, "Single photon resolution without pad", 0.03 * Unit::mm);
       addParam("aerogelMerit", m_aerogelMerit, "Aerogel figure of merit", defMerit);
-      addParam("inputTrackType", m_inputTrackType, "Input tracks from the tracking (0) or from simulation (1)", 0);
+      addParam("inputTrackType", m_inputTrackType, "Input tracks from the tracking (0) or from AeroHit (1)", 0);
     }
 
     ARICHReconstructorModule::~ARICHReconstructorModule()
@@ -234,7 +234,7 @@ namespace Belle2 {
       B2INFO("Input from " << input[m_inputTrackType]);
     }
 
-    void ARICHReconstructorModule::getTracks(std::vector<ARICHTrack> & tracks,
+    void ARICHReconstructorModule::getTracks(std::vector<ARICHTrack>& tracks,
                                              Const::ChargedStable hypothesis)
     {
       ExtDetectorID myDetID = EXT_ARICH; // arich
@@ -254,7 +254,7 @@ namespace Belle2 {
         const ARICHAeroHit* aeroHit = DataStore::getRelated<ARICHAeroHit>(particle);
         int aeroHitIndex = -1;
         if (aeroHit) aeroHitIndex = aeroHit->getArrayIndex();
-        int truePDGCode = 0;
+        int truePDGCode = -1;
         if (particle) truePDGCode = particle->getPDG();
 
         RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);

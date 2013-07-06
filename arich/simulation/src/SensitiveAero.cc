@@ -47,16 +47,18 @@ namespace Belle2 {
       // Get track parameters
 
       G4Track* aTrack = aStep->GetTrack();
-      G4StepPoint* PrePosition =  aStep->GetPreStepPoint();
-      G4ThreeVector worldPosition = PrePosition->GetPosition();
+      //G4StepPoint* PrePosition =  aStep->GetPreStepPoint();
+      G4StepPoint* PostPosition = aStep->GetPostStepPoint();
+      G4ThreeVector worldPosition = PostPosition->GetPosition();
       G4ParticleDefinition* particle = aTrack->GetDefinition();
       G4double  PDGCharge = particle->GetPDGCharge();
-      G4ThreeVector momentum = PrePosition->GetMomentum();
+      G4ThreeVector momentum = PostPosition->GetMomentum();
       // Save only tracks of charged particles
-      if (PDGCharge == 0) return(true);
+      if (PDGCharge == 0) return (true);
 
       // Track parameters are saved at the entrance in aerogel
-      if (((PrePosition->GetStepStatus() == fGeomBoundary)) && (momentum.z() > 0)) {
+      //if (((PrePosition->GetStepStatus() == fGeomBoundary)) && (momentum.z() > 0)) {
+      if ((PostPosition->GetStepStatus() == fGeomBoundary) && (momentum.z() > 0.0)) {
 
         /*       B2INFO ("SensAero: " << aTrack->GetDefinition()->GetParticleName()
            << " " << aTrack->GetTrackID()
@@ -70,7 +72,7 @@ namespace Belle2 {
         int trackID = aTrack->GetTrackID();
         int  PDGEncoding = particle->GetPDGEncoding();
 
-        G4ThreeVector localPosition = PrePosition->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
+        G4ThreeVector localPosition = PostPosition->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
         TVector3 TPosition(worldPosition.x() * Unit::mm, worldPosition.y() * Unit::mm, worldPosition.z() * Unit::mm);
         TVector3 TMomentum(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV , momentum.z() * Unit::MeV);
 

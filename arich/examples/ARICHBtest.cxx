@@ -48,7 +48,7 @@ h2d->SetTitle("Cherenkov space;tx[rad];ty[rad]");
 h2d->Draw("colz");
 //h2d->Draw();
 
-TArc *krog= new TArc(0,0,0.1); krog->SetFillStyle(4000);krog->Draw();
+//TArc *krog= new TArc(0,0,0.31); krog->SetFillStyle(4000);krog->Draw();
 
 main->cd(6);
 hits->Draw("y:x","mir==0","box");

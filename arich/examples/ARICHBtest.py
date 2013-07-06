@@ -134,6 +134,8 @@ geosaver.param('Filename', 'Belle2Geo.root')
 arichrec = register_module('ARICHReconstructor')
 arichrec.param('inputTrackType', 1)
 arichrec.param('debug', 3)
+arichrec.param('trackPositionResolution', 0.0)
+arichrec.param('trackAngleResolution', 0.0)
 
 profile = register_module('Profile')
 profile.param('outputFileName', 'profileusage.ps')

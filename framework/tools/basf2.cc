@@ -80,7 +80,7 @@ void executePythonFile(const string& pythonFile)
 
     exec_file(boost::python::str(fullPath.string()), main_namespace, main_namespace);
   } else {
-    B2ERROR("The given filename and/or path is not valid: " + pythonFile);
+    B2FATAL("The given filename and/or path is not valid: " + pythonFile);
   }
 }
 

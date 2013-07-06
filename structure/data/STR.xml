@@ -2,82 +2,299 @@
 <DetectorComponent name="STR" xmlns:xi="http://www.w3.org/2001/XInclude">
     <Creator library="structure">STRCreator</Creator>
     <Content>
-	<Rotation desc="Rotation of the structure with respect to the Detector" unit="rad">0.0</Rotation>
-	<OffsetZ desc="The offset of the Structure in z with respect to the IP" unit="cm">47.0</OffsetZ>
-	<Material desc="Starting material of Structure Vessel">Air</Material>
-		
-	<Poletip>
-		<Material desc="material of the Pole tip of the Belle II detector">Iron</Material>
+	<PolePieceL description="PolePiece L-side">
+	  <Material>Fe</Material>
+	  <Plane>
+	    <posZ unit="mm">-3151</posZ>
+	    <innerRadius unit="mm">950</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-2927.5</posZ>
+	    <innerRadius unit="mm">950</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-2927.5</posZ>
+	    <innerRadius unit="mm">850</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-2730</posZ>
+	    <innerRadius unit="mm">850</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-2730</posZ>
+	    <innerRadius unit="mm">700</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-2477.5</posZ>
+	    <innerRadius unit="mm">700</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-2477.5</posZ>
+	    <innerRadius unit="mm">600</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-2237.5</posZ>
+	    <innerRadius unit="mm">360</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-1945</posZ>
+	    <innerRadius unit="mm">360</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-1855</posZ>
+	    <innerRadius unit="mm">270</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-1577.5</posZ>
+	    <innerRadius unit="mm">270</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-1477.5</posZ>
+	    <innerRadius unit="mm">270</innerRadius>
+	    <outerRadius unit="mm">1150</outerRadius>  
+	  </Plane>
+	</PolePieceL>
+
+	<PolePieceR description="PolePiece R-side">
+	  <Material>Fe</Material>
+	  <Plane>
+	    <posZ unit="mm">2417.5</posZ>
+	    <innerRadius unit="mm">367</innerRadius>
+	    <outerRadius unit="mm">1150</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">2517.5</posZ>
+	    <innerRadius unit="mm">367</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">3184.5</posZ>
+	    <innerRadius unit="mm">367</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">3417.5</posZ>
+	    <innerRadius unit="mm">600</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">3417.5</posZ>
+	    <innerRadius unit="mm">700</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">3670</posZ>
+	    <innerRadius unit="mm">700</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">3670</posZ>
+	    <innerRadius unit="mm">850</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">3867.5</posZ>
+	    <innerRadius unit="mm">850</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">3867.5</posZ>
+	    <innerRadius unit="mm">950</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">4091</posZ>
+	    <innerRadius unit="mm">950</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	</PolePieceR>
+
+        <Phi unit="deg">0</Phi>
+        <Dphi unit="deg">360.0</Dphi>
+
+	<!--<ShieldR1>
+		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
 		<Phi unit="deg">0</Phi>
 		<Dphi unit="deg">360.0</Dphi>
 		<ZBoundary id="1">
-			<Zposition unit="cm">194.75</Zposition>
-			<InnerRadius unit="cm">50.0</InnerRadius>
-			<OuterRadius unit="cm">115.0</OuterRadius>
+			<Zposition unit="cm">206</Zposition>
+			<InnerRadius unit="cm">42.0</InnerRadius>
+			<OuterRadius unit="cm">42.0</OuterRadius>
 		</ZBoundary>
 		<ZBoundary id="2">
-			<Zposition unit="cm">204.75</Zposition>
-			<InnerRadius unit="cm">50.0</InnerRadius>
-			<OuterRadius unit="cm">125.0</OuterRadius>
+			<Zposition unit="cm">216</Zposition>
+			<InnerRadius unit="cm">42.0</InnerRadius>
+			<OuterRadius unit="cm">44.5</OuterRadius>
 		</ZBoundary>
 		<ZBoundary id="3">
-			<Zposition unit="cm">230.0</Zposition>
-			<InnerRadius unit="cm">50.0</InnerRadius>
-			<OuterRadius unit="cm">125.0</OuterRadius>
+			<Zposition unit="cm">240</Zposition>
+			<InnerRadius unit="cm">42.0</InnerRadius>
+			<OuterRadius unit="cm">44.5</OuterRadius>
 		</ZBoundary>
-		<ZBoundary id="4">
-			<Zposition unit="cm">230.0</Zposition>
-			<InnerRadius unit="cm">50.0</InnerRadius>
-			<OuterRadius unit="cm">128.0</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="5">
-			<Zposition unit="cm">262.0</Zposition>
-			<InnerRadius unit="cm">50.0</InnerRadius>
-			<OuterRadius unit="cm">128.0</OuterRadius>
-		</ZBoundary>
-	</Poletip>
-
-	<Poletip2>
-		<Material desc="material of the Pole tip of the Belle II detector">Iron</Material>
+	</ShieldR1>
+	<ShieldR2>
+		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
 		<Phi unit="deg">0</Phi>
 		<Dphi unit="deg">360.0</Dphi>
 		<ZBoundary id="1">
-			<Zposition unit="cm">262.0</Zposition>
-			<InnerRadius unit="cm">55.0</InnerRadius>
-			<OuterRadius unit="cm">128.0</OuterRadius>
+			<Zposition unit="cm">216</Zposition>
+			<InnerRadius unit="cm">44.5</InnerRadius>
+			<OuterRadius unit="cm">44.5</OuterRadius>
 		</ZBoundary>
 		<ZBoundary id="2">
-			<Zposition unit="cm">278.0</Zposition>
-			<InnerRadius unit="cm">55.0</InnerRadius>
-			<OuterRadius unit="cm">128.0</OuterRadius>
+			<Zposition unit="cm">226</Zposition>
+			<InnerRadius unit="cm">44.5</InnerRadius>
+			<OuterRadius unit="cm">47.0</OuterRadius>
 		</ZBoundary>
 		<ZBoundary id="3">
-			<Zposition unit="cm">278.0</Zposition>
-			<InnerRadius unit="cm">60.0</InnerRadius>
-			<OuterRadius unit="cm">128.0</OuterRadius>
+			<Zposition unit="cm">240</Zposition>
+			<InnerRadius unit="cm">44.5</InnerRadius>
+			<OuterRadius unit="cm">47.0</OuterRadius>
 		</ZBoundary>
-		<ZBoundary id="4">
-			<Zposition unit="cm">323.0</Zposition>
-			<InnerRadius unit="cm">60.0</InnerRadius>
-			<OuterRadius unit="cm">128.0</OuterRadius>
-		</ZBoundary>
-	</Poletip2>
-
-	<Poletip3>
-		<Material desc="material of the Pole tip of the Belle II detector">Iron</Material>
+	</ShieldR2>
+	<ShieldL1>
+		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
 		<Phi unit="deg">0</Phi>
 		<Dphi unit="deg">360.0</Dphi>
 		<ZBoundary id="1">
-			<Zposition unit="cm">323.0</Zposition>
-			<InnerRadius unit="cm">85.0</InnerRadius>
-			<OuterRadius unit="cm">128.0</OuterRadius>
+			<Zposition unit="cm">-145</Zposition>
+			<InnerRadius unit="cm">46.5</InnerRadius>
+			<OuterRadius unit="cm">49</OuterRadius>
 		</ZBoundary>
 		<ZBoundary id="2">
-			<Zposition unit="cm">362.1</Zposition>
-			<InnerRadius unit="cm">85.0</InnerRadius>
-			<OuterRadius unit="cm">128.0</OuterRadius>
+			<Zposition unit="cm">-114</Zposition>
+			<InnerRadius unit="cm">46.5</InnerRadius>
+			<OuterRadius unit="cm">49.0</OuterRadius>
 		</ZBoundary>
-	</Poletip3>
+		<ZBoundary id="3">
+			<Zposition unit="cm">-108</Zposition>
+			<InnerRadius unit="cm">46.5</InnerRadius>
+			<OuterRadius unit="cm">46.5</OuterRadius>
+		</ZBoundary>
+	</ShieldL1>
+	<ShieldL2>
+		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
+		<Phi unit="deg">0</Phi>
+		<Dphi unit="deg">360.0</Dphi>
+		<ZBoundary id="1">
+			<Zposition unit="cm">-145</Zposition>
+			<InnerRadius unit="cm">49.0</InnerRadius>
+			<OuterRadius unit="cm">51.5</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="2">
+			<Zposition unit="cm">-120</Zposition>
+			<InnerRadius unit="cm">49.0</InnerRadius>
+			<OuterRadius unit="cm">51.0</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="3">
+			<Zposition unit="cm">-114</Zposition>
+			<InnerRadius unit="cm">49.0</InnerRadius>
+			<OuterRadius unit="cm">49.0</OuterRadius>
+		</ZBoundary>
+	</ShieldL2>-->
+
+	<!-- both2 -->
+	<ShieldR1>
+		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
+		<Phi unit="deg">0</Phi>
+		<Dphi unit="deg">360.0</Dphi>
+		<ZBoundary id="1">
+			<Zposition unit="cm">216</Zposition>
+			<InnerRadius unit="cm">42.0</InnerRadius>
+			<OuterRadius unit="cm">42.0</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="2">
+			<Zposition unit="cm">226</Zposition>
+			<InnerRadius unit="cm">42.0</InnerRadius>
+			<OuterRadius unit="cm">44.5</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="3">
+			<Zposition unit="cm">240</Zposition>
+			<InnerRadius unit="cm">42.0</InnerRadius>
+			<OuterRadius unit="cm">44.5</OuterRadius>
+		</ZBoundary>
+	</ShieldR1>
+	<ShieldR2>
+		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
+		<Phi unit="deg">0</Phi>
+		<Dphi unit="deg">360.0</Dphi>
+		<ZBoundary id="1">
+			<Zposition unit="cm">206</Zposition>
+			<InnerRadius unit="cm">42.0</InnerRadius>
+			<OuterRadius unit="cm">42.0</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="2">
+			<Zposition unit="cm">216</Zposition>
+			<InnerRadius unit="cm">42.0</InnerRadius>
+			<OuterRadius unit="cm">44.5</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="3">
+			<Zposition unit="cm">226</Zposition>
+			<InnerRadius unit="cm">44.5</InnerRadius>
+			<OuterRadius unit="cm">47.0</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="4">
+			<Zposition unit="cm">240</Zposition>
+			<InnerRadius unit="cm">44.5</InnerRadius>
+			<OuterRadius unit="cm">47.0</OuterRadius>
+		</ZBoundary>
+	</ShieldR2>
+	<ShieldL1>
+		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
+		<Phi unit="deg">0</Phi>
+		<Dphi unit="deg">360.0</Dphi>
+		<ZBoundary id="1">
+			<Zposition unit="cm">-145</Zposition>
+			<InnerRadius unit="cm">46.5</InnerRadius>
+			<OuterRadius unit="cm">49</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="2">
+			<Zposition unit="cm">-120</Zposition>
+			<InnerRadius unit="cm">46.5</InnerRadius>
+			<OuterRadius unit="cm">49.0</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="3">
+			<Zposition unit="cm">-114</Zposition>
+			<InnerRadius unit="cm">46.5</InnerRadius>
+			<OuterRadius unit="cm">46.5</OuterRadius>
+		</ZBoundary>
+	</ShieldL1>
+	<ShieldL2>
+		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
+		<Phi unit="deg">0</Phi>
+		<Dphi unit="deg">360.0</Dphi>
+		<ZBoundary id="1">
+			<Zposition unit="cm">-145</Zposition>
+			<InnerRadius unit="cm">49.0</InnerRadius>
+			<OuterRadius unit="cm">51.5</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="2">
+			<Zposition unit="cm">-120</Zposition>
+			<InnerRadius unit="cm">49.0</InnerRadius>
+			<OuterRadius unit="cm">51.5</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="3">
+			<Zposition unit="cm">-114</Zposition>
+			<InnerRadius unit="cm">46.5</InnerRadius>
+			<OuterRadius unit="cm">49.0</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="4">
+			<Zposition unit="cm">-108</Zposition>
+			<InnerRadius unit="cm">46.5</InnerRadius>
+			<OuterRadius unit="cm">46.5</OuterRadius>
+		</ZBoundary>
+	</ShieldL2>
 
     </Content>
 </DetectorComponent>

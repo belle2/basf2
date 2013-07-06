@@ -1,3 +1,4 @@
+
 /**************************************************************************
  *  BASF2 (Belle Analysis Framework 2)                                    *
  *  Copyright(C) 2010 - Belle II Collaboration                            *
@@ -66,73 +67,94 @@ namespace Belle2 {
     void GeoSTRCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
     {
 
-      // --- Collect global parameters
-      //double GlobalRotAngle = content.getAngle("Rotation") / Unit::rad;
-      double GlobalOffsetZ  = content.getLength("OffsetZ") / Unit::mm;
+      GearDir cPolePieceL(content, "PolePieceL");
+      double PolePieceL_minZ(0), PolePieceL_maxZ(0);
+      G4Polycone* geo_PolePieceL = geometry::createPolyCone("geo_PolePieceL_name", cPolePieceL, PolePieceL_minZ, PolePieceL_maxZ);
+      string strMat_PolePieceL = cPolePieceL.getString("Material", "Air");
+      G4Material* mat_PolePieceL = Materials::get(strMat_PolePieceL);
+      G4LogicalVolume* logi_PolePieceL = new G4LogicalVolume(geo_PolePieceL, mat_PolePieceL, "logi_PolePieceL_name");
+      setColor(*logi_PolePieceL, "#CC0000");
+      //setVisibility(*logi_PolePieceL, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_PolePieceL, "phys_PolePieceL", &topVolume, false, 0);
 
-      double m_phi = content.getAngle("Poletip/Phi") / Unit::rad;
-      double m_dphi = content.getAngle("Poletip/Dphi") / Unit::rad;
+      GearDir cPolePieceR(content, "PolePieceR");
+      double PolePieceR_minZ(0), PolePieceR_maxZ(0);
+      G4Polycone* geo_PolePieceR = geometry::createPolyCone("geo_PolePieceR_name", cPolePieceR, PolePieceR_minZ, PolePieceR_maxZ);
+      string strMat_PolePieceR = cPolePieceR.getString("Material", "Air");
+      G4Material* mat_PolePieceR = Materials::get(strMat_PolePieceR);
+      G4LogicalVolume* logi_PolePieceR = new G4LogicalVolume(geo_PolePieceR, mat_PolePieceR, "logi_PolePieceR_name");
+      setColor(*logi_PolePieceR, "#CC0000");
+      //setVisibility(*logi_PolePieceR, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_PolePieceR, "phys_PolePieceR", &topVolume, false, 0);
 
-      int m_nBoundary = content.getNumberNodes("Poletip/ZBoundary");
 
-      double m_z[m_nBoundary];
-      double m_rmin[m_nBoundary];
-      double m_rmax[m_nBoundary];
-      for (int izBoundary  = 0; izBoundary < m_nBoundary; izBoundary++) {
-        m_z[izBoundary]    = content.getLength((boost::format("Poletip/ZBoundary[%1%]/Zposition") % (izBoundary + 1)).str()) / Unit::mm;
-        m_rmin[izBoundary] = content.getLength((boost::format("Poletip/ZBoundary[%1%]/InnerRadius") % (izBoundary + 1)).str()) / Unit::mm;
-        m_rmax[izBoundary] = content.getLength((boost::format("Poletip/ZBoundary[%1%]/OuterRadius") % (izBoundary + 1)).str()) / Unit::mm;
+      double m_phi = content.getAngle("Phi") / Unit::rad;
+      double m_dphi = content.getAngle("Dphi") / Unit::rad;
+
+      int m_nBoundarySR1 = content.getNumberNodes("ShieldR1/ZBoundary");
+      double m_zSR1[m_nBoundarySR1];
+      double m_rminSR1[m_nBoundarySR1];
+      double m_rmaxSR1[m_nBoundarySR1];
+      for (int izBoundary  = 0; izBoundary < m_nBoundarySR1; izBoundary++) {
+        m_zSR1[izBoundary]    = content.getLength((boost::format("ShieldR1/ZBoundary[%1%]/Zposition") % (izBoundary + 1)).str()) / Unit::mm;
+        m_rminSR1[izBoundary] = content.getLength((boost::format("ShieldR1/ZBoundary[%1%]/InnerRadius") % (izBoundary + 1)).str()) / Unit::mm;
+        m_rmaxSR1[izBoundary] = content.getLength((boost::format("ShieldR1/ZBoundary[%1%]/OuterRadius") % (izBoundary + 1)).str()) / Unit::mm;
+      }
+      int m_nBoundarySR2 = content.getNumberNodes("ShieldR2/ZBoundary");
+      double m_zSR2[m_nBoundarySR2];
+      double m_rminSR2[m_nBoundarySR2];
+      double m_rmaxSR2[m_nBoundarySR2];
+      for (int izBoundary  = 0; izBoundary < m_nBoundarySR2; izBoundary++) {
+        m_zSR2[izBoundary]    = content.getLength((boost::format("ShieldR2/ZBoundary[%1%]/Zposition") % (izBoundary + 1)).str()) / Unit::mm;
+        m_rminSR2[izBoundary] = content.getLength((boost::format("ShieldR2/ZBoundary[%1%]/InnerRadius") % (izBoundary + 1)).str()) / Unit::mm;
+        m_rmaxSR2[izBoundary] = content.getLength((boost::format("ShieldR2/ZBoundary[%1%]/OuterRadius") % (izBoundary + 1)).str()) / Unit::mm;
+      }
+      int m_nBoundarySL1 = content.getNumberNodes("ShieldL1/ZBoundary");
+      double m_zSL1[m_nBoundarySL1];
+      double m_rminSL1[m_nBoundarySL1];
+      double m_rmaxSL1[m_nBoundarySL1];
+      for (int izBoundary  = 0; izBoundary < m_nBoundarySL1; izBoundary++) {
+        m_zSL1[izBoundary]    = content.getLength((boost::format("ShieldL1/ZBoundary[%1%]/Zposition") % (izBoundary + 1)).str()) / Unit::mm;
+        m_rminSL1[izBoundary] = content.getLength((boost::format("ShieldL1/ZBoundary[%1%]/InnerRadius") % (izBoundary + 1)).str()) / Unit::mm;
+        m_rmaxSL1[izBoundary] = content.getLength((boost::format("ShieldL1/ZBoundary[%1%]/OuterRadius") % (izBoundary + 1)).str()) / Unit::mm;
+      }
+      int m_nBoundarySL2 = content.getNumberNodes("ShieldL2/ZBoundary");
+      double m_zSL2[m_nBoundarySL2];
+      double m_rminSL2[m_nBoundarySL2];
+      double m_rmaxSL2[m_nBoundarySL2];
+      for (int izBoundary  = 0; izBoundary < m_nBoundarySL2; izBoundary++) {
+        m_zSL2[izBoundary]    = content.getLength((boost::format("ShieldL2/ZBoundary[%1%]/Zposition") % (izBoundary + 1)).str()) / Unit::mm;
+        m_rminSL2[izBoundary] = content.getLength((boost::format("ShieldL2/ZBoundary[%1%]/InnerRadius") % (izBoundary + 1)).str()) / Unit::mm;
+        m_rmaxSL2[izBoundary] = content.getLength((boost::format("ShieldL2/ZBoundary[%1%]/OuterRadius") % (izBoundary + 1)).str()) / Unit::mm;
       }
 
-      int m_nBoundary2 = content.getNumberNodes("Poletip2/ZBoundary");
-      double m_z2[m_nBoundary2];
-      double m_rmin2[m_nBoundary2];
-      double m_rmax2[m_nBoundary2];
-      for (int izBoundary  = 0; izBoundary < m_nBoundary2; izBoundary++) {
-        m_z2[izBoundary]    = content.getLength((boost::format("Poletip2/ZBoundary[%1%]/Zposition") % (izBoundary + 1)).str()) / Unit::mm;
-        m_rmin2[izBoundary] = content.getLength((boost::format("Poletip2/ZBoundary[%1%]/InnerRadius") % (izBoundary + 1)).str()) / Unit::mm;
-        m_rmax2[izBoundary] = content.getLength((boost::format("Poletip2/ZBoundary[%1%]/OuterRadius") % (izBoundary + 1)).str()) / Unit::mm;
-      }
+      G4Polycone* ShieldPconR1 =
+        new G4Polycone("ShieldOR1", m_phi, m_dphi, m_nBoundarySR1, m_zSR1, m_rminSR1, m_rmaxSR1);
+      G4Polycone* ShieldPconR2 =
+        new G4Polycone("ShieldOR2", m_phi, m_dphi, m_nBoundarySR2, m_zSR2, m_rminSR2, m_rmaxSR2);
+      G4Polycone* ShieldPconL1 =
+        new G4Polycone("ShieldOL1", m_phi, m_dphi, m_nBoundarySL1, m_zSL1, m_rminSL1, m_rmaxSL1);
+      G4Polycone* ShieldPconL2 =
+        new G4Polycone("ShieldOR2", m_phi, m_dphi, m_nBoundarySL2, m_zSL2, m_rminSL2, m_rmaxSL2);
 
-      int m_nBoundary3 = content.getNumberNodes("Poletip3/ZBoundary");
-      double m_z3[m_nBoundary3];
-      double m_rmin3[m_nBoundary3];
-      double m_rmax3[m_nBoundary3];
-      for (int izBoundary  = 0; izBoundary < m_nBoundary3; izBoundary++) {
-        m_z3[izBoundary]    = content.getLength((boost::format("Poletip3/ZBoundary[%1%]/Zposition") % (izBoundary + 1)).str()) / Unit::mm;
-        m_rmin3[izBoundary] = content.getLength((boost::format("Poletip3/ZBoundary[%1%]/InnerRadius") % (izBoundary + 1)).str()) / Unit::mm;
-        m_rmax3[izBoundary] = content.getLength((boost::format("Poletip3/ZBoundary[%1%]/OuterRadius") % (izBoundary + 1)).str()) / Unit::mm;
-      }
+      G4LogicalVolume* ShieldLVR1 =
+        new G4LogicalVolume(ShieldPconR1, Materials::get("G4_Pb"), "LVShieldR1", 0, 0, 0);
+      //new G4LogicalVolume(ShieldPconR1, Materials::get("G4_POLYETHYLENE"), "LVShieldR1", 0, 0, 0);
+      G4LogicalVolume* ShieldLVR2 =
+        //new G4LogicalVolume(ShieldPconR2, Materials::get("G4_Pb"), "LVShieldR2", 0, 0, 0);
+        new G4LogicalVolume(ShieldPconR2, Materials::get("G4_POLYETHYLENE"), "LVShieldR2", 0, 0, 0);
+      G4LogicalVolume* ShieldLVL1 =
+        new G4LogicalVolume(ShieldPconL1, Materials::get("G4_Pb"), "LVShieldL1", 0, 0, 0);
+      //new G4LogicalVolume(ShieldPconL1, Materials::get("G4_POLYETHYLENE"), "LVShieldL1", 0, 0, 0);
+      G4LogicalVolume* ShieldLVL2 =
+        //new G4LogicalVolume(ShieldPconL2, Materials::get("G4_Pb"), "LVShieldL2", 0, 0, 0);
+        new G4LogicalVolume(ShieldPconL2, Materials::get("G4_POLYETHYLENE"), "LVShieldL2", 0, 0, 0);
 
-      //G4Polyhedra with more than 5 boundaries does not work with dawncut ???
-      G4Polycone* PoleTipPcon =
-        new G4Polycone("PoleTipO", m_phi, m_dphi, m_nBoundary, m_z, m_rmin, m_rmax);
-      G4Polycone* PoleTipPcon2 =
-        new G4Polycone("PoleTipO2", m_phi, m_dphi, m_nBoundary2, m_z2, m_rmin2, m_rmax2);
-      G4Polycone* PoleTipPcon3 =
-        new G4Polycone("PoleTipO3", m_phi, m_dphi, m_nBoundary3, m_z3, m_rmin3, m_rmax3);
+      //new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVR1, "PVShieldR1", &topVolume, false, 0);
+      //new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVR2, "PVShieldR2", &topVolume, false, 0);
+      //new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVL1, "PVShieldL1", &topVolume, false, 0);
+      //new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVL2, "PVShieldL2", &topVolume, false, 0);
 
-      G4LogicalVolume* PoleTipLV =
-        new G4LogicalVolume(PoleTipPcon, Materials::get("G4_Fe"), "LVPoleTip", 0, 0, 0);
-      G4LogicalVolume* PoleTipLV2 =
-        new G4LogicalVolume(PoleTipPcon2, Materials::get("G4_Fe"), "LVPoleTip2", 0, 0, 0);
-      G4LogicalVolume* PoleTipLV3 =
-        new G4LogicalVolume(PoleTipPcon3, Materials::get("G4_Fe"), "LVPoleTip3", 0, 0, 0);
-
-      G4RotationMatrix rotation(0.0, 0.0, 0.0);
-      G4ThreeVector translation(0.0, 0.0, GlobalOffsetZ);
-      G4Transform3D transform3(rotation, translation);
-
-      new G4PVPlacement(transform3, PoleTipLV, "PVPoleTip", &topVolume, false, 1);
-      new G4PVPlacement(transform3, PoleTipLV2, "PVPoleTip2", &topVolume, false, 1);
-      new G4PVPlacement(transform3, PoleTipLV3, "PVPoleTip3", &topVolume, false, 1);
-
-      G4RotationMatrix rotation2(0.0, M_PI, 0.0);
-      G4Transform3D transform6(rotation2, translation);
-
-      new G4PVPlacement(transform6, PoleTipLV, "PVPoleTip", &topVolume, false, 2);
-      new G4PVPlacement(transform6, PoleTipLV2, "PVPoleTip2", &topVolume, false, 2);
-      new G4PVPlacement(transform6, PoleTipLV3, "PVPoleTip3", &topVolume, false, 2);
     }
   }
 }

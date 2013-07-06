@@ -22,6 +22,8 @@
 #include <TGInputDialog.h>
 #include <TGTextEntry.h>
 #include <TGLViewer.h>
+#include <TObjArray.h>
+#include <TObjString.h>
 #include <TROOT.h>
 #include <TSystem.h>
 
@@ -52,7 +54,7 @@ DisplayUI::DisplayUI(bool automatic):
   browser->SetWindowName("Event Display");
   browser->HideBottomTab();
   browser->StartEmbedding(TRootBrowser::kRight);
-  m_viewer = new SplitGLView(gClient->GetRoot(), 800, 700);
+  m_viewer = new SplitGLView();
   browser->StopEmbedding();
 
   m_eventData = new TEveElementList();
@@ -64,7 +66,7 @@ DisplayUI::~DisplayUI()
   delete m_timer;
 }
 
-void DisplayUI::addParameter(const std::string& label, ModuleParam<bool> &param)
+void DisplayUI::addParameter(const std::string& label, ModuleParam<bool>& param)
 {
   m_paramList.push_back(make_pair(label, &param));
 }

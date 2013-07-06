@@ -1,3 +1,5 @@
+#include <framework/core/utilities.h>
+
 #include <iostream>
 #include <cstdlib>
 
@@ -12,6 +14,8 @@ int main(int argc, char* argv[])
     std::cerr << "  Show data in given input file using the event display.\n";
     return 1;
   }
-  std::string s = "basf2 $BELLE2_LOCAL_DIR/display/examples/display.py -i " + std::string(argv[1]);
+  using namespace Belle2::FileSystem;
+  std::string fullPath = findFile("/display/examples/display.py");
+  std::string s = "basf2 " + fullPath + " -i " + std::string(argv[1]);
   return system(s.c_str());
 }

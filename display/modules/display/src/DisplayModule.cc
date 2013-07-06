@@ -117,8 +117,8 @@ void DisplayModule::event()
     for (int i = 0; i < mcparticles.getEntries(); i++) {
       const MCParticle* part = mcparticles[i];
       if ((m_showAllPrimaries and part->hasStatus(MCParticle::c_PrimaryParticle))
-          or(m_showCharged and TMath::Nint(part->getCharge()) != 0)
-          or(m_showNeutrals and TMath::Nint(part->getCharge()) == 0)) {
+          or (m_showCharged and TMath::Nint(part->getCharge()) != 0)
+          or (m_showNeutrals and TMath::Nint(part->getCharge()) == 0)) {
         switch (abs(part->getPDG())) {
           case 11:
           case 13:

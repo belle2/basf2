@@ -100,7 +100,7 @@ namespace Belle2 {
 
     /** Add a GFTrackCand, to evaluate track finding. */
     template<class PXDType, class SVDType> void addTrackCandidate(const GFTrackCand* trackCand, const TString& label,
-        const StoreArray<PXDType> &pxdhits, const StoreArray<SVDType> &svdhits, const StoreArray<CDCHit> &cdchits);
+        const StoreArray<PXDType>& pxdhits, const StoreArray<SVDType>& svdhits, const StoreArray<CDCHit>& cdchits);
 
     /** Add all entries in the given 'hits' array (and the corresponding MCParticles) to the event scene. */
     template <class T> void addSimHits(const StoreArray<T>& hits) {
@@ -273,7 +273,7 @@ namespace Belle2 {
   };
 
   template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const GFTrackCand* trackCand, const TString& label,
-      const StoreArray<PXDType> &pxdhits, const StoreArray<SVDType> &svdhits, const StoreArray<CDCHit> &cdchits)
+      const StoreArray<PXDType>& pxdhits, const StoreArray<SVDType>& svdhits, const StoreArray<CDCHit>& cdchits)
   {
     const Color_t trackCandColor = kAzure - 2;
 

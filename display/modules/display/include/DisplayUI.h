@@ -39,7 +39,7 @@ namespace Belle2 {
     ~DisplayUI();
 
     /** Generate UI elements so the given module parameter can be changed at run time. */
-    void addParameter(const std::string& label, ModuleParam<bool> &param);
+    void addParameter(const std::string& label, ModuleParam<bool>& param);
 
     /** Go to next event. */
     void next();

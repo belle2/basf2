@@ -40,14 +40,16 @@ namespace Belle2 {
    */
   class WireID : public RelationsObject {
   public:
-    //--- Constructors ----------------------------------------------------------------------------------------------------------
+    //--- Constructors ---------------------------------------------
     /** Constructor taking the encoded wire number.
      *
     *  @param eWire  Number of wire using the encoded format. Careful - wires are not continuously within the encoded number.
     *                The default is set to the maximum allowed value, as 0 corresponds already to some wire.
     *                This assigned value does NOT correspond to any real wire.
     */
-    WireID(unsigned short eWire = 65535) {
+
+
+    explicit WireID(unsigned short eWire = 65535) {
       m_eWire = eWire;
     }
 

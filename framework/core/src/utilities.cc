@@ -13,6 +13,8 @@
 #include <framework/gearbox/Unit.h>
 
 #include <boost/filesystem.hpp>
+#include <TSystem.h>
+
 #include <sys/time.h>
 #include <dlfcn.h>
 #include <sstream>
@@ -89,6 +91,14 @@ namespace Belle2 {
       timespec ts;
       clock_gettime(CLOCK_REALTIME, &ts);
       return (ts.tv_sec * Unit::s) + (ts.tv_nsec * Unit::ns);
+    }
+
+    unsigned long getMemoryKB()
+    {
+      ProcInfo_t meminfo;
+      gSystem->GetProcInfo(&meminfo);
+
+      return meminfo.fMemVirtual;
     }
 
   }

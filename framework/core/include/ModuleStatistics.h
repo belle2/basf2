@@ -111,6 +111,7 @@ namespace Belle2 {
       /** Clear all counters */
       void clear() {
         memset(m_times.c_array(), 0, m_times.size()*sizeof(double));
+        memset(m_memoryKB.c_array(), 0, m_memoryKB.size()*sizeof(long));
         memset(m_calls.c_array(), 0, m_calls.size()*sizeof(unsigned int));
       }
 
@@ -127,6 +128,15 @@ namespace Belle2 {
       }
 
       /**
+       * Get accumulated memory for a given counter type
+       * @param type which counter to return. c_Total returns the sums of all other counters
+       */
+      long getMemoryKB(ECounters type = c_Event) const {
+        if (type >= c_Total) return std::accumulate(m_memoryKB.begin(), m_memoryKB.end(), 0.0);
+        return m_memoryKB[type];
+      }
+
+      /**
        * Get accumulated calls for a given counter type
        * @param type which counter to return. c_Total returns the sums of all other counters
        */
@@ -140,6 +150,9 @@ namespace Belle2 {
 
       /** Time spent in functions */
       boost::array<double, c_Total> m_times;
+
+      /** Virtual memory added [KB] */
+      boost::array<long, c_Total> m_memoryKB;
 
       /** Number of calls to functions */
       boost::array<unsigned int, c_Total> m_calls;
@@ -161,6 +174,7 @@ namespace Belle2 {
      */
     void startGlobal() {
       m_globalStart = Utils::getClock();
+      m_globalStartMemoryKB = Utils::getMemoryKB();
     }
 
     /** Stop to measure global time, increase counters; defined as inline to save some context switches.
@@ -169,7 +183,9 @@ namespace Belle2 {
      */
     inline void stopGlobal(ECounters mode = c_Event, bool suspend = false) {
       double elapsed = (Utils::getClock() - m_globalStart) / Unit::s;
+      long addedMemoryKB = (Utils::getMemoryKB() - m_globalStartMemoryKB);
       m_global.m_times[mode] += elapsed;
+      m_global.m_memoryKB[mode] += addedMemoryKB;
       if (!suspend) { ++m_global.m_calls[mode];}
     }
 
@@ -180,6 +196,7 @@ namespace Belle2 {
      */
     void startModule() {
       m_moduleStart = Utils::getClock();
+      m_moduleStartMemoryKB = Utils::getMemoryKB();
     }
 
     /** Stop to measure time and increase counters; defined as inline to save some context switches.
@@ -190,11 +207,14 @@ namespace Belle2 {
     inline void stopModule(const Module& module, ECounters mode = c_Event, bool suspend = false) {
       Statistics& stats = m_modules[&module];
       double elapsed = (Utils::getClock() - m_moduleStart) / Unit::s;
+      long addedMemoryKB = (Utils::getMemoryKB() - m_moduleStartMemoryKB);
+
       if (mode == c_Init && stats.m_name.empty()) {
         stats.m_name = module.getName();
         stats.m_id = m_modules.size() - 1;
       }
       stats.m_times[mode] += elapsed;
+      stats.m_memoryKB[mode] += addedMemoryKB;
       if (!suspend) ++stats.m_calls[mode];
     }
 
@@ -251,7 +271,7 @@ namespace Belle2 {
 
   protected:
     /** Default constructor */
-    ModuleStatistics(): m_moduleStart(0), m_globalStart(0), m_global("_global_") {}
+    ModuleStatistics(): m_moduleStart(0), m_globalStart(0), m_moduleStartMemoryKB(0), m_globalStartMemoryKB(0), m_global("_global_") {}
     /** Singleton, hide copy constructor*/
     ModuleStatistics(const ModuleStatistics& b);
     /** Singleton, hide assignment operator*/
@@ -261,6 +281,10 @@ namespace Belle2 {
     double m_moduleStart;
     /** Global start time */
     double m_globalStart;
+    /** Used heap at start of module (in KB) */
+    long m_moduleStartMemoryKB;
+    /** Used heap at global start (in KB) */
+    long m_globalStartMemoryKB;
     /** Statistics for whole framework */
     Statistics m_global;
     /** Statistical information for all Modules */

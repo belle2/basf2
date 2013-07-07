@@ -14,7 +14,6 @@
 #include <framework/gearbox/Unit.h>
 
 #include <string>
-#include <vector>
 #include <iomanip>
 
 namespace Belle2 {
@@ -63,6 +62,12 @@ namespace Belle2 {
      * @return Clock value in default time unit (ns)
      */
     double getClock();
+
+    /**
+     * Returns currently used virtual memory in KB.
+     *
+     */
+    unsigned long getMemoryKB();
   }
 
   /**

@@ -10,7 +10,6 @@
 
 #include <framework/dataobjects/ProfileInfo.h>
 #include <framework/core/utilities.h>
-#include <TSystem.h>
 
 using namespace Belle2;
 
@@ -19,10 +18,7 @@ ClassImp(ProfileInfo)
 
 void ProfileInfo::set(double timeOffset)
 {
-  ProcInfo_t meminfo;
-  gSystem->GetProcInfo(&meminfo);
-
-  m_memory = meminfo.fMemVirtual;
+  m_memory = Utils::getMemoryKB();
 
   m_timeInSec = Utils::getClock() / Unit::s - timeOffset;
 }

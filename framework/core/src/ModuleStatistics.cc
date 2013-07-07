@@ -34,10 +34,10 @@ namespace Belle2 {
   {
     if (!modules) modules = &m_modules;
     stringstream out;
-    out << boost::format("%|79T=|\n");
-    boost::format output("%s %|32t|| %10d | %14.3f | %14.3f\n");
-    out << output % "Name" % "Calls" % "Time(s)" % "Time(ms)/Call";
-    out << boost::format("%|79T-|\n");
+    out << boost::format("%|80T=|\n");
+    boost::format output("%s %|21t|| %10d | %10d | %14.3f | %14.3f\n");
+    out << output % "Name" % "Calls" % "Memory(MB)" % "Time(s)" % "Time(ms)/Call";
+    out << boost::format("%|80T-|\n");
 
     const unsigned int numModules = modules->size();
     for (unsigned int iModule = 0; iModule < numModules; iModule++) {
@@ -50,18 +50,20 @@ namespace Belle2 {
         out << output
             % stats.getName()
             % stats.getCalls(mode)
+            % (stats.getMemoryKB(mode) / 1024)
             % stats.getTime(mode)
             % (stats.getCalls(mode) > 0 ? (1e3 * stats.getTime(mode) / stats.getCalls(mode)) : 0);
       }
     }
 
-    out << boost::format("%|79T-|\n");
+    out << boost::format("%|80T-|\n");
     out << output
         % "Total"
         % m_global.getCalls(mode)
+        % (m_global.getMemoryKB(mode) / 1024)
         % m_global.getTime(mode)
         % (m_global.getCalls(mode) > 0 ? (1e3 * m_global.getTime(mode) / m_global.getCalls(mode)) : 0);
-    out << boost::format("%|79T=|\n");
+    out << boost::format("%|80T=|\n");
     return out.str();
   }
 
@@ -101,6 +103,7 @@ namespace Belle2 {
 
   //used to make python aware of default arguments
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(stats_time_overloads, getTime, 0, 1)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(stats_memory_overloads, getMemoryKB, 0, 1)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(stats_calls_overloads, getCalls, 0, 1)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getStatistics_overloads, getStatistics, 0, 1)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getModuleStatistics_overloads, getModuleStatistics, 1, 2)
@@ -149,6 +152,7 @@ namespace Belle2 {
     class_<Statistics>("Statistics")
     .def_readonly("name", &Statistics::getName)
     .def("time", &Statistics::getTime, stats_time_overloads())
+    .def("memory", &Statistics::getMemoryKB, stats_memory_overloads())
     .def("calls", &Statistics::getCalls, stats_calls_overloads())
     ;
 

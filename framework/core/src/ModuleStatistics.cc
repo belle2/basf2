@@ -35,7 +35,7 @@ namespace Belle2 {
     if (!modules) modules = &m_modules;
     stringstream out;
     out << boost::format("%|80T=|\n");
-    boost::format output("%s %|21t|| %10d | %10d | %14.3f | %14.3f\n");
+    boost::format output("%s %|22t|| %10d | %10d | %14.3f | %13.3f\n");
     out << output % "Name" % "Calls" % "Memory(MB)" % "Time(s)" % "Time(ms)/Call";
     out << boost::format("%|80T-|\n");
 

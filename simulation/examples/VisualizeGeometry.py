@@ -15,11 +15,10 @@ paramloader = register_module('Gearbox')
 # Create Geometry
 geobuilder = register_module('Geometry')
 geobuilder.log_level = LogLevel.INFO
-pguninput = register_module('PGunInput')
+pguninput = register_module('ParticleGun')
 g4sim = register_module('FullSim')
 
 evtmetagen.param('evtNumList', [1])
-evtmetagen.param('runList', [1])
 
 g4sim.param('EnableVisualization', True)
 g4sim.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
@@ -45,14 +44,10 @@ g4sim.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
 
 # Parameters for particle gun
 pguninput.param('nTracks', 1)
-pguninput.param('PIDcodes', [211])
-pguninput.param('pPar1', 2)
-pguninput.param('pPar2', 5)
-pguninput.param('Rseed', 0)
-pguninput.param('thetaPar1', 85)
-pguninput.param('thetaPar2', 95)
-pguninput.param('phiPar1', -5)
-pguninput.param('phiPar2', 5)
+pguninput.param('pdgCodes', [211])
+pguninput.param('momentumParams', [2.0, 5.0])
+pguninput.param('thetaParams', [85.0, 95.0])
+pguninput.param('phiParams', [-5.0, 5.0])
 
 main = create_path()
 

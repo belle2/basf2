@@ -137,16 +137,38 @@ namespace Belle2 {
         RelationArray aeroHitToArich(arichAeroHits, arichLikelihoods);
         aeroHitToArich.clear();
 
-        std::vector<ARICHTrack> arichTracks;
-        getTracks(arichTracks, Const::pion); // pion hypothesis
-        B2DEBUG(100, "Number of tracks from ext" << arichTracks.size());
-        if (arichTracks.empty()) return;
+        std::vector<ARICHTrack> arichPions;
+        std::vector<ARICHTrack> arichKaons;
+        getTracks(arichPions, Const::pion);
+        getTracks(arichKaons, Const::kaon);
+        B2DEBUG(100, "Number of tracks from ext" << arichPions.size());
+        if (arichPions.empty() and arichKaons.empty()) return;
 
-        m_ana->Likelihood2(arichTracks);
+        m_ana->Likelihood2(arichPions);
+        m_ana->Likelihood2(arichKaons);
 
-        int nTracks = arichTracks.size();
+        int nTracks = arichPions.size();
         for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
-          ARICHTrack* track = &arichTracks[iTrack];
+          ARICHTrack* track = &arichPions[iTrack];
+
+          double like[5];
+          double exp_phot[5];
+          track->getLikelihood(like);
+          track->getExpectedNOfPhotons(exp_phot);
+
+          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, like, 1, exp_phot);
+
+          // Add relations
+          int last = arichLikelihoods.getEntries() - 1;
+          trackToArich.add(track->getTrackID(), last);
+          extToArich.add(track->getHitID(), last);
+          int aeroIndex = track->getAeroIndex();
+          if (aeroIndex >= 0) aeroHitToArich.add(aeroIndex, last);
+
+        }
+        nTracks = arichKaons.size();
+        for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
+          ARICHTrack* track = &arichKaons[iTrack];
 
           double like[5];
           double exp_phot[5];
@@ -254,7 +276,7 @@ namespace Belle2 {
         const ARICHAeroHit* aeroHit = DataStore::getRelated<ARICHAeroHit>(particle);
         int aeroHitIndex = -1;
         if (aeroHit) aeroHitIndex = aeroHit->getArrayIndex();
-        int truePDGCode = -1;
+        int truePDGCode = 0;
         if (particle) truePDGCode = particle->getPDG();
 
         RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);

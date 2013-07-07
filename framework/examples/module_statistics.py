@@ -23,6 +23,7 @@ main = create_path()
 # Add modules to main path
 main.add_module(evtmetagen)
 main.add_module(evtmetainfo)
+main.add_module(register_module('Gearbox'))
 
 # Process all events
 process(main)
@@ -63,6 +64,20 @@ for stats in statistics.modules:
         % (stats.time(statistics.TERM) * 1e3, stats.calls(statistics.TERM),
            stats.time(statistics.TERM) * 1e3 / stats.calls(statistics.TERM))
     print
+
+print 'Memory statistics'
+for stats in statistics.modules:
+    print 'Module %s:' % stats.name
+    print ' -> initialize(): %10d KB' \
+        % (stats.memory(statistics.INIT))
+    print ' -> beginRun():   %10d KB' \
+        % (stats.memory(statistics.BEGIN_RUN))
+    print ' -> event():      %10d KB' \
+        % (stats.memory())
+    print ' -> endRun():     %10d KB' \
+        % (stats.memory(statistics.END_RUN))
+    print ' -> terminate():  %10d KB' \
+        % (stats.memory(statistics.TERM))
 
 # Get Statistics for single module
 stats = statistics.get(evtmetagen)

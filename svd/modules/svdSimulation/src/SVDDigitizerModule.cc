@@ -286,18 +286,24 @@ void SVDDigitizerModule::event()
   //Check sensor info and set pointers to current sensor
   for (unsigned int i = 0; i < nSimHits; ++i) {
     m_currentHit = storeSimHits[i];
-    const RelationIndex<MCParticle, SVDSimHit>::Element* mcRel = relMCParticleSimHit.getFirstElementTo(m_currentHit);
-    if (mcRel) {
-      m_currentParticle = mcRel->indexFrom;
-    } else {
-      //B2ERROR("Could not find MCParticle which produced SVDSimhit " << i);
+    // Don't bother with relations for background SimHits
+    if (m_currentHit->getBackgroundTag() != SimHitBase::bg_none) {
       m_currentParticle = -1;
-    }
-    const RelationIndex<SVDTrueHit, SVDSimHit>::Element* trueRel = relTrueHitSimHit.getFirstElementTo(m_currentHit);
-    if (trueRel) {
-      m_currentTrueHit = trueRel->indexFrom;
-    } else {
       m_currentTrueHit = -1;
+    } else {
+      const RelationIndex<MCParticle, SVDSimHit>::Element* mcRel = relMCParticleSimHit.getFirstElementTo(m_currentHit);
+      if (mcRel) {
+        m_currentParticle = mcRel->indexFrom;
+      } else {
+        B2WARNING("Could not find MCParticle which produced SVDSimhit " << i);
+        m_currentParticle = -1;
+      }
+      const RelationIndex<SVDTrueHit, SVDSimHit>::Element* trueRel = relTrueHitSimHit.getFirstElementTo(m_currentHit);
+      if (trueRel) {
+        m_currentTrueHit = trueRel->indexFrom;
+      } else {
+        m_currentTrueHit = -1;
+      }
     }
 
     VxdID sensorID = m_currentHit->getSensorID();

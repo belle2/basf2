@@ -111,18 +111,6 @@ void ECLPi0ReconstructorModule::event()
 
     CLHEP::HepSymMatrix   errorGamma1(7, 0);
     readErrorMatrix(iGamma1, errorGamma1);
-
-
-    /*
-             cout<<"FillGamma1 ErrorMatrix ";
-             for (int i = 0; i < 7; i++) {
-               for (int j = 0; j <=i ; j++) {
-                 cout<<errorGamma1[i][j]<<" ";
-               }
-             }
-            cout<<endl;
-
-    */
     CLHEP::Hep3Vector p3Gamma1(m_px1, m_py1, m_pz1);
 
     for (int iGamma2 = iGamma1 + 1; iGamma2 < Gamma.getEntries(); iGamma2++) {
@@ -134,27 +122,8 @@ void ECLPi0ReconstructorModule::event()
       m_pz2 = aECLGamma2->getPz();
       CLHEP::HepSymMatrix   errorGamma2(7, 0);
       readErrorMatrix(iGamma2, errorGamma2);
-      /*
-          aECLGamma2-> getErrorMatrix(GammaErrorMatrix);
-            for (int i = 0; i < 4; i++) {
-              for (int j = 0; j <=i ; j++) {
-                errorGamma2[i][j]=GammaErrorMatrix[i][j];
-              }
-            }
-          errorGamma2[4][4]=1.;
-          errorGamma2[5][5]=1.;
-          errorGamma2[6][6]=1.;
-            cout<<"FillGamma2 ErrorMatrix ";
-            for (int i = 0; i < 7; i++) {
-              for (int j = 0; j <=i ; j++) {
-                cout<<errorGamma2[i][j]<<" ";
-              }
-            }
-           cout<<endl;
-      */
       CLHEP::Hep3Vector p3Gamma2(m_px2, m_py2, m_pz2);
 
-      //CLHEP::Hep3Vector p3Rec = p3Gamma1 + p3Gamma2;
       CLHEP::HepLorentzVector lv_gamma1(p3Gamma1, EGamma1);
       CLHEP::HepLorentzVector lv_gamma2(p3Gamma2, EGamma2);
       CLHEP::HepLorentzVector lv_rec = lv_gamma1 + lv_gamma2;
@@ -164,7 +133,6 @@ void ECLPi0ReconstructorModule::event()
 
       const double mass = lv_rec.mag();
       if (fit_flag) {
-//        fit(lv_gamma1, lv_gamma2);
         CLHEP::HepLorentzVector fittedPi0Momentum;
         CLHEP::HepSymMatrix pi0ErrMatrix;
         TMatrixFSym Pi0ErrorTMatrix(4);

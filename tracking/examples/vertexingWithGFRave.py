@@ -37,7 +37,8 @@ param_pGun = {
     # 'yVertexParams': [0.0, vertexStd], 'zVertexParams': [0.0, vertexStd],
 pGun.param(param_pGun)
 g4sim = register_module('FullSim')
-g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
+# this is need for the MCTrackFinder to work correctly
+g4sim.param('StoreAllSecondaries', True)
 
 # digitizer
 cdcDigitizer = register_module('CDCDigitizer')
@@ -49,11 +50,14 @@ param_mctrackfinder = {
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'Smearing': 0,
+    'UseClusters': False,
     }
 mctrackfinder.param(param_mctrackfinder)
 trackfitter = register_module('GenFitter')
 
 trackfitter.logging.log_level = LogLevel.WARNING
+trackfitter.param('UseClusters', False)  # use true hits
+trackfitter.param('FilterId', 0)  # use kalman
 trackfitter.param('NIterations', 2)
 trackfitchecker = register_module('TrackFitChecker')
 # the reults of the statistical tests will only show up at info or debug level

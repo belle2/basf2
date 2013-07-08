@@ -48,12 +48,14 @@ param_mctrackfinder = {
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'Smearing': 0,
+    'UseClusters': False,
     }
 mctrackfinder.param(param_mctrackfinder)
 
 trackfitter = register_module('GenFitter')
 trackfitter.logging.log_level = LogLevel.WARNING
 trackfitter.param('NIterations', 2)
+trackfitter.param('UseClusters', False)
 
 trackfitchecker = register_module('TrackFitChecker')
 trackfitchecker.logging.log_level = LogLevel.INFO  # the reults of the statistical tests will only show up at info or debug level

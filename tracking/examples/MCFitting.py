@@ -86,6 +86,7 @@ param_mctrackfinder = {  # select which particles to use: primary particles
     'UseCDCHits': 1,
     'UseSVDHits': 1,
     'UsePXDHits': 1,
+    'UseClusters': False,
     'WhichParticles': ['primary'],
     }
 mctrackfinder.param(param_mctrackfinder)
@@ -99,6 +100,7 @@ param_cdcfitting = {
     'FilterId': 0,
     'NIterations': 1,
     'ProbCut': 0.001,
+    'UseClusters': False,
     }
 cdcfitting.param(param_cdcfitting)
 

@@ -52,7 +52,8 @@ evtgeninput.param('boost2LAB', True)
 #
 # simulation
 g4sim = register_module('FullSim')
-g4sim.param('StoreAllSecondaries', True)  # this is need for the MCTrackFinder to work correctly
+# this is need for the MCTrackFinder to work correctly
+g4sim.param('StoreAllSecondaries', True)
 # make the simulation less noisy
 g4sim.logging.log_level = LogLevel.ERROR
 
@@ -63,7 +64,10 @@ cdcDigitizer = register_module('CDCDigitizer')
 mctrackfinder = register_module('MCTrackFinder')
 
 # select which detectors you would like to use
-param_mctrackfinder = {'UseCDCHits': 1, 'UseSVDHits': 1, 'UsePXDHits': 1}
+param_mctrackfinder = {'UseCDCHits': 1,
+                       'UseSVDHits': 1,
+                       'UsePXDHits': 1,
+                       'UseClusters': False}
 mctrackfinder.param(param_mctrackfinder)
 # select which particles to use, here as example: only particles which created
 # hits in all tracking detectors (PXD, SVD and CDC) but do not have to be
@@ -74,13 +78,15 @@ mctrackfinder.param('WhichParticles', ['PXD', 'SVD', 'CDC'])
 trackfitting = register_module('GenFitter')
 
 # fit the tracks with one iteration of Kalman filter
-# 'PDGCodes': [] means use the pdgCodes from the MCTrackFinder wich are the correct ones
+# 'PDGCodes': [] means use the pdgCodes from
+# the MCTrackFinder wich are the correct ones
 param_trackfitting = {
     'StoreFailedTracks': 0,
     'FilterId': 0,
     'PDGCodes': [],
     'NIterations': 1,
     'ProbCut': 0.001,
+    'UseClusters': False,
     }
 trackfitting.param(param_trackfitting)
 

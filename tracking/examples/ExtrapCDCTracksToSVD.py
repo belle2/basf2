@@ -114,9 +114,7 @@ param_cdcfitting = {
     'TracksColName': 'Tracks_PatternReco',
     'GFTracksColName': 'GFTracks_PatternReco',
     'StoreFailedTracks': 1,
-    'mcTracks': 0,
-    'pdg': 211,
-    'allPDG': 0,
+    #'pdg': 211,
     'FilterId': 1,
     'ProbCut': 0.001,
     }
@@ -139,9 +137,7 @@ param_svdfitting = {
     'TracksColName': 'Tracks_withSVD',
     'GFTracksColName': 'GFTracks_withSVD',
     'StoreFailedTracks': 1,
-    'mcTracks': 0,
-    'pdg': 211,
-    'allPDG': 0,
+    #'PDGCodes': [211],
     'FilterId': 1,
     'ProbCut': 0.001,
     }

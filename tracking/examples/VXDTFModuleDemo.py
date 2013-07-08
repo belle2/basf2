@@ -9,11 +9,14 @@ from time import time
 
 numEvents = 100
 initialValue = 1
-secSetup = ['evtgenHIGH', 'evtgenSTD', 'evtgenLOW']  # ,'evtgenHIGH' 'evtgenSTD', 'evtgenLOW'] # when using the same secSetup several times, use this for setting Value
+secSetup = ['evtgenHIGH', 'evtgenSTD', 'evtgenLOW']
+# ,'evtgenHIGH' 'evtgenSTD', 'evtgenLOW'] # when using
+# the same secSetup several times, use this for setting Value
 
 rSeed = initialValue
 
-print 'running {events:} events, Seed {theSeed:} - evtGen No BG'.format(events=numEvents,
+print 'running {events:} events, Seed {theSeed:} - evtGen No BG'.format(
+        events=numEvents,
         theSeed=initialValue)
 
 set_log_level(LogLevel.ERROR)
@@ -46,7 +49,8 @@ vxdtf.logging.log_level = LogLevel.INFO
 vxdtf.logging.debug_level = 11
 # detectorType: Supports 'SVD' and 'VXD' so far
 # calcQIType:  Supports 'kalman', 'circleFit' or 'trackLength'
-# filterOverlappingTCs: Supports 'hopfield' (good but slow), 'greedy' (faster but worse results), 'none' (no overlapping tc-removal)
+# filterOverlappingTCs: Supports 'hopfield' (good but slow),
+# 'greedy' (faster but worse results), 'none' (no overlapping tc-removal)
 param_vxdtf = {
     'tccMinState': [2],
     'tccMinLayer': [3],
@@ -70,7 +74,7 @@ param_mctrackfinder = {  # 'PXD', 'SVD',
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'MinimalNDF': 6,
-    'UseClusters': 1,
+    # 'UseClusters': 1, is default now
     'WhichParticles': ['PXD', 'SVD'],
     'GFTrackCandidatesColName': 'mcTracks',
     }
@@ -83,7 +87,8 @@ eventCounter.param('stepSize', 25)
 analyzer = register_module('TFAnalizer')
 analyzer.logging.log_level = LogLevel.INFO
 analyzer.logging.debug_level = 11
-param_analyzer = {'printExtentialAnalysisData': False}  # set true if PRINTINFO is wanted
+# set true if PRINTINFO is wanted
+param_analyzer = {'printExtentialAnalysisData': False}
 analyzer.param(param_analyzer)
 
 # display = register_module('Display')

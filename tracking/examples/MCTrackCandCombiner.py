@@ -63,8 +63,6 @@ mccombiner.param('HitsRatio', 0.6)
 mccombiner.logging.log_level = LogLevel.INFO
 
 trackfitter = register_module('GenFitter')
-trackfitter.param('UseClusters', True)
-trackfitter.param('FilterId', 1)
 trackfitter.logging.log_level = LogLevel.WARNING
 
 output = register_module('RootOutput')

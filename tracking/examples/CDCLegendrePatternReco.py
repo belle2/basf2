@@ -155,6 +155,7 @@ param_mctrackfinder = {
     'UseCDCHits': 1,
     'UseSVDHits': 1,
     'UsePXDHits': 1,
+    'UseClusters': False,
     }
 mctrackfinder.param(param_mctrackfinder)
 
@@ -182,6 +183,7 @@ param_cdcfitting = {
     'FilterId': 1,
     'NIterations': 1,
     'ProbCut': 0.001,
+    'UseClusters': False,
     }
 
 cdcfitting.param(param_cdcfitting)

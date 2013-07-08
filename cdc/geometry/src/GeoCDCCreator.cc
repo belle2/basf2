@@ -645,8 +645,8 @@ namespace Belle2 {
         }
 
 
-        std::cout << iSLayer << " " << zfor_sensitive_middle << " " <<
-                  zback_sensitive_middle << std::endl;
+        //        std::cout << iSLayer << " " << zfor_sensitive_middle << " " <<
+        //                  zback_sensitive_middle << std::endl;
 
         // Middle sensitive tube
         G4Tubs* middleSensitiveTubeShape = new G4Tubs((format("solidSD_CDCLayer_%1%_middle") % iSLayer).str().c_str(), rmin_sensitive_middle * cm, rmax_sensitive_middle * cm, (zfor_sensitive_middle - zback_sensitive_middle)*cm / 2.0, 0 * deg, 360.*deg);

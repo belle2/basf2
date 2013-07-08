@@ -34,15 +34,14 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::SVD;
 
-
 //-----------------------------------------------------------------
 //                Auxiliaries for waveform storage
 //-----------------------------------------------------------------
 // FIXME: I believe this is wrong, these things must be created separately for
 // each instance of the digitizer, otherwise it can crash in parallel mode.
-int   tree_vxdID    = 0;        // VXD ID of a sensor
-int   tree_uv       = 0;        // U or V coordinate
-int   tree_strip    = 0;        // number of strip
+int tree_vxdID = 0;        // VXD ID of a sensor
+int tree_uv = 0;        // U or V coordinate
+int tree_strip = 0;        // number of strip
 double tree_signal[20];         // array for 20 samples of 10 ns
 
 //-----------------------------------------------------------------
@@ -54,7 +53,9 @@ REG_MODULE(SVDDigitizer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDDigitizerModule::SVDDigitizerModule() : Module(), m_rootFile(0), m_histDiffusion_u(0), m_histDiffusion_v(0), m_histLorentz_u(0), m_histLorentz_v(0), m_signalDist_u(0), m_signalDist_v(0)
+SVDDigitizerModule::SVDDigitizerModule() :
+  Module(), m_rootFile(0), m_histDiffusion_u(0), m_histDiffusion_v(0), m_histLorentz_u(
+    0), m_histLorentz_v(0), m_signalDist_u(0), m_signalDist_v(0)
 {
   //Set module properties
   setDescription("Create SVDDigits from SVDSimHits");
@@ -65,12 +66,11 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(), m_rootFile(0), m_histDiffus
   // 1. Collections
   addParam("MCParticles", m_storeMCParticlesName,
            "MCParticle collection name", string(""));
-  addParam("Digits", m_storeDigitsName,
-           "Digits collection name", string(""));
-  addParam("SimHits", m_storeSimHitsName,
-           "SimHit collection name", string(""));
-  addParam("TrueHits", m_storeTrueHitsName,
-           "TrueHit collection name", string(""));
+  addParam("Digits", m_storeDigitsName, "Digits collection name", string(""));
+  addParam("SimHits", m_storeSimHitsName, "SimHit collection name",
+           string(""));
+  addParam("TrueHits", m_storeTrueHitsName, "TrueHit collection name",
+           string(""));
 
   // 2. Physics
   addParam("Temperature", m_temperature,
@@ -83,40 +83,37 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(), m_rootFile(0), m_histDiffus
   // 3. Noise
   addParam("PoissonSmearing", m_applyPoisson,
            "Apply Poisson smearing on chargelets", true);
-  addParam("ElectronicEffects", m_applyNoise,
-           "Apply electronic effects?", true);
+  addParam("ElectronicEffects", m_applyNoise, "Apply electronic effects?",
+           true);
   addParam("ElectronicNoise", m_elNoise,
            "Electronic noise on strip signals in e-", double(2000.0));
   addParam("ZeroSuppressionCut", m_SNAdjacent,
            "Zero suppression cut in sigmas of strip noise", double(2.5));
 
   // 4. Timing
-  addParam("APVShapingTime", m_shapingTime,
-           "APV25 shpaing time in ns", double(50.0));
+  addParam("APVShapingTime", m_shapingTime, "APV25 shpaing time in ns",
+           double(50.0));
   addParam("ADCSamplingTime", m_samplingTime,
            "Interval between ADC samples in ns", double(30.0));
-  addParam("UseIntegrationWindow", m_applyWindow,
-           "Use integration window?", bool(true));
+  addParam("UseIntegrationWindow", m_applyWindow, "Use integration window?",
+           bool(true));
   addParam("WindowStart", m_startSampling,
            "Start of the sampling window, in ns", double(0.0));
-  addParam("WindowEnd", m_stopSampling,
-           "End of the sampling window, in ns", double(200.0));
+  addParam("WindowEnd", m_stopSampling, "End of the sampling window, in ns",
+           double(200.0));
   addParam("RandomPhaseSampling", m_randomPhaseSampling,
            "Start sampling at a random time?", bool(false));
 
   // 5. Processing
-  addParam("ADC", m_applyADC,
-           "Simulate ADC?", bool(false));
-  addParam("ADCLow", m_minADC,
-           "Low end of ADC range", double(-64000.0));
-  addParam("ADCHigh", m_maxADC,
-           "High end of ADC range", double(224000.0));
-  addParam("ADCbits", m_bitsADC,
-           "Number of ADC bits", int(10));
+  addParam("ADC", m_applyADC, "Simulate ADC?", bool(false));
+  addParam("ADCLow", m_minADC, "Low end of ADC range", double(-64000.0));
+  addParam("ADCHigh", m_maxADC, "High end of ADC range", double(224000.0));
+  addParam("ADCbits", m_bitsADC, "Number of ADC bits", int(10));
 
   // 6. Reporting
   addParam("statisticsFilename", m_rootFilename,
-           "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced", string(""));
+           "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced",
+           string(""));
   addParam("storeWaveforms", m_storeWaveforms,
            "Store waveforms in a TTree in the statistics file.", bool(false));
 }
@@ -125,26 +122,25 @@ void SVDDigitizerModule::initialize()
 {
   //Register all required collections
   StoreArray<SVDDigit>::registerPersistent(m_storeDigitsName);
-  RelationArray::registerPersistent<SVDDigit, MCParticle>(m_storeDigitsName, m_storeMCParticlesName);
-  RelationArray::registerPersistent<SVDDigit, SVDTrueHit>(m_storeDigitsName, m_storeMCParticlesName);
+  RelationArray::registerPersistent<SVDDigit, MCParticle>(m_storeDigitsName,
+                                                          m_storeMCParticlesName);
+  RelationArray::registerPersistent<SVDDigit, SVDTrueHit>(m_storeDigitsName,
+                                                          m_storeMCParticlesName);
 
   //Set names in case default was used. We need the names to initialize the RelationIndices.
   m_relMCParticleSimHitName = DataStore::relationName(
                                 DataStore::arrayName<MCParticle>(m_storeMCParticlesName),
-                                DataStore::arrayName<SVDSimHit>(m_storeSimHitsName)
-                              );
-  m_relTrueHitSimHitName    = DataStore::relationName(
-                                DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName),
-                                DataStore::arrayName<SVDSimHit>(m_storeSimHitsName)
-                              );
-  m_relDigitMCParticleName  = DataStore::relationName(
-                                DataStore::arrayName<SVDDigit>(m_storeDigitsName),
-                                DataStore::arrayName<MCParticle>(m_storeMCParticlesName)
-                              );
-  m_relDigitTrueHitName     = DataStore::relationName(
-                                DataStore::arrayName<SVDDigit>(m_storeDigitsName),
-                                DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName)
-                              );;
+                                DataStore::arrayName<SVDSimHit>(m_storeSimHitsName));
+  m_relTrueHitSimHitName = DataStore::relationName(
+                             DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName),
+                             DataStore::arrayName<SVDSimHit>(m_storeSimHitsName));
+  m_relDigitMCParticleName = DataStore::relationName(
+                               DataStore::arrayName<SVDDigit>(m_storeDigitsName),
+                               DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+  m_relDigitTrueHitName = DataStore::relationName(
+                            DataStore::arrayName<SVDDigit>(m_storeDigitsName),
+                            DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
+  ;
 
   //Convert parameters to correct units
   m_segmentLength *= Unit::mm;
@@ -156,12 +152,17 @@ void SVDDigitizerModule::initialize()
   m_samplingTime *= Unit::ns;
   m_shapingTime *= Unit::ns;
 
-  B2INFO("SVDDigitizer parameters (in default system units, *=cannot be set directly):");
+  B2INFO(
+    "SVDDigitizer parameters (in default system units, *=cannot be set directly):");
   B2INFO(" DATASTORE COLLECTIONS:")
-  B2INFO(" -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  B2INFO(" -->  Digits:             " << DataStore::arrayName<SVDDigit>(m_storeDigitsName));
-  B2INFO(" -->  SimHits:            " << DataStore::arrayName<SVDSimHit>(m_storeSimHitsName));
-  B2INFO(" -->  TrueHits:           " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
+  B2INFO(
+    " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+  B2INFO(
+    " -->  Digits:             " << DataStore::arrayName<SVDDigit>(m_storeDigitsName));
+  B2INFO(
+    " -->  SimHits:            " << DataStore::arrayName<SVDSimHit>(m_storeSimHitsName));
+  B2INFO(
+    " -->  TrueHits:           " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
   B2INFO(" -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
   B2INFO(" -->  DigitMCRel:         " << m_relDigitMCParticleName);
   B2INFO(" -->  TrueSimRel:         " << m_relTrueHitSimHitName);
@@ -182,7 +183,8 @@ void SVDDigitizerModule::initialize()
   B2INFO(" -->  IntegrationWindow:  " << (m_applyWindow ? "true" : "false"));
   B2INFO(" -->  Start of int. wind.:" << m_startSampling);
   B2INFO(" -->  End of int. window: " << m_stopSampling);
-  B2INFO(" -->  Random phase sampl.:" << (m_randomPhaseSampling ? "true" : "false"));
+  B2INFO(
+    " -->  Random phase sampl.:" << (m_randomPhaseSampling ? "true" : "false"));
   B2INFO(" PROCESSING:");
   B2INFO(" -->  ADC:                " << (m_applyADC ? "true" : "false"));
   B2INFO(" -->  ADC range low (e-): " << m_minADC);
@@ -191,23 +193,32 @@ void SVDDigitizerModule::initialize()
   B2INFO(" -->  1 adu (e-)*:        " << m_unitADC);
   B2INFO(" REPORTING: ");
   B2INFO(" -->  statisticsFilename: " << m_rootFilename);
-  B2INFO(" -->  storeWaveforms:     " << (m_storeWaveforms ? "true" : "false"));
+  B2INFO(
+    " -->  storeWaveforms:     " << (m_storeWaveforms ? "true" : "false"));
 
   if (!m_rootFilename.empty()) {
     m_rootFile = new TFile(m_rootFilename.c_str(), "RECREATE");
     m_rootFile->cd();
-    m_histDiffusion_u = new TH1D("h_holeDiffusion", "Diffusion distance, u", 200, -100, 100);
+    m_histDiffusion_u = new TH1D("h_holeDiffusion", "Diffusion distance, u",
+                                 200, -100, 100);
     m_histDiffusion_u->GetXaxis()->SetTitle("Diffusion distance u [um]");
-    m_histDiffusion_v = new TH1D("h_electronDiffusion", "Diffusion distance", 200, -100, 100);
+    m_histDiffusion_v = new TH1D("h_electronDiffusion",
+                                 "Diffusion distance", 200, -100, 100);
     m_histDiffusion_v->GetXaxis()->SetTitle("Diffusion distance v [um]");
-    m_histLorentz_u = new TH1D("h_LorentzAngle_u", "Lorentz angle, holes", 100, -0.1, 0.0);
+    m_histLorentz_u = new TH1D("h_LorentzAngle_u", "Lorentz angle, holes",
+                               100, -0.1, 0.0);
     m_histLorentz_u->GetXaxis()->SetTitle("Lorentz angle");
-    m_histLorentz_v = new TH1D("h_LorentzAngle_v", "Lorentz angle, electrons", 100, -0.02, 0.02);
+    m_histLorentz_v = new TH1D("h_LorentzAngle_v",
+                               "Lorentz angle, electrons", 100, -0.02, 0.02);
     m_histLorentz_v->GetXaxis()->SetTitle("Lorentz angle");
-    m_signalDist_u = new TH1D("h_signalDist_u", "Strip signals vs. TrueHits, holes", 100, -400, 400);
-    m_signalDist_u->GetXaxis()->SetTitle("U strip position - TrueHit u [um]");
-    m_signalDist_v = new TH1D("h_signalDist_v", "Strip signals vs. TrueHits, electrons", 100, -400, 400);
-    m_signalDist_v->GetXaxis()->SetTitle("V strip position - TrueHit v [um]");
+    m_signalDist_u = new TH1D("h_signalDist_u",
+                              "Strip signals vs. TrueHits, holes", 100, -400, 400);
+    m_signalDist_u->GetXaxis()->SetTitle(
+      "U strip position - TrueHit u [um]");
+    m_signalDist_v = new TH1D("h_signalDist_v",
+                              "Strip signals vs. TrueHits, electrons", 100, -400, 400);
+    m_signalDist_v->GetXaxis()->SetTitle(
+      "V strip position - TrueHit v [um]");
 
     if (m_storeWaveforms) {
       m_waveTree = new TTree("waveTree", "SVD waveforms");
@@ -221,7 +232,8 @@ void SVDDigitizerModule::initialize()
     m_storeWaveforms = false;
   }
   // Check if the global random number generator is available.
-  if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
+  if (!gRandom)
+    B2FATAL("gRandom not initialized, please set up gRandom first");
 }
 
 void SVDDigitizerModule::beginRun()
@@ -240,7 +252,6 @@ void SVDDigitizerModule::beginRun()
   }
 }
 
-
 void SVDDigitizerModule::event()
 {
   //Clear sensors and process SimHits
@@ -252,20 +263,26 @@ void SVDDigitizerModule::event()
   m_currentSensorInfo = 0;
 
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
-  StoreArray<SVDSimHit>  storeSimHits(m_storeSimHitsName);
+  StoreArray<SVDSimHit> storeSimHits(m_storeSimHitsName);
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
 
   // FIXME: Provisional fix to ensure proper output when there are no SimHits:
   // Create empty arrays, then empty relations will be created, too.
-  if (!storeSimHits.isValid())  storeSimHits.create();
-  if (!storeTrueHits.isValid()) storeTrueHits.create();
+  if (!storeSimHits.isValid())
+    storeSimHits.create();
+  if (!storeTrueHits.isValid())
+    storeTrueHits.create();
   // For the same reason, initialize the RelationArrays.
-  RelationArray mcParticlesToSimHits(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);
+  RelationArray mcParticlesToSimHits(storeMCParticles, storeSimHits,
+                                     m_relMCParticleSimHitName);
   RelationArray mcParticlesToTrueHits(storeMCParticles, storeTrueHits); // not used here
-  RelationArray trueHitsToSimHits(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
+  RelationArray trueHitsToSimHits(storeTrueHits, storeSimHits,
+                                  m_relTrueHitSimHitName);
 
-  RelationIndex<MCParticle, SVDSimHit> relMCParticleSimHit(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);
-  RelationIndex<SVDTrueHit, SVDSimHit> relTrueHitSimHit(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
+  RelationIndex<MCParticle, SVDSimHit> relMCParticleSimHit(storeMCParticles,
+                                                           storeSimHits, m_relMCParticleSimHitName);
+  RelationIndex<SVDTrueHit, SVDSimHit> relTrueHitSimHit(storeTrueHits,
+                                                        storeSimHits, m_relTrueHitSimHitName);
 
   // Clear old SVDDigits
   StoreArray<SVDDigit> storeDigits(m_storeDigitsName);
@@ -274,70 +291,65 @@ void SVDDigitizerModule::event()
   else
     storeDigits.getPtr()->Clear();
 
-  RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
+  RelationArray relDigitMCParticle(storeDigits, storeMCParticles,
+                                   m_relDigitMCParticleName);
   relDigitMCParticle.clear();
 
-  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
+  RelationArray relDigitTrueHit(storeDigits, storeTrueHits,
+                                m_relDigitTrueHitName);
   relDigitTrueHit.clear();
 
   unsigned int nSimHits = storeSimHits.getEntries();
-  if (nSimHits == 0) return;
+  if (nSimHits == 0)
+    return;
 
   //Check sensor info and set pointers to current sensor
   for (unsigned int i = 0; i < nSimHits; ++i) {
     m_currentHit = storeSimHits[i];
-    // Don't bother with relations for background SimHits
-    if (m_currentHit->getBackgroundTag() != SimHitBase::bg_none) {
-      m_currentParticle = -1;
-      m_currentTrueHit = -1;
+    const RelationIndex<MCParticle, SVDSimHit>::Element* mcRel =
+      relMCParticleSimHit.getFirstElementTo(m_currentHit);
+    if (mcRel) {
+      m_currentParticle = mcRel->indexFrom;
     } else {
-      const RelationIndex<MCParticle, SVDSimHit>::Element* mcRel = relMCParticleSimHit.getFirstElementTo(m_currentHit);
-      if (mcRel) {
-        m_currentParticle = mcRel->indexFrom;
-      } else {
-        B2WARNING("Could not find MCParticle which produced SVDSimhit " << i);
-        m_currentParticle = -1;
-      }
-      const RelationIndex<SVDTrueHit, SVDSimHit>::Element* trueRel = relTrueHitSimHit.getFirstElementTo(m_currentHit);
-      if (trueRel) {
-        m_currentTrueHit = trueRel->indexFrom;
-      } else {
-        m_currentTrueHit = -1;
-      }
+      // Don't bother with warnings for background SimHits
+      if (m_currentHit->getBackgroundTag() == SimHitBase::bg_none)
+        B2WARNING(
+          "Could not find MCParticle which produced SVDSimhit " << i);
+      m_currentParticle = -1;
+    }
+    const RelationIndex<SVDTrueHit, SVDSimHit>::Element* trueRel =
+      relTrueHitSimHit.getFirstElementTo(m_currentHit);
+    if (trueRel) {
+      m_currentTrueHit = trueRel->indexFrom;
+    } else {
+      m_currentTrueHit = -1;
     }
 
     VxdID sensorID = m_currentHit->getSensorID();
     if (!m_currentSensorInfo || sensorID != m_currentSensorInfo->getID()) {
-      m_currentSensorInfo = dynamic_cast<const SensorInfo*>(&VXD::GeoCache::get(sensorID));
+      m_currentSensorInfo =
+        dynamic_cast<const SensorInfo*>(&VXD::GeoCache::get(
+                                          sensorID));
       if (!m_currentSensorInfo)
-        B2FATAL("Sensor Information for Sensor " << sensorID << " not found, make sure that the geometry is set up correctly");
+        B2FATAL(
+          "Sensor Information for Sensor " << sensorID << " not found, make sure that the geometry is set up correctly");
 
-      const SensorInfo& info  = *m_currentSensorInfo;
+      const SensorInfo& info = *m_currentSensorInfo;
       // Publish some useful data
-      m_sensorThickness       = info.getThickness();
-      m_depletionVoltage      = info.getDepletionVoltage();
-      m_biasVoltage           = info.getBiasVoltage();
-      m_backplaneCapacitance  = info.getBackplaneCapacitance();
+      m_sensorThickness = info.getThickness();
+      m_depletionVoltage = info.getDepletionVoltage();
+      m_biasVoltage = info.getBiasVoltage();
+      m_backplaneCapacitance = info.getBackplaneCapacitance();
       m_interstripCapacitance = info.getInterstripCapacitance();
-      m_couplingCapacitance   = info.getCouplingCapacitance();
+      m_couplingCapacitance = info.getCouplingCapacitance();
 
       m_currentSensor = &m_sensors[sensorID];
-      B2DEBUG(20, "Sensor Parameters for Sensor " << sensorID << ": " << endl
-              << " --> Width:          " << m_currentSensorInfo->getWidth() << endl
-              << " --> Length:         " << m_currentSensorInfo->getLength() << endl
-              << " --> uPitch:         " << m_currentSensorInfo->getUPitch() << endl
-              << " --> vPitch:         " << m_currentSensorInfo->getVPitch(-m_currentSensorInfo->getLength() / 2.0)
-              << ", " << m_currentSensorInfo->getVPitch(m_currentSensorInfo->getLength() / 2.0) << endl
-              << " --> Thickness:      " << m_currentSensorInfo->getThickness() << endl
-              << " --> Deplet. voltage:" << m_currentSensorInfo->getDepletionVoltage() << endl
-              << " --> Bias voltage:   " << m_currentSensorInfo->getBiasVoltage() << endl
-              << " --> Backplane cap.: " << m_currentSensorInfo->getBackplaneCapacitance() << endl
-              << " --> Interstrip cap.:" << m_currentSensorInfo->getInterstripCapacitance() << endl
-              << " --> Coupling cap.:  " << m_currentSensorInfo->getCouplingCapacitance() << endl
-             );
+      B2DEBUG(20,
+              "Sensor Parameters for Sensor " << sensorID << ": " << endl << " --> Width:          " << m_currentSensorInfo->getWidth() << endl << " --> Length:         " << m_currentSensorInfo->getLength() << endl << " --> uPitch:         " << m_currentSensorInfo->getUPitch() << endl << " --> vPitch:         " << m_currentSensorInfo->getVPitch(-m_currentSensorInfo->getLength() / 2.0) << ", " << m_currentSensorInfo->getVPitch(m_currentSensorInfo->getLength() / 2.0) << endl << " --> Thickness:      " << m_currentSensorInfo->getThickness() << endl << " --> Deplet. voltage:" << m_currentSensorInfo->getDepletionVoltage() << endl << " --> Bias voltage:   " << m_currentSensorInfo->getBiasVoltage() << endl << " --> Backplane cap.: " << m_currentSensorInfo->getBackplaneCapacitance() << endl << " --> Interstrip cap.:" << m_currentSensorInfo->getInterstripCapacitance() << endl << " --> Coupling cap.:  " << m_currentSensorInfo->getCouplingCapacitance() << endl);
 
     }
-    B2DEBUG(10, "Processing hit " << i << " in Sensor " << sensorID << ", related to MCParticle " << m_currentParticle);
+    B2DEBUG(10,
+            "Processing hit " << i << " in Sensor " << sensorID << ", related to MCParticle " << m_currentParticle);
     processHit();
   }
   // If storage of waveforms is required, store them in the statistics file.
@@ -363,11 +375,11 @@ void SVDDigitizerModule::processHit()
     //Ignore hits which are outside of the SVD active time frame.
     //Here we can only discard hits that arrived after the window was closed;
     //we will later start sampling only after the window opened.
-    B2DEBUG(30, "Checking if hit is in timeframe "
-            << m_currentHit->getGlobalTime() << " <= " << m_stopSampling
-           );
+    B2DEBUG(30,
+            "Checking if hit is in timeframe " << m_currentHit->getGlobalTime() << " <= " << m_stopSampling);
 
-    if (m_currentHit->getGlobalTime() > m_stopSampling) return;
+    if (m_currentHit->getGlobalTime() > m_stopSampling)
+      return;
   }
   // Set time of the event
   m_currentTime = m_currentHit->getGlobalTime();
@@ -378,7 +390,8 @@ void SVDDigitizerModule::processHit()
   TVector3 direction = stopPoint - startPoint;
   double trackLength = direction.Mag();
   //Calculate the number of electrons and holes
-  double carriers = m_currentHit->getEnergyDep() * Unit::GeV / Const::ehEnergy;
+  double carriers = m_currentHit->getEnergyDep() * Unit::GeV
+                    / Const::ehEnergy;
 
   if (m_currentHit->getPDGcode() == 22 || trackLength < 0.1 * Unit::um) {
     //Photons deposit the energy at the end of their step
@@ -392,36 +405,44 @@ void SVDDigitizerModule::processHit()
     direction.SetMag(1.0);
 
     for (int segment = 0; segment < numberOfSegments; ++segment) {
-      TVector3 position = startPoint + direction * segmentLength * (segment + 0.5);
+      TVector3 position = startPoint
+                          + direction * segmentLength * (segment + 0.5);
       driftCharge(position, carriers);
     }
   }
 }
 
-
 double SVDDigitizerModule::getElectronMobility(double E) const
 {
   // Electron parameters - maximum velocity, critical intensity, beta factor
-  static double vmElec   = 1.53 * pow(m_temperature, -0.87) * 1.E9 * Unit::cm / Unit::s;
-  static double EcElec   = 1.01 * pow(m_temperature, +1.55) * Unit::V / Unit::cm;
+  static double vmElec = 1.53 * pow(m_temperature, -0.87) * 1.E9 * Unit::cm
+                         / Unit::s;
+  static double EcElec = 1.01 * pow(m_temperature, +1.55) * Unit::V
+                         / Unit::cm;
   static double betaElec = 2.57 * pow(m_temperature, +0.66) * 1.E-2;
 
-  return (vmElec / EcElec * 1. / (pow(1. + pow((fabs(E) / EcElec), betaElec), (1. / betaElec))));
+  return (vmElec / EcElec * 1.
+          / (pow(1. + pow((fabs(E) / EcElec), betaElec), (1. / betaElec))));
 }
 
 double SVDDigitizerModule::getHoleMobility(double E) const
 {
   // Hole parameters - maximum velocity, critical intensity, beta factor
-  static double vmHole   = 1.62 * pow(m_temperature, -0.52) * 1.E8 * Unit::cm / Unit::s;
-  static double EcHole   = 1.24 * pow(m_temperature, +1.68) * Unit::V / Unit::cm;
+  static double vmHole = 1.62 * pow(m_temperature, -0.52) * 1.E8 * Unit::cm
+                         / Unit::s;
+  static double EcHole = 1.24 * pow(m_temperature, +1.68) * Unit::V
+                         / Unit::cm;
   static double betaHole = 0.46 * pow(m_temperature, +0.17);
 
-  return (vmHole / EcHole * 1. / (pow(1. + pow((fabs(E) / EcHole), betaHole), (1. / betaHole))));
+  return (vmHole / EcHole * 1.
+          / (pow(1. + pow((fabs(E) / EcHole), betaHole), (1. / betaHole))));
 }
 
 const TVector3 SVDDigitizerModule::getEField(const TVector3& point) const
 {
-  TVector3 E(0, 0, 2.0 * m_depletionVoltage / m_sensorThickness * (point.Z() + 0.5 * m_sensorThickness)
+  TVector3 E(0, 0,
+             2.0 * m_depletionVoltage / m_sensorThickness
+             * (point.Z() + 0.5 * m_sensorThickness)
              - (m_biasVoltage - m_depletionVoltage) / m_sensorThickness);
   return E;
 }
@@ -434,7 +455,8 @@ const TVector3 SVDDigitizerModule::getBField(const TVector3& point) const
   return bLocal * Unit::TinStdUnits;
 }
 
-const TVector3 SVDDigitizerModule::getVelocity(CarrierType carrier, const TVector3& point) const
+const TVector3 SVDDigitizerModule::getVelocity(CarrierType carrier,
+                                               const TVector3& point) const
 {
   TVector3 E = getEField(point);
   TVector3 B = getBField(point);
@@ -442,7 +464,7 @@ const TVector3 SVDDigitizerModule::getVelocity(CarrierType carrier, const TVecto
   double mobility = 0;
   double hallFactor = 0;
   if (carrier == electron) {
-    mobility = - getElectronMobility(E.Mag());
+    mobility = -getElectronMobility(E.Mag());
     hallFactor = (1.13 + 0.0008 * (m_temperature - 273));
   } else {
     mobility = getHoleMobility(E.Mag());
@@ -452,67 +474,70 @@ const TVector3 SVDDigitizerModule::getVelocity(CarrierType carrier, const TVecto
   // Calculate products
   TVector3 EcrossB = E.Cross(B);
   TVector3 BEdotB = E.Dot(B) * B;
-  TVector3 v = mobility * E + mobility * mobilityH * EcrossB +
-               + mobility * mobilityH * mobilityH * BEdotB;
+  TVector3 v = mobility * E + mobility * mobilityH * EcrossB
+               + +mobility * mobilityH * mobilityH * BEdotB;
   v *= 1.0 / (1.0 + mobilityH * mobilityH * B.Mag2());
   return v;
 }
 
-
-void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers)
+void SVDDigitizerModule::driftCharge(const TVector3& position,
+                                     double carriers)
 {
-  B2DEBUG(30, "Drifting " << carriers << " carriers at position ("
-          << position.x() << ", "
-          << position.y() << ", "
-          << position.z() << ")."
-         );
+  B2DEBUG(30,
+          "Drifting " << carriers << " carriers at position (" << position.x() << ", " << position.y() << ", " << position.z() << ").");
 
   //Get references to current sensor/info for ease of use
   const SensorInfo& info = *m_currentSensorInfo;
   Sensor& sensor = *m_currentSensor;
 
   double distanceToFrontPlane = 0.5 * m_sensorThickness - position.Z();
-  double distanceToBackPlane  = 0.5 * m_sensorThickness + position.Z();
+  double distanceToBackPlane = 0.5 * m_sensorThickness + position.Z();
 
   // Approximation: calculate drift velocity at the point halfway towards
   // the respective sensor surface.
-  TVector3 mean_e(position.X(), position.Y(), 0.5 * (position.Z() + m_sensorThickness));
-  TVector3 mean_h(position.X(), position.Y(), 0.5 * (position.Z() - m_sensorThickness));
+  TVector3 mean_e(position.X(), position.Y(),
+                  0.5 * (position.Z() + m_sensorThickness));
+  TVector3 mean_h(position.X(), position.Y(),
+                  0.5 * (position.Z() - m_sensorThickness));
 
   // Calculate drift times and widths of charge clouds.
   // Electrons:
   TVector3 v_e = getVelocity(electron, mean_e);
   double driftTime_e = distanceToFrontPlane / v_e.Z();
   TVector3 center_e = position + driftTime_e * v_e;
-  double D_e = Const::kBoltzmann * m_temperature / Unit::e * getElectronMobility(getEField(mean_e).Mag());
+  double D_e = Const::kBoltzmann * m_temperature / Unit::e
+               * getElectronMobility(getEField(mean_e).Mag());
   double sigma_e = sqrt(2.0 * D_e * driftTime_e);
   double tanLorentz_e = v_e.Y() / v_e.Z();
   sigma_e *= sqrt(1.0 + tanLorentz_e * tanLorentz_e);
-  if (m_histLorentz_v) m_histLorentz_v->Fill(tanLorentz_e);
+  if (m_histLorentz_v)
+    m_histLorentz_v->Fill(tanLorentz_e);
 
   // Holes
   TVector3 v_h = getVelocity(hole, mean_h);
-  double driftTime_h = - distanceToBackPlane / v_h.Z();
+  double driftTime_h = -distanceToBackPlane / v_h.Z();
   TVector3 center_h = position + driftTime_h * v_h;
-  double D_h = Const::kBoltzmann * m_temperature / Unit::e * getElectronMobility(getEField(mean_h).Mag());
+  double D_h = Const::kBoltzmann * m_temperature / Unit::e
+               * getElectronMobility(getEField(mean_h).Mag());
   double sigma_h = sqrt(2.0 * D_h * driftTime_h);
   double tanLorentz_h = v_h.X() / v_h.Z(); // Is this OK?
   sigma_h *= sqrt(1.0 + tanLorentz_h * tanLorentz_h);
-  if (m_histLorentz_u) m_histLorentz_u->Fill(tanLorentz_h);
+  if (m_histLorentz_u)
+    m_histLorentz_u->Fill(tanLorentz_h);
 
   //Determine strips hit by the electron cloud
-  double vLow    = center_e.Y() - m_widthOfDiffusCloud * sigma_e;
-  double vHigh   = center_e.Y() + m_widthOfDiffusCloud * sigma_e;
-  int    vIDLow  = info.getVCellID(vLow, true);
-  int    vIDHigh = info.getVCellID(vHigh, true);
+  double vLow = center_e.Y() - m_widthOfDiffusCloud * sigma_e;
+  double vHigh = center_e.Y() + m_widthOfDiffusCloud * sigma_e;
+  int vIDLow = info.getVCellID(vLow, true);
+  int vIDHigh = info.getVCellID(vHigh, true);
   B2DEBUG(30, "Size of diffusion cloud (e): " << sigma_e);
   B2DEBUG(30, "vID from " << vIDLow << " to " << vIDHigh);
 
   //Determine strips hit by the hole cloud
-  double uLow    = center_h.X() - m_widthOfDiffusCloud * sigma_h;
-  double uHigh   = center_h.X() + m_widthOfDiffusCloud * sigma_h;
-  int    uIDLow  = info.getUCellID(uLow, center_h.Y(), true);
-  int    uIDHigh = info.getUCellID(uHigh, center_h.Y(), true);
+  double uLow = center_h.X() - m_widthOfDiffusCloud * sigma_h;
+  double uHigh = center_h.X() + m_widthOfDiffusCloud * sigma_h;
+  int uIDLow = info.getUCellID(uLow, center_h.Y(), true);
+  int uIDHigh = info.getUCellID(uHigh, center_h.Y(), true);
   B2DEBUG(30, "Size of diffusion cloud (h): " << sigma_h);
   B2DEBUG(30, "uID from " << uIDLow << " to " << uIDHigh);
 
@@ -529,18 +554,22 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers)
   // Electrons
   // Add one more readout strip on each end of the region to make place for charges
   // induced by capacitive coupling.
-  if (vIDLow > 0) vIDLow--;
-  if (vIDHigh < info.getVCells() - 1) vIDHigh++;
+  if (vIDLow > 0)
+    vIDLow--;
+  if (vIDHigh < info.getVCells() - 1)
+    vIDHigh++;
   double vGeomPitch = 0.5 * info.getVPitch();
   // We have to store the strip charges to calculate cross-talk.
   double fraction = 0;
   int nStrips_e = 2 * (vIDHigh - vIDLow) + 1;
   std::vector<double> eStripCharges(nStrips_e);
   double vPos = info.getVCellPosition(vIDLow);
-  double vLowerTail = NORMAL_CDF(center_e.Y(), sigma_e, vPos - 0.5 * vGeomPitch);
+  double vLowerTail =
+    NORMAL_CDF(center_e.Y(), sigma_e, vPos - 0.5 * vGeomPitch);
   for (int vID = 0; vID < nStrips_e; ++vID) {
-    double vUpperTail = NORMAL_CDF(center_e.Y(), sigma_e, vPos + 0.5 * vGeomPitch);
-    double vIntegral  = vUpperTail - vLowerTail;
+    double vUpperTail =
+      NORMAL_CDF(center_e.Y(), sigma_e, vPos + 0.5 * vGeomPitch);
+    double vIntegral = vUpperTail - vLowerTail;
     // Can fail on far tails
     if (TMath::IsNaN(vIntegral)) vIntegral = 0.0;
     vLowerTail = vUpperTail;
@@ -563,64 +592,68 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers)
   // FIXME: We have the same parameters for n and p strips. Is this correct?
   double correctedCharge = 0;
   double cNeighbour2 = 0.5 * info.getInterstripCapacitance()
-                       / (0.5 * info.getInterstripCapacitance() + info.getBackplaneCapacitance() + info.getCouplingCapacitance());
+                       / (0.5 * info.getInterstripCapacitance()
+                          + info.getBackplaneCapacitance()
+                          + info.getCouplingCapacitance());
   double cNeighbour1 = 0.5;
   double cSelf = 1.0 - 2.0 * cNeighbour2;
   //Leftmost strip (there must be at least one readout strip to the right):
   int arrayIndex = 0;
   if (vIDLow == 0) {
-    correctedCharge =
-      (cNeighbour2 + cSelf) * eStripCharges[arrayIndex]
-      + cNeighbour1 * eStripCharges[arrayIndex + 1]
-      + cNeighbour2 * eStripCharges[arrayIndex + 2];
+    correctedCharge = (cNeighbour2 + cSelf) * eStripCharges[arrayIndex]
+                      + cNeighbour1 * eStripCharges[arrayIndex + 1]
+                      + cNeighbour2 * eStripCharges[arrayIndex + 2];
   } else {
-    correctedCharge =
-      cSelf * eStripCharges[arrayIndex]
-      + cNeighbour1 * eStripCharges[arrayIndex + 1]
-      + cNeighbour2 * eStripCharges[arrayIndex + 2];
+    correctedCharge = cSelf * eStripCharges[arrayIndex]
+                      + cNeighbour1 * eStripCharges[arrayIndex + 1]
+                      + cNeighbour2 * eStripCharges[arrayIndex + 2];
   }
-  sensor.second[vIDLow].add(m_currentTime + driftTime_e, correctedCharge, m_shapingTime, m_currentParticle, m_currentTrueHit);
+  sensor.second[vIDLow].add(m_currentTime + driftTime_e, correctedCharge,
+                            m_shapingTime, m_currentParticle, m_currentTrueHit);
 
   for (int vID = vIDLow + 1; vID < vIDHigh; ++vID) {
     arrayIndex = 2 * (vID - vIDLow);
-    correctedCharge =
-      cNeighbour2 * eStripCharges[arrayIndex - 2]
-      + cNeighbour1 * eStripCharges[arrayIndex - 1]
-      + cSelf * eStripCharges[arrayIndex]
-      + cNeighbour1 * eStripCharges[arrayIndex + 1]
-      + cNeighbour2 * eStripCharges[arrayIndex + 2];
-    sensor.second[vID].add(m_currentTime + driftTime_e, correctedCharge, m_shapingTime, m_currentParticle, m_currentTrueHit);
+    correctedCharge = cNeighbour2 * eStripCharges[arrayIndex - 2]
+                      + cNeighbour1 * eStripCharges[arrayIndex - 1]
+                      + cSelf * eStripCharges[arrayIndex]
+                      + cNeighbour1 * eStripCharges[arrayIndex + 1]
+                      + cNeighbour2 * eStripCharges[arrayIndex + 2];
+    sensor.second[vID].add(m_currentTime + driftTime_e, correctedCharge,
+                           m_shapingTime, m_currentParticle, m_currentTrueHit);
   }
   // Rightmost strip (there must be at least one readout strip to the left):
   arrayIndex = 2 * (vIDHigh - vIDLow);
   if (vIDHigh == info.getVCells()) {
-    correctedCharge =
-      cNeighbour2 * eStripCharges[arrayIndex - 2]
-      + cNeighbour2 * eStripCharges[arrayIndex - 1]
-      + (cSelf + cNeighbour2) * eStripCharges[arrayIndex];
+    correctedCharge = cNeighbour2 * eStripCharges[arrayIndex - 2]
+                      + cNeighbour2 * eStripCharges[arrayIndex - 1]
+                      + (cSelf + cNeighbour2) * eStripCharges[arrayIndex];
   } else {
-    correctedCharge =
-      cNeighbour2 * eStripCharges[arrayIndex - 2]
-      + cNeighbour2 * eStripCharges[arrayIndex - 1]
-      + cNeighbour2 * eStripCharges[arrayIndex];
+    correctedCharge = cNeighbour2 * eStripCharges[arrayIndex - 2]
+                      + cNeighbour2 * eStripCharges[arrayIndex - 1]
+                      + cNeighbour2 * eStripCharges[arrayIndex];
   }
-  sensor.second[vIDHigh].add(m_currentTime + driftTime_e, correctedCharge, m_shapingTime, m_currentParticle, m_currentTrueHit);
+  sensor.second[vIDHigh].add(m_currentTime + driftTime_e, correctedCharge,
+                             m_shapingTime, m_currentParticle, m_currentTrueHit);
 
   //Holes
   // Add one more readout strip on each end of the region to make place for charges
   // induced by capacitive coupling.
-  if (uIDLow > 0) uIDLow--;
-  if (uIDHigh < info.getUCells() - 1) uIDHigh++;
+  if (uIDLow > 0)
+    uIDLow--;
+  if (uIDHigh < info.getUCells() - 1)
+    uIDHigh++;
   double uGeomPitch = 0.5 * info.getUPitch(center_h.Y());
   // We have to store the strip charges to later calculate cross-talk.
   fraction = 0;
   int nStrips_h = 2 * (uIDHigh - uIDLow) + 1;
   std::vector<double> hStripCharges(nStrips_h);
   double uPos = info.getUCellPosition(uIDLow, info.getVCellID(center_h.Y()));
-  double uLowerTail = NORMAL_CDF(center_h.X(), sigma_h, uPos - 0.5 * uGeomPitch);
+  double uLowerTail =
+    NORMAL_CDF(center_h.X(), sigma_h, uPos - 0.5 * uGeomPitch);
   for (int uID = 0; uID < nStrips_h; ++uID) {
-    double uUpperTail = NORMAL_CDF(center_h.X(), sigma_h, uPos + 0.5 * uGeomPitch);
-    double uIntegral  = uUpperTail - uLowerTail;
+    double uUpperTail =
+      NORMAL_CDF(center_h.X(), sigma_h, uPos + 0.5 * uGeomPitch);
+    double uIntegral = uUpperTail - uLowerTail;
     // Can fail on far tails
     if (TMath::IsNaN(uIntegral)) uIntegral = 0.0;
     uLowerTail = uUpperTail;
@@ -643,45 +676,42 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers)
   //Leftmost strip (there must be at least one readout strip to the right):
   arrayIndex = 0;
   if (uIDLow == 0) {
-    correctedCharge =
-      cSelf * hStripCharges[arrayIndex]
-      + cNeighbour1 * hStripCharges[arrayIndex + 1]
-      + cNeighbour2 * hStripCharges[arrayIndex + 2];
+    correctedCharge = cSelf * hStripCharges[arrayIndex]
+                      + cNeighbour1 * hStripCharges[arrayIndex + 1]
+                      + cNeighbour2 * hStripCharges[arrayIndex + 2];
   } else {
-    correctedCharge =
-      (cNeighbour2 + cSelf) * hStripCharges[arrayIndex]
-      + cNeighbour1 * hStripCharges[arrayIndex + 1]
-      + cNeighbour2 * hStripCharges[arrayIndex + 2];
+    correctedCharge = (cNeighbour2 + cSelf) * hStripCharges[arrayIndex]
+                      + cNeighbour1 * hStripCharges[arrayIndex + 1]
+                      + cNeighbour2 * hStripCharges[arrayIndex + 2];
   }
-  sensor.first[uIDLow].add(m_currentTime + driftTime_h, correctedCharge, m_shapingTime, m_currentParticle, m_currentTrueHit);
+  sensor.first[uIDLow].add(m_currentTime + driftTime_h, correctedCharge,
+                           m_shapingTime, m_currentParticle, m_currentTrueHit);
   for (int uID = uIDLow + 1; uID < uIDHigh; ++uID) {
     arrayIndex = 2 * (uID - uIDLow);
-    correctedCharge =
-      cNeighbour2 * hStripCharges[arrayIndex - 2]
-      + cNeighbour1 * hStripCharges[arrayIndex - 1]
-      + cSelf * hStripCharges[arrayIndex]
-      + cNeighbour1 * hStripCharges[arrayIndex + 1]
-      + cNeighbour2 * hStripCharges[arrayIndex + 2];
-    sensor.first[uID].add(m_currentTime + driftTime_h, correctedCharge, m_shapingTime, m_currentParticle, m_currentTrueHit);
+    correctedCharge = cNeighbour2 * hStripCharges[arrayIndex - 2]
+                      + cNeighbour1 * hStripCharges[arrayIndex - 1]
+                      + cSelf * hStripCharges[arrayIndex]
+                      + cNeighbour1 * hStripCharges[arrayIndex + 1]
+                      + cNeighbour2 * hStripCharges[arrayIndex + 2];
+    sensor.first[uID].add(m_currentTime + driftTime_h, correctedCharge,
+                          m_shapingTime, m_currentParticle, m_currentTrueHit);
   }
   // Rightmost strip (there must be at least one readout strip to the left):
   arrayIndex = 2 * (uIDHigh - uIDLow);
   if (uIDHigh == info.getUCells()) {
-    correctedCharge =
-      cNeighbour2 * hStripCharges[arrayIndex - 2]
-      + cNeighbour2 * hStripCharges[arrayIndex - 1]
-      + (cSelf + cNeighbour2) * hStripCharges[arrayIndex];
+    correctedCharge = cNeighbour2 * hStripCharges[arrayIndex - 2]
+                      + cNeighbour2 * hStripCharges[arrayIndex - 1]
+                      + (cSelf + cNeighbour2) * hStripCharges[arrayIndex];
   } else {
-    correctedCharge =
-      cNeighbour2 * hStripCharges[arrayIndex - 2]
-      + cNeighbour2 * hStripCharges[arrayIndex - 1]
-      + cSelf * hStripCharges[arrayIndex];
+    correctedCharge = cNeighbour2 * hStripCharges[arrayIndex - 2]
+                      + cNeighbour2 * hStripCharges[arrayIndex - 1]
+                      + cSelf * hStripCharges[arrayIndex];
   }
-  sensor.first[uIDHigh].add(m_currentTime + driftTime_h, correctedCharge, m_shapingTime, m_currentParticle, m_currentTrueHit);
+  sensor.first[uIDHigh].add(m_currentTime + driftTime_h, correctedCharge,
+                            m_shapingTime, m_currentParticle, m_currentTrueHit);
 
 #undef NORMAL_CDF
 }
-
 
 double SVDDigitizerModule::addNoise(double charge)
 {
@@ -697,14 +727,15 @@ double SVDDigitizerModule::addNoise(double charge)
   return charge;
 }
 
-
 void SVDDigitizerModule::saveDigits(double time)
 {
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  StoreArray<SVDDigit>   storeDigits(m_storeDigitsName);
-  RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
-  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
+  StoreArray<SVDDigit> storeDigits(m_storeDigitsName);
+  RelationArray relDigitMCParticle(storeDigits, storeMCParticles,
+                                   m_relDigitMCParticleName);
+  RelationArray relDigitTrueHit(storeDigits, storeTrueHits,
+                                m_relDigitTrueHitName);
 
   //Zero suppression cut in electrons
   double charge_threshold = m_SNAdjacent * m_elNoise;
@@ -713,7 +744,8 @@ void SVDDigitizerModule::saveDigits(double time)
 
   BOOST_FOREACH(Sensors::value_type & sensor, m_sensors) {
     int sensorID = sensor.first;
-    const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+    const SensorInfo& info =
+      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     // u-side digits:
     // Remember which strips are occupied by signal
     std::set<short> occupied_u;
@@ -724,28 +756,30 @@ void SVDDigitizerModule::saveDigits(double time)
       double charge;
       SVDSignal::relations_map particles;
       SVDSignal::relations_map truehits;
-      boost::tie(charge, particles,
-                 truehits) = s(time);
+      boost::tie(charge, particles, truehits) = s(time);
       // Add noise to charge.
       double sampleCharge = addNoise(charge);
       // Zero-suppress if too small signal
-      if (sampleCharge < charge_threshold) continue;
+      if (sampleCharge < charge_threshold)
+        continue;
       //Limit signal to ADC steps
       if (m_applyADC)
-        sampleCharge = round(min(m_maxADC, max(m_minADC, sampleCharge)) / m_unitADC) * m_unitADC;
+        sampleCharge = round(
+                         min(m_maxADC, max(m_minADC, sampleCharge)) / m_unitADC)
+                       * m_unitADC;
       // Remember the strip as occupied
       occupied_u.insert(iStrip);
 
       // Save as a new digit
       int digIndex = storeDigits.getEntries();
-      storeDigits.appendNew(SVDDigit(
-                              sensorID, true, iStrip, info.getUCellPosition(iStrip), sampleCharge,
-                              time
-                            ));
+      storeDigits.appendNew(
+        SVDDigit(sensorID, true, iStrip,
+                 info.getUCellPosition(iStrip), sampleCharge, time));
 
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {
-        relDigitMCParticle.add(digIndex, particles.begin(), particles.end());
+        relDigitMCParticle.add(digIndex, particles.begin(),
+                               particles.end());
       }
       //If the digit has any relations to truehits, add the Relations.
       if (truehits.size() > 0) {
@@ -757,9 +791,9 @@ void SVDDigitizerModule::saveDigits(double time)
             float trueWeight = trueRel.second;
             if (iTrueHit > -1)
               m_signalDist_u->Fill(
-                (info.getUCellPosition(iStrip) - storeTrueHits[iTrueHit]->getU()) / Unit::um,
-                trueWeight
-              );
+                (info.getUCellPosition(iStrip)
+                 - storeTrueHits[iTrueHit]->getU())
+                / Unit::um, trueWeight);
           }
         }
       }
@@ -771,12 +805,13 @@ void SVDDigitizerModule::saveDigits(double time)
       int uNoisyStrips = gRandom->Poisson(fraction * nU);
       for (short ns = 0; ns < uNoisyStrips; ++ns) {
         short iStrip = gRandom->Integer(nU);
-        if (occupied_u.count(iStrip) > 0) continue;
+        if (occupied_u.count(iStrip) > 0)
+          continue;
         // Add a noisy digit, no relations.
-        storeDigits.appendNew(SVDDigit(
-                                sensorID, true, iStrip, info.getUCellPosition(iStrip), addNoise(-1.0),
-                                time
-                              ));
+        storeDigits.appendNew(
+          SVDDigit(sensorID, true, iStrip,
+                   info.getUCellPosition(iStrip), addNoise(-1.0),
+                   time));
         // Remember strip as occupied
         occupied_u.insert(iStrip);
       } // for ns
@@ -796,23 +831,26 @@ void SVDDigitizerModule::saveDigits(double time)
       // Add noise to charge.
       double sampleCharge = addNoise(charge);
       // Zero-suppress if too small signal
-      if (sampleCharge < charge_threshold) continue;
+      if (sampleCharge < charge_threshold)
+        continue;
       //Limit signal to ADC steps
       if (m_applyADC)
-        sampleCharge = round(min(m_maxADC, max(m_minADC, sampleCharge)) / m_unitADC) * m_unitADC;
+        sampleCharge = round(
+                         min(m_maxADC, max(m_minADC, sampleCharge)) / m_unitADC)
+                       * m_unitADC;
       // Remember the strip as occupied
       occupied_v.insert(iStrip);
 
       // Save as a new digit
       int digIndex = storeDigits.getEntries();
-      storeDigits.appendNew(SVDDigit(
-                              sensorID, false, iStrip, info.getVCellPosition(iStrip), sampleCharge,
-                              time
-                            ));
+      storeDigits.appendNew(
+        SVDDigit(sensorID, false, iStrip,
+                 info.getVCellPosition(iStrip), sampleCharge, time));
 
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {
-        relDigitMCParticle.add(digIndex, particles.begin(), particles.end());
+        relDigitMCParticle.add(digIndex, particles.begin(),
+                               particles.end());
       }
       //If the digit has any relations to truehits, add the Relations
       if (truehits.size() > 0) {
@@ -824,9 +862,9 @@ void SVDDigitizerModule::saveDigits(double time)
             float trueWeight = trueRel.second;
             if (iTrueHit > -1)
               m_signalDist_v->Fill(
-                (info.getVCellPosition(iStrip) - storeTrueHits[iTrueHit]->getV()) / Unit::um,
-                trueWeight
-              );
+                (info.getVCellPosition(iStrip)
+                 - storeTrueHits[iTrueHit]->getV())
+                / Unit::um, trueWeight);
           }
         }
       }
@@ -838,12 +876,13 @@ void SVDDigitizerModule::saveDigits(double time)
       int vNoisyStrips = gRandom->Poisson(fraction * nV);
       for (short ns = 0; ns < vNoisyStrips; ++ns) {
         short iStrip = gRandom->Integer(nV);
-        if (occupied_v.count(iStrip) > 0) continue;
+        if (occupied_v.count(iStrip) > 0)
+          continue;
         // Add a noisy digit, no relations.
-        storeDigits.appendNew(SVDDigit(
-                                sensorID, false, iStrip, info.getVCellPosition(iStrip), addNoise(-1.0),
-                                time
-                              ));
+        storeDigits.appendNew(
+          SVDDigit(sensorID, false, iStrip,
+                   info.getVCellPosition(iStrip), addNoise(-1.0),
+                   time));
         // Remember strip as occupied
         occupied_v.insert(iStrip);
       } // for ns
@@ -865,7 +904,8 @@ void SVDDigitizerModule::saveWaveforms()
       tree_strip = stripSignal.first;
       SVDSignal& s = stripSignal.second;
       // Read the value only if the signal is large enough.
-      if (s.getCharge() < charge_threshold) continue;
+      if (s.getCharge() < charge_threshold)
+        continue;
       double charge;
       SVDSignal::relations_map particles;
       SVDSignal::relations_map truehits;
@@ -881,12 +921,13 @@ void SVDDigitizerModule::saveWaveforms()
       tree_strip = stripSignal.first;
       SVDSignal& s = stripSignal.second;
       // Read the values only if the signal is large enough
-      if (s.getCharge() < charge_threshold) continue;
+      if (s.getCharge() < charge_threshold)
+        continue;
       double charge;
       SVDSignal::relations_map particles;
       SVDSignal::relations_map truehits;
       for (int iTime = 0; iTime < 20; ++iTime) {
-        boost::tie(charge, particles, truehits) = s(10.*iTime);
+        boost::tie(charge, particles, truehits) = s(10. * iTime);
         tree_signal[iTime] = charge;
       }
       m_waveTree->Fill();
@@ -895,7 +936,6 @@ void SVDDigitizerModule::saveWaveforms()
   m_rootFile->Flush();
 }
 
-
 void SVDDigitizerModule::terminate()
 {
   if (m_rootFile) {
@@ -903,5 +943,4 @@ void SVDDigitizerModule::terminate()
     m_rootFile->Close();
   }
 }
-
 

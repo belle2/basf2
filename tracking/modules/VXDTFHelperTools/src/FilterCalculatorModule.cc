@@ -241,9 +241,9 @@ void FilterCalculatorModule::beginRun()
   for (int i = 0; i < m_numOfLayers * 2; i++) {
     m_trackletLengthCounter.push_back(0);
   }
-  bool bleh = false;
-  if (m_PARAMdetectorType == Const::SVD) { bleh = true; }
-  B2INFO("chosen detectorType: " << m_PARAMdetectorType << ", Const::PXD: " << Const::PXD << ", Const::SVD: " << Const::SVD << ", detectorType = SVD: " << bleh << ", uniSigma: " << m_PARAMuniSigma)
+  bool useSVDonly = false;
+  if (m_PARAMdetectorType == Const::SVD) { useSVDonly = true; }
+  B2INFO("chosen detectorType: " << m_PARAMdetectorType << ", Const::PXD: " << Const::PXD << ", Const::SVD: " << Const::SVD << ", detectorType = SVD: " << useSVDonly << ", uniSigma: " << m_PARAMuniSigma)
 }
 
 /// /// /// /// /// /// /// /// EVENT /// /// /// /// /// /// /// ///

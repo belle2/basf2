@@ -432,6 +432,7 @@ void VXDTFModule::initialize()
 void VXDTFModule::beginRun()
 {
   B2DEBUG(1, "################## entering VXD CA track finder - beginRun ######################");
+  B2INFO("entering VXD CA track finder (VXDTFModule) - beginRun: \n vvvvvvv");
   B2DEBUG(50, "##### be careful, current TF status does not support more than one run per initialization! #####");
 
 
@@ -448,7 +449,7 @@ void VXDTFModule::beginRun()
 
     if (int (m_PARAMdetectorType.size()) < i + 1) {
 //       newPass->detectorType = m_PARAMdetectorType[m_PARAMdetectorType.size() - 1];
-      B2WARNING("detectorType not set for each sectorMap, copying first choice")
+      B2WARNING("detectorType not set for each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
       if (m_PARAMdetectorType[m_PARAMdetectorType.size() - 1] == "SVD") {
         newPass->detectorType = Const::SVD;
       } else if (m_PARAMdetectorType[m_PARAMdetectorType.size() - 1] == "PXD") {
@@ -473,26 +474,26 @@ void VXDTFModule::beginRun()
 
     }
     if (int (m_PARAMsetupWeigh.size()) < i + 1) {
-      B2WARNING("setupWeigh not set each sectorMap, copying first choice")
+      B2WARNING("setupWeigh not set each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
       newPass->setupWeigh = m_PARAMsetupWeigh[m_PARAMsetupWeigh.size() - 1] * 0.01;
     } else {
       newPass->setupWeigh = m_PARAMsetupWeigh[i] * 0.01;
       if (newPass->setupWeigh < 0) { newPass->setupWeigh = 0; } else if (newPass->setupWeigh > 1.) { newPass->setupWeigh = 1.; }
     }
     if (int (m_PARAMhighestAllowedLayer.size()) < i + 1) {
-      B2WARNING("highestAllowedLayer not set each sectorMap, copying first choice")
+      B2WARNING("highestAllowedLayer not set each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
       newPass->highestAllowedLayer = m_PARAMhighestAllowedLayer[m_PARAMhighestAllowedLayer.size() - 1];
     } else {
       newPass->highestAllowedLayer = m_PARAMhighestAllowedLayer[i];
     }
     if (int (m_PARAMminLayer.size()) < i + 1) {
-      B2WARNING("minLayer not set each sectorMap, copying first choice")
+      B2WARNING("minLayer not set each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
       newPass->minLayer = m_PARAMminLayer[m_PARAMminLayer.size() - 1];
     } else {
       newPass->minLayer = m_PARAMminLayer[i];
     }
     if (int (m_PARAMminState.size()) < i + 1) {
-      B2WARNING("minState not set each sectorMap, copying first choice")
+      B2WARNING("minState not set each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
       newPass->minState = m_PARAMminState[m_PARAMminState.size() - 1];
     } else {
       newPass->minState = m_PARAMminState[i];
@@ -851,7 +852,7 @@ void VXDTFModule::beginRun()
     B2INFO("importing sectors, using " << chosenSetup << " > " << sectorList.getNumberNodes("aSector") << " sectors found");
 
     if (sectorList.getNumberNodes("aSector") == 0) {
-      B2FATAL("Failed to import sector map " << chosenSetup << "! No track finding possible. Please check ../tracking/data/VXDTFindex.xml whether your chosen sector maps are uncommented and recompile if you change entries...")
+      B2FATAL("Failed to import sector map " << chosenSetup << "! No track finding possible. Please check ../tracking/data/VXDTFindex.xml whether your chosen sector maps are uncommented (and files linked there are not zipped) and recompile if you change entries...")
     }
     double cutoffMinValue, cutoffMaxValue;
     string aSectorName, aFriendName, aFilterName;
@@ -1086,6 +1087,7 @@ void VXDTFModule::beginRun()
   m_totalSVDClusterCombis = 0;
   m_TESTERhighOccupancyCtr = 0;
 
+  B2INFO(" ^^^^^^^ \n leaving VXD CA track finder (VXDTFModule) - beginRun:");
 }
 
 /** *************************************+************************************* **/
@@ -1171,12 +1173,11 @@ void VXDTFModule::event()
   TVector3 hitLocal, transformedHitLocal, localSensorSize;
   PositionInfo hitInfo;
   double vSize, uSizeAtHit, uCoord, vCoord;
-  string aSectorName;
   unsigned int aSecID;
   VxdID aVxdID;
   boostClock::time_point timeStamp = boostClock::now();
   int badSectorRangeCtr = 0, aLayerID;
-  string checkString4badHits = "-", testString;
+  string checkString4badHits = "-";
   for (int iPart = 0; iPart < numOfPxdClusters; ++iPart) { /// means: numOfPxdClusters > 0 if at least one pass wants PXD hits
     const PXDCluster* const aClusterPtr = aPxdClusterArray[iPart];
 
@@ -1556,7 +1557,7 @@ void VXDTFModule::event()
     /*int*/ survivingTCs = 0;
 //   BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
     if (int(currentPass->tcVector.size()) != 0) {
-      survivingTCs = tcFilter(currentPass, passNumber, clustersOfEvent);
+      survivingTCs = tcFilter(currentPass, passNumber/*, clustersOfEvent*/);
       thisInfoPackage.numTCsAfterTCCfilter += survivingTCs;
       B2DEBUG(1, "pass " << passNumber << ": track candidate filter, " << survivingTCs << " TCs survived.");
     } else {
@@ -1969,8 +1970,8 @@ void VXDTFModule::endRun()
   int q90 = 9 * q10;
   int q99 = 99 * q1;
   B2INFO(" there were " << numLoggedEvents << " events recorded by the eventLogger, listing slowest, fastest, median q0.1 and q0.9 event:" << endl)
-  int meanTimeConsumption = 0;
   if (numLoggedEvents != 0) {
+    int meanTimeConsumption = 0;
     BOOST_FOREACH(EventInfoPackage & infoPackage, m_TESTERlogEvents) {
       meanTimeConsumption += infoPackage.totalTime.count();
     }
@@ -3067,7 +3068,8 @@ void VXDTFModule::tcCollector(CurrentPassData* currentPass)
 
 
 /** ***** Track Candidate Filter (tcFilter) ***** **/
-int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<ClusterInfo>& clustersOfEvent)
+int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber)
+// int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<ClusterInfo>& clustersOfEvent)
 {
   TCsOfEvent::iterator currentTC;
   TVector3* hitA, *hitB, *hitC, *hitD;

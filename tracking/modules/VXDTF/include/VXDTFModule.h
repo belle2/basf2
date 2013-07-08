@@ -372,8 +372,8 @@ namespace Belle2 {
 
       /** filters TCs via deltaPt, ZigZag and deltaDistance2IP */
       int tcFilter(CurrentPassData* currentPass,
-                   int passNumber,
-                   std::vector<ClusterInfo>& clustersOfEvent);
+                   int passNumber/*,
+                   std::vector<ClusterInfo>& clustersOfEvent*/);
 
 
       /** represents a step between the fast but weak calcQIbyLength and the mighty but slow calcQIbyKalman. Only useful for Tracks having at least 4 hits (3-hit-tracks will be set with smearValue) */

@@ -543,9 +543,9 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
 //  vector<PXDTrueHit*> pxdTrueHits;
   vector<const SVDTrueHit*> svdTrueHits;
 
-  typedef std::map<int, int> map_type;
+  /*typedef std::map<int, int> map_type;
   typedef pair<unsigned int, vector<int> > pair4SvdHitMap;
-  map<unsigned int, vector<int>  > svdHitMap; // since svdClusters are only 1D and we can not assume, that two clusters of the same hit are found in pairs within the TC-hit-List, we have to sort them before using them
+  map< pair4SvdHitMap > svdHitMap;*/ // since svdClusters are only 1D and we can not assume, that two clusters of the same hit are found in pairs within the TC-hit-List, we have to sort them before using them TODO find out, why this value is not used!
   for (int hitIndex = 0; hitIndex not_eq numOfHits; ++hitIndex) {
     B2DEBUG(100, "----importing hit " << hitIndex << " from trackCandidate...")
     int detID = -1; // ID of detector

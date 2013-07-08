@@ -113,6 +113,7 @@ namespace Belle2 {
     EXPECT_FALSE(aFilter.ziggZaggRZ());
     double chi2 = aFilter.circleFit(clapPhi, clapR, estimatedRadius);
 //     B2WARNING("after maxi-test, chi2 is " << chi2 << ", clapPhi,clapR,estimatedRadius is: " << clapPhi << "," << clapR << "," << estimatedRadius)
+    chi2++; // is simply for removing the warning. Has no other meaning since Value is resetted all the time
 
     aFilter.resetValues(&miniStuff);
     EXPECT_FALSE(aFilter.ziggZaggXY());

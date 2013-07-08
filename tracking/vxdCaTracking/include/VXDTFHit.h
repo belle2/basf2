@@ -99,12 +99,12 @@ namespace Belle2 {
       std::string getSectorString(); /**< returns name of sectors containing current hit (sectors are passDependent), in human readable string */
       const VxdID getVxdID() const { return m_VxdID; } /**< returns VxdID of sensor carrying current sector */
       float getTimeStamp() const { return m_timeStamp; } /**< set for SVDHits, for PXDHits it's 0 */
-      bool isReserved(); /* {
+      bool isReserved(); /**< is true, if a valid TC is already using any Cluster attached to this hit */ /* {
         if (m_clusterIndexU != NULL) { if (m_clusterIndexU->isReserved() == true) { return true; } }
         if (m_clusterIndexV != NULL) { if (m_clusterIndexV->isReserved() == true) { return true; } }
         if (m_clusterIndexUV != NULL) { if (m_clusterIndexUV->isReserved() == true) { return true; } }
         return false;
-      } */ /**< is true, if a valid TC is already using any Cluster attached to this hit */
+      } */
 
       /** setter **/
       void addInnerCell(int newCell) { m_attachedInnerCells.push_back(newCell); } /**< adds new Cell to vector of inner Cells attached to current hit */

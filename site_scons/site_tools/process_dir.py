@@ -104,6 +104,10 @@ def process_dir(
     if env.Dictionary().has_key('LIBS'):
         del env.Dictionary()['LIBS']
 
+    # link dataobjects to analysis modules
+    if dir_name == '.':
+        env.Append(LIBS=['dataobjects'])
+
     # include SConscript file if it exists
     sconscript_name = real_path(os.path.join(dir_name, 'SConscript'),
                                 release_dir)
@@ -167,8 +171,8 @@ def process_dir(
                 'data',
                 ]:
                 continue
-            process_dir(env, os.path.join(dir_name, entry), is_module_dir,
-                        release_dir)
+            process_dir(env, os.path.join(dir_name, entry), is_module_dir
+                        and dir_name != '.', release_dir)
 
     # determine whether we are in a special directory
     is_package_dir = dir_name == env['PACKAGE']

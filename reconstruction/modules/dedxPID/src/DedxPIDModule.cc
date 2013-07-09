@@ -7,7 +7,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Const.h>
 #include <framework/core/utilities.h>
 
@@ -16,8 +15,7 @@
 #include <generators/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
+#include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -34,11 +32,9 @@
 
 #include <TFile.h>
 #include <TGeoManager.h>
-#include <TH1F.h>
 #include <TH2F.h>
 #include <TMath.h>
 
-#include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
@@ -58,18 +54,13 @@ REG_MODULE(DedxPID)
 //#define USE_HELIX_PATH_LENGTH
 
 
-template <class HitClass> float get_edep(const HitClass* hit) { return hit->getEnergyDep(); }
-
-//specialization for PXDCluster, has getChange() instead of getEnergyDep()
-float get_edep(const PXDCluster* hit) { return hit->getCharge(); }
-
 
 DedxPIDModule::DedxPIDModule() : Module()
 {
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //Set module properties
-  setDescription("Extract dE/dx (and some other things) from Tracks&GFTrackCandidates and PXDClusters, SVDTrueHits (not digitized) and CDCHits.");
+  setDescription("Extract dE/dx and corresponding log-likelihood from fitted tracks and hits in the CDC, SVD and PXD.");
 
   //Parameter definitions
   addParam("useIndividualHits", m_useIndividualHits, "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", true);
@@ -77,14 +68,14 @@ DedxPIDModule::DedxPIDModule() : Module()
   addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded if UseIndividualHits is false", double(0.8));
 
   addParam("onlyPrimaryParticles", m_onlyPrimaryParticles, "Only save data for primary particles (as determined by MC truth)", false);
-  addParam("usePXD", m_usePXD, "Use PXD hits for dE/dx calculation", false);
-  addParam("useSVD", m_useSVD, "Use SVD hits for dE/dx calculation", true);
-  addParam("useCDC", m_useCDC, "Use CDC hits for dE/dx calculation", true);
+  addParam("usePXD", m_usePXD, "Use PXDClusters for dE/dx calculation", false);
+  addParam("useSVD", m_useSVD, "Use SVDClusters for dE/dx calculation", true);
+  addParam("useCDC", m_useCDC, "Use CDCHits for dE/dx calculation", true);
 
   addParam("trackDistanceThreshold", m_trackDistanceThreshhold, "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
   addParam("enableDebugOutput", m_enableDebugOutput, "Wether to save information on tracks and associated hits and dE/dx values in DedxTrack objects.", false);
 
-  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", std::string("/data/reconstruction/dedxPID_PDFs_r3701_235k_events_upper_80perc_trunc.root"));
+  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", std::string("/data/reconstruction/dedxPID_PDFs_r5541_200k_events_upper_80perc_trunc.root"));
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 }
 
@@ -110,10 +101,18 @@ void DedxPIDModule::initialize()
 
   //optional inputs
   StoreArray<MCParticle>::optional();
-  StoreArray<CDCHit>::optional();
-  StoreArray<SVDTrueHit>::optional();
-  StoreArray<PXDTrueHit>::optional();
-  StoreArray<PXDCluster>::optional();
+  if (m_useCDC)
+    StoreArray<CDCHit>::required();
+  else
+    StoreArray<CDCHit>::optional();
+  if (m_useSVD)
+    StoreArray<SVDCluster>::required();
+  else
+    StoreArray<SVDCluster>::optional();
+  if (m_usePXD)
+    StoreArray<PXDCluster>::required();
+  else
+    StoreArray<PXDCluster>::optional();
 
   //register outputs (if needed)
   if (m_enableDebugOutput)
@@ -201,13 +200,8 @@ void DedxPIDModule::event()
   const int num_mcparticles = mcparticles.getEntries();
 
   StoreArray<CDCHit> cdcHits;
-  StoreArray<SVDTrueHit> svdTrueHits;
-  StoreArray<PXDTrueHit> pxdTrueHits;
-  StoreArray<PXDCluster> pxdClusters; //no 1:1 correspondence with PXDTrueHits & PXDRecoHits!
-
-  boost::shared_ptr<RelationIndex<PXDCluster, PXDTrueHit> > pxdClustersToTrueHitsIndex;
-  if (m_usePXD)
-    pxdClustersToTrueHitsIndex = boost::make_shared<RelationIndex<PXDCluster, PXDTrueHit> >(pxdClusters, pxdTrueHits);
+  StoreArray<PXDCluster> pxdClusters;
+  StoreArray<SVDCluster> svdClusters;
 
   //outputs
   StoreArray<DedxLikelihood> likelihood_array;
@@ -274,8 +268,8 @@ void DedxPIDModule::event()
 
     //sort hits in the order they were created
     //this is required if I want to use the helix path length
-    const GFTrackCand& gftrackcand = gftrack->getCand();
-    const_cast<GFTrackCand& >(gftrackcand).sortHits();
+    GFTrackCand gftrackcand = gftrack->getCand();
+    gftrackcand.sortHits();
     const int num_hits = gftrackcand.getNHits();
     if (num_hits == 0) {
       B2WARNING("Track has no associated hits, skipping");
@@ -390,11 +384,11 @@ void DedxPIDModule::event()
           float total_distance = path_length - last_path_length;
           if (!helix_accurate or total_distance == 0.0) { //path length identical to last layer??
             B2INFO("Path length zero, using simple geometrical correction");
-            total_distance = getFlownDistanceCDC(current_layer, dedxTrack->m_p_vec.Theta(), phi_average);
+            total_distance = getTraversedLengthCDC(current_layer, dedxTrack->m_p_vec.Theta(), phi_average);
             total_distance = TMath::Min(direct_distance, total_distance); //total_distance diverges for phi ~ 0
           }
 #else
-          float total_distance = getFlownDistanceCDC(current_layer, dedxTrack->m_p_vec.Theta(), phi_average);
+          float total_distance = getTraversedLengthCDC(current_layer, dedxTrack->m_p_vec.Theta(), phi_average);
           total_distance = TMath::Min(direct_distance, total_distance); //total_distance diverges for phi ~ 0
 #endif
 
@@ -432,28 +426,13 @@ void DedxPIDModule::event()
     }
 
     if (m_usePXD) {
-      //get indices of PXDTrueHits
-      const std::vector<int>& pxdHitIDs = gftrackcand.getHitIDs(Const::PXD);
-      const int nPxdHits = pxdHitIDs.size();
-
-      //and construct a list of associated PXDCluster indices
-      std::vector<int> pxdClusterIDs;
-      for (int iHit = 0; iHit < nPxdHits; iHit++) {
-        typedef RelationIndex<PXDCluster, PXDTrueHit>::Element relElement_t;
-        unsigned int hitID = pxdHitIDs[iHit];
-        //get all relations that point to hitID
-        BOOST_FOREACH(const relElement_t & rel, pxdClustersToTrueHitsIndex->getElementsTo(pxdTrueHits[hitID])) {
-          pxdClusterIDs.push_back(rel.indexFrom);
-        }
-      }
-      sort(pxdClusterIDs.begin(), pxdClusterIDs.end());
+      const std::vector<int>& pxdClusterIDs = gftrackcand.getHitIDs(Const::PXD);
       saveSiHits(dedxTrack.get(), helix_at_origin, pxdClusters, pxdClusterIDs);
     }
 
     if (m_useSVD) {
-      //no way to access digitized SVD hits, so we'll just use the SVDTrueHits directly
-      const std::vector<int>& svdHitIDs = gftrackcand.getHitIDs(Const::SVD);
-      saveSiHits(dedxTrack.get(), helix_at_origin, svdTrueHits, svdHitIDs);
+      const std::vector<int>& svdClusterIDs = gftrackcand.getHitIDs(Const::SVD);
+      saveSiHits(dedxTrack.get(), helix_at_origin, svdClusters, svdClusterIDs);
     }
 
 
@@ -538,7 +517,7 @@ void DedxPIDModule::calculateMeans(float* mean, float* truncatedMean, float* tru
 }
 
 
-float DedxPIDModule::getFlownDistanceCDC(int layerid, float theta, float phi)
+float DedxPIDModule::getTraversedLengthCDC(int layerid, float theta, float phi)
 {
   static CDCGeometryPar& geo = CDCGeometryPar::Instance();
 
@@ -548,9 +527,48 @@ float DedxPIDModule::getFlownDistanceCDC(int layerid, float theta, float phi)
   return TMath::Abs(d / (sin(theta) * cos(phi)));
 }
 
-//assume HitClass provides getU/V(), getSensorID(), getEnergyDep()
-//true for SVDRecoHit2D, PXDRecoHit, and associated TrueHits
-template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const HelixHelper& helix, const StoreArray<HitClass> &hits, const std::vector<int> &hit_indices) const
+double DedxPIDModule::getTraversedLength(const PXDCluster* hit, const HelixHelper* helix)
+{
+  static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
+
+  const TVector3 local_pos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
+  const TVector3& global_pos = sensor.pointToGlobal(local_pos);
+  const TVector3& local_momentum = helix->momentum(helix->pathLengthToPoint(global_pos));
+
+  const TVector3& sensor_normal = sensor.vectorToGlobal(TVector3(0.0, 0.0, 1.0));
+  const double angle = sensor_normal.Angle(local_momentum); //includes theta and phi components
+
+  //I'm assuming there's only one hit per sensor, there are _very_ rare exceptions to that (most likely curlers)
+  return TMath::Min(sensor.getWidth(), sensor.getThickness() / fabs(cos(angle)));
+}
+
+double DedxPIDModule::getTraversedLength(const SVDCluster* hit, const HelixHelper* helix)
+{
+  static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
+
+  TVector3 a, b;
+  if (hit->isUCluster()) {
+    const float u = hit->getPosition();
+    a = sensor.pointToGlobal(TVector3(sensor.getBackwardWidth() / sensor.getWidth(0) * u, -0.5 * sensor.getLength(), 0.0));
+    b = sensor.pointToGlobal(TVector3(sensor.getForwardWidth() / sensor.getWidth(0) * u, +0.5 * sensor.getLength(), 0.0));
+  } else {
+    const float v = hit->getPosition();
+    a = sensor.pointToGlobal(TVector3(-0.5 * sensor.getWidth(v), v, 0.0));
+    b = sensor.pointToGlobal(TVector3(+0.5 * sensor.getWidth(v), v, 0.0));
+  }
+  const double path_length = helix->pathLengthToLine(a, b);
+  const TVector3& local_momentum = helix->momentum(path_length);
+
+  const TVector3& sensor_normal = sensor.vectorToGlobal(TVector3(0.0, 0.0, 1.0));
+  const double angle = sensor_normal.Angle(local_momentum); //includes theta and phi components
+
+  //I'm assuming there's only one hit per sensor, there are _very_ rare exceptions to that (most likely curlers)
+  return TMath::Min(sensor.getWidth(), sensor.getThickness() / fabs(cos(angle)));
+}
+
+template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const HelixHelper& helix, const StoreArray<HitClass>& hits, const std::vector<int>& hit_indices) const
 {
   const int num_hits = hit_indices.size();
   if (num_hits == 0)
@@ -563,36 +581,26 @@ template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const
   assert(current_detector == VXD::SensorInfoBase::PXD or current_detector == VXD::SensorInfoBase::SVD);
   assert(current_detector <= 1); //used as array index
 
-  std::vector<float> silicon_dedx(num_hits); //used for averages
+  std::vector<float> silicon_dedx; //used for averages
+  silicon_dedx.reserve(num_hits);
 
   for (int i = 0; i < num_hits; i++) {
     const HitClass* hit = hits[hit_indices.at(i)];
     if (!hit) {
-      B2ERROR("Silicon hit index out of bounds!");
+      B2ERROR(hits.getName() << " index out of bounds!");
       continue;
     }
-
-    const TVector3 local_pos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
-    const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
-    const TVector3& global_pos = sensor.pointToGlobal(local_pos);
-
-    //assumption: Si detectors are close enough to the origin that this is still accurate
-    const TVector3& local_momentum = helix.momentum(helix.pathLengthToPoint(global_pos));
-
-    const TVector3& sensor_normal = sensor.vectorToGlobal(TVector3(0.0, 0.0, 1.0));
-    const double angle = sensor_normal.Angle(local_momentum); //includes theta and phi components
-    const int layer = -hit->getSensorID().getLayerNumber();
-    assert(layer >= -6 && layer < 0);
-    const float hit_edep = get_edep(hit); //not a charge, but at least it's uncorrected
-
-    if (m_enableDebugOutput)
-      track->addHit(global_pos, layer, hit->getSensorID(), angle, hit_edep, false);
-
+    int layer = -1;
+    if (m_enableDebugOutput) {
+      layer = -hit->getSensorID().getLayerNumber();
+      assert(layer >= -6 && layer < 0);
+    }
 
     //active medium traversed, in cm (can traverse one sensor at most)
-    //I'm assuming there's only one hit per sensor, there are _very_ rare exceptions to that (most likely curlers)
-    const double total_distance = TMath::Min(sensor.getWidth(), sensor.getThickness() / fabs(cos(angle)));
-    const float dedx = hit_edep / total_distance;
+    //assumption: Si detectors are close enough to the origin that helix is still accurate
+    const double total_distance = getTraversedLength(hit, &helix);
+    const float charge = hit->getCharge();
+    const float dedx = charge / total_distance;
     if (dedx > 0) {
       //store data, if there's energy loss in last layer
       silicon_dedx.push_back(dedx);
@@ -603,6 +611,10 @@ template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const
       }
     } else {
       B2WARNING("dE/dx is zero in layer " << layer);
+    }
+
+    if (m_enableDebugOutput) {
+      track->addHit(TVector3(0, 0, 0), layer, hit->getSensorID(), 0, charge, false);
     }
   }
 

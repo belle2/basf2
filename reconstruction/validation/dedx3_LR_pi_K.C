@@ -9,7 +9,6 @@
 #include <TSystem.h>
 
 #include <iostream>
-#include <cstdlib>
 
 
 void plot(const TString &input_filename)
@@ -31,24 +30,26 @@ void plot(const TString &input_filename)
     exit(1);
   }
 
-  TFile *output_file = new TFile("dedx_curves.root", "RECREATE");
+  TFile *output_file = new TFile("dedx_LRplots_pi_K.root", "RECREATE");
   output_file->cd();
 
-  const int num_detectors = 3;
-  const char* detectors[] = { "PXD", "SVD", "CDC" };
-  const double dedx_cutoff[] = { 2.5e6, 2.5e6, 150.0 };
-  for(int idet = 0; idet < num_detectors; idet++) { //PXD not in input file, anyway
-    tree->Project(TString::Format("dedx_p_%d", idet), TString::Format("DedxTracks.m_dedx_avg_truncated[][%d]:m_p", idet),
-        TString::Format("DedxTracks.m_p < 3 && DedxTracks.m_dedx_avg_truncated[][%d] < %f ", idet, dedx_cutoff[idet]));
-    TH1* hist = (TH1*)output_file->Get(TString::Format("dedx_p_%d", idet));
-    hist->SetTitle(TString::Format("dE/dx curve for %s; p [GeV]; dE/dx", detectors[idet]));
+  const int show_particles = 2;
+  const int num_particles = 5;
+  const int pdg_codes[] = { 211, 321, 2212, 11, 13};
+  TString logl_strings[num_particles];
+  for(int part = 0; part < show_particles; part++) {
+    //now create histograms with this (unweighted) probability
+    tree->Project(TString::Format("%d_LR", pdg_codes[part]), "(DedxTracks.m_logl[][0] - DedxTracks.m_logl[][1]):m_p_true",
+        TString::Format("abs(DedxTracks.m_pdg) == %d", pdg_codes[part]));
+    TH1* hist = (TH1*)output_file->Get(TString::Format("%d_LR", pdg_codes[part]));
+    hist->SetTitle(TString::Format("LL(pi) - LL(K) for true %d", pdg_codes[part]));
     hist->Write();
 
   }
   output_file->Close();
 }
 
-void dedx1_curves()
+void dedx3_LR_pi_K()
 {
   gROOT->SetStyle("Plain");
 

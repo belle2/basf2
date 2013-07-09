@@ -5,6 +5,9 @@ import os
 import random
 from basf2 import *
 
+#change to True if you want to use PXD hits (fairly small benefit, if any)
+use_pxd = False
+
 # register necessary modules
 evtmetagen = register_module('EvtMetaGen')
 
@@ -38,31 +41,37 @@ main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(evtgeninput)
 main.add_module(g4sim)
-cdcdigi = register_module('CDCDigitizer')
-main.add_module(cdcdigi)
-pxd_digi = register_module('PXDDigitizer')
-main.add_module(pxd_digi)
-main.add_module(register_module('PXDClusterizer'))
+
+if use_pxd:
+    main.add_module(register_module('PXDDigitizer'))
+    main.add_module(register_module('PXDClusterizer'))
+main.add_module(register_module('SVDDigitizer'))
+main.add_module(register_module('SVDClusterizer'))
+main.add_module(register_module('CDCDigitizer'))
+
 mctrackfinder = register_module('MCTrackFinder')
-mctrackfinder.param('UsePXDHits', True)
+mctrackfinder.param('UsePXDHits', use_pxd)
 mctrackfinder.param('UseSVDHits', True)
 mctrackfinder.param('UseCDCHits', True)
+mctrackfinder.param('UseClusters', True)
 main.add_module(mctrackfinder)
+
 genfit = register_module('GenFitter')
+genfit.param('UseClusters', True)
 main.add_module(genfit)
+
 dedx = register_module('DedxPID')
 dedx_params = {
     'useIndividualHits': True,
     'removeLowest': 0.0,
     'removeHighest': 0.8,
     'onlyPrimaryParticles': False,
-    'usePXD': False,
+    'usePXD': use_pxd,
     'useSVD': True,
     'useCDC': True,
     'trackDistanceThreshold': 4.0,
     'enableDebugOutput': True,
-    'pdfFile': '/data/reconstruction/'
-               'dedxPID_PDFs_r3701_235k_events_upper_80perc_trunc.root',
+    #'pdfFile': 'YourPDFFile.root',
     'ignoreMissingParticles': False,
     }
 dedx.param(dedx_params)

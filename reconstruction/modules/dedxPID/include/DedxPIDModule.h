@@ -22,9 +22,10 @@
 #include <vector>
 
 class TH2F;
-class TH1F;
 
 namespace Belle2 {
+  class PXDCluster;
+  class SVDCluster;
   class DedxTrack;
   class HelixHelper;
 
@@ -32,7 +33,7 @@ namespace Belle2 {
    * @{
    */
 
-  /** Extract dE/dx (and some other things) from Tracks&GFTracks and PXDClusters, SVDTrueHits (not digitized) and CDCHits.
+  /** Extract dE/dx from fitted tracks.
    *
    * If a PDF file is specified using the 'PDFFile' parameter, likelihood values
    * for all particle hypotheses are calculated and saved in a DedxLikelihood object.
@@ -66,10 +67,16 @@ namespace Belle2 {
     void calculateMeans(float* mean, float* truncatedMean, float* truncatedMeanErr, const std::vector<float>& dedx) const;
 
     /** returns length of path through a layer, given (full) layer id and angles */
-    static float getFlownDistanceCDC(int layerid, float theta, float phi);
+    static float getTraversedLengthCDC(int layerid, float theta, float phi);
+
+    /** returns traversed length through active medium of given PXDCluster. */
+    static double getTraversedLength(const PXDCluster* hit, const HelixHelper* helix);
+
+    /** returns traversed length through active medium of given SVDCluster. */
+    static double getTraversedLength(const SVDCluster* hit, const HelixHelper* helix);
 
     /** save energy loss and hit information from SVD/PXDHits to track */
-    template <class HitClass> void saveSiHits(DedxTrack* track, const HelixHelper& helix, const StoreArray<HitClass> &hits, const std::vector<int> &hit_indices) const;
+    template <class HitClass> void saveSiHits(DedxTrack* track, const HelixHelper& helix, const StoreArray<HitClass>& hits, const std::vector<int>& hit_indices) const;
 
 
     /** for all particles, save log-likelihood values into 'logl'.
@@ -83,7 +90,7 @@ namespace Belle2 {
 
     /** should info from this detector be included in likelihood? */
     bool detectorEnabled(Dedx::Detector d) const {
-      return (d == Dedx::c_PXD and m_usePXD) or(d == Dedx::c_SVD and m_useSVD) or(d == Dedx::c_CDC and m_useCDC);
+      return (d == Dedx::c_PXD and m_usePXD) or (d == Dedx::c_SVD and m_useSVD) or (d == Dedx::c_CDC and m_useCDC);
     }
 
 
@@ -94,13 +101,10 @@ namespace Belle2 {
     /** dedx:momentum PDFs. */
     TH2F* m_pdfs[Dedx::c_num_detectors][Const::ChargedStable::c_SetSize]; //m_pdfs[detector_type][particle_type]
 
-    /** parameter for GFTrack array name. */
-    std::string m_gftracks_name;
-
     //parameters: full likelihood vs. truncated mean
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */
-    double m_removeLowest; /**< Portion of events with low dE/dx that should be discarded for truncated mean */
-    double m_removeHighest; /**< Portion of events with low dE/dx that should be discarded for truncated mean */
+    double m_removeLowest; /**< Portion of lowest dE/dx values that should be discarded for truncated mean */
+    double m_removeHighest; /**< Portion of highest dE/dx values that should be discarded for truncated mean */
 
     //parameters: technical stuff
     double m_trackDistanceThreshhold; /**< Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off. */

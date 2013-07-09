@@ -12,19 +12,17 @@ geometry.param('ExcludedComponents', ['EKLM'])
 
 input = register_module('RootInput')
 input.param('inputFileName', '../EvtGenSimRec.root')
+#original file already contains dE/dx info, but we want other options
+input.param('excludeBranchNames', ['DedxLikelihoods', 'DedxTracks'])
 
 dedx = register_module('DedxPID')
 dedx_params = {  # use default PDF file
-    'useIndividualHits': True,
     'removeLowest': 0.15,
     'removeHighest': 0.15,
-    'onlyPrimaryParticles': False,
     'usePXD': False,
     'useSVD': True,
     'useCDC': True,
-    'trackDistanceThreshold': 4.0,
     'enableDebugOutput': True,
-    'ignoreMissingParticles': False,
     }
 dedx.param(dedx_params)
 

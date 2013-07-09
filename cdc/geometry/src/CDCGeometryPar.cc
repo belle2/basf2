@@ -208,9 +208,7 @@ const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID) cons
 
   const double phiF = phiSize * (double(cellID) + offset)
                       + phiSize * 0.5 * double(m_nShifts[layerID]);
-  const double phiB = phiSize * (double(cellID) + offset);
   const TVector3 f(m_rSLayer[layerID] * cos(phiF), m_rSLayer[layerID] * sin(phiF), m_zSForwardLayer[layerID]);
-  const TVector3 b(m_rSLayer[layerID] * cos(phiB), m_rSLayer[layerID] * sin(phiB), m_zSBackwardLayer[layerID]);
 
   return f;
 }
@@ -237,10 +235,7 @@ const TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID) con
     offset += phi0 / (2 * M_PI / double(nWires));
   }*/
 
-  const double phiF = phiSize * (double(cellID) + offset)
-                      + phiSize * 0.5 * double(m_nShifts[layerID]);
   const double phiB = phiSize * (double(cellID) + offset);
-  const TVector3 f(m_rSLayer[layerID] * cos(phiF), m_rSLayer[layerID] * sin(phiF), m_zSForwardLayer[layerID]);
   const TVector3 b(m_rSLayer[layerID] * cos(phiB), m_rSLayer[layerID] * sin(phiB), m_zSBackwardLayer[layerID]);
 
   return b;

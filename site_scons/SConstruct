@@ -14,6 +14,7 @@ if not analysis:
 AddOption('--symlink', dest = 'symlink', action = 'store_true', default = False, help='Use symbolic links instead of copies for header files')
 AddOption('--extra-libpath', dest = 'extralibpath', action = 'store', help = 'Additional library path')
 AddOption('--extra-ccflags', dest = 'extraccflags', action = 'store', help = 'Additional compiler flags')
+AddOption('--c++11', dest = 'c++11', action = 'store_true', default = False, help = 'Enable C++11 compiler flag')
 
 SetOption('warn', 'no-fortran-cxx-mix')
 try:
@@ -149,10 +150,16 @@ if (not global_env.GetOption('clean')) and (not global_env.GetOption('help')):
     if not config.configure(global_env):
         Exit(1)
 
+# check for C++11
+if GetOption('c++11'):
+    global_env.Append(CCFLAGS = '-std=c++11')
+else:
+    global_env.Append(CPPDEFINES = {'constexpr': 'const'})
+
 # remove C++11 flag for cint
 global_env['CINTFLAGS'] = global_env['CCFLAGS'][:]
-if '--std=c++11' in global_env['CINTFLAGS']:
-    global_env['CINTFLAGS'].remove('--std=c++11')
+if '-std=c++11' in global_env['CINTFLAGS']:
+    global_env['CINTFLAGS'].remove('-std=c++11')
 
 # process the analysis directory
 if analysis:

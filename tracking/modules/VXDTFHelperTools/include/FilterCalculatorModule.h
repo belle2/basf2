@@ -18,6 +18,7 @@
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 
 #include <iostream>
 #include <fstream>
@@ -99,7 +100,7 @@ namespace Belle2 {
           m_svdHit = aHit;
           m_timeStamp = aHit->getGlobalTime();
           //        std::cout << " global timestamp: " << m_timeStamp << std::endl;
-        } else { std::cout << "Class VXDHit of FilterCalculatorModule: input type != hitType(SVD)!" << std::endl; }
+        } else { B2ERROR("Class VXDHit of FilterCalculatorModule: input type != hitType(SVD)!") }
       }
 
       /** setter for pxdHit */
@@ -108,7 +109,7 @@ namespace Belle2 {
           m_pxdHit = aHit;
           m_timeStamp = aHit->getGlobalTime();
           //        std::cout << " global timestamp: " << m_timeStamp << std::endl;
-        } else { std::cout << "Class VXDHit of FilterCalculatorModule: input type != hitType(PXD)!" << std::endl; }
+        } else { B2ERROR("Class VXDHit of FilterCalculatorModule: input type != hitType(PXD)!") }
       }
 
       /** setHit to vertex*/
@@ -156,11 +157,29 @@ namespace Belle2 {
         m_pT(pT),
         m_secMap(secMapPtr) {}
 
+      /** adds hit to Track (rejects track if hit is invalid, in that case returns false, else true) */
+//       bool addHit(VXDHit hit) {
+//        std::string newSecID = hit.getSectorID();
+//        std::string lastSecID = getLastHit()->getSectorID();
+//        if (newSecID[0] < lastSecID[0] )
+//        m_hitList.push_back(hit);
+//      }
+
       /** adds hit to Track */
       void addHit(VXDHit hit) { m_hitList.push_back(hit); }
 
       /** returns hits of track */
       const std::list<VXDHit> getTrack() { return m_hitList; }
+
+      /** returns pointer to last hit added, is NULL if no hit added so far */
+      const VXDHit* getLastHit() {
+        int hitPos = m_hitList.size();
+        if (hitPos != 0) {
+          std::list<VXDHit>::iterator thisPos = m_hitList.end(); --thisPos;
+          return &(*thisPos);
+        }
+        return NULL;
+      }
 
       /** returns indexNumber of current track */
       int getParticleID() { return m_index; }
@@ -173,6 +192,9 @@ namespace Belle2 {
 
       /** reverse hitlist*/
       void reverse() { m_hitList.reverse(); }
+
+      /** reset hitlist, should be done only, if there was a main problem with the hits included! */
+      void resetHitList(std::list<VXDHit>& newList) { m_hitList = newList; }
 
       /** set Pt of track */
       void setPt(double mom) { m_pT = mom; }

@@ -162,6 +162,7 @@ namespace Belle2 {
       std::string m_PARAMmcTCname; /**< the name of the mctrackCandidateCollection provided by the mcTrackFinder (has to be set manually there and here) */
       std::string m_PARAMcaTCname; /**< the name of the catrackCandidateCollection provided by the caTrackFinder (has to be set manually there and here) */
       std::string m_PARAMacceptedTCname; /**< the name of the trackCandidateCollection of successfully reconstructed track candidates determined by the TFAnalizer */
+      std::string m_PARAMinfoBoardName;           /**< InfoContainer collection name */
       double m_PARAMqiThreshold; /**<  chose value to filter TCs found by VXDTF. TCs having QIs lower than this value won't be marked as reconstructed (value 0-1). e.g. having a TC with 4 hits, 1 foreign, 3 good ones. would meand 0.75, a qiThreshold with 0.7 would mark the track as 'reconstructed', a threshold of 0.8 would neglect the TC */
       int m_PARAMminNumOfHitsThreshold; /**< defines how many hits of current TC has to be found again to be accepted as recovered, values lower than 3 wouldn't make sense because of minimal info needed for track parameters */
       int m_countReconstructedTCs; /**< counts number of reconstructed TCs */

@@ -78,6 +78,7 @@ TFAnalizerModule::TFAnalizerModule() : Module()
   addParam("mcTCname", m_PARAMmcTCname, "special name for mcTF track candidates", string("mcTracks"));
   addParam("caTCname", m_PARAMcaTCname, "special name for caTF track candidates", string(""));
   addParam("acceptedTCname", m_PARAMacceptedTCname, "special name for accepted/successfully reconstructed track candidates", string("acceptedVXDTFTracks"));
+  addParam("InfoBoardName", m_PARAMinfoBoardName, "Name of container used for data transfer from VXDTFModule", string(""));
   addParam("qiThreshold", m_PARAMqiThreshold, " chose value to filter TCs found by VXDTF. TCs having QIs lower than this value won't be marked as reconstructed", double(0.7));
   addParam("minNumOfHitsThreshold", m_PARAMminNumOfHitsThreshold, " defines how many hits of current TC has to be found again to be accepted as recovered, standard is 3 hits", int(3));
   addParam("printExtentialAnalysisData", m_PARAMprintExtentialAnalysisData, "set true, if you want to cout special Info to the shell", bool(false));
@@ -104,6 +105,7 @@ void TFAnalizerModule::initialize()
   StoreArray<SVDCluster>::required();
   StoreArray<PXDTrueHit>::required();
   StoreArray<SVDTrueHit>::required();
+  StoreArray<VXDTFInfoBoard>::optional(m_PARAMinfoBoardName); /// WARNING TODO: implement a minimal analyzing mode which can deal with TF's without using the InfoBoards...
 //  B2WARNING("TFAnalizerModule: at the moment, no curling tracks are supported! When you feed this module with curling tracks, results can be wrong and misleading")
   m_countReconstructedTCs = 0;
   m_countAcceptedGFTCs = 0;
@@ -191,7 +193,7 @@ void TFAnalizerModule::event()
   RelationArray relPXDClusterTrueHit(pxdClusters, pxdTrueHits);
   RelationArray relSVDClusterTrueHit(svdClusters, svdTrueHits);
 
-  StoreArray<VXDTFInfoBoard> extraInfos;
+  StoreArray<VXDTFInfoBoard> extraInfos(m_PARAMinfoBoardName);
 
   int numOfMcTCs = mcTrackCandidates.getEntries();
   int numOfCaTCs = caTrackCandidates.getEntries();

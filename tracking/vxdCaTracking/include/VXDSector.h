@@ -36,11 +36,15 @@ namespace Belle2 {
       //     typedef std::map<std::string, Cutoff*> ScopeMap; // key is scope of cutoff
       //     typedef std::map<std::string, ScopeMap*> CutoffTypeMap; // key is type of cutoff
 
-      /** constructor */
+      /** minimalconstructor (produces useless sectors)*/
+      VXDSector(): m_sectorID(0) { m_friends.clear(); }
+
+      /** useful constructor */
       VXDSector(unsigned int secID): m_sectorID(secID) { m_friends.clear(); } // default values
 
       bool operator<(const VXDSector& b)  const { return getSecID() < b.getSecID(); } /**< overloaded '<'-operator for sorting algorithms */
       bool operator==(const VXDSector& b) const { return getSecID() == b.getSecID(); } /**< overloaded '=='-operator for sorting algorithms */
+      bool operator>(const VXDSector& b)  const { return getSecID() > b.getSecID(); } /**< overloaded '>'-operator for sorting algorithms */
 
       /** setter - addHit adds hits to current sector */
       void addHit(VXDTFHit* newSpacePoint);

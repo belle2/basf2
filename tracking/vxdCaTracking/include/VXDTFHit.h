@@ -51,7 +51,7 @@ namespace Belle2 {
       //      * @param clusterIndexU Pointer to ClusterInfo an intermediate class storing index of SVDCluster containing U position.
       //      * @param clusterIndexV Pointer to ClusterInfo an intermediate class storing index of SVDCluster containing V position.
       //      * @param clusterIndexUV Pointer to ClusterInfo an intermediate class storing index of PXDCluster containing U and V position.
-      //      * @param detectorType defining whether hit lies on PXD, SVD or IP.
+      //      * @param detectorType defining whether hit lies on PXD, SVD or IP (using e.g Const::PXD for PXD-hits).
       //      * @param papaSector address of Sector containing hit.
       //      * @param VxdID ID of sensor containing parent clusterHit(s)
       //      * @param timeStamp time of birth (only set when SVD hit, else 0).
@@ -94,7 +94,7 @@ namespace Belle2 {
         return -1;
       }*/ /**< returns index position of clusterInfo in container,  only set for PXDHits */
       ClusterInfo* getClusterInfoUV(); /* { return m_clusterIndexUV; } */ /**< returns pointer to ClusterInfo UV, is NULL if value is not set */
-      int getDetectorType() const { return m_detectorType; } /**< returns detectorType IP=-1,PXD=0,SVD=1 */
+      int getDetectorType() const { return m_detectorType; } /**< returns detectorType IP=Const::IR,PXD=Const::PXD,SVD=Const::SVD */
       unsigned int getSectorName() { return m_papaSector; } /**< returns name of sectors containing current hit (sectors are passDependent), in speed optimized int */
       std::string getSectorString(); /**< returns name of sectors containing current hit (sectors are passDependent), in human readable string */
       const VxdID getVxdID() const { return m_VxdID; } /**< returns VxdID of sensor carrying current sector */
@@ -120,7 +120,7 @@ namespace Belle2 {
       ClusterInfo* m_clusterIndexU; /**< pointer to intermediate class storing index of SVDClusterU */
       ClusterInfo* m_clusterIndexV; /**< pointer to intermediate class storing index of SVDClusterV */
       ClusterInfo* m_clusterIndexUV; /**< pointer to  intermediate class storing index of PXDCluster */
-      int m_detectorType; /**< knows wheter hit is in PXD or SVD PXD = 0, SVD = 1, IP = -1 */
+      int m_detectorType; /**< knows wheter hit is in IP=Const::IR (only virtual hit), PXD=Const::PXD or SVD=Const::SVD  */
 
       unsigned int m_papaSector; /**< name of sector containing hit */ // convert to int? is that faster? (needed very often)
       VxdID m_VxdID; /**< VxdID of sensor containing hit */

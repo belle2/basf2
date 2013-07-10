@@ -10,7 +10,7 @@
 
 #include "../include/LittleHelper.h"
 #include <framework/logging/Logger.h>
-
+#include <math.h>       /* floor */
 #include <TRandom.h>
 
 using namespace std;
@@ -53,4 +53,15 @@ double LittleHelper::smearValueUniform(double low, double high, double mean, dou
     rngValue = gRandom->Uniform(mean - sigma, mean + sigma);
   }
   return rngValue;
+}
+
+
+int LittleHelper::getRandomIntegerUniform(int low, int high)
+{
+  return floor(gRandom->Uniform(low, high));
+}
+
+int LittleHelper::getRandomIntegerGauss(int mean, int sigma)
+{
+  return floor(gRandom->Gaus(mean, sigma));
 }

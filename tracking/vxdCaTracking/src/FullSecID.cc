@@ -84,6 +84,19 @@ FullSecID::FullSecID(VxdID vxdID, bool subLayerID, unsigned int sectorNumber):
 //  m_fullSecID = LayerID + SubLayerID + UniID + sectorNumber; // should be the same as above
 }
 
+FullSecID::FullSecID(unsigned int layerID, bool subLayerID, unsigned int sensorID, unsigned int sectorNumber)
+{
+  B2DEBUG(1000, "FullSecID-constructor: LayerID " << layerID << ", MaxLayer " << MaxLayer << ", SubLayerID " << subLayerID << ", MaxSubLayer " << MaxSubLayer << ", UniID " << sensorID << ", MaxVxdID " << MaxVxdID << ", sectorNumber " << sectorNumber << ", MaxSector " << MaxSector);
+  assert(layerID < MaxLayer + 1);
+  assert(subLayerID < MaxSubLayer + 1);
+  assert(sensorID < MaxVxdID + 1);
+  assert(sectorNumber < MaxSector + 1);
+
+  layerID <<= LayerBitShift;
+  subLayerID <<= SubLayerBitShift;
+  sensorID <<= VxdIDBitShift;
+  m_fullSecID = layerID | subLayerID | sensorID | sectorNumber; // should be the same as below
+}
 
 std::string FullSecID::getFullSecString()
 {

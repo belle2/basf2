@@ -82,6 +82,11 @@ namespace Belle2 {
       /** use this member if you want to smear your value using uniform resulting in a value between 0-1 using preset for mean and sigma. */
       double smearNormalizedUniform() { return smearValueUniform(0, 1, m_meanValue, m_sigmaValue); }
 
+      /** use this member if you want a uniformly distributed integer value between first and second variable */
+      int getRandomIntegerUniform(int low, int high);
+
+      /** use this member if you want a gaussian distributed integer value between first and second variable */
+      int getRandomIntegerGauss(int low, int high);
     protected:
       /** safety check whether incoming values make sense for smearing */
       bool checkSanity(double low, double high, double mean, double sigma);

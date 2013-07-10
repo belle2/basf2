@@ -12,6 +12,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
@@ -114,7 +115,7 @@ void CDCDigitizerModule::event()
     // Loop over all hits
     B2DEBUG(250, "Number of CDCSimHits in the current event: " << simHits.getEntries());
     int nHits = simHits.getEntries();
-    for (int iHits = 0; iHits < nHits; iHits++) {
+    for (int iHits = 0; iHits < nHits; ++iHits) {
       // Get a hit
       CDCSimHit* aCDCSimHit = simHits[iHits];
 
@@ -164,40 +165,28 @@ void CDCDigitizerModule::event()
       //remove negative drift time upon request
       //      if (!m_outputNegativeDriftTime && hitDriftTime < 0.) continue;
 
-      bool ifNewDigi = true;
-      // The first SimHit is always a new digit, but the looping will anyhow end immediately.
-      for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); iterSignalMap++) {
+      iterSignalMap = signalMap.find(wireID);
 
-        // Check if new SimHit is in cell of existing Signal.
-        if ((iterSignalMap->second.m_wireID == wireID)) {
-
-          // If true, the SimHit doesn't create a new digit, ...
-          ifNewDigi = false;
-
-          // ... smallest drift time has to be checked, ...
-          if (hitDriftTime < iterSignalMap->second.m_driftTime) {
-            iterSignalMap->second.m_simHitIndex = iHits;
-            iterSignalMap->second.m_driftTime   = hitDriftTime;
-
-            B2DEBUG(250, "hitDriftTime of current Signal: " << hitDriftTime << ", hitDriftLength: " << hitDriftLength);
-          }
-
-          // ... total charge has to be updated.
-          iterSignalMap->second.m_charge += hitdEdx;
-
-          //A SimHit will not be in more than one cell.
-          break;
-        }
-      } // End loop over previously stored Signal.
-
-      // If it is a new hit, save it to signal map.
-      if (ifNewDigi == true) {
-        signalMap.insert(make_pair(iHits, SignalInfo(iHits, wireID, hitDriftTime, hitdEdx)));
+      if (iterSignalMap == signalMap.end()) {
+        // new entry
+        signalMap.insert(make_pair(wireID, SignalInfo(iHits, wireID, hitDriftTime, hitdEdx)));
         B2DEBUG(150, "Creating new Signal with encoded wire number: " << wireID);
+
+      } else {
+        // ... smallest drift time has to be checked, ...
+
+        if (hitDriftTime < iterSignalMap->second.m_driftTime) {
+          iterSignalMap->second.m_driftTime   = hitDriftTime;
+          B2DEBUG(250, "hitDriftTime of current Signal: " << hitDriftTime << ",  hitDriftLength: " << hitDriftLength);
+        }
+        // ... total charge has to be updated.
+        iterSignalMap->second.m_charge += hitdEdx;
       }
     } // end loop over SimHits.
 
-    //--- Now Store the results into CDCHits and create corresponding relations between SimHits and CDCHits. --------------------
+    //--- Now Store the results into CDCHits and
+    // create corresponding relations between SimHits and CDCHits.
+
     unsigned int iCDCHits = 0;
 
     StoreArray<CDCHit> cdcHits(m_outputCDCHitsName);
@@ -207,21 +196,27 @@ void CDCDigitizerModule::event()
     RelationArray mcParticlesToCDCHits(mcParticles, cdcHits); //MCParticle<->CDCHit
 
     for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); ++iterSignalMap) {
+
       //remove negative drift time (TDC) upon request
+
       if (!m_outputNegativeDriftTime &&
-          iterSignalMap->second.m_driftTime < -0.5) continue;
+          iterSignalMap->second.m_driftTime < -0.5) {
+        continue;
+      }
+
       new(cdcHits.nextFreeAddress()) CDCHit(static_cast<unsigned short>((iterSignalMap->second.m_driftTime) + 0.5), getADCCount(iterSignalMap->second.m_charge),
                                             iterSignalMap->second.m_wireID);
 
-      cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex, iCDCHits);     //add entry
+      //add entry : CDCSimHit <-> CDCHit
+      cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex, iCDCHits);
 
-      for (int index = 0; index < mcParticlesToCDCSimHits.getEntries(); index++) {
-        for (int hit = 0; hit < (int)mcParticlesToCDCSimHits[index].getToIndices().size(); hit++) {
-          if ((int)mcParticlesToCDCSimHits[index].getToIndex(hit) == iterSignalMap->second.m_simHitIndex) {
-            mcParticlesToCDCHits.add(mcParticlesToCDCSimHits[index].getFromIndex(), iCDCHits);      //add entry
-          }
-        }
-      }
+
+      const CDCHit* cdcHit = cdcHits[cdcHits.getEntries() - 1];
+      const MCParticle* mcparticle =
+        simHits[iterSignalMap->second.m_simHitIndex]->getRelatedFrom<MCParticle>();
+      // relation MCParticle <-> CDCHit
+      mcparticle->addRelationTo(cdcHit);
+
       iCDCHits++;
     }
   } else {
@@ -241,9 +236,9 @@ float CDCDigitizerModule::smearDriftLength(float driftLength)
   }
 
   // Smear drift length
-  float newDL = gRandom->Gaus(driftLength / Unit::cm + mean / Unit::cm, resolution / Unit::cm);
-  while (newDL <= 0.) newDL = gRandom->Gaus(driftLength / Unit::cm + mean / Unit::cm, resolution / Unit::cm);
-  return newDL * Unit::cm;
+  float newDL = gRandom->Gaus(driftLength + mean , resolution);
+  while (newDL <= 0.) newDL = gRandom->Gaus(driftLength + mean, resolution);
+  return newDL;
 }
 
 

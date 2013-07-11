@@ -25,8 +25,8 @@ namespace Belle2 {
    * extrapolateToPoint() methods.
    */
   class HelixHelper {
-    const static double c_cTimesB = (1.5 * 0.00299792458); /**< magnetic filed times speed of light */
-    const static double c_maxFlightLength = 150.0; /**< maximal path length (from origin) considered for extrapolation */
+    constexpr static double c_cTimesB = (1.5 * 0.00299792458); /**< magnetic filed times speed of light */
+    constexpr static double c_maxFlightLength = 150.0; /**< maximal path length (from origin) considered for extrapolation */
 
   public:
     /** construct a helix with given helix parameters, as defined for Track objects */

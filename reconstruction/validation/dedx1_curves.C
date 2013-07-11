@@ -37,7 +37,7 @@ void plot(const TString &input_filename)
   const int num_detectors = 3;
   const char* detectors[] = { "PXD", "SVD", "CDC" };
   const double dedx_cutoff[] = { 2.5e6, 2.5e6, 150.0 };
-  for(int idet = 0; idet < num_detectors; idet++) { //PXD not in input file, anyway
+  for(int idet = 1; idet < num_detectors; idet++) { //PXD not in input file, anyway
     tree->Project(TString::Format("dedx_p_%d", idet), TString::Format("DedxTracks.m_dedx_avg_truncated[][%d]:m_p", idet),
         TString::Format("DedxTracks.m_p < 3 && DedxTracks.m_dedx_avg_truncated[][%d] < %f ", idet, dedx_cutoff[idet]));
     TH1* hist = (TH1*)output_file->Get(TString::Format("dedx_p_%d", idet));

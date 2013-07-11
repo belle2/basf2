@@ -92,25 +92,20 @@ void CDCTrackCandidate::addSegment(CDCSegment& aSegment)
 
 void CDCTrackCandidate::removeSegment(const int Id)
 {
-  list <CDCSegment> segmentList;
-
-  for (int i = 0; i < m_nSegments; i++) {
-    segmentList.push_back(m_Segments.at(i));
-  }
+  list <CDCSegment> segmentList(m_Segments.begin(), m_Segments.end());
 
   list<CDCSegment>::iterator it = segmentList.begin();
-  bool doneSeg = false;
-  while (it != segmentList.end() && doneSeg == false) {
+  while (it != segmentList.end()) {
     if ((*it).getId() == Id) {
       segmentList.erase(it);
-      doneSeg = true;
-    } else {++it;}
+      break;
+    } else {
+      ++it;
+    }
   }
 
   m_Segments.clear();
-  for (list<CDCSegment>::iterator it = segmentList.begin(); it != segmentList.end(); ++it) {
-    m_Segments.push_back(*it);
-  }
+  m_Segments.insert(m_Segments.begin(), segmentList.begin(), segmentList.end());
   update();
 }
 

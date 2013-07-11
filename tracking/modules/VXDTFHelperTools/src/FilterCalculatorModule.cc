@@ -156,28 +156,28 @@ void FilterCalculatorModule::initialize()
   int numCuts = m_PARAMpTcuts.size();
 
   for (int i = 0; i < numCuts - 1; ++i) {
-    string secMapName = (boost::format("%1%_%2%to%3%Gev") % m_PARAMsectorSetupFileName % m_PARAMpTcuts[i] % m_PARAMpTcuts[i + 1]).str();
+    string secMapName = (boost::format("%1%_%2%to%3%Gev") % m_PARAMsectorSetupFileName % m_PARAMpTcuts.at(i) % m_PARAMpTcuts.at(i + 1)).str();
     for (int i = 0; i < int(secMapName.length()); ++i) {
-      switch (secMapName[i]) {
+      switch (secMapName.at(i)) {
         case '_':
-          secMapName[i] = '-';
+          secMapName.at(i) = '-';
         case '.':
-          secMapName[i] = '-';
+          secMapName.at(i) = '-';
       }
     }
     m_PARAMsecMapNames.push_back(secMapName);
-    B2WARNING("FilterCalculatorModule-start: will use " << secMapName << " for storing cutoffs")
+    B2INFO("FilterCalculatorModule-start: will use " << secMapName << " for storing cutoffs")
   }
-  string secMapName = (boost::format("%1%-%2%toXGev") % m_PARAMsectorSetupFileName % m_PARAMpTcuts[numCuts - 1]).str();
+  string secMapName = (boost::format("%1%-%2%toXGev") % m_PARAMsectorSetupFileName % m_PARAMpTcuts.at(numCuts - 1)).str();
   for (int i = 0; i < int(secMapName.length()); ++i) {
-    switch (secMapName[i]) {
+    switch (secMapName.at(i)) {
       case '_':
-        secMapName[i] = '-';
+        secMapName.at(i) = '-';
       case '.':
-        secMapName[i] = '-';
+        secMapName.at(i) = '-';
     }
   }
-  B2WARNING("FilterCalculatorModule-start: will use " << secMapName << " for storing cutoffs")
+  B2INFO("FilterCalculatorModule-start: will use " << secMapName << " for storing cutoffs")
   m_PARAMsecMapNames.push_back(secMapName);
 
 
@@ -198,8 +198,8 @@ void FilterCalculatorModule::initialize()
       }
       B2FATAL("FilterCalculator::initialize: rootFileName is set wrong, although parameter 'writeToRoot' is enabled! Actual entries are: " << output)
     }
-    m_PARAMrootFileName[0] += ".root";
-    m_rootFilePtr = new TFile(m_PARAMrootFileName[0].c_str(), m_PARAMrootFileName[1].c_str()); // alternative: UPDATE
+    m_PARAMrootFileName.at(0) += ".root";
+    m_rootFilePtr = new TFile(m_PARAMrootFileName.at(0).c_str(), m_PARAMrootFileName.at(1).c_str()); // alternative: UPDATE
     m_treePtr = new TTree("m_treePtr", "aTree");
 
     m_treePtr->Branch("pTValuesInLayer1", &m_rootpTValuesInLayer1);
@@ -216,7 +216,7 @@ void FilterCalculatorModule::initialize()
   m_sectorMap.clear();
   B2INFO("~~~~~~~~~~~FilterCalculator - initialize ~~~~~~~~~~")
   B2INFO("chosen detectorType: " << m_PARAMdetectorType << ", highestAllowedLayer: " << m_PARAMhighestAllowedLayer << ", smearHits: " << m_PARAMsmearHits << ", noCurler: " << m_PARAMnoCurler << ", uniSigma: " << m_PARAMuniSigma)
-  B2INFO("origin is set to: (x,y,z) (" << m_PARAMsetOrigin[0] << "," << m_PARAMsetOrigin[1] << "," << m_PARAMsetOrigin[2] << "), testBeam-mode is " << m_PARAMtestBeam << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T")
+  B2INFO("origin is set to: (x,y,z) (" << m_PARAMsetOrigin.at(0) << "," << m_PARAMsetOrigin.at(1) << "," << m_PARAMsetOrigin.at(2) << "), testBeam-mode is " << m_PARAMtestBeam << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T")
 
   StoreArray<MCParticle>::required();
   StoreArray<PXDTrueHit>::required();
@@ -229,6 +229,7 @@ void FilterCalculatorModule::beginRun()
   B2INFO("~~~~~~~~~~~FilterCalculator - beginRun ~~~~~~~~~~")
   m_eventCounter = 0;
   m_badHitsCounter = 0;
+  m_badTrackletCounter = 0;
   m_totalLocalCoordValue = 0;
   m_totalGlobalCoordValue = 0;
   m_totalHitCounter = 0;
@@ -243,7 +244,7 @@ void FilterCalculatorModule::beginRun()
     m_PARAMdetectorType = Const::PXD;
     m_numOfLayers = 2;
   } else { m_numOfLayers = 4; m_PARAMdetectorType = Const::SVD; }
-  for (int i = 0; i < m_numOfLayers * 2; i++) {
+  for (int i = 0; i <= m_numOfLayers * 2; i++) {
     m_trackletLengthCounter.push_back(0);
   }
   bool useSVDonly = false;
@@ -255,7 +256,7 @@ void FilterCalculatorModule::beginRun()
 void FilterCalculatorModule::event()
 {
   double pMaxInMeV = 10000., pMinInMeV = 10.;
-  TVector3 origin(m_PARAMsetOrigin[0], m_PARAMsetOrigin[1], m_PARAMsetOrigin[2]);
+  TVector3 origin(m_PARAMsetOrigin.at(0), m_PARAMsetOrigin.at(1), m_PARAMsetOrigin.at(2));
 
   VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
 
@@ -332,8 +333,8 @@ void FilterCalculatorModule::event()
       continue;
     }
     double mcMomValue = mcMomentum.Perp();
-    if (mcMomValue < m_PARAMpTcuts[0]) {
-      B2DEBUG(5, "FilterCalculatorModule - event " << m_eventCounter << ": mcParticle with index " << iPart << " discarded because of bad pT-Value " << mcMomValue << " (below threshold of " << m_PARAMpTcuts[0] << ")")
+    if (mcMomValue < m_PARAMpTcuts.at(0)) {
+      B2DEBUG(5, "FilterCalculatorModule - event " << m_eventCounter << ": mcParticle with index " << iPart << " discarded because of bad pT-Value " << mcMomValue << " (below threshold of " << m_PARAMpTcuts.at(0) << ")")
       continue;
     } // filtering all particles having less than minimal threshold value of pT
 
@@ -350,8 +351,8 @@ void FilterCalculatorModule::event()
 
 //    ++m_trackletMomentumCounter[chosenSecMap];
 
-    B2DEBUG(10, "FilterCalculatorModule - event " << m_eventCounter << ": chosenSecMap is " << chosenSecMap << " with lower pt threshold of " << m_PARAMpTcuts[chosenSecMap])
-    MapOfSectors* thisSecMap = m_sectorMaps[chosenSecMap];
+    B2DEBUG(10, "FilterCalculatorModule - event " << m_eventCounter << ": chosenSecMap is " << chosenSecMap << " with lower pt threshold of " << m_PARAMpTcuts.at(chosenSecMap))
+    MapOfSectors* thisSecMap = m_sectorMaps.at(chosenSecMap);
 
     VXDTrack newTrack(iPart);
     if (m_PARAMdetectorType not_eq Const::SVD) { // want PXDhits
@@ -415,23 +416,23 @@ void FilterCalculatorModule::event()
         for (int j = 0; j != int(m_PARAMsectorConfigU.size() - 1); ++j) {
 //            B2INFO("uCuts(j)*uSize: " << m_PARAMsectorConfigU[j]*uSizeAtHit << " uCuts(j+1)*uSize: " << m_PARAMsectorConfigU[j+1]*uSizeAtHit );
 
-          if (uCoord >= (m_PARAMsectorConfigU[j]*uSizeAtHit * 2) && uCoord <= (m_PARAMsectorConfigU[j + 1]*uSizeAtHit * 2)) {
+          if (uCoord >= (m_PARAMsectorConfigU.at(j)*uSizeAtHit * 2) && uCoord <= (m_PARAMsectorConfigU.at(j + 1)*uSizeAtHit * 2)) {
 
             for (int k = 0; k != int(m_PARAMsectorConfigV.size() - 1); ++k) {
 //                B2INFO(" vCuts(k)*vSize: " << m_PARAMsectorConfigV[k]*vSize1 << " vCuts(k+1)*vSize: " << m_PARAMsectorConfigV[k+1]*vSize1 );
 
-              if (vCoord >= (m_PARAMsectorConfigV[k]*vSize1 * 2) && vCoord <= (m_PARAMsectorConfigV[k + 1]*vSize1 * 2)) {
+              if (vCoord >= (m_PARAMsectorConfigV.at(k)*vSize1 * 2) && vCoord <= (m_PARAMsectorConfigV.at(k + 1)*vSize1 * 2)) {
                 aSecID = k + 1 + j * (m_PARAMsectorConfigV.size() - 1);
                 B2DEBUG(10, "I have found a SecID: " << aSecID);
 
-                sectorEdgeV1 = m_PARAMsectorConfigV[k] * vSize1 * 2 - vSize1;
-                sectorEdgeV2 = m_PARAMsectorConfigV[k + 1] * vSize1 * 2 - vSize1;
+                sectorEdgeV1 = m_PARAMsectorConfigV.at(k) * vSize1 * 2 - vSize1;
+                sectorEdgeV2 = m_PARAMsectorConfigV.at(k + 1) * vSize1 * 2 - vSize1;
                 uSizeAtv1 = 0.5 * aSensorInfo.getUSize(sectorEdgeV1);
                 uSizeAtv2 = 0.5 * aSensorInfo.getUSize(sectorEdgeV2);
-                sectorEdgeU1OfV1 = m_PARAMsectorConfigU[j] * uSizeAtv1 * 2 - uSizeAtv1;
-                sectorEdgeU1OfV2 = m_PARAMsectorConfigU[j] * uSizeAtv2 * 2 - uSizeAtv2;
-                sectorEdgeU2OfV1 = m_PARAMsectorConfigU[j + 1] * uSizeAtv1 * 2 - uSizeAtv1;
-                sectorEdgeU2OfV2 = m_PARAMsectorConfigU[j + 1] * uSizeAtv2 * 2 - uSizeAtv2;
+                sectorEdgeU1OfV1 = m_PARAMsectorConfigU.at(j) * uSizeAtv1 * 2 - uSizeAtv1;
+                sectorEdgeU1OfV2 = m_PARAMsectorConfigU.at(j) * uSizeAtv2 * 2 - uSizeAtv2;
+                sectorEdgeU2OfV1 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv1 * 2 - uSizeAtv1;
+                sectorEdgeU2OfV2 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv2 * 2 - uSizeAtv2;
 
                 B2DEBUG(100, "Sector edges: O(" << sectorEdgeU1OfV1 << "," << sectorEdgeV1 << "), U(" << sectorEdgeU2OfV1 << "," << sectorEdgeV1 << "), V(" << sectorEdgeU1OfV2 << "," << sectorEdgeV2 << "), UV(" << sectorEdgeU2OfV2 << "," << sectorEdgeV2 << ")")
                 aSectorName = (boost::format("%1%_%2%_%3%") % aLayerID % aUniID % aSecID).str();
@@ -450,9 +451,11 @@ void FilterCalculatorModule::event()
           m_pxdHitCounter++;
           B2DEBUG(10, "adding new PXD hit of track " << iPart)
           VXDHit newHit(Const::PXD, aSectorName, aUniID, hitGlobal, pGlobal, pdg); // (0 = PXD hit)
-          if (aLayerID == 1 && m_PARAMwriteToRoot == true) {
-            m_rootmomValuesInLayer1.push_back(pGlobal.Mag());
-            m_rootpTValuesInLayer1.push_back(pGlobal.Perp());
+          if (m_PARAMwriteToRoot == true) {
+            if (aLayerID == 1) {
+              m_rootmomValuesInLayer1.push_back(pGlobal.Mag());
+              m_rootpTValuesInLayer1.push_back(pGlobal.Perp());
+            } // TODO here for layer 2 too
           }
           newHit.setPXDHit(aSiTrueHitPtr);
           newTrack.addHit(newHit);
@@ -517,25 +520,25 @@ void FilterCalculatorModule::event()
         string aSectorName;
         // searching for sector:
         for (int j = 0; j != int(m_PARAMsectorConfigU.size() - 1); ++j) {
-          B2DEBUG(150, "uCuts(j)*uSize: " << m_PARAMsectorConfigU[j]*uSizeAtHit << " uCuts(j+1)*uSize: " << m_PARAMsectorConfigU[j + 1]*uSizeAtHit);
+          B2DEBUG(150, "uCuts(j)*uSize: " << m_PARAMsectorConfigU.at(j)*uSizeAtHit << " uCuts(j+1)*uSize: " << m_PARAMsectorConfigU.at(j + 1)*uSizeAtHit);
 
-          if (uCoord >= (m_PARAMsectorConfigU[j]*uSizeAtHit * 2) && uCoord <= (m_PARAMsectorConfigU[j + 1]*uSizeAtHit * 2)) {
+          if (uCoord >= (m_PARAMsectorConfigU.at(j)*uSizeAtHit * 2) && uCoord <= (m_PARAMsectorConfigU.at(j + 1)*uSizeAtHit * 2)) {
 
             for (int k = 0; k != int(m_PARAMsectorConfigV.size() - 1); ++k) {
-              B2DEBUG(150, " vCuts(k)*vSize: " << m_PARAMsectorConfigV[k]*vSize1 << " vCuts(k+1)*vSize: " << m_PARAMsectorConfigV[k + 1]*vSize1);
+              B2DEBUG(150, " vCuts(k)*vSize: " << m_PARAMsectorConfigV.at(k)*vSize1 << " vCuts(k+1)*vSize: " << m_PARAMsectorConfigV.at(k + 1)*vSize1);
 
-              if (vCoord >= (m_PARAMsectorConfigV[k]*vSize1 * 2) && vCoord <= (m_PARAMsectorConfigV[k + 1]*vSize1 * 2)) {
+              if (vCoord >= (m_PARAMsectorConfigV.at(k)*vSize1 * 2) && vCoord <= (m_PARAMsectorConfigV.at(k + 1)*vSize1 * 2)) {
                 aSecID = k + 1 + j * (m_PARAMsectorConfigV.size() - 1);
                 B2DEBUG(10, "I have found a SecID: " << aSecID);
 
-                sectorEdgeV1 = m_PARAMsectorConfigV[k] * vSize1 * 2 - vSize1;
-                sectorEdgeV2 = m_PARAMsectorConfigV[k + 1] * vSize1 * 2 - vSize1;
+                sectorEdgeV1 = m_PARAMsectorConfigV.at(k) * vSize1 * 2 - vSize1;
+                sectorEdgeV2 = m_PARAMsectorConfigV.at(k + 1) * vSize1 * 2 - vSize1;
                 uSizeAtv1 = 0.5 * aSensorInfo.getUSize(sectorEdgeV1);
                 uSizeAtv2 = 0.5 * aSensorInfo.getUSize(sectorEdgeV2);
-                sectorEdgeU1OfV1 = m_PARAMsectorConfigU[j] * uSizeAtv1 * 2 - uSizeAtv1;
-                sectorEdgeU1OfV2 = m_PARAMsectorConfigU[j] * uSizeAtv2 * 2 - uSizeAtv2;
-                sectorEdgeU2OfV1 = m_PARAMsectorConfigU[j + 1] * uSizeAtv1 * 2 - uSizeAtv1;
-                sectorEdgeU2OfV2 = m_PARAMsectorConfigU[j + 1] * uSizeAtv2 * 2 - uSizeAtv2;
+                sectorEdgeU1OfV1 = m_PARAMsectorConfigU.at(j) * uSizeAtv1 * 2 - uSizeAtv1;
+                sectorEdgeU1OfV2 = m_PARAMsectorConfigU.at(j) * uSizeAtv2 * 2 - uSizeAtv2;
+                sectorEdgeU2OfV1 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv1 * 2 - uSizeAtv1;
+                sectorEdgeU2OfV2 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv2 * 2 - uSizeAtv2;
 
                 B2DEBUG(150, "Sector edges: O(" << sectorEdgeU1OfV1 << "," << sectorEdgeV1 << "), U(" << sectorEdgeU2OfV1 << "," << sectorEdgeV1 << "), V(" << sectorEdgeU1OfV2 << "," << sectorEdgeV2 << "), UV(" << sectorEdgeU2OfV2 << "," << sectorEdgeV2 << ")")
 
@@ -579,7 +582,7 @@ void FilterCalculatorModule::event()
     tracksOfEvent.push_back(newTrack);
 
     list<VXDHit> thisTrack = newTrack.getTrack();
-    if (thisTrack.size() > 30) { B2WARNING("event: " << m_eventCounter << " beware, tracklength is " << thisTrack.size()) }
+    if (thisTrack.size() > 30) { B2INFO("event: " << m_eventCounter << " beware, tracklength is " << thisTrack.size()) }
     if (int (thisTrack.size()) > m_numOfLayers * 2) { m_longTrackCounter++; }
     BOOST_FOREACH(VXDHit & hit, thisTrack) {
       B2DEBUG(10, "track has a hit in the following sector: " << hit.getSectorID())
@@ -594,7 +597,7 @@ void FilterCalculatorModule::event()
       thisUniID = riter->getUniID();
       oldRiter = riter;
       B2DEBUG(10, "adding Hit to tracklet: ")
-      newTracklet.addHit(*riter);
+      if (dynamic_cast<VXDHit*>(&(*riter)) != NULL) { newTracklet.addHit(*riter); }
 
       B2DEBUG(10, "copying track-segment into tracklet")
       ++riter;
@@ -602,7 +605,7 @@ void FilterCalculatorModule::event()
         while (riter != thisTrack.rend()) {
           friendUniID = riter->getUniID();
           if (thisUniID != friendUniID) {
-            newTracklet.addHit(*riter);
+            if (dynamic_cast<VXDHit*>(&(*riter)) != NULL) { newTracklet.addHit(*riter); }
           } else {
             string thisSecName = riter->getSectorID();
             B2WARNING("at event " << m_eventCounter << ": track " << newTrack.getParticleID() << " with momentum of " << newTrack.getPt() << "GeV/c has got two trueHits with same direction of flight, distance of " << (oldRiter->getHitPosition() - riter->getHitPosition()).Mag() << " of each other and deltatimestamp " << (oldRiter->getTimeStamp() - riter->getTimeStamp()) << " in the same sensor :" << thisSecName << ". Hit discarded!")
@@ -618,7 +621,7 @@ void FilterCalculatorModule::event()
             if (riter != thisTrack.rend()) {
               friendUniID = riter->getUniID();
               if (thisUniID != friendUniID) {
-                newTracklet.addHit(*riter);
+                if (dynamic_cast<VXDHit*>(&(*riter)) != NULL) { newTracklet.addHit(*riter); }
               } else {
                 string thisSecName = riter->getSectorID();
                 B2WARNING("at event " << m_eventCounter << ": track " << newTrack.getParticleID() << " with momentum of " << newTrack.getPt() << "GeV/c has got two trueHits with same direction of flight, distance of " << (oldRiter->getHitPosition() - riter->getHitPosition()).Mag() << " of each other and deltatimestamp " << (oldRiter->getTimeStamp() - riter->getTimeStamp()) << " in the same sensor :" << thisSecName << ". Hit discarded!")
@@ -630,11 +633,13 @@ void FilterCalculatorModule::event()
           }
         }
       }
+      int numHits = newTracklet.size();
+      B2DEBUG(10, "after collecting hits for the tracklet, size of tracklet: " << numHits)
 
+      if (numHits > m_numOfLayers * 2 + 1) { m_longTrackletCounter++; } else { m_trackletLengthCounter.at(numHits - 1)++; }
 
-      m_trackletLengthCounter[newTracklet.size() - 1] ++;
-
-      if (newTracklet.size() >= m_PARAMminTrackletLength) {
+      B2DEBUG(10, "after adding size")
+      if (numHits >= m_PARAMminTrackletLength) {
 
         if (direction == true) { // in that case the momentum vector of the tracklet points away from the IP -> outward movement
           newTracklet.reverse(); // ->inward "movement" of the hits, needed for the filtering, no presorting needed, the hits were in the right order.
@@ -651,12 +656,18 @@ void FilterCalculatorModule::event()
         while (friendIt != hitList.end()) {
           currentSector = currentIt->getSectorID();
           friendSector = friendIt->getSectorID();
-          if (currentSector[0] < friendSector[0]) {
-            B2ERROR("FilterCalculatorModule event " << m_eventCounter << ": tracklet has invalid sector-combination (outer/inner sector): " << currentSector << "/" << friendSector << "pID: " << newTracklet.getParticleID() << ", pT: " << newTracklet.getPt() << ", deleting friendHit")
-            friendIt = hitList.erase(friendIt);
+          if (int(currentSector.size()) == 0 || int(friendSector.size()) == 0) {
+            B2ERROR("FilterCalculatorModule event " << m_eventCounter << ": CurrentSector/FriendSector " << currentSector << "/" << friendSector << " got size 0! ")
+            friendIt = hitList.end();
             ++countedFails;
           } else {
-            ++currentIt; ++friendIt;
+            if (currentSector.at(0) < friendSector.at(0)) {
+              B2ERROR("FilterCalculatorModule event " << m_eventCounter << ": tracklet has invalid sector-combination (outer/inner sector): " << currentSector << "/" << friendSector << "pID: " << newTracklet.getParticleID() << ", pT: " << newTracklet.getPt() << ", deleting friendHit")
+              friendIt = hitList.erase(friendIt);
+              ++countedFails;
+            } else {
+              ++currentIt; ++friendIt;
+            }
           }
         } // filtering bad hits at different layers
 
@@ -682,6 +693,7 @@ void FilterCalculatorModule::event()
           }
           B2ERROR(values << "\n tracklet will be discarded!")
           riter = thisTrack.rend();
+          m_badTrackletCounter++;
         } else {
           B2DEBUG(10, " tracklet passed bad-tracklet-filters")
           int chosenSecMap = -1;
@@ -690,10 +702,9 @@ void FilterCalculatorModule::event()
               chosenSecMap++;
             } else { break; }
           }
-          m_trackletMomentumCounter[chosenSecMap]++;
+          m_trackletMomentumCounter.at(chosenSecMap)++;
 //        Tracklet.addHit(newHit); /// adding virtual hit to tracklet! WARNING: this line does not add any hits to an existing tracklet!
-          int numHits = newTracklet.size();
-          if (numHits > m_numOfLayers * 2 + 1) { m_longTrackletCounter++; }
+
           B2DEBUG(10, "adding tracklet to list")
           trackletsOfEvent.push_back(newTracklet);
         }
@@ -721,8 +732,8 @@ void FilterCalculatorModule::event()
   for (int i = 0; i < int(trackletsOfEvent.size()); i++) {
 
     bool firstrun = true, secondrun = true, thirdrun = true, lastRun = false;
-    list<VXDHit> aTracklet = trackletsOfEvent[i].getTrack();
-    MapOfSectors* thisSecMap = trackletsOfEvent[i].getSecMap();
+    list<VXDHit> aTracklet = trackletsOfEvent.at(i).getTrack();
+    MapOfSectors* thisSecMap = trackletsOfEvent.at(i).getSecMap();
     list<VXDHit>::iterator iter = aTracklet.begin(); // main iterator looping through the whole tracklet, "innermost Hit"
     list<VXDHit>::iterator it2HitsFilter = aTracklet.begin(); //important for 2hit-Filters: points to current hit of 2-hit-processes " next to innermost hit"
     list<VXDHit>::iterator it3HitsFilter = aTracklet.begin(); // -"- 3hit-Filters...m_PARAMlogTRadiusHighOccupancytoIPDistance
@@ -1081,15 +1092,17 @@ void FilterCalculatorModule::endRun()
   m_eventCounter++;
   B2INFO("~~~~~~~~~~~FilterCalculator - endRun ~~~~~~~~~~")
   for (int i = 0; i < int(m_PARAMsecMapNames.size()); ++i) {
-    B2INFO(" within " << m_eventCounter << " events we got " << m_trackletMomentumCounter.at(i) << " tracklets in the " << m_PARAMsecMapNames[i] << " setup")
+    B2INFO(" within " << m_eventCounter << " events we got " << m_trackletMomentumCounter.at(i) << " tracklets in the " << m_PARAMsecMapNames.at(i) << " setup")
   }
   for (int i = 0; i < int(m_trackletLengthCounter.size()); i++) {
-//    if ( m_trackletLengthCounter[i] == 0 ) { continue; }
-    B2INFO(" within " << m_eventCounter << " events we got " << m_trackletLengthCounter[i] << " tracklets containing " << i + 1 << " hits")
-    totalTrackletCounter += m_trackletLengthCounter[i];
-    totalHitCounter += m_trackletLengthCounter[i] * (i + 1);
+//    if ( m_trackletLengthCounter.at(i) == 0 ) { continue; }
+    B2INFO(" within " << m_eventCounter << " events we got " << m_trackletLengthCounter.at(i) << " tracklets containing " << i + 1 << " hits")
+    totalTrackletCounter += m_trackletLengthCounter.at(i);
+    totalHitCounter += m_trackletLengthCounter.at(i) * (i + 1);
   }
   B2INFO(m_badHitsCounter << " hits had to be discarded because of double impact in same sensor having same direction of flight")
+  B2INFO(m_badTrackletCounter << " tracklets had to be discarded because of crazy flight (forward and backward movement all the time)")
+
   B2INFO(" there were " << float(totalTrackletCounter) / float(m_eventCounter) << "/" << float(m_pxdHitCounter) / float(m_eventCounter) << "/" << float(m_svdHitCounter) / float(m_eventCounter) << " tracklets/pxdHits/svdHits per event...")
   B2INFO(" there were " << m_longTrackCounter << " Tracks having more than " << m_numOfLayers * 2 << " hits...")
   B2INFO(" there were " << m_longTrackletCounter << " Tracklets having more than " << m_numOfLayers * 2 << " hits!!!")
@@ -1101,19 +1114,39 @@ void FilterCalculatorModule::endRun()
 /// /// /// /// /// /// /// /// TERMINATE /// /// /// /// /// /// /// ///
 void FilterCalculatorModule::terminate()
 {
+  B2INFO("~~~~~~~~~~~FilterCalculator - terminate ~~~~~~~~~~")
+  int ctr = 0, smCtr = 0;
 
-  int ctr = 0;
   BOOST_FOREACH(MapOfSectors * thisMap, m_sectorMaps) {
+    int secMapSize = thisMap->size();
+    ctr = 0;
+    B2INFO("writing " << secMapSize << " entries of secmap " << m_PARAMsecMapNames.at(smCtr))
     BOOST_FOREACH(SecMapEntry thisEntry, *thisMap) {
+      if ((ctr % int(0.1 * float(secMapSize))) == 0) {
+        B2INFO("writing entry " << ctr << ": " << thisEntry.first)
+      }
+
+      // doing typeCheck: if (Class* check = dynamic_cast<Class*>(aPtr)) != NULL) then aPtr isOfType Class*
+//      if ((Sector* derived = dynamic_cast<Sector*>(&thisEntry.second)) != NULL)
+      if ((dynamic_cast<Sector*>(&thisEntry.second)) != NULL) {
+        thisEntry.second.exportFriends(m_PARAMsecMapNames.at(smCtr));
+        ctr++;
+      } else {
+        B2WARNING(" sector " << thisEntry.first << " is no sector!")
+      }
+// //       if ( thisEntry.first == (("6_52352_4").str())) {
+// //         B2INFO(" evil sector coming...")
+// //       }
 //      string secMapName = m_PARAMsecMapNames.at(ctr);
-      thisEntry.second.exportFriends(m_PARAMsecMapNames.at(ctr));
+
     }
     thisMap->clear();
-    ctr++;
+    smCtr++;
   }
   m_sectorMaps.clear();
 
   if (m_treePtr != NULL) {
+    B2INFO(" now filling rootFile")
     m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
     m_treePtr->Write();
     m_rootFilePtr->Close();

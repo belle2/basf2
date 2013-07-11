@@ -275,7 +275,7 @@ namespace Belle2 {
       virtual void initialize();
 
       virtual void beginRun();
-
+      virtual void the_real_event();
       virtual void event();
 
       virtual void endRun();

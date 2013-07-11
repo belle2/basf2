@@ -17,6 +17,7 @@
 // #include <functional>
 // #include <utility>
 #include <iterator>     // std::distance
+#include <math.h>       /* floor */
 
 
 using namespace std;
@@ -203,25 +204,25 @@ void TestMapModule::FillVector(vector<unsigned int>& vec)
 {
   for (int lay = 1; lay <= m_PARAMnumLayers; ++lay) {
     bool slay = true;
-    for (int sen = 0; sen < m_PARAMnumSensors / 2; ++sen) {
+    for (int sen = 0; sen < m_PARAMnumSensors; ++sen) {
       for (int sec = 0; sec < m_PARAMnumSectors; ++sec) {
         vec.push_back(FullSecID(lay, slay, sen, sec).getFullSecID());
       }
     }
     slay = false;
-    for (int sen = 0; sen < m_PARAMnumSensors / 2; ++sen) {
+    for (int sen = 0; sen < m_PARAMnumSensors; ++sen) {
       for (int sec = 0; sec < m_PARAMnumSectors; ++sec) {
         vec.push_back(FullSecID(lay, slay, sen, sec).getFullSecID());
       }
     }
-//    for (int slay = 0; slay < 2; ++slay) { // subLayer
-//      for (int sen = 0; sen < m_PARAMnumSensors/2; ++sen) {
-//        for (int sec = 0; sec < m_PARAMnumSectors; ++sec) {
-//          vec.push_back(FullSecID(lay, bool(slay), sen, sec).getFullSecID());
-//        }
-//      }
-//    }
   }
+  std::sort(vec.begin(), vec.end());
+  for (int pos = 1; pos < int(vec.size()); ++pos) {
+    if (vec[pos] == vec[pos - 1]) {
+      B2INFO(" vecPos " << pos << " double entry, FullSecID/string: " << vec[pos] << "/" << FullSecID(vec[pos]).getFullSecString())
+    }
+  }
+
   B2INFO("TestMapModule::FillVector: vector has " << vec.size() << " entries...")
 }
 

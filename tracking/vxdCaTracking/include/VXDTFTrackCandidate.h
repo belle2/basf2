@@ -96,6 +96,7 @@ namespace Belle2 {
       void addBookingRival(VXDTFTrackCandidate* aTC); /**< adds a TC sharing hits with current one */
 
       void addHopfieldClusterIndex(int anIndex) { m_hopfieldHitIndices.push_back(anIndex); } /**< add index number of Cluster attached to current TC (SVD and PXD), index is unique but does not point to real clusters */
+
       void addSegments(VXDSegmentCell* pCell) { m_attachedCells.push_back(pCell); } /**< add segment attached to current TC */
 
       void addHits(VXDTFHit* pHit) {

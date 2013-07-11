@@ -72,7 +72,9 @@
 // #include <boost/chrono/chrono_io.hpp>
 
 
-
+#ifdef HAS_CALLGRIND
+#include <valgrind/callgrind.h>
+#endif
 
 
 using namespace std;
@@ -1101,7 +1103,7 @@ void VXDTFModule::beginRun()
 /** ***********************************+ + +*********************************** **/
 /** *************************************+************************************* **/
 
-void VXDTFModule::event()
+void VXDTFModule::the_real_event()
 {
   EventInfoPackage thisInfoPackage;
   thisInfoPackage.clear();
@@ -1839,6 +1841,7 @@ void VXDTFModule::event()
     totalIndices.insert(totalIndices.end(), tempIndices.begin(), tempIndices.end());
 
     B2DEBUG(10, "before starting generateGFTrackCand: tempIndices: " << tempIndices.size() << ", totalIndices: " << totalIndices.size());
+#if 0
     GFTrackCand gfTC = generateGFTrackCand(currentTC, clustersOfEvent);                          /// generateGFTrackCand
 
     if (m_TESTERexpandedTestingRoutines == true) {
@@ -1854,7 +1857,10 @@ void VXDTFModule::event()
       extraInfo4GFTCs.appendNew(newBoard);
     }
     finalTrackCandidates.appendNew(gfTC);
+#endif
+
   }
+
   int nTotalIndices = totalIndices.size();
   vector<int>::iterator newEndOfVector;
   std::sort(totalIndices.begin(), totalIndices.end());
@@ -1892,6 +1898,17 @@ void VXDTFModule::event()
   thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
   B2DEBUG(1, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count());
   m_TESTERlogEvents.push_back(thisInfoPackage);
+}
+
+void VXDTFModule::event()
+{
+#ifdef HAS_CALLGRIND
+  CALLGRIND_START_INSTRUMENTATION;
+#endif
+  this->the_real_event();
+#ifdef HAS_CALLGRIND
+  CALLGRIND_STOP_INSTRUMENTATION;
+#endif
 }
 
 

@@ -17,6 +17,7 @@
 #include <sstream> // stringstream, needed for xml-data-compatibility
 #include <vector> // needed for xml-data-compatibility
 #include <boost/algorithm/string.hpp> // needed for xml-data-compatibility
+#include <bitset>
 
 
 using namespace std;
@@ -71,7 +72,7 @@ FullSecID::FullSecID(VxdID vxdID, bool subLayerID, unsigned int sectorNumber):
   unsigned int SubLayerID = subLayerID; // converting to int
   unsigned int UniID = vxdID;
 
-  B2DEBUG(1000, "FullSecID-constructor: LayerID " << LayerID << ", MaxLayer " << MaxLayer << ", SubLayerID " << SubLayerID << ", MaxSubLayer " << MaxSubLayer << ", UniID " << UniID << ", MaxVxdID " << MaxVxdID << ", sectorNumber " << sectorNumber << ", MaxSector " << MaxSector);
+  B2DEBUG(175, "FullSecID-constructor: LayerID " << LayerID << ", MaxLayer " << MaxLayer << ", SubLayerID " << SubLayerID << ", MaxSubLayer " << MaxSubLayer << ", UniID " << UniID << ", MaxVxdID " << MaxVxdID << ", sectorNumber " << sectorNumber << ", MaxSector " << MaxSector);
   assert(LayerID < MaxLayer + 1);
   assert(SubLayerID < MaxSubLayer + 1);
   assert(UniID < MaxVxdID + 1);
@@ -86,16 +87,18 @@ FullSecID::FullSecID(VxdID vxdID, bool subLayerID, unsigned int sectorNumber):
 
 FullSecID::FullSecID(unsigned int layerID, bool subLayerID, unsigned int sensorID, unsigned int sectorNumber)
 {
-  B2DEBUG(1000, "FullSecID-constructor: LayerID " << layerID << ", MaxLayer " << MaxLayer << ", SubLayerID " << subLayerID << ", MaxSubLayer " << MaxSubLayer << ", UniID " << sensorID << ", MaxVxdID " << MaxVxdID << ", sectorNumber " << sectorNumber << ", MaxSector " << MaxSector);
+  unsigned int SubLayerID = subLayerID; // converting to int
+  B2DEBUG(175, "FullSecID-constructor: LayerID " << layerID << ", MaxLayer " << MaxLayer << ", SubLayerID " << subLayerID << ", MaxSubLayer " << MaxSubLayer << ", UniID " << sensorID << ", MaxVxdID " << MaxVxdID << ", sectorNumber " << sectorNumber << ", MaxSector " << MaxSector);
   assert(layerID < MaxLayer + 1);
-  assert(subLayerID < MaxSubLayer + 1);
+  assert(SubLayerID < MaxSubLayer + 1);
   assert(sensorID < MaxVxdID + 1);
   assert(sectorNumber < MaxSector + 1);
 
   layerID <<= LayerBitShift;
-  subLayerID <<= SubLayerBitShift;
+  SubLayerID <<= SubLayerBitShift;
   sensorID <<= VxdIDBitShift;
-  m_fullSecID = layerID | subLayerID | sensorID | sectorNumber; // should be the same as below
+  m_fullSecID = layerID | SubLayerID | sensorID | sectorNumber; // should be the same as below
+  B2DEBUG(175, " m_fullSecID/binary: " << m_fullSecID << "/" << std::bitset<32>(m_fullSecID) << "\n, secID/binary: " << sectorNumber << "/" << std::bitset<32>(sectorNumber) << ", layerID-binary: " << std::bitset<32>(layerID) << "\n, SubLayerID-binary: " << std::bitset<32>(SubLayerID)  << ", sensorID-binary: " << std::bitset<32>(sensorID))
 }
 
 std::string FullSecID::getFullSecString()
@@ -106,3 +109,4 @@ std::string FullSecID::getFullSecString()
 //  cerr << "getFullSecString: " << (boost::format("%1%0_%2%_%3%") % aLayerID % aUniID % aSecID).str() << endl;
   return (boost::format("%1%%2%_%3%_%4%") % getLayerID() % getSubLayerID() % getUniID() % getSecID()).str();
 }
+

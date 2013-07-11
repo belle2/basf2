@@ -27,10 +27,17 @@ def get_files(path_name, release_dir):
         save_dir = os.getcwd()
         os.chdir(release_dir)
         result = Glob(path_name)
+        for entry in result[:]:
+            if os.path.isdir(str(entry)):
+                result.remove(entry)
         os.chdir(save_dir)
         return result
     else:
-        return Glob(path_name)
+        result = Glob(path_name)
+        for entry in result[:]:
+            if os.path.isdir(str(entry)):
+                result.remove(entry)
+        return result
 
 
 def real_path(path_name, release_dir):
@@ -80,7 +87,7 @@ def process_dir(
                   release_dir)]
 
     # get list of script files
-    script_files = get_files(os.path.join(dir_name, 'scripts', '*'),
+    script_files = get_files(os.path.join(dir_name, 'scripts', '*.py'),
                              release_dir)
 
     # get list of data files
@@ -140,7 +147,6 @@ def process_dir(
     # install data files in the data directory
     data = env.Install(os.path.join(env['DATADIR'], dir_name), env['DATA_FILES'
                        ])
-    Local(data)
     define_aliases(env, data, dir_name, 'data')
 
     # remember tests defined in this directory

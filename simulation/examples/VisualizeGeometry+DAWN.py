@@ -33,22 +33,6 @@ g4sim.param('UICommands', ['/vis/open DAWNFILE', '/vis/drawVolume',
 #            '/vis/scene/add/trajectories smooth',
 #            '/vis/modeling/trajectories/create/drawByCharge'])
 
-# Stupid fixstyle breaks the comments, so here is the commented version of the code above:
-# g4sim.param('UICommands', [
-## Use VRML2 backend
-    # '/vis/open VRML2FILE',
-## Draw the geometry
-    # '/vis/drawVolume',
-## Draw coordinate axes at the origin with a length of 100mm in each direction
-    # '/vis/scene/add/axes 0 0 0 100 mm',
-## Draw simulated tracks
-    # '/vis/scene/add/trajectories smooth',
-    # '/vis/modeling/trajectories/create/drawByCharge'
-## Uncomment the following two lines to have yellow dots at each step boundary along the trajectory
-##    '/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true',
-##    '/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 0.5',
-# ])
-
 # Parameters for particle gun
 pguninput.param('nTracks', 1)
 pguninput.param('pdgCodes', [211])

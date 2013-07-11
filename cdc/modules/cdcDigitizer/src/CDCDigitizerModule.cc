@@ -215,7 +215,9 @@ void CDCDigitizerModule::event()
       const MCParticle* mcparticle =
         simHits[iterSignalMap->second.m_simHitIndex]->getRelatedFrom<MCParticle>();
       // relation MCParticle <-> CDCHit
-      mcparticle->addRelationTo(cdcHit);
+      if (mcparticle != NULL) {
+        mcparticle->addRelationTo(cdcHit);
+      }
 
       iCDCHits++;
     }

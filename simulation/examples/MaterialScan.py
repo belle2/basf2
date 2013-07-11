@@ -9,6 +9,7 @@ logging.log_level = LogLevel.ERROR
 evtmetagen = register_module('EvtMetaGen')
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
+pgun = register_module('ParticleGun')
 simulation = register_module('FullSim')
 
 # Create one Event in one Run
@@ -17,6 +18,11 @@ evtmetagen.param({'runList': [1], 'evtNumList': [1]})
 # Restrict Geometry to certain components, in this case only PXD and SVD
 geometry.param('Components', ['PXD', 'SVD'])
 geometry.set_log_level(LogLevel.INFO)
+
+# sadly, MaterialScan needs FullSim, even though no particles are there.
+# add a neutrino so FullSim doesn't abort.
+pgun.param('nTracks', 1)
+pgun.param('pdgCodes', [12])
 
 # Create the MaterialScan module
 materialscan = register_module('MaterialScan')
@@ -103,6 +109,7 @@ main = create_path()
 main.add_module(evtmetagen)
 main.add_module(gearbox)
 main.add_module(geometry)
+main.add_module(pgun)
 main.add_module(simulation)
 main.add_module(materialscan)
 

@@ -3,6 +3,7 @@ Import('env')
 env['PYTHON_MODULE'] = True
 env['LIBS'] = ['framework',
                'boost_python',
+               '$ROOT_LIBS',
                '$PYTHON_LIBS']
 
 Return('env')

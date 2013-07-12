@@ -9,9 +9,7 @@ from basf2 import *
 evtmetagen = register_module('EvtMetaGen')
 
 # generate one event
-evtmetagen.param('ExpList', [0])
-evtmetagen.param('RunList', [1])
-evtmetagen.param('EvtNumList', [1000])
+evtmetagen.param('evtNumList', [1000])
 evtmetainfo = register_module('EvtMetaInfo')
 
 # create geometry
@@ -162,4 +160,3 @@ main.add_module(si_cdcTracksMerger)
 # Process events
 process(main)
 print statistics
-

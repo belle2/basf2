@@ -143,7 +143,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
     logSystem.setModuleLogConfig(NULL);
 
     //Check whether this is the master module
-    if (!m_master && DataStore::Instance().hasEntry(eventMetaData)) {
+    if (!m_master && DataStore::Instance().getEntry(eventMetaData) != NULL) {
       B2DEBUG(100, "Found master module " << module->getName());
       m_master = module;
     }

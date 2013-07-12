@@ -126,35 +126,36 @@ bool DataStore::createEntry(const std::string& name, EDurability durability,
 }
 
 
-bool DataStore::hasEntry(const StoreAccessorBase& accessor)
+DataStore::StoreEntry* DataStore::getEntry(const StoreAccessorBase& accessor)
 {
   const StoreObjConstIter& it = m_storeObjMap[accessor.getDurability()].find(accessor.getName());
 
-  if (it != m_storeObjMap[accessor.getDurability()].end()) {
-    return checkType(*(it->second), accessor);
+  if (it != m_storeObjMap[accessor.getDurability()].end() and checkType(*(it->second), accessor)) {
+    return it->second;
   } else {
-    return false;
+    return NULL;
   }
 }
 
 
 TObject** DataStore::getObject(const StoreAccessorBase& accessor)
 {
-  if (!hasEntry(accessor)) {
-    return 0;
+  StoreEntry* entry = getEntry(accessor);
+  if (!entry) {
+    return NULL;
   }
-  return &(m_storeObjMap[accessor.getDurability()][accessor.getName()]->ptr);
+  return &(entry->ptr);
 }
 
 
 bool DataStore::createObject(TObject* object, bool replace, const StoreAccessorBase& accessor)
 {
-  if (!hasEntry(accessor)) {
+  StoreEntry* entry = getEntry(accessor);
+  if (!entry) {
     B2ERROR("No entry with name " << accessor.getName() << " and durability " << accessor.getDurability() << " exists in the DataStore.");
     return false;
   }
 
-  StoreEntry* entry = m_storeObjMap[accessor.getDurability()][accessor.getName()];
   if (entry->ptr && !replace) {
     B2ERROR("An object with name " << accessor.getName() << " and durability " << accessor.getDurability() << " was already created in the DataStore.");
     return false;
@@ -424,7 +425,6 @@ RelationEntry DataStore::getRelationWith(const TObject* object, DataStore::Store
 
 void DataStore::clearMaps(EDurability durability)
 {
-  B2DEBUG(100, "Start deletion process of durability " << durability);
   for (StoreObjIter iter = m_storeObjMap[durability].begin(); iter != m_storeObjMap[durability].end(); ++iter) {
     iter->second->ptr = 0;
   }
@@ -448,7 +448,7 @@ bool DataStore::require(const StoreAccessorBase& accessor)
     info.addEntry(accessor.getName(), ModuleInfo::c_Input, (accessor.getClass() == RelationContainer::Class()));
   }
 
-  if (!hasEntry(accessor)) {
+  if (!getEntry(accessor)) {
     B2ERROR("The required DataStore entry with name " << accessor.getName() << " and durability " << accessor.getDurability() << " does not exist. Maybe you forgot the module that creates it?");
     return false;
   }
@@ -462,5 +462,5 @@ bool DataStore::optionalInput(const StoreAccessorBase& accessor)
     info.addEntry(accessor.getName(), ModuleInfo::c_OptionalInput, (accessor.getClass() == RelationContainer::Class()));
   }
 
-  return hasEntry(accessor);
+  return (getEntry(accessor) != NULL);
 }

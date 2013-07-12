@@ -169,15 +169,15 @@ namespace Belle2 {
     bool createEntry(const std::string& name, EDurability durability,
                      const TClass* objClass, bool array, bool transient, bool errorIfExisting);
 
-    /** Check whether an entry with the correct type is registered in the DataStore map.
+    /** Check whether an entry with the correct type is registered in the DataStore map and return it.
      *
      *  If the map of requested durability already contains an object under the key name with a DIFFERENT type
      *  than the given type one, an error will be reported. <br>
      *
      *  @param accessor   Encapsulates name, durability, and type
-     *  @return           True if the requested object exists.
+     *  @return           StoreEntry, or NULL if not found
      */
-    bool hasEntry(const StoreAccessorBase& accessor);
+    StoreEntry* getEntry(const StoreAccessorBase& accessor);
 
     /** Produce ERROR message if no entry of the given type is registered in the DataStore.
      *

@@ -248,7 +248,10 @@ namespace Belle2 {
           B2ERROR("No TrackFitResult for " << hypothesis.getPDGCode());
           continue;
         }
+        double chi2Prob = fitResult->getPValue();
+        B2DEBUG(50, "Track.Chi2 probability " << chi2Prob);
         int charge = fitResult->getCharge();
+        B2DEBUG(50, "Track.Charge " << charge);
         const MCParticle* particle = DataStore::getRelated<MCParticle>(track);
         const ARICHAeroHit* aeroHit = DataStore::getRelated<ARICHAeroHit>(particle);
         int aeroHitIndex = -1;

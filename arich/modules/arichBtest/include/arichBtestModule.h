@@ -11,13 +11,12 @@
 #ifndef ARICHBTESTMODULE_H
 #define ARCIHBTESTMODULE_H
 
-#include <zlib.h>
-
 #include <framework/core/Module.h>
 
 #include <string>
 #include <vector>
 #include <time.h>
+#include <zlib.h>
 
 class TFile;
 class TVector3;

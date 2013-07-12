@@ -21,8 +21,7 @@ geometry = register_module('Geometry')
 g4sim = register_module('FullSim')
 
 # one event
-evtmetagen.param('RunList', [1])
-evtmetagen.param('EvtNumList', [100])
+evtmetagen.param('evtNumList', [100])
 
 import random
 intseed = random.randint(1, 10000000)
@@ -46,7 +45,7 @@ param_pGun = {
 pGun.param(param_pGun)
 
 cdcDigitizer = register_module('CDCDigitizer')
-cdcDigitizer.param(param_cdcdigi)
+
 
 ext = register_module('Ext')
 ext.param('GFTracksColName', 'GFTracks')

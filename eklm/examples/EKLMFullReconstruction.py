@@ -46,7 +46,6 @@ param_pGun = {
 pGun.param(param_pGun)
 
 cdcDigitizer = register_module('CDCDigitizer')
-param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
 cdcDigitizer.param(param_cdcdigi)
 
 ext = register_module('Ext')

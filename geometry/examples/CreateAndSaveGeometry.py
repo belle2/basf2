@@ -17,7 +17,7 @@ from basf2 import *
 
 # EvtMetaGen - generate event meta data
 evtmetagen = register_module('EvtMetaGen')
-evtruninfo = {'ExpList': [0], 'RunList': [1], 'EvtNumList': [1]}
+evtruninfo = {'expList': [0], 'runList': [1], 'evtNumList': [1]}
 evtmetagen.param(evtruninfo)
 
 # Geometry parameter loader

@@ -340,6 +340,7 @@ void MCTrackFinderModule::event()
         for (int i = 0; i < nMcPartToPXDHits; ++i) {
           if (mcPartToPXDTrueHits[i].getFromIndex() == unsigned(iPart)) {
             for (unsigned int j = 0; j < mcPartToPXDTrueHits[i].getToIndices().size(); j++) {
+              if (mcPartToPXDTrueHits[i].getWeight(j) < 0) continue;  // skip hits from secondary particles
               pxdHitsIndices.push_back(mcPartToPXDTrueHits[i].getToIndex(j));
               ndf += 2;
             }
@@ -349,6 +350,7 @@ void MCTrackFinderModule::event()
         for (int i = 0; i < nPxdClusterToMCPart; ++i) {
           for (unsigned int j = 0; j < pxdClusterToMCParticle[i].getToIndices().size(); j++) {
             if (pxdClusterToMCParticle[i].getToIndex(j) == unsigned(iPart)) {
+              if (pxdClusterToMCParticle[i].getWeight(j) < 0) continue;  // skip hits from secondary particles
               pxdHitsIndices.push_back(pxdClusterToMCParticle[i].getFromIndex());
               ndf += 2;
             }
@@ -367,6 +369,7 @@ void MCTrackFinderModule::event()
         for (int i = 0; i < nMcPartToSVDHits; ++i) {
           if (mcPartToSVDTrueHits[i].getFromIndex() == unsigned(iPart)) {
             for (unsigned int j = 0; j < mcPartToSVDTrueHits[i].getToIndices().size(); j++) {
+              if (mcPartToSVDTrueHits[i].getWeight(j) < 0) continue;   // skip hits from secondary particles
               svdHitsIndices.push_back(mcPartToSVDTrueHits[i].getToIndex(j));
               ndf += 2;
             }
@@ -376,6 +379,7 @@ void MCTrackFinderModule::event()
         for (int i = 0; i < nSvdClusterToMCPart; ++i) {
           for (unsigned int j = 0; j < svdClusterToMCParticle[i].getToIndices().size(); j++) {
             if (svdClusterToMCParticle[i].getToIndex(j) == unsigned(iPart)) {
+              if (svdClusterToMCParticle[i].getWeight(j) < 0) continue; // skip hits from secondary particles
               svdHitsIndices.push_back(svdClusterToMCParticle[i].getFromIndex());
               ndf += 1;
             }
@@ -396,6 +400,7 @@ void MCTrackFinderModule::event()
       for (int i = 0; i < nMcPartToCDCHits; ++i) {
         if (mcPartToCDCHits[i].getFromIndex() == unsigned(iPart)) {
           for (unsigned int j = 0; j < mcPartToCDCHits[i].getToIndices().size(); j++) {
+            if (mcPartToCDCHits[i].getWeight(j) < 0) continue;  // skip hits from secondary particles
             int cdcHitIndex = mcPartToCDCHits[i].getToIndex(j);
             cdcHitsIndices.push_back(cdcHitIndex);
             ndf += 1;

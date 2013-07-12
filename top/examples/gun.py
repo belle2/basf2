@@ -10,14 +10,34 @@ from basf2 import *
 # relation from Tracks to TOPLikelihoods
 # --------------------------------------------------------------------
 
-# suppress messages and warnings during processing:
+# Suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
 
-# Event information, set the number of events to generate
+# Create path
+main = create_path()
+
+# Set number of events to generate
 evtmetagen = register_module('EvtMetaGen')
 evtmetagen.param({'evtNumList': [10], 'runList': [1]})
+main.add_module(evtmetagen)
 
-# particle gun: multiple tracks
+# Gearbox: access to database (xml files)
+gearbox = register_module('Gearbox')
+main.add_module(gearbox)
+
+# Geometry
+geometry = register_module('Geometry')
+geometry.param('Components', [
+    'MagneticField',
+    'BeamPipe',
+    'PXD',
+    'SVD',
+    'CDC',
+    'TOP',
+    ])
+main.add_module(geometry)
+
+# Particle gun: generate multiple tracks
 particlegun = register_module('ParticleGun')
 particlegun.param('pdgCodes', [211, -211, 321, -321])
 particlegun.param('nTracks', 5)
@@ -33,74 +53,57 @@ particlegun.param('xVertexParams', [0])
 particlegun.param('yVertexParams', [0])
 particlegun.param('zVertexParams', [0])
 particlegun.param('independentVertices', False)
-print_params(particlegun)
-
-# Show progress of processing
-progress = register_module('Progress')
-
-# Gearbox
-gearbox = register_module('Gearbox')
-
-# Geometry
-geometry = register_module('Geometry')
-geometry.param('Components', [
-    'MagneticField',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-    'TOP',
-    ])
+main.add_module(particlegun)
 
 # Simulation
 simulation = register_module('FullSim')
+main.add_module(simulation)
 
-# CDC digitizer
+# PXD digitization & clustering
+pxd_digitizer = register_module('PXDDigitizer')
+main.add_module(pxd_digitizer)
+pxd_clusterizer = register_module('PXDClusterizer')
+main.add_module(pxd_clusterizer)
+
+# SVD digitization & clustering
+svd_digitizer = register_module('SVDDigitizer')
+main.add_module(svd_digitizer)
+svd_clusterizer = register_module('SVDClusterizer')
+main.add_module(svd_clusterizer)
+
+# CDC digitization
 cdcDigitizer = register_module('CDCDigitizer')
-# use one gaussian with resolution of 0.01 in the digitizer (to simplify the fitting)
-param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
-cdcDigitizer.param(param_cdcdigi)
+main.add_module(cdcDigitizer)
 
 # MC track finder (for simplicity)
 mctrackfinder = register_module('MCTrackFinder')
-param_mctrackfinder = {  # select which particles to use: primary particles
-    'UseCDCHits': 1,
-    'UseSVDHits': 1,
-    'UsePXDHits': 1,
-    'WhichParticles': ['primary'],
-    }
-mctrackfinder.param(param_mctrackfinder)
+main.add_module(mctrackfinder)
 
 # Track fitting
-cdcfitting = register_module('GenFitter')
+trackfitter = register_module('GenFitter')
+main.add_module(trackfitter)
 
 # Track extrapolation
 ext = register_module('Ext')
+main.add_module(ext)
+
+# TOP digitization
+topdigi = register_module('TOPDigitizer')
+main.add_module(topdigi)
 
 # TOP reconstruction
-topdigi = register_module('TOPDigitizer')
 topreco = register_module('TOPReconstructor')
 topreco.param('debugLevel', 1)  # remove this line or set to 0 to suppress printout
+main.add_module(topreco)
 
 # Output
 output = register_module('RootOutput')
 output.param('outputFileName', 'TOPOutput.root')
-
-# Create path
-main = create_path()
-main.add_module(evtmetagen)
-main.add_module(progress)
-main.add_module(gearbox)
-main.add_module(geometry)
-main.add_module(particlegun)
-main.add_module(simulation)
-main.add_module(cdcDigitizer)
-main.add_module(mctrackfinder)
-main.add_module(cdcfitting)
-main.add_module(ext)
-main.add_module(topdigi)
-main.add_module(topreco)
 main.add_module(output)
+
+# Show progress of processing
+progress = register_module('Progress')
+main.add_module(progress)
 
 # Process events
 process(main)

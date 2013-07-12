@@ -99,7 +99,7 @@ namespace Belle2 {
        * @param tracks vector of TOPtracks to return
        * @param chargedStable particle hypothesis used for extrapolation
        */
-      void getTracks(std::vector<TOPtrack> & tracks, Const::ChargedStable chargedStable);
+      void getTracks(std::vector<TOPtrack>& tracks, Const::ChargedStable chargedStable);
 
       // Module parameters
 

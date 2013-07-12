@@ -106,7 +106,7 @@ namespace Belle2 {
 
       m_Z += GaussRnd(sig_z);
       double dx = GaussRnd(sig_x);
-      if (m_X* m_X + m_Y* m_Y != 0) phi = atan2(m_Y, m_X);
+      if (m_X * m_X + m_Y * m_Y != 0) phi = atan2(m_Y, m_X);
       m_X += dx * sin(phi);
       m_Y -= dx * cos(phi);
     }

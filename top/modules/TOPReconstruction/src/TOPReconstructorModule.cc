@@ -317,7 +317,7 @@ namespace Belle2 {
     }
 
 
-    void TOPReconstructorModule::getTracks(std::vector<TOPtrack> & tracks,
+    void TOPReconstructorModule::getTracks(std::vector<TOPtrack>& tracks,
                                            Const::ChargedStable chargedStable)
     {
       ExtDetectorID myDetID = EXT_TOP; // TOP

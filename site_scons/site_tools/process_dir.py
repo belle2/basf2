@@ -184,8 +184,8 @@ def process_dir(
     is_package_dir = dir_name == env['PACKAGE']
     is_sublib_dir = env.Dictionary().get('SUBLIB', False) == True
     is_python_module_dir = env.Dictionary().get('PYTHON_MODULE', False) == True
-    is_dataobjects_dir = dir_name == os.path.join(env['PACKAGE'], 'dataobjects'
-            ) and env['PACKAGE'] != 'framework'
+    is_dataobjects_dir = os.path.basename(dir_name) == 'dataobjects' \
+        and env['PACKAGE'] != 'framework'
     if dir_name == './dataobjects':
         is_dataobjects_dir = True
         is_module_dir = False

@@ -12,7 +12,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
@@ -210,13 +209,14 @@ void CDCDigitizerModule::event()
       //add entry : CDCSimHit <-> CDCHit
       cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex, iCDCHits);
 
-
       const CDCHit* cdcHit = cdcHits[cdcHits.getEntries() - 1];
-      const MCParticle* mcparticle =
-        simHits[iterSignalMap->second.m_simHitIndex]->getRelatedFrom<MCParticle>();
-      // relation MCParticle <-> CDCHit
-      if (mcparticle != NULL) {
-        mcparticle->addRelationTo(cdcHit);
+      RelationVector<MCParticle> rels = simHits[iterSignalMap->second.m_simHitIndex]->getRelationsFrom<MCParticle>();
+
+      if (rels.size() != 0) {
+        //assumption: only one MCParticle
+        const MCParticle* mcparticle = rels[0];
+        double weight = rels.weight(0);
+        mcparticle->addRelationTo(cdcHit, weight);
       }
 
       iCDCHits++;

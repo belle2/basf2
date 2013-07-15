@@ -164,9 +164,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 #ifdef HAS_CALLGRIND
   CALLGRIND_ZERO_STATS;
 #endif
-  long currEvent = 0;
-  bool endProcess = false;
-  PathPtr currPath;
+  const ModulePtrList& startModules = startPath->getModules();
   LogSystem& logSystem = LogSystem::Instance();
 
   //Remember the previous event meta data, and identify end of data meta data
@@ -179,14 +177,16 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
   ModuleStatistics& stats = ModuleStatistics::getInstance();
 
   //Loop over the events
+  long currEvent = 0;
+  bool endProcess = false;
   while (!endProcess) {
     stats.startGlobal();
 
     //Loop over the modules in the current path
-    currPath = startPath;
-    ModulePtrList modules = currPath->getModules();
-    ModulePtrList::const_iterator moduleIter = modules.begin();
-    while (!endProcess and moduleIter != modules.end()) {
+    ModulePtrList::const_iterator moduleIter = startModules.begin();
+    ModulePtrList::const_iterator endIter = startModules.end();
+    ModulePtrList modules; // used to hold modules for conditional paths only (to keep iterators valid)
+    while (!endProcess and moduleIter != endIter) {
       Module* module = moduleIter->get();
 
       //Set the module dependent log level
@@ -254,14 +254,15 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       if (!endProcess) {
         //Check for a module condition, evaluate it and if it is true switch to a new path
         if (module->evalCondition()) {
-          currPath = module->getConditionPath();
-          modules = currPath->getModules();
+          PathPtr condPath = module->getConditionPath();
+          modules = condPath->getModules();
           moduleIter = modules.begin();
+          endIter = modules.end();
         } else {
           ++moduleIter;
         }
       }
-    }
+    } //end module loop
 
     //Delete event related data in DataStore
     DataStore::Instance().clearMaps(DataStore::c_Event);
@@ -269,7 +270,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
     currEvent++;
     if ((maxEvent > 0) && (currEvent >= maxEvent)) endProcess = true;
     stats.stopGlobal(ModuleStatistics::c_Event);
-  }
+  } //end event loop
 #ifdef HAS_CALLGRIND
   CALLGRIND_DUMP_STATS_AT("event");
 #endif

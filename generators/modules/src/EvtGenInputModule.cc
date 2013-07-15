@@ -60,6 +60,9 @@ void EvtGenInputModule::initialize()
 {
   B2INFO("starting initialisation of EvtGen Input Module. ");
 
+  //needs to be available to initialize things in beginRun()!
+  StoreObjPtr<EventMetaData>::required();
+
   //setup the DECAY files:
   if (!m_userDECFileName.empty())
     m_Ievtgen.setup(m_DECFileName, m_pdlFileName, m_parentParticle, m_userDECFileName);
@@ -132,7 +135,7 @@ void EvtGenInputModule::event()
     m_Ievtgen.m_labboost = getBoost(Eher, Eler, cross_angle, angle);
   }
 
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
   mpg.clear();
   int nPart =  m_Ievtgen.simulateEvent(mpg, pParentParticle);
   B2INFO("Simulated event " << eventMetaDataPtr->getEvent() << " with " << nPart << " particles.");

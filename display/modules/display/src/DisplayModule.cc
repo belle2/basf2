@@ -36,7 +36,7 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("showNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
   addParam("showGFTracks", m_showGFTracks, "If true, fitted GFTracks will be shown in the display.", true);
   addParam("showGFTrackCands", m_showGFTrackCands, "If true, track candidates (GFTrackCands array) will be shown in the display.", false);
-  addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for GFTrackCands visualisation", false);
+  addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for GFTrackCands visualisation", true);
   addParam("automatic", m_automatic, "Non-interactively save visualisations for each event.", false);
   addParam("fullGeometry", m_fullGeometry, "Show full geometry instead of simplified shapes. Further details can be enabled by changing the VisLevel option for Eve -> Scenes -> Geometry Scene -> Top_1.", false);
 

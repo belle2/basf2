@@ -133,7 +133,7 @@ else:
 # central release
 repository = None
 if analysis:
-    global_env.Append(CCFLAGS = ['-I$BELLE2_RELEASE_DIR/include'])
+    global_env.Append(CCFLAGS = ['-I' + os.path.join(os.environ['BELLE2_RELEASE_DIR'], 'include')])
     global_env.Append(LIBPATH = [os.path.join(os.environ['BELLE2_RELEASE_DIR'], 'lib', subdir)])
 else:
     # use central release as repository if it is set up

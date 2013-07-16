@@ -21,7 +21,7 @@ using namespace Belle2;
 
 RbCtlMgr::RbCtlMgr()
 {
-  m_shmid = shmget(IPC_PRIVATE, sizeof(RbCtlShm), IPC_CREAT | 0666);
+  m_shmid = shmget(IPC_PRIVATE, sizeof(RbCtlShm), IPC_CREAT | 0600);
   if (m_shmid < 0) {
     perror("RbCtlMgr::shmget");
     return;
@@ -29,7 +29,7 @@ RbCtlMgr::RbCtlMgr()
   m_ctlshm = (RbCtlShm*) shmat(m_shmid, 0, 0);
   m_ctlshm->n_sync = 0;
 
-  m_semid = semget(IPC_PRIVATE, 1, IPC_CREAT | 0644);
+  m_semid = semget(IPC_PRIVATE, 1, IPC_CREAT | 0600);
   if (m_semid < 0) {
     perror("RbCtlMgr::semget");
     return;

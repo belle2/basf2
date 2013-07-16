@@ -167,18 +167,18 @@ namespace Belle2 {
     const double k_barConForwRg(k_barConTFC / k_barForwCos) ;
     const double k_barConForwR4(k_barConInnerR + k_barConForwRg) ;
     const double k_barConBackZ3(k_barConBackZIn -
-                                (k_barConTFC*
+                                (k_barConTFC *
                                  (k_barBackSin + k_barBackCos / k_barBackTan) -
                                  (k_barFinThick / k_barBackCos +
                                   k_barConInnerThick) / k_barBackTan)) ;
     const double k_barConForwZ3(k_barConForwZIn +
-                                (k_barConTFC*
+                                (k_barConTFC *
                                  (k_barForwSin + k_barForwCos / k_barForwTan) -
                                  (k_barFinThick / k_barForwCos +
                                   k_barConInnerThick) / k_barForwTan)) ;
-    const double k_barConBackR2(k_barCryInnerR + k_barBackTan*
+    const double k_barConBackR2(k_barCryInnerR + k_barBackTan *
                                 (k_barConBackZ3 - k_barCryBackZOut)) ;
-    const double k_barConForwR2(k_barCryInnerR - k_barForwTan*
+    const double k_barConForwR2(k_barCryInnerR - k_barForwTan *
                                 (k_barConForwZ3 - k_barCryForwZOut)) ;
     const double k_barConBackR3(k_barConBackR2 + k_barConBackRg) ;
     const double k_barConForwR3(k_barConForwR2 + k_barConForwRg) ;
@@ -389,7 +389,9 @@ namespace Belle2 {
 
       int nBarrelCrystal = content.getNumberNodes("BarrelCrystals/BarrelCrystal");
 
-      for (int iBrCry = 1 ; iBrCry <= nBarrelCrystal ; ++iBrCry) {{//46=29+17
+      for (int iBrCry = 1 ; iBrCry <= nBarrelCrystal ; ++iBrCry) {
+        {
+          //46=29+17
 
           GearDir layerContent(content);
           layerContent.append((format("/BarrelCrystals/BarrelCrystal[%1%]/") % (iBrCry)).str());
@@ -939,7 +941,7 @@ namespace Belle2 {
         assemblyBwDiodes->MakeImprint(logical_ecl, Global_offset);
       }
 
-      bool isFastSimulation = 1; //false;
+      bool isFastSimulation = false;
       if (!isFastSimulation) {
         double BarrelCylinderWZ[6]    = {k_c2z1, k_c2z2, k_c2z2, k_c1z2, k_c1z2, k_c1z3};
         double BarrelCylinderWRin[6]  = {k_c2r1, k_c2r1, k_c2r1, k_c1r1, k_c1r1, k_c1r1};

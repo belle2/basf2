@@ -50,7 +50,7 @@ output = register_module('RootOutput')
 
 # EvtMetaGen parameters
 # Set the number of events to be processed (10 event)
-evtmetagen.param({'evtNumList': [1000], 'runList': [1]})
+evtmetagen.param({'evtNumList': [100], 'runList': [1]})
 # ============================================================================
 
 # Set output filename
@@ -70,7 +70,7 @@ particlegun.param('nTracks', 1)
 # Setting the parameters for the random generation
 # of particles momenta:
 particlegun.param('momentumGeneration', 'uniform')
-particlegun.param('momentumParams', [1, 4])
+particlegun.param('momentumParams', [0.5, 5])
 # Setting the parameters for the random generation
 # of the particle polar angle:
 particlegun.param('thetaGeneration', 'uniformCosinus')
@@ -115,23 +115,9 @@ simulation.param('PhotonFraction', 0.3)
 #                            '/vis/modeling/trajectories/create/drawByCharge'])
 # =============================================================================
 
-# MCFinder parameters
-param_mctrackfinder = {  # select which particles to use: primary particles
-    'UseCDCHits': 1,
-    'UseSVDHits': 1,
-    'UsePXDHits': 1,
-    'WhichParticles': ['primary'],
-    }
-mctrackfinder.param(param_mctrackfinder)
-
-# GenFitter parameters
-
-# Extrapolation module parameters
-
 # =============================================================================
 # ARICH Reconstruction parameters
 arichRECO.logging.log_level = LogLevel.DEBUG
-arichRECO.logging.debug_level = 50
 arichRECO.param('inputTrackType', 0)
 # =============================================================================
 

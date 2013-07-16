@@ -149,11 +149,14 @@ namespace Belle2 {
           ARICHTrack* track = &arichTracks[iTrack];
 
           double like[5];
-          double exp_phot[5];
+          double expectedPhotons[5];
           track->getLikelihood(like);
-          track->getExpectedNOfPhotons(exp_phot);
+          track->getExpectedPhotons(expectedPhotons);
+          double detectedPhotons = track->getDetectedPhotons();
+          B2DEBUG(50, "Number of expected photons " << expectedPhotons[0]);
+          B2DEBUG(50, "Number of detected photons " << detectedPhotons);
 
-          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, like, 1, exp_phot);
+          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, like, detectedPhotons, expectedPhotons);
 
           // Add relations
           int last = arichLikelihoods.getEntries() - 1;
@@ -193,18 +196,19 @@ namespace Belle2 {
           arichTracks.push_back(ARICHTrack(*aeroHit));
         } // for iTrack
 
-        m_ana->ReconstructParticles(arichTracks);
+        m_ana->smearTracks(arichTracks);
         m_ana->Likelihood2(arichTracks);
 
 
 
         for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
           ARICHTrack* track = &arichTracks[iTrack];
+          double expectedPhotons[5];
           double like[5];
-          double exp_phot[5];
+          track->getExpectedPhotons(expectedPhotons);
           track->getLikelihood(like);
-          track->getExpectedNOfPhotons(exp_phot);
-          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, like, 1, exp_phot);
+          int detectedPhotons = track->getDetectedPhotons();
+          new(arichLikelihoods.nextFreeAddress()) ARICHLikelihood(1, like, detectedPhotons, expectedPhotons);
           aeroHitToArich.add(iTrack, iTrack);
         } // for iTrack
       }

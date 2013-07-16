@@ -21,6 +21,7 @@
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 #include <vector>
 #include <TRotation.h>
@@ -67,13 +68,11 @@ namespace Belle2 {
     }
 
 
-    int ARICHReconstruction::ReconstructParticles(std::vector<ARICHTrack>& arichTracks)
+    int ARICHReconstruction::smearTracks(std::vector<ARICHTrack>& arichTracks)
     {
+      unsigned int nTracks = arichTracks.size();
 
-      //StoreArray<ARICHTrack> arichTracks;
-      unsigned int tsize = arichTracks.size();
-
-      for (unsigned  int i = 0; i < tsize; i++) {
+      for (unsigned  int i = 0; i < nTracks; i++) {
         ARICHTrack* track = &arichTracks[i];
         double thc = gRandom->Gaus(0, m_trackAngRes);
         double fic = gRandom->Uniform(2 * M_PI);
@@ -94,7 +93,7 @@ namespace Belle2 {
     }
 
 
-    TVector3 ARICHReconstruction::FastTracking(TVector3 dirf, TVector3 r,  double* refind, double* z, int n)
+    TVector3 ARICHReconstruction::FastTracking(TVector3 dirf, TVector3 r,  double* refractiveInd, double* z, int n)
     {
       //
       // Description:
@@ -125,7 +124,7 @@ namespace Belle2 {
       r   += dirf * path;
 
       for (int a = 1; a <= n + 1 ; a++) {
-        rind = refind[a] / refind[a - 1];
+        rind = refractiveInd[a] / refractiveInd[a - 1];
         dirf = Refraction(dirf, rind);
         if (dirf.Mag() == 0) return TVector3();
         path = (z[a] - r.z()) / dirf.z();
@@ -172,7 +171,7 @@ namespace Belle2 {
 
     int ARICHReconstruction::CherenkovPhoton(TVector3 r, TVector3 rh,
                                              TVector3& rf, TVector3& dirf,
-                                             double* refind, double* z, int n)
+                                             double* refractiveInd, double* z, int n)
     {
       //
       // Description:
@@ -194,7 +193,7 @@ namespace Belle2 {
       static TVector3 norm(0, 0, 1); // detector plane normal vector
 
       double dwin    = m_arichGeoParameters->getDetectorWindowThickness();
-      double refind0 = m_arichGeoParameters->getDetectorWindowRefIndex();
+      double refractiveInd0 = m_arichGeoParameters->getDetectorWindowRefIndex();
 
       // iteration is stoped when the difference of photon positions on first aerogel exit
       // between two iterations is smaller than this value.
@@ -231,9 +230,9 @@ namespace Belle2 {
         else  dirf0[n] = (rh1 - rf0[n]).Unit();
 
         // *************************************
-        // n-layers of aerogel // refind relative refractive index
+        // n-layers of aerogel // refractiveInd relative refractive index
         for (int a = n - 1; a >= 0 ; a--) {
-          rind = refind[a] / refind[a + 1];
+          rind = refractiveInd[a] / refractiveInd[a + 1];
           dirf0[a] = Refraction(dirf0[a + 1], rind);
         }
 
@@ -245,7 +244,7 @@ namespace Belle2 {
           path = (z[a + 1] - rf0[a + 1].z()) / dirf0[a + 1].z();
         }
 
-        Refraction(dirf0[n], norm, refind0, dirw);
+        Refraction(dirf0[n], norm, refractiveInd0, dirw);
 
         // *************************************
 
@@ -268,130 +267,142 @@ namespace Belle2 {
     {
       static int ncount = 0;
       ncount++;
-      const double p_mass[5] = { 0.000511, 0.10566, 0.13957, 0.49368, 0.93827};// mass of particles in GeV
+      //const double p_mass[5] = { 0.000511, 0.10566, 0.13957, 0.49368, 0.93827};// mass of particles in GeV
+      const double p_mass[5] = {Const::electron.getMass(), Const::muon.getMass(), Const::pion.getMass(), Const::kaon.getMass(), Const::proton.getMass()};
 
-      unsigned int tsize = arichTracks.size();
+      const unsigned int nTracks = arichTracks.size();
       StoreArray<ARICHDigit> arichDigits;
-      unsigned int hsize = arichDigits.getEntries();
+      const unsigned int nPhotonHits = arichDigits.getEntries(); // detected photons
 
-      if (tsize == 0) return 0;
+      if (nTracks == 0) return 0;
 
-      unsigned int asize = m_arichGeoParameters->getNumberOfAerogelRadiators();
-      double  esigi[c_noOfHypotheses];
+      const unsigned int nAerogelLayers = m_arichGeoParameters->getNumberOfAerogelRadiators();
 
-      static double  refind[c_noOfAerogels];
+      static double  refractiveInd[c_noOfAerogels];
       static double  zaero[c_noOfAerogels];
       static double  thickness[c_noOfAerogels];
-      static double  trlen[c_noOfAerogels];
-      static double  n0[c_noOfAerogels];
+      static double  transmissionLen[c_noOfAerogels];
+      static double  n0[c_noOfAerogels]; //const factor in dN/dE formula
       static TVector3 anorm[c_noOfAerogels];
-      static double pad_size;
+      static double padSize;
       static double angmir;
       static int nMirSeg;
       static int first = 1;
 
-      double  lrad[c_noOfAerogels];
+      double  pathLengthRadiator[c_noOfAerogels];
       double  acceptance[c_noOfHypotheses][c_noOfAerogels];
-      double  lkh[c_noOfHypotheses];
-      double  nbgr[c_noOfHypotheses];
-      double  nsig[c_noOfAerogels][c_noOfHypotheses];
-      double  thc[c_noOfHypotheses][c_noOfAerogels];
+      double  logL[c_noOfHypotheses];
+      double  nBgr[c_noOfHypotheses];
+      double  nSig[c_noOfAerogels][c_noOfHypotheses]; // expected no. of photons
+      double  esigi[c_noOfHypotheses]; // expected number of signal photons in each pixel
+      double  thetaCh[c_noOfHypotheses][c_noOfAerogels]; // expected Ch. angle
 
       if (first) {
 
-        pad_size = m_arichGeoParameters->getDetectorPadSize();
+        padSize = m_arichGeoParameters->getDetectorPadSize();
         nMirSeg = m_arichGeoParameters->getNMirrors();
         angmir  = m_arichGeoParameters->getMirrorsStartAngle();
-        thickness[asize] = 0;
-        for (unsigned int i = 0; i < asize; i++) {
-          refind[i] = m_arichGeoParameters->getAerogelRefIndex(i) ;
+        thickness[nAerogelLayers] = 0;
+        for (unsigned int i = 0; i < nAerogelLayers; i++) {
+          refractiveInd[i] = m_arichGeoParameters->getAerogelRefIndex(i);
           anorm[i] = TVector3(0, 0, 1);
           thickness[i] = m_arichGeoParameters->getAerogelThickness(i);
           zaero[i] = m_arichGeoParameters->getAerogelZPosition(i) + thickness[i];
-          trlen[i] = m_arichGeoParameters->getAerogelTransmissionLength(i) ; // aerogel transmission length;
+          transmissionLen[i] = m_arichGeoParameters->getAerogelTransmissionLength(i) ; // aerogel transmission length;
           // measured FOM
-          n0[i] = m_aeroMerit[i] / (0.1516 * trlen[i] * (1 - exp(-thickness[i] / trlen[i])));
-          thickness[asize]   += thickness[i];
+          n0[i] = m_aeroMerit[i] / (0.1516 * transmissionLen[i] * (1 - exp(-thickness[i] / transmissionLen[i])));
+          thickness[nAerogelLayers]   += thickness[i];
         }
-        refind[asize  ]   = 1.0;
-        refind[asize + 1]   = m_arichGeoParameters->getDetectorWindowRefIndex();
-        zaero[asize  ] = m_arichGeoParameters->getDetectorZPosition();
-        zaero[asize + 1] = zaero[asize] + m_arichGeoParameters->getDetectorWindowThickness();
+        refractiveInd[nAerogelLayers  ]   = 1.0;
+        refractiveInd[nAerogelLayers + 1]   = m_arichGeoParameters->getDetectorWindowRefIndex();
+        zaero[nAerogelLayers  ] = m_arichGeoParameters->getDetectorZPosition();
+        zaero[nAerogelLayers + 1] = zaero[nAerogelLayers] + m_arichGeoParameters->getDetectorWindowThickness();
         first = 0;
       }
 
       // loop over all tracks
-      for (unsigned  int i = 0; i < tsize; i++) {
+      for (unsigned  int i = 0; i < nTracks; i++) {
 
         ARICHTrack* track =  &arichTracks[i];
-        int nfot = 0;
-        double padArea = pad_size / Unit::m * pad_size / Unit::m;
+        // Reconstructed photons within expected cone
+        int nDetPhotons = 0;
+        double padArea = padSize / Unit::m * padSize / Unit::m;
         int padNum = m_arichGeoParameters->getDetectorXPadNumber() * m_arichGeoParameters->getDetectorXPadNumber();
 
         // loop over all particle hypotheses
-        for (int hyp = 0; hyp < c_noOfHypotheses; hyp++) {
-          lkh[hyp] = 0;
+        for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
+          logL[iHyp] = 0;
 
           // loop over aerogel layers
-          for (unsigned int a = 0; a < asize; a++) {
-            lrad[a] = track->getMeanEmissionDirection(a) * anorm[a];    // track length in the radiator;
-            if (lrad[a]) lrad[a] = thickness[a] / lrad[a];
-            thc[hyp][a] = ExpectedCherenkovAngle(track->getReconstructedMomentum(), p_mass[hyp], refind[a]);
+          for (unsigned int iAerogel = 0; iAerogel < nAerogelLayers; iAerogel++) {
+            // track length in the radiator
+            pathLengthRadiator[iAerogel] = track->getMeanEmissionDirection(iAerogel) * anorm[iAerogel];
+            if (pathLengthRadiator[iAerogel]) {
+              pathLengthRadiator[iAerogel] = thickness[iAerogel] / pathLengthRadiator[iAerogel];
+            }
+            thetaCh[iHyp][iAerogel] = ExpectedCherenkovAngle(track->getReconstructedMomentum(),
+                                                             p_mass[iHyp],
+                                                             refractiveInd[iAerogel]);
 
             //----------------------------------
             // acceptance calculation
             //----------------------------------
 
-            acceptance[hyp][a] = 0;
-            const int maxmca = 100; // number of photons emitted in cone to calculate the geometrical acceptance
+            acceptance[iHyp][iAerogel] = 0;
+            const unsigned int c_maxPhotonsCone = 100; // number of photons emitted in cone to calculate the geometrical acceptance
 
-            for (int mca = 0; mca < maxmca; mca++) {
-              double fi = 2 * M_PI * mca / float(maxmca);
-              TVector3 epoint = track->getMeanEmissionPosition(a);
-              TVector3 edir  = track->getMeanEmissionDirection(a);
-              TVector3 adirf = setThetaPhi(thc[hyp][a], fi); // particle system
+            for (unsigned int iPhoton = 0; iPhoton < c_maxPhotonsCone; iPhoton++) {
+              double fi = 2 * M_PI * iPhoton / float(c_maxPhotonsCone);
+              TVector3 epoint = track->getMeanEmissionPosition(iAerogel);
+              TVector3 edir  = track->getMeanEmissionDirection(iAerogel);
+              TVector3 adirf = setThetaPhi(thetaCh[iHyp][iAerogel], fi); // particle system
               adirf =  TransformFromFixed(edir) * adirf;  // global system
 
               if (!m_arichGeoParameters->isSimple()) {
-                TVector3 dposition = FastTracking(adirf, epoint, &refind[a], &zaero[a], asize - a);
+                TVector3 dposition = FastTracking(adirf, epoint, &refractiveInd[iAerogel], &zaero[iAerogel], nAerogelLayers - iAerogel);
                 int copyno =  m_arichGeoParameters->getCopyNo(dposition);
-                if (InsideDetector(dposition, copyno)) acceptance[hyp][a] += 1;
+                if (InsideDetector(dposition, copyno)) acceptance[iHyp][iAerogel] += 1;
               } else {
-                TVector3 dposition = FastTrackingSimple(adirf, epoint, &refind[a], &zaero[a], asize - a);
+                TVector3 dposition = FastTrackingSimple(adirf, epoint, &refractiveInd[iAerogel], &zaero[iAerogel], nAerogelLayers - iAerogel);
                 for (int i = 1; i <= m_arichGeoParameters->getNMCopies(); i++) {
                   if (InsideDetector(dposition, i)) {
-                    acceptance[hyp][a] += 1;
+                    acceptance[iHyp][iAerogel] += 1;
                     break;
                   }
                 }
               }
             }
 
-            acceptance[hyp][a] /= float(maxmca);
+            acceptance[iHyp][iAerogel] /= float(c_maxPhotonsCone);
 
             //----------------------------------
             // expected number of photons
             //----------------------------------
 
-            nsig[hyp][a] = n0[a] * trlen[a] * sin(thc[hyp][a]) * sin(thc[hyp][a]) * (1 - exp(-lrad[a] / trlen[a])) * acceptance[hyp][a];
+            nSig[iHyp][iAerogel] = n0[iAerogel] * transmissionLen[iAerogel] *
+                                   sin(thetaCh[iHyp][iAerogel]) * sin(thetaCh[iHyp][iAerogel]) *
+                                   (1 - exp(-pathLengthRadiator[iAerogel] / transmissionLen[iAerogel])) *
+                                   acceptance[iHyp][iAerogel];
 
-            if (a > 0)  nsig[hyp][a - 1] *= exp(-lrad[a] / trlen[a]);
+            if (iAerogel > 0)  {
+              nSig[iHyp][iAerogel - 1] *= exp(-pathLengthRadiator[iAerogel] / transmissionLen[iAerogel]);
+            }
 
-          } // for (unsigned int a=0;a<asize;a++)
+          } // for (unsigned int iAerogel=0;iAerogel<nAerogelLayers;iAerogel++)
           //*********************************************************
 
-          nsig[hyp][asize] = 0;
-          thc[hyp][asize] = thc[hyp][0];
+          nSig[iHyp][nAerogelLayers] = 0;
+          thetaCh[iHyp][nAerogelLayers] = thetaCh[iHyp][0];
 
-          for (unsigned int a = 0; a < asize; a++) nsig[hyp][asize] += nsig[hyp][a];
+          for (unsigned int iAerogel = 0; iAerogel < nAerogelLayers; iAerogel++) nSig[iHyp][nAerogelLayers] += nSig[iHyp][iAerogel];
 
-          nbgr[hyp] = m_bkgLevel * padArea * padNum * m_arichGeoParameters->getNMCopies();
+          nBgr[iHyp] = m_bkgLevel * padArea * padNum * m_arichGeoParameters->getNMCopies();
 
-        }  // for (int hyp=0;hyp < c_noOfHypotheses; hyp++ )
+        }  // for (int iHyp=0;iHyp < c_noOfHypotheses; iHyp++ )
         //#####################################################
 
         double ebgri = m_bkgLevel * padArea;
-        TVector3 track_at_detector = track->getPositionAtZ(zaero[asize + 1]);
+        TVector3 track_at_detector = track->getPositionAtZ(zaero[nAerogelLayers + 1]);
 
         // the id numbers of mirrors from which the photons could possibly reflect are calculated
         int mirrors[3];
@@ -411,40 +422,40 @@ namespace Belle2 {
             refl = 3;
           }
         }
-        // loop over all photon hits
-        for (unsigned int ifot = 0; ifot < hsize; ifot++) {
+        // loop over all detected photon hits
+        for (unsigned int iPhoton = 0; iPhoton < nPhotonHits; iPhoton++) {
 
-          ARICHDigit* h = arichDigits[ifot];
+          ARICHDigit* h = arichDigits[iPhoton];
           int chID = h->getChannelID();
           int modID = h->getModuleID();
 
           TVector3 hitpos = m_arichGeoParameters->getChannelCenterGlob(modID, chID);
-          for (int hyp = 0; hyp < c_noOfHypotheses; hyp++) esigi[hyp] = 0;
-          int nfoo = nfot;
+          for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) esigi[iHyp] = 0;
+          int nfoo = nDetPhotons;
           // loop over all arogel layers
-          for (unsigned int ar = 0; ar < asize; ar++) {
+          for (unsigned int iAerogel = 0; iAerogel < nAerogelLayers; iAerogel++) {
 
-            TVector3 initialrf = track->getAerogelExit(ar);
-            TVector3 epoint = track->getMeanEmissionPosition(ar);
-            TVector3 edir  = track->getMeanEmissionDirection(ar);
+            TVector3 initialrf = track->getAerogelExit(iAerogel);
+            TVector3 epoint = track->getMeanEmissionPosition(iAerogel);
+            TVector3 edir  = track->getMeanEmissionDirection(iAerogel);
 
-            TVector3 dirf; // calculated photon direction
+            TVector3 photonDirection; // calculated photon direction
 
             // loop over possible mirror reflections
             for (int mirr = 0; mirr < refl; mirr++) {
               // calculate fi_ch for a given track refl
               TVector3 virthitpos =  HitVirtualPosition(hitpos, mirrors[mirr]);
 
-              if (CherenkovPhoton(epoint, virthitpos, initialrf, dirf, &refind[ar], &zaero[ar], asize - ar) < 0)  continue;
+              if (CherenkovPhoton(epoint, virthitpos, initialrf, photonDirection, &refractiveInd[iAerogel], &zaero[iAerogel], nAerogelLayers - iAerogel) < 0)  continue;
 
-              TVector3 dirch = TransformToFixed(edir) * dirf;
+              TVector3 dirch = TransformToFixed(edir) * photonDirection;
               double fi_cer = dirch.Phi();
               double th_cer = dirch.Theta();
 
 
-              if (m_Debug) m_hitstuple->Fill(ncount, ar, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), hitpos.z(), epoint.x(), epoint.y(), epoint.z() , edir.x(), edir.y());
+              if (m_Debug) m_hitstuple->Fill(ncount, iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), hitpos.z(), epoint.x(), epoint.y(), epoint.z() , edir.x(), edir.y());
               if (m_Debug > 2) continue;
-              if (fabs(th_cer - thc[track->getIdentity()][0]) < 0.05 && ar == 0 && nfoo == nfot) nfot++;
+              if (fabs(th_cer - thetaCh[track->getIdentity()][0]) < 0.05 && iAerogel == 0 && nfoo == nDetPhotons) nDetPhotons++;
               if (fi_cer < 0) fi_cer += 2 * M_PI;
               double fii = 0;
               if (mirr > 0) {
@@ -453,20 +464,20 @@ namespace Belle2 {
               }
 
               // loop over all particle hypotheses
-              for (int hyp = 0; hyp < c_noOfHypotheses; hyp++) {
+              for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
 
                 // track a photon from the mean emission point to the detector surface
-                TVector3  dirf1 = setThetaPhi(thc[hyp][ar], fi_cer);  // particle system
-                dirf1 = TransformFromFixed(edir) * dirf1;  // global system
+                TVector3  photonDirection1 = setThetaPhi(thetaCh[iHyp][iAerogel], fi_cer);  // particle system
+                photonDirection1 = TransformFromFixed(edir) * photonDirection1;  // global system
 
-                TVector3  photonAtAerogelExit = dirf1 * (thickness[ar] / dirf1.z());
-                TVector3  trackAtAerogelExit = edir * (thickness[ar] / edir.z());
+                TVector3  photonAtAerogelExit = photonDirection1 * (thickness[iAerogel] / photonDirection1.z());
+                TVector3  trackAtAerogelExit = edir * (thickness[iAerogel] / edir.z());
                 TVector3  dtrackphoton = photonAtAerogelExit - trackAtAerogelExit;
                 TVector3 detector_position;
                 if (!m_arichGeoParameters->isSimple()) {
-                  detector_position = FastTracking(dirf1, epoint, &refind[ar], &zaero[ar], asize - ar);
+                  detector_position = FastTracking(photonDirection1, epoint, &refractiveInd[iAerogel], &zaero[iAerogel], nAerogelLayers - iAerogel);
                 } else {
-                  detector_position = FastTrackingSimple(dirf1, epoint, &refind[ar], &zaero[ar], asize - ar);
+                  detector_position = FastTrackingSimple(photonDirection1, epoint, &refractiveInd[iAerogel], &zaero[iAerogel], nAerogelLayers - iAerogel);
                 }
                 TVector3 meanr             = detector_position - epoint;
                 double   path              = meanr.Mag();
@@ -484,59 +495,62 @@ namespace Belle2 {
                 // calculate pad acceptance
                 double  dr = (track_at_detector - detector_position).Mag();
 
-                if (dr > 0 && thc[hyp][ar]) {
-                  double pad_sizemm = pad_size / Unit::mm;
-                  double normalizacija = nsig[hyp][ar] * pad_sizemm / (2 * M_PI * dr / Unit::mm);
-                  double integral = SquareInt(pad_sizemm, pad_fi, dx / Unit::mm, detector_sigma * 0.1);
+                if (dr > 0 && thetaCh[iHyp][iAerogel]) {
+                  double padSizemm = padSize / Unit::mm;
+                  double normalizacija = nSig[iHyp][iAerogel] * padSizemm / (2 * M_PI * dr / Unit::mm);
+                  double integral = SquareInt(padSizemm, pad_fi, dx / Unit::mm, detector_sigma * 0.1);
                   // expected number of signal photons in each pixel
-                  esigi[hyp] += normalizacija * integral;
-                }// if (dr>0 && thc[hyp][ar])
+                  esigi[iHyp] += normalizacija * integral;
+                }// if (dr>0 && thetaCh[iHyp][iAerogel])
 
-              }// for (int hyp=0;hyp< c_noOfHypotheses; hyp++ )
+              }// for (int iHyp=0;iHyp< c_noOfHypotheses; iHyp++ )
 
             }// for (int mirr = 0; mirr < refl; mirr++)
 
-          }// for (unsigned int ar=0; ar<asize;ar++)
+          }// for (unsigned int iAerogel=0; iAerogel<nAerogelLayers;iAerogel++)
 
           //******************************************
           // LIKELIHOOD construction
           //*******************************************
 
-          for (int hyp = 0; hyp < c_noOfHypotheses; hyp++) {
-            double expected = esigi[hyp] + ebgri;
-            if (expected > 1e-13)    lkh[hyp] += expected + log(1 - exp(-expected));
+          for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
+            double expected = esigi[iHyp] + ebgri;
+            if (expected > 1e-13)    logL[iHyp] += expected + log(1 - exp(-expected));
             else {
-              lkh[hyp] += 1e-14 + log(1 - exp(-(1e-14)));
+              logL[iHyp] += 1e-14 + log(1 - exp(-(1e-14)));
             }
           }
 
           //*******************************************
 
-        }// for (unsigned  int ifot=0; ifot< hsize; ifot++)
+        }// for (unsigned  int iPhoton=0; iPhoton< nPhotonHits; iPhoton++)
 
         //******************************************
         // add constant term to the LIKELIHOOD function
         //*******************************************
 
 
-        for (int hyp = 0; hyp < c_noOfHypotheses; hyp++) {
-          lkh[hyp] -= (nsig[hyp][asize] + nbgr[hyp]);
+        for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
+          logL[iHyp] -= (nSig[iHyp][nAerogelLayers] + nBgr[iHyp]);
         }
 
         //******************************************
         // store LikeliHOOD info
         //******************************************
-        track->setExpectedNOfPhotons(0, nfot);
-        track->setLikelihood(lkh);
+        for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
+          track->setExpectedPhotons(iHyp, nSig[iHyp][nAerogelLayers]); // sum for all agels
+        }
+        track->setDetectedPhotons(nDetPhotons);
+        track->setLikelihood(logL);
         //**************************************
 
         if (m_Debug) {
           int id = track->getIdentity();
           if (id < 0) id = 0;
-          m_tracktuple->Fill(id, track->getReconstructedMomentum(), nsig[2][asize], acceptance[2][0], nfot, lkh[0], lkh[1], lkh[2], lkh[3], lkh[4]);
+          m_tracktuple->Fill(id, track->getReconstructedMomentum(), nSig[2][nAerogelLayers], acceptance[2][0], nDetPhotons, logL[0], logL[1], logL[2], logL[3], logL[4]);
         }
 
-      } // for (unsigned  int i=0; i< tsize; i++){
+      } // for (unsigned  int i=0; i< nTracks; i++){
 
       return 0;
     }
@@ -562,7 +576,7 @@ namespace Belle2 {
       m_aeroMerit = merit;
     }
 
-    TVector3 ARICHReconstruction::FastTrackingSimple(TVector3 dirf, TVector3 r,  double* refind, double* z, int n)
+    TVector3 ARICHReconstruction::FastTrackingSimple(TVector3 dirf, TVector3 r,  double* refractiveInd, double* z, int n)
     {
       //
       // Description:
@@ -581,7 +595,7 @@ namespace Belle2 {
       path = (z[0] - r.z()) / dirf.z();
       r   += dirf * path;
       for (int a = 1; a <= n + 1 ; a++) {
-        rind = refind[a] / refind[a - 1];
+        rind = refractiveInd[a] / refractiveInd[a - 1];
         dirf = Refraction(dirf, rind);
         if (dirf.Mag() == 0) return TVector3();
         path = (z[a] - r.z()) / dirf.z();

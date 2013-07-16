@@ -34,7 +34,7 @@ namespace Belle2 {
       ~ARICHReconstruction() {};
 
       //! Smeares track parameters ("simulate" the uncertainties of tracking).
-      int ReconstructParticles(std::vector<ARICHTrack>&);
+      int smearTracks(std::vector<ARICHTrack>&);
 
       //! Computes the value of identity likelihood function for different particle hypotheses.
       int Likelihood2(std::vector<ARICHTrack>&);
@@ -68,13 +68,13 @@ namespace Belle2 {
       //! Returns the hit virtual position, assuming that it was reflected from mirror.
       /*!
         \param hitpos vector of hit position
-        \param mirrorID id of mirror from which the foton was reflected
+        \param mirrorID id of mirror from which the photon was reflected
        */
       TVector3 HitVirtualPosition(const TVector3 hitpos, int mirrorID);
 
       //! Calculates the intersection of the Cherenkov photon emitted from point "r" in "dirf" direction with the detector plane.
       /*!
-        \param r vector of photon emittion point
+        \param r vector of photon emission point
         \param dirf direction of photon emission
         \param n number of aerogel layers through which photon passes
         \param refind array of layers refractive indices
@@ -84,7 +84,7 @@ namespace Belle2 {
 
 //! Calculates the intersection of the Cherenkov photon emitted from point "r" in "dirf" direction with the detector plane. (For the case of simple (beamtest) geometry.)
       /*!
-        \param r vector of photon emittion point
+        \param r vector of photon emission point
         \param dirf direction of photon emission
         \param n number of aerogel layers through which photon passes
         \param refind array of layers refractive indices

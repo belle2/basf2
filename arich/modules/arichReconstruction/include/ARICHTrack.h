@@ -47,11 +47,12 @@ namespace Belle2 {
       m_trackID(-1),
       m_extHitID(-1),
       m_identity(-1),
-      m_aeroIndex(-1) {
+      m_aeroIndex(-1),
+      m_detectedPhotons(-1) {
       /*! does nothing */
       for (int i = 0; i < c_noOfHypotheses; i++) {
         m_lkh[i] = 0;
-        m_sfot[i] = 0;
+        m_expectedPhotons[i] = 0;
         m_acc[i] = 0;
       }
     }
@@ -82,10 +83,11 @@ namespace Belle2 {
       m_trackID(trackID),
       m_extHitID(-1),
       m_identity(-1),
-      m_aeroIndex(-1) {
+      m_aeroIndex(-1),
+      m_detectedPhotons(-1) {
       for (int i = 0; i < c_noOfHypotheses; i++) {
         m_lkh[i]  = 0;
-        m_sfot[i] = 0;
+        m_expectedPhotons[i] = 0;
         m_acc[i]  = 0;
       }
     };
@@ -148,10 +150,13 @@ namespace Belle2 {
     void getLikelihood(double like[]) {like[0] = m_lkh[0]; like[1] = m_lkh[1]; like[2] = m_lkh[2]; like[3] = m_lkh[3]; like[4] = m_lkh[4];};
 
     //! returns expected number of detected photons for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
-    double getExpectedNOfPhotons(int i) const {return m_sfot[i]; };
+    double getExpectedPhotons(int i) const {return m_expectedPhotons[i]; };
 
     //! calculates the expected no. of photons. at the moment, impelemnted for true particle (MC->getPDGCode)
-    void getExpectedNOfPhotons(double nphot[]) {nphot[0] = m_sfot[0]; nphot[1] = m_sfot[1]; nphot[2] = m_sfot[2]; nphot[3] = m_sfot[3]; nphot[4] = m_sfot[4]; };
+    void getExpectedPhotons(double nphot[]) {nphot[0] = m_expectedPhotons[0]; nphot[1] = m_expectedPhotons[1]; nphot[2] = m_expectedPhotons[2]; nphot[3] = m_expectedPhotons[3]; nphot[4] = m_expectedPhotons[4]; };
+
+    //! returns detected no. of photons
+    int getDetectedPhotons(void) {return m_detectedPhotons;};
 
     //! returns geometrical acceptance of emitted Cherenkov photos by particle "i"(here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     double getGeometricalAcceptance(int i) const {return m_acc[i]; };
@@ -162,8 +167,14 @@ namespace Belle2 {
     //!  sets value of likelihood function for all particle hypotheses. "imax" is number of particle hypotheses, "val" is array of hypotheses values (val[0] electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     void setLikelihood(double* val) {for (int i = 0; i < c_noOfHypotheses; i++) m_lkh[i] = val[i];};
 
-    //! sets expected number of detected photons for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
-    void setExpectedNOfPhotons(int i, double val) {m_sfot[i] = val; };
+    //! sets theoretically expected number of photons for i-th particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
+    void setExpectedPhotons(int i, double val) {m_expectedPhotons[i] = val; };
+
+    //! sets detected number of photons for certain hypothesis
+    /* Photons are detected if they are found to be in the theoretically expected Cherenkov cone
+     * within +-50mrad (for now, fixed).
+     */
+    void setDetectedPhotons(double val) {m_detectedPhotons = val;};
 
     //! sets the reconstructed value of track parameters.
     // "r" is position of track, "dir" direction and "p" momentum of track on aerogel plane.
@@ -233,7 +244,8 @@ namespace Belle2 {
 
 
     double  m_lkh[c_noOfHypotheses];  /**< Value of likelihood function for different particle hypotheses. */
-    double  m_sfot[c_noOfHypotheses]; /**< Number of expected detected photons for different particle hypotheses.  */
+    double  m_expectedPhotons[c_noOfHypotheses]; /**< Number of theoretically expected photons for different particle hypotheses.  */
+    int     m_detectedPhotons;        /**< Number of detected photons in expected cone. */
     double  m_acc[c_noOfHypotheses];  /**< Geometrical acceptance of expected cherenkov ring for different particle hypotheses. */
 
 

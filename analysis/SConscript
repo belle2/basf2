@@ -2,7 +2,6 @@ Import('env')
 
 env['LIBS'] = [
 	    'framework', 
-	    'geometry', 
 	    'analysis_dataobjects', 
 	    'arich_dataobjects', 
        	    'bklm_dataobjects',
@@ -16,7 +15,6 @@ env['LIBS'] = [
 	    'top_dataobjects',
 	    'tracking_dataobjects', 
       	    'vxd_dataobjects',
-	    'tracking', 
 	    'genfitRK', 
 	    'gfrave', 
 	    '$ROOT_LIBS', 

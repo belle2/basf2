@@ -154,6 +154,11 @@ void ECLDigitizerModule::event()
       }
 
       m_n16 = 16;
+      m_ch = 0;
+      m_lar = 0;
+      m_ltr = 0;
+      m_lq = 0;
+
       m_ttrig = int(DeltaT) ;
       if (m_ttrig < 0)m_ttrig = 0;
       if (m_ttrig > 23)m_ttrig = 23;
@@ -606,7 +611,7 @@ lam:
     C1 += (1 << (k_c - 1));
     C1 >>= k_c;
   }
-  ch2 = (A1* *(f + it * 16) + B1* *(f1 + it * 16)) >> k1_chi;
+  ch2 = (A1** (f + it * 16) + B1** (f1 + it * 16)) >> k1_chi;
   ch2 += C1;
   ch2 = z0 - *n16 * ch2;
   ch1 = ((ch2) * (ch2));

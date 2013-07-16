@@ -26,6 +26,9 @@
 
 #include <cmath>
 #include <boost/format.hpp>
+#include <boost/foreach.hpp>
+#include <boost/algorithm/string.hpp>
+
 
 #include <G4Material.hh>
 #include <G4Box.hh>
@@ -240,6 +243,7 @@ namespace Belle2 {
 
     GeoECLCreator::~GeoECLCreator()
     {
+      delete m_sensitive;
 
     }
 

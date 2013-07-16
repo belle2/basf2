@@ -1,6 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['trg']
-#print env.Dump()
-
-Return('env')

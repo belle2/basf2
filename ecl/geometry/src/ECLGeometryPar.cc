@@ -44,6 +44,10 @@ ECLGeometryPar::ECLGeometryPar()
 
 ECLGeometryPar::~ECLGeometryPar()
 {
+  if (m_B4ECLGeometryParDB) {
+    delete m_B4ECLGeometryParDB;
+    B2INFO("m_B4ECLGeometryParDB deleted ");
+  }
 }
 
 void ECLGeometryPar::clear()

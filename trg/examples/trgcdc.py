@@ -50,7 +50,7 @@ cdctrg      = fw.register_module("TRGCDC")
 #g4sim.param('UICommands',['/control/execute physics.mac'])
 
 #...EvtMetaGen...
-evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
+evtmetagen.param({'EvtNumList': [2], 'RunList': [1]})
 
 #...GeoBuilder... Exclude detectors other than CDC
 geobuilder.param('Components', ['MagneticField', 'CDC'])
@@ -61,7 +61,7 @@ cdctrg.param('InnerTSLUTDataFile', os.path.join(basf2datadir,"trg/LRLUT.coe"))
 cdctrg.param('OuterTSLUTDataFile', os.path.join(basf2datadir,"trg/LRLUT.coe"))
 cdctrg.param('DebugLevel', 10)
 cdctrg.param('CurlBackStop', 1)
-cdctrg.param('SimulationMode', 2)
+cdctrg.param('SimulationMode', 3)
 cdctrg.param('FastSimulationMode', 2)
 cdctrg.param('2DFinderPerfect',1)
 #cdctrg.param('HoughFinderMeshX',180)

@@ -31,7 +31,7 @@ TRGTime::TRGTime(double timing,
                  bool edge,
                  const TRGClock & clock,
                  const std::string & name) :
-    _time(clock.time(timing)),
+    _time(clock.position(timing)),
     _edge(edge),
     _clock(& clock),
     _name(name) {
@@ -113,7 +113,7 @@ const TRGClock &
 TRGTime::clock(const TRGClock & c) {
     const double t = _clock->absoluteTime(_time);
     _clock = & c;
-    _time = c.time(t);
+    _time = c.position(t);
     return * _clock;
 }
 

@@ -67,7 +67,7 @@ main(int argc, char * argv[]) {
     outfile << "-- " << TRGCDCFrontEnd::version() << endl;
     outfile << "-- " << ts1 << endl;
     outfile << "--" << endl;
-    TRGCDCFrontEnd::implementation(TRGCDCFrontEnd::inner, outfile);
+    TRGCDCFrontEnd::implementation(TRGCDCFrontEnd::innerInside, outfile);
     outfile.close();
 
     //...Termination...

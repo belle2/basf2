@@ -15,6 +15,7 @@
 #define TRGState_FLAG_
 
 #include <vector>
+#include <iostream>
 #include "trg/trg/Time.h"
 
 namespace Belle2 {
@@ -27,10 +28,13 @@ class TRGState {
   public:
 
     /// Default constructor.
-    TRGState(unsigned bitSize);
+    TRGState(unsigned bitSize = 0);
 
     /// Constructor.
     TRGState(std::vector<bool> states);
+
+    /// Constructor.
+    TRGState(unsigned bitSize, const bool * const states);
 
     // /// Copy constructor.
     // TRGState(const TRGState &);
@@ -49,8 +53,11 @@ class TRGState {
     /// returns true if there are active bits.
     bool active(unsigned bitPosition) const;
 
-    /// returns pattern in unsigned.
-    unsigned long long pattern(void) const;
+    /// returns a filled array.
+    void copy2bool(bool * array) const;
+
+    /// returns subset from i with n bits.
+    TRGState subset(unsigned i, unsigned n) const;
 
     /// dumps contents. "message" is to select information to
     /// dump. "pre" will be printed in head of each line.
@@ -62,36 +69,55 @@ class TRGState {
     /// clears state.
     void clear(void);
 
+    /// sets state at bit i.
+    const TRGState & set(unsigned position, bool);
+
+    /// sets state.
+    const TRGState & set(unsigned position,
+			 unsigned size,
+			 const bool * const array);
+
+    /// sets state.
+    const TRGState & set(unsigned position, const TRGState &);
+
   public:// Operators
 
-    // /// returns AND result.
-    // TRGState operator&(const TRGState &) const;
+    /// Conversion to unsigned.
+    operator unsigned() const;
 
-    // /// returns AND result.
-    // TRGState operator&(const TRGTime &) const;
+    /// Conversion to unsigned long long
+    operator unsigned long long() const;
 
-    // /// returns AND result.
-    // TRGState & operator&=(const TRGState &);
+    /// appends TRGState (as MSB).
+    TRGState & operator+=(const TRGState &);
 
-    // /// returns AND result.
-    // TRGState & operator&=(const TRGTime &);
+    /// returns state of i'th bit.
+    bool operator[](unsigned i) const;
 
-    // /// returns OR result.
-    // TRGState operator|(const TRGState &) const;
+    /// Copy operator.
+    TRGState & operator=(const TRGState &);
 
-    // /// returns OR result.
-    // TRGState operator|(const TRGTime &) const;
+    /// Copy operator.
+    bool operator<(const TRGState &) const;
 
-    // /// returns OR result.
-    // TRGState & operator|=(const TRGState &);
+  public:// Utilities
 
-    // /// returns OR result.
-    // TRGState & operator|=(const TRGTime &);
+    /// Coverts from bool array to unsigned.
+    static unsigned toUnsigned(unsigned n, const bool * array);
 
   private:
 
-    /// bit size;
+    /// size of unsigned.
+    static const unsigned _su;
+
+    /// bit size of unsigned.
+    static const unsigned _bsu;
+
+    /// bit size.
     unsigned _size;
+
+    /// bit storage size.
+    unsigned _n;
 
     /// bit state.
     unsigned * _state;
@@ -107,9 +133,18 @@ TRGState::size(void) const {
 
 inline
 bool
+TRGState::active(void) const {
+    for (unsigned i = 0; i < _n; i++)
+	if (_state[i])
+	    return true;
+    return false;
+}
+
+inline
+bool
 TRGState::active(unsigned a) const {
-    const unsigned wp = a / sizeof(unsigned);
-    const unsigned bp = a % sizeof(unsigned);
+    const unsigned wp = a / _bsu;
+    const unsigned bp = a % _bsu;
     if (_state[wp] & (1 << bp))
 	return true;
     else
@@ -117,17 +152,124 @@ TRGState::active(unsigned a) const {
 }
 
 inline
-unsigned long long
-TRGState::pattern(void) const {
-    unsigned n = _size / sizeof(unsigned);
-    if (_size % sizeof(unsigned)) ++n;
+bool
+TRGState::operator[](unsigned a) const {
+    const unsigned wp = a / _bsu;
+    const unsigned bp = a % _bsu;
+    if (_state[wp] & (1 << bp))
+	return true;
+    else
+	return false;
+}
+
+inline
+TRGState::operator unsigned() const {
+#ifdef TRG_DEBUG
+    unsigned n = _size / _bsu;
+    if (_size % _bsu) ++n;
+    if (n > 1)
+	std::cout << "TRGState::operator unsigned() !!! bit size overflow"
+		  << ":bit size=" << _size << ",max bit size with unsigned="
+		  << _bsu << std::endl;
+#endif
+    return _state[0];
+
+}
+
+inline
+TRGState::operator unsigned long long() const {
+    unsigned n = _size / _bsu;
+    if (_size % _bsu) ++n;
+    const unsigned c = sizeof(unsigned long long);
+#ifdef TRG_DEBUG
+    if (n > sizeof(unsigned long long))
+	std::cout << "TRGState::operator unsigned long long() "
+		  << "!!! bit size overflow"
+		  << ":bit size=" << _size
+		  << ",max bit size with unsigned long long="
+		  << c << std::endl;
+#endif
+    if (n > c)
+	n = c;
     unsigned long long a = 0;
-    const unsigned s = sizeof(unsigned);
+    const unsigned s = _bsu;
     for (unsigned i = 0; i < n; i++) {
 	const unsigned long long b = _state[i];
 	a += b << (i * s);
     }
     return a;
+}
+
+inline
+void
+TRGState::copy2bool(bool * a) const {
+    for (unsigned i = 0; i < _size; i++) {
+	const unsigned wp = i / _bsu;
+	const unsigned bp = i % _bsu;
+	if (_state[wp] & (1 << bp))
+	    a[i] = true;
+	else
+	    a[i] = false;
+    }
+}
+
+inline
+const TRGState &
+TRGState::set(unsigned p, unsigned n, const bool * const a) {
+    for (unsigned i = 0; i < n; i++) {
+	const unsigned wp = (p + i) / _bsu;
+	const unsigned bp = (p + i) % _bsu;
+	if (a[i])
+	    _state[wp] |= (1 << bp);
+	else
+	    _state[wp] &= ~(1 << bp);
+    }
+    return * this;
+}
+
+inline
+const TRGState &
+TRGState::set(unsigned n, bool a) {
+    const unsigned wp = n / _bsu;
+    const unsigned bp = n % _bsu;
+    if (a)
+	_state[wp] |= (1 << bp);
+    else
+	_state[wp] &= ~(1 << bp);
+    return * this;
+}
+
+inline
+const TRGState &
+TRGState::set(unsigned p, const TRGState & s) {
+    const unsigned n = s.size();
+    for (unsigned i = 0; i < n; i++) {
+	const unsigned wp = (p + i) / _bsu;
+	const unsigned bp = (p + i) % _bsu;
+	if (s[i])
+	    _state[wp] |= (1 << bp);
+	else
+	    _state[wp] &= ~(1 << bp);
+    }
+    return * this;
+}
+
+inline
+unsigned
+TRGState::toUnsigned(unsigned n, const bool * a) {
+#ifdef TRG_DEBUG
+    if (n > 8) std::cout << "given array size(" << n << ") is too big"
+			 << std::endl;
+#endif
+
+    unsigned b = 0;
+    for (unsigned i = 0; i < n; i++) {
+	if (a[i]) {
+	    const unsigned bp = i % _bsu;
+	    b |= (1 << bp);
+	}
+    }
+    return b;
 }
 
 } // namespace Belle2

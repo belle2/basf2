@@ -20,8 +20,6 @@
 
 namespace Belle2 {
 
-class TRGTime;
-
 /// A class to represent a digitized signal. Unit is nano second.
 class TRGSignal {
 
@@ -29,6 +27,16 @@ class TRGSignal {
 
     /// Constructor.
     TRGSignal(const TRGClock & = Belle2_GDL::GDLSystemClock);
+
+    /// Constructor with clock and timing(t0 leading, t1 trailing).
+    TRGSignal(const TRGTime & t0, const TRGTime & t1);
+
+    /// Constructor with clock and timing(t0 leading, t1 trailing).
+    TRGSignal(const TRGClock & c, int t0, int t1);
+
+    /// Constructor with clock and timing(t0 leading, t1 trailing). t0
+    /// and t1 are in absolute time.
+    TRGSignal(const TRGClock & c, double t0, double t1);
 
     /// Constructor with name.
     TRGSignal(const std::string & name,
@@ -51,8 +59,14 @@ class TRGSignal {
     /// returns clock.
     const TRGClock & clock(void) const;
 
+    /// returns \# of signals.
+    unsigned nSignals(void) const;
+
     /// returns \# of edges.
     unsigned nEdges(void) const;
+
+    /// returns width of i'th signal (i=0,1,2,...).
+    unsigned width(unsigned i = 0) const;
 
     /// returns true if there is a signal.
     bool active(void) const;
@@ -70,14 +84,22 @@ class TRGSignal {
 
   public:// Modifiers
 
-    /// clears contents.
-    void clear(void);
-
     /// sets and returns name.
     const std::string & name(const std::string & newName);
 
+    /// clears contents.
+    void clear(void);
+
     /// changes clock.
     const TRGClock & clock(const TRGClock &);
+
+    /// makes a pulse with leading edge at t0 and with trailing edge
+    /// at t1. t0 and t1 in absolute time.
+    const TRGSignal & set(double t0, double t1);
+
+    /// makes a pulse with leading edge at clock t0 and with trailing
+    /// edge at clock t1.
+    const TRGSignal & set(int t0, int t1);
 
   public:// Operators
 
@@ -119,6 +141,12 @@ class TRGSignal {
     /// Or operation
     static std::vector<TRGTime> orOperation(const std::vector<TRGTime> &);
 
+    /// Sort operation.
+    void sort(void);
+
+    /// Self-consitency check. True is return if something wrong.
+    bool consistencyCheck(void) const;
+
   private:
 
     /// Name.
@@ -157,6 +185,11 @@ inline
 TRGSignal &
 TRGSignal::operator&=(const TRGTime & l) {
     TRGSignal left(l);
+
+#if TRG_DEBUG
+    consistencyCheck();
+#endif
+
     return (* this) &= left;
 }
 
@@ -165,6 +198,11 @@ TRGSignal
 TRGSignal::operator|(const TRGTime & l) const {
     TRGSignal t(* this);
     TRGSignal left(l);
+
+#if TRG_DEBUG
+    consistencyCheck();
+#endif
+
     return t | left;
 }
 
@@ -172,7 +210,18 @@ inline
 TRGSignal &
 TRGSignal::operator|=(const TRGTime & l) {
     TRGSignal left(l);
+
+#if TRG_DEBUG
+    consistencyCheck();
+#endif
+
     return (* this) |= left;
+}
+
+inline
+unsigned
+TRGSignal::nSignals(void) const {
+    return _history.size() / 2;
 }
 
 inline
@@ -184,6 +233,11 @@ TRGSignal::nEdges(void) const {
 inline
 void
 TRGSignal::clear(void) {
+
+#if TRG_DEBUG
+    consistencyCheck();
+#endif
+
     _history.clear();
 }
 
@@ -220,17 +274,6 @@ TRGSignal::operator[](unsigned i) const {
 inline
 const TRGClock &
 TRGSignal::clock(void) const {
-    return * _clock;
-}
-
-inline
-const TRGClock &
-TRGSignal::clock(const TRGClock & c) {
-    _clock = & c;
-
-    for (unsigned i = 0; i < _history.size(); i++)
-	_history[i].clock(c);
-
     return * _clock;
 }
 

@@ -26,14 +26,18 @@ namespace Belle2 {
 
 class TRGCDCFrontEnd;
 
-/// A class to represent a CDC front-end board
+/// A class to represent a CDC merger board
 class TRGCDCMerger
     : public TRGBoard,
       public std::vector<const TRGCDCFrontEnd *> {
     
   public:
     /// Constructor.
-    TRGCDCMerger(const std::string & name, const TRGClock &);
+    TRGCDCMerger(const std::string & name,
+		 const TRGClock & systemClock,
+		 const TRGClock & dataClock,
+		 const TRGClock & userClockInput,
+		 const TRGClock & userClockOutput);
 
     /// Destructor
     virtual ~TRGCDCMerger();

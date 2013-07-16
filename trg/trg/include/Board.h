@@ -20,7 +20,8 @@
 namespace Belle2 {
 
 class TRGClock;
-class TRGLink;
+class TRGSignalBundle;
+class TRGChannel;
 
 /// A class to represent a trigger board
 class TRGBoard {
@@ -28,7 +29,11 @@ class TRGBoard {
   public:
 
     /// Constructor.
-    TRGBoard(const std::string & name, const TRGClock &);
+    TRGBoard(const std::string & name,
+	     const TRGClock & systemClock,
+	     const TRGClock & dataClock,
+	     const TRGClock & userClockInput,
+	     const TRGClock & userClockOutput);
 
     /// Destructor
     virtual ~TRGBoard();
@@ -38,8 +43,17 @@ class TRGBoard {
     /// returns name.
     const std::string & name(void) const;
 
-    /// returns clock.
-    const TRGClock & clock(void) const;
+    /// returns system clock.
+    const TRGClock & clockSystem(void) const;
+
+    /// returns data clock.
+    const TRGClock & clockData(void) const;
+
+    /// returns Aurora user clock for input.
+    const TRGClock & clockUserInput(void) const;
+
+    /// returns Aurora user clock for output.
+    const TRGClock & clockUserOutput(void) const;
 
     /// dumps contents. "message" is to select information to
     /// dump. "pre" will be printed in head of each line.
@@ -48,19 +62,34 @@ class TRGBoard {
 
   public:// Modifiers
 
-    /// appends a link.
-    void append(const TRGLink *);
+    /// appends an input Aurora channel.
+    void appendInput(const TRGChannel *);
+
+    /// appends an output Aurora channel.
+    void appendOutput(TRGChannel *);
 
   private:
 
     /// Name of a board.
     const std::string _name;
 
-    /// Used clock. 
-    const TRGClock * _clock;
+    /// System clock. 
+    const TRGClock * _clockSystem;
 
-    /// Serial links.
-    std::vector<const TRGLink *> _links;
+    /// Data clock. 
+    const TRGClock * _clockData;
+
+    /// User clock. 
+    const TRGClock * _clockUserInput;
+
+    /// User clock. 
+    const TRGClock * _clockUserOutput;
+
+    /// Input Aurora channel.
+    std::vector<const TRGChannel *> _inputChannels;
+
+    /// Output Aurora channel.
+    std::vector<TRGChannel *> _outputChannels;
 };
 
 //-----------------------------------------------------------------------------
@@ -73,14 +102,38 @@ TRGBoard::name(void) const {
 
 inline
 const TRGClock &
-TRGBoard:: clock(void) const {
-    return * _clock;
+TRGBoard::clockSystem(void) const {
+    return * _clockSystem;
+}
+
+inline
+const TRGClock &
+TRGBoard::clockData(void) const {
+    return * _clockData;
+}
+
+inline
+const TRGClock &
+TRGBoard::clockUserInput(void) const {
+    return * _clockUserInput;
+}
+
+inline
+const TRGClock &
+TRGBoard::clockUserOutput(void) const {
+    return * _clockUserOutput;
 }
 
 inline
 void
-TRGBoard::append(const TRGLink * a) {
-    _links.push_back(a);
+TRGBoard::appendInput(const TRGChannel * a) {
+    _inputChannels.push_back(a);
+}
+
+inline
+void
+TRGBoard::appendOutput(TRGChannel * a) {
+    _outputChannels.push_back(a);
 }
 
 } // namespace Belle2

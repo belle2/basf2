@@ -50,11 +50,14 @@ class TRGClock {
 
   public:// Selectors
 
-    /// returns clock point.
-    int time(double timing) const;
+    /// returns name.
+    const std::string & name(void) const;
 
-    /// returns absolute time.
-    double absoluteTime(int time) const;
+    /// returns clock position.
+    int position(double timing) const;
+
+    /// returns absolute time of clock position
+    double absoluteTime(int clockPosition) const;
 
     /// returns over shoot.
     double overShoot(double timing) const;
@@ -62,15 +65,15 @@ class TRGClock {
     /// returns min \# of clocks to cover given time period.
     int unit(double period) const;
 
-    /// returns offset in nano second.
+    /// returns offset of the clock zero position in nano second.
     double offset(void) const;
 
     /// returns frequency in MHz.
     double frequency(void) const;
 
-    /// returns name.
-    const std::string & name(void) const;
-
+    /// returns phase of given timing in degree (0 to 360).
+    double phase(double timing) const;
+  
     /// dumps contents. "message" is to select information to
     /// dump. "pre" will be printed in head of each line.
     void dump(const std::string & message = "",

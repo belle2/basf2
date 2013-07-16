@@ -1,18 +1,18 @@
 //-----------------------------------------------------------------------------
 // $Id$
 //-----------------------------------------------------------------------------
-// Filename : TRGSignalVector.h
+// Filename : TRGSignalBundle.h
 // Section  : TRG
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
 //-----------------------------------------------------------------------------
-// Description : A class to represent a bundle of digitized signals.
+// Description : A class to represent a bundle of SignalVectors.
 //-----------------------------------------------------------------------------
 // $Log$
 //-----------------------------------------------------------------------------
 
-#ifndef TRGSignalVector_FLAG_
-#define TRGSignalVector_FLAG_
+#ifndef TRGSignalBundle_FLAG_
+#define TRGSignalBundle_FLAG_
 
 #include <vector>
 #include "trg/trg/Clock.h"
@@ -20,30 +20,29 @@
 namespace Belle2 {
 
 class TRGSignal;
+class TRGSignalVector;
 class TRGState;
 
-/// A class to represent a bundle of digitized signals. Given
-/// TRGSignal should exist while this object alive.
-class TRGSignalVector : public std::vector<TRGSignal> {
+/// A class to represent a bundle of SignalVectors.
+class TRGSignalBundle : public std::vector<TRGSignalVector *> {
 
   public:
 
     /// Default constructor.
-//  TRGSignalVector(const TRGClock & = Belle2_GDL::GDLSystemClock);
+    TRGSignalBundle(const TRGClock & = Belle2_GDL::GDLSystemClock);
 
     /// Constructor with name.
-    TRGSignalVector(const std::string & name,
-		    const TRGClock & = Belle2_GDL::GDLSystemClock,
-		    unsigned size = 0);
+    TRGSignalBundle(const std::string & name,
+		    const TRGClock & = Belle2_GDL::GDLSystemClock);
 
-    /// Copy constructor.
-    TRGSignalVector(const TRGSignalVector &);
-
-    /// Constructor.
-    TRGSignalVector(const TRGSignal &);
+    /// Constructor with a packer.
+    TRGSignalBundle(const std::string & name,
+		    const TRGClock & clock,
+		    const TRGSignalBundle & input,
+		    TRGState (* packer)(const TRGState &));
 
     /// Destructor
-    virtual ~TRGSignalVector();
+    virtual ~TRGSignalBundle();
 
   public:// Selectors
 
@@ -70,18 +69,10 @@ class TRGSignalVector : public std::vector<TRGSignal> {
     void dump(const std::string & message = "",
               const std::string & pre = "") const;
 
-  public:// Modifiers
-
-    /// sets state at given clock.
-    const TRGSignalVector & set(const TRGState &, int clockPosition);
-
   public:// Operators
 
     /// changes clock.
     const TRGClock & clock(const TRGClock &);
-
-    /// appends TRGSignal.
-    TRGSignalVector & operator+=(const TRGSignal &);
 
   private:
 
@@ -96,22 +87,22 @@ class TRGSignalVector : public std::vector<TRGSignal> {
 
 inline
 const std::string &
-TRGSignalVector::name(void) const {
+TRGSignalBundle::name(void) const {
     return _name;
 }
 
 inline
 const std::string &
-TRGSignalVector::name(const std::string & newName) {
+TRGSignalBundle::name(const std::string & newName) {
     return _name = newName;
 }
 
 inline
 const TRGClock &
-TRGSignalVector::clock(void) const {
+TRGSignalBundle::clock(void) const {
     return * _clock;
 }
 
 } // namespace Belle2
 
-#endif /* TRGSignalVector_FLAG_ */
+#endif /* TRGSignalBundle_FLAG_ */

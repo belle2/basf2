@@ -24,7 +24,7 @@
 #include "trg/trg/Debug.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/Signal.h"
-#include "trg/trg/Link.h"
+#include "trg/trg/Channel.h"
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
@@ -69,7 +69,7 @@ TRGCDC::name(void) const {
 
 string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.35");
+    return string("TRGCDC 5.36");
 }
 
 TRGCDC *
@@ -176,6 +176,14 @@ TRGCDC::TRGCDC(const string & configFile,
       _clock("CDCTrigger system clock", Belle2_GDL::GDLSystemClock, 1),
       _clockFE("CDCFE TDC clock", Belle2_GDL::GDLSystemClock, 8),
       _clockD("CDCTrigger data clock", Belle2_GDL::GDLSystemClock, 1, 4),
+      _clockUser3125("CDCTrigger Aurora user clock (3.125Gbps)",
+		     Belle2_GDL::GDLSystemClock,
+		     25,
+		     20),
+      _clockUser6250("CDCTrigger Aurora user clock (6.250Gbps)",
+		     Belle2_GDL::GDLSystemClock,
+		     50,
+		     20),
       _offset(5.3),
       _pFinder(0),
       _hFinder(0),
@@ -1772,6 +1780,12 @@ TRGCDC::firmwareSimulation(void) {
     //...Front ends...
     const unsigned nFronts = _fronts.size();
     for (unsigned i = 0; i < nFronts; i++) {
+
+	//...Skip inner-most FE because they have no contribution to TRG
+	if (i < 10)
+	    continue;
+
+	//...FE simulation...
 	_fronts[i]->simulate();
     }
 }
@@ -1843,7 +1857,20 @@ TRGCDC::configure(void) {
 	    f = _fronts[fid];
 	if (! f) {
 	    const string name = "CDCFrontEnd_" + TRGUtil::itostring(fid);
-	    f = new TCFrontEnd(name, _clockD);
+	    TCFrontEnd::boardType t = TCFrontEnd::unknown;
+	    if (_wires[wid]->superLayerId() == 0) {
+		if (_wires[wid]->localLayerId() < 5)
+		    t = TCFrontEnd::innerInside;
+		else
+		    t = TCFrontEnd::innerOutside;
+	    }
+	    else {
+		if (_wires[wid]->localLayerId() < 3)
+		    t = TCFrontEnd::outerInside;
+		else
+		    t = TCFrontEnd::outerOutside;
+	    }
+	    f = new TCFrontEnd(name, t, _clock, _clockD, _clockUser3125);
 	    _fronts.push_back(f);
 	}
 	f->push_back(_wires[wid]);
@@ -1855,40 +1882,26 @@ TRGCDC::configure(void) {
 		m = _mergers[mid];
 	    if (! m) {
 		const string name = "CDCMerger_" + TRGUtil::itostring(mid);
-		m = new TCMerger(name, _clock);
+		m = new TCMerger(name,
+				 _clock,
+				 _clockD,
+				 _clockUser3125,
+				 _clockUser6250);
 		_mergers.push_back(m);
 	    }
 	    m->push_back(f);
-//            cout << "  f added" << endl;
+	}
+
+	//...Make Aurora channel...
+	if (f && m) {
+	    const string n = f->name() + string("-") + m->name();
+	    TRGChannel * ch = new TRGChannel(n, * f, * m);
+	    f->appendOutput(ch);
+	    m->appendInput(ch);
 	}
 
 	++lines;
     }
-    infile.close();
-
-    //...Make a link in each front-end...
-    const unsigned nFronts = _fronts.size();
-    for (unsigned i = 0; i < nFronts; i++) {
-	TCFrontEnd & f = * _fronts[i];
-	TRGLink * fl = new TRGLink(f.name(), f.clock());
-	f.append(fl);
-	const unsigned nWires = f.size();
-	for (unsigned j = 0; j < nWires; j++) {
-	    fl->append(& f[j]->signal());
-	}
-	if (TRGDebug::level() > 2)
-	    f.dump("detail");
-    }
-
-    //...Make a link for mergers
-//     TRGLink * fl = new TRGLink("CDCFrontEnd_0", _clock);
-//     _links.push_back(fl);
-//     for (unsigned j = 0; j < 3; j++)
-//         for (unsigned i = 0; i < 16; i++)
-//             fl->append(& (* _layers[j])[i]->signal());
-//     TCFrontEnd f("CDCFrontEnd_0", _clock);
-//     f.append(fl);
-
     infile.close();
 }
 

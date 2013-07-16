@@ -1,33 +1,34 @@
 //-----------------------------------------------------------------------------
 // $Id$
 //-----------------------------------------------------------------------------
-// Filename : Merger.cc
-// Section  : TRG CDC
+// Filename : TRGChannel.cc
+// Section  : TRG
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
 //-----------------------------------------------------------------------------
-// Description : A class to represent a CDC front-end board
+// Description : A class to represent a trigger board
 //-----------------------------------------------------------------------------
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGCDC_SHORT_NAMES
-
-#include "trg/cdc/Merger.h"
+#include <iostream>
+#include "trg/trg/Channel.h"
+#include "trg/trg/Board.h"
 
 using namespace std;
 
 namespace Belle2 {
 
-TRGCDCMerger::TRGCDCMerger(const std::string & name,
-			   const TRGClock & systemClock,
-			   const TRGClock & dataClock,
-			   const TRGClock & userClockInput,
-			   const TRGClock & userClockOutput)
-    : TRGBoard(name, systemClock, dataClock, userClockInput, userClockOutput) {
+TRGChannel::TRGChannel(const std::string & name,
+		       const TRGBoard & sender,
+		       const TRGBoard & receiver)
+    : _name(name),
+      _sender(sender),
+      _receiver(receiver),
+      _data(0) {
 }
 
-TRGCDCMerger::~TRGCDCMerger() {
+TRGChannel::~TRGChannel() {
 }
 
 } // namespace Belle2

@@ -96,19 +96,20 @@ TRGClock::dump(const string & ,
 }
 
 int
-TRGClock::time(double t) const {
+TRGClock::position(double t) const {
+#ifdef TRG_DEBUG
     if ((t < minTiming()) || (t > maxTiming()))
         cout << "TRGClock::unit(" << _name
              << ") !!! out of time window : min=" << minTiming()
              << ",max=" << maxTiming() << ",given value=" << t << endl;
-
 //    cout << "t,offset,unit=" << t << "," << _offset << "," << int((t
 //    - _offset) / _cycle) << endl;
+#endif
 
     // Here ignoring offset effect (assuming same offset to a source).
 
     if (_source && _multi != 1) {
-	const int tt = _source->time(t);
+	const int tt = _source->position(t);
 	const double rem = _source->overShoot(t);
 	return tt * int(_multi) + int(rem / _cycle);
     }
@@ -124,9 +125,9 @@ double
 TRGClock::overShoot(double t) const {
     if (_source && _multi != 1) {
 	const double rem = _source->overShoot(t);
-	return rem - _cycle * double(_source->time(t));
+	return rem - _cycle * double(_source->position(t));
     }
-    return (t - _offset) - _cycle * double(time(t));
+    return (t - _offset) - _cycle * double(position(t));
 }
 
 TRGTime
@@ -139,6 +140,17 @@ TRGTime
 TRGClock::maxTRGTime(bool edge) const {
     TRGTime a(maxTiming(), edge, * this, _name + "_max");
     return a;
+}
+
+double
+TRGClock::phase(double a) const {
+//  return overShoot(a) / _cycle * 360;
+    const double pos = (a - _offset) / _cycle;
+    const double pos0 = double(int(pos));
+    const double dif = pos - pos0;
+    // std::cout << "a,offset,pos,pos0,dif=" << a << "," << _offset << ","
+    // 	      << pos << "," << pos0 << "," << dif << std::endl;
+    return dif * 360;
 }
 
 } // namespace Belle2

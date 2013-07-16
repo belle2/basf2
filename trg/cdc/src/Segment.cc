@@ -276,7 +276,7 @@ TCSegment::simulateWithClock(void) {
     //...Get wire informtion...
     const unsigned n = _wires.size();
     unsigned nHits = 0;
-    TRGSignalVector signals;
+    TRGSignalVector signals(name(), dataClock);
     for (unsigned i = 0; i < n; i++) {
 
 	//...Copy signal from a wire...
@@ -314,7 +314,7 @@ TCSegment::simulateWithClock(void) {
 	cout << TRGDebug::tab() << i << ":c=" << clocks[i] << ":" << state
 	     << endl;
 
-	_lut->getLRLUT(state.pattern(), superLayerId());
+	_lut->getLRLUT(unsigned(state), superLayerId());
     }
 
     TRGDebug::leaveStage(stage);

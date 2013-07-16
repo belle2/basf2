@@ -336,6 +336,9 @@ class TRGCDC {
     /// returns the data clock.
     const TRGClock & dataClock(void) const;
 
+    /// returns the user clock for Aurora 3.125 Gbps.
+    const TRGClock & userClock3125(void) const;
+
     /// returns the system offset in MC.
     double systemOffsetMC(void) const;
 
@@ -489,6 +492,12 @@ class TRGCDC {
 
     /// CDC trigger data clock.
     const TRGClock _clockD;
+
+    /// CDC trigger user clock for Aurora 3.125 Gbps.
+    const TRGClock _clockUser3125;
+
+    /// CDC trigger user clock for Aurora 6.250 Gbps.
+    const TRGClock _clockUser6250;
 
     /// Timing offset of CDC trigger.
     const double _offset;

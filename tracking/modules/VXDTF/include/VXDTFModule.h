@@ -428,6 +428,11 @@ namespace Belle2 {
       /** general Function to write data into a root file*/
       void writeToRootFile(double pValue, double chi2, int ndf);
 
+      /** fast bypass for very simple events having not more than 2 easily distinguishable tracks and cosmic events */
+      bool simpleEventReco(std::vector<ClusterInfo>& clusters, const StoreArray<PXDCluster>& aPxdClusterArray, const StoreArray<SVDCluster>& aSvdClusterArray);
+
+      /** combines 1D clusters to all possible 2D combinations*/
+      void  find2DSVDHits(std::map<int, SensorStruct>& activatedSensors, std::vector<ClusterHit>& clusterHitList, const StoreArray<SVDCluster>& aSvdClusterArray);
       //    /** general Function to write data into a root file*/
       //    void VXDTFModule::writeToRootFile(const Tracking::T_type1& variable, const std::string& branchName, const std::string &treeName);
       /** random generator function */
@@ -542,6 +547,7 @@ namespace Belle2 {
 
       double m_PARAMomega; /**< tuning parameter for hopfield network */
       double m_tcThreshold;   /**< defines threshold for hopfield network. neurons having values below threshold are discarded */
+      double m_PARAMreserveHitsThreshold; /**< tuning parameter for passes, valid values 0-1 ( = 0-100%). It defines how many percent of the TCs (sorted by QI) are allowed to reserve their hits (which disallows further passes to use these hits). This does not mean that TCs which were not allowed to reserve their hits will be deleted, this only means that they have to compete with TCs of other passes for their hits again. Setting the values to 100% = 1 means, no hits used by tcs surviving that pass are reused, 0% = 0 means every tc has to compete with all tcs of other passes (quite similar to former behavior) */
 
       bool m_PARAMqiSmear; /**<  allows to smear QIs via qqq-Interface, needed when having more than one TC with the same QI */
       bool m_PARAMcleanOverlappingSet; /**< when true, TCs which are found more than once (possible because of multipass) will get filtered */

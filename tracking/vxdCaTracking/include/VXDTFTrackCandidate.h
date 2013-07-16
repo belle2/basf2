@@ -43,7 +43,12 @@ namespace Belle2 {
         m_passIndex(-1),
         m_fitSucceeded(false),
         m_trackNumber(-1),
-        m_initialValuesSet(false) {}
+        m_initialValuesSet(false) {
+        m_attachedHits.reserve(12);
+        m_attachedCells.reserve(10);
+        m_pxdHitIndices.reserve(4);
+        m_svdHitIndices.reserve(16);
+      }
 
       /**copy constructor**/
       VXDTFTrackCandidate(VXDTFTrackCandidate*& other);

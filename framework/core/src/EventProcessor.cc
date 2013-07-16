@@ -174,13 +174,15 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
   endEventMetaData.setEndOfData();
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
+  const bool collectStats = !Environment::Instance().getNoStats();
   ModuleStatistics& stats = ModuleStatistics::getInstance();
 
   //Loop over the events
   long currEvent = 0;
   bool endProcess = false;
   while (!endProcess) {
-    stats.startGlobal();
+    if (collectStats)
+      stats.startGlobal();
 
     //Loop over the modules in the current path
     ModulePtrList::const_iterator moduleIter = startModules.begin();
@@ -193,9 +195,11 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
 
       //Call the event method of the module
-      stats.startModule();
+      if (collectStats)
+        stats.startModule();
       module->event();
-      stats.stopModule(*module, ModuleStatistics::c_Event);
+      if (collectStats)
+        stats.stopModule(*module, ModuleStatistics::c_Event);
 
       //Set the global log level
       logSystem.setModuleLogConfig(NULL);
@@ -217,7 +221,8 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
         if ((eventMetaDataPtr->getExperiment() != previousEventMetaData.getExperiment()) ||
             (eventMetaDataPtr->getRun() != previousEventMetaData.getRun())) {
 
-          stats.stopGlobal(ModuleStatistics::c_Event, true);
+          if (collectStats)
+            stats.stopGlobal(ModuleStatistics::c_Event, true);
           //End the previous run
           if (currEvent > 0) {
 #ifdef HAS_CALLGRIND
@@ -235,7 +240,8 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 #ifdef HAS_CALLGRIND
           CALLGRIND_ZERO_STATS;
 #endif
-          stats.startGlobal();
+          if (collectStats)
+            stats.startGlobal();
         }
 
         previousEventMetaData = *eventMetaDataPtr;
@@ -243,8 +249,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       } else {
         //Check for a second master module
         if (eventMetaDataPtr && (*eventMetaDataPtr != previousEventMetaData)) {
-          B2FATAL("Two master modules were discovered: " << m_master->getName()
-                  << " and " << module->getName());
+          B2FATAL("Two master modules were discovered: " << m_master->getName() << " and " << module->getName());
         }
       }
 
@@ -269,7 +274,8 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
     currEvent++;
     if ((maxEvent > 0) && (currEvent >= maxEvent)) endProcess = true;
-    stats.stopGlobal(ModuleStatistics::c_Event);
+    if (collectStats)
+      stats.stopGlobal(ModuleStatistics::c_Event);
   } //end event loop
 #ifdef HAS_CALLGRIND
   CALLGRIND_DUMP_STATS_AT("event");

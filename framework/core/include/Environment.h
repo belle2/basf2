@@ -119,7 +119,13 @@ namespace Belle2 {
     void setVisualizeDataFlow(bool on) { m_visualizeDataFlow = on; }
 
     /** Wether to generate DOT files with data store inputs/outputs of each module. */
-    bool getVisualizeDataFlow() { return m_visualizeDataFlow; }
+    bool getVisualizeDataFlow() const { return m_visualizeDataFlow; }
+
+    /** Disable collection of statistics during event processing. */
+    void setNoStats(bool noStats) { m_noStats = noStats; }
+
+    /** Disable collection of statistics during event processing. */
+    bool getNoStats() const { return m_noStats; }
 
 
   private:
@@ -132,6 +138,7 @@ namespace Belle2 {
     std::string m_outputFileOverride; /**< Override name of output file for output module */
     int m_numberProcessesOverride; /**< Override m_numberProcesses if >= 0 */
     bool m_visualizeDataFlow; /**< Wether to generate DOT files with data store inputs/outputs of each module. */
+    bool m_noStats; /**< Disable collection of statistics during event processing. Useful for very high-rate applications. */
 
     /**
      * The constructor is hidden to avoid that someone creates an instance of this class.

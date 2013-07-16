@@ -147,6 +147,7 @@ int main(int argc, char* argv[])
     ("processes,p", prog::value<int>(), "override number of parallel processes (0 to disable parallel processing)")
     ("visualize-dataflow", "Generate data flow diagram (dataflow.dot) for the executed steering file.")
     ("module-io", prog::value<string>(), "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
+    ("no-stats", "Disable collection of statistics during event processing. Useful for very high-rate applications, but produces empty table with 'print statistics'.")
     ;
 
     prog::options_description cmdlineOptions;
@@ -239,6 +240,10 @@ int main(int argc, char* argv[])
     if (varMap.count("module-io")) {
       runModuleIOVisualization = varMap["module-io"].as<string>();
       pythonFile = "basf2.py"; //make module maps available, visualization will happen later
+    }
+
+    if (varMap.count("no-stats")) {
+      Environment::Instance().setNoStats(true);
     }
 
     //Check for info option

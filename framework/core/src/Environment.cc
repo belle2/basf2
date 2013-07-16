@@ -39,7 +39,8 @@ Environment::Environment() :
   m_inputFileOverride(""),
   m_outputFileOverride(""),
   m_numberProcessesOverride(-1),
-  m_visualizeDataFlow(false)
+  m_visualizeDataFlow(false),
+  m_noStats(false)
 {
 
 }

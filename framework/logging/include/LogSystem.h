@@ -102,11 +102,10 @@ namespace Belle2 {
     LogConfig& getPackageLogConfig(const std::string& package) {return m_packageLogConfigs[package]; };
 
     /**
-     * Returns true if the log level of the log system is greater or equal the given level.
+     * Returns true if the given log level is allowed by the log system (i.e. >= the system level).
      *
      * @param level The log level which should be compared with the log level of the log system
      * @param debugLevel The level for debug messages. Only used for the debug level.
-     * @return True if the log level of the log system is greater or equal the given level.
      */
     bool isLevelEnabled(LogConfig::ELogLevel level, int debugLevel = 0, const std::string& package = "") const;
 
@@ -131,15 +130,30 @@ namespace Belle2 {
     int getMessageCounter(LogConfig::ELogLevel logLevel) const;
 
     /**
+     * Returns the current LogConfig object used by the logging system.
+     *
+     * Will use the configuration of the current package, if available,
+     * or the current module, if available,
+     * or, otherwise, the global configuration.
+     *
+     * The idea is that a module can call functions in a different package,
+     * and the log configuration for that package will be used.
+     */
+    const LogConfig& getCurrentLogConfig(const std::string& package = "") const;
+
+    /**
      * Returns the current log level used by the logging system.
      *
-     * If the current log configuration is set to a module
-     * log configuration, the log level of the module is returned.
-     * Otherwise the global log level is returned.
-     *
-     * @return The current log level of the logging system.
+     * \sa getCurrentLogConfig()
      */
-    LogConfig::ELogLevel getCurrentLogLevel() const;
+    inline LogConfig::ELogLevel getCurrentLogLevel(const std::string& package = "") const { return getCurrentLogConfig(package).getLogLevel(); }
+
+    /**
+     * Returns the current debug level used by the logging system.
+     *
+     * \sa getCurrentLogConfig()
+     */
+    inline int getCurrentDebugLevel(const std::string& package = "") const { return getCurrentLogConfig(package).getLogLevel(); }
 
     /**
      * Print error/warning summary at end of execution.

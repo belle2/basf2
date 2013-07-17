@@ -49,39 +49,18 @@ void LogSystem::resetLogConnections()
 
 bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, const std::string& package) const
 {
-  LogConfig::ELogLevel logLevelLimit = LogConfig::c_Default;
-  int debugLevelLimit = 0;
+  const LogConfig& config = getCurrentLogConfig(package);
+  LogConfig::ELogLevel logLevelLimit = config.getLogLevel();
+  int debugLevelLimit = config.getDebugLevel();
 
-  // first check whether the log level of the current package is set
-  map<string, LogConfig>::const_iterator packageLogConfig = m_packageLogConfigs.find(package);
-  if (packageLogConfig != m_packageLogConfigs.end()) {
-    const LogConfig& logConfig = packageLogConfig->second;
-    if (logConfig.getLogLevel() != LogConfig::c_Default) {
-      logLevelLimit = logConfig.getLogLevel();
-      debugLevelLimit = logConfig.getDebugLevel();
-    }
-  }
-
-  // if there's no package log level set, take it either from the module or the global settings
-  if (logLevelLimit == LogConfig::c_Default) {
-    if (m_moduleLogConfig && (m_moduleLogConfig->getLogLevel() != LogConfig::c_Default)) {
-      logLevelLimit = m_moduleLogConfig->getLogLevel();
-      debugLevelLimit = m_moduleLogConfig->getDebugLevel();
-    } else {
-      logLevelLimit = m_logConfig.getLogLevel();
-      debugLevelLimit = m_logConfig.getDebugLevel();
-    }
-  }
-
-  return ((level != LogConfig::c_Debug) && (logLevelLimit <= level)) ||
-         ((level == LogConfig::c_Debug) && (logLevelLimit == LogConfig::c_Debug) && (debugLevelLimit >= debugLevel));
+  return logLevelLimit <= level && (logLevelLimit != LogConfig::c_Debug || debugLevelLimit >= debugLevel);
 }
 
 
 bool LogSystem::sendMessage(LogMessage message)
 {
   LogConfig::ELogLevel logLevel = message.getLogLevel();
-  map<string, LogConfig>::iterator packageLogConfig = m_packageLogConfigs.find(message.getPackage());
+  map<string, LogConfig>::const_iterator packageLogConfig = m_packageLogConfigs.find(message.getPackage());
   if ((packageLogConfig != m_packageLogConfigs.end()) && packageLogConfig->second.getLogInfo(logLevel)) {
     message.setLogInfo(packageLogConfig->second.getLogInfo(logLevel));
   } else if (m_moduleLogConfig && m_moduleLogConfig->getLogInfo(logLevel)) {
@@ -129,13 +108,25 @@ int LogSystem::getMessageCounter(LogConfig::ELogLevel logLevel) const
 }
 
 
-LogConfig::ELogLevel LogSystem::getCurrentLogLevel() const
+const LogConfig& LogSystem::getCurrentLogConfig(const std::string& package) const
 {
-  //Check if module specific logging is set
-  if (m_moduleLogConfig && (m_moduleLogConfig->getLogLevel() != LogConfig::c_Default)) {
-    return m_moduleLogConfig->getLogLevel();
+  //package specific config?
+  if (!package.empty()) {
+    map<string, LogConfig>::const_iterator packageLogConfig = m_packageLogConfigs.find(package);
+    if (packageLogConfig != m_packageLogConfigs.end()) {
+      const LogConfig& logConfig = packageLogConfig->second;
+      if (logConfig.getLogLevel() != LogConfig::c_Default)
+        return logConfig;
+    }
   }
-  return m_logConfig.getLogLevel();
+
+  //module specific config?
+  if (m_moduleLogConfig && (m_moduleLogConfig->getLogLevel() != LogConfig::c_Default)) {
+    return *m_moduleLogConfig;
+  }
+
+  //global config
+  return m_logConfig;
 }
 
 

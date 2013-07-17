@@ -25,8 +25,8 @@
 #include "trg/ecl/TrgEcl.h"
 #include "trg/ecl/TrgEclCluster.h"
 
-#include "trg/dataobjects/ecl/TRGECLDigi.h"
-#include "trg/dataobjects/ecl/TRGECLTrg.h"
+#include "trg/ecl/dataobjects/TRGECLDigi.h"
+#include "trg/ecl/dataobjects/TRGECLTrg.h"
 //
 #include <math.h>
 //

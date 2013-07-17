@@ -20,8 +20,8 @@
 #include <ecl/dataobjects/ECLSimHit.h>
 
 #include "trg/ecl/TrgEclFAM.h"
-#include "trg/dataobjects/ecl/TRGECLDigi.h"
-#include "trg/dataobjects/ecl/TRGECLDigi0.h"
+#include "trg/ecl/dataobjects/TRGECLDigi.h"
+#include "trg/ecl/dataobjects/TRGECLDigi0.h"
 
 #include <stdlib.h>
 #include <iostream>

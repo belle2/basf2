@@ -592,7 +592,7 @@ namespace Belle2 {
       double brbackangle = 51.28 * deg; //52.902 * deg;
 
       double brphifina = 298.34 * cm / 2; // shorter base
-      double brphifinL = 32. * cm / 2; // height
+      double brphifinL = 19. * cm / 2; // height
 
       double f_xForw = brphifinL / tan(brforwangle);
       double f_xBack = brphifinL / tan(brbackangle);

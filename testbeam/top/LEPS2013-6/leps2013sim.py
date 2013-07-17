@@ -102,7 +102,8 @@ TOPdigi.param('electronicJitter', 100e-3)
 TOPdigi.param('timeZeroJitter', 25e-3)
 
 # Output
-output = register_module('RootOutput')
+# output = register_module('RootOutput')
+output = register_module('TOPLeps2013Output')
 output.param('outputFileName', outfile)
 
 # suppress messages and warnings during processing:

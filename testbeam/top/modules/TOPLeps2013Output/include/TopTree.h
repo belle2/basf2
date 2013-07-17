@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kenji Inami, Marko Staric                                             *
+ * Contributors: Kenji Inami, Marko Staric                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,7 +17,8 @@ namespace Belle2 {
   namespace TOP {
 
     /**
-     * structure for the output of test beam simulation to a root file (TTree "top")
+     * Structure for the output of test beam simulation to a root file (TTree "top")
+     * https://belle2.cc.kek.jp/~twiki/bin/view/Detector/TOP/BeamTestJune2013ROOTDataFormats
      *
      * Belle II numbering scheme (looking from the mirror towards the PMTs):
      * PMT numbering:
@@ -49,27 +50,27 @@ namespace Belle2 {
       Int_t runNum;         /**< run number */
       Int_t eventNum;       /**< event number */
       Short_t eventflag;    /**< 1:good event, 0:rejected, -1:junk */
-      Short_t eventtag_top; /**< ? */
+      Short_t eventtag_top; /**< tag for matching events btw. TOP and LEPS DAQ systems */
 
       Short_t nhit;                /**< number of hits */
       Short_t pmtid_mcp[MaxROI];   /**< PMT ID (Belle II numbering, 1-based) */
       Short_t ch_mcp[MaxROI];      /**< PMT channel ID (Belle II numbering, 1-based) */
-      Float_t tdc0_mcp[MaxROI];    /**< uncorrected TDC time, unit="ps" */
+      Float_t tdc0_mcp[MaxROI];    /**< raw TDC time, unit="ps" */
       Float_t adc0_mcp[MaxROI];    /**< pulse height, unit="ADC counts" */
       Short_t pmtflag_mcp[MaxROI]; /**< 1:good/main, 0:cross-talk/charge shared 2nd, -1:no hit/bad ch */
 
-      Int_t rf[4];                 /**< ? */
-      Float_t rf_time;             /**< ? */
-      Short_t bunchNum;            /**< bunch number */
+      Int_t rf[4];                 /**< RF values (50ps/bin) */
+      Float_t rf_time;             /**< time obtained from the rf values, unit="ps" */
+      Short_t bunchNum;            /**< SPring-8 bunch number */
 
-      Int_t trigS_tdc[2];          /**< trigger counters S TDC (25ps/bin), 0:?, 1:? */
-      Int_t trigS_adc[2];          /**< trigger counters S ADC (0.25pC/bin) */
-      Int_t trigM_tdc[2];          /**< trigger counters M TDC (25ps/bin), 0:?, 1:? */
-      Int_t trigM_adc[2];          /**< trigger counters M ADC (0.25pC/bin) */
-      Int_t timing_tdc;            /**< timing counter TDC (25ps/bin) */
-      Int_t timing_adc;            /**< timing counter ADC (0.25pC/bin) */
-      Int_t veto_adc[2];           /**< veto counters ADC (0.25pC/bin), 0:?, 1:? */
-      Int_t ratemon;               /**< rate monitor? */
+      Int_t trigS_tdc[2]; /**< trigger counters S TDC (25ps/bin), 0:upstream, 1:downstr */
+      Int_t trigS_adc[2]; /**< trigger counters S ADC (0.25pC/bin) */
+      Int_t trigM_tdc[2]; /**< trigger counters M TDC (25ps/bin), 0:upstream, 1:downstr */
+      Int_t trigM_adc[2]; /**< trigger counters M ADC (0.25pC/bin) */
+      Int_t timing_tdc;   /**< timing counter TDC (25ps/bin) */
+      Int_t timing_adc;   /**< timing counter ADC (0.25pC/bin) */
+      Int_t veto_adc[2];  /**< veto counters ADC (0.25pC/bin), 0:left, 1:right */
+      Int_t ratemon;      /**< rate monitor */
 
       Float_t tdc0_ch[512];    /**< copy of tdc0_mcp, index=channelID-1 (Belle II) */
       Float_t adc0_ch[512];    /**< copy of adc0_mcp, index=channelID-1 (Belle II) */
@@ -85,9 +86,17 @@ namespace Belle2 {
       Float_t trk_z_y[2];  /**< sciFi z of y-measuring fibers, unit="mm" */
       Int_t trk_qual_y[2]; /**< quality flag of y-measuring fibers */
 
-      Float_t trk1_x, trk1_y, trk1_z; /**< track position at first tracker, unit="mm" */
-      Float_t trk2_x, trk2_y, trk2_z; /**< track position at second tracker, unit="mm" */
-      Float_t trk_top_x, trk_top_y, trk_top_z; /**< track position at top, unit="mm" */
+      Float_t trk1_x; /**< track position x at upstream tracker, unit="mm" */
+      Float_t trk1_y; /**< track position y at upstream tracker, unit="mm" */
+      Float_t trk1_z; /**< track position z at upstream tracker, unit="mm" */
+
+      Float_t trk2_x; /**< track position x at downstream tracker, unit="mm" */
+      Float_t trk2_y; /**< track position y at downstream tracker, unit="mm" */
+      Float_t trk2_z; /**< track position z at downstream tracker, unit="mm" */
+
+      Float_t trk_top_x; /**< track position x at top, unit="mm" */
+      Float_t trk_top_y; /**< track position y at top, unit="mm" */
+      Float_t trk_top_z; /**< track position z at top, unit="mm" */
 
       /**
        * Clear the structure: set elements to zero

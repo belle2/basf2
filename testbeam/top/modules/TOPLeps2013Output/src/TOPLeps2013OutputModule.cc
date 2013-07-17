@@ -63,6 +63,12 @@ namespace Belle2 {
     m_file = NULL;
     m_treeTop = NULL;
     m_top.clear();
+
+    m_numPMTchannels = 0;
+    m_numChannels = 0;
+    m_tdcWidth = 0;
+    m_tdcOverflow = 0;
+
   }
 
   TOPLeps2013OutputModule::~TOPLeps2013OutputModule()
@@ -126,6 +132,13 @@ namespace Belle2 {
     m_treeTop->Branch("trk_top_x", &(m_top.trk_top_x), "trk_top_x/F");
     m_treeTop->Branch("trk_top_y", &(m_top.trk_top_y), "trk_top_y/F");
     m_treeTop->Branch("trk_top_z", &(m_top.trk_top_z), "trk_top_z/F");
+
+    m_topgp->setBasfUnits();
+    m_numPMTchannels = m_topgp->getNpadx() * m_topgp->getNpady();
+    m_numChannels = m_topgp->getNpmtx() * m_topgp->getNpmty() * m_numPMTchannels;
+    if (m_numChannels > 512) B2FATAL("Number of channels > 512");
+    m_tdcWidth = m_topgp->getTDCbitwidth() * Unit::ns / Unit::ps;
+    m_tdcOverflow = 1 << m_topgp->getTDCbits();
   }
 
   void TOPLeps2013OutputModule::beginRun()
@@ -142,14 +155,8 @@ namespace Belle2 {
     m_top.eventNum = evtMetaData->getEvent();
     m_top.eventflag = 1;
 
-    // daj to med private, testiraj numChannels <= 512!!!
-    int numPMTchannels = m_topgp->getNpadx() * m_topgp->getNpady();
-    int numChannels = m_topgp->getNpmtx() * m_topgp->getNpmty() * numPMTchannels;
-    float tdcWidth = m_topgp->getTDCbitwidth() * Unit::ns / Unit::ps;
-    int tdcOverflow = 1 << m_topgp->getTDCbits();
-
-    int TDC[numChannels];
-    for (int i = 0; i < numChannels; i++) TDC[i] = tdcOverflow;
+    int TDC[m_numChannels];
+    for (int i = 0; i < m_numChannels; i++) TDC[i] = m_tdcOverflow;
 
     StoreArray<TOPDigit> topDigits;
     for (int i = 0; i < topDigits.getEntries(); i++) {
@@ -158,15 +165,15 @@ namespace Belle2 {
       if (digi->getTDC() < TDC[ich]) TDC[ich] = digi->getTDC(); // single hit TDC
     }
 
-    for (int ich = 0; ich < numChannels; ich++) {
-      if (TDC[ich] == tdcOverflow) continue;
+    for (int ich = 0; ich < m_numChannels; ich++) {
+      if (TDC[ich] == m_tdcOverflow) continue;
       int i = m_top.nhit;
       m_top.nhit++;
-      m_top.pmtid_mcp[i] = ich / numPMTchannels + 1;
-      m_top.ch_mcp[i] = ich % numPMTchannels + 1;
+      m_top.pmtid_mcp[i] = ich / m_numPMTchannels + 1;
+      m_top.ch_mcp[i] = ich % m_numPMTchannels + 1;
       float tdc = TDC[ich];
       if (m_randomize) tdc += gRandom->Rndm();
-      m_top.tdc0_mcp[i] = tdc * tdcWidth;
+      m_top.tdc0_mcp[i] = tdc * m_tdcWidth;
       m_top.pmtflag_mcp[i] = 1;
 
       m_top.tdc0_ch[ich] = m_top.tdc0_mcp[i];

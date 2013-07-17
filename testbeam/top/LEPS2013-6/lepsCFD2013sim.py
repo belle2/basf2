@@ -70,9 +70,9 @@ beam03 = {
 
 # specify here the beam setup, number of events to simulate and output file
 # -------------------------------------------------------------------------
-beam = beam02
+beam = beam01
 nevents = [100]
-outfile = 'LEPS-CFDbeamtest02.root'
+outfile = 'LEPS-CFDbeamtest01.root'
 # -------------------------------------------------------------------------
 
 # Number of events to generate
@@ -104,7 +104,8 @@ TOPdigi.param('electronicJitter', 0)
 TOPdigi.param('timeZeroJitter', 30e-3)
 
 # Output
-output = register_module('RootOutput')
+# output = register_module('RootOutput')
+output = register_module('TOPLeps2013Output')
 output.param('outputFileName', outfile)
 
 # suppress messages and warnings during processing:

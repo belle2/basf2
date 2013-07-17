@@ -82,6 +82,11 @@ namespace Belle2 {
 
     TOP::TOPGeometryPar* m_topgp; /**< geometry parameters */
 
+    int m_numPMTchannels; /**< number of PMT channels */
+    int m_numChannels;    /**< number of all channels */
+    float m_tdcWidth;     /**< TDC bin width [ps] */
+    int m_tdcOverflow;    /**< TDC overflow value */
+
   };
 
 } // Belle2 namespace

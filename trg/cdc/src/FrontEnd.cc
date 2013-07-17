@@ -260,6 +260,11 @@ TRGCDCFrontEnd::simulate(void) {
 				   dClock,
 				   * _isb,
 				   TCFrontEnd::packerOuterInside);
+    else if (type() == outerOutside)
+	_osb = new TRGSignalBundle(no,
+				   dClock,
+				   * _isb,
+				   TCFrontEnd::packerOuterOutside);
 }
 
 TRGState
@@ -634,6 +639,152 @@ TCFrontEnd::packerOuterInside(const TRGState & input) {
 	p += 5;
     }
 
+#ifdef TRG_DEBUG
+    unpackerOuterInside(input, s);
+#endif
+
+    return s;
+}
+
+TRGState
+TCFrontEnd::packerOuterOutside(const TRGState & input) {
+
+    //...Input should be 48 hit pattern and 48x5 timing, total 288 bits...
+//
+// Wire numbers and TS ID
+//
+// outside
+//
+//    +--+--+--+--+-    -+--+--+--+--+--+--+
+//    |  47 |  46 | .... |  34 |  33 |  32 |
+//    +--+--+--+--+--+-    -+--+--+--+--+--+--+
+//       |  31 |  30 | ..... | 18 |  17 |  16 | 
+//    +--+--+--+--+--+-    -+--+--+--+--+--+--+
+//    |  15 |  14 | .... |  2  |  1  |  0  |  <- second priority wire layer
+//    +--+--+--+--+-    -+--+--+--+--+--+--+
+//
+//       15    14   ....    2     1     0      <- partial TS ID
+//
+// inside
+//
+//
+
+    //...Prepare a state for output...
+    TRGState s(48 + 16 * 5 + 16 * 5);
+
+    //...Set up bool array...
+    bool * b = new bool[input.size()];
+    input.copy2bool(b);
+
+    //...Naming...
+    const bool * const hitptn = & b[0];   // 16x3 = 48 bits
+    const bool * const timing[48] = {
+	& b[48], & b[53], & b[58], & b[63], 
+	& b[68], & b[73], & b[78], & b[83], 
+	& b[88], & b[93], & b[98], & b[103], 
+	& b[108], & b[113], & b[118], & b[123],
+	& b[128], & b[133], & b[138], & b[143], 
+	& b[148], & b[153], & b[158], & b[163], 
+	& b[168], & b[173], & b[178], & b[183], 
+	& b[188], & b[193], & b[198], & b[203],
+	& b[208], & b[213], & b[218], & b[223],
+	& b[228], & b[233], & b[238], & b[243],
+	& b[248], & b[253], & b[258], & b[263],
+	& b[268], & b[273], & b[278], & b[283]
+    };
+
+    //...Store hit pattern...
+    s.set(0, 48, hitptn);
+    unsigned p = 48;
+
+    //...Second priority cell timing...
+    for (unsigned i = 0; i < 16; i++) {
+	s.set(p, 5, timing[i]);
+	p += 5;
+    }
+
+    //...Fastest timing...
+    const bool dummy[6] = {false, false, false, false, false, true};
+    const TRGState wtDummy(6, dummy);
+    for (unsigned i = 0; i < 16; i++) {
+	TRGState wt[5];
+
+	if (i == 0) { // TS ID 0 has missing wires
+	    wt[0] = wtDummy;
+	    wt[1] = TRGState(5, timing[0]);
+	    wt[2] = wtDummy;
+	    wt[3] = TRGState(5, timing[16]);
+	    wt[4] = TRGState(5, timing[17]);
+
+	    //...Append 6th bit to indicate hit or not (no hit = 1)...
+	    if (! hitptn[0]) wt[1].set(5, true);
+	    if (! hitptn[16]) wt[3].set(5, true);
+	    if (! hitptn[67]) wt[4].set(5, true);
+	}
+	else if (i == 15) { // TS ID 15 has missing wires
+	    wt[0] = TRGState(5, timing[14]);
+	    wt[1] = TRGState(5, timing[15]);
+	    wt[2] = TRGState(5, timing[30]);
+	    wt[3] = TRGState(5, timing[31]);
+	    wt[4] = wtDummy;
+
+	    //...Append 6th bit to indicate hit or not (no hit = 1)...
+	    if (! hitptn[14]) wt[0].set(5, true);
+	    if (! hitptn[15]) wt[1].set(5, true);
+	    if (! hitptn[30]) wt[2].set(5, true);
+	    if (! hitptn[31]) wt[3].set(5, true);
+	}
+	else {
+	    wt[0] = TRGState(5, timing[i - 1]);
+	    wt[1] = TRGState(5, timing[i]);
+	    wt[2] = TRGState(5, timing[i + 15]);
+	    wt[3] = TRGState(5, timing[i + 16]);
+	    wt[4] = TRGState(5, timing[i + 17]);
+
+	    //...Append 6th bit to indicate hit or not (no hit = 1)...
+	    if (! hitptn[i - 1])  wt[0].set(5, true);
+	    if (! hitptn[i])      wt[1].set(5, true);
+	    if (! hitptn[i + 15]) wt[2].set(5, true);
+	    if (! hitptn[i + 16]) wt[3].set(5, true);
+	    if (! hitptn[i + 17]) wt[4].set(5, true);
+	}
+
+	//...Look for the fastest hit...
+	unsigned fastest0 = 0;
+	unsigned fastest1 = 0;
+	if (wt[0] < wt[1])
+	    fastest0 = 0;
+	else
+	    fastest0 = 1;
+	if (wt[2] < wt[3])
+	    fastest1 = 2;
+	else
+	    fastest1 = 3;
+
+	unsigned fastest2 = 0;
+	if (wt[fastest0] < wt[fastest1])
+	    fastest2 = fastest0;
+	else
+	    fastest2 = fastest1;
+
+	unsigned fastest3 = 0;
+	if (wt[fastest2] < wt[4])
+	    fastest3 = fastest2;
+	else
+	    fastest3 = 4;
+
+	TRGState fastest(5);
+	if (! wt[fastest3].active(5))
+	    fastest = wt[fastest3].subset(0, 5);
+
+	s.set(p, fastest);
+	p += 5;
+    }
+
+#ifdef TRG_DEBUG
+    unpackerOuterOutside(input, s);
+#endif
+
     return s;
 }
 
@@ -705,6 +856,140 @@ TCFrontEnd:: unpackerInnerInside(const TRGState & input,
 	    cout << "0";
     }
     cout << endl;
+
+    cout << "Output : fastest timing" << endl;
+    o = 128;
+    for (unsigned i = 0; i < 16; i++) {
+	TRGState s = output.subset(o + i * 5, 5);
+	if ((i % 4) == 0)
+	    cout << "        ";
+	cout << i << ": " << s << "  ";
+	if ((i % 4) == 3)
+	    cout << endl;
+    }
+}
+
+void
+TCFrontEnd:: unpackerOuterInside(const TRGState & input,
+				 const TRGState & output) {
+
+    cout << "Input bit size=" << input.size() << endl;
+
+    cout << "Input : wire hit pattern" << endl;
+    cout << "        ";
+    for (unsigned i = 0; i < 48; i++) {
+	const unsigned j = 48 - i - 1;
+	if (i && ((i % 8) == 0))
+	    cout << "_";
+	if (input[j])
+	    cout << "1";
+	else
+	    cout << "0";
+    }
+    cout << endl;
+    cout << "Input : wire hit timing" << endl;
+    unsigned o = 48;
+    for (unsigned i = 0; i < 48; i++) {
+	TRGState s = input.subset(o + i * 5, 5);
+	if ((i % 4) == 0)
+	    cout << "        ";
+	cout << i << ": " << s << "  ";
+	if ((i % 4) == 3)
+	    cout << endl;
+    }
+
+    cout << "Output bit size=" << output.size() << endl;
+
+    cout << "Output : wire hit pattern" << endl;
+    cout << "        ";
+    for (unsigned i = 0; i < 32; i++) {
+	const unsigned j = 32 - i - 1;
+	if (i && ((i % 8) == 0))
+	    cout << "_";
+	if (output[j])
+	    cout << "1";
+	else
+	    cout << "0";
+    }
+    cout << endl;
+
+    cout << "Output : priority cell timing" << endl;
+    o = 32;
+    for (unsigned i = 0; i < 16; i++) {
+	TRGState s = output.subset(o + i * 5, 5);
+	if ((i % 4) == 0)
+	    cout << "        ";
+	cout << i << ": " << s << "  ";
+	if ((i % 4) == 3)
+	    cout << endl;
+    }
+
+    cout << "Output : fastest timing" << endl;
+    o = 128;
+    for (unsigned i = 0; i < 16; i++) {
+	TRGState s = output.subset(o + i * 5, 5);
+	if ((i % 4) == 0)
+	    cout << "        ";
+	cout << i << ": " << s << "  ";
+	if ((i % 4) == 3)
+	    cout << endl;
+    }
+}
+
+void
+TCFrontEnd:: unpackerOuterOutside(const TRGState & input,
+				  const TRGState & output) {
+
+    cout << "Input bit size=" << input.size() << endl;
+
+    cout << "Input : wire hit pattern" << endl;
+    cout << "        ";
+    for (unsigned i = 0; i < 48; i++) {
+	const unsigned j = 48 - i - 1;
+	if (i && ((i % 8) == 0))
+	    cout << "_";
+	if (input[j])
+	    cout << "1";
+	else
+	    cout << "0";
+    }
+    cout << endl;
+    cout << "Input : wire hit timing" << endl;
+    unsigned o = 48;
+    for (unsigned i = 0; i < 48; i++) {
+	TRGState s = input.subset(o + i * 5, 5);
+	if ((i % 4) == 0)
+	    cout << "        ";
+	cout << i << ": " << s << "  ";
+	if ((i % 4) == 3)
+	    cout << endl;
+    }
+
+    cout << "Output bit size=" << output.size() << endl;
+
+    cout << "Output : wire hit pattern" << endl;
+    cout << "        ";
+    for (unsigned i = 0; i < 32; i++) {
+	const unsigned j = 32 - i - 1;
+	if (i && ((i % 8) == 0))
+	    cout << "_";
+	if (output[j])
+	    cout << "1";
+	else
+	    cout << "0";
+    }
+    cout << endl;
+
+    cout << "Output : Second priority cell timing" << endl;
+    o = 32;
+    for (unsigned i = 0; i < 16; i++) {
+	TRGState s = output.subset(o + i * 5, 5);
+	if ((i % 4) == 0)
+	    cout << "        ";
+	cout << i << ": " << s << "  ";
+	if ((i % 4) == 3)
+	    cout << endl;
+    }
 
     cout << "Output : fastest timing" << endl;
     o = 128;

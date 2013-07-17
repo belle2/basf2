@@ -89,8 +89,8 @@ void (* ParserN[N_KEYWORDS])(const string &) = {
 };
 
 int
-//main(int argc, char * argv[]) {
-main(int argc) {
+main(int argc, char **) { // argv[]) {
+//main(int argc) {
 
     cout << NAME << " ... " << VERSION << endl;
 
@@ -355,6 +355,9 @@ ParserVTS(const string & l) {
 	    break;
 	}
     }
+    if (! defined)
+	cout << "TRGCDCInterfaceBuilder::ParserVTS !!! " << name
+	     << " is not defined" << endl;
 
     //...Type definition...
     TypeDefinition(name, size, "std_logic");
@@ -384,6 +387,9 @@ ParserVTSV(const string & l) {
 	    break;
 	}
     }
+    if (! defined)
+	cout << "TRGCDCInterfaceBuilder::ParserVTS !!! " << name
+	     << " is not defined" << endl;
 
     //...Type definition...
     TypeDefinition(name, size, base);

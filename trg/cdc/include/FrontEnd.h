@@ -85,6 +85,14 @@ class TRGCDCFrontEnd
     static void unpackerInnerInside(const TRGState & input,
 				    const TRGState & output);
 
+    /// Unpacks TRGState.
+    static void unpackerOuterInside(const TRGState & input,
+				    const TRGState & output);
+
+    /// Unpacks TRGState.
+    static void unpackerOuterOutside(const TRGState & input,
+				     const TRGState & output);
+
     /// make a VHDL component file. Non-zero value will be returned if
     /// errors occured.
     static int implementation(const boardType & type, std::ofstream &);

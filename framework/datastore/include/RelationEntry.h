@@ -25,12 +25,16 @@ namespace Belle2 {
    */
   struct RelationEntry {
 
+    /** Default constructor.
+     */
+    RelationEntry(): object(0), weight(1.0) {}
+
     /** Constructor.
      *
-     *  @param obj  The object that is pointed to be the relation.
+     *  @param obj  The object that is pointed to by the relation.
      *  @param w    The weight of the relation.
      */
-    RelationEntry(TObject* obj, double w = 1): object(obj), weight(w) {}
+    RelationEntry(TObject* obj, double w = 1.0): object(obj), weight(w) {}
 
     TObject* object;  /**< Pointer to the object. */
     double   weight;  /**< Weight of the relation. */

@@ -48,10 +48,10 @@
 
 
 // Definitions of files
-const string cInRoot = "EvtGenOutput.root";  // input root file
+const string cInRoot = "EvtGenSimRec.root";  // input root file
 const string cOutRootAll = "CDCvalidatationAll.root";      // output root file (all histograms)
 const string cOutRootSL  = "CDCvalidation.root";       // output root file (super layer histograms)
-const string cOutDraw = "CDCvaidation.pdf";             // output drawing file
+const string cOutDraw = "CDCvalidation.pdf";             // output drawing file
                                                 //  filetype: ps or pdf 
 const string cOutDrawInit = cOutDraw+"(";
 const string cOutDrawFinal = cOutDraw+")";

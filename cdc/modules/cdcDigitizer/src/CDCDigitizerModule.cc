@@ -216,6 +216,7 @@ void CDCDigitizerModule::event()
         //assumption: only one MCParticle
         const MCParticle* mcparticle = rels[0];
         double weight = rels.weight(0);
+
         mcparticle->addRelationTo(cdcHit, weight);
       }
 

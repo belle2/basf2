@@ -48,7 +48,7 @@ namespace Belle2 {
       StoreArray<MCParticle> particles;
       StoreArray<TOPBarHit>  barhits;
       RelationArray  relation(particles, barhits);
-      registerMCParticleRelation(relation);
+      registerMCParticleRelation(relation, RelationArray::c_deleteElement);
     }
 
 

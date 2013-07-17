@@ -20,13 +20,13 @@ namespace Belle2 {
     */
 
   /**
-    * Class PXDTrueHit - Position where are particle traversed the detector plane.
+    * Class PXDTrueHit - Records of tracks that either enter or leave
+    * the sensitive volume.
     *
     * This class is meant as helper for tracking optimization. It stores
-    * information about particle traversal in condensed form: The local
-    * coordinates where the particle traversed the detector plane as well as
-    * the momenta when the particle entered the silicon, traversed the detector
-    * plane and exited the silicon.
+    * information about particle tracks in a sensor in condensed form: The local
+    * coordinates of the start point, midpoint and endpoint of the track,
+    * as well as track momenta at these points.
     *
     * This class holds particle hit data from geant4 simulation. As the simulated
     * hit classes are used to generate detector response, they contain _local_
@@ -39,8 +39,8 @@ namespace Belle2 {
 
     /** Constructor
      * @param sensorID SensorID of the Sensor
-     * @param u u coordinate of the hit in local coordinates
-     * @param v v coordinate of the hit in local coordinates
+     * @param u u coordinate of the hit
+     * @param v v coordinate of the hit
      * @param momentum momentum of the particle in local coordinates
      * @param globalTime timestamp of the hit
      */
@@ -48,25 +48,30 @@ namespace Belle2 {
                const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
       VXDTrueHit(sensorID, u, v, energyDep, globalTime, momentum, entryMomentum, exitMomentum)
     {}
-    /** Constructor
-     * @param sensorID SensorID of the Sensor
-     * @param u u coordinate of the hit in local coordinates
-     * @param v v coordinate of the hit in local coordinates
-     * @param entryU u coordinate of the hit in local coordinates when entering silicon
-     * @param entryV v coordinate of the hit in local coordinates when entering silicon
-     * @param exitU u coordinate of the hit in local coordinates when exiting silicon
-     * @param exitV v coordinate of the hit in local coordinates when exiting silicon
+    /** (Full) constructor
+     * @param sensorID SensorID of the sensor
+     * @param u u coordinate of the hit
+     * @param v v coordinate of the hit
+     * @param w w coordinate of the hit
+     * @param entryU u coordinate of the track start point
+     * @param entryV v coordinate of the track start point
+     * @param entryW w coordinate of the track start point
+     * @param exitU u coordinate of the track endpoint
+     * @param exitV v coordinate of the track endpoint
+     * @param exitW w coordinate of the track endpoint
      * @param momentum momentum of the particle in local coordinates
-     * @param entryMomentum momentum of the particle in local coordinates when entering silicon
-     * @param exitMomentum momentum of the particle in local coordinates when exiting silicon
+     * @param entryMomentum momentum at track start point
+     * @param exitMomentum momentum at track endpoint
      * @param globalTime timestamp of the hit
      */
     PXDTrueHit(
-      VxdID sensorID, float u, float v, float entryU, float entryV, float exitU, float exitV, float energyDep, float globalTime,
+      VxdID sensorID, float u, float v, float w, float entryU, float entryV, float entryW,
+      float exitU, float exitV, float exitW, float energyDep, float globalTime,
       const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
-      VXDTrueHit(sensorID, u, v, entryU, entryV, exitU, exitV, energyDep, globalTime, momentum, entryMomentum, exitMomentum)
+      VXDTrueHit(sensorID, u, v, w, entryU, entryV, entryW, exitU, exitV, exitW,
+                 energyDep, globalTime, momentum, entryMomentum, exitMomentum)
     {}
-    ClassDef(PXDTrueHit, 3)
+    ClassDef(PXDTrueHit, 4)
   };
 
   /** @}*/

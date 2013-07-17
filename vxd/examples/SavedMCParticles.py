@@ -11,20 +11,25 @@ logging.log_level = LogLevel.WARNING
 
 class CheckMCParticles(Module):
 
-    """Lists MCParticles that are not related to any TrueHits. Desirably,
-    there should be no such MCParticles.
-    VXD::GeoCache.
-     """
+    """
+    Counts MCParticles that generate TrueHits.
+    """
 
     def __init__(self):
         """Initialize the module"""
 
         super(CheckMCParticles, self).__init__()
+        ## Number of secondaries that generated a PXDTrueHit
         self.nSecondariesPXD = 0
+        ## Number of secondaries that generated an SVD TrueHit
         self.nSecondariesSVD = 0
+        ## Total number of MCParticles
         self.nMCParticles = 0
+        ## Total number of secondary MCParticles
         self.nSecondaries = 0
+        ## List of processes that generated secondaries in PXD
         self.processesPXD = []
+        ## List of processes that generated secondaries in SVD
         self.processesSVD = []
 
     def initialize(self):
@@ -34,8 +39,8 @@ class CheckMCParticles(Module):
         """ Does nothing """
 
     def event(self):
-        """Count the number of MCParticles that are not related to a VXD
-        TrueHit
+        """
+        Count the number of MCParticles related to a VXD TrueHit
         """
 
         mc_particles = Belle2.PyStoreArray('MCParticles')
@@ -54,9 +59,9 @@ class CheckMCParticles(Module):
 
     def terminate(self):
         """ Write results """
-        B2INFO('Found {nu} secondary MC Particles out of {n}.'\
+        B2INFO('Found {nu} secondary MC Particles out of total {n}.'\
             .format(nu=self.nSecondaries, n=self.nMCParticles))
-        B2INFO('Of these, found {n1} in PXD and {n2} in SVD.'\
+        B2INFO('Of these, found {n1} secondaries in PXD and {n2} in SVD.'\
             .format(n1=self.nSecondariesPXD, n2=self.nSecondariesSVD))
         B2INFO('Secondary processes for PXD: {list1}; for SVD: {list2}'\
             .format(list1=str(self.processesPXD), \

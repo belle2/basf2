@@ -950,8 +950,8 @@ TRGCDC::classification(void) {
 	} else {
 	    const TCWHit * hr2 = neighbor[2]->neighbor(2)->hit();
 	    const TCWHit * hl2 = neighbor[3]->neighbor(3)->hit();
-	    if ((hr2 == 0) && (hr1 != 0) && (hl1 == 0) ||
-		(hl2 == 0) && (hl1 != 0) && (hr1 == 0))
+	    if (((hr2 == 0) && (hr1 != 0) && (hl1 == 0)) ||
+		((hl2 == 0) && (hl1 != 0) && (hr1 == 0)))
 		state |= CellHitIsolated;
 	}
 

@@ -66,7 +66,7 @@ class TRGCDCWire : public TRGCDCCell {
 //     const TRGCDCTrackSegment * const segment(void) const;
 
     /// returns a pointer to a neighbor wire. This function is expensive.
-    const TRGCDCWire * const neighbor(unsigned) const;
+    const TRGCDCWire * neighbor(unsigned) const;
 
     /// returns true if a given wire is consective in a layer.
     bool consective(const TRGCDCWire &) const;

@@ -505,7 +505,7 @@ namespace Belle2 {
       double mcZ0 = trackMCParticle.getVertex().Z()/100;
       double mcCot = trackMCParticle.getMomentum().Pz()/trackMCParticle.getMomentum().Pt();
       // Set input of finder
-      double tempTrackVariables[] = {charge, rho, fitPhi0};
+      double tempTrackVariables[] = {double(charge), rho, fitPhi0};
       vector<double > trackVariables(tempTrackVariables, tempTrackVariables+sizeof(tempTrackVariables) / sizeof(tempTrackVariables[0]) );
 
       // Run finder

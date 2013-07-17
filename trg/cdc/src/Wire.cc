@@ -64,7 +64,7 @@ TRGCDCWire::dump(const string & msg, const string & pre) const {
     }    
 }
   
-const TRGCDCWire * const
+const TRGCDCWire *
 TRGCDCWire::neighbor(unsigned i) const {
     static bool first = false;
     if (first)

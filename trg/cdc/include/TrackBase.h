@@ -95,7 +95,7 @@ class TRGCDCTrackBase {
     virtual unsigned objectType(void) const;
 
     /// returns a pointer to a default fitter.
-    const TRGCDCFitter * const fitter(void) const;
+    const TRGCDCFitter * fitter(void) const;
 
     /// returns MC information. False will be returned if no MC
     /// info. available.
@@ -125,7 +125,7 @@ class TRGCDCTrackBase {
     virtual int fit(void);
 
     /// sets a default fitter.
-    const TRGCDCFitter * const fitter(const TRGCDCFitter *);
+    const TRGCDCFitter * fitter(const TRGCDCFitter *);
 
   public: // Utility functions
 
@@ -243,13 +243,13 @@ TRGCDCTrackBase::charge(double a) {
 }
 
 inline
-const TRGCDCFitter * const
+const TRGCDCFitter *
 TRGCDCTrackBase::fitter(void) const {
     return _fitter;
 }
 
 inline
-const TRGCDCFitter * const
+const TRGCDCFitter *
 TRGCDCTrackBase::fitter(const TRGCDCFitter * a) {
     _fitted = false;
     return _fitter = a;

@@ -121,7 +121,7 @@ class TRGCDCCellHit {
     HepGeom::Point3D<double>  position(unsigned) const;
 
     /// assigns a pointer to a TTrack.
-    const void * const track(void) const;
+    const void * track(void) const;
 
     /// returns sequential Length in one segment : this parameter is
     /// used in TCurlFinder now.
@@ -153,10 +153,10 @@ class TRGCDCCellHit {
     unsigned state(unsigned newState) const;
 
     /// assigns a pointer to a TTrack.
-    const void * const track(const void *);
+    const void * track(const void *);
 
     /// assigns a pointer to a TTrack. (tmp)
-    const void * const track(const void *) const;
+    const void * track(const void *) const;
 
     /// sets sequential length in one segment : this parameter is used in TCurlFinder now.
     unsigned sequence(unsigned) const;
@@ -289,19 +289,19 @@ TRGCDCCellHit::state(unsigned i) const {
 }
 
 inline
-const void * const
+const void *
 TRGCDCCellHit::track(void) const {
     return _track;
 }
 
 inline
-const void * const
+const void *
 TRGCDCCellHit::track(const void * a) {
     return _track = a;
 }
 
 inline
-const void * const
+const void *
 TRGCDCCellHit::track(const void * a) const {
     return _track = a;
 }

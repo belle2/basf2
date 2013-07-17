@@ -64,8 +64,7 @@ namespace Belle {
 
   typedef HepGeom::Vector3D<double>  Vector3D;
 
-
-  class CLHEP::Hep3Vector;
+//  class CLHEP::Hep3Vector;
 
 /// A class to represent a point in 2D.
   class TPoint2D {

@@ -218,7 +218,7 @@ namespace Belle {
     const Belle2::TRGCDCWireHit* hit(void) const;
 
     /// returns a pointer to a wire.
-    const Belle2::TRGCDCWire* const wire(void) const;
+    const Belle2::TRGCDCWire* wire(void) const;
 
     /// returns a pointer to a track.
     TTrack* track(void) const;
@@ -333,8 +333,9 @@ namespace Belle {
 // end S.Suzuki
 
     /// sets and returns arc and Z for the curl finder.
-    const HepGeom::Point3D<double> & arcZ(const HepGeom::Point3D<double> &, const unsigned = 0);
-    const unsigned fit2D(const unsigned&);
+    const HepGeom::Point3D<double> & arcZ(const HepGeom::Point3D<double> &,
+					  const unsigned = 0);
+    unsigned fit2D(const unsigned&);
     unsigned fit2D(void);
 
   public:// Drift distance
@@ -717,7 +718,7 @@ namespace Belle {
   }
 
   inline
-  const Belle2::TRGCDCWire* const
+  const Belle2::TRGCDCWire*
   TLink::wire(void) const
   {
     if (_hit) return & _hit->wire();
@@ -814,7 +815,7 @@ namespace Belle {
   }
 
   inline
-  const unsigned
+  unsigned
   TLink::fit2D(const unsigned& f)
   {
     return _fit2D = f;

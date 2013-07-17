@@ -553,7 +553,7 @@ namespace Belle {
       append(* a[i]);
   }
 
-  const Belle2::TRGCDCTrackMC* const
+  const Belle2::TRGCDCTrackMC*
   TTrackBase::hep(void) const
   {
     unsigned n = _links.length();

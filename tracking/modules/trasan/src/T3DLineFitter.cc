@@ -325,22 +325,22 @@ namespace Belle {
 
     //...TOF correction...
     //  momentum ???? or velocity -> assumued light velocity
-    float tof = 0.;
-    if (_tof) {
+//cnv    float tof = 0.;
+//cnv    if (_tof) {
       //    double length = ((onTrack - t.x0())*t.k())/t.k().mag();
-      double tl = t.tanl();
-      double length = ((onTrack - t.x0()) * t.k()) / sqrt(1 + tl * tl);
-      static const double Ic = 1 / 29.9792; //1/[cm/ns]
-      tof = length * Ic;
-    }
+//cnv      double tl = t.tanl();
+//cnv      double length = ((onTrack - t.x0()) * t.k()) / sqrt(1 + tl * tl);
+//cnv      static const double Ic = 1 / 29.9792; //1/[cm/ns]
+//cnv      tof = length * Ic;
+//cnv    }
 
     //...T0 and propagation corrections...
 //int wire = h.wire()->id();
     int wire = h.wire().id();
     int side = leftRight;
     if (side == 0) side = -1;
-    float p[3] = { -t.sinPhi0(), t.cosPhi0(), t.tanl()};
-    float x[3] = {onWire.x(), onWire.y(), onWire.z()};
+    float p[3] = {float( -t.sinPhi0()), float(t.cosPhi0()), float(t.tanl())};
+    float x[3] = {float(onWire.x()), float(onWire.y()), float(onWire.z())};
 //cnv  float time = h.reccdc()->m_tdc + t0Offset - tof;
     float time = 0;
     float dist;

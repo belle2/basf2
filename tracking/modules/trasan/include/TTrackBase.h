@@ -268,10 +268,10 @@ namespace Belle {
     virtual int fit(void);
 
     /// returns a pointer to a default fitter.
-    const TFitter* const fitter(void) const;
+    const TFitter* fitter(void) const;
 
     /// sets a default fitter.
-    const TFitter* const fitter(const TFitter*);
+    const TFitter* fitter(const TFitter*);
 
     /// false Fit
     void falseFit(); // added by matsu ( 1999/05/24 )
@@ -281,13 +281,13 @@ namespace Belle {
 
   public:// MC information
     /// returns Belle2::TRGCDCTrackMC.
-    const Belle2::TRGCDCTrackMC* const hep(void) const;
+    const Belle2::TRGCDCTrackMC* hep(void) const;
 
     /// returns \# of contributed Belle2::TRGCDCTrackMC tracks.
     unsigned nHeps(void) const;
 
     /// returns a pointer to TTrackMC.
-    const TTrackMC* const mc(void) const;
+    const TTrackMC* mc(void) const;
 
   public:// Obsolete functions. Followings should be removed in Trasan 2.
     /// returns true if fitted.
@@ -400,21 +400,21 @@ namespace Belle {
   }
 
   inline
-  const TTrackMC* const
+  const TTrackMC*
   TTrackBase::mc(void) const
   {
     return _mc;
   }
 
   inline
-  const TFitter* const
+  const TFitter*
   TTrackBase::fitter(void) const
   {
     return _fitter;
   }
 
   inline
-  const TFitter* const
+  const TFitter*
   TTrackBase::fitter(const TFitter* a)
   {
     _fitted = false;

@@ -138,8 +138,8 @@ void
 TRGCDCLink::dump_base(const string & msg, const string & pre) const {
 
     //...Basic options...
-    bool track = (msg.find("track") != string::npos);
-    bool mc = (msg.find("mc") != string::npos);
+//  bool track = (msg.find("track") != string::npos);
+//  bool mc = (msg.find("mc") != string::npos);
     bool pull = (msg.find("pull") != string::npos);
     bool flag = (msg.find("flag") != string::npos);
     bool stereo = (msg.find("stereo") != string::npos);
@@ -149,9 +149,10 @@ TRGCDCLink::dump_base(const string & msg, const string & pre) const {
     bool breif = (msg.find("breif") != string::npos);
     bool detail = (msg.find("detail") != string::npos);
     if (detail)
-	track = mc = pull = flag = stereo = pos = true;
+//	track = mc = pull = flag = stereo = pos = true;
+	pull = flag = stereo = pos = true;
     if (breif)
-	mc = pull = flag = true;
+	pull = flag = true;
 
     //...Output...
     cout << pre;
@@ -691,7 +692,7 @@ TRGCDCLink::nMissingAxialSuperLayers(const vector<TRGCDCLink *> & links) {
 
 const Belle2::TRGCDCTrackMC &
 TRGCDCLink::links2HEP(const vector<TRGCDCLink *> & ) {
-    const Belle2::TRGCDCTrackMC * best = NULL;
+    const Belle2::TRGCDCTrackMC * best = 0;
     const vector<const Belle2::TRGCDCTrackMC *> list = Belle2::TRGCDCTrackMC::list();
     unsigned nHep = list.size();
 
@@ -719,6 +720,8 @@ TRGCDCLink::links2HEP(const vector<TRGCDCLink *> & ) {
 	    nMax = N[i];
 	}
     }
+
+    free(N);
 
     return * best;
 }

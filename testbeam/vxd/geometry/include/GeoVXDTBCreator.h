@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOTBCREATOR_H_
-#define GEOTBCREATOR_H_
+#ifndef GEOVXDTBCREATOR_H_
+#define GEOVXDTBCREATOR_H_
 
 #include <pxd/simulation/SensitiveDetector.h>
 #include <svd/simulation/SensitiveDetector.h>

@@ -50,6 +50,9 @@ namespace Belle2 {
     StoreArray<PIDLikelihood>::registerPersistent();
     RelationArray::registerPersistent<Track, PIDLikelihood>();
 
+    StoreArray<TOPLikelihood>::optional();
+    StoreArray<ARICHLikelihood>::optional();
+    StoreArray<DedxLikelihood>::optional();
   }
 
 
@@ -72,7 +75,6 @@ namespace Belle2 {
 
     // output
     StoreArray<PIDLikelihood> pidLikelihoods;
-    pidLikelihoods.create();
 
     // loop over reconstructed tracks and collect likelihoods
     for (int itra = 0; itra < tracks.getEntries(); ++itra) {

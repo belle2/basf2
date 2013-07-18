@@ -10,6 +10,7 @@
 
 #include "../include/TwoHitFilters.h"
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <math.h>
 
 
 using namespace std;
@@ -23,4 +24,11 @@ double TwoHitFilters::filterNan(double value)
   if ((boost::math::isnan)(value) == true) return 0;
   return value;
 
+}
+
+
+double TwoHitFilters::fullSlopeRZ()
+{
+  double slope = sqrt(m_x2 + m_y2) / m_dz;
+  return filterNan(slope);
 }

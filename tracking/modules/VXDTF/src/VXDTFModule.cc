@@ -1164,14 +1164,16 @@ void VXDTFModule::the_real_event()
   VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
 
   // importing hits
+  int nTotalClustersThreshold = 0; // counts maximum number of allowed clusters to execute the baseline TF, is number of layers*2 (for svd it's number of Layers*4 because of 1D-Clusters)
   StoreArray<PXDCluster> aPxdClusterArray;
   int numOfPxdClusters = 0;
-  if (m_usePXDorSVDorVXDhits not_eq 1) { numOfPxdClusters = aPxdClusterArray.getEntries(); } // only filled, if we want to use them
+  if (m_usePXDorSVDorVXDhits not_eq 1) { numOfPxdClusters = aPxdClusterArray.getEntries(); nTotalClustersThreshold += 4; } // only filled, if we want to use them
   StoreArray<SVDCluster> aSvdClusterArray;
   int numOfSvdClusters = 0;
-  if (m_usePXDorSVDorVXDhits not_eq 0) { numOfSvdClusters = aSvdClusterArray.getEntries(); }
+  if (m_usePXDorSVDorVXDhits not_eq 0) { numOfSvdClusters = aSvdClusterArray.getEntries(); nTotalClustersThreshold += 16;}
   thisInfoPackage.numPXDCluster = numOfPxdClusters;
   thisInfoPackage.numSVDCluster = numOfSvdClusters;
+  int nTotalClusters = numOfPxdClusters + numOfSvdClusters; // counts number of clusters total
 
   // preparing storearray for trackCandidates and fitted tracks
   StoreArray<GFTrackCand> finalTrackCandidates(m_PARAMgfTrackCandsColName);
@@ -1202,8 +1204,8 @@ void VXDTFModule::the_real_event()
    * 1 track and no hits of secondary particles. the first check only tests for the most complicated case of a cosmic particle
    * passing each layer twice and hitting the overlapping regions (which results in 2 hits at the same layer in neighbouring ladders)
    * */
-  float totalClusters = float(numOfPxdClusters) + float(numOfSvdClusters) * 0.5 - 1.;
-  if (totalClusters < 0/*float(2*m_passSetupVector.at(0)->numTotalLayers)*/) {   /// TODO WARNING auskommentiert until further use
+  if (nTotalClusters - 1 < nTotalClustersThreshold) {
+    B2DEBUG(1, " requirements for baseline TF fullfilled, starting simpleEventReco...")
     bool successfullyReconstructed = simpleEventReco(clustersOfEvent, aPxdClusterArray, aSvdClusterArray); // aSvdClusterArray, aPxdClusterArray, m_tcVector, m_trackletFilterBox, m_threeHitFilterBox
     if (successfullyReconstructed == true) {
       // TODO, hier fehlt noch die Schleife von gegen Ende des Events, wo die notwendigen Sachen für den GFTCoutput vorbereitet werden (und auch die GFTrackCands im finalTrackCandidates-container appended werden)
@@ -1226,6 +1228,8 @@ void VXDTFModule::the_real_event()
         }
         finalTrackCandidates.appendNew(gfTC);
       }
+
+
     }
   }
 
@@ -1306,80 +1310,16 @@ void VXDTFModule::the_real_event()
 
   int numOfClusterCombis = 0;
   if (m_usePXDorSVDorVXDhits not_eq 0) {   /// means: is true when at least one pass wants SVD hits
-    typedef pair<int, SensorStruct > mapEntry;
     map<int, SensorStruct > activatedSensors; // mapEntry.first: vxdID, mapEntry.second SensorStruct having some extra info
     vector<ClusterHit> clusterHitList;
 
-    find2DSVDHits(activatedSensors, clusterHitList, aSvdClusterArray);
-
     // store each cluster (as a clusterPtr) in a map(uniID, sensorStruct), where sensorStruct contains 2 vectors (uClusters and vClusters).
-    // in the end a map containing illuminated sensors - and each cluster inhabiting them - exists.
-    /// old code:  (now find2DSVDHits)
-//     map<int, SensorStruct>::iterator sensorIter;
-//     for (int iPart = 0; iPart < numOfSvdClusters; ++iPart) {
-//
-//       SVDCluster* aClusterPtr = aSvdClusterArray[iPart];
-//
-//       aVxdID = aClusterPtr->getSensorID();
-//       int aUniID = aVxdID.getID();
-//       sensorIter = activatedSensors.find(aUniID);
-//       if (sensorIter == activatedSensors.end()) {
-//         SensorStruct newSensor;
-//         newSensor.layerID = aVxdID.getLayerNumber();
-//         sensorIter = activatedSensors.insert(sensorIter, mapEntry(aUniID, newSensor)); //activatedSensors.find(aUniID);
-//       }
-//       if (aClusterPtr->isUCluster() == true) {
-//         sensorIter->second.uClusters.push_back(make_pair(iPart, aClusterPtr));
-//       } else {
-//         sensorIter->second.vClusters.push_back(make_pair(iPart, aClusterPtr));
-//       }
-//     }
-//     B2DEBUG(20, activatedSensors.size() << " SVD sensors activated...")
-//
-//     // iterate through map & combine each possible combination of clusters. Store them in a vector of structs, where each struct carries an u & a v cluster
-//     int occupancy = m_TESTERSVDOccupancy.size(), numHits = 0;
-//     BOOST_FOREACH(mapEntry aSensor, activatedSensors) {
-//       int numUclusters = aSensor.second.uClusters.size();
-//       int numVclusters = aSensor.second.vClusters.size();
-//       B2DEBUG(100, " sensor " << FullSecID(aSensor.first).getFullSecString() << " has got " << numUclusters << " uClusters and " << numVclusters << " vClusters")
-//       if (numUclusters == 0 || numVclusters == 0) {
-//         m_TESTERbadSectorRangeCounterForClusters++;
-//         B2DEBUG(1, "at event: " << m_eventCounter << " sensor " << FullSecID(aSensor.first).getFullSecString() << " at layer " << aSensor.second.layerID << " has got " << numUclusters << "/" << numVclusters << " u/vclusters!")
-//       }
-//       if (numUclusters != numVclusters) {
-//         m_TESTERclustersPersSectorNotMatching++;
-//         if (m_PARAMDebugMode == true) {
-//           B2DEBUG(1, "at event: " << m_eventCounter << " at sensor " << FullSecID(aSensor.first).getFullSecString() << " at layer " << aSensor.second.layerID << " number of clusters do not match: Has got " << numUclusters << "/" << numVclusters << " u/vclusters!")
-//         }
-//       }
-//
-//       for (int uClNum = 0; uClNum < numUclusters; ++uClNum) {
-//         for (int vClNum = 0; vClNum < numVclusters; ++vClNum) {
-//           ClusterHit aHit;
-//           aHit.uCluster = aSensor.second.uClusters[uClNum].second;
-//           aHit.uClusterIndex = aSensor.second.uClusters[uClNum].first; // real index number for storearray of svdCluster
-//           aHit.vCluster = aSensor.second.vClusters[vClNum].second;
-//           aHit.vClusterIndex = aSensor.second.vClusters[vClNum].first;
-//           clusterHitList.push_back(aHit);
-//           ++numHits;
-//         }
-//       }
-//
-//       // protocolling number of 2D-cluster-combinations per sensor
-//       if (numHits == 0) { continue; }
-//       if (occupancy < numHits) {
-//         m_TESTERSVDOccupancy.resize(numHits+1, 0);
-//         occupancy = numHits;
-//       }
-//       m_TESTERSVDOccupancy[numHits - 1] += 1;
-//       if (m_PARAMhighOccupancyThreshold < numHits) {
-//         m_highOccupancyCase = true;
-//         m_TESTERhighOccupancyCtr++;
-//       } else { m_highOccupancyCase = false; }
-//
-//       numHits = 0;
-//     }
-    /// old code end (now find2DSVDHits)
+    // in the end a map containing illuminated sensors - and each cluster inhabiting them - exists:
+    findSensors4Clusters(activatedSensors, aSvdClusterArray);
+
+    // iterate through map of activated sensors & combine each possible combination of clusters. Store them in a vector of structs, where each struct carries an u & a v cluster:
+    find2DSVDHits(activatedSensors, clusterHitList);
+
     numOfClusterCombis = clusterHitList.size();
 
     BOOST_FOREACH(ClusterHit & aClusterCombi, clusterHitList) {
@@ -3932,12 +3872,13 @@ void VXDTFModule::writeToRootFile(double pValue, double chi2, int ndf)
 bool VXDTFModule::simpleEventReco(vector<ClusterInfo>& clusters, const StoreArray<PXDCluster>& aPxdClusterArray, const StoreArray<SVDCluster>& aSvdClusterArray)
 {
   PositionInfo newPosition;
-//  {
-//       TVector3 hitPosition; /**< contains global hitPosition */
-//       double sigmaX; /**< error in x-direction of hitPosition in global coordinates */
-//       double sigmaY; /**< error of y-direction of hitPosition in global coordinates */
-//     };
   TVector3 hitLocal;
+  VxdID aVxdID;
+  int aLayerID, numOfPxdClusters = 0;
+  map<int, SensorStruct> activatedSensors;
+  vector<ClusterHit> clusterHitList;
+  vector<VXDTFHit> vxdHits;
+  if (m_usePXDorSVDorVXDhits != 1) { numOfPxdClusters = aPxdClusterArray.getEntries(); }
 
   BOOST_FOREACH(ClusterInfo & aCluster, clusters) {
     bool isPXD = aCluster.isPXD();
@@ -3946,63 +3887,112 @@ bool VXDTFModule::simpleEventReco(vector<ClusterInfo>& clusters, const StoreArra
     if ((m_usePXDorSVDorVXDhits != 1) && (isPXD == true)) {
       const PXDCluster* const aClusterPtr = aPxdClusterArray[realClusterIndex];
 
-      B2DEBUG(100, "simpleEventReco::pxdCluster has clusterIndexUV: " << realClusterIndex << " with collected charge: " << aClusterPtr->getCharge() << " and their infoClass is at: " << realClusterIndex << " with collected charge: " << aPxdClusterArray[realClusterIndex]->getCharge())
-
       hitLocal.SetXYZ(aClusterPtr->getU(), aClusterPtr->getV(), 0);
 
-      VxdID aVxdID = aClusterPtr->getSensorID();
-      int aLayerID = aVxdID.getLayerNumber();
+      aVxdID = aClusterPtr->getSensorID();
+      aLayerID = aVxdID.getLayerNumber();
       const VXD::SensorInfoBase& aSensorInfo = dynamic_cast<const VXD::SensorInfoBase&>(VXD::GeoCache::get(aVxdID)); /// WARNING geht das? Lösungshilfe: vxd/geometry/GeoCache.h Zeile ~72
       newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
       newPosition.sigmaX = m_errorContainer.at(aLayerID - 1).first;
       FullSecID aSecID = FullSecID(aVxdID, false, 0);
       VXDTFHit newHit = VXDTFHit(newPosition, 1, NULL, NULL, &aCluster, Const::PXD, aSecID.getFullSecID(), aVxdID, 0);
-
-//      currentPass->push_back(newHit);
+      vxdHits.push_back(newHit);
+      //      currentPass->push_back(newHit);
     } else if ((m_usePXDorSVDorVXDhits != 0) && (isPXD == false)) {
-      /** TODO TODO TODO WARNING TODO
-       * hier muss die find2DSVDHits-fkt mit passenden Vorarbeiten durchgeackert werden, um alle nötigen Infos für den VXDTFHit
-       * zusammentragen zu können. Sollte möglichst bald erledigt werden!
-       * */
-//      const SVDCluster* const aClusterPtr = aSvdClusterArray[realClusterIndex];
-//
-// //       VXDTFHit(PositionInfo hitPos, int passIndex, ClusterInfo* clusterIndexU, ClusterInfo* clusterIndexV, ClusterInfo* clusterIndexUV, int detectorType, unsigned int papaSector, VxdID aVxdID, float timeStamp):
-//       VXDTFHit newHit = VXDTFHit(newPosition, 1, NULL, NULL, &aCluster, Const::PXD, aSecID.getFullSecID(), aVxdID, 0);
-//
-//         currentPass->push_back(newHit);
+      const SVDCluster* const aClusterPtr = aSvdClusterArray[realClusterIndex];
+      findSensor4Cluster(activatedSensors, aClusterPtr, realClusterIndex);
+      //
+      // //       VXDTFHit(PositionInfo hitPos, int passIndex, ClusterInfo* clusterIndexU, ClusterInfo* clusterIndexV, ClusterInfo* clusterIndexUV, int detectorType, unsigned int papaSector, VxdID aVxdID, float timeStamp):
+      //       VXDTFHit newHit = VXDTFHit(newPosition, 1, NULL, NULL, &aCluster, Const::PXD, aSecID.getFullSecID(), aVxdID, 0);
+      //
+      //         currentPass->push_back(newHit);
     }
   }
 
+  // now we have to iterate through the sensors of SVD-cluster again to be able to define our Hits:
+  find2DSVDHits(activatedSensors, clusterHitList);
+
+  BOOST_FOREACH(ClusterHit & aClusterCombi, clusterHitList) {
+    const SVDCluster* const uClusterPtr = aClusterCombi.uCluster; // uCluster
+    const SVDCluster* const vClusterPtr = aClusterCombi.vCluster; // vCluster
+    int clusterIndexU = aClusterCombi.uClusterIndex;
+    int clusterIndexV = aClusterCombi.vClusterIndex;
+
+    float timeStampU = uClusterPtr->getClsTime();
+    float timeStampV = vClusterPtr->getClsTime();
+
+    aVxdID = uClusterPtr->getSensorID();
+    aLayerID = aVxdID.getLayerNumber();
+    const VXD::SensorInfoBase& aSensorInfo = dynamic_cast<const VXD::SensorInfoBase&>(VXD::GeoCache::get(aVxdID));
+    if ((aSensorInfo.getBackwardWidth() > aSensorInfo.getForwardWidth()) == true) {   // isWedgeSensor
+      hitLocal.SetX((aSensorInfo.getWidth(vClusterPtr->getPosition()) / aSensorInfo.getWidth(0)) * uClusterPtr->getPosition());
+    } else { // rectangular Sensor
+      hitLocal.SetX(uClusterPtr->getPosition());
+    }
+    hitLocal.SetY(vClusterPtr->getPosition()); // always correct
+    hitLocal.SetZ(0.);
+
+    newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
+    newPosition.sigmaX = m_errorContainer.at(aLayerID - 1).first;
+
+    FullSecID aSecID = FullSecID(aVxdID, false, 0);
+    VXDTFHit newHit = VXDTFHit(newPosition, 1,  &clusters[clusterIndexU + numOfPxdClusters], &clusters[clusterIndexV + numOfPxdClusters], NULL, Const::SVD, aSecID.getFullSecID(), aVxdID, 0.5 * (timeStampU + timeStampV));
+
+    vxdHits.push_back(newHit);
+  }
+
+  /// now all hits are stored. To find out the occupancy of layers and ladders, the following step is done:
+  stringstream testOutput;
+  testOutput << " having hits in following secID/secID/Detector/clusterIndexU/V/UV: ";
+  BOOST_FOREACH(VXDTFHit & hit, vxdHits) {
+    testOutput << hit.getSectorString() << "/" << hit.getSectorName() << "/" << hit.getDetectorType() << "/" << hit.getClusterIndexU() << "/" << hit.getClusterIndexV() << "/" << hit.getClusterIndexUV() << " ";
+  }
+  B2WARNING(m_PARAMnameOfInstance << " - event " << m_eventCounter << ": " << testOutput.str())
   return true; // is true if reconstruction was successfull
 } // aSvdClusterArray, aPxdClusterArray, m_tcVector, m_trackletFilterBox, m_threeHitFilterBox
 
-void VXDTFModule::find2DSVDHits(std::map<int, SensorStruct>& activatedSensors, std::vector<ClusterHit>& clusterHitList, const StoreArray<SVDCluster>& aSvdClusterArray)
+
+
+// store each cluster (as a clusterPtr) in a map(uniID, sensorStruct), where sensorStruct contains 2 vectors (uClusters and vClusters).
+// in the end a map containing illuminated sensors - and each cluster inhabiting them - exists.
+void VXDTFModule::findSensors4Clusters(std::map<int, SensorStruct>& activatedSensors, const StoreArray<SVDCluster>& aSvdClusterArray)
 {
-  // store each cluster (as a clusterPtr) in a map(uniID, sensorStruct), where sensorStruct contains 2 vectors (uClusters and vClusters).
-  // in the end a map containing illuminated sensors - and each cluster inhabiting them - exists.
   map<int, SensorStruct>::iterator sensorIter;
   typedef pair<int, SensorStruct > mapEntry;
-  for (int iPart = 0; iPart < aSvdClusterArray.getEntries(); ++iPart) { /// numOfSvdClusters !!!
-
-    SVDCluster* aClusterPtr = aSvdClusterArray[iPart];
-
-    VxdID aVxdID = aClusterPtr->getSensorID();
-    int aUniID = aVxdID.getID();
-    sensorIter = activatedSensors.find(aUniID);
-    if (sensorIter == activatedSensors.end()) {
-      SensorStruct newSensor;
-      newSensor.layerID = aVxdID.getLayerNumber();
-      sensorIter = activatedSensors.insert(sensorIter, mapEntry(aUniID, newSensor)); //activatedSensors.find(aUniID);
-    }
-    if (aClusterPtr->isUCluster() == true) {
-      sensorIter->second.uClusters.push_back(make_pair(iPart, aClusterPtr));
-    } else {
-      sensorIter->second.vClusters.push_back(make_pair(iPart, aClusterPtr));
-    }
+  for (int iPart = 0; iPart < aSvdClusterArray.getEntries(); ++iPart) {
+    const SVDCluster* aClusterPtr = aSvdClusterArray[iPart];
+    findSensor4Cluster(activatedSensors, aClusterPtr, iPart);
   }
   B2DEBUG(20, activatedSensors.size() << " SVD sensors activated...")
+}
 
-  // iterate through map & combine each possible combination of clusters. Store them in a vector of structs, where each struct carries an u & a v cluster
+
+// store a cluster (as a clusterPtr) in a map(uniID, sensorStruct), where sensorStruct contains 2 vectors (uClusters and vClusters).
+void VXDTFModule::findSensor4Cluster(std::map<int, SensorStruct>& activatedSensors, const SVDCluster* aClusterPtr, int partNr)
+{
+  map<int, SensorStruct>::iterator sensorIter;
+  typedef pair<int, SensorStruct > mapEntry;
+
+  VxdID aVxdID = aClusterPtr->getSensorID();
+  int aUniID = aVxdID.getID();
+  sensorIter = activatedSensors.find(aUniID);
+  if (sensorIter == activatedSensors.end()) {
+    SensorStruct newSensor;
+    newSensor.layerID = aVxdID.getLayerNumber();
+    sensorIter = activatedSensors.insert(sensorIter, mapEntry(aUniID, newSensor)); //activatedSensors.find(aUniID);
+  }
+  if (aClusterPtr->isUCluster() == true) {
+    sensorIter->second.uClusters.push_back(make_pair(partNr, aClusterPtr));
+  } else {
+    sensorIter->second.vClusters.push_back(make_pair(partNr, aClusterPtr));
+  }
+}
+
+
+// iterate through map of activated sensors & combine each possible combination of clusters. Store them in a vector of structs, where each struct carries an u & a v cluster
+void VXDTFModule::find2DSVDHits(std::map<int, SensorStruct>& activatedSensors, std::vector<ClusterHit>& clusterHitList)
+{
+  typedef pair<int, SensorStruct > mapEntry;
   int occupancy = m_TESTERSVDOccupancy.size(), numHits = 0;
   BOOST_FOREACH(mapEntry aSensor, activatedSensors) {
     int numUclusters = aSensor.second.uClusters.size();

@@ -79,6 +79,9 @@ namespace Belle2 {
         return filterNan(slope);
       } // return unit: cm  (cm^2/cm = cm)
 
+      /** calculates the real slope of the hits in RZ, return unit: (sqrt(cm^2)/cm = none) */
+      double fullSlopeRZ();
+
       /** calculates the normed distance between the hits (3D), return unit: none */
       double calcNormedDist3D() {
         double normedVal = (m_x2 + m_y2) / (m_x2 + m_y2 + m_z2);

@@ -114,16 +114,16 @@ namespace Belle2 {
       /** structs for internal use **/
       /** SensorStruct needed for SVDCluster sorting, stores u and v clusters of Sensor  */
       struct SensorStruct {
-        std::vector<std::pair<int, Belle2::SVDCluster*> > uClusters; /**< .first is arrayIndex in StoreArray, .second is pointer to the Cluster itself */
-        std::vector<std::pair<int, Belle2::SVDCluster*> > vClusters; /**< same as uClusters, but for vClusters  */
+        std::vector<std::pair<int, const Belle2::SVDCluster*> > uClusters; /**< .first is arrayIndex in StoreArray, .second is pointer to the Cluster itself */
+        std::vector<std::pair<int, const Belle2::SVDCluster*> > vClusters; /**< same as uClusters, but for vClusters  */
         int layerID; /**< layer ID of the Cluster */
       };
 
 
       /** needed for SVDCluster sorting, represents a 2D-cluster (combining 2 1D-clusters) */
       struct ClusterHit {
-        SVDCluster* uCluster; /**< pointer to uCluster of current Hit */
-        SVDCluster* vCluster; /**< pointer to vCluster of current Hit */
+        const SVDCluster* uCluster; /**< pointer to uCluster of current Hit */
+        const SVDCluster* vCluster; /**< pointer to vCluster of current Hit */
         int uClusterIndex; /**< index number of uCluster of current Hit */
         int vClusterIndex; /**< index number of uCluster of current Hit */
       };
@@ -431,8 +431,14 @@ namespace Belle2 {
       /** fast bypass for very simple events having not more than 2 easily distinguishable tracks and cosmic events */
       bool simpleEventReco(std::vector<ClusterInfo>& clusters, const StoreArray<PXDCluster>& aPxdClusterArray, const StoreArray<SVDCluster>& aSvdClusterArray);
 
-      /** combines 1D clusters to all possible 2D combinations*/
-      void  find2DSVDHits(std::map<int, SensorStruct>& activatedSensors, std::vector<ClusterHit>& clusterHitList, const StoreArray<SVDCluster>& aSvdClusterArray);
+      /** store each cluster (as a clusterPtr) in a map(uniID, sensorStruct), where sensorStruct contains 2 vectors (uClusters and vClusters). In the end a map containing illuminated sensors - and each cluster inhabiting them - exists */
+      void findSensors4Clusters(std::map<int, SensorStruct>& activatedSensors, const StoreArray<SVDCluster>& aSvdClusterArray);
+
+      /** store a cluster (as a clusterPtr) in a map(uniID, sensorStruct), where sensorStruct contains 2 vectors (uClusters and vClusters), subroutine for findSensors4Clusters and simpleEventReco */
+      void findSensor4Cluster(std::map<int, SensorStruct>& activatedSensors, const SVDCluster* aClusterPtr, int partNr);
+
+      /** iterate through map of activated sensors & combine each possible combination of clusters. Store them in a vector of structs, where each struct carries an u & a v cluster */
+      void find2DSVDHits(std::map<int, SensorStruct>& activatedSensors, std::vector<ClusterHit>& clusterHitList);
       //    /** general Function to write data into a root file*/
       //    void VXDTFModule::writeToRootFile(const Tracking::T_type1& variable, const std::string& branchName, const std::string &treeName);
       /** random generator function */

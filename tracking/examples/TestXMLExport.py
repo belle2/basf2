@@ -44,7 +44,7 @@ geometry.param('Components', ['MagneticField', 'TB'])
 
 exportXML = register_module('ExportSectorMap')
 exportXML.logging.log_level = LogLevel.DEBUG
-exportXML.logging.debug_level = 1
+exportXML.logging.debug_level = 111
 exportXML.param('detectorType', detectType)
 exportXML.param('sectorSetup', secSetup)
 

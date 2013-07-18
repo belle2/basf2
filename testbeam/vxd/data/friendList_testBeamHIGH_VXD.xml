@@ -1290,7 +1290,7 @@
           </aFilter>
         </filterList>
       </aFriend>
-      <aFriend>
+ <!--     <aFriend>
         <friendID>50_41376_2</friendID>
         <filterList>
           <aFilter>
@@ -1621,7 +1621,7 @@
             </cuts>
           </aFilter>
         </filterList>
-      </aFriend>
+			</aFriend> -->
     </friendList>
   </aSector>
   <aSector>
@@ -11781,7 +11781,7 @@
   <aSector>
     <secID>30_24928_4</secID>
     <friendList>
-      <aFriend>
+     <!-- <aFriend>
         <friendID>40_33152_1</friendID>
         <filterList>
           <aFilter>
@@ -11946,7 +11946,7 @@
             </cuts>
           </aFilter>
         </filterList>
-      </aFriend>
+			</aFriend>-->
       <aFriend>
         <friendID>00_00_0</friendID>
         <filterList>
@@ -11987,7 +11987,7 @@
           </aFilter>
         </filterList>
       </aFriend>
-      <aFriend>
+    <!--  <aFriend>
         <friendID>60_49600_4</friendID>
         <filterList>
           <aFilter>
@@ -12152,8 +12152,8 @@
             </cuts>
           </aFilter>
         </filterList>
-      </aFriend>
-      <aFriend>
+      </aFriend>-->
+    <!--  <aFriend>
         <friendID>60_49600_1</friendID>
         <filterList>
           <aFilter>
@@ -12318,8 +12318,8 @@
             </cuts>
           </aFilter>
         </filterList>
-      </aFriend>
-      <aFriend>
+      </aFriend>-->
+     <!-- <aFriend>
         <friendID>50_41376_4</friendID>
         <filterList>
           <aFilter>
@@ -12484,8 +12484,8 @@
             </cuts>
           </aFilter>
         </filterList>
-      </aFriend>
-      <aFriend>
+      </aFriend>-->
+     <!-- <aFriend>
         <friendID>50_41376_2</friendID>
         <filterList>
           <aFilter>
@@ -12650,8 +12650,8 @@
             </cuts>
           </aFilter>
         </filterList>
-      </aFriend>
-      <aFriend>
+      </aFriend>-->
+     <!-- <aFriend>
         <friendID>50_41376_1</friendID>
         <filterList>
           <aFilter>
@@ -12816,7 +12816,7 @@
             </cuts>
           </aFilter>
         </filterList>
-      </aFriend>
+      </aFriend>-->
     </friendList>
   </aSector>
   <aSector>
@@ -13714,7 +13714,7 @@
           </aFilter>
         </filterList>
       </aFriend>
-      <aFriend>
+   <!--   <aFriend>
         <friendID>60_49600_4</friendID>
         <filterList>
           <aFilter>
@@ -13879,8 +13879,8 @@
             </cuts>
           </aFilter>
         </filterList>
-      </aFriend>
-      <aFriend>
+      </aFriend>-->
+   <!--   <aFriend>
         <friendID>60_49600_2</friendID>
         <filterList>
           <aFilter>
@@ -14045,8 +14045,8 @@
             </cuts>
           </aFilter>
         </filterList>
-      </aFriend>
-      <aFriend>
+      </aFriend>-->
+   <!--   <aFriend>
         <friendID>50_41376_5</friendID>
         <filterList>
           <aFilter>
@@ -14211,8 +14211,8 @@
             </cuts>
           </aFilter>
         </filterList>
-      </aFriend>
-      <aFriend>
+      </aFriend>-->
+   <!--   <aFriend>
         <friendID>50_41376_4</friendID>
         <filterList>
           <aFilter>
@@ -14377,7 +14377,7 @@
             </cuts>
           </aFilter>
         </filterList>
-      </aFriend>
+      </aFriend>-->
       <aFriend>
         <friendID>10_8480_1</friendID>
         <filterList>

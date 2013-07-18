@@ -216,7 +216,9 @@ void ExportSectorMapModule::initialize()
   VXDTFSecMap newSecMap = VXDTFSecMap();
   newSecMap.setSectorMap(m_fullSectorMapCopy);
   newSecMap.setMapName(chosenSetup);
-  file << Stream::escapeXML(Stream::serialize(&newSecMap));
+  string  tagName = "<" + chosenSetup + ">\n";
+  string  endTagName = "\n</" + chosenSetup + ">\n";
+  file << tagName << Stream::escapeXML(Stream::serialize(&newSecMap)) << endTagName;
 
   boostClock::time_point stopTimer = boostClock::now();
   m_fillStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);

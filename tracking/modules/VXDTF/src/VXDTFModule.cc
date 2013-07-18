@@ -18,7 +18,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <geometry/GeometryManager.h>
 #include <geometry/bfieldmap/BFieldMap.h>
-
+#include <tracking/dataobjects/VXDTFSecMap.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -871,10 +871,19 @@ void VXDTFModule::beginRun()
     /// importing sectorMap including friend Information and friend specific cutoffs
     newPass->sectorMap.clear();
     totalFriendCounter = 0;
-
     GearDir belleDir("/Detector/Tracking/CATFParameters/");
 
     string chosenSetup = (boost::format("sectorList_%1%_%2%") % newPass->sectorSetup  % newPass->chosenDetectorType).str();
+    string testSetup = "sectorList_testBeamSTD3_VXD";
+
+    typedef vector < pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > > > > SecMapBla;
+    VXDTFSecMap anotherMap;
+//    const SecMapBla& importedMap = anotherMap.getSectorMap();
+//    B2ERROR(" neue imported Map hat " << importedMap.size() << " einträge")
+    string directory = "/Detector/Tracking/CATFParameters/" + testSetup;
+    const VXDTFSecMap* newMap = dynamic_cast<const VXDTFSecMap*>(Gearbox::getInstance().getTObject(directory.c_str()));
+    const SecMapBla& importedMap = newMap->getSectorMap();
+    B2ERROR(" neue imported Map hat " << importedMap.size() << " einträge")
 
     GearDir sectorList(belleDir, chosenSetup);
 

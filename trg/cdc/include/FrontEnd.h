@@ -86,6 +86,10 @@ class TRGCDCFrontEnd
 				    const TRGState & output);
 
     /// Unpacks TRGState.
+    static void unpackerInnerOutside(const TRGState & input,
+				    const TRGState & output);
+
+    /// Unpacks TRGState.
     static void unpackerOuterInside(const TRGState & input,
 				    const TRGState & output);
 

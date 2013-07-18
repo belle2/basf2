@@ -10,8 +10,6 @@
 
 namespace Belle {
 
-#define inline
-
   bool TSegmentCurl::ms_smallcell(false);
   //ho  bool TSegmentCurl::ms_superb(false);
   bool TSegmentCurl::ms_superb(true);
@@ -103,8 +101,7 @@ namespace Belle {
   }
 
 
-  inline
-  const unsigned
+  unsigned
   TSegmentCurl::maxLocalLayerId(void) const
   {
 #if defined(HO_DEBUG)
@@ -114,8 +111,7 @@ namespace Belle {
   }
 
 
-  inline
-  const unsigned
+  unsigned
   TSegmentCurl::superLayerId(void) const
   {
 #if defined(HO_DEBUG)
@@ -125,8 +121,7 @@ namespace Belle {
   }
 
 
-  inline
-  const unsigned
+  unsigned
   TSegmentCurl::seqOfLayer(const unsigned i)
   {
 #if defined(HO_DEBUG)
@@ -137,8 +132,7 @@ namespace Belle {
   }
 
 
-  inline
-  const unsigned
+  unsigned
   TSegmentCurl::sizeOfLayer(const unsigned i)
   {
 #if defined(HO_DEBUG)
@@ -149,7 +143,6 @@ namespace Belle {
   }
 
 
-// inline
 // const unsigned
 // TSegmentCurl::maxLocalLayerId(const unsigned i)
 // {
@@ -158,7 +151,6 @@ namespace Belle {
 // }
 
 
-// inline
 // const unsigned
 // TSegmentCurl::superLayerId(const unsigned i)
 // {
@@ -167,7 +159,6 @@ namespace Belle {
 // }
 
 
-  inline
   void
   TSegmentCurl::append(TLink& e)
   {
@@ -180,7 +171,6 @@ namespace Belle {
   }
 
 
-  inline
   void
   TSegmentCurl::append(TLink* e)
   {
@@ -193,7 +183,6 @@ namespace Belle {
   }
 
 
-  inline
   void
   TSegmentCurl::append(AList<TLink> &e)
   {
@@ -207,7 +196,6 @@ namespace Belle {
   }
 
 
-  inline
   void
   TSegmentCurl::remove(TLink& e)
   {
@@ -220,7 +208,6 @@ namespace Belle {
   }
 
 
-  inline
   void
   TSegmentCurl::remove(TLink* e)
   {
@@ -233,7 +220,6 @@ namespace Belle {
   }
 
 
-  inline
   void
   TSegmentCurl::remove(AList<TLink> &e)
   {
@@ -252,7 +238,6 @@ namespace Belle {
   }
 
 
-  inline
   void
   TSegmentCurl::removeAll(void)
   {
@@ -266,9 +251,7 @@ namespace Belle {
     }
   }
 
-
-  inline
-  const unsigned
+  unsigned
   TSegmentCurl::maxSeq(void) const
   {
 #if defined(HO_DEBUG)
@@ -282,8 +265,7 @@ namespace Belle {
   }
 
 
-  inline
-  const unsigned
+  unsigned
   TSegmentCurl::layerIdOfMaxSeq(void)
   {
 #if defined(HO_DEBUG)
@@ -294,8 +276,7 @@ namespace Belle {
   }
 
 
-  inline
-  const unsigned
+  unsigned
   TSegmentCurl::numOfSeqOneLayer(void)
   {
 #if defined(HO_DEBUG)
@@ -306,8 +287,7 @@ namespace Belle {
   }
 
 
-  inline
-  const unsigned
+  unsigned
   TSegmentCurl::numOfLargeSeqLayer(void)
   {
 #if defined(HO_DEBUG)

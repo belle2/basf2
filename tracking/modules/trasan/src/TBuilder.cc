@@ -469,7 +469,7 @@ namespace Belle {
 
     //...Refine...
     AList<TLink> bad;
-    int err = _fitter.fit(t);
+    _fitter.fit(t);
 
 #ifdef TRASAN_DEBUG_DETAIL
     t.dump("breif", "after fit");
@@ -477,9 +477,9 @@ namespace Belle {
 #endif
 
     t.refine(bad, _maxSigmaStereo * 100.);
-    err = _fitter.fit(t);
+    _fitter.fit(t);
     t.refine(bad, _maxSigmaStereo * 10.);
-    err = _fitter.fit(t);
+    _fitter.fit(t);
     t.refine(bad, _maxSigmaStereo);
 #ifdef TRASAN_DEBUG_DETAIL
 //    if (nTrk == 2) {
@@ -488,7 +488,7 @@ namespace Belle {
 //    std::cout << "initial mom" << p0 << " is set" << std::endl;
 //    }
 #endif
-    err = _fitter.fit(t);
+    _fitter.fit(t);
 
 #ifdef TRASAN_DEBUG_DETAIL
     t.dump("breif", "         ");
@@ -564,13 +564,22 @@ namespace Belle {
 
       //...Refine...
       AList<TLink> bad;
-      int err = helixFitter().fit(* t);
+
+      // int err = helixFitter().fit(* t);
+      // t->refine(bad, maxSigmaStereo() * 100.);
+      // err = helixFitter().fit(* t);
+      // t->refine(bad, maxSigmaStereo() * 10.);
+      // err = helixFitter().fit(* t);
+      // t->refine(bad, maxSigmaStereo());
+      // err = helixFitter().fit(* t);
+
+      helixFitter().fit(* t);
       t->refine(bad, maxSigmaStereo() * 100.);
-      err = helixFitter().fit(* t);
+      helixFitter().fit(* t);
       t->refine(bad, maxSigmaStereo() * 10.);
-      err = helixFitter().fit(* t);
+      helixFitter().fit(* t);
       t->refine(bad, maxSigmaStereo());
-      err = helixFitter().fit(* t);
+      helixFitter().fit(* t);
 
 #ifdef TRASAN_WINDOW
       sz.clear();
@@ -1099,13 +1108,13 @@ namespace Belle {
 
       //...Refine...
       AList<TLink> bad;
-      int err = helixFitter().fit(* t);
+      helixFitter().fit(* t);
       t->refine(bad, maxSigmaStereo() * 100.);
-      err = helixFitter().fit(* t);
+      helixFitter().fit(* t);
       t->refine(bad, maxSigmaStereo() * 10.);
-      err = helixFitter().fit(* t);
+      helixFitter().fit(* t);
       t->refine(bad, maxSigmaStereo());
-      err = helixFitter().fit(* t);
+      helixFitter().fit(* t);
 
 #ifdef TRASAN_WINDOW
       sz.clear();

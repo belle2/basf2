@@ -1021,12 +1021,13 @@ TConformalFinder::findSegments(void) {
       unsigned nL = links.length();
       for (unsigned j = 0; j < nL; j++) {
         TLink& l = * links[i];
-        bool overlap = false;
-        for (unsigned k = 0; k < nT; k++) {
-          TTrack& t = * tracks[k];
-          if (t.links().hasMember(l))
-            overlap = true;
-        }
+//cnv   bool overlap = false;
+//cnv        for (unsigned k = 0; k < nT; k++) {
+//cnv          TTrack& t = * tracks[k];
+//cnv       if (t.links().hasMember(l))
+//cnv         overlap = true;
+//cnv        }
+// something wrong here
         multiLinks.append(l);
       }
       multiLinks.purge();
@@ -1088,7 +1089,7 @@ TConformalFinder::findSegments(void) {
     const AList<TSegment> & segments = t.segments();
     AList<TSegment> bads;
     unsigned used = 0;
-    TSegment* innerMost;
+//cnv    TSegment* innerMost;
     unsigned n = segments.length();
     for (unsigned i = 0; i < n; i++) {
       TSegment& s = * segments[i];
@@ -1106,7 +1107,7 @@ TConformalFinder::findSegments(void) {
 
       unsigned id = segments[i]->superLayerId();
       used |= (1 << id);
-      if (! id) innerMost = & s;
+//cnv      if (! id) innerMost = & s;
     }
 
 //      //...Check used super layers...

@@ -109,10 +109,10 @@ namespace Belle {
               const std::string& prefix = std::string("")) const;
 
     /// returns a pointer to i'th AList<TLink>.
-    const AList<TLink> * const bin(unsigned i) const;
+    const AList<TLink> * bin(unsigned i) const;
 
     /// returns a pointer to i'th AList<TLink>.
-    const AList<TLink> * const bin(int i) const;
+    const AList<TLink> * bin(int i) const;
 
     /// returns number in i'th bin.
     unsigned nBin(unsigned i) const;
@@ -181,7 +181,7 @@ namespace Belle {
 #ifdef THistogram_INLINE_DEFINE_HERE
 
   inline
-  const AList<TLink> * const
+  const AList<TLink> *
   THistogram::bin(unsigned i) const
   {
     if (i < _nBins) return _links[i];
@@ -189,7 +189,7 @@ namespace Belle {
   }
 
   inline
-  const AList<TLink> * const
+  const AList<TLink> *
   THistogram::bin(int i) const
   {
     while (i < 0) i += _nBins;

@@ -23,23 +23,23 @@ namespace Belle {
 
     ~TSegmentCurl(void);
 
-    const unsigned maxLocalLayerId(void) const;
-    const unsigned superLayerId(void) const;
-    const unsigned seqOfLayer(const unsigned);
-    const unsigned sizeOfLayer(const unsigned);
+    unsigned maxLocalLayerId(void) const;
+    unsigned superLayerId(void) const;
+    unsigned seqOfLayer(const unsigned);
+    unsigned sizeOfLayer(const unsigned);
 
-    const unsigned maxSeq(void) const;
-    const unsigned layerIdOfMaxSeq(void);
-    const unsigned numOfSeqOneLayer(void);
-    const unsigned numOfLargeSeqLayer(void);
+    unsigned maxSeq(void) const;
+    unsigned layerIdOfMaxSeq(void);
+    unsigned numOfSeqOneLayer(void);
+    unsigned numOfLargeSeqLayer(void);
 
     void setMaxSeq(const unsigned);
     void releaseMaxSeq(void);
 
-    inline const unsigned size(void) { return m_list.length(); }
+    inline unsigned size(void) { return m_list.length(); }
 
-    const unsigned maxLocalLayerId(const unsigned);
-    const unsigned superLayerId(const unsigned);
+    unsigned maxLocalLayerId(const unsigned);
+    unsigned superLayerId(const unsigned);
 
     void append(TLink&);
     void append(TLink*);

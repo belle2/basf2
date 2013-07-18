@@ -2586,11 +2586,11 @@ TCurlFinder::trace2DTrack(TCircle* circle)
   }
   qsort(angle, nSize, sizeof(double), TCurlFinder_doubleCompare); //chiisai-jun
   double maxDiffAngle = 0.;
-  unsigned maxIndex = 0;
+//  unsigned maxIndex = 0;
   for (unsigned i = 0, size = nSize; i < size - 1; ++i) {
     if (angle[i + 1] - angle[i] > maxDiffAngle) {
       maxDiffAngle = angle[i + 1] - angle[i];
-      maxIndex = i;
+//      maxIndex = i;
     }
   }
   delete [] angle;
@@ -2707,11 +2707,11 @@ TCurlFinder::trace3DTrack(TTrack* track)
   }
   qsort(angle, nSize, sizeof(double), TCurlFinder_doubleCompare); //chiisai-jun
   double maxDiffAngle = 0.;
-  unsigned maxIndex = 0;
+  // unsigned maxIndex = 0;
   for (unsigned i = 0, size = nSize; i < size - 1; ++i) {
     if (angle[i + 1] - angle[i] > maxDiffAngle) {
       maxDiffAngle = angle[i + 1] - angle[i];
-      maxIndex = i;
+      // maxIndex = i;
     }
   }
   delete [] angle;
@@ -2754,7 +2754,7 @@ TCurlFinder::mask3DTrack(TTrack* track,
 
   int pLayerId1 = static_cast<int>(layerId(2.*r));
   if(ms_superb) {
-    if(pLayerId1!=cdc.nLayers()) pLayerId1 -= 1;
+      if (unsigned(pLayerId1) != cdc.nLayers()) pLayerId1 -= 1;
   } else
   {
     if(pLayerId1 != 50)pLayerId1 -= 1;//hard coding parameter
@@ -3175,7 +3175,7 @@ TCurlFinder::make2DTrack(const AList<TLink> &seed,
   std::cout << "(TCurlFinder)  2D: Superlayer of seed = " << superLayerId << std::endl;
 #endif
 
-  bool appendFlag = false;
+//  bool appendFlag = false;
 nextStep:
 #if DEBUG_DEBUG_DETAIL
   std::cout << "(TCurlFinder)  2D: SearchPath = " << searchPath
@@ -3206,7 +3206,7 @@ nextStep:
     _cWindow.oneShot(* circle, leda_green);
 #endif
 
-    appendFlag = true;
+//    appendFlag = true;
     for (unsigned i = 0, size = cand.length(); i < size; ++i)
       circle->append(*cand[i]);
     errorFlag = circle->fitForCurl(ip);
@@ -3217,7 +3217,7 @@ nextStep:
                        searchPath, superLayerId,
                        m_param.RANGE_FOR_STEREO_SEARCH);
       if (cand.length() > 0) {
-        appendFlag = true;
+//        appendFlag = true;
         for (unsigned i = 0, size = cand.length(); i < size; ++i)
           circle->append(*cand[i]);
         errorFlag = circle->fitForCurl(ip);
@@ -3239,7 +3239,7 @@ nextStep:
       searchStereoCand(cand, preStereoCand, circle,
                        searchPath, superLayerId, m_param.RANGE_FOR_STEREO_SEARCH);
       if (cand.length() > 0) {
-        appendFlag = true;
+//        appendFlag = true;
         for (unsigned i = 0, size = cand.length(); i < size; ++i)circle->append(*cand[i]);
         errorFlag = circle->fitForCurl(ip);
         preStereoCand.remove(circle->links());
@@ -3708,7 +3708,7 @@ findIsolatedCloseHits(TLink* link)
       if (link->neighbor(i)->wire()->layerId() == layerID) {
         ++nNeighbor;
         int isolated = 1;
-        int testEach = 0; // for test
+//        int testEach = 0; // for test
         for (int j = 0; j < 7; ++j) {
           if (link->neighbor(i)->neighbor(j)) {
             if (link->neighbor(i)->neighbor(j)->wire()->layerId() == layerID &&
@@ -3718,7 +3718,7 @@ findIsolatedCloseHits(TLink* link)
 #if 1
             else if (link->neighbor(i)->neighbor(j)->wire()->layerId() == layerID &&
                      link->neighbor(i)->neighbor(j)->wire()->localId() == localID) {
-              testEach = 1;
+//              testEach = 1;
             }
 #endif
           } else break;

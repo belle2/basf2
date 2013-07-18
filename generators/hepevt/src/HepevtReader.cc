@@ -17,7 +17,6 @@
 #include <string>
 #include <stdexcept>
 #include <boost/lexical_cast.hpp>
-#include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
@@ -27,9 +26,7 @@
 using namespace std;
 using namespace Belle2;
 
-typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-boost::char_separator<char> sep(",; \t");
-
+const boost::char_separator<char> HepevtReader::sep(",; \t");
 
 void HepevtReader::open(const string& filename) throw(HepEvtCouldNotOpenFileError)
 {
@@ -44,7 +41,7 @@ int HepevtReader::getEvent(MCParticleGraph& graph, double& eventWeight) throw(He
   int eventID = -1;
   int nparticles = readEventHeader(eventID, eventWeight);
   if (nparticles <= 0) {
-    throw(HepEvtEmptyEventError() << m_lineNr << nparticles);
+    throw (HepEvtEmptyEventError() << m_lineNr << nparticles);
   }
 
   int first = graph.size();
@@ -68,7 +65,7 @@ int HepevtReader::getEvent(MCParticleGraph& graph, double& eventWeight) throw(He
     int d1 = p.getFirstDaughter();
     int d2 = p.getLastDaughter();
     if (d1 < 0 || d1 > nparticles || d2 < d1 || d2 > nparticles) {
-      throw(HepEvtInvalidDaughterIndicesError() << m_lineNr << d1 << d2 << nparticles);
+      throw (HepEvtInvalidDaughterIndicesError() << m_lineNr << d1 << d2 << nparticles);
     }
     if (d1 == 0) p.addStatus(MCParticle::c_StableInGenerator);
     //Add decays
@@ -138,7 +135,7 @@ int HepevtReader::readEventHeader(int& eventID, double& eventWeight) throw(HepEv
     try {
       fields.push_back(boost::lexical_cast<double>(tok));
     } catch (boost::bad_lexical_cast& e) {
-      throw(HepEvtConvertFieldError() << m_lineNr << index << tok);
+      throw (HepEvtConvertFieldError() << m_lineNr << index << tok);
     }
   }
 
@@ -169,9 +166,6 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle) throw(
   vector<double> fields;
   fields.reserve(15);
 
-//   typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-//   boost::char_separator<char> sep(",; \t");
-
   tokenizer tokens(line, sep);
   int index(0);
 
@@ -180,7 +174,7 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle) throw(
     try {
       fields.push_back(boost::lexical_cast<double>(tok));
     } catch (boost::bad_lexical_cast& e) {
-      throw(HepEvtConvertFieldError() << m_lineNr << index << tok);
+      throw (HepEvtConvertFieldError() << m_lineNr << index << tok);
     }
   }
 
@@ -225,6 +219,6 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle) throw(
       }
       break;
     default:
-      throw(HepEvtParticleFormatError() << m_lineNr << fields.size());
+      throw (HepEvtParticleFormatError() << m_lineNr << fields.size());
   }
 }

@@ -13,6 +13,7 @@
 
 #include <framework/core/FrameworkExceptions.h>
 #include <generators/dataobjects/MCParticleGraph.h>
+#include <boost/tokenizer.hpp>
 
 #include <string>
 #include <fstream>
@@ -88,6 +89,10 @@ namespace Belle2 {
 
 
   protected:
+    /** Just a typedef for simple use of the boost::tokenizer to split the lines */
+    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+    /** The characters at which to split, defaults to ",; \t" */
+    static const boost::char_separator<char> sep;
 
     int m_lineNr;          /**< The current line number within the ascii file. */
     std::ifstream m_input; /**< The input stream of the ascii file. */

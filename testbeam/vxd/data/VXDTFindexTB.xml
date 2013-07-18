@@ -6,7 +6,6 @@
 	<xi:include href="friendList_testBeamFINE_VXD.xml"/>
 	<xi:include href="friendList_testBeamSTD_VXD.xml"/>
 	<xi:include href="friendList_testBeamSTD2_VXD.xml"/>
-	
-
+	<xi:include href="friendList_testBeamSTD3_VXD.xml"/>
 
 </CATFParameters>

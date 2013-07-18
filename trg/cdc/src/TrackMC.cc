@@ -16,6 +16,9 @@
 
 namespace Belle2 {
 
+TRGCDCTrackMC *
+TRGCDCTrackMC::_undefined = new TRGCDCTrackMC();
+
 std::vector<const TRGCDCTrackMC *>
 TRGCDCTrackMC::_list = std::vector<const TRGCDCTrackMC *>();
 

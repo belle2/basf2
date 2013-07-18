@@ -23,6 +23,18 @@ using namespace std;
 
 namespace Belle2 {
 
+const TRGCDCLayer * TRGCDCUndefinedLayer = new TRGCDCLayer(9999,
+							   9999,
+							   9999,
+							   9999,
+							   9999,
+							   0,
+							   0,
+							   9999,
+							   9999,
+							   0,
+							   0);
+
 TRGCDCLayer::TRGCDCLayer(unsigned id,
 			 unsigned superLayerId,
 			 unsigned localLayerId,
@@ -86,7 +98,7 @@ const TRGCDCCell &
 TRGCDCLayer::cell(int id) const {
     if (_nCells == 0) {
 	cout << "TRGCDCLayer !!! This has no cell member : " << name() << endl;
-	return * (TRGCDCCell *)(0);
+	return * (TRGCDCCell *)(TRGCDCUndefinedLayer);
     }
 
     if (id < 0)

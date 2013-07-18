@@ -79,6 +79,11 @@ class TRGCDCTrackMC {
     /// returns a pointer to gen_hepevt.
 //cnv    const struct gen_hepevt * gen(void) const;
 
+  public:
+
+    /// Dummy particle.
+    static TRGCDCTrackMC * _undefined;
+
   private:
 //    const struct gen_hepevt * _hep;
     TRGCDCTrackMC * _mother;

@@ -103,7 +103,7 @@ void rPhiFit(double *rr, double *phi2, double *phierror, double &rho, double &my
   double pchi2 = -2*hcx*D-2*hcy*E+G;
   pchi2/=3;
   // Another way to calculate chi2
-  double pchi3;
+  double pchi3 = 0.; //iw
   for(unsigned i=0;i<5;i++){
     pchi3+=(2*(hcx*cos(phi2[i])+hcy*sin(phi2[i]))-rr[i])*(2*(hcx*cos(phi2[i])+hcy*sin(phi2[i]))-rr[i])/(fiterror[i]*fiterror[i]);
   }
@@ -148,7 +148,7 @@ void rPhiFit2(double *rr, double *phi2, double *phierror, double &rho, double &m
   double pchi2 = -2*hcx*D-2*hcy*E+G;
   pchi2/=nTS-2;
   // Another way to calculate chi2
-  double pchi3;
+  double pchi3 = 0.; //iw
   for(int i=0;i<nTS;i++){
     pchi3+=(2*(hcx*cos(phi2[i])+hcy*sin(phi2[i]))-rr[i])*(2*(hcx*cos(phi2[i])+hcy*sin(phi2[i]))-rr[i])/(fiterror[i]*fiterror[i]);
   }

@@ -124,9 +124,9 @@ void BFieldComponentBeamline::initialize_beamline(int isher)
       (*mapBuffer)[i][j].r   = r * Unit::m;
       (*mapBuffer)[i][j].phi = phi * M_PI / 180;
       //(*mapBuffer)[i][j].z   = z * Unit::m;
-      (*mapBuffer)[i][j].Br   = Br;
-      (*mapBuffer)[i][j].Bphi = Bphi;
-      (*mapBuffer)[i][j].Bz   = Bz;
+      (*mapBuffer)[i][j].Br   = - Br;   // flip the sign because I-parity in Yamaoka-san's data is wrong
+      (*mapBuffer)[i][j].Bphi = - Bphi; // flip the sign because I-parity in Yamaoka-san's data is wrong
+      (*mapBuffer)[i][j].Bz   = - Bz;   // flip the sign because I-parity in Yamaoka-san's data is wrong
     }
   }
 
@@ -195,11 +195,13 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
   offsetRPhi = m_offsetGridRPhi[isher];
   mapSizeRPhi = m_mapSizeRPhi[isher];
 
+  //from GEANT4 coordinate to ANSYS coordinate
+  //fabs(y) is used because field data exist only in y>0
   const double tx(-1.*point0.x());
   const double tz(-1.*point0.z());
-
   TVector3 point(tx * cos(rotate_angle) - tz * sin(rotate_angle), fabs(point0.y()),
                  tz * cos(rotate_angle) + tx * sin(rotate_angle));
+
 
   //Get the r and z component
   double r = point.Perp();
@@ -245,7 +247,7 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
     double r1 = mapBuffer[iz][ib.p[0]].r;
     double r2 = mapBuffer[iz][ib.p[1]].r;
 
-    if (r1* r2 != 0. && (fabs(phi1 - phi2) < 0.02 || fabs(r1 - r2) < 0.02)) {
+    if (r1 * r2 != 0. && (fabs(phi1 - phi2) < 0.02 || fabs(r1 - r2) < 0.02)) {
       //Cylindrical Polar Coordinates
       TVector3 point_r(r, phi, z);
       vector<TVector3> vp(4);
@@ -344,7 +346,14 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
 
   //B2DEBUG(20, "B HER3d field is calculated: z= " << z/Unit::m <<"[m] By= "<< By <<"[Tesla].")
 
-  //if(point0.y() == 0) By = 0.;
+  if (point0.y() == 0) By = 0.;
+
+  //if y<0 fabs(y), By should be flipped
+  if (point0.y() < 0) By = -1.*By;
+
+  //from ANSYS Coordinate to GEANT4 Coordinate
+  Bx = -1.*Bx;
+  Bz = -1.*Bz;
   return TVector3(Bx * cos(rotate_angle) + Bz * sin(rotate_angle), By,
                   Bz * cos(rotate_angle) - Bx * sin(rotate_angle));
 }
@@ -370,7 +379,7 @@ TVector3 BFieldComponentBeamline::calculate(const TVector3& point) const
 void BFieldComponentBeamline::terminate()
 {
 
-
+  /*
   //================================
   //check beam line magnetic field
   //================================
@@ -402,7 +411,7 @@ void BFieldComponentBeamline::terminate()
     printf("SolCheckLER s= %f [m], K0= %10.8f ,SK0= %10.8f, Bz= %f\n", s / 100., K0, SK0, Bler.Z());
     pler.Delete(); Bler.Delete();
   }
-
+  */
 
 
   B2DEBUG(10, "De-allocating the memory for the beamline magnetic field map loaded from the file"
@@ -427,7 +436,7 @@ void BFieldComponentBeamline::terminate()
   delete [] m_interBuffer_ler;
 }
 
-TVectorD BFieldComponentBeamline::calculateCoefficientRectangle(const TVector3& x, const vector<TVector3> &vx) const
+TVectorD BFieldComponentBeamline::calculateCoefficientRectangle(const TVector3& x, const vector<TVector3>& vx) const
 {
   TVectorD b(4);
   b(0) = 1;
@@ -459,7 +468,7 @@ TVectorD BFieldComponentBeamline::calculateCoefficientRectangle(const TVector3& 
   return phi;
 }
 
-TVectorD BFieldComponentBeamline::calculateCoefficientTriangle(const TVector3& x, const vector<TVector3> &vx) const
+TVectorD BFieldComponentBeamline::calculateCoefficientTriangle(const TVector3& x, const vector<TVector3>& vx) const
 {
   TVectorD b(3);
   b(0) = 1;

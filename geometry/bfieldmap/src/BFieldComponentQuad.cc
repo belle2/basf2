@@ -359,8 +359,6 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       double BX = (p0_HER / c / L) * (K1 * Y + SK1 * X + SK0);
       double BY = (p0_HER / c / L) * (K1 * X - SK1 * Y + K0);
 
-      //scale leak field
-      //BX*=0.9; BY*=0.9;
 
       Bleak.SetXYZ(BX, BY, Bs);
       Bleak.RotateZ(ROTATE / 180.*M_PI);
@@ -372,11 +370,8 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
               << ") is (Bx,By,Bz)=(" << Bleak.X() << "," << Bleak.Y() << "," << Bleak.Z() << ").")
     }
 
-    double scale_leak = 1;
-    //double scale_leak = 0.9;
-    //double scale_leak = 0;
 
-    return B + Bleak * scale_leak;
+    return B + Bleak;
   }
 
   /* in case the point is inside LER*/

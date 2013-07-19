@@ -139,7 +139,7 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
 
   //Treatment for unrealistic QC2 iron shape used for 2D-map calculation
   if (false) {
-    if (((250 < z) && (z < 320)) or((-220 < z) && (z < -160))) {
+    if (((250 < z) && (z < 320)) or ((-220 < z) && (z < -160))) {
       double angle_crossing = 0.0830;
 
       double angle_HER = - angle_crossing / 2.;

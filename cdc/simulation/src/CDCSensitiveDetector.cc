@@ -63,6 +63,8 @@ namespace Belle2 {
     GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"CDC\"]/Content");
     gd.append("/SensitiveDetector");
     m_thresholdEnergyDeposit =  Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "eV");
+    m_wireSag = gd.getBool("WireSag");
+    B2INFO("Sense wire sag in CDCSensitiveDetector on(=1)/off(=0):" << m_wireSag);
     m_thresholdEnergyDeposit *= GeV;  //GeV to MeV
     //    B2INFO("Threshold energy " << m_thresholdEnergyDeposit);
 
@@ -263,13 +265,22 @@ namespace Belle2 {
           //    std::cout << "onTrack    = " << onTrack  << std::endl;
           //    std::cout << "posW       = " << posW     << std::endl;
           if (ntry <= ntryMax) {
-            distance = dist;
-            onTrack.setX(q1[0]);
-            onTrack.setY(q1[1]);
-            onTrack.setZ(q1[2]);
-            posW.setX(q2[0]);
-            posW.setY(q2[1]);
-            posW.setZ(q2[2]);
+            if (m_wireSag) {
+              G4double ywb_sag, ywf_sag;
+              cdcg.getWirSagEffect(layerId, wires[i], q2[2], ywb_sag, ywf_sag);
+              HELWIR(xwb4, ywb_sag, zwb4, xwf4, ywf_sag, zwf4,
+                     xp,   yp,   zp,   px,   py,   pz,
+                     B_kG, charge, ntryMax, dist, q2, q1, ntry);
+            }
+            if (ntry <= ntryMax) {
+              distance = dist;
+              onTrack.setX(q1[0]);
+              onTrack.setY(q1[1]);
+              onTrack.setZ(q1[2]);
+              posW.setX(q2[0]);
+              posW.setY(q2[1]);
+              posW.setZ(q2[2]);
+            }
           }
           //hodebug
           //    std::cout << "af distance= " << distance << std::endl;

@@ -57,6 +57,8 @@ void CDCGeometryPar::clear()
   m_nSLayer = 0;
   m_nFLayer = 0;
   m_senseWireDiameter = 0.0;
+  m_senseWireTension  = 0.0;
+  m_senseWireDensity  = 0.0;
   m_fieldWireDiameter = 0.0;
   for (unsigned i = 0; i < 4; i++) {
     m_rWall[i] = 0;
@@ -174,11 +176,66 @@ void CDCGeometryPar::read()
   // Get sense wire diameter
   m_senseWireDiameter = gbxParams.getLength("SenseWire/Diameter");
 
+  // Get sense wire tension
+  m_senseWireTension = gbxParams.getLength("SenseWire/Tension");
+
+  //  // Get sense wire density
+  //  m_senseWireDensity = gbxParams.getDensity("Tungsten");
+  m_senseWireDensity = 19.3; // g/cm3  <- tentatively hard-coded here
+
+  //  std::cout << "diameter= " << m_senseWireDiameter << std::endl;
+  //  std::cout << "tension = " << m_senseWireTension  << std::endl;
+  //  std::cout << "density = " << m_senseWireDensity  << std::endl;
+
+  m_useRealGeometry = gbxParams.getBool("WhichGeometry");
+  B2INFO("Real CDC geometry in CDCGeometryPar on(=1)/off(=0):" << m_useRealGeometry);
+
   // Get field wire diameter
   m_fieldWireDiameter = gbxParams.getLength("FieldWire/Diameter");
 
+  //Set design sense-wire related params.
+  for (int iSLayer = 0; iSLayer < nSLayer; ++iSLayer) {
+    const int nWires = m_nWires[iSLayer];
+    for (int iCell = 0; iCell < nWires; ++iCell) {
+      setDesignWirParam(iSLayer, iCell);
+    }
+  }
+
+  //Replace geometry params. (from input data) upon request
+  if (m_useRealGeometry) readRealGeometry();
+
+
   //Print();
 
+}
+
+// Read other input data
+void CDCGeometryPar::readRealGeometry()
+{
+  std::string fileName = std::getenv("BELLE2_LOCAL_DIR");
+  fileName += "/cdc/data/misalignment.dat";
+
+  ifstream f_misalignment;
+  f_misalignment.open(fileName.c_str());
+  if (!f_misalignment) B2FATAL("cannot open misalignment.dat !");
+
+  int iL(0), iC(0);
+  double back[3], fwrd[3], tens;
+
+  while (!f_misalignment.eof()) {
+    f_misalignment >> iL >> iC >> back[0] >> back[1] >> back[2] >> fwrd[0] >> fwrd[1] >> fwrd[2] >> tens;
+
+    for (int i = 0; i < 3; ++i) {
+      m_BWirPos[i][iL][iC] += back[i];
+      m_FWirPos[i][iL][iC] += fwrd[i];
+    }
+
+    m_WirSagCoef[iL][iC] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.*(m_senseWireTension + tens));
+
+    std::cout << iL << " " << iC << " " << back[0] << " " << back[1] << " " << back[2] << " " << fwrd[0] << " " << fwrd[1] << " " << fwrd[2] << " " << tens << std::endl;
+  }
+
+  f_misalignment.close();
 }
 
 
@@ -187,58 +244,12 @@ void CDCGeometryPar::Print() const
 
 const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID) const
 {
-  const unsigned nWires = m_nWires[layerID];
-  double offset = m_offSet[layerID];
-  //...Offset modification to be aligned to axial at z=0...
-  const double phiSize = 2 * M_PI / double(nWires);
-  /*{
-    const double phiF = phiSize * offset
-                        + phiSize * 0.5 * double(m_nShifts[layerID]);
-    const double phiB = phiSize * offset;
-    const TVector3 f(m_rSLayer[layerID] * cos(phiF), m_rSLayer[layerID] * sin(phiF), m_zSForwardLayer[layerID]);
-    const TVector3 b(m_rSLayer[layerID] * cos(phiB), m_rSLayer[layerID] * sin(phiB), m_zSBackwardLayer[layerID]);
-
-    const TVector3 v = f - b;
-    const TVector3 u = v.Unit();
-    const double beta = (0 - b.z()) / u.z();
-    const TVector3 p = b + beta * u;
-    double phi0 = - atan2(p.y(), p.x());
-    offset += phi0 / (2 * M_PI / double(nWires));
-  }*/
-
-  const double phiF = phiSize * (double(cellID) + offset)
-                      + phiSize * 0.5 * double(m_nShifts[layerID]);
-  const TVector3 f(m_rSLayer[layerID] * cos(phiF), m_rSLayer[layerID] * sin(phiF), m_zSForwardLayer[layerID]);
-
-  return f;
+  return TVector3(m_FWirPos[0][layerID][cellID], m_FWirPos[1][layerID][cellID], m_FWirPos[2][layerID][cellID]);
 }
 
 const TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID) const
 {
-  const unsigned nWires = m_nWires[layerID];
-
-  double offset = m_offSet[layerID];
-  //...Offset modification to be aligned to axial at z=0...
-  const double phiSize = 2 * M_PI / double(nWires);
-  /*{
-    const double phiF = phiSize * offset
-                        + phiSize * 0.5 * double(m_nShifts[layerID]);
-    const double phiB = phiSize * offset;
-    const TVector3 f(m_rSLayer[layerID] * cos(phiF), m_rSLayer[layerID] * sin(phiF), m_zSForwardLayer[layerID]);
-    const TVector3 b(m_rSLayer[layerID] * cos(phiB), m_rSLayer[layerID] * sin(phiB), m_zSBackwardLayer[layerID]);
-
-    const TVector3 v = f - b;
-    const TVector3 u = v.Unit();
-    const double beta = (0 - b.z()) / u.z();
-    const TVector3 p = b + beta * u;
-    double phi0 = - atan2(p.y(), p.x());
-    offset += phi0 / (2 * M_PI / double(nWires));
-  }*/
-
-  const double phiB = phiSize * (double(cellID) + offset);
-  const TVector3 b(m_rSLayer[layerID] * cos(phiB), m_rSLayer[layerID] * sin(phiB), m_zSBackwardLayer[layerID]);
-
-  return b;
+  return TVector3(m_BWirPos[0][layerID][cellID], m_BWirPos[1][layerID][cellID], m_BWirPos[2][layerID][cellID]);
 }
 
 const double* CDCGeometryPar::innerRadiusWireLayer() const
@@ -373,4 +384,64 @@ void CDCGeometryPar::generateXML(const string& of)
 
   ofs << "  </Content>"                                         << endl
       << "</Subdetector>"                                       << endl;
+}
+
+void CDCGeometryPar::getWirSagEffect(const unsigned layerID, const unsigned cellID, const double Z, double& Yb_sag, double& Yf_sag) const
+{
+  //input Z: Z-coord. at which sense wire sag is computed.
+  //
+  //output Yb_sag: Y-corrd. of intersection of a tangent line and the backward endplate. Here the tangent line is computed from the 1'st derivative of a paraboric wire (due to gravity) and defined at Z=Z.
+  //output Yf_sag: ibid. but for forward.
+
+  const double Yb = m_BWirPos[1][layerID][cellID];
+  const double Zb = m_BWirPos[2][layerID][cellID];
+  const double Zf = m_FWirPos[2][layerID][cellID];
+
+  const double dx = m_FWirPos[0][layerID][cellID] - m_BWirPos[0][layerID][cellID];
+  const double dy = m_FWirPos[1][layerID][cellID] - Yb;
+  const double dz = Zf - Zb;
+
+  const double Zfp = sqrt(dz * dz + dx * dx); //=wire length in z-x plane since Zbp==0
+  const double Zp  = (Z - Zb) * Zfp / dz;
+
+  const double Coef = m_WirSagCoef[layerID][cellID];
+  //  std::cout << "Coef= " << Coef << std::endl;
+
+  const double Y_sag = (Coef * (Zp - Zfp) + dy / Zfp) * Zp + Yb;
+  const double dydz = (Coef * (2.*Zp - Zfp) * Zfp + dy) / dz;
+
+  Yb_sag = Y_sag + dydz * (Zb - Z);
+  Yf_sag = Y_sag + dydz * (Zf - Z);
+
+  //  const double Yf = m_FWirPos[1][layerID][cellID];
+  //  const double Xf = m_FWirPos[0][layerID][cellID];
+  //  const double Xb = m_BWirPos[0][layerID][cellID];
+  //    std::cout <<"Z,Zb,Zf,Yb,Yf,Vb,Xf= " << Z <<" "<< Zb <<" "<< Zf <<" "<< Yb <<" "<< Yf <<" "<< Xb <<" "<< Xf << std::endl;
+  //  std::cout <<"layerID,Yb_sag-Yb,Yf_sag-Yf= " << layerID <<" "<<1.e4*(Yb_sag - Yb) <<" "<< 1.e4*(Yf_sag - Yf) << std::endl;
+}
+
+void CDCGeometryPar::setDesignWirParam(const unsigned layerID, const unsigned cellID)
+{
+  const unsigned L = layerID;
+  const unsigned C =  cellID;
+
+  const double offset = m_offSet[L];
+  //...Offset modification to be aligned to axial at z=0...
+  const double phiSize = 2 * M_PI / double(m_nWires[L]);
+
+  const double phiF = phiSize * (double(C) + offset)
+                      + phiSize * 0.5 * double(m_nShifts[L]);
+
+  m_FWirPos[0][L][C] = m_rSLayer[L] * cos(phiF);
+  m_FWirPos[1][L][C] = m_rSLayer[L] * sin(phiF);
+  m_FWirPos[2][L][C] = m_zSForwardLayer[L];
+
+  const double phiB = phiSize * (double(C) + offset);
+
+  m_BWirPos[0][L][C] = m_rSLayer[L] * cos(phiB);
+  m_BWirPos[1][L][C] = m_rSLayer[L] * sin(phiB);
+  m_BWirPos[2][L][C] = m_zSBackwardLayer[L];
+
+  m_WirSagCoef[L][C] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8. * m_senseWireTension);
+
 }

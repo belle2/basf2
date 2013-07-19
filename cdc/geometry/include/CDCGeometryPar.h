@@ -18,10 +18,10 @@
 
 #include "TVector3.h"
 
-#define MAX_N_SLAYERS 56
-#define MAX_N_SCELLS 384
-#define MAX_N_FLAYERS 55
-#define MAX_N_KINK 30
+const unsigned MAX_N_SLAYERS =    56;
+const unsigned MAX_N_SCELLS  =   384;
+const unsigned MAX_N_FLAYERS =    55;
+const unsigned nSenseWires   = 14336;
 
 namespace Belle2 {
   namespace CDC {
@@ -53,6 +53,7 @@ namespace Belle2 {
 
       //! Gets geometry parameters from gearbox.
       void read();
+      void readRealGeometry();
 
       //! Generate an xml file used in gearbox
       /*!
@@ -312,8 +313,11 @@ namespace Belle2 {
       */
       void setSenseWireBZ(int layerId, double bz);
 
+      void getWirSagEffect(const unsigned layerID, const unsigned cellID, const double zw, double& ywb_sag, double& ywf_sag) const;
+
     private:
 
+      bool m_useRealGeometry; /*!< Switch to select geometry. */
       std::string m_version; /*!< The version of geometry parameters. */
       int m_nSLayer;         /*!< The number of sense wire layer. */
       int m_nFLayer;         /*!< The number of field wire layer. */
@@ -335,6 +339,8 @@ namespace Belle2 {
       //TVector3 m_wireBackwardPosition[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< The backward position of each sense wire in each layer. */
 
       double m_senseWireDiameter;                   /*!< The diameter of sense wires. */
+      double m_senseWireTension;                    /*!< The tension of sense wires. */
+      double m_senseWireDensity;                    /*!< The density of sense wires. */
       double m_fieldWireDiameter;                   /*!< The diameter of field wires. */
 
       double m_motherInnerR;  /*!< The inner radius of cdc mother volume. */
@@ -344,7 +350,18 @@ namespace Belle2 {
       double m_momZ[7];
       double m_momRmin[7];
 
+      float m_FWirPos[3][MAX_N_SLAYERS][MAX_N_SCELLS];
+      float m_BWirPos[3][MAX_N_SLAYERS][MAX_N_SCELLS];
+      //      double m_FWirPos[3][MAX_N_SLAYERS][MAX_N_SCELLS];
+      //      double m_BWirPos[3][MAX_N_SLAYERS][MAX_N_SCELLS];
+      //      TVector3 m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS];
+      //      TVector3 m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS];
+
+      float m_WirSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS];
+
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
+
+      void setDesignWirParam(const unsigned, const unsigned);
     };
 
 //-----------------------------------------------------------------------------

@@ -5,8 +5,12 @@
     <SensitiveDetector>
       <!-- If you need Simhit with edep=0, set negative value ex. -1.0 or -10.0 -->
       <EnergyDepositionThreshold desc="All hits with smaller energy will be dropped at SensitiveDetector level" unit="eV">0.0</EnergyDepositionThreshold>  
+      <!-- Switch for sense wire sag -->
+      <WireSag desc="true: on; false: off">false</WireSag>  
     </SensitiveDetector>
     <Rotation desc="Rotation of the whole cdc detector (should be the same as beampipe)" unit="mrad">0.0</Rotation>
+    <!-- Switch to select geometry -->
+    <WhichGeometry desc="true: use real geometry; false: use design geometry">false</WhichGeometry>
     <OffsetZ desc="The offset of the whole cdc in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>
     <Helium>Helium</Helium>
     <Ethane>Ethane</Ethane>
@@ -3935,6 +3939,7 @@
     </Covers>
     <SenseWire name="SenseWire">
       <Diameter desc="Diameter of sense wire" unit="mm">0.030</Diameter>
+      <Tension desc="Tension of sense wire (unit in cm intentionally since gW unit is missing)" unit="cm">50.0</Tension>
       <Number desc="The total number of sense wires">14336</Number>
     </SenseWire>
     <FieldWire name="FieldWire">

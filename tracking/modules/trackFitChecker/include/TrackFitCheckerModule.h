@@ -124,7 +124,7 @@ namespace Belle2 {
     /** Simply tests if any diagonal element of aMatrix is negative*/
     static bool hasMatrixNegDiagElement(const TMatrixT<double>& aMatrix);
 
-    // functions for dataflow inside module, registerXX fillXX and printXX all work on the same maps whose entries are accessed by the nameOfDataSample-string which acts as a key
+    // functions for dataflow inside module, registerX fillX and printX all work on the same maps whose entries are accessed by the nameOfDataSample-string which acts as a key
     void registerTrackWiseData(const std::string& nameOfDataSample);
     void registerTrackWiseVecData(const std::string& nameOfDataSample, const int nVarsToTest);
     void registerLayerWiseData(const std::string& nameOfDataSample, const int nVarsToTest);
@@ -150,8 +150,8 @@ namespace Belle2 {
     int m_nCdcLayers; /**< number of CDC layer, 56 normally */
     int m_nLayers; /**< m_nLayers = m_nPxdLayers + m_nSvdLayers + m_nCdcLayers */
 
-    std::vector<std::string> m_layerWiseTruthTestsVarNames;
-    std::vector<std::string> m_vertexTestsVarNames;
+    std::vector<std::string> m_layerWiseTruthTestsVarNames; /**< holds the names of the rows for the text file output table produced by the tests made by truthTests()*/
+    std::vector<std::string> m_vertexTestsVarNames; /**< holds the names of the rows for the text file output table produced by the track wise (vec) tests using the residuals at the true vertex position*/
 
 
     // the following maps should not be accessed directly but only with the corresponding "register" "fill" and "print" functions
@@ -180,7 +180,7 @@ namespace Belle2 {
     /** returns the median of the data sample "data" */
     static double calcMedian(std::vector<double> data);
     //void calcMedianAndMad(std::vector<double> data, double& median, double& mad);
-    /** calculates the truncated mean and standard deviation of the data sample "data". cutRatio is the truncation ratio. If symmetric is true the smallest and largest values will be ignored. If false only the largest values. The return value is the number of data point that were truncated */
+    /** calculates the truncated mean and standard deviation of the data sample "data". cutRatio is the truncation ratio. If symmetric is true the smallest and largest values will be ignored. If false only the largest values. The return value is the number of data points that were truncated */
     static int truncatedMeanAndStd(std::vector<double> data, const double cutRatio, const bool symmetric, double& mean, double& std);
     std::map<std::string, double > m_truncationRatios; /**<holds the ratio how many of the data of a named sample (name = key) should be cut away in the trunctatedMeanAndStd function. If a key does not exist, trunctatedMeanAndStd will not be calculated for the data sample using that key */
     /** returns the number of outliers in dataSample. An outlier is defined as being widthScaling*sigma away from mean */
@@ -191,7 +191,7 @@ namespace Belle2 {
 
     int m_processedTracks; /**< holds number of tracks used in the tests */
     double m_pvalueCut; /**< tracks with p-value smaller than m_pvalueCut will not be used in the tests */
-    bool m_fillOnlyInRootFile;
+    bool m_fillOnlyInRootFile; /**< this flag is set to true for a track with p-value lower than m_pvalueCut. While this track will be ignored in the in the test resutls printed by the print functions it will sill contribute to the data written to the root file */
     double m_truncationRatio; /**< the truncation ratio passed to truncatedMeanAndStd in the print functions */
     int m_nCutawayTracks; /**< holds the number of tracks with p-value larger than m_pvalueCut */
     int m_extrapFailed; /**< holds the number of tracks that cannot be extrapolated to their true vertex position by Genfit */
@@ -214,16 +214,17 @@ namespace Belle2 {
     std::string m_dataOutFileName; /**< this string will be added as a prefix to all output files of this module */
 
     //stuff for text file output
-    std::stringstream m_textOutput;
-    std::ofstream m_dataOut;
+    std::stringstream m_textOutput; /**< this object collects all results of the statistical tests so they can be written to the terminal and/or to a text file via the m_dataOut object */
+    std::ofstream m_dataOut; /**< file stream object to write the contend of m_textOutput into a text file */
 
 //    bool m_spMode;
 //    std::ofstream m_piStuffOut;
 
-    bool m_wAndPredPresentsTested; /**< this flag is set true after it was checked if predictied states and/or DAF wights are present */
+    bool m_wAndPredPresentsTested; /**< this flag is set true after it was checked if predicted states and/or DAF weights are present */
+
     //stuff for the text output for rave developers
-    bool m_exportTracksForRaveDeveloper;
-    std::ofstream m_forRaveOut;
+    bool m_exportTracksForRaveDeveloper; /**< if true a text file is created with track parameters. This file is intended as input for Wolfgang Waltenberger's stand alone Rave version to debug vertexing. */
+    std::ofstream m_forRaveOut; /**< the output file stream to create a text file with with track parameters intended as input for Wolfgang Waltenberger's stand alone Rave version to debug vertexing */
 
     bool m_writeToFile; /**< If true a text file with the results of all statistical tests will be created */
     //stuff for root output

@@ -204,7 +204,7 @@ void TrackFitCheckerModule::initialize()
   registerTrackWiseVecData("res_vertexPosMom", vecDataSize);
   // direclty the vertex coordinates
   registerTrackWiseVecData("vertexPosMom", vecDataSize);
-//   registerTrackWiseVecData("resVertexRZPtP", 6); // moritz DT legacy
+//   registerTrackWiseVecData("resVertexRZPtP", 6); // moritz phd thesis legacy
 //   registerTrackWiseVecData("pullsVertexRZPtP", 5);
   // pulls (z) of cartesian 7D coordinates at vertex
   //registerTrackWiseVecData("pulls_vertexState", 7);
@@ -1741,7 +1741,6 @@ int TrackFitCheckerModule::truncatedMeanAndStd(std::vector<double> data, const d
 
 int TrackFitCheckerModule::countOutliers(const vector<double>& dataSample, const double mean, const double sigma, const double widthScaling)
 {
-
   int n = dataSample.size();
   int nOutliers = 0;
   double halfInterval = widthScaling * sigma;

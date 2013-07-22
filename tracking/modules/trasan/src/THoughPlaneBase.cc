@@ -75,7 +75,7 @@ namespace Belle {
       X0 = unsigned((c[0].x() - _xMin) / _xSize);
       Y0 = unsigned((c[0].y() - _yMin) / _ySize);
       X1 = unsigned((c[1].x() - _xMin) / _xSize);
-      Y1 = unsigned((c[0].y() - _yMin) / _ySize);
+      Y1 = unsigned((c[1].y() - _yMin) / _ySize);
     }
   }
 

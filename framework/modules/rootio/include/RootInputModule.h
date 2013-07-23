@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/core/Environment.h>
 
 #include <string>
 #include <vector>
@@ -58,6 +59,18 @@ namespace Belle2 {
 
     /** Is called at the end of your Module */
     virtual void terminate();
+
+    /** Get list of input files, taking -i command line overrides into account. */
+    inline std::vector<std::string> getInputFiles() const {
+      std::vector<std::string> inputFiles = Environment::Instance().getInputFilesOverride();
+      if (!inputFiles.empty()) {
+        return inputFiles;
+      }
+      inputFiles = m_inputFileNames;
+      if (!m_inputFileName.empty())
+        inputFiles.push_back(m_inputFileName);
+      return inputFiles;
+    }
 
   protected:
 

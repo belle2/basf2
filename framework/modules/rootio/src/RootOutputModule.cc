@@ -15,7 +15,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/core/RandomNumbers.h>
-#include <framework/core/Environment.h>
 
 #include <TClonesArray.h>
 #include <TBaseClass.h>
@@ -44,7 +43,7 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experiment(0), m_r
 {
   //Set module properties
   setDescription("Writes DataStore objects into a .root file. Use RootInput to read them again.");
-  setPropertyFlags(c_Output | c_InitializeInProcess);
+  setPropertyFlags(c_Output);
 
   //Initialization of some member variables
   for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
@@ -78,10 +77,7 @@ void RootOutputModule::initialize()
   //create a file level metadata object in the data store
   StoreObjPtr<FileMetaData>::registerPersistent("", DataStore::c_Persistent, false);
 
-  const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
-  if (!outputFileArgument.empty())
-    m_outputFileName = outputFileArgument;
-
+  m_outputFileName = getOutputFile();
   TDirectory* dir = gDirectory;
   m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
   if (m_file->IsZombie()) {

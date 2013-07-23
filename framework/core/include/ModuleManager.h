@@ -11,9 +11,9 @@
 #ifndef MODULEMANAGER_H_
 #define MODULEMANAGER_H_
 
-#include <boost/shared_ptr.hpp>
-
 #include <framework/core/FrameworkExceptions.h>
+
+#include <boost/shared_ptr.hpp>
 
 #include <string>
 #include <map>

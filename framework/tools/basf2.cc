@@ -32,7 +32,6 @@
 #include <boost/python.hpp> //Has to be the first include (restriction due to python)
 
 #include <framework/pybasf2/PyBasf2.h>
-#include <framework/core/Framework.h>
 #include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConfig.h>
@@ -148,6 +147,7 @@ int main(int argc, char* argv[])
     ("visualize-dataflow", "Generate data flow diagram (dataflow.dot) for the executed steering file.")
     ("module-io", prog::value<string>(), "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
     ("no-stats", "Disable collection of statistics during event processing. Useful for very high-rate applications, but produces empty table with 'print statistics'.")
+    ("dry-run", "Read steering file, but do not start any actually start any event processing. Prints information on input/output files that would be used during normal execution.")
     ;
 
     prog::options_description cmdlineOptions;
@@ -251,6 +251,10 @@ int main(int argc, char* argv[])
       Environment::Instance().setNoStats(true);
     }
 
+    if (varMap.count("dry-run")) {
+      Environment::Instance().setDryRun(true);
+    }
+
     //Check for info option
     if (varMap.count("info")) {
       pythonFile = "info.py";
@@ -299,6 +303,11 @@ int main(int argc, char* argv[])
       //basf2.py was loaded, now do module I/O visualization
       if (!runModuleIOVisualization.empty()) {
         DataFlowVisualization::executeModuleAndCreateIOPlot(runModuleIOVisualization);
+      }
+
+      //--dry-run: print gathered information
+      if (Environment::Instance().getDryRun()) {
+        Environment::Instance().printJobInformation();
       }
     } catch (PythonModuleNotEmbeddedError& exc) {
       B2ERROR(exc.what());

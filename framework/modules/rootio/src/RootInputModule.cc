@@ -12,7 +12,6 @@
 
 #include <framework/modules/rootio/RootIOUtilities.h>
 #include <framework/core/InputController.h>
-#include <framework/core/Environment.h>
 
 #include <TClonesArray.h>
 #include <TSystem.h>
@@ -66,13 +65,9 @@ void RootInputModule::initialize()
 {
   gSystem->Load("libdataobjects");
   gSystem->Load("libTreePlayer");
-  const std::vector<std::string>& inputFiles = Environment::Instance().getInputFilesOverride();
-  if (!inputFiles.empty()) {
-    m_inputFileName = "";
-    m_inputFileNames = inputFiles;
-  }
 
-  if (m_inputFileName.empty() && m_inputFileNames.empty()) {
+  const vector<string>& inputFiles = getInputFiles();
+  if (inputFiles.empty()) {
     B2FATAL("You have to set either the 'inputFileName' or the 'inputFileNames' parameter!");
     return;
   }
@@ -80,10 +75,9 @@ void RootInputModule::initialize()
     B2FATAL("Cannot use both 'inputFileName' and 'inputFileNames' parameters!");
     return;
   }
-
-  if (!m_inputFileName.empty())
-    m_inputFileNames.push_back(m_inputFileName);
   //we'll only use m_inputFileNames from now on
+  m_inputFileNames = inputFiles;
+  m_inputFileName = "";
 
 
   //Open TFile

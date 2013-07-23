@@ -8,8 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <framework/core/Path.h>
 #include <framework/core/Environment.h>
 #include <framework/core/ModuleManager.h>
+#include <framework/core/Module.h>
+
+#include <framework/modules/rootio/RootInputModule.h>
+#include <framework/modules/rootio/RootOutputModule.h>
+
+#include <boost/foreach.hpp>
+
+#include <iostream>
 
 using namespace Belle2;
 using namespace std;
@@ -40,7 +49,8 @@ Environment::Environment() :
   m_outputFileOverride(""),
   m_numberProcessesOverride(-1),
   m_visualizeDataFlow(false),
-  m_noStats(false)
+  m_noStats(false),
+  m_dryRun(false)
 {
 
 }
@@ -48,4 +58,27 @@ Environment::Environment() :
 
 Environment::~Environment()
 {
+}
+
+void Environment::printJobInformation() const
+{
+  assert(m_mainPath);
+  const std::list<ModulePtr>& modules = m_mainPath->getModules();
+
+  BOOST_FOREACH(ModulePtr m, modules) {
+    string name = m->getName();
+    if (name == "RootInput") {
+      const RootInputModule* input = static_cast<RootInputModule*>(m.get());
+      const vector<string>& inputs = input->getInputFiles();
+      cout << "INPUT FILES:";
+      for (int i = 0; i < inputs.size(); i++) {
+        cout << " " << inputs[i];
+      }
+      cout << "\n";
+    } else if (name == "RootOutput") {
+      const RootOutputModule* output = static_cast<const RootOutputModule*>(m.get());
+      string out = output->getOutputFile();
+      cout << "OUTPUT FILE: " << out << "\n";
+    }
+  }
 }

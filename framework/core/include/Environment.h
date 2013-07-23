@@ -11,11 +11,15 @@
 #ifndef ENVIRONMENT_H
 #define ENVIRONMENT_H
 
+#include <boost/shared_ptr.hpp>
+
 #include <list>
 #include <string>
 #include <vector>
 
+
 namespace Belle2 {
+  class Path;
 
   /**
    * The Environment Class.
@@ -102,15 +106,11 @@ namespace Belle2 {
 
     /**
      * Sets the steering file content.
-     *
-     * @param steering The steering file content.
      */
     void setSteering(const std::string& steering) { m_steering = steering; };
 
     /**
      * Returns the steering file content.
-     *
-     * @return The steering file content.
      */
     const std::string& getSteering() const { return m_steering; };
 
@@ -125,7 +125,20 @@ namespace Belle2 {
 
     /** Disable collection of statistics during event processing. */
     bool getNoStats() const { return m_noStats; }
+    /** Read steering file, but do not start any actually start any event processing. Prints information on input/output files and number of events that that would be used during normal execution. */
+    void setDryRun(bool dryRun) { m_dryRun = dryRun; }
+    /** Read steering file, but do not start any actually start any event processing. Prints information on input/output files and number of events that that would be used during normal execution. */
+    bool getDryRun() const { return m_dryRun; }
 
+    /** Set path executed by the framework. */
+    void setMainPath(boost::shared_ptr<Path> path) { m_mainPath = path; }
+
+    /** Print information on input/output files in current steering file, used by --dry-run.
+     *
+     *  Function only relies on information available during module construction,
+     *  but requires that Framework::process() has been called to set a path.
+     **/
+    void printJobInformation() const;
 
   private:
 
@@ -138,6 +151,8 @@ namespace Belle2 {
     int m_numberProcessesOverride; /**< Override m_numberProcesses if >= 0 */
     bool m_visualizeDataFlow; /**< Wether to generate DOT files with data store inputs/outputs of each module. */
     bool m_noStats; /**< Disable collection of statistics during event processing. Useful for very high-rate applications. */
+    bool m_dryRun; /**< Read steering file, but do not start any actually start any event processing. Prints information on input/output files that that would be used during normal execution. */
+    boost::shared_ptr<Path> m_mainPath; /**< Path executed by the framework. */
 
     /**
      * The constructor is hidden to avoid that someone creates an instance of this class.

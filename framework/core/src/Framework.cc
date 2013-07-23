@@ -76,6 +76,10 @@ PathPtr Framework::createPath()
 
 void Framework::process(PathPtr startPath, long maxEvent)
 {
+  Environment::Instance().setMainPath(startPath);
+  if (Environment::Instance().getDryRun())
+    return; //processing disabled!
+
   static bool already_executed = false;
   if (already_executed) {
     B2FATAL("You can only call process() once per steering file!")

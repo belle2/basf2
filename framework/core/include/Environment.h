@@ -13,6 +13,7 @@
 
 #include <list>
 #include <string>
+#include <vector>
 
 namespace Belle2 {
 
@@ -37,9 +38,7 @@ namespace Belle2 {
     static Environment& Instance();
 
     /**
-     * Returns a reference to the list of the modules search filepaths.
-     *
-     * @return A reference to the list of the modules search filepaths.
+     * Returns a list of file paths searched for module libraries.
      */
     const std::list<std::string>& getModuleSearchPaths() const;
 
@@ -63,11 +62,11 @@ namespace Belle2 {
     /** Returns number of events in run 1 for EvtMetaGen module, or 0 for no override. */
     int getNumberEventsOverride() const { return m_numberEventsOverride; }
 
-    /** Override input file name for modules */
-    void setInputFileOverride(const std::string& name) { m_inputFileOverride = name; }
+    /** Override input file names for modules */
+    void setInputFilesOverride(const std::vector<std::string>& names) { m_inputFilesOverride = names; }
 
-    /** Return overriden input file name, or "" if none was set */
-    const std::string& getInputFileOverride() const { return m_inputFileOverride; }
+    /** Return overriden input file names, or empty vector if none were set */
+    const std::vector<std::string>& getInputFilesOverride() const { return m_inputFilesOverride; }
 
     /** Override output file name for modules */
     void setOutputFileOverride(const std::string& name) { m_outputFileOverride = name; }
@@ -134,7 +133,7 @@ namespace Belle2 {
     int m_numberProcesses;        /**< The number of processes that should be used for the parallel processing. */
     std::string m_steering;       /**< The content of the steering file. */
     int m_numberEventsOverride;   /**< Override number of events in the first run. */
-    std::string m_inputFileOverride; /**< Override name of input file for input module */
+    std::vector<std::string> m_inputFilesOverride; /** Override input file names for input modules */
     std::string m_outputFileOverride; /**< Override name of output file for output module */
     int m_numberProcessesOverride; /**< Override m_numberProcesses if >= 0 */
     bool m_visualizeDataFlow; /**< Wether to generate DOT files with data store inputs/outputs of each module. */

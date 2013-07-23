@@ -59,9 +59,13 @@ void SeqRootInputModule::initialize()
 {
   gSystem->Load("libdataobjects");
 
-  const std::string& inputFileArgument = Environment::Instance().getInputFileOverride();
-  if (!inputFileArgument.empty()) {
-    m_inputFileName = inputFileArgument;
+  const std::vector<std::string>& inputFiles = Environment::Instance().getInputFilesOverride();
+  if (!inputFiles.empty()) {
+    if (inputFiles.size() > 1) {
+      B2FATAL("SeqRootInput only accepts a single input file.")
+      return;
+    }
+    m_inputFileName = inputFiles[0];
   }
 
   // Initialize DataStoreStreamer

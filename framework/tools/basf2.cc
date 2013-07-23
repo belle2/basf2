@@ -141,8 +141,8 @@ int main(int argc, char* argv[])
     ("steering", prog::value<string>(), "the python steering file")
     ("arg", prog::value<vector<string> >(&arguments), "additional arguments to be passed to the steering file")
     ("log_level,l", prog::value<string>(), "set log level (one of DEBUG, INFO, WARNING, or ERROR)")
-    ("events,n", prog::value<int>(), "override number of events in first run for EvtMetaGen; otherwise set maximum number of events ")
-    ("input,i", prog::value<string>(), "override name of input file for (Seq)RootInput")
+    ("events,n", prog::value<int>(), "override number of events in first run for EvtMetaGen; otherwise set maximum number of events.")
+    ("input,i", prog::value<vector<string> >(), "override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file.")
     ("output,o", prog::value<string>(), "override name of output file for (Seq)RootOutput")
     ("processes,p", prog::value<int>(), "override number of parallel processes (0 to disable parallel processing)")
     ("visualize-dataflow", "Generate data flow diagram (dataflow.dot) for the executed steering file.")
@@ -180,13 +180,14 @@ int main(int argc, char* argv[])
       pythonFile = "version.py";
     }
 
-    //Check for modules option
+    //Check for modules option (-m)
     if (varMap.count("modules")) {
       string modArgs = varMap["modules"].as<string>();
       if (!modArgs.empty()) arguments.push_back(modArgs);
       pythonFile = "modules.py";
     }
 
+    // -n
     if (varMap.count("events")) {
       int nevents = varMap["events"].as<int>();
       if (nevents <= 0) {
@@ -196,16 +197,19 @@ int main(int argc, char* argv[])
       Environment::Instance().setNumberEventsOverride(nevents);
     }
 
+    // -i
     if (varMap.count("input")) {
-      std::string name = varMap["input"].as<string>();
-      Environment::Instance().setInputFileOverride(name);
+      const vector<string>& names = varMap["input"].as<vector<string> >();
+      Environment::Instance().setInputFilesOverride(names);
     }
 
+    // -o
     if (varMap.count("output")) {
       std::string name = varMap["output"].as<string>();
       Environment::Instance().setOutputFileOverride(name);
     }
 
+    // -p
     if (varMap.count("processes")) {
       int nprocesses = varMap["processes"].as<int>();
       if (nprocesses < 0) {
@@ -215,6 +219,7 @@ int main(int argc, char* argv[])
       Environment::Instance().setNumberProcessesOverride(nprocesses);
     }
 
+    // -l
     if (varMap.count("log_level")) {
       std::string levelParam = varMap["log_level"].as<string>();
       int level = -1;

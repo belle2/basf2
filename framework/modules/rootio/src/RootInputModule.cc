@@ -36,7 +36,7 @@ RootInputModule::RootInputModule() : Module()
 {
   //Set module properties
   setDescription("Reads objects/arrays from one or more .root files and makes them available through the DataStore.");
-  setPropertyFlags(c_Input | c_InitializeInProcess);
+  setPropertyFlags(c_Input);
 
   //Initialization of some member variables
   for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
@@ -47,8 +47,8 @@ RootInputModule::RootInputModule() : Module()
 
   //Parameter definition
   vector<string> emptyvector;
-  addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames instead.", string(""));
-  addParam("inputFileNames", m_inputFileNames, "List of input files. You may use wildcards to specify multiple files, e.g. 'somePrefix_*.root'.", emptyvector);
+  addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames instead. Can be overridden using the -i argument to basf2.", string(""));
+  addParam("inputFileNames", m_inputFileNames, "List of input files. You may use wildcards to specify multiple files, e.g. 'somePrefix_*.root'. Can be overridden using the -i argument to basf2.", emptyvector);
 
   addParam("eventNumber", m_counterNumber[0], "Skip this number of events before starting.", 0);
 
@@ -66,11 +66,10 @@ void RootInputModule::initialize()
 {
   gSystem->Load("libdataobjects");
   gSystem->Load("libTreePlayer");
-  const std::string& inputFileArgument = Environment::Instance().getInputFileOverride();
-  if (!inputFileArgument.empty()) {
+  const std::vector<std::string>& inputFiles = Environment::Instance().getInputFilesOverride();
+  if (!inputFiles.empty()) {
     m_inputFileName = "";
-    m_inputFileNames.clear();
-    m_inputFileNames.push_back(inputFileArgument);
+    m_inputFileNames = inputFiles;
   }
 
   if (m_inputFileName.empty() && m_inputFileNames.empty()) {

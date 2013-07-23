@@ -43,7 +43,7 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experiment(0), m_r
   m_runHigh(0), m_eventHigh(0)
 {
   //Set module properties
-  setDescription("Writes DataStore objects into a .root file");
+  setDescription("Writes DataStore objects into a .root file. Use RootInput to read them again.");
   setPropertyFlags(c_Output | c_InitializeInProcess);
 
   //Initialization of some member variables
@@ -52,8 +52,8 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experiment(0), m_r
   }
 
   //Parameter definition
-  addParam("outputFileName"  , m_outputFileName, "Name of the output file.", string("RootOutput.root"));
-  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticable effect.", 1);
+  addParam("outputFileName"  , m_outputFileName, "Name of the output file. Can be overridden using the -o argument to basf2.", string("RootOutput.root"));
+  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticeable effect.", 1);
   addParam("splitLevel", m_splitLevel, "Branch split level.", 99);
 
   vector<string> emptyvector;

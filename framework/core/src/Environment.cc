@@ -36,7 +36,7 @@ Environment::Environment() :
   m_numberProcesses(0),
   m_steering(""),
   m_numberEventsOverride(0),
-  m_inputFileOverride(""),
+  m_inputFilesOverride(),
   m_outputFileOverride(""),
   m_numberProcessesOverride(-1),
   m_visualizeDataFlow(false),

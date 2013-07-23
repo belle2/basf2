@@ -70,7 +70,7 @@ void Environment::printJobInformation() const
     if (name == "RootInput") {
       const RootInputModule* input = static_cast<RootInputModule*>(m.get());
       const vector<string>& inputs = input->getInputFiles();
-      for (int i = 0; i < inputs.size(); i++) {
+      for (unsigned int i = 0; i < inputs.size(); i++) {
         cout << "INPUT FILE: " << inputs[i] << "\n";
       }
     } else if (name == "RootOutput") {

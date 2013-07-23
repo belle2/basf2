@@ -271,9 +271,26 @@ TRGState
 TCFrontEnd::packerInnerInside(const TRGState & input) {
 
     //...Input should be 48 hit pattern and 48x5 timing, total 288 bits...
+//
+// Wire numbers and TS ID
+//
+// outside
+//
+//    +--+--+--+--+-    -+--+--+--+--+--+--+
+//    |  47 |  46 | .... |  34 |  33 |  32 |
+//    +--+--+--+--+--+-    -+--+--+--+--+--+--+
+//       |  31 |  30 | ..... | 18 |  17 |  16 |
+//    +--+--+--+--+--+-    -+--+--+--+--+--+--+
+//    |  15 |  14 | .... |  2  |  1  |  0  |
+//    +--+--+--+--+-    -+--+--+--+--+--+--+
+//
+//       15    14   ....    2     1     0      <- partial TS ID
+//
+// inside
+//
 
     //...Prepare a state for output...
-    TRGState s(32 + 16 * 5 + 16 + 16 * 5);
+    TRGState s(32 + 16 * 5 + 16 + 16 * 5 + 1 * 5);  // 1*5 for missing wire
 
     //...Set up bool array...
     bool * b = new bool[input.size()];
@@ -442,6 +459,9 @@ TCFrontEnd::packerInnerInside(const TRGState & input) {
 	p += 5;
     }
 
+    //...Timing of missing wires on edge TS...
+    s.set(p, 5, timing[31]);
+
     //...Debug...
 #ifdef TRG_DEBUG
     // input.dump("detail", TRGDebug::tab() + "FrontEnd_II in ");
@@ -477,7 +497,7 @@ TCFrontEnd::packerInnerOutside(const TRGState & input) {
 //
 
     //...Prepare a state for output...
-    TRGState s(48 + 16 * 5);
+    TRGState s(48 + 16 * 5 + 9 * 5);     // 9*5 for missing wire timings
 
     //...Set up bool array...
     bool * b = new bool[input.size()];
@@ -504,7 +524,6 @@ TCFrontEnd::packerInnerOutside(const TRGState & input) {
     s.set(0, 48, hitptn);
     unsigned p = 48;
 
-    //...Fastest timing...
     //...Fastest timing...
     const bool dummy[6] = {false, false, false, false, false, true};
     const TRGState wtDummy(6, dummy);
@@ -710,6 +729,25 @@ TCFrontEnd::packerInnerOutside(const TRGState & input) {
 	p += 5;
     }
 
+    //...Timing of missing wires on edge TS...
+    s.set(p, 5, timing[0]);
+    p += 5;
+    s.set(p, 5, timing[16]);
+    p += 5;
+    s.set(p, 5, timing[32]);
+    p += 5;
+    s.set(p, 5, timing[33]);
+    p += 5;
+    s.set(p, 5, timing[15]);
+    p += 5;
+    s.set(p, 5, timing[30]);
+    p += 5;
+    s.set(p, 5, timing[31]);
+    p += 5;
+    s.set(p, 5, timing[46]);
+    p += 5;
+    s.set(p, 5, timing[47]);
+
 #ifdef TRG_DEBUG
     unpackerInnerOutside(input, s);
 #endif
@@ -741,7 +779,7 @@ TCFrontEnd::packerOuterInside(const TRGState & input) {
 //
 
     //...Prepare a state for output...
-    TRGState s(48 + 16 * 5 + 16 * 5);
+    TRGState s(48 + 16 * 5 + 16 * 5 + 3 * 5);  // 3*5 for missing wires
 
     //...Set up bool array...
     bool * b = new bool[input.size()];
@@ -785,13 +823,13 @@ TCFrontEnd::packerOuterInside(const TRGState & input) {
 	    wt[1] = TRGState(5, timing[0]);
 	    wt[2] = TRGState(5, timing[1]);
 	    wt[3] = wtDummy;
-	    wt[4] = TRGState(5, timing[6]);
+	    wt[4] = TRGState(5, timing[16]);
 	    wt[5] = TRGState(5, timing[32]);
 
 	    //...Append 6th bit to indicate hit or not (no hit = 1)...
 	    if (! hitptn[0]) wt[1].set(5, true);
 	    if (! hitptn[1]) wt[2].set(5, true);
-	    if (! hitptn[6]) wt[4].set(5, true);
+	    if (! hitptn[16]) wt[4].set(5, true);
 	    if (! hitptn[32]) wt[5].set(5, true);
 	}
 	else if (i == 15) { // TS ID 15 has missing wires
@@ -863,6 +901,12 @@ TCFrontEnd::packerOuterInside(const TRGState & input) {
 	p += 5;
     }
 
+    s.set(p, 5, timing[0]);
+    p += 5;
+    s.set(p, 5, timing[15]);
+    p += 5;
+    s.set(p, 5, timing[31]);
+
 #ifdef TRG_DEBUG
     unpackerOuterInside(input, s);
 #endif
@@ -894,7 +938,7 @@ TCFrontEnd::packerOuterOutside(const TRGState & input) {
 //
 
     //...Prepare a state for output...
-    TRGState s(48 + 16 * 5 + 16 * 5);
+    TRGState s(48 + 16 * 5 + 16 * 5 + 3 * 5);  // 3*5 for missing wires
 
     //...Set up bool array...
     bool * b = new bool[input.size()];
@@ -1005,6 +1049,12 @@ TCFrontEnd::packerOuterOutside(const TRGState & input) {
 	p += 5;
     }
 
+    s.set(p, 5, timing[16]);
+    p += 5;
+    s.set(p, 5, timing[15]);
+    p += 5;
+    s.set(p, 5, timing[31]);
+
 #ifdef TRG_DEBUG
     unpackerOuterOutside(input, s);
 #endif
@@ -1091,6 +1141,17 @@ TCFrontEnd:: unpackerInnerInside(const TRGState & input,
 	if ((i % 4) == 3)
 	    cout << endl;
     }
+
+    cout << "Output : timing of missing wires" << endl;
+    o = 208;
+    for (unsigned i = 0; i < 1; i++) {
+	TRGState s = output.subset(o + i * 5, 5);
+	if ((i % 4) == 0)
+	    cout << "        ";
+	cout << i << ": " << s << "  ";
+	if ((i % 4) == 3)
+	    cout << endl;
+    }
 }
 
 void
@@ -1140,6 +1201,17 @@ TCFrontEnd:: unpackerInnerOutside(const TRGState & input,
     cout << "Output : fastest timing" << endl;
     o = 48;
     for (unsigned i = 0; i < 16; i++) {
+	TRGState s = output.subset(o + i * 5, 5);
+	if ((i % 4) == 0)
+	    cout << "        ";
+	cout << i << ": " << s << "  ";
+	if ((i % 4) == 3)
+	    cout << endl;
+    }
+
+    cout << "Output : timing of missing wires" << endl;
+    o = 128;
+    for (unsigned i = 0; i < 9; i++) {
 	TRGState s = output.subset(o + i * 5, 5);
 	if ((i % 4) == 0)
 	    cout << "        ";
@@ -1214,6 +1286,17 @@ TCFrontEnd:: unpackerOuterInside(const TRGState & input,
 	if ((i % 4) == 3)
 	    cout << endl;
     }
+
+    cout << "Output : timing of missing wires" << endl;
+    o = 208;
+    for (unsigned i = 0; i < 3; i++) {
+	TRGState s = output.subset(o + i * 5, 5);
+	if ((i % 4) == 0)
+	    cout << "        ";
+	cout << i << ": " << s << "  ";
+	if ((i % 4) == 3)
+	    cout << endl;
+    }
 }
 
 void
@@ -1274,6 +1357,17 @@ TCFrontEnd:: unpackerOuterOutside(const TRGState & input,
     cout << "Output : fastest timing" << endl;
     o = 128;
     for (unsigned i = 0; i < 16; i++) {
+	TRGState s = output.subset(o + i * 5, 5);
+	if ((i % 4) == 0)
+	    cout << "        ";
+	cout << i << ": " << s << "  ";
+	if ((i % 4) == 3)
+	    cout << endl;
+    }
+
+    cout << "Output : timing of missing wires" << endl;
+    o = 208;
+    for (unsigned i = 0; i < 3; i++) {
 	TRGState s = output.subset(o + i * 5, 5);
 	if ((i % 4) == 0)
 	    cout << "        ";

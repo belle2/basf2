@@ -76,9 +76,10 @@ PathPtr Framework::createPath()
 
 void Framework::process(PathPtr startPath, long maxEvent)
 {
-  Environment::Instance().setMainPath(startPath);
-  if (Environment::Instance().getDryRun())
+  if (Environment::Instance().getDryRun()) {
+    Environment::Instance().setJobInformation(startPath);
     return; //processing disabled!
+  }
 
   static bool already_executed = false;
   if (already_executed) {

@@ -60,10 +60,9 @@ Environment::~Environment()
 {
 }
 
-void Environment::printJobInformation() const
+void Environment::setJobInformation(boost::shared_ptr<Path> path)
 {
-  assert(m_mainPath);
-  const std::list<ModulePtr>& modules = m_mainPath->getModules();
+  const std::list<ModulePtr>& modules = path->getModules();
 
   BOOST_FOREACH(ModulePtr m, modules) {
     string name = m->getName();
@@ -71,12 +70,19 @@ void Environment::printJobInformation() const
       const RootInputModule* input = static_cast<RootInputModule*>(m.get());
       const vector<string>& inputs = input->getInputFiles();
       for (unsigned int i = 0; i < inputs.size(); i++) {
-        cout << "INPUT FILE: " << inputs[i] << "\n";
+        m_jobInfoOutput += "INPUT FILE: " + inputs[i] + "\n";
       }
     } else if (name == "RootOutput") {
       const RootOutputModule* output = static_cast<const RootOutputModule*>(m.get());
       string out = output->getOutputFile();
-      cout << "OUTPUT FILE: " << out << "\n";
+      m_jobInfoOutput += "OUTPUT FILE: " + out + "\n";
     }
   }
+
+
+}
+
+void Environment::printJobInformation() const
+{
+  cout << m_jobInfoOutput;
 }

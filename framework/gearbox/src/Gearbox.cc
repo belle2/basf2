@@ -120,7 +120,7 @@ namespace Belle2 {
     if (m_xmlDocument) close();
     //Check if we have at least one backend
     if (m_handlers.empty())
-      B2FATAL("No backends defined, please use Geabox::setBackends() first to specify how to access XML files");
+      B2FATAL("No backends defined, please use Gearbox::setBackends() first to specify how to access XML files.");
     //Open document
     m_xmlDocument = xmlParseFile(name.c_str());
 
@@ -192,7 +192,7 @@ namespace Belle2 {
       boost::trim(value.value);
       boost::trim(value.unit);
     }
-    //Add to cache, empty or not: results wont change
+    //Add to cache, empty or not: results won't change
     m_parameterCache.insert(path, value);
 
     xmlXPathFreeObject(result);

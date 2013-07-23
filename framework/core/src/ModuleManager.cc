@@ -179,7 +179,7 @@ void ModuleManager::fillModuleNameLibMap(boost::filesystem::directory_entry& map
     if (matchResult.size() == 2) {
       //Add result to map
       m_moduleNameLibMap.insert(make_pair(string(matchResult[1].first, matchResult[1].second), sharedLibPath));
-    } else B2ERROR("Regular expression did not work. Is the module map file well formated ?")
+    } else B2ERROR("Regular expression did not work. Is the module map file well formatted?")
     }
 
   //Close the map file

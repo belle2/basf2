@@ -585,7 +585,8 @@ namespace Belle2 {
   /**
    * The templated proxy class.
    * Be defining a global variable of this class, any module can be registered to the ModuleManager.
-   * This definition has to be added to each module definition. A macro is available
+   * For a module definition of MyTestModule, you should add "REG_MODULE(MyTest)" to the .cc file to register
+   * the module.
    */
   template <class T>
   class ModuleProxy : public ModuleProxyBase {

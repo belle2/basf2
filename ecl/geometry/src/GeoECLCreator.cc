@@ -588,11 +588,12 @@ namespace Belle2 {
 
       // add barrel phi fin ///////////////////////////////////////////////////////////////////////////////
 
-      double brforwangle = 32.20 * deg; //32.987 * deg;
-      double brbackangle = 51.28 * deg; //52.902 * deg;
 
-      double brphifina = 298.34 * cm / 2; // shorter base
-      double brphifinL = 19. * cm / 2; // height
+      double brforwangle = 33.003 * deg; // same as Belle I
+      double brbackangle = 52.879 * deg;
+
+      double brphifina = 298.14 * cm / 2; // shorter base
+      double brphifinL = 19.49 * cm / 2; // height
 
       double f_xForw = brphifinL / tan(brforwangle);
       double f_xBack = brphifinL / tan(brbackangle);
@@ -602,33 +603,58 @@ namespace Belle2 {
       double brphifinh = brphifinthickness / 2; // thickness
       double brphifintheta = atan(f_dx / brphifinL);
 
-      //double brphifin_centercrysphi_TIL = 1.112094 * deg;
-      //double brphifin_centercrysperpC = 140.7115 * cm;
-      //double brphifin_centercrysphiC = 1.382185 * deg;
       double brphifin_shorterbaseleft = 100.08 * cm;
       double cposix = 140.594699 * cm;
       double cposiy = 6.478866 * cm;
       double brphitiltphi = 3.7579644 * deg;
-      double brphirmoveout = 1.01 * cm;
+      double brphirmoveout = - 3.50 * cm;
+      double brphizmove =  - 0.0 * cm;
+      double brphimoveperp =   0.0 * cm;
 
       G4Transform3D r00 = G4RotateY3D(-90. * deg);
       G4Transform3D tilt_z = G4RotateY3D(0.);
       G4Transform3D central = G4Translate3D(0, 0, (brphifina - brphifin_shorterbaseleft + f_dx));
       G4Transform3D tilt_psi = G4RotateX3D(0E-6 * deg);
       G4Transform3D tilt_phi = G4RotateZ3D(brphitiltphi);
-      //G4Transform3D tilt_psi = G4Rotate3D(-0.3E-3*deg, G4Point3D(0, 0, 0), G4Point3D(cos(brphifin_centercrysphi_TIL), sin(brphifin_centercrysphi_TIL), 0) );
-      //G4Transform3D position = G4Translate3D(brphifin_centercrysperpC, 0, 0);
-      G4Transform3D cposition = G4Translate3D(cposix + brphirmoveout * cos(brphitiltphi), cposiy + brphirmoveout * sin(brphitiltphi), 0);
+      G4Transform3D cposition = G4Translate3D(cposix + brphirmoveout * cos(brphitiltphi) - brphimoveperp * sin(brphitiltphi), cposiy + brphirmoveout * sin(brphitiltphi) + brphimoveperp * cos(brphitiltphi), brphizmove);
       //G4Transform3D pos_phi = G4RotateZ3D(brphifin_centercrysphiC + (2.5114444*deg/2) );
       //G4Transform3D Tr =  cposition * tilt_phi * tilt_psi * central * tilt_z * r00;
       G4Transform3D Tr =  cposition * tilt_phi * tilt_psi * central * tilt_z * r00;
 
-      G4Trap* BrPhiFinShape = new G4Trap(format("solidEclBrPhiFin").str().c_str(),
-                                         brphifinL, brphifintheta, 180. * deg,
-                                         brphifinh, brphifinA, brphifinA, 0.,
-                                         brphifinh, brphifina, brphifina, 0.);
+      G4Trap* BrPhiFinShape1 = new G4Trap(format("solidEclBrPhiFinShape1").str().c_str(),
+                                          brphifinL, brphifintheta, 180. * deg,
+                                          brphifinh, brphifinA, brphifinA, 0.,
+                                          brphifinh, brphifina, brphifina, 0.);
+
+      double brphifinL2 = 9.46 * cm / 2; // height
+      double f_xForw2 = 0.;
+      double f_xBack2 = brphifinL2 / tan(brbackangle);
+      double f_dx2 = (f_xForw2 - f_xBack2) / 2;
+      double brphifinA2 = brphifinA + f_xForw2 + f_xBack2;
+      double brphifintheta2 = atan(f_dx2 / brphifinL2);
+
+      G4Trap* BrPhiFinShape2 = new G4Trap(format("solidEclBrPhiFinShape2").str().c_str(),
+                                          brphifinL2, brphifintheta2, 180. * deg,
+                                          brphifinh, brphifinA2, brphifinA2, 0.,
+                                          brphifinh, brphifinA, brphifinA, 0.);
+
+
+      double brphifinL3 = 2.94 * cm / 2; // height
+
+      G4Trap* BrPhiFinShape3 = new G4Trap(format("solidEclBrPhiFinShape3").str().c_str(),
+                                          brphifinL3, 0, 180. * deg,
+                                          brphifinh, brphifinA2, brphifinA2, 0.,
+                                          brphifinh, brphifinA2, brphifinA2, 0.);
+
+      G4Transform3D shape2position = G4Translate3D((brphifinA + f_dx2) - (brphifina + f_dx) - f_xBack * 2 , 0 , -(brphifinL + brphifinL2));   // move shape 2
+      G4Transform3D shape3position = G4Translate3D(brphifinA2 - (brphifina + f_dx) - f_xBack * 2 - f_xBack2 * 2 , 0 , -(brphifinL + brphifinL2 * 2 + brphifinL3)); // move shape 3
+
+      G4UnionSolid* BrPhiFinShape12 = new G4UnionSolid(format("solidEclBrPhiFinShape12").str().c_str(), BrPhiFinShape1, BrPhiFinShape2, shape2position);
+      G4UnionSolid* BrPhiFinShape = new G4UnionSolid(format("solidEclBrPhiFin").str().c_str(), BrPhiFinShape12, BrPhiFinShape3, shape3position);
+
+
+
       G4LogicalVolume* BrPhiFin = new G4LogicalVolume(BrPhiFinShape, medAl, format("logicalEclBrPhiFin").str().c_str(), 0, 0, 0);
-      //BrPhiFin->SetSensitiveDetector(m_sensitive);
       assemblyBrPhiFins->AddPlacedVolume(BrPhiFin, Tr);
 
 
@@ -779,11 +805,9 @@ namespace Belle2 {
 
           if (1 <= iCry && iCry <= 6) { // but not pentagon
             G4LogicalVolume* FwFoil = new G4LogicalVolume(FwFoilShape, medAlTeflon_thin, (format("logicalFwFoil_%1%") % iCry).str().c_str(), 0, 0, 0);
-            //FwFoil->SetSensitiveDetector(m_sensitive);
             assemblyFwFoils->AddPlacedVolume(FwFoil, Tr);
           } else {
             G4LogicalVolume* FwFoil = new G4LogicalVolume(FwFoilShape, medAlTeflon, (format("logicalFwFoil_%1%") % iCry).str().c_str(), 0, 0, 0);
-            //FwFoil->SetSensitiveDetector(m_sensitive);
             assemblyFwFoils->AddPlacedVolume(FwFoil, Tr);
           }
 
@@ -885,11 +909,9 @@ namespace Belle2 {
 
         if ((iCry == 110 || iCry == 113 || iCry == 116 || iCry == 119) || (121 <= iCry && iCry <= 128)) {
           G4LogicalVolume* BwFoil = new G4LogicalVolume(BwFoilShape, medAlTeflon_thin, (format("logicalBwFoil_%1%") % iCry).str().c_str(), 0, 0, 0);
-          //BwFoil->SetSensitiveDetector(m_sensitive);
           assemblyBwFoils->AddPlacedVolume(BwFoil, Tr);
         } else {
           G4LogicalVolume* BwFoil = new G4LogicalVolume(BwFoilShape, medAlTeflon, (format("logicalBwFoil_%1%") % iCry).str().c_str(), 0, 0, 0);
-          //BwFoil->SetSensitiveDetector(m_sensitive);
           assemblyBwFoils->AddPlacedVolume(BwFoil, Tr);
         }
 
@@ -929,62 +951,60 @@ namespace Belle2 {
         assemblyBrCrystals->MakeImprint(logical_ecl, BrR);
         assemblyBrFoils->MakeImprint(logical_ecl, BrRR);  // foil
         assemblyBrFoils->MakeImprint(logical_ecl, BrR);  // foil
-        assemblyBrFins->MakeImprint(logical_ecl, BrRR);  // fin
-        assemblyBrFins->MakeImprint(logical_ecl, BrR);  // fin
+        assemblyBrFins->MakeImprint(logical_ecl, BrRR);  // theta fin
+        assemblyBrFins->MakeImprint(logical_ecl, BrR);  // theta fin
         assemblyBrPhiFins->MakeImprint(logical_ecl, BrR);  // phi fin
       }//iSector
-
       for (int iSector = 0; iSector < 16; ++iSector) {//total 16
         G4Transform3D BrR = G4RotateZ3D(360.*iSector / 16 * deg);
         assemblyBwCrystals->MakeImprint(logical_ecl, BrR);
         assemblyBwFoils->MakeImprint(logical_ecl, BrR);  // foil
       }//16 sectior
+
+
       if (isBeamBkgStudy) {
         assemblyFwDiodes->MakeImprint(logical_ecl, Global_offset);
         assemblyBrDiodes->MakeImprint(logical_ecl, Global_offset);
         assemblyBwDiodes->MakeImprint(logical_ecl, Global_offset);
       }
 
-      bool isFastSimulation = false;
-      if (!isFastSimulation) {
-        double BarrelCylinderWZ[6]    = {k_c2z1, k_c2z2, k_c2z2, k_c1z2, k_c1z2, k_c1z3};
-        double BarrelCylinderWRin[6]  = {k_c2r1, k_c2r1, k_c2r1, k_c1r1, k_c1r1, k_c1r1};
-        double BarrelCylinderWRout[6] = {k_c2r3, k_c2r3, k_c2r2, k_c1r2, k_c1r3, k_c1r3};
+      double BarrelCylinderWZ[6]    = {k_c2z1, k_c2z2, k_c2z2, k_c1z2, k_c1z2, k_c1z3};
+      double BarrelCylinderWRin[6]  = {k_c2r1, k_c2r1, k_c2r1, k_c1r1, k_c1r1, k_c1r1};
+      double BarrelCylinderWRout[6] = {k_c2r3, k_c2r3, k_c2r2, k_c1r2, k_c1r3, k_c1r3};
 
 
-        G4Polycone* BarrelCylinderWorld = new G4Polycone("BarrelCylinderWorld", 0, 2 * PI, 6, BarrelCylinderWZ, BarrelCylinderWRin, BarrelCylinderWRout);
-        G4LogicalVolume* logical_BarrelCylinder = new G4LogicalVolume(BarrelCylinderWorld, medAir, "logical_BarrelCylinderWorld");
-        physical_ECLBarrelCylinder = new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logical_BarrelCylinder, "physicalBarrelCylinder", &topVolume, false, 0);
-        G4AssemblyVolume* assemblyBarrelCylinderSupport = new G4AssemblyVolume();
+      G4Polycone* BarrelCylinderWorld = new G4Polycone("BarrelCylinderWorld", 0, 2 * PI, 6, BarrelCylinderWZ, BarrelCylinderWRin, BarrelCylinderWRout);
+      G4LogicalVolume* logical_BarrelCylinder = new G4LogicalVolume(BarrelCylinderWorld, medAir, "logical_BarrelCylinderWorld");
+      physical_ECLBarrelCylinder = new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logical_BarrelCylinder, "physicalBarrelCylinder", &topVolume, false, 0);
+      G4AssemblyVolume* assemblyBarrelCylinderSupport = new G4AssemblyVolume();
 
-        double BarrelCylinder1Z[4] = {k_c1z1, k_c1z2, k_c1z2, k_c1z3};
-        double BarrelCylinder1Rin[4] = {k_c1r1, k_c1r1, k_c1r1, k_c1r1};
-        double BarrelCylinder1Rout[4] = {k_c1r2, k_c1r2, k_c1r3, k_c1r3};
+      double BarrelCylinder1Z[4] = {k_c1z1, k_c1z2, k_c1z2, k_c1z3};
+      double BarrelCylinder1Rin[4] = {k_c1r1, k_c1r1, k_c1r1, k_c1r1};
+      double BarrelCylinder1Rout[4] = {k_c1r2, k_c1r2, k_c1r3, k_c1r3};
 
-        G4Polycone* barCy1 =
-          new G4Polycone("ECL Barrel Support Cylinder", 0 * deg, 360.*deg, 4, BarrelCylinder1Z, BarrelCylinder1Rin, BarrelCylinder1Rout);
-
-
-        double BarrelCylinder2Z[4] = {k_c2z1, k_c2z2, k_c2z2, k_c2z3};
-        double BarrelCylinder2Rin[4] = {k_c2r1, k_c2r1, k_c2r1, k_c2r1};
-        double BarrelCylinder2Rout[4] = {k_c2r3, k_c2r3, k_c2r2, k_c1r2};
-
-        G4Polycone* barCy2 =
-          new G4Polycone("ECL Barrel Support Cylinder", 0 * deg, 360.*deg, 4, BarrelCylinder2Z, BarrelCylinder2Rin, BarrelCylinder2Rout);
-
-        G4LogicalVolume* barCy1_logi = new G4LogicalVolume(barCy1, Materials::get("G4_Fe"), "ECLBarrelSupportCylinder1", 0, 0, 0);
-        G4LogicalVolume* barCy2_logi = new G4LogicalVolume(barCy2, Materials::get("G4_Fe"), "ECLBarrelSupportCylinder2", 0, 0, 0);
+      G4Polycone* barCy1 =
+        new G4Polycone("ECL Barrel Support Cylinder", 0 * deg, 360.*deg, 4, BarrelCylinder1Z, BarrelCylinder1Rin, BarrelCylinder1Rout);
 
 
-        assemblyBarrelCylinderSupport->AddPlacedVolume(barCy1_logi, Global_offset);
-        assemblyBarrelCylinderSupport->AddPlacedVolume(barCy2_logi, Global_offset);
-        assemblyBarrelCylinderSupport->MakeImprint(logical_BarrelCylinder, Global_offset);
+      double BarrelCylinder2Z[4] = {k_c2z1, k_c2z2, k_c2z2, k_c2z3};
+      double BarrelCylinder2Rin[4] = {k_c2r1, k_c2r1, k_c2r1, k_c2r1};
+      double BarrelCylinder2Rout[4] = {k_c2r3, k_c2r3, k_c2r2, k_c1r2};
+
+      G4Polycone* barCy2 =
+        new G4Polycone("ECL Barrel Support Cylinder", 0 * deg, 360.*deg, 4, BarrelCylinder2Z, BarrelCylinder2Rin, BarrelCylinder2Rout);
+
+      G4LogicalVolume* barCy1_logi = new G4LogicalVolume(barCy1, Materials::get("G4_Fe"), "ECLBarrelSupportCylinder1", 0, 0, 0);
+      G4LogicalVolume* barCy2_logi = new G4LogicalVolume(barCy2, Materials::get("G4_Fe"), "ECLBarrelSupportCylinder2", 0, 0, 0);
 
 
-        makeEndcap(0);
-        makeEndcap(1);
-        makeSupport();
-      }
+      assemblyBarrelCylinderSupport->AddPlacedVolume(barCy1_logi, Global_offset);
+      assemblyBarrelCylinderSupport->AddPlacedVolume(barCy2_logi, Global_offset);
+      assemblyBarrelCylinderSupport->MakeImprint(logical_BarrelCylinder, Global_offset);
+
+
+      makeEndcap(0);
+      makeEndcap(1);
+      makeSupport();
 
 
     }//create

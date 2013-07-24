@@ -121,7 +121,8 @@ namespace Belle2 {
                << outputList->getList(0).size() << "+" << outputList->getList(1).size());
         break;
       default:
-        B2ERROR("ParticleCombiner: " << m_pdg << " " << m_listName << " ***invalid Type "
+        B2ERROR("ParticleCombiner: " << m_pdg << " " << m_listName << "->" << decay
+                << " ***invalid FlavorType: "
                 << outputList->getFlavorType());
     }
 

@@ -63,7 +63,7 @@ namespace Belle2 {
      *  If there are already entries from this MCId, the corresponding number of hits is increased by 1.
      *  If there are no entries from this MCId, a new entry with 1 hit is created.
      */
-    virtual void addMCParticle(std:: vector <std::pair<int, int> >  & mcParticleContributions, int mcId);
+    virtual void addMCParticle(std:: vector <std::pair<int, int> >&   mcParticleContributions, int mcId);
 
     /** This method evaluates the MCParticle Id with the largest contribution from the vector mcParticleContributions.
      *  This vector stores pairs <MCParticleId, Number of Hits from this MCParticle>.
@@ -82,11 +82,7 @@ namespace Belle2 {
 
     std::string m_cdcHitsCollectionName;                /**< CDCHits collection name */
 
-    std::string m_mcPartToCDCHits;                      /**< MCParticles to CDCHits relation name */
-
     std::string m_gfTrackCandsCollectionName;           /**< GFTrackCandidates collection name */
-
-    std::string m_gfTrackCandsToMCParticles;            /**< GFTrackCandidates to MCParticles relation name */
 
 
 

@@ -19,8 +19,6 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include "GFTrackCand.h"
 
-#include "framework/gearbox/Const.h"
-
 #include <cstdlib>
 #include <string>
 
@@ -33,7 +31,7 @@ REG_MODULE(CDCMCMatching)
 CDCMCMatchingModule::CDCMCMatchingModule() :
   Module()
 {
-  setDescription("Matches the GFTrackCandidates with MCTruth to evaluate the performance of pattern recognition. Assigns to each GFTrackCandidate an ID of the MCParticles which contributed the largest amount of hits to this track candidate.");
+  setDescription("Matches the GFTrackCandidates with MCTruth to evaluate the performance of the pattern recognition. Assigns to each GFTrackCandidate a relation to the MCParticle which contributed the largest amount of hits to this track candidate.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //the collection names as parameters may soon be obsolete if we will always use the default names created automatically
@@ -41,9 +39,8 @@ CDCMCMatchingModule::CDCMCMatchingModule() :
   //input
   addParam("MCParticlesColName", m_mcParticlesCollectionName, "Name of collection holding the MCParticles", string(""));
   addParam("CDCHitsColName", m_cdcHitsCollectionName, "CDCHits collection ", string(""));
-  addParam("MCParticlesToCDCHitsColName", m_mcPartToCDCHits, "Name of collection holding the relations between MCParticles and CDCHits", string(""));
 
-  addParam("GFTrackCandidatesColName", m_gfTrackCandsCollectionName, "Name of collection holding the GFTrackCandidates (output of the pattern recognition)", string("GFTrackCands_PatternReco"));
+  addParam("GFTrackCandidatesColName", m_gfTrackCandsCollectionName, "Name of collection holding the GFTrackCandidates (output of the pattern recognition)", string(""));
 
 }
 
@@ -142,7 +139,7 @@ void CDCMCMatchingModule::terminate()
 }
 
 
-void CDCMCMatchingModule::addMCParticle(vector <pair<int, int> >  & mcParticleContributions, int mcId)
+void CDCMCMatchingModule::addMCParticle(vector <pair<int, int> >&   mcParticleContributions, int mcId)
 {
 
   bool already = false;   //boolean to mark if this mcId is already there

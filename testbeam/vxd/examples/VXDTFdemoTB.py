@@ -86,7 +86,7 @@ vxdtf.logging.debug_level = 11
 # calcQIType:  Supports 'kalman', 'circleFit' or 'trackLength', 'circleFit' has best performance at the moment
 # filterOverlappingTCs: Supports 'hopfield', 'greedy' or 'none', 'hopfield' has best performance at the moment
 param_vxdtf = {  # normally we don't know the particleID, but in the case of the testbeam, we can expect (anti-?)electrons...
-    'activateBaselineTF': 0,
+    'activateBaselineTF': 1,
     'tccMinState': [2],
     'tccMinLayer': [3],
     'standardPdgCode': -11,

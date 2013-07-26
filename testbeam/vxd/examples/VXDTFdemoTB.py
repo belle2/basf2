@@ -6,21 +6,22 @@
 import os
 from basf2 import *
 from subprocess import call
+import datetime
 
-secSetup = ['testBeamHIGH']  # ,'evtgenHIGH' 'evtgenSTD', 'evtgenLOW'] # when using the same secSetup several times, use this for setting Value
+secSetup = ['testBeamFINE_VXD']  # use 'testBeamFINE_SVD' for svd-onle or 'testBeamFINE_VXD' for full vxd reco
+# and don't forget to set the clusters for the detector type you want in the mcTrackFinder down below!
 qiType = 'circleFit'
 filterOverlaps = 'hopfield'
-detectType = 'VXD'
-iteration = '1'
-numEvents = 100
-# bgType = 'noBG'
-# doSmear = False
-# doOVerlap = False
-# pTRange = 'fullRange'
-roFileNameTF = 'VXDTFoutput' + qiType + filterOverlaps + detectType + iteration
-# roFileNameTFA = 'TFAnalizer' + qiType + filterOverlaps + detectType + bgType + pTRange + iteration
+seed = 1
+numEvents = 250
+
+now = datetime.datetime.now()
+
+roFileNameTF = 'VXDTFoutput' + qiType + filterOverlaps + secSetup[0] \
+    + now.strftime('%Y-%m-%d %H:%M')
 
 set_log_level(LogLevel.ERROR)
+set_random_seed(seed)
 
 evtmetagen = register_module('EvtMetaGen')
 evtmetagen.param('expList', [0])
@@ -81,24 +82,22 @@ PXDCLUST = register_module('PXDClusterizer')
 
 vxdtf = register_module('VXDTF')
 vxdtf.logging.log_level = LogLevel.INFO
-vxdtf.logging.debug_level = 151
-# detectorType: Supports 'SVD' and 'VXD' so far
-# calcQIType:  Supports 'kalman', 'circleFit' or 'trackLength'
-# filterOverlappingTCs: Supports 'hopfield', 'greedy' or 'none'
-param_vxdtf = {
+vxdtf.logging.debug_level = 11
+# calcQIType:  Supports 'kalman', 'circleFit' or 'trackLength', 'circleFit' has best performance at the moment
+# filterOverlappingTCs: Supports 'hopfield', 'greedy' or 'none', 'hopfield' has best performance at the moment
+param_vxdtf = {  # normally we don't know the particleID, but in the case of the testbeam, we can expect (anti-?)electrons...
+    'activateBaselineTF': 0,
     'tccMinState': [2],
     'tccMinLayer': [3],
-    'detectorType': [detectType],
+    'standardPdgCode': -11,
     'sectorSetup': secSetup,
     'calcQIType': qiType,
     'cleanOverlappingSet': False,
     'filterOverlappingTCs': filterOverlaps,
     'TESTERexpandedTestingRoutines': True,
     'qiSmear': False,
+    'smearSigma': 0.000001,
     'GFTrackCandidatesColName': 'caTracks',
-    'setOrigin': [-50., 0., 0.],
-    'magneticFieldStrength': 0.976,
-    'tuneCircleFit': [0.0025],
     'writeToRoot': True,
     'rootFileName': [roFileNameTF, 'RECREATE'],
     'activateDistance3D': [True],
@@ -129,24 +128,26 @@ param_vxdtf = {
     'activateDeltaPt': [False],
     'activateDeltaDistance2IP': [False],
     'activateCircleFit': [True],
+    'tuneCircleFit': [0.00001],
     }
 vxdtf.param(param_vxdtf)
 
 analyzer = register_module('TFAnalizer')
 analyzer.logging.log_level = LogLevel.INFO
 analyzer.logging.debug_level = 11
-param_analyzer = {'printExtentialAnalysisData': False, 'caTCname': 'caTracks'}  # set true if PRINTINFO is wanted
+param_analyzer = {'printExtentialAnalysisData': False, 'caTCname': 'caTracks'}
+# 'printExtentialAnalysisData': set true if PRINTINFO is wanted
 analyzer.param(param_analyzer)
 
 mctrackfinder = register_module('MCTrackFinder')
 mctrackfinder.logging.log_level = LogLevel.INFO
-param_mctrackfinder = {  # 'PXD', 'SVD',
+param_mctrackfinder = {
     'UseCDCHits': 0,
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'Smearing': 0,
     'UseClusters': True,
-    'MinimalNDF': 6,
+    'MinimalNDF': 5,
     'WhichParticles': ['PXD', 'SVD'],
     'GFTrackCandidatesColName': 'mcTracks',
     }
@@ -156,6 +157,10 @@ trackfitter = register_module('GenFitter')
 trackfitter.logging.log_level = LogLevel.WARNING
 trackfitter.param('GFTrackCandidatesColName', 'acceptedVXDTFTracks')
 trackfitter.param('UseClusters', True)
+
+eventCounter = register_module('EventCounter')
+eventCounter.logging.log_level = LogLevel.INFO
+eventCounter.param('stepSize', 25)
 
 display = register_module('Display')
 
@@ -174,7 +179,7 @@ display = register_module('Display')
 # interactively by removing its checkmark in the 'Eve' tab.
 #
 # This option only makes sense when ShowGFTracks is true
-display.param('options', 'HTM')  # default
+display.param('options', 'HTMS')  # default
 
 # should hits always be assigned to a particle with c_PrimaryParticle flag?
 # with this option off, many tracking hits will be assigned to secondary e-
@@ -215,9 +220,25 @@ main.add_module(vxdtf)
 main.add_module(mctrackfinder)
 main.add_module(analyzer)
 main.add_module(trackfitter)
+main.add_module(eventCounter)
 # main.add_module(display)
 
 # Process events
 process(main)
 
 print statistics
+
+# print 'Event Statistics for vxdtf:'
+# print statistics([vxdtf])
+
+print 'Memory statistics'
+for stats in statistics.modules:
+    print 'Module %s:' % stats.name
+    print ' -> initialize(): %10d KB' % stats.memory(statistics.INIT)
+    print ' -> beginRun():   %10d KB' % stats.memory(statistics.BEGIN_RUN)
+    print ' -> event():      %10d KB' % stats.memory()
+    print ' -> endRun():     %10d KB' % stats.memory(statistics.END_RUN)
+    print ' -> terminate():  %10d KB' % stats.memory(statistics.TERM)
+
+print 'Event Statistics detailed:'
+print statistics(statistics.TOTAL)

@@ -2,10 +2,10 @@
 <!--This is the main index file for sectorMaps/fiendLists used by the VXDTFModule to support new ones, an entry within this list has to be added after adding the friendList-file to this directory-->
 <CATFParameters xmlns:xi="http://www.w3.org/2001/XInclude">
 	<!-- TODO: If you want to use the VXDTFModule, you have to uncomment the following lines! -->
-	<xi:include href="friendList_testBeamHIGH_VXD.xml"/>
-	<xi:include href="friendList_testBeamFINE_VXD.xml"/>
-	<xi:include href="friendList_testBeamSTD_VXD.xml"/>
-	<xi:include href="friendList_testBeamSTD2_VXD.xml"/>
-	<xi:include href="friendList_testBeamSTD3_VXD.xml"/>
+
+	<xi:include href="sectorList_testBeamFINE_VXD.xml"/>
+	<xi:include href="sectorList_testBeamSTD_SVD.xml"/>
+	<xi:include href="sectorList_testBeamFINE_SVD.xml"/>
+	<xi:include href="sectorList_testBeamSTD2_VXD.xml"/>
 
 </CATFParameters>

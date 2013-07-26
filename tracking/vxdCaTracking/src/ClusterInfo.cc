@@ -10,6 +10,7 @@
 
 // #include "../include/VXDTFTrackCandidate.h"
 #include "../include/ClusterInfo.h"
+#include <framework/logging/Logger.h>
 
 #include <boost/foreach.hpp>
 
@@ -21,40 +22,88 @@ using namespace Belle2::Tracking;
 
 void Belle2::Tracking::ClusterInfo::addTrackCandidate(VXDTFTrackCandidate* aTC)
 {
-  int ctr = 0;
   BOOST_FOREACH(VXDTFTrackCandidate * anotherTC, m_attachedTCs) {
-    if (isSameTC(aTC, anotherTC) == true) { ++ctr; break; }
+    if (isSameTC(aTC, anotherTC) == true) { return; }
   }
-  if (ctr == 0) { m_attachedTCs.push_back(aTC); }
+  m_attachedTCs.push_back(aTC);
 }
 
 
 bool Belle2::Tracking::ClusterInfo::isOverbooked()
 {
-  int ctr = 0;
-  vector<VXDTFTrackCandidate*> overbookedOnes;
-  BOOST_FOREACH(VXDTFTrackCandidate * aTC, m_attachedTCs) {
-    if (aTC->getCondition() == false) { continue; }
-    ++ctr;
-    overbookedOnes.push_back(aTC);
-  }
-  if (ctr > 1) {
-    BOOST_FOREACH(VXDTFTrackCandidate * aTC, overbookedOnes) {
-//      aTC->clearRivals();
-      BOOST_FOREACH(VXDTFTrackCandidate * bTC, overbookedOnes) {
-        if (isSameTC(aTC, bTC) == false) { aTC->addBookingRival(bTC); }
+  int nTCs = m_attachedTCs.size(), countIterations = 0;
+  TcContainer::iterator tcIta = m_attachedTCs.begin();
+  bool isOverbooked = false;
+  for (; tcIta != m_attachedTCs.end(); ++tcIta) {
+    if ((*tcIta)->getCondition() == false) { continue; }
+    TcContainer::iterator tcItb = tcIta;
+    for (++tcItb; tcItb != m_attachedTCs.end(); ++tcItb) {
+      if ((*tcItb)->getCondition() == false) { continue; }
+
+      if (isSameTC((*tcIta), (*tcItb)) == false) {
+        (*tcIta)->addBookingRival((*tcItb));
+        (*tcItb)->addBookingRival((*tcIta));
+        isOverbooked = true;
       }
     }
-    return true;
-  } else { return false; }
+    countIterations++;
+    if (countIterations > nTCs) { B2FATAL("ClusterInfo::isOverbooked(): iterator crash! nIterations: " << countIterations << ", nTCs: " << nTCs) }
+  }
+  B2DEBUG(150, " Cluster at ownIndex " << m_ownPositionInIndex << " has got total/alive" << nTCs << "/" << countIterations << " track candidates stored...")
+  if (isOverbooked == true && m_reserved == true) {
+    B2WARNING(" Cluster at ownIndex " << m_ownPositionInIndex << " has got total/alive" << nTCs << "/" << countIterations << " track candidates stored... and is reserved: " << m_reserved)
+  }
+  return isOverbooked;
 }
 
 
-void Belle2::Tracking::ClusterInfo::setReserved(VXDTFTrackCandidate* newBossTC)
+bool Belle2::Tracking::ClusterInfo::setReserved(VXDTFTrackCandidate* newBossTC)
 {
+  if (newBossTC == NULL) { B2WARNING("ClusterInfo::setReserved: you gave me a NULL pointer! ") return false; }
+  if (newBossTC->getCondition() == false) {
+    B2WARNING("ClusterInfo::setReserved: the new boss you sent is already dead! It had the tracknumber: " << newBossTC->getTrackNumber())
+    return false;
+  }
+  if (m_bossTC != NULL) {
+    if (newBossTC != m_bossTC) {
+      B2WARNING("ClusterInfo::setReserved: the cluster withOwnID (" << m_ownPositionInIndex << ") is already reserved by: " << m_bossTC->getTrackNumber() << ", new Boss has " << newBossTC->getTrackNumber() << " and is not the same!")
+      return false;
+    }
+    B2INFO("ClusterInfo::setReserved: the cluster withOwnID (" << m_ownPositionInIndex << ") was already reserved by that TC: " << m_bossTC->getTrackNumber() << ", you have sent now " << newBossTC->getTrackNumber() << " which is the same, old reserved-state(" << m_reserved << ")!")
+    m_reserved = true;
+    return true;
+  }
   BOOST_FOREACH(VXDTFTrackCandidate * aTC, m_attachedTCs) {
     if (aTC->getCondition() == false) { continue; }
     if (isSameTC(aTC, newBossTC) == false) { aTC->setCondition(false); }
   }
+  m_bossTC = newBossTC;
   m_reserved = true;
+  return true;
+}
+
+
+bool ClusterInfo::checkReserved(VXDTFTrackCandidate* newBossTC) const
+{
+  if (newBossTC == NULL) { B2WARNING("ClusterInfo::checkReserved: you gave me a NULL pointer! ") return false; }
+  if ((m_reserved == false) && (m_bossTC == NULL)) { return false; }
+  if (m_reserved == false && m_bossTC != NULL) {
+    if (newBossTC == m_bossTC) {
+      if (newBossTC->getCondition() == false) {
+        B2WARNING("ClusterInfo::checkReserved: he new boss you sent with trackNum " << m_bossTC->getTrackNumber() << " is already dead! You head it already reserved per pointer and m_reserved is " << m_reserved)
+        return false;
+      }
+      B2INFO("ClusterInfo::checkReserved: the Cluster withOwnID (" << m_ownPositionInIndex << ") was already pointing to new boss (trackNumber: " << m_bossTC->getTrackNumber() << ") but reserved was false, you gave me number " << newBossTC->getTrackNumber() << " which is the same as before, please start again with setReserved()")
+      return false;
+    }
+    B2WARNING("ClusterInfo::checkReserved: the new boss you sent is already dead! It had the tracknumber: " << newBossTC->getTrackNumber())
+  }
+  // reserved == true:
+
+  if (newBossTC != m_bossTC && m_bossTC != NULL) {
+    B2INFO("ClusterInfo::checkReserved: the cluster withOwnID (" << m_ownPositionInIndex << ") is already reserved by: " << m_bossTC->getTrackNumber() << ", new Boss has " << newBossTC->getTrackNumber() << " and is not the same")
+    return false;
+  }
+  return true;
+
 }

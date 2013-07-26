@@ -21,9 +21,8 @@ using boost::math::isnan;
 
 double TwoHitFilters::filterNan(double value)
 {
-  if ((boost::math::isnan)(value) == true) return 0;
+  if ((boost::math::isnan)(value) == true) { return 0; }
   return value;
-
 }
 
 

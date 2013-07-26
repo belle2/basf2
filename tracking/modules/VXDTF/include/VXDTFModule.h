@@ -40,6 +40,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <deque>
 #include <list>
 #include <map>
 #include <utility>
@@ -52,8 +53,8 @@
 #include <TFile.h>
 
 //boost:
-#include <boost/lambda/lambda.hpp>
-#include <boost/lambda/casts.hpp>
+#include "boost/tuple/tuple.hpp" // for tuple, tie
+#include <boost/graph/adjacency_list.hpp> // for customizable graphs
 #ifndef __CINT__
 #include <boost/unordered_map.hpp>
 #include <boost/chrono.hpp>
@@ -85,6 +86,9 @@ namespace Belle2 {
     public:
 
       struct CurrentPassData; /**< forward declaration  */
+      struct SensorStruct; /**< forward declaration  */
+      struct Vertex; /**< forward declaration  */
+      struct Edge; /**< forward declaration  */
 
       //      boost::unordered_map
 
@@ -98,6 +102,8 @@ namespace Belle2 {
       typedef std::vector<VXDTFHit*> HitsOfEvent; /**< contains all hits of event */
       typedef std::list<VXDSegmentCell*> ActiveSegmentsOfEvent; /**< is list since random deleting processes are needed */
       typedef std::vector<VXDSegmentCell*> TotalSegmentsOfEvent; /**< is vector since no entries are deleted and random access is needed  */
+      typedef std::map<int, SensorStruct> ActiveSensorsOfEvent; /**< is map where adresses to each activated sensor (key->int = uniID/vxdID) are stored and all clusters which can be found on them */
+      typedef std::list<int> BrokenSensorsOfEvent; /**< atm a list containing the keys to all sensors where number of u and v clusters don't fit */
       typedef std::pair<unsigned int, MapOfSectors::iterator> SectorNameAndPointerPair; /**< we are storing the name of the sector (which is encoded into an int) to be able to sort them! */
       typedef std::list<SectorNameAndPointerPair> OperationSequenceOfActivatedSectors; /**< contains all active sectors, can be sorted by name (first entry) */
       typedef std::vector<VXDTFTrackCandidate*> TCsOfEvent; /**< contains all track candidates of event */
@@ -108,35 +114,58 @@ namespace Belle2 {
       //    typedef boost::chrono::duration_cast durationCast;
       //    typedef std::chrono::high_resolution_clock boostClock;
       //    typedef std::chrono::nanoseconds boostNsec;
+      typedef boost::tuple<double, double, VXDTFHit*> HitExtraTuple; /**< get<0>: distance to origin, get<1>: distance to seedHit, get<2> pointer to hit. SeedHit is outermost hit of detector and will be used for cosmic search */
+      typedef boost::adjacency_list <
+      boost::vecS, // defines the container used for the edges (vecS = std::vector)
+            boost::vecS, // defines the container used for the vertices
+            boost::directedS, // defines the behavior of the edges: directed graph
+            Vertex, //  The type that describes a Vertex.
+            Edge //  The type that describes an Edge
+            > BoostUndirectedGraph; /**< used by simpleReco - is a mathematical graph storing info about Hits and their relations */
+      typedef boost::adjacency_list <
+      boost::vecS, // defines the container used for the edges (vecS = std::vector)
+            boost::vecS, // defines the container used for the vertices
+            boost::undirectedS, // defines the behavior of the edges: undirected graph (edge u,v = edge v,u) != bidirectionalS (edge u,v != edge v,u)
+            Vertex, //  The type that describes a Vertex.
+            Edge //  The type that describes an Edge
+            > BoostDirectedGraph; /**< used by simpleReco - is a mathematical graph storing info about Hits and their relations */
+      typedef BoostUndirectedGraph::vertex_descriptor undirectedVertexID; /**< used for adding vertices to BoostGraph */
+      typedef BoostUndirectedGraph::edge_descriptor undirectedEdgeID; /**< used for adding vertices to BoostGraph */
+      typedef BoostDirectedGraph::vertex_descriptor directedVertexID; /**< used for adding vertices to BoostGraph */
+      typedef BoostDirectedGraph::edge_descriptor directedEdgeID; /**< used for adding vertices to BoostGraph */
 
 
 
       /** structs for internal use **/
+
+      struct Vertex {
+        // or whatever, maybe nothing
+      };
+
+      struct Edge {
+        // nothing, probably. Or a weight, a distance, a direction, ...
+      };
+
       /** SensorStruct needed for SVDCluster sorting, stores u and v clusters of Sensor  */
       struct SensorStruct {
-        std::vector<std::pair<int, const Belle2::SVDCluster*> > uClusters; /**< .first is arrayIndex in StoreArray, .second is pointer to the Cluster itself */
-        std::vector<std::pair<int, const Belle2::SVDCluster*> > vClusters; /**< same as uClusters, but for vClusters  */
+        std::vector<ClusterInfo*> uClusters; /**< contains pointers to all uClusters(using ClusterInfo) on that sensor */
+        std::vector<ClusterInfo*> vClusters; /**< contains pointers to all vClusters(using ClusterInfo) on that sensor */
         int layerID; /**< layer ID of the Cluster */
       };
 
 
       /** needed for SVDCluster sorting, represents a 2D-cluster (combining 2 1D-clusters) */
       struct ClusterHit {
-        const SVDCluster* uCluster; /**< pointer to uCluster of current Hit */
-        const SVDCluster* vCluster; /**< pointer to vCluster of current Hit */
-        int uClusterIndex; /**< index number of uCluster of current Hit */
-        int vClusterIndex; /**< index number of uCluster of current Hit */
-      };
-
-      /** stores information to each cluster which TC is using it */
-      struct ClusterUsage {
-        std::vector<TCsOfEvent > PXDClusters; /**< carries index numbers of all pxd clusters and stores pointers to all TCs using them */
-        std::vector<TCsOfEvent> SVDClusters; /**< same as above but for svd clusters (information, whether its u or v is not important) */
+        ClusterInfo* uCluster; /**< pointer to uCluster(using ClusterInfo) of current Hit */
+        ClusterInfo* vCluster; /**< pointer to vCluster(using ClusterInfo) of current Hit */
       };
 
 
       /** for testing purposes, storing time consumption */
       struct TimeInfo {
+        /** constructor */
+        TimeInfo() {}
+        boostNsec baselineTF; /**< time consumption of the baselineTF */
         boostNsec hitSorting; /**< time consumption of the hit sorting process */
         boostNsec segFinder; /**< time consumption of the segFinder */
         boostNsec nbFinder; /**< time consumption of the nbFinder */
@@ -202,9 +231,11 @@ namespace Belle2 {
         MapOfSectors sectorMap; /**< carries the whole lookup-table including the information of which sectors can be combined */
 
         std::string sectorSetup; /**< name of setup, needed e.g. for XML-readout */
+        std::string additionalInfo; /**< carries some extra info about current setup/pass */
+        TVector3 origin; /**< stores the chosen origin (position of assumed primary vertex) */
         std::string chosenDetectorType; /**< same as detectorType, but fully written ('SVD','PXD' or 'VXD'), needed during xml and for logging messages */
         int detectorType; /**< PXD = 0 , SVD = 1, VXD = -1 */
-        double setupWeigh; /**< defines importance of current Pass. most important Passes stay at value 0.0, less important ones can be set between 0.0 and 100.0 (percent of QI-decrease). This affects the outcome of the neuronal network */
+        double reserveHitsThreshold; /**< value between 0 (0%) and 1 (100%), defines how many tcs are allowed to reserve their clusters which forbids other TCs to use them too */
         short int highestAllowedLayer; /**< needed for e.g. hitfinding. This value excludes Layernumbers higher than set value. (interesting for low momentum tracks)  */
         int numTotalLayers;  /**< needed e.g. for neuronal network. This value allows calculation of maximum track length (noncurling), carries implicit information about detectorType, while 'highestAllowedLayer' does not know whether its a SVD or VXD setup */
         int minLayer; /**< lowest layer considered for TCC */
@@ -253,6 +284,10 @@ namespace Belle2 {
         Filter circleFit; /**< carries information about the filter 'circleFit', type pair<bool isActivated, doubletuningParameter> , here the tuningparameter is currently used to store the global chi2 threshold value. */
         int activatedTccFilterTests; /**< counts number of tests activated for tcc filter */
 
+        SegFinderFilters twoHitFilterBox; /**< contains all the two hit filters needed by the segFinder */
+        NbFinderFilters threeHitFilterBox; /**< contains all the three hit filters needed by the nbFinder */
+        TcFourHitFilters fourHitFilterBox; /**< contains all the four hit filters needed by the post-ca-Filter */
+        TrackletFilters trackletFilterBox; /**< contains all the four-or-more hit filters needed by the post-ca-Filter */
 
         /** filled and resetted each event **/
         OperationSequenceOfActivatedSectors sectorSequence; /**< carries pointers to sectors which are used in current event */
@@ -266,27 +301,39 @@ namespace Belle2 {
         TCsOfEvent tcVector; /**< carries track candidates of current pass */
       };
 
+
       //! Constructor
       VXDTFModule();
+
 
       //! Destructor
       virtual ~VXDTFModule();
 
+
       virtual void initialize();
 
+
       virtual void beginRun();
+
+
       virtual void the_real_event();
+
+
       virtual void event();
+
 
       virtual void endRun();
 
+
       virtual void terminate();
+
 
       /** *************************************+************************************* **/
       /** ***********************************+ + +*********************************** **/
       /** *******************************+ functions +******************************* **/
       /** ***********************************+ + +*********************************** **/
       /** *************************************+************************************* **/
+
 
       /** works with VXDSegmentCells: checks state of inner neighbours and removes incompatible and virtual ones   */
       void delFalseFriends(CurrentPassData* currentPass,
@@ -317,18 +364,6 @@ namespace Belle2 {
 
       /** for the easy situation of 2 overlapping TCs we dont need comlex algorithms for finding the best subset of clean TCs... */
       void tcDuel(TCsOfEvent& tcVector);
-
-
-      /** calculates integer score for current filter (all filters combined deliver the QQQ (normed to 0-1)), works for filterTypes having both: min- and max-value */
-      int calcQQQscore(std::vector<std::pair<std::string, double> > quantiles,
-                       double currentValue,
-                       int numOfQuantiles); // -> TODO: dirty little helper
-
-
-      /** calculates integer score for current filter (all filters combined deliver the QQQ (normed to 0-1)), works for filterTypes having only  max-value */
-      int calcQQQscoreDeltas(std::vector<std::pair<std::string, double> > quantiles,
-                             double currentValue,
-                             int numOfQuantiles); // -> TODO: dirty little helper
 
 
       /** searches for sectors fitting current hit coordinates, returns blank string if nothing could be found */
@@ -376,29 +411,24 @@ namespace Belle2 {
                    std::vector<ClusterInfo>& clustersOfEvent*/);
 
 
-      /** represents a step between the fast but weak calcQIbyLength and the mighty but slow calcQIbyKalman. Only useful for Tracks having at least 4 hits (3-hit-tracks will be set with smearValue) */
-      //     void calcQIbyCircleFit(TCsOfEvent& tcVector);
-
 
       /** name is program, needed for GFTrackCand export */
-      void calcInitialValues4TCs(TCsOfEvent& tcVector); // -> TODO auslagern!
+      void calcInitialValues4TCs(CurrentPassData* currentPass); // -> TODO auslagern!
 
 
       /** simplest way to determine QI of track candidates, calculating them by track length */
       void calcQIbyLength(TCsOfEvent& tcVector,
                           PassSetupVector& passSetups); // -> auslagern!
 
+
       /** produce GFTrackCand for current TC */
-      GFTrackCand generateGFTrackCand(VXDTFTrackCandidate* currentTC, std::vector<ClusterInfo>& clusters);
+      GFTrackCand generateGFTrackCand(VXDTFTrackCandidate* currentTC);
+
 
       /** calculate real kalman-QI's for each currently living TC */
       void calcQIbyKalman(TCsOfEvent& tcVector,
                           StoreArray<PXDCluster>& pxdClusters,
                           std::vector<ClusterInfo>& clusters); // ->auslagern!
-      //    void calcQIbyKalman(TCsOfEvent& tcVector,
-      //                         StoreArray<PXDCluster>& pxdClusters,
-      //                         StoreArray<SVDCluster>& svdClusters,
-      //                         std::vector<ClusterInfo>& clusters); // old version, backup 13-03-29
 
 
       /** because of geometrical reasons and the multipass-support, it is a rather common situation that the same track will be recovered twice or more.
@@ -419,30 +449,63 @@ namespace Belle2 {
       /** reset all reused containers and delete others which are existing only for one event. */
       void cleanEvent(CurrentPassData* currentPass, unsigned int centerSector);
 
+
       /** for streching the limits of the cutoff values for finetuning */
       double addExtraGain(double prefix, double cutOff, double generalTune, double specialTune); // -> TODO: dirty little helper
 
-      /** safe way of importing cutoff values from the xml-file */
-      double getXMLValue(GearDir& quantiles, std::string& valueType, std::string& filterType); // -> TODO: dirty little helper
 
       /** general Function to write data into a root file*/
       void writeToRootFile(double pValue, double chi2, int ndf);
 
+
       /** fast bypass for very simple events having not more than 2 easily distinguishable tracks and cosmic events */
-      bool simpleEventReco(std::vector<ClusterInfo>& clusters, const StoreArray<PXDCluster>& aPxdClusterArray, const StoreArray<SVDCluster>& aSvdClusterArray);
+      bool baselineTF(std::vector<ClusterInfo>& clusters, CurrentPassData* passInfo);
+
 
       /** store each cluster (as a clusterPtr) in a map(uniID, sensorStruct), where sensorStruct contains 2 vectors (uClusters and vClusters). In the end a map containing illuminated sensors - and each cluster inhabiting them - exists */
-      void findSensors4Clusters(std::map<int, SensorStruct>& activatedSensors, const StoreArray<SVDCluster>& aSvdClusterArray);
+      void findSensors4Clusters(ActiveSensorsOfEvent& activatedSensors, std::vector<ClusterInfo>& clusters);
+
 
       /** store a cluster (as a clusterPtr) in a map(uniID, sensorStruct), where sensorStruct contains 2 vectors (uClusters and vClusters), subroutine for findSensors4Clusters and simpleEventReco */
-      void findSensor4Cluster(std::map<int, SensorStruct>& activatedSensors, const SVDCluster* aClusterPtr, int partNr);
+      void findSensor4Cluster(ActiveSensorsOfEvent& activatedSensors, ClusterInfo& aClusterInfo);
 
-      /** iterate through map of activated sensors & combine each possible combination of clusters. Store them in a vector of structs, where each struct carries an u & a v cluster */
-      void find2DSVDHits(std::map<int, SensorStruct>& activatedSensors, std::vector<ClusterHit>& clusterHitList);
-      //    /** general Function to write data into a root file*/
-      //    void VXDTFModule::writeToRootFile(const Tracking::T_type1& variable, const std::string& branchName, const std::string &treeName);
+
+      /** iterate through map of activated sensors & combine each possible combination of clusters. Store them in a vector of structs, where each struct carries an u & a v cluster. return value is a vector of sensorIDs which contains strange sensors (sensors with missing clusters) */
+      BrokenSensorsOfEvent find2DSVDHits(ActiveSensorsOfEvent& activatedSensors, std::vector<ClusterHit>& clusterHitList);
+
+
+      /** checks for each strange sensor whether it makes sense to generate 1D-VXDTFHits or not. we therefore filter by threshold to keep us from stumbling over messy sensors. It returns a container full with 1D-Hits  */
+      std::vector<VXDTFHit> dealWithStrangeSensors(ActiveSensorsOfEvent& activatedSensors, BrokenSensorsOfEvent& strangeSensors);
+
+
+      /** produces VXDTFHits when getting at least one SVDCluster*, currently not compatible with normal svd-hit-cases (only for baseline-tf) */
+      VXDTFHit deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInfo, ClusterInfo* vClusterInfo);
+
+
+//      /** creates a mathematical directed graph (check typedef for more info) which will be used by the simpleEventReco to find trackCandidates */
+//      BoostDirectedGraph createDirectedGraph(std::vector<VXDTFHit>& hits);
+//
+//
+//      /** creates a mathematical undirected graph (check typedef for more info) which will be used by the simpleEventReco to find trackCandidates */
+//      BoostUndirectedGraph createUndirectedGraph(std::vector<VXDTFHit>& hits);
+
+
+      /** sorts that specific tuple using position 1, not position 0 (which can be done by using standard sorting algorithm) */
+      bool sortHitExtraTupleAtPosition1(const HitExtraTuple& t1, const HitExtraTuple& t2);
+
+
+      /** executes the calculations needed for the circleFit */
+      bool doTheCircleFit(CurrentPassData* thisPass, VXDTFTrackCandidate* aTc, int nHits, int tcCtr, int addDegreesOfFreedom = 1);
+
+
+      /** reserves hits for the best TCs so far */
+      void reserveHits(TCsOfEvent& tcVector, CurrentPassData* currentPass);
       /** random generator function */
       //    ptrdiff_t rngWrapper(ptrdiff_t i);
+
+
+
+
     protected:
       TCsOfEvent m_tcVector; /**< carries links to all track candidates found within event (during tcc filter, bad ones get kicked, lateron they simply get deactivated) */
       TCsOfEvent m_tcVectorOverlapped; /**< links only to track candidates which share at least one cluster with others*/
@@ -451,9 +514,9 @@ namespace Belle2 {
       bool m_PARAMDebugMode; /**< some code will only be executed if this mode is enabled */
       std::vector<std::string> m_PARAMsectorSetup; /**< lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) accepts 'std', 'low', 'high' and 'personal', please note that the chosen setup has to exist as a xml-file in ../tracking/data/friendList_XXX.xml. If you can not create your own xml files using e.g. the filterCalculatorModule, use params for  'tuneCutoffXXX' or 'setupWeigh' instead. multipass supported by setting setups in a row */
 
-      std::vector<std::string> m_PARAMdetectorType; /**< defines which detector type has to be exported. VXD, PXD, SVD */
-      std::vector<double> m_PARAMsetOrigin; /**< allows to reset orign (e.g. usefull for special cases like testbeams), only valid if 3 entries are found */
-      double m_PARAMmagneticFieldStrength; /**< strength of magnetic field in Tesla, standard is 1.5T */
+//       std::vector<std::string> m_PARAMdetectorType; /**< defines which detector type has to be exported. VXD, PXD, SVD */
+//       std::vector<double> m_PARAMsetOrigin; /**< allows to reset orign (e.g. usefull for special cases like testbeams), only valid if 3 entries are found */
+//       double m_PARAMmagneticFieldStrength; /**< strength of magnetic field in Tesla, standard is 1.5T */
       std::vector<int> m_PARAMhighestAllowedLayer; /**< set value below 6 if you want to exclude outer layers (standard is 6) */
       std::vector<int> m_PARAMminLayer; /**< determines lowest layer considered by track candidate collector */
       std::vector<int> m_PARAMminState; /**< determines lowest state of cells considered by track candidate collector */
@@ -518,15 +581,12 @@ namespace Belle2 {
 
       /// needed for pass handling:
       PassSetupVector m_passSetupVector; /**< contains information for each pass */
+      CurrentPassData m_baselinePass; /**< baselineTF gets his own pass, gets some settings from the first pass of the PassSetupVector */
 
-      std::vector<double> m_PARAMsectorConfigU; /**< allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
-      std::vector<double> m_PARAMsectorConfigV; /**< allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
+//       std::vector<double> m_PARAMsectorConfigU; /**< allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
+//       std::vector<double> m_PARAMsectorConfigV; /**< allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
       int m_PARAMpdGCode; /**< tandard value is 211 (pi+), ATTENTION, instead of using inconsistent sign of PdGList, in this module positively charged particles are always positive and negatively charged ones are negative (relevant for leptons) */
 
-      SegFinderFilters m_twoHitFilterBox; /**< contains all the two hit filters needed by the segFinder */
-      NbFinderFilters m_threeHitFilterBox; /**< contains all the three hit filters needed by the nbFinder */
-      TcFourHitFilters m_fourHitFilterBox; /**< contains all the four hit filters needed by the post-ca-Filter */
-      TrackletFilters m_trackletFilterBox; /**< contains all the four-or-more hit filters needed by the post-ca-Filter */
       LittleHelper m_littleHelperBox; /**< bundles small but often used functions for smearing and others.  */
 
       int m_chargeSignFactor; /**< particle dependent. for leptons it is 1, for other particles it's -1... */
@@ -553,7 +613,7 @@ namespace Belle2 {
 
       double m_PARAMomega; /**< tuning parameter for hopfield network */
       double m_tcThreshold;   /**< defines threshold for hopfield network. neurons having values below threshold are discarded */
-      double m_PARAMreserveHitsThreshold; /**< tuning parameter for passes, valid values 0-1 ( = 0-100%). It defines how many percent of the TCs (sorted by QI) are allowed to reserve their hits (which disallows further passes to use these hits). This does not mean that TCs which were not allowed to reserve their hits will be deleted, this only means that they have to compete with TCs of other passes for their hits again. Setting the values to 100% = 1 means, no hits used by tcs surviving that pass are reused, 0% = 0 means every tc has to compete with all tcs of other passes (quite similar to former behavior) */
+      std::vector<double> m_PARAMreserveHitsThreshold; /**< tuning parameter for passes, valid values 0-1 ( = 0-100%). It defines how many percent of the TCs (sorted by QI) are allowed to reserve their hits (which disallows further passes to use these hits). This does not mean that TCs which were not allowed to reserve their hits will be deleted, this only means that they have to compete with TCs of other passes for their hits again. Setting the values to 100% = 1 means, no hits used by tcs surviving that pass are reused, 0% = 0 means every tc has to compete with all tcs of other passes (quite similar to former behavior) */
 
       bool m_PARAMqiSmear; /**<  allows to smear QIs via qqq-Interface, needed when having more than one TC with the same QI */
       bool m_PARAMcleanOverlappingSet; /**< when true, TCs which are found more than once (possible because of multipass) will get filtered */
@@ -583,8 +643,14 @@ namespace Belle2 {
       std::string m_PARAMgfTrackCandsColName;     /**< TrackCandidates collection name */
       std::string m_PARAMinfoBoardName;           /**< InfoContainer collection name */
       std::string m_PARAMnameOfInstance;           /**< Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names */
+      bool m_PARAMactivateBaselineTF; /**< there is a baseline trackfinder which catches events with a very small number of hits, e.g. bhabha, cosmic and single-track-events */
 
       /// the following variables are nimimal testing routines within the TF
+      int m_TESTERnoHitsAtEvent;  /**< counts number of times, where there were no hits at the event */
+      int m_TESTERstartedBaselineTF; /**< counts number of times, the baselineTF was started */
+      int m_TESTERacceptedBrokenHitsTrack; /**< counts number of times, where a tc having at least 1 1D-SVD hit was accepted */
+      int m_TESTERrejectedBrokenHitsTrack; /**< counts number of times, where a tc having at least 1 1D-SVD hit was rejected */
+      int m_TESTERsucceededBaselineTF; /**< counts number of times, the baselineTF found a track */
       int m_TESTERtriggeredZigZagXY;/**< counts how many times zigZagXY filter found bad TCs */
       int m_TESTERtriggeredZigZagRZ;/**< counts how many times zigZagRZ filter found bad TCs */
       int m_TESTERtriggeredDpT; /**< counts how many times deltaPt filter found bad TCs  */
@@ -618,10 +684,7 @@ namespace Belle2 {
       int m_TESTERbadSectorRangeCounterForClusters; /**< counts number of times when only 1 cluster has been found on a complete sensor (therefore no 2D hits possible) */
       int m_TESTERclustersPersSectorNotMatching; /**< counts number of times when numofUclusters and numOfVclusters per sensor do not match */
       int m_TESTERhighOccupancyCtr; /**< counts number of times when high occupancy mode was activated */
-
-
-      /// frequently used constants:
-      double m_CONSTaThird; /**< simply 1/3, will be calculated once since it's needed very often */
+      int m_TESTERovercrowdedStrangeSensors; /**< counts number of times when there was a strange sensor (svd-only: mismatching number of u/v clusters) but too many hits on it to be able to try to rescue Clusters by forming 1D-VXDTFHits */
 
     private:
 

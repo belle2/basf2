@@ -68,60 +68,106 @@ namespace Belle2 {
       /** Overrides Constructor-Setup for magnetic field. if no value is given, magnetic field is assumed to be Belle2-Detector standard of 1.5T */
       void resetMagneticField(double magneticFieldStrength = 1.5) { ThreeHitFilters::resetMagneticField(magneticFieldStrength); }
 
+
       /** simply checks whether angle3D-value is accepted by the given cutoffs */
       bool checkAngle3D(int nameAngle3D);
+
+
       /** calculates the angle between the hits/vectors (3D), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngle3D instead) */
       double calcAngle3D() { return ThreeHitFilters::calcAngle3D(); }
+
+
       /** calculates the angle between the hits/vectors (3D), returning unit: angle in radians */
       double fullAngle3D() { return ThreeHitFilters::fullAngle3D(); }
+
+
       /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
       SuccessAndFailCounter getAcceptanceRateAngle3D() { return m_angle3DCtr; }
 
+
       /** simply checks whether angleXY-value is accepted by the given cutoffs */
       bool checkAngleXY(int nameAngleXY);
+
+
       /** calculates the angle between the hits/vectors (XY), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngleXY instead) */
       double calcAngleXY() { return ThreeHitFilters::calcAngleXY(); }
+
+
       /** calculates the angle between the hits/vectors (XY), returning unit: angle in radians */
       double fullAngleXY() { return ThreeHitFilters::fullAngleXY(); }
+
+
       /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
       SuccessAndFailCounter getAcceptanceRateAngleXY() { return m_angleXYCtr; }
 
+
       /** simply checks whether angleRZ-value is accepted by the given cutoffs */
       bool checkAngleRZ(int nameAngleRZ);
+
+
       /** calculates the angle between the hits/vectors (RZ), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngleRZ instead) */
       double calcAngleRZ() { return ThreeHitFilters::calcAngleRZ(); }
+
+
       /** calculates the angle between the hits/vectors (RZ), returning unit: angle in radians */
       double fullAngleRZ() { return ThreeHitFilters::fullAngleRZ(); }
+
+
       /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
       SuccessAndFailCounter getAcceptanceRateAngleRZ() { return m_angleRZCtr; }
 
+
       /** simply checks whether angleRZ-value is accepted by the given cutoffs */
       bool checkCircleDist2IP(int nameCircleDist2IP);
+
+
       /** calculates the distance of the point of closest approach of circle to the IP, returning unit: cm */
       double calcCircleDist2IP() { return ThreeHitFilters::calcCircleDist2IP(); }
+
+
       /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
       SuccessAndFailCounter getAcceptanceRateCircleDist2IP() { return m_circleDist2IPCtr; }
 
+
       /** simply checks whether the difference of the slope in RZ-value is accepted by the given cutoffs */
       bool checkDeltaSlopeRZ(int nameDeltaSlopeRZ);
+
+
       /** calculates deviations in the slope of the inner segment and the outer segment, returning unit: none */
       double calcDeltaSlopeRZ() { return ThreeHitFilters::calcDeltaSlopeRZ(); }
+
+
       /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
       SuccessAndFailCounter getAcceptanceRateDeltaSlopeRZ() { return m_deltaSlopeRZCtr; }
 
+
       /** simply checks whether pT-value is accepted by the given cutoffs */
       bool checkPt(int namePt);
+
+
       /** calculates the estimation of the transverse momentum of the 3-hit-tracklet, returning unit: GeV/c */
       double calcPt() { return ThreeHitFilters::calcPt(); }
+
+
+      /** calculates the estimation of the transverse momentum of a given particle track circle radius, returning unit: GeV/c */
+      double calcPt(double& pT) { return ThreeHitFilters::calcPt(pT); }
+
+
       /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
       SuccessAndFailCounter getAcceptanceRatePt() { return m_pTCtr; }
 
+
       /** simply checks whether helixparameter-value is accepted by the given cutoffs */
       bool checkHelixFit(int nameHelixFit);
+
+
       /** calculates the helixparameter describing the deviation in z per unit angle, returning unit: none */
       double calcHelixFit() { return ThreeHitFilters::calcHelixFit(); }
+
+
       /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
       SuccessAndFailCounter getAcceptanceRateHelixFit() { return m_helixFitCtr; }
+
 
       /** returns cutoff-values of given filter */
       std::pair <double, double> getCutoffs(int aFilter) {

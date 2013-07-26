@@ -127,6 +127,9 @@ namespace Belle2 {
         return (m_magneticFieldFactor * m_radius);
       } // return unit: GeV/c
 
+      /** calculates the estimation of the transverse momentum of given radius using defined strength of magnetic field, returning unit: GeV/c */
+      double calcPt(double radius) { return (m_magneticFieldFactor * radius); } // return unit: GeV/c
+
       /** calculates deviations in the slope of the inner segment and the outer segment, returning unit: none */
       double calcDeltaSlopeRZ() {
         m_twoHitFilter.resetValues(m_hitA, m_hitB);

@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include "../include/VXDSegmentCell.h"
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
@@ -20,11 +21,14 @@ void VXDSegmentCell::kickFalseFriends(TVector3 primaryVertex)
 {
   std::list<VXDSegmentCell*>::iterator nbIter = m_innerNeighbours.begin();
   TVector3* innerHit;
+  int nNBs = 0;
   while (nbIter != m_innerNeighbours.end()) {
     VXDSegmentCell* pNextSeg = *nbIter;
     innerHit = pNextSeg->getInnerHit()->getHitCoordinates();
     if (pNextSeg->getState() != this->getState() - 1 || *innerHit == primaryVertex) {
       nbIter = this->eraseInnerNeighbour(nbIter);
     } else { ++nbIter; }
+    nNBs++;
+    if (nNBs > m_innerNeighbours.size()) { B2FATAL("ClusterInfo::isOverbooked(): iterator crash! nIterations: " << nNBs << ", nNBs: " << m_innerNeighbours.size()) }
   }
 }

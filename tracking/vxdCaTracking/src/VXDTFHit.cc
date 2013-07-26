@@ -33,11 +33,15 @@ bool Belle2::Tracking::VXDTFHit::operator==(const VXDTFHit& b) const
   return getTimeStamp() == b.getTimeStamp();
 }
 
+
+
 bool VXDTFHit::operator<(const VXDTFHit& b) const
 {
   B2FATAL("somebody is using the '=='-operator of VXDTFHit, although it does no valid comparison!");
   return getTimeStamp() < b.getTimeStamp();
 }
+
+
 
 bool VXDTFHit::operator>(const VXDTFHit& b) const
 {
@@ -46,37 +50,61 @@ bool VXDTFHit::operator>(const VXDTFHit& b) const
 }
 
 
+
 std::string VXDTFHit::getSectorString() { return FullSecID(m_papaSector).getFullSecString(); }
+
 
 
 int VXDTFHit::getClusterIndexU() const
 {
-  if (m_clusterIndexU != NULL) { return m_clusterIndexU->getOwnIndex(); }
+//  if (m_clusterInfoU != NULL ) { return m_clusterInfoU->getOwnIndex(); }
+  if (m_clusterInfoU != NULL) { return m_clusterInfoU->getRealIndex(); }
   return -1;
 } /**< returns index position of clusterInfo in container, only set for SVDHits */
 
-ClusterInfo* VXDTFHit::getClusterInfoU() { return m_clusterIndexU; } /**< returns pointer to ClusterInfo U, is NULL if value is not set */
+
+
+ClusterInfo* VXDTFHit::getClusterInfoU() const { return m_clusterInfoU; } /**< returns pointer to ClusterInfo U, is NULL if value is not set */
+
+
 
 int VXDTFHit::getClusterIndexV() const
 {
-  if (m_clusterIndexV != NULL) { return m_clusterIndexV->getOwnIndex(); }
+//  if (m_clusterInfoV != NULL ) { return m_clusterInfoV->getOwnIndex(); }
+  if (m_clusterInfoV != NULL) { return m_clusterInfoV->getRealIndex(); }
   return -1;
 } /**< returns index position of clusterInfo in container,  only set for SVDHits */
 
-ClusterInfo* VXDTFHit::getClusterInfoV() { return m_clusterIndexV; } /**< returns pointer to ClusterInfo V, is NULL if value is not set */
+
+
+ClusterInfo* VXDTFHit::getClusterInfoV() const { return m_clusterInfoV; } /**< returns pointer to ClusterInfo V, is NULL if value is not set */
+
+
 
 int VXDTFHit::getClusterIndexUV() const
 {
-  if (m_clusterIndexUV != NULL) { return m_clusterIndexUV->getOwnIndex(); }
+//  if (m_clusterInfoUV != NULL ) { return m_clusterInfoUV->getOwnIndex(); }
+  if (m_clusterInfoUV != NULL) { return m_clusterInfoUV->getRealIndex(); }
   return -1;
 } /**< returns index position of clusterInfo in container,  only set for PXDHits */
+ClusterInfo* VXDTFHit::getClusterInfoUV() const { return m_clusterInfoUV; }  /**< returns pointer to ClusterInfo UV, is NULL if value is not set */
 
-ClusterInfo* VXDTFHit::getClusterInfoUV() { return m_clusterIndexUV; }
 
-bool VXDTFHit::isReserved()
+
+bool VXDTFHit::isReserved() const
 {
-  if (m_clusterIndexU != NULL) { if (m_clusterIndexU->isReserved() == true) { return true; } }
-  if (m_clusterIndexV != NULL) { if (m_clusterIndexV->isReserved() == true) { return true; } }
-  if (m_clusterIndexUV != NULL) { if (m_clusterIndexUV->isReserved() == true) { return true; } }
+  if (m_clusterInfoU != NULL) { if (m_clusterInfoU->isReserved() == true) { return true; } }
+  if (m_clusterInfoV != NULL) { if (m_clusterInfoV->isReserved() == true) { return true; } }
+  if (m_clusterInfoUV != NULL) { if (m_clusterInfoUV->isReserved() == true) { return true; } }
   return false;
 }
+
+
+// void removeTrackCandidate() {
+//  m_attachedTrackCandidates--;
+//  if (m_clusterInfoU != NULL) { m_clusterInfoU->removeTrackCandidate(); }
+//   if (m_clusterInfoV != NULL) { m_clusterInfoV->removeTrackCandidate(); }
+//   if (m_clusterInfoUV != NULL) { m_clusterInfoUV->removeTrackCandidate(); }
+//
+//
+// } /**< decrease number of TCs using this hit */

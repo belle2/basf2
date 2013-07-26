@@ -93,8 +93,14 @@ namespace Belle2 {
       boostNsec m_fillStuff; /**< time consumption of the secMap-creation (initialize) */
       SecMapCopy m_fullSectorMapCopy; /**< contains the full information of the xml-file */
 
+      std::vector<double> m_PARAMsectorConfigU; /**< allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
+      std::vector<double> m_PARAMsectorConfigV; /**< allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
+      std::vector<double> m_PARAMsetOrigin; /**< allows to reset orign (e.g. usefull for special cases like testbeams), only valid if 3 entries are found */
+      double m_PARAMmagneticFieldStrength; /**< strength of magnetic field in Tesla, standard is 1.5T */
       std::string m_PARAMdetectorType; /**< defines which detector type has to be exported */
       std::string m_PARAMsectorSetup; /**< lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) */
+
+      std::string m_PARAMadditionalInfo; /**< this variable is reserved for extra info which shall be stored in the container, e.g. date of production or other useful info for the user(it shall be formatted before storing it), this info will be displayed by the VXDTF on Info-level */
     private:
 
     };

@@ -14,6 +14,7 @@
 #include <TVector3.h>
 #include "SharedFunctions.h"
 
+// #include "ClusterInfo.h"
 #include <vxd/dataobjects/VxdID.h>
 
 
@@ -36,9 +37,9 @@ namespace Belle2 {
       VXDTFHit():
         m_hit(),
         m_passIndex(0),
-        m_clusterIndexU(NULL), // SVD only
-        m_clusterIndexV(NULL), // SVD only
-        m_clusterIndexUV(NULL), // PXD only
+        m_clusterInfoU(NULL), // SVD only
+        m_clusterInfoV(NULL), // SVD only
+        m_clusterInfoUV(NULL), // PXD only
         m_detectorType(-1), //  0 = PXD, 1 = SVD, -1 should not occur
         m_papaSector(),
         m_VxdID(),
@@ -59,9 +60,9 @@ namespace Belle2 {
       VXDTFHit(PositionInfo hitPos, int passIndex, ClusterInfo* clusterIndexU, ClusterInfo* clusterIndexV, ClusterInfo* clusterIndexUV, int detectorType, unsigned int papaSector, VxdID aVxdID, float timeStamp):
         m_hit(hitPos),
         m_passIndex(passIndex),
-        m_clusterIndexU(clusterIndexU), // SVD only
-        m_clusterIndexV(clusterIndexV), // SVD only
-        m_clusterIndexUV(clusterIndexUV),
+        m_clusterInfoU(clusterIndexU), // SVD only
+        m_clusterInfoV(clusterIndexV), // SVD only
+        m_clusterInfoUV(clusterIndexUV),
         m_detectorType(detectorType),
         m_papaSector(papaSector),
         m_VxdID(aVxdID),
@@ -73,38 +74,56 @@ namespace Belle2 {
       bool operator>(const VXDTFHit& b) const; /**< overloaded '>'-operator for sorting algorithms */
 
       TVector3* getHitCoordinates() { return &(m_hit.hitPosition); } /**< returns global hit coordinates */
+
       PositionInfo* getPositionInfo() { return &m_hit; } /**< returns global hit coordinates and errors for x and y coordinates */
+
       const std::vector<int>& getAttachedInnerCell() const { return m_attachedInnerCells; } /**< returns all inner Cells attached to hit */
+
       const std::vector<int>& getAttachedOuterCell() const { return m_attachedOuterCells; } /**< returns all outer Cells attached to hit */
+
       int getNumberOfSegments() { return int(m_attachedInnerCells.size() + m_attachedOuterCells.size()); } /**< returns number of segments connected to this hit (hits without attached segments are ignored during TF process) */
+
       int getNumberOfTrackCandidates() { return m_attachedTrackCandidates; } /**< returns number of TCs using this hit */
+
       int getPassIndex() const { return m_passIndex; } /**< VXDTFHits are pass-dependent. Returns the index number of the pass containing current hit */
+
       int getClusterIndexU() const; /*{
-        if (m_clusterIndexU != NULL ) { return m_clusterIndexU->getOwnIndex(); }
+        if (m_clusterInfoU != NULL ) { return m_clusterInfoU->getOwnIndex(); }
         return -1;
-      }*/ /**< returns index position of clusterInfo in container, only set for SVDHits */
-      ClusterInfo* getClusterInfoU(); /*{ return m_clusterIndexU; }*/ /**< returns pointer to ClusterInfo U, is NULL if value is not set */
+      } *//**< returns index position of clusterInfo in container, only set for SVDHits */
+
+      ClusterInfo* getClusterInfoU() const; /*{ return m_clusterInfoU; }*/ /**< returns pointer to ClusterInfo U, is NULL if value is not set */
+
       int getClusterIndexV() const; /*{
-        if (m_clusterIndexV != NULL ) { return m_clusterIndexV->getOwnIndex(); }
+        if (m_clusterInfoV != NULL ) { return m_clusterInfoV->getOwnIndex(); }
         return -1;
       }*/ /**< returns index position of clusterInfo in container,  only set for SVDHits */
-      ClusterInfo* getClusterInfoV(); /*{ return m_clusterIndexV; }*/ /**< returns pointer to ClusterInfo V, is NULL if value is not set */
+
+      ClusterInfo* getClusterInfoV() const;/* { return m_clusterInfoUV; }*/ /**< returns pointer to ClusterInfo V, is NULL if value is not set */
+
       int getClusterIndexUV() const; /*{
-        if (m_clusterIndexUV != NULL ) { return m_clusterIndexUV->getOwnIndex(); }
+        if (m_clusterInfoUV != NULL ) { return m_clusterInfoUV->getOwnIndex(); }
         return -1;
       }*/ /**< returns index position of clusterInfo in container,  only set for PXDHits */
-      ClusterInfo* getClusterInfoUV(); /* { return m_clusterIndexUV; } */ /**< returns pointer to ClusterInfo UV, is NULL if value is not set */
+
+      ClusterInfo* getClusterInfoUV() const;/* { return m_clusterInfoUV; }*/  /**< returns pointer to ClusterInfo UV, is NULL if value is not set */
+
       int getDetectorType() const { return m_detectorType; } /**< returns detectorType IP=Const::IR,PXD=Const::PXD,SVD=Const::SVD */
+
       unsigned int getSectorName() { return m_papaSector; } /**< returns name of sectors containing current hit (sectors are passDependent), in speed optimized int */
+
       std::string getSectorString(); /**< returns name of sectors containing current hit (sectors are passDependent), in human readable string */
+
       const VxdID getVxdID() const { return m_VxdID; } /**< returns VxdID of sensor carrying current sector */
+
       float getTimeStamp() const { return m_timeStamp; } /**< set for SVDHits, for PXDHits it's 0 */
-      bool isReserved(); /**< is true, if a valid TC is already using any Cluster attached to this hit */ /* {
-        if (m_clusterIndexU != NULL) { if (m_clusterIndexU->isReserved() == true) { return true; } }
-        if (m_clusterIndexV != NULL) { if (m_clusterIndexV->isReserved() == true) { return true; } }
-        if (m_clusterIndexUV != NULL) { if (m_clusterIndexUV->isReserved() == true) { return true; } }
+
+      bool isReserved() const ; /* {
+        if (m_clusterInfoU != NULL) { if (m_clusterInfoU->isReserved() == true) { return true; } }
+        if (m_clusterInfoV != NULL) { if (m_clusterInfoV->isReserved() == true) { return true; } }
+        if (m_clusterInfoUV != NULL) { if (m_clusterInfoUV->isReserved() == true) { return true; } }
         return false;
-      } */
+      } */ /**< is true, if a valid TC is already using any Cluster attached to this hit */
 
       /** setter **/
       void addInnerCell(int newCell) { m_attachedInnerCells.push_back(newCell); } /**< adds new Cell to vector of inner Cells attached to current hit */
@@ -117,9 +136,9 @@ namespace Belle2 {
       PositionInfo m_hit; /**< global hit position and x and y errors of hit (global)*/
 
       int m_passIndex; /**< index number of pass containing VXDTFhit */
-      ClusterInfo* m_clusterIndexU; /**< pointer to intermediate class storing index of SVDClusterU */
-      ClusterInfo* m_clusterIndexV; /**< pointer to intermediate class storing index of SVDClusterV */
-      ClusterInfo* m_clusterIndexUV; /**< pointer to  intermediate class storing index of PXDCluster */
+      ClusterInfo* m_clusterInfoU; /**< pointer to intermediate class storing index of SVDClusterU */
+      ClusterInfo* m_clusterInfoV; /**< pointer to intermediate class storing index of SVDClusterV */
+      ClusterInfo* m_clusterInfoUV; /**< pointer to  intermediate class storing index of PXDCluster */
       int m_detectorType; /**< knows wheter hit is in IP=Const::IR (only virtual hit), PXD=Const::PXD or SVD=Const::SVD  */
 
       unsigned int m_papaSector; /**< name of sector containing hit */ // convert to int? is that faster? (needed very often)

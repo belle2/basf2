@@ -21,12 +21,6 @@ using namespace std;
 using namespace Belle2;
 using namespace Tracking;
 
-// VXDSector::VXDSector(unsigned int secID) {
-//  FullSecID aSecInt = FullSecID(secID);
-//  m_sectorID = aSecInt;
-// }
-
-void VXDSector::addHit(VXDTFHit* newSpacePoint) { m_hits.push_back(newSpacePoint); }
 
 void VXDSector::addFriend(int newSector)
 {
@@ -59,13 +53,4 @@ const vector<int> VXDSector::getSupportedCutoffs(unsigned int aFriend)
   vector<int> supportedCutoffs;
   mapIter->second.getSupportedCutoffs(supportedCutoffs);
   return supportedCutoffs;
-}
-
-Cutoff* VXDSector::getCutoff(int cutOffType, unsigned int aFriend)
-{
-  FriendMap::iterator mapIter = m_friendMap.find(aFriend);
-  if (mapIter == m_friendMap.end()) { // not found
-    return NULL;
-  }
-  return mapIter->second.getCutOff(cutOffType);
 }

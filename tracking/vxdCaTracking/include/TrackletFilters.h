@@ -29,11 +29,15 @@ namespace Belle2 {
 
       /** Empty constructor. For pre-inizialisation only, an object generated this way is useless unless resetValues(a, b) is called at least once */
       TrackletFilters():
+        m_radius(0),
+        m_chi2(0),
         m_numHits(0) { m_hits = NULL; }
 
       /** Constructor. expects a vector of TVector3 formatted hits ordered by magnitude in x-y (first entry should be the outermost hit. Atm not needed yet, but relevant for possible future changes where a dependency of related classes like the ThreeHitFilters expect a sorted input that way) */
       TrackletFilters(std::vector<Tracking::PositionInfo*>* hits):
-        m_hits(hits) {
+        m_hits(hits),
+        m_radius(0),
+        m_chi2(0) {
         m_numHits = m_hits->size();
       }
 
@@ -47,6 +51,9 @@ namespace Belle2 {
         m_numHits = hits->size();
       }
 
+      /** Overrides Constructor-Setup for magnetic field. if no value is given, magnetic field is assumed to be Belle2-Detector standard of 1.5T */
+      void resetMagneticField(double magneticFieldStrength = 1.5) { m_3hitFilterBox.resetMagneticField(magneticFieldStrength); }
+
       /** checks whether chain of segments are zigg-zagging (changing sign of curvature of neighbouring segments) in the X-Y-plane, returns true, if they are ziggzagging */
       bool ziggZaggXY();
 
@@ -55,16 +62,25 @@ namespace Belle2 {
 
       /** using circleFit(double, double) but neglects clap (closest approach of fitted circle to origin), so if your are not interested in the coordinates of clap, use this one */
       double circleFit() {
-        double phiValue, rValue, radius;
-        return circleFit(phiValue, rValue, radius);
+        double phiValue, rValue;
+        return circleFit(phiValue, rValue, m_radius);
       } // if you do not want to have the coordinates of the point of closest approach, use this one
 
       /** using paper "Effective circle fitting for particle trajectories" from V. Karimäki (Nucl.Instr.and Meth. in Physics Research, A305 (1991), Elsevier) to calculate chi2-value of a circle including these hits. Return value is chi2, input parameters are the future r-phi-coordinates of clap (closest approach of fitted circle to origin), which will be calculated during process */
       double circleFit(double& clapPhi, double& clapR, double& radius);
 
+      /** producing a reasonable guess for the pT of the tracklet */
+      double calcPt() {
+        if (m_radius < 0.001) { m_chi2 = circleFit(); }
+        if (m_radius < 0.001) { return 0.; }
+        return m_3hitFilterBox.calcPt(m_radius);
+      }
+
     protected:
 
       std::vector<Tracking::PositionInfo*>* m_hits; /**< stores hits using TVector3 format in a vector */
+      double m_radius; /**< stores radius of tracklet-circle */
+      double m_chi2; /**< stores chi2 of tracklet-circle */
       int m_numHits; /**< stores number of hits for some speed optimizations */
       ThreeHitFilters m_3hitFilterBox; /**< instance of ThreeHitFilters-class used for some internal calculations */
 

@@ -47,7 +47,7 @@ namespace Belle2 {
       bool operator>(const VXDSector& b)  const { return getSecID() > b.getSecID(); } /**< overloaded '>'-operator for sorting algorithms */
 
       /** setter - addHit adds hits to current sector */
-      void addHit(VXDTFHit* newSpacePoint);
+      void addHit(VXDTFHit* newSpacePoint) { m_hits.push_back(newSpacePoint); }
 
       /** setter - addFriend adds friends to current sector. Friends are compatible sectors defined by the currently loaded sectorMap */
       void addFriend(int newSector);
@@ -80,7 +80,13 @@ namespace Belle2 {
       const std::vector<int> getSupportedCutoffs(unsigned int aFriend);
 
       /** getter - return the cutoff. To get it, you have to know which friendSector and which CutoffType you want to have */
-      Cutoff* getCutoff(int cutOffType, unsigned int aFriend);
+      Cutoff* getCutoff(int cutOffType, unsigned int aFriend) {
+        FriendMap::iterator mapIter = m_friendMap.find(aFriend);
+        if (mapIter == m_friendMap.end()) { // not found
+          return NULL;
+        }
+        return mapIter->second.getCutOff(cutOffType);
+      }
 
       /** resetSector allows to delete all event-wise information (e.g. hits and segmentCells), but keeps longterm information like friends and cutoffs */
       void resetSector() { m_hits.clear(); m_innerSegmentCells.clear(); m_outerSegmentCells.clear(); } // should be called at the end of each event.

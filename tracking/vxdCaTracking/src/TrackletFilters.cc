@@ -56,7 +56,7 @@ bool TrackletFilters::ziggZaggRZ()
     rzHits.push_back(currentVector);
   }
   for (int i = 0; i < m_numHits - 2; ++i) {
-    int signValue = m_3hitFilterBox.calcSign(rzHits[i], rzHits[i + 1], rzHits[i + 2]);
+    int signValue = m_3hitFilterBox.calcSign(rzHits.at(i), rzHits.at(i + 1), rzHits.at(i + 2));
     chargeSigns.push_back(signValue);
 //    cout << "zzRZ charge was: " << signValue << endl;
   }

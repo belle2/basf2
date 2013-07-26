@@ -62,6 +62,7 @@
 
 
 //Boost-packages:
+#include "boost/tuple/tuple_comparison.hpp" // needed for sorting tuples
 #include <boost/foreach.hpp>
 #include <boost/bind/bind.hpp>
 #include <boost/format.hpp>
@@ -69,6 +70,9 @@
 #include <boost/algorithm/string/classification.hpp> // needed for is_any_of
 #include <boost/lexical_cast.hpp>
 #include <boost/math/special_functions/sign.hpp>
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/casts.hpp>
 // #include <boost/chrono/chrono_io.hpp>
 
 
@@ -122,8 +126,8 @@ VXDTFModule::VXDTFModule() : Module()
   minLayer.push_back(4);
   minState.push_back(2);
 
-  vector<double> setupWeigh;
-  setupWeigh.push_back(0.0);
+  vector<double> reserveHitsThreshold;
+  reserveHitsThreshold.push_back(0.5);
 
   vector<bool> activateDistance3D, activateDistanceXY, activateDistanceZ, activateSlopeRZ, activateNormedDistance3D, activateAngles3D, activateAnglesXY, activateAnglesRZ, activateDeltaSlopeRZ, activateDistance2IP, activatePT, activateHelixFit, activateAngles3DHioC, activateAnglesXYHioC, activateAnglesRZHioC, activateDeltaSlopeRZHioC, activateDistance2IPHioC, activatePTHioC, activateHelixFitHioC, activateZigZagXY, activateZigZagRZ, activateDeltaPt, activateDeltaDistance2IP, activateCircleFit, activateDeltaPtHioC, activateDeltaDistance2IPHioC;
   activateDistance3D.push_back(true);
@@ -183,10 +187,10 @@ VXDTFModule::VXDTFModule() : Module()
   vector<string> rootFileNameVals;
   rootFileNameVals.push_back(string("VXDTFoutput"));
   rootFileNameVals.push_back("RECREATE");
-  std::vector<double> originVec;
-  originVec.push_back(0);
-  originVec.push_back(0);
-  originVec.push_back(0);
+//   std::vector<double> originVec;
+//   originVec.push_back(0);
+//   originVec.push_back(0);
+//   originVec.push_back(0);
 
   //Set module properties
   setDescription(" trackfinder for the SVD using cellular automaton techniques, kalman filter (genfit) and a hopfield network as well.");
@@ -195,21 +199,20 @@ VXDTFModule::VXDTFModule() : Module()
   ///Steering parameter import
 
   addParam("debugMode", m_PARAMDebugMode, "some code will only be executed if this mode is enabled", bool(false));
-  addParam("sectorConfigU", m_PARAMsectorConfigU, "allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0", defaultConfigU);
-  addParam("sectorConfigV", m_PARAMsectorConfigV, "allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0", defaultConfigV);
+//   addParam("sectorConfigU", m_PARAMsectorConfigU, "allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0", defaultConfigU);
+//   addParam("sectorConfigV", m_PARAMsectorConfigV, "allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0", defaultConfigV);
 
-  addParam("detectorType", m_PARAMdetectorType, "defines which detector type has to be exported. Allowed values: 'VXD', 'PXD', 'SVD'", detectorType);
-  addParam("setOrigin", m_PARAMsetOrigin, "standard origin is (0,0,0). If you want to have the map calculated for another origin, set here(x,y,z)", originVec);
-  addParam("magneticFieldStrength", m_PARAMmagneticFieldStrength, "set strength of magnetic field in Tesla, standard is 1.5T", double(1.5));
-  addParam("sectorSetup", m_PARAMsectorSetup, "lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) accepts 'std', 'low', 'high' and 'personal', please note that the chosen setup has to exist as a xml-file in ../tracking/data/friendList_XXX.xml. If you can not create your own xml files using e.g. the filterCalculatorModule, use params for  'tuneCutoffXXX' or 'setupWeigh' instead. multipass supported by setting setups in a row", sectorSetup);
+//   addParam("detectorType", m_PARAMdetectorType, "defines which detector type has to be exported. Allowed values: 'VXD', 'PXD', 'SVD'", detectorType);
+//   addParam("setOrigin", m_PARAMsetOrigin, "standard origin is (0,0,0). If you want to have the map calculated for another origin, set here(x,y,z)", originVec);
+//   addParam("magneticFieldStrength", m_PARAMmagneticFieldStrength, "set strength of magnetic field in Tesla, standard is 1.5T", double(1.5));
+  addParam("sectorSetup", m_PARAMsectorSetup, "lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) accepts 'std', 'low', 'high' and 'personal', please note that the chosen setup has to exist as a xml-file in ../tracking/data/friendList_XXX.xml. If you can not create your own xml files using e.g. the filterCalculatorModule, use params for  'tuneCutoffXXX' (for tuning single values) or 'tuneCutoffs' (for tuning all at once) instead. multipass supported by setting setups in a row", sectorSetup);
 
   addParam("tuneCutoffs", m_PARAMtuneCutoffs, "for rapid changes of all cutoffs (no personal xml files needed), reduces/enlarges the range of the cutoffs in percent (lower and upper values are changed by this value). Only valid in range -99% < x < +1000%", double(0.0));
   addParam("GFTrackCandidatesColName", m_PARAMgfTrackCandsColName, "Name of collection holding the GFTrackCandidates (output)", string(""));
   addParam("InfoBoardName", m_PARAMinfoBoardName, "Name of container used for data transfer to TFAnalyzer, only used when TESTERexpandedTestingRoutines == true", string(""));
   addParam("nameOfInstance", m_PARAMnameOfInstance, "Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names", string("VXDTF"));
+  addParam("activateBaselineTF", m_PARAMactivateBaselineTF, "there is a baseline trackfinder which catches events with a very small number of hits, e.g. bhabha, cosmic and single-track-events", bool(true));
 
-
-  addParam("setupWeigh", m_PARAMsetupWeigh, " allows to individually weigh (level of surpression) each setup/pass. Please choose value between 0 and 100 (%), higher momentum setups are more reliable, therefore should be weighed best", setupWeigh);
 
   addParam("activateDistance3D", m_PARAMactivateDistance3D, " set True/False for each setup individually", activateDistance3D);
   addParam("activateDistanceXY", m_PARAMactivateDistanceXY, " set True/False for each setup individually", activateDistanceXY);
@@ -280,8 +283,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("tccMinLayer", m_PARAMminLayer, "determines lowest layer considered by track candidate collector", minLayer);
   addParam("tccMinState", m_PARAMminState, "determines lowest state of cells considered by track candidate collector", minState);
   addParam("omega", m_PARAMomega, "tuning parameter for the hopfield network", double(0.5));
-  addParam("reserveHitsThreshold", m_PARAMreserveHitsThreshold, "tuning parameter for multi-pass-setup, valid values are 0-1 ( = 0-100%). It defines how many percent of the TCs (sorted by QI) are allowed to reserve their hits (which disallows further passes to use these hits). This does not mean that TCs which were not allowed to reserve their hits will be deleted, this only means that they have to compete with TCs of other passes for their hits again. Setting the values to 100% = 1 means, no hits used by tcs surviving that pass are reused, 0% = 0 means every tc has to compete with all tcs of other passes (quite similar to former behavior)", double(0.5));
-
+  addParam("reserveHitsThreshold", m_PARAMreserveHitsThreshold, "tuning parameter for multi-pass-setup, valid values are 0-1 ( = 0-100%). It defines how many percent of the TCs (sorted by QI) are allowed to reserve their hits (which disallows further passes to use these hits). This does not mean that TCs which were not allowed to reserve their hits will be deleted, this only means that they have to compete with TCs of other passes for their hits again. Setting the values to 100% = 1 means, no hits used by tcs surviving that pass are reused, 0% = 0 means every tc has to compete with all tcs of other passes (quite similar to former behavior), standard is 50% = 0.5", reserveHitsThreshold);
 
   //for testing purposes:
   addParam("highestAllowedLayer", m_PARAMhighestAllowedLayer, "set value below 6 if you want to exclude outer layers (standard is 6)", highestAllowedLayer);
@@ -317,8 +319,7 @@ void VXDTFModule::initialize()
 {
   B2INFO("-----------------------------------------------\n       entering VXD CA track finder (" << m_PARAMnameOfInstance << ") - initialize:");
   m_littleHelperBox.resetValues(m_PARAMsmearMean, m_PARAMsmearSigma);
-  /// constants:
-  m_CONSTaThird = 1. / 3.;
+
   if (m_PARAMhighOccupancyThreshold < 0) { m_PARAMhighOccupancyThreshold = 0; }
 
   if (m_PARAMpdGCode > 10 and m_PARAMpdGCode < 18) { // in this case, its a lepton. since leptons with positive sign have got negative codes, this must taken into notice
@@ -332,10 +333,13 @@ void VXDTFModule::initialize()
   } else {
     m_PARAMtuneCutoffs = m_PARAMtuneCutoffs * 0.01; // reformatting to faster calculation
   }
-  if (m_PARAMreserveHitsThreshold < 0. or m_PARAMreserveHitsThreshold > 1.0) {
-    B2WARNING(m_PARAMnameOfInstance << ": chosen value for parameter 'reserveHitsThreshold' is invalid, reseting value to standard (=0.5)...")
-    m_PARAMreserveHitsThreshold = 0.5;
+  BOOST_FOREACH(double & value, m_PARAMreserveHitsThreshold) {
+    if (value < 0. or value > 1.0) {
+      B2WARNING(m_PARAMnameOfInstance << ": chosen value for parameter 'reserveHitsThreshold' is invalid, reseting value to standard (=0.5)...")
+      value = 0.5;
+    }
   }
+
 
   /// GFTrackCandidate
   StoreArray<GFTrackCand>::registerPersistent(m_PARAMgfTrackCandsColName);
@@ -383,6 +387,12 @@ void VXDTFModule::initialize()
   m_TESTERdiscardedSegmentsNFCtr = 0;
   m_TESTERbrokenCaRound = 0;
   m_TESTERkalmanSkipped = 0;
+  m_TESTERovercrowdedStrangeSensors = 0;
+  m_TESTERstartedBaselineTF = 0;
+  m_TESTERsucceededBaselineTF = 0;
+  m_TESTERnoHitsAtEvent = 0;
+  m_TESTERacceptedBrokenHitsTrack = 0;
+  m_TESTERrejectedBrokenHitsTrack = 0;
 
   if (m_PARAMcalcQIType == "trackLength") {
     B2INFO(m_PARAMnameOfInstance << "::initialize: chosen calcQIType is '" << m_PARAMcalcQIType << "'")
@@ -412,20 +422,18 @@ void VXDTFModule::initialize()
     m_filterOverlappingTCs = 1;
   }
 
-  if (int(m_PARAMsetOrigin.size()) != 3) {
-    B2WARNING(m_PARAMnameOfInstance << "::initialize: origin is set wrong, please set only 3 values (x,y,z). Rejecting user defined value and reset to (0,0,0)!")
-    m_PARAMsetOrigin.clear();
-    m_PARAMsetOrigin.push_back(0);
-    m_PARAMsetOrigin.push_back(0);
-    m_PARAMsetOrigin.push_back(0);
-  }
-  B2INFO(m_PARAMnameOfInstance << "::initialize: origin is set to: (x,y,z) (" << m_PARAMsetOrigin[0] << "," << m_PARAMsetOrigin[1] << "," << m_PARAMsetOrigin[2] << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T")
-  m_threeHitFilterBox.resetMagneticField(m_PARAMmagneticFieldStrength);
-  m_fourHitFilterBox.resetMagneticField(m_PARAMmagneticFieldStrength);
+//   if (int(m_PARAMsetOrigin.size()) != 3) {
+//     B2WARNING(m_PARAMnameOfInstance << "::initialize: origin is set wrong, please set only 3 values (x,y,z). Rejecting user defined value and reset to (0,0,0)!")
+//     m_PARAMsetOrigin.clear();
+//     m_PARAMsetOrigin.push_back(0);
+//     m_PARAMsetOrigin.push_back(0);
+//     m_PARAMsetOrigin.push_back(0);
+//   }
+//   B2INFO(m_PARAMnameOfInstance << "::initialize: origin is set to: (x,y,z) (" << m_PARAMsetOrigin.at(0) << "," << m_PARAMsetOrigin.at(1) << "," << m_PARAMsetOrigin.at(2) << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T")
 
   if (m_PARAMwriteToRoot == true) {
-    m_PARAMrootFileName[0] += ".root";
-    m_rootFilePtr = new TFile(m_PARAMrootFileName[0].c_str(), m_PARAMrootFileName[1].c_str()); // alternative: UPDATE
+    m_PARAMrootFileName.at(0) += ".root";
+    m_rootFilePtr = new TFile(m_PARAMrootFileName.at(0).c_str(), m_PARAMrootFileName.at(1).c_str()); // alternative: UPDATE
     m_treeTrackWisePtr = new TTree("m_treeTrackWisePtr", "aTrackWiseTree");
     m_treeEventWisePtr = new TTree("m_treeEventWisePtr", "anEventWiseTree");
     m_treeEventWisePtr->Branch("duration", &m_rootTimeConsumption);
@@ -438,16 +446,16 @@ void VXDTFModule::initialize()
   }
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {
-    B2WARNING("DebugLevel 1 is enabled!")
+    B2INFO("DebugLevel 1 is enabled!")
   }
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 2, PACKAGENAME()) == true) {
-    B2WARNING("DebugLevel 2 is enabled!")
+    B2INFO("DebugLevel 2 is enabled!")
   }
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true) {
-    B2WARNING("DebugLevel 3 is enabled!")
+    B2INFO("DebugLevel 3 is enabled!")
   }
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 4, PACKAGENAME()) == true) {
-    B2WARNING("DebugLevel 4 is enabled!")
+    B2INFO("DebugLevel 4 is enabled!")
   }
   B2INFO("       leaving VXD CA track finder (" << m_PARAMnameOfInstance << ") - initialize\n-----------------------------------------------");
 }
@@ -465,6 +473,10 @@ void VXDTFModule::beginRun()
   B2DEBUG(50, "##### be careful, current TF status does not support more than one run per initialization! #####");
 
 
+  // here some variables copied from the passes (will be rewritten for each pass, therefore only the settings of the last pass will survive)
+  double magneticField;
+  TVector3 origin;
+  string detectorType;
   /// for each setup, fill parameters, calc numTotalLayers... TODO: failsafe implementation (no protection against bad user imputs) lacks of style, longterm goal, export that procedure into a function
   int totalFriendCounter;
   m_usePXDorSVDorVXDhits = 2; /// needed, since in theory some passes could use SVD+PXD and some SVD-only. =0, when only PXDhits, = 1, when only svd-hits, =-1 when both cases occur
@@ -474,162 +486,174 @@ void VXDTFModule::beginRun()
 
     CurrentPassData* newPass = new CurrentPassData;
 
-    newPass->sectorSetup = m_PARAMsectorSetup[i];
+    newPass->sectorSetup = m_PARAMsectorSetup.at(i);
 
-    if (int (m_PARAMdetectorType.size()) < i + 1) {
-//       newPass->detectorType = m_PARAMdetectorType[m_PARAMdetectorType.size() - 1];
-      B2WARNING(m_PARAMnameOfInstance << "detectorType not set for each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
-      if (m_PARAMdetectorType[m_PARAMdetectorType.size() - 1] == "SVD") {
-        newPass->detectorType = Const::SVD;
-      } else if (m_PARAMdetectorType[m_PARAMdetectorType.size() - 1] == "PXD") {
-        newPass->detectorType = Const::PXD;
-      } else if (m_PARAMdetectorType[m_PARAMdetectorType.size() - 1] == "VXD") {
-        newPass->detectorType = Const::IR; // WARNING reusing Const::IR as Const::VXD as long as there is no real Const::VXD!
-      } else {
-        B2FATAL("chosen detectorType " << m_PARAMdetectorType[i] << " is unknown. VXDTF is unable to operate. Please choose 'VXD', 'SVD' or 'PXD' to proceed!")
-        newPass->detectorType = Const::SVD;
-      }
-    } else {
-      if (m_PARAMdetectorType[i] == "SVD") {
-        newPass->detectorType = Const::SVD;
-      } else if (m_PARAMdetectorType[i] == "PXD") {
-        newPass->detectorType = Const::PXD;
-      } else if (m_PARAMdetectorType[i] == "VXD") {
-        newPass->detectorType = Const::IR; // WARNING reusing Const::IR as Const::VXD as long as there is no real Const::VXD!
-      } else {
-        B2FATAL("chosen detectorType " << m_PARAMdetectorType[i] << " is unknown. VXDTF is unable to operate. Please choose 'VXD', 'SVD' or 'PXD' to proceed!")
-        newPass->detectorType = Const::SVD;
-      }
+    VXDTFSecMap::Class(); // essential, needed for root, DO NOT ASK WHY! -.-
+    string chosenSetup = (boost::format("sectorList_%1%") % newPass->sectorSetup).str();
+    string directory = "/Detector/Tracking/CATFParameters/" + chosenSetup;
+    try {
+      const VXDTFSecMap* newMap = dynamic_cast<const VXDTFSecMap*>(Gearbox::getInstance().getTObject(directory.c_str()));
+    } catch (exception& e) {
+      B2FATAL("VXDTFModule::initialize: could not load sectorMap. Reason: exception thrown: " << e.what() << ", this means you have to check whether the sectorMaps stored in ../tracking/data/VXDTFindex.xml and/or ../testbeam/vxd/data/VXDTFindexTF.xml are uncommented and locally unpacked and available!")
+    }
+    const VXDTFSecMap* newMap = dynamic_cast<const VXDTFSecMap*>(Gearbox::getInstance().getTObject(directory.c_str()));
 
+    const double mField = newMap->getMagneticFieldStrength();
+    magneticField = mField;
+    newPass->threeHitFilterBox.resetMagneticField(mField);
+    newPass->fourHitFilterBox.resetMagneticField(mField);
+    newPass->trackletFilterBox.resetMagneticField(mField);
+
+    newPass->additionalInfo = newMap->getAdditionalInfo();
+
+    newPass->secConfigU = newMap->getSectorConfigU();
+    newPass->secConfigV = newMap->getSectorConfigV();
+    origin = newMap->getOrigin();
+    newPass->origin = origin;
+    stringstream secConU, secConV;
+    BOOST_FOREACH(double entry, newPass->secConfigU) {
+      secConU << " " << entry;
     }
-    if (int (m_PARAMsetupWeigh.size()) < i + 1) {
-      B2WARNING("setupWeigh not set each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
-      newPass->setupWeigh = m_PARAMsetupWeigh[m_PARAMsetupWeigh.size() - 1] * 0.01;
-    } else {
-      newPass->setupWeigh = m_PARAMsetupWeigh[i] * 0.01;
-      if (newPass->setupWeigh < 0) { newPass->setupWeigh = 0; } else if (newPass->setupWeigh > 1.) { newPass->setupWeigh = 1.; }
+    BOOST_FOREACH(double entry, newPass->secConfigV) {
+      secConV << " " << entry;
     }
+    B2INFO(" pass " << newPass->sectorSetup << "-setting: got magneticFieldStrength: " << mField << ", origin at: (" << origin[0] << "," << origin[1] << "," << origin[2] << ") and sectorConfig \n U: " << secConU.str() << endl << " V: " << secConV.str() << endl << " and additional Info: " << newPass->additionalInfo)
+
+
     if (int (m_PARAMhighestAllowedLayer.size()) < i + 1) {
       B2WARNING(m_PARAMnameOfInstance << "highestAllowedLayer not set each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
-      newPass->highestAllowedLayer = m_PARAMhighestAllowedLayer[m_PARAMhighestAllowedLayer.size() - 1];
+      newPass->highestAllowedLayer = m_PARAMhighestAllowedLayer.at(m_PARAMhighestAllowedLayer.size() - 1);
     } else {
-      newPass->highestAllowedLayer = m_PARAMhighestAllowedLayer[i];
+      newPass->highestAllowedLayer = m_PARAMhighestAllowedLayer.at(i);
     }
-    if (int (m_PARAMminLayer.size()) < i + 1) {
-      B2WARNING(m_PARAMnameOfInstance << "minLayer not set each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
-      newPass->minLayer = m_PARAMminLayer[m_PARAMminLayer.size() - 1];
-    } else {
-      newPass->minLayer = m_PARAMminLayer[i];
-    }
-    if (int (m_PARAMminState.size()) < i + 1) {
-      B2WARNING(m_PARAMnameOfInstance << "minState not set each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
-      newPass->minState = m_PARAMminState[m_PARAMminState.size() - 1];
-    } else {
-      newPass->minState = m_PARAMminState[i];
-    }
+    detectorType = newMap->getDetectorType();
+    newPass->chosenDetectorType = detectorType;
+    newPass->numTotalLayers = 6;
+    if (detectorType == "SVD") {
 
+      newPass->detectorType = Const::SVD;
+      newPass->numTotalLayers = 4;
+      if (m_usePXDorSVDorVXDhits == 0) { m_usePXDorSVDorVXDhits = -1; } else if (m_usePXDorSVDorVXDhits == -1) {/*do nothing*/} else {
+        m_usePXDorSVDorVXDhits = 1;
+      }  // cases 1,-1, don't do anything, since state is okay
 
-    // calc numtotalLayers and chosenDetectorType:
-    if (newPass->detectorType == Const::PXD) {
-      newPass->chosenDetectorType = "PXD";
+    } else if (detectorType == "PXD") {
+
+      newPass->detectorType = Const::PXD;
       newPass->numTotalLayers = 2;
       newPass->minLayer = 2; /// !!!
       newPass->minState = 1;
       if (m_usePXDorSVDorVXDhits == 1) { m_usePXDorSVDorVXDhits = -1; } else if (m_usePXDorSVDorVXDhits == -1) {/*do nothing*/} else {
         m_usePXDorSVDorVXDhits = 0;
       }  // cases 1,-1, don't do anything, since state is okay
-    } else if (newPass->detectorType == Const::SVD) {
-      newPass->chosenDetectorType = "SVD";
-      newPass->numTotalLayers = 4;
-      if (m_usePXDorSVDorVXDhits == 0) { m_usePXDorSVDorVXDhits = -1; } else if (m_usePXDorSVDorVXDhits == -1) {/*do nothing*/} else {
-        m_usePXDorSVDorVXDhits = 1;
-      }  // cases 1,-1, don't do anything, since state is okay
 
-    } else if (newPass->detectorType == Const::IR) {
-      newPass->chosenDetectorType = "VXD";
+    } else if (detectorType == "VXD") {
+
       newPass->numTotalLayers = 6;
       if (m_usePXDorSVDorVXDhits not_eq - 1) { m_usePXDorSVDorVXDhits = -1; }  // cases -1, don't do anything, since state is okay
+      newPass->detectorType = Const::IR; // WARNING reusing Const::IR as Const::VXD as long as there is no real Const::VXD!
+
     } else {
-      B2ERROR(m_PARAMnameOfInstance << "Pass " << i << " with setting '" << m_PARAMsectorSetup[i] << "': chosen detectorType via param 'detectorType' is invalid, resetting value to standard (=VXD,-1)")
+      B2ERROR(m_PARAMnameOfInstance << "Pass " << i << " with setting '" << chosenSetup << "': chosen detectorType via param 'detectorType' (" << detectorType << ") is invalid, resetting value to standard (=VXD,-1)")
       newPass->chosenDetectorType = "VXD";
       newPass->detectorType = Const::IR;
-      newPass->numTotalLayers = 6;
     }
     newPass->numTotalLayers = newPass->numTotalLayers - (6 - newPass->highestAllowedLayer);
     if (newPass->numTotalLayers < 2) { newPass->numTotalLayers = 2; }   // to avoid division by zero in some cases
-//    /*if (newPass->numtotalLayers > m_numtotalLayers ) { m_numtotalLayers = newPass->numtotalLayers; } // this value only stores the highest number of total layers*/
     B2INFO(m_PARAMnameOfInstance << "Pass " << i << ": chosen detectorType: " << newPass->chosenDetectorType << " and chosen sectorSetup: " << newPass->sectorSetup)
 
-    newPass->secConfigU = m_PARAMsectorConfigU; // currently same sectorConfig for each pass, future support of different setups prepared
-    newPass->secConfigV = m_PARAMsectorConfigV; // currently same sectorConfig for each pass, future support of different setups prepared
+
+    if (int (m_PARAMreserveHitsThreshold.size()) < i + 1) {
+      B2WARNING("reserveHitsThreshold not set each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
+      newPass->reserveHitsThreshold = m_PARAMreserveHitsThreshold.at(m_PARAMreserveHitsThreshold.size() - 1) ;
+    } else {
+      newPass->reserveHitsThreshold = m_PARAMreserveHitsThreshold.at(i);
+      if (newPass->reserveHitsThreshold < 0) { newPass->reserveHitsThreshold = 0; } else if (newPass->reserveHitsThreshold > 1.) { newPass->reserveHitsThreshold = 1.; }
+    }
+    if (int (m_PARAMminLayer.size()) < i + 1) {
+      B2WARNING(m_PARAMnameOfInstance << "minLayer not set each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
+      newPass->minLayer = m_PARAMminLayer.at(m_PARAMminLayer.size() - 1);
+    } else {
+      newPass->minLayer = m_PARAMminLayer.at(i);
+    }
+    if (int (m_PARAMminState.size()) < i + 1) {
+      B2WARNING(m_PARAMnameOfInstance << "minState not set each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
+      newPass->minState = m_PARAMminState.at(m_PARAMminState.size() - 1);
+    } else {
+      newPass->minState = m_PARAMminState.at(i);
+    }
+
+    B2DEBUG(10, "starting import of segFinderFilters:")
 
     int sfCtr = 0, sfhoCtr = 0, nfCtr = 0, nfhoCtr = 0, tccfCtr = 0; // counting number of activated tests for each filter step
     ///sFinder:
     if (int (m_PARAMactivateDistance3D.size()) < i + 1) {
-      newPass->distance3D.first = m_PARAMactivateDistance3D[m_PARAMactivateDistance3D.size() - 1];
+      newPass->distance3D.first = m_PARAMactivateDistance3D.at(m_PARAMactivateDistance3D.size() - 1);
     } else {
-      newPass->distance3D.first = m_PARAMactivateDistance3D[i];
+      newPass->distance3D.first = m_PARAMactivateDistance3D.at(i);
     }
     if (int (m_PARAMactivateDistanceXY.size()) < i + 1) {
-      newPass->distanceXY.first = m_PARAMactivateDistanceXY[m_PARAMactivateDistanceXY.size() - 1];
+      newPass->distanceXY.first = m_PARAMactivateDistanceXY.at(m_PARAMactivateDistanceXY.size() - 1);
     } else {
-      newPass->distanceXY.first = m_PARAMactivateDistanceXY[i];;
+      newPass->distanceXY.first = m_PARAMactivateDistanceXY.at(i);;
     }
     if (int (m_PARAMactivateDistanceZ.size()) < i + 1) {
-      newPass->distanceZ.first = m_PARAMactivateDistanceZ[m_PARAMactivateDistanceZ.size() - 1];
+      newPass->distanceZ.first = m_PARAMactivateDistanceZ.at(m_PARAMactivateDistanceZ.size() - 1);
     } else {
-      newPass->distanceZ.first = m_PARAMactivateDistanceZ[i];
+      newPass->distanceZ.first = m_PARAMactivateDistanceZ.at(i);
     }
     if (int (m_PARAMactivateSlopeRZ.size()) < i + 1) {
-      newPass->slopeRZ.first = m_PARAMactivateSlopeRZ[m_PARAMactivateSlopeRZ.size() - 1];
+      newPass->slopeRZ.first = m_PARAMactivateSlopeRZ.at(m_PARAMactivateSlopeRZ.size() - 1);
     } else {
-      newPass->slopeRZ.first = m_PARAMactivateSlopeRZ[i];
+      newPass->slopeRZ.first = m_PARAMactivateSlopeRZ.at(i);
     }
     if (int (m_PARAMactivateNormedDistance3D.size()) < i + 1) {
-      newPass->normedDistance3D.first = m_PARAMactivateNormedDistance3D[m_PARAMactivateNormedDistance3D.size() - 1];
+      newPass->normedDistance3D.first = m_PARAMactivateNormedDistance3D.at(m_PARAMactivateNormedDistance3D.size() - 1);
     } else {
-      newPass->normedDistance3D.first = m_PARAMactivateNormedDistance3D[i];
+      newPass->normedDistance3D.first = m_PARAMactivateNormedDistance3D.at(i);
     }
     if (newPass->distance3D.first == true) { sfCtr++; }
     if (newPass->distanceXY.first == true) { sfCtr++; }
     if (newPass->distanceZ.first == true) { sfCtr++; }
     if (newPass->slopeRZ.first == true) { sfCtr++; }
     if (newPass->normedDistance3D.first == true) { sfCtr++; }
+    B2DEBUG(1, "finished importing segFinderFilters, " << sfCtr << " filters imported")
     ///sFinder ho finder (2+1 hit)
+    B2DEBUG(10, "starting import of segFinderHioCFilters:")
     if (int (m_PARAMactivateAngles3DHioC.size()) < i + 1) {
-      newPass->anglesHighOccupancy3D.first = m_PARAMactivateAngles3DHioC[m_PARAMactivateAngles3DHioC.size() - 1];
+      newPass->anglesHighOccupancy3D.first = m_PARAMactivateAngles3DHioC.at(m_PARAMactivateAngles3DHioC.size() - 1);
     } else {
-      newPass->anglesHighOccupancy3D.first =  m_PARAMactivateAngles3DHioC[i];
+      newPass->anglesHighOccupancy3D.first =  m_PARAMactivateAngles3DHioC.at(i);
     }
     if (int (m_PARAMactivateAnglesXYHioC.size()) < i + 1) {
-      newPass->anglesHighOccupancyXY.first = m_PARAMactivateAnglesXYHioC[m_PARAMactivateAnglesXYHioC.size() - 1];
+      newPass->anglesHighOccupancyXY.first = m_PARAMactivateAnglesXYHioC.at(m_PARAMactivateAnglesXYHioC.size() - 1);
     } else {
-      newPass->anglesHighOccupancyXY.first = m_PARAMactivateAnglesXYHioC[i];
+      newPass->anglesHighOccupancyXY.first = m_PARAMactivateAnglesXYHioC.at(i);
     }
     if (int (m_PARAMactivateAnglesRZHioC.size()) < i + 1) {
-      newPass->anglesHighOccupancyRZ.first = m_PARAMactivateAnglesRZHioC[m_PARAMactivateAnglesRZHioC.size() - 1];
+      newPass->anglesHighOccupancyRZ.first = m_PARAMactivateAnglesRZHioC.at(m_PARAMactivateAnglesRZHioC.size() - 1);
     } else {
-      newPass->anglesHighOccupancyRZ.first = m_PARAMactivateAnglesRZHioC[i];
+      newPass->anglesHighOccupancyRZ.first = m_PARAMactivateAnglesRZHioC.at(i);
     }
     if (int (m_PARAMactivateDeltaSlopeRZHioC.size()) < i + 1) {
-      newPass->deltaSlopeHighOccupancyRZ.first = m_PARAMactivateDeltaSlopeRZHioC[m_PARAMactivateDeltaSlopeRZHioC.size() - 1];
+      newPass->deltaSlopeHighOccupancyRZ.first = m_PARAMactivateDeltaSlopeRZHioC.at(m_PARAMactivateDeltaSlopeRZHioC.size() - 1);
     } else {
-      newPass->deltaSlopeHighOccupancyRZ.first = m_PARAMactivateDeltaSlopeRZHioC[i];
+      newPass->deltaSlopeHighOccupancyRZ.first = m_PARAMactivateDeltaSlopeRZHioC.at(i);
     }
     if (int (m_PARAMactivateDistance2IPHioC.size()) < i + 1) {
-      newPass->distanceHighOccupancy2IP.first = m_PARAMactivateDistance2IPHioC[m_PARAMactivateDistance2IPHioC.size() - 1];
+      newPass->distanceHighOccupancy2IP.first = m_PARAMactivateDistance2IPHioC.at(m_PARAMactivateDistance2IPHioC.size() - 1);
     } else {
-      newPass->distanceHighOccupancy2IP.first =  m_PARAMactivateDistance2IPHioC[i];
+      newPass->distanceHighOccupancy2IP.first =  m_PARAMactivateDistance2IPHioC.at(i);
     }
-    if (int (m_PARAMactivatePTHioC.size()) < i) {
-      newPass->pTHighOccupancy.first = m_PARAMactivatePTHioC[m_PARAMactivatePTHioC.size() - 1];
+    if (int (m_PARAMactivatePTHioC.size()) < i + 1) {
+      newPass->pTHighOccupancy.first = m_PARAMactivatePTHioC.at(m_PARAMactivatePTHioC.size() - 1);
     } else {
-      newPass->pTHighOccupancy.first =  m_PARAMactivatePTHioC[i];
+      newPass->pTHighOccupancy.first =  m_PARAMactivatePTHioC.at(i);
     }
     if (int (m_PARAMactivateHelixFitHioC.size()) < i + 1) {
-      newPass->helixHighOccupancyFit.first = m_PARAMactivateHelixFitHioC[m_PARAMactivateHelixFitHioC.size() - 1];
+      newPass->helixHighOccupancyFit.first = m_PARAMactivateHelixFitHioC.at(m_PARAMactivateHelixFitHioC.size() - 1);
     } else {
-      newPass->helixFit.first =  m_PARAMactivateHelixFitHioC[i];
+      newPass->helixHighOccupancyFit.first =  m_PARAMactivateHelixFitHioC.at(i);
     }
     if (newPass->anglesHighOccupancy3D.first == true) { sfhoCtr++; }
     if (newPass->anglesHighOccupancyXY.first == true) { sfhoCtr++; }
@@ -638,42 +662,44 @@ void VXDTFModule::beginRun()
     if (newPass->distanceHighOccupancy2IP.first == true) { sfhoCtr++; }
     if (newPass->pTHighOccupancy.first == true) { sfhoCtr++; }
     if (newPass->helixHighOccupancyFit.first == true) { sfhoCtr++; }
+    B2DEBUG(1, "finished importing segFinderHioCFilters, " << sfhoCtr << " filters imported")
 
     ///nbFinder:
+    B2DEBUG(10, "starting import of nbFinderFilters:")
     if (int (m_PARAMactivateAngles3D.size()) < i + 1) {
-      newPass->angles3D.first = m_PARAMactivateAngles3D[m_PARAMactivateAngles3D.size() - 1];
+      newPass->angles3D.first = m_PARAMactivateAngles3D.at(m_PARAMactivateAngles3D.size() - 1);
     } else {
-      newPass->angles3D.first =  m_PARAMactivateAngles3D[i];
+      newPass->angles3D.first =  m_PARAMactivateAngles3D.at(i);
     }
     if (int (m_PARAMactivateAnglesXY.size()) < i + 1) {
-      newPass->anglesXY.first = m_PARAMactivateAnglesXY[m_PARAMactivateAnglesXY.size() - 1];
+      newPass->anglesXY.first = m_PARAMactivateAnglesXY.at(m_PARAMactivateAnglesXY.size() - 1);
     } else {
-      newPass->anglesXY.first = m_PARAMactivateAnglesXY[i];
+      newPass->anglesXY.first = m_PARAMactivateAnglesXY.at(i);
     }
     if (int (m_PARAMactivateAnglesRZ.size()) < i + 1) {
-      newPass->anglesRZ.first = m_PARAMactivateAnglesRZ[m_PARAMactivateAnglesRZ.size() - 1];
+      newPass->anglesRZ.first = m_PARAMactivateAnglesRZ.at(m_PARAMactivateAnglesRZ.size() - 1);
     } else {
-      newPass->anglesRZ.first = m_PARAMactivateAnglesRZ[i];
+      newPass->anglesRZ.first = m_PARAMactivateAnglesRZ.at(i);
     }
     if (int (m_PARAMactivateDeltaSlopeRZ.size()) < i + 1) {
-      newPass->deltaSlopeRZ.first = m_PARAMactivateDeltaSlopeRZ[m_PARAMactivateDeltaSlopeRZ.size() - 1];
+      newPass->deltaSlopeRZ.first = m_PARAMactivateDeltaSlopeRZ.at(m_PARAMactivateDeltaSlopeRZ.size() - 1);
     } else {
-      newPass->deltaSlopeRZ.first = m_PARAMactivateDeltaSlopeRZ[i];
+      newPass->deltaSlopeRZ.first = m_PARAMactivateDeltaSlopeRZ.at(i);
     }
     if (int (m_PARAMactivateDistance2IP.size()) < i + 1) {
-      newPass->distance2IP.first = m_PARAMactivateDistance2IP[m_PARAMactivateDistance2IP.size() - 1];
+      newPass->distance2IP.first = m_PARAMactivateDistance2IP.at(m_PARAMactivateDistance2IP.size() - 1);
     } else {
-      newPass->distance2IP.first =  m_PARAMactivateDistance2IP[i];
+      newPass->distance2IP.first =  m_PARAMactivateDistance2IP.at(i);
     }
     if (int (m_PARAMactivatePT.size()) < i + 1) {
-      newPass->pT.first = m_PARAMactivatePT[m_PARAMactivatePT.size() - 1];
+      newPass->pT.first = m_PARAMactivatePT.at(m_PARAMactivatePT.size() - 1);
     } else {
-      newPass->pT.first =  m_PARAMactivatePT[i];
+      newPass->pT.first =  m_PARAMactivatePT.at(i);
     }
     if (int (m_PARAMactivateHelixFit.size()) < i + 1) {
-      newPass->helixFit.first = m_PARAMactivateHelixFit[m_PARAMactivateHelixFit.size() - 1];
+      newPass->helixFit.first = m_PARAMactivateHelixFit.at(m_PARAMactivateHelixFit.size() - 1);
     } else {
-      newPass->helixFit.first =  m_PARAMactivateHelixFit[i];
+      newPass->helixFit.first =  m_PARAMactivateHelixFit.at(i);
     }
     if (newPass->angles3D.first == true) { nfCtr++; }
     if (newPass->anglesXY.first == true) { nfCtr++; }
@@ -682,45 +708,47 @@ void VXDTFModule::beginRun()
     if (newPass->distance2IP.first == true) { nfCtr++; }
     if (newPass->pT.first == true) { nfCtr++; }
     if (newPass->helixFit.first == true) { nfCtr++; }
+    B2DEBUG(1, "finished importing nFinderFilters, " << nfCtr << " filters imported")
     ///nFinder ho finder (3+1 hit)
+    B2DEBUG(10, "starting import of nbFinderHioCFilters:")
     if (int (m_PARAMactivateDeltaPtHioC.size()) < i + 1) {
-      newPass->deltaPtHighOccupancy.first = m_PARAMactivateDeltaPtHioC[m_PARAMactivateDeltaPtHioC.size() - 1];
+      newPass->deltaPtHighOccupancy.first = m_PARAMactivateDeltaPtHioC.at(m_PARAMactivateDeltaPtHioC.size() - 1);
     } else {
-      newPass->deltaPtHighOccupancy.first = m_PARAMactivateDeltaPtHioC[i];
+      newPass->deltaPtHighOccupancy.first = m_PARAMactivateDeltaPtHioC.at(i);
     }
     if (int (m_PARAMactivateDeltaDistance2IPHioC.size()) < i + 1) {
-      newPass->deltaDistanceHighOccupancy2IP.first = m_PARAMactivateDeltaDistance2IPHioC[m_PARAMactivateDeltaDistance2IPHioC.size() - 1];
+      newPass->deltaDistanceHighOccupancy2IP.first = m_PARAMactivateDeltaDistance2IPHioC.at(m_PARAMactivateDeltaDistance2IPHioC.size() - 1);
     } else {
-      newPass->deltaDistanceHighOccupancy2IP.first = m_PARAMactivateDeltaDistance2IPHioC[i];
+      newPass->deltaDistanceHighOccupancy2IP.first = m_PARAMactivateDeltaDistance2IPHioC.at(i);
     }
     if (newPass->deltaPtHighOccupancy.first == true) { nfhoCtr++; }
     if (newPass->deltaDistanceHighOccupancy2IP.first == true) { nfhoCtr++; }
 
     /// post-TCC-filter:
     if (int (m_PARAMactivateZigZagXY.size()) < i + 1) {
-      newPass->zigzagXY.first = m_PARAMactivateZigZagXY[m_PARAMactivateZigZagXY.size() - 1];
+      newPass->zigzagXY.first = m_PARAMactivateZigZagXY.at(m_PARAMactivateZigZagXY.size() - 1);
     } else {
-      newPass->zigzagXY.first = m_PARAMactivateZigZagXY[i];
+      newPass->zigzagXY.first = m_PARAMactivateZigZagXY.at(i);
     }
     if (int (m_PARAMactivateZigZagRZ.size()) < i + 1) {
-      newPass->zigzagRZ.first = m_PARAMactivateZigZagRZ[m_PARAMactivateZigZagRZ.size() - 1];
+      newPass->zigzagRZ.first = m_PARAMactivateZigZagRZ.at(m_PARAMactivateZigZagRZ.size() - 1);
     } else {
-      newPass->zigzagRZ.first = m_PARAMactivateZigZagRZ[i];
+      newPass->zigzagRZ.first = m_PARAMactivateZigZagRZ.at(i);
     }
     if (int (m_PARAMactivateDeltaPt.size()) < i + 1) {
-      newPass->deltaPt.first = m_PARAMactivateDeltaPt[m_PARAMactivateDeltaPt.size() - 1];
+      newPass->deltaPt.first = m_PARAMactivateDeltaPt.at(m_PARAMactivateDeltaPt.size() - 1);
     } else {
-      newPass->deltaPt.first = m_PARAMactivateDeltaPt[i];
+      newPass->deltaPt.first = m_PARAMactivateDeltaPt.at(i);
     }
     if (int (m_PARAMactivateCircleFit.size()) < i + 1) {
-      newPass->circleFit.first = m_PARAMactivateCircleFit[m_PARAMactivateCircleFit.size() - 1];
+      newPass->circleFit.first = m_PARAMactivateCircleFit.at(m_PARAMactivateCircleFit.size() - 1);
     } else {
-      newPass->circleFit.first = m_PARAMactivateCircleFit[i];
+      newPass->circleFit.first = m_PARAMactivateCircleFit.at(i);
     }
     if (int (m_PARAMactivateDeltaDistance2IP.size()) < i + 1) {
-      newPass->deltaDistance2IP.first = m_PARAMactivateDeltaDistance2IP[m_PARAMactivateDeltaDistance2IP.size() - 1];
+      newPass->deltaDistance2IP.first = m_PARAMactivateDeltaDistance2IP.at(m_PARAMactivateDeltaDistance2IP.size() - 1);
     } else {
-      newPass->deltaDistance2IP.first = m_PARAMactivateDeltaDistance2IP[i];
+      newPass->deltaDistance2IP.first = m_PARAMactivateDeltaDistance2IP.at(i);
     }
     if (newPass->zigzagXY.first == true) { tccfCtr++; }
     if (newPass->zigzagRZ.first == true) { tccfCtr++; }
@@ -733,343 +761,277 @@ void VXDTFModule::beginRun()
     newPass->activatedNbFinderTests = nfCtr;
     newPass->activatedHighOccupancyNbFinderTests = nfhoCtr;
     newPass->activatedTccFilterTests = tccfCtr;
+    B2DEBUG(1, "finished importing nFinderHioCFilters, " << tccfCtr << " filters imported")
     B2INFO(m_PARAMnameOfInstance << "Pass " << i << " VXD Track finder: " << sfCtr << " segFinder tests, " << nfCtr << " friendFinder tests and " << tccfCtr << " TCC filter tests are enabled. HighOccupancy-mode activated for > " << m_PARAMhighOccupancyThreshold << " hits per sensor");
 
+    B2DEBUG(10, "starting import of tuning values for filters:")
     if (int (m_PARAMtuneDistance3D.size()) < i + 1) {
-      newPass->distance3D.second = m_PARAMtuneDistance3D[m_PARAMtuneDistance3D.size() - 1];
+      newPass->distance3D.second = m_PARAMtuneDistance3D.at(m_PARAMtuneDistance3D.size() - 1);
     } else {
-      newPass->distance3D.second = m_PARAMtuneDistance3D[i];
+      newPass->distance3D.second = m_PARAMtuneDistance3D.at(i);
     }
     if (int (m_PARAMtuneDistanceXY.size()) < i + 1) {
-      newPass->distanceXY.second = m_PARAMtuneDistanceXY[m_PARAMtuneDistanceXY.size() - 1];
+      newPass->distanceXY.second = m_PARAMtuneDistanceXY.at(m_PARAMtuneDistanceXY.size() - 1);
     } else {
-      newPass->distanceXY.second = m_PARAMtuneDistanceXY[i];;
+      newPass->distanceXY.second = m_PARAMtuneDistanceXY.at(i);;
     }
     if (int (m_PARAMtuneDistanceZ.size()) < i + 1) {
-      newPass->distanceZ.second = m_PARAMtuneDistanceZ[m_PARAMtuneDistanceZ.size() - 1];
+      newPass->distanceZ.second = m_PARAMtuneDistanceZ.at(m_PARAMtuneDistanceZ.size() - 1);
     } else {
-      newPass->distanceZ.second = m_PARAMtuneDistanceZ[i];
+      newPass->distanceZ.second = m_PARAMtuneDistanceZ.at(i);
     }
     if (int (m_PARAMtuneSlopeRZ.size()) < i + 1) {
-      newPass->slopeRZ.second = m_PARAMtuneSlopeRZ[m_PARAMtuneSlopeRZ.size() - 1];
+      newPass->slopeRZ.second = m_PARAMtuneSlopeRZ.at(m_PARAMtuneSlopeRZ.size() - 1);
     } else {
-      newPass->slopeRZ.second = m_PARAMtuneSlopeRZ[i];
+      newPass->slopeRZ.second = m_PARAMtuneSlopeRZ.at(i);
     }
     if (int (m_PARAMtuneNormedDistance3D.size()) < i + 1) {
-      newPass->normedDistance3D.second = m_PARAMtuneNormedDistance3D[m_PARAMtuneNormedDistance3D.size() - 1];
+      newPass->normedDistance3D.second = m_PARAMtuneNormedDistance3D.at(m_PARAMtuneNormedDistance3D.size() - 1);
     } else {
-      newPass->normedDistance3D.second = m_PARAMtuneNormedDistance3D[i];
+      newPass->normedDistance3D.second = m_PARAMtuneNormedDistance3D.at(i);
     }
     if (int (m_PARAMtuneAngles3D.size()) < i + 1) {
-      newPass->angles3D.second = m_PARAMtuneAngles3D[m_PARAMtuneAngles3D.size() - 1];
+      newPass->angles3D.second = m_PARAMtuneAngles3D.at(m_PARAMtuneAngles3D.size() - 1);
     } else {
-      newPass->angles3D.second =  m_PARAMtuneAngles3D[i];
+      newPass->angles3D.second =  m_PARAMtuneAngles3D.at(i);
     }
     if (int (m_PARAMtuneAnglesXY.size()) < i + 1) {
-      newPass->anglesXY.second = m_PARAMtuneAnglesXY[m_PARAMtuneAnglesXY.size() - 1];
+      newPass->anglesXY.second = m_PARAMtuneAnglesXY.at(m_PARAMtuneAnglesXY.size() - 1);
     } else {
-      newPass->anglesXY.second = m_PARAMtuneAnglesXY[i];
+      newPass->anglesXY.second = m_PARAMtuneAnglesXY.at(i);
     }
     if (int (m_PARAMtuneAnglesRZ.size()) < i + 1) {
-      newPass->anglesRZ.second = m_PARAMtuneAnglesRZ[m_PARAMtuneAnglesRZ.size() - 1];
+      newPass->anglesRZ.second = m_PARAMtuneAnglesRZ.at(m_PARAMtuneAnglesRZ.size() - 1);
     } else {
-      newPass->anglesRZ.second = m_PARAMtuneAnglesRZ[i];
+      newPass->anglesRZ.second = m_PARAMtuneAnglesRZ.at(i);
     }
     if (int (m_PARAMtuneDeltaSlopeRZ.size()) < i + 1) {
-      newPass->deltaSlopeRZ.second = m_PARAMtuneDeltaSlopeRZ[m_PARAMtuneDeltaSlopeRZ.size() - 1];
+      newPass->deltaSlopeRZ.second = m_PARAMtuneDeltaSlopeRZ.at(m_PARAMtuneDeltaSlopeRZ.size() - 1);
     } else {
-      newPass->deltaSlopeRZ.second = m_PARAMtuneDeltaSlopeRZ[i];
+      newPass->deltaSlopeRZ.second = m_PARAMtuneDeltaSlopeRZ.at(i);
     }
     if (int (m_PARAMtuneDistance2IP.size()) < i + 1) {
-      newPass->distance2IP.second = m_PARAMtuneDistance2IP[m_PARAMtuneDistance2IP.size() - 1];
+      newPass->distance2IP.second = m_PARAMtuneDistance2IP.at(m_PARAMtuneDistance2IP.size() - 1);
     } else {
-      newPass->distance2IP.second =  m_PARAMtuneDistance2IP[i];
+      newPass->distance2IP.second =  m_PARAMtuneDistance2IP.at(i);
     }
     if (int (m_PARAMtunePT.size()) < i + 1) {
-      newPass->pT.second = m_PARAMtunePT[m_PARAMtunePT.size() - 1];
+      newPass->pT.second = m_PARAMtunePT.at(m_PARAMtunePT.size() - 1);
     } else {
-      newPass->pT.second =  m_PARAMtunePT[i];
+      newPass->pT.second =  m_PARAMtunePT.at(i);
     }
     if (int (m_PARAMtuneHelixFit.size()) < i + 1) {
-      newPass->helixFit.second = m_PARAMtuneHelixFit[m_PARAMtuneHelixFit.size() - 1];
+      newPass->helixFit.second = m_PARAMtuneHelixFit.at(m_PARAMtuneHelixFit.size() - 1);
     } else {
-      newPass->helixFit.second =  m_PARAMtuneHelixFit[i];
+      newPass->helixFit.second =  m_PARAMtuneHelixFit.at(i);
     }
     if (int (m_PARAMtuneZigZagXY.size()) < i + 1) {
-      newPass->zigzagXY.second = m_PARAMtuneZigZagXY[m_PARAMtuneZigZagXY.size() - 1];
+      newPass->zigzagXY.second = m_PARAMtuneZigZagXY.at(m_PARAMtuneZigZagXY.size() - 1);
     } else {
-      newPass->zigzagXY.second = m_PARAMtuneZigZagXY[i];
+      newPass->zigzagXY.second = m_PARAMtuneZigZagXY.at(i);
     }
     if (int (m_PARAMtuneZigZagRZ.size()) < i + 1) {
-      newPass->zigzagRZ.second = m_PARAMtuneZigZagRZ[m_PARAMtuneZigZagRZ.size() - 1];
+      newPass->zigzagRZ.second = m_PARAMtuneZigZagRZ.at(m_PARAMtuneZigZagRZ.size() - 1);
     } else {
-      newPass->zigzagRZ.second = m_PARAMtuneZigZagRZ[i];
+      newPass->zigzagRZ.second = m_PARAMtuneZigZagRZ.at(i);
     }
     if (int (m_PARAMtuneDeltaPt.size()) < i + 1) {
-      newPass->deltaPt.second = m_PARAMtuneDeltaPt[m_PARAMtuneDeltaPt.size() - 1];
+      newPass->deltaPt.second = m_PARAMtuneDeltaPt.at(m_PARAMtuneDeltaPt.size() - 1);
     } else {
-      newPass->deltaPt.second = m_PARAMtuneDeltaPt[i];
+      newPass->deltaPt.second = m_PARAMtuneDeltaPt.at(i);
     }
     if (int (m_PARAMtuneDeltaDistance2IP.size()) < i + 1) {
-      newPass->deltaDistance2IP.second = m_PARAMtuneDeltaDistance2IP[m_PARAMtuneDeltaDistance2IP.size() - 1];
+      newPass->deltaDistance2IP.second = m_PARAMtuneDeltaDistance2IP.at(m_PARAMtuneDeltaDistance2IP.size() - 1);
     } else {
-      newPass->deltaDistance2IP.second = m_PARAMtuneDeltaDistance2IP[i];
+      newPass->deltaDistance2IP.second = m_PARAMtuneDeltaDistance2IP.at(i);
     }
     if (int (m_PARAMtuneCircleFit.size()) < i + 1) {
-      newPass->circleFit.second = m_PARAMtuneCircleFit[m_PARAMtuneCircleFit.size() - 1];
+      newPass->circleFit.second = m_PARAMtuneCircleFit.at(m_PARAMtuneCircleFit.size() - 1);
     } else {
-      newPass->circleFit.second = m_PARAMtuneCircleFit[i];
+      newPass->circleFit.second = m_PARAMtuneCircleFit.at(i);
     }
+    B2DEBUG(10, "starting import of tuning values of HioC filters:")
     // high occupancy cases:
     if (int (m_PARAMtuneAngles3DHioC.size()) < i + 1) {
-      newPass->anglesHighOccupancy3D.second = m_PARAMtuneAngles3DHioC[m_PARAMtuneAngles3DHioC.size() - 1];
+      newPass->anglesHighOccupancy3D.second = m_PARAMtuneAngles3DHioC.at(m_PARAMtuneAngles3DHioC.size() - 1);
     } else {
-      newPass->anglesHighOccupancy3D.second =  m_PARAMtuneAngles3DHioC[i];
+      newPass->anglesHighOccupancy3D.second =  m_PARAMtuneAngles3DHioC.at(i);
     }
     if (int (m_PARAMtuneAnglesXYHioC.size()) < i + 1) {
-      newPass->anglesHighOccupancyXY.second = m_PARAMtuneAnglesXYHioC[m_PARAMtuneAnglesXYHioC.size() - 1];
+      newPass->anglesHighOccupancyXY.second = m_PARAMtuneAnglesXYHioC.at(m_PARAMtuneAnglesXYHioC.size() - 1);
     } else {
-      newPass->anglesHighOccupancyXY.second = m_PARAMtuneAnglesXYHioC[i];
+      newPass->anglesHighOccupancyXY.second = m_PARAMtuneAnglesXYHioC.at(i);
     }
     if (int (m_PARAMtuneAnglesRZHioC.size()) < i + 1) {
-      newPass->anglesHighOccupancyRZ.second = m_PARAMtuneAnglesRZHioC[m_PARAMtuneAnglesRZHioC.size() - 1];
+      newPass->anglesHighOccupancyRZ.second = m_PARAMtuneAnglesRZHioC.at(m_PARAMtuneAnglesRZHioC.size() - 1);
     } else {
-      newPass->anglesHighOccupancyRZ.second = m_PARAMtuneAnglesRZHioC[i];
+      newPass->anglesHighOccupancyRZ.second = m_PARAMtuneAnglesRZHioC.at(i);
     }
     if (int (m_PARAMtuneDeltaSlopeRZHioC.size()) < i + 1) {
-      newPass->deltaSlopeHighOccupancyRZ.second = m_PARAMtuneDeltaSlopeRZHioC[m_PARAMtuneDeltaSlopeRZHioC.size() - 1];
+      newPass->deltaSlopeHighOccupancyRZ.second = m_PARAMtuneDeltaSlopeRZHioC.at(m_PARAMtuneDeltaSlopeRZHioC.size() - 1);
     } else {
-      newPass->deltaSlopeHighOccupancyRZ.second = m_PARAMtuneDeltaSlopeRZHioC[i];
+      newPass->deltaSlopeHighOccupancyRZ.second = m_PARAMtuneDeltaSlopeRZHioC.at(i);
     }
     if (int (m_PARAMtuneDistance2IPHioC.size()) < i + 1) {
-      newPass->distanceHighOccupancy2IP.second = m_PARAMtuneDistance2IPHioC[m_PARAMtuneDistance2IPHioC.size() - 1];
+      newPass->distanceHighOccupancy2IP.second = m_PARAMtuneDistance2IPHioC.at(m_PARAMtuneDistance2IPHioC.size() - 1);
     } else {
-      newPass->distanceHighOccupancy2IP.second =  m_PARAMtuneDistance2IPHioC[i];
+      newPass->distanceHighOccupancy2IP.second =  m_PARAMtuneDistance2IPHioC.at(i);
     }
     if (int (m_PARAMtunePTHioC.size()) < i + 1) {
-      newPass->pTHighOccupancy.second = m_PARAMtunePTHioC[m_PARAMtunePTHioC.size() - 1];
+      newPass->pTHighOccupancy.second = m_PARAMtunePTHioC.at(m_PARAMtunePTHioC.size() - 1);
     } else {
-      newPass->pTHighOccupancy.second =  m_PARAMtunePTHioC[i];
+      newPass->pTHighOccupancy.second =  m_PARAMtunePTHioC.at(i);
     }
     if (int (m_PARAMtuneHelixFitHioC.size()) < i + 1) {
-      newPass->helixHighOccupancyFit.second = m_PARAMtuneHelixFitHioC[m_PARAMtuneHelixFitHioC.size() - 1];
+      newPass->helixHighOccupancyFit.second = m_PARAMtuneHelixFitHioC.at(m_PARAMtuneHelixFitHioC.size() - 1);
     } else {
-      newPass->helixHighOccupancyFit.second =  m_PARAMtuneHelixFitHioC[i];
+      newPass->helixHighOccupancyFit.second =  m_PARAMtuneHelixFitHioC.at(i);
     }
     if (int (m_PARAMtuneDeltaPtHioC.size()) < i + 1) {
-      newPass->deltaPtHighOccupancy.second = m_PARAMtuneDeltaPtHioC[m_PARAMtuneDeltaPtHioC.size() - 1];
+      newPass->deltaPtHighOccupancy.second = m_PARAMtuneDeltaPtHioC.at(m_PARAMtuneDeltaPtHioC.size() - 1);
     } else {
-      newPass->deltaPtHighOccupancy.second = m_PARAMtuneDeltaPtHioC[i];
+      newPass->deltaPtHighOccupancy.second = m_PARAMtuneDeltaPtHioC.at(i);
     }
     if (int (m_PARAMtuneDeltaDistance2IPHioC.size()) < i + 1) {
-      newPass->deltaDistanceHighOccupancy2IP.second = m_PARAMtuneDeltaDistance2IPHioC[m_PARAMtuneDeltaDistance2IPHioC.size() - 1];
+      newPass->deltaDistanceHighOccupancy2IP.second = m_PARAMtuneDeltaDistance2IPHioC.at(m_PARAMtuneDeltaDistance2IPHioC.size() - 1);
     } else {
-      newPass->deltaDistanceHighOccupancy2IP.second = m_PARAMtuneDeltaDistance2IPHioC[i];
+      newPass->deltaDistanceHighOccupancy2IP.second = m_PARAMtuneDeltaDistance2IPHioC.at(i);
     }
 
 
     /// importing sectorMap including friend Information and friend specific cutoffs
     newPass->sectorMap.clear();
     totalFriendCounter = 0;
-    GearDir belleDir("/Detector/Tracking/CATFParameters/");
 
-    string chosenSetup = (boost::format("sectorList_%1%_%2%") % newPass->sectorSetup  % newPass->chosenDetectorType).str();
-    string testSetup = "sectorList_testBeamSTD3_VXD";
+    typedef std::pair< double, double> CutoffValue; /**< .first is minValue, .second is maxValue */
+    typedef std::pair<unsigned int, CutoffValue> Cutoff; /**< .first is code of filter, .second is CutoffValue */
+    typedef std::vector< Cutoff > FriendValue; /**< stores all Cutoffs */
+    typedef std::pair<unsigned int, FriendValue > Friend; /**< .first is secID of current Friend, second is FriendValue */
+    typedef std::vector< Friend > SectorValue; /**< stores all Friends */
+    typedef std::pair<unsigned int, SectorValue> Sector; /**< .first is secID of current sector, second is SectorValue */
+    typedef std::vector < Sector > SecMapCopy; /**< stores all Sectors */
 
-    typedef vector < pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > > > > SecMapBla;
-    VXDTFSecMap anotherMap;
-//    const SecMapBla& importedMap = anotherMap.getSectorMap();
-//    B2ERROR(" neue imported Map hat " << importedMap.size() << " einträge")
-    string directory = "/Detector/Tracking/CATFParameters/" + testSetup;
-    const VXDTFSecMap* newMap = dynamic_cast<const VXDTFSecMap*>(Gearbox::getInstance().getTObject(directory.c_str()));
-    const SecMapBla& importedMap = newMap->getSectorMap();
-    B2ERROR(" neue imported Map hat " << importedMap.size() << " einträge")
+    const SecMapCopy& importedMap = newMap->getSectorMap();
 
-    GearDir sectorList(belleDir, chosenSetup);
-
-    B2INFO(m_PARAMnameOfInstance << "importing sectors, using " << chosenSetup << " > " << sectorList.getNumberNodes("aSector") << " sectors found");
-
-    if (sectorList.getNumberNodes("aSector") == 0) {
-      B2FATAL(m_PARAMnameOfInstance << "Failed to import sector map " << chosenSetup << "! No track finding possible. Please check ../tracking/data/VXDTFindex.xml whether your chosen sector maps are uncommented (and files linked there are not zipped) and recompile if you change entries...")
-    }
     double cutoffMinValue, cutoffMaxValue;
-    string aSectorName, aFriendName, aFilterName;
-
     pair<double, double> cutoff;
-    BOOST_FOREACH(const GearDir & aSector, sectorList.getNodes("aSector")) {
 
-      aSectorName = aSector.getString("secID");
-      FullSecID secID = FullSecID(aSectorName); // same as aSectorName but info stored in an int
+    BOOST_FOREACH(const Sector & aSector, importedMap) {
+      B2DEBUG(110, " > > importing sector: " << FullSecID(aSector.first).getFullSecString() << " (named " << aSector.first << " as an int) including " << aSector.second.size() << " friends. ");
+      totalFriendCounter += aSector.second.size();
+      VXDSector* pSector = new VXDSector(aSector.first);
 
-      GearDir friendList(aSector, "friendList/");
+      BOOST_FOREACH(const Friend & aFriend, aSector.second) { // Friend.first is friendID
+        B2DEBUG(120, " > > importing friend: " << FullSecID(aFriend.first).getFullSecString() << " (named " << aFriend.first << " as an int) including " << aFriend.second.size() << " filters. ");
 
-      B2DEBUG(150, " > > importing sector: " << aSectorName << " (named " << secID.getFullSecID() << " as an int) including " << friendList.getNumberNodes("aFriend") << " friends. ");
-      totalFriendCounter += friendList.getNumberNodes("aFriend");
-      VXDSector* pSector = new VXDSector(secID.getFullSecID());
-
-      BOOST_FOREACH(const GearDir & aFriend, friendList.getNodes("aFriend")) {
-
-        aFriendName = aFriend.getString("friendID");
-        FullSecID friendID = FullSecID(aFriendName); // same as aFriendName but info stored in an int
-
-        GearDir filterList(aFriend, "filterList/");
-
-        BOOST_FOREACH(const GearDir & aFilter, filterList.getNodes("aFilter")) {
-
-          aFilterName = aFilter.getString("filterID");
-          GearDir cuts(aFilter, "cuts/");
-          cutoffMinValue = 0., cutoffMaxValue = 0.;
-          string min = "Min", max = "Max";
-          int filterID = FilterID().getFilterType(aFilterName);
+        BOOST_FOREACH(const Cutoff & aFilter, aFriend.second) {
+          B2DEBUG(130, " > > importing filter: " << FilterID().getFilterString(aFilter.first) << " (named " << aFilter.first << " as an int) including Min/Max: " << aFilter.second.first << "/" << aFilter.second.second);
+          // aFilter.first is filterID, .second is cutoff, where .second.first is min, .second.second is max
+          unsigned int filterID = aFilter.first;
           if (filterID == FilterID::numFilters) { B2FATAL("Filter in XML-File does not exist! check FilterID-class!")}
           // now, for each filter will be checked, whether it shall be stored or not and whether the cutoffs shall be modified:
-          if (aFilterName == FilterID::nameDistance3D && newPass->distance3D.first == true) {   // first: activateDistance3D, second: tuneDistance3D
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->distance3D.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->distance3D.second);
+          if (filterID == FilterID::distance3D && newPass->distance3D.first == true) {   // first: activateDistance3D, second: tuneDistance3D
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->distance3D.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->distance3D.second);
 
-          } else if (aFilterName == FilterID::nameDistanceXY &&  newPass->distanceXY.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->distanceXY.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->distanceXY.second);
+          } else if (filterID == FilterID::distanceXY &&  newPass->distanceXY.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->distanceXY.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->distanceXY.second);
 
-          } else if (aFilterName == FilterID::nameDistanceZ &&  newPass->distanceZ.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->distanceZ.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->distanceZ.second);
+          } else if (filterID == FilterID::distanceZ &&  newPass->distanceZ.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->distanceZ.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->distanceZ.second);
 
-          } else if (aFilterName == FilterID::nameSlopeRZ &&  newPass->slopeRZ.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->slopeRZ.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->slopeRZ.second);
+          } else if (filterID == FilterID::slopeRZ &&  newPass->slopeRZ.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->slopeRZ.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->slopeRZ.second);
 
-          } else if (aFilterName == FilterID::nameNormedDistance3D &&  newPass->normedDistance3D.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->normedDistance3D.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->normedDistance3D.second);
+          } else if (filterID == FilterID::normedDistance3D &&  newPass->normedDistance3D.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->normedDistance3D.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->normedDistance3D.second);
 
-          } else if (aFilterName == FilterID::nameAngles3D &&  newPass->angles3D.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->angles3D.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->angles3D.second);
+          } else if (filterID == FilterID::angles3D &&  newPass->angles3D.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->angles3D.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->angles3D.second);
 
-          } else if (aFilterName == FilterID::nameAnglesXY &&  newPass->anglesXY.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->anglesXY.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->anglesXY.second);
+          } else if (filterID == FilterID::anglesXY &&  newPass->anglesXY.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->anglesXY.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->anglesXY.second);
 
-          } else if (aFilterName == FilterID::nameAnglesRZ &&  newPass->anglesRZ.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->anglesRZ.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->anglesRZ.second);
+          } else if (filterID == FilterID::anglesRZ &&  newPass->anglesRZ.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->anglesRZ.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->anglesRZ.second);
 
-          } else if (aFilterName == FilterID::namePT &&  newPass->pT.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->pT.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->pT.second);
+          } else if (filterID == FilterID::pT &&  newPass->pT.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->pT.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->pT.second);
 
-          } else if (aFilterName == FilterID::nameHelixFit &&  newPass->helixFit.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->helixFit.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->helixFit.second);
+          } else if (filterID == FilterID::helixFit &&  newPass->helixFit.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->helixFit.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->helixFit.second);
 
-          } else if (aFilterName == FilterID::nameDistance2IP &&  newPass->distance2IP.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->distance2IP.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->distance2IP.second);
+          } else if (filterID == FilterID::distance2IP &&  newPass->distance2IP.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->distance2IP.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->distance2IP.second);
 
-          } else if (aFilterName == FilterID::nameDeltaSlopeRZ &&  newPass->deltaSlopeRZ.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->deltaSlopeRZ.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->deltaSlopeRZ.second);
+          } else if (filterID == FilterID::deltaSlopeRZ &&  newPass->deltaSlopeRZ.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->deltaSlopeRZ.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->deltaSlopeRZ.second);
 
-          } else if (aFilterName == FilterID::nameDeltapT &&  newPass->deltaPt.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->deltaPt.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->deltaPt.second);
+          } else if (filterID == FilterID::deltapT &&  newPass->deltaPt.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->deltaPt.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->deltaPt.second);
 
-          } else if (aFilterName == FilterID::nameDeltaDistance2IP &&  newPass->deltaDistance2IP.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->deltaDistance2IP.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->deltaDistance2IP.second);
+          } else if (filterID == FilterID::deltaDistance2IP &&  newPass->deltaDistance2IP.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->deltaDistance2IP.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->deltaDistance2IP.second);
 
-          } else if (aFilterName == FilterID::nameAnglesHighOccupancy3D &&  newPass->anglesHighOccupancy3D.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->anglesHighOccupancy3D.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->anglesHighOccupancy3D.second);
+          } else if (filterID == FilterID::anglesHighOccupancy3D &&  newPass->anglesHighOccupancy3D.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->anglesHighOccupancy3D.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->anglesHighOccupancy3D.second);
 
-          } else if (aFilterName == FilterID::nameAnglesHighOccupancyXY &&  newPass->anglesHighOccupancyXY.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->anglesHighOccupancyXY.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->anglesHighOccupancyXY.second);
+          } else if (filterID == FilterID::anglesHighOccupancyXY &&  newPass->anglesHighOccupancyXY.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->anglesHighOccupancyXY.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->anglesHighOccupancyXY.second);
 
-          } else if (aFilterName == FilterID::nameAnglesHighOccupancyRZ &&  newPass->anglesHighOccupancyRZ.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->anglesHighOccupancyRZ.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->anglesHighOccupancyRZ.second);
+          } else if (filterID == FilterID::anglesHighOccupancyRZ &&  newPass->anglesHighOccupancyRZ.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->anglesHighOccupancyRZ.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->anglesHighOccupancyRZ.second);
 
-          } else if (aFilterName == FilterID::namePTHighOccupancy &&  newPass->pTHighOccupancy.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->pTHighOccupancy.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->pTHighOccupancy.second);
+          } else if (filterID == FilterID::pTHighOccupancy &&  newPass->pTHighOccupancy.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->pTHighOccupancy.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->pTHighOccupancy.second);
 
-          } else if (aFilterName == FilterID::nameHelixHighOccupancyFit &&  newPass->helixHighOccupancyFit.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->helixHighOccupancyFit.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->helixHighOccupancyFit.second);
+          } else if (filterID == FilterID::helixHighOccupancyFit &&  newPass->helixHighOccupancyFit.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->helixHighOccupancyFit.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->helixHighOccupancyFit.second);
 
-          } else if (aFilterName == FilterID::nameDistanceHighOccupancy2IP &&  newPass->distanceHighOccupancy2IP.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->distanceHighOccupancy2IP.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->distanceHighOccupancy2IP.second);
+          } else if (filterID == FilterID::distanceHighOccupancy2IP &&  newPass->distanceHighOccupancy2IP.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->distanceHighOccupancy2IP.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->distanceHighOccupancy2IP.second);
 
-          } else if (aFilterName == FilterID::nameDeltaSlopeHighOccupancyRZ &&  newPass->deltaSlopeHighOccupancyRZ.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->deltaSlopeHighOccupancyRZ.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->deltaSlopeHighOccupancyRZ.second);
+          } else if (filterID == FilterID::deltaSlopeHighOccupancyRZ &&  newPass->deltaSlopeHighOccupancyRZ.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->deltaSlopeHighOccupancyRZ.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->deltaSlopeHighOccupancyRZ.second);
 
-          } else if (aFilterName == FilterID::nameDeltapTHighOccupancy &&  newPass->deltaPtHighOccupancy.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->deltaPtHighOccupancy.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->deltaPtHighOccupancy.second);
+          } else if (filterID == FilterID::deltapTHighOccupancy &&  newPass->deltaPtHighOccupancy.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->deltaPtHighOccupancy.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->deltaPtHighOccupancy.second);
 
-          } else if (aFilterName == FilterID::nameDeltaDistanceHighOccupancy2IP &&  newPass->deltaDistanceHighOccupancy2IP.first == true) {
-            cutoffMinValue = getXMLValue(cuts, min, aFilterName);
-            cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
-            cutoffMinValue = addExtraGain(-1, cutoffMinValue, m_PARAMtuneCutoffs, newPass->deltaDistanceHighOccupancy2IP.second);
-            cutoffMaxValue = addExtraGain(+1, cutoffMaxValue, m_PARAMtuneCutoffs, newPass->deltaDistanceHighOccupancy2IP.second);
+          } else if (filterID == FilterID::deltaDistanceHighOccupancy2IP &&  newPass->deltaDistanceHighOccupancy2IP.first == true) {
+            cutoffMinValue = addExtraGain(-1, aFilter.second.first, m_PARAMtuneCutoffs, newPass->deltaDistanceHighOccupancy2IP.second);
+            cutoffMaxValue = addExtraGain(+1, aFilter.second.second, m_PARAMtuneCutoffs, newPass->deltaDistanceHighOccupancy2IP.second);
           }
 
           cutoff = make_pair(cutoffMinValue, cutoffMaxValue);
-          pSector->addCutoff(filterID, friendID.getFullSecID(), cutoff);
-          /*      tempQuantile = make_pair("q0.01", cutoffMinValue);
-           p Cutoff->addQuantile(tempQuantile);*/
+          pSector->addCutoff(filterID, aFriend.first, cutoff);
         }
       }
-      newPass->sectorMap.insert(make_pair(secID.getFullSecID(), pSector)); /// TODO: add only if there is at least one cutoff added (implement by autocount within pSector->addCutoff and additional .size()- memberfunction)
+      newPass->sectorMap.insert(make_pair(aSector.first, pSector));
     }
+
+    B2INFO(m_PARAMnameOfInstance << "importing sectors, using " << chosenSetup << " > " << importedMap.size() << " sectors found");
+
 
     //generating virtual sector (represents the region of the primary vertex)
     string centerSector = "00_00_0";
@@ -1090,12 +1052,12 @@ void VXDTFModule::beginRun()
     //      B2DEBUG(200,"Opening sector " << mapIter->first << " which has got " << nFriends << " friends");
     //
     //      for (int f = 0; f < nFriends; ++f ) { // looping through friends
-    //        B2DEBUG(250," > Opening sectorFriend " << currentFriends.at(f) << "..."); /// method is safer than [f]
+    //        B2DEBUG(250," > Opening sectorFriend " << currentFriends.at(f) << "..."); /// method is safer than .at(f)
     //        vector<string> currentCutoffTypes = mapIter->second->getSupportedCutoffs(currentFriends.at(f));
     //
     //        for (int j = 0; j < int(currentCutoffTypes.size()); ++j) {
     //          Cutoff* aCutoff = mapIter->second->getCutoff(currentCutoffTypes.at(j), currentFriends.at(f));
-    //          B2DEBUG(250," cutoff is of type: " << currentCutoffTypes[j]
+    //          B2DEBUG(250," cutoff is of type: " << currentCutoffTypes.at(j)
     //            << ", min: " << aCutoff->getMinValue() << ", max:" << aCutoff->getMaxValue());
     //          cutoffTypesCounter++;
     //        }
@@ -1108,6 +1070,21 @@ void VXDTFModule::beginRun()
     m_passSetupVector.push_back(newPass); /// store pass for eternity (well until end of program)
   }
 
+  /** copying first pass for the BaselineTF (just to be sure that they don't influence each other) */
+  string centerSector = "00_00_0";
+  unsigned int centerSecID = FullSecID().getFullSecID(); // automatically produces secID of centerSector
+  VXDSector* pCenterSector = new VXDSector(centerSecID);
+  m_baselinePass.sectorMap.insert(make_pair(centerSecID, pCenterSector));
+  B2DEBUG(100, "Baseline-Pass: adding virtual centerSector with " << m_baselinePass.sectorMap.find(centerSecID)->second->getFriends().size() << " friends.");
+  m_baselinePass.threeHitFilterBox.resetMagneticField(magneticField);
+  m_baselinePass.fourHitFilterBox.resetMagneticField(magneticField);
+  m_baselinePass.trackletFilterBox.resetMagneticField(magneticField);
+  m_baselinePass.origin = m_passSetupVector.at(0)->origin;
+  m_baselinePass.detectorType = m_passSetupVector.at(0)->detectorType;
+  m_baselinePass.chosenDetectorType = m_passSetupVector.at(0)->chosenDetectorType;
+  m_baselinePass.numTotalLayers = m_passSetupVector.at(0)->numTotalLayers;
+  m_baselinePass.activatedTccFilterTests = 3; // pT, zzXY, circleFit
+  m_baselinePass.circleFit.second = m_passSetupVector.at(0)->circleFit.second;
 
   m_globalizedErrorContainer = Tracking::getGlobalizedHitErrors(); // storing errors of the vxd
   m_errorContainer = Tracking::getHitErrors();
@@ -1143,46 +1120,40 @@ void VXDTFModule::the_real_event()
   thisInfoPackage.clear();
   boostClock::time_point beginEvent = boostClock::now();
 
-
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+
   m_eventCounter = eventMetaDataPtr->getEvent();
   thisInfoPackage.evtNumber = m_eventCounter;
   B2DEBUG(1, "################## entering vxd CA track finder - event " << m_eventCounter << " ######################");
   /** cleaning will be done at the end of the event **/
 
   /** Section 3 - importing hits and find their papaSectors.**/
-
-//   generating virtual Hit at position (0, 0, 0) - needed for virtual segment.
-  TVector3 origin(m_PARAMsetOrigin[0], m_PARAMsetOrigin[1], m_PARAMsetOrigin[2]);; //(0., 0., 0.); // !!!
-  PositionInfo vertexInfo;
-  vertexInfo.hitPosition = origin;
-  vertexInfo.sigmaX = 0.1;
-  vertexInfo.sigmaY = 0.1;
-//   string centerSector = "00_00_0";
-  unsigned int centerSector = FullSecID().getFullSecID(); // automatically produces secID of centerSector
-  VxdID centerVxdID = VxdID(0, 0, 0); // dummy VxdID for virtual IP
-  int passNumber = 0;
-  BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
-    VXDTFHit* pTFHit = new VXDTFHit(vertexInfo, passNumber, 0, 0, 0, Const::IR, centerSector, centerVxdID, 0.0); // has no position in HitList, because it doesn't exist...
-
-    currentPass->sectorMap.find(centerSector)->second->addHit(pTFHit);
-    currentPass->hitVector.push_back(pTFHit);
-    passNumber++;
-  }
-
-  VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
-
   // importing hits
   int nTotalClustersThreshold = 0; // counts maximum number of allowed clusters to execute the baseline TF, is number of layers*2 (for svd it's number of Layers*4 because of 1D-Clusters)
   StoreArray<PXDCluster> aPxdClusterArray;
   int numOfPxdClusters = 0;
+//  m_nPXDClusters = 0; /// they are needed very often, therefore global variable is apprechiated
   if (m_usePXDorSVDorVXDhits not_eq 1) { numOfPxdClusters = aPxdClusterArray.getEntries(); nTotalClustersThreshold += 4; } // only filled, if we want to use them
   StoreArray<SVDCluster> aSvdClusterArray;
   int numOfSvdClusters = 0;
+//  m_nSVDClusters = 0;
   if (m_usePXDorSVDorVXDhits not_eq 0) { numOfSvdClusters = aSvdClusterArray.getEntries(); nTotalClustersThreshold += 16;}
   thisInfoPackage.numPXDCluster = numOfPxdClusters;
   thisInfoPackage.numSVDCluster = numOfSvdClusters;
   int nTotalClusters = numOfPxdClusters + numOfSvdClusters; // counts number of clusters total
+
+  boostClock::time_point stopTimer = boostClock::now();
+  if (nTotalClusters == 0) {
+    B2DEBUG(1, "there are no hits, terminating event...");
+    m_TESTERnoHitsAtEvent++;
+
+    m_TESTERtimeConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+    thisInfoPackage.sectionConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+    thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+    B2DEBUG(1, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
+    m_TESTERlogEvents.push_back(thisInfoPackage);
+    return;
+  }
 
   // preparing storearray for trackCandidates and fitted tracks
   StoreArray<GFTrackCand> finalTrackCandidates(m_PARAMgfTrackCandsColName);
@@ -1192,36 +1163,71 @@ void VXDTFModule::the_real_event()
     extraInfo4GFTCs.create();
   }
 
+  VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
 
+//   generating virtual Hit at position (0, 0, 0) - needed for virtual segment.
+  PositionInfo vertexInfo;
+
+  unsigned int centerSector = FullSecID().getFullSecID(); // automatically produces secID of centerSector
+  VxdID centerVxdID = VxdID(0, 0, 0); // dummy VxdID for virtual IP
+  int passNumber = m_passSetupVector.size() - 1;
+  BOOST_REVERSE_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
+    vertexInfo.hitPosition = currentPass->origin;
+    if (vertexInfo.hitPosition.Mag() > 0.1) { // probably no Belle2-VXD-Setup -> Vertex not known
+      vertexInfo.sigmaX = 1.; //0.1;
+      vertexInfo.sigmaY = 1.; //0.1;
+    } else {
+      vertexInfo.sigmaX = 0.15;
+      vertexInfo.sigmaY = 0.15;
+    }
+    VXDTFHit* pTFHit = new VXDTFHit(vertexInfo, passNumber, 0, 0, 0, Const::IR, centerSector, centerVxdID, 0.0); // has no position in HitList, because it doesn't exist...
+
+    currentPass->sectorMap.find(centerSector)->second->addHit(pTFHit);
+    currentPass->hitVector.push_back(pTFHit);
+    passNumber--;
+  }
+
+  m_baselinePass.sectorMap.find(centerSector)->second->addHit(new VXDTFHit(vertexInfo, 0, 0, 0, 0, Const::IR, centerSector, centerVxdID, 0.0)); // uses orignValues of first pass since reverse foreach has been used
+
+  stopTimer = boostClock::now();
+  m_TESTERtimeConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+  thisInfoPackage.sectionConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+
+
+  boostClock::time_point timeStamp = boostClock::now();
   vector<ClusterInfo> clustersOfEvent(numOfPxdClusters + numOfSvdClusters); /// contains info which tc uses which clusters
   for (int i = 0; i < numOfPxdClusters; ++i) {
-    ClusterInfo newCluster(i, i, true);
+    ClusterInfo newCluster(i, i, true, aPxdClusterArray[i], NULL);
     B2DEBUG(50, " clusterInfo: realIndex " << newCluster.getRealIndex() << ", ownIndex " << newCluster.getOwnIndex())
     clustersOfEvent[i] = newCluster;
-    B2DEBUG(50, " PXDcluster " << i << " in position " << i << " stores real Cluster " << clustersOfEvent[i].getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent[i].getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
+    B2DEBUG(50, " PXDcluster " << i << " in position " << i << " stores real Cluster " << clustersOfEvent.at(i).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent.at(i).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
   }
   for (int i = 0; i < numOfSvdClusters; ++i) {
-    ClusterInfo newCluster(i, i + numOfPxdClusters, false);
+    ClusterInfo newCluster(i, i + numOfPxdClusters, false, NULL, aSvdClusterArray[i]);
     B2DEBUG(50, " clusterInfo: realIndex " << newCluster.getRealIndex() << ", ownIndex " << newCluster.getOwnIndex())
     clustersOfEvent[i + numOfPxdClusters] = newCluster;
-    B2DEBUG(50, " SVDcluster " << i << " in position " << i + numOfPxdClusters << " stores real Cluster " << clustersOfEvent[i + numOfPxdClusters].getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent[i + numOfPxdClusters].getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
+    B2DEBUG(50, " SVDcluster " << i << " in position " << i + numOfPxdClusters << " stores real Cluster " << clustersOfEvent.at(i + numOfPxdClusters).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent.at(i + numOfPxdClusters).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
   } // the position in the vector is NOT the index it has stored (except if there are no PXDClusters)
+  m_TESTERtimeConsumption.hitSorting += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+  thisInfoPackage.sectionConsumption.hitSorting += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
 
 
+  timeStamp = boostClock::now();
   /// now follows a bypass for the simplistic case of one hit per layer (or <=2 hits per layer at the SVD ), this shall guarantee the reconstruction of single track events...
   /** the following bypass shall reconstruct very simple events like a cosmic event or a testbeam event with only
    * 1 track and no hits of secondary particles. the first check only tests for the most complicated case of a cosmic particle
    * passing each layer twice and hitting the overlapping regions (which results in 2 hits at the same layer in neighbouring ladders)
    * */
-  if (nTotalClusters - 1 < nTotalClustersThreshold) {
-    B2DEBUG(1, " requirements for baseline TF fullfilled, starting simpleEventReco...")
-    bool successfullyReconstructed = simpleEventReco(clustersOfEvent, aPxdClusterArray, aSvdClusterArray); // aSvdClusterArray, aPxdClusterArray, m_tcVector, m_trackletFilterBox, m_threeHitFilterBox
+  if ((nTotalClusters - 1 < nTotalClustersThreshold) && m_PARAMactivateBaselineTF == true) {
+    B2DEBUG(1, " requirements for baseline TF fullfilled, starting baselineTF...")
+    m_TESTERstartedBaselineTF++;
+    bool successfullyReconstructed = baselineTF(clustersOfEvent, &m_baselinePass);            /// baselineTF
     if (successfullyReconstructed == true) {
-      // TODO, hier fehlt noch die Schleife von gegen Ende des Events, wo die notwendigen Sachen für den GFTCoutput vorbereitet werden (und auch die GFTrackCands im finalTrackCandidates-container appended werden)
-      calcInitialValues4TCs(m_tcVector);                               /// calcInitialValues4TCs
+      m_TESTERsucceededBaselineTF++;
+      calcInitialValues4TCs(&m_baselinePass);                                                 /// calcInitialValues4TCs
 
-      BOOST_FOREACH(VXDTFTrackCandidate * aTC, m_tcVector) {
-        GFTrackCand gfTC = generateGFTrackCand(aTC, clustersOfEvent);                          /// generateGFTrackCand
+      BOOST_FOREACH(VXDTFTrackCandidate * aTC, m_baselinePass.tcVector) {
+        GFTrackCand gfTC = generateGFTrackCand(aTC);                                          /// generateGFTrackCand
 
         if (m_TESTERexpandedTestingRoutines == true) {
           VXDTFInfoBoard newBoard;
@@ -1238,13 +1244,21 @@ void VXDTFModule::the_real_event()
         finalTrackCandidates.appendNew(gfTC);
       }
 
-
+      cleanEvent(&m_baselinePass, centerSector);
+      stopTimer = boostClock::now();
+      if (m_PARAMwriteToRoot == true) {
+        m_rootTimeConsumption = (stopTimer - beginEvent).count();
+        m_treeEventWisePtr->Fill();
+      }
+      m_TESTERtimeConsumption.baselineTF += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+      thisInfoPackage.sectionConsumption.baselineTF += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+      thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+      B2DEBUG(1, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
+      m_TESTERlogEvents.push_back(thisInfoPackage);
+      return;
     }
   }
 
-  boostClock::time_point stopTimer = boostClock::now();
-  m_TESTERtimeConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-  thisInfoPackage.sectionConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
 
   B2DEBUG(1, "VXDTF event " << m_eventCounter << ": size of arrays, PXDCluster: " << numOfPxdClusters << ", SVDCLuster: " << numOfSvdClusters << ", clustersOfEvent: " << clustersOfEvent.size());
 
@@ -1253,7 +1267,7 @@ void VXDTFModule::the_real_event()
   double vSize, uSizeAtHit, uCoord, vCoord;
   unsigned int aSecID;
   VxdID aVxdID;
-  boostClock::time_point timeStamp = boostClock::now();
+  timeStamp = boostClock::now();
   int badSectorRangeCtr = 0, aLayerID;
   string checkString4badHits = "-";
   for (int iPart = 0; iPart < numOfPxdClusters; ++iPart) { /// means: numOfPxdClusters > 0 if at least one pass wants PXD hits
@@ -1268,7 +1282,7 @@ void VXDTFModule::the_real_event()
     VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
     hitInfo.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
     hitInfo.sigmaX = m_errorContainer.at(aLayerID - 1).first;
-//    hitInfo.sigmaV = m_globalizedErrorContainer[aLayerID][aVxdID.getLadderNumber()].second;
+    hitInfo.sigmaY = m_errorContainer.at(aLayerID - 1).second;
 
     // local(0,0,0) is the _center_ of the sensorplane, not at the edge!
     vSize = 0.5 * aSensorInfo.getVSize();
@@ -1319,28 +1333,39 @@ void VXDTFModule::the_real_event()
 
   int numOfClusterCombis = 0;
   if (m_usePXDorSVDorVXDhits not_eq 0) {   /// means: is true when at least one pass wants SVD hits
-    map<int, SensorStruct > activatedSensors; // mapEntry.first: vxdID, mapEntry.second SensorStruct having some extra info
+    ActiveSensorsOfEvent activatedSensors; // mapEntry.first: vxdID, mapEntry.second SensorStruct having some extra info
     vector<ClusterHit> clusterHitList;
 
     // store each cluster (as a clusterPtr) in a map(uniID, sensorStruct), where sensorStruct contains 2 vectors (uClusters and vClusters).
     // in the end a map containing illuminated sensors - and each cluster inhabiting them - exists:
-    findSensors4Clusters(activatedSensors, aSvdClusterArray);
+    findSensors4Clusters(activatedSensors, clustersOfEvent);                                    ///findSensors4Clusters
 
     // iterate through map of activated sensors & combine each possible combination of clusters. Store them in a vector of structs, where each struct carries an u & a v cluster:
-    find2DSVDHits(activatedSensors, clusterHitList);
+    BrokenSensorsOfEvent brokenSensors = find2DSVDHits(activatedSensors, clusterHitList);       /// find2DSVDHits
+    int nBrokenSensors = brokenSensors.size();
+    if (nBrokenSensors != 0) {
+      /// in this case, we should build 1D-clusters
+      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {
+        stringstream badSensors;
+        BOOST_FOREACH(int sensorID, brokenSensors) { badSensors << " " << FullSecID(sensorID).getFullSecString(); }
+        B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << ": there are " << nBrokenSensors << " sensors with strange cluster-behavior (num of u and v clusters does not mach), sensors are: \n" << badSensors)
+      }
+    }
 
     numOfClusterCombis = clusterHitList.size();
 
     BOOST_FOREACH(ClusterHit & aClusterCombi, clusterHitList) {
-      const SVDCluster* const uClusterPtr = aClusterCombi.uCluster; // uCluster
-      const SVDCluster* const vClusterPtr = aClusterCombi.vCluster; // vCluster
-      int clusterIndexU = aClusterCombi.uClusterIndex;
-      int clusterIndexV = aClusterCombi.vClusterIndex;
+      ClusterInfo* uClusterInfo = aClusterCombi.uCluster;
+      ClusterInfo* vClusterInfo = aClusterCombi.vCluster;
+      const SVDCluster* uClusterPtr = uClusterInfo->getSVDCluster(); // uCluster
+      const SVDCluster* vClusterPtr = vClusterInfo->getSVDCluster(); // vCluster
+      int clusterIndexU = uClusterInfo->getRealIndex();
+      int clusterIndexV = vClusterInfo->getRealIndex();
 
       float timeStampU = uClusterPtr->getClsTime();
       float timeStampV = vClusterPtr->getClsTime();
 
-      B2DEBUG(100, " svdClusterCombi has clusterIndexU/clusterIndexV: " << clusterIndexU << "/" << clusterIndexV << " with collected charge u/v: " << uClusterPtr->getCharge() << "/" << vClusterPtr->getCharge() << " and their infoClasses are at u/v: " << clusterIndexU + numOfPxdClusters << "/" << clusterIndexV + numOfPxdClusters << " with collected charge u/v: " << aSvdClusterArray[ clustersOfEvent[numOfPxdClusters + clusterIndexU].getRealIndex() ]->getCharge() << "/" << aSvdClusterArray[ clustersOfEvent[numOfPxdClusters + clusterIndexV].getRealIndex() ]->getCharge())
+      B2DEBUG(100, " svdClusterCombi has clusterIndexU/clusterIndexV: " << clusterIndexU << "/" << clusterIndexV << " with collected charge u/v: " << uClusterPtr->getCharge() << "/" << vClusterPtr->getCharge() << " and their infoClasses are at u/v: " << uClusterInfo->getOwnIndex() << "/" << vClusterInfo->getOwnIndex() << " with collected charge u/v: " << aSvdClusterArray[clusterIndexU]->getCharge() << "/" << aSvdClusterArray[clusterIndexV]->getCharge())
 
       aVxdID = uClusterPtr->getSensorID();
       aLayerID = aVxdID.getLayerNumber();
@@ -1356,7 +1381,7 @@ void VXDTFModule::the_real_event()
       hitInfo.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
       B2DEBUG(100, " VXDTF-event SVD hits: m_errorContainer.size(): " << m_errorContainer.size() << ", layerID-1: " << aLayerID - 1)
       hitInfo.sigmaX = m_errorContainer.at(aLayerID - 1).first;
-//      hitInfo.sigmaY = m_globalizedErrorContainer[aLayerID][aVxdID.getLadderNumber()].second;
+      hitInfo.sigmaY = m_errorContainer.at(aLayerID - 1).second;
 
       // local(0,0,0) is the center of the sensorplane
       vSize = 0.5 * aSensorInfo.getVSize();
@@ -1410,7 +1435,7 @@ void VXDTFModule::the_real_event()
 
         B2DEBUG(50, "A SVDCluster is found again within secID (int/string) " << aSecID << "/" << FullSecID(aSecID).getFullSecString() << " using sectorSetup " << currentPass->sectorSetup);
 
-        VXDTFHit* pTFHit = new VXDTFHit(hitInfo, passNumber, &clustersOfEvent[clusterIndexU + numOfPxdClusters], &clustersOfEvent[clusterIndexV + numOfPxdClusters], NULL, Const::SVD, aSecID, aVxdID,  0.5 * (timeStampU + timeStampV));
+        VXDTFHit* pTFHit = new VXDTFHit(hitInfo, passNumber, uClusterInfo, vClusterInfo, NULL, Const::SVD, aSecID, aVxdID,  0.5 * (timeStampU + timeStampV));
 
         currentPass->hitVector.push_back(pTFHit);
         secMapIter->second->addHit(pTFHit);
@@ -1509,6 +1534,10 @@ void VXDTFModule::the_real_event()
       BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
         cleanEvent(currentPass, centerSector);
       }
+      stopTimer = boostClock::now();
+      thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+      B2DEBUG(1, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
+      m_TESTERlogEvents.push_back(thisInfoPackage);
       return;
     } /// WARNING: hardcoded filter for events containing huge number of segments
 // }
@@ -1528,6 +1557,12 @@ void VXDTFModule::the_real_event()
       BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
         cleanEvent(currentPass, centerSector);
       }
+      stopTimer = boostClock::now();
+      m_TESTERtimeConsumption.cellularAutomaton += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+      thisInfoPackage.sectionConsumption.cellularAutomaton += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+      thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+      B2DEBUG(1, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
+      m_TESTERlogEvents.push_back(thisInfoPackage);
       return;
     }
 //     passNumber++;
@@ -1544,7 +1579,7 @@ void VXDTFModule::the_real_event()
     timeStamp = boostClock::now();
     int totalTCs = 0;
 //   BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
-    delFalseFriends(currentPass, origin);
+    delFalseFriends(currentPass, currentPass->origin);
     tcCollector(currentPass);                                     /// tcCollector
     int survivingTCs = currentPass->tcVector.size();
     totalTCs += survivingTCs;
@@ -1563,6 +1598,10 @@ void VXDTFModule::the_real_event()
       BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
         cleanEvent(currentPass, centerSector);
       }
+      stopTimer = boostClock::now();
+      thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+      B2DEBUG(1, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
+      m_TESTERlogEvents.push_back(thisInfoPackage);
       return;
     }
     /** Section 7 - end **/
@@ -1575,7 +1614,7 @@ void VXDTFModule::the_real_event()
     /*int*/ survivingTCs = 0;
 //   BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
     if (int(currentPass->tcVector.size()) != 0) {
-      survivingTCs = tcFilter(currentPass, passNumber/*, clustersOfEvent*/);
+      survivingTCs = tcFilter(currentPass, passNumber);
       thisInfoPackage.numTCsAfterTCCfilter += survivingTCs;
       B2DEBUG(1, "pass " << passNumber << ": track candidate filter, " << survivingTCs << " TCs survived.");
     } else {
@@ -1592,28 +1631,30 @@ void VXDTFModule::the_real_event()
 
     /** Section 9 - check overlap */
     timeStamp = boostClock::now();
-    ClusterUsage totalClusterUsage;
+//     ClusterUsage totalClusterUsage;
     bool  isOB = false;
-    int countOverbookedClusters = 0;
+    int countOverbookedClusters = 0, clustersReserved = 0;
+    m_tcVectorOverlapped.clear(); // July13: should be filled freshly for each pass
     /// each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
+    B2DEBUG(1, " checking overlaps now: there are " << clustersOfEvent.size() << " clusters ...")
     BOOST_FOREACH(ClusterInfo & aCluster, clustersOfEvent) {
       isOB = aCluster.isOverbooked();
       if (isOB == true) { countOverbookedClusters++; }
+      if (aCluster.isReserved() == true) { clustersReserved++; }
     } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
-    B2DEBUG(1, "after checking overlaps: there are " << countOverbookedClusters << " clusters of " << clustersOfEvent.size() << " marked as 'overbooked'...")
+    B2DEBUG(1, "after checking overlaps: there are " << countOverbookedClusters << " clusters of " << clustersOfEvent.size() << " marked as 'overbooked'... (reserved: " << clustersReserved << ")")
 
     int countCurrentTCs = 0;
 //   BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
     /// determine initial values for all track Candidates:
-    calcInitialValues4TCs(currentPass->tcVector);                               /// calcInitialValues4TCs
+    calcInitialValues4TCs(currentPass);                                                /// calcInitialValues4TCs
     BOOST_FOREACH(VXDTFTrackCandidate * currentTC, currentPass->tcVector) {
       if (currentTC->getCondition() == false) { continue; }   // in this case, the TC is already filtered
 
-      bool overbooked = currentTC->getOverlappingState(); /// TODO find out whether it is better to use the slower but safer function checkOverlappingState
       m_tcVector.push_back(currentTC);
-      if (overbooked == true) {
-        m_tcVectorOverlapped.push_back(currentTC);
-      }
+
+      bool overbookedCheck = currentTC->checkOverlappingState();
+      if (overbookedCheck == true) { m_tcVectorOverlapped.push_back(currentTC); }
       countCurrentTCs++;
     }
 //   } ///collect TCs and separately store overlapping TCs for hopfield used
@@ -1623,39 +1664,11 @@ void VXDTFModule::the_real_event()
     m_TESTERtimeConsumption.checkOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
     thisInfoPackage.sectionConsumption.checkOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
 
-    B2DEBUG(1, "event " << m_eventCounter << ": " << totalOverlaps << " overlapping track candidates found within " << countCurrentTCs << " current TCs alive")
+    B2DEBUG(1, "event " << m_eventCounter << ": " << totalOverlaps << " overlapping track candidates found within " << countCurrentTCs << " new TCs of this pass alive")
     /** Section 9 - end */
 
-//  for (int iPart = 0; iPart < numOfSvdClusters; ++iPart) {
-//
-//       SVDCluster* aClusterPtr = aSvdClusterArray[iPart];
-//
-//       aVxdID = aClusterPtr->getSensorID();
-//       int aUniID = aVxdID.getID();
-//       sensorIter = activatedSensors.find(aUniID);
-//       if (sensorIter == activatedSensors.end()) {
-//         SensorStruct newSensor;
-//        newSensor.layerID = aVxdID.getLayerNumber();
-//         sensorIter = activatedSensors.insert(sensorIter, mapEntry(aUniID, newSensor)); //activatedSensors.find(aUniID);
-//       }
-//     }
 
-/// testing purposes, can be deleted sometime soon...
-// // // // //  vector<int> svdClusters;
-// // // // //  BOOST_FOREACH( VXDTFTrackCandidate* aTC, m_tcVector) {
-// // // // //    if ( aTC->getCondition() == false ) { continue; }
-// // // // //    vector<int> svdHits = aTC->getSVDHitIndices();
-// // // // //    BOOST_FOREACH(int index, svdHits) {
-// // // // //      int clusterIndex = clustersOfEvent[index].getRealIndex();
-// // // // //      svdClusters.push_back(clusterIndex);
-// // // // //    }
-// // // // //  }
-// // // // //  std::sort(svdClusters.begin(), svdClusters.end());
-// // // // //  std::unique(svdClusters.begin(), svdClusters.end());
-// // // // //  int numTestClusters = svdClusters.size();
-// // // // //  if ( numTestClusters not_eq 0 ) {
-// // // // //    B2DEBUG(150, "event " << m_eventCounter << ": highest svdClusterIndex: " << numOfSvdClusters-1 << ", highest clusterInfoIndex: " << svdClusters[numTestClusters-1])
-// // // // //  }
+
 
     /** Section 10 - calc QI for each TC */
     timeStamp = boostClock::now();
@@ -1667,17 +1680,24 @@ void VXDTFModule::the_real_event()
       m_TESTERbrokenEventsCtr++;
 
       /** cleaning part **/
-//     BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
-      cleanEvent(currentPass, centerSector);
-//     }
+      BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
+        cleanEvent(currentPass, centerSector);
+      }
+
+      stopTimer = boostClock::now();
+      m_TESTERtimeConsumption.kalmanStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+      thisInfoPackage.sectionConsumption.kalmanStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+      thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+      B2DEBUG(1, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
+      m_TESTERlogEvents.push_back(thisInfoPackage);
       return;
+
     } else if (totalOverlaps > m_PARAMkillEventForHighOccupancyThreshold / 10 && m_calcQiType == 1) {
-      B2INFO(m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of overlapping TCs is " << totalOverlaps << " and therefore KF is too slow, will use simple QI calculation which produces worse results")
+      B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of overlapping TCs is " << totalOverlaps << " and therefore KF is too slow, will use simple QI (trackLength) calculation which produces worse results")
       allowKalman = false;
       m_TESTERkalmanSkipped++;
     }
     if (m_calcQiType == 1 and allowKalman == true) {
-//     calcQIbyKalman(m_tcVector, aPxdClusterArray, aSvdClusterArray, clustersOfEvent); /// calcQIbyKalman // old version, backup 13-03-29
       calcQIbyKalman(m_tcVector, aPxdClusterArray, clustersOfEvent); /// calcQIbyKalman
     } else if (m_calcQiType == 0) {
       calcQIbyLength(m_tcVector, m_passSetupVector);                              /// calcQIbyLength
@@ -1694,22 +1714,21 @@ void VXDTFModule::the_real_event()
     /** Section 11 - cleanOverlappingSet */
     timeStamp = boostClock::now();
     if (totalOverlaps > 2 && m_PARAMcleanOverlappingSet == true) {
-      int olSize = m_tcVectorOverlapped.size();
-      int killedTCs = 1;
+      int killedTCs = -1;
       int totalKilledTCs = 0, cleaningRepeatedCtr = 0;
       while (killedTCs != 0) {
-        int beforeSize = m_tcVectorOverlapped.size();
+        cleaningRepeatedCtr ++;
         killedTCs = cleanOverlappingSet(m_tcVectorOverlapped); /// removes TCs which are found more than once completely
         totalOverlaps = m_tcVectorOverlapped.size();
-        B2DEBUG(2, "out of funcCleanOverlappingSet: tcVectorBefore.size(): " << beforeSize << ", tcVectorAfter.size(): " << totalOverlaps << ", killed " << killedTCs << " TCs")
+        B2DEBUG(2, "out of funcCleanOverlappingSet-iteration " << cleaningRepeatedCtr << ": killed " << killedTCs << " TCs")
 
         totalKilledTCs += killedTCs;
-        cleaningRepeatedCtr ++;
       }
-      B2DEBUG(2, "out of funcCleanOverlappingSet: tcVectorBefore.size(): " << olSize << ", tcVectorAfter.size(): " << totalOverlaps << ", killed " << totalKilledTCs << " TCs within " << cleaningRepeatedCtr << " iterations")
+      B2DEBUG(1, "out of funcCleanOverlappingSet: killed " << totalKilledTCs << " TCs within " << cleaningRepeatedCtr << " iterations")
       m_TESTERcleanOverlappingSetStartedCtr++;
       thisInfoPackage.numTCsKilledByCleanOverlap += totalKilledTCs;
     }
+
     stopTimer = boostClock::now();
     m_TESTERtimeConsumption.cleanOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
     thisInfoPackage.sectionConsumption.cleanOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
@@ -1717,27 +1736,39 @@ void VXDTFModule::the_real_event()
 
 
 
-    /** testing purposes! */
-
-    /*bool*/ isOB = false;
-    /*int*/ countOverbookedClusters = 0;
-    /// each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
+    /** redo overlapping check - necessary since condition changed through cleanOverlappingSet! */
+    /** Section 9b - check overlap 2 */
+    timeStamp = boostClock::now();
+    isOB = false;
+    countOverbookedClusters = 0;
+    // each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
     BOOST_FOREACH(ClusterInfo & aCluster, clustersOfEvent) {
       isOB = aCluster.isOverbooked();
       if (isOB == true) { countOverbookedClusters++; }
     } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
-    B2DEBUG(1, "after checking overlaps again: there are " << countOverbookedClusters << " clusters of " << clustersOfEvent.size() << " marked as 'overbooked'...")
 
-    TCsOfEvent testTCVector;
+    m_tcVectorOverlapped.clear();
     BOOST_FOREACH(VXDTFTrackCandidate * currentTC, m_tcVector) {
       if (currentTC->getCondition() == false) { continue; }
-      if (currentTC->checkOverlappingState() == true) {
-        testTCVector.push_back(currentTC);
-      }
+
+      bool overbookedCheck = currentTC->checkOverlappingState();
+      /** // WARNING IMPORTANT (July,24th, 2013): they do not deliver the same results, but checkOverlappingState produces less overlapping tcs while there are still no overlaps in final result, if something else occurs, new studies necessary!!
+       * bool overbookedGet = currentTC->getOverlappingState();
+       * if (overbookedCheck != overbookedGet) {
+       *  B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": getOverlappingState ("<<overbookedGet<<") != checkOverlappingState ("<<overbookedCheck<<")! ")
+       * }
+       * if (overbookedGet == true || overbookedCheck == true )
+       */
+      if (overbookedCheck == true) { m_tcVectorOverlapped.push_back(currentTC); }
     }
-    int totalOverlaps2 = testTCVector.size();
-    B2DEBUG(1, "size of tcVector: " << m_tcVector.size() << ", tcVectorOverlapped: " << m_tcVectorOverlapped.size() << " testTCVector: " << totalOverlaps2 << ", totalOverlaps: " << totalOverlaps)
-    /** testing purposes - end */
+    totalOverlaps = m_tcVectorOverlapped.size();
+
+    stopTimer = boostClock::now();
+    m_TESTERtimeConsumption.checkOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+    thisInfoPackage.sectionConsumption.checkOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+
+    B2DEBUG(1, "after checking overlaps again: there are " << countOverbookedClusters << " clusters of " << clustersOfEvent.size() << " still 'overbooked', tcVector: " << m_tcVector.size() << ", tcVectorOverlapped: " << totalOverlaps)
+    /** Section 9b - end */
 
 
 
@@ -1746,62 +1777,41 @@ void VXDTFModule::the_real_event()
     if (totalOverlaps > 2) { // checking overlapping TCs for best subset, if there are more than 2 different TC's
       if (m_filterOverlappingTCs == 2) {   /// use Hopfield neuronal network
 
-//      hopfield(testTCVector, m_PARAMomega); // July2013: I believe, that there is a bug in cleanOverlappingSet, therefore extra check produced testTCVector which I trust more at the moment. Therefore I replaced m_tcVectorOverlapped with testTCVector temporarily
         hopfield(m_tcVectorOverlapped, m_PARAMomega);                             /// hopfield
 
+        int testTCs = 0;
         BOOST_FOREACH(VXDTFTrackCandidate * currentTC, m_tcVector) {
           if (currentTC->getCondition() == false) continue;
-          if (currentTC->checkOverlappingState() == true) testTCVector.push_back(currentTC);
-
-          int testTCs = testTCVector.size();
-
-          B2DEBUG(1, "after Hopfield: size of tcVector: " << m_tcVector.size() << ", tcVectorOverlapped: " << m_tcVectorOverlapped.size() << " testTCVector: " << testTCs)
-
-          int countHopfieldReruns = 0;
-          while (testTCs != 0 and countHopfieldReruns > 5) {
-            m_TESTERHopfieldLetsOverbookedTCsAliveCtr++;
-            B2DEBUG(1, "event " << m_eventCounter << ": after Hopfield there are still some overlapping TCs (" << testTCs << ")! restarting hopfield...")
-            /// checking overlapping TCs for best subset, if there are more than 2 different TC's
-            if (testTCs > 2) {
-              hopfield(testTCVector, m_PARAMomega);                                       /// hopfield
-            } else if (testTCs == 2) {
-              tcDuel(testTCVector);                                               /// tcDuel
-            } else { B2ERROR(" only 1 overlapping Track Candidate found after Hopfield, should not be possible!") }
-
-            testTCVector.clear();
-            BOOST_FOREACH(VXDTFTrackCandidate * currentTC, m_tcVector) {
-              if (currentTC->getCondition() == false) continue;
-              if (currentTC->checkOverlappingState() == true) testTCVector.push_back(currentTC);
-            }
-
-            testTCs = testTCVector.size();
-            ++countHopfieldReruns;
-          }
-          if (countHopfieldReruns > 5) {
-            isOB = false;
-            countOverbookedClusters = 0;
-            /// each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
-            BOOST_FOREACH(ClusterInfo & aCluster, clustersOfEvent) {
-              isOB = aCluster.isOverbooked();
-              if (isOB == true) { countOverbookedClusters++; }
-            } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
-            B2FATAL(m_PARAMnameOfInstance << " event " << m_eventCounter << ": Hopfield repeated " << countHopfieldReruns << " times, number of overlapping TCs is still " << testTCs << ", recheck of overlapped clusters resulted in " << countOverbookedClusters << " overbooked clusters")
-          }
+          if (currentTC->checkOverlappingState() == true) { testTCs++; }
         }
+        if (testTCs > 0) {
+          B2ERROR(" event " << m_eventCounter << ": m_tcVector: " << m_tcVector.size() << ", m_tcVectorOverlapped: " << m_tcVectorOverlapped.size() << ", overlapping tcs surviving Hopfield: " << testTCs << " <- should not happen!")
+        }
+        B2DEBUG(1, " event " << m_eventCounter << ": m_tcVector: " << m_tcVector.size() << ", m_tcVectorOverlapped: " << m_tcVectorOverlapped.size() << ", overlapping tcs surviving Hopfield: " << testTCs)
+
       } else if (m_filterOverlappingTCs == 1) {   /// use Greedy algorithm
 
-//      greedy(testTCVector); // July2013: I believe, that there is a bug in cleanOverlappingSet, therefore extra check produced testTCVector which I trust more at the moment. Therefore I replaced m_tcVectorOverlapped with testTCVector temporarily
         greedy(m_tcVectorOverlapped);                                               /// greedy
 
       } else { /* do nothing -> accept overlapping TCs */ }
     } else if (totalOverlaps == 2) {
 
-//    tcDuel(testTCVector); // July2013: I believe, that there is a bug in cleanOverlappingSet, therefore extra check produced testTCVector which I trust more at the moment. Therefore I replaced m_tcVectorOverlapped with testTCVector temporarily
       tcDuel(m_tcVectorOverlapped);                                                 /// tcDuel
 
     } else { B2DEBUG(10, " less than 2 overlapping Track Candidates found, no need for neuronal network") }
 
-  } /// /// /// WARNING pass loop end
+    stopTimer = boostClock::now();
+    m_TESTERtimeConsumption.neuronalStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+    thisInfoPackage.sectionConsumption.neuronalStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+    B2DEBUG(1, "before exporting TCs, length of m_tcVector: " << m_tcVector.size() << ", m_tcVectorOverlapped: " << m_tcVectorOverlapped.size() << ", both include already dead TCs");
+    /** Section 12 - end */
+
+
+
+    if (passNumber < int(m_passSetupVector.size() - 1)) { reserveHits(m_tcVector, currentPass); }
+
+    passNumber++;
+  } /// /// /// WARNING WARNING WARNING --- pass loop end --- WARNING WARNING WARNING
 
   bool isOB = false;
   int countOverbookedClusters = 0;
@@ -1810,52 +1820,47 @@ void VXDTFModule::the_real_event()
     isOB = aCluster.isOverbooked();
     if (isOB == true) { countOverbookedClusters++; }
   } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
-  B2DEBUG(1, "after doing Hopfield again: there are " << countOverbookedClusters << " clusters of " << clustersOfEvent.size() << " marked as 'overbooked'...")
+  if (countOverbookedClusters != 0) {
+    B2ERROR("after pass loop (and Hopfield there): there are " << countOverbookedClusters << " clusters of " << clustersOfEvent.size() << " marked as 'overbooked'...")
+  }
 
-
-
-  stopTimer = boostClock::now();
-  m_TESTERtimeConsumption.neuronalStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-  thisInfoPackage.sectionConsumption.neuronalStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-  B2DEBUG(1, "before exporting TCs, length of m_tcVector: " << m_tcVector.size() << ", m_tcVectorOverlapped: " << m_tcVectorOverlapped.size() << ", both include already dead TCs");
-  /** Section 12 - end */
 
 
 
   /** Section 13 - generateGFTrackCand */
   timeStamp = boostClock::now();
-  vector<int> totalIndices, tempIndices;
+  list<int> tempIndices, totalIndices;// temp: per tc, total, all of them. collects all indices used by final TCs, used to check for final overlapping TCs
   BOOST_FOREACH(VXDTFTrackCandidate * currentTC, m_tcVector) {
     if (currentTC->getCondition() == false) { continue; }
 
-    vector<int> pxdHits = currentTC->getPXDHitIndices();
-    stringstream printIndices, infoIndices;
-    infoIndices << "PXD: ";
-    printIndices << "PXD: ";
-    BOOST_FOREACH(int index, pxdHits) {
-      int clusterIndex = clustersOfEvent[index].getRealIndex();
-      printIndices << clusterIndex << " ";
-      infoIndices << index << " ";
-    }
-    vector<int> svdHits = currentTC->getSVDHitIndices();
-    infoIndices << ", SVD: ";
-    printIndices << ", SVD: ";
-    BOOST_FOREACH(int index, svdHits) {
-      int clusterIndex = clustersOfEvent[index].getRealIndex();
-      printIndices << clusterIndex << " ";
-      infoIndices << index << " ";
-    }
-    B2DEBUG(10, "before starting generateGFTrackCand: generated GFTC with following hits: " << printIndices.str());
-    B2DEBUG(10, "before starting generateGFTrackCand: generated GFTC with following intermediate clusters: " << infoIndices.str());
+    tempIndices = currentTC->getHopfieldHitIndices();
+    tempIndices.sort();
+    totalIndices.merge(tempIndices);
 
-    tempIndices = currentTC->getSVDHitIndices();
-    totalIndices.insert(totalIndices.end(), tempIndices.begin(), tempIndices.end());
+    if ((LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true)) {
+      stringstream printClusterInfoIndices;
+      printClusterInfoIndices << "Total: ";
+      BOOST_FOREACH(int index, tempIndices) { printClusterInfoIndices << index << " "; }
 
-    B2DEBUG(10, "before starting generateGFTrackCand: tempIndices: " << tempIndices.size() << ", totalIndices: " << totalIndices.size());
+      const vector<int>& pxdHits = currentTC->getPXDHitIndices();
+      stringstream printIndices;
+      printIndices << "PXD: ";
+      BOOST_FOREACH(int index, pxdHits) { printIndices << index << " "; }
+
+      const vector<int>& svdHits = currentTC->getSVDHitIndices();
+      printIndices << ", SVD: ";
+      BOOST_FOREACH(int index, svdHits) { printIndices << index << " "; }
+
+      B2DEBUG(10, "before starting generateGFTrackCand: generated GFTC with following real hits/clusters: " << printIndices.str());
+      B2DEBUG(10, "before starting generateGFTrackCand: generated GFTC with following intermediate clusters: " << printClusterInfoIndices.str());
+      B2DEBUG(10, "before starting generateGFTrackCand: tempIndices: " << pxdHits.size() + svdHits.size() << ", totalIndices: " << totalIndices.size());
+    }
+
+
 
     /// REACTIVATE the following code snippet if you want to test callgrind-stuff
 // #if 0
-    GFTrackCand gfTC = generateGFTrackCand(currentTC, clustersOfEvent);                          /// generateGFTrackCand
+    GFTrackCand gfTC = generateGFTrackCand(currentTC);                          /// generateGFTrackCand
 
     if (m_TESTERexpandedTestingRoutines == true) {
       VXDTFInfoBoard newBoard;
@@ -1873,23 +1878,34 @@ void VXDTFModule::the_real_event()
 // #endif
 
   }
-
   int nTotalIndices = totalIndices.size();
-  vector<int>::iterator newEndOfVector;
-  std::sort(totalIndices.begin(), totalIndices.end());
-  newEndOfVector = std::unique(totalIndices.begin(), totalIndices.end()); /// WARNING: std:unique does delete double entries but does NOT resize the vector! This means that for every removed element, at the end of the vector remains one random value stored
-  totalIndices.resize(std::distance(totalIndices.begin(), newEndOfVector));
+
+  totalIndices.sort(); // should already be sorted, but just to be sure....
+  tempIndices = totalIndices;
+  totalIndices.unique();
+
   int nReducedIndices = totalIndices.size();
 
-  int tcPos = 0, numOfFinalTCs = 0;
-  BOOST_FOREACH(VXDTFTrackCandidate * currentTC, m_tcVector) {
-    if (currentTC->getCondition() == false) { tcPos++; continue; }
-    TVector3 momentum = currentTC->getInitialMomentum();
-    B2DEBUG(20, "event " << m_eventCounter << ": TC " << tcPos << " has got condition = true, means its a final TC (TC-output). Its total Momentum is" << momentum.Mag() << ", its transverse momentum is: " << momentum.Perp())
-    numOfFinalTCs++;
-    tcPos++;
+  if ((LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true)) {
+    int tcPos = 0, numOfFinalTCs = 0;
+    BOOST_FOREACH(VXDTFTrackCandidate * currentTC, m_tcVector) {
+      if (currentTC->getCondition() == false) { tcPos++; continue; }
+      TVector3 momentum = currentTC->getInitialMomentum();
+      B2DEBUG(20, "event " << m_eventCounter << ": TC " << tcPos << " has got condition = true, means its a final TC (TC-output). Its total Momentum is" << momentum.Mag() << ", its transverse momentum is: " << momentum.Perp())
+      numOfFinalTCs++;
+      tcPos++;
+    }
+    B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << ": " << finalTrackCandidates.getEntries() << " final track candidates determined! Having a total number of hit indices: "  << nTotalIndices << ", and after doube entry removal: " << nReducedIndices)
   }
-  B2DEBUG(1, "vxdtf - event " << m_eventCounter << ": " << finalTrackCandidates.getEntries() << " final track candidates determined! Having a total number of hit indices: "  << nTotalIndices << ", and after doube entry removal: " << nReducedIndices)
+
+  if (nReducedIndices != nTotalIndices) {
+    stringstream aStream;
+    BOOST_FOREACH(int index, tempIndices) {
+      aStream << " " << index;
+    }
+    B2ERROR(m_PARAMnameOfInstance << " - event " << m_eventCounter << ": " << finalTrackCandidates.getEntries() << " final TCs determined. Having a total number of hit indices: "  << nTotalIndices << ", and after doube entry removal: " << nReducedIndices << "!\n before unique, totalIndices had the following entries: " << aStream.str())
+  }
+
   m_TESTERcountTotalTCsFinal += finalTrackCandidates.getEntries();
   thisInfoPackage.numTCsfinal += finalTrackCandidates.getEntries();
   /** Section 13 - end */
@@ -1946,42 +1962,56 @@ void VXDTFModule::endRun()
   m_TESTERlogEvents.resize(std::distance(m_TESTERlogEvents.begin(), newEndOfAnothterVector));
   std::reverse(m_TESTERlogEvents.begin(), m_TESTERlogEvents.end());
 
-  B2INFO(" ############### " << m_PARAMnameOfInstance << " endRun ############### ")
-  B2INFO(m_PARAMnameOfInstance << " settings: number of passes: " << m_passSetupVector.size() << ", tuneCutoffs: " << m_PARAMtuneCutoffs << ", chosen settings: ")
-  stringstream infoStuff2;
-  string infoStuff;
+  B2INFO(" ############### " << m_PARAMnameOfInstance << " endRun of " <<  m_eventCounter + 1 << " events ###############\nfor explanations of the values, activate DEBUG-mode (level 1 or greater)!")
+  string lineHigh = "------------------------------------------------------------------------------------------";
+  string lineApnd = "--------------------------";
+  B2INFO(lineHigh << lineApnd << lineApnd)
+  B2INFO(m_PARAMnameOfInstance << " settings: number of passes: " << m_passSetupVector.size() << ", tuneCutoffs: " << m_PARAMtuneCutoffs << ", QIfilterMode: " << m_PARAMcalcQIType << ", filterOverlappingTCs: " << m_PARAMfilterOverlappingTCs << ", chosen settings: ")
+  stringstream infoStuff2, infoStuff, secInfo;
+//  string lineLow = "____________________________________________________________________________________________________________________";
+  B2INFO(lineHigh << lineApnd << lineApnd)
+  B2INFO("detector\t| setup\t\t\t| maxLayer\t| minLayer\t| minState\t| sfTests\t| nfTests\t| TcFilterTests\t|")
   BOOST_FOREACH(CurrentPassData * currentPass, m_passSetupVector) {
-    infoStuff + ", secUConfig: ";
-    BOOST_FOREACH(double limit, currentPass->secConfigU) { infoStuff + boost::lexical_cast<string>(limit) + " "; }
-    infoStuff + ", secVConfig: ";
-    BOOST_FOREACH(double limit, currentPass->secConfigV) { infoStuff + boost::lexical_cast<string>(limit) + " "; }
-    B2INFO(m_PARAMnameOfInstance << " passtype: " << currentPass->chosenDetectorType << ", setup: " << currentPass->sectorSetup << ", maxLayer: " << currentPass->highestAllowedLayer << ", minLayer: " << currentPass->minLayer << ", minState: " << currentPass->minState << " sfTests: " << currentPass->activatedSegFinderTests << ", nfTests: " << currentPass->activatedNbFinderTests << ", TccFilterTests: " << currentPass->activatedTccFilterTests << infoStuff)
+    BOOST_FOREACH(double limit, currentPass->secConfigU) { secInfo << limit << " "; }
+    secInfo << "\t\t|";
+    BOOST_FOREACH(double limit, currentPass->secConfigV) { secInfo << limit << " "; }
+    secInfo << "\t\t|\n";
+    B2INFO(currentPass->chosenDetectorType << "\t| " << currentPass->sectorSetup << "\t| " << currentPass->highestAllowedLayer << "\t\t| " << currentPass->minLayer << "\t\t| " << currentPass->minState << "\t\t| " << currentPass->activatedSegFinderTests << "\t\t| " << currentPass->activatedNbFinderTests << "\t\t| " << currentPass->activatedTccFilterTests << "\t|")
   }
+  B2DEBUG(1, "Explanation: setup defines region (pT) to be searched(details in additionalInfo of XML-file)\n maxLayer is highest allowed layer, minLayer = lowest...\nminState lowest state of CA-cells used for seeding a TC\nXTests are number of activated tests, X=sf->segfinder, nf->neighbourFinder, TcFilter = TcFilter")
+  B2INFO(lineHigh << lineApnd << lineApnd)
+  B2INFO("\nsecUConfig \t\t| secVConfig \t\t|\n" << secInfo.str())
+  B2DEBUG(1, "Explanation: secConfigs are cuts for sector-calculation (cut*sensorWidth for U, cut*sensorLength for V), same value for each sensor")
+//  B2INFO(lineHigh)
 
-  infoStuff2 << ", following sensors had out of range hits: ";
-  BOOST_FOREACH(string & badSensor, m_TESTERbadSensors) {
-    infoStuff2 << badSensor << " ";
-  }
-  infoStuff2 << endl;
+  BOOST_FOREACH(string & badSensor, m_TESTERbadSensors) { infoStuff2 << badSensor << " "; }
+  B2INFO("In following sensors there were hits out of the sensitive plane:\n" << infoStuff2.str());
 
-  B2INFO(m_PARAMnameOfInstance << " total number of PXDHits: " << m_totalPXDClusters << ", SVDClusters/Hits: " << m_totalSVDClusters << "/" << m_totalSVDClusters * 0.5 << ", SVDClusterCombinations: " << m_totalSVDClusterCombis << ", ghostHitRate: " << double(m_totalSVDClusterCombis) / (double(m_totalSVDClusters) * 0.5) << ". Discarded hits without sector: " << m_badSectorRangeCounter << ", without friends: " << m_badFriendCounter << ", distorted hits: " << m_TESTERdistortedHitCtr << " discarded Sensors bec. of missing second cluster: " << m_TESTERbadSectorRangeCounterForClusters << " mismathing number of u&vClusters per sensor: " << m_TESTERclustersPersSectorNotMatching << infoStuff2.str())
-  B2INFO(m_PARAMnameOfInstance << " segfinder segments activated/discarded: " << m_TESTERtotalsegmentsSFCtr << "/" << m_TESTERdiscardedSegmentsSFCtr << ", nbFinder segments activated/discarded: " << m_TESTERtotalsegmentsNFCtr << "/" << m_TESTERdiscardedSegmentsNFCtr)
+  B2INFO(lineHigh  << "\n pxdc\t| svdc\t| svdH\t| catC\t| ghR\t\t| noSc\t| noFd\t| ooR \t| no2D\t| 1Dsn\t| 1DHO \t|\n " << m_totalPXDClusters << "\t| " << m_totalSVDClusters << "\t| " << int(m_totalSVDClusters * 0.5) << "\t| " << m_totalSVDClusterCombis << "\t| " << double(m_totalSVDClusterCombis) / (double(m_totalSVDClusters) * 0.5) << "\t| " << m_badSectorRangeCounter << "\t| " << m_badFriendCounter << "\t| " << m_TESTERdistortedHitCtr << "\t| " << m_TESTERbadSectorRangeCounterForClusters << "\t| " << m_TESTERclustersPersSectorNotMatching << "\t| " << m_TESTERovercrowdedStrangeSensors << "\t|")
 
-  B2INFO(m_PARAMnameOfInstance << " after " << m_eventCounter + 1 << " events, ZigZagXY triggered " << m_TESTERtriggeredZigZagXY << " times, ZigZagRZ triggered " << m_TESTERtriggeredZigZagRZ << " times, circleFit triggered " << m_TESTERtriggeredCircleFit << " times, and dpT triggered " << m_TESTERtriggeredDpT << " times, TCC approved " << m_TESTERapprovedByTCC << " TCs, "  << m_TESTERbadHopfieldCtr << "/" << m_TESTERHopfieldLetsOverbookedTCsAliveCtr << " times, the Hopfield network had no survivors/accepted ovrelapping TCs!")
-  B2INFO(m_PARAMnameOfInstance << " total number of TCs after TCC: " << m_TESTERcountTotalTCsAfterTCC << ", after TCC-filter: " << m_TESTERcountTotalTCsAfterTCCFilter << ", final: " << m_TESTERcountTotalTCsFinal)
-  B2INFO(m_PARAMnameOfInstance << " numOfTimes calcInitialValues4TCs filtered TCs: " << m_TESTERfilteredBadSeedTCs << ", cleanOverlappingSet got activated:" << m_TESTERcleanOverlappingSetStartedCtr << ", cleanOverlappingSet killed numTCs: " << m_TESTERfilteredOverlapsQI << ", cleanOverlappingSet did/didn't filter TCs: " << m_TESTERfilteredOverlapsQICtr << "/" << m_TESTERNotFilteredOverlapsQI << ", QIfilterMode: " << m_PARAMcalcQIType << ", filterOverlappingTCs: " << m_PARAMfilterOverlappingTCs)
-  B2INFO(m_PARAMnameOfInstance << " numOfTimes, where a kalman fit was possible: " << m_TESTERgoodFitsCtr << ", where it failed: " << m_TESTERbadFitsCtr << ", where the TF had to be terminated (highOccupancy/kalman): " << m_TESTERbrokenEventsCtr << ", and " << m_TESTERbrokenCaRound << " CA rounds aborted, " << m_TESTERkalmanSkipped << " kalmanSkipped because of high occupancy, " << m_TESTERhighOccupancyCtr << "when highOccupancyMode was activated")
+  B2DEBUG(1, "Explanation: pxdc: number of PXDClusters, 2D), svdc: SVDClusters(1D)\n svdH: # of SVDHits(guess of actual number of 2D-Track- and -BG-hits)\n catC: SVDClusterCombinations(combining u/v, including ghosthits)\n ghR: ghostHitRate(is only a guess, TODO: should be correctly determined!!)\n noSc: are hits discarded, where no fitting sector could be found\n noFd: hits having no hits in compatible sectors (friends), ooR: sensors which were not in sensitive plane of sensor, no2D: SVDclusters, were no 2nd cluster could be found\n 1Dsn: times where a SVDsensor hat not the same number of u and v clusters, 1DHO: like 1Dsn, but where a high occupancy case prevented reconstructing them")
+
+  B2INFO(lineHigh << lineApnd << lineApnd << "\n bl+\t| bl++\t| 1D+\t| 1D-\t| NoH\t| sf+\t| sf-\t| nf+\t| nf-\t| zzXY\t| zzRZ\t| cf\t| dpT\t| tcc+\t| Ttcc\t| Ttcf\t| Tfin\t| NNns\t| NNov\t|\n " << m_TESTERstartedBaselineTF << "\t| " << m_TESTERsucceededBaselineTF << "\t| " << m_TESTERacceptedBrokenHitsTrack << "\t| " << m_TESTERrejectedBrokenHitsTrack << "\t| " << m_TESTERnoHitsAtEvent << "\t| " << m_TESTERtotalsegmentsSFCtr << "\t| " << m_TESTERdiscardedSegmentsSFCtr << "\t| " << m_TESTERtotalsegmentsNFCtr << "\t| " << m_TESTERdiscardedSegmentsNFCtr << "\t|" << m_TESTERtriggeredZigZagXY << "\t| " << m_TESTERtriggeredZigZagRZ << "\t| " << m_TESTERtriggeredCircleFit << "\t| " << m_TESTERtriggeredDpT << "\t| " << m_TESTERapprovedByTCC << "\t| " << m_TESTERcountTotalTCsAfterTCC << "\t| " << m_TESTERcountTotalTCsAfterTCCFilter << "\t| " << m_TESTERcountTotalTCsFinal << "\t| " << m_TESTERbadHopfieldCtr << "\t| " << m_TESTERHopfieldLetsOverbookedTCsAliveCtr << "\t|")
+
+  B2DEBUG(1, "Explanation: bl+: baseLineTF started, bl++ baselineTF succeeded, 1D+: TCs with 1D-svd-Hits were accepted, 1D-: rejected, NoH: Events without hits\n sf+: segfinder segments activated, sf-: -discarded, nf+: nbFinder segments activated, nf-: discarded, zzXY: zigzagXY got triggered, zzRZ: same for zigzagRZ, cf: circleFit(tuneCircleFitValue), dpT: deltaPt\n tcc+: approved by tcc, Ttcc: total number of TCs after TCC, Ttcf: after TCC-filter, Tfin: total number of final TCs, NNns: the Hopfield network had no survivors, NNov: the Hopfield network accepted overlapping TCs (which should never occur! -> if != 0: Bug!)")
+
+  B2INFO(lineHigh << lineApnd << lineApnd << "\n civ4\t| clo+\t| cloK\t| cloF\t| cloS\t| kf+\t| kf-\t| TFHo\t| kfHo\t| CA-\t| Ho+\t|\n " << m_TESTERfilteredBadSeedTCs << "\t| " << m_TESTERcleanOverlappingSetStartedCtr << "\t| " << m_TESTERfilteredOverlapsQI << "\t| " << m_TESTERfilteredOverlapsQICtr << "\t| " << m_TESTERNotFilteredOverlapsQI << "\t| " << m_TESTERgoodFitsCtr << "\t| " << m_TESTERbadFitsCtr << "\t| " << m_TESTERbrokenEventsCtr << "\t| " << m_TESTERkalmanSkipped << "\t| " << m_TESTERbrokenCaRound << "\t| " << m_TESTERhighOccupancyCtr << "\t|")
+
+  B2DEBUG(1, "Explanation: civ4: numOfTimes calcInitialValues4TCs filtered TCs, clo+: cleanOverlappingSet got activated, cloK: cleanOverlappingSet killed at least 1 TC, cloF: # of TCs filtered/killed by cleanOverlappingSet, cloS: # of TCs survived cleanOverlappingSet, kf+: numOfTimes, where a kalman fit was possible, kf-: where it failed, TFHo: where the TF had to be terminated (event lost!), kfHo: kalmanSkipped because of high occupancy (alternative QICalc like CF activated), CA-: # of times, where CA had to be aborted, Ho+: when highOccupancyMode was activated")
+
+  B2INFO(lineHigh << lineApnd << lineApnd)
 
   string printOccupancy;
   for (int numOfHitsMinus1 = 0; numOfHitsMinus1 < int(m_TESTERSVDOccupancy.size()); ++ numOfHitsMinus1) {
-    if (m_TESTERSVDOccupancy[numOfHitsMinus1] != 0) {
-      printOccupancy = printOccupancy + " got " + boost::lexical_cast<string>(m_TESTERSVDOccupancy[numOfHitsMinus1]) + " times a sensor with " + boost::lexical_cast<string>(numOfHitsMinus1 + 1) + " hits\n";
+    if (m_TESTERSVDOccupancy.at(numOfHitsMinus1) != 0) {
+      printOccupancy = printOccupancy + " got " + boost::lexical_cast<string>(m_TESTERSVDOccupancy.at(numOfHitsMinus1)) + " times a sensor with " + boost::lexical_cast<string>(numOfHitsMinus1 + 1) + " hits\n";
     }
   }
   B2INFO(printOccupancy);
 
   stringstream printTime;
   printTime << "hitSorting took " << (m_TESTERtimeConsumption.hitSorting.count() * 0.001) << " microseconds\n";
+  printTime << "baselineTF took " << (m_TESTERtimeConsumption.baselineTF.count() * 0.001) << " microseconds\n";
   printTime << "segFinder took " << (m_TESTERtimeConsumption.segFinder.count() * 0.001) << " microseconds\n";
   printTime << "nbFinder took " << (m_TESTERtimeConsumption.nbFinder.count() * 0.001) << " microseconds\n";
   printTime << "cellularAutomaton took " << (m_TESTERtimeConsumption.cellularAutomaton.count() * 0.001) << " microseconds\n";
@@ -2010,16 +2040,16 @@ void VXDTFModule::endRun()
     BOOST_FOREACH(EventInfoPackage & infoPackage, m_TESTERlogEvents) {
       meanTimeConsumption += infoPackage.totalTime.count();
     }
-    B2INFO("slowest event: " << m_TESTERlogEvents[0].Print());
-    B2INFO("q1 event: " << m_TESTERlogEvents[q1].Print());
-    B2INFO("q10 event: " << m_TESTERlogEvents[q10].Print());
-    B2INFO("q25 event: " << m_TESTERlogEvents[q25].Print());
-    B2INFO("median event: " << m_TESTERlogEvents[median].Print());
-    B2INFO("q75 event: " << m_TESTERlogEvents[q75].Print());
-    B2INFO("q90 event: " << m_TESTERlogEvents[q90].Print());
-    B2INFO("q99 event: " << m_TESTERlogEvents[q99].Print());
-    B2INFO("fastest event: " << m_TESTERlogEvents[numLoggedEvents - 1].Print());
-    B2INFO("manually calculated mean: " << meanTimeConsumption / numLoggedEvents << ", and median: " << m_TESTERlogEvents[median].totalTime.count() << " of time consumption per event");
+    B2INFO("slowest event: " << m_TESTERlogEvents.at(0).Print());
+    B2INFO("q1 event: " << m_TESTERlogEvents.at(q1).Print());
+    B2INFO("q10 event: " << m_TESTERlogEvents.at(q10).Print());
+    B2INFO("q25 event: " << m_TESTERlogEvents.at(q25).Print());
+    B2INFO("median event: " << m_TESTERlogEvents.at(median).Print());
+    B2INFO("q75 event: " << m_TESTERlogEvents.at(q75).Print());
+    B2INFO("q90 event: " << m_TESTERlogEvents.at(q90).Print());
+    B2INFO("q99 event: " << m_TESTERlogEvents.at(q99).Print());
+    B2INFO("fastest event: " << m_TESTERlogEvents.at(numLoggedEvents - 1).Print());
+    B2INFO("manually calculated mean: " << meanTimeConsumption / numLoggedEvents << ", and median: " << m_TESTERlogEvents.at(median).totalTime.count() << " of time consumption per event");
   }
 
   B2INFO(" ############### " << m_PARAMnameOfInstance << " endRun - end ############### ")
@@ -2108,64 +2138,6 @@ void VXDTFModule::findTCs(TCsOfEvent& tcList,  VXDTFTrackCandidate* currentTC, s
 
 
 
-/** ***** calcQQQscore ***** **/
-/// calculates integer score for current filter (all filters combined deliver the QQQ (normed to 0-1)) WARNING although currently not in use, maybe needed later...
-int VXDTFModule::calcQQQscore(std::vector<std::pair<std::string, double> > cuts, double currentValue, int numOfQuantiles)
-{
-  int score;
-  int i = 0;
-  double currentQuantile = cuts[i].second;
-  if (currentValue < currentQuantile) {
-    /// is smaller than min value
-    score = 0;
-  } else if (currentValue > cuts.back().second) {
-    /// is bigger than max value
-    score = 0;
-  } else {
-    do {
-      i++;
-      currentQuantile = cuts[i].second;
-      if (i >= int(cuts.size())) { B2ERROR(m_PARAMnameOfInstance << "-CalcQQQScore: wrong index count!")}
-    } while (currentValue > currentQuantile);
-
-    int center = (numOfQuantiles + 1) / 2;
-    if (i < center) {
-      score = i;
-    } else if (i > center) {
-      score = center - (i - (center - 1));
-    } else { score = center; }
-  }
-  return score;
-}
-
-
-
-/** ***** calcQQQscoreDeltas ***** **/
-/// calculates integer score for current filter (all filters combined deliver the QQQ (normed to 0-1)), for normedDist3D, deltaPt... WARNING although currently not in use, maybe needed later...
-int VXDTFModule::calcQQQscoreDeltas(std::vector<std::pair<std::string, double> > cuts, double currentValue, int numOfQuantiles)
-{
-  int score;
-  int center = (numOfQuantiles + 1) / 2;
-  int i = 0;
-  double currentQuantile = cuts[i].second;
-  if (currentValue < currentQuantile) {
-    /// is smaller than min value
-    score = center;
-  } else if (currentValue > cuts.back().second) {
-    score = 0;
-  } else {
-    do {
-      i++;
-      currentQuantile = cuts[i].second;
-      if (i >= int(cuts.size())) { B2ERROR(m_PARAMnameOfInstance << "-CalcQQQScoreDeltas: wrong index count!"); i = numOfQuantiles + 1; break;}
-    } while (currentValue < currentQuantile);
-    score = (numOfQuantiles + 1 - i) / 2;
-  }
-  return score;
-}
-
-
-
 /** ***** hopfield ***** **/
 /// Neuronal network filtering overlapping Track Candidates by searching best subset of TC's
 void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
@@ -2183,29 +2155,29 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
   TMatrixD tempXMatrix(1, numOfTCs);
 
   vector<double> QIsOfTCs;
+  QIsOfTCs.reserve(numOfTCs);
   BOOST_FOREACH(VXDTFTrackCandidate * tc, tcVector) {
     QIsOfTCs.push_back(tc->getTrackQuality());
   }
 
-//  struct tcDependentValues {
-//
-//  }
-
   int countCasesWhen2NeuronsAreCompatible = 0;
   double compatibleValue = (1.0 - omega) / double(numOfTCs - 1);
+  list<int> hitsBoth, hitsItrk, hitsJtrk;
   for (int itrk = 0; itrk < numOfTCs; itrk++) {
 
-    list<int> hitsItrk = tcVector[itrk]->getHopfieldHitIndices();
+    hitsItrk = tcVector[itrk]->getHopfieldHitIndices();
+    hitsItrk.sort();
     int numOfHitsItrk = hitsItrk.size();
 
     for (int jtrk = itrk + 1; jtrk < numOfTCs; jtrk++) {
 
-      list<int> hitsBoth = hitsItrk;
-      list<int> hitsJtrk = tcVector[jtrk]->getHopfieldHitIndices();
+      hitsBoth = hitsItrk;
+      hitsJtrk = tcVector[jtrk]->getHopfieldHitIndices();
+      hitsJtrk.sort();
       int numOfHitsJtrk = hitsJtrk.size();
 
-      hitsBoth.insert(hitsBoth.end(), hitsJtrk.begin(), hitsJtrk.end());
-      hitsBoth.sort();
+      hitsBoth.merge(hitsJtrk);
+//       hitsBoth.sort();
       hitsBoth.unique();
 
       int numOfHitsBoth = hitsBoth.size();
@@ -2249,7 +2221,7 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
     B2DEBUG(100, printOut << endl);
   }
 
-  vector<int> sequenceVector(numOfTCs);
+  vector<int> sequenceVector(numOfTCs, 0);
   double rNum;
 
   for (int i = 0; i < numOfTCs; i++) {
@@ -2277,8 +2249,8 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
       double aTempVal = 0.0;
       for (int a = 0; a < numOfTCs; a++) { aTempVal = aTempVal + W(i, a) * xMatrix(0, a); } // doing it by hand...
 
-//      act = aTempVal + QIsOfTCs[i]; /// TODO replace old line below
-      act = aTempVal + omega * tcVector[i]->getTrackQuality(); //tempMatrix(0,0);
+      act = aTempVal + omega * QIsOfTCs[i];
+//       act = aTempVal + omega * tcVector[i]->getTrackQuality();
 
       xMatrix(0, i) = 0.5 * (1. + tanh(act / T));
 
@@ -2308,7 +2280,7 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
     B2DEBUG(1, "VXDTF event " << m_eventCounter << ": hopfield had no survivors! now using greedy... ")
     greedy(tcVector); /// greedy
     for (int i = 0; i < numOfTCs; i++) {
-      B2DEBUG(1, "tc " << i << " - got final neuron value: " << xMatrix(0, i) << " while having " << int((tcVector[i]->getHits()).size()) << " hits and quality indicator " << tcVector[i]->getTrackQuality())
+      B2DEBUG(1, "tc " << i << " - got final neuron value: " << xMatrix(0, i) << " while having " << int((tcVector.at(i)->getHits()).size()) << " hits and quality indicator " << tcVector.at(i)->getTrackQuality())
     }
 
     survivorCtr = 0;
@@ -2317,7 +2289,7 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
     } // should now have got some survivors
   } else {
     for (int i = 0; i < numOfTCs; i++) {
-      B2DEBUG(10, "tc " << i << " - got final neuron value: " << xMatrix(0, i) << " while having " << int((tcVector[i]->getHits()).size()) << " hits and quality indicator " << tcVector[i]->getTrackQuality())
+      B2DEBUG(50, "tc " << i << " - got final neuron value: " << xMatrix(0, i) << " while having " << int((tcVector.at(i)->getHits()).size()) << " hits and quality indicator " << tcVector.at(i)->getTrackQuality())
 //    xMatrix(0,i) = floor(xMatrix(0,i) + 0.5);
       if (xMatrix(0, i) > 0.7) { /// do we want to let this threshold hardcoded?
         tcVector[i]->setCondition(true);
@@ -2335,16 +2307,6 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
     }
   }
 
-//   if (survivorCtr == 0) { //
-//     m_TESTERbadHopfieldCtr++;
-//     B2DEBUG(1, "VXDTF event " << m_eventCounter << ": hopfield had no survivors! now using greedy... ")
-//    greedy(tcVector); /// greedy
-//     for (int i = 0; i < numOfTCs; i++) {
-//       B2DEBUG(1, "tc " << i << " - got final neuron value: " << xMatrix(0, i) << " while having " << int((tcVector[i]->getHits()).size()) << " hits and quality indicator " << tcVector[i]->getTrackQuality())
-//     }
-//   } else {
-//
-//  }
   if (survivorCtr == 0) { // in this case the NN AND greedy could not find any compatible entries
     B2WARNING(m_PARAMnameOfInstance << " smear:" << m_PARAMqiSmear << " event " << m_eventCounter << ": hopfield and greedy had no survivors! ")
 
@@ -2369,7 +2331,7 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
         xMatrixBegin << xMatrixCopy(0, i) << " ";
         xMatrixEnd << xMatrix(0, i) << " ";
 
-        B2WARNING(m_PARAMnameOfInstance << " tc " << i << " - got final neuron value: " << xMatrix(0, i) << " while having " << int((tcVector[i]->getHits()).size()) << " hits and quality indicator " << tcVector[i]->getTrackQuality())
+        B2WARNING(m_PARAMnameOfInstance << " tc " << i << " - got final neuron value: " << xMatrix(0, i) << " while having " << int((tcVector.at(i)->getHits()).size()) << " hits and quality indicator " << tcVector.at(i)->getTrackQuality())
       }
 
       noSurvivors << xMatrixBegin.str() << endl << xMatrixEnd.str() << endl << qiVec.str() << endl << weightMatrix.str() << endl;
@@ -2385,8 +2347,8 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
   list<VXDTFHit*> tempHits = allHits;
   allHits.sort(); allHits.unique();
   int sizeNew = allHits.size();
-//   if (sizeOld != sizeNew) { B2DEBUG(1, "NN event " << m_eventCounter << ": illegal result! Overlapping TCs (with " << sizeOld - sizeNew << " overlapping hits) accepted!")}
-  if (sizeOld != sizeNew) { /// temp, for debuging
+
+  if (sizeOld != sizeNew) { /// checks for strange behavior of NN
     B2ERROR(m_PARAMnameOfInstance << ", NN smear" << m_PARAMqiSmear << " event " << m_eventCounter << ": illegal result! Overlapping TCs (with " << sizeOld - sizeNew << " overlapping hits) accepted!")
     tempHits.sort();
     int hctr = 0;
@@ -2432,13 +2394,49 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
   }
 }
 
+
+
+void VXDTFModule::reserveHits(TCsOfEvent& tcVector, CurrentPassData* currentPass)
+{
+  list< pair< double, VXDTFTrackCandidate*> > allTCs;
+  double threshold = currentPass->reserveHitsThreshold;
+  int countAlive = 0;
+
+  B2DEBUG(10, "reserveHits for pass " << currentPass->sectorSetup << " with threshold " << threshold << " and total number of TCs " << tcVector.size())
+
+  BOOST_FOREACH(VXDTFTrackCandidate * tc, tcVector) { // store tcs in list of current TCs
+    if (tc->getCondition() == false) continue;
+    ++countAlive;
+    if (tc->isReserved() == true) continue;
+    allTCs.push_back(make_pair(tc->getTrackQuality(), tc));
+  }
+
+  allTCs.sort();
+  allTCs.reverse();
+  int tcsRunreserved = allTCs.size();
+  int limit2Go = int(double(tcsRunreserved) * threshold + 0.5), count2Limit = 0, countSucceeded = 0;
+  B2DEBUG(1, "reserveHits - pass " << currentPass->sectorSetup << ": threshold " << threshold << ", total number of TCs " << tcVector.size() << ", alive " << countAlive << ", & unreserved " << tcsRunreserved << ", results in " << limit2Go << " TCs to be allowed to reserve their hits")
+
+  list< pair< double, VXDTFTrackCandidate*> >::iterator currentTC = allTCs.begin();
+  bool succeeded;
+  while (count2Limit < limit2Go) {
+    succeeded = currentTC->second->setReserved();
+    if (succeeded == true) ++countSucceeded;
+    ++currentTC;
+    ++count2Limit;
+    if (std::distance(allTCs.begin(), currentTC) > tcsRunreserved) {
+      B2FATAL(" reserveHits: iterator goes rampage!")
+    }
+  }
+  B2DEBUG(1, "reserveHits - pass " << currentPass->sectorSetup << ": threshold " << threshold << ", totalTcs: " << tcVector.size() << ", tcs alive&unreserved: " << allTCs.size() << ", allows " << limit2Go << " TCs to reserve their hits, managed " << countSucceeded << " to succeed")
+}
+
+
+
 /** ***** greedy ***** **/
 /// search for nonOverlapping trackCandidates using Greedy algorithm (start with TC of highest QI, remove all TCs incompatible with current TC, if there are still TCs there, repeat step until no incompatible TCs are there any more)
 void VXDTFModule::greedy(TCsOfEvent& tcVector)
 {
-
-//  vector< unsigned int> killVector;
-//  vector< unsigned int> survivorVector;
   list< pair< double, VXDTFTrackCandidate*> > overlappingTCs;
 
   int countTCsAliveAtStart = 0, countSurvivors = 0, countKills = 0;
@@ -2492,7 +2490,7 @@ void VXDTFModule::greedyRecursive(std::list< std::pair<double, VXDTFTrackCandida
 
     countKills++;
 
-    if (qi >= rival->getTrackQuality()) { ///
+    if (qi >= rival->getTrackQuality()) {
       rival->setCondition(false);
     } else {
       tcEntry->second->setCondition(false);
@@ -2535,17 +2533,16 @@ VXDTFModule::SectorNameAndPointerPair VXDTFModule::searchSector4Hit(VxdID aVxdID
     vector<double>& vConfig)
 {
   VXDTFModule::MapOfSectors::iterator secMapIter = m_sectorMap.begin();
-//   int aUniID = aVxdID.getID();
-//   int aLayerID = aVxdID.getLayerNumber();
+
   int aSecID;
   unsigned int aFullSecID = numeric_limits<unsigned int>::max();
 
   for (int j = 0; j != int(uConfig.size() - 1); ++j) {
-    B2DEBUG(175, "uCuts(j)*uSize: " << uConfig[j]*sensorSize[0] << " uCuts(j+1)*uSize: " << uConfig[j + 1]*sensorSize[0]);
+    B2DEBUG(175, "uCuts(j)*uSize: " << uConfig.at(j)*sensorSize[0] << " uCuts(j+1)*uSize: " << uConfig.at(j + 1)*sensorSize[0]);
 
     if (localHit[0] >= (uConfig[j]*sensorSize[0] * 2.) && localHit[0] <= (uConfig[j + 1]*sensorSize[0] * 2.)) {
       for (int k = 0; k != int(vConfig.size() - 1); ++k) {
-        B2DEBUG(175, " vCuts(k)*vSize: " << vConfig[k]*sensorSize[1] << " vCuts(k+1)*vSize: " << vConfig[k + 1]*sensorSize[1]);
+        B2DEBUG(175, " vCuts(k)*vSize: " << vConfig.at(k)*sensorSize[1] << " vCuts(k+1)*vSize: " << vConfig.at(k + 1)*sensorSize[1]);
 
         if (localHit[1] >= (vConfig[k]*sensorSize[1] * 2.) && localHit[1] <= (vConfig[k + 1]*sensorSize[1] * 2.)) {
           aSecID = k + 1 + j * (vConfig.size() - 1);
@@ -2569,20 +2566,15 @@ VXDTFModule::SectorNameAndPointerPair VXDTFModule::searchSector4Hit(VxdID aVxdID
     }
   } //sector-searching loop
   SectorNameAndPointerPair result;
-  result = make_pair(aFullSecID, secMapIter);
-  return result;
+  return make_pair(aFullSecID, secMapIter);
 }
 
 
 
 bool VXDTFModule::compareSecSequence(VXDTFModule::SectorNameAndPointerPair& lhs, VXDTFModule::SectorNameAndPointerPair& rhs)
 {
-  if (lhs.first < rhs.first) return true;
+  if (lhs.first < rhs.first) { return true; }
   return false;
-//   int compareValue = lhs.first.compare(rhs.first); // if lhs.first < rhs.first -> compareValue = -1;
-//   if (compareValue < 0) {
-//     return true;
-//   } else { return false; }
 }
 
 
@@ -2594,7 +2586,6 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
   unsigned int currentFriendID, oldFriendID;
   oldFriendID = numeric_limits<unsigned int>::max();
   TVector3 currentVector, tempVector;
-  TVector3 origin(m_PARAMsetOrigin[0], m_PARAMsetOrigin[1], m_PARAMsetOrigin[2]);
   TVector3* currentCoords, *friendCoords;
   bool accepted = false; // recycled return value of the filters
   int simpleSegmentQI; // considers only min and max cutoff values, but could be weighed by order of relevance
@@ -2632,7 +2623,7 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
 
       int numOfFriendHits = allFriendHits.size();
       if (numOfFriendHits == 0 && ownHits[currentHit]->getNumberOfSegments() == 0) {
-        B2DEBUG(10, "event " << m_eventCounter << ": current Hit has no friendHits although layer is " << FullSecID(mainSecIter->second->getSecID()).getLayerID() << " and secID: " << FullSecID(ownHits[currentHit]->getSectorName()).getFullSecString())
+        B2DEBUG(10, "event " << m_eventCounter << ": current Hit has no friendHits although layer is " << FullSecID(mainSecIter->second->getSecID()).getLayerID() << " and secID: " << FullSecID(ownHits.at(currentHit)->getSectorName()).getFullSecString())
       }
       B2DEBUG(50, "Sector " << FullSecID(mainSecIter->first).getFullSecString() << " has got " << numOfFriendHits << " hits lying among his friends! ");
       for (int friendHit = 0; friendHit < numOfFriendHits; ++friendHit) {
@@ -2646,74 +2637,74 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
         }
 
         friendCoords = allFriendHits[friendHit]->getHitCoordinates();
-        m_twoHitFilterBox.resetValues(*currentCoords, *friendCoords, mainSecIter->second, currentFriendID);
+        currentPass->twoHitFilterBox.resetValues(*currentCoords, *friendCoords, mainSecIter->second, currentFriendID);
 
         if (currentPass->distance3D.first == true) { // min & max!
-          accepted = m_twoHitFilterBox.checkDist3D(FilterID::distance3D);
+          accepted = currentPass->twoHitFilterBox.checkDist3D(FilterID::distance3D);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " dist3d: segment approved!")
           } else {
             B2DEBUG(150, " dist3d: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_twoHitFilterBox.getCutoffs(FilterID::distance3D);
-              B2WARNING("dist3D - minCutoff: " << cutoffs.first << ", calcValue: " << m_twoHitFilterBox.calcDist3D() << ", maxCutoff: " << cutoffs.second)
+              pair <double, double> cutoffs = currentPass->twoHitFilterBox.getCutoffs(FilterID::distance3D);
+              B2WARNING("dist3D - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->twoHitFilterBox.calcDist3D() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " dist3d is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->distanceXY.first == true) { // min & max!
-          accepted = m_twoHitFilterBox.checkDistXY(FilterID::distanceXY);
+          accepted = currentPass->twoHitFilterBox.checkDistXY(FilterID::distanceXY);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " distxy: segment approved!")
           } else {
             B2DEBUG(150, " distxy: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_twoHitFilterBox.getCutoffs(FilterID::distanceXY);
-              B2WARNING("distxy - minCutoff: " << cutoffs.first << ", calcValue: " << m_twoHitFilterBox.calcDistXY() << ", maxCutoff: " << cutoffs.second)
+              pair <double, double> cutoffs = currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceXY);
+              B2WARNING("distxy - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->twoHitFilterBox.calcDistXY() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " distxy is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->distanceZ.first == true) { // min & max!
-          accepted = m_twoHitFilterBox.checkDistZ(FilterID::distanceZ);
+          accepted = currentPass->twoHitFilterBox.checkDistZ(FilterID::distanceZ);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " distz: segment approved!")
           } else {
             B2DEBUG(150, " distz: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_twoHitFilterBox.getCutoffs(FilterID::distanceZ);
-              B2WARNING("distz - minCutoff: " << cutoffs.first << ", calcValue: " << m_twoHitFilterBox.calcDistZ() << ", maxCutoff: " << cutoffs.second)
+              pair <double, double> cutoffs = currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceZ);
+              B2WARNING("distz - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->twoHitFilterBox.calcDistZ() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " distz is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->normedDistance3D.first == true) { // max only
-          accepted = m_twoHitFilterBox.checkNormedDist3D(FilterID::normedDistance3D);
+          accepted = currentPass->twoHitFilterBox.checkNormedDist3D(FilterID::normedDistance3D);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " normeddist3d: segment approved!")
           } else {
             B2DEBUG(150, " normeddist3d: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_twoHitFilterBox.getCutoffs(FilterID::normedDistance3D);
-              B2WARNING("normeddist3d - minCutoff: " << cutoffs.first << ", calcValue: " << m_twoHitFilterBox.calcNormedDist3D() << ", maxCutoff: " << cutoffs.second)
+              pair <double, double> cutoffs = currentPass->twoHitFilterBox.getCutoffs(FilterID::normedDistance3D);
+              B2WARNING("normeddist3d - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->twoHitFilterBox.calcNormedDist3D() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " normeddist3d is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->slopeRZ.first == true) { // min & max!
-          accepted = m_twoHitFilterBox.checkSlopeRZ(FilterID::slopeRZ);
+          accepted = currentPass->twoHitFilterBox.checkSlopeRZ(FilterID::slopeRZ);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " slopeRZ: segment approved!")
           } else {
             B2DEBUG(150, " slopeRZ: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_twoHitFilterBox.getCutoffs(FilterID::slopeRZ);
-              B2WARNING("slopeRZ - minCutoff: " << cutoffs.first << ", calcValue: " << m_twoHitFilterBox.calcSlopeRZ() << ", maxCutoff: " << cutoffs.second)
+              pair <double, double> cutoffs = currentPass->twoHitFilterBox.getCutoffs(FilterID::slopeRZ);
+              B2WARNING("slopeRZ - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->twoHitFilterBox.calcSlopeRZ() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " slopeRZ is not activated for pass: " << currentPass->sectorSetup << "!") }
@@ -2727,16 +2718,16 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
         }
 
         if (m_highOccupancyCase == true && currentHit < (numOfCurrentHits - 1)) {
-          m_threeHitFilterBox.resetValues(*currentCoords, *friendCoords, origin, mainSecIter->second, currentFriendID);
-          bool testPassed = SegFinderHighOccupancy(currentPass, m_threeHitFilterBox);
+          currentPass->threeHitFilterBox.resetValues(*currentCoords, *friendCoords, currentPass->origin, mainSecIter->second, currentFriendID);
+          bool testPassed = SegFinderHighOccupancy(currentPass, currentPass->threeHitFilterBox);
           if (testPassed == false) {
-            B2DEBUG(150, "SegFINDERHighOccupancy: segment discarded! Outer/inner Segment: " << FullSecID(ownHits[currentHit]->getSectorName()).getFullSecString() << "/" << FullSecID(currentFriendID).getFullSecString())
+            B2DEBUG(150, "SegFINDERHighOccupancy: segment discarded! Outer/inner Segment: " << FullSecID(ownHits.at(currentHit)->getSectorName()).getFullSecString() << "/" << FullSecID(currentFriendID).getFullSecString())
             discardedSegmentsCounter++;
             oldFriendID = currentFriendID;
             continue;
           }
         }
-        B2DEBUG(100, " segment approved!  Outer/inner Segment: " << FullSecID(ownHits[currentHit]->getSectorName()).getFullSecString() << "/" << FullSecID(currentFriendID).getFullSecString())
+        B2DEBUG(100, " segment approved!  Outer/inner Segment: " << FullSecID(ownHits.at(currentHit)->getSectorName()).getFullSecString() << "/" << FullSecID(currentFriendID).getFullSecString())
         VXDSegmentCell* pCell = new VXDSegmentCell(ownHits[currentHit],
                                                    allFriendHits[friendHit],
                                                    mainSecIter,
@@ -2757,7 +2748,6 @@ int VXDTFModule::segFinder(CurrentPassData* currentPass)
 
   return discardedSegmentsCounter;
 }
-
 
 
 
@@ -2871,7 +2861,6 @@ bool VXDTFModule::SegFinderHighOccupancy(CurrentPassData* currentPass, NbFinderF
 
 
 
-
 /** ***** neighbourFinder ***** **/
 /// filters neighbouring segments in given pass and returns number of discarded segments
 int VXDTFModule::neighbourFinder(CurrentPassData* currentPass)
@@ -2880,7 +2869,6 @@ int VXDTFModule::neighbourFinder(CurrentPassData* currentPass)
   int NFdiscardedSegmentsCounter = 0;
   unsigned int currentFriendID; // not needed: outerLayerID, innerLayerID
   TVector3 outerVector, centerVector, innerVector, outerTempVector;
-  TVector3 origin(m_PARAMsetOrigin[0], m_PARAMsetOrigin[1], m_PARAMsetOrigin[2]);
   TVector3* outerCoords, *centerCoords, *innerCoords;
   TVector3 innerTempVector, cpA/*central point of innerSegment*/, cpB/*central point of mediumSegment*/, nA/*normal vector of segment a*/, nB/*normal vector of segment b*/, intersectionAB;
   int simpleSegmentQI; // better than segmentApproved, but still digital (only min and max cutoff values), but could be weighed by order of relevance
@@ -2908,102 +2896,102 @@ int VXDTFModule::neighbourFinder(CurrentPassData* currentPass)
         innerCoords = currentInnerSeg->getInnerHit()->getHitCoordinates();
 
         simpleSegmentQI = 0;
-        m_threeHitFilterBox.resetValues(*outerCoords, *centerCoords, *innerCoords, mainSecIter->second, currentFriendID);
+        currentPass->threeHitFilterBox.resetValues(*outerCoords, *centerCoords, *innerCoords, mainSecIter->second, currentFriendID);
 
         if (currentPass->angles3D.first == true) { // min & max!
-          accepted = m_threeHitFilterBox.checkAngle3D(FilterID::angles3D);
+          accepted = currentPass->threeHitFilterBox.checkAngle3D(FilterID::angles3D);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " angles3D: segment approved!")
           } else {
             B2DEBUG(150, " angles3D: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(FilterID::angles3D);
-              B2WARNING("angles3D - minCutoff: " << cutoffs.first << ", calcValue: " << m_threeHitFilterBox.calcAngle3D() << ", maxCutoff: " << cutoffs.second)
+              pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::angles3D);
+              B2WARNING("angles3D - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcAngle3D() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " angles3D is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->anglesXY.first == true) { // min & max!
-          accepted = m_threeHitFilterBox.checkAngleXY(FilterID::anglesXY);
+          accepted = currentPass->threeHitFilterBox.checkAngleXY(FilterID::anglesXY);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " anglesXY: segment approved!")
           } else {
             B2DEBUG(150, " anglesXY: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(FilterID::anglesXY);
-              B2WARNING("anglesXY - minCutoff: " << cutoffs.first << ", calcValue: " << m_threeHitFilterBox.calcAngleXY() << ", maxCutoff: " << cutoffs.second)
+              pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::anglesXY);
+              B2WARNING("anglesXY - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcAngleXY() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " anglesXY is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->anglesRZ.first == true) { // min & max!
-          accepted = m_threeHitFilterBox.checkAngleRZ(FilterID::anglesRZ);
+          accepted = currentPass->threeHitFilterBox.checkAngleRZ(FilterID::anglesRZ);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " anglesRZ: segment approved!")
           } else {
             B2DEBUG(150, " anglesRZ: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(FilterID::anglesRZ);
-              B2WARNING("anglesRZ - minCutoff: " << cutoffs.first << ", calcValue: " << m_threeHitFilterBox.calcAngleRZ() << ", maxCutoff: " << cutoffs.second)
+              pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::anglesRZ);
+              B2WARNING("anglesRZ - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcAngleRZ() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " anglesRZ is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->distance2IP.first == true) { // max only
-          accepted = m_threeHitFilterBox.checkCircleDist2IP(FilterID::distance2IP);
+          accepted = currentPass->threeHitFilterBox.checkCircleDist2IP(FilterID::distance2IP);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " distance2IP: segment approved!")
           } else {
             B2DEBUG(150, " distance2IP: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(FilterID::distance2IP);
-              B2WARNING("distance2IP - minCutoff: " << cutoffs.first << ", calcValue: " << m_threeHitFilterBox.calcCircleDist2IP() << ", maxCutoff: " << cutoffs.second)
+              pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::distance2IP);
+              B2WARNING("distance2IP - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcCircleDist2IP() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " distance2IP is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->deltaSlopeRZ.first == true) { // min & max!
-          accepted = m_threeHitFilterBox.checkDeltaSlopeRZ(FilterID::deltaSlopeRZ);
+          accepted = currentPass->threeHitFilterBox.checkDeltaSlopeRZ(FilterID::deltaSlopeRZ);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " deltaSlopeRZ: segment approved!")
           } else {
             B2DEBUG(150, " deltaSlopeRZ: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(FilterID::deltaSlopeRZ);
-              B2WARNING("deltaSlopeRZ - minCutoff: " << cutoffs.first << ", calcValue: " << m_threeHitFilterBox.calcDeltaSlopeRZ() << ", maxCutoff: " << cutoffs.second)
+              pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::deltaSlopeRZ);
+              B2WARNING("deltaSlopeRZ - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcDeltaSlopeRZ() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " deltaSlopeRZ is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->pT.first == true) { // min & max!
-          accepted = m_threeHitFilterBox.checkPt(FilterID::pT);
+          accepted = currentPass->threeHitFilterBox.checkPt(FilterID::pT);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " pT: segment approved!")
           } else {
             B2DEBUG(150, " pT: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(FilterID::pT);
-              B2WARNING("pT - minCutoff: " << cutoffs.first << ", calcValue: " << m_threeHitFilterBox.calcPt() << ", maxCutoff: " << cutoffs.second)
+              pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::pT);
+              B2WARNING("pT - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcPt() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " pT is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (currentPass->helixFit.first == true) { // min & max!
-          accepted = m_threeHitFilterBox.checkHelixFit(FilterID::helixFit);
+          accepted = currentPass->threeHitFilterBox.checkHelixFit(FilterID::helixFit);
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " helixFit: segment approved!")
           } else {
             B2DEBUG(150, " helixFit: segment discarded!")
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = m_threeHitFilterBox.getCutoffs(FilterID::helixFit);
-              B2WARNING("helixFit - minCutoff: " << cutoffs.first << ", calcValue: " << m_threeHitFilterBox.calcHelixFit() << ", maxCutoff: " << cutoffs.second)
+              pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::helixFit);
+              B2WARNING("helixFit - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcHelixFit() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " helixFit is not activated for pass: " << currentPass->sectorSetup << "!") }
@@ -3013,9 +3001,9 @@ int VXDTFModule::neighbourFinder(CurrentPassData* currentPass)
           continue;
         }
         if (m_highOccupancyCase == true) {
-          if (origin != *innerCoords) {
-            m_fourHitFilterBox.resetValues(*outerCoords, *centerCoords, *innerCoords, origin, mainSecIter->second, currentFriendID);
-            bool testPassed = NbFinderHighOccupancy(currentPass, m_fourHitFilterBox);
+          if (currentPass->origin != *innerCoords) {
+            currentPass->fourHitFilterBox.resetValues(*outerCoords, *centerCoords, *innerCoords, currentPass->origin, mainSecIter->second, currentFriendID);
+            bool testPassed = NbFinderHighOccupancy(currentPass, currentPass->fourHitFilterBox);
             if (testPassed == false) {
               B2DEBUG(150, "NbFINDERHighOccupancy: segment discarded! ")
               continue;
@@ -3055,6 +3043,7 @@ int VXDTFModule::neighbourFinder(CurrentPassData* currentPass)
 }
 
 
+
 bool VXDTFModule::NbFinderHighOccupancy(CurrentPassData* currentPass, TcFourHitFilters& fourHitFilterBox)
 {
   int simpleSegmentQI = 0;
@@ -3092,6 +3081,7 @@ bool VXDTFModule::NbFinderHighOccupancy(CurrentPassData* currentPass, TcFourHitF
     return false;
   } else { return true; }
 }
+
 
 
 /** ***** cellular automaton ***** **/
@@ -3154,14 +3144,16 @@ int VXDTFModule::cellularAutomaton(CurrentPassData* currentPass)
     }
   }
 
-  //segmentOutPut:
-  countedSegments = 0;
-  BOOST_FOREACH(VXDSegmentCell * currentSeg, currentPass->activeCellList) {
-    B2DEBUG(150, "Post CA - Current state of cell: " << currentSeg->getState() << " with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString());
-    if (currentSeg->getInnerNeighbours().size() == 0 && currentSeg->getOuterNeighbours().size() == 0) { continue; }
-    countedSegments++;
+  if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true) {
+    countedSegments = 0;
+    BOOST_FOREACH(VXDSegmentCell * currentSeg, currentPass->activeCellList) {
+      B2DEBUG(150, "Post CA - Current state of cell: " << currentSeg->getState() << " with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString());
+      if (currentSeg->getInnerNeighbours().size() == 0 && currentSeg->getOuterNeighbours().size() == 0) { continue; }
+      countedSegments++;
+    }
+    B2DEBUG(10, "CA - " << countedSegments << " segments have at least one friend");
   }
-  B2DEBUG(10, "CA - " << countedSegments << " segments have at least one friend");
+
   return caRound;
 }
 
@@ -3208,10 +3200,8 @@ void VXDTFModule::tcCollector(CurrentPassData* currentPass)
 
 
 
-
 /** ***** Track Candidate Filter (tcFilter) ***** **/
 int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber)
-// int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber, vector<ClusterInfo>& clustersOfEvent)
 {
   TCsOfEvent::iterator currentTC;
   TVector3* hitA, *hitB, *hitC, *hitD;
@@ -3245,6 +3235,7 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber)
     }
 
     vector<PositionInfo*> currentHitPositions;
+    currentHitPositions.reserve(numOfCurrentHits);
     if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 20, PACKAGENAME()) == true) {
       stringstream secNameOutput;
       secNameOutput << endl << " tc " << tcCtr << " got " << numOfCurrentHits << " hits and the following secIDs: ";
@@ -3261,11 +3252,11 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber)
     }
 
     // feeding trackletFilterbox with hits:
-    m_trackletFilterBox.resetValues(&currentHitPositions);
+    currentPass->trackletFilterBox.resetValues(&currentHitPositions);
     bool isZiggZagging;
 
     if (currentPass->zigzagXY.first == true) {
-      isZiggZagging = m_trackletFilterBox.ziggZaggXY();
+      isZiggZagging = currentPass->trackletFilterBox.ziggZaggXY();
       if (isZiggZagging == true) {
         B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by ziggZaggXY! ");
         m_TESTERtriggeredZigZagXY++; tcCtr++;
@@ -3276,35 +3267,9 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber)
     }
 
     if (currentPass->circleFit.first == true) {
-      boostNsec duration;
-      boostClock::time_point timer = boostClock::now();
-      double closestApproachPhi, closestApproachR, estimatedRadius;
-      double chi2 = m_trackletFilterBox.circleFit(closestApproachPhi, closestApproachR, estimatedRadius);
-      (*currentTC)->setEstRadius(estimatedRadius);
-      if (chi2 < 0) { chi2 = 0; }
-      double probability = TMath::Prob(chi2, numOfCurrentHits - 3 + 1);
-      // why is there numOfHits - 3 + 1? Answer: each hit is one additional degree of freedom (since only the measurement of the u-coordinate of the sensors can be used) but 3 parameters are measured, therefore 3 has to be substracted from the number of hits to get the ndf. The additional degree of freedom (+1) is there, since the origin is used as another hit for the circlefitter but has two degrees of freedom instead of one for the normal hits. therefore +1 has to be added again.
-      B2DEBUG(100, "TCC Filter at tc " << tcCtr << ": estimated closestApproachPhi, closestApproachR, estimatedRadius: " << closestApproachPhi << ", " << closestApproachR << ", " << estimatedRadius << " got fitted with chi2 of " << chi2 << " and probability of " << probability << " with ndf: " << numOfCurrentHits - 3 + 1)
-      if (probability < currentPass->circleFit.second) {  // means tc is bad
-        B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by circleFit! ");
-        m_TESTERtriggeredCircleFit++; tcCtr++;
-        (*currentTC)->setCondition(false);
-        continue;
-      }
-      if (m_calcQiType == 2) {
-//         if (chi2 < 0) { chi2 = 0; }
-//         double probability = TMath::Prob(chi2, numOfCurrentHits - 3);
-        writeToRootFile(probability, chi2, numOfCurrentHits - 3 + 1);
-        if (m_PARAMqiSmear == true) { probability = m_littleHelperBox.smearNormalizedGauss(probability); }
-        (*currentTC)->setTrackQuality(probability);
-        (*currentTC)->setFitSucceeded(true);
-      }
-      boostClock::time_point timer2 = boostClock::now();
-      duration = boost::chrono::duration_cast<boostNsec>(timer2 - timer);
-
-      B2DEBUG(20, " TCC filter circleFit approved TC " << tcCtr << " with numOfHits: " <<  numOfCurrentHits << ", time consumption: " << duration.count() << " ns");
+      bool succeeded = doTheCircleFit(currentPass, (*currentTC), numOfCurrentHits, tcCtr);
+      B2DEBUG(150, " TCFilter, circleFit succeeded: " << succeeded)
     }
-
 
     int a = 0, b = 1, c = 2, d = 3;
     bool abortTC = false, accepted;
@@ -3316,17 +3281,17 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber)
       hitC = currentHits[c]->getHitCoordinates();
       hitD = currentHits[d]->getHitCoordinates();
 
-      m_fourHitFilterBox.resetValues(*hitA, *hitB, *hitC, *hitD, thisSector, friendID);
+      currentPass->fourHitFilterBox.resetValues(*hitA, *hitB, *hitC, *hitD, thisSector, friendID);
 
       if (currentPass->deltaPt.first == true) {
-        accepted = m_fourHitFilterBox.checkDeltapT(FilterID::deltapT);
+        accepted = currentPass->fourHitFilterBox.checkDeltapT(FilterID::deltapT);
         if (accepted == false) {
           B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by deltaPt! ");
           m_TESTERtriggeredDpT++;
           (*currentTC)->setCondition(false);
           if (m_PARAMDebugMode == true) {
-            pair <double, double> cutoffs = m_fourHitFilterBox.getCutoffs(FilterID::deltapT);
-            B2WARNING("deltaPt - minCutoff: " << cutoffs.first << ", calcValue: " << m_fourHitFilterBox.deltapT() << ", maxCutoff: " << cutoffs.second)
+            pair <double, double> cutoffs = currentPass->fourHitFilterBox.getCutoffs(FilterID::deltapT);
+            B2WARNING("deltaPt - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->fourHitFilterBox.deltapT() << ", maxCutoff: " << cutoffs.second)
           }
           abortTC = true;
           break;
@@ -3334,14 +3299,14 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber)
         B2DEBUG(20, " TCC filter deltaPt approved TC " << tcCtr);
       }
       if (currentPass->deltaDistance2IP.first == true) {
-        accepted = m_fourHitFilterBox.checkDeltaDistCircleCenter(FilterID::deltaDistance2IP);
+        accepted = currentPass->fourHitFilterBox.checkDeltaDistCircleCenter(FilterID::deltaDistance2IP);
         if (accepted == false) {
           B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by deltaDistance2IP! ");
           m_TESTERtriggeredDD2IP++;
           (*currentTC)->setCondition(false);
           if (m_PARAMDebugMode == true) {
-            pair <double, double> cutoffs = m_fourHitFilterBox.getCutoffs(FilterID::deltaDistance2IP);
-            B2WARNING("deltaDistance2IP - minCutoff: " << cutoffs.first << ", calcValue: " << m_fourHitFilterBox.deltaDistCircleCenter() << ", maxCutoff: " << cutoffs.second)
+            pair <double, double> cutoffs = currentPass->fourHitFilterBox.getCutoffs(FilterID::deltaDistance2IP);
+            B2WARNING("deltaDistance2IP - minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->fourHitFilterBox.deltaDistCircleCenter() << ", maxCutoff: " << cutoffs.second)
           }
           abortTC = true;
           break;
@@ -3363,9 +3328,9 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber)
       BOOST_FOREACH(VXDTFHit * currentHit, currentHits) {
         currentHitPositions.push_back(currentHit->getPositionInfo());
       }
-      m_trackletFilterBox.resetValues(&currentHitPositions);
+      currentPass->trackletFilterBox.resetValues(&currentHitPositions);
 
-      isZiggZagging = m_trackletFilterBox.ziggZaggRZ();
+      isZiggZagging = currentPass->trackletFilterBox.ziggZaggRZ();
       if (isZiggZagging == true) {
         B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by ziggZaggRZ! ");
         m_TESTERtriggeredZigZagRZ++; tcCtr++;
@@ -3401,12 +3366,13 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber)
       secNameOutput << aSecName << "/" << FullSecID(aSecName).getFullSecString() << " ";
       if (currentHit->getDetectorType() == Const::PXD) {   // PXD
         currentHit->getClusterInfoUV()->addTrackCandidate(currentTC);
-//         clustersOfEvent[currentHit->getClusterIndexUV()].addTrackCandidate(currentTC);
       } else {
-        currentHit->getClusterInfoU()->addTrackCandidate(currentTC);
-        currentHit->getClusterInfoV()->addTrackCandidate(currentTC);
-//         clustersOfEvent[currentHit->getClusterIndexU()].addTrackCandidate(currentTC);
-//         clustersOfEvent[currentHit->getClusterIndexV()].addTrackCandidate(currentTC);
+        if (currentHit->getClusterInfoU() != NULL) { currentHit->getClusterInfoU()->addTrackCandidate(currentTC); } else {
+          B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": currentSVDHit got no UCluster! " <<  aSecName << "/" << FullSecID(aSecName).getFullSecString())
+        }
+        if (currentHit->getClusterInfoV() != NULL) { currentHit->getClusterInfoV()->addTrackCandidate(currentTC); } else {
+          B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": currentSVDHit got no VCluster! " <<  aSecName << "/" << FullSecID(aSecName).getFullSecString())
+        }
       }
     } // used for output and informing each cluster which TC is using it
     B2DEBUG(20, " " << secNameOutput.str() << " and " << numOfHits << " hits");
@@ -3421,126 +3387,88 @@ int VXDTFModule::tcFilter(CurrentPassData* currentPass, int passNumber)
 
 
 
-
-
-void VXDTFModule::calcInitialValues4TCs(TCsOfEvent& tcVector) /// TODO: use vxdCaTracking-classes to reduce code errors
+void VXDTFModule::calcInitialValues4TCs(CurrentPassData* currentPass) /// TODO: use vxdCaTracking-classes to reduce redundancy TODO-2: why not putting that into the VXDTFTrackCandidate-class?
 {
-  TVector3* hitA, *hitB, *hitC;
+  TVector3 hitA, hitB, hitC;
   TVector3 hitA_T, hitB_T, hitC_T; // those with _T are the hits of the transverlal plane
   TVector3 intersection, radialVector, pTVector, pVector; //coords of center of projected circle of trajectory & vector pointing from center to innermost hit
+  ThreeHitFilters threeHitFilterBox = ThreeHitFilters();
   TVector3 segAB, segBC, segAC, cpAB, cpBC, nAB, nBC;
   int numOfCurrentHits, signCurvature, pdGCode;
-  double muVal, radiusInCm, pT, theta, pZ, preFactor; // needed for dPt calculation
-  BOOST_FOREACH(VXDTFTrackCandidate * aTC, tcVector) {
+  double radiusInCm, pT, theta, pZ, preFactor; // needed for dPt calculation
+  BOOST_FOREACH(VXDTFTrackCandidate * aTC, currentPass->tcVector) {
 
     if (aTC->getCondition() == false) { continue; }
     const vector<VXDTFHit*>& currentHits = aTC->getHits();
     numOfCurrentHits = currentHits.size();
 
+    if (numOfCurrentHits < 3) {
+      B2ERROR("calcInitialValues4TCs: currentTC got " << numOfCurrentHits << " hits! At this point only tcs having at least 3 hits should exist!")
+    }
 /// method A: 3 neighbouring inner hits:
     if (m_KFBackwardFilter == true) {
-      hitA = currentHits[2]->getHitCoordinates();
-      hitB = currentHits[1]->getHitCoordinates();
-      hitC = currentHits[0]->getHitCoordinates(); // outermost hit and initial value for GFTrackCandidate
+      hitA = *(currentHits[2]->getHitCoordinates());
+      hitB = *(currentHits[1]->getHitCoordinates());
+      hitC = *(currentHits[0]->getHitCoordinates()); // outermost hit and initial value for GFTrackCandidate
     } else {
-      hitA = currentHits[numOfCurrentHits - 1]->getHitCoordinates(); // innermost hit and initial value for GFTrackCandidate
-      hitB = currentHits[numOfCurrentHits - 2]->getHitCoordinates();
-      hitC = currentHits[numOfCurrentHits - 3]->getHitCoordinates();
+      hitA = *(currentHits[numOfCurrentHits - 1]->getHitCoordinates()); // innermost hit and initial value for GFTrackCandidate
+      hitB = *(currentHits[numOfCurrentHits - 2]->getHitCoordinates());
+      hitC = *(currentHits[numOfCurrentHits - 3]->getHitCoordinates());
     }
 
-    hitA_T = *hitA; hitA_T.SetZ(0.);
-    hitB_T = *hitB; hitB_T.SetZ(0.);
-    hitC_T = *hitC; hitC_T.SetZ(0.);
-    segAB = *hitB - *hitA;
-    segAC = *hitC - *hitA;
+    hitA_T = hitA; hitA_T.SetZ(0.);
+    hitB_T = hitB; hitB_T.SetZ(0.);
+    hitC_T = hitC; hitC_T.SetZ(0.);
+    segAB = hitB - hitA;
+    segAC = hitC - hitA;
     theta = segAC.Theta();
 
-/// method B: using (0,0,0) as innermost hit:
-//    hitA.SetX(0.);
-//    hitA.SetY(0.);
-//    hitA.SetZ(0.);
-// //     hitA = currentHits[numOfCurrentHits - 1]->getHitCoordinates(); // innermost hit and initial value for GFTrackCandidate
-//    hitA_T = hitA; hitA_T.SetZ(0.);
-//    hitB = currentHits[numOfCurrentHits - 1]->getHitCoordinates();
-//    hitB_T = hitB; hitB_T.SetZ(0.);
-//    hitC = currentHits[0]->getHitCoordinates();
-//    hitC_T = hitC; hitC_T.SetZ(0.);
-
-/// method C: innermost, outermost and a center hit:
-//    hitA = currentHits[numOfCurrentHits - 1]->getHitCoordinates(); // innermost hit and initial value for GFTrackCandidate
-//    hitA_T = hitA; hitA_T.SetZ(0.);
-//    int centerHit = float(numOfCurrentHits)*0.5 +1;
-//    if (centerHit == numOfCurrentHits) { centerHit--; } else if (centerHit == 1 ) { centerHit++; }
-//    hitB = currentHits[centerHit - 1]->getHitCoordinates();
-//    hitB_T = hitB; hitB_T.SetZ(0.);
-//    hitC = currentHits[0]->getHitCoordinates(); // outermost hit
-//    hitC_T = hitC; hitC_T.SetZ(0.);
-//    segAB = hitB - hitA;
-//    theta = segAB.Theta();
 
     segAB.SetZ(0.);
     segBC = hitC_T - hitB_T;
-    cpAB = 0.5 * segAB + hitA_T; // central point of innerSegment
-    cpBC = 0.5 * segBC + hitB_T;// central point of mediumSegment
-    nAB = segAB.Orthogonal();
     nBC = segBC.Orthogonal();
 
     signCurvature = sign(nBC * segAB);
 
-    muVal = (((cpAB(1) - cpBC(1)) / nBC(1)) + (((cpBC(0) - cpAB(0)) / nAB(0)) * nAB(1) / nBC(1))) / (1. - ((nBC(0) / nAB(0)) * (nAB(1) / nBC(1))));
-    intersection.SetX(cpBC(0) + muVal * nBC(0)); // x-coord of intersection point
-    intersection.SetY(cpBC(1) + muVal * nBC(1)); // y-coord of intersection point
-    intersection.SetZ(0.);
+    currentPass->threeHitFilterBox.calcCircleCenter(hitA_T, hitB_T, hitC_T, intersection);
     if (m_KFBackwardFilter == true) {
-      radialVector = (intersection - *hitC);
+      radialVector = (intersection - hitC);
     } else {
-      radialVector = (intersection - *hitA);
+      radialVector = (intersection - hitA);
     }
 
     radiusInCm = aTC->getEstRadius();
     if (radiusInCm  < 0.1 || radiusInCm > 100000.) { // if it is not set, value stays at zero, therefore small check should be enough
       radiusInCm = radialVector.Mag(); // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
     }
-//       double chi2 = -1; // means, no chi2 will be calculated
-//     radiusInCm = circleFit(currentHits,chi2);
 
-    pT = 0.45 * radiusInCm * 0.01; // pT[GeV/c] = 0.3*B[T]*r[m] = 0.45*r[cm]/100 = 0.45*r*0.01 length of pT
+    pT = currentPass->threeHitFilterBox.calcPt(radiusInCm); // pT[GeV/c] = 0.3*B[T]*r[m] = 0.45*r[cm]/100 = 0.45*r*0.01 length of pT
     B2DEBUG(150, "event: " << m_eventCounter << ": calculated pT: " << pT);
     pZ = pT / tan(theta);
     preFactor = pT / radiusInCm;
     pTVector = preFactor * radialVector.Orthogonal() ;
 
     if (m_KFBackwardFilter == true) {
-      if ((*hitC + pTVector).Mag() < hitC->Mag()) { pTVector = pTVector * -1; }
+      if ((hitC + pTVector).Mag() < hitC.Mag()) { pTVector = pTVector * -1; }
     } else {
-      if ((*hitA + pTVector).Mag() < hitA->Mag()) { pTVector = pTVector * -1; }
+      if ((hitA + pTVector).Mag() < hitA.Mag()) { pTVector = pTVector * -1; }
     }
-
 
     pVector = pTVector;
     pVector.SetZ(pZ);
 
     // the sign of curvature determines the charge of the particle, negative sign for curvature means positively charged particle. The signFactor is needed since the sign of PDG-codes are not defined by their charge but by being a particle or an antiparticle
 
-///     if ( m_KFBackwardFilter == true ) {
-///       pdGCode = signCurvature * m_PARAMpdGCode * m_chargeSignFactor * (-1);
-///     } else {
     pdGCode = signCurvature * m_PARAMpdGCode * m_chargeSignFactor;
-///     }
 
     if (m_KFBackwardFilter == true) {
-      aTC->setInitialValue(*hitC, pVector, pdGCode);
+      aTC->setInitialValue(hitC, pVector, pdGCode);
     } else {
-      aTC->setInitialValue(*hitA, pVector, pdGCode);
+      aTC->setInitialValue(hitA, pVector, pdGCode);
     }
 
-    B2DEBUG(10, " TC has got momentum of " << pVector.Mag() << "GeV and estimated pdgCode " << pdGCode);
+    B2DEBUG(10, " TC has got momentum/pT of " << pVector.Mag() << "/" << pTVector.Mag() << "GeV and estimated pdgCode " << pdGCode);
 
-//    if ( pValue < 0.02 ) {
-//      aTC->setCondition(false);
-//      m_TESTERfilteredBadSeedTCs++;
-//      B2DEBUG(10, "Total momentum of current TC is " << pValue << "GeV and and therefore neglected by calcInitialValues4TCs");
-//    }
   }
 }
 
@@ -3549,7 +3477,7 @@ void VXDTFModule::calcInitialValues4TCs(TCsOfEvent& tcVector) /// TODO: use vxdC
 void VXDTFModule::calcQIbyLength(TCsOfEvent& tcVector, PassSetupVector& passSetups)
 {
   /// setting quality indices and smear result if chosen
-  double firstValue = 0.0, rngValue = 0.0, setupWeigh = 0.0, maxLength = 0.0, numTotalLayers;
+  double firstValue = 0.0, rngValue = 0.0, maxLength = 0.0, numTotalLayers;
 
   BOOST_FOREACH(VXDTFTrackCandidate * currentTC, tcVector) {
     if (currentTC->getCondition() == false) { continue; }
@@ -3568,12 +3496,12 @@ void VXDTFModule::calcQIbyLength(TCsOfEvent& tcVector, PassSetupVector& passSetu
     if (rngValue < -0.4) { rngValue = -0.4; } else if (rngValue > 0.4) { rngValue = 0.4; }
 
     if (m_PARAMqiSmear == true) {
-      firstValue = rngValue + 1.0 - setupWeigh;
+      firstValue = rngValue + 1.0;
 
     } else {
-      firstValue = 1.0 - setupWeigh;
+      firstValue = 1.0;
     }
-    B2DEBUG(50, "setQQQ gets the following values: setupWeigh: " << setupWeigh << ", first value: " << firstValue << ", QQQScore: " << sqrt(firstValue * 0.5))
+    B2DEBUG(50, "setQQQ gets the following values: first value: " << firstValue << ", QQQScore: " << sqrt(firstValue * 0.5))
     currentTC->setQQQ(firstValue, 2.0);  // resulting QI = 0.3-0.7
     currentTC->setTrackQuality((currentTC->getQQQ() * double(currentTC->getHits().size()*maxLength)));
     currentTC->setFitSucceeded(true); // no real fit means, allways succeeded
@@ -3595,7 +3523,6 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
 
     TVector3 posErrors(1, 1, 1);
 
-//    currentTC->getInitialMomentum().Print();
     RKTrackRep* trackRep = new RKTrackRep(currentTC->getInitialCoordinates(), currentTC->getInitialMomentum(), posErrors, momErrors, currentTC->getPDGCode());
 
     GFTrack track(trackRep);
@@ -3672,7 +3599,7 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
 
 
 
-GFTrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentTC, vector<ClusterInfo>& clusters)
+GFTrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentTC)
 {
   GFTrackCand newGFTrackCand;
 
@@ -3682,32 +3609,16 @@ GFTrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentTC, vec
   TVectorD stateSeed(6); //(x,y,z,px,py,pz)
   TMatrixDSym covSeed(6);
   int pdgCode = currentTC->getPDGCode();
-  vector<int> pxdHits = currentTC->getPXDHitIndices();
-  vector<int> svdHits = currentTC->getSVDHitIndices();
-  vector<int> pxdClusters, svdClusters;
+  const vector<int>& pxdHits = currentTC->getPXDHitIndices();
+  const vector<int>& svdHits = currentTC->getSVDHitIndices();
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true) {
     stringstream printIndices;
     printIndices << "PXD: ";
-    BOOST_FOREACH(int index, pxdHits) {
-      int clusterIndex = clusters[index].getRealIndex();
-      printIndices << clusterIndex << " ";
-      pxdClusters.push_back(clusterIndex);
-    }
+    BOOST_FOREACH(int index, pxdHits) { printIndices << index << " "; }
     printIndices << ", SVD: ";
-    BOOST_FOREACH(int index, svdHits) {
-      int clusterIndex = clusters[index].getRealIndex();
-      printIndices << clusterIndex << " ";
-      svdClusters.push_back(clusterIndex);
-    }
+    BOOST_FOREACH(int index, svdHits) { printIndices << index << " "; }
     B2DEBUG(10, "generated GFTC with following hits: " << printIndices.str());
-  } else { // no debugging output
-    BOOST_FOREACH(int index, pxdHits) {
-      pxdClusters.push_back(clusters[index].getRealIndex());
-    }
-    BOOST_FOREACH(int index, svdHits) {
-      svdClusters.push_back(clusters[index].getRealIndex());
-    }
   }
 
   stateSeed(0) = posIn[0]; stateSeed(1) = posIn[1]; stateSeed(2) = posIn[2];
@@ -3718,10 +3629,10 @@ GFTrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentTC, vec
 
   newGFTrackCand.set6DSeedAndPdgCode(stateSeed, pdgCode, covSeed);
 
-  BOOST_REVERSE_FOREACH(int hitIndex, pxdClusters) {  // order of hits within VXDTFTrackCandidate: outer->inner hits. GFTrackCand: inner->outer hits
+  BOOST_REVERSE_FOREACH(int hitIndex, pxdHits) {  // order of hits within VXDTFTrackCandidate: outer->inner hits. GFTrackCand: inner->outer hits
     newGFTrackCand.addHit(Const::PXD, hitIndex);
   }
-  BOOST_REVERSE_FOREACH(int hitIndex, svdClusters) {  // order of hits within VXDTFTrackCandidate: outer->tcFilterinner hits. GFTrackCand: inner->outer hits
+  BOOST_REVERSE_FOREACH(int hitIndex, svdHits) {  // order of hits within VXDTFTrackCandidate: outer->tcFilterinner hits. GFTrackCand: inner->outer hits
     newGFTrackCand.addHit(Const::SVD, hitIndex);
   }
 
@@ -3735,21 +3646,22 @@ int VXDTFModule::cleanOverlappingSet(TCsOfEvent& tcVector)
   int numOfIHits = 0, numOfJHits = 0, numOfMergedHits = 0, killedTCs = 0;
   list<int> ihitIDs, jhitIDs, mergedHitIDs;
 
-  vector<VXDTFTrackCandidate*> rivals;
+//   TCsOfEvent rivals;
   BOOST_FOREACH(VXDTFTrackCandidate * aTC, tcVector) {
     if (aTC->getCondition() == false) { continue; }
     ihitIDs = aTC->getHopfieldHitIndices();
+    ihitIDs.sort();
     numOfIHits = ihitIDs.size();
 
-    rivals = aTC->getBookingRivals();
+    const TCsOfEvent& rivals = aTC->getBookingRivals();
     BOOST_FOREACH(VXDTFTrackCandidate * bTC, rivals) {
       if (bTC->getCondition() == false) { continue; }
       jhitIDs = bTC->getHopfieldHitIndices();
+      jhitIDs.sort();
       numOfJHits = jhitIDs.size();
 
       mergedHitIDs = ihitIDs;
-      mergedHitIDs.insert(mergedHitIDs.end(), jhitIDs.begin(), jhitIDs.end());
-      mergedHitIDs.sort();
+      mergedHitIDs.merge(jhitIDs); // sorts entries of jhitIDs into mergedHitIDs
       mergedHitIDs.unique();
       numOfMergedHits = mergedHitIDs.size();
 
@@ -3758,25 +3670,17 @@ int VXDTFModule::cleanOverlappingSet(TCsOfEvent& tcVector)
         if (aTC->getTrackQuality() > bTC->getTrackQuality()) {
           bTC->setCondition(false);
         } else {
-          aTC->setCondition(false); // although this one already died, we have to continue since there could be other TCs sharing all their hits with him TODO WHY? explanation not sufficient!
-          break; // since explanation is not good enough, we stop the loop of the rivals since there is no check whether aTC is still alive and therefore many bTCs could die although aTC is already dead
+          aTC->setCondition(false);
+          break; // checkOverlappingSet only filters TCs where one is a complete subset of the other. breaking here means, that aTC is subset of bTC, which makes any further filtering using aTC useless. By definition, the bTC has not been the outer loop yet (both know each other through the clusters, therefore bTC would have killed aTC already)
         }
       }
     }
   }
   m_TESTERfilteredOverlapsQI += killedTCs;
-  B2DEBUG(10, "VXDTFModule event " << m_eventCounter << ": so far, " << m_TESTERfilteredOverlapsQI << " TCs have been killed by funcCleanOverlappingSet...")
+  B2DEBUG(10, "VXDTFModule event " << m_eventCounter << ": so far, (this round/total)" << m_TESTERfilteredOverlapsQI << "/" << killedTCs << " TCs have been killed by funcCleanOverlappingSet...")
   /// now all TCs which were completely redundant should be dead. Therefore some TCs could be clean by now -> collecting all overlapping TCs which are still alive:
   if (killedTCs not_eq 0) {
-    TCsOfEvent newOverlappingTCs;
-    BOOST_FOREACH(VXDTFTrackCandidate * aTC, tcVector) {
-      if (aTC->getCondition() == false) { continue; }
-      if (aTC->checkOverlappingState() == true) {
-        newOverlappingTCs.push_back(aTC);
-      }
-    }
-    B2DEBUG(10, "within funcCleanOverlappingSet: tcVector.size(): " << tcVector.size() << ", newOverlappingTCs.size(): " << newOverlappingTCs.size() << " and " << (tcVector.size() - newOverlappingTCs.size() - killedTCs) << " former overlapping TCs are now clean")
-    tcVector = newOverlappingTCs;
+    /// since cleanOverlappingSet also influences other TCs, it is safer not to refill them here
     m_TESTERfilteredOverlapsQICtr++;
   } else { m_TESTERNotFilteredOverlapsQI++; B2DEBUG(10, "VXDTFModule event " << m_eventCounter << ": no TC is subset of other TC")}
   return killedTCs;
@@ -3786,14 +3690,12 @@ int VXDTFModule::cleanOverlappingSet(TCsOfEvent& tcVector)
 /** cleaning part **/
 void VXDTFModule::cleanEvent(CurrentPassData* currentPass, unsigned int centerSector)
 {
-
   // sectors stay alive, therefore only reset!
   BOOST_FOREACH(SectorNameAndPointerPair & aSector, currentPass->sectorSequence) {
     aSector.second->second->resetSector();
   }
   currentPass->sectorMap.find(centerSector)->second->resetSector(); // doing the same for the virtual sector which is not in the operation sequence
   currentPass->sectorSequence.clear();
-
 
   //segments, Hits and TrackCandidates can be deleted
   BOOST_FOREACH(VXDSegmentCell * aCell, currentPass->totalCellVector) {
@@ -3823,6 +3725,7 @@ string VXDTFModule::EventInfoPackage::Print()
   output << " timeConsumption of event " << evtNumber << " in microseconds: " << endl;
 
   output << "total: " << totalTime.count();
+  output << ", baselineTF: " << sectionConsumption.baselineTF.count();
   output << ", hitsorting: " << sectionConsumption.hitSorting.count();
   output << ", sf: "  << sectionConsumption.segFinder.count();
   output << ", nf: " << sectionConsumption.nbFinder.count();
@@ -3854,18 +3757,6 @@ double VXDTFModule::addExtraGain(double prefix, double cutOff, double generalTun
 }
 
 
-double VXDTFModule::getXMLValue(GearDir& cuts, string& valueType, string& filterType)
-{
-  double aValue;
-  try {
-    aValue = cuts.getDouble(valueType);
-  } catch (...) {
-    B2WARNING("import of " << filterType << "-" << valueType << "-value failed! Setting to 0!!")
-    aValue = 0;
-  }
-  return aValue;
-}
-
 
 void VXDTFModule::writeToRootFile(double pValue, double chi2, int ndf)
 {
@@ -3878,111 +3769,232 @@ void VXDTFModule::writeToRootFile(double pValue, double chi2, int ndf)
 }
 
 
-bool VXDTFModule::simpleEventReco(vector<ClusterInfo>& clusters, const StoreArray<PXDCluster>& aPxdClusterArray, const StoreArray<SVDCluster>& aSvdClusterArray)
+bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, CurrentPassData* passInfo)
 {
+  /** overall principle:
+   * generate hits (including 1D-hits)
+   * sort them to be able to collect TCs (different sorting technique for different cases)
+   * collect TCs
+   * test them by some basic tests
+   * store or break
+   **/
   PositionInfo newPosition;
   TVector3 hitLocal;
   VxdID aVxdID;
-  int aLayerID, numOfPxdClusters = 0;
-  map<int, SensorStruct> activatedSensors;
+  int aLayerID, nHits;
+  ActiveSensorsOfEvent activatedSensors;
   vector<ClusterHit> clusterHitList;
-  vector<VXDTFHit> vxdHits;
-  if (m_usePXDorSVDorVXDhits != 1) { numOfPxdClusters = aPxdClusterArray.getEntries(); }
+  vector<VXDTFHit> vxdHits, singleSidedHits;
 
-  BOOST_FOREACH(ClusterInfo & aCluster, clusters) {
-    bool isPXD = aCluster.isPXD();
-    int realClusterIndex = aCluster.getRealIndex();
-    // m_usePXDorSVDorVXDhits -> -1: VXD, 0: PXD, 1: SVD
-    if ((m_usePXDorSVDorVXDhits != 1) && (isPXD == true)) {
-      const PXDCluster* const aClusterPtr = aPxdClusterArray[realClusterIndex];
+  BOOST_FOREACH(ClusterInfo & aClusterInfo, clusters) {
+    bool isPXD = aClusterInfo.isPXD();
+    if (isPXD == true) { // there are pxdHits, only if PXDHits were allowed. pxd-hits are easy, can be stored right away
 
-      hitLocal.SetXYZ(aClusterPtr->getU(), aClusterPtr->getV(), 0);
+      hitLocal.SetXYZ(aClusterInfo.getPXDCluster()->getU(), aClusterInfo.getPXDCluster()->getV(), 0);
 
-      aVxdID = aClusterPtr->getSensorID();
+      aVxdID = aClusterInfo.getPXDCluster()->getSensorID();
       aLayerID = aVxdID.getLayerNumber();
-      const VXD::SensorInfoBase& aSensorInfo = dynamic_cast<const VXD::SensorInfoBase&>(VXD::GeoCache::get(aVxdID)); /// WARNING geht das? Lösungshilfe: vxd/geometry/GeoCache.h Zeile ~72
+      const VXD::SensorInfoBase& aSensorInfo = dynamic_cast<const VXD::SensorInfoBase&>(VXD::GeoCache::get(aVxdID));
       newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
       newPosition.sigmaX = m_errorContainer.at(aLayerID - 1).first;
+      newPosition.sigmaY = m_errorContainer.at(aLayerID - 1).second;
       FullSecID aSecID = FullSecID(aVxdID, false, 0);
-      VXDTFHit newHit = VXDTFHit(newPosition, 1, NULL, NULL, &aCluster, Const::PXD, aSecID.getFullSecID(), aVxdID, 0);
+      VXDTFHit newHit = VXDTFHit(newPosition, 1, NULL, NULL, &aClusterInfo, Const::PXD, aSecID.getFullSecID(), aVxdID, 0);
       vxdHits.push_back(newHit);
-      //      currentPass->push_back(newHit);
-    } else if ((m_usePXDorSVDorVXDhits != 0) && (isPXD == false)) {
-      const SVDCluster* const aClusterPtr = aSvdClusterArray[realClusterIndex];
-      findSensor4Cluster(activatedSensors, aClusterPtr, realClusterIndex);
-      //
-      // //       VXDTFHit(PositionInfo hitPos, int passIndex, ClusterInfo* clusterIndexU, ClusterInfo* clusterIndexV, ClusterInfo* clusterIndexUV, int detectorType, unsigned int papaSector, VxdID aVxdID, float timeStamp):
-      //       VXDTFHit newHit = VXDTFHit(newPosition, 1, NULL, NULL, &aCluster, Const::PXD, aSecID.getFullSecID(), aVxdID, 0);
-      //
-      //         currentPass->push_back(newHit);
+
+    } else if ((m_usePXDorSVDorVXDhits != 0) && (isPXD == false)) { // svd-hits are tricky, therefore several steps needed
+      findSensor4Cluster(activatedSensors, aClusterInfo);                 /// findSensor4Cluster
     }
   }
 
   // now we have to iterate through the sensors of SVD-cluster again to be able to define our Hits:
-  find2DSVDHits(activatedSensors, clusterHitList);
+  BrokenSensorsOfEvent brokenSensors = find2DSVDHits(activatedSensors, clusterHitList);   /// findSVD2DHits
+  int nBrokenSensors = brokenSensors.size();
 
   BOOST_FOREACH(ClusterHit & aClusterCombi, clusterHitList) {
-    const SVDCluster* const uClusterPtr = aClusterCombi.uCluster; // uCluster
-    const SVDCluster* const vClusterPtr = aClusterCombi.vCluster; // vCluster
-    int clusterIndexU = aClusterCombi.uClusterIndex;
-    int clusterIndexV = aClusterCombi.vClusterIndex;
-
-    float timeStampU = uClusterPtr->getClsTime();
-    float timeStampV = vClusterPtr->getClsTime();
-
-    aVxdID = uClusterPtr->getSensorID();
-    aLayerID = aVxdID.getLayerNumber();
-    const VXD::SensorInfoBase& aSensorInfo = dynamic_cast<const VXD::SensorInfoBase&>(VXD::GeoCache::get(aVxdID));
-    if ((aSensorInfo.getBackwardWidth() > aSensorInfo.getForwardWidth()) == true) {   // isWedgeSensor
-      hitLocal.SetX((aSensorInfo.getWidth(vClusterPtr->getPosition()) / aSensorInfo.getWidth(0)) * uClusterPtr->getPosition());
-    } else { // rectangular Sensor
-      hitLocal.SetX(uClusterPtr->getPosition());
-    }
-    hitLocal.SetY(vClusterPtr->getPosition()); // always correct
-    hitLocal.SetZ(0.);
-
-    newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
-    newPosition.sigmaX = m_errorContainer.at(aLayerID - 1).first;
-
-    FullSecID aSecID = FullSecID(aVxdID, false, 0);
-    VXDTFHit newHit = VXDTFHit(newPosition, 1,  &clusters[clusterIndexU + numOfPxdClusters], &clusters[clusterIndexV + numOfPxdClusters], NULL, Const::SVD, aSecID.getFullSecID(), aVxdID, 0.5 * (timeStampU + timeStampV));
-
+    VXDTFHit newHit = deliverVXDTFHitWrappedSVDHit(aClusterCombi.uCluster, aClusterCombi.vCluster);
     vxdHits.push_back(newHit);
   }
+  nHits = vxdHits.size();
 
-  /// now all hits are stored. To find out the occupancy of layers and ladders, the following step is done:
-  stringstream testOutput;
-  testOutput << " having hits in following secID/secID/Detector/clusterIndexU/V/UV: ";
+  if (nBrokenSensors != 0) {  /// in this case, we should build 1D-clusters
+
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {
+      stringstream badSensors;
+      BOOST_FOREACH(int sensorID, brokenSensors) { badSensors << " " << FullSecID(sensorID).getFullSecString(); }
+      B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: there are " << nBrokenSensors << " sensors with strange cluster-behavior (num of u and v clusters does not mach), sensors are: \n" << badSensors.str())
+    }
+
+    // now we check for each strange sensor whether it makes sense to generate 1D-VXDTFHits or not. we therefore filter by threshold to keep us from stumbling over messy sensors
+    singleSidedHits = dealWithStrangeSensors(activatedSensors, brokenSensors);
+
+    vxdHits.insert(vxdHits.end(), singleSidedHits.begin(), singleSidedHits.end());
+    /// missing: could use the timeStamp to improve that situation -> if timestamp of both sides fit -> allowed to form a 2D-hit, else only 1D-option, for those who were allowed to form partners, they are also creating a 1D-hit (total number of possible combinations is reduced by forbidding to combine timing-incompatible hits ). This feature shall only be used, when there is a strange sensor (therefore can be combined with the find2DSVDHits-function as a possibility if strange sensor occurs) -> can not detect cases, where no u-cluster fits to a v-cluster (e.g. if they come from two track where each produced only one cluster)
+  } else { B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: there are no broken sensors with strange cluster-behavior") }
+  vector<int> hitsPerLayer(6, 0);
+  aLayerID = 0;
+  /** tuple version does not work!!!
+  typedef boost::tuple<double, double, VXDTFHit*> HitExtraTuple; // tuple: get<0>: distance to origin, get<1>: distance to seedHit, get<2> pointer to hit. SeedHit is outermost hit and will be used for cosmic search
+  typedef list< HitExtraTuple > HitExtraTupleContainer;
+  HitExtraTupleContainer listOfHitExtras;
+  */
+  typedef pair< double, VXDTFHit*> HitExtra; // we use the first variable twice using different meanings. this is pretty messy, but I can not get the tuple-version to work...
+  list<HitExtra> listOfHitExtras;
+
+
+  int maxCounts = 0; // carries the highest number of hits per layer that occured
   BOOST_FOREACH(VXDTFHit & hit, vxdHits) {
-    testOutput << hit.getSectorString() << "/" << hit.getSectorName() << "/" << hit.getDetectorType() << "/" << hit.getClusterIndexU() << "/" << hit.getClusterIndexV() << "/" << hit.getClusterIndexUV() << " ";
+    aLayerID = hit.getVxdID().getLayerNumber();
+    hitsPerLayer.at(aLayerID - 1) += 1;
+    if (hitsPerLayer[aLayerID - 1] > maxCounts) { maxCounts = hitsPerLayer[aLayerID - 1]; }
+    listOfHitExtras.push_back(make_pair((*hit.getHitCoordinates() - passInfo->origin).Mag(),  &hit));    // first is distance of hit to chosen origin
+//    listOfHitExtras.push_back( boost::make_tuple( (*hit.getHitCoordinates() - passInfo->origin).Mag(), 0.,  &hit) ); // distance to seedHit can not be calculated yet, since we don't know the seed yet
   }
-  B2WARNING(m_PARAMnameOfInstance << " - event " << m_eventCounter << ": " << testOutput.str())
-  return true; // is true if reconstruction was successfull
-} // aSvdClusterArray, aPxdClusterArray, m_tcVector, m_trackletFilterBox, m_threeHitFilterBox
+  listOfHitExtras.sort(); // std-sorting starts with first entry, therefore it sorts by distance to origin
+  listOfHitExtras.reverse(); // now hits with highest distance to origin are the outermost
 
+  if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {
+    stringstream ssHitsPerLayer;
+    for (int i = 0; i < 6; ++i) { ssHitsPerLayer << "at layer " << i + 1 << ": " << hitsPerLayer.at(i) << endl; }
+    B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: before creating TC: nHits (normal/strange) " << nHits << "/" << singleSidedHits.size() << ", Hits per Layer:\n" << ssHitsPerLayer.str())
+  }
+
+  VXDTFTrackCandidate* newTC = new VXDTFTrackCandidate();
+
+  // easiest case: no more than 1 Hit per Layer:
+  if (maxCounts == 1) {
+    /** tuple version does not work!!!
+    BOOST_FOREACH(HitExtraTuple& bundle, listOfHitExtras ) {
+      newTC.addHits(get<2>(bundle));
+    } */
+    BOOST_FOREACH(HitExtra & bundle, listOfHitExtras) {
+      newTC->addHits(bundle.second);
+    }
+    // WARNING TODO: here some testing of newTC
+  } else { // case of more than one hit per layer (e.g. bhabha scattering, cosmic particle, background (last point not surpressed!))
+    TVector3 seedPosition = *(*listOfHitExtras.begin()).second->getHitCoordinates();
+
+    /** tuple version does not work!!!
+     * TVector3 seedPosition = *get<2>(*listOfHitExtras.begin())->getHitCoordinates();
+    BOOST_FOREACH(HitExtraTuple& bundle, listOfHitExtras ) { // prepare for sorting by distance to seed:
+      get<1>(bundle) = (*get<2>(bundle)->getHitCoordinates() - seedPosition).Mag();
+    }
+    //    listOfHitExtras.sort(sortHitExtraTupleAtPosition1);
+
+    //    boost::bind( static_cast< double >( &HitExtraTuple::get<1> ), _1 );
+    listOfHitExtras.sort(boost::bind(&HitExtraTuple::get<1>(), _1) > boost::bind(&HitExtraTuple::get<1>(), _2));
+
+    BOOST_FOREACH(HitExtraTuple& bundle, listOfHitExtras ) { // prepare for sorting by distance to seed:
+      if ( aVxdID == bundle.get<2>()->getVxdID()) { continue; }
+      // do some stuff here
+      aVxdID = bundle.get<2>()->getVxdID();
+    } */
+
+    aVxdID = 0;
+    BOOST_FOREACH(HitExtra & bundle, listOfHitExtras) { // prepare for sorting by distance to seed:
+      bundle.first = (*bundle.second->getHitCoordinates() - seedPosition).Mag();
+    }
+    listOfHitExtras.sort(); // now first entry is seed, following entries are hits with growing distance
+
+    BOOST_FOREACH(HitExtra & bundle, listOfHitExtras) { // collect hits for TC
+      if (aVxdID == bundle.second->getVxdID()) { continue; }
+      newTC->addHits(bundle.second);
+      aVxdID = bundle.second->getVxdID();
+    }
+  }
+
+  // now we have got exactly 1 TC, we do some filtering now:
+  const vector<VXDTFHit*>& hitsOfTC = newTC->getHits();
+  nHits = hitsOfTC.size();
+  vector<PositionInfo*> currentHitPositions;
+  currentHitPositions.reserve(nHits);
+
+
+  if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {
+    stringstream secNameOutput;
+    secNameOutput << endl << " tc " << 0 << " got " << nHits << " hits and the following secIDs: ";
+    BOOST_FOREACH(VXDTFHit * currentHit, hitsOfTC) {
+      currentHitPositions.push_back(currentHit->getPositionInfo());
+      string aSecName = FullSecID(currentHit->getSectorName()).getFullSecString();
+      secNameOutput << aSecName << " ";
+    } // used for output
+    B2DEBUG(1, " " << secNameOutput.str() << " and " <<  nHits << " hits");
+  } else {
+    BOOST_FOREACH(VXDTFHit * currentHit, hitsOfTC) {
+      currentHitPositions.push_back(currentHit->getPositionInfo());
+    }
+  }
+
+  if (nHits < 3) {
+    delete newTC;
+    if (nBrokenSensors != 0) { m_TESTERrejectedBrokenHitsTrack++; }
+    B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: tc rejected, size too small: " << nHits);
+    return false;
+  }
+
+  // feeding trackletFilterbox with hits:
+  passInfo->trackletFilterBox.resetValues(&currentHitPositions);
+  bool isZiggZagging;
+
+  isZiggZagging = passInfo->trackletFilterBox.ziggZaggXY();
+  if (isZiggZagging == true) {
+    B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: tc rejected by ziggZaggXY! ");
+    m_TESTERtriggeredZigZagXY++;
+    newTC->setCondition(false);
+    delete newTC;
+    if (nBrokenSensors != 0) { m_TESTERrejectedBrokenHitsTrack++; }
+    return false;
+  }
+  B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: ziggZaggXY approved TC");
+
+
+  bool survivedCF = doTheCircleFit(passInfo, newTC, nHits, 0, 0);
+  if (survivedCF == false) {
+    delete newTC;
+    m_TESTERtriggeredCircleFit++;
+    if (nBrokenSensors != 0) { m_TESTERrejectedBrokenHitsTrack++; }
+    B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: rejected by circleFit");
+    return false;
+  }
+
+  double pT = passInfo->trackletFilterBox.calcPt();
+  if (pT < 0.01) {   // smaller than 10 MeV, WARNING: hardcoded!
+    delete newTC;
+    if (nBrokenSensors != 0) { m_TESTERrejectedBrokenHitsTrack++; }
+    B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: rejected by pT (too small: " << pT << "GeV/c)");
+    return false;
+  }
+
+  passInfo->tcVector.push_back(newTC);
+  if (nBrokenSensors != 0) { m_TESTERacceptedBrokenHitsTrack++; }
+
+  B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: tc approved!");
+  return true; // is true if reconstruction was successfull
+} // m_tcVector, m_trackletFilterBox, m_threeHitFilterBox
+
+
+bool VXDTFModule::sortHitExtraTupleAtPosition1(const HitExtraTuple& t1, const HitExtraTuple& t2) { return get<1>(t1) < get<1>(t2); }
 
 
 // store each cluster (as a clusterPtr) in a map(uniID, sensorStruct), where sensorStruct contains 2 vectors (uClusters and vClusters).
 // in the end a map containing illuminated sensors - and each cluster inhabiting them - exists.
-void VXDTFModule::findSensors4Clusters(std::map<int, SensorStruct>& activatedSensors, const StoreArray<SVDCluster>& aSvdClusterArray)
+void VXDTFModule::findSensors4Clusters(ActiveSensorsOfEvent& activatedSensors, vector<ClusterInfo>& clusters)
 {
-  map<int, SensorStruct>::iterator sensorIter;
-  typedef pair<int, SensorStruct > mapEntry;
-  for (int iPart = 0; iPart < aSvdClusterArray.getEntries(); ++iPart) {
-    const SVDCluster* aClusterPtr = aSvdClusterArray[iPart];
-    findSensor4Cluster(activatedSensors, aClusterPtr, iPart);
+  BOOST_FOREACH(ClusterInfo & cluster, clusters) {
+    if (cluster.isPXD() == true) { continue; }
+    findSensor4Cluster(activatedSensors, cluster);
   }
   B2DEBUG(20, activatedSensors.size() << " SVD sensors activated...")
 }
 
 
 // store a cluster (as a clusterPtr) in a map(uniID, sensorStruct), where sensorStruct contains 2 vectors (uClusters and vClusters).
-void VXDTFModule::findSensor4Cluster(std::map<int, SensorStruct>& activatedSensors, const SVDCluster* aClusterPtr, int partNr)
+void VXDTFModule::findSensor4Cluster(ActiveSensorsOfEvent& activatedSensors, ClusterInfo& aClusterInfo)
 {
-  map<int, SensorStruct>::iterator sensorIter;
+  ActiveSensorsOfEvent::iterator sensorIter;
   typedef pair<int, SensorStruct > mapEntry;
 
-  VxdID aVxdID = aClusterPtr->getSensorID();
+  VxdID aVxdID = aClusterInfo.getSVDCluster()->getSensorID();
   int aUniID = aVxdID.getID();
   sensorIter = activatedSensors.find(aUniID);
   if (sensorIter == activatedSensors.end()) {
@@ -3990,42 +4002,131 @@ void VXDTFModule::findSensor4Cluster(std::map<int, SensorStruct>& activatedSenso
     newSensor.layerID = aVxdID.getLayerNumber();
     sensorIter = activatedSensors.insert(sensorIter, mapEntry(aUniID, newSensor)); //activatedSensors.find(aUniID);
   }
-  if (aClusterPtr->isUCluster() == true) {
-    sensorIter->second.uClusters.push_back(make_pair(partNr, aClusterPtr));
+  if (aClusterInfo.getSVDCluster()->isUCluster() == true) {
+    sensorIter->second.uClusters.push_back(&aClusterInfo);
   } else {
-    sensorIter->second.vClusters.push_back(make_pair(partNr, aClusterPtr));
+    sensorIter->second.vClusters.push_back(&aClusterInfo);
   }
 }
 
 
-// iterate through map of activated sensors & combine each possible combination of clusters. Store them in a vector of structs, where each struct carries an u & a v cluster
-void VXDTFModule::find2DSVDHits(std::map<int, SensorStruct>& activatedSensors, std::vector<ClusterHit>& clusterHitList)
+
+VXDTFHit VXDTFModule::deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInfo, ClusterInfo* vClusterInfo)
 {
-  typedef pair<int, SensorStruct > mapEntry;
-  int occupancy = m_TESTERSVDOccupancy.size(), numHits = 0;
-  BOOST_FOREACH(mapEntry aSensor, activatedSensors) {
-    int numUclusters = aSensor.second.uClusters.size();
-    int numVclusters = aSensor.second.vClusters.size();
-    B2DEBUG(100, " sensor " << FullSecID(aSensor.first).getFullSecString() << " has got " << numUclusters << " uClusters and " << numVclusters << " vClusters")
-    if (numUclusters == 0 || numVclusters == 0) {
-      m_TESTERbadSectorRangeCounterForClusters++;
-      B2DEBUG(1, "at event: " << m_eventCounter << " sensor " << FullSecID(aSensor.first).getFullSecString() << " at layer " << aSensor.second.layerID << " has got " << numUclusters << "/" << numVclusters << " u/vclusters!")
+  float timeStampU = 0, timeStampV = 0;
+  TVector3 hitLocal;
+  PositionInfo newPosition;
+  VxdID aVxdID;
+
+  if (uClusterInfo != NULL) {
+    timeStampU = uClusterInfo->getSVDCluster()->getClsTime();
+    aVxdID = uClusterInfo->getSVDCluster()->getSensorID();
+  }
+  if (vClusterInfo != NULL) {
+    timeStampV = vClusterInfo->getSVDCluster()->getClsTime();
+    aVxdID = vClusterInfo->getSVDCluster()->getSensorID(); // could overwrite the value assigned by uCluster, but it's not important, since they are on the same sensor
+  }
+
+  int aLayerID = aVxdID.getLayerNumber();
+
+  const VXD::SensorInfoBase& aSensorInfo = dynamic_cast<const VXD::SensorInfoBase&>(VXD::GeoCache::get(aVxdID));
+
+  if (uClusterInfo != NULL) {
+    if ((aSensorInfo.getBackwardWidth() > aSensorInfo.getForwardWidth()) == true) {   // isWedgeSensor
+      hitLocal.SetX((aSensorInfo.getWidth(vClusterInfo->getSVDCluster()->getPosition()) / aSensorInfo.getWidth(0)) * uClusterInfo->getSVDCluster()->getPosition());
+    } else { // rectangular Sensor
+      hitLocal.SetX(uClusterInfo->getSVDCluster()->getPosition());
     }
-    if (numUclusters != numVclusters) {
-      m_TESTERclustersPersSectorNotMatching++;
-      if (m_PARAMDebugMode == true) {
-        B2DEBUG(1, "at event: " << m_eventCounter << " at sensor " << FullSecID(aSensor.first).getFullSecString() << " at layer " << aSensor.second.layerID << " number of clusters do not match: Has got " << numUclusters << "/" << numVclusters << " u/vclusters!")
+    newPosition.sigmaX = m_errorContainer.at(aLayerID - 1).first;
+  } else {
+    hitLocal.SetX(0.); // is center of the plane
+    newPosition.sigmaX = sqrt(aSensorInfo.getBackwardWidth() * 0.0833333); // std deviation of uniformly distributed value sqrt((b-a)/12)
+  }
+  /// WARNING we are ignoring the case of a missing cluster at a wedge sensor (at least for the calculation of the error. For the Kalman filter, this should be unimportant since it is working with local coordinates and an axis transformation (where the problem of the dependency of clusters at both side does not occur), this will be a problem for the circleFitter, which is working with global coordinates, where the dependeny is still there!)
+  if (vClusterInfo != NULL) {
+    hitLocal.SetY(vClusterInfo->getSVDCluster()->getPosition()); // always correct
+    newPosition.sigmaY = m_errorContainer.at(aLayerID - 1).second;
+  } else {
+    hitLocal.SetY(0.); // is center of the plane
+    newPosition.sigmaY = sqrt(aSensorInfo.getLength() * 0.0833333); // std deviation of uniformly distributed value
+  }
+
+  newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
+
+  FullSecID aSecID = FullSecID(aVxdID, false, 0);
+  return VXDTFHit(newPosition, 1, uClusterInfo, vClusterInfo, NULL, Const::SVD, aSecID.getFullSecID(), aVxdID, 0.5 * (timeStampU + timeStampV));
+}
+
+
+
+// now we check for each strange sensor whether it makes sense to generate 1D-VXDTFHits or not. we therefore filter by threshold to keep us from stumbling over messy sensors
+std::vector<VXDTFHit> VXDTFModule::dealWithStrangeSensors(ActiveSensorsOfEvent& activatedSensors, BrokenSensorsOfEvent& strangeSensors)
+{
+  ActiveSensorsOfEvent::iterator itCurrentSensor;
+  typedef pair<int, const SVDCluster*> ClusterBundle;
+  vector<VXDTFHit> singleSidedHits;
+  int nClusters = 0, threshold = 2;
+  singleSidedHits.reserve(strangeSensors.size()*threshold);
+  bool takeUside = false;
+
+  // check which type (u/v) got more clusters (most crowded side) -> nClusters
+  // if nClusters < threshold
+  // -> generate foreach cluster of most crowded side a 1D-VXDTF-Hit, take the center of the sensorplane for the missing side and huge error for it (needed for kalman/circleFit)
+  BOOST_FOREACH(int sensorID, strangeSensors) {
+    itCurrentSensor = activatedSensors.find(sensorID);
+    if (itCurrentSensor == activatedSensors.end()) { continue; } // well, should not occur, but safety first ;)
+
+    int numUclusters = itCurrentSensor->second.uClusters.size();
+    int numVclusters = itCurrentSensor->second.vClusters.size();
+    if (numUclusters > numVclusters) { nClusters = numUclusters; takeUside = true; } else { nClusters = numVclusters; takeUside = false; }
+    if (nClusters > threshold) { m_TESTERovercrowdedStrangeSensors++; continue; }
+
+    if (takeUside == true) {
+      BOOST_FOREACH(ClusterInfo * aClusterInfo, itCurrentSensor->second.uClusters) {
+        singleSidedHits.push_back(deliverVXDTFHitWrappedSVDHit(aClusterInfo, NULL));
+      }
+    } else {
+      BOOST_FOREACH(ClusterInfo * aClusterInfo, itCurrentSensor->second.vClusters) {
+        singleSidedHits.push_back(deliverVXDTFHitWrappedSVDHit(NULL, aClusterInfo));
       }
     }
 
+  }
+  return singleSidedHits;
+}
+
+
+
+// iterate through map of activated sensors & combine each possible combination of clusters. Store them in a vector of structs, where each struct carries an u & a v cluster
+VXDTFModule::BrokenSensorsOfEvent VXDTFModule::find2DSVDHits(ActiveSensorsOfEvent& activatedSensors, std::vector<ClusterHit>& clusterHitList)
+{
+  typedef pair<int, SensorStruct > mapEntry;
+  BrokenSensorsOfEvent strangeSensors;
+  int occupancy = m_TESTERSVDOccupancy.size(), numHits = 0;
+  bool isStrange = false;
+  BOOST_FOREACH(const mapEntry & aSensor, activatedSensors) {
+    int numUclusters = aSensor.second.uClusters.size();
+    int numVclusters = aSensor.second.vClusters.size();
+    B2DEBUG(100, " sensor " << FullSecID(VxdID(aSensor.first), false, 0).getFullSecString() << " has got " << numUclusters << " uClusters and " << numVclusters << " vClusters")
+    if (numUclusters == 0 || numVclusters == 0) {
+      m_TESTERbadSectorRangeCounterForClusters++;
+      B2DEBUG(1, "at event: " << m_eventCounter << " sensor " << FullSecID(VxdID(aSensor.first), false, 0).getFullSecString() << " at layer " << aSensor.second.layerID << " has got " << numUclusters << "/" << numVclusters << " u/vclusters!")
+      isStrange = true;
+    }
+    if (numUclusters != numVclusters) {
+      m_TESTERclustersPersSectorNotMatching++;
+      B2DEBUG(1, "at event: " << m_eventCounter << " at sensor " << FullSecID(VxdID(aSensor.first), false, 0).getFullSecString() << " at layer " << aSensor.second.layerID << " number of clusters do not match: Has got " << numUclusters << "/" << numVclusters << " u/vclusters!")
+      isStrange = true;
+    }
+    if (isStrange == true) { strangeSensors.push_back(aSensor.first); isStrange = false; }
+    /// possible extension: adding here the case for strange sensors (instead of returning them), code down below would be used only for normal ones, see
+
     for (int uClNum = 0; uClNum < numUclusters; ++uClNum) {
       for (int vClNum = 0; vClNum < numVclusters; ++vClNum) {
-        ClusterHit aHit;
-        aHit.uCluster = aSensor.second.uClusters[uClNum].second;
-        aHit.uClusterIndex = aSensor.second.uClusters[uClNum].first; // real index number for storearray of svdCluster
-        aHit.vCluster = aSensor.second.vClusters[vClNum].second;
-        aHit.vClusterIndex = aSensor.second.vClusters[vClNum].first;
-        clusterHitList.push_back(aHit);
+        ClusterHit aClusterCombi;
+        aClusterCombi.uCluster = aSensor.second.uClusters[uClNum];
+        aClusterCombi.vCluster = aSensor.second.vClusters[vClNum];
+        clusterHitList.push_back(aClusterCombi);
         ++numHits;
       }
     }
@@ -4044,25 +4145,60 @@ void VXDTFModule::find2DSVDHits(std::map<int, SensorStruct>& activatedSensors, s
 
     numHits = 0;
   }
+
+  if (strangeSensors.size() != 0) {
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {
+      stringstream output;
+      output << m_PARAMnameOfInstance << " - event: " << m_eventCounter << ": there were strange sensors (having missing clusters) during this event, activated Sensors were:\n";
+      BOOST_FOREACH(const mapEntry & aSensor, activatedSensors) { output << " " << FullSecID(VxdID(aSensor.first), false, 0).getFullSecString(); }
+      output << "\n strange sensors were:\n";
+      BOOST_FOREACH(int sensorID, strangeSensors) { output << " " << FullSecID(VxdID(sensorID), false, 0).getFullSecString(); }
+      B2DEBUG(1, "\n\n" << output.str() << "\n\n")
+    }
+  }
+
+  return strangeSensors;
 }
 
-//       /** adds a pointer to a track candidate using this cluster */
-//       void addTrackCandidate(VXDTFTrackCandidate* aTC);
+
+// VXDTFModule::BoostDirectedGraph VXDTFModule::createDirectedGraph(std::vector<VXDTFHit>& hits) { // case where origin is center
+//  BoostDirectedGraph aGraph;
+//  return aGraph;
+// }
 //
-//       /** returns the index of the Real cluster this intermediate class is attached to */
-//       int getRealIndex() { return m_clusterIndex; }
-//
-//       /** returns the index number of this intermediate class in the container which stores all the ClusterInfos */
-//       int getOwnIndex() { return m_ownPositionInIndex; }
-//
-//       /** returns boolean wwhich says whether this intermediate class is attached to a PXD- or SVDCluster */
-//       bool isPXD() { return m_isPXD; }
-//
-//       /** checks each TC whether it's alive or not. If there is more than one TC alive, it's overbooked and returned boolean is True*/
-//       bool isOverbooked();
-//
-//       /** ClusterInfo shall be set reserved, if a final TC for a pass is using it (a pointer to that TC is inputParameter) */
-//       void setReserved(VXDTFTrackCandidate* newBossTC);
-//
-//       /** is true, if an accepted TC of a pass is using it. This means that no other TC is allowed to use it any more */
-//       bool isReserved() { return m_reserved; }
+// VXDTFModule::BoostUndirectedGraph VXDTFModule::createUndirectedGraph(std::vector<VXDTFHit>& hits) {
+//  BoostUndirectedGraph aGraph;
+//  return aGraph;
+// }
+
+
+bool VXDTFModule::doTheCircleFit(CurrentPassData* thisPass, VXDTFTrackCandidate* aTc, int nHits, int tcCtr, int addDegreesOfFreedom)
+{
+  boostNsec duration;
+  boostClock::time_point timer = boostClock::now();
+  double closestApproachPhi, closestApproachR, estimatedRadius;
+  double chi2 = thisPass->trackletFilterBox.circleFit(closestApproachPhi, closestApproachR, estimatedRadius);
+  aTc->setEstRadius(estimatedRadius);
+  if (chi2 < 0) { chi2 = 0; }
+  double probability = TMath::Prob(chi2, nHits - 3 + addDegreesOfFreedom);
+  // why is there numOfHits - 3 + addDegreesOfFreedom? Answer: each hit is one additional degree of freedom (since only the measurement of the u-coordinate of the sensors can be used) but 3 parameters are measured, therefore 3 has to be substracted from the number of hits to get the ndf. The additional degree of freedom (+1) is there, since the origin is used as another hit for the circlefitter but has two degrees of freedom instead of one for the normal hits. therefore +1 has to be added again.
+  B2DEBUG(100, "TCC Filter at tc " << tcCtr << ": estimated closestApproachPhi, closestApproachR, estimatedRadius: " << closestApproachPhi << ", " << closestApproachR << ", " << estimatedRadius << " got fitted with chi2 of " << chi2 << " and probability of " << probability << " with ndf: " << nHits - 3 + addDegreesOfFreedom)
+  if (probability < thisPass->circleFit.second) {  // means tc is bad
+    B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by circleFit! ");
+    m_TESTERtriggeredCircleFit++; tcCtr++;
+    aTc->setCondition(false);
+    writeToRootFile(probability, chi2, nHits - 3 + addDegreesOfFreedom);
+    return false;
+  }
+  if (m_calcQiType == 2) {
+    writeToRootFile(probability, chi2, nHits - 3 + addDegreesOfFreedom);
+    if (m_PARAMqiSmear == true) { probability = m_littleHelperBox.smearNormalizedGauss(probability); }
+    aTc->setTrackQuality(probability);
+    aTc->setFitSucceeded(true);
+  }
+  boostClock::time_point timer2 = boostClock::now();
+  duration = boost::chrono::duration_cast<boostNsec>(timer2 - timer);
+
+  B2DEBUG(20, " TCC filter circleFit approved TC " << tcCtr << " with numOfHits: " <<  nHits << ", time consumption: " << duration.count() << " ns");
+  return true;
+}

@@ -54,10 +54,14 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
     // Add parameters
-    addParam("PDG", m_pdg, "PDG code", 0);
+    addParam("PDG", m_pdg,
+             "PDG code. If set to zero, particle list assumed to exist", 0);
     addParam("ListName", m_listName, "name of particle list", string(""));
     vector<string> defaultSelection;
     addParam("Select", m_selection, "selection criteria", defaultSelection);
+    addParam("persistent", m_persistent,
+             "toggle newly created particle list btw. transient/persistent", false);
+
   }
 
   ParticleSelectorModule::~ParticleSelectorModule()
@@ -77,7 +81,11 @@ namespace Belle2 {
     }
 
     if (m_pdg != 0) {
-      StoreObjPtr<ParticleList>::registerTransient(m_listName);
+      if (m_persistent) {
+        StoreObjPtr<ParticleList>::registerPersistent(m_listName);
+      } else {
+        StoreObjPtr<ParticleList>::registerTransient(m_listName);
+      }
     }
 
     for (unsigned int i = 0; i < m_selection.size(); i++) {

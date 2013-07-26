@@ -59,6 +59,8 @@ namespace Belle2 {
              defaultList);
     addParam("MassCutLow", m_massCutLow, "[GeV] lower mass cut", 0.0);
     addParam("MassCutHigh", m_massCutHigh, "[GeV] upper mass cut", 100.0);
+    addParam("persistent", m_persistent,
+             "toggle output particle list btw. transient/persistent", false);
 
   }
 
@@ -68,7 +70,11 @@ namespace Belle2 {
 
   void ParticleCombinerModule::initialize()
   {
-    StoreObjPtr<ParticleList>::registerTransient(m_listName);
+    if (m_persistent) {
+      StoreObjPtr<ParticleList>::registerPersistent(m_listName);
+    } else {
+      StoreObjPtr<ParticleList>::registerTransient(m_listName);
+    }
   }
 
   void ParticleCombinerModule::beginRun()

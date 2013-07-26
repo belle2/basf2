@@ -111,6 +111,7 @@ namespace Belle2 {
     std::vector<std::string> m_inputListNames; /**< input particle list names */
     double m_massCutLow;      /**< lower mass cut */
     double m_massCutHigh;     /**< upper mass cut */
+    bool m_persistent;  /**< toggle output particle list btw. transient/persistent */
 
   };
 

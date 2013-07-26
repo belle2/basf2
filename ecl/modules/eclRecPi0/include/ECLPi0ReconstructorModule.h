@@ -102,9 +102,6 @@ namespace Belle2 {
       /** pi0 mass region (without fitting). */
       float pi0_mass_max;
 
-      /** apply mass constraint fit */
-      int fit_flag;
-
       /** chi2 threshold of fitting result */
       float chi2_max;
 

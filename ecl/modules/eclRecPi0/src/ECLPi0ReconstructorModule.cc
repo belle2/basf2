@@ -66,7 +66,6 @@ void ECLPi0ReconstructorModule::initialize()
 
   pi0_mass_min = 0.08; // Modify: 20040112 KM
   pi0_mass_max = 0.18; // Modify: 20040112 KM
-  fit_flag = 1;
   chi2_max = 15.;
   // Initialize variables
   m_nRun    = 0 ;
@@ -132,31 +131,29 @@ void ECLPi0ReconstructorModule::event()
       CLHEP::Hep3Vector xGamma2(0, 0, 0);
 
       const double mass = lv_rec.mag();
-      if (fit_flag) {
-        CLHEP::HepLorentzVector fittedPi0Momentum;
-        CLHEP::HepSymMatrix pi0ErrMatrix;
-        TMatrixFSym Pi0ErrorTMatrix(4);
+      CLHEP::HepLorentzVector fittedPi0Momentum;
+      CLHEP::HepSymMatrix pi0ErrMatrix;
+      TMatrixFSym Pi0ErrorTMatrix(4);
 
-        MassFitKFit km;
-        km.setMagneticField(1.5);
-        km.addTrack(lv_gamma1, xGamma1, errorGamma1, 0);
-        km.addTrack(lv_gamma2, xGamma2, errorGamma2, 0);
-        const double MASS_PI0 = 0.1349739;
+      MassFitKFit km;
+      km.setMagneticField(1.5);
+      km.addTrack(lv_gamma1, xGamma1, errorGamma1, 0);
+      km.addTrack(lv_gamma2, xGamma2, errorGamma2, 0);
+      const double MASS_PI0 = 0.1349739;
 
-        km.setInvariantMass(MASS_PI0);
+      km.setInvariantMass(MASS_PI0);
 
-        unsigned err = km.doFit();
-        double confLevel(DBL_MAX);
-        if (!err) {
-          confLevel = km.getCHIsq();
-          fillFitted4Vector(km, fittedPi0Momentum, pi0ErrMatrix);
-          for (int i = 0; i < 4; i++) {
-            for (int j = 0; j <= i ; j++) {
-              Pi0ErrorTMatrix[i][j] = pi0ErrMatrix[i][j];
-            }
+      unsigned err = km.doFit();
+      double confLevel(DBL_MAX);
+      if (!err) {
+        confLevel = km.getCHIsq();
+        fillFitted4Vector(km, fittedPi0Momentum, pi0ErrMatrix);
+        for (int i = 0; i < 4; i++) {
+          for (int j = 0; j <= i ; j++) {
+            Pi0ErrorTMatrix[i][j] = pi0ErrMatrix[i][j];
           }
+        }
 
-        } else {cout << m_nEvent << " km.doFit err " << endl;  }
 
         if (pi0_mass_min < mass && mass < pi0_mass_max) {
 
@@ -180,9 +177,8 @@ void ECLPi0ReconstructorModule::event()
           eclPi0ToGamma.add(m_Pi0Num, iGamma2);
           //cout << "Event " << m_nEvent << " Pi0 from Gamma " << m_showerId1 << " " << m_showerId2 << " " << m_pi0E << " " << m_pi0mass << endl;
 
-        }
-      } else if (pi0_mass_min < mass && mass < pi0_mass_max) {
-      }
+        }//unfitted mass with pi0 mass window
+      } else {cout << m_nEvent << " km.doFit err " << endl;  }
 
     }//iGamma2
   }//iGamma1

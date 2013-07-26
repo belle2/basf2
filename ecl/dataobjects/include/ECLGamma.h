@@ -54,6 +54,14 @@ namespace Belle2 {
      */
     TVector3 getMomentum() const ;
 
+    /*! Get TVector3 Positon assuming gamma comes from IP
+     * @return assuming Positon (0,0,0) of Gamma
+     */
+    TVector3 getPositon() const {
+      TVector3 Positon(0., 0., 0.);
+      return Positon;
+    }
+
     /*! Get px Momentum reading ECLShower through ShowerId
      * @return px Momentum from ECLShower
      */

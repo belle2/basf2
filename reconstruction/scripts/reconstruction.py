@@ -10,25 +10,54 @@ def add_reconstruction(path, components=None):
     """
 
     # tracking
-    if components == None or 'PXD' in components or 'SVD' in components \
-        or 'CDC' in components:
+    if components == None or 'SVD' in components or 'CDC' in components:
 
-        # find MCTracks in CDC, SVD, and PXD
-        mc_trackfinder = register_module('MCTrackFinder')
-        if components == None or 'PXD' in components:
-            mc_trackfinder.param('UsePXDHits', 1)
-        if components == None or 'SVD' in components:
-            mc_trackfinder.param('UseSVDHits', 1)
+        # CDC track finder: trasan
+        cdc_trackcands = None
         if components == None or 'CDC' in components:
-            mc_trackfinder.param('UseCDCHits', 1)
-        path.add_module(mc_trackfinder)
+            cdc_trackcands = 'CDCGFTrackCands'
+            trackcands = cdc_trackcands
+            cdc_trackfinder = register_module('Trasan')
+            cdc_trackfinder.param('GFTrackCandidatesColName', cdc_trackcands)
+            path.add_module(cdc_trackfinder)
+
+        # VXD track finder
+        vxd_trackcands = None
+        if components == None or 'SVD' in components:
+            vxd_trackcands = 'VXDGFTrackCands'
+            trackcands = vxd_trackcands
+            vxd_trackfinder = register_module('VXDTF')
+            vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
+            if components != None and 'PCX' not in components:
+                vxd_trackfinder.param('sectorSetup', ['evtNormSecHIGH_SVD',
+                                      'evtNormSecMED_SVD', 'evtNormSecLOW_SVD'
+                                      ])
+            else:
+                vxd_trackfinder.param('sectorSetup', ['evtNormSecHIGH_VXD',
+                                      'evtNormSecMED_VXD', 'evtNormSecLOW_VXD'
+                                      ])
+            path.add_module(vxd_trackfinder)
+
+        # track merging
+        if cdc_trackcands and vxd_trackcands:
+            trackcands = 'GFTrackCands'
+            track_merger = register_module('MCTrackCandCombiner')
+            track_merger.param('CDCTrackCandidatesColName', cdc_trackcands)
+            track_merger.param('VXDTrackCandidatesColName', vxd_trackcands)
+            track_merger.param('OutputTrackCandidatesColName', trackcands)
+            path.add_module(track_merger)
 
         # track fitting
         trackfitter = register_module('GenFitter')
+        trackfitter.param('GFTrackCandidatesColName', trackcands)
         path.add_module(trackfitter)
 
         # dE/dx PID
         dEdxPID = register_module('DedxPID')
+        if not vxd_trackcands:
+            dEdxPID.param('useSVD', False)
+        if not cdc_trackcands:
+            dEdxPID.param('useCDC', False)
         path.add_module(dEdxPID)
 
         # track extrapolation

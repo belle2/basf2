@@ -124,7 +124,7 @@ namespace Belle2 {
     //Open document
     m_xmlDocument = xmlParseFile(name.c_str());
 
-    xmlXIncludeProcess(m_xmlDocument);
+    xmlXIncludeProcessFlags(m_xmlDocument, XML_PARSE_HUGE);
     //Speeds up XPath computation on static documents.
     xmlXPathOrderDocElems(m_xmlDocument);
 

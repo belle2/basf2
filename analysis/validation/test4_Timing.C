@@ -30,9 +30,9 @@ TString exec(const char* cmd) {
 void test4Timing()
 {
   const char* files[] = {
-    "test1DSTtoMDST.py",
-    "test2MDSTtoUDST.py",
-    "test3UDSTtoNTUP.py"
+    "test1_DSTtoMDST.py",
+    "test2_MDSTtoUDST.py",
+    "test3_UDSTtoNTUP.py"
   };
   TFile* output = TFile::Open("Timing.root", "recreate");
   output->cd();

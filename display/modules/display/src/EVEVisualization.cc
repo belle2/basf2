@@ -858,6 +858,7 @@ void EVEVisualization::makeTracks()
     m_calo3d->SetForwardEndCapPos(196.5); //inner edge of forward endcap
     m_calo3d->SetBackwardEndCapPos(-102.0); //inner edge of backward endcap
     m_calo3d->SetMaxValAbs(2.1);
+    m_calo3d->SetRnrFrame(false, false); //don't show crystal grid
     gEve->AddElement(m_calo3d);
   }
 }
@@ -891,9 +892,15 @@ void EVEVisualization::clearEvent()
 void EVEVisualization::addVertex(const GFRaveVertex* vertex, const TString& name)
 {
   TVector3 v = vertex->getPos();
-  TEvePointSet* Vertices = new TEvePointSet(name);
-  Vertices->SetMainColor(kYellow);
-  Vertices->SetNextPoint(v.x(), v.y(), v.z());
+  TEvePointSet* vertexPoint = new TEvePointSet(name);
+  //sadly, setting a title for a TEveGeoShape doesn't result in a popup...
+  vertexPoint->SetTitle(TString::Format("%s\n"
+                                        "V=(%.3f, %.3f, %.3f)\n"
+                                        "pVal=%e",
+                                        name.Data(), v.x(), v.y(), v.z(),
+                                        TMath::Prob(vertex->getChi2(), vertex->getNdf())));
+  vertexPoint->SetMainColor(kYellow);
+  vertexPoint->SetNextPoint(v.x(), v.y(), v.z());
 
   TMatrixDEigen eigen_values(vertex->getCov());
   TEveGeoShape* det_shape = new TEveGeoShape(name + " Error");
@@ -928,8 +935,8 @@ void EVEVisualization::addVertex(const GFRaveVertex* vertex, const TString& name
   det_shape->SetMainColor(kYellow);   //The color of the error ellipsoid.
   det_shape->SetMainTransparency(0);
 
-  Vertices->AddElement(det_shape);
-  gEve->AddElement(Vertices);
+  vertexPoint->AddElement(det_shape);
+  gEve->AddElement(vertexPoint);
 }
 
 
@@ -946,12 +953,12 @@ void EVEVisualization::addGamma(const ECLGamma* gamma, const TString& name)
   TEveLine* gammaVis = new TEveLine(name);
   gammaVis->SetNextPoint(0, 0, 0); //assuming gamma came from IP
   gammaVis->SetNextPoint(Momentum.x(), Momentum.y(), Momentum.z());
-  gammaVis->SetTitle(TString::Format("ECLGamma %d\n"
+  gammaVis->SetTitle(TString::Format("%s\n"
                                      "Energy=%.3f\n"
-                                     "pX=%.3f, pY=%.3f, pZ=%.3f\n",
-                                     gamma->GetShowerId(), energy, pX, pY, pZ));
+                                     "p=(%.3f, %.3f, %.3f)",
+                                     name.Data(), energy, pX, pY, pZ));
 
-  gammaVis->SetMainColor(kGreen);
+  gammaVis->SetMainColor(kGreen + 2);
   gammaVis->SetLineWidth(2.0);
   m_calo3d->AddElement(gammaVis);
 }

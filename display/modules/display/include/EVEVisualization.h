@@ -107,7 +107,7 @@ namespace Belle2 {
     template <class T> void addSimHits(const StoreArray<T>& hits) {
       const int numHits = hits.getEntries();
       for (int i = 0; i < numHits; i++) {
-        const RelationsObject* rel = static_cast<RelationsObject*>(hits[i]);
+        const RelationsObject* rel = hits[i];
         const MCParticle* mcpart = rel->getRelatedFrom<MCParticle>();
 
         addSimHit(hits[i], mcpart);
@@ -175,7 +175,7 @@ namespace Belle2 {
      *      option.\n\n
      * 'H': Draw hits. This causes the hits to be visualized. Normally, the size of the hit
      *      representation is connected to the covariance matrix of the hit, scaled by the value
-     *      set in setErrScale which is normally 1. See also option 'A' and 'S'. Normally used in
+     *      set in setErrScale which is normally 1. See also option 'S'. Normally used in
      *      connection with 'D'.\n\n
      * 'M': Draw track markers. Draw the intersection points between the track and the virtual
      *      (and/or real) detector planes. Can only be used in connection with 'T'.\n\n

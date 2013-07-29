@@ -31,10 +31,10 @@ void test2_Validation_B2Dpi(){
 
  TFile * output = TFile::Open("Bu_D0pi,Kpi_Breco.root", "recreate");
  
-  TH1F * h_mbc              = new TH1F("mbc","mbc;m_{bc} GeV;mbc",50,5.24,5.29);
-  TH1F * h_mbctruthmatch    = new TH1F("mbctruthmatch","mbc;m_{bc} truthmatch;Events",50,5.24,5.29);
-  TH1F * h_deltae           = new TH1F("deltae","deltae;#Delta E GeV;Events",50,-0.2,0.2);
-  TH1F * h_deltaetruthmatch = new TH1F("deltaetruthmatch","deltaetruthmatch;#Delta E GeV;Events",50,-0.2,0.2);
+  TH1F * h_mbc              = new TH1F("mbc","B2Dpi;m_{bc} [GeV];Events",25,5.24,5.29);
+  TH1F * h_mbctruthmatch    = new TH1F("mbctruthmatch","B2Dpi;m_{bc} [GeV] (truthmatch);Events",25,5.24,5.29);
+  TH1F * h_deltae           = new TH1F("deltae","B2Dpi;#Delta E [GeV];Events",20,-0.2,0.2);
+  TH1F * h_deltaetruthmatch = new TH1F("deltaetruthmatch","B2Dpi;#Delta E [GeV] (truth matched);Events",20,-0.2,0.2);
 
   TH1F * h_md0              = new TH1F("md0","md0;m_{D^{0}} GeV;Events",30,1.84,1.9);
 
@@ -187,15 +187,15 @@ void test2_Validation_B2Kstgamma(){
   recoTree->AddFile("../Bd_Kstgamma.ntup.root");
   TFile * output = TFile::Open("Bd_Kstgamma_Breco.root", "recreate");
  
-  TH1F * h_mbc           = new TH1F("mbc","mbc;m_{bc} GeV;mbc",50,5.24,5.29);
-  TH1F * h_mbctruthmatch = new TH1F("mbctruthmatch","mbc;m_{bc} GeV truthmatch;Events",50,5.24,5.29);
-  TH1F * h_deltae           = new TH1F("deltae","deltae;#Delta E GeV;Events",50,-0.2,0.2);
-  TH1F * h_deltaetruthmatch = new TH1F("deltaetruthamatch","deltae;#Delta E GeV truthmatch;Events",50,-0.2,0.2);
+  TH1F * h_mbc           = new TH1F("mbc","B2Kstgamma;m_{bc} [GeV];Events",25,5.24,5.29);
+  TH1F * h_mbctruthmatch = new TH1F("mbctruthmatch","B2Kstgamma;m_{bc} [GeV] (truth matched);Events",25,5.24,5.29);
+  TH1F * h_deltae           = new TH1F("deltae","B2Kstgamma;#Delta E [GeV];Events",20,-0.2,0.2);
+  TH1F * h_deltaetruthmatch = new TH1F("deltaetruthamatch","B2Kstgamma;#Delta E [GeV] (truth matched);Events",20,-0.2,0.2);
 
-  TH1F * h_egamma         = new TH1F("egamma","egamma;E_{#gamma} GeV;Events",50,0.,3.5);
-  TH1F * h_egammatruthmatch         = new TH1F("egammatruthmatch","egamma;E_{#gamma} GeV truthmatch;Events",50,0.,3.5);
-  TH1F * h_mkst           = new TH1F("mkst","mkst;m_{K*} GeV;Events",50,0.6,1.5);
-  TH1F * h_mksttruthmatch           = new TH1F("mksttruthmatch","mkst;m_{K*} GeV truthmatch;Events",50,0.6,1.5);
+  TH1F * h_egamma         = new TH1F("egamma","B2Kstgamma;E_{#gamma} [GeV];Events",17,0.,3.4);
+  TH1F * h_egammatruthmatch         = new TH1F("egammatruthmatch","B2Kstgamma;E_{#gamma} [GeV] (truth matched);Events",17,0.,3.4);
+  TH1F * h_mkst           = new TH1F("mkst","B2Kstgamma;m_{K^{*0}} [GeV];Events",25,0.5,1.5);
+  TH1F * h_mksttruthmatch           = new TH1F("mksttruthmatch","B2Kstgamma;m_{K^{*0}} [GeV] (truth matched);Events",25,0.5,1.5);
 
   enum hypo {pion=0, kaon=1, electron=2, muon=3, proton=4, bplus=5, d0=6, photon=7, bzero=8, kstar=9};
   const int pid[] = {211,321,11,13,2212,521,421,22,511,313};
@@ -332,15 +332,15 @@ void test2_Validation_B2JpsiKS(){
   recoTree->AddFile("../Bd_JpsiKS,mumu.ntup.root");
    TFile * output = TFile::Open("Bd_JpsiKS,mumu_Breco.root", "recreate");
  
-  TH1F * h_mbc              = new TH1F("mbc","mbc;m_{bc} GeV;mbc",50,5.24,5.29);
-  TH1F * h_mbctruthmatch    = new TH1F("mbctruthmatch","mbc;m_{bc} GeV truthmatch;Events",50,5.24,5.29);
-  TH1F * h_deltae           = new TH1F("deltae","deltae;#Delta E GeV;Events",50,-0.2,0.2);
-  TH1F * h_deltaetruthmatch = new TH1F("deltaetruthamatch","deltae;#Delta E GeV truthmatch;Events",50,-0.2,0.2);
+  TH1F * h_mbc              = new TH1F("mbc","B2JpsiKS;m_{bc} [GeV];Events"                       ,25,5.24,5.29);
+  TH1F * h_mbctruthmatch    = new TH1F("mbctruthmatch","B2JpsiKS;m_{bc} [GeV] (truthmatch);Events",25,5.24,5.29);
+  TH1F * h_deltae           = new TH1F("deltae","B2JpsiKS;#Delta E [GeV];Events"                          ,20,-0.2,0.2);
+  TH1F * h_deltaetruthmatch = new TH1F("deltaetruthmatch","B2JpsiKS;#Delta E [GeV] (truth matched);Events",20,-0.2,0.2);
 
-  TH1F * h_mjpsi            = new TH1F("mjpsi","mjpsi;m_{J/#psi} GeV;Events",50,3.,3.2);
-  TH1F * h_mjpsitruthmatch  = new TH1F("mjpsitruthmatch","mjpsi;m_{J/#psi} GeV truthmatch;Events",50,3.,3.2);
-  TH1F * h_mks              = new TH1F("mks","mks;m_{KS} GeV;Events",50,0.4,0.6);
-  TH1F * h_mkstruthmatch    = new TH1F("mkstruthmatch","mks;m_{KS} GeV truthmatch;Events",50,0.4,0.6);
+  TH1F * h_mjpsi            = new TH1F("mjpsi","B2JpsiKS;m_{J/#psi} [GeV];Events",20,3.,3.2);
+  TH1F * h_mjpsitruthmatch  = new TH1F("mjpsitruthmatch","B2JpsiKS;m_{J/#psi} [GeV] (truth matched);Events",20,3.,3.2);
+  TH1F * h_mks              = new TH1F("mks","B2JpsiKS;m_{KS} [GeV];Events",20,0.4,0.6);
+  TH1F * h_mkstruthmatch    = new TH1F("mkstruthmatch","B2JpsiKS;m_{KS} [GeV] (truth matched);Events",20,0.4,0.6);
 
   enum hypo {pion=0, kaon=1, electron=2, muon=3, proton=4, bplus=5, d0=6, photon=7, bzero=8, kstar=9, ks=10, jpsi=11};
   const int pid[] = {211,321,11,13,2212,521,421,22,511,313,310,443};

@@ -57,14 +57,87 @@ ntuple1.param('strTools', [
     '^pi+',
     'Kinematics',
     '^pi+',
+    'Track',
+    '^pi+',
     'MCTruth',
     '^pi+',
     'MCKinematics',
+    '^pi+',
+    'MCReconstructible',
     '^pi+',
     'PID',
     '^pi+',
     ])
 main.add_module(ntuple1)
+
+mcfinder = register_module('MCDecayFinder')
+mcfinder.param('strDecayString', 'pi+')
+mcfinder.param('strListName', 'truthpi+')
+main.add_module(mcfinder)
+
+mcfinder2 = register_module('MCDecayFinder')
+mcfinder2.param('strDecayString', 'gamma')
+mcfinder2.param('strListName', 'truthgamma')
+main.add_module(mcfinder2)
+
+ntuple1truth = register_module('NtupleMaker')
+ntuple1truth.param('strTreeName', 'truthpituple')
+ntuple1truth.param('strListName', 'truthpi+')
+ntuple1truth.param('strTools', [
+    'EventMetaData',
+    '^pi+',
+    'Kinematics',
+    '^pi+',
+    'Track',
+    '^pi+',
+    'MCTruth',
+    '^pi+',
+    'MCKinematics',
+    '^pi+',
+    'MCReconstructible',
+    '^pi+',
+    'PID',
+    '^pi+',
+    ])
+main.add_module(ntuple1truth)
+
+ntuple1b = register_module('NtupleMaker')
+ntuple1b.param('strTreeName', 'gammatuple')
+ntuple1b.param('strListName', 'gamma')
+ntuple1b.param('strTools', [
+    'EventMetaData',
+    '^gamma',
+    'Kinematics',
+    '^gamma',
+    'Track',
+    '^gamma',
+    'MCTruth',
+    '^gamma',
+    'MCKinematics',
+    '^gamma',
+    'PID',
+    '^gamma',
+    ])
+main.add_module(ntuple1b)
+
+ntuple1btruth = register_module('NtupleMaker')
+ntuple1btruth.param('strTreeName', 'truthgammatuple')
+ntuple1btruth.param('strListName', 'truthgamma')
+ntuple1btruth.param('strTools', [
+    'EventMetaData',
+    '^gamma',
+    'Kinematics',
+    '^gamma',
+    'Track',
+    '^gamma',
+    'MCTruth',
+    '^gamma',
+    'MCKinematics',
+    '^gamma',
+    'PID',
+    '^gamma',
+    ])
+main.add_module(ntuple1btruth)
 
 # check pi0 resolution
 ntuple2 = register_module('NtupleMaker')
@@ -74,6 +147,8 @@ ntuple2.param('strTools', [
     'EventMetaData',
     'pi0',
     'MCTruth',
+    'pi0 -> ^gamma ^gamma',
+    'MCKinematics',
     'pi0 -> ^gamma ^gamma',
     'Kinematics',
     '^pi0 -> ^gamma ^gamma',

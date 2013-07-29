@@ -120,8 +120,8 @@ namespace Belle2 {
 
   private:
 
-    static const double tomb = 3.8937966e5 / 1e6;   /**< Conversion factor (hc)^2 */
-    static const double twopi = 2.0 * M_PI;         /**< 2*pi. To keep things short. */
+    static constexpr double tomb = 3.8937966e5 / 1e6;   /**< Conversion factor (hc)^2 */
+    static constexpr double twopi = 2.0 * M_PI;         /**< 2*pi. To keep things short. */
 
     //Variable names directly taken from the FORTRAN code. Sorry.
     double alpha;  /**< variable   */

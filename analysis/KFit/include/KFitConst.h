@@ -42,13 +42,13 @@ namespace Belle2 {
       static const int    kMaxIterationCount = 15;
 
       /** Initial chi-square value (internal use) */
-      static const double kInitialCHIsq = 1.0e+30;
+      static constexpr double kInitialCHIsq = 1.0e+30;
 
       /** Default magnetic field */
-      static const double kDefaultMagneticField = 1.45638;
+      static constexpr double kDefaultMagneticField = 1.45638;
 
       /** Speed of light */
-      static const double kLightSpeed = 0.00299792458;
+      static constexpr double kLightSpeed = 0.00299792458;
     };
 
   } // namespace analysis

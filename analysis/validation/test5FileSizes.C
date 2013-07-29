@@ -1,4 +1,4 @@
-void test6FileSizes(){
+void test5FileSizes(){
 
  // open the file with simulated and reconstructed EvtGen particles
   TFile* input = TFile::Open("../GenericB_GENSIMRECtoDST.dst.root");

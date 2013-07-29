@@ -291,6 +291,7 @@ void GenFitterModule::event()
     for (int iPdg = 0; iPdg != nPdg; ++iPdg) {  // loop over all pdg hypothesises
       //make sure the track fit starts with the correct PDG code because the sign of the PDG code will also set the charge in the TrackRep
       TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(m_pdgCodes[iPdg]);
+      B2DEBUG(99, "GenFitter: current PDG code: " << m_pdgCodes[iPdg]);
       int currentPdgCode = boost::math::sign(aTrackCandPointer->getChargeSeed()) * m_pdgCodes[iPdg];
       if (currentPdgCode == 0) {
         B2FATAL("Either the charge of the current GFTRackCand is 0 or you set 0 as a PDG code");
@@ -438,7 +439,7 @@ void GenFitterModule::event()
               tracks.appendNew(); //Track is created empty, helix parameters are not available because the fit failed, but other variables may give some hint on the reason for the failure
 
               //Create relation
-              if (aTrackCandPointer->getMcTrackId() != -999) {
+              if (aTrackCandPointer->getMcTrackId() >= 0) {
                 gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
               }
 
@@ -464,7 +465,7 @@ void GenFitterModule::event()
                                           tracks[trackCounter]->setCotTheta(-999);
                             */
               //Create relations
-              if (aTrackCandPointer->getMcTrackId() != -999) {
+              if (aTrackCandPointer->getMcTrackId() >= 0) {
                 mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
               } else B2WARNING("No MCParticle contributed to this track! No MCParticle<->Track relation will be created!");
             }
@@ -478,7 +479,7 @@ void GenFitterModule::event()
             tracks.appendNew(); //Track is created empty, parameters are set later on
 
             //Create relation
-            if (aTrackCandPointer->getMcTrackId() != -999) {
+            if (aTrackCandPointer->getMcTrackId() >= 0) {
               gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
             }
 
@@ -532,7 +533,7 @@ void GenFitterModule::event()
               //MH: this is new stuff...
               tracks[trackCounter]->setTrackFitResultIndex(chargedStable, trackFitResultCounter);
               //Create relations
-              if (aTrackCandPointer->getMcTrackId() != -999) {
+              if (aTrackCandPointer->getMcTrackId() >= 0) {
                 mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
               }
 
@@ -616,7 +617,7 @@ void GenFitterModule::event()
             catch (...) {
               B2WARNING("Something went wrong during the extrapolation of fit results!");
               //Create relations
-              if (aTrackCandPointer->getMcTrackId() != -999) {
+              if (aTrackCandPointer->getMcTrackId() >= 0) {
                 mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
               } else B2WARNING("No MCParticle contributed to this track! No MCParticle<->Track relation will be created!");
 //              tracks[trackCounter]->setExtrapFailed(true);

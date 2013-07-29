@@ -64,7 +64,22 @@ main.add_module(geometry)
 # the content is not yet defined, but we want to first ensure the Particle class behaves as expected
 output = register_module('RootOutput')
 output.param('outputFileName', '../MDSTtoUDST.udst.root')
-output.param('branchNames', ['MCParticles', 'Particles', 'EventMetaData'])
+branches = [
+    'Particles',
+    'Tracks',
+    'TrackFitResults',
+    'PIDLikelihoods',
+    'TracksToPIDLikelihoods',
+    'ECLShowers',
+    'ECLGammas',
+    'ECLGammasToECLShowers',
+    'ECLPi0s',
+    'ECLPi0sToECLGammas',
+    'EKLMK0Ls',
+    ]
+# if mc: ##Include all MC information
+branches += ['MCParticles', 'TracksToMCParticles', 'EventMetaData']
+output.param('branchNames', branches)
 main.add_module(output)
 
 # Go

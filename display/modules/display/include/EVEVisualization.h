@@ -44,6 +44,7 @@ class TEvePointSet;
 class TEveTrackList;
 
 namespace Belle2 {
+  class DisplayData;
 
   /** Produces visualisation for MCParticles, simhits, GFTracks, geometry and other things.
    *
@@ -156,6 +157,9 @@ namespace Belle2 {
     /** Add a reconstructed photon in the ECL. */
     void addRecGammas(const ECLGamma*, const TString&);
 
+    /** Add user-defined data (labels, points, etc.) */
+    void showUserData(const DisplayData& displayData);
+
     // === configuration options ===
 
     /** @brief Set the display options.
@@ -194,6 +198,7 @@ namespace Belle2 {
 
     /** Show full geometry instead of simplified shapes. */
     void showFullGeo(bool on) { m_fullgeo = on; }
+
 
   private:
     /** Object for the energy bar visualisation. */

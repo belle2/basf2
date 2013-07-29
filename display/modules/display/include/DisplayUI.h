@@ -20,6 +20,7 @@ namespace Belle2 {
   //forward declaration needed because CINT balks at inclusion of python headers in ModuleParam...
   template <class T> class ModuleParam;
   class SplitGLView;
+  class DisplayData;
 
   /** Control TEve browser user interface.
    *
@@ -111,6 +112,9 @@ namespace Belle2 {
 
     /** Close window and exit immediately. */
     void exit();
+
+    /** Add user-defined data (histograms, etc.). */
+    void showUserData(const DisplayData& displayData);
 
 
   private:

@@ -1,5 +1,6 @@
 #include <display/modules/display/DisplayModule.h>
 
+#include <display/dataobjects/DisplayData.h>
 #include <display/modules/display/DisplayUI.h>
 #include <display/modules/display/EVEVisualization.h>
 #include <geometry/GeometryManager.h>
@@ -9,6 +10,7 @@
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <GFTrack.h>
 #include <GFRaveVertex.h>
@@ -66,6 +68,7 @@ void DisplayModule::initialize()
   StoreArray<GFTrack>::optional();
   StoreArray<GFTrackCand>::optional();
   StoreArray<GFRaveVertex>::optional();
+  StoreObjPtr<DisplayData>::optional();
 
   if (!gGeoManager) { //TGeo geometry not initialized, do it ourselves
     //convert geant4 geometry to TGeo geometry
@@ -184,6 +187,12 @@ void DisplayModule::event()
   const int nRecGammas = RecGammas.getEntries();
   for (int i = 0; i < nRecGammas; i++) {
     m_visualizer->addRecGammas(RecGammas[i], TString::Format("ECL_Gamma %d", i));  //RecGammas[i] points to each slot of ECLGamma object.
+  }
+
+  StoreObjPtr<DisplayData> displayData;
+  if (displayData) {
+    m_visualizer->showUserData(*displayData);
+    m_display->showUserData(*displayData);
   }
 
 

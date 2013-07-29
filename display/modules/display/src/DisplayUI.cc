@@ -5,10 +5,13 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
+#include <display/dataobjects/DisplayData.h>
 #include <display/async/AsyncWrapper.h>
+#include <display/modules/display/BrowsableWrapper.h>
 #include <display/modules/display/SplitGLView.h>
 
 #include <TApplication.h>
+#include <TCanvas.h>
 #include <TEveBrowser.h>
 #include <TEveManager.h>
 #include <TEveEventManager.h>
@@ -22,17 +25,24 @@
 #include <TGInputDialog.h>
 #include <TGTextEntry.h>
 #include <TGLViewer.h>
+#include <TMacro.h>
 #include <TObjArray.h>
 #include <TObjString.h>
 #include <TROOT.h>
 #include <TSystem.h>
 
+class TGPictureButton; //missing fwd declaration in root
+#include <TGFileBrowser.h>
+
 #include <boost/scoped_ptr.hpp>
+#include <boost/foreach.hpp>
 
 #include <cmath>
 
 
 using namespace Belle2;
+
+ClassImp(DisplayUI)
 
 DisplayUI::DisplayUI(bool automatic):
   m_currentEntry(0),
@@ -606,4 +616,77 @@ void DisplayUI::exit()
     AsyncWrapper::stopMainProcess();
 }
 
-ClassImp(DisplayUI)
+void DisplayUI::showUserData(const DisplayData& displayData)
+{
+  static TGFileBrowser* fileBrowser = NULL;
+  static TCanvas* canvas = NULL;
+  static std::map<std::string, BrowsableWrapper*> wrapperMap;
+  typedef std::pair<std::string, BrowsableWrapper*> WrapperPair;
+  BOOST_FOREACH(WrapperPair entry, wrapperMap) {
+    //doesn't do anything
+    //fileBrowser->RecursiveRemove(wrappers[i]);
+    entry.second = NULL;
+  }
+
+  if (displayData.m_histograms.empty())
+    return; //nothing to show
+
+  if (!fileBrowser) {
+    gEve->GetBrowser()->StartEmbedding(0);
+    fileBrowser = gEve->GetBrowser()->MakeFileBrowser();
+    gEve->GetBrowser()->StopEmbedding("Histograms");
+
+
+    //create new tab with canvas
+    gEve->GetBrowser()->StartEmbedding(TRootBrowser::kRight);
+    TEveWindowSlot* slot = TEveWindow::CreateWindowMainFrame();
+    gEve->GetBrowser()->StopEmbedding();
+    slot->StartEmbedding();
+    canvas = new TCanvas;
+    slot->StopEmbedding("Canvas");
+  }
+
+  //invert pad -> name map
+  const std::map<TVirtualPad*, std::string>& padMap = BrowsableWrapper::getPads();
+  std::map<std::string, TVirtualPad*> nameMap;
+  typedef std::pair<TVirtualPad*, std::string> EntryType;
+  BOOST_FOREACH(EntryType entry, padMap) {
+    nameMap[entry.second] = entry.first;
+  }
+
+  for (int i = 0; i < displayData.m_histograms.size(); i++) {
+    std::string name(displayData.m_histograms.at(i)->GetName());
+    if (!wrapperMap[name])
+      wrapperMap[name] = new BrowsableWrapper(displayData.m_histograms.at(i));
+    else
+      wrapperMap[name]->setWrapped(displayData.m_histograms.at(i));
+    BrowsableWrapper* wrapper = wrapperMap[name];
+
+    if (nameMap.find(name) != nameMap.end()) {
+      TVirtualPad* oldGpad = gPad;
+      //redraw
+      nameMap[name]->cd();
+      wrapper->Browse(fileBrowser->Browser());
+
+      //restore state
+      oldGpad->cd();
+    }
+    fileBrowser->Add(wrapper);
+
+  }
+
+  /*
+    TMacro* m = new TMacro;
+    m->AddLine("{ TEveWindowSlot* currentWindow = gEve->GetWindowManager()->GetCurrentWindowAsSlot(); \
+                  if (currentWindow) { \
+                     std::cout << \" this is a slot!\\n\"; \
+                     currentWindow->StartEmbedding(); \
+                     TCanvas* c = new TCanvas; \
+                     c->cd(); \
+                     currentWindow->StopEmbedding(\"Canvas\"); \
+                   } else { std::cout << \" not a slot!\\n\"; } \
+                 }");
+    m->SetName("Add canvas to active window");
+    fileBrowser->Add(m);
+    */
+}

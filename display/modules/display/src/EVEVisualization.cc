@@ -19,6 +19,8 @@
 */
 #include <display/modules/display/EVEVisualization.h>
 
+#include <display/dataobjects/DisplayData.h>
+
 #include <framework/logging/Logger.h>
 #include <framework/core/utilities.h>
 #include <geometry/GeometryManager.h>
@@ -39,7 +41,6 @@
 #include <GFTools.h>
 
 #include <TApplication.h>
-#include <TEveBrowser.h>
 #include <TEveBox.h>
 #include <TEveCalo.h>
 #include <TEveManager.h>
@@ -51,6 +52,7 @@
 #include <TEvePointSet.h>
 #include <TEveProjectionManager.h>
 #include <TEveStraightLineSet.h>
+#include <TEveText.h>
 #include <TEveTrack.h>
 #include <TEveTrackPropagator.h>
 #include <TFile.h>
@@ -72,6 +74,7 @@
 
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/foreach.hpp>
 
 #include <assert.h>
 #include <cmath>
@@ -753,7 +756,9 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
 
     //neutrals and very short-lived particles should stop somewhere
     //(can result in wrong shapes for particles stopped in the detector, so not used there)
-    if (TMath::Nint(particle->getCharge()) == 0 or !particle->hasStatus(MCParticle::c_StoppedInDetector)) {
+    //also make sure a decay vertex is set, and that it is not set to (0,0,0) (as with particle gun)
+    if ((TMath::Nint(particle->getCharge()) == 0 or !particle->hasStatus(MCParticle::c_StoppedInDetector))
+        and mctrack.fDecayed and mctrack.fTDecay != 0.0) {
       TEvePathMarkD decayMark(TEvePathMarkD::kDecay);
       decayMark.fV.Set(particle->getDecayVertex());
       m_mcparticleTracks[particle].track->AddPathMark(decayMark);
@@ -979,4 +984,30 @@ void EVEVisualization::addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines)
   const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
 
   lines->AddLine(wire_pos_f.x(), wire_pos_f.y(), wire_pos_f.z(), wire_pos_b.x(), wire_pos_b.y(), wire_pos_b.z());
+}
+
+void EVEVisualization::showUserData(const DisplayData& displayData)
+{
+  std::vector<std::pair<std::string, TVector3> >::const_iterator labelIt = displayData.m_labels.begin();
+  for (; labelIt != displayData.m_labels.end(); ++labelIt) {
+    TEveText* text = new TEveText(labelIt->first.c_str());
+    text->SetTitle(labelIt->first.c_str());
+    text->SetMainColor(kGray + 1);
+    const TVector3& p = labelIt->second;
+    text->PtrMainTrans()->SetPos(p.x(), p.y(), p.z());
+    gEve->AddElement(text);
+  }
+
+  std::map<std::string, std::vector<TVector3> >::const_iterator pointIt = displayData.m_pointSets.begin();
+  for (; pointIt != displayData.m_pointSets.end(); ++pointIt) {
+    TEvePointSet* points = new TEvePointSet(pointIt->first.c_str());
+    points->SetTitle(pointIt->first.c_str());
+    points->SetMarkerStyle(7);
+    points->SetMainColor(kGreen);
+    BOOST_FOREACH(const TVector3 & p, pointIt->second) {
+      points->SetNextPoint(p.x(), p.y(), p.z());
+    }
+    gEve->AddElement(points);
+  }
+
 }

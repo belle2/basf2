@@ -142,6 +142,16 @@ namespace Belle2 {
      **/
     MCTrack* addMCParticle(const MCParticle* particle);
 
+    /** Add a vertex point and its covariance matrix. */
+    void addVertex(const GFRaveVertex* vertex, const TString& name);
+
+    /** Add a reconstructed photon in the ECL. */
+    void addGamma(const ECLGamma* gamma, const TString& name);
+
+    /** Add user-defined data (labels, points, etc.) */
+    void showUserData(const DisplayData& displayData);
+
+
     /** Create visual representation of all tracks.
      *
      *  Needs to be called after all hits / tracks are added.
@@ -150,15 +160,6 @@ namespace Belle2 {
 
     /** clear event data. */
     void clearEvent();
-
-    /** Add a vertex point and its covariance matrix. */
-    void addVertexEllip(const GFRaveVertex&, const TString&, const TString&);
-
-    /** Add a reconstructed photon in the ECL. */
-    void addRecGammas(const ECLGamma*, const TString&);
-
-    /** Add user-defined data (labels, points, etc.) */
-    void showUserData(const DisplayData& displayData);
 
     // === configuration options ===
 

@@ -888,18 +888,15 @@ void EVEVisualization::clearEvent()
 
 
 
-void EVEVisualization::addVertexEllip(const GFRaveVertex& VertexEllip, const TString& VertexName, const TString& EllipName)
+void EVEVisualization::addVertex(const GFRaveVertex* vertex, const TString& name)
 {
-  TVector3 v = VertexEllip.getPos();         //calls the public member function getPos() of the GFRaveVertex class to assign the position of the vertex to "v"
-  TEvePointSet* Vertices = new TEvePointSet(VertexName);   // This class names the vertices through the pointer "Vertices" from the DM.cc using the argument "VertexName".
-  Vertices-> SetNextPoint(v.x(), v.y(), v.z());  //.x() is a method of TVector3 class.
-  gEve->AddElement(Vertices);  //draw the point
+  TVector3 v = vertex->getPos();
+  TEvePointSet* Vertices = new TEvePointSet(name);
+  Vertices->SetMainColor(kYellow);
+  Vertices->SetNextPoint(v.x(), v.y(), v.z());
 
-
-  TMatrixT<double> CovMatrix = VertexEllip.getCov();  //calls getCov to assign the covariance matrix to the object CovMatrix of the TMatrixT class, double is a template (entries data type of the matrix)
-
-  TMatrixDEigen eigen_values(CovMatrix);  //Declare the object of the T..DEigen class using constructor(matrix).  //copied from line 500 from the addTrack function: To draw the error ellipsoid!
-  TEveGeoShape* det_shape = new TEveGeoShape(EllipName);   //Names the ellipsoid in the GUI.
+  TMatrixDEigen eigen_values(vertex->getCov());
+  TEveGeoShape* det_shape = new TEveGeoShape(name + " Error");
   det_shape->IncDenyDestroy();
   det_shape->SetShape(new TGeoSphere(0., 1.));   //Initially created as a sphere, then "scaled" into an ellipsoid.
   TMatrixT<double> ev = eigen_values.GetEigenValues(); //Assigns the eigenvalues into the "ev" matrix.
@@ -923,39 +920,40 @@ void EVEVisualization::addVertexEllip(const GFRaveVertex& VertexEllip, const TSt
 
 
 
-  //No autoscaling needed here!
-
   // rotate and translate -------------------------------------------------------
   TGeoGenTrans det_trans(v(0), v(1), v(2), pseudo_res_0, pseudo_res_1, pseudo_res_2, &det_rot); //Puts the ellipsoid at the position of the vertex, v(0)=v.x(), operator () overloaded.
   det_shape->SetTransMatrix(det_trans);
   // finished rotating and translating ------------------------------------------
 
   det_shape->SetMainColor(kYellow);   //The color of the error ellipsoid.
-  det_shape->SetMainTransparency(0);  //Zero transparency.
+  det_shape->SetMainTransparency(0);
 
-  gEve->AddElement(det_shape);     //Draws the ellipsoid.
+  Vertices->AddElement(det_shape);
+  gEve->AddElement(Vertices);
 }
 
 
-void EVEVisualization::addRecGammas(const ECLGamma* RecGamma, const TString& GammaName)   // Using pointer is more convenient.
+void EVEVisualization::addGamma(const ECLGamma* gamma, const TString& name)
 {
-  TVector3 Momentum = RecGamma->getMomentum();
-  Momentum.SetMag(200);  // SetMag is a method of TVector3, enlarges the private data members pX,pY,pZ (factor*pX).
+  TVector3 Momentum = gamma->getMomentum();
+  Momentum.SetMag(200);
 
-  float Energy = RecGamma->getEnergy();
-  float pX = RecGamma->getPx();
-  float pY = RecGamma->getPy();
-  float pZ = RecGamma->getPz();
+  float energy = gamma->getEnergy();
+  float pX = gamma->getPx();
+  float pY = gamma->getPy();
+  float pZ = gamma->getPz();
 
-  TEveLine* Gamma = new TEveLine(GammaName); // protected TString type data member of the TEvePointSet class inherited!
-  Gamma->SetNextPoint(0, 0, 0);            // the object of TEveLine visualizes a line connecting 2 points.
-  Gamma->SetNextPoint(Momentum.x(), Momentum.y(), Momentum.z());
-  Gamma->SetTitle(TString::Format("ECL_Gamma_%d\n"    //SetTitle method is inherited for displaying popups.
-                                  "Energy=%.3f\n"
-                                  "pX=%.3f, pY=%.3f, pZ=%.3f\n",
-                                  RecGamma->GetShowerId(), Energy, pX, pY, pZ)); //ShowerId already set after reconstruction!
+  TEveLine* gammaVis = new TEveLine(name);
+  gammaVis->SetNextPoint(0, 0, 0); //assuming gamma came from IP
+  gammaVis->SetNextPoint(Momentum.x(), Momentum.y(), Momentum.z());
+  gammaVis->SetTitle(TString::Format("ECLGamma %d\n"
+                                     "Energy=%.3f\n"
+                                     "pX=%.3f, pY=%.3f, pZ=%.3f\n",
+                                     gamma->GetShowerId(), energy, pX, pY, pZ));
 
-  m_calo3d->AddElement(Gamma);
+  gammaVis->SetMainColor(kGreen);
+  gammaVis->SetLineWidth(2.0);
+  m_calo3d->AddElement(gammaVis);
 }
 
 void EVEVisualization::addRecoHit(const SVDCluster* hit, TEveStraightLineSet* lines)

@@ -175,18 +175,17 @@ void DisplayModule::event()
   m_visualizer->makeTracks();
 
 
-  StoreArray<GFRaveVertex> Vertices;
-  const int nVertices = Vertices.getEntries();
+  StoreArray<GFRaveVertex> vertices;
+  const int nVertices = vertices.getEntries();
   for (int i = 0; i < nVertices; i++) {
-    //B2INFO("Distance from center" <<  Vertices[i]->getPos().Mag());
-    m_visualizer->addVertexEllip(*(Vertices[i]), TString::Format("Vertex %d", i), TString::Format("VertexCovarianceEllipsoid %d", i));
+    m_visualizer->addVertex(vertices[i], TString::Format("GFRaveVertex %d", i));
   }
 
 
-  StoreArray<ECLGamma> RecGammas;
-  const int nRecGammas = RecGammas.getEntries();
+  StoreArray<ECLGamma> gammas;
+  const int nRecGammas = gammas.getEntries();
   for (int i = 0; i < nRecGammas; i++) {
-    m_visualizer->addRecGammas(RecGammas[i], TString::Format("ECL_Gamma %d", i));  //RecGammas[i] points to each slot of ECLGamma object.
+    m_visualizer->addGamma(gammas[i], TString::Format("ECLGamma %d", i));
   }
 
   StoreObjPtr<DisplayData> displayData;

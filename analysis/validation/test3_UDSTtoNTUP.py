@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+## This is a dummy script, ready to test UDST reading when ParticleLists are persistified
 import sys
 
 rootFileName = '../UDSTtoNTUP'
@@ -49,16 +50,7 @@ geometry.param('Components', components)
 main.add_module(geometry)
 
 # ---------------------------------------------------------------
-# Analysis module to check basic analysis input containers
-# analysis = register_module('analysisValidation')
-# output root file name (the suffix .root will be added automaticaly)
-# analysis.param('outputFileName', rootFileName)
-# specify the names of Track collections
-# analysis.param('GFTrackCandidatesColName', 'GFTrackCands')
-# analysis.param('GFTracksColName', 'GFTracks')
-# analysis.param('TracksColName', 'Tracks')
-# analysis.param('TestType', 'udst')
-# main.add_module(analysis)
+# Here the ParticleLists will be extracted from the UDST to dump to ntuple
 
 # ---------------------------------------------------------------
 # Produce a microdst with Particles and MCParticles only (event meta data is included by default)

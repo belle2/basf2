@@ -10,6 +10,7 @@ sys.stdout = open(logFileName, 'w')
 
 import os
 from basf2 import *
+from modularAnalysis import *
 
 main = create_path()
 
@@ -48,16 +49,8 @@ geometry.param('Components', components)
 main.add_module(geometry)
 
 # ---------------------------------------------------------------
-# Analysis module to check basic analysis input containers
-# analysis = register_module('analysisValidation')
-# output root file name (the suffix .root will be added automaticaly)
-# analysis.param('outputFileName', rootFileName)
-# specify the names of Track collections
-# analysis.param('GFTrackCandidatesColName', 'GFTrackCands')
-# analysis.param('GFTracksColName', 'GFTracks')
-# analysis.param('TracksColName', 'Tracks')
-# analysis.param('TestType', 'dst')
-# main.add_module(analysis)
+# Run analysis tools to create Final State Particles (further tests to come)
+loadReconstructedParticles(main)
 
 # ---------------------------------------------------------------
 # Produce a microdst with reconstructed Particles

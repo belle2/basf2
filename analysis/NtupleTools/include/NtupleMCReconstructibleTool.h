@@ -29,11 +29,17 @@ namespace Belle2 {
     /** Reconstructible based on particle ID */
     int* m_iReconstructible;
     /** Flags for subdetectors */
+    /** Particle seen in the PXD **/
     int* m_iSeenInPXD;
+    /** Particle seen in the SVD **/
     int* m_iSeenInSVD;
+    /** Particle seen in the CDC **/
     int* m_iSeenInCDC;
+    /** Particle seen in the TOP **/
     int* m_iSeenInTOP;
+    /** Particle seen in the ECL **/
     int* m_iLastSeenInECL;
+    /** Particle seen in the KLM **/
     int* m_iLastSeenInKLM;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */

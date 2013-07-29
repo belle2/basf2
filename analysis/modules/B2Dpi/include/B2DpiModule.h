@@ -89,7 +89,7 @@ namespace Belle2 {
     /** Generated info Related functions **/
     int isBtoD0PiDecay(MCParticle* part);
     int isD0Decay(MCParticle* part);
-    void removeFSRPhoton(std::vector<MCParticle*> daughters, std::vector<MCParticle*> &daughtersWithoutFSR);
+    void removeFSRPhoton(std::vector<MCParticle*> daughters, std::vector<MCParticle*>& daughtersWithoutFSR);
 
   protected:
     std::string  m_mcParticlesColName;     /**< MCParticles collection name. */

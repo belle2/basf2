@@ -679,7 +679,7 @@ int B2DpiModule::isD0Decay(MCParticle* part)
 // removes all photons from the daughters list
 // assumes that all photons are due to the final stat radiation
 // should not be used in radiative decays
-void B2DpiModule::removeFSRPhoton(std::vector<MCParticle*> daughters, std::vector<MCParticle*> &daughtersWithoutFSR)
+void B2DpiModule::removeFSRPhoton(std::vector<MCParticle*> daughters, std::vector<MCParticle*>& daughtersWithoutFSR)
 {
   for (unsigned i = 0; i < daughters.size(); i++) {
     if (daughters[i]->getPDG() != 22)

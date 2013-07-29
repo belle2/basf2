@@ -478,8 +478,8 @@ void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXD
 
 void TFAnalizerModule::printMC(bool type, VXDTrackCandidate& mcTC, RootVariables& rootVariables)
 {
-  string info;
-  if (type == true) { info = "FOUNDINFO"; } else { info = "LOSTINFO"; }
+  string info = "FOUNDINFO";
+  if (type == false) { info = "LOSTINFO"; }
 
   TVector3 zDir(0., 0., 1.); // vector parallel to z-axis
   TVector3 mcDirection = mcTC.direction;
@@ -510,8 +510,8 @@ void TFAnalizerModule::printMC(bool type, VXDTrackCandidate& mcTC, RootVariables
 
 void TFAnalizerModule::printCA(bool type, VXDTrackCandidate& caTC)
 {
-  string info;
-  if (type == true) { info = "FOUNDCATCINFO"; } else { info = "LOSTCATCINFO"; }
+  string info = "FOUNDCATCINFO";
+  if (type == false) { info = "LOSTCATCINFO"; }
 
   TVector3 zDir(0., 0., 1.); // vector parallel to z-axis
 

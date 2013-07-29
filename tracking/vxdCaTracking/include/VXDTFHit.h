@@ -101,10 +101,11 @@ namespace Belle2 {
 
       ClusterInfo* getClusterInfoV() const;/* { return m_clusterInfoUV; }*/ /**< returns pointer to ClusterInfo V, is NULL if value is not set */
 
+      /** returns index position of clusterInfo in container,  only set for PXDHits */
       int getClusterIndexUV() const; /*{
         if (m_clusterInfoUV != NULL ) { return m_clusterInfoUV->getOwnIndex(); }
         return -1;
-      }*/ /**< returns index position of clusterInfo in container,  only set for PXDHits */
+      }*/
 
       ClusterInfo* getClusterInfoUV() const;/* { return m_clusterInfoUV; }*/  /**< returns pointer to ClusterInfo UV, is NULL if value is not set */
 
@@ -118,12 +119,13 @@ namespace Belle2 {
 
       float getTimeStamp() const { return m_timeStamp; } /**< set for SVDHits, for PXDHits it's 0 */
 
+      /** is true, if a valid TC is already using any Cluster attached to this hit */
       bool isReserved() const ; /* {
         if (m_clusterInfoU != NULL) { if (m_clusterInfoU->isReserved() == true) { return true; } }
         if (m_clusterInfoV != NULL) { if (m_clusterInfoV->isReserved() == true) { return true; } }
         if (m_clusterInfoUV != NULL) { if (m_clusterInfoUV->isReserved() == true) { return true; } }
         return false;
-      } */ /**< is true, if a valid TC is already using any Cluster attached to this hit */
+      } */
 
       /** setter **/
       void addInnerCell(int newCell) { m_attachedInnerCells.push_back(newCell); } /**< adds new Cell to vector of inner Cells attached to current hit */

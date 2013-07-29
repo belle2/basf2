@@ -1036,7 +1036,7 @@ void VXDTFModule::beginRun()
 
 
     //generating virtual sector (represents the region of the primary vertex)
-    string centerSector = "00_00_0";
+//     string centerSector = "00_00_0";
     unsigned int centerSecID = FullSecID().getFullSecID(); // automatically produces secID of centerSector
     VXDSector* pCenterSector = new VXDSector(centerSecID);
     newPass->sectorMap.insert(make_pair(centerSecID, pCenterSector));
@@ -1073,7 +1073,7 @@ void VXDTFModule::beginRun()
   }
 
   /** copying first pass for the BaselineTF (just to be sure that they don't influence each other) */
-  string centerSector = "00_00_0";
+//   string centerSector = "00_00_0";
   unsigned int centerSecID = FullSecID().getFullSecID(); // automatically produces secID of centerSector
   VXDSector* pCenterSector = new VXDSector(centerSecID);
   m_baselinePass.sectorMap.insert(make_pair(centerSecID, pCenterSector));
@@ -1271,7 +1271,7 @@ void VXDTFModule::the_real_event()
   VxdID aVxdID;
   timeStamp = boostClock::now();
   int badSectorRangeCtr = 0, aLayerID;
-  string checkString4badHits = "-";
+//   string checkString4badHits = "-";
   for (int iPart = 0; iPart < numOfPxdClusters; ++iPart) { /// means: numOfPxdClusters > 0 if at least one pass wants PXD hits
     const PXDCluster* const aClusterPtr = aPxdClusterArray[iPart];
 
@@ -1969,7 +1969,7 @@ void VXDTFModule::endRun()
   string lineApnd = "--------------------------";
   B2INFO(lineHigh << lineApnd << lineApnd)
   B2INFO(m_PARAMnameOfInstance << " settings: number of passes: " << m_passSetupVector.size() << ", tuneCutoffs: " << m_PARAMtuneCutoffs << ", QIfilterMode: " << m_PARAMcalcQIType << ", filterOverlappingTCs: " << m_PARAMfilterOverlappingTCs << ", chosen settings: ")
-  stringstream infoStuff2, infoStuff, secInfo;
+  stringstream infoStuff2, secInfo;
 //  string lineLow = "____________________________________________________________________________________________________________________";
   B2INFO(lineHigh << lineApnd << lineApnd)
   B2INFO("detector\t| setup\t\t\t| maxLayer\t| minLayer\t| minState\t| sfTests\t| nfTests\t| TcFilterTests\t|")
@@ -2465,7 +2465,7 @@ void VXDTFModule::greedy(TCsOfEvent& tcVector)
 
   greedyRecursive(overlappingTCs, totalSurvivingQI, countSurvivors, countKills);
 
-  B2DEBUG(1, "VXDTFModule::greedy: total number of TCs: " << tcVector.size() << ", TCs alive at begin of greedy algoritm: " << countTCsAliveAtStart << ", TCs survived: " << countSurvivors << ", TCs killed: " << countKills)
+  B2DEBUG(1, "VXDTFModule::greedy: total number of TCs: " << tcVector.size() << " with totalQi " << totalQI << ", TCs alive at begin of greedy algoritm: " << countTCsAliveAtStart << ", TCs survived: " << countSurvivors << ", TCs killed: " << countKills)
 }
 
 
@@ -4143,7 +4143,7 @@ VXDTFModule::BrokenSensorsOfEvent VXDTFModule::find2DSVDHits(ActiveSensorsOfEven
       occupancy = numHits;
     }
     m_TESTERSVDOccupancy[numHits - 1] += 1;
-    if (m_PARAMhighOccupancyThreshold < numHits) {
+    if (m_PARAMhighOccupancyThreshold < occupancy) {
       m_highOccupancyCase = true;
       m_TESTERhighOccupancyCtr++;
     } else { m_highOccupancyCase = false; }

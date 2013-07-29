@@ -41,7 +41,9 @@ namespace Belle2 {
     // vector< pair< unsigned int, vector< pair< unsigned int, vector< pair< unsigned int, pair<double, double> > > > > > > .... hail typedefs -.-
 
     /** Default constructor for the ROOT IO. */
-    VXDTFSecMap(): m_magneticFieldStrength(1.5) {}
+    VXDTFSecMap():
+      m_magneticFieldStrength(1.5),
+      m_additionalInfo("") {}
 
     /** getter - returns full sectorMapInformation */
     const SecMapCopy& getSectorMap() const { return m_sectorMap; }

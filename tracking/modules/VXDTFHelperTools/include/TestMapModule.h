@@ -40,9 +40,9 @@ namespace Belle2 {
       typedef boost::chrono::high_resolution_clock boostClock; /**< used for measuring time comsumption */ // high_resolution_clock, process_cpu_clock
 //       typedef boost::chrono::microseconds boostNsec; /**< defines time resolution (currently mictroseconds) */ // microseconds, milliseconds
       typedef boost::chrono::nanoseconds boostNsec; /**< defines time resolution (currently nanoseconds) */ // microseconds, milliseconds
-      typedef std::map<unsigned int, VXDSector> MapOfSectors;
-      typedef boost::container::flat_map<unsigned int, VXDSector> FlatMapOfSectors;
-      typedef boost::unordered_map<unsigned int, VXDSector> UnorderedMapOfSectors;
+      typedef std::map<unsigned int, VXDSector> MapOfSectors; /**< defines a sectorMap using the stl::map, key is sectorID coded using FullSecID(), second is Sector itself */
+      typedef boost::container::flat_map<unsigned int, VXDSector> FlatMapOfSectors; /**< defines a sectorMap using the boost::flat_map, key is sectorID coded using FullSecID(), second is Sector itself */
+      typedef boost::unordered_map<unsigned int, VXDSector> UnorderedMapOfSectors; /**< defines a sectorMap using the boost::unordered_map, key is sectorID coded using FullSecID(), second is Sector itself */
 
       /**
       * Constructor of the module.

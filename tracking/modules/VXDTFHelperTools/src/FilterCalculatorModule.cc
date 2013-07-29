@@ -308,10 +308,8 @@ void FilterCalculatorModule::event()
   vector<VXDTrack> tracksOfEvent;
   vector<VXDTrack> trackletsOfEvent; // tracks cut into bite-sized pieces for the filtering part
 
-  int trackThreshold;
-  if (m_PARAMuseEvtgen == true) {
-    trackThreshold = numOfMcParticles;
-  } else { trackThreshold = m_PARAMtracksPerEvent; }
+  int trackThreshold = m_PARAMtracksPerEvent;
+  if (m_PARAMuseEvtgen == true) { trackThreshold = numOfMcParticles; }
 
   for (int iPart = 0; iPart not_eq trackThreshold; ++iPart) {
     const MCParticle* const aMcParticlePtr = aMcParticleArray[iPart];

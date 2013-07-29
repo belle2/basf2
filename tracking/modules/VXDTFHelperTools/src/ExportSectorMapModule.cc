@@ -91,7 +91,7 @@ void ExportSectorMapModule::initialize()
   TVector3 origin(m_PARAMsetOrigin[0], m_PARAMsetOrigin[1], m_PARAMsetOrigin[2]);
 
   /// importing sectorMap including friend Information and friend specific cutoffs
-  int totalFriendCounter = 0;
+//   int totalFriendCounter = 0;
 
   GearDir belleDir("/Detector/Tracking/CATFParameters/");
 
@@ -108,7 +108,7 @@ void ExportSectorMapModule::initialize()
   int countFriends = 0, countFilters = 0;
   string aSectorName, aFriendName, aFilterName, min = "Min", max = "Max";
 
-  pair<double, double> cutoff;
+//   pair<double, double> cutoff;
   BOOST_FOREACH(const GearDir & aSector, sectorList.getNodes("aSector")) {
 
     aSectorName = aSector.getString("secID");
@@ -117,7 +117,7 @@ void ExportSectorMapModule::initialize()
     GearDir friendList(aSector, "friendList/");
 
     B2DEBUG(1, " > > importing sector: " << aSectorName << " (named " << secID.getFullSecID() << " as an int) including " << friendList.getNumberNodes("aFriend") << " friends. ");
-    totalFriendCounter += friendList.getNumberNodes("aFriend");
+//     totalFriendCounter += friendList.getNumberNodes("aFriend");
 
     SectorValue sectorValue;
 

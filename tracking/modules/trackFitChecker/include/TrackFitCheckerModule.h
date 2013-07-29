@@ -59,8 +59,8 @@ namespace Belle2 {
 //    typedef StatisticsAccuWithMeanAndVar StatisticsContainer;
 //    typedef boost::accumulators::accumulator_set < double, boost::accumulators::stats < boost::accumulators::tag::mean, boost::accumulators::tag::tail<boost::accumulators::right>, boost::accumulators::tag::variance(boost::accumulators::lazy) > > StatisticsAccuWithMeanVarAndTail;
 //    typedef StatisticsAccuWithMeanVarAndTail StatisticsContainer;
-    typedef boost::accumulators::accumulator_set < double, boost::accumulators::stats < boost::accumulators::tag::mean, boost::accumulators::tag::median, boost::accumulators::tag::variance(boost::accumulators::lazy) > > StatisticsAccuWithMeanMedianAndVar;
-    typedef StatisticsAccuWithMeanMedianAndVar StatisticsContainer;
+    typedef boost::accumulators::accumulator_set < double, boost::accumulators::stats < boost::accumulators::tag::mean, boost::accumulators::tag::median, boost::accumulators::tag::variance(boost::accumulators::lazy) > > StatisticsAccuWithMeanMedianAndVar; /**< is a typedef for defining a Container containing information which will be stored in a root output file for statistical interpretation - long version */
+    typedef StatisticsAccuWithMeanMedianAndVar StatisticsContainer; /**< is a typedef for defining a Container containing information which will be stored in a root output file for statistical interpretation - short version */
 
   public:
 
@@ -125,23 +125,23 @@ namespace Belle2 {
     static bool hasMatrixNegDiagElement(const TMatrixT<double>& aMatrix);
 
     // functions for dataflow inside module, registerX fillX and printX all work on the same maps whose entries are accessed by the nameOfDataSample-string which acts as a key
-    void registerTrackWiseData(const std::string& nameOfDataSample);
-    void registerTrackWiseVecData(const std::string& nameOfDataSample, const int nVarsToTest);
-    void registerLayerWiseData(const std::string& nameOfDataSample, const int nVarsToTest);
-    void registerTVector3(const std::string& nameOfDataSample); // to create a TVector3 branch in the costum root tree in this module's output
-    void registerInt(const std::string& nameOfDataSample);
+    void registerTrackWiseData(const std::string& nameOfDataSample); /**< used for dataflow inside module, registerX fillX and printX all work on the same maps whose entries are accessed by the nameOfDataSample-string which acts as a key, registerTrackWiseData registers new data to be stored as a single value once for each track */
+    void registerTrackWiseVecData(const std::string& nameOfDataSample, const int nVarsToTest); /**< used for dataflow inside module, registerX fillX and printX all work on the same maps whose entries are accessed by the nameOfDataSample-string which acts as a key, registerTrackWiseVecData registers new data to be stored as a vector once for each track */
+    void registerLayerWiseData(const std::string& nameOfDataSample, const int nVarsToTest); /**< used for dataflow inside module, registerX fillX and printX all work on the same maps whose entries are accessed by the nameOfDataSample-string which acts as a key, registerLayerWiseData registers new data to be stored as a value once for each layer */
+    void registerTVector3(const std::string& nameOfDataSample); /**< to create a TVector3 branch in the custom root tree in this module's output */
+    void registerInt(const std::string& nameOfDataSample); /**< used for dataflow inside module, registerX fillX and printX all work on the same maps whose entries are accessed by the nameOfDataSample-string which acts as a key, registerInt registers new data to be stored as an int */
 
-    void fillTrackWiseData(const std::string& nameOfDataSample, const double newData);
-    void fillTrackWiseVecData(const std::string& nameOfDataSample, const std::vector<double>& newData);
-    void fillLayerWiseData(const std::string& nameOfDataSample, const int accuVecIndex, const std::vector<double>& newData);
-    void fillTVector3(const std::string& nameOfDataSample, const TVector3& newData);
-    void fillInt(const std::string& nameOfDataSample, const int newData);
+    void fillTrackWiseData(const std::string& nameOfDataSample, const double newData); /**< used for dataflow inside module, registerX fillX and printX all work on the same maps whose entries are accessed by the nameOfDataSample-string which acts as a key, fillTrackWiseData stores new data as a single value once for each track */
+    void fillTrackWiseVecData(const std::string& nameOfDataSample, const std::vector<double>& newData); /**< used for dataflow inside module, registerX fillX and printX all work on the same maps whose entries are accessed by the nameOfDataSample-string which acts as a key, fillTrackWiseVecData stores new data as a single value once for each track */
+    void fillLayerWiseData(const std::string& nameOfDataSample, const int accuVecIndex, const std::vector<double>& newData); /**< used for dataflow inside module, registerX fillX and printX all work on the same maps whose entries are accessed by the nameOfDataSample-string which acts as a key, fillLayerWiseData new data as a single value once for each track */
+    void fillTVector3(const std::string& nameOfDataSample, const TVector3& newData); /**< stores a TVector3 into a TVector3 branch in the custom root tree in this module's output */
+    void fillInt(const std::string& nameOfDataSample, const int newData); /**< used for dataflow inside module, registerX fillX and printX all work on the same maps whose entries are accessed by the nameOfDataSample-string which acts as a key, fillInt stores new data as an int  */
 
     // for text- or console-output, nameOfDataSample is fileName,therefore only internally set within code
-    void printTrackWiseStatistics(const std::string& nameOfDataSample, const bool count = false);
-    void printTrackWiseVecStatistics(const std::string& nameOfDataSample, const std::vector<std::string>& trackWiseVarNames, const  bool count = false);
-    void printLayerWiseStatistics(const std::string& nameOfDataSample,  const std::vector<std::string>& layerWiseVarNames, int madVars, const bool count = true);
-    void printLRResData(const std::string& nameOfDataSample, const std::vector<std::string>& layerWiseVarNames);
+    void printTrackWiseStatistics(const std::string& nameOfDataSample, const bool count = false); /**< for text- or console-output of track wise data, nameOfDataSample is fileName,therefore only internally set within code */
+    void printTrackWiseVecStatistics(const std::string& nameOfDataSample, const std::vector<std::string>& trackWiseVarNames, const  bool count = false); /**< or text- or console-output of trackwise data which is stored as a vector, nameOfDataSample is fileName,therefore only internally set within code */
+    void printLayerWiseStatistics(const std::string& nameOfDataSample,  const std::vector<std::string>& layerWiseVarNames, int madVars, const bool count = true); /**< or text- or console-output for layer wise data, nameOfDataSample is fileName,therefore only internally set within code */
+    void printLRResData(const std::string& nameOfDataSample, const std::vector<std::string>& layerWiseVarNames); /**< print the data of left-right-residuals? */
 
     //When no layer wise tests are done, the layer numbers are set to 0 in this module.
     int m_nSiLayers; /**< number of Si layers.  m_nSiLayers = m_nPxdLayers + m_nSvdLayers */
@@ -156,27 +156,28 @@ namespace Belle2 {
 
     // the following maps should not be accessed directly but only with the corresponding "register" "fill" and "print" functions
     //the following maps will be filled with the test data so that statistical quantities like mean and variance can be calculated
-    std::map<std::string, StatisticsContainer > m_trackWiseDataSamples;
-    std::map<std::string, std::vector<StatisticsContainer> > m_trackWiseVecDataSamples;
-    std::map<std::string, std::vector<std::vector<StatisticsContainer> > > m_layerWiseDataSamples;
+    std::map<std::string, StatisticsContainer > m_trackWiseDataSamples; /**< */
+    std::map<std::string, std::vector<StatisticsContainer> > m_trackWiseVecDataSamples; /**< */
+    std::map<std::string, std::vector<std::vector<StatisticsContainer> > > m_layerWiseDataSamples; /**< */
 
     //the following maps will be filled with the test data so they can be written into a root file for further analysis with root
-    std::map<std::string, float > m_trackWiseDataForRoot;
-    std::map<std::string, std::vector<float>* > m_trackWiseVecDataForRoot;
-    std::map<std::string, std::vector< std::vector <float> >* > m_layerWiseDataForRoot;
-    std::map<std::string, TVector3* > m_TVector3ForRoot; //this one is to store the mcparticle truth info for position and momentum
-    std::map<std::string, int > m_intForRoot; //this one is to store some auxiliary (like if track was fitted successful) info about the tracks into the root file
+    std::map<std::string, float > m_trackWiseDataForRoot; /**< the map will be filled with the track wise test data so they can be written into a root file for further analysis with root*/
+    std::map<std::string, std::vector<float>* > m_trackWiseVecDataForRoot; /**< the map will be filled with the track wise vector test data so they can be written into a root file for further analysis with root */
+    std::map<std::string, std::vector< std::vector <float> >* > m_layerWiseDataForRoot; /**< the map will be filled with the layer wise test data so they can be written into a root file for further analysis with root */
+    std::map<std::string, TVector3* > m_TVector3ForRoot; /**< this one is to store the mcparticle truth info for position and momentum*/
+    std::map<std::string, int > m_intForRoot; /**< this one is to store some auxiliary (like if track was fitted successful) info about the tracks into the root file */
 
     // now the data itself also in c++ vectors so this module can use custom implemented estimators instead just the one provided by root and
     bool m_robust; /**< if this flag is true the robust tests (= median and MAD and truncated mean and std) will be executed */
-    std::map<std::string, std::vector<double > > m_trackWiseData;
-    std::map<std::string, std::vector<std::vector<double> > > m_trackWiseVecData;
-    std::map<std::string, std::vector<std::vector< std::vector <double> > > > m_layerWiseData;
+    std::map<std::string, std::vector<double > > m_trackWiseData; /**< now the track wise data itself also in c++ vectors so this module can use custom implemented estimators instead just the one provided by root and */
+    std::map<std::string, std::vector<std::vector<double> > > m_trackWiseVecData; /**< now the track wise vector data itself also in c++ vectors so this module can use custom implemented estimators instead just the one provided by root and */
+    std::map<std::string, std::vector<std::vector< std::vector <double> > > > m_layerWiseData; /**< now the layer wise data itself also in c++ vectors so this module can use custom implemented estimators instead just the one provided by root and*/
 
 
     /** function to calculated the MAD or "median absolute deviation" for given data sample (data). One also has to provide the median of the sample */
     static double calcMad(const std::vector<double>& data, const double& median);
     std::map<std::string, double > m_madScalingFactors; /**< scaling factors for the MAD to make it comparable to the standard deviation. If a key does not exist, no MAD will be calculated for the data sample using that key*/
+
     /** returns the median of the data sample "data" */
     static double calcMedian(std::vector<double> data);
     //void calcMedianAndMad(std::vector<double> data, double& median, double& mad);

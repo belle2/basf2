@@ -21,11 +21,11 @@ void test2_Validation_pi0(){
   TFile* output = new TFile("pi0Validation.root", "recreate");
 
   /* Mass constrained fit value, as stored in Particle */
-  TH1F * h_pi0_mf   = new TH1F("mpi0f",";Mass constrained fit m(#pi^{0}) GeV;N",80,0.133,0.137);
+  TH1F * h_pi0_mf   = new TH1F("mpi0f",";Mass constrained fit m(#pi^{0}) [GeV];N",40,0.133,0.137);
   /* Invariant mass determined from the two photon daughters */
-  TH1F * h_pi0_m    = new TH1F("mpi0","#pi0 mass no cut;m(#pi^{0}) GeV;N",40,0.08,0.18);
+  TH1F * h_pi0_m    = new TH1F("mpi0","#pi^{0} mass no cut;m(#pi^{0}) [GeV];N",40,0.08,0.18);
   /* Invariant mass after Egamma>0.05 GeV criterion */
-  TH1F * h_pi0_mcut = new TH1F("mpi0cut","#pi0 mass with photon cut;m(#pi^{0}) GeV;N",40,0.08,0.18);
+  TH1F * h_pi0_mcut = new TH1F("mpi0cut","#pi^{0} mass with photon cut;m(#pi^{0}) [GeV];N",40,0.08,0.18);
 
   /* Access the Photons and pi0 M*/
   float fpi0_gamma0_P4[4];  

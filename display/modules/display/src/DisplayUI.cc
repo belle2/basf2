@@ -619,7 +619,6 @@ void DisplayUI::exit()
 void DisplayUI::showUserData(const DisplayData& displayData)
 {
   static TGFileBrowser* fileBrowser = NULL;
-  static TCanvas* canvas = NULL;
   static std::map<std::string, BrowsableWrapper*> wrapperMap;
   typedef std::pair<std::string, BrowsableWrapper*> WrapperPair;
   BOOST_FOREACH(WrapperPair entry, wrapperMap) {
@@ -642,7 +641,7 @@ void DisplayUI::showUserData(const DisplayData& displayData)
     TEveWindowSlot* slot = TEveWindow::CreateWindowMainFrame();
     gEve->GetBrowser()->StopEmbedding();
     slot->StartEmbedding();
-    canvas = new TCanvas;
+    new TCanvas;
     slot->StopEmbedding("Canvas");
   }
 
@@ -654,7 +653,7 @@ void DisplayUI::showUserData(const DisplayData& displayData)
     nameMap[entry.second] = entry.first;
   }
 
-  for (int i = 0; i < displayData.m_histograms.size(); i++) {
+  for (unsigned int i = 0; i < displayData.m_histograms.size(); i++) {
     std::string name(displayData.m_histograms.at(i)->GetName());
     if (!wrapperMap[name])
       wrapperMap[name] = new BrowsableWrapper(displayData.m_histograms.at(i));

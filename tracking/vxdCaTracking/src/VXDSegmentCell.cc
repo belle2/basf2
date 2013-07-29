@@ -29,6 +29,6 @@ void VXDSegmentCell::kickFalseFriends(TVector3 primaryVertex)
       nbIter = this->eraseInnerNeighbour(nbIter);
     } else { ++nbIter; }
     nNBs++;
-    if (nNBs > m_innerNeighbours.size()) { B2FATAL("ClusterInfo::isOverbooked(): iterator crash! nIterations: " << nNBs << ", nNBs: " << m_innerNeighbours.size()) }
+    if (nNBs > int(m_innerNeighbours.size())) { B2FATAL("ClusterInfo::isOverbooked(): iterator crash! nIterations: " << nNBs << ", nNBs: " << m_innerNeighbours.size()) }
   }
 }

@@ -237,6 +237,7 @@ void TFAnalizerModule::event()
   } // determine compatibility matrix
 
   list<foundIDentry> foundIDs; // .first: id of mcTC assigned, .second: qi of tc, the higher, the better
+  int countedDoubleEntries = 0; // counts IDs which were found more than once
 
   if (int(caTcVector.size()) != 0) {   // ! caTcVector.empty()
     B2DEBUG(1, " between loops: caTcVector.size():" << caTcVector.size() << ", caTcVector[0].indexNumber: " << caTcVector[0].indexNumber << ", finAssID: " << caTcVector[0].finalAssignedID << ", QI: " << caTcVector[0].qualityIndex)
@@ -268,7 +269,9 @@ void TFAnalizerModule::event()
 
 
     typedef pair <int, double> idEntry;
-    BOOST_FOREACH(foundIDentry iD, foundIDs) { if (iD.first == caTC.finalAssignedID && iD.second > trackQuality) { m_countedDoubleEntries++; continue; } }// no output here since it has been recovered several times, we take the best caTC
+
+    BOOST_FOREACH(foundIDentry iD, foundIDs) { if (iD.first == caTC.finalAssignedID && iD.second > trackQuality) { countedDoubleEntries++; continue; } }// no output here since it has been recovered several times, we take the best caTC
+
 
     foundIDs.push_back(make_pair(caTC.finalAssignedID, trackQuality));
     if (caTC.qualityIndex > 0.99) { // harder method: caTC.qualityIndex which means totally reconstructed
@@ -281,6 +284,7 @@ void TFAnalizerModule::event()
       printInfo(1, mcTcVector[caTC.finalAssignedID], caTC, rootVariables);
     }
   }
+  m_countedDoubleEntries += countedDoubleEntries;
 
   foundIDs.sort(isFirstValueBigger);
   foundIDs.unique(isFirstValueTheSame);
@@ -318,10 +322,13 @@ void TFAnalizerModule::event()
   BOOST_FOREACH(foundIDentry ID, foundIDs) {
     B2DEBUG(1, " - ID " << ID.first << " recovered")
   }
-  B2DEBUG(1, " the tested TrackFinder found " << numOfFoundIDs << " IDs within " << int(caTcVector.size()) << " TCs and lost " << int(mcTcVector.size() - foundIDs.size()))
   int acceptedTCs = acceptedTrackCandidates.getEntries();
   m_countAcceptedGFTCs += acceptedTCs;
   B2DEBUG(1, " of " << numOfCaTCs << " TCs produced by the tested TrackFinder, " << acceptedTCs << " were recognized safely and stored into the container of accepted TCs")
+
+  int ghosts = numOfCaTCs - numOfFoundIDs - countedDoubleEntries;
+  B2DEBUG(1, " the tested TrackFinder found total " << numOfFoundIDs << " IDs (perfect/clean/multipleFound/ghost: " << rootVariables.completeCAMomValues.size() << "/" << rootVariables.cleanCAMomValues.size() << "/" << countedDoubleEntries << "/" << ghosts << ") within " << int(caTcVector.size()) << " TCs and lost " << int(mcTcVector.size() - foundIDs.size()))
+
 
   if (m_PARAMwriteToRoot == true) {
     m_rootTotalMCMomValues = rootVariables.totalMCMomValues;
@@ -356,7 +363,7 @@ void TFAnalizerModule::endRun()
 
   B2INFO("TFAnalizerModule: After " << m_eventCounter + 1 << " events there was a total number of " << m_mcTrackCounter << " mcTrackCandidates and " << m_totalRealHits << " realHits. Of these TCs, " << m_mcTrackVectorCounter << " mcTrackCandidates where used for analysis because of cutoffs.")
   B2INFO("TFAnalizerModule: There were " << m_caTrackCounter << " caTrackCandidates, of those " << m_countAcceptedGFTCs << " were stored in acceptedTCcontainer for further use, number of times where charge was guessed wrong: " << m_wrongChargeSignCounter << ", number of caTCs which produced a double entry: " << m_countedDoubleEntries)
-  B2INFO("the VXDTF found (total/perfect/clean/ghost)" << m_countReconstructedTCs << "/" << m_countedPerfectRecoveries << "/" << m_countedCleanRecoveries << "/" << (m_caTrackCounter - m_countReconstructedTCs) << " TCs -> efficiency(total/perfect/clean/ghost): " << double(100 * m_countReconstructedTCs) / double(m_mcTrackVectorCounter) << "%/" << double(100 * m_countedPerfectRecoveries) / double(m_mcTrackVectorCounter) << "%/" << double(100 * m_countedCleanRecoveries) / double(m_mcTrackVectorCounter) << "/%" << double(100 * (m_caTrackCounter - m_countReconstructedTCs)) / double(m_countReconstructedTCs) << "%")
+  B2INFO("the VXDTF found (total/perfect/clean/ghost)" << m_countReconstructedTCs << "/" << m_countedPerfectRecoveries << "/" << m_countedCleanRecoveries << "/" << (m_caTrackCounter - m_countReconstructedTCs) << " TCs -> efficiency(total/perfect/clean/ghost): " << double(100 * m_countReconstructedTCs) / double(m_mcTrackVectorCounter) << "%/" << double(100 * m_countedPerfectRecoveries) / double(m_mcTrackVectorCounter) << "%/" << double(100 * m_countedCleanRecoveries) / double(m_mcTrackVectorCounter) << "%/" << double(100 * (m_caTrackCounter - m_countReconstructedTCs)) / double(m_countReconstructedTCs) << "%")
 
 
 }

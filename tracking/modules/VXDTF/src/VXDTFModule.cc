@@ -491,12 +491,13 @@ void VXDTFModule::beginRun()
     VXDTFSecMap::Class(); // essential, needed for root, DO NOT ASK WHY! -.-
     string chosenSetup = (boost::format("sectorList_%1%") % newPass->sectorSetup).str();
     string directory = "/Detector/Tracking/CATFParameters/" + chosenSetup;
+    const VXDTFSecMap* newMap;
     try {
-      const VXDTFSecMap* newMap = dynamic_cast<const VXDTFSecMap*>(Gearbox::getInstance().getTObject(directory.c_str()));
+      newMap = dynamic_cast<const VXDTFSecMap*>(Gearbox::getInstance().getTObject(directory.c_str()));
     } catch (exception& e) {
       B2FATAL("VXDTFModule::initialize: could not load sectorMap. Reason: exception thrown: " << e.what() << ", this means you have to check whether the sectorMaps stored in ../tracking/data/VXDTFindex.xml and/or ../testbeam/vxd/data/VXDTFindexTF.xml are uncommented and locally unpacked and available!")
     }
-    const VXDTFSecMap* newMap = dynamic_cast<const VXDTFSecMap*>(Gearbox::getInstance().getTObject(directory.c_str()));
+//     const VXDTFSecMap* newMap = dynamic_cast<const VXDTFSecMap*>(Gearbox::getInstance().getTObject(directory.c_str()));
 
     const double mField = newMap->getMagneticFieldStrength();
     magneticField = mField;
@@ -928,6 +929,7 @@ void VXDTFModule::beginRun()
           B2DEBUG(130, " > > importing filter: " << FilterID().getFilterString(aFilter.first) << " (named " << aFilter.first << " as an int) including Min/Max: " << aFilter.second.first << "/" << aFilter.second.second);
           // aFilter.first is filterID, .second is cutoff, where .second.first is min, .second.second is max
           unsigned int filterID = aFilter.first;
+          cutoffMinValue = 0, cutoffMaxValue = 0;
           if (filterID == FilterID::numFilters) { B2FATAL("Filter in XML-File does not exist! check FilterID-class!")}
           // now, for each filter will be checked, whether it shall be stored or not and whether the cutoffs shall be modified:
           if (filterID == FilterID::distance3D && newPass->distance3D.first == true) {   // first: activateDistance3D, second: tuneDistance3D
@@ -1243,20 +1245,20 @@ void VXDTFModule::the_real_event()
         }
         finalTrackCandidates.appendNew(gfTC);
       }
-
-      cleanEvent(&m_baselinePass, centerSector);
-      stopTimer = boostClock::now();
-      if (m_PARAMwriteToRoot == true) {
-        m_rootTimeConsumption = (stopTimer - beginEvent).count();
-        m_treeEventWisePtr->Fill();
-      }
-      m_TESTERtimeConsumption.baselineTF += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-      thisInfoPackage.sectionConsumption.baselineTF += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-      thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-      B2DEBUG(1, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
-      m_TESTERlogEvents.push_back(thisInfoPackage);
-      return;
     }
+    cleanEvent(&m_baselinePass, centerSector);
+    stopTimer = boostClock::now();
+    if (m_PARAMwriteToRoot == true) {
+      m_rootTimeConsumption = (stopTimer - beginEvent).count();
+      m_treeEventWisePtr->Fill();
+    }
+    m_TESTERtimeConsumption.baselineTF += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+    thisInfoPackage.sectionConsumption.baselineTF += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+    thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+    B2DEBUG(1, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
+    m_TESTERlogEvents.push_back(thisInfoPackage);
+    return;
+
   }
 
 
@@ -3785,6 +3787,7 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, CurrentPassData* pas
   ActiveSensorsOfEvent activatedSensors;
   vector<ClusterHit> clusterHitList;
   vector<VXDTFHit> vxdHits, singleSidedHits;
+  vxdHits.reserve(clusters.size() * 2);
 
   BOOST_FOREACH(ClusterInfo & aClusterInfo, clusters) {
     bool isPXD = aClusterInfo.isPXD();
@@ -3945,7 +3948,7 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, CurrentPassData* pas
     if (nBrokenSensors != 0) { m_TESTERrejectedBrokenHitsTrack++; }
     return false;
   }
-  B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: ziggZaggXY approved TC");
+  B2DEBUG(2, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: ziggZaggXY approved TC");
 
 
   bool survivedCF = doTheCircleFit(passInfo, newTC, nHits, 0, 0);
@@ -3956,6 +3959,7 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, CurrentPassData* pas
     B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: rejected by circleFit");
     return false;
   }
+  B2DEBUG(2, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: circleFit approved TC");
 
   double pT = passInfo->trackletFilterBox.calcPt();
   if (pT < 0.01) {   // smaller than 10 MeV, WARNING: hardcoded!
@@ -3964,6 +3968,7 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, CurrentPassData* pas
     B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: rejected by pT (too small: " << pT << "GeV/c)");
     return false;
   }
+  B2DEBUG(2, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: pT approved TC");
 
   passInfo->tcVector.push_back(newTC);
   if (nBrokenSensors != 0) { m_TESTERacceptedBrokenHitsTrack++; }

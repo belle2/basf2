@@ -17,12 +17,17 @@
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 
 namespace Belle2 {
+
+  /** List of implemented NtupleTools used to create an NtupleTool object
+  from a provided Name. If you implemented a new NtupleTool, the create() method
+  has to be extended (see existing entries there). */
   class NtupleToolList {
   public:
     NtupleToolList() {};
     ~NtupleToolList() {};
-    /** Create calls the respective analysis tools specified in strName to build the analysis root tree */
-    /** The decay descriptor provides steering within the respective analysis tools*/
+    /** Create the NtupleTool specified by strName. The TTree* tree is
+    the tree to which the NtupleTool will write. The DecayDescriptor d specifies
+    which reconstructed particles the NtupleTool should act on. */
     static NtupleFlatTool* create(std::string strName, TTree* tree, DecayDescriptor& d);
   };
 } // namespace Belle2

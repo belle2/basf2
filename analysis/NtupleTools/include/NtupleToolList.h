@@ -21,6 +21,8 @@ namespace Belle2 {
   public:
     NtupleToolList() {};
     ~NtupleToolList() {};
+    /** Create calls the respective analysis tools specified in strName to build the analysis root tree */
+    /** The decay descriptor provides steering within the respective analysis tools*/
     static NtupleFlatTool* create(std::string strName, TTree* tree, DecayDescriptor& d);
   };
 } // namespace Belle2

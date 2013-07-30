@@ -80,7 +80,7 @@ namespace Belle2 {
      *  Second parameter is the name of the CDCTrackHits array. In this way the sort function can get all necessary information about the hits.
      *  Third parameter is the estimated charge of the track, which is needed for hits from the same layer to be ordered correctly.
      */
-    static void sortHits(std::vector<int> & hitIndices, const std::vector<CDCTrackHit>& cdcTrackHits, double charge);
+    static void sortHits(std::vector<int>& hitIndices, const std::vector<CDCTrackHit>& cdcTrackHits, double charge);
 
     /** This method is a comparison function used in the sortHits() function.
      *  This method is there to compare 4-tuples with <hitId, rho, wireId, charge>.

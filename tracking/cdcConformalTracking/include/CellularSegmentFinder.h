@@ -46,7 +46,7 @@ namespace Belle2 {
      *  Third parameter: number of layer in the given superlayer (usually 6, in the innermost 8)
      *  This method is executed for each superlayer. The states of all hits in this superlayer are evaluated.
      */
-    static void EvaluateStates(std::vector<CDCTrackHit> & cdcHits, const int startLayer, const int nLayers);
+    static void EvaluateStates(std::vector<CDCTrackHit>& cdcHits, const int startLayer, const int nLayers);
 
     /** This method checks for hit neighbours in the same layer.
      *  Per default only 'single hit chain' is constructed. There are however often two hits in one layer.
@@ -54,7 +54,7 @@ namespace Belle2 {
      *  If such a neighbour hit is found, it is checked if the drift times of the two hits are 'compatible' (their sum should be approximately the distance between the wires).
      *  If such a neighbour hit is found, this hit get the same segment ids assigned as the given hit.
      */
-    static void  CheckLayerNeighbours(const CDCTrackHit& aHit, std::vector<CDCTrackHit> & cdcHits);
+    static void  CheckLayerNeighbours(const CDCTrackHit& aHit, std::vector<CDCTrackHit>& cdcHits);
 
     /** This is the main method of the CellularSegmentFinder.
       * First parameter: name of the StoreArray with CDCTrackHits (input)
@@ -66,7 +66,7 @@ namespace Belle2 {
       * An additional method is executed each time a neighbouring hit is found: it is checked if there is a close neighbour in the same layer (WireIdDifference == 1) and this hit get also the same segment Id.
       * In the last step all the segments are finally created and added to the StoreArray (and all hits get assigned accordingly to their segment Ids, the same hit can be used by different segments)
       */
-    static void FindSegments(std::vector<CDCTrackHit> & cdcHits, std::vector<CDCSegment> & Segments);
+    static void FindSegments(std::vector<CDCTrackHit>& cdcHits, std::vector<CDCSegment>& Segments);
 
   private:
 

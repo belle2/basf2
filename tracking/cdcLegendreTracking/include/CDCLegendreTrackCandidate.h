@@ -46,7 +46,7 @@ namespace Belle2 {
      * @param trackHitList List of Hits, which are assigned to the track
      */
     CDCLegendreTrackCandidate(double theta, double r, int charge,
-                              const std::vector<CDCLegendreTrackHit*> & trackHitList);
+                              const std::vector<CDCLegendreTrackHit*>& trackHitList);
 
     /**Return vector of assigned hits.*/
     inline std::vector<Belle2::CDCLegendreTrackHit*> getTrackHits() {
@@ -138,7 +138,7 @@ namespace Belle2 {
      * Determines the charge assumption of a potential track candidate, using its curvature with respect to all hits. A voting system is used to separate single and two tracks
      */
     static int getChargeAssumption(
-      double theta, double r, const std::vector<CDCLegendreTrackHit*> & trackHits);
+      double theta, double r, const std::vector<CDCLegendreTrackHit*>& trackHits);
 
     /**
      * @brief return Layer ID of the contributing axial hit with the small layer ID.

@@ -241,7 +241,7 @@ void CDCTrackingModule::terminate()
 
 }
 
-void CDCTrackingModule::sortHits(vector<int> & hitIndices, const vector<CDCTrackHit>& cdcTrackHits, double charge)
+void CDCTrackingModule::sortHits(vector<int>& hitIndices, const vector<CDCTrackHit>& cdcTrackHits, double charge)
 {
   unsigned int max_hits = hitIndices.size();
 

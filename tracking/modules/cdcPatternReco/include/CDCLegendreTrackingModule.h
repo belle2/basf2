@@ -98,8 +98,8 @@ namespace Belle2 {
 
     int m_maxLevel; /**< Maximum Level of FastHough Algorithm*/
 
-    const static double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
-    const static double m_rc = 0.0176991150442477874; /**< threshold of r, which defines curlers*/
+    static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
+    static constexpr double m_rc = 0.0176991150442477874; /**< threshold of r, which defines curlers*/
 
     double* m_sin_theta; /**< Lookup array for calculation of sin*/
     double* m_cos_theta; /**< Lookup array for calculation of cos*/
@@ -117,7 +117,7 @@ namespace Belle2 {
      * @param CDCLegendreTrackHits name of the CDCTrackHits array. In this way the sort funtion can get all necessary information about the hits.
      * @param charge estimated charge of the track, which is needed for hits from the same layer to be ordered correctly.
      */
-    void sortHits(std::vector<CDCLegendreTrackHit*> & hitIndices, int charge);
+    void sortHits(std::vector<CDCLegendreTrackHit*>& hitIndices, int charge);
 
     /**
      * Function used in the event function, which contains the search for tracks, calling multiply the Fast Hough algorithm, always just searching for one track and afterwards removin the according hits from the hit list.
@@ -139,7 +139,7 @@ namespace Belle2 {
      * @param track construction of std::pairs, describing the track candidate by the axial hits, belonging to it and the parameter r and theta
      * @param trackHitList list of all track hits, which are used for track finding. Hits belonging to the track candidate will be deleted from it.
      */
-    void createLegendreTrackCandidate(const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > &track, std::set<CDCLegendreTrackHit*>* trackHitList);
+    void createLegendreTrackCandidate(const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track, std::set<CDCLegendreTrackHit*>* trackHitList);
 
 
     /**
@@ -166,8 +166,8 @@ namespace Belle2 {
      * At each step, the remaining voting plane is divided in 2x2 squares and the voting procedure is performed in each of them, following NIM A 592 (456 - 462).
      * Only bins with more bins than the current maximum are further investigated where the current maximum is determined of the configured threshold or the number of hits of an already found track candidate.
      */
-    void MaxFastHough(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > *candidate,
-                      const std::vector<CDCLegendreTrackHit*> &hits, const int level, const int theta_min,
+    void MaxFastHough(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* candidate,
+                      const std::vector<CDCLegendreTrackHit*>& hits, const int level, const int theta_min,
                       const int theta_max, const double r_min, const double r_max, const unsigned limit);
 
     /**

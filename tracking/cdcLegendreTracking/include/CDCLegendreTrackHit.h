@@ -117,7 +117,7 @@ namespace Belle2 {
 
     TVector3 m_wirePositionOrig;           /**< Original Coordinates of the center (!) of the hit wire. */
 
-    static const double m_zReference = 25.852;  /**< Reference z position for wire position determination*/
+    static constexpr double m_zReference = 25.852;  /**< Reference z position for wire position determination*/
 
   }; //end class CDCTrackHit
 } //end namespace Belle2

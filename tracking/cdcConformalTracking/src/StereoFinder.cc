@@ -53,7 +53,7 @@ int StereoFinder::WireIdDifference(CDCTrackCandidate& track, CDCSegment& segment
   return CellularSegmentFinder::WireIdDifference(track.getOuterMostHit(), segment.getOuterMostHit());
 }
 
-void StereoFinder::FindStereoSegments(CDCTrackCandidate& startTrack, vector<CDCSegment> & cdcStereoSegments, double SimpleDistanceCut,
+void StereoFinder::FindStereoSegments(CDCTrackCandidate& startTrack, vector<CDCSegment>& cdcStereoSegments, double SimpleDistanceCut,
                                       double ShortDistanceCut, int SLId)
 {
   int nSegments = cdcStereoSegments.size();
@@ -236,7 +236,7 @@ void StereoFinder::CheckOvercrowdedSL(CDCTrackCandidate& axialCandidate, CDCTrac
 }
 
 
-void StereoFinder::AppendStereoSegments(vector<CDCSegment> & cdcStereoSegments, vector<CDCTrackCandidate>& cdcTrackCandidates)
+void StereoFinder::AppendStereoSegments(vector<CDCSegment>& cdcStereoSegments, vector<CDCTrackCandidate>& cdcTrackCandidates)
 {
 
   int nSegments = cdcStereoSegments.size();

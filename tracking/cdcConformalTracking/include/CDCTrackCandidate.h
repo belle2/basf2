@@ -85,10 +85,10 @@ namespace Belle2 {
     TVector3& getDirection() {return m_direction;};
 
     /** Returns a vector with all segments in the TrackCandidate. */
-    std::vector<Belle2::CDCSegment> & getSegments() {return m_Segments;};
+    std::vector<Belle2::CDCSegment>& getSegments() {return m_Segments;};
 
     /** Returns a vector with all hits in the TrackCandidate. */
-    std::vector<Belle2::CDCTrackHit> & getTrackHits() {return m_TrackHits;};
+    std::vector<Belle2::CDCTrackHit>& getTrackHits() {return m_TrackHits;};
 
     /** Returns the innermost axial hit (closest to the origin) of the TrackCandidate. */
     CDCTrackHit& getInnerMostHit() {return m_innerMostHit;};

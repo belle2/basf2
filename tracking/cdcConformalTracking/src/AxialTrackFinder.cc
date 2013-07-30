@@ -124,7 +124,7 @@ double AxialTrackFinder::SimpleDistance(CDCSegment& segment1,
 
 
 float AxialTrackFinder::UsedSegmentsFraction(CDCTrackCandidate& track,
-                                             vector<int> & UsedSegmentId)
+                                             vector<int>& UsedSegmentId)
 {
 
   int used = 0;
@@ -147,7 +147,7 @@ float AxialTrackFinder::UsedSegmentsFraction(CDCTrackCandidate& track,
 }
 
 float AxialTrackFinder::UsedHitsFraction(CDCTrackCandidate& track,
-                                         vector<int> & UsedTrackHitId)
+                                         vector<int>& UsedTrackHitId)
 {
 
   int used = 0;
@@ -187,7 +187,7 @@ int AxialTrackFinder::EvaluateBestCandidate(const vector<CDCTrackCandidate>& can
 
 
 
-vector<CDCTrackCandidate> AxialTrackFinder:: FindTrackCandidates(vector<CDCSegment> & cdcAxialSegments, double SimpleDistanceCut, double AngleCut, double ShortDistanceCut, int StartSLId)
+vector<CDCTrackCandidate> AxialTrackFinder:: FindTrackCandidates(vector<CDCSegment>& cdcAxialSegments, double SimpleDistanceCut, double AngleCut, double ShortDistanceCut, int StartSLId)
 {
 
   double myAngleCut = AngleCut;
@@ -419,7 +419,7 @@ void AxialTrackFinder::FitTrackCandidate(CDCTrackCandidate& candidate)
 
 
 
-void AxialTrackFinder::FitTrackCandidates(vector<CDCTrackCandidate> & candidates)
+void AxialTrackFinder::FitTrackCandidates(vector<CDCTrackCandidate>& candidates)
 {
 
   for (unsigned int i = 0; i < candidates.size(); i++) {
@@ -428,7 +428,7 @@ void AxialTrackFinder::FitTrackCandidates(vector<CDCTrackCandidate> & candidates
   }
 }
 
-void AxialTrackFinder::CollectTrackCandidates(vector<CDCSegment> & cdcAxialSegments, vector<CDCTrackCandidate>& cdcTrackCandidates)
+void AxialTrackFinder::CollectTrackCandidates(vector<CDCSegment>& cdcAxialSegments, vector<CDCTrackCandidate>& cdcTrackCandidates)
 {
 
   if (cdcAxialSegments.size() == 0) B2WARNING("AxialTrackFinder: cdcAxialSegments collection is empty!");

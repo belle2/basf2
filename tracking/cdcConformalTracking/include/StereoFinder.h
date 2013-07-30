@@ -72,7 +72,7 @@ namespace Belle2 {
      * Fourth parameter: cut an the 'shortest' distance between the track and the segment in the conformal plane.
      * Fifth parameter: superlayer to be searched.
      */
-    static void FindStereoSegments(CDCTrackCandidate& startTrack, std::vector<CDCSegment> & cdcStereoSegments, double SimpleDistanceCut, double ShortDistanceCut, int SLId);
+    static void FindStereoSegments(CDCTrackCandidate& startTrack, std::vector<CDCSegment>& cdcStereoSegments, double SimpleDistanceCut, double ShortDistanceCut, int SLId);
 
 
     /**Main method to append the stereo segments to the track candidates.
@@ -82,7 +82,7 @@ namespace Belle2 {
      * After the 'best matching' coordinates are found, the segments have to pass another more strict cut to be assigned to the track candidate.
      * At the end the superlayers are checked to have only one segment, the best one is selected and the others are removed.
      */
-    static void AppendStereoSegments(std::vector<CDCSegment> & cdcStereoSegments, std::vector<CDCTrackCandidate> & CDCTrackCandidates);
+    static void AppendStereoSegments(std::vector<CDCSegment>& cdcStereoSegments, std::vector<CDCTrackCandidate>& CDCTrackCandidates);
 
   private:
 

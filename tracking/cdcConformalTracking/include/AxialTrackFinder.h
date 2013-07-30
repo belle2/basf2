@@ -46,19 +46,19 @@ namespace Belle2 {
      * First parameter is a track which segments will be checked.
      * Second parameter is a vector with Id's of already used segments.
      */
-    static float UsedSegmentsFraction(CDCTrackCandidate& track, std::vector<int> & UsedSegmentId);
+    static float UsedSegmentsFraction(CDCTrackCandidate& track, std::vector<int>& UsedSegmentId);
 
     /** Returns a fraction of hits already used to reconstruct another track.
      * First parameter is a track which hits will be checked.
      * Second parameter is a vector with Id's of already used hits.
      */
-    static float UsedHitsFraction(CDCTrackCandidate& track, std::vector<int> & UsedTrackHitId);
+    static float UsedHitsFraction(CDCTrackCandidate& track, std::vector<int>& UsedTrackHitId);
 
     /** Returns the track candidate with the smallest chi2 from the given track candidate vector.
      *  One 'real' track may have multiple track candidates which differ by some wrongly assigned hits/segments.
      *  If the tracks are 'too similar', the one with the lowest chi2 (from the linear fit in the conformal plane) is selected.
      */
-    static int EvaluateBestCandidate(const std::vector <CDCTrackCandidate> & candidates, const std::vector <int> & indices);
+    static int EvaluateBestCandidate(const std::vector <CDCTrackCandidate>& candidates, const std::vector <int>& indices);
 
 
     /** Searchs for track candidates from given segments and within the given cuts.
@@ -72,7 +72,7 @@ namespace Belle2 {
      * If more than one segment from the same superlayer is 'neighbour' to another, the candidate is split and the two candidates are propagated independently.
      * A vector filled with found track candidates is returned.
      */
-    static std::vector<CDCTrackCandidate> FindTrackCandidates(std::vector<CDCSegment> & cdcAxialSegments, double SimpleDistanceCut, double AngleCut, double ShortDistanceCut, int StartSLId);
+    static std::vector<CDCTrackCandidate> FindTrackCandidates(std::vector<CDCSegment>& cdcAxialSegments, double SimpleDistanceCut, double AngleCut, double ShortDistanceCut, int StartSLId);
 
     /** Performs a simple linear fit of the track in the conformal plane, calculates and assigns chi2, transverse momentum and charge estimation to the track candidate.
      *  Conformal coordinates of all hits (excluding the first layer) of the given track candidate are fitted with a straight line.
@@ -83,7 +83,7 @@ namespace Belle2 {
     /** Performs a simple linear fit of all the tracks in the conformal plane, calculates and assigns chi2, transverse momentum and charge estimation to the track candidates.
      *  Conformal coordinates of all hits (excluding the first layer) of the given track candidate are fitted with a straight line.
      */
-    static void FitTrackCandidates(std::vector<CDCTrackCandidate> & candidates);
+    static void FitTrackCandidates(std::vector<CDCTrackCandidate>& candidates);
 
     /** Main method of to create track candidates from segments.
      * First parameter is a vector with axial Segments ('input'), second the name of the CDCTrackCandidates array ('output').
@@ -92,7 +92,7 @@ namespace Belle2 {
      * Only candidates with enough unused segments can be added to the final array. (The search starts with the longest candidates).
      * An additional step is performed for 'short' (2 or 3 segments) candidates to find out if they can be combined to one 'long' (4 or 5 segments) candidate.
      */
-    static void CollectTrackCandidates(std::vector<CDCSegment> & cdcAxialSegments, std::vector<CDCTrackCandidate>& CDCTrackCandidates);
+    static void CollectTrackCandidates(std::vector<CDCSegment>& cdcAxialSegments, std::vector<CDCTrackCandidate>& CDCTrackCandidates);
 
 
   private:

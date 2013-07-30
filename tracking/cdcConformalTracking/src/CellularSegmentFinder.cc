@@ -110,7 +110,7 @@ void CellularSegmentFinder::EvaluateStates(vector<CDCTrackHit>& cdcHits, const i
 
 }
 
-void CellularSegmentFinder::CheckLayerNeighbours(const CDCTrackHit& aHit, vector<CDCTrackHit> & cdcHits)
+void CellularSegmentFinder::CheckLayerNeighbours(const CDCTrackHit& aHit, vector<CDCTrackHit>& cdcHits)
 {
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
 
@@ -130,7 +130,7 @@ void CellularSegmentFinder::CheckLayerNeighbours(const CDCTrackHit& aHit, vector
 
 }
 
-void CellularSegmentFinder::FindSegments(vector<CDCTrackHit> & cdcHits, vector <CDCSegment>& Segments)
+void CellularSegmentFinder::FindSegments(vector<CDCTrackHit>& cdcHits, vector <CDCSegment>& Segments)
 {
 
   vector<CDCTrackHit> hitsArray [9]; //array to store TrackHit vectors, with track hits belonging to only one superlayer

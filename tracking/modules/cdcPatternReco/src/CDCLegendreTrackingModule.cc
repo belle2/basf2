@@ -279,7 +279,7 @@ void CDCLegendreTrackingModule::mergeTracks(CDCLegendreTrackCandidate* cand1,
 }
 
 void CDCLegendreTrackingModule::createLegendreTrackCandidate(
-  const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > &track,
+  const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track,
   std::set<CDCLegendreTrackHit*>* trackHitList)
 {
 
@@ -424,13 +424,13 @@ void CDCLegendreTrackingModule::terminate()
 }
 
 void CDCLegendreTrackingModule::MaxFastHough(
-  std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > *candidate,
-  const std::vector<CDCLegendreTrackHit*> &hits, const int level,
+  std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* candidate,
+  const std::vector<CDCLegendreTrackHit*>& hits, const int level,
   const int theta_min, const int theta_max, const double r_min,
   const double r_max, const unsigned limit)
 {
   if (not m_reconstructCurler
-      && (r_min* r_max >= 0 && fabs(r_min) > m_rc && fabs(r_max) > m_rc)) {
+      && (r_min * r_max >= 0 && fabs(r_min) > m_rc && fabs(r_max) > m_rc)) {
     return;
   }
 
@@ -526,7 +526,7 @@ inline bool CDCLegendreTrackingModule::sameSign(double n1, double n2,
 }
 
 void CDCLegendreTrackingModule::sortHits(
-  std::vector<CDCLegendreTrackHit*> & hits, int charge)
+  std::vector<CDCLegendreTrackHit*>& hits, int charge)
 {
   CDCTracking_SortHit sorter(charge);
   stable_sort(hits.begin(), hits.end(), sorter);

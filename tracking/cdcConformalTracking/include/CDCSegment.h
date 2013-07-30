@@ -63,12 +63,12 @@ namespace Belle2 {
     bool getIsAxial() const {return m_isAxial;};
 
     /** Return a vector with Ids of track candidates to which this segment may belong.  */
-    const std::vector<int> & getTrackCandId() const {return m_trackCandId;};
+    const std::vector<int>& getTrackCandId() const {return m_trackCandId;};
 
     /** Returns a vector with TrackHits objects in the Segment.
      * This vector contains all Hits which build this Segment.
      */
-    std::vector<Belle2::CDCTrackHit> & getTrackHits() {return m_TrackHits;};
+    std::vector<Belle2::CDCTrackHit>& getTrackHits() {return m_TrackHits;};
 
     /** Returns the direction of the segment.
      * The direction is calculated as a TVector3 of the innermost hit position relatively to the outermost hit position of the segment in the conformal plane.

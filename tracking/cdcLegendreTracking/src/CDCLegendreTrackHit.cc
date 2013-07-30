@@ -258,11 +258,11 @@ bool CDCLegendreTrackHit::approach2(const CDCLegendreTrackCandidate& track)
 
   double l;
 
-  if (isnan(l1) && isnan(l2))
+  if (std::isnan(l1) && std::isnan(l2))
     return false;
-  else if (isnan(l1))
+  else if (std::isnan(l1))
     l = l2;
-  else if (isnan(l2))
+  else if (std::isnan(l2))
     l = l1;
   else
     l = fabs(l1 - 0.5) < fabs(l2 - 0.5) ? l1 : l2;

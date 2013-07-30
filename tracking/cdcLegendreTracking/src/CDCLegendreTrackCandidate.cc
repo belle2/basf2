@@ -35,7 +35,7 @@ CDCLegendreTrackCandidate::~CDCLegendreTrackCandidate()
 }
 
 CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(double theta, double r, int charge,
-                                                     const std::vector<CDCLegendreTrackHit*> & trackHitList) :
+                                                     const std::vector<CDCLegendreTrackHit*>& trackHitList) :
   m_theta(theta), m_r(r), m_xc(cos(theta) / r), m_yc(sin(theta) / r), m_charge(charge), m_axialHits(0), m_stereoHits(0), m_calcedMomentum(false), m_momEstimation(0, 0, 0)
 {
   m_TrackHits.reserve(256);
@@ -167,7 +167,7 @@ double CDCLegendreTrackCandidate::DistanceTo(double xc, double yc,
 }
 
 int CDCLegendreTrackCandidate::getChargeAssumption(
-  double theta, double r, const std::vector<CDCLegendreTrackHit*> & trackHits)
+  double theta, double r, const std::vector<CDCLegendreTrackHit*>& trackHits)
 {
   double yc = TMath::Sin(theta) / r;
   double xc = TMath::Cos(theta) / r;

@@ -1,12 +1,16 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2011  Belle II Collaboration                         *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Martin Ritter                              *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+/*****************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                        *
+ * Copyright(C) 2010-2011  Belle II Collaboration                            *
+ *                                                                           *
+ * Author: The Belle II Collaboration                                        *
+ * Contributors: Andreas Moll, Martin Ritter                                 *
+ *                                                                           *
+ * This software is provided "as is" without any warranty.                   *
+ *                                                                           *
+ * 7/28/13 Modified (addToG4) to (addToG4 && mcParticle.getLifetime() != 0.0)*
+ * to deal with the resonance particles that enter the detector in GEANT4    *
+ * by R. Godang and Doris Kim                                                *
+ *****************************************************************************/
 
 #include <simulation/kernel/MCParticleGenerator.h>
 
@@ -70,7 +74,8 @@ void MCParticleGenerator::addParticle(MCParticle& mcParticle, G4Event* event, G4
 
   G4ParticleDefinition* pdef = G4ParticleTable::GetParticleTable()->FindParticle(mcParticle.getPDG());
   if (pdef == NULL) {
-    if (addToG4) B2WARNING("PDG code " << mcParticle.getPDG() << " unknown to Geant4. Particle will be skipped.");
+    // 7/28/13 RG, DK when the skipped particle has a long lived and it is not flagged as virtual
+    if (addToG4 && mcParticle.getLifetime() != 0.0) B2WARNING("PDG code " << mcParticle.getPDG() << " unknown to Geant4. Particle will be skipped.");
     addToG4 = false;
   }
 

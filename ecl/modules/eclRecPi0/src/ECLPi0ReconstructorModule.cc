@@ -175,10 +175,9 @@ void ECLPi0ReconstructorModule::event()
 
           eclPi0ToGamma.add(m_Pi0Num, iGamma1);
           eclPi0ToGamma.add(m_Pi0Num, iGamma2);
-          //cout << "Event " << m_nEvent << " Pi0 from Gamma " << m_showerId1 << " " << m_showerId2 << " " << m_pi0E << " " << m_pi0mass << endl;
 
         }//unfitted mass with pi0 mass window
-      } else {cout << m_nEvent << " km.doFit err " << endl;  }
+      }//if MassFit not fail
 
     }//iGamma2
   }//iGamma1

@@ -86,6 +86,26 @@ namespace Belle2 {
       return DataStore::Instance().optionalInput(*this);
     }
 
+    /** Create a default object in the data store.
+     *
+     *  @param replace   Should an existing object be replaced?
+     *  @return          True if the creation succeeded.
+     **/
+    bool create(bool replace = false) {
+      return DataStore::Instance().createObject(0, replace, *this);
+    };
+
+    /** Add an existing object to the data store (takes ownership).
+     *
+     *  @param object    The object that should be put in the DataStore.
+     *  @param replace   Should an existing object be replaced?
+     *  @return          True if the creation succeeded.
+     **/
+    bool assign(TObject* object, bool replace = false) {
+      return DataStore::Instance().createObject(object, replace, *this);
+    };
+
+
     /** Return name under which the object is saved in the DataStore. */
     const std::string& getName() const { return m_name; }
 

@@ -56,19 +56,19 @@ namespace Belle2 {
       cdchit.create();
       cdchit->setCharge(5.0);
       \endcode
-   *  To put an existing object in the data store, use it as first argument
-   *  of the create method:
+   *  To put an existing object in the data store, use the assign method:
    *  \code
       //store a single cdchit
       CDCHit* cdchit = new CDCHit;
-      StoreObjPtr<CDCHit> cdchit;
-      cdchit.create(cdchit);
-      cdchit->setCharge(5.0);
+      StoreObjPtr<CDCHit> cdchitPtr;
+      cdchitPtr.assign(cdchit);
+      cdchitPtr->setCharge(5.0);
       \endcode
    *  Note that the datastore takes ownership of the object!
    *
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreObjPtr">The basf2 developers</a>
    *  @sa If you want to store more than a single object of one type, use the StoreArray class.
+   *  @sa Data can also be created/accessed from Python modules using PyStoreObj
    */
   template <class T> class StoreObjPtr : public StoreAccessorBase {
   public:
@@ -135,25 +135,6 @@ namespace Belle2 {
      */
     explicit StoreObjPtr(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event):
       StoreAccessorBase(DataStore::objectName<T>(name), durability, T::Class(), false), m_storeObjPtr(0) {}
-
-    /** Create a default object in the data store.
-     *
-     *  @param replace   Should an existing object be replaced?
-     *  @return          True if the creation succeeded.
-     **/
-    bool create(bool replace = false) {
-      return DataStore::Instance().createObject(0, replace, *this);
-    };
-
-    /** Add an existing object to the data store (takes ownership).
-     *
-     *  @param object    The object that should be put in the DataStore.
-     *  @param replace   Should an existing object be replaced?
-     *  @return          True if the creation succeeded.
-     **/
-    bool assign(TObject* object, bool replace = false) {
-      return DataStore::Instance().createObject(object, replace, *this);
-    };
 
     /** Check whether the object was created.
      *

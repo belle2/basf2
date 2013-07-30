@@ -121,9 +121,10 @@ namespace Belle2 {
    *  Internally, the arrays are stored as TClonesArrays, see
    *  http://root.cern.ch/root/html/TClonesArray.html for technical details.
    *
-   *  @sa objects in different arrays can be linked using relations, see
+   *  @sa Objects in different arrays can be linked using relations, see
    *      RelationArray or RelationIndex.
-   *  @sa see StoreObjPtr for a way store single objects
+   *  @sa See StoreObjPtr for a way store single objects
+   *  @sa Data can also be accessed from Python modules using PyStoreArray
    *
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreArray">The basf2 developers</a>
    */
@@ -197,28 +198,14 @@ namespace Belle2 {
     explicit StoreArray(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event):
       StoreAccessorBase(DataStore::arrayName<T>(name), durability, T::Class(), true), m_storeArray(0) {}
 
-    /** Create an empty array in the data store.
+    /** Delete all entries in this array.
      *
-     *  \note Arrays are automatically set to an empty state at the start
-     *        of each event, so there's usually no need to call this yourself.
-     *        Can be used to empty an array, by calling it with replace=true.
-     *
-     *  @param replace   Should an existing object be replaced?
-     *  @return          True if the creation succeeded.
-     **/
-    bool create(bool replace = false) {
-      return DataStore::Instance().createObject(0, replace, *this);
-    };
-
-    /** Add an existing array to the data store.
-     *
-     *  @param object    The object that should be put in the DataStore.
-     *  @param replace   Should an existing object be replaced?
-     *  @return          True if the creation succeeded.
-     **/
-    bool assign(TObject* object, bool replace = false) {
-      return DataStore::Instance().createObject(object, replace, *this);
-    };
+     * TODO: currently produces dangling relations if any were created
+     */
+    bool clear() {
+      if (isValid())
+        (*m_storeArray)->Delete();
+    }
 
     /** Check whether the array was created.
      *

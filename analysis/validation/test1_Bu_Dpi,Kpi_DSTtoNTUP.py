@@ -4,51 +4,33 @@
 import sys
 import os
 from basf2 import *
-
-from reconstruction import add_reconstruction
 from modularAnalysis import *
 
-# Create main path
-main = create_path()
+inputMdst('../Bu_D0pi,Kpi_GENSIMRECtoDST.dst.root')
+loadReconstructedParticles()
 
-input = register_module('RootInput')
-input.param('inputFileName', '../Bu_D0pi,Kpi_GENSIMRECtoDST.dst.root')
-main.add_module(input)
-
-# ---------------------------------------------------------------
-# Show progress of processing
-progress = register_module('Progress')
-gearbox = register_module('Gearbox')
-main.add_module(progress)
-main.add_module(gearbox)
-
-# ----------------------------------------------------------------
-loadReconstructedParticles(main)
-
-selectParticle(main, 'K-', -321, [''])
-selectParticle(main, 'pi+', 211, [''])
-selectParticle(main, 'pi-', -211, [''])
+selectParticle('K-', -321, [''])
+selectParticle('pi+', 211, [''])
+selectParticle('pi-', -211, [''])
 
 makeParticle(
-    main,
     'D0',
     421,
     ['K-', 'pi+'],
     1.7,
     2.0,
     )
-applyCuts(main, 'D0', ['M 1.81:1.91'])
+applyCuts('D0', ['M 1.81:1.91'])
 
 # Prepare the B candidates
 makeParticle(
-    main,
     'B-toD0pi',
     -521,
     ['D0', 'pi-'],
     5.2,
     5.4,
     )
-applyCuts(main, 'B-toD0pi', ['M 5.2:5.4'])
+applyCuts('B-toD0pi', ['M 5.2:5.4'])
 
 # ----> NtupleMaker module
 ntuple1 = register_module('NtupleMaker')

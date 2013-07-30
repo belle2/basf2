@@ -4,58 +4,21 @@
 import sys
 import os
 from basf2 import *
-
-from reconstruction import add_reconstruction
 from modularAnalysis import *
 
-# Create main path
-main = create_path()
+inputMdst('../Bd_JpsiKS,mumu_GENSIMRECtoDST.dst.root')
+loadReconstructedParticles()
 
-input = register_module('RootInput')
-input.param('inputFileName', '../Bd_JpsiKS,mumu_GENSIMRECtoDST.dst.root')
-main.add_module(input)
+selectParticle('pi+', 211, [''])
+selectParticle('pi-', -211, [''])
+selectParticle('mu+', 13, [''])
+selectParticle('mu-', -13, [''])
 
-# ---------------------------------------------------------------
-# Show progress of processing
-progress = register_module('Progress')
-gearbox = register_module('Gearbox')
-main.add_module(progress)
-main.add_module(gearbox)
-
-# ----------------------------------------------------------------
-loadReconstructedParticles(main)
-
-selectParticle(main, 'pi+', 211, [''])
-selectParticle(main, 'pi-', -211, [''])
-selectParticle(main, 'mu+', 13, [''])
-selectParticle(main, 'mu-', -13, [''])
-
-makeParticle(
-    main,
-    'jpsi',
-    443,
-    ['mu-', 'mu+'],
-    2.8,
-    3.3,
-    )
-makeParticle(
-    main,
-    'KS0',
-    310,
-    ['pi-', 'pi+'],
-    0.4,
-    0.6,
-    )
+makeParticle('jpsi', 443, ['mu-', 'mu+'], 2.8, 3.3)
+makeParticle('KS0', 310, ['pi-', 'pi+'], 0.4, 0.6)
 
 # Prepare the B candidates
-makeParticle(
-    main,
-    'B0toJpsiKS',
-    511,
-    ['jpsi', 'KS0'],
-    5.2,
-    5.4,
-    )
+makeParticle('B0toJpsiKS', 511, ['jpsi', 'KS0'], 5.2, 5.4)
 
 # ----> NtupleMaker module
 ntuple1 = register_module('NtupleMaker')
@@ -94,3 +57,4 @@ process(main)
 
 # ----> Print call statistics
 print statistics
+

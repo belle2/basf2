@@ -3,61 +3,54 @@
 
 from basf2 import *
 
+main = create_path()
 
-def Events(
-    path,
-    numlist,
-    runlist,
-    explist,
-    ):
 
-    evtmetagen = register_module('EvtMetaGen')
-    evtmetagen.param({'evtNumList': numlist, 'runList': runlist, 'expList'
-                     : explist})
-    path.add_module(evtmetagen)
+def inputMdst(filename, path=main):
+    roinput = register_module('RootInput')
+    roinput.param('inputFileName', filename)
+    path.add_module(roinput)
+    gearbox = register_module('Gearbox')
+    path.add_module(gearbox)
     progress = register_module('Progress')
     path.add_module(progress)
 
 
-def Input(path, filename):
-    roinput = register_module('RootInput')
-    roinput.param('inputFileName', filename)
-    path.add_module(roinput)
-
-
-def Output(path, filename):
+def outputMdst(filename, path=main):
     rooutput = register_module('RootOutput')
     rooutput.param('outputFileName', filename)
     path.add_module(rooutput)
 
 
-def loadMCParticles(path):
+def loadMCParticles(path=main):
     ploader = register_module('ParticleLoader')
     ploader.param('UseMCParticles', True)
     path.add_module(ploader)
 
 
-def loadReconstructedParticles(path):
+def loadReconstructedParticles(path=main):
     ploader = register_module('ParticleLoader')
     ploader.param('UseMCParticles', False)
     path.add_module(ploader)
 
 
 def selectParticle(
-    path,
     list_name,
     PDGcode,
     criteria,
+    persistent=False,
+    path=main,
     ):
 
     pselect = register_module('ParticleSelector')
     pselect.param('PDG', PDGcode)
     pselect.param('ListName', list_name)
     pselect.param('Select', criteria)
+    pselect.param('persistent', persistent)
     path.add_module(pselect)
 
 
-def applyCuts(path, list_name, criteria):
+def applyCuts(list_name, criteria, path=main):
     pselect = register_module('ParticleSelector')
     pselect.param('ListName', list_name)
     pselect.param('Select', criteria)
@@ -65,12 +58,13 @@ def applyCuts(path, list_name, criteria):
 
 
 def makeParticle(
-    path,
     list_name,
     PDGcode,
     list_of_lists,
     mL,
     mH,
+    persistent=False,
+    path=main,
     ):
 
     pmake = register_module('ParticleCombiner')
@@ -79,20 +73,41 @@ def makeParticle(
     pmake.param('InputListNames', list_of_lists)
     pmake.param('MassCutLow', mL)
     pmake.param('MassCutHigh', mH)
+    pmake.param('persistent', persistent)
     path.add_module(pmake)
 
 
-def fitVertex(path, list_name, confidenceLevel):
+def fitVertex(list_name, confidenceLevel, path=main):
     pvfit = register_module('ParticleVertexFitter')
     pvfit.param('ListName', list_name)
     pvfit.param('ConfidenceLevel', confidenceLevel)
     path.add_module(pvfit)
 
 
-def printList(path, list_name, full):
+def printList(list_name, full, path=main):
     prlist = register_module('ParticlePrinter')
     prlist.param('ListName', list_name)
     prlist.param('FullPrint', full)
     path.add_module(prlist)
+
+
+def ntupleFile(file_name, path=main):
+    ntmaker = register_module('NtupleMaker')
+    ntmaker.param('strFileName', file_name)
+    path.add_module(ntmaker)
+
+
+def ntupleTree(
+    tree_name,
+    list_name,
+    tools,
+    path=main,
+    ):
+
+    ntmaker = register_module('NtupleMaker')
+    ntmaker.param('strTreeName', tree_name)
+    ntmaker.param('strListName', list_name)
+    ntmaker.param('strTools', tools)
+    path.add_module(ntmaker)
 
 

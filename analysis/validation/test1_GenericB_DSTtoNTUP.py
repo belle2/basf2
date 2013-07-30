@@ -4,39 +4,22 @@
 import sys
 import os
 from basf2 import *
-
-from reconstruction import add_reconstruction
 from modularAnalysis import *
 
-# Create main path
-main = create_path()
+inputMdst('../GenericB_GENSIMRECtoDST.dst.root')
+loadReconstructedParticles()
 
-input = register_module('RootInput')
-input.param('inputFileName', '../GenericB_GENSIMRECtoDST.dst.root')
-main.add_module(input)
-
-# ---------------------------------------------------------------
-# Show progress of processing
-progress = register_module('Progress')
-gearbox = register_module('Gearbox')
-main.add_module(progress)
-main.add_module(gearbox)
-
-# ----------------------------------------------------------------
-loadReconstructedParticles(main)
-
-selectParticle(main, 'K-', -321, [''])
-selectParticle(main, 'pi+', 211, [''])
-selectParticle(main, 'pi-', -211, [''])
-selectParticle(main, 'pi0', 111, [''])
-selectParticle(main, 'gamma', 22, [''])
-selectParticle(main, 'e+', 11, [''])
-selectParticle(main, 'e-', -11, [''])
-selectParticle(main, 'mu+', 13, [''])
-selectParticle(main, 'mu-', -13, [''])
+selectParticle('K-', -321, [''])
+selectParticle('pi+', 211, [''])
+selectParticle('pi-', -211, [''])
+selectParticle('pi0', 111, [''])
+selectParticle('gamma', 22, [''])
+selectParticle('e+', 11, [''])
+selectParticle('e-', -11, [''])
+selectParticle('mu+', 13, [''])
+selectParticle('mu-', -13, [''])
 
 makeParticle(
-    main,
     'KS0',
     310,
     ['pi-', 'pi+'],

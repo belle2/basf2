@@ -4,32 +4,15 @@
 import sys
 import os
 from basf2 import *
-
-from reconstruction import add_reconstruction
 from modularAnalysis import *
 
-# Create main path
-main = create_path()
+inputMdst('../Bd_Kstgamma_GENSIMRECtoDST.dst.root')
+loadReconstructedParticles()
 
-input = register_module('RootInput')
-input.param('inputFileName', '../Bd_Kstgamma_GENSIMRECtoDST.dst.root')
-main.add_module(input)
-
-# ---------------------------------------------------------------
-# Show progress of processing
-progress = register_module('Progress')
-gearbox = register_module('Gearbox')
-main.add_module(progress)
-main.add_module(gearbox)
-
-# ----------------------------------------------------------------
-loadReconstructedParticles(main)
-
-selectParticle(main, 'K-', -321, [''])
-selectParticle(main, 'pi+', 211, [''])
-selectParticle(main, 'gamma', 22, [''])
+selectParticle('K-', -321, [''])
+selectParticle('pi+', 211, [''])
+selectParticle('gamma', 22, [''])
 makeParticle(
-    main,
     'K*0',
     313,
     ['K-', 'pi+'],
@@ -39,7 +22,6 @@ makeParticle(
 
 # Prepare the B candidates
 makeParticle(
-    main,
     'B0toK*0gamma',
     511,
     ['K*0', 'gamma'],

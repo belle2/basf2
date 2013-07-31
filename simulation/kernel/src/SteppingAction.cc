@@ -39,8 +39,8 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   // Check for NULL world volume
   //------------------------------
   if (track->GetVolume() == NULL) {
-    B2WARNING("SteppingAction: Track in NULL volume, terminating !\n"
-              << "step_no=" + track->GetCurrentStepNumber() << " type=" << track->GetDefinition()->GetParticleName()
+    B2WARNING("SteppingAction: Track in NULL volume, terminating!\n"
+              << "step_no=" << track->GetCurrentStepNumber() << " type=" << track->GetDefinition()->GetParticleName()
               << "\n position=" << G4BestUnit(track->GetPosition(), "Length") << " momentum=" << G4BestUnit(track->GetMomentum(), "Energy"))
     track->SetTrackStatus(fStopAndKill);
     return;
@@ -52,7 +52,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   // Check for very high number of steps.
   //---------------------------------------
   if (track->GetCurrentStepNumber() > m_maxNumberSteps) {
-    B2WARNING("SteppingAction: Too many steps for this track, terminating !\n"
+    B2WARNING("SteppingAction: Too many steps for this track, terminating!\n"
               << "step_no=" << track->GetCurrentStepNumber() << "type=" << track->GetDefinition()->GetParticleName()
               << "\n position=" << G4BestUnit(track->GetPosition(), "Length") << " momentum=" << G4BestUnit(track->GetMomentum(), "Energy"))
     track->SetTrackStatus(fStopAndKill);

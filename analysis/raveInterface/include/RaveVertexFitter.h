@@ -21,8 +21,8 @@
 
 //Genfit
 #include <GFTrack.h>
-#include <GFRaveVertex.h>
-#include <GFRaveConverters.h> // include same converter functions between root and rave
+//#include <GFRaveVertex.h>
+#include <GFRaveConverters.h> // has some converter functions between root and rave
 //rave
 #include <rave/Track.h>
 
@@ -36,6 +36,7 @@ namespace Belle2 {
      * parameters can be passed as a string. RaveVertexFitter provides the getters to extract the results produced by Rave.
      */
     class RaveVertexFitter {
+      /** I am using std::vector<int>::size_type because it is the official return value of .size() although on normal machines a ::size_type is just an unsigned int anyway. Because std::vector<int>::size_type is so long it is shortened to VecSize */
       typedef std::vector<int>::size_type VecSize;
     public:
 
@@ -151,7 +152,7 @@ namespace Belle2 {
 
 //  /** The default constructor checks if RaveSetup was initialized and will set the attributes of RaveVertexFitter */
 //  RaveVertexFitter();
-      /** initalize m_useBeamSpot. Called by constructor*/
+      /** Initialize m_useBeamSpot. Called by constructor*/
       void initBeamSpotMember();
       /** checks if the vertex the user requested via one of the getters it actually there*/
       void isVertexIdValid(const VecSize vertexId) const;

@@ -127,7 +127,7 @@ void ParticleStatsModule::terminate()
 
   std::cout << "\n=======================================================\n";
   std::cout << "\t\t\t";
-  std::cout << "| Average Candidate Multiplicity\n";
+  std::cout << "| Average Candidate Multiplicity (ACM) | ACM For Passed Events \n";
   for (int iList = 0; iList < nParticleLists; ++iList) {
     std::cout << Form("%14s(%2d)", m_strParticleLists[iList].c_str(), iList) << "\t|";
     std::cout << "\t" << Form("%6.4f", (*m_MultiplicityMatrix)(iList, 1) / m_nEvents);

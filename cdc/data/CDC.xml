@@ -22,7 +22,7 @@
 
     <MomVol>
       <ZBound id="0">
-        <Z unit="mm">-1009.0</Z>
+        <Z unit="mm">-1000.0</Z>
 	<Rmin unit="mm">260.0</Rmin>
       </ZBound>
       <ZBound id="1">
@@ -3901,7 +3901,7 @@
         <InnerR2 desc="Inner radius far from IP" unit="mm">280.5</InnerR2>
         <Thickness desc="The thickness of the cover" unit="mm">0.5</Thickness>
         <Angle desc="The angle between the cover and z axis" unit="rad">1.51</Angle>
-        <PosZ desc="Z position near IP" unit="mm">-950.0</PosZ>
+        <PosZ desc="Z position near IP" unit="mm">-1000.0</PosZ>
       </Cover>
 <!--      <Cover id="1">
         <Name>BackwardCover</Name>
@@ -3918,7 +3918,7 @@
         <InnerR2 desc="Inner radius far from IP" unit="mm">1128.0</InnerR2>
         <Thickness desc="The thickness of the cover" unit="mm">0.5</Thickness>
         <Angle desc="The angle between the cover and z axis" unit="rad">1.51</Angle>
-        <PosZ desc="Z position near IP" unit="mm">-1008.0</PosZ>
+        <PosZ desc="Z position near IP" unit="mm">-990.0</PosZ>
       </Cover> 	
       <Cover id="3">
         <Name>ForwardCover</Name>

@@ -15,6 +15,8 @@
 #include <string>
 
 namespace Belle2 {
+  template< class T >
+  class RelationVector;
   /**
    *  \addtogroup modules
    *  @{
@@ -70,6 +72,12 @@ namespace Belle2 {
 
 
   private:
+    /** remove hits/clusters (orignating from secondary particles - hits with negative weights)
+     * from MCParticle<--> class T relation vector
+     * @param relationVector: hits in this vector are checked
+     * @return: vector< T* > with the good hits */
+    template< class T >
+    std::vector< T* > removeHitsWithNegativeWeights(RelationVector< T >& relationVector);
 
     std::string m_cdcTrackCandColName;                          /**< CDC TrackCandidates collection name */
     std::string m_vxdTrackCandColName;                          /**< VXD TrackCandidates collection name */

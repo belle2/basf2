@@ -150,15 +150,21 @@ void MCTrackCandCombinerModule::event()
     MCParticle* aMcParticle = mcParticles[iPart];
 
     RelationVector<CDCHit> cdcRelations = aMcParticle->getRelationsTo<CDCHit>();
-    const int nCdcHits = cdcRelations.size();
+    // remove hits from secondary particles
+    std::vector< CDCHit* > cdcHitsFromMcParticle = removeHitsWithNegativeWeights< CDCHit >(cdcRelations);
+    const int nCdcHits = cdcHitsFromMcParticle.size();
+
 
     RelationVector<PXDCluster> pxdRelations = aMcParticle->getRelationsFrom<PXDCluster>(); //yeah these are in the opposite direction :-P
-
-    const int nPxdHits = pxdRelations.size();
+    // remove hits from seconday particles
+    std::vector< PXDCluster* > pxdClusterFromMcParticle = removeHitsWithNegativeWeights< PXDCluster >(pxdRelations);
+    const int nPxdHits = pxdClusterFromMcParticle.size();
 
     RelationVector<SVDCluster> svdRelations = aMcParticle->getRelationsFrom<SVDCluster>();
+    // remove hits from seconday particles
+    std::vector< SVDCluster* > svdClusterFromMcParticle = removeHitsWithNegativeWeights< SVDCluster >(svdRelations);
+    const int nSvdHits = svdClusterFromMcParticle.size();
 
-    const int nSvdHits = svdRelations.size();
 
     if (nCdcHits + nPxdHits + nSvdHits < 3) {
       continue; //2 hits are not enough to produce a TC no matter what track finder was used
@@ -179,7 +185,7 @@ void MCTrackCandCombinerModule::event()
       }
       for (int i = 0; i not_eq nHitIDs; ++i) {
         for (int j = 0; j not_eq nCdcHits; ++j) {
-          if (hitsFromTC[i] == cdcRelations[j]) {
+          if (hitsFromTC[i] == cdcHitsFromMcParticle[j]) {
             ++nMatchingHits;
           }
         }
@@ -214,14 +220,14 @@ void MCTrackCandCombinerModule::event()
       }
       for (int i = 0; i not_eq nPxdHitsFromTC; ++i) {
         for (int j = 0; j not_eq nPxdHits; ++j) {
-          if (pxdHitsFromTC[i] == pxdRelations[j]) {
+          if (pxdHitsFromTC[i] == pxdClusterFromMcParticle[j]) {
             ++nMatchingHits;
           }
         }
       }
       for (int i = 0; i not_eq nSvdHitsFromTC; ++i) {
         for (int j = 0; j not_eq nSvdHits; ++j) {
-          if (svdHitsFromTC[i] == svdRelations[j]) {
+          if (svdHitsFromTC[i] == svdClusterFromMcParticle[j]) {
             ++nMatchingHits;
           }
         }
@@ -324,4 +330,26 @@ void MCTrackCandCombinerModule::endRun()
 
 void MCTrackCandCombinerModule::terminate()
 {
+}
+
+template< class T >
+std::vector< T* > MCTrackCandCombinerModule::removeHitsWithNegativeWeights(RelationVector< T >& relationVector)
+{
+  std::vector< T* > goodHits;
+  int nHitMcParticlRelation = relationVector.size();
+  if (nHitMcParticlRelation == 0) {
+    B2DEBUG(99, "No relations found.");
+    goodHits.clear();
+    return goodHits;
+  }
+
+  for (int iHitRelation = 0; iHitRelation < nHitMcParticlRelation; iHitRelation++) {
+    if (relationVector.weight(iHitRelation) < 0) {
+      // remove hits with negative weights. These hits originate from secondary particles
+      continue;
+    }
+    goodHits.push_back(relationVector[iHitRelation]);
+  }
+
+  return goodHits;
 }

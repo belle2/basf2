@@ -26,7 +26,7 @@ namespace Belle2 {
    * Class to hold a list of particles and anti-particles. The list is implemented
    * as two std::vector<int> holding the indices of particles in StoreArray<Particle>.
    * Particles in the list can only be of the same kind (according to PDG code and
-   * flavor type).
+   * flavor type) and from the same Particle store array.
    */
 
   class ParticleList : public TObject {
@@ -37,7 +37,8 @@ namespace Belle2 {
      */
     ParticleList():
       m_pdg(0),
-      m_flavorType(0)
+      m_flavorType(0),
+      m_particleStore("Particles")
     {}
 
     /**
@@ -47,12 +48,24 @@ namespace Belle2 {
     void setPDG(int pdg) {m_pdg = pdg; setFlavorType();}
 
     /**
+     * Sets Particle store array name to which particle list refers to
+     * @param name name of the Particle store array
+     */
+    void setParticleStoreName(std::string name) {m_particleStore = name;}
+
+    /**
      * Swaps flavor type
      */
     void swapFlavorType() {m_flavorType = (m_flavorType == 0) ? 1 : 0;}
 
     /**
      * Adds a new particle to the list (safe method)
+     * @param particle pointer to particle in the StoreArray<Particle>
+     */
+    void addParticle(const Particle* particle);
+
+    /**
+     * Adds a new particle to the list (almost safe method)
      * @param iparticle index of the particle in the StoreArray<Particle>
      * @param pdg particle PDG code
      * @param flavorType particle flavor type
@@ -91,6 +104,12 @@ namespace Belle2 {
      * Remove marked elements from list
      */
     void removeMarked();
+
+    /**
+     * Returns Particle store array name to which particle list refers to
+     * @return name of the Particle store array
+     */
+    std::string getParticleStoreName() {return m_particleStore;}
 
     /**
      * Returns PDG code
@@ -137,10 +156,26 @@ namespace Belle2 {
 
     /**
      * Returns i-th particle from the list
-     * @param i list index (i<getListSize())
+     * @param i list index (i < getListSize())
      * @return const pointer to Particle or NULL
      */
     const Particle* getParticle(unsigned i) const;
+
+    /**
+     * Returns number of particles in the list
+     * @return number of particles
+     */
+    unsigned getNumofParticles() const {
+      return m_list[0].size();
+    }
+
+    /**
+     * Returns number of anti-particles in the list
+     * @return number of anti-particles
+     */
+    unsigned getNumofAntiParticles() const {
+      return m_list[1].size();
+    }
 
     /**
      * Prints the list
@@ -153,13 +188,14 @@ namespace Belle2 {
     unsigned m_flavorType;             /**< 0 unflavored, 1 flavored */
     std::vector<int> m_list[2];        /**< list of 0-based indices of Particles */
     std::vector<bool> m_good[2];       /**< flag for 'good' element */
+    std::string m_particleStore;       /**< name of Particle store array */
 
     /**
      * sets m_flavorType using m_pdg
      */
     void setFlavorType();
 
-    ClassDef(ParticleList, 1); /**< ClassDef */
+    ClassDef(ParticleList, 2); /**< ClassDef */
 
   };
 

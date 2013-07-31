@@ -21,12 +21,13 @@ namespace Belle2 {
   moment skipping of intermediate resonances is not implemented. */
   class MCDecayFinderModule : public Module {
   private:
-    /** Decay descriptor of decays to look for. */
-    DecayDescriptor m_decaydescriptor;
-    /** Decay string to build the decay descriptor. */
-    std::string m_strDecay;
-    /** Name of output particle list. */
-    std::string m_strListName;
+
+    DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
+    std::string m_strDecay; /**< Decay string to build the decay descriptor. */
+    std::string m_strListName; /**< Name of output particle list. */
+    bool m_persistent;  /**< toggle output particle list btw. transient/persistent */
+    std::string m_particleStore; /**< name of Particle store array */
+
   public:
     /** Constructor. */
     MCDecayFinderModule();

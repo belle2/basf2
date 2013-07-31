@@ -121,3 +121,23 @@ def ntupleTree(
     path.add_module(ntmaker)
 
 
+def findMCDecay(
+    list_name,
+    decay,
+    persistent=False,
+    path=main,
+    ):
+
+    decayfinder = register_module('MCDecayFinder')
+    decayfinder.param('strListName', list_name)
+    decayfinder.param('strDecayString', decay)
+    decayfinder.param('persistent', persistent)
+    path.add_module(decayfinder)
+
+
+def summaryOfLists(particleLists, path=main):
+    particleStats = register_module('ParticleStats')
+    particleStats.param('strParticleLists', particleLists)
+    path.add_module(particleStats)
+
+

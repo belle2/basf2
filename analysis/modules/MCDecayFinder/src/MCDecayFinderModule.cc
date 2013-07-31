@@ -3,7 +3,7 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald                                         *
+* Contributors: Christian Oswald, Marko Staric                           *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -11,6 +11,7 @@
 #include <analysis/modules/MCDecayFinder/MCDecayFinderModule.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <generators/dataobjects/MCParticle.h>
 #include <string>
@@ -27,30 +28,48 @@ MCDecayFinderModule::MCDecayFinderModule() : Module()
   setDescription("Find decays in MCParticle list matching a given DecayString.");
   //Parameter definition
   addParam("strDecayString", m_strDecay, "DecayDescriptor string.", string(""));
-  addParam("strListName", m_strListName, "Name of particle list with reconstructed particles.", string(""));
+  addParam("strListName", m_strListName, "Name of the output particle list", string(""));
+  addParam("persistent", m_persistent,
+           "toggle output particle list btw. transient/persistent", false);
 }
 
 void MCDecayFinderModule::initialize()
 {
-  B2WARNING("This is an untested prototype. Do not uses for any production purposes.")
+  B2WARNING("This is an untested prototype. Do not use for any production purposes.");
 
   if (m_strDecay.empty()) B2ERROR("No decay descritor string provided.");
   m_decaydescriptor.init(m_strDecay);
   if (m_strListName.empty()) B2ERROR("No name of output particle list provided.");
 
-  // Register output particle list
-  StoreObjPtr<ParticleList>::registerTransient(m_strListName);
+  m_particleStore = std::string("FoundParticles") + m_strListName;
+  B2INFO("particle store used: " << m_particleStore);
 
-  // Register RelationArray between output Particles and generated (input) MCParticles
-  RelationArray::registerPersistent<Particle, MCParticle>();
+  // Register output particle list, particle store and relation to MCParticles
+
+  if (m_persistent) {
+    StoreObjPtr<ParticleList>::registerPersistent(m_strListName);
+    StoreArray<Particle>::registerPersistent(m_particleStore);
+    RelationArray::registerPersistent<Particle, MCParticle>(m_particleStore,
+                                                            string("MCParticles"));
+  } else {
+    StoreObjPtr<ParticleList>::registerTransient(m_strListName);
+    StoreArray<Particle>::registerTransient(m_particleStore);
+    RelationArray::registerTransient<Particle, MCParticle>(m_particleStore,
+                                                           string("MCParticles"));
+  }
 }
 
 void MCDecayFinderModule::event()
 {
+  // particle store (working space)
+  StoreArray<Particle> particles(m_particleStore);
+  particles.create();
+
   // Get output particle list
   StoreObjPtr<ParticleList> outputList(m_strListName);
   outputList.create();
   outputList->setPDG(m_decaydescriptor.getPDGCode());
+  outputList->setParticleStoreName(m_particleStore);
 
   // retrieve list of MCParticles
   StoreArray<MCParticle> mcparticles;
@@ -59,7 +78,6 @@ void MCDecayFinderModule::event()
     return;
   }
 
-  StoreArray<Particle> particles;
 
   // loop over all MCParticles
   int nMCParticles = mcparticles.getEntries();
@@ -69,7 +87,7 @@ void MCDecayFinderModule::event()
       if (decay->getObj()) {
         B2INFO("Match!");
         int iIndex = write(decay);
-        outputList->addParticle(iIndex, particles[iIndex]->getPDGCode(), particles[iIndex]->getFlavorType());
+        outputList->addParticle(particles[iIndex]);
       }
     }
   }
@@ -183,7 +201,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
 int MCDecayFinderModule::write(DecayTree<MCParticle>* decay)
 {
   // Particle array for output
-  StoreArray<Particle> particles;
+  StoreArray<Particle> particles(m_particleStore);
   // Input MCParticle array
   StoreArray<MCParticle> mcparticles;
   // Relation between particles and MCParticles

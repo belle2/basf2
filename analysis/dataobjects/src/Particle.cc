@@ -66,7 +66,7 @@ Particle::Particle(const TLorentzVector& momentum,
 Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
                    const unsigned flavorType,
-                   const std::vector<int> &daughterIndices) :
+                   const std::vector<int>& daughterIndices) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
   m_plist(0)
@@ -464,7 +464,7 @@ void Particle::fixParticleList() const
 }
 
 
-void Particle::fillFSPDaughters(std::vector<const Belle2::Particle*> &fspDaughters) const
+void Particle::fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughters) const
 {
   // this is FSP
   if (getNDaughters() == 0) {

@@ -14,6 +14,9 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
+// framework aux
+#include <framework/logging/Logger.h>
+
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 
@@ -22,11 +25,32 @@
 using namespace std;
 using namespace Belle2;
 
+void ParticleList::addParticle(const Particle* particle)
+{
+  if (particle->getArrayName() != m_particleStore) {
+    B2ERROR("ParticleList::addParticle particle is from different store array, not added");
+    return;
+  }
+  int iparticle = particle->getArrayIndex();
+  if (iparticle < 0) {
+    B2ERROR("ParticleList::addParticle particle is not in a store array, not added")
+    return;
+  }
+  int pdg = particle->getPDGCode();
+  unsigned type = particle->getFlavorType();
+  addParticle((unsigned) iparticle, pdg, type);
+}
 
 void ParticleList::addParticle(unsigned iparticle, int pdg, unsigned type)
 {
-  if (abs(pdg) != abs(m_pdg)) return;
-  if (type != m_flavorType) return;
+  if (abs(pdg) != abs(m_pdg)) {
+    B2ERROR("ParticleList::addParticle PDG codes do not match, not added")
+    return;
+  }
+  if (type != m_flavorType) {
+    B2ERROR("ParticleList::addParticle flavor types do not match, not added")
+    return;
+  }
   unsigned k = 0;
   if (m_flavorType == 1) k = (pdg == m_pdg) ? 0 : 1;
   m_list[k].push_back(iparticle);
@@ -67,7 +91,7 @@ void ParticleList::removeMarked()
 
 const Particle* ParticleList::getParticle(unsigned i) const
 {
-  StoreArray<Particle> Particles;
+  StoreArray<Particle> Particles(m_particleStore);
   if (i < m_list[0].size()) {
     return Particles[m_list[0][i]];
   } else {
@@ -83,6 +107,7 @@ const Particle* ParticleList::getParticle(unsigned i) const
 void ParticleList::print() const
 {
   std::cout << "ParticleList:";
+  std::cout << " " << m_particleStore;
   std::cout << " PDGCode=" << m_pdg;
   std::cout << " flavorType=" << m_flavorType;
   if (m_flavorType == 0) {

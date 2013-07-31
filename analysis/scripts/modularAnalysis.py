@@ -16,6 +16,16 @@ def inputMdst(filename, path=main):
     path.add_module(progress)
 
 
+def inputMdstList(filelist, path=main):
+    roinput = register_module('RootInput')
+    roinput.param('inputFileNames', filelist)
+    path.add_module(roinput)
+    gearbox = register_module('Gearbox')
+    path.add_module(gearbox)
+    progress = register_module('Progress')
+    path.add_module(progress)
+
+
 def outputMdst(filename, path=main):
     rooutput = register_module('RootOutput')
     rooutput.param('outputFileName', filename)

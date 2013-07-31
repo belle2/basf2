@@ -336,8 +336,22 @@ TCFrontEnd::packerInnerInside(const TRGState & input) {
 	    //...Others...
 	    else {
 
+		//...Both secondarys have hit...
+		if (hitptn[i + 15] && hitptn[i + 16]) {
+		    const unsigned t0 = TRGState::toUnsigned(5, timing[15]);
+		    const unsigned t1 = TRGState::toUnsigned(5, timing[16]);
+		    if (t0 < t1) {
+			s.set(p, 5, timing[i + 15]);
+			secondPriority.set(i, false);
+		    }
+		    else {
+			s.set(p, 5, timing[i + 16]);
+			secondPriority.set(i, true);
+		    }
+		}
+
 		//...Secondary at right side...
-		if (hitptn[i + 15]) {
+		else if (hitptn[i + 15]) {
 		    s.set(p, 5, timing[i + 15]);
 		    secondPriority.set(i, false);
 		}

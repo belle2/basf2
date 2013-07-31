@@ -148,6 +148,12 @@ void MCTrackCandCombinerModule::event()
   // loop over MCParticles.
   for (int iPart = 0; iPart not_eq nMcParticles; ++iPart) {
     MCParticle* aMcParticle = mcParticles[iPart];
+    const int truePdgCode = aMcParticle->getPDG();
+    if (isNotAChargedStable(truePdgCode)) {
+      B2DEBUG(49, "The MCParticle with PDG code " << truePdgCode << " is not a chargedstable one. Skip it.");
+      continue;
+    }
+
 
     RelationVector<CDCHit> cdcRelations = aMcParticle->getRelationsTo<CDCHit>();
     // remove hits from secondary particles
@@ -266,7 +272,6 @@ void MCTrackCandCombinerModule::event()
       goodCdcCands.push_back(bestTC);
     }
     //easiest case; no curler finding yet
-    const int truePdgCode = aMcParticle->getPDG();
     B2DEBUG(100, "The track caused by MCParticle with index " << iPart << " and PDG code " << truePdgCode << " that has p = " << aMcParticle->getMomentum().Mag() << " GeV and θ = " << aMcParticle->getMomentum().Theta() * 180 / TMath::Pi() << "° was found by at least one track finder.");
     B2DEBUG(100, "goodVxdCands.size() " << goodVxdCands.size() << " goodCdcCands.size() " << goodCdcCands.size());
     if (goodVxdCands.size() == 1 and goodCdcCands.size() == 1) { //from one mcparticle we have one tc in vxd and one in cdc
@@ -352,4 +357,9 @@ std::vector< T* > MCTrackCandCombinerModule::removeHitsWithNegativeWeights(Relat
   }
 
   return goodHits;
+}
+
+bool MCTrackCandCombinerModule::isNotAChargedStable(int pdgCode)
+{
+  return (Const::chargedStableSet.find(abs(pdgCode)) == Const::invalidParticle);
 }

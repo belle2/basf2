@@ -48,10 +48,10 @@ namespace Belle2 {
     void setPDG(int pdg) {m_pdg = pdg; setFlavorType();}
 
     /**
-     * Sets Particle store array name to which particle list refers to
+     * Sets Particle store array name to which particle list refers
      * @param name name of the Particle store array
      */
-    void setParticleStoreName(std::string name) {m_particleStore = name;}
+    void setParticleCollectionName(std::string name) {m_particleStore = name;}
 
     /**
      * Swaps flavor type
@@ -106,10 +106,10 @@ namespace Belle2 {
     void removeMarked();
 
     /**
-     * Returns Particle store array name to which particle list refers to
+     * Returns Particle store array name to which particle list refers
      * @return name of the Particle store array
      */
-    std::string getParticleStoreName() {return m_particleStore;}
+    std::string getParticleCollectionName() {return m_particleStore;}
 
     /**
      * Returns PDG code

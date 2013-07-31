@@ -69,7 +69,7 @@ void MCDecayFinderModule::event()
   StoreObjPtr<ParticleList> outputList(m_strListName);
   outputList.create();
   outputList->setPDG(m_decaydescriptor.getPDGCode());
-  outputList->setParticleStoreName(m_particleStore);
+  outputList->setParticleCollectionName(m_particleStore);
 
   // retrieve list of MCParticles
   StoreArray<MCParticle> mcparticles;

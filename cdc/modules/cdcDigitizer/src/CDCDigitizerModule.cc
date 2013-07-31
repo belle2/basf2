@@ -176,6 +176,7 @@ void CDCDigitizerModule::event()
 
         if (hitDriftTime < iterSignalMap->second.m_driftTime) {
           iterSignalMap->second.m_driftTime   = hitDriftTime;
+          iterSignalMap->second.m_simHitIndex = iHits;
           B2DEBUG(250, "hitDriftTime of current Signal: " << hitDriftTime << ",  hitDriftLength: " << hitDriftLength);
         }
         // ... total charge has to be updated.

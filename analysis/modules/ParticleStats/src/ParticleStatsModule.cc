@@ -57,7 +57,7 @@ void ParticleStatsModule::event()
 
     StoreObjPtr<ParticleList> particlelist(m_strParticleLists[iList]);
     if (!particlelist) {
-      B2WARNING("ParticleListi " << m_strParticleLists[iList] << " not found");
+      B2INFO("ParticleListi " << m_strParticleLists[iList] << " not found");
       continue;
     } else {
       if (!particlelist->getListSize())continue;
@@ -69,7 +69,7 @@ void ParticleStatsModule::event()
       for (int jList = 0; jList < nParticleLists; ++jList) {
         StoreObjPtr<ParticleList> particlelistj(m_strParticleLists[jList]);
         if (!particlelistj) {
-          B2WARNING("ParticleListj " << m_strParticleLists[jList] << " not found");
+          B2INFO("ParticleListj " << m_strParticleLists[jList] << " not found");
           continue;
         } else {
           if (!particlelistj->getListSize())continue;
@@ -85,23 +85,6 @@ void ParticleStatsModule::event()
 
   }
   StoreArray<Particle> Particles;
-  int npi0 = 0, npi = 0, ngamma = 0, nk = 0, ne = 0, np = 0, nmu = 0;
-  for (int i = 0; i < Particles.getEntries(); i++) {
-    const Particle* part = Particles[i];
-    std::cout << part->getPDGCode() << " ";
-    int id = part->getPDGCode();
-    if (abs(id) == 111)npi0++;
-    if (abs(id) == 211)npi++;
-    if (abs(id) == 22)ngamma++;
-    if (abs(id) == 321)nk++;
-    if (abs(id) == 11)ne++;
-    if (abs(id) == 13)nmu++;
-    if (abs(id) == 2212)np++;
-
-
-  }
-//    std::cout<<"gam "<< ngamma<<" pi0 "<<npi0<<" pi "<<npi<<" nk "<<nk<<" ne "<<ne<<" np "<<np<<" nmu "<<nmu<<"\n";
-
   m_nParticles += Particles.getEntries();
 
   m_nEvents++;

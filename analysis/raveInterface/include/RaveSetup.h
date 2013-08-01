@@ -63,16 +63,17 @@ namespace Belle2 {
       static void Print();
 
     protected:
-
+      /** default constructor */
       RaveSetup();
+      /** default destructor */
       ~RaveSetup();
-      static RaveSetup* s_instance;
+      static RaveSetup* s_instance; /**< pointer to unique and global object of this class (singleton) */
 
-      bool m_useBeamSpot;
-      TVector3 m_beamSpot;
-      TMatrixDSym m_beamSpotCov;
+      bool m_useBeamSpot; /**< flag determines if beam spot information should be used for vertex fit. Can be overruled by individual fits in RaveVertexFitter */
+      TVector3 m_beamSpot; /**< beam spot position. Can be used as additional information by RaveVertexFitter */
+      TMatrixDSym m_beamSpotCov; /**< beam spot position covariance matrix. Can be used as additional information by RaveVertexFitter */
 
-      rave::VertexFactory* m_raveVertexFactory;
+      rave::VertexFactory* m_raveVertexFactory; /**< The RAVE vertex factory is the principal interface offered by the RAVE vertex fitting library. */
 
 //      GFRaveVertexFactory* m_GFRaveVertexFactory;
 

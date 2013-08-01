@@ -350,14 +350,15 @@ namespace Belle2 {
       double m_momZ[7];
       double m_momRmin[7];
 
-      float m_FWirPos[3][MAX_N_SLAYERS][MAX_N_SCELLS];
-      float m_BWirPos[3][MAX_N_SLAYERS][MAX_N_SCELLS];
-      //      double m_FWirPos[3][MAX_N_SLAYERS][MAX_N_SCELLS];
-      //      double m_BWirPos[3][MAX_N_SLAYERS][MAX_N_SCELLS];
+      //      float m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3];
+      //      float m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3];
+      double m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3];
+      double m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3];
       //      TVector3 m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS];
       //      TVector3 m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS];
 
-      float m_WirSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS];
+      //      float m_WirSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS];
+      double m_WirSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS];
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
 

@@ -1,0 +1,49 @@
+//+
+// File : RevRb2Sock.cc
+// Description : Send events in RingBuffer to Socket
+//               Reverse Direction
+//
+// Author : Ryosuke Itoh, IPNS, KEK
+// Date : 25 - Jul - 2013
+//-
+
+#include "daq/rfarm/event/RevRb2Sock.h"
+
+using namespace std;
+using namespace Belle2;
+
+RevRb2Sock::RevRb2Sock(string rbuf, int port)
+{
+  m_rbuf = new RingBuffer(rbuf.c_str(), RBUFSIZE);
+  m_sock = new REvtSocketSend(port);
+  m_evtbuf = new char[MAXEVTSIZE];
+
+}
+
+RevRb2Sock::~RevRb2Sock(void)
+{
+  delete m_sock;
+  delete m_rbuf;
+}
+
+int RevRb2Sock::SendEvent(void)
+{
+  // Get a record from ringbuf
+  int size;
+  while ((size = m_rbuf->remq((int*)m_evtbuf)) == 0) {
+    //    printf ( "Rx : evtbuf is not available yet....\n" );
+    usleep(100);
+  }
+
+  EvtMessage* msg = new EvtMessage(m_evtbuf);    // Ptr copy, no overhead
+
+  if (msg->type() == MSG_TERMINATE) {
+    printf("EoF found. Exitting.....\n");
+    m_sock->send(msg);
+    return -1;
+  } else {
+    return m_sock->send(msg);
+    //    return msg->size();
+  }
+}
+

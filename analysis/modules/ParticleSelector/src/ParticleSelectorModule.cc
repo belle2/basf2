@@ -103,17 +103,17 @@ namespace Belle2 {
 
   void ParticleSelectorModule::event()
   {
-    StoreArray<Particle> Particles;
     StoreObjPtr<ParticleList> plist(m_listName);
 
     if (m_pdg != 0) { // new particle list: fill selected
       plist.create();
       plist->setPDG(m_pdg);
+      StoreArray<Particle> Particles;
       for (int i = 0; i < Particles.getEntries(); i++) {
         const Particle* part = Particles[i];
         if (abs(part->getPDGCode()) != abs(m_pdg)) continue;
         if (m_pSelector.select(part)) {
-          plist->addParticle(i, part->getPDGCode(), part->getFlavorType());
+          plist->addParticle(part);
         }
       }
     } else { // existing particle list: apply selections and remove unselected

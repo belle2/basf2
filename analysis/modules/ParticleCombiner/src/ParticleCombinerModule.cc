@@ -94,6 +94,11 @@ namespace Belle2 {
         B2ERROR("ParticleList " << m_inputListNames[i] << " not found");
         return;
       }
+      if (list->getParticleCollectionName() != std::string("Particles")) {
+        B2ERROR("ParticleList " << m_inputListNames[i] <<
+                " does not refer to the default Particle collection");
+        return;
+      }
       plists.push_back(list);
     }
 

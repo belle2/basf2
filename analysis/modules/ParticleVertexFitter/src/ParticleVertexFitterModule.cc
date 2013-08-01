@@ -83,7 +83,7 @@ namespace Belle2 {
       return;
     }
 
-    StoreArray<Particle> Particles;
+    StoreArray<Particle> Particles(plist->getParticleCollectionName());
 
     for (unsigned k = 0; k < plist->getFlavorType() + 1; k++) {
       for (unsigned i = 0; i < plist->getList(k).size(); i++) {

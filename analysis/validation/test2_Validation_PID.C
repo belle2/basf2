@@ -239,11 +239,11 @@ void test2_Validation_PID(){
     TGraphAsymmErrors *Eff_P_p  = new TGraphAsymmErrors();
 
     //Histogram efficiencies - needed for the validation page
-    TH1F * h_Eff_Ppi  = new TH1F(Form("P_Eff_%s_pi",string(names[i]).c_str())           ,Form("Eff pi ;p(%s) GeV;PIDpi Efficiency",string(names[i]).c_str())            ,npbins,plow,phigh);
-    TH1F * h_Eff_Pk   = new TH1F(Form("P_Eff_%s_k",string(names[i]).c_str())            ,Form("Eff k;p(%s) GeV;PIDk Efficiency",string(names[i]).c_str())            ,npbins,plow,phigh);
-    TH1F * h_Eff_Pe   = new TH1F(Form("P_Eff_%s_e",string(names[i]).c_str())            ,Form("Eff e;p(%s) GeV;PIDe Efficiency",string(names[i]).c_str())            ,npbins,plow,phigh);
-    TH1F * h_Eff_Pmu  = new TH1F(Form("P_Eff_%s_mu",string(names[i]).c_str())           ,Form("Eff mu;p(%s) GeV;PIDmu Efficiency",string(names[i]).c_str())            ,npbins,plow,phigh);
-    TH1F * h_Eff_Pp   = new TH1F(Form("P_Eff_%s_p",string(names[i]).c_str())            ,Form("Eff pr;p(%s) GeV;PIDpr Efficiency",string(names[i]).c_str())            ,npbins,plow,phigh);
+    TH1F * h_Eff_Ppi  = new TH1F(Form("P_Eff_%s_pi",string(names[i]).c_str())  ,Form("Eff pi;p(%s) GeV;PIDpi Hypothesis Efficiency",string(names[i]).c_str()) ,npbins,plow,phigh);
+    TH1F * h_Eff_Pk   = new TH1F(Form("P_Eff_%s_k",string(names[i]).c_str())   ,Form("Eff k ;p(%s) GeV;PIDk  Hypothesis Efficiency",string(names[i]).c_str()) ,npbins,plow,phigh);
+    TH1F * h_Eff_Pe   = new TH1F(Form("P_Eff_%s_e",string(names[i]).c_str())   ,Form("Eff e ;p(%s) GeV;PIDe  Hypothesis Efficiency",string(names[i]).c_str()) ,npbins,plow,phigh);
+    TH1F * h_Eff_Pmu  = new TH1F(Form("P_Eff_%s_mu",string(names[i]).c_str())  ,Form("Eff mu;p(%s) GeV;PIDmu Hypothesis Efficiency",string(names[i]).c_str()) ,npbins,plow,phigh);
+    TH1F * h_Eff_Pp   = new TH1F(Form("P_Eff_%s_p",string(names[i]).c_str())   ,Form("Eff pr;p(%s) GeV;PIDpr Hypothesis Efficiency",string(names[i]).c_str()) ,npbins,plow,phigh);
 
     Eff_P_pi ->SetMarkerColor(kRed);     Eff_P_pi ->SetLineColor(kRed);
     Eff_P_k  ->SetMarkerColor(kBlue);    Eff_P_k ->SetLineColor(kBlue);

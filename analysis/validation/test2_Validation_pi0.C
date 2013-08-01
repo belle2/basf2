@@ -111,6 +111,8 @@ void test2_Validation_pi0(){
 
   float meancut   = mean->getVal(); 
   float meanerror = mean->getError(); 
+  float width = sig1.getVal();
+  float widtherror = sig1.getError();
 
   framex->Draw("");
   
@@ -131,8 +133,8 @@ void test2_Validation_pi0(){
   
   /* Save the numerical fit results to a validation ntuple */
   string namelist;
-  TNtuple* tvalidation = new TNtuple("pi0mass", "tree", "mean:error");
-  tvalidation->Fill(meancut,meanerror);
+  TNtuple* tvalidation = new TNtuple("pi0mass", "tree", "mean:meanerror:width:widtherror");
+  tvalidation->Fill(meancut,meanerror,width,widtherror);
 
   output->Write();
   //delete output;

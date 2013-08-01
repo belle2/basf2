@@ -159,6 +159,8 @@ void test2_Validation_B2Dpi(){
 
   float meancut   = mean.getVal(); 
   float meanerror = mean.getError(); 
+  float width = sig1.getVal();
+  float widtherror = sig1.getError();
 
   framex->Draw("");
 
@@ -172,8 +174,8 @@ void test2_Validation_B2Dpi(){
 
   cout<< "Average Efficiency per track = " << Form("%4.3f +/- %4.3f",efftrack, erreff)<< endl;
 
-  TNtuple* tbreco = new TNtuple("Bu_D0pi reco", "tree", "nreco:d0width:d0width_err" );
-  tbreco->Fill(nreco,meancut,meanerror);
+  TNtuple* tbreco = new TNtuple("Bu_D0pi reco", "tree", "nreco:d0mean:d0mean_err:d0width:d0width_err" );
+  tbreco->Fill(nreco,meancut,meanerror,width,widtherror);
 
   output->Write();
   delete output;
@@ -495,6 +497,8 @@ void test2_Validation_B2JpsiKS(){
 
   float meancut   = mean.getVal(); 
   float meanerror = mean.getError(); 
+  float width      = sig1.getVal();
+  float widtherror = sig1.getError();
 
   framex->Draw("");
 
@@ -509,8 +513,8 @@ void test2_Validation_B2JpsiKS(){
 
   cout<< "Average Efficiency per track = " << Form("%4.3f +/- %4.3f",efftrack, erreff)<< endl;
  
-  TNtuple* tbreco = new TNtuple("Bd_JpsiKS,mumu reco", "tree", "nreco:jpsiwidth:jpsiwidtherr" );
-  tbreco->Fill(nreco, meancut,meanerror);
+  TNtuple* tbreco = new TNtuple("Bd_JpsiKS,mumu reco", "tree", "nreco:mean:meanerror:width:widtherror" );
+  tbreco->Fill(nreco, meancut,meanerror,width,widtherror);
 
   output->Write();
   delete output;

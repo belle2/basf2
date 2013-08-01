@@ -48,9 +48,8 @@ namespace Belle2 {
     ParticleStatsModule();
     /** Destructor. */
     ~ParticleStatsModule() {}
-    /** Initialises the module. At the moment this contains the
-    construction of a DecayDescriptor object. This will by replaced
-    by a simple call to the parser. */
+    /** Initialises the module.
+     */
     void initialize();
     /** Method called for each event. */
     void event();

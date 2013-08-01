@@ -38,7 +38,7 @@ void ParticleStatsModule::initialize()
   B2INFO("Number of ParticleLists studied " << nParticleLists << " ");
 
   m_PassMatrix = new TMatrix(nParticleLists, nParticleLists + 1);
-  m_MultiplicityMatrix = new TMatrix(nParticleLists, 2);
+  m_MultiplicityMatrix = new TMatrix(nParticleLists, 3); // 0 All particles; 1 Negative; 2 Positive
 
   m_nEvents = 0;
 
@@ -60,11 +60,24 @@ void ParticleStatsModule::event()
       B2INFO("ParticleListi " << m_strParticleLists[iList] << " not found");
       continue;
     } else {
+      //std::cout<<"particle list collection name"  <<    particlelist->getParticleCollectionName()<<std::endl;
+
       if (!particlelist->getListSize())continue;
 
       pass = true;
-      (*m_MultiplicityMatrix)(iList, 0) = (*m_MultiplicityMatrix)(iList, 0) + 1;
-      (*m_MultiplicityMatrix)(iList, 1) = (*m_MultiplicityMatrix)(iList, 1) + particlelist->getListSize();
+      // All Particles&Anti-Particles
+      (*m_MultiplicityMatrix)(iList, 0) = (*m_MultiplicityMatrix)(iList, 0) + particlelist->getListSize();
+
+      // Particles
+      if (particlelist->getNumofParticles())
+        (*m_MultiplicityMatrix)(iList, 1) = (*m_MultiplicityMatrix)(iList, 1) + particlelist->getNumofParticles();
+
+      // Anti-Particles
+      if (particlelist->getNumofAntiParticles())
+        (*m_MultiplicityMatrix)(iList, 2) = (*m_MultiplicityMatrix)(iList, 2) + particlelist->getNumofAntiParticles();
+
+
+
 
       for (int jList = 0; jList < nParticleLists; ++jList) {
         StoreObjPtr<ParticleList> particlelistj(m_strParticleLists[jList]);
@@ -108,7 +121,7 @@ void ParticleStatsModule::terminate()
     }
   }
 
-  std::cout << "=======================================================\n";
+  std::cout << "=======================================================================\n";
   std::cout << "\t\t\t";
   std::cout << "|Retention";
   for (int iList = 0; iList < nParticleLists; ++iList) {
@@ -125,13 +138,17 @@ void ParticleStatsModule::terminate()
     std::cout << "\n";
   }
 
-  std::cout << "\n=======================================================\n";
-  std::cout << "\t\t\t";
-  std::cout << "| Average Candidate Multiplicity (ACM) | ACM For Passed Events \n";
+  std::cout << "\n======================================================================\n";
+  std::cout << " Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) \n";
+  std::cout << "\t\t\t| All Particles \t\t| Particles     \t\t| AntiParticles \t\t\n";
+  std::cout << "\t\t\t| ACM\t\t| ACMPE\t\t| ACM\t\t| ACMPE\t\t| ACM\t\t| ACMPE \n";
   for (int iList = 0; iList < nParticleLists; ++iList) {
     std::cout << Form("%14s(%2d)", m_strParticleLists[iList].c_str(), iList) << "\t|";
-    std::cout << "\t" << Form("%6.4f", (*m_MultiplicityMatrix)(iList, 1) / m_nEvents);
-    std::cout << "\t" << Form("%6.4f", (*m_MultiplicityMatrix)(iList, 1) / m_nEvents / (*m_PassMatrix)(iList, iList));
+
+    for (int iFlav = 0; iFlav < 3; ++iFlav) {
+      std::cout << "\t" << Form("%8.4f", (*m_MultiplicityMatrix)(iList, iFlav) / m_nEvents);
+      std::cout << "\t" << Form("%8.4f", (*m_MultiplicityMatrix)(iList, iFlav) / m_nEvents / (*m_PassMatrix)(iList, iList));
+    }
     std::cout << "\n";
   }
 

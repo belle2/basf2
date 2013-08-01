@@ -1,0 +1,160 @@
+//+
+// File : RFEventSever.cc
+// Description : Receive events from EVB1 and distribute them to
+//                 processing nodes
+//
+// Author : Ryosuke Itoh, IPNS, KEK
+// Date : 24 - June - 2013
+//-
+
+#include "daq/rfarm/manager/RFEventServer.h"
+
+#define RFEVSOUT stdout
+
+using namespace std;
+using namespace Belle2;
+
+RFEventServer* RFEventServer::s_instance = 0;
+//RFServerBase* RFServerBase::s_instance = 0;
+
+RFEventServer::RFEventServer(string conffile)
+{
+  // 0. Initialize configuration manager
+  m_conf = new RFConf(conffile.c_str());
+  char* nodename = m_conf->getconf("distributor", "nodename");
+  //  char nodename[256];
+  //  gethostname ( nodename, sizeof(nodename) );
+
+  // 1. Initialize local shared memory
+  m_shm = new RFSharedMem(nodename);
+
+  // 2. Initialize process manager
+  m_proc = new RFProcessManager(nodename);
+
+  // 3. Set execution directory
+  string execdir = string(m_conf->getconf("system", "execdir_base")) + "/distributor";
+
+  mkdir(execdir.c_str(), 0755);
+  chdir(execdir.c_str());
+
+  // 5. Initialize LogManager
+  m_log = new RFLogManager(nodename);
+
+}
+
+RFEventServer::~RFEventServer()
+{
+  delete m_log;
+  delete m_proc;
+  delete m_shm;
+  delete m_conf;
+}
+
+// Access to Singleton
+RFEventServer& RFEventServer::Create(string conffile)
+{
+  if (!s_instance) {
+    s_instance = new RFEventServer(conffile);
+  }
+  return *s_instance;
+}
+
+RFEventServer& RFEventServer::Instance()
+{
+  return *s_instance;
+}
+
+
+// Functions hooked up by NSM2
+
+void RFEventServer::Configure(NSMmsg*, NSMcontext*)
+{
+  // 0. Global parameters
+  char* ringbuf = m_conf->getconf("distributor", "ringbuffer");
+
+  // 2. Run sender
+  m_nnodes = 0;
+  int maxnodes = m_conf->getconfi("processor", "nnodes");
+  int idbase = m_conf->getconfi("processor", "idbase");
+  char* hostbase = m_conf->getconf("processor", "hostbase");
+  char* badlist = m_conf->getconf("processor", "badlist");
+
+  char* sender = m_conf->getconf("distributor", "sender", "script");
+  int portbase = m_conf->getconfi("distributor", "sender", "portbase");
+
+  char hostname[512], idname[3];
+  for (int i = 0; i < maxnodes; i++) {
+    sprintf(idname, "%2.2d", idbase + i);
+    if (badlist == NULL  ||
+        strstr(badlist, idname) == 0) {
+      int port = (idbase + i) + portbase;
+      char portchar[256];
+      sprintf(portchar, "%d", port);
+      m_pid_sender[m_nnodes] = m_proc->Execute(sender, ringbuf, portchar);
+      m_nnodes++;
+    }
+  }
+
+  // 1. Run receiver
+  char* src = m_conf->getconf("distributor", "source");
+  if (strstr(src, "net") != 0) {
+    // Run receiver
+    char* receiver = m_conf->getconf("distributor", "receiver", "script");
+    char* src = m_conf->getconf("distributor", "receiver", "host");
+    char* port = m_conf->getconf("distributor", "receiver", "port");
+    char* ringbuf = m_conf->getconf("distributor", "ringbuffer");
+    m_pid_recv = m_proc->Execute(receiver, ringbuf, src, port);
+  } else if (strstr(src, "file") != 0) {
+    // Run file reader
+    char* filein = m_conf->getconf("distributor", "fileinput", "script");
+    char* file = m_conf->getconf("distributor", "fileinput", "filename");
+    char* ringbuf = m_conf->getconf("distributor", "ringbuffer");
+    char* nnodechr = m_conf->getconf("distributor", "nnodes");
+    m_pid_recv = m_proc->Execute(filein, ringbuf, file, nnodechr);
+  }
+  // else none
+}
+
+void RFEventServer::Start(NSMmsg*, NSMcontext*)
+{
+}
+
+void RFEventServer::Stop(NSMmsg*, NSMcontext*)
+{
+}
+
+
+void RFEventServer::Restart(NSMmsg*, NSMcontext*)
+{
+  if (m_pid_recv != 0) {
+    kill(m_pid_recv, SIGINT);
+  }
+  for (int i = 0; i < m_nnodes; i++) {
+    if (m_pid_sender[i] != 0) {
+      printf("RFEventServer:: killing sender pid=%d\n", m_pid_sender[i]);
+      kill(m_pid_sender[i], SIGINT);
+    }
+  }
+  sleep(2);
+  NSMmsg* nsmmsg = NULL;
+  NSMcontext* nsmcontext = NULL;
+  RFEventServer::Configure(nsmmsg, nsmcontext);
+}
+
+// Server function
+
+void RFEventServer::server()
+{
+  while (true) {
+    int st = m_proc->CheckOutput();
+    if (st < 0) {
+      perror("RFEventServer::server");
+      //      exit ( -1 );
+    } else if (st > 0) {
+      m_log->ProcessLog(m_proc->GetFd());
+    }
+  }
+}
+
+
+

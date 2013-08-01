@@ -43,7 +43,7 @@ namespace Belle2 {
     RFLogManager*      m_log;
 
     int m_pid_receiver;
-    int m_pid_basf2
+    int m_pid_basf2;
     int m_pid_sender;
     int m_nnodes;
 

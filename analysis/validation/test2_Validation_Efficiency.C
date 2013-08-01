@@ -33,7 +33,7 @@ TH1F * h_ThpiTruth = new TH1F("Theta_pi_Truth",";#theta(#pi) ;N" ,nthbins,thlow,
 TH1F * h_PhpiTruth = new TH1F("Phi_pi_Truth",";#phi(#pi) ;N" ,nthbins,phlow,phhigh);	
 
 TH1F * h_Ppi       = new TH1F("P_pi_"    ,";p_{T};N"      ,nptbins,ptlow,pthigh);
-TH1F * h_Thpi      = new TH1F("Theta_pi_",";cos#theta(#pi) ;N" ,nthbins,thlow,thhigh);	
+TH1F * h_Thpi      = new TH1F("Theta_pi_",";#theta(#pi) ;N" ,nthbins,thlow,thhigh);	
 TH1F * h_Phpi      = new TH1F("Phi_pi_"  ,";#phi(#pi) ;N" ,nthbins,phlow,phhigh);	
 
 //Photons
@@ -42,7 +42,7 @@ TH1F * h_ThgammaTruth = new TH1F("Theta_gamma_Truth",";#theta(#gamma) ;N" ,nthbi
 TH1F * h_PhgammaTruth = new TH1F("Phi_gamma_Truth",";#phi(#gamma) ;N" ,nthbins,phlow,phhigh);	
 
 TH1F * h_Pgamma       = new TH1F("P_gamma_"    ,";p_{T};N"      ,npbins,plow,phigh);
-TH1F * h_Thgamma      = new TH1F("Theta_gamma_",";cos#theta(#gamma) ;N" ,nthbins,thlow,thhigh);	
+TH1F * h_Thgamma      = new TH1F("Theta_gamma_",";#theta(#gamma) ;N" ,nthbins,thlow,thhigh);	
 TH1F * h_Phgamma      = new TH1F("Phi_gamma_"  ,";#phi(#gamma) ;N" ,nthbins,phlow,phhigh);	
 
 void test2_Validation_Efficiency_Truth(TString, int);
@@ -108,7 +108,7 @@ void test2_Validation_Efficiency(){
   h_th->Draw();
   Eff_TrackTh->SetFillColor(kBlue);
   Eff_TrackTh->Draw("2");belleName->Draw();
-  maincanvas->Print("efficiency.pdf","Title:Track efficiency cos#theta");
+  maincanvas->Print("efficiency.pdf","Title:Track efficiency #theta");
 
   TGraphAsymmErrors *Eff_TrackPh = new TGraphAsymmErrors();
   Eff_TrackPh  -> Divide(h_Phpi ,h_PhpiTruth ,"cl=0.683 b(1,1) mode");
@@ -168,7 +168,7 @@ void test2_Validation_Efficiency(){
   h_thg->Draw();
   Eff_PhotonTh->SetFillColor(kBlue);
   Eff_PhotonTh->Draw("2");belleName->Draw();
-  maincanvas->Print("efficiency.pdf","Title:Photon efficiency cos#theta");
+  maincanvas->Print("efficiency.pdf","Title:Photon efficiency #theta");
 
   TGraphAsymmErrors *Eff_PhotonPh = new TGraphAsymmErrors();
   Eff_PhotonPh  -> Divide(h_Phgamma ,h_PhgammaTruth ,"cl=0.683 b(1,1) mode");

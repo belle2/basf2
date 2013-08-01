@@ -30,8 +30,7 @@ namespace Belle2 {
   class ECLShower;
   class ECLGamma;
   class ECLPi0;
-  // TODO: check with Martin
-  //class Track;
+  //  class Track;
   class MCParticle;
 
   /** \addtogroup dataobjects
@@ -141,25 +140,25 @@ namespace Belle2 {
      * Constructor from a reconstructed track (mdst object Track);
      * @param track pointer to Track object
      * @param chargedStable Type of charged particle
-     * @param mdstIndex store array index of Track object
+     * @param mdstIndex store array index of Track object (optional)
      */
     Particle(const Track* track,
              const Const::ChargedStable& chargedStable,
-             const int mdstIndex);
+             const int mdstIndex = -1);
 
     /**
      * Constructor from a reconstructed gamma candidate (mdst object ECLGamma)
      * @param gamma pointer to ECLGamma object
-     * @param mdstIndex store array index of ECLGamma object
+     * @param mdstIndex store array index of ECLGamma object (optional)
      */
-    Particle(const ECLGamma* gamma, const int mdstIndex);
+    Particle(const ECLGamma* gamma, const int mdstIndex = -1);
 
     /**
      * Constructor from a reconstructed pi0 candidate (mdst object ECLPi0)
      * @param pi0 pointer to ECLPi0 object
-     * @param mdstIndex store array index of ECLPi0 object
+     * @param mdstIndex store array index of ECLPi0 object (optional)
      */
-    Particle(const ECLPi0* pi0, const int mdstIndex);
+    Particle(const ECLPi0* pi0, const int mdstIndex = -1);
 
     /**
      * Constructor from MC particle (mdst object MCParticle)
@@ -511,13 +510,13 @@ namespace Belle2 {
 
     // transient data members
     /**
-     * Internal pointer to DataStore Array containing particles belonging to
+     * Internal pointer to DataStore Array containing the particle belonging to
      * this collection.
      *
      * This is a transient member and will not be written to file. The pointer
-     * will be set correctly on first access after deserialisation
+     * is set when it is the first time needed.
      */
-    TClonesArray* m_plist; //! transient pointer to particle StoreArray
+    TClonesArray* m_arrayPointer; //! transient pointer to particle StoreArray
 
     // private methods
     /**
@@ -535,10 +534,10 @@ namespace Belle2 {
     /**
      * Search the DataStore for the corresponding Particle array.
      *
-     * This function is called automatically if the pointer to the
-     * particle list is not set when needed, e.g. after deserialization.
+     * This function is called automatically if the pointer
+     * is not set when needed
      */
-    void fixParticleList() const;
+    void fixArrayPointer() const;
 
     /**
      * Fill final state particle daughters into a vector

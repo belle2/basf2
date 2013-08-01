@@ -19,7 +19,7 @@
 #include <ecl/dataobjects/ECLGamma.h>
 #include <ecl/dataobjects/ECLPi0.h>
 #include <generators/dataobjects/MCParticle.h>
-//#include <tracking/dataobjects/Track.h>
+#include <tracking/dataobjects/Track.h>
 #include <tracking/dataobjects/TrackFitResult.h>
 
 #include <iostream>
@@ -30,7 +30,7 @@ using namespace Belle2;
 Particle::Particle() :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_plist(0)
+  m_arrayPointer(0)
 {
   resetErrorMatrix();
 }
@@ -38,7 +38,7 @@ Particle::Particle() :
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_plist(0)
+  m_arrayPointer(0)
 {
   m_pdgCode = pdgCode;
   setFlavorType();
@@ -53,7 +53,7 @@ Particle::Particle(const TLorentzVector& momentum,
                    const unsigned mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_plist(0)
+  m_arrayPointer(0)
 {
   m_pdgCode = pdgCode;
   m_flavorType = flavorType;
@@ -69,7 +69,7 @@ Particle::Particle(const TLorentzVector& momentum,
                    const std::vector<int>& daughterIndices) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_plist(0)
+  m_arrayPointer(0)
 {
   m_pdgCode = pdgCode;
   m_flavorType = flavorType;
@@ -88,7 +88,7 @@ Particle::Particle(const Track* track,
                    const int mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_plist(0)
+  m_arrayPointer(0)
 {
   if (!track) return;
   const TrackFitResult* trackFit = track->getTrackFitResult(chargedStable);
@@ -96,11 +96,8 @@ Particle::Particle(const Track* track,
 
   m_flavorType = 1;
   m_particleType = c_Track;
-  m_mdstIndex = mdstIndex;
-  /* TODO: class must be derived from RelationsObject to use getArrayIndex()
-    if(mdstIndex < 0) {m_mdstIndex = track->getArrayIndex();}
-    else {m_mdstIndex = mdstIndex;}
-  */
+  if (mdstIndex < 0) {m_mdstIndex = track->getArrayIndex();}
+  else {m_mdstIndex = mdstIndex;}
 
   // set PDG code TODO: ask Anze why this procedure is needed?
   int absPDGCode = chargedStable.getPDGCode();
@@ -179,7 +176,7 @@ Particle::Particle(const Track* track,
 Particle::Particle(const ECLGamma* gamma, const int mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_plist(0)
+  m_arrayPointer(0)
 {
   if (!gamma) return;
 
@@ -187,11 +184,15 @@ Particle::Particle(const ECLGamma* gamma, const int mdstIndex) :
   m_px = gamma->getPx();
   m_py = gamma->getPy();
   m_pz = gamma->getPz();
-  // position: TODO obtain the values that are used in the momentum construction
+  //  setVertex(gamma->getPosition());
+  setVertex(gamma->getPositon()); // TODO: report this typo to ECL
 
   m_particleType = c_ECLGamma;
-  m_mdstIndex = mdstIndex;
-  // TODO: class must be derived from RelationsObject to use getArrayIndex()
+  if (mdstIndex < 0) {m_mdstIndex = gamma->getArrayIndex();}
+  else {m_mdstIndex = mdstIndex;}
+
+  // set Chi^2 probability:
+  m_pValue = 1; //TODO: gamma quality can be written here
 
   // set error matrix
   TMatrixFSym errMatrix(c_DimMatrix);
@@ -203,7 +204,7 @@ Particle::Particle(const ECLGamma* gamma, const int mdstIndex) :
 Particle::Particle(const ECLPi0* pi0, const int mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_plist(0)
+  m_arrayPointer(0)
 {
   if (!pi0) return;
 
@@ -215,24 +216,15 @@ Particle::Particle(const ECLPi0* pi0, const int mdstIndex) :
   // position: TODO obtain the values that are used for gamma momentum construction
 
   m_particleType = c_Pi0;
-  m_mdstIndex = mdstIndex;
-  // TODO: class must be derived from RelationsObject to use getArrayIndex()
+  if (mdstIndex < 0) {m_mdstIndex = pi0->getArrayIndex();}
+  else {m_mdstIndex = mdstIndex;}
 
-  // set Chi^2 probability: TODO ask ECL to provide a function
-  //  m_pValue = pi0->getPValue();
+  // set Chi^2 probability:
+  m_pValue = pi0->getPValue();
 
-  // set the error matrix (TODO: ask ECL to supply 7x7 matrix as for ECLGamma!)
-  resetErrorMatrix();
-  TMatrixFSym momErrMatrix = pi0->getErrorMatrix();
+  // set error matrix
   TMatrixFSym errMatrix(c_DimMatrix);
-  errMatrix.SetSub(0, momErrMatrix);
-
-  // set diagonals for x, y, z uncertainties to some large values
-  // Note that all other elements are set to 0.0
-  errMatrix(4, 4) = 1000;
-  errMatrix(5, 5) = 1000;
-  errMatrix(6, 6) = 1000;
-
+  pi0->getErrorMatrix7x7(errMatrix);
   storeErrorMatrix(errMatrix);
 }
 
@@ -240,7 +232,7 @@ Particle::Particle(const ECLPi0* pi0, const int mdstIndex) :
 Particle::Particle(const MCParticle* mcParticle, const int mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(0), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_plist(0)
+  m_arrayPointer(0)
 {
   if (!mcParticle) return;
 
@@ -340,21 +332,22 @@ float Particle::getCharge(void) const
 
 const Particle* Particle::getDaughter(unsigned i) const
 {
-  fixParticleList();
+  if (!m_arrayPointer) fixArrayPointer();
+  if (!m_arrayPointer) return NULL; // fixing failed
 
-  if (i >= getNDaughters())
-    return NULL;
-
-  return static_cast<Particle*>(m_plist->At(m_daughterIndices[i]));
+  if (i >= getNDaughters()) return NULL;
+  return static_cast<Particle*>(m_arrayPointer->At(m_daughterIndices[i]));
 }
 
 const std::vector<Belle2::Particle*> Particle::getDaughters() const
 {
-  fixParticleList();
-
   std::vector<Particle*> daughters(getNDaughters());
+
+  if (!m_arrayPointer) fixArrayPointer();
+  if (!m_arrayPointer) return daughters; // fixing failed
+
   for (unsigned i = 0; i < getNDaughters(); i++)
-    daughters[i] = static_cast<Particle*>(m_plist->At(m_daughterIndices[i]));
+    daughters[i] = static_cast<Particle*>(m_arrayPointer->At(m_daughterIndices[i]));
 
   return daughters;
 }
@@ -428,38 +421,22 @@ void  Particle::storeErrorMatrix(const TMatrixFSym& m)
   }
 }
 
-void Particle::fixParticleList() const
+void Particle::fixArrayPointer() const
 {
-  if (m_plist != 0) return;
 
-  TClonesArray* plist(0);
+  TClonesArray* arrayPointer(0);
 
-  //Search default location
-  StoreArray<Particle> Particles;
-  if (Particles && getArrayIndex() >= 0) {
-    plist = Particles.getPtr();
-  } else {
-    //Search all StoreArrays which happen to store Particles
-    const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::c_Event);
-    for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
-      TClonesArray* value = dynamic_cast<TClonesArray*>(iter->second->ptr);
-      if (value && value->GetClass() == Class() && value->IndexOf(this) >= 0) {
-        plist = value;
-        break;
-      }
-    }
-  }
-  //Could not find any collection, raise exception
-  if (!plist) {
-    B2ERROR("Could not determine StoreArray the Particle belongs to !");
-    // TODO: deal with exceptions
-    //throw NoParticleListSetError();
-  }
+  std::string arrayName = getArrayName();
+  if (arrayName.empty())
+    B2ERROR("Particle::fixArrayPointer particle does not belong to a StoreArray");
 
-  //Set plist pointer and index for whole array
-  for (int i = 0; i < plist->GetEntriesFast(); i++) {
-    Particle& p = *(static_cast<Particle*>(plist->At(i)));
-    p.m_plist         = plist;
+  StoreArray<Particle> Particles(arrayName);
+  arrayPointer = Particles.getPtr();
+
+  //Set the StoreArray pointer for all elements
+  for (int i = 0; i < arrayPointer->GetEntriesFast(); i++) {
+    Particle& p = *(static_cast<Particle*>(arrayPointer->At(i)));
+    p.m_arrayPointer = arrayPointer;
   }
 }
 
@@ -495,7 +472,8 @@ void Particle::setFlavorType()
 
 void Particle::print() const
 {
-  std::cout << "Particle:";
+  std::cout << "Particle: collection=";
+  std::cout << getArrayName();
   std::cout << " PDGCode=" << m_pdgCode;
   std::cout << " Charge=" << getCharge();
   std::cout << " PDGMass=" << getPDGMass();
@@ -504,7 +482,7 @@ void Particle::print() const
   std::cout << std::endl;
 
   std::cout << " mdstIndex=" << m_mdstIndex;
-  std::cout << " arrayIndex=" << this->getArrayIndex();
+  std::cout << " arrayIndex=" << getArrayIndex();
   std::cout << " daughterIndices: ";
   for (unsigned i = 0; i < m_daughterIndices.size(); i++) {
     std::cout << m_daughterIndices[i] << ", ";
@@ -527,6 +505,7 @@ void Particle::print() const
 
   std::cout << " momentum=(";
   std::cout << m_px << "," << m_py << "," << m_pz << ")";
+  std::cout << " p=" << getP();
   std::cout << std::endl;
 
   std::cout << " position=(";

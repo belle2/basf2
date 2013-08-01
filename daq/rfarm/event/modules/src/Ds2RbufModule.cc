@@ -81,7 +81,7 @@ void Ds2RbufModule::event()
   delete msg;
 
   // return
-  m_rbuf++;
+  m_nsent++;
 
 }
 

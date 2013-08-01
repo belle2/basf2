@@ -215,8 +215,8 @@ TRGCDCFrontEnd::simulate(void) {
 		    const double phase = dClock.phase(at);
 		    const unsigned bits = unsigned(phase / (360. / 32.));
 
- 		    cout << "at,phase,bits=" << at << "," << phase << ","
- 			 << bits << endl;
+// 		    cout << "at,phase,bits=" << at << "," << phase << ","
+// 			 << bits << endl;
 
 		    for (unsigned k = 0; k < 5; k++) {
 			const string n1 = n + "-" + TRGUtilities::itostring(k);
@@ -422,20 +422,20 @@ TCFrontEnd::packerInnerInside(const TRGState & input) {
 
 	    //...One hit case...
 	    else if (hh == 1) {
-		cout << "p=" << p << endl;
-		cout << "one hit pri" << endl;
-		s.dump("detail", "one hit pri ");
-		s.subset(p, 5).dump("detail", "one hit pri ");
+		// cout << "p=" << p << endl;
+		// cout << "one hit pri" << endl;
+		// s.dump("detail", "one hit pri ");
+		// s.subset(p, 5).dump("detail", "one hit pri ");
 		s.set(p, 5, timing[i0]);
-		s.dump("detail", "one hit pri ");
-		s.subset(p, 5).dump("detail", "one hit pri ");
+		// s.dump("detail", "one hit pri ");
+		// s.subset(p, 5).dump("detail", "one hit pri ");
 	    }
 	    else if (hh == 2) {
-		cout << "one hit sec0" << endl;
+//		cout << "one hit sec0" << endl;
 		s.set(p, 5, timing[i1]);
 	    }
 	    else if (hh == 4) {
-		cout << "one hit sec1" << endl;
+//		cout << "one hit sec1" << endl;
 		s.set(p, 5, timing[i2]);
 	    }
 

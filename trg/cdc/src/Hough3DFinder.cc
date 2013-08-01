@@ -43,8 +43,8 @@ using namespace std;
 
 namespace Belle2 {
 
-  TRGCDCHough3DFinder::TRGCDCHough3DFinder(const TRGCDC & TRGCDC)
-    : _cdc(TRGCDC) {
+  TRGCDCHough3DFinder::TRGCDCHough3DFinder(const TRGCDC & TRGCDC, bool makeRootFile, int finderMode)
+    : _cdc(TRGCDC), m_makeRootFile(makeRootFile) , m_finderMode(finderMode) {
       m_Trg_PI = 3.141592653589793;
       // Initialize rr, ztostraw, anglest, nWiresInStereoLayer.
       CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
@@ -75,7 +75,7 @@ namespace Belle2 {
       m_z0StepSize = m_z0End/((m_nZ0Steps-1)/2);
 
       // Save in root.
-      m_fileHough3D = new TFile("Hough3D.root","RECREATE");
+      if(m_makeRootFile) m_fileHough3D = new TFile("Hough3D.root","RECREATE");
       m_treeTrackHough3D = new TTree("m_treeTrackHough3D","track");
       m_st0TSsTrackHough3D = new TClonesArray("TVectorD");
       m_st1TSsTrackHough3D = new TClonesArray("TVectorD");
@@ -169,7 +169,7 @@ namespace Belle2 {
 
       m_Hough3DFinder = new Hough3DFinder();
       // 1: Hough3DFinder 2: GeoFinder 3: VHDL GeoFinder
-      m_Hough3DFinder->setMode(2);
+      m_Hough3DFinder->setMode(m_finderMode);
       // Set input file name for VHDL GeoFinder.
       m_Hough3DFinder->setInputFileName("GeoFinder.input");
       // For VHDL GEoFinder
@@ -198,7 +198,7 @@ namespace Belle2 {
     m_Hough3DFinder->destruct();
 
     // Deallocate root variables
-    delete m_fileHough3D;
+    if(m_makeRootFile) delete m_fileHough3D;
     delete m_treeTrackHough3D;
     delete m_st0TSsTrackHough3D;
     delete m_st1TSsTrackHough3D;
@@ -242,8 +242,10 @@ namespace Belle2 {
   }
 
   void TRGCDCHough3DFinder::terminate(void){
-    m_fileHough3D->Write();
-    m_fileHough3D->Close();
+    if(m_makeRootFile) {
+      m_fileHough3D->Write();
+      m_fileHough3D->Close();
+    }
   }
 
   void TRGCDCHough3DFinder::doit(vector<TCTrack *> & trackList, int eventNum){
@@ -259,9 +261,8 @@ namespace Belle2 {
       aTrack.setTrackID(iTrack+1);
     }
 
-    int m_version=1;
-    if(m_version==0) doitPerfectly(trackList);
-    if(m_version==1) doitFind(trackList);
+    if(m_finderMode==0) doitPerfectly(trackList);
+    if(m_finderMode!=0) doitFind(trackList);
   }
 
   void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){

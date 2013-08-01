@@ -73,6 +73,7 @@ void Hough3DFinder::initialize(TVectorD &geometryVariables, vector<float > &init
       initVersion3(initVariables);
       break;
     default:
+      cout<<"[Error] 3DFinder mode is not correct"<<endl;
       break;
   }
 }
@@ -388,7 +389,7 @@ void Hough3DFinder::runFinderVersion1(vector<double> &trackVariables, vector<vec
   int tempHoughZ0;
   double actualCot, actualZ0;
   // Find best vote.
-  double minZ0;
+  //double minZ0;
 
   // Vote in Hough Mesh Layers.
   for(int cotStep=0; cotStep<m_nCotSteps; cotStep++){
@@ -505,7 +506,7 @@ void Hough3DFinder::runFinderVersion1(vector<double> &trackVariables, vector<vec
       if(m_houghMax<m_houghMesh[houghCot][houghZ0]){
         m_houghMax=m_houghMesh[houghCot][houghZ0];
         // If highest vote changes, need to initialize minZ0, minDiffHough
-        minZ0 = 9999;
+        //minZ0 = 9999;
         m_minDiffHough = 9999;
       }
       // When highest vote
@@ -715,7 +716,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
 
   // Select TS candidate range variables
   double stCand[4][10];
-  double stCandDiff[4][10];
+  //double stCandDiff[4][10];
   double stCandIndex[4][10];
   double stAxPhi[4];
   int stAxWire[4];
@@ -728,7 +729,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
   for( int i=0; i<4; i++ ) {
     for( int j=0; j<10; j++) {
       stCand[i][j] = 9999;
-      stCandDiff[i][j] = 9999;
+      //stCandDiff[i][j] = 9999;
       stCandIndex[i][j] = 9999;
       stCandHitMap[i][j] = 0;
     }
@@ -850,7 +851,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
         double diffPhi = stAxPhi[iLayer]-indexTS*2*m_Trg_PI/m_nWires[iLayer]*2;
         if (diffPhi > m_Trg_PI ) diffPhi -= 2*m_Trg_PI;
         if (diffPhi < -m_Trg_PI ) diffPhi += 2*m_Trg_PI;
-        stCandDiff[iLayer][iTS] = diffPhi/2/m_Trg_PI*m_nWires[iLayer]/2;
+        //stCandDiff[iLayer][iTS] = diffPhi/2/m_Trg_PI*m_nWires[iLayer]/2;
         (*m_geoCandidatesDiffStWires)[iLayer].push_back(diffPhi/2/m_Trg_PI*m_nWires[iLayer]/2);
 
         // Save indexTS

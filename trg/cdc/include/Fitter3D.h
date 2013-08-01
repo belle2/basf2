@@ -43,7 +43,8 @@ class TRGCDCFitter3D {
                    const bool fLRLUT,
 		   const bool fevtTime,
 		   const bool fzierror,
-		   const bool fmclr);
+		   const bool fmclr,
+       bool makeRootFile);
 
     /// Destructor
     virtual ~TRGCDCFitter3D();
@@ -178,6 +179,7 @@ class TRGCDCFitter3D {
       bool m_flagEvtTime;
       bool m_flagzierror;
       bool m_flagmclr;
+      bool m_makeRootFile;
 };
 
 //-----------------------------------------------------------------------------

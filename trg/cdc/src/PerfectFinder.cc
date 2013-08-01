@@ -211,11 +211,16 @@ TRGCDCPerfectFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
 		continue;
 	    }
  	    TCLink * best = 0;
-	    int timeMin = 99999;
+	    //int timeMin = 99999;
+	    float timeMin = 99999;
  	    for (unsigned j = 0; j < layers[i].size(); j++) {
- 		const TRGTime & t = * (layers[i][j]->cell()->signal())[0];
- 		if (t.time() < timeMin) {
- 		    timeMin = t.time();
+ 		//const TRGTime & t = * (layers[i][j]->cell()->signal())[0];
+    const float tsDrift = layers[i][j]->cell()->hit()->drift();
+    //cout<<"PF2D ["<<layers[i][j]->cell()->superLayerId()<<"-"<<layers[i][j]->cell()->localId()<<"] Tick: "<<t.time()<<" Drift: "<<tsDrift<<endl;
+ 		//if (t.time() < timeMin) {
+ 		//    timeMin = t.time();
+    if (tsDrift < timeMin) {
+        timeMin = tsDrift;
  		    best = layers[i][j];
  		}
  	    }

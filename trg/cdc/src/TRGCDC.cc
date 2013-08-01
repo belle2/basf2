@@ -39,6 +39,7 @@
 #include "trg/cdc/LUT.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
+#include "trg/cdc/TrackSegmentFinder.h"
 #include "trg/cdc/PerfectFinder.h"
 #include "trg/cdc/HoughFinder.h"
 #include "trg/cdc/Hough3DFinder.h"
@@ -69,7 +70,7 @@ TRGCDC::name(void) const {
 
 string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.37");
+    return string("TRGCDC 5.38");
 }
 
 TRGCDC *
@@ -80,6 +81,7 @@ TRGCDC::getTRGCDC(const string & configFile,
 		  unsigned simulationMode,
 		  unsigned fastSimulationMode,
 		  unsigned firmwareSimulationMode,
+      bool makeRootFile,
 		  bool perfect2DFinder,
 		  bool perfect3DFinder,
 		  const string & innerTSLUTDataFile,
@@ -93,7 +95,11 @@ TRGCDC::getTRGCDC(const string & configFile,
 		  bool fevtTime,
 		  bool fzierror,
 		  bool fmclr,
-		  double inefficiency) {
+		  double inefficiency,
+      bool fileTSF,
+      bool fileHough3D,
+      int finder3DMode,
+      bool fileFitter3D) {
     if (_cdc) {
 	//delete _cdc;
 	_cdc = 0;
@@ -104,6 +110,7 @@ TRGCDC::getTRGCDC(const string & configFile,
 			  simulationMode,
 			  fastSimulationMode,
 			  firmwareSimulationMode,
+        makeRootFile,
 			  perfect2DFinder,
 			  perfect3DFinder,
 			  innerTSLUTDataFile,
@@ -117,7 +124,11 @@ TRGCDC::getTRGCDC(const string & configFile,
 			  fevtTime,
 			  fzierror,
 			  fmclr,
-			  inefficiency);
+			  inefficiency,
+        fileTSF,
+        fileHough3D,
+        finder3DMode,
+        fileFitter3D);
     }
     else {
 	cout << "TRGCDC::getTRGCDC ... good-bye" << endl;
@@ -139,6 +150,7 @@ TRGCDC::TRGCDC(const string & configFile,
 	       unsigned simulationMode,
 	       unsigned fastSimulationMode,
 	       unsigned firmwareSimulationMode,
+         bool makeRootFile,
 	       bool perfect2DFinder,
 	       bool perfect3DFinder,
 	       const string & innerTSLUTDataFile,
@@ -152,12 +164,17 @@ TRGCDC::TRGCDC(const string & configFile,
 	       bool fevtTime,
 	       bool fzierror,
 	       bool fmclr,
-	       double inefficiency)
+	       double inefficiency,
+         bool fileTSF,
+         bool fileHough3D,
+         int finder3DMode,
+         bool fileFitter3D)
     : _debugLevel(0),
       _configFilename(configFile),
       _simulationMode(simulationMode),
       _fastSimulationMode(fastSimulationMode),
       _firmwareSimulationMode(firmwareSimulationMode),
+      _makeRootFile(makeRootFile),
       _perfect2DFinder(perfect2DFinder),
       _perfect3DFinder(perfect3DFinder),
       _innerTSLUTDataFilename(innerTSLUTDataFile),
@@ -169,6 +186,10 @@ TRGCDC::TRGCDC(const string & configFile,
       _fzierror(fzierror),
       _fmclr(fmclr),
       _inefficiency(inefficiency),
+      _fileTSF(fileTSF),
+      _fileHough3D(fileHough3D),
+      _finder3DMode(finder3DMode),
+      _fileFitter3D(fileFitter3D),
       _fudgeFactor(1.),
       _width(0),
       _r(0),
@@ -468,6 +489,9 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
 	}
     }
 
+    //...Track Segment Finder...
+    _tsFinder = new TSFinder(*this, _fileTSF);
+
     //...Perfect 2D Finder...
     _pFinder = new TCPFinder("Perfect2DFinder", * this);
 
@@ -482,7 +506,7 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
 			     houghFinderPeakMin);
 
     //...Hough 3D Finder...
-    _h3DFinder = new TCH3DFinder(*this);
+    _h3DFinder = new TCH3DFinder(*this, _fileHough3D, _finder3DMode);
 
     //...3D fitter...
     _fitter3D = new TCFitter3D("Fitter3D",
@@ -492,7 +516,8 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
                                _fLRLUT,
 			       _fevtTime,
 			       _fzierror,
-			       _fmclr);
+			       _fmclr,
+             _fileFitter3D);
     _fitter3D->initialize();
 
     //...For module simulation (Front-end)...
@@ -502,7 +527,7 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
     m_eventNum = 1;
 
     //...Initialize root file...
-    m_file = new TFile((char*)_rootTRGCDCFilename.c_str(), "RECREATE");
+    if(_makeRootFile) m_file = new TFile((char*)_rootTRGCDCFilename.c_str(), "RECREATE");
     m_tree = new TTree("m_tree", "tree");
     m_treeAllTracks = new TTree("m_treeAllTracks", "treeAllTracks");
 
@@ -529,13 +554,17 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
 
 void
 TRGCDC::terminate(void) {
+
+    if(_tsFinder) {
+      _tsFinder->terminate();
+    }
     if(_fitter3D) {
       _fitter3D->terminate();
     }
     if(_h3DFinder) {
       _h3DFinder->terminate();
     }
-    if(m_file) {
+    if(_makeRootFile) {
       m_file->Write();
       m_file->Close();
     }
@@ -1313,6 +1342,7 @@ TRGCDC::~TRGCDC() {
     delete [] _r;
     delete [] _r2;
 
+    if(_tsFinder) delete _tsFinder;
     if (_hFinder)
 	delete _hFinder;
     if (_h3DFinder)
@@ -1371,67 +1401,70 @@ TRGCDC::fastSimulation(void) {
     const bool trackSegmentSimulationOnly = _fastSimulationMode & 1;
     const bool trackSegmentClockSimulation = _fastSimulationMode & 2;
 
-    //...Store TS hits...
-    const unsigned n = _tss.size();
-    for (unsigned i = 0; i < n; i++) {
-	TCSegment & s = * _tss[i];
-	s.simulate(trackSegmentClockSimulation);
-	if (s.signal().active()) {
-            TCSHit * th = new TCSHit(s);
-            s.hit(th);
-            _segmentHits.push_back(th);
-            _segmentHitsSL[s.layerId()].push_back(th);
+    _tsFinder->doit(_tss, trackSegmentClockSimulation, _segmentHits, _segmentHitsSL);
 
-	    //...Create TCShit...
-//	    unsigned j = 0;
-//	    const TCWire * w = s[j];
-//	    TCSHit * th = 0;
-//	    while (w) {
-//		const TCWHit * h = w->hit();
-//		if (h) {
-//		    if (! th) {
-//			th = new TCSHit(s);
-//			s.hit(th);
-//			_segmentHits.push_back(th);
-//			_segmentHitsSL[s.layerId()].push_back(th);
-//		    }
-//		    s._hits.push_back(h);
-//		}
-//		w = s[++j];
+//    //...Store TS hits...
+//    const unsigned n = _tss.size();
+//    for (unsigned i = 0; i < n; i++) {
+//	TCSegment & s = * _tss[i];
+//	s.simulate(trackSegmentClockSimulation);
+//	if (s.signal().active()) {
+//            TCSHit * th = new TCSHit(s);
+//            s.hit(th);
+//            _segmentHits.push_back(th);
+//            _segmentHitsSL[s.layerId()].push_back(th);
+//
+//	    //...Create TCShit...
+////	    unsigned j = 0;
+////	    const TCWire * w = s[j];
+////	    TCSHit * th = 0;
+////	    while (w) {
+////		const TCWHit * h = w->hit();
+////		if (h) {
+////		    if (! th) {
+////			th = new TCSHit(s);
+////			s.hit(th);
+////			_segmentHits.push_back(th);
+////			_segmentHitsSL[s.layerId()].push_back(th);
+////		    }
+////		    s._hits.push_back(h);
+////		}
+////		w = s[++j];
+////	    }
+//	}
+//    }
+//
+//    if (TRGDebug::level() > 1) {
+//	cout << TRGDebug::tab() << "TS hit list" << endl;
+//	string dumpOption = "trigger";
+//	if (TRGDebug::level() > 2)
+//	    dumpOption = "detail";
+//	for (unsigned i = 0; i < nSegments(); i++) {
+//	    const TCSegment & s = segment(i);
+//	    if (s.signal().active())
+//		s.dump(dumpOption, TRGDebug::tab(4));
+//	}
+//
+//	cout << TRGDebug::tab() << "TS hit list (2)" << endl;
+//	if (TRGDebug::level() > 2)
+//	    dumpOption = "detail";
+//	for (unsigned i = 0; i < _segmentHits.size(); i++) {
+//	    const TCSHit & s = * _segmentHits[i];
+//	    s.dump(dumpOption, TRGDebug::tab(4));
+//	}
+//
+//	cout << TRGDebug::tab() << "TS hit list (3)" << endl;
+//	if (TRGDebug::level() > 2)
+//	    dumpOption = "detail";
+//	for (unsigned j = 0; j < _superLayers.size(); j++) {
+//	    for (unsigned i = 0; i < _segmentHitsSL[j].size(); i++) {
+//		const vector<TCSHit*> & s = _segmentHitsSL[j];
+//		for (unsigned k = 0; k < s.size(); k++)
+//		    s[k]->dump(dumpOption, TRGDebug::tab(4));
 //	    }
-	}
-    }
+//	}
+//    }
 
-    if (TRGDebug::level() > 1) {
-	cout << TRGDebug::tab() << "TS hit list" << endl;
-	string dumpOption = "trigger";
-	if (TRGDebug::level() > 2)
-	    dumpOption = "detail";
-	for (unsigned i = 0; i < nSegments(); i++) {
-	    const TCSegment & s = segment(i);
-	    if (s.signal().active())
-		s.dump(dumpOption, TRGDebug::tab(4));
-	}
-
-	cout << TRGDebug::tab() << "TS hit list (2)" << endl;
-	if (TRGDebug::level() > 2)
-	    dumpOption = "detail";
-	for (unsigned i = 0; i < _segmentHits.size(); i++) {
-	    const TCSHit & s = * _segmentHits[i];
-	    s.dump(dumpOption, TRGDebug::tab(4));
-	}
-
-	cout << TRGDebug::tab() << "TS hit list (3)" << endl;
-	if (TRGDebug::level() > 2)
-	    dumpOption = "detail";
-	for (unsigned j = 0; j < _superLayers.size(); j++) {
-	    for (unsigned i = 0; i < _segmentHitsSL[j].size(); i++) {
-		const vector<TCSHit*> & s = _segmentHitsSL[j];
-		for (unsigned k = 0; k < s.size(); k++)
-		    s[k]->dump(dumpOption, TRGDebug::tab(4));
-	    }
-	}
-    }
 
     if (trackSegmentSimulationOnly) {
 	TRGDebug::leaveStage("TRGCDC simulation");

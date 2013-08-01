@@ -85,6 +85,9 @@ class TRGCDCModule : public Module {
     /// Switch for the firmware simulation. 0:do nothing, 1:do everything
     int _firmwareSimulationMode;
 
+    /// Switch for TRGCDC.root file.
+    bool _fileTRGCDC;
+
     /// Switch to activate perfect 2D finder.
     bool _perfect2DFinder;
 
@@ -109,11 +112,23 @@ class TRGCDCModule : public Module {
     /// Switch for the zi error.
     bool _fzierror;
 
-    /// Switch for MC L/R information
+    /// Switch for MC L/R information.
     bool _fmclr;
 
-    /// Parameter for Hit inefficiency
+    /// Parameter for Hit inefficiency.
     double _wireHitInefficiency;
+
+    /// Switch for TSF.root file.
+    bool _fileTSF;
+
+    /// Switch for Hough3D.root file.
+    bool _fileHough3D;
+
+    /// Sets mode of 3DFinder.
+    int _finder3DMode;
+    
+    /// Switch for Fitter3D.root file.
+    bool _fileFitter3D;
 
   private:
 

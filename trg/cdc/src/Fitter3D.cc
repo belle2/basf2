@@ -21,6 +21,7 @@
 #include "trg/cdc/Track.h"
 #include "trg/cdc/Link.h"
 #include <cstdlib>
+#include <bitset>
 
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
@@ -113,7 +114,8 @@ namespace Belle2 {
                                  bool fLRLUT,
 				 bool fevtTime,
 				 bool fzierror,
-				 bool fmclr)
+				 bool fmclr,
+         bool makeRootFile)
     : _name(name),
     _cdc(TRGCDC),
     _eventTime(eventTime),
@@ -121,7 +123,8 @@ namespace Belle2 {
     m_flagWireLRLUT(fLRLUT),
     m_flagEvtTime(fevtTime),
     m_flagzierror(fzierror),
-    m_flagmclr(fmclr){
+    m_flagmclr(fmclr),
+    m_makeRootFile(makeRootFile) {
 
       //...Initialization...
     }
@@ -296,7 +299,7 @@ namespace Belle2 {
     m_zerror2[0]=0.00388; m_zerror2[1]=0.00538; m_zerror2[2]=0.00650; m_zerror2[3]=0.00842;
     m_phierror[0] = 0.0085106; m_phierror[1] = 0.0039841; m_phierror[2] = 0.0025806; m_phierror[3] = 0.0019084; m_phierror[4] = 0.001514;
 
-    m_fileFitter3D = new TFile((char*)m_rootFitter3DFilename.c_str(),"RECREATE");
+    if(m_makeRootFile) m_fileFitter3D = new TFile((char*)m_rootFitter3DFilename.c_str(),"RECREATE");
     m_treeTrackFitter3D = new TTree("m_treeTrackFitter3D","track");
 
     m_tSTrackFitter3D = new TClonesArray("TVectorD");
@@ -603,7 +606,15 @@ namespace Belle2 {
           phi_w[i]=(double) s->localId()/ni[s->superLayerId()]*4*m_Trg_PI;
           phi[i]=(double) s->localId()/ni[s->superLayerId()]*4*m_Trg_PI;
           //phi[i]=s->phiPosition();
+          //cout<<"Hit pattern: "<<s->hitPattern()<<endl;
+          //unsigned int tsSize = s->wires().size();
+          //if (tsSize == 11) {
+          //  cout<<s->name()<<" Hit pattern: "<<bitset<11>(s->hitPattern())<<endl;
+          //} else if (tsSize == 15) {
+          //  cout<<s->name()<<" Hit pattern: "<<bitset<15>(s->hitPattern())<<endl;
+          //}
           lutv[i]=s->LUT()->getLRLUT(s->hitPattern(),s->superLayerId());
+          //cout<<"lutv["<<i<<"]: "<<lutv[i]<<endl;
 
           if( m_flagWireLRLUT){
             ///...Using Drift time information
@@ -999,8 +1010,10 @@ namespace Belle2 {
     }
 
   void TRGCDCFitter3D::terminate(void){
-    m_fileFitter3D->Write();
-    m_fileFitter3D->Close();
+    if(m_makeRootFile) {
+      m_fileFitter3D->Write();
+      m_fileFitter3D->Close();
+    }
     // Should clean up allocated memory
   }   
 

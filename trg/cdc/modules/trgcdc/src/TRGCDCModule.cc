@@ -43,6 +43,7 @@ TRGCDCModule::TRGCDCModule()
       _simulationMode(1),
       _fastSimulationMode(0),
       _firmwareSimulationMode(0),
+      _fileTRGCDC(0),
       _perfect2DFinder(false),
       _perfect3DFinder(false),
 //    _hFinderMeshX(96),
@@ -53,6 +54,10 @@ TRGCDCModule::TRGCDCModule()
       _fLRLUT(1),
       _fevtTime(1),
       _wireHitInefficiency(0.),
+      _fileTSF(0),
+      _fileHough3D(0),
+      _finder3DMode(0),
+      _fileFitter3D(0),
       _cdc(0),
       _sa(0) {
 
@@ -97,6 +102,10 @@ TRGCDCModule::TRGCDCModule()
 	     _firmwareSimulationMode,
 	     "TRGCDC firmware simulation mode",
 	     _firmwareSimulationMode);
+    addParam("TRGCDCRootFile",
+              _fileTRGCDC,
+              "Flag for making TRGCDC.root",
+              _fileTRGCDC);
     addParam("2DFinderPerfect",
              _perfect2DFinder,
              "2D finder perfect option",
@@ -137,6 +146,22 @@ TRGCDCModule::TRGCDCModule()
              _wireHitInefficiency,
              "wire hit inefficiency",
              _wireHitInefficiency);
+    addParam("TSFRootFile",
+              _fileTSF,
+              "Flag for making TSF.root",
+              _fileTSF);
+    addParam("Hough3DRootFile",
+              _fileHough3D,
+              "Flag for making Hough3D.root",
+              _fileHough3D);
+    addParam("Finder3DMode",
+              _finder3DMode,
+              "Mode for finder3D",
+              _finder3DMode);
+    addParam("Fitter3DRootFile",
+              _fileFitter3D,
+              "Flag for making Fitter3D.root",
+              _fileFitter3D);
 
 
     if (TRGDebug::level())
@@ -201,6 +226,7 @@ TRGCDCModule::beginRun() {
 				 _simulationMode,
 				 _fastSimulationMode,
 				 _firmwareSimulationMode,
+         _fileTRGCDC,
 				 _perfect2DFinder,
 				 _perfect3DFinder,
 				 _innerTSLUTDataFilename,
@@ -214,7 +240,11 @@ TRGCDCModule::beginRun() {
 				 _fevtTime,
 				 _fzierror,
 				 _fmclr,
-				 _wireHitInefficiency);
+				 _wireHitInefficiency,
+         _fileTSF,
+         _fileHough3D,
+         _finder3DMode,
+         _fileFitter3D);
 
     if (TRGDebug::level())
 	cout << "TRGCDCModule ... beginRun called " << endl;

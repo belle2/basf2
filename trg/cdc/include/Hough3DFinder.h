@@ -31,7 +31,7 @@ class TRGCDCLink;
 class TRGCDCHough3DFinder {
   public:
     // Contructor.
-    TRGCDCHough3DFinder(const TRGCDC &);
+    TRGCDCHough3DFinder(const TRGCDC &, bool makeRootFile, int finderMode);
     ~TRGCDCHough3DFinder();
     // Member functions.
     void doit(std::vector<TRGCDCTrack *> & trackList);
@@ -50,6 +50,9 @@ class TRGCDCHough3DFinder {
     double m_ztostraw[4];
     double m_anglest[4];
     double m_Trg_PI;
+    bool m_makeRootFile;
+    // 0: perfect finder, 1: Hough3DFinder, 2: GeoFinder, 3: VHDL GeoFinder
+    int m_finderMode;
     // Hough Variables.
     Hough3DFinder* m_Hough3DFinder;
     double m_cotStart;

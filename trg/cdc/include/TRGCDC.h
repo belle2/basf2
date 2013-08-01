@@ -45,6 +45,7 @@ class TRGCDCSegment;
 class TRGCDCSegmentHit;
 class TRGCDCFrontEnd;
 class TRGCDCMerger;
+class TRGCDCTrackSegmentFinder;
 class TRGCDCPerfectFinder;
 class TRGCDCHoughFinder;
 class TRGCDCHough3DFinder;
@@ -68,6 +69,7 @@ class TRGCDC {
 			      unsigned simulationMode = 0,
 			      unsigned fastSimulationMode = 0,
 			      unsigned firmwareSimulationMode = 0,
+            bool _makeRootFile = 0,
                               bool perfect2DFinder = false,
                               bool perfect3DFinder = false,
 			      const std::string & innerTSLUTDataFile = "?",
@@ -81,7 +83,11 @@ class TRGCDC {
 			      bool fevtTime = 1,
 			      bool fzierror=1,
 			      bool fmclr=0,
-			      double inefficiency=0);
+			      double inefficiency=0,
+            bool fileTSF=0,
+            bool fileHough3D=0,
+            int finder3DMode=0,
+            bool fileFitter3D=0);
     
     /// returns TRGCDC object. TRGCDC should be created with specific
     /// configuration before calling this function.
@@ -94,6 +100,7 @@ class TRGCDC {
 	   unsigned simulationMode,
 	   unsigned fastSimulationMode,
 	   unsigned firmwareSimulationMode,
+     bool makeRootFile,
 	   bool perfect2DFinder,
 	   bool perfect3DFinder,
 	   const std::string & innerTSLUTDataFile,
@@ -107,7 +114,11 @@ class TRGCDC {
 	   bool fevtTime,
 	   bool fzierror,
 	   bool fmclr,
-	   double inefficiecny);
+	   double inefficiecny,
+     bool fileTSF,
+     bool fileHough3D,
+     int finder3DMode,
+     bool fileFitter3D);
 
     /// Destructor
     virtual ~TRGCDC();
@@ -385,6 +396,9 @@ class TRGCDC {
     /// Firmware simulation mode.
     unsigned _firmwareSimulationMode;
 
+    /// Switch for TRGCDC.root file.
+    bool _makeRootFile;
+
     /// Switch to activate perfect 2D finder.
     const bool _perfect2DFinder;
 
@@ -417,6 +431,18 @@ class TRGCDC {
 
     /// Hit inefficiency parameter.
     double _inefficiency;
+
+    /// Switch for TSF.root file.
+    bool _fileTSF;
+
+    /// Switch for Hough3D.root file.
+    bool _fileHough3D;
+
+    /// Sets mode of 3DFinder.
+    int _finder3DMode;
+
+    /// Switch for Fitter3D.root file.
+    bool _fileFitter3D;
 
     /// Super layers.
     std::vector<std::vector<TRGCDCLayer *> *> _superLayers;
@@ -510,6 +536,9 @@ class TRGCDC {
 
     /// CDC trigger merger boards.
     std::vector<TRGCDCMerger *> _mergers;
+
+    /// Track Segement Finder.
+    TRGCDCTrackSegmentFinder* _tsFinder;
 
     /// Perfect 2D finder.
     TRGCDCPerfectFinder * _pFinder;

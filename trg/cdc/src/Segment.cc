@@ -189,6 +189,7 @@ TCSegment::simulateWithoutClock(void) {
 
     //...System clocks...
     const TRGClock & systemClock = TRGCDC::getTRGCDC()->systemClock();
+    //systemClock.dump();
 
     //...Get wire informtion...
     const unsigned n = _wires.size();
@@ -247,8 +248,14 @@ TCSegment::simulateWithoutClock(void) {
     //...Coincidence of all layers...
     TRGSignal all = l0 & l1 & l2 & l3 & l4;
 
-    if (all.nEdges())
+
+
+    if (all.nEdges()) {
+    all.name(name());
 	_signal = all;
+    //cout<<all.name()<<":#signals="<<all.nSignals()<<endl;;
+    //all.dump();
+    }
 
 //     if (iwd) {
 // 	l0.dump("", "     l0-> ");
@@ -262,10 +269,13 @@ TCSegment::simulateWithoutClock(void) {
 //     }    
 
     TRGDebug::leaveStage("TS sim");
+
 }
 
 void
 TCSegment::simulateWithClock(void) {
+
+    //cout<<"Start TSF with clock"<<endl;
 
     const string stage = "TS sim w/clock" + name();
     TRGDebug::enterStage(stage);
@@ -308,14 +318,72 @@ TCSegment::simulateWithClock(void) {
     //...Check state changes...
     vector<int> clocks = signals.stateChanges();
     const unsigned nStates = clocks.size();
+    int tsSize = signals.size();
+    // TS timing
+    int tsRise, tsFall = 0;
+    bool tsPrevious = 0;
+    TRGSignal tsSignal(dataClock);
     for (unsigned i = 0; i < nStates; i++) {
 	const TRGState state = signals.state(clocks[i]);
 //	state.dump("dump of state:", TRGDebug::tab());
-	cout << TRGDebug::tab() << i << ":c=" << clocks[i] << ":" << state
-	     << endl;
+//cout << TRGDebug::tab() << i << ":c=" << clocks[i] << ":" << state
+//<< endl;
 
-	_lut->getLRLUT(unsigned(state), superLayerId());
+	  //_lut->getLRLUT(unsigned(state), superLayerId());
+    bool tsL0,tsL1,tsL2,tsL3,tsL4, tsAll= 0;
+    if(tsSize == 11) {
+      //cout<<"Outer TS"<<endl;
+	    //...Simple simulation assuming 3:2:1:2:3 shape...
+	    tsL0 = state[0] | state[1] | state[2];
+	    tsL1 = state[3] | state[4];
+	    tsL2 = state[5];
+	    tsL3 = state[6] | state[7];
+	    tsL4 = state[8] | state[9] | state[10];
+    } else if (tsSize == 15) {
+      //cout<<"Inner TS"<<endl;
+	    //...Simple simulation assuming 1:2:3:4:5 shape...
+	    tsL0 = state[0];
+	    tsL1 = state[1] | state[2];
+	    tsL2 = state[3] | state[4] | state[5];
+	    tsL3 = state[6] | state[7] | state[8] | state[9];
+	    tsL4 = state[10] |state[11] | state[12] | state[13] |state[14];
     }
+
+    tsAll = tsL0 & tsL1 & tsL2 & tsL3 & tsL4;
+    //cout<<"L0,L1,L2,L3,L4: "<<tsL0<<tsL1<<tsL2<<tsL3<<tsL4<<endl;
+    //cout<<"tsAll: "<<tsAll<<endl;
+
+    // Makes signal for TS
+    if(tsPrevious != tsAll) {
+      if(tsAll == 1) {
+        //cout<<"Start of new signal"<<endl;
+        tsRise = clocks[i];
+        tsPrevious = tsAll;
+      }
+      if(tsAll == 0) {
+        tsFall = clocks[i];
+        tsSignal |= TRGSignal(dataClock, tsRise, tsFall);
+        tsPrevious = tsAll;
+        //cout<<"End of new signal"<<endl;
+        //tsSignal.dump();
+      }
+    }
+    
+    } // Loop over all state changes
+
+    //cout<<"End of all signals for TS"<<endl;
+    //tsSignal.dump();
+
+
+    if(tsSignal.nEdges()) {
+      tsSignal.name(name());
+      _signal = tsSignal;
+      //cout<<tsSignal.name()<<":#signals="<<tsSignal.nSignals()<<endl;
+      //tsSignal.dump();
+    }
+
+
+    //cout<<"End TSF with clock"<<endl;
 
     TRGDebug::leaveStage(stage);
 }

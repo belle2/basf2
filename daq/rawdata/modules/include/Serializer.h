@@ -24,10 +24,11 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <daq/dataobjects/RawCDC.h>
+#include <daq/rawdata/modules/DAQConsts.h>
+#include <daq/dataobjects/RawCOPPER.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
-#include <daq/rawdata/modules/DAQConsts.h>
+
 
 #include <sys/types.h>
 #include <sys/socket.h>

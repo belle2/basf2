@@ -11,8 +11,10 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
-#include <daq/dataobjects/RawCDC.h>
+
+#include <daq/dataobjects/RawCOPPER.h>
 #include <daq/dataobjects/RawHeader.h>
+#include <daq/rawdata/modules/DAQConsts.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -52,6 +54,9 @@ namespace Belle2 {
     int m_size;
     int m_maxevt;
     int m_nevt;
+
+    //! size of buffer for one event (word)
+    int BUF_SIZE_WORD;
 
     // Event Meta Data
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;

@@ -27,8 +27,8 @@
 #include <daq/dataflow/EvtSocket.h>
 
 #include <framework/dataobjects/EventMetaData.h>
-#include <daq/dataobjects/RawCDC.h>
 #include <daq/rawdata/modules/DAQConsts.h>
+#include <daq/dataobjects/RawCOPPER.h>
 
 #include <daq/rawdata/modules/DeSerializer.h>
 

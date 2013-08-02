@@ -23,9 +23,8 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <daq/dataflow/EvtSocket.h>
-
+#include <daq/dataobjects/RawCOPPER.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <daq/dataobjects/RawCDC.h>
 
 #include <sys/socket.h>
 #include <sys/types.h>

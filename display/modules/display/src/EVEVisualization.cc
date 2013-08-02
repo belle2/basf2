@@ -705,8 +705,8 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
       m_mcparticleTracks[particle].simhits = new TEvePointSet(pointsTitle);
       m_mcparticleTracks[particle].simhits->SetTitle(pointsTitle);
       m_mcparticleTracks[particle].simhits->SetMarkerStyle(6);
-      m_mcparticleTracks[particle].simhits->SetMainColor(kWhite);
-      m_mcparticleTracks[particle].simhits->SetMainTransparency(50);
+      m_mcparticleTracks[particle].simhits->SetMainColor(kViolet - 5);
+      //m_mcparticleTracks[particle].simhits->SetMainTransparency(50);
       m_mcparticleTracks[particle].track = NULL;
     }
     return &m_mcparticleTracks[particle];
@@ -811,7 +811,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     m_mcparticleTracks[particle].simhits->SetTitle(pointsTitle);
     m_mcparticleTracks[particle].simhits->SetMarkerStyle(6);
     m_mcparticleTracks[particle].simhits->SetMainColor(m_mcparticleTracks[particle].track->GetLineColor());
-    m_mcparticleTracks[particle].simhits->SetMainTransparency(50);
+    //m_mcparticleTracks[particle].simhits->SetMainTransparency(50);
     m_mcparticleTracks[particle].track->AddElement(m_mcparticleTracks[particle].simhits);
   }
   return &m_mcparticleTracks[particle];

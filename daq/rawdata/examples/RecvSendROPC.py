@@ -21,32 +21,25 @@ from basf2 import *
 
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.ERROR)
-# set_log_level(LogLevel.INFO)
+set_log_level(LogLevel.INFO)
 
 # Modules
-receiver = register_module('DeSerializerPC')
-dump = register_module('PrintCollections')
-perf = register_module('DAQPerf')
+reader = register_module('DeSerializerPC')
+sender = register_module('Serializer')
 
-# RxSocket
-receiver.param('RecvBasePort', 33000)
-receiver.param('NumConn', 1)
-receiver.param('LocalHostName', 'ropc01')
-receiver.param('EventDataBufferWords', 4801)
-
-receiver.param('DumpFileName', 'ROPC01dump.dat')
-
-# Perf
-perf.param('Cycle', 100000)
-perf.param('MonitorSize', True)
+# TxSocket
+reader.param('RecvPort', 35000)
+# sender.param('DestHostName', 'hltes')
+sender.param('DestHostName', 'localhost')
+sender.param('DestPort', 37000)
+sender.param('ProcessMethod', 'ROPC')
 
 # Create main path
 main = create_path()
 
 # Add modules to main path
-main.add_module(receiver)
-# main.add_module(dump)
-# main.add_module(perf)
+main.add_module(reader)
+main.add_module(sender)
 
 # Process all events
 process(main)

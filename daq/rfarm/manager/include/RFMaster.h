@@ -17,10 +17,10 @@
 #include "daq/rfarm/manager/RFServerBase.h"
 
 namespace Belle2 {
-  class RfMaster : public RFServerBase {
+  class RFMaster : public RFServerBase {
   public:
-    RfMaster(string conf);
-    ~RfMaster();
+    RFMaster(std::string conf);
+    ~RFMaster();
 
     // Functions to be hooked to NSM
     void Configure(NSMmsg*, NSMcontext*);

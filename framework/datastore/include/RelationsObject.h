@@ -108,7 +108,7 @@ namespace Belle2 {
      *  @return        A vector of relations.
      */
     template <class TO> RelationVector<TO> getRelationsTo(const std::string& name = "") const {
-      return RelationVector<TO>(DataStore::Instance().getRelationsFromTo(this, m_cacheDataStoreEntry, m_cacheArrayIndex, TO::Class(), name));
+      return RelationVector<TO>(DataStore::Instance().getRelationsWith(DataStore::c_ToSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, TO::Class(), name));
     }
 
     /** Get the relations that point from another store array to this object.
@@ -120,7 +120,7 @@ namespace Belle2 {
      *  @return        A vector of relations.
      */
     template <class FROM> RelationVector<FROM> getRelationsFrom(const std::string& name = "") const {
-      return RelationVector<FROM>(DataStore::Instance().getRelationsToFrom(this, m_cacheDataStoreEntry, m_cacheArrayIndex, FROM::Class(), name));
+      return RelationVector<FROM>(DataStore::Instance().getRelationsWith(DataStore::c_FromSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, FROM::Class(), name));
     }
 
     /** Get the relations between this object and another store array.
@@ -134,7 +134,7 @@ namespace Belle2 {
      *  @return        A vector of relations.
      */
     template <class T> RelationVector<T> getRelationsWith(const std::string& name = "") const {
-      return RelationVector<T>(DataStore::Instance().getRelationsWith(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name));
+      return RelationVector<T>(DataStore::Instance().getRelationsWith(DataStore::c_BothSides, this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name));
     }
 
     /** Get the object to which this object has a relation.
@@ -146,7 +146,7 @@ namespace Belle2 {
      *  @return        The first related object or a null pointer.
      */
     template <class TO> const TO* getRelatedTo(const std::string& name = "") const {
-      return static_cast<const TO*>(DataStore::Instance().getRelationFromTo(this, m_cacheDataStoreEntry, m_cacheArrayIndex, TO::Class(), name).object);
+      return static_cast<const TO*>(DataStore::Instance().getRelationWith(DataStore::c_ToSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, TO::Class(), name).object);
     }
 
     /** Get the object from which this object has a relation.
@@ -158,7 +158,7 @@ namespace Belle2 {
      *  @return        The first related object or a null pointer.
      */
     template <class FROM> const FROM* getRelatedFrom(const std::string& name = "") const {
-      return static_cast<const FROM*>(DataStore::Instance().getRelationToFrom(this, m_cacheDataStoreEntry, m_cacheArrayIndex, FROM::Class(), name).object);
+      return static_cast<const FROM*>(DataStore::Instance().getRelationWith(DataStore::c_FromSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, FROM::Class(), name).object);
     }
 
     /** Get the object to or from which this object has a relation.
@@ -170,7 +170,7 @@ namespace Belle2 {
      *  @return        The first related object or a null pointer.
      */
     template <class T> const T* getRelated(const std::string& name = "") const {
-      return static_cast<const T*>(DataStore::Instance().getRelationWith(this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name).object);
+      return static_cast<const T*>(DataStore::Instance().getRelationWith(DataStore::c_BothSides, this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name).object);
     }
 
     /** Get name of array this object is stored in, or "" if not found. */

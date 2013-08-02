@@ -126,7 +126,7 @@ bool DataStore::createEntry(const std::string& name, EDurability durability,
 }
 
 
-DataStore::StoreEntry* DataStore::getEntry(const StoreAccessorBase& accessor)
+DataStore::StoreEntry* DataStore::getEntry(const StoreAccessorBase& accessor) const
 {
   const StoreObjConstIter& it = m_storeObjMap[accessor.getDurability()].find(accessor.getName());
 
@@ -138,7 +138,7 @@ DataStore::StoreEntry* DataStore::getEntry(const StoreAccessorBase& accessor)
 }
 
 
-TObject** DataStore::getObject(const StoreAccessorBase& accessor)
+TObject** DataStore::getObject(const StoreAccessorBase& accessor) const
 {
   StoreEntry* entry = getEntry(accessor);
   if (!entry) {
@@ -170,7 +170,6 @@ bool DataStore::createObject(TObject* object, bool replace, const StoreAccessorB
     } else {
       delete entry->object;
       entry->object = static_cast<TObject*>(accessor.getClass()->New());
-//      entry->object->Clear();
     }
   }
 
@@ -179,7 +178,7 @@ bool DataStore::createObject(TObject* object, bool replace, const StoreAccessorB
 }
 
 
-bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& entry, int& index)
+bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& entry, int& index) const
 {
   // check whether the cached information is (still) valid
   if (entry && entry->ptr && (index >= 0)) {
@@ -196,7 +195,7 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
 
   // search for the object and set the entry and index
   const TClass* objectClass = object->IsA();
-  for (StoreObjIter iter = m_storeObjMap[c_Event].begin(); iter != m_storeObjMap[c_Event].end(); ++iter) {
+  for (StoreObjConstIter iter = m_storeObjMap[c_Event].begin(); iter != m_storeObjMap[c_Event].end(); ++iter) {
     if (iter->second->ptr && iter->second->isArray) {
       TClonesArray* array = static_cast<TClonesArray*>(iter->second->ptr);
       const TClass* arrayClass = array->GetClass();
@@ -218,10 +217,12 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
   return false;
 }
 
-void DataStore::getArrayNames(std::vector<std::string>& names, const std::string& arrayName, const TClass* arrayClass)
+void DataStore::getArrayNames(std::vector<std::string>& names, const std::string& arrayName, const TClass* arrayClass) const
 {
-  if (arrayName == "ALL") {
-    for (StoreObjIter iter = m_storeObjMap[c_Event].begin(); iter != m_storeObjMap[c_Event].end(); ++iter) {
+  if (arrayName.empty()) {
+    names.push_back(defaultArrayName(arrayClass->GetName()));
+  } else if (arrayName == "ALL") {
+    for (StoreObjConstIter iter = m_storeObjMap[c_Event].begin(); iter != m_storeObjMap[c_Event].end(); ++iter) {
       if (iter->second->ptr && iter->second->isArray) {
         TClonesArray* array = static_cast<TClonesArray*>(iter->second->ptr);
         if (array->GetClass()->InheritsFrom(arrayClass)) {
@@ -229,8 +230,6 @@ void DataStore::getArrayNames(std::vector<std::string>& names, const std::string
         }
       }
     }
-  } else if (arrayName.empty()) {
-    names.push_back(defaultArrayName(arrayClass->GetName()));
   } else {
     names.push_back(arrayName);
   }
@@ -273,166 +272,112 @@ bool DataStore::addRelation(const TObject* fromObject, DataStore::StoreEntry*& f
   return true;
 }
 
-std::vector<RelationEntry> DataStore::getRelationsFromTo(const TObject* fromObject, DataStore::StoreEntry*& fromEntry, int& fromIndex, const TClass* toClass, const std::string& toName)
+std::vector<RelationEntry> DataStore::getRelationsWith(ESearchSide searchSide, const TObject* object, DataStore::StoreEntry*& entry, int& index, const TClass* withClass, const std::string& withName)
 {
+  if (searchSide == c_BothSides) {
+    std::vector<RelationEntry> result = getRelationsWith(c_ToSide, object, entry, index, withClass, withName);
+    const std::vector<RelationEntry>& fromResult = getRelationsWith(c_FromSide, object, entry, index, withClass, withName);
+    result.insert(result.end(), fromResult.begin(), fromResult.end());
+    return result;
+  }
+
   std::vector<RelationEntry> result;
 
-  // get entry from which the relations point
-  if (!findStoreEntry(fromObject, fromEntry, fromIndex)) return result;
+  // get StoreEntry for 'object'
+  if (!findStoreEntry(object, entry, index)) return result;
 
-  // get names of store arrys to which the relations point
-  std::vector<string> toNames;
-  getArrayNames(toNames, toName, toClass);
+  // get names of store arrays to search
+  std::vector<string> names;
+  getArrayNames(names, withName, withClass);
 
-  // loop over to store arrays
-  for (std::vector<string>::const_iterator toNameIt = toNames.begin(); toNameIt != toNames.end(); ++toNameIt) {
-    const StoreObjIter& arrayIter = m_storeObjMap[c_Event].find(*toNameIt);
+  // loop over store arrays
+  for (std::vector<string>::const_iterator nameIt = names.begin(); nameIt != names.end(); ++nameIt) {
+    const StoreObjConstIter& arrayIter = m_storeObjMap[c_Event].find(*nameIt);
     if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == NULL) continue;
 
     // get the relations from -> to
-    const string& relationsName = relationName(fromEntry->name, *toNameIt);
+    const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, *nameIt) : relationName(*nameIt, entry->name);
     RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
     if (!relIndex)
       continue;
 
-    //hack alert, since boost::multi_index requires unique types for the indices
     typedef RelationIndex<TObject, TObject>::Element relElement_t;
-    //get relations with fromObject
-    BOOST_FOREACH(const relElement_t & rel, relIndex.getElementsFrom(fromObject)) {
-      TObject* const toObject = const_cast<TObject*>(rel.to);
-      if (toObject)
-        result.push_back(RelationEntry(toObject, rel.weight));
+    //get relations with object
+    if (searchSide == c_ToSide) {
+      BOOST_FOREACH(const relElement_t & rel, relIndex.getElementsFrom(object)) {
+        TObject* const toObject = const_cast<TObject*>(rel.to);
+        if (toObject)
+          result.push_back(RelationEntry(toObject, rel.weight));
+      }
+    } else {
+      BOOST_FOREACH(const relElement_t & rel, relIndex.getElementsTo(object)) {
+        TObject* const fromObject = const_cast<TObject*>(rel.from);
+        if (fromObject)
+          result.push_back(RelationEntry(fromObject, rel.weight));
+      }
     }
   }
 
   return result;
+
 }
 
-std::vector<RelationEntry> DataStore::getRelationsToFrom(const TObject* toObject, DataStore::StoreEntry*& toEntry, int& toIndex, const TClass* fromClass, const std::string& fromName)
+RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* object, DataStore::StoreEntry*& entry, int& index, const TClass* withClass, const std::string& withName)
 {
-  std::vector<RelationEntry> result;
-
-  // get entry to which the relations point
-  if (!findStoreEntry(toObject, toEntry, toIndex)) return result;
-
-  // get names of store arrys from which the relations point
-  std::vector<string> fromNames;
-  getArrayNames(fromNames, fromName, fromClass);
-
-  // loop over from store arrays
-  for (std::vector<string>::const_iterator fromNameIt = fromNames.begin(); fromNameIt != fromNames.end(); ++fromNameIt) {
-    const StoreObjIter& arrayIter = m_storeObjMap[c_Event].find(*fromNameIt);
-    if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == NULL) continue;
-
-    // get the relations from -> to
-    const string& relationsName = relationName(*fromNameIt, toEntry->name);
-    RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
-    if (!relIndex)
-      continue;
-
-    //hack alert, since boost::multi_index requires unique types for the indices
-    typedef RelationIndex<TObject, TObject>::Element relElement_t;
-    //get relations with toObject
-    BOOST_FOREACH(const relElement_t & rel, relIndex.getElementsTo(toObject)) {
-      TObject* const fromObject = const_cast<TObject*>(rel.from);
-      if (fromObject)
-        result.push_back(RelationEntry(fromObject, rel.weight));
+  if (searchSide == c_BothSides) {
+    RelationEntry result = getRelationWith(c_ToSide, object, entry, index, withClass, withName);
+    if (!result.object) {
+      result = getRelationWith(c_FromSide, object, entry, index, withClass, withName);
     }
+    return result;
   }
 
-  return result;
-}
+  // get StoreEntry for 'object'
+  if (!findStoreEntry(object, entry, index)) return RelationEntry(0);
 
-std::vector<RelationEntry> DataStore::getRelationsWith(const TObject* object, DataStore::StoreEntry*& entry, int& index, const TClass* withClass, const std::string& name)
-{
-  std::vector<RelationEntry> result = getRelationsFromTo(object, entry, index, withClass, name);
+  // get names of store arrays to search
+  std::vector<string> names;
+  getArrayNames(names, withName, withClass);
 
-  const std::vector<RelationEntry>& fromResult = getRelationsToFrom(object, entry, index, withClass, name);
-
-  result.insert(result.end(), fromResult.begin(), fromResult.end());
-  return result;
-}
-
-RelationEntry DataStore::getRelationFromTo(const TObject* fromObject, DataStore::StoreEntry*& fromEntry, int& fromIndex, const TClass* toClass, const std::string& toName)
-{
-  // get entry from which the relations point
-  if (!findStoreEntry(fromObject, fromEntry, fromIndex)) return RelationEntry(0);
-
-  // get names of store arrys to which the relations point
-  std::vector<string> toNames;
-  getArrayNames(toNames, toName, toClass);
-
-  // loop over to store arrays
-  for (std::vector<string>::const_iterator toNameIt = toNames.begin(); toNameIt != toNames.end(); ++toNameIt) {
-    const StoreObjIter& arrayIter = m_storeObjMap[c_Event].find(*toNameIt);
+  // loop over store arrays
+  for (std::vector<string>::const_iterator nameIt = names.begin(); nameIt != names.end(); ++nameIt) {
+    const StoreObjConstIter& arrayIter = m_storeObjMap[c_Event].find(*nameIt);
     if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == NULL) continue;
 
     // get the relations from -> to
-    const string& relationsName = relationName(fromEntry->name, *toNameIt);
+    const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, *nameIt) : relationName(*nameIt, entry->name);
     RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
     if (!relIndex)
       continue;
 
     // get first element
-    const RelationIndex<TObject, TObject>::Element* element = relIndex.getFirstElementFrom(fromObject);
-    if (element && element->to) {
-      return RelationEntry(const_cast<TObject*>(element->to), element->weight);
+    if (searchSide == c_ToSide) {
+      const RelationIndex<TObject, TObject>::Element* element = relIndex.getFirstElementFrom(object);
+      if (element && element->to) {
+        return RelationEntry(const_cast<TObject*>(element->to), element->weight);
+      }
+    } else {
+      const RelationIndex<TObject, TObject>::Element* element = relIndex.getFirstElementTo(object);
+      if (element && element->from) {
+        return RelationEntry(const_cast<TObject*>(element->from), element->weight);
+      }
     }
   }
 
   return RelationEntry(0);
-}
-
-RelationEntry DataStore::getRelationToFrom(const TObject* toObject, DataStore::StoreEntry*& toEntry, int& toIndex, const TClass* fromClass, const std::string& fromName)
-{
-  // get entry to which the relations point
-  if (!findStoreEntry(toObject, toEntry, toIndex)) return RelationEntry(0);
-
-  // get names of store arrys from which the relations point
-  std::vector<string> fromNames;
-  getArrayNames(fromNames, fromName, fromClass);
-
-  // loop over from store arrays
-  for (std::vector<string>::const_iterator fromNameIt = fromNames.begin(); fromNameIt != fromNames.end(); ++fromNameIt) {
-    const StoreObjIter& arrayIter = m_storeObjMap[c_Event].find(*fromNameIt);
-    if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == NULL) continue;
-
-    // get the relations from -> to
-    const string& relationsName = relationName(*fromNameIt, toEntry->name);
-    RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
-    if (!relIndex)
-      continue;
-
-    // get first element
-    const RelationIndex<TObject, TObject>::Element* element = relIndex.getFirstElementTo(toObject);
-    if (element && element->from) {
-      return RelationEntry(const_cast<TObject*>(element->from), element->weight);
-    }
-  }
-
-  return RelationEntry(0);
-}
-
-RelationEntry DataStore::getRelationWith(const TObject* object, DataStore::StoreEntry*& entry, int& index, const TClass* withClass, const std::string& name)
-{
-  RelationEntry result = getRelationFromTo(object, entry, index, withClass, name);
-  if (!result.object) {
-    result = getRelationToFrom(object, entry, index, withClass, name);
-  }
-  return result;
 }
 
 
 void DataStore::clearMaps(EDurability durability)
 {
-  for (StoreObjIter iter = m_storeObjMap[durability].begin(); iter != m_storeObjMap[durability].end(); ++iter) {
+  for (StoreObjConstIter iter = m_storeObjMap[durability].begin(); iter != m_storeObjMap[durability].end(); ++iter) {
     iter->second->ptr = 0;
   }
 }
 
 void DataStore::reset(EDurability durability)
 {
-  for (StoreObjIter iter = m_storeObjMap[durability].begin(); iter != m_storeObjMap[durability].end(); ++iter) {
+  for (StoreObjConstIter iter = m_storeObjMap[durability].begin(); iter != m_storeObjMap[durability].end(); ++iter) {
     //delete stored object/array
     delete iter->second->object;
     //delete StoreEntry

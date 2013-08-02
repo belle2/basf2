@@ -135,7 +135,8 @@ void RootInputModule::initialize()
       //Get information about the object in the branch
       TObject* objectPtr = 0;
       branch->SetAddress(&objectPtr);
-      bool array = (static_cast<string>(branch->GetClassName()) == "TClonesArray");
+      branch->GetEntry();
+      bool array = (string(branch->GetClassName()) == "TClonesArray");
       TClass* objClass = 0;
       if (array)
         objClass = (static_cast<TClonesArray*>(objectPtr))->GetClass();

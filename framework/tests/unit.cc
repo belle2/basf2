@@ -13,6 +13,18 @@ namespace Belle2 {
   protected:
 
   };
+  TEST_F(UnitTest, MultiplyDivide)
+  {
+    //set to 10mm in standard units
+    double length = 10.0 * Unit::mm;
+    //=1.0 cm
+    EXPECT_DOUBLE_EQ(1.0, length);
+
+    EXPECT_DOUBLE_EQ(10.0, length / Unit::mm);
+    EXPECT_DOUBLE_EQ(10000.0, length / Unit::um);
+
+    EXPECT_DOUBLE_EQ(1e9, 1 * Unit::s);
+  }
 
   /** check conversions between different units. */
   TEST_F(UnitTest, ConvertValue)

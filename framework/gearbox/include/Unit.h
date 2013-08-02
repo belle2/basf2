@@ -24,8 +24,17 @@ namespace Belle2 {
    * to convert floating point numbers from a specified unit to the standard
    * unit of the framework.
    *
+   * \code
+     //multiply with a Unit to convert to standard units, e.g.
+     double length = 10.0 * Unit::mm;
+     // length now equals 1.0 (stand for length: cm)
+
+     //divide with a Unit to convert from standard units to the given one:
+     double length_mm  = length / Unit::mm;
+     \endcode
+   *
    * This class cannot be instantiated, use the static members directly.
-   * The implemantation can be found in UnitConst.cc
+   * The implementation can be found in UnitConst.cc
    */
   class Unit {
 
@@ -105,9 +114,11 @@ namespace Belle2 {
     /**
      * Converts a floating point value to the standard framework unit.
      *
+     * If the given unit is not found, the value is returned unchanged (and an error printed).
+     *
      * @param value The value which should be converted.
      * @param unitString The string of the unit of the specified value.
-     * @return The value converted to the specified unit.
+     * @return The value converted to the standard unit.
      */
     static double convertValue(double value, const std::string& unitString);
 

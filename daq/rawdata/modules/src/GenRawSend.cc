@@ -13,7 +13,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#define RAWDATASIZE 1000*4
 
 using namespace std;
 using namespace Belle2;
@@ -36,10 +35,12 @@ GenRawSendModule::GenRawSendModule() : Module()
   m_size = 0;
   m_nevt = 0;
   //Parameter definition
+  addParam("EventDataBufferWords", BUF_SIZE_WORD, "DataBuffer words per event", 4800);
   addParam("Size", m_size, "Raw Data Size", 256);
   addParam("MaxEvent", m_maxevt, "Max Number of Event", 1000000);
   addParam("DestHostName", m_dest, "Destination host", string("localhost"));
   addParam("DestPort", m_port, "Destination port", 1111);
+
 
   cout << "GenRawSendModule : constructor called" << endl;
 }
@@ -55,8 +56,8 @@ GenRawSendModule::~GenRawSendModule()
 
 void GenRawSendModule::initialize()
 {
-  m_buffer = new char[RAWDATASIZE];
-  memset(m_buffer, 0, RAWDATASIZE);
+  m_buffer = new char[ BUF_SIZE_WORD ];
+  memset(m_buffer, 0,  BUF_SIZE_WORD);
 
   // Initialize EventMetaData
   //  StoreObjPtr<EventMetaData>::registerPersistent();

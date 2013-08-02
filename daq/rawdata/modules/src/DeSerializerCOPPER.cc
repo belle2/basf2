@@ -1,9 +1,9 @@
 //+
-// File : DeSerializerCOPPER.cc
-// Description : Module to receive data from COPPER FIFO
+// File : DeSerializerPC.cc
+// Description : Module to read COPPER FIFO and store it to DataStore
 //
-// Author : Satoru Yamada, IPNS, KEK
-// Date : 1 - Aug - 2013
+// Author : Satoru Yamada Itoh, IPNS, KEK
+// Date : 2 - Aug - 2013
 //-
 
 #include <daq/rawdata/modules/DeSerializerCOPPER.h>

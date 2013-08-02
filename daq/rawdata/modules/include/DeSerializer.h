@@ -1,9 +1,9 @@
 //+
 // File : DeSerializer.h
-// Description : Module to restore DataStore in RingBuffer
+// Description : Base class for Module to receive data from outside and store it to DataStore
 //
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 5 - Jan - 2012
+// Author : Satoru Yamada Itoh, IPNS, KEK
+// Date : 2 - Aug - 2013
 //-
 
 #ifndef DESERIALIZER_H
@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 #include <stdlib.h>
+#include <sys/time.h>
+
 
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
@@ -24,6 +26,13 @@
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <daq/dataobjects/RawCDC.h>
+
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+
 
 namespace Belle2 {
 
@@ -47,36 +56,83 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
+    virtual void OpenOutputFile();
+
+    virtual void DumpData(char* buf, int size);
+
+  protected :
+
+    // Event Meta Data
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+
+    //! data
+    StoreObjPtr<RawCOPPER> m_rawcopper;
+
+    //!    StoreObjPtr<RawCOPPER> m_rawcopper;
+    StoreArray<RawCOPPER> rawcprarray;
+
+    //! Compression Level
+    int m_compressionLevel;
+
+    //! size of buffer for one event (word)
+    int BUF_SIZE_WORD;
+
+    //! No. of sent events
+    int n_basf2evt;
+
+    //! No. of prev sent events
+    int m_prev_nevt;
+
+    //! dump filename
+    std::string dump_fname;
+
+    //! dump file descripter
+    FILE* fp_dump;
+
+    //! buffer
+    int* m_buffer;
+
+    //! buffer
+    int* m_bufary[NUM_EVT_PER_BASF2LOOP];
+
+    // For monitoring
+    timeval m_t0;
+    double m_totbytes;
+    double m_prev_totbytes;
+    int m_ncycle;
+    //! for time monitoring
+    double cur_time;
+
+    double m_start_time;
+    double m_prev_time;
+    double time_array0[1000];
+    double time_array1[1000];
+    double time_array2[1000];
+    double time_array3[1000];
+    double time_array4[1000];
+    double time_array5[1000];
+    int prev_event;
+
+    //! store time info.
+    double GetTimeSec();
+
+    //! store time info.
+    void RecordTime(int event, double* array);
+
+    //! check data
+    int check_data(char* buf, int prev_eve, int* cur_eve);
+
+    //! Messaage handler
+    MsgHandler* m_msghandler;
+
+
     // Data members
   private:
 
     // Parallel processing parameters
 
-    // Event Meta Data
-    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
-    //! Receiver Port
-    std::vector<int> m_port;
 
-    //! Reciever Socket
-    std::vector<EvtSocketRecv*> m_recv;
-
-    //! Messaage handler
-    MsgHandler* m_msghandler;
-
-    //! Compression Level
-    int m_compressionLevel;
-
-    //! No. of sent events
-    int m_nsent;
-
-    //! buffer
-    int* m_buffer;
-
-    // For monitoring
-    timeval m_t0;
-    double m_totbytes;
-    int m_ncycle;
 
 
   };

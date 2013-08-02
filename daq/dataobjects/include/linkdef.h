@@ -6,7 +6,10 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::RawHeader;
+#pragma link C++ class Belle2::RawTrailer;
 #pragma link C++ class Belle2::RawCOPPER;
 #pragma link C++ class Belle2::RawCDC;
+#pragma link C++ class Belle2::SendHeader;
+#pragma link C++ class Belle2::SendTrailer;
 
 #endif

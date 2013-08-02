@@ -73,7 +73,7 @@ void pEventProcessor::process(PathPtr spath)
 
   // 2. Analyze start path and split into parallel paths
   m_histoManagerFound = false;
-  analyze_path(spath);
+  analyze_path(spath); //also inserts Rx/Tx modules into path (sets up IPC structures)
   B2DEBUG(100, "process : inlistpath size = " << m_inpathlist.size());
   B2DEBUG(100, "process : bodypathlist size = " << m_bodypathlist.size());
   B2DEBUG(100, "process : outpathlist size = " << m_outpathlist.size());
@@ -139,9 +139,16 @@ void pEventProcessor::process(PathPtr spath)
 
   // 6. Framework process
   if (m_procHandler->isFramework()) {
-    //ignore SIGINT for main process, so children have time to clean up
+    //ignore some signals for framework (mother) process, so only child processes will handle them
+    //once they are finished, the framework process will clean up IPC structures
     if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
       B2FATAL("Cannot ignore SIGINT signal handler for main process\n");
+    }
+    if (signal(SIGTERM, SIG_IGN) == SIG_ERR) {
+      B2FATAL("Cannot ignore SIGTERM signal handler for main process\n");
+    }
+    if (signal(SIGQUIT, SIG_IGN) == SIG_ERR) {
+      B2FATAL("Cannot ignore SIGQUIT signal handler for main process\n");
     }
     // 6.0 Build End of data message
     EvtMessage term(NULL, 0, MSG_TERMINATE);

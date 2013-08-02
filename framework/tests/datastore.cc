@@ -165,6 +165,11 @@ namespace Belle2 {
       EXPECT_EQ(profileInfo[i]->getMemory(), 128u);
       EXPECT_FLOAT_EQ(profileInfo[i]->getTimeInSec(), 60.0);
     }
+
+    //test removing data
+    evtData.clear();
+    EXPECT_TRUE(evtData.isValid());
+    EXPECT_EQ(evtData.getEntries(), 0);
   }
 
   /** check TClonesArray consistency (i.e. no gaps) */
@@ -283,7 +288,7 @@ namespace Belle2 {
     i = 0;
     for (StoreArray<EventMetaData>::iterator it = evtDataNonConst.begin(); it != evtDataNonConst.end(); ++it) {
       EXPECT_TRUE(&(*it) == evtData[i]);
-      EXPECT_EQ(it->getEvent(), 10 + i);
+      EXPECT_EQ((int)it->getEvent(), 10 + i);
       i++;
     }
     EXPECT_EQ(i, evtData.getEntries());
@@ -303,7 +308,7 @@ namespace Belle2 {
   TEST_F(DataStoreTest, DataStoreRegistration)
   {
     StoreObjPtr<EventMetaData> evtPtr("abc123");
-    StoreArray<EventMetaData>  evtArray("abc123array");
+    StoreArray<EventMetaData> evtArray("abc123array");
 
     //verify that they aren't registered right now
     EXPECT_FALSE(evtPtr.isOptional());

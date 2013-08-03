@@ -13,6 +13,7 @@ namespace Belle2 {
   protected:
 
   };
+  /** check manual conversion. */
   TEST_F(UnitTest, MultiplyDivide)
   {
     //set to 10mm in standard units

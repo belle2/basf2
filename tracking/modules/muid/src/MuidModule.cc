@@ -10,9 +10,6 @@
 
 #include <tracking/modules/muid/MuidModule.h>
 #include <tracking/modules/muid/MuidPar.h>
-#include <tracking/modules/ext/ExtManager.h>
-#include <tracking/modules/ext/ExtPhysicsList.h>
-#include <tracking/modules/ext/ExtCylSurfaceTarget.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/Muid.h>
 #include <tracking/dataobjects/MuidHit.h>
@@ -21,6 +18,9 @@
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <simulation/kernel/DetectorConstruction.h>
 #include <simulation/kernel/MagneticField.h>
+#include <simulation/kernel/ExtManager.h>
+#include <simulation/kernel/ExtPhysicsList.h>
+#include <simulation/kernel/ExtCylSurfaceTarget.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <bklm/geometry/GeometryPar.h>
 
@@ -109,7 +109,7 @@ void MuidModule::initialize()
   registerVolumes();
 
   // Define the geant4e extrapolation Manager.
-  m_extMgr = ExtManager::GetManager();
+  m_extMgr = Simulation::ExtManager::GetManager();
 
   // See if muid will coexist with geant4 simulation.
   // (The particle list will have been constructed already, if so.)
@@ -121,7 +121,7 @@ void MuidModule::initialize()
     m_extMgr->SetUserInitialization(new DetectorConstruction());
     G4Region* region = (*(G4RegionStore::GetInstance()))[0];
     region->SetProductionCuts(G4ProductionCutsTable::GetProductionCutsTable()->GetDefaultProductionCuts());
-    m_extMgr->SetUserInitialization(new ExtPhysicsList);
+    m_extMgr->SetUserInitialization(new Simulation::ExtPhysicsList);
     //Create the magnetic field for the Geant4e simulation
     Simulation::MagneticField* magneticField = new Simulation::MagneticField();
     G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
@@ -160,7 +160,7 @@ void MuidModule::initialize()
   double nSector = bklmContent.getNumberNodes("Sectors/Forward/Sector");
   double rMax = outerRadius / cos(M_PI / nSector);
   std::cout << "MUID initialize: eklmLength=" << eklmLength << "  bklmHalfLength=" << bklmHalfLength << "  offsetZ=" << offsetZ << "  minZ=" << minZ << "  maxZ=" << maxZ << "  outerRadius=" << outerRadius << "  nSector=" << nSector << "  rMax=" << rMax << std::endl;
-  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(new ExtCylSurfaceTarget(rMax, minZ, maxZ));
+  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(new Simulation::ExtCylSurfaceTarget(rMax, minZ, maxZ));
   m_OffsetZ = bklmContent.getLength("OffsetZ");
   m_EndcapMaxR = eklmContent.getLength("EndCap/OuterR"); // 290.0 cm --> 332.0 cm
   m_EndcapMinR = eklmContent.getLength("EndCap/InnerR"); // 125.0 cm --> 130.5 cm

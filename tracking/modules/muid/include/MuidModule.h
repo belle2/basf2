@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <tracking/dataobjects/ExtHit.h>
+#include <simulation/kernel/ExtManager.h>
 #include <bklm/geometry/GeometryPar.h>
 #include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Matrix/SymMatrix.h>
@@ -73,8 +74,6 @@ namespace Belle2 {
     TVector3            positionAtHitPlane;
     double              chi2;
   };
-
-  class ExtManager;
 
   /** The geant4e-based muon identification module.
    *
@@ -207,7 +206,7 @@ namespace Belle2 {
     double getPDFRchisq(int, int, int, double) const;
 
     //! Pointer to the ExtManager singleton
-    ExtManager* m_extMgr;
+    Simulation::ExtManager* m_extMgr;
 
     //! Pointer to the simulation's G4RunManager (if any)
     G4RunManager* m_runMgr;

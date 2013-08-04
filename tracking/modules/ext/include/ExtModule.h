@@ -16,6 +16,8 @@
 #include <framework/datastore/RelationArray.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <framework/gearbox/Const.h>
+#include <simulation/kernel/ExtManager.h>
+#include <simulation/kernel/ExtCylSurfaceTarget.h>
 
 #include <G4TouchableHandle.hh>
 #include <G4ErrorTrajErr.hh>
@@ -34,9 +36,6 @@ class G4String;
 class GFTrack;
 
 namespace Belle2 {
-
-  class ExtManager;
-  class ExtCylSurfaceTarget;
 
   /** The geant4e-based track extrapolation module.
    *
@@ -112,7 +111,7 @@ namespace Belle2 {
     void createHit(const G4ErrorFreeTrajState*, ExtHitStatus, int, int, StoreArray<ExtHit>&, RelationArray&);
 
     //! Pointer to the ExtManager singleton
-    ExtManager* m_extMgr;
+    Simulation::ExtManager* m_extMgr;
 
     //! Pointer to the simulation's G4RunManager (if any)
     G4RunManager* m_runMgr;
@@ -137,7 +136,7 @@ namespace Belle2 {
     double m_tof;
 
     // virtual "target" cylinder
-    ExtCylSurfaceTarget* m_target;
+    Simulation::ExtCylSurfaceTarget* m_target;
 
   };
 

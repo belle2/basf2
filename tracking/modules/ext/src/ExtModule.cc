@@ -9,14 +9,14 @@
  **************************************************************************/
 
 #include <tracking/modules/ext/ExtModule.h>
-#include <tracking/modules/ext/ExtManager.h>
-#include <tracking/modules/ext/ExtPhysicsList.h>
-#include <tracking/modules/ext/ExtCylSurfaceTarget.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/Track.h>
 #include <tracking/dataobjects/TrackFitResult.h>
 #include <simulation/kernel/DetectorConstruction.h>
 #include <simulation/kernel/MagneticField.h>
+#include <simulation/kernel/ExtManager.h>
+#include <simulation/kernel/ExtPhysicsList.h>
+#include <simulation/kernel/ExtCylSurfaceTarget.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
 #include <cmath>
@@ -93,7 +93,7 @@ void ExtModule::initialize()
   registerVolumes();
 
   // Define the geant4e extrapolation Manager.
-  m_extMgr = ExtManager::GetManager();
+  m_extMgr = Simulation::ExtManager::GetManager();
 
   // See if ext will coexist with geant4 simulation.
   // (The particle list will have been constructed already, if so.)
@@ -105,7 +105,7 @@ void ExtModule::initialize()
     m_extMgr->SetUserInitialization(new DetectorConstruction());
     G4Region* region = (*(G4RegionStore::GetInstance()))[0];
     region->SetProductionCuts(G4ProductionCutsTable::GetProductionCutsTable()->GetDefaultProductionCuts());
-    m_extMgr->SetUserInitialization(new ExtPhysicsList);
+    m_extMgr->SetUserInitialization(new Simulation::ExtPhysicsList);
     //Create the magnetic field for the Geant4e simulation
     Simulation::MagneticField* magneticField = new Simulation::MagneticField();
     G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
@@ -135,7 +135,7 @@ void ExtModule::initialize()
   double offsetZ = strContent.getLength("OffsetZ") * cm;
   double rMax = strContent.getLength("Cryostat/Rmin") * cm;
   double halfLength = strContent.getLength("Cryostat/HalfLength") * cm;
-  m_target = new ExtCylSurfaceTarget(rMax, offsetZ - halfLength, offsetZ + halfLength);
+  m_target = new Simulation::ExtCylSurfaceTarget(rMax, offsetZ - halfLength, offsetZ + halfLength);
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_target);
 
   // Hypotheses for extrapolation

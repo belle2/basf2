@@ -12,9 +12,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <generators/dataobjects/MCParticle.h>
-//#include <framework/gearbox/Unit.h>
-//#include <framework/logging/Logger.h>
 
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <bklm/dataobjects/BKLMDigit.h>
@@ -34,9 +31,8 @@ REG_MODULE(BKLMDigitizer)
 BKLMDigitizerModule::BKLMDigitizerModule() : Module()
 {
 
-  //! Set description
-  setDescription("BKLMDigitizerModule");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setDescription("Creates BKLMDigits from BKLMSimHits");
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 BKLMDigitizerModule::~BKLMDigitizerModule()
@@ -45,17 +41,10 @@ BKLMDigitizerModule::~BKLMDigitizerModule()
 
 void BKLMDigitizerModule::initialize()
 {
+  StoreArray<BKLMSimHit>::required();
+
   // Force creation of BKLM datastores
-  StoreArray<BKLMSimHit> simHits;
-  StoreArray<MCParticle> particles;
-  RelationArray particleToSimHits(particles, simHits);
-  StoreArray<BKLMDigit> strips;
-  RelationArray stripToSimHits(strips, simHits);
-  RelationArray simHitToStrip(simHits, strips);
-  StoreArray<BKLMSimHit>::registerPersistent();
   StoreArray<BKLMDigit>::registerPersistent();
-  RelationArray::registerPersistent<MCParticle, BKLMSimHit>();
-  RelationArray::registerPersistent<BKLMDigit, BKLMSimHit>();
   RelationArray::registerPersistent<BKLMSimHit, BKLMDigit>();
 }
 
@@ -69,22 +58,16 @@ void BKLMDigitizerModule::event()
   // Get BKLM hits collection from the data store
   //---------------------------------------------
   StoreArray<BKLMSimHit> simHits;
-  if (!simHits) {
-    B2ERROR("BKLMDigitizerModule: Cannot find BKLMSimHits array");
-  }
-
   unsigned int nSimHit = simHits.getEntries();
   if (nSimHit == 0) return;
 
-  StoreArray<BKLMDigit> strips("BKLMDigits");
-  RelationArray stripToSimHits(strips, simHits);
+  StoreArray<BKLMDigit> strips;
   RelationArray simHitToStrip(simHits, strips);
 
   unsigned int nStrip = 0;
   unsigned int s = 0;
 
   vector<unsigned int> indices;
-  vector<vector<unsigned int> > reverseIndices;
   for (unsigned int h = 0; h < nSimHit; ++h) {
     BKLMSimHit* simHit = simHits[h];
     indices.clear();
@@ -97,20 +80,13 @@ void BKLMDigitizerModule::event()
           if (strip.match(strips[s])) break;
         }
         if (s == nStrip) {
-          new(strips.nextFreeAddress()) BKLMDigit(strip);
-          vector<unsigned int> rev;
-          reverseIndices.push_back(rev);
+          strips.appendNew(strip);
           nStrip++;
         }
-        reverseIndices[s].push_back(h);
       }
     }
     simHitToStrip.add(h, indices);  // 1 hit to many strips
   }
-  for (s = 0; s < nStrip; ++s) {
-    stripToSimHits.add(s, reverseIndices[s]); // 1 strip to many hits
-  }
-
 }
 
 void BKLMDigitizerModule::endRun()
@@ -121,6 +97,3 @@ void BKLMDigitizerModule::terminate()
 {
 }
 
-void BKLMDigitizerModule::printModuleParameters() const
-{
-}

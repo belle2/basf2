@@ -22,6 +22,7 @@ namespace Belle2 {
   namespace bklm {
 
     Module::Module() :
+      m_HasRPCs(false),
       m_IsForward(false),
       m_Sector(0),
       m_Layer(0),
@@ -34,13 +35,21 @@ namespace Belle2 {
       m_PhiStripNumber(0),
       m_PhiStripMin(0),
       m_PhiStripMax(0),
+      m_PhiOffset(0),
       m_ZStripWidth(0.0),
       m_ZStripLength(0.0),
       m_ZStripNumber(0),
       m_ZStripMin(0),
-      m_ZStripMax(0)
-    {}
+      m_ZStripMax(0),
+      m_ZOffset(0)
+    {
+      m_PhiScintPositions.clear();
+      m_PhiScintLengths.clear();
+      m_ZScintPositions.clear();
+      m_ZScintLengths.clear();
+    }
 
+    // constructor for RPC module
     Module::Module(bool       isForward,
                    int        sector,
                    int        layer,
@@ -52,11 +61,14 @@ namespace Belle2 {
                    int        phiStripNumber,
                    int        phiStripMin,
                    int        phiStripMax,
+                   int        phiOffset,
                    double     zStripWidth,
                    double     zStripLength,
                    int        zStripNumber,
                    int        zStripMin,
-                   int        zStripMax) :
+                   int        zStripMax,
+                   int        zOffset) :
+      m_HasRPCs(true),
       m_IsForward(isForward),
       m_Sector(sector),
       m_Layer(layer),
@@ -69,14 +81,65 @@ namespace Belle2 {
       m_PhiStripNumber(phiStripNumber),
       m_PhiStripMin(phiStripMin),
       m_PhiStripMax(phiStripMax),
+      m_PhiOffset(phiOffset),
       m_ZStripWidth(zStripWidth),
       m_ZStripLength(zStripLength),
       m_ZStripNumber(zStripNumber),
       m_ZStripMin(zStripMin),
-      m_ZStripMax(zStripMax)
-    {}
+      m_ZStripMax(zStripMax),
+      m_ZOffset(zOffset)
+    {
+      m_PhiScintPositions.clear();
+      m_PhiScintLengths.clear();
+      m_ZScintPositions.clear();
+      m_ZScintLengths.clear();
+    }
 
+    // constructor for scint module
+    Module::Module(bool       isForward,
+                   int        sector,
+                   int        layer,
+                   Hep3Vector shift,
+                   double     localX,
+                   Sector*    sectorPtr,
+                   double     phiStripWidth,
+                   double     phiStripLength,
+                   int        phiStripNumber,
+                   int        phiOffset,
+                   double     zStripWidth,
+                   double     zStripLength,
+                   int        zStripNumber,
+                   int        zOffset) :
+      m_HasRPCs(false),
+      m_IsForward(isForward),
+      m_Sector(sector),
+      m_Layer(layer),
+      m_Shift(shift),
+      m_LocalX(localX),
+      m_ToleranceX(2.0),   // cm
+      m_SectorPtr(sectorPtr),
+      m_PhiStripWidth(phiStripWidth),
+      m_PhiStripLength(phiStripLength),
+      m_PhiStripNumber(phiStripNumber),
+      m_PhiStripMin(0),
+      m_PhiStripMax(0),
+      m_PhiOffset(phiOffset),
+      m_ZStripWidth(zStripWidth),
+      m_ZStripLength(zStripLength),
+      m_ZStripNumber(zStripNumber),
+      m_ZStripMin(0),
+      m_ZStripMax(0),
+      m_ZOffset(zOffset)
+    {
+      m_PhiScintPositions.clear();
+      m_PhiScintLengths.clear();
+      m_ZScintPositions.clear();
+      m_ZScintLengths.clear();
+    }
+
+    // copy constructor
     Module::Module(const Module& m) :
+      m_HasRPCs(m.m_HasRPCs),
       m_IsForward(m.m_IsForward),
       m_Sector(m.m_Sector),
       m_Layer(m.m_Layer),
@@ -89,40 +152,23 @@ namespace Belle2 {
       m_PhiStripNumber(m.m_PhiStripNumber),
       m_PhiStripMin(m.m_PhiStripMin),
       m_PhiStripMax(m.m_PhiStripMax),
+      m_PhiOffset(m.m_PhiOffset),
       m_ZStripWidth(m.m_ZStripWidth),
       m_ZStripLength(m.m_ZStripLength),
       m_ZStripNumber(m.m_ZStripNumber),
       m_ZStripMin(m.m_ZStripMin),
-      m_ZStripMax(m.m_ZStripMax)
-    {}
+      m_ZStripMax(m.m_ZStripMax),
+      m_ZOffset(m.m_ZOffset)
+    {
+      m_PhiScintPositions = m.m_PhiScintPositions;
+      m_PhiScintLengths = m.m_PhiScintLengths;
+      m_ZScintPositions = m.m_ZScintPositions;
+      m_ZScintLengths = m.m_ZScintLengths;
+    }
 
     Module::~Module()
     {
     }
-
-    /* must be a nonstatic member function
-    Module::Module& operator=( const Module& m ) {
-      if ( this != &m ) {
-        m_IsForward = m.m_IsForward;
-        m_Sector = m.m_Sector;
-        m_Layer = m.m_Layer;
-        m_Shift = m.m_Shift;
-        m_LocalX = m.m_LocalX;
-        m_SectorPtr = m.m_SectorPtr;
-        m_PhiStripWidth = m.m_PhiStripWidth;
-        m_PhiStripLength = m.m_PhiStripLength;
-        m_PhiStripNumber = m.m_PhiStripNumber;
-        m_PhiStripMin = m.m_PhiStripMin;
-        m_PhiStripMax = m.m_PhiStripMax;
-        m_ZStripWidth = m.m_ZStripWidth;
-        m_ZStripLength = m.m_ZStripLength;
-        m_ZStripNumber = m.m_ZStripNumber;
-        m_ZStripMin = m.m_ZStripMin;
-        m_ZStripMax = m.m_ZStripMax;
-      }
-      return *this;
-    }
-    */
 
     bool Module::operator<(const Module& m) const
     {
@@ -144,6 +190,30 @@ namespace Belle2 {
       return (m.isForward() == m_IsForward) &&
              (m.getSector() == m_Sector) &&
              (m.getLayer()  == m_Layer);
+    }
+
+    void Module::addPhiScint(int scint, double length, double offset, double position)
+    {
+      while (m_PhiScintLengths.size() <= (unsigned int)scint) {
+        m_PhiScintLengths.push_back(0.0);
+        m_PhiScintOffsets.push_back(0.0);
+        m_PhiScintPositions.push_back(0.0);
+      }
+      m_PhiScintLengths[scint] = length;
+      m_PhiScintOffsets[scint] = offset;
+      m_PhiScintPositions[scint] = position;
+    }
+
+    void Module::addZScint(int scint, double length, double offset, double position)
+    {
+      while (m_ZScintLengths.size() <= (unsigned int)scint) {
+        m_ZScintLengths.push_back(0.0);
+        m_ZScintOffsets.push_back(0.0);
+        m_ZScintPositions.push_back(0.0);
+      }
+      m_ZScintLengths[scint] = length;
+      m_ZScintOffsets[scint] = offset;
+      m_ZScintPositions[scint] = position;
     }
 
     double Module::getLocalCoordinate(double stripAve, bool isPhiReadout) const

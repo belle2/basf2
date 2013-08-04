@@ -20,6 +20,7 @@
 
 #define NLAYER 15
 #define NSECTOR 8
+#define NSCINT 100
 #define PLANE_INNER 1
 #define PLANE_OUTER 2
 
@@ -70,6 +71,27 @@ namespace Belle2 {
 
       //! Get the size (dx,dy,dz) of the detector module's gas gaps of specified layer
       const CLHEP::Hep3Vector getGasHalfSize(int layer, bool hasChimney) const;
+
+      //! Get the size (dx,dy,dz) of the scintillator detector module's polystyrene filler
+      const CLHEP::Hep3Vector getPolystyreneHalfSize(int layer, bool hasChimney) const;
+
+      //! Get the size (dx,dy,dz) of the scintillator detector module's air filler
+      const CLHEP::Hep3Vector getAirHalfSize(int layer, bool hasChimney) const;
+
+      //! Get the size (dx,dy,dz) of the scintillator detector module's scintillator envelope
+      const CLHEP::Hep3Vector getScintEnvelopeHalfSize(int layer, bool hasChimney) const;
+
+      //! Get the offset of the scintillator detector module's scintillator envelope
+      const CLHEP::Hep3Vector getScintEnvelopeOffset(int layer, bool hasChimney) const;
+
+      //! Get the radial offset of the scintillator detector module's air envelope
+      double getAirOffsetX(void) const;
+
+      //! Get the height of the active volume of a scintillator strip
+      double getScintHalfHeight(void) const { return 0.5 * m_ScintHeight - m_ScintTiO2ThicknessTop; }
+
+      //! Get the height of the active volume of a scintillator strip
+      double getScintHalfWidth(void) const { return 0.5 * m_ScintWidth - m_ScintTiO2ThicknessSide; }
 
       //! Get the radial midpoint of the gap of specified layer
       double getGapMiddleRadius(int layer) const;
@@ -133,6 +155,21 @@ namespace Belle2 {
 
       //! Get the radius of the inner tangent circle of gap 1 (next-to-innermost)
       double getGapInnerRadius(void) const { return m_GapInnerRadius; }
+
+      //! Get the number of z-measuring cathode strips in an RPC module
+      int getNZStrips(bool isChimney) const { return (isChimney ? m_NZStripsChimney : m_NZStrips); }
+
+      //! Get the number of phi-measuring cathode strips in an RPC module
+      int getNPhiStrips(int layer) const;
+
+      //! Get the number of z-measuring scintillators in a scintillator module
+      int getNZScints(bool isChimney) const { return (isChimney ? m_NZScintsChimney : m_NZScints); }
+
+      //! Get the number of phi-measuring scintillators in a scintillator module
+      int getNPhiScints(int layer) const;
+
+      //! Get the offset of the scintillator envelope within a scintillator module
+      const CLHEP::Hep3Vector getScintOffset(int layer, bool isChimney) const;
 
       //! Get the length along z of the module
       double getModuleLength(void) const { return m_ModuleLength; }
@@ -331,6 +368,18 @@ namespace Belle2 {
       //! radius of the inner tangent circle of virtual gap 0 (assuming equal-height layers)
       double m_GapInnerRadius;
 
+      //! number of z-measuring cathode strips in a standard RPC module
+      int m_NZStrips;
+
+      //! number of z-measuring cathode strips in a chimney-sector RPC module
+      int m_NZStripsChimney;
+
+      //! number of z-measuring scintillators in a standard scintillator module
+      int m_NZScints;
+
+      //! number of z-measuring scintillators in a chimney-sector scintillator module
+      int m_NZScintsChimney;
+
       //! length along z of the module
       double m_ModuleLength;
 
@@ -369,6 +418,27 @@ namespace Belle2 {
 
       //! size of the border between a detector module's perimeter and electrode
       double m_ModuleElectrodeBorder;
+
+      //! height of the inner polystyrene-filler sheet
+      double m_ModulePolystyreneInnerHeight;
+
+      //! height of the outer polystyrene-filler sheet
+      double m_ModulePolystyreneOuterHeight;
+
+      //! width of one scintillator strip (cm), including the TiO2 coating
+      double m_ScintWidth;
+
+      //! height of one scintillator strip (cm), including the TiO2 coating
+      double m_ScintHeight;
+
+      //! radius (cm) of the central bore in the scintillator strip
+      double m_ScintBoreRadius;
+
+      //! thickness (cm) of the TiO2 coating on the top (and bottom) of the scintillator strip
+      double m_ScintTiO2ThicknessTop;
+
+      //! thickness (cm) of the TiO2 coating on the left (and right) side of the scintillator strip
+      double m_ScintTiO2ThicknessSide;
 
       //! length along z of the chimney hole
       double m_ChimneyLength;
@@ -444,9 +514,6 @@ namespace Belle2 {
 
       //! angular width of the innermost-module support plate's bracket's cutout
       double m_BracketCutoutDphi;
-
-      //! array of RPC/scint flags for each layer
-      bool m_HasRPCs[NLAYER + 1];
 
       //! vector of pointers to defined sectors
       std::vector<Sector*> m_Sectors;

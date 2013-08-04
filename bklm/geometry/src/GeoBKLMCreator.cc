@@ -56,7 +56,7 @@ namespace Belle2 {
     GeoBKLMCreator::GeoBKLMCreator()
     {
       m_sensitive = new SensitiveDetector();
-      m_bkgsensitive = NULL;
+      //m_bkgsensitive = NULL;
       m_GeoPar = NULL;
       m_SectorDphi = 0.0;
       m_SectorDz = 0.0;
@@ -66,7 +66,7 @@ namespace Belle2 {
     GeoBKLMCreator::~GeoBKLMCreator()
     {
       delete m_sensitive;
-      if (m_bkgsensitive != NULL) delete m_bkgsensitive;
+      //if (m_bkgsensitive != NULL) delete m_bkgsensitive;
     }
 
     //-----------------------------------------------------------------
@@ -76,7 +76,8 @@ namespace Belle2 {
     void GeoBKLMCreator::create(const GearDir& content, G4LogicalVolume& motherLogical, GeometryTypes)
     {
 
-      if (content.getInt("BeamBackgroundStudy") != 0) { m_bkgsensitive = new BkgSensitiveDetector("BKLM"); }
+      //if (content.getInt("BeamBackgroundStudy") != 0) { m_bkgsensitive = new BkgSensitiveDetector("BKLM"); }
+      if (content.getInt("BeamBackgroundStudy") != 0) { m_sensitive = (SensitiveDetector*)(new BkgSensitiveDetector("BKLM")); }
 
       m_GeoPar = GeometryPar::instance(content);
       m_SectorDphi = 2.0 * M_PI / m_GeoPar->getNSector();
@@ -708,23 +709,23 @@ namespace Belle2 {
                  );
       sprintf(name, "BKLM.Layer%02dGasLogical", layer);
       G4LogicalVolume* gasLogical;
-      if (m_bkgsensitive != NULL) {
-        gasLogical = new G4LogicalVolume(gasBox,
-                                         Materials::get("RPCGas"),
-                                         name,
-                                         0, // use global field manager
-                                         m_bkgsensitive, // this is the only sensitive volume in BKLM
-                                         0 // no user limits
-                                        );
-      } else {
-        gasLogical = new G4LogicalVolume(gasBox,
-                                         Materials::get("RPCGas"),
-                                         name,
-                                         0, // use global field manager
-                                         m_sensitive, // this is the only sensitive volume in BKLM
-                                         0 // no user limits
-                                        );
-      }
+//      if (m_bkgsensitive != NULL) {
+//        gasLogical = new G4LogicalVolume(gasBox,
+//                                         Materials::get("RPCGas"),
+//                                         name,
+//                                         0, // use global field manager
+//                                         m_bkgsensitive, // this is the only sensitive volume in BKLM
+//                                         0 // no user limits
+//                                        );
+//      } else {
+      gasLogical = new G4LogicalVolume(gasBox,
+                                       Materials::get("RPCGas"),
+                                       name,
+                                       0, // use global field manager
+                                       m_sensitive, // this is the only sensitive volume in BKLM
+                                       0 // no user limits
+                                      );
+//      }
       gasLogical->SetVisAttributes(G4VisAttributes(true, G4Colour(1.0, 0.5, 0.0)));
       sprintf(name, "BKLM.Gas_%c_%d_%02d_Inner", fbname, sector, layer);
       new G4PVPlacement(G4TranslateX3D(-dxGas),
@@ -775,7 +776,7 @@ namespace Belle2 {
 
     void GeoBKLMCreator::putScintModuleInGap(G4LogicalVolume* gapLogical, int fb, int sector, int layer, bool hasChimney)
     {
-      char name[40];
+      char name[80];
       char fbname = (fb == BKLM_FORWARD) ? 'F' : 'B';
       // Module is aluminum (but interior will be filled)
       sprintf(name, "BKLM.Layer%02dModuleBox", layer);
@@ -794,27 +795,138 @@ namespace Belle2 {
                             name
                            );
       moduleLogical->SetVisAttributes(G4VisAttributes(false));
-      // Place polystyrene inside aluminum frame  *DIVOT*
       sprintf(name, "BKLM.Layer%02dPolystyreneBox", layer);
-      const Hep3Vector scintHalfSize = m_GeoPar->getReadoutHalfSize(layer, hasChimney) * cm;
-      G4Box* scintBox =
+      const Hep3Vector polystyreneHalfSize = m_GeoPar->getPolystyreneHalfSize(layer, hasChimney) * cm;
+      G4Box* polystyreneBox =
         new G4Box(name,
-                  scintHalfSize.x(), scintHalfSize.y(), scintHalfSize.z()
+                  polystyreneHalfSize.x(), polystyreneHalfSize.y(), polystyreneHalfSize.z()
                  );
       sprintf(name, "BKLM.Layer%02dPolystyreneLogical", layer);
-      G4LogicalVolume* scintLogical =
-        new G4LogicalVolume(scintBox,
+      G4LogicalVolume* polystyreneLogical =
+        new G4LogicalVolume(polystyreneBox,
                             Materials::get("G4_POLYSTYRENE"),
-                            name,
-                            0, // use global field manager
-                            m_sensitive, // this is the only sensitive volume in BKLM
-                            0 // no user limits
+                            name
                            );
-      scintLogical->SetVisAttributes(G4VisAttributes(true, G4Colour(1.0, 0.5, 0.0)));
-      // Place polystyrene inside module  *DIVOT*
-      sprintf(name, "BKLM.Sci_%c_%d_%02d_Inner", fbname, sector, layer);
+      polystyreneLogical->SetVisAttributes(G4VisAttributes(false));
+      sprintf(name, "BKLM.Layer%02dAirBox", layer);
+      const Hep3Vector airHalfSize = m_GeoPar->getAirHalfSize(layer, hasChimney) * cm;
+      G4Box* airBox =
+        new G4Box(name,
+                  airHalfSize.x(), airHalfSize.y(), airHalfSize.z()
+                 );
+      sprintf(name, "BKLM.Layer%02dAirLogical", layer);
+      G4LogicalVolume* airLogical =
+        new G4LogicalVolume(airBox,
+                            Materials::get("G4_AIR"),
+                            name
+                           );
+      airLogical->SetVisAttributes(G4VisAttributes(false));
+      sprintf(name, "BKLM.Layer%02dScintEnvelopeBox", layer);
+      const Hep3Vector scintEnvelopeHalfSize = m_GeoPar->getScintEnvelopeHalfSize(layer, hasChimney) * cm;
+      G4Box* scintEnvelopeBox =
+        new G4Box(name,
+                  scintEnvelopeHalfSize.x(), scintEnvelopeHalfSize.y(), scintEnvelopeHalfSize.z()
+                 );
+      sprintf(name, "BKLM.Layer%02dInnerEnvelopeLogical", layer);
+      G4LogicalVolume* innerEnvelopeLogical =
+        new G4LogicalVolume(scintEnvelopeBox,
+                            Materials::get("G4_POLYSTYRENE"),
+                            name
+                           );
+      innerEnvelopeLogical->SetVisAttributes(G4VisAttributes(false));
+      double scintHalfHeight = m_GeoPar->getScintHalfHeight();
+      double scintHalfWidth  = m_GeoPar->getScintHalfWidth();
+      const Module* module = m_GeoPar->findSector(fb == BKLM_FORWARD, sector)->findModule(layer);
+      for (int scint = 1; scint <= m_GeoPar->getNPhiScints(layer); ++scint) {
+        sprintf(name, "BKLM.Layer%02dPhiScintBox%02d", layer, scint);
+        double scintHalfLength = module->getPhiScintHalfLength(scint);
+        double scintOffset     = module->getPhiScintOffset(scint);
+        double scintPosition   = module->getPhiScintPosition(scint);
+        G4Box* scintBox = new G4Box(name, scintHalfHeight, scintHalfWidth, scintHalfLength);
+        sprintf(name, "BKLM.Layer%02dPhiScintLogical%02d", layer, scint);
+        G4LogicalVolume* scintLogical =
+          new G4LogicalVolume(scintBox,
+                              Materials::get("G4_POLYSTYRENE"),
+                              name,
+                              0, // use global field manager
+                              m_sensitive, // this is the only sensitive volume in BKLM
+                              0 // no user limits
+                             );
+        scintLogical->SetVisAttributes(G4VisAttributes(true, G4Colour(1.0, 0.5, 0.0)));
+        sprintf(name, "BKLM.Sci_%c_%d_%02d_Inner_%02d", fbname, sector, layer, scint);
+        new G4PVPlacement(G4Translate3D(0.0, scintPosition, scintOffset),
+                          scintLogical,
+                          name,
+                          innerEnvelopeLogical,
+                          false,
+                          0,
+                          m_GeoPar->doOverlapCheck()
+                         );
+      }
+      sprintf(name, "BKLM.Layer%02dOuterEnvelopeLogical", layer);
+      G4LogicalVolume* outerEnvelopeLogical =
+        new G4LogicalVolume(scintEnvelopeBox,
+                            Materials::get("G4_POLYSTYRENE"),
+                            name
+                           );
+      outerEnvelopeLogical->SetVisAttributes(G4VisAttributes(false));
+      for (int scint = 1; scint <= m_GeoPar->getNZScints(layer); ++scint) {
+        sprintf(name, "BKLM.Layer%02dZScintBox%02d", layer, scint);
+        double scintHalfLength = module->getZScintHalfLength(scint);
+        double scintOffset     = module->getZScintOffset(scint);
+        double scintPosition   = module->getZScintPosition(scint);
+        G4Box* scintBox = new G4Box(name, scintHalfHeight, scintHalfLength, scintHalfWidth);
+        sprintf(name, "BKLM.Layer%02dZScintLogical%02d", layer, scint);
+        G4LogicalVolume* scintLogical =
+          new G4LogicalVolume(scintBox,
+                              Materials::get("G4_POLYSTYRENE"),
+                              name,
+                              0, // use global field manager
+                              m_sensitive, // this is the only sensitive volume in BKLM
+                              0 // no user limits
+                             );
+        scintLogical->SetVisAttributes(G4VisAttributes(true, G4Colour(1.0, 0.5, 0.0)));
+        sprintf(name, "BKLM.Sci_%c_%d_%02d_Outer_%02d", fbname, sector, layer, scint);
+        new G4PVPlacement(G4Translate3D(0.0, scintOffset, scintPosition),
+                          scintLogical,
+                          name,
+                          outerEnvelopeLogical,
+                          false,
+                          0,
+                          m_GeoPar->doOverlapCheck()
+                         );
+      }
+      Hep3Vector scintEnvelopeOffset = m_GeoPar->getScintEnvelopeOffset(layer, hasChimney);
+      sprintf(name, "BKLM.Layer%02dInnerEnvelopePhysical", layer);
+      new G4PVPlacement(G4Translate3D(-scintEnvelopeHalfSize.x(), scintEnvelopeOffset.y(), scintEnvelopeOffset.z()),
+                        innerEnvelopeLogical,
+                        name,
+                        airLogical,
+                        false,
+                        0,
+                        m_GeoPar->doOverlapCheck()
+                       );
+      sprintf(name, "BKLM.Layer%02dOuterEnvelopePhysical", layer);
+      new G4PVPlacement(G4Translate3D(+scintEnvelopeHalfSize.x(), scintEnvelopeOffset.y(), scintEnvelopeOffset.z()),
+                        outerEnvelopeLogical,
+                        name,
+                        airLogical,
+                        false,
+                        0,
+                        m_GeoPar->doOverlapCheck()
+                       );
+      sprintf(name, "BKLM.Layer%02dAirPhysical", layer);
+      new G4PVPlacement(G4TranslateX3D(m_GeoPar->getAirOffsetX()),
+                        airLogical,
+                        name,
+                        polystyreneLogical,
+                        false,
+                        0,
+                        m_GeoPar->doOverlapCheck()
+                       );
+      sprintf(name, "BKLM.Layer%02dPolystyrenePhysical", layer);
       new G4PVPlacement(G4TranslateZ3D(0.0),
-                        scintLogical,
+                        polystyreneLogical,
                         name,
                         moduleLogical,
                         false,

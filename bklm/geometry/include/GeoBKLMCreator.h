@@ -19,7 +19,7 @@ class G4Tubs;
 namespace Belle2 {
 
   class GearDir;
-  class BkgSensitiveDetector;
+  //class BkgSensitiveDetector;
 
   namespace bklm {
 
@@ -91,7 +91,7 @@ namespace Belle2 {
       SensitiveDetector* m_sensitive;
 
       //! Pointer to the BKLM BkgSensitiveDetector processor
-      BkgSensitiveDetector* m_bkgsensitive;
+      //BkgSensitiveDetector* m_bkgsensitive;
 
       //! Angular extent of one sector
       double m_SectorDphi;

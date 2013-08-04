@@ -30,7 +30,7 @@ namespace Belle2 {
       //! Empty constructor does nothing
       Module(void);
 
-      //! Constructor with explicit values
+      //! Constructor with explicit values (for RPC module)
       Module(bool              isForward,
              int               sector,
              int               module,
@@ -42,11 +42,29 @@ namespace Belle2 {
              int               phiStripNumber,
              int               phiStripMin,
              int               phiStripMax,
+             int               phiOffset,
              double            zStripWidth,
              double            zStripLength,
              int               zStripNumber,
              int               zStripMin,
-             int               zStripMax);
+             int               zStripMax,
+             int               zOffset);
+
+      //! Constructor with explicit values (for scint module)
+      Module(bool              isForward,
+             int               sector,
+             int               module,
+             CLHEP::Hep3Vector shift,
+             double            localX,
+             Sector*           sectorPtr,
+             double            phiStripWidth,
+             double            phiStripLength,
+             int               phiStripNumber,
+             int               phiOffset,
+             double            zStripWidth,
+             double            zStripLength,
+             int               zStripNumber,
+             int               zOffset);
 
       //! Copy constructor
       Module(const Module& m);
@@ -54,14 +72,14 @@ namespace Belle2 {
       //! Destructor
       ~Module();
 
-      //! Assignment operator
-      Module& operator=(const Module& m) const;
-
       //! Comparison operator (ordering)
       bool operator<(const Module& m) const;
 
       //! Comparison operator (equality)
       bool operator==(const Module& m) const { return isSameModule(m); }
+
+      //! Get module's detector type (true for RPCs, false for scints)
+      bool hasRPCs() const { return m_HasRPCs; }
 
       //! Get module's end (forward or backward)
       bool isForward() const { return m_IsForward; }
@@ -81,6 +99,9 @@ namespace Belle2 {
       //! Get module's phi-strip maximum index
       int getPhiStripMax() const { return m_PhiStripMax; }
 
+      //! Get module's offset direction along phi for the strip/scint envelope
+      int getPhiOffset() const { return m_PhiOffset; }
+
       //! Get module's z-strip count
       int getZStripNumber() const { return m_ZStripNumber; }
 
@@ -89,6 +110,9 @@ namespace Belle2 {
 
       //! Get module's z-strip maximum index
       int getZStripMax() const { return m_ZStripMax; }
+
+      //! Get module's offset direction along z for the strip/scint envelope
+      int getZOffset() const { return m_ZOffset; }
 
       //! Get module's shift, nominally (0,0,0) (in local coordinates)
       const CLHEP::Hep3Vector getShift() const { return m_Shift; }
@@ -105,10 +129,34 @@ namespace Belle2 {
       //! Determine if two modules are identical
       bool isSameModule(const Module& m) const;
 
+      //! Add one phi-measuring scintillator strip to the module
+      void addPhiScint(int scint, double length, double offset, double position);
+
+      //! Add one z-measuring scintillator strip to the module
+      void addZScint(int scint, double length, double offset, double position);
+
       //! Get the number of strips in this module
       int getNStrips(bool isPhiReadout) const {
         return (isPhiReadout ? m_PhiStripNumber : m_ZStripNumber);
       }
+
+      //! Get the half-length (within the scintillator envelope) of a given phi-measuring scintillator
+      double getPhiScintHalfLength(int scint) const { return 0.5 * m_PhiScintLengths[scint]; }
+
+      //! Get the length-offset (within the scintillator envelope) of a given phi-measuring scintillator
+      double getPhiScintOffset(int scint) const { return m_PhiScintOffsets[scint]; }
+
+      //! Get the position (within the scintillator envelope) of a given phi-measuring scintillator
+      double getPhiScintPosition(int scint) const { return m_PhiScintPositions[scint]; }
+
+      //! Get the half-length (within the scintillator envelope) of a given z-measuring scintillator
+      double getZScintHalfLength(int scint) const { return 0.5 * m_ZScintLengths[scint]; }
+
+      //! Get the length-offset (within the scintillator envelope) of a given z-measuring scintillator
+      double getZScintOffset(int scint) const { return m_ZScintOffsets[scint]; }
+
+      //! Get the position (within the scintillator envelope) of a given z-measuring scintillator
+      double getZScintPosition(int scint) const { return m_ZScintPositions[scint]; }
 
       //! Convert 1D strip position (0..nStrips) to local coordinate
       double getLocalCoordinate(double stripAve, bool isPhiReadout) const;
@@ -138,6 +186,9 @@ namespace Belle2 {
       void printTree(void) const;
 
     private:
+
+      //! to store the detector type (true=RPCs, false=scints) of this module
+      bool m_HasRPCs;
 
       //! to store the axial end (true=forward or false=backward) of this module
       bool m_IsForward;
@@ -175,6 +226,9 @@ namespace Belle2 {
       //! to store the maximum phi strip number in this module
       int m_PhiStripMax;
 
+      //! to store the offset direction along phi of the strip/scint envelope in this module
+      int m_PhiOffset;
+
       //! to store the width (in cm) of each z strip in this module
       double m_ZStripWidth;
 
@@ -189,6 +243,27 @@ namespace Belle2 {
 
       //! to store the maximum z strip number in this module
       int m_ZStripMax;
+
+      //! to store the offset direction along z of the strip/scint envelope in this module
+      int m_ZOffset;
+
+      //! to store the length of each phi-measuring scintillator
+      std::vector<double> m_PhiScintLengths;
+
+      //! to store the position (within scintillator envelope) of each phi-measuring scintillator
+      std::vector<double> m_PhiScintPositions;
+
+      //! to store the length-offset (within scintillator envelope) of each phi-measuring scintillator
+      std::vector<double> m_PhiScintOffsets;
+
+      //! to store the length of each z-measuring scintillator
+      std::vector<double> m_ZScintLengths;
+
+      //! to store the position (within scintillator envelope) of each z-measuring scintillator
+      std::vector<double> m_ZScintPositions;
+
+      //! to store the length-offset (within scintillator envelope) of each z-measuring scintillator
+      std::vector<double> m_ZScintOffsets;
 
     };
 

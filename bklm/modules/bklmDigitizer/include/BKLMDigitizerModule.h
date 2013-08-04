@@ -43,9 +43,6 @@ namespace Belle2 {
 
   protected:
 
-    //! Print BKLMDigitizerModule parameters
-    void printModuleParameters() const;
-
   private:
 
   };

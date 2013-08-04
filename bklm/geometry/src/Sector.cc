@@ -25,7 +25,6 @@ namespace Belle2 {
       m_IsForward(false),
       m_Sector(0),
       m_NLayer(0),
-      m_Shift(Hep3Vector()),
       m_Translation(Hep3Vector()),
       m_Rotation(HepRotation()),
       m_RotationInverse(HepRotation()),
@@ -38,13 +37,11 @@ namespace Belle2 {
     Sector::Sector(bool        isForward,
                    int         sector,
                    int         nLayer,
-                   Hep3Vector  shift,
                    Hep3Vector  translation,
                    HepRotation rotation) :
       m_IsForward(isForward),
       m_Sector(sector),
       m_NLayer(nLayer),
-      m_Shift(shift),
       m_Translation(translation),
       m_Rotation(rotation)
     {
@@ -58,7 +55,6 @@ namespace Belle2 {
       m_IsForward(s.m_IsForward),
       m_Sector(s.m_Sector),
       m_NLayer(s.m_NLayer),
-      m_Shift(s.m_Shift),
       m_Translation(s.m_Translation),
       m_Rotation(s.m_Rotation),
       m_RotationInverse(s.m_RotationInverse),
@@ -71,31 +67,12 @@ namespace Belle2 {
     {
     }
 
-    /*
-    Sector::Sector& operator=( const Sector& s ) {
-      if ( this != &s ) {
-        m_IsForward = s.m_IsForward;
-        m_Sector = s.m_Sector;
-        m_NLayer = s.m_NLayer;
-        m_Shift = s.m_Shift;
-        m_Translation = s.m_Translation;
-        m_Rotation = s.m_Rotation;
-        m_RotationInverse = s.m_RotationInverse;
-        m_Normal = s.m_Normal;
-        m_Modules = s.m_Modules;
-      }
-      return *this;
-    }
-    */
-
-    /*
     bool Sector::operator<(const Sector& s) const
     {
       if (m_IsForward != s.m_IsForward) return (m_IsForward);
       if (m_Sector    != s.m_Sector)    return (m_Sector < s.m_Sector);
       return false;
     }
-    */
 
     void Sector::addModule(Module* m)
     {
@@ -130,17 +107,17 @@ namespace Belle2 {
 
     const Hep3Vector Sector::localToGlobal(const Hep3Vector& v) const
     {
-      return rotateToGlobal(v) + m_Translation + m_Shift;
+      return rotateToGlobal(v) + m_Translation;
     }
 
     const Hep3Vector Sector::globalToLocal(const Hep3Vector& v) const
     {
-      return rotateToLocal(v - m_Translation - m_Shift);
+      return rotateToLocal(v - m_Translation);
     }
 
     const Hep3Vector Sector::globalToLocal(double x, double y, double z) const
     {
-      return rotateToLocal(Hep3Vector(x, y, z) - m_Translation - m_Shift);
+      return rotateToLocal(Hep3Vector(x, y, z) - m_Translation);
     }
 
     const HepMatrix Sector::localToGlobal(const HepMatrix& m) const
@@ -191,8 +168,7 @@ namespace Belle2 {
     void Sector::printTree() const
     {
       B2INFO("Sector: BKLM-"   << (m_IsForward == 0 ? 'F' : 'B')
-             << "-S"   << m_Sector
-             << "    " << m_Shift);
+             << "-S"   << m_Sector);
       vector<Module*>::const_iterator iM;
       for (iM = m_Modules.begin(); iM != m_Modules.end(); ++iM) {
         (*iM)->printTree();

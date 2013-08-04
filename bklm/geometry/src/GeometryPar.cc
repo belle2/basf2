@@ -87,6 +87,11 @@ namespace Belle2 {
 
       m_GapLength = content.getLength("Layers/GapLength");
 
+      m_NZStrips = content.getInt("Layers/NZStrips");
+      m_NZStripsChimney = content.getInt("Layers/NZStripsChimney");
+      m_NZScints = content.getInt("Layers/NZScintillators");
+      m_NZScintsChimney = content.getInt("Layers/NZScintillatorsChimney");
+
       m_ModuleLength = content.getLength("Module/Length");
       m_ModuleLengthChimney = content.getLength("Module/LengthChimney");
       m_ModuleCoverHeight = content.getLength("Module/CoverHeight");
@@ -99,7 +104,14 @@ namespace Belle2 {
       m_ModuleHeight = (m_ModuleCoverHeight + m_ModuleReadoutHeight + m_ModuleGasHeight + m_ModuleGlassHeight * 2.0) * 2.0;
       m_ModuleFrameWidth = content.getLength("Module/FrameWidth");
       m_ModuleGasSpacerWidth = content.getLength("Module/SpacerWidth");
-      m_ModuleElectrodeBorder = content.getLength(" Module/ElectrodeBorder");
+      m_ModuleElectrodeBorder = content.getLength("Module/ElectrodeBorder");
+      m_ModulePolystyreneInnerHeight = content.getLength("Module/PolystyreneInnerHeight");
+      m_ModulePolystyreneOuterHeight = content.getLength("Module/PolystyreneOuterHeight");
+      m_ScintWidth = content.getLength("Module/Scintillator/Width");
+      m_ScintHeight = content.getLength("Module/Scintillator/Height");
+      m_ScintBoreRadius = content.getLength("Module/Scintillator/BoreRadius");
+      m_ScintTiO2ThicknessTop = content.getLength("Module/Scintillator/TiO2ThicknessTop");
+      m_ScintTiO2ThicknessSide = content.getLength("Module/Scintillator/TiO2ThicknessSide");
 
       m_ChimneyLength = content.getLength("Chimney/Length");
       m_ChimneyWidth = content.getLength("Chimney/Width");
@@ -130,65 +142,96 @@ namespace Belle2 {
       m_BracketInset = content.getLength("BracketInset");
       m_BracketCutoutDphi = content.getAngle("BracketCutoutDphi");
 
-      m_HasRPCs[0] = false;
-      double phiStripWidth[NLAYER + 1] = { 0.0 };
-      double phiStripLength[NLAYER + 1] = { 0.0 };
-      int    phiStripNumber[NLAYER + 1] = { 0 };
-      int    phiStripMin[NLAYER + 1] = { 0 };
-      int    phiStripMax[NLAYER + 1] = { 0 };
-      double zStripWidth[NLAYER + 1] = { 0.0 };
-      double zStripLength[NLAYER + 1] = { 0.0 };
-      int    zStripNumber[NLAYER + 1] = { 0 };
-      char name[40] = { '\0' };
-      for (int layer = 1; layer <= m_NLayer; ++layer) {
-        sprintf(name, "/Layers/Layer[@layer=\"%d\"]", layer);
-        GearDir layerContent(content);
-        layerContent.append(name);
-        m_HasRPCs[layer] = layerContent.getInt("HasRPCs");
-        phiStripWidth[layer] = layerContent.getLength("PhiStrips/Width");
-        phiStripLength[layer] = layerContent.getLength("PhiStrips/Length");
-        phiStripNumber[layer] = layerContent.getInt("PhiStrips/NStrips");
-        phiStripMin[layer] = (layer == 1 ? 2 : 1);
-        phiStripMax[layer] = (layer == 1 ? phiStripNumber[layer] - 1 : phiStripNumber[layer]);
-        zStripWidth[layer] = layerContent.getLength("ZStrips/Width");
-        zStripLength[layer] = layerContent.getLength("ZStrips/Length");
-        zStripNumber[layer] = layerContent.getInt("ZStrips/NStrips");
-      }
-
       Hep3Vector rSector(m_GapInnerRadius + 0.5 * m_GapNominalHeight, 0.0, 0.0);
-      for (int fb = 0; fb < 2; ++fb) {
-        bool isForward = (fb == 0);
+      char name[40] = { '\0' };
+      for (int fb = 1; fb <= 2; ++fb) {
+        bool isForward = (fb == 1);
         Hep3Vector deltaZ(0.0, 0.0, (isForward ? m_ModuleElectrodeBorder : -m_ModuleElectrodeBorder));
         for (int sector = 1; sector <= m_NSector; ++sector) {
+          int nZStrips = ((!isForward) && (sector == 3) ? m_NZStripsChimney : m_NZStrips);
+          int nZScints = ((!isForward) && (sector == 3) ? m_NZScintsChimney : m_NZScints);
           sprintf(name, "/Sectors/%s/Sector[@sector=\"%d\"]", (isForward ? "Forward" : "Backward"), sector);
           GearDir sectorContent(content);
           sectorContent.append(name);
-          Hep3Vector shift(sectorContent.getLength("Shift/X"),
-                           sectorContent.getLength("Shift/Y"),
-                           sectorContent.getLength("Shift/Z"));
           HepRotation rotation;
           if (~isForward) rotation.rotateX(M_PI);
           rotation.rotateZ(sectorContent.getAngle("/Phi"));
           Hep3Vector translation(0.0, 0.0, m_OffsetZ);
           translation += rotation(rSector) + deltaZ;
-          Sector* pSector = new Sector(isForward, sector, m_NLayer, shift, translation, rotation);
+          Sector* pSector = new Sector(isForward, sector, m_NLayer, translation, rotation);
           m_Sectors.push_back(pSector);
           for (int layer = 1; layer <= m_NLayer; ++layer) {
-            int zStripMin = 1;
-            int zStripMax = zStripNumber[layer];
-            if ((!isForward) && (sector == 3)) zStripMax = sectorContent.getInt("ZStrips/NStrips");
             GearDir layerContent(sectorContent);
             sprintf(name, "/Layer[@layer=\"%d\"]", layer);
             layerContent.append(name);
-            Hep3Vector lshift(layerContent.getLength("Shift/X"),
-                              layerContent.getLength("Shift/Y"),
-                              layerContent.getLength("Shift/Z"));
+            Hep3Vector shift(layerContent.getLength("ReconstructionShift/X"),
+                             layerContent.getLength("ReconstructionShift/Y"),
+                             layerContent.getLength("ReconstructionShift/Z"));
             double dr = (layer == 1 ? (m_GapNominalHeight - m_Gap1NominalHeight) * 0.5 : (layer - 1) * m_LayerHeight);
-            pSector->addModule(new Module(isForward, sector, layer, lshift, dr, pSector,
-                                          phiStripWidth[layer], phiStripLength[layer],
-                                          phiStripNumber[layer], phiStripMin[layer], phiStripMax[layer],
-                                          zStripWidth[layer], zStripLength[layer],
-                                          zStripNumber[layer], zStripMin, zStripMax));
+            sprintf(name, "/Layers/Layer[@layer=\"%d\"]", layer);
+            layerContent = content;
+            layerContent.append(name);
+            if (layerContent.getBool("HasRPCs")) {
+              int phiStripNumber = layerContent.getInt("PhiStrips/NStrips");
+              pSector->addModule(new Module(isForward, sector, layer, shift, dr, pSector,
+                                            layerContent.getLength("PhiStrips/Width"),
+                                            layerContent.getLength("PhiStrips/Length"),
+                                            phiStripNumber,
+                                            (layer == 1 ? 2 : 1),
+                                            (layer == 1 ? phiStripNumber - 1 : phiStripNumber),
+                                            0,
+                                            layerContent.getLength("ZStrips/Width"),
+                                            layerContent.getLength("ZStrips/Length"),
+                                            nZStrips,
+                                            1,
+                                            nZStrips,
+                                            0));
+              //DIVOT to call these 3 functions
+              const Module* m = pSector->findModule(layer);
+              const HepMatrix lE = m->getLocalError(1, 1);
+              const Rect mR = m->getModuleRectLocal();
+              const Rect sR = m->getStripRectLocal(0.0, true);
+              phiStripNumber = (int)(lE.trace() + mR.corner[0].x() + sR.corner[0].x());
+            } else {
+              int    nPhiScints = layerContent.getInt("PhiScintillators/NScints");
+              double phiScintLength = nZScints * m_ScintWidth;
+              double zScintLength = nPhiScints * m_ScintWidth;
+              Module* pModule = new Module(isForward, sector, layer, shift, dr, pSector,
+                                           m_ScintWidth,
+                                           phiScintLength,
+                                           nPhiScints,
+                                           layerContent.getInt("PhiScintillators/Offset"),
+                                           m_ScintWidth,
+                                           zScintLength,
+                                           nZScints,
+                                           layerContent.getInt("ZScintillators/Offset")
+                                          );
+              pSector->addModule(pModule);
+              double base = -0.5 * (nPhiScints + 1) * m_ScintWidth;
+              for (int scint = 1; scint <= nPhiScints; ++scint) {
+                sprintf(name, "/PhiScintillators/Scint[@scint=\"%d\"]", scint);
+                GearDir scintContent(layerContent);
+                scintContent.append(name);
+                double dLength = scintContent.getLength("DLength", 0.0);
+                pModule->addPhiScint(scint,
+                                     phiScintLength + dLength,
+                                     0.5 * fabs(dLength) * scintContent.getInt("Offset", 0),
+                                     base + scint * m_ScintWidth
+                                    );
+              }
+              base = -0.5 * (nZScints + 1) * m_ScintWidth;
+              for (int scint = 1; scint <= nZScints; ++scint) {
+                sprintf(name, "/ZScintillators/Scint[@scint=\"%d\"]", scint);
+                GearDir scintContent(layerContent);
+                scintContent.append(name);
+                double dLength = scintContent.getLength("DLength", 0.0);
+                pModule->addZScint(scint,
+                                   zScintLength + dLength,
+                                   0.5 * fabs(dLength) * scintContent.getInt("Offset", 0),
+                                   base + scint * m_ScintWidth
+                                  );
+              }
+            }
           }
         }
       }
@@ -261,6 +304,59 @@ namespace Belle2 {
       return size;
     }
 
+    const Hep3Vector GeometryPar::getPolystyreneHalfSize(int layer, bool flag) const
+    {
+      return getReadoutHalfSize(layer, flag);
+    }
+
+    const Hep3Vector GeometryPar::getAirHalfSize(int layer, bool flag) const
+    {
+      Hep3Vector size = getPolystyreneHalfSize(layer, flag);
+      size.setX(m_ScintHeight);
+      return size;
+    }
+
+    const Hep3Vector GeometryPar::getScintEnvelopeHalfSize(int layer, bool flag) const
+    {
+      return Hep3Vector(0.5 * m_ScintHeight,
+                        0.5 * m_ScintWidth * getNPhiScints(layer),
+                        0.5 * m_ScintWidth * getNZScints(flag)
+                       );
+    }
+
+    int GeometryPar::getNPhiStrips(int layer) const
+    {
+      if (m_Sectors.front()->findModule(layer)->hasRPCs()) {
+        return m_Sectors.front()->findModule(layer)->getNStrips(true);
+      } else {
+        return 0;
+      }
+    }
+
+    int GeometryPar::getNPhiScints(int layer) const
+    {
+      if (m_Sectors.front()->findModule(layer)->hasRPCs()) {
+        return 0;
+      } else {
+        return m_Sectors.front()->findModule(layer)->getNStrips(true);
+      }
+    }
+
+    const Hep3Vector GeometryPar::getScintEnvelopeOffset(int layer, bool flag) const
+    {
+      Hep3Vector airSize = getAirHalfSize(layer, flag);
+      Hep3Vector scintEnvelopeSize = getScintEnvelopeHalfSize(layer, flag);
+      Hep3Vector offset = 0.5 * (airSize - scintEnvelopeSize);
+      offset.setY(offset.y() * m_Sectors.front()->findModule(layer)->getPhiOffset());
+      offset.setZ(offset.z() * m_Sectors.front()->findModule(layer)->getZOffset());
+      return offset;
+    }
+
+    double GeometryPar::getAirOffsetX(void) const
+    {
+      return 0.5 * (m_ModulePolystyreneInnerHeight - m_ModulePolystyreneOuterHeight);
+    }
+
     double GeometryPar::getGapMiddleRadius(int layer) const
     {
       if (layer == 1) {
@@ -318,7 +414,7 @@ namespace Belle2 {
     bool GeometryPar::hasRPCs(int layer) const
     {
       if ((layer <= 0) || (layer > m_NLayer)) return true;
-      return m_HasRPCs[layer];
+      return m_Sectors.front()->findModule(layer)->hasRPCs();
     }
 
     const Sector* GeometryPar::findSector(bool isForward, int sector) const

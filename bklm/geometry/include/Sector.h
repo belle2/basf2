@@ -63,7 +63,6 @@ namespace Belle2 {
       Sector(bool               isForward,
              int                sector,
              int                nlayers,
-             CLHEP::Hep3Vector  shift,
              CLHEP::Hep3Vector  translation,
              CLHEP::HepRotation rotation);
 
@@ -102,9 +101,6 @@ namespace Belle2 {
 
       //! Get number of layers in this sector
       int getNLayer() const { return m_NLayer; }
-
-      //! Get sector's shift, nominally (0,0,0) (in global coordinates)
-      const CLHEP::Hep3Vector& getShift() const { return m_Shift; }
 
       //! Get sector's translation (in global coordinates)
       const CLHEP::Hep3Vector& getTranslation() const { return m_Translation; }
@@ -158,9 +154,6 @@ namespace Belle2 {
 
       //! to store the number of layers in this sector
       int m_NLayer;
-
-      //! to store the shift (in global coordinates) of this sector; nominally (0,0,0)
-      CLHEP::Hep3Vector m_Shift;
 
       //! to store the position (in global coordinates) of this sector
       CLHEP::Hep3Vector m_Translation;

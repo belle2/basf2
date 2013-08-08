@@ -3,14 +3,9 @@
 
 ##############################################################################
 #
-# This is an example steering file to run ARICH part of Belle2 simulation.
-# It uses ParicleGun module to generate tracks,
-# (see "generators/example/ParticleGunFull.py" for detailed usage)
-# needs reconstructed tracks(Tracks) extrapolated to ARICH (ExtHits).
-# The module builds geometry, performs geant4 simulation, does ARICH
-# reconstruction and stores output (for each track a value of likelihood
-# for different particle hypotheses) in an output root file
-# defined in RootOutput options below.
+# This is an example steering file to visulize ARICH subdetector.
+# It creates .wrl file which can be opened with apropriate
+# viewer (ex. freewrl).
 #
 ##############################################################################
 
@@ -33,18 +28,10 @@ geometry = register_module('Geometry')
 particlegun = register_module('ParticleGun')
 # Run simulation
 simulation = register_module('FullSim')
-# ARICH digitization module
-arichDIGI = register_module('ARICHDigitizer')
-# ARICH reconstruction module
-arichRECO = register_module('ARICHReconstructor')
 
 # EvtMetaGen parameters
 # Set the number of events to be processed (10 event)
 evtmetagen.param({'evtNumList': [1], 'runList': [1]})
-# ============================================================================
-
-# Set output filename
-output.param('outputFileName', 'ParticleGunOutput.root')
 # ============================================================================
 
 # ============================================================================
@@ -98,13 +85,6 @@ simulation.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume'])
 #                            '/vis/modeling/trajectories/create/drawByCharge'])
 # =============================================================================
 
-# =============================================================================
-# ARICH Reconstruction parameters
-arichRECO.logging.log_level = LogLevel.DEBUG
-arichRECO.logging.debug_level = 50
-arichRECO.param('inputTrackType', 0)
-# =============================================================================
-
 # Do the simulation
 # =============================================================================
 main = create_path()
@@ -112,10 +92,8 @@ main.add_module(evtmetagen)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)
-# main.add_module(particlegun)
+main.add_module(particlegun)
 main.add_module(simulation)
-# main.add_module(arichDIGI)
-# main.add_module(arichRECO)
 
 # Process events
 process(main)

@@ -106,19 +106,7 @@ trackfitting = register_module('GenFitter')
 # ---------------------------------------------------------------
 # dE/dx PID
 dedx = register_module('DedxPID')
-dedx_params = {
-    'UseIndividualHits': True,
-    'RemoveLowest': 0.15,
-    'RemoveHighest': 0.15,
-    'OnlyPrimaryParticles': True,
-    'UsePXD': False,
-    'UseSVD': False,
-    'UseCDC': True,
-    'TrackDistanceThreshold': 4.0,
-    'EnableDebugOutput': True,
-    'PDFFile': os.path.join(basf2datadir, 'analysis/dedxPID_PDFs_r3178.root'),
-    'IgnoreMissingParticles': False,
-    }
+dedx_params = {'onlyPrimaryParticles': True, 'useSVD': False}
 dedx.param(dedx_params)
 
 # ---------------------------------------------------------------

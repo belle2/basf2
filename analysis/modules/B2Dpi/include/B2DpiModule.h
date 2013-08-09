@@ -81,14 +81,16 @@ namespace Belle2 {
     unsigned doKmFit(Particle& p, double& confLevel);
     /** Do a mass-vertex constrained fit **/
     unsigned doKmvFit(const Particle* p, double& confLevel);
-    /** **/
+    /** Get mother for a mass-vertex constrained fit **/
     unsigned makeMother(MassVertexFitKFit& km, Particle* mother);
-    /** **/
+    /** Get mother for a vertex constrained fit **/
     unsigned makeMother(VertexFitKFit& kv, Particle* mother);
 
     /** Generated info Related functions **/
     int isBtoD0PiDecay(MCParticle* part);
+    /** Check if this is a true D->Kpi decay **/
     int isD0Decay(MCParticle* part);
+    /** Remove the FSR photon from daughter list **/
     void removeFSRPhoton(std::vector<MCParticle*> daughters, std::vector<MCParticle*>& daughtersWithoutFSR);
 
   protected:

@@ -105,54 +105,88 @@ namespace Belle2 {
     /** output root file name (given as Module parameter) */
     std::string m_dataOutFileName;
 
-    /** Root tree and file for saving the output */
+    /** Root tree for saving the output */
     TTree* m_tree;
+    /** file for the root tree **/
     TFile* m_rootFile;
-
+    /** D mass variable **/
     double m_md;
+    /** Mbc variable **/
     double m_mbc;
+    /** DeltaE variable **/
     double m_deltae;
+    /** D mass after kinematic fit **/
     double m_md_fit;
+    /** Mbc variable after kinematic fit **/
     double m_mbc_fit;
+    /** DeltaE variable after kinematic fit **/
     double m_deltae_fit;
+    /** CM energy variable **/
     double m_cmse;
+    /** B candidates list size **/
     double m_bsize;
+    /** x-coordinate of B candidate vertex **/
     double m_bp_vx;
+    /** y-coordinate of B candidate vertex **/
     double m_bp_vy;
+    /** z-coordinate of B candidate vertex **/
     double m_bp_vz;
+    /** x-error of B candidate vertex **/
     double m_bp_evx;
+    /** y-error of B candidate vertex **/
     double m_bp_evy;
+    /** z-error of B candidate vertex **/
     double m_bp_evz;
+    /** x-coordinate of vertex of true B **/
     double m_gen_bp_vx;
+    /** y-coordinate of vertex of true B **/
     double m_gen_bp_vy;
+    /** z-coordinate of vertex of true B **/
     double m_gen_bp_vz;
+    /** chi2 of B candidate vertex **/
     double m_bp_chi2;
-
+    /** x-coordinate of D candidate vertex **/
     double m_d0_vx;
+    /** y-coordinate of D candidate vertex **/
     double m_d0_vy;
+    /** z-coordinate of D candidate vertex **/
     double m_d0_vz;
+    /** x-error of D candidate vertex **/
     double m_d0_evx;
+    /** y-error of D candidate vertex **/
     double m_d0_evy;
+    /** z-error of D candidate vertex **/
     double m_d0_evz;
+    /** x-coordinate of vertex of true D **/
     double m_gen_d0_vx;
+    /** y-coordinate of vertex of true D **/
     double m_gen_d0_vy;
+    /** z-coordinate of vertex of true D **/
     double m_gen_d0_vz;
+    /** chi2 of D candidate (mass-vertex fit) **/
     double m_d0_chi2;
-
+    /** Number of events read **/
     int nevt;
-
+    /** B candidate 4-vector **/
     TLorentzVector m_b;
 
     // MCParticles for the signal decay chain
+    /** MCParticle for the B signal **/
     MCParticle* BPSig;
+    /** MCParticle for the D (daughter of B) signal **/
     MCParticle* D0Sig;
+    /** MCParticle for the K (daughter of D) signal **/
     MCParticle* KSig;
+    /** MCParticle for the pi (daughter of D) signal **/
     MCParticle* PiSig;
+    /**  MCParticle for the prompt pi signal **/
     MCParticle* PrimaryPI;
+    /** MCParticle for the other side B (tag side) **/
     MCParticle* BMTag;
 
-    // boost vector for the CMS frame == Y(4S) frame
+    /** boost vector for the CMS frame == Y(4S) frame **/
     TVector3 boostToCMS;
+    /** CM energy variable (sqrt(s)/2) **/
     double cmsE;
   };
 

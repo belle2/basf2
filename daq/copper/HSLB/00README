@@ -1,0 +1,16 @@
+=========================================================
+Configure CPLD (Aug. 14, 2013)
+
+1, Get a CPLD configuration file
+Use 130621_HSLB_cpld_readback.jed
+
+
+2, Attach HSLB on COPPER and turn on the power of COPPER
+
+3, Download the file to CPLD on HSLB
+-	Prepare USB-JTAG adapter
+-	Connect between your PC and CPLD
+-	Use impact to download the file to CPLD
+
+=========================================================
+

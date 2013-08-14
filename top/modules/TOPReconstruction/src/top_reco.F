@@ -1,6 +1,6 @@
 !-----------------------------------------------------------------------
 ! TOP counter for Belle: Reconstruction
-! M. Staric, oct-2008, may-2009, feb-2010
+! M. Staric, oct-2008, may-2009, feb-2010, oct-2011
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 !-----------------------------------------------------------------------
 
@@ -71,6 +71,7 @@
       REAL RR, HLX(10)
       REAL HLX_LOC(10), Y, T0, T1, T2, T3, T4, TMI, FI, R(3), DIR(3)
       LOGICAL OK1
+      LOGICAL INSIDE_QBAR
       
       FLAG=0
       DO I=1,10
@@ -102,6 +103,8 @@
          IF(.NOT.OK) CYCLE
          OK=ABS(T_R0(3)).LT.QBAR_C(I)/2.
          IF(.NOT.OK) CYCLE
+         OK=INSIDE_QBAR(T_R0(1),T_R0(2),T_R0(3),I)
+         IF(.NOT.OK) CYCLE
          MODUL=I
          EXIT
       ENDDO
@@ -131,19 +134,28 @@
       FI=ATAN2(T_DIR(2),T_DIR(1))
       T_CFI(0)=COS(FI)
       T_SFI(0)=SIN(FI)
-      T_H=-0.1                   ! [cm]
+
+      T_H=0.1                   ! [cm]
       T1=TOF_C0+T_H/C0
       CALL GET_HLX_RDIR(HLX_LOC,T1,T_R1,DIR)
-      IF(ABS(T_R1(3)).GE.QBAR_C(I)/2.) THEN
-         T_H=-T_H
-         T1=TOF_C0+T_H/C0
-         CALL GET_HLX_RDIR(HLX_LOC,T1,T_R1,DIR)
-      ENDIF
+      OK=INSIDE_QBAR(T_R1(1),T_R1(2),T_R1(3),MODUL)
+      IF(.NOT.OK) RETURN
       T_CTH(1)=DIR(3)
       T_STH(1)=SQRT(1-T_CTH(1)**2)
       FI=ATAN2(DIR(2),DIR(1))
       T_CFI(1)=COS(FI)
       T_SFI(1)=SIN(FI)
+
+      T1=TOF_C0-T_H/C0
+      CALL GET_HLX_RDIR(HLX_LOC,T1,T_R2,DIR)
+      OK=INSIDE_QBAR(T_R2(1),T_R2(2),T_R2(3),MODUL)
+      IF(.NOT.OK) RETURN
+      T_CTH(-1)=DIR(3)
+      T_STH(-1)=SQRT(1-T_CTH(1)**2)
+      FI=ATAN2(DIR(2),DIR(1))
+      T_CFI(-1)=COS(FI)
+      T_SFI(-1)=SIN(FI)
+
       TOF_C0=TOF_C0+T0
       FLAG=1
 
@@ -299,7 +311,6 @@
       IMPLICIT NONE
       REAL MEAN
       REAL N
-c      REAL ALOGAM
 
       IF(MEAN.EQ.0) THEN
          IF(N.EQ.0) THEN
@@ -308,7 +319,6 @@ c      REAL ALOGAM
             POIS_LOG=-1.E10
          ENDIF
       ELSE
-c         POIS_LOG=N*LOG(MEAN)-MEAN-ALOGAM(N+1.)
          POIS_LOG=N*LOG(MEAN)-MEAN
       ENDIF
 
@@ -429,12 +439,32 @@ c         POIS_LOG=N*LOG(MEAN)-MEAN-ALOGAM(N+1.)
       IF(RTRA_FLAG(1).NE.1) RETURN
       NUMCH=NCH(0)+NCH(1)
       IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
-      IF(MASS.LE.0) RETURN
 
-      IF(MASS.NE.MASS_HYP) CALL TOP_SET_PDF(MASS,RTRA_T0(1))
+      IF(BETA_RQ.GT.0) THEN
+         IF(BETA_RQ.NE.BETA) THEN
+            PRINT*,'construct PDF for Beta=',BETA_RQ
+            CALL TOP_SET_PDF(MASS,RTRA_T0(1))
+         ENDIF
+      ELSE
+         IF(MASS.NE.MASS_HYP) THEN
+            PRINT*,'construct PDF for Mass=',MASS
+            CALL TOP_SET_PDF(MASS,RTRA_T0(1))
+         ENDIF
+      ENDIF
       SFOT=STFS+STFB
       P=STFS/SFOT
       GET_PDF=P*TOP_SIGNAL(T,ICH)+(1-P)*TOP_BGR(T,ICH)
+
+      END
+
+
+      SUBROUTINE SET_BETA_RQ(BT)
+
+      IMPLICIT NONE
+      REAL BT
+#include "TOP_PIK.fi"
+
+      BETA_RQ=BT
 
       END
 

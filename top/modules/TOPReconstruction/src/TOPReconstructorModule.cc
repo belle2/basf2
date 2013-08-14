@@ -295,6 +295,8 @@ namespace Belle2 {
       double z1 = m_topgp->getZ1();             // backward bar position
       double z2 = m_topgp->getZ2();             // forward bar position
       double DzExp = m_topgp->getWLength();     // expansion volume length
+      double Wwidth = m_topgp->getWwidth();     // expansion volume width
+      double Wflat = m_topgp->getWflat();     // expansion volume flat part
       double YsizExp = m_topgp->getWextdown() + m_topgp->getQthickness();
       double XsizPMT = m_topgp->getNpmtx() * m_topgp->getMsizex() +
                        (m_topgp->getNpmtx() - 1) * m_topgp->getXgap();
@@ -307,7 +309,9 @@ namespace Belle2 {
         id = setQbar(A, B, z1, z2, R, 0, Phi, PMT, SphericM);
         setMirrorRadius(id, MirrR);
         setMirrorCenter(id, MirrXc, MirrYc);
-        addExpansionVolume(id, Left, Prism, DzExp, B / 2, B / 2 - YsizExp);
+        addExpansionVolume(id, Left, Prism, DzExp - Wflat, B / 2, B / 2 - YsizExp,
+                           0, 0, Wwidth);
+        setBBoxWindow(id, Wflat);
         arrangePMT(id, Left, XsizPMT, YsizPMT);
         Phi += Dphi;
       }

@@ -60,6 +60,20 @@ namespace Belle2 {
       m_QbarID = -1;
     }
 
+    double TOPtrack::Tof(int Lund)
+    {
+      int lundc[5] = {11, 13, 211, 321, 2212};
+      double masses[5] = {.511E-3, .10566, .13957, .49368, .93827};
+
+      double mass = 0;
+      for (int i = 0; i < 5; i++) {
+        if (abs(Lund) == lundc[i]) {mass = masses[i]; break;}
+      }
+      double pmom = p();
+      double beta = pmom / sqrt(pmom * pmom + mass * mass);
+      return m_Tlen / beta / Const::speedOfLight;
+    }
+
     void TOPtrack::setTrackLength(double tof, double mass)
     {
       double pmom = p();

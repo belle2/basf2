@@ -17,17 +17,20 @@
 namespace Belle2 {
   namespace TOP {
 
-    /*! Class to hold reconstructed track, interface to fortran.
+    /**
+     * Class to hold reconstructed track, interface to fortran.
      *  Input to TOPreco.
      */
 
     class TOPtrack {
     public:
-      /*! Default constructor
+      /**
+       * Default constructor
        */
       TOPtrack();
 
-      /*! Constructor with track parameters
+      /**
+       * Constructor with track parameters
        * @param x track spatial position x
        * @param y track spatial position y
        * @param z track spatial position z
@@ -37,115 +40,142 @@ namespace Belle2 {
        * @param Tlen track length from IP
        * @param Q track charge
        * @param Lund LUND code (optional)
-       * @param label label (optional)
        */
       TOPtrack(double x, double y, double z, double Px, double Py, double Pz,
                double Tlen, int Q, int Lund = 0);
 
-      /*! get x
+      /**
+       * get x
        * @return  spatial position x
        */
       double X() {return m_X;}
 
-      /*! get y
+      /**
+       * get y
        * @return  spatial position y
        */
       double Y() {return m_Y;}
 
-      /*! get z
+      /**
+       * get z
        * @return  spatial position z
        */
       double Z() {return m_Z;}
 
-      /*! get momentum x
+      /**
+       * get momentum x
        * @return  momentum component x
        */
       double Px() {return m_Px;}
 
-      /*! get momentum y
+      /**
+       * get momentum y
        * @return  momentum component y
        */
       double Py() {return m_Py;}
 
-      /*! get momentum z
+      /**
+       * get momentum z
        * @return  momentum component z
        */
       double Pz() {return m_Pz;}
 
-      /*! get track length from IP to current position
+      /**
+       * get track length from IP to current position
        * @return track length from IP
        */
       double Tlen() {return m_Tlen;}
 
-      /*! set track length from time-of-flight and particle mass
+      /**
+       * get time-of-flight from IP to current position for given charged stable
+       * @param Lund PDG code
+       * @return time-of-flight
+       */
+      double Tof(int Lund);
+
+      /**
+       * set track length from time-of-flight and particle mass
        * @param tof time-of-flight
        * @param mass particle mass
        */
       void setTrackLength(double tof, double mass);
 
-      /*! get momentum magnitude
+      /**
+       * get momentum magnitude
        * @return momentum
        */
       double p() {return sqrt(m_Px * m_Px + m_Py * m_Py + m_Pz * m_Pz);}
 
-      /*! get momentum polar angle
+      /**
+       * get momentum polar angle
        * @return momentum polar angle
        */
       double theta() {return acos(m_Pz / p());}
 
-      /*! get momentum azimuthal angle
+      /**
+       * get momentum azimuthal angle
        * @return momentum azimuthal angle
        */
       double phi() {return atan2(m_Py, m_Px);}
 
-      /*! get LUND code
+      /**
+       * get LUND code
        * @return LUND code
        */
       int Lund() {return m_LUND;}
 
-      /*! get first label
+      /**
+       * get first label
        * @return label
        */
       int Label() {return m_Label[0];}
 
-      /*! get label i
+      /**
+       * get label i
        * @param i label index (i=0...9)
        * @return label
        */
       int Label(unsigned int i) {if (i < 10) {return m_Label[i];} else {return 0;}}
 
-      /*! set label i
+      /**
+       * set label i
        * @param i label index (i=0...9)
        * @param label label to store
        */
       void setLabel(unsigned int i, int label) {if (i < 10) m_Label[i] = label;}
 
-      /*! get charge
+      /**
+       * get charge
        * @return charge
        */
       int Q() {return m_Q;}
 
-      /*! get internal particle code
+      /**
+       * get internal particle code
        * @return internal particle code: 1=e, 2=mu, 3=pi, 4=K, 5=p, 0=unknown
        */
       int Hyp();
 
-      /*! get bar ID
+      /**
+       * get bar ID
        * @return bar ID if hit, else -1
        */
       int QbarID() {return m_QbarID;}
 
-      /*! check if track is at TOP
+      /**
+       * check if track is at TOP
        * @return true or false
        */
       bool atTop() {return m_atTop;}
 
-      /*! propagate track to TOP counter
+      /**
+       * propagate track to TOP counter
        * @return bar ID if hit, else -1
        */
       int toTop();
 
-      /*! smear track
+      /**
+       * smear track
        * @param sig_x sigma in x
        * @param sig_z sigma in z
        * @param sig_theta sigma in theta
@@ -153,7 +183,8 @@ namespace Belle2 {
        */
       void smear(double sig_x, double sig_z, double sig_theta, double sig_phi);
 
-      /*! print track parameters to std output
+      /**
+       * print track parameters to std output
        */
       void Dump();
 

@@ -748,8 +748,8 @@ c--   sorting required: A>B>C
       ID=QBAR_EXT(LR,MDN)
       IF(ID.EQ.0) RETURN
       IF(EXT_SHAPE(ID).EQ.2) THEN
-         PHI0=ATAN2(EXT_YDN(ID)+QBAR_B(MDN)/2,EXT_DZ(ID))
-         PHI1=ATAN2(EXT_YUP(ID)-QBAR_B(MDN)/2,EXT_DZ(ID))
+         PHI0=ATAN2(EXT_YDN(ID)-EXT_YDNIN(ID),EXT_DZ(ID))
+         PHI1=ATAN2(EXT_YUP(ID)-EXT_YUPIN(ID),EXT_DZ(ID))
       ELSE
          PHI0=0.
          PHI1=0.
@@ -905,7 +905,5 @@ c--   sorting required: A>B>C
       K=K1
 
       END
-
-
 
 

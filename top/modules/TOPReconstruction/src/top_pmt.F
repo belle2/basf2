@@ -1,6 +1,6 @@
 !-----------------------------------------------------------------------
 ! TOP counter for Belle: initialization of/interface to TOP_PMT, TOP_QEFF
-! M. Staric, mar-2009, sept-2011
+! M. Staric, mar-2009, sept-2011, 
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 !-----------------------------------------------------------------------
 

@@ -1,7 +1,7 @@
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 // Fast simulation and reconstruction package for TOP counter (F77 core)
-// M. Staric, March-2009, Sept-2011
+// M. Staric, March-2009, Sept-2011, Avg-2013
 //-----------------------------------------------------------------------------
 //
 // TOPf77fun.h
@@ -19,7 +19,8 @@ extern "C" {
   void set_simu_par_(float*, float*);
   void set_qbar_redg_(float*);
   int set_qbar_(float*, float*, float*, float*, float*, float*, float*, int*, int*);
-  void set_extvol_(int*, int*, int*, float*, float*, float*);
+  void set_bbwin_(int*, float*);
+  void set_extvol_(int*, int*, int*, float*, float*, float*, float*, float*, float*, float*, float*);
   void arrange_pmt_(int*, int*, float*, float*, float*, float*);
   void set_rmi_(int*, float*);
   void set_xyc_(int*, float*, float*);
@@ -35,7 +36,8 @@ extern "C" {
   void track2top_(float*, float*, float*, float*, int*);
   void get_qbar_(int*, float*, float*, float*, int*, int*, int*, int*);
   void get_mirror_(int*, float*, float*, float*, float*, float*);
-  void get_expvol_(int*, float*, float*, float*, int*, int*);
+  void get_expvol_(int*, float*, float*, float*, float*, float*, float*, int*, int*);
+  float get_bbwin_(int*);
 
   // fortran functions defined in top_pmt.F
   void set_pmt_(float*, float*, float*, float*, int*, int*, float*);
@@ -49,16 +51,11 @@ extern "C" {
 
   // fortran functions defined in top_tdc.F
   void set_tdc_(int*, float*, float*);
+  void set_cfd_(float*, float*);
 
   // fortran functions defined in top_par.F
   void set_top_par_(float*, float*);
   void get_top_par_(float*, float*);
-
-  // fortran functions defined in top_mtra.F
-  //  void mtra_clear_();
-  //  void mtra_put_(float*,float*,float*,float*,float*,float*,float*,float*,int*,int*);
-  //  int mtra_getnum_();
-  //  void mtra_get_(int*,int*,int*,int*,int*);
 
   // fortran functions defined in top_rtra.F
   void rtra_clear_();
@@ -79,12 +76,6 @@ extern "C" {
   int data_getnum_();
   void data_get_(int*, int*, int*, int*);
 
-  // fortran functions defined in top_phot.F
-  //  int phot_getnum_();
-  //  void phot_get_(int*,int*,int*,float*,float*,int*,float*,float*,float*,float*,int*,int*);
-  //  void phot_get_e_(int*,float*,float*,float*,float*,float*,float*,float*,float*);
-  //  void phot_get_d_(int*,float*,float*,float*,float*,float*,float*,float*,float*);
-
   // fortran functions defined in top_digi_func.F
   int ich_digi_(float*, float*, int*, int*);
   int ich_digiz_(float*, float*, float*, int*);
@@ -94,24 +85,12 @@ extern "C" {
   int tdc_digi_(float*);
   float tdc_to_t_(int*);
 
-  // fortran functions defined in top_mcgen.F
-  //  void top_mcgen_();
-
   // fortran functions defined in top_reco.F
   void top_reco_();
   float cher_angle_(float*, float*, float*);
   void getnum_pulls_(int*);
   void get_pulls_(int*, float*, float*, float*, float*, float*, int*);
   float get_pdf_(int*, float*, float*);
-
-  // fortran functions defined in hbook_open.F
-  //  void hbook_open_(const char*, int );
-  //  void hbook_close_();
-
-  // fortran functions defined in top_hbook.F
-  //  void ntup_init_(int*,const char*,int );
-  //  void ntup_ffill_(const char*,float*,int );
-  //  void ntup_flush_();
 
 }
 

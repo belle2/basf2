@@ -39,6 +39,7 @@ c        4 spherical mirror
       REAL QBAR_XCMI(0:NSIZ_MOD-1)     ! x center-of-curvature (local frame)
       REAL QBAR_YCMI(0:NSIZ_MOD-1)     ! y center-of-curvature (local frame)
       REAL QBAR_ZCMI(0:NSIZ_MOD-1)     ! z center-of-curvature (local frame)
+      REAL QBAR_MIPOS(0:NSIZ_MOD-1)    ! mirror position: -1 on left, 1 on right
       REAL QBAR_ZL(0:NSIZ_MOD-1)       ! left-z of a block shaped part
       REAL QBAR_ZR(0:NSIZ_MOD-1)       ! right-z of a block shaped part
       INTEGER N_PMT(0:1,0:NSIZ_MOD-1)  ! number of PMT's per exit window
@@ -50,13 +51,15 @@ c        4 spherical mirror
       REAL PMT_DY(0:1,0:NSIZ_MOD-1)    ! PMT spacing in y [cm]
       INTEGER QBAR_NCH0(0:NSIZ_MOD-1)  ! num. of channels for LR=0 
       INTEGER QBAR_EXT(0:1,0:NSIZ_MOD-1) ! pointer to TOP_EXT 
+      REAL QBAR_WIN(0:NSIZ_MOD-1)      ! bar box exit window thickness 
 
       COMMON /TOP_GEO/ TOP_INI, B_FIELD, SIG_BEAM, TOP_R1, TOP_R2,
      &     TOP_Z1, TOP_Z2, QBAR_RADL, BGR_PER_QBAR, QBAR_REDG, LIN_OPT,
      &     NUM_MOD, QBAR_A, QBAR_B, QBAR_C, QBAR_R, QBAR_DX, QBAR_DZ,
      &     QBAR_FI, QBAR_CFI, QBAR_SFI, QBAR_LSIDE, QBAR_RSIDE,
-     &     QBAR_RMI, QBAR_XCMI, QBAR_YCMI, QBAR_ZCMI, QBAR_ZL, QBAR_ZR,
+     &     QBAR_RMI, QBAR_XCMI, QBAR_YCMI, QBAR_ZCMI, QBAR_MIPOS,
+     &     QBAR_ZL, QBAR_ZR,
      &     N_PMT, N_PMTX, N_PMTY, PMT_X0, PMT_Y0, PMT_DX, PMT_DY, 
-     &     QBAR_NCH0, QBAR_EXT, QBAR_FOCL
+     &     QBAR_NCH0, QBAR_EXT, QBAR_FOCL, QBAR_WIN
 
 

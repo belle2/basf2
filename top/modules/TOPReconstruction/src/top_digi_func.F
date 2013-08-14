@@ -1,6 +1,6 @@
 !-----------------------------------------------------------------------
 ! TOP counter for Belle: Digitization - basic functions and inverse functions
-! M. Staric, sept-2008, sept-2011
+! M. Staric, sept-2008, sept-2011, 
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 !-----------------------------------------------------------------------
 

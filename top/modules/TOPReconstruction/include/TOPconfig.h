@@ -1,7 +1,7 @@
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 // Fast simulation and reconstruction package for TOP counter (F77 core)
-// M. Staric, March-2009, Sept-2011
+// M. Staric, March-2009, Sept-2011, Avg-2013
 //-----------------------------------------------------------------------------
 //
 // TOPconfig.h
@@ -19,14 +19,23 @@
 namespace Belle2 {
   namespace TOP {
 
-    /*! exit window types */
+    /**
+     * exit window types
+     */
     enum {None = 0, PMT, PlaneM, CylindricM, SphericM};
-    /*! argument LR */
+
+    /**
+     * argument LR
+     */
     enum {Left = 0, Right = 1};
-    /*! expansion volume shapes */
+
+    /**
+     * expansion volume shapes
+     */
     enum {NoRefl = 0, Box, Prism};
 
-    /*! define TOP counter volume (must be called first)
+    /**
+     * define TOP counter volume (must be called first)
      * @param R1 inner radius of TOP volume
      * @param R2 outer radius of TOP volume
      * @param Z1 backward border of TOP volume
@@ -39,7 +48,8 @@ namespace Belle2 {
       set_topvol_(&r1, &r2, &z1, &z2);
     }
 
-    /*! set magnetic field (use negative value to reverse polarity)
+    /**
+     * set magnetic field (use negative value to reverse polarity)
      * @param B magnetic field
      */
     inline void setBfield(double B)
@@ -48,7 +58,8 @@ namespace Belle2 {
       set_bfield_(&b);
     }
 
-    /*! set bar edge roughness (radius)
+    /**
+     * set bar edge roughness (radius)
      * @param R roughness
      */
     inline void setEdgeRoughness(double R)
@@ -57,7 +68,8 @@ namespace Belle2 {
       set_qbar_redg_(&r);
     }
 
-    /*! define PMT dimensions (must be called prior to setQbar)
+    /**
+     * define PMT dimensions (must be called prior to setQbar)
      * @param A size in x
      * @param B size in y
      * @param Asens sensitive area in x
@@ -75,7 +87,8 @@ namespace Belle2 {
       set_pmt_(&a, &b, &aa, &bb, &Nx, &Ny, &tts);
     }
 
-    /*! define TTS with multi-gaussian PDF
+    /**
+     * define TTS with multi-gaussian PDF
      * @param ng number of Gaussian terms
      * @param Frac fractions of Gaussian terms
      * @param Mean mean values of Gaussian terms
@@ -92,7 +105,8 @@ namespace Belle2 {
       set_tts_(&ng, frac, t0, sig);
     }
 
-    /*! read quantum efficencies from file
+    /**
+     * read quantum efficencies from file
      * @param file file name
      * @param CE electron collection efficiency
      */
@@ -102,7 +116,8 @@ namespace Belle2 {
       read_qeffi_(file, &ce, len);
     }
 
-    /*! set quantum efficiency
+    /**
+     * set quantum efficiency
      * @param Wavelength wavelength values
      * @param QE quantum efficiency values
      * @param Size array size
@@ -119,7 +134,8 @@ namespace Belle2 {
       set_qeffi_(lam, qef, &Size, &ce);
     }
 
-    /*! define bar geometry; returns QbarID
+    /**
+     * define bar geometry; returns QbarID
      * @param A bar width
      * @param B bar thickness
      * @param Z1 backward window position
@@ -141,22 +157,45 @@ namespace Belle2 {
       return id;
     }
 
-    /*! add i-TOP expansion volume
+    /**
+     * add QBB exit window
+     * @param QbarID bar ID
+     * @param thickness window thickness
+     */
+    inline void setBBoxWindow(int QbarID, double thickness)
+    {
+      float d = thickness;
+      set_bbwin_(&QbarID, &d);
+    }
+
+    /**
+     * add i-TOP expansion volume
      * @param QbarID bar ID
      * @param LR Left or Right
      * @param Shape shape (Box, Prism, etc.)
      * @param Dz length
      * @param Yup uppermost y
      * @param Ydown lowermost y
+     * @param YupIn uppermost y at bar
+     * @param YdownIn lowermost y at bar
+     * @param Width width (0 means same width as bar)
+     * @param DzRefl length of the reflective part at exit
+     * @param Refl reflectivity of that part
      */
-    inline void addExpansionVolume(int QbarID, int LR, int Shape, double Dz, double Yup,
-                                   double Ydown)
+    inline void addExpansionVolume(int QbarID, int LR, int Shape, double Dz,
+                                   double Yup, double Ydown,
+                                   double YupIn = 0, double YdownIn = 0,
+                                   double Width = 0, double DzRefl = 0, double Refl = 0)
     {
-      float dz = (float) Dz; float yup = (float) Yup; float ydn = (float) Ydown;
-      set_extvol_(&QbarID, &LR, &Shape, &dz, &yup, &ydn);
+      float dz = Dz; float yup = Yup; float ydn = Ydown; float a = Width;
+      float yupi = YupIn; float ydni = YdownIn;
+      float dzrefl = DzRefl; float refl = Refl;
+      set_extvol_(&QbarID, &LR, &Shape, &dz, &yup, &ydn, &a, &yupi, &ydni,
+                  &dzrefl, &refl);
     }
 
-    /*! re-arrange PMT's at (both) exit window(s)
+    /**
+     * re-arrange PMT's at (both) exit window(s)
      * @param QbarID bar ID
      * @param sizX box size in x
      * @param sizY box size in y
@@ -174,7 +213,8 @@ namespace Belle2 {
       arrange_pmt_(&QbarID, &LR, &sizx, &sizy, &dx, &dy);
     }
 
-    /*! re-arrange PMT's at exit window LR
+    /**
+     * re-arrange PMT's at exit window LR
      * @param QbarID bar ID
      * @param LR Left or Right
      * @param sizX box size in x
@@ -190,7 +230,8 @@ namespace Belle2 {
       arrange_pmt_(&QbarID, &LR, &sizx, &sizy, &dx, &dy);
     }
 
-    /*! set mirror radius
+    /**
+     * set mirror radius
      * @param QbarID bar ID
      * @param R radius
      */
@@ -200,7 +241,8 @@ namespace Belle2 {
       set_rmi_(&QbarID, &r);
     }
 
-    /*! set mirror center
+    /**
+     * set mirror center
      * @param QbarID bar ID
      * @param Xc center of curvature in x (local frame)
      * @param Yc center of curvature in y (local frame)
@@ -211,7 +253,8 @@ namespace Belle2 {
       set_xyc_(&QbarID, &xc, &yc);
     }
 
-    /*! define TDC
+    /**
+     * define TDC
      * @param NBIT   number of bits
      * @param ChWid  channel width
      * @param Offset offset
@@ -222,7 +265,19 @@ namespace Belle2 {
       set_tdc_(&NBIT, &chwid, &offset);
     }
 
-    /*! finalize TOP configuration (must be called last)
+    /**
+     * define CFD
+     * @param delTpileup pileup time
+     * @param delTdoubleHit double hit resolution
+     */
+    inline void setCFD(double delTpileup, double delTdoubleHit)
+    {
+      float dt = delTpileup; float delt = delTdoubleHit;
+      set_cfd_(&dt, &delt);
+    }
+
+    /**
+     * finalize TOP configuration (must be called last)
      * @param Dump print configuration to std output
      * @return true if successfull
      */

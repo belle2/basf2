@@ -1,6 +1,6 @@
 !-----------------------------------------------------------------------
 ! TOP counter for Belle: Helix
-! M. Staric, oct-2008, jan-2010 (added B=0 case)
+! M. Staric, oct-2008, jan-2010 (added B=0 case), 
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 !
 ! Helix along z-axis; t'=t*beta is running parameter

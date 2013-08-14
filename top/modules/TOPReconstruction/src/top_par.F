@@ -1,6 +1,6 @@
 !-----------------------------------------------------------------------
 ! TOP counter for Belle: initialization/interface of TOP_PAR, TOP_CONS
-! M. Staric, mar-2009
+! M. Staric, mar-2009, 
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 !-----------------------------------------------------------------------
 

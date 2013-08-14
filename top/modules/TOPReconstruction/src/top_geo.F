@@ -1,7 +1,7 @@
 !-----------------------------------------------------------------------
 ! TOP counter for Belle: initialization of/interface to TOP_GEO
 !                        quartz data, mirror reflectivity
-! M. Staric, mar-2009, feb-2010, sept-2011
+! M. Staric, mar-2009, feb-2010, sept-2011, jan-2012
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 !-----------------------------------------------------------------------
 
@@ -112,8 +112,10 @@ c--   returns module ID or -1 (=failure)
       QBAR_XCMI(K)=0.
       QBAR_YCMI(K)=0.
       QBAR_ZCMI(K)=0.
+      QBAR_MIPOS(K)=0.
       QBAR_ZL(K)=-C/2
       QBAR_ZR(K)= C/2
+      QBAR_WIN(K)=0.
       IF(LSIDE.EQ.1.OR.RSIDE.EQ.1) THEN
          QBAR_LSIDE(K)=LSIDE
          QBAR_RSIDE(K)=RSIDE
@@ -123,6 +125,8 @@ c--   returns module ID or -1 (=failure)
             QBAR_YCMI(K)=B/2
             CALL SET_ZCMI(K)
          ENDIF
+         IF(LSIDE.GT.1) QBAR_MIPOS(K)=-1.
+         IF(RSIDE.GT.1) QBAR_MIPOS(K)=1.
       ELSE
          QBAR_LSIDE(K)=0
          QBAR_RSIDE(K)=0
@@ -139,17 +143,36 @@ c--   returns module ID or -1 (=failure)
       END
 
 
-      SUBROUTINE SET_EXTVOL(ID,LR,SHAPE,DZE,YUPE,YDNE)
+      SUBROUTINE SET_BBWIN(ID,D)
+
+      IMPLICIT NONE
+      INTEGER ID                ! module ID
+      REAL D                    ! thickness
+
+#include "TOP_GEO.fi"
+
+      IF(ID.LT.0.OR.ID.GE.NUM_MOD) RETURN
+      IF(D>0) QBAR_WIN(ID)=D
+
+      END
+
+
+      SUBROUTINE SET_EXTVOL(ID,LR,SHAPE,DZE,YUPE,YDNE,XSIZ,
+     &     YUPI,YDNI,DZREFL,REFL)
 
       IMPLICIT NONE
       INTEGER ID                ! module ID
       INTEGER LR                ! 0/1=left/right
       INTEGER SHAPE             ! shape, 0/1/2=noRefl/Box/Prism
       REAL DZE, YUPE, YDNE      ! exp. volume geo [cm]
+      REAL XSIZ                 ! width if >0 else bar width used
+      REAL YUPI, YDNI           ! input window if>0 else bar used
+      REAL DZREFL, REFL         ! reflective part
 
 #include "TOP_GEO.fi"
 #include "TOP_EXT.fi"
-      REAL DZ, YUP, YDN, ZZ
+      REAL DZ, YUP, YDN, ZZ, A
+      REAL YUPIN, YDNIN
       INTEGER TYP(0:1)
       INTEGER K
 
@@ -158,11 +181,18 @@ c--   returns module ID or -1 (=failure)
          RETURN
       ENDIF
 
+      IF(ID.LT.0.OR.ID.GE.NUM_MOD) RETURN
       TYP(0)=QBAR_LSIDE(ID)
       TYP(1)=QBAR_RSIDE(ID)
       IF(TYP(LR).NE.1) RETURN
 
       DZ=ABS(DZE)
+      A=XSIZ
+      IF(A.LE.0) A=QBAR_A(ID)
+      YUPIN=YUPI
+      IF(YUPIN.EQ.0) YUPIN=QBAR_B(ID)/2
+      YDNIN=YDNI
+      IF(YDNIN.EQ.0) YDNIN=-QBAR_B(ID)/2
       IF(YUPE.GT.YDNE) THEN
          YUP=YUPE
          YDN=YDNE
@@ -170,9 +200,16 @@ c--   returns module ID or -1 (=failure)
          YUP=YDNE
          YDN=YUPE
       ENDIF
+      IF(SHAPE.EQ.1) THEN
+         YUPIN=YUP
+         YDNIN=YDN
+      ENDIF
 
       DO K=1,NUM_EXT
          IF(EXT_DZ(K).EQ.DZ.AND.EXT_YUP(K).EQ.YUP.AND.EXT_YDN(K).EQ.YDN
+     &        .AND.EXT_YUPIN(K).EQ.YUPIN.AND.EXT_YDNIN(K).EQ.YDNIN
+     &        .AND.EXT_A(K).EQ.A.AND.EXT_DZREFL(K).EQ.DZREFL
+     &        .AND.EXT_REFL(K).EQ.REFL
      &        .AND.EXT_LR(K).EQ.LR.AND.EXT_SHAPE(K).EQ.SHAPE) THEN 
             EXIT
          ENDIF
@@ -183,12 +220,17 @@ c--   returns module ID or -1 (=failure)
          EXT_DZ(K)=DZ
          EXT_YUP(K)=YUP
          EXT_YDN(K)=YDN
+         EXT_YUPIN(K)=YUPIN
+         EXT_YDNIN(K)=YDNIN
+         EXT_A(K)=A
+         EXT_DZREFL(K)=DZREFL
+         EXT_REFL(K)=REFL
          EXT_SHAPE(K)=SHAPE
          EXT_LR(K)=LR
          NUM_EXT=K
       ENDIF
       QBAR_EXT(LR,ID)=K
-      CALL ARRANGE_PMT(ID,LR,QBAR_A(ID),YUP-YDN,0.,0.)
+      CALL ARRANGE_PMT(ID,LR,A,YUP-YDN,0.,0.)
       QBAR_FOCL(ID)=QBAR_C(ID)+EXT_DZ(K)
       IF(LR.EQ.0) THEN
          ZZ=QBAR_ZL(ID)-EXT_DZ(K)+QBAR_DZ(ID)
@@ -388,26 +430,29 @@ c-- internal functions --------------------------------------------------
       PRINT*
 
       PRINT*,'ID     A      B      C    Rxy     Dx     Dz     PHI  L  R
-     &   Rmi     Xc     Yc     Zc    Zl     Zr  NpmtL NpmtR ExtL ExtR'
+     &   Rmi     Xc     Yc     Zc    Zl     Zr  NpmtL NpmtR ExtL ExtR bb
+     &win'
 
       DO I=0,NUM_MOD-1
          PRINT 100,I,QBAR_A(I),QBAR_B(I),QBAR_C(I),QBAR_R(I),QBAR_DX(I),
      &        QBAR_DZ(I),QBAR_FI(I)/PI*180.,QBAR_LSIDE(I),QBAR_RSIDE(I),
      &        QBAR_RMI(I),QBAR_XCMI(I),QBAR_YCMI(I),QBAR_ZCMI(I),
      &        QBAR_ZL(I),QBAR_ZR(I),N_PMT(0,I),N_PMT(1,I),QBAR_EXT(0,I),
-     &        QBAR_EXT(1,I)
+     &        QBAR_EXT(1,I),QBAR_WIN(I)
       ENDDO
- 100  FORMAT(I3,7F7.1,2I3,6F7.1,4I5)
+ 100  FORMAT(I3,7F7.1,2I3,6F7.1,4I5,F6.2)
       IF(NUM_EXT.GT.0) THEN
          PRINT*
          PRINT*,'Expansion volume(s):'
-         PRINT*,' I Shape LR    Dz     Yup     Ydn'
+         PRINT*,' I Shape LR    Dz      Yup     Ydn     A      YupIn   Y
+     &dnIn   DzRefl  Refl'
          DO I=1,NUM_EXT
             PRINT 101,I,EXT_SHAPE(I),EXT_LR(I),EXT_DZ(I),EXT_YUP(I),
-     &           EXT_YDN(I)
+     &           EXT_YDN(I),EXT_A(I),EXT_YUPIN(I),EXT_YDNIN(I),
+     &           EXT_DZREFL(I),EXT_REFL(I)
          ENDDO
       ENDIF
- 101  FORMAT(I3,2I4,3F8.2)
+ 101  FORMAT(I3,2I4,8F8.2)
       PRINT*
 
       END
@@ -672,13 +717,11 @@ c-- utility functions (moved from top_mcgen.F + new) -------------------
 #include "TOP_GEO.fi"
 #include "TOP_EXT.fi"
       INTEGER LR, K
-      REAL Z, BH, ZZ
+      REAL Z, ZZ, Y
 
 
       INSIDE_EXTVOL=.FALSE.
       IF(M.LT.0.OR.M.GE.NUM_MOD) RETURN
-      IF(ABS(XP).GT.QBAR_A(M)/2) RETURN
-      BH=QBAR_B(M)/2
       ZZ=ZP
       DO LR=0,1
          K=QBAR_EXT(LR,M)
@@ -687,11 +730,14 @@ c-- utility functions (moved from top_mcgen.F + new) -------------------
          ZZ=-ZZ
          Z=ABS(ZP)-QBAR_C(M)/2
          IF(Z.LT.0.OR.Z.GT.EXT_DZ(K)) CYCLE
-         IF(YP.LT.MIN(EXT_YDN(K),-BH)) CYCLE
-         IF(YP.GT.MAX(EXT_YUP(K),BH)) CYCLE
+         IF(ABS(XP).GT.EXT_A(K)/2) RETURN
+         IF(YP.LT.MIN(EXT_YDN(K),EXT_YDNIN(K))) CYCLE
+         IF(YP.GT.MAX(EXT_YUP(K),EXT_YUPIN(K))) CYCLE
          IF(EXT_SHAPE(K).EQ.2) THEN
-            IF(YP.GT.(EXT_YUP(K)-BH)/EXT_DZ(K)*Z+BH) CYCLE
-            IF(YP.LT.(EXT_YDN(K)+BH)/EXT_DZ(K)*Z-BH) CYCLE
+            Y=(EXT_YUP(K)-EXT_YUPIN(K))/EXT_DZ(K)*Z+EXT_YUPIN(K)
+            IF(YP.GT.Y) CYCLE
+            Y=(EXT_YDN(K)-EXT_YDNIN(K))/EXT_DZ(K)*Z+EXT_YDNIN(K)
+            IF(YP.LT.Y) CYCLE
          ENDIF
          INSIDE_EXTVOL=.TRUE.
          RETURN
@@ -897,11 +943,11 @@ c-- utility functions (moved from top_mcgen.F + new) -------------------
       END
 
 
-      SUBROUTINE GET_EXPVOL(ID,DZ,YUP,YDN,SHAPE,LR)
+      SUBROUTINE GET_EXPVOL(ID,DZ,YUP,YDN,YUPIN,YDNIN,A,SHAPE,LR)
       
       IMPLICIT NONE
       INTEGER ID
-      REAL DZ, YUP, YDN
+      REAL DZ, YUP, YDN, YUPIN, YDNIN, A
       INTEGER SHAPE, LR
 #include "TOP_EXT.fi"
 
@@ -915,7 +961,28 @@ c-- utility functions (moved from top_mcgen.F + new) -------------------
       DZ=EXT_DZ(ID)
       YUP=EXT_YUP(ID)
       YDN=EXT_YDN(ID)
+      YUPIN=EXT_YUPIN(ID)
+      YDNIN=EXT_YDNIN(ID)
+      A=EXT_A(ID)
       SHAPE=EXT_SHAPE(ID)
       LR=EXT_LR(ID)
       END
+
+
+
+      REAL FUNCTION GET_BBWIN(ID)
+
+      IMPLICIT NONE
+      INTEGER ID                ! module ID
+
+#include "TOP_GEO.fi"
+
+      IF(ID.GE.0.AND.ID.LT.NUM_MOD) THEN
+         GET_BBWIN=QBAR_WIN(ID)
+      ELSE
+         GET_BBWIN=0.
+      ENDIF
+
+      END
+
 

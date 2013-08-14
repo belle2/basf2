@@ -24,3 +24,15 @@
       END
 
 
+      SUBROUTINE SET_CFD(DT, DELT)
+      
+      IMPLICIT NONE
+      REAL DT                   ! CFD pile-up time [ns]
+      REAL DELT                 ! CFD double pulse resolution [ns]
+#include "TOP_TDC.fi"
+
+      CFD_DT=DT
+      CFD_DELT=DELT
+
+      END
+

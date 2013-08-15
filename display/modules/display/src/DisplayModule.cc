@@ -79,6 +79,10 @@ void DisplayModule::initialize()
     GFFieldManager::getInstance()->init(new GFGeant4Field());
     GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
   }
+  if (!gGeoManager) {
+    B2ERROR("Couldn't create TGeo geometry!");
+    return;
+  }
 
   m_display = new DisplayUI(m_automatic);
   //pass some parameters to DisplayUI to be able to change them at run time

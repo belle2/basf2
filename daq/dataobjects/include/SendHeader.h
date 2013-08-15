@@ -25,25 +25,30 @@ namespace Belle2 {
     SendHeader();
 
     //! Constructor using existing pointer to raw data buffer
-    SendHeader(unsigned int*);
+    SendHeader(int*);
     //! Destructor
     ~SendHeader();
 
     //! Get Header contents
-    unsigned int* header(void);
+    int* GetBuffer(void);
 
     //! set buffer
-    void header(unsigned int* hdr);
+    void SetBuffer(int* hdr);
 
-    void initialize(); //! initialize Header
+    void Initialize(); //! initialize Header
 
-    void set_nwords(int total_data_nwords);    //! set contents of Header
+    void SetNwords(int total_data_nwords);    //! set contents of Header
 
-    void set_num_events_in_packet(int num_events);
+    void SetNumEventsinPacket(int num_events);
 
-    int get_nwords();  //! get contents of Header
-    int get_hdr_nwords();  //! get contents of Header
-    int get_num_events_in_packet();
+    int GetTotalNwords();  //! get contents of Header
+    int GetHdrNwords();  //! get contents of Header
+    int GetNumEventsinPacket();
+
+    /* Data Format : Node info */
+    enum {
+      SENDHDR_NWORDS = 4
+    };
 
   private:
 
@@ -55,13 +60,9 @@ namespace Belle2 {
       POS_RESERVED_0 = 3,
     };
 
-    /* Data Format : Node info */
-    enum {
-      NUM_HDR_WORDS = 4
-    };
 
 
-    unsigned int m_header[ NUM_HDR_WORDS ];
+    int m_buffer[ SENDHDR_NWORDS ];
 
     ClassDef(SendHeader, 1);
   };

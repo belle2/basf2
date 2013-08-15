@@ -70,6 +70,9 @@ namespace Belle2 {
     //!    StoreObjPtr<RawCOPPER> m_rawcopper;
     StoreArray<RawCOPPER> rawcprarray;
 
+    //! # of events in a run
+    int max_nevt;
+
     //! Compression Level
     int m_compressionLevel;
 

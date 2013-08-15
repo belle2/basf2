@@ -15,48 +15,50 @@ ClassImp(SendHeader);
 
 SendHeader::SendHeader()
 {
-  initialize();
+  Initialize();
   //  cout << "SendHeader NULL constructor" << endl;
 }
 
-SendHeader::SendHeader(unsigned int* buffer)
+SendHeader::SendHeader(int* buffer)
 {
   //  cout << "SendHeader constructor with buffer" << endl;
-  memcpy(m_header, buffer, NUM_HDR_WORDS * sizeof(int));
+  memcpy(m_buffer, buffer, SENDHDR_NWORDS * sizeof(int));
 }
 
 SendHeader::~SendHeader()
 {
 }
 
-unsigned int* SendHeader::header()
+int* SendHeader::GetBuffer()
 {
-  return m_header;
+  return m_buffer;
 }
 
-void SendHeader::header(unsigned int* bufin)
+void SendHeader::SetBuffer(int* bufin)
 {
-  memcpy(m_header, bufin, NUM_HDR_WORDS * sizeof(int));
+  memcpy(m_buffer, bufin, SENDHDR_NWORDS * sizeof(int));
 }
 
-void SendHeader::initialize()
+void SendHeader::Initialize()
 {
-  memset(m_header, 0, sizeof(int)* NUM_HDR_WORDS);
-  m_header[ POS_HDR_NWORDS ] = NUM_HDR_WORDS;
+  memset(m_buffer, 0, sizeof(int)* SENDHDR_NWORDS);
+  m_buffer[ POS_HDR_NWORDS ] = SENDHDR_NWORDS;
 }
 
-void SendHeader::set_nwords(int total_data_nwords)
+void SendHeader::SetNwords(int total_data_nwords)
 {
-  m_header[ POS_NWORDS ] = total_data_nwords;
+  m_buffer[ POS_NWORDS ] = total_data_nwords;
 }
 
-void SendHeader::set_num_events_in_packet(int num_events)
+void SendHeader::SetNumEventsinPacket(int num_events)
 {
-  m_header[ POS_NUM_EVENTS_IN_PACKET ] = num_events;
+  m_buffer[ POS_NUM_EVENTS_IN_PACKET ] = num_events;
 }
 
 
-int SendHeader::get_nwords() {  return m_header[ POS_NWORDS ];}
-int SendHeader::get_hdr_nwords() {    return NUM_HDR_WORDS; }
-int SendHeader::get_num_events_in_packet() {  return m_header[ POS_NUM_EVENTS_IN_PACKET ]; }
+int SendHeader::GetTotalNwords() {  return m_buffer[ POS_NWORDS ];}
+int SendHeader::GetHdrNwords() {    return SENDHDR_NWORDS; }
+int SendHeader::GetNumEventsinPacket() {  return m_buffer[ POS_NUM_EVENTS_IN_PACKET ]; }
+
+
 

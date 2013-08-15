@@ -56,7 +56,7 @@ namespace Belle2 {
 
   protected :
     //! Accept connection
-    virtual int Accept();
+    virtual int Connect();
 
     //! receive data
     virtual int Recv(int fd, char* buf, int data_size_byte, int flag);
@@ -64,18 +64,23 @@ namespace Belle2 {
     //! receive data
     virtual int* RecvSocketData(int* malloc_flag, int* total_m_size_word, int* default_buf);
 
-    //! Local host address
-    std::string m_local;
-
-    //! Receiver Port
-    int m_base_port;
+    //! buffer after removing SendHeaader and SendTrailer
+    int* m_bufary_body[NUM_EVT_PER_BASF2LOOP];
 
     //! # of connections
-    int num_connections;
+    int m_num_connections;
+
+    //! Reciever basf2 Socket
+    std::vector<EvtSocketRecv*> m_recv;
 
     //! Reciever Socket
-    std::vector<EvtSocketRecv*> m_recv;
     std::vector<int> m_socket;
+
+    //! hostname of upstream Data Sources
+    std::vector<std::string> m_hostname_from;
+
+    //! port # to connect data sources
+    std::vector<int> m_port_from;
 
 
     // Data members

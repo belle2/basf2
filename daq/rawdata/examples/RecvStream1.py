@@ -25,16 +25,17 @@ set_log_level(LogLevel.ERROR)
 
 # Modules
 receiver = register_module('DeSerializerPC')
-dump = register_module('PrintCollections')
+# dump = register_module('PrintCollections')
+dump = register_module('RootOutput')
 perf = register_module('DAQPerf')
 
 # RxSocket
-receiver.param('RecvBasePort', 33000)
-receiver.param('NumConn', 1)
-receiver.param('LocalHostName', 'ropc01')
+receiver.param('NumConn', 2)
+receiver.param('HostNameFrom', ['cpr006', 'cpr007'])
+receiver.param('PortFrom', [33000, 33000])
 receiver.param('EventDataBufferWords', 4801)
 
-receiver.param('DumpFileName', 'ROPC01dump.dat')
+# receiver.param('DumpFileName', 'ROPC01dump.dat' )
 
 # Perf
 perf.param('Cycle', 100000)
@@ -45,7 +46,7 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(receiver)
-# main.add_module(dump)
+main.add_module(dump)
 # main.add_module(perf)
 
 # Process all events

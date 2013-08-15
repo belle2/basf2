@@ -13,6 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#define HEADER_SIZE 23
 
 using namespace std;
 using namespace Belle2;
@@ -100,7 +101,7 @@ void GenRawSendModule::event()
 
   // Create RawCOPPER and fill buffer
   m_rawcopper.create();
-  int* buf = m_rawcopper->allocate_buffer(m_size + HEADER_SIZE);
+  int* buf = m_rawcopper->AllocateBuffer(m_size + HEADER_SIZE);
   buf[0] = m_size + HEADER_SIZE;
   buf[1] = HEADER_SIZE;
   buf[2] = m_size;

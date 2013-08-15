@@ -66,13 +66,14 @@ namespace Belle2 {
     virtual void SendOneBuffer(RawCOPPER* rawcpr);
     virtual void SendOneByOne(RawCOPPER* rawcpr);
     virtual void SendByWriteV(RawCOPPER* rawcpr);
-    virtual void Connect(const char* hostname, const int port);
+    //    virtual void Connect(const char* hostname, const int port);
+    virtual void Accept();
+
     virtual void VerifyCheckSum(int* buf);
     virtual void FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawCOPPER* rawcpr);
     // Data members
+
   protected :
-
-
 
     enum {
       COPPER = 1,
@@ -96,10 +97,10 @@ namespace Belle2 {
     // Parameters for EvtSocket
 
     //! Destination Host
-    std::string m_dest;
+    std::string m_hostname_local;
 
     //! Destination port
-    int m_port;
+    int m_port_to;
 
     //! Socket ID
     int m_socket;

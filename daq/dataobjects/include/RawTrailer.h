@@ -11,6 +11,8 @@
 
 #include <string.h>
 
+#include <stdlib.h>
+
 #include <framework/datastore/DataStore.h>
 
 #include <TObject.h>
@@ -33,29 +35,31 @@ namespace Belle2 {
     //! Default constructor
     RawTrailer();
 
-    //! Constructor using existing pointer to raw data buffer
-    RawTrailer(unsigned int*);
-
     //! Destructor
     ~RawTrailer();
 
-    unsigned int* trailer(); //! return buffer
+    void CheckBuffer(); //! set buffer
 
-    void trailer(unsigned int* bufin); //! set buffer
+    int* GetBuffer(); //! return buffer
 
-    void initialize(); //! initialize header
+    void SetBuffer(int* bufin); //! set buffer
 
-    void set_chksum(int chksum);   //! initialize header
+    void Initialize(); //! set buffer
 
-    void set_magic_word(); //!
+    void SetChksum(int chksum);   //! initialize header
 
-    int get_trl_nwords(); //!
+    void SetMagicWord(); //!
 
-    unsigned int get_magic_word(); //!
+    int GetTrlNwords(); //!
+
+    int GetMagicWord(); //!
+
+    enum {
+      RAWTRAILER_NWORDS = 2
+    };
 
   private:
     enum {
-      RAWCOPPER_TRAILER_SIZE = 2,
       MAGIC_WORD_TERM_TRAILER = 0x7fff0006
     };
 
@@ -63,7 +67,11 @@ namespace Belle2 {
       POS_CHKSUM = 0,
       POS_TERM_WORD = 1
     };
-    unsigned int m_trailer[RAWCOPPER_TRAILER_SIZE];
+
+    //    unsigned int m_trailer[RAWCOPPER_TRAILER_SIZE];
+    int* m_buffer;
+
+
     ClassDef(RawTrailer, 1);
   };
 }

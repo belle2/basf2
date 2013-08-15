@@ -29,6 +29,7 @@ DeSerializerModule::DeSerializerModule() : Module()
 
   addParam("DumpFileName", dump_fname, "filename to record data", string(""));
   addParam("EventDataBufferWords", BUF_SIZE_WORD, "DataBuffer words per event", 4800);
+  addParam("MaxEventNum", max_nevt, "Maximum event number in one run", -1);
 
 
   n_basf2evt = -1;

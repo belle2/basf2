@@ -129,45 +129,54 @@ void DeSerializerCOPPERModule::initialize()
 void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 {
 
-  RawHeader* raw_header = &(raw_copper->m_header);
-  RawTrailer* raw_trailer = &(raw_copper->m_trailer);
+  RawHeader* raw_header;
+  if ((raw_header = raw_copper->GetRawHeader()) == NULL) {
+    perror("No RawHeaader is available. Exiting...");
+    exit(1);
+  }
+
+  RawTrailer* raw_trailer;
+  if ((raw_trailer = raw_copper->GetRawTrailer()) == NULL) {
+    perror("No RawTrailer is available. Exiting...");
+    exit(1);
+  }
 
 
   //
   // initialize header and trailer
   //
-  raw_header->initialize();
-  raw_trailer->initialize();
+  raw_header->Initialize();
+  raw_trailer->Initialize();
 
   //
   // Add node-info
   //
-  int eve_no = raw_copper->get_coppereve_no() ; //tentative
-  raw_header->add_nodeinfo_and_update_hdrsize(raw_copper->get_copper_node_id(), eve_no);
+  int eve_no = raw_copper->GetCoppereveNo() ; //tentative
+  raw_header->AddNodeInfo(raw_copper->GetCopperNodeId());
 
   //
   // Obtain info from Rawdata
   //
-  raw_header->set_eve_no(raw_copper->get_coppereve_no());
-  raw_header->set_subsys_id(raw_copper->get_subsys_id());
-  raw_header->set_num_b2l_block(raw_copper->get_num_b2l_block());
-  raw_header->set_offset_1st_b2l(raw_copper->offset_1st_b2l_wo_rawhdr() + raw_header->get_hdr_nwords());
-  raw_header->set_offset_2nd_b2l(raw_copper->offset_2nd_b2l_wo_rawhdr() + raw_header->get_hdr_nwords());
-  raw_header->set_offset_3rd_b2l(raw_copper->offset_3rd_b2l_wo_rawhdr() + raw_header->get_hdr_nwords());
-  raw_header->set_offset_4th_b2l(raw_copper->offset_4th_b2l_wo_rawhdr() + raw_header->get_hdr_nwords());
+  raw_header->SetEveNo(raw_copper->GetCoppereveNo());
+  raw_header->SetSubsysId(raw_copper->GetSubsysId());
+  raw_header->SetNumB2lBlock(raw_copper->GetNumB2lBlock());
+  raw_header->SetOffset1stB2l(raw_copper->Offset1stB2lWoRawhdr() + raw_header->GetHdrNwords());
+  raw_header->SetOffset2ndB2l(raw_copper->Offset2ndB2lWoRawhdr() + raw_header->GetHdrNwords());
+  raw_header->SetOffset3rdB2l(raw_copper->Offset3rdB2lWoRawhdr() + raw_header->GetHdrNwords());
+  raw_header->SetOffset4thB2l(raw_copper->Offset4thB2lWoRawhdr() + raw_header->GetHdrNwords());
 
   //
   // Obtain info from SlowController
   //
   int dummy_exp_no = 0, dummy_run_no = 0;
-  raw_header->set_exp_no(dummy_exp_no);
-  raw_header->set_run_no(dummy_run_no);
+  raw_header->SetExpNo(dummy_exp_no);
+  raw_header->SetRunNo(dummy_run_no);
 
   //
   // Needs definition or not used
   //
   int dummy_data_type = 0;
-  raw_header->set_data_type(dummy_data_type);
+  raw_header->SetDataType(dummy_data_type);
   //  raw_header->set_trunc_mask( int trunc_mask );
 
 
@@ -175,10 +184,10 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   // Set total words info
   //
   int nwords =
-    raw_header->get_hdr_nwords()
-    + raw_trailer->get_trl_nwords()
-    + raw_copper->get_body_nwords();
-  raw_header->set_nwords(nwords);
+    raw_header->GetHdrNwords()
+    + raw_trailer->GetTrlNwords()
+    + raw_copper->GetBodyNwords();
+  raw_header->SetNwords(nwords);
 
 
   // Check magic words are set at proper positions
@@ -217,7 +226,12 @@ void DeSerializerCOPPERModule::event()
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
     int m_size_word = 0;
     int malloc_flag = 0;
+
+#ifdef CLONE_ARRAY
+
     int* temp_buf = ReadCOPPERFIFO(j, &malloc_flag, &m_size_word);
+#endif
+
 
     //
     // Fill RawCOPPER
@@ -227,11 +241,11 @@ void DeSerializerCOPPERModule::event()
 #ifdef CLONE_ARRAY
     temp_rawcopper =  rawcprarray.appendNew();
     // Store data buffer
-    temp_rawcopper->buffer(temp_buf, m_size_word, malloc_flag);
+    temp_rawcopper->SetBuffer(temp_buf, m_size_word, malloc_flag);
     // Fill header and trailer
     FillNewRawCOPPERHeader(temp_rawcopper);
 #else
-    m_rawcopper->buffer(temp_buf, m_size_word, malloc_flag);
+    m_rawcopper->SetBuffer(temp_buf, m_size_word, malloc_flag);
     //FillNewRawCOPPERHeader( m_rawcopper );
 #endif
 
@@ -312,7 +326,10 @@ void DeSerializerCOPPERModule::event()
 
 int* DeSerializerCOPPERModule::ReadCOPPERFIFO(const int entry, int* malloc_flag, int* m_size_word)
 {
+  // Get header size
+  const int COPPER_HEADER_TRAILER_NWORDS = 9;
 
+  // prepare buffer
   *m_size_word = 0;
   int* temp_buf = m_bufary[ entry ];
   temp_buf[0] =  BUF_SIZE_WORD ;
@@ -322,9 +339,8 @@ int* DeSerializerCOPPERModule::ReadCOPPERFIFO(const int entry, int* malloc_flag,
   //
   // Read data from HSLB
   //
-
   int n = 0;
-  int recvd_byte = 0;
+  int recvd_byte = RawHeader::RAWHEADER_NWORDS * sizeof(int);
   while (1) {
     int read_size = 0;
     if ((read_size = read(cpr_fd, (char*)m_bufary[entry] + recvd_byte, sizeof(int) *  BUF_SIZE_WORD  - recvd_byte)) < 0) {
@@ -332,23 +348,27 @@ int* DeSerializerCOPPERModule::ReadCOPPERFIFO(const int entry, int* malloc_flag,
       exit(-1);
     } else {
       recvd_byte += read_size;
-      if (recvd_byte > (int)(sizeof(int) * (RawCOPPER::POS_DATA_LENGTH + 1)))break;
+      if (recvd_byte - RawHeader::RAWHEADER_NWORDS * sizeof(int) > (int)(sizeof(int) * (RawCOPPER::POS_DATA_LENGTH + 1)))break;
     }
   }
 
-  *m_size_word = m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ] + 9; // 9 words are COPPER haeder and trailer size.
-  if ((int)((*m_size_word)*sizeof(int)) < recvd_byte) {
+  *m_size_word = m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH + RawHeader::RAWHEADER_NWORDS ]
+                 + COPPER_HEADER_TRAILER_NWORDS + RawHeader::RAWHEADER_NWORDS + RawTrailer::RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.
+
+  if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) > recvd_byte) {
     // Check buffer size
     if (*m_size_word >  BUF_SIZE_WORD) {
       *malloc_flag = 1;
       temp_buf = new int[ *m_size_word ];
       memcpy(temp_buf, m_bufary[ entry ], recvd_byte);
-      recvd_byte += Read(cpr_fd, (char*)temp_buf + recvd_byte, *m_size_word * sizeof(int) - recvd_byte);
+      recvd_byte += Read(cpr_fd, (char*)temp_buf + recvd_byte,
+                         (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
     } else {
-      recvd_byte += Read(cpr_fd, (char*)(m_bufary[ entry ]) + recvd_byte, *m_size_word * sizeof(int) - recvd_byte);
+      recvd_byte += Read(cpr_fd, (char*)(m_bufary[ entry ]) + recvd_byte,
+                         (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
     }
-  } else if ((int)((*m_size_word)*sizeof(int)) > recvd_byte) {
-    perror("Read more than data size. Exiting...");
+  } else if ((int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte) {
+    printf("Read more than data size. Exiting...: %d %d %d %d %d\n", recvd_byte, *m_size_word * sizeof(int) , RawTrailer::RAWTRAILER_NWORDS * sizeof(int), m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
     exit(-1);
   }
 
@@ -359,7 +379,7 @@ int* DeSerializerCOPPERModule::ReadCOPPERFIFO(const int entry, int* malloc_flag,
   printf("\n");
   fflush(stdout);
 #endif
-  m_totbytes +=  recvd_byte;
+  m_totbytes +=  recvd_byte - RawHeader::RAWHEADER_NWORDS * sizeof(int);
 
 
 #else

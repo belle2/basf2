@@ -15,52 +15,55 @@ ClassImp(RawTrailer);
 
 RawTrailer::RawTrailer()
 {
-  initialize();
-  //  cout << "RawTrailer NULL constructor" << endl;
-}
-
-RawTrailer::RawTrailer(unsigned int* buffer)
-{
-  memcpy(m_trailer, buffer, RAWCOPPER_TRAILER_SIZE * sizeof(int));
+  m_buffer = NULL;
 }
 
 RawTrailer::~RawTrailer()
 {
 }
 
-unsigned int* RawTrailer::trailer()
+void RawTrailer::CheckBuffer()
 {
-  return m_trailer;
+  if (m_buffer == NULL) {
+    perror("m_buffer is NULL. Exiting...");
+    exit(1);
+  }
 }
 
-void RawTrailer::trailer(unsigned int* bufin)
+int* RawTrailer::GetBuffer()
 {
-  memcpy(m_trailer, bufin, RAWCOPPER_TRAILER_SIZE * sizeof(int));
+  return m_buffer;
 }
 
-void RawTrailer::initialize()
+void RawTrailer::SetBuffer(int* bufin)
 {
-  memset(m_trailer, 0, RAWCOPPER_TRAILER_SIZE * sizeof(int));
-  set_magic_word();
+  m_buffer = bufin;
 }
 
-
-void RawTrailer::set_chksum(int chksum)
+void RawTrailer::Initialize()
 {
-  m_trailer[ POS_CHKSUM ] = chksum;
+  SetMagicWord();
 }
 
-void RawTrailer::set_magic_word()
+void RawTrailer::SetChksum(int chksum)
 {
-  m_trailer[ POS_TERM_WORD ] = MAGIC_WORD_TERM_TRAILER;
+  CheckBuffer();
+  m_buffer[ POS_CHKSUM ] = chksum;
 }
 
-unsigned int RawTrailer::get_magic_word()
+void RawTrailer::SetMagicWord()
 {
-  return m_trailer[ POS_TERM_WORD ];
+  CheckBuffer();
+  m_buffer[ POS_TERM_WORD ] = MAGIC_WORD_TERM_TRAILER;
 }
 
-int RawTrailer::get_trl_nwords()
+int RawTrailer::GetMagicWord()
 {
-  return RAWCOPPER_TRAILER_SIZE;
+  CheckBuffer();
+  return m_buffer[ POS_TERM_WORD ];
+}
+
+int RawTrailer::GetTrlNwords()
+{
+  return RAWTRAILER_NWORDS;
 }

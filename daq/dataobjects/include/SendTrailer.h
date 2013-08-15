@@ -25,25 +25,28 @@ namespace Belle2 {
     SendTrailer();
 
     //! Constructor using existing pointer to raw data buffer
-    SendTrailer(unsigned int*);
+    SendTrailer(int*);
 
     //! Destructor
     ~SendTrailer();
 
-    unsigned int* trailer(); //! return buffer
+    int* GetBuffer(); //! return buffer
 
-    void trailer(unsigned int* bufin); //! set buffer
+    void SetBuffer(int* bufin); //! set buffer
 
-    void initialize(); //! initialize header
+    void Initialize(); //! initialize header
 
-    void set_chksum(int chksum);   //! initialize header
+    void SetChksum(int chksum);   //! initialize header
 
-    void set_magic_word(); //!
+    void SetMagicWord(); //!
 
-    int get_trl_nwords(); //!
+    int GetTrlNwords(); //!
 
-    unsigned int get_magic_word(); //!
+    int GetMagicWord(); //!
 
+    enum {
+      SENDTRL_NWORDS = 2
+    };
   private:
 
     enum {
@@ -52,10 +55,10 @@ namespace Belle2 {
     };
 
     enum {
-      NUM_TRAILER_WORDS = 2,
       MAGIC_WORD_SEND_TRAILER = 0x7fff0007
     };
-    unsigned int m_trailer[ NUM_TRAILER_WORDS ];
+
+    int m_buffer[ SENDTRL_NWORDS ];
     ClassDef(SendTrailer, 1);
   };
 }

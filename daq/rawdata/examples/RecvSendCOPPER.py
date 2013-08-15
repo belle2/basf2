@@ -30,7 +30,7 @@ sender = register_module('Serializer')
 
 # TxSocket
 sender.param('DestPort', 33000)
-sender.param('DestHostName', 'ropc01')
+sender.param('LocalHostName', 'cpr006')
 sender.param('ProcessMethod', 'COPPER')
 # reader.param('DumpFileName', 'COPPERdump.dat' )
 

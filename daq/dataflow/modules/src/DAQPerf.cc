@@ -82,7 +82,7 @@ void DAQPerfModule::event()
     StoreArray<RawCOPPER> rawcprary;
     double rawsize = 0;
     for (unsigned int i = 0; i < rawcprary.getEntries(); i++) {
-      rawsize += (double)(rawcprary[i]->size());
+      rawsize += (double)(rawcprary[i]->Size());
     }
     m_totbytes += rawsize * 4;
   }

@@ -30,60 +30,52 @@ namespace Belle2 {
     virtual ~RawCOPPER();
 
     //! copy rawdata into internal buffer
-    virtual void copy(int* bufin, int nwords);
+    virtual void Copy(int* bufin, int nwords);
 
     //! allocate buffer
-    virtual int* allocate_buffer(int nwords);
+    virtual int* AllocateBuffer(int nwords);
 
     //! get buffer
-    virtual int* buffer();
+    virtual int* GetBuffer();
 
     //! set buffer
-    virtual void buffer(int* bufin, int nwords);
-
-    //! set buffer
-    virtual void buffer(int* bufin, int nwords, int malloc_flag);
-
-    //! get header
-    virtual int* header(void);
-    //! set header
-    virtual void header(int*);
-
-    //! get data
-    virtual int* data(void);
-    //! set
-    virtual void data(int nwords, int*);
+    virtual void SetBuffer(int* bufin, int nwords, int malloc_flag);
 
     //! get data length
-    virtual int get_body_nwords();
+    virtual int GetBodyNwords();
 
     //! get data length
-    virtual int size();
+    virtual int Size();
+
+    //! get data length
+    virtual RawHeader* GetRawHeader();
+
+    //! get data length
+    virtual RawTrailer* GetRawTrailer();
 
     //! get COPPER node id from data
-    virtual int get_copper_node_id();
+    virtual int GetCopperNodeId();
 
     //! get Event number from data
-    virtual unsigned int get_coppereve_no();
+    virtual unsigned int GetCoppereveNo();
 
     //! get subsystem-ID from data
-    virtual int get_subsys_id();
+    virtual int GetSubsysId();
 
     //! get b2l block from data
-    virtual int get_num_b2l_block();
+    virtual int GetNumB2lBlock();
 
     //! get offset to 1st b2l block
-    virtual int offset_1st_b2l_wo_rawhdr();
+    virtual int Offset1stB2lWoRawhdr();
 
     //! get offset to 2nd b2l block
-    virtual int offset_2nd_b2l_wo_rawhdr();
+    virtual int Offset2ndB2lWoRawhdr();
 
     //! get offset to 3rd b2l block
-    virtual int offset_3rd_b2l_wo_rawhdr();
+    virtual int Offset3rdB2lWoRawhdr();
 
     //! get offset to 4th b2l block
-    virtual int offset_4th_b2l_wo_rawhdr();
-
+    virtual int Offset4thB2lWoRawhdr();
 
 
     RawHeader m_header; //|| do not split the header
@@ -144,6 +136,8 @@ namespace Belle2 {
 
     int m_nwords;
     int* m_buffer; //[m_nwords]
+    int* m_alloc_pointer; // used for deleting buffer
+
     bool m_allocated;
 
     ClassDef(RawCOPPER, 1);

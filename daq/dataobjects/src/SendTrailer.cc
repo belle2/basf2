@@ -16,52 +16,52 @@ ClassImp(SendTrailer);
 
 SendTrailer::SendTrailer()
 {
-  initialize();
+  Initialize();
   //  cout << "SendTrailer NULL constructor" << endl;
 }
 
-SendTrailer::SendTrailer(unsigned int* buffer)
+SendTrailer::SendTrailer(int* buffer)
 {
-  memcpy(m_trailer, buffer, NUM_TRAILER_WORDS * sizeof(int));
+  memcpy(m_buffer, buffer, SENDTRL_NWORDS * sizeof(int));
 }
 
 SendTrailer::~SendTrailer()
 {
 }
 
-unsigned int* SendTrailer::trailer()
+int* SendTrailer::GetBuffer()
 {
-  return m_trailer;
+  return m_buffer;
 }
 
-void SendTrailer::trailer(unsigned int* bufin)
+void SendTrailer::SetBuffer(int* bufin)
 {
-  memcpy(m_trailer, bufin, NUM_TRAILER_WORDS * sizeof(int));
+  memcpy(m_buffer, bufin, SENDTRL_NWORDS * sizeof(int));
 }
 
-void SendTrailer::initialize()
+void SendTrailer::Initialize()
 {
-  memset(m_trailer, 0, NUM_TRAILER_WORDS * sizeof(int));
-  set_magic_word();
+  memset(m_buffer, 0, SENDTRL_NWORDS * sizeof(int));
+  SetMagicWord();
 }
 
 
-void SendTrailer::set_chksum(int chksum)
+void SendTrailer::SetChksum(int chksum)
 {
-  m_trailer[ POS_CHKSUM ] = chksum;
+  m_buffer[ POS_CHKSUM ] = chksum;
 }
 
-void SendTrailer::set_magic_word()
+void SendTrailer::SetMagicWord()
 {
-  m_trailer[ POS_TERM_WORD ] = MAGIC_WORD_SEND_TRAILER;
+  m_buffer[ POS_TERM_WORD ] = MAGIC_WORD_SEND_TRAILER;
 }
 
-unsigned int SendTrailer::get_magic_word()
+int SendTrailer::GetMagicWord()
 {
-  return m_trailer[ POS_TERM_WORD ];
+  return m_buffer[ POS_TERM_WORD ];
 }
 
-int SendTrailer::get_trl_nwords()
+int SendTrailer::GetTrlNwords()
 {
-  return NUM_TRAILER_WORDS;
+  return SENDTRL_NWORDS;
 }

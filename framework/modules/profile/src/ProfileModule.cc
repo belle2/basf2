@@ -112,7 +112,7 @@ void ProfileModule::terminate()
     int nPoints = m_nEvents / m_step;
     TGraph* graph = new TGraph(nPoints);
     for (int i = 0; i < nPoints; i++) {
-      graph->SetPoint(i, m_eventInfo[i].time, (double)m_eventInfo[i].mem);
+      graph->SetPoint(i, m_eventInfo[i].time, (double)m_eventInfo[i].mem / 1024);
     }
     graph->SetMarkerStyle(kMultiply);
     graph->Draw("ALP");

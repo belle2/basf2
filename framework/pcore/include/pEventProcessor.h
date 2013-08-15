@@ -59,7 +59,9 @@ namespace Belle2 {
     ModulePtrList init_modules_in_main(const ModulePtrList& modlist);
 
     /*! Extract modules to be initialized in forked process */
-    ModulePtrList init_modules_in_process(const ModulePtrList& modlist);
+    ModulePtrList init_modules_in_process(const ModulePtrList& modlist,
+                                          const ModulePtrList& pmodlist,
+                                          int eliminate_flag = 0);
 
   protected:
 
@@ -88,6 +90,14 @@ namespace Belle2 {
     bool m_histoManagerFound;
     /** Pointer to HistoManagerModule, if m_histoManagerFound is set */
     ModulePtr m_histoman;
+
+    /** Processing modes for init_modules_in_process() */
+    enum EliminationModes {
+      c_ElimNone = 0,
+      c_ElimInput = 1,
+      c_ElimOutput = 2,
+      c_ElimBoth = 3
+    };
 
   };
 

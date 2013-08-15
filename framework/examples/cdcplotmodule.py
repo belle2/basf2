@@ -1,18 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import matplotlib
-#to avoid loading gtk backend in the following imports
-#(fails if no X11 display is available)
-matplotlib.use('agg')
-
-import matplotlib.pyplot as plt
-from matplotlib.patches import Circle
-import matplotlib.cm as colormap
-
 from basf2 import *
-from ROOT import Belle2
 
+try:
+    import matplotlib
+    #to avoid loading gtk backend in the following imports
+    #(fails if no X11 display is available)
+    matplotlib.use('agg')
+
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import Circle
+    import matplotlib.cm as colormap
+except:
+    B2FATAL('This example requires Matplotlib. Please install'\
+          ' it and try again. (Package "python-matplotlib" on Debian/Ubuntu)')
+
+from ROOT import Belle2
 import os
 
 

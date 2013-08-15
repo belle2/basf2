@@ -91,9 +91,7 @@ void pEventProcessor::process(PathPtr spath)
   if (m_procHandler->isEvtServer()) {   // In event server process
     PathPtr& inpath = m_inpathlist[0];
     ModulePtrList inpath_modules = m_pathManager.buildModulePathList(inpath);
-    //    ModulePtrList procinitmodules = init_modules_in_process(inpath_modules);
-    ModulePtrList procinitmodules = init_modules_in_process(modulelist, inpath_modules,
-                                                            c_ElimOutput);
+    ModulePtrList procinitmodules = init_modules_in_process(inpath_modules);
     if (!procinitmodules.empty())
       processInitialize(procinitmodules);
     processCore(inpath, inpath_modules);
@@ -111,9 +109,7 @@ void pEventProcessor::process(PathPtr spath)
       if (m_procHandler->isOutputSrv()) {   // In output server process
         m_master = 0; //allow resetting master module
         ModulePtrList outpath_modules = m_pathManager.buildModulePathList(outpath);
-        //        ModulePtrList procinitmodules = init_modules_in_process(outpath_modules);
-        ModulePtrList procinitmodules = init_modules_in_process(modulelist, outpath_modules,
-                                                                c_ElimInput);
+        ModulePtrList procinitmodules = init_modules_in_process(outpath_modules);
         if (!procinitmodules.empty())
           processInitialize(procinitmodules);
         processCore(outpath, outpath_modules);
@@ -132,9 +128,7 @@ void pEventProcessor::process(PathPtr spath)
     m_master = 0; //allow resetting master module
     PathPtr& mainpath = m_bodypathlist[m_bodypathlist.size() - 1];
     ModulePtrList main_modules = m_pathManager.buildModulePathList(mainpath);
-    //    ModulePtrList procinitmodules = init_modules_in_process(main_modules);
-    ModulePtrList procinitmodules = init_modules_in_process(modulelist, main_modules,
-                                                            c_ElimBoth);
+    ModulePtrList procinitmodules = init_modules_in_process(main_modules);
     if (!procinitmodules.empty())
       processInitialize(procinitmodules);
     processCore(mainpath, main_modules);
@@ -393,32 +387,15 @@ ModulePtrList pEventProcessor::init_modules_in_main(const ModulePtrList& modlist
   return tmpModuleList;
 }
 
-ModulePtrList pEventProcessor::init_modules_in_process(const ModulePtrList& modlist,
-                                                       const ModulePtrList& pmodlist,
-                                                       int elim)
+ModulePtrList pEventProcessor::init_modules_in_process(const ModulePtrList& modlist)
 {
   ModulePtrList tmpModuleList;
   ModulePtrList::const_iterator listIter;
 
-  // Extract specified modules
   for (listIter = modlist.begin(); listIter != modlist.end(); ++listIter) {
     Module* module = listIter->get();
-    if (!module->hasProperties(Module::c_InitializeInMain)) {
-      if (!module->hasProperties(Module::c_InternalSerializer)) {
-        if (elim == c_ElimInput && module->hasProperties(Module::c_Input)) continue;
-        if (elim == c_ElimOutput && module->hasProperties(Module::c_Output)) continue;
-        if (elim == c_ElimBoth && (module->hasProperties(Module::c_Input) ||
-                                   module->hasProperties(Module::c_Output))) continue;
-      }
+    if (!module->hasProperties(Module::c_InitializeInMain))
       tmpModuleList.push_back(*listIter);
-    }
-  }
-  // Add Serializer modules
-  for (listIter = pmodlist.begin(); listIter != pmodlist.end(); ++listIter) {
-    Module* module = listIter->get();
-    if (module->hasProperties(Module::c_InternalSerializer)) {
-      tmpModuleList.push_back(*listIter);
-    }
   }
 
   return tmpModuleList;

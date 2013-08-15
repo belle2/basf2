@@ -58,15 +58,15 @@ void DataFlowVisualization::generateModulePlots(const std::string& filename, con
 
     //add nodes
     for (std::set<std::string>::const_iterator it = m_allOutputs.begin(); it != m_allOutputs.end(); ++it) {
-      file << "  " << *it << " [shape=box,style=filled,fillcolor=" << m_fillcolor[MInfo::c_Output] << "];\n";
+      file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << m_fillcolor[MInfo::c_Output] << "];\n";
     }
     for (std::set<std::string>::const_iterator it = m_allInputs.begin(); it != m_allInputs.end(); ++it) {
       if (m_allOutputs.count(*it) == 0)
-        file << "  " << *it << " [shape=box,style=filled,fillcolor=" << m_fillcolor[MInfo::c_Input] << "];\n";
+        file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << m_fillcolor[MInfo::c_Input] << "];\n";
     }
     for (std::set<std::string>::const_iterator it = m_unknownArrays.begin(); it != m_unknownArrays.end(); ++it) {
       if (m_allOutputs.count(*it) == 0 && m_allInputs.count(*it) == 0)
-        file << "  " << *it << " [shape=box,style=filled,fillcolor=" << unknownfillcolor << "];\n";
+        file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << unknownfillcolor << "];\n";
     }
 
 
@@ -79,7 +79,7 @@ void DataFlowVisualization::plotPath(std::ofstream& file, const Path& path, cons
   const ModulePtrList& moduleList = path.getModules();
   //graph name must begin with cluster for fancy graphics!
   const std::string graphname = pathName.empty() ? "clusterMain" : ("cluster" + pathName);
-  file << "  subgraph " << graphname << " {\n";
+  file << "  subgraph \"" << graphname << "\" {\n";
   if (pathName.empty()) {
     file << "    rank=min;\n";
   } else {
@@ -87,19 +87,19 @@ void DataFlowVisualization::plotPath(std::ofstream& file, const Path& path, cons
   }
   file << "    style=solid;\n";
   file << "    color=grey;\n";
-  file << "    " << graphname  << "_inv [shape=point,style=invis];\n";
+  file << "    \"" << graphname  << "_inv\" [shape=point,style=invis];\n";
   std::string lastModule("");
   //connect modules in right order...
   for (ModulePtrList::const_iterator it = moduleList.begin(); it != moduleList.end(); ++it) {
     const std::string& module = (*it)->getName();
-    file << "    " << module << ";\n";
+    file << "    \"" << module << "\";\n";
     if (!lastModule.empty()) {
-      file << "    " << lastModule << " -> " << module << " [color=black];\n";
+      file << "    \"" << lastModule << "\" -> \"" << module << "\" [color=black];\n";
     }
     if ((*it)->hasCondition()) {
       const Path* conditionPath = (*it)->getConditionPath().get();
       plotPath(file, *conditionPath, module);
-      file << "    " << module << " -> cluster" << module << "_inv [color=grey,lhead=cluster" << module << "];\n";
+      file << "    \"" << module << "\" -> \"cluster" << module << "_inv\" [color=grey,lhead=\"cluster" << module << "\"];\n";
     }
 
     lastModule = module;
@@ -110,8 +110,8 @@ void DataFlowVisualization::plotPath(std::ofstream& file, const Path& path, cons
 void DataFlowVisualization::generateModulePlot(std::ofstream& file, const std::string& name, bool steeringFileFlow)
 {
   if (!steeringFileFlow)
-    file << "digraph " << name << " {\n";
-  file << "  " << name << ";\n";
+    file << "digraph \"" << name << "\" {\n";
+  file << "  \"" << name << "\";\n";
 
   std::map<std::string, DataStore::ModuleInfo>::const_iterator foundInfoIter = m_moduleInfo.find(name);
   if (foundInfoIter != m_moduleInfo.end()) {
@@ -124,13 +124,13 @@ void DataFlowVisualization::generateModulePlot(std::ofstream& file, const std::s
 
       for (std::set<std::string>::const_iterator setit = entries.begin(); setit != entries.end(); ++setit) {
         if (!steeringFileFlow)
-          file << "  " << *setit << " [shape=box,style=filled,fillcolor=" << fillcolor << "];\n";
+          file << "  \"" << *setit << "\" [shape=box,style=filled,fillcolor=" << fillcolor << "];\n";
         if (i == MInfo::c_Output) {
           m_allOutputs.insert(*setit);
-          file << "  " << name << " -> " << *setit << " [color=" << arrowcolor << "];\n";
+          file << "  \"" << name << "\" -> \"" << *setit << "\" [color=" << arrowcolor << "];\n";
         } else {
           m_allInputs.insert(*setit);
-          file << "  " << *setit << " -> " << name  << " [color=" << arrowcolor << "];\n";
+          file << "  \"" << *setit << "\" -> \"" << name  << "\" [color=" << arrowcolor << "];\n";
         }
       }
 
@@ -149,14 +149,14 @@ void DataFlowVisualization::generateModulePlot(std::ofstream& file, const std::s
         //any connected arrays that are neither input nor output?
         if (checkArrayUnknown(from, moduleInfo)) {
           if (!steeringFileFlow)
-            file << "  " << from << " [shape=box,style=filled,fillcolor=" << unknownfillcolor << "];\n";
+            file << "  \"" << from << "\" [shape=box,style=filled,fillcolor=" << unknownfillcolor << "];\n";
         }
         if (checkArrayUnknown(to, moduleInfo)) {
           if (!steeringFileFlow)
-            file << "  " << to << " [shape=box,style=filled,fillcolor=" << unknownfillcolor << "];\n";
+            file << "  \"" << to << "\" [shape=box,style=filled,fillcolor=" << unknownfillcolor << "];\n";
         }
 
-        file << "  " << from << " -> " << to << " [color=" << arrowcolor << ",style=dashed];\n";
+        file << "  \"" << from << "\" -> \"" << to << "\" [color=" << arrowcolor << ",style=dashed];\n";
       }
     }
   }

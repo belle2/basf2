@@ -18,3 +18,23 @@ cprfin_fngeneric        9808  0
 copper                 30208  0
 
 ==================================================
+How to install COPPER drivers modules automatically (Aug.16, 2013)
+
+1, correct path of module and script
+e.g.)
+insmod ./drv/copper.ko  -> Need to modify
+action $"Making nodes: " ./src/mkdevs.sh -> Need to modify
+
+2, copy initd_copper and  initd_cprfin_fngeneri files
+[ on COPPER CPU] # cp initd_copper /etc/init.d/copper
+[ on COPPER CPU] # cp initd_cprfin_fngeneric /etc/init.d/cprfin_fngeneric
+
+If you boot many COPPER CPUs w/ one boot server, note that those files may be common to all COPPER boards,
+unless you specify them in /tftpboot/copper/snapshot/files.
+
+3, use chkconfig to register
+[ on COPPER CPU] # chkconfig --add copper
+[ on COPPER CPU] # chkconfig --add cprfin_fngeneric
+
+Maybe it will work.
+==================================================

@@ -1,0 +1,34 @@
+=========================================================
+How to use : from Yamagata-san's e-mail on Jul.27, 2013 (rev. 6369)
+
+
+~yamagata/eb0
+
+random_data_generator: 
+Make data in a form of SendHeader+RawCopperHeader+RawCopperTrailer+SendTrailer and put to stdout
+COPPER header is not made.
+
+eb0: prototype of eb0. Read 1st word and take the value as the total length then send to downstream.
+
+
+fetch_event: read data from stdin and check if data has SendHeader+RawCopperHeader+RawCopperTrailer+SendTrailer.
+Read data is discarded.
+
+Usage : 
+Prepare 3 terminals.
+1st: ./eb0 -n 2
+2nd: nc -l 65000 | ./fetch_event
+3rd: 
+./random_event_generator -S 1280 -n 10000000 | nc 127.0.0.1 32000 &
+./random_event_generator -S 6400 -n 10000000 | nc 127.0.0.1 32001 &
+=========================================================
+After changing a client-server role. Aug.16, 2013 
+
+Usage : 
+Prepare 3 terminals.
+1st: ./eb0 -n 2
+2nd: nc -l 65000 | ./fetch_event
+3rd: 
+./random_event_generator -S 1280 -n 10000000 | nc 127.0.0.1 32000 &
+./random_event_generator -S 6400 -n 10000000 | nc 127.0.0.1 32001 &
+

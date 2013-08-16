@@ -13,4 +13,17 @@ Use 130621_HSLB_cpld_readback.jed
 -	Use impact to download the file to CPLD
 
 =========================================================
+Use HSLB as a dummy data producer (Aug. 16, 2013)
 
+1, Download a test firmware which make a HSLB produces 
+dummy data with size of about 256byte and 1Hz rate
+ 
+% ...daq/copper/test_program/hslb/boothslb -abcd ./bit/HSLB_1Hz256B.bit
+"-abcd" specify slots for HSLB cards
+
+2, Read data
+% ...daq/copper/test_program/copper/record-nakao -abcd
+
+
+
+=========================================================

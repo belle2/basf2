@@ -46,14 +46,13 @@ DeSerializerPCModule::DeSerializerPCModule() : DeSerializerModule()
 
 DeSerializerPCModule::~DeSerializerPCModule()
 {
+
 }
 
 
 
 void DeSerializerPCModule::initialize()
 {
-
-
 
   // Accept requests for connections
   Connect();
@@ -190,7 +189,7 @@ int DeSerializerPCModule::Connect()
 
 
 
-int* DeSerializerPCModule::RecvSocketData(int* malloc_flag, int* total_buf_nwords, int* default_buf)
+int* DeSerializerPCModule::RecvDatafromCOPPER(int* malloc_flag, int* total_buf_nwords, int* default_buf)
 {
 
   int* temp_buf = NULL;
@@ -219,6 +218,7 @@ int* DeSerializerPCModule::RecvSocketData(int* malloc_flag, int* total_buf_nword
                         - SendTrailer::SENDTRL_NWORDS;
     *total_buf_nwords += rawcpr_nwords;
     each_buf_nwords.push_back(rawcpr_nwords);
+
   }
 
   if (*total_buf_nwords >  BUF_SIZE_WORD) {
@@ -283,6 +283,61 @@ int* DeSerializerPCModule::RecvSocketData(int* malloc_flag, int* total_buf_nword
 
 
 
+int* DeSerializerPCModule::RecvDatafromEvb0(int* malloc_flag, int* total_buf_nwords, int* default_buf)
+{
+
+  int* temp_buf = NULL;
+  int flag = 0;
+  vector <int> each_buf_nwords;
+  each_buf_nwords.clear();
+
+  *total_buf_nwords = 0;
+
+  //
+  // Read Size
+  //
+  for (int i = 0; i < m_socket.size(); i++) {
+    int ropc_nwords;
+    Recv(m_socket[ i ], (char*)&ropc_nwords, sizeof(int), flag);
+    *total_buf_nwords = ropc_nwords;
+    each_buf_nwords.push_back(ropc_nwords);
+  }
+
+  if (*total_buf_nwords > BUF_SIZE_WORD) {
+    *malloc_flag = 1;
+    temp_buf = new int[ *total_buf_nwords ];
+  } else {
+    *malloc_flag = 0;
+    temp_buf = default_buf;
+  }
+
+  // Read body
+  int total_recvd_byte = 0;
+  for (int i = 0; i < m_socket.size(); i++) {
+    if ((total_recvd_byte % sizeof(int)) != 0) {
+      printf("recvd buffer size is in the unit of word. Exiting... : %d bytes \n"
+             , total_recvd_byte);
+      exit(1);
+    }
+    temp_buf[ total_recvd_byte / sizeof(int) ] = each_buf_nwords[ i ];
+    total_recvd_byte += sizeof(int);
+    total_recvd_byte += Recv(m_socket[ i ], (char*)temp_buf + total_recvd_byte,
+                             (each_buf_nwords[ i ] - 1) * sizeof(int), flag);
+  }
+
+  if (*total_buf_nwords * sizeof(int) != total_recvd_byte) {
+    perror("Receiving data in an invalid unit. Exting...");
+    exit(-1);
+  }
+
+  return temp_buf;
+
+}
+
+
+
+
+
 
 void DeSerializerPCModule::event()
 {
@@ -310,7 +365,8 @@ void DeSerializerPCModule::event()
     // Get a record from socket
     int total_buf_nwords = 0 ;
     int malloc_flag = 0;
-    int* temp_buf = RecvSocketData(&malloc_flag, &total_buf_nwords, m_bufary[ j ]);
+    //    int* temp_buf = RecvDatafromCOPPER(&malloc_flag, &total_buf_nwords, m_bufary[ j ]);
+    int* temp_buf = RecvDatafromEvb0(&malloc_flag, &total_buf_nwords, m_bufary[ j ]);
     m_totbytes += total_buf_nwords * sizeof(int);
 
     // Dump binary data
@@ -321,10 +377,7 @@ void DeSerializerPCModule::event()
 #ifndef DISCARD_DATA
 #ifdef CLONE_ARRAY
     temp_rawcopper =  rawcprarray.appendNew();
-    // buffer to store in RawCOPPER
     temp_rawcopper->SetBuffer((int*)temp_buf + SendHeader::SENDHDR_NWORDS, total_buf_nwords, malloc_flag);
-    //     Binary2RawCOPPER( malloc_flag, total_buf_nwords, temp_buf,
-    //     m_bufary_body[ j ], temp_rawcopper );
 
 #else
     //    m_rawcopper->buffer(temp_buf_body, body_size_word, malloc_flag_body);

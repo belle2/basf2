@@ -30,7 +30,7 @@ dump = register_module('RootOutput')
 perf = register_module('DAQPerf')
 
 # RxSocket
-receiver.param('NumConn', 2)
+receiver.param('NumConn', 1)
 receiver.param('HostNameFrom', ['cpr006', 'cpr007'])
 receiver.param('PortFrom', [33000, 33000])
 receiver.param('EventDataBufferWords', 4801)

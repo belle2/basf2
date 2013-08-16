@@ -24,6 +24,8 @@
 #include <daq/dataflow/EvtSocket.h>
 #include <daq/dataobjects/RawCOPPER.h>
 
+//#include <daq/dataobjects/RawROPC.h>
+
 #include <framework/dataobjects/EventMetaData.h>
 #include <daq/rawdata/modules/DeSerializer.h>
 
@@ -62,7 +64,9 @@ namespace Belle2 {
     virtual int Recv(int fd, char* buf, int data_size_byte, int flag);
 
     //! receive data
-    virtual int* RecvSocketData(int* malloc_flag, int* total_m_size_word, int* default_buf);
+    virtual int* RecvDatafromCOPPER(int* malloc_flag, int* total_m_size_word, int* default_buf);
+
+    virtual int* RecvDatafromEvb0(int* malloc_flag, int* total_m_size_word, int* default_buf);
 
     //! buffer after removing SendHeaader and SendTrailer
     int* m_bufary_body[NUM_EVT_PER_BASF2LOOP];

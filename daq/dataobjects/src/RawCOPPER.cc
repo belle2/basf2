@@ -29,7 +29,10 @@ void RawCOPPER::Copy(int* bufin, int nwords)
 {
   //  m_nwords = bufin[0];
   m_nwords = nwords;
+
+  if (m_allocated) delete[] m_buffer;
   m_buffer = new int[m_nwords];
+
   memcpy((char*)m_buffer, (char*)bufin, m_nwords * sizeof(int));
   m_allocated = true;
 }

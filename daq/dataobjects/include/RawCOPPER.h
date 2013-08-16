@@ -136,8 +136,6 @@ namespace Belle2 {
 
     int m_nwords;
     int* m_buffer; //[m_nwords]
-    int* m_alloc_pointer; // used for deleting buffer
-
     bool m_allocated;
 
     ClassDef(RawCOPPER, 1);

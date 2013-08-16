@@ -73,15 +73,15 @@ namespace Belle2 {
        * Set kinetic energy cut for secondaries
        * @param cut_MeV kinetic energy in MeV
        */
-      //void setKineticEnergyCut(double cut_MeV) {m_EnergyCut = cut_MeV;}
+      void setKineticEnergyCut(double cut_MeV) {m_EnergyCut = cut_MeV;}
 
 
     protected:
 
       MCParticleGraph& m_mcParticleGraph; /**< Reference to the MCParticle graph which is updated by the tracking action. */
       bool m_IgnoreOpticalPhotons; /**< do not store optical photons in MCParticles */
-      bool m_IgnoreSecondaries; /**< do not store low energy secondaries in MCParticles */
-      //double m_EnergyCut; /**< kinetic energy cut for secondaries [MeV] */
+      bool m_IgnoreSecondaries;    /**< do not store secondaries in MCParticles */
+      double m_EnergyCut;          /**< kinetic energy cut for stored secondaries [MeV] */
 
     };
 

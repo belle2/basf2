@@ -105,7 +105,7 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
 
         currParticle.decaysInto(daughterParticle); //Add the decay
 
-        // Optical photons and low energy secondaries:  steering of output to MCParticles
+        // Optical photons and secondaries:  steering of output to MCParticles
         if (daughterTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
           if (m_IgnoreOpticalPhotons) daughterParticle.setIgnore();
           // to apply quantum efficiency only once, if optical photon is a daugher of optical photon
@@ -116,9 +116,9 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
             daughterInfo->setFraction(currInfo->getFraction());
           }
         } else {
-          //Do not store the generator info in the MCParticles block
-          //if (m_IgnoreSecondaries && daughterTrack->GetKineticEnergy() < m_EnergyCut)
-          if (m_IgnoreSecondaries)
+          // Do not store the generator info in the final MCParticles block
+          // if the ignore flag is set or its kinetic energy is too low.
+          if (m_IgnoreSecondaries || daughterTrack->GetKineticEnergy() < m_EnergyCut)
             daughterParticle.setIgnore();
         }
 

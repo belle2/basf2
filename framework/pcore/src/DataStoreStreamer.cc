@@ -100,18 +100,8 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
         const TClass* cl = objlist.at(i)->IsA();
         if (array)
           cl = static_cast<TClonesArray*>(objlist.at(i))->GetClass();
-        //  if (m_initStatus == 0) {
-        // Create DataStore entry on the fly
-        if (DataStore::Instance().getEntry(StoreAccessorBase(namelist.at(i), durability, cl, array)) == NULL) {
-          bool active = DataStore::Instance().getInitializeActive();
-          if (!active) {
-            DataStore::Instance().setInitializeActive(true);
-          }
+        if (m_initStatus == 0) {
           DataStore::Instance().createEntry(namelist.at(i), durability, cl, array, false, false);
-          if (!active) {
-            DataStore::Instance().setInitializeActive(false);
-          }
-          //    printf ( "!!! DataStoreEntry created for %s\n", namelist.at(i).c_str() );
         }
         DataStore::Instance().createObject(objlist.at(i), true,
                                            StoreAccessorBase(namelist.at(i), durability, cl, array));

@@ -7,12 +7,14 @@
 //-
 
 #include <framework/pcore/DataStoreStreamer.h>
-#include <framework/logging/Logger.h>
+#include <framework/pcore/MsgHandler.h>
 
+#include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <TClonesArray.h>
+#include <TClass.h>
 
 using namespace std;
 using namespace Belle2;
@@ -47,14 +49,33 @@ EvtMessage* DataStoreStreamer::streamDataStore(DataStore::EDurability durability
   int narrays = 0;
   int nobjs = 0;
   for (DataStore::StoreObjConstIter it = map.begin(); it != map.end(); ++it) {
-    if (m_msghandler->add(it->second->ptr, it->first)) {
+    DataStore::StoreEntry* entry = it->second;
+    //verify that bits are unused
+    if (entry->object->TestBit(c_IsTransient)) {
+      B2FATAL("DataStoreStreamer::c_IsTransient bit is set for " << it->first << "!");
+    }
+    if (entry->object->TestBit(c_IsNull)) {
+      B2FATAL("DataStoreStreamer::c_IsNull bit is set for " << it->first << "!");
+    }
+    //verify TObject bits are serialised
+    if (entry->object->IsA()->CanIgnoreTObjectStreamer()) {
+      B2FATAL("TObject streamers disabled for " << it->first << "!");
+    }
+    //store some information in TObject bits to ensure consistent state even if entry->ptr is NULL
+    entry->object->SetBit(c_IsTransient, entry->isTransient);
+    entry->object->SetBit(c_IsNull, (entry->ptr == NULL));
+    if (m_msghandler->add(entry->object, it->first)) {
       B2DEBUG(100, "adding item " << it->first);
 
-      if (it->second->isArray)
+      if (entry->isArray)
         narrays++;
       else
         nobjs++;
     }
+
+    //reset bits (are checked to be false when streaming the object)
+    entry->object->SetBit(c_IsTransient, false);
+    entry->object->SetBit(c_IsNull, false);
   }
 
   // Encode EvtMessage
@@ -97,17 +118,29 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
     for (int i = 0; i < nobjs + narrays; i++) {
       bool array = (dynamic_cast<TClonesArray*>(objlist.at(i)) != 0);
       if (objlist.at(i) != NULL) {
-        const TClass* cl = objlist.at(i)->IsA();
+        TObject* obj = objlist.at(i);
+        const TClass* cl = obj->IsA();
         if (array)
-          cl = static_cast<TClonesArray*>(objlist.at(i))->GetClass();
-        if (m_initStatus == 0) {
-          DataStore::Instance().createEntry(namelist.at(i), durability, cl, array, false, false);
+          cl = static_cast<TClonesArray*>(obj)->GetClass();
+        if (m_initStatus == 0) { //are we called by the module's initialize() function?
+          bool transient = obj->TestBit(c_IsTransient);
+          DataStore::Instance().createEntry(namelist.at(i), durability, cl, array, transient, false);
         }
-        DataStore::Instance().createObject(objlist.at(i), true,
-                                           StoreAccessorBase(namelist.at(i), durability, cl, array));
-        B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
+        //only restore object if it is valid for current event
+        bool ptrIsNULL = obj->TestBit(c_IsNull);
+        if (!ptrIsNULL) {
+          DataStore::Instance().createObject(obj, true,
+                                             StoreAccessorBase(namelist.at(i), durability, cl, array));
+          B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
+        }
+
+        //reset bits (are checked to be false when streaming the object)
+        obj->SetBit(c_IsTransient, false);
+        obj->SetBit(c_IsNull, false);
+
       } else {
-        B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " is NULL!");
+        //DataStore always has non-NULL content (wether they're available is a different matter)
+        B2ERROR("restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " is NULL!");
       }
     }
   }

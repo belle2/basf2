@@ -8,11 +8,12 @@
 // Date : 5 - Sep - 2012
 //-
 
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/pcore/EvtMessage.h>
+
 
 namespace Belle2 {
+  class MsgHandler;
 
   /** Stream/restore DataStore objects to/from EvtMessage. */
   class DataStoreStreamer {
@@ -51,6 +52,11 @@ namespace Belle2 {
 
 
   private:
+    /** bits to store in TObject. */
+    enum ETObjectBits {
+      c_IsTransient = BIT(19), /**< The corresponding StoreEntry is transient. */
+      c_IsNull = BIT(20) /**< object is not valid for current event, set StoreEntry::ptr to NULL. */
+    };
 
     /** MsgHandler
      *

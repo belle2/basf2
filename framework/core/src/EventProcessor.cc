@@ -27,11 +27,13 @@
 #include <signal.h>
 #include <unistd.h>
 
+#include <TRandom.h>
+
 using namespace std;
 using namespace Belle2;
 
 
-EventProcessor::EventProcessor(PathManager& pathManager) : m_pathManager(pathManager), m_master(0)
+EventProcessor::EventProcessor(PathManager& pathManager) : m_pathManager(pathManager), m_master(NULL), m_mainRNG(NULL)
 {
 
 }
@@ -115,6 +117,9 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 #ifdef HAS_CALLGRIND
   CALLGRIND_ZERO_STATS;
 #endif
+  //store main RNG to be able to restore it later
+  m_mainRNG = gRandom;
+
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
   ModuleStatistics& stats = ModuleStatistics::getInstance();
@@ -164,6 +169,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 #ifdef HAS_CALLGRIND
   CALLGRIND_ZERO_STATS;
 #endif
+
   const ModulePtrList& startModules = startPath->getModules();
   LogSystem& logSystem = LogSystem::Instance();
 
@@ -183,6 +189,8 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
   while (!endProcess) {
     if (collectStats)
       stats.startGlobal();
+
+    gRandom = m_mainRNG;
 
     //Loop over the modules in the current path
     ModulePtrList::const_iterator moduleIter = startModules.begin();
@@ -295,6 +303,8 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 #ifdef HAS_CALLGRIND
   CALLGRIND_ZERO_STATS;
 #endif
+  gRandom = m_mainRNG;
+
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_reverse_iterator listIter;
   ModuleStatistics& stats = ModuleStatistics::getInstance();
@@ -329,6 +339,8 @@ void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
 #ifdef HAS_CALLGRIND
   CALLGRIND_ZERO_STATS;
 #endif
+  gRandom = m_mainRNG;
+
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
   ModuleStatistics& stats = ModuleStatistics::getInstance();
@@ -348,11 +360,12 @@ void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
     //Set the global log level
     logSystem.setModuleLogConfig(NULL);
   }
+  gRandom = m_mainRNG;
+
   stats.stopGlobal(ModuleStatistics::c_BeginRun);
 #ifdef HAS_CALLGRIND
   CALLGRIND_DUMP_STATS_AT("beginRun");
 #endif
-
 }
 
 
@@ -361,6 +374,8 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
 #ifdef HAS_CALLGRIND
   CALLGRIND_ZERO_STATS;
 #endif
+  gRandom = m_mainRNG;
+
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
   ModuleStatistics& stats = ModuleStatistics::getInstance();
@@ -380,6 +395,7 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
     //Set the global log level
     logSystem.setModuleLogConfig(NULL);
   }
+  gRandom = m_mainRNG;
 
   stats.stopGlobal(ModuleStatistics::c_EndRun);
 #ifdef HAS_CALLGRIND

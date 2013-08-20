@@ -14,6 +14,8 @@
 #include <framework/core/Path.h>
 #include <framework/core/Module.h>
 
+class TRandom;
+
 namespace Belle2 {
 
   class PathManager;
@@ -103,6 +105,7 @@ namespace Belle2 {
 
     PathManager& m_pathManager; /**< Reference to the path manager, which takes care of creating and handling paths. */
     const Module* m_master;  /**< The master module that determines the experiment/run/event number **/
+    TRandom* m_mainRNG; /**< The main random number generator. A copy of the gRandom pointer, to reset it at the beginning of module execution when using RandomBarrierModule. */
   };
 
 }

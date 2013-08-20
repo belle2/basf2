@@ -45,16 +45,14 @@ namespace Belle2 {
       \param position vector of track position on aerogel plane
       \param momentum vector of track momentum on aerogel plane
     */
-    ARICHAeroHit(
-      int trackId,
-      int particleId,
-      TVector3 position,
-      TVector3 momentum
-    ) {
-      m_trackID = trackId;
-      m_particleID = particleId;
-      m_position = position;
-      m_momentum = momentum;
+    ARICHAeroHit(int trackId,
+                 int particleId,
+                 TVector3 position,
+                 TVector3 momentum) :
+      m_trackID(trackId),
+      m_particleID(particleId),
+      m_position(position),
+      m_momentum(momentum) {
     }
 
     //! Set Geant4 track ID

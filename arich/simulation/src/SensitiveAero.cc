@@ -38,7 +38,7 @@ namespace Belle2 {
       StoreArray<MCParticle> particles;
       StoreArray<ARICHAeroHit> hits;
       RelationArray relation(particles, hits);
-      registerMCParticleRelation(relation);
+      registerMCParticleRelation(relation, RelationArray::c_deleteElement);
 
     }
 

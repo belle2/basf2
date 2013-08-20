@@ -49,7 +49,7 @@ namespace Belle2 {
 
       //Get time (check for proper global time)
       const G4double globalTime = track.GetGlobalTime();
-      if (isnan(globalTime)) {
+      if (std::isnan(globalTime)) {
         B2ERROR("ARICH Sensitive Detector: global time is nan !");
         return false;
       }

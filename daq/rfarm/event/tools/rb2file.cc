@@ -17,7 +17,7 @@
 #include "framework/pcore/EvtMessage.h"
 
 #define RBUFSIZE 100000000
-#define MAXEVTSIZE 4000000
+#define MAXEVTSIZE 400000000
 
 using namespace Belle2;
 using namespace std;

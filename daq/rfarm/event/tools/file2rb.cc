@@ -16,7 +16,7 @@
 #include "framework/pcore/RingBuffer.h"
 
 #define RBUFSIZE 100000000
-#define MAXEVTSIZE 40000000
+#define MAXEVTSIZE  400000000
 
 using namespace Belle2;
 using namespace std;
@@ -39,6 +39,10 @@ int main(int argc, char** argv)
   for (;;) {
     int is = file->read(evbuf, MAXEVTSIZE);
     if (is <= 0) break;
+    if (is > MAXEVTSIZE) {
+      printf("Event size too large : %d\n", is);
+      continue;
+    }
 
     // Put the message in ring buffer
     int irb = 0;

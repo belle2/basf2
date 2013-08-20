@@ -22,7 +22,7 @@
 //#include <framework/datastore/DataStore.h>
 
 #define RBUFSIZE 100000000
-#define MAXEVTSIZE 10000000
+#define MAXEVTSIZE  400000000
 
 
 namespace Belle2 {

@@ -29,24 +29,29 @@ namespace Belle2 {
       m_Shift(Hep3Vector()),
       m_LocalX(0.0),
       m_ToleranceX(0.0),
-      m_SectorPtr(NULL),
       m_PhiStripWidth(0.0),
       m_PhiStripLength(0.0),
       m_PhiStripNumber(0),
       m_PhiStripMin(0),
       m_PhiStripMax(0),
-      m_PhiOffset(0),
+      m_PhiOffsetSign(0),
       m_ZStripWidth(0.0),
       m_ZStripLength(0.0),
       m_ZStripNumber(0),
       m_ZStripMin(0),
       m_ZStripMax(0),
-      m_ZOffset(0)
+      m_ZOffsetSign(0),
+      m_Translation(Hep3Vector()),
+      m_Rotation(HepRotation()),
+      m_RotationInverse(HepRotation()),
+      m_Normal(Hep3Vector())
     {
       m_PhiScintPositions.clear();
       m_PhiScintLengths.clear();
       m_ZScintPositions.clear();
       m_ZScintLengths.clear();
+      m_RotationMatrix = m_Rotation;
+      m_RotationInverseMatrix = m_RotationInverse;
     }
 
     // constructor for RPC module
@@ -55,19 +60,18 @@ namespace Belle2 {
                    int        layer,
                    Hep3Vector shift,
                    double     localX,
-                   Sector*    sectorPtr,
                    double     phiStripWidth,
                    double     phiStripLength,
                    int        phiStripNumber,
                    int        phiStripMin,
                    int        phiStripMax,
-                   int        phiOffset,
                    double     zStripWidth,
                    double     zStripLength,
                    int        zStripNumber,
                    int        zStripMin,
                    int        zStripMax,
-                   int        zOffset) :
+                   Hep3Vector translation,
+                   HepRotation rotation) :
       m_HasRPCs(true),
       m_IsForward(isForward),
       m_Sector(sector),
@@ -75,24 +79,29 @@ namespace Belle2 {
       m_Shift(shift),
       m_LocalX(localX),
       m_ToleranceX(2.0),   // cm
-      m_SectorPtr(sectorPtr),
       m_PhiStripWidth(phiStripWidth),
       m_PhiStripLength(phiStripLength),
       m_PhiStripNumber(phiStripNumber),
       m_PhiStripMin(phiStripMin),
       m_PhiStripMax(phiStripMax),
-      m_PhiOffset(phiOffset),
+      m_PhiOffsetSign(0),
       m_ZStripWidth(zStripWidth),
       m_ZStripLength(zStripLength),
       m_ZStripNumber(zStripNumber),
       m_ZStripMin(zStripMin),
       m_ZStripMax(zStripMax),
-      m_ZOffset(zOffset)
+      m_ZOffsetSign(0),
+      m_Translation(translation),
+      m_Rotation(rotation)
     {
       m_PhiScintPositions.clear();
       m_PhiScintLengths.clear();
       m_ZScintPositions.clear();
       m_ZScintLengths.clear();
+      m_RotationInverse = m_Rotation.inverse();
+      m_RotationMatrix = m_Rotation;
+      m_RotationInverseMatrix = m_RotationInverse;
+      m_Normal = m_Rotation(Hep3Vector(1.0, 0.0, 0.0));
     }
 
     // constructor for scint module
@@ -101,15 +110,15 @@ namespace Belle2 {
                    int        layer,
                    Hep3Vector shift,
                    double     localX,
-                   Sector*    sectorPtr,
-                   double     phiStripWidth,
+                   double     stripWidth,
                    double     phiStripLength,
                    int        phiStripNumber,
-                   int        phiOffset,
-                   double     zStripWidth,
+                   int        phiOffsetSign,
                    double     zStripLength,
                    int        zStripNumber,
-                   int        zOffset) :
+                   int        zOffsetSign,
+                   Hep3Vector translation,
+                   HepRotation rotation) :
       m_HasRPCs(false),
       m_IsForward(isForward),
       m_Sector(sector),
@@ -117,24 +126,29 @@ namespace Belle2 {
       m_Shift(shift),
       m_LocalX(localX),
       m_ToleranceX(2.0),   // cm
-      m_SectorPtr(sectorPtr),
-      m_PhiStripWidth(phiStripWidth),
+      m_PhiStripWidth(stripWidth),
       m_PhiStripLength(phiStripLength),
       m_PhiStripNumber(phiStripNumber),
       m_PhiStripMin(0),
       m_PhiStripMax(0),
-      m_PhiOffset(phiOffset),
-      m_ZStripWidth(zStripWidth),
+      m_PhiOffsetSign(phiOffsetSign),
+      m_ZStripWidth(stripWidth),
       m_ZStripLength(zStripLength),
       m_ZStripNumber(zStripNumber),
       m_ZStripMin(0),
       m_ZStripMax(0),
-      m_ZOffset(zOffset)
+      m_ZOffsetSign(zOffsetSign),
+      m_Translation(translation),
+      m_Rotation(rotation)
     {
       m_PhiScintPositions.clear();
       m_PhiScintLengths.clear();
       m_ZScintPositions.clear();
       m_ZScintLengths.clear();
+      m_RotationInverse = m_Rotation.inverse();
+      m_RotationMatrix = m_Rotation;
+      m_RotationInverseMatrix = m_RotationInverse;
+      m_Normal = m_Rotation(Hep3Vector(1.0, 0.0, 0.0));
     }
 
     // copy constructor
@@ -146,19 +160,22 @@ namespace Belle2 {
       m_Shift(m.m_Shift),
       m_LocalX(m.m_LocalX),
       m_ToleranceX(m.m_ToleranceX),
-      m_SectorPtr(m.m_SectorPtr),
       m_PhiStripWidth(m.m_PhiStripWidth),
       m_PhiStripLength(m.m_PhiStripLength),
       m_PhiStripNumber(m.m_PhiStripNumber),
       m_PhiStripMin(m.m_PhiStripMin),
       m_PhiStripMax(m.m_PhiStripMax),
-      m_PhiOffset(m.m_PhiOffset),
+      m_PhiOffsetSign(m.m_PhiOffsetSign),
       m_ZStripWidth(m.m_ZStripWidth),
       m_ZStripLength(m.m_ZStripLength),
       m_ZStripNumber(m.m_ZStripNumber),
       m_ZStripMin(m.m_ZStripMin),
       m_ZStripMax(m.m_ZStripMax),
-      m_ZOffset(m.m_ZOffset)
+      m_ZOffsetSign(m.m_ZOffsetSign),
+      m_Translation(m.m_Translation),
+      m_Rotation(m.m_Rotation),
+      m_RotationInverse(m.m_RotationInverse),
+      m_Normal(m.m_Normal)
     {
       m_PhiScintPositions = m.m_PhiScintPositions;
       m_PhiScintLengths = m.m_PhiScintLengths;
@@ -168,28 +185,6 @@ namespace Belle2 {
 
     Module::~Module()
     {
-    }
-
-    bool Module::operator<(const Module& m) const
-    {
-      if (m_IsForward != m.m_IsForward) return (m_IsForward == 0);
-      if (m_Sector    != m.m_Sector)    return (m_Sector < m.m_Sector);
-      if (m_Layer     != m.m_Layer)     return (m_Layer < m.m_Layer);
-      return false;
-    }
-
-    bool Module::isSameModule(bool isForward, int sector, int layer) const
-    {
-      return (isForward == m_IsForward) &&
-             (sector    == m_Sector) &&
-             (layer     == m_Layer);
-    }
-
-    bool Module::isSameModule(const Module& m) const
-    {
-      return (m.isForward() == m_IsForward) &&
-             (m.getSector() == m_Sector) &&
-             (m.getLayer()  == m_Layer);
     }
 
     void Module::addPhiScint(int scint, double length, double offset, double position)
@@ -349,6 +344,66 @@ namespace Belle2 {
 
       phiStripDiv = remainder((posShifted.y() / m_PhiStripWidth) + 0.5, 1.0);
       zStripDiv   = remainder((posShifted.z() / m_ZStripWidth) + 0.5, 1.0);
+    }
+
+    const Hep3Vector Module::localToGlobal(const Hep3Vector& v) const
+    {
+      return rotateToGlobal(v) + m_Translation;
+    }
+
+    const Hep3Vector Module::globalToLocal(const Hep3Vector& v) const
+    {
+      return rotateToLocal(v - m_Translation);
+    }
+
+    const Hep3Vector Module::globalToLocal(double x, double y, double z) const
+    {
+      return rotateToLocal(Hep3Vector(x, y, z) - m_Translation);
+    }
+
+    const HepMatrix Module::localToGlobal(const HepMatrix& m) const
+    {
+      return (m_RotationInverseMatrix * m * m_RotationMatrix);
+    }
+
+    const HepMatrix Module::globalToLocal(const HepMatrix& m) const
+    {
+      return (m_RotationMatrix * m * m_RotationInverseMatrix);
+    }
+
+    const Rect Module::localToGlobal(const Rect& r) const
+    {
+      Rect global;
+      global.corner[0] = localToGlobal(r.corner[0]);
+      global.corner[1] = localToGlobal(r.corner[1]);
+      global.corner[2] = localToGlobal(r.corner[2]);
+      global.corner[3] = localToGlobal(r.corner[3]);
+      return global;
+    }
+
+    const Rect Module::globalToLocal(const Rect& r) const
+    {
+      Rect local;
+      local.corner[0] = globalToLocal(r.corner[0]);
+      local.corner[1] = globalToLocal(r.corner[1]);
+      local.corner[2] = globalToLocal(r.corner[2]);
+      local.corner[3] = globalToLocal(r.corner[3]);
+      return local;
+    }
+
+    const Hep3Vector Module::rotateToGlobal(const Hep3Vector& v) const
+    {
+      return m_Rotation * v;
+    }
+
+    const Hep3Vector Module::rotateToLocal(const Hep3Vector& v) const
+    {
+      return m_RotationInverse * v;
+    }
+
+    const Hep3Vector Module::getNormal() const
+    {
+      return m_Rotation * Hep3Vector(1.0, 0.0, 0.0);
     }
 
     void Module::printTree() const

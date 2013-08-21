@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <bklm/dataobjects/BKLMHit2d.h>
+#include <bklm/dataobjects/BKLMHit1d.h>
 
 #include <framework/logging/Logger.h>
 
@@ -24,31 +25,41 @@ BKLMHit2d::BKLMHit2d() : RelationsObject()
 }
 
 //! Constructor with orthogonal 1D hits
-BKLMHit2d::BKLMHit2d(const BKLMDigit* hit1, const BKLMDigit* hit2) :
+BKLMHit2d::BKLMHit2d(const BKLMHit1d* hit1, const BKLMHit1d* hit2) :
   RelationsObject()
 {
-  // DIVOT see common/com-klm/hit/KlmHit2D initializer
-  // this is a dummy line to make use of symbols hit1 and hit2
-  if (hit1 == hit2) return;
-}
-
-//! Constructor with initial values
-BKLMHit2d::BKLMHit2d(int status, bool isForward, int sector, int layer,
-                     const double position[2], const double positionVariance[2],
-                     double time, double energy) :
-  RelationsObject(),
-  m_Status(status),
-  m_IsForward(isForward),
-  m_Sector(sector),
-  m_Layer(layer),
-  m_Time(time),
-  m_Energy(energy)
-{
-  m_Position[0] = position[0];
-  m_Position[1] = position[1];
-  m_PositionVariance[0] = positionVariance[0];
-  m_PositionVariance[1] = positionVariance[1];
-  // DIVOT convert m_Position to 3D global coordinates in m_GlobalPosition
+  const BKLMHit1d* hitPhi = hit1;
+  const BKLMHit1d* hitZ   = hit2;
+  m_ModuleID = hitPhi->getModuleID() & ~MODULE_PLANE_MASK;
+  if (m_ModuleID != (hitZ->getModuleID() & ~MODULE_PLANE_MASK)) {
+    B2WARNING("BKLMHit2d:  Attempt to form a 2D hit from distinct-module 1D hits")
+  }
+  if (hitPhi->isPhiReadout() == hitZ->isPhiReadout()) {
+    B2WARNING("BKLMHit2d:  Attempt to form a 2D hit from parallel 1D hits")
+  } else if (hitZ->isPhiReadout()) {
+    hitPhi = hit2;
+    hitZ   = hit1;
+  }
+  m_Status = hitPhi->getStatus() | hitZ->getStatus();
+  m_IsForward = hitPhi->isForward();
+  m_Sector = hitPhi->getSector();
+  m_Layer = hitPhi->getLayer();
+  m_PhiStripMin = hitPhi->getStripMin();
+  m_PhiStripMax = hitPhi->getStripMax();
+  m_PhiStripCount = hitPhi->getStripCount();
+  m_PhiStripAve = hitPhi->getStripAve();
+  m_PhiStripErr = hitPhi->getStripErr();
+  m_ZStripMin = hitZ->getStripMin();
+  m_ZStripMax = hitZ->getStripMax();
+  m_ZStripCount = hitZ->getStripCount();
+  m_ZStripAve = hitZ->getStripAve();
+  m_ZStripErr = hitZ->getStripErr();
+  m_GlobalPosition = TVector3(0.0, 0.0, 0.0);
+  m_LocalPosition = TVector3(0.0, 0.0, 0.0);
+  m_LocalVariance.ResizeTo(2, 2);
+  m_LocalVariance.Clear();
+  m_Time = 0.5 * (hitPhi->getTime() + hitZ->getTime());
+  m_EDep = hitPhi->getEDep() + hitZ->getEDep();
 }
 
 //! Copy constructor
@@ -58,36 +69,57 @@ BKLMHit2d::BKLMHit2d(const BKLMHit2d& h) :
   m_IsForward(h.m_IsForward),
   m_Sector(h.m_Sector),
   m_Layer(h.m_Layer),
+  m_ModuleID(h.m_ModuleID),
+  m_PhiStripMin(h.m_PhiStripMin),
+  m_PhiStripMax(h.m_PhiStripMax),
+  m_PhiStripCount(h.m_PhiStripCount),
+  m_PhiStripAve(h.m_PhiStripAve),
+  m_PhiStripErr(h.m_PhiStripErr),
+  m_ZStripMin(h.m_ZStripMin),
+  m_ZStripMax(h.m_ZStripMax),
+  m_ZStripCount(h.m_ZStripCount),
+  m_ZStripAve(h.m_ZStripAve),
+  m_ZStripErr(h.m_ZStripErr),
+  m_GlobalPosition(h.m_GlobalPosition),
+  m_LocalPosition(h.m_LocalPosition),
+  m_LocalVariance(h.m_LocalVariance),
   m_Time(h.m_Time),
-  m_Energy(h.m_Energy)
+  m_EDep(h.m_EDep)
 {
-  m_Position[0] = h.m_Position[0];
-  m_Position[1] = h.m_Position[1];
-  m_PositionVariance[0] = h.m_PositionVariance[0];
-  m_PositionVariance[1] = h.m_PositionVariance[1];
-  m_GlobalPosition = h.m_GlobalPosition;
 }
 
-void BKLMHit2d::getLocalPosition(double position[2], double positionError[2]) const
+void BKLMHit2d::getLocalPosition(double position[2], double error[2]) const
 {
-  position[0] = m_Position[0];
-  position[1] = m_Position[1];
-  positionError[0] = sqrt(m_PositionVariance[0]);
-  positionError[1] = sqrt(m_PositionVariance[1]);
+  position[0] = m_LocalPosition.Y();
+  position[1] = m_LocalPosition.Z();
+  error[0] = sqrt(m_LocalVariance[0][0]);
+  error[1] = sqrt(m_LocalVariance[1][1]);
 }
 
-void BKLMHit2d::getLocalVariance(double positionVariance[2]) const
+void BKLMHit2d::getLocalVariance(double variance[2]) const
 {
-  positionVariance[0] = m_PositionVariance[0];
-  positionVariance[1] = m_PositionVariance[1];
+  variance[0] = m_LocalVariance[0][0];
+  variance[1] = m_LocalVariance[1][1];
 }
 
-void BKLMHit2d::setLocalPosition(const double position[2], const double positionError[2])
+void BKLMHit2d::setLocalPosition(double x, double y, double z)
 {
-  m_Position[0] = position[0];
-  m_Position[1] = position[1];
-  m_PositionVariance[0] = positionError[0] * positionError[0];
-  m_PositionVariance[1] = positionError[1] * positionError[1];
-  // DIVOT convert m_Position to 3D global position in m_GlobalPosition
+  m_LocalPosition.SetX(x);
+  m_LocalPosition.SetY(y);
+  m_LocalPosition.SetZ(z);
 }
 
+void BKLMHit2d::setLocalVariance(double yy, double yz, double zy, double zz)
+{
+  m_LocalVariance[0][0] = yy;
+  m_LocalVariance[0][1] = yz;
+  m_LocalVariance[1][0] = zy;
+  m_LocalVariance[1][1] = zz;
+}
+
+void BKLMHit2d::setGlobalPosition(double x, double y, double z)
+{
+  m_GlobalPosition.SetX(x);
+  m_GlobalPosition.SetY(y);
+  m_GlobalPosition.SetZ(z);
+}

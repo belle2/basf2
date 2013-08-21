@@ -53,12 +53,10 @@
         </ZStrips>
         <PhiScintillators>
           <NScints>37</NScints>
-          <OffsetX>-1</OffsetX>
-          <Offset>-1</Offset>
+          <OffsetSign>-1</OffsetSign>
         </PhiScintillators>
         <ZScintillators>
-          <OffsetX>+1</OffsetX>
-          <Offset>-1</Offset>
+          <OffsetSign>-1</OffsetSign>
         </ZScintillators>
       </Layer>
       <Layer layer="2">
@@ -74,71 +72,69 @@
         </ZStrips>
         <PhiScintillators>
           <NScints>42</NScints>
-          <OffsetX>-1</OffsetX>
-          <Offset>+1</Offset>
+          <OffsetSign>+1</OffsetSign>
         </PhiScintillators>
         <ZScintillators>
-          <OffsetX>+1</OffsetX>
-          <Offset>-1</Offset>
+          <OffsetSign>-1</OffsetSign>
           <Scint scint="7">
             <DLength unit="cm">-2.0</DLength>
-            <Offset>-1</Offset>
+            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="8">
             <DLength unit="cm">-2.0</DLength>
-            <Offset>-1</Offset>
+            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="9">
             <DLength unit="cm">-2.0</DLength>
-            <Offset>-1</Offset>
+            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="10">
             <DLength unit="cm">-2.0</DLength>
-            <Offset>-1</Offset>
+            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="22">
             <DLength unit="cm">-2.0</DLength>
-            <Offset>-1</Offset>
+            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="23">
             <DLength unit="cm">-2.0</DLength>
-            <Offset>-1</Offset>
+            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="24">
             <DLength unit="cm">-2.0</DLength>
-            <Offset>-1</Offset>
+            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="25">
             <DLength unit="cm">-2.0</DLength>
-            <Offset>-1</Offset>
+            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="37">
             <DLength unit="cm">-2.0</DLength>
-            <Offset>-1</Offset>
+            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="38">
             <DLength unit="cm">-2.0</DLength>
-            <Offset>-1</Offset>
+            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="39">
             <DLength unit="cm">-2.0</DLength>
-            <Offset>-1</Offset>
+            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="40">
             <DLength unit="cm">-2.0</DLength>
-            <Offset>-1</Offset>
+            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="51">
             <DLength unit="cm">-2.0</DLength>
-            <Offset>-1</Offset>
+            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="52">
             <DLength unit="cm">-2.0</DLength>
-            <Offset>-1</Offset>
+            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="53">
             <DLength unit="cm">-2.0</DLength>
-            <Offset>-1</Offset>
+            <OffsetSign>+1</OffsetSign>
           </Scint>
         </ZScintillators>
       </Layer>
@@ -2082,7 +2078,8 @@
       <GasHeight unit="cm">0.2</GasHeight>
       <Length unit="cm">222.0</Length>
       <LengthChimney unit="cm">159.0</LengthChimney>
-      <FrameWidth unit="cm">0.125</FrameWidth>
+      <FrameWidth unit="cm">1.25</FrameWidth>
+      <FrameThickness unit="cm">0.3</FrameThickness>
       <SpacerWidth unit="cm">0.6</SpacerWidth>
       <ElectrodeBorder unit="cm">1.0</ElectrodeBorder>
       <PolystyreneInnerHeight unit="cm">0.635</PolystyreneInnerHeight>
@@ -2090,7 +2087,8 @@
       <Scintillator>
         <Width unit="cm">4.00</Width>
         <Height unit="cm">1.00</Height>
-        <BoreRadius unit="cm">0.25</BoreRadius>
+        <BoreRadius unit="cm">0.125</BoreRadius>
+        <FiberRadius unit="cm">0.06</FiberRadius>
         <TiO2ThicknessTop unit="cm">0.030</TiO2ThicknessTop>
         <TiO2ThicknessSide unit="cm">0.015</TiO2ThicknessSide>
       </Scintillator>

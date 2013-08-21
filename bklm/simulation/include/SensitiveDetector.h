@@ -19,6 +19,10 @@ namespace Belle2 {
 
   namespace bklm {
 
+    class Module;
+    class GeometryPar;
+    class SimulationPar;
+
     //! Class for the BKLM Sensitive Detector
     //! Each qualified simulation step is saved into a StoreArray of BKLMSimHits.
     class SensitiveDetector: public Simulation::SensitiveDetectorBase {
@@ -37,19 +41,25 @@ namespace Belle2 {
     private:
 
       //! Find the ranges of matching RPC strips for each simulated hit
-      void convertHitToRPCStrips(const TVector3&, bool, int, int, int&, int&, int&, int&);
+      void convertHitToRPCStrips(const CLHEP::Hep3Vector&, const Module*, int&, int&, int&, int&);
 
       //! Flag to say whether background study will be done or not
       bool m_DoBackgroundStudy;
 
       //! PDG encoding for neutron
-      int m_NeutronPID;
+      int m_NeutronPDG;
 
       //! maximum permissible hit time (based on overflow of LeCroy 1877 TDC)
       double m_HitTimeMax;
 
       //! Flag to enforce once-only initializations in Initialize()
       bool m_FirstCall;
+
+      //! Pointer to GeometryPar singleton
+      GeometryPar* m_GeoPar;
+
+      //! Pointer to SimulationPar singleton
+      SimulationPar* m_SimPar;
 
     };
 

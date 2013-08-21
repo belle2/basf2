@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <bklm/dataobjects/BKLMDigit.h>
+#include <bklm/dataobjects/BKLMSimHit.h>
 
 #include <framework/logging/Logger.h>
 
@@ -21,43 +22,98 @@ BKLMDigit::BKLMDigit() : RelationsObject()
 {
 }
 
-//! Constructor with initial values
-BKLMDigit::BKLMDigit(unsigned int status, bool isForward, int sector,
-                     int layer, bool isPhiReadout, int strip,
-                     double time, double energy) :
+//! Constructor with initial values for an RPC or scint hit
+//BKLMDigit::BKLMDigit(unsigned int status, int pdg, bool isForward, int sector,
+//                     int layer, bool isPhiReadout, int strip, int moduleID,
+//                     const TVector3& globalPosition, const TVector3& localPosition,
+//                     double time, double eDep) :
+//  RelationsObject(),
+//  m_Status(status),
+//  m_PDG(pdg),
+//  m_IsForward(isForward),
+//  m_Sector(sector),
+//  m_Layer(layer),
+//  m_IsPhiReadout(isPhiReadout),
+//  m_Strip(strip),
+//  m_ModuleID(moduleID),
+//  m_SimGlobalPosition(globalPosition),
+//  m_SimLocalPosition(localPosition),
+//  m_SimTime(time),
+//  m_Time(0.0),
+//  m_SimEDep(eDep),
+//  m_EDep(0.0),
+//  m_SimNPixel(0),
+//  m_NPixel(0.0),
+//  m_FitStatus(0)
+//{
+//}
+
+//! Constructor with initial values for an RPC hit
+BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   RelationsObject(),
-  m_Status(status),
-  m_IsForward(isForward),
-  m_Sector(sector),
-  m_Layer(layer),
-  m_IsPhiReadout(isPhiReadout),
+  m_Status(simHit->getStatus()),
+  m_PDG(simHit->getPDG()),
+  m_IsForward(simHit->isForward()),
+  m_Sector(simHit->getSector()),
+  m_Layer(simHit->getLayer()),
+  m_IsPhiReadout(simHit->isPhiReadout()),
   m_Strip(strip),
-  m_Time(time),
-  m_Energy(energy)
+  m_ModuleID(simHit->getModuleID()),
+  m_SimGlobalPosition(simHit->getGlobalPosition()),
+  m_SimLocalPosition(simHit->getLocalPosition()),
+  m_SimTime(simHit->getTime()),
+  m_Time(0.0),
+  m_SimEDep(simHit->getEDep()),
+  m_EDep(0.0),
+  m_SimNPixel(0),
+  m_NPixel(0.0),
+  m_FitStatus(0)
 {
 }
+
+//! Constructor with initial values for a scint hit
+BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
+  RelationsObject(),
+  m_Status(simHit->getStatus()),
+  m_PDG(simHit->getPDG()),
+  m_IsForward(simHit->isForward()),
+  m_Sector(simHit->getSector()),
+  m_Layer(simHit->getLayer()),
+  m_IsPhiReadout(simHit->isPhiReadout()),
+  m_Strip(simHit->getStrip()),
+  m_ModuleID(simHit->getModuleID()),
+  m_SimGlobalPosition(simHit->getGlobalPosition()),
+  m_SimLocalPosition(simHit->getLocalPosition()),
+  m_SimTime(simHit->getTime()),
+  m_Time(0.0),
+  m_SimEDep(simHit->getEDep()),
+  m_EDep(0.0),
+  m_SimNPixel(0),
+  m_NPixel(0.0),
+  m_FitStatus(0)
+{
+}
+
 
 //! Copy constructor
-BKLMDigit::BKLMDigit(const BKLMDigit& h) :
-  RelationsObject(h),
-  m_Status(h.m_Status),
-  m_IsForward(h.m_IsForward),
-  m_Sector(h.m_Sector),
-  m_Layer(h.m_Layer),
-  m_IsPhiReadout(h.m_IsPhiReadout),
-  m_Strip(h.m_Strip),
-  m_Time(h.m_Time),
-  m_Energy(h.m_Energy)
+BKLMDigit::BKLMDigit(const BKLMDigit& digit) :
+  RelationsObject(digit),
+  m_Status(digit.m_Status),
+  m_PDG(digit.m_PDG),
+  m_IsForward(digit.m_IsForward),
+  m_Sector(digit.m_Sector),
+  m_Layer(digit.m_Layer),
+  m_IsPhiReadout(digit.m_IsPhiReadout),
+  m_Strip(digit.m_Strip),
+  m_ModuleID(digit.m_ModuleID),
+  m_SimGlobalPosition(digit.m_SimGlobalPosition),
+  m_SimLocalPosition(digit.m_SimLocalPosition),
+  m_SimTime(digit.m_SimTime),
+  m_Time(digit.m_Time),
+  m_SimEDep(digit.m_SimEDep),
+  m_EDep(digit.m_EDep),
+  m_SimNPixel(digit.m_SimNPixel),
+  m_NPixel(digit.m_NPixel),
+  m_FitStatus(digit.m_FitStatus)
 {
-}
-
-bool BKLMDigit::match(const BKLMDigit* s) const
-{
-  if (m_Strip        != s->getStrip()) return false;
-  if (m_Layer        != s->getLayer()) return false;
-  if (m_Sector       != s->getSector()) return false;
-  if (m_IsForward    != s->isForward()) return false;
-  if (m_IsPhiReadout != s->isPhiReadout()) return false;
-  if (m_Status       != s->getStatus()) return false;
-  return true;
 }

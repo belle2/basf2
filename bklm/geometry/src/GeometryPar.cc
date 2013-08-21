@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <bklm/geometry/GeometryPar.h>
+#include <bklm/dataobjects/BKLMStatus.h>
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
@@ -103,6 +104,7 @@ namespace Belle2 {
       m_ModuleReadoutHeight = m_ModuleFoamHeight + (m_ModuleCopperHeight + m_ModuleMylarHeight) * 2.0;
       m_ModuleHeight = (m_ModuleCoverHeight + m_ModuleReadoutHeight + m_ModuleGasHeight + m_ModuleGlassHeight * 2.0) * 2.0;
       m_ModuleFrameWidth = content.getLength("Module/FrameWidth");
+      m_ModuleFrameThickness = content.getLength("Module/FrameThickness");
       m_ModuleGasSpacerWidth = content.getLength("Module/SpacerWidth");
       m_ModuleElectrodeBorder = content.getLength("Module/ElectrodeBorder");
       m_ModulePolystyreneInnerHeight = content.getLength("Module/PolystyreneInnerHeight");
@@ -110,6 +112,7 @@ namespace Belle2 {
       m_ScintWidth = content.getLength("Module/Scintillator/Width");
       m_ScintHeight = content.getLength("Module/Scintillator/Height");
       m_ScintBoreRadius = content.getLength("Module/Scintillator/BoreRadius");
+      m_ScintFiberRadius = content.getLength("Module/Scintillator/FiberRadius");
       m_ScintTiO2ThicknessTop = content.getLength("Module/Scintillator/TiO2ThicknessTop");
       m_ScintTiO2ThicknessSide = content.getLength("Module/Scintillator/TiO2ThicknessSide");
 
@@ -146,7 +149,7 @@ namespace Belle2 {
       char name[40] = { '\0' };
       for (int fb = 1; fb <= 2; ++fb) {
         bool isForward = (fb == 1);
-        Hep3Vector deltaZ(0.0, 0.0, (isForward ? m_ModuleElectrodeBorder : -m_ModuleElectrodeBorder));
+        double dzRPC = (isForward ? m_ModuleElectrodeBorder : -m_ModuleElectrodeBorder);
         for (int sector = 1; sector <= m_NSector; ++sector) {
           int nZStrips = ((!isForward) && (sector == 3) ? m_NZStripsChimney : m_NZStrips);
           int nZScints = ((!isForward) && (sector == 3) ? m_NZScintsChimney : m_NZScints);
@@ -154,12 +157,8 @@ namespace Belle2 {
           GearDir sectorContent(content);
           sectorContent.append(name);
           HepRotation rotation;
-          if (~isForward) rotation.rotateX(M_PI);
+          if (!isForward) rotation.rotateX(M_PI);
           rotation.rotateZ(sectorContent.getAngle("/Phi"));
-          Hep3Vector translation(0.0, 0.0, m_OffsetZ);
-          translation += rotation(rSector) + deltaZ;
-          Sector* pSector = new Sector(isForward, sector, m_NLayer, translation, rotation);
-          m_Sectors.push_back(pSector);
           for (int layer = 1; layer <= m_NLayer; ++layer) {
             GearDir layerContent(sectorContent);
             sprintf(name, "/Layer[@layer=\"%d\"]", layer);
@@ -168,45 +167,52 @@ namespace Belle2 {
                              layerContent.getLength("ReconstructionShift/Y"),
                              layerContent.getLength("ReconstructionShift/Z"));
             double dr = (layer == 1 ? (m_GapNominalHeight - m_Gap1NominalHeight) * 0.5 : (layer - 1) * m_LayerHeight);
+            int moduleID = (isForward ? 0 : MODULE_END_MASK)
+                           + ((sector - 1) << MODULE_SECTOR_BIT)
+                           + ((layer - 1) << MODULE_LAYER_BIT);
             sprintf(name, "/Layers/Layer[@layer=\"%d\"]", layer);
             layerContent = content;
             layerContent.append(name);
             if (layerContent.getBool("HasRPCs")) {
+              Hep3Vector translation(0.0, 0.0, m_OffsetZ + dzRPC);
               int phiStripNumber = layerContent.getInt("PhiStrips/NStrips");
-              pSector->addModule(new Module(isForward, sector, layer, shift, dr, pSector,
-                                            layerContent.getLength("PhiStrips/Width"),
-                                            layerContent.getLength("PhiStrips/Length"),
-                                            phiStripNumber,
-                                            (layer == 1 ? 2 : 1),
-                                            (layer == 1 ? phiStripNumber - 1 : phiStripNumber),
-                                            0,
-                                            layerContent.getLength("ZStrips/Width"),
-                                            layerContent.getLength("ZStrips/Length"),
-                                            nZStrips,
-                                            1,
-                                            nZStrips,
-                                            0));
+              Module* pModule = new Module(isForward, sector, layer, shift, dr,
+                                           layerContent.getLength("PhiStrips/Width"),
+                                           layerContent.getLength("PhiStrips/Length"),
+                                           phiStripNumber,
+                                           (layer == 1 ? 2 : 1),
+                                           (layer == 1 ? phiStripNumber - 1 : phiStripNumber),
+                                           layerContent.getLength("ZStrips/Width"),
+                                           layerContent.getLength("ZStrips/Length"),
+                                           nZStrips,
+                                           1,
+                                           nZStrips,
+                                           translation + rotation(rSector),
+                                           rotation
+                                          );
+              m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
               //DIVOT to call these 3 functions
-              const Module* m = pSector->findModule(layer);
-              const HepMatrix lE = m->getLocalError(1, 1);
-              const Rect mR = m->getModuleRectLocal();
-              const Rect sR = m->getStripRectLocal(0.0, true);
+              const HepMatrix lE = pModule->getLocalError(1, 1);
+              const Rect mR = pModule->getModuleRectLocal();
+              const Rect sR = pModule->getStripRectLocal(0.0, true);
               phiStripNumber = (int)(lE.trace() + mR.corner[0].x() + sR.corner[0].x());
             } else {
+              Hep3Vector translation(0.0, 0.0, m_OffsetZ);
               int    nPhiScints = layerContent.getInt("PhiScintillators/NScints");
               double phiScintLength = nZScints * m_ScintWidth;
               double zScintLength = nPhiScints * m_ScintWidth;
-              Module* pModule = new Module(isForward, sector, layer, shift, dr, pSector,
+              Module* pModule = new Module(isForward, sector, layer, shift, dr,
                                            m_ScintWidth,
                                            phiScintLength,
                                            nPhiScints,
-                                           layerContent.getInt("PhiScintillators/Offset"),
-                                           m_ScintWidth,
+                                           layerContent.getInt("PhiScintillators/OffsetSign"),
                                            zScintLength,
                                            nZScints,
-                                           layerContent.getInt("ZScintillators/Offset")
+                                           layerContent.getInt("ZScintillators/OffsetSign"),
+                                           translation + rotation(rSector),
+                                           rotation
                                           );
-              pSector->addModule(pModule);
+              m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
               double base = -0.5 * (nPhiScints + 1) * m_ScintWidth;
               for (int scint = 1; scint <= nPhiScints; ++scint) {
                 sprintf(name, "/PhiScintillators/Scint[@scint=\"%d\"]", scint);
@@ -215,7 +221,7 @@ namespace Belle2 {
                 double dLength = scintContent.getLength("DLength", 0.0);
                 pModule->addPhiScint(scint,
                                      phiScintLength + dLength,
-                                     0.5 * fabs(dLength) * scintContent.getInt("Offset", 0),
+                                     0.5 * fabs(dLength) * scintContent.getInt("OffsetSign", 0),
                                      base + scint * m_ScintWidth
                                     );
               }
@@ -227,7 +233,7 @@ namespace Belle2 {
                 double dLength = scintContent.getLength("DLength", 0.0);
                 pModule->addZScint(scint,
                                    zScintLength + dLength,
-                                   0.5 * fabs(dLength) * scintContent.getInt("Offset", 0),
+                                   0.5 * fabs(dLength) * scintContent.getInt("OffsetSign", 0),
                                    base + scint * m_ScintWidth
                                   );
               }
@@ -304,14 +310,23 @@ namespace Belle2 {
       return size;
     }
 
-    const Hep3Vector GeometryPar::getPolystyreneHalfSize(int layer, bool flag) const
+    const Hep3Vector GeometryPar::getPolystyreneHalfSize1(int layer, bool flag) const
     {
       return getReadoutHalfSize(layer, flag);
     }
 
+    const Hep3Vector GeometryPar::getPolystyreneHalfSize2(int layer, bool flag) const
+    {
+      Hep3Vector size = getModuleHalfSize(layer, flag);
+      size.setX(size.x() - m_ModuleFrameThickness - m_ModuleCoverHeight);
+      size.setY(size.y() - m_ModuleFrameThickness);
+      size.setZ(size.z() - m_ModuleFrameThickness);
+      return size;
+    }
+
     const Hep3Vector GeometryPar::getAirHalfSize(int layer, bool flag) const
     {
-      Hep3Vector size = getPolystyreneHalfSize(layer, flag);
+      Hep3Vector size = getPolystyreneHalfSize2(layer, flag);
       size.setX(m_ScintHeight);
       return size;
     }
@@ -326,29 +341,27 @@ namespace Belle2 {
 
     int GeometryPar::getNPhiStrips(int layer) const
     {
-      if (m_Sectors.front()->findModule(layer)->hasRPCs()) {
-        return m_Sectors.front()->findModule(layer)->getNStrips(true);
-      } else {
-        return 0;
-      }
+      const Module* module = findModule(layer);
+      if (module == NULL) return 0;
+      if (!(module->hasRPCs())) return 0;
+      return module->getNStrips(true);
     }
 
     int GeometryPar::getNPhiScints(int layer) const
     {
-      if (m_Sectors.front()->findModule(layer)->hasRPCs()) {
-        return 0;
-      } else {
-        return m_Sectors.front()->findModule(layer)->getNStrips(true);
-      }
+      const Module* module = findModule(layer);
+      if (module == NULL) return 0;
+      if (module->hasRPCs()) return 0;
+      return module->getNStrips(true);
     }
 
     const Hep3Vector GeometryPar::getScintEnvelopeOffset(int layer, bool flag) const
     {
       Hep3Vector airSize = getAirHalfSize(layer, flag);
       Hep3Vector scintEnvelopeSize = getScintEnvelopeHalfSize(layer, flag);
-      Hep3Vector offset = 0.5 * (airSize - scintEnvelopeSize);
-      offset.setY(offset.y() * m_Sectors.front()->findModule(layer)->getPhiOffset());
-      offset.setZ(offset.z() * m_Sectors.front()->findModule(layer)->getZOffset());
+      Hep3Vector offset = airSize - scintEnvelopeSize;
+      offset.setY(offset.y() * findModule(layer)->getPhiOffsetSign());
+      offset.setZ(offset.z() * findModule(layer)->getZOffsetSign());
       return offset;
     }
 
@@ -413,20 +426,30 @@ namespace Belle2 {
 
     bool GeometryPar::hasRPCs(int layer) const
     {
-      if ((layer <= 0) || (layer > m_NLayer)) return true;
-      return m_Sectors.front()->findModule(layer)->hasRPCs();
+      const Module* module = findModule(layer);
+      if (module == NULL) return false;
+      return module->hasRPCs();
     }
 
-    const Sector* GeometryPar::findSector(bool isForward, int sector) const
+    const Module* GeometryPar::findModule(bool isForward, int sector, int layer) const
     {
-      vector<Sector*>::const_iterator iS;
-      for (iS = m_Sectors.begin(); iS != m_Sectors.end(); ++iS) {
-        if (((*iS)->isForward() == isForward) && ((*iS)->getSector() == sector)) {
-          break;
-        }
-      }
-      return (*iS);
+      int moduleID = (isForward ? 0 : MODULE_END_MASK)
+                     + ((sector - 1) << MODULE_SECTOR_BIT)
+                     + ((layer - 1) << MODULE_LAYER_BIT);
+      map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
+      if (iM == m_Modules.end()) return NULL;
+      return iM->second;
     }
+
+    const Module* GeometryPar::findModule(int layer) const
+    {
+      int moduleID = ((layer - 1) << MODULE_LAYER_BIT);
+      map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
+      if (iM == m_Modules.end()) return NULL;
+      return iM->second;
+    }
+
+
   } // end of namespace bklm
 
 } // end of namespace Belle2

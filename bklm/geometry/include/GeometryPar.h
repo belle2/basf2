@@ -11,18 +11,20 @@
 #ifndef BKLMGEOMETRYPAR_H
 #define BKLMGEOMETRYPAR_H
 
-#include "bklm/geometry/Sector.h"
 #include "bklm/geometry/Module.h"
 
 #include <vector>
+#include <map>
 
 #include "CLHEP/Vector/ThreeVector.h"
 
 #define NLAYER 15
 #define NSECTOR 8
 #define NSCINT 100
-#define PLANE_INNER 1
-#define PLANE_OUTER 2
+#define BKLM_INNER 1
+#define BKLM_OUTER 2
+#define BKLM_FORWARD 1
+#define BKLM_BACKWARD 2
 
 namespace Belle2 {
 
@@ -73,7 +75,10 @@ namespace Belle2 {
       const CLHEP::Hep3Vector getGasHalfSize(int layer, bool hasChimney) const;
 
       //! Get the size (dx,dy,dz) of the scintillator detector module's polystyrene filler
-      const CLHEP::Hep3Vector getPolystyreneHalfSize(int layer, bool hasChimney) const;
+      const CLHEP::Hep3Vector getPolystyreneHalfSize1(int layer, bool hasChimney) const;
+
+      //! Get the size (dx,dy,dz) of the scintillator detector module's polystyrene filler
+      const CLHEP::Hep3Vector getPolystyreneHalfSize2(int layer, bool hasChimney) const;
 
       //! Get the size (dx,dy,dz) of the scintillator detector module's air filler
       const CLHEP::Hep3Vector getAirHalfSize(int layer, bool hasChimney) const;
@@ -92,6 +97,12 @@ namespace Belle2 {
 
       //! Get the height of the active volume of a scintillator strip
       double getScintHalfWidth(void) const { return 0.5 * m_ScintWidth - m_ScintTiO2ThicknessSide; }
+
+      //! Get the radius of the cylindrical central bore in a scintillator strip
+      double getScintBoreRadius(void) const { return m_ScintBoreRadius; }
+
+      //! Get the radius of the cylindrical central WLS fiber in a scintillator strip
+      double getScintFiberRadius(void) const { return m_ScintFiberRadius; }
 
       //! Get the radial midpoint of the gap of specified layer
       double getGapMiddleRadius(int layer) const;
@@ -201,6 +212,9 @@ namespace Belle2 {
       //! Get the width of the module's perimeter aluminum frame
       double getModuleFrameWidth(void) const { return m_ModuleFrameWidth; }
 
+      //! Get the thickness of the module's perimeter aluminum frame
+      double getModuleFrameThickness(void) const { return m_ModuleFrameThickness; }
+
       //! Get the width of the module's gas-gap's perimeter spacer
       double getModuleGasSpacerWidth(void) const { return m_ModuleGasSpacerWidth; }
 
@@ -276,8 +290,11 @@ namespace Belle2 {
       //! Get the vector of sector definitions
       const std::vector<Sector*> getSectors(void) const { return m_Sectors; };
 
-      //! Get the pointer to the definition of a sector
-      const Sector* findSector(bool isForward, int sector) const;
+      //! Get the pointer to the definition of a module
+      const Module* findModule(bool isForward, int sector, int layer) const;
+
+      //! Get the pointer to the definition of a module in forward sector #1
+      const Module* findModule(int layer) const;
 
       //! Print all sector and module definitions
       void printTree(void) const;
@@ -410,8 +427,11 @@ namespace Belle2 {
       //! height of a detector module
       double m_ModuleHeight;
 
-      //! width of a detector module's frame
+      //! width of a detector module's frame ("C" shape - width of horizontal leg)
       double m_ModuleFrameWidth;
+
+      //! thickness of a detector module's frame ("C" shape - thickness of vertical leg)
+      double m_ModuleFrameThickness;
 
       //! width of a detector module's spacer
       double m_ModuleGasSpacerWidth;
@@ -433,6 +453,9 @@ namespace Belle2 {
 
       //! radius (cm) of the central bore in the scintillator strip
       double m_ScintBoreRadius;
+
+      //! radius (cm) of the central WLS fiber in the scintillator strip
+      double m_ScintFiberRadius;
 
       //! thickness (cm) of the TiO2 coating on the top (and bottom) of the scintillator strip
       double m_ScintTiO2ThicknessTop;
@@ -515,8 +538,8 @@ namespace Belle2 {
       //! angular width of the innermost-module support plate's bracket's cutout
       double m_BracketCutoutDphi;
 
-      //! vector of pointers to defined sectors
-      std::vector<Sector*> m_Sectors;
+      //! map of <volumeIDs, pointers to defined modules>
+      std::map<int, Module*> m_Modules;
 
       //! static pointer to the singleton instance of this class
       static GeometryPar* m_Instance;

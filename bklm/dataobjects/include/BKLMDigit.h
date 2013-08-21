@@ -12,24 +12,16 @@
 #define BKLMDIGIT_H
 
 #include <framework/datastore/RelationsObject.h>
+#include <bklm/dataobjects/BKLMStatus.h>
 
-// Definition of each bit in m_Status
-// BKLMDigit originated from MC simulation (rather than real data)
-#define STATUS_MC 0x40000000
+#include <TVector3.h>
 
-// BKLMDigit represents the decay point of a simulated particle
-#define STATUS_DECAYED 0x20000000
-
-// BKLMDigit is located in an RPC (rather than a scintillator)
-#define STATUS_INRPC 0x00000001
-
-// BKLMDigit is outside the in-time coincidence window
-#define STATUS_OUTOFTIME 0x00000002
-
-// BKLMDigit has been assigned to a track
-#define STATUS_ONTRACK 0x00000004
+#define BKLM_INNER 1
+#define BKLM_OUTER 2
 
 namespace Belle2 {
+
+  class BKLMSimHit;
 
   //! Store one BKLM strip hit as a ROOT object
   class BKLMDigit : public RelationsObject {
@@ -39,8 +31,14 @@ namespace Belle2 {
     //! Empty constructor for ROOT IO (needed to make the class storable)
     BKLMDigit();
 
-    //! Constructor with initial values
-    BKLMDigit(unsigned int, bool, int, int, bool, int, double, double);
+    //! Constructor with initial values for an RPC or scint hit
+//    BKLMDigit(unsigned int, int, bool, int, int, bool, int, int, const TVector3&, const TVector3&, double, double);
+
+    //! Constructor with initial values for an RPC hit
+    BKLMDigit(const BKLMSimHit*, int);
+
+    //! Constructor with initial values for a scint hit
+    BKLMDigit(const BKLMSimHit*);
 
     //! Copy constructor
     BKLMDigit(const BKLMDigit&);
@@ -52,7 +50,13 @@ namespace Belle2 {
     unsigned int getStatus() const { return m_Status; }
 
     //! returns flag whether hit is in RPC (true) or scintillator (false)
-    bool isInRPC() const { return ((m_Status & 0x00000001) != 0); }
+    bool isInRPC() const { return ((m_Status & STATUS_INRPC) != 0); }
+
+    //! returns the PDG code of the leading particle
+    int getPDG(void) { return m_PDG; }
+
+    //! returns whether the scint hit is usable in fit
+    bool isGood() const { return m_IsAboveThreshold; }
 
     //! returns end (TRUE=forward or FALSE=backward) of this strip
     bool isForward() const { return m_IsForward; }
@@ -66,17 +70,44 @@ namespace Belle2 {
     //! returns readout coordinate (TRUE=phi, FALSE=z) of this strip
     bool isPhiReadout() const { return m_IsPhiReadout; }
 
+    //! returns plane number
+    int getPlane() const { return (m_IsPhiReadout ? BKLM_INNER : BKLM_OUTER); }
+
     //! returns strip number
     int getStrip() const { return m_Strip; }
 
-    //! returns hit time
+    //! returns unique detector-module ID
+    int getModuleID() const { return m_ModuleID; }
+
+    //! returns the MC-simulation global position of the hit
+    TVector3 getSimGlobalPosition(void) const { return m_SimGlobalPosition; }
+
+    //! returns the MC-simulation local position of the hit
+    TVector3 getSimLocalPosition(void) const { return m_SimLocalPosition; }
+
+    //! returns MC-simulation hit time
+    double getSimTime() const { return m_SimTime; }
+
+    //! returns reconstructed hit time
     double getTime() const { return m_Time; }
 
-    //! returns pulse height
-    double getEnergy() const { return m_Energy; }
+    //! returns MC-simulation energy deposition
+    double getSimEDep() const { return m_SimEDep; }
+
+    //! returns reconstructed energy deposition
+    double getEDep() const { return m_EDep; }
+
+    //! returns the number of simulated MPPC pixels
+    double getSimNPixel() const { return m_SimNPixel; }
+
+    //! returns the number of reconstructed MPPC pixels
+    double getNPixel() const { return m_NPixel; }
+
+    //! returns status of pulse-fit (enum EKLM::FPGAFitStatus returned as int!)
+    int getFitStatus() { return m_FitStatus; }
 
     //! determines if two BKLMDigits are equal based on geometry only
-    bool match(const BKLMDigit*) const;
+    bool match(const BKLMDigit* d) const { return ((m_ModuleID == d->getModuleID()) && (m_Strip == d->getStrip())); }
 
     //! sets status word (all bits)
     void setStatus(unsigned int status) { m_Status = status; }
@@ -90,18 +121,33 @@ namespace Belle2 {
     //! clears some status bit(s)
     void clearStatusBits(unsigned int status) { m_Status &= (~status); }
 
-    //! sets time (ns)
+    //! sets whether scint hit is usable in fit
+    void isGood(bool flag) { m_IsAboveThreshold = flag; }
+
+    //! sets reconstructed time (ns)
     void setTime(double time) { m_Time = time; }
 
-    //! sets energy (MeV)
-    void setEnergy(double energy) { m_Energy = energy; }
+    //! sets reconstructed energy deposition (MeV)
+    void setEDep(double eDep) { m_EDep = eDep; }
+
+    //! sets the number of simulated MPPC pixels (scintillator only)
+    void setSimNPixel(int nPixel) { m_SimNPixel = nPixel; }
+
+    //! sets the number of reconstructed MPPC pixels (scintillator only)
+    void setNPixel(double nPixel) { m_NPixel = nPixel; }
+
+    //! set the status of the pulse-fit (enum EKLM::FPGAFitStatus --> int!)
+    void setFitStatus(int status) { m_FitStatus = status; }
 
   private:
 
     //! status word
     unsigned int m_Status;
 
-    //! axial end (TRUE=forward or FALSE=backward) of the strip
+    //! PDG code of the (leading) particle
+    int m_PDG;
+
+    //! axial end of the BKLM (TRUE=forward or FALSE=backward) of the strip
     bool m_IsForward;
 
     //! sector number of the strip
@@ -116,11 +162,38 @@ namespace Belle2 {
     //! strip number
     int m_Strip;
 
-    //! global hit time relative to trigger (ns)
+    //! unique detector-module identifier
+    int m_ModuleID;
+
+    //! MC-simulation Global position of the hit
+    TVector3 m_SimGlobalPosition;
+
+    //! MC-simulation Local position of the hit
+    TVector3 m_SimLocalPosition;
+
+    //! MC-simulation event hit time (ns)
+    double m_SimTime;
+
+    //! reconstructed hit time relative to trigger (ns)
     double m_Time;
 
-    //! pulse height (MeV)
-    double m_Energy;
+    //! MC-simulation pulse height (MeV)
+    double m_SimEDep;
+
+    //! reconstructed pulse height (MeV)
+    double m_EDep;
+
+    //! flag to indicate whether the hit pulse height is above threshold
+    bool m_IsAboveThreshold;
+
+    //! simulated number of MPPC pixels
+    int m_SimNPixel;
+
+    //! reconstructed number of MPPC pixels (=photoelectrons in EKLM)
+    double m_NPixel;
+
+    //! pulse-fit status
+    int m_FitStatus;
 
     //! Needed to make the ROOT object storable
     ClassDef(BKLMDigit, 1)

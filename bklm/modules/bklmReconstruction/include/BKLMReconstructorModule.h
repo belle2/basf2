@@ -8,9 +8,14 @@
 
 namespace Belle2 {
 
+  namespace bklm {
+    class GeometryPar;
+  }
+
   //! Module BKLMReconstructorModule
   /*!
-    Simple module for reading BKLM hits
+    Convert StoreArray<BKLMDigit> to StoreArray<BKLMHit1d> and that to StoreArray<BKLMHit2d>
+    and store relations among these.
   */
   class BKLMReconstructorModule : public Module {
 
@@ -58,6 +63,12 @@ namespace Belle2 {
 
   protected:
   private:
+
+    //! Pointer to GeometryPar singleton
+    bklm::GeometryPar* m_GeoPar;
+
+    //! maximum time difference (ns) between two strips that are considered to be in coincidence
+    double m_dtMax;
 
   };
 } // end namespace Belle2

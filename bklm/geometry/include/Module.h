@@ -12,6 +12,7 @@
 #define BKLMMODULE_H
 
 #include "CLHEP/Vector/ThreeVector.h"
+#include "CLHEP/Vector/Rotation.h"
 #include "CLHEP/Matrix/Matrix.h"
 
 #include "bklm/geometry/Rect.h"
@@ -20,9 +21,35 @@ namespace Belle2 {
 
   namespace bklm {
 
-    class Sector;
-
-    //! Define the geometry of a BKLM module
+    /*! Define the geometry of a BKLM module
+     *  Each sector [octant] contains Modules.  The local geometry of a sector
+     *  and its modules is oriented to the position of sector 0 by a rotation
+     *  the global z axis.
+     *
+     *       SECTOR 0 GLOBAL COORDINATES        SECTOR s LOCAL COORDINATES
+     *
+     *   +y                  _                               +y    _
+     *   ^                  / |                              ^    / |
+     *   |                /   |                              |  /   |
+     *   |              /     |                              |/     |
+     *   |            /       |                             /|      |
+     *   |            |   end |                             ||  end |
+     *   + - - - - -  |  view | - - > +x         - - - - -  |+ view | - - > +x
+     *                |       |                             |       |
+     *                \       |                             \       |
+     *                  \     |                               \     |
+     *                    \   |                                 \   |
+     *                      \_|                                   \_|
+     *
+     *   The local origin is shifted along the +x axis so that it coincides with
+     *   the middle of the layer 0 gap (=slot).  Outer layers are at larger values
+     *   of local x.  The local origin is shifted along the z axis so that it
+     *   lies at the boundary between the forward and backward halves of the barrel.
+     *   For the backward sectors, the module is rotated by 180 degrees about the +x
+     *   axis so that the orientation of the local z axis is flipped from the global
+     *   orientation so that all modules extend along the local +z axis from the
+     *   local z=0 (which is nearest the IP).
+     */
     class Module {
 
     public:
@@ -36,19 +63,18 @@ namespace Belle2 {
              int               module,
              CLHEP::Hep3Vector shift,
              double            localX,
-             Sector*           sectorPtr,
              double            phiStripWidth,
              double            phiStripLength,
              int               phiStripNumber,
-             int               phiStripMin,
              int               phiStripMax,
-             int               phiOffset,
+             int               phiOffsetSign,
              double            zStripWidth,
              double            zStripLength,
              int               zStripNumber,
              int               zStripMin,
              int               zStripMax,
-             int               zOffset);
+             CLHEP::Hep3Vector translation,
+             CLHEP::HepRotation rotation);
 
       //! Constructor with explicit values (for scint module)
       Module(bool              isForward,
@@ -56,27 +82,21 @@ namespace Belle2 {
              int               module,
              CLHEP::Hep3Vector shift,
              double            localX,
-             Sector*           sectorPtr,
-             double            phiStripWidth,
+             double            stripWidth,
              double            phiStripLength,
              int               phiStripNumber,
-             int               phiOffset,
-             double            zStripWidth,
+             int               phiOffsetSign,
              double            zStripLength,
              int               zStripNumber,
-             int               zOffset);
+             int               zOffsetSign,
+             CLHEP::Hep3Vector translation,
+             CLHEP::HepRotation rotation);
 
       //! Copy constructor
       Module(const Module& m);
 
       //! Destructor
       ~Module();
-
-      //! Comparison operator (ordering)
-      bool operator<(const Module& m) const;
-
-      //! Comparison operator (equality)
-      bool operator==(const Module& m) const { return isSameModule(m); }
 
       //! Get module's detector type (true for RPCs, false for scints)
       bool hasRPCs() const { return m_HasRPCs; }
@@ -100,7 +120,7 @@ namespace Belle2 {
       int getPhiStripMax() const { return m_PhiStripMax; }
 
       //! Get module's offset direction along phi for the strip/scint envelope
-      int getPhiOffset() const { return m_PhiOffset; }
+      int getPhiOffsetSign() const { return m_PhiOffsetSign; }
 
       //! Get module's z-strip count
       int getZStripNumber() const { return m_ZStripNumber; }
@@ -112,22 +132,13 @@ namespace Belle2 {
       int getZStripMax() const { return m_ZStripMax; }
 
       //! Get module's offset direction along z for the strip/scint envelope
-      int getZOffset() const { return m_ZOffset; }
+      int getZOffsetSign() const { return m_ZOffsetSign; }
 
       //! Get module's shift, nominally (0,0,0) (in local coordinates)
       const CLHEP::Hep3Vector getShift() const { return m_Shift; }
 
       //! Get module's altitude (in local coordinates)
       double getLocalX() const { return m_LocalX; }
-
-      //! Get pointer to the module's containing sector
-      const Sector* getSectorPtr(void) const { return m_SectorPtr; }
-
-      //! Determine if two modules are identical
-      bool isSameModule(bool isForward, int sector, int layer) const;
-
-      //! Determine if two modules are identical
-      bool isSameModule(const Module& m) const;
 
       //! Add one phi-measuring scintillator strip to the module
       void addPhiScint(int scint, double length, double offset, double position);
@@ -182,8 +193,38 @@ namespace Belle2 {
       //! Fills phiStrip and zStrip with relative position (-0.5..+0.5) of space-point (in local coordinates) along each strip's width
       void getStripDivisions(const CLHEP::Hep3Vector& p, double& phiStrip, double& zStrip) const;
 
-      //! Print module definition
-      void printTree(void) const;
+      //! Transform space-point within this module from local to global coordinates
+      const CLHEP::Hep3Vector localToGlobal(const CLHEP::Hep3Vector& v) const;
+
+      //! Transform space-point within this module from global to local coordinates
+      const CLHEP::Hep3Vector globalToLocal(const CLHEP::Hep3Vector& v) const;
+
+      //! Transform space-point within this module from global to local coordinates
+      const CLHEP::Hep3Vector globalToLocal(double x, double y, double z) const;
+
+      //! Transform rotation matrix within this sector from local to global coordinates
+      const CLHEP::HepMatrix localToGlobal(const CLHEP::HepMatrix& m) const;
+
+      //! Transform rotation matrix within this sector from global to local coordinates
+      const CLHEP::HepMatrix globalToLocal(const CLHEP::HepMatrix& m) const;
+
+      //! Transform space-points of bounding rectangle from local to global coordinates
+      const Rect localToGlobal(const Rect& r) const;
+
+      //! Transform space-points of bounding rectangle from global to local coordinates
+      const Rect globalToLocal(const Rect& r) const;
+
+      //! Rotate direction or momentum vector from local to global coordinates
+      const CLHEP::Hep3Vector rotateToGlobal(const CLHEP::Hep3Vector& v) const;
+
+      //! Rotate direction or momentum vector from global to local coordinates
+      const CLHEP::Hep3Vector rotateToLocal(const CLHEP::Hep3Vector& v) const;
+
+      //! Get the unit vector normal to this module, in global coordinates
+      const CLHEP::Hep3Vector getNormal() const;
+
+      //! Print the module's definition
+      void printTree() const;
 
     private:
 
@@ -208,9 +249,6 @@ namespace Belle2 {
       //! to store the tolerance in variation from local height of this module
       double m_ToleranceX;
 
-      //! to store the pointer to this module's containing sector class
-      Sector* m_SectorPtr;
-
       //! to store the width (in cm) of each phi strip this module
       double m_PhiStripWidth;
 
@@ -227,7 +265,7 @@ namespace Belle2 {
       int m_PhiStripMax;
 
       //! to store the offset direction along phi of the strip/scint envelope in this module
-      int m_PhiOffset;
+      int m_PhiOffsetSign;
 
       //! to store the width (in cm) of each z strip in this module
       double m_ZStripWidth;
@@ -245,7 +283,7 @@ namespace Belle2 {
       int m_ZStripMax;
 
       //! to store the offset direction along z of the strip/scint envelope in this module
-      int m_ZOffset;
+      int m_ZOffsetSign;
 
       //! to store the length of each phi-measuring scintillator
       std::vector<double> m_PhiScintLengths;
@@ -264,6 +302,24 @@ namespace Belle2 {
 
       //! to store the length-offset (within scintillator envelope) of each z-measuring scintillator
       std::vector<double> m_ZScintOffsets;
+
+      //! to store the position (in global coordinates) of this module's sector
+      CLHEP::Hep3Vector m_Translation;
+
+      //! to store the rotation matrix (in global coordinates) of this module's sector
+      CLHEP::HepRotation m_Rotation;
+
+      //! to store the inverse of the rotation matrix (in global coordinates) of this module's sector
+      CLHEP::HepRotation m_RotationInverse;
+
+      //! to store a copy of the rotation matrix in alternate form
+      CLHEP::HepMatrix m_RotationMatrix;
+
+      //! to store a copy of the inverse of the rotation matrix in alternate form
+      CLHEP::HepMatrix m_RotationInverseMatrix;
+
+      //! to store the unit normal vector (in global coordinates) of this module
+      CLHEP::Hep3Vector m_Normal;
 
     };
 

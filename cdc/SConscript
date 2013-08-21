@@ -5,4 +5,6 @@ env['LIBS'] = ['framework', 'geometry', 'simulation', 'genfit',
                '$GEANT4_LIBS', 'CLHEP','generators_dataobjects',
 	       'simulation_dataobjects']
 
+#env.Append(CPPDEFINES = {'CDC_DEBUG':None})
+
 Return('env')

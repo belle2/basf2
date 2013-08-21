@@ -55,5 +55,6 @@ float SimpleTDCCountTranslator::getDriftLengthResolution(float,
                                                          bool,
                                                          float, float)
 {
-  return 0.000169 + 1.3333333E-6; // (130 µm)^2 in cm^2 + (40/sqrt(12) µm)^2 also in cm
+//  return 0.000169 + 1.3333333E-6; // (130 µm)^2 in cm^2 + (40/sqrt(12) µm)^2 also in cm
+  return 0.000169;  //the above should be taken into account in the digitizer, not here
 }

@@ -61,6 +61,13 @@ void CDCGeometryPar::clear()
   m_senseWireTension  = 0.0;
   m_senseWireDensity  = 0.0;
   m_fieldWireDiameter = 0.0;
+
+  m_tdcOffset         = 0;
+  m_tdcBinWidth       = 0.0;
+  m_nominalDriftV     = 0.0;
+  m_nominalPropSpeed  = 0.0;
+  m_nominalSpaceResol = 0.0;
+
   for (unsigned i = 0; i < 4; i++) {
     m_rWall[i] = 0;
     for (unsigned j = 0; j < 2; j++)
@@ -147,6 +154,7 @@ void CDCGeometryPar::read()
 
   // Get sense layers parameters
   GearDir gbxParams(content);
+  m_debug = gbxParams.getBool("Debug");
   int nSLayer = gbxParams.getNumberNodes("SLayers/SLayer");
   m_nSLayer = nSLayer;
 
@@ -188,6 +196,8 @@ void CDCGeometryPar::read()
   //  std::cout << "tension = " << m_senseWireTension  << std::endl;
   //  std::cout << "density = " << m_senseWireDensity  << std::endl;
 
+  m_readXTetc = gbxParams.getBool("readXTetc");
+
   m_useRealGeometry = gbxParams.getBool("WhichGeometry");
   B2INFO("Real CDC geometry in CDCGeometryPar on(=1)/off(=0):" << m_useRealGeometry);
 
@@ -202,20 +212,43 @@ void CDCGeometryPar::read()
     }
   }
 
-  //Replace geometry params. (from input data) upon request
-  if (m_useRealGeometry) readRealGeometry();
+  //Set various quantities (should be moved to CDC.xml later...)
+  m_tdcOffset = 0;  //to be adjusted later; set to 32768 ???
+  m_tdcBinWidth = 1.0;  //in ns
+  m_nominalDriftV    = 4.e-3;  //in cm/ns
+  m_nominalDriftVInv = 1. / m_nominalDriftV; //in ns/cm
+  m_nominalPropSpeed = 27.25;  //in ns/cm (Belle's result, provided by iwasaki san)
 
+  m_nominalSpaceResol = gbxParams.getLength("SenseWire/SpaceResol");
+  m_maxSpaceResol = 10. * m_nominalSpaceResol;
+
+  //Replace geometry params. (from input data) upon request
+  if (m_useRealGeometry) readRealGeometry(gbxParams);
+
+  if (m_readXTetc) {
+    //Read xt params.
+    readXT(gbxParams);
+
+    //Read sigma params.
+    readSigma(gbxParams);
+
+    //Read propagation speed
+    readPropSpeed(gbxParams);
+  }
 
   //Print();
 
 }
 
 // Read alignment params.
-void CDCGeometryPar::readRealGeometry()
+void CDCGeometryPar::readRealGeometry(const GearDir gbxParams)
 {
-  ifstream ifs;
-  std::string fileName0 = "/cdc/data/alignment.dat";
+  std::string fileName0 = gbxParams.getString("alignmentFileName");
+  fileName0 = "/cdc/data/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName0);
+
+  ifstream ifs;
+
   if (fileName == "") {
     B2FATAL(fileName0 << " not exist!");
   } else {
@@ -250,16 +283,185 @@ void CDCGeometryPar::readRealGeometry()
 
     m_WirSagCoef[iL][iC] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.*(m_senseWireTension + tens));
 
-    std::cout << iL << " " << iC;
-    for (int i = 0; i < np; ++i) {
-      std::cout << " " << back[i];
-      std::cout << " " << fwrd[i];
+    if (m_debug) {
+      std::cout << iL << " " << iC;
+      for (int i = 0; i < np; ++i) {
+        std::cout << " " << back[i];
+        std::cout << " " << fwrd[i];
+      }
+      std::cout << " " << tens << std::endl;
     }
-    std::cout << " " << tens << std::endl;
 
   }
 
   if (nRead != nSenseWires) B2FATAL("CDCGeometryPar::readRealGeometry: #lines read-in (=" << nRead << ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
+
+  ifs.close();
+}
+
+
+// Read x-t params.
+void CDCGeometryPar::readXT(const GearDir gbxParams)
+{
+  std::string fileName0 = gbxParams.getString("xtFileName");
+  fileName0 = "/cdc/data/" + fileName0;
+  std::string fileName = FileSystem::findFile(fileName0);
+
+  ifstream ifs;
+
+  if (fileName == "") {
+    B2FATAL(fileName0 << " not exist!");
+  } else {
+    B2INFO(fileName0 << " exists.");
+    ifs.open(fileName.c_str());
+    if (!ifs) B2FATAL("cannot open " << fileName0 << " !");
+  }
+
+  int iL, lr;
+  const int np = 9;
+  double alpha, dummy0, dummy1, xt[np];
+  unsigned nRead = 0;
+
+  while (true) {
+    ifs >> iL >> alpha >> dummy0 >> dummy1 >> lr;
+    for (int i = 0; i < np - 1; ++i) {
+      ifs >> xt[i];
+    }
+
+    if (ifs.eof()) break;
+
+    ++nRead;
+
+    const int ialpha = 0;  //tentative
+
+    for (int i = 0; i < np - 1; ++i) {
+      m_XT[iL][lr][ialpha][i] = xt[i];
+    }
+
+    double bound = m_XT[iL][lr][ialpha][6];
+    int i = np - 1;
+    xt[i] = m_XT[iL][lr][ialpha][0] + bound
+            * (m_XT[iL][lr][ialpha][1] + bound
+               * (m_XT[iL][lr][ialpha][2] + bound
+                  * (m_XT[iL][lr][ialpha][3] + bound
+                     * (m_XT[iL][lr][ialpha][4] + bound
+                        * (m_XT[iL][lr][ialpha][5])))));
+
+    m_XT[iL][lr][ialpha][i] = xt[i];
+
+    if (m_debug) {
+      std::cout << iL << " " << alpha << " " << dummy0 << " " << dummy1 << " " << lr;
+      for (int i = 0; i < np; ++i) {
+        std::cout << " " << xt[i];
+      }
+      std::cout << std::endl;
+    }
+
+    /*    //convert unit, microsec -> nsec
+    i = 1;
+    m_XT[iL][lr][ialpha][i] *= 1.e-3;
+    i = 2;
+    m_XT[iL][lr][ialpha][i] *= 1.e-6;
+    i = 3;
+    m_XT[iL][lr][ialpha][i] *= 1.e-9;
+    i = 4;
+    m_XT[iL][lr][ialpha][i] *= 1.e-12;
+    i = 5;
+    m_XT[iL][lr][ialpha][i] *= 1.e-15;
+    i = 6;
+    m_XT[iL][lr][ialpha][i] *= 1.e3;
+    i = 7;
+    m_XT[iL][lr][ialpha][i] *= 1.e-3;
+    */
+  }
+
+  if (nRead != 2 * MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readXT: #lines read-in (=" << nRead << ") is inconsistent with 2 x total #layers (=" << 2 * MAX_N_SLAYERS << ") !");
+
+  ifs.close();
+}
+
+// Read space reso. params.
+void CDCGeometryPar::readSigma(const GearDir gbxParams)
+{
+  std::string fileName0 = gbxParams.getString("sigmaFileName");
+  fileName0 = "/cdc/data/" + fileName0;
+  std::string fileName = FileSystem::findFile(fileName0);
+
+  ifstream ifs;
+
+  if (fileName == "") {
+    B2FATAL(fileName0 << " not exist!");
+  } else {
+    B2INFO(fileName0 << " exists.");
+    ifs.open(fileName.c_str());
+    if (!ifs) B2FATAL("cannot open " << fileName0 << " !");
+  }
+
+  int iL;
+  const int np = 6;
+  double sigma[np];
+  unsigned nRead = 0;
+
+  while (true) {
+    ifs >> iL;
+    for (int i = 0; i < np; ++i) {
+      ifs >> sigma[i];
+    }
+    if (ifs.eof()) break;
+
+    ++nRead;
+
+    for (int i = 0; i < np; ++i) {
+      m_Sigma[iL][i] = sigma[i];
+    }
+
+    if (m_debug) {
+      std::cout << iL;
+      for (int i = 0; i < np; ++i) {
+        std::cout << " " << sigma[i];
+      }
+      std::cout << std::endl;
+    }
+  }
+
+  if (nRead != MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readSigma: #lines read-in (=" << nRead << ") is inconsistent with total #layers (=" << MAX_N_SLAYERS << ") !");
+
+  ifs.close();
+}
+
+// Read propagation speed param.
+void CDCGeometryPar::readPropSpeed(const GearDir gbxParams)
+{
+  std::string fileName0 = gbxParams.getString("propSpeedFileName");
+  fileName0 = "/cdc/data/" + fileName0;
+  std::string fileName = FileSystem::findFile(fileName0);
+
+  ifstream ifs;
+
+  if (fileName == "") {
+    B2FATAL(fileName0 << " not exist!");
+  } else {
+    B2INFO(fileName0 << " exists.");
+    ifs.open(fileName.c_str());
+    if (!ifs) B2FATAL("cannot open " << fileName0 << " !");
+  }
+
+  int iL;
+  double speed;
+  unsigned nRead = 0;
+
+  while (true) {
+    ifs >> iL >> speed;
+    if (ifs.eof()) break;
+
+    ++nRead;
+
+    m_PropSpeedInv[iL] = 1. / speed;
+
+    if (m_debug) std::cout << iL << " " << speed << std::endl;
+  }
+
+  if (nRead != MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readPropSpeed: #lines read-in (=" << nRead << ") is inconsistent with total #layers (=" << MAX_N_SLAYERS << ") !");
 
   ifs.close();
 }
@@ -459,20 +661,127 @@ void CDCGeometryPar::setDesignWirParam(const unsigned layerID, const unsigned ce
   //...Offset modification to be aligned to axial at z=0...
   const double phiSize = 2 * M_PI / double(m_nWires[L]);
 
+  const double phiF = phiSize * (double(C) + offset)
+                      + phiSize * 0.5 * double(m_nShifts[L]);
+
+  m_FWirPos[L][C][0] = m_rSLayer[L] * cos(phiF);
+  m_FWirPos[L][C][1] = m_rSLayer[L] * sin(phiF);
+  m_FWirPos[L][C][2] = m_zSForwardLayer[L];
+
   const double phiB = phiSize * (double(C) + offset);
 
   m_BWirPos[L][C][0] = m_rSLayer[L] * cos(phiB);
   m_BWirPos[L][C][1] = m_rSLayer[L] * sin(phiB);
   m_BWirPos[L][C][2] = m_zSBackwardLayer[L];
 
-  const double phiF = phiB + phiSize * 0.5 * double(m_nShifts[L]);
-
-  m_FWirPos[L][C][0] = m_rSLayer[L] * cos(phiF);
-  m_FWirPos[L][C][1] = m_rSLayer[L] * sin(phiF);
-  m_FWirPos[L][C][2] = m_zSForwardLayer[L];
-
-  //  std::cout <<"L,C,Bw,Fw= " << L <<" "<< C <<" "<< m_BWirPos[L][C][0] <<" "<< m_BWirPos[L][C][1] <<" "<< m_BWirPos[L][C][2] <<" "<< m_FWirPos[L][C][0] <<" "<< m_FWirPos[L][C][1] <<" "<< m_FWirPos[L][C][2] << std::endl;
-
   m_WirSagCoef[L][C] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8. * m_senseWireTension);
 
 }
+
+double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha) const
+{
+
+  double dDdt;
+
+  const unsigned ialpha = 0; //tentative
+  const double boundary = m_XT[iCLayer][lr][ialpha][6];
+
+  if (time < boundary) {
+    dDdt =    m_XT[iCLayer][lr][ialpha][1] + time
+              * (2.*m_XT[iCLayer][lr][ialpha][2] + time
+                 * (3.*m_XT[iCLayer][lr][ialpha][3] + time
+                    * (4.*m_XT[iCLayer][lr][ialpha][4] + time
+                       * (5.*m_XT[iCLayer][lr][ialpha][5]))));
+  } else {
+    dDdt = m_XT[iCLayer][lr][ialpha][7];
+  }
+
+  if (lr == 0) dDdt *= -1.;
+  return dDdt;
+
+}
+
+double CDCGeometryPar::getDriftLength(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha) const
+{
+
+  double dist = 0.;
+
+  const unsigned ialpha = 0;
+  const double boundary = m_XT[iCLayer][lr][ialpha][6];
+
+  if (time < boundary) {
+    dist = m_XT[iCLayer][lr][ialpha][0] + time
+           * (m_XT[iCLayer][lr][ialpha][1] + time
+              * (m_XT[iCLayer][lr][ialpha][2] + time
+                 * (m_XT[iCLayer][lr][ialpha][3] + time
+                    * (m_XT[iCLayer][lr][ialpha][4] + time
+                       * (m_XT[iCLayer][lr][ialpha][5])))));
+  } else {
+    dist = m_XT[iCLayer][lr][ialpha][7] * (time - boundary) + m_XT[iCLayer][lr][ialpha][8];
+  }
+
+  if (lr == 0) dist *= -1.;
+  return std::max(0., dist);
+
+}
+
+double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLayer, const unsigned short lr, const double alpha) const
+{
+  //to be replaced with a smarter algorithm...
+
+  const double eps = 2.5e-1;
+  const double maxTime = 5000.; //in ns
+  const double maxTrials = 100;
+
+  double t0 = 0.;
+  double d0 = getDriftLength(t0, iCLayer, lr, alpha) - dist;
+
+  unsigned i = 0;
+  double t1 = maxTime;
+  double time = dist * m_nominalDriftVInv;
+  while (((t1 - t0) > eps) && (i < maxTrials)) {
+    time = 0.5 * (t0 + t1);
+    double d1 = getDriftLength(time, iCLayer, lr, alpha) - dist;
+    if (d0 * d1 > 0.) {
+      t0 = time;
+    } else {
+      t1 = time;
+    }
+    ++i;
+  }
+
+  if (i >= maxTrials - 1 || time > maxTime) {
+    B2WARNING("CDCGeometryPar::getDriftTime " << dist << " " << iCLayer << " " << alpha << " " << lr << " " << t0 << " " << t1 << " " << time << " " << d0);
+  }
+
+  return time;
+
+}
+
+double CDCGeometryPar::getSigma(const double driftL, const unsigned short iCLayer) const
+{
+
+  return m_nominalSpaceResol; //tentatively; to be updated in the next release
+
+  /*  const double P0 = m_Sigma[iCLayer][0];
+      const double P1 = m_Sigma[iCLayer][1];
+      const double P2 = m_Sigma[iCLayer][2];
+      const double P3 = m_Sigma[iCLayer][3];
+      const double P4 = m_Sigma[iCLayer][4];
+      const double P5 = m_Sigma[iCLayer][5];
+      cout <<"P0= " << P0 << endl;
+      cout <<"P1= " << P1 << endl;
+      cout <<"P2= " << P2 << endl;
+      cout <<"P3= " << P3 << endl;
+      cout <<"P4= " << P4 << endl;
+      cout <<"P5= " << P5 << endl;
+      cout <<"driftL= " << driftL << endl;
+      cout <<"iCLayer= " << iCLayer << std::endl;
+
+      const double driftL2 = driftL * driftL;
+      const double sigma = sqrt(P0/(driftL2 + P1) + P2*driftL + P3 + P4*exp(P5*driftL2));
+
+      return std::min(sigma, m_maxSpaceResol);
+  */
+}
+

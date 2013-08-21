@@ -17,6 +17,7 @@
 //cdc package headers
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/WireID.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 //C++/C standard lib elements.
 #include <string>
@@ -68,22 +69,34 @@ namespace Belle2 {
      *
      *  @return Drift length after smearing.
      */
-    //    float smearDriftLength(float driftLength, float fraction, float mean1, float resolution1, float mean2, float resolution2);
-    float smearDriftLength(float driftLength);
+    float smearDriftLength(float driftLength, float dDdt);
+
+
+    /** The method to get dD/dt
+     *
+     *  In this method, X-T function will be used to calculate dD/dt (drift velocity).
+     *
+     *  @param driftLength The value of drift length.
+     *
+     *  @return dDdt.
+     *
+     */
+    float getdDdt(const float driftLength);
+
 
     /** The method to get drift time based on drift length
      *
      *  In this method, X-T function will be used to calculate drift time.
      *
      *  @param driftLength The value of drift length.
-     *  @param tof The value of time of flight.
-     *  @param propLength The length that signal needs to propagation in the wire.
+     *  @param addTof   Switch for adding time of flight.
+     *  @param addDelay Switch for adding signal propagation delay in the wire.
      *
      *  @return Drift time.
      *
-     *  @todo implementation of non-cicular surfaces of constant drift time (in reverse).
      */
-    float getDriftTime(float driftLength, float tof, float propLength);
+    float getDriftTime(const float driftLength, const bool addTof, const bool addDelay);
+
 
     /** Charge to ADC Count converter. */
     unsigned short getADCCount(const float charge);
@@ -105,19 +118,32 @@ namespace Belle2 {
     double m_tMin;              /**< Lower edge of time window in ns */
     double m_tMaxOuter;         /**< Upper edge of time window in ns for the outer layers*/
     double m_tMaxInner;         /**< Upper edge of time window in ns for the inner layers */
+    unsigned short m_tdcOffset; /**< Offset of TDC count (in ns)*/
+
+    Belle2::CDC::CDCGeometryPar* m_cdcp;  /**< Pointer to CDCGeometryPar */
+    CDCSimHit* m_aCDCSimHit;    /**< Pointer to CDCSimHit */
+    WireID m_wireID;            /**< WireID corresp. to this hit */
+    double m_tdcBinWidth;       /**< Width of a TDC bin (in ns)*/
+    double m_tdcBinHwidth;      /**< Half width of a TDC bin (in ns)*/
+    double m_tdcResol;          /**< TDC resolution (in ns)*/
+    double m_driftV;            /**< Nominal drift velocity (in cm/ns)*/
+    double m_driftVInv;         /**< m_driftV^-1 (in ns/cm)*/
+    double m_propSpeedInv;      /**< Inv. of nominal signal propagation speed in a wire (in ns/cm)*/
+
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
     bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */
+    bool m_addInWirePropagationDelay4Bg; /**< A switch used to control adding propagation delay into the total drift time or not for beam bg. */
+    bool m_addTimeOfFlight4Bg;     /**< A switch used to control adding time of flight into the total drift time or not for beam bg. */
     bool m_outputNegativeDriftTime;     /**< A switch to output negative drift time to CDCHit */
 //    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
 
     /** Structure for saving the signal information. */
     struct SignalInfo {
       /** Constructor that initializes all members. */
-      SignalInfo(unsigned short simHitIndex = 0, WireID wireID = WireID(), float driftTime = 0, float charge = 0) :
-        m_simHitIndex(simHitIndex), m_wireID(wireID), m_driftTime(driftTime), m_charge(charge) {}
+      SignalInfo(unsigned short simHitIndex = 0, float driftTime = 0, float charge = 0) :
+        m_simHitIndex(simHitIndex), m_driftTime(driftTime), m_charge(charge) {}
       unsigned short m_simHitIndex;   /**< SimHit Index number. */
-      WireID         m_wireID;        /**< Wire Number object. */
       float          m_driftTime;     /**< Shortest drift time of any SimHit in the cell. */
       float          m_charge;        /**< Sum of charge for all SimHits in the cell. */
     };

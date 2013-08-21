@@ -11,6 +11,8 @@
 #ifndef CDCGEOMETRYPAR_H
 #define CDCGEOMETRYPAR_H
 
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearDir.h>
 #include <cdc/dataobjects/WireID.h>
 
 #include <vector>
@@ -53,7 +55,10 @@ namespace Belle2 {
 
       //! Gets geometry parameters from gearbox.
       void read();
-      void readRealGeometry();
+      void readRealGeometry(const GearDir);
+      void readXT(const GearDir);
+      void readSigma(const GearDir);
+      void readPropSpeed(const GearDir);
 
       //! Generate an xml file used in gearbox
       /*!
@@ -313,10 +318,49 @@ namespace Belle2 {
       */
       void setSenseWireBZ(int layerId, double bz);
 
+      inline unsigned short getTdcOffset() const {
+        return m_tdcOffset;
+      }
+
+      inline double getTdcBinWidth() const {
+        return m_tdcBinWidth;
+      }
+
+      inline double getNominalDriftV() const {
+        return m_nominalDriftV;
+      }
+
+      inline double getNominalPropSpeed() const {
+        return m_nominalPropSpeed;
+      }
+
+      inline double getNominalSpaceResol() const {
+        return m_nominalSpaceResol;
+      }
+
+      inline void setNominalSpaceResol(double resol) {
+        m_nominalSpaceResol = resol;
+      }
+
+      inline double getPropSpeedInv(const unsigned int iCLayer) const {
+        return m_PropSpeedInv[iCLayer];
+      }
+
       void getWirSagEffect(const unsigned layerID, const unsigned cellID, const double zw, double& ywb_sag, double& ywf_sag) const;
+
+      double getDriftV(const double dt, const unsigned short layer, const unsigned short lr, const double alpha = 0.) const;
+
+      double getDriftLength(const double dt, const unsigned short layer, const unsigned short lr, const double alpha = 0.) const;
+
+      double getDriftTime(const double dist, const unsigned short layer, const unsigned short lr, const double alpha = 0.) const;
+
+      double getSigma(const double dist, const unsigned short layer) const;
+
 
     private:
 
+      bool m_debug;          /*!< Switch for debug printing. */
+      bool m_readXTetc;      /*!< Switch to read-in x-t etc. params.. */
       bool m_useRealGeometry; /*!< Switch to select geometry. */
       std::string m_version; /*!< The version of geometry parameters. */
       int m_nSLayer;         /*!< The number of sense wire layer. */
@@ -357,12 +401,25 @@ namespace Belle2 {
       //      TVector3 m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS];
       //      TVector3 m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS];
 
-      //      float m_WirSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS];
       double m_WirSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS];
+
+      double m_XT[MAX_N_SLAYERS][2][18][9];
+
+      double m_Sigma[MAX_N_SLAYERS][6];
+
+      double m_PropSpeedInv[MAX_N_SLAYERS];
+
+      unsigned short m_tdcOffset;
+      double m_tdcBinWidth;
+      double m_nominalDriftV, m_nominalDriftVInv;
+      double m_nominalPropSpeed;
+      double m_nominalSpaceResol;
+      double m_maxSpaceResol;
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
 
       void setDesignWirParam(const unsigned, const unsigned);
+
     };
 
 //-----------------------------------------------------------------------------

@@ -9,8 +9,20 @@
       <WireSag desc="true: on; false: off">false</WireSag>  
     </SensitiveDetector>
     <Rotation desc="Rotation of the whole cdc detector (should be the same as beampipe)" unit="mrad">0.0</Rotation>
+
+    <!-- Switch for printing for debug -->
+    <Debug desc="true: print out; false: not print out.">false</Debug>
+
     <!-- Switch to select geometry -->
     <WhichGeometry desc="true: use real geometry; false: use design geometry">false</WhichGeometry>
+    <alignmentFileName desc="file which contains alignment data">alignment.dat</alignmentFileName>
+
+    <!-- Switch to read x-t etc. params. -->
+    <readXTetc desc="true: read x-t etc. params. from disk; false: not read.">false</readXTetc>
+    <xtFileName desc="file which contains x-t relation">xt_constDriftV.dat</xtFileName>
+    <sigmaFileName desc="file which contains space resol.">sigma_const.dat</sigmaFileName>
+    <propSpeedFileName desc="file which contains propagation speed">propspeed_v0.dat</propSpeedFileName>
+
     <OffsetZ desc="The offset of the whole cdc in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>
     <Helium>Helium</Helium>
     <Ethane>Ethane</Ethane>
@@ -3941,6 +3953,7 @@
       <Diameter desc="Diameter of sense wire" unit="mm">0.030</Diameter>
       <Tension desc="Tension of sense wire (unit in cm intentionally since gW unit is missing)" unit="cm">50.0</Tension>
       <Number desc="The total number of sense wires">14336</Number>
+      <SpaceResol desc="Nominal space resolution" unit="cm">0.0130</SpaceResol>
     </SenseWire>
     <FieldWire name="FieldWire">
       <Diameter desc="Diameter of field wire" unit="mm">0.126</Diameter>

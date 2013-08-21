@@ -142,14 +142,16 @@ int DeSerializerModule::check_data(char* buf, int prev_eve, int* cur_eve)
 void DeSerializerModule::endRun()
 {
   //fill Run data
-
   B2INFO("endRun done.");
+
 }
 
 
 void DeSerializerModule::terminate()
 {
   B2INFO("terminate called");
+
+  //  exit(1);
 }
 
 double DeSerializerModule::GetTimeSec()
@@ -162,8 +164,8 @@ double DeSerializerModule::GetTimeSec()
 
 void DeSerializerModule::RecordTime(int event, double* array)
 {
-  if (event >= 50000 && event < 50500) {
-    array[ event - 50000 ] = GetTimeSec() - m_start_time;
+  if (event >= 10000 && event < 10500) {
+    array[ event - 10000 ] = GetTimeSec() - m_start_time;
   }
   return;
 }

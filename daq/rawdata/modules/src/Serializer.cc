@@ -20,6 +20,8 @@ using namespace Belle2;
 //#define MEMCPY_TO_ONE_BUFFER
 #define SEND_BY_WRITEV
 
+//#define DEBUG
+
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -384,9 +386,9 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
     perror("SEND error1");
     exit(1);
   }
-
   int total_send_bytes = sizeof(int) * send_header.GetTotalNwords();
   if (n != total_send_bytes) {
+    perror("Failed to send all data");
     printf("Sent data length is not consistent. %d %d : Exiting...", n, total_send_bytes);
     exit(1);
   }
@@ -472,6 +474,10 @@ void SerializerModule::Accept()
       exit(-1);
     }
   }
+
+//   int flag = 1;
+//   ret = setsockopt(fd_accept, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(flag) );
+
   m_socket = fd_accept;
 
 #else
@@ -552,6 +558,11 @@ void SerializerModule::event()
     //
     // Send data
     //
+
+#ifdef DEBUG
+    printf("Send loop : %d\n", j);
+#endif
+
 #ifndef NOT_SEND
 
 #ifdef NOT_USE_SOCKETLIB
@@ -584,6 +595,18 @@ void SerializerModule::event()
           perror("Failed to send data. Exiting...");
           exit(1);
         }
+
+#ifdef DEBUG
+        printf("size :: %d %d\n", m_size_byte, m_size_byte / sizeof(int));
+        for (int i = 0; i < m_size_byte / sizeof(int); i++) {
+          printf("0x%.8x ", *((int*)buf + i));
+          if ((i + 1) % 10 == 0) printf("\n %6d :: ", i);
+        }
+        printf("\n");
+        printf("\n");
+
+#endif
+
         break;
 
       default :

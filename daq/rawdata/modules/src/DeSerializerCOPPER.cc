@@ -8,7 +8,7 @@
 
 #include <daq/rawdata/modules/DeSerializerCOPPER.h>
 
-#define CHECKEVT 50000
+#define CHECKEVT 1000
 
 
 //#define CHECK_SUM

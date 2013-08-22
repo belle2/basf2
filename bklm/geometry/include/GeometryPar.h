@@ -287,9 +287,6 @@ namespace Belle2 {
       //! Get the angular width of the layer-0 support plate's bracket's cutout
       double getBracketCutoutDphi(void) const { return m_BracketCutoutDphi; }
 
-      //! Get the vector of sector definitions
-      const std::vector<Sector*> getSectors(void) const { return m_Sectors; };
-
       //! Get the pointer to the definition of a module
       const Module* findModule(bool isForward, int sector, int layer) const;
 

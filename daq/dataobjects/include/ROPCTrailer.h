@@ -69,10 +69,10 @@ namespace Belle2 {
     };
 
     //    unsigned int m_trailer[RAWCOPPER_TRAILER_SIZE];
-    int* m_buffer;
-
+    int* m_buffer; //! do not record buffer ( RawROPC includes buffer of RawHeader and RawTrailer )
 
     ClassDef(ROPCTrailer, 1);
+
   };
 }
 

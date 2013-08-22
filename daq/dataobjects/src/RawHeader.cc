@@ -54,7 +54,6 @@ void RawHeader::Initialize()
   memset(m_buffer, 0, sizeof(int)*RAWHEADER_NWORDS);
   m_buffer[ POS_HDR_NWORDS ] = RAWHEADER_NWORDS;
   m_buffer[ POS_NUM_NODES ] = 0;
-  m_buffer[ POS_TERM_FIXED_PART ] = MAGIC_WORD_TERM_FIXED_PART;
   m_buffer[ POS_TERM_HEADER ] = MAGIC_WORD_TERM_HEADER;
 }
 
@@ -91,19 +90,15 @@ void RawHeader::SetSubsysId(int subsys_id)
 void RawHeader::SetDataType(int data_type)
 {
   CheckBuffer();
-  m_buffer[ POS_DATA_TYPE ] = data_type;
+  m_buffer[ POS_TRUNC_MASK_DATATYPE ] =
+    (data_type & 0x7FFFFFFF) | (m_buffer[ POS_TRUNC_MASK_DATATYPE ] & 0x80000000);
 }
 void RawHeader::SetTruncMask(int trunc_mask)
 {
   CheckBuffer();
-  m_buffer[ POS_TRUNC_MASK ] = trunc_mask;
+  m_buffer[ POS_TRUNC_MASK_DATATYPE ] = (trunc_mask << 31) | (m_buffer[ POS_TRUNC_MASK_DATATYPE ] & 0x7FFFFFFF);
 }
 
-void RawHeader::SetNumB2lBlock(int num_b2l_block)
-{
-  CheckBuffer();
-  m_buffer[ POS_NUM_B2L_BLOCK ] = num_b2l_block;
-}
 
 void RawHeader::SetOffset1stB2l(int offset_1st_b2l)
 {
@@ -180,20 +175,15 @@ int RawHeader::GetSubsysId()
 int RawHeader::GetDataType()
 {
   CheckBuffer();
-  return m_buffer[ POS_DATA_TYPE ];
+  return (m_buffer[ POS_TRUNC_MASK_DATATYPE ] & 0x7FFFFFFF);
 }
 
 int RawHeader::GetTruncMask()
 {
   CheckBuffer();
-  return m_buffer[ POS_TRUNC_MASK ];
+  return (m_buffer[ POS_TRUNC_MASK_DATATYPE ] >> 23) & 0x1;
 }
 
-int RawHeader::GetNumB2lBlock()
-{
-  CheckBuffer();
-  return m_buffer[ POS_NUM_B2L_BLOCK ];
-}
 
 int RawHeader::GetOffset1stB2l()
 {
@@ -236,11 +226,6 @@ int RawHeader::GetNodeInfo(int node_no, int* node_id)
   return 0;
 }
 
-unsigned int RawHeader::GetMagicWordFixedPart()
-{
-  CheckBuffer();
-  return m_buffer[ POS_TERM_FIXED_PART ];
-}
 
 unsigned int RawHeader::GetMagicWordEntireHeader()
 {

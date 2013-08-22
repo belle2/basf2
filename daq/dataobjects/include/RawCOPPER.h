@@ -47,11 +47,17 @@ namespace Belle2 {
     //! get data length
     virtual int Size();
 
-    //! get data length
-    virtual RawHeader* GetRawHeader();
+    /*     //! get data length */
+    /*     virtual RawHeader* GetRawHeader(); */
 
-    //! get data length
-    virtual RawTrailer* GetRawTrailer();
+    /*     //! get data length */
+    /*     virtual RawTrailer* GetRawTrailer(); */
+
+    //! get buffer pointer of rawcopper header
+    virtual int* GetRawHdrBufPtr();
+
+    //! get buffer pointer of rawcopper trailer
+    virtual int* GetRawTrlBufPtr();
 
     //! get COPPER node id from data
     virtual int GetCopperNodeId();
@@ -65,21 +71,31 @@ namespace Belle2 {
     //! get b2l block from data
     virtual int GetNumB2lBlock();
 
-    //! get offset to 1st b2l block
-    virtual int Offset1stB2lWoRawhdr();
 
-    //! get offset to 2nd b2l block
-    virtual int Offset2ndB2lWoRawhdr();
+    //! get # of offset words for FEE slot A buffer position
+    int GetFEEDataOffsetA();
 
-    //! get offset to 3rd b2l block
-    virtual int Offset3rdB2lWoRawhdr();
+    //! get # of offset words for FEE slot A buffer position
+    int GetFEEDataOffsetB();
 
-    //! get offset to 4th b2l block
-    virtual int Offset4thB2lWoRawhdr();
+    //! get # of offset words for FEE slot A buffer position
+    int GetFEEDataOffsetC();
 
+    //! get # of offset words for FEE slot A buffer position
+    int GetFEEDataOffsetD();
 
-    RawHeader m_header; //|| do not split the header
-    RawTrailer m_trailer; //|| do not split the header
+    //! get FEE buffer pointer for slot A
+    int* GetFEEBufferA();
+
+    //! get FEE buffer pointer for slot B
+    int* GetFEEBufferB();
+
+    //! get FEE buffer pointer for slot C
+    int* GetFEEBufferC();
+
+    //! get FEE buffer pointer for slot D
+    int* GetFEEBufferD();
+
 
     /* Data Format : COPPER header*/
     enum {
@@ -101,7 +117,8 @@ namespace Belle2 {
     enum {
       POS_MAGIC_B2LHSLB = 0,
       POS_EVE_CNT_B2LHSLB = 1,
-      SIZE_B2LHSLB_HEADER = 2
+      //      SIZE_B2LHSLB_HEADER = 2
+      SIZE_B2LHSLB_HEADER = 0 // As of Aug.22,2013, the header size is one word. It should be 2 in future.
     };
     /* Data Format : B2link HSLB Trailer */
     enum {
@@ -110,16 +127,19 @@ namespace Belle2 {
     };
 
 
-    /* Data Format : B2link FEF Header */
+    /* Data Format : B2link FEE Header */
     enum {
-      POS_EVEID_B2LFEF = 0,
-      POS_EVETIME_B2LFEF = 1,
-      SIZE_B2LFEF_HEADER = 2
+      POS_EVEID_B2LFEE = 0,
+      POS_EVETIME_B2LFEE = 1,
+      //      SIZE_B2LFEE_HEADER = 2
+      SIZE_B2LFEE_HEADER = 1  // As of Aug.22,2013, the header size is one word. It should be 2 in future.
     };
-    /* Data Format : B2link FEF Trailer */
+
+
+    /* Data Format : B2link FEE Trailer */
     enum {
-      POS_CHKSUM_B2LFEF = 0,
-      SIZE_B2LFEF_TRAILER = 1
+      POS_CHKSUM_B2LFEE = 0,
+      SIZE_B2LFEE_TRAILER = 1
     };
 
 
@@ -137,6 +157,10 @@ namespace Belle2 {
     int m_nwords;
     int* m_buffer; //[m_nwords]
     bool m_allocated;
+
+    RawHeader tmp_header;  //! Not record
+    RawTrailer tmp_trailer; //! Not record
+
 
     ClassDef(RawCOPPER, 1);
   };

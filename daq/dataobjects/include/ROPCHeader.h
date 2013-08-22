@@ -73,7 +73,7 @@ namespace Belle2 {
 
   private:
 
-    int* m_buffer;
+    int* m_buffer; //! do not record buffer ( RawROPC includes buffer of RawHeader and RawTrailer )
     //    unsigned int m_header[HEADER_SIZE];
 
     ClassDef(ROPCHeader, 1);

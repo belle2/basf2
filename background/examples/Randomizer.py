@@ -28,7 +28,6 @@ outputName = '{d}/Touschek_LER_rnd.root'.format(d=outputDir)
 rootinput = register_module('RootInput')
 # CHANGE THIS TO POINT TO THE APPROPRIATE FILE(S) ON YOUR FILESYSTEM!!!
 rootinput.param('inputFileName', inputName)
-rootinput.param('treeName', 'tree')
 
 # rootinput.param('excludeBranchNames',['TOPTracks'])
 # rootinput.set_log_level(LogLevel.INFO)
@@ -55,7 +54,7 @@ outpath = create_path()
 main.add_path(outpath)
 
 # Set branching condition
-randomizer.condition('>0', outpath)
+randomizer.if_value('>0', outpath)
 
 # print to check
 print main

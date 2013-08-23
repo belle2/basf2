@@ -82,7 +82,7 @@ main.add_module(kltrigger)
 # if PyTrigger returns 0, we'll jump into an empty path
 # (skipping further modules in 'main': digitisation, tracking and display)
 emptypath = create_path()
-kltrigger.condition('<1', emptypath)
+kltrigger.if_false(emptypath)
 ########################################
 
 cdcdigi = register_module('CDCDigitizer')

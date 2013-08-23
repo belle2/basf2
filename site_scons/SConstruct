@@ -11,7 +11,7 @@ AddOption('--color', dest = 'color', nargs = 1, default = 'off', action = 'store
 AddOption('--verbose', dest = 'verbose', action = 'store_true', default = False, help='Enable verbose output')
 if not analysis:
     AddOption('--local', dest = 'local', action = 'store_true', default = False, help='Enable faster build of local code. No code in the central release should depend on the local code!')
-AddOption('--symlink', dest = 'symlink', action = 'store_true', default = False, help='Use symbolic links instead of copies for header files')
+AddOption('--symlink', dest = 'symlink', action = 'store_true', default = False, help='Use symbolic links instead of copies')
 AddOption('--extra-libpath', dest = 'extralibpath', action = 'store', help = 'Additional library path')
 AddOption('--extra-ccflags', dest = 'extraccflags', action = 'store', help = 'Additional compiler flags')
 AddOption('--c++11', dest = 'c++11', action = 'store_true', default = False, help = 'Enable C++11 compiler flag')

@@ -130,15 +130,9 @@ def process_dir(
                 return
 
     # install header files in the include directory
-    if GetOption('symlink'):
-        for header in env['HEADER_FILES']:
-            include = env.SymLink(os.path.join(env['INCDIR'], dir_name,
-                                  os.path.basename(str(header))), header)
-            define_aliases(env, include, dir_name, 'include')
-    else:
-        includes = env.Install(os.path.join(env['INCDIR'], dir_name),
-                               env['HEADER_FILES'])
-        define_aliases(env, includes, dir_name, 'include')
+    includes = env.Install(os.path.join(env['INCDIR'], dir_name),
+                           env['HEADER_FILES'])
+    define_aliases(env, includes, dir_name, 'include')
 
     # install script files in the library directory
     scripts = env.Install(env['LIBDIR'], env['SCRIPT_FILES'])

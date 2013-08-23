@@ -343,15 +343,6 @@ namespace Belle2 {
     {
       const Module* module = findModule(layer);
       if (module == NULL) return 0;
-      if (!(module->hasRPCs())) return 0;
-      return module->getNStrips(true);
-    }
-
-    int GeometryPar::getNPhiScints(int layer) const
-    {
-      const Module* module = findModule(layer);
-      if (module == NULL) return 0;
-      if (module->hasRPCs()) return 0;
       return module->getNStrips(true);
     }
 

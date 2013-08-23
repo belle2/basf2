@@ -17,6 +17,7 @@ class G4VSolid;
 class G4Box;
 class G4Tubs;
 class G4LogicalVolume;
+class G4VSensitiveDetector;
 class G4String;
 
 namespace Belle2 {
@@ -28,7 +29,6 @@ namespace Belle2 {
     class GeometryPar;
     class Sector;
     class Module;
-    class SensitiveDetector;
 
     //!   This class creates the BKLM geometry of the Belle II detector
 
@@ -104,10 +104,7 @@ namespace Belle2 {
       GeometryPar* m_GeoPar;
 
       //! Pointer to the BKLM SensitiveDetector processor
-      SensitiveDetector* m_Sensitive;
-
-      //! Pointer to the BKLM BkgSensitiveDetector processor
-      //BkgSensitiveDetector* m_bkgsensitive;
+      G4VSensitiveDetector* m_Sensitive;
 
       //! Angular extent of one sector
       double m_SectorDphi;

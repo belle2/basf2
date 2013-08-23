@@ -50,6 +50,8 @@ namespace Belle2 {
       m_NeutronPDG = 0;     // dummy initializer
       m_DoBackgroundStudy = false;  // dummy initializer
       m_HitTimeMax = 0.0;   // dummy initializer
+      m_GeoPar = NULL;  // dummy initializer
+      m_SimPar = NULL;  // dummy initializer
       StoreArray<MCParticle> particles;
       StoreArray<BKLMSimHit> simHits;
       RelationArray particleToSimHits(particles, simHits);

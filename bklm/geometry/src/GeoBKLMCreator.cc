@@ -54,7 +54,7 @@ namespace Belle2 {
 
     GeoBKLMCreator::GeoBKLMCreator()
     {
-      m_Sensitive = new SensitiveDetector();
+      m_Sensitive = dynamic_cast<G4VSensitiveDetector*>(new SensitiveDetector());
       m_GeoPar = NULL;
       m_SectorDphi = 0.0;
       m_SectorDz = 0.0;
@@ -73,7 +73,9 @@ namespace Belle2 {
     void GeoBKLMCreator::create(const GearDir& content, G4LogicalVolume& motherLogical, GeometryTypes)
     {
 
-      if (content.getInt("BeamBackgroundStudy") != 0) { m_Sensitive = (SensitiveDetector*)(new BkgSensitiveDetector("BKLM")); }
+      if (content.getInt("BeamBackgroundStudy") != 0) {
+        m_Sensitive = dynamic_cast<G4VSensitiveDetector*>(new BkgSensitiveDetector("BKLM"));
+      }
 
       m_GeoPar = GeometryPar::instance(content);
       m_SectorDphi = 2.0 * M_PI / m_GeoPar->getNSector();
@@ -175,7 +177,6 @@ namespace Belle2 {
     {
       static G4Polyhedra* capSolid = NULL;
       static G4LogicalVolume* capLogical[2] = { NULL };
-      static G4Box* cablesSolid[2] = { NULL };
       static G4LogicalVolume* cablesLogical[2] = { NULL };
 
       // Fill cap with iron and (aluminum) cables
@@ -185,10 +186,10 @@ namespace Belle2 {
       const double dz = m_SectorDz - gapHalfSize.z();
       const double ri = m_GeoPar->getLayerInnerRadius(1) * cm + 2.0 * gapHalfSize.x();
       const double ro = m_GeoPar->getOuterRadius() * cm;
-      const double z[2] = { -dz, dz};
-      const double rInner[2] = {ri, ri};
-      const double rOuter[2] = {ro, ro};
       if (capSolid == NULL) {
+        const double z[2] = { -dz, dz};
+        const double rInner[2] = {ri, ri};
+        const double rOuter[2] = {ro, ro};
         capSolid =
           new G4Polyhedra("BKLM.CapSolid",
                           -0.5 * m_SectorDphi,
@@ -209,12 +210,12 @@ namespace Belle2 {
       }
       if (cablesLogical[newLvol] == NULL) {
         name = (hasChimney ? "BKLM.ChimneyCablesSolid" : "BKLM.CablesSolid");
-        cablesSolid[newLvol] =
+        G4Box* cablesSolid =
           new G4Box(name, 0.5 * (ro - ri), dy, dz);
         cablesLogical[newLvol] =
-          new G4LogicalVolume(cablesSolid[newLvol],
+          new G4LogicalVolume(cablesSolid,
                               Materials::get("G4_Al"),
-                              logicalName(cablesSolid[newLvol])
+                              logicalName(cablesSolid)
                              );
         cablesLogical[newLvol]->SetVisAttributes(G4VisAttributes(false));
       }
@@ -343,22 +344,21 @@ namespace Belle2 {
 
     void GeoBKLMCreator::putLayer1SupportInInnerVoid(G4LogicalVolume* innerAirLogical, bool hasChimney)
     {
-      static G4Box* supportBox[2] = { NULL };
       static G4LogicalVolume* supportLogical[2] = { NULL };
 
       int newLvol = (hasChimney ? 1 : 0);
       const Hep3Vector size = m_GeoPar->getSupportPlateHalfSize(hasChimney) * cm;
       if (supportLogical[newLvol] == NULL) {
-        supportBox[newLvol] =
+        G4Box* supportBox =
           new G4Box(G4String((hasChimney ? "BKLM.ChimneySupportSolid" : "BKLM.SupportSolid")),
                     size.x(),
                     size.y(),
                     size.z()
                    );
         supportLogical[newLvol] =
-          new G4LogicalVolume(supportBox[newLvol],
+          new G4LogicalVolume(supportBox,
                               Materials::get("G4_Al"),
-                              logicalName(supportBox[newLvol])
+                              logicalName(supportBox)
                              );
         supportLogical[newLvol]->SetVisAttributes(G4VisAttributes(false));
       }
@@ -478,12 +478,12 @@ namespace Belle2 {
       const double z[2] = { -dz, +dz};
       char name[80] = "";
       for (int layer = 1; layer <= m_GeoPar->getNLayer(); ++layer) {
-        const double ri = m_GeoPar->getLayerInnerRadius(layer) * cm;
-        const double ro = m_GeoPar->getLayerOuterRadius(layer) * cm;
-        const double rInner[2] = {ri, ri};
-        const double rOuter[2] = {ro, ro};
         // Fill layer with iron
         if (layerIronSolid[layer] == NULL) {
+          const double ri = m_GeoPar->getLayerInnerRadius(layer) * cm;
+          const double ro = m_GeoPar->getLayerOuterRadius(layer) * cm;
+          const double rInner[2] = {ri, ri};
+          const double rOuter[2] = {ro, ro};
           sprintf(name, "BKLM.Layer%02dIronSolid", layer);
           layerIronSolid[layer] =
             new G4Polyhedra(name,
@@ -659,7 +659,7 @@ namespace Belle2 {
       // Fill gap with air
       sprintf(name, "BKLM.Layer%02d%sGapSolid", layer, (hasChimney ? "Chimney" : ""));
       G4Box* gapBox =
-        new G4Box("BKLM.LayerGapSolid",
+        new G4Box(name,
                   gapHalfSize.x(), gapHalfSize.y(), gapHalfSize.z()
                  );
       G4LogicalVolume* gapLogical =

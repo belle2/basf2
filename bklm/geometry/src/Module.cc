@@ -94,10 +94,12 @@ namespace Belle2 {
       m_Translation(translation),
       m_Rotation(rotation)
     {
-      m_PhiScintPositions.clear();
       m_PhiScintLengths.clear();
-      m_ZScintPositions.clear();
+      m_PhiScintPositions.clear();
+      m_PhiScintOffsets.clear();
       m_ZScintLengths.clear();
+      m_ZScintPositions.clear();
+      m_ZScintOffsets.clear();
       m_RotationInverse = m_Rotation.inverse();
       m_RotationMatrix = m_Rotation;
       m_RotationInverseMatrix = m_RotationInverse;
@@ -141,10 +143,12 @@ namespace Belle2 {
       m_Translation(translation),
       m_Rotation(rotation)
     {
-      m_PhiScintPositions.clear();
       m_PhiScintLengths.clear();
-      m_ZScintPositions.clear();
+      m_PhiScintPositions.clear();
+      m_PhiScintOffsets.clear();
       m_ZScintLengths.clear();
+      m_ZScintPositions.clear();
+      m_ZScintOffsets.clear();
       m_RotationInverse = m_Rotation.inverse();
       m_RotationMatrix = m_Rotation;
       m_RotationInverseMatrix = m_RotationInverse;
@@ -172,15 +176,17 @@ namespace Belle2 {
       m_ZStripMin(m.m_ZStripMin),
       m_ZStripMax(m.m_ZStripMax),
       m_ZOffsetSign(m.m_ZOffsetSign),
+      m_PhiScintLengths(m.m_PhiScintLengths),
+      m_PhiScintPositions(m.m_PhiScintPositions),
+      m_PhiScintOffsets(m.m_PhiScintOffsets),
+      m_ZScintLengths(m.m_ZScintLengths),
+      m_ZScintPositions(m.m_ZScintPositions),
+      m_ZScintOffsets(m.m_ZScintOffsets),
       m_Translation(m.m_Translation),
       m_Rotation(m.m_Rotation),
       m_RotationInverse(m.m_RotationInverse),
       m_Normal(m.m_Normal)
     {
-      m_PhiScintPositions = m.m_PhiScintPositions;
-      m_PhiScintLengths = m.m_PhiScintLengths;
-      m_ZScintPositions = m.m_ZScintPositions;
-      m_ZScintLengths = m.m_ZScintLengths;
     }
 
     Module::~Module()

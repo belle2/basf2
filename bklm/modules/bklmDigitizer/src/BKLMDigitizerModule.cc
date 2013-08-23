@@ -203,7 +203,7 @@ enum EKLM::FPGAFitStatus BKLMDigitizerModule::processEntry(std::vector<std::pair
   double half_len = (simHit->isPhiReadout() ? module->getPhiScintHalfLength(simHit->getStrip())
                      : module->getZScintHalfLength(simHit->getStrip()));
 
-  for (std::vector<std::pair<int, BKLMSimHit*> >::iterator iHit = vHits.begin(); iHit != vHits.end(); iHit++) {
+  for (std::vector<std::pair<int, BKLMSimHit*> >::iterator iHit = vHits.begin(); iHit != vHits.end(); ++iHit) {
 
     simHit = iHit->second;
     // calculate distance

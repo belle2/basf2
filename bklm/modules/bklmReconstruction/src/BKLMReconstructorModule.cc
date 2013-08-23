@@ -78,7 +78,7 @@ void BKLMReconstructorModule::event()
     BKLMDigit* digit = digits[d];
     volIDToDigits.insert(std::pair<int, int>(digit->getModuleID() + digit->getStrip(), d));
   }
-  if (volIDToDigits.size() == 0) return;
+  if (volIDToDigits.empty()) return;
 
   StoreArray<BKLMHit1d> hit1ds;
   RelationArray hit1dToDigits(hit1ds, digits);

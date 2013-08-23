@@ -167,17 +167,17 @@ namespace Belle2 {
       //! Get the radius of the inner tangent circle of gap 1 (next-to-innermost)
       double getGapInnerRadius(void) const { return m_GapInnerRadius; }
 
-      //! Get the number of z-measuring cathode strips in an RPC module
+      //! Get the number of z-measuring cathode strips or scintillators
       int getNZStrips(bool isChimney) const { return (isChimney ? m_NZStripsChimney : m_NZStrips); }
 
-      //! Get the number of phi-measuring cathode strips in an RPC module
+      //! Get the number of phi-measuring cathode strips or scintillators
       int getNPhiStrips(int layer) const;
 
       //! Get the number of z-measuring scintillators in a scintillator module
       int getNZScints(bool isChimney) const { return (isChimney ? m_NZScintsChimney : m_NZScints); }
 
       //! Get the number of phi-measuring scintillators in a scintillator module
-      int getNPhiScints(int layer) const;
+      int getNPhiScints(int layer) const { return getNPhiStrips(layer); }
 
       //! Get the offset of the scintillator envelope within a scintillator module
       const CLHEP::Hep3Vector getScintOffset(int layer, bool isChimney) const;

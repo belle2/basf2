@@ -71,6 +71,10 @@ void Module::setLogInfo(int logLevel, unsigned int logInfo)
 
 void Module::if_value(const std::string& expression, boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
 {
+  if (m_hasCondition) {
+    B2ERROR("You can only set a single condition per module!");
+  }
+
   CondParser condParser;
   if (condParser.parseCondition(expression, m_conditionOperator, m_conditionValue)) {
     m_hasCondition = true;

@@ -5,7 +5,7 @@ import os
 from SCons.Script import GetOption
 
 # define relpath for python < 2.6
-if not hasattr(os, 'relpath'):
+if not hasattr(os.path, 'relpath'):
 
 
     def relpath(path, start=os.path.curdir):
@@ -26,7 +26,7 @@ if not hasattr(os, 'relpath'):
         return os.path.join(*rel_list)
 
 
-os.path.relpath = relpath
+    os.path.relpath = relpath
 
 
 def create_symlink(target, source, env):

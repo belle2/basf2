@@ -13,6 +13,7 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/core/ModuleStatistics.h>
 #include <framework/core/PathManager.h>
+#include <framework/core/PathIterator.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -170,7 +171,6 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
   CALLGRIND_ZERO_STATS;
 #endif
 
-  const ModulePtrList& startModules = startPath->getModules();
   LogSystem& logSystem = LogSystem::Instance();
 
   //Remember the previous event meta data, and identify end of data meta data
@@ -193,11 +193,9 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
     gRandom = m_mainRNG;
 
     //Loop over the modules in the current path
-    ModulePtrList::const_iterator moduleIter = startModules.begin();
-    ModulePtrList::const_iterator endIter = startModules.end();
-    ModulePtrList modules; // used to hold modules for conditional paths only (to keep iterators valid)
-    while (!endProcess and moduleIter != endIter) {
-      Module* module = moduleIter->get();
+    PathIterator moduleIter(startPath);
+    while (!endProcess and !moduleIter.isDone()) {
+      Module* module = moduleIter.get();
 
       //Set the module dependent log level
       logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
@@ -268,11 +266,13 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
         //Check for a module condition, evaluate it and if it is true switch to a new path
         if (module->evalCondition()) {
           PathPtr condPath = module->getConditionPath();
-          modules = condPath->getModules();
-          moduleIter = modules.begin();
-          endIter = modules.end();
+          if (module->getAfterConditionPath() == Module::c_Continue) { //continue with parent Path after condition path is executed?
+            moduleIter = PathIterator(condPath, moduleIter);
+          } else {
+            moduleIter = PathIterator(condPath);
+          }
         } else {
-          ++moduleIter;
+          moduleIter.next();
         }
       }
     } //end module loop

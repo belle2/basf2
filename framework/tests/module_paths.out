@@ -1,7 +1,7 @@
 [INFO] Steering file: framework/tests/module_paths.py
 >>> basf2 Python environment set
 >>> Framework object created: fw
-[[] -> EvtMetaGen -> [SelectOddEvents -> EvtMetaInfo -> [Progress -> []]] -> PrintCollections]
+[[[]] -> EvtMetaGen -> [SelectOddEvents -> EvtMetaInfo -> [Progress -> [[]]]] -> PrintCollections]
 [INFO] Begin of new run
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
@@ -21,6 +21,8 @@
 [INFO] ----------------------------------------------------------------------------
 [INFO] 
 [INFO] ============================================================================
+[INFO] In module ReturnFalse1Condition
+[INFO] In module final
 [INFO] Setting return value to False
 [INFO] Processed:   1 runs,      2 events
 [INFO] ------------------------------------------------------------------------
@@ -45,8 +47,10 @@
 [INFO] ----------------------------------------------------------------------------
 [INFO] 
 [INFO] ============================================================================
+[INFO] In module ReturnFalse1Condition
+[INFO] In module final
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 2
 [INFO] ========================================================================
 [INFO] terminating SelectOddEvents
-[[] -> EvtMetaGen -> [SelectOddEvents -> EvtMetaInfo -> [Progress -> []]] -> PrintCollections]
+[[[]] -> EvtMetaGen -> [SelectOddEvents -> EvtMetaInfo -> [Progress -> [[]]]] -> PrintCollections -> ReturnFalse -> final]

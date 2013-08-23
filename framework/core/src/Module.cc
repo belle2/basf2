@@ -13,6 +13,8 @@
 #include <boost/python/list.hpp>
 #include <boost/python/dict.hpp>
 #include <boost/python/copy_const_reference.hpp>
+#include <boost/python/overloads.hpp>
+#include <boost/python/enum.hpp>
 
 #include <framework/core/Module.h>
 #include <framework/core/PyModule.h>
@@ -31,7 +33,8 @@ Module::Module() :
   m_logConfig(),
   m_hasReturnValue(false),
   m_returnValue(0),
-  m_hasCondition(false)
+  m_hasCondition(false),
+  m_afterConditionPath(c_End)
 {
 }
 
@@ -66,27 +69,22 @@ void Module::setLogInfo(int logLevel, unsigned int logInfo)
 }
 
 
-void Module::setCondition(const std::string& expression, boost::shared_ptr<Path> path)
+void Module::if_value(const std::string& expression, boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
 {
   CondParser condParser;
   if (condParser.parseCondition(expression, m_conditionOperator, m_conditionValue)) {
     m_hasCondition = true;
     m_conditionPath = path;
+    m_afterConditionPath = afterConditionPath;
   } else {
     B2ERROR("Invalid condition: could not parse condition: '" + expression + "'! The condition is NOT active!");
   }
 }
 
 
-void Module::setCondition(boost::shared_ptr<Path> path)
+void Module::if_false(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
 {
-  CondParser condParser;
-  if (condParser.parseCondition("<1", m_conditionOperator, m_conditionValue)) {
-    m_hasCondition = true;
-    m_conditionPath = path;
-  } else {
-    B2ERROR("Invalid condition: could not parse condition: '<1'! The condition is NOT active!");
-  }
+  if_value("<1", path, afterConditionPath);
 }
 
 
@@ -213,15 +211,19 @@ boost::python::list _getParamInfoListPython(const Module* m)
   return *p.get(); //copy
 }
 
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(if_value_overloads, if_value, 2, 3)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(if_false_overloads, if_false, 1, 2)
+
 
 void Module::exposePythonAPI()
 {
-  //For overloaded functions, member function pointer variables are needed (see boost::python documentation)
-  void (Module::*setConditionString)(const std::string&, boost::shared_ptr<Path>) = &Module::setCondition;
-  void (Module::*setConditionBool)(boost::shared_ptr<Path>) = &Module::setCondition;
-
   void (Module::*setReturnValueInt)(int) = &Module::setReturnValue;
   void (Module::*setReturnValueBool)(bool) = &Module::setReturnValue;
+
+  enum_<Module::EAfterConditionPath>("AfterConditionPath")
+  .value("END", Module::c_End)
+  .value("CONTINUE", Module::c_Continue)
+  ;
 
   //Python class definition
   class_<Module, PyModule>("Module")
@@ -229,8 +231,10 @@ void Module::exposePythonAPI()
   .def("name", &Module::getName, return_value_policy<copy_const_reference>())
   .def("set_name", &Module::setModuleName)
   .def("description", &Module::getDescription, return_value_policy<copy_const_reference>())
-  .def("condition", setConditionString)
-  .def("condition", setConditionBool)
+  .def("if_value", &Module::if_value, if_value_overloads())
+  .def("if_false", &Module::if_false, if_false_overloads())
+  .def("condition", &Module::if_value, if_value_overloads()) //TODO: legacy, remove at some point
+  .def("condition", &Module::if_false, if_false_overloads()) //TODO: legacy, remove at some point
   .def("param", &Module::setParamObject)
   .def("param", &Module::setParamListPython)
   .def("param", &Module::setParamDict)

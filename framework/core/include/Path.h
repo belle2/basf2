@@ -11,12 +11,11 @@
 #ifndef PATH_H_
 #define PATH_H_
 
-#include <boost/python/list.hpp>
-
 #include <framework/core/PathElement.h>
 
-#include <list>
 #include <boost/shared_ptr.hpp>
+
+#include <list>
 
 
 namespace Belle2 {
@@ -89,19 +88,14 @@ namespace Belle2 {
      */
     virtual std::string getPathString() const;
 
-    /**
-     * Returns a list of the modules in this path (as python list).
-     *
-     * @return A list of all modules of this path (as python list).
-     */
-    boost::python::list getModulesPython() const;
-
     /** Exposes methods of the Path class to Python. */
     static void exposePythonAPI();
 
 
   private:
     std::list<boost::shared_ptr<PathElement> > m_elements; /**< The list of path elements (Modules and sub-Paths) */
+
+    friend class PathIterator;
   };
 
 } // end namespace Belle2

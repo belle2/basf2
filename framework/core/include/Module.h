@@ -57,7 +57,7 @@ namespace Belle2 {
    * Modules can also define a return value (int or bool) using setReturnValue(),
    * which can be used in the steering file to split the Path based on the set value:
    *  \code
-      module_with_condition.condition("<1", another_path)
+      module_with_condition.if_value("<1", another_path)
       \endcode
    * In case the module condition for a given event is less than 1, the execution
    * will be diverted into another_path for this event. You could for example set
@@ -82,6 +82,12 @@ namespace Belle2 {
       c_InitializeInProcess         = 16, /**< initialize() function is called in same forked process event() is called in (this is the default.)*/
       c_InitializeInMain            = 32,  /**< initialize() function is called in the main process, i.e. only once. Resources allocated there will be available to all forked processes, using copy-on-write pages (see 'man 2 fork').*/
       c_InternalSerializer          = 64  /**< This module is an internal serializer/deserializer for parallel processing */
+    };
+
+    /** Different options for behaviour _after_ a conditional path was executed. */
+    enum EAfterConditionPath {
+      c_End, /**< End current event after the conditional path. */
+      c_Continue, /**< After the conditional path, resume execution after this module. */
     };
 
     /**
@@ -209,6 +215,14 @@ namespace Belle2 {
     void setLogInfo(int logLevel, unsigned int logInfo);
 
     /**
+     * Sets the condition path of the module
+     *
+     * @param path
+     */
+    void setConditionPath(const boost::shared_ptr<Path>& path) { m_conditionPath = path; };
+
+
+    /**
      * Sets the condition of the module.
      *
      * See https://belle2.cc.kek.jp/~twiki/bin/view/Computing/ModCondTut or CondParser::parseCondition() for a description of the syntax.
@@ -219,32 +233,9 @@ namespace Belle2 {
      *
      * @param expression The expression of the condition.
      * @param path       Shared pointer to the Path which will be executed if the condition is evaluated to true.
+     * @param afterConditionPath  What to do after executing 'path'.
      */
-    void setCondition(const std::string& expression, boost::shared_ptr<Path> path);
-
-    /**
-     * Sets the condition of the module.
-     *
-     * Please be careful: Avoid creating cyclic paths, e.g. by linking a condition
-     * to a path which is processed before the path where this module is
-     * located in.
-     *
-     * @param expression Parsed condition operator
-     * @param value      Parsed condition value
-     * @param path       Shared pointer to the Path which will be executed if the condition is evaluated to true.
-     */
-    void setCondition(const Belle2::CondParser::EConditionOperators expression, int value, boost::shared_ptr<Path> path) {
-      m_conditionOperator = expression;
-      m_conditionValue = value;
-      m_conditionPath = path;
-    };
-
-    /**
-     * Sets the condition path of the module
-     *
-     * @param path
-     */
-    void setConditionPath(const boost::shared_ptr<Path>& path) { m_conditionPath = path; };
+    void if_value(const std::string& expression, boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = c_End);
 
     /**
      * A simplified version to set the condition of the module.
@@ -253,11 +244,13 @@ namespace Belle2 {
      * to a path which is processed before the path where this module is
      * located in.
      *
-     * It is equivalent to the setCondition() method, using the expression "<1".
+     * It is equivalent to the if_value() method, using the expression "<1".
      * This method is meant to be used together with the setReturnValue(bool value) method.
+     *
      * @param path Shared pointer to the Path which will be executed if the return value is _false_.
+     * @param afterConditionPath  What to do after executing 'path'.
      */
-    void setCondition(boost::shared_ptr<Path> path);
+    void if_false(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = c_End);
 
     /**
      * Returns true if a condition was set for the module.
@@ -269,7 +262,7 @@ namespace Belle2 {
      *
      * If no condition or result value was defined, the method returns false.
      * Otherwise, the condition is evaluated and the result of the evaluation returned.
-     * To speed up the evaluation, the condition string was already parsed in the method setCondition().
+     * To speed up the evaluation, the condition string was already parsed in the method if_value().
      *
      * @return True if a condition and return value exists and the condition expression was evaluated to true.
      */
@@ -295,6 +288,9 @@ namespace Belle2 {
      * @return Parsed condition value
      */
     int getConditionValue() const { return m_conditionValue; };
+
+    /** What to do after a conditional path is finished. */
+    EAfterConditionPath getAfterConditionPath() const { return m_afterConditionPath; }
 
     /**
      * Returns true if all specified property flags are available in this module.
@@ -439,6 +435,7 @@ namespace Belle2 {
     boost::shared_ptr<Path> m_conditionPath; /**< The path which which will be executed if the condition is evaluated to true. */
     Belle2::CondParser::EConditionOperators m_conditionOperator;  /**< The operator of the condition (set by parsing the condition expression). */
     int m_conditionValue;                    /**< The value of the condition (set by parsing the condition expression). */
+    EAfterConditionPath m_afterConditionPath; /**< What to do after a conditional path is finished. */
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //                    Python API

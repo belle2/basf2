@@ -10,6 +10,7 @@
 
 #include <boost/python/register_ptr_to_python.hpp>
 #include <boost/python/class.hpp>
+#include <boost/python/list.hpp>
 
 #include <framework/core/Path.h>
 #include <framework/core/Module.h>
@@ -83,10 +84,13 @@ std::string Path::getPathString() const
 }
 
 
-boost::python::list Path::getModulesPython() const
+/**
+ * Returns a list of the modules in given path (as python list).
+ */
+boost::python::list _getModulesPython(const Path* path)
 {
   boost::python::list returnList;
-  const std::list<ModulePtr>& modules = getModules();
+  const std::list<ModulePtr>& modules = path->getModules();
 
   for (std::list<ModulePtr>::const_iterator listIter = modules.begin(); listIter != modules.end(); ++listIter)
     returnList.append(boost::python::object(ModulePtr(*listIter)));
@@ -101,7 +105,7 @@ void Path::exposePythonAPI()
   .def("__str__", &Path::getPathString)
   .def("add_module", &Path::addModule)
   .def("add_path", &Path::addPath)
-  .def("modules", &Path::getModulesPython)
+  .def("modules", &_getModulesPython)
   ;
 
   register_ptr_to_python<PathPtr>();

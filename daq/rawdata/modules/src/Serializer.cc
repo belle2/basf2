@@ -136,12 +136,12 @@ void SerializerModule::terminate()
 
 void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawCOPPER* rawcpr)
 {
+  RawHeader rawhdr;
+  rawhdr.SetBuffer(rawcpr->GetRawHdrBufPtr());
 
   int total_send_nwords =
     hdr->GetHdrNwords() +
-    rawcpr->m_header.GetHdrNwords() +
-    rawcpr->GetBodyNwords() +
-    rawcpr->m_trailer.GetTrlNwords() +
+    rawhdr.GetNwords() +
     trl->GetTrlNwords();
 
   hdr->SetNwords(total_send_nwords);
@@ -150,215 +150,33 @@ void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, 
 }
 
 
-void SerializerModule::SendOneBuffer(RawCOPPER* rawcpr)
-{
-
-  SendHeader send_header;
-  SendTrailer send_trailer;
-
-  int send_header_nwords = send_header.GetHdrNwords();
-
-  int rawheader_nwords = rawcpr->m_header.GetHdrNwords();
-  int rawtrailer_nwords = rawcpr->m_trailer.GetTrlNwords();
-  int rawcopperbody_nwords =
-    rawcpr->GetBodyNwords();
-  int send_trailer_nwords = send_trailer.GetTrlNwords();
-
-  int total_send_nwords = (send_header_nwords + rawheader_nwords + rawcopperbody_nwords + rawtrailer_nwords + send_trailer_nwords);
-  send_header.SetNwords(total_send_nwords);
-
-  int rawcopper_nwords = rawcpr->m_header.GetNwords();
-  if (rawcopper_nwords != rawheader_nwords + rawcopperbody_nwords + rawtrailer_nwords) {
-    printf("invalid data length of RawCOPEPR. Exiting... : %d %d %d %d\n",
-           rawcopper_nwords,
-           rawheader_nwords,
-           rawcopperbody_nwords,
-           rawtrailer_nwords
-          );
-    exit(-1);
-  }
-
-
-
-  int total_send_bytes = total_send_nwords * sizeof(int);
-  char* send_buf = new char[ total_send_bytes ];
-  memcpy(send_buf, send_header.GetBuffer(), send_header_nwords * sizeof(int));
-  memcpy(send_buf + send_header_nwords * sizeof(int),
-         rawcpr->m_header.GetBuffer(),
-         rawheader_nwords * sizeof(int));
-
-  memcpy(send_buf + (send_header_nwords + rawheader_nwords) * sizeof(int),
-         rawcpr->GetBuffer(),
-         rawcopperbody_nwords * sizeof(int));
-  memcpy(send_buf + (send_header_nwords + rawheader_nwords + rawcopperbody_nwords) * sizeof(int),
-         rawcpr->m_trailer.GetBuffer(),
-         rawtrailer_nwords * sizeof(int));
-  memcpy(send_buf + (send_header_nwords + rawheader_nwords + rawcopperbody_nwords + rawtrailer_nwords) * sizeof(int),
-         send_trailer.GetBuffer(),
-         send_trailer_nwords * sizeof(int));
-
-
-  // Send data to Readout CP
-  int send_bytes = total_send_bytes;
-  int sent_bytes = 0;
-  int current_size = send_bytes;
-  while (send_bytes - sent_bytes > 0) {
-    int n = 0;
-    if ((n = send(m_socket, (char*)send_buf + sent_bytes, current_size, MSG_NOSIGNAL)) < 0) {
-      perror("SEND error3");
-      exit(1);
-    }
-    sent_bytes += n;
-    current_size -= n;
-  }
-
-#ifdef DEBUG
-  if (n_basf2evt == 0) {
-    for (int k = 0; k < send_bytes / sizeof(int); k++) {
-      printf("0x%.8x ", *((int*)send_buf + k));
-      if ((k + 1) % 10 == 0) printf("\n %6d : ", k);
-    }
-    printf("\n");
-    printf("\n");
-  }
-#endif
-
-  delete [] send_buf;
-
-}
-
-
-void SerializerModule::SendOneByOne(RawCOPPER* rawcpr)
-{
-
-  SendHeader send_header;
-  SendTrailer send_trailer;
-
-  int send_header_nwords = send_header.GetHdrNwords();
-  int rawheader_nwords = rawcpr->m_header.GetHdrNwords();
-  int rawcopperbody_nwords = rawcpr->GetBodyNwords();
-  int rawtrailer_nwords = rawcpr->m_trailer.GetTrlNwords();
-  int rawcopper_nwords = rawcpr->m_header.GetNwords();
-  int send_trailer_nwords = send_trailer.GetTrlNwords();
-
-  int total_send_nwords =
-    send_header_nwords + rawheader_nwords + rawcopperbody_nwords
-    + rawtrailer_nwords + send_trailer_nwords;
-
-  send_header.SetNwords(total_send_nwords);
-
-  if (rawcopper_nwords != rawheader_nwords + rawcopperbody_nwords + rawtrailer_nwords) {
-    printf("invalid data length of RawCOPEPR. Exiting... : %d %d %d %d\n",
-           rawcopper_nwords,
-           rawheader_nwords,
-           rawcopperbody_nwords,
-           rawtrailer_nwords
-          );
-    exit(-1);
-  }
-
-
-
-  // Send SendHeader
-
-  int send_bytes = sizeof(int) * send_header_nwords;
-  int sent_bytes = 0;
-  int current_size = send_bytes;
-  while (send_bytes - sent_bytes > 0) {
-    int n = 0;
-    if ((n = send(m_socket, (char*)(send_header.GetBuffer()) + sent_bytes, current_size, MSG_NOSIGNAL)) < 0) {
-      perror("SEND error1");
-      exit(1);
-    }
-    sent_bytes += n;
-    current_size -= n;
-  }
-
-  // Send RawCopper Header
-  send_bytes = sizeof(int) * rawheader_nwords;
-  sent_bytes = 0;
-  current_size = send_bytes;
-  while (send_bytes - sent_bytes > 0) {
-    int n = 0;
-    if ((n = send(m_socket, (char*)(rawcpr->m_header.GetBuffer()) + sent_bytes, current_size, MSG_NOSIGNAL)) < 0) {
-      perror("SEND error2");
-      exit(1);
-    }
-    sent_bytes += n;
-    current_size -= n;
-  }
-
-  // Send Body
-  send_bytes = sizeof(int) * rawcopperbody_nwords;
-  sent_bytes = 0;
-  current_size = send_bytes;
-
-  while (send_bytes - sent_bytes > 0) {
-    int n = 0;
-    if ((n = send(m_socket, (char*)(rawcpr->GetBuffer()) + sent_bytes, current_size, MSG_NOSIGNAL)) < 0) {
-      perror("SEND error3");
-      exit(1);
-    }
-    sent_bytes += n;
-    current_size -= n;
-  }
-
-  // Send RawCOPPER Trailer
-  send_bytes = sizeof(int) * rawtrailer_nwords;
-  sent_bytes = 0;
-  current_size = send_bytes;
-  while (send_bytes - sent_bytes > 0) {
-    int n = 0;
-    if ((n = send(m_socket, (char*)(rawcpr->m_trailer.GetBuffer()) + sent_bytes, current_size, MSG_NOSIGNAL)) < 0) {
-      perror("SEND error3");
-      exit(1);
-    }
-    sent_bytes += n;
-    current_size -= n;
-  }
-
-  // Send SendTrailer
-
-  send_bytes = sizeof(int) * send_trailer_nwords;
-  sent_bytes = 0;
-  current_size = send_bytes;
-  while (send_bytes - sent_bytes > 0) {
-    int n = 0;
-    if ((n = send(m_socket, (char*)(send_trailer.GetBuffer()) + sent_bytes, current_size, MSG_NOSIGNAL)) < 0) {
-      perror("SEND error4");
-      exit(1);
-    }
-    sent_bytes += n;
-    current_size -= n;
-  }
-}
-
-
-
 void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
 {
+
+  RawHeader rawhdr;
+  rawhdr.SetBuffer(rawcpr->GetRawHdrBufPtr());
+
+  RawTrailer rawtrl;
+  rawtrl.SetBuffer(rawcpr->GetRawTrlBufPtr());
 
   SendHeader send_header;
   SendTrailer send_trailer;
   FillSendHeaderTrailer(&send_header, &send_trailer, rawcpr);
 
   enum {
-    NUM_BUFFER = 5
+    NUM_BUFFER = 3
   };
   struct iovec iov[ NUM_BUFFER ];
 
   // check Body data size
-  int rawheader_nwords = rawcpr->m_header.GetHdrNwords();
-  int rawcopperbody_nwords = rawcpr->GetBodyNwords();
-  int rawtrailer_nwords = rawcpr->m_trailer.GetTrlNwords();
-  int rawcopper_nwords = rawcpr->m_header.GetNwords();
+  int rawcopper_nwords = rawcpr->Size();
+  int rawheader_nwords = rawhdr.GetNwords();
 
-  if (rawcopper_nwords != rawheader_nwords + rawcopperbody_nwords + rawtrailer_nwords) {
-    printf("invalid data length of RawCOPEPR. Exiting... : %d %d %d %d\n",
+
+  if (rawcopper_nwords != rawheader_nwords) {
+    printf("invalid data length of RawCOPEPR. Exiting... : %d %d \n",
            rawcopper_nwords,
-           rawheader_nwords,
-           rawcopperbody_nwords,
-           rawtrailer_nwords
+           rawheader_nwords
           );
     exit(-1);
   }
@@ -367,17 +185,11 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
   iov[0].iov_base = (char*)send_header.GetBuffer();
   iov[0].iov_len = sizeof(int) * send_header.GetHdrNwords();
 
-  iov[1].iov_base = (char*)rawcpr->m_header.GetBuffer();
-  iov[1].iov_len = sizeof(int) * rawheader_nwords;
+  iov[1].iov_base = (char*)rawcpr->GetBuffer();
+  iov[1].iov_len = sizeof(int) * rawcopper_nwords;
 
-  iov[2].iov_base = (char*)rawcpr->GetBuffer();
-  iov[2].iov_len = sizeof(int) * rawcopperbody_nwords;
-
-  iov[3].iov_base = (char*)rawcpr->m_trailer.GetBuffer();
-  iov[3].iov_len = sizeof(int) * rawtrailer_nwords;
-
-  iov[4].iov_base = (char*)send_trailer.GetBuffer();
-  iov[4].iov_len = sizeof(int) * send_trailer.GetTrlNwords();
+  iov[2].iov_base = (char*)send_trailer.GetBuffer();
+  iov[2].iov_len = sizeof(int) * send_trailer.GetTrlNwords();
 
 
   // Send Multiple buffers
@@ -508,18 +320,13 @@ void SerializerModule::RecordTime(int event, double* array)
 }
 
 
-void SerializerModule::VerifyCheckSum(int* buf)     // Should be modified
+unsigned int SerializerModule::CalcXORChecksum(int* buf, int nwords)
 {
-
-  int check_sum = 0;
-  for (int i = 0 ; i < buf[0]; i++) {
-    if (i != 2)   check_sum += buf[i];
+  unsigned int checksum = 0;
+  for (int i = 0; i < nwords; i++) {
+    checksum = checksum ^ buf[ i ];
   }
-
-  if (buf[2] != check_sum) {
-    cout << "Invalid checksum : " << check_sum << " " << buf[1] << endl;
-    exit(1);
-  }
+  return checksum;
 }
 
 

@@ -107,24 +107,6 @@ void PrintDataModule::terminate()
 
 
 
-void PrintDataModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawCOPPER* rawcpr)
-{
-
-  int total_send_nwords =
-    hdr->GetHdrNwords() +
-    rawcpr->m_header.GetHdrNwords() +
-    rawcpr->GetBodyNwords() +
-    rawcpr->m_trailer.GetTrlNwords() +
-    trl->GetTrlNwords();
-
-  hdr->SetNwords(total_send_nwords);
-
-  return;
-}
-
-
-
-
 double PrintDataModule::GetTimeSec()
 {
   struct timeval t;
@@ -173,9 +155,21 @@ void PrintDataModule::event()
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
     int* buf;
     int m_size_byte = 0;
-
     buf = rawcprarray[ j ]->GetBuffer();
+
     m_size_byte = rawcprarray[ j ]->Size() * sizeof(int);
+
+    printf("buf %p header %p footer %p", buf, rawcprarray[ j ]->GetBuffer(), rawcprarray[ j ]->GetBuffer());
+
+//     for( int i = 0 ; i < rawcprarray[ j ]->Size(); i++){
+//       printf("%.8x ", buf[ i ] );
+
+//       if( ( i + 1 ) % 10 == 0 ){
+//  printf("\n %.8d:", i + 2 );
+//       }
+//     }
+//     printf("\n");
+//     printf("\n");
 
     printf("evn %d j %d size %d\n", n_basf2evt,  j, m_size_byte);
   }
@@ -183,7 +177,6 @@ void PrintDataModule::event()
 //   StoreObjPtr<RawCOPPER> rawcopper;
 //   int* buf;
 //   buf = rawcopper->GetBuffer();
-
 
 //   m_eventMetaDataPtr.create();
 //   m_eventMetaDataPtr->setExperiment(1);

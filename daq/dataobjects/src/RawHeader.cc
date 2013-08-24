@@ -93,10 +93,18 @@ void RawHeader::SetDataType(int data_type)
   m_buffer[ POS_TRUNC_MASK_DATATYPE ] =
     (data_type & 0x7FFFFFFF) | (m_buffer[ POS_TRUNC_MASK_DATATYPE ] & 0x80000000);
 }
+
 void RawHeader::SetTruncMask(int trunc_mask)
 {
   CheckBuffer();
   m_buffer[ POS_TRUNC_MASK_DATATYPE ] = (trunc_mask << 31) | (m_buffer[ POS_TRUNC_MASK_DATATYPE ] & 0x7FFFFFFF);
+}
+
+void RawHeader::SetB2LFEEHdrPart(unsigned int word1, unsigned int word2)
+{
+  m_buffer[ POS_HSLB_1 ] = word1;
+  m_buffer[ POS_HSLB_2 ] = word2;
+
 }
 
 
@@ -131,7 +139,7 @@ int RawHeader::AddNodeInfo(int node_id)
     return -1;
   }
 
-  m_buffer[ POS_NODES_0 + m_buffer[ POS_NUM_NODES ] ] = node_id;
+  m_buffer[ POS_NODES_1 + m_buffer[ POS_NUM_NODES ] ] = node_id;
   m_buffer[ POS_NUM_NODES ]++;
   return 0;
 }
@@ -221,7 +229,7 @@ int RawHeader::GetNodeInfo(int node_no, int* node_id)
   if (node_no >= GetNumNodes()) {
     return -1;
   }
-  *node_id = m_buffer[ POS_NODES_0 + node_no ];
+  *node_id = m_buffer[ POS_NODES_1 + node_no ];
 
   return 0;
 }
@@ -232,4 +240,3 @@ unsigned int RawHeader::GetMagicWordEntireHeader()
   CheckBuffer();
   return m_buffer[ POS_TERM_HEADER ];
 }
-

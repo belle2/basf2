@@ -25,29 +25,6 @@ RawCOPPER::~RawCOPPER()
   if (m_allocated) delete[] m_buffer;
 }
 
-void RawCOPPER::Copy(int* bufin, int nwords)
-{
-  //  m_nwords = bufin[0];
-  m_nwords = nwords;
-
-  if (m_allocated) delete[] m_buffer;
-  m_buffer = new int[m_nwords];
-
-  memcpy((char*)m_buffer, (char*)bufin, m_nwords * sizeof(int));
-  m_allocated = true;
-}
-
-// RawHeader* RawCOPPER::GetRawHeader()
-// {
-//   return &m_header;
-// }
-
-// RawTrailer* RawCOPPER::GetRawTrailer()
-// {
-//   return &m_trailer;
-// }
-
-
 int* RawCOPPER::GetRawHdrBufPtr()
 {
   if (m_buffer == NULL || m_nwords <= 0) {
@@ -68,24 +45,25 @@ int* RawCOPPER::GetRawTrlBufPtr()
 }
 
 
-int RawCOPPER::GetBodyNwords()
-{
-  return m_nwords;
-}
 
 int RawCOPPER::Size()
 {
   return m_nwords;
 }
 
-int* RawCOPPER::AllocateBuffer(int nwords)
+int RawCOPPER::GetBodyNwords()
 {
-  m_nwords = nwords;
-  if (m_allocated) delete[] m_buffer;
-  m_buffer = new int[nwords];
-  m_allocated = true;
-  return m_buffer;
+  return m_nwords;
 }
+
+// int* RawCOPPER::AllocateBuffer(int nwords)
+// {
+//   m_nwords = nwords;
+//   if (m_allocated) delete[] m_buffer;
+//   m_buffer = new int[nwords];
+//   m_allocated = true;
+//   return m_buffer;
+// }
 
 int* RawCOPPER::GetBuffer()
 {
@@ -116,14 +94,24 @@ void RawCOPPER::SetBuffer(int* bufin, int nwords, int malloc_flag)
 
 
 
-int RawCOPPER::GetCopperNodeId()
+int RawCOPPER::GetCOPPERNodeId()
 {
   return 0;
 }
 
-unsigned int RawCOPPER::GetCoppereveNo()
+unsigned int RawCOPPER::GetCOPPEREveNo()
 {
   return m_buffer[ POS_EVE_NUM_COPPER + tmp_header.RAWHEADER_NWORDS ];
+}
+
+unsigned int RawCOPPER::GetB2LFEEHdr1()
+{
+  return m_buffer[ 0 + SIZE_B2LHSLB_HEADER + POS_EVE_NUM_COPPER + tmp_header.RAWHEADER_NWORDS ];
+}
+
+unsigned int RawCOPPER::GetB2LFEEHdr2()
+{
+  return m_buffer[ 1 + SIZE_B2LHSLB_HEADER + POS_EVE_NUM_COPPER + tmp_header.RAWHEADER_NWORDS ];
 }
 
 int RawCOPPER::GetSubsysId()
@@ -148,43 +136,43 @@ int RawCOPPER::GetNumB2lBlock()
   return cnt;
 }
 
-int RawCOPPER::GetFEEDataOffsetA()
+
+
+int RawCOPPER::GetOffset1stB2l()
 {
   return
     tmp_header.RAWHEADER_NWORDS
-    + SIZE_COPPER_HEADER
-    + SIZE_B2LHSLB_HEADER
-    + SIZE_B2LFEE_HEADER;
+    + SIZE_COPPER_HEADER;
 }
 
-int RawCOPPER::GetFEEDataOffsetB()
+int RawCOPPER::GetOffset2ndB2l()
 {
   return
-    GetFEEDataOffsetA()
+    GetOffset1stB2l()
     + m_buffer[ POS_CH_B_DATA_LENGTH + tmp_header.RAWHEADER_NWORDS ];
 }
 
-int RawCOPPER::GetFEEDataOffsetC()
+int RawCOPPER::GetOffset3rdB2l()
 {
   return
-    GetFEEDataOffsetB()
+    GetOffset2ndB2l()
     + m_buffer[ POS_CH_C_DATA_LENGTH + tmp_header.RAWHEADER_NWORDS ];
 }
 
-int RawCOPPER::GetFEEDataOffsetD()
+int RawCOPPER::GetOffset4thB2l()
 {
   return
-    GetFEEDataOffsetC()
+    GetOffset3rdB2l()
     + m_buffer[ POS_CH_D_DATA_LENGTH + tmp_header.RAWHEADER_NWORDS ];
 }
 
 
 
-int* RawCOPPER::GetFEEBufferA()
+int* RawCOPPER::Get1stFEEBuffer()
 {
   RawHeader rawhdr;
   rawhdr.SetBuffer(GetRawHdrBufPtr());
-  if (rawhdr.GetOffset1stB2l() != GetFEEDataOffsetA()) {
+  if (rawhdr.GetOffset1stB2l() != GetOffset1stB2l()) {
     printf("Data position info is inconsistent. Exting...\n");
     exit(1);
   }
@@ -195,11 +183,11 @@ int* RawCOPPER::GetFEEBufferA()
   return &(m_buffer[ rawhdr.GetOffset1stB2l() ]);
 }
 
-int* RawCOPPER::GetFEEBufferB()
+int* RawCOPPER::Get2ndFEEBuffer()
 {
   RawHeader rawhdr;
   rawhdr.SetBuffer(GetRawHdrBufPtr());
-  if (rawhdr.GetOffset2ndB2l() != GetFEEDataOffsetB()) {
+  if (rawhdr.GetOffset2ndB2l() != GetOffset2ndB2l()) {
     printf("Data position info is inconsistent. Exting...\n");
     exit(1);
   }
@@ -211,11 +199,11 @@ int* RawCOPPER::GetFEEBufferB()
 
 }
 
-int* RawCOPPER::GetFEEBufferC()
+int* RawCOPPER::Get3rdFEEBuffer()
 {
   RawHeader rawhdr;
   rawhdr.SetBuffer(GetRawHdrBufPtr());
-  if (rawhdr.GetOffset3rdB2l() != GetFEEDataOffsetC()) {
+  if (rawhdr.GetOffset3rdB2l() != GetOffset3rdB2l()) {
     printf("Data position info is inconsistent. Exting...\n");
     exit(1);
   }
@@ -227,11 +215,11 @@ int* RawCOPPER::GetFEEBufferC()
 
 }
 
-int* RawCOPPER::GetFEEBufferD()
+int* RawCOPPER::Get4thFEEBuffer()
 {
   RawHeader rawhdr;
   rawhdr.SetBuffer(GetRawHdrBufPtr());
-  if (rawhdr.GetOffset4thB2l() != GetFEEDataOffsetD()) {
+  if (rawhdr.GetOffset4thB2l() != GetOffset4thB2l()) {
     printf("Data position info is inconsistent. Exting...\n");
     exit(1);
   }

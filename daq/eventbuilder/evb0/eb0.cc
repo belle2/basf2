@@ -6,9 +6,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <string>
 #include "send_header_and_trailer.h"
 #include "raw_copper_header_and_trailer.h"
 
+//#define DEBUG
+//#define TIME
 
 static int NUM_ENTRY = 50;
 int total_size;
@@ -36,13 +39,24 @@ char* vbuf_to = NULL;
 //FILE * fp_from;
 char* vbuf_from = NULL;
 
-FILE* fp_basf2_to = NULL;
+FILE* fp_from_basf2 = NULL;
 
+#ifdef TIME
+
+#define EVE_MAX 600
+#define EVE_MIN 100
+#define EVE_DISP 700
+
+double GetTimeSec()
+{
+  struct timeval t;
+  gettimeofday(&t, NULL);
+  return (t.tv_sec + t.tv_usec * 1.e-6 - 1376878536.);
+}
+#endif
 
 void fill_hdr(int* buf)
 {
-
-
 
 }
 
@@ -84,9 +98,10 @@ public:
     clear();
   };
 
-  void init(int from) {
+  void init() {
+    //  void init(int from) {
     clear();
-    port_from = from;
+    //    port_from = from;
   };
 
   int fread(char* buffer, int len) {
@@ -100,35 +115,21 @@ public:
 
   int copy(char* buffer, int len) {
     int ret;
-#ifdef DEBUG
-    printf("Reading data... size %d\n", len);
-#endif
     ret = fread(buffer, len);
     if (ret != 1 && feof(fp_from)) {
+      exit(1);
       return 0;
     }
-#ifdef DEBUG
-    printf("done.\n");
-    printf("Sending data... size %d\n", len);
-#endif
 
-    char* buffer_body = buffer + sizeof(struct SendHeader);
-    int len_body = len - sizeof(struct SendHeader) - sizeof(struct SendTrailer);
-    modify_rawheader((int*)buffer_body);
+    //     char* buffer_body = buffer + sizeof( struct SendHeader );
+    //     int len_body = len - sizeof( struct SendHeader ) - sizeof( struct SendTrailer );
+    char* buffer_body = buffer;
+    int len_body = len;
+    //    modify_rawheader( (int*)buffer_body );
 
     fwrite(buffer_body, len_body);
     fflush(fp_to);
-
-#ifdef DEBUG
-    printf("done.\n");
-
-    for (int i = 0; i < len / sizeof(int); i++) {
-      printf("0x%.8x ", *((int*)buffer + i));
-      if ((i + 1) % 10 == 0) printf("\n %6d : ", i);
-    }
-    printf("\n");
-    printf("\n");
-#endif
+    //    printf("Sent %d bytes\n", len_body);
 
     return len;
   };
@@ -140,7 +141,7 @@ public:
 
     char portstr[64];
 
-    snprintf(portstr, sizeof(portstr), "%d", port_from);
+    snprintf(portstr, sizeof(portstr), "%d", port_to);
 
     hint.ai_family = AF_UNSPEC;
     hint.ai_socktype = SOCK_STREAM;
@@ -232,6 +233,7 @@ FILE* fp_accept(const char* local_hostname, unsigned short port_from, const char
   ret = setsockopt(fd_listen, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
   assert(ret == 0);
 
+
   ret = setsockopt(fd_listen, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
   assert(ret == 0);
 
@@ -288,10 +290,9 @@ FILE* fp_connect(const char* hostname, unsigned short port, const char* opt /* f
   ret  = -1;
   printf("connecting to %s (%d) socket %d\n", hostname, port, fd);
   while (ret != 0) {
-    ret = connect(fd, res->ai_addr, res->ai_addrlen);
     sleep(1);
+    ret = connect(fd, res->ai_addr, res->ai_addrlen);
   }
-
   assert(ret == 0);
   printf("Done\n");
 
@@ -318,6 +319,7 @@ FILE* fp_connect(const char* hostname, unsigned short port, const char* opt /* f
 main(int argc, char** argv)
 {
 
+  std::string copper_hostname[3] = {"cpr006", "cpr007", "cpr008"};
 
   int ch;
   while (-1 != (ch = getopt(argc, argv, "i:s:S:n:p:P:Dbh"))) {
@@ -348,46 +350,60 @@ main(int argc, char** argv)
         break;
     }
   }
+  connection conn_hdr;
 
   connection conn[nstream];
-  connection conn_hdr;
-  connection conn_basf2;
 
-  if (!discard) {
-    //  fp_to = fp_connect("127.0.0.1", port_to, "w");
-    //     if( basf2 ){
-    //       fp_to = fp_connect("localhost", port_to_basf2, "w");
-    //       // fp_to = fp_connect("192.168.100.11", port_to, "w");
-    //     }else{
-    //       fp_to = fp_accept("localhost", port_to, "w");
-    //     }
-    printf("Accepting...\n");
-    fp_to = fp_accept("localhost", port_to, "w");
+
+  if (basf2 || !discard) {
+    std::string host;
+    int port;
+
+    if (basf2) {
+      host = "localhost";
+      port = port_to_basf2;
+    } else {
+      host = "localhost";
+      port = port_to;
+    }
+
+    printf("Accepting from %s port %d...\n", host.c_str(), port);
+    FILE* fp = fp_accept(host.c_str(), port, "w");
     printf("Done\n");
     for (int i = 0; i < nstream; i++) {
-      conn[i].set_fp_to(fp_to);
+      conn[i].set_fp_to(fp);
     }
+
+
   }
 
-//   if( basf2 ){
-//     conn_basf2.init( port_from_basf2 );
-//     conn_basf2.listen();
-//     fp_basf2_to = fp_connect("192.168.100.11", port_to, "w");
-//     // fp_basf2_to = fp_connect("localhost", port_to_basf2, "w");
-//     conn_basf2.set_fp_to(fp_basf2_to);
-//     printf("accepting from basf2...");
-//     conn_basf2.accept();
-//     printf("done\n");
-//   }
+  connection conn_basf2;
+  if (basf2 && !discard) {
+    FILE* fp;
+    char host_to[20] = "localhost";
+    printf("Done\n");
+    printf("Accepting from %s port %d...\n", host_to, port_to);
+    fp = fp_accept("localhost", port_to, "w");
+    conn_basf2.set_fp_to(fp);
 
-//   if( add_hdr ){
-//     conn_hdr.set_fp_to( fp_to );
-//   }
+    fp = fp_connect("localhost", port_from_basf2, "r");
+    conn_basf2.set_fp_from(fp);
+
+  }
+
+
 
   for (int i = 0; i < nstream; i++) {
-    int port_from = baseport_from + i;
-    conn[i].set_fp_from(fp_connect("localhost", port_from, "r"));
+    //    int port_from = baseport_from + i;
+    int port_from = baseport_from;
+    //    conn[i].set_fp_from( fp_connect("localhost", port_from, "r") );
+    conn[i].set_fp_from(fp_connect(copper_hostname[ i ].c_str(), port_from, "r"));
   }
+
+  //   if( add_hdr ){
+  //     conn_hdr.set_fp_to( fp_to );
+  //   }
+
 
   char* buffer = new char[max_event_size];
   struct timeval tv0, tv1;
@@ -397,13 +413,23 @@ main(int argc, char** argv)
 
   int* hdr[hdr_nwords];
 
-  for (int nevent = 0; ; nevent++) {
-    for (int nentry = 0; nentry < NUM_ENTRY; nentry++) {
-
-#ifdef DEBUG
-      printf("neve %d ent %d\n" , nevent, nentry);
+#ifdef TIME
+  int diff_cnt = 0;
+  double time_diff1[500];
+  double time_diff2[500];
+  double time_diff3[500];
+  double time_diff4[500];
 #endif
 
+  for (int nevent = 0; ; nevent++) {
+
+#ifdef TIME
+    if (nevent >= EVE_MIN && nevent < EVE_MAX) {
+      time_diff1[ diff_cnt ] = GetTimeSec();
+    }
+#endif
+
+    for (int nentry = 0; nentry < NUM_ENTRY; nentry++) {
       //       if( add_hdr ){
       //  fill_hdr( hdr );
       //  conn_hdr.copy( hdr, hdr_nwords*sizeof(int) );
@@ -411,28 +437,58 @@ main(int argc, char** argv)
 
       for (int i = 0; i < nstream; i++) {
         uint32_t nword;
-        if (discard) {
+        if (! basf2 && discard) {
           if (0 == conn[i].fread((char*)&nword, sizeof(nword))) {
             exit(0);
           }
+#ifdef DEBUG
+          printf("Size %d\n", nword * sizeof(int));
+#endif
+
           if (0 == conn[i].fread(buffer, sizeof(nword) * (nword - 1))) {
             exit(0);
           }
         } else {
-
           if (0 == conn[i].copy((char*)&nword, sizeof(nword))) {
             exit(0);
           }
-
+#ifdef DEBUG
+          printf("Size %d\n", nword * sizeof(int));
+#endif
           if (0 == conn[i].copy(buffer, sizeof(nword) * (nword - 1))) {
             exit(0);
           }
+#ifdef DEBUG
+          //    for( int i = 0; i < nword-1;i++){
+          //      printf( "0x%.8x ", *( (int*)buffer + i ) );
+          //      if( ( i + 1 ) % 10 == 0 ) printf("\n %6d : ", i );
+          //    }
+          //    printf("\n");
+          //    printf("\n");
+#endif
         }
         total_size += sizeof(nword) * nword;
+
+
+#ifdef DEBUG
+        printf("neve %d ent %d size %d\n" , nevent, nentry, sizeof(nword)*nword);
+
+#endif
       }
+
+
     }
 
+#ifdef TIME
+    if (nevent >= EVE_MIN && nevent < EVE_MAX) {
+      time_diff2[ diff_cnt ] = GetTimeSec();
+    }
+#endif
 
+
+    //
+    // Receive data from basf2 and send to evb
+    //
     if (!discard && basf2) {
       for (int nentry = 0; nentry < NUM_ENTRY; nentry++) {
         uint32_t nword;
@@ -442,29 +498,66 @@ main(int argc, char** argv)
         if (0 == conn_basf2.copy((char*)&nword, sizeof(nword))) {
           exit(0);
         }
+
 #ifdef DEBUG
         printf("size2 %d ent %d eve %d\n", nword, nentry, nevent);
 #endif
         if (0 == conn_basf2.copy(buffer, sizeof(nword) * (nword - 1))) {
           exit(0);
         }
+
+#ifdef DEBUG
+        for (int i = 0; i < nword - 1; i++) {
+          printf("0x%.8x ", *((int*)buffer + i));
+          if ((i + 1) % 10 == 0) printf("\n %6d :: ", i);
+        }
+        printf("\n");
+        printf("\n");
+
+#endif
+
       }
+
+#ifdef TIME
+      if (nevent >= EVE_MIN && nevent < EVE_MAX) {
+        time_diff3[ diff_cnt ] = GetTimeSec();
+        diff_cnt++;
+      }
+#endif
+
+
+
     }
 
-
+    //
+    // Rate Monitor
+    //
     if (nevent % (interval / NUM_ENTRY) == 0) {
-      gettimeofday(&tv1, 0);
       if (nevent > 0) {
+        gettimeofday(&tv1, 0);
         double tdiff = (double)(tv1.tv_sec - tv0.tv_sec);
         tdiff += (double)(tv1.tv_usec - tv0.tv_usec) / 1000000.0;
-        printf("%d event %f sec %f MB/s %lf kHz %d %d %lf %lf\n",
-               nevent, tdiff, total_size / 1000000.0 / tdiff,
-               (nevent - prev_nevent) / tdiff
+        printf("%d event %.2f sec %.2f MB/s %.2lf kHz %d %d %lf %lf\n",
+               nevent * NUM_ENTRY, tdiff, total_size / 1000000.0 / tdiff,
+               (nevent - prev_nevent)*NUM_ENTRY / tdiff / 1000.
               );
         total_size = 0;
         prev_nevent = nevent;
+        tv0 = tv1;
       }
-      tv0 = tv1;
+
     }
+
+#ifdef TIME
+    if (nevent == EVE_DISP) {
+      for (int i = 0; i < EVE_MAX - EVE_MIN; i++) {
+        printf("%d %lf %lf %lf\n",
+               i, time_diff1[i], time_diff2[i], time_diff3[i]);
+      }
+
+
+      fflush(stdout);
+    }
+#endif
   }
 }

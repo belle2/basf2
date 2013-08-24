@@ -124,16 +124,35 @@ namespace Belle2 {
     //! check data
     int check_data(char* buf, int prev_eve, int* cur_eve);
 
+    //! calculate checksum
+    unsigned int CalcSimpleChecksum(int* buf, int nwords);
+
+    //! calculate checksum
+    unsigned int CalcXORChecksum(int* buf, int nwords);
+
     //! Messaage handler
     MsgHandler* m_msghandler;
 
+    //! Node(PC or COPPER) ID
+    unsigned int m_nodeid;
+
+    //! run no.
+    int m_run_no;
+
+    //! exp no.
+    int m_exp_no;
+
+    //! data type
+    int m_data_type;
+
+    //! trunc mask
+    int m_trunc_mask;
 
     // Data members
   private:
 
+
     // Parallel processing parameters
-
-
 
 
 

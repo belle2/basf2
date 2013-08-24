@@ -63,15 +63,15 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    virtual void SendOneBuffer(RawCOPPER* rawcpr);
-    virtual void SendOneByOne(RawCOPPER* rawcpr);
     virtual void SendByWriteV(RawCOPPER* rawcpr);
     //    virtual void Connect(const char* hostname, const int port);
     virtual void Accept();
 
-    virtual void VerifyCheckSum(int* buf);
     virtual void FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawCOPPER* rawcpr);
     // Data members
+
+    //! calculate checksum
+    unsigned int CalcXORChecksum(int* buf, int nwords);
 
   protected :
 

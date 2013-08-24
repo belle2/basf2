@@ -62,9 +62,8 @@ namespace Belle2 {
     virtual void event();
     virtual void endRun();
     virtual void terminate();
-
     virtual void VerifyCheckSum(int* buf);
-    virtual void FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawCOPPER* rawcpr);
+
     // Data members
 
   protected :

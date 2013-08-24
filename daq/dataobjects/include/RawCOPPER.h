@@ -30,10 +30,10 @@ namespace Belle2 {
     virtual ~RawCOPPER();
 
     //! copy rawdata into internal buffer
-    virtual void Copy(int* bufin, int nwords);
+    //    virtual void Copy(int* bufin, int nwords);
 
     //! allocate buffer
-    virtual int* AllocateBuffer(int nwords);
+
 
     //! get buffer
     virtual int* GetBuffer();
@@ -42,10 +42,10 @@ namespace Belle2 {
     virtual void SetBuffer(int* bufin, int nwords, int malloc_flag);
 
     //! get data length
-    virtual int GetBodyNwords();
+    virtual int Size();
 
     //! get data length
-    virtual int Size();
+    virtual int GetBodyNwords();
 
     /*     //! get data length */
     /*     virtual RawHeader* GetRawHeader(); */
@@ -60,10 +60,16 @@ namespace Belle2 {
     virtual int* GetRawTrlBufPtr();
 
     //! get COPPER node id from data
-    virtual int GetCopperNodeId();
+    virtual int GetCOPPERNodeId();
 
     //! get Event number from data
-    virtual unsigned int GetCoppereveNo();
+    virtual unsigned int GetCOPPEREveNo();
+
+    //! get Event number from data
+    virtual unsigned int GetB2LFEEHdr1();
+
+    //! get Event number from data
+    virtual unsigned int GetB2LFEEHdr2();
 
     //! get subsystem-ID from data
     virtual int GetSubsysId();
@@ -73,28 +79,28 @@ namespace Belle2 {
 
 
     //! get # of offset words for FEE slot A buffer position
-    int GetFEEDataOffsetA();
+    int GetOffset1stB2l();
 
     //! get # of offset words for FEE slot A buffer position
-    int GetFEEDataOffsetB();
+    int GetOffset2ndB2l();
 
     //! get # of offset words for FEE slot A buffer position
-    int GetFEEDataOffsetC();
+    int GetOffset3rdB2l();
 
     //! get # of offset words for FEE slot A buffer position
-    int GetFEEDataOffsetD();
+    int GetOffset4thB2l();
 
     //! get FEE buffer pointer for slot A
-    int* GetFEEBufferA();
+    int* Get1stFEEBuffer();
 
     //! get FEE buffer pointer for slot B
-    int* GetFEEBufferB();
+    int* Get2ndFEEBuffer();
 
     //! get FEE buffer pointer for slot C
-    int* GetFEEBufferC();
+    int* Get3rdFEEBuffer();
 
     //! get FEE buffer pointer for slot D
-    int* GetFEEBufferD();
+    int* Get4thFEEBuffer();
 
 
     /* Data Format : COPPER header*/

@@ -41,7 +41,7 @@ DeSerializerPCModule::DeSerializerPCModule() : DeSerializerModule()
   addParam("NumConn", m_num_connections, "Number of Connections", 0);
   addParam("HostNameFrom", m_hostname_from, "Hostnames of data sources");
   addParam("PortFrom", m_port_from, "port numbers of data sources");
-
+  max_nevt = 10000;
   //Parameter definition
   B2INFO("DeSerializerPC: Constructor done.");
 }
@@ -397,8 +397,8 @@ void DeSerializerPCModule::event()
     // Get a record from socket
     int total_buf_nwords = 0 ;
     int malloc_flag = 0;
-    //    int* temp_buf = RecvDatafromCOPPER(&malloc_flag, &total_buf_nwords, m_bufary[ j ]);
-    int* temp_buf = RecvDatafromEvb0(&malloc_flag, &total_buf_nwords, m_bufary[ j ]);
+    int* temp_buf = RecvDatafromCOPPER(&malloc_flag, &total_buf_nwords, m_bufary[ j ]);
+    //    int* temp_buf = RecvDatafromEvb0(&malloc_flag, &total_buf_nwords, m_bufary[ j ]);
     m_totbytes += total_buf_nwords * sizeof(int);
 
 #ifdef DEBUG
@@ -409,6 +409,20 @@ void DeSerializerPCModule::event()
     if (dump_fname.size() > 0) {
       DumpData((char*)temp_buf, total_buf_nwords * sizeof(int));
     }
+
+    printf("********* checksum 0x%.8x : %d\n" , CalcSimpleChecksum(temp_buf, total_buf_nwords - 2), total_buf_nwords);
+
+    printf("\n%.8d : ", 0);
+    for (int i = 0; i < total_buf_nwords; i++) {
+      printf("0x%.8x ", temp_buf[ i ]);
+      if ((i + 1) % 10 == 0) {
+        printf("\n%.8d : ", i + 1);
+      }
+    }
+    printf("\n");
+    printf("\n");
+
+
 
 #ifdef TIME_MONITOR
     RecordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP + j, time_array1);
@@ -442,9 +456,9 @@ void DeSerializerPCModule::event()
   m_eventMetaDataPtr->setExperiment(1);
   m_eventMetaDataPtr->setRun(1);
   m_eventMetaDataPtr->setEvent(n_basf2evt);
-  if (n_basf2evt == 100) {
-    m_eventMetaDataPtr->setEndOfData();
-  }
+//   if (n_basf2evt == 100) {
+//     m_eventMetaDataPtr->setEndOfData();
+//   }
   //
   // Printing Event rate
   //
@@ -462,6 +476,8 @@ void DeSerializerPCModule::event()
     m_prev_time = cur_time;
     m_prev_totbytes = m_totbytes;
     m_prev_nevt = n_basf2evt;
+
+
   }
 
 #ifdef TIME_MONITOR

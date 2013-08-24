@@ -16,9 +16,9 @@
 //#define MAXEVTSIZE 400000000
 //#define TIME_MONITOR
 
-#define CLONE_ARRAY  // w/o this, this program does not work.
 
-//#define DISCARD_DATA
+
+
 
 using namespace std;
 using namespace Belle2;
@@ -103,11 +103,9 @@ void DeSerializerCOPPERModule::initialize()
   m_eventMetaDataPtr.registerAsPersistent();
 
   // Initialize Array of RawCOPPER
-#ifdef CLONE_ARRAY
+
   rawcprarray.registerPersistent();
-#else
-  m_rawcopper.registerPersistent();
-#endif
+
 
   if (dump_fname.size() > 0) {
     OpenOutputFile();
@@ -128,198 +126,53 @@ void DeSerializerCOPPERModule::initialize()
 
 void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 {
-
-  RawHeader* raw_header;
-  if ((raw_header = raw_copper->GetRawHeader()) == NULL) {
-    perror("No RawHeaader is available. Exiting...");
-    exit(1);
-  }
-
-  RawTrailer* raw_trailer;
-  if ((raw_trailer = raw_copper->GetRawTrailer()) == NULL) {
-    perror("No RawTrailer is available. Exiting...");
-    exit(1);
-  }
+  RawHeader rawhdr;
+  rawhdr.SetBuffer(raw_copper->GetRawHdrBufPtr());
 
 
   //
-  // initialize header and trailer
+  // initialize header(header nwords, magic word) and trailer(magic word)
   //
-  raw_header->Initialize();
-  raw_trailer->Initialize();
+  rawhdr.Initialize(); // Fill 2nd( hdr size) and 20th header word( magic word )
 
-  //
-  // Add node-info
-  //
-  int eve_no = raw_copper->GetCoppereveNo() ; //tentative
-  raw_header->AddNodeInfo(raw_copper->GetCopperNodeId());
-
-  //
-  // Obtain info from Rawdata
-  //
-  raw_header->SetEveNo(raw_copper->GetCoppereveNo());
-  raw_header->SetSubsysId(raw_copper->GetSubsysId());
-  raw_header->SetNumB2lBlock(raw_copper->GetNumB2lBlock());
-  raw_header->SetOffset1stB2l(raw_copper->Offset1stB2lWoRawhdr() + raw_header->GetHdrNwords());
-  raw_header->SetOffset2ndB2l(raw_copper->Offset2ndB2lWoRawhdr() + raw_header->GetHdrNwords());
-  raw_header->SetOffset3rdB2l(raw_copper->Offset3rdB2lWoRawhdr() + raw_header->GetHdrNwords());
-  raw_header->SetOffset4thB2l(raw_copper->Offset4thB2lWoRawhdr() + raw_header->GetHdrNwords());
-
-  //
-  // Obtain info from SlowController
-  //
-  int dummy_exp_no = 0, dummy_run_no = 0;
-  raw_header->SetExpNo(dummy_exp_no);
-  raw_header->SetRunNo(dummy_run_no);
-
-  //
-  // Needs definition or not used
-  //
-  int dummy_data_type = 0;
-  raw_header->SetDataType(dummy_data_type);
-  //  raw_header->set_trunc_mask( int trunc_mask );
-
-
-  //
   // Set total words info
-  //
-  int nwords =
-    raw_header->GetHdrNwords()
-    + raw_trailer->GetTrlNwords()
-    + raw_copper->GetBodyNwords();
-  raw_header->SetNwords(nwords);
+  int nwords = raw_copper->Size();
+  rawhdr.SetNwords(nwords);
 
+  //
+  // Obtain info from SlowController via AddParam
+  //
+  rawhdr.SetExpNo(m_exp_no);   // Fill 3rd header word
+  rawhdr.SetRunNo(m_run_no);   // Fill 3rd header word
+
+  // Obtain eve.# from COPPER header
+  rawhdr.SetEveNo(raw_copper->GetCOPPEREveNo());   // Fill 4th header word
+  rawhdr.SetB2LFEEHdrPart(raw_copper->GetB2LFEEHdr1(), raw_copper->GetB2LFEEHdr2());   // Fill 5th and 6th words
+
+  // Obtain info from SlowController via AddParam or COPPER data
+  rawhdr.SetSubsysId(m_nodeid);   // Fill 7th header word
+  rawhdr.SetDataType(m_data_type);   // Fill 8th header word
+  rawhdr.SetTruncMask(m_trunc_mask);   // Fill 8th header word
+
+  // Offset
+  rawhdr.SetOffset1stB2l(raw_copper->GetOffset1stB2l());    // Fill 9th header word
+  rawhdr.SetOffset2ndB2l(raw_copper->GetOffset2ndB2l());   // Fill 10th header word
+  rawhdr.SetOffset3rdB2l(raw_copper->GetOffset3rdB2l());   // Fill 11th header word
+  rawhdr.SetOffset4thB2l(raw_copper->GetOffset4thB2l());   // Fill 12th header word
+
+  // Add node-info
+  rawhdr.AddNodeInfo(m_nodeid);   // Fill 13th header word
+
+  //
+  // Fill info in Trailer
+  //
+  RawTrailer rawtrl;
+  rawtrl.SetBuffer(raw_copper->GetRawTrlBufPtr());
+  rawtrl.Initialize(); // Fill 2nd word : magic word
+  rawtrl.SetChksum(CalcSimpleChecksum(raw_copper->GetBuffer(),
+                                      raw_copper->Size() - rawtrl.GetTrlNwords()));
 
   // Check magic words are set at proper positions
-
-
-
-}
-
-
-void DeSerializerCOPPERModule::event()
-{
-
-#ifdef TIME_MONITOR
-  RecordTime(n_basf2evt, time_array0);
-#endif
-
-  if (n_basf2evt < 0) {
-    OpenCOPPER();
-    m_start_time = GetTimeSec();
-    n_basf2evt = 0;
-  }
-
-#ifdef CLONE_ARRAY
-  rawcprarray.create();
-#else
-  m_rawcopper.create();
-#endif
-
-
-#ifdef TIME_MONITOR
-  RecordTime(n_basf2evt, time_array1);
-#endif
-
-
-  RawCOPPER* temp_rawcopper;
-  for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
-    int m_size_word = 0;
-    int malloc_flag = 0;
-
-#ifdef CLONE_ARRAY
-
-    int* temp_buf = ReadCOPPERFIFO(j, &malloc_flag, &m_size_word);
-#endif
-
-
-    //
-    // Fill RawCOPPER
-    //
-#ifndef DISCARD_DATA
-
-#ifdef CLONE_ARRAY
-    temp_rawcopper =  rawcprarray.appendNew();
-    // Store data buffer
-    temp_rawcopper->SetBuffer(temp_buf, m_size_word, malloc_flag);
-    // Fill header and trailer
-    FillNewRawCOPPERHeader(temp_rawcopper);
-#else
-    m_rawcopper->SetBuffer(temp_buf, m_size_word, malloc_flag);
-    //FillNewRawCOPPERHeader( m_rawcopper );
-#endif
-
-    if (dump_fname.size() > 0) {
-      DumpData((char*)temp_buf, m_size_word * sizeof(int));
-    }
-
-
-#endif // DISCARD_DATA
-
-#ifdef TIME_MONITOR
-    RecordTime(n_basf2evt, time_array2);
-#endif
-    m_totbytes += m_size_word * sizeof(int);
-  }
-
-
-  //
-  // Update EventMetaData
-  //
-  m_eventMetaDataPtr.create();
-  m_eventMetaDataPtr->setExperiment(1234);
-  m_eventMetaDataPtr->setRun(105);
-  m_eventMetaDataPtr->setEvent(n_basf2evt);
-
-
-#ifdef TIME_MONITOR
-  RecordTime(n_basf2evt, time_array3);
-
-  if (n_basf2evt == 51000) {
-    double diff0 = 0., diff1 = 0., diff2 = 0., diff3 = 0., diff4 = 0., diff5 = 0.;
-    for (int i = 0; i < 500; i++) {
-      printf("Read %d %lf %lf %lf %lf %lf\n", i + 50000, time_array0[ i ], time_array1[ i ], time_array2[ i ], time_array3[ i ],     time_array3[i] - time_array2[i]);
-      if (i > 1) {
-        diff0 += time_array0[ i ] - time_array4[ i - 1 ];
-      }
-      if (i > 0) {
-        diff1 += time_array1[ i ] - time_array0[ i ];
-        diff2 += time_array2[ i ] - time_array1[ i ];
-        diff3 += time_array3[ i ] - time_array2[ i ];
-        diff4 += time_array4[ i ] - time_array3[ i ];
-        diff5 += time_array5[ i ] - time_array4[ i ];
-      }
-    }
-    printf("DeSerializerCOPPER : %.2e %.2e %.2e %.2e %.2e %.2e\n",
-           diff0 / 498., diff1 / 499., diff2 / 499., diff3 / 499., diff4 / 499., diff5 / 499.);
-  }
-#endif
-
-
-  //
-  // Print current status
-  //
-
-  if (n_basf2evt % (CHECKEVT / NUM_EVT_PER_BASF2LOOP) == 0) {
-    double cur_time = GetTimeSec();
-    double total_time = cur_time - m_start_time;
-    double interval = cur_time - m_prev_time;
-
-    time_t timer;
-    struct tm* t_st;
-    time(&timer);
-    t_st = localtime(&timer);
-
-    printf("Event %d TotRecvd %.1lf [MB] ElapsedTime %.2lf [s] EvtRate %.4lf [kHz] RcvdRate %.4lf [MB/s] %s",
-           n_basf2evt, m_totbytes / 1.e6, total_time, (n_basf2evt - m_prev_nevt) / interval / 1.e3 * NUM_EVT_PER_BASF2LOOP, (m_totbytes - m_prev_totbytes) / interval / 1.e6, asctime(t_st));
-    fflush(stdout);
-    m_prev_time = cur_time;
-    m_prev_totbytes = m_totbytes;
-    m_prev_nevt = n_basf2evt;
-  }
-
-  n_basf2evt++;
-  return;
 }
 
 
@@ -452,4 +305,82 @@ int DeSerializerCOPPERModule::Read(int fd, char* buf, int data_size_byte)
 
 }
 
+
+
+void DeSerializerCOPPERModule::event()
+{
+
+  if (n_basf2evt < 0) {
+    OpenCOPPER();
+    m_start_time = GetTimeSec();
+    n_basf2evt = 0;
+  }
+
+
+  rawcprarray.create();
+  RawCOPPER* temp_rawcopper;
+  for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
+    int m_size_word = 0;
+    int malloc_flag = 0;
+    int* temp_buf = ReadCOPPERFIFO(j, &malloc_flag, &m_size_word);
+
+
+
+    //
+    // Fill RawCOPPER
+    //
+
+    temp_rawcopper =  rawcprarray.appendNew();
+    // Store data buffer
+    temp_rawcopper->SetBuffer(temp_buf, m_size_word, malloc_flag);
+    // Fill header and trailer
+    FillNewRawCOPPERHeader(temp_rawcopper);
+//     printf("\n%.8d : ", 0);
+//     for( int i = 0; i < m_size_word; i++){
+//       printf("0x%.8x ", temp_buf[ i ]);
+//       if( ( i + 1 ) % 10 == 0 ){
+//  printf("\n%.8d : ", i + 1 );
+//       }
+//     }
+//     printf("\n");
+//     printf("\n");
+    if (dump_fname.size() > 0) {
+      DumpData((char*)temp_buf, m_size_word * sizeof(int));
+    }
+    m_totbytes += m_size_word * sizeof(int);
+  }
+
+
+  //
+  // Update EventMetaData
+  //
+  m_eventMetaDataPtr.create();
+  m_eventMetaDataPtr->setExperiment(1234);
+  m_eventMetaDataPtr->setRun(105);
+  m_eventMetaDataPtr->setEvent(n_basf2evt);
+
+
+  //
+  // Print current status
+  //
+  if (n_basf2evt % (CHECKEVT / NUM_EVT_PER_BASF2LOOP) == 0) {
+    double cur_time = GetTimeSec();
+    double total_time = cur_time - m_start_time;
+    double interval = cur_time - m_prev_time;
+
+    time_t timer;
+    struct tm* t_st;
+    time(&timer);
+    t_st = localtime(&timer);
+    printf("Event %d TotRecvd %.1lf [MB] ElapsedTime %.2lf [s] EvtRate %.4lf [kHz] RcvdRate %.4lf [MB/s] %s",
+           n_basf2evt, m_totbytes / 1.e6, total_time, (n_basf2evt - m_prev_nevt) / interval / 1.e3 * NUM_EVT_PER_BASF2LOOP, (m_totbytes - m_prev_totbytes) / interval / 1.e6, asctime(t_st));
+    fflush(stdout);
+    m_prev_time = cur_time;
+    m_prev_totbytes = m_totbytes;
+    m_prev_nevt = n_basf2evt;
+  }
+
+  n_basf2evt++;
+  return;
+}
 

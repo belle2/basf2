@@ -36,6 +36,11 @@ DeSerializerModule::DeSerializerModule() : Module()
   m_totbytes = 0;
   m_compressionLevel = 0;
 
+  m_nodeid = 0; // will obtain info from parameter
+  m_exp_no = 0; // will obtain info from parameter
+  m_run_no = 0; // will obtain info from parameter
+  m_data_type = 0; // will obtain info from parameter
+  m_trunc_mask = 0; // will obtain info from parameter
 
   prev_event = -1;
 
@@ -130,13 +135,30 @@ int DeSerializerModule::check_data(char* buf, int prev_eve, int* cur_eve)
     printf("invalid footer magic word : %d 0x%x\n", word_num - pos_footer_magic, m_buf[ word_num - pos_footer_magic ]);
     exit(1);
   }
-
   return 0;
-
-
 }
 
 
+unsigned int  DeSerializerModule::CalcXORChecksum(int* buf, int nwords)
+{
+  unsigned int checksum = 0;
+  for (int i = 0; i < nwords; i++) {
+
+    checksum = checksum ^ buf[ i ];
+  }
+  return checksum;
+}
+
+
+unsigned int  DeSerializerModule::CalcSimpleChecksum(int* buf, int nwords)
+{
+  unsigned int checksum = 0;
+  for (int i = 0; i < nwords; i++) {
+    checksum = checksum + (unsigned int)buf[ i ];
+    //    printf("i %.4d 0x%.8x 0x%.8x\n", i, checksum, buf[i]);
+  }
+  return checksum;
+}
 
 
 void DeSerializerModule::endRun()

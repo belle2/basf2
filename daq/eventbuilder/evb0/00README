@@ -22,13 +22,25 @@ Prepare 3 terminals.
 ./random_event_generator -S 1280 -n 10000000 | nc 127.0.0.1 32000 &
 ./random_event_generator -S 6400 -n 10000000 | nc 127.0.0.1 32001 &
 =========================================================
-After changing a client-server role. Aug.16, 2013 
+After changing a client-server role. Aug.16, 2013 (rev.6374)
 
 Usage : 
 Prepare 3 terminals.
 1st: ./eb0 -n 2
-2nd: nc -l 65000 | ./fetch_event
+2nd: nc 127.0.0.1 65000 | ./fetch_event
 3rd: 
-./random_event_generator -S 1280 -n 10000000 | nc 127.0.0.1 32000 &
-./random_event_generator -S 6400 -n 10000000 | nc 127.0.0.1 32001 &
+./random_event_generator -S 1280 -n 10000000 | nc -l 32000  &
+./random_event_generator -S 6400 -n 10000000 | nc -l 32001 &
+
+
+=========================================================
+Connect basf2 program on COPPER
+Usage : 
+Prepare 4 terminals.
+1st: ropc01% ./eb0 -n 1 -b
+2nd: ropc01% ./RecvSendatROPC.sh
+3rd: ropc01% nc 127.0.0.1 65000 > /dev/null
+
+4th: cpr006% ./RecvSendCOPPER.sh
+
 

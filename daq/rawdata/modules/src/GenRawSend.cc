@@ -100,23 +100,23 @@ void GenRawSendModule::event()
   */
 
   // Create RawCOPPER and fill buffer
-  m_rawcopper.create();
-  int* buf = m_rawcopper->AllocateBuffer(m_size + HEADER_SIZE);
-  buf[0] = m_size + HEADER_SIZE;
-  buf[1] = HEADER_SIZE;
-  buf[2] = m_size;
-  //  memset ( (char*)&buf[HEADER_SIZE+1], 0, (m_size-1)*4 );
-  memcpy((char*)&buf[HEADER_SIZE + 1], m_buffer, (m_size - 1) * 4);
+//   m_rawcopper.create();
+//   int* buf = m_rawcopper->AllocateBuffer(m_size + HEADER_SIZE);
+//   buf[0] = m_size + HEADER_SIZE;
+//   buf[1] = HEADER_SIZE;
+//   buf[2] = m_size;
+//   //  memset ( (char*)&buf[HEADER_SIZE+1], 0, (m_size-1)*4 );
+//   memcpy((char*)&buf[HEADER_SIZE + 1], m_buffer, (m_size - 1) * 4);
 
-  /* Dummy Data
-  int* buf = (int*)m_buffer;
-  buf[0] = m_size+HEADER_SIZE;
-  */
+//   /* Dummy Data
+//   int* buf = (int*)m_buffer;
+//   buf[0] = m_size+HEADER_SIZE;
+//   */
 
-  // Send Buffer
-  int nbytes = buf[0] * 4;
-  int stat = m_sock->send_buffer(nbytes, (char*)buf);
-  //  printf ( "nbytes = %d, stat = %d\n", nbytes, stat );
+//   // Send Buffer
+//   int nbytes = buf[0] * 4;
+//   int stat = m_sock->send_buffer(nbytes, (char*)buf);
+//   //  printf ( "nbytes = %d, stat = %d\n", nbytes, stat );
 
   m_nevt++;
 }

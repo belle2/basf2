@@ -273,6 +273,14 @@ namespace Belle2 {
     EXPECT_TRUE(toRels.object(1) == (profileData)[1]);
     EXPECT_TRUE(toRels.object(2) == (profileData)[2]);
 
+    //test range-based for over RelationVector
+    int i = 0;
+    for (const ProfileInfo & prof : toRels) {
+      (void)prof; //variable unused
+      i++;
+    }
+    EXPECT_EQ(i, 3);
+
     const ProfileInfo* toObj = (profileData)[2];
     RelationVector<EventMetaData> fromRels = DataStore::getRelationsToObj<EventMetaData>(toObj);
     EXPECT_EQ(fromRels.size(), 1u);

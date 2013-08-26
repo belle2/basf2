@@ -293,15 +293,21 @@ namespace Belle2 {
     }
     EXPECT_EQ(i, evtData.getEntries());
 
-    /*
-        //range-based for
-        i = 0;
-        for (EventMetaData& emd : evtDataNonConst) {
-          EXPECT_TRUE(&emd == evtData[i]);
-          i++;
-        }
-        EXPECT_EQ(i, evtData.getEntries());
-        */
+    //range-based for
+    i = 0;
+    for (EventMetaData & emd : evtDataNonConst) {
+      EXPECT_TRUE(&emd == evtData[i]);
+      i++;
+    }
+    EXPECT_EQ(i, evtData.getEntries());
+
+    //range-based for (const)
+    i = 0;
+    for (const EventMetaData & emd : evtData) {
+      EXPECT_TRUE(&emd == evtData[i]);
+      i++;
+    }
+    EXPECT_EQ(i, evtData.getEntries());
   }
 
   /** test registerPersistent(), optional() */

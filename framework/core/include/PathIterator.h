@@ -22,7 +22,6 @@ namespace Belle2 {
 
   /** Iterator over a Path (returning Module pointers).
    *
-   *
    */
   class PathIterator {
   public:
@@ -32,35 +31,33 @@ namespace Belle2 {
       m_iter(path->m_elements.begin()),
       m_end(path->m_elements.end()),
       m_parentIterator() {
-      //B2WARNING("going to path " << (void*)path.get());
       descendIfNecessary();
     }
 
+    /** Constructor with back-reference to an iterator over the parent path. */
     explicit PathIterator(const PathPtr& path, const PathIterator& parentIterator) :
       m_path(path),
       m_iter(path->m_elements.begin()),
       m_end(path->m_elements.end()),
       m_parentIterator(new PathIterator(parentIterator)) {
-      //B2WARNING("going to path (with parent) " << (void*)path.get());
       descendIfNecessary();
     }
 
     /** increment. */
     void next() {
-      //B2WARNING("next()");
       if (!isDone())
         ++m_iter;
       descendIfNecessary();
     }
+
+    /** Check if we're pointing to another path and descend if that is the case. */
     void descendIfNecessary() {
       if (!isDone() and dynamic_cast<Path*>(m_iter->get())) {
-        //B2WARNING("decending into path" << (void*)m_iter->get());
         //we're pointing to another Path
         *this = PathIterator(boost::static_pointer_cast<Path>(*m_iter), *this);
       }
       //check _afterwards_ if we need to jump back up
       if (isDone() and m_parentIterator) {
-        //B2WARNING("climbing into parent path");
         //jump back to parent iterator
         *this = *(m_parentIterator.get());
         next(); //go to next module

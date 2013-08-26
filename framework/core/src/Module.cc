@@ -237,8 +237,6 @@ void Module::exposePythonAPI()
   .def("description", &Module::getDescription, return_value_policy<copy_const_reference>())
   .def("if_value", &Module::if_value, if_value_overloads())
   .def("if_false", &Module::if_false, if_false_overloads())
-  .def("condition", &Module::if_value, if_value_overloads()) //TODO: legacy, remove at some point
-  .def("condition", &Module::if_false, if_false_overloads()) //TODO: legacy, remove at some point
   .def("param", &Module::setParamObject)
   .def("param", &Module::setParamListPython)
   .def("param", &Module::setParamDict)

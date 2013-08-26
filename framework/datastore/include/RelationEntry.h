@@ -11,8 +11,9 @@
 #ifndef RELATIONENTRY_H
 #define RELATIONENTRY_H
 
+#include <framework/utilities/ArrayIterator.h>
+
 #include <vector>
-#include <string>
 
 class TObject;
 
@@ -49,6 +50,11 @@ namespace Belle2 {
    */
   template <class T> class RelationVector {
   public:
+    /** STL-like iterator over the T objects (not T* ). */
+    typedef ArrayIterator<RelationVector<T>, T> iterator;
+    /** STL-like const_iterator over the T objects (not T* ). */
+    typedef ArrayIterator<RelationVector<T>, const T> const_iterator;
+
 
     /** Constructor.
      *
@@ -74,14 +80,14 @@ namespace Belle2 {
      *  @param index      Index of relation.
      *  @return           Object that the relation points to.
      */
-    T*     object(int index) {return static_cast<T*>(m_relations[index].object);}
+    T*     object(int index) const {return static_cast<T*>(m_relations[index].object);}
 
     /** Get object with index.
      *
      *  @param index      Index of relation.
      *  @return           Object that the relation points to.
      */
-    T*     operator[](int index) {return object(index);}
+    T*     operator[](int index) const {return object(index);}
 
     /** Get weight with index.
      *
@@ -91,15 +97,15 @@ namespace Belle2 {
     double weight(int index) const {return m_relations[index].weight;}
 
 
-#if defined(__CINT__) || defined(R__DICTIONARY_FILENAME)
-    /**
-     * @{
-     * dummy functions to get ROOT to generate a checked __getitem__() that handles out-of-range errors (needed for PyROOT).
-     */
-    static void begin() { }
-    static void end() { }
-    /** @} */
-#endif
+    /** Return iterator to first entry. */
+    iterator begin() { return iterator(this, 0); }
+    /** Return iterator to last entry +1. */
+    iterator end() { return iterator(this, size()); }
+
+    /** Return const_iterator to first entry. */
+    const_iterator begin() const { return const_iterator(this, 0); }
+    /** Return const_iterator to last entry +1. */
+    const_iterator end() const { return const_iterator(this, size()); }
 
   private:
     std::vector<Belle2::RelationEntry> m_relations;  /**< The vector of relation entries */

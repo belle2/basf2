@@ -72,6 +72,8 @@ namespace Belle2 {
    */
   class RelationArray: public StoreAccessorBase {
   public:
+    /** STL-like const_iterator over the T objects (not T* ). */
+    typedef ArrayIterator<RelationArray, const RelationElement> const_iterator;
 
     /** Typedef to simplify use of correct index_type */
     typedef RelationElement::index_type index_type;
@@ -458,6 +460,11 @@ namespace Belle2 {
         FunctionFrom& replaceFrom = FunctionFrom(), const FunctionTo&
         replaceTo = FunctionTo(), EConsolidationAction action =
           c_doNothing);
+
+    /** Return const_iterator to first entry. */
+    const_iterator begin() const { assertValid(); return const_iterator(this, 0); }
+    /** Return const_iterator to last entry +1. */
+    const_iterator end() const { assertValid(); return const_iterator(this, getEntries()); }
 
   private:
 

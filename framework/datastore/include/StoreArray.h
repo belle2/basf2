@@ -14,51 +14,11 @@
 #include <framework/datastore/StoreAccessorBase.h>
 #include <framework/datastore/DataStore.h>
 
+#include <framework/utilities/ArrayIterator.h>
+
 #include <TClonesArray.h>
 
-#include <iterator>
-
 namespace Belle2 {
-  template <class T> class StoreArray;
-
-  /** Iterator class for StoreArray, allowing use of stl algorithms, range-based for etc.
-   *
-   * Note that dereferencing an iterator returns a reference to the object pointed to instead of a pointer.
-   */
-  template <class ArrayType, class ValueType>
-  class StoreArrayIterator : public std::iterator<std::input_iterator_tag, ValueType> {
-  public:
-    /** Constructor. */
-    explicit StoreArrayIterator(const StoreArray<ArrayType>* array, int index):
-      m_array(array),
-      m_index(index)
-    {}
-
-    /** prefix increment. */
-    StoreArrayIterator<ArrayType, ValueType>& operator++() { ++m_index; return *this; }
-
-    /** postfix increment. */
-    StoreArrayIterator<ArrayType, ValueType> operator++(int) {
-      StoreArrayIterator<ArrayType, ValueType> old = *this;
-      ++(*this);
-      return old;
-    }
-
-    /** check equality. */
-    bool operator==(const StoreArrayIterator<ArrayType, ValueType>& rhs) const { return m_index == rhs.m_index && m_array == rhs.m_array; }
-    /** check inequality. */
-    bool operator!=(const StoreArrayIterator<ArrayType, ValueType>& rhs) const { return !(*this == rhs); }
-
-    /** dereference. */
-    ValueType& operator*() const { return *((*m_array)[m_index]); }
-    /** dereference. */
-    ValueType* operator->() const { return (*m_array)[m_index]; }
-
-  private:
-    const StoreArray<ArrayType>* m_array; /**< Array to iterate over. */
-    int m_index; /**< Current index. */
-  };
-
   /** Accessor to arrays stored in the data store.
    *
    *  StoreArrays (like StoreObjPtrs) are uniquely identified by their name
@@ -132,9 +92,9 @@ namespace Belle2 {
   class StoreArray : public StoreAccessorBase {
   public:
     /** STL-like iterator over the T objects (not T* ). */
-    typedef StoreArrayIterator<T, T> iterator;
+    typedef ArrayIterator<StoreArray<T>, T> iterator;
     /** STL-like const_iterator over the T objects (not T* ). */
-    typedef StoreArrayIterator<T, const T> const_iterator;
+    typedef ArrayIterator<StoreArray<T>, const T> const_iterator;
 
     /** Register an array, that should be written to the output by default, in the data store.
      *  This must be called in the initialization phase.
@@ -288,14 +248,14 @@ namespace Belle2 {
     TClonesArray* getPtr() const { ensureCreated(); return *m_storeArray;}
 
     /** Return iterator to first entry. */
-    iterator begin() { return iterator(this, 0); }
+    iterator begin() { ensureAttached(); return iterator(this, 0); }
     /** Return iterator to last entry +1. */
-    iterator end() { return iterator(this, getEntries()); }
+    iterator end() { ensureAttached(); return iterator(this, getEntries()); }
 
     /** Return const_iterator to first entry. */
-    const_iterator begin() const { return const_iterator(this, 0); }
+    const_iterator begin() const { ensureAttached(); return const_iterator(this, 0); }
     /** Return const_iterator to last entry +1. */
-    const_iterator end() const { return const_iterator(this, getEntries()); }
+    const_iterator end() const { ensureAttached(); return const_iterator(this, getEntries()); }
 
   private:
     /** Ensure that this object is attached. */

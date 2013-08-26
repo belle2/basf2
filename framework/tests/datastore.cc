@@ -38,12 +38,19 @@ namespace Belle2 {
 
       ProfileInfo profileInfoObject(128, 60.0);
       for (int i = 0; i < 10; ++i) {
-        EventMetaData* newobj;
-        newobj = evtData.appendNew();
+        //direct construction
+        EventMetaData* newobj = evtData.appendNew();
         newobj->setEvent(10 + i);
-        newobj = evtDataDifferentName.appendNew();
-        newobj->setEvent(20 + i);
-        newobj = new(evtDataDifferentDurability.nextFreeAddress()) EventMetaData(30 + i);
+
+        //copy-construction
+        EventMetaData newObj2;
+        newObj2.setEvent(20 + i);
+        evtDataDifferentName.appendNew(newObj2);
+
+        //fancy constructors
+        newobj = evtDataDifferentDurability.appendNew(30 + i);
+        //equivalent to:
+        //newobj = new(evtDataDifferentDurability.nextFreeAddress()) EventMetaData(30 + i);
 
         //copy-construct ProfileInfo objects
         new(profileInfo.nextFreeAddress()) ProfileInfo(profileInfoObject);

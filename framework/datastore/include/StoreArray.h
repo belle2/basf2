@@ -59,16 +59,8 @@ namespace Belle2 {
       //fill newhit with data here...
       \endcode
    *
-   *  alternatively, you can copy an existing object into the array using
-   *  appendNew(const T& obj) instead.
-   *  If performance is especially important, you can also create a new object
-   *  using 'placement-new':
-   *  \code
-      new (cdcsimhits.nextFreeAddress()) CDCSimHit(some ctor arguments);
-      \endcode
-
-   *  This creates a new CDCSimHit at the end of the array and allows
-   *  you to fill its data members using a custom constructor.
+   *  appendNew() can also use non-default constructors, e.g. if there is a constructor
+   *  that takes the arguments (int, float), you can use appendNew(int, float) instead.
    *
    *
    *  <h1>Registration of arrays</h1>
@@ -203,8 +195,8 @@ namespace Belle2 {
         \endcode
      *  which constructs a new T object at the end of myStoreArray.
      *
-     *  If you only want to use T's default or copy constructor, use the safer
-     *  appendNew() instead.
+     *  \warning Legacy function, use the much safer
+     *           appendNew(some ctor arguments) instead.
      *
      *  \return pointer to address just past the last array element
      */
@@ -223,21 +215,27 @@ namespace Belle2 {
      */
     inline T* appendNew() { return new(nextFreeAddress()) T(); }
 
-    /** Copy-construct a new T object at the end of the array.
+    /** Construct a new T object directly at the end of the array.
      *
-     *  Appends a new object to the array, and returns a pointer so
-     *  it can be filled with data. The copy-constructor of T is
-     *  used to create the object.
+     * This is done by forwarding all arguments to the constructor of the type T.
+     * If there is a constructor which takes the given combination of arguments
+     * then this call will succeed, otherwise it fails on compilation.
      *
-     *  \note For code that needs to store large numbers of objects in an
-     *        array, you may want to avoid creating a temporary object for
-     *        each of them. In this case, the default-constructing variant
-     *        of appendNew() or placement-new with a custom constructor (see
-     *        documentation of nextFreeAddress() ) may be better.
+     * This method imposes no overhead as no temporary has to be constructed
+     * and should be the preferred solution for creating new objects. It is equivalent to
+     * \code
+       new (myStoreArray.nextFreeAddress()) T(some ctor arguments);
+       \endcode
+     * but would be written just as
+     * \code
+       myStoreArray.appendNew(some ctor arguments);
+       \endcode
      *
      *  \return pointer to the created object
      */
-    inline T* appendNew(const T& obj) { return new(nextFreeAddress()) T(obj); }
+    template<class ...Args> T* appendNew(Args&& ... params) {
+      return new(nextFreeAddress()) T(std::forward<Args>(params)...);
+    }
 
     /** Raw access to the underlying TClonesArray.
      *

@@ -8,10 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+//first because of python include
+#include <framework/core/ModuleStatistics.h>
+
 #include <framework/core/EventProcessor.h>
 
 #include <framework/core/ModuleManager.h>
-#include <framework/core/ModuleStatistics.h>
 #include <framework/core/PathManager.h>
 #include <framework/core/PathIterator.h>
 #include <framework/datastore/DataStore.h>

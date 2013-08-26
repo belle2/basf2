@@ -81,7 +81,7 @@ namespace Belle2 {
      *  @return dDdt.
      *
      */
-    float getdDdt(const float driftLength);
+    float getdDdt(float driftLength);
 
 
     /** The method to get drift time based on drift length
@@ -95,11 +95,11 @@ namespace Belle2 {
      *  @return Drift time.
      *
      */
-    float getDriftTime(const float driftLength, const bool addTof, const bool addDelay);
+    float getDriftTime(float driftLength, bool addTof, bool addDelay);
 
 
     /** Charge to ADC Count converter. */
-    unsigned short getADCCount(const float charge);
+    unsigned short getADCCount(float charge);
 
     std::string m_inputCDCSimHitsName;       /**< Input array name.  */
     std::string m_outputCDCHitsName;         /**< Output array name. */
@@ -120,15 +120,17 @@ namespace Belle2 {
     double m_tMaxInner;         /**< Upper edge of time window in ns for the inner layers */
     unsigned short m_tdcOffset; /**< Offset of TDC count (in ns)*/
 
-    Belle2::CDC::CDCGeometryPar* m_cdcp;  /**< Pointer to CDCGeometryPar */
+    CDC::CDCGeometryPar* m_cdcp;  /**< Pointer to CDCGeometryPar */
     CDCSimHit* m_aCDCSimHit;    /**< Pointer to CDCSimHit */
     WireID m_wireID;            /**< WireID corresp. to this hit */
     double m_tdcBinWidth;       /**< Width of a TDC bin (in ns)*/
+    double m_tdcBinWidthInv;    /**< m_tdcBinWidth^-1 (in ns^-1)*/
     double m_tdcBinHwidth;      /**< Half width of a TDC bin (in ns)*/
     double m_tdcResol;          /**< TDC resolution (in ns)*/
     double m_driftV;            /**< Nominal drift velocity (in cm/ns)*/
     double m_driftVInv;         /**< m_driftV^-1 (in ns/cm)*/
     double m_propSpeedInv;      /**< Inv. of nominal signal propagation speed in a wire (in ns/cm)*/
+    unsigned short m_noOfSmallCellLayers; /**< No. of layers consisting of small cells */
 
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */

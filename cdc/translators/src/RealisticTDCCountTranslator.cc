@@ -9,9 +9,6 @@
  **************************************************************************/
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
-#if defined(CDC_DEBUG)
-#include <iostream>
-#endif
 
 using namespace std;
 using namespace Belle2;
@@ -24,7 +21,7 @@ RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagati
   m_tdcBinWidth = m_cdcp.getTdcBinWidth();
 
 #if defined(CDC_DEBUG)
-  cout << " " << std::endl;
+  cout << " " << endl;
   cout << "RealisticTDCCountTranslator constructor" << endl;
   cout << "m_cdcp=" << &m_cdcp << endl;
   cout << "m_tdcBinWidth=" << m_tdcBinWidth << endl;

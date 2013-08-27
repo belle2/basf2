@@ -289,9 +289,10 @@ FILE* fp_connect(const char* hostname, unsigned short port, const char* opt /* f
 
   ret  = -1;
   printf("connecting to %s (%d) socket %d\n", hostname, port, fd);
-  while (ret != 0) {
-    sleep(1);
+  while (true) {
     ret = connect(fd, res->ai_addr, res->ai_addrlen);
+    if (ret == 0) break;
+    sleep(1);
   }
   assert(ret == 0);
   printf("Done\n");
@@ -537,10 +538,12 @@ main(int argc, char** argv)
         gettimeofday(&tv1, 0);
         double tdiff = (double)(tv1.tv_sec - tv0.tv_sec);
         tdiff += (double)(tv1.tv_usec - tv0.tv_usec) / 1000000.0;
-        printf("%d event %.2f sec %.2f MB/s %.2lf kHz %d %d %lf %lf\n",
-               nevent * NUM_ENTRY, tdiff, total_size / 1000000.0 / tdiff,
-               (nevent - prev_nevent)*NUM_ENTRY / tdiff / 1000.
-              );
+
+        printf("event %d\n", nevent * NUM_ENTRY);
+//         printf("%d event %.2f sec %.2f MB/s %.2lf kHz %d %d %lf %lf\n",
+//                nevent * NUM_ENTRY, tdiff, total_size / 1000000.0 / tdiff,
+//                (nevent - prev_nevent)*NUM_ENTRY / tdiff / 1000.
+//               );
         total_size = 0;
         prev_nevent = nevent;
         tv0 = tv1;

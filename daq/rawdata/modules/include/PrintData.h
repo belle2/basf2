@@ -89,35 +89,6 @@ namespace Belle2 {
 
     int* m_buffer;
 
-    // Parameters for EvtSocket
-
-    //! Destination Host
-    std::string m_hostname_local;
-
-    //! Destination port
-    int m_port_to;
-
-    //! Socket ID
-    int m_socket;
-
-    //! EvtSocket
-    EvtSocketSend* m_sock;
-    double m_start_time;
-
-    double time_array0[1000];
-    double time_array1[1000];
-    double time_array2[1000];
-
-    //! How to handle data
-    std::string p_method;
-    int p_method_val;
-
-    //! store time info.
-    double GetTimeSec();
-
-    //! store time info.
-    void RecordTime(int event, double* array);
-
 
   };
 

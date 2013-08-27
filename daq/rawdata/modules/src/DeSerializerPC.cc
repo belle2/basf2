@@ -18,7 +18,7 @@
 //#define DISCARD_DATA
 //#define CHECK_SUM
 
-#define TIME_MONITOR
+//#define TIME_MONITOR
 //#define DEBUG
 
 using namespace std;
@@ -41,8 +41,7 @@ DeSerializerPCModule::DeSerializerPCModule() : DeSerializerModule()
   addParam("NumConn", m_num_connections, "Number of Connections", 0);
   addParam("HostNameFrom", m_hostname_from, "Hostnames of data sources");
   addParam("PortFrom", m_port_from, "port numbers of data sources");
-  max_nevt = 10000;
-  //Parameter definition
+
   B2INFO("DeSerializerPC: Constructor done.");
 }
 
@@ -382,6 +381,8 @@ void DeSerializerPCModule::event()
 #endif
 
 
+
+
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
 
 #ifdef TIME_MONITOR
@@ -410,8 +411,8 @@ void DeSerializerPCModule::event()
       DumpData((char*)temp_buf, total_buf_nwords * sizeof(int));
     }
 
+#ifdef DEBUG
     printf("********* checksum 0x%.8x : %d\n" , CalcSimpleChecksum(temp_buf, total_buf_nwords - 2), total_buf_nwords);
-
     printf("\n%.8d : ", 0);
     for (int i = 0; i < total_buf_nwords; i++) {
       printf("0x%.8x ", temp_buf[ i ]);
@@ -421,7 +422,7 @@ void DeSerializerPCModule::event()
     }
     printf("\n");
     printf("\n");
-
+#endif
 
 
 #ifdef TIME_MONITOR
@@ -456,47 +457,15 @@ void DeSerializerPCModule::event()
   m_eventMetaDataPtr->setExperiment(1);
   m_eventMetaDataPtr->setRun(1);
   m_eventMetaDataPtr->setEvent(n_basf2evt);
-//   if (n_basf2evt == 100) {
-//     m_eventMetaDataPtr->setEndOfData();
-//   }
-  //
-  // Printing Event rate
-  //
-  if (n_basf2evt  % (CHECKEVT / NUM_EVT_PER_BASF2LOOP) == 0) {
-    double cur_time = GetTimeSec();
-    double total_time = cur_time - m_start_time;
-    double interval = cur_time - m_prev_time;
-
-    printf("Event %d EvtRate %.4lf [kHz] RcvdRate %.4lf [MB/s] TotalRecvd %.1lf [MB] ElapsedTime %.2lf [s] \n",
-           n_basf2evt * NUM_EVT_PER_BASF2LOOP,
-           (n_basf2evt - m_prev_nevt) / interval / 1.e3 * NUM_EVT_PER_BASF2LOOP, (m_totbytes - m_prev_totbytes) / interval / 1.e6,
-           m_totbytes / 1.e6,
-           total_time);
-    fflush(stdout);
-    m_prev_time = cur_time;
-    m_prev_totbytes = m_totbytes;
-    m_prev_nevt = n_basf2evt;
-
-
-  }
-
-#ifdef TIME_MONITOR
-  //  RecordTime(n_basf2evt, time_array1);
-  if (n_basf2evt == 400) {
-    for (int i = 0; i < 500; i++) {
-      printf("%d %lf %lf %lf\n", i, time_array0[ i ], time_array1[ i ], time_array2[ i ]);
-    }
-  }
-#endif
-  //  if( n_basf2evt == 1000 ){
-  //    terminate();
-  //  }
 
   n_basf2evt++;
 
 
-  if (n_basf2evt * NUM_EVT_PER_BASF2LOOP >= max_nevt && max_nevt > 0) {
-    m_eventMetaDataPtr->setEndOfData();
+  if (max_nevt >= 0 || max_seconds >= 0.) {
+    if (n_basf2evt * NUM_EVT_PER_BASF2LOOP >= max_nevt && max_nevt > 0
+        ||  GetTimeSec() - m_start_time > max_seconds) {
+      m_eventMetaDataPtr->setEndOfData();
+    }
   }
 
   return;

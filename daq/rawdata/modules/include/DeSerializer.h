@@ -73,6 +73,9 @@ namespace Belle2 {
     //! # of events in a run
     int max_nevt;
 
+    //! time to stop a run
+    double max_seconds;
+
     //! Compression Level
     int m_compressionLevel;
 
@@ -134,7 +137,7 @@ namespace Belle2 {
     MsgHandler* m_msghandler;
 
     //! Node(PC or COPPER) ID
-    unsigned int m_nodeid;
+    int m_nodeid;
 
     //! run no.
     int m_run_no;

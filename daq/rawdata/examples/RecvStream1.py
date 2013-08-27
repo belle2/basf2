@@ -24,18 +24,24 @@ set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # Modules
+
 receiver = register_module('DeSerializerPC')
 # dump = register_module('PrintCollections')
 dump = register_module('RootOutput')
 perf = register_module('DAQPerf')
 
 # RxSocket
+receiver.param('NodeID', 3)
 receiver.param('NumConn', 1)
-#receiver.param('HostNameFrom', ['localhost', 'cpr007'])
-receiver.param('HostNameFrom', ['cpr006', 'cpr007'])
-#receiver.param('PortFrom', [35000, 35000])
-receiver.param('PortFrom', [33000, 33000])
+receiver.param('HostNameFrom', ['localhost', 'cpr007'])
+#receiver.param('HostNameFrom', ['cpr006', 'cpr007'])
+
+receiver.param('PortFrom', [35000, 36000])
+#receiver.param('PortFrom', [33000, 33000])
+
 receiver.param('EventDataBufferWords', 4801)
+receiver.param('MaxTime', 300.)
+#receiver.param('MaxEventNum', 30.)
 
 # receiver.param('DumpFileName', 'ROPC01dump.dat' )
 

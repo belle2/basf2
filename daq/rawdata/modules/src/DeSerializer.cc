@@ -30,13 +30,14 @@ DeSerializerModule::DeSerializerModule() : Module()
   addParam("DumpFileName", dump_fname, "filename to record data", string(""));
   addParam("EventDataBufferWords", BUF_SIZE_WORD, "DataBuffer words per event", 4800);
   addParam("MaxEventNum", max_nevt, "Maximum event number in one run", -1);
-
+  addParam("MaxTime", max_seconds, "Time(s) to stop, DAQ", -1.);
+  addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);
 
   n_basf2evt = -1;
   m_totbytes = 0;
   m_compressionLevel = 0;
 
-  m_nodeid = 0; // will obtain info from parameter
+
   m_exp_no = 0; // will obtain info from parameter
   m_run_no = 0; // will obtain info from parameter
   m_data_type = 0; // will obtain info from parameter

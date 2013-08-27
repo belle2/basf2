@@ -41,8 +41,6 @@ PrintDataModule::PrintDataModule() : Module()
   n_basf2evt = -1;
   m_compressionLevel = 0;
 
-  //Parameter definition
-  B2INFO("Tx: Constructor done.");
 }
 
 
@@ -58,22 +56,8 @@ void PrintDataModule::initialize()
   // Initialize EvtMetaData
   //  m_eventMetaDataPtr.registerAsPersistent();
 
-
-#ifdef DUMMY
-  m_buffer = new int[ BUF_SIZE_WORD ];
-
-#endif
-
-
   // Create Message Handler
   m_msghandler = new MsgHandler(m_compressionLevel);
-
-  B2INFO("Tx initialized.");
-  memset(time_array0, 0, sizeof(time_array0));
-  memset(time_array1, 0, sizeof(time_array1));
-  memset(time_array2, 0, sizeof(time_array2));
-
-
 
 }
 
@@ -107,21 +91,6 @@ void PrintDataModule::terminate()
 
 
 
-double PrintDataModule::GetTimeSec()
-{
-  struct timeval t;
-  gettimeofday(&t, NULL);
-  return (t.tv_sec + t.tv_usec * 1.e-6);
-}
-
-
-void PrintDataModule::RecordTime(int event, double* array)
-{
-  if (event >= 50000 && event < 50500) {
-    array[ event - 50000 ] = GetTimeSec() - m_start_time;
-  }
-  return;
-}
 
 
 void PrintDataModule::VerifyCheckSum(int* buf)     // Should be modified
@@ -141,55 +110,41 @@ void PrintDataModule::VerifyCheckSum(int* buf)     // Should be modified
 
 void PrintDataModule::event()
 {
-  if (n_basf2evt <= 0) {
-    m_start_time = GetTimeSec();
-    n_basf2evt = 0;
-  }
-
-#ifdef TIME_MONITOR
-  double cur_time;
-  RecordTime(n_basf2evt, time_array0);
-#endif
-
   StoreArray<RawCOPPER> rawcprarray;
+
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
+    RawHeader rawhdr;
     int* buf;
-    int m_size_byte = 0;
+    int size_byte = 0;
     buf = rawcprarray[ j ]->GetBuffer();
+    rawhdr.SetBuffer(rawcprarray[ j ]->GetRawHdrBufPtr());
+    size_byte = rawcprarray[ j ]->Size() * sizeof(int);
 
-    m_size_byte = rawcprarray[ j ]->Size() * sizeof(int);
+    //
+    // Extract FEE buffer
+    //
+    int* fee_buf_1st;
+    int* fee_buf_2nd;
+    int* fee_buf_3rd;
+    int* fee_buf_4th;
 
-    printf("buf %p header %p footer %p", buf, rawcprarray[ j ]->GetBuffer(), rawcprarray[ j ]->GetBuffer());
 
-//     for( int i = 0 ; i < rawcprarray[ j ]->Size(); i++){
-//       printf("%.8x ", buf[ i ] );
+    printf("=== event====\n exp %d run %d eve %d copperNode %d type %d size %d byte\n",
+           rawhdr.GetExpNo(),
+           rawhdr.GetRunNo(),
+           rawhdr.GetEveNo(),
+           rawhdr.GetSubsysId(),
+           rawhdr.GetDataType(),
+           size_byte);
 
-//       if( ( i + 1 ) % 10 == 0 ){
-//  printf("\n %.8d:", i + 2 );
-//       }
-//     }
-//     printf("\n");
-//     printf("\n");
+    fee_buf_1st = rawcprarray[ j ]->Get1stFEEBuffer();
+    fee_buf_2nd = rawcprarray[ j ]->Get2ndFEEBuffer();
+    fee_buf_3rd = rawcprarray[ j ]->Get3rdFEEBuffer();
+    fee_buf_4th = rawcprarray[ j ]->Get4thFEEBuffer();
+    printf("FEEbuf %p %p %p %p\n", fee_buf_1st, fee_buf_2nd, fee_buf_3rd, fee_buf_4th);
 
-    printf("evn %d j %d size %d\n", n_basf2evt,  j, m_size_byte);
   }
 
-//   StoreObjPtr<RawCOPPER> rawcopper;
-//   int* buf;
-//   buf = rawcopper->GetBuffer();
-
-//   m_eventMetaDataPtr.create();
-//   m_eventMetaDataPtr->setExperiment(1);
-//   m_eventMetaDataPtr->setRun(1);
-//   m_eventMetaDataPtr->setEvent(n_basf2evt);
-//   if( n_basf2evt == 100){
-//   m_eventMetaDataPtr->setEndOfData();
-//   }
-
-
-#ifdef TIME_MONITOR
-  RecordTime(n_basf2evt, time_array2);
-#endif
 
   n_basf2evt++;
 

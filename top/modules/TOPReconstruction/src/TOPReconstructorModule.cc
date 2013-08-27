@@ -297,6 +297,8 @@ namespace Belle2 {
       double DzExp = m_topgp->getWLength();     // expansion volume length
       double Wwidth = m_topgp->getWwidth();     // expansion volume width
       double Wflat = m_topgp->getWflat();     // expansion volume flat part
+      double filterThick = m_topgp->getdGlue();
+      double pmtWindow = m_topgp->getWinthickness();
       double YsizExp = m_topgp->getWextdown() + m_topgp->getQthickness();
       double XsizPMT = m_topgp->getNpmtx() * m_topgp->getMsizex() +
                        (m_topgp->getNpmtx() - 1) * m_topgp->getXgap();
@@ -311,7 +313,7 @@ namespace Belle2 {
         setMirrorCenter(id, MirrXc, MirrYc);
         addExpansionVolume(id, Left, Prism, DzExp - Wflat, B / 2, B / 2 - YsizExp,
                            0, 0, Wwidth);
-        setBBoxWindow(id, Wflat);
+        setBBoxWindow(id, Wflat + filterThick + pmtWindow);
         arrangePMT(id, Left, XsizPMT, YsizPMT);
         Phi += Dphi;
       }

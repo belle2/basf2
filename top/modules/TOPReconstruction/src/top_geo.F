@@ -455,6 +455,8 @@ c-- internal functions --------------------------------------------------
  101  FORMAT(I3,2I4,8F8.2)
       PRINT*
 
+c      call print_refind(1.4, 4.0, 0.01) ! xml format
+
       END
 
 
@@ -558,36 +560,75 @@ c-- internal functions --------------------------------------------------
 
 c-- functions with quartz & mirror data -------------------------------------
 
+      SUBROUTINE PRINT_REFIND(EMIN, EMAX, STEP)
+
+c     print refractive index in xml format
+
+      IMPLICIT NONE
+      REAL EMIN, EMAX, STEP     ! range and step [eV]
+      
+      REAL E, PHASE_INDEX
+
+      E=EMIN
+      DO WHILE(E.LE.EMAX)
+         PRINT 100,' <value energy="',E,'">',PHASE_INDEX(E),'</value>'
+         E=E+STEP
+      ENDDO
+      PRINT*
+ 100  FORMAT(A,F10.8,A,F10.8,A)
+
+      END
+
 ***** quartz refractive index, absorption length
 
-      REAL FUNCTION PHASE_INDEX(E)
+      REAL FUNCTION PHIND_LAMBDA(LAM)
 
-c--   T. Ijima (6-jul-2004)
+      IMPLICIT NONE
+      REAL LAM                  ! photon wavelength (nm)
+
+      INTEGER I
+      REAL X, B(3), C(3)
+      DATA B /0.6961663, 0.4079426, 0.8974794/
+      DATA C /0.0046791, 0.0135121, 97.9340025/
+      SAVE B, C
+
+C      PHIND_LAMBDA=1.44+8.20/(LAM-126.) ! T. Ijima (6-jul-2004)
+      
+      X=(LAM*0.001)**2
+      PHIND_LAMBDA=1.
+      DO I=1,3
+         PHIND_LAMBDA=PHIND_LAMBDA+B(I)*X/(X-C(I))
+      ENDDO
+      PHIND_LAMBDA=SQRT(PHIND_LAMBDA) ! K. Inami (avg-2013)
+
+      END
+
+
+      REAL FUNCTION PHASE_INDEX(E)
 
       IMPLICIT NONE
       REAL E                    ! photon energy (eV)
 
-      REAL LAM
+      REAL LAM, PHIND_LAMBDA
 
       LAM=1240./E
-      PHASE_INDEX=1.44+8.20/(LAM-126.)
+      PHASE_INDEX=PHIND_LAMBDA(LAM)
 
       END
 
 
       REAL FUNCTION GROUP_INDEX(E)
 
-c--   T. Ijima (6-jul-2004)
-
       IMPLICIT NONE
       REAL E                    ! photon energy (eV)
 
-      REAL LAM, DNDL, PHIND
-
+      REAL LAM, DL, DNDL, PHIND, PHIND_LAMBDA
+      DATA DL /1./              ! (nm)
+      SAVE DL
 
       LAM=1240./E
-      PHIND=1.44+8.20/(LAM-126.)
-      DNDL=-8.20/(LAM-126.)**2
+      PHIND=PHIND_LAMBDA(LAM)
+      DNDL=(PHIND_LAMBDA(LAM+DL/2)-PHIND_LAMBDA(LAM-DL/2))/DL
 
       GROUP_INDEX=PHIND/(1.+LAM/PHIND*DNDL)
 
@@ -615,7 +656,7 @@ c--   J. Va'vra (7-jul-2004)
       IMPLICIT NONE
       REAL E                    ! photon energy (eV)
 
-      MIRROR_REFL=0.95
+      MIRROR_REFL=0.90
 
       END
 

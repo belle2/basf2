@@ -320,7 +320,7 @@ FILE* fp_connect(const char* hostname, unsigned short port, const char* opt /* f
 main(int argc, char** argv)
 {
 
-  std::string copper_hostname[3] = {"cpr006", "cpr007", "cpr008"};
+  std::string copper_hostname[10];
 
   int ch;
   while (-1 != (ch = getopt(argc, argv, "i:s:S:n:p:P:Dbh"))) {
@@ -333,6 +333,11 @@ main(int argc, char** argv)
         break;
       case 'n':
         nstream = strtol(optarg, 0, 0);
+        for (int i = 0 ; i < nstream; i++) {
+          copper_hostname[ i ] = argv[optind + i];
+          printf("COPPER %d %s\n", optind, copper_hostname[ i ].c_str());
+        }
+
         break;
       case 'p':
         baseport_from = strtol(optarg, 0, 0);

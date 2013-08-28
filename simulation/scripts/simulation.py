@@ -4,7 +4,7 @@
 from basf2 import *
 
 
-def add_simulation(path, components=None):
+def add_simulation(path, components=None, bkgfiles=None):
     """
     This function adds the standard simulation modules to a path.
     """
@@ -22,6 +22,12 @@ def add_simulation(path, components=None):
     # detector simulation
     g4sim = register_module('FullSim')
     path.add_module(g4sim)
+
+    # background mixing
+    if bkgfiles is not None:
+        bkgmixer = register_module('MixBkg')
+        bkgmixer.param('BackgroundFiles', bkgfiles)
+        path.add_module(bkgmixer)
 
     # PXD simulation
     if components == None or 'PXD' in components:

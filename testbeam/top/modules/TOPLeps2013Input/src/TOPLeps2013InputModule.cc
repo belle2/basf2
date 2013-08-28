@@ -27,6 +27,8 @@
 // DataStore classes
 #include <framework/dataobjects/EventMetaData.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <tracking/dataobjects/Track.h>
+#include <tracking/dataobjects/ExtHit.h>
 
 using namespace std;
 
@@ -51,17 +53,30 @@ namespace Belle2 {
     // Add parameters
     addParam("inputFileName", m_inputFileName, "Input file name",
              string(""));
+    addParam("ntofMin", m_ntofMin, "minimal TOF hits to select event", 1);
+    addParam("ntofMax", m_ntofMax, "maximal TOF hits to select event", 1);
+    addParam("rfTimeMin", m_rfTimeMin, "minimal RF time to select event [ns]", 41.0);
+    addParam("x0", m_x0, "track starting position in x [cm]", 0.0);
+    addParam("y0", m_y0, "track starting position in y [cm]", 0.0);
+    addParam("z0", m_z0, "track starting position in z [cm]", 0.0);
+    addParam("p", m_p, "track momentum magnitude [GeV/c]", 2.1);
+    addParam("theta", m_theta, "track polar angle [deg]", 90.0);
+    addParam("phi", m_phi, "track azimuthal angle [deg]", 0.0);
+    addParam("t0", m_t0, "offset time to add for adjusting photon TDC times [ns]", 0.0);
 
     // initialize other private data members
     m_file = NULL;
     m_treeTop = NULL;
+    m_treeLeps = NULL;
     m_top.clear();
+    m_ntof = 0;
     m_topgp = NULL;
 
     m_numPMTchannels = 0;
     m_numChannels = 0;
     m_tdcWidth = 0;
     m_tdcOverflow = 0;
+    m_timeMax = 0;
     m_numEntries = 0;
     m_entryCounter = 0;
 
@@ -132,13 +147,24 @@ namespace Belle2 {
     m_treeTop->SetBranchAddress("trk_top_y", &(m_top.trk_top_y));
     m_treeTop->SetBranchAddress("trk_top_z", &(m_top.trk_top_z));
 
+    m_treeLeps = (TTree*)m_file->Get("leps");
+    if (m_treeLeps) {
+      m_treeLeps->SetBranchAddress("ntof", &(m_ntof));
+    } else {
+      m_ntof = 1;
+      B2WARNING("TOPLeps2013Input: leps tree not found, ntof set to 1");
+    }
+
     m_numEntries = m_treeTop->GetEntries();
     m_entryCounter = 0;
 
     // data store objects registration
     StoreObjPtr<EventMetaData>::registerPersistent();
     StoreArray<TOPDigit>::registerPersistent();
-
+    StoreArray<Track>::registerPersistent();
+    StoreArray<TrackFitResult>::registerPersistent();
+    StoreArray<ExtHit>::registerPersistent();
+    RelationArray::registerPersistent<Track, ExtHit>();
   }
 
   void TOPLeps2013InputModule::beginRun()
@@ -156,8 +182,9 @@ namespace Belle2 {
       m_numPMTchannels = m_topgp->getNpadx() * m_topgp->getNpady();
       m_numChannels = m_topgp->getNpmtx() * m_topgp->getNpmty() * m_numPMTchannels;
       if (m_numChannels > 512) B2FATAL("Number of channels > 512");
-      m_tdcWidth = m_topgp->getTDCbitwidth() * Unit::ns / Unit::ps;
+      m_tdcWidth = m_topgp->getTDCbitwidth();
       m_tdcOverflow = 1 << m_topgp->getTDCbits();
+      m_timeMax = (float) m_tdcOverflow * m_tdcWidth;
     }
     m_top.clear();
     m_topgp->setBasfUnits();
@@ -167,16 +194,28 @@ namespace Belle2 {
     evtMetaData.create();
     StoreArray<TOPDigit> digits;
     digits.create();
+    StoreArray<Track> tracks;
+    tracks.create();
+    StoreArray<TrackFitResult> trackFitResults;
+    trackFitResults.create();
+    StoreArray<ExtHit> extHits;
+    extHits.create();
+    RelationArray trackToExtHits(tracks, extHits);
+    trackToExtHits.clear();
 
-    // check entry counter
-    if (m_entryCounter == m_numEntries) {
-      evtMetaData->setEndOfData(); // stop event processing
-      return;
-    }
-
-    // read event (TODO: only for m_top.eventflag == 1)
-    m_treeTop->GetEntry(m_entryCounter);
-    m_entryCounter++;
+    // read from ntuple and select event
+    bool select = false;
+    do {
+      if (m_entryCounter == m_numEntries) {
+        evtMetaData->setEndOfData(); // stop event processing
+        return;
+      }
+      m_treeTop->GetEntry(m_entryCounter);
+      if (m_treeLeps) m_treeLeps->GetEntry(m_entryCounter);
+      m_entryCounter++;
+      select = m_ntof >= m_ntofMin && m_ntof <= m_ntofMax;
+      if (m_treeLeps) select = select && m_top.rf_time * Unit::ps / Unit::ns > m_rfTimeMin;
+    } while (!select);
 
     // set event metadata
     evtMetaData->setEvent(m_top.eventNum);
@@ -185,11 +224,54 @@ namespace Belle2 {
     // write good data to data store
     for (int i = 0; i < (int)m_top.nhit; i++) {
       if (m_top.pmtflag_mcp[i] != 1) continue;
+      double t = m_top.tdc_mcp[i] * Unit::ps / Unit::ns + m_t0;
+      if (t < 0) continue;
+      if (t > m_timeMax) continue;
       int ich = (m_top.pmtid_mcp[i] - 1) * m_numPMTchannels + m_top.ch_mcp[i];
-      int TDC = m_top.tdc0_mcp[i] / m_tdcWidth;
-      new(digits.nextFreeAddress()) TOPDigit(1, ich, TDC);
+      int TDC = t / m_tdcWidth;
+      if (TDC < m_tdcOverflow)
+        new(digits.nextFreeAddress()) TOPDigit(1, ich, TDC);
     }
 
+    // write track info to data store
+    TrackFitResult* trackFitResult = trackFitResults.appendNew();
+    TVector3 position(m_x0, m_y0, m_z0);
+    trackFitResult->setPosition(position);
+    TVector3 momentum;
+    momentum.SetMagThetaPhi(m_p, m_theta * Unit::deg, m_phi * Unit::deg);
+    trackFitResult->setMomentum(momentum);
+    trackFitResult->setCharge(-1);
+
+    Track* track = tracks.appendNew();
+    short index = trackFitResult->getArrayIndex();
+    track->setTrackFitResultIndex(Const::electron, index);
+    track->setTrackFitResultIndex(Const::muon, index);
+    track->setTrackFitResultIndex(Const::pion, index);
+    track->setTrackFitResultIndex(Const::kaon, index);
+    track->setTrackFitResultIndex(Const::proton, index);
+
+    // extrapolate track to bar (to the plane at x = inner radius)
+    TVector3 direction = momentum.Unit();
+    int barID = 1;
+    double x = m_topgp->getRadius();
+    double path = (x - position.X()) / direction.X();
+    double y = position.Y() + path * direction.Y();
+    double z = position.Z() + path * direction.Z();
+    TVector3 hit(x, y, z);
+    int pdgCode = Const::pion.getPDGCode();
+    double mass = Const::pion.getMass();
+    double beta = m_p / sqrt(m_p * m_p + mass * mass);
+    double tof = path / (beta * Const::speedOfLight);
+    TMatrixD covariance(6, 6);
+    ExtHit* extHit = extHits.appendNew(ExtHit(pdgCode, EXT_TOP, barID, EXT_ENTER, tof, hit,
+                                              momentum, covariance));
+    track->addRelationTo(extHit);
+
+    B2INFO("run " << evtMetaData->getRun()
+           << " event " << evtMetaData->getEvent()
+           << ": ntof=" << m_ntof
+           << " nhit=" << digits.getEntries()
+           << " rf_time=" << m_top.rf_time << " ps");
   }
 
 

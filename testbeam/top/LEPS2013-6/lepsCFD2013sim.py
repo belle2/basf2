@@ -8,12 +8,21 @@ from basf2 import *
 # Belle coordinate frame is used: bar along z-axis, perpendicular to x-axis at x=120cm
 # beam fired from x=0
 #
-#   x = z(LEPS)+120 cm
+#   x = z(LEPS) + 120 cm
 #   y = -y(LEPS)
 #   z = x(LEPS)
+#
+# Inami-san alignment data conversion:
+#
+#   x = y(Inami)
+#   y = -x(Inami)
+#   z = z(Inami) + 695 mm
+#   theta = theta(Inami)
+#   phi = -phi(Inami)/sin(theta(Inami))
+# (last two in approximation for phi<<1)
 # ------------------------------------------
 
-# beam definition for exp001 (cosTheta=0.0)
+# beam definition for exp001 (cosTheta=0.0), Inami-san alignment (2013/8/8)
 
 beam01 = {
     'pdgCodes': [-11],
@@ -22,16 +31,16 @@ beam01 = {
     'momentumGeneration': 'normal',
     'momentumParams': [2.12, 0.21],
     'thetaGeneration': 'normal',
-    'thetaParams': [89.4678, 0],
+    'thetaParams': [89.639, 0],
     'phiGeneration': 'normal',
-    'phiParams': [0, 0],
+    'phiParams': [0.057, 0],
     'vertexGeneration': 'normal',
     'xVertexParams': [0, 0],
-    'yVertexParams': [0, 0.5],
-    'zVertexParams': [123.035, 0.5],
+    'yVertexParams': [-0.20, 0.5],
+    'zVertexParams': [124.30, 0.5],
     }
 
-# beam definition for exp002 (cosTheta=0.39)
+# beam definition for exp002 (cosTheta=0.39), Inami-san alignment (2013/8/8)
 
 beam02 = {
     'pdgCodes': [-11],
@@ -40,13 +49,13 @@ beam02 = {
     'momentumGeneration': 'normal',
     'momentumParams': [2.12, 0.21],
     'thetaGeneration': 'normal',
-    'thetaParams': [66.9446, 0],
+    'thetaParams': [67.288, 0],
     'phiGeneration': 'normal',
-    'phiParams': [0, 0],
+    'phiParams': [0.124, 0],
     'vertexGeneration': 'normal',
     'xVertexParams': [0, 0],
-    'yVertexParams': [0.1, 0.5],
-    'zVertexParams': [72.568, 0.5],
+    'yVertexParams': [-0.10, 0.5],
+    'zVertexParams': [73.00, 0.5],
     }
 
 # beam definition for exp003 (cosTheta=0.39, impact close to bar side)
@@ -59,13 +68,13 @@ beam03 = {
     'momentumGeneration': 'normal',
     'momentumParams': [2.12, 0.21],
     'thetaGeneration': 'normal',
-    'thetaParams': [66.9, 0],
+    'thetaParams': [67.288, 0],
     'phiGeneration': 'normal',
-    'phiParams': [0, 0],
+    'phiParams': [0.124, 0],
     'vertexGeneration': 'normal',
     'xVertexParams': [0, 0],
     'yVertexParams': [-19.9, 0.5],
-    'zVertexParams': [65.73, 0.5],
+    'zVertexParams': [73.00, 0.5],
     }
 
 # specify here the beam setup, number of events to simulate and output file
@@ -100,8 +109,8 @@ simulation = register_module('FullSim')
 
 # TOP digitization
 TOPdigi = register_module('TOPDigitizer')
-TOPdigi.param('electronicJitter', 0)
-TOPdigi.param('timeZeroJitter', 30e-3)
+TOPdigi.param('electronicJitter', 35e-3)
+TOPdigi.param('timeZeroJitter', 25e-3)
 
 # Output
 # output = register_module('RootOutput')

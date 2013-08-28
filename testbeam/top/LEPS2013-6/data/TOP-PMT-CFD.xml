@@ -5,7 +5,7 @@
   <nPMTy desc="Number of PMT modules rows">2</nPMTy>
   <Xgap desc="Gap between PMTs in x direction" unit="mm">0.5</Xgap>
   <Ygap desc="Gap between PMTs in y direction" unit="mm">0.5</Ygap>
-  <dGlue desc="Thickness of the glue with which the PMTs are glued to the wedge" unit="mm">0.1</dGlue>
+  <dGlue desc="Thickness of glue+filter btw. PMTs and wedge" unit="mm">2.5</dGlue>
   <glueMaterial>PMTGlue</glueMaterial>
   <stackMaterial>TOPAir</stackMaterial>
     
@@ -17,8 +17,8 @@
     <ModuleZSize  desc="module wall size in Z" unit="mm">9.6</ModuleZSize>
     <ModuleWall desc="thickness of the module wall" unit="mm">0.5</ModuleWall>
     
-    <SensXSize desc="Active surface x dimension" unit="mm">22.5</SensXSize>
-    <SensYSize desc="Active surface y dimension" unit="mm">22.5</SensYSize>
+    <SensXSize desc="Active surface x dimension" unit="mm">23.0</SensXSize>
+    <SensYSize desc="Active surface y dimension" unit="mm">23.0</SensYSize>
     <SensThickness desc="Thickness of active surface" unit="mm">0.1</SensThickness>	
     <sensMaterial desc="Active surface material">TOPPMTBialkali</sensMaterial>
     
@@ -32,7 +32,7 @@
     <PadYNum desc="Number of pads in y direction">4</PadYNum>
     
     <TDCbits desc="Number of TDC bits">12</TDCbits>
-    <TDCbitwidth desc="Width of TDC bit" unit="ps">25</TDCbitwidth>
+    <TDCbitwidth desc="Width of TDC bit" unit="ps">24.41</TDCbitwidth>
   </Module>
 
   <TTS>

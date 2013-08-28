@@ -161,13 +161,13 @@ def add_mc_reconstruction(path, components=None):
     add_posttracking_reconstruction(path, components)
 
 
-def add_mdst_output(path, mc=True):
+def add_mdst_output(path, mc=True, filename='mdst.root'):
     """
     This function adds the mdst output modules to a path.
     """
 
     output = register_module('RootOutput')
-    output.param('outputFileName', 'mdst.root')
+    output.param('outputFileName', filename)
     branches = [
         'Tracks',
         'TrackFitResults',

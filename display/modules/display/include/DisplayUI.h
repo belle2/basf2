@@ -83,6 +83,9 @@ namespace Belle2 {
      */
     bool startDisplay();
 
+    /** Set title of Eve window. Add fileName, if given. */
+    void setTitle(const std::string& fileName = "");
+
     /** Toggle between light and dark color scheme for viewers. */
     void toggleColorScheme();
 

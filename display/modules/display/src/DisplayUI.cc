@@ -60,8 +60,8 @@ DisplayUI::DisplayUI(bool automatic):
     TEveManager::Create(!m_automatic, "I"); //show window in interactive mode, hide file browser
   }
 
+  setTitle(); //set default window title
   TEveBrowser* browser = gEve->GetBrowser();
-  browser->SetWindowName("Event Display");
   browser->HideBottomTab();
   browser->StartEmbedding(TRootBrowser::kRight);
   m_viewer = new SplitGLView();
@@ -93,10 +93,23 @@ void DisplayUI::prev()
   goToEvent(m_currentEntry - 1);
 }
 
+void DisplayUI::setTitle(const std::string& fileName)
+{
+  std::string title("Belle II Event Display");
+  if (!fileName.empty())
+    title += " - " + fileName;
+
+  TEveBrowser* browser = gEve->GetBrowser();
+  browser->SetWindowName(title.c_str());
+}
+
 void DisplayUI::updateUI()
 {
-  if (InputController::canControlInput())
+  if (InputController::canControlInput()) {
     m_currentEntry = InputController::getCurrentEntry();
+
+    setTitle(InputController::getCurrentFileName());
+  }
 
   //change UI state?
   const long numEntries = InputController::numEntries();

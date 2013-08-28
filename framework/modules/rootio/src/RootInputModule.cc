@@ -162,6 +162,7 @@ void RootInputModule::initialize()
   }
   if (m_tree[DataStore::c_Event]) {
     InputController::setCanControlInput(true);
+    InputController::setChain(m_tree[DataStore::c_Event]);
     InputController::setNumEntries(m_tree[DataStore::c_Event]->GetEntries());
   }
 }

@@ -11,6 +11,10 @@
 #ifndef INPUTCONTROLLER_H
 #define INPUTCONTROLLER_H
 
+#include <string>
+
+class TChain;
+
 namespace Belle2 {
   /** A static class to control supported input modules.
    *
@@ -65,6 +69,9 @@ namespace Belle2 {
     /** set total number of entries in the opened file. */
     static void setNumEntries(long n) { s_numEntries = n; }
 
+    /** Return name of current file in loaded chain (or empty string if none loaded). */
+    static std::string getCurrentFileName();
+
     /** Indicate that an event (in the given entry) was loaded and reset all members related to the next entry. */
     static void eventLoaded(long entry) {
       s_nextEntry = -1;
@@ -73,6 +80,9 @@ namespace Belle2 {
       s_nextEvent = -1;
       s_currentEntry = entry;
     }
+
+    /** Set the loaded TChain (event durability). */
+    static void setChain(const TChain* chain) { s_chain = chain; }
 
   private:
     InputController() { }
@@ -105,6 +115,9 @@ namespace Belle2 {
 
     /** total number of entries in event tree, or zero if none exists. */
     static long s_numEntries;
+
+    /** Opened TChain (event durability). */
+    static const TChain* s_chain;
   };
 }
 #endif

@@ -1,5 +1,8 @@
 #include <framework/core/InputController.h>
 
+#include <TChain.h>
+#include <TFile.h>
+
 using namespace Belle2;
 
 bool InputController::s_canControlInput = false;
@@ -9,3 +12,16 @@ long InputController::s_nextRun = -1;
 long InputController::s_nextEvent = -1;
 long InputController::s_numEntries = 0;
 long InputController::s_currentEntry = 0;
+const TChain* InputController::s_chain = NULL;
+
+std::string InputController::getCurrentFileName()
+{
+  if (!s_chain)
+    return "";
+
+  const TFile* f = s_chain->GetFile();
+  if (!f)
+    return "";
+
+  return f->GetName();
+}

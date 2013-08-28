@@ -68,7 +68,7 @@ void RootInputModule::initialize()
 
   const vector<string>& inputFiles = getInputFiles();
   if (inputFiles.empty()) {
-    B2FATAL("You have to set either the 'inputFileName' or the 'inputFileNames' parameter!");
+    B2FATAL("You have to set either the 'inputFileName' or the 'inputFileNames' parameter, or start basf2 with the '-i MyFile.root' option.");
     return;
   }
   if (!m_inputFileName.empty() && !m_inputFileNames.empty()) {

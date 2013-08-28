@@ -61,7 +61,7 @@ namespace Belle2 {
     virtual void terminate();
 
     /** Get list of input files, taking -i command line overrides into account. */
-    inline std::vector<std::string> getInputFiles() const {
+    std::vector<std::string> getInputFiles() const {
       std::vector<std::string> inputFiles = Environment::Instance().getInputFilesOverride();
       if (!inputFiles.empty()) {
         return inputFiles;

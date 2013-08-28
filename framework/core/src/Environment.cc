@@ -13,11 +13,6 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/core/Module.h>
 
-#include <framework/modules/rootio/RootInputModule.h>
-#include <framework/modules/rootio/RootOutputModule.h>
-
-#include <boost/foreach.hpp>
-
 #include <iostream>
 
 using namespace Belle2;
@@ -64,22 +59,28 @@ void Environment::setJobInformation(boost::shared_ptr<Path> path)
 {
   const std::list<ModulePtr>& modules = path->getModules();
 
-  BOOST_FOREACH(ModulePtr m, modules) {
+  for (ModulePtr m : modules) {
     string name = m->getName();
     if (name == "RootInput") {
-      const RootInputModule* input = static_cast<RootInputModule*>(m.get());
-      const vector<string>& inputs = input->getInputFiles();
-      for (unsigned int i = 0; i < inputs.size(); i++) {
-        m_jobInfoOutput += "INPUT FILE: " + inputs[i] + "\n";
+      std::vector<std::string> inputFiles = Environment::Instance().getInputFilesOverride();
+      if (inputFiles.empty()) {
+        string inputFileName = m->getParam<string>("inputFileName").getValue();
+        if (!inputFileName.empty())
+          inputFiles.push_back(inputFileName);
+        else
+          inputFiles = m->getParam<vector<string> >("inputFileNames").getValue();
+      }
+
+      for (string file : inputFiles) {
+        m_jobInfoOutput += "INPUT FILE: " + file + "\n";
       }
     } else if (name == "RootOutput") {
-      const RootOutputModule* output = static_cast<const RootOutputModule*>(m.get());
-      string out = output->getOutputFile();
+      std::string out = Environment::Instance().getOutputFileOverride();
+      if (out.empty())
+        out = m->getParam<string>("outputFileName").getValue();
       m_jobInfoOutput += "OUTPUT FILE: " + out + "\n";
     }
   }
-
-
 }
 
 void Environment::printJobInformation() const

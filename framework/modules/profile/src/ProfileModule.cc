@@ -12,6 +12,7 @@
 #include <framework/dataobjects/ProfileInfo.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/utilities.h>
+
 #include <TROOT.h>
 #include <TCanvas.h>
 #include <TGraph.h>
@@ -32,7 +33,7 @@ REG_MODULE(Profile)
 ProfileModule::ProfileModule() : Module(), m_outputFileName(""), m_timeOffset(Utils::getClock() / Unit::s), m_nEvents(0), m_step(1), m_eventInfo(k_maxPoints)
 {
   // Set module properties
-  setDescription("Records execution time and memory usage.");
+  setDescription("Records execution time and memory usage in ProfileInfo objects for each event. Can also graph memory usage.");
   addParam("outputFileName", m_outputFileName, "File name of memory usage plot.", std::string(""));
 }
 

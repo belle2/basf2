@@ -192,14 +192,9 @@ void CDCGeometryPar::read()
   //  m_senseWireDensity = gbxParams.getDensity("Tungsten");
   m_senseWireDensity = 19.3; // g/cm3  <- tentatively hard-coded here
 
-  //  std::cout << "diameter= " << m_senseWireDiameter << std::endl;
-  //  std::cout << "tension = " << m_senseWireTension  << std::endl;
-  //  std::cout << "density = " << m_senseWireDensity  << std::endl;
-
-  m_readXTetc = gbxParams.getBool("readXTetc");
-
-  m_useRealGeometry = gbxParams.getBool("WhichGeometry");
-  B2INFO("Real CDC geometry in CDCGeometryPar on(=1)/off(=0):" << m_useRealGeometry);
+  //  cout << "diameter= " << m_senseWireDiameter << endl;
+  //  cout << "tension = " << m_senseWireTension  << endl;
+  //  cout << "density = " << m_senseWireDensity  << endl;
 
   // Get field wire diameter
   m_fieldWireDiameter = gbxParams.getLength("FieldWire/Diameter");
@@ -209,8 +204,10 @@ void CDCGeometryPar::read()
     const int nWires = m_nWires[iSLayer];
     for (int iCell = 0; iCell < nWires; ++iCell) {
       setDesignWirParam(iSLayer, iCell);
+      //      outputDesignWirParam(iSLayer, iCell);
     }
   }
+
 
   //Set various quantities (should be moved to CDC.xml later...)
   m_tdcOffset = 0;  //to be adjusted later; set to 32768 ???
@@ -223,9 +220,14 @@ void CDCGeometryPar::read()
   m_maxSpaceResol = 10. * m_nominalSpaceResol;
 
   //Replace geometry params. (from input data) upon request
-  if (m_useRealGeometry) readRealGeometry(gbxParams);
+  m_Geometry4Recon = gbxParams.getBool("Geometry4Recon");
+  B2INFO("CDCGeometryPar: Geometry for reconstruction on(=1)/off(=0):" <<
+         m_Geometry4Recon);
+  if (m_Geometry4Recon) readGeometry4Recon(gbxParams);
 
-  if (m_readXTetc) {
+  //Set xt etc. params. for simulation
+  m_XTetc = gbxParams.getBool("XTetc");
+  if (m_XTetc) {
     //Read xt params.
     readXT(gbxParams);
 
@@ -236,30 +238,40 @@ void CDCGeometryPar::read()
     readPropSpeed(gbxParams);
   }
 
+  //Replace xt etc. with those for reconstriction
+  m_XTetc4Recon = gbxParams.getBool("XTetc4Recon");
+  B2INFO("CDCGeometryPar: x-t etc. for reconstruction on(=1)/off(=0):" << m_XTetc4Recon);
+
+  if (m_XTetc4Recon) {
+    readXT(gbxParams, 1);
+    //    readSigma(gbxParams, 1);
+    readPropSpeed(gbxParams, 1);
+  }
+
   //Print();
 
 }
 
 // Read alignment params.
-void CDCGeometryPar::readRealGeometry(const GearDir gbxParams)
+void CDCGeometryPar::readGeometry4Recon(const GearDir gbxParams)
 {
-  std::string fileName0 = gbxParams.getString("alignmentFileName");
+  std::string fileName0 = gbxParams.getString("geometry4ReconFileName");
   fileName0 = "/cdc/data/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName0);
 
   ifstream ifs;
 
   if (fileName == "") {
-    B2FATAL(fileName0 << " not exist!");
+    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
   } else {
-    B2INFO(fileName0 << " exists.");
+    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
     ifs.open(fileName.c_str());
-    if (!ifs) B2FATAL("cannot open " << fileName0 << " !");
+    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }
 
   int iL(0), iC(0);
   const int np = 3;
-  double back[np], fwrd[np], tens;
+  double back[np], fwrd[np], tension;
   unsigned nRead = 0;
 
   while (true) {
@@ -270,26 +282,24 @@ void CDCGeometryPar::readRealGeometry(const GearDir gbxParams)
     for (int i = 0; i < np; ++i) {
       ifs >> fwrd[i];
     }
-    ifs >> tens;
+    ifs >> tension;
 
     if (ifs.eof()) break;
 
     ++nRead;
 
     for (int i = 0; i < np; ++i) {
-      m_BWirPos[iL][iC][i] += back[i];
-      m_FWirPos[iL][iC][i] += fwrd[i];
+      m_BWirPos[iL][iC][i] = back[i];
+      m_FWirPos[iL][iC][i] = fwrd[i];
     }
 
-    m_WirSagCoef[iL][iC] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.*(m_senseWireTension + tens));
+    m_WirSagCoef[iL][iC] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.*(tension));
 
     if (m_debug) {
-      std::cout << iL << " " << iC;
-      for (int i = 0; i < np; ++i) {
-        std::cout << " " << back[i];
-        std::cout << " " << fwrd[i];
-      }
-      std::cout << " " << tens << std::endl;
+      cout << iL << " " << iC;
+      for (int i = 0; i < np; ++i) cout << " " << back[i];
+      for (int i = 0; i < np; ++i) cout << " " << fwrd[i];
+      cout << " " << tension << endl;
     }
 
   }
@@ -301,20 +311,24 @@ void CDCGeometryPar::readRealGeometry(const GearDir gbxParams)
 
 
 // Read x-t params.
-void CDCGeometryPar::readXT(const GearDir gbxParams)
+void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
 {
   std::string fileName0 = gbxParams.getString("xtFileName");
+  if (mode == 1) {
+    std::string fileName0 = gbxParams.getString("xt4ReconFileName");
+  }
+
   fileName0 = "/cdc/data/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName0);
 
   ifstream ifs;
 
   if (fileName == "") {
-    B2FATAL(fileName0 << " not exist!");
+    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
   } else {
-    B2INFO(fileName0 << " exists.");
+    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
     ifs.open(fileName.c_str());
-    if (!ifs) B2FATAL("cannot open " << fileName0 << " !");
+    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }
 
   int iL, lr;
@@ -350,11 +364,11 @@ void CDCGeometryPar::readXT(const GearDir gbxParams)
     m_XT[iL][lr][ialpha][i] = xt[i];
 
     if (m_debug) {
-      std::cout << iL << " " << alpha << " " << dummy0 << " " << dummy1 << " " << lr;
+      cout << iL << " " << alpha << " " << dummy0 << " " << dummy1 << " " << lr;
       for (int i = 0; i < np; ++i) {
-        std::cout << " " << xt[i];
+        cout << " " << xt[i];
       }
-      std::cout << std::endl;
+      cout << endl;
     }
 
     /*    //convert unit, microsec -> nsec
@@ -381,20 +395,23 @@ void CDCGeometryPar::readXT(const GearDir gbxParams)
 }
 
 // Read space reso. params.
-void CDCGeometryPar::readSigma(const GearDir gbxParams)
+void CDCGeometryPar::readSigma(const GearDir gbxParams, const int mode)
 {
   std::string fileName0 = gbxParams.getString("sigmaFileName");
+  if (mode == 1) {
+    std::string fileName0 = gbxParams.getString("sigma4ReconFileName");
+  }
   fileName0 = "/cdc/data/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName0);
 
   ifstream ifs;
 
   if (fileName == "") {
-    B2FATAL(fileName0 << " not exist!");
+    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
   } else {
-    B2INFO(fileName0 << " exists.");
+    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
     ifs.open(fileName.c_str());
-    if (!ifs) B2FATAL("cannot open " << fileName0 << " !");
+    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }
 
   int iL;
@@ -416,11 +433,11 @@ void CDCGeometryPar::readSigma(const GearDir gbxParams)
     }
 
     if (m_debug) {
-      std::cout << iL;
+      cout << iL;
       for (int i = 0; i < np; ++i) {
-        std::cout << " " << sigma[i];
+        cout << " " << sigma[i];
       }
-      std::cout << std::endl;
+      cout << endl;
     }
   }
 
@@ -430,20 +447,23 @@ void CDCGeometryPar::readSigma(const GearDir gbxParams)
 }
 
 // Read propagation speed param.
-void CDCGeometryPar::readPropSpeed(const GearDir gbxParams)
+void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
 {
   std::string fileName0 = gbxParams.getString("propSpeedFileName");
+  if (mode == 1) {
+    std::string fileName0 = gbxParams.getString("propSpeed4ReconFileName");
+  }
   fileName0 = "/cdc/data/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName0);
 
   ifstream ifs;
 
   if (fileName == "") {
-    B2FATAL(fileName0 << " not exist!");
+    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
   } else {
-    B2INFO(fileName0 << " exists.");
+    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
     ifs.open(fileName.c_str());
-    if (!ifs) B2FATAL("cannot open " << fileName0 << " !");
+    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }
 
   int iL;
@@ -458,7 +478,7 @@ void CDCGeometryPar::readPropSpeed(const GearDir gbxParams)
 
     m_PropSpeedInv[iL] = 1. / speed;
 
-    if (m_debug) std::cout << iL << " " << speed << std::endl;
+    if (m_debug) cout << iL << " " << speed << endl;
   }
 
   if (nRead != MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readPropSpeed: #lines read-in (=" << nRead << ") is inconsistent with total #layers (=" << MAX_N_SLAYERS << ") !");
@@ -637,7 +657,7 @@ void CDCGeometryPar::getWirSagEffect(const unsigned layerID, const unsigned cell
   const double Zp  = (Z - Zb) * Zfp / dz;
 
   const double Coef = m_WirSagCoef[layerID][cellID];
-  //  std::cout << "Coef= " << Coef << std::endl;
+  //  cout << "Coef= " << Coef << endl;
 
   const double Y_sag = (Coef * (Zp - Zfp) + dy / Zfp) * Zp + Yb;
   const double dydz = (Coef * (2.*Zp - Zfp) * Zfp + dy) / dz;
@@ -648,8 +668,8 @@ void CDCGeometryPar::getWirSagEffect(const unsigned layerID, const unsigned cell
   //  const double Yf = m_FWirPos[layerID][cellID][1];
   //  const double Xf = m_FWirPos[layerID][cellID][0];
   //  const double Xb = m_BWirPos[layerID][cellID][0];
-  //    std::cout <<"Z,Zb,Zf,Yb,Yf,Vb,Xf= " << Z <<" "<< Zb <<" "<< Zf <<" "<< Yb <<" "<< Yf <<" "<< Xb <<" "<< Xf << std::endl;
-  //  std::cout <<"layerID,Yb_sag-Yb,Yf_sag-Yf= " << layerID <<" "<<1.e4*(Yb_sag - Yb) <<" "<< 1.e4*(Yf_sag - Yf) << std::endl;
+  //    cout <<"Z,Zb,Zf,Yb,Yf,Vb,Xf= " << Z <<" "<< Zb <<" "<< Zf <<" "<< Yb <<" "<< Yf <<" "<< Xb <<" "<< Xf << endl;
+  //  cout <<"layerID,Yb_sag-Yb,Yf_sag-Yf= " << layerID <<" "<<1.e4*(Yb_sag - Yb) <<" "<< 1.e4*(Yf_sag - Yf) << endl;
 }
 
 void CDCGeometryPar::setDesignWirParam(const unsigned layerID, const unsigned cellID)
@@ -676,6 +696,32 @@ void CDCGeometryPar::setDesignWirParam(const unsigned layerID, const unsigned ce
 
   m_WirSagCoef[L][C] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8. * m_senseWireTension);
 
+}
+
+void CDCGeometryPar::outputDesignWirParam(const unsigned layerID, const unsigned cellID) const
+{
+
+  const unsigned L = layerID;
+  const unsigned C =  cellID;
+
+  static bool first = true;
+  static ofstream ofs;
+  if (first) {
+    first = false;
+    ofs.open("alignment.dat");
+  }
+
+  ofs << L << "  " << C;
+
+  ofs << setiosflags(ios::showpoint | ios::uppercase);
+
+  for (int i = 0; i < 3; ++i) ofs << "  " <<  setw(15) << setprecision(8) << m_BWirPos[L][C][i];
+
+  for (int i = 0; i < 3; ++i) ofs << "  " <<  setw(15) << setprecision(8) << m_FWirPos[L][C][i];
+  ofs << setiosflags(ios::fixed);
+  ofs << "  " <<  setw(4) << setprecision(1) << m_senseWireTension;
+
+  ofs << endl;
 }
 
 double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha) const
@@ -776,7 +822,7 @@ double CDCGeometryPar::getSigma(const double driftL, const unsigned short iCLaye
       cout <<"P4= " << P4 << endl;
       cout <<"P5= " << P5 << endl;
       cout <<"driftL= " << driftL << endl;
-      cout <<"iCLayer= " << iCLayer << std::endl;
+      cout <<"iCLayer= " << iCLayer << endl;
 
       const double driftL2 = driftL * driftL;
       const double sigma = sqrt(P0/(driftL2 + P1) + P2*driftL + P3 + P4*exp(P5*driftL2));
@@ -784,4 +830,3 @@ double CDCGeometryPar::getSigma(const double driftL, const unsigned short iCLaye
       return std::min(sigma, m_maxSpaceResol);
   */
 }
-

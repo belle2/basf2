@@ -1,3 +1,4 @@
+
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2012 - Belle II Collaboration                             *
@@ -55,10 +56,10 @@ namespace Belle2 {
 
       //! Gets geometry parameters from gearbox.
       void read();
-      void readRealGeometry(const GearDir);
-      void readXT(const GearDir);
-      void readSigma(const GearDir);
-      void readPropSpeed(const GearDir);
+      void readGeometry4Recon(const GearDir);
+      void readXT(const GearDir, int mode = 0);
+      void readSigma(const GearDir, int mode = 0);
+      void readPropSpeed(const GearDir, int mode = 0);
 
       //! Generate an xml file used in gearbox
       /*!
@@ -346,22 +347,23 @@ namespace Belle2 {
         return m_PropSpeedInv[iCLayer];
       }
 
-      void getWirSagEffect(const unsigned layerID, const unsigned cellID, const double zw, double& ywb_sag, double& ywf_sag) const;
+      void getWirSagEffect(unsigned layerID, unsigned cellID, double zw, double& ywb_sag, double& ywf_sag) const;
 
-      double getDriftV(const double dt, const unsigned short layer, const unsigned short lr, const double alpha = 0.) const;
+      double getDriftV(double dt, unsigned short layer, unsigned short lr, double alpha = 0.) const;
 
-      double getDriftLength(const double dt, const unsigned short layer, const unsigned short lr, const double alpha = 0.) const;
+      double getDriftLength(double dt, unsigned short layer, unsigned short lr, double alpha = 0.) const;
 
-      double getDriftTime(const double dist, const unsigned short layer, const unsigned short lr, const double alpha = 0.) const;
+      double getDriftTime(double dist, unsigned short layer, unsigned short lr, double alpha = 0.) const;
 
-      double getSigma(const double dist, const unsigned short layer) const;
+      double getSigma(double dist, unsigned short layer) const;
 
 
     private:
 
       bool m_debug;          /*!< Switch for debug printing. */
-      bool m_readXTetc;      /*!< Switch to read-in x-t etc. params.. */
-      bool m_useRealGeometry; /*!< Switch to select geometry. */
+      bool m_XTetc;          /*!< Switch for reading x-t etc. params.. */
+      bool m_Geometry4Recon; /*!< Switch for selecting geometry. */
+      bool m_XTetc4Recon;    /*!< Switch for selecting xt etc. */
       std::string m_version; /*!< The version of geometry parameters. */
       int m_nSLayer;         /*!< The number of sense wire layer. */
       int m_nFLayer;         /*!< The number of field wire layer. */
@@ -418,7 +420,9 @@ namespace Belle2 {
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
 
-      void setDesignWirParam(const unsigned, const unsigned);
+      void setDesignWirParam(unsigned, unsigned);
+
+      void outputDesignWirParam(unsigned, unsigned) const;
 
     };
 

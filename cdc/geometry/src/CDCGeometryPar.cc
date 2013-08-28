@@ -729,6 +729,10 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
 
   double dDdt;
 
+  if (false) {
+    std::cout << "alpha " << alpha << std::endl;
+  }
+
   const unsigned ialpha = 0; //tentative
   const double boundary = m_XT[iCLayer][lr][ialpha][6];
 
@@ -751,6 +755,10 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
 {
 
   double dist = 0.;
+
+  if (false) {
+    std::cout << "alpha " << alpha << std::endl;
+  }
 
   const unsigned ialpha = 0;
   const double boundary = m_XT[iCLayer][lr][ialpha][6];
@@ -807,6 +815,9 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
 double CDCGeometryPar::getSigma(const double driftL, const unsigned short iCLayer) const
 {
 
+  if (false) {
+    std::cout << "driftL " << driftL << " iCLayer " << iCLayer << std::endl;
+  }
   return m_nominalSpaceResol; //tentatively; to be updated in the next release
 
   /*  const double P0 = m_Sigma[iCLayer][0];

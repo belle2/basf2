@@ -56,7 +56,7 @@ DisplayUI::DisplayUI(bool automatic):
     new TApplication("ROOT_application", 0, 0);
   }
   if (!gEve) {
-    B2INFO("Creating TEve window ...");
+    B2INFO("Creating TEve window.");
     TEveManager::Create(!m_automatic, "I"); //show window in interactive mode, hide file browser
   }
 

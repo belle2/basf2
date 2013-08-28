@@ -173,7 +173,7 @@ void EVEVisualization::addGeometry()
   if (!gGeoManager)
     return;
 
-  B2INFO("Setting up geometry for TEve...");
+  B2DEBUG(100, "Setting up geometry for TEve...");
   //set colours by atomic mass number
   gGeoManager->DefaultColors();
 
@@ -234,7 +234,7 @@ void EVEVisualization::addGeometry()
   eve_top_node->SetRnrSelfChildren(m_fullgeo, m_fullgeo);
 
 
-  B2INFO("Loading geometry projections...");
+  B2DEBUG(100, "Loading geometry projections...");
 
   const std::string extractPath = FileSystem::findFile("/data/display/geometry_extract.root");
   TFile* f = TFile::Open(extractPath.c_str(), "READ");
@@ -250,6 +250,7 @@ void EVEVisualization::addGeometry()
   gEve->AddGlobalElement(gs);
 
   gs->SetRnrSelfChildren(false, !m_fullgeo);
+  B2DEBUG(100, "Done.");
 }
 
 void EVEVisualization::addTrack(const GFTrack* gftrack, const TString& label)

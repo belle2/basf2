@@ -113,7 +113,7 @@ void DisplayModule::event()
   //secondaries cannot be shown if they are merged into primaries
   m_visualizer->setAssignToPrimaries(m_assignToPrimaries && !m_showNeutrals && !m_showCharged);
   if (m_assignToPrimaries && (m_showNeutrals || m_showCharged)) {
-    B2WARNING("AssignHitsToPrimaries and ShowCharged/ShowNeutrals can not be used together!");
+    B2WARNING("assignHitsToPrimaries and showCharged/showNeutrals can not be used together!");
   }
 
   m_visualizer->setHideSecondaries(m_hideSecondaries);

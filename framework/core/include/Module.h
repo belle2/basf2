@@ -310,6 +310,18 @@ namespace Belle2 {
     /** Return module param list. */
     const ModuleParamList& getParamList() const { return m_moduleParamList; }
 
+    /**
+     * Returns a reference to a parameter. The returned parameter has already the correct type.
+     *
+     * Throws an exception of type ModuleParameterNotFoundError if a parameter with the given name does not exist.
+     * Throws an exception of type ModuleParameterTypeError if the parameter type of does not match to the template parameter.
+     *
+     * @param name The unique name of the parameter.
+     * @return A reference to a module parameter having the correct type.
+     */
+    template<typename T>
+    ModuleParam<T>& getParam(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError, ModuleParamList::ModuleParameterTypeError);
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //                   Python API
@@ -369,18 +381,6 @@ namespace Belle2 {
      */
     template<typename T>
     void addParam(const std::string& name, T& paramVariable, const std::string& description);
-
-    /**
-     * Returns a reference to a parameter. The returned parameter has already the correct type.
-     *
-     * Throws an exception of type ModuleParameterNotFoundError if a parameter with the given name does not exist.
-     * Throws an exception of type ModuleParameterTypeError if the parameter type of does not match to the template parameter.
-     *
-     * @param name The unique name of the parameter.
-     * @return A reference to a module parameter having the correct type.
-     */
-    template<typename T>
-    ModuleParam<T>& getParam(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError, ModuleParamList::ModuleParameterTypeError);
 
     /**
      * Sets the return value for this module as integer.

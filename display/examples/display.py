@@ -2,21 +2,25 @@
 # -*- coding: utf-8 -*-
 
 #
-# Opens the MCFittingEvtGenOutput.root file and shows MCParticles,
-# SimHits and  GFTracks using the Display module.
-
-# The input file can also be set using
+# Opens a .root file and shows MCParticles,
+# SimHits and GFTracks using the Display module.
+# Usage:
 #  basf2 display/example/display.py -i MyInputFile.root
 #
+# Note: this file is also used by the 'b2display' command,
+# so the following is also possible:
+#  b2display MyInputFile.root
+#
+# If you want custom settings for b2display, you thus only need to
+# edit this steering file.
 
 from basf2 import *
 
 # create paths
 main = create_path()
 
-input = register_module('RootInput')
-# set the input file, in this case, the output of MCFittingEvtGen.py example
-input.param('inputFileName', 'MCFittingEvtGenOutput.root')
+rootinput = register_module('RootInput')
+#no input file set, use -i
 
 # create geometry
 gearbox = register_module('Gearbox')
@@ -25,7 +29,7 @@ geometry = register_module('Geometry')
 # we'll exclude ECL (saves about 10s in startup time)
 geometry.param('ExcludedComponents', ['ECL'])
 
-main.add_module(input)
+main.add_module(rootinput)
 main.add_module(gearbox)
 main.add_module(geometry)
 

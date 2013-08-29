@@ -29,8 +29,6 @@ namespace Belle2 {
    * To create a list of PXDRecoHits for all PXDTrueHits belonging to one MCParticle do something like:
    *
    * @code
-   * //Set up random number generator if not already done
-   * if(!gRandom) gRandom = new TRandom3(0);
    * //Get the MCParticle in question
    * MCParticle* mcParticle = ...
    * //Assume some error on the position

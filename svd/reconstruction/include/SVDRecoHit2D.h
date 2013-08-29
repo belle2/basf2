@@ -27,8 +27,6 @@ namespace Belle2 {
    * To create a list of SVDRecoHits for all SVDTrueHits belonging to one MCParticle do something like:
    *
    * @code
-   * //Set up random number generator if not already done
-   * if(!gRandom) gRandom = new TRandom3(0);
    * //Get the MCParticle in question
    * MCParticle* mcParticle = ...
    * //Iterate over the relation and create a list of hits

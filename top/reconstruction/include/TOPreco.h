@@ -12,7 +12,7 @@
 #ifndef _TOPreco_h
 #define _TOPreco_h
 
-#include "TOPtrack.h"
+#include <top/reconstruction/TOPtrack.h>
 extern "C" {void set_beta_rq_(float*);}
 
 namespace Belle2 {

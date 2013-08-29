@@ -13,7 +13,7 @@
 #ifndef _TOPconfig_h
 #define _TOPconfig_h
 
-#include "TOPf77fun.h"
+#include <top/reconstruction/TOPf77fun.h>
 #include <cstring>
 
 namespace Belle2 {

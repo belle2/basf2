@@ -13,8 +13,8 @@
 #include <iomanip>
 #include <math.h>
 #include <stdlib.h>
-#include "top/modules/TOPReconstruction/TOPtrack.h"
-#include "top/modules/TOPReconstruction/TOPf77fun.h"
+#include <top/reconstruction/TOPtrack.h>
+#include <top/reconstruction/TOPf77fun.h>
 #include <TRandom3.h>
 #include <framework/gearbox/Const.h>
 

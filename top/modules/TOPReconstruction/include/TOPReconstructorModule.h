@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Petric, Marko Staric                                             *
+ * Contributors: Marko Petric, Marko Staric                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,7 +15,7 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <string>
 
-#include "top/modules/TOPReconstruction/TOPtrack.h"
+#include <top/reconstruction/TOPtrack.h>
 #include <framework/gearbox/Const.h>
 
 
@@ -88,11 +88,6 @@ namespace Belle2 {
       enum {c_LTrack = 0, c_LextHit, c_LbarHit};
 
       // Private methods
-
-      /**
-       * Configure TOP geometry for reconstruction
-       */
-      void TOPconfigure();
 
       /**
        * Return extrapolated tracks

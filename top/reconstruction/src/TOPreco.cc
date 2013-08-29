@@ -11,8 +11,9 @@
 
 #include <iostream>
 #include <iomanip>
-#include "top/modules/TOPReconstruction/TOPreco.h"
-#include "top/modules/TOPReconstruction/TOPf77fun.h"
+#include <top/reconstruction/TOPreco.h>
+#include <top/reconstruction/TOPf77fun.h>
+
 #include <framework/gearbox/Const.h>
 
 namespace Belle2 {

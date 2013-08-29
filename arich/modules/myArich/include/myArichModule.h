@@ -84,26 +84,28 @@ namespace Belle2 {
 
   private:
 
-    Int_t m_eventNo; //! Number of event in Tracks
-    Int_t m_trackNo; //! number of tracks(hits) per event
+    Int_t m_eventNo; /**< Number of event in Tracks */
+    Int_t m_trackNo; /**< Number of tracks(hits) per event */
 
-    std::string m_outputFile; //! output root file
-    int m_inputTrackType; //! Input particles from Track(GenFit+ext) or AeroHit(GEANT4 simulation)
+    std::string m_outputFile; /**< output root file */
 
-    TFile* file; //! pointer to output root file
-    TTree* tree; //! pointer to output tree
+    /** Input particles from Track(GenFit+ext) or AeroHit(GEANT4 simulation) */
+    int m_inputTrackType;
 
-    Float_t m_chi2; //! Chi2 p-value from MCTrackFit
-    Int_t m_pdg; //! PDG from the MC-generator
-    Int_t m_primary; //! MC Flag
+    TFile* file; /**< pointer to output root file */
+    TTree* tree; /**< pointer to output tree */
 
-    Float_t m_truePosition[3]; // Position of aeroHit (GEANT4)
-    Float_t m_position[3]; // Position of extrapolated particle
-    Float_t m_trueMomentum[3]; // Momentum of aeroHit (GEANT4)
-    Float_t m_momentum[3]; // Momentum of extrapolated particle
-    Float_t m_logl[5]; // Log likelihood (ARICH)
-    Int_t   m_detPhotons; // Detected photons in a ring (ARICH)
-    Float_t m_expPhotons[5]; // Theoretically expected photons (ARICH)
+    Float_t m_chi2; /**< Chi2 p-value from MCTrackFit */
+    Int_t m_pdg; /**< PDG from the MC-generator */
+    Int_t m_primary; /**< MC Flag */
+
+    Float_t m_truePosition[3]; /**< Position of aeroHit (GEANT4) */
+    Float_t m_position[3]; /**< Position of extrapolated particle */
+    Float_t m_trueMomentum[3]; /**< Momentum of aeroHit (GEANT4) */
+    Float_t m_momentum[3]; /**< Momentum of extrapolated particle */
+    Float_t m_logl[5]; /**< Log likelihood (ARICHReco) */
+    Int_t   m_detPhotons; /**< Detected photons in a ring (ARICHReco) */
+    Float_t m_expPhotons[5]; /**< Theoretically expected photons (ARICHReco) */
 
   };
 

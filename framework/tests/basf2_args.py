@@ -9,6 +9,10 @@ ret = os.system('basf2 --version')
 if ret != 0:
     sys.exit(1)
 
+ret = os.system('basf2 --help')
+if ret != 0:
+    sys.exit(1)
+
 ret = os.system('basf2 -m')
 if ret != 0:
     sys.exit(1)

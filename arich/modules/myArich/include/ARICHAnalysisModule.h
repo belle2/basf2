@@ -16,8 +16,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MYARICHMODULE_H
-#define MYARICHMODULE_H
+#ifndef ARICHANALYSISMODULE_H
+#define ARICHANALYSISMODULE_H
 
 #include <framework/core/Module.h>
 #include <string>
@@ -34,19 +34,19 @@ namespace Belle2 {
   /**
    *
    */
-  class myArichModule : public Module {
+  class ARICHAnalysisModule : public Module {
 
   public:
 
     /**
      * Constructor
      */
-    myArichModule();
+    ARICHAnalysisModule();
 
     /**
      * Destructor
      */
-    virtual ~myArichModule();
+    virtual ~ARICHAnalysisModule();
 
     /**
      * Initialize the Module.

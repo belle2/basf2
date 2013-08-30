@@ -113,7 +113,7 @@ arichRECO.logging.debug_level = 20
 arichRECO.param('inputTrackType', 0)
 
 # my module - reconstruction efficiency analysis
-arichEfficiency = register_module('myArich')
+arichEfficiency = register_module('ARICHAnalysis')
 arichEfficiency.logging.log_level = LogLevel.DEBUG
 arichEfficiency.logging.debug_level = 20
 arichEfficiency.param('outputFile', filename)

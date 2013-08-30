@@ -24,7 +24,7 @@
  **************************************************************************/
 
 // Own include
-#include <arich/modules/myArich/myArichModule.h>
+#include <arich/modules/myArich/ARICHAnalysisModule.h>
 
 #include <framework/core/ModuleManager.h>
 
@@ -58,13 +58,13 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(myArich)
+  REG_MODULE(ARICHAnalysis)
 
   //-----------------------------------------------------------------
   //                 Implementation
   //-----------------------------------------------------------------
 
-  myArichModule::myArichModule() : Module(),
+  ARICHAnalysisModule::ARICHAnalysisModule() : Module(),
     m_eventNo(-1),
     m_trackNo(-1),
     file(new TFile),
@@ -76,7 +76,7 @@ namespace Belle2 {
 
   {
     // set module description (e.g. insert text)
-    setDescription("Reconstruction efficiency analysis");
+    setDescription("The module saves variables needed for performance analysis, such as postion and momentum of the hit, likelihoods for hypotheses and number of photons.");
     setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
     // Add parameters
@@ -101,11 +101,11 @@ namespace Belle2 {
 
   }
 
-  myArichModule::~myArichModule()
+  ARICHAnalysisModule::~ARICHAnalysisModule()
   {
   }
 
-  void myArichModule::initialize()
+  void ARICHAnalysisModule::initialize()
   {
     B2DEBUG(50, "Initialize");
 
@@ -129,12 +129,12 @@ namespace Belle2 {
 
   }
 
-  void myArichModule::beginRun()
+  void ARICHAnalysisModule::beginRun()
   {
     B2DEBUG(50, "BeginRun");
   }
 
-  void myArichModule::event()
+  void ARICHAnalysisModule::event()
   {
     m_eventNo++;
     B2DEBUG(50, "Event" << m_eventNo);
@@ -252,17 +252,17 @@ namespace Belle2 {
   }
 
 
-  void myArichModule::endRun()
+  void ARICHAnalysisModule::endRun()
   {
   }
 
-  void myArichModule::terminate()
+  void ARICHAnalysisModule::terminate()
   {
     file->Write();
     file->Close();
   }
 
-  void myArichModule::printModuleParams() const
+  void ARICHAnalysisModule::printModuleParams() const
   {
   }
 

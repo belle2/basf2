@@ -10,23 +10,11 @@ from ROOT import Belle2
 
 
 class NoopModule(Module):
-
     """Doesn't do anything."""
-
-    def __init__(self):
-        """constructor."""
-
-        super(NoopModule, self).__init__()
 
 
 class TestModule(Module):
-
     """Test to read relations in the input files."""
-
-    def __init__(self):
-        """constructor."""
-
-        super(TestModule, self).__init__()
 
     def event(self):
         """reimplementation of Module::event().

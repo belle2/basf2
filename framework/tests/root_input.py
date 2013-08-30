@@ -12,10 +12,6 @@ from ROOT import Belle2
 class NoopModule(Module):
     """Doesn't do anything."""
 
-    def __init__(self):
-        """constructor."""
-        super(NoopModule, self).__init__()
-
 
 # copy input file into current dir to avoid having the full path in .out file
 try:

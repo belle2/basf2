@@ -8,13 +8,7 @@ from ROOT import Belle2
 
 
 class SelectOddEvents(Module):
-
     """For events with an odd event number, set module return value to False"""
-
-    def __init__(self):
-        """constructor."""
-
-        super(SelectOddEvents, self).__init__()
 
     def event(self):
         """reimplementation of Module::event()."""

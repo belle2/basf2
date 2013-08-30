@@ -12,13 +12,7 @@ from ROOT import Belle2
 
 
 class TestModule(Module):
-
     """Test to read relations."""
-
-    def __init__(self):
-        """constructor."""
-
-        super(TestModule, self).__init__()
 
     def event(self):
         """reimplementation of Module::event().

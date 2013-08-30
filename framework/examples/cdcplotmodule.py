@@ -82,10 +82,6 @@ class CDCPlotModule(Module):
     ## event counter
     num_events = 0
 
-    def __init__(self):
-        """constructor."""
-        super(CDCPlotModule, self).__init__()
-
     def event(self):
         """reimplementation of Module::event().
 

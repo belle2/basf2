@@ -9,11 +9,6 @@ class MinModule(Module):
     """
     Example module to drop into ipython and create some objects to look at.
     """
-    def __init__(self):
-        """
-        call constructor of base class, required.
-        """
-        super(MinModule, self).__init__()
 
     def event(self):
         """

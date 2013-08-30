@@ -11,11 +11,6 @@ from ROOT import Belle2
 class PrintFileMetaData(Module):
     """Print FileMetaData object."""
 
-    def __init__(self):
-        """constructor."""
-
-        super(PrintFileMetaData, self).__init__()
-
     def initialize(self):
         """reimplementation of Module::initialize()."""
 

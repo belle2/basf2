@@ -8,18 +8,14 @@ from ROOT import Belle2
 class NoopModule(Module):
     """Doesn't do anything."""
 
-    def __init__(self):
-        """constructor."""
-        super(NoopModule, self).__init__()
-
 
 class EvtMetaDataTest(Module):
-
     """Prints EventMetaData objects and stops event processing in event 3."""
 
     def __init__(self):
         """constructor."""
 
+        # need to call super() _if_ we reimplement the constructor
         super(EvtMetaDataTest, self).__init__()
         B2INFO('event\trun\texp')
 

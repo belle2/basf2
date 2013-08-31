@@ -62,7 +62,7 @@ namespace Belle2 {
     addParam("p", m_p, "track momentum magnitude [GeV/c]", 2.1);
     addParam("theta", m_theta, "track polar angle [deg]", 90.0);
     addParam("phi", m_phi, "track azimuthal angle [deg]", 0.0);
-    addParam("t0", m_t0, "offset time to add for adjusting photon TDC times [ns]", 0.0);
+    addParam("t0", m_t0, "common offset to be added to photon TDC times [ns]", 0.0);
 
     // initialize other private data members
     m_file = NULL;
@@ -95,6 +95,7 @@ namespace Belle2 {
     if (!m_file->IsOpen()) B2FATAL("can't open file " << filename);
 
     m_treeTop = (TTree*)m_file->Get("top");
+    if (!m_treeTop) B2FATAL("No top tree found in file " << m_inputFileName);
 
     m_treeTop->SetBranchAddress("runNum", &(m_top.runNum));
     m_treeTop->SetBranchAddress("eventNum", &(m_top.eventNum));

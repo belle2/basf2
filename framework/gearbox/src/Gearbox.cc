@@ -124,8 +124,8 @@ namespace Belle2 {
     //Open document
     m_xmlDocument = xmlParseFile(name.c_str());
 
-#if LIBXML_VERSION >= 20900
-    //libxml >= 2.9.0 introduced some limits on node size etc. which breaks VXDTF files
+#if LIBXML_VERSION >= 20700
+    //libxml >= 2.7.0 introduced some limits on node size etc. which breaks reading VXDTF files
     xmlXIncludeProcessFlags(m_xmlDocument, XML_PARSE_HUGE);
 #else
     xmlXIncludeProcess(m_xmlDocument);

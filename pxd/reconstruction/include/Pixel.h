@@ -38,10 +38,18 @@ namespace Belle2 {
       Pixel(const PXDDigit* digit, unsigned int index): m_index(index),
         m_u(digit->getUCellID()), m_v(digit->getVCellID()),
         m_charge(digit->getCharge()) {}
+
       /** Comparison operator, sorting by row,column in ascending order */
       bool operator<(const Pixel& b) const { return m_v < b.m_v || (m_v == b.m_v && m_u < b.m_u); }
+      /** Comparison operator, sorting by row,column in ascending order */
+      bool operator<=(const Pixel& b) const { return  m_v < b.m_v || (m_v == b.m_v && m_u <= b.m_u); }
+      /** Comparison operator, sorting by row,column in ascending order */
+      bool operator>(const Pixel& b) const { return b < *this; }
+      /** Comparison operator, sorting by row,column in ascending order */
+      bool operator>=(const Pixel& b) const { return  b <= *this; }
       /** Equality operator */
       bool operator==(const Pixel& b) const { return m_v == b.m_v && m_u == b.m_u; }
+
       /** Return the CellID in u */
       unsigned short getU() const { return m_u; }
       /** Return the CellID in v */
@@ -50,6 +58,7 @@ namespace Belle2 {
       float getCharge() const { return m_charge; }
       /** Return the Index of the digit */
       unsigned int getIndex() const { return m_index; }
+
     private:
       /** Index of the corresponding PXDDigit in the StoreArray */
       unsigned int m_index;

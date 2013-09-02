@@ -160,33 +160,31 @@ void PXDClusterizerModule::event()
 
   //We require all pixels are already sorted and directly cluster them. Once
   //the sensorID changes, we write out all existing clusters and continue.
-  VxdID sensorID;
-  unsigned int lastU(0), lastV(0);
+  VxdID sensorID(0);
+  //To check sorting
+  Pixel lastPixel;
   for (int i = 0; i < nPixels; i++) {
     const PXDDigit* const digit = storeDigits[i];
     Pixel px(digit, i);
-    //Load the correct noise map for the first pixel
-    if (i == 0)
-      m_noiseMap.setSensorID(digit->getSensorID());
-    //Ignore digits with not enough signal
-    if (!m_noiseMap(px, m_cutAdjacent))
-      continue;
-
     //New sensor, write clusters
     if (sensorID != digit->getSensorID()) {
       writeClusters(sensorID);
       sensorID = digit->getSensorID();
       //Load the correct noise map for the new sensor
       m_noiseMap.setSensorID(sensorID);
-    } else if (lastV > px.getV()
-               || (lastV == px.getV() && lastU > px.getU())) {
+    } else if (px <= lastPixel) {
       //Check for sorting as precaution
-      B2FATAL("Pixels are not sorted correctly, please change the assumeSorted "
-              "parameter to false or fix the input to be ordered by v,u in "
-              "ascending order");
+      B2FATAL("Pixels are not sorted correctly, please include the "
+              "PXDDigitSorter module before running the Clusterizer or fix "
+              "the input to be ordered by v,u in ascending order");
     }
-    lastU = px.getU();
-    lastV = px.getV();
+    //Remember last pixel to check sorting
+    lastPixel = px;
+
+    //Ignore digits with not enough signal. Has to be done after the check of
+    //the SensorID to make sure we compare to the correct noise level
+    if (!m_noiseMap(px, m_cutAdjacent)) continue;
+
     // TODO: If we would like to cluster across dead channels we would need a
     // sorted list of dead pixels. Assuming we have such a list m_deadChannels
     // containing Pixel instances with all dead channels of this sensor and

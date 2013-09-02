@@ -40,9 +40,6 @@ namespace Belle2 {
     class PXDClusterizerModule : public Module {
 
     public:
-      /** Container to sort the hits by row and column */
-      typedef std::set<Pixel> Sensor;
-
       /** Container for a RelationArray Lookup table */
       typedef std::vector<const RelationElement*> RelationLookup;
 
@@ -122,8 +119,6 @@ namespace Belle2 {
       unsigned int m_sizeHeadTail;
       /** LorentzAngle , FIXME: should be determined directly from B-Field */
       double m_tanLorentzAngle;
-      /** Assume the PXDDigits to be sorted so we can skip sorting them */
-      bool m_assumeSorted;
 
       /** cache of the last seen clusters to speed up clustering */
       ClusterCache m_cache;

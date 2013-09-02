@@ -66,9 +66,6 @@ PXDClusterizerModule::PXDClusterizerModule() :
 
   addParam("TanLorentz", m_tanLorentzAngle, "Tangent of the Lorentz angle",
            double(0.25));
-  addParam("AssumeSorted", m_assumeSorted,
-           "Assume Digits in Collection are orderd by sensor,row,column in ascending order",
-           true);
 }
 
 void PXDClusterizerModule::initialize()
@@ -118,7 +115,6 @@ void PXDClusterizerModule::initialize()
   B2INFO(" -->  ClusterDigitRel:    " << m_relClusterDigitName);
   B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
   B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
-  B2INFO(" -->  AssumeSorted:       " << (m_assumeSorted ? "true" : "false"));
   B2INFO(" -->  TanLorentz:         " << m_tanLorentzAngle);
 
   //This is still static noise for all pixels, should be done more sophisticated in the future
@@ -162,82 +158,55 @@ void PXDClusterizerModule::event()
 
   m_cache.clear();
 
-  if (!m_assumeSorted) {
-    //If the pixels are in random order, we have to sort them first before we can cluster them
-    std::map<VxdID, Sensor> sensors;
-    //Fill sensors
-    for (int i = 0; i < nPixels; i++) {
-      const PXDDigit* const digit = storeDigits[i];
-      Pixel px(digit, i);
-      VxdID sensorID = digit->getSensorID();
-      std::pair<Sensor::iterator, bool> it = sensors[sensorID].insert(px);
-      if (!it.second)
-        B2ERROR(
-          "Pixel (" << px.getU() << "," << px.getV() << ") in sensor " << (string)sensorID << " is already set, ignoring second occurence");
-    }
+  //We require all pixels are already sorted and directly cluster them. Once
+  //the sensorID changes, we write out all existing clusters and continue.
+  VxdID sensorID;
+  unsigned int lastU(0), lastV(0);
+  for (int i = 0; i < nPixels; i++) {
+    const PXDDigit* const digit = storeDigits[i];
+    Pixel px(digit, i);
+    //Load the correct noise map for the first pixel
+    if (i == 0)
+      m_noiseMap.setSensorID(digit->getSensorID());
+    //Ignore digits with not enough signal
+    if (!m_noiseMap(px, m_cutAdjacent))
+      continue;
 
-    //Now we loop over sensors and cluster each sensor in turn
-    for (map<VxdID, Sensor>::iterator it = sensors.begin(); it != sensors.end();
-         ++it) {
-      m_noiseMap.setSensorID(it->first);
-      for (const PXD::Pixel & px : it->second) {
-        if (!m_noiseMap(px, m_cutAdjacent)) continue;
-        m_cache.findCluster(px.getU(), px.getV()).add(px);
-      }
-      writeClusters(it->first);
-      it->second.clear();
+    //New sensor, write clusters
+    if (sensorID != digit->getSensorID()) {
+      writeClusters(sensorID);
+      sensorID = digit->getSensorID();
+      //Load the correct noise map for the new sensor
+      m_noiseMap.setSensorID(sensorID);
+    } else if (lastV > px.getV()
+               || (lastV == px.getV() && lastU > px.getU())) {
+      //Check for sorting as precaution
+      B2FATAL("Pixels are not sorted correctly, please change the assumeSorted "
+              "parameter to false or fix the input to be ordered by v,u in "
+              "ascending order");
     }
-  } else {
-    //If we can assume that all pixels are already sorted we can skip the
-    //reordering and directly cluster them once the sensorID changes, we write
-    //out all existing clusters and continue
-    VxdID sensorID;
-    unsigned int lastU(0), lastV(0);
-    for (int i = 0; i < nPixels; i++) {
-      const PXDDigit* const digit = storeDigits[i];
-      Pixel px(digit, i);
-      //Load the correct noise map for the first pixel
-      if (i == 0)
-        m_noiseMap.setSensorID(digit->getSensorID());
-      //Ignore digits with not enough signal
-      if (!m_noiseMap(px, m_cutAdjacent))
-        continue;
+    lastU = px.getU();
+    lastV = px.getV();
+    // TODO: If we would like to cluster across dead channels we would need a
+    // sorted list of dead pixels. Assuming we have such a list m_deadChannels
+    // containing Pixel instances with all dead channels of this sensor and
+    // m_currentDeadChannel is an iterator to that list (initialized to
+    // begin(m_deadChannels) when the sensorID changes), we would do
+    //
+    // while(m_currentDeadChannel != end(m_deadChannels) && *m_currentDeadChannel < px){
+    //   m_cache.findCluster(m_currentDeadChannel->getU(), m_currentDeadChannel->getV());
+    //   m_currentDeadChannel++;
+    // }
+    //
+    // This would have the effect of marking the pixel address as belonging
+    // to a cluster but would not modify the clusters itself (except for
+    // possible merging of clusters) so we would end up with clusters that
+    // contain holes or are disconnected.
 
-      //New sensor, write clusters
-      if (sensorID != digit->getSensorID()) {
-        writeClusters(sensorID);
-        sensorID = digit->getSensorID();
-        //Load the correct noise map for the new sensor
-        m_noiseMap.setSensorID(sensorID);
-      } else if (lastV > px.getV()
-                 || (lastV == px.getV() && lastU > px.getU())) {
-        //Check for sorting as precaution
-        B2FATAL(
-          "Pixels are not sorted correctly, please change the assumeSorted parameter " << "to false or fix the input to be ordered by v,u in ascending order");
-      }
-      lastU = px.getU();
-      lastV = px.getV();
-      // TODO: If we would like to cluster across dead channels we would need a
-      // sorted list of dead pixels. Assuming we have such a list m_deadChannels
-      // containing Pixel instances with all dead channels of this sensor and
-      // m_currentDeadChannel is an iterator to that list (initialized to  we
-      // would do begin(m_deadChannels) when the sensorID changes) we would do
-      //
-      // while(m_currentDeadChannel != end(m_deadChannels) && *m_currentDeadChannel < px){
-      //   m_cache.findCluster(m_currentDeadChannel->getU(), m_currentDeadChannel->getV());
-      //   m_currentDeadChannel++;
-      // }
-      //
-      // This would have the effect of marking the pixel address as belonging
-      // to a cluster but would not modify the clusters itself (except for
-      // possible merging of clusters) so we would end up with clusters that
-      // contain holes or are disconnected.
-
-      // Find correct cluster and add pixel to cluster
-      m_cache.findCluster(px.getU(), px.getV()).add(px);
-    }
-    writeClusters(sensorID);
+    // Find correct cluster and add pixel to cluster
+    m_cache.findCluster(px.getU(), px.getV()).add(px);
   }
+  writeClusters(sensorID);
 }
 
 void PXDClusterizerModule::createRelationLookup(const RelationArray& relation, RelationLookup& lookup, size_t digits)

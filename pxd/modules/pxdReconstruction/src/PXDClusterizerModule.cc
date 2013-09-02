@@ -12,7 +12,6 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
@@ -24,6 +23,7 @@
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
+
 #include <boost/foreach.hpp>
 
 using namespace std;
@@ -33,7 +33,7 @@ using namespace Belle2::PXD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDClusterizer)
+REG_MODULE(PXDClusterizer);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -125,24 +125,14 @@ void PXDClusterizerModule::initialize()
 
   //This is still static noise for all pixels, should be done more sophisticated in the future
   m_noiseMap.setNoiseLevel(m_elNoise);
-}
-
-inline void PXDClusterizerModule::findCluster(const Pixel& px)
-{
-  ClusterCandidate* prev = m_cache.findCluster(px.getU(), px.getV());
-  if (!prev) {
-    m_clusters.push_back(ClusterCandidate());
-    prev = &m_clusters.back();
-  }
-  prev->add(px);
-  m_cache.setLast(px.getU(), px.getV(), prev);
+  m_cutElectrons = m_elNoise * m_cutAdjacent;
 }
 
 void PXDClusterizerModule::event()
 {
-  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
-  StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
+  const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  const StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
+  const StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
   StoreArray<PXDCluster> storeClusters(m_storeClustersName);
 
   if (!storeClusters.isValid())
@@ -152,21 +142,26 @@ void PXDClusterizerModule::event()
 
   RelationArray relClusterMCParticle(storeClusters, storeMCParticles,
                                      m_relClusterMCParticleName);
-  relClusterMCParticle.clear();
+  if (relClusterMCParticle) relClusterMCParticle.clear();
 
   RelationArray relClusterDigit(storeClusters, storeDigits,
                                 m_relClusterDigitName);
-  relClusterDigit.clear();
+  if (relClusterDigit) relClusterDigit.clear();
 
   RelationArray relClusterTrueHit(storeClusters, storeTrueHits,
                                   m_relClusterTrueHitName);
-  relClusterTrueHit.clear();
+  if (relClusterTrueHit) relClusterTrueHit.clear();
 
   int nPixels = storeDigits.getEntries();
   if (nPixels == 0)
     return;
 
-  m_clusters.clear();
+  //Build lookup tables for relations
+  RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
+  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
+  createRelationLookup(relDigitMCParticle, m_mcRelation, storeDigits.getEntries());
+  createRelationLookup(relDigitTrueHit, m_trueRelation, storeDigits.getEntries());
+
   m_cache.clear();
 
   if (!m_assumeSorted) {
@@ -174,8 +169,9 @@ void PXDClusterizerModule::event()
     std::map<VxdID, Sensor> sensors;
     //Fill sensors
     for (int i = 0; i < nPixels; i++) {
-      Pixel px(storeDigits[i], i);
-      VxdID sensorID = px.get()->getSensorID();
+      const PXDDigit* const digit = storeDigits[i];
+      Pixel px(digit, i);
+      VxdID sensorID = digit->getSensorID();
       std::pair<Sensor::iterator, bool> it = sensors[sensorID].insert(px);
       if (!it.second)
         B2ERROR(
@@ -188,7 +184,7 @@ void PXDClusterizerModule::event()
       m_noiseMap.setSensorID(it->first);
       BOOST_FOREACH(const PXD::Pixel & px, it->second) {
         if (!m_noiseMap(px, m_cutAdjacent)) continue;
-        findCluster(px);
+        m_cache.findCluster(px.getU(), px.getV()).add(px);
       }
       writeClusters(it->first);
       it->second.clear();
@@ -200,18 +196,19 @@ void PXDClusterizerModule::event()
     VxdID sensorID;
     unsigned int lastU(0), lastV(0);
     for (int i = 0; i < nPixels; i++) {
-      Pixel px(storeDigits[i], i);
+      const PXDDigit* const digit = storeDigits[i];
+      Pixel px(digit, i);
       //Load the correct noise map for the first pixel
       if (i == 0)
-        m_noiseMap.setSensorID(px.getSensorID());
+        m_noiseMap.setSensorID(digit->getSensorID());
       //Ignore digits with not enough signal
       if (!m_noiseMap(px, m_cutAdjacent))
         continue;
 
       //New sensor, write clusters
-      if (sensorID != px.getSensorID()) {
+      if (sensorID != digit->getSensorID()) {
         writeClusters(sensorID);
-        sensorID = px.getSensorID();
+        sensorID = digit->getSensorID();
         //Load the correct noise map for the new sensor
         m_noiseMap.setSensorID(sensorID);
       } else if (lastV > px.getV()
@@ -222,22 +219,65 @@ void PXDClusterizerModule::event()
       }
       lastU = px.getU();
       lastV = px.getV();
+      // TODO: If we would like to cluster across dead channels we would need a
+      // sorted list of dead pixels. Assuming we have such a list m_deadChannels
+      // containing Pixel instances with all dead channels of this sensor and
+      // m_currentDeadChannel is an iterator to that list (initialized to  we
+      // would do begin(m_deadChannels) when the sensorID changes) we would do
+      //
+      // while(m_currentDeadChannel != end(m_deadChannels) && *m_currentDeadChannel < px){
+      //   m_cache.findCluster(m_currentDeadChannel->getU(), m_currentDeadChannel->getV());
+      //   m_currentDeadChannel++;
+      // }
+      //
+      // This would have the effect of marking the pixel address as belonging
+      // to a cluster but would not modify the clusters itself (except for
+      // possible merging of clusters) so we would end up with clusters that
+      // contain holes or are disconnected.
+
       // Find correct cluster and add pixel to cluster
-      findCluster(px);
+      m_cache.findCluster(px.getU(), px.getV()).add(px);
     }
     writeClusters(sensorID);
   }
 }
 
+void PXDClusterizerModule::createRelationLookup(const RelationArray& relation, RelationLookup& lookup, size_t digits)
+{
+  lookup.clear();
+  //If we don't have a relation we don't build a lookuptable
+  if (!relation) return;
+  //Resize to number of digits and set all values
+  lookup.resize(digits);
+  const unsigned int size = relation.getEntries();
+  for (unsigned int i = 0; i < size; ++i) {
+    const RelationElement& element = relation[i];
+    lookup[element.getFromIndex()] = &element;
+  }
+}
+
+void PXDClusterizerModule::fillRelationMap(const RelationLookup& lookup, std::map<unsigned int, float>& relation, unsigned int index)
+{
+  //If the lookuptable is not empty and the element is set
+  if (!lookup.empty() && lookup[index]) {
+    const RelationElement& element = *lookup[index];
+    const unsigned int size = element.getSize();
+    //Add all Relations to the map
+    for (unsigned int i = 0; i < size; ++i) {
+      relation[element.getToIndex(i)] += element.getWeight(i);
+    }
+  }
+}
+
 void PXDClusterizerModule::writeClusters(VxdID sensorID)
 {
-  if (m_clusters.empty())
+  if (m_cache.empty())
     return;
 
   //Get all datastore elements
-  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
-  StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
-  StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
+  const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  const StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
+  const StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
   StoreArray<PXDCluster> storeClusters(m_storeClustersName);
   RelationArray relClusterMCParticle(storeClusters, storeMCParticles,
                                      m_relClusterMCParticleName);
@@ -245,141 +285,104 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
                                 m_relClusterDigitName);
   RelationArray relClusterTrueHit(storeClusters, storeTrueHits,
                                   m_relClusterTrueHitName);
-  RelationIndex<PXDDigit, MCParticle> relDigitMCParticle(storeDigits,
-                                                         storeMCParticles, m_relDigitMCParticleName);
-  RelationIndex<PXDDigit, PXDTrueHit> relDigitTrueHit(storeDigits,
-                                                      storeTrueHits, m_relDigitTrueHitName);
 
   //Get Geometry information
   const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(
                                                              sensorID));
 
-  BOOST_FOREACH(ClusterCandidate & cls, m_clusters) {
+  map<unsigned int, float> mc_relations;
+  map<unsigned int, float> truehit_relations;
+  vector<pair<unsigned int, float> > digit_weights;
+
+  BOOST_FOREACH(ClusterCandidate & cls, m_cache) {
     //Check for noise cuts
     if (!(cls.size() > 0 && m_noiseMap(cls.getCharge(), m_cutCluster) && m_noiseMap(cls.getSeed(), m_cutSeed))) continue;
 
-    const Pixel& seed = cls.getSeed();
-    unsigned int maxU(0), minU(info.getUCells() - 1) , maxV(0), minV(info.getVCells() - 1);
-    double minUCharge(0), maxUCharge(0), minVCharge(0), maxVCharge(0);
-    double posU(0), posV(0);
-
-// For head tail, we need the min/max pixels in both directions. To avoid copy
-// pasting, we define a macro for checking if the ID is at the border
-#define SET_CLUSTER_LIMIT(var,op,cell,charge)\
-  if(var op cell){\
-    var = cell;\
-    var##Charge = charge;\
-  }else if(var == cell){\
-    var##Charge += charge;\
-  }
-
-    map<int, float> mc_relations;
-    map<int, float> truehit_relations;
-    vector<pair<int, float> > digit_weights;
+    double rho(0);
+    ClusterProjection projU, projV;
+    mc_relations.clear();
+    truehit_relations.clear();
+    digit_weights.clear();
     digit_weights.reserve(cls.size());
+
+    const Pixel& seed = cls.getSeed();
+
     BOOST_FOREACH(const PXD::Pixel & px, cls.pixels()) {
-      SET_CLUSTER_LIMIT(minU, > , px.getU(), px.getCharge());
-      SET_CLUSTER_LIMIT(maxU, < , px.getU(), px.getCharge());
-      SET_CLUSTER_LIMIT(minV, > , px.getV(), px.getCharge());
-      SET_CLUSTER_LIMIT(maxV, < , px.getV(), px.getCharge());
+      //Add the Pixel information to the two projections
+      projU.add(px.getU(), info.getUCellPosition(px.getU()), px.getCharge());
+      projV.add(px.getV(), info.getVCellPosition(px.getV()), px.getCharge());
 
-      posU += px.getCharge() * info.getUCellPosition(px.getU());
-      posV += px.getCharge() * info.getVCellPosition(px.getV());
-
-      typedef const RelationIndex<PXDDigit, MCParticle>::Element relMC_type;
-      typedef const RelationIndex<PXDDigit, PXDTrueHit>::Element relTrueHit_type;
-
-      //Fill map with MCParticle relations
-      BOOST_FOREACH(relMC_type & mcRel, relDigitMCParticle.getElementsFrom(px.get())) {
-        mc_relations[mcRel.indexTo] += mcRel.weight;
-      };
-      //Fill map with PXDTrueHit relations
-      BOOST_FOREACH(relTrueHit_type & trueRel, relDigitTrueHit.getElementsFrom(px.get())) {
-        truehit_relations[trueRel.indexTo] += trueRel.weight;
-      };
-      //Add digit to the Cluster->Digit relation list
-      digit_weights.push_back(make_pair(px.getIndex(), px.getCharge()));
+      //Obtain relations from MCParticles
+      fillRelationMap(m_mcRelation, mc_relations, px.getIndex());
+      //Obtain relations from PXDTrueHits
+      fillRelationMap(m_trueRelation, truehit_relations, px.getIndex());
+      //Save the weight of the digits for the Cluster->Digit relation
+      digit_weights.push_back(std::make_pair(px.getIndex(), px.getCharge()));
     }
-    posU /= cls.getCharge();
-    posV /= cls.getCharge();
-    const int sizeU = maxU - minU + 1;
-    const int sizeV = maxV - minV + 1;
+    projU.finalize();
+    projV.finalize();
+
+    const double pitchU = info.getUPitch();
+    const double pitchV = info.getVPitch(projV.getPos());
     // Calculate shape correlation coefficient: only for non-trivial shapes
-    double uError(0), vError(0), rho(0);
-    if ((sizeU > 1) && (sizeV > 1)) {
+    if (projU.getSize() > 1 && projV.getSize() > 1) {
       // Add in-pixel position noise to smear the correlation
-      double posUU = cls.getCharge() * info.getUPitch() * info.getUPitch() / 12.0;
-      double posVV = cls.getCharge() * info.getVPitch() * info.getVPitch() / 12.0;
+      double posUU = cls.getCharge() * pitchU * pitchU / 12.0;
+      double posVV = cls.getCharge() * pitchV * pitchV / 12.0;
       double posUV(0);
-      BOOST_FOREACH(const PXD::Pixel & px, cls.pixels()) {
-        double du = info.getUCellPosition(px.getU()) - posU;
-        double dv = info.getVCellPosition(px.getV()) - posV;
+      BOOST_FOREACH(const Pixel & px, cls.pixels()) {
+        const double du = info.getUCellPosition(px.getU()) - projU.getPos();
+        const double dv = info.getVCellPosition(px.getV()) - projV.getPos();
         posUU += px.getCharge() * du * du;
         posVV += px.getCharge() * dv * dv;
         posUV += px.getCharge() * du * dv;
       }
       rho = posUV / sqrt(posUU * posVV);
     }
-    if (sizeU >= m_sizeHeadTail) {
-      //Average charge in the central area
-      double centreCharge = (cls.getCharge() - minUCharge - maxUCharge) / (sizeU - 2);
-      minUCharge = (minUCharge < centreCharge) ? minUCharge : centreCharge;
-      maxUCharge = (maxUCharge < centreCharge) ? maxUCharge : centreCharge;
-      double minUPos = info.getUCellPosition(minU);
-      double maxUPos = info.getUCellPosition(maxU);
-      posU = 0.5 * (minUPos + maxUPos + (maxUCharge - minUCharge) / centreCharge * info.getUPitch());
-      double sn = centreCharge / m_cutAdjacent / m_elNoise;
-      double landauHead = minUCharge / centreCharge;
-      double landauTail = maxUCharge / centreCharge;
-      uError = 0.5 * info.getUPitch() * sqrt(2.0 / sn / sn +
-                                             0.5 * landauHead * landauHead + 0.5 * landauTail * landauTail);
-    } else if (sizeU <= 2) { // Add a phantom charge to second strip
-      double phantomCharge = m_cutAdjacent * m_elNoise;
-      uError = info.getUPitch() * (sizeV + 2) * phantomCharge / (cls.getCharge() + (sizeV + 3) * phantomCharge);
-    } else { // from 3 to m_sizeHeadTail
-      double sn = cls.getSeedCharge() / m_elNoise;
-      uError = 2 * info.getUPitch() / sn;
-    }
-    if (sizeV >= m_sizeHeadTail) {
-      //Average charge in the central area
-      double centreCharge = (cls.getCharge() - minVCharge - maxVCharge) / (sizeV - 2);
-      minVCharge = (minVCharge < centreCharge) ? minVCharge : centreCharge;
-      maxVCharge = (maxVCharge < centreCharge) ? maxVCharge : centreCharge;
-      double minVPos = info.getVCellPosition(minV);
-      double maxVPos = info.getVCellPosition(maxV);
-      posV = 0.5 * (minVPos + maxVPos + (maxVCharge * info.getVPitch(maxVPos) -
-                                         minVCharge * info.getVPitch(minVPos)) / centreCharge);
-      double snHead = centreCharge / m_cutAdjacent / m_elNoise / info.getVPitch(minVPos);
-      double snTail = centreCharge / m_cutAdjacent / m_elNoise / info.getVPitch(maxVPos);
-      double landauHead = minVCharge / centreCharge * info.getVPitch(minVPos);
-      double landauTail = maxVCharge / centreCharge * info.getVPitch(maxVPos);
-      vError = 0.5 * sqrt(1.0 / snHead / snHead + 1.0 / snTail / snTail +
-                          0.5 * landauHead * landauHead + 0.5 * landauTail * landauTail);
-    } else if (sizeV <= 2) { // Add a phantom charge to second strip
-      double phantomCharge = m_cutAdjacent * m_elNoise;
-      vError = info.getVPitch(posV) * (sizeU + 2) * phantomCharge / (cls.getCharge() + (sizeU + 3) * phantomCharge);
-    } else { // from 3 to m_sizeHeadTail
-      double sn = cls.getSeedCharge() / m_elNoise;
-      vError = 2 * info.getVPitch(posV) / sn;
-    }
+
+    //Calculate position and error with u as primary axis, fixed pitch size
+    calculatePositionError(cls, projU, projV, pitchU, pitchU, pitchU);
+    //Calculate position and error with v as primary axis, possibly different pitch sizes
+    calculatePositionError(cls, projV, projU, info.getVPitch(projV.getMinPos()), pitchV, info.getVPitch(projV.getMaxPos()));
 
     //Lorentz shift correction FIXME: get from Bfield
-    posU -= 0.5 * info.getThickness() * m_tanLorentzAngle;
+    projU.setPos(projU.getPos() - 0.5 * info.getThickness() * m_tanLorentzAngle);
 
     //Store Cluster into Datastore ...
     int clsIndex = storeClusters.getEntries();
-    storeClusters.appendNew(PXDCluster(
-                              seed.get()->getSensorID(), posU, posV, uError, vError,
-                              rho, cls.getCharge(), seed.getCharge(),
-                              cls.size(), sizeU, sizeV, minU, minV
-                            ));
+    new(storeClusters.nextFreeAddress()) PXDCluster(sensorID, projU.getPos(), projV.getPos(), projU.getError(), projV.getError(),
+                                                    rho, cls.getCharge(), seed.getCharge(),
+                                                    cls.size(), projU.getSize(), projV.getSize(), projU.getMinCell(), projV.getMinCell()
+                                                   );
 
     //Create Relations to this Digit
-    relClusterMCParticle.add(clsIndex, mc_relations.begin(), mc_relations.end());
-    relClusterTrueHit.add(clsIndex, truehit_relations.begin(), truehit_relations.end());
+    if (!mc_relations.empty()) relClusterMCParticle.add(clsIndex, mc_relations.begin(), mc_relations.end());
+    if (!truehit_relations.empty()) relClusterTrueHit.add(clsIndex, truehit_relations.begin(), truehit_relations.end());
     relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
   }
 
-  m_clusters.clear();
   m_cache.clear();
+}
+
+void PXDClusterizerModule::calculatePositionError(const ClusterCandidate& cls, ClusterProjection& primary, const ClusterProjection& secondary, double minPitch, double centerPitch, double maxPitch)
+{
+  if (primary.getSize() >= m_sizeHeadTail) { //Analog head tail
+    //Average charge in the central area
+    const double centerCharge = primary.getCenterCharge() / (primary.getSize() - 2);
+    const double minCharge = (primary.getMinCharge() < centerCharge) ? primary.getMinCharge() : centerCharge;
+    const double maxCharge = (primary.getMaxCharge() < centerCharge) ? primary.getMaxCharge() : centerCharge;
+    primary.setPos(0.5 * (primary.getMinPos() + primary.getMaxPos()
+                          + (maxCharge * maxPitch - minCharge * minPitch) / centerCharge));
+    const double snHead = centerCharge / m_cutElectrons / minPitch;
+    const double snTail = centerCharge / m_cutElectrons / maxPitch;
+    const double landauHead = minCharge / centerCharge * minPitch;
+    const double landauTail = maxCharge / centerCharge * maxPitch;
+    primary.setError(0.5 * sqrt(1.0 / snHead / snHead + 1.0 / snTail / snTail
+                                + 0.5 * landauHead * landauHead + 0.5 * landauTail * landauTail));
+  } else if (primary.getSize() <= 2) { // Add a phantom charge to second strip
+    primary.setError(centerPitch * (secondary.getSize() + 2) * m_cutElectrons / (primary.getCharge() + (secondary.getSize() + 3) * m_cutElectrons));
+  } else {
+    const double sn = cls.getSeedCharge() / m_elNoise;
+    primary.setError(2.0 * centerPitch / sn);
+  }
 }

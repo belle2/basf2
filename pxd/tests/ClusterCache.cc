@@ -10,12 +10,13 @@
 
 #include <pxd/reconstruction/ClusterCache.h>
 #include <gtest/gtest.h>
+#include <bitset>
+#include <boost/foreach.hpp>
 
 using namespace std;
 
 namespace Belle2 {
   namespace PXD {
-
     /** Check that we cluster to hits next to each other but not if one is in between.
      *
      * So we set a cluster at position (2,0) marked c and the findCluster
@@ -43,41 +44,20 @@ namespace Belle2 {
     TEST(ClusterCache, FindNeighbours)
     {
       ClusterCache cache;
-      ClusterCandidate cls;
-
-      cache.setLast(2, 0, &cls);
-      //Right pixel belongs to cluster
-      EXPECT_EQ(&cls,                 cache.findCluster(3, 0));
-      //Next to right is not clustered
-      EXPECT_EQ((ClusterCandidate*)0, cache.findCluster(4, 0));
-      //one down, two columns left is to far away
-      EXPECT_EQ((ClusterCandidate*)0, cache.findCluster(0, 1));
-      //We also want the bottom left pixel
-      EXPECT_EQ(&cls,                 cache.findCluster(1, 1));
-      //the bottom pixel
-      EXPECT_EQ(&cls,                 cache.findCluster(2, 1));
-      //and of course the bottom right.
-      EXPECT_EQ(&cls,                 cache.findCluster(3, 1));
-      //But everything farther away does not belong to the same
-      //cluster
-      EXPECT_EQ((ClusterCandidate*)0, cache.findCluster(4, 1));
-      //Two rows down is also excluded
-      EXPECT_EQ((ClusterCandidate*)0, cache.findCluster(0, 2));
-      EXPECT_EQ((ClusterCandidate*)0, cache.findCluster(1, 2));
-      EXPECT_EQ((ClusterCandidate*)0, cache.findCluster(2, 2));
-      EXPECT_EQ((ClusterCandidate*)0, cache.findCluster(3, 2));
-      EXPECT_EQ((ClusterCandidate*)0, cache.findCluster(4, 2));
-    }
-
-    /** Check that we do not cluster if a row has been skipped */
-    TEST(ClusterCache, SkipRow)
-    {
-      ClusterCache cache;
-      ClusterCandidate cls;
-
-      cache.setLast(0, 0, &cls);
-      EXPECT_EQ((ClusterCandidate*)0, cache.findCluster(0, 2));
-      EXPECT_EQ((ClusterCandidate*)0, cache.findCluster(1, 2));
+      for (int v = 0; v < 4; ++v) {
+        for (int u = 0; u < 5; ++u) {
+          if (v == 0 && u <= 2) continue;
+          cache.clear();
+          ClusterCandidate& cls1 = cache.findCluster(2, 0);
+          if ((v == 0 && u == 3) || (v == 1 && u >= 1 && u <= 3)) {
+            //Check that neighboring pixels return the same cluster
+            EXPECT_EQ(&cls1, &cache.findCluster(u, v)) << "u: " << u << " v: " << v;
+          } else {
+            //And all other pixels return another cluster
+            EXPECT_NE(&cls1, &cache.findCluster(u, v)) << "u: " << u << " v: " << v;
+          }
+        }
+      }
     }
 
     /** Test that clusters get merged if they are found to have a common pixel.
@@ -94,11 +74,11 @@ namespace Belle2 {
      * @verbatim
      * u 0 1 2 3 4 5 6 7 8 9 →
      * v┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
-     * 0│ │1│ │2│ │ │2│ │ │ │ │
+     * 0│ │ │1│ │2│ │3│ │ │ │ │
      *  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
-     * 1│1│ │X│ │ │ │Y│ │ │ │ │
+     * 1│4│ │ │X│ │ │5│ │ │ │ │
      *  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
-     * 2│Z│ │ │ │ │ │ │ │ │ │ │
+     * 2│ │6│Y│ │7│Z│ │ │ │ │ │
      *  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
      * 3│ │ │ │ │ │ │ │ │ │ │ │
      *  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
@@ -108,42 +88,67 @@ namespace Belle2 {
      */
     TEST(ClusterCache, Merging)
     {
+      //Create clusters 1, 2, 3 and 4
       ClusterCache cache;
-      std::vector<ClusterCandidate> cls(2);
-      cls[0].add(Pixel(0, 1));
-      cls[1].add(Pixel(0, 2));
-      //cls[2].add(Pixel(0,2));
+      ClusterCandidate& cls1 = cache.findCluster(2, 0);
+      ClusterCandidate& cls2 = cache.findCluster(4, 0);
+      cls1.add(Pixel(1));
+      cls2.add(Pixel(2));
+      cache.findCluster(6, 0).add(Pixel(3));
+      cache.findCluster(0, 1).add(Pixel(4));
 
-      //Set the two clusters as shown above
-      cache.setLast(1, 0, &cls[0]);
-      cache.setLast(3, 0, &cls[1]);
-      cache.setLast(6, 0, &cls[1]);
-      cache.setLast(0, 1, &cls[0]);
-      //And find a cluster for pixel X
-      ClusterCandidate* found = cache.findCluster(2, 1);
-      //We must have found the neighbours
-      ASSERT_TRUE(found);
-      //and the two cluster should have been merged
-      ASSERT_EQ(2u, found->size());
+      //Add Pixel X
+      ClusterCandidate& foundX = cache.findCluster(3, 1);
+      //and the clusters 1 and 2 should have been merged
+      ASSERT_EQ(2u, foundX.size());
       //The pointer should be one of the two
-      EXPECT_TRUE(found == &cls[0] || found == &cls[1]);
+      EXPECT_TRUE(&foundX == &cls1 || &foundX == &cls2);
       //The sum of indices should be ok
-      EXPECT_EQ(3u, found->pixels()[0].getIndex() + found->pixels()[1].getIndex());
+      EXPECT_EQ(3u, foundX.pixels()[0].getIndex() + foundX.pixels()[1].getIndex());
       //the other cluster should be empty now
-      int other = (found == &cls[0]) ? 1 : 0;
-      EXPECT_EQ(0u, cls[other].size());
-      //Ok, now lets set the cluster
-      cache.setLast(1, 1, found);
+      EXPECT_TRUE((cls1.size() == 0 && cls2.size() == 2) || (cls1.size() == 2 && cls2.size() == 0));
 
-      //And add pixel Y
-      ClusterCandidate* foundY = cache.findCluster(6, 1);
-      EXPECT_EQ(found, foundY);
-      cache.setLast(6, 1, foundY);
+      //And add pixel 5, 6 and Y
+      cache.findCluster(6, 1).add(Pixel(5));
+      cache.findCluster(1, 2).add(Pixel(6));
+      ClusterCandidate& foundY = cache.findCluster(2, 2);
+      EXPECT_EQ(4u, foundY.size());
+      {
+        //Check for equality by merging empty clusters. merge returns a pointer
+        //to the topmost cluster in a group of merged clusters
+        ClusterCandidate t1, t2;
+        EXPECT_EQ(foundX.merge(t1), foundY.merge(t2));
+      }
 
-      //And finally pixel Z
-      ClusterCandidate* foundZ = cache.findCluster(0, 2);
-      EXPECT_EQ(found, foundZ);
+      //And finally pixel 7 and Z
+      cache.findCluster(4, 2).add(Pixel(7));
+      ClusterCandidate& foundZ = cache.findCluster(5, 2);
+      ASSERT_EQ(7u, foundY.size());
+      {
+        //Check for equality by merging empty clusters. merge returns a pointer
+        //to the topmost cluster in a group of merged clusters
+        ClusterCandidate t1, t2;
+        EXPECT_EQ(foundX.merge(t1), foundZ.merge(t2));
+      }
+
+      //Check if all 7 pixels are present using a bitmask to see if we get every index from 1 to 7 once
+      std::bitset<7> check_index(-1);
+      BOOST_FOREACH(const Pixel & px, foundZ.pixels()) {
+        ASSERT_LT(0u, px.getIndex());
+        ASSERT_GE(7u, px.getIndex());
+        EXPECT_TRUE(check_index[px.getIndex() - 1]) << "index: " << px.getIndex();
+        check_index[px.getIndex() - 1] = false;
+      }
+      EXPECT_TRUE(check_index.none());
     }
 
+    //Check if the clustercache is empty
+    TEST(ClusterCache, Empty)
+    {
+      ClusterCache cache;
+      ASSERT_TRUE(cache.empty());
+      cache.findCluster(0, 0);
+      ASSERT_FALSE(cache.empty());
+    }
   } //PXD namespace
 } //Belle namespace

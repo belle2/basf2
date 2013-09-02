@@ -12,16 +12,15 @@
 #define PXDClusterizerModule_H
 
 #include <framework/core/Module.h>
-#include <pxd/geometry/SensorInfo.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/reconstruction/ClusterCache.h>
+#include <pxd/reconstruction/ClusterProjection.h>
 #include <pxd/reconstruction/NoiseMap.h>
-#include <pxd/reconstruction/Pixel.h>
-#include <boost/format.hpp>
 #include <string>
-#include <deque>
 
 namespace Belle2 {
+  class RelationArray;
+  class RelationElement;
 
   namespace PXD {
     /** \addtogroup modules
@@ -44,6 +43,9 @@ namespace Belle2 {
       /** Container to sort the hits by row and column */
       typedef std::set<Pixel> Sensor;
 
+      /** Container for a RelationArray Lookup table */
+      typedef std::vector<const RelationElement*> RelationLookup;
+
       /** Constructor defining the parameters */
       PXDClusterizerModule();
 
@@ -52,16 +54,40 @@ namespace Belle2 {
       /** do the clustering */
       virtual void event();
 
-    protected:
-      /** Find the cluster a given pixel belongs to.
-       * For this to work correctly, the pixels have to be passed sorted by sensor,row,column
-       * @param px Pixel to find the cluster for
+    private:
+      /** Create lookup maps for Relations
+       * We do not use the RelationIndex as we know much more about the
+       * relations: we know the relations get created in a consolidated way by
+       * the Digitizer and that they already point in the right direction so we
+       * only need to speed up finding the correct element. We just create a
+       * vector from digit id to relationElement pointer for fast lookup
+       * @param relation RelationArray to build the lookuptable for
+       * @param lookup Lookuptable to fill
+       * @param number of digits in this event
        */
-      void findCluster(const Pixel& px);
+      void createRelationLookup(const RelationArray& relation, RelationLookup& lookup, size_t digits);
+
+      /** Add the relation from a given PXDDigit index to a map
+       * @param lookup Lookuptable to use for the relation
+       * @param relation map to add the entries to
+       * @param index index of the PXDDigit
+       */
+      void fillRelationMap(const RelationLookup& lookup, std::map<unsigned int, float>& relation, unsigned int index);
+
       /** Write clusters to collection.
        * This method will check all cluster candidates and write valid ones to the datastore
        */
       void writeClusters(VxdID sensorID);
+
+      /** Calculate position and error for a given cluster.
+       * @param cls ClusterCandidate of the cluster
+       * @param primary Projection of the cluster to calculate the position and error for
+       * @param secondary Projection of the cluster in the other direction
+       * @param minPitch Pitch at the minimum cell of the cluster
+       * @param centerPitch Pitch between pixel cells
+       * @param maxPitch Pitch at the maximum cell of the cluster
+       */
+      void calculatePositionError(const ClusterCandidate& cls, ClusterProjection& primary, const ClusterProjection& secondary, double minPitch, double centerPitch, double maxPitch);
 
       /** Noise in number of electrons */
       double m_elNoise;
@@ -71,6 +97,8 @@ namespace Belle2 {
       double m_cutAdjacent;
       /** Cluster cut in sigma */
       double m_cutCluster;
+      /** Number of electrons for Adjacent cut, basically m_elNoise*m_cutAdjacent */
+      double m_cutElectrons;
       /** Name of the collection to use for the PXDDigits */
       std::string m_storeDigitsName;
       /** Name of the collection to use for the PXDClusters */
@@ -91,20 +119,21 @@ namespace Belle2 {
       std::string m_relClusterTrueHitName;
 
       /** Size of the cluster at which we switch from Center of Gravity to Analog Head Tail */
-      int m_sizeHeadTail;
+      unsigned int m_sizeHeadTail;
       /** LorentzAngle , FIXME: should be determined directly from B-Field */
       double m_tanLorentzAngle;
-      /** Pointer to the geometry info of the currently active Sensor */
-      SensorInfo* m_geometry;
       /** Assume the PXDDigits to be sorted so we can skip sorting them */
       bool m_assumeSorted;
 
-      /** List of all cluster candidates */
-      std::deque<ClusterCandidate> m_clusters;
       /** cache of the last seen clusters to speed up clustering */
       ClusterCache m_cache;
       /** Noisemap for the currently active sensor */
       NoiseMap m_noiseMap;
+
+      /** Lookuptable for PXDDigit->MCParticle relation */
+      RelationLookup m_mcRelation;
+      /** Lookuptable for PXDDigit->PXDTrueHit relation */
+      RelationLookup m_trueRelation;
 
     };//end class declaration
 

@@ -17,47 +17,51 @@ namespace Belle2 {
 
   namespace PXD {
     /**
-     * Class to represent one pixel
+     * Class to represent one pixel, used in clustering for fast access
      *
      * This class is a wrapper around PXDDigit to provide ordered access.
      * Ordering is rowwise: first all digits belonging to the first row,
      * ordered by column in ascending order.
      *
-     * This class also remembers the index of the PXDDigit which is needed
-     * for relation creation.
+     * It contains a copy of the essential values of the PXDDigit to speed up
+     * lookup during clustering. PXDDigit is not used directly as
+     * a) we need the index of the digit after the clustering and the digit
+     * does not keep its own index and
+     * b) Inheriting from TObject makes the PXDDigit more than three times
+     * larger than this small class
      */
     class Pixel {
     public:
-      /** Constructor
-       * @param digit Pointer to the digit to be wrapped by this pixel
-       * @param index Index of the PXDDigit in the collection
-       */
-      Pixel(PXDDigit* digit, unsigned int index): m_digit(digit), m_index(index) {}
-      /** Comparison operator */
-      bool operator<(const Pixel& b)  const { return getV() < b.getV() || (getV() == b.getV() && getU() < b.getU()); }
+      /** Construct using only an index, used for testing */
+      Pixel(unsigned int index = 0): m_index(index), m_u(0), m_v(0), m_charge(0) {}
+      /** Construct from a given PXDDigit and its store index */
+      Pixel(const PXDDigit* digit, unsigned int index): m_index(index),
+        m_u(digit->getUCellID()), m_v(digit->getVCellID()),
+        m_charge(digit->getCharge()) {}
+      /** Comparison operator, sorting by row,column in ascending order */
+      bool operator<(const Pixel& b) const { return m_v < b.m_v || (m_v == b.m_v && m_u < b.m_u); }
       /** Equality operator */
-      bool operator==(const Pixel& b) const { return getV() == b.getV() && getU() == b.getU(); }
-      /** Return the sensorID of the pixel */
-      VxdID getSensorID() const { return m_digit ? m_digit->getSensorID() : VxdID(0); }
-      /** Shorthand to get the pixel column ID */
-      unsigned int getU() const { return m_digit ? m_digit->getUCellID() : -1; }
-      /** Shorthand to get the pixel row ID */
-      unsigned int getV() const { return m_digit ? m_digit->getVCellID() : -1; }
-      /** Shorthand to get the pixel charge */
-      float getCharge() const { return m_digit ? m_digit->getCharge() : 0;  }
-      /** Return pointer to the wrapped Digit */
-      PXDDigit* get() const { return m_digit; }
-      /** Return the index of the Digit in the collection */
+      bool operator==(const Pixel& b) const { return m_v == b.m_v && m_u == b.m_u; }
+      /** Return the CellID in u */
+      unsigned short getU() const { return m_u; }
+      /** Return the CellID in v */
+      unsigned short getV() const { return m_v; }
+      /** Return the Charge of the Pixel */
+      float getCharge() const { return m_charge; }
+      /** Return the Index of the digit */
       unsigned int getIndex() const { return m_index; }
-    protected:
-      /** Pointer to the wrapped digit */
-      PXDDigit* m_digit;
-      /** Index of the wrapped digit */
+    private:
+      /** Index of the corresponding PXDDigit in the StoreArray */
       unsigned int m_index;
+      /** Cell ID in u */
+      unsigned short m_u;
+      /** Cell ID in v */
+      unsigned short m_v;
+      /** Charge of the pixel */
+      float m_charge;
     };
 
-  }
-
-}
+  } // PXD namespace
+} // Belle2 namespace
 
 #endif //PXD_PIXEL_H

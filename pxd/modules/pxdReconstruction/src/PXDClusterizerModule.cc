@@ -70,31 +70,44 @@ PXDClusterizerModule::PXDClusterizerModule() :
 
 void PXDClusterizerModule::initialize()
 {
-  //Register output collections
-  StoreArray<PXDCluster>::registerPersistent(m_storeClustersName);
-  RelationArray::registerPersistent<PXDCluster, MCParticle>(m_storeClustersName,
-                                                            m_storeMCParticlesName);
-  RelationArray::registerPersistent<PXDCluster, PXDDigit>(m_storeClustersName,
-                                                          m_storeDigitsName);
-  RelationArray::registerPersistent<PXDCluster, PXDTrueHit>(m_storeClustersName,
-                                                            m_storeTrueHitsName);
+  //Register collections
+  StoreArray<PXDCluster> storeClusters(m_storeClustersName);
+  StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
+  StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
+  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
-  //Set names in case default was used. We need these for the RelationIndices.
-  m_relDigitMCParticleName = DataStore::relationName(
-                               DataStore::arrayName<PXDDigit>(m_storeDigitsName),
-                               DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  m_relClusterMCParticleName = DataStore::relationName(
-                                 DataStore::arrayName<PXDCluster>(m_storeClustersName),
-                                 DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  m_relClusterDigitName = DataStore::relationName(
-                            DataStore::arrayName<PXDCluster>(m_storeClustersName),
-                            DataStore::arrayName<PXDDigit>(m_storeDigitsName));
-  m_relDigitTrueHitName = DataStore::relationName(
-                            DataStore::arrayName<PXDDigit>(m_storeDigitsName),
-                            DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName));
-  m_relClusterTrueHitName = DataStore::relationName(
-                              DataStore::arrayName<PXDCluster>(m_storeClustersName),
-                              DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName));
+  storeClusters.registerAsPersistent();
+  storeDigits.required();
+  storeTrueHits.isOptional();
+  storeMCParticles.isOptional();
+
+  RelationArray relClusterDigits(storeClusters, storeDigits);
+  RelationArray relClusterTrueHits(storeClusters, storeTrueHits);
+  RelationArray relClusterMCParticles(storeClusters, storeMCParticles);
+  RelationArray relDigitMCParticles(storeDigits, storeMCParticles);
+  RelationArray relDigitTrueHits(storeDigits, storeTrueHits);
+
+  relClusterDigits.registerAsPersistent();
+  //Relations to Simulation objects are only needed if the parent one already
+  //exists
+  if (relDigitTrueHits.isOptional()) {
+    relClusterTrueHits.registerAsPersistent();
+  }
+  if (relDigitMCParticles.isOptional()) {
+    relClusterMCParticles.registerAsPersistent();
+  }
+
+  //Now save all names to speed creation later, mainly if they had default names
+  m_storeClustersName = storeClusters.getName();
+  m_storeDigitsName = storeDigits.getName();
+  m_storeTrueHitsName = storeTrueHits.getName();
+  m_storeMCParticlesName = storeMCParticles.getName();
+
+  m_relClusterDigitName = relClusterDigits.getName();
+  m_relClusterTrueHitName = relClusterTrueHits.getName();
+  m_relClusterMCParticleName = relClusterMCParticles.getName();
+  m_relDigitTrueHitName = relDigitTrueHits.getName();
+  m_relDigitMCParticleName = relDigitMCParticles.getName();
 
   B2INFO(
     "PXDClusterizer Parameters (in default system units, *=cannot be set directly):");

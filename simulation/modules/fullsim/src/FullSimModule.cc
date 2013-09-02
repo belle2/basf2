@@ -39,6 +39,12 @@
 #include <G4LossTableManager.hh>
 #include <G4HadronicProcessStore.hh>
 
+#include <G4Mag_UsualEqRhs.hh>
+#include <G4NystromRK4.hh>
+#include <G4HelixExplicitEuler.hh>
+#include <G4HelixSimpleRunge.hh>
+#include <G4CachedMagneticField.hh>
+
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Simulation;
@@ -73,6 +79,8 @@ FullSimModule::FullSimModule() : Module(), m_visManager(NULL)
   addParam("StoreOpticalPhotons", m_storeOpticalPhotons, "If set to True optical photons are stored in MCParticles", false);
   addParam("StoreAllSecondaries", m_storeSecondaries, "If set to True all secondaries produced by Geant over a kinetic energy cut are stored in MCParticles, otherwise do not store them", false);
   addParam("SecondariesEnergyCut", m_energyCut, "[MeV] Kinetic energy cut for storing secondaries", 1.0);
+  addParam("magneticField", m_magneticField, "Chooses the magnetic field stepper used by Geant4. possible values are: default, nystrom, expliciteuler, simplerunge", string("default"));
+  addParam("magneticCacheDistance", m_magneticCacheDistance, "Minimum distance for BField lookup in cm. If the next requested point is closer than this distance than return the flast BField value. 0 means no caching", 0.0);
 
   vector<string> defaultCommands;
   addParam("UICommands", m_uiCommands, "A list of Geant4 UI commands that should be applied before the simulation starts.", defaultCommands);
@@ -108,10 +116,36 @@ void FullSimModule::initialize()
   runManager.SetUserInitialization(physicsList);
 
   //Create the magnetic field for the Geant4 simulation
-  MagneticField* magneticField = new MagneticField();
-  G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-  fieldManager->SetDetectorField(magneticField);
-  fieldManager->CreateChordFinder(magneticField);
+  if (m_magneticField != "none") {
+    G4MagneticField* magneticField = new MagneticField();
+    if (m_magneticCacheDistance > 0) {
+      magneticField = new G4CachedMagneticField(magneticField, m_magneticCacheDistance);
+    }
+    G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
+    fieldManager->SetDetectorField(magneticField);
+    if (m_magneticField != "default") {
+      //We only use Magnetic field so let's try the specialized steppers
+      G4Mag_UsualEqRhs* pMagFldEquation = new G4Mag_UsualEqRhs(magneticField);
+      G4MagIntegratorStepper* stepper(0);
+      if (m_magneticField == "nystrom") {
+        stepper = new G4NystromRK4(pMagFldEquation);
+      } else if (m_magneticField == "expliciteuler") {
+        stepper = new G4HelixExplicitEuler(pMagFldEquation);
+      } else if (m_magneticField == "simplerunge") {
+        stepper = new G4HelixSimpleRunge(pMagFldEquation);
+      } else {
+        B2FATAL("Unknown magnetic field option: " << m_magneticField);
+      }
+      //Set a minimum stepsize: The chordfinder should not attempt to limit
+      //the stepsize to something less than 10µm (which is the default
+      //value of Geant4
+      G4ChordFinder* chordfinder = new G4ChordFinder(magneticField, 1e-2 * mm, stepper);
+      fieldManager->SetChordFinder(chordfinder);
+    } else {
+      fieldManager->CreateChordFinder(magneticField);
+    }
+    //This might be a good place to optimize the Integration parameters (DeltaOneStep, DeltaIntersection, MinEpsilon, MaxEpsilon)
+  }
 
   //Create the generator action which takes the MCParticle list and converts it to Geant4 primary vertices.
   G4VUserPrimaryGeneratorAction* generatorAction = new PrimaryGeneratorAction(m_mcParticleInputColName, m_mcParticleGraph);

@@ -99,6 +99,8 @@ namespace Belle2 {
     bool m_storeOpticalPhotons;            /**< controls storing of optical photons in MCParticles */
     bool m_storeSecondaries;               /**< contorls storing of Geant secondaries in MCParticles */
     double m_energyCut;                    /**< kinetic energy cut for the stored Geant secondaries */
+    std::string m_magneticField; /**< magnetic field stepper to use */
+    double m_magneticCacheDistance; /**< minimal distance for magnetic field lookup. If distance is smaller, return last value */
 
   private:
 

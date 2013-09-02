@@ -62,7 +62,7 @@ namespace Belle2 {
       if (!cls) {
         if (m_currCluster == m_clusters.end()) {
           //We already use all ClusterCandidates, create a new one
-          m_clusters.push_front(ClusterCandidate());
+          m_clusters.emplace_front();
           cls = &m_clusters.front();
         } else {
           //There are some Candidates left, use them

@@ -24,8 +24,6 @@
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 
-#include <boost/foreach.hpp>
-
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
@@ -182,7 +180,7 @@ void PXDClusterizerModule::event()
     for (map<VxdID, Sensor>::iterator it = sensors.begin(); it != sensors.end();
          ++it) {
       m_noiseMap.setSensorID(it->first);
-      BOOST_FOREACH(const PXD::Pixel & px, it->second) {
+      for (const PXD::Pixel & px : it->second) {
         if (!m_noiseMap(px, m_cutAdjacent)) continue;
         m_cache.findCluster(px.getU(), px.getV()).add(px);
       }
@@ -249,9 +247,7 @@ void PXDClusterizerModule::createRelationLookup(const RelationArray& relation, R
   if (!relation) return;
   //Resize to number of digits and set all values
   lookup.resize(digits);
-  const unsigned int size = relation.getEntries();
-  for (unsigned int i = 0; i < size; ++i) {
-    const RelationElement& element = relation[i];
+  for (const RelationElement & element : relation) {
     lookup[element.getFromIndex()] = &element;
   }
 }
@@ -294,7 +290,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
   map<unsigned int, float> truehit_relations;
   vector<pair<unsigned int, float> > digit_weights;
 
-  BOOST_FOREACH(ClusterCandidate & cls, m_cache) {
+  for (ClusterCandidate & cls : m_cache) {
     //Check for noise cuts
     if (!(cls.size() > 0 && m_noiseMap(cls.getCharge(), m_cutCluster) && m_noiseMap(cls.getSeed(), m_cutSeed))) continue;
 
@@ -307,7 +303,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
 
     const Pixel& seed = cls.getSeed();
 
-    BOOST_FOREACH(const PXD::Pixel & px, cls.pixels()) {
+    for (const PXD::Pixel & px : cls.pixels()) {
       //Add the Pixel information to the two projections
       projU.add(px.getU(), info.getUCellPosition(px.getU()), px.getCharge());
       projV.add(px.getV(), info.getVCellPosition(px.getV()), px.getCharge());
@@ -317,7 +313,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
       //Obtain relations from PXDTrueHits
       fillRelationMap(m_trueRelation, truehit_relations, px.getIndex());
       //Save the weight of the digits for the Cluster->Digit relation
-      digit_weights.push_back(std::make_pair(px.getIndex(), px.getCharge()));
+      digit_weights.emplace_back(px.getIndex(), px.getCharge());
     }
     projU.finalize();
     projV.finalize();
@@ -330,7 +326,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
       double posUU = cls.getCharge() * pitchU * pitchU / 12.0;
       double posVV = cls.getCharge() * pitchV * pitchV / 12.0;
       double posUV(0);
-      BOOST_FOREACH(const Pixel & px, cls.pixels()) {
+      for (const Pixel & px : cls.pixels()) {
         const double du = info.getUCellPosition(px.getU()) - projU.getPos();
         const double dv = info.getVCellPosition(px.getV()) - projV.getPos();
         posUU += px.getCharge() * du * du;
@@ -350,10 +346,10 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
 
     //Store Cluster into Datastore ...
     int clsIndex = storeClusters.getEntries();
-    new(storeClusters.nextFreeAddress()) PXDCluster(sensorID, projU.getPos(), projV.getPos(), projU.getError(), projV.getError(),
-                                                    rho, cls.getCharge(), seed.getCharge(),
-                                                    cls.size(), projU.getSize(), projV.getSize(), projU.getMinCell(), projV.getMinCell()
-                                                   );
+    storeClusters.appendNew(sensorID, projU.getPos(), projV.getPos(), projU.getError(), projV.getError(),
+                            rho, cls.getCharge(), seed.getCharge(),
+                            cls.size(), projU.getSize(), projV.getSize(), projU.getMinCell(), projV.getMinCell()
+                           );
 
     //Create Relations to this Digit
     if (!mc_relations.empty()) relClusterMCParticle.add(clsIndex, mc_relations.begin(), mc_relations.end());

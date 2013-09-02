@@ -41,8 +41,8 @@ namespace Belle2 {
       m_pixels.insert(m_pixels.end(), pcls->m_pixels.begin(), pcls->m_pixels.end());
       //If the allocated memory is too large, shrink it down to default
       if (pcls->m_pixels.capacity() > c_maxCapacity) {
-        std::vector<Pixel> tmp(c_defaultCapacity);
-        std::swap(pcls->m_pixels, tmp);
+        pcls->m_pixels.resize(c_defaultCapacity);
+        pcls->m_pixels.shrink_to_fit();
       }
       //Clear the pixels and charge in the merged cluster
       pcls->m_pixels.clear();

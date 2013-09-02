@@ -11,7 +11,6 @@
 #include <pxd/reconstruction/ClusterCache.h>
 #include <gtest/gtest.h>
 #include <bitset>
-#include <boost/foreach.hpp>
 
 using namespace std;
 
@@ -133,7 +132,7 @@ namespace Belle2 {
 
       //Check if all 7 pixels are present using a bitmask to see if we get every index from 1 to 7 once
       std::bitset<7> check_index(-1);
-      BOOST_FOREACH(const Pixel & px, foundZ.pixels()) {
+      for (const Pixel & px : foundZ.pixels()) {
         ASSERT_LT(0u, px.getIndex());
         ASSERT_GE(7u, px.getIndex());
         EXPECT_TRUE(check_index[px.getIndex() - 1]) << "index: " << px.getIndex();

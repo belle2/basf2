@@ -1,0 +1,34 @@
+# checks all built shared libraries for undefined symbols
+# (not satisfied by links)
+
+# this catches problems that are not apparent when creating another
+# .so with them, but only when linking executables
+
+import os
+import tempfile
+
+localdir = os.environ['BELLE2_LOCAL_DIR']
+subdir = os.environ['BELLE2_SUBDIR']
+
+libdir = localdir + '/lib/' + subdir
+
+#define main() for building executables
+maincc = tempfile.NamedTemporaryFile(suffix='.cc', delete=False)
+maincc.write("int main() { return 0; }\n")
+maincc.close()
+
+libs = os.listdir(libdir)
+for lib in libs:
+    if not lib.endswith('.so'):
+        continue  # not a shared object
+
+    #try linking an executable with the given library
+    tmpfile = tempfile.NamedTemporaryFile()
+    try:
+        os.system("g++ -o %s -L%s -l:%s %s" %
+                  (tmpfile.name, libdir, lib, maincc.name))
+        tmpfile.close()  # might not work
+    except:
+        pass
+
+os.unlink(maincc.name)

@@ -18,8 +18,6 @@
 #include <TClonesArray.h>
 #include <TClass.h>
 
-#include <boost/foreach.hpp>
-
 using namespace std;
 using namespace Belle2;
 
@@ -195,9 +193,9 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
 
   // search for the object and set the entry and index
   const TClass* objectClass = object->IsA();
-  for (StoreObjConstIter iter = m_storeObjMap[c_Event].begin(); iter != m_storeObjMap[c_Event].end(); ++iter) {
-    if (iter->second->ptr && iter->second->isArray) {
-      TClonesArray* array = static_cast<TClonesArray*>(iter->second->ptr);
+  for (auto & mapEntry : m_storeObjMap[c_Event]) {
+    if (mapEntry.second->ptr && mapEntry.second->isArray) {
+      TClonesArray* array = static_cast<TClonesArray*>(mapEntry.second->ptr);
       const TClass* arrayClass = array->GetClass();
       if (arrayClass == objectClass) {
         if (object == array->Last()) {
@@ -208,7 +206,7 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
         }
 
         if (index >= 0) {
-          entry = iter->second;
+          entry = mapEntry.second;
           return true;
         }
       }
@@ -222,11 +220,11 @@ void DataStore::getArrayNames(std::vector<std::string>& names, const std::string
   if (arrayName.empty()) {
     names.push_back(defaultArrayName(arrayClass->GetName()));
   } else if (arrayName == "ALL") {
-    for (StoreObjConstIter iter = m_storeObjMap[c_Event].begin(); iter != m_storeObjMap[c_Event].end(); ++iter) {
-      if (iter->second->ptr && iter->second->isArray) {
-        TClonesArray* array = static_cast<TClonesArray*>(iter->second->ptr);
+    for (auto & mapEntry : m_storeObjMap[c_Event]) {
+      if (mapEntry.second->ptr && mapEntry.second->isArray) {
+        TClonesArray* array = static_cast<TClonesArray*>(mapEntry.second->ptr);
         if (array->GetClass()->InheritsFrom(arrayClass)) {
-          names.push_back(iter->second->name);
+          names.push_back(mapEntry.second->name);
         }
       }
     }
@@ -290,36 +288,34 @@ std::vector<RelationEntry> DataStore::getRelationsWith(ESearchSide searchSide, c
   std::vector<string> names;
   getArrayNames(names, withName, withClass);
 
-  // loop over store arrays
-  for (std::vector<string>::const_iterator nameIt = names.begin(); nameIt != names.end(); ++nameIt) {
-    const StoreObjConstIter& arrayIter = m_storeObjMap[c_Event].find(*nameIt);
+  // loop over found store arrays
+  for (const std::string & name : names) {
+    const StoreObjConstIter& arrayIter = m_storeObjMap[c_Event].find(name);
     if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == NULL) continue;
 
     // get the relations from -> to
-    const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, *nameIt) : relationName(*nameIt, entry->name);
+    const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name) : relationName(name, entry->name);
     RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
     if (!relIndex)
       continue;
 
-    typedef RelationIndex<TObject, TObject>::Element relElement_t;
     //get relations with object
     if (searchSide == c_ToSide) {
-      BOOST_FOREACH(const relElement_t & rel, relIndex.getElementsFrom(object)) {
+      for (const auto & rel : relIndex.getElementsFrom(object)) {
         TObject* const toObject = const_cast<TObject*>(rel.to);
         if (toObject)
-          result.push_back(RelationEntry(toObject, rel.weight));
+          result.emplace_back(toObject, rel.weight);
       }
     } else {
-      BOOST_FOREACH(const relElement_t & rel, relIndex.getElementsTo(object)) {
+      for (const auto & rel : relIndex.getElementsTo(object)) {
         TObject* const fromObject = const_cast<TObject*>(rel.from);
         if (fromObject)
-          result.push_back(RelationEntry(fromObject, rel.weight));
+          result.emplace_back(fromObject, rel.weight);
       }
     }
   }
 
   return result;
-
 }
 
 RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* object, DataStore::StoreEntry*& entry, int& index, const TClass* withClass, const std::string& withName)
@@ -339,13 +335,13 @@ RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* 
   std::vector<string> names;
   getArrayNames(names, withName, withClass);
 
-  // loop over store arrays
-  for (std::vector<string>::const_iterator nameIt = names.begin(); nameIt != names.end(); ++nameIt) {
-    const StoreObjConstIter& arrayIter = m_storeObjMap[c_Event].find(*nameIt);
+  // loop over found store arrays
+  for (const std::string & name : names) {
+    const StoreObjConstIter& arrayIter = m_storeObjMap[c_Event].find(name);
     if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == NULL) continue;
 
     // get the relations from -> to
-    const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, *nameIt) : relationName(*nameIt, entry->name);
+    const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name) : relationName(name, entry->name);
     RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
     if (!relIndex)
       continue;
@@ -370,18 +366,18 @@ RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* 
 
 void DataStore::clearMaps(EDurability durability)
 {
-  for (StoreObjConstIter iter = m_storeObjMap[durability].begin(); iter != m_storeObjMap[durability].end(); ++iter) {
-    iter->second->ptr = 0;
+  for (auto & mapEntry : m_storeObjMap[durability]) {
+    mapEntry.second->ptr = 0;
   }
 }
 
 void DataStore::reset(EDurability durability)
 {
-  for (StoreObjConstIter iter = m_storeObjMap[durability].begin(); iter != m_storeObjMap[durability].end(); ++iter) {
+  for (auto & mapEntry : m_storeObjMap[durability]) {
     //delete stored object/array
-    delete iter->second->object;
+    delete mapEntry.second->object;
     //delete StoreEntry
-    delete iter->second;
+    delete mapEntry.second;
   }
   m_storeObjMap[durability].clear();
 }

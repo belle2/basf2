@@ -48,11 +48,11 @@ namespace {
   template<class range> void checkRelation(range a, range b)
   {
     //They should have the same number of elements
-    assert_eq(std::distance(a.first, a.second), std::distance(b.first, b.second));
+    assert_eq(std::distance(a.begin(), a.end()), std::distance(b.begin(), b.end()));
     //Loop over both ranges and compare index and weights
-    for (; a.first != a.second && b.first != b.second; ++a.first, ++b.first) {
-      assert_eq(a.first->indexTo, b.first->indexTo);
-      assert_float(a.first->weight, b.first->weight);
+    for (; a.begin() != a.end() && b.begin() != b.end(); ++a.begin(), ++b.begin()) {
+      assert_eq(a.begin()->indexTo, b.begin()->indexTo);
+      assert_float(a.begin()->weight, b.begin()->weight);
     }
   }
 }

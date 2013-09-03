@@ -19,26 +19,37 @@ RFEventProcessor::RFEventProcessor(string conffile)
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());
   //  char* nodename = m_conf->getconf ( "processor", "nodename" );
-  char nodename[256];
-  strcpy(nodename, "evp_");
-  gethostname(&nodename[4], sizeof(nodename));
-  printf("nodename = %s\n", nodename);
+  //  char nodename[256];
+  strcpy(m_nodename, "evp_");
+  gethostname(&m_nodename[4], sizeof(m_nodename));
+  printf("nodename = %s\n", m_nodename);
 
-  // 1. Initialize local shared memory
-  m_shm = new RFSharedMem(nodename);
-
-  // 2. Initialize process manager
-  m_proc = new RFProcessManager(nodename);
-
-  // 3. Set execution directory
-  string execdir = string(m_conf->getconf("system", "execdir_base")) + "/" + string(nodename);
+  // 1. Set execution directory
+  string execdir = string(m_conf->getconf("system", "execdir_base")) + "/" + string(m_nodename);
   printf("execdir = %s\n", execdir.c_str());
 
   mkdir(execdir.c_str(), 0755);
   chdir(execdir.c_str());
 
-  // 4. Initialize LogManager
-  m_log = new RFLogManager(nodename);
+  // 2. Initialize local shared memory
+  m_shm = new RFSharedMem(m_nodename);
+
+  // 3. Initialize process manager
+  m_proc = new RFProcessManager(m_nodename);
+
+  // 4. Initialize RingBuffers
+  char* rbufin = m_conf->getconf("processor", "ringbufin");
+  int rbinsize = m_conf->getconfi("processor", "ringbufinsize");
+  m_rbufin = new RingBuffer(rbufin, rbinsize);
+  char* rbufout = m_conf->getconf("processor", "ringbufout");
+  int rboutsize = m_conf->getconfi("processor", "ringbufoutsize");
+  m_rbufout = new RingBuffer(rbufout, rboutsize);
+
+  // 5. Initialize LogManager
+  m_log = new RFLogManager(m_nodename);
+
+  // 6. Initialize data flow monitor
+  m_flow = new RFFlowStat(m_nodename);
 
 }
 
@@ -48,6 +59,9 @@ RFEventProcessor::~RFEventProcessor()
   delete m_proc;
   delete m_shm;
   delete m_conf;
+  delete m_flow;
+  delete m_rbufin;
+  delete m_rbufout;
 }
 
 
@@ -64,7 +78,7 @@ void RFEventProcessor::Configure(NSMmsg*, NSMcontext*)
   // 1. Run sender / logger
   char* sender = m_conf->getconf("processor", "sender", "script");
   char* port = m_conf->getconf("processor", "sender", "port");
-  m_pid_sender = m_proc->Execute(sender, rbufout, port);
+  m_pid_sender = m_proc->Execute(sender, rbufout, port, m_nodename, (char*)"1");
 
   // 2. Run basf2
   char* basf2 = m_conf->getconf("processor", "basf2", "script");
@@ -84,7 +98,7 @@ void RFEventProcessor::Configure(NSMmsg*, NSMcontext*)
   int rport = atoi(id) + portbase;
   char portchar[256];
   sprintf(portchar, "%d", rport);
-  m_pid_receiver = m_proc->Execute(receiver, rbufin, srchost, portchar);
+  m_pid_receiver = m_proc->Execute(receiver, rbufin, srchost, portchar, m_nodename, (char*)"0");
 }
 
 void RFEventProcessor::Start(NSMmsg*, NSMcontext*)
@@ -128,6 +142,8 @@ void RFEventProcessor::server()
     } else if (st > 0) {
       m_log->ProcessLog(m_proc->GetFd());
     }
+    m_flow->fillNodeInfo(0, GetNodeInfo(), false);
+    m_flow->fillNodeInfo(1, GetNodeInfo(), true);
   }
 }
 

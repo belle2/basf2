@@ -180,7 +180,7 @@ void RFLogManager::Abort(char* fmt, ...)
 
 int RFLogManager::ProcessLog(int fd)
 {
-  char* p, *q, buf[1024];
+  char* p, *q, buf[4000000];
   int len;
   int siz = sizeof(buf) - 1;
   int toolong = 0;

@@ -34,6 +34,9 @@ RFNSM::RFNSM(char* nodename, RFServerBase* server)
   // Redirect log message to standard output
   b2nsm_logging(RFNSMOUT);
 
+  // Set debug
+  nsmlib_debuglevel(0);
+
   // Register server
   g_nsmserver = server;
 
@@ -75,6 +78,7 @@ RFNSM::~RFNSM()
 
 void RFNSM::AllocMem(char* format)
 {
+  printf("AllocMem : format file = %s\n", format);
   // Allocate shared memory
   RfNodeInfo* m_info = (RfNodeInfo*)b2nsm_allocmem(m_nodename.c_str(), format,
                                                    1, 3);

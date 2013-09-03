@@ -13,7 +13,8 @@ using namespace Belle2;
 
 Sock2Rb::Sock2Rb(string rbuf, int port)
 {
-  m_rbuf = new RingBuffer(rbuf.c_str(), RBUFSIZE);
+  //  m_rbuf = new RingBuffer(rbuf.c_str(), RBUFSIZE);
+  m_rbuf = new RingBuffer(rbuf.c_str());
   m_sock = new EvtSocketRecv(port);
   m_evtbuf = new char[MAXEVTSIZE];
 

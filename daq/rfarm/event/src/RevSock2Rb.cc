@@ -11,11 +11,13 @@
 using namespace std;
 using namespace Belle2;
 
-RevSock2Rb::RevSock2Rb(string rbuf, string src, int port)
+RevSock2Rb::RevSock2Rb(string rbuf, string src, int port, string shmname, int id)
 {
-  m_rbuf = new RingBuffer(rbuf.c_str(), RBUFSIZE);
+  //  m_rbuf = new RingBuffer(rbuf.c_str(), RBUFSIZE);
+  m_rbuf = new RingBuffer(rbuf.c_str());
   m_sock = new REvtSocketRecv(src, port);
   m_evtbuf = new char[MAXEVTSIZE];
+  m_flow = new RFFlowStat((char*)shmname.c_str(), id, m_rbuf);
 
 }
 
@@ -38,6 +40,7 @@ int RevSock2Rb::ReceiveEvent(void)
     // Flag End Of File !!!!!
     //    return msg->type(); // EOF
   }
+  m_flow->log(msg->size());
 
   // Put the message in ring buffer
   int stat = 0;

@@ -48,7 +48,8 @@ Ds2RbufModule::~Ds2RbufModule()
 void Ds2RbufModule::initialize()
 {
 
-  m_rbuf = new RingBuffer(m_rbufname.c_str(), RBUFSIZE);
+  //  m_rbuf = new RingBuffer(m_rbufname.c_str(), RBUFSIZE);
+  m_rbuf = new RingBuffer(m_rbufname.c_str());
   //  m_msghandler = new MsgHandler(m_compressionLevel);
   m_streamer = new DataStoreStreamer(m_compressionLevel);
 

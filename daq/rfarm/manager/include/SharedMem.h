@@ -36,6 +36,8 @@ namespace Belle2 {
     void* ptr(void);
     int shmid(void);
 
+    bool IsCreated(void);
+
   private:
     bool m_new; /**< True if we created the ring buffer ourselves (and need to clean it). */
     bool m_file;

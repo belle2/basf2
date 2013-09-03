@@ -9,6 +9,8 @@
 // Date : 24 - Jul - 2013
 //-
 
+#include "daq/rfarm/manager/RfNodeInfo.h"
+
 namespace Belle2 {
   class RFServerBase {
   public:
@@ -23,8 +25,19 @@ namespace Belle2 {
     virtual void Restart(NSMmsg*, NSMcontext*) {};
     virtual void Status(NSMmsg*, NSMcontext*) {};
 
+    virtual void SetNodeInfo(RfNodeInfo* ptr) {
+      m_nsmmem = ptr;
+    };
+
+    virtual RfNodeInfo* GetNodeInfo() {
+      return m_nsmmem;
+    };
+
   public:
     static RFServerBase* s_instance;
+
+  private:
+    RfNodeInfo* m_nsmmem;
 
   };
 }

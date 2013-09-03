@@ -22,13 +22,14 @@
 
 #include "framework/pcore/RingBuffer.h"
 #include "daq/dataflow/REvtSocket.h"
+#include "daq/rfarm/manager/RFFlowStat.h"
 
 #define RBUFSIZE 100000000
 
 class RevSock2Rb {
 public:
   /*! Constuctor and Destructor */
-  RevSock2Rb(std::string rbuf, std::string src, int port);
+  RevSock2Rb(std::string rbuf, std::string src, int port, std::string shmname, int id);
   ~RevSock2Rb(void);
 
   /*! Event function */
@@ -37,6 +38,7 @@ public:
 private:
   RingBuffer* m_rbuf;
   REvtSocketRecv* m_sock;
+  RFFlowStat* m_flow;
   char* m_evtbuf;
 
 };

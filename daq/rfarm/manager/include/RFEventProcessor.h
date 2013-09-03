@@ -15,6 +15,9 @@
 #include "daq/rfarm/manager/RFProcessManager.h"
 #include "daq/rfarm/manager/RFLogManager.h"
 #include "daq/rfarm/manager/RFNSM.h"
+#include "daq/rfarm/manager/RFFlowStat.h"
+
+#include "framework/pcore/RingBuffer.h"
 
 #include "daq/rfarm/manager/RFServerBase.h"
 
@@ -41,11 +44,15 @@ namespace Belle2 {
     RFSharedMem*       m_shm;
     RFProcessManager*  m_proc;
     RFLogManager*      m_log;
+    RingBuffer*        m_rbufin;
+    RingBuffer*        m_rbufout;
+    RFFlowStat*        m_flow;
 
     int m_pid_receiver;
     int m_pid_basf2;
     int m_pid_sender;
     int m_nnodes;
+    char m_nodename[256];
 
   };
 

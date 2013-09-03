@@ -29,8 +29,10 @@ int main(int argc, char** argv)
     exit(-1);
   }
 
-  RingBuffer* rbufin = new RingBuffer(argv[1], RBUFSIZE);
-  RingBuffer* rbufout = new RingBuffer(argv[2], RBUFSIZE);
+  //  RingBuffer* rbufin = new RingBuffer(argv[1], RBUFSIZE);
+  RingBuffer* rbufin = new RingBuffer(argv[1]);
+  //  RingBuffer* rbufout = new RingBuffer(argv[2], RBUFSIZE);
+  RingBuffer* rbufout = new RingBuffer(argv[2]);
   char* evbuf = new char[MAXEVTSIZE];
 
   int eof = 0;

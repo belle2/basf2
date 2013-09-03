@@ -18,28 +18,35 @@ RFOutputServer::RFOutputServer(string conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());
-  //  char* nodename = m_conf->getconf ( "collector", "nodename" );
-  char nodename[256];
-  gethostname(nodename, sizeof(nodename));
+  char* nodename = m_conf->getconf("collector", "nodename");
+  //  char nodename[256];
+  //  gethostname(nodename, sizeof(nodename));
 
-  // 1. Initialize NSM
-  //  m_nsm = new RFNSM ( nodename, infofile );
-  //  printf ( "RFOutputServer : NSM initialized.....\n" );
-
-  // 2. Initialize local shared memory
-  m_shm = new RFSharedMem(nodename);
-
-  // 3. Initialize process manager
-  m_proc = new RFProcessManager(nodename);
-
-  // 4. Set execution directory
+  // 1. Set execution directory
   string execdir = string(m_conf->getconf("system", "execdir_base")) + "/collector";
 
   mkdir(execdir.c_str(), 0755);
   chdir(execdir.c_str());
 
+  // 2. Initialize local shared memory
+  m_shm = new RFSharedMem(nodename);
+
+  // 3. Initialize RingBuffers
+  char* rbufin = m_conf->getconf("collector", "ringbufin");
+  int rbinsize = m_conf->getconfi("collector", "ringbufinsize");
+  m_rbufin = new RingBuffer(rbufin, rbinsize);
+  char* rbufout = m_conf->getconf("collector", "ringbufout");
+  int rboutsize = m_conf->getconfi("collector", "ringbufoutsize");
+  m_rbufout = new RingBuffer(rbufout, rboutsize);
+
+  // 4. Initialize process manager
+  m_proc = new RFProcessManager(nodename);
+
   // 5. Initialize LogManager
   m_log = new RFLogManager(nodename);
+
+  // 6. Initialize data flow monitor
+  m_flow = new RFFlowStat(nodename);
 
 }
 
@@ -49,6 +56,9 @@ RFOutputServer::~RFOutputServer()
   delete m_proc;
   delete m_shm;
   delete m_conf;
+  delete m_rbufin;
+  delete m_rbufout;
+  delete m_flow;
 }
 
 
@@ -62,13 +72,17 @@ void RFOutputServer::Configure(NSMmsg*, NSMcontext*)
   char* rbufin = m_conf->getconf("collector", "ringbufin");
   char* rbufout = m_conf->getconf("collector", "ringbufout");
 
+  char* shmname = m_conf->getconf("collector", "nodename");
+
   // 1. Run sender / logger
   char* src = m_conf->getconf("collector", "destination");
   if (strstr(src, "net") != 0) {
     // Run sender
     char* sender = m_conf->getconf("collector", "sender", "script");
     char* port = m_conf->getconf("collector", "sender", "port");
-    m_pid_sender = m_proc->Execute(sender, rbufout, port);
+    char idbuf[3];
+    sprintf(idbuf, "%2.2d", RF_OUTPUT_ID);
+    m_pid_sender = m_proc->Execute(sender, rbufout, port, shmname, idbuf);
   } else if (strstr(src, "file") != 0) {
     // Run file writer
     char* writer = m_conf->getconf("collector", "writer", "script");
@@ -92,13 +106,14 @@ void RFOutputServer::Configure(NSMmsg*, NSMcontext*)
   char* port = m_conf->getconf("processor", "sender", "port");
 
   char* receiver = m_conf->getconf("collector", "receiver", "script");
-  char hostname[512], idname[3];
+  char hostname[512], idname[3], shmid[3];
   for (int i = 0; i < maxnodes; i++) {
     sprintf(idname, "%2.2d", idbase + i);
+    sprintf(shmid, "%2.2d", i);
     if (badlist == NULL  ||
         strstr(badlist, idname) == 0) {
       sprintf(hostname, "%s%2.2d", hostbase, idbase + i);
-      m_pid_receiver[m_nnodes] = m_proc->Execute(receiver, rbufin, hostname, port);
+      m_pid_receiver[m_nnodes] = m_proc->Execute(receiver, rbufin, hostname, port, shmname, shmid);
       m_nnodes++;
     }
   }

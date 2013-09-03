@@ -34,7 +34,8 @@ int main(int argc, char** argv)
     perror("file open");
     exit(-1);
   }
-  RingBuffer* rbuf = new RingBuffer(argv[1], RBUFSIZE);
+  //  RingBuffer* rbuf = new RingBuffer(argv[1], RBUFSIZE);
+  RingBuffer* rbuf = new RingBuffer(argv[1]);
   char* evbuf = new char[MAXEVTSIZE];
 
   int eof = 0;

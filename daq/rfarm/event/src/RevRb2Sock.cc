@@ -12,11 +12,13 @@
 using namespace std;
 using namespace Belle2;
 
-RevRb2Sock::RevRb2Sock(string rbuf, int port)
+RevRb2Sock::RevRb2Sock(string rbuf, int port, string shmname, int id)
 {
-  m_rbuf = new RingBuffer(rbuf.c_str(), RBUFSIZE);
+  //  m_rbuf = new RingBuffer((char*)rbuf.c_str(), RBUFSIZE);
+  m_rbuf = new RingBuffer((char*)rbuf.c_str());
   m_sock = new REvtSocketSend(port);
   m_evtbuf = new char[MAXEVTSIZE];
+  m_flow = new RFFlowStat((char*)shmname.c_str(), id, m_rbuf);
 
 }
 
@@ -34,6 +36,7 @@ int RevRb2Sock::SendEvent(void)
     //    printf ( "Rx : evtbuf is not available yet....\n" );
     usleep(100);
   }
+  m_flow->log(size * 4);
 
   EvtMessage* msg = new EvtMessage(m_evtbuf);    // Ptr copy, no overhead
 

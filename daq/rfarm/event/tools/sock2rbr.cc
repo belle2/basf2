@@ -20,7 +20,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-  // Retrieve RingBuffer name[1], and port number[2]
+  // Retrieve RingBuffer name[1], port number[2], shmname[4], and id[5]
   if (argc < 2) {
     printf("syntax : sock2rb rbufname src port\n");
     exit(-1);
@@ -29,8 +29,10 @@ int main(int argc, char** argv)
   string a1(argv[1]);
   string a2(argv[2]);
   int a3 = atoi(argv[3]);
+  string a4(argv[4]);
+  int a5 = atoi(argv[5]);
 
-  RevSock2Rb sr(a1, a2, a3);
+  RevSock2Rb sr(a1, a2, a3, a4, a5);
 
   for (;;) {
     int stat = sr.ReceiveEvent();

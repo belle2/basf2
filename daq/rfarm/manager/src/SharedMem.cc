@@ -82,3 +82,9 @@ int SharedMem::shmid(void)
   return m_shmid;
 }
 
+bool SharedMem::IsCreated(void)
+{
+  return m_new;
+}
+
+

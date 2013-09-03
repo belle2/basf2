@@ -17,10 +17,15 @@ int main(int argc, char** argv)
   RFConf conf(argv[1]);
 
   // Creation of event server instance. evs contains the instance
-  RFEventServer& evs = RFEventServer::Create(argv[1]);
+  //  RFEventServer& evs = RFEventServer::Create(argv[1]);
 
-  RFNSM nsm(conf.getconf("distributor", "nodename"), &evs);
+  RFEventServer* evs = new RFEventServer(argv[1]);
 
-  evs.server();
+
+  RFNSM nsm(conf.getconf("distributor", "nodename"), evs);
+  nsm.AllocMem(conf.getconf("system", "nsmdata"));
+  evs->SetNodeInfo(nsm.GetNodeInfo());
+
+  evs->server();
 
 }

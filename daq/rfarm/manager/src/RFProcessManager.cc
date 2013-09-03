@@ -7,6 +7,7 @@
 //-
 
 #include "daq/rfarm/manager/RFProcessManager.h"
+#include <time.h>
 
 using namespace std;
 using namespace Belle2;
@@ -131,10 +132,10 @@ int RFProcessManager::CheckOutput()
   if (m_iopipe[0] > 0) FD_SET(m_iopipe[0], &fdset);
   int highest = m_iopipe[0];
 
-  // Time out parameter (1sec.)
+  // Time out parameter
   struct timeval tv;
   tv.tv_sec = 1;
-  tv.tv_usec = 0;
+  tv.tv_usec = 1; // omajinai
 
   // Fetch fd
   int nfd;
@@ -144,8 +145,12 @@ int RFProcessManager::CheckOutput()
     } else {
       break;
     }
+    sleep(1);
   }
   // Return nfd
+  //  time_t now = time ( NULL );
+  //  printf ( "[%s] CheckOutput : nfd = %d\n", ctime(&now), nfd );
+  //  fflush ( stdout );
   return nfd;
 }
 

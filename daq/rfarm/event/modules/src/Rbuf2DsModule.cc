@@ -10,6 +10,9 @@
 #include <TSystem.h>
 #include <stdlib.h>
 
+#include "framework/datastore/StoreObjPtr.h"
+#include "framework/dataobjects/EventMetaData.h"
+
 using namespace std;
 using namespace Belle2;
 
@@ -50,7 +53,8 @@ void Rbuf2DsModule::initialize()
 {
   gSystem->Load("libdataobjects");
 
-  m_rbuf = new RingBuffer(m_rbufname.c_str(), RBUFSIZE);
+  //  m_rbuf = new RingBuffer(m_rbufname.c_str(), RBUFSIZE);
+  m_rbuf = new RingBuffer(m_rbufname.c_str());
   //  m_msghandler = new MsgHandler(m_compressionLevel);
 
   // Initialize DataStoreStreamer
@@ -120,6 +124,17 @@ void Rbuf2DsModule::event()
   // Restore DataStore
   // Restore DataStore
   m_streamer->restoreDataStore(msg);
+
+  /*
+  // Dummy event header for debugging
+  // Event Meta Data
+  StoreObjPtr<EventMetaData> evtm;
+  evtm.create();
+  evtm->setExperiment(1);
+  evtm->setRun(1);
+  evtm->setEvent(m_nrecv);
+  */
+
 
   delete[] evtbuf;
   delete msg;

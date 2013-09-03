@@ -12,7 +12,6 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
 using namespace Belle2;
@@ -127,7 +126,7 @@ void RemoveMCParticlesModule::applyCuts(const MCParticle& particle, bool cut)
   if (cut) m_mpg[particle.getArrayIndex()].setIgnore(true);
 
   //Then we look at all daughters
-  BOOST_FOREACH(MCParticle * daughter, particle.getDaughters()) {
+  for (MCParticle * daughter : particle.getDaughters()) {
     applyCuts(*daughter, cut);
   }
 }

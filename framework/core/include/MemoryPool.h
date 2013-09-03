@@ -12,7 +12,6 @@
 #define MEMORYPOOL_H
 
 #include <vector>
-#include <boost/foreach.hpp>
 
 namespace Belle2 {
 
@@ -92,7 +91,7 @@ namespace Belle2 {
      * Release all allocated memory, called automatically upon destruction.
      */
     void release_memory() {
-      BOOST_FOREACH(T * ptr, m_chunks) {
+      for (T * ptr : m_chunks) {
         free(reinterpret_cast<void*>(ptr));
       }
       m_chunks.clear();

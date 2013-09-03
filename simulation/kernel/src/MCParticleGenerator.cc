@@ -139,7 +139,7 @@ void MCParticleGenerator::addParticle(MCParticle& mcParticle, G4Event* event, G4
 
   //Add all children
   int currMotherIndex = m_mcParticleGraph.size();
-  BOOST_FOREACH(MCParticle * daughter, mcParticle.getDaughters()) {
+  for (MCParticle * daughter : mcParticle.getDaughters()) {
     addParticle(*daughter, event, g4Mother, currMotherIndex, useTime);
   }
 }

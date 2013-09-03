@@ -95,7 +95,7 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
     MCParticleGraph::GraphParticle& currParticle = TrackInfo::getInfo(*track);
 
     // Add particle and decay Information to all secondaries
-    BOOST_FOREACH(G4Track * daughterTrack, *fpTrackingManager->GimmeSecondaries()) {
+    for (G4Track * daughterTrack : *fpTrackingManager->GimmeSecondaries()) {
 
       // Add the particle to the particle graph and as UserInfo to the track
       // if it is a secondary particle created by Geant4.

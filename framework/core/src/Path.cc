@@ -15,8 +15,6 @@
 #include <framework/core/Path.h>
 #include <framework/core/Module.h>
 
-#include <boost/foreach.hpp>
-
 using namespace Belle2;
 using namespace boost::python;
 
@@ -50,7 +48,7 @@ void Path::addPath(PathPtr path)
 std::list<ModulePtr> Path::getModules() const
 {
   std::list<ModulePtr> modules;
-  BOOST_FOREACH(const boost::shared_ptr<PathElement>& elem, m_elements) {
+  for (const boost::shared_ptr<PathElement>& elem : m_elements) {
     if (dynamic_cast<Module*>(elem.get()) != 0) {
       //this path element is a Module, create a ModulePtr that shares ownership with 'elem'
       modules.push_back(boost::static_pointer_cast<Module>(elem));
@@ -71,7 +69,7 @@ std::string Path::getPathString() const
 {
   std::string out("");
   bool firstElem = true;
-  BOOST_FOREACH(const boost::shared_ptr<PathElement>& elem, m_elements) {
+  for (const boost::shared_ptr<PathElement>& elem : m_elements) {
     if (!firstElem) {
       out += " -> ";
     } else {

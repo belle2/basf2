@@ -13,6 +13,7 @@
 
 #include <framework/datastore/RelationEntry.h>
 
+#include <vector>
 #include <string>
 #include <set>
 #include <map>
@@ -22,11 +23,14 @@ class TClass;
 
 namespace Belle2 {
   class StoreAccessorBase;
-  /** In the store you can park objects, that have to be accessed by various modules.
+  template <class T> class RelationVector;
+
+  /** In the store you can park objects that have to be accessed by various modules.
    *
-   *  The store saves objects together with names and some flags in maps.
    *  Normal users should try to access the store via StoreAccessorBase-derived classes like
-   *  StoreObjPtr or StoreArray. <br>
+   *  StoreObjPtr or StoreArray.
+   *
+   *  The store saves objects/arrays with a unique (name, durability) key.
    *  Currently the store supports either the storage of single objects (that inherit from TObject)
    *  or TClonesArrays which can store a large number of objects of the same type.
    *  Besides that, you have to chose the durability of the things you want to store. <br>

@@ -8,6 +8,83 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//dummy file to allow building dictionary for RelationVector<T>
-#include <framework/datastore/RelationEntry.h>
+#ifndef RELATIONVECTOR_H
+#define RELATIONVECTOR_H
 
+#include <framework/datastore/RelationEntry.h>
+#include <framework/utilities/ArrayIterator.h>
+
+#include <vector>
+
+
+namespace Belle2 {
+  /** Class for type safe access to objects that are referred to in relations.
+   *
+   *  This class is supposed to be used by the RelationsInterface to provide
+   *  type safe access to the objects in a vector of relations returned by
+   *  the data store.
+   */
+  template <class T> class RelationVector {
+  public:
+    /** STL-like iterator over the T objects (not T* ). */
+    typedef ArrayIterator<RelationVector<T>, T> iterator;
+    /** STL-like const_iterator over the T objects (not T* ). */
+    typedef ArrayIterator<RelationVector<T>, const T> const_iterator;
+
+
+    /** Constructor.
+     *
+     *  @param relations  The vector of relation objects.
+     */
+    RelationVector(const std::vector<Belle2::RelationEntry>& relations): m_relations(relations) {}
+
+    /** Accessor for the relations vector.
+     *
+     *  @return           Vector of RelationEntry objects.
+     */
+    const std::vector<Belle2::RelationEntry>& relations() const {return m_relations;}
+
+
+    /** Get number of relations.
+     *
+     *  @return           Number of relations.
+     */
+    size_t size() const { return m_relations.size();}
+
+    /** Get object with index.
+     *
+     *  @param index      Index of relation.
+     *  @return           Object that the relation points to.
+     */
+    T*     object(int index) const {return static_cast<T*>(m_relations[index].object);}
+
+    /** Get object with index.
+     *
+     *  @param index      Index of relation.
+     *  @return           Object that the relation points to.
+     */
+    T*     operator[](int index) const {return object(index);}
+
+    /** Get weight with index.
+     *
+     *  @param index      Index of relation.
+     *  @return           Weight that the relation has.
+     */
+    double weight(int index) const {return m_relations[index].weight;}
+
+
+    /** Return iterator to first entry. */
+    iterator begin() { return iterator(this, 0); }
+    /** Return iterator to last entry +1. */
+    iterator end() { return iterator(this, size()); }
+
+    /** Return const_iterator to first entry. */
+    const_iterator begin() const { return const_iterator(this, 0); }
+    /** Return const_iterator to last entry +1. */
+    const_iterator end() const { return const_iterator(this, size()); }
+
+  private:
+    std::vector<Belle2::RelationEntry> m_relations;  /**< The vector of relation entries */
+  };
+}
+#endif

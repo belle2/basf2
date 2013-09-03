@@ -12,6 +12,7 @@
 #define RELATIONSOBJECT_H
 
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/RelationVector.h>
 
 #include <TObject.h>
 

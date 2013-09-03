@@ -13,6 +13,7 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
+#include <framework/utilities/ArrayIterator.h>
 #include <framework/dataobjects/RelationElement.h>
 #include <framework/dataobjects/RelationContainer.h>
 #include <framework/logging/Logger.h>

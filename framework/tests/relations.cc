@@ -170,6 +170,7 @@ namespace Belle2 {
     {
       int size(0);
       double allweights(0);
+      //for backwards compatibility: BOOST_FOREACH should work
       BOOST_FOREACH(el_t & e, relIndex.getElementsFrom((evtData)[0])) {
         ++size;
         allweights += e.weight;
@@ -180,7 +181,7 @@ namespace Belle2 {
     {
       int size(0);
       double allweights(0);
-      BOOST_FOREACH(el_t & e, relIndex.getElementsTo((profileData)[0])) {
+      for (el_t & e : relIndex.getElementsTo((profileData)[0])) {
         ++size;
         allweights += e.weight;
       }
@@ -190,7 +191,7 @@ namespace Belle2 {
     {
       int size(0);
       double allweights(0);
-      BOOST_FOREACH(el_t & e, relIndex.getElementsTo((profileData)[4])) {
+      for (const el_t & e : relIndex.getElementsTo((profileData)[4])) {
         ++size;
         allweights += e.weight;
       }

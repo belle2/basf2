@@ -12,6 +12,8 @@
 
 #include <framework/datastore/RelationIndexManager.h>
 
+#include <boost/range/iterator_range.hpp>
+
 namespace Belle2 {
   template <class T> class StoreArray;
 
@@ -49,18 +51,18 @@ namespace Belle2 {
       \endcode
    *
    *  If more than one associated object exists, one can loop over them using
-   *  BOOST_FOREACH. For example, when one instead wants to find the CDCSimHits
+   *  range-based for. For example, when one instead wants to find the CDCSimHits
    *  belonging to a particle, one can use:
    *  \code
       const MCParticle* particle = ...;
-      BOOST_FOREACH(const relElement_t & rel, mcparticlesToCdcsimhits.getElementsFrom(particle)) {
+      for(const relElement_t & rel: mcparticlesToCdcsimhits.getElementsFrom(particle)) {
         const CDCSimHit* hit = rel.to;
         //...
       }
       \endcode
    *
    *  The documentation of the relation element type used by getFirstElementTo()/
-   *  getFirstElementFrom() or during the BOOST_FOREACH loop can be found in
+   *  getFirstElementFrom() or during the for loop can be found in
    *  RelationIndexContainer<FROM, TO>::Element.
    *
    *  Note that the BOOST_FOREACH macro must always be used with a typedef similar
@@ -82,7 +84,7 @@ namespace Belle2 {
     typedef typename ElementIndex::template nth_index<0>::type index_from;
 
     /** Typedef for easy access to the to side of the index. */
-    typedef typename ElementIndex::template nth_index<1>::type   index_to;
+    typedef typename ElementIndex::template nth_index<1>::type index_to;
 
     /** Element iterator of the from side index.
      *
@@ -94,11 +96,11 @@ namespace Belle2 {
     /** Element iterator of the to side index. */
     typedef typename index_to::const_iterator iterator_to;
 
-    /** Pair of iterators specifing the range [first,second) of the from side. */
-    typedef std::pair<iterator_from, iterator_from> range_from;
+    /** Iterator range [first,second) of the from side. */
+    typedef boost::iterator_range<iterator_from> range_from;
 
-    /** Pair of iterators specifing the range [first,second) of the to side. */
-    typedef std::pair<iterator_to, iterator_to> range_to;
+    /** Iterator range [first,second) of the to side. */
+    typedef boost::iterator_range<iterator_to> range_to;
 
     /** Constructor.
      *
@@ -135,44 +137,44 @@ namespace Belle2 {
 
     /** Return a range of all elements pointing from the given object.
      *
-     *  Can be used with BOOST_FOREACH macro, see RelationIndex class
+     *  Can be used with range-based for, see RelationIndex class
      *  documentation for an example.
      *
      *  @param   from Pointer for which to get the relation.
-     *  @returns pair of iterators specifing the range [first,second) of
+     *  @returns Iterator range [first,second) of
      *           elements which point from this object.
      */
     range_from getElementsFrom(const FROM* from) const { return m_from.equal_range(from); }
 
     /** Return a range of all elements pointing from the given object.
      *
-     *  Can be used with BOOST_FOREACH macro, see RelationIndex class
+     *  Can be used with range-based for, see RelationIndex class
      *  documentation for an example.
      *
      *  @param from Reference for which to get the relation
-     *  @returns Pair of iterators specifing the range [first,second) of
+     *  @returns Iterator range [first,second) of
      *           elements which point from this object
      */
     range_from getElementsFrom(const FROM& from) const { return m_from.equal_range(&from); }
 
     /** Return a range of all elements pointing to the given object.
      *
-     *  Can be used with BOOST_FOREACH macro, see RelationIndex class
+     *  Can be used with range-based for, see RelationIndex class
      *  documentation for an example.
      *
      *  @param to Pointer for which to get the relation
-     *  @returns Pair of iterators specifing the range [first,second) of
+     *  @returns Iterator range [first,second) of
      *           elements which point to this object
      */
     range_to getElementsTo(const TO* to) const { return m_to.equal_range(to); }
 
     /** Return a range of all elements pointing to the given object.
      *
-     *  Can be used with BOOST_FOREACH macro, see RelationIndex class
+     *  Can be used with range-based for, see RelationIndex class
      *  documentation for an example.
      *
      *  @param to Reference for which to get the relation
-     *  @returns Pair of iterators specifing the range [first,second) of
+     *  @returns Iterator range [first,second) of
      *           elements which point to this object
      */
     range_to getElementsTo(const TO& to) const { return m_to.equal_range(&to); }

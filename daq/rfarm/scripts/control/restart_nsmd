@@ -1,6 +1,0 @@
-#! /bin/tcsh
-foreach x (02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17)
-  ssh root@hlttb$x service nsmd restart
-end
-ssh root@hlttbsrv service nsmd restart
-ssh root@hltsr01 service nsmd restart

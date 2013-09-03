@@ -91,8 +91,9 @@ void RingBuffer::openSHM(int size)
 {
   // 1. Open shared memory
   unsigned int sizeBytes = size * sizeof(int);
-  m_shmid = shmget(m_shmkey, sizeBytes, IPC_CREAT | 0600);
+  m_shmid = shmget(m_shmkey, sizeBytes, IPC_CREAT | 0644);
   if (m_shmid < 0) {
+    //    perror ( "RingBuffer:shmget" );
     unsigned int maxSizeBytes = size;
     ifstream shmax("/proc/sys/kernel/shmmax");
     if (shmax.good())

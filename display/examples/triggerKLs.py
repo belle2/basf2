@@ -18,13 +18,7 @@ from ROOT import Belle2
 
 
 class PyTrigger(Module):
-
     """Returns 1 if current event contains at least one K_L^0, 0 otherwise"""
-
-    def __init__(self):
-        """constructor."""
-
-        super(PyTrigger, self).__init__()
 
     def event(self):
         """reimplementation of Module::event()."""

@@ -29,11 +29,6 @@ vertexparams = [[0, 1], [0, 1], [10, 2]]
 class VisualizeVertex(Module):
     """Visualize the vertex configured for the ParticleGun"""
 
-    def __init__(self):
-        """constructor."""
-
-        super(VisualizeVertex, self).__init__()
-
     def initialize(self):
         """reimplementation of Module::initialize()."""
 

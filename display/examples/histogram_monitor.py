@@ -31,11 +31,6 @@ class GenerateHist(Module):
         100, -150.0, 150.0,
         100, -150.0, 150.0)
 
-    def __init__(self):
-        """constructor."""
-
-        super(GenerateHist, self).__init__()
-
     def initialize(self):
         """reimplementation of Module::initialize()."""
 

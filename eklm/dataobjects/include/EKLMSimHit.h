@@ -64,18 +64,6 @@ namespace Belle2 {
     void setParentTrackID(int track);
 
     /**
-     * Get volume name.
-     * @return Name.
-     */
-    std::string getName()  const;
-
-    /**
-     * Set volume name.
-     * @param[in] name Name.
-     */
-    void setName(std::string& name);
-
-    /**
      * Get volume identifier.
      * @return Identifier.
      */

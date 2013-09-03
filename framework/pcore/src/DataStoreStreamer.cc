@@ -132,15 +132,14 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
           DataStore::Instance().createObject(obj, true,
                                              StoreAccessorBase(namelist.at(i), durability, cl, array));
           B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
-        } else {
-          if (m_initStatus == 1) {
-            delete obj;
-          }
-        }
-        //reset bits (are checked to be false when streaming the object)
-        obj->SetBit(c_IsTransient, false);
-        obj->SetBit(c_IsNull, false);
 
+          //reset bits of object in DataStore (are checked to be false when streaming the object)
+          obj->SetBit(c_IsTransient, false);
+          obj->SetBit(c_IsNull, false);
+        } else {
+          //not stored, clean up
+          delete obj;
+        }
       } else {
         //DataStore always has non-NULL content (wether they're available is a different matter)
         B2ERROR("restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " is NULL!");

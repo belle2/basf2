@@ -30,8 +30,9 @@ int main(int argc, char* argv[])
   const int num_pdg_codes = Const::ChargedStable::c_SetSize;
 
   if (argc < 2 or argc > 3) {
-    std::cerr << "Usage: " << argv[0] << " INPUT_FILE [OUTPUT_FILE]\n";
-    std::cerr << "\t if OUTPUT_FILE is not given, histograms will be drawn.\n";
+    std::cerr << "Usage: " << argv[0] << " INPUT_FILE [OUTPUT_FILE]\n\n";
+    std::cerr << "Generates PDFs for the DedxPID module, requires an input .root file created by running DedxPID with enableDebug=True.\n";
+    std::cerr << "If OUTPUT_FILE is not given, histograms will be drawn instead of being saved.\n";
     return 1;
   }
   gSystem->Load("libtracking");

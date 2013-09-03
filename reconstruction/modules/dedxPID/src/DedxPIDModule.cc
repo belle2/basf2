@@ -461,7 +461,7 @@ void DedxPIDModule::event()
 
     //save DedxLikelihood
     if (!m_pdfFile.empty()) {
-      DedxLikelihood* likelihoodObj = new(likelihood_array.nextFreeAddress()) DedxLikelihood(dedxTrack->m_logl);
+      DedxLikelihood* likelihoodObj = likelihood_array.appendNew(dedxTrack->m_logl);
       track->addRelationTo(likelihoodObj);
     }
   } //end loop over tracks

@@ -12,7 +12,7 @@
 #define EKLMFIBERANDELECTRONICS_H
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMSimHit.h>
+#include <eklm/dataobjects/EKLMSim2Hit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/Digitizer.h>
@@ -23,7 +23,7 @@ namespace Belle2 {
   namespace EKLM {
 
     /**
-     * Digitize EKLMSimHits to get EKLM StripHits.
+     * Digitize EKLMSim2Hits to get EKLM StripHits.
      */
     class FiberAndElectronics {
 
@@ -32,7 +32,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      FiberAndElectronics(std::pair <int, std::vector<EKLMSimHit*> >,
+      FiberAndElectronics(std::pair <int, std::vector<EKLMSim2Hit*> >,
                           EKLM::GeometryData* geoDat,
                           struct EKLM::DigitizationParams* digPar);
 
@@ -103,7 +103,7 @@ namespace Belle2 {
       int m_npe;
 
       /** Pointer to vector if the SimHits. */
-      std::vector<EKLMSimHit*> m_vectorHits;
+      std::vector<EKLMSim2Hit*> m_vectorHits;
 
       /**
        * Distance from the hitpoint to SiPM for the (forward, backward) photons
@@ -134,9 +134,9 @@ namespace Belle2 {
 
       /**
        * Calculate 'distances' to the direct and mirrored hits.
-       * @param[in] sh EKLMSimHit.
+       * @param[in] sh EKLMSim2Hit.
        */
-      void lightPropagationDistance(EKLMSimHit*);
+      void lightPropagationDistance(EKLMSim2Hit*);
 
       /**
        * Reflect time-shape of 1p.e. signal.

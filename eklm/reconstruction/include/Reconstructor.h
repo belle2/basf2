@@ -76,7 +76,7 @@ namespace Belle2 {
        * @param[in] pos  Hit position.
        * @param[in] time HIt time.
        */
-      bool fastHit(HepGeom::Point3D<double> &pos, double time);
+      bool fastHit(HepGeom::Point3D<double>& pos, double time);
 
       /**
        * Check whether strips intersect.
@@ -91,7 +91,7 @@ namespace Belle2 {
        * @return true if strips have intersection.
        */
       bool doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
-                         HepGeom::Point3D<double> *crossPoint,
+                         HepGeom::Point3D<double>* crossPoint,
                          double& chisq, double& time);
 
       /** Speed of the first photon. */

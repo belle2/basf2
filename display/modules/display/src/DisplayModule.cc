@@ -62,7 +62,7 @@ void DisplayModule::initialize()
   StoreArray<PXDSimHit>::optional();
   StoreArray<SVDSimHit>::optional();
   StoreArray<BKLMSimHit>::optional();
-  StoreArray<EKLMStepHit>::optional();
+  StoreArray<EKLMSimHit>::optional();
   StoreArray<ECLHit>::optional();
   StoreArray<ECLGamma>::optional();
   StoreArray<GFTrack>::optional();
@@ -151,7 +151,7 @@ void DisplayModule::event()
   m_visualizer->addSimHits(StoreArray<PXDSimHit>());
   m_visualizer->addSimHits(StoreArray<SVDSimHit>());
   m_visualizer->addSimHits(StoreArray<ECLHit>());
-  m_visualizer->addSimHits(StoreArray<EKLMStepHit>());
+  m_visualizer->addSimHits(StoreArray<EKLMSimHit>());
   m_visualizer->addSimHits(StoreArray<BKLMSimHit>());
 
   if (m_showGFTracks) {

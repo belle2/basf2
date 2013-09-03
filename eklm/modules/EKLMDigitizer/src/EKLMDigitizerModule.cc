@@ -37,7 +37,7 @@ EKLMDigitizerModule::~EKLMDigitizerModule()
 
 void EKLMDigitizerModule::initialize()
 {
-  StoreArray<EKLMSimHit>::registerPersistent();
+  StoreArray<EKLMSim2Hit>::registerPersistent();
   StoreArray<EKLMDigit>::registerPersistent();
   if (m_geoDat.read() != 0)
     B2FATAL("Cannot read geometry data file.");

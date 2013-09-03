@@ -8,29 +8,40 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <iostream>
-#include <fstream>
-
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
-ClassImp(Belle2::EKLMSimHit)
+ClassImp(EKLMSimHit);
 
 EKLMSimHit::EKLMSimHit()
 {
-  setMomentum(CLHEP::HepLorentzVector(0, 0, 0, 0));
-  m_volid = 0;
 }
 
-EKLMSimHit::EKLMSimHit(const EKLMStepHit* stepHit)
-  : EKLMHitBase((EKLMHitBase)*stepHit)
+EKLMSimHit::~EKLMSimHit()
 {
-  setMomentum(stepHit->getMomentum());
-  setVolumeID(stepHit->getVolumeID());
+}
+
+int EKLMSimHit::getTrackID() const
+{
+  return m_trackID;
+}
+
+void EKLMSimHit::setTrackID(int track)
+{
+  m_trackID = track;
+}
+
+int EKLMSimHit::getParentTrackID() const
+{
+  return m_parentTrackID;
+}
+
+void EKLMSimHit::setParentTrackID(int track)
+{
+  m_parentTrackID = track;
 }
 
 int EKLMSimHit::getVolumeID() const

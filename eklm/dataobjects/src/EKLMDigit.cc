@@ -21,7 +21,7 @@ EKLMDigit::EKLMDigit()
 {
 }
 
-EKLMDigit::EKLMDigit(const EKLMSimHit* hit)
+EKLMDigit::EKLMDigit(const EKLMSim2Hit* hit)
   : EKLMHitBase((EKLMHitBase)(*hit)),
     m_Plane(hit->getPlane()),
     m_Strip(hit->getStrip()),

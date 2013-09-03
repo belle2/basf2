@@ -25,7 +25,7 @@ EKLM::Reconstructor::Reconstructor(GeometryData* geoDat)
   m_geoDat = geoDat;
 }
 
-bool EKLM::Reconstructor::fastHit(HepGeom::Point3D<double> &pos, double time)
+bool EKLM::Reconstructor::fastHit(HepGeom::Point3D<double>& pos, double time)
 {
   return time < pos.mag() / Const::speedOfLight - 2.0 * m_sigmaT;
 }
@@ -99,7 +99,7 @@ void EKLM::Reconstructor::create2dHits()
 }
 
 bool EKLM::Reconstructor::doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
-                                        HepGeom::Point3D<double> *crossPoint,
+                                        HepGeom::Point3D<double>* crossPoint,
                                         double& chisq, double& time)
 {
   bool is;

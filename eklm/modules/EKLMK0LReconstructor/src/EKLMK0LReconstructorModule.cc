@@ -57,8 +57,8 @@ static bool layerLessThan(struct HitData hit1, struct HitData hit2)
  * @param[in,out] hits   Hits.
  * @param[in.out] hits2d New 2d hits.
  */
-static void merge2dClusters(std::vector<struct HitData> &hits,
-                            std::vector<EKLMHit2d*> &hits2d)
+static void merge2dClusters(std::vector<struct HitData>& hits,
+                            std::vector<EKLMHit2d*>& hits2d)
 {
   std::vector<struct HitData>::iterator it, it2, itStart, itEnd;
   int layerRange[15];
@@ -154,7 +154,7 @@ static void merge2dClusters(std::vector<struct HitData> &hits,
  * @param[in,out] hits    All hits (including this).
  */
 static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
-                               std::vector<struct HitData> &hits)
+                               std::vector<struct HitData>& hits)
 {
   int i;
   int layerHits[14], nLayers;

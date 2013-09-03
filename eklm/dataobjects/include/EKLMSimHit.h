@@ -1,50 +1,79 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010  Belle II Collaboration                              *
+ * Copyright(C) 2011  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Timofey Uglov, Kirill Chilikin                           *
+ * Contributors: Timofey Uglov                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMSIMHIT_H
-#define EKLMSIMHIT_H
-
-/* External headers. */
-#include <TObject.h>
+#ifndef EKLMSTEPHIT_H
+#define EKLMSTEPHIT_H
 
 /* Belle2 headers. */
+#include <generators/dataobjects/SimHitBase.h>
 #include <eklm/dataobjects/EKLMHitBase.h>
 #include <eklm/dataobjects/EKLMHitCoord.h>
 #include <eklm/dataobjects/EKLMHitMomentum.h>
-#include <eklm/dataobjects/EKLMStepHit.h>
 
 namespace Belle2 {
 
   /**
-   * Class to handle simulation hits.
+   * Class EKLMSimHit stores information on particular Geant step;
+   * using information from TrackID and ParentTrackID it is possible
+   * to restore the hit tree and thus another type of hits.
    */
+
   class EKLMSimHit : public EKLMHitBase, public EKLMHitCoord,
     public EKLMHitMomentum {
-
   public:
 
     /**
-     * Default constructor needed to make the class storable.
+     * Constructor.
      */
     EKLMSimHit();
 
     /**
-     * Constructor with StepHit.
-     * @param[in] stepHit EKLMStepHit.
-     */
-    EKLMSimHit(const EKLMStepHit* stepHit);
-
-    /**
      * Destructor.
      */
-    ~EKLMSimHit() {};
+    ~EKLMSimHit();
+
+    /**
+     * Get track ID
+     * @return Track ID.
+     */
+    int getTrackID() const;
+
+    /**
+     * Set track ID.
+     * @param[in] track track ID.
+     */
+    void setTrackID(int track);
+
+    /**
+     * Get ID of parent track.
+     * @return Track ID.
+     */
+    int getParentTrackID() const;
+
+    /**
+     * Set ID of parent track.
+     * @param[in] track track ID.
+     */
+    void setParentTrackID(int track);
+
+    /**
+     * Get volume name.
+     * @return Name.
+     */
+    std::string getName()  const;
+
+    /**
+     * Set volume name.
+     * @param[in] name Name.
+     */
+    void setName(std::string& name);
 
     /**
      * Get volume identifier.
@@ -60,6 +89,7 @@ namespace Belle2 {
 
     /**
      * Get plane number.
+     * @return Plane number.
      */
     int getPlane() const;
 
@@ -83,6 +113,12 @@ namespace Belle2 {
 
   private:
 
+    /** Track ID. */
+    int m_trackID;
+
+    /** Parent track ID. */
+    int m_parentTrackID;
+
     /** Volume identifier. */
     int m_volid;
 
@@ -92,11 +128,11 @@ namespace Belle2 {
     /** Number of strip. */
     int m_Strip;
 
-    /** Needed to make root object storable. */
-    ClassDef(Belle2::EKLMSimHit, 1);
+    /** The class title. */
+    ClassDef(EKLMSimHit, 1);
 
   };
 
-} // end of namespace Belle2
+} // end namespace Belle2
 
-#endif //EKLMSIMHIT_H
+#endif

@@ -8,68 +8,57 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* C++ headers. */
+#include <iostream>
+#include <fstream>
+
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMStepHit.h>
+#include <eklm/dataobjects/EKLMSim2Hit.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
-ClassImp(EKLMStepHit);
+ClassImp(Belle2::EKLMSim2Hit)
 
-EKLMStepHit::EKLMStepHit()
+EKLMSim2Hit::EKLMSim2Hit()
 {
+  setMomentum(CLHEP::HepLorentzVector(0, 0, 0, 0));
+  m_volid = 0;
 }
 
-EKLMStepHit::~EKLMStepHit()
+EKLMSim2Hit::EKLMSim2Hit(const EKLMSimHit* stepHit)
+  : EKLMHitBase((EKLMHitBase)*stepHit)
 {
+  setMomentum(stepHit->getMomentum());
+  setVolumeID(stepHit->getVolumeID());
 }
 
-int EKLMStepHit::getTrackID() const
-{
-  return m_trackID;
-}
-
-void EKLMStepHit::setTrackID(int track)
-{
-  m_trackID = track;
-}
-
-int EKLMStepHit::getParentTrackID() const
-{
-  return m_parentTrackID;
-}
-
-void EKLMStepHit::setParentTrackID(int track)
-{
-  m_parentTrackID = track;
-}
-
-int EKLMStepHit::getVolumeID() const
+int EKLMSim2Hit::getVolumeID() const
 {
   return m_volid;
 }
 
-void EKLMStepHit::setVolumeID(int id)
+void EKLMSim2Hit::setVolumeID(int id)
 {
   m_volid = id;
 }
 
-int EKLMStepHit::getPlane() const
+int EKLMSim2Hit::getPlane() const
 {
   return m_Plane;
 }
 
-void EKLMStepHit::setPlane(int plane)
+void EKLMSim2Hit::setPlane(int plane)
 {
   m_Plane = plane;
 }
 
-int EKLMStepHit::getStrip() const
+int EKLMSim2Hit::getStrip() const
 {
   return m_Strip;
 }
 
-void EKLMStepHit::setStrip(int strip)
+void EKLMSim2Hit::setStrip(int strip)
 {
   m_Strip = strip;
 }

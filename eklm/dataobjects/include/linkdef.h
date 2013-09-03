@@ -13,10 +13,10 @@
 #pragma link C++ class Belle2::EKLMHitMomentum;
 
 /* Geant stage. */
-#pragma link C++ class Belle2::EKLMStepHit;
+#pragma link C++ class Belle2::EKLMSimHit;
 
 /* Digitization stage. */
-#pragma link C++ class Belle2::EKLMSimHit;
+#pragma link C++ class Belle2::EKLMSim2Hit;
 #pragma link C++ class Belle2::EKLMDigit;
 
 /* Reconstuction stage. */

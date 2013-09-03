@@ -13,7 +13,7 @@
 
 /* Belle2 headers. */
 #include <simulation/kernel/SensitiveDetectorBase.h>
-#include <eklm/dataobjects/EKLMStepHit.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/geometry/GeoEKLMTypes.h>
 
 namespace Belle2 {
@@ -23,8 +23,8 @@ namespace Belle2 {
     /**
      * The Class for EKLM Sensitive Detector.
      * @details
-     * In this class, every variables defined in EKLMStepHit will be calculated.
-     * EKLMStepHits are saved into hits collection.
+     * In this class, every variables defined in EKLMSimHit will be calculated.
+     * EKLMSimHits are saved into hits collection.
      */
 
     class EKLMSensitiveDetector : public Simulation::SensitiveDetectorBase  {
@@ -42,8 +42,8 @@ namespace Belle2 {
       ~EKLMSensitiveDetector() {};
 
       /**
-       * Process each step and calculate variables for EKLMStepHit
-       * store EKLMStepHit.
+       * Process each step and calculate variables for EKLMSimHit
+       * store EKLMSimHit.
        */
       bool step(G4Step* aStep, G4TouchableHistory* history);
 

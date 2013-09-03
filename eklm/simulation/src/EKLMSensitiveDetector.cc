@@ -23,7 +23,7 @@ using namespace Belle2;
 
 EKLM::EKLMSensitiveDetector::
 EKLMSensitiveDetector(G4String name, enum EKLMSensitiveType type)
-  : Simulation::SensitiveDetectorBase(name, KLM)
+: Simulation::SensitiveDetectorBase(name, KLM)
 {
   m_type = type;
   GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
@@ -34,13 +34,13 @@ EKLMSensitiveDetector(G4String name, enum EKLMSensitiveType type)
   m_ThresholdHitTime =
     Unit::convertValue(gd.getDouble("HitTimeThreshold") , "ns");
 
-  StoreArray<EKLMStepHit> stepHits;
+  StoreArray<EKLMSimHit> stepHits;
   StoreArray<MCParticle> particles;
   RelationArray particleToStepHits(particles, stepHits);
   registerMCParticleRelation(particleToStepHits);
 
-  StoreArray<EKLMStepHit>::registerPersistent();
-  RelationArray::registerPersistent<MCParticle, EKLMStepHit>();
+  StoreArray<EKLMSimHit>::registerPersistent();
+  RelationArray::registerPersistent<MCParticle, EKLMSimHit>();
 }
 
 //-----------------------------------------------------
@@ -97,8 +97,8 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
                 aStep->GetPreStepPoint()->GetPosition());
   lpos = hist->GetHistory()->GetTopTransform().TransformPoint(gpos);
   /* Create step hit and store in to DataStore */
-  StoreArray<EKLMStepHit> stepHits;
-  EKLMStepHit* hit = new(stepHits.nextFreeAddress())EKLMStepHit();
+  StoreArray<EKLMSimHit> stepHits;
+  EKLMSimHit* hit = new(stepHits.nextFreeAddress())EKLMSimHit();
   hit->setMomentum(CLHEP::HepLorentzVector(track.GetMomentum(),
                                            track.GetTotalEnergy()));
   hit->setTrackID(track.GetTrackID());

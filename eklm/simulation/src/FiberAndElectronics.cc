@@ -25,7 +25,7 @@ using namespace Belle2;
 static const char MemErr[] = "Memory allocation error.";
 
 EKLM::FiberAndElectronics::FiberAndElectronics(
-  std::pair < int, std::vector<EKLMSimHit*> > entry,
+  std::pair < int, std::vector<EKLMSim2Hit*> > entry,
   EKLM::GeometryData* geoDat,
   struct EKLM::DigitizationParams* digPar)
 {
@@ -71,7 +71,7 @@ EKLM::FiberAndElectronics::~FiberAndElectronics()
 void EKLM::FiberAndElectronics::processEntry()
 {
   int i;
-  for (std::vector<EKLMSimHit*> ::iterator iHit = m_vectorHits.begin();
+  for (std::vector<EKLMSim2Hit*> ::iterator iHit = m_vectorHits.begin();
        iHit != m_vectorHits.end(); iHit++) {
 
     // calculate distance
@@ -124,7 +124,7 @@ void EKLM::FiberAndElectronics::processEntry()
     debugOutput();
 }
 
-void EKLM::FiberAndElectronics::lightPropagationDistance(EKLMSimHit* sh)
+void EKLM::FiberAndElectronics::lightPropagationDistance(EKLMSim2Hit* sh)
 {
   double half_len;
   double local_pos;
@@ -195,7 +195,8 @@ double EKLM::FiberAndElectronics::lightPropagationTime(double L)
   return L / m_digPar->firstPhotonlightSpeed;
 }
 
-struct EKLM::FPGAFitParams* EKLM::FiberAndElectronics::getFitResults() {
+struct EKLM::FPGAFitParams* EKLM::FiberAndElectronics::getFitResults()
+{
   return &m_FPGAParams;
 }
 

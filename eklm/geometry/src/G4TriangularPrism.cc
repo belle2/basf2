@@ -70,7 +70,7 @@ err_mem3:
 err_mem2:
   delete m_tube;
 err_mem1:
-  throw(std::bad_alloc());
+  throw (std::bad_alloc());
 }
 
 G4TriangularPrism::~G4TriangularPrism()

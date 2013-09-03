@@ -69,7 +69,7 @@ namespace Belle2 {
        * @return True if strips intersect.
        */
       bool intersection(EKLMDigit* hit1, EKLMDigit* hit2,
-                        HepGeom::Point3D<double> *cross,
+                        HepGeom::Point3D<double>* cross,
                         double* d1, double* d2, double* sd);
 
       /** Transformations. */

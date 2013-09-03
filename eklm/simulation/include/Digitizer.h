@@ -20,8 +20,8 @@
 
 /* Belle2 headers. */
 #include <eklm/geometry/GeometryData.h>
-#include <eklm/dataobjects/EKLMStepHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
+#include <eklm/dataobjects/EKLMSim2Hit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -89,7 +89,7 @@ namespace Belle2 {
     };
 
     /**
-     * Digitize EKLMSimHits to get EKLM StripHits.
+     * Digitize EKLMSim2Hits to get EKLM StripHits.
      * @details
      * Usually called by eklmDigitizerModule.
      */
@@ -136,20 +136,20 @@ namespace Belle2 {
       /** Parameters. */
       struct EKLM::DigitizationParams* m_digPar;
 
-      /** Map for EKLMStepHit sorting according sensitive volumes. */
-      std::map<int, std::vector<EKLMStepHit*> > m_stepHitVolumeMap;
+      /** Map for EKLMSimHit sorting according sensitive volumes. */
+      std::map<int, std::vector<EKLMSimHit*> > m_stepHitVolumeMap;
 
       /** Map for hits sorting according strip name. */
-      std::map<int, std::vector<EKLMSimHit*> > m_HitStripMap;
+      std::map<int, std::vector<EKLMSim2Hit*> > m_HitStripMap;
 
       /** Vector of EKLMDigits. */
       std::vector<EKLMDigit*> m_HitVector;
 
       /** Sim hits vector. */
-      std::vector<EKLMSimHit*> m_simHitsVector;
+      std::vector<EKLMSim2Hit*> m_simHitsVector;
 
       /** SimHit storage initialization. */
-      StoreArray<EKLMSimHit> m_simHitsArray;
+      StoreArray<EKLMSim2Hit> m_simHitsArray;
 
       /** StripHit storage initialization. */
       StoreArray<EKLMDigit> m_stripHitsArray;

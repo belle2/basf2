@@ -38,22 +38,22 @@ void EKLM::Digitizer::readAndSortStepHits()
 {
   B2DEBUG(1, "EKLM::Digitizer::readAndSortStepHits()");
 
-  StoreArray<EKLMStepHit> stepHitsArray;
+  StoreArray<EKLMSimHit> stepHitsArray;
   for (int i = 0; i < stepHitsArray.getEntries(); i++) {
 
     // search for entries of the same strip
-    std::map<int, std::vector<EKLMStepHit*> >::iterator
+    std::map<int, std::vector<EKLMSimHit*> >::iterator
     it = m_stepHitVolumeMap.find((stepHitsArray[i])->getVolumeID());
 
     if (it == m_stepHitVolumeMap.end()) { //  new entry
-      std::vector<EKLMStepHit*> *vectorHits = NULL;
+      std::vector<EKLMSimHit*>* vectorHits = NULL;
       try {
-        vectorHits = new std::vector<EKLMStepHit*> (1, (stepHitsArray[i]));
+        vectorHits = new std::vector<EKLMSimHit*> (1, (stepHitsArray[i]));
       } catch (std::bad_alloc& ba) {
         B2FATAL(MemErr);
       }
 
-      m_stepHitVolumeMap.insert(std::pair<int, std::vector<EKLMStepHit*> >((stepHitsArray[i])->getVolumeID(), *vectorHits));
+      m_stepHitVolumeMap.insert(std::pair<int, std::vector<EKLMSimHit*> >((stepHitsArray[i])->getVolumeID(), *vectorHits));
     } else {
       it->second.push_back(stepHitsArray[i]);
     }
@@ -70,15 +70,15 @@ void EKLM::Digitizer::makeSimHits()
 
 
   //loop over volumes
-  for (std::map<int, std::vector<EKLMStepHit*> >::iterator
+  for (std::map<int, std::vector<EKLMSimHit*> >::iterator
        volumeIterator = m_stepHitVolumeMap.begin();
        volumeIterator != m_stepHitVolumeMap.end(); volumeIterator++) {
 
     // we have only tree graphs here, so edge is completely defined by it's track ID
     // map to store (edge  <--> hit) == (vertex <--> hit) correspondence
-    std::map < int , EKLMStepHit*> hitMap;
+    std::map < int , EKLMSimHit*> hitMap;
 
-    for (std::vector<EKLMStepHit*>::iterator i = volumeIterator->second.begin();
+    for (std::vector<EKLMSimHit*>::iterator i = volumeIterator->second.begin();
          i != volumeIterator->second.end(); i++) {
       // ID key
       int key = (*i)->getTrackID();
@@ -90,10 +90,10 @@ void EKLM::Digitizer::makeSimHits()
       //this procedure removes multiple maps entries  with identical keys
 
       // search if entry already exist
-      std::map < int , EKLMStepHit*>::iterator mapIterator = hitMap.find(key);
+      std::map < int , EKLMSimHit*>::iterator mapIterator = hitMap.find(key);
       if (mapIterator == hitMap.end()) { // nothing found
         // add an entry
-        hitMap.insert(std::pair< int , EKLMStepHit*>(key, *i));
+        hitMap.insert(std::pair< int , EKLMSimHit*>(key, *i));
       } else { // entry already exists
         // get  time of the entries
         double oldTime = mapIterator->second->getTime();
@@ -125,11 +125,11 @@ void EKLM::Digitizer::makeSimHits()
     // use special ParentTrackID for the tracks coming from abroad  remains these trees splittable
     int non_exsisting_rtracks_counter = hitMap.size();
 
-    for (std::map < int , EKLMStepHit*>::iterator hitIterator = hitMap.begin();
+    for (std::map < int , EKLMSimHit*>::iterator hitIterator = hitMap.begin();
          hitIterator != hitMap.end(); hitIterator++) {
 
       //search for parent entry in the map
-      std::map < int , EKLMStepHit*>::iterator parentIterator =
+      std::map < int , EKLMSimHit*>::iterator parentIterator =
         hitMap.find(hitIterator->second->getParentTrackID());
 
       if (parentIterator != hitMap.end()) { // nothing found
@@ -146,24 +146,24 @@ void EKLM::Digitizer::makeSimHits()
     std::vector<int> component(num_vertices(G));
 
     // map for component <-> simhit correspondence
-    std::map <int, EKLMSimHit*> graphComponentToSimHit;
+    std::map <int, EKLMSim2Hit*> graphComponentToSimHit;
 
     // loop over the vertices
-    for (std::map < int , EKLMStepHit*>::iterator hitIterator = hitMap.begin();
+    for (std::map < int , EKLMSimHit*>::iterator hitIterator = hitMap.begin();
          hitIterator != hitMap.end(); hitIterator++) {
-      // get EKLMStepHit corresponding to the current vertex
-      EKLMStepHit* stepHit = hitIterator->second;
+      // get EKLMSimHit corresponding to the current vertex
+      EKLMSimHit* stepHit = hitIterator->second;
 
       // search for the current component in the map
-      std::map <int, EKLMSimHit*>::iterator current =
+      std::map <int, EKLMSim2Hit*>::iterator current =
         graphComponentToSimHit.find(component[distance(hitMap.begin(), hitIterator)]);
       if (current == graphComponentToSimHit.end()) {    // no  entry for this component
 
-        // create new EKLMSimHit and store all information into it
-        EKLMSimHit* simHit =
-          new(m_simHitsArray.nextFreeAddress()) EKLMSimHit(stepHit);
+        // create new EKLMSim2Hit and store all information into it
+        EKLMSim2Hit* simHit =
+          new(m_simHitsArray.nextFreeAddress()) EKLMSim2Hit(stepHit);
         // insert hit to the map
-        graphComponentToSimHit.insert(std::pair<int, EKLMSimHit*>(component[distance(hitMap.begin(), hitIterator)], simHit));
+        graphComponentToSimHit.insert(std::pair<int, EKLMSim2Hit*>(component[distance(hitMap.begin(), hitIterator)], simHit));
 
         simHit->setGlobalPosition(stepHit->getGlobalPosition());
         simHit->setPlane(stepHit->getPlane());
@@ -202,17 +202,17 @@ void EKLM::Digitizer::readAndSortSimHits()
   for (int i = 0; i < m_simHitsArray.getEntries(); i++) {
 
     // search for entries of the same strip
-    std::map<int, std::vector<EKLMSimHit*> >::iterator
+    std::map<int, std::vector<EKLMSim2Hit*> >::iterator
     it = m_HitStripMap.find((m_simHitsArray[i])->getVolumeID());
 
     if (it == m_HitStripMap.end()) { //  new entry
-      std::vector<EKLMSimHit*> *vectorHits = NULL;
+      std::vector<EKLMSim2Hit*>* vectorHits = NULL;
       try {
-        vectorHits = new std::vector<EKLMSimHit*> (1, (m_simHitsArray[i]));
+        vectorHits = new std::vector<EKLMSim2Hit*> (1, (m_simHitsArray[i]));
       } catch (std::bad_alloc& ba) {
         B2FATAL(MemErr);
       }
-      m_HitStripMap.insert(std::pair<int, std::vector<EKLMSimHit*> >
+      m_HitStripMap.insert(std::pair<int, std::vector<EKLMSim2Hit*> >
                            ((m_simHitsArray[i])->getVolumeID(), *vectorHits));
     } else {
       it->second.push_back(m_simHitsArray[i]);
@@ -226,7 +226,7 @@ void EKLM::Digitizer::readAndSortSimHits()
 //!  are simulated in EKLMFiberAndElectronics class
 void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
 {
-  for (std::map<int, std::vector<EKLMSimHit*> >::iterator it =
+  for (std::map<int, std::vector<EKLMSim2Hit*> >::iterator it =
          m_HitStripMap.begin(); it != m_HitStripMap.end(); it++) {
 
 
@@ -237,7 +237,7 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
     // do all work
     fes->processEntry();
 
-    EKLMSimHit* simHit = it->second.front();
+    EKLMSim2Hit* simHit = it->second.front();
 
     // create new stripHit
     EKLMDigit* stripHit =

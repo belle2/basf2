@@ -80,7 +80,7 @@ namespace Belle2 {
       const std::vector<int> getSupportedCutoffs(unsigned int aFriend);
 
       /** getter - return the cutoff. To get it, you have to know which friendSector and which CutoffType you want to have */
-      Cutoff* getCutoff(int cutOffType, unsigned int aFriend) {
+      const Cutoff* getCutoff(int cutOffType, unsigned int aFriend) {
         FriendMap::iterator mapIter = m_friendMap.find(aFriend);
         if (mapIter == m_friendMap.end()) { // not found
           return NULL;

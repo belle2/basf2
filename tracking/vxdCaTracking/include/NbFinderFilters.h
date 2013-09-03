@@ -171,7 +171,7 @@ namespace Belle2 {
 
       /** returns cutoff-values of given filter */
       std::pair <double, double> getCutoffs(int aFilter) {
-        Cutoff* pCutoff = m_thisSector->getCutoff(aFilter, m_friendID);
+        const Cutoff* pCutoff = m_thisSector->getCutoff(aFilter, m_friendID);
         if (pCutoff != NULL) return std::make_pair(pCutoff->getMinValue(), pCutoff->getMaxValue());
         return std::make_pair(0., 0.);
       }// one method to read them all...

@@ -18,7 +18,7 @@ using namespace Belle2::Tracking;
 
 bool NbFinderFilters::checkAngle3D(int nameAngle3D)
 {
-  Cutoff* pCutoff = m_thisSector->getCutoff(nameAngle3D, m_friendID);
+  const Cutoff* pCutoff = m_thisSector->getCutoff(nameAngle3D, m_friendID);
   if (pCutoff != NULL) {
     double aResult = ThreeHitFilters::calcAngle3D();
     if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {
@@ -33,7 +33,7 @@ bool NbFinderFilters::checkAngle3D(int nameAngle3D)
 
 bool NbFinderFilters::checkAngleXY(int nameAngleXY)
 {
-  Cutoff* pCutoff = m_thisSector->getCutoff(nameAngleXY, m_friendID);
+  const Cutoff* pCutoff = m_thisSector->getCutoff(nameAngleXY, m_friendID);
   if (pCutoff != NULL) {
     double aResult = ThreeHitFilters::calcAngleXY();
     if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {
@@ -48,7 +48,7 @@ bool NbFinderFilters::checkAngleXY(int nameAngleXY)
 
 bool NbFinderFilters::checkAngleRZ(int nameAngleRZ)
 {
-  Cutoff* pCutoff = m_thisSector->getCutoff(nameAngleRZ, m_friendID);
+  const Cutoff* pCutoff = m_thisSector->getCutoff(nameAngleRZ, m_friendID);
   if (pCutoff != NULL) {
     double aResult = ThreeHitFilters::calcAngleRZ();
     if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {
@@ -63,7 +63,7 @@ bool NbFinderFilters::checkAngleRZ(int nameAngleRZ)
 
 bool NbFinderFilters::checkCircleDist2IP(int nameCircleDist2IP)
 {
-  Cutoff* pCutoff = m_thisSector->getCutoff(nameCircleDist2IP, m_friendID);
+  const Cutoff* pCutoff = m_thisSector->getCutoff(nameCircleDist2IP, m_friendID);
   if (pCutoff != NULL) {
     double aResult = ThreeHitFilters::calcCircleDist2IP();
     if (aResult < pCutoff->getMaxValue()) {
@@ -78,7 +78,7 @@ bool NbFinderFilters::checkCircleDist2IP(int nameCircleDist2IP)
 
 bool NbFinderFilters::checkDeltaSlopeRZ(int nameDeltaSlopeRZ)
 {
-  Cutoff* pCutoff = m_thisSector->getCutoff(nameDeltaSlopeRZ, m_friendID);
+  const Cutoff* pCutoff = m_thisSector->getCutoff(nameDeltaSlopeRZ, m_friendID);
   if (pCutoff != NULL) {
     double aResult = ThreeHitFilters::calcDeltaSlopeRZ();
     if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {
@@ -93,7 +93,7 @@ bool NbFinderFilters::checkDeltaSlopeRZ(int nameDeltaSlopeRZ)
 
 bool NbFinderFilters::checkPt(int namePt)
 {
-  Cutoff* pCutoff = m_thisSector->getCutoff(namePt, m_friendID);
+  const Cutoff* pCutoff = m_thisSector->getCutoff(namePt, m_friendID);
   if (pCutoff != NULL) {
     double aResult = ThreeHitFilters::calcPt();
     if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {
@@ -108,7 +108,7 @@ bool NbFinderFilters::checkPt(int namePt)
 
 bool NbFinderFilters::checkHelixFit(int nameHelixFit)
 {
-  Cutoff* pCutoff = m_thisSector->getCutoff(nameHelixFit, m_friendID);
+  const Cutoff* pCutoff = m_thisSector->getCutoff(nameHelixFit, m_friendID);
   if (pCutoff != NULL) {
     double aResult = this->calcHelixFit();
     if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {

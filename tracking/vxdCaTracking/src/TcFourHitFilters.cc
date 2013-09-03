@@ -18,7 +18,7 @@ using namespace Belle2::Tracking;
 
 bool TcFourHitFilters::checkDeltapT(int nameDeltapT)
 {
-  Cutoff* pCutoff = m_thisSector->getCutoff(nameDeltapT, m_friendID);
+  const Cutoff* pCutoff = m_thisSector->getCutoff(nameDeltapT, m_friendID);
   if (pCutoff != NULL) {
     double aResult = FourHitFilters::deltapT();
     if (/*aResult > pCutoff->getMinValue() &&*/ aResult < pCutoff->getMaxValue()) {
@@ -33,7 +33,7 @@ bool TcFourHitFilters::checkDeltapT(int nameDeltapT)
 
 bool TcFourHitFilters::checkDeltaDistCircleCenter(int nameDeltaDistCircleCenter)
 {
-  Cutoff* pCutoff = m_thisSector->getCutoff(nameDeltaDistCircleCenter, m_friendID);
+  const Cutoff* pCutoff = m_thisSector->getCutoff(nameDeltaDistCircleCenter, m_friendID);
   if (pCutoff != NULL) {
     double aResult = FourHitFilters::deltaDistCircleCenter();
     if (aResult < pCutoff->getMaxValue()) {
@@ -48,7 +48,7 @@ bool TcFourHitFilters::checkDeltaDistCircleCenter(int nameDeltaDistCircleCenter)
 
 pair <double, double> TcFourHitFilters::getCutoffs(int aFilter)
 {
-  Cutoff* pCutoff = m_thisSector->getCutoff(aFilter, m_friendID);
+  const Cutoff* pCutoff = m_thisSector->getCutoff(aFilter, m_friendID);
   if (pCutoff != NULL) return make_pair(pCutoff->getMinValue(), pCutoff->getMaxValue());
   return make_pair(0., 0.);
 }

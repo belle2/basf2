@@ -85,7 +85,7 @@ namespace Belle2 {
     };
 
     /** Different options for behaviour _after_ a conditional path was executed. */
-    enum EAfterConditionPath {
+    enum class EAfterConditionPath {
       c_End, /**< End current event after the conditional path. */
       c_Continue, /**< After the conditional path, resume execution after this module. */
     };
@@ -235,7 +235,7 @@ namespace Belle2 {
      * @param path       Shared pointer to the Path which will be executed if the condition is evaluated to true.
      * @param afterConditionPath  What to do after executing 'path'.
      */
-    void if_value(const std::string& expression, boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = c_End);
+    void if_value(const std::string& expression, boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
      * A simplified version to set the condition of the module.
@@ -250,7 +250,7 @@ namespace Belle2 {
      * @param path Shared pointer to the Path which will be executed if the return value is _false_.
      * @param afterConditionPath  What to do after executing 'path'.
      */
-    void if_false(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = c_End);
+    void if_false(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
      * Returns true if a condition was set for the module.

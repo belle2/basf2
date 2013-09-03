@@ -34,7 +34,7 @@ Module::Module() :
   m_hasReturnValue(false),
   m_returnValue(0),
   m_hasCondition(false),
-  m_afterConditionPath(c_End)
+  m_afterConditionPath(EAfterConditionPath::c_End)
 {
 }
 
@@ -225,8 +225,8 @@ void Module::exposePythonAPI()
   void (Module::*setReturnValueBool)(bool) = &Module::setReturnValue;
 
   enum_<Module::EAfterConditionPath>("AfterConditionPath")
-  .value("END", Module::c_End)
-  .value("CONTINUE", Module::c_Continue)
+  .value("END", Module::EAfterConditionPath::c_End)
+  .value("CONTINUE", Module::EAfterConditionPath::c_Continue)
   ;
 
   //Python class definition

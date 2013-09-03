@@ -268,7 +268,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
         //Check for a module condition, evaluate it and if it is true switch to a new path
         if (module->evalCondition()) {
           PathPtr condPath = module->getConditionPath();
-          if (module->getAfterConditionPath() == Module::c_Continue) { //continue with parent Path after condition path is executed?
+          if (module->getAfterConditionPath() == Module::EAfterConditionPath::c_Continue) { //continue with parent Path after condition path is executed?
             moduleIter = PathIterator(condPath, moduleIter);
           } else {
             moduleIter = PathIterator(condPath);

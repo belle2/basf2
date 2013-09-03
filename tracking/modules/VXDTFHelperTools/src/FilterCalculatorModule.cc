@@ -357,9 +357,8 @@ void FilterCalculatorModule::event()
       B2DEBUG(10, "I'm in PXD and chosen detectorType is: " << m_PARAMdetectorType)
 //        int ctr = 0;
       RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relationMcPxdTrueHit.getElementsFrom(aMcParticlePtr);
-
-      while (iterPairMcPxd.first not_eq iterPairMcPxd.second) {
-        const PXDTrueHit* const aSiTrueHitPtr = iterPairMcPxd.first->to;
+      for (const auto & relElement : iterPairMcPxd) {
+        const PXDTrueHit* const aSiTrueHitPtr = relElement.to;
         double uTrue = aSiTrueHitPtr->getU();
         double vTrue = aSiTrueHitPtr->getV();
         double u = uTrue;
@@ -458,7 +457,6 @@ void FilterCalculatorModule::event()
           newHit.setPXDHit(aSiTrueHitPtr);
           newTrack.addHit(newHit);
         }
-        ++iterPairMcPxd.first;
 //          ctr++;
       }
     }
@@ -466,9 +464,8 @@ void FilterCalculatorModule::event()
       B2DEBUG(10, "I'm in SVD and chosen detectorType is: " << m_PARAMdetectorType)
 //        int ctr = 0;
       RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relationMcSvdTrueHit.getElementsFrom(aMcParticlePtr);
-      while (iterPairMcSvd.first not_eq iterPairMcSvd.second) {
-
-        const SVDTrueHit* const aSiTrueHitPtr = iterPairMcSvd.first->to;
+      for (const auto & relElement : iterPairMcSvd) {
+        const SVDTrueHit* const aSiTrueHitPtr = relElement.to;
         double uTrue = aSiTrueHitPtr->getU();
         double vTrue = aSiTrueHitPtr->getV();
         double u = uTrue;
@@ -560,7 +557,6 @@ void FilterCalculatorModule::event()
           newTrack.addHit(newHit);
         }
 //          ctr++;
-        ++iterPairMcSvd.first;
       } // now each hit knows in which direction the particle goes, in which sector it lies and where it is
     }
 

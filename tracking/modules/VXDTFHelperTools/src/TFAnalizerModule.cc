@@ -573,8 +573,8 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
     if (detID == Const::SVD) { // svd
       svdHitIDsOfCurrentTC.push_back(hitID);
       RelationIndex<SVDCluster, SVDTrueHit>::range_from relationRange = relationSVD.getElementsFrom(svdClusters[hitID]);
-      while (relationRange.first not_eq relationRange.second) {
-        const SVDTrueHit* aTrueHit = relationRange.first->to;
+      for (const auto & relElement : relationRange) {
+        const SVDTrueHit* aTrueHit = relElement.to;
 
         aVxdID = aTrueHit->getSensorID();
 
@@ -585,7 +585,6 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
         B2DEBUG(100, "gotSVD, u: " << aTrueHit->getU() << ", v: " << aTrueHit->getV())
 
         svdTrueHits.push_back(aTrueHit);
-        ++relationRange.first;
       }
     }
   } /// getting Info for each hit. 1D clusters make the whole thing complicated since it has to be checked, whether two 1D hits form a 2D hit of the track or not
@@ -618,9 +617,9 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
     aTC->getHit(0, detID, hitID); // 0 means innermost hit
     if (detID == Const::PXD) {  // means PXD
       RelationIndex<PXDCluster, PXDTrueHit>::range_from relationRange = relationPXD.getElementsFrom(pxdClusters[hitID]);
-      while (relationRange.first not_eq relationRange.second) {
+      for (const auto & relElement : relationRange) {
         // since more than one trueHit can be the cause of current hit, we have to find the real TrueHit. Identified by |momentum|
-        const PXDTrueHit* aTrueHit = relationRange.first->to;
+        const PXDTrueHit* aTrueHit = relElement.to;
         tempMomentum = aTrueHit->getMomentum();
 
         aVxdID = aTrueHit->getSensorID();
@@ -629,13 +628,12 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
 
         if (pValue - tempMomentum.Mag() < pValue * 0.1) { gotNewMomentum = true; break; } // if difference in Momentum is less than 10% of initial momentum, we accept current value as the real one
 
-        ++relationRange.first;
       }
     } else if (detID == Const::SVD) {  // SVD
       RelationIndex<SVDCluster, SVDTrueHit>::range_from relationRange = relationSVD.getElementsFrom(svdClusters[hitID]);
-      while (relationRange.first not_eq relationRange.second) {
+      for (const auto & relElement : relationRange) {
         // since more than one trueHit can be the cause of current hit, we have to find the real TrueHit. Identified by |momentum|
-        const SVDTrueHit* aTrueHit = relationRange.first->to;
+        const SVDTrueHit* aTrueHit = relElement.to;
         tempMomentum = aTrueHit->getMomentum();
 
         aVxdID = aTrueHit->getSensorID();
@@ -644,7 +642,6 @@ void TFAnalizerModule::extractHits(GFTrackCand* aTC,
 
         if (pValue - tempMomentum.Mag() < pValue * 0.1) { gotNewMomentum = true; break; } // if difference in Momentum is less than 10% of initial momentum, we accept current value as the real one
 
-        ++relationRange.first;
       }
     } else { B2FATAL("TFAnalizer - this track candidate does not have any VXD-hits, can not analyze it") }
 

@@ -509,21 +509,20 @@ void MCTrackFinderModule::event()
       unsigned int hitCounter = 0;
       BOOST_FOREACH(int hitID, pxdHitsIndices) {
         RelationIndex<PXDCluster, PXDTrueHit>::range_from iterPairCluTr = relPxdClusterTrueHit.getElementsFrom(pxdClusters[hitID]);
-        if (iterPairCluTr.first == iterPairCluTr.second && m_enforceTrueHit == true) { // there is not trueHit! trow away hit because there is no time information for sorting
+        if (iterPairCluTr.empty() && m_enforceTrueHit == true) { // there is not trueHit! trow away hit because there is no time information for sorting
           ++m_noTrueHitCounter;
           continue;
         }
         float time = -1;
         RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcTr = relMcPxdTrueHit.getElementsFrom(aMcParticlePtr);
-        while (iterPairCluTr.first != iterPairCluTr.second && time < 0) {// make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
-          while (iterPairMcTr.first != iterPairMcTr.second) {
-            if (iterPairMcTr.first->to == iterPairCluTr.first->to) {
-              time = iterPairCluTr.first->to->getGlobalTime();
+        for (const auto & relElementCluTr : iterPairCluTr) { // make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
+          if (time >= 0) break;
+          for (const auto & relElementMcTr : iterPairMcTr) {
+            if (relElementMcTr.to == relElementCluTr.to) {
+              time = relElementCluTr.to->getGlobalTime();
               break;
             }
-            ++iterPairMcTr.first;
           }
-          ++iterPairCluTr.first;
         }
 
         trackCandidates[counter]->addHit(Const::PXD, hitID, -1, double(time));
@@ -543,21 +542,20 @@ void MCTrackFinderModule::event()
       unsigned int hitCounter = 0;
       BOOST_FOREACH(int hitID, svdHitsIndices) {
         RelationIndex<SVDCluster, SVDTrueHit>::range_from iterPairCluTr = relSvdClusterTrueHit.getElementsFrom(svdClusters[hitID]);
-        if (iterPairCluTr.first == iterPairCluTr.second && m_enforceTrueHit == true) { // there is not trueHit! throw away hit because there is no time information for sorting
+        if (iterPairCluTr.empty() && m_enforceTrueHit == true) { // there is not trueHit! throw away hit because there is no time information for sorting
           ++m_noTrueHitCounter;
           continue;
         }
         float time = -1;
         RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcTr = relMcSvdTrueHit.getElementsFrom(aMcParticlePtr);
-        while (iterPairCluTr.first != iterPairCluTr.second && time < 0) {// make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
-          while (iterPairMcTr.first != iterPairMcTr.second) {
-            if (iterPairMcTr.first->to == iterPairCluTr.first->to) {
-              time = iterPairCluTr.first->to->getGlobalTime();
+        for (const auto & relElementCluTr : iterPairCluTr) { // make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
+          if (time >= 0) break;
+          for (const auto & relElementMcTr : iterPairMcTr) {
+            if (relElementMcTr.to == relElementCluTr.to) {
+              time = relElementCluTr.to->getGlobalTime();
               break;
             }
-            ++iterPairMcTr.first;
           }
-          ++iterPairCluTr.first;
         }
         trackCandidates[counter]->addHit(Const::SVD, hitID, -1, double(time));
         ++hitCounter;

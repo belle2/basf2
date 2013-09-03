@@ -105,16 +105,14 @@ void TrueHitTesterModule::event()
       if (aMcParticlePtr->hasStatus(MCParticle::c_PrimaryParticle) == true) {
         vector<int> layerIds;
         RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relMcPxdTrueHit.getElementsFrom(aMcParticlePtr);
-        while (iterPairMcPxd.first not_eq iterPairMcPxd.second) {
-          int layerId = iterPairMcPxd.first->to->getSensorID().getLayerNumber();
+        for (const auto & relElementMcPxd : iterPairMcPxd) {
+          int layerId = relElementMcPxd.to->getSensorID().getLayerNumber();
           layerIds.push_back(layerId);
-          ++iterPairMcPxd.first;
         }
         RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getElementsFrom(aMcParticlePtr);
-        while (iterPairMcSvd.first not_eq iterPairMcSvd.second) {
-          int layerId = iterPairMcSvd.first->to->getSensorID().getLayerNumber();
+        for (const auto & relElementMcSvd : iterPairMcSvd) {
+          int layerId = relElementMcSvd.to->getSensorID().getLayerNumber();
           layerIds.push_back(layerId);
-          ++iterPairMcSvd.first;
         }
         if (layerIds.size() not_eq unsigned(m_nLayers)) {
           filterEvent = true;
@@ -155,14 +153,12 @@ void TrueHitTesterModule::event()
         double energyLastHit = aMcParticlePtr->getEnergy() + mass;
         vector<VXDTrueHit const*> trueHitPtrs;
         RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relMcPxdTrueHit.getElementsFrom(aMcParticlePtr);
-        while (iterPairMcPxd.first not_eq iterPairMcPxd.second) {
-          trueHitPtrs.push_back(static_cast<VXDTrueHit const*>(iterPairMcPxd.first->to));
-          ++iterPairMcPxd.first;
+        for (const auto & relElementMcPxd : iterPairMcPxd) {
+          trueHitPtrs.push_back(static_cast<VXDTrueHit const*>(relElementMcPxd.to));
         }
         RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getElementsFrom(aMcParticlePtr);
-        while (iterPairMcSvd.first not_eq iterPairMcSvd.second) {
-          trueHitPtrs.push_back(static_cast<VXDTrueHit const*>(iterPairMcSvd.first->to));
-          ++iterPairMcSvd.first;
+        for (const auto & relElementMcSvd : iterPairMcSvd) {
+          trueHitPtrs.push_back(static_cast<VXDTrueHit const*>(relElementMcSvd.to));
         }
         int nTrueHits = trueHitPtrs.size();
         B2DEBUG(100, "nTrueHits " << nTrueHits);

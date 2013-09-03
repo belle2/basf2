@@ -9,8 +9,7 @@
  **************************************************************************/
 
 #include <boost/python.hpp>
-
-#include <framework/pybasf2/PyBasf2.h>
+#include <framework/utilities/RegisterPythonModule.h>
 
 #include <framework/pybasf2/Framework.h>
 #include <framework/pybasf2/LogPythonInterface.h>
@@ -83,12 +82,6 @@ BOOST_PYTHON_MODULE(pybasf2)
   def("update_file_metadata", &updateFileMetaData);
 }
 
-
-//! Creates the basf2 Python module.
-void PyBasf2::embedPythonModule() throw(PythonModuleNotEmbeddedError)
-{
-  if (PyImport_AppendInittab(const_cast<char*>("pybasf2"), initpybasf2) == -1) {
-    throw PythonModuleNotEmbeddedError();
-  }
-}
+//register the module during library load
+REGISTER_PYTHON_MODULE(pybasf2)
 

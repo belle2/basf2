@@ -31,7 +31,6 @@
 
 #include <boost/python.hpp> //Has to be the first include (restriction due to python)
 
-#include <framework/pybasf2/PyBasf2.h>
 #include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConfig.h>
@@ -291,9 +290,6 @@ int main(int argc, char* argv[])
       }
       PySys_SetArgv(arguments.size() + 1, const_cast<char**>(pyargs));
 
-      //Embedd Python modules
-      PyBasf2::embedPythonModule();
-
       //Execute Python file
       executePythonFile(pythonFile);
 
@@ -309,8 +305,6 @@ int main(int argc, char* argv[])
       if (Environment::Instance().getDryRun()) {
         Environment::Instance().printJobInformation();
       }
-    } catch (PythonModuleNotEmbeddedError& exc) {
-      B2ERROR(exc.what());
     } catch (error_already_set) {
       PyErr_Print();
       return 1;

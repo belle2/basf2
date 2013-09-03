@@ -1,4 +1,4 @@
-#include <framework/datastore/PyRelationArray.h>
+#include <framework/pybasf2/PyRelationArray.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>

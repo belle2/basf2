@@ -1,4 +1,4 @@
-#include <framework/datastore/PyStoreObj.h>
+#include <framework/pybasf2/PyStoreObj.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>

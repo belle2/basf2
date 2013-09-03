@@ -1,4 +1,4 @@
-#include <framework/datastore/PyStoreArray.h>
+#include <framework/pybasf2/PyStoreArray.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>

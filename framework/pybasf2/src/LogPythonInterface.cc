@@ -10,7 +10,8 @@
 
 #include <boost/python.hpp>
 
-#include <framework/logging/LogPythonInterface.h>
+#include <framework/pybasf2/LogPythonInterface.h>
+
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConnectionFilter.h>
 #include <framework/logging/LogConnectionTxtFile.h>

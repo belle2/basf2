@@ -9,7 +9,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/core/Framework.h>
+#include <framework/pybasf2/Framework.h>
+
 #include <framework/core/Environment.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/utilities.h>

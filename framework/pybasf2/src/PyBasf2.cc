@@ -12,13 +12,13 @@
 
 #include <framework/pybasf2/PyBasf2.h>
 
+#include <framework/pybasf2/Framework.h>
+#include <framework/pybasf2/LogPythonInterface.h>
 #include <framework/core/Module.h>
 #include <framework/core/Path.h>
-#include <framework/core/Framework.h>
 #include <framework/core/ModuleStatistics.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/ModuleParamInfoPython.h>
-#include <framework/logging/LogPythonInterface.h>
 #include <framework/dataobjects/FileMetaData.h>
 
 #include <TFile.h>

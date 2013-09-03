@@ -12,6 +12,8 @@
 #define MEMORYPOOL_H
 
 #include <vector>
+#include <cstddef>
+#include <cstdlib>
 
 namespace Belle2 {
 

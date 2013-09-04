@@ -12,8 +12,8 @@ set_random_seed(12345)
 
 # Event data
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [500])
-evtmetagen.param('RunList', [1])
+evtmetagen.param('evtNumList', [500])
+evtmetagen.param('runList', [1])
 
 # Particle gun
 particlegun = register_module('ParticleGun')

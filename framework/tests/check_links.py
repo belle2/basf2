@@ -13,9 +13,10 @@ subdir = os.environ['BELLE2_SUBDIR']
 libdir = localdir + '/lib/' + subdir
 
 #define main() for building executables
-maincc = tempfile.NamedTemporaryFile(suffix='.cc', delete=False)
-maincc.write("int main() { return 0; }\n")
-maincc.close()
+maincc = tempfile.mkstemp(suffix='.cc')
+mainccfd = open(maincc[1], 'w+')
+mainccfd.write("int main() { return 0; }\n")
+mainccfd.close()
 
 libs = os.listdir(libdir)
 for lib in libs:
@@ -26,9 +27,9 @@ for lib in libs:
     tmpfile = tempfile.NamedTemporaryFile()
     try:
         os.system("g++ -o %s -L%s -l:%s %s" %
-                  (tmpfile.name, libdir, lib, maincc.name))
+                  (tmpfile.name, libdir, lib, maincc[1]))
         tmpfile.close()  # might not work
     except:
         pass
 
-os.unlink(maincc.name)
+os.unlink(maincc[1])

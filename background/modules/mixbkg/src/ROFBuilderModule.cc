@@ -24,7 +24,6 @@
 #include <bklm/dataobjects/BKLMSimHit.h>
 
 #include <map>
-#include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
 
 using namespace std;
@@ -326,7 +325,7 @@ void ROFBuilderModule::addParticleToEventGraph(MCParticleGraph& graph, MCParticl
 
   //Add all children
   int currMotherIndex = graph.size();
-  BOOST_FOREACH(MCParticle * daughter, mcParticle.getDaughters()) {
+  for (MCParticle * daughter : mcParticle.getDaughters()) {
     addParticleToEventGraph(graph, *daughter, currMotherIndex, keepList);
   }
 }
@@ -342,7 +341,8 @@ void ROFBuilderModule::addParticleToROFGraph(MCParticle& mcParticle, int motherI
 
   //Add all children
   int currMotherIndex = m_rofMCParticleGraph.size();
-  BOOST_FOREACH(MCParticle * daughter, mcParticle.getDaughters()) {
+  for (MCParticle * daughter : mcParticle.getDaughters()) {
+    //BOOST_FOREACH(MCParticle * daughter, mcParticle.getDaughters()) {
     addParticleToROFGraph(*daughter, currMotherIndex, uniqueIDList);
   }
 }

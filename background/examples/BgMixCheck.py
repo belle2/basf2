@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 ##############################################################################
-# This script detects subdetector/component/generator conflicts in a list of
-# ROF files.
 # Example script - 2013 Belle II Collaboration
 ##############################################################################
 import sys
@@ -38,10 +36,10 @@ subdetectorNames = {
 # 5. Compares and reports confclicts
 #
 # Usage:
-# chmod a+x RofCheck.py
-# ./background/examples/RofCheck.py <list-of-rof-files>
+# chmod a+x BgMixCheck.py
+# ./background/examples/BgMixCheck.py <list-of-rof-files>
 # or
-# python background/examples/RofCheck.py <list-of-rof-files>
+# python background/examples/BgMixCheck.py <list-of-rof-files>
 # Wildcards can be used to specify the path and names of rof files,
 # such as /data/belle2/BG/rof/rof*.root
 

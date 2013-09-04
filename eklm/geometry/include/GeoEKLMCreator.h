@@ -207,28 +207,28 @@ namespace Belle2 {
     };
 
     /**
-     * Class GeoEKLMBelleII.
+     * Class GeoEKLMCreator.
      * The creator for the  EKLM geometry of the Belle II detector.
      */
-    class GeoEKLMBelleII : public geometry::CreatorBase {
+    class GeoEKLMCreator : public geometry::CreatorBase {
 
     public:
 
       /**
        * Default constructor.
        */
-      GeoEKLMBelleII();
+      GeoEKLMCreator();
 
       /**
        * Constructor with optional geometry data loading.
        * @param[in] geo True to load transfomation data.
        */
-      GeoEKLMBelleII(bool geo);
+      GeoEKLMCreator(bool geo);
 
       /**
        * Destructor.
        */
-      ~GeoEKLMBelleII();
+      ~GeoEKLMCreator();
 
       /**
        * Creation of the detector geometry.

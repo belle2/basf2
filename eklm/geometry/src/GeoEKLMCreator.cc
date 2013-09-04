@@ -28,7 +28,7 @@
 
 /* Belle2 headers. */
 #include <eklm/geometry/G4TriangularPrism.h>
-#include <eklm/geometry/GeoEKLMBelleII.h>
+#include <eklm/geometry/GeoEKLMCreator.h>
 #include <eklm/simulation/EKLMSensitiveDetector.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
@@ -41,11 +41,11 @@ using namespace Belle2;
 static const char MemErr[] = "Memory allocation error.";
 
 /* Register the creator */
-geometry::CreatorFactory<EKLM::GeoEKLMBelleII> GeoEKLMFactory("EKLMBelleII");
+geometry::CreatorFactory<EKLM::GeoEKLMCreator> GeoEKLMFactory("EKLMCreator");
 
 /******************************* CONSTRUCTORS ********************************/
 
-void EKLM::GeoEKLMBelleII::constructor(bool geo)
+void EKLM::GeoEKLMCreator::constructor(bool geo)
 {
   SectorSupportSize.CornerAngle = -1;
   haveGeoDat = false;
@@ -62,17 +62,17 @@ void EKLM::GeoEKLMBelleII::constructor(bool geo)
   }
 }
 
-EKLM::GeoEKLMBelleII::GeoEKLMBelleII()
+EKLM::GeoEKLMCreator::GeoEKLMCreator()
 {
   constructor(true);
 }
 
-EKLM::GeoEKLMBelleII::GeoEKLMBelleII(bool geo)
+EKLM::GeoEKLMCreator::GeoEKLMCreator(bool geo)
 {
   constructor(geo);
 }
 
-EKLM::GeoEKLMBelleII::~GeoEKLMBelleII()
+EKLM::GeoEKLMCreator::~GeoEKLMCreator()
 {
   int i, j;
   if (m_geoDat != NULL)
@@ -105,7 +105,7 @@ EKLM::GeoEKLMBelleII::~GeoEKLMBelleII()
 
 /***************************** MEMORY ALLOCATION *****************************/
 
-void EKLM::GeoEKLMBelleII::mallocVolumes()
+void EKLM::GeoEKLMCreator::mallocVolumes()
 {
   int i;
   solids.plane = (G4VSolid**)malloc(nPlane * sizeof(G4VSolid*));
@@ -155,7 +155,7 @@ void EKLM::GeoEKLMBelleII::mallocVolumes()
            (nSection + 1) * sizeof(struct EKLM::SectionSupportSolids));
 }
 
-void EKLM::GeoEKLMBelleII::freeVolumes()
+void EKLM::GeoEKLMCreator::freeVolumes()
 {
   int i;
   free(solids.plane);
@@ -173,7 +173,7 @@ void EKLM::GeoEKLMBelleII::freeVolumes()
 
 /********************************** XML DATA *********************************/
 
-void EKLM::GeoEKLMBelleII::createMaterials()
+void EKLM::GeoEKLMCreator::createMaterials()
 {
   mat.air = geometry::Materials::get("Air");
   mat.polystyrene = geometry::Materials::get("EKLMPolystyrene");
@@ -229,7 +229,7 @@ static void readSectorSupportData(struct EKLM::SectorSupportSize* sss,
   sss->Corner4Z = gd->getLength("Corner4Z") * cm;
 }
 
-void EKLM::GeoEKLMBelleII::readXMLData()
+void EKLM::GeoEKLMCreator::readXMLData()
 {
   int i;
   int j;
@@ -361,7 +361,7 @@ void EKLM::GeoEKLMBelleII::readXMLData()
 
 /****************************** TRANSFORMATIONS ******************************/
 
-void EKLM::GeoEKLMBelleII::getEndcapTransform(HepGeom::Transform3D* t, int n)
+void EKLM::GeoEKLMCreator::getEndcapTransform(HepGeom::Transform3D* t, int n)
 {
   if (!haveGeoDat)
     readXMLData();
@@ -374,7 +374,7 @@ void EKLM::GeoEKLMBelleII::getEndcapTransform(HepGeom::Transform3D* t, int n)
          HepGeom::RotateY3D(180.*CLHEP::deg);
 }
 
-void EKLM::GeoEKLMBelleII::getLayerTransform(HepGeom::Transform3D* t, int n)
+void EKLM::GeoEKLMCreator::getLayerTransform(HepGeom::Transform3D* t, int n)
 {
   if (!haveGeoDat)
     readXMLData();
@@ -383,7 +383,7 @@ void EKLM::GeoEKLMBelleII::getLayerTransform(HepGeom::Transform3D* t, int n)
                             0.5 * LayerPosition.length);
 }
 
-void EKLM::GeoEKLMBelleII::getSectorTransform(HepGeom::Transform3D* t, int n)
+void EKLM::GeoEKLMCreator::getSectorTransform(HepGeom::Transform3D* t, int n)
 {
   if (!haveGeoDat)
     readXMLData();
@@ -404,7 +404,7 @@ void EKLM::GeoEKLMBelleII::getSectorTransform(HepGeom::Transform3D* t, int n)
   }
 }
 
-void EKLM::GeoEKLMBelleII::getPlaneTransform(HepGeom::Transform3D* t, int n)
+void EKLM::GeoEKLMCreator::getPlaneTransform(HepGeom::Transform3D* t, int n)
 {
   if (!haveGeoDat)
     readXMLData();
@@ -418,14 +418,14 @@ void EKLM::GeoEKLMBelleII::getPlaneTransform(HepGeom::Transform3D* t, int n)
                            HepGeom::Vector3D<double>(1., 1., 0.));
 }
 
-void EKLM::GeoEKLMBelleII::getStripTransform(HepGeom::Transform3D* t, int n)
+void EKLM::GeoEKLMCreator::getStripTransform(HepGeom::Transform3D* t, int n)
 {
   if (!haveGeoDat)
     readXMLData();
   *t = HepGeom::Translate3D(StripPosition[n].X, StripPosition[n].Y, 0.0);
 }
 
-void EKLM::GeoEKLMBelleII::getSheetTransform(HepGeom::Transform3D* t, int n)
+void EKLM::GeoEKLMCreator::getSheetTransform(HepGeom::Transform3D* t, int n)
 {
   double y;
   if (!haveGeoDat)
@@ -440,7 +440,7 @@ void EKLM::GeoEKLMBelleII::getSheetTransform(HepGeom::Transform3D* t, int n)
 
 /*************************** CREATION OF SOLIDS ******************************/
 
-void EKLM::GeoEKLMBelleII::createEndcapSolid()
+void EKLM::GeoEKLMCreator::createEndcapSolid()
 {
   G4Polyhedra* op = NULL;
   G4Tubs* tb = NULL;
@@ -464,7 +464,7 @@ void EKLM::GeoEKLMBelleII::createEndcapSolid()
   }
 }
 
-void EKLM::GeoEKLMBelleII::createPlaneSolid(int n)
+void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
 {
   double r;
   double x;
@@ -623,7 +623,7 @@ void EKLM::GeoEKLMBelleII::createPlaneSolid(int n)
   delete pr3;
 }
 
-void EKLM::GeoEKLMBelleII::createPlasticSheetSolid(int n)
+void EKLM::GeoEKLMCreator::createPlasticSheetSolid(int n)
 {
   int i;
   int m;
@@ -697,7 +697,7 @@ void EKLM::GeoEKLMBelleII::createPlasticSheetSolid(int n)
   }
 }
 
-void EKLM::GeoEKLMBelleII::createSolids()
+void EKLM::GeoEKLMCreator::createSolids()
 {
   int i;
   char name[128];
@@ -777,7 +777,7 @@ void EKLM::GeoEKLMBelleII::createSolids()
 
 /************************** CREATION OF VOLUMES ******************************/
 
-void EKLM::GeoEKLMBelleII::createEndcap(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createEndcap(G4LogicalVolume* mlv)
 {
   G4LogicalVolume* logicEndcap = NULL;
   G4Transform3D* t;
@@ -801,7 +801,7 @@ void EKLM::GeoEKLMBelleII::createEndcap(G4LogicalVolume* mlv)
     createLayer(logicEndcap);
 }
 
-void EKLM::GeoEKLMBelleII::createLayer(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createLayer(G4LogicalVolume* mlv)
 {
   static G4Tubs* solidLayer = NULL;
   G4LogicalVolume* logicLayer = NULL;
@@ -832,7 +832,7 @@ void EKLM::GeoEKLMBelleII::createLayer(G4LogicalVolume* mlv)
     createSector(logicLayer);
 }
 
-void EKLM::GeoEKLMBelleII::createSector(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createSector(G4LogicalVolume* mlv)
 {
   int i;
   static G4Tubs* solidSector = NULL;
@@ -873,7 +873,7 @@ void EKLM::GeoEKLMBelleII::createSector(G4LogicalVolume* mlv)
         createSectionReadoutBoard(logicSector);
 }
 
-void EKLM::GeoEKLMBelleII::calcBoardTransform()
+void EKLM::GeoEKLMCreator::calcBoardTransform()
 {
   int i;
   int j;
@@ -896,7 +896,7 @@ void EKLM::GeoEKLMBelleII::calcBoardTransform()
   }
 }
 
-void EKLM::GeoEKLMBelleII::createSectorCover(int iCover, G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createSectorCover(int iCover, G4LogicalVolume* mlv)
 {
   double z;
   double lz;
@@ -979,7 +979,7 @@ void EKLM::GeoEKLMBelleII::createSectorCover(int iCover, G4LogicalVolume* mlv)
   printVolumeMass(logicCover);
 }
 
-G4Box* EKLM::GeoEKLMBelleII::createSectorSupportBoxX(G4LogicalVolume* mlv,
+G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxX(G4LogicalVolume* mlv,
                                                      G4Transform3D& t)
 {
   double x1;
@@ -1002,7 +1002,7 @@ G4Box* EKLM::GeoEKLMBelleII::createSectorSupportBoxX(G4LogicalVolume* mlv,
   return res;
 }
 
-G4Box* EKLM::GeoEKLMBelleII::createSectorSupportBoxY(G4LogicalVolume* mlv,
+G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxY(G4LogicalVolume* mlv,
                                                      G4Transform3D& t)
 {
   double y1;
@@ -1024,7 +1024,7 @@ G4Box* EKLM::GeoEKLMBelleII::createSectorSupportBoxY(G4LogicalVolume* mlv,
   return res;
 }
 
-double EKLM::GeoEKLMBelleII::getSectorSupportCornerAngle()
+double EKLM::GeoEKLMCreator::getSectorSupportCornerAngle()
 {
   double x1;
   double y1;
@@ -1041,7 +1041,7 @@ double EKLM::GeoEKLMBelleII::getSectorSupportCornerAngle()
   return SectorSupportSize.CornerAngle;
 }
 
-G4Box* EKLM::GeoEKLMBelleII::createSectorSupportBoxTop(G4LogicalVolume* mlv,
+G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxTop(G4LogicalVolume* mlv,
                                                        G4Transform3D& t)
 {
   double x1;
@@ -1070,7 +1070,7 @@ G4Box* EKLM::GeoEKLMBelleII::createSectorSupportBoxTop(G4LogicalVolume* mlv,
   return res;
 }
 
-G4Tubs* EKLM::GeoEKLMBelleII::createSectorSupportInnerTube(G4LogicalVolume* mlv)
+G4Tubs* EKLM::GeoEKLMCreator::createSectorSupportInnerTube(G4LogicalVolume* mlv)
 {
   double x1;
   double y1;
@@ -1096,7 +1096,7 @@ G4Tubs* EKLM::GeoEKLMBelleII::createSectorSupportInnerTube(G4LogicalVolume* mlv)
   return res;
 }
 
-G4Tubs* EKLM::GeoEKLMBelleII::createSectorSupportOuterTube(G4LogicalVolume* mlv)
+G4Tubs* EKLM::GeoEKLMCreator::createSectorSupportOuterTube(G4LogicalVolume* mlv)
 {
   double x1;
   double y1;
@@ -1127,7 +1127,7 @@ G4Tubs* EKLM::GeoEKLMBelleII::createSectorSupportOuterTube(G4LogicalVolume* mlv)
   return res;
 }
 
-void EKLM::GeoEKLMBelleII::createSectorSupportCorner1(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createSectorSupportCorner1(G4LogicalVolume* mlv)
 {
   double lx;
   double x;
@@ -1213,7 +1213,7 @@ void EKLM::GeoEKLMBelleII::createSectorSupportCorner1(G4LogicalVolume* mlv)
   printVolumeMass(logicCorner1);
 }
 
-void EKLM::GeoEKLMBelleII::createSectorSupportCorner2(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createSectorSupportCorner2(G4LogicalVolume* mlv)
 {
   static double r;
   static double x;
@@ -1268,7 +1268,7 @@ void EKLM::GeoEKLMBelleII::createSectorSupportCorner2(G4LogicalVolume* mlv)
   printVolumeMass(logicCorner2);
 }
 
-void EKLM::GeoEKLMBelleII::createSectorSupportCorner3(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createSectorSupportCorner3(G4LogicalVolume* mlv)
 {
   static double r;
   static double x;
@@ -1324,7 +1324,7 @@ void EKLM::GeoEKLMBelleII::createSectorSupportCorner3(G4LogicalVolume* mlv)
   printVolumeMass(logicCorner3);
 }
 
-void EKLM::GeoEKLMBelleII::createSectorSupportCorner4(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createSectorSupportCorner4(G4LogicalVolume* mlv)
 {
   static double r;
   static double x;
@@ -1380,7 +1380,7 @@ void EKLM::GeoEKLMBelleII::createSectorSupportCorner4(G4LogicalVolume* mlv)
   printVolumeMass(logicCorner4);
 }
 
-void EKLM::GeoEKLMBelleII::createSectorSupport(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createSectorSupport(G4LogicalVolume* mlv)
 {
   static G4Box* solidBoxX = NULL;
   static G4Box* solidBoxY = NULL;
@@ -1467,7 +1467,7 @@ void EKLM::GeoEKLMBelleII::createSectorSupport(G4LogicalVolume* mlv)
   printVolumeMass(logicSectorSupport);
 }
 
-G4SubtractionSolid* EKLM::GeoEKLMBelleII::
+G4SubtractionSolid* EKLM::GeoEKLMCreator::
 subtractBoardSolids(G4SubtractionSolid* plane, int n)
 {
   int i;
@@ -1519,7 +1519,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
   return res;
 }
 
-void EKLM::GeoEKLMBelleII::createPlane(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createPlane(G4LogicalVolume* mlv)
 {
   int i;
   int j;
@@ -1549,7 +1549,7 @@ void EKLM::GeoEKLMBelleII::createPlane(G4LogicalVolume* mlv)
     createStripVolume(logicPlane);
 }
 
-void EKLM::GeoEKLMBelleII::createSectionReadoutBoard(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createSectionReadoutBoard(G4LogicalVolume* mlv)
 {
   int i;
   static G4Box* solidSectionReadoutBoard = NULL;
@@ -1587,7 +1587,7 @@ void EKLM::GeoEKLMBelleII::createSectionReadoutBoard(G4LogicalVolume* mlv)
     createStripBoard(i, logicSectionReadoutBoard);
 }
 
-void EKLM::GeoEKLMBelleII::createBaseBoard(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createBaseBoard(G4LogicalVolume* mlv)
 {
   static G4Box* solidBaseBoard = NULL;
   G4LogicalVolume* logicBaseBoard = NULL;
@@ -1619,7 +1619,7 @@ void EKLM::GeoEKLMBelleII::createBaseBoard(G4LogicalVolume* mlv)
   printVolumeMass(logicBaseBoard);
 }
 
-void EKLM::GeoEKLMBelleII::createStripBoard(int iBoard, G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createStripBoard(int iBoard, G4LogicalVolume* mlv)
 {
   static G4Box* solidStripBoard = NULL;
   G4LogicalVolume* logicStripBoard = NULL;
@@ -1654,7 +1654,7 @@ void EKLM::GeoEKLMBelleII::createStripBoard(int iBoard, G4LogicalVolume* mlv)
   printVolumeMass(logicStripBoard);
 }
 
-void EKLM::GeoEKLMBelleII::createSectionSupport(int iSectionSupport,
+void EKLM::GeoEKLMCreator::createSectionSupport(int iSectionSupport,
                                                 G4LogicalVolume* mlv)
 {
   G4Transform3D t;
@@ -1756,7 +1756,7 @@ void EKLM::GeoEKLMBelleII::createSectionSupport(int iSectionSupport,
   printVolumeMass(logicSectionSupport);
 }
 
-void EKLM::GeoEKLMBelleII::createPlasticSheetElement(int iSheetPlane, int iSheet,
+void EKLM::GeoEKLMCreator::createPlasticSheetElement(int iSheetPlane, int iSheet,
                                                      G4LogicalVolume* mlv)
 {
   double z;
@@ -1791,7 +1791,7 @@ void EKLM::GeoEKLMBelleII::createPlasticSheetElement(int iSheetPlane, int iSheet
   printVolumeMass(logvol.psheet[iSheet - 1]);
 }
 
-void EKLM::GeoEKLMBelleII::createStripVolume(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createStripVolume(G4LogicalVolume* mlv)
 {
   G4Transform3D t;
   std::string StripVolume_Name = "StripVolume_" +
@@ -1820,7 +1820,7 @@ void EKLM::GeoEKLMBelleII::createStripVolume(G4LogicalVolume* mlv)
   }
 }
 
-void EKLM::GeoEKLMBelleII::createStrip(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createStrip(G4LogicalVolume* mlv)
 {
   G4LogicalVolume* logicStrip = NULL;
   G4Transform3D t;
@@ -1844,7 +1844,7 @@ void EKLM::GeoEKLMBelleII::createStrip(G4LogicalVolume* mlv)
   printVolumeMass(logicStrip);
 }
 
-void EKLM::GeoEKLMBelleII::createStripGroove(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createStripGroove(G4LogicalVolume* mlv)
 {
   G4LogicalVolume* logicGroove = NULL;
   G4Transform3D t;
@@ -1867,7 +1867,7 @@ void EKLM::GeoEKLMBelleII::createStripGroove(G4LogicalVolume* mlv)
   printVolumeMass(logicGroove);
 }
 
-void EKLM::GeoEKLMBelleII::createStripSensitive(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createStripSensitive(G4LogicalVolume* mlv)
 {
   G4LogicalVolume* logicSensitive = NULL;
   G4Transform3D t;
@@ -1892,7 +1892,7 @@ void EKLM::GeoEKLMBelleII::createStripSensitive(G4LogicalVolume* mlv)
   printVolumeMass(logicSensitive);
 }
 
-void EKLM::GeoEKLMBelleII::createSiPM(G4LogicalVolume* mlv)
+void EKLM::GeoEKLMCreator::createSiPM(G4LogicalVolume* mlv)
 {
   G4LogicalVolume* logicSiPM = NULL;
   G4Transform3D t;
@@ -1914,14 +1914,14 @@ void EKLM::GeoEKLMBelleII::createSiPM(G4LogicalVolume* mlv)
   printVolumeMass(logicSiPM);
 }
 
-void EKLM::GeoEKLMBelleII::printVolumeMass(G4LogicalVolume* lv)
+void EKLM::GeoEKLMCreator::printVolumeMass(G4LogicalVolume* lv)
 {
   if (m_mode == EKLM_DETECTOR_PRINTMASSES)
     printf("Volume %s: mass = %g g\n", lv->GetName().c_str(),
            lv->GetMass() / g);
 }
 
-void EKLM::GeoEKLMBelleII::create(const GearDir& content,
+void EKLM::GeoEKLMCreator::create(const GearDir& content,
                                   G4LogicalVolume& topVolume,
                                   geometry::GeometryTypes type)
 {

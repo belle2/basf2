@@ -2,7 +2,7 @@
 <DetectorComponent name="EKLM">
   <Description>Belle II EKLM geometry</Description>
   <Version>0</Version>
-  <Creator library="eklm">EKLMBelleII</Creator>
+  <Creator library="eklm">EKLMCreator</Creator>
   <Content>
     <ESTR>
 	<Rotation desc="Rotation of the structure with respect to the Detector" unit="rad">0.0</Rotation>

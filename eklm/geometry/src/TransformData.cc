@@ -9,7 +9,7 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/geometry/GeoEKLMBelleII.h>
+#include <eklm/geometry/GeoEKLMCreator.h>
 #include <eklm/geometry/TransformData.h>
 
 using namespace Belle2;
@@ -129,7 +129,7 @@ void EKLM::fillTransforms(struct TransformData* dat)
   int i3;
   int i4;
   int i5;
-  EKLM::GeoEKLMBelleII g(false);
+  EKLM::GeoEKLMCreator g(false);
   for (i1 = 0; i1 < 2; i1++) {
     g.getEndcapTransform(&(dat->endcap[i1]), i1);
     for (i2 = 0; i2 < 14; i2++) {

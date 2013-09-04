@@ -5,16 +5,25 @@
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 23 - Apr - 2013
 //-
+#include <string>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <daq/dqm/HistoServer.h>
 
-#define HISTO_PORT 9998
+using namespace Belle2;
+using namespace std;
 
 int main(int argc, char** argv)
 {
-  HistoServer hserv(HISTO_PORT);
+  if (argc < 3) {
+    printf("Usage : hserver port mapfile\n");
+    exit(-1);
+  }
+  int port = atoi(argv[1]);
+  string file = string(argv[2]);
+
+  HistoServer hserv(port, file);
 
   hserv.init();
 

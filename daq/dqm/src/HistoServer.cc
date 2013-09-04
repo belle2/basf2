@@ -11,10 +11,11 @@ using namespace Belle2;
 using namespace std;
 
 // Constructor / Destructor
-HistoServer::HistoServer(int port)
+HistoServer::HistoServer(int port, string filename)
 {
   m_port = port;
   m_force_exit = 0;
+  m_filename = filename;
 }
 
 HistoServer::~HistoServer()
@@ -28,8 +29,13 @@ int HistoServer:: init()
 {
   m_sock = new EvtSocketRecv(m_port, false);
   m_man = new EvtSocketManager(m_sock);
-  m_mapfile = TMapFile::Create("DqmHisto", "RECREATE", MAPFILESIZE);
+  m_mapfile = TMapFile::Create(m_filename.c_str(), "RECREATE", MAPFILESIZE);
   m_hman = new HistoManager(m_mapfile);
+
+  // Semaphore to ensure exclusive access to shm
+  //  m_mapfile->CreateSemaphore();
+  //  m_mapfile->ReleaseSemaphore();
+  return 0;
 
 }
 // Server function to collect histograms
@@ -78,9 +84,12 @@ int HistoServer::server()
     loop_counter++;
     if (loop_counter % 1000 == 0) {
       //      printf ( "HistoServer: merging histograms\n" );
+      //      m_mapfile->AcquireSemaphore();
       m_hman->merge();
+      //      m_mapfile->ReleaseSemaphore();
     }
   }
+  return 0;
 }
 
 

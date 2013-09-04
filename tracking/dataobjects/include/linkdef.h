@@ -29,4 +29,7 @@
 #pragma link C++ class pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > > >+;
 #pragma link C++ class vector < pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > > > >+;
 
+#pragma link C++ class Belle2::ROIid;
+#pragma link C++ class Belle2::PXDIntercept;
+
 #endif

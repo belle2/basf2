@@ -240,6 +240,7 @@ namespace Belle2 {
         int numTotalLayers;  /**< needed e.g. for neuronal network. This value allows calculation of maximum track length (noncurling), carries implicit information about detectorType, while 'highestAllowedLayer' does not know whether its a SVD or VXD setup */
         int minLayer; /**< lowest layer considered for TCC */
         int minState; /**< lowest state considered for seeds during TCC */
+        double magneticFieldStrength; /**< the strength of the magnetic field in Tesla */
 
         /** soon to come (maybe even layer-specific): **/
         std::vector<double> secConfigU;  /**< defines subdivition of sensors U */
@@ -508,6 +509,7 @@ namespace Belle2 {
 
     protected:
       TCsOfEvent m_tcVector; /**< carries links to all track candidates found within event (during tcc filter, bad ones get kicked, lateron they simply get deactivated) */
+      TCsOfEvent m_allTCsOfEvent; /**< carries links to really all track candidates found within event (used for deleting TrackCandidates at end of event) TODO: check whether use of m_tcVector can not be merged this one. Seems like redundant steps*/
       TCsOfEvent m_tcVectorOverlapped; /**< links only to track candidates which share at least one cluster with others*/
 
       /// module_parameters:

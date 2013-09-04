@@ -1784,7 +1784,7 @@ void EKLM::GeoEKLMCreator::createPlasticSheetElement(int iSheetPlane, int iSheet
   t = t * G4Translate3D(0, 0, z);
   try {
     new G4PVPlacement(t, logvol.psheet[iSheet - 1], Sheet_Name,
-                      mlv, false, 1, false);
+                      mlv, false, (iSheetPlane - 1) * nSection + iSheet, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }

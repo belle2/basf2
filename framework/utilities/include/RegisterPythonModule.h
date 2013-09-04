@@ -11,7 +11,6 @@
 #ifndef REGISTERPYTHONMODULE_H
 #define REGISTERPYTHONMODULE_H
 
-#include <framework/logging/Logger.h>
 
 namespace Belle2 {
   /** Proxy class to register python modules (i.e. the things you can 'import')
@@ -23,17 +22,17 @@ namespace Belle2 {
    * defined objects.
    * This might be useful to allow extra definitions for individual basf2 modules,
    * which can be imported after registering the module.
+   *
+   * The REGISTER_PYTHON_MODULE_AUTOIMPORT macro is identical, but will also
+   * import the module into the global namespace after loading it.
    */
   class BoostPythonModuleProxy {
   public:
     /** Don't construct this object yourself, use the REGISTER_PYTHON_MODULE macro instead. */
-    BoostPythonModuleProxy(const char* name, void (*initFunc)()) {
-      if (PyImport_AppendInittab(const_cast<char*>(name), initFunc) == -1) {
-        B2FATAL("BoostPythonModuleProxy for " << name << " failed.");
-      }
-    }
+    BoostPythonModuleProxy(const char* name, void (*initFunc)(), bool auto_import = false);
   };
 
-#define REGISTER_PYTHON_MODULE(moduleName) BoostPythonModuleProxy boostPythonModuleProxy##moduleName(#moduleName, init##moduleName);
+#define REGISTER_PYTHON_MODULE(moduleName) Belle2::BoostPythonModuleProxy boostPythonModuleProxy##moduleName(#moduleName, init##moduleName);
+#define REGISTER_PYTHON_MODULE_AUTOIMPORT(moduleName) Belle2::BoostPythonModuleProxy boostPythonModuleProxy##moduleName(#moduleName, init##moduleName, true);
 }
 #endif

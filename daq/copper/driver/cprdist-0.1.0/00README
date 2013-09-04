@@ -1,6 +1,17 @@
 ==================================================
-How to compile and install COPPER drivers (Aug.14, 2013)
-                                                                                                                                         
+How to compile and install COPPER drivers (Sep.3, 2013)
+
+To avoid an error message below during installation of modules, please check notices,
+ "insmod: error inserting 'daq/cprdist-0.1.0/drv/copper.ko': -1 Invalid module format"
+
+NOTICE : the version of compiler(/usr/bin/gcc) should be 
+same as the one used for kernel compilation or PXE server's gcc version.
+You can check the version by  % /usr/bin/gcc --dumpversion
+
+NOTICE : If you try to compile drivers on a PXE server and COPPER_CPU's linux kernel is different from
+the one used on PXE server, please modify KERNEL_VERSION in drv/Makefile and cprfin_fngeneric/Makefile.
+
+
 % make clean
 % make
 % cd cprfin_fngeneric/

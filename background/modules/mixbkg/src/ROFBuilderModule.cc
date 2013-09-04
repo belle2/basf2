@@ -51,7 +51,6 @@ ROFBuilderModule::ROFBuilderModule() : Module()
   addParam("SimHitMCPartRelationName", m_simHitMCPartRelationName, "The SimHit to MCParticle relation name.");
   // Timing mode
   addParam("TimeAwareMode", m_timeAwareMode, "Randomize events and generate time information in ROFs", bool(false));
-  addParam("RandomizeNonSAD", m_randomizeNonSAD, "Randomize other than SAD events?", bool(false));
   // For timeless mode - fixed number of base events per ROF
   addParam("EventsPerReadoutFrame", m_eventsPerReadoutFrame, "The number of events that represent one readout frame.", double(1));
   // For time-aware mode - Poisson-distributed number of base events, placed uniformly in time.
@@ -128,20 +127,8 @@ void ROFBuilderModule::initialize()
   m_numberSimHits = 0;
   m_rofGraphUniqueID = -1;
 
-  // Randomize events?
-  bool isSAD = boost::to_upper_copy(m_generatorName).find("SAD") != string::npos;
-  m_randomize = m_timeAwareMode && (isSAD || m_randomizeNonSAD);
-
   // Number of events on input
   int nBaseEvents = InputController::numEntries();
-
-  if (m_randomize) {
-    // Initialize the event randomizer
-    // FIXME: Could be the randomization is strictly necessary only for Coulomb and Touschek!
-    m_selector = new RandomPermutation(nBaseEvents);
-    // Set the first event number to read in InputController
-    InputController::setNextEntry(m_selector->getNext());
-  }
 
   if (m_timeAwareMode) {
     // Set time-dependent parameters.
@@ -175,7 +162,6 @@ void ROFBuilderModule::initialize()
     B2INFO("Window start (ns)    : " << m_windowStart)
     B2INFO("Base sample size (ns): " << m_baseSampleSize)
     B2INFO("Events on input      : " << nBaseEvents)
-    B2INFO("Randomize events     : " << m_randomize)
   }
   B2INFO("-------------------------------------------------------")
 }
@@ -183,8 +169,6 @@ void ROFBuilderModule::initialize()
 
 void ROFBuilderModule::event()
 {
-  // If all input events have been processed, do nothing.
-  if (m_randomize && m_selector->isFinished()) return;
   //Check if a new readout frame has to be created
   bool frameDone = (m_event >= ((m_currReadoutFrameIdx + 1) * m_eventsPerReadoutFrame));
   if (m_timeAwareMode) {
@@ -235,11 +219,6 @@ void ROFBuilderModule::event()
 
   m_event++;
 
-  if (m_randomize) {
-    // Set next event number to read in InputController
-    InputController::setNextEntry(m_selector->getNext());
-  }
-
 }
 
 
@@ -266,7 +245,6 @@ void ROFBuilderModule::terminate()
   delete m_mcParticles;
   delete m_readoutFrame;
 
-  if (m_randomize) delete m_selector;
   if (m_timeAwareMode) delete m_timer;
 
 }
@@ -338,7 +316,7 @@ MCParticleGraph::GraphParticle& ROFBuilderModule::createGraphParticle(MCParticle
 }
 
 
-void ROFBuilderModule::addParticleToEventGraph(MCParticleGraph& graph, MCParticle& mcParticle, int motherIndex, const std::vector<bool> &keepList)
+void ROFBuilderModule::addParticleToEventGraph(MCParticleGraph& graph, MCParticle& mcParticle, int motherIndex, const std::vector<bool>& keepList)
 {
   MCParticleGraph::GraphParticle& graphParticle = createGraphParticle(graph, mcParticle, motherIndex);
 
@@ -354,7 +332,7 @@ void ROFBuilderModule::addParticleToEventGraph(MCParticleGraph& graph, MCParticl
 }
 
 
-void ROFBuilderModule::addParticleToROFGraph(MCParticle& mcParticle, int motherIndex, std::vector<int> &uniqueIDList)
+void ROFBuilderModule::addParticleToROFGraph(MCParticle& mcParticle, int motherIndex, std::vector<int>& uniqueIDList)
 {
   MCParticleGraph::GraphParticle& graphParticle = createGraphParticle(m_rofMCParticleGraph, mcParticle, motherIndex);
 

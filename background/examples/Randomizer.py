@@ -20,7 +20,7 @@ inputName = '{d}/Touschek_LER_all.root'.format(d=inputDir)
 
 outputDir = '.'
 outputName = '{d}/Touschek_LER_rnd.root'.format(d=outputDir)
-# *******************************************************************************
+# ****************************************************************************
 
 # Register modules
 

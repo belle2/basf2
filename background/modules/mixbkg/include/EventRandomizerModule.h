@@ -33,6 +33,11 @@ namespace Belle2 {
       m_data = new int[n];
       for (int i = 0; i < n; ++i) m_data[i] = i;
     }
+
+    /** No copy construction allowed.
+     */
+    RandomPermutation(const RandomPermutation& other) = delete;
+
     /** Destructor. */
     ~RandomPermutation() { delete [] m_data; }
     /** Return the next index to retrieve.
@@ -58,10 +63,6 @@ namespace Belle2 {
     bool isFinished() const { return m_finished; }
 
   private:
-    /** Hide copy constructor. */
-    RandomPermutation(const RandomPermutation& other):
-      m_n(other.m_n), m_data(other.m_data), m_current(other.m_current), m_finished(other.m_finished)
-    {}
 
     int m_n;              /**< Size of the array.*/
     int* m_data;          /**< Array of indices.*/

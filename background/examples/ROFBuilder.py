@@ -5,13 +5,17 @@
 #
 # This example steering file generates readout frames (ROFs) for the SVD.
 #
-# This is phase one of the processing underlying the background mixing. You have
-# to produce a "catalogue" of ROFs for individual background/generator combinations.
+# This is phase one of the processing underlying the background mixing. A user
+# has to produce a "catalog" of ROFs for individual background/generator
+# combinations.
 # The produced ROF files contain collections of background SimHits to be mixed
 # into events of simulated data by the MixBkg module.
-# The ROF file has a special format, different from that of ROOT files produced by
-# the ROOTOutput module, They are read and used by the MixBkg module, not the
-# ROOTInput module.
+# NOTES
+# 1. The event-randomization feature has been removed from ROFBuilder.
+# To randomize the input event sequence, use the EventRandomizer module.
+# 2. The ROF file has a special format, different from that of the ROOT files
+# produced by the ROOTOutput module, They are read and used by the MixBkg
+# module, not the ROOTInput module.
 #
 ##############################################################################
 
@@ -34,16 +38,17 @@ subdetectorCodes = {
     'BKLM': 8,
     'ECLsim': 9,
     }
-# ECL is a special case, use 'ECL' to produce ROFs with ECLHits, 'ECLsim' for ROFs with ECLSimHits.
-
-# *******************************************************************************
+# ECL is a special case, use 'ECL' to produce ROFs with ECLHits, 'ECLsim' for
+# ROFs with ECLSimHits.
+# ****************************************************************************
 # USER SETTINGS
 subdetectorName = 'SVD'
 bgType = 'Touschek'
 bgSource = 'LER'
 bgGenerator = 'SAD'
 
-inputDir = '~/work/belle2/BG/summer2012'
+# Replace this with paths on your own system!
+inputDir = '/data/belle2/BG/summer2012'
 # A single background file !
 inputName = '{d}/output_{t}_{s}_*.root'.format(d=inputDir, t=bgType,
         s=bgSource)
@@ -61,7 +66,7 @@ if subdetectorName == 'ECL':
 elif subdetectorName == 'ECLsim':
     collectionName = 'ECLSimHits'
 
-# *******************************************************************************
+# *****************************************************************************
 
 # Register modules
 
@@ -86,9 +91,6 @@ rofbuilder.param('ComponentName', bgType)
 rofbuilder.param('GeneratorName', bgGenerator + '_' + bgSource)
 # With SimHits, save MCParticles that caused them and their predecessors.
 rofbuilder.param('MCParticleWriteMode', 2)
-# Set this to True only if RBB data have to be over-used, ie, used to generate
-# more frames than their nominal number.
-rofbuilder.param('RandomizeNonSAD', False)  # This is the default
 rofbuilder.set_log_level(LogLevel.INFO)
 
 # Show progress of processing

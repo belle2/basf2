@@ -34,57 +34,6 @@
 namespace Belle2 {
 
   /**
-   * Class RandomPermutation: provide a random permutation of integers 0..n-1.
-   *
-   * This class is a generator: when created with a given size n, it provides (via
-   * RandomPermutation::Next) randomized integers from 0 to n-1.
-   */
-  class RandomPermutation {
-  public:
-    /** Constructor.
-     * @param n size of the input sequence.
-     */
-    RandomPermutation(int n) : m_n(n), m_current(n), m_finished(false) {
-      m_data = new int[n];
-      for (int i = 0; i < n; ++i) m_data[i] = i;
-    }
-    /** Destructor. */
-    ~RandomPermutation() { delete [] m_data; }
-    /** Return the next index to retrieve.
-     * @return next index to retrieve, or, at the end, m_n and then -1 to terminate RootInput.
-     */
-    int getNext() {
-      if (m_finished) return -1;
-      if (m_current < 0) {
-        m_finished = true;
-        return m_n - 1;
-      }
-      int iSelect = gRandom->Integer(m_current--);
-      int result = m_data[m_current];
-      if (iSelect < m_current) {
-        result = m_data[iSelect];
-        m_data[iSelect] = m_data[m_current];
-      }
-      return result;
-    }
-    /** Check if the permutation has been read out.
-     * @return true if all m_n indices have been read.
-     */
-    bool isFinished() const { return m_finished; }
-
-  private:
-    /** Hide copy constructor. */
-    RandomPermutation(const RandomPermutation& other):
-      m_n(other.m_n), m_data(other.m_data), m_current(other.m_current), m_finished(other.m_finished)
-    {}
-
-    int m_n;              /**< Size of the array.*/
-    int* m_data;          /**< Array of indices.*/
-    int m_current;        /**< Current position in the array of indices.*/
-    bool m_finished;      /**< Indicates that the permuation has been exhausted.*/
-  };
-
-  /**
    * Class RandomTimer: Provide exponentially distributied arrival times of beam
    * background events.
    * The class also wraps back the time sequence when the end of the acceptance window
@@ -149,9 +98,10 @@ namespace Belle2 {
    * which caused a SimHit are saved by default. But can optionally be extended by setting
    * the 'MCParticleWriteMode' parameter of the module.
    *
-   * The 'time-aware" mode of the ROFBuilder randomizes the order of input events
+   * The 'time-aware" mode of the ROFBuilder expects random order of input events
    * and builds sequences of SimHits (and the underlying MCParticles, if
-   * desired) randomized in event occurrence times.
+   * desired) randomized in event occurrence times. If the input sequence has to
+   * be randomized, use the EventRandomizer module.
    * For the time-aware mode, set the corresponding parameter to true, and set
    * the start time and size of the acceptance window of your subdetector (in ns).
    * Also specify the time interval equivalent of the input data (in us).
@@ -159,14 +109,8 @@ namespace Belle2 {
    * and the corresponding parameter only has effect in the "timeless" mode.
    *
    * NOTES ON CURRENT IMPLEMENTATION (October 2012)
-   * - The randomization of events takes time, especially when multiple files are
-   * used on input. I believe this can be improved, but not much.
-   * - Currently, the module cannot write MCParticles, as it has problems with
-   * events that don't have SimHits for the required subdetector and it cannot find
-   * the corresponding relation. Will be fixed.
-   * - The module currently only works for PXD and SVD. Other subdetectors can
-   * be added relatively easily, BUT
-   * 1. their SimHits have to inherit from the SimHitBase class (currently in
+   * To make the module work with a specific subdetector,
+   * 1. the subdetector's SimHits have to inherit from the SimHitBase class (currently in
    * generators/dataobjects) and
    * 2. (if time-aware mode is desired), re-implement SimHitBase::shiftInTime(float delta)
    * to do something like m_simHitTime += delta, whatever simHitTime is and is
@@ -186,6 +130,10 @@ namespace Belle2 {
    * to appear will simply be outside of the acceptance. My impression is that
    * there is a measurable fraction of delayed background, so this will have to
    * be improved.
+   * CHANGE SEPTEMBER 2013:
+   * The event-randomization feature was removed from ROFBuilderModule. Use the
+   * EventRandomizer module to randomize input events. As before, be aware that
+   * event randomization takes lots of time.
    */
   class ROFBuilderModule : public Module {
 
@@ -229,13 +177,7 @@ namespace Belle2 {
     double m_windowStart;                 /**< Start of ROF windomw.*/
     double m_windowSize;                  /**< Size of ROF window.*/
     double m_baseSampleSize;              /**< Size of the base data sample.*/
-    bool m_randomizeNonSAD;               /**< Randomize events for other than SAD generator?*/
-    /* Note: This may be needed if the sample
-     * is going to be over-used.
-     */
-
     //Variables
-    bool m_randomize;                            /**< Randomize the order of events? */
     MCParticleGraph m_rofMCParticleGraph;        /**< The MCParticle graph for one full readout frame. */
     std::vector<int> m_mcpToSimHitMap;           /**< List for one full readout frame that maps a SimHit index (the list index) to a MCParticle index. */
     int m_rofGraphUniqueID;                      /**< Unique identifier for the nodes of the ROF graph. */
@@ -249,7 +191,6 @@ namespace Belle2 {
     int m_currReadoutFrameIdx;                   /**< The index of the current readout frame. */
     std::vector<std::string> m_SimHitClassNames; /**< Stores the SimHit class name for each subdetector type. */
     int m_numberSimHits;                         /**< The current number of SimHits. */
-    RandomPermutation* m_selector;               /**< The class that says which record of the input to read next. */
     RandomTimer* m_timer;                        /**< The timer generates random event times. */
     float m_eventTime;                           /**< The time shift for current event. */
 
@@ -280,7 +221,7 @@ namespace Belle2 {
      * @param useUniqueID Set it to true to store a unique number for each node into the trackID.
      * @param keepList List which specifies the indices of the MCParticle which should be kept. Set it to NULL to skip the list.
      */
-    void addParticleToEventGraph(MCParticleGraph& graph, MCParticle& mcParticle, int motherIndex, const std::vector<bool> &keepList);
+    void addParticleToEventGraph(MCParticleGraph& graph, MCParticle& mcParticle, int motherIndex, const std::vector<bool>& keepList);
 
     /** Add MCParticle (and its daughters) to the ROF MCParticleGraph, keeping
      * track of their list indices.
@@ -288,7 +229,7 @@ namespace Belle2 {
      * @param motherIndex index of mother particle
      * @param uniqueIDList relates MCParticle index (list index) to unique ID
      */
-    void addParticleToROFGraph(MCParticle& mcParticle, int motherIndex, std::vector<int> &uniqueIDList);
+    void addParticleToROFGraph(MCParticle& mcParticle, int motherIndex, std::vector<int>& uniqueIDList);
 
   };
 

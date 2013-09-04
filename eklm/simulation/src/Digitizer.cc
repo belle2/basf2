@@ -165,11 +165,6 @@ void EKLM::Digitizer::makeSimHits()
         // insert hit to the map
         graphComponentToSimHit.insert(std::pair<int, EKLMSim2Hit*>(component[distance(hitMap.begin(), hitIterator)], simHit));
 
-        simHit->setGlobalPosition(stepHit->getGlobalPosition());
-        simHit->setPlane(stepHit->getPlane());
-        simHit->setStrip(stepHit->getStrip());
-        simHit->setMomentum(stepHit->getMomentum());
-
       } else { // entry already exist
         // compare hittime. The leading one has smallest time
         if (current->second->getTime() < stepHit->getTime()) {
@@ -181,6 +176,7 @@ void EKLM::Digitizer::makeSimHits()
           current->second->setEDep(current->second->getEDep() +
                                    stepHit->getEDep());
           current->second->setGlobalPosition(stepHit->getGlobalPosition());
+          current->second->setLocalPosition(stepHit->getLocalPosition());
           current->second->setTime(stepHit->getTime());
           current->second->setPDG(stepHit->getPDG());
           current->second->setMomentum(stepHit->getMomentum());

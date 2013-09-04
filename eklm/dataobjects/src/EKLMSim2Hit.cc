@@ -27,10 +27,13 @@ EKLMSim2Hit::EKLMSim2Hit()
 }
 
 EKLMSim2Hit::EKLMSim2Hit(const EKLMSimHit* stepHit)
-  : EKLMHitBase((EKLMHitBase)*stepHit)
+  : EKLMHitBase((EKLMHitBase)*stepHit),
+    EKLMHitCoord((EKLMHitCoord)*stepHit),
+    EKLMHitMomentum((EKLMHitMomentum)*stepHit)
 {
-  setMomentum(stepHit->getMomentum());
   setVolumeID(stepHit->getVolumeID());
+  setPlane(stepHit->getPlane());
+  setStrip(stepHit->getStrip());
 }
 
 int EKLMSim2Hit::getVolumeID() const

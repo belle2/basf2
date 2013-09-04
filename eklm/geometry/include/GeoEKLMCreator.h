@@ -140,14 +140,33 @@ namespace Belle2 {
     };
 
     /**
+     * Sector support solids.
+     */
+    struct SectorSupportSolids {
+      double c2x;      /**< Corner 2 X. */
+      double c2y;      /**< Corner 2 Y. */
+      double c3x;      /**< Corner 3 X. */
+      double c3y;      /**< Corner 3 Y. */
+      double c4x;      /**< Corner 4 X. */
+      double c4y;      /**< Corner 4 Y. */
+      G4VSolid* itube; /**< Inner tube. */
+      G4VSolid* otube; /**< Outer tube. */
+      G4VSolid* corn1; /**< Corner 1. */
+      G4VSolid* corn2; /**< Corner 2. */
+      G4VSolid* corn3; /**< Corner 3. */
+      G4VSolid* corn4; /**< Corner 4. */
+      G4VSolid* supp;  /**< Support. */
+    };
+
+    /**
      * Section support solids.
      */
     struct SectionSupportSolids {
-      G4Box* topbox;        /**< Top box. */
-      G4Box* midbox;        /**< Middle box. */
-      G4Box* botbox;        /**< Bottom box. */
-      G4UnionSolid* us;     /**< Top box + middle box. */
-      G4UnionSolid* secsup; /**< Section support. */
+      G4VSolid* topbox; /**< Top box. */
+      G4VSolid* midbox; /**< Middle box. */
+      G4VSolid* botbox; /**< Bottom box. */
+      G4VSolid* us;     /**< Top box + middle box. */
+      G4VSolid* secsup; /**< Section support. */
     };
 
     /**
@@ -162,15 +181,23 @@ namespace Belle2 {
      * All solids of EKLM.
      */
     struct Solids {
-      G4VSolid* endcap;                     /**< Endcap. */
-      G4VSolid** plane;                     /**< Plane. */
-      G4VSolid** psheet;                    /**< Element of plastic sheet. */
-      G4Box** stripvol;                     /**< Strip + SiPM volume. */
-      G4Box** strip;                        /**< Strips. */
-      G4Box** groove;                       /**< Strip grooves. */
-      G4Box* sipm;                          /**< SiPM. */
-      struct ScintillatorSolids* scint;     /**< Scintillator. */
-      struct SectionSupportSolids** secsup; /**< Section support. */
+      G4VSolid* endcap;                         /**< Endcap. */
+      G4VSolid* layer;                          /**< Layer. */
+      G4VSolid* sector;                         /**< Sector. */
+      G4VSolid* cover;                          /**< Sector cover. */
+      G4VSolid* secsupp;                        /**< Sector support. */
+      G4VSolid** plane;                         /**< Plane. */
+      G4VSolid** psheet;                        /**< Element of plastic sheet. */
+      G4VSolid** stripvol;                      /**< Strip + SiPM volume. */
+      G4VSolid** strip;                         /**< Strips. */
+      G4VSolid** groove;                        /**< Strip grooves. */
+      G4VSolid* sipm;                           /**< SiPM. */
+      G4VSolid* board;                          /**< Readout board. */
+      G4VSolid* baseboard;                      /**< Readout board base. */
+      G4VSolid* stripboard;                     /**< Readout board for 1 strip. */
+      struct SectorSupportSolids sectorsup;     /**< Sector support. */
+      struct ScintillatorSolids* scint;         /**< Scintillator. */
+      struct SectionSupportSolids** sectionsup; /**< Section support. */
     };
 
     /**
@@ -319,6 +346,36 @@ namespace Belle2 {
       void createEndcapSolid();
 
       /**
+       * Create sector cover solid.
+       */
+      void createSectorCoverSolid();
+
+      /**
+       * Create sector support solid.
+       */
+      void createSectorSupportSolid();
+
+      /**
+       * Create sector support corner 1 solid.
+       */
+      void createSectorSupportCorner1Solid();
+
+      /**
+       * Create sector support corner 2 solid.
+       */
+      void createSectorSupportCorner2Solid();
+
+      /**
+       * Create sector support corner 3 solid.
+       */
+      void createSectorSupportCorner3Solid();
+
+      /**
+       * Create sector support corner 4 solid.
+       */
+      void createSectorSupportCorner4Solid();
+
+      /**
        * Create plane solid.
        * @param[in] n Number of plane, from 0 to 1.
        */
@@ -368,42 +425,37 @@ namespace Belle2 {
 
       /**
        * Create inner tube of sector support structure.
-       * @param[in] mlv   Mother logical volume.
        */
-      G4Tubs* createSectorSupportInnerTube(G4LogicalVolume* mlv);
+      G4Tubs* createSectorSupportInnerTube();
 
       /**
        * Create outer tube of sector support structure.
-       * @param[in] mlv   Mother logical volume.
        */
-      G4Tubs* createSectorSupportOuterTube(G4LogicalVolume* mlv);
+      G4Tubs* createSectorSupportOuterTube();
 
       /**
        * Create X side of sector support structure.
-       * @param[in]  mlv   Mother logical volume.
        * @param[out] t     Transformation.
        * @details
        * Sets t to the transformation of the box.
        */
-      G4Box* createSectorSupportBoxX(G4LogicalVolume* mlv, G4Transform3D& t);
+      G4Box* createSectorSupportBoxX(G4Transform3D& t);
 
       /**
        * Create Y side of sector support structure.
-       * @param[in]  mlv   Mother logical volume.
        * @param[out] t     Transformation.
        * @details
        * Sets t to the transformation of the box.
        */
-      G4Box* createSectorSupportBoxY(G4LogicalVolume* mlv, G4Transform3D& t);
+      G4Box* createSectorSupportBoxY(G4Transform3D& t);
 
       /**
        * Create box in the cutted corner of sector support structure.
-       * @param[in]  mlv   Mother logical volume.
        * @param[out] t     Transformation.
        * @details
        * Sets t to the transformation of the box.
        */
-      G4Box* createSectorSupportBoxTop(G4LogicalVolume* mlv, G4Transform3D& t);
+      G4Box* createSectorSupportBoxTop(G4Transform3D& t);
 
       /**
        * Create sector support corner 1.

@@ -1,0 +1,86 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Martin Ritter, Igal Jaegle                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#include <beast/he3tube/simulation/SensitiveDetector.h>
+#include <beast/he3tube/dataobjects/He3tubeSimHit.h>
+
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
+#include <framework/gearbox/Unit.h>
+
+#include <G4Track.hh>
+#include <G4Step.hh>
+
+namespace Belle2 {
+  /** Namespace to encapsulate code needed for the HE3TUBE detector */
+  namespace he3tube {
+
+    SensitiveDetector::SensitiveDetector():
+      Simulation::SensitiveDetectorBase("He3tubeSensitiveDetector", Simulation::SensitiveDetectorBase::Other)
+    {
+      //Make sure all collections are registered
+      StoreArray<MCParticle>   mcParticles;
+      StoreArray<He3tubeSimHit>  simHits;
+      RelationArray relMCSimHit(mcParticles, simHits);
+
+      //Register all collections we want to modify and require those we want to use
+      mcParticles.registerAsPersistent();
+      simHits.registerAsPersistent();
+      relMCSimHit.registerAsPersistent();
+
+      //Register the Relation so that the TrackIDs get replaced by the actual
+      //MCParticle indices after simulating the events. This is needed as
+      //secondary particles might not be stored so everything relating to those
+      //particles will be attributed to the last saved mother particle
+      registerMCParticleRelation(relMCSimHit);
+    }
+
+    bool SensitiveDetector::step(G4Step* step, G4TouchableHistory*)
+    {
+      //Get Track information
+      const G4Track& track    = *step->GetTrack();
+      const int trackID       = track.GetTrackID();
+      const double depEnergy  = step->GetTotalEnergyDeposit() * Unit::MeV;
+      const G4ThreeVector G4tkPos = step->GetTrack()->GetPosition();
+      TVector3 tkPos(G4tkPos.x() * Unit::cm, G4tkPos.y() * Unit::cm, G4tkPos.z() * Unit::cm);
+      const int tkPDG = step->GetTrack()->GetDefinition()->GetPDGEncoding();
+      const int detNb = step->GetTrack()->GetVolume()->GetCopyNo();
+      const double stGTime = step->GetPreStepPoint()->GetGlobalTime();
+
+      //Ignore everything below 1eV
+      if (depEnergy < Unit::eV) return false;
+
+
+
+      //Get the datastore arrays
+      StoreArray<MCParticle>  mcParticles;
+      StoreArray<He3tubeSimHit> simHits;
+      RelationArray relMCSimHit(mcParticles, simHits);
+
+      //Add SimHit
+      const int hitIndex = simHits.getEntries();
+      new(simHits.nextFreeAddress()) He3tubeSimHit(
+        depEnergy,
+        tkPos,
+        detNb,
+        tkPDG,
+        stGTime
+      );
+
+      //Add Relation between SimHit and MCParticle with a weight of 1. Since
+      //the MCParticle index is not yet defined we use the trackID from Geant4
+      relMCSimHit.add(trackID, hitIndex, 1.0);
+
+      return true;
+    }
+
+  } //he3tube namespace
+} //Belle2 namespace

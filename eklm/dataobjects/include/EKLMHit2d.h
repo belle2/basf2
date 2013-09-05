@@ -17,6 +17,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -24,7 +25,7 @@ namespace Belle2 {
    * Class for 2d hits handling.
    */
   class EKLMHit2d : public EKLMHitBase, public EKLMHitGlobalCoord,
-    public EKLMHitMCTime {
+    public EKLMHitMCTime, public RelationsObject {
 
   public:
 

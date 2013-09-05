@@ -26,7 +26,7 @@ namespace Belle2 {
    */
 
   class EKLMSimHit : public EKLMHitBase, public EKLMHitCoord,
-    public EKLMHitMomentum {
+    public EKLMHitMomentum, public SimHitBase {
   public:
 
     /**

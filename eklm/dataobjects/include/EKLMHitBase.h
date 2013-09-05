@@ -13,16 +13,14 @@
 
 /* Extrenal headers. */
 #include <CLHEP/Geometry/Point3D.h>
-
-/* Belle 2 headers. */
-#include <framework/datastore/RelationsObject.h>
+#include <TObject.h>
 
 namespace Belle2 {
 
   /**
    * Base hit class.
    */
-  class EKLMHitBase: public RelationsObject {
+  class EKLMHitBase {
 
   public:
 
@@ -39,7 +37,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~EKLMHitBase();
+    virtual ~EKLMHitBase();
 
     /**
      * Get endcap number.

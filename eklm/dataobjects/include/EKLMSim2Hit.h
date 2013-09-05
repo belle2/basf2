@@ -19,6 +19,7 @@
 #include <eklm/dataobjects/EKLMHitCoord.h>
 #include <eklm/dataobjects/EKLMHitMomentum.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -26,7 +27,7 @@ namespace Belle2 {
    * Class to handle simulation hits.
    */
   class EKLMSim2Hit : public EKLMHitBase, public EKLMHitCoord,
-    public EKLMHitMomentum {
+    public EKLMHitMomentum, public RelationsObject {
 
   public:
 

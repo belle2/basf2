@@ -18,6 +18,7 @@
 #include <eklm/dataobjects/EKLMHitBase.h>
 #include <eklm/dataobjects/EKLMHitMCTime.h>
 #include <eklm/dataobjects/EKLMSim2Hit.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -26,7 +27,7 @@ namespace Belle2 {
    * hitted strips.
    */
   class EKLMDigit : public EKLMHitBase, public EKLMHitCoord,
-    public EKLMHitMCTime {
+    public EKLMHitMCTime, public RelationsObject {
 
   public:
 

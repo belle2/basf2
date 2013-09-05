@@ -34,10 +34,10 @@ EKLMSensitiveDetector(G4String name, enum EKLMSensitiveType type)
   m_ThresholdHitTime =
     Unit::convertValue(gd.getDouble("HitTimeThreshold") , "ns");
 
-  StoreArray<EKLMSimHit> stepHits;
+  StoreArray<EKLMSimHit> simHits;
   StoreArray<MCParticle> particles;
-  RelationArray particleToStepHits(particles, stepHits);
-  registerMCParticleRelation(particleToStepHits);
+  RelationArray particleToSimHits(particles, simHits);
+  registerMCParticleRelation(particleToSimHits);
 
   StoreArray<EKLMSimHit>::registerPersistent();
   RelationArray::registerPersistent<MCParticle, EKLMSimHit>();
@@ -97,8 +97,8 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
                 aStep->GetPreStepPoint()->GetPosition());
   lpos = hist->GetHistory()->GetTopTransform().TransformPoint(gpos);
   /* Create step hit and store in to DataStore */
-  StoreArray<EKLMSimHit> stepHits;
-  EKLMSimHit* hit = new(stepHits.nextFreeAddress())EKLMSimHit();
+  StoreArray<EKLMSimHit> simHits;
+  EKLMSimHit* hit = new(simHits.nextFreeAddress())EKLMSimHit();
   hit->setMomentum(CLHEP::HepLorentzVector(track.GetMomentum(),
                                            track.GetTotalEnergy()));
   hit->setTrackID(track.GetTrackID());
@@ -144,8 +144,8 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   }
   /* Relation. */
   StoreArray<MCParticle> particles;
-  RelationArray particleToStepHits(particles, stepHits);
-  particleToStepHits.add(track.GetTrackID(), stepHits.getEntries() - 1);
+  RelationArray particleToSimHits(particles, simHits);
+  particleToSimHits.add(track.GetTrackID(), simHits.getEntries() - 1);
   return true;
 }
 

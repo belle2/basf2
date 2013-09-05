@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMSTEPHIT_H
-#define EKLMSTEPHIT_H
+#ifndef EKLMSIMHIT_H
+#define EKLMSIMHIT_H
 
 /* Belle2 headers. */
 #include <generators/dataobjects/SimHitBase.h>

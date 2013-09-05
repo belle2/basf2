@@ -34,31 +34,31 @@ EKLM::Digitizer::~Digitizer()
 {
 }
 
-void EKLM::Digitizer::readAndSortStepHits()
+void EKLM::Digitizer::readAndSortSimHits()
 {
-  B2DEBUG(1, "EKLM::Digitizer::readAndSortStepHits()");
+  B2DEBUG(1, "EKLM::Digitizer::readAndSortSimHits()");
 
-  StoreArray<EKLMSimHit> stepHitsArray;
-  for (int i = 0; i < stepHitsArray.getEntries(); i++) {
+  StoreArray<EKLMSimHit> simHitsArray;
+  for (int i = 0; i < simHitsArray.getEntries(); i++) {
 
     // search for entries of the same strip
     std::map<int, std::vector<EKLMSimHit*> >::iterator
-    it = m_stepHitVolumeMap.find((stepHitsArray[i])->getVolumeID());
+    it = m_simHitVolumeMap.find((simHitsArray[i])->getVolumeID());
 
-    if (it == m_stepHitVolumeMap.end()) { //  new entry
+    if (it == m_simHitVolumeMap.end()) { //  new entry
       std::vector<EKLMSimHit*>* vectorHits = NULL;
       try {
-        vectorHits = new std::vector<EKLMSimHit*> (1, (stepHitsArray[i]));
+        vectorHits = new std::vector<EKLMSimHit*> (1, (simHitsArray[i]));
       } catch (std::bad_alloc& ba) {
         B2FATAL(MemErr);
       }
 
-      m_stepHitVolumeMap.insert(std::pair<int, std::vector<EKLMSimHit*> >((stepHitsArray[i])->getVolumeID(), *vectorHits));
+      m_simHitVolumeMap.insert(std::pair<int, std::vector<EKLMSimHit*> >((simHitsArray[i])->getVolumeID(), *vectorHits));
     } else {
-      it->second.push_back(stepHitsArray[i]);
+      it->second.push_back(simHitsArray[i]);
     }
   }
-  B2DEBUG(1, "EKLM::Digitizer::readAndSortStepHits()  completed");
+  B2DEBUG(1, "EKLM::Digitizer::readAndSortSimHits()  completed");
 }
 
 
@@ -71,8 +71,8 @@ void EKLM::Digitizer::makeSimHits()
 
   //loop over volumes
   for (std::map<int, std::vector<EKLMSimHit*> >::iterator
-       volumeIterator = m_stepHitVolumeMap.begin();
-       volumeIterator != m_stepHitVolumeMap.end(); volumeIterator++) {
+       volumeIterator = m_simHitVolumeMap.begin();
+       volumeIterator != m_simHitVolumeMap.end(); volumeIterator++) {
 
     // we have only tree graphs here, so edge is completely defined by it's track ID
     // map to store (edge  <--> hit) == (vertex <--> hit) correspondence
@@ -83,7 +83,7 @@ void EKLM::Digitizer::makeSimHits()
       // ID key
       int key = (*i)->getTrackID();
 
-      // here we merge all StepHits produced by the same track.
+      // here we merge all SimHits produced by the same track.
       //The leading (with smallest time) hit survies.
       //The others are deleted.
       //Integrated energy deposition is prescribed to the leading hit
@@ -152,7 +152,7 @@ void EKLM::Digitizer::makeSimHits()
     for (std::map < int , EKLMSimHit*>::iterator hitIterator = hitMap.begin();
          hitIterator != hitMap.end(); hitIterator++) {
       // get EKLMSimHit corresponding to the current vertex
-      EKLMSimHit* stepHit = hitIterator->second;
+      EKLMSimHit* simHit = hitIterator->second;
 
       // search for the current component in the map
       std::map <int, EKLMSim2Hit*>::iterator current =
@@ -160,26 +160,26 @@ void EKLM::Digitizer::makeSimHits()
       if (current == graphComponentToSimHit.end()) {    // no  entry for this component
 
         // create new EKLMSim2Hit and store all information into it
-        EKLMSim2Hit* simHit =
-          new(m_simHitsArray.nextFreeAddress()) EKLMSim2Hit(stepHit);
+        EKLMSim2Hit* sim2Hit =
+          new(m_simHitsArray.nextFreeAddress()) EKLMSim2Hit(simHit);
         // insert hit to the map
-        graphComponentToSimHit.insert(std::pair<int, EKLMSim2Hit*>(component[distance(hitMap.begin(), hitIterator)], simHit));
+        graphComponentToSimHit.insert(std::pair<int, EKLMSim2Hit*>(component[distance(hitMap.begin(), hitIterator)], sim2Hit));
 
       } else { // entry already exist
         // compare hittime. The leading one has smallest time
-        if (current->second->getTime() < stepHit->getTime()) {
+        if (current->second->getTime() < simHit->getTime()) {
           // new hit is successor, add edep of the successor to the ancestor
           current->second->setEDep(current->second->getEDep() +
-                                   stepHit->getEDep());
+                                   simHit->getEDep());
         } else {
           // new hit is ancestor,  modify everything
           current->second->setEDep(current->second->getEDep() +
-                                   stepHit->getEDep());
-          current->second->setGlobalPosition(stepHit->getGlobalPosition());
-          current->second->setLocalPosition(stepHit->getLocalPosition());
-          current->second->setTime(stepHit->getTime());
-          current->second->setPDG(stepHit->getPDG());
-          current->second->setMomentum(stepHit->getMomentum());
+                                   simHit->getEDep());
+          current->second->setGlobalPosition(simHit->getGlobalPosition());
+          current->second->setLocalPosition(simHit->getLocalPosition());
+          current->second->setTime(simHit->getTime());
+          current->second->setPDG(simHit->getPDG());
+          current->second->setMomentum(simHit->getMomentum());
         }
       }
     }
@@ -192,7 +192,7 @@ void EKLM::Digitizer::makeSimHits()
 
 
 
-void EKLM::Digitizer::readAndSortSimHits()
+void EKLM::Digitizer::readAndSortSim2Hits()
 {
 
   for (int i = 0; i < m_simHitsArray.getEntries(); i++) {

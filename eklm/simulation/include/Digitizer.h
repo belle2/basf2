@@ -111,17 +111,17 @@ namespace Belle2 {
       /**
        * Read hits from the store, sort sim hits and fill m_HitStripMap.
        */
-      void readAndSortStepHits();
+      void readAndSortSimHits();
 
       /**
-       * Create SimHits from StepHits using boost:graph mechanism.
+       * Create SimHits from SimHits using boost:graph mechanism.
        */
       void makeSimHits();
 
       /**
        * Read hits from the store, sort sim hits and fill m_HitStripMap.
        */
-      void readAndSortSimHits();
+      void readAndSortSim2Hits();
 
       /**
        * Merge hits from the same strip. Create EKLMDigits.
@@ -137,7 +137,7 @@ namespace Belle2 {
       struct EKLM::DigitizationParams* m_digPar;
 
       /** Map for EKLMSimHit sorting according sensitive volumes. */
-      std::map<int, std::vector<EKLMSimHit*> > m_stepHitVolumeMap;
+      std::map<int, std::vector<EKLMSimHit*> > m_simHitVolumeMap;
 
       /** Map for hits sorting according strip name. */
       std::map<int, std::vector<EKLMSim2Hit*> > m_HitStripMap;

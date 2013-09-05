@@ -64,9 +64,9 @@ void EKLMDigitizerModule::beginRun()
 void EKLMDigitizerModule::event()
 {
   EKLM::Digitizer digi(&m_geoDat, &m_digPar);
-  digi.readAndSortStepHits();
-  digi.makeSimHits();
   digi.readAndSortSimHits();
+  digi.makeSimHits();
+  digi.readAndSortSim2Hits();
   digi.mergeSimHitsToStripHits(m_discriminatorThreshold);
 }
 

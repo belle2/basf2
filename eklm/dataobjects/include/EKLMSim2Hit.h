@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMSIMHIT_H
-#define EKLMSIMHIT_H
+#ifndef EKLMSIM2HIT_H
+#define EKLMSIM2HIT_H
 
 /* External headers. */
 #include <TObject.h>
@@ -36,10 +36,10 @@ namespace Belle2 {
     EKLMSim2Hit();
 
     /**
-     * Constructor with StepHit.
-     * @param[in] stepHit EKLMSimHit.
+     * Constructor with SimHit.
+     * @param[in] simHit EKLMSimHit.
      */
-    EKLMSim2Hit(const EKLMSimHit* stepHit);
+    EKLMSim2Hit(const EKLMSimHit* simHit);
 
     /**
      * Destructor.

@@ -487,10 +487,10 @@ void EKLM::GeoEKLMCreator::createSectorCoverSolid()
   double ang;
   G4Transform3D t1;
   G4Transform3D t2;
-  G4Tubs* solidCoverTube;
-  G4Box* solidCoverBox;
-  G4Box* box;
-  G4IntersectionSolid* is;
+  G4Tubs* solidCoverTube = NULL;
+  G4Box* solidCoverBox = NULL;
+  G4Box* box = NULL;
+  G4IntersectionSolid* is = NULL;
   lz = 0.5 * (SectorPosition.length - SectorSupportPosition.length);
   try {
     solidCoverTube = new G4Tubs("Cover_Tube",
@@ -830,11 +830,11 @@ void EKLM::GeoEKLMCreator::createSectorSupportSolid()
   G4Box* solidBoxX;
   G4Box* solidBoxY;
   G4Box* solidBoxTop;
-  G4Tubs* solidLimitationTube;
-  G4UnionSolid* us1;
-  G4UnionSolid* us2;
-  G4UnionSolid* us3;
-  G4UnionSolid* us4;
+  G4Tubs* solidLimitationTube = NULL;
+  G4UnionSolid* us1 = NULL;
+  G4UnionSolid* us2 = NULL;
+  G4UnionSolid* us3 = NULL;
+  G4UnionSolid* us4 = NULL;
   G4Transform3D tbx;
   G4Transform3D tby;
   G4Transform3D tbt;

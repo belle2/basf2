@@ -26,8 +26,8 @@ namespace Belle2 {
   /**
    * Class to handle simulation hits.
    */
-  class EKLMSim2Hit : public EKLMHitBase, public EKLMHitCoord,
-    public EKLMHitMomentum, public RelationsObject {
+  class EKLMSim2Hit : public RelationsObject, public EKLMHitBase,
+    public EKLMHitCoord, public EKLMHitMomentum {
 
   public:
 

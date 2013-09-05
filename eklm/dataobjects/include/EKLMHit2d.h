@@ -24,8 +24,8 @@ namespace Belle2 {
   /**
    * Class for 2d hits handling.
    */
-  class EKLMHit2d : public EKLMHitBase, public EKLMHitGlobalCoord,
-    public EKLMHitMCTime, public RelationsObject {
+  class EKLMHit2d : public RelationsObject, public EKLMHitBase,
+    public EKLMHitGlobalCoord, public EKLMHitMCTime {
 
   public:
 

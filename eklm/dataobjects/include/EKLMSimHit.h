@@ -25,8 +25,8 @@ namespace Belle2 {
    * to restore the hit tree and thus another type of hits.
    */
 
-  class EKLMSimHit : public EKLMHitBase, public EKLMHitCoord,
-    public EKLMHitMomentum, public SimHitBase {
+  class EKLMSimHit : public SimHitBase, public EKLMHitBase, public EKLMHitCoord,
+    public EKLMHitMomentum {
   public:
 
     /**

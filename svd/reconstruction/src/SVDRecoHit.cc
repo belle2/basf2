@@ -65,7 +65,7 @@ SVDRecoHit::SVDRecoHit(const SVDTrueHit* hit, bool uDirection, float sigma):
   setDetectorPlane();
 }
 
-SVDRecoHit::SVDRecoHit(const SVDCluster* hit, float sigma):
+SVDRecoHit::SVDRecoHit(const SVDCluster* hit):
   GFAbsPlanarHit(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
   m_cluster(hit), m_energyDep(0), m_rotationPhi(0)
 {

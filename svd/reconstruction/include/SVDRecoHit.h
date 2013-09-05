@@ -62,7 +62,7 @@ namespace Belle2 {
       * @param hit    SVDCluster to use as base.
       * FIXME: Parameter sigma is no longer used and will be removed.
       */
-    SVDRecoHit(const SVDCluster* hit, float sigma = -1);
+    SVDRecoHit(const SVDCluster* hit);
 
     /** Destructor. */
     virtual ~SVDRecoHit() {}

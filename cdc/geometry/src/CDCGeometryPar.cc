@@ -746,7 +746,7 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
     dDdt = m_XT[iCLayer][lr][ialpha][7];
   }
 
-  if (lr == 0) dDdt *= -1.;
+  if (lr == 1) dDdt *= -1.;
   return dDdt;
 
 }
@@ -774,7 +774,7 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
     dist = m_XT[iCLayer][lr][ialpha][7] * (time - boundary) + m_XT[iCLayer][lr][ialpha][8];
   }
 
-  if (lr == 0) dist *= -1.;
+  if (lr == 1) dist *= -1.;
   return std::max(0., dist);
 
 }

@@ -209,7 +209,7 @@ void ROFBuilderModule::event()
       break;
     case 6 : addSimHitsToROF<ECLHit>();
       break;
-    case 7 : //addSimHitsToROF<EKLMSimHit>();
+    case 7 : addSimHitsToROF<EKLMSimHit>();
       break;
     case 8 : addSimHitsToROF<BKLMSimHit>();
       break;

@@ -19,8 +19,8 @@ using namespace Belle2;
 EKLM::Reconstructor::Reconstructor(GeometryData* geoDat)
 {
   GearDir Digitizer = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]"
-                              "/Content/Digitizer");
-  m_firstPhotonlightSpeed = Digitizer.getDouble("FirstPhotonSpeed");
+                              "/Content/DigitizationParams");
+  m_firstPhotonlightSpeed = Digitizer.getDouble("FiberLightSpeed");
   m_sigmaT = Digitizer.getDouble("TimeResolution");
   m_geoDat = geoDat;
 }

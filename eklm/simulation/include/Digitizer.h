@@ -54,7 +54,7 @@ namespace Belle2 {
      * @var DigitizationParams::fiberDeExcitationTime
      * Fiber deexcitation time, ns.
      *
-     * @var DigitizationParams::firstPhotonlightSpeed
+     * @var DigitizationParams::fiberLightSpeed
      * Speed of light in fiber, cm/ns.
      *
      * @var DigitizationParams::attenuationLength
@@ -80,13 +80,19 @@ namespace Belle2 {
       double mirrorReflectiveIndex;
       double scintillatorDeExcitationTime;
       double fiberDeExcitationTime;
-      double firstPhotonlightSpeed;
+      double fiberLightSpeed;
       double attenuationLength;
       double PEAttenuationFreq;
       double meanSiPMNoise;
       bool enableConstBkg;
       bool debug;
     };
+
+    /**
+     * Set default digitization parameters.
+     * @param[out] digPar Digitization parameters.
+     */
+    void setDefDigitizationParams(struct DigitizationParams* digPar);
 
     /**
      * Digitize EKLMSim2Hits to get EKLM StripHits.

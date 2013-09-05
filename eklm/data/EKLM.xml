@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DetectorComponent name="EKLM">
+<DetectorComponent name="EKLM" xmlns:xi="http://www.w3.org/2001/XInclude">
   <Description>Belle II EKLM geometry</Description>
   <Version>0</Version>
   <Creator library="eklm">EKLMCreator</Creator>
@@ -43,17 +43,13 @@
 		<RSHIFT_ESLOT unit="cm">5.0</RSHIFT_ESLOT>
 		<RMAX_GLASS unit="cm">320.0</RMAX_GLASS>
 	</EndcapKLMSlot>
-
     </ESTR>
+    <xi:include href="DigitizationParams.xml"/>
     <Mode desc="0 -- normal operation, 1 -- bg study">0</Mode>
     <SensitiveDetector>
      <EnergyDepositionThreshold desc="All hits with smaller energy will be dropped at SensitiveDetector level" unit="MeV">0.0</EnergyDepositionThreshold>
      <HitTimeThreshold desc="All hits with larger time will be dropped at SensitiveDetector level" unit="ns">1000000000</HitTimeThreshold>
     </SensitiveDetector>
-     <Digitizer>
-     <FirstPhotonSpeed desc="Speed for a fastest photon. Should be measured, cm/ns">17.0</FirstPhotonSpeed>
-     <TimeResolution desc="Time resolution used in 2D hit reconstruction">3.0</TimeResolution>
-    </Digitizer>
     <Rotation desc="Rotation of the EKLM with respect to the Detector"
       unit="mrad">0.0</Rotation>
     <Endcap>

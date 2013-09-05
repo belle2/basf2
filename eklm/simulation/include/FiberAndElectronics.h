@@ -1,5 +1,5 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
+* BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -45,6 +45,21 @@ namespace Belle2 {
        * Process.
        */
       void processEntry();
+
+      /**
+       * Calculate StripHit times (at the end of the strip),
+       * @param[in]  stripLen    Length of strip.
+       * @param[in]  distSipm    Distance to SiPM.
+       * @param[in]  nPE         Number of photoelectrons.
+       * @param[in]  timeShift   Time of the SimHit.
+       * @param[in]  isReflected If the hit is direct or reflected.
+       * @param[in]  digPar      Digitization parameters.
+       * @param[out] hist        Histogram.
+       * @return Vector of hit times.
+       */
+      void fillAmplitude(double stripLen, double distSiPM, int nPE,
+                         double timeShift, bool isReflected,
+                         struct DigitizationParams* digPar, float* hist);
 
       /**
        * Get fit results.
@@ -105,58 +120,13 @@ namespace Belle2 {
       /** Pointer to vector if the SimHits. */
       std::vector<EKLMSim2Hit*> m_vectorHits;
 
-      /**
-       * Distance from the hitpoint to SiPM for the (forward, backward) photons
-       * (no account for the angle).
-       */
-      std::pair<double, double> m_hitDist;
-
       /** Name of the strip. */
       std::string m_stripName;
-
-      /**
-       * Calculate StripHit times (at the end of the strip),
-       * @param[in] Number of photoelectrons.
-       * @param[in] Time of the SimHit.
-       * @param[in] If the hit is direct or reflected.
-       * @param[out] hist Histogram.
-       * @return Vector of hit times.
-       */
-      void fillAmplitude(int nPE, double timeShift, bool isReflected,
-                         float* hist);
-
-      /**
-       * Get delay depending on the distance to the hit.
-       * @param[in] L Distance in cm.
-       * @return Delay.
-       */
-      double lightPropagationTime(double L);
-
-      /**
-       * Calculate 'distances' to the direct and mirrored hits.
-       * @param[in] sh EKLMSim2Hit.
-       */
-      void lightPropagationDistance(EKLMSim2Hit*);
-
-      /**
-       * Reflect time-shape of 1p.e. signal.
-       * Amplitude should be 1, exp tail defined by 1 parameter
-       * @param[in] t Time.
-       * @return Signal shape.
-       */
-      double signalShape(double t);
 
       /**
        * Add random noise to the signal (amplitude-dependend).
        */
       void addRandomSiPMNoise();
-
-      /**
-       * Amplitude attenuation with a distance f(l)=distanceAttenuation(l)*f(0).
-       * @param[in] dist Distance.
-       * @return Amplitude attenuation.
-       */
-      double distanceAttenuation(double dist);
 
       /**
        * Simulate ADC (create digital signal from analog),

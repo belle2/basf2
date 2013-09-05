@@ -16,12 +16,31 @@
 /* Belle2 headers. */
 #include <eklm/simulation/Digitizer.h>
 #include <eklm/simulation/FiberAndElectronics.h>
+#include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
 static const char MemErr[] = "Memory allocation error.";
+
+void EKLM::setDefDigitizationParams(struct DigitizationParams* digPar)
+{
+  GearDir dig("/Detector/DetectorComponent[@name=\"EKLM\"]/"
+              "Content/DigitizationParams");
+  digPar->ADCSamplingTime = dig.getDouble("ADCSamplingTime");
+  digPar->nDigitizations = dig.getDouble("nDigitizations");
+  digPar->nPEperMeV = dig.getDouble("nPEperMeV");
+  digPar->minCosTheta = cos(dig.getDouble("MaxTotalIRAngle") / 180.0 * M_PI);
+  digPar->mirrorReflectiveIndex = dig.getDouble("MirrorReflectiveIndex");
+  digPar->scintillatorDeExcitationTime = dig.getDouble("ScintDeExTime");
+  digPar->fiberDeExcitationTime = dig.getDouble("FiberDeExTime");
+  digPar->fiberLightSpeed = dig.getDouble("FiberLightSpeed");
+  digPar->attenuationLength = dig.getDouble("AttenuationLength");
+  digPar->PEAttenuationFreq = dig.getDouble("PEAttenuationFreq");
+  digPar->meanSiPMNoise = dig.getDouble("MeanSiPMNoise");
+  digPar->enableConstBkg = dig.getDouble("EnableConstBkg") > 0;
+}
 
 EKLM::Digitizer::Digitizer(EKLM::GeometryData* geoDat,
                            struct EKLM::DigitizationParams* digPar)

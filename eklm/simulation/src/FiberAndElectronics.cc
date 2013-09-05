@@ -71,24 +71,23 @@ EKLM::FiberAndElectronics::~FiberAndElectronics()
 void EKLM::FiberAndElectronics::processEntry()
 {
   int i;
-  for (std::vector<EKLMSim2Hit*> ::iterator iHit = m_vectorHits.begin();
-       iHit != m_vectorHits.end(); iHit++) {
-
-    // calculate distance
-    lightPropagationDistance(*iHit);
-
-
-    // Poisson mean for # of p.e.
-    double nPEmean = (*iHit)->getEDep() * m_digPar->nPEperMeV;
-
-
-    // fill histograms
-    fillAmplitude(gRandom->Poisson(nPEmean), (*iHit)->getTime(),
-                  false, m_amplitudeDirect);
+  double l;
+  double npe;
+  std::vector<EKLMSim2Hit*>::iterator it;
+  EKLMSim2Hit* hit;
+  for (it = m_vectorHits.begin(); it != m_vectorHits.end(); it++) {
+    hit = *it;
+    /* Poisson mean for number of photoelectrons. */
+    npe = hit->getEDep() * m_digPar->nPEperMeV;
+    /* Fill histograms. */
+    l = m_geoDat->getStripLength(hit->getStrip());
+    fillAmplitude(l, 0.5 * l - hit->getLocalPosition().x(),
+                  gRandom->Poisson(npe), hit->getTime(), false, m_digPar,
+                  m_amplitudeDirect);
     if (m_digPar->mirrorReflectiveIndex > 0)
-      fillAmplitude(gRandom->Poisson(nPEmean), (*iHit)->getTime(),
-                    true, m_amplitudeReflected);
-
+      fillAmplitude(l, 0.5 * l - hit->getLocalPosition().x(),
+                    gRandom->Poisson(npe), hit->getTime(), true, m_digPar,
+                    m_amplitudeReflected);
   }
 
   // sum up histograms
@@ -124,15 +123,6 @@ void EKLM::FiberAndElectronics::processEntry()
     debugOutput();
 }
 
-void EKLM::FiberAndElectronics::lightPropagationDistance(EKLMSim2Hit* sh)
-{
-  double half_len;
-  double local_pos;
-  half_len = 0.5 * m_geoDat->getStripLength(sh->getStrip());
-  local_pos = sh->getLocalPosition().x();
-  m_hitDist = std::make_pair(half_len - local_pos, 3.0 * half_len + local_pos);
-}
-
 void EKLM::FiberAndElectronics::addRandomSiPMNoise()
 {
   int i;
@@ -140,46 +130,43 @@ void EKLM::FiberAndElectronics::addRandomSiPMNoise()
     m_amplitude[i] = m_amplitude[i] + gRandom->Poisson(m_digPar->meanSiPMNoise);
 }
 
-double EKLM::FiberAndElectronics::signalShape(double t)
-{
-  if (t > 0)
-    return exp(-m_digPar->PEAttenuationFreq * t);
-  return 0;
-}
-
-double  EKLM::FiberAndElectronics::distanceAttenuation(double dist)
-{
-  return exp(-dist / m_digPar->attenuationLength);
-}
-
-void EKLM::FiberAndElectronics::fillAmplitude(int nPE, double timeShift,
-                                              bool isReflected, float* hist)
+void EKLM::FiberAndElectronics::fillAmplitude(double stripLen, double distSiPM,
+                                              int nPE, double timeShift,
+                                              bool isReflected,
+                                              struct DigitizationParams* digPar,
+                                              float* hist)
 {
   int i;
   int j;
   double hitTime;
+  double digTime;
   double deExcitationTime;
   double cosTheta;
   double hitDist;
   for (i = 0; i < nPE; i++) {
-    cosTheta = gRandom->Uniform(m_digPar->minCosTheta, 1);
+    cosTheta = gRandom->Uniform(digPar->minCosTheta, 1);
     if (!isReflected)
-      hitDist = m_hitDist.first / cosTheta;
+      hitDist = distSiPM / cosTheta;
     else
-      hitDist = m_hitDist.second / cosTheta;
-    /* Drop lightflashes which were captured by fiber */
-    if (gRandom->Uniform() > distanceAttenuation(hitDist))
+      hitDist = (2.0 * stripLen - distSiPM) / cosTheta;
+    /* Drop lightflashes which were captured by fiber. */
+    if (gRandom->Uniform() > exp(-hitDist / digPar->attenuationLength))
       continue;
     /* Account for mirror reflective index. */
     if (isReflected)
-      if (gRandom->Uniform() > m_digPar->mirrorReflectiveIndex)
+      if (gRandom->Uniform() > digPar->mirrorReflectiveIndex)
         continue;
     m_npe++;
-    deExcitationTime = gRandom->Exp(m_digPar->scintillatorDeExcitationTime) +
-                       gRandom->Exp(m_digPar->fiberDeExcitationTime);
-    hitTime = lightPropagationTime(hitDist) + deExcitationTime + timeShift;
-    for (j = 0; j < m_digPar->nDigitizations; j++)
-      hist[j] = hist[j] + signalShape(j * m_digPar->ADCSamplingTime - hitTime);
+    deExcitationTime = gRandom->Exp(digPar->scintillatorDeExcitationTime) +
+                       gRandom->Exp(digPar->fiberDeExcitationTime);
+    hitTime = hitDist / digPar->fiberLightSpeed + deExcitationTime +
+              timeShift;
+    for (j = 0; j < digPar->nDigitizations; j++) {
+      digTime = j * digPar->ADCSamplingTime;
+      if (digTime > hitTime)
+        hist[j] = hist[j] + exp(-digPar->PEAttenuationFreq *
+                                (digTime - hitTime));
+    }
   }
 }
 
@@ -188,11 +175,6 @@ void EKLM::FiberAndElectronics::simulateADC()
   int i;
   for (i = 0; i < m_digPar->nDigitizations; i++)
     m_ADCAmplitude[i] = (int)(0.5 * ADCRange * m_amplitude[i]);
-}
-
-double EKLM::FiberAndElectronics::lightPropagationTime(double L)
-{
-  return L / m_digPar->firstPhotonlightSpeed;
 }
 
 struct EKLM::FPGAFitParams* EKLM::FiberAndElectronics::getFitResults()

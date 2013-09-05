@@ -42,19 +42,7 @@ void EKLMDigitizerModule::initialize()
   if (m_geoDat.read() != 0)
     B2FATAL("Cannot read geometry data file.");
   EKLM::transformsToGlobal(&m_geoDat.transf);
-  /* Fill digitization parameters. */
-  m_digPar.ADCSamplingTime = 1.0;
-  m_digPar.nDigitizations = 200;
-  m_digPar.nPEperMeV = 22;
-  m_digPar.minCosTheta = cos(26.7 / 180.0 * M_PI);
-  m_digPar.mirrorReflectiveIndex = 0.95;
-  m_digPar.scintillatorDeExcitationTime = 3.0;
-  m_digPar.fiberDeExcitationTime = 10.0;
-  m_digPar.firstPhotonlightSpeed = 17.0;
-  m_digPar.attenuationLength = 300.0;
-  m_digPar.PEAttenuationFreq = 3.0;
-  m_digPar.meanSiPMNoise = -1;
-  m_digPar.enableConstBkg = false;
+  EKLM::setDefDigitizationParams(&m_digPar);
 }
 
 void EKLMDigitizerModule::beginRun()

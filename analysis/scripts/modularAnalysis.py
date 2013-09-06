@@ -29,6 +29,7 @@ def inputMdstList(filelist, path=main):
 def outputMdst(filename, path=main):
     rooutput = register_module('RootOutput')
     rooutput.param('outputFileName', filename)
+    rooutput.set_name('RootOutput_' + filename)
     path.add_module(rooutput)
 
 
@@ -53,6 +54,7 @@ def selectParticle(
     ):
 
     pselect = register_module('ParticleSelector')
+    pselect.set_name('ParticleSelector_' + list_name)
     pselect.param('PDG', PDGcode)
     pselect.param('ListName', list_name)
     pselect.param('Select', criteria)
@@ -62,6 +64,7 @@ def selectParticle(
 
 def applyCuts(list_name, criteria, path=main):
     pselect = register_module('ParticleSelector')
+    pselect.set_name('ParticleSelector_applyCuts_' + list_name)
     pselect.param('ListName', list_name)
     pselect.param('Select', criteria)
     path.add_module(pselect)
@@ -78,6 +81,7 @@ def makeParticle(
     ):
 
     pmake = register_module('ParticleCombiner')
+    pmake.set_name('ParticleCombiner_' + list_name)
     pmake.param('PDG', PDGcode)
     pmake.param('ListName', list_name)
     pmake.param('InputListNames', list_of_lists)
@@ -89,6 +93,7 @@ def makeParticle(
 
 def fitVertex(list_name, confidenceLevel, path=main):
     pvfit = register_module('ParticleVertexFitter')
+    pvfit.set_name('ParticleVertexFitter_' + list_name)
     pvfit.param('ListName', list_name)
     pvfit.param('ConfidenceLevel', confidenceLevel)
     path.add_module(pvfit)
@@ -96,6 +101,7 @@ def fitVertex(list_name, confidenceLevel, path=main):
 
 def printList(list_name, full, path=main):
     prlist = register_module('ParticlePrinter')
+    prlist.set_name('ParticlePrinter_' + list_name)
     prlist.param('ListName', list_name)
     prlist.param('FullPrint', full)
     path.add_module(prlist)
@@ -103,6 +109,7 @@ def printList(list_name, full, path=main):
 
 def ntupleFile(file_name, path=main):
     ntmaker = register_module('NtupleMaker')
+    ntmaker.set_name('NtupleMaker_ntupleFile_' + file_name)
     ntmaker.param('strFileName', file_name)
     path.add_module(ntmaker)
 
@@ -115,6 +122,7 @@ def ntupleTree(
     ):
 
     ntmaker = register_module('NtupleMaker')
+    ntmaker.set_name('NtupleMaker_ntupleTree_' + list_name)
     ntmaker.param('strTreeName', tree_name)
     ntmaker.param('strListName', list_name)
     ntmaker.param('strTools', tools)
@@ -129,6 +137,7 @@ def findMCDecay(
     ):
 
     decayfinder = register_module('MCDecayFinder')
+    decayfinder.set_name('MCDecayFinder_' + list_name)
     decayfinder.param('strListName', list_name)
     decayfinder.param('strDecayString', decay)
     decayfinder.param('persistent', persistent)

@@ -40,7 +40,6 @@
          RETURN
       ENDIF
       CALL SET_XYCH(MODUL)
-      T_MAX=TDC_RANGE*TDC_DT
       CALL SET_BACKG(MODUL)
       DO ICH=0,NUMCH-1
          NUM_PIK(ICH)=0

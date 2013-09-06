@@ -110,6 +110,7 @@ namespace Belle2 {
       double m_sigmaZ;       /**< track smearing in Z (r.m.s) */
       double m_sigmaTheta;   /**< track smearing in Theta (r.m.s) */
       double m_sigmaPhi;     /**< track smearing in Phi (r.m.s) */
+      double m_maxTime;      /**< optional time limit for photons */
 
       bool m_smearTrack;     /**< set to true, if at least one sigma > 0 */
 

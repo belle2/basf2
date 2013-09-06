@@ -11,6 +11,7 @@
       REAL CHWID                ! channel width [ns]
       REAL OFFSET               ! offset [ns]
 #include "TOP_TDC.fi"
+#include "TOP_PIK.fi"
       DATA TDC_INI /.FALSE./
       DATA CFD_DT /0.5/         ! MC: CFD pile-up time [ns]
       DATA CFD_DELT /5./        ! MC: CFD double pulse resolution [ns]
@@ -19,6 +20,7 @@
       TDC_DT=CHWID
       TDC_T0=OFFSET
       TIME_RANGE=TDC_RANGE*TDC_DT
+      T_MAX=TIME_RANGE
       TDC_INI=.TRUE.
 
       END
@@ -34,5 +36,17 @@
       CFD_DT=DT
       CFD_DELT=DELT
 
+      END
+
+
+      SUBROUTINE SET_TMAX(TMAX)
+      
+      IMPLICIT NONE
+      REAL TMAX
+#include "TOP_PIK.fi"
+      
+      IF(TMAX.LE.0) RETURN
+      T_MAX=MIN(T_MAX,TMAX)
+      
       END
 

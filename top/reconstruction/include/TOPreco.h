@@ -13,7 +13,11 @@
 #define _TOPreco_h
 
 #include <top/reconstruction/TOPtrack.h>
-extern "C" {void set_beta_rq_(float*);}
+
+extern "C" {
+  void set_beta_rq_(float*);
+  void set_tmax_(float*);
+}
 
 namespace Belle2 {
   namespace TOP {
@@ -43,6 +47,15 @@ namespace Belle2 {
        * @param HypID internal codes in the same order as Masses[]
        */
       void SetHypID(int NumHyp, int HypID[]);
+
+      /**
+       * set maximum for photon times (allows to set it lower than TDC range)
+       * @param Tmax maximum time [ns]
+       */
+      void setTmax(double Tmax) {
+        float tmax = (float) Tmax;
+        set_tmax_(&tmax);
+      }
 
       /**
        * clear data list

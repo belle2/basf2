@@ -82,11 +82,13 @@ namespace Belle2 {
       addParam("minBkgPerBar", m_minBkgPerBar,
                "Minimal number of background photons per bar", 0.0);
       addParam("scaleN0", m_scaleN0, "Scale factor for N0", 1.0);
-      addParam("sigmaRphi", m_sigmaRphi , "track smearing sigma in Rphi [cm]", 0.0);
-      addParam("sigmaZ", m_sigmaZ , "track smearing sigma in Z [cm]", 0.0);
-      addParam("sigmaTheta", m_sigmaTheta , "track smearing sigma in Theta [radians]",
+      addParam("sigmaRphi", m_sigmaRphi, "track smearing sigma in Rphi [cm]", 0.0);
+      addParam("sigmaZ", m_sigmaZ, "track smearing sigma in Z [cm]", 0.0);
+      addParam("sigmaTheta", m_sigmaTheta, "track smearing sigma in Theta [radians]",
                0.0);
-      addParam("sigmaPhi", m_sigmaPhi , "track smearing sigma in Phi [radians]", 0.0);
+      addParam("sigmaPhi", m_sigmaPhi, "track smearing sigma in Phi [radians]", 0.0);
+      addParam("maxTime", m_maxTime,
+               "time limit for photons [ns] (0 = use default one)", 0.0);
 
       for (int i = 0; i < c_Nhyp; i++) {m_Masses[i] = 0;}
 
@@ -180,6 +182,10 @@ namespace Belle2 {
       // create reconstruction object
 
       TOPreco reco(c_Nhyp, m_Masses, m_minBkgPerBar, m_scaleN0);
+
+      // set time limit for photons lower than that given by TDC range (optional)
+
+      if (m_maxTime > 0) reco.setTmax(m_maxTime);
 
       // clear reconstruction object
 

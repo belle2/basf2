@@ -254,10 +254,9 @@
             ICH=DATA_ICH(I)
             IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
             T=(DATA_TDC(I)+.5)*TDC_DT+TDC_T0
+            IF(T.LT.0.OR.T.GT.T_MAX) CYCLE
             NFOT=NFOT+1
             F=P*TOP_SIGNAL(T,ICH)+(1-P)*TOP_BGR(T,ICH)
-            if(f.le.0) print*,'fill_lkh',
-     &           ich,m,stfs,stfb,p,top_signal(t,ich),top_bgr(t,ich)
             PLKH=PLKH+LOG(F)
             IF(FLAG) CALL STORE_PULLS(T,ICH)
          ENDIF

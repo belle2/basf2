@@ -44,7 +44,7 @@ ROIPixelTranslator::fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
     B2DEBUG(1, "  --->> a NEW INTERCEPT!");
 
 
-    const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(((*listOfIntercepts)[i]->getPlane()).getSensorInfo());
+    const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo((*listOfIntercepts)[i]->getSensorID());
 
     double widthTotU = std::min(m_maxWidthU , sqrt((*listOfIntercepts)[i]->getSigmaU() * (*listOfIntercepts)[i]->getSigmaU() + m_sigmaSystU * m_sigmaSystU) * m_numSigmaTotU);
     double widthTotV = std::min(m_maxWidthV , sqrt((*listOfIntercepts)[i]->getSigmaV() * (*listOfIntercepts)[i]->getSigmaV() + m_sigmaSystV * m_sigmaSystV) * m_numSigmaTotV);
@@ -64,9 +64,9 @@ ROIPixelTranslator::fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
     double topRight_uID = aSensorInfo.getUCellID(maxU, maxV, false);
     double topRight_vID = aSensorInfo.getVCellID(maxV, false);
 
-    B2DEBUG(2, "  LAYER = " << ((*listOfIntercepts)[i]->getPlane().getSensorInfo()).getLayerNumber()
-            << " LADDER = " << ((*listOfIntercepts)[i]->getPlane().getSensorInfo()).getLadderNumber()
-            << " SENSOR = " << ((*listOfIntercepts)[i]->getPlane().getSensorInfo()).getSensorNumber()
+    B2DEBUG(2, "  LAYER = " << VxdID((*listOfIntercepts)[i]->getSensorID()).getLayerNumber()
+            << " LADDER = " << VxdID((*listOfIntercepts)[i]->getSensorID()).getLadderNumber()
+            << " SENSOR = " << VxdID((*listOfIntercepts)[i]->getSensorID()).getSensorNumber()
            );
 
     B2DEBUG(2, "  nPixels (U,V) = (" << nPixelsU << "," << nPixelsV << ")");
@@ -100,7 +100,7 @@ ROIPixelTranslator::fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
       tmpROIid.setMinVid(aSensorInfo.getVCellID(minV, true));
       tmpROIid.setMaxUid(aSensorInfo.getUCellID(maxU, maxV, true));
       tmpROIid.setMaxVid(aSensorInfo.getVCellID(maxV, true));
-      tmpROIid.setSensorID(((*listOfIntercepts)[i]->getPlane()).getSensorInfo()) ;
+      tmpROIid.setSensorID((*listOfIntercepts)[i]->getSensorID()) ;
 
       ROIidList->appendNew(tmpROIid);
 

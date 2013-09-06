@@ -69,7 +69,7 @@ ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
       tmpPXDIntercept.setSigmaUprime(sqrt(covMatrix(1, 1)));
       tmpPXDIntercept.setSigmaVprime(sqrt(covMatrix(2, 2)));
       tmpPXDIntercept.setLambda(lambda);
-      tmpPXDIntercept.setPlane(*itPlanes);
+      //      tmpPXDIntercept.setPlane(*itPlanes);
       tmpPXDIntercept.setVxdID(itPlanes->getSensorInfo());
 
       listToBeFilled->appendNew(tmpPXDIntercept);

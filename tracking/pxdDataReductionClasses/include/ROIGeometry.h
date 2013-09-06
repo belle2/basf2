@@ -17,7 +17,8 @@
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <RKTrackRep.h>
 #include <GFTrackCand.h>
-#include <tracking/dataobjects/ROIDetPlane.h>
+//#include <tracking/dataobjects/ROIDetPlane.h>
+#include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
 
 class ROIDetPlane;
 class GFTrack;

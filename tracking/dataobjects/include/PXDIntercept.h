@@ -14,7 +14,7 @@
 #include <framework/datastore/RelationsObject.h>
 #include <GFTrackCand.h>
 #include <framework/datastore/RelationsObject.h>
-#include <tracking/dataobjects/ROIDetPlane.h>
+//#include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
 #include <pxd/geometry/SensorInfo.h>
 
 namespace Belle2 {
@@ -43,7 +43,6 @@ namespace Belle2 {
     double getSigmaUprime() const { return m_sigmaUprime; }
     double getSigmaVprime() const { return m_sigmaVprime; }
     double getLambda() const { return m_lambda; }
-    ROIDetPlane getPlane() const { return m_plane; }
     VxdID::baseType getSensorID() const { return m_sensorID; }
 
     void setCoorU(double user_coorU) { m_coorU = user_coorU; }
@@ -53,7 +52,6 @@ namespace Belle2 {
     void setSigmaUprime(double user_sigmaUprime) { m_sigmaUprime = user_sigmaUprime; }
     void setSigmaVprime(double user_sigmaVprime) { m_sigmaVprime = user_sigmaVprime; }
     void setLambda(double user_lambda) { m_lambda = user_lambda; }
-    void setPlane(ROIDetPlane user_plane) { m_plane = user_plane; }
     void setVxdID(VxdID::baseType user_vxdID) { m_sensorID = user_vxdID; }
 
   private:
@@ -65,7 +63,7 @@ namespace Belle2 {
     double m_sigmaUprime; /**< statistical error of the extrapolation along the u coordinate */
     double m_sigmaVprime; /**< statistical error of the extrapolation along the v coordinate */
     double m_lambda; /**< length of the track*/
-    ROIDetPlane m_plane; //! /**< plane of the extrapolation */
+    //    ROIDetPlane m_plane; //! /**< plane of the extrapolation */
 
     VxdID::baseType m_sensorID; /**< sensor ID */
 

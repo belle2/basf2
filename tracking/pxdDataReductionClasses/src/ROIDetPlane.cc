@@ -9,7 +9,8 @@
  **************************************************************************/
 
 #include <vxd/geometry/GeoCache.h>
-#include <tracking/dataobjects/ROIDetPlane.h>
+//#include <tracking/dataobjects/ROIDetPlane.h>
+#include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
 
 using namespace Belle2;
 using namespace std;

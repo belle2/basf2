@@ -69,7 +69,7 @@ namespace Belle2 {
     std::string m_PXDInterceptListName;
     std::string m_ROIListName;
 
-    int m_numIterKalmanFilter; /** number of iterations of the Kalman Filter*/
+    int m_numIterKalmanFilter; /**< number of iterations of the Kalman Filter*/
 
     double m_sigmaSystU;
     double m_sigmaSystV;

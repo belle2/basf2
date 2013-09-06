@@ -83,9 +83,6 @@ namespace Belle2 {
     //! returns energy deposition
     double getEDep() const { return m_EDep; }
 
-    //! determines if two BKLMHit1ds are in the same detector module
-    bool match(const BKLMHit1d*) const;
-
     //! sets status word
     void setStatus(int status) { m_Status = status; }
 

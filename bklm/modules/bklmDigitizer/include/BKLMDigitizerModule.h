@@ -143,6 +143,9 @@ namespace Belle2 {
     //! Digital fit result
     float* m_ADCFit;
 
+    //! FPGA fitter
+    EKLM::FPGAFitter* m_fitter;
+
     //! FPGA fit status
     enum EKLM::FPGAFitStatus m_FPGAStat;
 

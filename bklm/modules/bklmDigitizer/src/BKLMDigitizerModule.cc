@@ -68,6 +68,11 @@ void BKLMDigitizerModule::initialize()
   // Force creation and persistence of BKLM output datastores
   StoreArray<BKLMDigit>::registerPersistent();
   RelationArray::registerPersistent<BKLMSimHit, BKLMDigit>();
+  try {
+    m_fitter = new EKLM::FPGAFitter(m_nDigitizations);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL("BKLMDigitizer:: Memory allocation error of FPGAFitter")
+  }
 }
 
 void BKLMDigitizerModule::beginRun()
@@ -133,6 +138,7 @@ void BKLMDigitizerModule::endRun()
 
 void BKLMDigitizerModule::terminate()
 {
+  delete m_fitter;
 }
 
 void BKLMDigitizerModule::digitize(std::map<int, std::vector<std::pair<int, BKLMSimHit*> > > volIDToSimHits, StoreArray<BKLMDigit>& digits)
@@ -235,8 +241,7 @@ enum EKLM::FPGAFitStatus BKLMDigitizerModule::processEntry(std::vector<std::pair
 
   /* Fit. */
   m_FPGAParams.bgAmplitude = (double)m_enableConstBkg;
-  m_FPGAStat = EKLM::FPGAFit(m_ADCAmplitude, m_ADCFit, m_nDigitizations,
-                             &m_FPGAParams);
+  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, m_ADCFit, &m_FPGAParams);
   if (m_FPGAStat != EKLM::c_FPGASuccessfulFit)
     return m_FPGAStat;
   /**

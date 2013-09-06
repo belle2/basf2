@@ -72,7 +72,7 @@ void EKLM::FiberAndElectronics::processEntry()
 {
   int i;
   double l;
-  double npe;
+  double npe, gnpe;
   std::vector<EKLMSim2Hit*>::iterator it;
   EKLMSim2Hit* hit;
   for (it = m_vectorHits.begin(); it != m_vectorHits.end(); it++) {
@@ -81,13 +81,16 @@ void EKLM::FiberAndElectronics::processEntry()
     npe = hit->getEDep() * m_digPar->nPEperMeV;
     /* Fill histograms. */
     l = m_geoDat->getStripLength(hit->getStrip());
-    fillAmplitude(l, 0.5 * l - hit->getLocalPosition().x(),
-                  gRandom->Poisson(npe), hit->getTime(), false, m_digPar,
-                  m_amplitudeDirect);
-    if (m_digPar->mirrorReflectiveIndex > 0)
-      fillAmplitude(l, 0.5 * l - hit->getLocalPosition().x(),
-                    gRandom->Poisson(npe), hit->getTime(), true, m_digPar,
-                    m_amplitudeReflected);
+    gnpe = gRandom->Poisson(npe);
+    fillSiPMOutput(l, 0.5 * l - hit->getLocalPosition().x(), gnpe,
+                   hit->getTime(), false, m_digPar, m_amplitudeDirect);
+    m_npe = gnpe;
+    if (m_digPar->mirrorReflectiveIndex > 0) {
+      gnpe = gRandom->Poisson(npe);
+      fillSiPMOutput(l, 0.5 * l - hit->getLocalPosition().x(), gnpe,
+                     hit->getTime(), true, m_digPar, m_amplitudeReflected);
+    }
+    m_npe = m_npe + gnpe;
   }
 
   // sum up histograms
@@ -130,11 +133,11 @@ void EKLM::FiberAndElectronics::addRandomSiPMNoise()
     m_amplitude[i] = m_amplitude[i] + gRandom->Poisson(m_digPar->meanSiPMNoise);
 }
 
-void EKLM::FiberAndElectronics::fillAmplitude(double stripLen, double distSiPM,
-                                              int nPE, double timeShift,
-                                              bool isReflected,
-                                              struct DigitizationParams* digPar,
-                                              float* hist)
+void EKLM::fillSiPMOutput(double stripLen, double distSiPM,
+                          int nPE, double timeShift,
+                          bool isReflected,
+                          struct DigitizationParams* digPar,
+                          float* hist)
 {
   int i;
   int j;
@@ -143,6 +146,8 @@ void EKLM::FiberAndElectronics::fillAmplitude(double stripLen, double distSiPM,
   double deExcitationTime;
   double cosTheta;
   double hitDist;
+  for (j = 0; j < digPar->nDigitizations; j++)
+    hist[j] = 0;
   for (i = 0; i < nPE; i++) {
     cosTheta = gRandom->Uniform(digPar->minCosTheta, 1);
     if (!isReflected)
@@ -156,7 +161,6 @@ void EKLM::FiberAndElectronics::fillAmplitude(double stripLen, double distSiPM,
     if (isReflected)
       if (gRandom->Uniform() > digPar->mirrorReflectiveIndex)
         continue;
-    m_npe++;
     deExcitationTime = gRandom->Exp(digPar->scintillatorDeExcitationTime) +
                        gRandom->Exp(digPar->fiberDeExcitationTime);
     hitTime = hitDist / digPar->fiberLightSpeed + deExcitationTime +

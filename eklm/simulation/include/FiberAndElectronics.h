@@ -23,6 +23,21 @@ namespace Belle2 {
   namespace EKLM {
 
     /**
+     * Calculate StripHit times (at the end of the strip),
+     * @param[in]  stripLen    Length of strip.
+     * @param[in]  distSipm    Distance to SiPM.
+     * @param[in]  nPE         Number of photoelectrons.
+     * @param[in]  timeShift   Time of the SimHit.
+     * @param[in]  isReflected If the hit is direct or reflected.
+     * @param[in]  digPar      Digitization parameters.
+     * @param[out] hist        Histogram.
+     * @return Vector of hit times.
+     */
+    void fillSiPMOutput(double stripLen, double distSiPM, int nPE,
+                        double timeShift, bool isReflected,
+                        struct DigitizationParams* digPar, float* hist);
+
+    /**
      * Digitize EKLMSim2Hits to get EKLM StripHits.
      */
     class FiberAndElectronics {
@@ -45,21 +60,6 @@ namespace Belle2 {
        * Process.
        */
       void processEntry();
-
-      /**
-       * Calculate StripHit times (at the end of the strip),
-       * @param[in]  stripLen    Length of strip.
-       * @param[in]  distSipm    Distance to SiPM.
-       * @param[in]  nPE         Number of photoelectrons.
-       * @param[in]  timeShift   Time of the SimHit.
-       * @param[in]  isReflected If the hit is direct or reflected.
-       * @param[in]  digPar      Digitization parameters.
-       * @param[out] hist        Histogram.
-       * @return Vector of hit times.
-       */
-      void fillAmplitude(double stripLen, double distSiPM, int nPE,
-                         double timeShift, bool isReflected,
-                         struct DigitizationParams* digPar, float* hist);
 
       /**
        * Get fit results.

@@ -38,7 +38,7 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
                                       int npe)
 {
   int j;
-  double t;
+  double t, s;
   TH1F* h = NULL;
   t = m_digPar.nDigitizations * m_digPar.ADCSamplingTime;
   try {
@@ -48,8 +48,11 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
   }
   EKLM::fillSiPMOutput(l, d, npe, 0, false, &m_digPar, m_hDir);
   EKLM::fillSiPMOutput(l, d, npe, 0, true, &m_digPar, m_hRef);
+  s = 0;
+  for (j = 0; j < m_digPar.nDigitizations; j++)
+    s = s + m_hDir[j] + m_hRef[j];
   for (j = 1; j <= m_digPar.nDigitizations; j++)
-    h->SetBinContent(j, m_hDir[j - 1] + m_hRef[j - 1]);
+    h->SetBinContent(j, (m_hDir[j - 1] + m_hRef[j - 1]) / s);
   h->Write();
   delete h;
 }

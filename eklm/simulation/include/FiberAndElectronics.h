@@ -49,7 +49,8 @@ namespace Belle2 {
        */
       FiberAndElectronics(std::pair <int, std::vector<EKLMSim2Hit*> >,
                           EKLM::GeometryData* geoDat,
-                          struct EKLM::DigitizationParams* digPar);
+                          struct EKLM::DigitizationParams* digPar,
+                          FPGAFitter* fitter);
 
       /**
        * Destructor.
@@ -89,6 +90,9 @@ namespace Belle2 {
 
       /** Parameters. */
       struct EKLM::DigitizationParams* m_digPar;
+
+      /** Fitter. */
+      FPGAFitter* m_fitter;
 
       /** Stands for nDigitizations*ADCSamplingTime. */
       double m_histRange;

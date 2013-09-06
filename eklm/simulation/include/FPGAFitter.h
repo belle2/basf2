@@ -44,15 +44,41 @@ namespace Belle2 {
     };
 
     /**
-     * FPGA fitter.
-     * @param[in]  amp     Digital amplitude.
-     * @param[in]  fit     Fit result histogram.
-     * @param[in]  nPoints Number of points in amplitude array.
-     * @param[out] par     Fit parameters.
-     * @return Fit status.
+     * FPGA fitter class.
      */
-    enum FPGAFitStatus FPGAFit(int* amp, float* fit, int nPoints,
-                               struct FPGAFitParams* par);
+    class FPGAFitter {
+
+    public:
+
+      /**
+       * Constructor.
+       * @param[in]  nPoints Number of points in amplitude arrays.
+       */
+      FPGAFitter(int nPoints);
+
+      /**
+       * Destructor.
+       */
+      ~FPGAFitter();
+
+      /**
+       * FPGA fitter.
+       * @param[in]  amp     Digital amplitude.
+       * @param[in]  fit     Fit result histogram.
+       * @param[out] par     Fit parameters.
+       * @return Fit status.
+       */
+      enum FPGAFitStatus fit(int* amp, float* fit, struct FPGAFitParams* par);
+
+    private:
+
+      /** Number of points. */
+      int m_nPoints;
+
+      /** Signal shape. */
+      float* m_sig;
+
+    };
 
   }
 

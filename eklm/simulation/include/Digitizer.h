@@ -19,10 +19,11 @@
 #include <CLHEP/Vector/ThreeVector.h>
 
 /* Belle2 headers. */
-#include <eklm/geometry/GeometryData.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSim2Hit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/geometry/GeometryData.h>
+#include <eklm/simulation/FPGAFitter.h>
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
@@ -141,6 +142,9 @@ namespace Belle2 {
 
       /** Parameters. */
       struct EKLM::DigitizationParams* m_digPar;
+
+      /** FPGA fitter. */
+      FPGAFitter m_fitter;
 
       /** Map for EKLMSimHit sorting according sensitive volumes. */
       std::map<int, std::vector<EKLMSimHit*> > m_simHitVolumeMap;

@@ -72,8 +72,12 @@ namespace Belle2 {
      * @param[in] name Name.
      * @param[in] l    Length of strip.
      * @param[in] d    Distance from SiPM.
+     * @param[in] npe  Number of photoelctrons.
      */
-    void generateHistogram(char* name, double l, double d);
+    void generateHistogram(const char* name, double l, double d, int npe);
+
+    /** Operation mode. */
+    std::string m_mode;
 
     /** Name of output file. */
     std::string m_out;

@@ -17,9 +17,13 @@ evtmetagen.param('evtNumList', [1])
 # XML reader
 xmldata = register_module('Gearbox')
 
-# EKLM alignment
+# EKLM ADC
 eklmadc = register_module('EKLMADC')
-eklmadc.param('OutputFile', 'EKLMADC.root')
+eklmadc.param('Mode', 'Shape')
+eklmadc.param('OutputFile', 'FPGA.root')
+# For generation of the histograms for strips.
+# eklmadc.param('Mode', 'Strips')
+# eklmadc.param('OutputFile', 'EKLMADC.root')
 
 # Create main path
 main = create_path()

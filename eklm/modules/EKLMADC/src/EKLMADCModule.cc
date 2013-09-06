@@ -26,25 +26,28 @@ EKLMADCModule::EKLMADCModule() : Module()
   setDescription("Standalone generation and studies of ADC output.");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("OutputFile", m_out, "Output file.", std::string("EKLMADC.root"));
+  addParam("Mode", m_mode, "Mode (\"Shape\" or \"Strips\").",
+           std::string("Strips"));
 }
 
 EKLMADCModule::~EKLMADCModule()
 {
 }
 
-void EKLMADCModule::generateHistogram(char* name, double l, double d)
+void EKLMADCModule::generateHistogram(const char* name, double l, double d,
+                                      int npe)
 {
   int j;
   double t;
-  TH1F* h;
+  TH1F* h = NULL;
   t = m_digPar.nDigitizations * m_digPar.ADCSamplingTime;
   try {
     h = new TH1F(name, "", m_digPar.nDigitizations, 0, t);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  EKLM::fillSiPMOutput(l, d, 10000, 0, false, &m_digPar, m_hDir);
-  EKLM::fillSiPMOutput(l, d, 10000, 0, true, &m_digPar, m_hRef);
+  EKLM::fillSiPMOutput(l, d, npe, 0, false, &m_digPar, m_hDir);
+  EKLM::fillSiPMOutput(l, d, npe, 0, true, &m_digPar, m_hRef);
   for (j = 1; j <= m_digPar.nDigitizations; j++)
     h->SetBinContent(j, m_hDir[j - 1] + m_hRef[j - 1]);
   h->Write();
@@ -66,13 +69,19 @@ void EKLMADCModule::initialize()
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  for (i = 1; i <= 75; i++) {
-    l = m_geoDat.getStripLength(i);
-    snprintf(str, 32, "h%d_near", i);
-    generateHistogram(str, l, 0);
-    snprintf(str, 32, "h%d_far", i);
-    generateHistogram(str, l, l);
-  }
+  if (m_mode.compare("Strips") == 0) {
+    for (i = 1; i <= 75; i++) {
+      l = m_geoDat.getStripLength(i);
+      snprintf(str, 32, "h%d_near", i);
+      generateHistogram(str, l, 0, 10000);
+      snprintf(str, 32, "h%d_far", i);
+      generateHistogram(str, l, l, 10000);
+    }
+  } else if (m_mode.compare("Shape") == 0) {
+    m_digPar.mirrorReflectiveIndex = 0;
+    generateHistogram("FitShape", 0, 0, 1000000);
+  } else
+    B2FATAL("Unknown operation mode.");
   delete m_hDir;
   delete m_hRef;
   m_fout->Close();

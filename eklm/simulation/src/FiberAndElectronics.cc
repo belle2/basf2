@@ -27,9 +27,12 @@ static const char MemErr[] = "Memory allocation error.";
 EKLM::FiberAndElectronics::FiberAndElectronics(
   std::pair < int, std::vector<EKLMSim2Hit*> > entry,
   EKLM::GeometryData* geoDat,
-  struct EKLM::DigitizationParams* digPar)
+  struct EKLM::DigitizationParams* digPar,
+  FPGAFitter* fitter)
 {
   m_digPar = digPar;
+  m_geoDat = geoDat;
+  m_fitter = fitter;
   m_npe = 0;
   m_stripName = "Strip" + boost::lexical_cast<std::string>(entry.first);
 
@@ -55,7 +58,6 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
 
   // define vector of hits
   m_vectorHits = entry.second;
-  m_geoDat = geoDat;
 }
 
 
@@ -107,8 +109,7 @@ void EKLM::FiberAndElectronics::processEntry()
 
   /* Fit. */
   m_FPGAParams.bgAmplitude = (double)m_digPar->enableConstBkg;
-  m_FPGAStat = FPGAFit(m_ADCAmplitude, m_ADCFit, m_digPar->nDigitizations,
-                       &m_FPGAParams);
+  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, m_ADCFit, &m_FPGAParams);
   if (m_FPGAStat != c_FPGASuccessfulFit)
     return;
   /**

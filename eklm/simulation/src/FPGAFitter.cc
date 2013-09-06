@@ -12,15 +12,53 @@
 #include <math.h>
 
 /* External headers. */
+#include <TFile.h>
+#include <TH1F.h>
 #include <TMinuit.h>
 
 /* Belle2 headers. */
 #include <eklm/simulation/FPGAFitter.h>
+#include <framework/core/utilities.h>
+#include <framework/logging/Logger.h>
+
+static const char MemErr[] = "Memory allocation error.";
 
 using namespace Belle2;
 
 static int* famp;
 static int n;
+
+EKLM::FPGAFitter::FPGAFitter(int nPoints)
+{
+  int i;
+  TFile* f;
+  TH1F* h;
+  m_nPoints = nPoints;
+  try {
+    f = new TFile(FileSystem::findFile("/data/eklm/FPGA.root").c_str());
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  if (f->IsZombie())
+    B2FATAL("Cannot open FPGA data file.");
+  h = (TH1F*)f->Get("FitShape");
+  if (h->GetNbinsX() != m_nPoints)
+    B2FATAL("Numbers of digitization points in FPGA data file and program are "
+            "diffetent.");
+  try {
+    m_sig = new float[m_nPoints];
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  for (i = 0; i < m_nPoints; i++)
+    m_sig[i] = h->GetBinContent(i + 1);
+  f->Close();
+  delete f;
+}
+
+EKLM::FPGAFitter::~FPGAFitter()
+{
+}
 
 static double SignalShapeFitFunction(double x, double* par)
 {
@@ -49,8 +87,8 @@ static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
   }
 }
 
-enum EKLM::FPGAFitStatus EKLM::FPGAFit(int* amp, float* fit, int nPoints,
-                                       struct FPGAFitParams* par)
+enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, float* fit,
+                                               struct FPGAFitParams* par)
 {
   const int thr = 100;
   int i;
@@ -60,12 +98,12 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFit(int* amp, float* fit, int nPoints,
   double mpar[5];
   sum = 0;
   firstSig = -1;
-  lastSig = nPoints - 1;
+  lastSig = m_nPoints - 1;
   /**
    * Calculate integral above threshold and simultaneously find
    * first and last point above threshold.
    */
-  for (i = 0; i < nPoints; i++) {
+  for (i = 0; i < m_nPoints; i++) {
     if (amp[i] > thr) {
       sum = sum + amp[i];
       if (firstSig == -1)
@@ -87,12 +125,12 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFit(int* amp, float* fit, int nPoints,
   double args[1];
   TMinuit* mn = new TMinuit(5);
   famp = amp;
-  n = nPoints;
+  n = m_nPoints;
   mn->SetFCN(fcn);
   int ierflg;
   mn->SetPrintLevel(-1);
   for (i = 0; i <= 1; i++)
-    mn->mnparm(i, "", mpar[i], fabs(mpar[i]) / 10., 0.0, nPoints, ierflg);
+    mn->mnparm(i, "", mpar[i], fabs(mpar[i]) / 10., 0.0, m_nPoints, ierflg);
   for (i = 2; i <= 3; i++)
     mn->mnparm(i, "", mpar[i], fabs(mpar[i]) / 10., 0.0, 0.0, ierflg);
   mn->mnparm(4, "", mpar[4], 1.0, 0.0, 0.0, ierflg);
@@ -107,7 +145,7 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFit(int* amp, float* fit, int nPoints,
     mn->mnpout(i, s, mpar[i], err, xup, xlow, iuint);
   delete mn;
   /*** End of Minuit code. ***/
-  for (i = 0; i < nPoints; i++)
+  for (i = 0; i < m_nPoints; i++)
     fit[i] = SignalShapeFitFunction(i, mpar);
   par->startTime = mpar[0];
   par->peakTime = mpar[1];

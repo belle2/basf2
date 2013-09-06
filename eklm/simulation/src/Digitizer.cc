@@ -43,7 +43,8 @@ void EKLM::setDefDigitizationParams(struct DigitizationParams* digPar)
 }
 
 EKLM::Digitizer::Digitizer(EKLM::GeometryData* geoDat,
-                           struct EKLM::DigitizationParams* digPar)
+                           struct EKLM::DigitizationParams* digPar) :
+  m_fitter(digPar->nDigitizations)
 {
   m_geoDat = geoDat;
   m_digPar = digPar;
@@ -55,8 +56,6 @@ EKLM::Digitizer::~Digitizer()
 
 void EKLM::Digitizer::readAndSortSimHits()
 {
-  B2DEBUG(1, "EKLM::Digitizer::readAndSortSimHits()");
-
   StoreArray<EKLMSimHit> simHitsArray;
   for (int i = 0; i < simHitsArray.getEntries(); i++) {
 
@@ -77,17 +76,11 @@ void EKLM::Digitizer::readAndSortSimHits()
       it->second.push_back(simHitsArray[i]);
     }
   }
-  B2DEBUG(1, "EKLM::Digitizer::readAndSortSimHits()  completed");
 }
 
 
 void EKLM::Digitizer::makeSimHits()
 {
-  B2DEBUG(1, "EKLM::Digitizer::makeSimHits()");
-
-
-
-
   //loop over volumes
   for (std::map<int, std::vector<EKLMSimHit*> >::iterator
        volumeIterator = m_simHitVolumeMap.begin();
@@ -204,9 +197,6 @@ void EKLM::Digitizer::makeSimHits()
     }
 
   }
-
-
-  B2DEBUG(1, "EKLM::Digitizer::makeSimHits() completed");
 }
 
 
@@ -247,7 +237,7 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
 
     // create fes entry
     EKLM::FiberAndElectronics* fes =
-      new EKLM::FiberAndElectronics(*it, m_geoDat, m_digPar);
+      new EKLM::FiberAndElectronics(*it, m_geoDat, m_digPar, &m_fitter);
 
     // do all work
     fes->processEntry();
@@ -278,6 +268,5 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
 
     delete fes;
   }
-  //    B2INFO( "STOP MERGING HITS");
 }
 

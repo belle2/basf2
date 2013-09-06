@@ -48,7 +48,6 @@ PXDDataRedAnalysisModule::PXDDataRedAnalysisModule()
 {
   //Set module properties
   setDescription("This module performs the analysis of the PXDDataReduction module output");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   addParam("writeToRoot", m_writeToRoot,
            "set true if you want to save the informations in a root file named by parameter 'rootFileName'", bool(true));

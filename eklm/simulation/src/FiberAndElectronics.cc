@@ -153,7 +153,9 @@ void EKLM::fillSiPMOutput(double stripLen, double distSiPM,
   double deExcitationTime;
   double cosTheta;
   double hitDist;
+  double sig, dt;
   *gnpe = 0;
+  dt = 0.5 * digPar->ADCSamplingTime;
   for (j = 0; j < digPar->nDigitizations; j++)
     hist[j] = 0;
   for (i = 0; i < nPE; i++) {
@@ -176,9 +178,16 @@ void EKLM::fillSiPMOutput(double stripLen, double distSiPM,
               timeShift;
     for (j = 0; j < digPar->nDigitizations; j++) {
       digTime = j * digPar->ADCSamplingTime;
-      if (digTime > hitTime)
-        hist[j] = hist[j] + exp(-digPar->PEAttenuationFreq *
-                                (digTime - hitTime));
+      if (digTime > hitTime + dt)
+        sig = (exp(-digPar->PEAttenuationFreq * (digTime - hitTime - dt)) -
+               exp(-digPar->PEAttenuationFreq * (digTime - hitTime + dt))
+              ) / digPar->PEAttenuationFreq;
+      else if (digTime > hitTime - dt)
+        sig = (1.0 - exp(-digPar->PEAttenuationFreq * (digTime - hitTime + dt))
+              ) / digPar->PEAttenuationFreq;
+      else
+        sig = 0;
+      hist[j] = hist[j] + sig;
     }
   }
 }

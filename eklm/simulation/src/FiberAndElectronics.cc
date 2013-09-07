@@ -129,7 +129,8 @@ void EKLM::FiberAndElectronics::processEntry()
   m_FPGAParams.amplitude = m_FPGAParams.amplitude * 2 / ADCRange;
   m_FPGAParams.bgAmplitude = m_FPGAParams.bgAmplitude * 2 / ADCRange;
   if (m_digPar->debug)
-    debugOutput();
+    if (m_npe >= 10)
+      debugOutput();
 }
 
 void EKLM::FiberAndElectronics::addRandomSiPMNoise()

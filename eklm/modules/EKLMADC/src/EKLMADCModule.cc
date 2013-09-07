@@ -38,6 +38,7 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
                                       int npe)
 {
   int j;
+  int gnpe;
   double t, s;
   TH1F* h = NULL;
   t = m_digPar.nDigitizations * m_digPar.ADCSamplingTime;
@@ -46,8 +47,8 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  EKLM::fillSiPMOutput(l, d, npe, 0, false, &m_digPar, m_hDir);
-  EKLM::fillSiPMOutput(l, d, npe, 0, true, &m_digPar, m_hRef);
+  EKLM::fillSiPMOutput(l, d, npe, 0, false, &m_digPar, m_hDir, &gnpe);
+  EKLM::fillSiPMOutput(l, d, npe, 0, true, &m_digPar, m_hRef, &gnpe);
   s = 0;
   for (j = 0; j < m_digPar.nDigitizations; j++)
     s = s + m_hDir[j] + m_hRef[j];

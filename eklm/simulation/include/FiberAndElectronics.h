@@ -31,11 +31,13 @@ namespace Belle2 {
      * @param[in]  isReflected If the hit is direct or reflected.
      * @param[in]  digPar      Digitization parameters.
      * @param[out] hist        Histogram.
+     * @param[out] gnpe        Number of generated photoelectrons.
      * @return Vector of hit times.
      */
     void fillSiPMOutput(double stripLen, double distSiPM, int nPE,
                         double timeShift, bool isReflected,
-                        struct DigitizationParams* digPar, float* hist);
+                        struct DigitizationParams* digPar, float* hist,
+                        int* gnpe);
 
     /**
      * Digitize EKLMSim2Hits to get EKLM StripHits.

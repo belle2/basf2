@@ -72,9 +72,9 @@ EKLM::FiberAndElectronics::~FiberAndElectronics()
 
 void EKLM::FiberAndElectronics::processEntry()
 {
-  int i;
+  int i, gnpe;
   double l;
-  double npe, gnpe;
+  double npe;
   std::vector<EKLMSim2Hit*>::iterator it;
   EKLMSim2Hit* hit;
   for (it = m_vectorHits.begin(); it != m_vectorHits.end(); it++) {
@@ -83,15 +83,14 @@ void EKLM::FiberAndElectronics::processEntry()
     npe = hit->getEDep() * m_digPar->nPEperMeV;
     /* Fill histograms. */
     l = m_geoDat->getStripLength(hit->getStrip());
-    gnpe = gRandom->Poisson(npe);
-    fillSiPMOutput(l, 0.5 * l - hit->getLocalPosition().x(), gnpe,
-                   hit->getTime(), false, m_digPar, m_amplitudeDirect);
+    fillSiPMOutput(l, 0.5 * l - hit->getLocalPosition().x(),
+                   gRandom->Poisson(npe), hit->getTime(), false, m_digPar,
+                   m_amplitudeDirect, &gnpe);
     m_npe = gnpe;
-    if (m_digPar->mirrorReflectiveIndex > 0) {
-      gnpe = gRandom->Poisson(npe);
-      fillSiPMOutput(l, 0.5 * l - hit->getLocalPosition().x(), gnpe,
-                     hit->getTime(), true, m_digPar, m_amplitudeReflected);
-    }
+    if (m_digPar->mirrorReflectiveIndex > 0)
+      fillSiPMOutput(l, 0.5 * l - hit->getLocalPosition().x(),
+                     gRandom->Poisson(npe), hit->getTime(), true, m_digPar,
+                     m_amplitudeReflected, &gnpe);
     m_npe = m_npe + gnpe;
   }
 
@@ -138,7 +137,7 @@ void EKLM::fillSiPMOutput(double stripLen, double distSiPM,
                           int nPE, double timeShift,
                           bool isReflected,
                           struct DigitizationParams* digPar,
-                          float* hist)
+                          float* hist, int* gnpe)
 {
   int i;
   int j;
@@ -147,6 +146,7 @@ void EKLM::fillSiPMOutput(double stripLen, double distSiPM,
   double deExcitationTime;
   double cosTheta;
   double hitDist;
+  *gnpe = 0;
   for (j = 0; j < digPar->nDigitizations; j++)
     hist[j] = 0;
   for (i = 0; i < nPE; i++) {
@@ -162,6 +162,7 @@ void EKLM::fillSiPMOutput(double stripLen, double distSiPM,
     if (isReflected)
       if (gRandom->Uniform() > digPar->mirrorReflectiveIndex)
         continue;
+    *gnpe = *gnpe + 1;
     deExcitationTime = gRandom->Exp(digPar->scintillatorDeExcitationTime) +
                        gRandom->Exp(digPar->fiberDeExcitationTime);
     hitTime = hitDist / digPar->fiberLightSpeed + deExcitationTime +

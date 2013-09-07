@@ -36,6 +36,9 @@
 
 #include <sstream>
 
+// ROOT
+#include <TRandom3.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -72,6 +75,9 @@ namespace Belle2 {
     addParam("scaleN0", m_scaleN0, "Scale factor for N0", 1.0);
     addParam("electronicJitter", m_electronicJitter,
              "r.m.s of electronic jitter [ns]", 50e-3);
+    addParam("maxTime", m_maxTime,
+             "time limit for photons [ns] (0 = use default one)", 0.0);
+    addParam("everyNth", m_everyNth, "randomly choose every Nth event", 0);
 
     // initialize other private data members
     m_file = NULL;
@@ -107,10 +113,17 @@ namespace Belle2 {
   void TOPbetaScanModule::event()
   {
 
+    // randomly choose every Nth event
+
+    if (m_everyNth > 0) {
+      if (int(gRandom->Rndm() * m_everyNth) != 0) return;
+    }
+
     // create reconstruction object
 
     double mass[1] = {Const::electron.getMass()}; // one hypothesis with electron mass
     TOP::TOPreco reco(1, mass, m_minBkgPerBar, m_scaleN0);
+    if (m_maxTime > 0) reco.setTmax(m_maxTime);
     reco.Clear();
 
     // put photon hits into it
@@ -222,14 +235,14 @@ namespace Belle2 {
     for (int i = 0; i < m_numPoints; i++) {
       reco.setBeta(beta[i]);
       reco.Reconstruct(track);
-      if (!reco.Flag()) B2WARNING("TOPbetaScan: reconstruction flag = false");
+      if (reco.Flag() != 1) B2WARNING("TOPbetaScan: reconstruction flag = false");
       double logL[1], expPhot[1];
       int Nphot;
       reco.GetLogL(1, logL, expPhot, Nphot);
       logLikelihood[i] = logL[0];
     }
 
-    // save a scan to histogram (for control)
+    // save scan to histogram (for control)
 
     if ((int) m_scanHistograms.size() < m_numScanHistograms) {
       string id = string("Hscan") + numberToString(m_scanHistograms.size());

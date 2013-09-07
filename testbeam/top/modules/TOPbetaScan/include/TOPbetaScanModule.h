@@ -105,6 +105,8 @@ namespace Belle2 {
     double m_minBkgPerBar;    /**< minimal assumed background photons per bar */
     double m_scaleN0;         /**< scale factor for N0 */
     double m_electronicJitter;     /**< r.m.s of electronic jitter */
+    double m_maxTime;      /**< optional time limit for photons */
+    int m_everyNth;     /**< randomly choose every Nth event */
 
     TFile* m_file;           /**< TFile */
     TH1F* m_betaHistogram;   /**< 1D histogram for the results */

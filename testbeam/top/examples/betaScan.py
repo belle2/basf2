@@ -5,7 +5,7 @@ from basf2 import *
 import sys
 
 # ------------------------------------------------------------------------------
-# This example shows haw to perform beta scan to measure the resolution in beta
+# This example shows how to run a beta scan to measure the resolution in beta
 #
 # User has to modify at least input file name below
 # ------------------------------------------------------------------------------
@@ -20,7 +20,7 @@ if not os.path.exists(inputFile):
 # Input
 lepsInput = register_module('TOPLeps2013Input')
 lepsInput.param('inputFileName', inputFile)
-track = {  # for CFD runs of exp001
+beam = {  # for CFD runs of exp001
     'x0': 0,
     'y0': -0.20,
     'z0': 124.30,
@@ -28,13 +28,14 @@ track = {  # for CFD runs of exp001
     'theta': 89.639,
     'phi': 0.057,
     }
-lepsInput.param(track)
+lepsInput.param(beam)
 lepsInput.param('t0', 1.51)  # for CFD runs of exp001
 # print_params(lepsInput)
 
 # Gearbox
 gearbox = register_module('Gearbox')
-gearbox.param('fileName', 'testbeam/top/LEPS2013-6/TOP-CFD.xml')
+gearbox.param('fileName', 'testbeam/top/LEPS2013-6/TOP-CFD.xml')  # for CFD runs
+# gearbox.param('fileName', 'testbeam/top/LEPS2013-6/TOP.xml') # for IRS3B runs
 
 # Geometry
 geometry = register_module('Geometry')
@@ -44,6 +45,8 @@ geometry.param('Components', ['TOP'])
 betaScan = register_module('TOPbetaScan')
 betaScan.param('betaMin', 0.95)
 betaScan.param('betaMax', 1.05)
+betaScan.param('maxTime', 55)  # use photons in the range 0 < t < 55 ns
+betaScan.param('electronicJitter', 35e-3)
 betaScan.param('minBkgPerBar', 5)
 betaScan.param('outputFileName', outputFile)
 # print_params(betaScan)

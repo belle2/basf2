@@ -42,7 +42,7 @@ namespace Belle2 {
     /**
      * Digitize EKLMSim2Hits to get EKLM StripHits.
      */
-    class FiberAndElectronics {
+    class FiberAndElectronics : public EKLMHitMCTime {
 
     public:
 

@@ -22,6 +22,7 @@
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/dataobjects/EKLMSectorHit.h>
 #include <eklm/geometry/GeometryData.h>
+#include <eklm/simulation/Digitizer.h>
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
@@ -78,27 +79,8 @@ namespace Belle2 {
        */
       bool fastHit(HepGeom::Point3D<double>& pos, double time);
 
-      /**
-       * Check whether strips intersect.
-       * @details
-       * Determines crossing point in the global rest frame,
-       * calculates Chi^2 of the hit and hittime.
-       * @param[in]  hit1       First hit.
-       * @param[in]  hit2       Second hit.
-       * @param[out] crossPoint Crossing point.
-       * @param[out] chisq      Chi^2.
-       * @param[out] time       Time.
-       * @return true if strips have intersection.
-       */
-      bool doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
-                         HepGeom::Point3D<double>* crossPoint,
-                         double& chisq, double& time);
-
-      /** Speed of the first photon. */
-      double m_firstPhotonlightSpeed;
-
-      /** Time smearing. */
-      double m_sigmaT;
+      /** Digitization parameters. */
+      struct DigitizationParams m_digPar;
 
       /** Geometry data. */
       GeometryData* m_geoDat;

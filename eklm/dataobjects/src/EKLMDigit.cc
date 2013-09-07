@@ -100,3 +100,13 @@ void EKLMDigit::setVolumeID(int id)
   m_volid = id;
 }
 
+float EKLMDigit::getSiPMMCTime() const
+{
+  return m_sMCTime;
+}
+
+void EKLMDigit::setSiPMMCTime(float t)
+{
+  m_sMCTime = t;
+}
+

@@ -86,6 +86,7 @@ namespace Belle2 {
       double PEAttenuationFreq;
       double meanSiPMNoise;
       bool enableConstBkg;
+      double timeResolution;
       bool debug;
     };
 

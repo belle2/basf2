@@ -133,6 +133,18 @@ namespace Belle2 {
      */
     void setFitStatus(int s);
 
+    /**
+     * Get SiPM MC time.
+     * @return Time.
+     */
+    float getSiPMMCTime() const;
+
+    /**
+     * Set SiPM MC time.
+     * @param[in] t Time.
+     */
+    void setSiPMMCTime(float t);
+
   private:
 
     /** Number of plane. */
@@ -155,6 +167,9 @@ namespace Belle2 {
 
     /** Volume identifier. */
     int m_volid;
+
+    /** MC time at SiPM. */
+    float m_sMCTime;
 
     /** Makes objects storable. */
     ClassDef(Belle2::EKLMDigit, 1);

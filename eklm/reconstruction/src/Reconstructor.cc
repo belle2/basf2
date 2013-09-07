@@ -18,16 +18,13 @@ using namespace Belle2;
 
 EKLM::Reconstructor::Reconstructor(GeometryData* geoDat)
 {
-  GearDir Digitizer = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]"
-                              "/Content/DigitizationParams");
-  m_firstPhotonlightSpeed = Digitizer.getDouble("FiberLightSpeed");
-  m_sigmaT = Digitizer.getDouble("TimeResolution");
+  setDefDigitizationParams(&m_digPar);
   m_geoDat = geoDat;
 }
 
 bool EKLM::Reconstructor::fastHit(HepGeom::Point3D<double>& pos, double time)
 {
-  return time < pos.mag() / Const::speedOfLight - 2.0 * m_sigmaT;
+  return time < pos.mag() / Const::speedOfLight - 2.0 * m_digPar.timeResolution;
 }
 
 void EKLM::Reconstructor::readStripHits()
@@ -71,6 +68,9 @@ void EKLM::Reconstructor::create2dHits()
   std::vector<EKLMSectorHit*>::iterator it;
   int n1, n2;
   int i1, i2;
+  double d1, d2;
+  double t, t1, t2;
+  double sd;
   EKLMDigit* hit1, *hit2;
   for (it = m_SectorHitVector.begin(); it != m_SectorHitVector.end(); it++) {
     n1 = (*it)->getHitNumber(1);
@@ -80,41 +80,25 @@ void EKLM::Reconstructor::create2dHits()
       for (i2 = 0; i2 < n2; i2++) {
         hit2 = (*it)->getHit(2, i2);
         HepGeom::Point3D<double> crossPoint(0, 0, 0);
-        double chisq = 0;
-        double time = 0;
-        if (!(doesIntersect(hit1, hit2, &crossPoint, chisq, time)))
+        if (!m_geoDat->intersection(hit1, hit2, &crossPoint, &d1, &d2, &sd))
           continue;
-        if (fastHit(crossPoint, time))
+        t1 = hit1->getTime() - d1 / m_digPar.fiberLightSpeed +
+             0.5 * sd / Const::speedOfLight;
+        t2 = hit2->getTime() - d2 / m_digPar.fiberLightSpeed -
+             0.5 * sd / Const::speedOfLight;
+        t = (t1 + t2) / 2;
+        if (fastHit(crossPoint, t))
           continue;
         EKLMHit2d* hit2d =
           new(m_hit2dArray.nextFreeAddress()) EKLMHit2d(hit1, hit2);
         hit2d->setEDep(hit1->getEDep() + hit2->getEDep());
         hit2d->setGlobalPosition(crossPoint);
-        hit2d->setChiSq(chisq);
-        hit2d->setTime(time);
+        hit2d->setChiSq((t1 - t2) * (t1 - t2) /
+                        m_digPar.timeResolution / m_digPar.timeResolution);
+        hit2d->setTime(t);
         hit2d->setMCTime((hit1->getMCTime() + hit2->getMCTime()) / 2);
       }
     }
   }
-}
-
-bool EKLM::Reconstructor::doesIntersect(EKLMDigit* hit1, EKLMDigit* hit2,
-                                        HepGeom::Point3D<double>* crossPoint,
-                                        double& chisq, double& time)
-{
-  bool is;
-  double d1, d2;
-  double t1, t2;
-  double sd;
-  is = m_geoDat->intersection(hit1, hit2, crossPoint, &d1, &d2, &sd);
-  if (is == false)
-    return false;
-  t1 = hit1->getTime() - d1 / m_firstPhotonlightSpeed +
-       0.5 * sd / Const::speedOfLight;
-  t2 = hit2->getTime() - d2 / m_firstPhotonlightSpeed -
-       0.5 * sd / Const::speedOfLight;
-  time = (t1 + t2) / 2;
-  chisq = (t1 - t2) * (t1 - t2) / m_sigmaT / m_sigmaT;
-  return true;
 }
 

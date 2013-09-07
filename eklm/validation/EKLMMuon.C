@@ -5,8 +5,14 @@ void EKLMMuon()
   TFile* fin = new TFile("../EKLMMuonOutput.root");
   TTree* tree = (TTree*) fin->Get("tree");
   TFile* fout = new TFile("EKLMMuon.root", "recreate");
+  TH1F* h1dtres = new TH1F("muon_h1dtres", "EKLM muon 1d hits time resolution",
+    100, -10, 10);
   TH1F* h2dtres = new TH1F("muon_h2dtres", "EKLM muon 2d hits time resolution",
     100, -10, 10);
+  h1dtres->SetXTitle("ns");
+  h1dtres->SetYTitle("Events");
+  tree->Draw("EKLMDigits.m_Time-EKLMDigits.m_sMCTime>>muon_h1dtres", "EKLMDigits.m_good==1");
+  h1dtres->Write();
   h2dtres->SetXTitle("ns");
   h2dtres->SetYTitle("Events");
   tree->Draw("EKLMHit2ds.m_Time-EKLMHit2ds.m_MCTime>>muon_h2dtres");

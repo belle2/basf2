@@ -73,25 +73,31 @@ EKLM::FiberAndElectronics::~FiberAndElectronics()
 void EKLM::FiberAndElectronics::processEntry()
 {
   int i, gnpe;
-  double l;
+  double l, d, t;
   double npe;
   std::vector<EKLMSim2Hit*>::iterator it;
   EKLMSim2Hit* hit;
+  m_MCTime = -1;
   for (it = m_vectorHits.begin(); it != m_vectorHits.end(); it++) {
     hit = *it;
     /* Poisson mean for number of photoelectrons. */
     npe = hit->getEDep() * m_digPar->nPEperMeV;
     /* Fill histograms. */
     l = m_geoDat->getStripLength(hit->getStrip());
-    fillSiPMOutput(l, 0.5 * l - hit->getLocalPosition().x(),
-                   gRandom->Poisson(npe), hit->getTime(), false, m_digPar,
-                   m_amplitudeDirect, &gnpe);
+    d = 0.5 * l - hit->getLocalPosition().x();
+    t = hit->getTime() + d / m_digPar->fiberLightSpeed;
+    if (m_MCTime < 0)
+      m_MCTime = t;
+    else
+      m_MCTime = t < m_MCTime ? t : m_MCTime;
+    fillSiPMOutput(l, d, gRandom->Poisson(npe), hit->getTime(), false,
+                   m_digPar, m_amplitudeDirect, &gnpe);
     m_npe = gnpe;
-    if (m_digPar->mirrorReflectiveIndex > 0)
-      fillSiPMOutput(l, 0.5 * l - hit->getLocalPosition().x(),
-                     gRandom->Poisson(npe), hit->getTime(), true, m_digPar,
-                     m_amplitudeReflected, &gnpe);
-    m_npe = m_npe + gnpe;
+    if (m_digPar->mirrorReflectiveIndex > 0) {
+      fillSiPMOutput(l, d, gRandom->Poisson(npe), hit->getTime(), true,
+                     m_digPar, m_amplitudeReflected, &gnpe);
+      m_npe = m_npe + gnpe;
+    }
   }
 
   // sum up histograms
@@ -219,31 +225,15 @@ void EKLM::FiberAndElectronics::debugOutput()
     histAmplitudeDirect =
       new TH1D("histAmplitudeDirect", m_stripName.c_str(),
                m_digPar->nDigitizations, 0, m_histRange);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  try {
     histAmplitudeReflected =
       new TH1D("histAmplitudeReflected", m_stripName.c_str(),
                m_digPar->nDigitizations, 0, m_histRange);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  try {
     histAmplitude =
       new TH1D("histAmplitude", m_stripName.c_str(),
                m_digPar->nDigitizations, 0, m_histRange);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  try {
     histADCAmplitude =
       new TH1D("histADCAmplitude", m_stripName.c_str(),
                m_digPar->nDigitizations, 0, m_histRange);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  try {
     histADCFit =
       new TH1D("histADCFit", m_stripName.c_str(),
                m_digPar->nDigitizations, 0, m_histRange);

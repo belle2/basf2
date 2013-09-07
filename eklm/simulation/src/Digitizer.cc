@@ -40,6 +40,7 @@ void EKLM::setDefDigitizationParams(struct DigitizationParams* digPar)
   digPar->PEAttenuationFreq = dig.getDouble("PEAttenuationFreq");
   digPar->meanSiPMNoise = dig.getDouble("MeanSiPMNoise");
   digPar->enableConstBkg = dig.getDouble("EnableConstBkg") > 0;
+  digPar->timeResolution = dig.getDouble("TimeResolution");
 }
 
 EKLM::Digitizer::Digitizer(EKLM::GeometryData* geoDat,
@@ -231,13 +232,17 @@ void EKLM::Digitizer::readAndSortSim2Hits()
 //!  are simulated in EKLMFiberAndElectronics class
 void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
 {
+  EKLM::FiberAndElectronics* fes;
   for (std::map<int, std::vector<EKLMSim2Hit*> >::iterator it =
          m_HitStripMap.begin(); it != m_HitStripMap.end(); it++) {
 
 
     // create fes entry
-    EKLM::FiberAndElectronics* fes =
-      new EKLM::FiberAndElectronics(*it, m_geoDat, m_digPar, &m_fitter);
+    try {
+      fes = new FiberAndElectronics(*it, m_geoDat, m_digPar, &m_fitter);
+    } catch (std::bad_alloc& ba) {
+      B2FATAL(MemErr);
+    }
 
     // do all work
     fes->processEntry();
@@ -249,6 +254,7 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
       new(m_stripHitsArray.nextFreeAddress()) EKLMDigit(simHit);
 
     stripHit->setMCTime(simHit->getTime());
+    stripHit->setSiPMMCTime(fes->getMCTime());
     stripHit->setGlobalPosition(simHit->getGlobalPosition());
     stripHit->setGeneratedNPE(fes->getGeneratedNPE());
     if (!fes->getFitStatus()) {

@@ -68,7 +68,7 @@ namespace Belle2 {
       G4Isotope* iHe3 = new G4Isotope("iHe3", z = 2, n = 3, a = 3.0160293 * g / mole);
       G4Element* eHe3 = new G4Element("eHe3", symbol = "eHe3", ncomponents = 1);
       eHe3->AddIsotope(iHe3, abundance = 100.);
-      G4Material* gHe3 = new G4Material("gHe3", density = 8.960 * g / cm3, ncomponents = 1);
+      G4Material* gHe3 = new G4Material("gHe3", density = 0.00066 * g / cm3, ncomponents = 1);
       gHe3->AddElement(eHe3, 1);
 
       //lets get the stepsize parameter with a default value of 5 µm
@@ -147,7 +147,7 @@ namespace Belle2 {
                                        startAngle, spanningAngle);
 
         string matGas = activeParams.getString("MaterialGas");
-        G4LogicalVolume* l_iHe3Gas = new G4LogicalVolume(s_iHe3Gas, geometry::Materials::get(matGas), "l_iHe3Gas");
+        G4LogicalVolume* l_iHe3Gas = new G4LogicalVolume(s_iHe3Gas, gHe3, "l_iHe3Gas");
 
         new G4PVPlacement(rot_he3tube, He3TUBEpos, l_iHe3Gas, "p_iHe3Gas", &topVolume, false, 1);
 
@@ -158,7 +158,7 @@ namespace Belle2 {
                                       activeParams.getLength("gas_hz")*Unit::cm,
                                       startAngle, spanningAngle);
 
-        G4LogicalVolume* l_He3Gas = new G4LogicalVolume(s_He3Gas, geometry::Materials::get(matGas), "l_He3Gas", 0, m_sensitive);
+        G4LogicalVolume* l_He3Gas = new G4LogicalVolume(s_He3Gas, gHe3, "l_He3Gas", 0, m_sensitive);
 
         new G4PVPlacement(0, G4ThreeVector(0, 0, 0), l_He3Gas, "p_iHe3Gas", l_iHe3Gas, false, detID);
 

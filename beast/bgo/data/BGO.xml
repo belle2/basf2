@@ -13,7 +13,7 @@
     <!-- we can also have arrays as parameters which makes it easy to get a
          number of values as vector<double>.  The numbers can be divided by
          whitespace, comma or semi-colon -->
-    <bar unit="mm">1 2 3 4 5 6 7 8
+    <bar unit="mm">1 
     </bar>
 
     <Active>
@@ -23,7 +23,7 @@
       <z_bgo unit="cm">36.8637</z_bgo>
       <AngleX unit="deg">0.0</AngleX>
       <AngleY unit="deg">-11.5</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <AngleZ unit="deg">90.0</AngleZ>
       <cDz unit="mm">124.0</cDz>
       <cDy2 unit="mm">19.616</cDy2>
       <cDy1 unit="mm">12.280</cDy1>
@@ -38,8 +38,8 @@
      <x_bgo unit="cm">0.0</x_bgo>
      <y_bgo unit="cm">7.5</y_bgo>
      <z_bgo unit="cm">36.8637</z_bgo>
-     <AngleX unit="deg">0.0</AngleX>
-     <AngleY unit="deg">11.5</AngleY>
+     <AngleX unit="deg">11.5</AngleX>
+     <AngleY unit="deg">0</AngleY>
      <AngleZ unit="deg">0.0</AngleZ>
      <cDz unit="mm">124.0</cDz>
      <cDy2 unit="mm">19.616</cDy2>
@@ -54,6 +54,23 @@
      <Material>BGO-Material</Material>
      <x_bgo unit="cm">-7.5</x_bgo>
      <y_bgo unit="cm">0.0</y_bgo>
+     <z_bgo unit="cm">36.8637</z_bgo>
+     <AngleX unit="deg">0.0</AngleX>
+     <AngleY unit="deg">11.5</AngleY>
+     <AngleZ unit="deg">90.0</AngleZ>
+     <cDz unit="mm">124.0</cDz>
+     <cDy2 unit="mm">19.616</cDy2>
+     <cDy1 unit="mm">12.280</cDy1>
+     <cDx3 unit="mm">30.828</cDx3>
+     <cDx4 unit="mm">34.692</cDx4>
+     <cDx1 unit="mm">22.938</cDx1>
+     <cDx2 unit="mm">25.356</cDx2> 
+   </Active>
+   
+   <Active>
+     <Material>BGO-Material</Material>
+     <x_bgo unit="cm">0.0</x_bgo>
+     <y_bgo unit="cm">-7.5</y_bgo>
      <z_bgo unit="cm">36.8637</z_bgo>
      <AngleX unit="deg">-11.5</AngleX>
      <AngleY unit="deg">0.0</AngleY>
@@ -66,15 +83,50 @@
      <cDx1 unit="mm">22.938</cDx1>
      <cDx2 unit="mm">25.356</cDx2> 
    </Active>
-   
+
+   <Active>
+     <Material>BGO-Material</Material>
+     <x_bgo unit="cm">7.5</x_bgo>
+     <y_bgo unit="cm">0.0</y_bgo>
+     <z_bgo unit="cm">-20.6061</z_bgo>
+     <AngleX unit="deg">0.0</AngleX>
+     <AngleY unit="deg">-160.0</AngleY>
+     <AngleZ unit="deg">90.0</AngleZ>
+     <cDz unit="mm">124.0</cDz>
+     <cDy2 unit="mm">19.616</cDy2>
+     <cDy1 unit="mm">12.280</cDy1>
+     <cDx3 unit="mm">30.828</cDx3>
+     <cDx4 unit="mm">34.692</cDx4>
+     <cDx1 unit="mm">22.938</cDx1>
+     <cDx2 unit="mm">25.356</cDx2> 
+   </Active>
+
    <Active>
      <Material>BGO-Material</Material>
      <x_bgo unit="cm">0.0</x_bgo>
-     <y_bgo unit="cm">-7.5</y_bgo>
-     <z_bgo unit="cm">36.8637</z_bgo>
-     <AngleX unit="deg">0.0</AngleX>
-     <AngleY unit="deg">-11.5</AngleY>
+     <y_bgo unit="cm">7.5</y_bgo>
+     <z_bgo unit="cm">-20.6061</z_bgo>
+     <AngleX unit="deg">160.0</AngleX>
+     <AngleY unit="deg">0.0</AngleY>
      <AngleZ unit="deg">0.0</AngleZ>
+     <cDz unit="mm">124.0</cDz>
+     <cDy2 unit="mm">19.616</cDy2>
+     <cDy1 unit="mm">12.280</cDy1>
+     <cDx3 unit="mm">30.828</cDx3>
+     <cDx4 unit="mm">34.692</cDx4>
+     <cDx1 unit="mm">22.938</cDx1>
+     <cDx2 unit="mm">25.356</cDx2> 
+   </Active>
+   
+   
+   <Active>
+     <Material>BGO-Material</Material>
+     <x_bgo unit="cm">-7.5</x_bgo>
+     <y_bgo unit="cm">0.0</y_bgo>
+     <z_bgo unit="cm">-20.6061</z_bgo>
+     <AngleX unit="deg">0.0</AngleX>
+     <AngleY unit="deg">160.0</AngleY>
+     <AngleZ unit="deg">90.0</AngleZ>
      <cDz unit="mm">124.0</cDz>
      <cDy2 unit="mm">19.616</cDy2>
      <cDy1 unit="mm">12.280</cDy1>
@@ -86,72 +138,20 @@
    
    <Active>
      <Material>BGO-Material</Material>
-      <x_bgo unit="cm">7.5</x_bgo>
-      <y_bgo unit="cm">0.0</y_bgo>
-      <z_bgo unit="cm">-20.6061</z_bgo>
-      <AngleX unit="deg">20.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-      <cDz unit="mm">124.0</cDz>
-      <cDy1 unit="mm">19.616</cDy1>
-      <cDy2 unit="mm">12.280</cDy2>
-      <cDx1 unit="mm">30.828</cDx1>
-      <cDx2 unit="mm">34.692</cDx2>
-      <cDx3 unit="mm">22.938</cDx3>
-      <cDx4 unit="mm">25.356</cDx4> 
-   </Active>
-
-   <Active>
-     <Material>BGO-Material</Material>
-     <x_bgo unit="cm">0.0</x_bgo>
-     <y_bgo unit="cm">7.5</y_bgo>
-     <z_bgo unit="cm">-20.6061</z_bgo>
-     <AngleX unit="deg">20.0</AngleX>
-     <AngleY unit="deg">0.0</AngleY>
-     <AngleZ unit="deg">0.0</AngleZ>
-     <cDz unit="mm">124.0</cDz>
-     <cDy1 unit="mm">19.616</cDy1>
-     <cDy2 unit="mm">12.280</cDy2>
-     <cDx1 unit="mm">30.828</cDx1>
-     <cDx2 unit="mm">34.692</cDx2>
-     <cDx3 unit="mm">22.938</cDx3>
-     <cDx4 unit="mm">25.356</cDx4> 
-   </Active>
-   
-   
-   <Active>
-     <Material>BGO-Material</Material>
-     <x_bgo unit="cm">-7.5</x_bgo>
-     <y_bgo unit="cm">0.0</y_bgo>
-     <z_bgo unit="cm">-20.6061</z_bgo>
-     <AngleX unit="deg">20.0</AngleX>
-     <AngleY unit="deg">0.0</AngleY>
-     <AngleZ unit="deg">0.0</AngleZ>
-     <cDz unit="mm">124.0</cDz>
-     <cDy1 unit="mm">19.616</cDy1>
-     <cDy2 unit="mm">12.280</cDy2>
-     <cDx1 unit="mm">30.828</cDx1>
-     <cDx2 unit="mm">34.692</cDx2>
-     <cDx3 unit="mm">22.938</cDx3>
-     <cDx4 unit="mm">25.356</cDx4> 
-   </Active>
-   
-   <Active>
-     <Material>BGO-Material</Material>
      <x_bgo unit="cm">0.0</x_bgo>
      <y_bgo unit="cm">-7.5</y_bgo>
      <z_bgo unit="cm">-20.6061</z_bgo>
-     <AngleX unit="deg">20.0</AngleX>
+     <AngleX unit="deg">-160.0</AngleX>
      <AngleY unit="deg">0.0</AngleY>
      <AngleZ unit="deg">0.0</AngleZ>
      <cDz unit="mm">124.0</cDz>
-     <cDy1 unit="mm">19.616</cDy1>
-     <cDy2 unit="mm">12.280</cDy2>
-     <cDx1 unit="mm">30.828</cDx1>
-     <cDx2 unit="mm">34.692</cDx2>
-     <cDx3 unit="mm">22.938</cDx3>
-     <cDx4 unit="mm">25.356</cDx4> 
+     <cDy2 unit="mm">19.616</cDy2>
+     <cDy1 unit="mm">12.280</cDy1>
+     <cDx3 unit="mm">30.828</cDx3>
+     <cDx4 unit="mm">34.692</cDx4>
+     <cDx1 unit="mm">22.938</cDx1>
+     <cDx2 unit="mm">25.356</cDx2> 
    </Active>
-    
+
   </Content>
 </DetectorComponent>

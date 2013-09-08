@@ -21,8 +21,8 @@ geometry = register_module('Geometry')
 simulation = register_module('FullSim')
 # do something with the microtpc data
 # analysis = register_module('Microtpc')
-# analysis = register_module('He3tube')
-analysis = register_module('Bgo')
+analysis = register_module('He3tube')
+# analysis = register_module('Bgo')
 # save the microtpc results
 output = register_module('RootOutput')
 # an show some progress of the microtpc simulation
@@ -64,8 +64,8 @@ particlegun.param({  # Shoot electrons and positrons
 
 # Main XML parameter file to load, relative to global data directory
 # gearbox.param('fileName','beast/microtpc/detector.xml')
-# gearbox.param('fileName','beast/he3tube/detector.xml')
-gearbox.param('fileName', 'beast/bgo/detector.xml')
+gearbox.param('fileName', 'beast/he3tube/detector.xml')
+# gearbox.param('fileName', 'beast/bgo/detector.xml')
 
 # Lets see some more information on geometry building
 geometry.set_log_level(LogLevel.INFO)
@@ -75,8 +75,8 @@ analysis.set_log_level(LogLevel.INFO)
 
 # And write the results to microtpc-simulation.root
 # output.param('outputFileName', 'microtpc-simulation.root')
-# output.param('outputFileName', 'he3tube-simulation.root')
-output.param('outputFileName', 'bgo-simulation.root')
+output.param('outputFileName', 'he3tube-simulation.root')
+# output.param('outputFileName', 'bgo-simulation.root')
 
 # Here we create a processing path and add the modules
 main = create_path()

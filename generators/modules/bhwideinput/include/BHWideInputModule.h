@@ -64,7 +64,7 @@ namespace Belle2 {
     std::vector<T> make_vector(T const& t1, T const& t2);  /**< make_vector. */
 
     template <typename T>
-    std::pair<T, T> vectorToPair(std::vector<T> &vec, const std::string& name = "");
+    std::pair<T, T> vectorToPair(std::vector<T>& vec, const std::string& name = "");
   }; /**< vectorToPair. */
 
   template <typename T>
@@ -73,11 +73,11 @@ namespace Belle2 {
     std::vector<T> v;
     v.push_back(t1);
     v.push_back(t2);
-    return v;
+    return v; /**< make_vector */
   }
 
   template <typename T>
-  inline std::pair<T, T> BHWideInputModule::vectorToPair(std::vector<T> &vec, const std::string& name)
+  inline std::pair<T, T> BHWideInputModule::vectorToPair(std::vector<T>& vec, const std::string& name)
   {
     std::pair<T, T> p;
     if (vec.size() != 2) {
@@ -86,7 +86,7 @@ namespace Belle2 {
       p.first  = vec[0];
       p.second = vec[1];
     }
-    return p;
+    return p;  /**< vectorToPair. */
   }
 
 } // end namespace Belle2

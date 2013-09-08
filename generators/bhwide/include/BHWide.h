@@ -30,27 +30,32 @@ namespace Belle2 {
   class BHWide {
   public:
 
+    /** Call needed channels. */
     enum Channel {
       CH_BOTH = 0,    /**< both s and t-channels + interferences. */
       CH_S_ONLY = 1,  /**< only s-channel (for tests!), with model ==  HM_CALKUL.*/
       CH_T_ONLY = 2   /**< only t-channel (for tests!), with model ==  HM_CALKUL. */
     };
 
+    /** Call random generator */
     enum RandomGenerator {
       RG_RANMAR = 1, /**< Ranmar generator. */
       RG_RANECU = 2  /**< Ranecu generator. */
     };
 
+    /** Call electroweak correction */
     enum EWCorrectionLib {
       EC_BABAMC = 1, /**< ElectroWeak Corr. from BABAMC (obsolete). */
       EC_ALIBABA = 2 /**< ElectroWeak Corr. from ALIBABA, RECOMMENDED. */
     };
 
+    /** Call Brem Model */
     enum HardBremsModel {
       HM_HELICITY_AMP = 1, /**< obtained by the BHWide authors (helicity amplitudes). */
       HM_CALKUL = 2        /**< from CALKUL, Nucl. Phys. B206 (1982) 61. */
     };
 
+    /** Call photon polarization */
     enum PhotonVacPolarization {
       PP_OFF = 0,       /**< Photon vacuum polarization is off. */
       PP_BHLUMI = 1,    /**< Burkhardt et.al. 1989, as in BHLUMI 2.0x. */

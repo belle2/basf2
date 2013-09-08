@@ -131,9 +131,13 @@ namespace Belle2 {
     double rme2s;  /**< variable   */
     double rls;    /**< variable   */
     double z0;     /**< variable   */
-    double a1, a2, ac;  /**< variable   */
+    double a1;  /**< variable   */
+    double a2;  /**< variable   */
+    double ac;  /**< variable   */
     double sigapp;      /**< variable   */
-    double eb, pb, rin2pb; /**< variable   */
+    double eb;     /**< variable   */
+    double pb;     /**< variable   */
+    double rin2pb; /**< variable   */
     double p1[4];  /**< variable   */
     double p2[4];  /**< variable   */
     double q1[4];  /**< variable   */

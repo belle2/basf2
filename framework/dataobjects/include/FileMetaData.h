@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2013 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thomas Kuhr                                              *
@@ -13,6 +13,7 @@
 #include <TObject.h>
 #include <TRandom3.h>
 #include <time.h>
+#include <fstream>
 
 
 namespace Belle2 {
@@ -48,9 +49,9 @@ namespace Belle2 {
      */
     unsigned long getEvents() const {return m_events;}
 
-    /** Experiment number getter.
+    /** Lowest experiment number getter.
      */
-    unsigned long getExperiment() const {return m_experiment;}
+    unsigned long getExperimentLow() const {return m_experimentLow;}
 
     /** Lowest run number getter.
      */
@@ -60,6 +61,10 @@ namespace Belle2 {
      */
     unsigned long getEventLow() const {return m_eventLow;}
 
+    /** Highest experiment number getter.
+     */
+    unsigned long getExperimentHigh() const {return m_experimentHigh;}
+
     /** Highest run number getter.
      */
     unsigned long getRunHigh() const {return m_runHigh;}
@@ -67,6 +72,14 @@ namespace Belle2 {
     /** Highest event number in highest run getter.
      */
     unsigned long getEventHigh() const {return m_eventHigh;}
+
+    /** Check whether the given event is in the covered range of events.
+     *
+     *  @param experiment The experiment number of the event.
+     *  @param run The run number of the event.
+     *  @param event The event number of the event.
+     */
+    bool containsEvent(unsigned long experiment, unsigned long run, unsigned long event) const;
 
     /** Get number of parent files.
      */
@@ -116,25 +129,21 @@ namespace Belle2 {
      */
     void setEvents(unsigned long events) {m_events = events;}
 
-    /** Experiment number setter.
+    /** Lowest experiment, run and event number setter.
      *
-     *  @param experiment The experiment number.
-     */
-    void setExperiment(unsigned long experiment) {m_experiment = experiment;}
-
-    /** Lowest run and event number setter.
-     *
+     *  @param experiment The lowest experiment number.
      *  @param run The lowest run number.
      *  @param event The lowest event number of the lowest run.
      */
-    void setLow(unsigned long run, unsigned long event) {m_runLow = run; m_eventLow = event;}
+    void setLow(unsigned long experiment, unsigned long run, unsigned long event) {m_experimentLow = experiment; m_runLow = run; m_eventLow = event;}
 
-    /** Highest run and event number setter.
+    /** Highest experiment, run and event number setter.
      *
+     *  @param experiment The highest experiment number.
      *  @param run The highest run number.
      *  @param event The highest event number of the highest run.
      */
-    void setHigh(unsigned long run, unsigned long event) {m_runHigh = run; m_eventHigh = event;}
+    void setHigh(unsigned long experiment, unsigned long run, unsigned long event) {m_experimentHigh = experiment; m_runHigh = run; m_eventHigh = event;}
 
     /** Parents setter.
      *
@@ -180,6 +189,25 @@ namespace Belle2 {
      */
     static void exposePythonAPI();
 
+    /** Print the content of the meta data object.
+     *
+     *  @param option Use "all" to print everything, except steering file. Use "steering" for printing steering file.
+     */
+    virtual void Print(Option_t* option = "") const;
+
+    /** Input stream operator for reading file meta data from the file catalog in xml format.
+     *
+     *  @param input The input stream.
+     *  @param metaData The FileMetaData object.
+     */
+    friend std::istream& operator>> (std::istream& input, FileMetaData& metaData);
+
+    /** Output stream operator for writing file meta data to the file catalog in xml format.
+     *
+     *  @param output The output stream.
+     *  @param metaData The FileMetaData object.
+     */
+    friend std::ostream& operator<< (std::ostream& output, const FileMetaData& metaData);
 
   private:
 
@@ -199,9 +227,9 @@ namespace Belle2 {
      */
     unsigned long m_events;
 
-    /** Experiment number.
+    /** Lowest experiment number.
      */
-    unsigned long m_experiment;
+    unsigned long m_experimentLow;
 
     /** Lowest run number.
      */
@@ -210,6 +238,10 @@ namespace Belle2 {
     /** Lowest event number in lowest run.
      */
     unsigned long m_eventLow;
+
+    /** Highest experiment number.
+     */
+    unsigned long m_experimentHigh;
 
     /** Highest run number.
      */
@@ -257,7 +289,7 @@ namespace Belle2 {
 
     /** ROOT Macro for FileMetaData dictionary.
      */
-    ClassDef(FileMetaData, 2);
+    ClassDef(FileMetaData, 3);
 
   }; //class
 

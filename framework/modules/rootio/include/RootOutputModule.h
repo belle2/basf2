@@ -61,9 +61,6 @@ namespace Belle2 {
      */
     virtual void initialize();
 
-    /** Make sure the file doesn't contain more than one experiment. */
-    virtual void beginRun();
-
     /** Write data in c_Event DataStore maps.
      *
      *  Loops over all objects in event maps (in the first call of the function) and writes them to event-TTree.
@@ -156,9 +153,9 @@ namespace Belle2 {
     /** Vector of parent file IDs. */
     std::vector<int> m_parents;
 
-    /** Experiment number.
+    /** Lowest experiment number.
      */
-    unsigned long m_experiment;
+    unsigned long m_experimentLow;
 
     /** Lowest run number.
      */
@@ -167,6 +164,10 @@ namespace Belle2 {
     /** Lowest event number in lowest run.
      */
     unsigned long m_eventLow;
+
+    /** Highest experiment number.
+     */
+    unsigned long m_experimentHigh;
 
     /** Highest run number.
      */

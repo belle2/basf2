@@ -14,6 +14,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/FileMetaData.h>
+#include <framework/core/FileCatalog.h>
 #include <framework/core/RandomNumbers.h>
 
 #include <TClonesArray.h>
@@ -38,8 +39,8 @@ REG_MODULE(RootOutput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experiment(0), m_runLow(0), m_eventLow(0),
-  m_runHigh(0), m_eventHigh(0)
+RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(0), m_runLow(0), m_eventLow(0),
+  m_experimentHigh(0), m_runHigh(0), m_eventHigh(0)
 {
   //Set module properties
   setDescription("Writes DataStore objects into a .root file. Use RootInput to read them again.");
@@ -158,16 +159,6 @@ bool RootOutputModule::hasStreamers(TClass* cl)
   }
 }
 
-void RootOutputModule::beginRun()
-{
-  B2DEBUG(1, "beginRun called.");
-
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  if (m_experiment && (m_experiment != eventMetaDataPtr->getExperiment())) {
-    B2ERROR("The output file " << m_outputFileName << " contains more than one experiment.");
-  }
-}
-
 
 void RootOutputModule::event()
 {
@@ -185,16 +176,24 @@ void RootOutputModule::event()
 
   // keep track of file level metadata
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  if (!m_experiment) {
-    m_experiment = eventMetaDataPtr->getExperiment();
-  }
-  if (!m_runLow || (eventMetaDataPtr->getRun() < m_runLow) || ((eventMetaDataPtr->getRun() == m_runLow) && (eventMetaDataPtr->getEvent() < m_eventLow))) {
-    m_runLow = eventMetaDataPtr->getRun();
-    m_eventLow = eventMetaDataPtr->getEvent();
-  }
-  if (!m_runHigh || (eventMetaDataPtr->getRun() > m_runHigh) || ((eventMetaDataPtr->getRun() == m_runHigh) && (eventMetaDataPtr->getEvent() > m_eventHigh))) {
-    m_runHigh = eventMetaDataPtr->getRun();
-    m_eventHigh = eventMetaDataPtr->getEvent();
+  unsigned int experiment =  eventMetaDataPtr->getExperiment();
+  unsigned int run =  eventMetaDataPtr->getRun();
+  unsigned int event = eventMetaDataPtr->getEvent();
+  if (!m_experimentLow) {
+    m_experimentLow = m_experimentHigh = experiment;
+    m_runLow = m_runHigh = run;
+    m_eventLow = m_eventHigh = event;
+  } else {
+    if ((experiment < m_experimentLow) || ((experiment == m_experimentLow) && ((run < m_runLow) || ((run == m_runLow) && (event < m_eventLow))))) {
+      m_experimentLow = experiment;
+      m_runLow = run;
+      m_eventLow = event;
+    }
+    if ((experiment > m_experimentHigh) || ((experiment == m_experimentHigh) && ((run > m_runHigh) || ((run == m_runHigh) && (event > m_eventHigh))))) {
+      m_experimentHigh = experiment;
+      m_runHigh = run;
+      m_eventHigh = event;
+    }
   }
 }
 
@@ -215,9 +214,8 @@ void RootOutputModule::terminate()
 
     //fill the file level metadata
     fileMetaDataPtr->setEvents(tree->GetEntries());
-    fileMetaDataPtr->setExperiment(m_experiment);
-    fileMetaDataPtr->setLow(m_runLow, m_eventLow);
-    fileMetaDataPtr->setHigh(m_runHigh, m_eventHigh);
+    fileMetaDataPtr->setLow(m_experimentLow, m_runLow, m_eventLow);
+    fileMetaDataPtr->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
   }
 
   //fill more file level metadata
@@ -237,6 +235,9 @@ void RootOutputModule::terminate()
   fileMetaDataPtr->setCreationData(release, time(0), site, user);
   fileMetaDataPtr->setRandom(RandomNumbers::getInitialSeed(), RandomNumbers::getInitialRandom());
   fileMetaDataPtr->setSteering(Environment::Instance().getSteering());
+
+  //register the file in the catalog
+  FileCatalog::Instance().registerFile(m_outputFileName, *fileMetaDataPtr);
 
   //fill Persistent data
   fillTree(DataStore::c_Persistent);

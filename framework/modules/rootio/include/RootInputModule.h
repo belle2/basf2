@@ -14,6 +14,8 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/core/Environment.h>
+#include <framework/core/FileCatalog.h>
+#include <framework/dataobjects/FileMetaData.h>
 
 #include <string>
 #include <vector>
@@ -76,9 +78,26 @@ namespace Belle2 {
 
 
   private:
-    /** Actually performs the reading from the tree into m_objects. */
-    void readTree(DataStore::EDurability durability);
+    typedef std::vector<DataStore::StoreEntry*> StoreEntries;   /**< Vector of entries in the data store. */
 
+    /** Actually performs the reading from the tree into m_objects. */
+    void readTree();
+
+    /**
+     * Connect branches of the given tree to the data store.
+     *
+     * @param tree The tree to be connected.
+     * @param durability The data store durability level.
+     * @param storeEntries The store entries to which the branches are connected will be added to this vector.
+     * @return True if the branches could be connected successfully.
+     */
+    bool connectBranches(TTree* tree, DataStore::EDurability durability, StoreEntries* storeEntries);
+
+    /** Connect the parent trees and fill m_parentStoreEntries. */
+    bool createParentStoreEntries();
+
+    /** Read data of the current event from the parents. */
+    bool readParentTrees();
 
     //first the steerable variables:
     /** File to read from. Cannot be used together with m_inputFileNames. */
@@ -100,20 +119,39 @@ namespace Belle2 {
      */
     std::vector<std::string> m_excludeBranchNames[DataStore::c_NDurabilityTypes];
 
-    /** Next entry to be read in event/persistent tree.
+    /** Next entry to be read in event tree.
      *
-     * Can be set from steering file for event durability to skip some events.
+     * Can be set from steering file to skip some events.
      */
-    int m_counterNumber[DataStore::c_NDurabilityTypes];
+    int m_counterNumber;
+
+    /** Level of parent files to be read. */
+    int m_parentLevel;
 
 
     //then those for purely internal use:
 
-    /**  TTree for input. */
-    TChain* m_tree[DataStore::c_NDurabilityTypes];
+    /**  TTree for event input. */
+    TChain* m_tree;
+
+    /**  TTree for persistent input. */
+    TChain* m_persistent;
 
     /** Vector of DataStore entries that we are supposed to read in. */
-    std::vector<DataStore::StoreEntry*> m_entries[DataStore::c_NDurabilityTypes];
+    StoreEntries m_storeEntries;
+
+    /** Tree of parent metadata */
+    FileCatalog::ParentMetaData m_parentMetaData;
+
+    /** Index of the current parent per level */
+    std::vector<int> m_currentParent;
+
+    /** The parent DataStore entries per level */
+    std::vector<StoreEntries> m_parentStoreEntries;
+
+    /** Map of file IDs to trees */
+    std::map<int, TTree*> m_parentTrees;
+
   };
 } // end namespace Belle2
 

@@ -18,6 +18,7 @@
 #include <framework/core/ModuleStatistics.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/ModuleParamInfoPython.h>
+#include <framework/core/FileCatalog.h>
 #include <framework/dataobjects/FileMetaData.h>
 
 #include <TFile.h>
@@ -63,6 +64,11 @@ FileMetaData updateFileMetaData(const std::string& fileName, int id, const std::
   } else {
     fileMetaData->Write("FileMetaData");
   }
+
+  // update the local file catalog
+  FileMetaData localMetaData = *fileMetaData;
+  FileCatalog::Instance().registerFile(fileName, localMetaData);
+
   return *fileMetaData;
 }
 

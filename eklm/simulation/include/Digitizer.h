@@ -151,10 +151,10 @@ namespace Belle2 {
       FPGAFitter m_fitter;
 
       /** Map for EKLMSimHit sorting according sensitive volumes. */
-      std::map<int, std::vector<EKLMSimHit*> > m_simHitVolumeMap;
+      std::multimap<int, EKLMSimHit*> m_simHitVolumeMap;
 
       /** Map for hits sorting according strip name. */
-      std::map<int, std::vector<EKLMSim2Hit*> > m_HitStripMap;
+      std::multimap<int, EKLMSim2Hit*> m_HitStripMap;
 
       /** Vector of EKLMDigits. */
       std::vector<EKLMDigit*> m_HitVector;

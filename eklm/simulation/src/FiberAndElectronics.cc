@@ -25,7 +25,8 @@ using namespace Belle2;
 static const char MemErr[] = "Memory allocation error.";
 
 EKLM::FiberAndElectronics::FiberAndElectronics(
-  std::pair < int, std::vector<EKLMSim2Hit*> > entry,
+  std::multimap<int, EKLMSim2Hit*>::iterator& it,
+  std::multimap<int, EKLMSim2Hit*>::iterator& end,
   EKLM::GeometryData* geoDat,
   struct EKLM::DigitizationParams* digPar,
   FPGAFitter* fitter)
@@ -33,8 +34,10 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   m_digPar = digPar;
   m_geoDat = geoDat;
   m_fitter = fitter;
+  m_hit = it;
+  m_hitEnd = end;
   m_npe = 0;
-  m_stripName = "Strip" + boost::lexical_cast<std::string>(entry.first);
+  m_stripName = "Strip" + boost::lexical_cast<std::string>(it->first);
 
   m_histRange = m_digPar->nDigitizations * m_digPar->ADCSamplingTime;
 
@@ -55,9 +58,6 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   m_ADCFit = (float*)calloc(m_digPar->nDigitizations, sizeof(float));
   if (m_ADCFit == NULL)
     B2FATAL(MemErr);
-
-  // define vector of hits
-  m_vectorHits = entry.second;
 }
 
 
@@ -75,11 +75,11 @@ void EKLM::FiberAndElectronics::processEntry()
   int i, gnpe;
   double l, d, t;
   double npe;
-  std::vector<EKLMSim2Hit*>::iterator it;
+  std::multimap<int, EKLMSim2Hit*>::iterator it;
   EKLMSim2Hit* hit;
   m_MCTime = -1;
-  for (it = m_vectorHits.begin(); it != m_vectorHits.end(); it++) {
-    hit = *it;
+  for (it = m_hit; it != m_hitEnd; ++it) {
+    hit = it->second;
     /* Poisson mean for number of photoelectrons. */
     npe = hit->getEDep() * m_digPar->nPEperMeV;
     /* Fill histograms. */

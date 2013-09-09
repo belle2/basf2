@@ -49,7 +49,8 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      FiberAndElectronics(std::pair <int, std::vector<EKLMSim2Hit*> >,
+      FiberAndElectronics(std::multimap<int, EKLMSim2Hit*>::iterator& it,
+                          std::multimap<int, EKLMSim2Hit*>::iterator& end,
                           EKLM::GeometryData* geoDat,
                           struct EKLM::DigitizationParams* digPar,
                           FPGAFitter* fitter);
@@ -123,8 +124,11 @@ namespace Belle2 {
       /** Number of photoelectrons (generated). */
       int m_npe;
 
-      /** Pointer to vector if the SimHits. */
-      std::vector<EKLMSim2Hit*> m_vectorHits;
+      /** First hit. */
+      std::multimap<int, EKLMSim2Hit*>::iterator m_hit;
+
+      /** End of hits. */
+      std::multimap<int, EKLMSim2Hit*>::iterator m_hitEnd;
 
       /** Name of the strip. */
       std::string m_stripName;

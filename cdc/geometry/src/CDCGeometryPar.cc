@@ -19,6 +19,7 @@
 #include <boost/format.hpp>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 
 using namespace std;
 using namespace boost;

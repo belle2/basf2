@@ -762,7 +762,7 @@ namespace Belle2 {
 
 
 
-      bool nshieldflag = false;
+      const bool nshieldflag = true;
       if (nshieldflag) {
         //
         // B4C for shilding material of neutron
@@ -813,14 +813,14 @@ namespace Belle2 {
         G4Cons* bgShieldConeShape_4 = new G4Cons("solid_B4C_4", (20.25 + 8.5) * cm, (20.25 + 8.5 + 3.0) * cm, (20.25 + 4.5)* cm, (20.25 + 4.5 + 3.0) * cm,  13.0 * cm / 2.0, 0.*deg, 360.*deg);
         G4LogicalVolume* bgShieldCone_4 = new G4LogicalVolume(bgShieldConeShape_4, B4C, "logical_B4c_4", 0, 0, 0);
         bgShieldCone_4->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
-        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -73.5 * cm), bgShieldCone_4, "physicalbgShield_1%", logical_cdc, false, 0);
+        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -73.5 * cm), bgShieldCone_4, "physicalbgShield_B4C_4", logical_cdc, false, 0);
 
         G4Cons* bgShieldConeShape_5 = new G4Cons("solid_B4C_5", (20.25 + 4.5) * cm, (20.25 + 4.5 + 3.0) * cm, (20.25 - 8.0 + 4.5)* cm, (20.25 - 8.0 + 4.5 + 3.0) * cm,  15.0 * cm / 2.0, 0.*deg, 360.*deg);
-        G4LogicalVolume* bgShieldCone_5 = new G4LogicalVolume(bgShieldConeShape_5, B4C, "logical_B4c_5", 0, 0, 0);
+        G4LogicalVolume* bgShieldCone_5 = new G4LogicalVolume(bgShieldConeShape_5, B4C, "logical_B4C_5", 0, 0, 0);
         bgShieldCone_5->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
         // Commented by M. U. June 3rd, 2013
         //        G4VPhysicalVolume* physbgShieldCone_5;
-        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -48.0 * cm), bgShieldCone_5, "physicalbgShield_1%", logical_cdc, false, 0);
+        //  new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -48.0 * cm), bgShieldCone_5, "physicalbgShield_B4C_5", logical_cdc, false, 0);
 
       }
 

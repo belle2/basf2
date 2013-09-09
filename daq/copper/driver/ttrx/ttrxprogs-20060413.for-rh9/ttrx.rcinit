@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# ttrx	Script to load/unload ttrx devices
+#
+# Author: M. Nakao
+#
+# chkconfig: 2345 20 90
+# description: TT-RX drivers
+
+. /etc/init.d/functions
+
+# See how we were called.
+case "$1" in
+  start)
+	action $"Loading TT-RX device driver: " \
+           insmod /lib/modules/`uname -r`/misc/ttrx.o
+	action $"Loading TT-RX FIFO driver: " \
+           insmod /lib/modules/`uname -r`/misc/ttrx_fifo.o
+	;;
+  stop)
+	action $"Unloading TT-RX device drivers: " \
+           rmmod ttrx ttrx_fifo
+	;;
+  status)
+	# nothing
+	:
+	;;
+  restart|reload)
+	# nothing
+	:
+	;;
+  *)
+	# do not advertise unreasonable commands that there is no reason
+	# to use with this device
+	echo $"Usage: $0 {start|stop|status|restart|reload}"
+	exit 1
+esac
+
+exit 0

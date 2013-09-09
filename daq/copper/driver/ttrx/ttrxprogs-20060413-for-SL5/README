@@ -1,0 +1,63 @@
+
+README for ttrxprogs-20050909.tgz
+
+1. build and install the TT-RX driver
+   1a. "cd driver"
+   1b. edit "Makefile" to modify $(USRSRCLINUX) directory
+   1c. run "make"
+   1d. run "./load" to make /dev/ttrx0 and /dev/ttrx_fifo0
+   1e. "mkdir /lib/modules/misc"
+   1f. "cp ttrx.o ttrx_fifo.o /lib/modules/misc"
+
+2. install script for init
+   2a. "cp ttrx.rcinit /etc/rc.d/init.d/ttrx"
+   2b. "chkconfig --level=345 ttrx on"
+
+3. build user programs
+   3a. "cd src"
+   3b. edit "Makefile" to modify $(prefix) directory
+   3c. "make"
+   3d. "make install"
+
+4. run user programs
+   4a. dump the TT-RX registers by "dumprx" program
+       % dumprx
+
+----------------------------------------------------------------------------
+dumprx 2005082400 --- TT-RX v4 serial #009 CPLD v0.12 FPGA v0.18 rev 2
+----------------------------------------------------------------------------
+020  PRGM=0000000c done=1 init=1 m012=0(flash)
+100    ID=58525454 OK
+120   CSR=0c000100 ulock*=0 usync*=0 uclkok=1 uclksel=1 noready=0
+                   dtag=0 utag=0 misc=0 entest=0 exbsy=0 nobsy=0 bsy=0 ready=1
+                   fifoful=0 orun=0 full=0(enabled) half=0(enabled) empty=0
+130   CLK=e3040000 uclkcnt=99(v) lclk(_) rclk=1/4+0
+                   uedgeo=0 dedgeo=0 sclkneg=0 dclkneg=0
+140  INTR=e3040000 irq=0
+150  MASK=00000010 nobsy=0 exbsy=0 bsy=0 mask=10
+200  TRIG=00ffffff disbusy=0 decg=0 trigsel=std (free-run)
+210 TLAST=00ffffff (free-run)
+220  RATE=00000000 refclk=42333000 Hz[28:24] rndset=0[17:16] plsset=1/1[9:0]
+230   TAG=0002738d
+250 DEPTH=00007f5d
+400 USTAT=00000005 lock*=0 sync*=0(0/0) parity=0/0(0) in=00(00) out=05
+410 UERRS=00130005 #parity=19 #sync=5
+420  UCMD=00000000 ret=00 in=00 cmd=00
+430  UCHK=00000000 err=0
+440  URAW=00009420 usr=000(_) out=025(v) in=020
+700   EXT=00050403 0 5 4 3
+----------------------------------------------------------------------------
+Trigger=EXT count=160653 (no limit)  Status=READY
+----------------------------------------------------------------------------
+
+   4b. generate dummy trigger from TT-RX
+       (examples)
+       trigrx -localbusy random 100 10000
+           [generate 100 Hz 10k count random triggers, without checking
+            the BUSY signals from FINESSE]
+       trigrx random 100
+           [generate 100 Hz random triggers for ever, as far as the trigger
+            BUSY handshake is correct]
+       trigrx pulse 1 1
+           [generate just one trigger]
+       (to see more options just run the trigrx commands)

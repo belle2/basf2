@@ -1,0 +1,1 @@
+cmd_/home/yamagata/ttrxprogs-20060413/driver/ttrx_fifo.ko := ld -m elf_i386 -m elf_i386 -r -o /home/yamagata/ttrxprogs-20060413/driver/ttrx_fifo.ko /home/yamagata/ttrxprogs-20060413/driver/ttrx_fifo.o /home/yamagata/ttrxprogs-20060413/driver/ttrx_fifo.mod.o

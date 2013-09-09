@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# $Id: load_fifo,v 1.1.1.1 2005/02/23 09:44:12 ttrx Exp $
+# $Log: load_fifo,v $
+# Revision 1.1.1.1  2005/02/23 09:44:12  ttrx
+# First into cvs
+#
+#
+module="ttrx_fifo"
+device="ttrx_fifo"
+group="root"
+mode="666"
+pwd=$PWD
+
+/sbin/rmmod $module
+rm -f /dev/${device}*
+/sbin/insmod $pwd/ttrx_fifo.o $* || exit 1
+major=`cat /proc/devices | awk "\\$2==\"$module\" {print \\$1}"`
+mknod /dev/${device}0 c $major 0
+mknod /dev/${device}1 c $major 1
+chgrp $group /dev/${device}0
+chmod $mode  /dev/${device}0
+chgrp $group /dev/${device}1
+chmod $mode  /dev/${device}1

@@ -31,7 +31,7 @@ static int n;
 EKLM::FPGAFitter::FPGAFitter(int nPoints)
 {
   int i;
-  TFile* f;
+  TFile* f = NULL;
   TH1F* h;
   m_nPoints = nPoints;
   try {

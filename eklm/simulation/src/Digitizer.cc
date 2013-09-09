@@ -232,7 +232,7 @@ void EKLM::Digitizer::readAndSortSim2Hits()
 //!  are simulated in EKLMFiberAndElectronics class
 void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
 {
-  EKLM::FiberAndElectronics* fes;
+  EKLM::FiberAndElectronics* fes = NULL;
   for (std::map<int, std::vector<EKLMSim2Hit*> >::iterator it =
          m_HitStripMap.begin(); it != m_HitStripMap.end(); it++) {
 

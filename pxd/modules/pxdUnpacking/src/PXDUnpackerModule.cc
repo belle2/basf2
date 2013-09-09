@@ -161,12 +161,12 @@ public:
     return sfnr_offset & 0x3FF;
   };
   unsigned int calc_crc(void) {
-    unsigned int* d;
+//     unsigned int* d;
     unsigned int c = 0;
-    d = (unsigned int*)this;
+//     d = (unsigned int*)this;
     c = 0;
     for (unsigned int k = 0; k < (size() - 1) * 4; k++) {
-      c = xcrc32((k ^ 1) + (const unsigned char*)d, 1 , c);
+      c = xcrc32((k ^ 1) + /*(const unsigned char*)d*/, 1 , c);
     }
     if (c == crc32) {
       if (verbose)
@@ -216,13 +216,13 @@ public:
     set_crc(calc_crc());
   };
   unsigned int calc_crc(void) {
-    unsigned int* d;
+//     unsigned int* d;
     unsigned int c = 0;
-    d = (unsigned int*)this;
+//     d = (unsigned int*)this;
 
     if (verbose)
       B2INFO(" DHH Common Frame CRC:");
-    for (unsigned int i = 0; i < size(); i++) if (verbose) B2INFO(" d " << hex << d[i]);
+    for (unsigned int i = 0; i < size(); i++) /*if (verbose) B2INFO(" d " << hex << d[i])*/;
     return c;
   };
   void set_crc(unsigned int c) {
@@ -307,9 +307,9 @@ public:
     set_crc(calc_crc());
   };
   unsigned int calc_crc(void) {
-    unsigned int* d;
+//     unsigned int* d;
     unsigned int c = 0;
-    d = (unsigned int*)this;
+//     d = (unsigned int*)this;
 
     return c;
   };
@@ -347,13 +347,13 @@ public:
     set_crc(calc_crc());
   };
   unsigned int calc_crc(void) {
-    unsigned int* d;
+//     unsigned int* d;
     unsigned int c = 0;
-    d = (unsigned int*)this;
+//     d = (unsigned int*)this;
 
     c = 0;
     for (unsigned int k = 0; k < (size() - 1) * 4; k++) {
-      c = xcrc32((k ^ 1) + (const unsigned char*)d, 1 , c);
+      c = xcrc32((k ^ 1) + /*(const unsigned char*)d*/, 1 , c);
 
     }
 
@@ -835,15 +835,15 @@ void PXDUnpackerModule::fill_pixelmap(void* data, unsigned int len, unsigned int
                                dhh_ID, (d[i] >> 20) & 0xFFF, (d[i] >> 8) & 0xFFF, d[i] & 0xFF,
                                dhh_first_frame_id_lo, toffset
                              ));
-      int row, col, val;
+      int row, col;//, val;
       if (commode) {
         row = (d[i] >> 21) & 0x7FF;
         col = (d[i] >> 10) & 0x7FF;
-        val = d[i] & 0x3FF;
+        //val = d[i] & 0x3FF;
       } else {
         row = (d[i] >> 20) & 0xFFF;
         col = (d[i] >> 8) & 0xFFF;
-        val = d[i] & 0xFF;
+//         val = d[i] & 0xFF;
       }
       if (row >= 0 && row < ROWS && col >= 0 && col < COLUMNS) {
       }

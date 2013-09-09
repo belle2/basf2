@@ -2075,6 +2075,12 @@ void VXDTFModule::terminate()
     currentPass->sectorMap.clear();
     delete currentPass; // deleting struct itself
   }
+
+  BOOST_FOREACH(secMapEntry aSector, m_baselinePass.sectorMap) { // dealing with the baseline pass separately
+    delete aSector.second;
+  }
+  m_baselinePass.sectorMap.clear();
+
   m_passSetupVector.clear();
 }
 

@@ -6,6 +6,8 @@
 #include <gtest/gtest.h>
 #include <boost/foreach.hpp>
 
+#include <algorithm>
+
 using namespace std;
 
 namespace Belle2 {
@@ -269,10 +271,67 @@ namespace Belle2 {
   TEST_F(DataStoreTest, StoreArrayIteration)
   {
     const StoreArray<EventMetaData> evtData;
+    StoreArray<EventMetaData> evtDataNonConst;
     //array syntax
     for (int i = 0; i < evtData.getEntries(); i++) {
       EXPECT_TRUE(evtData[i] != NULL);
     }
+
+    //basic iterator features
+    {
+      //input iterator:
+      StoreArray<EventMetaData>::iterator it = evtDataNonConst.begin();
+      StoreArray<EventMetaData>::iterator it2(it);
+      it2 = it;
+
+      //equality/inequality
+      EXPECT_TRUE(it == it2);
+      EXPECT_FALSE(it != it2);
+
+      //test postfix
+      EXPECT_TRUE((it++) == it2);
+      it2++;
+
+      //test prefix
+      EXPECT_TRUE(it != (++it2));
+
+      //rvalue deref
+      EventMetaData ev = *it;
+      it->getEvent();
+      it2 = it;
+
+      //output iterator:
+      //lvalue deref (just overwrite with same object)
+      *it = ev;
+      *it++ = ev;
+
+      EXPECT_TRUE(ev == *it2);
+      EXPECT_TRUE(it2 != it); //was incremented
+      EXPECT_TRUE(ev != *it); //was incremented
+
+      //forward iterator (default constructor and multi-pass):
+      StoreArray<EventMetaData>::iterator it3;
+      it3 = it;
+      ev = *it++;
+      EXPECT_TRUE(ev == *it3);
+    }
+
+    //algorithm stuff
+    {
+      StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
+      EXPECT_EQ((int)evtDataNonConst[0]->getEvent(), 10);
+      EXPECT_EQ((int)evtDataDifferentName[0]->getEvent(), 20);
+      //swap all members of evtDataNonConst ande evtDataDifferentName (same length!)
+      std::swap_ranges(evtDataNonConst.begin(), evtDataNonConst.end(), evtDataDifferentName.begin());
+      EXPECT_EQ((int)evtDataDifferentName[9]->getEvent(), 19);
+      EXPECT_EQ((int)evtDataNonConst[9]->getEvent(), 29);
+
+      //undo
+      std::swap_ranges(evtDataDifferentName.begin(), evtDataDifferentName.end(), evtDataNonConst.begin());
+      EXPECT_EQ((int)evtDataNonConst[9]->getEvent(), 19);
+      EXPECT_EQ((int)evtDataDifferentName[9]->getEvent(), 29);
+    }
+
 
     //const_iterator
     int i = 0;
@@ -284,7 +343,6 @@ namespace Belle2 {
 
 
     //iterator
-    StoreArray<EventMetaData> evtDataNonConst;
     i = 0;
     BOOST_FOREACH(EventMetaData & emd, evtDataNonConst) {
       EXPECT_TRUE(&emd == evtData[i]);

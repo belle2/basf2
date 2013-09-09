@@ -11,7 +11,8 @@
 #include <framework/modules/profile/ProfileModule.h>
 #include <framework/dataobjects/ProfileInfo.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/core/utilities.h>
+#include <framework/utilities/Utils.h>
+#include <framework/gearbox/Unit.h>
 
 #include <TROOT.h>
 #include <TCanvas.h>

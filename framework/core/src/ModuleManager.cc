@@ -10,7 +10,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/core/ModuleManager.h>
-#include <framework/core/utilities.h>
+#include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
 
 #include <boost/filesystem.hpp>

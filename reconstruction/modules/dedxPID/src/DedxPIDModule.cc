@@ -8,7 +8,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Const.h>
-#include <framework/core/utilities.h>
+#include <framework/utilities/FileSystem.h>
 
 #include <tracking/dataobjects/Track.h>
 #include <tracking/dataobjects/TrackFitResult.h>

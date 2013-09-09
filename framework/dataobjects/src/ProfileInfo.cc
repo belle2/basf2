@@ -9,7 +9,9 @@
  **************************************************************************/
 
 #include <framework/dataobjects/ProfileInfo.h>
-#include <framework/core/utilities.h>
+
+#include <framework/utilities/Utils.h>
+#include <framework/gearbox/Unit.h>
 
 using namespace Belle2;
 

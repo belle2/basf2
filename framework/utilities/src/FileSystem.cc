@@ -8,17 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/core/utilities.h>
+#include <framework/utilities/FileSystem.h>
+
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 #include <boost/filesystem.hpp>
-#include <TSystem.h>
 
-#include <sys/time.h>
+//dlopen etc.
 #include <dlfcn.h>
-#include <sstream>
-#include <cstdlib>
 
 using namespace std;
 namespace fs = boost::filesystem;
@@ -83,24 +80,4 @@ namespace Belle2 {
         return string("");
     }
   }
-
-  namespace Utils {
-
-    double getClock()
-    {
-      timespec ts;
-      clock_gettime(CLOCK_REALTIME, &ts);
-      return (ts.tv_sec * Unit::s) + (ts.tv_nsec * Unit::ns);
-    }
-
-    unsigned long getMemoryKB()
-    {
-      ProcInfo_t meminfo;
-      gSystem->GetProcInfo(&meminfo);
-
-      return meminfo.fMemVirtual;
-    }
-
-  }
-} // Belle2 namespace
-
+}

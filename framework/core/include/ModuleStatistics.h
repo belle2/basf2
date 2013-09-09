@@ -12,11 +12,12 @@
 #define MODULESTATISTICS_H
 
 #include <boost/python/list.hpp>
-#include <boost/array.hpp>
 
 #include <framework/gearbox/Unit.h>
 #include <framework/core/Module.h>
-#include <framework/core/utilities.h>
+#include <framework/utilities/Utils.h>
+
+#include <boost/array.hpp>
 
 #include <map>
 #include <cstring>

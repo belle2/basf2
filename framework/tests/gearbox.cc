@@ -3,7 +3,7 @@
 #include <framework/logging/LogSystem.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/core/utilities.h>
+#include <framework/utilities/FileSystem.h>
 
 #include <gtest/gtest.h>
 #include <string>

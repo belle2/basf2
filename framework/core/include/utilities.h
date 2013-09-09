@@ -11,79 +11,11 @@
 #ifndef CORE_FUNCTIONS_H
 #define CORE_FUNCTIONS_H
 
-#include <framework/gearbox/Unit.h>
+//TODO
+//#warning "framework/core/utilities.h is deprecated, use framework/utilities/FileSystem.h and Utils.h instead!"
 
-#include <string>
-#include <iomanip>
+#include <framework/utilities/FileSystem.h>
+#include <framework/utilities/Utils.h>
 
-namespace Belle2 {
-  /** Utility functions related to filename validation and filesystem access */
-  namespace FileSystem {
-    /** Check if a given filename exits */
-    bool fileExists(const std::string& filename);
-    /** Check if the dir containing the filename exists */
-    bool fileDirExists(const std::string& filename);
-    /** Check if filename points to an existing file */
-    bool isFile(const std::string& filename);
-    /** Check if filename points to an existing directory */
-    bool isDir(const std::string& filename);
-
-    /**
-     * Load a shared library
-     * @param library  Name of the library
-     * @param fullname If false, the Library name is interpreted as short name
-     *                 like given to the compiler with -l. It will be expanded
-     *                 to lib<library>.so
-     */
-    bool loadLibrary(std::string library, bool fullname = true);
-
-    /**
-     * Search for given file in local or central release directory and return
-     * absolute path if found.
-     *
-     * @param path path to file/directory, assuming it's installed locally
-     *             (e.g. /data/geometry/Belle2.xml). Leading slash is not
-     *             strictly required.
-     * @return absolute path to file in local directory, if it exists,
-     *         otherwise abs. path to file in central release directory,
-     *         or empty if file wasn't found.
-     */
-    std::string findFile(const std::string& path);
-  }
-
-  /** General utility functions */
-  namespace Utils {
-    /**
-     * Return current value of the high performance clock.
-     *
-     * The returned value is meant to measure relative times and does not show
-     * absolute time values;
-     *
-     * @return Clock value in default time unit (ns)
-     */
-    double getClock();
-
-    /**
-     * Returns currently used virtual memory in KB.
-     *
-     */
-    unsigned long getMemoryKB();
-  }
-
-  /**
-   * Print an INFO message txt followed by the time it took to execute the
-   * statment given as second argument.
-   *
-   * Care should be taken not to define variables in this call since they will
-   * be scoped and thus unavaiable after the macro
-   */
-#define B2INFO_MEASURE_TIME(txt, ...) {\
-    double __b2_elapsed_time__ = ::Belle2::Utils::getClock();\
-    {__VA_ARGS__;}\
-    __b2_elapsed_time__ = (::Belle2::Utils::getClock() - __b2_elapsed_time__)/Unit::ms;\
-    B2INFO(txt << std::fixed << std::setprecision(3) << __b2_elapsed_time__ << " ms");\
-  }
-
-} // Belle2 namespace
 
 #endif //CORE_FUNCTIONS_H

@@ -11,7 +11,7 @@
 #include <framework/gearbox/FileHandler.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/logging/Logger.h>
-#include <framework/core/utilities.h>
+#include <framework/utilities/FileSystem.h>
 
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/device/file.hpp>

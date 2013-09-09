@@ -10,7 +10,8 @@
 
 #include <framework/logging/LogMessage.h>
 
-#include <framework/core/utilities.h>
+#include <framework/utilities/Utils.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/pcore/ProcHandler.h>
 
 #include <ostream>

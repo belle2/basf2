@@ -22,7 +22,7 @@
 #include <display/dataobjects/DisplayData.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/core/utilities.h>
+#include <framework/utilities/FileSystem.h>
 #include <geometry/GeometryManager.h>
 #include <vxd/geometry/GeoCache.h>
 #include <ecl/geometry/ECLGeometryPar.h>

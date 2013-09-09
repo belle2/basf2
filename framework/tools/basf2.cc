@@ -36,7 +36,7 @@
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogSystem.h>
 #include <framework/core/DataFlowVisualization.h>
-#include <framework/core/utilities.h>
+#include <framework/utilities/FileSystem.h>
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>

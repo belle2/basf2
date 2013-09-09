@@ -5,7 +5,6 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/core/utilities.h>
 
 #include <TVector3.h>
 

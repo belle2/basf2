@@ -13,7 +13,6 @@
 
 #include <framework/core/Environment.h>
 #include <framework/core/RandomNumbers.h>
-#include <framework/core/utilities.h>
 #include <framework/core/EventProcessor.h>
 #include <framework/core/PathManager.h>
 #include <framework/pcore/pEventProcessor.h>

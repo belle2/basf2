@@ -70,6 +70,9 @@ namespace Belle2 {
      * @var DigitizationParams::enableConstBkg
      * Enable background in fitting.
      *
+     * @var DigitizationParams::timeResolution
+     * Time resolution (of reconstructed time, not ADC).
+     *
      * @var DigitizationParams::debug
      * Debug mode (generates additional output files with histograms).
      */

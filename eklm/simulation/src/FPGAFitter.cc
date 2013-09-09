@@ -58,6 +58,7 @@ EKLM::FPGAFitter::FPGAFitter(int nPoints)
 
 EKLM::FPGAFitter::~FPGAFitter()
 {
+  delete m_sig;
 }
 
 static double SignalShapeFitFunction(double x, double* par)

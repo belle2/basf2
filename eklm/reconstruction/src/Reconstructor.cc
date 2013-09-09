@@ -99,6 +99,7 @@ void EKLM::Reconstructor::create2dHits()
         hit2d->setMCTime((hit1->getMCTime() + hit2->getMCTime()) / 2);
       }
     }
+    delete *it;
   }
 }
 

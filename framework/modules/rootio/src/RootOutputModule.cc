@@ -39,7 +39,7 @@ REG_MODULE(RootOutput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(0), m_runLow(0), m_eventLow(0),
+RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), m_runLow(0), m_eventLow(0),
   m_experimentHigh(0), m_runHigh(0), m_eventHigh(0)
 {
   //Set module properties
@@ -176,10 +176,10 @@ void RootOutputModule::event()
 
   // keep track of file level metadata
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  unsigned int experiment =  eventMetaDataPtr->getExperiment();
-  unsigned int run =  eventMetaDataPtr->getRun();
-  unsigned int event = eventMetaDataPtr->getEvent();
-  if (!m_experimentLow) {
+  unsigned long experiment =  eventMetaDataPtr->getExperiment();
+  unsigned long run =  eventMetaDataPtr->getRun();
+  unsigned long event = eventMetaDataPtr->getEvent();
+  if (m_experimentLow > m_experimentHigh) { //starting condition
     m_experimentLow = m_experimentHigh = experiment;
     m_runLow = m_runHigh = run;
     m_eventLow = m_eventHigh = event;

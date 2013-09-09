@@ -28,17 +28,27 @@ namespace Belle2 {
 
     /**
      * Struct to keep all necessary parameters for the cosmic generator
-     * level: version 1 (default) and 2 of the generator
-     * ipRequirement: restrict the vertex to IP or not (default)
-     * ipdr: vertex restriction in the radial direction
-     * ipdz: vertex restriction in z direction
-     * ptmin: minimum value of the transverse momentum
      */
     struct Parameters {
+      /**
+       * Generator version: level 1 (default) or 2
+       */
       int level;
+      /**
+       * Restrict the vertex to IP or not (default)
+       */
       int ipRequirement;
+      /**
+       * Vertex restriction in the radial direction
+       */
       double ipdr;
+      /**
+       * Vertex restriction in z direction
+       */
       double ipdz;
+      /**
+       * Minimum value of the transverse momentum
+       */
       double ptmin;
     };
 
@@ -90,33 +100,113 @@ namespace Belle2 {
     int muChargeFlag(const double);
 
     /**
-     * Distributions for the version (level) 1
+     * Generates distributions in 5-parameter space for different particle charges
      */
     void mkdist_v1(const int charge, double*);
+    /**
+     * Generates vertex distributions in the radial direction dr by accept-reject method
+     * for positively charged particles
+     */
     int mkDr_pos_v1(const double dr, const float rndm);
+    /**
+     * Generates vertex distributions in the radial direction dr by accept-reject method
+     * for negatively
+     */
     int mkDr_neg_v1(const double dr, const float rndm);
+    /**
+     * Generates azimuthal angle phi distributions by accept-reject method
+     * for positively charged particles
+     */
     int mkPhi_pos_v1(const double phi, const float rndm);
+    /**
+     * Generates azimuthal angle phi distributions by accept-reject method
+     * for negatively charged particles
+     */
     int mkPhi_neg_v1(const double phi, const float rndm);
+    /**
+     * Generates transverse momentum pt distributions by accept-reject method
+     * for positively charged particles
+     */
     int mkPt_pos_v1(const double pt, const float rndm);
+    /**
+     * Generates transverse momentum pt distributions by accept-reject method
+     * for negatively charged particles
+     */
     int mkPt_neg_v1(const double pt, const float rndm);
+    /**
+     * Generates z vertex dz distributions by accept-reject method
+     * for positively charged particles
+     */
     int mkDz_pos_v1(const double dz, const float rndm);
+    /**
+     * Generates z vertex dz distributions by accept-reject method
+     * for negatively charged particles
+     */
     int mkDz_neg_v1(const double dz, const float rndm);
+    /**
+     * Generates tangent of the polar angle tanl distributions by accept-reject method
+     * for positively charged particles
+     */
     int mkTanl_pos_v1(const double tanl, const float rndm);
+    /**
+     * Generates tangent of the polar angle tanl distributions by accept-reject method
+     * for negatively charged particles
+     */
     int mkTanl_neg_v1(const double tanl, const float rndm);
 
     /**
-     * Distributions for the version (level) 2
+     * Generates distributions in 5-parameter space for different particle charges
      */
     void mkdist_v2(const int charge, double*);
+    /**
+     * Generates vertex distributions in the radial direction dr by accept-reject method
+     * for positively charged particles
+     */
     int mkDr_pos_v2(const double dr, const float rndm);
+    /**
+     * Generates vertex distributions in the radial direction dr by accept-reject method
+     * for negatively charged particles
+     */
     int mkDr_neg_v2(const double dr, const float rndm);
+    /**
+     * Generates azimuthal angle phi distributions by accept-reject method
+     * for positively charged particles
+     */
     int mkPhi_pos_v2(const double phi, const float rndm);
+    /**
+     * Generates azimuthal angle phi distributions by accept-reject method
+     * for negatively charged particles
+     */
     int mkPhi_neg_v2(const double phi, const float rndm);
+    /**
+     * Generates transverse momentum pt distributions by accept-reject method
+     * for positively charged particles
+     */
     int mkPt_pos_v2(const double pt, const float rndm);
+    /**
+     * Generates transverse momentum pt distributions by accept-reject method
+     * for negatively charged particles
+     */
     int mkPt_neg_v2(const double pt, const float rndm);
+    /**
+     * Generates z vertex dz distributions by accept-reject method
+     * for positively charged particles
+     */
     int mkDz_pos_v2(const double dz, const float rndm);
+    /**
+     * Generates z vertex dz distributions by accept-reject method
+     * for negatively charged particles
+     */
     int mkDz_neg_v2(const double dz, const float rndm);
+    /**
+     * Generates tangent of the polar angle tanl distributions by accept-reject method
+     * for positively charged particles
+     */
     int mkTanl_pos_v2(const double tanl, const float rndm);
+    /**
+     * Generates tangent of the polar angle tanl distributions by accept-reject method
+     * for negatively charged particles
+     */
     int mkTanl_neg_v2(const double tanl, const float rndm);
 
   };

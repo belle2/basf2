@@ -35,7 +35,6 @@ class TGPictureButton; //missing fwd declaration in root
 #include <TGFileBrowser.h>
 
 #include <boost/scoped_ptr.hpp>
-#include <boost/foreach.hpp>
 
 #include <cmath>
 
@@ -633,10 +632,10 @@ void DisplayUI::showUserData(const DisplayData& displayData)
 {
   static TGFileBrowser* fileBrowser = NULL;
   static std::map<std::string, BrowsableWrapper*> wrapperMap;
-  typedef std::pair<std::string, BrowsableWrapper*> WrapperPair;
-  BOOST_FOREACH(WrapperPair entry, wrapperMap) {
+  for (auto & entry : wrapperMap) {
     //doesn't do anything
     //fileBrowser->RecursiveRemove(wrappers[i]);
+
     entry.second = NULL;
   }
 
@@ -661,8 +660,7 @@ void DisplayUI::showUserData(const DisplayData& displayData)
   //invert pad -> name map
   const std::map<TVirtualPad*, std::string>& padMap = BrowsableWrapper::getPads();
   std::map<std::string, TVirtualPad*> nameMap;
-  typedef std::pair<TVirtualPad*, std::string> EntryType;
-  BOOST_FOREACH(EntryType entry, padMap) {
+  for (const auto & entry : padMap) {
     nameMap[entry.second] = entry.first;
   }
 

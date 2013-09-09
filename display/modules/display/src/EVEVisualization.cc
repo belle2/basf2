@@ -74,7 +74,6 @@
 
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/foreach.hpp>
 
 #include <assert.h>
 #include <cmath>
@@ -994,23 +993,21 @@ void EVEVisualization::addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines)
 
 void EVEVisualization::showUserData(const DisplayData& displayData)
 {
-  std::vector<std::pair<std::string, TVector3> >::const_iterator labelIt = displayData.m_labels.begin();
-  for (; labelIt != displayData.m_labels.end(); ++labelIt) {
-    TEveText* text = new TEveText(labelIt->first.c_str());
-    text->SetTitle(labelIt->first.c_str());
+  for (const auto & labelPair : displayData.m_labels) {
+    TEveText* text = new TEveText(labelPair.first.c_str());
+    text->SetTitle(labelPair.first.c_str());
     text->SetMainColor(kGray + 1);
-    const TVector3& p = labelIt->second;
+    const TVector3& p = labelPair.second;
     text->PtrMainTrans()->SetPos(p.x(), p.y(), p.z());
     gEve->AddElement(text);
   }
 
-  std::map<std::string, std::vector<TVector3> >::const_iterator pointIt = displayData.m_pointSets.begin();
-  for (; pointIt != displayData.m_pointSets.end(); ++pointIt) {
-    TEvePointSet* points = new TEvePointSet(pointIt->first.c_str());
-    points->SetTitle(pointIt->first.c_str());
+  for (const auto & pointPair : displayData.m_pointSets) {
+    TEvePointSet* points = new TEvePointSet(pointPair.first.c_str());
+    points->SetTitle(pointPair.first.c_str());
     points->SetMarkerStyle(7);
     points->SetMainColor(kGreen);
-    BOOST_FOREACH(const TVector3 & p, pointIt->second) {
+    for (const TVector3 & p : pointPair.second) {
       points->SetNextPoint(p.x(), p.y(), p.z());
     }
     gEve->AddElement(points);

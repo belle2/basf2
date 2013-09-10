@@ -8,8 +8,8 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef PARTICLESTATSMODULE_H
-#define PARTICLESTATSMODULE_H
+#ifndef SKIMFILTERMODULE_H
+#define SKIMFILTERMODULE_H
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -25,29 +25,23 @@ using namespace Belle2;
 
 namespace Belle2 {
 
-  /** This module summarises the ParticleLists in the event.
-  It determines  event pass correlations between Lists. */
+  /** This module filters events based on presence of candidates in a list of ParticleLists.
+  For detailed Particle List statistics use the ParticleStats module. */
 
-  class ParticleStatsModule : public Module {
+  class SkimFilterModule : public Module {
   private:
     /** Event counter **/
     int m_nEvents;
     /** Number of events with Particle candidates**/
     int m_nPass;
-    /** Count the total number of particles */
-    int m_nParticles;
-    /** Name of the TTree. */
+    /** Name of the lists */
     std::vector<std::string> m_strParticleLists;
-    /** Pass matrix for the particle lists. */
-    TMatrix*  m_PassMatrix;
-    /** Particle multiplicity matrix for the particle lists. */
-    TMatrix*  m_MultiplicityMatrix;
 
   public:
     /** Constructor. */
-    ParticleStatsModule();
+    SkimFilterModule();
     /** Destructor. */
-    ~ParticleStatsModule() {}
+    ~SkimFilterModule() {}
     /** Initialises the module.
      */
     void initialize();
@@ -58,4 +52,5 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif // PARTICLESTATSMODULE_H
+#endif // SKIMFILTERMODULE_H
+

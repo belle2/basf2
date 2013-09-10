@@ -26,7 +26,7 @@ using namespace Belle2;
 namespace Belle2 {
 
   /** This module summarises the ParticleLists in the event.
-  It determines event pass correlations between Lists. */
+  It determines  event pass correlations between Lists. */
 
   class ParticleStatsModule : public Module {
   private:

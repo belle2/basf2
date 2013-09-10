@@ -56,17 +56,20 @@ namespace Belle2 {
 
       /** Initialize the module */
       virtual void initialize();
-      /** do the clustering */
+      /** do the unpacking */
       virtual void event();
 
     private:
-      /** Find the cluster a given pixel belongs to.
-       * For this to work correctly, the pixels have to be passed sorted by sensor,row,column
-       * @param px Pixel to find the cluster for
+      /** Unpack one event (several frames) stored in RawPXD object.
+       * @param px RawPXD data object
        */
-      void unpack(RawPXD* px);
+      void unpack_event(RawPXD* px);
 
-      void do_test(void* data, int len, int pad, int& last_framenr, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr);
+      /** Unpack one frame (within an event).
+       * @param data pointer to frame
+       * @param len length of frame
+       */
+      void unpack_frame(void* data, int len, int pad, int& last_framenr, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr);
 
       void fill_pixelmap(void* data, unsigned int len, unsigned int dhh_first_frame_id_lo, unsigned int dhh_ID, unsigned short toffset);
 

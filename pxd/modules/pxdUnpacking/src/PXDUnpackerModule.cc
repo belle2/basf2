@@ -19,30 +19,18 @@
 #include <boost/foreach.hpp>
 #include <pxd/dataobjects/PXDRawHit.h>
 
-//#define _FILE_OFFSET_BITS 64
-
 #include <stdio.h>
 #include <unistd.h>
-#include <signal.h>
 #include <string.h>
 
-//#define HAVE_DECL_BASENAME 1
+#include <boost/crc.hpp>
+#include <boost/cstdint.hpp>
 
-#define xcrc32(a,b,c) (0);
-
-#define COL_WRITE "\e[100;00;91;1m"
-#define COL_READ "\e[47;00;34;1m"
-#define COL_NORM "\e[0m\n"
-#define COL_RED "\e[40;00;31;1m"
-#define COL_MAGENTA "\e[40;00;35;1m"
-#define COL_AQUA "\e[40;00;96;1m"
-#define COL_GREEN "\e[40;00;32;1m"
-#define COL_BLUE "\e[40;00;94;1m"
-#define COL_YELLOW "\e[40;00;93;1m"
 #define FIDS    32
 #define ROWS    1024
 #define COLUMNS 256
 #define MAX_DATA  20
+
 #define DHP_FRAME_HEADER_DATA_TYPE_RAW  0x0
 #define DHP_FRAME_HEADER_DATA_TYPE_ZSD  0x5
 #define DHH_FRAME_HEADER_DATA_TYPE_DHP_RAW  0x0
@@ -69,11 +57,9 @@ REG_MODULE(PXDUnpacker)
 //-----------------------------------------------------------------
 
 
+using boost::crc_optimal;
+typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhh_crc_32_type;
 
-
-typedef unsigned int uint_t;
-typedef unsigned int u32;
-typedef unsigned char u8;
 
 unsigned int type_error = 0, crc_error = 0, magic_error = 0, zerodata_error = 0;
 unsigned int queue_error = 0, fnr_error = 0, wie_error = 0, end_error = 0, evt_skip_error = 0, start_error = 0, evtnr_error = 0;
@@ -124,8 +110,8 @@ public:
   };
   void print(void) {
     if (verbose)
-      B2INFO(COL_BLUE << " DHH FRAME TYP " << hex << get_type() << dec << dhh_type_name[get_type()] << " FNR " << hex << get_fnr()
-             << " DDHID " << hex << get_dhhid() << " CHIP " << get_chipid() << " ERR " << get_err() << COL_NORM);
+      B2INFO(" DHH FRAME TYP " << hex << get_type() << dec << dhh_type_name[get_type()] << " FNR " << hex << get_fnr()
+             << " DDHID " << hex << get_dhhid() << " CHIP " << get_chipid() << " ERR " << get_err());
   };
 };
 
@@ -161,19 +147,20 @@ public:
     return sfnr_offset & 0x3FF;
   };
   unsigned int calc_crc(void) {
-//     unsigned int* d;
-    unsigned int c = 0;
-//     d = (unsigned int*)this;
-    c = 0;
+    unsigned int* d;
+    dhh_crc_32_type bocrc;
+    d = (unsigned int*)this;
     for (unsigned int k = 0; k < (size() - 1) * 4; k++) {
-      c = xcrc32((k ^ 1) + /*(const unsigned char*)d*/, 1 , c);
+      bocrc.process_byte(((const unsigned char*)d)[(k ^ 1)]);
     }
+    unsigned int c;
+    c = bocrc.checksum();
     if (c == crc32) {
       if (verbose)
-        B2INFO(COL_GREEN << " DHH Event Frame CRC " << hex << c << " == " << hex << crc32 << COL_NORM);
+        B2INFO(" DHH Event Frame CRC " << hex << c << " == " << hex << crc32);
     } else {
       crc_error++;
-      B2INFO(COL_RED " DHH Event Frame CRC " << hex << c << " != " << hex << crc32 << COL_NORM);
+      B2INFO(" DHH Event Frame CRC " << hex << c << " != " << hex << crc32);
       error_flag = true;
     }
     return c;
@@ -196,9 +183,9 @@ public:
   void print(void) {
     word0.print();
     if (verbose)
-      B2INFO(COL_GREEN << " DHH Event Frame TNRLO " << hex << trigger_nr_lo << " TNRHI " << hex << trigger_nr_hi << " TTLO " << hex
+      B2INFO(" DHH Event Frame TNRLO " << hex << trigger_nr_lo << " TNRHI " << hex << trigger_nr_hi << " TTLO " << hex
              << " TTHI " << hex << time_tag_hi << " SFNR " << hex << ((sfnr_offset >> 10) & 0x3F) << " OFF " << hex << (sfnr_offset & 0x3FF)
-             << " CRC " << hex << crc32 << calc_crc() << COL_NORM);
+             << " CRC " << hex << crc32 << calc_crc());
   };
 };
 
@@ -216,13 +203,13 @@ public:
     set_crc(calc_crc());
   };
   unsigned int calc_crc(void) {
-//     unsigned int* d;
+    unsigned int* d;
     unsigned int c = 0;
-//     d = (unsigned int*)this;
+    d = (unsigned int*)this;
 
     if (verbose)
       B2INFO(" DHH Common Frame CRC:");
-    for (unsigned int i = 0; i < size(); i++) /*if (verbose) B2INFO(" d " << hex << d[i])*/;
+    for (unsigned int i = 0; i < size(); i++) if (verbose) B2INFO(" d " << hex << d[i]);
     return c;
   };
   void set_crc(unsigned int c) {
@@ -273,7 +260,7 @@ public:
   void print(void) {
     word0.print();
     if (verbose)
-      B2INFO(COL_GREEN << " DHH Direct Readout (Raw|ZSD) Frame TNRLO " << hex << trigger_nr_lo << " CRC " << hex << calc_crc() << COL_NORM);
+      B2INFO(" DHH Direct Readout (Raw|ZSD) Frame TNRLO " << hex << trigger_nr_lo << " CRC " << hex << calc_crc());
   };
 };
 
@@ -307,9 +294,14 @@ public:
     set_crc(calc_crc());
   };
   unsigned int calc_crc(void) {
-//     unsigned int* d;
-    unsigned int c = 0;
-//     d = (unsigned int*)this;
+    unsigned int* d;
+    dhh_crc_32_type bocrc;
+    d = (unsigned int*)this;
+    for (unsigned int k = 0; k < (size() - 1) * 4; k++) {
+      bocrc.process_byte(((const unsigned char*)d)[(k ^ 1)]);
+    }
+    unsigned int c;
+    c = bocrc.checksum();
 
     return c;
   };
@@ -327,7 +319,7 @@ public:
   void print(void) {
     word0.print();
     if (verbose)
-      B2INFO(COL_GREEN << " DHH Ghost Frame TNRLO " << hex << trigger_nr_lo << " CRC " << hex << crc32 << hex << calc_crc() << COL_NORM);
+      B2INFO(" DHH Ghost Frame TNRLO " << hex << trigger_nr_lo << " CRC " << hex << crc32 << hex << calc_crc());
   };
 };
 
@@ -347,22 +339,20 @@ public:
     set_crc(calc_crc());
   };
   unsigned int calc_crc(void) {
-//     unsigned int* d;
-    unsigned int c = 0;
-//     d = (unsigned int*)this;
-
-    c = 0;
+    unsigned int* d;
+    dhh_crc_32_type bocrc;
+    d = (unsigned int*)this;
     for (unsigned int k = 0; k < (size() - 1) * 4; k++) {
-      c = xcrc32((k ^ 1) + /*(const unsigned char*)d*/, 1 , c);
-
+      bocrc.process_byte(((const unsigned char*)d)[(k ^ 1)]);
     }
-
+    unsigned int c;
+    c = bocrc.checksum();
     if (c == crc32) {
       if (verbose)
-        B2INFO(COL_GREEN " DHH End Frame CRC " << hex << c << " ==  " << hex << crc32 << COL_NORM);
+        B2INFO(" DHH End Frame CRC " << hex << c << " ==  " << hex << crc32);
     } else {
       crc_error++;
-      B2INFO(COL_RED " DHH End Frame CRC " << hex << c << " != " << hex << crc32 << COL_NORM);
+      B2INFO(" DHH End Frame CRC " << hex << c << " != " << hex << crc32);
       error_flag = true;
     }
     return c;
@@ -392,8 +382,8 @@ public:
   void print(void) {
     word0.print();
     if (verbose)
-      B2INFO(COL_GREEN << "DHH End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
-             << " CRC " << hex << crc32 << hex << calc_crc() << COL_NORM);
+      B2INFO("DHH End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
+             << " CRC " << hex << crc32 << hex << calc_crc());
   };
 };
 
@@ -436,16 +426,14 @@ public:
     return ((unsigned short*)data)[1];
   };
   unsigned int calc_crc(void) {
-    unsigned char* d;
-    unsigned int c = 0;
-    d = (unsigned char*)data;
-
-    c = 0;
-
-    for (int k = 0; k < length - 4; k++) {
-      c = xcrc32((k ^ 1) + (const unsigned char*)d, 1 , c);
-
+    unsigned int* d;
+    dhh_crc_32_type bocrc;
+    d = (unsigned int*)this;
+    for (unsigned int k = 0; k < (size() - 1) * 4; k++) {
+      bocrc.process_byte(((const unsigned char*)d)[(k ^ 1)]);
     }
+    unsigned int c;
+    c = bocrc.checksum();
 
     unsigned int crc32;
     if (pad != 0) {
@@ -456,13 +444,13 @@ public:
 
     if (c == crc32) {
       if (verbose)
-        B2INFO(COL_GREEN " DHH Data Frame CRC: " << hex << c << " == " << hex << crc32 << COL_NORM);
+        B2INFO(" DHH Data Frame CRC: " << hex << c << " == " << hex << crc32);
     } else {
       crc_error++;
       if (verbose) {
-        B2INFO(COL_RED " DHH Data Frame CRC: " << hex << c << hex << crc32 << hex << * (unsigned int*)(d + length - 8) << hex
+        B2INFO(" DHH Data Frame CRC: " << hex << c << hex << crc32 << hex << * (unsigned int*)(d + length - 8) << hex
                << * (unsigned int*)(d + length - 6) << hex << * (unsigned int*)(d + length - 4) << hex << * (unsigned int*)(d + length - 2) << hex
-               << * (unsigned int*)(d + length + 0) << hex << * (unsigned int*)(d + length + 2) << COL_NORM);
+               << * (unsigned int*)(d + length + 0) << hex << * (unsigned int*)(d + length + 2));
       };
       error_flag = true;
     }
@@ -499,13 +487,13 @@ public:
         s = ((dhh_end_event_frame*)data)->size();
         break;
       case DHH_FRAME_HEADER_DATA_TYPE_UNUSED:
-        B2INFO(COL_RED << " Error: type undefined " << COL_NORM);
+        B2INFO(" Error: type undefined ");
         s = 0;
         error_flag = true;
         break;
 
       default:
-        B2INFO(COL_RED << " Error: no data " << COL_NORM);
+        B2INFO(" Error: no data ");
         error_flag = true;
         s = 0;
         break;
@@ -515,7 +503,7 @@ public:
   };
 
   void write_pedestal(void) {
-    B2INFO(COL_GREEN << " Write Pedestal Date - done " << COL_NORM);
+    B2INFO(" Write Pedestal Date - done ");
 
   };
 
@@ -598,13 +586,9 @@ int PXDUnpackerModule::format_raw_from_dhp(void* dhp_in, int anzahl, void* raw_o
 
 
   int dhp_warning = 0;
-#define COL_READ "\e[47;00;34;1m"
-#define COL_RED "\e[40;00;31;1m"
-#define COL_NORM "\e[0m\n"
-
 
   if (dhp_pix[2] == dhp_pix[3]) {
-    B2INFO(COL_READ << " Warn: double $A000 detected ...could be error " << COL_NORM);
+    B2INFO(" Warn: double $A000 detected ...could be error ");
     dhp_warning++;
   }
 
@@ -613,7 +597,7 @@ int PXDUnpackerModule::format_raw_from_dhp(void* dhp_in, int anzahl, void* raw_o
     B2INFO(" DHP Frame Nr     |   " << hex << dhp_header_id_I << " ( " << hex << dhp_header_id_I << " ) ");
 
   if (dhp_pix[3] == dhp_pix[4]) {
-    B2INFO(COL_READ << " Warn: Could be double FrameNr " << COL_NORM);
+    B2INFO(" Warn: Could be double FrameNr ");
     dhp_warning++;
 
   } else {
@@ -634,7 +618,7 @@ int PXDUnpackerModule::format_raw_from_dhp(void* dhp_in, int anzahl, void* raw_o
           B2INFO(" SetRow: " << hex << dhp_row << " CM " << hex << dhp_cm);
       } else {
         if (!rowflag) {
-          B2INFO(COL_RED << " Error: Pix without Row!!! skip dhp data " << COL_NORM);
+          B2INFO(" Error: Pix without Row!!! skip dhp data ");
           return -2;
         } else {
           dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] >> 14) & 0x001);
@@ -722,13 +706,13 @@ void PXDUnpackerModule::event()
     if (verbose) {
       B2INFO(" PXD Unpacker --> Unpack Objects: " << i);
     };
-    unpack(storeRaws[i]);
+    unpack_event(storeRaws[i]);
 
   }
 
 }
 
-void PXDUnpackerModule::unpack(RawPXD* px)
+void PXDUnpackerModule::unpack_event(RawPXD* px)
 {
   int last_wie = 0, last_framenr = 0, last_start = 0, last_end = 0;
   unsigned int last_evtnr = 0;
@@ -792,12 +776,12 @@ void PXDUnpackerModule::unpack(RawPXD* px)
     if (lo & 0x3) {
       pad = 0xFF;
       if (verbose)
-        B2INFO(COL_YELLOW << " Data with not MOD 4 length " << " ( " << lo << pad << " ) " << COL_NORM);
+        B2INFO(" Data with not MOD 4 length " << " ( " << lo << pad << " ) ");
     } else {
       pad = 0;
     }
 
-    do_test(ll + (char*)buffer, lo, pad, last_framenr, last_wie, last_start, last_end, last_evtnr);
+    unpack_frame(ll + (char*)buffer, lo, pad, last_framenr, last_wie, last_start, last_end, last_evtnr);
     //printf("lo %d",lo);
     ll = Offset_Tabelle[j];      //ll becomes the value of the j offset
     if (Offset_Tabelle[j] == len) break;
@@ -835,18 +819,6 @@ void PXDUnpackerModule::fill_pixelmap(void* data, unsigned int len, unsigned int
                                dhh_ID, (d[i] >> 20) & 0xFFF, (d[i] >> 8) & 0xFFF, d[i] & 0xFF,
                                dhh_first_frame_id_lo, toffset
                              ));
-      int row, col;//, val;
-      if (commode) {
-        row = (d[i] >> 21) & 0x7FF;
-        col = (d[i] >> 10) & 0x7FF;
-        //val = d[i] & 0x3FF;
-      } else {
-        row = (d[i] >> 20) & 0xFFF;
-        col = (d[i] >> 8) & 0xFFF;
-//         val = d[i] & 0xFF;
-      }
-      if (row >= 0 && row < ROWS && col >= 0 && col < COLUMNS) {
-      }
     }
   } else if (cid < 0) {
     if (cid == -1) dhp_size_error++;
@@ -857,7 +829,7 @@ void PXDUnpackerModule::fill_pixelmap(void* data, unsigned int len, unsigned int
 unsigned int dhh_first_frame_id_lo = 0;
 unsigned int dhh_first_offset = 0;
 
-void PXDUnpackerModule::do_test(void* data, int len, int pad, int& last_framenr, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr)
+void PXDUnpackerModule::unpack_frame(void* data, int len, int pad, int& last_framenr, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr)
 {
   dhh_frame_header_word0* hw;
   error_flag = false;
@@ -870,7 +842,7 @@ void PXDUnpackerModule::do_test(void* data, int len, int pad, int& last_framenr,
   int s;
   s = dhh.size() * 4;
   if (len != s) if (verbose)
-      B2INFO(COL_YELLOW  << " Size (real) " << len << " != " << s << " (in data) " << pad << COL_NORM);
+      B2INFO(" Size (real) " << len << " != " << s << " (in data) " << pad);
 
   int le = 0, ls = last_start;
 
@@ -913,7 +885,7 @@ void PXDUnpackerModule::do_test(void* data, int len, int pad, int& last_framenr,
       if (last_end == 0) {
         end_error++;
         if (verbose) {
-          B2INFO(COL_RED << " Error: Start without End " << COL_NORM);
+          B2INFO(" Error: Start without End ");
         };
         error_flag = true;
       }
@@ -924,7 +896,7 @@ void PXDUnpackerModule::do_test(void* data, int len, int pad, int& last_framenr,
       if ((evtnr & 0x7FFF) != ((last_evtnr + 1) & 0x7FFF)) {
         evt_skip_error++;
         if (verbose) {
-          B2INFO(COL_RED << " Event skipped: " << evtnr << " != " << last_evtnr << " + 1 " << COL_NORM);
+          B2INFO(" Event skipped: " << evtnr << " != " << last_evtnr << " + 1 ");
         };
         error_flag = true;
       }
@@ -947,7 +919,7 @@ void PXDUnpackerModule::do_test(void* data, int len, int pad, int& last_framenr,
       le = 1;
       stat_end++;
       if (last_start == 0) {
-        B2INFO(COL_RED << " Error: End without Start " << COL_NORM);
+        B2INFO(" Error: End without Start ");
         start_error++;
         error_flag = true;
       }
@@ -959,23 +931,23 @@ void PXDUnpackerModule::do_test(void* data, int len, int pad, int& last_framenr,
       };
       if (last_wie != w) {
         if (verbose) {
-          B2INFO(COL_MAGENTA << " Error: WIE " << hex << last_wie << " vs END " << hex << w << " pad " << hex << pad << COL_NORM);
+          B2INFO(" Error: WIE " << hex << last_wie << " vs END " << hex << w << " pad " << hex << pad);
         };
         error_flag = true;
         wie_error++;
       } else {
         if (verbose)
-          B2INFO(COL_GREEN << " EVT END: WIE " << hex << last_wie << " == END " << hex << w << " pad " << hex << pad << COL_NORM);
+          B2INFO(" EVT END: WIE " << hex << last_wie << " == END " << hex << w << " pad " << hex << pad);
       }
       break;
     case DHH_FRAME_HEADER_DATA_TYPE_UNUSED:
-      B2INFO(COL_RED << " Error: type undefined " << COL_NORM);
+      B2INFO(" Error: type undefined ");
       type_error++;
       hw->print();
       error_flag = true;
       break;
     default:
-      B2INFO(COL_RED << " Error: no data " << COL_NORM);
+      B2INFO(" Error: no data ");
       type_error++;
       hw->print();
       error_flag = true;
@@ -983,12 +955,12 @@ void PXDUnpackerModule::do_test(void* data, int len, int pad, int& last_framenr,
   }
 
   if (evtnr != last_evtnr) {
-    B2INFO(COL_RED << " Error: Event Nr " << evtnr << " != " << last_evtnr << COL_NORM);
+    B2INFO(" Error: Event Nr " << evtnr << " != " << last_evtnr);
     evtnr_error++;
     error_flag = true;
   }
   if (lfnr != ((last_framenr + 1) & 0xF)) {
-    B2INFO(COL_RED << " Error: Frame Nr " << lfnr << " != " << last_framenr << " + 1 " << COL_NORM);
+    B2INFO(" Error: Frame Nr " << lfnr << " != " << last_framenr << " + 1 ");
     fnr_error++;
     error_flag = true;
   }

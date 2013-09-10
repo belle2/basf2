@@ -26,9 +26,11 @@ namespace Belle2 {
 
   class MCParticle;
 
-  /** The SmearPrimaryVertex module.
-   * Prints the content of the MCParticle collection
-   * as tree using the B2INFO message to the logging system.
+  /**
+   * The SmearPrimaryVertex module moves the Primary Vertex (e+e- collision point) to
+   * to a new point defined by user. In addition smearing is applied randomly on event
+   * by event basis. Module loops over all MCParticles and shiftes their decay and
+   * production vertices.
    */
   class SmearPrimaryVertexModule : public Module {
 
@@ -57,44 +59,51 @@ namespace Belle2 {
     // Module parameters for the user interface
 
     // new nominal interaction point (cm)
-    double m_new_ip_x, m_new_ip_y, m_new_ip_z;
+    double m_new_ip_x; /**< New nominal position of Primary Vertex in x (cm) */
+    double m_new_ip_y; /**< New nominal position of Primary Vertex in y (cm) */
+    double m_new_ip_z; /**< New nominal position of Primary Vertex in z (cm) */
 
     // new spread (standard deviation) for interaction point (cm)
-    double m_sigma_ip_x, m_sigma_ip_y, m_sigma_ip_z;
+    double m_sigma_ip_x; /**< Spread (standard deviation) of Primary Vertex in x (cm) */
+    double m_sigma_ip_y; /**< Spread (standard deviation) of Primary Vertex in y (cm) */
+    double m_sigma_ip_z; /**< Spread (standard deviation) of Primary Vertex in z (cm) */
 
     // new angle of beam profile (rad)
-    double m_new_angle_ip_xy;
-    double m_new_angle_ip_yz;
-    double m_new_angle_ip_zx;
+    double m_new_angle_ip_xy; /**< Angle of rotation of Primary Vertex Profile wrt. z-axis (in xy-plane) in (rad) */
+    double m_new_angle_ip_yz; /**< Angle of rotation of Primary Vertex Profile wrt. x-axis (in yz-plane) in (rad) */
+    double m_new_angle_ip_zx; /**< Angle of rotation of Primary Vertex Profile wrt. y-axis (in zx-plane) in (rad) */
 
     // new nominal ip point and sigma (cm)
-    TVector3 m_new_nominal_ip;
-    TVector3 m_sigma_ip;
-    TVector3 m_new_angle_ip;
+    TVector3 m_new_nominal_ip; /**< New nominal position of Primary Vertex in (cm) */
+    TVector3 m_sigma_ip;       /**< Spread (standard deviation) of Primary Vertex in (cm) */
+    TVector3 m_new_angle_ip;   /**< Angle of rotation of Primary Vertex Profile */
 
     // new and old ip (smeared) (cm)
-    TVector3 old_ip, m_new_ip;
+    TVector3 old_ip;    /**< Old Primary Vertex position (before smearing) */
+    TVector3 m_new_ip;  /**< New Primery Vertex position (after smearing) */
 
-    // time difference
-    double difft;
-
-    // returns new vertex positions
+    /**
+     * Returns the shifted vertex given as an input.
+     * @param oldVertex to be shifted
+     * @return shifted vertex (given by  oldVertex + (newIP - oldIP))
+     */
     TVector3 getShiftedVertex(TVector3 oldVertex);
 
-    // sets new PV
+
+    /**
+     * Determines the new Primary Vertex for this event from the primary vertex specified by the user and
+     * random shift given by the user specified spread.
+     */
     void setNewPrimaryVertex(void);
+
+    /**
+     * Old primary vertex is taken to be the production vertex of the first MCParticle in the MCParticles array.
+     */
     void setOldPrimaryVertex(void);
 
     std::string m_particleList; /**< The name of the MCParticle collection. */
 
     bool m_useDB; /**< Use values from the Database. */
-
-
-    // TODO: delete!
-    TFile* m_rootFile;
-    TTree* m_tree;
-    double m_o_vx, m_o_vy, m_o_vz;
-    double m_n_vx, m_n_vy, m_n_vz;
   };
 
 } // end namespace Belle2

@@ -52,7 +52,7 @@
       <AngleY unit="deg">0.0</AngleY>
       <AngleZ unit="deg">0.0</AngleZ>
       <px unit="cm">25.0</px>
-      <py unit="cm">105.0</py>
+      <py unit="cm">100.0</py>
       <pz unit="cm">300.0</pz>
    </Active>
 
@@ -65,7 +65,7 @@
       <AngleY unit="deg">0.0</AngleY>
       <AngleZ unit="deg">0.0</AngleZ>
       <px unit="cm">25.0</px>
-      <py unit="cm">105.0</py>
+      <py unit="cm">100.0</py>
       <pz unit="cm">300.0</pz>
    </Active>
     

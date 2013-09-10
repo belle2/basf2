@@ -32,9 +32,6 @@ namespace Belle2 {
     //! Constructor from a vector of BKLMDigits
     BKLMHit1d(const std::vector<Belle2::BKLMDigit*>&);
 
-    //! Constructor from a real RPC hit *DIVOT* not ready
-    BKLMHit1d(int);
-
     //! Copy constructor
     BKLMHit1d(const BKLMHit1d&);
 

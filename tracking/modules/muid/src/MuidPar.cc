@@ -43,51 +43,58 @@ namespace Belle2 {
 
   void MuidPar::fillPDFs(int expNo, const char hypothesisName[])
   {
-    char name[128];
-    sprintf(name, "/Detector/Tracking/MuidParameters/Content/Experiment[@id=\"%d\"]/%sPDFs/", expNo, hypothesisName);
-    GearDir content(name);
+    char line[128];
+    sprintf(line, "/Detector/Tracking/MuidParameters/Experiment[@exp=\"%d\"]/%s/", expNo, hypothesisName);
+    GearDir content(line);
     if (!content) {
-      B2ERROR("muid::MuidPar::fillPDFs(): required XML content " << name << " not found")
-      return;
-    }
-    string pathname = FileSystem::findFile("/data/" + content.getString("Filename"));
-    if (!FileSystem::fileExists(pathname)) {
-      B2ERROR("muid::MuidPar::fillPDFs(): pathname " << pathname << " does not exist")
-      return;
+      B2ERROR("muid:MuidPar::fillPDFs(): required XML content MuidParameters not found")
     }
 
-    try {
-      std::ifstream pdfStream;
-      pdfStream.open(pathname.c_str());
-      pdfStream.get(name, 80, '\n');
-      B2INFO("muid::MuidPar::fillPDFs():  reading " << hypothesisName << " PDFs from " << pathname.c_str() << "  (identifier = " << name << ")")
-      for (int k = 0; k < 4; k++) {
-        for (int j = 0; j < 15; j++) {
-          for (int i = 0; i < MUID_MaxRange; i++) {
-            pdfStream >> m_RangePDF[k][j][i];
+    m_IsValid = true;
+    for (int outcome = 1; outcome <= 4; ++outcome) {
+      sprintf(line, "/Outcome[@outcome=\"%d\"]", outcome);
+      GearDir outcomeContent(content);
+      outcomeContent.append(line);
+      for (int layer = 1; layer <= 15; ++layer) {
+        sprintf(line, "LongitudinalPDF/LastLayer[@layer=\"%d\"]", layer);
+        std::vector<double> rangePDF = outcomeContent.getArray(line);
+        if (rangePDF.size() != MUID_MaxRange) {
+          B2ERROR("muid::MuidPar::fillPDFs(): LongitudinalPDF vector for hypothesis " << hypothesisName << "  outcome " << outcome
+                  << " layer=" << layer << " has " << rangePDF.size() << " entries; should be " << MUID_MaxRange)
+          m_IsValid = false;
+        } else {
+          for (int i = 0; i < MUID_MaxRange; ++i) {
+            m_RangePDF[outcome - 1][layer - 1][i] = rangePDF[i];
           }
         }
       }
-      double dx = MUID_ReducedChiSquaredLimit / MUID_MaxReducedChiSquared;                   // bin size
-      for (int k = 0; k < 4; k++) {
-        for (int i = 0; i < MUID_MaxReducedChiSquared; i++) {
-          pdfStream >> m_ReducedChiSquaredPDF[k][i];
+      double dx = MUID_ReducedChiSquaredLimit / MUID_MaxReducedChiSquared;   // bin size
+      std::vector<double> reducedChiSquaredPDF = outcomeContent.getArray("TransversePDF");
+      if (reducedChiSquaredPDF.size() != MUID_MaxReducedChiSquared) {
+        B2ERROR("muid::MuidPar::fillPDFs(): TransversePDF vector for hypothesis " << hypothesisName << "  outcome " << outcome
+                << " has " << reducedChiSquaredPDF.size() << " entries; should be " << MUID_MaxReducedChiSquared)
+        m_IsValid = false;
+      } else {
+        for (int i = 0; i < MUID_MaxReducedChiSquared; ++i) {
+          m_ReducedChiSquaredPDF[outcome - 1][i] = reducedChiSquaredPDF[i];
         }
-        spline(MUID_MaxReducedChiSquared, dx, &m_ReducedChiSquaredPDF[k][0], &m_ReducedChiSquaredD1[k][0],
-               &m_ReducedChiSquaredD2[k][0], &m_ReducedChiSquaredD3[k][0]);
+        spline(MUID_MaxReducedChiSquared, dx, &m_ReducedChiSquaredPDF[outcome - 1][0], &m_ReducedChiSquaredD1[outcome - 1][0],
+               &m_ReducedChiSquaredD2[outcome - 1][0], &m_ReducedChiSquaredD3[outcome - 1][0]);
       }
-      for (int k = 0; k < 4; k++) {
-        for (int j = 0; j < 15; j++) {
-          pdfStream >> m_ReducedChiSquaredNorm[k][j];
+      std::vector<double> reducedChiSquaredPDFNorm = outcomeContent.getArray("TransversePDFNormalization");
+      if (reducedChiSquaredPDFNorm.size() != 15) {
+        B2ERROR("muid::MuidPar::fillPDFs(): TransversePDFNormaliztion vector for hypothesis " << hypothesisName << "  outcome " << outcome
+                << " has " << reducedChiSquaredPDFNorm.size() << " entries; should be " << 15)
+        m_IsValid = false;
+      } else {
+        for (int layer = 1; layer <= 15; ++layer) {
+          m_ReducedChiSquaredNorm[outcome - 1][layer - 1] = reducedChiSquaredPDFNorm[layer - 1];
         }
       }
-      pdfStream.close();
-    } catch (exception& e) {
-      B2ERROR("muid::MuidPar::fillPDFs():  exception " << e.what() << " occurred while reading PDFs from " << pathname.c_str())
-      return;
     }
-    m_IsValid = true;
-
+    if (!m_IsValid) {
+      B2FATAL("muid::MuidPar::fillPDFs():  failed to read PDFs")
+    }
   }
 
   void MuidPar::spline(int n, double dx, double Y[], double B[], double C[], double D[])

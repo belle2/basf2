@@ -10,12 +10,13 @@
 
 #include <tracking/modules/muid/MuidModule.h>
 #include <tracking/modules/muid/MuidPar.h>
-#include <tracking/dataobjects/ExtHit.h>
+#include <tracking/dataobjects/MuidLikelihood.h>
 #include <tracking/dataobjects/Muid.h>
 #include <tracking/dataobjects/MuidHit.h>
-#include <bklm/dataobjects/BKLMDigit.h>
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
+#include <tracking/dataobjects/Track.h>
+#include <tracking/dataobjects/TrackFitResult.h>
 #include <simulation/kernel/DetectorConstruction.h>
 #include <simulation/kernel/MagneticField.h>
 #include <simulation/kernel/ExtManager.h>
@@ -62,6 +63,7 @@
 #include <G4ErrorFreeTrajState.hh>
 #include <G4StateManager.hh>
 #include <G4TransportationManager.hh>
+#include <G4VPhysicalVolume.hh>
 #include <G4FieldManager.hh>
 
 using namespace std;
@@ -79,13 +81,14 @@ using namespace Belle2;
 
 REG_MODULE(Muid)
 
-MuidModule::MuidModule() : Module(), m_extMgr(NULL)    // no MuidManager yet
+MuidModule::MuidModule() : Module(), m_extMgr(NULL)    // no ExtManager yet
 {
   m_pdgCode.clear();
   setDescription("Identifies muons by extrapolating tracks from CDC to KLM using geant4e");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("pdgCodes", m_pdgCode, "Positive-charge PDG codes for extrapolation hypotheses", m_pdgCode);
-  addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the reconstructed tracks", string(""));
+  addParam("TracksColName", m_tracksColName, "Name of collection holding the reconstructed tracks", string(""));
+  addParam("MuidLikelihoodsColName", m_muidLikelihoodsColName, "Name of collection holding the muon identification likelihood information from the extrapolation", string(""));
   addParam("MuidsColName", m_muidsColName, "Name of collection holding the muon identification information from the extrapolation", string(""));
   addParam("MuidHitsColName", m_muidHitsColName, "Name of collection holding the muidHits from the extrapolation", string(""));
   addParam("MinPt", m_minPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", double(0.1));
@@ -129,7 +132,7 @@ void MuidModule::initialize()
     fieldManager->CreateChordFinder(magneticField);
     m_extMgr->InitGeant4e();
   } else {
-    // ext will coexist with simulation
+    // muid will coexist with simulation
     m_runMgr = G4RunManager::GetRunManager();
     m_trk    = const_cast<G4UserTrackingAction*>(m_runMgr->GetUserTrackingAction());
     m_stp    = const_cast<G4UserSteppingAction*>(m_runMgr->GetUserSteppingAction());
@@ -137,112 +140,109 @@ void MuidModule::initialize()
     G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
   }
 
-  // Redefine ext's step length, magnetic field step limitation (fraction of local curvature radius),
+  // Redefine muid's step length, magnetic field step limitation (fraction of local curvature radius),
   // and kinetic energy loss limitation (maximum fractional energy loss) by communicating with
   // the geant4 UI.  (Commands were defined in ExtMessenger when physics list was set up.)
-  G4double maxStep = min(10.0, m_maxStep) * cm;
-  if (maxStep > 0.0) {
-    char stepSize[80];
-    sprintf(stepSize, "/geant4e/limits/stepLength %8.2f mm", maxStep);
-    G4UImanager::GetUIpointer()->ApplyCommand(stepSize);
-  }
+  G4double maxStep = ((m_maxStep == 0.0) ? 10.0 : std::min(10.0, m_maxStep)) * cm;
+  char stepSize[80];
+  std::sprintf(stepSize, "/geant4e/limits/stepLength %8.2f mm", maxStep);
+  G4UImanager::GetUIpointer()->ApplyCommand(stepSize);
   G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/magField 0.001");
   G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/energyLoss 0.05");
 
-  GearDir eklmContent = GearDir("Detector/DetectorComponent[@name=\"EKLM\"]/Content/");
-  double eklmLength = eklmContent.getLength("Length") * cm;
-  GearDir bklmContent = GearDir("Detector/DetectorComponent[@name=\"BKLM\"]/Content/");
-  double bklmHalfLength = bklmContent.getLength("HalfLength") * cm;
-  double offsetZ = bklmContent.getLength("OffsetZ") * cm;
-  double minZ = offsetZ - (bklmHalfLength + eklmLength);
-  double maxZ = offsetZ + (bklmHalfLength + eklmLength);
-  double outerRadius = bklmContent.getLength("OuterRadius") * cm;
-  double nSector = bklmContent.getNumberNodes("Sectors/Forward/Sector");
-  double rMax = outerRadius / cos(M_PI / nSector);
-  std::cout << "MUID initialize: eklmLength=" << eklmLength << "  bklmHalfLength=" << bklmHalfLength << "  offsetZ=" << offsetZ << "  minZ=" << minZ << "  maxZ=" << maxZ << "  outerRadius=" << outerRadius << "  nSector=" << nSector << "  rMax=" << rMax << std::endl;
-  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(new Simulation::ExtCylSurfaceTarget(rMax, minZ, maxZ));
-  m_OffsetZ = bklmContent.getLength("OffsetZ");
-  m_EndcapMaxR = eklmContent.getLength("EndCap/OuterR"); // 290.0 cm --> 332.0 cm
-  m_EndcapMinR = eklmContent.getLength("EndCap/InnerR"); // 125.0 cm --> 130.5 cm
-  m_BarrelMinR = bklmContent.getLength("Layers/InnerRadius"); // 202.0 cm --> 201.9 cm ok
-  m_EndcapHalfLength = eklmContent.getLength("EndCap/Length") * 0.5; // 69.5 cm --> 66.05 cm ok
-  m_BarrelHalfLength = bklmContent.getLength("Layers/GapLength");  // 222.0 cm ok
-  m_EndcapLayers = eklmContent.getInt("EndCap/nLayer"); // 14 ok
-  m_BarrelLayers = bklmContent.getNumberNodes("Layers/Layer"); // 15 ok
-  m_EndcapMiddleZ = eklmContent.getLength("HalfLength") + m_EndcapHalfLength; // 291.5 cm --> 296.05 cm ok
-  m_StripPositionError = 4.0; // 4.0 cm DIVOT should this be 4/sqrt{12}?
-  m_DefaultError = 15.0; // 15.0 cm DIVOT
-  m_maxDistCM = 25.0; // max distance between KLM hit and extrapolation crossing
-  m_maxDistSIGMA = 5.0; // ditto (in sigmas)
-  m_StripWidth = 4.0; // cm  *DIVOT*
-  m_StripPositionVariance = m_StripWidth * m_StripWidth / 12.0; // cm
-  m_ScintWidth = 4.0; // cm  *DIVOT*
-  m_ScintPositionVariance = m_ScintWidth * m_ScintWidth / 12.0; // cm
+  GearDir bklmContent = GearDir("/Detector/DetectorComponent[@name=\"BKLM\"]/Content/");
+  GearDir eklmContent = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/");
+  m_BarrelHalfLength = bklmContent.getLength("HalfLength") * cm; // in G4 units (mm)
+  m_EndcapHalfLength = 0.5 * eklmContent.getLength("Endcap/Length") * cm; // in G4 units (mm)
+  m_OffsetZ = bklmContent.getLength("OffsetZ") * cm;
+  double minZ = m_OffsetZ - (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
+  double maxZ = m_OffsetZ + (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
+  double rMax = bklmContent.getLength("OuterRadius") * cm / cos(M_PI / bklmContent.getNumberNodes("Sectors/Forward/Sector"));
+  m_target = new Simulation::ExtCylSurfaceTarget(rMax, minZ, maxZ);
+  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_target);
+
+  m_BarrelHalfLength /= cm;  // in G4e units (cm)
+  m_EndcapHalfLength /= cm;  // in G4e units (cm)
+  m_OffsetZ /= cm;           // in G4e units (cm)
+  m_BarrelMinR = bklmContent.getLength("Layers/InnerRadius");  // in G4e units (cm)
+  m_EndcapMinR = eklmContent.getLength("Endcap/InnerR");       // in G4e units (cm) 125.0 cm --> 130.5 cm
+  m_EndcapMaxR = eklmContent.getLength("Endcap/OuterR");       // in G4e units (cm) 290.0 cm --> 332.0 cm
+  m_BarrelLayers = bklmContent.getNumberNodes("Layers/Layer");
+  m_EndcapLayers = eklmContent.getInt("Endcap/nLayer");
+  m_EndcapMiddleZ = m_BarrelHalfLength + m_EndcapHalfLength;   // in G4e units (cm)
+  m_StripPositionError = 8.0; // in G4e units (cm) DIVOT should this be 4/sqrt{12}?
+  m_DefaultError = 15.0;      // in G4e units (cm) DIVOT
+  m_maxDistCM = 25.0;         // in G4e units (cm) max distance between KLM hit and extrapolation crossing
+  m_maxDistSIGMA = 5.0;       // ditto (in sigmas)
+  m_StripWidth = 4.0;         // in G4e units (cm)  *DIVOT*
+  m_StripPositionVariance = m_StripWidth * m_StripWidth / 12.0; // in G4e units (cm)
+  m_ScintWidth = 4.0; // in G4e units (cm)  *DIVOT*
+  m_ScintPositionVariance = m_ScintWidth * m_ScintWidth / 12.0; // in G4e units (cm)
 
   // KLM geometry (for associating KLM hit with extrapolated crossing point) (cm)
 
-  m_BarrelActiveMinZ = bklmContent.getLength("Module/ElectrodeBorder");
+  m_BarrelActiveMinZ = bklmContent.getLength("Module/ElectrodeBorder");  // in G4e units (cm)
   m_BarrelActiveMaxZ = bklmContent.getLength("Layers/Layer[@layer=\"1\"]/PhiStrips/Length")
-                       + m_BarrelActiveMinZ; // was 216.9+2.78 cm --> 216.9+1.0 cm
+                       + m_BarrelActiveMinZ; // in G4e units (cm) was 216.9+2.78 cm --> 216.9+1.0 cm
   for (int layer = 1; layer <= m_BarrelLayers; ++layer) {
-    m_BarrelModuleMiddleRadius[layer] = bklm::GeometryPar::instance()->getModuleMiddleRadius(layer); // cm
+    m_BarrelModuleMiddleRadius[layer - 1] = bklm::GeometryPar::instance()->getModuleMiddleRadius(layer); // in G4e units (cm)
   }
-  double dz(eklmContent.getLength("EndCap/ShiftZ"));
-  double z0(eklmContent.getLength("EndCap/PositionZ") - m_OffsetZ + dz - eklmContent.getLength("EndCap/Length") * 0.5);
+  double dz(eklmContent.getLength("Endcap/Layer/ShiftZ")); // in G4e units (cm)
+  double z0(eklmContent.getLength("Endcap/PositionZ") - m_OffsetZ + dz - 0.5 * eklmContent.getLength("Endcap/Layer/Length")); // in G4e units (cm)
   for (int layer = 1; layer <= m_EndcapLayers; ++layer) {
-    m_EndcapModuleMiddleZ[layer] = z0 + dz * (layer - 1);
+    m_EndcapModuleMiddleZ[layer - 1] = z0 + dz * (layer - 1);  // in G4e units (cm)
   }
-  m_EndcapActiveMinR = eklmContent.getLength("Plane/InnerR"); // 133.5 cm --> 132.5 cm
-  m_EndcapActiveMaxR = eklmContent.getLength("Plane/OuterR"); // 315.9 cm --> 329.0 cm
+  m_EndcapActiveMinR = eklmContent.getLength("Endcap/Layer/Sector/Plane/InnerR");  // in G4e units (cm)
+  m_EndcapActiveMaxR = eklmContent.getLength("Endcap/Layer/Sector/Plane/OuterR");  // in G4e units (cm)
   for (int sector = 1; sector <= 8; ++sector) {
     double phi = M_PI_4 * (sector - 1);
-    m_BarrelSectorPerp[sector].SetX(cos(phi));
-    m_BarrelSectorPerp[sector].SetY(sin(phi));
-    m_BarrelSectorPerp[sector].SetZ(0.0);
-    m_BarrelSectorPhi[sector].SetX(-sin(phi));
-    m_BarrelSectorPhi[sector].SetY(cos(phi));
-    m_BarrelSectorPhi[sector].SetZ(0.0);
+    m_BarrelSectorPerp[sector - 1].SetX(cos(phi));
+    m_BarrelSectorPerp[sector - 1].SetY(sin(phi));
+    m_BarrelSectorPerp[sector - 1].SetZ(0.0);
+    m_BarrelSectorPhi[sector - 1].SetX(-sin(phi));
+    m_BarrelSectorPhi[sector - 1].SetY(cos(phi));
+    m_BarrelSectorPhi[sector - 1].SetZ(0.0);
   }
 
-  // Default hypothesis for extrapolation
-  if (m_pdgCode.size() == 0) {
-    m_pdgCode.push_back(G4ParticleTable::GetParticleTable()->FindParticle("mu+")->GetPDGEncoding());
-  }
-  // check that the (user-)defined PDG codes for the extrapolation hypotheses are legal
-  for (unsigned int hypothesis = 0; hypothesis < m_pdgCode.size(); ++hypothesis) {
-    G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(m_pdgCode[hypothesis]);
-    if (particle->GetPDGCharge() == 0) {
-      B2FATAL("Module muid initialize(): Particle " << particle->GetParticleName() << " is neutral. Only charged particles can be extrapolated")
+  // Hypotheses for extrapolation (default is muon only)
+  if (m_pdgCode.empty()) {
+    m_chargedStable.push_back(Const::muon);
+  } else { // user defined
+    std::vector<Const::ChargedStable> stack;
+    stack.push_back(Const::pion);
+    stack.push_back(Const::electron);
+    stack.push_back(Const::muon);
+    stack.push_back(Const::kaon);
+    stack.push_back(Const::proton);
+    for (unsigned i = 0; i < m_pdgCode.size(); ++i) {
+      for (unsigned k = 0; k < stack.size(); ++k) {
+        if (abs(m_pdgCode[i]) == stack[k].getPDGCode()) {
+          m_chargedStable.push_back(stack[k]);
+          stack.erase(stack.begin() + k);
+          --k;
+        }
+      }
     }
-    if (particle->GetPDGCharge() < 0) {
-      m_pdgCode[hypothesis] = -m_pdgCode[hypothesis];
-      particle = G4ParticleTable::GetParticleTable()->FindParticle(m_pdgCode[hypothesis]);
+    if (m_chargedStable.empty()) B2ERROR("Module muid initialize(): no valid PDG codes for extrapolation")
     }
-    string g4eName = "g4e_" + particle->GetParticleName();
-    G4ParticleDefinition* g4eParticle = G4ParticleTable::GetParticleTable()->FindParticle(g4eName);
-    if (g4eParticle == NULL) {
-      B2FATAL("Module muid initialize(): Particle " << g4eName << " is not defined in G4ParticleTable")
-    }
-    if (G4ParticleTable::GetParticleTable()->FindAntiParticle(g4eName) == NULL) {
-      B2FATAL("Module muid initialize(): Antiparticle of " << g4eName << " is not defined in G4ParticleTable")
-    }
-    B2INFO("Module muid initialize(): hypotheses for " << particle->GetParticleName() << " and its antiparticle will be extrapolated")
+
+  for (unsigned i = 0; i < m_chargedStable.size(); ++i) {
+    B2INFO("Module muid initialize(): hypothesis for PDG code "
+           << m_chargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated")
   }
 
   int expNo = 0;  // DIVOT
-  m_muonPar = new MuidPar(expNo, "muon");
-  m_pionPar = new MuidPar(expNo, "pion");
-  m_kaonPar = new MuidPar(expNo, "kaon");
+  m_muonPar = new MuidPar(expNo, "Muon");
+  m_pionPar = new MuidPar(expNo, "Pion");
+  m_kaonPar = new MuidPar(expNo, "Kaon");
 
-  StoreArray<GFTrack> gfTracks(m_gfTracksColName);
-  StoreArray<Muid> muids(m_muidsColName);
-  RelationArray gfTrackToMuid(gfTracks, muids);
-  StoreArray<MuidHit> muidHits(m_muidHitsColName);
-  RelationArray gfTrackToMuidHits(gfTracks, muidHits);
+  // Register output and relation arrays' persistence
+  StoreArray<MuidLikelihood>::registerPersistent();
   StoreArray<Muid>::registerPersistent();
   StoreArray<MuidHit>::registerPersistent();
-  RelationArray::registerPersistent<GFTrack, Muid>();
-  RelationArray::registerPersistent<GFTrack, MuidHit>();
+  RelationArray::registerPersistent<Track, MuidLikelihood>();
+  RelationArray::registerPersistent<Track, Muid>();
+  RelationArray::registerPersistent<Track, MuidHit>();
 
   return;
 
@@ -262,37 +262,51 @@ void MuidModule::event()
   }
 
   // Loop over the reconstructed tracks.
-  // Do extrapolation for each hypotheses (pion, electron, muon, kaon, proton)
-  // of each reconstructed track.
-  // Pion hypothesis:  extrapolate until calorimeter exit
-  // Other hypotheses: extrapolate up to but not including calorimeter
+  // Do extrapolation for each hypotheses of each reconstructed track.
 
   StoreArray<BKLMHit2d> bklmHits(m_bklmHitsColName);
   StoreArray<EKLMHit2d> eklmHits(m_eklmHitsColName);
-  StoreArray<GFTrack> gfTracks(m_gfTracksColName);
+  StoreArray<Track> tracks(m_tracksColName);
+  StoreArray<MuidLikelihood> muidLikelihoods(m_muidLikelihoodsColName);
   StoreArray<Muid> muids(m_muidsColName);
-  RelationArray gfTrackToMuid(gfTracks, muids);
   StoreArray<MuidHit> muidHits(m_muidHitsColName);
-  RelationArray gfTrackToMuidHits(gfTracks, muidHits);
-  muids.getPtr()->Clear();
-  muidHits.getPtr()->Clear();
+  RelationArray trackToMuidLikelihood(tracks, muidLikelihoods);
+  RelationArray trackToMuid(tracks, muids);
+  RelationArray trackToMuidHits(tracks, muidHits);
 
   G4ThreeVector position;
   G4ThreeVector momentum;
   G4ErrorTrajErr covG4e(5, 0);
 
-  int nTracks = gfTracks.getEntries();
-  for (int t = 0; t < nTracks; ++t) {
+  for (int t = 0; t < tracks.getEntries(); ++t) {
 
-    int charge = int(gfTracks[t]->getCardinalRep()->getCharge());
+    for (unsigned int hypothesis = 0; hypothesis < m_chargedStable.size(); ++hypothesis) {
 
-    for (unsigned int hypothesis = 0; hypothesis < m_pdgCode.size(); hypothesis++) {
+      Const::ChargedStable chargedStable = m_chargedStable[hypothesis];
 
-      int pdgCode = m_pdgCode[hypothesis] * charge;
+      const TrackFitResult* trackFit = tracks[t]->getTrackFitResult(chargedStable);
+      if (!trackFit) {
+        B2ERROR("Muid::event(): no valid TrackFitResult for PDGcode " <<
+                chargedStable.getPDGCode() << ": extrapolation not possible")
+        continue;
+      }
+
+      const GFTrack* gfTrack = DataStore::getRelated<GFTrack>(trackFit);
+      if (!gfTrack) {
+        B2ERROR("Muid::event(): no relation of TrackFitResult with GFTrack for PDGcode " <<
+                chargedStable.getPDGCode() << ": extrapolation not possible")
+        continue;
+      }
+
+      int charge = int(gfTrack->getCardinalRep()->getCharge());
+      int pdgCode = chargedStable.getPDGCode() * charge;
+      if (chargedStable == Const::electron || chargedStable == Const::muon) pdgCode = -pdgCode;
+
       Muid* muid = new(muids.nextFreeAddress()) Muid(pdgCode);
-      gfTrackToMuid.add(t, muids.getEntries() - 1);
-      getStartPoint(gfTracks[t], pdgCode, position, momentum, covG4e);
-      if (gfTracks[t]->getMom().Pt() <= m_minPt) continue;
+      trackToMuid.add(t, muids.getEntries() - 1);
+
+      getStartPoint(gfTrack, pdgCode, position, momentum, covG4e);
+      if (gfTrack->getMom().Pt() <= m_minPt) continue;
       G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
       string g4eName = "g4e_" + particle->GetParticleName();
       double mass = particle->GetPDGMass();
@@ -309,7 +323,7 @@ void MuidModule::event()
         // Ignore the zero-length step by PropagateOneStep() at each boundary
         if (length > 0.0) {
           if (preStatus == fGeomBoundary) {      // first step in this volume?
-            if (createHit(state, t, pdgCode, muidHits, gfTrackToMuidHits, bklmHits, eklmHits)) {
+            if (createHit(state, t, pdgCode, muidHits, trackToMuidHits, bklmHits, eklmHits)) {
               break;
             }
           }
@@ -320,10 +334,7 @@ void MuidModule::event()
           break;
         }
         // Reached the target boundary?
-        if (G4ErrorPropagatorData::GetErrorPropagatorData()->GetState() == G4ErrorState(G4ErrorState_TargetCloserThanBoundary)) {
-          break;
-        }
-        if (m_extMgr->GetPropagator()->CheckIfLastStep(track)) {
+        if (m_target->GetDistanceFromPoint(track->GetPosition()) < 0.0) {
           break;
         }
 
@@ -334,6 +345,8 @@ void MuidModule::event()
       delete state;
 
       finishTrack(muid);
+      new(muidLikelihoods.nextFreeAddress()) MuidLikelihood(muid);
+      trackToMuidLikelihood.add(t, muidLikelihoods.getEntries() - 1);
 
     } // hypothesis loop
 
@@ -357,6 +370,7 @@ void MuidModule::terminate()
     m_runMgr->SetUserAction(m_trk);
     m_runMgr->SetUserAction(m_stp);
   }
+  delete m_target;
   delete m_enter;
   delete m_exit;
 
@@ -381,37 +395,19 @@ void MuidModule::registerVolumes()
        iVol != pvStore->end(); ++iVol) {
     const G4String name = (*iVol)->GetName();
     // see belle2/run/volname3.txt:
-    // Barrel KLM: BKLM.EnvelopePhysical and BKLM.Gas_*_*_**_*
-    if ((name == "BKLM.EnvelopePhysical") || (name.substr(0, 8) == "BKLM.Gas") || (name.substr(0, 8) == "BKLM.Sci")) {
-      m_enter->push_back(*iVol);
-      m_exit->push_back(*iVol);
+    // Barrel KLM: BKLM.EnvelopePhysical for envelope
+    //             BKLM.Layer**GasPhysical for RPCs or BKLM.Layer**ChimneyGasPhysical for RPCs
+    //             BKLM.ScintType*Physical for scintillator strips
+    if (name.substr(0, 5) == "BKLM.") {
+      if ((name == "BKLM.EnvelopePhysical") || (name.find("ScintType") != string::npos) ||
+          (name.find("GasPhysical") != string::npos)) {
+        m_enter->push_back(*iVol);
+        m_exit->push_back(*iVol);
+      }
     }
     // Endcap KLM: Endcap_{1,2} and
     // Sensitive_Strip_StripVolume_{1..75}_Plane_{1,2}_Sector_{1..4}_Layer_{1..14}_Endcap_{1,2}
-    if ((name == "Endcap_1") || (name == "Endcap_2") || (name.substr(0, 27) == "Sensitive_Strip_StripVolume")) {
-      m_enter->push_back(*iVol);
-      m_exit->push_back(*iVol);
-    }
-    // ECL
-    if (name == "physicalECL") {
-      m_enter->push_back(*iVol);
-      m_exit->push_back(*iVol);
-    }
-    // ECL crystal (=sensitive) has an automatically generated PV name
-    // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
-    // YYY is logicalEcl**Crystal, where **=Br, Fw, or Bw.
-    // XXX is 1..144 for Br, 1..16 for Fw, and 1..16 for Bw
-    // ZZZ is n_pv_m where n is 1..46 for Br, 1..72 for Fw, and 73..132 for Bw
-    // CopyNo() encodes XXX and n.
-    if (name.find("_logicalEclBrCrystal_") != string::npos) {
-      m_enter->push_back(*iVol);
-      m_exit->push_back(*iVol);
-    }
-    if (name.find("_logicalEclFwCrystal_") != string::npos) {
-      m_enter->push_back(*iVol);
-      m_exit->push_back(*iVol);
-    }
-    if (name.find("_logicalEclBwCrystal_") != string::npos) {
+    if ((name.substr(0, 7) == "Endcap_") || (name.substr(0, 27) == "Sensitive_Strip_StripVolume")) {
       m_enter->push_back(*iVol);
       m_exit->push_back(*iVol);
     }
@@ -425,32 +421,28 @@ void MuidModule::getVolumeID(const G4TouchableHandle& touch, ExtDetectorID& detI
 
   // default values
   detID = EXT_UNKNOWN;
-  copyID = 0;
+  copyID = -1;
 
   G4String name = touch->GetVolume(0)->GetName();
-  if (name.find("CDC") != string::npos) {
-    detID = EXT_CDC;
-    copyID = touch->GetCopyNumber(0);
-  }
   // Barrel KLM: BKLM.EnvelopePhysical for envelope
-  //             BKLM.Layer**GasPhysical for RPCs
+  //             BKLM.Layer**GasPhysical or BKLM.Layer**ChimneyGasPhysical for RPCs
   //             BKLM.ScintType*Physical for scintillator strips
   if (name == "BKLM.EnvelopePhysical") {
     detID = EXT_BKLM;
-  }
-  if ((name.substr(0, 10) == "BKLM.Layer") && (name.substr(12, 3) == "Gas")) {
-    detID = EXT_BKLM;
-    int end = touch->GetCopyNumber(7);
-    int sector = touch->GetCopyNumber(6);
-    int layer = touch->GetCopyNumber(4);
-    int plane = touch->GetCopyNumber(0);
-    copyID = ((end - 1) << 14)
-             + ((sector - 1) << 11)
-             + ((layer - 1) << 7)
-             + ((plane - 1) << 6)
-             + 1;
-  }
-  if (name.substr(0, 14) == "BKLM.ScintType") {
+  } else if (name.substr(0, 10) == "BKLM.Layer") {
+    if (name.find("GasPhysical") != string::npos) {
+      detID = EXT_BKLM;
+      int end = touch->GetCopyNumber(7);
+      int sector = touch->GetCopyNumber(6);
+      int layer = touch->GetCopyNumber(4);
+      int plane = touch->GetCopyNumber(0);
+      copyID = ((end - 1) << 14)
+               + ((sector - 1) << 11)
+               + ((layer - 1) << 7)
+               + ((plane - 1) << 6)
+               + 0;
+    }
+  } else if (name.substr(0, 14) == "BKLM.ScintType") {
     detID = EXT_BKLM;
     int end = touch->GetCopyNumber(8);
     int sector = touch->GetCopyNumber(7);
@@ -468,8 +460,7 @@ void MuidModule::getVolumeID(const G4TouchableHandle& touch, ExtDetectorID& detI
   // Sensitive_Strip_StripVolume_{1..75}_Plane_{1,2}_Sector_{1..4}_Layer_{1..14}_Endcap_{1,2}
   if ((name == "Endcap_1") || (name == "Endcap_2")) {
     detID = EXT_EKLM;
-  }
-  if (name.substr(0, 27) == "Sensitive_Strip_StripVolume") {
+  } else if (name.substr(0, 27) == "Sensitive_Strip_StripVolume") {
     detID = EXT_EKLM;
     int end = touch->GetCopyNumber(6);
     int sector = touch->GetCopyNumber(4);
@@ -481,22 +472,6 @@ void MuidModule::getVolumeID(const G4TouchableHandle& touch, ExtDetectorID& detI
              + ((layer - 1) << 7)
              + ((plane - 1) << 6)
              + scint;
-  }
-  // ECL
-  if (name == "physicalECL") {
-    detID = EXT_ECL;
-  }
-  // ECL crystal (=sensitive) has an automatically generated PV name
-  // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
-  // YYY is logicalEcl**Crystal, where **=Br, Fw, or Bw.
-  // XXX is 1..144 for Br, 1..16 for Fw, and 1..16 for Bw
-  // ZZZ is n_pv_m where n is 1..46 for Br, 1..72 for Fw, and 73..132 for Bw
-  // ECL cellID is derived from XXX and n (using code from Poyuan).
-  if ((name.find("_logicalEclBrCrystal_") != string::npos) ||
-      (name.find("_logicalEclBwCrystal_") != string::npos) ||
-      (name.find("_logicalEclFwCrystal_") != string::npos)) {
-    detID = EXT_ECL;
-    copyID = ECL::ECLGeometryPar::Instance()->ECLVolNameToCellID(name);
   }
 
 }
@@ -764,7 +739,7 @@ void MuidModule::getStartPoint(const GFTrack* gfTrack, int pdgCode,
 // Write another volume-entry point on track.
 // The track state will be modified here by the Kalman fitter.
 bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode,
-                           StoreArray<MuidHit>& muidHits, RelationArray& gfTrackToMuidHits,
+                           StoreArray<MuidHit>& muidHits, RelationArray& trackToMuidHits,
                            const StoreArray<BKLMHit2d>& bklmHits, const StoreArray<EKLMHit2d>& eklmHits)
 {
 
@@ -796,7 +771,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
   }
 
   ExtDetectorID detID = EXT_UNKNOWN;
-  int copyID = 0;
+  int copyID = -1;
   getVolumeID(preTouch, detID, copyID);
   m_wasInBarrelIron = (detID == EXT_BKLM);
 
@@ -813,7 +788,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
     if (j != m_enter->end()) {        // entered a KLM sensitive volume?
 
       p.enteredSensitiveVolume = true;
-      getAddress(preVol->GetName(), p.address);
+      getAddress(detID, copyID, p.address);
       if (p.address.inBarrel) {
         if (m_geantBarrelLayer < p.address.layer) {
           if ((m_geantBarrelLayer < 14) || (z < m_BarrelHalfLength - 10.0)) {
@@ -860,7 +835,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
           double hitTime = 0.0;  // DIVOT should be measured hit time
           new(muidHits.nextFreeAddress())
           MuidHit(pdgCode, p.address.inBarrel, p.address.isForward, p.address.sector, p.address.layer, p.position, p.positionAtHitPlane, extTime, hitTime, p.chi2);
-          gfTrackToMuidHits.add(trackID, muidHits.getEntries() - 1);
+          trackToMuidHits.add(trackID, muidHits.getEntries() - 1);
           p.intersected = CROSSED;
           p.enteredSensitiveVolume = true;
           int layer = max(m_geantBarrelLayer, p.address.layer);
@@ -891,7 +866,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
           double hitTime = 0.0;  // DIVOT should be measured hit time
           new(muidHits.nextFreeAddress())
           MuidHit(pdgCode, p.address.inBarrel, p.address.isForward, p.address.sector, p.address.layer, p.position, p.positionAtHitPlane, extTime, hitTime, p.chi2);
-          gfTrackToMuidHits.add(trackID, muidHits.getEntries() - 1);
+          trackToMuidHits.add(trackID, muidHits.getEntries() - 1);
           p.intersected = CROSSED;
           p.enteredSensitiveVolume = true;
           int layer = max(m_geantEndcapLayer, p.address.layer);
@@ -928,7 +903,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
 
     if ((!p.hasMatchingHit) && (m_sideGapEscape == 1)) {
       // DIVOT Is this ad hoc adjustment for some obscure feature of the geant3 simulation geometry?
-      p.momentum += p.momentum.Unit() * 50.0 * MeV;
+      // p.momentum += p.momentum.Unit() * 50.0 * MeV;
       G4Vector3D newMom(p.momentum.X(), p.momentum.Y(), p.momentum.Z());
       state->SetMomentum(newMom * GeV);
       m_sideGapEscape = 2;
@@ -1064,7 +1039,7 @@ void MuidModule::findMatchingBarrelHit(Point& p, const StoreArray<BKLMHit2d>& bk
 {
 
   double diffBest = 1.0E12;
-  double localVariance[2] = {0.0, 0.0};
+  double localVariance[2] = {m_StripPositionError, m_StripPositionError};
 
   p.hasMatchingHit = false;
   BKLMHit2d* hitBest = NULL;
@@ -1078,7 +1053,7 @@ void MuidModule::findMatchingBarrelHit(Point& p, const StoreArray<BKLMHit2d>& bk
     double varTrack = getPlaneVariance(p.covariance, p.momentum.Unit(), diffDir);
     double projectionPhi = m_BarrelSectorPhi[hit->getSector()] * diffDir;
     double projectionTheta = diffDir.z();
-    hit->getLocalVariance(localVariance);
+    // DIVOT hit->getLocalVariance(localVariance);
     double varHit = projectionPhi * projectionPhi * localVariance[0] +
                     projectionTheta * projectionTheta * localVariance[1];
     if (diffMag <= max(sqrt(varTrack + varHit) * m_maxDistSIGMA, m_maxDistCM)) {
@@ -1093,7 +1068,7 @@ void MuidModule::findMatchingBarrelHit(Point& p, const StoreArray<BKLMHit2d>& bk
 
   }     // for (h)
   if (p.hasMatchingHit) {
-    hitBest->getLocalVariance(localVariance);
+    // DIVOT hitBest->getLocalVariance(localVariance);
     TVector3 hitPos = hitBest->getGlobalPosition();
     adjustIntersection(p, localVariance, hitPos);
     if (p.chi2 >= 0.0) {
@@ -1413,23 +1388,18 @@ void MuidModule::finishTrack(Muid* muid)
   muid->setKaonPDFValue(kaon);
   muid->setMissPDFValue(miss);
   muid->setJunkPDFValue(junk);
+
 }
 
-void MuidModule::getAddress(const G4String& topName, Address& address)
+void MuidModule::getAddress(int detID, int copyID, Address& address)
 {
 
-  // geant3 volume names were "klm_barrel_gas_#_#_##_#_phys"
-  //                          "klm_endcap_gas_#_#_##_#_phys"
-  //                          "klm_barrel_scint_#_#_##_#_phys"
-  //                          "klm_endcap_scint_#_#_##_#_phys"
-  // Need to use new volume names here
-  address.inBarrel = topName.substr(4, 6) == "barrel";
-  address.isRPC = (topName.substr(11, 3) == "gas");
-  int i0 = (address.isRPC ? 0 : 2);
-  address.isForward = topName.substr(i0 + 15, 1) == "F";
-  address.sector = atoi(topName.substr(i0 + 17, 1).data());
-  address.layer = atoi(topName.substr(i0 + 19, 2).data());
-  address.isInnerPlane = true; // DIVOT
+  address.inBarrel = (detID == EXT_BKLM);
+  address.isForward = ((copyID >> 14) == 0);
+  address.sector = ((copyID >> 11) & 7);
+  address.layer = ((copyID >> 7) & 15);
+  address.isInnerPlane = (((copyID >> 6) & 1) == 0);
+  address.isRPC = (copyID & 63) == 0;
 
 }
 

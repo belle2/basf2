@@ -15,7 +15,9 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <tracking/dataobjects/ExtHit.h>
+#include <framework/gearbox/Const.h>
 #include <simulation/kernel/ExtManager.h>
+#include <simulation/kernel/ExtCylSurfaceTarget.h>
 #include <bklm/geometry/GeometryPar.h>
 #include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Matrix/SymMatrix.h>
@@ -125,8 +127,11 @@ namespace Belle2 {
     //! Flag for source (0 = beam, 1 = cosmic ray)
     int    m_cosmic;
 
-    //! Name of the GFTrack collection of the reconstructed tracks to be extrapolated
-    std::string m_gfTracksColName;
+    //! Name of the Track collection of the reconstructed tracks to be extrapolated
+    std::string m_tracksColName;
+
+    //! Name of the muidLikelihood collection of the muon identification information
+    std::string m_muidLikelihoodsColName;
 
     //! Name of the muid collection of the muon identification information
     std::string m_muidsColName;
@@ -181,8 +186,8 @@ namespace Belle2 {
     //! Complete muon identification after end of track extrapolation
     void finishTrack(Muid*);
 
-    //! Convert GEANT4 physical volume name in BKLM/EKLM to an Address
-    void getAddress(const G4String&, Address&);
+    //! Convert GEANT4 physical volume in BKLM/EKLM to an Address
+    void getAddress(int, int, Address&);
 
     //! Convert GEANT4e covariance to phase-space covariance
     void fromG4eToPhasespace(const G4ErrorFreeTrajState*, CLHEP::HepSymMatrix&);
@@ -220,12 +225,18 @@ namespace Belle2 {
     //! PDG code for the particle-ID hypotheses
     std::vector<int> m_pdgCode;
 
+    //!  ChargedStable hypotheses
+    std::vector<Const::ChargedStable> m_chargedStable;
+
     // Pointers to geant4 physical volumes whose entry/exit points will be saved
     std::vector<G4VPhysicalVolume*>* m_enter;
     std::vector<G4VPhysicalVolume*>* m_exit;
 
     // Time of flight (ns) along the track from the interaction point
     double m_tof;
+
+    // virtual "target" cylinder
+    Simulation::ExtCylSurfaceTarget* m_target;
 
     double m_OffsetZ;
     double m_EndcapMaxR;

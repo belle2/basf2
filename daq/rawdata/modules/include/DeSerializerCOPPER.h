@@ -67,9 +67,9 @@ namespace Belle2 {
 
     //! COPPER file descripter
     int cpr_fd;
-
     int use_slot;
 
+    int finnesse_bit_flag;
 
   };
 

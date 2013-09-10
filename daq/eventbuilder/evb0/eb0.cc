@@ -26,7 +26,7 @@ int port_from_basf2 = 37000;
 
 int port_to = 65000;
 
-int interval = 10000;
+int interval = 2000;
 int vbuf_size = 0;
 int discard = 0;
 int basf2 = 0;
@@ -360,6 +360,7 @@ main(int argc, char** argv)
 
   connection conn[nstream];
 
+  printf("bas2 %d discard %d\n", basf2, discard);
 
   if (basf2 || !discard) {
     std::string host;
@@ -387,14 +388,16 @@ main(int argc, char** argv)
   if (basf2 && !discard) {
     FILE* fp;
     char host_to[20] = "localhost";
-    printf("Done\n");
+
     printf("Accepting from %s port %d...\n", host_to, port_to);
     fp = fp_accept("localhost", port_to, "w");
-    conn_basf2.set_fp_to(fp);
+    printf("Done\n");
 
+    printf("Connecting to port %d...\n", port_to);
+    conn_basf2.set_fp_to(fp);
     fp = fp_connect("localhost", port_from_basf2, "r");
     conn_basf2.set_fp_from(fp);
-
+    printf("Done\n");
   }
 
 

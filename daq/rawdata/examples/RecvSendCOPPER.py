@@ -21,6 +21,10 @@ from basf2 import *
 import sys
 argvs = sys.argv
 
+if len(argvs) != 4:
+    print 'Usage : RecvSendCOPPER.py <COPPER hostname> <COPPER nodeID> <bit flag of FINNESEs>'
+    sys.exit()
+
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.ERROR)
 set_log_level(LogLevel.INFO)
@@ -32,10 +36,13 @@ sender = register_module('Serializer')
 
 # TxSocket
 reader.param('NodeID', int(argvs[2]))
+reader.param('FinnesseBitFlag', int(argvs[3]))
+
 sender.param('DestPort', 33000)
 # sender.param('LocalHostName', 'cpr006')
 sender.param('LocalHostName', argvs[1])
 sender.param('ProcessMethod', 'COPPER')
+
 # reader.param('DumpFileName', 'COPPERdump.dat' )
 
 # Create main path

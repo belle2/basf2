@@ -39,6 +39,7 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
   //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
+  addParam("FinnesseBitFlag", finnesse_bit_flag, "finnese (A,B,C,D) -> bit (0,1,2,3)", 15);
 
   //Parameter definition
   B2INFO("DeSerializerCOPPER: Constructor done.");
@@ -55,17 +56,26 @@ void DeSerializerCOPPERModule::initialize()
 #ifndef DUMMY
   use_slot = 0; /* bit mask */
   int slot_shift;
-  slot_shift = 0; // a:0, b:1, c:2, d:3
-  use_slot |= 1 << slot_shift;  //
 
-  slot_shift = 1; // a:0, b:1, c:2, d:3
-  use_slot |= 1 << slot_shift;  //
+  if ((finnesse_bit_flag & 0x1) == 1) {
+    slot_shift = 0; // a:0, b:1, c:2, d:3
+    use_slot |= 1 << slot_shift;  //
+  }
 
-  slot_shift = 2; // a:0, b:1, c:2, d:3
-  use_slot |= 1 << slot_shift;  //
+  if (((finnesse_bit_flag >> 1) & 0x1) == 1) {
+    slot_shift = 1; // a:0, b:1, c:2, d:3
+    use_slot |= 1 << slot_shift;  //
+  }
 
-  slot_shift = 3; // a:0, b:1, c:2, d:3
-  use_slot |= 1 << slot_shift;  //
+  if (((finnesse_bit_flag >> 2) & 0x1) == 1) {
+    slot_shift = 2; // a:0, b:1, c:2, d:3
+    use_slot |= 1 << slot_shift;  //
+  }
+
+  if (((finnesse_bit_flag >> 3) & 0x1) == 1) {
+    slot_shift = 3; // a:0, b:1, c:2, d:3
+    use_slot |= 1 << slot_shift;  //
+  }
   //
   // Present slots to use
   //
@@ -372,7 +382,7 @@ void DeSerializerCOPPERModule::event()
     struct tm* t_st;
     time(&timer);
     t_st = localtime(&timer);
-    printf("Event %d TotRecvd %.1lf [MB] ElapsedTime %.2lf [s] EvtRate %.4lf [kHz] RcvdRate %.4lf [MB/s] %s",
+    printf("Event %d TotRecvd %.1lf [MB] ElapsedTime %.1lf [s] EvtRate %.2lf [kHz] RcvdRate %.2lf [MB/s] %s",
            n_basf2evt, m_totbytes / 1.e6, total_time, (n_basf2evt - m_prev_nevt) / interval / 1.e3 * NUM_EVT_PER_BASF2LOOP, (m_totbytes - m_prev_totbytes) / interval / 1.e6, asctime(t_st));
     fflush(stdout);
     m_prev_time = cur_time;

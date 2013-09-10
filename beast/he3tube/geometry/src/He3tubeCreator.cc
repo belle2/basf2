@@ -160,7 +160,10 @@ namespace Belle2 {
 
         G4LogicalVolume* l_He3Gas = new G4LogicalVolume(s_He3Gas, gHe3, "l_He3Gas", 0, m_sensitive);
 
-        new G4PVPlacement(0, G4ThreeVector(0, 0, 0), l_He3Gas, "p_iHe3Gas", l_iHe3Gas, false, detID);
+        //Lets limit the Geant4 stepsize inside the volume
+        l_He3Gas->SetUserLimits(new G4UserLimits(stepSize));
+
+        new G4PVPlacement(0, G4ThreeVector(0, 0, 0), l_He3Gas, "p_He3Gas", l_iHe3Gas, false, detID);
 
         detID++;
       }

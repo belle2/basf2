@@ -197,7 +197,7 @@ namespace Belle2 {
         //create ring spacer
         G4double iR_RSpacer = oR_Rod;
         G4double oR_RSpacer = oR_Rod + 2.*Unit::mm;
-        G4double h_RSpacer = 0.5 * Unit::cm;
+        G4double h_RSpacer = (z_Ring[1] - dz_Ring - (z_Ring[0] + dz_Ring)) / 2.;
         G4double sA_RSpacer = 0.*Unit::deg;
         G4double spA_RSpacer = 360.*Unit::deg;
         G4Tubs* s_RSpacer = new G4Tubs("s_RSpacer1", iR_RSpacer, oR_RSpacer, h_RSpacer, sA_RSpacer, spA_RSpacer);
@@ -210,7 +210,7 @@ namespace Belle2 {
           for (G4int k = 0; k < 4; k++) {
             x_RSpacer[i] = x_Rod[k];
             y_RSpacer[i] = y_Rod[k];
-            z_RSpacer[i] = z_Ring[i] + 0.5 * Unit::cm + dz_Ring;
+            z_RSpacer[i] = z_Ring[i] + dz_Ring + h_RSpacer;
             sprintf(Name, "p_RSpacer_%d_%d", i, k);
             new G4PVPlacement(0, G4ThreeVector(x_RSpacer[i], y_RSpacer[i], z_RSpacer[i]), l_RSpacer, Name, l_iGasTPC, false, 1);
           }
@@ -255,11 +255,12 @@ namespace Belle2 {
           sprintf(Name, "p_GEMSupport_%d", i);
           new G4PVPlacement(0, G4ThreeVector(x_GEM, y_GEM, z_GEM[i]), l_GEMSupport, Name, l_iGasTPC, false, 1);
         }
-
+        //cout <<"gem 1 " << z_GEM[0] << " gem 2 " << z_GEM[1] << " ring 22 " << z_Ring[22] << " anode " << z_Ring[23] << " dz_GEM " << dz_GEM << " dz_Ring " << dz_Ring << endl;
         //create sensitive volume
         G4double dx_GasTPC = 2.5 * Unit::cm;
         G4double dy_GasTPC = 2.5 * Unit::cm;
-        G4double dz_GasTPC = 13.4 * Unit::cm;
+        G4double dz_GasTPC = (z_Ring[23] - dz_Ring - z_GEM[1] - dz_GEM) / 2. * Unit::cm; //13.5 * Unit::cm;
+        //cout << " dz_GasTPC " << dz_GasTPC << endl;
         G4Box* s_GasTPC = new G4Box("s_GasTPC", dx_GasTPC, dy_GasTPC, dz_GasTPC);
         G4LogicalVolume* l_GasTPC = new G4LogicalVolume(s_GasTPC, geometry::Materials::get(matGas), "l_GasTPC", 0, m_sensitive);
 

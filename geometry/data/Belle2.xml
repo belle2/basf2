@@ -50,9 +50,10 @@
   <xi:include href="../bklm/BKLM.xml"/>
   <xi:include href="../eklm/EKLM.xml"/>
 
-  <!-- VXD Tracking -->
+  <!-- VXD Tracking and MUID muon identification -->
   <Tracking>
     <xi:include href="../tracking/VXDTFindex.xml"/>
+    <xi:include href="../tracking/MuidParameters.xml"/>
   </Tracking>
 
 </Detector>

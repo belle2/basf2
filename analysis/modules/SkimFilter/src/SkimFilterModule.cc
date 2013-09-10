@@ -44,7 +44,7 @@ void SkimFilterModule::initialize()
 void SkimFilterModule::event()
 {
 
-  setReturnValue(pass);
+  setReturnValue(0);
 
   // number of ParticleLists
   int nParticleLists = m_strParticleLists.size();

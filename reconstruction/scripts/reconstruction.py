@@ -51,6 +51,11 @@ def add_posttracking_reconstruction(path, components=None):
         eklm_k0l_rec = register_module('EKLMK0LReconstructor')
         path.add_module(eklm_k0l_rec)
 
+    # BKLM reconstruction
+    if components == None or 'BKLM' in components:
+        bklm_rec = register_module('BKLMReconstructor')
+        path.add_module(bklm_rec)
+
     # charged particle PID
     if components == None or 'PXD' in components or 'SVD' in components \
         or 'CDC' in components:
@@ -117,6 +122,10 @@ def add_reconstruction(path, components=None):
         # track extrapolation
         ext = register_module('Ext')
         path.add_module(ext)
+
+        # muon identification
+        muid = register_module('Muid')
+        path.add_module(muid)
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path, components)

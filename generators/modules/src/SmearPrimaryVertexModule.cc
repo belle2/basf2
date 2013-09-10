@@ -57,24 +57,10 @@ SmearPrimaryVertexModule::SmearPrimaryVertexModule() : Module()
 
 void SmearPrimaryVertexModule::initialize()
 {
-  string dataFileName = "SmearPrimaryVertexModule.root";
-
-  m_rootFile = new TFile(dataFileName.c_str(), "RECREATE");
-  m_tree     = new TTree("m_tree", "Before and After Tree");
-
-  m_tree->Branch("opvx",      &m_o_vx,      "opvx/D");
-  m_tree->Branch("opvy",      &m_o_vy,      "opvy/D");
-  m_tree->Branch("opvz",      &m_o_vz,      "opvz/D");
-  m_tree->Branch("npvx",      &m_n_vx,      "npvx/D");
-  m_tree->Branch("npvy",      &m_n_vy,      "npvy/D");
-  m_tree->Branch("npvz",      &m_n_vz,      "npvz/D");
-
 }
 
 void SmearPrimaryVertexModule::terminate()
 {
-  m_tree->Write();
-  m_rootFile->Close();
 }
 
 
@@ -118,25 +104,10 @@ void SmearPrimaryVertexModule::event()
   for (int i = 0; i < MCParticles.getEntries(); i++) {
     MCParticle* mc = MCParticles[i];
 
-    //TODO: check if it is primary
-
-    if (i == 0) {
-      m_o_vx = mc->getVertex().X();
-      m_o_vy = mc->getVertex().Y();
-      m_o_vz = mc->getVertex().Z();
-    }
-
     // shift production vertex
     mc->setProductionVertex(getShiftedVertex(mc->getVertex()));
     // shift decay vertex
     mc->setDecayVertex(getShiftedVertex(mc->getDecayVertex()));
-
-    if (i == 0) {
-      m_n_vx = mc->getVertex().X();
-      m_n_vy = mc->getVertex().Y();
-      m_n_vz = mc->getVertex().Z();
-      m_tree->Fill();
-    }
   }
 }
 

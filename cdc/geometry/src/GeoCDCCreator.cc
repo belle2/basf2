@@ -762,7 +762,7 @@ namespace Belle2 {
 
 
 
-      const bool nshieldflag = true;
+      const bool nshieldflag = false;
       if (nshieldflag) {
         //
         // B4C for shilding material of neutron

@@ -8,7 +8,7 @@ from SCons.Scanner.C import CScanner
 
 # regular expression to find class names in linkdef files
 linkdef_class_re = \
-    re.compile('^#pragma\\s+link\\s+C\\+\\+\\s+class\\s+Belle2::([\\w]*::)?([\\w<>,\\*]+)[+-]?\\!?;\\s*$'
+    re.compile('^#pragma\\s+link\\s+C\\+\\+\\s+class\\s+Belle2::([\\w]*::)?([\\w<>,\\*]+)[+-]?\\!?;.*$'
                , re.M)
 
 

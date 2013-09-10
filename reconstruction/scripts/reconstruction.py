@@ -82,7 +82,7 @@ def add_reconstruction(path, components=None):
             trackcands = vxd_trackcands
             vxd_trackfinder = register_module('VXDTF')
             vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
-            if components != None and 'PCX' not in components:
+            if components != None and 'PXD' not in components:
                 vxd_trackfinder.param('sectorSetup', ['evtNormSecHIGH_SVD',
                                       'evtNormSecMED_SVD', 'evtNormSecLOW_SVD'
                                       ])

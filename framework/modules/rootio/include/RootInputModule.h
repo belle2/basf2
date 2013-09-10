@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck, Christian Pulvermacher                      *
+ * Contributors: Martin Heck, Christian Pulvermacher, Thomas Kuhr         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 #include <TChain.h>
 
@@ -136,6 +137,9 @@ namespace Belle2 {
 
     /**  TTree for persistent input. */
     TChain* m_persistent;
+
+    /** Already connected branches. */
+    std::set<std::string> m_connectedBranches[DataStore::c_NDurabilityTypes];
 
     /** Vector of DataStore entries that we are supposed to read in. */
     StoreEntries m_storeEntries;

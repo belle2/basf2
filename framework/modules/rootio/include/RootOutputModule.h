@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Martin Heck, Thomas Kuhr                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -137,6 +137,9 @@ namespace Belle2 {
      *  Set the branch split level.
      */
     int m_splitLevel;
+
+    /** Flag to enable or disable the update of the metadata catalog */
+    bool m_updateFileCatalog;
 
 
     //then those for purely internal use:

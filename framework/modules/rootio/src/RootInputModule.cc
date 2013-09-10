@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck, Christian Pulvermacher                      *
+ * Contributors: Martin Heck, Christian Pulvermacher, Thomas Kuhr         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -225,6 +225,8 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
     TBranch* branch = static_cast<TBranch*>(branches->At(jj));
     if (!branch) continue;
     const std::string branchName = branch->GetName();
+    //skip already connected branches
+    if (m_connectedBranches[durability].find(branchName) != m_connectedBranches[durability].end()) continue;
     //skip excluded branches, and branches not in m_branchNames (if it is not empty)
     if (binary_search(m_excludeBranchNames[durability].begin(), m_excludeBranchNames[durability].end(), branchName) ||
         (!m_branchNames[durability].empty() && !binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName))) {
@@ -263,7 +265,7 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
     }
 
     //Keep track of already connected branches
-    m_excludeBranchNames[durability].push_back(branchName);
+    m_connectedBranches[durability].insert(branchName);
   }
 
   return true;

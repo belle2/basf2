@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Martin Heck, Thomas Kuhr                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -55,6 +55,7 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
   addParam("outputFileName"  , m_outputFileName, "Name of the output file. Can be overridden using the -o argument to basf2.", string("RootOutput.root"));
   addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticeable effect.", 1);
   addParam("splitLevel", m_splitLevel, "Branch split level.", 99);
+  addParam("updateFileCatalog", m_updateFileCatalog, "Flag that specifies whether the file metadata catalog is updated.", true);
 
   vector<string> emptyvector;
   addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of branches to be written from event map. Empty means all branches. Transient objects added here will also be saved. (EventMetaData is always saved)", emptyvector);
@@ -237,7 +238,9 @@ void RootOutputModule::terminate()
   fileMetaDataPtr->setSteering(Environment::Instance().getSteering());
 
   //register the file in the catalog
-  FileCatalog::Instance().registerFile(m_outputFileName, *fileMetaDataPtr);
+  if (m_updateFileCatalog) {
+    FileCatalog::Instance().registerFile(m_outputFileName, *fileMetaDataPtr);
+  }
 
   //fill Persistent data
   fillTree(DataStore::c_Persistent);

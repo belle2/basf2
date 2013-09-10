@@ -15,6 +15,7 @@ param_evtmetagen = {'expList': [1, 1], 'runList': [1, 2], 'evtNumList': [100,
 evtmetagen.param(param_evtmetagen)
 
 output.param('outputFileName', 'root_output_test.root')
+output.param('updateFileCatalog', False)
 
 # Create paths
 main = create_path()

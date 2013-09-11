@@ -44,12 +44,10 @@ EKLM::FPGAFitter::FPGAFitter(int nPoints)
   h = (TH1F*)f->Get("FitShape");
   if (h->GetNbinsX() != m_nPoints)
     B2FATAL("Numbers of digitization points in FPGA data file and program are "
-            "diffetent.");
-  try {
-    m_sig = new float[m_nPoints];
-  } catch (std::bad_alloc& ba) {
+            "different.");
+  m_sig = (float*)malloc(m_nPoints * sizeof(float));
+  if (m_sig == NULL)
     B2FATAL(MemErr);
-  }
   for (i = 0; i < m_nPoints; i++)
     m_sig[i] = h->GetBinContent(i + 1);
   f->Close();
@@ -58,7 +56,7 @@ EKLM::FPGAFitter::FPGAFitter(int nPoints)
 
 EKLM::FPGAFitter::~FPGAFitter()
 {
-  delete m_sig;
+  free(m_sig);
 }
 
 static double SignalShapeFitFunction(double x, double* par)

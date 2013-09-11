@@ -95,6 +95,7 @@ bool HistoManager::merge()
     }
   }
   m_mapfile->Update();
+  //  m_mapfile->ls();
   //  printf ( "HistoManager: merge called and mapfile updated!!!!!\n" );
 }
 

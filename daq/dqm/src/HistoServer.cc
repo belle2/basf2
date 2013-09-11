@@ -53,7 +53,7 @@ int HistoServer::server()
       printf("Initial connection request detected!\n");
       //      int fd = recvsock[;
     } else if (exam_stat == 1) { //
-      //      printf ( "Histo data ready on socket\n" );
+      // printf ( "Histo data ready on socket\n" );
       vector<int>& recvsock = m_man->connected_socket_list();
       for (vector<int>::iterator it = recvsock.begin();
            it != recvsock.end(); ++it) {
@@ -83,7 +83,7 @@ int HistoServer::server()
     usleep(1000);
     loop_counter++;
     if (loop_counter % 1000 == 0) {
-      //      printf ( "HistoServer: merging histograms\n" );
+      printf("HistoServer: merging histograms\n");
       //      m_mapfile->AcquireSemaphore();
       m_hman->merge();
       //      m_mapfile->ReleaseSemaphore();

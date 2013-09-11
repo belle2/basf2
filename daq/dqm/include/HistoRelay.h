@@ -26,6 +26,7 @@ namespace Belle2 {
 
     int collect();
   private:
+    std::string m_filename;
     TMapFile* m_map;
     EvtSocketSend* m_sock;
     MsgHandler* m_msg;

@@ -80,9 +80,6 @@ namespace Belle2 {
       /** Strip lengths. */
       double m_stripLen[75];
 
-      /** Intersection data. */
-      bool m_isect[75 * 74 / 2];
-
     };
 
   }

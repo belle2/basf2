@@ -29,7 +29,7 @@ namespace Belle2 {
     geometry::CreatorFactory<GeoVXDServiceCreator> GeoVXDServiceFactory("VXDServiceCreator");
 
 
-    void GeoVXDServiceCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+    void GeoVXDServiceCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes)
     {
       m_defaultMaterial = topVolume.GetMaterial();
       createDockBoxes(GearDir(content, "DockBoxes"), topVolume);

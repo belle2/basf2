@@ -503,159 +503,11 @@ public:
   };
 
   void write_pedestal(void) {
-    B2INFO(" Write Pedestal Date - done ");
+    B2INFO(" Write Pedestal Data - done ");
 
   };
 
 };
-
-
-
-int PXDUnpackerModule::format_raw_from_dhp(void* dhp_in, int anzahl, void* raw_out, int& raw_anzahl, bool printflag = false, bool commode = false)
-{
-  unsigned int* p_pix = (unsigned int*)raw_out;
-  unsigned short* dhp_pix = (unsigned short*)dhp_in;
-  raw_anzahl = 0;
-
-  int dhh_header_id_I = 0;
-  int dhh_header_error = 0;
-  int dhh_header_type = 0;
-  int dhh_header_dhh = 0;
-
-  int dhp_header_id_I = 0;
-  int dhp_header_type  = 0;
-  int dhp_reserved     = 0;
-  int dhp_chipid       = 0;
-
-  int dhp_id = 0, dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
-  int dhp_offset = 0;
-  bool rowflag = false;
-
-  if (anzahl < 4) return -1;
-
-  if (printflag)
-    B2INFO(" HEADER --  " << hex << dhp_pix[0] << hex << dhp_pix[1] << hex << dhp_pix[2] << hex << dhp_pix[3] << " -- ");
-
-
-
-  if (printflag)
-    B2INFO("DHH Header     |  " << hex << dhp_pix[0] << " ( " << dec << dhp_pix[0] << " ) ");
-  dhh_header_error = (dhp_pix[0] >> 10) & 0x3F;
-  dhh_header_type  = (dhp_pix[0] >> 8) & 0x3;
-  dhh_header_dhh   = (dhp_pix[0] >> 2) & 0x3F;
-  dhp_id           = dhp_pix[0] & 0x3;
-
-  if (dhp_id != 0) {
-    B2INFO(" DECODE ERROR ... DHP ID !=0  " << hex << dhp_pix[0]);
-    printflag = true;
-  }
-  if (dhp_id == 0) {
-    dhp_offset = 0;
-  }
-  if (dhp_id == 1) {
-    dhp_offset = 64;
-  }
-  if (dhp_id == 2) {
-    dhp_offset = 128;
-  }
-  if (dhp_id == 3) {
-    dhp_offset = 192;
-  }
-  if (printflag) {
-    B2INFO(" error     |   " << hex << dhh_header_error << " ( " << hex << dhh_header_error << " ) ");
-    B2INFO(" type     |   " << hex << dhh_header_type << " ( " << hex << dhh_header_type << " ) ");
-    B2INFO(" DHH ID     |   " << hex << dhh_header_dhh << " ( " << hex << dhh_header_dhh << " ) ");
-    B2INFO(" chip ID     |   " << hex << dhp_id << " ( " << hex << dhp_id << " ) ");
-  }
-
-  dhh_header_id_I  = dhp_pix[1] & 0xFFFF;
-  if (printflag)
-    B2INFO(" Trigger Nr     |   " << hex << dhh_header_id_I << " ( " << hex << dhh_header_id_I << " ) ");
-
-  if (printflag)
-    B2INFO(" DHP Header     |   " << hex << dhp_pix[2] << " ( " << hex << dhp_pix[2] << " ) ");
-  dhp_header_type  = (dhp_pix[2] >> 13) & 0x7;
-  dhp_reserved     = (dhp_pix[2] >> 8) & 0x1F;
-  dhp_chipid       =  dhp_pix[2] & 0xFF;
-
-  if (printflag) {
-    B2INFO(" DHP type          |    " << hex << dhp_header_type << " ( " << dec << dhp_header_type << " ) ");
-    B2INFO(" DHP rederved          |    " << hex << dhp_reserved << " ( " << dec << dhp_reserved << " ) ");
-    B2INFO(" DHP chip ID          |    " << hex << dhp_chipid << " ( " << dec << dhp_chipid << " ) ");
-  }
-
-
-  int dhp_warning = 0;
-
-  if (dhp_pix[2] == dhp_pix[3]) {
-    B2INFO(" Warn: double $A000 detected ...could be error ");
-    dhp_warning++;
-  }
-
-  dhp_header_id_I  = dhp_pix[3] & 0xFFFF;
-  if (printflag)
-    B2INFO(" DHP Frame Nr     |   " << hex << dhp_header_id_I << " ( " << hex << dhp_header_id_I << " ) ");
-
-  if (dhp_pix[3] == dhp_pix[4]) {
-    B2INFO(" Warn: Could be double FrameNr ");
-    dhp_warning++;
-
-  } else {
-
-  }
-
-
-  for (int i = 4; i < anzahl ; i++) {
-
-    if (printflag)
-      B2INFO(" -- " << hex << dhp_pix[i] << " --   " << dec << i);
-    {
-      if (((dhp_pix[i] >> 15) & 0x1) == 0) {
-        rowflag = true;
-        dhp_row = (dhp_pix[i] >> 5) & 0xFFE;
-        dhp_cm  = dhp_pix[i] & 0x3F;
-        if (printflag)
-          B2INFO(" SetRow: " << hex << dhp_row << " CM " << hex << dhp_cm);
-      } else {
-        if (!rowflag) {
-          B2INFO(" Error: Pix without Row!!! skip dhp data ");
-          return -2;
-        } else {
-          dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] >> 14) & 0x001);
-          dhp_col = ((dhp_pix[i] >> 8) & 0x3F) + dhp_offset;
-          dhp_adc = dhp_pix[i] & 0xFF;
-          if (printflag)
-            B2INFO(" SetPix: Row " << hex << dhp_row << " Col " << hex << dhp_col << " ADC " << hex << dhp_adc
-                   << " ADC+CM " << hex << (dhp_adc + dhp_cm));
-
-          if (commode) {
-            p_pix[raw_anzahl] = ((dhp_row & 0x7FF) << 21) | ((dhp_col & 0x7FF) << 10) | ((dhp_adc + dhp_cm) & 0x3FF);
-          } else {
-            p_pix[raw_anzahl] = ((dhp_row & 0xFFF) << 20) | ((dhp_col & 0xFFF) << 8) | ((dhp_adc & 0xFF));
-          }
-          raw_anzahl++;
-        }
-      }
-    }
-  }
-
-  if (printflag) {
-    B2INFO(" header ID    |    " << hex << dhh_header_id_I << " ( " << dhh_header_id_I << " ) ");
-    B2INFO(" error    |    " << hex << dhh_header_error << " ( " << dhh_header_error << " ) ");
-    B2INFO(" type    |    " << hex << dhh_header_type << " ( " << dhh_header_type << " ) ");
-    B2INFO(" DHH_ID    |    " << hex << dhh_header_dhh << " ( " << dhh_header_dhh << " ) ");
-    B2INFO(" chip ID    |    " << hex << dhp_id << " ( " << dhp_id << " ) ");
-    for (int i = 0; i < raw_anzahl ; i++) {
-      B2INFO(" RAW      |   " << hex << p_pix[i]);
-      printf("raw %08X  |  ", p_pix[i]);
-      B2INFO(" row " << hex << ((p_pix[i] >> 20) & 0xFFF) << dec << " ( " << ((p_pix[i] >> 20) & 0xFFF) << " ) " << " col " << hex << ((p_pix[i] >> 8) & 0xFFF)
-             << " ( " << dec << ((p_pix[i] >> 8) & 0xFFF) << " ) " << " adc " << hex << (p_pix[i] & 0xFF) << " ( " << (p_pix[i] & 0xFF) << " ) "
-            );
-    }
-  }
-
-  return dhp_header_id_I;
-}
 
 PXDUnpackerModule::PXDUnpackerModule() :
   Module()
@@ -790,40 +642,176 @@ void PXDUnpackerModule::unpack_event(RawPXD* px)
 
 }
 
-void PXDUnpackerModule::fill_pixelmap(void* data, unsigned int len, unsigned int dhh_first_frame_id_lo, unsigned int dhh_ID, unsigned short toffset)
+void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int dhh_first_frame_id_lo, unsigned int dhh_ID, unsigned short toffset)
 {
-  // len in bytes!!!
+  unsigned int anzahl = len2 / 2; // len2 in bytes!!!
   StoreArray<PXDRawHit> storeRawHits(m_storeRawHitsName);
-  int lout = 0;
   bool commode = false;
-  int cid;
-  int fid;
-  cid = format_raw_from_dhp(data, len / 2, tmpbuffer, lout, false, commode);
-  fid = (cid - dhh_first_frame_id_lo) & (FIDS - 1);
+  bool printflag = false;
+  unsigned short* dhp_pix = (unsigned short*)data;
 
-  if (cid >= 0 && fid >= 0 && fid < FIDS) {
-    unsigned int* d;
-    d = (unsigned int*)tmpbuffer;
+  int dhh_header_id_I = 0;
+  int dhh_header_error = 0;
+  int dhh_header_type = 0;
+  int dhh_header_dhh = 0;
 
+  int dhp_header_id_I = 0;
+  int dhp_header_type  = 0;
+  int dhp_reserved     = 0;
+  int dhp_chipid       = 0;
 
-    for (int i = 0; i < lout ; i++) {
-      if (verbose) {
-        B2INFO(" raw    |   " << hex << d[i]);
-        B2INFO(" row " << hex << ((d[i] >> 20) & 0xFFF) << "(" << ((d[i] >> 20) & 0xFFF) << ")" << " col " << "(" << hex << ((d[i] >> 8) & 0xFFF) << ((d[i] >> 8) & 0xFFF)
-               << " adc " << "(" << hex << (d[i] & 0xFF) << (d[i] & 0xFF) << ")");
-        B2INFO(" dhh_ID " << dhh_ID);
-        B2INFO(" start-Frame-Nr " << dec << dhh_first_frame_id_lo);
-        B2INFO(" toffset " << toffset);
-      };
-      storeRawHits.appendNew(PXDRawHit(
-                               dhh_ID, (d[i] >> 20) & 0xFFF, (d[i] >> 8) & 0xFFF, d[i] & 0xFF,
-                               dhh_first_frame_id_lo, toffset
-                             ));
-    }
-  } else if (cid < 0) {
-    if (cid == -1) dhp_size_error++;
-    if (cid == -2) dhp_pixel_error++;
+  int dhp_id = 0, dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
+  int dhp_offset = 0;
+  bool rowflag = false;
+
+  if (anzahl < 4) {
+    dhp_size_error++;
+    return;
+    //return -1;
   }
+
+  if (printflag)
+    B2INFO(" HEADER --  " << hex << dhp_pix[0] << hex << dhp_pix[1] << hex << dhp_pix[2] << hex << dhp_pix[3] << " -- ");
+
+
+
+  if (printflag)
+    B2INFO("DHH Header     |  " << hex << dhp_pix[0] << " ( " << dec << dhp_pix[0] << " ) ");
+  dhh_header_error = (dhp_pix[0] >> 10) & 0x3F;
+  dhh_header_type  = (dhp_pix[0] >> 8) & 0x3;
+  dhh_header_dhh   = (dhp_pix[0] >> 2) & 0x3F;
+  dhp_id           = dhp_pix[0] & 0x3;
+
+  //if (dhp_id != 0) {// onyl for testbeam with one dhp
+  //  B2INFO(" DECODE ERROR ... DHP ID !=0  " << hex << dhp_pix[0]);
+  //  printflag = true;
+  //}
+  if (dhp_id == 0) {
+    dhp_offset = 0;
+  }
+  if (dhp_id == 1) {
+    dhp_offset = 64;
+  }
+  if (dhp_id == 2) {
+    dhp_offset = 128;
+  }
+  if (dhp_id == 3) {
+    dhp_offset = 192;
+  }
+  if (printflag) {
+    B2INFO(" error     |   " << hex << dhh_header_error << " ( " << hex << dhh_header_error << " ) ");
+    B2INFO(" type     |   " << hex << dhh_header_type << " ( " << hex << dhh_header_type << " ) ");
+    B2INFO(" DHH ID     |   " << hex << dhh_header_dhh << " ( " << hex << dhh_header_dhh << " ) ");
+    B2INFO(" chip ID     |   " << hex << dhp_id << " ( " << hex << dhp_id << " ) ");
+  }
+
+  dhh_header_id_I  = dhp_pix[1] & 0xFFFF;
+  if (printflag)
+    B2INFO(" Trigger Nr     |   " << hex << dhh_header_id_I << " ( " << hex << dhh_header_id_I << " ) ");
+
+  if (printflag)
+    B2INFO(" DHP Header     |   " << hex << dhp_pix[2] << " ( " << hex << dhp_pix[2] << " ) ");
+  dhp_header_type  = (dhp_pix[2] >> 13) & 0x7;
+  dhp_reserved     = (dhp_pix[2] >> 8) & 0x1F;
+  dhp_chipid       =  dhp_pix[2] & 0xFF;
+
+  if (printflag) {
+    B2INFO(" DHP type          |    " << hex << dhp_header_type << " ( " << dec << dhp_header_type << " ) ");
+    B2INFO(" DHP rederved          |    " << hex << dhp_reserved << " ( " << dec << dhp_reserved << " ) ");
+    B2INFO(" DHP chip ID          |    " << hex << dhp_chipid << " ( " << dec << dhp_chipid << " ) ");
+  }
+
+
+  int dhp_warning = 0;
+
+  if (dhp_pix[2] == dhp_pix[3]) {
+    B2INFO(" Warn: double $A000 detected ...could be error ");
+    dhp_warning++;
+  }
+
+  dhp_header_id_I  = dhp_pix[3] & 0xFFFF;
+  if (printflag)
+    B2INFO(" DHP Frame Nr     |   " << hex << dhp_header_id_I << " ( " << hex << dhp_header_id_I << " ) ");
+
+  if (dhp_pix[3] == dhp_pix[4]) {
+    B2INFO(" Warn: Could be double FrameNr ");
+    dhp_warning++;
+
+  } else {
+
+  }
+
+
+  for (unsigned int i = 4; i < anzahl ; i++) {
+
+    if (printflag)
+      B2INFO(" -- " << hex << dhp_pix[i] << " --   " << dec << i);
+    {
+      if (((dhp_pix[i] >> 15) & 0x1) == 0) {
+        rowflag = true;
+        dhp_row = (dhp_pix[i] >> 5) & 0xFFE;
+        dhp_cm  = dhp_pix[i] & 0x3F;
+        if (printflag)
+          B2INFO(" SetRow: " << hex << dhp_row << " CM " << hex << dhp_cm);
+      } else {
+        if (!rowflag) {
+          B2ERROR(" Error: Pix without Row!!! skip dhp data ");
+          dhp_pixel_error++;
+          return;
+          // return -2;
+        } else {
+          dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] >> 14) & 0x001);
+          dhp_col = ((dhp_pix[i] >> 8) & 0x3F) + dhp_offset;
+          dhp_adc = dhp_pix[i] & 0xFF;
+          if (printflag)
+            B2INFO(" SetPix: Row " << hex << dhp_row << " Col " << hex << dhp_col << " ADC " << hex << dhp_adc
+                   << " ADC+CM " << hex << (dhp_adc + dhp_cm));
+
+          /*if (verbose) {
+            B2INFO(" raw    |   " << hex << d[i]);
+            B2INFO(" row " << hex << ((d[i] >> 20) & 0xFFF) << "(" << ((d[i] >> 20) & 0xFFF) << ")" << " col " << "(" << hex << ((d[i] >> 8) & 0xFFF) << ((d[i] >> 8) & 0xFFF)
+                   << " adc " << "(" << hex << (d[i] & 0xFF) << (d[i] & 0xFF) << ")");
+            B2INFO(" dhh_ID " << dhh_ID);
+            B2INFO(" start-Frame-Nr " << dec << dhh_first_frame_id_lo);
+            B2INFO(" toffset " << toffset);
+          };*/
+
+          if (commode) {
+//            p_pix[raw_anzahl] = ((dhp_row & 0x7FF) << 21) | ((dhp_col & 0x7FF) << 10) | ((dhp_adc + dhp_cm) & 0x3FF);
+            storeRawHits.appendNew(PXDRawHit(
+                                     dhh_ID, dhp_row, dhp_col, dhp_adc + dhp_cm,
+                                     dhh_first_frame_id_lo, toffset
+                                   ));
+          } else {
+//            p_pix[raw_anzahl] = ((dhp_row & 0xFFF) << 20) | ((dhp_col & 0xFFF) << 8) | ((dhp_adc & 0xFF));
+            storeRawHits.appendNew(PXDRawHit(
+                                     dhh_ID, dhp_row, dhp_col, dhp_adc,
+                                     dhh_first_frame_id_lo, toffset
+                                   ));
+          }
+        }
+      }
+    }
+  }
+
+  if (printflag) {
+    B2INFO(" header ID    |    " << hex << dhh_header_id_I << " ( " << dhh_header_id_I << " ) ");
+    B2INFO(" error    |    " << hex << dhh_header_error << " ( " << dhh_header_error << " ) ");
+    B2INFO(" type    |    " << hex << dhh_header_type << " ( " << dhh_header_type << " ) ");
+    B2INFO(" DHH_ID    |    " << hex << dhh_header_dhh << " ( " << dhh_header_dhh << " ) ");
+    B2INFO(" chip ID    |    " << hex << dhp_id << " ( " << dhp_id << " ) ");
+    /*for (int i = 0; i < raw_anzahl ; i++) {
+      B2INFO(" RAW      |   " << hex << p_pix[i]);
+      printf("raw %08X  |  ", p_pix[i]);
+      B2INFO(" row " << hex << ((p_pix[i] >> 20) & 0xFFF) << dec << " ( " << ((p_pix[i] >> 20) & 0xFFF) << " ) " << " col " << hex << ((p_pix[i] >> 8) & 0xFFF)
+             << " ( " << dec << ((p_pix[i] >> 8) & 0xFFF) << " ) " << " adc " << hex << (p_pix[i] & 0xFF) << " ( " << (p_pix[i] & 0xFF) << " ) "
+            );
+    }*/
+  }
+
+//  return dhp_header_id_I;
+//    if (cid == -1) dhp_size_error++;
+//    if (cid == -2) dhp_pixel_error++;
 };
 
 unsigned int dhh_first_frame_id_lo = 0;
@@ -866,7 +854,7 @@ void PXDUnpackerModule::unpack_frame(void* data, int len, int pad, int& last_fra
       dhh.calc_crc();
       stat_zsd++;
 
-      if (dcp_check_flag) fill_pixelmap(data, len - 4, dhh_first_frame_id_lo, hw->get_dhhid(), dhh_first_offset);
+      unpack_dhp(data, len - 4, dhh_first_frame_id_lo, hw->get_dhhid(), dhh_first_offset);
 
       break;
     case DHH_FRAME_HEADER_DATA_TYPE_DCE_RAW:

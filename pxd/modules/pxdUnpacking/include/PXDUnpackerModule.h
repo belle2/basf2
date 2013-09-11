@@ -71,9 +71,8 @@ namespace Belle2 {
        */
       void unpack_frame(void* data, int len, int pad, int& last_framenr, int& last_wie, int& last_start, int& last_end, unsigned int& last_evtnr);
 
-      void fill_pixelmap(void* data, unsigned int len, unsigned int dhh_first_frame_id_lo, unsigned int dhh_ID, unsigned short toffset);
+      void unpack_dhp(void* data, unsigned int len, unsigned int dhh_first_frame_id_lo, unsigned int dhh_ID, unsigned short toffset);
 
-      int format_raw_from_dhp(void* dhp_in, int anzahl, void* raw_out, int& raw_anzahl, bool printflag, bool commode);
 
       /** Write clusters to collection.
        * This method will check all cluster candidates and write valid ones to the datastore

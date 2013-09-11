@@ -38,6 +38,13 @@ from modularAnalysis import *
 #
 # ----------------------------------------------------------------------------------
 
+# check if the required input file exists
+import os.path
+import sys
+if not os.path.isfile('EvtGenOutput.root'):
+    sys.exit('EvtGenOutput.root file does not exist. Please run analysis/examples/EvtgenOut.py script first.'
+             )
+
 inputMdst('EvtGenOutput.root')
 loadMCParticles()
 

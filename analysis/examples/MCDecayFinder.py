@@ -28,7 +28,7 @@ evtgeninput = register_module('EvtGenInput')
 evtgeninput.param('boost2LAB', True)
 # use specified user decay file
 evtgeninput.param('userDECFile', os.environ['BELLE2_LOCAL_DIR']
-                  + '/analysis/modules/B2Dpi/datafiles/BtoDpi.dec')
+                  + '/analysis/examples/exampleEvtgenDecayFiles/BtoDpi.dec')
 main.add_module(evtgeninput)
 
 # ----> Show progress of processing

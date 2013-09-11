@@ -39,6 +39,13 @@ from modularAnalysis import *
 #
 # ----------------------------------------------------------------------------------
 
+# check if the required input file exists
+import os.path
+import sys
+if not os.path.isfile('output.root'):
+    sys.exit('output.root file does not exist. Please run reconstruction/examples/example.py script first.'
+             )
+
 inputMdst('output.root')
 loadReconstructedParticles()
 

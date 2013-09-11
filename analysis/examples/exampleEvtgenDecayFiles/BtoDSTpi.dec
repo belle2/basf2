@@ -1,0 +1,36 @@
+#
+# Define my particles
+#
+Alias myB B0
+Alias myantiB anti-B0
+ChargeConj myB myantiB
+Alias myD D0
+Alias myantiD anti-D0
+ChargeConj myD myantiD
+Alias myDST D*+
+Alias myantiDST D*-
+ChargeConj myD myantiD
+#
+#
+Decay Upsilon(4S)
+0.500 myB  anti-B0                          VSS;
+0.500 B0  myantiB                           VSS;
+Enddecay
+#
+Decay myB
+1.000 myantiDST   pi+         PHOTOS SVS;
+Enddecay
+#
+CDecay myantiB
+#
+Decay myDST
+1.000   myD  pi+                         PHOTOS VSS;
+Enddecay
+#
+CDecay myantiDST
+#
+Decay myD
+1.000   K-  pi+                         PHOTOS PHSP;
+Enddecay
+#
+CDecay myantiD

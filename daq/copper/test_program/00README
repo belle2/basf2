@@ -1,13 +1,1 @@
-=========================================================
-Download firmware to FPGA on HSLB (Aug. 14, 2013)
-
-% ./hslb/boothslb -abcd ./hslb/hslb.bit 
-"-abcd" specify slots for HSLB cards
-
-=========================================================
-Read data in COPPER FIFO (Aug. 14, 2013)
-
-% ./copper/record-nakao -abcd
-"-abcd" specify slots for HSLB cards
-
-=========================================================
+Please see https://belle2.cc.kek.jp/svn/trunk/software/daq/copper/doc/SetupPocketDAQ_2_installDriverandFirmware.pdf

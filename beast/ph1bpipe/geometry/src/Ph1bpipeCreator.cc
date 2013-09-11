@@ -70,7 +70,7 @@ namespace Belle2 {
       BOOST_FOREACH(double value, bar) {
         B2INFO("value: " << value);
       }
-      int detID = 0;
+
       //Lets loop over all the Active nodes
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
@@ -101,7 +101,6 @@ namespace Belle2 {
         new G4PVPlacement(0, PH1BPIPEpos, l_PH1BPIPE, "p_PH1BPIPE", &topVolume, false, 1);
 
         //create endcaps
-        G4double EndcapinnerRadius = 0.;
         G4Tubs* s_PH1BPIPEendcap = new G4Tubs("s_PH1BPIPEendcap",
                                               activeParams.getLength("endcap_innerRadius")*Unit::cm,
                                               activeParams.getLength("endcap_outerRadius")*Unit::cm,

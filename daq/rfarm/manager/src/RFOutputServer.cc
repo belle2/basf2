@@ -117,6 +117,20 @@ void RFOutputServer::Configure(NSMmsg*, NSMcontext*)
       m_nnodes++;
     }
   }
+
+  // 4. Run histo receiver
+  // 4. Histogram Receiver
+  char* hrecv = m_conf->getconf("collector", "historecv", "script");
+  char* hport = m_conf->getconf("collector", "historecv", "port");
+  char* mapfile = m_conf->getconf("collector", "historecv", "mapfile");
+  m_pid_hrecv = m_proc->Execute(hrecv, hport, mapfile);
+
+  // 5. Histogram Relay
+  char* hrelay = m_conf->getconf("collector", "historelay", "script");
+  char* dqmdest = m_conf->getconf("dqmserver", "host");
+  char* dqmport = m_conf->getconf("dqmserver", "port");
+  char* interval = m_conf->getconf("collector", "historelay", "interval");
+  m_pid_hrelay = m_proc->Execute(hrelay, mapfile, dqmdest, dqmport, interval);
 }
 
 void RFOutputServer::Start(NSMmsg*, NSMcontext*)

@@ -51,6 +51,8 @@ namespace Belle2 {
     int m_pid_receiver;
     int m_pid_basf2;
     int m_pid_sender;
+    int m_pid_hrecv;
+    int m_pid_hrelay;
     int m_nnodes;
     char m_nodename[256];
 

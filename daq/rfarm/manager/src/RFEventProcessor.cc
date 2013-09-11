@@ -99,6 +99,19 @@ void RFEventProcessor::Configure(NSMmsg*, NSMcontext*)
   char portchar[256];
   sprintf(portchar, "%d", rport);
   m_pid_receiver = m_proc->Execute(receiver, rbufin, srchost, portchar, m_nodename, (char*)"0");
+
+  // 4. Histogram Receiver
+  char* hrecv = m_conf->getconf("processor", "historecv", "script");
+  char* hport = m_conf->getconf("processor", "historecv", "port");
+  char* mapfile = m_conf->getconf("processor", "historecv", "mapfile");
+  m_pid_hrecv = m_proc->Execute(hrecv, hport, mapfile);
+
+  // 5. Histogram Relay
+  char* hrelay = m_conf->getconf("processor", "historelay", "script");
+  char* dqmdest = m_conf->getconf("dqmserver", "host");
+  char* dqmport = m_conf->getconf("dqmserver", "port");
+  char* interval = m_conf->getconf("processor", "historelay", "interval");
+  m_pid_hrelay = m_proc->Execute(hrelay, mapfile, dqmdest, dqmport, interval);
 }
 
 void RFEventProcessor::Start(NSMmsg*, NSMcontext*)

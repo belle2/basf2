@@ -1,6 +1,6 @@
 Import('env')
 
 #These are the libraries the awesome package has to be linked against
-env['LIBS'] = ['framework','simulation','beast_microtpc_dataobjects','beast_bgo_dataobjects','beast_ph1bpipe_dataobjects','beast_cave_dataobjects','beast_ph1sustr_dataobjects','beast_he3tube_dataobjects']
+env['LIBS'] = ['framework','simulation','geometry','simulation_dataobjects', 'generators_dataobjects','beast_microtpc_dataobjects','beast_bgo_dataobjects','beast_ph1bpipe_dataobjects','beast_cave_dataobjects','beast_ph1sustr_dataobjects','beast_he3tube_dataobjects']
 
 Return('env')

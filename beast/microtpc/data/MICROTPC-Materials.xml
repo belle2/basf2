@@ -138,10 +138,12 @@
 
   
   <Material name="MaterialGas">
-     <density unit="g/cm3">1.786e-4</density>
+     <density unit="g/cm3">6.69081e-4</density>
      <state>Gas</state>
      <Components>
-        <Element fraction="1.0">He</Element>
+        <Element fraction="0.7">He</Element>
+        <Element fraction="0.1">C</Element>
+        <Element fraction="0.2">O</Element>
      </Components>
   </Material>
 

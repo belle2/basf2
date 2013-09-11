@@ -1,5 +1,5 @@
-#ifndef RFDQMSERVER_H
-#define RFDQMSERVER_H
+#ifndef RF_DQMSERVER_H
+#define RF_DQMSERVER_H
 //+
 // File : RFDqmServer.h
 // Description : DQM server for RFARM

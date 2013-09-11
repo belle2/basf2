@@ -1,5 +1,5 @@
 //+
-// File : RFOutputSever.cc
+// File : RFEventProcessor.cc
 // Description : Collect outputs from worker node and send them to EVB2
 //               w/ branch to PXD
 //
@@ -75,21 +75,34 @@ void RFEventProcessor::Configure(NSMmsg*, NSMcontext*)
   char* rbufin = m_conf->getconf("processor", "ringbufin");
   char* rbufout = m_conf->getconf("processor", "ringbufout");
 
-  // 1. Run sender / logger
+  // 1. Histogram Receiver
+  char* hrecv = m_conf->getconf("processor", "historecv", "script");
+  char* hport = m_conf->getconf("processor", "historecv", "port");
+  char* mapfile = m_conf->getconf("processor", "historecv", "mapfile");
+  m_pid_hrecv = m_proc->Execute(hrecv, hport, mapfile);
+
+  // 2. Histogram Relay
+  char* hrelay = m_conf->getconf("processor", "historelay", "script");
+  char* dqmdest = m_conf->getconf("dqmserver", "host");
+  char* dqmport = m_conf->getconf("dqmserver", "port");
+  char* interval = m_conf->getconf("processor", "historelay", "interval");
+  m_pid_hrelay = m_proc->Execute(hrelay, mapfile, dqmdest, dqmport, interval);
+
+  // 3. Run sender / logger
   char* sender = m_conf->getconf("processor", "sender", "script");
   char* port = m_conf->getconf("processor", "sender", "port");
   m_pid_sender = m_proc->Execute(sender, rbufout, port, m_nodename, (char*)"1");
 
-  // 2. Run basf2
+  // 4. Run basf2
   char* basf2 = m_conf->getconf("processor", "basf2", "script");
-  m_pid_basf2 = m_proc->Execute(basf2, rbufin, rbufout);
+  m_pid_basf2 = m_proc->Execute(basf2, rbufin, rbufout, hport);
 
-  // 3. Run receiver
+  // 5. Run receiver
   char* receiver = m_conf->getconf("processor", "receiver", "script");
   char* srchost = m_conf->getconf("distributor", "host");
   //  char* port = m_conf->getconf ( "distributor", "port" );
   int portbase = m_conf->getconfi("distributor", "sender", "portbase");
-  char* hostbase = m_conf->getconf("processor", "hostbase");
+  char* hostbase = m_conf->getconf("processor", "nodebase");
   int baselen = strlen(hostbase);
   char hostname[256];
   gethostname(hostname, sizeof(hostname));
@@ -100,18 +113,6 @@ void RFEventProcessor::Configure(NSMmsg*, NSMcontext*)
   sprintf(portchar, "%d", rport);
   m_pid_receiver = m_proc->Execute(receiver, rbufin, srchost, portchar, m_nodename, (char*)"0");
 
-  // 4. Histogram Receiver
-  char* hrecv = m_conf->getconf("processor", "historecv", "script");
-  char* hport = m_conf->getconf("processor", "historecv", "port");
-  char* mapfile = m_conf->getconf("processor", "historecv", "mapfile");
-  m_pid_hrecv = m_proc->Execute(hrecv, hport, mapfile);
-
-  // 5. Histogram Relay
-  char* hrelay = m_conf->getconf("processor", "historelay", "script");
-  char* dqmdest = m_conf->getconf("dqmserver", "host");
-  char* dqmport = m_conf->getconf("dqmserver", "port");
-  char* interval = m_conf->getconf("processor", "historelay", "interval");
-  m_pid_hrelay = m_proc->Execute(hrelay, mapfile, dqmdest, dqmport, interval);
 }
 
 void RFEventProcessor::Start(NSMmsg*, NSMcontext*)

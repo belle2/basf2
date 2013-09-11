@@ -46,6 +46,11 @@ RFMaster::~RFMaster()
 void RFMaster::Configure(NSMmsg*, NSMcontext*)
 {
   int* pars;
+  // 0. Configure DqmServer
+  char* dqmserver = m_conf->getconf("dqmserver", "nodename");
+  b2nsm_sendreq(dqmserver, "RF_CONFIGURE", 0, pars);
+  sleep(2);
+
   // 1. Configure distributor
   char* distributor = m_conf->getconf("distributor", "nodename");
   b2nsm_sendreq(distributor, "RF_CONFIGURE", 0, pars);
@@ -54,7 +59,7 @@ void RFMaster::Configure(NSMmsg*, NSMcontext*)
   // 2. Configure event processors
   int maxnodes = m_conf->getconfi("processor", "nnodes");
   int idbase = m_conf->getconfi("processor", "idbase");
-  char* hostbase = m_conf->getconf("processor", "hostbase");
+  char* hostbase = m_conf->getconf("processor", "nodebase");
   char* badlist = m_conf->getconf("processor", "badlist");
 
   char hostnode[512], idname[3];
@@ -85,6 +90,12 @@ void RFMaster::Stop(NSMmsg*, NSMcontext*)
 void RFMaster::Restart(NSMmsg*, NSMcontext*)
 {
   int* pars;
+
+  // 0. Configure DqmServer
+  char* dqmserver = m_conf->getconf("dqmserver", "nodename");
+  b2nsm_sendreq(dqmserver, "RF_RESTART", 0, pars);
+  sleep(2);
+
   // 1. Configure distributor
   char* distributor = m_conf->getconf("distributor", "nodename");
   b2nsm_sendreq(distributor, "RF_RESTART", 0, pars);

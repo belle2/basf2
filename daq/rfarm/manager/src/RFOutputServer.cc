@@ -74,7 +74,20 @@ void RFOutputServer::Configure(NSMmsg*, NSMcontext*)
 
   char* shmname = m_conf->getconf("collector", "nodename");
 
-  // 1. Run sender / logger
+  // 1. Histogram Receiver
+  char* hrecv = m_conf->getconf("collector", "historecv", "script");
+  char* hport = m_conf->getconf("collector", "historecv", "port");
+  char* mapfile = m_conf->getconf("collector", "historecv", "mapfile");
+  m_pid_hrecv = m_proc->Execute(hrecv, hport, mapfile);
+
+  // 2. Histogram Relay
+  char* hrelay = m_conf->getconf("collector", "historelay", "script");
+  char* dqmdest = m_conf->getconf("dqmserver", "host");
+  char* dqmport = m_conf->getconf("dqmserver", "port");
+  char* interval = m_conf->getconf("collector", "historelay", "interval");
+  m_pid_hrelay = m_proc->Execute(hrelay, mapfile, dqmdest, dqmport, interval);
+
+  // 3. Run sender / logger
   char* src = m_conf->getconf("collector", "destination");
   if (strstr(src, "net") != 0) {
     // Run sender
@@ -93,14 +106,15 @@ void RFOutputServer::Configure(NSMmsg*, NSMcontext*)
     // Do not run anything
   }
 
-  // 2. Run basf2
+  // 4. Run basf2
   char* basf2 = m_conf->getconf("collector", "basf2", "script");
-  m_pid_basf2 = m_proc->Execute(basf2, rbufin, rbufout);
+  m_pid_basf2 = m_proc->Execute(basf2, rbufin, rbufout, hport);
 
-  // 3. Run receiver
+  // 5. Run receiver
   m_nnodes = 0;
   int maxnodes = m_conf->getconfi("processor", "nnodes");
   int idbase = m_conf->getconfi("processor", "idbase");
+  //  char* hostbase = m_conf->getconf("processor", "hostbase");
   char* hostbase = m_conf->getconf("processor", "hostbase");
   char* badlist = m_conf->getconf("processor", "badlist");
   char* port = m_conf->getconf("processor", "sender", "port");
@@ -117,20 +131,6 @@ void RFOutputServer::Configure(NSMmsg*, NSMcontext*)
       m_nnodes++;
     }
   }
-
-  // 4. Run histo receiver
-  // 4. Histogram Receiver
-  char* hrecv = m_conf->getconf("collector", "historecv", "script");
-  char* hport = m_conf->getconf("collector", "historecv", "port");
-  char* mapfile = m_conf->getconf("collector", "historecv", "mapfile");
-  m_pid_hrecv = m_proc->Execute(hrecv, hport, mapfile);
-
-  // 5. Histogram Relay
-  char* hrelay = m_conf->getconf("collector", "historelay", "script");
-  char* dqmdest = m_conf->getconf("dqmserver", "host");
-  char* dqmport = m_conf->getconf("dqmserver", "port");
-  char* interval = m_conf->getconf("collector", "historelay", "interval");
-  m_pid_hrelay = m_proc->Execute(hrelay, mapfile, dqmdest, dqmport, interval);
 }
 
 void RFOutputServer::Start(NSMmsg*, NSMcontext*)

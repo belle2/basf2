@@ -13,9 +13,14 @@
 
 #include <framework/dataobjects/FileMetaData.h>
 
-#include <boost/interprocess/sync/file_lock.hpp>
 #include <map>
 #include <vector>
+
+namespace boost {
+  namespace interprocess {
+    class file_lock;
+  }
+}
 
 
 namespace Belle2 {

@@ -637,8 +637,8 @@ namespace Belle {
         //...Cal. closest points...
         t.approach(* l, _sag);
         double dPhi = l->dPhi();
-        const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-        const HepGeom::Point3D<double> & onWire = l->positionOnWire();
+        const HepGeom::Point3D<double>& onTrack = l->positionOnTrack();
+        const HepGeom::Point3D<double>& onWire = l->positionOnWire();
         unsigned leftRight = (onWire.cross(onTrack).z() < 0.)
                              ? CellHitLeft : CellHitRight;
 
@@ -896,8 +896,8 @@ namespace Belle {
         TLink* l = initBadWires[i];
         t.approach(* l, _sag);
 //      double dPhi = l->dPhi();
-        const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-        const HepGeom::Point3D<double> & onWire = l->positionOnWire();
+        const HepGeom::Point3D<double>& onTrack = l->positionOnTrack();
+        const HepGeom::Point3D<double>& onWire = l->positionOnWire();
         Vector3D v = onTrack - onWire;
         double vmag = v.mag();
         unsigned leftRight = (onWire.cross(onTrack).z() < 0.)
@@ -1017,8 +1017,8 @@ namespace Belle {
         //...Cal. closest points...
         t.approach(* l, _sag);
         double dPhi = l->dPhi();
-        const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-        const HepGeom::Point3D<double> & onWire = l->positionOnWire();
+        const HepGeom::Point3D<double>& onTrack = l->positionOnTrack();
+        const HepGeom::Point3D<double>& onWire = l->positionOnWire();
         unsigned leftRight = CellHitRight;
         if (onWire.cross(onTrack).z() < 0.) leftRight = CellHitLeft;
 
@@ -1282,16 +1282,16 @@ namespace Belle {
       const double v_dot_wireBackwardPosition = v.x() * wireBackwardPosition.x()
                                                 +                                       v.y() * wireBackwardPosition.y()
                                                 +                                       v.z() * wireBackwardPosition.z();
-      const double c[3] = { w.backwardPosition().x() - v_dot_wireBackwardPosition* v.x(),
-                            w.backwardPosition().y() - v_dot_wireBackwardPosition* v.y(),
-                            w.backwardPosition().z() - v_dot_wireBackwardPosition* v.z()
+      const double c[3] = { w.backwardPosition().x() - v_dot_wireBackwardPosition * v.x(),
+                            w.backwardPosition().y() - v_dot_wireBackwardPosition * v.y(),
+                            w.backwardPosition().z() - v_dot_wireBackwardPosition * v.z()
                           };
 
       const double x[3] = { link.positionOnTrack().x(), link.positionOnTrack().y(), link.positionOnTrack().z() };
       const double x_minus_c[3] = { x[0] - c[0], x[1] - c[1], x[2] - c[2] };
 
       //Vector dxdphi(3);
-      const double dxdphi[3] = { rho* sinPhi0dPhi, -rho* cosPhi0dPhi, -rho* tanLambda };
+      const double dxdphi[3] = { rho * sinPhi0dPhi, -rho * cosPhi0dPhi, -rho * tanLambda };
 
       //Vector d2xdphi2(3);
       const double d2xdphi2[3] = { -dxdphi[1], dxdphi[0], 0. };
@@ -1586,8 +1586,8 @@ namespace Belle {
   {
 
     const Belle2::TRGCDCWireHit& h = * l.hit();
-    const HepGeom::Point3D<double> & onTrack = l.positionOnTrack();
-    const HepGeom::Point3D<double> & onWire = l.positionOnWire();
+    const HepGeom::Point3D<double>& onTrack = l.positionOnTrack();
+    const HepGeom::Point3D<double>& onWire = l.positionOnWire();
     unsigned leftRight = CellHitRight;
     if (onWire.cross(onTrack).z() < 0.) leftRight = CellHitLeft;
 
@@ -1718,8 +1718,8 @@ namespace Belle {
         //...Cal. closest points...
         t.approach(* l, _sag);
         double dPhi = l->dPhi();
-        const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-        const HepGeom::Point3D<double> & onWire = l->positionOnWire();
+        const HepGeom::Point3D<double>& onTrack = l->positionOnTrack();
+        const HepGeom::Point3D<double>& onWire = l->positionOnWire();
         unsigned leftRight = (onWire.cross(onTrack).z() < 0.) ? CellHitLeft : CellHitRight;
 
         //...Obtain drift distance and its error...
@@ -1977,8 +1977,8 @@ namespace Belle {
         //...Cal. closest points...
         t.approach(* l, _sag);
         double dPhi = l->dPhi();
-        const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-        const HepGeom::Point3D<double> & onWire = l->positionOnWire();
+        const HepGeom::Point3D<double>& onTrack = l->positionOnTrack();
+        const HepGeom::Point3D<double>& onWire = l->positionOnWire();
         unsigned leftRight = CellHitRight;
         if (onWire.cross(onTrack).z() < 0.) leftRight = CellHitLeft;
 
@@ -2161,8 +2161,8 @@ namespace Belle {
 //=========================================
 
     const Belle2::TRGCDCWireHit& h = * l.hit();
-    const HepGeom::Point3D<double> & onTrack = l.positionOnTrack();
-    const HepGeom::Point3D<double> & onWire = l.positionOnWire();
+    const HepGeom::Point3D<double>& onTrack = l.positionOnTrack();
+    const HepGeom::Point3D<double>& onWire = l.positionOnWire();
     unsigned leftRight = CellHitRight;
     if (onWire.cross(onTrack).z() < 0.) leftRight = CellHitLeft;
 

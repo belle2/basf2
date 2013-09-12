@@ -381,8 +381,8 @@ namespace Belle {
         if (nTrial && !allAxial) doSagCorrection = 1;
         t.approach(* l, doSagCorrection);
         double dPhi = l->dPhi();
-        const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-        const HepGeom::Point3D<double> & onWire = l->positionOnWire();
+        const HepGeom::Point3D<double>& onTrack = l->positionOnTrack();
+        const HepGeom::Point3D<double>& onWire = l->positionOnWire();
 
 #ifdef TRASAN_DEBUG_DETAIL
 //      std::cout << "    in fit " << onTrack << ", " << onWire;
@@ -483,8 +483,8 @@ namespace Belle {
           if (nTrial  && !allAxial) doSagCorrection = 1;
           t.approach(* l, doSagCorrection);
           double dPhi = l->dPhi();
-          const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-          const HepGeom::Point3D<double> & onWire = l->positionOnWire();
+          const HepGeom::Point3D<double>& onTrack = l->positionOnTrack();
+          const HepGeom::Point3D<double>& onWire = l->positionOnWire();
 
 #ifdef TRASAN_DEBUG_DETAIL
           // std::cout << "    in fit in case of change < 0. " << onTrack << ", " << onWire;
@@ -700,8 +700,8 @@ namespace Belle {
         if (nTrial && !allAxial) doSagCorrection = 1;
         t.approach(* l, doSagCorrection);
         double dPhi = l->dPhi();
-        const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-        const HepGeom::Point3D<double> & onWire = l->positionOnWire();
+        const HepGeom::Point3D<double>& onTrack = l->positionOnTrack();
+        const HepGeom::Point3D<double>& onWire = l->positionOnWire();
 
 #ifdef TRASAN_DEBUG_DETAIL
         // std::cout << "    in fitCathode " << onTrack << ", " << onWire;
@@ -872,8 +872,8 @@ namespace Belle {
               if (nTrial  && !allAxial) doSagCorrection = 1;
               t.approach(* l , doSagCorrection);
               double dPhi = l->dPhi();
-              const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-              const HepGeom::Point3D<double> & onWire = l->positionOnWire();
+              const HepGeom::Point3D<double>& onTrack = l->positionOnTrack();
+              const HepGeom::Point3D<double>& onWire = l->positionOnWire();
 
 #ifdef TRASAN_DEBUG_DETAIL
               // std::cout << "    in fitCathode " << onTrack << ", " << onWire;

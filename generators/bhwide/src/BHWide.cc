@@ -14,12 +14,13 @@
 
 #include <TDatabasePDG.h>
 #include <TLorentzVector.h>
+#include <TRandom.h>
 
 using namespace std;
 using namespace Belle2;
 
 //Declaration of the BHWide FORTRAN methods and common blocks.
-extern"C" {
+extern "C" {
 
   extern struct {
     double p1[4];        /**< 4-momenta of incoming positron. */
@@ -32,6 +33,30 @@ extern"C" {
 
   void bhwide_(int* mode, double* xpar, int* npar);
   void glimit_(int* number);
+
+  /** Wrap BHwide random number generator and use ROOT.
+   * This method returns an array of random numbers in the range ]0,1[
+   * @param drvec array to store the random numbers
+   * @param lenght size of the array
+   */
+  void varran_(double* drvec, int* lengt)
+  {
+    for (int i = 0; i < *lengt; ++i) {
+      do {
+        //BHWide does not want 1 for some reason, at least they are rejected in
+        //the original VARRAN subroutine so we do it here as well
+        drvec[i] = gRandom->Rndm();
+      } while (drvec[i] >= 1.0);
+    }
+  }
+  /** Also Wrap the random number generator in alibaba.f used for MC
+   * integration. Does not seem to be called but better safe then sorry
+   * @param rvec pointer to the random number to be set
+   */
+  void ranmar_(double* rvec)
+  {
+    *rvec = gRandom->Rndm();
+  }
 }
 
 

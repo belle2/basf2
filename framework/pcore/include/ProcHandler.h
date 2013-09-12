@@ -11,9 +11,7 @@
 
 namespace Belle2 {
 
-/// @class ProcHandler
-/// @brief Process handler class definition
-  /*! A class to manage processes for parallel processing */
+  /** A class to manage processes for parallel processing. */
   class ProcHandler {
   private:
     int m_nEvtSrv;          ///< # of event servers
@@ -27,12 +25,12 @@ namespace Belle2 {
     int m_fEvtServer;       ///< flag for event server (1:evtserver)
     int m_fEvtProc;         ///< flag for event process (1:evtproc)
     int m_fOutputSrv;       ///< flag for output server (1:outputsrv)
-    int m_fEvtServerID;     ///< ID of event server
-    static int s_fEvtProcID;       ///< ID of event process
     int m_fOutputSrvID;     ///< ID of output server
 
     key_t m_kSrcShm;        ///< key value for source shared memory
     key_t m_kOutShm;        ///< key value for output shared memory
+
+    static int s_fEvtProcID;       ///< ID of current process
 
   public:
     /*! Constructor */

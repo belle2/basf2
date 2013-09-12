@@ -56,7 +56,6 @@ int ProcHandler::init_EvtServer()
     exit(-99);
   } else {
     m_fEvtServer = 1; // I'm event server
-    //    s_fEvtProcID = -10;
     s_fEvtProcID = 10000;
     //die when parent dies
     prctl(PR_SET_PDEATHSIG, SIGHUP);
@@ -108,7 +107,6 @@ int ProcHandler::init_OutServer(int id)
   } else {
     m_fOutputSrv = 1; // I'm output server
     m_fOutputSrvID = id;
-    //    s_fEvtProcID = -20;
     s_fEvtProcID = 20000 + id;
     //die when parent dies
     prctl(PR_SET_PDEATHSIG, SIGHUP);
@@ -149,7 +147,6 @@ int ProcHandler::isOutputSrv()
   return m_fOutputSrv;
 }
 
-/// @brief Returns ID number of event process
 int ProcHandler::EvtProcID()
 {
   return s_fEvtProcID;

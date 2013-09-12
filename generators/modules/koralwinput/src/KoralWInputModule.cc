@@ -11,7 +11,7 @@
 #include <generators/modules/koralwinput/KoralWInputModule.h>
 #include <generators/utilities/cm2LabBoost.h>
 
-#include <framework/core/utilities.h>
+#include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>

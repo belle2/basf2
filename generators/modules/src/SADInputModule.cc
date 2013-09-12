@@ -12,7 +12,7 @@
 #include <generators/dataobjects/MCParticleGraph.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/core/utilities.h>
+#include <framework/utilities/FileSystem.h>
 
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/GearDir.h>

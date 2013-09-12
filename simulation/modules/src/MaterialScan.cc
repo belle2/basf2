@@ -10,7 +10,7 @@
 
 #include <simulation/modules/MaterialScan.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/core/utilities.h>
+#include <framework/utilities/Utils.h>
 #include <boost/format.hpp>
 #include <algorithm>
 
@@ -83,7 +83,7 @@ bool MaterialScan::createNext(G4ThreeVector& origin, G4ThreeVector& direction)
 
 void MaterialScan::fillValue(const std::string& name, double value)
 {
-  TH2D* &hist = m_regions[name];
+  TH2D*& hist = m_regions[name];
   if (!hist) {
     //Create new histogram
     m_rootFile->cd(m_name.c_str());

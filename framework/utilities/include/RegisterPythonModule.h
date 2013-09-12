@@ -13,18 +13,47 @@
 
 
 namespace Belle2 {
-  /** Proxy class to register python modules (i.e. the things you can 'import')
+  /** Proxy class to register python modules (the things you can 'import').
    *
    * Use it by defining your module via BOOST_PYTHON_MODULE(name), then call
    * REGISTER_PYTHON_MODULE(name) with the same name.
    *
    * After the library has been loaded, you can use 'import name' to import the
    * defined objects.
-   * This might be useful to allow extra definitions for individual basf2 modules,
-   * which can be imported after registering the module.
-   *
-   * The REGISTER_PYTHON_MODULE_AUTOIMPORT macro is identical, but will also
+   * The REGISTER_PYTHON_MODULE_AUTOIMPORT() macro is identical, but will also
    * import the module into the global namespace after loading it.
+   *
+   * This might be useful to allow extra definitions for individual basf2 modules,
+   * consider for example:
+   *
+   * \code
+
+     //in MyTestModule.h (preferably as a member of your Module class):
+     enum class Shape {
+       Sphere,
+       Cube
+     };
+
+     //in MyTestModule.cc
+     #include <boost/python.hpp>
+     #include <framework/utilities/RegisterPythonModule.h>
+     //...
+     using namespace boost::python;
+
+     BOOST_PYTHON_MODULE(MyTest)
+     {
+       //export enum to python, e.g. Shape::Sphere becomes Shape.Sphere
+       enum_<Shape>("Shape")
+         .value("Sphere", Shape::Sphere)
+         .value("Cube", Shape::Cube)
+         ;
+     }
+     REGISTER_PYTHON_MODULE_AUTOIMPORT(MyTest)
+
+     \endcode
+   *
+   * In a steering file, the type MyTest.Sphere is available immediately after
+   * register_module('MyTest').
    */
   class BoostPythonModuleProxy {
   public:

@@ -1617,8 +1617,8 @@ namespace Belle {
     int side = leftRight;
     if (side == 0) side = -1;
     HepGeom::Vector3D<double> tp = t.helix().momentum(dPhi);
-    float p[3] = {tp.x(), tp.y(), tp.z()};
-    float x[3] = {onWire.x(), onWire.y(), onWire.z()};
+    float p[3] = {(float)tp.x(), (float)tp.y(), (float)tp.z()};
+    float x[3] = {(float)onWire.x(), (float)onWire.y(), (float)onWire.z()};
 //cnv    float time = h.reccdc()->m_tdc + t0Offset - tof;
     float time = 0;
     float dist;
@@ -2211,8 +2211,8 @@ namespace Belle {
     int side = leftRight;
     if (side == 0) side = -1;
     HepGeom::Vector3D<double> tp = t.helix().momentum(dPhi);
-    float p[3] = {tp.x(), tp.y(), tp.z()};
-    float x[3] = {onWire.x(), onWire.y(), onWire.z()};
+    float p[3] = {(float)tp.x(), (float)tp.y(), (float)tp.z()};
+    float x[3] = {(float)onWire.x(), (float)onWire.y(), (float)onWire.z()};
 //cnv    float time = h.reccdc()->m_tdc + tev - tof;
     float time = 0;
     //    float dist_p;

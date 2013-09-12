@@ -399,8 +399,8 @@ namespace Belle {
           int wire = h.wire().id();
           int side = leftRight;
           if (side == 0) side = -1;
-          float x[3] = { onWire.x(), onWire.y(), onWire.z()};
-          float p[3] = {t.p().x(), t.p().y(), t.p().z()};
+          float x[3] = { (float)onWire.x(), (float)onWire.y(), (float)onWire.z()};
+          float p[3] = {(float)t.p().x(), (float)t.p().y(), (float)t.p().z()};
 //cnv               float time = l->hit()->reccdc()->m_tdc + t0Offset;
           float time = 0;
           float dist =  distance;
@@ -500,8 +500,8 @@ namespace Belle {
             int wire = h.wire().id();
             int side = leftRight;
             if (side == 0) side = -1;
-            float x[3] = { onWire.x(), onWire.y(), onWire.z()};
-            float p[3] = {t.p().x(), t.p().y(), t.p().z()};
+            float x[3] = { (float)onWire.x(), (float)onWire.y(), (float)onWire.z()};
+            float p[3] = {(float)t.p().x(), (float)t.p().y(), (float)t.p().z()};
 //cnv               float time = l->hit()->reccdc()->m_tdc + t0Offset;
             float time = 0;
             float dist = distance;
@@ -718,8 +718,8 @@ namespace Belle {
           int wire = h.wire().id();
           int side = leftRight;
           if (side == 0) side = -1;
-          float x[3] = { onWire.x(), onWire.y(), onWire.z()};
-          float p[3] = {t.p().x(), t.p().y(), t.p().z()};
+          float x[3] = { (float)onWire.x(), (float)onWire.y(), (float)onWire.z()};
+          float p[3] = {(float)t.p().x(), (float)t.p().y(), (float)t.p().z()};
 //cnv               float time = l->hit()->reccdc()->m_tdc + t0Offset;
           float time = 0;
           float dist =  distance;
@@ -889,8 +889,8 @@ namespace Belle {
                 int wire = h.wire().id();
                 int side = leftRight;
                 if (side == 0) side = -1;
-                float x[3] = { onWire.x(), onWire.y(), onWire.z()};
-                float p[3] = {t.p().x(), t.p().y(), t.p().z()};
+                float x[3] = { (float)onWire.x(), (float)onWire.y(), (float)onWire.z()};
+                float p[3] = {(float)t.p().x(), (float)t.p().y(), (float)t.p().z()};
 //cnv               float time = l->hit()->reccdc()->m_tdc + t0Offset;
                 float time = 0;
                 float dist = distance;

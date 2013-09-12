@@ -431,8 +431,8 @@ namespace Belle {
           int wire = h.wire().id();
           int side = leftRight;
           if (side == 0) side = -1;
-          float tp[3] = {p.x(), p.y(), p.z()};
-          float x[3] = {onWire.x(), onWire.y(), onWire.z()};
+          float tp[3] = {(float)p.x(), (float)p.y(), (float)p.z()};
+          float x[3] = {(float)onWire.x(), (float)onWire.y(), (float)onWire.z()};
 //cnv float time = h.reccdc()->m_tdc + t0Offset - tof;
           float time = 0;
           float dist;

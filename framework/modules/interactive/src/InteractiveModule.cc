@@ -45,6 +45,7 @@ void InteractiveModule::initialize()
 }
 void InteractiveModule::event()
 {
+  B2INFO("Opening (I)Python shell, press Ctrl+D to close it. Press Ctrl+C first to exit basf2.");
   if (PyRun_SimpleString("interactive.embed()") == -1) {
     B2ERROR("embed() failed!");
   }

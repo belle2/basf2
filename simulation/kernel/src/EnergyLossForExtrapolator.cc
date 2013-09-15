@@ -33,6 +33,8 @@
 #include <G4LossTableManager.hh>
 #include <G4WentzelVIModel.hh>
 
+#include <framework/logging/Logger.h>
+
 using namespace Belle2;
 using namespace Belle2::Simulation;
 
@@ -180,8 +182,7 @@ G4bool EnergyLossForExtrapolator::SetupKinematics(const G4ParticleDefinition* pa
   if (mat != currentMaterial) {
     G4int i = mat->GetIndex();
     if (i >= nmat) {
-      G4cout << "### EnergyLossForExtrapolator WARNING:index i= "
-             << i << " is out of table - NO extrapolation" << G4endl;
+      B2WARNING("EnergyLossForExtrapolator: index i= " << i << " is out of table - NO extrapolation")
     } else {
       flag = true;
       currentMaterial = mat;
@@ -213,9 +214,7 @@ G4bool EnergyLossForExtrapolator::SetupKinematics(const G4ParticleDefinition* pa
 void EnergyLossForExtrapolator::Initialisation()
 {
   isInitialised = true;
-  if (verbose > 1) {
-    G4cout << "### EnergyLossForExtrapolator::Initialisation" << G4endl;
-  }
+  B2DEBUG(10, "EnergyLossForExtrapolator::Initialisation")
   currentParticle = 0;
   currentMaterial = 0;
   kineticEnergy   = 0.0;
@@ -270,44 +269,32 @@ void EnergyLossForExtrapolator::Initialisation()
 
   G4LossTableBuilder builder;
 
-  if (verbose > 1)
-    G4cout << "### EnergyLossForExtrapolator Builds electron tables" << G4endl;
-
+  B2DEBUG(10, "EnergyLossForExtrapolator Builds electron tables")
   ComputeElectronDEDX(electron, dedxElectron);
   builder.BuildRangeTable(dedxElectron, rangeElectron);
   builder.BuildInverseRangeTable(rangeElectron, invRangeElectron);
 
-  if (verbose > 1)
-    G4cout << "### EnergyLossForExtrapolator Builds positron tables" << G4endl;
-
+  B2DEBUG(10, "EnergyLossForExtrapolator Builds positron tables")
   ComputeElectronDEDX(positron, dedxPositron);
   builder.BuildRangeTable(dedxPositron, rangePositron);
   builder.BuildInverseRangeTable(rangePositron, invRangePositron);
 
-  if (verbose > 1)
-    G4cout << "### EnergyLossForExtrapolator Builds muon tables" << G4endl;
-
+  B2DEBUG(10, "EnergyLossForExtrapolator Builds muon tables")
   ComputeMuonDEDX(muonPlus, dedxMuon);
   builder.BuildRangeTable(dedxMuon, rangeMuon);
   builder.BuildInverseRangeTable(rangeMuon, invRangeMuon);
 
-  if (verbose > 1)
-    G4cout << "### EnergyLossForExtrapolator Builds pion tables" << G4endl;
-
+  B2DEBUG(10, "EnergyLossForExtrapolator Builds pion tables")
   ComputeHadronDEDX(pionPlus, dedxPion);
   builder.BuildRangeTable(dedxPion, rangePion);
   builder.BuildInverseRangeTable(rangePion, invRangePion);
 
-  if (verbose > 1)
-    G4cout << "### EnergyLossForExtrapolator Builds kaon tables" << G4endl;
-
+  B2DEBUG(10, "EnergyLossForExtrapolator Builds kaon tables")
   ComputeHadronDEDX(kaonPlus, dedxKaon);
   builder.BuildRangeTable(dedxKaon, rangeKaon);
   builder.BuildInverseRangeTable(rangeKaon, invRangeKaon);
 
-  if (verbose > 1)
-    G4cout << "### EnergyLossForExtrapolator Builds proton tables" << G4endl;
-
+  B2DEBUG(10, "EnergyLossForExtrapolator Builds proton tables")
   ComputeHadronDEDX(proton, dedxProton);
   builder.BuildRangeTable(dedxProton, rangeProton);
   builder.BuildInverseRangeTable(rangeProton, invRangeProton);
@@ -338,8 +325,7 @@ const G4ParticleDefinition* EnergyLossForExtrapolator::FindParticle(const G4Stri
   if (name != currentParticleName) {
     p = G4ParticleTable::GetParticleTable()->FindParticle(name);
     if (!p) {
-      G4cout << "### EnergyLossForExtrapolator WARNING:FindParticle fails to find "
-             << name << G4endl;
+      B2WARNING("EnergyLossForExtrapolator: FindParticle fails to find " << name)
     }
   } else {
     p = currentParticle;
@@ -428,16 +414,12 @@ void EnergyLossForExtrapolator::ComputeElectronDEDX(const G4ParticleDefinition* 
   currentParticle = part;
 
   const G4MaterialTable* mtable = G4Material::GetMaterialTable();
-  if (0 < verbose) {
-    G4cout << "EnergyLossForExtrapolator::ComputeElectronDEDX for "
-           << part->GetParticleName()
-           << G4endl;
-  }
+  B2INFO("EnergyLossForExtrapolator::ComputeElectronDEDX for " << part->GetParticleName())
+
   for (G4int i = 0; i < nmat; i++) {
 
     const G4Material* mat = (*mtable)[i];
-    if (1 < verbose)
-      G4cout << "i= " << i << "  mat= " << mat->GetName() << G4endl;
+    B2DEBUG(10, "EnergyLossForExtrapolator::ComputeElectronDEDX(): i= " << i << "  mat= " << mat->GetName())
     const G4MaterialCutsCouple* couple = couples[i];
     G4PhysicsVector* aVector = (*table)[i];
 
@@ -445,12 +427,10 @@ void EnergyLossForExtrapolator::ComputeElectronDEDX(const G4ParticleDefinition* 
 
       G4double e = aVector->Energy(j);
       G4double dedx = ioni->ComputeDEDX(couple, part, e, e) + brem->ComputeDEDX(couple, part, e, e);
-      if (1 < verbose) {
-        G4cout << "j= " << j
-               << "  e(MeV)= " << e / MeV
-               << " dedx(Mev/cm)= " << dedx* cm / MeV
-               << " dedx(Mev.cm2/g)= " << dedx / ((MeV * mat->GetDensity()) / (g / cm2)) << G4endl;
-      }
+      B2DEBUG(10, "EnergyLossForExtrapolator::ComputeElectronDEDX(): j= " << j
+              << "  e(MeV)= " << e / MeV
+              << " dedx(Mev/cm)= " << dedx * cm / MeV
+              << " dedx(Mev.cm2/g)= " << dedx / ((MeV * mat->GetDensity()) / (g / cm2)))
       aVector->PutValue(j, dedx);
     }
   }
@@ -476,17 +456,12 @@ void EnergyLossForExtrapolator::ComputeMuonDEDX(const G4ParticleDefinition* part
   currentParticle = part;
 
   const G4MaterialTable* mtable = G4Material::GetMaterialTable();
-
-  if (0 < verbose) {
-    G4cout << "EnergyLossForExtrapolator::ComputeMuonDEDX for " << part->GetParticleName()
-           << G4endl;
-  }
+  B2INFO("EnergyLossForExtrapolator::ComputeMuonDEDX for " << part->GetParticleName())
 
   for (G4int i = 0; i < nmat; i++) {
 
     const G4Material* mat = (*mtable)[i];
-    if (1 < verbose)
-      G4cout << "i= " << i << "  mat= " << mat->GetName() << G4endl;
+    B2DEBUG(10, "EnergyLossForExtrapolator::ComputeMuonDEDX(): i= " << i << "  mat= " << mat->GetName())
     const G4MaterialCutsCouple* couple = couples[i];
     G4PhysicsVector* aVector = (*table)[i];
     for (G4int j = 0; j <= nbins; j++) {
@@ -496,12 +471,10 @@ void EnergyLossForExtrapolator::ComputeMuonDEDX(const G4ParticleDefinition* part
                       pair->ComputeDEDX(couple, part, e, e) +
                       brem->ComputeDEDX(couple, part, e, e);
       aVector->PutValue(j, dedx);
-      if (1 < verbose) {
-        G4cout << "j= " << j
-               << "  e(MeV)= " << e / MeV
-               << " dedx(Mev/cm)= " << dedx* cm / MeV
-               << " dedx(Mev/(g/cm2)= " << dedx / ((MeV * mat->GetDensity()) / (g / cm2)) << G4endl;
-      }
+      B2DEBUG(10, "EnergyLossForExtrapolator::ComputeMuonDEDX(): j= " << j
+              << "  e(MeV)= " << e / MeV
+              << " dedx(Mev/cm)= " << dedx * cm / MeV
+              << " dedx(Mev/(g/cm2)= " << dedx / ((MeV * mat->GetDensity()) / (g / cm2)))
     }
   }
   delete ioni;
@@ -521,17 +494,12 @@ void EnergyLossForExtrapolator::ComputeHadronDEDX(const G4ParticleDefinition* pa
   currentParticle = part;
 
   const G4MaterialTable* mtable = G4Material::GetMaterialTable();
-
-  if (0 < verbose) {
-    G4cout << "EnergyLossForExtrapolator::ComputeHadronDEDX for " << part->GetParticleName()
-           << G4endl;
-  }
+  B2INFO("EnergyLossForExtrapolator::ComputeHadronDEDX for " << part->GetParticleName())
 
   for (G4int i = 0; i < nmat; i++) {
 
     const G4Material* mat = (*mtable)[i];
-    if (1 < verbose)
-      G4cout << "i= " << i << "  mat= " << mat->GetName() << G4endl;
+    B2DEBUG(10, "EnergyLossForExtrapolator::ComputeHadronDEDX(): i= " << i << "  mat= " << mat->GetName())
     const G4MaterialCutsCouple* couple = couples[i];
     G4PhysicsVector* aVector = (*table)[i];
     for (G4int j = 0; j <= nbins; j++) {
@@ -539,12 +507,10 @@ void EnergyLossForExtrapolator::ComputeHadronDEDX(const G4ParticleDefinition* pa
       G4double e = aVector->Energy(j);
       G4double dedx = ioni->ComputeDEDX(couple, part, e, e);
       aVector->PutValue(j, dedx);
-      if (1 < verbose) {
-        G4cout << "j= " << j
-               << "  e(MeV)= " << e / MeV
-               << " dedx(Mev/cm)= " << dedx* cm / MeV
-               << " dedx(Mev.cm2/g)= " << dedx / ((mat->GetDensity()) / (g / cm2)) << G4endl;
-      }
+      B2DEBUG(10, "EnergyLossForExtrapolator::ComputeHadronDEDX(): j= " << j
+              << "  e(MeV)= " << e / MeV
+              << " dedx(Mev/cm)= " << dedx * cm / MeV
+              << " dedx(Mev.cm2/g)= " << dedx / ((mat->GetDensity()) / (g / cm2)))
     }
   }
   delete ioni;
@@ -565,28 +531,21 @@ void EnergyLossForExtrapolator::ComputeTransportXS(const G4ParticleDefinition* p
   currentParticle = part;
 
   const G4MaterialTable* mtable = G4Material::GetMaterialTable();
-
-  if (0 < verbose) {
-    G4cout << "EnergyLossForExtrapolator::ComputeTransportXS for " << part->GetParticleName()
-           << G4endl;
-  }
+  B2INFO("EnergyLossForExtrapolator::ComputeTransportXS for " << part->GetParticleName())
 
   for (G4int i = 0; i < nmat; i++) {
 
     const G4Material* mat = (*mtable)[i];
     msc->SetCurrentCouple(couples[i]);
-    if (1 < verbose)
-      G4cout << "i= " << i << "  mat= " << mat->GetName() << G4endl;
+    B2DEBUG(10, "EnergyLossForExtrapolator::ComputeTransportXS(): i= " << i << "  mat= " << mat->GetName())
     G4PhysicsVector* aVector = (*table)[i];
     for (G4int j = 0; j <= nbins; j++) {
 
       G4double e = aVector->Energy(j);
       G4double xs = msc->CrossSectionPerVolume(mat, part, e);
       aVector->PutValue(j, xs);
-      if (1 < verbose) {
-        G4cout << "j= " << j << "  e(MeV)= " << e / MeV
-               << " xs(1/mm)= " << xs* mm << G4endl;
-      }
+      B2DEBUG(10, "EnergyLossForExtrapolator::ComputeTransportXS(): j= " << j << "  e(MeV)= " << e / MeV
+              << " xs(1/mm)= " << xs * mm)
     }
   }
   delete msc;

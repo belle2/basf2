@@ -43,6 +43,7 @@ namespace Belle2 {
       virtual ~He3tubeCreator();
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
     protected:
+      /**  SensitiveDetector He-3 tube */
       SensitiveDetector* m_sensitive;
     };
 

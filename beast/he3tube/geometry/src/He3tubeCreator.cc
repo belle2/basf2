@@ -46,6 +46,7 @@ namespace Belle2 {
   namespace he3tube {
 
     // Register the creator
+    /** Creator creates the He-3 tube geometry */
     geometry::CreatorFactory<He3tubeCreator> He3tubeFactory("HE3TUBECreator");
 
     He3tubeCreator::He3tubeCreator(): m_sensitive(0)
@@ -146,7 +147,7 @@ namespace Belle2 {
                                        activeParams.getLength("tube_hz")*Unit::cm,
                                        startAngle, spanningAngle);
 
-        string matGas = activeParams.getString("MaterialGas");
+        //string matGas = activeParams.getString("MaterialGas");
         G4LogicalVolume* l_iHe3Gas = new G4LogicalVolume(s_iHe3Gas, gHe3, "l_iHe3Gas");
 
         new G4PVPlacement(rot_he3tube, He3TUBEpos, l_iHe3Gas, "p_iHe3Gas", &topVolume, false, 1);

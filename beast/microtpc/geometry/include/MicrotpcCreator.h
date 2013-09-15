@@ -43,6 +43,7 @@ namespace Belle2 {
       virtual ~MicrotpcCreator();
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
     protected:
+      /**  SensitiveDetector micro-tpc */
       SensitiveDetector* m_sensitive;
     };
 

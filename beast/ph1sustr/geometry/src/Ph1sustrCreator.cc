@@ -46,6 +46,7 @@ namespace Belle2 {
   namespace ph1sustr {
 
     // Register the creator
+    /** Creator creates the phase 1 support structure geometry */
     geometry::CreatorFactory<Ph1sustrCreator> Ph1sustrFactory("PH1SUSTRCreator");
 
     Ph1sustrCreator::Ph1sustrCreator(): m_sensitive(0)

@@ -43,6 +43,7 @@ namespace Belle2 {
       virtual ~CaveCreator();
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
     protected:
+      /**  SensitiveDetector cave */
       SensitiveDetector* m_sensitive;
     };
 

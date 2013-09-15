@@ -45,6 +45,7 @@ namespace Belle2 {
   namespace microtpc {
 
     // Register the creator
+    /** Creator creates the micro-tpc geometry */
     geometry::CreatorFactory<MicrotpcCreator> MicrotpcFactory("MICROTPCCreator");
 
     MicrotpcCreator::MicrotpcCreator(): m_sensitive(0)

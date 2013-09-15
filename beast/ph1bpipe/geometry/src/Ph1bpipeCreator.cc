@@ -46,6 +46,7 @@ namespace Belle2 {
   namespace ph1bpipe {
 
     // Register the creator
+    /** Creator creates the phase 1 beam pipe for |s| < 4 m geometry */
     geometry::CreatorFactory<Ph1bpipeCreator> Ph1bpipeFactory("PH1BPIPECreator");
 
     Ph1bpipeCreator::Ph1bpipeCreator(): m_sensitive(0)

@@ -43,6 +43,7 @@ namespace Belle2 {
       virtual ~Ph1sustrCreator();
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
     protected:
+      /**  SensitiveDetector phase 1 support structure */
       SensitiveDetector* m_sensitive;
     };
 

@@ -46,6 +46,7 @@ namespace Belle2 {
   namespace cave {
 
     // Register the creator
+    /** Creator creates the cave geometry */
     geometry::CreatorFactory<CaveCreator> CaveFactory("CAVECreator");
 
     CaveCreator::CaveCreator(): m_sensitive(0)

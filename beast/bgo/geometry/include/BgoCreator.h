@@ -43,6 +43,7 @@ namespace Belle2 {
       virtual ~BgoCreator();
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
     protected:
+      /**  SensitiveDetector BGO */
       SensitiveDetector* m_sensitive;
     };
 

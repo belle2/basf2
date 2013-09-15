@@ -77,6 +77,7 @@ analysis.set_log_level(LogLevel.INFO)
 # output.param('outputFileName', 'microtpc-simulation.root')
 # output.param('outputFileName', 'he3tube-simulation.root')
 output.param('outputFileName', 'bgo-simulation.root')
+output.param('updateFileCatalog', False)
 
 # Here we create a processing path and add the modules
 main = create_path()

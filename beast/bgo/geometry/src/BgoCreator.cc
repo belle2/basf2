@@ -46,6 +46,7 @@ namespace Belle2 {
   namespace bgo {
 
     // Register the creator
+    /** Creator creates the BGO geometry */
     geometry::CreatorFactory<BgoCreator> BgoFactory("BGOCreator");
 
     BgoCreator::BgoCreator(): m_sensitive(0)

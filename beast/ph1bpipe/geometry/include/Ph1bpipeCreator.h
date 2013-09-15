@@ -43,6 +43,7 @@ namespace Belle2 {
       virtual ~Ph1bpipeCreator();
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
     protected:
+      /**  SensitiveDetector phase 1 beam pipe */
       SensitiveDetector* m_sensitive;
     };
 

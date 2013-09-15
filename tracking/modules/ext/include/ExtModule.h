@@ -128,14 +128,16 @@ namespace Belle2 {
     //!  ChargedStable hypotheses
     std::vector<Const::ChargedStable> m_chargedStable;
 
-    // Pointers to geant4 physical volumes whose entry/exit points will be saved
+    //! Pointers to geant4 physical volumes whose entry points will be saved
     std::vector<G4VPhysicalVolume*>* m_enter;
+
+    //! Pointers to geant4 physical volumes whose exit points will be saved
     std::vector<G4VPhysicalVolume*>* m_exit;
 
-    // Time of flight (ns) along the track from the interaction point
+    //! Time of flight (ns) along the track from the interaction point
     double m_tof;
 
-    // virtual "target" cylinder
+    //! virtual "target" cylinder (boundary beyond which extrapolation ends)
     Simulation::ExtCylSurfaceTarget* m_target;
 
   };

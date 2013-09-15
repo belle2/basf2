@@ -237,7 +237,6 @@ void ExtModule::event()
       double minP = sqrt((mass + m_minKE) * (mass + m_minKE) - mass * mass);
       G4ErrorFreeTrajState* state = new G4ErrorFreeTrajState(g4eName, position, momentum, covG4e);
       m_extMgr->InitTrackPropagation();
-      std::cout << "ExtModule::event():  extrapolating track # " << t << " with hypothesis " << hypothesis << " and Q = " << charge << "  PDG = " << pdgCode << "  p = (" << momentum.x() << ", " << momentum.y() << ", " << momentum.z() << ")  .............." << std::endl; // DIVOT
       while (true) {
         const G4int    errCode    = m_extMgr->PropagateOneStep(state, G4ErrorMode_PropForwards);
         G4Track*       track      = state->GetG4Track();

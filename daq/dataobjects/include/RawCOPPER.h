@@ -162,7 +162,7 @@ namespace Belle2 {
 
     int m_nwords;
     int* m_buffer; //[m_nwords]
-    bool m_allocated;
+    bool m_use_prealloc_buf;
 
     RawHeader tmp_header;  //! Not record
     RawTrailer tmp_trailer; //! Not record

@@ -17,12 +17,14 @@ RawCOPPER::RawCOPPER()
 {
   m_nwords = 0;
   m_buffer = NULL;
-  m_allocated = false;
+  m_use_prealloc_buf = false;
 }
 
 RawCOPPER::~RawCOPPER()
 {
-  if (m_allocated) delete[] m_buffer;
+  if (!m_use_prealloc_buf && m_buffer != NULL) {
+    delete[] m_buffer;
+  }
 }
 
 int* RawCOPPER::GetRawHdrBufPtr()
@@ -59,9 +61,9 @@ int RawCOPPER::GetBodyNwords()
 // int* RawCOPPER::AllocateBuffer(int nwords)
 // {
 //   m_nwords = nwords;
-//   if (m_allocated) delete[] m_buffer;
+//   if (!m_use_prealloc_buf && m_buffer != NULL) delete[] m_buffer;
 //   m_buffer = new int[nwords];
-//   m_allocated = true;
+//   m_use_prealloc_buf = false;
 //   return m_buffer;
 // }
 
@@ -73,12 +75,12 @@ int* RawCOPPER::GetBuffer()
 
 void RawCOPPER::SetBuffer(int* bufin, int nwords, int malloc_flag)
 {
-  if (m_allocated) delete[] m_buffer;
+  if (!m_use_prealloc_buf && m_buffer != NULL) delete[] m_buffer;
 
   if (malloc_flag == 0) {
-    m_allocated = false;
+    m_use_prealloc_buf = true;
   } else {
-    m_allocated = true;
+    m_use_prealloc_buf = false;
   }
   //  m_nwords = bufin[0];
   m_nwords = nwords;

@@ -120,12 +120,14 @@ def add_reconstruction(path, components=None):
         path.add_module(dEdxPID)
 
         # track extrapolation
-        ext = register_module('Ext')
-        path.add_module(ext)
+        if components == None or 'CDC' in components and 'ECL' in components:
+            ext = register_module('Ext')
+            path.add_module(ext)
 
         # muon identification
-        muid = register_module('Muid')
-        path.add_module(muid)
+        if components == None or 'BKLM' in components and 'EKLM' in components:
+            muid = register_module('Muid')
+            path.add_module(muid)
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path, components)
@@ -163,8 +165,14 @@ def add_mc_reconstruction(path, components=None):
         path.add_module(dEdxPID)
 
         # track extrapolation
-        ext = register_module('Ext')
-        path.add_module(ext)
+        if components == None or 'CDC' in components and 'ECL' in components:
+            ext = register_module('Ext')
+            path.add_module(ext)
+
+        # muon identification
+        if components == None or 'BKLM' in components and 'EKLM' in components:
+            muid = register_module('Muid')
+            path.add_module(muid)
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path, components)

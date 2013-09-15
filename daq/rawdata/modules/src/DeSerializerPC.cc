@@ -9,6 +9,7 @@
 #include <daq/rawdata/modules/DeSerializerPC.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
+#include <sys/mman.h>
 
 //#define MAXEVTSIZE 400000000
 #define CHECKEVT 5000
@@ -97,6 +98,8 @@ void DeSerializerPCModule::initialize()
   memset(time_array1, 0, sizeof(time_array1));
   memset(time_array2, 0, sizeof(time_array2));
 
+//   m_shmname = "/tmp/temp.daq";
+//   int shm_open(const char *m_shmname, int oflag, mode_t mode);
 
 }
 
@@ -459,6 +462,10 @@ void DeSerializerPCModule::event()
   m_eventMetaDataPtr->setEvent(n_basf2evt);
 
   n_basf2evt++;
+
+  if (n_basf2evt % 10) {
+
+  }
 
 
   if (max_nevt >= 0 || max_seconds >= 0.) {

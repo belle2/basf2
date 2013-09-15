@@ -89,7 +89,7 @@ namespace Belle2 {
     int m_ADC;
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMRawHit, 1)
+    ClassDef(BKLMRawHit, 2)
 
   };
 

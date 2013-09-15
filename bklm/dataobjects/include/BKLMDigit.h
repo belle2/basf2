@@ -196,7 +196,7 @@ namespace Belle2 {
     int m_FitStatus;
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMDigit, 1)
+    ClassDef(BKLMDigit, 2)
 
   };
 

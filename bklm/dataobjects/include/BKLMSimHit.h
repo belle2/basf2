@@ -171,7 +171,7 @@ namespace Belle2 {
     double m_KineticEnergy;
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMSimHit, 1);
+    ClassDef(BKLMSimHit, 2);
 
   };
 

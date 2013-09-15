@@ -10,8 +10,10 @@
 
 #include <bklm/modules/bklmReconstruction/BKLMReconstructorModule.h>
 
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <bklm/geometry/GeometryPar.h>
 #include <bklm/geometry/Module.h>
 #include <bklm/dataobjects/BKLMDigit.h>
@@ -64,6 +66,8 @@ void BKLMReconstructorModule::initialize()
 
 void BKLMReconstructorModule::beginRun()
 {
+  StoreObjPtr<EventMetaData> evtMetaData;
+  B2INFO("BKLMReconstructorModule::beginRun(): experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun())
 }
 
 void BKLMReconstructorModule::event()

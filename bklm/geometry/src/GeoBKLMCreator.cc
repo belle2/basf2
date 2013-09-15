@@ -159,9 +159,6 @@ namespace Belle2 {
         bool hasChimney = (fb == BKLM_BACKWARD) && (sector == 3);
         bool hasInnerSupport = (sector <= m_GeoPar->getNSector() / 2 + 1);
         G4LogicalVolume* sectorLogical = getSectorLogical(fb, hasChimney, hasInnerSupport);
-        putCapInSector(sectorLogical, hasChimney);
-        putInnerRegionInSector(sectorLogical, hasInnerSupport, hasChimney);
-        putLayersInSector(sectorLogical, (fb == BKLM_FORWARD), sector, hasChimney);
         new G4PVPlacement(G4RotateZ3D(m_SectorDphi * s),
                           sectorLogical,
                           physicalName(sectorLogical),
@@ -207,8 +204,6 @@ namespace Belle2 {
                               name
                              );
         capLogical[newLvol]->SetVisAttributes(G4VisAttributes(false));
-      }
-      if (cablesLogical[newLvol] == NULL) {
         name = (hasChimney ? "BKLM.ChimneyCablesSolid" : "BKLM.CablesSolid");
         G4Box* cablesSolid =
           new G4Box(name, 0.5 * (ro - ri), dy, dz);
@@ -218,23 +213,23 @@ namespace Belle2 {
                               logicalName(cablesSolid)
                              );
         cablesLogical[newLvol]->SetVisAttributes(G4VisAttributes(false));
+        new G4PVPlacement(G4Translate3D(0.5 * (ri + ro), -(0.5 * dyBrace + dy), 0.0),
+                          cablesLogical[newLvol],
+                          physicalName(cablesLogical[newLvol]) + "_L",
+                          capLogical[newLvol],
+                          false,
+                          1,
+                          m_GeoPar->doOverlapCheck()
+                         );
+        new G4PVPlacement(G4Translate3D(0.5 * (ri + ro), +(0.5 * dyBrace + dy), 0.0),
+                          cablesLogical[newLvol],
+                          physicalName(cablesLogical[newLvol]) + "_R",
+                          capLogical[newLvol],
+                          false,
+                          2,
+                          m_GeoPar->doOverlapCheck()
+                         );
       }
-      new G4PVPlacement(G4Translate3D(0.5 * (ri + ro), -(0.5 * dyBrace + dy), 0.0),
-                        cablesLogical[newLvol],
-                        physicalName(cablesLogical[newLvol]),
-                        capLogical[newLvol],
-                        false,
-                        1,
-                        m_GeoPar->doOverlapCheck()
-                       );
-      new G4PVPlacement(G4Translate3D(0.5 * (ri + ro), +(0.5 * dyBrace + dy), 0.0),
-                        cablesLogical[newLvol],
-                        physicalName(cablesLogical[newLvol]),
-                        capLogical[newLvol],
-                        false,
-                        2,
-                        m_GeoPar->doOverlapCheck()
-                       );
       new G4PVPlacement(G4TranslateZ3D(m_SectorDz - dz),
                         capLogical[newLvol],
                         physicalName(capLogical[newLvol]),
@@ -271,16 +266,14 @@ namespace Belle2 {
       }
       int newLvol = (hasInnerSupport ? 2 : 0) + (hasChimney ? 1 : 0);
       if (innerIronLogical[newLvol] == NULL) {
-        char name[80] = "";
-        sprintf(name, "BKLM.InnerIronType%sLogical", (hasChimney ? "Chimney" : ""));
         innerIronLogical[newLvol] =
           new G4LogicalVolume(innerIronSolid,
                               Materials::get("G4_Fe"),
-                              name
+                              (hasChimney ? "BKLM.InnerIronChimneyLogical" : "BKLM.InnerIronLogical")
                              );
         innerIronLogical[newLvol]->SetVisAttributes(G4VisAttributes(false));
+        putVoidInInnerRegion(innerIronLogical[newLvol], hasInnerSupport, hasChimney);
       }
-      putVoidInInnerRegion(innerIronLogical[newLvol], hasInnerSupport, hasChimney);
       new G4PVPlacement(G4TranslateZ3D(0.0),
                         innerIronLogical[newLvol],
                         physicalName(innerIronLogical[newLvol]),
@@ -319,18 +312,16 @@ namespace Belle2 {
       }
       int newLvol = (hasInnerSupport ? 2 : 0) + (hasChimney ? 1 : 0);
       if (innerAirLogical[newLvol] == NULL) {
-        char name[80] = "";
-        sprintf(name, "BKLM.InnerAirType%sLogical", (hasChimney ? "Chimney" : ""));
         innerAirLogical[newLvol] =
           new G4LogicalVolume(innerAirSolid,
                               Materials::get("G4_AIR"),
-                              name
+                              (hasChimney ? "BKLM.InnerAirChimneyLogical" : "BKLM.InnerAirLogical")
                              );
         innerAirLogical[newLvol]->SetVisAttributes(G4VisAttributes(false));
-      }
-      if (hasInnerSupport) {
-        putLayer1SupportInInnerVoid(innerAirLogical[newLvol], hasChimney);
-        putLayer1BracketsInInnerVoid(innerAirLogical[newLvol], hasChimney);
+        if (hasInnerSupport) {
+          putLayer1SupportInInnerVoid(innerAirLogical[newLvol], hasChimney);
+          putLayer1BracketsInInnerVoid(innerAirLogical[newLvol], hasChimney);
+        }
       }
       new G4PVPlacement(G4TranslateX3D(m_RibShift),
                         innerAirLogical[newLvol],
@@ -350,7 +341,7 @@ namespace Belle2 {
       const Hep3Vector size = m_GeoPar->getSupportPlateHalfSize(hasChimney) * cm;
       if (supportLogical[newLvol] == NULL) {
         G4Box* supportBox =
-          new G4Box(G4String((hasChimney ? "BKLM.ChimneySupportSolid" : "BKLM.SupportSolid")),
+          new G4Box((hasChimney ? "BKLM.ChimneySupportSolid" : "BKLM.SupportSolid"),
                     size.x(),
                     size.y(),
                     size.z()
@@ -457,10 +448,12 @@ namespace Belle2 {
                              );
         bracketsLogical->SetVisAttributes(G4VisAttributes(true, G4Colour(0.6, 0.6, 0.6)));
       }
+      char name[80] = "";
       for (int bracket = 0; bracket < (hasChimney ? 2 : 3); ++bracket) {
+        sprintf(name, "%s%d", (hasChimney ? "Chimney" : ""), bracket);
         new G4PVPlacement(G4TranslateZ3D(m_GeoPar->getBracketZPosition(bracket, hasChimney) * cm),
                           bracketsLogical,
-                          physicalName(bracketsLogical),
+                          physicalName(bracketsLogical) + name,
                           innerAirLogical,
                           false,
                           bracket,
@@ -469,7 +462,7 @@ namespace Belle2 {
       }
     }
 
-    void GeoBKLMCreator::putLayersInSector(G4LogicalVolume* sectorLogical, bool isForward, int sector, bool hasChimney)
+    void GeoBKLMCreator::putLayersInSector(G4LogicalVolume* sectorLogical, bool isForward, bool hasChimney)
     {
       static G4Polyhedra* layerIronSolid[NLAYER + 1] = { NULL };
       static G4LogicalVolume* layerIronLogical[2 * (NLAYER + 1)] = { NULL };
@@ -495,6 +488,7 @@ namespace Belle2 {
         }
         int newLvol = (hasChimney ? (NLAYER + 1) : 0) + layer;
         if (layerIronLogical[newLvol] == NULL) {
+          int sector = (hasChimney ? 3 : 1);
           sprintf(name, "BKLM.Layer%02d%sIronLogical", layer, (hasChimney ? "Chimney" : ""));
           layerIronLogical[newLvol] =
             new G4LogicalVolume(layerIronSolid[layer],
@@ -933,6 +927,9 @@ namespace Belle2 {
                               name
                              );
         sectorLogical[newLvol]->SetVisAttributes(G4VisAttributes(false));
+        putCapInSector(sectorLogical[newLvol], hasChimney);
+        putInnerRegionInSector(sectorLogical[newLvol], hasInnerSupport, hasChimney);
+        putLayersInSector(sectorLogical[newLvol], (fb == BKLM_FORWARD), hasChimney);
       }
       return sectorLogical[newLvol];
     }

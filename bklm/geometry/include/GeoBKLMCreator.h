@@ -71,7 +71,7 @@ namespace Belle2 {
       void putLayer1BracketsInInnerVoid(G4LogicalVolume*, bool);
 
       //! Put the layers into each sector
-      void putLayersInSector(G4LogicalVolume*, bool, int, bool);
+      void putLayersInSector(G4LogicalVolume*, bool, bool);
 
       //! Put the solenoid's cooling chimney into the backward top sector
       void putChimneyInLayer(G4LogicalVolume*, int);

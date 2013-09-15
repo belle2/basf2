@@ -187,7 +187,7 @@ namespace Belle2 {
     double m_EDep;
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMHit2d, 1)
+    ClassDef(BKLMHit2d, 2)
 
   };
 

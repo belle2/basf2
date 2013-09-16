@@ -89,19 +89,19 @@ namespace Belle2 {
       RelationIndex<MCParticle, CaveSimHit> relMCSimHit(mcParticles, simHits);
 
       //Lets loop over all created CaveSimHits:
-      int nSimHits = simHits.getEntries();
-      for (int i = 0; i < nSimHits; ++i) {
-        CaveSimHit& hit = *simHits[i];
-        //Find all MCParticles which point to that SimHit and the corresponding weight
-        RelationIndex<MCParticle, CaveSimHit>::range_to range = relMCSimHit.getElementsTo(hit);
-        //for (; range.first != range.second; ++range.first) {
-        //And Print something about the relation
-        //const RelationIndex<MCParticle, CaveSimHit>::Element& relation = *range.first;
-        //B2INFO("CaveSimHit #" << i << " has an energy deposition of " << hit.getEnergyDep()
-        //     << " and is related to MCParticle #" << relation.indexFrom
-        //       << " which has an PDG code of " << relation.from->getPDG());
-        //}
-      }
+      //int nSimHits = simHits.getEntries();
+      //for (int i = 0; i < nSimHits; ++i) {
+      //CaveSimHit& hit = *simHits[i];
+      //Find all MCParticles which point to that SimHit and the corresponding weight
+      //RelationIndex<MCParticle, CaveSimHit>::range_to range = relMCSimHit.getElementsTo(hit);
+      //for (; range.first != range.second; ++range.first) {
+      //And Print something about the relation
+      //const RelationIndex<MCParticle, CaveSimHit>::Element& relation = *range.first;
+      //B2INFO("CaveSimHit #" << i << " has an energy deposition of " << hit.getEnergyDep()
+      //     << " and is related to MCParticle #" << relation.indexFrom
+      //       << " which has an PDG code of " << relation.from->getPDG());
+      //}
+      //}
 
       //Now let's do it the other way round:
       int nMCParticles = mcParticles.getEntries();

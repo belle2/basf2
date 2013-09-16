@@ -174,7 +174,6 @@ namespace Belle2 {
     {
       static G4Polyhedra* capSolid = NULL;
       static G4LogicalVolume* capLogical[2] = { NULL };
-      static G4LogicalVolume* cablesLogical[2] = { NULL };
 
       // Fill cap with iron and (aluminum) cables
       const Hep3Vector gapHalfSize = m_GeoPar->getGapHalfSize(0, false) * cm;
@@ -207,23 +206,23 @@ namespace Belle2 {
         name = (hasChimney ? "BKLM.ChimneyCablesSolid" : "BKLM.CablesSolid");
         G4Box* cablesSolid =
           new G4Box(name, 0.5 * (ro - ri), dy, dz);
-        cablesLogical[newLvol] =
+        G4LogicalVolume* cablesLogical =
           new G4LogicalVolume(cablesSolid,
                               Materials::get("G4_Al"),
                               logicalName(cablesSolid)
                              );
-        cablesLogical[newLvol]->SetVisAttributes(G4VisAttributes(false));
+        cablesLogical->SetVisAttributes(G4VisAttributes(false));
         new G4PVPlacement(G4Translate3D(0.5 * (ri + ro), -(0.5 * dyBrace + dy), 0.0),
-                          cablesLogical[newLvol],
-                          physicalName(cablesLogical[newLvol]) + "_L",
+                          cablesLogical,
+                          physicalName(cablesLogical) + "_L",
                           capLogical[newLvol],
                           false,
                           1,
                           m_GeoPar->doOverlapCheck()
                          );
         new G4PVPlacement(G4Translate3D(0.5 * (ri + ro), +(0.5 * dyBrace + dy), 0.0),
-                          cablesLogical[newLvol],
-                          physicalName(cablesLogical[newLvol]) + "_R",
+                          cablesLogical,
+                          physicalName(cablesLogical) + "_R",
                           capLogical[newLvol],
                           false,
                           2,

@@ -96,11 +96,12 @@ void BKLMHit2d::getLocalPosition(double position[2], double error[2]) const
   error[1] = sqrt(m_LocalVariance[1][1]);
 }
 
-void BKLMHit2d::getLocalVariance(double variance[2]) const
-{
-  variance[0] = m_LocalVariance[0][0];
-  variance[1] = m_LocalVariance[1][1];
-}
+// DIVOT this function is not used
+//void BKLMHit2d::getLocalVariance(double variance[2]) const
+//{
+//  variance[0] = m_LocalVariance[0][0];
+//  variance[1] = m_LocalVariance[1][1];
+//}
 
 void BKLMHit2d::setLocalPosition(double x, double y, double z)
 {

@@ -91,9 +91,6 @@ namespace Belle2 {
     //! returns 2D hit position and uncertainty in local coordinates (cm)
     void getLocalPosition(double position[2], double positionError[2]) const;
 
-    //! returns 2D hit variance in local coordinates (cm)
-    void getLocalVariance(double positionVariance[2]) const;
-
     //! returns 2D reconstructed hit time (average of the 2 projections)
     double getTime() const { return m_Time; }
 

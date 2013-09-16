@@ -14,6 +14,8 @@
 
 #include <boost/array.hpp>
 
+#include <map>
+
 namespace Belle2 {
 
   /** Manager to keep a cache of existing RelationIndexContainers.
@@ -49,6 +51,8 @@ namespace Belle2 {
       RelationMap::iterator it = relations.find(name);
       if (it != relations.end()) {
         indexContainer = dynamic_cast< RelationIndexContainer<FROM, TO>* >(it->second);
+        if (!indexContainer and it->second)
+          delete it->second; //avoid memory leak if type differs
       }
       if (!indexContainer) {
         indexContainer = new RelationIndexContainer<FROM, TO>(relation.getAccessorParams());
@@ -67,13 +71,7 @@ namespace Belle2 {
      *
      *  @param durability Which cache to clear
      */
-    void clear(DataStore::EDurability durability = DataStore::c_Event) {
-      RelationMap& relations = m_cache[durability];
-      RelationMap::iterator end(relations.end());
-      for (RelationMap::iterator it = relations.begin(); it != end; ++it)
-        delete it->second;
-      relations.clear();
-    }
+    void clear(DataStore::EDurability durability = DataStore::c_Event);
 
   protected:
     /** Constructor hidden. */

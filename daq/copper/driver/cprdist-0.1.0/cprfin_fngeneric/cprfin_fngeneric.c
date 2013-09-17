@@ -29,10 +29,14 @@ cprfinfngeneric_getreg(const int slot, const off_t offset /* offset in unsigned 
 	if( offset <0 || offset > 0x7f ) return -EINVAL;
 
 	finesse_base_addr = cprfin_finesse_base_addr(slot);
+	/*
+	nakao: this printk reads the register three times and therefore harmful.
+
 	printk("finesse_base_addr = 0x%08x, offset=0x%08x, rawval=0x%08x, macro_access=0x%08x\n", 
 	    finesse_base_addr, offset,
 	    *(finesse_base_addr + offset),
 		cprfin_finesse_reg(slot, 4 * offset));
+	*/
 	*val = (*(finesse_base_addr + offset)) >> 24;
 
 	return 0;
@@ -125,10 +129,14 @@ cprfinfngeneric_open(struct inode *inode, struct file *filp)
 
 	if( slot<0 || slot > 4 ) return -ENXIO;
 
+/*
+	nakao: multiple access to FINESSE is needed in some application
+
 	if( CPRFIN_opened[slot] ){
 		printk(DRIVER_NAME ": open(): device busy\n");
 		return -EBUSY;
 	}
+*/
 
 	if( !cprfin_exist_finesse(slot) ){
 		printk(DRIVER_NAME ": open(): no such device or address\n");

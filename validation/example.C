@@ -12,6 +12,8 @@ void example()
   hTopLHs->GetXaxis()->SetTitle("TOP LL(#pi)-LL(K)");
   hTopLHs->GetYaxis()->SetTitle("tracks");
   tree->Draw("TOPLikelihoods.m_logL_pi-TOPLikelihoods.m_logL_K>>hTopLHs");
+  hTopLHs->GetListOfFunctions()->Add(new TNamed("Description", "This is an example of a validation plot."));
+  hTopLHs->GetListOfFunctions()->Add(new TNamed("Check", "- There is a colored line for each revision/release.<br>- There is a histogram with black line and grey fill color as reference plot."));
   hTopLHs->Write();
 
   // an example of a 2D histogram
@@ -19,13 +21,17 @@ void example()
   hMCVertex->GetXaxis()->SetTitle("x [cm]");
   hMCVertex->GetYaxis()->SetTitle("y [cm]");
   tree->Draw("MCParticles.m_productionVertex_y:MCParticles.m_productionVertex_x>>hMCVertex");
+  hMCVertex->GetListOfFunctions()->Add(new TNamed("Description", "This is an example of a 2D validation plot."));
+  hMCVertex->GetListOfFunctions()->Add(new TNamed("Check", "There is a 2D plot for the reference and for each revision/release."));
   hMCVertex->Write();
 
   // an example of a numerical value
   TH1F* hNTrackCands = new TH1F("hNTrackCands", "Number of Track Candidates", 100, -0.5, 99.5);
-  tree->Draw("@GFTrackCands.size()>>hNTrackCands");
+  tree->Draw("@Tracks.size()>>hNTrackCands");
   TNtuple* nTrackCands = new TNtuple("nTrackCands", "Average Number of Track Candidates", "number:rms");
   nTrackCands->Fill(hNTrackCands->GetMean(), hNTrackCands->GetRMS());
+  nTrackCands->SetAlias("Description", "This is an example of a table with validation values.");
+  nTrackCands->SetAlias("Check", "There is a row for the reference and for each revision/release.");
   delete hNTrackCands;
   nTrackCands->Write();
 

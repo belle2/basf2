@@ -22,19 +22,10 @@ evtgeninput.param('boost2LAB', True)
 main.add_module(evtgeninput)
 
 # detecor simulation
-components = [
-    'MagneticField',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-    'TOP',
-    'ARICH',
-    ]
-add_simulation(main, components)
+add_simulation(main)
 
 # reconstruction
-add_reconstruction(main, components)
+add_reconstruction(main)
 
 # output
 output = register_module('RootOutput')

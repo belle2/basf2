@@ -165,10 +165,10 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawhdr.SetTruncMask(m_trunc_mask);   // Fill 8th header word
 
   // Offset
-  rawhdr.SetOffset1stB2l(raw_copper->GetOffset1stB2l());    // Fill 9th header word
-  rawhdr.SetOffset2ndB2l(raw_copper->GetOffset2ndB2l());   // Fill 10th header word
-  rawhdr.SetOffset3rdB2l(raw_copper->GetOffset3rdB2l());   // Fill 11th header word
-  rawhdr.SetOffset4thB2l(raw_copper->GetOffset4thB2l());   // Fill 12th header word
+  rawhdr.SetOffset1stFINNESSE(raw_copper->GetOffset1stFINNESSE());    // Fill 9th header word
+  rawhdr.SetOffset2ndFINNESSE(raw_copper->GetOffset2ndFINNESSE());   // Fill 10th header word
+  rawhdr.SetOffset3rdFINNESSE(raw_copper->GetOffset3rdFINNESSE());   // Fill 11th header word
+  rawhdr.SetOffset4thFINNESSE(raw_copper->GetOffset4thFINNESSE());   // Fill 12th header word
 
   // Add node-info
   rawhdr.AddNodeInfo(m_nodeid);   // Fill 13th header word

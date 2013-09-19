@@ -11,8 +11,6 @@
 #pragma link C++ class Belle2::RawCDC;
 #pragma link C++ class Belle2::SendHeader;
 #pragma link C++ class Belle2::SendTrailer;
-#pragma link C++ class Belle2::ROPCHeader;
-#pragma link C++ class Belle2::ROPCTrailer;
 #pragma link C++ class Belle2::RawROPC;
 
 #endif

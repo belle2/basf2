@@ -47,7 +47,7 @@ namespace Belle2 {
 
     /* Data Format : Node info */
     enum {
-      SENDHDR_NWORDS = 4
+      SENDHDR_NWORDS = 6
     };
 
   private:
@@ -57,7 +57,9 @@ namespace Belle2 {
       POS_NWORDS = 0,
       POS_HDR_NWORDS = 1,
       POS_NUM_EVENTS_IN_PACKET = 2,
-      POS_RESERVED_0 = 3,
+      POS_EXP_RUN_NUM = 3,
+      POS_EVE_NUM = 4,
+      POS_NODE_ID = 5
     };
 
 

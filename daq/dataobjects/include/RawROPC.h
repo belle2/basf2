@@ -12,8 +12,8 @@
 // Includes
 #include <stdio.h>
 #include <stdlib.h>
-#include <daq/dataobjects/ROPCHeader.h>
-#include <daq/dataobjects/ROPCTrailer.h>
+#include <daq/dataobjects/SendHeader.h>
+#include <daq/dataobjects/SendTrailer.h>
 #include <framework/datastore/DataStore.h>
 
 #include <TObject.h>
@@ -48,13 +48,13 @@ namespace Belle2 {
     virtual int Size();
 
     //! get data length
-    virtual ROPCHeader* GetROPCHeader();
+    virtual SendHeader* GetSendHeader();
 
     //! get data length
-    virtual ROPCTrailer* GetROPCTrailer();
+    virtual SendTrailer* GetSendTrailer();
 
-    ROPCHeader m_header; //|| do not split the header
-    ROPCTrailer m_trailer; //|| do not split the header
+    SendHeader m_header; //|| do not split the header
+    SendTrailer m_trailer; //|| do not split the header
 
   private:
     int m_nwords;

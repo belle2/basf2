@@ -37,12 +37,12 @@ void RawROPC::Copy(int* bufin, int nwords)
   m_allocated = true;
 }
 
-ROPCHeader* RawROPC::GetROPCHeader()
+SendHeader* RawROPC::GetSendHeader()
 {
   return &m_header;
 }
 
-ROPCTrailer* RawROPC::GetROPCTrailer()
+SendTrailer* RawROPC::GetSendTrailer()
 {
   return &m_trailer;
 }

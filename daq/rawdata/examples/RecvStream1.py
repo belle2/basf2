@@ -40,7 +40,7 @@ receiver.param('PortFrom', [35000, 36000])
 # receiver.param('PortFrom', [33000, 33000])
 
 receiver.param('EventDataBufferWords', 4801)
-receiver.param('MaxTime', 300.)
+receiver.param('MaxTime', 30.)
 # receiver.param('MaxEventNum', 30.)
 dump.param('outputFileName', 'root_output.root')
 dump.param('compressionLevel', 0)

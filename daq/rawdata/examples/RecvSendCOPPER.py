@@ -50,7 +50,7 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(reader)
-# main.add_module(sender)
+main.add_module(sender)
 
 # Process all events
 process(main)

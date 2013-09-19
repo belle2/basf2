@@ -67,7 +67,7 @@ namespace Belle2 {
     bool   m_alsoChildren; /**< If true, also remove all children of a particle if it fails any cut */
     std::vector<int> m_pdgCodes; /**< List of pdgCodes wo apply cuts on. If empty, apply cuts to all particles */
 
-    MCParticleGraph m_mpg; /** ParticleGraph used for reformatting MCParticle collection */
+    MCParticleGraph m_mpg; /**<ParticleGraph used for reformatting MCParticle collection */
   };
 
   /** @}*/

@@ -36,13 +36,20 @@ void plot(const TString &input_filename)
   const int show_particles = 2;
   const int num_particles = 5;
   const int pdg_codes[] = { 211, 321, 2212, 11, 13};
+  const char* pdg_names[] = { "pions", "kaons", "protons", "electrons", "muons" };
   TString logl_strings[num_particles];
   for(int part = 0; part < show_particles; part++) {
     //now create histograms with this (unweighted) probability
     tree->Project(TString::Format("%d_LR", pdg_codes[part]), "(DedxTracks.m_logl[][0] - DedxTracks.m_logl[][1]):m_p_true",
         TString::Format("abs(DedxTracks.m_pdg) == %d", pdg_codes[part]));
     TH1* hist = (TH1*)output_file->Get(TString::Format("%d_LR", pdg_codes[part]));
-    hist->SetTitle(TString::Format("LL(pi) - LL(K) for true %d", pdg_codes[part]));
+    hist->SetTitle(TString::Format("LL(pi) - LL(K) for true %s, over momentum", pdg_names[part]));
+    hist->GetListOfFunctions()->Add(new TNamed("Description", hist->GetTitle()));
+    if (pdg_codes[part] == 211) {
+      hist->GetListOfFunctions()->Add(new TNamed("Check", "Should be as high as possible (esp. for low momenta), with almost no entries <0 "));
+    } else {
+      hist->GetListOfFunctions()->Add(new TNamed("Check", "Should be as low as possible (esp. for low momenta), with almost no entries >0 "));
+    }
     hist->Write();
 
   }

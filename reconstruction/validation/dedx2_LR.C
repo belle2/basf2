@@ -36,6 +36,7 @@ void plot(const TString &input_filename)
   const int show_particles = 5;
   const int num_particles = 5;
   const int pdg_codes[] = { 211, 321, 2212, 11, 13};
+  const char* pdg_names[] = { "pions", "kaons", "protons", "electrons", "muons" };
   TString logl_strings[num_particles];
   for(int part = 0; part < show_particles; part++) {
     //for this particle, take its likelihood...
@@ -54,7 +55,15 @@ void plot(const TString &input_filename)
     tree->Project(TString::Format("%d_prob", pdg_codes[part]), logl_strings[part].Data(),
         TString::Format("abs(DedxTracks.m_pdg) == %d", pdg_codes[part]));
     TH1* hist = (TH1*)output_file->Get(TString::Format("%d_prob", pdg_codes[part]));
-    hist->SetTitle(TString::Format("Unweighted output prob. for true %d", pdg_codes[part]));
+    hist->SetTitle(TString::Format("Unweighted output prob. for true %s", pdg_names[part]));
+    hist->GetListOfFunctions()->Add(new TNamed("Description", hist->GetTitle()));
+    if (pdg_codes[part] == 211) {
+      hist->GetListOfFunctions()->Add(new TNamed("Check", "Peak at 1, but also many at lower values"));
+    } else if (pdg_codes[part] == 13) {
+      hist->GetListOfFunctions()->Add(new TNamed("Check", "Like pions, but too few entries for evaluation"));
+    } else {
+      hist->GetListOfFunctions()->Add(new TNamed("Check", "Peak at 1"));
+    }
     hist->Write();
 
   }

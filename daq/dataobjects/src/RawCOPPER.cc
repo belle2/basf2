@@ -128,7 +128,7 @@ int RawCOPPER::GetSubsysId()
     (slot & 0x000000FF);
 }
 
-int RawCOPPER::GetNumB2lBlock()
+int RawCOPPER::GetNumFINNESSEBlock()
 {
   int cnt = 0;
   if (m_buffer[ POS_CH_A_DATA_LENGTH + tmp_header.RAWHEADER_NWORDS ] > 0) cnt++;
@@ -140,95 +140,127 @@ int RawCOPPER::GetNumB2lBlock()
 
 
 
-int RawCOPPER::GetOffset1stB2l()
+int RawCOPPER::GetOffset1stFINNESSE()
 {
   return
     tmp_header.RAWHEADER_NWORDS
     + SIZE_COPPER_HEADER;
+  //  tmp_header.RAWHEADER_NWORDS : RawCOPPER header length
+  //  SIZE_COPPER_HEADER : COPPER header length
+
 }
 
-int RawCOPPER::GetOffset2ndB2l()
+int RawCOPPER::GetOffset2ndFINNESSE()
 {
   return
-    GetOffset1stB2l()
+    GetOffset1stFINNESSE()
     + m_buffer[ POS_CH_B_DATA_LENGTH + tmp_header.RAWHEADER_NWORDS ];
 }
 
-int RawCOPPER::GetOffset3rdB2l()
+int RawCOPPER::GetOffset3rdFINNESSE()
 {
   return
-    GetOffset2ndB2l()
+    GetOffset2ndFINNESSE()
     + m_buffer[ POS_CH_C_DATA_LENGTH + tmp_header.RAWHEADER_NWORDS ];
 }
 
-int RawCOPPER::GetOffset4thB2l()
+int RawCOPPER::GetOffset4thFINNESSE()
 {
   return
-    GetOffset3rdB2l()
+    GetOffset3rdFINNESSE()
     + m_buffer[ POS_CH_D_DATA_LENGTH + tmp_header.RAWHEADER_NWORDS ];
 }
 
 
 
-int* RawCOPPER::Get1stFEEBuffer()
+int* RawCOPPER::Get1stFINNESSEBuffer()
 {
   RawHeader rawhdr;
   rawhdr.SetBuffer(GetRawHdrBufPtr());
-  if (rawhdr.GetOffset1stB2l() != GetOffset1stB2l()) {
+  if (rawhdr.GetOffset1stFINNESSE() != GetOffset1stFINNESSE()) {
     printf("Data position info is inconsistent. Exting...\n");
     exit(1);
   }
-  if (rawhdr.GetOffset1stB2l() > m_nwords) {
+  if (rawhdr.GetOffset1stFINNESSE() > m_nwords) {
     printf("Data size is smaller than data position info. Exting...\n");
     exit(1);
   }
-  return &(m_buffer[ rawhdr.GetOffset1stB2l() ]);
+  return &(m_buffer[ rawhdr.GetOffset1stFINNESSE() ]);
 }
 
-int* RawCOPPER::Get2ndFEEBuffer()
+int* RawCOPPER::Get2ndFINNESSEBuffer()
 {
   RawHeader rawhdr;
   rawhdr.SetBuffer(GetRawHdrBufPtr());
-  if (rawhdr.GetOffset2ndB2l() != GetOffset2ndB2l()) {
+  if (rawhdr.GetOffset2ndFINNESSE() != GetOffset2ndFINNESSE()) {
     printf("Data position info is inconsistent. Exting...\n");
     exit(1);
   }
-  if (rawhdr.GetOffset2ndB2l() > m_nwords) {
+  if (rawhdr.GetOffset2ndFINNESSE() > m_nwords) {
     printf("Data size is smaller than data position info. Exting...\n");
     exit(1);
   }
-  return &(m_buffer[ rawhdr.GetOffset2ndB2l() ]);
-
-}
-
-int* RawCOPPER::Get3rdFEEBuffer()
-{
-  RawHeader rawhdr;
-  rawhdr.SetBuffer(GetRawHdrBufPtr());
-  if (rawhdr.GetOffset3rdB2l() != GetOffset3rdB2l()) {
-    printf("Data position info is inconsistent. Exting...\n");
-    exit(1);
-  }
-  if (rawhdr.GetOffset3rdB2l() > m_nwords) {
-    printf("Data size is smaller than data position info. Exting...\n");
-    exit(1);
-  }
-  return &(m_buffer[ rawhdr.GetOffset3rdB2l() ]);
+  return &(m_buffer[ rawhdr.GetOffset2ndFINNESSE() ]);
 
 }
 
-int* RawCOPPER::Get4thFEEBuffer()
+int* RawCOPPER::Get3rdFINNESSEBuffer()
 {
   RawHeader rawhdr;
   rawhdr.SetBuffer(GetRawHdrBufPtr());
-  if (rawhdr.GetOffset4thB2l() != GetOffset4thB2l()) {
+  if (rawhdr.GetOffset3rdFINNESSE() != GetOffset3rdFINNESSE()) {
     printf("Data position info is inconsistent. Exting...\n");
     exit(1);
   }
-  if (rawhdr.GetOffset4thB2l() > m_nwords) {
+  if (rawhdr.GetOffset3rdFINNESSE() > m_nwords) {
     printf("Data size is smaller than data position info. Exting...\n");
     exit(1);
   }
-  return &(m_buffer[ rawhdr.GetOffset4thB2l() ]);
+  return &(m_buffer[ rawhdr.GetOffset3rdFINNESSE() ]);
 
+}
+
+int* RawCOPPER::Get4thFINNESSEBuffer()
+{
+  RawHeader rawhdr;
+  rawhdr.SetBuffer(GetRawHdrBufPtr());
+  if (rawhdr.GetOffset4thFINNESSE() != GetOffset4thFINNESSE()) {
+    printf("Data position info is inconsistent. Exting...\n");
+    exit(1);
+  }
+  if (rawhdr.GetOffset4thFINNESSE() > m_nwords) {
+    printf("Data size is smaller than data position info. Exting...\n");
+    exit(1);
+  }
+  return &(m_buffer[ rawhdr.GetOffset4thFINNESSE() ]);
+
+}
+
+
+int* RawCOPPER::Get1stDetectorBuffer()
+{
+  RawHeader rawhdr;
+  rawhdr.SetBuffer(GetRawHdrBufPtr());
+  return &(m_buffer[ rawhdr.GetOffset1stFINNESSE() + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER ]);
+}
+
+int* RawCOPPER::Get2ndDetectorBuffer()
+{
+  RawHeader rawhdr;
+  rawhdr.SetBuffer(GetRawHdrBufPtr());
+  return &(m_buffer[ rawhdr.GetOffset2ndFINNESSE() + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER ]);
+}
+
+int* RawCOPPER::Get3rdDetectorBuffer()
+{
+  RawHeader rawhdr;
+  rawhdr.SetBuffer(GetRawHdrBufPtr());
+  return &(m_buffer[ rawhdr.GetOffset3rdFINNESSE() + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER ]);
+}
+
+int* RawCOPPER::Get4thDetectorBuffer()
+{
+  RawHeader rawhdr;
+  rawhdr.SetBuffer(GetRawHdrBufPtr());
+  return &(m_buffer[ rawhdr.GetOffset4thFINNESSE() + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER ]);
 }

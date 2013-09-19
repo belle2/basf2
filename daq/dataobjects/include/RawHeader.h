@@ -53,10 +53,10 @@ namespace Belle2 {
     void SetB2LFEEHdrPart(unsigned int word1, unsigned int word2);   //! set contents of header
 
 
-    void SetOffset1stB2l(int offset_1st_b2l);    //! set contents of header
-    void SetOffset2ndB2l(int offset_2nd_b2l);    //! set contents of header
-    void SetOffset3rdB2l(int offset_3rd_b2l);    //! set contents of header
-    void SetOffset4thB2l(int offset_4th_b2l);    //! set contents of header
+    void SetOffset1stFINNESSE(int offset_1st_FINNESSE);    //! set contents of header
+    void SetOffset2ndFINNESSE(int offset_2nd_FINNESSE);    //! set contents of header
+    void SetOffset3rdFINNESSE(int offset_3rd_FINNESSE);    //! set contents of header
+    void SetOffset4thFINNESSE(int offset_4th_FINNESSE);    //! set contents of header
     int AddNodeInfo(int node_id);
 
     int GetNwords();  //! get contents of header
@@ -68,10 +68,10 @@ namespace Belle2 {
     int GetDataType();  //! get contents of header
     int GetTruncMask();  //! get contents of header
 
-    int GetOffset1stB2l();  //! get contents of header
-    int GetOffset2ndB2l();  //! get contents of header
-    int GetOffset3rdB2l();  //! get contents of header
-    int GetOffset4thB2l();  //! get contents of header
+    int GetOffset1stFINNESSE();  //! get contents of header
+    int GetOffset2ndFINNESSE();  //! get contents of header
+    int GetOffset3rdFINNESSE();  //! get contents of header
+    int GetOffset4thFINNESSE();  //! get contents of header
     int GetNumNodes();  //! get contents of header
     int GetNodeInfo(int node_no, int* node_id);    //! get contents of header
     unsigned int GetMagicWordEntireHeader();
@@ -91,10 +91,10 @@ namespace Belle2 {
       POS_HSLB_2 = 5,
       POS_SUBSYS_ID = 6,
       POS_TRUNC_MASK_DATATYPE = 7,
-      POS_OFFSET_1ST_B2L = 8,
-      POS_OFFSET_2ND_B2L = 9,
-      POS_OFFSET_3RD_B2L = 10,
-      POS_OFFSET_4TH_B2L = 11,
+      POS_OFFSET_1ST_FINNESSE = 8,
+      POS_OFFSET_2ND_FINNESSE = 9,
+      POS_OFFSET_3RD_FINNESSE = 10,
+      POS_OFFSET_4TH_FINNESSE = 11,
       POS_RESVD_1 = 12,
       POS_RESVD_2 = 13,
       POS_NUM_NODES = 14,

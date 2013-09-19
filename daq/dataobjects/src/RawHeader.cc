@@ -108,26 +108,26 @@ void RawHeader::SetB2LFEEHdrPart(unsigned int word1, unsigned int word2)
 }
 
 
-void RawHeader::SetOffset1stB2l(int offset_1st_b2l)
+void RawHeader::SetOffset1stFINNESSE(int offset_1st_FINNESSE)
 {
   CheckBuffer();
-  m_buffer[ POS_OFFSET_1ST_B2L ] = offset_1st_b2l;
+  m_buffer[ POS_OFFSET_1ST_FINNESSE ] = offset_1st_FINNESSE;
 }
 
-void RawHeader::SetOffset2ndB2l(int offset_2nd_b2l)
+void RawHeader::SetOffset2ndFINNESSE(int offset_2nd_FINNESSE)
 {
   CheckBuffer();
-  m_buffer[ POS_OFFSET_2ND_B2L ] = offset_2nd_b2l;
+  m_buffer[ POS_OFFSET_2ND_FINNESSE ] = offset_2nd_FINNESSE;
 }
-void RawHeader::SetOffset3rdB2l(int offset_3rd_b2l)
+void RawHeader::SetOffset3rdFINNESSE(int offset_3rd_FINNESSE)
 {
   CheckBuffer();
-  m_buffer[ POS_OFFSET_3RD_B2L ] = offset_3rd_b2l;
+  m_buffer[ POS_OFFSET_3RD_FINNESSE ] = offset_3rd_FINNESSE;
 }
-void RawHeader::SetOffset4thB2l(int offset_4th_b2l)
+void RawHeader::SetOffset4thFINNESSE(int offset_4th_FINNESSE)
 {
   CheckBuffer();
-  m_buffer[ POS_OFFSET_4TH_B2L ] = offset_4th_b2l;
+  m_buffer[ POS_OFFSET_4TH_FINNESSE ] = offset_4th_FINNESSE;
 }
 
 int RawHeader::AddNodeInfo(int node_id)
@@ -193,28 +193,28 @@ int RawHeader::GetTruncMask()
 }
 
 
-int RawHeader::GetOffset1stB2l()
+int RawHeader::GetOffset1stFINNESSE()
 {
   CheckBuffer();
-  return m_buffer[ POS_OFFSET_1ST_B2L ];
+  return m_buffer[ POS_OFFSET_1ST_FINNESSE ];
 }
 
-int RawHeader::GetOffset2ndB2l()
+int RawHeader::GetOffset2ndFINNESSE()
 {
   CheckBuffer();
-  return m_buffer[ POS_OFFSET_2ND_B2L ];
+  return m_buffer[ POS_OFFSET_2ND_FINNESSE ];
 }
 
-int RawHeader::GetOffset3rdB2l()
+int RawHeader::GetOffset3rdFINNESSE()
 {
   CheckBuffer();
-  return m_buffer[ POS_OFFSET_3RD_B2L ];
+  return m_buffer[ POS_OFFSET_3RD_FINNESSE ];
 }
 
-int RawHeader::GetOffset4thB2l()
+int RawHeader::GetOffset4thFINNESSE()
 {
   CheckBuffer();
-  return m_buffer[ POS_OFFSET_4TH_B2L ];
+  return m_buffer[ POS_OFFSET_4TH_FINNESSE ];
 }
 
 int RawHeader::GetNumNodes()

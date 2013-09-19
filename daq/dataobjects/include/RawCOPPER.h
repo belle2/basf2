@@ -75,33 +75,44 @@ namespace Belle2 {
     virtual int GetSubsysId();
 
     //! get b2l block from data
-    virtual int GetNumB2lBlock();
+    virtual int GetNumFINNESSEBlock();
 
 
     //! get # of offset words for FEE slot A buffer position
-    int GetOffset1stB2l();
+    int GetOffset1stFINNESSE();
 
     //! get # of offset words for FEE slot A buffer position
-    int GetOffset2ndB2l();
+    int GetOffset2ndFINNESSE();
 
     //! get # of offset words for FEE slot A buffer position
-    int GetOffset3rdB2l();
+    int GetOffset3rdFINNESSE();
 
     //! get # of offset words for FEE slot A buffer position
-    int GetOffset4thB2l();
+    int GetOffset4thFINNESSE();
 
-    //! get FEE buffer pointer for slot A
-    int* Get1stFEEBuffer();
+    //! get FINNESSE buffer pointer for slot A
+    int* Get1stFINNESSEBuffer();
 
-    //! get FEE buffer pointer for slot B
-    int* Get2ndFEEBuffer();
+    //! get FINNESSE buffer pointer for slot B
+    int* Get2ndFINNESSEBuffer();
 
-    //! get FEE buffer pointer for slot C
-    int* Get3rdFEEBuffer();
+    //! get FINNESSE buffer pointer for slot C
+    int* Get3rdFINNESSEBuffer();
 
-    //! get FEE buffer pointer for slot D
-    int* Get4thFEEBuffer();
+    //! get FINNESSE buffer pointer for slot D
+    int* Get4thFINNESSEBuffer();
 
+    //! get Detector Buffer of slot A
+    int* Get1stDetectorBuffer();
+
+    //! get Detector Buffer of slot B
+    int* Get2ndDetectorBuffer();
+
+    //! get Detector Buffer of slot C
+    int* Get3rdDetectorBuffer();
+
+    //! get Detector Buffer of slot D
+    int* Get4thDetectorBuffer();
 
     /* Data Format : COPPER header*/
     enum {
@@ -124,7 +135,8 @@ namespace Belle2 {
       POS_MAGIC_B2LHSLB = 0,
       POS_EVE_CNT_B2LHSLB = 1,
       //      SIZE_B2LHSLB_HEADER = 2
-      SIZE_B2LHSLB_HEADER = 0 // As of Aug.22,2013, the header size is one word. It should be 2 in future.
+      //      SIZE_B2LHSLB_HEADER = 0 // As of Aug.22,2013, the header size is one word. It should be 2 in future.
+      SIZE_B2LHSLB_HEADER = 2
     };
     /* Data Format : B2link HSLB Trailer */
     enum {
@@ -137,8 +149,8 @@ namespace Belle2 {
     enum {
       POS_EVEID_B2LFEE = 0,
       POS_EVETIME_B2LFEE = 1,
-      //      SIZE_B2LFEE_HEADER = 2
-      SIZE_B2LFEE_HEADER = 1  // As of Aug.22,2013, the header size is one word. It should be 2 in future.
+      SIZE_B2LFEE_HEADER = 2
+                           //      SIZE_B2LFEE_HEADER = 1  // As of Aug.22,2013, the header size is one word. It should be 2 in future.
     };
 
 

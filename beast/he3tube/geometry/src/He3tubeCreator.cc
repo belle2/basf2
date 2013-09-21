@@ -59,7 +59,7 @@ namespace Belle2 {
       if (m_sensitive) delete m_sensitive;
     }
 
-    void He3tubeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+    void He3tubeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
       G4String symbol;
       G4double a, z, n;

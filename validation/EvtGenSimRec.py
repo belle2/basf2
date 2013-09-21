@@ -4,6 +4,7 @@
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
+import glob
 
 set_random_seed(12345)
 

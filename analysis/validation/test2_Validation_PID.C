@@ -10,7 +10,16 @@
 gSystem->Load("libRooFit.so");
 using namespace RooFit ;
 void test2_Validation_PID(){
-  
+
+  TCanvas *c_pidvalidation = new TCanvas ("PIDvalidation","PIDvalidation",1600,800);
+  c_pidvalidation->Print("pid.pdf[");			      
+   TPaveText *belleName = new TPaveText(0.6,0.9,0.9,0.95,"BRNDC");
+  belleName->SetFillColor(0);
+  belleName->SetTextColor(kGray);
+  belleName->SetTextAlign(12);
+  belleName->SetBorderSize(0);
+  belleName->AddText("Belle II Validation");
+   
   /*  Take the pituple prepared by the NtupleMaker */
   TChain * recoTree = new TChain("pituple");
   recoTree->AddFile("../GenericB.ntup.root");
@@ -66,8 +75,8 @@ void test2_Validation_PID(){
     TH1F * h_cosThp_PID   = new TH1F(Form("CosTheta_%s_p_PID",string(names[i]).c_str()) ,Form(";PIDcut cos#theta(%s) ;N",string(names[i]).c_str()),nthbins,thlow,thhigh);			  
     TH1F * h_PIDp         = new TH1F(Form("P_%s_PIDp",string(names[i]).c_str())         ,Form(";PIDp(%s);N",string(names[i]).c_str())             ,npidbins,pidlow,pidhigh);
     
-    TH2F * h_P_Efficiency = new TH2F("P_Efficiency",";p(#pi) GeV;Efficiency",10,0,3.6,10,0,1.1);
-    TH2F * h_cosTh_Efficiency = new TH2F("cosTh_Efficiency",";p(#pi) GeV;Efficiency",10,-1,1,10,0,1.1);
+    TH2F * h_P_Efficiency = new TH2F("P_Efficiency",";p GeV;Efficiency",10,0,3.6,10,0,1.1);
+    TH2F * h_cosTh_Efficiency = new TH2F("cosTh_Efficiency",";cos#theta;Efficiency",10,-1,1,10,0,1.1);
     
     float fpi_TruthP;  
     float fpi_P4[4];  
@@ -161,13 +170,9 @@ void test2_Validation_PID(){
       
     }
 
-    TCanvas *tc = new TCanvas (Form("tc%s",string(names[i]).c_str()),"tcReco",1600,400);
-    TCanvas *tcb = new TCanvas (Form("tcb%s",string(names[i]).c_str()),"tcReco",1000,900);
+    TCanvas *tc = new TCanvas (Form("tc%s",string(names[i]).c_str()),"tcReco");
     
-    tc->Divide(5,1);
-    tcb->Divide(2,1);
-
-    tc->cd(1);
+    tc->cd();
     h_Ppi->SetLineColor(kRed);
     h_Ppi->Draw();
     h_Pk->SetLineColor(kBlue);
@@ -178,8 +183,9 @@ void test2_Validation_PID(){
     h_Pmu->Draw("same");
     h_Pp->SetLineColor(kMagenta);
     h_Pp->Draw("same");
+    tc->Print("pid.pdf",Form("Title: P noPID, %s hypothesis",string(names[i]).c_str()));
     
-    tc->cd(3);
+    tc->cd();
     h_cosThpi->SetLineColor(kRed);
     h_cosThpi->Draw();
     h_cosThk->SetLineColor(kBlue);
@@ -190,8 +196,9 @@ void test2_Validation_PID(){
     h_cosThmu->Draw("same");
     h_cosThp->SetLineColor(kMagenta);
     h_cosThp->Draw("same");
+    tc->Print("pid.pdf",Form("Title: cos#theta noPID, %s hypothesis",string(names[i]).c_str()));
 
-    tc->cd(2);
+    tc->cd();
     h_Ppi_PID->SetLineColor(kRed);
     h_Ppi_PID->Draw();
     h_Pk_PID->SetLineColor(kBlue);
@@ -202,6 +209,7 @@ void test2_Validation_PID(){
     h_Pmu_PID->Draw("same");
     h_Pp_PID->SetLineColor(kMagenta);
     h_Pp_PID->Draw("same");
+    tc->Print("pid.pdf",Form("Title: P PID, %s hypothesis",string(names[i]).c_str()));
     
     tc->cd(4);
     h_cosThpi_PID->SetLineColor(kRed);
@@ -214,9 +222,9 @@ void test2_Validation_PID(){
     h_cosThmu_PID->Draw("same");
     h_cosThp_PID->SetLineColor(kMagenta);
     h_cosThp_PID->Draw("same");
-    
+    tc->Print("pid.pdf",Form("Title: cos#theta PID, %s hypothesis",string(names[i]).c_str()));
 
-    tc->cd(5);
+
     h_PIDpi->SetLineColor(kRed);
     h_PIDpi->Draw();
     h_PIDk->SetLineColor(kBlue);
@@ -227,7 +235,8 @@ void test2_Validation_PID(){
     h_PIDmu->Draw("same");
     h_PIDp->SetLineColor(kMagenta);
     h_PIDp->Draw("same");
-    
+    tc->Print("pid.pdf",Form("Title: PID, %s hypothesis",string(names[i]).c_str()));
+ 
    
     TFile* output = new TFile(Form("PIDValidation%sID.root",string(names[i]).c_str()), "recreate");
     
@@ -240,10 +249,24 @@ void test2_Validation_PID(){
 
     //Histogram efficiencies - needed for the validation page
     TH1F * h_Eff_Ppi  = new TH1F(Form("P_Eff_%s_pi",string(names[i]).c_str())  ,Form("Eff pi;p(%s) GeV;PIDpi Hypothesis Efficiency",string(names[i]).c_str()) ,npbins,plow,phigh);
+    h_Eff_Ppi->GetListOfFunctions()->Add(new TNamed("Description", Form("PID-%s>0.5 efficiency of truth-matched pi tracks in bins of lab momentum. A Generic BBbar sample is used.",string(names[i]).c_str())));
+    h_Eff_Ppi->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuous efficiency."));
+
     TH1F * h_Eff_Pk   = new TH1F(Form("P_Eff_%s_k",string(names[i]).c_str())   ,Form("Eff k ;p(%s) GeV;PIDk  Hypothesis Efficiency",string(names[i]).c_str()) ,npbins,plow,phigh);
+    h_Eff_Pk->GetListOfFunctions()->Add(new TNamed("Description", Form("PID-%s>0.5 efficiency of truth-matched K tracks in bins of lab momentum. A Generic BBbar sample is used.",string(names[i]).c_str())));
+    h_Eff_Pk->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuou efficiency."));
+
     TH1F * h_Eff_Pe   = new TH1F(Form("P_Eff_%s_e",string(names[i]).c_str())   ,Form("Eff e ;p(%s) GeV;PIDe  Hypothesis Efficiency",string(names[i]).c_str()) ,npbins,plow,phigh);
+    h_Eff_Pe->GetListOfFunctions()->Add(new TNamed("Description", Form("PID-%s>0.5 efficiency of truth-matched e tracks in bins of lab momentum. A Generic BBbar sample is used.",string(names[i]).c_str())));
+    h_Eff_Pe->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuou efficiency."));
+
     TH1F * h_Eff_Pmu  = new TH1F(Form("P_Eff_%s_mu",string(names[i]).c_str())  ,Form("Eff mu;p(%s) GeV;PIDmu Hypothesis Efficiency",string(names[i]).c_str()) ,npbins,plow,phigh);
+    h_Eff_Pmu->GetListOfFunctions()->Add(new TNamed("Description", Form("PID-%s>0.5 efficiency of truth-matched mu tracks in bins of lab momentum. A Generic BBbar sample is used.",string(names[i]).c_str())));
+    h_Eff_Pmu->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuou efficiency."));
+
     TH1F * h_Eff_Pp   = new TH1F(Form("P_Eff_%s_p",string(names[i]).c_str())   ,Form("Eff pr;p(%s) GeV;PIDpr Hypothesis Efficiency",string(names[i]).c_str()) ,npbins,plow,phigh);
+    h_Eff_Pp->GetListOfFunctions()->Add(new TNamed("Description", Form("PID-%s>0.5 efficiency of truth-matched proton tracks in bins of lab momentum. A Generic BBbar sample is used.",string(names[i]).c_str())));
+    h_Eff_Pp->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuou efficiency."));
 
     Eff_P_pi ->SetMarkerColor(kRed);     Eff_P_pi ->SetLineColor(kRed);
     Eff_P_k  ->SetMarkerColor(kBlue);    Eff_P_k ->SetLineColor(kBlue);
@@ -263,13 +286,13 @@ void test2_Validation_PID(){
     h_Eff_Pmu -> Divide(h_Pmu_PID,h_Pmu);
     h_Eff_Pp  -> Divide(h_Pp_PID,h_Pp);
 
-    tcb->cd(1);
     h_P_Efficiency->Draw();
     Eff_P_pi ->Draw("p");
     Eff_P_k  ->Draw("p");
     Eff_P_e  ->Draw("p");
     Eff_P_mu ->Draw("p");
     Eff_P_p  ->Draw("p");
+    tc->Print("pid.pdf",Form("Title: Efficiency, %s hypothesis",string(names[i]).c_str()));
 
     TGraphAsymmErrors *Eff_cosTh_pi = new TGraphAsymmErrors();
     TGraphAsymmErrors *Eff_cosTh_k  = new TGraphAsymmErrors();
@@ -284,10 +307,24 @@ void test2_Validation_PID(){
 
     //Histogram efficiencies - needed for the validation page
     TH1F * h_Eff_cosThpi  = new TH1F(Form("cosTh_Eff_%s_pi",string(names[i]).c_str())           ,Form(";cos#theta(%s);PIDpi Efficiency",string(names[i]).c_str())            ,nthbins,thlow,thhigh);
+    h_Eff_cosThpi->GetListOfFunctions()->Add(new TNamed("Description", Form("PID-%s>0.5 efficiency of truth-matched #pi tracks in bins of cos theta_lab. A Generic BBbar sample is used.",string(names[i]).c_str())));
+    h_Eff_cosThpi->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuous efficiency."));
+
     TH1F * h_Eff_cosThk   = new TH1F(Form("cosTh_Eff_%s_k",string(names[i]).c_str())            ,Form(";cos#theta(%s);PIDk Efficiency",string(names[i]).c_str())            ,nthbins,thlow,thhigh);
+    h_Eff_cosThk->GetListOfFunctions()->Add(new TNamed("Description", Form("PID-%s>0.5 efficiency of truth-matched K tracks in bins of cos theta_lab. A Generic BBbar sample is used.",string(names[i]).c_str())));
+    h_Eff_cosThk->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuou efficiency."));
+
     TH1F * h_Eff_cosThe   = new TH1F(Form("cosTh_Eff_%s_e",string(names[i]).c_str())            ,Form(";cos#theta(%s);PIDe Efficiency",string(names[i]).c_str())            ,nthbins,thlow,thhigh);
+    h_Eff_cosThe->GetListOfFunctions()->Add(new TNamed("Description", Form("PID-%s>0.5 efficiency of truth-matched e tracks in bins of cos theta_lab. A Generic BBbar sample is used.",string(names[i]).c_str())));
+    h_Eff_cosThe->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuou efficiency."));
+
     TH1F * h_Eff_cosThmu  = new TH1F(Form("cosTh_Eff_%s_mu",string(names[i]).c_str())           ,Form(";cos#theta(%s);PIDmu Efficiency",string(names[i]).c_str())            ,nthbins,thlow,thhigh);
+    h_Eff_cosThmu->GetListOfFunctions()->Add(new TNamed("Description", Form("PID-%s>0.5 efficiency of truth-matched #mu tracks in bins of cos theta_lab. A Generic BBbar sample is used.",string(names[i]).c_str())));
+    h_Eff_cosThmu->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuou efficiency."));
+
     TH1F * h_Eff_cosThp   = new TH1F(Form("cosTh_Eff_%s_p",string(names[i]).c_str())            ,Form(";cos#theta(%s);PIDpr Efficiency",string(names[i]).c_str())            ,nthbins,thlow,thhigh);
+    h_Eff_cosThp->GetListOfFunctions()->Add(new TNamed("Description", Form("PID-%s>0.5 efficiency of truth-matched proton tracks in bins of cos theta_lab. A Generic BBbar sample is used.",string(names[i]).c_str())));
+    h_Eff_cosThp->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuou efficiency."));
 
     Eff_cosTh_pi -> Divide(h_cosThpi_PID,h_cosThpi,"cl=0.683 b(1,1) mode");
     Eff_cosTh_k  -> Divide(h_cosThk_PID ,h_cosThk ,"cl=0.683 b(1,1) mode");
@@ -295,7 +332,6 @@ void test2_Validation_PID(){
     Eff_cosTh_mu -> Divide(h_cosThmu_PID,h_cosThmu,"cl=0.683 b(1,1) mode");
     Eff_cosTh_p  -> Divide(h_cosThp_PID ,h_cosThp ,"cl=0.683 b(1,1) mode");
 
-    tcb->cd(2);
     h_cosTh_Efficiency->Draw();
     Eff_cosTh_pi ->Draw("p");
     Eff_cosTh_k  ->Draw("p");
@@ -308,12 +344,14 @@ void test2_Validation_PID(){
     h_Eff_cosThe  -> Divide(h_cosThe_PID,h_cosThe);
     h_Eff_cosThmu -> Divide(h_cosThmu_PID,h_cosThmu);
     h_Eff_cosThp  -> Divide(h_cosThp_PID,h_cosThp);
+    tc->Print("pid.pdf",Form("Title: Efficiency, %s hypothesis",string(names[i]).c_str()));
 
     output->Write();
     
   }
   
   
+    c_pidvalidation->Print("pid.pdf]");
 
 
 }

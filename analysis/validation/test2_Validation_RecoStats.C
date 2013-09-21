@@ -63,7 +63,8 @@ void test2_Validation_RecoStats(){
   
   TH1F *h_Reco[50]; 
 
-  Float_t RecoMeans[40];
+  Float_t RecoMeans[24];
+  Float_t SimMeans[16];
   Float_t RecoRMS[40];
 
   TCanvas *tc = new TCanvas ("tcReco","tcReco",1000,800);
@@ -98,16 +99,29 @@ void test2_Validation_RecoStats(){
     h_Reco[i]->Draw("hist");
     cout<<RecoVars[i]<<" \t\t"<<h_Reco[i]->GetMean();
     cout<<" \t\t"<<h_Reco[i]->GetRMS()<<endl;
-    RecoMeans[i]=h_Reco[i]->GetMean();
+    SimMeans[i-24]=h_Reco[i]->GetMean();
     RecoRMS[i]=h_Reco[i]->GetRMS();
   }
 
-  string namelist;
-  for(int i=0;i<40;i++) namelist = namelist + Form("%s:",string(RecoVars[i]).c_str());
-  cout<<namelist<<endl;
+  string reconamelist;
+  for(int i=0;i<24;i++) reconamelist = reconamelist + Form("%s:",string(RecoVars[i]).c_str());
+
+  string simnamelist;
+  for(int i=24;i<40;i++) simnamelist = simnamelist + Form("%s:",string(RecoVars[i]).c_str());
+
   TFile * output = TFile::Open("RecoStats.root", "recreate");
-  TNtuple* trecostats = new TNtuple("Reco Stats in Nevents", "tree", Form("%s",string(namelist).c_str()));
+  TNtuple* trecostats = new TNtuple("Reco Stats: N(objects)/Event", "tree", Form("%s",string(reconamelist).c_str()));
+  trecostats->SetAlias("Description", "Average MDST reconstructionobject multiplicities per event. Useful to trace back problems to specific input.");
+  trecostats->SetAlias("Check", "Look for any MDST classes that are empty, or changed substantially.");
   trecostats->Fill(RecoMeans);
   trecostats->Write();
+  
+  TFile * outputsim = TFile::Open("SimStats.root", "recreate");
+  TNtuple* tsimstats = new TNtuple("Sim Stats: N(objects)/Event", "tree", Form("%s",string(simnamelist).c_str()));
+  tsimstats->SetAlias("Description", "Average MDST simulation object multiplicities per event. Useful to trace back problems to specific input.");
+  tsimstats->SetAlias("Check", "Look for any MDST classes that are empty, or changed substantially. Note that MCParticles may change substantially in the case that secondary particles are preserved by subdetector simulation.");
+  tsimstats->Fill(SimMeans);
+  tsimstats->Write();
+
   delete output;
 }

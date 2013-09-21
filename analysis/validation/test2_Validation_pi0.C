@@ -18,14 +18,21 @@ void test2_Validation_pi0(){
   TChain * recoTree = new TChain("pi0tuple");
   recoTree->AddFile("../GenericB.ntup.root");
 
-  TFile* output = new TFile("pi0Validation.root", "recreate");
-
-  /* Mass constrained fit value, as stored in Particle */
-  TH1F * h_pi0_mf   = new TH1F("mpi0f",";Mass constrained fit m(#pi^{0}) [GeV];N",40,0.133,0.137);
-  /* Invariant mass determined from the two photon daughters */
-  TH1F * h_pi0_m    = new TH1F("mpi0","#pi^{0} mass no cut;m(#pi^{0}) [GeV];N",40,0.08,0.18);
+  //Plots used in offline validation
   /* Invariant mass after Egamma>0.05 GeV criterion */
   TH1F * h_pi0_mcut = new TH1F("mpi0cut","#pi^{0} mass with photon cut;m(#pi^{0}) [GeV];N",40,0.08,0.18);
+
+  //Plots for online/web validation
+  TFile* output = new TFile("pi0Validation.root", "recreate");
+  /* Mass constrained fit value, as stored in Particle */
+  TH1F * h_pi0_mf   = new TH1F("mpi0f",";Mass constrained fit m(#pi^{0}) [GeV];N",40,0.133,0.137);
+  h_pi0_mf->GetListOfFunctions()->Add(new TNamed("Description", Form("pi0 Mass constrained fit mass, with background. A Generic BBbar sample is used. Test may be replaced with analysis mode validation with pi0.",string(names[i]).c_str())));
+  h_pi0_mf->GetListOfFunctions()->Add(new TNamed("Check", "Stable S/B, non-empty (i.e. pi0 import to analysis modules is working), consistent mean."));
+
+  /* Invariant mass determined from the two photon daughters */
+  TH1F * h_pi0_m    = new TH1F("mpi0","#pi^{0} mass no cut;m(#pi^{0}) [GeV];N",40,0.08,0.18);
+  h_pi0_m->GetListOfFunctions()->Add(new TNamed("Description", Form("pi0 Mass, with background. A Generic BBbar sample is used. Test may be replaced with analysis mode validation with pi0.",string(names[i]).c_str())));
+  h_pi0_m->GetListOfFunctions()->Add(new TNamed("Check", "Stable S/B, non-empty (i.e. pi0 import to analysis modules is working), consistent mean."));
 
   /* Access the Photons and pi0 M*/
   float fpi0_gamma0_P4[4];  
@@ -47,20 +54,22 @@ void test2_Validation_pi0(){
   }
 
   TCanvas *tc = new TCanvas ("tcReco","tcReco",600,600);
-  tc->Divide(2,2);
+  tc->Print("pi0.pdf[");
+
+  TCanvas *tc = new TCanvas ("tcReco","tcReco",600,600);
   // Mass constrained fit mass
-  tc->cd(1);
   h_pi0_mf->SetLineColor(kRed);
   h_pi0_mf->SetMinimum(0.);
   h_pi0_mf->Draw();
+  tc->Print("pi0.pdf");
 
   // Raw masses (unfit)
-  tc->cd(2);
   h_pi0_m->SetLineColor(kRed);
   h_pi0_m->Draw();
   h_pi0_m->SetMinimum(0.);
   h_pi0_mcut->SetLineColor(kBlue);
   h_pi0_mcut->Draw("same");
+  tc->Print("pi0.pdf");
 
   RooRealVar *mass  =  new RooRealVar("mass","m(#pi^{0}) GeV" , 0.08, 0.18);
   RooDataHist hpicut("hpicut","hpicut",*mass, h_pi0_mcut);
@@ -95,7 +104,6 @@ void test2_Validation_pi0(){
   
   RooAddPdf totalPdf("totalpdf", "",shapes, yields);
   
-  tc->cd(3);
   totalPdf->fitTo(hpicut,RooFit::Extended(kTRUE),Minos(1));
   /* Fit to the unfit mass with cuts */
   RooPlot *framex = mass->frame();
@@ -115,9 +123,9 @@ void test2_Validation_pi0(){
   float widtherror = sig1.getError();
 
   framex->Draw("");
+  tc->Print("pi0.pdf");
   
   /* Fit to the unfit mass with cuts */
-  tc->cd(4);
   totalPdf->fitTo(hpinocut,RooFit::Extended(kTRUE),Minos(1));
   RooPlot *framey = mass->frame();
   hpinocut.plotOn(framey, Binning(40),Name("Hist"));
@@ -130,11 +138,17 @@ void test2_Validation_pi0(){
   framey->getAttText()->SetTextSize(0.03); 
   framey->SetMaximum(h_pi0_m->GetMaximum()*1.5);
   framey->Draw();
+  tc->Print("pi0.pdf");
   
   /* Save the numerical fit results to a validation ntuple */
   string namelist;
   TNtuple* tvalidation = new TNtuple("pi0mass", "tree", "mean:meanerror:width:widtherror");
-  tvalidation->Fill(meancut,meanerror,width,widtherror);
+  tvalidation->Fill(meancut*1000.,meanerror*1000.,width*1000.,widtherror*1000.);
+  tvalidation->SetAlias("Description", "Fit to the pi0 mass in background conditions. Note this test may be replaced due to overlap with ECL specific tests.");
+  tvalidation->SetAlias("Check", "Consistent numerical fit results.");
+
+  tc->Print("pi0.pdf");
+  tc->Print("pi0.pdf]");
 
   output->Write();
   //delete output;

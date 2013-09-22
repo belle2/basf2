@@ -25,7 +25,7 @@
 #include <daq/dataobjects/RawCOPPER.h>
 
 //#include <daq/dataobjects/RawROPC.h>
-
+#include <daq/rawdata/modules/DAQConsts.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <daq/rawdata/modules/DeSerializer.h>
 

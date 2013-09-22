@@ -5,7 +5,7 @@
 // Author : Satoru Yamada Itoh, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
-#include <daq/rawdata/modules/DAQConsts.h>
+
 #include <daq/rawdata/modules/DeSerializerPC.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>

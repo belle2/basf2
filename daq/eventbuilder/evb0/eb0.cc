@@ -369,12 +369,14 @@ main(int argc, char** argv)
     if (basf2) {
       host = "localhost";
       port = port_to_basf2;
+      printf("Accepting from basf2 : %s port %d...\n", host.c_str(), port);
     } else {
       host = "localhost";
       port = port_to;
+      printf("Accepting from event builder %s port %d...\n", host.c_str(), port);
     }
 
-    printf("Accepting from %s port %d...\n", host.c_str(), port);
+
     FILE* fp = fp_accept(host.c_str(), port, "w");
     printf("Done\n");
     for (int i = 0; i < nstream; i++) {
@@ -389,7 +391,7 @@ main(int argc, char** argv)
     FILE* fp;
     char host_to[20] = "localhost";
 
-    printf("Accepting from %s port %d...\n", host_to, port_to);
+    printf("Accepting from event builder : %s port %d...\n", host_to, port_to);
     fp = fp_accept("localhost", port_to, "w");
     printf("Done\n");
 

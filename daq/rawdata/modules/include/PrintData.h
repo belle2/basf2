@@ -26,6 +26,7 @@
 
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/dataobjects/RawCOPPER.h>
+#include <daq/dataobjects/RawCDC.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
 
@@ -63,6 +64,8 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
     virtual void VerifyCheckSum(int* buf);
+    virtual void PrintEvent(RawCOPPER* raw_array);
+
 
     // Data members
 

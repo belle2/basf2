@@ -82,6 +82,7 @@ int* RawCOPPER::GetRawTrlBufPtr(int n)
 {
   int pos_nwords;
   RawTrailer trl;
+
   if (n == (m_num_events * m_num_nodes) - 1) {
     pos_nwords = m_nwords - trl.GetTrlNwords();
   } else {
@@ -94,6 +95,7 @@ int* RawCOPPER::GetRawTrlBufPtr(int n)
 int RawCOPPER::GetCprBlockNwords(int n)
 {
   int size;
+  //  printf("aaaaaaaaaaaaa %d %d\n", n, m_num_events * m_num_nodes );
   if (n == (m_num_events * m_num_nodes) - 1) {
     size =  m_nwords - GetBufferPos(n);
   } else {

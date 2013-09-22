@@ -79,7 +79,7 @@ int SocketIO::write_data(int sock, char* data, int len)
       }
     }
   }
-  return(bcount);
+  return (bcount);
 }
 
 int SocketIO::get(int sock, char* data, int len)
@@ -128,7 +128,7 @@ int SocketIO::read_data(int sock, char* data, int len)
     }
   }
   //  printf ( "SocketIO::read_data ended : bcount = %d!!!\n", bcount );
-  return(bcount);
+  return (bcount);
 }
 
 void SocketIO::interrupt(void)
@@ -201,13 +201,13 @@ int SocketRecv::accept()
   int t;
   if ((t =::accept(m_sock, (struct sockaddr*)&isa, &i)) < 0) {
     m_errno = errno;
-    return(-1);
+    return (-1);
   }
 
   printf("SocketRecv:: connection request accepted, sender=%d\n", t);
 
   m_sender = t;
-  return(t);
+  return (t);
 }
 
 int SocketRecv::close()

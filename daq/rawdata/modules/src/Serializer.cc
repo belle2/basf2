@@ -136,14 +136,16 @@ void SerializerModule::terminate()
 
 void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawCOPPER* rawcpr)
 {
+  const int num_cprblock = 0;
   RawHeader rawhdr;
-  rawhdr.SetBuffer(rawcpr->GetRawHdrBufPtr());
-
+  rawhdr.SetBuffer(rawcpr->GetWholeBuffer());
   int total_send_nwords =
     hdr->GetHdrNwords() +
     rawhdr.GetNwords() +
     trl->GetTrlNwords();
 
+  hdr->SetNumEventsinPacket(rawcpr->GetNumEvents());
+  hdr->SetNumNodesinPacket(rawcpr->GetNumNodes());
   hdr->SetNwords(total_send_nwords);
 
   return;
@@ -152,12 +154,7 @@ void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, 
 
 void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
 {
-
-  RawHeader rawhdr;
-  rawhdr.SetBuffer(rawcpr->GetRawHdrBufPtr());
-
-  RawTrailer rawtrl;
-  rawtrl.SetBuffer(rawcpr->GetRawTrlBufPtr());
+  const int num_cprblock = 0;
 
   SendHeader send_header;
   SendTrailer send_trailer;
@@ -169,23 +166,13 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
   struct iovec iov[ NUM_BUFFER ];
 
   // check Body data size
-  int rawcopper_nwords = rawcpr->Size();
-  int rawheader_nwords = rawhdr.GetNwords();
-
-
-  if (rawcopper_nwords != rawheader_nwords) {
-    printf("invalid data length of RawCOPEPR. Exiting... : %d %d \n",
-           rawcopper_nwords,
-           rawheader_nwords
-          );
-    exit(-1);
-  }
+  int rawcopper_nwords = rawcpr->TotalBufNwords();
 
   //Fill iov info.
   iov[0].iov_base = (char*)send_header.GetBuffer();
   iov[0].iov_len = sizeof(int) * send_header.GetHdrNwords();
 
-  iov[1].iov_base = (char*)rawcpr->GetBuffer();
+  iov[1].iov_base = (char*)rawcpr->GetWholeBuffer();
   iov[1].iov_len = sizeof(int) * rawcopper_nwords;
 
   iov[2].iov_base = (char*)send_trailer.GetBuffer();
@@ -344,14 +331,15 @@ void SerializerModule::event()
 
   StoreArray<RawCOPPER> rawcprarray;
 
-  for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
+  //  for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
+  for (int j = 0; j < rawcprarray.getEntries(); j++) {
     int* buf;
     int m_size_byte = 0;
 
 #ifndef DUMMY_DATA
     //  StoreObjPtr<RawCOPPER> rawcopper;
-    buf = rawcprarray[ j ]->GetBuffer();
-    m_size_byte = rawcprarray[ j ]->Size() * sizeof(int);
+    buf = rawcprarray[ j ]->GetWholeBuffer();
+    m_size_byte = rawcprarray[ j ]->TotalBufNwords() * sizeof(int);
 #else
     m_size_byte = 1000;
     m_buffer[0] = (m_size_byte + 3) / 4;

@@ -47,11 +47,11 @@ DeSerializerPCModule::DeSerializerPCModule() : DeSerializerModule()
 }
 
 
+
 DeSerializerPCModule::~DeSerializerPCModule()
 {
 
 }
-
 
 
 void DeSerializerPCModule::initialize()
@@ -63,7 +63,6 @@ void DeSerializerPCModule::initialize()
   // allocate buffer
   for (int i = 0 ; i < NUM_EVT_PER_BASF2LOOP; i++) {
     m_bufary[i] = new int[ BUF_SIZE_WORD ];
-    m_bufary_body[i] = new int[ BUF_SIZE_WORD ];
   }
   m_buffer = new int[ BUF_SIZE_WORD ];
 
@@ -71,7 +70,6 @@ void DeSerializerPCModule::initialize()
   // initialize buffer
   for (int i = 0 ; i < NUM_EVT_PER_BASF2LOOP; i++) {
     memset(m_bufary[i], 0,  BUF_SIZE_WORD * sizeof(int));
-    memset(m_bufary_body[i], 0,  BUF_SIZE_WORD * sizeof(int));
   }
 
   // Open message handler
@@ -97,6 +95,8 @@ void DeSerializerPCModule::initialize()
   memset(time_array0, 0, sizeof(time_array0));
   memset(time_array1, 0, sizeof(time_array1));
   memset(time_array2, 0, sizeof(time_array2));
+
+  ClearNumUsedBuf();
 
 //   m_shmname = "/tmp/temp.daq";
 //   int shm_open(const char *m_shmname, int oflag, mode_t mode);
@@ -194,7 +194,7 @@ int DeSerializerPCModule::Connect()
 
 
 
-int* DeSerializerPCModule::RecvDatafromCOPPER(int* malloc_flag, int* total_buf_nwords, int* default_buf)
+int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int* num_events_in_sendblock, int* num_nodes_in_sendblock)
 {
 
   int* temp_buf = NULL;
@@ -204,34 +204,51 @@ int* DeSerializerPCModule::RecvDatafromCOPPER(int* malloc_flag, int* total_buf_n
 
   each_buf_nwords.clear();
 #ifdef NOT_USE_SOCKETLIB
-  //
-  // Read Size
-  //
 
+
+  // Read Header and obtain data size
   int read_size = 0;
   int recv_size = sizeof(int);
 
   int send_hdr_buf[ SendHeader::SENDHDR_NWORDS ];
+
+  int temp_num_events = 0;
+  int temp_num_nodes = 0;
 
   for (int i = 0; i < m_socket.size(); i++) {
     int recvd_size = 0;
     Recv(m_socket[ i ], (char*)send_hdr_buf, sizeof(int)*SendHeader::SENDHDR_NWORDS, flag);
     SendHeader send_hdr;
     send_hdr.SetBuffer(send_hdr_buf);
+
+    temp_num_events = send_hdr.GetNumEventsinPacket();
+    temp_num_nodes = send_hdr.GetNumNodesinPacket();
+    if (i == 0) {
+      *num_events_in_sendblock = temp_num_events;
+      *num_nodes_in_sendblock = temp_num_nodes;
+    } else if (*num_events_in_sendblock != temp_num_events || *num_nodes_in_sendblock != temp_num_nodes) {
+      printf("Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n", *num_events_in_sendblock , temp_num_events , *num_nodes_in_sendblock , temp_num_nodes);
+      exit(1);
+    }
     int rawcpr_nwords = send_hdr.GetTotalNwords()
                         - SendHeader::SENDHDR_NWORDS
                         - SendTrailer::SENDTRL_NWORDS;
     *total_buf_nwords += rawcpr_nwords;
     each_buf_nwords.push_back(rawcpr_nwords);
-
   }
 
+
+  // Prepare buffer
   if (*total_buf_nwords >  BUF_SIZE_WORD) {
     *malloc_flag = 1;
     temp_buf = new int[ *total_buf_nwords ];
   } else {
-    *malloc_flag = 0;
-    temp_buf = default_buf;
+    if ((temp_buf = GetBufArray()) == 0) {
+      *malloc_flag = 1;
+      temp_buf = new int[ *total_buf_nwords ];
+    } else {
+      *malloc_flag = 0;
+    }
   }
 
 
@@ -288,78 +305,6 @@ int* DeSerializerPCModule::RecvDatafromCOPPER(int* malloc_flag, int* total_buf_n
 
 
 
-int* DeSerializerPCModule::RecvDatafromEvb0(int* malloc_flag, int* total_buf_nwords, int* default_buf)
-{
-
-  int* temp_buf = NULL;
-  int flag = 0;
-  vector <int> each_buf_nwords;
-  each_buf_nwords.clear();
-
-  *total_buf_nwords = 0;
-
-  //
-  // Read Size
-  //
-  for (int i = 0; i < m_socket.size(); i++) {
-    int ropc_nwords;
-    Recv(m_socket[ i ], (char*)&ropc_nwords, sizeof(int), flag);
-
-    *total_buf_nwords = ropc_nwords;
-    each_buf_nwords.push_back(ropc_nwords);
-#ifdef DEBUG
-    printf("nwords %d\n", ropc_nwords);
-#endif
-  }
-
-
-
-  if (*total_buf_nwords > BUF_SIZE_WORD) {
-    *malloc_flag = 1;
-    temp_buf = new int[ *total_buf_nwords ];
-  } else {
-    *malloc_flag = 0;
-    temp_buf = default_buf;
-  }
-
-  // Read body
-  int total_recvd_byte = 0;
-  for (int i = 0; i < m_socket.size(); i++) {
-    if ((total_recvd_byte % sizeof(int)) != 0) {
-      printf("recvd buffer size is in the unit of word. Exiting... : %d bytes \n"
-             , total_recvd_byte);
-      exit(1);
-    }
-    temp_buf[ total_recvd_byte / sizeof(int) ] = each_buf_nwords[ i ];
-    total_recvd_byte += sizeof(int);
-    total_recvd_byte += Recv(m_socket[ i ], (char*)temp_buf + total_recvd_byte,
-                             (each_buf_nwords[ i ] - 1) * sizeof(int), flag);
-
-
-  }
-
-#ifdef DEBUG
-  printf("size ::: %d\n", *total_buf_nwords);
-  for (int i = 0; i < *total_buf_nwords; i++) {
-    printf("0x%.8x ", *((int*)temp_buf + i));
-    if ((i + 1) % 10 == 0) printf("\n %6d ::: ", i + 2);
-  }
-  printf("\n");
-  printf("\n");
-
-#endif
-
-
-
-  if (*total_buf_nwords * sizeof(int) != total_recvd_byte) {
-    perror("Receiving data in an invalid unit. Exting...");
-    exit(-1);
-  }
-
-  return temp_buf;
-
-}
-
 
 
 
@@ -368,6 +313,7 @@ int* DeSerializerPCModule::RecvDatafromEvb0(int* malloc_flag, int* total_buf_nwo
 void DeSerializerPCModule::event()
 {
 
+  ClearNumUsedBuf();
 
   if (n_basf2evt < 0) {
     m_start_time = GetTimeSec();
@@ -401,8 +347,9 @@ void DeSerializerPCModule::event()
     // Get a record from socket
     int total_buf_nwords = 0 ;
     int malloc_flag = 0;
-    int* temp_buf = RecvDatafromCOPPER(&malloc_flag, &total_buf_nwords, m_bufary[ j ]);
-    //    int* temp_buf = RecvDatafromEvb0(&malloc_flag, &total_buf_nwords, m_bufary[ j ]);
+    int num_events_in_sendblock = 0;
+    int num_nodes_in_sendblock = 0;
+    int* temp_buf = RecvData(&malloc_flag, &total_buf_nwords, &num_events_in_sendblock, &num_nodes_in_sendblock);
     m_totbytes += total_buf_nwords * sizeof(int);
 
 #ifdef DEBUG
@@ -437,11 +384,11 @@ void DeSerializerPCModule::event()
     temp_rawcopper =  rawcprarray.appendNew();
 
     // NotRemove SendHeader
-    temp_rawcopper->SetBuffer((int*)temp_buf, total_buf_nwords, malloc_flag);
+    //    printf("Node %d numblock %d \n", temp_buf[6], m_socket.size());
+    temp_rawcopper->SetBuffer((int*)temp_buf, total_buf_nwords, malloc_flag, num_events_in_sendblock, m_socket.size()*num_nodes_in_sendblock);
 
     // Remove SendHeader
     //    temp_rawcopper->SetBuffer((int*)temp_buf + SendHeader::SENDHDR_NWORDS, total_buf_nwords, malloc_flag);
-
 #else
     //    m_rawcopper->buffer(temp_buf_body, body_size_word, malloc_flag_body);
 #endif
@@ -452,6 +399,7 @@ void DeSerializerPCModule::event()
 #endif
 
   }
+
 
   //
   // Update EventMetaData

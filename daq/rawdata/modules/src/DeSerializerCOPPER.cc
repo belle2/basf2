@@ -136,9 +136,9 @@ void DeSerializerCOPPERModule::initialize()
 
 void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 {
+  const int num_cprblock = 0; // On COPPER, 1 COPPER block will be stored in a RawCOPPER.
   RawHeader rawhdr;
-  rawhdr.SetBuffer(raw_copper->GetRawHdrBufPtr());
-
+  rawhdr.SetBuffer(raw_copper->GetRawHdrBufPtr(num_cprblock));
 
   //
   // initialize header(header nwords, magic word) and trailer(magic word)
@@ -146,7 +146,7 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawhdr.Initialize(); // Fill 2nd( hdr size) and 20th header word( magic word )
 
   // Set total words info
-  int nwords = raw_copper->Size();
+  int nwords = raw_copper->GetCprBlockNwords(num_cprblock);
   rawhdr.SetNwords(nwords);
 
   //
@@ -156,8 +156,8 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawhdr.SetRunNo(m_run_no);   // Fill 3rd header word
 
   // Obtain eve.# from COPPER header
-  rawhdr.SetEveNo(raw_copper->GetCOPPEREveNo());   // Fill 4th header word
-  rawhdr.SetB2LFEEHdrPart(raw_copper->GetB2LFEEHdr1(), raw_copper->GetB2LFEEHdr2());   // Fill 5th and 6th words
+  rawhdr.SetEveNo(raw_copper->GetCOPPEREveNo(num_cprblock));     // Fill 4th header word
+  //  rawhdr.SetB2LFEEHdrPart(raw_copper->GetB2LFEEHdr1(), raw_copper->GetB2LFEEHdr2());   // Fill 5th and 6th words
 
   // Obtain info from SlowController via AddParam or COPPER data
   rawhdr.SetSubsysId(m_nodeid);   // Fill 7th header word
@@ -165,10 +165,13 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   rawhdr.SetTruncMask(m_trunc_mask);   // Fill 8th header word
 
   // Offset
-  rawhdr.SetOffset1stFINNESSE(raw_copper->GetOffset1stFINNESSE());    // Fill 9th header word
-  rawhdr.SetOffset2ndFINNESSE(raw_copper->GetOffset2ndFINNESSE());   // Fill 10th header word
-  rawhdr.SetOffset3rdFINNESSE(raw_copper->GetOffset3rdFINNESSE());   // Fill 11th header word
-  rawhdr.SetOffset4thFINNESSE(raw_copper->GetOffset4thFINNESSE());   // Fill 12th header word
+  rawhdr.SetOffset1stFINNESSE(raw_copper->GetOffset1stFINNESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));          // Fill 9th header word
+  rawhdr.SetOffset2ndFINNESSE(raw_copper->GetOffset2ndFINNESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));         // Fill 10th header word
+  rawhdr.SetOffset3rdFINNESSE(raw_copper->GetOffset3rdFINNESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));         // Fill 11th header word
+  rawhdr.SetOffset4thFINNESSE(raw_copper->GetOffset4thFINNESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));         // Fill 12th header word
+
+  // Add node-info
+  rawhdr.SetMagicWordEntireHeader();
 
   // Add node-info
   rawhdr.AddNodeInfo(m_nodeid);   // Fill 13th header word
@@ -177,10 +180,10 @@ void DeSerializerCOPPERModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper)
   // Fill info in Trailer
   //
   RawTrailer rawtrl;
-  rawtrl.SetBuffer(raw_copper->GetRawTrlBufPtr());
+  rawtrl.SetBuffer(raw_copper->GetRawTrlBufPtr(num_cprblock));
   rawtrl.Initialize(); // Fill 2nd word : magic word
-  rawtrl.SetChksum(CalcSimpleChecksum(raw_copper->GetBuffer(),
-                                      raw_copper->Size() - rawtrl.GetTrlNwords()));
+  rawtrl.SetChksum(CalcSimpleChecksum(raw_copper->GetBuffer(num_cprblock),
+                                      raw_copper->GetCprBlockNwords(num_cprblock) - rawtrl.GetTrlNwords()));
 
   // Check magic words are set at proper positions
 }
@@ -320,6 +323,7 @@ int DeSerializerCOPPERModule::Read(int fd, char* buf, int data_size_byte)
 void DeSerializerCOPPERModule::event()
 {
 
+
   if (n_basf2evt < 0) {
     OpenCOPPER();
     m_start_time = GetTimeSec();
@@ -342,9 +346,11 @@ void DeSerializerCOPPERModule::event()
 
     temp_rawcopper =  rawcprarray.appendNew();
     // Store data buffer
-    temp_rawcopper->SetBuffer(temp_buf, m_size_word, malloc_flag);
+    temp_rawcopper->SetBuffer(temp_buf, m_size_word, malloc_flag, 1, 1);
     // Fill header and trailer
+
     FillNewRawCOPPERHeader(temp_rawcopper);
+
 //     printf("\n%.8d : ", 0);
 //     for( int i = 0; i < m_size_word; i++){
 //       printf("0x%.8x ", temp_buf[ i ]);

@@ -63,13 +63,23 @@ namespace Belle2 {
     //! receive data
     virtual int Recv(int fd, char* buf, int data_size_byte, int flag);
 
+
     //! receive data
-    virtual int* RecvDatafromCOPPER(int* malloc_flag, int* total_m_size_word, int* default_buf);
+    virtual int* RecvData(int* malloc_flag, int* total_m_size_word, int* num_events_in_sendblock, int* num_nodes_in_sendblock);
 
-    virtual int* RecvDatafromEvb0(int* malloc_flag, int* total_m_size_word, int* default_buf);
+    virtual int* GetBufArray() {
+      int* tempbuf = 0;
+      if (m_num_usedbuf < NUM_EVT_PER_BASF2LOOP) {
+        tempbuf = m_bufary[ m_num_usedbuf  ];
+        m_num_usedbuf++;
+      }
+      return tempbuf;
+    }
 
-    //! buffer after removing SendHeaader and SendTrailer
-    int* m_bufary_body[NUM_EVT_PER_BASF2LOOP];
+    virtual void ClearNumUsedBuf() {
+      m_num_usedbuf = 0;
+      return ;
+    }
 
     //! # of connections
     int m_num_connections;
@@ -87,13 +97,9 @@ namespace Belle2 {
     std::vector<int> m_port_from;
 
 
-    // Data members
-  private:
 
-    // Parallel processing parameters
-
-
-
+    //! # of already used buffers
+    int m_num_usedbuf;
 
 
   };

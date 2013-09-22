@@ -112,48 +112,54 @@ void PrintDataModule::event()
 {
   StoreArray<RawCOPPER> rawcprarray;
 
-  for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
-    RawHeader rawhdr;
-    int* buf;
-    int size_byte = 0;
-    buf = rawcprarray[ j ]->GetBuffer();
-    rawhdr.SetBuffer(rawcprarray[ j ]->GetRawHdrBufPtr());
-    size_byte = rawcprarray[ j ]->Size() * sizeof(int);
+  for (int j = 0; j < rawcprarray.getEntries(); j++) {
+    int tot_size_byte = rawcprarray[j]->TotalBufNwords() * sizeof(int);
 
-    //
-    // Extract FEE buffer
-    //
-    int* finnesse_buf_1st;
-    int* finnesse_buf_2nd;
-    int* finnesse_buf_3rd;
-    int* finnesse_buf_4th;
+    for (int i = 0; i < rawcprarray[ j ]->GetNumEntries(); i++) {
 
-    int* detector_buf_1st;
-    int* detector_buf_2nd;
-    int* detector_buf_3rd;
-    int* detector_buf_4th;
+      RawHeader rawhdr;
+      int* buf;
+      int size_byte = 0;
+      buf = rawcprarray[ j ]->GetBuffer(i);
+      rawhdr.SetBuffer(rawcprarray[ j ]->GetRawHdrBufPtr(i));
+      size_byte = rawcprarray[ j ]->GetCprBlockNwords(i) * sizeof(int);
+
+      //
+      // Extract FEE buffer
+      //
+      int* finnesse_buf_1st;
+      int* finnesse_buf_2nd;
+      int* finnesse_buf_3rd;
+      int* finnesse_buf_4th;
+
+      int* detector_buf_1st;
+      int* detector_buf_2nd;
+      int* detector_buf_3rd;
+      int* detector_buf_4th;
 
 
-    printf("=== event====\n exp %d run %d eve %d copperNode %d type %d size %d byte\n",
-           rawhdr.GetExpNo(),
-           rawhdr.GetRunNo(),
-           rawhdr.GetEveNo(),
-           rawhdr.GetSubsysId(),
-           rawhdr.GetDataType(),
-           size_byte);
+      printf("=== event====\nBlk %d(size %d) %d(size %d) \nexp %d run %d eve %d copperNode %d type %d\n",
+             j, tot_size_byte, i, size_byte,
+             rawhdr.GetExpNo(),
+             rawhdr.GetRunNo(),
+             rawhdr.GetEveNo(),
+             rawhdr.GetSubsysId(),
+             rawhdr.GetDataType());
 
-    finnesse_buf_1st = rawcprarray[ j ]->Get1stFINNESSEBuffer();
-    finnesse_buf_2nd = rawcprarray[ j ]->Get2ndFINNESSEBuffer();
-    finnesse_buf_3rd = rawcprarray[ j ]->Get3rdFINNESSEBuffer();
-    finnesse_buf_4th = rawcprarray[ j ]->Get4thFINNESSEBuffer();
-    printf("FINNNESSE buf %p %p %p %p\n", finnesse_buf_1st, finnesse_buf_2nd, finnesse_buf_3rd, finnesse_buf_4th);
 
-    detector_buf_1st = rawcprarray[ j ]->Get1stDetectorBuffer();
-    detector_buf_2nd = rawcprarray[ j ]->Get2ndDetectorBuffer();
-    detector_buf_3rd = rawcprarray[ j ]->Get3rdDetectorBuffer();
-    detector_buf_4th = rawcprarray[ j ]->Get4thDetectorBuffer();
-    printf("Detector  buf %p %p %p %p\n", detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th);
+      finnesse_buf_1st = rawcprarray[ j ]->Get1stFINNESSEBuffer(i);
+      finnesse_buf_2nd = rawcprarray[ j ]->Get2ndFINNESSEBuffer(i);
+      finnesse_buf_3rd = rawcprarray[ j ]->Get3rdFINNESSEBuffer(i);
+      finnesse_buf_4th = rawcprarray[ j ]->Get4thFINNESSEBuffer(i);
+      printf("FINNNESSE buf %p %p %p %p\n", finnesse_buf_1st, finnesse_buf_2nd, finnesse_buf_3rd, finnesse_buf_4th);
 
+      detector_buf_1st = rawcprarray[ j ]->Get1stDetectorBuffer(i);
+      detector_buf_2nd = rawcprarray[ j ]->Get2ndDetectorBuffer(i);
+      detector_buf_3rd = rawcprarray[ j ]->Get3rdDetectorBuffer(i);
+      detector_buf_4th = rawcprarray[ j ]->Get4thDetectorBuffer(i);
+      printf("Detector  buf %p %p %p %p\n", detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th);
+
+    }
   }
 
 

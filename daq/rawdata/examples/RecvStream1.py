@@ -34,7 +34,7 @@ perf = register_module('DAQPerf')
 receiver.param('NodeID', 3)
 receiver.param('NumConn', 1)
 receiver.param('HostNameFrom', ['localhost', 'cpr007'])
-# receiver.param('HostNameFrom', ['cpr006', 'cpr007'])
+# receiver.param('HostNameFrom', ['cpr006', 'cpr009'])
 
 receiver.param('PortFrom', [35000, 36000])
 # receiver.param('PortFrom', [33000, 33000])

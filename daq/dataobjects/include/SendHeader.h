@@ -40,10 +40,14 @@ namespace Belle2 {
     void SetNwords(int total_data_nwords);    //! set contents of Header
 
     void SetNumEventsinPacket(int num_events);
+    void SetNumNodesinPacket(int num_nodes);
+    void SetNodeID(int node_id);
 
     int GetTotalNwords();  //! get contents of Header
     int GetHdrNwords();  //! get contents of Header
     int GetNumEventsinPacket();
+    int GetNumNodesinPacket();
+    int GetNodeID();
 
     /* Data Format : Node info */
     enum {
@@ -56,7 +60,7 @@ namespace Belle2 {
     enum {
       POS_NWORDS = 0,
       POS_HDR_NWORDS = 1,
-      POS_NUM_EVENTS_IN_PACKET = 2,
+      POS_NUM_EVE_NUM_NODES = 2,
       POS_EXP_RUN_NUM = 3,
       POS_EVE_NUM = 4,
       POS_NODE_ID = 5

@@ -32,20 +32,33 @@ namespace Belle2 {
     //! copy rawdata into internal buffer
     //    virtual void Copy(int* bufin, int nwords);
 
-    //! allocate buffer
+    //! Get total length of
+    virtual int TotalBufNwords();
+
+    //! get position of COPPER block
+    virtual int GetBufferPos(int n);
 
 
-    //! get buffer
-    virtual int* GetBuffer();
+    //! get nth buffer pointer
+    virtual int* GetWholeBuffer();
+
+    //! get nth buffer pointer
+    virtual int* GetBuffer(int n);
+
+    //! get nth buffer pointer
+    virtual int GetNumEntries() { return m_num_events * m_num_nodes; }
+
+    //! get nth buffer pointer
+    virtual int GetNumNodes() { return m_num_nodes; }
+
+    //! get nth buffer pointer
+    virtual int GetNumEvents() { return m_num_events; }
 
     //! set buffer
-    virtual void SetBuffer(int* bufin, int nwords, int malloc_flag);
+    virtual void SetBuffer(int* bufin, int nwords, int malloc_flag, int num_events, int num_nodes);
 
-    //! get data length
-    virtual int Size();
-
-    //! get data length
-    virtual int GetBodyNwords();
+    //! get COPPER Block Size
+    virtual int GetCprBlockNwords(int n);
 
     /*     //! get data length */
     /*     virtual RawHeader* GetRawHeader(); */
@@ -54,65 +67,60 @@ namespace Belle2 {
     /*     virtual RawTrailer* GetRawTrailer(); */
 
     //! get buffer pointer of rawcopper header
-    virtual int* GetRawHdrBufPtr();
+    virtual int* GetRawHdrBufPtr(int n);
 
     //! get buffer pointer of rawcopper trailer
-    virtual int* GetRawTrlBufPtr();
+    virtual int* GetRawTrlBufPtr(int n);
 
     //! get COPPER node id from data
-    virtual int GetCOPPERNodeId();
+    virtual int GetCOPPERNodeId(int n);
 
     //! get Event number from data
-    virtual unsigned int GetCOPPEREveNo();
-
-    //! get Event number from data
-    virtual unsigned int GetB2LFEEHdr1();
-
-    //! get Event number from data
-    virtual unsigned int GetB2LFEEHdr2();
+    virtual unsigned int GetCOPPEREveNo(int n);
 
     //! get subsystem-ID from data
-    virtual int GetSubsysId();
+    virtual int GetSubsysId(int n);
 
     //! get b2l block from data
-    virtual int GetNumFINNESSEBlock();
+    virtual int GetNumFINNESSEBlock(int n);
 
 
     //! get # of offset words for FEE slot A buffer position
-    int GetOffset1stFINNESSE();
+    int GetOffset1stFINNESSE(int n);
 
     //! get # of offset words for FEE slot A buffer position
-    int GetOffset2ndFINNESSE();
+    int GetOffset2ndFINNESSE(int n);
 
     //! get # of offset words for FEE slot A buffer position
-    int GetOffset3rdFINNESSE();
+    int GetOffset3rdFINNESSE(int n);
 
     //! get # of offset words for FEE slot A buffer position
-    int GetOffset4thFINNESSE();
+    int GetOffset4thFINNESSE(int n);
 
     //! get FINNESSE buffer pointer for slot A
-    int* Get1stFINNESSEBuffer();
+    int* Get1stFINNESSEBuffer(int n);
 
     //! get FINNESSE buffer pointer for slot B
-    int* Get2ndFINNESSEBuffer();
+    int* Get2ndFINNESSEBuffer(int n);
 
     //! get FINNESSE buffer pointer for slot C
-    int* Get3rdFINNESSEBuffer();
+    int* Get3rdFINNESSEBuffer(int n);
 
     //! get FINNESSE buffer pointer for slot D
-    int* Get4thFINNESSEBuffer();
+    int* Get4thFINNESSEBuffer(int n);
 
     //! get Detector Buffer of slot A
-    int* Get1stDetectorBuffer();
+    int* Get1stDetectorBuffer(int n);
 
     //! get Detector Buffer of slot B
-    int* Get2ndDetectorBuffer();
+    int* Get2ndDetectorBuffer(int n);
 
     //! get Detector Buffer of slot C
-    int* Get3rdDetectorBuffer();
+    int* Get3rdDetectorBuffer(int n);
 
     //! get Detector Buffer of slot D
-    int* Get4thDetectorBuffer();
+    int* Get4thDetectorBuffer(int n);
+
 
     /* Data Format : COPPER header*/
     enum {
@@ -129,6 +137,20 @@ namespace Belle2 {
       POS_CH_D_DATA_LENGTH = 12,
       SIZE_COPPER_HEADER = 13
     };
+
+    /*
+       size of COPPER_BLOCK =
+       RawHeader.RAWHEADER_NWORDS +
+       SIZE_COPPER_FRONT_HEADER +
+       m_buffer[ POS_DATA_LENGTH ] +
+       SIZE_COPPER_TRAILER +
+       RawTrailer.RAWTRAILER_NWORDS
+    */
+    enum {
+      SIZE_COPPER_FRONT_HEADER = 7,
+      SIZE_COPPER_TRAILER = 2
+    };
+
 
     /* Data Format : B2link HSLB Header */
     enum {
@@ -169,7 +191,7 @@ namespace Belle2 {
     };
 
 
-  private:
+  protected :
 
 
     int m_nwords;
@@ -179,6 +201,8 @@ namespace Belle2 {
     RawHeader tmp_header;  //! Not record
     RawTrailer tmp_trailer; //! Not record
 
+    int m_num_events;
+    int m_num_nodes;
 
     ClassDef(RawCOPPER, 1);
   };

@@ -45,6 +45,9 @@ void SendHeader::Initialize()
   m_buffer[ POS_HDR_NWORDS ] = SENDHDR_NWORDS;
 }
 
+
+// Set Values
+
 void SendHeader::SetNwords(int total_data_nwords)
 {
   m_buffer[ POS_NWORDS ] = total_data_nwords;
@@ -52,13 +55,36 @@ void SendHeader::SetNwords(int total_data_nwords)
 
 void SendHeader::SetNumEventsinPacket(int num_events)
 {
-  m_buffer[ POS_NUM_EVENTS_IN_PACKET ] = num_events;
+  m_buffer[ POS_NUM_EVE_NUM_NODES ] =
+    (m_buffer[ POS_NUM_EVE_NUM_NODES ] & 0x0000FFFF) |
+    ((num_events << 16) & 0xFFFF0000);
+}
+
+void SendHeader::SetNumNodesinPacket(int num_nodes)
+{
+  m_buffer[ POS_NUM_EVE_NUM_NODES ] =
+    (m_buffer[ POS_NUM_EVE_NUM_NODES ] & 0xFFFF0000) |
+    (num_nodes & 0x0000FFFF);
+}
+
+void SendHeader::SetNodeID(int node_id)
+{
+  m_buffer[ POS_NODE_ID ] = node_id;
 }
 
 
+// Get Values
+
 int SendHeader::GetTotalNwords() {  return m_buffer[ POS_NWORDS ];}
 int SendHeader::GetHdrNwords() {    return SENDHDR_NWORDS; }
-int SendHeader::GetNumEventsinPacket() {  return m_buffer[ POS_NUM_EVENTS_IN_PACKET ]; }
+int SendHeader::GetNumEventsinPacket()
+{
+  return
+    ((m_buffer[ POS_NUM_EVE_NUM_NODES ] & 0xFFFF0000) >> 16) & 0x0000FFFF;
 
+}
+int SendHeader::GetNumNodesinPacket() {  return m_buffer[ POS_NUM_EVE_NUM_NODES ] & 0x0000FFFF; }
+
+int SendHeader::GetNodeID() { return m_buffer[ POS_NODE_ID ]; }
 
 

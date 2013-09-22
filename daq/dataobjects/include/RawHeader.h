@@ -39,7 +39,8 @@ namespace Belle2 {
     //! set buffer
     void SetBuffer(int* hdr);
 
-    void CheckBuffer(); //! initialize header
+    void CheckSetBuffer(); //! initialize header
+    void CheckGetBuffer(); //! initialize header
 
     void Initialize(); //! initialize header
 
@@ -57,6 +58,8 @@ namespace Belle2 {
     void SetOffset2ndFINNESSE(int offset_2nd_FINNESSE);    //! set contents of header
     void SetOffset3rdFINNESSE(int offset_3rd_FINNESSE);    //! set contents of header
     void SetOffset4thFINNESSE(int offset_4th_FINNESSE);    //! set contents of header
+    void SetMagicWordEntireHeader(); //! set magic words;
+
     int AddNodeInfo(int node_id);
 
     int GetNwords();  //! get contents of header

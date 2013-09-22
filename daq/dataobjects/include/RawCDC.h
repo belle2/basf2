@@ -1,16 +1,21 @@
 //+
-// File : RawCDC.h
-// Description : pseudo raw data of CDC for test
+// File : RawCOPPER.h
+// Description : Module to handle raw data from COPPER
 //
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 3 - Sep - 2010
+// Author : Satoru Yamada, IPNS, KEK
+// Date : 2 - Aug - 2013
 //-
 
 #ifndef RAWCDC_H
 #define RAWCDC_H
 
-#include <framework/datastore/DataStore.h>
+// Includes
+#include <stdio.h>
+#include <stdlib.h>
 #include <daq/dataobjects/RawCOPPER.h>
+#include <daq/dataobjects/RawHeader.h>
+#include <daq/dataobjects/RawTrailer.h>
+#include <framework/datastore/DataStore.h>
 
 #include <TObject.h>
 
@@ -19,12 +24,9 @@ namespace Belle2 {
   class RawCDC : public RawCOPPER {
   public:
     //! Default constructor
-    RawCDC() {};
-    //! Constructor using existing pointer to raw data buffer
-    RawCDC(int* buf, int nwords) :
-      RawCOPPER(buf, nwords) {};
+    RawCDC();
     //! Destructor
-    ~RawCDC() {};
+    virtual ~RawCDC();
 
     ClassDef(RawCDC, 1);
   };

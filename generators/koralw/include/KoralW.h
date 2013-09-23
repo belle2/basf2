@@ -28,7 +28,7 @@ namespace Belle2 {
   public:
 
     /** Constructor. */
-    KoralW() {};
+    KoralW() : m_applyBoost(0.0), m_crossSection(0.0), m_crossSectionError(0.0) {};
 
     /** Destructor. */
     ~KoralW() {};

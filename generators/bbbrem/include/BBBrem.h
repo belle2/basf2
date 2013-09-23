@@ -30,8 +30,33 @@ namespace Belle2 {
 
   public:
 
-    /** Constructor. */
-    BBBrem() : m_applyBoost(false), m_cmsEnergy(10.58), m_photonEFrac(0.000001), m_unweighted(true), m_maxWeight(0.0), m_maxWeightDelivered(0.0), m_sumWeightDelivered(0.0), m_sumWeightDeliveredSqr(0.0), m_eventCount(0), m_crossSection(0.0), m_crossSectionError(0.0), alpha(0.0), rme(0.0), s(0.0), rme2(0.0), rme2s(0.0), rls(0.0), z0(0.0), a1(0.0), a2(0.0), ac(0.0), sigapp(0.0), eb(0.0), pb(0.0), rin2pb(0.0), weight(0.0) {};
+    BBBrem() :
+      m_eventCount(0),
+      m_applyBoost(false),
+      m_unweighted(true),
+      m_maxWeight(0.0),
+      m_maxWeightDelivered(0.0),
+      m_sumWeightDelivered(0.0),
+      m_sumWeightDeliveredSqr(0.0),
+      m_cmsEnergy(10.58),
+      m_photonEFrac(0.000001),
+      m_crossSection(0.0),
+      m_crossSectionError(0.0),
+      alpha(0.0),
+      rme(0.0),
+      s(0.0),
+      rme2(0.0),
+      rme2s(0.0),
+      rls(0.0),
+      z0(0.0),
+      a1(0.0),
+      a2(0.0),
+      ac(0.0),
+      sigapp(0.0),
+      eb(0.0),
+      pb(0.0),
+      rin2pb(0.0),
+      weight(0.0) {};
 
     //BBBrem() : m_applyBoost(false), m_unweighted(true), m_cmsEnergy(10.58), m_photonEFrac(0.000001) {};
 

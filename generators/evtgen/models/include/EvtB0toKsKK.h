@@ -20,7 +20,8 @@ class EvtB0toKsKK : public  EvtDecayAmp {
 public:
 
   /* Constructor. */
-  EvtB0toKsKK() {}
+  //EvtB0toKsKK() {}
+  EvtB0toKsKK() : alpha_kpkmnr(0.0), alpha_kskpnr(0.0), alpha_kskmnr(0.0) {};
 
   /* Destructor. */
   virtual ~EvtB0toKsKK();

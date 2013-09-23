@@ -26,12 +26,12 @@ void test2_Validation_pi0(){
   TFile* output = new TFile("pi0Validation.root", "recreate");
   /* Mass constrained fit value, as stored in Particle */
   TH1F * h_pi0_mf   = new TH1F("mpi0f",";Mass constrained fit m(#pi^{0}) [GeV];N",40,0.133,0.137);
-  h_pi0_mf->GetListOfFunctions()->Add(new TNamed("Description", Form("pi0 Mass constrained fit mass, with background. A Generic BBbar sample is used. Test may be replaced with analysis mode validation with pi0.",string(names[i]).c_str())));
+  h_pi0_mf->GetListOfFunctions()->Add(new TNamed("Description", "pi0 Mass constrained fit mass, with background. A Generic BBbar sample is used. Test may be replaced with analysis mode validation with pi0.",));
   h_pi0_mf->GetListOfFunctions()->Add(new TNamed("Check", "Stable S/B, non-empty (i.e. pi0 import to analysis modules is working), consistent mean."));
 
   /* Invariant mass determined from the two photon daughters */
   TH1F * h_pi0_m    = new TH1F("mpi0","#pi^{0} mass no cut;m(#pi^{0}) [GeV];N",40,0.08,0.18);
-  h_pi0_m->GetListOfFunctions()->Add(new TNamed("Description", Form("pi0 Mass, with background. A Generic BBbar sample is used. Test may be replaced with analysis mode validation with pi0.",string(names[i]).c_str())));
+  h_pi0_m->GetListOfFunctions()->Add(new TNamed("Description", "pi0 Mass, with background. A Generic BBbar sample is used. Test may be replaced with analysis mode validation with pi0."));
   h_pi0_m->GetListOfFunctions()->Add(new TNamed("Check", "Stable S/B, non-empty (i.e. pi0 import to analysis modules is working), consistent mean."));
 
   /* Access the Photons and pi0 M*/

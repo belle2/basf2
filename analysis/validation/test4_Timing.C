@@ -27,7 +27,7 @@ TString exec(const char* cmd) {
 }
 
 /** Run each DST analysis steering file in a list of files a few times, store execution time in Ntuple. */
-void test4Timing()
+void test4_Timing()
 {
   const char* files[] = {
     "test1_DSTtoMDST.py",

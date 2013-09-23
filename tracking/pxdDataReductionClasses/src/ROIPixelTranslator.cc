@@ -49,12 +49,12 @@ ROIPixelTranslator::fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
     double widthTotU = std::min(m_maxWidthU , sqrt((*listOfIntercepts)[i]->getSigmaU() * (*listOfIntercepts)[i]->getSigmaU() + m_sigmaSystU * m_sigmaSystU) * m_numSigmaTotU);
     double widthTotV = std::min(m_maxWidthV , sqrt((*listOfIntercepts)[i]->getSigmaV() * (*listOfIntercepts)[i]->getSigmaV() + m_sigmaSystV * m_sigmaSystV) * m_numSigmaTotV);
 
-    double minU = (*listOfIntercepts)[i]->getCoorU() - widthTotU;
-    double maxU = (*listOfIntercepts)[i]->getCoorU() + widthTotU;
+    double minU = (*listOfIntercepts)[i]->getCoorU() - widthTotU / 2 ;
+    double maxU = (*listOfIntercepts)[i]->getCoorU() + widthTotU / 2 ;
     const int nPixelsU = aSensorInfo.getUCells() - 1;
 
-    double minV = (*listOfIntercepts)[i]->getCoorV() - widthTotV;
-    double maxV = (*listOfIntercepts)[i]->getCoorV() + widthTotV;
+    double minV = (*listOfIntercepts)[i]->getCoorV() - widthTotV / 2;
+    double maxV = (*listOfIntercepts)[i]->getCoorV() + widthTotV / 2;
     const int nPixelsV = aSensorInfo.getVCells() - 1;
 
     const int firstPixelID = 0;

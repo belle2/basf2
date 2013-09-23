@@ -17,7 +17,6 @@
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <RKTrackRep.h>
 #include <GFTrackCand.h>
-//#include <tracking/dataobjects/ROIDetPlane.h>
 #include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
 
 class ROIDetPlane;
@@ -48,9 +47,9 @@ namespace Belle2 {
     void appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled, RKTrackRep* theTrack,
                           int theGFTrackCandIndex, RelationArray* gfTrackCandToPXDIntercepts);
 
-    std::list<ROIDetPlane> m_planeList;
+    std::list<ROIDetPlane> m_planeList; /**< list of planes*/
 
-    void fillPlaneList();
+    void fillPlaneList(); /**< fill the list of planes*/
 
   };
 

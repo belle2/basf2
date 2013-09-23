@@ -50,14 +50,15 @@ ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
 
   double lambda = 0;
 
-  while (itPlanes != m_planeList.end()) {
+  for (int propDir = -1; propDir <= 1; propDir += 2) {
+    theTrack->setPropDir(propDir);
 
-    for (int propDir = -1; propDir <= 1; propDir += 2) {
-      theTrack->setPropDir(propDir);
+    while (itPlanes != m_planeList.end()) {
+
       try {
         lambda = theTrack->extrapolate(*itPlanes, predictedIntersect, covMatrix);
       }  catch (...) {
-        //      B2WARNING("extrapolation failed");
+        B2WARNING("extrapolation failed");
         itPlanes++;
         continue;
       }

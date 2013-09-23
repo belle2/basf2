@@ -43,17 +43,17 @@ namespace Belle2 {
      * Append the ROIid to the list listToBeFilled
      */
     void fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
-                       StoreArray<ROIid>* ROIidList);
+                       StoreArray<ROIid>* ROIidList); /**< fill the list of ROIs*/
 
 
 
   protected:
-    double  m_sigmaSystU;
-    double  m_sigmaSystV;
-    double  m_numSigmaTotU;
-    double  m_numSigmaTotV;
-    double  m_maxWidthU;
-    double  m_maxWidthV;
+    double  m_sigmaSystU; /**< systematic error along the U coordinate*/
+    double  m_sigmaSystV; /**< systematic error along the V coordinate*/
+    double  m_numSigmaTotU; /**< number of standard deviations to be taken to define a ROI along U*/
+    double  m_numSigmaTotV; /**< number of standard deviations to be taken to define a ROI along V*/
+    double  m_maxWidthU; /**< ROI maximum width allowed in the U direction*/
+    double  m_maxWidthV; /**< ROI maximum width allowed in the V direction*/
 
 
   };

@@ -27,15 +27,15 @@ namespace Belle2 {
 
     ROIDetPlane() {};
 
-    ROIDetPlane(const VxdID& sensorInfo);
+    ROIDetPlane(const VxdID& sensorInfo); /**< the constructor*/
 
     ~ROIDetPlane();
 
-    inline VxdID getSensorInfo() {return m_sensorInfo;};
+    inline VxdID getSensorInfo() {return m_sensorInfo;}; /**< return the sensor ID*/
 
   private:
 
-    VxdID m_sensorInfo;
+    VxdID m_sensorInfo; /**< the sensor ID*/
 
 
   };

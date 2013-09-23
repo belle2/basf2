@@ -55,7 +55,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    SGCosmic() {}
+    SGCosmic();
 
     /**
      * Default destructor

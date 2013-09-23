@@ -28,7 +28,7 @@ using namespace Belle2;
 using namespace HepGeom;
 using namespace CLHEP;
 
-// #define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 ofstream ofs_cosmic1g("cosmic1g.out");
@@ -36,6 +36,18 @@ ofstream ofs_cosmic1c("cosmic1c.out");
 ofstream ofs_cosmic2g("cosmic2g.out");
 ofstream ofs_cosmic2c("cosmic2c.out");
 #endif
+
+SGCosmic::SGCosmic()
+{
+  Parameters m_parameters;
+  m_parameters.level = 1;
+  m_parameters.ipRequirement = 0;
+  m_parameters.ipdr = 3.; // Only relevant for ipRequirement = 1
+  m_parameters.ipdz = 3.; // Only relevant for ipRequirement = 1
+  m_parameters.ptmin = 0.7;
+  setParameters(m_parameters);
+}
+
 
 bool SGCosmic::setParameters(const Parameters& p)
 {

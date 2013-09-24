@@ -12,10 +12,18 @@ void EKLMMuon()
   h1dtres->SetXTitle("ns");
   h1dtres->SetYTitle("Events");
   tree->Draw("EKLMDigits.m_Time-EKLMDigits.m_sMCTime>>muon_h1dtres", "EKLMDigits.m_good==1");
+  h1dtres->GetListOfFunctions()->Add(new TNamed("Description",
+    "Time resolution")); 
+  h1dtres->GetListOfFunctions()->Add(new TNamed("Check",
+    "No bias. See bug #997.")); 
   h1dtres->Write();
   h2dtres->SetXTitle("ns");
   h2dtres->SetYTitle("Events");
   tree->Draw("EKLMHit2ds.m_Time-EKLMHit2ds.m_MCTime>>muon_h2dtres");
+  h2dtres->GetListOfFunctions()->Add(new TNamed("Description",
+    "Time resolution")); 
+  h2dtres->GetListOfFunctions()->Add(new TNamed("Check",
+    "No bias. See bug #997.")); 
   h2dtres->Write();
   delete h2dtres;
   delete fin;

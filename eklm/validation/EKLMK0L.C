@@ -94,7 +94,35 @@ void EKLMK0L()
     pres->Fill(p.Mag() - pmc.Mag());
     ptres->Fill(p.Theta() - pmc.Theta());
     ppres->Fill(p.Phi() - pmc.Phi());
-  } 
+  }
+  xres->GetListOfFunctions()->Add(new TNamed("Description",
+    "X resolution")); 
+  xres->GetListOfFunctions()->Add(new TNamed("Check",
+    "No bias, resolution ~ 10 cm.")); 
+  yres->GetListOfFunctions()->Add(new TNamed("Description",
+    "Y resolution")); 
+  yres->GetListOfFunctions()->Add(new TNamed("Check",
+    "No bias, resolution ~ 10 cm.")); 
+  zres->GetListOfFunctions()->Add(new TNamed("Description",
+    "Z resolution")); 
+  zres->GetListOfFunctions()->Add(new TNamed("Check",
+    "No bias, resolution ~ 10 cm.")); 
+  tres->GetListOfFunctions()->Add(new TNamed("Description",
+    "Time resolution")); 
+  tres->GetListOfFunctions()->Add(new TNamed("Check",
+    "No bias. See bug #997.")); 
+  pres->GetListOfFunctions()->Add(new TNamed("Description",
+    "Momentum resolution")); 
+  pres->GetListOfFunctions()->Add(new TNamed("Check",
+    "No bias. See bug #997.")); 
+  ptres->GetListOfFunctions()->Add(new TNamed("Description",
+    "Momentum theta resolution")); 
+  ptres->GetListOfFunctions()->Add(new TNamed("Check",
+    "No bias, resolution ~ 0.03")); 
+  ppres->GetListOfFunctions()->Add(new TNamed("Description",
+    "Momentum phi resolution")); 
+  ppres->GetListOfFunctions()->Add(new TNamed("Check",
+    "No bias, resolution ~ 0.05")); 
   xres->Write();
   yres->Write();
   zres->Write();

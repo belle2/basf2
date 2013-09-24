@@ -80,7 +80,7 @@ namespace Belle2 {
     float m_ChiSq;
 
     /** Needed to make Belle2::EKLMHit2d storable. */
-    ClassDef(Belle2::EKLMHit2d, 1);
+    ClassDef(Belle2::EKLMHit2d, 2);
 
   };
 

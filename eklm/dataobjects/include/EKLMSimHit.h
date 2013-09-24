@@ -117,7 +117,7 @@ namespace Belle2 {
     int m_Strip;
 
     /** The class title. */
-    ClassDef(EKLMSimHit, 1);
+    ClassDef(Belle2::EKLMSimHit, 2);
 
   };
 

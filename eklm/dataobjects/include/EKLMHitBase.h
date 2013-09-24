@@ -140,7 +140,7 @@ namespace Belle2 {
   private:
 
     /** Needed to make objects storable. */
-    ClassDef(Belle2::EKLMHitBase, 1);
+    ClassDef(Belle2::EKLMHitBase, 2);
 
   };
 

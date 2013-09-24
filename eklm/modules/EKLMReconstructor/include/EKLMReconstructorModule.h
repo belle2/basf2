@@ -66,12 +66,6 @@ namespace Belle2 {
     /** Geometry data. */
     EKLM::GeometryData m_geoDat;
 
-    /** Light speed for first photon. */
-    double m_firstPhotonlightSpeed;
-
-    /** Time error. */
-    double m_sigmaT;
-
   };
 
 }

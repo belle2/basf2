@@ -68,7 +68,7 @@ namespace Belle2 {
     double m_discriminatorThreshold;
 
     /** Transformation data. */
-    struct EKLM::GeometryData m_geoDat;
+    EKLM::GeometryData m_geoDat;
 
     /** Digitization parameters. */
     struct EKLM::DigitizationParams m_digPar;

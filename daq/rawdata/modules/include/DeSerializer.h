@@ -98,7 +98,14 @@ namespace Belle2 {
     int* m_buffer;
 
     //! buffer
-    int* m_bufary[NUM_EVT_PER_BASF2LOOP];
+    int* m_bufary[ NUM_PREALLOC_BUF ];
+    //    int* m_bufary[NUM_EVT_PER_BASF2LOOP];
+
+    //! Getbuffer
+    virtual int* GetPreAllocBuf();
+
+    //! Getbuffer
+    virtual int* GetBuffer(int nwords, int* malloc_flag);
 
     // For monitoring
     timeval m_t0;
@@ -132,6 +139,15 @@ namespace Belle2 {
 
     //! calculate checksum
     unsigned int CalcXORChecksum(int* buf, int nwords);
+
+    virtual void ClearNumUsedBuf() {
+      m_num_usedbuf = 0;
+      return ;
+    }
+
+    //! # of already used buffers
+    int m_num_usedbuf;
+
 
     //! Messaage handler
     MsgHandler* m_msghandler;

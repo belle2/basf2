@@ -25,10 +25,12 @@ set_log_level(LogLevel.ERROR)
 
 # Modules
 
-receiver = register_module('DeSerializerPC')
+# receiver = register_module('DeSerializerPC')
+receiver = register_module('DeSerializerHLT')
 # dump = register_module('PrintCollections')
 dump = register_module('RootOutput')
 perf = register_module('DAQPerf')
+output = register_module('PrintData')
 
 # RxSocket
 receiver.param('NodeID', 3)
@@ -58,6 +60,7 @@ main = create_path()
 # Add modules to main path
 main.add_module(receiver)
 main.add_module(dump)
+# main.add_module(output)
 # main.add_module(perf)
 
 # Process all events

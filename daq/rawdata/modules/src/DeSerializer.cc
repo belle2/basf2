@@ -68,7 +68,7 @@ void DeSerializerModule::initialize()
 {
 
   // allocate buffer
-  for (int i = 0 ; i < NUM_EVT_PER_BASF2LOOP; i++) {
+  for (int i = 0 ; i < NUM_PREALLOC_BUF; i++) {
     m_bufary[i] = new int[ BUF_SIZE_WORD ];
   }
   m_buffer = new int[ BUF_SIZE_WORD ];
@@ -209,4 +209,40 @@ void DeSerializerModule::DumpData(char* buf, int size)
     perror("Failed to write buffer to a file. Exiting...");
     exit(-1);
   }
+}
+
+int* DeSerializerModule::GetBuffer(int nwords, int* malloc_flag)
+{
+  int* temp_buf = NULL;
+  // Prepare buffer
+  //  printf("############ %d %d %d %d\n", nwords, BUF_SIZE_WORD, m_num_usedbuf, NUM_PREALLOC_BUF );
+  if (nwords >  BUF_SIZE_WORD) {
+    *malloc_flag = 1;
+    temp_buf = new int[ nwords ];
+  } else {
+    if ((temp_buf = GetPreAllocBuf()) == 0x0) {
+      printf("Null pointer from GetPreALlocBuf(). Exting...\n");
+      sleep(1234567);
+      exit(1);
+    } else {
+      *malloc_flag = 0;
+    }
+  }
+  return temp_buf;
+
+}
+
+int* DeSerializerModule::GetPreAllocBuf()
+{
+  int* tempbuf = 0;
+  if (m_num_usedbuf < NUM_PREALLOC_BUF) {
+    tempbuf = m_bufary[ m_num_usedbuf  ];
+    m_num_usedbuf++;
+  } else {
+    printf("No pre-allocated buffers are left. %d > %d \n", m_num_usedbuf, NUM_PREALLOC_BUF);
+    printf("Not enough buffers are allocated or memory leak or forget to call ClearNumUsedBuf every event loop. Exting...\n");
+    sleep(1234567);
+    exit(1);
+  }
+  return tempbuf;
 }

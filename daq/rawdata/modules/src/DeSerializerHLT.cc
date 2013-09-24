@@ -45,152 +45,157 @@ DeSerializerHLTModule::~DeSerializerHLTModule()
 
 
 
-// void DeSerializerHLTModule::FillNewRawCOPPERHeader(RawCOPPER* raw_copper, int num_events, int num_nodes )
-// {
-//   const int num_cprblock = num_events * num_nodes; // On COPPER, 1 COPPER block will be stored in a RawCOPPER.
+void DeSerializerHLTModule::initialize()
+{
 
-//   for( int i = 0; i < num_cprblock; i++){
-//     RawHeader rawhdr;
-//     rawhdr.SetBuffer( raw_copper->GetRawHdrBufPtr( i ) );
+  // Accept requests for connections
+  Connect();
 
-//     //
-//     // initialize header(header nwords, magic word) and trailer(magic word)
-//     //
-//     rawhdr.Initialize(); // Fill 2nd( hdr size) and 20th header word( magic word )
-
-//     // Set total words info
-//     int nwords = raw_copper->GetCprBlockNwords( i );
-//     rawhdr.SetNwords(nwords);
-
-//     //
-//     // Obtain info from SlowController via AddParam
-//     //
-//     rawhdr.SetExpNo(m_exp_no);   // Fill 3rd header word
-//     rawhdr.SetRunNo(m_run_no);   // Fill 3rd header word
-
-//     // Obtain eve.# from COPPER header
-//     rawhdr.SetEveNo( raw_copper->GetCOPPEREveNo( i ) );     // Fill 4th header word
-//     //  rawhdr.SetB2LFEEHdrPart(raw_copper->GetB2LFEEHdr1(), raw_copper->GetB2LFEEHdr2());   // Fill 5th and 6th words
-
-//     // Obtain info from SlowController via AddParam or COPPER data
-//     rawhdr.SetSubsysId( raw_copper->GetCOPPEREveNo( i ) );   // Fill 7th header word
+  // allocate buffer
+  for (int i = 0 ; i < NUM_PREALLOC_BUF; i++) {
+    m_bufary[i] = new int[ BUF_SIZE_WORD ];
+  }
+  m_buffer = new int[ BUF_SIZE_WORD ];
 
 
-//     rawhdr.SetDataType(m_data_type);   // Fill 8th header word
-//     rawhdr.SetTruncMask(m_trunc_mask);   // Fill 8th header word
+  // initialize buffer
+  for (int i = 0 ; i < NUM_PREALLOC_BUF; i++) {
+    memset(m_bufary[i], 0,  BUF_SIZE_WORD * sizeof(int));
+  }
 
-//     // Offset
-//     rawhdr.SetOffset1stFINNESSE(raw_copper->GetOffset1stFINNESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));          // Fill 9th header word
-//     rawhdr.SetOffset2ndFINNESSE(raw_copper->GetOffset2ndFINNESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));         // Fill 10th header word
-//     rawhdr.SetOffset3rdFINNESSE(raw_copper->GetOffset3rdFINNESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));         // Fill 11th header word
-//     rawhdr.SetOffset4thFINNESSE(raw_copper->GetOffset4thFINNESSE(num_cprblock) - raw_copper->GetBufferPos(num_cprblock));         // Fill 12th header word
+  // Open message handler
+  m_msghandler = new MsgHandler(m_compressionLevel);
 
-//     // Add node-info
-//     rawhdr.SetMagicWordEntireHeader();
+  // Initialize EvtMetaData
+  m_eventMetaDataPtr.registerAsPersistent();
 
-//     // Add node-info
-//     rawhdr.AddNodeInfo(m_nodeid);   // Fill 13th header word
+  // Initialize Array of RawCOPPER
 
-//     //
-//     // Fill info in Trailer
-//     //
-//     RawTrailer rawtrl;
-//     rawtrl.SetBuffer(raw_copper->GetRawTrlBufPtr(num_cprblock));
-//     rawtrl.Initialize(); // Fill 2nd word : magic word
-//     rawtrl.SetChksum(CalcSimpleChecksum(raw_copper->GetBuffer(num_cprblock),
-//          raw_copper->GetCprBlockNwords(num_cprblock) - rawtrl.GetTrlNwords()));
+  rawcprarray.registerPersistent();
+  raw_cdcarray.registerPersistent();
+  raw_svdarray.registerPersistent();
+  raw_bpidarray.registerPersistent();
+  raw_epidarray.registerPersistent();
+  raw_eclarray.registerPersistent();
+  raw_klmarray.registerPersistent();
 
-//     // Check magic words are set at proper positions
 
-//   }
+  if (dump_fname.size() > 0) {
+    OpenOutputFile();
+  }
 
-//   return;
-// }
+  B2INFO("Rx initialized.");
+
+  // Initialize arrays for time monitor
+  memset(time_array0, 0, sizeof(time_array0));
+  memset(time_array1, 0, sizeof(time_array1));
+  memset(time_array2, 0, sizeof(time_array2));
+
+  ClearNumUsedBuf();
+
+//   m_shmname = "/tmp/temp.daq";
+//   int shm_open(const char *m_shmname, int oflag, mode_t mode);
+
+}
+
 
 
 void DeSerializerHLTModule::event()
 {
+  ClearNumUsedBuf();
+
   if (n_basf2evt < 0) {
     m_start_time = GetTimeSec();
     n_basf2evt = 0;
   }
 
-
+  rawcprarray.create();
+  raw_svdarray.create();
   raw_cdcarray.create();
-//   raw_svdarray.create();
-//   raw_eclarray.create();
-//   raw_bpidarray.create();
-//   raw_epidarray.create();
-//   raw_klmarray.create();
-
+  raw_bpidarray.create();
+  raw_epidarray.create();
+  raw_eclarray.create();
+  raw_klmarray.create();
 
 
   // DataStore interface
-
-
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP; j++) {
     // Get a record from socket
     int total_buf_nwords = 0 ;
     int malloc_flag = 0;
     int num_events_in_sendblock = 0;
     int num_nodes_in_sendblock = 0;
+
+    // Receive data
     int* temp_buf = RecvData(&malloc_flag, &total_buf_nwords,
                              &num_events_in_sendblock, &num_nodes_in_sendblock);
+    RawCOPPER temp_rawcopper;
+    temp_rawcopper.SetBuffer(temp_buf, total_buf_nwords, malloc_flag, num_events_in_sendblock, num_nodes_in_sendblock);
 
 
-    //    RawCOPPER* temp_rawcopper;
-    RawCOPPER* temp_rawcopper;
-    temp_rawcopper->SetBuffer(temp_buf, total_buf_nwords, malloc_flag, num_events_in_sendblock, num_nodes_in_sendblock);
+    // Store data to DataStore
+    for (int k = 0; k < temp_rawcopper.GetNumEvents(); k++) {
+      for (int l = 0; l < temp_rawcopper.GetNumNodes(); l++) {
+        int index = k * temp_rawcopper.GetNumEvents() + l;
+        int buf_nwords = temp_rawcopper.GetCprBlockNwords(index);
 
-    for (int k = 0; k < num_events_in_sendblock; k++) {
-      for (int l = 0; l < num_nodes_in_sendblock; l++) {
+        int* temp_buf2 = NULL;
+        int malloc_flag2 = 0;
+        temp_buf2 = GetBuffer(buf_nwords, &malloc_flag2);
+        memcpy(temp_buf2, temp_rawcopper.GetBuffer(index), sizeof(int)*buf_nwords);
+        const int temp_num_events = 1;
+        const int temp_num_nodes = 1;
 
-        switch (temp_rawcopper->GetSubsysId(k * num_nodes_in_sendblock + l) & DETECTOR_MASK) {
+        //  RawHeader hdr;
+        // Fill data to Raw*** class
+
+        switch (temp_rawcopper.GetSubsysId(k * num_nodes_in_sendblock + l) & DETECTOR_MASK) {
           case CDC_ID :
-            RawCDC* temp_rawcdc;
-            temp_rawcdc = raw_cdcarray.appendNew();
-            //    temp_rawcdc->SetBuffer();
+            RawCDC* rawcdc;
+            rawcdc = raw_cdcarray.appendNew();
+            rawcdc->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
             break;
-//  case SVD_ID :
-//    temp_rawsvd = raw_svdarray.appendNew();
-//    temp_rawsvd->SetBuffer();
-//    break;
-//  case ECL_ID :
-//    temp_rawecl = raw_eclarray.appendNew();
-//    temp_rawecl->SetBuffer();
-//    break;
-//  case BPID_ID :
-//    temp_rawbpid = raw_bpidarray.appendNew();
-//    temp_rawbpid->SetBuffer();
-//    break;
-//  case EPID_ID :
-//    temp_rawepid = raw_epidarray.appendNew();
-//    temp_rawepid->SetBuffer();
-//    break;
-//  case KLM_ID :
-//    temp_rawklm = raw_klmarray.appendNew();
-//    temp_rawklm->SetBuffer();
-//    break;
+          case SVD_ID :
+            RawSVD* rawsvd;
+            rawsvd = raw_svdarray.appendNew();
+            rawsvd->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
+            break;
+          case ECL_ID :
+            RawECL* rawecl;
+            rawecl = raw_eclarray.appendNew();
+            rawecl->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
+            break;
+          case BPID_ID :
+            RawBPID* rawbpid;
+            rawbpid = raw_bpidarray.appendNew();
+            rawbpid->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
+            break;
+          case EPID_ID :
+            RawEPID* rawepid;
+            rawepid = raw_epidarray.appendNew();
+            rawepid->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
+            break;
+          case KLM_ID :
+            RawKLM* rawklm;
+            rawklm = raw_klmarray.appendNew();
+            rawklm->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
+            break;
           default :
+            RawCOPPER* rawcopper;
+            rawcopper = rawcprarray.appendNew();
+            rawcopper->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
+//    hdr.SetBuffer( rawcopper->GetRawHdrBufPtr( 0 ) );
+//    printf("CPR eve %d sysid %d\n", hdr.GetEveNo(), hdr.GetSubsysId() );
+
             break;
         }
-
-
         // Fill header and trailer
-
-
-
-
       }
     }
 
-
     m_totbytes += total_buf_nwords * sizeof(int);
 
-
-
     if (malloc_flag == 1) delete temp_buf;
-
   }
 
   //
@@ -203,12 +208,14 @@ void DeSerializerHLTModule::event()
 
   n_basf2evt++;
 
-//   if (max_nevt >= 0 || max_seconds >= 0.) {
-//     if (n_basf2evt * NUM_EVT_PER_BASF2LOOP >= max_nevt && max_nevt > 0
-//         ||  GetTimeSec() - m_start_time > max_seconds) {
-//       m_eventMetaDataPtr->setEndOfData();
-//     }
-//   }
+
+  if (max_nevt >= 0 || max_seconds >= 0.) {
+    if (n_basf2evt * NUM_EVT_PER_BASF2LOOP >= max_nevt && max_nevt > 0
+        ||  GetTimeSec() - m_start_time > max_seconds) {
+      m_eventMetaDataPtr->setEndOfData();
+    }
+  }
+
 
   return;
 }

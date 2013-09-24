@@ -9,6 +9,11 @@
 #pragma link C++ class Belle2::RawTrailer;
 #pragma link C++ class Belle2::RawCOPPER;
 #pragma link C++ class Belle2::RawCDC;
+#pragma link C++ class Belle2::RawSVD;
+#pragma link C++ class Belle2::RawECL;
+#pragma link C++ class Belle2::RawBPID;
+#pragma link C++ class Belle2::RawEPID;
+#pragma link C++ class Belle2::RawKLM;
 #pragma link C++ class Belle2::SendHeader;
 #pragma link C++ class Belle2::SendTrailer;
 #pragma link C++ class Belle2::RawROPC;

@@ -94,7 +94,7 @@ void DeSerializerCOPPERModule::initialize()
 #endif
 
   // allocate buffer
-  for (int i = 0 ; i < NUM_EVT_PER_BASF2LOOP; i++) {
+  for (int i = 0 ; i < NUM_PREALLOC_BUF; i++) {
     m_bufary[i] = new int[ BUF_SIZE_WORD ];
   }
   m_buffer = new int[ BUF_SIZE_WORD ];
@@ -102,7 +102,7 @@ void DeSerializerCOPPERModule::initialize()
   //
   // Initialize basf2 related
   //
-  for (int i = 0 ; i < NUM_EVT_PER_BASF2LOOP; i++) {
+  for (int i = 0 ; i < NUM_PREALLOC_BUF; i++) {
     memset(m_bufary[i], 0,  BUF_SIZE_WORD * sizeof(int));
   }
 

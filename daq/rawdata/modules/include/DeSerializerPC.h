@@ -67,19 +67,7 @@ namespace Belle2 {
     //! receive data
     virtual int* RecvData(int* malloc_flag, int* total_m_size_word, int* num_events_in_sendblock, int* num_nodes_in_sendblock);
 
-    virtual int* GetBufArray() {
-      int* tempbuf = 0;
-      if (m_num_usedbuf < NUM_EVT_PER_BASF2LOOP) {
-        tempbuf = m_bufary[ m_num_usedbuf  ];
-        m_num_usedbuf++;
-      }
-      return tempbuf;
-    }
 
-    virtual void ClearNumUsedBuf() {
-      m_num_usedbuf = 0;
-      return ;
-    }
 
     //! # of connections
     int m_num_connections;
@@ -98,8 +86,6 @@ namespace Belle2 {
 
 
 
-    //! # of already used buffers
-    int m_num_usedbuf;
 
 
   };

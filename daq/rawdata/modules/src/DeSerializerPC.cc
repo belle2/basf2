@@ -61,14 +61,14 @@ void DeSerializerPCModule::initialize()
   Connect();
 
   // allocate buffer
-  for (int i = 0 ; i < NUM_EVT_PER_BASF2LOOP; i++) {
+  for (int i = 0 ; i < NUM_PREALLOC_BUF; i++) {
     m_bufary[i] = new int[ BUF_SIZE_WORD ];
   }
   m_buffer = new int[ BUF_SIZE_WORD ];
 
 
   // initialize buffer
-  for (int i = 0 ; i < NUM_EVT_PER_BASF2LOOP; i++) {
+  for (int i = 0 ; i < NUM_PREALLOC_BUF; i++) {
     memset(m_bufary[i], 0,  BUF_SIZE_WORD * sizeof(int));
   }
 
@@ -237,21 +237,7 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
     each_buf_nwords.push_back(rawcpr_nwords);
   }
 
-
-  // Prepare buffer
-  if (*total_buf_nwords >  BUF_SIZE_WORD) {
-    *malloc_flag = 1;
-    temp_buf = new int[ *total_buf_nwords ];
-  } else {
-    if ((temp_buf = GetBufArray()) == 0) {
-      *malloc_flag = 1;
-      temp_buf = new int[ *total_buf_nwords ];
-    } else {
-      *malloc_flag = 0;
-    }
-  }
-
-
+  temp_buf = GetBuffer(*total_buf_nwords, malloc_flag);
   // Read body
   int total_recvd_byte = 0;
   for (int i = 0; i < m_socket.size(); i++) {

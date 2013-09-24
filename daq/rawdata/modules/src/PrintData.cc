@@ -138,7 +138,7 @@ void PrintDataModule::PrintEvent(RawCOPPER* raw_array)
     int* detector_buf_4th;
 
 
-    printf("(size %d) \nexp %d run %d eve %d copperNode %d type %d\n",
+    printf("(size %d) : %d (size %d)\nexp %d run %d eve %d copperNode %d type %d\n",
            tot_size_byte, i, size_byte,
            rawhdr.GetExpNo(),
            rawhdr.GetRunNo(),
@@ -168,16 +168,48 @@ void PrintDataModule::event()
   StoreArray<RawCOPPER> rawcprarray;
   StoreArray<RawCDC> raw_cdcarray;
 
+  StoreArray<RawSVD> raw_svdarray;
+  StoreArray<RawBPID> raw_bpidarray;
+  StoreArray<RawEPID> raw_epidarray;
+  StoreArray<RawKLM> raw_klmarray;
+  StoreArray<RawECL> raw_eclarray;
+
   for (int j = 0; j < rawcprarray.getEntries(); j++) {
-    printf("=== RawCOPPER event====\nBlk %d ", j);
+    printf("=== RawCOPPER event====\nBlock %d ", j);
     //  PrintEvent( &rawcprarray );
     PrintEvent(rawcprarray[ j ]);
   }
 
   for (int j = 0; j < raw_cdcarray.getEntries(); j++) {
-    printf("=== RawCDC    event====\nBlk %d ", j);
+    printf("=== RawCDC    event====\nBlock %d ", j);
     //  PrintEvent( &rawcprarray );
     PrintEvent(raw_cdcarray[ j ]);
+  }
+
+  for (int j = 0; j < raw_svdarray.getEntries(); j++) {
+    printf("=== RawSVD    event====\nBlock %d ", j);
+    //  PrintEvent( &rawcprarray );
+    PrintEvent(raw_svdarray[ j ]);
+  }
+  for (int j = 0; j < raw_bpidarray.getEntries(); j++) {
+    printf("=== RawBPID    event====\nBlock %d ", j);
+    //  PrintEvent( &rawcprarray );
+    PrintEvent(raw_bpidarray[ j ]);
+  }
+  for (int j = 0; j < raw_epidarray.getEntries(); j++) {
+    printf("=== RawEPID    event====\nBlock %d ", j);
+    //  PrintEvent( &rawcprarray );
+    PrintEvent(raw_epidarray[ j ]);
+  }
+  for (int j = 0; j < raw_eclarray.getEntries(); j++) {
+    printf("=== RawECL    event====\nBlock %d ", j);
+    //  PrintEvent( &rawcprarray );
+    PrintEvent(raw_eclarray[ j ]);
+  }
+  for (int j = 0; j < raw_klmarray.getEntries(); j++) {
+    printf("=== RawKLM    event====\nBlock %d ", j);
+    //  PrintEvent( &rawcprarray );
+    PrintEvent(raw_klmarray[ j ]);
   }
 
 

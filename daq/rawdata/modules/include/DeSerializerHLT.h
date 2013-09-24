@@ -10,14 +10,19 @@
 #define DESERIALIZERHLT_H
 #include <daq/rawdata/modules/DeSerializerPC.h>
 #include <daq/dataobjects/RawCDC.h>
+#include <daq/dataobjects/RawSVD.h>
+#include <daq/dataobjects/RawECL.h>
+#include <daq/dataobjects/RawEPID.h>
+#include <daq/dataobjects/RawBPID.h>
+#include <daq/dataobjects/RawKLM.h>
 #include <daq/rawdata/modules/DAQConsts.h>
 
 #define DETECTOR_MASK 0xFFFFFFFF // tentative
-#define CDC_ID 0x00000001 // tentative
-#define SVD_ID 0x00000002 // tentative
-#define ECL_ID 0x00000003 // tentative
-#define BPID_ID 0x00000004 // tentative
-#define EPID_ID 0x00000005 // tentative
+#define SVD_ID 0x00000001 // tentative
+#define CDC_ID 0x00000002 // tentative
+#define BPID_ID 0x00000003 // tentative
+#define EPID_ID 0x00000004 // tentative
+#define ECL_ID 0x00000005 // tentative
 #define KLM_ID 0x00000006 // tentative
 
 namespace Belle2 {
@@ -35,18 +40,26 @@ namespace Belle2 {
     DeSerializerHLTModule();
     virtual ~DeSerializerHLTModule();
 
+    //! initialize functions
+    virtual void initialize();
+
     //! Module functions to be called from event process
     //    void FillNewRawCOPPERHeader(RawCOPPER* raw_copper);
-
     //! Module functions to be called from event process
     virtual void event();
 
 
   protected :
-    // Data members
 
+    // Data members
     //!    StoreObjPtr<RawCOPPER> m_rawcopper;
     StoreArray<RawCDC> raw_cdcarray;
+    StoreArray<RawSVD> raw_svdarray;
+    StoreArray<RawBPID> raw_bpidarray;
+    StoreArray<RawECL> raw_eclarray;
+    StoreArray<RawEPID> raw_epidarray;
+    StoreArray<RawKLM> raw_klmarray;
+
     /*     StoreArray<RawSVD> raw_cdcarray; */
     /*     StoreArray<RawECL> raw_cdcarray; */
     /*     StoreArray<RawBPID> raw_cdcarray; */

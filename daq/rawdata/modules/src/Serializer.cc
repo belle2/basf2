@@ -182,13 +182,20 @@ void SerializerModule::SendByWriteV(RawCOPPER* rawcpr)
   // Send Multiple buffers
   int n = 0;
   if ((n = writev(m_socket, iov, NUM_BUFFER)) < 0) {
+    //  if ((n = writev(m_socket, iov, NUM_BUFFER)) != total_send_bytes) {
     perror("SEND error1");
     exit(1);
   }
+
   int total_send_bytes = sizeof(int) * send_header.GetTotalNwords();
   if (n != total_send_bytes) {
     perror("Failed to send all data");
     printf("Sent data length is not consistent. %d %d : Exiting...", n, total_send_bytes);
+    fflush(stdout);
+//     for( int i = 0; i < total_send_bytes/4 ; i++){
+//       printf("", );
+//     }
+    sleep(1234567);
     exit(1);
   }
 

@@ -40,7 +40,7 @@ void RunControlMessageManager::run()
           _data_man->getRunConfig()->setVersion(nsm.getParam(1));
         } else if (nsm.getParam(0) == RunControlMessage::FLAG_RUN_LENGTH) {
         } else if (nsm.getParam(0) == RunControlMessage::FLAG_EXP_NO) {
-          _data_man->getRunStatus()->setExpNumber(nsm.getParam(1));
+          //_data_man->getRunStatus()->setExpNumber(nsm.getParam(1));
         } else {
           B2DAQ::debug("unknown command = %d %d", nsm.getParam(0), nsm.getParam(1));
         }

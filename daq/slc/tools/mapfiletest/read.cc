@@ -6,7 +6,7 @@
 
 int main()
 {
-  TMapFile* file = TMapFile::Create("test.map");
+  TMapFile* file = TMapFile::Create("/tmp/hserver.konno.map");
   TMapRec* mr = file->GetFirst();
   while (file->OrgAddress(mr)) {
     TObject* obj = file->Get(mr->GetName());

@@ -26,10 +26,12 @@ full:
 #	make ttdd
 	make -C rocontrold/
 	make -C runcontrold/
+	make -C tools/
 	make -C javalib/
 
 clean:
 	make -C javalib/ clean
+	make -C tools/ clean
 	make -C templated/ clean
 	make -C cprcontrold/ clean
 	make -C rocontrold/ clean

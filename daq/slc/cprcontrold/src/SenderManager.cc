@@ -30,16 +30,16 @@ void SenderManager::run() throw()
   //${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream1.sh
   B2DAQ::debug("Try to start basf2 script");
   if (_node != NULL) {
-    B2DAQ::debug("DEBUG:%s:%d", __FILE__, __LINE__);
     const char* belle2_path = getenv("BELLE2_LOCAL_DIR");
+    const char* belle2_option = getenv("BELLE2_OPTION");
     if (belle2_path == NULL) {
       B2DAQ::debug("env BELLE2_LOCAL_DIR is not avaiable.");
       return ;
     }
     B2DAQ::debug("DEBUG:%s:%d:%s", __FILE__, __LINE__, belle2_path);
     char path[128];
-    sprintf(path, "%s/bin/Linux_i686/debug/basf2",
-            belle2_path);
+    sprintf(path, "%s/bin/Linux_i686/%s/basf2",
+            belle2_option, belle2_path);
     B2DAQ::debug("DEBUG:%s:%d:%s", __FILE__, __LINE__, path);
     char script_c[128];
     sprintf(script_c, "%s/daq/rawdata/examples/%s",
@@ -72,7 +72,7 @@ void SenderManager::run() throw()
     argv[i++] = id_c;
     argv[i++] = slots_c;
     argv[i++] = NULL;
-    B2DAQ::debug("'%s' '%s' '%s' '%s' '%s'",
+    B2DAQ::debug("%s %s %s %s %s",
                  argv[0], argv[1], argv[2], argv[3], argv[4]);
     if (execvp(path, argv) == -1) {
       B2DAQ::debug("Faield to start receiver basf2 script");

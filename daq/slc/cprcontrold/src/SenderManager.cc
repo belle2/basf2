@@ -43,7 +43,9 @@ void SenderManager::run() throw()
     sprintf(script_c, "%s/daq/rawdata/examples/%s",
             belle2_path, _node->getSender()->getScript().c_str());
     char hostname_c[64];
-    std::string hostname = (_node->getHost()) ? _node->getHost()->getName() : run_script("hostname");
+    std::string hostname = run_script("hostname");
+    //std::string hostname = (_node->getHost()) ? _node->getHost()->getName() : run_script("hostname");
+    sprintf(hostname_c, "%s", hostname.c_str());
 
     char id_c[32];
     sprintf(id_c, "%d", (int)_node->getID());

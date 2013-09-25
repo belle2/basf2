@@ -12,23 +12,8 @@
 #define PXDUnpackerModule_H
 
 #include <framework/core/Module.h>
-#include <boost/format.hpp>
-#include <string>
-#include <deque>
-#include <pxd/dataobjects/PXDRawHit.h>
+// #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/RawPXD.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <time.h>
-#include <sys/time.h>
-
-
 
 
 namespace Belle2 {
@@ -40,13 +25,7 @@ namespace Belle2 {
 
     /** The PXDUnpacker module.
      *
-     * This module is responsible to cluster all hits found in the PXD and
-     * write them to the apropriate collections. It does this in a "streaming" way:
-     * The hits are examined in an ordered way (sorted by row, then by column) and for each
-     * pixel we only have to check the left neighbor and the three adjacent
-     * hits in the last row. By caching the last row, each pixel gets examined
-     * only once and the 4 adjacent pixels are accessed in constant time.
-     * @see ClusterCache
+     * This module is responsible for unpacking the Raw PXD data to Pixels
      */
     class PXDUnpackerModule : public Module {
 

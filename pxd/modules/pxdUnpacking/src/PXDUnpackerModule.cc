@@ -13,23 +13,15 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
-#include <vxd/geometry/GeoCache.h>
-#include <pxd/geometry/SensorInfo.h>
 #include <pxd/dataobjects/RawPXD.h>
-#include <boost/foreach.hpp>
 #include <pxd/dataobjects/PXDRawHit.h>
 
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
+// for htonl
+#include <arpa/inet.h>
 
+#include <boost/foreach.hpp>
 #include <boost/crc.hpp>
 #include <boost/cstdint.hpp>
-
-#define FIDS    32
-#define ROWS    1024
-#define COLUMNS 256
-#define MAX_DATA  20
 
 #define DHP_FRAME_HEADER_DATA_TYPE_RAW  0x0
 #define DHP_FRAME_HEADER_DATA_TYPE_ZSD  0x5
@@ -171,15 +163,6 @@ public:
   inline static unsigned int size(void) {
     return 4;
   };
-  void stream(FILE* fh) {
-    fwrite(&word0, 2, 1, fh);
-    fwrite(&trigger_nr_lo, 2, 1, fh);
-    fwrite(&trigger_nr_hi, 2, 1, fh);
-    fwrite(&time_tag_lo, 2, 1, fh);
-    fwrite(&time_tag_hi, 2, 1, fh);
-    fwrite(&sfnr_offset, 2, 1, fh);
-    fwrite(&crc32, 4, 1, fh);
-  };
   void print(void) {
     word0.print();
     if (verbose)
@@ -218,12 +201,6 @@ public:
   inline static unsigned int size(void) {
     return 2 + 96 / 2;
   };
-  void stream(FILE* fh) {
-    fwrite(&word0, 2, 1, fh);
-    fwrite(&trigger_nr_lo, 2, 1, fh);
-    fwrite(data, 2, 96, fh);
-    fwrite(&crc32, 4, 1, fh);
-  };
 };
 
 class dhh_direct_readout_frame {
@@ -250,12 +227,6 @@ public:
   };
   inline static unsigned int size(void) {
     return 2;
-  };
-  void stream(FILE* fh) {
-    fwrite(&word0, 2, 1, fh);
-    fwrite(&trigger_nr_lo, 2, 1, fh);
-    ///
-    fwrite(&crc32, 4, 1, fh);
   };
   void print(void) {
     word0.print();
@@ -310,11 +281,6 @@ public:
   };
   inline static unsigned int size(void) {
     return 2;
-  };
-  void stream(FILE* fh) {
-    fwrite(&word0, 2, 1, fh);
-    fwrite(&trigger_nr_lo, 2, 1, fh);
-    fwrite(&crc32, 4, 1, fh);
   };
   void print(void) {
     word0.print();
@@ -371,13 +337,6 @@ public:
   };
   inline static unsigned int size(void) {
     return 4;
-  };
-  void stream(FILE* fh) {
-    fwrite(&word0, 2, 1, fh);
-    fwrite(&trigger_nr_lo, 2, 1, fh);
-    fwrite(&wordsinevent, 4, 1, fh);
-    fwrite(&errorinfo, 4, 1, fh);
-    fwrite(&crc32, 4, 1, fh);
   };
   void print(void) {
     word0.print();

@@ -1,0 +1,75 @@
+11:53:42.870 ------------------------------------------------------------------
+11:53:42.870 Date: 2013.09.10
+11:53:42.870 ./master: INIT
+11:53:42.870 callback(OK) registered
+11:53:42.870 callback(ERROR) registered
+11:53:52.487 START=>KONNO sendreq failed: no error
+11:54:27.620 ------------------------------------------------------------------
+11:54:27.620 Date: 2013.09.10
+11:54:27.620 ./master: INIT
+11:54:27.621 callback(OK) registered
+11:54:27.621 callback(ERROR) registered
+11:54:32.759 START=>KONNO sendreq failed: no error
+11:54:42.917 ------------------------------------------------------------------
+11:54:42.917 Date: 2013.09.10
+11:54:42.917 ./master: INIT
+11:54:42.917 callback(OK) registered
+11:54:42.918 callback(ERROR) registered
+11:54:50.080 START=>konno sendreq failed: no error
+11:56:05.265 ------------------------------------------------------------------
+11:56:05.265 Date: 2013.09.10
+11:56:05.264 ./master: INIT
+11:56:05.265 callback(OK) registered
+11:56:05.265 callback(ERROR) registered
+11:56:09.222 RC_START=>KONNO
+12:10:58.489 ------------------------------------------------------------------
+12:10:58.489 Date: 2013.09.10
+12:10:58.489 ./master: INIT
+12:10:58.489 callback(OK) registered
+12:10:58.490 callback(ERROR) registered
+12:11:24.777 ------------------------------------------------------------------
+12:11:24.777 Date: 2013.09.10
+12:11:24.777 ./master: INIT
+12:11:24.777 callback(OK) registered
+12:11:24.777 callback(ERROR) registered
+12:11:29.642 START=>R
+12:13:41.402 ------------------------------------------------------------------
+12:13:41.402 Date: 2013.09.10
+12:13:41.402 ./master: INIT
+12:13:41.402 callback(OK) registered
+12:13:41.402 callback(ERROR) registered
+12:14:11.450 ------------------------------------------------------------------
+12:14:11.450 Date: 2013.09.10
+12:14:11.450 ./master: INIT
+12:14:11.451 callback(OK) registered
+12:14:11.451 callback(ERROR) registered
+12:14:15.066 RC_START=>KONNO
+12:15:23.354 RC_START=>KONNO
+12:16:48.994 ------------------------------------------------------------------
+12:16:48.994 Date: 2013.09.10
+12:16:48.994 ./master: INIT
+12:16:48.994 callback(OK) registered
+12:16:48.995 callback(ERROR) registered
+12:16:52.659 RC_START=>KONNO
+12:24:49.131 RC_START=>KONNO
+12:25:57.547 RC_START=>KONNO
+12:27:02.060 RC_START=>KONNO
+12:28:03.333 RC_START=>KONNO
+12:28:59.141 RC_START=>KONNO
+12:29:08.469 RC_STOP=>KONNO
+12:29:58.997 RC_START=>KONNO
+12:30:09.892 RC_START=>KONNO
+12:30:14.989 RC_STOP=>KONNO
+13:05:27.882 RC_START=>KONNO
+14:11:03.971 ------------------------------------------------------------------
+14:11:03.971 Date: 2013.09.10
+14:11:03.971 ./master: INIT
+14:11:03.972 callback(OK) registered
+14:11:03.972 callback(ERROR) registered
+14:11:08.741 RC_START=>KONNO
+14:19:41.429 ------------------------------------------------------------------
+14:19:41.429 Date: 2013.09.10
+14:19:41.429 ./master: INIT
+14:19:41.429 callback(OK) registered
+14:19:41.429 callback(ERROR) registered
+14:19:48.726 RC_START=>KONNO

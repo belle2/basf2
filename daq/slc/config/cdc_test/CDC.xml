@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<system name="CDC" version="1" hosts="CDC_Hosts" ftswset="CDC_FTSW" >
+  <group name="COPPER-ROPC" rows="8" cols="2" >
+    <receiver name="ROPC01" host="ropc01" script="RecvStream1.sh" senders="CPR006"/>
+    <copper name="CPR001" host="cpr001" module_class="CDC_COPPER" script="RecvSendCOPPER.py" event_size="1024" port="35000" used="false" />
+    <copper name="CPR002" host="cpr002" module_class="CDC_COPPER" script="RecvSendCOPPER.py" event_size="1024" port="35000" used="false" />
+    <copper name="CPR003" host="cpr003" module_class="CDC_COPPER" script="RecvSendCOPPER.py" event_size="1024" port="35000" used="false" />
+    <copper name="CPR004" host="cpr004" module_class="CDC_COPPER" script="RecvSendCOPPER.py" event_size="1024" port="35000" used="false" />
+    <copper name="CPR005" host="cpr005" module_class="CDC_COPPER" script="RecvSendCOPPER.py" event_size="1024" port="35000" used="false" />
+    <copper name="CPR006" host="cpr006" module_class="CDC_COPPER" script="RecvSendCOPPER.py" event_size="1024" port="35000" />
+    <copper name="CPR007" host="cpr007" module_class="CDC_COPPER" script="RecvSendCOPPER.py" event_size="1024" port="35000" used="false" />
+    <copper name="CPR008" host="cpr008" module_class="CDC_COPPER" script="RecvSendCOPPER.py" event_size="1024" port="35000" used="false" />
+    <copper name="CPR009" host="cpr009" module_class="CDC_COPPER" script="RecvSendCOPPER.py" event_size="1024" port="35000" used="false" />
+    <copper name="CPR010" host="cpr010" module_class="CDC_COPPER" script="RecvSendCOPPER.py" event_size="1024" port="35000" used="false" />
+    <copper name="CPR011" host="cpr011" module_class="CDC_COPPER" script="RecvSendCOPPER.py" event_size="1024" port="35000" used="false" />
+    <copper name="CPR012" host="cpr012" module_class="CDC_COPPER" script="RecvSendCOPPER.py" event_size="1024" port="35000" used="false" />
+    <copper name="CPR013" host="cpr013" module_class="CDC_COPPER" script="RecvSendCOPPER.py" event_size="1024" port="35000" used="false" />
+    <copper name="CPR014" host="cpr014" module_class="CDC_COPPER" script="RecvSendCOPPER.py" event_size="1024" port="35000" used="false" />
+    <copper name="CPR015" host="cpr015" module_class="CDC_COPPER" script="RecvSendCOPPER.py" event_size="1024" port="35000" used="false" />
+  </group>
+</system>

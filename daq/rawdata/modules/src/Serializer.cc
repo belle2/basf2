@@ -138,15 +138,17 @@ void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, 
 {
   const int num_cprblock = 0;
   RawHeader rawhdr;
-  rawhdr.SetBuffer(rawcpr->GetWholeBuffer());
+  rawhdr.SetBuffer(rawcpr->GetRawHdrBufPtr(0));
   int total_send_nwords =
     hdr->GetHdrNwords() +
     rawhdr.GetNwords() +
     trl->GetTrlNwords();
 
+  hdr->SetNwords(total_send_nwords);
   hdr->SetNumEventsinPacket(rawcpr->GetNumEvents());
   hdr->SetNumNodesinPacket(rawcpr->GetNumNodes());
-  hdr->SetNwords(total_send_nwords);
+  hdr->SetEventNumber(rawhdr.GetEveNo());
+  hdr->SetNodeID(rawhdr.GetSubsysId());
 
   return;
 }

@@ -67,6 +67,13 @@ void SendHeader::SetNumNodesinPacket(int num_nodes)
     (num_nodes & 0x0000FFFF);
 }
 
+
+void SendHeader::SetEventNumber(int eve_num)
+{
+  m_buffer[ POS_EVE_NUM ] = eve_num;
+}
+
+
 void SendHeader::SetNodeID(int node_id)
 {
   m_buffer[ POS_NODE_ID ] = node_id;
@@ -84,6 +91,8 @@ int SendHeader::GetNumEventsinPacket()
 
 }
 int SendHeader::GetNumNodesinPacket() {  return m_buffer[ POS_NUM_EVE_NUM_NODES ] & 0x0000FFFF; }
+
+int SendHeader::GetEventNumber() { return m_buffer[ POS_EVE_NUM ]; }
 
 int SendHeader::GetNodeID() { return m_buffer[ POS_NODE_ID ]; }
 

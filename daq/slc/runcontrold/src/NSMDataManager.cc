@@ -87,7 +87,7 @@ bool NSMDataManager::allocateData(const std::string& path) throw()
   for (std::map<std::string, COPPERNode*>::iterator it = copper_m.begin();
        it != copper_m.end(); it++) {
     std::string module_class = it->first;
-    void* handler = dlopen(B2DAQ::form("%s/lib/libB2DAQ_%s.so",
+    void* handler = dlopen(B2DAQ::form("%s/lib/libB2SLC_%s.so",
                                        path.c_str(), module_class.c_str()).c_str(),
                            RTLD_NOW | RTLD_GLOBAL);
     if (!handler) {

@@ -23,7 +23,7 @@ int main(int argc, char** argv)
   const char* name = argv[1];
   const char* class_name = argv[2];
   const char* path = argv[3];
-  void* handle = dlopen(B2DAQ::form("%s/lib/libB2DAQ_%s.so",
+  void* handle = dlopen(B2DAQ::form("%s/lib/libB2SLC_%s.so",
                                     path, class_name).c_str(),
                         RTLD_NOW | RTLD_GLOBAL);
   if (!handle) {

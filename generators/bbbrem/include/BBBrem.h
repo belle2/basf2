@@ -30,6 +30,7 @@ namespace Belle2 {
 
   public:
 
+    /** Constructor. */
     BBBrem() :
       m_eventCount(0),
       m_applyBoost(false),
@@ -56,7 +57,8 @@ namespace Belle2 {
       eb(0.0),
       pb(0.0),
       rin2pb(0.0),
-      weight(0.0) {};
+      weight(0.0)
+    {for (int i = 0; i < 4; i++) p1[i] = p2[i] = q1[i] = q2[i] = qk[i] = 0.0;}
 
     //BBBrem() : m_applyBoost(false), m_unweighted(true), m_cmsEnergy(10.58), m_photonEFrac(0.000001) {};
 

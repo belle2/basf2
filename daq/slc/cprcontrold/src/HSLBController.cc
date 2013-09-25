@@ -62,7 +62,6 @@ bool HSLBController::load() throw()
         int address = 0;
         if (reg.getSize() == 1) {
           address = reg.getAddress() + ch;
-          B2DAQ::debug("%s:%d : _mgt=%d", __FILE__, __LINE__, (int)_mgt);
           mgt_set_param(_mgt, address, reg.getValue(ch));
         } else if (reg.getSize() == 2) {
           address = reg.getAddress() + ch * 2;

@@ -14,6 +14,9 @@ namespace B2DAQ {
 
   class DataReceiverCallback : public RCCallback {
 
+  private:
+    int* openBuffer(size_t count, const char* path) throw();
+
   public:
     DataReceiverCallback(DataReceiverNode* node = NULL, 
 			 DataReceiverData* _data = NULL);

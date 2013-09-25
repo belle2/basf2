@@ -12,7 +12,7 @@ INCDIR  = ./include
 TMPDIR  = ./tmp
 LIBDIR  = ./lib
 
-LIBS    +=  -lm -lpthread -lz  
+LIBS    +=  -lm -lpthread -lz -lrt
 LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCSYS
 LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCUTIL
 LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCNODE

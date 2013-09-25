@@ -1,8 +1,16 @@
 
 #!/bin/bash
 
+## setup for Basf2 framework ##
+if [ ! -n "${BELLE2_LOCAL_DIR}" ]; then 
+source $HOME/tools/setup_belle2
+cd $HOME/release/
+setuprel
+cd -
+fi
+
 ## setup for slow control system libraries ##
-export B2SLC_PATH=$HOME/b2slc
+export B2SLC_PATH=$BELLE2_LOCAL_DIR/daq/slc
 export PATH=$PATH:$HOME/bin:$B2SLC_PATH/bin
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$B2SLC_PATH/lib
 
@@ -23,18 +31,11 @@ export CLASSPATH=.:$JAVA_HOME/jre/lib:$JAVA_HOME/lib\
 :$B2SLC_PATH/javalib/mysql-connector-java-5.1.26-bin.jar
 
 ## setup for slow control database access ##
-export B2SC_DB_HOST="localhost";
-export B2SC_DB_NAME="b2daq";
+export B2SC_DB_HOST="ropc01.kek.jp";
+export B2SC_DB_NAME="b2slow_test";
 export B2SC_DB_USER="slcdaq";
 export B2SC_DB_PASS="slcdaq";
 export B2SC_DB_PORT=3306;
-
-## setup for Basf2 framework ##
-BASF2_HOME=$HOME
-source $BASF2_HOME/tools/setup_belle2
-cd $BASF2_HOME/release/
-setuprel
-cd -
 
 ## setup for directory 
 export HSLB_FIRMEWATE_PATH=/home/usr/yamadas/bit/

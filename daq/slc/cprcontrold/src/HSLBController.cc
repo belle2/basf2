@@ -78,11 +78,13 @@ bool HSLBController::load() throw()
 bool HSLBController::reload() throw()
 {
   return true;
+  /*
   if (_mgt != NULL) {
     return load();
   } else {
     return true;
   }
+  */
 }
 
 bool HSLBController::start() throw()

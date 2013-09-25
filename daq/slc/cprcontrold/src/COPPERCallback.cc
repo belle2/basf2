@@ -131,6 +131,7 @@ bool COPPERCallback::reload() throw()
       return false;
     }
   }
+  load();
   return true;
 }
 

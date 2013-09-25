@@ -31,27 +31,22 @@ void SenderManager::run() throw()
   B2DAQ::debug("Try to start basf2 script");
   if (_node != NULL) {
     const char* belle2_path = getenv("BELLE2_LOCAL_DIR");
-    const char* belle2_option = getenv("BELLE2_OPTION");
+    const char* belle2_sub = getenv("BELLE2_SUBDIR");
     if (belle2_path == NULL) {
       B2DAQ::debug("env BELLE2_LOCAL_DIR is not avaiable.");
       return ;
     }
-    B2DAQ::debug("DEBUG:%s:%d:%s", __FILE__, __LINE__, belle2_path);
     char path[128];
-    sprintf(path, "%s/bin/Linux_i686/%s/basf2",
-            belle2_option, belle2_path);
-    B2DAQ::debug("DEBUG:%s:%d:%s", __FILE__, __LINE__, path);
+    sprintf(path, "%s/bin/%s/basf2",
+            belle2_path, belle2_sub);
     char script_c[128];
     sprintf(script_c, "%s/daq/rawdata/examples/%s",
             belle2_path, _node->getSender()->getScript().c_str());
-    B2DAQ::debug("DEBUG:%s:%d:%s", __FILE__, __LINE__, script_c);
     char hostname_c[64];
     std::string hostname = (_node->getHost()) ? _node->getHost()->getName() : run_script("hostname");
-    sprintf(hostname_c, "%s", hostname.c_str());
 
     char id_c[32];
     sprintf(id_c, "%d", (int)_node->getID());
-    B2DAQ::debug("DEBUG:%s:%d:%s", __FILE__, __LINE__, id_c);
 
     int flag = 0;
     for (size_t slot = 0; slot < 4; slot++) {
@@ -62,7 +57,6 @@ void SenderManager::run() throw()
     }
     char slots_c[8];
     sprintf(slots_c, "%d", flag);
-    B2DAQ::debug("DEBUG:%s:%d:%s", __FILE__, __LINE__, slots_c);
 
     char* argv[8];
     int i = 0;

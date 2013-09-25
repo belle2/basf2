@@ -13,7 +13,17 @@
 #include <TObject.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+    * @{
+    */
 
+  /**
+   * The Raw PXD class.
+   *
+   * This class stores the RAW data received from the ONSEN system.
+   * This data is then decoded by the pxdUnpacker module.
+   * Object is based on the src of RawCOPPER, but less complicated.
+   */
   class RawPXD : public TObject {
   public:
 
@@ -38,12 +48,15 @@ namespace Belle2 {
     virtual int* data(void);
 
   private:
-    int m_nwords;
-    int* m_buffer; //[m_nwords]
-    bool m_allocated;
+    int m_nwords;/**< Number of (32bit) Words stored in the buffer. There might be unsused bytes in the last word.*/
+    int* m_buffer; //[m_nwords] /**< Buffer of size m_nwords  */
+    bool m_allocated;/**< copied over flag*/
 
     ClassDef(RawPXD, 1)
-  };
-}
+  }; // class RawPXD
+
+  /** @}*/
+
+} // end namespace Belle2
 
 #endif

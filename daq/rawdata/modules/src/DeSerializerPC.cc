@@ -126,6 +126,13 @@ int DeSerializerPCModule::Recv(int sock, char* buf, int data_size_byte, int flag
       if (n == data_size_byte)break;
     }
   }
+
+  // Dump binary data
+  if (dump_fname.size() > 0) {
+    DumpData((char*)buf, data_size_byte);
+  }
+
+
   return n;
 
 }
@@ -298,9 +305,7 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
 
 void DeSerializerPCModule::event()
 {
-
   ClearNumUsedBuf();
-
   if (n_basf2evt < 0) {
     m_start_time = GetTimeSec();
     n_basf2evt = 0;
@@ -314,7 +319,6 @@ void DeSerializerPCModule::event()
 #else
   m_rawcopper.create();
 #endif
-
 
 
 
@@ -342,10 +346,10 @@ void DeSerializerPCModule::event()
     printf("Recvd data : %d bytes\n", total_buf_nwords * sizeof(int));
     fflush(stdout);
 #endif
-    // Dump binary data
-    if (dump_fname.size() > 0) {
-      DumpData((char*)temp_buf, total_buf_nwords * sizeof(int));
-    }
+//     // Dump binary data
+//     if (dump_fname.size() > 0) {
+//       DumpData((char*)temp_buf, total_buf_nwords * sizeof(int));
+//     }
 
 #ifdef DEBUG
     printf("********* checksum 0x%.8x : %d\n" , CalcSimpleChecksum(temp_buf, total_buf_nwords - 2), total_buf_nwords);
@@ -401,13 +405,12 @@ void DeSerializerPCModule::event()
 
   }
 
-
+  //  printf("check 5 maxevt %d  mattime %lf %d %lf\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP, GetTimeSec() - m_start_time  );
   if (max_nevt >= 0 || max_seconds >= 0.) {
-    if (n_basf2evt * NUM_EVT_PER_BASF2LOOP >= max_nevt && max_nevt > 0
-        ||  GetTimeSec() - m_start_time > max_seconds) {
+    if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP >= max_nevt && max_nevt > 0)
+        || (GetTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
       m_eventMetaDataPtr->setEndOfData();
     }
   }
-
   return;
 }

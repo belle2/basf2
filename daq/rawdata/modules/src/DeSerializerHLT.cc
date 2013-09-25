@@ -210,8 +210,8 @@ void DeSerializerHLTModule::event()
 
 
   if (max_nevt >= 0 || max_seconds >= 0.) {
-    if (n_basf2evt * NUM_EVT_PER_BASF2LOOP >= max_nevt && max_nevt > 0
-        ||  GetTimeSec() - m_start_time > max_seconds) {
+    if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP >= max_nevt && max_nevt > 0)
+        || (GetTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
       m_eventMetaDataPtr->setEndOfData();
     }
   }

@@ -3,7 +3,7 @@ CXX     = g++
 RM      = rm -rf
 CP      = cp -f
 
-B2DAQ_LIB = $(B2DAQ_PATH)
+B2SLC_LIB = $(B2SLC_PATH)
 
 BINDIR  = ./bin
 SRCDIR  = ./src
@@ -11,19 +11,18 @@ INCDIR  = ./include
 TMPDIR  = ./tmp
 LIBDIR  = ./lib
 
-LIBS    += -L$(B2DAQ_LIB)/lib -lB2DAQXML
-LIBS    += -L$(B2DAQ_LIB)/lib -lB2DAQDB
-LIBS    += -L$(B2DAQ_LIB)/lib -lB2DAQUTIL
-LIBS    += -L$(B2DAQ_LIB)/lib -lB2DAQNODE
-LIBS    += -L$(B2DAQ_LIB)/lib -lB2DAQSYS
+LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCXML
+LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCDB
+LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCUTIL
+LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCNODE
+LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCSYS
 LIBS    += -lm -lpthread
 LIBS    += $(shell xml2-config --libs)
 LIBS    += $(shell mysql_config --libs)
 
-CFLAGS   = -g -Wall -fPIC -D_REENTRANT -DB2DAQ_DEBUG_MODE #-Wno-deprecated
+CFLAGS   = -g -Wall -fPIC -D_REENTRANT -DB2SLC_DEBUG_MODE #-Wno-deprecated
 CFLAGS  += -I./include
-CFLAGS  += -I$(B2DAQ_LIB)/include -I$(B2DAQGUI_LIB)/include
-CFLAGS  += -I$(B2DAQXML_LIB)/include
+CFLAGS  += -I$(B2SLC_LIB)/include
 CFLAGS  += $(GTKCFLAGS)
 CFLAGS  += $(shell xml2-config --cflags)
 CFLAGS  += $(shell mysql_config --cflags)

@@ -143,6 +143,14 @@ bool COPPERCallback::start() throw()
       return false;
     }
   }
+  if (_status != NULL) {
+    try {
+      _status->read(NULL);
+    } catch (const NSMHandlerException& e) {
+      B2DAQ::debug("Failed to access to Run status %s", e.what());
+      return false;
+    }
+  }
   int input[4] = {
     1,//RUNNING,
     (int)_status->getExpNumber(),

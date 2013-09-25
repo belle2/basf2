@@ -75,6 +75,8 @@ int RFProcessManager::Execute(char* scr, int nargs, char** args)
     fflush(stderr);
     int stexe = execvp(scr, argval);
     perror("execvp!!");
+    fprintf(stderr, "missing file : %s\n", scr);
+    fflush(stderr);
     exit(-1);
   }
   // Parent process (pid>0 : success, pid<0 : error )

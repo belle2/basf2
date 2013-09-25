@@ -81,6 +81,8 @@ void RFEventProcessor::Configure(NSMmsg*, NSMcontext*)
   char* mapfile = m_conf->getconf("processor", "historecv", "mapfile");
   m_pid_hrecv = m_proc->Execute(hrecv, hport, mapfile);
 
+  sleep(5);    // make sure that TMapFile is created.
+
   // 2. Histogram Relay
   char* hrelay = m_conf->getconf("processor", "historelay", "script");
   char* dqmdest = m_conf->getconf("dqmserver", "host");

@@ -21,7 +21,7 @@ RFDqmServer::RFDqmServer(string conffile)
   //  gethostname ( nodename, sizeof(nodename) );
 
   // 1. Set execution directory
-  string execdir = string(m_conf->getconf("system", "execdir_base")) + "/dqm";
+  string execdir = string(m_conf->getconf("system", "execdir_base")) + "/dqmserver";
 
   mkdir(execdir.c_str(), 0755);
   chdir(execdir.c_str());

@@ -71,7 +71,7 @@ void RFMaster::Configure(NSMmsg*, NSMcontext*)
       b2nsm_sendreq(hostnode, "RF_CONFIGURE", 0, pars);
     }
   }
-  sleep(2);
+  sleep(10);
 
   // 3. Configure collector
   char* collector = m_conf->getconf("collector", "nodename");

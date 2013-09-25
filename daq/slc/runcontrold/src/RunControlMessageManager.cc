@@ -22,6 +22,9 @@ void RunControlMessageManager::run()
       _node_used_v.push_back(node->isUsed());
     }
   }
+  _node_seq_i = -1;
+  _cmd_seq = RCCommand::UNKNOWN;
+  _state_seq = RCState::UNKNOWN;
   while (true) {
     RunControlMessage msg = MessageBox::get().pop();
     RCCommand cmd = msg.getCommand();
@@ -33,7 +36,6 @@ void RunControlMessageManager::run()
           _node_system->setOperationMode(nsm.getParam(1));
         } else if (nsm.getParam(0) == RunControlMessage::FLAG_OPERATORS) {
           _data_man->getRunConfig()->setOperators(nsm.getData());
-          std::cout << __FILE__ << ":" << __LINE__ << ">>" << nsm.getData() << std::endl;
         } else if (nsm.getParam(0) == RunControlMessage::FLAG_RUN_TYPE) {
           _data_man->getRunConfig()->setRunType(nsm.getData());
         } else if (nsm.getParam(0) == RunControlMessage::FLAG_RUN_VERSION) {
@@ -44,31 +46,37 @@ void RunControlMessageManager::run()
         } else {
           B2DAQ::debug("unknown command = %d %d", nsm.getParam(0), nsm.getParam(1));
         }
-      } else if (cmd == RCCommand::BOOT || cmd == RCCommand::REBOOT) {
-        downloadConfig(cmd, _data_man->getRunConfig()->getVersion());
-        send(cmd, RCState::BOOTING_TS);
-      } else if (cmd == RCCommand::LOAD || cmd == RCCommand::RELOAD) {
-        downloadConfig(cmd, _data_man->getRunConfig()->getVersion());
-        send(cmd, RCState::LOADING_TS);
-      } else if (cmd == RCCommand::START) {
-        uploadRunConfig();
-        send(cmd, RCState::STARTING_TS);
-      } else if (cmd == RCCommand::STOP) {
-        uploadRunResult();
-        send(cmd, RCState::STOPPING_TS);
-      } else if (cmd == RCCommand::PAUSE) {
-        send(cmd, RCState::PAUSED_S);
-      } else if (cmd == RCCommand::RESUME) {
-        send(cmd, RCState::RUNNING_S);
-      } else if (cmd == RCCommand::RECOVER) {
-        send(cmd, RCState::RECOVERING_RS);
-      } else if (cmd == RCCommand::ABORT) {
-        send(cmd, RCState::ABORTING_RS);
-      } else if (cmd == RCCommand::STATECHECK) {
-        send(cmd, RCState::UNKNOWN);
+      } else {
+        _cmd_seq = cmd;
+        _node_seq_i = 0;
+        if (cmd == RCCommand::BOOT || cmd == RCCommand::REBOOT) {
+          downloadConfig(cmd, _data_man->getRunConfig()->getVersion());
+          send(cmd, RCState::BOOTING_TS);
+        } else if (cmd == RCCommand::LOAD || cmd == RCCommand::RELOAD) {
+          downloadConfig(cmd, _data_man->getRunConfig()->getVersion());
+          send(cmd, RCState::LOADING_TS);
+        } else if (cmd == RCCommand::START) {
+          uploadRunConfig();
+          send(cmd, RCState::STARTING_TS);
+        } else if (cmd == RCCommand::STOP) {
+          uploadRunResult();
+          send(cmd, RCState::STOPPING_TS);
+        } else if (cmd == RCCommand::PAUSE) {
+          send(cmd, RCState::PAUSED_S);
+        } else if (cmd == RCCommand::RESUME) {
+          send(cmd, RCState::RUNNING_S);
+        } else if (cmd == RCCommand::RECOVER) {
+          send(cmd, RCState::RECOVERING_RS);
+        } else if (cmd == RCCommand::ABORT) {
+          send(cmd, RCState::ABORTING_RS);
+        } else if (cmd == RCCommand::STATECHECK) {
+          send(cmd, RCState::UNKNOWN);
+        }
       }
     } else if (msg.getId() == RunControlMessage::LOCALNSM) {
       if (cmd == RCCommand::STATECHECK) {
+        _cmd_seq = cmd;
+        _node_seq_i = 0;
         send(cmd, RCState::UNKNOWN);
       } else {
         int id = _comm->getMessage().getNodeId();
@@ -76,6 +84,7 @@ void RunControlMessageManager::run()
         if (node != NULL) {
           if (cmd == RCCommand::OK) {
             node->setState(RCState(nsm.getData()));
+            send(_cmd_seq, _state_seq);
             handleOk(node);
           } else if (cmd == RCCommand::ERROR) {
             _rc_node->setState(RCState::ERROR_ES);
@@ -127,33 +136,46 @@ bool RunControlMessageManager::send(const RCCommand& command,
   RCState state_org = _rc_node->getState();
   bool is_success = true;
   std::vector<NSMNode*>& node_v(_node_system->getNodes());
+  if (_node_seq_i < 0) return true;
+  if (_node_seq_i == 0) {
+    _cmd_seq = command;
+    _state_seq = state_success;
+  }
+  if (_node_seq_i >= (int)node_v.size()) {
+    _cmd_seq = RCCommand::UNKNOWN;
+    _state_seq = RCState::UNKNOWN;
+    _node_seq_i = -1;
+    return true;
+  }
+
   try {
-    for (size_t index = 0; index < node_v.size(); index++) {
-      NSMNode* node(node_v[index]);
-      if (!node->isUsed()) continue;
-      int id = node->getNodeID();
-      if (id < 0) id = _comm->getNodeIdByName(node->getName());
-      int pid = (id >= 0) ? _comm->getNodePidByName(node->getName()) : -1;
-      if (id >= 0 && pid > 0) {
-        if (command != RCCommand::RECOVER) {
-          _comm->sendRequest(node, command);
-        } else {
-          tryRecover(node);
-        }
-        node->setConnection(Connection::ONLINE);
-        if (getNodeByID(id) == NULL) addNode(id, node);
-        if (state_success != State::UNKNOWN) {
-          node->setState(state_success);
-          reportState(node);
-        }
+    //for (size_t index = 0; index < node_v.size(); index++) {
+    NSMNode* node(node_v[_node_seq_i]);
+    _node_seq_i++;
+    if (!node->isUsed()) return true;
+    int id = node->getNodeID();
+    if (id < 0) id = _comm->getNodeIdByName(node->getName());
+    int pid = (id >= 0) ? _comm->getNodePidByName(node->getName()) : -1;
+    if (id >= 0 && pid > 0) {
+      if (command != RCCommand::RECOVER) {
+        _comm->sendRequest(node, command);
       } else {
-        node->setConnection(Connection::OFFLINE);
-        node->setState(State::UNKNOWN);
-        reportState(node);
-        _rc_node->setState(RCState::ERROR_ES);
-        is_success = false;
+        tryRecover(node);
       }
+      node->setConnection(Connection::ONLINE);
+      if (getNodeByID(id) == NULL) addNode(id, node);
+      if (state_success != State::UNKNOWN) {
+        node->setState(state_success);
+        reportState(node);
+      }
+    } else {
+      node->setConnection(Connection::OFFLINE);
+      node->setState(State::UNKNOWN);
+      reportState(node);
+      _rc_node->setState(RCState::ERROR_ES);
+      is_success = false;
     }
+    //}
   } catch (const IOException& e) {
     is_success = false;
   }

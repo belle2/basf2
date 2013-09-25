@@ -60,6 +60,9 @@ namespace B2DAQ {
     std::map<std::string, NSMNode*> _node_name_m;
     std::vector<bool> _node_used_v;
     int _ntry_recover;
+    int _node_seq_i;
+    RCCommand _cmd_seq;
+    RCState _state_seq;
 
   };
 

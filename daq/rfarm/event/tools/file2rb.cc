@@ -35,6 +35,7 @@ int main(int argc, char** argv)
   }
   //  RingBuffer* rbuf = new RingBuffer(argv[1], RBUFSIZE);
   RingBuffer* rbuf = new RingBuffer(argv[1]);
+  rbuf->dump_db();
   char* evbuf = new char[MAXEVTSIZE];
 
   for (;;) {

@@ -10,6 +10,8 @@
 
 #include <util/Debugger.hh>
 
+#include <unistd.h>
+
 using namespace B2DAQ;
 
 void RunControlMessageManager::run()
@@ -26,7 +28,9 @@ void RunControlMessageManager::run()
   RCCommand cmd_seq;
   while (true) {
     RunControlMessage msg = MessageBox::get().pop();
+    usleep(100);
     RCCommand cmd = msg.getCommand();
+    std::cout << __FILE__ << ":" << __LINE__ << " " << cmd.getLabel() << std::endl;
     const NSMMessage& nsm(msg.getMessage());
     if (msg.getId() == RunControlMessage::GUI) {
       if (!cmd.isAvailable(_rc_node->getState())) continue;
@@ -85,12 +89,17 @@ void RunControlMessageManager::run()
         }
       } else {
         int id = _comm->getMessage().getNodeId();
+        //std::cout << __FILE__ << ":" << __LINE__ << " " << id << std::endl;
         NSMNode* node = findNode(id);
         if (node != NULL) {
           if (cmd == RCCommand::OK) {
             node->setState(RCState(nsm.getData()));
             reportState(node);
             std::vector<NSMNode*>& node_v(_node_system->getNodes());
+            for (size_t i = 0; i < node_v.size(); i++) {
+              if (node_v[i]->isUsed())
+                reportState(node_v[i]);
+            }
             if (isSynchronized(node->getState(), node_v.size())) {
               _rc_node->setState(node->getState());
               reportState(_rc_node);
@@ -205,7 +214,7 @@ bool RunControlMessageManager::reportState(NSMNode* node, const std::string& dat
   nsm.setParam(2, node->getState().getId());
   if (data.size() > 0) nsm.setData(data);
   /*
-  std::cout << __FILE__ << ":" << __LINE__ << " RUNCONTROL>>GUI ("
+  std::cerr << __FILE__ << ":" << __LINE__ << " RUNCONTROL>>GUI ("
       << node->getName().c_str() << "="
       << node->getState().getLabel() << ")" << std::endl;
   */

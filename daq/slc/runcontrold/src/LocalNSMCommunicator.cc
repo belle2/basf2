@@ -6,6 +6,8 @@
 
 #include <util/Debugger.hh>
 
+#include <iostream>
+
 using namespace B2DAQ;
 
 bool LocalNSMCommunicator::init() throw(IOException)
@@ -24,6 +26,8 @@ RunControlMessage LocalNSMCommunicator::waitMessage() throw(IOException)
   if (_nsm_comm->wait(5000)) {
     msg.setMessage(_nsm_comm->getMessage());
     msg.setCommand(RCCommand(msg.getMessage().getRequestName()));
+    //std::cerr << __FILE__ << ":" << __LINE__ << " node="
+    //        << _nsm_comm->getMessage().getNodeId() << std::endl;
   } else {
     msg.setCommand(RCCommand::STATECHECK);
   }

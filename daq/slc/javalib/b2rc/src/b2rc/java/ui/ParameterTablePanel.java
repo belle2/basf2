@@ -23,6 +23,8 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
+import b2daq.core.Log;
+import b2daq.core.LogLevel;
 import b2daq.ui.Updatable;
 import b2rc.core.RCNodeSystem;
 import b2rc.db.RCDBManager;
@@ -42,8 +44,12 @@ abstract public class ParameterTablePanel extends JPanel implements Updatable {
 	protected int _version = -1;
 	protected int _version_max = -1;
 	private VersionControlPanel _version_panel;
+	private EditorMainPanel _editor_panel;
 
-	public ParameterTablePanel(VersionControlPanel version_panel, RCNodeSystem system, String label, String alias) {
+	public ParameterTablePanel(EditorMainPanel editor_panel, 
+			VersionControlPanel version_panel, RCNodeSystem system, 
+			String label, String alias) {
+		_editor_panel = editor_panel;
 		_version_panel = version_panel;
 		GridBagLayout layout = new GridBagLayout();
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -111,6 +117,10 @@ abstract public class ParameterTablePanel extends JPanel implements Updatable {
 					upload();
 					updateList();
 					_version_panel.setComboBox(_label, _combo_version);
+					_editor_panel.addLog(new Log("Added new version = "+
+					"<span style='color:blue;font-weight:bold;'>"+_version +
+					"</span> for <span style='color:blue;font-weight:bold;'>" + 
+					getAlias() +"</span>", LogLevel.INFO));
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}

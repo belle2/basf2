@@ -55,17 +55,17 @@ public class EditorMainPanel extends JPanel implements Updatable {
 		_system = system;
 		_version_panel = new VersionControlPanel(this, _system, _panel_v);
 		_tab_panel.addTab("Version Control", _version_panel);
-		COPPERParameterTablePanel copper_panel = new COPPERParameterTablePanel(_version_panel, _system);
-		TTDParameterTablePanel ttd_panel = new TTDParameterTablePanel(_version_panel, _system);
-		HSLBParameterTablePanel hslb_panel = new HSLBParameterTablePanel(_version_panel, _system, copper_panel);
-		FTSWParameterTablePanel ftsw_panel = new FTSWParameterTablePanel(_version_panel, _system, ttd_panel);
+		COPPERParameterTablePanel copper_panel = new COPPERParameterTablePanel(this, _version_panel, _system);
+		TTDParameterTablePanel ttd_panel = new TTDParameterTablePanel(this, _version_panel, _system);
+		HSLBParameterTablePanel hslb_panel = new HSLBParameterTablePanel(this, _version_panel, _system, copper_panel);
+		FTSWParameterTablePanel ftsw_panel = new FTSWParameterTablePanel(this, _version_panel, _system, ttd_panel);
 		addPanel(copper_panel);
 		addPanel(ttd_panel);
-		addPanel(new DataRecieverParameterTablePanel(_version_panel, _system));
+		addPanel(new DataRecieverParameterTablePanel(this, _version_panel, _system));
 		addPanel(hslb_panel);
 		addPanel(ftsw_panel);
 		for (String label : _system.getModuleLists().keySet()) {
-			addPanel(new FEEModuleParameterTablePanel(_version_panel, system, label));
+			addPanel(new FEEModuleParameterTablePanel(this, _version_panel, system, label));
 		}
 	}
 	

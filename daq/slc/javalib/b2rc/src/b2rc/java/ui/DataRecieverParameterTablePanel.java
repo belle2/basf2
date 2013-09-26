@@ -17,8 +17,8 @@ public class DataRecieverParameterTablePanel extends ParameterTablePanel {
 
 	private ArrayList<DataRecieverNode> _recv_v; 
 	
-	public DataRecieverParameterTablePanel(VersionControlPanel version_panel, RCNodeSystem system) {
-		super(version_panel, system, "reciever_node", "ROPC");
+	public DataRecieverParameterTablePanel(EditorMainPanel editor_panel,VersionControlPanel version_panel, RCNodeSystem system) {
+		super(editor_panel, version_panel, system, "reciever_node", "ROPC");
 		_recv_v = system.getReceiverNodes();
 		DefaultTableModel model = (DefaultTableModel)getModel();
 		model.addColumn("NSM name");

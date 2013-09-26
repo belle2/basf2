@@ -14,8 +14,8 @@ import b2rc.db.RCDBManager;
 
 public class TTDParameterTablePanel extends ParameterTablePanel {
 
-	public TTDParameterTablePanel(VersionControlPanel version_panel, RCNodeSystem system) {
-		super(version_panel, system, "ttd_node", "TTD");
+	public TTDParameterTablePanel(EditorMainPanel editor_panel,VersionControlPanel version_panel, RCNodeSystem system) {
+		super(editor_panel, version_panel, system, "ttd_node", "TTD");
 		DefaultTableModel model = (DefaultTableModel)getModel();
 		model.addColumn("Name");
 		//model.addColumn("ProductID");

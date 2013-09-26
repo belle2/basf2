@@ -15,8 +15,9 @@ public class COPPERParameterTablePanel extends ParameterTablePanel {
 
 	private ArrayList<COPPERNode> _copper_v;
 	
-	public COPPERParameterTablePanel(VersionControlPanel version_panel, RCNodeSystem system) {
-		super(version_panel, system, "copper_node", "COPPER");
+	public COPPERParameterTablePanel(EditorMainPanel editor_panel,
+			VersionControlPanel version_panel, RCNodeSystem system) {
+		super(editor_panel, version_panel, system, "copper_node", "COPPER");
 		_copper_v = system.getCOPPERNodes();
 		DefaultTableModel model = (DefaultTableModel)getModel();
 		model.addColumn("NSM name");

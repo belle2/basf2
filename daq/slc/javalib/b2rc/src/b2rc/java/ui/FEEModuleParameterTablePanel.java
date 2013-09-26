@@ -21,8 +21,8 @@ public class FEEModuleParameterTablePanel extends ParameterTablePanel {
 	private HashMap<Integer, Integer> _slot_m = new HashMap<Integer, Integer>();
 	private HashMap<Integer, Integer> _ch_m = new HashMap<Integer, Integer>();
 	
-	public FEEModuleParameterTablePanel(VersionControlPanel version_panel, RCNodeSystem system, String label) {
-		super(version_panel, system, label, label);
+	public FEEModuleParameterTablePanel(EditorMainPanel editor_panel,VersionControlPanel version_panel, RCNodeSystem system, String label) {
+		super(editor_panel, version_panel, system, label, label);
 		_module_v = _system.getModules(label);
 		DefaultTableModel model = (DefaultTableModel)getModel();
 		model.addColumn("Host COPPER");

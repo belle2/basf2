@@ -15,8 +15,8 @@ public class FTSWParameterTablePanel extends ParameterTablePanel {
 
 	private TTDParameterTablePanel _ttd_panel;
 
-	public FTSWParameterTablePanel(VersionControlPanel version_panel, RCNodeSystem system, TTDParameterTablePanel ttd_panel) {
-		super(version_panel, system, "ftsw", "FTSW");
+	public FTSWParameterTablePanel(EditorMainPanel editor_panel,VersionControlPanel version_panel, RCNodeSystem system, TTDParameterTablePanel ttd_panel) {
+		super(editor_panel, version_panel, system, "ftsw", "FTSW");
 		_ttd_panel = ttd_panel;
 		DefaultTableModel model = (DefaultTableModel) getModel();
 		// model.addColumn("ProductID");

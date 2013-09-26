@@ -15,8 +15,8 @@ public class HSLBParameterTablePanel extends ParameterTablePanel {
 
 	private COPPERParameterTablePanel _copper_panel;
 
-	public HSLBParameterTablePanel(VersionControlPanel version_panel, RCNodeSystem system, COPPERParameterTablePanel copper_panel) {
-		super(version_panel, system, "hslb", "HSLB");
+	public HSLBParameterTablePanel(EditorMainPanel editor_panel,VersionControlPanel version_panel, RCNodeSystem system, COPPERParameterTablePanel copper_panel) {
+		super(editor_panel, version_panel, system, "hslb", "HSLB");
 		_copper_panel = copper_panel;
 		DefaultTableModel model = (DefaultTableModel) getModel();
 		model.addColumn("Host COPPER");

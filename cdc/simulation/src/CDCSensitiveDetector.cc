@@ -66,6 +66,7 @@ namespace Belle2 {
     m_wireSag = gd.getBool("WireSag");
     B2INFO("Sense wire sag in CDCSensitiveDetector on(=1)/off(=0):" << m_wireSag);
     m_thresholdEnergyDeposit *= GeV;  //GeV to MeV
+    m_thresholdKineticEnergy = 0.0; // Dummy to avoid a warning (tentative).
     //    B2INFO("Threshold energy " << m_thresholdEnergyDeposit);
 
   }
@@ -1165,7 +1166,7 @@ L10:
     const G4int ndim = 3;
     const G4double delta = 1.e-5;
 
-    G4double fi4;
+
     G4double xwb, ywb, zwb, xwf, ywf, zwf;
     G4double xw, yw, zw, xh, yh, zh;
     G4double fi, fi_corr;
@@ -1239,38 +1240,30 @@ L10:
     dr   = a[0];   fi0  = a[1];  cpa  = a[2];
     dz   = a[3];   tanl = a[4];
     x0   = a[5];   y0   = a[6];  z0   = a[7];
-    fi4  = 0.;
 
-    //set initial value for fi
-    if (fi4 == 0. || iflg == 1) {
-      //      xwm    = 0.5 * (xwb + xwf);
-      //      ywm    = 0.5 * (ywb + ywf);
-      xwm    = xxx;
-      ywm    = yyy;
-      //r(cm) = alpha/cpa = alpha * pt(GeV); bfield(kG)
-      G4double bfield = sqrt(B_kG[0] * B_kG[0] +
-                             B_kG[1] * B_kG[1] +
-                             B_kG[2] * B_kG[2]);
-      alpha  = 1.e4 / 2.99792458 / bfield;
-      r      = alpha / cpa;
-      cosfi0 = cos(fi0);
-      sinfi0 = sin(fi0);
-      // Commented by M. U. June, 2nd, 2013
-      //      chrg   = 1.; if (r < 0.) chrg = -1.;
-      xc  = x0 + (dr + r) * cosfi0;
-      yc  = y0 + (dr + r) * sinfi0;
-      dx1 = x0 - xc;
-      dy1 = y0 - yc;
-      dx2 = xwm - xc;
-      dy2 = ywm - yc;
-      crs = dx1 * dy2 - dy1 * dx2;
-      dot = dx1 * dx2 + dy1 * dy2;
-      fi = atan2(crs, dot);
-    } else {
-      fi = fi4;
-    }
-    //write(6,*) ' fi st ', fi, ' fi0 ', fi0, ' fi0fi ', fi0fi,
-    //.    ' chrg ', chrg
+    //
+    // set initial value for phi
+    //
+
+    xwm    = xxx;
+    ywm    = yyy;
+    //r(cm) = alpha/cpa = alpha * pt(GeV); bfield(kG)
+    G4double bfield = sqrt(B_kG[0] * B_kG[0] +
+                           B_kG[1] * B_kG[1] +
+                           B_kG[2] * B_kG[2]);
+    alpha  = 1.e4 / 2.99792458 / bfield;
+    r      = alpha / cpa;
+    cosfi0 = cos(fi0);
+    sinfi0 = sin(fi0);
+    xc  = x0 + (dr + r) * cosfi0;
+    yc  = y0 + (dr + r) * sinfi0;
+    dx1 = x0 - xc;
+    dy1 = y0 - yc;
+    dx2 = xwm - xc;
+    dy2 = ywm - yc;
+    crs = dx1 * dy2 - dy1 * dx2;
+    dot = dx1 * dx2 + dy1 * dy2;
+    fi = atan2(crs, dot);
 
     //begin iterative procedure for newton 's method   '
     fact = 1.;

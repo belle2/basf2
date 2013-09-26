@@ -275,6 +275,8 @@ namespace Belle2 {
       G4double m_thresholdEnergyDeposit;
       G4double m_thresholdKineticEnergy;
 
+      // test
+
       G4bool m_wireSag;
 
       int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC array.*/

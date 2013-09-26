@@ -35,6 +35,7 @@ namespace B2DAQ {
     void run();
 
   private:
+    bool recover(NSMNode* node);
     bool isSynchronized(const RCState& state, int size);
     int distribute(int index, const RCCommand& command) throw();
     bool send(NSMNode* node, const RCCommand& command) throw();
@@ -42,6 +43,7 @@ namespace B2DAQ {
     void uploadRunConfig() throw();
     void uploadRunResult() throw();
     bool reportState(NSMNode* node, const std::string& message = "") throw();
+    RCState getNextState(const RCCommand& cmd);
     void updateRunStatus(const State& state_org);
     NSMNode* findNode(int id) throw();
     NSMNode* getNodeByID(int id) throw();

@@ -30,10 +30,9 @@ void RunControlMessageManager::run()
     RunControlMessage msg = MessageBox::get().pop();
     usleep(100);
     RCCommand cmd = msg.getCommand();
-    std::cout << __FILE__ << ":" << __LINE__ << " " << cmd.getLabel() << std::endl;
+    //std::cout << __FILE__ << ":" << __LINE__ << " " << cmd.getLabel() << std::endl;
     const NSMMessage& nsm(msg.getMessage());
     if (msg.getId() == RunControlMessage::GUI) {
-      if (!cmd.isAvailable(_rc_node->getState())) continue;
       if (cmd == RCCommand::SET) {
         if (nsm.getParam(0) == RunControlMessage::FLAG_MODE) {
           _node_system->setOperationMode(nsm.getParam(1));
@@ -49,36 +48,52 @@ void RunControlMessageManager::run()
           B2DAQ::debug("unknown parameter = %d, value = %d", nsm.getParam(0), nsm.getParam(1));
         }
       } else {
+        if (nsm.getNParams() > 0) {
+          NSMNode* node = _node_system->getNodes()[nsm.getParam(0)];
+          RCState state_next = getNextState(cmd);
+          if (state_next != RCState::UNKNOWN)
+            node->setState(state_next);
+          reportState(node);
+          _comm->sendRequest(node, cmd);
+          continue;
+        }
+        if (!cmd.isAvailable(_rc_node->getState())) continue;
         index_seq = 0;
         cmd_seq = cmd;
+        RCState state_next = getNextState(cmd);
+        if (state_next != RCState::UNKNOWN)
+          _rc_node->setState(state_next);
         if (cmd == RCCommand::BOOT || cmd == RCCommand::REBOOT) {
           downloadConfig(cmd, _data_man->getRunConfig()->getVersion());
-          _rc_node->setState(RCState::BOOTING_TS);
         } else if (cmd == RCCommand::LOAD || cmd == RCCommand::RELOAD) {
           downloadConfig(cmd, _data_man->getRunConfig()->getVersion());
-          _rc_node->setState(RCState::LOADING_TS);
         } else if (cmd == RCCommand::START) {
           uploadRunConfig();
-          _rc_node->setState(RCState::STARTING_TS);
         } else if (cmd == RCCommand::STOP) {
           uploadRunResult();
-          _rc_node->setState(RCState::STOPPING_TS);
-        } else if (cmd == RCCommand::PAUSE) {
-          _rc_node->setState(RCState::PAUSED_S);
-        } else if (cmd == RCCommand::RESUME) {
-          _rc_node->setState(RCState::RUNNING_S);
-        } else if (cmd == RCCommand::RECOVER) {
-          _rc_node->setState(RCState::RECOVERING_RS);
-        } else if (cmd == RCCommand::ABORT) {
-          _rc_node->setState(RCState::ABORTING_RS);
         }
         reportState(_rc_node);
         std::vector<NSMNode*>& node_v(_node_system->getNodes());
         for (size_t i = 0; i < node_v.size(); i++) {
+          RCState state_org = node_v[i]->getState();
           node_v[i]->setState(_rc_node->getState());
           reportState(node_v[i]);
+          if (cmd_seq == RCCommand::RECOVER)
+            node_v[i]->setState(state_org);
         }
-        index_seq = distribute(index_seq, cmd_seq) ;
+        if (cmd_seq != RCCommand::RECOVER) {
+          index_seq = distribute(index_seq, cmd_seq);
+        } else {
+          bool recovered = true;
+          for (size_t i = 0; i < node_v.size(); i++) {
+            recovered &= recover(node_v[i]);
+          }
+          if (recovered) {
+            _rc_node->setState(RCState::READY_S);
+            reportState(_rc_node);
+            index_seq = -1;
+          }
+        }
       }
     } else if (msg.getId() == RunControlMessage::LOCALNSM) {
       if (index_seq < 0 && cmd == RCCommand::STATECHECK) {
@@ -89,27 +104,39 @@ void RunControlMessageManager::run()
         }
       } else {
         int id = nsm.getNodeId();
-        std::cout << __FILE__ << ":" << __LINE__ << " " << id << std::endl;
+        //std::cout << __FILE__ << ":" << __LINE__ << " " << id << std::endl;
         NSMNode* node = findNode(id);
         if (node != NULL) {
           if (cmd == RCCommand::OK) {
             node->setState(RCState(nsm.getData()));
             reportState(node);
             std::vector<NSMNode*>& node_v(_node_system->getNodes());
-            for (size_t i = 0; i < node_v.size(); i++) {
-              if (node_v[i]->isUsed())
-                reportState(node_v[i]);
-            }
-            if (isSynchronized(node->getState(), node_v.size())) {
-              _rc_node->setState(node->getState());
-              reportState(_rc_node);
-            }
-            if (index_seq >= (int)node_v.size()) index_seq = -1;
-            if (index_seq > 0) {
-              RCState next_state = RCState(_rc_node->getState()).next();
-              if (!node_v[index_seq]->isSynchronize() ||
-                  isSynchronized(next_state, index_seq)) {
-                index_seq = distribute(index_seq, cmd_seq);
+            if (cmd_seq == RCCommand::RECOVER) {
+              bool recovered = true;
+              for (size_t i = 0; i < node_v.size(); i++) {
+                recovered &= recover(node_v[i]);
+              }
+              if (recovered) {
+                _rc_node->setState(RCState::READY_S);
+                reportState(_rc_node);
+                index_seq = -1;
+              }
+            } else {
+              for (size_t i = 0; i < node_v.size(); i++) {
+                if (node_v[i]->isUsed())
+                  reportState(node_v[i]);
+              }
+              if (isSynchronized(node->getState(), node_v.size())) {
+                _rc_node->setState(node->getState());
+                reportState(_rc_node);
+              }
+              if (index_seq >= (int)node_v.size()) index_seq = -1;
+              if (index_seq > 0) {
+                RCState next_state = RCState(_rc_node->getState()).next();
+                if (!node_v[index_seq]->isSynchronize() ||
+                    isSynchronized(next_state, index_seq)) {
+                  index_seq = distribute(index_seq, cmd_seq);
+                }
               }
             }
           } else if (cmd == RCCommand::ERROR) {
@@ -153,6 +180,47 @@ void RunControlMessageManager::addNode(int id, NSMNode* node) throw()
     _node_id_m.insert(std::map<int, NSMNode*>::value_type(id, node));
     _node_name_m.insert(std::map<std::string, NSMNode*>::value_type(node->getName(), node));
   }
+}
+
+bool RunControlMessageManager::recover(NSMNode* node)
+{
+  if (!node->isUsed()) return true;
+  if (node->getState() == RCState::INITIAL_S) {
+    _comm->sendRequest(node, RCCommand::BOOT);
+  } else if (node->getState() == RCState::CONFIGURED_S) {
+    _comm->sendRequest(node, RCCommand::LOAD);
+  } else if (node->getState() == RCState::READY_S) {
+    return true;
+  } else if (node->getState() == RCState::PAUSED_S) {
+    _comm->sendRequest(node, RCCommand::STOP);
+  } else if (node->getState() == RCState::RUNNING_S) {
+    _comm->sendRequest(node, RCCommand::STOP);
+  } else if (node->getState() == RCState::ERROR_ES) {
+    _comm->sendRequest(node, RCCommand::RECOVER);
+  }
+  return false;
+}
+
+RCState RunControlMessageManager::getNextState(const RCCommand& cmd)
+{
+  if (cmd == RCCommand::BOOT || cmd == RCCommand::REBOOT) {
+    return RCState::BOOTING_TS;
+  } else if (cmd == RCCommand::LOAD || cmd == RCCommand::RELOAD) {
+    return RCState::LOADING_TS;
+  } else if (cmd == RCCommand::START) {
+    return RCState::STARTING_TS;
+  } else if (cmd == RCCommand::STOP) {
+    return RCState::STOPPING_TS;
+  } else if (cmd == RCCommand::PAUSE) {
+    return RCState::PAUSED_S;
+  } else if (cmd == RCCommand::RESUME) {
+    return RCState::RUNNING_S;
+  } else if (cmd == RCCommand::RECOVER) {
+    return RCState::RECOVERING_RS;
+  } else if (cmd == RCCommand::ABORT) {
+    return RCState::ABORTING_RS;
+  }
+  return RCState::UNKNOWN;
 }
 
 bool RunControlMessageManager::isSynchronized(const RCState& state, int size)

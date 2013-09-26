@@ -1,8 +1,10 @@
 #include "COPPERCallback.hh"
 
 #include "SenderManager.hh"
+#include "ProcessListener.hh"
 
 #include <system/Fork.hh>
+#include <system/PThread.hh>
 
 #include <node/COPPERNode.hh>
 
@@ -56,7 +58,8 @@ bool COPPERCallback::boot() throw()
     }
   }
 
-  FILE* file = popen("/home/usr/tkonno/b2slc/cprcontrold/ttrx/bootrx /home/usr/tkonno/b2slc/cprcontrold/ttrx/tt4r009.bit", "r");
+  FILE* file = popen("${B2SLC_PATH}/cprcontrold/ttrx/bootrx ${B2SLC_PATH}/cprcontrold/ttrx/tt4r009.bit", "r");
+  //FILE* file = popen("/home/usr/tkonno/b2slc/cprcontrold/ttrx/bootrx /home/usr/tkonno/b2slc/cprcontrold/ttrx/tt4r009.bit", "r");
   char str[1024];
   memset(str, '\0', 1024);
   fread(str, 1, 1024 - 1, file);
@@ -130,6 +133,7 @@ bool COPPERCallback::load() throw()
   system("killall basf2");
   _fork.cancel();
   _fork = Fork(new SenderManager(_node));
+  PThread(new ProcessListener(this, _fork));
   return true;
 }
 

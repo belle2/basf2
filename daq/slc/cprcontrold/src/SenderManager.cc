@@ -26,8 +26,6 @@ std::string SenderManager::run_script(const std::string& cmd)
 
 void SenderManager::run() throw()
 {
-  //${BELLE2_LOCAL_DIR}/daq/eventbuilder/evb0/eb0 -n 2 cpr006 cpr007 -D -b
-  //${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream1.sh
   B2DAQ::debug("Try to start basf2 script");
   if (_node != NULL) {
     const char* belle2_path = getenv("BELLE2_LOCAL_DIR");
@@ -44,7 +42,6 @@ void SenderManager::run() throw()
             belle2_path, _node->getSender()->getScript().c_str());
     char hostname_c[64];
     std::string hostname = run_script("hostname");
-    //std::string hostname = (_node->getHost()) ? _node->getHost()->getName() : run_script("hostname");
     sprintf(hostname_c, "%s", hostname.c_str());
 
     char id_c[32];

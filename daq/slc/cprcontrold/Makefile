@@ -41,7 +41,7 @@ OBJS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.o)
 
 .PHONY : all clean mgt ttrx
 
-all: mgt ttrx $(TARGETS)
+all: mgt $(TARGETS)
 
 ttrx:
 	@ make -C ttrx

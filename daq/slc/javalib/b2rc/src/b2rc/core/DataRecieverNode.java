@@ -24,6 +24,8 @@ public class DataRecieverNode extends RCNode {
 	}
 
 	public void clearSenders() {
+		_sender_v = new DataSender[20];
+		_sender_i = 0;
 	}
 
 	public DataSender getSender(int i) {

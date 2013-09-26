@@ -130,7 +130,7 @@ throw(DBHandlerException)
 DBRecord DBNodeSystemConfigurator::readVersionControlTable(int version) throw(DBHandlerException)
 {
   _db->execute(B2DAQ::form("select * from version_control where version = %d;", version));
-  B2DAQ::debug("select * from version_control where version = %d;", version);
+  //B2DAQ::debug("select * from version_control where version = %d;", version);
   std::vector<DBRecord>& record_v(_db->loadRecords());
   if (record_v.size() == 0) {
     throw (DBHandlerException(__FILE__, __LINE__,

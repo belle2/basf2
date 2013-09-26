@@ -3,30 +3,13 @@
 all:
 	make -C nsm2/
 	make -C src/ full
-
-runcontrold: 
-	make -C runcontrold/
-
-gui: 
-	make -C javalib/
-
-rocontrold:
-	make -C rocontrold/
-
-cprcontrold:
-	make -C cprcontrold/
-
-ttdd:
-	make -C ttdd/
-
-full:
-	make all
 	make -C templated/
 	make -C cprcontrold/
 #	make ttdd
 	make -C rocontrold/
 	make -C runcontrold/
 	make -C tools/
+	cd tools/gen_copper; ./bin/gen_copper; cd -
 	make -C javalib/
 
 clean:

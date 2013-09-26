@@ -25,13 +25,13 @@ void RecieverManager::run() throw()
     char path[128];
     char script_c[128];
     sprintf(path, "/bin/sh");
-    B2DAQ::debug("DEBUG:%s/daq/copper/daq_scripts/%s", belle2_path, _node->getScript().c_str());
     sprintf(script_c, "%s/daq/copper/daq_scripts/%s",
             belle2_path, _node->getScript().c_str());
     char* argv[3];
     argv[0] = path;
     argv[1] = script_c;
     argv[2] = NULL;
+    B2DAQ::debug("%s %s", path, script_c);
     if (execvp(path, argv) == -1) {
       B2DAQ::debug("Faield to start receiver basf2 script");
     }

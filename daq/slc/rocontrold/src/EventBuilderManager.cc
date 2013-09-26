@@ -52,9 +52,10 @@ void EventBuilderManager::run() throw()
     argv[i++] = NULL;
     i = 0;
     while (argv[i] != NULL) {
-      printf("%s\n", argv[i]);
+      printf("%s ", argv[i]);
       i++;
     }
+    printf("\n");
     if (execvp(path, argv) == -1) {
       B2DAQ::debug("Faield to start eb0");
     }

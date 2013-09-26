@@ -16,13 +16,13 @@ typedef void* func_t(void*, const char*);
 
 int main(int argc, char** argv)
 {
-  if (argc < 4) {
-    B2DAQ::debug("Usage : ./copperd <name> <class> <path>");
+  if (argc < 3) {
+    B2DAQ::debug("Usage : ./copperd <name> <class_name>");
     return 1;
   }
   const char* name = argv[1];
   const char* class_name = argv[2];
-  const char* path = argv[3];
+  const char* path = getenv("B2SC_CPRLIB_PATH");
   void* handle = dlopen(B2DAQ::form("%s/lib/libB2SLC_%s.so",
                                     path, class_name).c_str(),
                         RTLD_NOW | RTLD_GLOBAL);

@@ -44,19 +44,17 @@ int main(int argc, char** argv)
   using namespace B2DAQ;
 
   if (argc < 1) {
-    std::cerr << "Usage : ./runcontrold <path to config file>"
+    std::cerr << "Usage : ./runcontrold <hostname>"
               << std::endl;
     return 1;
   }
 
-  ConfigReader conf(argv[1]);
-
-  const std::string node_name = conf.get("NSMNODE_NAME");
-  const std::string dir = conf.get("XML_DIR");
-  const std::string entry = conf.get("XML_ENTRY");
-  const std::string path = conf.get("NSMDATA_LIB");
-  const std::string ip = conf.get("SERVER_IP");
-  const int port = atoi(conf.get("SERVER_PORT").c_str());
+  const std::string node_name = "RUNCONTROL";
+  const std::string dir = getenv("B2SC_XML_PATH");
+  const std::string entry = getenv("B2SC_XML_ENTRY");
+  const std::string path = getenv("B2SC_CPRLIB_PATH");
+  const std::string ip = argv[1];
+  const int port = (argc > 2) ? atoi(argv[2]) : 50000;
   const std::string db_host = getenv("B2SC_DB_HOST");
   const std::string db_name = getenv("B2SC_DB_NAME");
   const std::string db_user = getenv("B2SC_DB_USER");

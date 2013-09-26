@@ -27,9 +27,19 @@ namespace B2DAQ {
     virtual void close() throw(DBHandlerException) = 0;
     virtual void clear() throw() = 0;
     virtual DBRecordList& loadRecords() throw(DBHandlerException) = 0;
+    const std::string& getHostName() const throw() { return _hostname; }
+    const std::string& getDatabase() const throw() { return _database; }
+    const std::string& getUserName() const throw() { return _username; }
+    const std::string& getPassword() const throw() { return _password; }
+    int getPort() const throw() { return _port; }
 
   protected:
     DBRecordList _record_v;
+    std::string _hostname;
+    std::string _database;
+    std::string _username;
+    std::string _password;
+    int _port;
 
   };
 

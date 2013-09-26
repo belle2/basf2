@@ -20,6 +20,11 @@ void MySQLInterface::connect(const std::string& host,
                              int port)
 throw(DBHandlerException)
 {
+  _hostname = host;
+  _database = database;
+  _username = user;
+  _password = password;
+  _port = port;
   if (!mysql_real_connect(_sq_conn, host.c_str(),
                           user.c_str(), password.c_str(),
                           database.c_str(), port, NULL, 0)) {

@@ -32,6 +32,9 @@ namespace B2DAQ {
     unsigned long long getTotalTriggers() const throw() {
       return _total_triggers;
     }
+    int getState(unsigned int index, int state) throw() {
+      return _state_v[index];
+    }
     void setExpNumber(ExpNumber_t exp_no) throw() { _exp_no = exp_no; }
     void setRunNumber(RunNumber_t run_no) throw() { _run_no = run_no; }
     ExpNumber_t incrementExpNumber() throw() {
@@ -47,6 +50,9 @@ namespace B2DAQ {
     void setTotalTriggers(unsigned long long total_triggers) throw() {
       _total_triggers = total_triggers;
     }
+    void setState(unsigned int index, int state) throw() {
+      _state_v[index] = state;
+    }
 
   private:
     unsigned long long _serial;
@@ -55,6 +61,7 @@ namespace B2DAQ {
     RunTime_t _start_time;
     RunTime_t _end_time;
     unsigned long long _total_triggers;
+    int _state_v[1024];
     
   };
 

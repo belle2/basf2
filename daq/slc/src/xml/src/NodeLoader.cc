@@ -1,6 +1,7 @@
 #include "NodeLoader.hh"
 
 #include <util/StringUtil.hh>
+#include <util/Debugger.hh>
 
 #include <iostream>
 
@@ -204,6 +205,7 @@ void NodeLoader::loadNodes(XMLElement* el)
   if (node != NULL) {
     node->setVersion(_system.getVersion());
     node->setUsed(!(el->getAttribute("used") == "false"));
+    node->setSynchronize((el->getAttribute("synchronize") == "true"));
     node->setIndex(_system.getNodes().size());
     node->setName(name);
     _system.addNode(node);

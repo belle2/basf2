@@ -10,6 +10,7 @@ struct run_status {
   uint64 start_time;
   uint64 end_time;
   uint64 total_triggers;
+  uint32 state[1024];
 };
 
 #endif

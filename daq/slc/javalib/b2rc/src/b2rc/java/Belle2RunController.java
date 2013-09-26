@@ -59,7 +59,7 @@ public class Belle2RunController extends JavaEntoryPoint {
 					}
 				}
 			}
-			_loader.load("CDC");
+			_loader.load(socket_reader.readString());
 			RCDBManager.get().setNodeSystem(_loader.getSystem());
 			_frame = new RCMainFrame(_loader.getSystem());
 			_frame.init();

@@ -17,11 +17,9 @@ using namespace B2DAQ;
 bool GUICommunicator::init() throw(IOException)
 {
   _is_ready = false;
-  B2DAQ::debug("%s:%d waiting for new connecction", __FILE__, __LINE__);
   _socket = _server_socket.accept();
   _writer = TCPSocketWriter(_socket);
   _reader = TCPSocketReader(_socket);
-  _is_ready = true;
 
   std::vector<std::string>& file_path_v(_loader->getFilePathList());
   _writer.writeInt((int)file_path_v.size());
@@ -32,7 +30,6 @@ bool GUICommunicator::init() throw(IOException)
     std::ifstream fin(file_path_v[i].c_str());
     std::string buf;
     while (fin && getline(fin, buf)) {
-      std::cout << buf << std::endl;
       for (size_t j = 0; j < buf.size(); j++) {
         _writer.writeChar(buf.at(j));
       }
@@ -99,6 +96,8 @@ bool GUICommunicator::init() throw(IOException)
   msg.setMessage(nsm);
   sendMessage(msg);
   usleep(50000);
+  _is_ready = true;
+
   return true;
 }
 
@@ -112,7 +111,6 @@ bool GUICommunicator::reset() throw()
 RunControlMessage GUICommunicator::waitMessage() throw(IOException)
 {
   RunControlMessage msg(RunControlMessage::GUI);
-  B2DAQ::debug("%s:%d wait for new command", __FILE__, __LINE__);
   msg.setCommand(RCCommand(_reader.readString().c_str()));
   NSMMessage nsm;
   nsm.setNParams(_reader.readInt());
@@ -138,6 +136,8 @@ throw(IOException)
       _writer.writeString(msg.getMessage().getData());
       _mutex.unlock();
     } catch (const IOException& e) {
+      _is_ready = false;
+      _socket.close();
       _mutex.unlock();
       throw (e);
     }

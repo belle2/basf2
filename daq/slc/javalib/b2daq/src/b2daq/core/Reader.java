@@ -14,5 +14,5 @@ public abstract class Reader {
 	public void readObject(SerializableObject obj) throws Exception {
 		obj.readObject(this);
 	}
-
+	
 }

@@ -28,7 +28,7 @@ void NSMCommunicator::init(bool usesig) throw(NSMHandlerException)
     throw (NSMHandlerException(__FILE__, __LINE__, "Error during init2"));
   }
   nsmlib_usesig(_nsmc, 0);
-  b2nsm_logging(stdout);
+  //b2nsm_logging(stdout);
   _id = _nsmc->nodeid;
 
   b2nsm_context(_nsmc);

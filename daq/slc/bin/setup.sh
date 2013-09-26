@@ -16,7 +16,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$B2SLC_PATH/lib
 
 ## NSM configuration ##
 export NSM2_HOST=`/sbin/ifconfig | grep "192\.168\.10\." | sed "s/:/ /g" | awk '{print $3}'`
-#export NSM2_HOST=130.87.227.252
+export NSM2_HOST=130.87.227.252
 #export NSM2_HOST=192.168.244.136
 export NSM2_PORT=8122
 export NSM2_SHMKEY=8122

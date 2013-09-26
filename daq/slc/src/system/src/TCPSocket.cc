@@ -5,6 +5,7 @@
 #include <cstring>
 #include <cerrno>
 
+//#include <iostream>
 #include <sstream>
 #include <vector>
 
@@ -68,6 +69,8 @@ size_t TCPSocket::write(const void* buf, size_t count) throw(IOException)
   int ret;
   while (c < count) {
     ret = send(_fd, ((unsigned char*)buf + c), (count - c), MSG_NOSIGNAL);
+    //std::cout << __FILE__ << ":" << __LINE__ << " " << count
+    //        << " " << ret << " " << c << std::endl;
     if (ret <= 0) {
       throw (IOException(__FILE__, __LINE__, "Error while writing"));
     }

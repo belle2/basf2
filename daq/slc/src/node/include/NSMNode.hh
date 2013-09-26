@@ -30,6 +30,7 @@ namespace B2DAQ {
     Connection& getConnection() throw() { return _connection; }
     const Connection& getConnection() const throw() { return _connection; }
     int getNodeID() const throw() { return _node_id; }
+    bool isSynchronize() const throw() { return _sync; }
     int getIndex() const throw() { return _index; }
     void setName(const std::string& name) throw() { _name = name; }
     void setUsed(bool used) throw() { _used = used; }
@@ -40,6 +41,7 @@ namespace B2DAQ {
     }
     void setNodeID(int id) throw() { _node_id = id; }
     void setIndex(int index) throw() { _index = index; }
+    void setSynchronize(bool sync) throw() { _sync = sync; }
     virtual const std::string getSQLFields() const throw();
     virtual const std::string getSQLLabels() const throw();
     virtual const std::string getSQLValues() const throw();
@@ -57,6 +59,7 @@ namespace B2DAQ {
     Connection _connection;
     int _node_id;
     int _index;
+    bool _sync;
 
   };
 

@@ -17,10 +17,12 @@ bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
   } else if (cmd == Command::ERROR) {
     return error();
   }
+  /*
   B2DAQ::debug("Node = %s", msg.getNodeName());
   B2DAQ::debug("Request = %s", msg.getRequestName());
   B2DAQ::debug("Command = %s", cmd.getLabel());
   B2DAQ::debug("State = %s", _node->getState().getLabel());
+  */
   if (cmd.isAvailable(_node->getState()) == 0) {
     return false;
   }

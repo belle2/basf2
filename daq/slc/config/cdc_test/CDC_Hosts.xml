@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <hosts>
-  <host type="pc" name="ropc01" product_id="01" location="room1:rack1:crate1:slot1" />
-  <host type="copper" name="cpr001" product_id="200001" location="room1:rack1:crate1:slot1" />
-  <host type="copper" name="cpr002" product_id="200002" location="room1:rack1:crate1:slot1" />
-  <host type="copper" name="cpr003" product_id="200003" location="room1:rack1:crate1:slot1" />
-  <host type="copper" name="cpr004" product_id="200004" location="room1:rack1:crate1:slot1" />
-  <host type="copper" name="cpr005" product_id="200005" location="room1:rack1:crate1:slot1" />
-  <host type="copper" name="cpr006" product_id="200006" location="room1:rack1:crate1:slot1" />
-  <host type="copper" name="cpr007" product_id="200007" location="room1:rack1:crate1:slot1" />
-  <host type="copper" name="cpr008" product_id="200008" location="room1:rack1:crate1:slot1" />
-  <host type="copper" name="cpr009" product_id="200009" location="room1:rack1:crate1:slot1" />
-  <host type="copper" name="cpr010" product_id="200010" location="room1:rack1:crate1:slot1" />
-  <host type="copper" name="cpr011" product_id="200011" location="room1:rack1:crate1:slot1" />
-  <host type="copper" name="cpr012" product_id="200012" location="room1:rack1:crate1:slot1" />
-  <host type="copper" name="cpr013" product_id="200013" location="room1:rack1:crate1:slot1" />
-  <host type="copper" name="cpr014" product_id="200014" location="room1:rack1:crate1:slot1" />
-  <host type="copper" name="cpr015" product_id="200015" location="room1:rack1:crate1:slot1" />
-  <host type="vmic" name="ttd3" product_id="300015" location="room1:rack1:crate1:slot1" />
+  <host type="pc" name="ropc01" />
+  <host type="copper" name="cpr001" />
+  <host type="copper" name="cpr002" />
+  <host type="copper" name="cpr003" />
+  <host type="copper" name="cpr004" />
+  <host type="copper" name="cpr005" />
+  <host type="copper" name="cpr006" />
+  <host type="copper" name="cpr007" />
+  <host type="copper" name="cpr008" />
+  <host type="copper" name="cpr009" />
+  <host type="copper" name="cpr010" />
+  <host type="copper" name="cpr011" />
+  <host type="copper" name="cpr012" />
+  <host type="copper" name="cpr013" />
+  <host type="copper" name="cpr014" />
+  <host type="copper" name="cpr015" />
+  <host type="vmic" name="ttd3" />
 </hosts>

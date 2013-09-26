@@ -27,7 +27,7 @@ void DataReceiverData::read(NSMNode* node) throw(NSMHandlerException)
       recv->addSender(new DataSender());
     }
   }
-  std::cout << __FILE__ << ":" << __LINE__ << ":" << data->ncopper << " " << recv->getNSenders() << std::endl;
+  //std::cout << __FILE__ << ":" << __LINE__ << ":" << data->ncopper << " " << recv->getNSenders() << std::endl;
   for (size_t i = 0; i < ncopper; i++) {
     DataSender* sender = recv->getSender(i);
     if (sender != NULL) {
@@ -44,11 +44,11 @@ void DataReceiverData::write(NSMNode* node) throw(NSMHandlerException)
   DataReceiverNode* recv = (DataReceiverNode*)node;
   data->ncopper = (short)recv->getNSenders();
   strncpy(data->script, recv->getScript().c_str(), 64);
-  std::cout << __FILE__ << ":" << __LINE__ << ":" << data->ncopper << " " << recv->getNSenders() << std::endl;
+  //std::cout << __FILE__ << ":" << __LINE__ << ":" << data->ncopper << " " << recv->getNSenders() << std::endl;
   for (int i = 0; i < recv->getNSenders(); i++) {
     DataSender* sender = recv->getSender(i);
     if (sender != NULL) {
-      std::cout << __FILE__ << ":" << __LINE__ << ":" << sender->getHost() << std::endl;
+      //std::cout << __FILE__ << ":" << __LINE__ << ":" << sender->getHost() << std::endl;
       strncpy((char*)(data->host + i * 64), sender->getHost().c_str(), 64);
       data->port[i] = sender->getPort();
       data->event_size[i] = sender->getEventSize();

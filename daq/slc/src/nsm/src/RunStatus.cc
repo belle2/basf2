@@ -5,6 +5,8 @@ extern "C" {
 #include "run_status.h"
 }
 
+#include <cstring>
+
 using namespace B2DAQ;
 
 RunStatus::RunStatus(const std::string& data_name) throw()
@@ -16,6 +18,7 @@ RunStatus::RunStatus(const std::string& data_name) throw()
   _start_time = 0;
   _end_time = 0;
   _total_triggers = 0;
+  memset(_state_v, 0, sizeof(_state_v));
 }
 
 void RunStatus::read(NSMNode*) throw(NSMHandlerException)
@@ -25,6 +28,7 @@ void RunStatus::read(NSMNode*) throw(NSMHandlerException)
   _run_no = status->run_no;
   _start_time = status->start_time;
   _end_time = status->end_time;
+  memcpy(_state_v, status->state, sizeof(status->state));
 }
 
 void RunStatus::write(NSMNode*) throw(NSMHandlerException)
@@ -34,5 +38,6 @@ void RunStatus::write(NSMNode*) throw(NSMHandlerException)
   status->run_no = _run_no;
   status->start_time = _start_time;
   status->end_time = _end_time;
+  memcpy(status->state, _state_v, sizeof(status->state));
 }
 

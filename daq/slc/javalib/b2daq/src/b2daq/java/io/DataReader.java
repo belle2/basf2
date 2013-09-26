@@ -6,14 +6,14 @@ import java.io.InputStream;
 
 import b2daq.core.Reader;
 
-
 public class DataReader extends Reader {
 
 	protected DataInputStream _stream;
 	
 	public DataReader() {}
 	public DataReader(InputStream stream) {
-		_stream = new DataInputStream(new BufferedInputStream(stream));
+		//_stream = new DataInputStream(new BufferedInputStream(stream));
+		_stream = new DataInputStream(stream);
 	}
 	
 	@Override

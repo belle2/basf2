@@ -88,8 +88,8 @@ void RunControlMessageManager::run()
             send(node_v[i], cmd);
         }
       } else {
-        int id = _comm->getMessage().getNodeId();
-        //std::cout << __FILE__ << ":" << __LINE__ << " " << id << std::endl;
+        int id = nsm.getNodeId();
+        std::cout << __FILE__ << ":" << __LINE__ << " " << id << std::endl;
         NSMNode* node = findNode(id);
         if (node != NULL) {
           if (cmd == RCCommand::OK) {

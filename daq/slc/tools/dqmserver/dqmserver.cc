@@ -10,6 +10,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <cstdlib>
 
 #include <dlfcn.h>
 
@@ -25,9 +26,10 @@ struct DQM_input {
 
 int main(int argc, char** argv)
 {
-  if (argc < 2) {
-    std::cout << "Usage: ./dqmserver <config_file>"
+  if (argc < 3) {
+    std::cout << "Usage: ./dqmserver <config file> <ip address>"
               << std::endl;
+    return 1;
   }
 
   std::vector<DQM_input> input_v;
@@ -44,9 +46,10 @@ int main(int argc, char** argv)
 
   const size_t ninputs = input_v.size();
   HistoServer* server = new HistoServer();
-  server->setDirectory("/tmp");
+  server->setDirectory(getenv("B2SC_DQM_MAP_PATH"));
   for (size_t n = 0; n < ninputs; n++) {
-    void* handle = dlopen(B2DAQ::form("%s/lib/libB2DQM_%s.so",
+    void* handle = dlopen(B2DAQ::form("%s/%s/lib/libB2DQM_%s.so",
+                                      getenv("B2SC_DQM_LIB_PATH"),
                                       input_v[n].so_path.c_str(),
                                       input_v[n].name.c_str()).c_str(),
                           RTLD_NOW | RTLD_GLOBAL);
@@ -55,16 +58,16 @@ int main(int argc, char** argv)
       return 1;
     }
     char* error = NULL;
-    func_t* createHistoManager = (func_t*)dlsym(handle,
-                                                B2DAQ::form("create%sHistoManager",
-                                                            input_v[n].name.c_str()).c_str());
+    func_t* createHistoManager =
+      (func_t*)dlsym(handle, B2DAQ::form("create%sHistoManager",
+                                         input_v[n].name.c_str()).c_str());
     if ((error = dlerror()) != NULL) {
       B2DAQ::debug("%s", error);
       return 1;
     }
     server->addManager(input_v[n].filename, (HistoManager*)createHistoManager());
   }
-  B2DAQ::PThread(new SocketAcceptor(server));
+  B2DAQ::PThread(new SocketAcceptor(argv[2], server));
   server->run();
   return 0;
 }

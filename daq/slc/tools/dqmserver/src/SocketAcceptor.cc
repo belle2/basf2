@@ -10,7 +10,7 @@ using namespace B2DQM;
 
 void SocketAcceptor::run()
 {
-  B2DAQ::TCPServerSocket server_socket("130.87.227.248", 50100);
+  B2DAQ::TCPServerSocket server_socket(_ip, 50101);
   server_socket.open();
   while (true) {
     B2DAQ::TCPSocket socket = server_socket.accept();

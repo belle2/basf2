@@ -82,8 +82,16 @@ void HistoServer::run()
         } else if (event_v[i].getMask() == Inotify::FILE_MODIFY &&
                    created_new == true) {
           std::cout << "Detect file modify : " << event_v[i].getName() << std::endl;
+          int count = 0;
           while (!_manager_v[index]->init()) {
             sleep(2);
+            count++;
+            if (count > 3) break;
+          }
+          if (count > 3) {
+            std::cout << "Failed to initialize with file="
+                      << event_v[i].getName() << std::endl;
+            continue;
           }
           _manager_v[index]->update();
           _updater_v[index]->start();

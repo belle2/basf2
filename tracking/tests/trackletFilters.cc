@@ -3,16 +3,30 @@
 #include <tracking/vxdCaTracking/TrackletFilters.h>
 #include <tracking/vxdCaTracking/LittleHelper.h>
 #include <tracking/vxdCaTracking/SharedFunctions.h>
-#include <boost/foreach.hpp>
+
+// stl:
 #include <vector>
-#include <TVector3.h>
 #include <math.h>
+#include <utility> // pair
+
+// root:
+#include <TVector3.h>
 #include <gtest/gtest.h>
+#include <TRandom.h>
+
+//boost:
+#include <boost/foreach.hpp>
+#include <boost/bind/bind.hpp>
+// #ifndef __CINT__
+// #include <boost/chrono.hpp>
+// #endif
 
 using namespace std;
 using namespace Belle2::Tracking;
 
 namespace Belle2 {
+
+  /** execute this file typing "test_tracking" in the tracking/test */
 #define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
 
   /** Producing suitable input data for for the TrackletFilters-class */
@@ -127,5 +141,68 @@ namespace Belle2 {
     chi2 = aFilter.circleFit(clapPhi, clapR, estimatedRadius);
 //     B2WARNING("after testVector-test, chi2 is " << chi2 << " clapPhi,clapR,estimatedRadius is: " << clapPhi << "," << clapR << "," << estimatedRadius)
 
+    /// comparing calcCircleCenter and circleFit: taking 3 hits lying on a circle (by definition) and a 4th one lying there too. If calcCircleCenter and circleFit are without errors, they should deliver the same result:
+    TVector3 hitA, hitB, hitC, hitD, hitE;
+    radius = 15;
+    sigma = 0.001;
+    TVector3 moveCircle = TVector3(radius, 0, 0.);
+    hitA.SetMagThetaPhi(gRandom->Gaus(radius, sigma) , gRandom->Gaus(M_PI * 0.5, sigma), bVal * scalePhi); hitA += moveCircle;
+    hitB.SetMagThetaPhi(gRandom->Gaus(radius, sigma) , gRandom->Gaus(M_PI * 0.5, sigma), cVal * scalePhi); hitB += moveCircle;
+    hitC.SetMagThetaPhi(gRandom->Gaus(radius, sigma) , gRandom->Gaus(M_PI * 0.5, sigma), dVal * scalePhi); hitC += moveCircle;
+    hitD.SetMagThetaPhi(gRandom->Gaus(radius, sigma) , gRandom->Gaus(M_PI * 0.5, sigma), eVal * scalePhi); hitD += moveCircle;
+    hitE.SetMagThetaPhi(gRandom->Gaus(radius, sigma) , gRandom->Gaus(M_PI * 0.5, sigma), fVal * scalePhi); hitE += moveCircle;
+    vector<TVector3> hits;
+    hits.push_back(hitA), hits.push_back(hitB), hits.push_back(hitC), hits.push_back(hitD), hits.push_back(hitE);
+
+    f3h.resetValues(hitA, hitB, hitC);
+
+    vector<PositionInfo*> compareVec;
+    vector<PositionInfo> tempCompareVec;
+
+    int ctr = 0;
+    BOOST_FOREACH(TVector3 & hit, hits) {
+      PositionInfo posInfo;
+      posInfo.hitPosition = hit;
+      posInfo.sigmaX = 0.001;
+      posInfo.sigmaY = 0.001;
+      tempCompareVec.push_back(posInfo);
+//      compareVec.push_back(&(tempCompareVec.at(ctr)));
+      ctr++;
+    }
+
+    for (int i = 0; i < int(tempCompareVec.size()); ++i) {
+      compareVec.push_back(&(tempCompareVec.at(i)));
+    }
+
+    aFilter.resetValues(&compareVec);
+    aFilter.resetMagneticField();
+
+    TVector3 circleCenter;
+
+//    typedef boost::chrono::high_resolution_clock boostClock; /**< used for measuring time comsumption */ // high_resolution_clock, process_cpu_clock
+//     typedef boost::chrono::nanoseconds boostNsec; /**< defines time resolution (currently nanoseconds) */ // microseconds, milliseconds
+
+//    boostClock::time_point startTimer = boostClock::now();
+    f3h.calcCircleCenter(hitA, hitB, hitC, circleCenter);
+//    boostClock::time_point stopTimer = boostClock::now();
+//    boostNsec durCircleCenter = boost::chrono::duration_cast<boostNsec>(stopTimer - startTimer);
+
+//    startTimer = boostClock::now();
+    aFilter.circleFit(clapPhi, clapR, estimatedRadius);
+//    stopTimer = boostClock::now();
+//    boostNsec durCircleFit = boost::chrono::duration_cast<boostNsec>(stopTimer - startTimer);
+//    B2WARNING("after comparison-test, chi2 is " << chi2 << ", clapPhi,clapR,estimatedRadius is: " << clapPhi << "," << clapR << "," << estimatedRadius)
+    double estimatedHelixRadius;
+    TVector3 estimatedMomentum;
+//    startTimer = boostClock::now();
+    pair<double, TVector3> returnValues = aFilter.helixFit();
+    /*    stopTimer = boostClock::now();
+        boostNsec durHelixFit = boost::chrono::duration_cast<boostNsec>(stopTimer - startTimer);
+      */
+//    EXPECT_FLOAT_EQ((hitA-circleCenter).Mag(), returnValues.first);
+
+    EXPECT_FLOAT_EQ(14.511622, returnValues.first);
+
+//    B2WARNING("duration(ns): durCircleCenter: " << durCircleCenter.count() << ", durCircleFit: " << durCircleFit.count() << ", durHelixFit: " << durHelixFit.count() )
   }
 }  // namespace

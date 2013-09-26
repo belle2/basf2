@@ -12,7 +12,7 @@ initialValue = 1
 
 # secSetup = ['evtNormSecHIGH_SVD', 'evtNormSecMED_SVD', 'evtNormSecLOW_SVD']
 secSetup = ['evtNormSecHIGH_VXD', 'evtNormSecMED_VXD', 'evtNormSecLOW_VXD']
-# if you want to use SVD only, please uncomment secSetup ending with SVD, then comment the VXD-version - and don't forget to set the clusters for the detector type you want in the mcTrackFinder down below!
+# WARNING if you want to use SVD only, please uncomment secSetup ending with SVD, then comment the VXD-version - and don't forget to set the clusters for the detector type you want in the mcTrackFinder down below!
 
 print 'running {events:} events, Seed {theSeed:} - evtGen No BG'.format(events=numEvents,
         theSeed=initialValue)
@@ -37,38 +37,36 @@ evtgeninput = register_module('EvtGenInput')
 evtgeninput.logging.log_level = LogLevel.WARNING
 
 geometry = register_module('Geometry')
-geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
-# geometry.param('Components', [
-    # 'BeamPipe',
-    # 'Cryostat',
-    # 'HeavyMetalShield',
-    # 'MagneticField',
-    # 'PXD',
-    # 'SVD',
-    # 'SVD-Support',
-    # ])
+##geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
+geometry.param('Components', [
+    'BeamPipe',
+    'Cryostat',
+    'HeavyMetalShield',
+    'MagneticField',
+    'PXD',
+    'SVD',
+    'SVD-Support',
+    ])
 
 g4sim = register_module('FullSim')
 g4sim.param('StoreAllSecondaries', True)
 
 vxdtf = register_module('VXDTF')
 vxdtf.logging.log_level = LogLevel.INFO
-vxdtf.logging.debug_level = 1
+vxdtf.logging.debug_level = 6
 # calcQIType:  Supports 'kalman', 'circleFit' or 'trackLength'
 # filterOverlappingTCs: Supports 'hopfield' (good but slow), 'greedy' (faster but worse results), 'none' (no overlapping tc-removal)
-param_vxdtf = {
-    'tccMinState': [2],
-    'tccMinLayer': [3],
-    'reserveHitsThreshold': [0.6],
-    'sectorSetup': secSetup,
-    'calcQIType': 'circleFit',
-    'tuneCircleFit': [0.001, 0.001, 0.00001],
-    'filterOverlappingTCs': 'hopfield',
-    'cleanOverlappingSet': True,
-    'activateZigZagXY': [False, True, True],
-    'TESTERexpandedTestingRoutines': True,
-    'qiSmear': False,
-    }
+param_vxdtf = {'sectorSetup': secSetup}  # 'activateBaselineTF': 0,
+                                         # 'tccMinState': [2],
+                                         # 'tccMinLayer': [3],
+                                         # 'reserveHitsThreshold': [0.6],
+    # 'calcQIType': 'circleFit',
+    # 'tuneCircleFit': [0.001, 0.001, 0.00001],
+    # 'filterOverlappingTCs': 'hopfield',
+    # 'cleanOverlappingSet': True,
+    # 'activateZigZagXY': [False, True, True],
+    # 'TESTERexpandedTestingRoutines': True,
+    # 'qiSmear': False,
 vxdtf.param(param_vxdtf)
 
 mctrackfinder = register_module('MCTrackFinder')
@@ -81,7 +79,7 @@ param_mctrackfinder = {
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'MinimalNDF': 6,
-    'WhichParticles': ['PXD', 'SVD'],
+    'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',
     }
 mctrackfinder.param(param_mctrackfinder)
@@ -93,13 +91,8 @@ eventCounter.param('stepSize', 25)
 analyzer = register_module('TFAnalizer')
 analyzer.logging.log_level = LogLevel.INFO
 analyzer.logging.debug_level = 11
-# set true if PRINTINFO is wanted
 param_analyzer = {'printExtentialAnalysisData': False}
 analyzer.param(param_analyzer)
-
-# display = register_module('Display')
-# param_Display = {'showGFTrackCands': 1, 'useClusters': 1, 'fullGeometry': 1}
-# display.param(param_Display)
 
 # Create paths
 main = create_path()
@@ -121,7 +114,6 @@ main.add_module(svdClusterizer)
 main.add_module(vxdtf)
 main.add_module(mctrackfinder)
 main.add_module(analyzer)
-# main.add_module(display)
 # Process events
 process(main)
 

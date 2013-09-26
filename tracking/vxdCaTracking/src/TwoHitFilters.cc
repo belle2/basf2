@@ -10,18 +10,17 @@
 
 #include "../include/TwoHitFilters.h"
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <math.h>
+#include <cmath>
 
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Tracking;
-using boost::math::isnan;
 
 
 double TwoHitFilters::filterNan(double value)
 {
-  if ((boost::math::isnan)(value) == true) { return 0; }
+  if (std::isnan(value) == true) { return 0; }
   return value;
 }
 

@@ -16,15 +16,5 @@ namespace B2DAQ {
     std::cout << ss << std::endl;
   }
 
-  const char* debug_c(const char* msg, ...)
-  {
-    va_list ap;
-    static char ss[1024];
-    va_start(ap, msg);
-    vsprintf(ss, msg, ap);
-    va_end(ap);
-    return ss;
-  }
-
 }
 

@@ -4,7 +4,7 @@ SRCDIR=$(B2SLC_PATH)/src
 INCDIR=$(B2SLC_PATH)/include
 LIBDIR=$(B2SLC_PATH)/lib
 
-all: util node system nsm runcontrol dqm
+all: util system node nsm runcontrol dqm
 
 full: all xml db
 

@@ -2,13 +2,14 @@
 
 #include "NSMCallback.hh"
 
-#include <util/Debugger.hh>
+#include <util/StringUtil.hh>
 
 extern "C" {
 #include <nsmlib2.h>
 #include <belle2nsm.h>
 }
 
+#include <iostream>
 #include <cstdio>
 #include <cstring>
 
@@ -42,8 +43,8 @@ void NSMCommunicator::init(bool usesig) throw(NSMHandlerException)
         it->id = -1;
         _id = -1;
         throw (NSMHandlerException(__FILE__, __LINE__,
-                                   B2DAQ::debug_c("Failed to register callback (%s)",
-                                                  command.getLabel())));
+                                   B2DAQ::form("Failed to register callback (%s)",
+                                               command.getLabel())));
       }
     }
   }
@@ -99,6 +100,7 @@ bool NSMCommunicator::wait(int sec) throw(NSMHandlerException)
     throw (NSMHandlerException(__FILE__, __LINE__, "Error during wait"));
   } else if (nsmc == _nsmc) {
     _message.read(nsmc);
+    //std::cerr << __FILE__ << ":" << __LINE__ << " id = " << _message.getNodeId() << std::endl;
     return true;
   }
   return false;

@@ -4,7 +4,6 @@
 namespace B2DAQ{
 
   extern void debug(const char* msg, ...);
-  extern const char* debug_c(const char* msg, ...);
 
 }
 

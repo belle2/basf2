@@ -9,6 +9,7 @@ import b2daq.java.ui.JavaEntoryPoint;
 import b2daq.java.ui.LoginPanel;
 import b2rc.db.RCDBManager;
 import b2rc.java.io.RCServerCommunicator;
+import b2rc.java.ui.DBConfigPanel;
 import b2rc.java.ui.RCMainFrame;
 import b2rc.xml.XMLRCNodeLoader;
 
@@ -60,6 +61,15 @@ public class Belle2RunController extends JavaEntoryPoint {
 				}
 			}
 			_loader.load(socket_reader.readString());
+
+			String hostname = socket_reader.readString();
+			String database = socket_reader.readString();
+			String username = socket_reader.readString();
+			String password = socket_reader.readString();
+			int port = socket_reader.readInt();
+			if ( !DBConfigPanel.showLoginDialog(_frame, hostname, 
+						database, username, password, port) ) System.exit(1);
+			RCDBManager.open(hostname, database, username, password, port);
 			RCDBManager.get().setNodeSystem(_loader.getSystem());
 			_frame = new RCMainFrame(_loader.getSystem());
 			_frame.init();

@@ -23,6 +23,11 @@ public class RCDBManager {
 	private Connection _conn;
 	private Statement _statement;
 	private RCNodeSystem _system;
+	private String _hostname;
+	private String _database;
+	private String _username;
+	private String _password;
+	private int _port;
 
 	static public RCDBManager open(String hostname, String database,
 			String username, String password, int port) throws Exception {
@@ -31,35 +36,24 @@ public class RCDBManager {
 	}
 
 	static public RCDBManager get() throws Exception {
-		if (__dbman == null) {
-			String hostname = System.getenv("B2SC_DB_HOST");
-			if ( hostname == null ) hostname = "localhost";
-			String dbname = System.getenv("B2SC_DB_NAME");
-			if ( dbname == null ) dbname = "b2daq";
-			String username = System.getenv("B2SC_DB_USER");
-			if ( username == null ) username = "slcdaq";
-			String password = System.getenv("B2SC_DB_PASS");
-			if ( password == null ) password = "slcdaq";
-			String port_s = System.getenv("B2SC_DB_PORT");
-			if ( port_s == null ) port_s = "33306";
-			int port = 0;
-			try {
-				port = Integer.parseInt(port_s);
-			} catch (Exception e) {
-				port = 3306;
-			}
-			return open(hostname, dbname, username, password, port);
-			//return open("localhost", "b2daq", "slcdaq", "slcdaq", 33306);
-		}
 		return __dbman;
 	}
 
 	public RCDBManager(String hostname, String database, String username,
 			String password, int port) throws Exception {
+		_hostname = hostname;
+		_database = database;
+		_username = username;
+		_password = password;
+		_port = port;
+		connect();
+	}
+
+	public void connect() throws Exception { 
 		final String driver = "org.gjt.mm.mysql.Driver";
 		Class.forName(driver);
-		String url = "jdbc:mysql://" + hostname + ":" + port + "/" + database;
-		_conn = DriverManager.getConnection(url, username, password);
+		String url = "jdbc:mysql://" + _hostname + ":" + _port + "/" + _database;
+		_conn = DriverManager.getConnection(url, _username, _password);
 		_statement = _conn.createStatement();
 	}
 

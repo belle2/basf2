@@ -54,7 +54,11 @@ void RunControlMessageManager::run()
           if (state_next != RCState::UNKNOWN)
             node->setState(state_next);
           reportState(node);
-          _comm->sendRequest(node, cmd);
+          if (cmd_seq == RCCommand::RECOVER) {
+            recover(node);
+          } else {
+            _comm->sendRequest(node, cmd);
+          }
           continue;
         }
         if (!cmd.isAvailable(_rc_node->getState())) continue;

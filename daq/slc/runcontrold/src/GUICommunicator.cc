@@ -38,6 +38,11 @@ bool GUICommunicator::init() throw(IOException)
     _writer.writeChar('\0');
   }
   _writer.writeString(_loader->getEntryLabel());
+  _writer.writeString(_db->getHostName());
+  _writer.writeString(_db->getDatabase());
+  _writer.writeString(_db->getUserName());
+  _writer.writeString(_db->getPassword());
+  _writer.writeInt(_db->getPort());
 
   RunControlMessage msg(RunControlMessage::GUI);
   msg.setCommand(RCCommand::SET);

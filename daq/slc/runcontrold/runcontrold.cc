@@ -91,9 +91,6 @@ int main(int argc, char** argv)
 
   TCPServerSocket server_socket(ip, port);
   server_socket.open();
-  HostCommunicator* ui_comm =
-    new GUICommunicator(server_socket, loader, data);
-  B2DAQ::PThread(new Listener(ui_comm));
 
   MySQLInterface* db = new MySQLInterface();
   db->init();
@@ -117,6 +114,8 @@ int main(int argc, char** argv)
       data->getRunStatus()->setRunNumber(0);
     }
   } catch (const std::exception& e) {}
+  HostCommunicator* ui_comm =  new GUICommunicator(server_socket, db, loader, data);
+  B2DAQ::PThread(new Listener(ui_comm));
 
   RunControlMessageManager* manager
     = new RunControlMessageManager(db, comm, data, ui_comm,

@@ -6,6 +6,8 @@
 
 #include <xml/NodeLoader.hh>
 
+#include <db/DBInterface.hh>
+
 #include <system/TCPServerSocket.hh>
 #include <system/Mutex.hh>
 #include <system/TCPSocketWriter.hh>
@@ -17,8 +19,8 @@ namespace B2DAQ {
 
   public:
     GUICommunicator(const TCPServerSocket& server_socket, 
-		    NodeLoader* loader, NSMDataManager* data) 
-      : _server_socket(server_socket), _loader(loader), 
+		    DBInterface* db, NodeLoader* loader, NSMDataManager* data) 
+      : _server_socket(server_socket), _loader(loader), _db(db),
 	_system(&(loader->getSystem())), _data(data) {}
     virtual ~GUICommunicator() throw() {}
 
@@ -32,6 +34,7 @@ namespace B2DAQ {
   private:
     TCPServerSocket _server_socket;
     NodeLoader* _loader;
+    DBInterface* _db;
     NodeSystem* _system;
     NSMDataManager* _data;
     TCPSocket _socket;

@@ -83,6 +83,7 @@ namespace Belle2 {
 
     std::string m_tracksColName;                     /**< Tracks collection name */
     std::string m_gfTracksColName;                   /**< GFTracks collection name */
+    bool m_suppressGFExceptionOutput;                /**< Switch on/off printing GenFit error message output */
 
     //These are two different counters, the counter for GFTrackCands refers to the number of input GFTrackCands. The number of total successfull/failed fits may be different, if GFTrackCand is fitted several times under different PDG hypothesises.
     int m_failedFitCounter;                          /**< Number of failed fits. */

@@ -110,6 +110,10 @@ GenFitterModule::GenFitterModule() :
   addParam("noiseBrems", m_noiseBrems, "activate the material effect: NoiseBrems", true);
   addParam("noEffects", m_noEffects, "switch off all material effects in Genfit. This overwrites all individual material effects switches", false);
   addParam("resolveWireHitAmbi", m_resolveWireHitAmbi, "If true, DAF will resolve the left right ambiguity of wire hits. If false, closest to prediction will be chosen", false);
+  addParam("suppressGFExceptionOutput", m_suppressGFExceptionOutput, "Suppress error messages in GenFit.", true);
+
+  // keep GFExceptions quit or not
+  GFException::quiet(m_suppressGFExceptionOutput);
 }
 
 GenFitterModule::~GenFitterModule()
@@ -429,7 +433,10 @@ void GenFitterModule::event()
           //gfTrack.getTrackRep(0)->getCov().Print();
 
           if (genfitStatusFlag != 0) {    //if fit failed
-            B2WARNING("Genfit returned an error (with status flag " << genfitStatusFlag << ") during the fit of a track in event " << eventCounter);
+            std::stringstream warningStreamFitFailed;
+            warningStreamFitFailed << "Event " << eventCounter << ", GFTrackCand: " << i << ", PDG hypo: " << currentPdgCode <<
+                                   ": fit failed. GenFit returned an error (with status flag " << genfitStatusFlag << ").";
+            B2WARNING(warningStreamFitFailed.str());
             ++m_failedFitCounter;
             if (m_storeFailed == true) {
               ++trackCounter;

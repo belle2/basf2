@@ -39,9 +39,12 @@ SRCS   = $(wildcard $(SRCDIR)/*.cc)
 DEPS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.d)
 OBJS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.o)
 
-.PHONY : all clean mgt
+.PHONY : all clean mgt ttrx
 
-all: mgt $(TARGETS)
+all: mgt ttrx $(TARGETS)
+
+ttrx:
+	@ make -C ttrx
 
 mgt: 
 	@ make -C mgt
@@ -54,6 +57,7 @@ clean:
 	@ echo '<< cleaning directory >>'
 	@ $(RM) $(BINDIR) $(TMPDIR)
 	@ make -C mgt/ clean
+	@ make -C ttrx/ clean
 	@ $(RM) *~ */*~ \#*\#* */\#*\#*
 
 $(TARGETS): $(BINDIR)/% : %.cc $(OBJS)

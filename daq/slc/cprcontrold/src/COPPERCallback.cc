@@ -17,6 +17,7 @@
 #include <errno.h>
 #include <cstring>
 #include <cstdio>
+#include <iostream>
 
 using namespace B2DAQ;
 
@@ -54,6 +55,15 @@ bool COPPERCallback::boot() throw()
       return false;
     }
   }
+
+  FILE* file = popen("/home/usr/tkonno/b2slc/cprcontrold/ttrx/bootrx /home/usr/tkonno/b2slc/cprcontrold/ttrx/tt4r009.bit", "r");
+  char str[1024];
+  memset(str, '\0', 1024);
+  fread(str, 1, 1024 - 1, file);
+  pclose(file);
+  std::string s = str;
+  std::cout << s << std::endl;
+
   for (int slot = 0; slot < 4; slot++) {
     if (!_hslbcon_v[slot].boot()) {
       B2DAQ::debug("Failed to boot HSLB:%c", (char)(slot + 'a'));

@@ -21,7 +21,7 @@ bool HSLBController::boot() throw()
 {
   if (_hslb == NULL) return true;
   int board_type, firmware, hardware;
-  if (_hslb->isUsed() > 0) {
+  if (_hslb->isUsed()) {
     const char* firmware_path = getenv("HSLB_FIRMEWATE_PATH");
     if (firmware_path == NULL) return false;
     const std::string path = B2DAQ::form("%s/%s",

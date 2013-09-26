@@ -31,7 +31,6 @@ Mgt_t* mgt_boot(int slot, const char* path, int* board_type,
     printf("boot FPGA: done\n");
     //mgt_execute(mgt, CTL_LINK);
     //mgt_check_FEE(mgt);
-    printf("DEBUG:%s:%d\n", __FILE__, __LINE__);
     return mgt;
   } else { 
     printf("boot FPGA: failed\n");

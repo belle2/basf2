@@ -15,6 +15,17 @@ namespace B2DAQ {
   class FTSW : public Module {
 
   public:
+    static const int TRIG_NORMAL;
+    static const int TRIG_IN;
+    static const int TRIG_TLU;
+    static const int TRIG_PULSE;
+    static const int TRIG_REVO;
+    static const int TRIG_RANDOM;
+    static const int TRIG_POSSION;
+    static const int TRIG_ONCE;
+    static const int TRIG_STOP;
+
+  public:
     typedef std::vector<FEEModule*> FEEModuleList;
 
   public:
@@ -39,6 +50,8 @@ namespace B2DAQ {
 	_module_i++;
       }
     }
+    int getTriggerMode() const throw() { return _trigger_mode; }
+    void setTriggerMode(int mode) throw() { _trigger_mode = mode; }
     virtual const std::string getSQLFields() const throw();
     virtual const std::string getSQLLabels() const throw();
     virtual const std::string getSQLValues() const throw();
@@ -49,6 +62,7 @@ namespace B2DAQ {
     bool _used;
     FEEModuleList _module_v;
     int _module_i;
+    int _trigger_mode;
     
   };
 

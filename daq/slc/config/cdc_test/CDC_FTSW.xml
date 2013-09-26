@@ -1,3 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ftswset >
+  <ftsw product_id="00001" location="roomA:rack0:crate0:slot1" channel="1" firmware="m010-000deg.bit" trigger_mode="TLU"/>
 </ftswset>

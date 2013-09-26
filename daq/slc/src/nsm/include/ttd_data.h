@@ -6,6 +6,7 @@ const int ttd_data_revision = 1;
 struct ttd_data {
   uint16 nftsw;
   uint16 channel[16];
+  uint16 trigger_mode[16];
   byte8 used[16];
   char firmware[1024];
 };

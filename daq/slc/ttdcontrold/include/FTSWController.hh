@@ -3,6 +3,8 @@
 
 #include <node/FTSW.hh>
 
+#include <system/PThread.hh>
+
 #include <ftsw.h>
 
 namespace B2DAQ {
@@ -31,7 +33,8 @@ namespace B2DAQ {
   private:
     FTSW* _ftsw;
     ftsw_t* _ftsw_fd;
-    
+    PThread _thread;
+
   };
 
 }

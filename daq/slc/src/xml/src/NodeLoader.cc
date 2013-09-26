@@ -83,15 +83,27 @@ void NodeLoader::loadFTSWs(XMLElement* el)
     XMLElement* el_ftswset = _parser->parse(path);
     int version = 0;
     std::vector<XMLElement*> el_v = el_ftswset->getElements();
+    int id = 0;
     for (size_t i = 0; i < el_v.size(); i++) {
       if (el_v[i]->getTag() == "ftsw") {
         FTSW* ftsw = new FTSW();
         ftsw->setVersion(version);
-        ftsw->setID(i);
+        ftsw->setID(id++);
         ftsw->setChannel(atoi(el_v[i]->getAttribute("channel").c_str()));
         ftsw->setProductID(atoi(el_v[i]->getAttribute("product_id").c_str()));
         ftsw->setLocation(el_v[i]->getAttribute("location"));
         ftsw->setFirmware(el_v[i]->getAttribute("firmware"));
+        int mode = FTSW::TRIG_NORMAL;
+        std::string mode_s = B2DAQ::toupper(el_v[i]->getAttribute("trigger_mode"));
+        if (mode_s == "IN") mode = FTSW::TRIG_IN;
+        else if (mode_s == "TLU") mode = FTSW::TRIG_TLU;
+        else if (mode_s == "PULSE") mode = FTSW::TRIG_PULSE;
+        else if (mode_s == "REVO") mode = FTSW::TRIG_REVO;
+        else if (mode_s == "RANDOM") mode = FTSW::TRIG_RANDOM;
+        else if (mode_s == "POSSION") mode = FTSW::TRIG_POSSION;
+        else if (mode_s == "ONCE") mode = FTSW::TRIG_ONCE;
+        else if (mode_s == "STOP") mode = FTSW::TRIG_STOP;
+        ftsw->setTriggerMode(mode);
         _system.addFTSW(ftsw);
         _ftsw_m.insert(std::map<int, FTSW*>::value_type(ftsw->getProductID(), ftsw));
       }

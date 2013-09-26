@@ -74,8 +74,8 @@ public class SystemButtonPanel extends JPanel implements Updatable {
 								RunControlMessage.FLAG_OPERATORS, _system.getOperators()));
 						com.sendMessage(new RunControlMessage(RCCommand.SET, 
 								RunControlMessage.FLAG_RUN_TYPE, _system.getRunType()));
-						com.sendMessage(new RunControlMessage(RCCommand.SET, 
-								RunControlMessage.FLAG_EXP_NO, _system.getVersion()));
+						//com.sendMessage(new RunControlMessage(RCCommand.SET, 
+						//		RunControlMessage.FLAG_EXP_NO, _system.getVersion()));
 					}
 					com.sendMessage(new RunControlMessage(RCCommand.SET, 
 							RunControlMessage.FLAG_RUN_VERSION, _system.getVersion()));

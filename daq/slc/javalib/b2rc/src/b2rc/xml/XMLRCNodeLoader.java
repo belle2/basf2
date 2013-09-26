@@ -166,18 +166,29 @@ public class XMLRCNodeLoader {
 			Element el_ftswset = parse(path);
 			int version = 0;
 			NodeList el_v = el_ftswset.getChildNodes();
+			int id = 0;
 			for (int i = 0; i < el_v.getLength(); i++) {
 				if ( el_v.item(i) instanceof Element) {
 					Element elc = (Element) el_v.item(i);
 					if (elc.getTagName() == "ftsw") {
 						FTSW ftsw = new FTSW();
 						ftsw.setVersion(version);
-						ftsw.setId(i);
+						ftsw.setId(id++);
 						ftsw.setChannel(parseInt(elc.getAttribute("channel")));
-						ftsw.setProductID(parseInt(elc
-								.getAttribute("product_id")));
+						ftsw.setProductID(parseInt(elc.getAttribute("product_id")));
 						ftsw.setLocation(elc.getAttribute("location"));
 						ftsw.setFirmware(elc.getAttribute("firmware"));
+						int mode = FTSW.TRIG_NORMAL;
+						String mode_s = elc.getAttribute("trigger_mode").toUpperCase();
+						if ( mode_s == "IN" ) mode = FTSW.TRIG_IN;
+						else if ( mode_s == "TLU" ) mode = FTSW.TRIG_TLU;
+						else if ( mode_s == "PULSE" ) mode = FTSW.TRIG_PULSE;
+						else if ( mode_s == "REVO" ) mode = FTSW.TRIG_REVO;
+						else if ( mode_s == "RANDOM" ) mode = FTSW.TRIG_RANDOM;
+						else if ( mode_s == "POSSION" ) mode = FTSW.TRIG_POSSION;
+						else if ( mode_s == "ONCE" ) mode = FTSW.TRIG_ONCE;
+						else if ( mode_s == "STOP" ) mode = FTSW.TRIG_STOP;
+						ftsw.setTriggerMode(mode);
 						_system.addFTSW(ftsw);
 						_ftsw_m.put(ftsw.getProductID(), ftsw);
 					}

@@ -16,4 +16,5 @@
   <host type="copper" name="cpr013" product_id="200013" location="room1:rack1:crate1:slot1" />
   <host type="copper" name="cpr014" product_id="200014" location="room1:rack1:crate1:slot1" />
   <host type="copper" name="cpr015" product_id="200015" location="room1:rack1:crate1:slot1" />
+  <host type="vmic" name="ttd3" product_id="300015" location="room1:rack1:crate1:slot1" />
 </hosts>

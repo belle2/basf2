@@ -43,6 +43,7 @@ int main(int argc, char** argv)
 
   std::stringstream ss;
   ss << "drop table host_conf;";
+  std::cout << ss.str() << std::endl;
   try {
     db.execute(ss.str());
   } catch (const std::exception&) {}
@@ -53,26 +54,31 @@ int main(int argc, char** argv)
   } catch (const std::exception&) {}
   ss.str("");
   ss << "drop table ttd_node_conf;";
+  std::cout << ss.str() << std::endl;
   try {
     db.execute(ss.str()); ss.str("");
   } catch (const std::exception&) {}
   ss.str("");
   ss << "drop table ftsw_conf;";
+  std::cout << ss.str() << std::endl;
   try {
     db.execute(ss.str()); ss.str("");
   } catch (const std::exception&) {}
   ss.str("");
   ss << "drop table reciever_node_conf;";
+  std::cout << ss.str() << std::endl;
   try {
     db.execute(ss.str()); ss.str("");
   } catch (const std::exception&) {}
   ss.str("");
   ss << "drop table hslb_conf;";
+  std::cout << ss.str() << std::endl;
   try {
     db.execute(ss.str()); ss.str("");
   } catch (const std::exception&) {}
   for (std::map<std::string, std::vector<FEEModule*> >::iterator it = module_v_m.begin();
        it != module_v_m.end(); it++) {
+    std::cout << ss.str() << std::endl;
     ss << "drop table " << it->first << "_conf;";
     try {
       db.execute(ss.str()); ss.str("");
@@ -81,9 +87,11 @@ int main(int argc, char** argv)
   }
   ss << "drop table version_control;";
   try {
+    std::cout << ss.str() << std::endl;
     db.execute(ss.str()); ss.str("");
   } catch (const std::exception&) {}
   ss.str("");
   db.close();
+  std::cout << "done" << std::endl;
   return 0;
 }

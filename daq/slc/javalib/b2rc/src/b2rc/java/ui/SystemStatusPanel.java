@@ -106,6 +106,8 @@ public class SystemStatusPanel extends JPanel implements Updatable {
 
 	public void update() {
 		_daq_state_label.update(_system.getRunControlNode());
+		setStartTime(_system.getStartTime());
+		setEndTime(_system.getEndTime());
 	}
 
 	private void setGrid(GridBagConstraints gbc, int gridwidth, int gridheight,
@@ -135,13 +137,21 @@ public class SystemStatusPanel extends JPanel implements Updatable {
 		_text_run_no.setText(""+no);
 	}
 	public void setStartTime(int time) {
-		_text_start_time.setText(new Time(time).toDateString());
+		if ( time <= 0 ) {
+			_text_start_time.setText("<html><span style='color:black;font-weight:bold;'>No data taking</span></html>");
+		} else {
+			_text_start_time.setText(new Time(time).toDateString());
+		}
 	}
 	public void setEndTime(int time) {
-		if ( !_system.getRunControlNode().getState().equals(RCState.RUNNING_S)) {
-			_text_end_time.setText(new Time(time).toDateString());
+		if ( time <= 0 ) {
+			_text_end_time.setText("<html><span style='color:black;font-weight:bold;'>No data taking</span></html>");
 		} else {
-			_text_end_time.setText("<html><span style='color:blue;font-weight:bold;'>Now taking data</span></html>");
+			if ( !_system.getRunControlNode().getState().equals(RCState.RUNNING_S)) {
+				_text_end_time.setText(new Time(time).toDateString());
+			} else {
+				_text_end_time.setText("<html><span style='color:blue;font-weight:bold;'>Data taking is on going</span></html>");
+			}
 		}
 	}
 }

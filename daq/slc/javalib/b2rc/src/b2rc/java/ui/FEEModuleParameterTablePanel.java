@@ -47,12 +47,18 @@ public class FEEModuleParameterTablePanel extends ParameterTablePanel {
 				if ( row <  0 || col < 0) return;
 				DefaultTableModel model2 = (DefaultTableModel) getModel();
 				try {
-					int value = (Integer)model2.getValueAt(row, col);
-					int id = (Integer)model2.getValueAt(row, 0);
-					if ( id <  0 ) return;
-					FEEModule module = _module_v.get(id);
-					FEEModule.Register reg = module.getRegister(_slot_m.get(col));
-					reg.setValue(_ch_m.get(col), value);
+					switch (col) {
+					case 0: break;
+					case 1: break;
+					case 2: break;
+					default:
+						int value = (Integer)model2.getValueAt(row, col);
+						int id = (Integer)model2.getValueAt(row, 0);
+						if ( id <  0 ) return;
+						FEEModule module = _module_v.get(id);
+						FEEModule.Register reg = module.getRegister(_slot_m.get(col));
+						reg.setValue(_ch_m.get(col), value);
+					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}

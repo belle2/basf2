@@ -36,6 +36,7 @@ void TTDData::read(NSMNode* node) throw(NSMHandlerException)
       ftsw->setFirmware((const char*)(data->firmware + i * 64));
       std::cout << "TTDData::write firmware = " << ftsw->getFirmware() << std::endl;
       ftsw->setUsed((bool)data->used[i]);
+      ftsw->setTriggerMode(data->trigger_mode[i]);
     }
   }
 }
@@ -51,6 +52,7 @@ void TTDData::write(NSMNode* node) throw(NSMHandlerException)
       data->channel[i] = ftsw->getChannel();
       strncpy((char*)(data->firmware + i * 64), ftsw->getFirmware().c_str(), 64);
       data->used[i] = (byte8)ftsw->isUsed();
+      data->trigger_mode[i] = ftsw->getTriggerMode();
     }
   }
 }

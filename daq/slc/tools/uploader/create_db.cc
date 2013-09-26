@@ -43,6 +43,7 @@ int main(int argc, char** argv)
   config.createTables();
   config.writeTables();
 
+  std::cout << "done" << std::endl;
   db.close();
   return 0;
 }

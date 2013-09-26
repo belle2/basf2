@@ -5,7 +5,7 @@ CP      = cp -f
 
 B2SLC_LIB  = $(B2SLC_PATH)
 NSM2_PATH  = $(B2SLC_PATH)/nsm2
-FTSW_PATH  = $(B2SLC_PATH)/ttdd/ftsw
+FTSW_PATH  = $(B2SLC_PATH)/ttdcontrold/ftsw
 
 BINDIR  = ./bin
 SRCDIR  = ./src
@@ -19,7 +19,7 @@ LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCUTIL
 LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCNODE
 LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCRC
 LIBS    += -L$(B2SLC_LIB)/lib -lB2SLCNSM
-LIBS    += -L$(FTSW_PATH) -lFTSW
+LIBS    += $(FTSW_PATH)/ftswlib.o
 LIBS    += $(NSM2_PATH)/corelib/nsmlib2.o \
            $(NSM2_PATH)/corelib/nsmhash.o \
            $(NSM2_PATH)/corelib/nsmparse.o \

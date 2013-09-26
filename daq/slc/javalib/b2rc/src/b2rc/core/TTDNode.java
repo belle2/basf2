@@ -40,7 +40,7 @@ public class TTDNode extends RCNode {
 		StringBuffer buf = new StringBuffer();
 		buf.append(super.getSQLFields());
 		for (int i = 0; i < _ftsw_v.length; i++) {
-			buf.append(", ftsw_" + i + " smallint");
+			buf.append(", ftsw_id_" + i + " smallint");
 		}
 		return buf.toString();
 	}
@@ -50,7 +50,7 @@ public class TTDNode extends RCNode {
 		StringBuffer buf = new StringBuffer();
 		buf.append(super.getSQLLabels());
 		for (int i = 0; i < _ftsw_v.length; i++) {
-			buf.append(", ftsw_" + i);
+			buf.append(", ftsw_id_" + i);
 		}
 		return buf.toString();
 	}

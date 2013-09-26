@@ -40,7 +40,7 @@ public class DataRecieverNode extends RCNode {
 		buf.append(super.getSQLFields());
 		buf.append(", script text");
 		for (int i = 0; i < _sender_v.length; i++) {
-			buf.append(", sender_" + i + " smallint");
+			buf.append(", sender_id_" + i + " smallint");
 		}
 		return buf.toString();
 	}
@@ -51,7 +51,7 @@ public class DataRecieverNode extends RCNode {
 		buf.append(super.getSQLLabels());
 		buf.append(", script");
 		for (int i = 0; i < _sender_v.length; i++) {
-			buf.append(", sender_" + i);
+			buf.append(", sender_id_" + i);
 		}
 		return buf.toString();
 	}
@@ -60,7 +60,7 @@ public class DataRecieverNode extends RCNode {
 	public String getSQLValues() {
 		StringBuffer buf = new StringBuffer();
 		buf.append(super.getSQLValues());
-		buf.append(", "+_script);
+		buf.append(", '"+_script+"'");
 		for (int i = 0; i < _sender_v.length; i++) {
 			if (_sender_v[i] != null) {
 				buf.append(", " + _sender_v[i].getId());

@@ -3,8 +3,11 @@ package b2rc.java.ui;
 import java.util.Vector;
 
 import javax.swing.JTable;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
+import b2rc.core.COPPERNode;
 import b2rc.core.RCNodeSystem;
 import b2rc.core.TTDNode;
 import b2rc.db.RCDBManager;
@@ -21,6 +24,30 @@ public class TTDParameterTablePanel extends ParameterTablePanel {
 			model.addColumn("FTSW "+i);
 		}
 		_table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		_table.getModel().addTableModelListener(new TableModelListener() {
+			public void tableChanged(TableModelEvent e) {
+				int row = e.getFirstRow();
+				int col = e.getColumn();
+				if ( row <  0 || col < 0) return;
+				DefaultTableModel model2 = (DefaultTableModel) getModel();
+				try {
+					int id = (Integer)model2.getValueAt(row, 0);
+					if ( id <  0 ) return;
+					TTDNode ttd = _system.getTTDNodes().get(id);
+					switch (col) {
+					case 1:
+						ttd.setUsed((Boolean)model2.getValueAt(row, col));
+						break;
+					case 2:
+						ttd.setName(model2.getValueAt(row, col).toString());
+						break;
+					default:
+					}
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 		update();
 	}
 

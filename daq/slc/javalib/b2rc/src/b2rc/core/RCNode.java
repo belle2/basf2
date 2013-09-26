@@ -89,7 +89,6 @@ public class RCNode extends SCObject {
 
 	@Override
 	public String getSQLValues() {
-		System.out.println(getName()+";"+_host.getName()+";"+_host.getId());
 		return super.getSQLValues() + ", '" + _name + "', " + ((_used)?"true":"false") + ", " + _host.getId();
 	}
 

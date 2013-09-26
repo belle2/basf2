@@ -81,7 +81,7 @@ public class Belle2RunController extends JavaEntoryPoint {
 	
 	static public void main(String[] argv) {
 		Belle2RunController gui = new Belle2RunController();
-		String host = (argv.length > 0)? argv[0]:"localhost";//"130.87.227.252";
+		String host = (argv.length > 0)? argv[0]:"b2slow2.kek.jp";
 		int port = (argv.length > 1)? Integer.parseInt(argv[1]):50000;
 		gui.init(host, port, "");
 		gui.run();

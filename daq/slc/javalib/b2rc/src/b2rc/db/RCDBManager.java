@@ -70,10 +70,9 @@ public class RCDBManager {
 
 	public synchronized ResultSet executeQuery(String sql) {
 		try {
-			//System.out.println(sql);
 			return _statement.executeQuery(sql);
 		} catch (SQLException e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -82,6 +81,7 @@ public class RCDBManager {
 		try {
 			return _statement.execute(sql);
 		} catch (SQLException e) {
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -147,6 +147,8 @@ public class RCDBManager {
 			ftsw.setUsed(results.getBoolean("used"));
 			ftsw.setProductID(results.getInt("product_id"));
 			ftsw.setLocation(results.getString("location"));
+			int mode = results.getInt("trigger_mode");
+			ftsw.setTriggerMode(mode);
 			ftsw.clearModules();
 			for (int slot = 0; slot < 10; slot++) {
 				String module_type = results.getString("module_type_" + slot);
@@ -246,7 +248,7 @@ public class RCDBManager {
 	}
 
 	public synchronized void readDataReceiverNodeTable(int version) throws SQLException {
-		ResultSet results = executeQuery("select * from receiver_node_conf where version = " + version + ";");
+		ResultSet results = executeQuery("select * from reciever_node_conf where version = " + version + ";");
 		if ( results == null ) return;
 		ArrayList<DataRecieverNode> node_v = _system.getReceiverNodes();
 		ArrayList<COPPERNode> copper_v = _system.getCOPPERNodes();

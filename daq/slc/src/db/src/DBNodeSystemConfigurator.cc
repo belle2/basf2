@@ -37,7 +37,7 @@ DBRecord DBNodeSystemConfigurator::readTables(int version) throw(DBHandlerExcept
        it != _system->getModuleLists().end(); it++) {
     std::string label = it->first;
     if (label.size() > 0) {
-      std::cout << "'" << label << "' " << record.getFieldValueInt(label + "_ver") << std::endl;
+      //std::cout << "'" << label << "' " << record.getFieldValueInt(label + "_ver") << std::endl;
       readFEEModuleTable(label, it->second, record.getFieldValueInt(label + "_ver"));
     }
   };
@@ -130,7 +130,7 @@ throw(DBHandlerException)
 DBRecord DBNodeSystemConfigurator::readVersionControlTable(int version) throw(DBHandlerException)
 {
   _db->execute(B2DAQ::form("select * from version_control where version = %d;", version));
-  B2DAQ::debug("select * from version_control where version = %d;", version);
+  //B2DAQ::debug("select * from version_control where version = %d;", version);
   std::vector<DBRecord>& record_v(_db->loadRecords());
   if (record_v.size() == 0) {
     throw (DBHandlerException(__FILE__, __LINE__,
@@ -245,6 +245,8 @@ void DBNodeSystemConfigurator::readFTSWTable(int version) throw(DBHandlerExcepti
     ftsw->setProductID(record_v[i].getFieldValueInt("product_id"));
     ftsw->setLocation(record_v[i].getFieldValue("location"));
     ftsw->clearModules();
+    int mode = record_v[i].getFieldValueInt("trigger_mode");
+    ftsw->setTriggerMode(mode);
     for (size_t slot = 0; slot < 20; slot++) {
       std::string module_type = record_v[i].getFieldValue(B2DAQ::form("module_type_%d", slot));
       int module_id = record_v[i].getFieldValueInt(B2DAQ::form("module_id_%d", slot));
@@ -273,7 +275,7 @@ void DBNodeSystemConfigurator::readDataReceiverNodeTable(int version) throw(DBHa
       int copper_id = record_v[i].getFieldValueInt(B2DAQ::form("sender_id_%d", slot));
       if (copper_id >= 0 && copper_id < (int)copper_v.size()) {
         COPPERNode* copper = copper_v[copper_id];
-        std::cout << "DEBUG:" << __FILE__ << ":" << __LINE__ << ":" << copper->getSender()->getHost() << std::endl;
+        //std::cout << "DEBUG:" << __FILE__ << ":" << __LINE__ << ":" << copper->getSender()->getHost() << std::endl;
         node->addSender(copper->getSender());
       }
     }
@@ -382,7 +384,6 @@ void DBNodeSystemConfigurator::writeDataReceiverNodeTable(int version) throw(DBH
     ss << "insert into reciever_node_conf ("
        << reciever_v[i]->getSQLLabels() << ") values ("
        << reciever_v[i]->getSQLValues() << "); ";
-    std::cout << ss.str() << std::endl;
     _db->execute(ss.str()); ss.str("");
   }
 }

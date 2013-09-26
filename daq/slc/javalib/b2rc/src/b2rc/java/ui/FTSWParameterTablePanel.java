@@ -22,7 +22,9 @@ public class FTSWParameterTablePanel extends ParameterTablePanel {
 		// model.addColumn("ProductID");
 		// model.addColumn("Location");
 		model.addColumn("Host TTD");
+		model.addColumn("Channel");
 		model.addColumn("Firmware");
+		model.addColumn("Trigger mode");
 		model.addColumn("FEEModule type");
 		model.addColumn("FEEModule ID");
 		_table.getModel().addTableModelListener(new TableModelListener() {
@@ -40,7 +42,29 @@ public class FTSWParameterTablePanel extends ParameterTablePanel {
 						ftsw.setUsed((Boolean)model2.getValueAt(row, col));
 						break;
 					case 3:
+						try {
+							ftsw.setChannel(Integer.parseInt(model2.getValueAt(row, col).toString()));
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+						break;
+					case 4:
 						ftsw.setFirmware(model2.getValueAt(row, col).toString());
+						break;
+					case 5: {
+						String mode_s = model2.getValueAt(row, col).toString();
+						int mode = FTSW.TRIG_NORMAL;
+						if ( mode_s == "IN" ) mode = FTSW.TRIG_IN;
+						else if ( mode_s == "TLU" ) mode = FTSW.TRIG_TLU;
+						else if ( mode_s == "PULSE" ) mode = FTSW.TRIG_PULSE;
+						else if ( mode_s == "REVO" ) mode = FTSW.TRIG_REVO;
+						else if ( mode_s == "RANDOM" ) mode = FTSW.TRIG_RANDOM;
+						else if ( mode_s == "POSSION" ) mode = FTSW.TRIG_POSSION;
+						else if ( mode_s == "ONCE" ) mode = FTSW.TRIG_ONCE;
+						else if ( mode_s == "STOP" ) mode = FTSW.TRIG_STOP;
+						ftsw.setTriggerMode(mode);
+						break;
+					}
 					}
 				} catch (Exception e1) {
 				}
@@ -73,11 +97,23 @@ public class FTSWParameterTablePanel extends ParameterTablePanel {
 					break;
 			}
 			if (host_ttd != null) {
-				param_v.add(host_ttd.getName() + ":" + ftsw.getChannel());
+				param_v.add(host_ttd.getName());
 			} else {
 				param_v.add("");
 			}
+			param_v.add(""+ftsw.getChannel());
 			param_v.add(ftsw.getFirmware());
+			switch (ftsw.getTriggerMode()) {
+			case FTSW.TRIG_IN: param_v.add("NORMAL");break;
+			case FTSW.TRIG_TLU:param_v.add("TLU");break;
+			case FTSW.TRIG_PULSE:param_v.add("PULSE");break;
+			case FTSW.TRIG_REVO:param_v.add("REVO");break;
+			case FTSW.TRIG_RANDOM:param_v.add("RANDOM");break;
+			case FTSW.TRIG_POSSION:param_v.add("POSSION");break;
+			case FTSW.TRIG_ONCE:param_v.add("ONCE");break;
+			case FTSW.TRIG_STOP:param_v.add("STOP");break;
+			default : param_v.add("NORMAL");break;
+			}
 			model.addRow(param_v);
 		}
 		if ( _ttd_panel != null ) _ttd_panel.update();

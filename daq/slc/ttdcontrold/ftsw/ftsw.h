@@ -228,6 +228,9 @@
 
 \* ---------------------------------------------------------------------- */
 
+#ifndef _FTSW_H_
+#define _FTSW_H_
+
 /* register map */
 #define FTSWREG(a)  (a<<2)
 
@@ -377,4 +380,6 @@ int trigger_ftsw_single(ftsw_t* ftsw);
 int stop_ftsw_trigger(ftsw_t* ftsw);
 #ifdef __cplusplus
 }
+#endif
+
 #endif

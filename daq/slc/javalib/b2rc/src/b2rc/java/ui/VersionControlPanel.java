@@ -284,7 +284,6 @@ public class VersionControlPanel extends JPanel implements Updatable {
 			}
 		}
 		ss.append(");");
-		System.out.println(ss.toString());
 		try {
 			RCDBManager.get().execute(ss.toString());
 			_version_old = _version_max;
@@ -333,7 +332,6 @@ public class VersionControlPanel extends JPanel implements Updatable {
 				for ( ParameterTablePanel table : _table_v ) {
 					_enabled_v.put(table.getLabel(), false);
 					int version = result.getInt(table.getLabel()+"_ver");
-					System.out.println(table.getLabel()+":"+version);
 					JComboBox combo = _combo_v.get(table.getLabel());
 					for ( int i = 0; i < combo.getItemCount(); i++ ) {
 						if ( combo.getItemAt(i).toString().matches(""+version) ) {

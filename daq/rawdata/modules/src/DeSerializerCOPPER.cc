@@ -334,9 +334,9 @@ void DeSerializerCOPPERModule::event()
 
     // Use shared memory to start(for HSLB dummy data)
     if (m_shmflag != 0) {
-      int* cfg_buf = ShmGet(m_shmfd_cfg, 4);
+      //      int* cfg_buf = ShmGet(m_shmfd_cfg, 4);
       while (1) {
-        if (cfg_buf[0] == 1)break;
+        if (m_cfg_buf[0] == 1)break;
         usleep(10000);
       }
     }

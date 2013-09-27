@@ -36,11 +36,11 @@ using namespace Belle2;
 REG_MODULE(StandardTrackingPerformance)
 
 StandardTrackingPerformanceModule::StandardTrackingPerformanceModule() :
-  Module(), m_outputFile(NULL), m_dataTree(NULL), m_cosinePolarAngleMC(-999), m_cosinePolarAngleTrack(
-    -999), m_momentumMC(-999), m_momentumTrack(-999), m_momentumDif(-9990), m_bMassMC(
-      -999), m_bMass(-999), m_ptotB_MC(-999), m_ptotB(-999), m_generatedChargedStableMcParticles(-999),
-  m_fittedChargedStabletracks(-999)
+  Module(), m_outputFile(NULL), m_dataTree(NULL), m_nGeneratedChargedStableMcParticles(-999),
+  m_nFittedChargedStabletracks(-999)
 {
+
+  setDescription("Module to test the tracking efficiency. Writes information about the tracks and MCParticles in a ROOT file.");
   addParam("outputFileName", m_outputFileName, "Name of output root file.",
            std::string("StandardTrackingPerformanceOutput.root"));
   addParam("gfTrackColName", m_gfTrackColName, "Name of GFTrack collection.",
@@ -89,22 +89,23 @@ void StandardTrackingPerformanceModule::event()
   StoreArray< GFTrack > gfTracks(m_gfTrackColName);
   StoreArray<MCParticle> mcParticles;
 
+  m_nGeneratedChargedStableMcParticles = 0;
+  m_nFittedChargedStabletracks = 0;
 
 
-  BOOST_FOREACH(MCParticle mcParticle, mcParticles) {
+  BOOST_FOREACH(MCParticle & mcParticle, mcParticles) {
     // check status of mcParticle
     if (isPrimaryMcParticle(mcParticle) && isChargedStable(mcParticle) && mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
-      m_cosinePolarAngleTrack = -999; // set everything to default values
-      m_cosinePolarAngleMC = -999;
-      m_momentumMC = -999;
-      m_momentumTrack = -999;
-      m_momentumDif = -999;
+      setVariablesToDefaultValue();
 
       int pdgCode = mcParticle.getPDG();
       B2DEBUG(99, "Primary MCParticle has PDG code " << pdgCode);
 
-      m_cosinePolarAngleMC = mcParticle.getMomentum().CosTheta();
-      m_momentumMC = mcParticle.getMomentum().Mag();
+      m_nGeneratedChargedStableMcParticles++;
+
+      m_trackProperties.cosTheta_gen = mcParticle.getMomentum().CosTheta();
+      m_trackProperties.ptot_gen = mcParticle.getMomentum().Mag();
+      m_trackProperties.pt_gen = mcParticle.getMomentum().Pt();
 
       GFTrack* gfTrack = findRelatedTrack(mcParticle, gfTracks);
 
@@ -113,16 +114,13 @@ void StandardTrackingPerformanceModule::event()
         // find related TrackFitResult, if none is found, something went wrong during fit or extrapolation
         const TrackFitResult* fitResult = findRelatedTrackFitResult(gfTrack);
         if (fitResult != NULL) { // valid TrackFitResult found
+          m_nFittedChargedStabletracks++;
           // write some data to the root tree
-          m_cosinePolarAngleTrack = fitResult->getMomentum().CosTheta();
-          m_cosinePolarAngleTrack = mcParticle.getMomentum().CosTheta();
-          m_momentumTrack = fitResult->getMomentum().Mag();
-
-          m_momentumDif = m_momentumTrack - m_momentumMC;
-
+          m_trackProperties.cosTheta = fitResult->getMomentum().CosTheta();
+          m_trackProperties.ptot = fitResult->getMomentum().Mag();
+          m_trackProperties.pt = fitResult->getMomentum().Pt();
         }
       }
-
 
       m_dataTree->Fill(); // write data to tree
     }
@@ -160,8 +158,9 @@ double StandardTrackingPerformanceModule::calculateModulus(double xx,
 GFTrack* StandardTrackingPerformanceModule::findRelatedTrack(
   MCParticle& mcParticle, StoreArray<GFTrack>& gfTracks)
 {
+  B2DEBUG(99, "Entered findRelatedTrack function.");
   int iMcParticle = mcParticle.getArrayIndex();
-
+  B2DEBUG(99, "MCParticle array index: " << iMcParticle);
   GFTrack* resultGfTrack = NULL;
 
   for (GFTrack & gfTrack : gfTracks) {
@@ -210,17 +209,18 @@ void StandardTrackingPerformanceModule::setupTree()
     B2FATAL("Data tree was not created.");
   }
 
-  m_dataTree->Branch("cosTheta_MC", &m_cosinePolarAngleMC, "cosTheta_MC/D");
-  m_dataTree->Branch("cosTheta_Track", &m_cosinePolarAngleTrack,
-                     "cosTheta_Track/D");
-  m_dataTree->Branch("ptot_MC", &m_momentumMC, "ptot_MC/D");
-  m_dataTree->Branch("ptot_Track", &m_momentumTrack, "ptot_Track/D");
-  m_dataTree->Branch("ptot_Dif", &m_momentumDif, "ptot_Dif/D");
-  m_dataTree->Branch("Bmass_MC", &m_bMassMC, "Bmass_MC/D");
-  m_dataTree->Branch("Bptot_MC", &m_ptotB_MC, "Bptot_MC/D");
-  m_dataTree->Branch("Bptot", &m_ptotB, "Bptot/D");
-  m_dataTree->Branch("nGenChargedFS", &m_generatedChargedStableMcParticles, "nGenChargedFS/D");
-  m_dataTree->Branch("nFitChargedFS", &m_fittedChargedStabletracks, "nFitChargedFS/D");
+  m_dataTree->Branch("cosTheta_gen", &m_trackProperties.cosTheta_gen, "cosTheta_gen/D");
+  m_dataTree->Branch("cosTheta", &m_trackProperties.cosTheta,
+                     "cosTheta/D");
+  m_dataTree->Branch("ptot_gen", &m_trackProperties.ptot_gen, "ptot_gen/D");
+  m_dataTree->Branch("ptot", &m_trackProperties.ptot, "ptot/D");
+
+  m_dataTree->Branch("pt_gen", &m_trackProperties.pt_gen, "pt_gen/D");
+  m_dataTree->Branch("pt", &m_trackProperties.pt, "pt/D");
+
+  m_dataTree->Branch("nGenChargedFS", &m_nGeneratedChargedStableMcParticles, "nGenChargedFS/D");
+  m_dataTree->Branch("nFitChargedFS", &m_nFittedChargedStabletracks, "nFitChargedFS/D");
+
 }
 
 const TrackFitResult* StandardTrackingPerformanceModule::findRelatedTrackFitResult(
@@ -253,7 +253,6 @@ const TrackFitResult* StandardTrackingPerformanceModule::findRelatedTrackFitResu
   }
 
   return NULL;
-
 }
 
 void StandardTrackingPerformanceModule::writeData()
@@ -342,4 +341,17 @@ void StandardTrackingPerformanceModule::addChargedStable(
   }
 
   return;
+}
+
+void StandardTrackingPerformanceModule::setVariablesToDefaultValue()
+{
+  m_trackProperties.cosTheta = -999;
+  m_trackProperties.mass = -999;
+  m_trackProperties.pt = -999;
+  m_trackProperties.ptot = -999;
+
+  m_trackProperties.cosTheta_gen = -999;
+  m_trackProperties.mass_gen = -999;
+  m_trackProperties.pt_gen = -999;
+  m_trackProperties.ptot_gen = -999;
 }

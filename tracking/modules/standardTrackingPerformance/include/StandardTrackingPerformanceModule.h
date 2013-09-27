@@ -11,6 +11,7 @@
 #define STANDARDTRACKINGPERFORMANCEMODULE_H_
 
 #include <framework/core/Module.h>
+#include <tracking/modules/standardTrackingPerformance/ParticleProperties.h>
 
 // forward declarations
 class TTree;
@@ -59,6 +60,8 @@ namespace Belle2 {
     bool isPrimaryMcParticle(MCParticle& mcParticle);
     bool isChargedStable(MCParticle& mcParticle);
 
+    void setVariablesToDefaultValue();
+
     /** find all interesting charged final state particles
      * if no decay chain is specified, take all charged stable ones.
      */
@@ -97,18 +100,12 @@ namespace Belle2 {
 
     std::vector< Particle > m_chargedStableParticles;
 
-    double m_cosinePolarAngleMC;
-    double m_cosinePolarAngleTrack;
 
-    double m_momentumMC;
-    double m_momentumTrack;
-    double m_momentumDif;
-    double m_bMassMC;
-    double m_bMass;
-    double m_ptotB_MC;
-    double m_ptotB;
-    double m_generatedChargedStableMcParticles;
-    double m_fittedChargedStabletracks;
+    ParticleProperties m_mcParticleProperties;
+    ParticleProperties m_trackProperties;
+
+    double m_nGeneratedChargedStableMcParticles;
+    double m_nFittedChargedStabletracks;
 
   };
 

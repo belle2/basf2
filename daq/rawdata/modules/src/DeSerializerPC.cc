@@ -44,12 +44,6 @@ DeSerializerPCModule::DeSerializerPCModule() : DeSerializerModule()
   addParam("PortFrom", m_port_from, "port numbers of data sources");
   B2INFO("DeSerializerPC: Constructor done.");
 
-  printf("PC  shmflag %d #################\n", m_shmflag);
-  if (m_shmflag != 0) {
-    ShmOpen("/ropc_config", "/ropc_status");
-    m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
-    m_cfg_sta = ShmGet(m_shmfd_sta, 4);
-  }
 }
 
 
@@ -106,6 +100,12 @@ void DeSerializerPCModule::initialize()
 
   //   m_shmname = "/tmp/temp.daq";
   //   int shm_open(const char *m_shmname, int oflag, mode_t mode);
+  printf("PC  shmflag %d #################\n", m_shmflag);
+  if (m_shmflag != 0) {
+    ShmOpen("/ropc_config", "/ropc_status");
+    m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
+    m_cfg_sta = ShmGet(m_shmfd_sta, 4);
+  }
 
 }
 

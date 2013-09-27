@@ -45,14 +45,6 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
   B2INFO("DeSerializerCOPPER: Constructor done.");
 
   printf("shmflag %d #################3\n", m_shmflag);
-  if (m_shmflag != 0) {
-    ShmOpen("/cpr_config", "/cpr_status");
-    m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
-    m_cfg_sta = ShmGet(m_shmfd_sta, 4);
-    printf("Waiting for Start %d %d %p %p\n", m_shmfd_cfg, m_shmfd_sta, m_cfg_sta, m_cfg_buf);
-
-
-  }
 }
 
 
@@ -130,6 +122,14 @@ void DeSerializerCOPPERModule::initialize()
   if (dump_fname.size() > 0) {
     OpenOutputFile();
   }
+
+  if (m_shmflag != 0) {
+    ShmOpen("/cpr_config", "/cpr_status");
+    m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
+    m_cfg_sta = ShmGet(m_shmfd_sta, 4);
+    printf("Waiting for Start %d %d %p %p\n", m_shmfd_cfg, m_shmfd_sta, m_cfg_sta, m_cfg_buf);
+  }
+
 
   B2INFO("Rx initialized.");
   memset(time_array0, 0, sizeof(time_array0));

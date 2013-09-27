@@ -44,9 +44,6 @@ tracking_efficiency = register_module('StandardTrackingPerformance')
 tracking_efficiency.param('outputFileName', output_file_name)
 path.add_module(tracking_efficiency)
 
-data_store = register_module('PrintCollections')
-path.add_module(data_store)
-
 process(path)
 
 print statistics

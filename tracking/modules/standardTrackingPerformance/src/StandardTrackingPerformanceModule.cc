@@ -149,12 +149,6 @@ bool StandardTrackingPerformanceModule::isChargedStable(MCParticle& mcParticle)
          != Const::invalidParticle;
 }
 
-double StandardTrackingPerformanceModule::calculateModulus(double xx,
-                                                           double yy, double zz)
-{
-  return sqrt(xx * xx + yy * yy + zz * zz);
-}
-
 GFTrack* StandardTrackingPerformanceModule::findRelatedTrack(
   MCParticle& mcParticle, StoreArray<GFTrack>& gfTracks)
 {

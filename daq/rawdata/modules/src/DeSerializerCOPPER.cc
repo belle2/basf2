@@ -335,6 +335,9 @@ void DeSerializerCOPPERModule::event()
     // Use shared memory to start(for HSLB dummy data)
     if (m_shmflag != 0) {
       //      int* cfg_buf = ShmGet(m_shmfd_cfg, 4);
+      printf("Waiting for Start %p\n", m_cfg_buf);
+      fflush(stdout);
+
       while (1) {
         if (m_cfg_buf[0] == 1)break;
         usleep(10000);

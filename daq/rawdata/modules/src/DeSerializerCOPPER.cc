@@ -44,6 +44,7 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
   //Parameter definition
   B2INFO("DeSerializerCOPPER: Constructor done.");
 
+  printf("shmflag %d #################3\n", m_shmflag);
   if (m_shmflag != 0) {
     ShmOpen("/cpr_config", "/cpr_status");
     m_cfg_buf = ShmGet(m_shmfd_cfg, 4);

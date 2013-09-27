@@ -44,6 +44,7 @@ DeSerializerPCModule::DeSerializerPCModule() : DeSerializerModule()
   addParam("PortFrom", m_port_from, "port numbers of data sources");
   B2INFO("DeSerializerPC: Constructor done.");
 
+  printf("PC  shmflag %d #################\n", m_shmflag);
   if (m_shmflag != 0) {
     ShmOpen("/ropc_config", "/ropc_status");
     m_cfg_buf = ShmGet(m_shmfd_cfg, 4);

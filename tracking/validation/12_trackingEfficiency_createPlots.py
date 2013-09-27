@@ -12,7 +12,8 @@
 #################################################################
 
 from __future__ import division
-from ROOT import TFile, TTree, TH1F, TCanvas, TGraphErrors, TGraph, gStyle
+from ROOT import TFile, TTree, TH1F, TCanvas, TGraphErrors, TGraph, gStyle, \
+    TNamed
 import sys
 import math
 import numpy as np
@@ -56,7 +57,6 @@ def main():
     # create efficiency in bins of pt plot
     calculate_efficiency_in_pt(data_tree)
 
-    # pt_values = [0.05, 0.1, 0.15, 0.25, 0.5, 1.0, 2.0, 3.0]
     pt_values = [
         0.05,
         0.1,
@@ -64,6 +64,7 @@ def main():
         0.25,
         0.5,
         1.0,
+        2.0,
         3.0,
         ]
 
@@ -99,6 +100,12 @@ def calculate_efficiency_in_pt(data_tree):
     efficiency_hist = TH1F('hEfficiency', 'hEfficiency', number_bins,
                            pt_lower, pt_upper)
 
+    description = \
+        'Events with 10 muon tracks with fixed transverse momentum are generated using the ParticleGun (500 events for each pt value). The events are reconstructed with VXDTF+Trasan+MCTrackCandCombiner. This plot shows the single track reconstruction efficiency over the transverse momentum.'
+    check = 'The efficiency should be stable for higher pt values.'
+    efficiency_hist.GetListOfFunctions().Add(TNamed('Description',
+            description))
+    efficiency_hist.GetListOfFunctions().Add(TNamed('Check', check))
     # loop over bins and calculate efficiency and error of efficiency
     for ibin in range(1, number_bins + 1):
         number_generated = hist_pt_gen.GetBinContent(ibin)
@@ -143,9 +150,17 @@ def generate_cos_theta_plot(data_tree, pt_value):
                    'pt_gen>(%.2f - %f) &&pt_gen<(%.2f + %f) && pt != -999'
                    % (pt_value, DELTA_PT, pt_value, DELTA_PT), 'goff')
 
+    description = \
+        'Events with 10 muon tracks with fixed transverse momentum are generated using the ParticleGun (500 events for each pt value). The events are reconstructed with VXDTF+Trasan+MCTrackCandCombiner. The plot shows the single track reconstruction efficiency in bins of the polar angle for the fixed transverse momentum pt = %.2f GeV.' \
+        % pt_value
+    check = 'Stable efficiency over the hole range of the polar angle.'
+
     efficiency_hist = TH1F('hEfficiencyPt%.2fGeV' % pt_value,
                            'hEfficiencyPt%.2fGeV' % pt_value, number_bins,
                            cos_lower, cos_upper)
+    efficiency_hist.GetListOfFunctions().Add(TNamed('Description',
+            description))
+    efficiency_hist.GetListOfFunctions().Add(TNamed('Check', check))
     for ibin in range(1, number_bins + 1):
         efficiency = 0
         error = 0
@@ -187,6 +202,12 @@ def calculate_momentum_resolution(data_tree, pt_value_condition):
     hist_residuum.SetXTitle('(pt_{rec} - pt_{gen}) in GeV')
     hist_residuum.SetYTitle('number of entries/(%.3f GeV)' % (0.6 / 120))
 
+    description = \
+        'Events with 10 muon tracks with fixed transverse momentum are generated using the ParticleGun (500 events for each pt value). The events are reconstructed with VXDTF+Trasan+MCTrackCandCombiner. The plot shows the difference of the generated transverse momentum pt_{gen} = %.2f GeV and the reconstructed transverse momentum pt_{rec} for all successfully fitted tracks.' \
+        % pt_value_condition
+    check = 'Residuals should be distributed around 0 GeV.'
+    hist_residuum.GetListOfFiles().Add(TNamed('Description', description))
+    hist_residuum.GetListOfFiles().Add(TNamed('Check', check))
     # loop over all entries in data_tree
     for ientry in range(number_entries):
         data_tree.GetEntry(ientry)  # load entry
@@ -215,8 +236,6 @@ def calculate_momentum_resolution(data_tree, pt_value_condition):
     sigma_pt = hist_residuum.GetRMS(1)
     sigma_pt_error = hist_residuum.GetRMSError(1)
 
-    print sigma_pt
-    print sigma_pt_error
     return (pt_value_condition, sigma_pt, sigma_pt_error)
 
 
@@ -252,6 +271,14 @@ def create_momentum_resolution_plot(data_tree, pt_condition_values):
     hist_resolution.SetTitle('Momentum resolution')
     hist_resolution.SetXTitle('pt in GeV')
     hist_resolution.SetYTitle('#sigma_{pt}/pt')
+
+    description = \
+        'Events with 10 muon tracks with fixed transverse momentum are generated using the ParticleGun (500 events for each pt value). The events are reconstructed with VXDTF+Trasan+MCTrackCandCombiner. The plot shows the relative momentum resolution of the transverse momentum over transverse momentum.'
+    check = ''
+    hist_resolution.GetListOfFunctions().Add(TNamed('Description',
+            description))
+    hist_resolution.GetListOfFunctions().Add(TNamed('Check', check))
+
     hist_resolution.Write()
 
 

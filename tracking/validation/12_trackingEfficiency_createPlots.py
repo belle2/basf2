@@ -194,13 +194,18 @@ def calculate_momentum_resolution(data_tree, pt_value_condition):
     pt_values_gen = []
     residuums = []
 
+    nbins = 200
+    pt_lower = -0.1
+    pt_upper = 0.1
+
     hist_residuum = TH1F('hResiduumPt%.2f' % pt_value_condition,
-                         'hResiduumPt%.2f' % pt_value_condition, 120, -0.3,
-                         0.3)
+                         'hResiduumPt%.2f' % pt_value_condition, nbins,
+                         pt_lower, pt_upper)
     hist_residuum.SetTitle('Momentum residuals for pt = %.2f'
                            % pt_value_condition)
     hist_residuum.SetXTitle('(pt_{rec} - pt_{gen}) in GeV')
-    hist_residuum.SetYTitle('number of entries/(%.3f GeV)' % (0.6 / 120))
+    hist_residuum.SetYTitle('number of entries/(%.3f GeV)' % ((pt_upper
+                            - pt_lower) / nbins))
 
     description = \
         'Events with 10 muon tracks with fixed transverse momentum are generated using the ParticleGun (500 events for each pt value). The events are reconstructed with VXDTF+Trasan+MCTrackCandCombiner. The plot shows the difference of the generated transverse momentum pt_{gen} = %.2f GeV and the reconstructed transverse momentum pt_{rec} for all successfully fitted tracks.' \

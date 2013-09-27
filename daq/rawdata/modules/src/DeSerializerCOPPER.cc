@@ -48,6 +48,9 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
     ShmOpen("/cpr_config", "/cpr_status");
     m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
     m_cfg_sta = ShmGet(m_shmfd_sta, 4);
+    printf("Waiting for Start %d %d %p %p\n", m_shmfd_cfg, m_shmfd_sta, m_cfg_sta, m_cfg_buf);
+
+
   }
 }
 

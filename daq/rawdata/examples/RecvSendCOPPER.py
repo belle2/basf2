@@ -60,8 +60,8 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(reader)
-# main.add_module (histo)
-# main.add_module ( monitor );
+main.add_module(histo)
+main.add_module(monitor)
 main.add_module(sender)
 
 # Process all events

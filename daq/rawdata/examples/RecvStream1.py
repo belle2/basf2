@@ -44,6 +44,17 @@ receiver.param('MaxEventNum', 400000)
 receiver.param('UseShmFlag', 0)
 # receiver.param('DumpFileName', 'cpr006_dump.dat')
 
+# Histo Module
+# histo = register_module('HistoManager')
+# main.add_module (histo)
+histo = register_module('DqmHistoManager')
+histo.param('HostName', 'ropc01')
+histo.param('Port', 9991)
+histo.param('DumpInterval', 10)
+
+# Monitor module
+monitor = register_module('MonitorDataCOPPER')
+
 # Dump
 dump.param('outputFileName', 'root_output.root')
 dump.param('compressionLevel', 0)
@@ -58,7 +69,9 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(receiver)
-# main.add_module(dump)
+main.add_module(histo)
+main.add_module(monitor)
+main.add_module(dump)
 # main.add_module(output)
 # main.add_module(perf)
 

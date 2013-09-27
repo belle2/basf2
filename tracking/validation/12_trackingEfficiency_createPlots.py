@@ -26,7 +26,7 @@ def main():
 
     print 'Tracking validation plots.'
 
-    # gStyle.SetOptStat(0)
+    gStyle.SetOptStat(0)
 
     # load data file
     input_file_name = '../trackingEfficiency_FinalData.root'

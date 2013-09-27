@@ -83,15 +83,14 @@ void StandardTrackingPerformanceModule::event()
   unsigned long runNumber = eventMetaData->getRun();
   unsigned long expNumber = eventMetaData->getExperiment();
 
-  B2INFO(
-    "Processes experiment " << expNumber << " run " << runNumber << " event " << eventNumber);
+  B2DEBUG(99,
+          "Processes experiment " << expNumber << " run " << runNumber << " event " << eventNumber);
 
   StoreArray< GFTrack > gfTracks(m_gfTrackColName);
   StoreArray<MCParticle> mcParticles;
 
   m_nGeneratedChargedStableMcParticles = 0;
   m_nFittedChargedStabletracks = 0;
-
 
   BOOST_FOREACH(MCParticle & mcParticle, mcParticles) {
     // check status of mcParticle

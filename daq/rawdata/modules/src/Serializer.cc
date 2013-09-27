@@ -141,7 +141,8 @@ void SerializerModule::FillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, 
   rawhdr.SetBuffer(rawcpr->GetRawHdrBufPtr(0));
   int total_send_nwords =
     hdr->GetHdrNwords() +
-    rawhdr.GetNwords() +
+    rawcpr->TotalBufNwords() +
+    //    rawhdr.GetNwords() +
     trl->GetTrlNwords();
 
   hdr->SetNwords(total_send_nwords);
@@ -246,7 +247,8 @@ void SerializerModule::Accept()
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
     printf("port %d : ", m_port_to);
-    perror("Failed to bind");
+    perror("Failed to bind. Maybe other programs have already occupied this port. Exting...");
+    sleep(1234567);
     exit(1);
   }
 

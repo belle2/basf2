@@ -32,6 +32,9 @@ DeSerializerModule::DeSerializerModule() : Module()
   addParam("MaxEventNum", max_nevt, "Maximum event number in one run", -1);
   addParam("MaxTime", max_seconds, "Time(s) to stop, DAQ", -1.);
   addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);
+  addParam("UseShmFlag", m_shmflag, "Use shared memory to communicate with Runcontroller", 0);
+
+
 
   n_basf2evt = -1;
   m_totbytes = 0;
@@ -74,6 +77,51 @@ void DeSerializerModule::initialize()
   m_buffer = new int[ BUF_SIZE_WORD ];
 
 }
+
+
+void DeSerializerModule::ShmOpen(char* path_cfg, char* path_sta)
+{
+  errno = 0;
+  /*m_shmfd_cfg = shm_open( "/cpr_config2", O_CREAT | O_EXCL | O_RDWR, 0666);
+  if (m_shmfd_cfg < 0) {
+    if (errno != EEXIST) {
+      perror("shm_open1");
+      exit(1);
+    }
+  */
+  m_shmfd_cfg = shm_open(path_cfg, O_RDWR, 0666);
+  if (m_shmfd_cfg < 0) {
+    printf("%s\n", path_cfg);
+    perror("shm_open2");
+    exit(1);
+  }
+  //}
+  /*
+  m_shmfd_sta = shm_open( "/cpr_status2", O_CREAT | O_EXCL | O_RDWR, 0666);
+  if (m_shmfd_sta < 0) {
+    if (errno != EEXIST) {
+      perror("shm_open1");
+      exit(1);
+    }
+    */
+  m_shmfd_sta = shm_open(path_sta , O_RDWR, 0666);
+  if (m_shmfd_sta < 0) {
+    printf("%s\n", path_sta);
+    perror("shm_open2");
+    exit(1);
+  }
+  //}
+  int size = 4 * sizeof(int);
+  ftruncate(m_shmfd_cfg, size);
+  ftruncate(m_shmfd_sta, size);
+}
+
+int* DeSerializerModule::ShmGet(int fd, int size_words)
+{
+  int offset = 0;
+  return (int*)mmap(NULL, size_words * sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED, fd, offset);
+}
+
 
 void DeSerializerModule::event()
 {

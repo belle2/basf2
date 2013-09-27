@@ -29,27 +29,39 @@ if len(argvs) != 4:
 set_log_level(LogLevel.ERROR)
 set_log_level(LogLevel.INFO)
 
-# Modules
+# Reader
 # reader = register_module('HSLBReaderArray')
 reader = register_module('DeSerializerCOPPER')
-sender = register_module('Serializer')
-
-# TxSocket
 reader.param('NodeID', int(argvs[2]))
 reader.param('FinnesseBitFlag', int(argvs[3]))
+reader.param('UseShmFlag', 0)
+# reader.param('DumpFileName', 'COPPERdump.dat' )
 
+# Histo Module
+# histo = register_module('HistoManager')
+# main.add_module (histo)
+histo = register_module('DqmHistoManager')
+histo.param('HostName', 'ropc01')
+histo.param('Port', 9991)
+histo.param('DumpInterval', 10)
+
+# Monitor module
+monitor = register_module('MonitorDataCOPPER')
+
+# Sender
+sender = register_module('Serializer')
 sender.param('DestPort', 33000)
 # sender.param('LocalHostName', 'cpr006')
 sender.param('LocalHostName', argvs[1])
 sender.param('ProcessMethod', 'COPPER')
-
-# reader.param('DumpFileName', 'COPPERdump.dat' )
 
 # Create main path
 main = create_path()
 
 # Add modules to main path
 main.add_module(reader)
+# main.add_module (histo)
+# main.add_module ( monitor );
 main.add_module(sender)
 
 # Process all events

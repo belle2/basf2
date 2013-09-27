@@ -42,8 +42,13 @@ DeSerializerPCModule::DeSerializerPCModule() : DeSerializerModule()
   addParam("NumConn", m_num_connections, "Number of Connections", 0);
   addParam("HostNameFrom", m_hostname_from, "Hostnames of data sources");
   addParam("PortFrom", m_port_from, "port numbers of data sources");
-
   B2INFO("DeSerializerPC: Constructor done.");
+
+  if (m_shmflag != 0) {
+    ShmOpen("/ropc_config", "/ropc_status");
+    m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
+    m_cfg_sta = ShmGet(m_shmfd_sta, 4);
+  }
 }
 
 
@@ -98,8 +103,8 @@ void DeSerializerPCModule::initialize()
 
   ClearNumUsedBuf();
 
-//   m_shmname = "/tmp/temp.daq";
-//   int shm_open(const char *m_shmname, int oflag, mode_t mode);
+  //   m_shmname = "/tmp/temp.daq";
+  //   int shm_open(const char *m_shmname, int oflag, mode_t mode);
 
 }
 
@@ -126,13 +131,6 @@ int DeSerializerPCModule::Recv(int sock, char* buf, int data_size_byte, int flag
       if (n == data_size_byte)break;
     }
   }
-
-  // Dump binary data
-  if (dump_fname.size() > 0) {
-    DumpData((char*)buf, data_size_byte);
-  }
-
-
   return n;
 
 }
@@ -204,12 +202,16 @@ int DeSerializerPCModule::Connect()
 int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int* num_events_in_sendblock, int* num_nodes_in_sendblock)
 {
 
-  int* temp_buf = NULL;
+  int* temp_buf = NULL; // buffer for data-body
   int flag = 0;
-  vector <int> each_buf_nwords;
-  *total_buf_nwords = 0;
 
+  vector <int> each_buf_nwords;
   each_buf_nwords.clear();
+
+  *total_buf_nwords = 0;
+  *num_nodes_in_sendblock = 0;
+  *num_events_in_sendblock = 0;
+
 #ifdef NOT_USE_SOCKETLIB
 
 
@@ -222,6 +224,7 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
   int temp_num_events = 0;
   int temp_num_nodes = 0;
 
+  // Read header
   for (int i = 0; i < m_socket.size(); i++) {
     int recvd_size = 0;
     Recv(m_socket[ i ], (char*)send_hdr_buf, sizeof(int)*SendHeader::SENDHDR_NWORDS, flag);
@@ -230,17 +233,20 @@ int* DeSerializerPCModule::RecvData(int* malloc_flag, int* total_buf_nwords, int
 
     temp_num_events = send_hdr.GetNumEventsinPacket();
     temp_num_nodes = send_hdr.GetNumNodesinPacket();
+
     if (i == 0) {
       *num_events_in_sendblock = temp_num_events;
-      *num_nodes_in_sendblock = temp_num_nodes;
-    } else if (*num_events_in_sendblock != temp_num_events || *num_nodes_in_sendblock != temp_num_nodes) {
+    } else if (*num_events_in_sendblock != temp_num_events) {
       printf("Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n", *num_events_in_sendblock , temp_num_events , *num_nodes_in_sendblock , temp_num_nodes);
       exit(1);
     }
+    *num_nodes_in_sendblock += temp_num_nodes;
+
     int rawcpr_nwords = send_hdr.GetTotalNwords()
                         - SendHeader::SENDHDR_NWORDS
                         - SendTrailer::SENDTRL_NWORDS;
     *total_buf_nwords += rawcpr_nwords;
+
     each_buf_nwords.push_back(rawcpr_nwords);
   }
 
@@ -346,10 +352,8 @@ void DeSerializerPCModule::event()
     printf("Recvd data : %d bytes\n", total_buf_nwords * sizeof(int));
     fflush(stdout);
 #endif
-//     // Dump binary data
-//     if (dump_fname.size() > 0) {
-//       DumpData((char*)temp_buf, total_buf_nwords * sizeof(int));
-//     }
+
+    // Dump binary data
 
 #ifdef DEBUG
     printf("********* checksum 0x%.8x : %d\n" , CalcSimpleChecksum(temp_buf, total_buf_nwords - 2), total_buf_nwords);
@@ -377,6 +381,7 @@ void DeSerializerPCModule::event()
     //    printf("Node %d numblock %d \n", temp_buf[6], m_socket.size());
     temp_rawcopper->SetBuffer((int*)temp_buf, total_buf_nwords, malloc_flag, num_events_in_sendblock, m_socket.size()*num_nodes_in_sendblock);
 
+
     // Remove SendHeader
     //    temp_rawcopper->SetBuffer((int*)temp_buf + SendHeader::SENDHDR_NWORDS, total_buf_nwords, malloc_flag);
 #else
@@ -387,6 +392,36 @@ void DeSerializerPCModule::event()
 #ifdef TIME_MONITOR
     RecordTime(n_basf2evt * NUM_EVT_PER_BASF2LOOP + j, time_array2);
 #endif
+
+//     {
+//       RawHeader rawhdr;
+//       SendHeader hdr;
+//       SendTrailer trl;
+//       rawhdr.SetBuffer( temp_buf );
+//       int total_send_nwords =
+//  hdr.GetHdrNwords() +
+//  temp_rawcopper->TotalBufNwords()*2 +
+//  trl.GetTrlNwords();
+//       int subsys_id = rawhdr.GetSubsysId();
+
+//       hdr.SetNwords(total_send_nwords);
+//       hdr.SetNumEventsinPacket(temp_rawcopper->GetNumEvents());
+//       hdr.SetNumNodesinPacket(temp_rawcopper->GetNumNodes());
+//       hdr.SetEventNumber(rawhdr.GetEveNo());
+//       hdr.SetNodeID( 0x00010000 );
+
+//       if (dump_fname.size() > 0) {
+//  if( subsys_id == 1 ){
+//  DumpData((char*)hdr.GetBuffer(), hdr.GetHdrNwords() * sizeof(int));
+//  }
+//  DumpData((char*)temp_buf, total_buf_nwords * sizeof(int));
+//  if( subsys_id == 2 ){
+//  DumpData((char*)trl.GetBuffer(), trl.GetTrlNwords() * sizeof(int));
+//  }
+//       }
+//     }
+
+
 
   }
 
@@ -399,18 +434,30 @@ void DeSerializerPCModule::event()
   m_eventMetaDataPtr->setRun(1);
   m_eventMetaDataPtr->setEvent(n_basf2evt);
 
-  n_basf2evt++;
 
-  if (n_basf2evt % 10) {
 
+  //
+  // Shsared memory
+  //
+  if (m_shmflag != 0) {
+    if (n_basf2evt % 10 == 0) {
+      if (m_cfg_buf[ 0 ] == 0) m_eventMetaDataPtr->setEndOfData();
+    }
   }
 
-  //  printf("check 5 maxevt %d  mattime %lf %d %lf\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP, GetTimeSec() - m_start_time  );
+  //
+  // Monitor
+  //
   if (max_nevt >= 0 || max_seconds >= 0.) {
     if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP >= max_nevt && max_nevt > 0)
         || (GetTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
+
+      printf("################## check 5 maxevt %d  mattime %lf %d %lf\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP, GetTimeSec() - m_start_time);
       m_eventMetaDataPtr->setEndOfData();
     }
   }
+
+  n_basf2evt++;
+
   return;
 }

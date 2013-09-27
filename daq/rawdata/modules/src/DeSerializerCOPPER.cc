@@ -43,6 +43,12 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
 
   //Parameter definition
   B2INFO("DeSerializerCOPPER: Constructor done.");
+
+  if (m_shmflag != 0) {
+    ShmOpen("/cpr_config", "/cpr_status");
+    m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
+    m_cfg_sta = ShmGet(m_shmfd_sta, 4);
+  }
 }
 
 
@@ -325,11 +331,20 @@ void DeSerializerCOPPERModule::event()
 
 
   if (n_basf2evt < 0) {
+
+    // Use shared memory to start(for HSLB dummy data)
+    if (m_shmflag != 0) {
+      int* cfg_buf = ShmGet(m_shmfd_cfg, 4);
+      while (1) {
+        if (cfg_buf[0] == 1)break;
+        usleep(10000);
+      }
+    }
+
     OpenCOPPER();
     m_start_time = GetTimeSec();
     n_basf2evt = 0;
   }
-
 
   rawcprarray.create();
   RawCOPPER* temp_rawcopper;
@@ -338,28 +353,15 @@ void DeSerializerCOPPERModule::event()
     int malloc_flag = 0;
     int* temp_buf = ReadCOPPERFIFO(j, &malloc_flag, &m_size_word);
 
-
-
     //
     // Fill RawCOPPER
     //
-
     temp_rawcopper =  rawcprarray.appendNew();
     // Store data buffer
     temp_rawcopper->SetBuffer(temp_buf, m_size_word, malloc_flag, 1, 1);
     // Fill header and trailer
-
     FillNewRawCOPPERHeader(temp_rawcopper);
 
-//     printf("\n%.8d : ", 0);
-//     for( int i = 0; i < m_size_word; i++){
-//       printf("0x%.8x ", temp_buf[ i ]);
-//       if( ( i + 1 ) % 10 == 0 ){
-//  printf("\n%.8d : ", i + 1 );
-//       }
-//     }
-//     printf("\n");
-//     printf("\n");
     if (dump_fname.size() > 0) {
       DumpData((char*)temp_buf, m_size_word * sizeof(int));
     }
@@ -374,6 +376,8 @@ void DeSerializerCOPPERModule::event()
   m_eventMetaDataPtr->setExperiment(1234);
   m_eventMetaDataPtr->setRun(105);
   m_eventMetaDataPtr->setEvent(n_basf2evt);
+
+
 
 
   //

@@ -192,8 +192,8 @@ namespace Belle2 {
 //    stopTimer = boostClock::now();
 //    boostNsec durCircleFit = boost::chrono::duration_cast<boostNsec>(stopTimer - startTimer);
 //    B2WARNING("after comparison-test, chi2 is " << chi2 << ", clapPhi,clapR,estimatedRadius is: " << clapPhi << "," << clapR << "," << estimatedRadius)
-    double estimatedHelixRadius;
-    TVector3 estimatedMomentum;
+//     double estimatedHelixRadius;
+//     TVector3 estimatedMomentum;
 //    startTimer = boostClock::now();
     pair<double, TVector3> returnValues = aFilter.helixFit();
     /*    stopTimer = boostClock::now();

@@ -382,7 +382,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Tracking
 
   TMatrixD AtGA(2, 2);
   TMatrixD AtG(2, nHits);
-  double sumWi, sumWiSi, sumWiSi2, sw;
+  double sumWi = 0, sumWiSi = 0, sumWiSi2 = 0, sw = 0;
   for (int i = 0; i < nHits; ++i) {
     sumWi += invVarVvalues(i, 0);
     sw = invVarVvalues(i, 0) * s(i, 0);

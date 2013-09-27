@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = [ 'framework', 'tracking', 'tracking_dataobjects', 'analysis_dataobjects']
+Return('env')
+

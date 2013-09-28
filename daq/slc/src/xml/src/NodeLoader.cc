@@ -253,6 +253,7 @@ void NodeLoader::loadCOPPERNodes(XMLElement* el)
       if (el_v[i]->getTag() == "hslb") {
         HSLB* hslb = new HSLB();
         hslb->setFirmware(el_v[i]->getAttribute("firmware"));
+        hslb->setUsed(el_v[i]->getAttribute("used") != "false");
         hslb->setFEEModule(_module_m[el_v[i]->getAttribute("type")]);
         copper->setHSLB((int)(el_v[i]->getAttribute("slot")[0] - 'a'), hslb);
       }

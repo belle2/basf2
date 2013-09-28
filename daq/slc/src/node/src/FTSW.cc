@@ -23,7 +23,7 @@ const std::string FTSW::getSQLFields() const throw()
   std::stringstream ss;
   ss << Module::getSQLFields()
      << ", used boolean, channel smallint, firmware text"
-     << "trigger_mode int, dummy_rate int, _trigger_limit int";
+     << ", trigger_mode int, dummy_rate int, trigger_limit int";
   return ss.str();
 }
 
@@ -31,8 +31,8 @@ const std::string FTSW::getSQLLabels() const throw()
 {
   std::stringstream ss;
   ss << Module::getSQLLabels()
-     << ", used, channel, firmware, "
-     << "trigger_mode, dummy_rate, _trigger_limit";
+     << ", used, channel, firmware"
+     << ", trigger_mode, dummy_rate, trigger_limit";
   return ss.str();
 }
 

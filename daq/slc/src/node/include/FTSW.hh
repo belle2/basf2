@@ -26,7 +26,9 @@ namespace B2DAQ {
 
   public:
     FTSW(int channel = -1)
-      : _channel(channel), _firmware(), _used(true) {}
+      : _channel(channel), _firmware(), _used(true),
+	_trigger_mode(TRIG_NORMAL), _dummy_rate(0),
+	_trigger_limit(-1) {}
     virtual ~FTSW() throw() {}
 
   public:

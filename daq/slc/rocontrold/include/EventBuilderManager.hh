@@ -1,14 +1,14 @@
 #ifndef _B2DAQ_EventBuilderManager_hh
 #define _B2DAQ_EventBuilderManager_hh
 
-#include <node/DataReceiverNode.hh>
+#include <node/RONode.hh>
 
 namespace B2DAQ {
 
   class EventBuilderManager {
     
   public:
-    EventBuilderManager(DataReceiverNode* node = NULL)
+    EventBuilderManager(RONode* node = NULL)
       : _node(node) {}
     virtual ~EventBuilderManager() {}
 
@@ -16,7 +16,7 @@ namespace B2DAQ {
     virtual void run() throw();
     
   private:
-    DataReceiverNode* _node;
+    RONode* _node;
 
   };
 

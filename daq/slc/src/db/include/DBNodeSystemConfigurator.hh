@@ -29,7 +29,7 @@ namespace B2DAQ {
 				      std::vector<FEEModule*>& module_v) throw(DBHandlerException);
     virtual void createTTDNodeTable() throw(DBHandlerException);
     virtual void createFTSWTable() throw(DBHandlerException);
-    virtual void createDataReceiverNodeTable() throw(DBHandlerException);
+    virtual void createRONodeTable() throw(DBHandlerException);
     virtual DBRecord readVersionControlTable(int version) throw(DBHandlerException);
     virtual void readHostTable(int version) throw(DBHandlerException);
     virtual void readCOPPERNodeTable(int version) throw(DBHandlerException);
@@ -39,7 +39,7 @@ namespace B2DAQ {
 				    int version) throw(DBHandlerException);
     virtual void readTTDNodeTable(int version) throw(DBHandlerException);
     virtual void readFTSWTable(int version) throw(DBHandlerException);
-    virtual void readDataReceiverNodeTable(int version) throw(DBHandlerException);
+    virtual void readRONodeTable(int version) throw(DBHandlerException);
     virtual void writeVersionControlTable() throw(DBHandlerException);
     virtual void writeHostTable(int version) throw(DBHandlerException);
     virtual void writeCOPPERNodeTable(int version) throw(DBHandlerException);
@@ -49,7 +49,7 @@ namespace B2DAQ {
 				     int version) throw(DBHandlerException);
     virtual void writeTTDNodeTable(int version) throw(DBHandlerException);
     virtual void writeFTSWTable(int version) throw(DBHandlerException);
-    virtual void writeDataReceiverNodeTable(int version) throw(DBHandlerException);
+    virtual void writeRONodeTable(int version) throw(DBHandlerException);
 
   protected:
     DBInterface* _db;

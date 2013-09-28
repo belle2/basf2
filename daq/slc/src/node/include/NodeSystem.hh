@@ -3,7 +3,7 @@
 
 #include "NSMNode.hh"
 #include "NodeGroup.hh"
-#include "DataReceiverNode.hh"
+#include "RONode.hh"
 #include "TTDNode.hh"
 #include "COPPERNode.hh"
 #include "HSLB.hh"
@@ -48,7 +48,7 @@ namespace B2DAQ {
     std::vector<Host*>& getHosts() { return _host_v; }
     std::vector<NSMNode*>& getNodes() { return _node_v; }
     std::vector<NodeGroup*>& getNodeGroups() { return _group_v; }
-    std::vector<DataReceiverNode*>& getReceiverNodes() { return _recv_v; }
+    std::vector<RONode*>& getRONodes() { return _ro_v; }
     std::vector<TTDNode*>& getTTDNodes() { return _ttd_v; }
     std::vector<FTSW*>& getFTSWs() { return _ftsw_v; }
     std::vector<COPPERNode*>& getCOPPERNodes() { return _copper_v; }
@@ -63,7 +63,7 @@ namespace B2DAQ {
     void addHost(Host* host) { _host_v.push_back(host); }
     void addNode(NSMNode* node) { _node_v.push_back(node); }
     void addNodeGroup(NodeGroup* group);
-    void addReceiverNode(DataReceiverNode* node) { _recv_v.push_back(node); }
+    void addRONode(RONode* node) { _ro_v.push_back(node); }
     void addCOPPERNode(COPPERNode* node) { _copper_v.push_back(node); }
     void addTTDNode(TTDNode* node) { _ttd_v.push_back(node); }
     void addFTSW(FTSW* ftsw) { _ftsw_v.push_back(ftsw); }
@@ -88,7 +88,7 @@ namespace B2DAQ {
     std::vector<NodeGroup*> _group_v;
     std::vector<TTDNode*> _ttd_v;
     std::vector<FTSW*> _ftsw_v;
-    std::vector<DataReceiverNode*> _recv_v;
+    std::vector<RONode*> _ro_v;
     std::vector<COPPERNode*> _copper_v;
     std::vector<HSLB*> _hslb_v;
     std::vector<FEEModule*> _module_v;

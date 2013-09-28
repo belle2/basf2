@@ -77,7 +77,7 @@ int main(int argc, char** argv)
     db.execute(ss.str()); ss.str("");
   } catch (const std::exception&) {}
   ss.str("");
-  ss << "drop table reciever_node_conf;";
+  ss << "drop table ro_node_conf;";
   std::cout << ss.str() << std::endl;
   try {
     db.execute(ss.str()); ss.str("");

@@ -1,11 +1,9 @@
-#include "DataReceiverCallback.hh"
+#include "ROCallback.hh"
 
-#include <nsm/DataReceiverData.hh>
+#include <nsm/ROData.hh>
 #include <nsm/NSMNodeDaemon.hh>
 
-#include <runcontrol/RCState.hh>
-
-#include <node/DataReceiverNode.hh>
+#include <node/RONode.hh>
 
 #include <util/Debugger.hh>
 #include <util/StringUtil.hh>
@@ -21,11 +19,11 @@ int main(int argc, char** argv)
   const char* name = argv[1];
   //const char* path = argv[2];
 
-  DataReceiverNode* node = new DataReceiverNode(name);
-  DataReceiverData* data = new DataReceiverData(B2DAQ::form("%s_DATA", name));
-  DataReceiverCallback* callback = new DataReceiverCallback(node, data);
+  RONode* node = new RONode(name);
+  ROData* data = new ROData(B2DAQ::form("%s_DATA", name));
+  ROCallback* callback = new ROCallback(node, data);
   NSMNodeDaemon* daemon = new NSMNodeDaemon(node, callback, data);
-  node->setState(RCState::INITIAL_S);
+  node->setState(State::INITIAL_S);
   daemon->run();
 
   return 0;

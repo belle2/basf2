@@ -3,6 +3,7 @@
 #include "DataSender.hh"
 #include "HSLB.hh"
 #include "Host.hh"
+#include "FEEModule.hh"
 
 #include <util/StringUtil.hh>
 
@@ -56,3 +57,46 @@ const std::string COPPERNode::getSQLValues() const throw()
   return ss.str();
 }
 
+int COPPERNode::getParams(const Command& command, int* pars,
+                          std::string& datap)
+{
+  int npar = 0;
+  std::stringstream ss; ss.str("");
+  if (command == Command::BOOT) {
+    pars[npar++] = 0;
+    ss << _sender->getHost() << " ";
+    for (size_t i = 0; i < MAX_HSLBS; i++) {
+      if (_hslb_v[i] != NULL) {
+        pars[1] |= _hslb_v[i]->isUsed();
+        ss << _hslb_v[i]->getFirmware() << " ";
+        FEEModule* module = _hslb_v[i]->getFEEModule();
+        if (module != NULL) {
+          FEEModule::RegisterList& reg_v(module->getRegisters());
+          for (size_t i = 0; i < reg_v.size(); i++) {
+            FEEModule::Register& reg(reg_v[i]);
+            pars[npar++] = reg.getSize();
+            pars[npar++] = reg.getAddress();
+            pars[npar++] = reg.length();
+          }
+        }
+      }
+    }
+  } else if (command == Command::LOAD) {
+    for (size_t i = 0; i < 4; i++) {
+      if (_hslb_v[i] != NULL) {
+        FEEModule* module = _hslb_v[i]->getFEEModule();
+        if (module != NULL) {
+          FEEModule::RegisterList& reg_v(module->getRegisters());
+          for (size_t i = 0; i < reg_v.size(); i++) {
+            FEEModule::Register& reg(reg_v[i]);
+            for (size_t ch = 0; ch < reg.length(); ch++) {
+              pars[npar++] = reg.getValue(ch);
+            }
+          }
+        }
+      }
+    }
+  }
+  datap = ss.str();
+  return npar;
+}

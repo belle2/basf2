@@ -25,11 +25,9 @@ RunControlMessage LocalNSMCommunicator::waitMessage() throw(IOException)
   RunControlMessage msg(RunControlMessage::LOCALNSM);
   if (_nsm_comm->wait(5000)) {
     msg.setMessage(_nsm_comm->getMessage());
-    msg.setCommand(RCCommand(msg.getMessage().getRequestName()));
-    //std::cerr << __FILE__ << ":" << __LINE__ << " node="
-    //        << _nsm_comm->getMessage().getNodeId() << std::endl;
+    msg.setCommand(msg.getMessage().getRequestName());
   } else {
-    msg.setCommand(RCCommand::STATECHECK);
+    msg.setCommand(Command::STATECHECK);
   }
   return msg;
 }

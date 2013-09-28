@@ -30,7 +30,7 @@ void NodeLoader::load(const std::string& entry)
     module_v[i]->setID(_system.getModules(type).size());
     _system.getModules(type).push_back(module_v[i]);
   }
-  std::vector<DataReceiverNode*>& recv_v(_system.getReceiverNodes());
+  std::vector<RONode*>& recv_v(_system.getRONodes());
   for (size_t i = 0; i < recv_v.size(); i++) {
     recv_v[i]->clearSenders();
     std::vector<std::string> copper_name_v = B2DAQ::split(_copper_name_v[i], ',');
@@ -118,7 +118,7 @@ void NodeLoader::loadNodes(XMLElement* el)
   NSMNode* node = NULL;
   const std::string name = el->getAttribute("name");
   const std::string tag = el->getTag();
-  if (tag == "copper") {
+  if (tag == "copper_node") {
     COPPERNode* copper = new COPPERNode();
     node = copper;
     copper->setID(_system.getCOPPERNodes().size());
@@ -157,7 +157,7 @@ void NodeLoader::loadNodes(XMLElement* el)
     const int event_size = (el->hasAttribute("event_size")) ? atoi(el->getAttribute("event_size").c_str()) : -1;
     copper->getSender()->setEventSize(event_size);
     copper->getSender()->setID(copper->getID());
-  } else if (tag == "ttd") {
+  } else if (tag == "ttd_node") {
     TTDNode* ttd = new TTDNode();
     node = ttd;
     ttd->setID(_system.getTTDNodes().size());
@@ -175,12 +175,12 @@ void NodeLoader::loadNodes(XMLElement* el)
         ttd->addFTSW(_ftsw_m[channel]);
       }
     }
-  } else if (tag == "receiver") {
-    DataReceiverNode* recv = new DataReceiverNode();
+  } else if (tag == "ro_node") {
+    RONode* recv = new RONode();
     node = recv;
-    recv->setID(_system.getReceiverNodes().size());
+    recv->setID(_system.getRONodes().size());
     recv->setScript(el->getAttribute("script"));
-    _system.addReceiverNode(recv);
+    _system.addRONode(recv);
     std::string hostname = el->getAttribute("host");
     _copper_name_v.push_back(el->getAttribute("senders"));
     if (_host_m.find(hostname) != _host_m.end()) {

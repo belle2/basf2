@@ -37,8 +37,6 @@ namespace B2DAQ {
 		     const std::string& message) throw(NSMHandlerException) {
       sendRequest(node, cmd, 0, NULL, message.size(), message.c_str());
     }
-    void sendOK(NSMNode* node, const std::string& message = "") throw(NSMHandlerException);
-    void sendError(NSMNode* node, const std::string& message = "") throw(NSMHandlerException);
     void replyOK(NSMNode* node, const std::string& message = "") throw(NSMHandlerException);
     void replyError(const std::string& message = "") throw(NSMHandlerException);
     bool wait(int sec) throw(NSMHandlerException);

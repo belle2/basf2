@@ -112,6 +112,7 @@ void mgt_close(Mgt_t* mgt) {
       munmap((void*)mgt->xmemp, 0x1000000);
     }
     close(mgt->fd);
+    free(mgt);
   }
 }
 

@@ -45,3 +45,32 @@ const std::string TTDNode::getSQLValues() const throw()
   }
   return ss.str();
 }
+
+int TTDNode::getParams(const Command& command, int* pars,
+                       std::string& datap)
+{
+  int npar = 0;
+  std::stringstream ss; ss.str("");
+  if (command == Command::BOOT) {
+    pars[npar++] = _ftsw_i;
+    pars[npar++] = 0;
+    for (size_t i = 0; i < _ftsw_i; i++) {
+      if (_ftsw_v[i] != NULL) {
+        pars[1] |= _ftsw_v[i]->isUsed();
+        pars[npar++] =  _ftsw_v[i]->getChannel();
+        ss << _ftsw_v[i]->getFirmware() << " ";
+      }
+    }
+  } else if (command == Command::LOAD) {
+    for (size_t i = 0; i < _ftsw_i; i++) {
+      if (_ftsw_v[i] != NULL) {
+        pars[npar++] = _ftsw_v[i]->getTriggerMode();
+        pars[npar++] = _ftsw_v[i]->getDummyRate();
+        pars[npar++] = _ftsw_v[i]->getTriggerLimit();
+      }
+    }
+  }
+  datap = ss.str();
+  return npar;
+}
+

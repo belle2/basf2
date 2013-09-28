@@ -1,8 +1,7 @@
 #include "GUICommunicator.hh"
 #include "MessageBox.hh"
 
-#include <runcontrol/RCState.hh>
-
+#include <node/State.hh>
 #include <node/Connection.hh>
 
 #include <util/Debugger.hh>
@@ -44,63 +43,6 @@ bool GUICommunicator::init() throw(IOException)
   _writer.writeString(_db->getPassword());
   _writer.writeInt(_db->getPort());
 
-  RunControlMessage msg(RunControlMessage::GUI);
-  msg.setCommand(RCCommand::SET);
-  NSMMessage nsm;
-
-  nsm.setNParams(1);
-  nsm.setParam(0, RunControlMessage::FLAG_RUN_TYPE);
-  nsm.setData(_data->getRunConfig()->getRunType());
-  msg.setMessage(nsm);
-  sendMessage(msg);
-  usleep(50000);
-
-  nsm.setParam(0, RunControlMessage::FLAG_OPERATORS);
-  nsm.setData(_data->getRunConfig()->getOperators());
-  msg.setMessage(nsm);
-  sendMessage(msg);
-  usleep(50000);
-
-  nsm.setNParams(2);
-  nsm.setParam(0, RunControlMessage::FLAG_RUN_VERSION);
-  nsm.setParam(1, _data->getRunConfig()->getVersion());
-  nsm.setData("");
-  msg.setMessage(nsm);
-  sendMessage(msg);
-  usleep(50000);
-
-  nsm.setParam(0, RunControlMessage::FLAG_RUN_NO);
-  nsm.setParam(1, _data->getRunStatus()->getRunNumber());
-  msg.setMessage(nsm);
-  sendMessage(msg);
-  usleep(50000);
-
-  nsm.setParam(0, RunControlMessage::FLAG_EXP_NO);
-  nsm.setParam(1, _data->getRunStatus()->getExpNumber());
-  msg.setMessage(nsm);
-  sendMessage(msg);
-  usleep(50000);
-
-  nsm.setParam(0, RunControlMessage::FLAG_START_TIME);
-  nsm.setParam(1, _data->getRunStatus()->getStartTime());
-  msg.setMessage(nsm);
-  sendMessage(msg);
-  usleep(50000);
-
-  nsm.setParam(0, RunControlMessage::FLAG_END_TIME);
-  nsm.setParam(1, _data->getRunStatus()->getEndTime());
-  msg.setMessage(nsm);
-  sendMessage(msg);
-  usleep(50000);
-
-  msg.setCommand(RCCommand::STATE);
-  nsm.setNParams(3);
-  nsm.setParam(0, -1);
-  nsm.setParam(1, _system->getRunControlNode()->getConnection().getId());
-  nsm.setParam(2, _system->getRunControlNode()->getState().getId());
-  msg.setMessage(nsm);
-  sendMessage(msg);
-  usleep(50000);
   _is_ready = true;
 
   return true;
@@ -116,7 +58,7 @@ bool GUICommunicator::reset() throw()
 RunControlMessage GUICommunicator::waitMessage() throw(IOException)
 {
   RunControlMessage msg(RunControlMessage::GUI);
-  msg.setCommand(RCCommand(_reader.readString().c_str()));
+  msg.setCommand(_reader.readString().c_str());
   NSMMessage nsm;
   nsm.setNParams(_reader.readInt());
   for (size_t i = 0; i < nsm.getNParams(); i++) {

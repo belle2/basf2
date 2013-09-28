@@ -36,10 +36,10 @@ bool HSLBController::boot() throw()
 bool HSLBController::reset() throw()
 {
   if (_mgt != NULL) {
-    int result = mgt_execute(_mgt, CTL_RESET_LINK);
+    mgt_execute(_mgt, CTL_RESET_LINK);
     mgt_close(_mgt);
-    if (result) return boot();
-    return false;
+    _mgt = NULL;
+    return true;
   } else {
     return true;
   }

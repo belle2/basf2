@@ -1,6 +1,7 @@
 #ifndef _B2DAQ_NSMNode_hh
 #define _B2DAQ_NSMNode_hh
 
+#include "Command.hh"
 #include "Node.hh"
 #include "State.hh"
 #include "Connection.hh"
@@ -47,6 +48,8 @@ namespace B2DAQ {
     virtual const std::string getSQLValues() const throw();
     virtual int revision() const throw() { return 1; }
     virtual const std::string format() const throw() { return ""; }
+    virtual int getParams(const Command& cmd, int* pars, 
+			  std::string& datap) { return 0; }
 
   private:
     std::string _type;

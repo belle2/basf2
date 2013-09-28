@@ -16,7 +16,7 @@ void DBNodeSystemConfigurator::createTables() throw(DBHandlerException)
   createHSLBTable();
   createTTDNodeTable();
   createFTSWTable();
-  createDataReceiverNodeTable();
+  createRONodeTable();
   for (std::map<std::string, std::vector<FEEModule*> >::iterator it = _system->getModuleLists().begin();
        it != _system->getModuleLists().end(); it++) {
     createFEEModuleTable(it->first, it->second);
@@ -32,7 +32,7 @@ DBRecord DBNodeSystemConfigurator::readTables(int version) throw(DBHandlerExcept
   readHostTable(record.getFieldValueInt("host_ver"));
   readCOPPERNodeTable(record.getFieldValueInt("copper_node_ver"));
   readHSLBTable(record.getFieldValueInt("hslb_ver"));
-  readDataReceiverNodeTable(record.getFieldValueInt("reciever_node_ver"));
+  readRONodeTable(record.getFieldValueInt("ro_node_ver"));
   for (std::map<std::string, std::vector<FEEModule*> >::iterator it = _system->getModuleLists().begin();
        it != _system->getModuleLists().end(); it++) {
     std::string label = it->first;
@@ -57,7 +57,7 @@ void DBNodeSystemConfigurator::writeTables() throw(DBHandlerException)
   writeHSLBTable(0);
   writeTTDNodeTable(0);
   writeFTSWTable(0);
-  writeDataReceiverNodeTable(0);
+  writeRONodeTable(0);
   for (std::map<std::string, std::vector<FEEModule*> >::iterator it = _system->getModuleLists().begin();
        it != _system->getModuleLists().end(); it++) {
     std::string label = it->first;
@@ -107,11 +107,11 @@ void DBNodeSystemConfigurator::createFTSWTable() throw(DBHandlerException)
                              _system->getFTSWs()[0]->getSQLFields().c_str()));
 }
 
-void DBNodeSystemConfigurator::createDataReceiverNodeTable() throw(DBHandlerException)
+void DBNodeSystemConfigurator::createRONodeTable() throw(DBHandlerException)
 {
-  if (_system->getReceiverNodes().size() > 0)
-    _db->execute(B2DAQ::form("create table reciever_node_conf (%s);",
-                             _system->getReceiverNodes()[0]->getSQLFields().c_str()));
+  if (_system->getRONodes().size() > 0)
+    _db->execute(B2DAQ::form("create table ro_node_conf (%s);",
+                             _system->getRONodes()[0]->getSQLFields().c_str()));
 }
 
 void DBNodeSystemConfigurator::createFEEModuleTable(const std::string& module_class,
@@ -240,34 +240,27 @@ void DBNodeSystemConfigurator::readFTSWTable(int version) throw(DBHandlerExcepti
     ftsw->setUsed(record_v[i].getFieldValueInt("used"));
     ftsw->setProductID(record_v[i].getFieldValueInt("product_id"));
     ftsw->setLocation(record_v[i].getFieldValue("location"));
-    ftsw->clearModules();
-    int mode = record_v[i].getFieldValueInt("trigger_mode");
-    ftsw->setTriggerMode(mode);
-    for (size_t slot = 0; slot < FTSW::MAX_MODULES; slot++) {
-      std::string module_type = record_v[i].getFieldValue(B2DAQ::form("module_type_%d", slot));
-      int module_id = record_v[i].getFieldValueInt(B2DAQ::form("module_id_%d", slot));
-      std::vector<FEEModule*>& module_v(_system->getModules(module_type));
-      if (module_id >= 0 && module_id < (int)module_v.size())
-        ftsw->addFEEModule(module_v[module_id]);
-    }
+    ftsw->setTriggerMode(record_v[i].getFieldValueInt("trigger_mode"));
+    ftsw->setDummyRate(record_v[i].getFieldValueInt("dummy_rate"));
+    ftsw->setTriggerLimit(record_v[i].getFieldValueInt("trigger_limit"));
   }
 }
 
-void DBNodeSystemConfigurator::readDataReceiverNodeTable(int version) throw(DBHandlerException)
+void DBNodeSystemConfigurator::readRONodeTable(int version) throw(DBHandlerException)
 {
-  _db->execute(B2DAQ::form("select * from reciever_node_conf where version = %d;", version));
+  _db->execute(B2DAQ::form("select * from ro_node_conf where version = %d;", version));
   std::vector<DBRecord>& record_v(_db->loadRecords());
-  std::vector<DataReceiverNode*>& node_v(_system->getReceiverNodes());
+  std::vector<RONode*>& node_v(_system->getRONodes());
   std::vector<COPPERNode*>& copper_v(_system->getCOPPERNodes());
   for (size_t i = 0; i < record_v.size(); i++) {
     const int id = record_v[i].getFieldValueInt("id");
     if (id < 0 || id >= (int)node_v.size()) continue;
-    DataReceiverNode* node = node_v[id];
+    RONode* node = node_v[id];
     node->setName(record_v[i].getFieldValue("name"));
     node->setUsed(record_v[i].getFieldValueInt("used"));
     node->setScript(record_v[i].getFieldValue("script"));
     node->clearSenders();
-    for (size_t slot = 0; slot < DataReceiverNode::MAX_SENDERS; slot++) {
+    for (size_t slot = 0; slot < RONode::MAX_SENDERS; slot++) {
       int copper_id = record_v[i].getFieldValueInt(B2DAQ::form("sender_id_%d", slot));
       if (copper_id >= 0 && copper_id < (int)copper_v.size()) {
         COPPERNode* copper = copper_v[copper_id];
@@ -370,15 +363,15 @@ void DBNodeSystemConfigurator::writeFTSWTable(int version) throw(DBHandlerExcept
   }
 }
 
-void DBNodeSystemConfigurator::writeDataReceiverNodeTable(int version) throw(DBHandlerException)
+void DBNodeSystemConfigurator::writeRONodeTable(int version) throw(DBHandlerException)
 {
-  std::vector<DataReceiverNode*>& reciever_v(_system->getReceiverNodes());
+  std::vector<RONode*>& ro_v(_system->getRONodes());
   std::stringstream ss;
-  for (size_t i = 0; i < reciever_v.size(); i++) {
-    reciever_v[i]->setVersion(version);
-    ss << "insert into reciever_node_conf ("
-       << reciever_v[i]->getSQLLabels() << ") values ("
-       << reciever_v[i]->getSQLValues() << "); ";
+  for (size_t i = 0; i < ro_v.size(); i++) {
+    ro_v[i]->setVersion(version);
+    ss << "insert into ro_node_conf ("
+       << ro_v[i]->getSQLLabels() << ") values ("
+       << ro_v[i]->getSQLValues() << "); ";
     _db->execute(ss.str()); ss.str("");
   }
 }

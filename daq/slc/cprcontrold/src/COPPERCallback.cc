@@ -86,24 +86,14 @@ bool COPPERCallback::boot() throw()
   std::cout << str << std::endl;
 
   for (int slot = 0; slot < 4; slot++) {
-    if (!_hslbcon_v[slot].boot()) {
+    if (!(_hslbcon_v[slot].reset() &&
+          _hslbcon_v[slot].boot())) {
       B2DAQ::debug("Failed to boot HSLB:%c", (char)(slot + 'a'));
       setReply(B2DAQ::form("Failed to boot HSLB:%c", (char)(slot + 'a')));
       return false;
     }
   }
   return true;
-}
-
-bool COPPERCallback::reboot() throw()
-{
-  for (int slot = 0; slot < 4; slot++) {
-    if (!_hslbcon_v[slot].reset()) {
-      setReply(B2DAQ::form("Failed to reboot HSLB:%c", (char)(slot + 'a')));
-      return false;
-    }
-  }
-  return boot();
 }
 
 bool COPPERCallback::load() throw()
@@ -141,11 +131,6 @@ bool COPPERCallback::load() throw()
   _listener = new ProcessListener(this, _fork);
   _thread = PThread(_listener);
   return true;
-}
-
-bool COPPERCallback::reload() throw()
-{
-  return load();
 }
 
 bool COPPERCallback::start() throw()
@@ -197,12 +182,6 @@ bool COPPERCallback::resume() throw()
 
 bool COPPERCallback::pause() throw()
 {
-  return true;
-}
-
-bool COPPERCallback::recover() throw()
-{
-  B2DAQ::debug("RECOVER");
   return true;
 }
 

@@ -57,17 +57,6 @@ bool TTDCallback::boot() throw()
   return true;
 }
 
-bool TTDCallback::reboot() throw()
-{
-  for (size_t slot = 0; slot < _ftswcon_v.size(); slot++) {
-    if (!_ftswcon_v[slot].reboot()) {
-      B2DAQ::debug("Failed to reboot FTSW:%d", slot);
-      return false;
-    }
-  }
-  return true;
-}
-
 bool TTDCallback::load() throw()
 {
   try {
@@ -81,17 +70,6 @@ bool TTDCallback::load() throw()
   for (size_t slot = 0; slot < _ftswcon_v.size(); slot++) {
     if (!_ftswcon_v[slot].load()) {
       B2DAQ::debug("Failed to load FTSW:%d", slot);
-      return false;
-    }
-  }
-  return true;
-}
-
-bool TTDCallback::reload() throw()
-{
-  for (size_t slot = 0; slot < _ftswcon_v.size(); slot++) {
-    if (!_ftswcon_v[slot].reload()) {
-      B2DAQ::debug("Failed to reload FTSW:%d", slot);
       return false;
     }
   }
@@ -136,17 +114,6 @@ bool TTDCallback::pause() throw()
   for (size_t slot = 0; slot < _ftswcon_v.size(); slot++) {
     if (!_ftswcon_v[slot].pause()) {
       B2DAQ::debug("Failed to pause FTSW:%d", slot);
-      return false;
-    }
-  }
-  return true;
-}
-
-bool TTDCallback::recover() throw()
-{
-  for (size_t slot = 0; slot < _ftswcon_v.size(); slot++) {
-    if (!_ftswcon_v[slot].recover()) {
-      B2DAQ::debug("Failed to recover FTSW:%d", slot);
       return false;
     }
   }

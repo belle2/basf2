@@ -6,8 +6,6 @@
 
 #include <nsm/NSMCommunicator.hh>
 
-#include <runcontrol/RCState.hh>
-
 using namespace B2DAQ;
 
 void ProcessListener::run()
@@ -20,10 +18,8 @@ void ProcessListener::run()
   _mutex.lock();
   if (_is_running) {
     B2DAQ::debug("Forked process was down");
-    _callback->getNode()->setState(RCState::ERROR_ES);
     try {
-      _callback->getCommunicator()->sendError(_callback->getNode(),
-                                              "Readout process was done");
+      _callback->getCommunicator()->replyError("Readout process was done");
     } catch (const IOException& e) {
       B2DAQ::debug("%s:%d : exception=%s", __FILE__, __LINE__, e.what());
     }

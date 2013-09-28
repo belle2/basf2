@@ -15,7 +15,6 @@
 
 #include <node/NSMNode.hh>
 
-#include <runcontrol/RCState.hh>
 #include <runcontrol/RCCallback.hh>
 
 #include <util/ConfigReader.hh>
@@ -68,7 +67,7 @@ int main(int argc, char** argv)
 
   NodeSystem& node_system(loader->getSystem());
   NSMNode* rc_node = new NSMNode(node_name);
-  rc_node->setState(RCState::INITIAL_S);
+  rc_node->setState(State::INITIAL_S);
   node_system.setRunControlNode(rc_node);
   NSMCommunicator* comm = new NSMCommunicator(rc_node);
   RCCallback* callback = new RCCallback(rc_node);
@@ -112,7 +111,7 @@ int main(int argc, char** argv)
       data->getRunStatus()->setRunNumber(0);
     }
   } catch (const std::exception& e) {}
-  HostCommunicator* ui_comm =  new GUICommunicator(server_socket, db, loader, data);
+  HostCommunicator* ui_comm =  new GUICommunicator(server_socket, db, loader);
   B2DAQ::PThread(new Listener(ui_comm));
 
   RunControlMessageManager* manager

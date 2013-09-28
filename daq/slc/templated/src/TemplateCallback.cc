@@ -26,23 +26,9 @@ bool TemplateCallback::boot() throw()
   return true;
 }
 
-bool TemplateCallback::reboot() throw()
-{
-  B2DAQ::debug("REBOOT");
-  sleep(3);
-  return true;
-}
-
 bool TemplateCallback::load() throw()
 {
   B2DAQ::debug("LOAD");
-  sleep(3);
-  return true;
-}
-
-bool TemplateCallback::reload() throw()
-{
-  B2DAQ::debug("RELOAD");
   sleep(3);
   return true;
 }
@@ -57,7 +43,7 @@ bool TemplateCallback::start() throw()
 bool TemplateCallback::stop() throw()
 {
   B2DAQ::debug("STOP");
-  //sleep(3);
+  sleep(3);
   return true;
 }
 
@@ -67,11 +53,6 @@ bool TemplateCallback::resume() throw()
 }
 
 bool TemplateCallback::pause() throw()
-{
-  return true;
-}
-
-bool TemplateCallback::recover() throw()
 {
   return true;
 }

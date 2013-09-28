@@ -1,7 +1,7 @@
 #include "NSMDataManager.hh"
 
 #include <nsm/TTDData.hh>
-#include <nsm/DataReceiverData.hh>
+#include <nsm/ROData.hh>
 
 #include <util/Debugger.hh>
 #include <util/StringUtil.hh>
@@ -130,9 +130,9 @@ bool NSMDataManager::allocateData(const std::string& path) throw()
     return false;
   }
   try {
-    std::vector<DataReceiverNode*>& node_v(node_system.getReceiverNodes());
+    std::vector<RONode*>& node_v(node_system.getRONodes());
     for (size_t i = 0; i < node_v.size(); i++) {
-      NSMData* data = new DataReceiverData(node_v[i]->getName() + "_DATA");
+      NSMData* data = new ROData(node_v[i]->getName() + "_DATA");
       data->allocate();
       _recv_data_v.push_back(data);
     }
@@ -168,7 +168,7 @@ bool NSMDataManager::writeData() throw()
     return false;
   }
   try {
-    std::vector<DataReceiverNode*>& node_v(node_system.getReceiverNodes());
+    std::vector<RONode*>& node_v(node_system.getRONodes());
     for (size_t i = 0; i < node_v.size(); i++) {
       if (node_v[i] != NULL)
         _recv_data_v[i]->write(node_v[i]);
@@ -202,7 +202,7 @@ bool NSMDataManager::readData() throw()
     return false;
   }
   try {
-    std::vector<DataReceiverNode*>& node_v(node_system.getReceiverNodes());
+    std::vector<RONode*>& node_v(node_system.getRONodes());
     for (size_t i = 0; i < node_v.size(); i++) {
       _recv_data_v[i]->read(node_v[i]);
     }

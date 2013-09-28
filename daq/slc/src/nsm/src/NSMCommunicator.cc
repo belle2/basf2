@@ -61,18 +61,6 @@ void NSMCommunicator::sendRequest(NSMNode* node, const Command& command,
   }
 }
 
-void NSMCommunicator::sendOK(NSMNode* node, const std::string& message)
-throw(NSMHandlerException)
-{
-  sendRequest(node, Command::OK, _node->getState().getLabel());
-}
-
-void NSMCommunicator::sendError(NSMNode* node, const std::string& message)
-throw(NSMHandlerException)
-{
-  sendRequest(node, Command::ERROR, message);
-}
-
 void NSMCommunicator::replyOK(NSMNode* node, const std::string& message)
 throw(NSMHandlerException)
 {

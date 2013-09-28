@@ -1,7 +1,7 @@
 #ifndef _B2DAQ_RunControlMessage_hh
 #define _B2DAQ_RunControlMessage_hh
 
-#include <runcontrol/RCCommand.hh>
+#include <node/Command.hh>
 
 #include <nsm/NSMMessage.hh>
 
@@ -50,14 +50,14 @@ namespace B2DAQ {
     void setCommand(const Command& command) throw() {
       _command = command;
     }
-    const RCCommand& getCommand() const throw() {
+    const Command& getCommand() const throw() {
       return _command;
     }
 
   private:
     HostID _id;
     NSMMessage _msg;
-    RCCommand _command;
+    Command _command;
 
   };
 

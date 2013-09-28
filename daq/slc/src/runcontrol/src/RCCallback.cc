@@ -1,5 +1,4 @@
 #include "RCCallback.hh"
-#include "RCState.hh"
 
 #include <nsm/NSMCommunicator.hh>
 
@@ -11,7 +10,7 @@ using namespace B2DAQ;
 
 bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
 {
-  RCCommand cmd(msg.getRequestName());
+  Command cmd(msg.getRequestName());
   if (cmd == Command::OK) {
     return ok();
   } else if (cmd == Command::ERROR) {
@@ -29,37 +28,31 @@ bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
   setReply("");
   State state_org = _node->getState();
   bool result = false;
-  if (cmd == RCCommand::BOOT) {
+  if (cmd == Command::BOOT) {
     result = boot();
-  } else if (cmd == RCCommand::REBOOT) {
-    result = reboot();
-  } else if (cmd == RCCommand::LOAD) {
+  } else if (cmd == Command::LOAD) {
     result = load();
-  } else if (cmd == RCCommand::RELOAD) {
-    result = reload();
-  } else if (cmd == RCCommand::START) {
+  } else if (cmd == Command::START) {
     result = start();
-  } else if (cmd == RCCommand::STOP) {
+  } else if (cmd == Command::STOP) {
     result = stop();
-  } else if (cmd == RCCommand::RESUME) {
+  } else if (cmd == Command::RESUME) {
     result = resume();
-  } else if (cmd == RCCommand::PAUSE) {
+  } else if (cmd == Command::PAUSE) {
     result = pause();
-  } else if (cmd == RCCommand::STATECHECK) {
-    result = stateCheck();
-  } else if (cmd == RCCommand::ABORT) {
+  } else if (cmd == Command::ABORT) {
     result = abort();
   }
   NSMCommunicator* com = getCommunicator();
   if (result) {
-    if (cmd != RCCommand::STATECHECK &&
+    if (cmd != Command::STATECHECK &&
         _node->getState() == state_org) {
       _node->setState(cmd.nextState());
     }
     com->replyOK(_node, _reply);
     return true;
   } else {
-    _node->setState(RCState::ERROR_ES);
+    _node->setState(State::ERROR_ES);
     com->replyError(_reply);
   }
   return false;
@@ -68,16 +61,12 @@ bool RCCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
 RCCallback::RCCallback(NSMNode* node) throw()
 {
   _node = node;
-  if (node != NULL) node->setState(RCState::INITIAL_S);
-  add(RCCommand::BOOT);
-  add(RCCommand::REBOOT);
-  add(RCCommand::LOAD);
-  add(RCCommand::RELOAD);
-  add(RCCommand::START);
-  add(RCCommand::STOP);
-  add(RCCommand::RESUME);
-  add(RCCommand::PAUSE);
-  add(RCCommand::STATECHECK);
-  add(RCCommand::RECOVER);
-  add(RCCommand::ABORT);
+  if (node != NULL) node->setState(State::INITIAL_S);
+  add(Command::BOOT);
+  add(Command::LOAD);
+  add(Command::START);
+  add(Command::STOP);
+  add(Command::RESUME);
+  add(Command::PAUSE);
+  add(Command::ABORT);
 }

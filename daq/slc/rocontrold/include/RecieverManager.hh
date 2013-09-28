@@ -1,14 +1,14 @@
 #ifndef _B2DAQ_RecieverManager_hh
 #define _B2DAQ_RecieverManager_hh
 
-#include <node/DataReceiverNode.hh>
+#include <node/RONode.hh>
 
 namespace B2DAQ {
 
   class RecieverManager {
     
   public:
-    RecieverManager(DataReceiverNode* node = NULL)
+    RecieverManager(RONode* node = NULL)
       : _node(node) {}
     virtual ~RecieverManager() {}
 
@@ -16,7 +16,7 @@ namespace B2DAQ {
     virtual void run() throw();
     
   private:
-    DataReceiverNode* _node;
+    RONode* _node;
 
   };
 

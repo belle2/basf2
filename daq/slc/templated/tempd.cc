@@ -2,8 +2,6 @@
 
 #include <nsm/NSMNodeDaemon.hh>
 
-#include <runcontrol/RCState.hh>
-
 #include <util/Debugger.hh>
 #include <util/StringUtil.hh>
 
@@ -21,7 +19,7 @@ int main(int argc, char** argv)
   NSMNode* node = new NSMNode(name);
   TemplateCallback* callback = new TemplateCallback(node);
   NSMNodeDaemon* daemon = new NSMNodeDaemon(node, callback);
-  node->setState(RCState::INITIAL_S);
+  node->setState(State::INITIAL_S);
   daemon->run();
 
   return 0;

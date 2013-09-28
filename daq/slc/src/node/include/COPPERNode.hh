@@ -30,6 +30,8 @@ namespace B2DAQ {
     virtual const std::string getSQLFields() const throw();
     virtual const std::string getSQLLabels() const throw();
     virtual const std::string getSQLValues() const throw();
+    virtual int getParams(const Command& command, int* pars, 
+			  std::string& datap);
     
   private:
     DataSender* _sender;

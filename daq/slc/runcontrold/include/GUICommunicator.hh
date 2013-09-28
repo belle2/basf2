@@ -19,9 +19,8 @@ namespace B2DAQ {
 
   public:
     GUICommunicator(const TCPServerSocket& server_socket, 
-		    DBInterface* db, NodeLoader* loader, NSMDataManager* data) 
-      : _server_socket(server_socket), _loader(loader), _db(db),
-	_system(&(loader->getSystem())), _data(data) {}
+		    DBInterface* db, NodeLoader* loader) 
+      : _server_socket(server_socket), _loader(loader), _db(db) {}
     virtual ~GUICommunicator() throw() {}
 
   public:
@@ -35,8 +34,6 @@ namespace B2DAQ {
     TCPServerSocket _server_socket;
     NodeLoader* _loader;
     DBInterface* _db;
-    NodeSystem* _system;
-    NSMDataManager* _data;
     TCPSocket _socket;
     TCPSocketWriter _writer;
     TCPSocketReader _reader;

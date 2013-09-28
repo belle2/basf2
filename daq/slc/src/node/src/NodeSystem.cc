@@ -40,7 +40,7 @@ void NodeSystem::setVersion(const std::string& label, int version)
          it != _host_v.end(); it++) {
       (*it)->setVersion(version);
     }
-  } else if (label == "copper") {
+  } else if (label == "copper_node") {
     for (std::vector<COPPERNode*>::iterator it = _copper_v.begin();
          it != _copper_v.end(); it++) {
       (*it)->setVersion(version);
@@ -50,7 +50,7 @@ void NodeSystem::setVersion(const std::string& label, int version)
          it != _hslb_v.end(); it++) {
       (*it)->setVersion(version);
     }
-  } else if (label == "ttd") {
+  } else if (label == "ttd_node") {
     for (std::vector<TTDNode*>::iterator it = _ttd_v.begin();
          it != _ttd_v.end(); it++) {
       (*it)->setVersion(version);
@@ -60,9 +60,9 @@ void NodeSystem::setVersion(const std::string& label, int version)
          it != _ftsw_v.end(); it++) {
       (*it)->setVersion(version);
     }
-  } else if (label == "receiver") {
-    for (std::vector<DataReceiverNode*>::iterator it = _recv_v.begin();
-         it != _recv_v.end(); it++) {
+  } else if (label == "ro_node") {
+    for (std::vector<RONode*>::iterator it = _ro_v.begin();
+         it != _ro_v.end(); it++) {
       (*it)->setVersion(version);
     }
   } else {
@@ -89,7 +89,7 @@ const std::string NodeSystem::getSQLFields() const throw()
   ss << "version int, date timestamp, "
      << "operation_mode int, run_type text, description text, "
      << "hosts_ver int, copper_node_ver int, hslb_ver int, ttd_node_ver int, "
-     << "ftsw_ver int, reciever_node_ver int";
+     << "ftsw_ver int, ro_node_ver int";
   for (std::map<std::string, std::vector<FEEModule*> >::iterator
        it = _module_v_m.begin(); it != _module_v_m.end(); it++) {
     ss << ", " << it->first << "_ver int";
@@ -103,7 +103,7 @@ const std::string NodeSystem::getSQLLabels() const throw()
   ss << "version, date, "
      << "operation_mode, run_type, description, "
      << "hosts_ver, copper_node_ver, hslb_ver, ttd_node_ver, "
-     << "ftsw_ver, reciever_node_ver";
+     << "ftsw_ver, ro_node_ver";
   for (std::map<std::string, std::vector<FEEModule*> >::iterator
        it = _module_v_m.begin(); it != _module_v_m.end(); it++) {
     ss << ", " << it->first << "_ver";
@@ -121,7 +121,7 @@ const std::string NodeSystem::getSQLValues() const throw()
      << ((_hslb_v.size() > 0) ? _hslb_v[0]->getVersion() : 0) << ", "
      << ((_ttd_v.size() > 0) ? _ttd_v[0]->getVersion() : 0) << ", "
      << ((_ftsw_v.size() > 0) ? _ftsw_v[0]->getVersion() : 0) << ", "
-     << ((_recv_v.size() > 0) ? _recv_v[0]->getVersion() : 0);
+     << ((_ro_v.size() > 0) ? _ro_v[0]->getVersion() : 0);
   for (std::map<std::string, std::vector<FEEModule*> >::iterator it = _module_v_m.begin();
        it != _module_v_m.end(); it++) {
     ss  << ", " << ((it->second.size() > 0) ? it->second[0]->getVersion() : 0);

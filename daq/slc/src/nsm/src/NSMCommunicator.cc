@@ -51,11 +51,11 @@ void NSMCommunicator::init(bool usesig) throw(NSMHandlerException)
 }
 
 void NSMCommunicator::sendRequest(NSMNode* node, const Command& command,
-                                  int npar, int* pars,
+                                  int npar, unsigned int* pars,
                                   int len, const char* datap) throw(NSMHandlerException)
 {
   if (b2nsm_sendreq_data(node->getName().c_str(), command.getLabel(),
-                         npar, pars, len, datap) < 0) {
+                         npar, (int*)pars, len, datap) < 0) {
     _id = -1;
     throw (NSMHandlerException(__FILE__, __LINE__, "Failed to send request"));
   }

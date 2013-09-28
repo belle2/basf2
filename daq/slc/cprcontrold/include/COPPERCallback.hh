@@ -19,8 +19,7 @@ namespace B2DAQ {
   class COPPERCallback : public RCCallback {
 
   public:
-    COPPERCallback(COPPERNode* node = NULL, 
-		   NSMData* data = NULL);
+    COPPERCallback(COPPERNode* node = NULL);
     virtual ~COPPERCallback() throw();
 
   public:
@@ -37,10 +36,8 @@ namespace B2DAQ {
 
   private:
     COPPERNode* _node;
-    NSMData* _data;
     int* _buf_config;
     int* _buf_status;
-    RunStatus* _status;
     HSLBController _hslbcon_v[4];
     Fork _fork;
     PThread _thread;

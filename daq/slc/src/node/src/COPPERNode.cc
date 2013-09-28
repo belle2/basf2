@@ -57,7 +57,7 @@ const std::string COPPERNode::getSQLValues() const throw()
   return ss.str();
 }
 
-int COPPERNode::getParams(const Command& command, int* pars,
+int COPPERNode::getParams(const Command& command, unsigned int* pars,
                           std::string& datap)
 {
   int npar = 0;
@@ -107,7 +107,8 @@ int COPPERNode::getParams(const Command& command, int* pars,
 }
 
 void COPPERNode::setParams(const Command& command,
-                           int npar, const int* pars, const std::string& datap)
+                           int npar, const unsigned int* pars,
+                           const std::string& datap)
 {
   int par_i = 0;
   if (command == Command::BOOT) {

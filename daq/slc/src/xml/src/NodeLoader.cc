@@ -91,7 +91,6 @@ void NodeLoader::loadFTSWs(XMLElement* el)
         ftsw->setVersion(version);
         ftsw->setID(id++);
         ftsw->setChannel(atoi(el_v[i]->getAttribute("channel").c_str()));
-        std::cout << __FILE__ << ":" << __LINE__ << " channel = " << ftsw->getChannel() << std::endl;
         ftsw->setProductID(atoi(el_v[i]->getAttribute("product_id").c_str()));
         ftsw->setLocation(el_v[i]->getAttribute("location"));
         ftsw->setFirmware(el_v[i]->getAttribute("firmware"));
@@ -106,6 +105,9 @@ void NodeLoader::loadFTSWs(XMLElement* el)
         else if (mode_s == "ONCE") mode = FTSW::TRIG_ONCE;
         else if (mode_s == "STOP") mode = FTSW::TRIG_STOP;
         ftsw->setTriggerMode(mode);
+        ftsw->setTriggerMode(mode);
+        ftsw->setDummyRate(atoi(el_v[i]->getAttribute("dummy_rate").c_str()));
+        ftsw->setTriggerLimit(atoi(el_v[i]->getAttribute("trigger_limit").c_str()));
         _system.addFTSW(ftsw);
         _ftsw_m.insert(std::map<int, FTSW*>::value_type(ftsw->getChannel(), ftsw));
       }

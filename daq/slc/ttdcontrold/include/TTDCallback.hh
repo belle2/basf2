@@ -19,8 +19,7 @@ namespace B2DAQ {
   class TTDCallback : public RCCallback {
 
   public:
-    TTDCallback(TTDNode* node = NULL, 
-		TTDData* _data = NULL);
+    TTDCallback(TTDNode* node = NULL);
     virtual ~TTDCallback() throw();
 
   public:
@@ -33,9 +32,7 @@ namespace B2DAQ {
     virtual bool abort() throw();
 
   private:
-    RunStatus* _status;
     TTDNode* _node;
-    TTDData* _data;
     std::vector<FTSWController> _ftswcon_v;
     Fork _fork;
     

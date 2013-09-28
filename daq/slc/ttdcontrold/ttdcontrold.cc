@@ -1,6 +1,5 @@
 #include "TTDCallback.hh"
 
-#include <nsm/TTDData.hh>
 #include <nsm/NSMNodeDaemon.hh>
 
 #include <node/TTDNode.hh>
@@ -20,9 +19,8 @@ int main(int argc, char** argv)
   //const char* path = argv[2];
 
   TTDNode* node = new TTDNode(name);
-  TTDData* data = new TTDData(B2DAQ::form("%s_DATA", name));
-  TTDCallback* callback = new TTDCallback(node, data);
-  NSMNodeDaemon* daemon = new NSMNodeDaemon(node, callback, data);
+  TTDCallback* callback = new TTDCallback(node);
+  NSMNodeDaemon* daemon = new NSMNodeDaemon(node, callback);
   daemon->run();
 
   return 0;

@@ -64,8 +64,8 @@ bool HSLBController::load() throw()
           address = reg.getAddress() + ch * 2;
           mgt_set_param2(_mgt, address, reg.getValue(ch));
         }
-        B2DAQ::debug("  set %s to address = %d ( value = %d )",
-                     reg.getName().c_str(), address, reg.getValue(ch));
+        B2DAQ::debug("  set register to address = %x ( value = %d )",
+                     address, reg.getValue(ch));
       }
     }
   }

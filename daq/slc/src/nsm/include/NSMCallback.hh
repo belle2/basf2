@@ -2,6 +2,7 @@
 #define _B2DAQ_NSMCallback_hh
 
 #include "NSMHandlerException.hh"
+#include "NSMMessage.hh"
 
 #include <node/Command.hh>
 
@@ -36,6 +37,7 @@ namespace B2DAQ {
     virtual void selfCheck() throw(NSMHandlerException) {}
 
   public:
+    NSMMessage& getMessage();
     NSMCommunicator* getCommunicator() { return _comm; }
     void setCommunicator(NSMCommunicator* comm) { _comm = comm; }
 
@@ -45,7 +47,6 @@ namespace B2DAQ {
       NSMRequestId req = {-1, cmd};
       _req_v.push_back(req);
     }
-    //Command findCommand(NSMMessage& msg) throw(NSMHandlerException);
     virtual bool perform(NSMMessage& msg) throw(NSMHandlerException);
     
   protected:

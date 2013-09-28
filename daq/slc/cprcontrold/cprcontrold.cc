@@ -17,38 +17,15 @@ typedef void* func_t(void*, const char*);
 int main(int argc, char** argv)
 {
   if (argc < 3) {
-    B2DAQ::debug("Usage : ./copperd <name> <class_name>");
+    B2DAQ::debug("Usage : ./copperd <name>");
     return 1;
   }
   const char* name = argv[1];
-  const char* class_name = argv[2];
-  const char* path = getenv("B2SC_CPRLIB_PATH");
-  void* handle = dlopen(B2DAQ::form("%s/lib/libB2SLC_%s.so",
-                                    path, class_name).c_str(),
-                        RTLD_NOW | RTLD_GLOBAL);
-  if (!handle) {
-    B2DAQ::debug("%s", dlerror());
-    return 1;
-  }
-
-  char* error = NULL;
-  func_t* createCOPPERData = (func_t*)dlsym(handle, B2DAQ::form("create%sData", class_name).c_str());
-  if ((error = dlerror()) != NULL) {
-    B2DAQ::debug("%s", error);
-    return 1;
-  }
 
   COPPERNode* node = new COPPERNode(name);
-  NSMData* data = (NSMData*)createCOPPERData((void*)node,
-                                             B2DAQ::form("%s_DATA", name).c_str());
-  if (data == NULL) {
-    B2DAQ::debug("System error: No COPPER node is ready.");
-    return 1;
-  }
-  COPPERCallback* callback = new COPPERCallback(node, data);
-  NSMNodeDaemon* daemon = new NSMNodeDaemon(node, callback, data);
+  COPPERCallback* callback = new COPPERCallback(node);
+  NSMNodeDaemon* daemon = new NSMNodeDaemon(node, callback);
   daemon->run();
 
-  dlclose(handle);
   return 0;
 }

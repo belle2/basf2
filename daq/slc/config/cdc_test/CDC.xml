@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <system name="CDC" version="1" hosts="CDC_Hosts" ftswset="CDC_FTSW" >
   <group name="COPPER-ROPC" rows="2" cols="2" >
-    <ttd name="TTD3" host="ttd3" ftsw="48" />
-    <copper name="CPR006" host="cpr006" module_class="CDC_COPPER" script="RecvSendCOPPER.py" synchronize="true" />
-    <copper name="CPR009" host="cpr009" module_class="CDC_COPPER" script="RecvSendCOPPER.py" />
-    <receiver name="ROPC01" host="ropc01" script="RecvStream1.sh" senders="CPR006,CPR009" synchronize="true" />
+    <ttd_node name="TTD3" host="ttd3" ftsw="48" />
+    <copper_node name="CPR006" host="cpr006" module_class="CDC_COPPER" script="RecvSendCOPPER.py" synchronize="true" />
+    <copper_node name="CPR009" host="cpr009" module_class="CDC_COPPER" script="RecvSendCOPPER.py" />
+    <ro_node name="ROPC01" host="ropc01" script="RecvStream1.sh" senders="CPR006,CPR009" synchronize="true" />
   </group>
 </system>

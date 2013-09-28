@@ -25,3 +25,8 @@ bool NSMCallback::perform(NSMMessage& msg) throw(NSMHandlerException)
   }
   throw (NSMHandlerException(__FILE__, __LINE__, "Wrong request"));
 }
+
+NSMMessage& NSMCallback::getMessage()
+{
+  return _comm->getMessage();
+}

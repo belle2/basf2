@@ -58,7 +58,7 @@ const std::string RONode::getSQLValues() const throw()
   return ss.str();
 }
 
-int RONode::getParams(const Command& command, int* pars,
+int RONode::getParams(const Command& command, unsigned int* pars,
                       std::string& datap)
 {
   int npar = 0;
@@ -76,7 +76,8 @@ int RONode::getParams(const Command& command, int* pars,
 }
 
 void RONode::setParams(const Command& command, int npar,
-                       const int* pars, const std::string& datap)
+                       const unsigned int* pars,
+                       const std::string& datap)
 {
   int par_i = 0;
   if (command == Command::BOOT) {

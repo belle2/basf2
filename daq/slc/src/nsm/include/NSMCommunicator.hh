@@ -26,10 +26,10 @@ namespace B2DAQ {
   public:
     virtual void init(bool usesig = false) throw(NSMHandlerException);
     void sendRequest(NSMNode* node, const Command& cmd, 
-		     int npar = 0, int* pars = NULL, 
+		     int npar = 0, unsigned int* pars = NULL, 
 		     int len = 0, const char* datap = NULL) throw(NSMHandlerException);
     void sendRequest(NSMNode* node, const Command& cmd, 
-		     int npar, int* pars, 
+		     int npar, unsigned int* pars, 
 		     const std::string& message) throw(NSMHandlerException) {
       sendRequest(node, cmd, npar, pars, message.size(), message.c_str());
     }

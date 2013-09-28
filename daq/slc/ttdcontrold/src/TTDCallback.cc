@@ -12,10 +12,9 @@
 
 using namespace B2DAQ;
 
-TTDCallback::TTDCallback(TTDNode* node, TTDData* data)
-  : RCCallback(node), _node(node), _data(data)
+TTDCallback::TTDCallback(TTDNode* node)
+  : RCCallback(node), _node(node)
 {
-  _status = new RunStatus("RUN_STATUS");
 }
 
 TTDCallback::~TTDCallback() throw()
@@ -25,22 +24,6 @@ TTDCallback::~TTDCallback() throw()
 
 bool TTDCallback::boot() throw()
 {
-  while (!_status->isAvailable()) {
-    try {
-      _status->open();
-    } catch (const NSMHandlerException& e) {
-      B2DAQ::debug("TTD daemon : Failed to open run status. Waiting for 5 seconds..");
-      sleep(5);
-    }
-  }
-  if (_data != NULL) {
-    try {
-      _data->read(_node);
-    } catch (const NSMHandlerException& e) {
-      B2DAQ::debug("Failed to access to NSM data, %s", e.what());
-      return false;
-    }
-  }
   std::vector<FTSW*>& ftsw_v(_node->getFTSWs());
   if (_ftswcon_v.size() != ftsw_v.size()) {
     _ftswcon_v.resize(0);
@@ -59,14 +42,6 @@ bool TTDCallback::boot() throw()
 
 bool TTDCallback::load() throw()
 {
-  try {
-    if (_data != NULL) {
-      _data->read(_node);
-    }
-  } catch (const NSMHandlerException& e) {
-    B2DAQ::debug("Failed to access NSM data.");
-    return false;
-  }
   for (size_t slot = 0; slot < _ftswcon_v.size(); slot++) {
     if (!_ftswcon_v[slot].load()) {
       B2DAQ::debug("Failed to load FTSW:%d", slot);

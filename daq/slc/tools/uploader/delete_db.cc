@@ -15,16 +15,8 @@ using namespace B2DAQ;
 
 int main(int argc, char** argv)
 {
-  if (argc < 3) {
-    std::cerr << "Usage : ./gui "
-              << "<directory path to XML files> "
-              << "<entry XML file name> "
-              << std::endl;
-    return 1;
-  }
-
-  const std::string dir = argv[1];
-  const std::string entry = argv[2];
+  const std::string dir = getenv("B2SC_XML_PATH");
+  const std::string entry = getenv("B2SC_XML_ENTRY");
 
   NodeLoader loader(dir);
   loader.setVersion(0);

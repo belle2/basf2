@@ -1,6 +1,5 @@
 #include "ROCallback.hh"
 
-#include <nsm/ROData.hh>
 #include <nsm/NSMNodeDaemon.hh>
 
 #include <node/RONode.hh>
@@ -17,12 +16,10 @@ int main(int argc, char** argv)
     return 1;
   }
   const char* name = argv[1];
-  //const char* path = argv[2];
 
   RONode* node = new RONode(name);
-  ROData* data = new ROData(B2DAQ::form("%s_DATA", name));
-  ROCallback* callback = new ROCallback(node, data);
-  NSMNodeDaemon* daemon = new NSMNodeDaemon(node, callback, data);
+  ROCallback* callback = new ROCallback(node);
+  NSMNodeDaemon* daemon = new NSMNodeDaemon(node, callback);
   node->setState(State::INITIAL_S);
   daemon->run();
 

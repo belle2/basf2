@@ -23,13 +23,12 @@
 
 using namespace B2DAQ;
 
-COPPERCallback::COPPERCallback(COPPERNode* node, NSMData* data)
-  : RCCallback(node), _node(node), _data(data)
+COPPERCallback::COPPERCallback(COPPERNode* node)
+  : RCCallback(node), _node(node)
 {
   for (int slot = 0; slot < 4; slot++) {
     _hslbcon_v[slot].setHSLB(slot, node->getHSLB(slot));
   }
-  _status = new RunStatus("RUN_STATUS");
   _buf_config = NULL;
   _buf_status = NULL;
   _listener = NULL;
@@ -37,28 +36,10 @@ COPPERCallback::COPPERCallback(COPPERNode* node, NSMData* data)
 
 COPPERCallback::~COPPERCallback() throw()
 {
-  delete _status;
 }
 
 bool COPPERCallback::boot() throw()
 {
-  while (!_status->isAvailable()) {
-    try {
-      _status->open();
-    } catch (const NSMHandlerException& e) {
-      B2DAQ::debug("TTD daemon : Failed to open run status. Waiting for 5 seconds..");
-      sleep(5);
-    }
-  }
-  if (_data != NULL) {
-    try {
-      _data->read(_node);
-    } catch (const NSMHandlerException& e) {
-      B2DAQ::debug("Failed to access to NSM data, %s", e.what());
-      return false;
-    }
-  }
-
   if (_buf_config == NULL) {
     _buf_config = openBuffer(4, "/cpr_config");
     if (_buf_config == NULL) {
@@ -98,22 +79,6 @@ bool COPPERCallback::boot() throw()
 
 bool COPPERCallback::load() throw()
 {
-  if (_data != NULL) {
-    try {
-      _data->read(_node);
-    } catch (const NSMHandlerException& e) {
-      B2DAQ::debug("Failed to access to NSM data %s", e.what());
-      return false;
-    }
-  }
-  if (_status != NULL) {
-    try {
-      _status->read(NULL);
-    } catch (const NSMHandlerException& e) {
-      B2DAQ::debug("Failed to access to Run status %s", e.what());
-      return false;
-    }
-  }
   for (size_t slot = 0; slot < 4; slot++) {
     if (!_hslbcon_v[slot].load()) {
       B2DAQ::debug("Failed to load HSLB:%c", (char)(slot + 'a'));
@@ -143,18 +108,10 @@ bool COPPERCallback::start() throw()
     }
   }
   */
-  if (_status != NULL) {
-    try {
-      _status->read(NULL);
-    } catch (const NSMHandlerException& e) {
-      B2DAQ::debug("Failed to access to Run status %s", e.what());
-      return false;
-    }
-  }
   int input[4] = {
     1,//RUNNING,
-    (int)_status->getExpNumber(),
-    (int)_status->getRunNumber(),
+    (int)getMessage().getParam(0),//ExpNumber
+    (int)getMessage().getParam(1),//RunNumber
     0
   };
   memcpy(_buf_config, input, sizeof(int) * 4);

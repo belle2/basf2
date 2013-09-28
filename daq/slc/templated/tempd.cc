@@ -14,7 +14,6 @@ int main(int argc, char** argv)
     return 1;
   }
   const char* name = argv[1];
-  //const char* path = argv[2];
 
   NSMNode* node = new NSMNode(name);
   TemplateCallback* callback = new TemplateCallback(node);

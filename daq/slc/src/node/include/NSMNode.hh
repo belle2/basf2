@@ -48,8 +48,10 @@ namespace B2DAQ {
     virtual const std::string getSQLValues() const throw();
     virtual int revision() const throw() { return 1; }
     virtual const std::string format() const throw() { return ""; }
-    virtual int getParams(const Command& cmd, int* pars, 
+    virtual int getParams(const Command& command, unsigned int* pars, 
 			  std::string& datap) { return 0; }
+    virtual void setParams(const Command& command, int npar, 
+			   const unsigned int* pars, const std::string& datap) {}
 
   private:
     std::string _type;

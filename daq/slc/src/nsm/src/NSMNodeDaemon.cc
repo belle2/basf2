@@ -41,6 +41,11 @@ void NSMNodeDaemon::run() throw()
   try {
     while (true) {
       if (nsm_comm->wait(2000)) {
+        NSMMessage msg = nsm_comm->getMessage();
+        Command command = msg.getRequestName();
+        int npar = msg.getNParams();
+        const unsigned int* pars = msg.getParams();
+        _node->setParams(command, npar, pars, msg.getData());
         _node->setConnection(Connection::ONLINE);
         nsm_comm->performCallback();
       } else {

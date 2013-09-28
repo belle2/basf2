@@ -34,11 +34,13 @@ void RunControlMessageManager::run()
     if (msg.getId() == RunControlMessage::GUI) {
       if (nsm.getParam(0) > 0) {
         NSMNode* node = _node_system->getNodes()[nsm.getParam(0)];
-        State state_next = getNextState(cmd);
-        if (state_next != State::UNKNOWN)
-          node->setState(state_next);
-        reportState(node);
-        _comm->sendRequest(node, cmd);
+        if (cmd.isAvailable(node->getState())) {
+          State state_next = getNextState(cmd);
+          if (state_next != State::UNKNOWN)
+            node->setState(state_next);
+          reportState(node);
+          send(node, cmd);
+        }
       } else {
         if (!cmd.isAvailable(_rc_node->getState())) continue;
         index_seq = 0;
@@ -94,7 +96,7 @@ void RunControlMessageManager::run()
             }
             if (index_seq >= (int)node_v.size()) index_seq = -1;
             if (index_seq > 0) {
-              State next_state = State(_rc_node->getState()).next();
+              State next_state = _rc_node->getState().next();
               if (!node_v[index_seq]->isSynchronize() ||
                   isSynchronized(next_state, index_seq)) {
                 index_seq = distribute(index_seq, cmd_seq);
@@ -186,7 +188,9 @@ bool RunControlMessageManager::isSynchronized(const State& state, int size)
   std::vector<NSMNode*>& node_v(_node_system->getNodes());
   for (int i = 0; i < size; i++) {
     if (node_v[i]->isUsed() &&
-        node_v[i]->getState() != state) return false;
+        !(node_v[i]->getState() == state ||
+          (state == State::CONFIGURED_S &&
+           node_v[i]->getState() == State::READY_S))) return false;
   }
   return true;
 }
@@ -212,7 +216,7 @@ bool RunControlMessageManager::send(NSMNode* node, const Command& command) throw
     if (id < 0) id = _comm->getNodeIdByName(node->getName());
     int pid = (id >= 0) ? _comm->getNodePidByName(node->getName()) : -1;
     if (id >= 0 && pid > 0) {
-      int pars[256];
+      unsigned int pars[256];
       std::string data = "";
       int npar = node->getParams(command, pars, data);
       _comm->sendRequest(node, command, npar, pars, data);

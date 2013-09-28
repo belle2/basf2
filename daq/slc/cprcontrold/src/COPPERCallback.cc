@@ -32,6 +32,7 @@ COPPERCallback::COPPERCallback(COPPERNode* node, NSMData* data)
   _status = new RunStatus("RUN_STATUS");
   _buf_config = NULL;
   _buf_status = NULL;
+  _listener = NULL;
 }
 
 COPPERCallback::~COPPERCallback() throw()
@@ -58,22 +59,6 @@ bool COPPERCallback::boot() throw()
     }
   }
 
-  FILE* file = popen("${B2SLC_PATH}/cprcontrold/ttrx/bootrx ${B2SLC_PATH}/cprcontrold/ttrx/tt4r009.bit", "r");
-  //FILE* file = popen("/home/usr/tkonno/b2slc/cprcontrold/ttrx/bootrx /home/usr/tkonno/b2slc/cprcontrold/ttrx/tt4r009.bit", "r");
-  char str[1024];
-  memset(str, '\0', 1024);
-  fread(str, 1, 1024 - 1, file);
-  pclose(file);
-  std::string s = str;
-  std::cout << s << std::endl;
-
-  for (int slot = 0; slot < 4; slot++) {
-    if (!_hslbcon_v[slot].boot()) {
-      B2DAQ::debug("Failed to boot HSLB:%c", (char)(slot + 'a'));
-      setReply(B2DAQ::form("Failed to boot HSLB:%c", (char)(slot + 'a')));
-      return false;
-    }
-  }
   if (_buf_config == NULL) {
     _buf_config = openBuffer(4, "/cpr_config");
     if (_buf_config == NULL) {
@@ -92,18 +77,33 @@ bool COPPERCallback::boot() throw()
     }
     memset(_buf_status, 0, sizeof(int) * 4);
   }
+
+  FILE* file = popen("${B2SLC_PATH}/cprcontrold/ttrx/bootrx ${B2SLC_PATH}/cprcontrold/ttrx/tt4r009.bit", "r");
+  char str[4096];
+  memset(str, '\0', 4096);
+  fread(str, 1, 4096 - 1, file);
+  pclose(file);
+  std::cout << str << std::endl;
+
+  for (int slot = 0; slot < 4; slot++) {
+    if (!_hslbcon_v[slot].boot()) {
+      B2DAQ::debug("Failed to boot HSLB:%c", (char)(slot + 'a'));
+      setReply(B2DAQ::form("Failed to boot HSLB:%c", (char)(slot + 'a')));
+      return false;
+    }
+  }
   return true;
 }
 
 bool COPPERCallback::reboot() throw()
 {
   for (int slot = 0; slot < 4; slot++) {
-    if (!_hslbcon_v[slot].reboot()) {
+    if (!_hslbcon_v[slot].reset()) {
       setReply(B2DAQ::form("Failed to reboot HSLB:%c", (char)(slot + 'a')));
       return false;
     }
   }
-  return true;
+  return boot();
 }
 
 bool COPPERCallback::load() throw()
@@ -116,12 +116,6 @@ bool COPPERCallback::load() throw()
       return false;
     }
   }
-  for (size_t slot = 0; slot < 4; slot++) {
-    if (!_hslbcon_v[slot].load()) {
-      B2DAQ::debug("Failed to load HSLB:%c", (char)(slot + 'a'));
-      return false;
-    }
-  }
   if (_status != NULL) {
     try {
       _status->read(NULL);
@@ -130,33 +124,40 @@ bool COPPERCallback::load() throw()
       return false;
     }
   }
+  for (size_t slot = 0; slot < 4; slot++) {
+    if (!_hslbcon_v[slot].load()) {
+      B2DAQ::debug("Failed to load HSLB:%c", (char)(slot + 'a'));
+      return false;
+    }
+  }
+  if (_listener != NULL) {
+    _listener->setRunning(false);
+    _listener = NULL;
+    _thread.cancel();
+  }
   system("killall basf2");
   _fork.cancel();
   _fork = Fork(new SenderManager(_node));
-  PThread(new ProcessListener(this, _fork));
+  _listener = new ProcessListener(this, _fork);
+  _thread = PThread(_listener);
   return true;
 }
 
 bool COPPERCallback::reload() throw()
 {
-  for (size_t slot = 0; slot < 4; slot++) {
-    if (!_hslbcon_v[slot].reload()) {
-      B2DAQ::debug("Failed to reload HSLB:%c", (char)(slot + 'a'));
-      return false;
-    }
-  }
-  load();
-  return true;
+  return load();
 }
 
 bool COPPERCallback::start() throw()
 {
+  /*
   for (size_t slot = 0; slot < 4; slot++) {
     if (!_hslbcon_v[slot].start()) {
       B2DAQ::debug("Failed to start HSLB:%c", (char)(slot + 'a'));
       return false;
     }
   }
+  */
   if (_status != NULL) {
     try {
       _status->read(NULL);
@@ -177,57 +178,36 @@ bool COPPERCallback::start() throw()
 
 bool COPPERCallback::stop() throw()
 {
+  /*
   for (size_t slot = 0; slot < 4; slot++) {
     if (!_hslbcon_v[slot].stop()) {
       B2DAQ::debug("Failed to stop HSLB:%c", (char)(slot + 'a'));
       return false;
     }
   }
+  */
   memset(_buf_config, 0, sizeof(int) * 4);
   return true;
 }
 
 bool COPPERCallback::resume() throw()
 {
-  for (size_t slot = 0; slot < 4; slot++) {
-    if (!_hslbcon_v[slot].resume()) {
-      B2DAQ::debug("Failed to resume HSLB:%c", (char)(slot + 'a'));
-      return false;
-    }
-  }
   return true;
 }
 
 bool COPPERCallback::pause() throw()
 {
-  for (size_t slot = 0; slot < 4; slot++) {
-    if (!_hslbcon_v[slot].pause()) {
-      B2DAQ::debug("Failed to pause HSLB:%c", (char)(slot + 'a'));
-      return false;
-    }
-  }
   return true;
 }
 
 bool COPPERCallback::recover() throw()
 {
-  for (size_t slot = 0; slot < 4; slot++) {
-    if (!_hslbcon_v[slot].recover()) {
-      B2DAQ::debug("Failed to recover HSLB:%c", (char)(slot + 'a'));
-      return false;
-    }
-  }
+  B2DAQ::debug("RECOVER");
   return true;
 }
 
 bool COPPERCallback::abort() throw()
 {
-  for (size_t slot = 0; slot < 4; slot++) {
-    if (!_hslbcon_v[slot].abort()) {
-      B2DAQ::debug("Failed to abort HSLB:%c", (char)(slot + 'a'));
-      return false;
-    }
-  }
   return true;
 }
 

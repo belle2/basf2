@@ -215,6 +215,7 @@ void DBNodeSystemConfigurator::readTTDNodeTable(int version) throw(DBHandlerExce
   std::vector<Host*>& host_v(_system->getHosts());
   std::vector<TTDNode*>& node_v(_system->getTTDNodes());
   std::vector<FTSW*>& ftsw_v(_system->getFTSWs());
+  /*
   for (size_t i = 0; i < record_v.size(); i++) {
     const int id = record_v[i].getFieldValueInt("id");
     if (id < 0 || id >= (int)node_v.size()) continue;
@@ -226,10 +227,13 @@ void DBNodeSystemConfigurator::readTTDNodeTable(int version) throw(DBHandlerExce
     node->clearFTSWs();
     for (size_t slot = 0; slot < 10; slot++) {
       int ftsw_id = record_v[i].getFieldValueInt(B2DAQ::form("ftsw_id_%d", slot));
-      if (ftsw_id >= 0 && ftsw_id < (int)ftsw_v.size())
+      if (ftsw_id >= 0 && ftsw_id < (int)ftsw_v.size()) {
+  std::cout << __FILE__ << ":" << __LINE__ << " channel = " << ftsw_v[ftsw_id]->getChannel() << std::endl;
         node->addFTSW(ftsw_v[ftsw_id]);
+      }
     }
   }
+  */
 }
 
 void DBNodeSystemConfigurator::readFTSWTable(int version) throw(DBHandlerException)
@@ -242,8 +246,9 @@ void DBNodeSystemConfigurator::readFTSWTable(int version) throw(DBHandlerExcepti
     if (id < 0 || id >= (int)ftsw_v.size()) continue;
     FTSW* ftsw = ftsw_v[id];
     ftsw->setUsed(record_v[i].getFieldValueInt("used"));
-    ftsw->setProductID(record_v[i].getFieldValueInt("product_id"));
-    ftsw->setLocation(record_v[i].getFieldValue("location"));
+    ftsw->setChannel(record_v[i].getFieldValueInt("channel"));
+    //ftsw->setProductID(record_v[i].getFieldValueInt("product_id"));
+    //ftsw->setLocation(record_v[i].getFieldValue("location"));
     ftsw->clearModules();
     int mode = record_v[i].getFieldValueInt("trigger_mode");
     ftsw->setTriggerMode(mode);

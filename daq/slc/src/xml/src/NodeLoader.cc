@@ -91,6 +91,7 @@ void NodeLoader::loadFTSWs(XMLElement* el)
         ftsw->setVersion(version);
         ftsw->setID(id++);
         ftsw->setChannel(atoi(el_v[i]->getAttribute("channel").c_str()));
+        std::cout << __FILE__ << ":" << __LINE__ << " channel = " << ftsw->getChannel() << std::endl;
         ftsw->setProductID(atoi(el_v[i]->getAttribute("product_id").c_str()));
         ftsw->setLocation(el_v[i]->getAttribute("location"));
         ftsw->setFirmware(el_v[i]->getAttribute("firmware"));
@@ -106,7 +107,7 @@ void NodeLoader::loadFTSWs(XMLElement* el)
         else if (mode_s == "STOP") mode = FTSW::TRIG_STOP;
         ftsw->setTriggerMode(mode);
         _system.addFTSW(ftsw);
-        _ftsw_m.insert(std::map<int, FTSW*>::value_type(ftsw->getProductID(), ftsw));
+        _ftsw_m.insert(std::map<int, FTSW*>::value_type(ftsw->getChannel(), ftsw));
       }
     }
   }
@@ -169,9 +170,9 @@ void NodeLoader::loadNodes(XMLElement* el)
     }
     std::vector<std::string> ftsw_v = B2DAQ::split(el->getAttribute("ftsw"), ',');
     for (size_t ich = 0; ich < ftsw_v.size(); ich++) {
-      int product_id = atoi(ftsw_v[ich].c_str());
-      if (_ftsw_m.find(product_id) != _ftsw_m.end()) {
-        ttd->addFTSW(_ftsw_m[product_id]);
+      int channel = atoi(ftsw_v[ich].c_str());
+      if (_ftsw_m.find(channel) != _ftsw_m.end()) {
+        ttd->addFTSW(_ftsw_m[channel]);
       }
     }
   } else if (tag == "receiver") {

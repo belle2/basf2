@@ -55,7 +55,7 @@ bool DataReceiverCallback::boot() throw()
     B2DAQ::debug("Failed to access NSM data.");
     return false;
   }
-
+  ///*
   FILE* file = popen("cd /home/usr/tkonno/cdc;/home/xilinx/ise12.4/ISE/bin/lin/impact -batch cdc41b2l011-impact.cmd", "r");
   char str[102400];
   memset(str, '\0', 102400);
@@ -63,7 +63,7 @@ bool DataReceiverCallback::boot() throw()
   pclose(file);
   std::string s = str;
   std::cout << s << std::endl;
-
+  //*/
   if (_buf_config == NULL) {
     _buf_config = openBuffer(4, "/ropc_config");
     if (_buf_config == NULL) {

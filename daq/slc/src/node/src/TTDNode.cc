@@ -10,8 +10,10 @@ using namespace B2DAQ;
 
 void TTDNode::clearFTSWs() throw()
 {
-  for (size_t i = 0; i < _ftsw_v.size(); i++)
+  for (size_t i = 0; i < _ftsw_v.size(); i++) {
+    if (_ftsw_v[i] != NULL) delete _ftsw_v[i];
     _ftsw_v[i] = NULL;
+  }
   _ftsw_i = 0;
 }
 

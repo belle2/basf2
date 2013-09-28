@@ -16,6 +16,9 @@ namespace B2DAQ {
     virtual ~RCCallback() throw() {}
 
   public:
+    NSMNode* getNode() throw() { return _node; }
+
+  public:
     virtual bool boot() throw() { return true; }
     virtual bool reboot() throw() { return true; }
     virtual bool load() throw() { return true; }

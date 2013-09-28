@@ -5,6 +5,8 @@
 
 #include <runcontrol/RCCallback.hh>
 
+#include <nsm/RunStatus.hh>
+
 #include <node/TTDNode.hh>
 
 #include <system/Fork.hh>
@@ -34,6 +36,7 @@ namespace B2DAQ {
     virtual bool abort() throw();
 
   private:
+    RunStatus* _status;
     TTDNode* _node;
     TTDData* _data;
     std::vector<FTSWController> _ftswcon_v;

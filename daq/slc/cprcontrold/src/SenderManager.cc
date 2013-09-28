@@ -35,18 +35,15 @@ void SenderManager::run() throw()
       return ;
     }
     char path[128];
-    sprintf(path, "%s/bin/%s/basf2",
-            belle2_path, belle2_sub);
+    sprintf(path, "%s/bin/%s/basf2", belle2_path, belle2_sub);
     char script_c[128];
     sprintf(script_c, "%s/daq/rawdata/examples/%s",
             belle2_path, _node->getSender()->getScript().c_str());
     char hostname_c[64];
     std::string hostname = run_script("hostname");
     sprintf(hostname_c, "%s", hostname.c_str());
-
     char id_c[32];
     sprintf(id_c, "%d", (int)_node->getID());
-
     int flag = 0;
     for (size_t slot = 0; slot < 4; slot++) {
       HSLB* hslb = _node->getHSLB(slot);
@@ -56,7 +53,6 @@ void SenderManager::run() throw()
     }
     char slots_c[8];
     sprintf(slots_c, "%d", flag);
-
     char* argv[8];
     int i = 0;
     argv[i++] = path;

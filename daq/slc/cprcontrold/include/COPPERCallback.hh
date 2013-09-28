@@ -4,6 +4,7 @@
 #include <node/COPPERNode.hh>
 
 #include <system/Fork.hh>
+#include <system/PThread.hh>
 
 #include <runcontrol/RCCallback.hh>
 
@@ -12,6 +13,8 @@
 #include "HSLBController.hh"
 
 namespace B2DAQ {
+
+  class ProcessListener;
 
   class COPPERCallback : public RCCallback {
 
@@ -43,6 +46,8 @@ namespace B2DAQ {
     RunStatus* _status;
     HSLBController _hslbcon_v[4];
     Fork _fork;
+    PThread _thread;
+    ProcessListener* _listener;
     
   };
 

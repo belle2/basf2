@@ -13,7 +13,10 @@
 using namespace B2DAQ;
 
 TTDCallback::TTDCallback(TTDNode* node, TTDData* data)
-  : RCCallback(node), _node(node), _data(data) {}
+  : RCCallback(node), _node(node), _data(data)
+{
+  _status = new RunStatus("RUN_STATUS");
+}
 
 TTDCallback::~TTDCallback() throw()
 {
@@ -22,11 +25,21 @@ TTDCallback::~TTDCallback() throw()
 
 bool TTDCallback::boot() throw()
 {
-  try {
-    _data->read(_node);
-  } catch (const NSMHandlerException& e) {
-    B2DAQ::debug("failed to access NSM data.");
-    return false;
+  while (!_status->isAvailable()) {
+    try {
+      _status->open();
+    } catch (const NSMHandlerException& e) {
+      B2DAQ::debug("TTD daemon : Failed to open run status. Waiting for 5 seconds..");
+      sleep(5);
+    }
+  }
+  if (_data != NULL) {
+    try {
+      _data->read(_node);
+    } catch (const NSMHandlerException& e) {
+      B2DAQ::debug("Failed to access to NSM data, %s", e.what());
+      return false;
+    }
   }
   std::vector<FTSW*>& ftsw_v(_node->getFTSWs());
   if (_ftswcon_v.size() != ftsw_v.size()) {

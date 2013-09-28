@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 {
   using namespace B2DAQ;
 
-  if (argc < 1) {
+  if (argc < 2) {
     std::cerr << "Usage : ./runcontrold <hostname>"
               << std::endl;
     return 1;

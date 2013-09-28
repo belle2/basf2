@@ -9,12 +9,14 @@ all:
 	make -C rocontrold/
 	make -C runcontrold/
 	make -C tools/
+	make -C dqmserver/
 	cd tools/gen_copper; ./bin/gen_copper; cd -
 	make -C javalib/
 
 clean:
 	make -C javalib/ clean
 	make -C tools/ clean
+	make -C dqmserver/ clean
 	make -C templated/ clean
 	make -C cprcontrold/ clean
 	make -C rocontrold/ clean

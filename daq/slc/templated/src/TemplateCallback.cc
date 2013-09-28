@@ -57,7 +57,7 @@ bool TemplateCallback::start() throw()
 bool TemplateCallback::stop() throw()
 {
   B2DAQ::debug("STOP");
-  sleep(3);
+  //sleep(3);
   return true;
 }
 

@@ -2,19 +2,19 @@
 
 using namespace B2DAQ;
 
-const RCState RCState::INITIAL_S(101, "RC_INITIAL", "INITIAL");
-const RCState RCState::CONFIGURED_S(102, "RC_CONFIGURED", "CONFIGURED");
-const RCState RCState::READY_S(103, "RC_READY", "READY");
-const RCState RCState::RUNNING_S(104, "RC_RUNNING", "RUNNING");
-const RCState RCState::PAUSED_S(105, "RC_PAUSED", "PAUSED");
-const RCState RCState::BOOTING_TS(201, "RC_BOOTING", "BOOTING");
-const RCState RCState::LOADING_TS(202, "RC_LOADING", "LOADING");
-const RCState RCState::STARTING_TS(203, "RC_STARTING", "STARTING");
-const RCState RCState::STOPPING_TS(204, "RC_STOPPING", "STOPPING");
-const RCState RCState::ERROR_ES(301, "RC_ERROR", "ERROR");
-const RCState RCState::FATAL_ES(302, "RC_FATAL", "FATAL");
-const RCState RCState::RECOVERING_RS(402, "RC_RECOVERING", "RECOVERING");
-const RCState RCState::ABORTING_RS(403, "RC_ABORTING", "ABORTING");
+const RCState RCState::INITIAL_S(101, "INITIAL", "INITIAL");
+const RCState RCState::CONFIGURED_S(102, "CONFIGURED", "CONFIGURED");
+const RCState RCState::READY_S(103, "READY", "READY");
+const RCState RCState::RUNNING_S(104, "RUNNING", "RUNNING");
+const RCState RCState::PAUSED_S(105, "PAUSED", "PAUSED");
+const RCState RCState::BOOTING_TS(201, "BOOTING", "BOOTING");
+const RCState RCState::LOADING_TS(202, "LOADING", "LOADING");
+const RCState RCState::STARTING_TS(203, "STARTING", "STARTING");
+const RCState RCState::STOPPING_TS(204, "STOPPING", "STOPPING");
+const RCState RCState::ERROR_ES(301, "ERROR", "ERROR");
+const RCState RCState::FATAL_ES(302, "FATAL", "FATAL");
+const RCState RCState::RECOVERING_RS(402, "RECOVERING", "RECOVERING");
+const RCState RCState::ABORTING_RS(403, "ABORTING", "ABORTING");
 
 const RCState& RCState::operator=(const std::string& label) throw()
 {

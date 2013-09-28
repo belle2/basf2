@@ -42,6 +42,18 @@ int main(int argc, char** argv)
              atoi(getenv("B2SC_DB_PORT")));
 
   std::stringstream ss;
+  ss << "drop table run_config;";
+  std::cout << ss.str() << std::endl;
+  try {
+    db.execute(ss.str());
+  } catch (const std::exception&) {}
+  ss.str("");
+  ss << "drop table run_status;";
+  std::cout << ss.str() << std::endl;
+  try {
+    db.execute(ss.str());
+  } catch (const std::exception&) {}
+  ss.str("");
   ss << "drop table host_conf;";
   std::cout << ss.str() << std::endl;
   try {
@@ -78,16 +90,16 @@ int main(int argc, char** argv)
   } catch (const std::exception&) {}
   for (std::map<std::string, std::vector<FEEModule*> >::iterator it = module_v_m.begin();
        it != module_v_m.end(); it++) {
-    std::cout << ss.str() << std::endl;
     ss << "drop table " << it->first << "_conf;";
+    std::cout << ss.str() << std::endl;
     try {
       db.execute(ss.str()); ss.str("");
     } catch (const std::exception&) {}
     ss.str("");
   }
   ss << "drop table version_control;";
+  std::cout << ss.str() << std::endl;
   try {
-    std::cout << ss.str() << std::endl;
     db.execute(ss.str()); ss.str("");
   } catch (const std::exception&) {}
   ss.str("");

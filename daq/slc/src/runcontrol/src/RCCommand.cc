@@ -4,20 +4,20 @@
 
 using namespace B2DAQ;
 
-const RCCommand RCCommand::UNKNOWN(-1, "RC_UNKNOWN", "UNKNOWN");
-const RCCommand RCCommand::BOOT(101, "RC_BOOT", "BOOT");
-const RCCommand RCCommand::REBOOT(102, "RC_REBOOT", "REBOOT");
-const RCCommand RCCommand::LOAD(103, "RC_LOAD", "LOAD");
-const RCCommand RCCommand::RELOAD(104, "RC_RELOAD", "RELOAD");
-const RCCommand RCCommand::START(105, "RC_START", "START");
-const RCCommand RCCommand::STOP(106, "RC_STOP", "STOP");
-const RCCommand RCCommand::RESUME(107, "RC_RESUMEN", "RESUME");
-const RCCommand RCCommand::PAUSE(108, "RC_PAUSE", "PAUSE");
-const RCCommand RCCommand::RECOVER(202, "RC_RECOVER", "RECOVER");
-const RCCommand RCCommand::ABORT(203, "RC_ABORT", "ABORT");
-const RCCommand RCCommand::STATECHECK(301, "RC_STATECHECK", "STATECHECK");
-const RCCommand RCCommand::STATE(302, "RC_STATE", "STATE");
-const RCCommand RCCommand::SET(401, "RC_SET", "SET");
+const RCCommand RCCommand::UNKNOWN(-1, "UNKNOWN", "UNKNOWN");
+const RCCommand RCCommand::BOOT(101, "BOOT", "BOOT");
+const RCCommand RCCommand::REBOOT(102, "REBOOT", "REBOOT");
+const RCCommand RCCommand::LOAD(103, "LOAD", "LOAD");
+const RCCommand RCCommand::RELOAD(104, "RELOAD", "RELOAD");
+const RCCommand RCCommand::START(105, "START", "START");
+const RCCommand RCCommand::STOP(106, "STOP", "STOP");
+const RCCommand RCCommand::RESUME(107, "RESUMEN", "RESUME");
+const RCCommand RCCommand::PAUSE(108, "PAUSE", "PAUSE");
+const RCCommand RCCommand::RECOVER(202, "RECOVER", "RECOVER");
+const RCCommand RCCommand::ABORT(203, "ABORT", "ABORT");
+const RCCommand RCCommand::STATECHECK(301, "STATECHECK", "STATECHECK");
+const RCCommand RCCommand::STATE(302, "STATE", "STATE");
+const RCCommand RCCommand::SET(401, "SET", "SET");
 
 const RCCommand& RCCommand::operator=(const std::string& label) throw()
 {

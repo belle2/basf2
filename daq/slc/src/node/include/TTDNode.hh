@@ -36,6 +36,9 @@ namespace B2DAQ {
     virtual const std::string getSQLValues() const throw();
     virtual int getParams(const Command& command, 
 			  int* pars, std::string& datap);
+    virtual void setParams(const Command& command, 
+			   int npar, const int* pars, 
+			   const std::string& datap);
 
   private:
     FTSWList _ftsw_v;

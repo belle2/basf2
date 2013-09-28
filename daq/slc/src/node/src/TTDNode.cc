@@ -56,7 +56,7 @@ int TTDNode::getParams(const Command& command, int* pars,
     pars[npar++] = 0;
     for (size_t i = 0; i < _ftsw_i; i++) {
       if (_ftsw_v[i] != NULL) {
-        pars[1] |= _ftsw_v[i]->isUsed();
+        pars[1] |= _ftsw_v[i]->isUsed() << i;
         pars[npar++] =  _ftsw_v[i]->getChannel();
         ss << _ftsw_v[i]->getFirmware() << " ";
       }
@@ -72,5 +72,32 @@ int TTDNode::getParams(const Command& command, int* pars,
   }
   datap = ss.str();
   return npar;
+}
+
+void TTDNode::setParams(const Command& command, int npar,
+                        const int* pars, const std::string& datap)
+{
+  int par_i = 0;
+  if (command == Command::BOOT) {
+    _ftsw_i = pars[par_i++];
+    par_i++;
+    std::vector<std::string> str_v = B2DAQ::split(datap, ' ');
+    for (size_t i = 0; i < _ftsw_i; i++) {
+      if (_ftsw_v[i] == NULL) {
+        _ftsw_v[i] = new FTSW();
+      }
+      _ftsw_v[i]->setUsed(0x01 & (pars[1] >> i));
+      _ftsw_v[i]->setChannel(pars[par_i++]);
+      _ftsw_v[i]->setFirmware(str_v[i]);
+    }
+  } else if (command == Command::LOAD) {
+    for (size_t i = 0; i < _ftsw_i; i++) {
+      if (_ftsw_v[i] != NULL) {
+        _ftsw_v[i]->setTriggerMode(pars[par_i++]);
+        _ftsw_v[i]->setDummyRate(pars[par_i++]);
+        _ftsw_v[i]->setTriggerLimit(pars[par_i++]);
+      }
+    }
+  }
 }
 

@@ -6,13 +6,14 @@
 #include <string>
 #include <vector>
 
-#define MAX_MODULES 16
-
 namespace B2DAQ {
 
   class FEEModule;
 
   class FTSW : public Module {
+
+  public:
+    static const size_t MAX_MODULES = 16;
 
   public:
     static const int TRIG_NORMAL;
@@ -61,7 +62,7 @@ namespace B2DAQ {
     std::string _firmware;
     bool _used;
     FEEModuleList _module_v;
-    int _module_i;
+    size_t _module_i;
     int _trigger_mode;
     
   };

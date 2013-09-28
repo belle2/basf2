@@ -4,11 +4,12 @@
 #include "NSMNode.hh"
 #include "FTSW.hh"
 
-#define MAX_FTSWS 16
-
 namespace B2DAQ {
 
   class TTDNode : public NSMNode {
+
+  public:
+    static const size_t MAX_FTSWS = 16;
 
   public:
     typedef std::vector<FTSW*> FTSWList;
@@ -36,7 +37,7 @@ namespace B2DAQ {
 
   private:
     FTSWList _ftsw_v;
-    int _ftsw_i;
+    size_t _ftsw_i;
 
   };
 

@@ -100,7 +100,6 @@ bool NSMCommunicator::wait(int sec) throw(NSMHandlerException)
     throw (NSMHandlerException(__FILE__, __LINE__, "Error during wait"));
   } else if (nsmc == _nsmc) {
     _message.read(nsmc);
-    //std::cerr << __FILE__ << ":" << __LINE__ << " id = " << _message.getNodeId() << std::endl;
     return true;
   }
   return false;

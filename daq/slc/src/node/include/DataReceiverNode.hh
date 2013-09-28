@@ -7,11 +7,12 @@
 #include <vector>
 #include <iostream>
 
-#define MAX_SENDERS 20
-
 namespace B2DAQ {
 
   class DataReceiverNode : public NSMNode {
+
+  public:
+    static const size_t MAX_SENDERS = 20;
 
   public:
     typedef std::vector<DataSender*> DataSenderList;
@@ -37,7 +38,7 @@ namespace B2DAQ {
     
   private:
     DataSenderList _sender_v;
-    int _sender_i;
+    size_t _sender_i;
     std::string _script;
 
   };

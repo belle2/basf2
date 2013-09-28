@@ -3,14 +3,15 @@
 
 #include "NSMNode.hh"
 
-#define MAX_HSLBS 4
-
 namespace B2DAQ {
 
   class DataSender;
   class HSLB;
 
   class COPPERNode : public NSMNode {
+
+  public:
+    static const size_t MAX_HSLBS = 4;
 
   public:
     COPPERNode(const std::string& name = "");

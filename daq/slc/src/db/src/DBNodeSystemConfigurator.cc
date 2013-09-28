@@ -37,7 +37,6 @@ DBRecord DBNodeSystemConfigurator::readTables(int version) throw(DBHandlerExcept
        it != _system->getModuleLists().end(); it++) {
     std::string label = it->first;
     if (label.size() > 0) {
-      //std::cout << "'" << label << "' " << record.getFieldValueInt(label + "_ver") << std::endl;
       readFEEModuleTable(label, it->second, record.getFieldValueInt(label + "_ver"));
     }
   };
@@ -130,7 +129,6 @@ throw(DBHandlerException)
 DBRecord DBNodeSystemConfigurator::readVersionControlTable(int version) throw(DBHandlerException)
 {
   _db->execute(B2DAQ::form("select * from version_control where version = %d;", version));
-  //B2DAQ::debug("select * from version_control where version = %d;", version);
   std::vector<DBRecord>& record_v(_db->loadRecords());
   if (record_v.size() == 0) {
     throw (DBHandlerException(__FILE__, __LINE__,
@@ -170,7 +168,7 @@ void DBNodeSystemConfigurator::readCOPPERNodeTable(int version) throw(DBHandlerE
     node->setUsed(record_v[i].getFieldValueInt("used"));
     int host_id = record_v[i].getFieldValueInt("host_id");
     if (host_id >= 0 && host_id < (int)host_v.size()) node->setHost(host_v[host_id]);
-    for (size_t slot = 0; slot < 4; slot++) {
+    for (size_t slot = 0; slot < COPPERNode::MAX_HSLBS; slot++) {
       int hslb_id = record_v[i].getFieldValueInt(B2DAQ::form("hslb_id_%d", slot));
       if (hslb_id >= 0 && hslb_id < (int)hslb_v.size()) {
         node->setHSLB(slot, hslb_v[hslb_id]);
@@ -198,13 +196,11 @@ void DBNodeSystemConfigurator::readHSLBTable(int version) throw(DBHandlerExcepti
     hslb->setProductID(record_v[i].getFieldValueInt("product_id"));
     hslb->setLocation(record_v[i].getFieldValue("location"));
     hslb->setFirmware(record_v[i].getFieldValue("firmware"));
-    /*
     std::string module_type = record_v[i].getFieldValue("module_type");
     std::vector<FEEModule*>& module_v(_system->getModules(module_type));
     int module_id = record_v[i].getFieldValueInt("module_id");
-    if ( module_id >= 0 && module_id < (int)module_v.size() )
+    if (module_id >= 0 && module_id < (int)module_v.size())
       hslb->setFEEModule(module_v[module_id]);
-    */
   }
 }
 
@@ -215,7 +211,6 @@ void DBNodeSystemConfigurator::readTTDNodeTable(int version) throw(DBHandlerExce
   std::vector<Host*>& host_v(_system->getHosts());
   std::vector<TTDNode*>& node_v(_system->getTTDNodes());
   std::vector<FTSW*>& ftsw_v(_system->getFTSWs());
-  /*
   for (size_t i = 0; i < record_v.size(); i++) {
     const int id = record_v[i].getFieldValueInt("id");
     if (id < 0 || id >= (int)node_v.size()) continue;
@@ -225,15 +220,12 @@ void DBNodeSystemConfigurator::readTTDNodeTable(int version) throw(DBHandlerExce
     int host_id = record_v[i].getFieldValueInt("host_id");
     if (host_id >= 0 && host_id < (int)host_v.size()) node->setHost(host_v[host_id]);
     node->clearFTSWs();
-    for (size_t slot = 0; slot < 10; slot++) {
+    for (size_t slot = 0; slot < TTDNode::MAX_FTSWS; slot++) {
       int ftsw_id = record_v[i].getFieldValueInt(B2DAQ::form("ftsw_id_%d", slot));
-      if (ftsw_id >= 0 && ftsw_id < (int)ftsw_v.size()) {
-  std::cout << __FILE__ << ":" << __LINE__ << " channel = " << ftsw_v[ftsw_id]->getChannel() << std::endl;
+      if (ftsw_id >= 0 && ftsw_id < (int)ftsw_v.size())
         node->addFTSW(ftsw_v[ftsw_id]);
-      }
     }
   }
-  */
 }
 
 void DBNodeSystemConfigurator::readFTSWTable(int version) throw(DBHandlerException)
@@ -246,13 +238,12 @@ void DBNodeSystemConfigurator::readFTSWTable(int version) throw(DBHandlerExcepti
     if (id < 0 || id >= (int)ftsw_v.size()) continue;
     FTSW* ftsw = ftsw_v[id];
     ftsw->setUsed(record_v[i].getFieldValueInt("used"));
-    ftsw->setChannel(record_v[i].getFieldValueInt("channel"));
-    //ftsw->setProductID(record_v[i].getFieldValueInt("product_id"));
-    //ftsw->setLocation(record_v[i].getFieldValue("location"));
+    ftsw->setProductID(record_v[i].getFieldValueInt("product_id"));
+    ftsw->setLocation(record_v[i].getFieldValue("location"));
     ftsw->clearModules();
     int mode = record_v[i].getFieldValueInt("trigger_mode");
     ftsw->setTriggerMode(mode);
-    for (size_t slot = 0; slot < 20; slot++) {
+    for (size_t slot = 0; slot < FTSW::MAX_MODULES; slot++) {
       std::string module_type = record_v[i].getFieldValue(B2DAQ::form("module_type_%d", slot));
       int module_id = record_v[i].getFieldValueInt(B2DAQ::form("module_id_%d", slot));
       std::vector<FEEModule*>& module_v(_system->getModules(module_type));
@@ -276,11 +267,10 @@ void DBNodeSystemConfigurator::readDataReceiverNodeTable(int version) throw(DBHa
     node->setUsed(record_v[i].getFieldValueInt("used"));
     node->setScript(record_v[i].getFieldValue("script"));
     node->clearSenders();
-    for (size_t slot = 0; slot < 10; slot++) {
+    for (size_t slot = 0; slot < DataReceiverNode::MAX_SENDERS; slot++) {
       int copper_id = record_v[i].getFieldValueInt(B2DAQ::form("sender_id_%d", slot));
       if (copper_id >= 0 && copper_id < (int)copper_v.size()) {
         COPPERNode* copper = copper_v[copper_id];
-        //std::cout << "DEBUG:" << __FILE__ << ":" << __LINE__ << ":" << copper->getSender()->getHost() << std::endl;
         node->addSender(copper->getSender());
       }
     }

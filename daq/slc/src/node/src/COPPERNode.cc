@@ -26,7 +26,7 @@ const std::string COPPERNode::getSQLFields() const throw()
 {
   std::stringstream ss;
   ss << NSMNode::getSQLFields();
-  for (int i = 0; i < MAX_HSLBS; i++) {
+  for (size_t i = 0; i < MAX_HSLBS; i++) {
     ss << ", hslb_id_" << i << " smallint";
   }
   ss << _sender->getSQLFields();
@@ -37,7 +37,7 @@ const std::string COPPERNode::getSQLLabels() const throw()
 {
   std::stringstream ss;
   ss << NSMNode::getSQLLabels();
-  for (int i = 0; i < MAX_HSLBS; i++) {
+  for (size_t i = 0; i < MAX_HSLBS; i++) {
     ss << ", hslb_id_" << i;
   }
   ss << _sender->getSQLLabels();
@@ -48,7 +48,7 @@ const std::string COPPERNode::getSQLValues() const throw()
 {
   std::stringstream ss;
   ss << NSMNode::getSQLValues();
-  for (int i = 0; i < MAX_HSLBS; i++) {
+  for (size_t i = 0; i < MAX_HSLBS; i++) {
     int id = (_hslb_v[i] != NULL) ? _hslb_v[i]->getID() : -1;
     ss << ", " << id;
   }

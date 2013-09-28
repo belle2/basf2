@@ -309,7 +309,6 @@ void RunControlMessageManager::downloadConfig(const Command& cmd, int version) t
   } catch (const IOException& e) {
     B2DAQ::debug("Error on loading system configuration.:%s", e.what());
   }
-  _data_man->writeData();
   std::vector<NSMNode*>& node_v(_node_system->getNodes());
   for (size_t i = 0; i < node_v.size(); i++) {
     NSMNode* node(node_v[i]);

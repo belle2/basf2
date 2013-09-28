@@ -78,10 +78,8 @@ int main(int argc, char** argv)
     B2DAQ::debug("TTD daemon : Failed to connect NSM network. Terminate process...");
     return 1;
   }
-  data->allocateData(path);
   data->allocateRunConfig();
   data->allocateRunStatus();
-  data->writeData();
   data->writeRunConfig();
   data->writeRunStatus();
   B2DAQ::PThread(new LocalNSMCommunicator(comm));

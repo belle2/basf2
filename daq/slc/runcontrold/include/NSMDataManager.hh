@@ -26,9 +26,6 @@ namespace B2DAQ {
     RunConfig* getRunConfig() throw() { return _config; }
     bool writeRunStatus() throw();
     bool writeRunConfig() throw();
-    bool allocateData(const std::string& path) throw();
-    bool writeData() throw();
-    bool readData() throw();
 
   private:
     NodeLoader* _loader;
@@ -36,9 +33,6 @@ namespace B2DAQ {
     RunConfig* _config;
     std::vector<void*> _handler_v;
     std::map<std::string, createCOPPERData_t*> _func_m;
-    std::vector<NSMData*> _copper_data_v;
-    std::vector<NSMData*> _ttd_data_v;
-    std::vector<NSMData*> _recv_data_v;
 
   };
 

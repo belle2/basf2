@@ -253,13 +253,13 @@ main(int argc, char** argv)
         printf("usage: start <node> <run-number>\n");
       } else {
         int runno = atoi(av[2]);
-        b2nsm_sendreq_data(av[1], "RC_START", 1, &runno, len, text);
+        b2nsm_sendreq_data(av[1], "START", 1, &runno, len, text);
       }
     } else if (strcasecmp(av[0], "stop") == 0) {
       if (ac < 2) {
         printf("usage: start <node> <run-number>\n");
       } else {
-        b2nsm_sendreq_data(av[1], "RC_STOP", 0, 0, len, text);
+        b2nsm_sendreq_data(av[1], "STOP", 0, 0, len, text);
       }
     } else {
       printf("unknown request %s\n", av[0]);

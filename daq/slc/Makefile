@@ -10,8 +10,8 @@ all:
 	make -C runcontrold/
 	make -C tools/
 	make -C dqmserver/
-	cd tools/gen_copper; ./bin/gen_copper; cd -
 	make -C javalib/
+	make -C bin/
 
 clean:
 	make -C javalib/ clean
@@ -25,4 +25,4 @@ clean:
 	make -C src/ clean
 	make -C nsm2/ clean
 	rm -rf *~ .*~ \#*~
-
+	make -C bin/ clean

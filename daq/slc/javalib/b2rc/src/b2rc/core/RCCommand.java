@@ -9,20 +9,20 @@ public class RCCommand extends RCEnum {
 	final static public RCCommand UNKNOWN = new RCCommand(-1, "UNKNOWN", "UNKNOWN");
 	final static public RCCommand OK = new RCCommand(1, "OK", "OK");
 	final static public RCCommand ERROR = new RCCommand(2, "ERROR", "ERROR");
-	final static public RCCommand BOOT = new RCCommand(101, "RC_BOOT", "BOOT");
-	final static public RCCommand REBOOT = new RCCommand(102, "RC_REBOOT", "REBOOT");
-	final static public RCCommand LOAD = new RCCommand(103, "RC_LOAD", "LOAD");
-	final static public RCCommand RELOAD = new RCCommand(104, "RC_RELOAD", "RELOAD");
-	final static public RCCommand START = new RCCommand(105, "RC_START", "START");
-	final static public RCCommand STOP = new RCCommand(106, "RC_STOP", "STOP");
-	final static public RCCommand RESUME = new RCCommand(107, "RC_RESUMEN", "RESUME");
-	final static public RCCommand PAUSE = new RCCommand(108, "RC_PAUSE", "PAUSE");
-	final static public RCCommand RECOVER = new RCCommand(202, "RC_RECOVER", "RECOVER");
-	final static public RCCommand ABORT = new RCCommand(203, "RC_ABORT", "ABORT");
-	final static public RCCommand STATECHECK = new RCCommand(301, "RC_STATECHECK", "STATECHECK");
-	final static public RCCommand STATE = new RCCommand(302, "RC_STATE", "STATE");
-	final static public RCCommand SET = new RCCommand(401, "RC_SET", "SET");
-	final static public RCCommand GET = new RCCommand(401, "RC_GET", "GET");
+	final static public RCCommand BOOT = new RCCommand(101, "BOOT", "BOOT");
+	final static public RCCommand REBOOT = new RCCommand(102, "REBOOT", "REBOOT");
+	final static public RCCommand LOAD = new RCCommand(103, "LOAD", "LOAD");
+	final static public RCCommand RELOAD = new RCCommand(104, "RELOAD", "RELOAD");
+	final static public RCCommand START = new RCCommand(105, "START", "START");
+	final static public RCCommand STOP = new RCCommand(106, "STOP", "STOP");
+	final static public RCCommand RESUME = new RCCommand(107, "RESUMEN", "RESUME");
+	final static public RCCommand PAUSE = new RCCommand(108, "PAUSE", "PAUSE");
+	final static public RCCommand RECOVER = new RCCommand(202, "RECOVER", "RECOVER");
+	final static public RCCommand ABORT = new RCCommand(203, "ABORT", "ABORT");
+	final static public RCCommand STATECHECK = new RCCommand(301, "STATECHECK", "STATECHECK");
+	final static public RCCommand STATE = new RCCommand(302, "STATE", "STATE");
+	final static public RCCommand SET = new RCCommand(401, "SET", "SET");
+	final static public RCCommand GET = new RCCommand(401, "GET", "GET");
 	
 	final static public RCCommand [] CommandList = {
 		BOOT, REBOOT,LOAD, RELOAD,

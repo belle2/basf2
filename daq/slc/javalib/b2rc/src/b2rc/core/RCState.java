@@ -3,20 +3,19 @@ package b2rc.core;
 public class RCState extends RCEnum {
 
 	final static public RCState UNKNOWN = new RCState(0, "UNKNOWN", "UNKNOWN");
-	final static public RCState INITIAL_S = new RCState(101, "RC_INITIAL_S", "INITIAL");
-	final static public RCState CONFIGURED_S = new RCState(102, "RC_CONFIGURED_S", "CONFIGURED");
-	final static public RCState READY_S = new RCState(103, "RC_READY_S", "READY");
-	final static public RCState RUNNING_S = new RCState(104, "RC_RUNNING_S", "RUNNING");
-	final static public RCState PAUSED_S = new RCState(105, "RC_PAUSED_S", "PAUSED");
-	final static public RCState BOOTING_TS = new RCState(201, "RC_BOOTING_TS", "BOOTING");
-	final static public RCState LOADING_TS = new RCState(202, "RC_LOADING_TS", "LOADING");
-	final static public RCState STARTING_TS = new RCState(203, "RC_STARTING_TS", "STARTING");
-	final static public RCState STOPPING_TS = new RCState(204, "RC_STOPPING_TS", "STOPPING");
-	final static public RCState ERROR_ES = new RCState(301, "RC_ERROR_ES", "ERROR");
-	final static public RCState FATAL_ES = new RCState(302, "RC_FATAL_ES", "FATAL");
-	final static public RCState RECOVERING_RS = new RCState(402, "RC_RECOVERING_RS", "RECOVERING");
-	final static public RCState ABORTING_RS = new RCState(403, "RC_ABORTING_RS", "ABORTING");
-	final static public RCState OFFLINE_LS = new RCState(501, "RC_OFFLINE_LS", "OFFLINE_LS");
+	final static public RCState INITIAL_S = new RCState(101, "INITIAL_S", "INITIAL");
+	final static public RCState CONFIGURED_S = new RCState(102, "CONFIGURED_S", "CONFIGURED");
+	final static public RCState READY_S = new RCState(103, "READY_S", "READY");
+	final static public RCState RUNNING_S = new RCState(104, "RUNNING_S", "RUNNING");
+	final static public RCState PAUSED_S = new RCState(105, "PAUSED_S", "PAUSED");
+	final static public RCState BOOTING_TS = new RCState(201, "BOOTING_TS", "BOOTING");
+	final static public RCState LOADING_TS = new RCState(202, "LOADING_TS", "LOADING");
+	final static public RCState STARTING_TS = new RCState(203, "STARTING_TS", "STARTING");
+	final static public RCState STOPPING_TS = new RCState(204, "STOPPING_TS", "STOPPING");
+	final static public RCState ERROR_ES = new RCState(301, "ERROR_ES", "ERROR");
+	final static public RCState FATAL_ES = new RCState(302, "FATAL_ES", "FATAL");
+	final static public RCState RECOVERING_RS = new RCState(402, "RECOVERING_RS", "RECOVERING");
+	final static public RCState ABORTING_RS = new RCState(403, "ABORTING_RS", "ABORTING");
 	
 	private boolean _active = true;
 	private boolean _masked = false;
@@ -76,7 +75,6 @@ public class RCState extends RCEnum {
 		  else if ( label.matches(FATAL_ES._label) ) copy(FATAL_ES);
 		  else if ( label.matches(RECOVERING_RS._label) ) copy(RECOVERING_RS);
 		  else if ( label.matches(ABORTING_RS._label) ) copy(ABORTING_RS);
-		  else if ( label.matches(OFFLINE_LS._label) ) copy(OFFLINE_LS);
 		  else copy(UNKNOWN);
 	}
 
@@ -102,7 +100,6 @@ public class RCState extends RCEnum {
 		  else if ( id == FATAL_ES._id ) copy(FATAL_ES);
 		  else if ( id == RECOVERING_RS._id ) copy(RECOVERING_RS);
 		  else if ( id == ABORTING_RS._id ) copy(ABORTING_RS);
-		  else if ( id == OFFLINE_LS._id ) copy(OFFLINE_LS);
 		  else copy(UNKNOWN);
 	}
 

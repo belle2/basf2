@@ -74,7 +74,17 @@ public class DBConfigPanel extends JPanel {
 		switch(result) {
 		   case 0:
 			   try {
-				   RCDBManager.open(hostname, database, username, password, port);
+				   int port_in = port;
+				   try {
+					   port_in = Integer.parseInt(login._host_port_panel.getText());
+				   } catch (Exception e) {
+					   port_in = port;
+				   }
+				   RCDBManager.open(login._host_name_panel.getText(), 
+						   login._database_panel.getText(), 
+						   login._account_panel.getText(), 
+						   login._password_panel.getText(), 
+						   port_in);
 			   } catch (Exception e) {
 					e.printStackTrace();
 				   return false;

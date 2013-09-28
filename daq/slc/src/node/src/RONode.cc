@@ -62,13 +62,31 @@ int RONode::getParams(const Command& command, int* pars,
                       std::string& datap)
 {
   int npar = 0;
+  pars[npar++] = _sender_i;
   std::stringstream ss; ss.str("");
   if (command == Command::BOOT) {
     ss << _script << " ";
     for (size_t i = 0; i < _sender_i; i++) {
       ss << _sender_v[i]->getHost() << " ";
     }
+  } else if (command == Command::LOAD) {
   }
   datap = ss.str();
   return npar;
+}
+
+void RONode::setParams(const Command& command, int npar,
+                       const int* pars, const std::string& datap)
+{
+  int par_i = 0;
+  if (command == Command::BOOT) {
+    std::vector<std::string> str_v = B2DAQ::split(datap, ' ');
+    _sender_i = pars[par_i++];
+    _script = str_v[0];
+    for (size_t i = 0; i < _sender_i; i++) {
+      _sender_v[i]->setHost(str_v[i + 1]);
+    }
+  } else if (command == Command::LOAD) {
+
+  }
 }

@@ -82,7 +82,6 @@ int main(int argc, char** argv)
   data->allocateRunStatus();
   data->writeRunConfig();
   data->writeRunStatus();
-  B2DAQ::PThread(new LocalNSMCommunicator(comm));
 
   TCPServerSocket server_socket(ip, port);
   server_socket.open();
@@ -111,6 +110,7 @@ int main(int argc, char** argv)
   } catch (const std::exception& e) {}
   HostCommunicator* ui_comm =  new GUICommunicator(server_socket, db, loader);
   B2DAQ::PThread(new Listener(ui_comm));
+  B2DAQ::PThread(new LocalNSMCommunicator(comm));
 
   RunControlMessageManager* manager
     = new RunControlMessageManager(db, comm, data, ui_comm,

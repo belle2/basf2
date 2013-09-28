@@ -218,7 +218,14 @@ bool RunControlMessageManager::send(NSMNode* node, const Command& command) throw
     if (id >= 0 && pid > 0) {
       unsigned int pars[256];
       std::string data = "";
-      int npar = node->getParams(command, pars, data);
+      int npar = 0;
+      if (command != Command::START) {
+        npar = node->getParams(command, pars, data);
+      } else {
+        npar = 2;
+        pars[0] = _data_man->getRunStatus()->getExpNumber();
+        pars[1] = _data_man->getRunStatus()->getRunNumber();
+      }
       _comm->sendRequest(node, command, npar, pars, data);
       if (getNodeByID(id) == NULL) addNode(id, node);
       node->setConnection(Connection::ONLINE);

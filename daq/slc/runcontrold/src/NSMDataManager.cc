@@ -46,7 +46,7 @@ bool NSMDataManager::writeRunStatus() throw()
 RunConfig* NSMDataManager::allocateRunConfig() throw()
 {
   if (_config == NULL) {
-    _config = new RunConfig("NODE_CONFIG");
+    _config = new RunConfig("RUN_CONFIG");
     try {
       _config->allocate();
     } catch (const NSMHandlerException& e) {

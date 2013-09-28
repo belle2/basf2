@@ -43,10 +43,16 @@ public class RCServerCommunicator {
 		RunControlMessage msg = new RunControlMessage();
 		_system.getRunControlNode().setConnection(RCConnection.ONLINE);
 		_system.getRunControlNode().setState(RCState.UNKNOWN);
+		_socket_writer.writeObject(new RunControlMessage(RCCommand.STATECHECK));
 		while (true) {
 			_socket_reader.readObject(msg);
 			RCCommand cmd = msg.getCommand();
-			if (cmd.equal(RCCommand.STATE)) {
+			if ( cmd.equal(RCCommand.ERROR) ) {
+				RCNode node = _system.getNodes().get(msg.getParam(0));
+				_main_panel.addLog(new Log("Node " + node.getName()+ " got ERRPR : <br/>" +
+						"<span style='color:red;font-weight:bold;'>" + msg.getData()+"</span>",
+						LogLevel.ERROR));
+			} else if (cmd.equal(RCCommand.OK)) {
 				int id = msg.getParam(0);
 				if (id < 0) {
 					RCState state_org = new RCState(_system.getRunControlNode().getState());
@@ -88,58 +94,42 @@ public class RCServerCommunicator {
 						}
 					}
 				} else {
-					RCNode node;
-					try {
-						node = _system.getNodes().get(id);
-						RCState state_org = new RCState(node.getState());
-						node.setConnection(msg.getParam(1));
-						node.setState(msg.getParam(2));
-						RCState state = node.getState();
-						if (!state.equals(state_org) && _main_panel != null) {
-							if ( state.isError() ) {
-								_main_panel.addLog(new Log("Node " + node.getName()+
-										" got <span style='color:blue;font-weight:bold;'>ERRPR</span> <br/>" +
-										"Message = " + msg.getData() , LogLevel.ERROR));
-							}
+					RCNode node = _system.getNodes().get(id);
+					RCState state_org = new RCState(node.getState());
+					node.setConnection(msg.getParam(1));
+					node.setState(msg.getParam(2));
+					RCState state = node.getState();
+					if (!state.equals(state_org) && _main_panel != null) {
+						if ( state.isError() ) {
+							_main_panel.addLog(new Log("Node " + node.getName()+
+									" got <span style='color:blue;font-weight:bold;'>ERRPR</span> <br/>" +
+									"Message = " + msg.getData() , LogLevel.ERROR));
 						}
-						_main_panel.update();
-					} catch (Exception e) {
-						e.printStackTrace();
 					}
-				}
-			} else if (cmd.equal(RCCommand.SET)) {
-				int flag = msg.getParam(0);
-				if ( flag == RunControlMessage.FLAG_OPERATORS ) {
-					_system.setOperators("'"+msg.getData()+"'");
-					_main_panel.getControlSummaryPanel().getConfigurationPanel().setOperators(msg.getData());
-				} else if ( flag == RunControlMessage.FLAG_RUN_TYPE ) {
-					_system.setRunType(msg.getData());
-				} else {
-					int value = msg.getParam(1);
-					if ( flag == RunControlMessage.FLAG_MODE ) {
-						_system.setOperationMode(value);
-					} else if ( flag == RunControlMessage.FLAG_RUN_VERSION ) {
-						_system.setVersion(value);
-						_main_panel.getControlSummaryPanel().getConfigurationPanel().setVerionCombo(value);
-					} else if ( flag == RunControlMessage.FLAG_RUN_LENGTH ) {
-						_system.setVersion(value);                                                                              
-					} else if ( flag == RunControlMessage.FLAG_EXP_NO ) {
-						_system.setExpNumber(value);
-						_main_panel.getControlSummaryPanel().getStatusPanel().setExpNumber(value);
-					} else if ( flag == RunControlMessage.FLAG_RUN_NO ) {
-						_system.setRunNumber(value);
-						_main_panel.getControlSummaryPanel().getStatusPanel().setRunNumber(value);
-					} else if ( flag == RunControlMessage.FLAG_START_TIME ) {
-						_system.setStartTime(value);
-						_main_panel.getControlSummaryPanel().getStatusPanel().setStartTime(value);
-					} else if ( flag == RunControlMessage.FLAG_END_TIME ) {
-						_system.setEndTime(value);
-						_main_panel.getControlSummaryPanel().getStatusPanel().setEndTime(value);
-					} else if ( flag == RunControlMessage.FLAG_TOTAL_TRIGGER ) {
-						//_system.setTotalTriggers(value);
+					if ( msg.getNParams() > 3 ) {
+						int version = msg.getParam(3);
+						int exp_no = msg.getParam(4);
+						int run_no = msg.getParam(5);
+						int start_time = msg.getParam(6);
+						_system.setVersion(version);
+						_system.setExpNumber(exp_no);
+						_system.setRunNumber(run_no);
+						_system.setStartTime(start_time);
+						if ( msg.getNParams() > 7 ) {
+							int end_time = msg.getParam(7);
+							_system.setEndTime(end_time);
+						}
+						String [] str_v = msg.getData().split("\n");
+						String run_type = str_v[0];
+						if ( str_v.length > 1 ) {
+							String operators = str_v[1];
+							_main_panel.getControlSummaryPanel().getConfigurationPanel().setOperators(operators);
+							_system.setOperators(operators);
+						}
+						_system.setRunType(run_type);
 					}
+					_main_panel.update();
 				}
-				_main_panel.update();
 			}
 		}
 	}
@@ -153,3 +143,4 @@ public class RCServerCommunicator {
 	}
 
 }
+ 

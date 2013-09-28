@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import b2rc.core.COPPERNode;
-import b2rc.core.DataRecieverNode;
+import b2rc.core.RONode;
 import b2rc.core.FEEModule;
 import b2rc.core.FTSW;
 import b2rc.core.HSLB;
@@ -106,7 +106,7 @@ public class RCDBManager {
 			ver_m.put("hslb_ver", results.getInt("hslb_ver"));
 			ver_m.put("ttd_node_ver", results.getInt("ttd_node_ver"));
 			ver_m.put("ftsw_ver", results.getInt("ftsw_ver"));
-			ver_m.put("reciever_node_ver", results.getInt("reciever_node_ver"));
+			ver_m.put("ro_node_ver", results.getInt("ro_node_ver"));
 			for (String label : _system.getModuleLists().keySet()) {
 				ver_m.put(label + "_ver", results.getInt(label + "_ver"));
 			}
@@ -114,7 +114,7 @@ public class RCDBManager {
 			readHostTable(ver_m.get("hosts_ver"));
 			readCOPPERNodeTable(ver_m.get("copper_node_ver"));
 			readHSLBTable(ver_m.get("hslb_ver"));
-			readDataReceiverNodeTable(ver_m.get("reciever_node_ver"));
+			readRONodeTable(ver_m.get("reciever_node_ver"));
 			for (String label : _system.getModuleLists().keySet()) {
 				readFEEModuleTable(label, _system.getModuleLists().get(label), ver_m.get(label + "_ver"));
 			}
@@ -241,15 +241,15 @@ public class RCDBManager {
 		}
 	}
 
-	public synchronized void readDataReceiverNodeTable(int version) throws SQLException {
-		ResultSet results = executeQuery("select * from reciever_node_conf where version = " + version + ";");
+	public synchronized void readRONodeTable(int version) throws SQLException {
+		ResultSet results = executeQuery("select * from ro_node_conf where version = " + version + ";");
 		if ( results == null ) return;
-		ArrayList<DataRecieverNode> node_v = _system.getReceiverNodes();
+		ArrayList<RONode> node_v = _system.getReceiverNodes();
 		ArrayList<COPPERNode> copper_v = _system.getCOPPERNodes();
 		while ( !results.isClosed() && results.next() ) {
 			int id = results.getInt("id");
 			if (id < 0 || id >= (int) node_v.size()) continue;
-			DataRecieverNode node = node_v.get(id);
+			RONode node = node_v.get(id);
 			node.setName(results.getString("name"));
 			node.setUsed(results.getBoolean("used"));
 			node.setScript(results.getString("script"));

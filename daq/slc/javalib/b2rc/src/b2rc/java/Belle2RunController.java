@@ -61,7 +61,6 @@ public class Belle2RunController extends JavaEntoryPoint {
 				}
 			}
 			_loader.load(socket_reader.readString());
-
 			String hostname = socket_reader.readString();
 			String database = socket_reader.readString();
 			String username = socket_reader.readString();

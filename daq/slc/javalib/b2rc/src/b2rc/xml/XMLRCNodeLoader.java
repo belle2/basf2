@@ -16,7 +16,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import b2rc.core.COPPERNode;
-import b2rc.core.DataRecieverNode;
+import b2rc.core.RONode;
 import b2rc.core.DataSender;
 import b2rc.core.FEEModule;
 import b2rc.core.FTSW;
@@ -109,7 +109,7 @@ public class XMLRCNodeLoader {
 				_system.getModules(type).add(module);
 			}
 		}
-		ArrayList<DataRecieverNode> recv_v = _system.getReceiverNodes();
+		ArrayList<RONode> recv_v = _system.getReceiverNodes();
 		for (int i = 0; i < recv_v.size(); i++) {
 			String[] copper_name_v = _copper_name_v.get(i).split(",");
 			recv_v.get(i).clearSenders();
@@ -202,7 +202,7 @@ public class XMLRCNodeLoader {
 		RCNode node = null;
 		String name = el.getAttribute("name");
 		String tag = el.getTagName();
-		if (tag == "copper") {
+		if ( tag == COPPERNode.TAG ) {
 			COPPERNode copper = new COPPERNode();
 			node = copper;
 			copper.setId(_system.getCOPPERNodes().size());
@@ -248,7 +248,7 @@ public class XMLRCNodeLoader {
 			int event_size = (el.hasAttribute("event_size")) ? parseInt(el.getAttribute("event_size")) : -1;
 			copper.getSender().setEventSize(event_size);
 			copper.getSender().setId(copper.getId());
-		} else if (tag == "ttd") {
+		} else if ( tag == TTDNode.TAG ) {
 			TTDNode ttd = new TTDNode();
 			node = ttd;
 			ttd.setId(_system.getTTDNodes().size());
@@ -266,8 +266,8 @@ public class XMLRCNodeLoader {
 					ttd.addFTSW(_ftsw_m.get(product_id));
 				}
 			}
-		} else if (tag == "receiver") {
-			DataRecieverNode recv = new DataRecieverNode();
+		} else if ( tag == RONode.TAG ) {
+			RONode recv = new RONode();
 			node = recv;
 			recv.setId(_system.getReceiverNodes().size());
 			recv.setScript(el.getAttribute("script"));

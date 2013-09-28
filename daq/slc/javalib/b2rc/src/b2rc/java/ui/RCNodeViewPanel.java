@@ -61,17 +61,20 @@ public class RCNodeViewPanel extends JPanel implements Updatable {
 					if (_node.getState().equals(RCState.INITIAL_S)) {
 						command_v.add(RCCommand.BOOT);
 					} else if (_node.getState().equals(RCState.CONFIGURED_S)) {
-						command_v.add(RCCommand.REBOOT);
+						command_v.add(RCCommand.BOOT);
 						command_v.add(RCCommand.LOAD);
 					} else if (_node.getState().equals(RCState.READY_S)) {
-						command_v.add(RCCommand.RELOAD);
+						command_v.add(RCCommand.BOOT);
+						command_v.add(RCCommand.LOAD);
 						command_v.add(RCCommand.START);
 					} else if (_node.getState().equals(RCState.RUNNING_S)) {
 						command_v.add(RCCommand.PAUSE);
+						command_v.add(RCCommand.ABORT);
 					} else if (_node.getState().equals(RCState.PAUSED_S)) {
+						command_v.add(RCCommand.STOP);
 						command_v.add(RCCommand.RESUME);
+						command_v.add(RCCommand.ABORT);
 					}
-					command_v.add(RCCommand.RECOVER);
 					JMenu menu = new JMenu("Command");
 					popup_menu.add(menu);
 					for (RCCommand command : command_v) {

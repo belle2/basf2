@@ -19,7 +19,7 @@ public class RCNodeSystem extends SCObject {
 	private ArrayList<RCNodeGroup> _group_v = new ArrayList<RCNodeGroup>();
 	private ArrayList<TTDNode> _ttd_v = new ArrayList<TTDNode>();
 	private ArrayList<FTSW> _ftsw_v = new ArrayList<FTSW>();
-	private ArrayList<DataRecieverNode> _recv_v = new ArrayList<DataRecieverNode>();
+	private ArrayList<RONode> _recv_v = new ArrayList<RONode>();
 	private ArrayList<COPPERNode> _copper_v = new ArrayList<COPPERNode>();
 	private ArrayList<HSLB> _hslb_v = new ArrayList<HSLB>();
 	private ArrayList<FEEModule> _module_v = new ArrayList<FEEModule>();
@@ -73,7 +73,7 @@ public class RCNodeSystem extends SCObject {
 				ftsw.setVersion(version);
 			}
 		} else if (label == "receiver") {
-			for (DataRecieverNode recv : _recv_v) {
+			for (RONode recv : _recv_v) {
 				recv.setVersion(version);
 			}
 		} else {
@@ -123,7 +123,7 @@ public class RCNodeSystem extends SCObject {
 		return _group_v;
 	}
 
-	public ArrayList<DataRecieverNode> getReceiverNodes() {
+	public ArrayList<RONode> getReceiverNodes() {
 		return _recv_v;
 	}
 
@@ -171,7 +171,7 @@ public class RCNodeSystem extends SCObject {
 		}
 	}
 
-	public void addReceiverNode(DataRecieverNode node) {
+	public void addReceiverNode(RONode node) {
 		_recv_v.add(node);
 	}
 

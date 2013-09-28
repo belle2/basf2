@@ -61,7 +61,7 @@ public class EditorMainPanel extends JPanel implements Updatable {
 		FTSWParameterTablePanel ftsw_panel = new FTSWParameterTablePanel(this, _version_panel, _system, ttd_panel);
 		addPanel(copper_panel);
 		addPanel(ttd_panel);
-		addPanel(new DataRecieverParameterTablePanel(this, _version_panel, _system));
+		addPanel(new ROParameterTablePanel(this, _version_panel, _system));
 		addPanel(hslb_panel);
 		addPanel(ftsw_panel);
 		for (String label : _system.getModuleLists().keySet()) {

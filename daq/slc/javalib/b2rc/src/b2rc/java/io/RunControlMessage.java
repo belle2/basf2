@@ -7,17 +7,6 @@ import b2rc.core.RCCommand;
 
 public class RunControlMessage implements SerializableObject {
 
-	static final public int FLAG_MODE = 101;
-	static final public int FLAG_OPERATORS = 102;
-	static final public int FLAG_RUN_TYPE = 103;
-	static final public int FLAG_RUN_VERSION = 104;
-	static final public int FLAG_RUN_LENGTH = 105;
-	static final public int FLAG_EXP_NO = 201;
-	static final public int FLAG_RUN_NO = 202;
-	static final public int FLAG_START_TIME = 203;
-	static final public int FLAG_END_TIME = 204;
-	static final public int FLAG_TOTAL_TRIGGER = 301;
-	
 	private RCCommand _command = new RCCommand();
 	private int[] _pars = new int [0];
 	private String _data = "";
@@ -39,6 +28,13 @@ public class RunControlMessage implements SerializableObject {
 		_command.copy(cmd);
 		_pars = pars;
 		_data = data;
+	}
+
+	public RunControlMessage(RCCommand cmd, int value) {
+		_command.copy(cmd);
+		_pars = new int [1];
+		_pars[0] = value;
+		_data = "";
 	}
 
 	public RunControlMessage(RCCommand cmd, int flag, int value) {

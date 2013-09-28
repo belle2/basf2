@@ -35,7 +35,7 @@ public class SystemButtonPanel extends JPanel implements Updatable {
 	private RCCommand _boot_command = new RCCommand(RCCommand.BOOT);
 	private RCCommand _load_command = new RCCommand(RCCommand.LOAD);
 	private RCCommand _start_command = new RCCommand(RCCommand.START);
-	private RCCommand _recover_command = new RCCommand(RCCommand.RECOVER);
+	private RCCommand _recover_command = new RCCommand(RCCommand.ABORT);
 
 	private void setGrid(GridBagConstraints gbc, int gridwidth, int gridheight,
 			int gridx, int gridy, double weightx, double weighty, int fill,
@@ -65,22 +65,16 @@ public class SystemButtonPanel extends JPanel implements Updatable {
 		public void actionPerformed(ActionEvent arg0) {
 			RCServerCommunicator com = RCServerCommunicator.get();
 			try {
-				if ( _command.equals(RCCommand.BOOT) || _command.equals(RCCommand.REBOOT) ||
-						_command.equals(RCCommand.LOAD) || _command.equals(RCCommand.RELOAD) ) {
-					if ( _command.equals(RCCommand.LOAD) || _command.equals(RCCommand.RELOAD) ) {
-						com.sendMessage(new RunControlMessage(RCCommand.SET, 
-								RunControlMessage.FLAG_MODE, _system.getOperationMode()));
-						com.sendMessage(new RunControlMessage(RCCommand.SET, 
-								RunControlMessage.FLAG_OPERATORS, _system.getOperators()));
-						com.sendMessage(new RunControlMessage(RCCommand.SET, 
-								RunControlMessage.FLAG_RUN_TYPE, _system.getRunType()));
-						//com.sendMessage(new RunControlMessage(RCCommand.SET, 
-						//		RunControlMessage.FLAG_EXP_NO, _system.getVersion()));
-					}
-					com.sendMessage(new RunControlMessage(RCCommand.SET, 
-							RunControlMessage.FLAG_RUN_VERSION, _system.getVersion()));
+				if ( _command.equals(RCCommand.BOOT) ||
+					_command.equals(RCCommand.LOAD) ) {
+					int [] pars = new int [2];
+					pars[0] = -1;
+					pars[1] = _system.getVersion();
+					String data = _system.getOperators();
+					com.sendMessage(new RunControlMessage(_command, pars, data));
+				} else {
+					com.sendMessage(new RunControlMessage(_command));
 				}
-				com.sendMessage(new RunControlMessage(_command));
 				com.getControlPanel().addLog(new Log("Pushed command: "+ _command.getAlias(), LogLevel.INFO));
 			} catch (Exception e) {
 				com.getControlPanel().addLog(new Log("Failed to send command", LogLevel.ERROR));
@@ -143,25 +137,24 @@ public class SystemButtonPanel extends JPanel implements Updatable {
 			_boot_command.copy(RCCommand.BOOT);
 			_load_command.copy(RCCommand.LOAD);
 			_start_command.copy(RCCommand.START);
-			_recover_command.copy(RCCommand.RECOVER);
 		} else if ( state.equals(RCState.CONFIGURED_S) ){
-			_boot_command.copy(RCCommand.REBOOT);
+			_boot_command.copy(RCCommand.BOOT);
 			_load_command.copy(RCCommand.LOAD);
 			_start_command.copy(RCCommand.START);
-			_recover_command.copy(RCCommand.RECOVER);
+			_recover_command.copy(RCCommand.ABORT);
 		} else if ( state.equals(RCState.READY_S) ){
-			_boot_command.copy(RCCommand.REBOOT);
-			_load_command.copy(RCCommand.RELOAD);
+			_boot_command.copy(RCCommand.BOOT);
+			_load_command.copy(RCCommand.LOAD);
 			_start_command.copy(RCCommand.START);
-			_recover_command.copy(RCCommand.RECOVER);
+			_recover_command.copy(RCCommand.ABORT);
 		} else if ( state.equals(RCState.RUNNING_S) ){
-			_boot_command.copy(RCCommand.REBOOT);
-			_load_command.copy(RCCommand.RELOAD);
+			_boot_command.copy(RCCommand.BOOT);
+			_load_command.copy(RCCommand.LOAD);
 			_start_command.copy(RCCommand.STOP);
-			_recover_command.copy(RCCommand.RECOVER);
+			_recover_command.copy(RCCommand.ABORT);
 		} else if ( state.equals(RCState.FATAL_ES) ){
-			_boot_command.copy(RCCommand.REBOOT);
-			_load_command.copy(RCCommand.RELOAD);
+			_boot_command.copy(RCCommand.BOOT);
+			_load_command.copy(RCCommand.LOAD);
 			_start_command.copy(RCCommand.STOP);
 			_recover_command.copy(RCCommand.ABORT);
 		}

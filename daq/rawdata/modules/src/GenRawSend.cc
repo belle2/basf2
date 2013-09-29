@@ -33,7 +33,6 @@ GenRawSendModule::GenRawSendModule() : Module()
   printf("GenRawSendModule: Constructor called \n");
 
   m_buffer = NULL;
-  m_size = 0;
   m_nevt = 0;
   //Parameter definition
   addParam("EventDataBufferWords", BUF_SIZE_WORD, "DataBuffer words per event", 4800);

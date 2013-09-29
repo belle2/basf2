@@ -39,9 +39,12 @@ receiver.param('HostNameFrom', ['localhost', 'cpr007'])
 receiver.param('PortFrom', [35000, 36000])
 # receiver.param('PortFrom', [33000, 33000])
 receiver.param('EventDataBufferWords', 4801)
-receiver.param('MaxTime', 30.)
-receiver.param('MaxEventNum', 400000)
-receiver.param('UseShmFlag', 0)
+# receiver.param('MaxTime', 30.)
+receiver.param('MaxTime', -1.)
+# receiver.param('MaxEventNum', 400000)
+receiver.param('MaxEventNum', -1)
+use_shm_flag = 0
+receiver.param('UseShmFlag', use_shm_flag)
 # receiver.param('DumpFileName', 'cpr006_dump.dat')
 
 # Histo Module
@@ -51,6 +54,7 @@ histo = register_module('DqmHistoManager')
 histo.param('HostName', 'ropc01')
 histo.param('Port', 9991)
 histo.param('DumpInterval', 10)
+histo.param('HistoFileName', 'ropc_histofile.root')
 
 # Monitor module
 monitor = register_module('MonitorDataCOPPER')
@@ -69,8 +73,10 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(receiver)
-main.add_module(histo)
-main.add_module(monitor)
+
+if use_shm_flag != 0:
+    main.add_module(histo)
+    main.add_module(monitor)
 main.add_module(dump)
 # main.add_module(output)
 # main.add_module(perf)

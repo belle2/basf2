@@ -34,8 +34,6 @@ DeSerializerModule::DeSerializerModule() : Module()
   addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);
   addParam("UseShmFlag", m_shmflag, "Use shared memory to communicate with Runcontroller", 0);
 
-  printf("BBBBBBBBBBBASE  shmflag %d #################3\n", m_shmflag);
-
   n_basf2evt = -1;
   m_totbytes = 0;
   m_compressionLevel = 0;

@@ -38,13 +38,13 @@ DeSerializerCOPPERModule::DeSerializerCOPPERModule() : DeSerializerModule()
 {
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
+
   //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
   addParam("FinnesseBitFlag", finnesse_bit_flag, "finnese (A,B,C,D) -> bit (0,1,2,3)", 15);
 
   //Parameter definition
   B2INFO("DeSerializerCOPPER: Constructor done.");
 
-  printf("shmflag %d #################3\n", m_shmflag);
 }
 
 
@@ -127,7 +127,6 @@ void DeSerializerCOPPERModule::initialize()
     ShmOpen("/cpr_config", "/cpr_status");
     m_cfg_buf = ShmGet(m_shmfd_cfg, 4);
     m_cfg_sta = ShmGet(m_shmfd_sta, 4);
-    printf("Waiting for Start %d %d %p %p\n", m_shmfd_cfg, m_shmfd_sta, m_cfg_sta, m_cfg_buf);
   }
 
 
@@ -339,9 +338,8 @@ void DeSerializerCOPPERModule::event()
     // Use shared memory to start(for HSLB dummy data)
     if (m_shmflag != 0) {
       //      int* cfg_buf = ShmGet(m_shmfd_cfg, 4);
-      printf("Waiting for Start %p\n", m_cfg_buf);
+      printf("Waiting for Start...\n");
       fflush(stdout);
-
       while (1) {
         if (m_cfg_buf[0] == 1)break;
         usleep(10000);

@@ -34,20 +34,16 @@ REG_MODULE(Serializer)
 SerializerModule::SerializerModule() : Module()
 {
   //Set module properties
-
   setDescription("Encode DataStore into RingBuffer");
   addParam("DestPort", m_port_to, "Destination port", BASE_PORT_ROPC_COPPER);
-
   addParam("ProcessMethod", p_method, "Process method", string("COPPER"));
-
   addParam("LocalHostName", m_hostname_local, "local host", string(""));
-
 #ifdef DUMMY
   addParam("EventDataBufferWords", BUF_SIZE_WORD, "DataBuffer words per event", 4800);
 #endif
+
   n_basf2evt = -1;
   m_compressionLevel = 0;
-
   //Parameter definition
   B2INFO("Tx: Constructor done.");
 }

@@ -34,7 +34,8 @@ set_log_level(LogLevel.INFO)
 reader = register_module('DeSerializerCOPPER')
 reader.param('NodeID', int(argvs[2]))
 reader.param('FinnesseBitFlag', int(argvs[3]))
-reader.param('UseShmFlag', 0)
+use_shm_flag = 0
+reader.param('UseShmFlag', use_shm_flag)
 # reader.param('DumpFileName', 'COPPERdump.dat' )
 
 # Histo Module
@@ -44,6 +45,8 @@ histo = register_module('DqmHistoManager')
 histo.param('HostName', 'ropc01')
 histo.param('Port', 9991)
 histo.param('DumpInterval', 10)
+
+histo.param('HistoFileName', 'histo_file_'.join([argvs[1], '.root']))
 
 # Monitor module
 monitor = register_module('MonitorDataCOPPER')
@@ -60,8 +63,9 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(reader)
-main.add_module(histo)
-main.add_module(monitor)
+if use_shm_flag != 0:
+    main.add_module(histo)
+    main.add_module(monitor)
 main.add_module(sender)
 
 # Process all events

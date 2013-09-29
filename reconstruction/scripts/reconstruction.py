@@ -9,6 +9,11 @@ def add_posttracking_reconstruction(path, components=None):
     This function adds the standard reconstruction modules after tracking to a path.
     """
 
+    # track extrapolation
+    if components == None or 'CDC' in components and 'ECL' in components:
+        ext = register_module('Ext')
+        path.add_module(ext)
+
     # TOP reconstruction
     if components == None or 'TOP' in components:
         top_rec = register_module('TOPReconstructor')
@@ -55,6 +60,11 @@ def add_posttracking_reconstruction(path, components=None):
     if components == None or 'BKLM' in components:
         bklm_rec = register_module('BKLMReconstructor')
         path.add_module(bklm_rec)
+
+    # muon identification
+    if components == None or 'BKLM' in components and 'EKLM' in components:
+        muid = register_module('Muid')
+        path.add_module(muid)
 
     # charged particle PID
     if components == None or 'PXD' in components or 'SVD' in components \
@@ -119,16 +129,6 @@ def add_reconstruction(path, components=None):
             dEdxPID.param('useCDC', False)
         path.add_module(dEdxPID)
 
-        # track extrapolation
-        if components == None or 'CDC' in components and 'ECL' in components:
-            ext = register_module('Ext')
-            path.add_module(ext)
-
-        # muon identification
-        if components == None or 'BKLM' in components and 'EKLM' in components:
-            muid = register_module('Muid')
-            path.add_module(muid)
-
     # add further reconstruction modules
     add_posttracking_reconstruction(path, components)
 
@@ -164,16 +164,6 @@ def add_mc_reconstruction(path, components=None):
             dEdxPID.param('useCDC', False)
         path.add_module(dEdxPID)
 
-        # track extrapolation
-        if components == None or 'CDC' in components and 'ECL' in components:
-            ext = register_module('Ext')
-            path.add_module(ext)
-
-        # muon identification
-        if components == None or 'BKLM' in components and 'EKLM' in components:
-            muid = register_module('Muid')
-            path.add_module(muid)
-
     # add further reconstruction modules
     add_posttracking_reconstruction(path, components)
 
@@ -196,6 +186,7 @@ def add_mdst_output(path, mc=True, filename='mdst.root'):
         'ECLPi0s',
         'ECLPi0sToECLGammas',
         'EKLMK0Ls',
+        'MuidLikelihoods',
         ]
     if mc:
         branches += ['MCParticles', 'MCParticlesToTracks',

@@ -16,14 +16,13 @@
 
 namespace Belle2 {
 
-  /**
-   * Standalone physics list for the geant4e extrapolator.
-   * This is used only if the simulation module is not present; otherwise,
-   * the simulation's physics list (which contains this) is used.
-   */
-
   namespace Simulation {
 
+    /**
+     * Standalone physics list for the geant4e extrapolator.
+     * This is used only if the simulation module is not present; otherwise,
+     * the simulation's physics list (which contains this) is used.
+     */
     class ExtPhysicsList: public G4VModularPhysicsList {
 
     public:

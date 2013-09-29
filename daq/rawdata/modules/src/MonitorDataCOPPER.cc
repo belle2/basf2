@@ -84,6 +84,8 @@ void MonitorDataCOPPERModule::terminate()
 
 void MonitorDataCOPPERModule::event()
 {
+
+
   h_nevt->Fill((float)m_nevt);
   StoreArray<RawCOPPER> rawcprarray;
 
@@ -120,5 +122,8 @@ void MonitorDataCOPPERModule::event()
     }
   }
   m_nevt++;
+  if (m_nevt % 1000 == 0) {
+    printf("m_nevt = %d\n", m_nevt);
 
+  }
 }

@@ -1,7 +1,7 @@
-cmd_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o := /usr/bin/gcc -Wp,-MD,/home/usr/yamadas/daq/cprdist-0.1.0/drv/.copper.mod.o.d  -nostdinc -isystem /usr/lib/gcc/i386-redhat-linux/4.1.2/include -D__KERNEL__ -Iinclude  -include include/linux/autoconf.h  -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -Wstrict-prototypes -Wundef -Werror-implicit-function-declaration -fno-delete-null-pointer-checks -fwrapv -Os -pipe -msoft-float -fno-builtin-sprintf -fno-builtin-log2 -fno-builtin-puts  -mpreferred-stack-boundary=2  -march=i686 -mtune=generic -mtune=generic -mregparm=3 -ffreestanding -Iinclude/asm-i386/mach-generic -Iinclude/asm-i386/mach-default -fomit-frame-pointer -g  -fno-stack-protector -Wdeclaration-after-statement -Wno-pointer-sign    -D"KBUILD_STR(s)=\#s" -D"KBUILD_BASENAME=KBUILD_STR(copper.mod)"  -D"KBUILD_MODNAME=KBUILD_STR(copper)" -DMODULE -c -o /home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o /home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.c
+cmd_/home/usr/yamadas/basf2/release/daq/copper/driver/cprdist-0.1.0/drv/copper.mod.o := /usr/bin/gcc -Wp,-MD,/home/usr/yamadas/basf2/release/daq/copper/driver/cprdist-0.1.0/drv/.copper.mod.o.d  -nostdinc -isystem /usr/lib/gcc/i386-redhat-linux/4.1.2/include -D__KERNEL__ -Iinclude  -include include/linux/autoconf.h -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -O2 -pipe -msoft-float -mpreferred-stack-boundary=2  -march=i686 -mtune=generic -mregparm=3 -ffreestanding -Iinclude/asm-i386/mach-generic -Iinclude/asm-i386/mach-default -fomit-frame-pointer -g  -fno-stack-protector -Wdeclaration-after-statement -Wno-pointer-sign    -D"KBUILD_STR(s)=\#s" -D"KBUILD_BASENAME=KBUILD_STR(copper.mod)"  -D"KBUILD_MODNAME=KBUILD_STR(copper)" -DMODULE -c -o /home/usr/yamadas/basf2/release/daq/copper/driver/cprdist-0.1.0/drv/copper.mod.o /home/usr/yamadas/basf2/release/daq/copper/driver/cprdist-0.1.0/drv/copper.mod.c
 
-deps_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o := \
-  /home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.c \
+deps_/home/usr/yamadas/basf2/release/daq/copper/driver/cprdist-0.1.0/drv/copper.mod.o := \
+  /home/usr/yamadas/basf2/release/daq/copper/driver/cprdist-0.1.0/drv/copper.mod.c \
     $(wildcard include/config/module/unload.h) \
   include/linux/module.h \
     $(wildcard include/config/modules.h) \
@@ -10,27 +10,21 @@ deps_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o := \
     $(wildcard include/config/kallsyms.h) \
   include/linux/sched.h \
     $(wildcard include/config/detect/softlockup.h) \
-    $(wildcard include/config/detect/hung/task.h) \
     $(wildcard include/config/split/ptlock/cpus.h) \
-    $(wildcard include/config/mmu/notifier.h) \
     $(wildcard include/config/keys.h) \
     $(wildcard include/config/bsd/process/acct.h) \
     $(wildcard include/config/taskstats.h) \
-    $(wildcard include/config/audit.h) \
     $(wildcard include/config/inotify/user.h) \
     $(wildcard include/config/schedstats.h) \
     $(wildcard include/config/task/delay/acct.h) \
     $(wildcard include/config/smp.h) \
-    $(wildcard include/config/utrace.h) \
     $(wildcard include/config/rt/mutexes.h) \
     $(wildcard include/config/debug/mutexes.h) \
     $(wildcard include/config/trace/irqflags.h) \
     $(wildcard include/config/lockdep.h) \
-    $(wildcard include/config/task/xacct.h) \
     $(wildcard include/config/numa.h) \
     $(wildcard include/config/cpusets.h) \
     $(wildcard include/config/compat.h) \
-    $(wildcard include/config/ptrace.h) \
     $(wildcard include/config/hotplug/cpu.h) \
     $(wildcard include/config/preempt.h) \
     $(wildcard include/config/pm.h) \
@@ -58,7 +52,6 @@ deps_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o := \
     $(wildcard include/config/debug/lock/alloc.h) \
   include/linux/preempt.h \
     $(wildcard include/config/debug/preempt.h) \
-    $(wildcard include/config/preempt/notifiers.h) \
   include/linux/thread_info.h \
   include/linux/bitops.h \
   include/asm/bitops.h \
@@ -83,6 +76,7 @@ deps_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o := \
     $(wildcard include/config/hugetlb/page.h) \
     $(wildcard include/config/highmem4g.h) \
     $(wildcard include/config/page/offset.h) \
+    $(wildcard include/config/physical/start.h) \
     $(wildcard include/config/flatmem.h) \
   include/asm-generic/memory_model.h \
     $(wildcard include/config/discontigmem.h) \
@@ -112,9 +106,6 @@ deps_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o := \
   include/linux/linkage.h \
   include/asm/linkage.h \
     $(wildcard include/config/x86/alignment/16.h) \
-  include/linux/log2.h \
-    $(wildcard include/config/arch/has/ilog2/u32.h) \
-    $(wildcard include/config/arch/has/ilog2/u64.h) \
   include/asm/bug.h \
     $(wildcard include/config/bug.h) \
     $(wildcard include/config/debug/bugverbose.h) \
@@ -135,21 +126,19 @@ deps_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o := \
   include/linux/bitmap.h \
   include/linux/string.h \
   include/asm/string.h \
-  include/linux/list.h \
-    $(wildcard include/config/debug/list.h) \
-  include/linux/poison.h \
-  include/linux/prefetch.h \
   include/linux/stringify.h \
   include/linux/spinlock_types.h \
-  include/asm/spinlock_types.h \
   include/linux/lockdep.h \
-    $(wildcard include/config/lock/stat.h) \
     $(wildcard include/config/generic/hardirqs.h) \
     $(wildcard include/config/prove/locking.h) \
+  include/linux/list.h \
+  include/linux/poison.h \
+  include/linux/prefetch.h \
   include/linux/debug_locks.h \
     $(wildcard include/config/debug/locking/api/selftests.h) \
   include/linux/stacktrace.h \
     $(wildcard include/config/stacktrace.h) \
+  include/asm/spinlock_types.h \
   include/asm/spinlock.h \
     $(wildcard include/config/x86/ppro/fence.h) \
   include/asm/atomic.h \
@@ -167,8 +156,9 @@ deps_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o := \
   include/asm/tsc.h \
     $(wildcard include/config/x86/tsc.h) \
     $(wildcard include/config/x86/generic.h) \
+  include/linux/config.h \
+    $(wildcard include/config/h.h) \
   include/linux/jiffies.h \
-    $(wildcard include/config/tick/divider.h) \
   include/linux/calc64.h \
   include/asm/div64.h \
   include/linux/rbtree.h \
@@ -211,7 +201,6 @@ deps_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o := \
   include/asm-i386/mach-generic/mach_mpspec.h \
   include/asm/io_apic.h \
     $(wildcard include/config/pci/msi.h) \
-    $(wildcard include/config/xen.h) \
   include/asm/apic.h \
     $(wildcard include/config/x86/good/apic.h) \
   include/linux/pm.h \
@@ -247,7 +236,6 @@ deps_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o := \
     $(wildcard include/config/need/multiple/nodes.h) \
     $(wildcard include/config/have/arch/early/pfn/to/nid.h) \
     $(wildcard include/config/sparsemem/extreme.h) \
-    $(wildcard include/config/nodes/span/other/nodes.h) \
   include/linux/init.h \
     $(wildcard include/config/hotplug.h) \
     $(wildcard include/config/acpi/hotplug/memory.h) \
@@ -262,7 +250,6 @@ deps_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o := \
   include/asm/topology.h \
   include/asm-generic/topology.h \
   include/linux/kmalloc_sizes.h \
-    $(wildcard include/config/ppc/64k/pages.h) \
     $(wildcard include/config/mmu.h) \
     $(wildcard include/config/large/allocs.h) \
   include/linux/seccomp.h \
@@ -282,8 +269,6 @@ deps_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o := \
     $(wildcard include/config/no/idle/hz.h) \
   include/linux/ktime.h \
     $(wildcard include/config/ktime/scalar.h) \
-  include/linux/task_io_accounting.h \
-    $(wildcard include/config/task/io/accounting.h) \
   include/linux/aio.h \
   include/linux/workqueue.h \
   include/linux/aio_abi.h \
@@ -305,10 +290,6 @@ deps_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o := \
   include/asm/desc.h \
   include/asm/ldt.h \
   include/linux/moduleparam.h \
-  include/linux/tracepoint.h \
-    $(wildcard include/config/tracepoints.h) \
-  include/linux/marker.h \
-    $(wildcard include/config/markers.h) \
   include/asm/local.h \
   include/asm/module.h \
     $(wildcard include/config/m486.h) \
@@ -334,6 +315,6 @@ deps_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o := \
   include/linux/vermagic.h \
   include/linux/utsrelease.h \
 
-/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o: $(deps_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o)
+/home/usr/yamadas/basf2/release/daq/copper/driver/cprdist-0.1.0/drv/copper.mod.o: $(deps_/home/usr/yamadas/basf2/release/daq/copper/driver/cprdist-0.1.0/drv/copper.mod.o)
 
-$(deps_/home/usr/yamadas/daq/cprdist-0.1.0/drv/copper.mod.o):
+$(deps_/home/usr/yamadas/basf2/release/daq/copper/driver/cprdist-0.1.0/drv/copper.mod.o):
